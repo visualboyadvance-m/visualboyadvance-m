@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-04 04:47+0000\n"
-"PO-Revision-Date: 2019-08-03 02:07+0000\n"
-"Last-Translator: Xuntao Chi <1139954766@qq.com>\n"
+"POT-Creation-Date: 2019-08-18 18:59+0000\n"
+"PO-Revision-Date: 2019-08-18 18:59+0000\n"
+"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/bgk/vba-m/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,7 +24,7 @@ msgstr ""
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../src/wx/cmdevents.cpp:102
+#: ../src/wx/cmdevents.cpp:105
 msgid ""
 "GameBoy Advance Files "
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy"
@@ -32,308 +32,308 @@ msgid ""
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "GBA 文件\n(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GB文件\n(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: ../src/wx/cmdevents.cpp:114
+#: ../src/wx/cmdevents.cpp:117
 msgid "Open ROM file"
 msgstr "打开 ROM 文件"
 
-#: ../src/wx/cmdevents.cpp:131
+#: ../src/wx/cmdevents.cpp:134
 msgid ""
 "GameBoy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "GB 文件 (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: ../src/wx/cmdevents.cpp:138
+#: ../src/wx/cmdevents.cpp:141
 msgid "Open GB ROM file"
 msgstr "打开 GB ROM 文件"
 
-#: ../src/wx/cmdevents.cpp:155
+#: ../src/wx/cmdevents.cpp:158
 msgid ""
 "GameBoy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "GBC 文件\n(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: ../src/wx/cmdevents.cpp:162
+#: ../src/wx/cmdevents.cpp:165
 msgid "Open GBC ROM file"
 msgstr "打开 GBC ROM 文件"
 
-#: ../src/wx/cmdevents.cpp:558 ../src/wx/cmdevents.cpp:674
-#: ../src/wx/cmdevents.cpp:713 ../src/wx/cmdevents.cpp:786
+#: ../src/wx/cmdevents.cpp:564 ../src/wx/cmdevents.cpp:680
+#: ../src/wx/cmdevents.cpp:719 ../src/wx/cmdevents.cpp:792
 msgid "Unknown"
 msgstr "未知"
 
-#: ../src/wx/cmdevents.cpp:566
+#: ../src/wx/cmdevents.cpp:572
 msgid "ROM"
 msgstr "ROM"
 
-#: ../src/wx/cmdevents.cpp:570
+#: ../src/wx/cmdevents.cpp:576
 msgid "ROM+MBC1"
 msgstr "ROM+MBC1"
 
-#: ../src/wx/cmdevents.cpp:574
+#: ../src/wx/cmdevents.cpp:580
 msgid "ROM+MBC1+RAM"
 msgstr "ROM+MBC1+RAM"
 
-#: ../src/wx/cmdevents.cpp:578
+#: ../src/wx/cmdevents.cpp:584
 msgid "ROM+MBC1+RAM+BATT"
 msgstr "ROM+MBC1+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:582
+#: ../src/wx/cmdevents.cpp:588
 msgid "ROM+MBC2"
 msgstr "ROM+MBC2"
 
-#: ../src/wx/cmdevents.cpp:586
+#: ../src/wx/cmdevents.cpp:592
 msgid "ROM+MBC2+BATT"
 msgstr "ROM+MBC2+BATT"
 
-#: ../src/wx/cmdevents.cpp:590
+#: ../src/wx/cmdevents.cpp:596
 msgid "ROM+MMM01"
 msgstr "ROM+MMM01"
 
-#: ../src/wx/cmdevents.cpp:594
+#: ../src/wx/cmdevents.cpp:600
 msgid "ROM+MMM01+RAM"
 msgstr "ROM+MMM01+RAM"
 
-#: ../src/wx/cmdevents.cpp:598
+#: ../src/wx/cmdevents.cpp:604
 msgid "ROM+MMM01+RAM+BATT"
 msgstr "ROM+MMM01+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:602
+#: ../src/wx/cmdevents.cpp:608
 msgid "ROM+MBC3+TIMER+BATT"
 msgstr "ROM+MBC3+TIMER+BATT"
 
-#: ../src/wx/cmdevents.cpp:606
+#: ../src/wx/cmdevents.cpp:612
 msgid "ROM+MBC3+TIMER+RAM+BATT"
 msgstr "ROM+MBC3+TIMER+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:610
+#: ../src/wx/cmdevents.cpp:616
 msgid "ROM+MBC3"
 msgstr "ROM+MBC3"
 
-#: ../src/wx/cmdevents.cpp:614
+#: ../src/wx/cmdevents.cpp:620
 msgid "ROM+MBC3+RAM"
 msgstr "ROM+MBC3+RAM"
 
-#: ../src/wx/cmdevents.cpp:618
+#: ../src/wx/cmdevents.cpp:624
 msgid "ROM+MBC3+RAM+BATT"
 msgstr "ROM+MBC3+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:622
+#: ../src/wx/cmdevents.cpp:628
 msgid "ROM+MBC5"
 msgstr "ROM+MBC5"
 
-#: ../src/wx/cmdevents.cpp:626
+#: ../src/wx/cmdevents.cpp:632
 msgid "ROM+MBC5+RAM"
 msgstr "ROM+MBC5+RAM"
 
-#: ../src/wx/cmdevents.cpp:630
+#: ../src/wx/cmdevents.cpp:636
 msgid "ROM+MBC5+RAM+BATT"
 msgstr "ROM+MBC5+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:634
+#: ../src/wx/cmdevents.cpp:640
 msgid "ROM+MBC5+RUMBLE"
 msgstr "ROM+MBC5+RUMBLE"
 
-#: ../src/wx/cmdevents.cpp:638
+#: ../src/wx/cmdevents.cpp:644
 msgid "ROM+MBC5+RUMBLE+RAM"
 msgstr "ROM+MBC5+RUMBLE+RAM"
 
-#: ../src/wx/cmdevents.cpp:642
+#: ../src/wx/cmdevents.cpp:648
 msgid "ROM+MBC5+RUMBLE+RAM+BATT"
 msgstr "ROM+MBC5+RUMBLE+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:646
+#: ../src/wx/cmdevents.cpp:652
 msgid "ROM+MBC7+BATT"
 msgstr "ROM+MBC7+BATT"
 
-#: ../src/wx/cmdevents.cpp:650 ../src/wx/guiinit.cpp:734
+#: ../src/wx/cmdevents.cpp:656 ../src/wx/guiinit.cpp:734
 msgid "GameGenie"
 msgstr "GameGenie"
 
-#: ../src/wx/cmdevents.cpp:654
+#: ../src/wx/cmdevents.cpp:660
 msgid "GameShark V3.0"
 msgstr "GameShark V3.0"
 
-#: ../src/wx/cmdevents.cpp:658
+#: ../src/wx/cmdevents.cpp:664
 msgid "ROM+POCKET CAMERA"
 msgstr "ROM+POCKET CAMERA"
 
-#: ../src/wx/cmdevents.cpp:662
+#: ../src/wx/cmdevents.cpp:668
 msgid "ROM+BANDAI TAMA5"
 msgstr "ROM+BANDAI TAMA5"
 
-#: ../src/wx/cmdevents.cpp:666
+#: ../src/wx/cmdevents.cpp:672
 msgid "ROM+HuC-3"
 msgstr "ROM+HuC-3"
 
-#: ../src/wx/cmdevents.cpp:670
+#: ../src/wx/cmdevents.cpp:676
 msgid "ROM+HuC-1"
 msgstr "ROM+HuC-1"
 
-#: ../src/wx/cmdevents.cpp:720 ../src/wx/guiinit.cpp:1814
+#: ../src/wx/cmdevents.cpp:726 ../src/wx/guiinit.cpp:1826
 #: ../src/wx/xrc/DisplayConfig.xrc:85 ../src/wx/xrc/DisplayConfig.xrc:135
 #: ../src/wx/xrc/DisplayConfig.xrc:221
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:32
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:183
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:204
 #: ../src/wx/xrc/GeneralConfig.xrc:152 ../src/wx/xrc/SoundConfig.xrc:219
 #: ../src/wx/xrc/SoundConfig.xrc:309 ../src/wx/xrc/SpeedupConfig.xrc:45
 #: ../src/wx/xrc/SpeedupConfig.xrc:120
 msgid "None"
 msgstr "无"
 
-#: ../src/wx/cmdevents.cpp:819 ../src/wx/cmdevents.cpp:835
+#: ../src/wx/cmdevents.cpp:825 ../src/wx/cmdevents.cpp:841
 msgid "Select Dot Code file"
 msgstr "选择点代码文件"
 
-#: ../src/wx/cmdevents.cpp:821 ../src/wx/cmdevents.cpp:837
+#: ../src/wx/cmdevents.cpp:827 ../src/wx/cmdevents.cpp:843
 msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 msgstr "电子阅读器点代码 (*.bin;*.raw)|*.bin;*.raw"
 
-#: ../src/wx/cmdevents.cpp:856 ../src/wx/cmdevents.cpp:1051
+#: ../src/wx/cmdevents.cpp:862 ../src/wx/cmdevents.cpp:1057
 msgid "Select battery file"
 msgstr "选择电池文件"
 
-#: ../src/wx/cmdevents.cpp:857 ../src/wx/cmdevents.cpp:1052
+#: ../src/wx/cmdevents.cpp:863 ../src/wx/cmdevents.cpp:1058
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "电池文件 (*.sav)|*.sav|记忆文件(*.dat)|*.dat"
 
-#: ../src/wx/cmdevents.cpp:865
+#: ../src/wx/cmdevents.cpp:871
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
 msgstr "导入电池文件将删除之前保存的游戏进度 (直到下次写入前)。你确定要继续吗？"
 
-#: ../src/wx/cmdevents.cpp:866 ../src/wx/cmdevents.cpp:894
-#: ../src/wx/cmdevents.cpp:1014
+#: ../src/wx/cmdevents.cpp:872 ../src/wx/cmdevents.cpp:900
+#: ../src/wx/cmdevents.cpp:1020
 msgid "Confirm import"
 msgstr "确认导入"
 
-#: ../src/wx/cmdevents.cpp:872 ../src/wx/panel.cpp:344
+#: ../src/wx/cmdevents.cpp:878 ../src/wx/panel.cpp:344
 #, c-format
 msgid "Loaded battery %s"
 msgstr "读取电池 %s"
 
-#: ../src/wx/cmdevents.cpp:874
+#: ../src/wx/cmdevents.cpp:880
 #, c-format
 msgid "Error loading battery %s"
 msgstr "读取电池错误 %s"
 
-#: ../src/wx/cmdevents.cpp:883
+#: ../src/wx/cmdevents.cpp:889
 msgid "Select code file"
 msgstr "选择代码文件"
 
-#: ../src/wx/cmdevents.cpp:884
+#: ../src/wx/cmdevents.cpp:890
 msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
 msgstr "Gameshark  代码文件 (*.spc;*.xpc)|*.spc;*.xpc"
 
-#: ../src/wx/cmdevents.cpp:884
+#: ../src/wx/cmdevents.cpp:890
 msgid "Gameshark Code File (*.gcf)|*.gcf"
 msgstr "Gameshark 代码文件 (*.gcf)|*.gcf"
 
-#: ../src/wx/cmdevents.cpp:893
+#: ../src/wx/cmdevents.cpp:899
 msgid ""
 "Importing a code file will replace any loaded cheats.  Do you want to "
 "continue?"
 msgstr "导入代码将会重置之前已经读取的所有金手指代码。你确定要继续吗？"
 
-#: ../src/wx/cmdevents.cpp:910
+#: ../src/wx/cmdevents.cpp:916
 #, c-format
 msgid "Cannot open file %s"
 msgstr "无法打开文件 %s"
 
-#: ../src/wx/cmdevents.cpp:920
+#: ../src/wx/cmdevents.cpp:926
 #, c-format
 msgid "Unsupported code file %s"
 msgstr "不支持的代码文件 %s"
 
-#: ../src/wx/cmdevents.cpp:990
+#: ../src/wx/cmdevents.cpp:996
 #, c-format
 msgid "Loaded code file %s"
 msgstr "已读取的代码文件 %s"
 
-#: ../src/wx/cmdevents.cpp:992
+#: ../src/wx/cmdevents.cpp:998
 #, c-format
 msgid "Error loading code file %s"
 msgstr "读取代码文件错误 %s"
 
-#: ../src/wx/cmdevents.cpp:1003 ../src/wx/cmdevents.cpp:1079
+#: ../src/wx/cmdevents.cpp:1009 ../src/wx/cmdevents.cpp:1085
 msgid "Select snapshot file"
 msgstr "选择快照文件"
 
-#: ../src/wx/cmdevents.cpp:1004
+#: ../src/wx/cmdevents.cpp:1010
 msgid ""
 "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots "
 "(*.gsv)|*.gsv"
 msgstr "GS & PAC 快照 (*.sps;*.xps)|*.sps;*.xps|GameShark SP 快照 (*.gsv)|*.gsv"
 
-#: ../src/wx/cmdevents.cpp:1004
+#: ../src/wx/cmdevents.cpp:1010
 msgid "Gameboy Snapshot (*.gbs)|*.gbs"
 msgstr "Gameboy 快照 (*.gbs)|*.gbs"
 
-#: ../src/wx/cmdevents.cpp:1013
+#: ../src/wx/cmdevents.cpp:1019
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
 msgstr "导入快照将删除之前保存的游戏进度 (直到下次保存前)。你确定要继续吗？ "
 
-#: ../src/wx/cmdevents.cpp:1038
+#: ../src/wx/cmdevents.cpp:1044
 #, c-format
 msgid "Loaded snapshot file %s"
 msgstr "已读取的快照文件 %s"
 
-#: ../src/wx/cmdevents.cpp:1040
+#: ../src/wx/cmdevents.cpp:1046
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr "快照文件读取错误 %s"
 
-#: ../src/wx/cmdevents.cpp:1063
+#: ../src/wx/cmdevents.cpp:1069
 #, c-format
 msgid "Wrote battery %s"
 msgstr "写入电池 %s"
 
-#: ../src/wx/cmdevents.cpp:1065 ../src/wx/panel.cpp:648
+#: ../src/wx/cmdevents.cpp:1071 ../src/wx/panel.cpp:648
 #, c-format
 msgid "Error writing battery %s"
 msgstr "写入电池错误 %s"
 
-#: ../src/wx/cmdevents.cpp:1073
+#: ../src/wx/cmdevents.cpp:1079
 msgid "EEPROM saves cannot be exported"
 msgstr "EEPROM 存档无法导出"
 
-#: ../src/wx/cmdevents.cpp:1080
+#: ../src/wx/cmdevents.cpp:1086
 msgid "Gameshark Snapshot (*.sps)|*.sps"
 msgstr "Gameshark 快照 (*.sps)|*.sps"
 
-#: ../src/wx/cmdevents.cpp:1094
+#: ../src/wx/cmdevents.cpp:1100
 msgid "Exported from VisualBoyAdvance-M"
 msgstr "从 VBA-M 导出"
 
-#: ../src/wx/cmdevents.cpp:1106
+#: ../src/wx/cmdevents.cpp:1112
 #, c-format
 msgid "Saved snapshot file %s"
 msgstr "保存快照文件 %s "
 
-#: ../src/wx/cmdevents.cpp:1108
+#: ../src/wx/cmdevents.cpp:1114
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr "保存快照文件错误 %s"
 
-#: ../src/wx/cmdevents.cpp:1123 ../src/wx/cmdevents.cpp:1204
+#: ../src/wx/cmdevents.cpp:1129 ../src/wx/cmdevents.cpp:1207
 #: ../src/wx/cmdevents.cpp:1277 ../src/wx/cmdevents.cpp:1304
 #: ../src/wx/viewers.cpp:562 ../src/wx/viewers.cpp:772
 #: ../src/wx/viewsupt.cpp:1161
 msgid "Select output file"
 msgstr "选择输出文件"
 
-#: ../src/wx/cmdevents.cpp:1124 ../src/wx/viewsupt.cpp:1162
+#: ../src/wx/cmdevents.cpp:1130 ../src/wx/viewsupt.cpp:1162
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG 图片|*.png|BMP 图片|*.bmp"
 
-#: ../src/wx/cmdevents.cpp:1148 ../src/wx/sys.cpp:435
+#: ../src/wx/cmdevents.cpp:1154 ../src/wx/sys.cpp:435
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "写入快照 %s"
 
-#: ../src/wx/cmdevents.cpp:1172 ../src/wx/cmdevents.cpp:1245
+#: ../src/wx/cmdevents.cpp:1175 ../src/wx/cmdevents.cpp:1245
 msgid " files ("
 msgstr "文件 ("
 
@@ -345,65 +345,65 @@ msgstr "VBA 影片文件|*.vmv"
 msgid "Select file"
 msgstr "选择文件"
 
-#: ../src/wx/cmdevents.cpp:1488 ../src/wx/cmdevents.cpp:1573
+#: ../src/wx/cmdevents.cpp:1500 ../src/wx/cmdevents.cpp:1593
 msgid "Select state file"
 msgstr "选择状态文件"
 
-#: ../src/wx/cmdevents.cpp:1489 ../src/wx/cmdevents.cpp:1574
+#: ../src/wx/cmdevents.cpp:1501 ../src/wx/cmdevents.cpp:1594
 msgid "VisualBoyAdvance saved game files|*.sgm"
 msgstr "VisualBoyAdvance 保存游戏文件|*.sgm"
 
-#: ../src/wx/cmdevents.cpp:1806
+#: ../src/wx/cmdevents.cpp:1833
 msgid "Sound enabled"
 msgstr "开启声音"
 
-#: ../src/wx/cmdevents.cpp:1806
+#: ../src/wx/cmdevents.cpp:1833
 msgid "Sound disabled"
 msgstr "静音"
 
-#: ../src/wx/cmdevents.cpp:1819 ../src/wx/cmdevents.cpp:1833
+#: ../src/wx/cmdevents.cpp:1846 ../src/wx/cmdevents.cpp:1860
 #, c-format
 msgid "Volume: %d%%"
 msgstr "音量 %d%%"
 
-#: ../src/wx/cmdevents.cpp:1907
+#: ../src/wx/cmdevents.cpp:1934
 msgid "Set to 0 for pseudo tty"
 msgstr "给伪 tty 设置成 0"
 
-#: ../src/wx/cmdevents.cpp:1909
+#: ../src/wx/cmdevents.cpp:1936
 msgid "Port to wait for connection:"
 msgstr "准备连接的端口"
 
-#: ../src/wx/cmdevents.cpp:1910
+#: ../src/wx/cmdevents.cpp:1937
 msgid "GDB Connection"
 msgstr "GDB 连接"
 
-#: ../src/wx/cmdevents.cpp:1957
+#: ../src/wx/cmdevents.cpp:1984
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "准备连接到 %s"
 
-#: ../src/wx/cmdevents.cpp:1964
+#: ../src/wx/cmdevents.cpp:1991
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "准备连接的端口 %d"
 
-#: ../src/wx/cmdevents.cpp:1967
+#: ../src/wx/cmdevents.cpp:1994
 msgid "Waiting for GDB..."
 msgstr "等待 GDB..."
 
-#: ../src/wx/cmdevents.cpp:2489
+#: ../src/wx/cmdevents.cpp:2516
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "任天堂 GameBoy (+Color+Advance) 模拟器。"
 
-#: ../src/wx/cmdevents.cpp:2490
+#: ../src/wx/cmdevents.cpp:2517
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "版权 (C) 1999-2003 Forgotten\n版权 (C) 2004-2006 VBA 开发团队\n版权 (C) 2007-2017 VBA-M 开发团队"
 
-#: ../src/wx/cmdevents.cpp:2491
+#: ../src/wx/cmdevents.cpp:2518
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -419,11 +419,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "本程序是自由软件: 你可以在自由软件基金会公布的 GNU 通用发布\n许可证条款下重新分发和/或修改此软件，依自己意愿许可证 V2 版或\n任意更新版许可证选其一即可。\n\n本程序希望是能有作用的分发出去，但【无任何担保】；甚至没有隐含\n的【可销售性】或【特定用途的适用性】保证。请查阅 GNU 通用发布\n许可证了解更多信息。\n\n你应该已经收到 GNU 通用发布许可证的副本以及本程序。\n如果没有，请查看 http://www.gnu.org/licenses 。"
 
-#: ../src/wx/cmdevents.cpp:2751
+#: ../src/wx/cmdevents.cpp:2778
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "局域网连接已激活，禁用连接模式即可断开联网。"
 
-#: ../src/wx/cmdevents.cpp:2757
+#: ../src/wx/cmdevents.cpp:2784
 msgid "Network is not supported in local mode."
 msgstr "本地模式不支持网络"
 
@@ -561,7 +561,7 @@ msgstr "保存原有数值？"
 msgid "Removing cheats"
 msgstr "移除金手指"
 
-#: ../src/wx/guiinit.cpp:733 ../src/wx/xrc/JoyPanel.xrc:244
+#: ../src/wx/guiinit.cpp:733 ../src/wx/xrc/JoyPanel.xrc:364
 msgid "GameShark"
 msgstr "GameShark"
 
@@ -627,118 +627,118 @@ msgstr "%d frames = %.2f ms"
 msgid "Default device"
 msgstr "默认设备"
 
-#: ../src/wx/guiinit.cpp:1694
+#: ../src/wx/guiinit.cpp:1706
 msgid "Desktop mode"
 msgstr "窗口模式"
 
-#: ../src/wx/guiinit.cpp:1701
+#: ../src/wx/guiinit.cpp:1713
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: ../src/wx/guiinit.cpp:1855
+#: ../src/wx/guiinit.cpp:1867
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "在 %s 中没有可用插件"
 
-#: ../src/wx/guiinit.cpp:1875 ../src/wx/xrc/DisplayConfig.xrc:107
+#: ../src/wx/guiinit.cpp:1887 ../src/wx/xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "插件"
 
-#: ../src/wx/guiinit.cpp:1903
+#: ../src/wx/guiinit.cpp:1915
 msgid "Please select a plugin or a different filter"
 msgstr "请选择一个插件或过滤器"
 
-#: ../src/wx/guiinit.cpp:1904
+#: ../src/wx/guiinit.cpp:1916
 msgid "Plugin selection error"
 msgstr "插件选择错误"
 
-#: ../src/wx/guiinit.cpp:2103
+#: ../src/wx/guiinit.cpp:2115
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr "将清除所有自定义加速，是否继续？"
 
-#: ../src/wx/guiinit.cpp:2103
+#: ../src/wx/guiinit.cpp:2115
 msgid "Confirm"
 msgstr "确定"
 
-#: ../src/wx/guiinit.cpp:2697
+#: ../src/wx/guiinit.cpp:2709
 msgid "Main icon not found"
 msgstr "未找到主图标"
 
-#: ../src/wx/guiinit.cpp:2715
+#: ../src/wx/guiinit.cpp:2727
 msgid "Main display panel not found"
 msgstr "未找到主显示面板"
 
-#: ../src/wx/guiinit.cpp:2829
+#: ../src/wx/guiinit.cpp:2841
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "复写菜单加速器：%s 对应 %s 和 %s; 保持优先"
 
-#: ../src/wx/guiinit.cpp:2843
+#: ../src/wx/guiinit.cpp:2855
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "菜单加速器 %s 为 %s 覆盖 %s 的默认值 ; 保留菜单"
 
-#: ../src/wx/guiinit.cpp:2949
+#: ../src/wx/guiinit.cpp:2961
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "无效的菜单项目 %s; 正在移除"
 
-#: ../src/wx/guiinit.cpp:3144
+#: ../src/wx/guiinit.cpp:3156
 msgid "Code"
 msgstr "代码"
 
-#: ../src/wx/guiinit.cpp:3153
+#: ../src/wx/guiinit.cpp:3165
 msgid "Description"
 msgstr "描述"
 
-#: ../src/wx/guiinit.cpp:3227 ../src/wx/xrc/CheatAdd.xrc:31
+#: ../src/wx/guiinit.cpp:3239 ../src/wx/xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "地址"
 
-#: ../src/wx/guiinit.cpp:3228
+#: ../src/wx/guiinit.cpp:3240
 msgid "Old Value"
 msgstr "原有数值"
 
-#: ../src/wx/guiinit.cpp:3229
+#: ../src/wx/guiinit.cpp:3241
 msgid "New Value"
 msgstr "新数值"
 
-#: ../src/wx/guiinit.cpp:3725
+#: ../src/wx/guiinit.cpp:3777
 msgid "Menu commands"
 msgstr "菜单命令"
 
-#: ../src/wx/guiinit.cpp:3748
+#: ../src/wx/guiinit.cpp:3800
 msgid "Other commands"
 msgstr "其他命令"
 
-#: ../src/wx/guiinit.cpp:3859
+#: ../src/wx/guiinit.cpp:3911
 msgid "JoyBus host invalid; disabling"
 msgstr "JoyBus 主机无效; 正在禁用"
 
-#: ../src/wx/opts.cpp:536 ../src/wx/opts.cpp:831
+#: ../src/wx/opts.cpp:555 ../src/wx/opts.cpp:851
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "无效的数值 %s 于选项 %s，合法数值类型为 %s%s%s"
 
-#: ../src/wx/opts.cpp:553 ../src/wx/opts.cpp:843
+#: ../src/wx/opts.cpp:572 ../src/wx/opts.cpp:863
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "无效的数值 %d 于选项 %s，合法数值类型为 %d - %d"
 
-#: ../src/wx/opts.cpp:560 ../src/wx/opts.cpp:569 ../src/wx/opts.cpp:851
-#: ../src/wx/opts.cpp:859
+#: ../src/wx/opts.cpp:579 ../src/wx/opts.cpp:588 ../src/wx/opts.cpp:871
+#: ../src/wx/opts.cpp:879
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "无效的数值 %f 于选项 %s; 合法数值类型为 %f - %f"
 
-#: ../src/wx/opts.cpp:628 ../src/wx/opts.cpp:649 ../src/wx/opts.cpp:928
-#: ../src/wx/opts.cpp:954
+#: ../src/wx/opts.cpp:648 ../src/wx/opts.cpp:669 ../src/wx/opts.cpp:948
+#: ../src/wx/opts.cpp:974
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "%s 键不能绑定为 %s"
 
-#: ../src/wx/opts.cpp:814
+#: ../src/wx/opts.cpp:834
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "无效设置 %s - %s 已忽略"
@@ -828,42 +828,42 @@ msgstr "没有用于回退的内存"
 msgid "Error writing rewind state"
 msgstr "回写状态错误"
 
-#: ../src/wx/panel.cpp:2323
+#: ../src/wx/panel.cpp:2321
 msgid "memory allocation error"
 msgstr "内存分配错误"
 
-#: ../src/wx/panel.cpp:2326
+#: ../src/wx/panel.cpp:2324
 msgid "error initializing codec"
 msgstr "初始化代码错误"
 
-#: ../src/wx/panel.cpp:2329
+#: ../src/wx/panel.cpp:2327
 msgid "error writing to output file"
 msgstr "回写输出文件错误"
 
-#: ../src/wx/panel.cpp:2332
+#: ../src/wx/panel.cpp:2330
 msgid "can't guess output format from file name"
 msgstr "无法从文件名猜测输出格式"
 
-#: ../src/wx/panel.cpp:2337
+#: ../src/wx/panel.cpp:2335
 msgid "programming error; aborting!"
 msgstr "程序错误!"
 
-#: ../src/wx/panel.cpp:2348 ../src/wx/panel.cpp:2376
+#: ../src/wx/panel.cpp:2352 ../src/wx/panel.cpp:2383
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "不能开始录制到 %s (%s)"
 
-#: ../src/wx/panel.cpp:2404
+#: ../src/wx/panel.cpp:2411
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "录制音频/视频时错误 (%s); 正在中止"
 
-#: ../src/wx/panel.cpp:2410
+#: ../src/wx/panel.cpp:2417
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "录制音频时错误 (%s); 正在中止"
 
-#: ../src/wx/panel.cpp:2420
+#: ../src/wx/panel.cpp:2427
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "录制视频时错误 (%s); 正在中止"
@@ -1031,75 +1031,75 @@ msgstr "G:"
 msgid "B:"
 msgstr "B:"
 
-#: ../src/wx/wxvbam.cpp:201
+#: ../src/wx/wxvbam.cpp:203
 msgid "visualboyadvance-m"
 msgstr "visualboyadvance-m"
 
-#: ../src/wx/wxvbam.cpp:415
+#: ../src/wx/wxvbam.cpp:417
 msgid "Could not create main window"
 msgstr "无法创建主窗口"
 
-#: ../src/wx/wxvbam.cpp:482
+#: ../src/wx/wxvbam.cpp:484
 msgid "Save built-in XRC file and exit"
 msgstr "保存内置 XRC 文件并退出"
 
-#: ../src/wx/wxvbam.cpp:485
+#: ../src/wx/wxvbam.cpp:487
 msgid "Save built-in vba-over.ini and exit"
 msgstr "保存内置 vba-over.ini 文件并退出"
 
-#: ../src/wx/wxvbam.cpp:488
+#: ../src/wx/wxvbam.cpp:490
 msgid "Print configuration path and exit"
 msgstr "打印配置路径并退出"
 
-#: ../src/wx/wxvbam.cpp:491
+#: ../src/wx/wxvbam.cpp:493
 msgid "Start in full-screen mode"
 msgstr "以全屏模式启动"
 
-#: ../src/wx/wxvbam.cpp:495
+#: ../src/wx/wxvbam.cpp:497
 msgid "Delete shared link state first, if it exists"
 msgstr "请先删除共享链接状态，如果存在的话"
 
-#: ../src/wx/wxvbam.cpp:502
+#: ../src/wx/wxvbam.cpp:504
 msgid "List all settable options and exit"
 msgstr "列出所有可设置的选项并退出"
 
-#: ../src/wx/wxvbam.cpp:505
+#: ../src/wx/wxvbam.cpp:507
 msgid "ROM file"
 msgstr "ROM 文件"
 
-#: ../src/wx/wxvbam.cpp:507
+#: ../src/wx/wxvbam.cpp:509
 msgid "<config>=<value>"
 msgstr "<设置>=<值>"
 
-#: ../src/wx/wxvbam.cpp:538
+#: ../src/wx/wxvbam.cpp:540
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr "配置/建构错误：无法找到内置 xrc 文件"
 
-#: ../src/wx/wxvbam.cpp:546
+#: ../src/wx/wxvbam.cpp:548
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "将内置配置写入到 %s。\n如要覆盖，请删除所有未更改的根节点。首先在以下搜索覆盖内置路径里找到任意 .xrc 或 .xrs 文件中正确名称的根节点："
 
-#: ../src/wx/wxvbam.cpp:561
+#: ../src/wx/wxvbam.cpp:563
 msgid "Configuration is read from, in order:"
 msgstr "配置按顺序从中读取："
 
-#: ../src/wx/wxvbam.cpp:575
+#: ../src/wx/wxvbam.cpp:577
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
 msgstr "将内置覆盖文件写入到 %s\n 如要覆盖，请删除所有未更改的部分。首个找到的部分从以下搜索路径使用："
 
-#: ../src/wx/wxvbam.cpp:581
+#: ../src/wx/wxvbam.cpp:583
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\t内置"
 
-#: ../src/wx/wxvbam.cpp:592
+#: ../src/wx/wxvbam.cpp:594
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1107,13 +1107,13 @@ msgid ""
 "\n"
 msgstr "如果在用户界面中进行了任何配置更改，则保存从命令行设置的选项。\n\n对于标志选项，true 和 false 分别指定为 1 和 0。\n\n"
 
-#: ../src/wx/wxvbam.cpp:613
+#: ../src/wx/wxvbam.cpp:615
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "可用于键盘 /* 选项的命令是:\n\n"
 
-#: ../src/wx/wxvbam.cpp:647
+#: ../src/wx/wxvbam.cpp:649
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "错误的配置选项或多个 ROM 文件被指定:\n"
 
@@ -1314,7 +1314,18 @@ msgstr "搜索(&S)"
 msgid "U&pdate Old"
 msgstr "更新旧值(&P)"
 
-#: ../src/wx/xrc/CheatCreate.xrc:195 ../src/wx/xrc/Logging.xrc:119
+#: ../src/wx/xrc/CheatCreate.xrc:195 ../src/wx/xrc/JoyPanel.xrc:29
+#: ../src/wx/xrc/JoyPanel.xrc:52 ../src/wx/xrc/JoyPanel.xrc:75
+#: ../src/wx/xrc/JoyPanel.xrc:98 ../src/wx/xrc/JoyPanel.xrc:121
+#: ../src/wx/xrc/JoyPanel.xrc:144 ../src/wx/xrc/JoyPanel.xrc:167
+#: ../src/wx/xrc/JoyPanel.xrc:191 ../src/wx/xrc/JoyPanel.xrc:214
+#: ../src/wx/xrc/JoyPanel.xrc:237 ../src/wx/xrc/JoyPanel.xrc:268
+#: ../src/wx/xrc/JoyPanel.xrc:290 ../src/wx/xrc/JoyPanel.xrc:312
+#: ../src/wx/xrc/JoyPanel.xrc:334 ../src/wx/xrc/JoyPanel.xrc:356
+#: ../src/wx/xrc/JoyPanel.xrc:378 ../src/wx/xrc/JoyPanel.xrc:400
+#: ../src/wx/xrc/JoyPanel.xrc:422 ../src/wx/xrc/JoyPanel.xrc:444
+#: ../src/wx/xrc/JoyPanel.xrc:475 ../src/wx/xrc/JoyPanel.xrc:497
+#: ../src/wx/xrc/Logging.xrc:119
 msgid "&Clear"
 msgstr "清除(&C)"
 
@@ -1764,23 +1775,23 @@ msgid "Save type :"
 msgstr "保存类型 : "
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:27
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:178
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:199
 #: ../src/wx/xrc/GameBoyConfig.xrc:29 ../src/wx/xrc/GameBoyConfig.xrc:59
 msgid "Automatic"
 msgstr "自动"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:28
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:179
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:200
 msgid "EEPROM"
 msgstr "EEPROM"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:29
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:180
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:201
 msgid "SRAM"
 msgstr "SRAM"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:30
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:181
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:202
 msgid "Flash"
 msgstr "闪存"
 
@@ -1793,12 +1804,12 @@ msgid "Flash size :"
 msgstr "闪存大小 : "
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:49
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:200
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:221
 msgid "64K"
 msgstr "64K"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:50
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:201
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:222
 msgid "128K"
 msgstr "128K"
 
@@ -1819,61 +1830,70 @@ msgid "Bios file :"
 msgstr "BIOS 文件 : "
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:115
-#: ../src/wx/xrc/GameBoyConfig.xrc:126
+msgid "Current BIOS file :"
+msgstr ""
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:122
+#: ../src/wx/xrc/GameBoyConfig.xrc:138 ../src/wx/xrc/GameBoyConfig.xrc:159
+msgid "(None)"
+msgstr ""
+
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:136
+#: ../src/wx/xrc/GameBoyConfig.xrc:168
 msgid "Boot ROM"
 msgstr "引导 ROM"
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:125
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:146
 msgid "Game Code"
 msgstr "游戏代码"
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:139
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:160
 msgid "Comment"
 msgstr "注释"
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:151
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:172
 msgid "Real Time Clock:"
 msgstr "实时时钟"
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:159
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:177
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:199
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:217
-#: ../src/wx/xrc/GameBoyConfig.xrc:138
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:180
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:198
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:220
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:238
+#: ../src/wx/xrc/GameBoyConfig.xrc:180
 msgid "Default"
 msgstr "默认"
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:160
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:218
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:181
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:239
 msgid "Disabled"
 msgstr "禁用"
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:161
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:219
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:182
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:240
 msgid "Enabled"
 msgstr "开启"
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:169
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:190
 msgid "Save Type:"
 msgstr "保存类型 : "
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:182
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:203
 msgid "EEPROM+Sensor"
 msgstr "EEPROM+传感器"
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:191
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:212
 msgid "Flash Size:"
 msgstr "闪存大小 :"
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:209
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:230
 msgid "Mirroring:"
 msgstr "镜像:"
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:233
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:254
 msgid "&Defaults"
 msgstr "默认(&D)"
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:240
+#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:261
 msgid "Game Overrides"
 msgstr "游戏覆盖"
 
@@ -1922,8 +1942,8 @@ msgid "System"
 msgstr "系统"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:84
-msgid "Boot &ROM file :"
-msgstr "引导 ROM 文件(&R) :"
+msgid "GB Boot &ROM file :"
+msgstr ""
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:91 ../src/wx/xrc/GameBoyConfig.xrc:113
 msgid "Select A File"
@@ -1933,15 +1953,23 @@ msgstr "选择一个文件"
 msgid "GBC Boot ROM &file :"
 msgstr "GBC 引导 ROM 文件(&F) :"
 
-#: ../src/wx/xrc/GameBoyConfig.xrc:144
+#: ../src/wx/xrc/GameBoyConfig.xrc:131
+msgid "Current GB BIOS file :"
+msgstr ""
+
+#: ../src/wx/xrc/GameBoyConfig.xrc:152
+msgid "Current GBC BIOS file :"
+msgstr ""
+
+#: ../src/wx/xrc/GameBoyConfig.xrc:186
 msgid "User 1"
 msgstr "用户 1"
 
-#: ../src/wx/xrc/GameBoyConfig.xrc:150
+#: ../src/wx/xrc/GameBoyConfig.xrc:192
 msgid "User 2"
 msgstr "用户 2"
 
-#: ../src/wx/xrc/GameBoyConfig.xrc:156
+#: ../src/wx/xrc/GameBoyConfig.xrc:198
 msgid "Custom Colors"
 msgstr "自定义颜色"
 
@@ -2001,7 +2029,7 @@ msgstr "CRC :"
 msgid "ROM Information"
 msgstr "ROM 信息"
 
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:10 ../src/wx/xrc/JoyPanel.xrc:167
+#: ../src/wx/xrc/GBColorPrefPanel.xrc:10 ../src/wx/xrc/JoyPanel.xrc:247
 msgid "Standard"
 msgstr "标准"
 
@@ -2563,97 +2591,97 @@ msgstr "单击字段，然后按键或移动操纵杆以添加。 按退格键�
 msgid "Up"
 msgstr "上"
 
-#: ../src/wx/xrc/JoyPanel.xrc:29
+#: ../src/wx/xrc/JoyPanel.xrc:37
 msgid "A"
 msgstr "A"
 
-#: ../src/wx/xrc/JoyPanel.xrc:44
+#: ../src/wx/xrc/JoyPanel.xrc:60
 msgid "Down"
 msgstr "下"
 
-#: ../src/wx/xrc/JoyPanel.xrc:59
+#: ../src/wx/xrc/JoyPanel.xrc:83
 msgid "B"
 msgstr "B"
 
-#: ../src/wx/xrc/JoyPanel.xrc:74
+#: ../src/wx/xrc/JoyPanel.xrc:106
 msgid "Left"
 msgstr "左"
 
-#: ../src/wx/xrc/JoyPanel.xrc:89
+#: ../src/wx/xrc/JoyPanel.xrc:129
 msgid "L"
 msgstr "L"
 
-#: ../src/wx/xrc/JoyPanel.xrc:104
+#: ../src/wx/xrc/JoyPanel.xrc:152
 msgid "Right"
 msgstr "右"
 
-#: ../src/wx/xrc/JoyPanel.xrc:119
+#: ../src/wx/xrc/JoyPanel.xrc:175
 msgid "R"
 msgstr "R"
 
-#: ../src/wx/xrc/JoyPanel.xrc:135
+#: ../src/wx/xrc/JoyPanel.xrc:199
 msgid "Select"
 msgstr "选择"
 
-#: ../src/wx/xrc/JoyPanel.xrc:150
+#: ../src/wx/xrc/JoyPanel.xrc:222
 msgid "Start"
 msgstr "出发"
 
-#: ../src/wx/xrc/JoyPanel.xrc:174
+#: ../src/wx/xrc/JoyPanel.xrc:254
 msgid "Motion Up"
 msgstr "动作 上"
 
-#: ../src/wx/xrc/JoyPanel.xrc:188
+#: ../src/wx/xrc/JoyPanel.xrc:276
 msgid "Autofire A"
 msgstr "连发 A"
 
-#: ../src/wx/xrc/JoyPanel.xrc:202
+#: ../src/wx/xrc/JoyPanel.xrc:298
 msgid "Motion Down"
 msgstr "动作 下"
 
-#: ../src/wx/xrc/JoyPanel.xrc:216
+#: ../src/wx/xrc/JoyPanel.xrc:320
 msgid "Autofire B"
 msgstr "连发 B"
 
-#: ../src/wx/xrc/JoyPanel.xrc:230
+#: ../src/wx/xrc/JoyPanel.xrc:342
 msgid "Motion Left/Dark"
 msgstr "动作左/暗"
 
-#: ../src/wx/xrc/JoyPanel.xrc:258
+#: ../src/wx/xrc/JoyPanel.xrc:386
 msgid "Motion Right/Light"
 msgstr "动作 右/亮"
 
-#: ../src/wx/xrc/JoyPanel.xrc:272
+#: ../src/wx/xrc/JoyPanel.xrc:408
 msgid "Speed Up"
 msgstr "加速"
 
-#: ../src/wx/xrc/JoyPanel.xrc:286
+#: ../src/wx/xrc/JoyPanel.xrc:430
 msgid "Spin Left"
 msgstr "左旋转"
 
-#: ../src/wx/xrc/JoyPanel.xrc:306
+#: ../src/wx/xrc/JoyPanel.xrc:461
 msgid "Spin Right"
 msgstr "右旋转"
 
-#: ../src/wx/xrc/JoyPanel.xrc:320
+#: ../src/wx/xrc/JoyPanel.xrc:483
 msgid "Screenshot"
 msgstr "截图"
 
-#: ../src/wx/xrc/JoyPanel.xrc:336
+#: ../src/wx/xrc/JoyPanel.xrc:507
 msgid "Special"
 msgstr " 特定"
 
-#: ../src/wx/xrc/JoyPanel.xrc:344
+#: ../src/wx/xrc/JoyPanel.xrc:515
 msgid "Use as default"
 msgstr " 作为默认值"
 
-#: ../src/wx/xrc/JoyPanel.xrc:351
+#: ../src/wx/xrc/JoyPanel.xrc:522
 msgid "Defaults"
 msgstr "默认"
 
-#: ../src/wx/xrc/JoyPanel.xrc:358
-msgid "Clear"
-msgstr "清除"
+#: ../src/wx/xrc/JoyPanel.xrc:529
+msgid "Clear All"
+msgstr ""
 
 #: ../src/wx/xrc/LinkConfig.xrc:4
 msgid "Link configuration"
@@ -2997,8 +3025,8 @@ msgid "&Start in full screen"
 msgstr "启动时全屏(&S)"
 
 #: ../src/wx/xrc/MainMenu.xrc:299
-msgid "&Quick resize"
-msgstr "快速调整大小"
+msgid "&Scaled resize"
+msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:301
 msgid "&1x"
