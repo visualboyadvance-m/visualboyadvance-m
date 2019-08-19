@@ -136,7 +136,7 @@ void DisList::MoveSB()
         pos = (topaddr - 100) / 10 + 100;
     else if (topaddr >= maxaddr - 1100)
         pos = (topaddr - maxaddr + 1100) / 10 + 300;
-    else
+    else // FIXME this pos is very likely wrong... but I cannot trigger it
         pos = 250;
 
     sb.SetScrollbar(pos, 20, 500, 20);
@@ -553,16 +553,16 @@ void MemView::MoveSB()
 {
     int pos;
 
-    if (topaddr / 16 <= 100)
+    if (topaddr / 16 <= 100) // <= 100
         pos = topaddr / 16;
-    else if (topaddr / 16 >= maxaddr / 16 - 100)
+    else if (topaddr / 16 >= maxaddr / 16 - 100) // >= 400
         pos = topaddr / 16 - maxaddr / 16 + 500;
-    else if (topaddr / 16 < 1100)
+    else if (topaddr / 16 < 1100) // <= 200
         pos = (topaddr / 16 - 100) / 10 + 100;
-    else if (topaddr / 16 >= maxaddr / 16 - 1100)
+    else if (topaddr / 16 >= maxaddr / 16 - 1100) // >= 300
         pos = (topaddr / 16 - maxaddr / 16 + 1100) / 10 + 300;
-    else
-        pos = 250;
+    else // > 200 && < 300
+        pos = ((topaddr / 16) - 1100) / (((maxaddr / 16) - 2200) / 100) + 200;
 
     sb.SetScrollbar(pos, 20, 500, 20);
 }
@@ -597,6 +597,13 @@ void MemView::MoveView(wxScrollEvent& ev)
 
         MoveSB();
     } // ignore THUMBTRACK and CHANGED
+    // do not interrupt scroll because no event was triggered
+    else if (pos <= 200)
+        topaddr = ((pos - 100) * 10 + 100) * 16;
+    else if (pos >= 300)
+        topaddr = ((pos - 300) * 10 - 1100) * 16 + maxaddr;
+    else if (pos > 200 && pos < 300)
+        topaddr = ((pos - 200) * ((maxaddr / 16 - 2200) / 100) + 1100) * 16;
 
     RefillNeeded();
 }
@@ -649,7 +656,7 @@ void MemView::Refill(wxDC& dc)
 
     for (size_t i = 0; i < (size_t)nlines && i < words.size() / 4; i++) {
         wxString line, word;
-        line.Printf(maxaddr > 0xffff ? wxT("%08X   ") : wxT("%04X   "), topaddr + i * 16);
+        line.Printf(maxaddr > 0xffff ? wxT("%08X   ") : wxT("%04X   "), topaddr + (int)i * 16);
 
         for (int j = 0; j < 4; j++) {
             uint32_t v = words[i * 4 + j];
