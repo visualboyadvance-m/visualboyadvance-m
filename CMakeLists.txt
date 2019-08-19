@@ -357,6 +357,12 @@ if(NOT ENABLE_ASM_CORE)
     add_definitions(-DC_CORE)
 endif()
 
+set(NLS_DEFAULT OFF)
+
+if(NOT CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
+    set(NLS_DEFAULT ON)
+endif()
+
 option(ENABLE_NLS "Enable translations" ${NLS_DEFAULT})
 
 # Enable internationalization

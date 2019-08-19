@@ -103,7 +103,7 @@ table_line_append  DIST_PRE_BUILD       libmodplug " \
 table_line_append DIST_PRE_BUILD libzmq "sed -i.bak 's/-lstdc++/-lc++/g' src/libzmq.pc.in"
 table_line_append DIST_PRE_BUILD ffmpeg "sed -i.bak 's/-lstdc++/-lc++/g' configure"
 
-table_line_append DIST_ARGS wxwidgets  "--with-macosx-version-min=\$MACOSX_DEPLOYMENT_TARGET LDFLAGS=\"\$LDFLAGS -stdlib=libc++\""
+table_line_append DIST_CONFIGURE_OVERRIDES wxwidgets  "--with-macosx-version-min=\$MACOSX_DEPLOYMENT_TARGET LDFLAGS=\"\$LDFLAGS -stdlib=libc++\""
 table_line_append DIST_ARGS ffmpeg     "--disable-videotoolbox --extra-ldflags='-framework CoreText'"
 table_line_append DIST_ARGS libmodplug "CC=clang++ CXX=clang++"
 

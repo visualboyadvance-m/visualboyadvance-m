@@ -59,8 +59,17 @@ ln -sf "$BUILD_ROOT/target" "$BUILD_ROOT/root"
 perl_dists="$perl_dists XML-NamespaceSupport XML-SAX-Base XML-SAX"
 perl_dists=$(list_remove_duplicates $perl_dists)
 
+# to codesign windows binary
+table_insert_after DISTS pkgconfig '
+    osslsigncode    https://github.com/mtrojnar/osslsigncode/archive/18810b7e0bb1d8e0d25b6c2565a065cf66bce5d7.tar.gz    bin/osslsigncode
+'
+
+table_line_append DIST_CONFIGURE_OVERRIDES osslsigncode 'sh autogen.sh && ./configure --prefix=/usr'
+
+table_line_append DIST_EXTRA_LIBS osslsigncode '-lz -lssl -lcrypto -ldl'
+
 host_dists="$host_dists autoconf autoconf-archive automake m4 gsed bison \
-                        flex-2.6.3 flex c2man docbook2x ccache ninja"
+                        flex-2.6.3 flex c2man docbook2x ccache ninja curl osslsigncode"
 host_dists=$(list_remove_duplicates $host_dists)
 
 both_dists="$both_dists openssl zlib bzip2 libiconv"

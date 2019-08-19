@@ -105,10 +105,11 @@ DISTS=$DISTS'
     bzip2           https://github.com/nemequ/bzip2/releases/download/v1.0.6/bzip2-1.0.6.tar.gz                 lib/libbz2.a
     xz              https://tukaani.org/xz/xz-5.2.3.tar.gz                                                      lib/liblzma.a
     unzip           https://downloads.sourceforge.net/project/infozip/UnZip%206.x%20%28latest%29/UnZip%206.0/unzip60.tar.gz     bin/unzip
-    zlib            https://zlib.net/zlib-1.2.11.tar.gz                                                         lib/libz.a
+    zlib            https://www.zlib.net/zlib-1.2.11.tar.gz                                                     lib/libz.a
     ccache          https://www.samba.org/ftp/ccache/ccache-3.4.3.tar.xz                                        bin/ccache
     zip             https://downloads.sourceforge.net/project/infozip/Zip%203.x%20%28latest%29/3.0/zip30.tar.gz                 bin/zip
-    openssl         https://www.openssl.org/source/openssl-1.0.2p.tar.gz                                        lib/libssl.a
+    openssl         https://www.openssl.org/source/openssl-1.1.1c.tar.gz                                        lib/libssl.a
+    curl            https://curl.haxx.se/download/curl-7.65.3.tar.xz                                            lib/libcurl.a
     cmake           https://cmake.org/files/v3.13/cmake-3.13.0-rc1.tar.gz                                       bin/cmake
     m4              http://ftp.gnu.org/gnu/m4/m4-1.4.18.tar.xz                                                  bin/m4
     autoconf        https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz                                       bin/autoconf
@@ -182,7 +183,7 @@ DISTS=$DISTS'
     harfbuzz        https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-1.7.5.tar.bz2                lib/libharfbuzz.a
     sfml            https://github.com/SFML/SFML/archive/013d053277c980946bc7761a2a088f1cbb788f8c.tar.gz        lib/libsfml-system-s.a
     shared-mime-info http://freedesktop.org/~hadess/shared-mime-info-1.9.tar.xz                                 bin/update-mime-database
-    wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.2/wxWidgets-3.1.2.tar.bz2     lib/libwx_baseu-3.1*.a
+    wxwidgets       https://github.com/wxWidgets/wxWidgets/archive/bcca16911d917a39d86a183ec976d9f4759e56d0.tar.gz lib/libwx_baseu-3.1*.a
     graphite2       https://github.com/silnrsi/graphite/releases/download/1.3.10/graphite2-1.3.10.tgz           lib/libgraphite2.a
     xvidcore        http://downloads.xvid.org/downloads/xvidcore-1.3.4.tar.bz2                                  lib/libxvidcore.a
     fribidi         https://github.com/fribidi/fribidi/releases/download/v1.0.1/fribidi-1.0.1.tar.bz2           lib/libfribidi.a
@@ -269,7 +270,6 @@ DIST_RELOCATION_TYPES="$DIST_RELOCATION_TYPES
 
 DIST_PRE_BUILD="$DIST_PRE_BUILD
 #    xz              mkdir -p build-aux; touch build-aux/config.rpath; mkdir -p po; touch po/Makefile.in.in; sed -i.bak 's/ po / /g' Makefile.am;
-    openssl         sed -E -i.bak '/^build_all:/{; s/ build_tests / /; }' Makefile.org;
     getopt          sed -i.bak 's/\\\$(LDFLAGS)\\(.*\\)\$/\\1 \$(LDFLAGS)/' Makefile;
     libicu          cd source;
 #    flex-2.6.3      sed -i.bak '/^'\"\$TAB\"'tests \\\\\$/d' Makefile.am;
@@ -319,15 +319,6 @@ DIST_POST_BUILD="$DIST_POST_BUILD
                     sed -i.bak \"s|/usr/share/fonts|\$BUILD_ROOT/root/share/fonts|g\" \"\$BUILD_ROOT/root/etc/fonts/fonts.conf\";
 "
 
-DIST_POST_CONFIGURE="$DIST_POST_CONFIGURE
-    #
-    # I tried to use this to make openssl build in parallel, but it fails unpredictably.
-    #
-    #openssl         sed -E -i.bak ' \
-    #    s/^(\\t+)([^\\t]+\\\$\\((BUILD_ONE_CMD|RECURSIVE_BUILD_CMD|RECURSIVE_MAKE)\\))/\1+ \2/ \
-    #' \$(find . -name Makefile);
-"
-
 DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
     openssl     ./config no-shared --prefix=/usr --openssldir=/etc/ssl
     cmake       ./configure --prefix=/usr --no-qt-gui --parallel=\$NUM_CPUS --enable-ccache
@@ -364,6 +355,7 @@ DIST_ARGS="$DIST_ARGS
     libicu      --disable-extras --disable-tools --disable-tests --disable-samples
     gettext     --with-included-gettext --with-included-glib --with-included-libcroco --with-included-libunistring --with-included-libxml --disable-curses CPPFLAGS=\"\$CPPFLAGS -DLIBXML_STATIC\"
     pkgconfig   --with-internal-glib --with-libiconv=gnu
+    curl        --with-ssl
     pcre        --enable-utf8 --enable-pcre8 --enable-pcre16 --enable-pcre32 --enable-unicode-properties --enable-pcregrep-libz --enable-pcregrep-libbz2 --enable-jit
     libxslt     --without-python --without-crypto
     libgd       --without-xpm
@@ -405,9 +397,8 @@ export DIST_BARE_MAKE_ARGS='CC="$CC"'
 
 export ALL_MAKE_ARGS='V=1 VERBOSE=1'
 
-# have to disable ccache for openssl
 DIST_MAKE_ARGS="$DIST_MAKE_ARGS
-    openssl     CC=\"\$CC\" CXX=\"\$CXX\" LDFLAGS=\"\$LDFLAGS\" -j1
+    openssl     CC=\"\$CC\"
     getopt      LDFLAGS=\"\$LDFLAGS -lintl -liconv\" CFLAGS=\"\$CFLAGS\"
     bzip2       libbz2.a bzip2 bzip2recover CFLAGS=\"\$CFLAGS\" LDFLAGS=\"\$LDFLAGS\"
     unzip       generic2
@@ -2626,12 +2617,17 @@ build_project() {
     mkdir -p "$BUILD_ROOT/project"
     cd "$BUILD_ROOT/project"
 
+    rm -f visualboyadvance-m.exe
+
     # FIXME: turn LTO back on when everything works
-    echo_eval_run cmake "'$CHECKOUT'" $REQUIRED_CMAKE_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=OFF $CMAKE_BASE_ARGS $PROJECT_ARGS $@
+    echo_eval_run cmake "'$CHECKOUT'" $REQUIRED_CMAKE_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=ON $CMAKE_BASE_ARGS $PROJECT_ARGS $@
     echo_run make -j$NUM_CPUS VERBOSE=1
 
     if [ "$target_os" = mac ]; then
         $STRIP visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m
+
+        # unlock keychain for codesigning certificate
+        security -v unlock-keychain ~/Library/Keychains/login.keychain* || :
 
         codesign -s "Developer ID Application" --deep ./visualboyadvance-m.app || :
 
@@ -2640,18 +2636,35 @@ build_project() {
         rm -f $zip
         zip -9r $zip ./visualboyadvance-m.app
 
-        gpg --detach-sign -a $zip
+        rm -f $zip.asc
+        gpg --detach-sign -a $zip || :
     elif [ "$target_os" != windows ] && path_exists visualboyadvance-m; then
         $STRIP visualboyadvance-m
     elif [ "$target_os" = windows ] && path_exists visualboyadvance-m.exe; then
         $STRIP visualboyadvance-m.exe
+
+        mv visualboyadvance-m.exe visualboyadvance-m-unsigned.exe
+
+        osslsigncode sign -pkcs12 ~/.codesign/windows_comodo.pkcs12 -pass "$(pass vbam-windows-codesign-cert)" \
+            -n visualboyadvance-m -i https://github.com/visualboyadvance-m/visualboyadvance-m \
+            -in visualboyadvance-m-unsigned.exe -out visualboyadvance-m.exe || cp visualboyadvance-m-unsigned.exe visualboyadvance-m.exe
 
         zip=./visualboyadvance-m-Win-${target_bits:-$bits}bit.zip
 
         rm -f $zip
         zip -9 $zip ./visualboyadvance-m.exe
 
-        gpg --detach-sign -a $zip
+        rm -f translations.zip
+
+        make install DESTDIR=./destdir
+        cd destdir/usr/local/share/locale
+        zip -9r ../../../../../translations.zip *
+        cd ../../../../..
+
+        rm -f $zip.asc translations.zip.asc
+
+        gpg --detach-sign -a $zip || :
+        gpg --detach-sign -a translations.zip || :
     fi
 
     dist_post_build project
