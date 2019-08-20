@@ -1412,18 +1412,18 @@ EVT_HANDLER(JoypadAutofireL, "Autofire L (toggle)")
 {
     bool menuPress;
     GetMenuOptionBool("JoypadAutofireL", menuPress);
-    toggleBitVar(&menuPress, &autofire, KEYM_LEFT);
+    toggleBitVar(&menuPress, &autofire, KEYM_L);
     SetMenuOption("JoypadAutofireL", menuPress ? 1 : 0);
-    GetMenuOptionInt("JoypadAutofireL", autofire, KEYM_LEFT);
+    GetMenuOptionInt("JoypadAutofireL", autofire, KEYM_L);
 }
 
 EVT_HANDLER(JoypadAutofireR, "Autofire R (toggle)")
 {
     bool menuPress;
     GetMenuOptionBool("JoypadAutofireR", menuPress);
-    toggleBitVar(&menuPress, &autofire, KEYM_RIGHT);
+    toggleBitVar(&menuPress, &autofire, KEYM_R);
     SetMenuOption("JoypadAutofireR", menuPress ? 1 : 0);
-    GetMenuOptionInt("JoypadAutofireR", autofire, KEYM_RIGHT);
+    GetMenuOptionInt("JoypadAutofireR", autofire, KEYM_R);
 }
 
 EVT_HANDLER_MASK(LoadGameRecent, "Load most recent save", CMDEN_SAVST)

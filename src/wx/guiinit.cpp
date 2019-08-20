@@ -2946,8 +2946,8 @@ bool MainFrame::BindControls()
         MenuOptionBool("LoadGameAutoLoad", gopts.autoload_state);
         MenuOptionIntMask("JoypadAutofireA", autofire, KEYM_A);
         MenuOptionIntMask("JoypadAutofireB", autofire, KEYM_B);
-        MenuOptionIntMask("JoypadAutofireL", autofire, KEYM_LEFT);
-        MenuOptionIntMask("JoypadAutofireR", autofire, KEYM_RIGHT);
+        MenuOptionIntMask("JoypadAutofireL", autofire, KEYM_L);
+        MenuOptionIntMask("JoypadAutofireR", autofire, KEYM_R);
         MenuOptionBool("EmulatorSpeedupToggle", turbo);
         MenuOptionIntRadioValue("LinkType0Nothing", gopts.gba_link_type, 0);
         MenuOptionIntRadioValue("LinkType1Cable", gopts.gba_link_type, 1);
