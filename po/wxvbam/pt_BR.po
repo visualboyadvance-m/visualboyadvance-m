@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-18 18:59+0000\n"
-"PO-Revision-Date: 2019-08-18 18:59+0000\n"
+"POT-Creation-Date: 2019-08-20 23:18+0000\n"
+"PO-Revision-Date: 2019-08-20 23:19+0000\n"
 "Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/bgk/vba-m/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -322,15 +322,15 @@ msgstr "Erro ao salvar o arquivo snapshot %s"
 #: ../src/wx/cmdevents.cpp:1129 ../src/wx/cmdevents.cpp:1207
 #: ../src/wx/cmdevents.cpp:1277 ../src/wx/cmdevents.cpp:1304
 #: ../src/wx/viewers.cpp:562 ../src/wx/viewers.cpp:772
-#: ../src/wx/viewsupt.cpp:1161
+#: ../src/wx/viewsupt.cpp:1168
 msgid "Select output file"
 msgstr "Selecione o arquivo de saída"
 
-#: ../src/wx/cmdevents.cpp:1130 ../src/wx/viewsupt.cpp:1162
+#: ../src/wx/cmdevents.cpp:1130 ../src/wx/viewsupt.cpp:1169
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "Imagens PNG|*.png|Imagens BMP|*.bmp"
 
-#: ../src/wx/cmdevents.cpp:1154 ../src/wx/sys.cpp:435
+#: ../src/wx/cmdevents.cpp:1154 ../src/wx/sys.cpp:442
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "Snapshot escrito %s"
@@ -347,65 +347,65 @@ msgstr "Arquivo de Filme VBA|*.vmv"
 msgid "Select file"
 msgstr "Selecione o arquivo"
 
-#: ../src/wx/cmdevents.cpp:1500 ../src/wx/cmdevents.cpp:1593
+#: ../src/wx/cmdevents.cpp:1610 ../src/wx/cmdevents.cpp:1703
 msgid "Select state file"
 msgstr "Selecione o arquivo de estado"
 
-#: ../src/wx/cmdevents.cpp:1501 ../src/wx/cmdevents.cpp:1594
+#: ../src/wx/cmdevents.cpp:1611 ../src/wx/cmdevents.cpp:1704
 msgid "VisualBoyAdvance saved game files|*.sgm"
 msgstr "Arquivos de jogo salvo do VisualBoyAdvance|*.sgm"
 
-#: ../src/wx/cmdevents.cpp:1833
+#: ../src/wx/cmdevents.cpp:1943
 msgid "Sound enabled"
 msgstr "Som ativado"
 
-#: ../src/wx/cmdevents.cpp:1833
+#: ../src/wx/cmdevents.cpp:1943
 msgid "Sound disabled"
 msgstr "Som desativado"
 
-#: ../src/wx/cmdevents.cpp:1846 ../src/wx/cmdevents.cpp:1860
+#: ../src/wx/cmdevents.cpp:1956 ../src/wx/cmdevents.cpp:1970
 #, c-format
 msgid "Volume: %d%%"
 msgstr "Volume: %d%%"
 
-#: ../src/wx/cmdevents.cpp:1934
+#: ../src/wx/cmdevents.cpp:2044
 msgid "Set to 0 for pseudo tty"
 msgstr "Defina como 0 para pseudo tty"
 
-#: ../src/wx/cmdevents.cpp:1936
+#: ../src/wx/cmdevents.cpp:2046
 msgid "Port to wait for connection:"
 msgstr "Porta para esperar por conexão:"
 
-#: ../src/wx/cmdevents.cpp:1937
+#: ../src/wx/cmdevents.cpp:2047
 msgid "GDB Connection"
 msgstr "Conexão GDB"
 
-#: ../src/wx/cmdevents.cpp:1984
+#: ../src/wx/cmdevents.cpp:2094
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "Esperando a conexão de %s"
 
-#: ../src/wx/cmdevents.cpp:1991
+#: ../src/wx/cmdevents.cpp:2101
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "Esperando por conexão na porta %d"
 
-#: ../src/wx/cmdevents.cpp:1994
+#: ../src/wx/cmdevents.cpp:2104
 msgid "Waiting for GDB..."
 msgstr "Esperando por GDB..."
 
-#: ../src/wx/cmdevents.cpp:2516
+#: ../src/wx/cmdevents.cpp:2626
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Emulador de Nintendo GameBoy (+Color+Advance)."
 
-#: ../src/wx/cmdevents.cpp:2517
+#: ../src/wx/cmdevents.cpp:2627
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2017 VBA-M development team"
 
-#: ../src/wx/cmdevents.cpp:2518
+#: ../src/wx/cmdevents.cpp:2628
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -421,11 +421,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Este programa é um software livre: você pode redistribuí-lo e/ou modificá-lo\nde acordo com os termos da GNU General Public License como publicado pela\nFree Sotware Foundation, bem como a versão 2 da Licença, ou (na sua opção)\nqualquer versão posterior.\n\nEste programa é distribuído na esperança que o mesmo seja útil,\nmas SEM QUALQUER GARANTIA; sem mesmo a garantia implícita de\nCOMERCIALIZAÇÃO ou ADEQUAÇÃO PARA PROPÓSITOS PESSOAIS. Consulte\na GNU General Public License para mais detalhes.\n\nVocê deve ter recebido uma cópia da GNU General Public License\njunto com este programa. Se não recebeu, veja em http://www.gnu.org/licenses."
 
-#: ../src/wx/cmdevents.cpp:2778
+#: ../src/wx/cmdevents.cpp:2888
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "O link LAN já está ativo. Desative o modo link para ser desconectado."
 
-#: ../src/wx/cmdevents.cpp:2784
+#: ../src/wx/cmdevents.cpp:2894
 msgid "Network is not supported in local mode."
 msgstr "Rede não é suportada em modo local."
 
@@ -681,40 +681,40 @@ msgstr "Duplicar acelerador de menu: %s para %s e %s; mantendo primeiro"
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Acelerador de menu %s para %s substitui o padrão para %s ; mantendo menu"
 
-#: ../src/wx/guiinit.cpp:2961
+#: ../src/wx/guiinit.cpp:2971
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Item de menu inválido %s; removendo"
 
-#: ../src/wx/guiinit.cpp:3156
+#: ../src/wx/guiinit.cpp:3166
 msgid "Code"
 msgstr "Código"
 
-#: ../src/wx/guiinit.cpp:3165
+#: ../src/wx/guiinit.cpp:3175
 msgid "Description"
 msgstr "Descrição"
 
-#: ../src/wx/guiinit.cpp:3239 ../src/wx/xrc/CheatAdd.xrc:31
+#: ../src/wx/guiinit.cpp:3249 ../src/wx/xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Endereço"
 
-#: ../src/wx/guiinit.cpp:3240
+#: ../src/wx/guiinit.cpp:3250
 msgid "Old Value"
 msgstr "Valor Antigo"
 
-#: ../src/wx/guiinit.cpp:3241
+#: ../src/wx/guiinit.cpp:3251
 msgid "New Value"
 msgstr "Valor Novo"
 
-#: ../src/wx/guiinit.cpp:3777
+#: ../src/wx/guiinit.cpp:3787
 msgid "Menu commands"
 msgstr "Comandos do menu"
 
-#: ../src/wx/guiinit.cpp:3800
+#: ../src/wx/guiinit.cpp:3810
 msgid "Other commands"
 msgstr "Outros comandos"
 
-#: ../src/wx/guiinit.cpp:3911
+#: ../src/wx/guiinit.cpp:3921
 msgid "JoyBus host invalid; disabling"
 msgstr "Host JoyBus inválido; desativando"
 
@@ -879,7 +879,7 @@ msgstr "Não há jogo em andamento para gravar"
 msgid "Cannot open output file %s"
 msgstr "Não foi possível abrir o arquivo de saída %s"
 
-#: ../src/wx/sys.cpp:137 ../src/wx/sys.cpp:157 ../src/wx/sys.cpp:296
+#: ../src/wx/sys.cpp:137 ../src/wx/sys.cpp:157 ../src/wx/sys.cpp:303
 msgid "Error writing game recording"
 msgstr "Erro ao salvar gravação do jogo"
 
@@ -896,51 +896,51 @@ msgstr "Não foi possível abrir o arquivo de gravação %s"
 msgid "Error reading game recording"
 msgstr "Erro ao ler a gravação do jogo"
 
-#: ../src/wx/sys.cpp:307
+#: ../src/wx/sys.cpp:314
 msgid "Playback ended"
 msgstr "Reprodução finalizada"
 
-#: ../src/wx/sys.cpp:326
+#: ../src/wx/sys.cpp:333
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr "%d%%(%d, %d fps)"
 
-#: ../src/wx/sys.cpp:334
+#: ../src/wx/sys.cpp:341
 #, c-format
 msgid "%d%%"
 msgstr "%d%%"
 
-#: ../src/wx/sys.cpp:750 ../src/wx/xrc/GBPrinter.xrc:65
+#: ../src/wx/sys.cpp:757 ../src/wx/xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "&Descartar "
 
-#: ../src/wx/sys.cpp:784
+#: ../src/wx/sys.cpp:791
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "Arquivos de imagem (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: ../src/wx/sys.cpp:793
+#: ../src/wx/sys.cpp:800
 msgid "Save printer image to"
 msgstr "Salvar imagem de impressão para"
 
-#: ../src/wx/sys.cpp:807 ../src/wx/sys.cpp:990
+#: ../src/wx/sys.cpp:814 ../src/wx/sys.cpp:997
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "Escreveu saida de impressora em %s"
 
-#: ../src/wx/sys.cpp:812 ../src/wx/sys.cpp:883
+#: ../src/wx/sys.cpp:819 ../src/wx/sys.cpp:890
 msgid "&Close"
 msgstr "&Fechar"
 
-#: ../src/wx/sys.cpp:878
+#: ../src/wx/sys.cpp:885
 msgid "Printed"
 msgstr "Impresso"
 
-#: ../src/wx/sys.cpp:1178
+#: ../src/wx/sys.cpp:1185
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "Erro ao abrir pseudo tty: %s"
 
-#: ../src/wx/sys.cpp:1277
+#: ../src/wx/sys.cpp:1284
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "Erro ao configurar soquete do servidor (%d)"
@@ -1021,15 +1021,15 @@ msgstr "0xFF00 - I/O"
 msgid "0xFF80 - RAM"
 msgstr "0xFF80 - RAM"
 
-#: ../src/wx/viewsupt.cpp:769
+#: ../src/wx/viewsupt.cpp:776
 msgid "R:"
 msgstr "R:"
 
-#: ../src/wx/viewsupt.cpp:774
+#: ../src/wx/viewsupt.cpp:781
 msgid "G:"
 msgstr "G:"
 
-#: ../src/wx/viewsupt.cpp:779
+#: ../src/wx/viewsupt.cpp:786
 msgid "B:"
 msgstr "B:"
 
@@ -2997,7 +2997,7 @@ msgstr "&Wireless"
 msgid "&GameCube"
 msgstr "&GameCube"
 
-#: ../src/wx/xrc/MainMenu.xrc:268 ../src/wx/xrc/MainMenu.xrc:435
+#: ../src/wx/xrc/MainMenu.xrc:268 ../src/wx/xrc/MainMenu.xrc:478
 msgid "&Game Boy"
 msgstr "&Game Boy"
 
@@ -3118,235 +3118,263 @@ msgstr "Entrada"
 msgid "&Autofire"
 msgstr "&Autofire"
 
-#: ../src/wx/xrc/MainMenu.xrc:398
+#: ../src/wx/xrc/MainMenu.xrc:398 ../src/wx/xrc/MainMenu.xrc:433
 msgid "&A"
 msgstr "&A"
 
-#: ../src/wx/xrc/MainMenu.xrc:402
+#: ../src/wx/xrc/MainMenu.xrc:402 ../src/wx/xrc/MainMenu.xrc:437
 msgid "&B"
 msgstr "&B"
 
-#: ../src/wx/xrc/MainMenu.xrc:406
+#: ../src/wx/xrc/MainMenu.xrc:406 ../src/wx/xrc/MainMenu.xrc:441
 msgid "&L"
 msgstr "&L"
 
-#: ../src/wx/xrc/MainMenu.xrc:410
+#: ../src/wx/xrc/MainMenu.xrc:410 ../src/wx/xrc/MainMenu.xrc:445
 msgid "&R"
 msgstr "&R"
 
-#: ../src/wx/xrc/MainMenu.xrc:416
+#: ../src/wx/xrc/MainMenu.xrc:415
+msgid "&Autohold"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:417
+msgid "&Up"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:421
+msgid "&Down"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:425
+msgid "&Left"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:429
+msgid "&Right"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:449
+msgid "&Select"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:453
+msgid "&Start"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:459
 msgid "&Game Boy Advance"
 msgstr "&Game Boy Advance"
 
-#: ../src/wx/xrc/MainMenu.xrc:418 ../src/wx/xrc/MainMenu.xrc:437
+#: ../src/wx/xrc/MainMenu.xrc:461 ../src/wx/xrc/MainMenu.xrc:480
 msgid "Configure ..."
 msgstr "Configurar..."
 
-#: ../src/wx/xrc/MainMenu.xrc:422
+#: ../src/wx/xrc/MainMenu.xrc:465
 msgid "&Real-time clock"
 msgstr "&Relógio em tempo real"
 
-#: ../src/wx/xrc/MainMenu.xrc:426
+#: ../src/wx/xrc/MainMenu.xrc:469
 msgid "&Use BIOS file"
 msgstr "&Usar arquivo de BIOS"
 
-#: ../src/wx/xrc/MainMenu.xrc:430
+#: ../src/wx/xrc/MainMenu.xrc:473
 msgid "&Debug print"
 msgstr "Imprimir &debug"
 
-#: ../src/wx/xrc/MainMenu.xrc:441
+#: ../src/wx/xrc/MainMenu.xrc:484
 msgid "&GB printer"
 msgstr "Impressão &GB"
 
-#: ../src/wx/xrc/MainMenu.xrc:445
+#: ../src/wx/xrc/MainMenu.xrc:488
 msgid "&Gather a full page before printing"
 msgstr "Reúna uma &página inteira antes de imprimir"
 
-#: ../src/wx/xrc/MainMenu.xrc:449
+#: ../src/wx/xrc/MainMenu.xrc:492
 msgid "&Save printouts as screen captures"
 msgstr "&Salvar saída de impressão como captura de tela"
 
-#: ../src/wx/xrc/MainMenu.xrc:454
+#: ../src/wx/xrc/MainMenu.xrc:497
 msgid "&Use GB BIOS file"
 msgstr "&Usar arquivo de BIOS GB"
 
-#: ../src/wx/xrc/MainMenu.xrc:458
+#: ../src/wx/xrc/MainMenu.xrc:501
 msgid "&Use GBC BIOS file"
 msgstr "&Usar arquivo de BIOS GBC"
 
-#: ../src/wx/xrc/MainMenu.xrc:463
+#: ../src/wx/xrc/MainMenu.xrc:506
 msgid "&General ..."
 msgstr "&Geral..."
 
-#: ../src/wx/xrc/MainMenu.xrc:466
+#: ../src/wx/xrc/MainMenu.xrc:509
 msgid "&Speedup / Turbo ..."
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:469
+#: ../src/wx/xrc/MainMenu.xrc:512
 msgid "D&irectories ..."
 msgstr "D&iretórios..."
 
-#: ../src/wx/xrc/MainMenu.xrc:472
+#: ../src/wx/xrc/MainMenu.xrc:515
 msgid "&Key Shortcuts ..."
 msgstr "Atalhos de tecla..."
 
-#: ../src/wx/xrc/MainMenu.xrc:476
+#: ../src/wx/xrc/MainMenu.xrc:519
 msgid "&Tools"
 msgstr "Ferramen&tas"
 
-#: ../src/wx/xrc/MainMenu.xrc:478
+#: ../src/wx/xrc/MainMenu.xrc:521
 msgid "&Cheats"
 msgstr "Trapaças"
 
-#: ../src/wx/xrc/MainMenu.xrc:480
+#: ../src/wx/xrc/MainMenu.xrc:523
 msgid "List &cheats ..."
 msgstr "Listar trapaças"
 
-#: ../src/wx/xrc/MainMenu.xrc:483
+#: ../src/wx/xrc/MainMenu.xrc:526
 msgid "Find c&heat ..."
 msgstr "Pesquisar trapaça..."
 
-#: ../src/wx/xrc/MainMenu.xrc:487
+#: ../src/wx/xrc/MainMenu.xrc:530
 msgid "A&utomatically save/load cheats"
 msgstr "Salvar / carregar trapaças a&utomaticamente"
 
-#: ../src/wx/xrc/MainMenu.xrc:491
+#: ../src/wx/xrc/MainMenu.xrc:534
 msgid "&Enable cheats"
 msgstr "Habilitar trapaças"
 
-#: ../src/wx/xrc/MainMenu.xrc:498
+#: ../src/wx/xrc/MainMenu.xrc:541
 msgid "&Break into GDB"
 msgstr "&Break into GDB"
 
-#: ../src/wx/xrc/MainMenu.xrc:502
+#: ../src/wx/xrc/MainMenu.xrc:545
 msgid "&Configure port..."
 msgstr "&Configurar porta..."
 
-#: ../src/wx/xrc/MainMenu.xrc:505
+#: ../src/wx/xrc/MainMenu.xrc:548
 msgid "&Break on load"
 msgstr "&Break on load"
 
-#: ../src/wx/xrc/MainMenu.xrc:510
+#: ../src/wx/xrc/MainMenu.xrc:553
 msgid "&Disconnect"
 msgstr "&Desconectar"
 
-#: ../src/wx/xrc/MainMenu.xrc:512
+#: ../src/wx/xrc/MainMenu.xrc:555
 msgid "&GDB"
 msgstr "&GDB"
 
-#: ../src/wx/xrc/MainMenu.xrc:515
+#: ../src/wx/xrc/MainMenu.xrc:558
 msgid "&Disassemble..."
 msgstr "&Disassemble..."
 
-#: ../src/wx/xrc/MainMenu.xrc:518
+#: ../src/wx/xrc/MainMenu.xrc:561
 msgid "&Logging..."
 msgstr "&Logging..."
 
-#: ../src/wx/xrc/MainMenu.xrc:521
+#: ../src/wx/xrc/MainMenu.xrc:564
 msgid "&IO Viewer..."
 msgstr "Visualizador &IO..."
 
-#: ../src/wx/xrc/MainMenu.xrc:524
+#: ../src/wx/xrc/MainMenu.xrc:567
 msgid "&Map Viewer..."
 msgstr "Visualizador de &mapa"
 
-#: ../src/wx/xrc/MainMenu.xrc:527
+#: ../src/wx/xrc/MainMenu.xrc:570
 msgid "M&emory Viewer..."
 msgstr "Visualizador de M&emória..."
 
-#: ../src/wx/xrc/MainMenu.xrc:530
+#: ../src/wx/xrc/MainMenu.xrc:573
 msgid "&OAM Viewer..."
 msgstr "Visualizador &OAM..."
 
-#: ../src/wx/xrc/MainMenu.xrc:533
+#: ../src/wx/xrc/MainMenu.xrc:576
 msgid "&Palette Viewer..."
 msgstr "Visualizador de &paleta..."
 
-#: ../src/wx/xrc/MainMenu.xrc:536
+#: ../src/wx/xrc/MainMenu.xrc:579
 msgid "&Tile Viewer..."
 msgstr "Visualizador de &tile..."
 
-#: ../src/wx/xrc/MainMenu.xrc:541
+#: ../src/wx/xrc/MainMenu.xrc:584
 msgid "BG &0"
 msgstr "BG &0"
 
-#: ../src/wx/xrc/MainMenu.xrc:546
+#: ../src/wx/xrc/MainMenu.xrc:589
 msgid "BG &1"
 msgstr "BG &1"
 
-#: ../src/wx/xrc/MainMenu.xrc:551
+#: ../src/wx/xrc/MainMenu.xrc:594
 msgid "BG &2"
 msgstr "BG &2"
 
-#: ../src/wx/xrc/MainMenu.xrc:556
+#: ../src/wx/xrc/MainMenu.xrc:599
 msgid "BG &3"
 msgstr "BG &3"
 
-#: ../src/wx/xrc/MainMenu.xrc:561
+#: ../src/wx/xrc/MainMenu.xrc:604
 msgid "&OBJ"
 msgstr "&OBJ"
 
-#: ../src/wx/xrc/MainMenu.xrc:566
+#: ../src/wx/xrc/MainMenu.xrc:609
 msgid "&WIN 0"
 msgstr "&WIN 0"
 
-#: ../src/wx/xrc/MainMenu.xrc:571
+#: ../src/wx/xrc/MainMenu.xrc:614
 msgid "W&IN 1"
 msgstr "W&IN 1"
 
-#: ../src/wx/xrc/MainMenu.xrc:576
+#: ../src/wx/xrc/MainMenu.xrc:619
 msgid "O&BJ WIN"
 msgstr "O&BJ WIN"
 
-#: ../src/wx/xrc/MainMenu.xrc:580
+#: ../src/wx/xrc/MainMenu.xrc:623
 msgid "&View Layers"
 msgstr "&Visualizar camadas"
 
-#: ../src/wx/xrc/MainMenu.xrc:584
+#: ../src/wx/xrc/MainMenu.xrc:627
 msgid "Channel &1"
 msgstr "Canal &1"
 
-#: ../src/wx/xrc/MainMenu.xrc:589
+#: ../src/wx/xrc/MainMenu.xrc:632
 msgid "Channel &2"
 msgstr "Canal &2"
 
-#: ../src/wx/xrc/MainMenu.xrc:594
+#: ../src/wx/xrc/MainMenu.xrc:637
 msgid "Channel &3"
 msgstr "Canal &3"
 
-#: ../src/wx/xrc/MainMenu.xrc:599
+#: ../src/wx/xrc/MainMenu.xrc:642
 msgid "Channel &4"
 msgstr "Canal &4"
 
-#: ../src/wx/xrc/MainMenu.xrc:604
+#: ../src/wx/xrc/MainMenu.xrc:647
 msgid "Direct Sound &A"
 msgstr "Direct Sound &A"
 
-#: ../src/wx/xrc/MainMenu.xrc:609
+#: ../src/wx/xrc/MainMenu.xrc:652
 msgid "Direct Sound &B"
 msgstr "Direct Sound &B"
 
-#: ../src/wx/xrc/MainMenu.xrc:613
+#: ../src/wx/xrc/MainMenu.xrc:656
 msgid "&Sound Channels"
 msgstr "Canais de &som"
 
-#: ../src/wx/xrc/MainMenu.xrc:617
+#: ../src/wx/xrc/MainMenu.xrc:660
 msgid "&Help"
 msgstr "Ajuda"
 
-#: ../src/wx/xrc/MainMenu.xrc:619
+#: ../src/wx/xrc/MainMenu.xrc:662
 msgid "Report &Bugs"
 msgstr "Reportar erros"
 
-#: ../src/wx/xrc/MainMenu.xrc:622
+#: ../src/wx/xrc/MainMenu.xrc:665
 msgid "VBA-M Support &Forum"
 msgstr "&Fórum de suporte VBA-M"
 
-#: ../src/wx/xrc/MainMenu.xrc:625
+#: ../src/wx/xrc/MainMenu.xrc:668
 msgid "Translations"
 msgstr "Traduções"
 
-#: ../src/wx/xrc/MainMenu.xrc:636
+#: ../src/wx/xrc/MainMenu.xrc:679
 msgid "&Factory Reset..."
 msgstr ""
 

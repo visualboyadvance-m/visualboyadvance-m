@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-18 18:59+0000\n"
-"PO-Revision-Date: 2019-08-18 18:59+0000\n"
+"POT-Creation-Date: 2019-08-20 23:18+0000\n"
+"PO-Revision-Date: 2019-08-20 23:19+0000\n"
 "Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/bgk/vba-m/language/ko/)\n"
 "MIME-Version: 1.0\n"
@@ -316,15 +316,15 @@ msgstr "%s 스냅샷 파일 저장 오류"
 #: ../src/wx/cmdevents.cpp:1129 ../src/wx/cmdevents.cpp:1207
 #: ../src/wx/cmdevents.cpp:1277 ../src/wx/cmdevents.cpp:1304
 #: ../src/wx/viewers.cpp:562 ../src/wx/viewers.cpp:772
-#: ../src/wx/viewsupt.cpp:1161
+#: ../src/wx/viewsupt.cpp:1168
 msgid "Select output file"
 msgstr "출력 파일을 선택"
 
-#: ../src/wx/cmdevents.cpp:1130 ../src/wx/viewsupt.cpp:1162
+#: ../src/wx/cmdevents.cpp:1130 ../src/wx/viewsupt.cpp:1169
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG 이미지|*.png|BMP 이미지|*.bmp"
 
-#: ../src/wx/cmdevents.cpp:1154 ../src/wx/sys.cpp:435
+#: ../src/wx/cmdevents.cpp:1154 ../src/wx/sys.cpp:442
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "%s 스냅샷이 기록됨"
@@ -341,65 +341,65 @@ msgstr "VBA 리플레이 파일|*.vmv"
 msgid "Select file"
 msgstr "파일 선택"
 
-#: ../src/wx/cmdevents.cpp:1500 ../src/wx/cmdevents.cpp:1593
+#: ../src/wx/cmdevents.cpp:1610 ../src/wx/cmdevents.cpp:1703
 msgid "Select state file"
 msgstr "상태 저장 파일을 선택"
 
-#: ../src/wx/cmdevents.cpp:1501 ../src/wx/cmdevents.cpp:1594
+#: ../src/wx/cmdevents.cpp:1611 ../src/wx/cmdevents.cpp:1704
 msgid "VisualBoyAdvance saved game files|*.sgm"
 msgstr "VisualBoyAdvance 상태 저장 파일|*.sgm"
 
-#: ../src/wx/cmdevents.cpp:1833
+#: ../src/wx/cmdevents.cpp:1943
 msgid "Sound enabled"
 msgstr "소리 켜짐"
 
-#: ../src/wx/cmdevents.cpp:1833
+#: ../src/wx/cmdevents.cpp:1943
 msgid "Sound disabled"
 msgstr "소리 꺼짐"
 
-#: ../src/wx/cmdevents.cpp:1846 ../src/wx/cmdevents.cpp:1860
+#: ../src/wx/cmdevents.cpp:1956 ../src/wx/cmdevents.cpp:1970
 #, c-format
 msgid "Volume: %d%%"
 msgstr "음량: %d%%"
 
-#: ../src/wx/cmdevents.cpp:1934
+#: ../src/wx/cmdevents.cpp:2044
 msgid "Set to 0 for pseudo tty"
 msgstr "가상 Teletypewriter를 0으로 설정"
 
-#: ../src/wx/cmdevents.cpp:1936
+#: ../src/wx/cmdevents.cpp:2046
 msgid "Port to wait for connection:"
 msgstr "연결 대기용 포트:"
 
-#: ../src/wx/cmdevents.cpp:1937
+#: ../src/wx/cmdevents.cpp:2047
 msgid "GDB Connection"
 msgstr "GDB 연결"
 
-#: ../src/wx/cmdevents.cpp:1984
+#: ../src/wx/cmdevents.cpp:2094
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "%s로 연결 대기 중"
 
-#: ../src/wx/cmdevents.cpp:1991
+#: ../src/wx/cmdevents.cpp:2101
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "%d 포트로 연결 대기 중"
 
-#: ../src/wx/cmdevents.cpp:1994
+#: ../src/wx/cmdevents.cpp:2104
 msgid "Waiting for GDB..."
 msgstr "GDB 대기 중..."
 
-#: ../src/wx/cmdevents.cpp:2516
+#: ../src/wx/cmdevents.cpp:2626
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "닌텐도 게임 보이 (+컬러+어드밴스) 에뮬레이터"
 
-#: ../src/wx/cmdevents.cpp:2517
+#: ../src/wx/cmdevents.cpp:2627
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA 개발팀\nCopyright (C) 2007-2017 VBA-M 개발팀"
 
-#: ../src/wx/cmdevents.cpp:2518
+#: ../src/wx/cmdevents.cpp:2628
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -415,11 +415,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "이 프로그램은 자유 소프트웨어입니다. 소프트웨어의 피양도자는 자유\n소프트웨어 재단이 공표한 GNU 일반 공중 사용 허가서 2판 또는 그\n이후 판을 임의로 선택해서, 그 규정에 따라 프로그램을 개작하거나 \n재배포할 수 있습니다. \n\n이 프로그램은 유용하게 사용될 수 있으리라는 희망에서 배포되고\n있지만, 특정한 목적에 맞는 적합성 여부나 판매용으로 사용할 수 \n있으리라는 묵시적인 보증을 포함한 어떠한 형태의 보증도 제공하지 \n않습니다. 보다 자세한 사항에 대해서는 GNU 일반 공중 사용 허가서를\n참고하시기 바랍니다.\n\nGNU 일반 공중 사용 허가서는 이 프로그램과 함께 제공됩니다. 만약,\n이 문서가 누락되어 있다면 http://www.gnu.org/licenses 를\n참조 바랍니다."
 
-#: ../src/wx/cmdevents.cpp:2778
+#: ../src/wx/cmdevents.cpp:2888
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LAN 연결이 이미 활성화 상태입니다. 연결해체를 위해 연결 모드를 비활성화 하십시오."
 
-#: ../src/wx/cmdevents.cpp:2784
+#: ../src/wx/cmdevents.cpp:2894
 msgid "Network is not supported in local mode."
 msgstr "로컬 모드에서는 네트워크가 지원되지 않습니다."
 
@@ -675,40 +675,40 @@ msgstr "메뉴 가속기 복제: %s 는 %s 와 %s용; 첫 번째 유지"
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "%s 메뉴 가속기 (%s에 대해) 는 %s에 대한 초기값을 덮어씌움 ; 메뉴 유지"
 
-#: ../src/wx/guiinit.cpp:2961
+#: ../src/wx/guiinit.cpp:2971
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "무효한 %s 메뉴 항목 ; 제거"
 
-#: ../src/wx/guiinit.cpp:3156
+#: ../src/wx/guiinit.cpp:3166
 msgid "Code"
 msgstr "코드"
 
-#: ../src/wx/guiinit.cpp:3165
+#: ../src/wx/guiinit.cpp:3175
 msgid "Description"
 msgstr "설명"
 
-#: ../src/wx/guiinit.cpp:3239 ../src/wx/xrc/CheatAdd.xrc:31
+#: ../src/wx/guiinit.cpp:3249 ../src/wx/xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "주소"
 
-#: ../src/wx/guiinit.cpp:3240
+#: ../src/wx/guiinit.cpp:3250
 msgid "Old Value"
 msgstr "이전 값"
 
-#: ../src/wx/guiinit.cpp:3241
+#: ../src/wx/guiinit.cpp:3251
 msgid "New Value"
 msgstr "새 값"
 
-#: ../src/wx/guiinit.cpp:3777
+#: ../src/wx/guiinit.cpp:3787
 msgid "Menu commands"
 msgstr "메뉴 명령"
 
-#: ../src/wx/guiinit.cpp:3800
+#: ../src/wx/guiinit.cpp:3810
 msgid "Other commands"
 msgstr "그 외 명령"
 
-#: ../src/wx/guiinit.cpp:3911
+#: ../src/wx/guiinit.cpp:3921
 msgid "JoyBus host invalid; disabling"
 msgstr "조이버스 호스트 무효; 비활성화"
 
@@ -873,7 +873,7 @@ msgstr "녹화할 진행 중인 게임이 없습니다."
 msgid "Cannot open output file %s"
 msgstr "출력파일 %s을 열 수 없습니다."
 
-#: ../src/wx/sys.cpp:137 ../src/wx/sys.cpp:157 ../src/wx/sys.cpp:296
+#: ../src/wx/sys.cpp:137 ../src/wx/sys.cpp:157 ../src/wx/sys.cpp:303
 msgid "Error writing game recording"
 msgstr "게임 녹화를 기록할 수 없습니다."
 
@@ -890,51 +890,51 @@ msgstr "녹화 파일 %s 을 열 수 없습니다."
 msgid "Error reading game recording"
 msgstr "게임 녹화를 읽을 수 없습니다."
 
-#: ../src/wx/sys.cpp:307
+#: ../src/wx/sys.cpp:314
 msgid "Playback ended"
 msgstr "재생 종료."
 
-#: ../src/wx/sys.cpp:326
+#: ../src/wx/sys.cpp:333
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr "%d%%(%d, %d fps)"
 
-#: ../src/wx/sys.cpp:334
+#: ../src/wx/sys.cpp:341
 #, c-format
 msgid "%d%%"
 msgstr "%d%%"
 
-#: ../src/wx/sys.cpp:750 ../src/wx/xrc/GBPrinter.xrc:65
+#: ../src/wx/sys.cpp:757 ../src/wx/xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "버리기(&D)"
 
-#: ../src/wx/sys.cpp:784
+#: ../src/wx/sys.cpp:791
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "이미지 파일 (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: ../src/wx/sys.cpp:793
+#: ../src/wx/sys.cpp:800
 msgid "Save printer image to"
 msgstr "프린터 이미지 저장 : "
 
-#: ../src/wx/sys.cpp:807 ../src/wx/sys.cpp:990
+#: ../src/wx/sys.cpp:814 ../src/wx/sys.cpp:997
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "프린터 결과를 %s에 기록했습니다."
 
-#: ../src/wx/sys.cpp:812 ../src/wx/sys.cpp:883
+#: ../src/wx/sys.cpp:819 ../src/wx/sys.cpp:890
 msgid "&Close"
 msgstr "닫기(&C)"
 
-#: ../src/wx/sys.cpp:878
+#: ../src/wx/sys.cpp:885
 msgid "Printed"
 msgstr "인쇄됨"
 
-#: ../src/wx/sys.cpp:1178
+#: ../src/wx/sys.cpp:1185
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "가상 tty %s를 열 수 없습니다."
 
-#: ../src/wx/sys.cpp:1277
+#: ../src/wx/sys.cpp:1284
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "서버 소켓 셋업 에러 (%d)"
@@ -1015,15 +1015,15 @@ msgstr "0xFF00 - I/O"
 msgid "0xFF80 - RAM"
 msgstr "0xFF80 - RAM"
 
-#: ../src/wx/viewsupt.cpp:769
+#: ../src/wx/viewsupt.cpp:776
 msgid "R:"
 msgstr "R:"
 
-#: ../src/wx/viewsupt.cpp:774
+#: ../src/wx/viewsupt.cpp:781
 msgid "G:"
 msgstr "G:"
 
-#: ../src/wx/viewsupt.cpp:779
+#: ../src/wx/viewsupt.cpp:786
 msgid "B:"
 msgstr "B:"
 
@@ -2991,7 +2991,7 @@ msgstr "무선(&W)"
 msgid "&GameCube"
 msgstr "게임 큐브(&G)"
 
-#: ../src/wx/xrc/MainMenu.xrc:268 ../src/wx/xrc/MainMenu.xrc:435
+#: ../src/wx/xrc/MainMenu.xrc:268 ../src/wx/xrc/MainMenu.xrc:478
 msgid "&Game Boy"
 msgstr "게임 보이(&G)"
 
@@ -3112,235 +3112,263 @@ msgstr "입력(&I)"
 msgid "&Autofire"
 msgstr "연사(&A)"
 
-#: ../src/wx/xrc/MainMenu.xrc:398
+#: ../src/wx/xrc/MainMenu.xrc:398 ../src/wx/xrc/MainMenu.xrc:433
 msgid "&A"
 msgstr "&A"
 
-#: ../src/wx/xrc/MainMenu.xrc:402
+#: ../src/wx/xrc/MainMenu.xrc:402 ../src/wx/xrc/MainMenu.xrc:437
 msgid "&B"
 msgstr "&B"
 
-#: ../src/wx/xrc/MainMenu.xrc:406
+#: ../src/wx/xrc/MainMenu.xrc:406 ../src/wx/xrc/MainMenu.xrc:441
 msgid "&L"
 msgstr "&L"
 
-#: ../src/wx/xrc/MainMenu.xrc:410
+#: ../src/wx/xrc/MainMenu.xrc:410 ../src/wx/xrc/MainMenu.xrc:445
 msgid "&R"
 msgstr "&R"
 
-#: ../src/wx/xrc/MainMenu.xrc:416
+#: ../src/wx/xrc/MainMenu.xrc:415
+msgid "&Autohold"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:417
+msgid "&Up"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:421
+msgid "&Down"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:425
+msgid "&Left"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:429
+msgid "&Right"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:449
+msgid "&Select"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:453
+msgid "&Start"
+msgstr ""
+
+#: ../src/wx/xrc/MainMenu.xrc:459
 msgid "&Game Boy Advance"
 msgstr "게임 보이 어드밴스(&G)"
 
-#: ../src/wx/xrc/MainMenu.xrc:418 ../src/wx/xrc/MainMenu.xrc:437
+#: ../src/wx/xrc/MainMenu.xrc:461 ../src/wx/xrc/MainMenu.xrc:480
 msgid "Configure ..."
 msgstr "구성설정..."
 
-#: ../src/wx/xrc/MainMenu.xrc:422
+#: ../src/wx/xrc/MainMenu.xrc:465
 msgid "&Real-time clock"
 msgstr "실시간 시계(&R)"
 
-#: ../src/wx/xrc/MainMenu.xrc:426
+#: ../src/wx/xrc/MainMenu.xrc:469
 msgid "&Use BIOS file"
 msgstr "BIOS 파일을 사용(&U)"
 
-#: ../src/wx/xrc/MainMenu.xrc:430
+#: ../src/wx/xrc/MainMenu.xrc:473
 msgid "&Debug print"
 msgstr "디버그 프린트(&D)"
 
-#: ../src/wx/xrc/MainMenu.xrc:441
+#: ../src/wx/xrc/MainMenu.xrc:484
 msgid "&GB printer"
 msgstr "게임 보이 프린터(&G)"
 
-#: ../src/wx/xrc/MainMenu.xrc:445
+#: ../src/wx/xrc/MainMenu.xrc:488
 msgid "&Gather a full page before printing"
 msgstr "출력 전 모든 페이지를 모으기(&G)"
 
-#: ../src/wx/xrc/MainMenu.xrc:449
+#: ../src/wx/xrc/MainMenu.xrc:492
 msgid "&Save printouts as screen captures"
 msgstr "스크린 캡쳐로 저장하기(&S)"
 
-#: ../src/wx/xrc/MainMenu.xrc:454
+#: ../src/wx/xrc/MainMenu.xrc:497
 msgid "&Use GB BIOS file"
 msgstr "게임 보이 BIOS 파일을 사용(&U)"
 
-#: ../src/wx/xrc/MainMenu.xrc:458
+#: ../src/wx/xrc/MainMenu.xrc:501
 msgid "&Use GBC BIOS file"
 msgstr "게임 보이 컬러 BIOS 파일을 사용(&U)"
 
-#: ../src/wx/xrc/MainMenu.xrc:463
+#: ../src/wx/xrc/MainMenu.xrc:506
 msgid "&General ..."
 msgstr "일반(&G)..."
 
-#: ../src/wx/xrc/MainMenu.xrc:466
+#: ../src/wx/xrc/MainMenu.xrc:509
 msgid "&Speedup / Turbo ..."
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:469
+#: ../src/wx/xrc/MainMenu.xrc:512
 msgid "D&irectories ..."
 msgstr "디렉토리(&I)..."
 
-#: ../src/wx/xrc/MainMenu.xrc:472
+#: ../src/wx/xrc/MainMenu.xrc:515
 msgid "&Key Shortcuts ..."
 msgstr "단축키(&K)..."
 
-#: ../src/wx/xrc/MainMenu.xrc:476
+#: ../src/wx/xrc/MainMenu.xrc:519
 msgid "&Tools"
 msgstr "도구(&T)"
 
-#: ../src/wx/xrc/MainMenu.xrc:478
+#: ../src/wx/xrc/MainMenu.xrc:521
 msgid "&Cheats"
 msgstr "치트(&C)"
 
-#: ../src/wx/xrc/MainMenu.xrc:480
+#: ../src/wx/xrc/MainMenu.xrc:523
 msgid "List &cheats ..."
 msgstr "치트 목록(&C)..."
 
-#: ../src/wx/xrc/MainMenu.xrc:483
+#: ../src/wx/xrc/MainMenu.xrc:526
 msgid "Find c&heat ..."
 msgstr "치트 찾기(&H)..."
 
-#: ../src/wx/xrc/MainMenu.xrc:487
+#: ../src/wx/xrc/MainMenu.xrc:530
 msgid "A&utomatically save/load cheats"
 msgstr "치트 자동으로 저장/불러오기(&U)"
 
-#: ../src/wx/xrc/MainMenu.xrc:491
+#: ../src/wx/xrc/MainMenu.xrc:534
 msgid "&Enable cheats"
 msgstr "치트 사용(&E)"
 
-#: ../src/wx/xrc/MainMenu.xrc:498
+#: ../src/wx/xrc/MainMenu.xrc:541
 msgid "&Break into GDB"
 msgstr "GDB로 브레이크(&B)"
 
-#: ../src/wx/xrc/MainMenu.xrc:502
+#: ../src/wx/xrc/MainMenu.xrc:545
 msgid "&Configure port..."
 msgstr "포트 구성(&C)..."
 
-#: ../src/wx/xrc/MainMenu.xrc:505
+#: ../src/wx/xrc/MainMenu.xrc:548
 msgid "&Break on load"
 msgstr "로드 시 브레이크(&B)"
 
-#: ../src/wx/xrc/MainMenu.xrc:510
+#: ../src/wx/xrc/MainMenu.xrc:553
 msgid "&Disconnect"
 msgstr "연결 끊기(&D)"
 
-#: ../src/wx/xrc/MainMenu.xrc:512
+#: ../src/wx/xrc/MainMenu.xrc:555
 msgid "&GDB"
 msgstr "&GDB"
 
-#: ../src/wx/xrc/MainMenu.xrc:515
+#: ../src/wx/xrc/MainMenu.xrc:558
 msgid "&Disassemble..."
 msgstr "디스어셈블(&D)..."
 
-#: ../src/wx/xrc/MainMenu.xrc:518
+#: ../src/wx/xrc/MainMenu.xrc:561
 msgid "&Logging..."
 msgstr "기록(&L)..."
 
-#: ../src/wx/xrc/MainMenu.xrc:521
+#: ../src/wx/xrc/MainMenu.xrc:564
 msgid "&IO Viewer..."
 msgstr "입출력 뷰어(&I)..."
 
-#: ../src/wx/xrc/MainMenu.xrc:524
+#: ../src/wx/xrc/MainMenu.xrc:567
 msgid "&Map Viewer..."
 msgstr "맵 뷰어(&M)..."
 
-#: ../src/wx/xrc/MainMenu.xrc:527
+#: ../src/wx/xrc/MainMenu.xrc:570
 msgid "M&emory Viewer..."
 msgstr "메모리 뷰어(&E)..."
 
-#: ../src/wx/xrc/MainMenu.xrc:530
+#: ../src/wx/xrc/MainMenu.xrc:573
 msgid "&OAM Viewer..."
 msgstr "OAM 뷰어(&O)..."
 
-#: ../src/wx/xrc/MainMenu.xrc:533
+#: ../src/wx/xrc/MainMenu.xrc:576
 msgid "&Palette Viewer..."
 msgstr "팔레트 뷰어(&P)..."
 
-#: ../src/wx/xrc/MainMenu.xrc:536
+#: ../src/wx/xrc/MainMenu.xrc:579
 msgid "&Tile Viewer..."
 msgstr "타일 뷰어(&T)..."
 
-#: ../src/wx/xrc/MainMenu.xrc:541
+#: ../src/wx/xrc/MainMenu.xrc:584
 msgid "BG &0"
 msgstr "BG &0"
 
-#: ../src/wx/xrc/MainMenu.xrc:546
+#: ../src/wx/xrc/MainMenu.xrc:589
 msgid "BG &1"
 msgstr "BG &1"
 
-#: ../src/wx/xrc/MainMenu.xrc:551
+#: ../src/wx/xrc/MainMenu.xrc:594
 msgid "BG &2"
 msgstr "BG &2"
 
-#: ../src/wx/xrc/MainMenu.xrc:556
+#: ../src/wx/xrc/MainMenu.xrc:599
 msgid "BG &3"
 msgstr "BG &3"
 
-#: ../src/wx/xrc/MainMenu.xrc:561
+#: ../src/wx/xrc/MainMenu.xrc:604
 msgid "&OBJ"
 msgstr "개체(&O)"
 
-#: ../src/wx/xrc/MainMenu.xrc:566
+#: ../src/wx/xrc/MainMenu.xrc:609
 msgid "&WIN 0"
 msgstr "창 0(&W)"
 
-#: ../src/wx/xrc/MainMenu.xrc:571
+#: ../src/wx/xrc/MainMenu.xrc:614
 msgid "W&IN 1"
 msgstr "창 1(&I)"
 
-#: ../src/wx/xrc/MainMenu.xrc:576
+#: ../src/wx/xrc/MainMenu.xrc:619
 msgid "O&BJ WIN"
 msgstr "개체 창(&B)"
 
-#: ../src/wx/xrc/MainMenu.xrc:580
+#: ../src/wx/xrc/MainMenu.xrc:623
 msgid "&View Layers"
 msgstr "레이어 보기(&V)"
 
-#: ../src/wx/xrc/MainMenu.xrc:584
+#: ../src/wx/xrc/MainMenu.xrc:627
 msgid "Channel &1"
 msgstr "채널 &1"
 
-#: ../src/wx/xrc/MainMenu.xrc:589
+#: ../src/wx/xrc/MainMenu.xrc:632
 msgid "Channel &2"
 msgstr "채널 &2"
 
-#: ../src/wx/xrc/MainMenu.xrc:594
+#: ../src/wx/xrc/MainMenu.xrc:637
 msgid "Channel &3"
 msgstr "채널 &3"
 
-#: ../src/wx/xrc/MainMenu.xrc:599
+#: ../src/wx/xrc/MainMenu.xrc:642
 msgid "Channel &4"
 msgstr "채널 &4"
 
-#: ../src/wx/xrc/MainMenu.xrc:604
+#: ../src/wx/xrc/MainMenu.xrc:647
 msgid "Direct Sound &A"
 msgstr "다이렉트 사운드 &A"
 
-#: ../src/wx/xrc/MainMenu.xrc:609
+#: ../src/wx/xrc/MainMenu.xrc:652
 msgid "Direct Sound &B"
 msgstr "다이렉트 사운드 &B"
 
-#: ../src/wx/xrc/MainMenu.xrc:613
+#: ../src/wx/xrc/MainMenu.xrc:656
 msgid "&Sound Channels"
 msgstr "사운드 채널(&S)"
 
-#: ../src/wx/xrc/MainMenu.xrc:617
+#: ../src/wx/xrc/MainMenu.xrc:660
 msgid "&Help"
 msgstr "도움말(&H)"
 
-#: ../src/wx/xrc/MainMenu.xrc:619
+#: ../src/wx/xrc/MainMenu.xrc:662
 msgid "Report &Bugs"
 msgstr "버그 제보(&B)"
 
-#: ../src/wx/xrc/MainMenu.xrc:622
+#: ../src/wx/xrc/MainMenu.xrc:665
 msgid "VBA-M Support &Forum"
 msgstr "VBA-M 지원 포럼(&F)"
 
-#: ../src/wx/xrc/MainMenu.xrc:625
+#: ../src/wx/xrc/MainMenu.xrc:668
 msgid "Translations"
 msgstr "번역하기"
 
-#: ../src/wx/xrc/MainMenu.xrc:636
+#: ../src/wx/xrc/MainMenu.xrc:679
 msgid "&Factory Reset..."
 msgstr ""
 
