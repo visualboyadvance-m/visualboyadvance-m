@@ -73,12 +73,12 @@ public:
     wxButton* okb;
     void ServerOKButton(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         okb->SetLabel(_("Start!"));
     }
     void ClientOKButton(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         okb->SetLabel(_("Connect"));
     }
     // attached to OK, so skip when OK
@@ -707,13 +707,13 @@ public:
     CheatListFill(const CheatListFill& e)
         : wxValidator()
     {
-	(void)e; // unused params
+        (void)e; // unused params
     }
     wxObject* Clone() const { return new CheatListFill(*this); }
     bool TransferFromWindow() { return true; }
     bool Validate(wxWindow* p) {
-	(void)p; // unused params
-	return true;
+        (void)p; // unused params
+        return true;
     }
     bool TransferToWindow()
     {
@@ -840,13 +840,13 @@ public:
 // will ever get
 #if 0
 
-					if (list->addrs.size() > 1000)
-					{
-						wxLogError(_("Search produced %d results.  Please refine better"),
-						           list->addrs.size());
-						list->addrs.clear();
-						return;
-					}
+                                        if (list->addrs.size() > 1000)
+                                        {
+                                                wxLogError(_("Search produced %d results.  Please refine better"),
+                                                           list->addrs.size());
+                                                list->addrs.clear();
+                                                return;
+                                        }
 
 #endif
                 }
@@ -892,7 +892,7 @@ public:
 
     void UpdateVals(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         if (cheatSearchData.count) {
             cheatSearchUpdateValues(&cheatSearchData);
 
@@ -905,7 +905,7 @@ public:
 
     void ResetSearch(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         if (!cheatSearchData.count) {
             CheatSearchBlock* block = cheatSearchData.blocks;
 
@@ -997,7 +997,7 @@ public:
 
     void AddCheatB(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         int idx = list->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 
         if (idx >= 0)
@@ -1204,7 +1204,7 @@ public:
 
     void UpdateView(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         dlg->TransferDataFromWindow();
 
         if (ofmt != fmt && !val_s.empty()) {
@@ -1293,13 +1293,13 @@ public:
     CheatFindFill(const CheatFindFill& e)
         : wxValidator()
     {
-	(void)e; // unused params
+        (void)e; // unused params
     }
     wxObject* Clone() const { return new CheatFindFill(*this); }
     bool TransferFromWindow() { return true; }
     bool Validate(wxWindow* p) {
-	(void)p; // unused params
-	return true;
+        (void)p; // unused params
+        return true;
     }
     bool TransferToWindow()
     {
@@ -1433,7 +1433,7 @@ public:
     }
     void ColorReset(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         const uint16_t* color = &systemGbPalette[pno * 8];
 
         for (int i = 0; i < 8; i++, color++)
@@ -1444,7 +1444,7 @@ public:
 
     void ColorButton(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         c->SetSelection(0);
     }
 } GBColorConfigHandler[3];
@@ -1459,13 +1459,13 @@ public:
     GBACtrlEnabler(const GBACtrlEnabler& e)
         : wxValidator()
     {
-	(void)e; // unused params
+        (void)e; // unused params
     }
     wxObject* Clone() const { return new GBACtrlEnabler(*this); }
     bool TransferFromWindow() { return true; }
     bool Validate(wxWindow* p) {
-	(void)p; // unused params
-	return true;
+        (void)p; // unused params
+        return true;
     }
     bool TransferToWindow()
     {
@@ -1485,7 +1485,7 @@ public:
     }
     void Detect(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         uint32_t sz = wxGetApp().frame->GetPanel()->game_size();
         utilGBAFindSave(sz);
         type->SetSelection(saveType);
@@ -1511,7 +1511,7 @@ public:
 
     void FullVol(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         vol->SetValue(100);
     }
     void AdjustFrames(int count)
@@ -1522,7 +1522,7 @@ public:
     }
     void AdjustFramesEv(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         AdjustFrames(bufs->GetValue());
     }
 
@@ -1610,12 +1610,12 @@ public:
     SoundConfigLoad(const SoundConfigLoad& e)
         : wxValidator()
     {
-	(void)e; // unused params
+        (void)e; // unused params
     }
     wxObject* Clone() const { return new SoundConfigLoad(*this); }
     bool Validate(wxWindow* p) {
-	(void)p; // unused params
-	return true;
+        (void)p; // unused params
+        return true;
     }
     bool TransferToWindow()
     {
@@ -1689,12 +1689,12 @@ public:
     ScreenModeList(const ScreenModeList& e)
         : wxValidator()
     {
-	(void)e; // unused params
+        (void)e; // unused params
     }
     wxObject* Clone() const { return new ScreenModeList(*this); }
     bool Validate(wxWindow* p) {
-	(void)p; // unused params
-	return true;
+        (void)p; // unused params
+        return true;
     }
     bool TransferToWindow()
     {
@@ -1767,13 +1767,13 @@ public:
     PluginEnabler(const PluginEnabler& e)
         : wxValidator()
     {
-	(void)e; // unused params
+        (void)e; // unused params
     }
     wxObject* Clone() const { return new PluginEnabler(*this); }
     bool TransferFromWindow() { return true; }
     bool Validate(wxWindow* p) {
-	(void)p; // unused params
-	return true;
+        (void)p; // unused params
+        return true;
     }
     bool TransferToWindow()
     {
@@ -1799,7 +1799,7 @@ class PluginListFiller : public PluginEnabler {
 public:
     PluginListFiller(wxDialog* parent, wxControl* lab, wxChoice* ch)
         : PluginEnabler()
-	, dlg(parent)
+        , dlg(parent)
         , txt(lab)
         , filtch(ch)
         , plugins()
@@ -1807,7 +1807,7 @@ public:
     }
     PluginListFiller(const PluginListFiller& e)
         : PluginEnabler()
-	, dlg(e.dlg)
+        , dlg(e.dlg)
         , txt(e.txt)
         , filtch(e.filtch)
         , plugins(e.plugins)
@@ -1815,8 +1815,8 @@ public:
     }
     wxObject* Clone() const { return new PluginListFiller(*this); }
     bool Validate(wxWindow* p) {
-	(void)p; // unused params
-	return true;
+        (void)p; // unused params
+        return true;
     }
     bool TransferToWindow()
     {
@@ -1854,9 +1854,9 @@ public:
                 if (plugins[i] == gopts.filter_plugin)
                     ch->SetSelection(i + 1);
             }
-	    else {
+            else {
                 plugins.RemoveAt(i--);
-	    }
+            }
         }
 
         if (ch->GetCount() == 1) {
@@ -2055,14 +2055,14 @@ public:
     // after selecting a key in key list, enable Remove button
     void KeySel(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         remb->Enable(lb->GetSelection() != wxNOT_FOUND);
     }
 
     // remove selected binding
     void Remove(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         int lsel = lb->GetSelection();
 
         if (lsel == wxNOT_FOUND)
@@ -2111,7 +2111,7 @@ public:
     // wipe out all user bindings
     void ResetAll(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         if (user_accels.empty() || wxMessageBox(_("This will clear all user-defined accelerators.  Are you sure?"), _("Confirm"), wxYES_NO) != wxYES)
             return;
 
@@ -2127,7 +2127,7 @@ public:
     // remove old key binding, add new key binding, and update GUI
     void Assign(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         wxTreeItemId csel = tc->GetSelection();
         wxString accel = key->GetValue();
 
@@ -2168,7 +2168,7 @@ public:
     // update curas and maybe enable asb
     void CheckKey(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         wxString nkey = key->GetValue();
 
         if (nkey.empty()) {
@@ -2292,7 +2292,7 @@ public:
     // set thrsel from thr
     void SetThrottleSel(wxSpinEvent& evt)
     {
-	(void)evt; // unused params
+        (void)evt; // unused params
         DoSetThrottleSel(thr->GetValue());
     }
 
@@ -2307,7 +2307,7 @@ public:
     // set thr from thrsel
     void SetThrottle(wxCommandEvent& evt)
     {
-	(void)evt; // unused params
+        (void)evt; // unused params
         uint32_t val = thrsel->GetSelection() * 25;
 
         if (val <= 600)
@@ -2347,7 +2347,7 @@ public:
     // set speedup_throttle_sel from speedup_throttle
     void SetSpeedupThrottleSel(wxSpinEvent& evt)
     {
-	(void)evt; // unused params
+        (void)evt; // unused params
         DoSetSpeedupThrottleSel(speedup_throttle_spin->GetValue());
     }
 
@@ -2366,7 +2366,7 @@ public:
     // set speedup_throttle from speedup_throttle_sel
     void SetSpeedupThrottle(wxCommandEvent& evt)
     {
-	(void)evt; // unused params
+        (void)evt; // unused params
         uint32_t val = speedup_throttle_sel->GetSelection() * 25;
 
         if (val > 0 && val <= 600) {
@@ -2750,29 +2750,29 @@ bool MainFrame::BindControls()
 
     if (menubar) {
 #if 0 // doesn't work in 2.9 at all (causes main menu to malfunction)
-		// to fix, recursively copy entire menu insted of just copying
-		// menubar.  This means that every saved menu item must also be
-		// saved twice...  A lot of work for a mostly worthless feature.
-		// If you want the menu, just exit full-screen mode.
-		// Either that, or add an option to retain the regular
-		// menubar in full-screen mode
-		// create a context menu for fullscreen mode
-		// FIXME: on gtk port, this gives Gtk-WARNING **:
-		//   gtk_menu_attach_to_widget(): menu already attached to GtkMenuItem
-		// but it works anyway
-		// Note: menu default accelerators (e.g. alt-f for file menu) don't
-		// work with context menu (and can never work, since there is no
-		// way to pop up a submenu)
-		// It would probably be better, in the end, to use a collapsed menu
-		// bar (either Amiga-style press RMB to make appear, or Windows
-		// collapsed toolbar-style move mouse to within a pixel of top to
-		// make appear).  Not supported in wx without a lot of work, though.
-		// Maybe this feature should just be dropped; the user would simply
-		// have to exit fullscreen mode to use the menu.
-		ctx_menu = new wxMenu();
+                // to fix, recursively copy entire menu insted of just copying
+                // menubar.  This means that every saved menu item must also be
+                // saved twice...  A lot of work for a mostly worthless feature.
+                // If you want the menu, just exit full-screen mode.
+                // Either that, or add an option to retain the regular
+                // menubar in full-screen mode
+                // create a context menu for fullscreen mode
+                // FIXME: on gtk port, this gives Gtk-WARNING **:
+                //   gtk_menu_attach_to_widget(): menu already attached to GtkMenuItem
+                // but it works anyway
+                // Note: menu default accelerators (e.g. alt-f for file menu) don't
+                // work with context menu (and can never work, since there is no
+                // way to pop up a submenu)
+                // It would probably be better, in the end, to use a collapsed menu
+                // bar (either Amiga-style press RMB to make appear, or Windows
+                // collapsed toolbar-style move mouse to within a pixel of top to
+                // make appear).  Not supported in wx without a lot of work, though.
+                // Maybe this feature should just be dropped; the user would simply
+                // have to exit fullscreen mode to use the menu.
+                ctx_menu = new wxMenu();
 
-		for (int i = 0; i < menubar->GetMenuCount(); i++)
-			ctx_menu->AppendSubMenu(menubar->GetMenu(i), menubar->GetMenuLabel(i));
+                for (int i = 0; i < menubar->GetMenuCount(); i++)
+                        ctx_menu->AppendSubMenu(menubar->GetMenu(i), menubar->GetMenuLabel(i));
 
 #endif
 
@@ -3173,12 +3173,12 @@ bool MainFrame::BindControls()
             cheat_list_handler.item1.SetFont(cl->GetFont());
             cheat_list_handler.item1.SetColumn(1);
 #if 0
-			// the ideal way to set col 0's width would be to use
-			// wxLIST_AUTOSIZE after setting value to a sample:
-			cheat_list_handler.item0.SetText(wxT("00000000 00000000"));
-			cl->InsertItem(cheat_list_handler.item0);
-			cl->SetColumnWidth(0, wxLIST_AUTOSIZE);
-			cl->RemoveItem(0);
+                        // the ideal way to set col 0's width would be to use
+                        // wxLIST_AUTOSIZE after setting value to a sample:
+                        cheat_list_handler.item0.SetText(wxT("00000000 00000000"));
+                        cl->InsertItem(cheat_list_handler.item0);
+                        cl->SetColumnWidth(0, wxLIST_AUTOSIZE);
+                        cl->RemoveItem(0);
 #else
             // however, the generic listctrl implementation uses the wrong
             // font to determine width (window vs. item), and does not
@@ -3420,7 +3420,7 @@ bool MainFrame::BindControls()
         }
 #define getcbbe(n, o) getbe(n, o, cb, wxCheckBox, CB)
         wxBoolIntEnValidator* bienval;
-	(void)bienval; // not used yet
+        (void)bienval; // not used yet
 #define getbie(n, o, v, cv, t, wt)                                        \
     do {                                                                  \
         cv = SafeXRCCTRL<t>(d, n);                                        \
