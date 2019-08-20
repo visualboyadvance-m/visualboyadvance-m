@@ -216,7 +216,7 @@ void GameArea::LoadGame(const wxString& name)
         if (loadpatch) {
             // don't use real rom size or it might try to resize rom[]
             // instead, use known size of rom[]
-            int size = 0x2000000;
+            int size = 0x2000000 < rom_size ? 0x2000000 : rom_size;
             applyPatch(pfn.GetFullPath().mb_str(), &rom, &size);
             // that means we no longer really know rom_size either <sigh>
         }
