@@ -779,7 +779,7 @@ void systemStopGamePlayback();
 extern bool turbo;
 
 // mask of key press flags; see below
-extern int joypress[4], autofire;
+extern int joypress[4], autofire, autohold;
 
 // FIXME: these defines should be global to project and used instead of raw numbers
 #define KEYM_A (1 << 0)

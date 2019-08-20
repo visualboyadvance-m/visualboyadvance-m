@@ -2948,6 +2948,16 @@ bool MainFrame::BindControls()
         MenuOptionIntMask("JoypadAutofireB", autofire, KEYM_B);
         MenuOptionIntMask("JoypadAutofireL", autofire, KEYM_L);
         MenuOptionIntMask("JoypadAutofireR", autofire, KEYM_R);
+        MenuOptionIntMask("JoypadAutoholdUp", autohold, KEYM_UP);
+        MenuOptionIntMask("JoypadAutoholdDown", autohold, KEYM_DOWN);
+        MenuOptionIntMask("JoypadAutoholdLeft", autohold, KEYM_LEFT);
+        MenuOptionIntMask("JoypadAutoholdRight", autohold, KEYM_RIGHT);
+        MenuOptionIntMask("JoypadAutoholdA", autohold, KEYM_A);
+        MenuOptionIntMask("JoypadAutoholdB", autohold, KEYM_B);
+        MenuOptionIntMask("JoypadAutoholdL", autohold, KEYM_L);
+        MenuOptionIntMask("JoypadAutoholdR", autohold, KEYM_R);
+        MenuOptionIntMask("JoypadAutoholdSelect", autohold, KEYM_SELECT);
+        MenuOptionIntMask("JoypadAutoholdStart", autohold, KEYM_START);
         MenuOptionBool("EmulatorSpeedupToggle", turbo);
         MenuOptionIntRadioValue("LinkType0Nothing", gopts.gba_link_type, 0);
         MenuOptionIntRadioValue("LinkType1Cable", gopts.gba_link_type, 1);

@@ -363,7 +363,7 @@
           <label>_Decrease volume</label>
           <enabled>0</enabled>
         </object>
-	<object class="wxMenuItem" name="ToggleSound">
+        <object class="wxMenuItem" name="ToggleSound">
           <label>_Toggle sound</label>
           <checkable>0</checkable>
         </object>
@@ -408,6 +408,49 @@
           </object>
           <object class="wxMenuItem" name="JoypadAutofireR">
             <label>_R</label>
+            <checkable>1</checkable>
+          </object>
+        </object>
+        <object class="wxMenu">
+          <label>_Autohold</label>
+          <object class="wxMenuItem" name="JoypadAutoholdUp">
+            <label>_Up</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdDown">
+            <label>_Down</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdLeft">
+            <label>_Left</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdRight">
+            <label>_Right</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdA">
+            <label>_A</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdB">
+            <label>_B</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdL">
+            <label>_L</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdR">
+            <label>_R</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdSelect">
+            <label>_Select</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdStart">
+            <label>_Start</label>
             <checkable>1</checkable>
           </object>
         </object>
