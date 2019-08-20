@@ -515,11 +515,19 @@ set(XRC_SOURCES
 # wxrc does not support xrs files in -c output (> 10x compression)
 # we do it using the bin2c.c utility
 
-set(BIN2C ${CMAKE_BINARY_DIR}/bin2c)
+set(BIN2C ${CMAKE_BINARY_DIR}/bin2c${CMAKE_EXECUTABLE_SUFFIX})
 
-include(HostCompile)
-
-host_compile(${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c ${BIN2C})
+if(NOT MSVC)
+	include(HostCompile)
+	host_compile(${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c ${BIN2C})
+	set(BIN2C_DEP ${BIN2C})
+else()
+	# on the appveyor visual studio environment, cl.exe cannot be run from
+	# cmake
+	add_executable(bin2c ${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c)
+	set(BIN2C     bin2c)
+	set(BIN2C_DEP bin2c)
+endif()
 
 if(WXRC)
     separate_arguments(WXRC UNIX_COMMAND ${WXRC})
@@ -596,14 +604,14 @@ add_custom_command(
 add_custom_command(
     OUTPUT builtin-xrc.h
     COMMAND ${BIN2C} wxvbam.xrs builtin-xrc.h builtin_xrs
-    DEPENDS wxvbam.xrs
+    DEPENDS wxvbam.xrs ${BIN2C_DEP}
 )
 
 # use a built-in vba-over.ini if no config file present
 add_custom_command(
     OUTPUT builtin-over.h
     COMMAND ${BIN2C} ${CMAKE_CURRENT_SOURCE_DIR}/../vba-over.ini builtin-over.h builtin_over
-    DEPENDS ../vba-over.ini
+    DEPENDS ../vba-over.ini ${BIN2C_DEP}
 )
 
 # I don't like duplicating/triplicating code, so I only declare

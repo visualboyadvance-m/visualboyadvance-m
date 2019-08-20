@@ -18,12 +18,12 @@ function(host_compile src dst_cmd)
         set(compile_command cc ${src} -o ${dst} ${link_flags})
     else()
         # special case for Visual Studio
-        set(compile_command cl ${src} /link "/out:${dst}")
+	set(compile_command ${CMAKE_C_COMPILER} ${src} /link "/out:${dst}")
     endif()
 
-    execute_process(COMMAND ${compile_command} OUTPUT_VARIABLE compile_out ERROR_VARIABLE compile_out RESULT_VARIABLE compile_result)
+    execute_process(COMMAND ${compile_command} OUTPUT_VARIABLE compile_out ERROR_VARIABLE compile_err RESULT_VARIABLE compile_result)
 
     if(NOT compile_result EQUAL 0)
-        message(FATAL_ERROR "Failed compiling ${src} for the host: ${compile_out}")
+        message(FATAL_ERROR "Failed compiling ${src} for the host: ${compile_err}")
     endif()
 endfunction()

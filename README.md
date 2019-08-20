@@ -16,7 +16,7 @@
 
 [![Join the chat at https://gitter.im/visualboyadvance-m/Lobby](https://badges.gitter.im/visualboyadvance-m/Lobby.svg)](https://gitter.im/visualboyadvance-m/Lobby)
 [![Build Status](https://travis-ci.org/visualboyadvance-m/visualboyadvance-m.svg?branch=master)](https://travis-ci.org/visualboyadvance-m/visualboyadvance-m)
-[![Coverity Scan Build Status](https://scan.coverity.com/projects/16096/badge.svg)](https://scan.coverity.com/projects/visualboyadvance-m-visualboyadvance-m)
+[![Build status](https://ci.appveyor.com/api/projects/status/5ckx25vct1q1ovfc?svg=true)](https://ci.appveyor.com/project/ZachBacon65337/visualboyadvance-m-2ys5r)
 
 # Visual Boy Advance - M
 
