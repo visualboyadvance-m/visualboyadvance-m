@@ -1426,6 +1426,116 @@ EVT_HANDLER(JoypadAutofireR, "Autofire R (toggle)")
     GetMenuOptionInt("JoypadAutofireR", autofire, KEYM_R);
 }
 
+EVT_HANDLER(JoypadAutoholdUp, "Autohold Up (toggle)")
+{
+    bool menuPress;
+    char keyName[] = "JoypadAutoholdUp";
+    int keym = KEYM_UP;
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &autohold, keym);
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, autohold, keym);
+}
+
+EVT_HANDLER(JoypadAutoholdDown, "Autohold Down (toggle)")
+{
+    bool menuPress;
+    char keyName[] = "JoypadAutoholdDown";
+    int keym = KEYM_DOWN;
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &autohold, keym);
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, autohold, keym);
+}
+
+EVT_HANDLER(JoypadAutoholdLeft, "Autohold Left (toggle)")
+{
+    bool menuPress;
+    char keyName[] = "JoypadAutoholdLeft";
+    int keym = KEYM_LEFT;
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &autohold, keym);
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, autohold, keym);
+}
+
+EVT_HANDLER(JoypadAutoholdRight, "Autohold Right (toggle)")
+{
+    bool menuPress;
+    char keyName[] = "JoypadAutoholdRight";
+    int keym = KEYM_RIGHT;
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &autohold, keym);
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, autohold, keym);
+}
+
+EVT_HANDLER(JoypadAutoholdA, "Autohold A (toggle)")
+{
+    bool menuPress;
+    char keyName[] = "JoypadAutoholdA";
+    int keym = KEYM_A;
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &autohold, keym);
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, autohold, keym);
+}
+
+EVT_HANDLER(JoypadAutoholdB, "Autohold B (toggle)")
+{
+    bool menuPress;
+    char keyName[] = "JoypadAutoholdB";
+    int keym = KEYM_B;
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &autohold, keym);
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, autohold, keym);
+}
+
+EVT_HANDLER(JoypadAutoholdL, "Autohold L (toggle)")
+{
+    bool menuPress;
+    char keyName[] = "JoypadAutoholdL";
+    int keym = KEYM_L;
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &autohold, keym);
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, autohold, keym);
+}
+
+EVT_HANDLER(JoypadAutoholdR, "Autohold R (toggle)")
+{
+    bool menuPress;
+    char keyName[] = "JoypadAutoholdR";
+    int keym = KEYM_R;
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &autohold, keym);
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, autohold, keym);
+}
+
+EVT_HANDLER(JoypadAutoholdSelect, "Autohold Select (toggle)")
+{
+    bool menuPress;
+    char keyName[] = "JoypadAutoholdSelect";
+    int keym = KEYM_SELECT;
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &autohold, keym);
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, autohold, keym);
+}
+
+EVT_HANDLER(JoypadAutoholdStart, "Autohold Start (toggle)")
+{
+    bool menuPress;
+    char keyName[] = "JoypadAutoholdStart";
+    int keym = KEYM_START;
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &autohold, keym);
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, autohold, keym);
+}
+
 EVT_HANDLER_MASK(LoadGameRecent, "Load most recent save", CMDEN_SAVST)
 {
     panel->LoadState();

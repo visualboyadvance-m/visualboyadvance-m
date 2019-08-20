@@ -29,7 +29,7 @@ uint16_t systemGbPalette[24] = {
 int RGB_LOW_BITS_MASK;
 
 // these are local, though.
-int joypress[4], autofire;
+int joypress[4], autofire, autohold;
 static int sensorx[4], sensory[4], sensorz[4];
 bool pause_next;
 bool turbo;
@@ -259,6 +259,13 @@ uint32_t systemReadJoypad(int joy)
     if (ret & KEYM_AUTO_B) {
         ret |= KEYM_B;
         af |= KEYM_B;
+    }
+
+    uint32_t ah = autohold;
+    uint32_t ah_but = ah | ret;
+    if (ah_but)
+    {
+        ret ^= ah;
     }
 
     static int autofire_trigger = 1;
