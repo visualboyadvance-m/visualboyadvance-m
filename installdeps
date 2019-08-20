@@ -419,7 +419,6 @@ fedora_installdeps() {
     if [ $tries -eq 0 ]; then
         warning 'installing rpmfusion repos failed, continuing without ffmpeg'
         no_ffmpeg=1
-        cmake_flags="$cmake_flags -DENABLE_FFMPEG=NO"
     fi
 
     # non-multiarch packages first
@@ -517,11 +516,11 @@ fedora_installdeps() {
         case "$target" in
             mingw-w64-i686)
                 target=mingw32
-                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-i686.cmake -DENABLE_LINK=NO"
+                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-i686.cmake"
                 ;;
             mingw-w64-x86_64)
                 target=mingw64
-                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-x86_64.cmake -DENABLE_LINK=NO"
+                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-x86_64.cmake"
                 ;;
             *)
                 error 'unknown cross target (this should not happen)'
@@ -543,7 +542,6 @@ fedora_installdeps() {
 
     if ! rpm -q $ffmpeg >/dev/null 2>&1; then
         warning 'ffmpeg failed to install (probably due to conflicts)'
-        cmake_flags="$cmake_flags -DENABLE_FFMPEG=NO"
     fi
 
     [ -n "$warning" ] && warning "$warning"
@@ -598,7 +596,6 @@ rhel_installdeps() {
     if [ $tries -eq 0 ]; then
         warning 'installing rpmfusion repos failed, continuing without ffmpeg'
         no_ffmpeg=1
-        cmake_flags="$cmake_flags -DENABLE_FFMPEG=NO"
     fi
 
     # non-multiarch packages first
@@ -625,7 +622,6 @@ rhel_installdeps() {
         fi
 
         warning='RHEL does not currently have SFML packages, LINK support will be disabled'
-        cmake_flags="$cmake_flags -DENABLE_LINK=NO"
 
         for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel libpng-devel SDL2-devel openal-soft-devel wxGTK3-devel gtk3-devel; do
             case $pkg in
@@ -701,11 +697,11 @@ rhel_installdeps() {
         case "$target" in
             mingw-w64-i686)
                 target=mingw32
-                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-i686.cmake -DENABLE_LINK=NO"
+                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-i686.cmake"
                 ;;
             mingw-w64-x86_64)
                 target=mingw64
-                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-x86_64.cmake -DENABLE_LINK=NO"
+                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-x86_64.cmake"
                 ;;
             *)
                 error 'unknown cross target (this should not happen)'
@@ -727,7 +723,6 @@ rhel_installdeps() {
 
     if ! rpm -q $ffmpeg >/dev/null 2>&1; then
         warning 'ffmpeg failed to install (probably due to conflicts)'
-        cmake_flags="$cmake_flags -DENABLE_FFMPEG=NO"
     fi
 
     [ -n "$warning" ] && warning "$warning"
@@ -751,7 +746,6 @@ gcc gcc-c++ libpng16-devel libSDL2-devel openal-soft-devel wxWidgets-3_0-devel\
 
     if [ "$target" = m32 ]; then
         libs=$(echo "$libs" | sed -E 's/([^ ]) ([^ ])/\1-32bit \2/g; s/$/-32bit/;')
-        cmake_flags="$cmake_flags -DENABLE_LINK=NO"
     fi
 
     check sudo zypper in -y $tools $libs
@@ -841,10 +835,10 @@ EOF
         # windows cross build
         case "$target" in
             *i686*)
-                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-i686.cmake -DENABLE_LINK=NO"
+                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-i686.cmake"
                 ;;
             *x86_64*)
-                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-x86_64.cmake -DENABLE_LINK=NO"
+                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-x86_64.cmake"
                 ;;
             *)
                 # this will never be reached, it's checked in check_cross()
@@ -972,8 +966,6 @@ solus_installdeps() {
     if [ -n "$amd64" -a "$target" = m32 ]; then
         warning 'SFML is required for LINK support, there is no 32 bit SFML package in Solus currently, if you want LINK support you will need to install it manually'
         warning 'ffmpeg is required for game recording, there is no 32 bit ffmpeg package in Solus currently, you may wish to install it manually'
-
-        cmake_flags="$cmake_flags -DENABLE_LINK=NO -DENABLE_FFMPEG=NO"
     fi
 
     build_instructions

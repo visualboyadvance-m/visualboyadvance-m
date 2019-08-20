@@ -28,7 +28,27 @@ endif()
 
 option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" OFF)
 
-option(ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" OFF)
+find_package(OpenAL)
+
+if(OPENAL_FOUND)
+	set(ENABLE_OPENAL_DEFAULT ON)
+else()
+	set(ENABLE_OPENAL_DEFAULT OFF)
+endif()
+
+option(ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" ${ENABLE_OPENAL_DEFAULT})
+
+if(ENABLE_OPENAL)
+	find_package(OpenAL REQUIRED)
+
+	include_directories(${OPENAL_INCLUDE_DIR})
+
+	if(OPENAL_STATIC OR (WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)))
+		add_definitions(-DAL_LIBTYPE_STATIC)
+	endif()
+else()
+    add_definitions(-DNO_OAL)
+endif()
 
 if(APPLE)
     add_definitions(-DwxMAC_USE_CORE_GRAPHICS)
@@ -44,17 +64,6 @@ endif()
 
 if(NOT ENABLE_DIRECT3D)
     add_definitions(-DNO_D3D)
-endif()
-
-if(ENABLE_OPENAL)
-    find_package(OpenAL REQUIRED)
-    include_directories(${OPENAL_INCLUDE_DIR})
-
-    if(OPENAL_STATIC OR (WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)))
-        add_definitions(-DAL_LIBTYPE_STATIC)
-    endif()
-else(ENABLE_OPENAL)
-    add_definitions(-DNO_OAL)
 endif()
 
 unset(FAUDIO_LIBS)

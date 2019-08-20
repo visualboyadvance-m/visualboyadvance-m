@@ -182,15 +182,15 @@ Here is the complete list:
 | ENABLE_ASM            | Enable the following two ASM options                                 | ON for 32 bit builds  |
 | ENABLE_ASM_SCALERS    | Enable x86 ASM graphic filters                                       | ON for 32 bit builds  |
 | ENABLE_MMX            | Enable MMX                                                           | ON for 32 bit builds  |
-| ENABLE_LINK           | Enable GBA linking functionality (requires SFML)                     | ON                    |
+| ENABLE_LINK           | Enable GBA linking functionality (requires SFML)                     | AUTO                  |
 | ENABLE_LIRC           | Enable LIRC support                                                  | OFF                   |
-| ENABLE_FFMPEG         | Enable ffmpeg A/V recording                                          | OFF                   |
+| ENABLE_FFMPEG         | Enable ffmpeg A/V recording                                          | AUTO                  |
 | ENABLE_ONLINEUPDATES  | Enable online update checks                                          | ON                    |
 | ENABLE_LTO            | Compile with Link Time Optimization (gcc and clang only)             | ON for release build  |
 | ENABLE_GBA_LOGGING    | Enable extended GBA logging                                          | ON                    |
 | ENABLE_DIRECT3D       | Direct3D rendering for wxWidgets (Windows, **NOT IMPLEMENTED!!!**)   | ON                    |
 | ENABLE_XAUDIO2        | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |
-| ENABLE_OPENAL         | Enable OpenAL for the wxWidgets port                                 | OFF                   |
+| ENABLE_OPENAL         | Enable OpenAL for the wxWidgets port                                 | AUTO                  |
 | ENABLE_SSP            | Enable gcc stack protector support (gcc only)                        | OFF                   |
 | ENABLE_ASAN           | Enable libasan sanitizers (by default address, only in debug mode)   | OFF                   |
 | VBAM_STATIC           | Try link all libs statically (the following are set to ON if ON)     | OFF                   |

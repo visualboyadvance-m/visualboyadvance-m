@@ -98,14 +98,40 @@ if(ENABLE_ASM_SCALERS)
     option(ENABLE_MMX "Enable MMX" ${MMX_DEFAULT})
 endif()
 
-option(ENABLE_LINK "Enable GBA linking functionality" ON)
+set(ENABLE_LINK_DEFAULT OFF)
+
+# msys2 does not have static sfml libs atm
+# while on mxe we use static libs
+if(WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe) AND NOT CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
+	set(SFML_STATIC_LIBRARIES TRUE)
+endif()
+
+find_package(SFML 2 COMPONENTS network system)
+
+if(SFML_FOUND)
+	set(ENABLE_LINK_DEFAULT ON)
+endif()
+
+option(ENABLE_LINK "Enable GBA linking functionality" ${ENABLE_LINK_DEFAULT})
+
 option(ENABLE_LIRC "Enable LIRC support" OFF)
 
-# currently completely broken
 set(FFMPEG_DEFAULT OFF)
 
-if(WIN32 AND NOT (MINGW AND MSYS))
-    set(FFMPEG_DEFAULT OFF)
+find_package(PkgConfig)
+
+if(PKGCONFIG_FOUND)
+	set(FFMPEG_DEFAULT ON)
+
+	foreach(ffmpeg_lib libavcodec libavformat libswscale libavutil libswresample)
+		unset(FFMPEG_LIB)
+		pkg_check_modules(FFMPEG_LIB ${ffmpeg_lib})
+
+		if(NOT FFMPEG_LIB_FOUND)
+			set(FFMPEG_DEFAULT OFF)
+			break()
+		endif()
+	endforeach()
 endif()
 
 option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
@@ -247,21 +273,6 @@ if(WIN32)
 
     if(SETUPAPI_LIBRARY)
         set(SDL2_LIBRARY ${SDL2_LIBRARY} ${SETUPAPI_LIBRARY})
-    endif()
-endif()
-
-if(ENABLE_LINK)
-    # msys2 does not have static sfml libs atm
-    # while on mxe we use static libs
-    if(WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe) AND NOT CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
-        set(SFML_STATIC_LIBRARIES TRUE)
-    endif()
-
-    find_package(SFML 2 COMPONENTS network system)
-
-    if(NOT SFML_FOUND)
-        message(WARNING "SFML not found, LINK will be disabled")
-        set(ENABLE_LINK NO)
     endif()
 endif()
 
