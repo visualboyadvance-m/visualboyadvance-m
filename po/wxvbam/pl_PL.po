@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-08-20 23:18+0000\n"
-"PO-Revision-Date: 2019-08-20 23:19+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"PO-Revision-Date: 2019-08-21 08:18+0000\n"
+"Last-Translator: Damian Drakon <dragon1590@gmail.com>\n"
 "Language-Team: Polish (Poland) (http://www.transifex.com/bgk/vba-m/language/pl_PL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2675,7 +2675,7 @@ msgstr "Domyślne"
 
 #: ../src/wx/xrc/JoyPanel.xrc:529
 msgid "Clear All"
-msgstr ""
+msgstr "Wyczyść wszystko"
 
 #: ../src/wx/xrc/LinkConfig.xrc:4
 msgid "Link configuration"
@@ -2871,47 +2871,47 @@ msgstr "Eksportuj"
 
 #: ../src/wx/xrc/MainMenu.xrc:156
 msgid "Screen capt&ure..."
-msgstr ""
+msgstr "Zrzut ekranu..."
 
 #: ../src/wx/xrc/MainMenu.xrc:160
 msgid "Start &sound recording..."
-msgstr ""
+msgstr "Rozpocznij nagrywanie dźwięku..."
 
 #: ../src/wx/xrc/MainMenu.xrc:163
 msgid "Stop s&ound recording"
-msgstr ""
+msgstr "Zatrzymaj nagrywanie dźwięku"
 
 #: ../src/wx/xrc/MainMenu.xrc:166
 msgid "Start &video recording..."
-msgstr ""
+msgstr "Rozpocznij nagrywanie obrazu..."
 
 #: ../src/wx/xrc/MainMenu.xrc:169
 msgid "Stop v&ideo recording"
-msgstr ""
+msgstr "Zatrzymaj nagrywanie obrazu"
 
 #: ../src/wx/xrc/MainMenu.xrc:172
 msgid "Start &game recording..."
-msgstr ""
+msgstr "Rozpocznij nagrywanie gry..."
 
 #: ../src/wx/xrc/MainMenu.xrc:175
 msgid "Stop g&ame recording"
-msgstr ""
+msgstr "Zatrzymaj nagrywanie gry"
 
 #: ../src/wx/xrc/MainMenu.xrc:177
 msgid "&Record"
-msgstr ""
+msgstr "Nagrywanie"
 
 #: ../src/wx/xrc/MainMenu.xrc:181
 msgid "Start playing &movie..."
-msgstr ""
+msgstr "Rozpocznij odtwarzanie filmu..."
 
 #: ../src/wx/xrc/MainMenu.xrc:184
 msgid "Stop playing m&ovie"
-msgstr ""
+msgstr "Zatrzymaj odtwarzanie filmu"
 
 #: ../src/wx/xrc/MainMenu.xrc:186
 msgid "&Play"
-msgstr ""
+msgstr "Odtwarzanie"
 
 #: ../src/wx/xrc/MainMenu.xrc:193
 msgid "&Emulation"
