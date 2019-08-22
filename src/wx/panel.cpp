@@ -1542,6 +1542,7 @@ public:
         int outrb = systemColorDepth == 24 ? 0 : 4;
         int outstride = std::ceil(width * outbpp * scale) + outrb;
         delta += instride * procy;
+
         // FIXME: fugly hack
         if(gopts.render_method == RND_OPENGL)
             dst += (int)std::ceil(outstride * (procy + 1) * scale);
@@ -1554,7 +1555,7 @@ public:
                 return 0;
             }
 
-            src += instride;
+            //src += instride;
 
             // interframe blending filter
             // definitely not thread safe by default
@@ -1589,7 +1590,7 @@ public:
                 continue;
             }
 
-            src += instride * procy;
+            //src += instride * procy;
 
             // naturally, any of these with accumulation buffers like those of
             // the IFB filters will screw up royally as well
