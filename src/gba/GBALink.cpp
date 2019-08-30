@@ -2925,7 +2925,7 @@ static void UpdateCableIPC(int ticks)
         }
 
         // next cycle
-        transfer_direction++;
+        transfer_direction = !transfer_direction;
     }
 
     if (transfer_direction > linkmem->trgbas && linktime >= trtimeend[transfer_direction - 3][tspeed]) {

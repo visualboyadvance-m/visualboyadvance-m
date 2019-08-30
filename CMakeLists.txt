@@ -610,6 +610,14 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
 
     set(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${MY_C_LINKER_FLAGS_STR}")
     set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${MY_C_LINKER_FLAGS_STR}")
+elseif(MSVC)
+    add_compile_options(/std:c++latest)
+
+    if(CMAKE_BUILD_TYPE STREQUAL Debug)
+        add_compile_options(/W4)
+    else()
+        add_compile_options(/W0)
+    endif()
 endif()
 
 # Assembler flags
