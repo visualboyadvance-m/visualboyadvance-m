@@ -7,7 +7,40 @@ services:
 matrix:
     fast_finish: true
     include:
-        - env: BUILD_ENV=ubuntu
+        - env: BUILD_ENV=ubuntu-bionic
+          language: cpp
+          os: linux
+          dist: bionic
+          before_script:
+              - ./installdeps
+          script:
+              - mkdir build
+              - cd build
+              - cmake .. -DENABLE_SDL=ON
+              - make -j2
+# xvfb fails on bionic for some reason
+#              - xvfb-run ./visualboyadvance-m --help
+          cache:
+              directories:
+                  - "$HOME/.ccache"
+        - env: BUILD_ENV=ubuntu-xenial
+          language: cpp
+          os: linux
+          dist: xenial
+          before_script:
+              - ./installdeps
+          script:
+              - mkdir build
+              - cd build
+# ffmpeg currently broken on xenial
+              - cmake .. -DENABLE_SDL=ON -DENABLE_FFMPEG=OFF
+              - make -j2
+# xvfb fails on xenial too
+#              - xvfb-run ./visualboyadvance-m --help
+          cache:
+              directories:
+                  - "$HOME/.ccache"
+        - env: BUILD_ENV=ubuntu-trusty
           language: cpp
           os: linux
           dist: trusty
@@ -78,7 +111,6 @@ matrix:
           cache:
               directories:
                   - "$HOME/.ccache"
-                  - /usr/local
 
 notifications:
     webhooks:
