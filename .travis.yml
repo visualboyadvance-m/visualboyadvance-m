@@ -16,7 +16,7 @@ matrix:
           script:
               - mkdir build
               - cd build
-              - cmake .. -DENABLE_SDL=ON -DENABLE_OPENAL=ON
+              - cmake .. -DENABLE_SDL=ON
               - make -j2
               - xvfb-run ./visualboyadvance-m --help
           cache:
@@ -31,7 +31,7 @@ matrix:
           script:
               - mkdir build
               - cd build
-              - /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-cmake .. -DENABLE_SDL=ON -DENABLE_OPENAL=ON
+              - /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-cmake .. -DENABLE_SDL=ON
               - make -j2
           cache:
               directories:
@@ -45,7 +45,7 @@ matrix:
           script:
               - mkdir build
               - cd build
-              - /usr/lib/mxe/usr/bin/i686-w64-mingw32.static-cmake .. -DENABLE_SDL=ON -DENABLE_OPENAL=ON
+              - /usr/lib/mxe/usr/bin/i686-w64-mingw32.static-cmake .. -DENABLE_SDL=ON
               - make -j2
           cache:
               directories:
@@ -72,7 +72,7 @@ matrix:
           script:
               - mkdir build
               - cd build
-              - cmake .. -DENABLE_SDL=ON -DENABLE_OPENAL=ON -DENABLE_LINK=ON
+              - cmake .. -DENABLE_SDL=ON
               - make -j2
 #              - ./visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m --help
           cache:

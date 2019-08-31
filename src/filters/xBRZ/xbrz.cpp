@@ -21,8 +21,10 @@
 #include <cmath> //std::sqrt
 #include "xbrz_tools.h"
 
-using namespace xbrz;
+// some gcc versions lie about having this C++17 feature
+#define static_assert(x) static_assert(x, "assertion failed")
 
+using namespace xbrz;
 
 namespace
 {

@@ -121,17 +121,16 @@ set(FFMPEG_DEFAULT OFF)
 find_package(PkgConfig)
 
 if(PKGCONFIG_FOUND)
-	set(FFMPEG_DEFAULT ON)
+    set(FFMPEG_DEFAULT ON)
 
-	foreach(ffmpeg_lib libavcodec libavformat libswscale libavutil libswresample)
-		unset(FFMPEG_LIB)
-		pkg_check_modules(FFMPEG_LIB ${ffmpeg_lib})
+    foreach(ffmpeg_lib libavcodec libavformat libswscale libavutil libswresample)
+        pkg_check_modules(FFMPEG_LIB_${ffmpeg_lib} ${ffmpeg_lib} QUIET)
 
-		if(NOT FFMPEG_LIB_FOUND)
-			set(FFMPEG_DEFAULT OFF)
-			break()
-		endif()
-	endforeach()
+        if(NOT FFMPEG_LIB_${ffmpeg_lib}_FOUND)
+            set(FFMPEG_DEFAULT OFF)
+            break()
+        endif()
+    endforeach()
 endif()
 
 option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
@@ -325,6 +324,8 @@ include(GNUInstallDirs)
 # C defines
 add_definitions(-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DSDL -DUSE_OPENGL -DSYSCONF_INSTALL_DIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}" -DWITH_LIRC=${WITHLIRC})
 add_definitions(-DPKGDATADIR="${CMAKE_INSTALL_FULL_DATADIR}/vbam" -DPACKAGE=)
+
+add_definitions(-D__STDC_FORMAT_MACROS)
 
 if(ENABLE_LINK)
     # IPC linking code needs sem_timedwait which can be either in librt or pthreads
@@ -557,6 +558,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         add_compile_options(${C_COMPILE_FLAG})
     endforeach()
 
+    include(CheckCXXCompilerFlag)
+
     set(MY_CXX_FLAGS -std=gnu++11 -fexceptions)
 
     foreach(ARG ${MY_CXX_FLAGS})
@@ -611,7 +614,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     set(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${MY_C_LINKER_FLAGS_STR}")
     set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${MY_C_LINKER_FLAGS_STR}")
 elseif(MSVC)
-    add_compile_options(/std:c++latest)
+    add_compile_options(/std:c++11)
 
     if(CMAKE_BUILD_TYPE STREQUAL Debug)
         add_compile_options(/W4)
