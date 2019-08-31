@@ -3,7 +3,6 @@
 
 
 - [Visual Boy Advance - M](#visual-boy-advance---m)
-  - [Note for Windows Users](#note-for-windows-users)
   - [Building](#building)
   - [Building a Libretro core](#building-a-libretro-core)
   - [Visual Studio Support](#visual-studio-support)
@@ -39,13 +38,7 @@ It is also generally very easy to build from source, see below.
 If you are using the windows binary release and you need localization, unzip
 the `translations.zip` to the same directory as the executable.
 
-## Note for Windows Users
-
-If you are having issues, try resetting your config file first.
-
-- open file explorer
-- in the location bar, type `%USERPROFILE%\AppData\Local` and press enter
-- delete the directory called `visualboyadvance-m`
+If you are having issues, try resetting the config file first, go to `Help -> Factory Reset`.
 
 ## Building
 
