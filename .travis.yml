@@ -32,8 +32,7 @@ matrix:
           script:
               - mkdir build
               - cd build
-# ffmpeg currently broken on xenial
-              - cmake .. -DENABLE_SDL=ON -DENABLE_FFMPEG=OFF
+              - cmake .. -DENABLE_SDL=ON
               - make -j2
 # xvfb fails on xenial too
 #              - xvfb-run ./visualboyadvance-m --help

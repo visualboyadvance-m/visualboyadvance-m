@@ -120,13 +120,17 @@ set(FFMPEG_DEFAULT OFF)
 
 find_package(PkgConfig)
 
+set(FFMPEG_LIBS_LIST libavcodec>=58.18.100 libavformat>=58.12.100 libswscale>=5.1.100 libavutil>=56.14.100 libswresample>=3.1.100)
+
 if(PKGCONFIG_FOUND)
     set(FFMPEG_DEFAULT ON)
 
-    foreach(ffmpeg_lib libavcodec libavformat libswscale libavutil libswresample)
-        pkg_check_modules(FFMPEG_LIB_${ffmpeg_lib} ${ffmpeg_lib} QUIET)
+    foreach(ffmpeg_lib ${FFMPEG_LIBS_LIST})
+        string(REGEX REPLACE ">=.*" "" ffmpeg_lib_name ${ffmpeg_lib})
 
-        if(NOT FFMPEG_LIB_${ffmpeg_lib}_FOUND)
+        pkg_check_modules(FFMPEG_LIB_${ffmpeg_lib_name} ${ffmpeg_lib} QUIET)
+
+        if(NOT FFMPEG_LIB_${ffmpeg_lib_name}_FOUND)
             set(FFMPEG_DEFAULT OFF)
             break()
         endif()
@@ -290,7 +294,7 @@ set(
 if(ENABLE_FFMPEG)
     find_package(PkgConfig REQUIRED)
 
-    pkg_check_modules(FFMPEG REQUIRED libavcodec libavformat libswscale libavutil libswresample)
+    pkg_check_modules(FFMPEG REQUIRED ${FFMPEG_LIBS_LIST})
 
     if(FFMPEG_STATIC)
         set(FFMPEG_LIBRARIES ${FFMPEG_STATIC_LIBRARIES})
