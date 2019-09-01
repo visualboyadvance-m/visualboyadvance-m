@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-08-20 23:18+0000\n"
-"PO-Revision-Date: 2019-08-21 08:18+0000\n"
+"PO-Revision-Date: 2019-08-30 09:27+0000\n"
 "Last-Translator: Damian Drakon <dragon1590@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/bgk/vba-m/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -853,7 +853,7 @@ msgstr "Nie można rozpocząć nagrywania do %s (%s)"
 #: ../src/wx/panel.cpp:2411
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
-msgstr "Błąd podczas nagrywania audio/wideo (%s); przerywanie"
+msgstr "Błąd podczas nagrywania dźwięku/obrazu (%s); przerywanie"
 
 #: ../src/wx/panel.cpp:2417
 #, c-format
@@ -2630,7 +2630,7 @@ msgstr "Ruch w górę"
 
 #: ../src/wx/xrc/JoyPanel.xrc:276
 msgid "Autofire A"
-msgstr "Auto-strzał A"
+msgstr "Autostrzał A"
 
 #: ../src/wx/xrc/JoyPanel.xrc:298
 msgid "Motion Down"
@@ -2638,7 +2638,7 @@ msgstr "Ruch w dół"
 
 #: ../src/wx/xrc/JoyPanel.xrc:320
 msgid "Autofire B"
-msgstr "Auto-strzał B"
+msgstr "Autostrzał B"
 
 #: ../src/wx/xrc/JoyPanel.xrc:342
 msgid "Motion Left/Dark"
@@ -2682,7 +2682,7 @@ msgstr "Wyczyść wszystko"
 
 #: ../src/wx/xrc/LinkConfig.xrc:4
 msgid "Link configuration"
-msgstr "Konfiguracja łącza"
+msgstr "Konfiguracja połączenia"
 
 #: ../src/wx/xrc/LinkConfig.xrc:11
 msgid "Link timeout (in milliseconds)"
@@ -2918,47 +2918,47 @@ msgstr "Odtwarzanie"
 
 #: ../src/wx/xrc/MainMenu.xrc:193
 msgid "&Emulation"
-msgstr ""
+msgstr "Emulacja"
 
 #: ../src/wx/xrc/MainMenu.xrc:195
 msgid "&Pause"
-msgstr ""
+msgstr "Wstrzymaj grę"
 
 #: ../src/wx/xrc/MainMenu.xrc:199
 msgid "&Next frame"
-msgstr ""
+msgstr "Następna klatka"
 
 #: ../src/wx/xrc/MainMenu.xrc:202
 msgid "Re&wind"
-msgstr ""
+msgstr "Przewiń wstecz"
 
 #: ../src/wx/xrc/MainMenu.xrc:206
 msgid "Toggle &full screen"
-msgstr ""
+msgstr "Wł./Wył. tryb pełnoekranowy"
 
 #: ../src/wx/xrc/MainMenu.xrc:213
 msgid "&Turbo mode"
-msgstr ""
+msgstr "Tryb turbo"
 
 #: ../src/wx/xrc/MainMenu.xrc:217
 msgid "&VSync"
-msgstr ""
+msgstr "Synchronizacja pionowa"
 
 #: ../src/wx/xrc/MainMenu.xrc:221
 msgid "&Auto skip frames"
-msgstr ""
+msgstr "Autopomijanie klatek"
 
 #: ../src/wx/xrc/MainMenu.xrc:226
 msgid "&Skip BIOS"
-msgstr ""
+msgstr "Pomiń BIOS"
 
 #: ../src/wx/xrc/MainMenu.xrc:230
 msgid "&Auto IPS/UPS/IPF patch"
-msgstr ""
+msgstr "Autozastosowanie poprawek IPS/UPS/IPF"
 
 #: ../src/wx/xrc/MainMenu.xrc:234
 msgid "&Pause when inactive"
-msgstr ""
+msgstr "Wstrzymaj grę, gdy okno jest nieaktywne"
 
 #: ../src/wx/xrc/MainMenu.xrc:239
 msgid "&Reset"
@@ -2966,27 +2966,27 @@ msgstr "Zresetuj"
 
 #: ../src/wx/xrc/MainMenu.xrc:243
 msgid "&Options"
-msgstr ""
+msgstr "Opcje"
 
 #: ../src/wx/xrc/MainMenu.xrc:245
 msgid "&Link"
-msgstr ""
+msgstr "Połączenie"
 
 #: ../src/wx/xrc/MainMenu.xrc:247
 msgid "Start &Network Link ..."
-msgstr ""
+msgstr "Uruchom połączenie sieciowe"
 
 #: ../src/wx/xrc/MainMenu.xrc:252
 msgid "&Nothing"
-msgstr ""
+msgstr "Brak"
 
 #: ../src/wx/xrc/MainMenu.xrc:256
 msgid "&Cable"
-msgstr ""
+msgstr "Kabel"
 
 #: ../src/wx/xrc/MainMenu.xrc:260
 msgid "&Wireless"
-msgstr ""
+msgstr "Bezprzewodowy"
 
 #: ../src/wx/xrc/MainMenu.xrc:264
 msgid "&GameCube"
@@ -2998,80 +2998,80 @@ msgstr "Game Boy"
 
 #: ../src/wx/xrc/MainMenu.xrc:273
 msgid "&Local mode"
-msgstr ""
+msgstr "Tryb lokalny"
 
 #: ../src/wx/xrc/MainMenu.xrc:277
 msgid "&Link at boot"
-msgstr ""
+msgstr "Połącz przy uruchamianiu"
 
 #: ../src/wx/xrc/MainMenu.xrc:281
 msgid "&Speed hack"
-msgstr ""
+msgstr "Złamanie prędkości"
 
 #: ../src/wx/xrc/MainMenu.xrc:285 ../src/wx/xrc/MainMenu.xrc:291
 #: ../src/wx/xrc/MainMenu.xrc:356 ../src/wx/xrc/MainMenu.xrc:392
 msgid "&Configure ..."
-msgstr ""
+msgstr "Konfiguruj..."
 
 #: ../src/wx/xrc/MainMenu.xrc:289
 msgid "&Video"
-msgstr ""
+msgstr "Obraz"
 
 #: ../src/wx/xrc/MainMenu.xrc:295
 msgid "&Start in full screen"
-msgstr ""
+msgstr "Uruchom w trybie pełnoekranowym"
 
 #: ../src/wx/xrc/MainMenu.xrc:299
 msgid "&Scaled resize"
-msgstr ""
+msgstr "Skalowana zmiana rozmiaru"
 
 #: ../src/wx/xrc/MainMenu.xrc:301
 msgid "&1x"
-msgstr ""
+msgstr "1x"
 
 #: ../src/wx/xrc/MainMenu.xrc:304
 msgid "&2x"
-msgstr ""
+msgstr "2x"
 
 #: ../src/wx/xrc/MainMenu.xrc:307
 msgid "&3x"
-msgstr ""
+msgstr "3x"
 
 #: ../src/wx/xrc/MainMenu.xrc:310
 msgid "&4x"
-msgstr ""
+msgstr "4x"
 
 #: ../src/wx/xrc/MainMenu.xrc:313
 msgid "&5x"
-msgstr ""
+msgstr "5x"
 
 #: ../src/wx/xrc/MainMenu.xrc:316
 msgid "&6x"
-msgstr ""
+msgstr "6x"
 
 #: ../src/wx/xrc/MainMenu.xrc:320
 msgid "&Retain aspect ratio"
-msgstr ""
+msgstr "Zachowaj proporcje"
 
 #: ../src/wx/xrc/MainMenu.xrc:325
 msgid "&Bilinear filter"
-msgstr ""
+msgstr "Filtr dwuliniowy"
 
 #: ../src/wx/xrc/MainMenu.xrc:336
 msgid "&Keep window on top"
-msgstr ""
+msgstr "Utrzymaj okno na wierzchu"
 
 #: ../src/wx/xrc/MainMenu.xrc:341
 msgid "&Status bar"
-msgstr ""
+msgstr "Pasek stanu"
 
 #: ../src/wx/xrc/MainMenu.xrc:345
 msgid "&Disable on-screen display"
-msgstr ""
+msgstr "Wyłącz wyświetlanie informacji na ekranie"
 
 #: ../src/wx/xrc/MainMenu.xrc:349
 msgid "&Transparent on-screen display"
-msgstr ""
+msgstr "Wyświetlanie przejrzystych informacji na ekranie"
 
 #: ../src/wx/xrc/MainMenu.xrc:354
 msgid "&Audio"

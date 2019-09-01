@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# park seungbin <parksengbin48@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-08-20 23:18+0000\n"
-"PO-Revision-Date: 2019-08-20 23:19+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"PO-Revision-Date: 2019-08-27 16:23+0000\n"
+"Last-Translator: park seungbin <parksengbin48@gmail.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/bgk/vba-m/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,31 +24,31 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy"
 " Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "게임보이 어드벤처 파일\n(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: ../src/wx/cmdevents.cpp:117
 msgid "Open ROM file"
-msgstr ""
+msgstr "롬 파일 열기"
 
 #: ../src/wx/cmdevents.cpp:134
 msgid ""
 "GameBoy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "게임보이 파일 (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: ../src/wx/cmdevents.cpp:141
 msgid "Open GB ROM file"
-msgstr ""
+msgstr "게임보이 롬 파일 열기"
 
 #: ../src/wx/cmdevents.cpp:158
 msgid ""
 "GameBoy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "게임보이 컬러 파일 (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: ../src/wx/cmdevents.cpp:165
 msgid "Open GBC ROM file"
-msgstr ""
+msgstr "게임보이컬러 롬 파일 열기"
 
 #: ../src/wx/cmdevents.cpp:564 ../src/wx/cmdevents.cpp:680
 #: ../src/wx/cmdevents.cpp:719 ../src/wx/cmdevents.cpp:792
@@ -56,7 +57,7 @@ msgstr ""
 
 #: ../src/wx/cmdevents.cpp:572
 msgid "ROM"
-msgstr ""
+msgstr "롬"
 
 #: ../src/wx/cmdevents.cpp:576
 msgid "ROM+MBC1"
@@ -193,17 +194,17 @@ msgstr ""
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
-msgstr ""
+msgstr "배터리 파일을 가져오면 저장된 게임이 모두 지워집니다. 계속하시겠습니까?"
 
 #: ../src/wx/cmdevents.cpp:872 ../src/wx/cmdevents.cpp:900
 #: ../src/wx/cmdevents.cpp:1020
 msgid "Confirm import"
-msgstr ""
+msgstr "가져오기 확인"
 
 #: ../src/wx/cmdevents.cpp:878 ../src/wx/panel.cpp:344
 #, c-format
 msgid "Loaded battery %s"
-msgstr ""
+msgstr "%s를 로드한 배터리"
 
 #: ../src/wx/cmdevents.cpp:880
 #, c-format
@@ -212,7 +213,7 @@ msgstr ""
 
 #: ../src/wx/cmdevents.cpp:889
 msgid "Select code file"
-msgstr ""
+msgstr "코드파일 선택"
 
 #: ../src/wx/cmdevents.cpp:890
 msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
@@ -231,7 +232,7 @@ msgstr ""
 #: ../src/wx/cmdevents.cpp:916
 #, c-format
 msgid "Cannot open file %s"
-msgstr ""
+msgstr "%s파일을 열수 없습니다"
 
 #: ../src/wx/cmdevents.cpp:926
 #, c-format
@@ -250,7 +251,7 @@ msgstr ""
 
 #: ../src/wx/cmdevents.cpp:1009 ../src/wx/cmdevents.cpp:1085
 msgid "Select snapshot file"
-msgstr ""
+msgstr "스냅샷 파일 선택"
 
 #: ../src/wx/cmdevents.cpp:1010
 msgid ""
@@ -260,7 +261,7 @@ msgstr ""
 
 #: ../src/wx/cmdevents.cpp:1010
 msgid "Gameboy Snapshot (*.gbs)|*.gbs"
-msgstr ""
+msgstr "게임보이 스넵샷 (*.gbs)|*.gbs"
 
 #: ../src/wx/cmdevents.cpp:1019
 msgid ""
@@ -276,7 +277,7 @@ msgstr ""
 #: ../src/wx/cmdevents.cpp:1046
 #, c-format
 msgid "Error loading snapshot file %s"
-msgstr ""
+msgstr "로드중 %s 스넵샷 파일 에러"
 
 #: ../src/wx/cmdevents.cpp:1069
 #, c-format
@@ -303,19 +304,19 @@ msgstr ""
 #: ../src/wx/cmdevents.cpp:1112
 #, c-format
 msgid "Saved snapshot file %s"
-msgstr ""
+msgstr "%s스넵샷 저장완료 "
 
 #: ../src/wx/cmdevents.cpp:1114
 #, c-format
 msgid "Error saving snapshot file %s"
-msgstr ""
+msgstr "스넵샷%s저장 중 에러"
 
 #: ../src/wx/cmdevents.cpp:1129 ../src/wx/cmdevents.cpp:1207
 #: ../src/wx/cmdevents.cpp:1277 ../src/wx/cmdevents.cpp:1304
 #: ../src/wx/viewers.cpp:562 ../src/wx/viewers.cpp:772
 #: ../src/wx/viewsupt.cpp:1168
 msgid "Select output file"
-msgstr ""
+msgstr "출력파일 선택"
 
 #: ../src/wx/cmdevents.cpp:1130 ../src/wx/viewsupt.cpp:1169
 msgid "PNG images|*.png|BMP images|*.bmp"
@@ -328,7 +329,7 @@ msgstr ""
 
 #: ../src/wx/cmdevents.cpp:1175 ../src/wx/cmdevents.cpp:1245
 msgid " files ("
-msgstr ""
+msgstr "파일("
 
 #: ../src/wx/cmdevents.cpp:1305 ../src/wx/cmdevents.cpp:1326
 msgid "VBA Movie files|*.vmv"
@@ -336,7 +337,7 @@ msgstr ""
 
 #: ../src/wx/cmdevents.cpp:1325
 msgid "Select file"
-msgstr ""
+msgstr "파일 선택"
 
 #: ../src/wx/cmdevents.cpp:1610 ../src/wx/cmdevents.cpp:1703
 msgid "Select state file"
@@ -348,11 +349,11 @@ msgstr ""
 
 #: ../src/wx/cmdevents.cpp:1943
 msgid "Sound enabled"
-msgstr ""
+msgstr "소리 켜기"
 
 #: ../src/wx/cmdevents.cpp:1943
 msgid "Sound disabled"
-msgstr ""
+msgstr "소리 끄기"
 
 #: ../src/wx/cmdevents.cpp:1956 ../src/wx/cmdevents.cpp:1970
 #, c-format
@@ -369,7 +370,7 @@ msgstr ""
 
 #: ../src/wx/cmdevents.cpp:2047
 msgid "GDB Connection"
-msgstr ""
+msgstr "GDB 연결"
 
 #: ../src/wx/cmdevents.cpp:2094
 #, c-format
@@ -379,7 +380,7 @@ msgstr ""
 #: ../src/wx/cmdevents.cpp:2101
 #, c-format
 msgid "Waiting for connection on port %d"
-msgstr ""
+msgstr "포트%d에 연결중이니 기다려주세요"
 
 #: ../src/wx/cmdevents.cpp:2104
 msgid "Waiting for GDB..."
@@ -387,7 +388,7 @@ msgstr ""
 
 #: ../src/wx/cmdevents.cpp:2626
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
-msgstr ""
+msgstr "닌텐도 게임보이(+컬러+어드벤스) 에뮬레이터입니다."
 
 #: ../src/wx/cmdevents.cpp:2627
 msgid ""
@@ -418,7 +419,7 @@ msgstr ""
 
 #: ../src/wx/cmdevents.cpp:2894
 msgid "Network is not supported in local mode."
-msgstr ""
+msgstr "로컬 모드에서는 네트워크가 지원되지 않음."
 
 #: ../src/wx/dsound.cpp:90 ../src/wx/dsound.cpp:104
 #, c-format
@@ -488,11 +489,11 @@ msgstr ""
 
 #: ../src/wx/guiinit.cpp:77
 msgid "Start!"
-msgstr ""
+msgstr "시작!"
 
 #: ../src/wx/guiinit.cpp:82 ../src/wx/xrc/NetLink.xrc:86
 msgid "Connect"
-msgstr ""
+msgstr "연결"
 
 #: ../src/wx/guiinit.cpp:96
 msgid "You must enter a valid host name"
@@ -500,63 +501,63 @@ msgstr ""
 
 #: ../src/wx/guiinit.cpp:97
 msgid "Host name invalid"
-msgstr ""
+msgstr "호스트 이름이 잘못됨"
 
 #: ../src/wx/guiinit.cpp:115
 msgid "Waiting for clients..."
-msgstr ""
+msgstr "클라이언트를 기다리는 중..."
 
 #: ../src/wx/guiinit.cpp:116
 #, c-format
 msgid "Server IP address is: %s\n"
-msgstr ""
+msgstr "서버 IP주소는 %s\n"
 
 #: ../src/wx/guiinit.cpp:118
 msgid "Waiting for connection..."
-msgstr ""
+msgstr "연결중... 기다려주세요."
 
 #: ../src/wx/guiinit.cpp:119
 #, c-format
 msgid "Connecting to %s\n"
-msgstr ""
+msgstr "%s에 연결합니다\n"
 
 #: ../src/wx/guiinit.cpp:152
 msgid ""
 "Error occurred.\n"
 "Please try again."
-msgstr ""
+msgstr "오류가 발생했습니다.\n 다시 시도해보십시오."
 
 #: ../src/wx/guiinit.cpp:219 ../src/wx/guiinit.cpp:272
 msgid "Select cheat file"
-msgstr ""
+msgstr "치트파일 선택"
 
 #: ../src/wx/guiinit.cpp:220
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
-msgstr ""
+msgstr "VBA 치트 리스트 (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 
 #: ../src/wx/guiinit.cpp:239 ../src/wx/panel.cpp:401
 msgid "Loaded cheats"
-msgstr ""
+msgstr "치트 불러오기"
 
 #: ../src/wx/guiinit.cpp:273
 msgid "VBA cheat lists (*.clt)|*.clt"
-msgstr ""
+msgstr "VBA 치트 파일 (*.clt)|*.clt"
 
 #: ../src/wx/guiinit.cpp:291
 msgid "Saved cheats"
-msgstr ""
+msgstr "치트 저장됨"
 
 #: ../src/wx/guiinit.cpp:322 ../src/wx/guiinit.cpp:341
 msgid "Restore old values?"
-msgstr ""
+msgstr "이전 값을 복원하시겠습니까?"
 
 #: ../src/wx/guiinit.cpp:323 ../src/wx/guiinit.cpp:342
 msgid "Removing cheats"
-msgstr ""
+msgstr "치트 지우기"
 
 #: ../src/wx/guiinit.cpp:733 ../src/wx/xrc/JoyPanel.xrc:364
 msgid "GameShark"
-msgstr ""
+msgstr "게임샤크"
 
 #: ../src/wx/guiinit.cpp:736
 msgid "Generic Code"
@@ -585,19 +586,19 @@ msgstr ""
 
 #: ../src/wx/guiinit.cpp:857
 msgid "Search produced no results"
-msgstr ""
+msgstr "검색 결과 없음"
 
 #: ../src/wx/guiinit.cpp:1020
 msgid "8-bit "
-msgstr ""
+msgstr "8비트"
 
 #: ../src/wx/guiinit.cpp:1024
 msgid "16-bit "
-msgstr ""
+msgstr "16비트"
 
 #: ../src/wx/guiinit.cpp:1028
 msgid "32-bit "
-msgstr ""
+msgstr "32비트"
 
 #: ../src/wx/guiinit.cpp:1034
 msgid "signed decimal"
@@ -622,7 +623,7 @@ msgstr ""
 
 #: ../src/wx/guiinit.cpp:1706
 msgid "Desktop mode"
-msgstr ""
+msgstr "데스크탑 모드"
 
 #: ../src/wx/guiinit.cpp:1713
 #, c-format
@@ -636,7 +637,7 @@ msgstr ""
 
 #: ../src/wx/guiinit.cpp:1887 ../src/wx/xrc/DisplayConfig.xrc:107
 msgid "Plugin"
-msgstr ""
+msgstr "플러그인"
 
 #: ../src/wx/guiinit.cpp:1915
 msgid "Please select a plugin or a different filter"
@@ -644,7 +645,7 @@ msgstr ""
 
 #: ../src/wx/guiinit.cpp:1916
 msgid "Plugin selection error"
-msgstr ""
+msgstr "플러그인 선택 오류"
 
 #: ../src/wx/guiinit.cpp:2115
 msgid "This will clear all user-defined accelerators.  Are you sure?"
@@ -652,7 +653,7 @@ msgstr ""
 
 #: ../src/wx/guiinit.cpp:2115
 msgid "Confirm"
-msgstr ""
+msgstr "확인"
 
 #: ../src/wx/guiinit.cpp:2709
 msgid "Main icon not found"
@@ -679,23 +680,23 @@ msgstr ""
 
 #: ../src/wx/guiinit.cpp:3166
 msgid "Code"
-msgstr ""
+msgstr "코드"
 
 #: ../src/wx/guiinit.cpp:3175
 msgid "Description"
-msgstr ""
+msgstr "서술"
 
 #: ../src/wx/guiinit.cpp:3249 ../src/wx/xrc/CheatAdd.xrc:31
 msgid "Address"
-msgstr ""
+msgstr "주소"
 
 #: ../src/wx/guiinit.cpp:3250
 msgid "Old Value"
-msgstr ""
+msgstr "오래된 값"
 
 #: ../src/wx/guiinit.cpp:3251
 msgid "New Value"
-msgstr ""
+msgstr "새로운 값"
 
 #: ../src/wx/guiinit.cpp:3787
 msgid "Menu commands"
@@ -762,7 +763,7 @@ msgstr ""
 
 #: ../src/wx/panel.cpp:434
 msgid " player "
-msgstr ""
+msgstr "플레이어"
 
 #: ../src/wx/panel.cpp:596
 #, c-format
