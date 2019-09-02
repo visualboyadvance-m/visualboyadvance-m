@@ -524,7 +524,7 @@ set(XRC_SOURCES
 # wxrc does not support xrs files in -c output (> 10x compression)
 # we do it using the bin2c.c utility
 
-set(BIN2C ${CMAKE_BINARY_DIR}/bin2c${CMAKE_EXECUTABLE_SUFFIX})
+set(BIN2C ${CMAKE_BINARY_DIR}/bin2c)
 
 if(NOT MSVC)
 	include(HostCompile)

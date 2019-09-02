@@ -40,10 +40,10 @@ case "\$CC" in
         ;;
 esac
 
-export CPPFLAGS="$CPPFLAGS${CPPFLAGS:+ }-I\$BUILD_ROOT/root/include"
-export CFLAGS="$CFLAGS${CFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -pthread -lm"
-export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"
-export OBJCXXFLAGS="$OBJCXXFLAGS${OBJCXXFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"
+export CPPFLAGS="$CPPFLAGS${CPPFLAGS:+ }-I\$BUILD_ROOT/root/include -DCURL_STATICLIB"
+export CFLAGS="$CFLAGS${CFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -pthread -lm -DCURL_STATICLIB"
+export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm -DCURL_STATICLIB"
+export OBJCXXFLAGS="$OBJCXXFLAGS${OBJCXXFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm -DCURL_STATICLIB"
 export LDFLAGS="$LDFLAGS${LDFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -pthread -lm"
 export STRIP="\${STRIP:-strip}"
 
@@ -355,7 +355,7 @@ DIST_ARGS="$DIST_ARGS
     libicu      --disable-extras --disable-tools --disable-tests --disable-samples
     gettext     --with-included-gettext --with-included-glib --with-included-libcroco --with-included-libunistring --with-included-libxml --disable-curses CPPFLAGS=\"\$CPPFLAGS -DLIBXML_STATIC\"
     pkgconfig   --with-internal-glib --with-libiconv=gnu
-    curl        --with-ssl
+    curl        --with-ssl --without-brotli
     pcre        --enable-utf8 --enable-pcre8 --enable-pcre16 --enable-pcre32 --enable-unicode-properties --enable-pcregrep-libz --enable-pcregrep-libbz2 --enable-jit
     libxslt     --without-python --without-crypto
     libgd       --without-xpm
@@ -496,9 +496,14 @@ setup() {
 
     OPWD=$PWD
     cd "$BUILD_ROOT/root"
-    for d in perl5 share etc man doc; do
-        [ -d "$d" ] || mkdir "$d"
+
+    for d in bin perl5 share etc man doc; do
+        mkdir -p "$d"
     done
+
+    # things like strawberry perl very rudely put this in the PATH
+    [ -L bin/gmake ] || ln -s "$(command -v make)" bin/gmake
+
     cd "$OPWD"
 
     if [ -z "$BUILD_FFMPEG" ]; then
@@ -687,7 +692,7 @@ msys2_install_core_deps() {
     done
 
     # install
-    pacman --noconfirm --needed -S make tar patch diffutils ccache perl msys2-w32api-headers msys2-runtime-devel gcc gcc-libs mpfr windows-default-manifest python python2 "$@"
+    pacman --noconfirm --needed -S make tar patch diffutils ccache perl msys2-w32api-headers msys2-runtime-devel gcc gcc-libs mpfr windows-default-manifest python python2 pass "$@"
 
     # make sure msys perl takes precedence over mingw perl if the latter is installed
     mkdir -p "$BUILD_ROOT/root/bin"
@@ -2627,7 +2632,7 @@ build_project() {
         lto=OFF
     fi
 
-    echo_eval_run cmake "'$CHECKOUT'" $REQUIRED_CMAKE_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=${lto} $CMAKE_BASE_ARGS $PROJECT_ARGS $@
+    echo_eval_run cmake "'$CHECKOUT'" $REQUIRED_CMAKE_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=${lto} $CMAKE_ARGS $PROJECT_ARGS $@
     echo_run make -j$NUM_CPUS VERBOSE=1
 
     if [ "$target_os" = mac ]; then
@@ -2664,9 +2669,9 @@ build_project() {
         rm -f translations.zip
 
         make install DESTDIR=./destdir
-        cd destdir/usr/local/share/locale
-        zip -9r ../../../../../translations.zip *
-        cd ../../../../..
+        cd destdir/usr/share/locale
+        zip -9r ../../../../translations.zip *
+        cd ../../../..
 
         rm -f $zip.asc translations.zip.asc
 
