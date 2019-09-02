@@ -480,6 +480,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         set(MY_C_DBG_FLAGS -g -fno-omit-frame-pointer)
     endif()
 
+    include(CheckCXXCompilerFlag)
+
     if(ENABLE_ASAN)
         string(TOLOWER ${CMAKE_BUILD_TYPE} build)
         if(NOT build STREQUAL "debug")
@@ -490,7 +492,13 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         if(SANITIZER STREQUAL "on" OR SANITIZER STREQUAL "true")
             set(SANITIZER address)
         endif()
-        set(MY_C_DBG_FLAGS ${MY_C_DBG_FLAGS} -fsanitize=${SANITIZER} -lasan)
+        set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "-lasan")
+        check_cxx_compiler_flag("-fsanitize=${SANITIZER} -lasan" ASAN_SUPPORT_FLAG)
+        if(${ASAN_SUPPORT_FLAG})
+            set(MY_C_DBG_FLAGS ${MY_C_DBG_FLAGS} -fsanitize=${SANITIZER} -lasan)
+        else()
+            message(FATAL_ERROR "asan not available to compiler.")
+        endif()
     endif()
 
     # common flags
@@ -499,8 +507,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     if(NOT (WIN32 OR X86_32)) # inline asm is not allowed with -fPIC
         set(MY_C_FLAGS ${MY_C_FLAGS} -fPIC)
     endif()
-
-    include(CheckCXXCompilerFlag)
 
     # check if ssp flags are supported for this version of gcc
     if(CMAKE_COMPILER_IS_GNUCXX)
