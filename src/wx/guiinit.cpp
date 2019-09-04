@@ -1672,6 +1672,9 @@ public:
                 if (defkeys_joystick[i].joy)
                     a.push_back(defkeys_joystick[i]);
 
+                if (extrakeys_joystick[i].joy)
+                    a.push_back(extrakeys_joystick[i]);
+
                 tc->SetValue(wxJoyKeyTextCtrl::ToString(a));
             }
         }

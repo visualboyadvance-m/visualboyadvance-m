@@ -3,8 +3,9 @@
 
 #define NUM_KEYS 21
 extern const wxString joynames[NUM_KEYS];
-extern wxJoyKeyBinding defkeys_keyboard[NUM_KEYS]; // keyboard defaults
-extern wxJoyKeyBinding defkeys_joystick[NUM_KEYS]; // joystick defaults
+extern wxJoyKeyBinding defkeys_keyboard[NUM_KEYS];  // keyboard defaults
+extern wxJoyKeyBinding defkeys_joystick[NUM_KEYS];  // joystick defaults
+extern wxJoyKeyBinding extrakeys_joystick[NUM_KEYS];// extra joystick defaults
 
 extern struct opts_t {
     opts_t();
