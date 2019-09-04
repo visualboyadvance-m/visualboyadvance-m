@@ -3,7 +3,9 @@
   <object class="wxMenuBar" name="MainMenu">
     <object class="wxMenu">
       <label>_File</label>
-      <object class="wxMenuItem" name="wxID_OPEN"/>
+      <object class="wxMenuItem" name="wxID_OPEN">
+        <label>Open...</label>
+      </object>
       <object class="wxMenuItem" name="OpenGB">
         <label>Open _GB...</label>
       </object>
@@ -187,7 +189,9 @@
       </object>
       <object class="separator"/>
       <object class="wxMenuItem" name="wxID_CLOSE"/>
-      <object class="wxMenuItem" name="wxID_EXIT"/>
+      <object class="wxMenuItem" name="wxID_EXIT">
+        <label>_Quit</label>
+      </object>
     </object>
     <object class="wxMenu">
       <label>_Emulation</label>
