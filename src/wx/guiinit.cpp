@@ -2833,6 +2833,17 @@ bool MainFrame::BindControls()
                 continue;
 	    }
 #endif
+#ifndef MMX
+
+	    if (cmdtab[i].cmd_id == XRCID("MMX"))
+	    {
+		if (mi)
+		    mi->GetMenu()->Remove(mi);
+                cmdtab[i].cmd_id = XRCID("NOOP");
+                cmdtab[i].mi = NULL;
+                continue;
+	    }
+#endif
 
             if (mi) {
                 // wxgtk provides no way to retrieve stock label/accel
@@ -2911,6 +2922,7 @@ bool MainFrame::BindControls()
         // remove this item from the menu completely
         wxMenuItem* gdbmi = XRCITEM("GDBMenu");
         gdbmi->GetMenu()->Remove(gdbmi);
+        gdbmi = NULL;
 #endif
 
         // if a recent menu is present, save its location
@@ -2981,6 +2993,7 @@ bool MainFrame::BindControls()
         MenuOptionIntMask("JoypadAutoholdR", autohold, KEYM_R);
         MenuOptionIntMask("JoypadAutoholdSelect", autohold, KEYM_SELECT);
         MenuOptionIntMask("JoypadAutoholdStart", autohold, KEYM_START);
+        MenuOptionIntMask("MMX", disableMMX, 1);
         MenuOptionBool("EmulatorSpeedupToggle", turbo);
         MenuOptionIntRadioValue("LinkType0Nothing", gopts.gba_link_type, 0);
         MenuOptionIntRadioValue("LinkType1Cable", gopts.gba_link_type, 1);
