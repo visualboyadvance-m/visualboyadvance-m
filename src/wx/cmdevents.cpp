@@ -1839,61 +1839,100 @@ EVT_HANDLER(CheatsEnable, "Enable cheats (toggle)")
 // Debug menu
 EVT_HANDLER_MASK(VideoLayersBG0, "Video layer BG0 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    GetMenuOptionInt("VideoLayersBG0", layerSettings, (1 << 8));
+    bool menuPress;
+    char keyName[] = "VideoLayersBG0";
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &layerSettings, (1 << 8));
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, layerSettings, (1 << 8));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersBG1, "Video layer BG1 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    GetMenuOptionInt("VideoLayersBG1", layerSettings, (1 << 9));
+    bool menuPress;
+    char keyName[] = "VideoLayersBG1";
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &layerSettings, (1 << 9));
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, layerSettings, (1 << 9));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersBG2, "Video layer BG2 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    GetMenuOptionInt("VideoLayersBG2", layerSettings, (1 << 10));
+    bool menuPress;
+    char keyName[] = "VideoLayersBG2";
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &layerSettings, (1 << 10));
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, layerSettings, (1 << 10));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersBG3, "Video layer BG3 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    GetMenuOptionInt("VideoLayersBG3", layerSettings, (1 << 11));
+    bool menuPress;
+    char keyName[] = "VideoLayersBG3";
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &layerSettings, (1 << 11));
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, layerSettings, (1 << 11));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersOBJ, "Video layer OBJ (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    GetMenuOptionInt("VideoLayersOBJ", layerSettings, (1 << 12));
+    bool menuPress;
+    char keyName[] = "VideoLayersOBJ";
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &layerSettings, (1 << 12));
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, layerSettings, (1 << 12));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersWIN0, "Video layer WIN0 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    GetMenuOptionInt("VideoLayersWIN0", layerSettings, (1 << 13));
+    bool menuPress;
+    char keyName[] = "VideoLayersWIN0";
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &layerSettings, (1 << 13));
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, layerSettings, (1 << 13));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersWIN1, "Video layer WIN1 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    GetMenuOptionInt("VideoLayersWIN1", layerSettings, (1 << 14));
+    bool menuPress;
+    char keyName[] = "VideoLayersWIN1";
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &layerSettings, (1 << 14));
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, layerSettings, (1 << 14));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersOBJWIN, "Video layer OBJWIN (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    GetMenuOptionInt("VideoLayersOBJWIN", layerSettings, (1 << 15));
+    bool menuPress;
+    char keyName[] = "VideoLayersOBJWIN";
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &layerSettings, (1 << 15));
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, layerSettings, (1 << 15));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
-// not in menu
 EVT_HANDLER_MASK(VideoLayersReset, "Show all video layers", CMDEN_GB | CMDEN_GBA)
 {
 #define set_vl(s)                                     \
@@ -1920,42 +1959,72 @@ EVT_HANDLER_MASK(VideoLayersReset, "Show all video layers", CMDEN_GB | CMDEN_GBA
 
 EVT_HANDLER_MASK(SoundChannel1, "Sound Channel 1 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    GetMenuOptionInt("SoundChannel1", gopts.sound_en, (1 << 0));
+    bool menuPress;
+    char keyName[] = "SoundChannel1";
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &gopts.sound_en, (1 << 0));
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, gopts.sound_en, (1 << 0));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
 
 EVT_HANDLER_MASK(SoundChannel2, "Sound Channel 2 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    GetMenuOptionInt("SoundChannel2", gopts.sound_en, (1 << 1));
+    bool menuPress;
+    char keyName[] = "SoundChannel2";
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &gopts.sound_en, (1 << 1));
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, gopts.sound_en, (1 << 1));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
 
 EVT_HANDLER_MASK(SoundChannel3, "Sound Channel 3 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    GetMenuOptionInt("SoundChannel3", gopts.sound_en, (1 << 2));
+    bool menuPress;
+    char keyName[] = "SoundChannel3";
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &gopts.sound_en, (1 << 2));
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, gopts.sound_en, (1 << 2));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
 
 EVT_HANDLER_MASK(SoundChannel4, "Sound Channel 4 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    GetMenuOptionInt("SoundChannel4", gopts.sound_en, (1 << 3));
+    bool menuPress;
+    char keyName[] = "SoundChannel4";
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &gopts.sound_en, (1 << 3));
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, gopts.sound_en, (1 << 3));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
 
 EVT_HANDLER_MASK(DirectSoundA, "Direct Sound A (toggle)", CMDEN_GBA)
 {
-    GetMenuOptionInt("DirectSoundA", gopts.sound_en, (1 << 8));
+    bool menuPress;
+    char keyName[] = "DirectSoundA";
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &gopts.sound_en, (1 << 8));
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, gopts.sound_en, (1 << 8));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
 
 EVT_HANDLER_MASK(DirectSoundB, "Direct Sound B (toggle)", CMDEN_GBA)
 {
-    GetMenuOptionInt("DirectSoundB", gopts.sound_en, (1 << 9));
+    bool menuPress;
+    char keyName[] = "DirectSoundB";
+    GetMenuOptionBool(keyName, menuPress);
+    toggleBitVar(&menuPress, &gopts.sound_en, (1 << 9));
+    SetMenuOption(keyName, menuPress ? 1 : 0);
+    GetMenuOptionInt(keyName, gopts.sound_en, (1 << 9));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
