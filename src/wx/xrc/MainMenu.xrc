@@ -40,6 +40,9 @@
         <object class="wxMenuItem" name="LoadGameRecent">
           <label>Most _recent</label>
         </object>
+        <object class="wxMenuItem" name="LoadGameSlot">
+          <label>Load current state slot</label>
+        </object>
         <object class="wxMenuItem" name="LoadGameAutoLoad">
           <label>_Auto load most recent</label>
           <checkable>1</checkable>
@@ -94,6 +97,12 @@
         <object class="wxMenuItem" name="SaveGameOldest">
           <label>_Oldest slot</label>
         </object>
+        <object class="wxMenuItem" name="SaveGameSlot">
+          <label>Save current state slot</label>
+        </object>
+        <object class="wxMenuItem" name="IncrGameSlotSave">
+          <label>Increase state slot number and save</label>
+        </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="SaveGame01">
           <label>_1</label>
@@ -130,6 +139,12 @@
           <label>To _File ...</label>
         </object>
         <label>_Save state</label>
+      </object>
+      <object class="wxMenuItem" name="IncrGameSlot">
+        <label>Increase state slot number</label>
+      </object>
+      <object class="wxMenuItem" name="DecrGameSlot">
+        <label>Decrease state slot number</label>
       </object>
       <object class="separator"/>
       <object class="wxMenu">
@@ -320,8 +335,18 @@
             <label>_6x</label>
           </object>
         </object>
+        <object class="wxMenuItem" name="ChangeFilter">
+          <label>Change pixel filter</label>
+        </object>
+        <object class="wxMenuItem" name="ChangeIFB">
+          <label>Change interframe blending</label>
+        </object>
         <object class="wxMenuItem" name="RetainAspect">
           <label>_Retain aspect ratio</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="MMX">
+          <label>Enable MMX</label>
           <checkable>1</checkable>
         </object>
         <object class="separator"/>
@@ -418,19 +443,19 @@
         <object class="wxMenu">
           <label>_Autohold</label>
           <object class="wxMenuItem" name="JoypadAutoholdUp">
-            <label>_Up</label>
+            <label>Up</label>
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="JoypadAutoholdDown">
-            <label>_Down</label>
+            <label>Down</label>
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="JoypadAutoholdLeft">
-            <label>_Left</label>
+            <label>Left</label>
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="JoypadAutoholdRight">
-            <label>_Right</label>
+            <label>Right</label>
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="JoypadAutoholdA">
@@ -450,11 +475,11 @@
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="JoypadAutoholdSelect">
-            <label>_Select</label>
+            <label>Select</label>
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="JoypadAutoholdStart">
-            <label>_Start</label>
+            <label>Start</label>
             <checkable>1</checkable>
           </object>
         </object>
@@ -584,6 +609,10 @@
       </object>
       <object class="separator"/>
       <object class="wxMenu">
+        <object class="wxMenuItem" name="VideoLayersReset">
+          <label>Show all video layers</label>
+        </object>
+        <object class="separator"/>
         <object class="wxMenuItem" name="VideoLayersBG0">
           <label>BG _0</label>
           <checkable>1</checkable>
@@ -683,7 +712,9 @@
         <label>_Factory Reset...</label>
       </object>
       <object class="separator"/>
-      <object class="wxMenuItem" name="wxID_ABOUT"/>
+      <object class="wxMenuItem" name="wxID_ABOUT">
+        <label>_About...</label>
+      </object>
     </object>
   </object>
 </resource>
