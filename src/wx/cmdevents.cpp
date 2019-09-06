@@ -1749,12 +1749,20 @@ EVT_HANDLER_MASK(SaveGameSlot, "Save current state slot", CMDEN_GB | CMDEN_GBA)
 EVT_HANDLER_MASK(IncrGameSlot, "Increase state slot number", CMDEN_GB | CMDEN_GBA)
 {
     state_slot = (state_slot + 1) % 10;
+
+    wxString msg;
+    msg.Printf(_("Current state slot #%d"), state_slot);
+    systemScreenMessage(msg);
 }
 
 // new
 EVT_HANDLER_MASK(DecrGameSlot, "Decrease state slot number", CMDEN_GB | CMDEN_GBA)
 {
     state_slot = (state_slot + 9) % 10;
+
+    wxString msg;
+    msg.Printf(_("Current state slot #%d"), state_slot);
+    systemScreenMessage(msg);
 }
 
 // new
@@ -1762,6 +1770,10 @@ EVT_HANDLER_MASK(IncrGameSlotSave, "Increase state slot number and save", CMDEN_
 {
     state_slot = (state_slot + 1) % 10;
     panel->SaveState(state_slot + 1);
+
+    wxString msg;
+    msg.Printf(_("Current state slot #%d"), state_slot);
+    systemScreenMessage(msg);
 }
 
 EVT_HANDLER_MASK(Rewind, "Rewind", CMDEN_REWIND)
@@ -2523,6 +2535,10 @@ EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
         panel->panel->Destroy();
         panel->panel = NULL;
     }
+
+    wxString msg;
+    msg.Printf(_("Using pixel filter #%d"), gopts.filter);
+    systemScreenMessage(msg);
 }
 
 EVT_HANDLER_MASK(ChangeIFB, "Change Interframe Blending", CMDEN_NREC_ANY)
@@ -2534,6 +2550,10 @@ EVT_HANDLER_MASK(ChangeIFB, "Change Interframe Blending", CMDEN_NREC_ANY)
         panel->panel->Destroy();
         panel->panel = NULL;
     }
+
+    wxString msg;
+    msg.Printf(_("Using interframe blending #%d"), gopts.ifb);
+    systemScreenMessage(msg);
 }
 
 EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)
