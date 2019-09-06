@@ -2803,8 +2803,10 @@ EVT_HANDLER(ApplyPatches, "Apply IPS/UPS/IPF patches if found")
 
 EVT_HANDLER(MMX, "Enable MMX")
 {
+#ifdef MMX
     GetMenuOptionInt("MMX", disableMMX, 1);
     update_opts();
+#endif
 }
 
 EVT_HANDLER(KeepOnTop, "Keep window on top")
