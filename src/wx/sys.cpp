@@ -69,7 +69,7 @@ void systemMessage(int id, const char* fmt, ...)
             exit(1);
     }
 
-    wxLogError(wxT("%s"), wxString(buf, wxConvLibc).c_str());
+    wxLogError(wxT("%s"), wxString(buf, wxConvUTF8).c_str());
 }
 
 static int frames = 0;
@@ -1044,7 +1044,7 @@ void systemScreenMessage(const wxString& msg)
 
 void systemScreenMessage(const char* msg)
 {
-    systemScreenMessage(wxString(msg, wxConvLibc));
+    systemScreenMessage(wxString(msg, wxConvUTF8));
 }
 
 bool systemCanChangeSoundQuality()
@@ -1185,7 +1185,7 @@ bool debugOpenPty()
 
     if ((pty_master = posix_openpt(O_RDWR | O_NOCTTY)) < 0 || grantpt(pty_master) < 0 || unlockpt(pty_master) < 0 || !(slave_name = ptsname(pty_master))) {
         wxLogError(_("Error opening pseudo tty: %s"), wxString(strerror(errno),
-                                                          wxConvLibc)
+                                                          wxConvUTF8)
                                                           .c_str());
 
         if (pty_master >= 0) {
@@ -1196,7 +1196,7 @@ bool debugOpenPty()
         return false;
     }
 
-    pty_slave = wxString(slave_name, wxConvLibc);
+    pty_slave = wxString(slave_name, wxConvUTF8);
     remoteSendFnc = debugWritePty;
     remoteRecvFnc = debugReadPty;
     remoteCleanUpFnc = debugClosePty;
@@ -1308,7 +1308,7 @@ void log(const char* defaultMsg, ...)
     char buf[2048];
     va_start(valist, defaultMsg);
     vsnprintf(buf, 2048, defaultMsg, valist);
-    wxString msg = wxString(buf, wxConvLibc);
+    wxString msg = wxString(buf, wxConvUTF8);
     va_end(valist);
     wxGetApp().log.append(msg);
 
