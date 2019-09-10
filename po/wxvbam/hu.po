@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-06 19:39-0300\n"
-"PO-Revision-Date: 2019-09-06 22:39+0000\n"
-"Last-Translator: Edênis Freindorfer Azevedo\n"
+"PO-Revision-Date: 2019-09-10 17:02+0000\n"
+"Last-Translator: Model T800\n"
 "Language-Team: Hungarian (http://www.transifex.com/bgk/vba-m/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -352,7 +352,7 @@ msgstr "VisualBoyAdvance játékmentés fájlok|*.sgm"
 #: ../src/wx/cmdevents.cpp:1775
 #, c-format
 msgid "Current state slot #%d"
-msgstr ""
+msgstr "#%d Játékállás hely"
 
 #: ../src/wx/cmdevents.cpp:2044
 msgid "Sound enabled"
@@ -396,12 +396,12 @@ msgstr "Várakozás a GDB-re"
 #: ../src/wx/cmdevents.cpp:2609
 #, c-format
 msgid "Using pixel filter #%d"
-msgstr ""
+msgstr "Alkalmazott pixelszűrő:  #%d"
 
 #: ../src/wx/cmdevents.cpp:2624
 #, c-format
 msgid "Using interframe blending #%d"
-msgstr ""
+msgstr "Képkockaátmenet elmosás: #%d"
 
 #: ../src/wx/cmdevents.cpp:2747
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
@@ -678,7 +678,7 @@ msgstr "A főikon nem található"
 
 #: ../src/wx/guiinit.cpp:2722
 msgid "Browse"
-msgstr ""
+msgstr "Tallózás"
 
 #: ../src/wx/guiinit.cpp:2736
 msgid "Main display panel not found"
@@ -2764,7 +2764,7 @@ msgstr "&Fájl"
 
 #: ../src/wx/xrc/MainMenu.xrc:7
 msgid "Open..."
-msgstr ""
+msgstr "Megnyitás..."
 
 #: ../src/wx/xrc/MainMenu.xrc:10
 msgid "Open &GB..."
@@ -2808,7 +2808,7 @@ msgstr "Legutolsó"
 
 #: ../src/wx/xrc/MainMenu.xrc:44
 msgid "Load current state slot"
-msgstr ""
+msgstr "Játékállás betöltése"
 
 #: ../src/wx/xrc/MainMenu.xrc:47
 msgid "&Auto load most recent"
@@ -2872,11 +2872,11 @@ msgstr "Legkorábbi helyére"
 
 #: ../src/wx/xrc/MainMenu.xrc:101
 msgid "Save current state slot"
-msgstr ""
+msgstr "Játékállás mentése"
 
 #: ../src/wx/xrc/MainMenu.xrc:104
 msgid "Increase state slot number and save"
-msgstr ""
+msgstr "Játékállás sorszám növelése és mentés"
 
 #: ../src/wx/xrc/MainMenu.xrc:139
 msgid "To &File ..."
@@ -2888,11 +2888,11 @@ msgstr "Játékállás menté&se"
 
 #: ../src/wx/xrc/MainMenu.xrc:144
 msgid "Increase state slot number"
-msgstr ""
+msgstr "Játékállás sorszám növelése"
 
 #: ../src/wx/xrc/MainMenu.xrc:147
 msgid "Decrease state slot number"
-msgstr ""
+msgstr "Játékállás sorszám csökkentése"
 
 #: ../src/wx/xrc/MainMenu.xrc:152 ../src/wx/xrc/MainMenu.xrc:164
 msgid "&Battery file..."
@@ -2960,7 +2960,7 @@ msgstr "Lejátszás"
 
 #: ../src/wx/xrc/MainMenu.xrc:208
 msgid "&Quit"
-msgstr ""
+msgstr "Kilépés"
 
 #: ../src/wx/xrc/MainMenu.xrc:212
 msgid "&Emulation"
@@ -3097,11 +3097,11 @@ msgstr "&6x"
 
 #: ../src/wx/xrc/MainMenu.xrc:339
 msgid "Change pixel filter"
-msgstr ""
+msgstr "Pixelszűrő csere"
 
 #: ../src/wx/xrc/MainMenu.xrc:342
 msgid "Change interframe blending"
-msgstr ""
+msgstr "Képkockaátmenet csere"
 
 #: ../src/wx/xrc/MainMenu.xrc:345
 msgid "&Retain aspect ratio"
@@ -3109,7 +3109,7 @@ msgstr "Méretarány megő&rzése"
 
 #: ../src/wx/xrc/MainMenu.xrc:349
 msgid "Enable MMX"
-msgstr ""
+msgstr "MMX engedélyezése"
 
 #: ../src/wx/xrc/MainMenu.xrc:354
 msgid "&Bilinear filter"
@@ -3325,7 +3325,7 @@ msgstr "Csempe Meg&tekintő..."
 
 #: ../src/wx/xrc/MainMenu.xrc:613
 msgid "Show all video layers"
-msgstr ""
+msgstr "Összes képréteg megjelenítése"
 
 #: ../src/wx/xrc/MainMenu.xrc:617
 msgid "BG &0"
@@ -3413,7 +3413,7 @@ msgstr "Alaphelyzet Visszaállítás..."
 
 #: ../src/wx/xrc/MainMenu.xrc:716
 msgid "&About..."
-msgstr ""
+msgstr "Névjegy..."
 
 #: ../src/wx/xrc/MapViewer.xrc:4
 msgid "Map Viewer"

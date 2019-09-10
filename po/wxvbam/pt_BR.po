@@ -18,8 +18,8 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-06 19:39-0300\n"
-"PO-Revision-Date: 2019-09-06 23:46+0000\n"
-"Last-Translator: Edênis Freindorfer Azevedo\n"
+"PO-Revision-Date: 2019-09-10 12:41+0000\n"
+"Last-Translator: bgK\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/bgk/vba-m/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -360,7 +360,7 @@ msgstr "Arquivos de jogo salvo do VisualBoyAdvance|*.sgm"
 #: ../src/wx/cmdevents.cpp:1775
 #, c-format
 msgid "Current state slot #%d"
-msgstr "Slot de estado atual #%d"
+msgstr ""
 
 #: ../src/wx/cmdevents.cpp:2044
 msgid "Sound enabled"
@@ -404,12 +404,12 @@ msgstr "Esperando por GDB..."
 #: ../src/wx/cmdevents.cpp:2609
 #, c-format
 msgid "Using pixel filter #%d"
-msgstr "Usar filtro de pixel #%d"
+msgstr ""
 
 #: ../src/wx/cmdevents.cpp:2624
 #, c-format
 msgid "Using interframe blending #%d"
-msgstr "Usar mesclagem de quadros #%d"
+msgstr ""
 
 #: ../src/wx/cmdevents.cpp:2747
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
@@ -686,7 +686,7 @@ msgstr "Ícone principal não encontrado"
 
 #: ../src/wx/guiinit.cpp:2722
 msgid "Browse"
-msgstr "Procurar"
+msgstr ""
 
 #: ../src/wx/guiinit.cpp:2736
 msgid "Main display panel not found"
@@ -2772,7 +2772,7 @@ msgstr "Arquivo"
 
 #: ../src/wx/xrc/MainMenu.xrc:7
 msgid "Open..."
-msgstr "Abrir..."
+msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:10
 msgid "Open &GB..."
@@ -2816,7 +2816,7 @@ msgstr "Mais &recente"
 
 #: ../src/wx/xrc/MainMenu.xrc:44
 msgid "Load current state slot"
-msgstr "Carregar slot do estado atual"
+msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:47
 msgid "&Auto load most recent"
@@ -2880,11 +2880,11 @@ msgstr "Sl&ot mais antigo"
 
 #: ../src/wx/xrc/MainMenu.xrc:101
 msgid "Save current state slot"
-msgstr "Salvar no slot do estado atual"
+msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:104
 msgid "Increase state slot number and save"
-msgstr "Incrementar o número do slot do estado atual e salvar"
+msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:139
 msgid "To &File ..."
@@ -2896,11 +2896,11 @@ msgstr "&Salvar estado"
 
 #: ../src/wx/xrc/MainMenu.xrc:144
 msgid "Increase state slot number"
-msgstr "Incrementar o slot do estado atual"
+msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:147
 msgid "Decrease state slot number"
-msgstr "Decrementar o slot do estado atual"
+msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:152 ../src/wx/xrc/MainMenu.xrc:164
 msgid "&Battery file..."
@@ -2968,7 +2968,7 @@ msgstr "Re&produzir"
 
 #: ../src/wx/xrc/MainMenu.xrc:208
 msgid "&Quit"
-msgstr "&Sair"
+msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:212
 msgid "&Emulation"
@@ -3105,11 +3105,11 @@ msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:339
 msgid "Change pixel filter"
-msgstr "Mudar filtro de pixel"
+msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:342
 msgid "Change interframe blending"
-msgstr "Mudar mesclagem de quadros"
+msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:345
 msgid "&Retain aspect ratio"
@@ -3117,7 +3117,7 @@ msgstr "Manter aspecto"
 
 #: ../src/wx/xrc/MainMenu.xrc:349
 msgid "Enable MMX"
-msgstr "Habilitar MMX"
+msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:354
 msgid "&Bilinear filter"
@@ -3333,7 +3333,7 @@ msgstr "Visualizador de &tile..."
 
 #: ../src/wx/xrc/MainMenu.xrc:613
 msgid "Show all video layers"
-msgstr "Mostrar todas as camadas de vídeos"
+msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:617
 msgid "BG &0"
@@ -3421,7 +3421,7 @@ msgstr "Restauração de fábrica..."
 
 #: ../src/wx/xrc/MainMenu.xrc:716
 msgid "&About..."
-msgstr "&Sobre..."
+msgstr ""
 
 #: ../src/wx/xrc/MapViewer.xrc:4
 msgid "Map Viewer"
