@@ -26,12 +26,12 @@ case "\$CC" in
         ;;
     *)
         if command -v ccache >/dev/null; then
-            case "\$REQUIRED_CMAKE_ARGS" in
+            case "\$CMAKE_REQUIRED_ARGS" in
                 *ccache*)
                     :
                     ;;
                 *)
-                    REQUIRED_CMAKE_ARGS="\$REQUIRED_CMAKE_ARGS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=\$CC -DCMAKE_CXX_COMPILER=\$CXX"
+                    CMAKE_REQUIRED_ARGS="\$CMAKE_REQUIRED_ARGS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=\$CC -DCMAKE_CXX_COMPILER=\$CXX"
                     ;;
             esac
             export CC="ccache \$CC"
@@ -223,16 +223,26 @@ FFMPEG_DISTS='
 : ${PATH_SEP:=':'}
 
 # these two can be set to always be included regardless of overrides
-export REQUIRED_CONFIGURE_ARGS="$REQUIRED_CONFIGURE_ARGS"
-export REQUIRED_CMAKE_ARGS="$REQUIRED_CMAKE_ARGS"
-
-export CONFIGURE_ARGS="$CONFIGURE_ARGS --disable-shared --enable-static --prefix=/usr"
+export CONFIGURE_REQUIRED_ARGS="$CONFIGURE_REQUIRED_ARGS"
+export CMAKE_REQUIRED_ARGS="$CMAKE_REQUIRED_ARGS"
 
 export CMAKE_BASE_ARGS="$CMAKE_BASE_ARGS -DBUILD_SHARED_LIBS=NO -DENABLE_SHARED=NO -DCMAKE_PREFIX_PATH:FILEPATH=\"\$CMAKE_PREFIX_PATH\" -DCMAKE_BUILD_TYPE=Release"
 
-export CMAKE_ARGS="$CMAKE_BASE_ARGS $CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=/usr"
+export CONFIGURE_INSTALL_ARGS="--prefix=/usr --sysconfdir=/etc"
 
-export MESON_ARGS="--prefix /usr --buildtype release --default-library static -Dintrospection=false"
+export CMAKE_INSTALL_ARGS="-DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_FULL_SYSCONFDIR=/etc"
+
+export MESON_INSTALL_ARGS="--prefix /usr --sysconfdir /etc"
+
+if [ -z "$target_os" ] && [ "$os" = linux ] && [ "$bits" = 64 ]; then
+    export CONFIGURE_INSTALL_ARGS="$CONFIGURE_INSTALL_ARGS --libdir=/usr/lib64"
+    export MESON_INSTALL_ARGS="$MESON_INSTALL_ARGS --libdir /usr/lib64"
+    export CMAKE_INSTALL_ARGS="$CMAKE_INSTALL_ARGS -DCMAKE_INSTALL_RPATH=/usr/lib64 -DCMAKE_INSTALL_LIBDIR=/usr/lib64"
+fi
+
+export CONFIGURE_ARGS="$CONFIGURE_ARGS --disable-shared --enable-static $CONFIGURE_INSTALL_ARGS"
+export CMAKE_ARGS="$CMAKE_BASE_ARGS $CMAKE_ARGS $CMAKE_INSTALL_ARGS"
+export MESON_ARGS="--buildtype release --default-library static -Dintrospection=false $MESON_INSTALL_ARGS"
 
 DIST_PATCHES=$DIST_PATCHES'
     m4              https://raw.githubusercontent.com/gentoo/gentoo/master/sys-devel/m4/files/m4-1.4.18-glibc228.patch
@@ -322,9 +332,9 @@ DIST_POST_BUILD="$DIST_POST_BUILD
 DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
     openssl     ./config no-shared --prefix=/usr --openssldir=/etc/ssl
     cmake       ./configure --prefix=/usr --no-qt-gui --parallel=\$NUM_CPUS --enable-ccache
-    zlib        ./configure --static --prefix=/usr
+    zlib        ./configure --prefix=/usr --static
     XML-SAX     echo no | PERL_MM_USE_DEFAULT=0 perl Makefile.PL
-    wxwidgets   ./configure \$REQUIRED_CONFIGURE_ARGS --disable-shared --prefix=/usr --enable-stl --disable-precomp-headers --enable-cxx11 --enable-permissive --with-opengl --with-libpng
+    wxwidgets   ./configure \$CONFIGURE_REQUIRED_ARGS --disable-shared --prefix=/usr --enable-stl --disable-precomp-headers --enable-cxx11 --enable-permissive --with-opengl --with-libpng
 "
 
 DIST_BUILD_OVERRIDES="$DIST_BUILD_OVERRIDES
@@ -360,7 +370,7 @@ DIST_ARGS="$DIST_ARGS
     libxslt     --without-python --without-crypto
     libgd       --without-xpm
     fontconfig  --with-baseconfigdir=/etc/fonts 
-    graphviz    --disable-ltdl --without-x CFLAGS=\"-include \$PWD/declspec.h \$CFLAGS\"
+    graphviz    --disable-ltdl --without-x --disable-swig CFLAGS=\"-include \$PWD/declspec.h \$CFLAGS\"
     python2     --with-ensurepip --with-system-expat
     python3     --with-ensurepip --with-system-expat
     glib        --with-libiconv=gnu
@@ -1418,15 +1428,15 @@ build_dist() {
 
                     if [ -f autogen.sh ]; then
                         chmod +x autogen.sh
-                        eval "set -- $REQUIRED_CONFIGURE_ARGS $(dist_args "$current_dist" autoconf) $extra_dist_args"
+                        eval "set -- $CONFIGURE_REQUIRED_ARGS $(dist_args "$current_dist" autoconf) $extra_dist_args"
                         echo_run ./autogen.sh "$@"
                     elif [ -f buildconf.sh ]; then
                         chmod +x buildconf.sh
-                        eval "set -- $REQUIRED_CONFIGURE_ARGS $(dist_args "$current_dist" autoconf) $extra_dist_args"
+                        eval "set -- $CONFIGURE_REQUIRED_ARGS $(dist_args "$current_dist" autoconf) $extra_dist_args"
                         echo_run ./buildconf.sh "$@"
                     elif [ -f bootstrap ]; then
                         chmod +x bootstrap
-                        eval "set -- $REQUIRED_CONFIGURE_ARGS $(dist_args "$current_dist" autoconf) $extra_dist_args"
+                        eval "set -- $CONFIGURE_REQUIRED_ARGS $(dist_args "$current_dist" autoconf) $extra_dist_args"
                         echo_run ./bootstrap "$@"
                     else
                         if [ -d m4 ]; then
@@ -1455,11 +1465,11 @@ build_dist() {
                 if [ -z "$autogen" ] || ! path_exists config.status; then
                     if path_exists Configure; then
                         chmod +x ./Configure
-                        eval "set -- $REQUIRED_CONFIGURE_ARGS $(dist_args "$current_dist" autoconf) $extra_dist_args"
+                        eval "set -- $CONFIGURE_REQUIRED_ARGS $(dist_args "$current_dist" autoconf) $extra_dist_args"
                         echo_run ./Configure "$@"
                     else
                         chmod +x ./configure
-                        eval "set -- $REQUIRED_CONFIGURE_ARGS $(dist_args "$current_dist" autoconf) $extra_dist_args"
+                        eval "set -- $CONFIGURE_REQUIRED_ARGS $(dist_args "$current_dist" autoconf) $extra_dist_args"
                         echo_run ./configure "$@"
                     fi
                 fi
@@ -1494,7 +1504,7 @@ build_dist() {
                 eval "set -- $extra_dist_args"
                 echo_eval_run "$configure_override $@"
             else
-                eval "set -- $REQUIRED_CMAKE_ARGS $(dist_args "$current_dist" cmake) $extra_dist_args -G Ninja"
+                eval "set -- $CMAKE_REQUIRED_ARGS $(dist_args "$current_dist" cmake) $extra_dist_args -G Ninja"
                 echo_run cmake .. "$@"
             fi
             dist_post_configure "$current_dist"
@@ -1523,7 +1533,7 @@ build_dist() {
                 eval "set -- $extra_dist_args"
                 echo_eval_run "$configure_override $@"
             else
-                eval "set -- $REQUIRED_CMAKE_ARGS $(dist_args "$current_dist" cmake) $extra_dist_args"
+                eval "set -- $CMAKE_REQUIRED_ARGS $(dist_args "$current_dist" cmake) $extra_dist_args"
                 echo_run cmake .. "$@"
             fi
             dist_post_configure "$current_dist"
@@ -2632,7 +2642,7 @@ build_project() {
         lto=OFF
     fi
 
-    echo_eval_run cmake "'$CHECKOUT'" $REQUIRED_CMAKE_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=${lto} $CMAKE_ARGS $PROJECT_ARGS $@
+    echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=${lto} $CMAKE_ARGS $PROJECT_ARGS $@
     echo_run make -j$NUM_CPUS VERBOSE=1
 
     if [ "$target_os" = mac ]; then

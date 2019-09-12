@@ -57,9 +57,9 @@ EOF
 
 export BUILD_ENV
 
-export REQUIRED_CONFIGURE_ARGS="--host=${target_arch}"
+export CONFIGURE_REQUIRED_ARGS="--host=${target_arch}"
 
-export REQUIRED_CMAKE_ARGS="$REQUIRED_CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE='$(perl -MCwd=abs_path -le "print abs_path(q{${0%/*}/../../cmake/Toolchain-cross-MinGW-w64-${target_cpu}.cmake})")'"
+export CMAKE_REQUIRED_ARGS="$CMAKE_REQUIRED_ARGS -DCMAKE_TOOLCHAIN_FILE='$(perl -MCwd=abs_path -le "print abs_path(q{${0%/*}/../../cmake/Toolchain-cross-MinGW-w64-${target_cpu}.cmake})")'"
 
 . "${0%/*}/../builder/mingw.sh"
 

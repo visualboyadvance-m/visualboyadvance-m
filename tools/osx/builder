@@ -49,7 +49,7 @@ export BUILD_ENV
 export TAR=tar
 
 if [ "$target_cpu" = i386 ]; then
-    export REQUIRED_CONFIGURE_ARGS='--host=i386-apple-darwin --build=x86_64-apple-darwin'
+    export CONFIGURE_REQUIRED_ARGS='--host=i386-apple-darwin --build=x86_64-apple-darwin'
 fi
 
 . "$(dirname "$0")/../builder/core.sh"

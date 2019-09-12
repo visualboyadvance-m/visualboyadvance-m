@@ -18,6 +18,8 @@ table_insert_before DISTS sfml '
     openal          http://kcat.strangesoft.net/openal-releases/openal-soft-1.18.2.tar.bz2                      lib/libopenal.a
 '
 
+table_line_append DIST_EXTRA_LDFLAGS openal '-lintl -liconv'
+
 XORG_DISTS="xproto xcb-proto inputproto kbproto xextproto renderproto
 randrproto glproto dri2proto dri3proto damageproto fixesproto recordproto
 xf86vidmodeproto libpthread-stubs xtrans libXau libxcb libX11 libXext
@@ -27,11 +29,11 @@ libXxf86vm"
 # have to build a large chunk of X11 on *nix
 table_insert_before DISTS sfml '
     xproto          https://www.x.org/archive/individual/proto/xproto-7.0.31.tar.bz2                            include/X11/X.h
-    xcb-proto       https://www.x.org/archive/individual/xcb/xcb-proto-1.12.tar.bz2                             lib/pkgconfig/xcb-proto.pc
+    xcb-proto       https://www.x.org/archive/individual/xcb/xcb-proto-1.13.tar.bz2                             lib/pkgconfig/xcb-proto.pc
     inputproto      https://www.x.org/archive/individual/proto/inputproto-2.3.2.tar.bz2                         include/X11/extensions/XI.h
     kbproto         https://www.x.org/archive/individual/proto/kbproto-1.0.7.tar.bz2                            include/X11/extensions/XKBsrv.h
     xextproto       https://www.x.org/archive/individual/proto/xextproto-7.3.0.tar.bz2                          include/X11/extensions/shmproto.h
-    renderproto     https://www.x.org/archive/individual/proto/renderproto-0.11.tar.bz2                         lib/pkgconfig/renderproto.pc
+    renderproto     https://www.x.org/archive/individual/proto/renderproto-0.11.1.tar.bz2                         lib/pkgconfig/renderproto.pc
     randrproto      https://www.x.org/archive/individual/proto/randrproto-1.5.0.tar.bz2                         lib/pkgconfig/randrproto.pc
     glproto         https://www.x.org/releases/individual/proto/glproto-1.4.17.tar.bz2                          lib/pkgconfig/glproto.pc
     dri2proto       https://www.x.org/archive/individual/proto/dri2proto-2.8.tar.bz2                            lib/pkgconfig/dri2proto.pc
@@ -43,14 +45,14 @@ table_insert_before DISTS sfml '
     libpthread-stubs https://www.x.org/archive/individual/xcb/libpthread-stubs-0.4.tar.bz2                      lib/pkgconfig/pthread-stubs.pc
     xtrans          https://www.x.org/archive/individual/lib/xtrans-1.3.5.tar.bz2                               include/X11/Xtrans/Xtrans.h
     libXau          https://www.x.org/archive/individual/lib/libXau-1.0.8.tar.bz2                               lib/libXau.so
-    libxcb          https://www.x.org/archive/individual/xcb/libxcb-1.12.tar.bz2                                lib/libxcb.so
-    libX11          https://www.x.org/archive/individual/lib/libX11-1.6.5.tar.bz2                               lib/libX11.so
+    libxcb          https://www.x.org/archive/individual/xcb/libxcb-1.13.tar.bz2                                lib/libxcb.so
+    libX11          https://www.x.org/archive/individual/lib/libX11-1.6.6.tar.bz2                               lib/libX11.so
     libXext         https://www.x.org/archive/individual/lib/libXext-1.3.3.tar.bz2                              lib/libXext.so
     libXrender      https://www.x.org/archive/individual/lib/libXrender-0.9.10.tar.bz2                          lib/libXrender.so
     libXrandr       https://www.x.org/archive/individual/lib/libXrandr-1.5.1.tar.bz2                            lib/libXrandr.so
     libXfixes       https://www.x.org/archive//individual/lib/libXfixes-5.0.3.tar.bz2                           lib/libXfixes.so
     libXdamage      https://www.x.org/archive//individual/lib/libXdamage-1.1.4.tar.bz2                          lib/libXdamage.so
-    libxshmfence    https://www.x.org/archive//individual/lib/libxshmfence-1.2.tar.bz2                          lib/libxshmfence.so
+    libxshmfence    https://www.x.org/archive//individual/lib/libxshmfence-1.3.tar.bz2                          lib/libxshmfence.so
     libXi           https://www.x.org/archive//individual/lib/libXi-1.7.9.tar.bz2                               lib/libXi.so
     libXtst         https://www.x.org/archive//individual/lib/libXtst-1.2.3.tar.bz2                             lib/libXtst.so
     libXxf86vm      https://www.x.org/archive//individual/lib/libXxf86vm-1.1.4.tar.bz2                          lib/libXxf86vm.so
@@ -64,20 +66,22 @@ done
 
 # and Wayland now that that's a thing
 table_insert_before DISTS sfml '
-    wayland         https://wayland.freedesktop.org/releases/wayland-1.14.0.tar.xz                              lib/libwayland-client.so
-    wayland-protocols https://wayland.freedesktop.org/releases/wayland-protocols-1.11.tar.xz                    share/pkgconfig/wayland-protocols.pc
+    wayland         https://wayland.freedesktop.org/releases/wayland-1.16.0.tar.xz                              lib/libwayland-client.so
+    wayland-protocols https://wayland.freedesktop.org/releases/wayland-protocols-1.15.tar.xz                    share/pkgconfig/wayland-protocols.pc
 '
 
-# no reason to link wayland core static, since we still depend on wayland-egl from mesa
-table_line_append DIST_ARGS wayland --enable-shared --disable-static
+# no reason to link wayland static
+for dist in wayland; do
+    table_line_append DIST_ARGS $dist --enable-shared --disable-static
+done
 
 # and mesa OpenGL (the Gallium drivers in mesa require llvm)
 table_insert_before DISTS sfml '
     libpciaccess    https://www.x.org/archive//individual/lib/libpciaccess-0.14.tar.bz2                         lib/libpciaccess.a
     libdrm          https://dri.freedesktop.org/libdrm/libdrm-2.4.88.tar.bz2                                    lib/libdrm.a
-#    llvm            http://releases.llvm.org/5.0.0/llvm-5.0.0.src.tar.xz                                        lib/libLLVMCore.a
+#    llvm            http://releases.llvm.org/5.0.0/llvm-5.0.0.src.tar.xz                                       lib/libLLVMCore.a
     libelf          http://www.mr511.de/software/libelf-0.8.13.tar.gz                                           lib/libelf.a
-    mesa            https://mesa.freedesktop.org/archive/mesa-17.3.0-rc5.tar.xz                                 lib/libGL.so
+    mesa            https://mesa.freedesktop.org/archive/mesa-18.2.0-rc6.tar.xz                                 lib/libGL.so
     glu             ftp://ftp.freedesktop.org/pub/mesa/glu/glu-9.0.0.tar.bz2                                    lib/libGLU.a
     freeglut        https://downloads.sourceforge.net/project/freeglut/freeglut/3.0.0/freeglut-3.0.0.tar.gz     lib/libglut.a
 '
@@ -156,7 +160,9 @@ table_line_append DIST_EXTRA_LIBS wxwidgets '-Wl,--allow-multiple-definition -Wl
 
 #table_line_append DIST_EXTRA_LIBS gobject-introspection '-Wl,--as-needed -Wl,--start-group -Wl,-lmount -Wl,-lglib-2.0 -Wl,-lgio-2.0 -Wl,-lgmodule-2.0 -Wl,-lgobject-2.0 -Wl,-lpcre -Wl,-lz -Wl,-lffi -Wl,-lpthread -Wl,-lresolv -Wl,-ldl -Wl,-lintl -Wl,-liconv -Wl,-luuid -Wl,-lblkid -Wl,-lm -Wl,-lutil -Wl,--end-group'
 
-table_line_append DIST_ARGS mesa '--enable-shared --disable-static --with-gallium-drivers=no --with-dri-drivers=no --with-platforms=x11,surfaceless,drm,wayland'
+table_line_replace DIST_CONFIGURE_TYPES mesa autoconf
+
+table_line_append DIST_ARGS mesa '--enable-shared --disable-static --with-gallium-drivers=no --with-dri-drivers=no --with-platforms=x11,surfaceless,drm,wayland CC="$CC -I$BUILD_ROOT/dists/mesa/include"'
 
 table_line_append DIST_EXTRA_LIBS mesa '-Wl,--as-needed -Wl,--start-group -lexpat -lxcb -lxcb-dri3 -lxcb-dri2 -lxcb-present -lxcb-sync -lxcb-xfixes -lxshmfence -lX11-xcb -ldrm -ldrm_amdgpu -ldrm_intel -ldrm_nouveau -ldrm_radeon -lwayland-client -Wl,--end-group'
 

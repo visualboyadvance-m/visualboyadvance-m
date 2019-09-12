@@ -24,7 +24,7 @@ if [ "$(uname -o 2>/dev/null || :)" = Cygwin ]; then
     fi
 fi
 
-export REQUIRED_CMAKE_ARGS="-DGETTEXT_MSGFMT_EXECUTABLE:FILEPATH=\"\$BUILD_ROOT/host/bin/msgfmt\" -DGETTEXT_MSGMERGE_EXECUTABLE=\"\$BUILD_ROOT/host/bin/msgmerge\""
+export CMAKE_REQUIRED_ARGS="-DGETTEXT_MSGFMT_EXECUTABLE:FILEPATH=\"\$BUILD_ROOT/host/bin/msgfmt\" -DGETTEXT_MSGMERGE_EXECUTABLE=\"\$BUILD_ROOT/host/bin/msgmerge\""
 
 . "${0%/*}/../builder/mingw-cross.sh"
 
