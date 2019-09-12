@@ -23,4 +23,4 @@ before_build:
     cmake .. -DVCPKG_TARGET_TRIPLET=x64-windows
 
 build_script:
-  - msbuild /m ALL_BUILD.vcxproj -p:Configuration=Release
+  - msbuild -m -p:BuildInParallel=true -p:Configuration=Release ALL_BUILD.vcxproj
