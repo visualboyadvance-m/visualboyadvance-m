@@ -75,7 +75,9 @@ std::string get_xdg_user_config_home()
     std::string home(getenv("HOME"));
     path = home + "/Library/Application Support";
 #elif _WIN32
-    std::string app_data(getenv("LOCALAPPDATA"));
+    char *app_data_env = getenv("LOCALAPPDATA");
+    if (!app_data_env) app_data_env = getenv("APPDATA");
+    std::string app_data(app_data_env);
     path = app_data;
 #else // Unix
     char *xdg_var = getenv("XDG_CONFIG_HOME");
@@ -103,7 +105,9 @@ std::string get_xdg_user_data_home()
     std::string home(getenv("HOME"));
     path = home + "/Library/Application Support";
 #elif _WIN32
-    std::string app_data(getenv("LOCALAPPDATA"));
+    char *app_data_env = getenv("LOCALAPPDATA");
+    if (!app_data_env) app_data_env = getenv("APPDATA");
+    std::string app_data(app_data_env);
     path = app_data;
 #else // Unix
     char *xdg_var = getenv("XDG_DATA_HOME");
