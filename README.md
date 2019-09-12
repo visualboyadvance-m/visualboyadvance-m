@@ -88,10 +88,10 @@ environment variable `VCPKG_ROOT` is set.
 To build in the visual studio command prompt, use something like this:
 
 ```
-mkdir vsbuild
-cd vsbuild
+mkdir build
+cd build
 cmake .. -DVCPKG_TARGET_TRIPLET=x64-windows
-msbuild /m .\ALL_BUILD.vcxproj -p:Configuration=Release
+msbuild -m -p:BuildInParallel=true -p:Configuration=Release .\ALL_BUILD.vcxproj 
 ```
 
 This support is new and we are still working out some issues, including support
