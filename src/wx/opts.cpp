@@ -803,6 +803,11 @@ void update_opts()
             if (cmdtab[cmd].cmd_id == cmd_id)
                 break;
 
+        // NOOP overwrittes commands removed by the user
+        wxString command = cmdtab[cmd].cmd;
+        if (cmdtab[cmd].cmd_id == XRCID("NOOP"))
+            command = wxT("NOOP");
+
         wxAcceleratorEntry_v::iterator j;
 
         for (j = i + 1; j < gopts.accels.end(); ++j)
@@ -812,8 +817,8 @@ void update_opts()
         wxAcceleratorEntry_v nv(i, j);
         wxString nvs = wxKeyTextCtrl::ToString(nv);
 
-        if (nvs != cfg->Read(cmdtab[cmd].cmd))
-            cfg->Write(cmdtab[cmd].cmd, nvs);
+        if (nvs != cfg->Read(command))
+            cfg->Write(command, nvs);
     }
 
     cfg->SetPath(wxT("/"));
