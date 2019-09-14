@@ -2667,6 +2667,9 @@ build_project() {
 
         mv visualboyadvance-m.exe visualboyadvance-m-unsigned.exe
 
+        message 'Press ENTER to use your GPG passphrase to unlock your code-signing certificate...'
+        read -r dummy
+
         osslsigncode sign -pkcs12 ~/.codesign/windows_comodo.pkcs12 -pass "$(pass vbam-windows-codesign-cert)" \
             -n visualboyadvance-m -i https://github.com/visualboyadvance-m/visualboyadvance-m \
             -in visualboyadvance-m-unsigned.exe -out visualboyadvance-m.exe || cp visualboyadvance-m-unsigned.exe visualboyadvance-m.exe
