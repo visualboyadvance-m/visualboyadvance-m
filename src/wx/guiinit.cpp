@@ -2930,6 +2930,12 @@ bool MainFrame::BindControls()
         gdbmi->GetMenu()->Remove(gdbmi);
         gdbmi = NULL;
 #endif
+#ifdef NO_LINK
+        // remove this item from the menu completely
+        wxMenuItem* linkmi = XRCITEM("LinkMenu");
+        linkmi->GetMenu()->Remove(linkmi);
+        linkmi = NULL;
+#endif
 
         // if a recent menu is present, save its location
         wxMenuItem* recentmi = XRCITEM("RecentMenu");
