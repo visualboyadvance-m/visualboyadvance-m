@@ -3398,7 +3398,7 @@ bool MainFrame::BindControls()
             // Online Auto Update check frequency
             getrbi("UpdateNever", gopts.onlineupdates, 0);
             getrbi("UpdateDaily", gopts.onlineupdates, 1);
-            getrbi("UpdateWeekly", gopts.onlineupdates, 7);
+            getrbi("UpdateWeekly", gopts.onlineupdates, 2);
 #else
             wxWindowList &children = d->GetChildren();
             std::vector<wxWindow*> forDeletion;
