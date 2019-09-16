@@ -260,7 +260,7 @@
     </object>
     <object class="wxMenu">
       <label>_Options</label>
-      <object class="wxMenu">
+      <object class="wxMenu" name="LinkMenu">
         <label>_Link</label>
         <object class="wxMenuItem" name="LanLink">
           <label>Start _Network Link ...</label>
