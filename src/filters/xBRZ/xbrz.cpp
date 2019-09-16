@@ -64,16 +64,23 @@ uint32_t gradientARGB(uint32_t pixFront, uint32_t pixBack) //find intermediate c
 }
 
 
-//inline
-//double fastSqrt(double n)
-//{
-//    __asm //speeds up xBRZ by about 9% compared to std::sqrt which internally uses the same assembler instructions but adds some "fluff"
-//    {
-//        fld n
-//        fsqrt
-//    }
-//}
-//
+inline double fastSqrt(double n)
+{
+#ifdef __GNUC__ || __clang__ || __MINGW64_VERSION_MAJOR || __MINGW32_MAJOR_VERSION
+    __asm__ ("fsqrt" : "+t" (n));
+    return n;
+#elif _MSC_VER && _M_IX86
+    // speeds up xBRZ by about 9% compared to std::sqrt which internally uses
+    // the same assembler instructions but adds some "fluff"
+    __asm {
+        fld n
+        fsqrt
+    }
+#else // _MSC_VER && _M_X64 OR other platforms
+    // VisualStudio x86_64 does not allow inline ASM
+    return std::sqrt(n);
+#endif
+}
 
 
 #ifdef _MSC_VER
@@ -147,7 +154,7 @@ double distRGB(uint32_t pix1, uint32_t pix2)
     const double b_diff = static_cast<int>(getBlue (pix1)) - getBlue (pix2);
 
     //euklidean RGB distance
-    return std::sqrt(square(r_diff) + square(g_diff) + square(b_diff));
+    return fastSqrt(square(r_diff) + square(g_diff) + square(b_diff));
 }
 #endif
 
@@ -175,7 +182,7 @@ double distYCbCr(uint32_t pix1, uint32_t pix2, double lumaWeight)
     const double c_r = scale_r * (r_diff - y);
 
     //we skip division by 255 to have similar range like other distance functions
-    return std::sqrt(square(lumaWeight * y) + square(c_b) + square(c_r));
+    return fastSqrt(square(lumaWeight * y) + square(c_b) + square(c_r));
 }
 
 
@@ -205,7 +212,7 @@ double distYCbCrBuffered(uint32_t pix1, uint32_t pix2)
             const double c_b = scale_b * (b_diff - y);
             const double c_r = scale_r * (r_diff - y);
 
-            tmp.push_back(static_cast<float>(std::sqrt(square(y) + square(c_b) + square(c_r))));
+            tmp.push_back(static_cast<float>(fastSqrt(square(y) + square(c_b) + square(c_r))));
         }
         return tmp;
     }();
@@ -1042,7 +1049,7 @@ struct ColorDistanceARGB
         else
             return a2 * d + 255 * (a1 - a2);
 
-        //alternative? return std::sqrt(a1 * a2 * square(distYCbCrBuffered(pix1, pix2)) + square(255 * (a1 - a2)));
+        //alternative? return fastSqrt(a1 * a2 * square(distYCbCrBuffered(pix1, pix2)) + square(255 * (a1 - a2)));
     }
 };
 
