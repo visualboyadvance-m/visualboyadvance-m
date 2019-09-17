@@ -68,6 +68,10 @@ else
     table_line_replace DIST_CONFIGURE_OVERRIDES openssl './Configure darwin64-x86_64-cc no-shared --prefix=/usr --openssldir=/etc/ssl'
 fi
 
+table_line_append DIST_EXTRA_CFLAGS libogg    "-include \"$(xcode-select -p)\"/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/stdint.h"
+
+table_line_append DIST_EXTRA_CFLAGS libvorbis "-include \"$(xcode-select -p)\"/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/stdint.h"
+
 # -Wl,-no_compact_unwind must be passed in LDFLAGS to openssl
 table_line_append DIST_MAKE_ARGS openssl "LDFLAGS=\"\$LDFLAGS\""
 

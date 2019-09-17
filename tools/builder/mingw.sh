@@ -321,7 +321,7 @@ table_insert_before DISTS sfml '
 
 table_line_append DIST_ARGS openal '-DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF -DALSOFT_TESTS=OFF'
 
-table_line_replace DIST_ARGS mp3lame "LDFLAGS='\$LDFLAGS \$BUILD_ROOT/root/lib/libcatgets.a'"
+table_line_append DIST_PATCHES mp3lame "https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-lame/0007-revert-posix-code.patch"
 
 table_line_append DIST_POST_BUILD libgsm ":; \
     rm -f \$BUILD_ROOT/root/lib/libgsm.dll.a \$BUILD_ROOT/root/bin/libgsm.dll; \
@@ -346,6 +346,8 @@ table_line_append DIST_ARGS ffmpeg "--extra-ldflags='-Wl,-allow-multiple-definit
 
 table_line_append DIST_ARGS gettext "--enable-threads=windows"
 
+table_line_append DIST_ARGS graphite2 "-DBUILD_SHARED_LIBS=OFF"
+
 table_line_append DIST_ARGS glib "--with-threads=posix --disable-libelf"
 
 table_line_append  DIST_PATCHES glib "\
@@ -356,7 +358,7 @@ table_line_append  DIST_PATCHES glib "\
 "
 
 table_line_append DIST_PATCHES graphite2 "\
-    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-graphite2/001-graphite2-1.3.8-win64.patch \
+    https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-graphite2/001-graphite2-1.3.12-win64.patch \
 "
 
 table_line_append DIST_PATCHES libgsm "\

@@ -40,10 +40,10 @@ case "\$CC" in
         ;;
 esac
 
-export CPPFLAGS="$CPPFLAGS${CPPFLAGS:+ }-I\$BUILD_ROOT/root/include -DCURL_STATICLIB"
-export CFLAGS="$CFLAGS${CFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -pthread -lm -DCURL_STATICLIB"
-export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm -DCURL_STATICLIB"
-export OBJCXXFLAGS="$OBJCXXFLAGS${OBJCXXFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm -DCURL_STATICLIB"
+export CPPFLAGS="$CPPFLAGS${CPPFLAGS:+ }-I\$BUILD_ROOT/root/include -DCURL_STATICLIB -DGRAPHITE2_STATIC"
+export CFLAGS="$CFLAGS${CFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -pthread -lm -DCURL_STATICLIB -DGRAPHITE2_STATIC"
+export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm -DCURL_STATICLIB -DGRAPHITE2_STATIC"
+export OBJCXXFLAGS="$OBJCXXFLAGS${OBJCXXFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm -DCURL_STATICLIB -DGRAPHITE2_STATIC"
 export LDFLAGS="$LDFLAGS${LDFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -pthread -lm"
 export STRIP="\${STRIP:-strip}"
 
@@ -102,8 +102,8 @@ ORIG_PATH=$PATH
 PRE_BUILD_DISTS="$PRE_BUILD_DISTS bzip2 xz unzip"
 
 DISTS=$DISTS'
-    bzip2           https://github.com/nemequ/bzip2/releases/download/v1.0.6/bzip2-1.0.6.tar.gz                 lib/libbz2.a
-    xz              https://tukaani.org/xz/xz-5.2.3.tar.gz                                                      lib/liblzma.a
+    bzip2           ftp://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz                                           lib/libbz2.a
+    xz              https://tukaani.org/xz/xz-5.2.4.tar.gz                                                      lib/liblzma.a
     unzip           https://downloads.sourceforge.net/project/infozip/UnZip%206.x%20%28latest%29/UnZip%206.0/unzip60.tar.gz     bin/unzip
     zlib            https://www.zlib.net/zlib-1.2.11.tar.gz                                                     lib/libz.a
     ccache          https://www.samba.org/ftp/ccache/ccache-3.4.3.tar.xz                                        bin/ccache
@@ -118,8 +118,8 @@ DISTS=$DISTS'
     libtool         https://ftp.gnu.org/gnu/libtool/libtool-2.4.6.tar.xz                                        bin/libtool
     xorg-macros     https://www.x.org/archive//individual/util/util-macros-1.19.1.tar.bz2                       share/pkgconfig/xorg-macros.pc
     help2man        https://ftp.gnu.org/gnu/help2man/help2man-1.47.5.tar.xz                                     bin/help2man
-    libiconv        https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz                                   lib/libiconv.a
-    gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-0.19.8.1.tar.xz                                  lib/libintl.a
+    libiconv        https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz                                   lib/libiconv.a
+    gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-0.19.8.1.tar.xz                                    lib/libintl.a
     getopt          http://frodo.looijaard.name/system/files/software/getopt/getopt-1.1.6.tar.gz                bin/getopt
     gsed            http://ftp.gnu.org/gnu/sed/sed-4.4.tar.xz                                                   bin/sed
     bison           https://ftp.gnu.org/gnu/bison/bison-3.0.5.tar.xz                                            bin/bison
@@ -170,49 +170,48 @@ DISTS=$DISTS'
     bakefile        https://github.com/vslavik/bakefile/archive/33c270a565ba0954cca9611b2443593b2e9e698a.tar.gz bin/bakefile_gen
     XML-Parser      https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.44.tar.gz                      perl5/man/man3/XML*Parser.3*
     intltool        https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz                bin/intltoolize
-    ninja           https://github.com/ninja-build/ninja/archive/v1.8.2.tar.gz                                  bin/ninja
-    meson           https://github.com/mesonbuild/meson/releases/download/0.44.0/meson-0.44.0.tar.gz            bin/meson
+    ninja           https://github.com/ninja-build/ninja/archive/v1.9.0.tar.gz                                  bin/ninja
+    meson           https://github.com/mesonbuild/meson/releases/download/0.51.2/meson-0.51.2.tar.gz            bin/meson
     glib            https://github.com/GNOME/glib/archive/2.58.1.tar.gz                                         lib/libglib-2.0.a
     libgpg-error    https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.36.tar.bz2                     lib/libgpg-error.a
-    libgcrypt       https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.2.tar.bz2                          lib/libgcrypt.a
-    libsecret       http://ftp.gnome.org/pub/gnome/sources/libsecret/0.18/libsecret-0.18.5.tar.xz               lib/libsecret-1.a
-    sdl2            https://www.libsdl.org/release/SDL2-2.0.9.tar.gz                                            lib/libSDL2.a
-    flac            https://github.com/xiph/flac/archive/f7cd466c24fb5d1966943f3ea36a1f4a37858597.tar.gz        lib/libFLAC.a
-    libogg          http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.xz                                  lib/libogg.a
-    libvorbis       https://github.com/xiph/vorbis/archive/v1.3.5.tar.gz                                        lib/libvorbis.a
+    libgcrypt       https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.5.tar.bz2                          lib/libgcrypt.a
+    libsecret       http://ftp.gnome.org/pub/gnome/sources/libsecret/0.19/libsecret-0.19.1.tar.xz               lib/libsecret-1.a
+    sdl2            https://www.libsdl.org/release/SDL2-2.0.10.tar.gz                                           lib/libSDL2.a
+    flac            https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.3.3.tar.xz                             lib/libFLAC.a
+    libogg          http://downloads.xiph.org/releases/ogg/libogg-1.3.4.tar.xz                                  lib/libogg.a
+    libvorbis       https://github.com/xiph/vorbis/archive/v1.3.6.tar.gz                                        lib/libvorbis.a
     harfbuzz        https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-1.7.5.tar.bz2                lib/libharfbuzz.a
     sfml            https://github.com/SFML/SFML/archive/013d053277c980946bc7761a2a088f1cbb788f8c.tar.gz        lib/libsfml-system-s.a
     shared-mime-info http://freedesktop.org/~hadess/shared-mime-info-1.9.tar.xz                                 bin/update-mime-database
-    wxwidgets       https://github.com/wxWidgets/wxWidgets/archive/bcca16911d917a39d86a183ec976d9f4759e56d0.tar.gz lib/libwx_baseu-3.1*.a
-    graphite2       https://github.com/silnrsi/graphite/releases/download/1.3.10/graphite2-1.3.10.tgz           lib/libgraphite2.a
-    xvidcore        http://downloads.xvid.org/downloads/xvidcore-1.3.4.tar.bz2                                  lib/libxvidcore.a
+    wxwidgets       https://github.com/wxWidgets/wxWidgets/archive/1753ed403765269bf9f6d3bb540f7e77a8758e39.tar.gz lib/libwx_baseu-3.1*.a
+    graphite2       https://github.com/silnrsi/graphite/releases/download/1.3.13/graphite2-1.3.13.tgz           lib/libgraphite2.a
+    xvidcore        http://downloads.xvid.org/downloads/xvidcore-1.3.5.tar.bz2                                  lib/libxvidcore.a
     fribidi         https://github.com/fribidi/fribidi/releases/download/v1.0.1/fribidi-1.0.1.tar.bz2           lib/libfribidi.a
-    libgsm          http://www.quut.com/gsm/gsm-1.0.17.tar.gz                                                   lib/libgsm.a
+    libgsm          http://www.quut.com/gsm/gsm-1.0.18.tar.gz                                                   lib/libgsm.a
     libmodplug      https://github.com/Konstanty/libmodplug/archive/5a39f5913d07ba3e61d8d5afdba00b70165da81d.tar.gz lib/libmodplug.a
     libopencore-amrnb https://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.5.tar.gz lib/libopencore-amrnb.a
-    opus            https://archive.mozilla.org/pub/opus/opus-1.2.1.tar.gz                                      lib/libopus.a
+    opus            https://archive.mozilla.org/pub/opus/opus-1.3.1.tar.gz                                      lib/libopus.a
     snappy          https://github.com/google/snappy/archive/1.1.7.tar.gz                                       lib/libsnappy.a
-    libsoxr         https://downloads.sourceforge.net/project/soxr/soxr-0.1.2-Source.tar.xz                     lib/libsoxr.a
+    libsoxr         https://downloads.sourceforge.net/project/soxr/soxr-0.1.3-Source.tar.xz                     lib/libsoxr.a
     speex           http://downloads.us.xiph.org/releases/speex/speex-1.2.0.tar.gz                              lib/libspeex.a
     libtheora       https://github.com/Distrotech/libtheora/archive/17b02c8c564475bb812e540b551219fc42b1f75f.tar.gz lib/libtheora.a
     vidstab         https://github.com/georgmartius/vid.stab/archive/v1.1.0.tar.gz                              lib/libvidstab.a
     libvo-amrwbenc  https://github.com/mstorsjo/vo-amrwbenc/archive/v0.1.3.tar.gz                               lib/libvo-amrwbenc.a
     mp3lame         https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz                 lib/libmp3lame.a
-    libass          https://github.com/libass/libass/releases/download/0.13.7/libass-0.13.7.tar.xz              lib/libass.a
-    libbluray       ftp://ftp.videolan.org/pub/videolan/libbluray/1.0.2/libbluray-1.0.2.tar.bz2                 lib/libbluray.a
-    libvpx          http://storage.googleapis.com/downloads.webmproject.org/releases/webm/libvpx-1.6.1.tar.bz2  lib/libvpx.a
+    libass          https://github.com/libass/libass/releases/download/0.14.0/libass-0.14.0.tar.xz              lib/libass.a
+    libbluray       https://download.videolan.org/pub/videolan/libbluray/1.1.2/libbluray-1.1.2.tar.bz2          lib/libbluray.a
+    libvpx          https://github.com/webmproject/libvpx/archive/v1.8.1.tar.gz                                 lib/libvpx.a
     libwavpack      http://www.wavpack.com/wavpack-5.1.0.tar.bz2                                                lib/libwavpack.a
-    libx264         ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20171228-2245.tar.bz2      lib/libx264.a
-    libx265         https://bitbucket.org/multicoreware/x265/downloads/x265_2.5.tar.gz                          lib/libx265.a
+    libx264         https://download.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20190913-2245-stable.tar.bz2      lib/libx264.a
+    libx265         https://bitbucket.org/multicoreware/x265/downloads/x265_3.1.2.tar.gz                        lib/libx265.a
     libxavs         https://github.com/Distrotech/xavs/archive/distrotech-xavs-git.tar.gz                       lib/libxavs.a
     libzmq          https://github.com/zeromq/libzmq/releases/download/v4.2.2/zeromq-4.2.2.tar.gz               lib/libzmq.a
-    libzvbi         https://downloads.sourceforge.net/project/zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2           lib/libzvbi.a
-    ffmpeg          https://github.com/ffmpeg/ffmpeg/archive/0c78b6a416c661afed745d44495b5194f714fb96.tar.gz    lib/libavformat.a
+#   libzvbi         https://downloads.sourceforge.net/project/zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2           lib/libzvbi.a
+    ffmpeg          https://ffmpeg.org/releases/ffmpeg-4.2.1.tar.bz2                                            lib/libavformat.a
 '
 
 # for now we don't build ffmpeg because game recording is broken
-BUILD_FFMPEG=
-PROJECT_ARGS="$PROJECT_ARGS -DENABLE_FFMPEG=NO"
+BUILD_FFMPEG=1
 
 FFMPEG_DISTS='
     graphite2 xvidcore fribidi libgsm libmodplug libopencore-amrnb opus snappy
@@ -248,7 +247,7 @@ DIST_PATCHES=$DIST_PATCHES'
     m4              https://raw.githubusercontent.com/gentoo/gentoo/master/sys-devel/m4/files/m4-1.4.18-glibc228.patch
     docbook2x       https://gist.githubusercontent.com/rkitover/0b5dcc95a0703a9b0e0e7eb6d325a98e/raw/e256d2fad8d19633ac8abe02a0d1e119063d1fd9/docbook2x.patch
     ccache          https://gist.githubusercontent.com/rkitover/4dd30c2841a2131be8715038f538d622/raw/40a8f0f50aa6ca5f9658a0c37aa17393cc80c109/ccache-3.4.2-msys.patch
-    graphite2       https://gist.githubusercontent.com/rkitover/418600634d7cf19e2bf1c3708b50c042/raw/839b72d9cda545f2e3b640d743c1bd44b89861b9/graphite2-1.3.10-static.patch
+    graphite2       https://gist.githubusercontent.com/ZachBacon/759066387c5680e0966e8a5e59711423/raw/9c1654cf3efa794181be6ef2d78f17d77ed63a9e/static.patch
     python2         https://gist.githubusercontent.com/rkitover/2d9e5baff1f1cc4f2618dee53083bd35/raw/7f33fcf5470a9f1013ac6ae7bb168368a98fe5a0/python-2.7.14-custom-static-openssl.patch https://gist.githubusercontent.com/rkitover/afab7ed3ac7ce1860c43a258571c8ae1/raw/6f5fc90a7acf5f5c3ffda2edf402b28f469a4b3b/python-2.7.14-static-libintl.patch
     python3         https://gist.githubusercontent.com/rkitover/93d89a679705875c59275fb0a8f22b45/raw/6149e7fa3920d6c674c79448c5a4c9313620e06c/python-3.6.3-custom-static-openssl.patch https://gist.githubusercontent.com/rkitover/b18f19eafda3775a9652cc9cdf3ec914/raw/ed14c34bf9f205ccc3a4684dbdb83f8620162b98/python-3.6.3-static-libintl.patch
     intltool        https://gist.githubusercontent.com/rkitover/d638882f52e5d5f8e392cbf6842cd6d0/raw/dcfbe358bbb8b89f88b40a9c3402494552fd33f8/intltool-0.51.0.patch
@@ -319,7 +318,7 @@ DIST_POST_BUILD="$DIST_POST_BUILD
     flex-2.6.3      build_dist flex || :;
     libtool         ln -sf \"\$BUILD_ROOT/root/bin/libtoolize\" \"\$BUILD_ROOT/root/bin/glibtoolize\";
     glib            rebuild_dist gettext --without-included-glib --without-included-libxml;
-    graphviz        (cd \"\$BUILD_ROOT/root/bin\"; path_exists dot_static && ! path_exists dot && ln -sf \"\$BUILD_ROOT/root/bin/dot_static\" ./dot || :);
+#    graphviz        (cd \"\$BUILD_ROOT/root/bin\"; path_exists dot_static && ! path_exists dot && ln -sf \"\$BUILD_ROOT/root/bin/dot_static\" ./dot || :);
     libxml2         mkdir -p \"\$BUILD_ROOT/root/etc/xml\"; \
                     xmlcatalog --noout --create \"\$(cygpath -m \"\$BUILD_ROOT/root/etc/xml/catalog.xml\")\" || :;
     python2         pip2 install six;
@@ -520,6 +519,7 @@ setup() {
         for dist in $FFMPEG_DISTS; do
             table_line_remove DISTS $dist
         done
+        PROJECT_ARGS="$PROJECT_ARGS -DENABLE_FFMPEG=NO"
     fi
 
     DIST_NAMES=$(  table_column DISTS 0 3)
