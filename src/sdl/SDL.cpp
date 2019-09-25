@@ -494,27 +494,9 @@ void sdlOpenGLInit(int w, int h)
 {
     (void)w; // unused params
     (void)h; // unused params
-#if 0
-  float screenAspect = (float) sizeX / sizeY,
-        windowAspect = (float) w / h;
 
-  if(glIsTexture(screenTexture))
-  glDeleteTextures(1, &screenTexture);
-#endif
     glDisable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
-
-#if 0
-  if(windowAspect == screenAspect)
-    glViewport(0, 0, w, h);
-  else if (windowAspect < screenAspect) {
-    int height = (int)(w / screenAspect);
-    glViewport(0, (h - height) / 2, w, height);
-  } else {
-    int width = (int)(h * screenAspect);
-    glViewport((w - width) / 2, 0, width, h);
-  }
-#endif
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -523,30 +505,6 @@ void sdlOpenGLInit(int w, int h)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
-#if 0
-  glGenTextures(1, &screenTexture);
-  glBindTexture(GL_TEXTURE_2D, screenTexture);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                  openGL == 2 ? GL_LINEAR : GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                  openGL == 2 ? GL_LINEAR : GL_NEAREST);
-
-  // Calculate texture size as a the smallest working power of two
-  float n1 = log10((float)destWidth ) / log10( 2.0f);
-  float n2 = log10((float)destHeight ) / log10( 2.0f);
-  float n = (n1 > n2)? n1 : n2;
-
-    // round up
-  if (((float)((int)n)) != n)
-    n = ((float)((int)n)) + 1.0f;
-
-  textureSize = (int)pow(2.0f, n);
-
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureSize, textureSize, 0,
-               GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-#endif
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
 
@@ -883,24 +841,6 @@ void sdlInitVideo()
 
     uint32_t rmask, gmask, bmask;
 
-#if 0
-  if(openGL) {
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN /* OpenGL RGBA masks */
-      rmask = 0x000000FF;
-      gmask = 0x0000FF00;
-      bmask = 0x00FF0000;
-#else
-      rmask = 0xFF000000;
-      gmask = 0x00FF0000;
-      bmask = 0x0000FF00;
-#endif
-  } else {
-      rmask = surface->format->Rmask;
-      gmask = surface->format->Gmask;
-      bmask = surface->format->Bmask;
-  }
-#endif
-
     if (openGL) {
         rmask = 0xFF000000;
         gmask = 0x00FF0000;
@@ -926,36 +866,6 @@ void sdlInitVideo()
         systemBlueShift += 8;
     }
 
-#if 0
-  if (openGL) {
-    systemColorDepth = 0;
-    int i;
-    glcontext = SDL_GL_CreateContext(window);
-    SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &i);
-    systemColorDepth += i;
-    SDL_GL_GetAttribute(SDL_GL_GREEN_SIZE, &i);
-    systemColorDepth += i;
-    SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &i);
-    systemColorDepth += i;
-    printf("color depth (without alpha) is %d\n", systemColorDepth);
-    SDL_GL_GetAttribute(SDL_GL_ALPHA_SIZE, &i);
-    systemColorDepth += i;
-    printf("color depth is %d\n", systemColorDepth);
-  }
-  else
-    systemColorDepth = 32;
-
-  if(systemColorDepth == 16) {
-    srcPitch = sizeX*2 + 4;
-  } else {
-    if(systemColorDepth == 32)
-      srcPitch = sizeX*4 + 4;
-    else
-      srcPitch = sizeX*3;
-  }
-
-#endif
-
     systemColorDepth = 32;
     srcPitch = sizeX * 4 + 4;
 
@@ -965,32 +875,6 @@ void sdlInitVideo()
     }
 
     sdlResizeVideo();
-
-#if 0
-  if(openGL) {
-    int scaledWidth = screenWidth * sdlOpenglScale;
-    int scaledHeight = screenHeight * sdlOpenglScale;
-
-    free(filterPix);
-    filterPix = (uint8_t *)calloc(1, (systemColorDepth >> 3) * destWidth * destHeight);
-    sdlOpenGLInit(screenWidth, screenHeight);
-
-    if (	(!fullScreen)
-	&&	sdlOpenglScale	> 1
-	&&	scaledWidth	< desktopWidth
-	&&	scaledHeight	< desktopHeight
-    ) {
-        SDL_SetVideoMode(scaledWidth, scaledHeight, 0,
-                       SDL_OPENGL | SDL_RESIZABLE |
-                       (fullScreen ? SDL_FULLSCREEN : 0));
-        sdlOpenGLInit(scaledWidth, scaledHeight);
-	/* xKiv: it would seem that SDL_RESIZABLE causes the *previous* dimensions to be immediately
-	 * reported back via the SDL_VIDEORESIZE event
-	 */
-	ignore_first_resize_event	= 1;
-    }
-  }
-#endif
 }
 #if defined(KMOD_GUI)
 #define KMOD_META KMOD_GUI
@@ -1124,41 +1008,6 @@ void sdlPollEvents()
         case SDL_QUIT:
             emulating = 0;
             break;
-#if 0
-    case SDL_VIDEORESIZE:
-      if (ignore_first_resize_event)
-      {
-	      ignore_first_resize_event	= 0;
-	      break;
-      }
-      if (openGL)
-      {
-        SDL_SetVideoMode(event.resize.w, event.resize.h, 0,
-                       SDL_OPENGL | SDL_RESIZABLE |
-					   (fullScreen ? SDL_FULLSCREEN : 0));
-        sdlOpenGLInit(event.resize.w, event.resize.h);
-      }
-      break;
-    case SDL_ACTIVEEVENT:
-      if(pauseWhenInactive && (event.active.state & SDL_APPINPUTFOCUS)) {
-        active = event.active.gain;
-        if(active) {
-          if(!paused) {
-            if(emulating)
-              soundResume();
-          }
-        } else {
-          wasPaused = true;
-          if(pauseWhenInactive) {
-            if(emulating)
-              soundPause();
-          }
-
-          memset(delta,255,delta_size);
-        }
-      }
-      break;
-#endif
         case SDL_WINDOWEVENT:
             switch (event.window.event) {
             case SDL_WINDOWEVENT_FOCUS_GAINED:
