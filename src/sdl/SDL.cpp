@@ -1538,8 +1538,8 @@ int main(int argc, char** argv)
     gb_effects_config.surround = false;
     gb_effects_config.enabled = false;
 
-    ReadOpts(argc, argv);
     LoadConfig(); // Parse command line arguments (overrides ini)
+    ReadOpts(argc, argv);
 
     inputSetKeymap(PAD_1, KEY_LEFT, ReadPrefHex("Joy0_Left"));
     inputSetKeymap(PAD_1, KEY_RIGHT, ReadPrefHex("Joy0_Right"));

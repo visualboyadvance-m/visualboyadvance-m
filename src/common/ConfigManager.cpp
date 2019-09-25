@@ -898,6 +898,7 @@ int ReadOpts(int argc, char ** argv)
 			preferences = NULL;
 			OpenPreferences(optarg);
 			fclose(f);
+			LoadConfig();
 		}
 		break;
 		case 'd':
