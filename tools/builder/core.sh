@@ -408,11 +408,11 @@ DIST_MAKE_ARGS="$DIST_MAKE_ARGS
     shared-mime-info    -j1
     xvidcore    -j1
     fontconfig  LIBS=\"-lintl -liconv\"
+    libgsm      CC=\"\$CC \$CFLAGS\"
 "
 
 DIST_MAKE_INSTALL_ARGS="$DIST_MAKE_INSTALL_ARGS
     openssl     MANDIR=/share/man
-    libgsm      CC=\"\$CC\"
 "
 
 DIST_EXTRA_LDFLAGS="$DIST_EXTRA_LDFLAGS
@@ -745,6 +745,12 @@ mac_install_core_deps() {
 
         error 'Please install XCode and the XCode Command Line Tools, then run this script again. On newer systems this can be done with: [35m;xcode-select --install[0m'
     fi
+
+    if ! command -v brew >/dev/null; then
+        error 'Please install Mac Homebrew: [35m;https://brew.sh/[0m'
+    fi
+
+    brew -v install perl
 }
 
 setup_tmp_dir() {
