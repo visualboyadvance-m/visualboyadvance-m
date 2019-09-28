@@ -72,6 +72,10 @@ table_line_append DIST_EXTRA_CFLAGS libogg    "-include \"$(xcode-select -p)\"/P
 
 table_line_append DIST_EXTRA_CFLAGS libvorbis "-include \"$(xcode-select -p)\"/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/stdint.h"
 
+table_line_append DIST_EXTRA_CFLAGS libtheora "-include \"$(xcode-select -p)\"/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/stdint.h"
+
+table_line_append DIST_EXTRA_CFLAGS ffmpeg "-include \"$(xcode-select -p)\"/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/stdint.h"
+
 # -Wl,-no_compact_unwind must be passed in LDFLAGS to openssl
 table_line_append DIST_MAKE_ARGS openssl "LDFLAGS=\"\$LDFLAGS\""
 
@@ -108,7 +112,9 @@ table_line_append DIST_PRE_BUILD libzmq "sed -i.bak 's/-lstdc++/-lc++/g' src/lib
 table_line_append DIST_PRE_BUILD ffmpeg "sed -i.bak 's/-lstdc++/-lc++/g' configure"
 
 table_line_append DIST_CONFIGURE_OVERRIDES wxwidgets  "--with-macosx-version-min=\$MACOSX_DEPLOYMENT_TARGET LDFLAGS=\"\$LDFLAGS -stdlib=libc++\""
-table_line_append DIST_ARGS ffmpeg     "--disable-videotoolbox --extra-ldflags='-framework CoreText'"
+
 table_line_append DIST_ARGS libmodplug "CC=clang++ CXX=clang++"
+
+table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg "--disable-videotoolbox --extra-ldflags='-framework CoreText'"
 
 builder "$@"

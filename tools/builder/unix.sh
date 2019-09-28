@@ -172,6 +172,6 @@ table_line_append DIST_ARGS openal '-DLIBTYPE=STATIC'
 
 table_line_append DIST_MAKE_ARGS libvpx "AS='yasm -DPIC'"
 
-table_line_append DIST_ARGS ffmpeg '--enable-pic'
+table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg '--enable-pic'
 
 table_line_append DIST_EXTRA_LDFLAGS ffmpeg '-lgomp'

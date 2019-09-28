@@ -132,14 +132,6 @@ table_line_append DIST_ARGS libsoxr '-DHAVE_WORDS_BIGENDIAN_EXITCODE=0'
 vpx_target=x86-win32-gcc
 [ "$target_bits" -eq 64 ] && vpx_target=x86_64-win64-gcc
 
-table_line_replace DIST_CONFIGURE_OVERRIDES libvpx "./configure --target=$vpx_target \$CONFIGURE_ARGS $(table_line DIST_ARGS libvpx)"
+table_line_append DIST_CONFIGURE_OVERRIDES libvpx --target=$vpx_target
 
-table_line_remove  DIST_ARGS                libvpx
-
-table_line_replace DIST_CONFIGURE_OVERRIDES ffmpeg "\
-    ./configure --arch=$target_cpu --target-os=mingw32 --cross-prefix=${target_arch}- \
-        --pkg-config='\$BUILD_ROOT/host/bin/pkg-config' \
-        \$CONFIGURE_ARGS $(table_line DIST_ARGS ffmpeg) \
-"
-
-table_line_remove  DIST_ARGS                ffmpeg
+table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg "--arch=$target_cpu --target-os=mingw32 --cross-prefix=${target_arch}- --enable-cross-compile --pkg-config='$BUILD_ROOT/host/bin/pkg-config'"

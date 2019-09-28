@@ -41,7 +41,7 @@ export BUILD_ENV
 
 if [ ! -L "$BUILD_ROOT/root" ]; then
     mv "$BUILD_ROOT/root" "$BUILD_ROOT/target"
-    mkdir "$BUILD_ROOT/host"
+    mkdir -p "$BUILD_ROOT/host"
     ln -sf "$BUILD_ROOT/target" "$BUILD_ROOT/root"
     cp -a "$BUILD_ROOT/target/"* "$BUILD_ROOT/host"
 
@@ -51,7 +51,7 @@ if [ ! -L "$BUILD_ROOT/root" ]; then
         ln -s "$BUILD_ROOT/target/$d" "$BUILD_ROOT/host/$d"
     done
 
-    mkdir "$BUILD_ROOT/host/bin" "$BUILD_ROOT/target/bin"
+    mkdir -p "$BUILD_ROOT/host/bin" "$BUILD_ROOT/target/bin"
 fi
 
 ln -sf "$BUILD_ROOT/target" "$BUILD_ROOT/root"
@@ -342,11 +342,9 @@ table_line_replace DIST_CONFIGURE_TYPES xvidcore autoreconf
 
 table_line_append DIST_ARGS libsoxr '-DWITH_OPENMP=NO'
 
-table_line_append DIST_ARGS ffmpeg "--extra-ldflags='-Wl,-allow-multiple-definition' --extra-libs='-lwsock32 -lws2_32 -liphlpapi -lfreetype'"
+table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg "--extra-ldflags='-Wl,-allow-multiple-definition' --extra-libs='-lwsock32 -lws2_32 -liphlpapi -lfreetype'"
 
 table_line_append DIST_ARGS gettext "--enable-threads=windows"
-
-table_line_append DIST_ARGS graphite2 "-DBUILD_SHARED_LIBS=OFF"
 
 table_line_append DIST_ARGS glib "--with-threads=posix --disable-libelf"
 
@@ -382,3 +380,9 @@ table_line_append DIST_POST_BUILD  wxwidgets ":; \
         mv \$BUILD_ROOT/root/include/langinfo.bak \$BUILD_ROOT/root/include/langinfo.h; \
     fi;
 "
+
+if [ "$target_bits" = 32 ]; then
+    table_line_append DIST_EXTRA_CFLAGS libvpx -mstackrealign
+else
+    table_line_append DIST_EXTRA_CFLAGS libvpx -fno-asynchronous-unwind-tables
+fi
