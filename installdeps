@@ -321,7 +321,22 @@ debian_installdeps() {
                 ;;
         esac
 
-        debian_rel=trusty
+        debian_rel=$(lsb_release -a 2>/dev/null | sed -En 's/^Codename:[[:space:]]*//p')
+
+        case "$debian_rel" in
+            bionic|stretch|trusty|xenial)
+                ;;
+            buster|cosmic|disco)
+                debian_rel=bionic
+                ;;
+            yakkety|zesty|artful)
+                debian_rel=xenial
+                ;;
+            *)
+                debian_rel=trusty
+                ;;
+        esac
+
         mxe_apt_sources=/etc/apt/sources.list.d/mxeapt.list
 
         sudo apt-get -qq -y update
