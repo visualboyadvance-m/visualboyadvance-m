@@ -215,6 +215,7 @@ endif()
 
 # generate version.h
 include_directories(${CMAKE_BINARY_DIR})
+string(REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+).*" "\\1,\\2,\\3,0" WIN_VERSION "${VERSION}")
 configure_file("${CMAKE_SOURCE_DIR}/src/version.h.in" "${CMAKE_BINARY_DIR}/version.h" @ONLY)
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
