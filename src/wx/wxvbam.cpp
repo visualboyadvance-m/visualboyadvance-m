@@ -185,6 +185,25 @@ wxString wxvbamApp::GetAbsolutePath(wxString path)
     return path;
 }
 
+#ifndef NO_ONLINEUPDATES
+#include "../common/version_cpp.h"
+
+#ifdef __WXMSW__
+#include "winsparkle-wrapper.h"
+#endif // __WXMSW__
+
+static void init_check_for_updates()
+{
+#ifdef __WXMSW__
+    wxString version(vbam_version);
+    //win_sparkle_set_appcast_url("https://github.com/visualboyadvance-m/visualboyadvance-m/data/appcast.xml");
+    win_sparkle_set_appcast_url("https://raw.githubusercontent.com/visualboyadvance-m/visualboyadvance-m/update-checker/data/appcast.xml");
+    win_sparkle_set_app_details(L"visualboyadvance-m", L"VisualBoyAdvance-M", version.c_str());
+    win_sparkle_init();
+#endif // __WXMSW__
+}
+#endif // NO_ONLINEUPDATES
+
 bool wxvbamApp::OnInit()
 {
     // set up logging
@@ -431,6 +450,14 @@ bool wxvbamApp::OnInit()
     if (isFullscreen && wxGetApp().pending_load != wxEmptyString)
 	frame->ShowFullScreen(isFullscreen);
     frame->Show(true);
+
+#if defined(__WXMSW__) && !defined(NO_ONLINEUPDATES)
+    winsparkle = new WinSparkleDllWrapper();
+#endif
+
+#ifndef NO_ONLINEUPDATES
+    init_check_for_updates();
+#endif
 
     return true;
 }
@@ -680,6 +707,11 @@ wxvbamApp::~wxvbamApp() {
 	home = NULL;
     }
     delete overrides;
+
+#if defined(__WXMSW__) && !defined(NO_ONLINEUPDATES)
+    win_sparkle_cleanup();
+    delete winsparkle;
+#endif
 }
 
 MainFrame::MainFrame()
