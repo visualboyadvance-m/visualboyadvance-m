@@ -2693,6 +2693,21 @@ EVT_HANDLER(Customize, "Customize UI...")
         update_opts();
 }
 
+#ifndef NO_ONLINEUPDATES
+#ifdef __WXMSW__
+#include "winsparkle-wrapper.h"
+#endif
+#endif
+
+EVT_HANDLER(UpdateEmu, "Check for updates...")
+{
+#ifndef NO_ONLINEUPDATES
+#ifdef __WXMSW__
+    win_sparkle_check_update_with_ui();
+#endif
+#endif
+}
+
 EVT_HANDLER(FactoryReset, "Factory Reset...")
 {
     wxMessageDialog dlg(NULL, wxString(wxT(

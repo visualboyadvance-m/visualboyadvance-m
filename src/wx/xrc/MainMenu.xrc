@@ -704,10 +704,10 @@
       <object class="wxMenuItem" name="UpdateRDB">
         <label>Update ROM database</label>
       </object>
+      -->
       <object class="wxMenuItem" name="UpdateEmu">
         <label>Check for updates</label>
       </object>
-      -->
       <object class="wxMenuItem" name="FactoryReset">
         <label>_Factory Reset...</label>
       </object>
