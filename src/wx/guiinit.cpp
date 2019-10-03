@@ -3400,37 +3400,6 @@ bool MainFrame::BindControls()
         sc->SetValidator(wxUIntValidator(&o));    \
     } while (0)
         {
-#ifndef NO_ONLINEUPDATES
-            // Online Auto Update check frequency
-            getrbi("UpdateNever", gopts.onlineupdates, 0);
-            getrbi("UpdateDaily", gopts.onlineupdates, 1);
-            getrbi("UpdateWeekly", gopts.onlineupdates, 2);
-#else
-            wxWindowList &children = d->GetChildren();
-            std::vector<wxWindow*> forDeletion;
-            for (wxWindowList::Node *node = children.GetFirst(); node; node = node->GetNext())
-            {
-                wxWindow *current = (wxWindow *)node->GetData();
-                if (dynamic_cast<wxStaticText*>(current))
-                {
-                    if (((wxStaticText *)current)->GetName() == wxT("OnlineUpdates"))
-                        forDeletion.push_back(current);
-                }
-                else if (dynamic_cast<wxRadioButton*>(current))
-                {
-                    wxString tmp = ((wxRadioButton *)current)->GetName();
-                    if (tmp == wxT("UpdateNever") ||
-                        tmp == wxT("UpdateDaily") ||
-                        tmp == wxT("UpdateWeekly"))
-                        forDeletion.push_back(current);
-                }
-            }
-            for (unsigned i = 0; i < forDeletion.size(); ++i)
-            {
-                delete forDeletion[i];
-            }
-            std::vector<wxWindow*>().swap(forDeletion);
-#endif // NO_ONLINEUPDATES
             getrbi("PNG", captureFormat, 0);
             getrbi("BMP", captureFormat, 1);
             getsc("RewindInterval", gopts.rewind_interval);
