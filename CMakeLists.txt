@@ -809,7 +809,7 @@ set(
     src/sdl/expr.cpp
     src/sdl/exprNode.cpp
     src/sdl/expr-lex.cpp
-    src/common/version.c
+    src/common/version.cpp
 )
 
 set(
@@ -819,7 +819,7 @@ set(
     src/sdl/inputSDL.h
     src/sdl/expr.cpp.h
     src/sdl/exprNode.h
-    src/common/version_c.h
+    src/common/version_cpp.h
 )
 
 set(

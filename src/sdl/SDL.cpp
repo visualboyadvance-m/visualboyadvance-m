@@ -41,7 +41,7 @@
 
 #include <time.h>
 
-#include "../common/version_c.h"
+#include "../common/version_cpp.h"
 
 #include "SDL.h"
 

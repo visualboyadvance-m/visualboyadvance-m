@@ -10,7 +10,7 @@
 #include <wx/wfstream.h>
 #include <wx/msgdlg.h>
 
-#include "../common/version_c.h"
+#include "../common/version_cpp.h"
 #include "../common/ConfigManager.h"
 #include "../gb/gbPrinter.h"
 #include "../gba/agbprint.h"
@@ -2722,8 +2722,6 @@ EVT_HANDLER(Translate, "Translations")
 {
     wxLaunchDefaultBrowser(wxT("http://www.transifex.com/projects/p/vba-m"));
 }
-
-#include "../common/version_c.h"
 
 // was About
 EVT_HANDLER(wxID_ABOUT, "About...")

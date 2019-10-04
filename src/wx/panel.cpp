@@ -5,7 +5,7 @@
 #include <wx/dcbuffer.h>
 #include <SDL_joystick.h>
 
-#include "../common/version_c.h"
+#include "../common/version_cpp.h"
 #include "../common/ConfigManager.h"
 #include "../common/Patch.h"
 #include "../gb/gbPrinter.h"
