@@ -66,17 +66,17 @@ uint32_t gradientARGB(uint32_t pixFront, uint32_t pixBack) //find intermediate c
 
 inline double fastSqrt(double n)
 {
-#ifdef __GNUC__ || __clang__ || __MINGW64_VERSION_MAJOR || __MINGW32_MAJOR_VERSION
+#if (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
     __asm__ ("fsqrt" : "+t" (n));
     return n;
-#elif _MSC_VER && _M_IX86
+#elif defined(_MSC_VER) && defined(_M_IX86)
     // speeds up xBRZ by about 9% compared to std::sqrt which internally uses
     // the same assembler instructions but adds some "fluff"
     __asm {
         fld n
         fsqrt
     }
-#else // _MSC_VER && _M_X64 OR other platforms
+#else // defined(_MSC_VER) && defined(_M_X64) OR other platforms
     // VisualStudio x86_64 does not allow inline ASM
     return std::sqrt(n);
 #endif
