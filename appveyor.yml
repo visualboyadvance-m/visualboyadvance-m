@@ -24,3 +24,6 @@ before_build:
 
 build_script:
   - msbuild -m -p:BuildInParallel=true -p:Configuration=Release ALL_BUILD.vcxproj
+
+cache:
+  - c:\projects\vcpkg
