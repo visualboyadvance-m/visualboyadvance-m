@@ -8,15 +8,15 @@
 # Rythm Tse <ksusix@gmail.com>, 2016
 # Xuntao Chi <1139954766@qq.com>, 2019
 # 后海游泳大老爷 <my.yuicn@gmail.com>, 2015
-# 天绝星 <c.cejhb@gmail.com>, 2017
+# 天绝星 <c.cejhb@gmail.com>, 2017,2019
 # 沈舒超 <ssc19940105@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-06 19:39-0300\n"
-"PO-Revision-Date: 2019-09-10 12:41+0000\n"
-"Last-Translator: bgK\n"
+"PO-Revision-Date: 2019-10-03 03:38+0000\n"
+"Last-Translator: 天绝星 <c.cejhb@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/bgk/vba-m/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -357,7 +357,7 @@ msgstr "VisualBoyAdvance 保存游戏文件|*.sgm"
 #: ../src/wx/cmdevents.cpp:1775
 #, c-format
 msgid "Current state slot #%d"
-msgstr ""
+msgstr "当前状态插槽 #%d"
 
 #: ../src/wx/cmdevents.cpp:2044
 msgid "Sound enabled"
@@ -401,12 +401,12 @@ msgstr "等待 GDB..."
 #: ../src/wx/cmdevents.cpp:2609
 #, c-format
 msgid "Using pixel filter #%d"
-msgstr ""
+msgstr "正在使用像素滤镜 #%d"
 
 #: ../src/wx/cmdevents.cpp:2624
 #, c-format
 msgid "Using interframe blending #%d"
-msgstr ""
+msgstr "正在使用帧间混合 #%d"
 
 #: ../src/wx/cmdevents.cpp:2747
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
@@ -683,7 +683,7 @@ msgstr "未找到主图标"
 
 #: ../src/wx/guiinit.cpp:2722
 msgid "Browse"
-msgstr ""
+msgstr "浏览"
 
 #: ../src/wx/guiinit.cpp:2736
 msgid "Main display panel not found"
@@ -1712,11 +1712,11 @@ msgstr "插件 : "
 
 #: ../src/wx/xrc/DisplayConfig.xrc:127
 msgid "Interframe blending :"
-msgstr "插帧渲染 : "
+msgstr "帧间混合 : "
 
 #: ../src/wx/xrc/DisplayConfig.xrc:136
 msgid "Smart interframe blending"
-msgstr "智能插帧渲染"
+msgstr "智能帧间混合"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:137
 msgid "Interframe motion blur"
@@ -1851,12 +1851,12 @@ msgstr "BIOS 文件 : "
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file :"
-msgstr ""
+msgstr "当前 BIOS 文件 :"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:122
 #: ../src/wx/xrc/GameBoyConfig.xrc:138 ../src/wx/xrc/GameBoyConfig.xrc:159
 msgid "(None)"
-msgstr ""
+msgstr "(无)"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:136
 #: ../src/wx/xrc/GameBoyConfig.xrc:168
@@ -1963,7 +1963,7 @@ msgstr "系统"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:84
 msgid "GB Boot &ROM file :"
-msgstr ""
+msgstr "GB 引导 ROM 文件(&R) :"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:91 ../src/wx/xrc/GameBoyConfig.xrc:113
 msgid "Select A File"
@@ -1975,11 +1975,11 @@ msgstr "GBC 引导 ROM 文件(&F) :"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:131
 msgid "Current GB BIOS file :"
-msgstr ""
+msgstr "当前 GB BIOS 文件 :"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:152
 msgid "Current GBC BIOS file :"
-msgstr ""
+msgstr "当前 GBC BIOS 文件 :"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:186
 msgid "User 1"
@@ -2701,7 +2701,7 @@ msgstr "默认"
 
 #: ../src/wx/xrc/JoyPanel.xrc:529
 msgid "Clear All"
-msgstr ""
+msgstr "全部清除"
 
 #: ../src/wx/xrc/LinkConfig.xrc:4
 msgid "Link configuration"
@@ -2769,7 +2769,7 @@ msgstr "文件(&F)"
 
 #: ../src/wx/xrc/MainMenu.xrc:7
 msgid "Open..."
-msgstr ""
+msgstr "打开..."
 
 #: ../src/wx/xrc/MainMenu.xrc:10
 msgid "Open &GB..."
@@ -2813,7 +2813,7 @@ msgstr "最常用"
 
 #: ../src/wx/xrc/MainMenu.xrc:44
 msgid "Load current state slot"
-msgstr ""
+msgstr "载入当前状态插槽"
 
 #: ../src/wx/xrc/MainMenu.xrc:47
 msgid "&Auto load most recent"
@@ -2877,11 +2877,11 @@ msgstr "最近插槽(&O)"
 
 #: ../src/wx/xrc/MainMenu.xrc:101
 msgid "Save current state slot"
-msgstr ""
+msgstr "保存当前状态插槽"
 
 #: ../src/wx/xrc/MainMenu.xrc:104
 msgid "Increase state slot number and save"
-msgstr ""
+msgstr "增加状态插槽号并保存"
 
 #: ../src/wx/xrc/MainMenu.xrc:139
 msgid "To &File ..."
@@ -2893,11 +2893,11 @@ msgstr "保存状态(&S)"
 
 #: ../src/wx/xrc/MainMenu.xrc:144
 msgid "Increase state slot number"
-msgstr ""
+msgstr "增加状态插槽号"
 
 #: ../src/wx/xrc/MainMenu.xrc:147
 msgid "Decrease state slot number"
-msgstr ""
+msgstr "减少状态插槽号"
 
 #: ../src/wx/xrc/MainMenu.xrc:152 ../src/wx/xrc/MainMenu.xrc:164
 msgid "&Battery file..."
@@ -2965,7 +2965,7 @@ msgstr "播放(&P)"
 
 #: ../src/wx/xrc/MainMenu.xrc:208
 msgid "&Quit"
-msgstr ""
+msgstr "退出(&Q)"
 
 #: ../src/wx/xrc/MainMenu.xrc:212
 msgid "&Emulation"
@@ -3074,7 +3074,7 @@ msgstr "启动时全屏(&S)"
 
 #: ../src/wx/xrc/MainMenu.xrc:318
 msgid "&Scaled resize"
-msgstr ""
+msgstr "缩放大小(&S)"
 
 #: ../src/wx/xrc/MainMenu.xrc:320
 msgid "&1x"
@@ -3102,11 +3102,11 @@ msgstr "&6x"
 
 #: ../src/wx/xrc/MainMenu.xrc:339
 msgid "Change pixel filter"
-msgstr ""
+msgstr "更改像素滤镜"
 
 #: ../src/wx/xrc/MainMenu.xrc:342
 msgid "Change interframe blending"
-msgstr ""
+msgstr "更改帧间混合"
 
 #: ../src/wx/xrc/MainMenu.xrc:345
 msgid "&Retain aspect ratio"
@@ -3114,7 +3114,7 @@ msgstr "保持宽高比(&R)"
 
 #: ../src/wx/xrc/MainMenu.xrc:349
 msgid "Enable MMX"
-msgstr ""
+msgstr "启用 MMX"
 
 #: ../src/wx/xrc/MainMenu.xrc:354
 msgid "&Bilinear filter"
@@ -3194,7 +3194,7 @@ msgstr "&R"
 
 #: ../src/wx/xrc/MainMenu.xrc:444
 msgid "&Autohold"
-msgstr ""
+msgstr "自动保留(&A)"
 
 #: ../src/wx/xrc/MainMenu.xrc:488
 msgid "&Game Boy Advance"
@@ -3330,7 +3330,7 @@ msgstr "碎片查看器...(&T)"
 
 #: ../src/wx/xrc/MainMenu.xrc:613
 msgid "Show all video layers"
-msgstr ""
+msgstr "显示所有视频图层"
 
 #: ../src/wx/xrc/MainMenu.xrc:617
 msgid "BG &0"
@@ -3418,7 +3418,7 @@ msgstr "恢复默认设置"
 
 #: ../src/wx/xrc/MainMenu.xrc:716
 msgid "&About..."
-msgstr ""
+msgstr "关于...(&A)"
 
 #: ../src/wx/xrc/MapViewer.xrc:4
 msgid "Map Viewer"
