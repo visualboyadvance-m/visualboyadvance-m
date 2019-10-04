@@ -17,6 +17,9 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#ifndef VBAM_VERSION_H
+#define VBAM_VERSION_H
+
 #define VBA_NAME "VisualBoyAdvance-M"
 #define VBA_CURRENT_VERSION "@VERSION@"
 
@@ -46,3 +49,5 @@
 
 #define VER_FILEVERSION_STR VERSION
 #define VER_FILEVERSION @WIN_VERSION@
+
+#endif /* VBAM_VERSION_H */

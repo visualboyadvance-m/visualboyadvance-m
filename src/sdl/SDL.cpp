@@ -41,7 +41,7 @@
 
 #include <time.h>
 
-#include "version.h"
+#include "../common/version_c.h"
 
 #include "SDL.h"
 
@@ -1521,7 +1521,7 @@ void SetHomeDataDir()
 
 int main(int argc, char** argv)
 {
-    fprintf(stdout, "%s\n", VBA_NAME_AND_SUBVERSION);
+    fprintf(stdout, "%s\n", vba_name_and_subversion);
 
     home = argv[0];
     SetHome(home);

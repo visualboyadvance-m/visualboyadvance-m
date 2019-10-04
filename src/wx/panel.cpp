@@ -5,7 +5,7 @@
 #include <wx/dcbuffer.h>
 #include <SDL_joystick.h>
 
-#include "version.h"
+#include "../common/version_c.h"
 #include "../common/ConfigManager.h"
 #include "../common/Patch.h"
 #include "../gb/gbPrinter.h"
@@ -424,9 +424,8 @@ void GameArea::SetFrameTitle()
     }
 
     tit.append(wxT("VisualBoyAdvance-M "));
-#ifndef FINAL_BUILD
-    tit.append(_(VERSION));
-#endif
+    tit.append(vbam_version);
+
 #ifndef NO_LINK
     int playerId = GetLinkPlayerId();
 

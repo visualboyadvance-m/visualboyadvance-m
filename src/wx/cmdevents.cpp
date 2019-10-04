@@ -10,7 +10,7 @@
 #include <wx/wfstream.h>
 #include <wx/msgdlg.h>
 
-#include "version.h"
+#include "../common/version_c.h"
 #include "../common/ConfigManager.h"
 #include "../gb/gbPrinter.h"
 #include "../gba/agbprint.h"
@@ -2723,22 +2723,14 @@ EVT_HANDLER(Translate, "Translations")
     wxLaunchDefaultBrowser(wxT("http://www.transifex.com/projects/p/vba-m"));
 }
 
+#include "../common/version_c.h"
+
 // was About
 EVT_HANDLER(wxID_ABOUT, "About...")
 {
     wxAboutDialogInfo ai;
     ai.SetName(wxT("VisualBoyAdvance-M"));
-    wxString version = wxT("");
-#ifndef FINAL_BUILD
-#ifndef VERSION
-# define VERSION "git"
-#endif
-
-    if (!version.IsEmpty())
-        version = version + wxT("-");
-
-    version = version + wxT(VERSION);
-#endif
+    wxString version(vbam_version);
     ai.SetVersion(version);
     // setting website, icon, license uses custom aboutbox on win32 & macosx
     // but at least win32 standard about is nothing special

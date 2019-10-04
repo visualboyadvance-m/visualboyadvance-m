@@ -668,6 +668,7 @@ set(
     cmd-evtable.h
     # icon File
     xrc/vbam.xpm
+    ../common/version.c
 )
 
 if(APPLE)
@@ -693,6 +694,7 @@ set(
     ../sdl/text.h
     # from external source with minor modifications
     widgets/wx/checkedlistctrl.h
+    ../common/version_c.h
 )
 
 set(
