@@ -21,9 +21,9 @@ function(host_compile src dst_cmd)
 	set(compile_command ${CMAKE_C_COMPILER} ${src} /link "/out:${dst}")
     endif()
 
-    execute_process(COMMAND ${compile_command} OUTPUT_VARIABLE compile_out ERROR_VARIABLE compile_err RESULT_VARIABLE compile_result)
-
-    if(NOT compile_result EQUAL 0)
-        message(FATAL_ERROR "Failed compiling ${src} for the host: ${compile_err}")
-    endif()
+    add_custom_command(
+        OUTPUT "${dst}"
+        COMMAND ${compile_command}
+        DEPENDS "${src}"
+    )
 endfunction()
