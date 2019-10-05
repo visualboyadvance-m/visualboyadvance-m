@@ -821,7 +821,7 @@ void MainFrame::OnSize(wxSizeEvent& event)
 
 int MainFrame::FilterEvent(wxEvent& event)
 {
-    if (event.GetEventType() == wxEVT_KEY_DOWN)
+    if (event.GetEventType() == wxEVT_KEY_DOWN && !menus_opened && !dialog_opened)
     {
         wxKeyEvent& ke = (wxKeyEvent&)event;
         int keyCode = ke.GetKeyCode();
