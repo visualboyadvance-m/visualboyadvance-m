@@ -31,6 +31,8 @@ endif()
 
 set(ALL_TARGETS fex visualboyadvance-m vbamcore vbam)
 
+add_custom_target(generate)
+
 #Output all binaries at top level
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
