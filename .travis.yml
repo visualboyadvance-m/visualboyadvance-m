@@ -1,5 +1,6 @@
 ---
 sudo: required
+language: cpp
 
 services:
     - xvfb
@@ -7,109 +8,69 @@ services:
 matrix:
     fast_finish: true
     include:
-        - env: BUILD_ENV=ubuntu-bionic
-          language: cpp
-          os: linux
+        - env: BUILD_ENV=ubuntu-bionic INSTALLDEPS=1
           dist: bionic
-          before_script:
-              - ./installdeps
-          script:
-              - mkdir build
-              - cd build
-              - cmake .. -DENABLE_SDL=ON
-              - make -j2
-# xvfb fails on bionic for some reason
-#              - xvfb-run ./visualboyadvance-m --help
-          cache:
-              directories:
-                  - "$HOME/.ccache"
-        - env: BUILD_ENV=ubuntu-xenial
-          language: cpp
-          os: linux
+          # xvfb fails on bionic for some reason
+        - env: BUILD_ENV=ubuntu-xenial INSTALLDEPS=1
           dist: xenial
-          before_script:
-              - ./installdeps
-          script:
-              - mkdir build
-              - cd build
-              - cmake .. -DENABLE_SDL=ON
-              - make -j2
-# xvfb fails on xenial too
-#              - xvfb-run ./visualboyadvance-m --help
-          cache:
-              directories:
-                  - "$HOME/.ccache"
-        - env: BUILD_ENV=ubuntu-trusty
-          language: cpp
-          os: linux
+          # xvfb fails on xenial too
+        - env: BUILD_ENV=ubuntu-trusty INSTALLDEPS=1 XVFB_RUN=1
           dist: trusty
-          before_script:
-              - ./installdeps
-          script:
-              - mkdir build
-              - cd build
-              - cmake .. -DENABLE_SDL=ON
-              - make -j2
-              - xvfb-run ./visualboyadvance-m --help
-          cache:
-              directories:
-                  - "$HOME/.ccache"
-        - env: BUILD_ENV=mingw-w64
-          language: cpp
-          os: linux
+        - env: BUILD_ENV=mingw-w64 INSTALLDEPS=1
           dist: trusty
-          before_script:
-              - ./installdeps MinGW-w64-x86_64
-          script:
-              - mkdir build
-              - cd build
-              - /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-cmake .. -DENABLE_SDL=ON
-              - make -j2
-          cache:
-              directories:
-                  - "$HOME/.ccache"
-        - env: BUILD_ENV=mingw-w32
-          language: cpp
-          os: linux
+        - env: BUILD_ENV=mingw-w32 INSTALLDEPS=1
           dist: trusty
-          before_script:
-              - ./installdeps MinGW-w64-i686
-          script:
-              - mkdir build
-              - cd build
-              - /usr/lib/mxe/usr/bin/i686-w64-mingw32.static-cmake .. -DENABLE_SDL=ON
-              - make -j2
-          cache:
-              directories:
-                  - "$HOME/.ccache"
-        - env: BUILD_ENV=libretro
-          language: cpp
-          os: linux
+        - env: BUILD_ENV=libretro CXX="ccache g++" CC="ccache gcc"
           dist: trusty
           before_install:
               - sudo apt-get -qqy update
               - sudo apt-get -qqy install build-essential ccache
           script:
               - cd src/libretro
-              - make -j2 CXX="ccache g++" CC="ccache gcc"
-          cache:
-              directories:
-                  - "$HOME/.ccache"
-        - env: BUILD_ENV=mac
-          language: cpp
+              - make
+        - env: BUILD_ENV=mac INSTALLDEPS=1
           os: osx
           osx_image: xcode10.2
-          before_script:
-              - ./installdeps
-          script:
-              - mkdir build
-              - cd build
-              - cmake .. -DENABLE_SDL=ON
-              - make -j2
-#              - ./visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m --help
-          cache:
-              directories:
-                  - "$HOME/.ccache"
+
+before_script:
+    - |
+        case "$BUILD_ENV" in
+            mingw-w64 )
+                ARG=MinGW-w64-x86_64
+                cmake=/usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-cmake
+            ;;
+            mingw-w32 )
+                ARG=MinGW-w64-i686
+                cmake=/usr/lib/mxe/usr/bin/i686-w64-mingw32.static-cmake
+            ;;
+            * )
+                cmake=cmake
+            ;;
+        esac
+    - |
+        if [ -n "$INSTALLDEPS" ]; then
+            ./installdeps $ARG
+        fi
+
+script:
+    - mkdir build
+    - cd build
+    - "$cmake" .. -DENABLE_SDL=ON
+    - make
+    - |
+        if [ -n "$XVFB_RUN" ]; then
+            xvfb-run ./visualboyadvance-m --help
+        #elif [ "$BUILD_ENV" = mac ]; then
+        #    ./visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m --help
+        fi
+
+cache:
+    directories:
+        - "$HOME/.ccache"
+
+env:
+    global:
+        - MAKEFLAGS="-j2"
 
 notifications:
     webhooks:
