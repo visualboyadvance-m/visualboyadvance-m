@@ -458,7 +458,10 @@ uint32_t systemGetClock()
     return wxGetApp().timer.Time();
 }
 
-void systemCartridgeRumble(bool) {}
+void systemCartridgeRumble(bool b)
+{
+    wxGetApp().frame->SetJoystickRumble(b);
+}
 
 static uint8_t sensorDarkness = 0xE8; // total darkness (including daylight on rainy days)
 

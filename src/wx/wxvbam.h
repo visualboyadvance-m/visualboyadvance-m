@@ -326,6 +326,8 @@ public:
 
     virtual bool DialogOpened() { return dialog_opened != 0; }
 
+    virtual void SetJoystickRumble(bool b) { joy.SetRumble(b); }
+
     // required for building from xrc
     DECLARE_DYNAMIC_CLASS(MainFrame);
     // required for event handling

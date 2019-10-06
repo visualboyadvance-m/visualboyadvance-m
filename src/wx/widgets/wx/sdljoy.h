@@ -56,6 +56,9 @@ public:
     // 0 is returned if joy is invalid
     int GetNumButtons(int joy);
 
+    // true = currently rumbling, false = turn off rumbling
+    void SetRumble(bool b) { rumbling = b; }
+
     virtual ~wxSDLJoy();
 
 protected:
@@ -64,7 +67,9 @@ protected:
     wxSDLJoyState* joystate;
     wxEvtHandler* evthandler;
     bool nosticks;
+    bool rumbling = false;
     void Notify();
+    uint16_t poll_time_ms = 50;
 };
 
 enum {

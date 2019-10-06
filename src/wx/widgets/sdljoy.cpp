@@ -121,7 +121,7 @@ void wxSDLJoy::Add(int joy)
         joystate[joy].dev = SDL_JoystickOpen(joy);
 
     if (nosticks && joystate[joy].dev) {
-        Start(50);
+        Start(poll_time_ms);
         nosticks = false;
     }
 }
@@ -238,6 +238,16 @@ void wxSDLJoy::Notify()
 
                 joystate[i].curval[nax + nhat + j] = val;
             }
+
         }
+    }
+
+    // do rumble only on device 0
+    SDL_Joystick* dev = joystate[0].dev;
+    if (dev) {
+        if (rumbling)
+            SDL_JoystickRumble(dev, 0xFFFF, 0xFFFF, poll_time_ms);
+        else
+            SDL_JoystickRumble(dev, 0, 0, 0);
     }
 }
