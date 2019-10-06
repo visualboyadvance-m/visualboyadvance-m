@@ -20,7 +20,7 @@ if(CMAKE_PREFIX_PATH)
 endif()
 
 # adjust the default behaviour of the FIND_XXX() commands:
-# search headers and libraries in the target environment, search 
+# search headers and libraries in the target environment, search
 # programs in the host environment too
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
