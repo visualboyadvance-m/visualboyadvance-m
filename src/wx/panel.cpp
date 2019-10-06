@@ -229,7 +229,6 @@ void GameArea::LoadGame(const wxString& name)
             bool enable_rtc = cfg->Read(wxT("rtcEnabled"), rtcEnabled);
 
             rtcEnable(enable_rtc);
-            rtcEnableRumble(enable_rtc);
 
             int fsz = cfg->Read(wxT("flashSize"), (long)0);
 
@@ -251,7 +250,6 @@ void GameArea::LoadGame(const wxString& name)
             cfg->SetPath(wxT("/"));
         } else {
             rtcEnable(rtcEnabled);
-            rtcEnableRumble(rtcEnabled);
             flashSetSize(0x10000 << winFlashSize);
 
             if (cpuSaveType < 0 || cpuSaveType > 5)
@@ -274,6 +272,8 @@ void GameArea::LoadGame(const wxString& name)
         // this **MUST** be called **AFTER** setting sample rate because the core calls soundInit()
         soundSetThrottle(throttle);
         soundFiltering = (float)gopts.gba_sound_filter / 100.0f;
+
+        rtcEnableRumble(true);
 
         CPUInit(gopts.gba_bios.mb_fn_str(), useBiosFileGBA);
 

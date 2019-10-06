@@ -243,11 +243,13 @@ void wxSDLJoy::Notify()
     }
 
     // do rumble only on device 0
+#if SDL_VERSION_ATLEAST(2, 0, 9)
     SDL_Joystick* dev = joystate[0].dev;
     if (dev) {
         if (rumbling)
-            SDL_JoystickRumble(dev, 0xFFFF, 0xFFFF, poll_time_ms);
+            SDL_JoystickRumble(dev, 0xFFFF, 0xFFFF, poll_time_ms * 2);
         else
             SDL_JoystickRumble(dev, 0, 0, 0);
     }
+#endif
 }
