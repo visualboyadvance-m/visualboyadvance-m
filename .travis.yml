@@ -59,6 +59,7 @@ script:
     - cd -- "$DIR"
     - if [ "$BUILD_ENV" != libretro ]; then $CMAKE $CMAKE_ARGS ..; fi
     - make
+    - if [ "$BUILD_ENV" != libretro ]; then make install DESTDIR=/tmp/VBAM; fi
     - |
         if [ -n "$XVFB_RUN" ]; then
             xvfb-run ./visualboyadvance-m --help
