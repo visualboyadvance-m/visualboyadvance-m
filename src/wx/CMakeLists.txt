@@ -838,3 +838,9 @@ if(APPLE)
 endif()
 
 set(WX_EXE_NAME visualboyadvance-m-wx${CMAKE_EXECUTABLE_SUFFIX})
+
+install(
+    TARGETS visualboyadvance-m
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    BUNDLE  DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
