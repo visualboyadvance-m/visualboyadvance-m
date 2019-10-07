@@ -1,115 +1,76 @@
 ---
+cache: ccache
+dist: trusty
+language: cpp
+services: xvfb
 sudo: required
-
-services:
-    - xvfb
 
 matrix:
     fast_finish: true
     include:
         - env: BUILD_ENV=ubuntu-bionic
-          language: cpp
-          os: linux
           dist: bionic
-          before_script:
-              - ./installdeps
-          script:
-              - mkdir build
-              - cd build
-              - cmake .. -DENABLE_SDL=ON
-              - make -j2
-# xvfb fails on bionic for some reason
-#              - xvfb-run ./visualboyadvance-m --help
-          cache:
-              directories:
-                  - "$HOME/.ccache"
+          # xvfb fails on bionic for some reason
         - env: BUILD_ENV=ubuntu-xenial
-          language: cpp
-          os: linux
           dist: xenial
-          before_script:
-              - ./installdeps
-          script:
-              - mkdir build
-              - cd build
-              - cmake .. -DENABLE_SDL=ON
-              - make -j2
-# xvfb fails on xenial too
-#              - xvfb-run ./visualboyadvance-m --help
-          cache:
-              directories:
-                  - "$HOME/.ccache"
-        - env: BUILD_ENV=ubuntu-trusty
-          language: cpp
-          os: linux
-          dist: trusty
-          before_script:
-              - ./installdeps
-          script:
-              - mkdir build
-              - cd build
-              - cmake .. -DENABLE_SDL=ON
-              - make -j2
-              - xvfb-run ./visualboyadvance-m --help
-          cache:
-              directories:
-                  - "$HOME/.ccache"
+          # xvfb fails on xenial too
+        - env: BUILD_ENV=ubuntu-trusty XVFB_RUN=1
         - env: BUILD_ENV=mingw-w64
-          language: cpp
-          os: linux
-          dist: trusty
-          before_script:
-              - ./installdeps MinGW-w64-x86_64
-          script:
-              - mkdir build
-              - cd build
-              - /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-cmake .. -DENABLE_SDL=ON
-              - make -j2
-          cache:
-              directories:
-                  - "$HOME/.ccache"
         - env: BUILD_ENV=mingw-w32
-          language: cpp
-          os: linux
-          dist: trusty
-          before_script:
-              - ./installdeps MinGW-w64-i686
-          script:
-              - mkdir build
-              - cd build
-              - /usr/lib/mxe/usr/bin/i686-w64-mingw32.static-cmake .. -DENABLE_SDL=ON
-              - make -j2
-          cache:
-              directories:
-                  - "$HOME/.ccache"
         - env: BUILD_ENV=libretro
-          language: cpp
-          os: linux
-          dist: trusty
-          before_install:
-              - sudo apt-get -qqy update
-              - sudo apt-get -qqy install build-essential ccache
-          script:
-              - cd src/libretro
-              - make -j2 CXX="ccache g++" CC="ccache gcc"
-          cache:
-              directories:
-                  - "$HOME/.ccache"
         - env: BUILD_ENV=mac
-          language: cpp
           os: osx
           osx_image: xcode10.2
-          before_script:
-              - ./installdeps
-          script:
-              - mkdir build
-              - cd build
-              - cmake .. -DENABLE_SDL=ON
-              - make -j2
-#              - ./visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m --help
-          cache:
-              directories:
-                  - "$HOME/.ccache"
+          install: export PATH="/usr/local/opt/ccache/libexec:$PATH"
+
+before_install:
+    - |
+        case "$BUILD_ENV" in
+            mingw-w64 )
+                ARG=MinGW-w64-x86_64
+                CMAKE=/usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-cmake
+            ;;
+            mingw-w32 )
+                ARG=MinGW-w64-i686
+                CMAKE=/usr/lib/mxe/usr/bin/i686-w64-mingw32.static-cmake
+            ;;
+            * )
+                CMAKE=cmake
+            ;;
+        esac
+    - |
+        if [ "$BUILD_ENV" != libretro ]; then
+            ./installdeps $ARG
+        fi
+
+before_script:
+    - |
+        if [ -n "$ENABLE_SDL" ]; then
+            CMAKE_ARGS="$CMAKE_ARGS -DENABLE_SDL=ON"
+        fi
+    - |
+        if [ "$BUILD_ENV" = libretro ]; then
+            cd src/libretro
+        else
+            mkdir -p build
+            cd build
+        fi
+
+script:
+    - if [ "$BUILD_ENV" != libretro ]; then $CMAKE $CMAKE_ARGS ..; fi
+    - make
+    - |
+        if [ -n "$XVFB_RUN" ]; then
+            xvfb-run ./visualboyadvance-m --help
+        #elif [ "$BUILD_ENV" = mac ]; then
+        #    - ./visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m --help
+        fi
+
+env:
+    global:
+        - CMAKE_ARGS=""
+        - ENABLE_SDL=1
+        - MAKEFLAGS="-j2"
 
 notifications:
     webhooks:
