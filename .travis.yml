@@ -41,6 +41,9 @@ before_install:
     - |
         if [ "$BUILD_ENV" != libretro ]; then
             ./installdeps $ARG
+            DIR=build
+        else
+            DIR=src/libretro
         fi
 
 before_script:
@@ -48,15 +51,10 @@ before_script:
         if [ -n "$ENABLE_SDL" ]; then
             CMAKE_ARGS="$CMAKE_ARGS -DENABLE_SDL=ON"
         fi
-    - |
-        if [ "$BUILD_ENV" = libretro ]; then
-            cd src/libretro
-        else
-            mkdir -p build
-            cd build
-        fi
 
 script:
+    - mkdir -p -- "$DIR"
+    - cd -- "$DIR"
     - if [ "$BUILD_ENV" != libretro ]; then $CMAKE $CMAKE_ARGS ..; fi
     - make
     - |
