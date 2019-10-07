@@ -59,11 +59,10 @@ script:
     - make
     - if [ "$BUILD_ENV" != libretro ]; then make install DESTDIR=/tmp/VBAM; fi
     - |
-        if [ -n "$XVFB_RUN" ]; then
+        if [ "$BUILD_ENV" = mac ]; then
+            ./$PRGNAM.app/Contents/MacOS/$PRGNAM --help
+        elif [ -n "$XVFB_RUN" ]; then
             xvfb-run -a ./$PRGNAM --help
-        # TODO: --help crashes on OSX sometimes.
-        #elif [ "$BUILD_ENV" = mac ]; then
-        #    ./$PRGNAM.app/Contents/MacOS/$PRGNAM --help
         fi
 
 env:
