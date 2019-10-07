@@ -983,7 +983,6 @@ endif()
 
 if(ENABLE_WX)
     add_subdirectory(src/wx)
-    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/visualboyadvance-m${CMAKE_EXECUTABLE_SUFFIX} DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 endif()
 
 if(ENABLE_WX)
