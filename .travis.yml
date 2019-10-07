@@ -62,9 +62,9 @@ script:
     - if [ "$BUILD_ENV" != libretro ]; then make install DESTDIR=/tmp/VBAM; fi
     - |
         if [ -n "$XVFB_RUN" ]; then
-            xvfb-run ./visualboyadvance-m --help
-        #elif [ "$BUILD_ENV" = mac ]; then
-        #    - ./visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m --help
+            xvfb-run ./$PRGNAM --help
+        elif [ "$BUILD_ENV" = mac ]; then
+            /tmp/VBAM/usr/local/bin/$PRGNAM.app/Contents/MacOS/$PRGNAM --help
         fi
 
 env:
@@ -72,6 +72,7 @@ env:
         - CMAKE_ARGS=""
         - ENABLE_SDL=1
         - MAKEFLAGS="-j2"
+        - PRGNAM=visualboyadvance-m
 
 notifications:
     webhooks:
