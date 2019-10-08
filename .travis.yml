@@ -1,6 +1,6 @@
 ---
 cache: ccache
-dist: trusty
+dist: xenial
 language: cpp
 services: xvfb
 sudo: required
@@ -10,10 +10,10 @@ matrix:
     include:
         - env: BUILD_ENV=ubuntu-bionic XVFB_RUN=1
           dist: bionic
-        - env: BUILD_ENV=ubuntu-xenial XVFB_RUN=1
-          dist: xenial
         - env: BUILD_ENV=ubuntu-trusty XVFB_RUN=1
-        - env: BUILD_ENV=ubuntu-trusty XVFB_RUN=1 CC=clang CXX=clang++
+          dist: trusty
+        - env: BUILD_ENV=ubuntu-xenial XVFB_RUN=1
+        - env: BUILD_ENV=ubuntu-xenial XVFB_RUN=1 CC=clang CXX=clang++
         - env: BUILD_ENV=mingw-w64
         - env: BUILD_ENV=mingw-w32
         - env: BUILD_ENV=libretro
