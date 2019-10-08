@@ -8,12 +8,10 @@ sudo: required
 matrix:
     fast_finish: true
     include:
-        - env: BUILD_ENV=ubuntu-bionic
+        - env: BUILD_ENV=ubuntu-bionic XVFB_RUN=1
           dist: bionic
-          # xvfb fails on bionic for some reason
-        - env: BUILD_ENV=ubuntu-xenial
+        - env: BUILD_ENV=ubuntu-xenial XVFB_RUN=1
           dist: xenial
-          # xvfb fails on xenial too
         - env: BUILD_ENV=ubuntu-trusty XVFB_RUN=1
         - env: BUILD_ENV=ubuntu-trusty XVFB_RUN=1 CC=clang CXX=clang++
         - env: BUILD_ENV=mingw-w64
@@ -62,9 +60,10 @@ script:
     - if [ "$BUILD_ENV" != libretro ]; then make install DESTDIR=/tmp/VBAM; fi
     - |
         if [ -n "$XVFB_RUN" ]; then
-            xvfb-run ./visualboyadvance-m --help
+            xvfb-run -a ./$PRGNAM --help
+        # TODO: --help crashes on OSX sometimes.
         #elif [ "$BUILD_ENV" = mac ]; then
-        #    - ./visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m --help
+        #    ./$PRGNAM.app/Contents/MacOS/$PRGNAM --help
         fi
 
 env:
@@ -72,6 +71,7 @@ env:
         - CMAKE_ARGS=""
         - ENABLE_SDL=1
         - MAKEFLAGS="-j2"
+        - PRGNAM=visualboyadvance-m
 
 notifications:
     webhooks:
