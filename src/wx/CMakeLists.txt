@@ -751,7 +751,6 @@ add_executable(
     ${CM_STUFF}
 )
 
-
 target_link_libraries(
     visualboyadvance-m
     ${VBAMCORE_LIBS}
@@ -805,10 +804,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     endif()
 endif()
 
-if(WIN32)
-    install(PROGRAMS ${PROJECT_BINARY_DIR}/visualboyadvance-m${CMAKE_EXECUTABLE_SUFFIX} DESTINATION ${CMAKE_BINARY_DIR})
-endif()
-
 if(NOT WIN32 AND NOT APPLE)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/wxvbam.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
 endif()
@@ -836,8 +831,6 @@ if(APPLE)
         )
     endif()
 endif()
-
-set(WX_EXE_NAME visualboyadvance-m-wx${CMAKE_EXECUTABLE_SUFFIX})
 
 install(
     TARGETS visualboyadvance-m
