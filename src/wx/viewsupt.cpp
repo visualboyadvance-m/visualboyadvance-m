@@ -725,7 +725,7 @@ void MemView::Resize(wxSizeEvent& ev)
         Refill();
 }
 
-void MemView::Show(uint32_t addr, bool force_update)
+void MemView::ShowAddr(uint32_t addr, bool force_update)
 {
     if (addr < topaddr || addr >= topaddr + (nlines - 1) * 16) {
         // align to nearest 16-byte block

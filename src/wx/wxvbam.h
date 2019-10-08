@@ -283,7 +283,7 @@ public:
     void set_global_accels();
 
     // 2.8 has no HasFocus(), and FindFocus() doesn't work right
-    bool HasFocus()
+    bool HasFocus() const
     {
         return focused;
     }

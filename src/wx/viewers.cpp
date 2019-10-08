@@ -679,7 +679,7 @@ public:
     }
     void Goto(uint32_t addr)
     {
-        mv->Show(addr, true);
+        mv->ShowAddr(addr, true);
     }
     void RefreshCmd(wxCommandEvent& ev)
     {
