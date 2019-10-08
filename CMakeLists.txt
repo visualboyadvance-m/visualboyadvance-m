@@ -505,7 +505,11 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     endif()
 
     # common flags
-    set(MY_C_FLAGS -pipe -Wformat -Wformat-security -D_FORTIFY_SOURCE=2 -feliminate-unused-debug-types)
+    set(MY_C_FLAGS -pipe -Wformat -Wformat-security -feliminate-unused-debug-types)
+
+    if(NOT CMAKE_BUILD_TYPE MATCHES Debug)
+        list(APPEND MY_C_FLAGS -D_FORTIFY_SOURCE=2)
+    endif()
 
     if(NOT (WIN32 OR X86_32)) # inline asm is not allowed with -fPIC
         set(MY_C_FLAGS ${MY_C_FLAGS} -fPIC)
