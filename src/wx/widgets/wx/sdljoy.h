@@ -111,8 +111,6 @@ public:
     {
         return prev_val;
     }
-    // required for PostEvent, apparently
-    wxEvent* Clone();
 
 protected:
     unsigned short joy;
