@@ -120,7 +120,7 @@ public:
     // the main configuration
     wxFileConfig* cfg;
     // vba-over.ini
-    wxFileConfig* overrides;
+    wxFileConfig* overrides = nullptr;
 
     wxFileName rom_database;
     wxFileName rom_database_scene;
