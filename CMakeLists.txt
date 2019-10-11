@@ -941,6 +941,7 @@ add_library(
     ${SRC_DEBUGGER}
     ${HDR_DEBUGGER}
 )
+add_dependencies(vbamcore generate)
 set_property(TARGET vbamcore PROPERTY CXX_STANDARD 11)
 set_property(TARGET vbamcore PROPERTY CXX_STANDARD_REQUIRED ON)
 
