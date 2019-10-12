@@ -2850,6 +2850,16 @@ bool MainFrame::BindControls()
                 continue;
 	    }
 #endif
+#if defined(NO_ONLINEUPDATES) || !defined(__WXMSW__)
+	    if (cmdtab[i].cmd_id == XRCID("UpdateEmu"))
+	    {
+                if (mi)
+		    mi->GetMenu()->Remove(mi);
+                cmdtab[i].cmd_id = XRCID("NOOP");
+                cmdtab[i].mi = NULL;
+                continue;
+	    }
+#endif
 
             if (mi) {
                 // wxgtk provides no way to retrieve stock label/accel
