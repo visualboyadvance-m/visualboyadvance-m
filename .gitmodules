@@ -1,3 +1,4 @@
 [submodule "dependencies"]
-	path = dependencies
-	url = https://github.com/visualboyadvance-m/dependencies.git
+    path = dependencies
+    url = https://github.com/visualboyadvance-m/dependencies.git
+    branch = master
