@@ -25,12 +25,15 @@ before_install:
                 CMAKE=/usr/lib/mxe/usr/bin/i686-w64-mingw32.static-cmake
             ;;
             windows )
-                choco install msys2 pkgconfiglite
+                choco install msys2
+                bash /bin/rebaseall
+                export MSYSTEM=MINGW64
+                bash='C:\tools\msys64\usr\bin\bash'
             ;;
         esac
     - |
         if [ "$BUILD_ENV" != libretro ]; then
-            ./installdeps $ARG
+            $bash ./installdeps $ARG
             DIR=build
         else
             DIR=src/libretro
