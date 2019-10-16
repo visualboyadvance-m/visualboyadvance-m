@@ -22,9 +22,13 @@ matrix:
           os: osx
           osx_image: xcode10.2
           install: export PATH="/usr/local/opt/ccache/libexec:$PATH"
+        - env: BUILD_ENV=windows
+          os: windows
 
 before_install:
     - |
+        CMAKE=cmake
+
         case "$BUILD_ENV" in
             mingw-w64 )
                 ARG=MinGW-w64-x86_64
@@ -34,8 +38,8 @@ before_install:
                 ARG=MinGW-w64-i686
                 CMAKE=/usr/lib/mxe/usr/bin/i686-w64-mingw32.static-cmake
             ;;
-            * )
-                CMAKE=cmake
+            windows )
+                choco install msys2 pkgconfiglite
             ;;
         esac
     - |
