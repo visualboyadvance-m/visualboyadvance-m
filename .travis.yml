@@ -8,20 +8,6 @@ sudo: required
 matrix:
     fast_finish: true
     include:
-        - env: BUILD_ENV=ubuntu-bionic XVFB_RUN=1
-          dist: bionic
-        - env: BUILD_ENV=ubuntu-xenial XVFB_RUN=1
-          dist: xenial
-        - env: BUILD_ENV=ubuntu-trusty XVFB_RUN=1
-        - env: BUILD_ENV=ubuntu-trusty XVFB_RUN=1 CC=clang CXX=clang++
-        - env: BUILD_ENV=mingw-w64
-        - env: BUILD_ENV=mingw-w32
-        - env: BUILD_ENV=libretro
-        - env: BUILD_ENV=libretro CC=clang CXX=clang++
-        - env: BUILD_ENV=mac
-          os: osx
-          osx_image: xcode10.2
-          install: export PATH="/usr/local/opt/ccache/libexec:$PATH"
         - env: BUILD_ENV=windows
           os: windows
 
