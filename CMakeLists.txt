@@ -242,7 +242,7 @@ if(AMD64 AND (ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS OR ENABLE_MMX))
 endif()
 
 if(ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS)
-    enable_language(ASM_NASM)
+    enable_language(ASM)
     set(ASM_ENABLED ON)
 endif()
 
