@@ -507,8 +507,17 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     # common flags
     set(MY_C_FLAGS -pipe -Wformat -Wformat-security -feliminate-unused-debug-types)
 
-    if(NOT CMAKE_BUILD_TYPE MATCHES Debug)
-        list(APPEND MY_C_FLAGS -D_FORTIFY_SOURCE=2)
+    if(ENABLE_SSP AND CMAKE_BUILD_TYPE STREQUAL Debug)
+        if(WIN32)
+            set(SSP_STATIC ON)
+        endif()
+
+        find_package(SSP)
+
+        if(SSP_LIBRARY)
+            list(APPEND MY_C_FLAGS        -D_FORTIFY_SOURCE=2)
+            list(APPEND MY_C_LINKER_FLAGS ${SSP_LIBRARY})
+        endif()
     endif()
 
     if(NOT (WIN32 OR X86_32)) # inline asm is not allowed with -fPIC
@@ -601,18 +610,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     if(CMAKE_COMPILER_IS_GNUCXX)
         if(ENABLE_LTO)
             include(UseGCCBinUtilsWrappers)
-        endif()
-
-        if(WIN32)
-            set(SSP_STATIC ON)
-        endif()
-
-        if(ENABLE_SSP)
-            find_package(SSP)
-
-            if(SSP_LIBRARY)
-                set(MY_C_LINKER_FLAGS ${MY_C_LINKER_FLAGS} ${SSP_LIBRARY})
-            endif()
         endif()
 
         set(MY_C_LINKER_FLAGS ${MY_C_LINKER_FLAGS} -Wl,-allow-multiple-definition)

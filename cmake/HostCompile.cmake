@@ -9,17 +9,21 @@ function(host_compile src dst_cmd)
                 set(link_flags -Wl,--subsystem,console)
             endif()
         else()
-            set(dst "${dst_cmd}")
+            set(dst ${dst_cmd})
         endif()
 
         # assume cc foo.c -o foo # will work on most hosts
         add_custom_command(
-            OUTPUT "${dst}"
+            OUTPUT ${dst}
             COMMAND cc ${src} -o ${dst} ${link_flags}
-            DEPENDS "${src}"
+            DEPENDS ${src}
         )
     else()
-        get_filename_component(dst "${dst_cmd}" NAME)
-        add_executable("${dst}" "${src}")
+        get_filename_component(dst ${dst_cmd} NAME)
+
+        add_executable(${dst} ${src})
+
+        # this is necessary because we override main with SDL_main
+        target_compile_definitions(${dst} PRIVATE -Dmain=main)
     endif()
 endfunction()
