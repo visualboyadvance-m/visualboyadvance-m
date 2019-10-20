@@ -16,7 +16,7 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-06 19:39-0300\n"
-"PO-Revision-Date: 2019-10-03 03:39+0000\n"
+"PO-Revision-Date: 2019-10-07 15:24+0000\n"
 "Last-Translator: 天绝星 <c.cejhb@gmail.com>\n"
 "Language-Team: Chinese Simplified (http://www.transifex.com/bgk/vba-m/language/zh-Hans/)\n"
 "MIME-Version: 1.0\n"
@@ -2646,7 +2646,7 @@ msgstr "选择"
 
 #: ../src/wx/xrc/JoyPanel.xrc:222 ../src/wx/xrc/MainMenu.xrc:482
 msgid "Start"
-msgstr "出发"
+msgstr "开始"
 
 #: ../src/wx/xrc/JoyPanel.xrc:254
 msgid "Motion Up"
