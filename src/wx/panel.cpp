@@ -133,12 +133,16 @@ void GameArea::LoadGame(const wxString& name)
 
         if (!pfn.IsFileReadable()) {
             pfn.SetExt(wxT("ups"));
+			
+			if (!pfn.IsFileReadable()) {
+				pfn.SetExt(wxT("bps"));
 
-            if (!pfn.IsFileReadable()) {
-                pfn.SetExt(wxT("ppf"));
-                loadpatch = pfn.IsFileReadable();
-            }
-        }
+				if (!pfn.IsFileReadable()) {
+					pfn.SetExt(wxT("ppf"));
+					loadpatch = pfn.IsFileReadable();
+				}
+			}
+		}
     }
 
     if (t == IMAGE_GB) {

@@ -112,6 +112,18 @@ static int64_t readVarPtr(FILE* f)
     return offset;
 }
 
+static int64_t readSignVarPtr(FILE* f)
+{
+    int64_t offset = readVarPtr(f);
+    bool sign =  offset & 1;
+    
+    offset = offset >> 1;
+    if (sign) {
+        offset = -offset;
+    }
+    return offset;
+}
+
 #ifndef MIN
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #endif
@@ -275,6 +287,132 @@ static bool patchApplyUPS(const char* patchname, uint8_t** rom, int* size)
                 *mem++ ^= x;
             }
         }
+    }
+
+    fclose(f);
+    return true;
+}
+
+static bool patchApplyBPS(const char* patchname, uint8_t** rom, int* size)
+{
+    int64_t srcCRC, dstCRC, patchCRC;
+
+    FILE* f = fopen(patchname, "rb");
+    if (!f)
+        return false;
+
+    fseeko64(f, 0, SEEK_END);
+    __off64_t patchSize = ftello64(f);
+    if (patchSize < 20) {
+        fclose(f);
+        return false;
+    }
+
+    fseeko64(f, 0, SEEK_SET);
+    if (fgetc(f) != 'B' || fgetc(f) != 'P' || fgetc(f) != 'S' || fgetc(f) != '1') {
+        fclose(f);
+        return false;
+    }
+
+    fseeko64(f, -12, SEEK_END);
+    srcCRC = readInt4(f);
+    dstCRC = readInt4(f);
+    patchCRC = readInt4(f);
+    if (srcCRC == -1 || dstCRC == -1 || patchCRC == -1) {
+        fclose(f);
+        return false;
+    }
+
+    fseeko64(f, 0, SEEK_SET);
+    uint32_t crc = computePatchCRC(f, patchSize - 4);
+    
+    if (crc != patchCRC) {
+        fclose(f);
+        return false;
+    }
+
+    crc = crc32(0L, Z_NULL, 0);
+    crc = crc32(crc, *rom, *size);
+
+    fseeko64(f, 4, SEEK_SET);
+    int64_t dataSize;
+    int64_t srcSize = readVarPtr(f);
+    int64_t dstSize = readVarPtr(f);
+    int64_t mtdSize = readVarPtr(f);
+    fseeko64(f, mtdSize, SEEK_CUR);
+
+    if (crc == srcCRC) {
+        if (srcSize != *size) {
+            fclose(f);
+            return false;
+        }
+        dataSize = dstSize;
+    } else if (crc == dstCRC) {
+        if (dstSize != *size) {
+            fclose(f);
+            return false;
+        }
+        dataSize = srcSize;
+    } else {
+        fclose(f);
+        return false;
+    }
+    
+    uint8_t* new_rom = (uint8_t*)calloc(1, dataSize);
+    
+    int64_t length = 0;
+    uint8_t action = 0;
+    uint32_t outputOffset = 0, sourceRelativeOffset = 0, targetRelativeOffset = 0;
+    
+    while (ftello64(f) < patchSize - 12) {
+        length = readVarPtr(f);
+        action = length & 3 ;
+        length = (length>>2) + 1;
+        switch(action){
+        case 0: // sourceRead
+            while(length--) {
+                new_rom[outputOffset] = rom[0][outputOffset];
+                outputOffset++;
+            }
+            break;
+        case 1: // patchRead
+            while(length--) {
+                new_rom[outputOffset++] = fgetc(f);
+            }
+            break;
+        case 2: // sourceCopy
+            sourceRelativeOffset += readSignVarPtr(f);
+            while(length--) {
+                new_rom[outputOffset++] = rom[0][sourceRelativeOffset++];
+            }
+            break;
+        case 3: // targetCopy
+            targetRelativeOffset += readSignVarPtr(f);
+            while(length--) { // yes, copy from alredy patched rom, and only 1 byte at time (pseudo-rle)
+                new_rom[outputOffset++] = new_rom[targetRelativeOffset++]; 
+            }
+            break;
+        }
+    }
+    
+    crc = crc32(0L, Z_NULL, 0);
+    crc = crc32(crc, new_rom, dataSize);
+    
+    // TODO
+    if(crc == dstCRC) {
+#if 1
+        if (dataSize > *size) {
+            // SIGSEGV in /src/gba/GBA.cpp:3313 [*((uint16_t*)&rom[0x1fe209c]) = 0xdffa; // SWI 0xFA]
+            *rom = (uint8_t*)realloc(*rom, dataSize);
+        } 
+        memcpy(*rom, new_rom, dataSize);
+        *size = dataSize;
+        free(new_rom);
+#else
+        free(*rom);
+        *rom = new_rom;
+        *size = dataSize;
+#endif
     }
 
     fclose(f);
@@ -464,6 +602,10 @@ static bool patchApplyPPF(const char* patchname, uint8_t** rom, int* size)
 
 #endif
 
+// HINT: new format(.ext) => aditional changes in 
+//              sdl/SDL.cpp>>>main (~1600)  
+//              wx/panel.cpp>>>GameArea::LoadGame (~130)
+
 bool applyPatch(const char* patchname, uint8_t** rom, int* size)
 {
 #ifndef __LIBRETRO__
@@ -476,6 +618,8 @@ bool applyPatch(const char* patchname, uint8_t** rom, int* size)
         return patchApplyIPS(patchname, rom, size);
     if (_stricmp(p, ".ups") == 0)
         return patchApplyUPS(patchname, rom, size);
+    if (_stricmp(p, ".bps") == 0)
+        return patchApplyBPS(patchname, rom, size);
     if (_stricmp(p, ".ppf") == 0)
         return patchApplyPPF(patchname, rom, size);
 #endif
