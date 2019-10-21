@@ -114,7 +114,13 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
         winmm comctl32 oleacc rpcrt4 shlwapi version wsock32 opengl32
     )
 
-    file(COPY ${_VCPKG_ROOT_DIR}/buildtrees/wxwidgets/${WINARCH}-windows${suffix}/lib/wxrc.exe DESTINATION ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/${path_prefix}/bin)
+    if(NOT EXISTS ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/${path_prefix}/bin/wxrc.exe)
+        file(
+            COPY ${_VCPKG_ROOT_DIR}/buildtrees/wxwidgets/${WINARCH}-windows${suffix}/lib/wxrc.exe
+            DESTINATION ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/${path_prefix}/bin
+        )
+    endif()
+
     set(WXRC ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/${path_prefix}/bin/wxrc.exe)
 
     if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/zip.exe)
