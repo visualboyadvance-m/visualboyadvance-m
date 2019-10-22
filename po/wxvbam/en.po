@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../src/wx/wxvbam.cpp:488
+#: ../src/wx/wxvbam.cpp:583
 msgid ""
 "\n"
 "\tbuilt-in"
@@ -25,11 +25,11 @@ msgstr ""
 "\n"
 "\tbuilt-in"
 
-#: ../src/wx/cmdevents.cpp:1167 ../src/wx/cmdevents.cpp:1240
+#: ../src/wx/cmdevents.cpp:1195 ../src/wx/cmdevents.cpp:1265
 msgid " files ("
 msgstr " files ("
 
-#: ../src/wx/panel.cpp:445
+#: ../src/wx/panel.cpp:493
 msgid " player "
 msgstr " player "
 
@@ -38,27 +38,27 @@ msgstr " player "
 msgid "% of normal:"
 msgstr "% of normal:"
 
-#: ../src/wx/guiinit.cpp:1497
+#: ../src/wx/guiinit.cpp:1520
 #, c-format
 msgid "%d frames = %.2f ms"
 msgstr "%d frames = %.2f ms"
 
-#: ../src/wx/guiinit.cpp:1660
+#: ../src/wx/guiinit.cpp:1716
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: ../src/wx/sys.cpp:336
+#: ../src/wx/sys.cpp:341
 #, c-format
 msgid "%d%%"
 msgstr "%d%%"
 
-#: ../src/wx/sys.cpp:328
+#: ../src/wx/sys.cpp:333
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr "%d%%(%d, %d fps)"
 
-#: ../src/wx/panel.cpp:85
+#: ../src/wx/panel.cpp:90
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s is not a valid ROM file"
