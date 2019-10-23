@@ -9,13 +9,14 @@
 # Kevin Kastner <tails32@hotmail.de>, 2015
 # Larson März <larson@protonmail.ch>, 2017
 # Larson März <larson@protonmail.ch>, 2014
+# Marco Ruhl <marcoruhl@hotmail.de>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-06 19:39-0300\n"
-"PO-Revision-Date: 2019-10-05 14:39+0000\n"
-"Last-Translator: Fabian Arndt <administrator@root-core.net>\n"
+"PO-Revision-Date: 2019-10-22 23:01+0000\n"
+"Last-Translator: Marco Ruhl <marcoruhl@hotmail.de>\n"
 "Language-Team: German (http://www.transifex.com/bgk/vba-m/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,31 +30,31 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy"
 " Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "GameBoy Advance-Dateien (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr "GameBoy Advance Dateien (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: ../src/wx/cmdevents.cpp:117
 msgid "Open ROM file"
-msgstr "ROM-Datei öffnen"
+msgstr "ROM Datei öffnen"
 
 #: ../src/wx/cmdevents.cpp:134
 msgid ""
 "GameBoy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "GameBoy-Dateien (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr "GameBoy Dateien (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: ../src/wx/cmdevents.cpp:141
 msgid "Open GB ROM file"
-msgstr "GB ROM-Datei öffnen"
+msgstr "GB ROM Datei öffnen"
 
 #: ../src/wx/cmdevents.cpp:158
 msgid ""
 "GameBoy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "GameBoy Color-Dateien (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr "GameBoy Color Dateien (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: ../src/wx/cmdevents.cpp:165
 msgid "Open GBC ROM file"
-msgstr "GBC ROM-Datei öffnen"
+msgstr "GBC ROM Datei öffnen"
 
 #: ../src/wx/cmdevents.cpp:584 ../src/wx/cmdevents.cpp:700
 #: ../src/wx/cmdevents.cpp:739 ../src/wx/cmdevents.cpp:812
@@ -2948,11 +2949,11 @@ msgstr "Spiel&aufzeichnung anhalten"
 
 #: ../src/wx/xrc/MainMenu.xrc:194
 msgid "&Record"
-msgstr "Aufzeichnen"
+msgstr "&Aufzeichnen"
 
 #: ../src/wx/xrc/MainMenu.xrc:198
 msgid "Start playing &movie..."
-msgstr "Fil&m abspielen..."
+msgstr "Film abspielen..."
 
 #: ../src/wx/xrc/MainMenu.xrc:201
 msgid "Stop playing m&ovie"
@@ -2960,7 +2961,7 @@ msgstr "Film anhalten"
 
 #: ../src/wx/xrc/MainMenu.xrc:203
 msgid "&Play"
-msgstr "Abs&pielen"
+msgstr "&Abspielen"
 
 #: ../src/wx/xrc/MainMenu.xrc:208
 msgid "&Quit"
@@ -2976,7 +2977,7 @@ msgstr "&Pause"
 
 #: ../src/wx/xrc/MainMenu.xrc:218
 msgid "&Next frame"
-msgstr "&Nächster Frame"
+msgstr "&Nächstes Bild"
 
 #: ../src/wx/xrc/MainMenu.xrc:221
 msgid "Re&wind"
@@ -2988,27 +2989,27 @@ msgstr "&Vollbild umschalten"
 
 #: ../src/wx/xrc/MainMenu.xrc:232
 msgid "&Turbo mode"
-msgstr "&Turbo-Modus"
+msgstr "&Turbo Modus"
 
 #: ../src/wx/xrc/MainMenu.xrc:236
 msgid "&VSync"
-msgstr "&Vertikale Synchronisation"
+msgstr "&VSync"
 
 #: ../src/wx/xrc/MainMenu.xrc:240
 msgid "&Auto skip frames"
-msgstr "&Automatisch Frames überspringen"
+msgstr "&Automatisch Bilder überspringen"
 
 #: ../src/wx/xrc/MainMenu.xrc:245
 msgid "&Skip BIOS"
-msgstr "BIO&S überspringen"
+msgstr "&BIOS überspringen"
 
 #: ../src/wx/xrc/MainMenu.xrc:249
 msgid "&Auto IPS/UPS/IPF patch"
-msgstr "&Automatisch IPS/UPS/IPF-Patches anwenden"
+msgstr "&Automatisch IPS/UPS/IPF Patchen"
 
 #: ../src/wx/xrc/MainMenu.xrc:253
 msgid "&Pause when inactive"
-msgstr "Bei Inaktivität &pausieren"
+msgstr "&Bei Inaktivität Pausieren"
 
 #: ../src/wx/xrc/MainMenu.xrc:258
 msgid "&Reset"
@@ -3032,7 +3033,7 @@ msgstr "&Nichts"
 
 #: ../src/wx/xrc/MainMenu.xrc:275
 msgid "&Cable"
-msgstr "Kabel"
+msgstr "&Kabel"
 
 #: ../src/wx/xrc/MainMenu.xrc:279
 msgid "&Wireless"
@@ -3052,7 +3053,7 @@ msgstr "&Lokaler Modus"
 
 #: ../src/wx/xrc/MainMenu.xrc:296
 msgid "&Link at boot"
-msgstr "Beim Booten &Link aufbauen"
+msgstr "&Beim Booten Link aufbauen"
 
 #: ../src/wx/xrc/MainMenu.xrc:300
 msgid "&Speed hack"
@@ -3073,7 +3074,7 @@ msgstr "&Im Vollbild starten"
 
 #: ../src/wx/xrc/MainMenu.xrc:318
 msgid "&Scaled resize"
-msgstr "&Skalierte Größe setzen"
+msgstr "&Skalierte Größenänderung"
 
 #: ../src/wx/xrc/MainMenu.xrc:320
 msgid "&1x"
@@ -3109,11 +3110,11 @@ msgstr "Zwischenbild-Überblendung ändern"
 
 #: ../src/wx/xrc/MainMenu.xrc:345
 msgid "&Retain aspect ratio"
-msgstr "Bildschi&rmseitenverhältnis beibehalten"
+msgstr "&Seitenverhältnis beibehalten"
 
 #: ../src/wx/xrc/MainMenu.xrc:349
 msgid "Enable MMX"
-msgstr "MMX aktivieren"
+msgstr "MMX Aktivieren"
 
 #: ../src/wx/xrc/MainMenu.xrc:354
 msgid "&Bilinear filter"
@@ -3121,7 +3122,7 @@ msgstr "&Bilinearer Filter"
 
 #: ../src/wx/xrc/MainMenu.xrc:365
 msgid "&Keep window on top"
-msgstr "Fenster im Vordergrund halten"
+msgstr "&Fenster im Vordergrund halten"
 
 #: ../src/wx/xrc/MainMenu.xrc:370
 msgid "&Status bar"
@@ -3129,11 +3130,11 @@ msgstr "&Statusleiste"
 
 #: ../src/wx/xrc/MainMenu.xrc:374
 msgid "&Disable on-screen display"
-msgstr "On-Screen-&Display deaktivieren"
+msgstr "&Transparente Bildschirmanzeige Deaktivieren"
 
 #: ../src/wx/xrc/MainMenu.xrc:378
 msgid "&Transparent on-screen display"
-msgstr "&Transparentes On-Screen-Display"
+msgstr "&Transparente Bildschirmanzeige"
 
 #: ../src/wx/xrc/MainMenu.xrc:383
 msgid "&Audio"
@@ -3141,19 +3142,19 @@ msgstr "&Audio"
 
 #: ../src/wx/xrc/MainMenu.xrc:388
 msgid "&Increase volume"
-msgstr "Lautstärke &erhöhen"
+msgstr "&Lautstärke erhöhen"
 
 #: ../src/wx/xrc/MainMenu.xrc:392
 msgid "&Decrease volume"
-msgstr "Lautstärke &verringern"
+msgstr "&Lautstärke verringern"
 
 #: ../src/wx/xrc/MainMenu.xrc:396
 msgid "&Toggle sound"
-msgstr "Sound umschal&ten"
+msgstr "&Sound Umschalten"
 
 #: ../src/wx/xrc/MainMenu.xrc:401
 msgid "&GBA sound interpolation"
-msgstr "&GBA Ton-Interpolation"
+msgstr "&GBA Ton Interpolation"
 
 #: ../src/wx/xrc/MainMenu.xrc:406
 msgid "&GB sound enhancement"
@@ -3161,7 +3162,7 @@ msgstr "&GB Tonverbesserung"
 
 #: ../src/wx/xrc/MainMenu.xrc:410
 msgid "&GB surround sound effect"
-msgstr "&GB Surround-Sound-Effekt"
+msgstr "&GB Surround-Sound Effekt"
 
 #: ../src/wx/xrc/MainMenu.xrc:414
 msgid "&GB sound declicking"
@@ -3169,11 +3170,11 @@ msgstr "&GB Klickgeräusche dämpfen"
 
 #: ../src/wx/xrc/MainMenu.xrc:419
 msgid "&Input"
-msgstr "Steuerung"
+msgstr "Eingabe"
 
 #: ../src/wx/xrc/MainMenu.xrc:425
 msgid "&Autofire"
-msgstr "&Autofeuer"
+msgstr "Autofeuer"
 
 #: ../src/wx/xrc/MainMenu.xrc:427 ../src/wx/xrc/MainMenu.xrc:462
 msgid "&A"
@@ -3193,11 +3194,11 @@ msgstr "&R"
 
 #: ../src/wx/xrc/MainMenu.xrc:444
 msgid "&Autohold"
-msgstr "&Autohold"
+msgstr "Selbsthaltung"
 
 #: ../src/wx/xrc/MainMenu.xrc:488
 msgid "&Game Boy Advance"
-msgstr "&Game Boy Advance"
+msgstr "GameBoy Advance"
 
 #: ../src/wx/xrc/MainMenu.xrc:490 ../src/wx/xrc/MainMenu.xrc:509
 msgid "Configure ..."
@@ -3205,15 +3206,15 @@ msgstr "Konfigurieren..."
 
 #: ../src/wx/xrc/MainMenu.xrc:494
 msgid "&Real-time clock"
-msgstr "Echtzeituh&r (RTC)"
+msgstr "Echtzeituhr"
 
 #: ../src/wx/xrc/MainMenu.xrc:498
 msgid "&Use BIOS file"
-msgstr "BIOS-Datei verwenden"
+msgstr "BIOS Datei verwenden"
 
 #: ../src/wx/xrc/MainMenu.xrc:502
 msgid "&Debug print"
-msgstr "&Debug-Ausdruck"
+msgstr "Debug Ausdruck"
 
 #: ../src/wx/xrc/MainMenu.xrc:513
 msgid "&GB printer"
@@ -3221,11 +3222,11 @@ msgstr "&GB Drucker"
 
 #: ../src/wx/xrc/MainMenu.xrc:517
 msgid "&Gather a full page before printing"
-msgstr "Ausdruck hinauszö&gern, bis Seite voll ist"
+msgstr "Ausdruck hinauszögern, bis Seite voll ist"
 
 #: ../src/wx/xrc/MainMenu.xrc:521
 msgid "&Save printouts as screen captures"
-msgstr "Au&sdruck als Screenshot speichern"
+msgstr "Ausdrucke als Screenshot speichern"
 
 #: ../src/wx/xrc/MainMenu.xrc:526
 msgid "&Use GB BIOS file"
@@ -3237,47 +3238,47 @@ msgstr "GBC BIOS-Datei verwenden"
 
 #: ../src/wx/xrc/MainMenu.xrc:535
 msgid "&General ..."
-msgstr "All&gemeines..."
+msgstr "Allgemeines..."
 
 #: ../src/wx/xrc/MainMenu.xrc:538
 msgid "&Speedup / Turbo ..."
-msgstr "Be&schleunigung / Turbo ..."
+msgstr "Beschleunigung / Turbo ..."
 
 #: ../src/wx/xrc/MainMenu.xrc:541
 msgid "D&irectories ..."
-msgstr "Verze&ichnisse..."
+msgstr "Verzeichnisse..."
 
 #: ../src/wx/xrc/MainMenu.xrc:544
 msgid "&Key Shortcuts ..."
-msgstr "Tasten&kürzel..."
+msgstr "Tastenkürzel..."
 
 #: ../src/wx/xrc/MainMenu.xrc:548
 msgid "&Tools"
-msgstr "&Hilfsmi&ttel"
+msgstr "Hilfsmittel"
 
 #: ../src/wx/xrc/MainMenu.xrc:550
 msgid "&Cheats"
-msgstr "&Cheats"
+msgstr "Cheats"
 
 #: ../src/wx/xrc/MainMenu.xrc:552
 msgid "List &cheats ..."
-msgstr "&Cheats auflisten..."
+msgstr "Cheats auflisten..."
 
 #: ../src/wx/xrc/MainMenu.xrc:555
 msgid "Find c&heat ..."
-msgstr "C&heat suchen..."
+msgstr "Cheat suchen..."
 
 #: ../src/wx/xrc/MainMenu.xrc:559
 msgid "A&utomatically save/load cheats"
-msgstr "Cheats a&utomatisch laden/speichern"
+msgstr "Cheats Automatisch Laden/Speichern"
 
 #: ../src/wx/xrc/MainMenu.xrc:563
 msgid "&Enable cheats"
-msgstr "Ch&eats aktivieren"
+msgstr "Cheats aktivieren"
 
 #: ../src/wx/xrc/MainMenu.xrc:570
 msgid "&Break into GDB"
-msgstr "In den GD&B springen"
+msgstr "In den GDB springen"
 
 #: ../src/wx/xrc/MainMenu.xrc:574
 msgid "&Configure port..."
@@ -3285,11 +3286,11 @@ msgstr "Port konfigurieren..."
 
 #: ../src/wx/xrc/MainMenu.xrc:577
 msgid "&Break on load"
-msgstr "&Break beim Laden"
+msgstr "Pause beim Laden"
 
 #: ../src/wx/xrc/MainMenu.xrc:582
 msgid "&Disconnect"
-msgstr "Verbin&dung trennen"
+msgstr "Verbindung trennen"
 
 #: ../src/wx/xrc/MainMenu.xrc:584
 msgid "&GDB"
@@ -3297,39 +3298,39 @@ msgstr "&GDB"
 
 #: ../src/wx/xrc/MainMenu.xrc:587
 msgid "&Disassemble..."
-msgstr "&Disassemblen..."
+msgstr "Zerlegen..."
 
 #: ../src/wx/xrc/MainMenu.xrc:590
 msgid "&Logging..."
-msgstr "Protoko&ll anlegen..."
+msgstr "Protokoll anlegen..."
 
 #: ../src/wx/xrc/MainMenu.xrc:593
 msgid "&IO Viewer..."
-msgstr "&IO-Anzeige..."
+msgstr "IO Anzeige..."
 
 #: ../src/wx/xrc/MainMenu.xrc:596
 msgid "&Map Viewer..."
-msgstr "&Map-Ansicht..."
+msgstr "Map Ansicht..."
 
 #: ../src/wx/xrc/MainMenu.xrc:599
 msgid "M&emory Viewer..."
-msgstr "Speicher-Ansicht..."
+msgstr "Speicher Ansicht..."
 
 #: ../src/wx/xrc/MainMenu.xrc:602
 msgid "&OAM Viewer..."
-msgstr "&OAM-Ansicht..."
+msgstr "OAM Ansicht..."
 
 #: ../src/wx/xrc/MainMenu.xrc:605
 msgid "&Palette Viewer..."
-msgstr "&Paletten-Ansicht..."
+msgstr "Paletten Ansicht..."
 
 #: ../src/wx/xrc/MainMenu.xrc:608
 msgid "&Tile Viewer..."
-msgstr "Kachel-Ansich&t..."
+msgstr "Kachel-Ansich..."
 
 #: ../src/wx/xrc/MainMenu.xrc:613
 msgid "Show all video layers"
-msgstr "Alle Video-Ebenen anzeigen"
+msgstr "Alle Video Ebenen anzeigen"
 
 #: ../src/wx/xrc/MainMenu.xrc:617
 msgid "BG &0"
@@ -3397,7 +3398,7 @@ msgstr "Tonkanäle"
 
 #: ../src/wx/xrc/MainMenu.xrc:693
 msgid "&Help"
-msgstr "&Hilfe"
+msgstr "Hilfe"
 
 #: ../src/wx/xrc/MainMenu.xrc:695
 msgid "Report &Bugs"
@@ -3405,7 +3406,7 @@ msgstr "Fehler melden"
 
 #: ../src/wx/xrc/MainMenu.xrc:698
 msgid "VBA-M Support &Forum"
-msgstr "VBA-M Hilfe-&Forum"
+msgstr "VBA-M Hilfe&Forum"
 
 #: ../src/wx/xrc/MainMenu.xrc:701
 msgid "Translations"
@@ -3546,7 +3547,7 @@ msgstr "Paletten-Ansicht"
 
 #: ../src/wx/xrc/PaletteViewer.xrc:88
 msgid "C&hange backdrop color..."
-msgstr "&Hintergrundfarbe ändern..."
+msgstr "Hintergrundfarbe ändern..."
 
 #: ../src/wx/xrc/SoundConfig.xrc:4
 msgid "Sound Settings"
@@ -3566,7 +3567,7 @@ msgstr "Maximum"
 
 #: ../src/wx/xrc/SoundConfig.xrc:71
 msgid "Sample rate :"
-msgstr "Sample-Rate:"
+msgstr "Abtastrate:"
 
 #: ../src/wx/xrc/SoundConfig.xrc:77
 msgid "48 KHz"
@@ -3594,7 +3595,7 @@ msgstr "OpenAL"
 
 #: ../src/wx/xrc/SoundConfig.xrc:118
 msgid "DirectSound"
-msgstr "DirectSound"
+msgstr "Direkt Sound"
 
 #: ../src/wx/xrc/SoundConfig.xrc:125
 msgid "XAudio2"
@@ -3610,15 +3611,15 @@ msgstr "Gerät"
 
 #: ../src/wx/xrc/SoundConfig.xrc:154
 msgid "Enable stereo upmixing"
-msgstr "Stereo-Upmixing aktivieren"
+msgstr "Stereo mischung aktivieren"
 
 #: ../src/wx/xrc/SoundConfig.xrc:161
 msgid "Enable hardware acceleration"
-msgstr "Hardware-Beschleunigung aktivieren"
+msgstr "Hardware Beschleunigung aktivieren"
 
 #: ../src/wx/xrc/SoundConfig.xrc:190
 msgid "Number of sound buffers:"
-msgstr "Anzahl der Sound-Buffer:"
+msgstr "Anzahl der Sound Puffer:"
 
 #: ../src/wx/xrc/SoundConfig.xrc:198
 msgid "Advanced"
@@ -3658,11 +3659,11 @@ msgstr "Beschleunigung - Begrenzung"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:84
 msgid "Speedup Frame Skip"
-msgstr "Beschleunigung - Frame-Skipping"
+msgstr "Schnelleres Überspringen von Bildern"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:102
 msgid "# of frames:"
-msgstr "Frame-Anzahl:"
+msgstr "Anzahl der Frames:"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:121
 msgid "1"
@@ -3774,7 +3775,7 @@ msgstr "30"
 
 #: ../src/wx/xrc/TileViewer.xrc:4
 msgid "Tile Viewer"
-msgstr "Kachel-Ansicht"
+msgstr "Kachel Ansicht"
 
 #: ../src/wx/xrc/TileViewer.xrc:15
 msgid "1&6"
