@@ -264,7 +264,7 @@ check_cross() {
             esac
 
             # get the necessary win32 headers
-            check git submodule update --remote --recursive
+            check git submodule update --init --remote --recursive
             ;;
         m32|-m32)
             target=m32
