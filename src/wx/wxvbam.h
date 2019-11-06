@@ -73,6 +73,7 @@ inline std::string ToString(const wxChar* aString)
 }
 
 class MainFrame;
+class WinSparkleDllWrapper;
 
 class wxvbamApp : public wxApp {
 public:
@@ -156,7 +157,8 @@ protected:
 
 private:
     wxPathList config_path;
-    char* home = NULL;
+    char* home = nullptr;
+    WinSparkleDllWrapper *winsparkle = nullptr;
 };
 
 DECLARE_APP(wxvbamApp);

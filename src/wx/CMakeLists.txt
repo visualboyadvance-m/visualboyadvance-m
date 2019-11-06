@@ -696,7 +696,13 @@ set(
     # from external source with minor modifications
     widgets/wx/checkedlistctrl.h
     ../common/version_cpp.h
+    winsparkle-wrapper.h
 )
+
+if(WIN32)
+    list(APPEND SRC_WX winsparkle-wrapper.cpp)
+    list(APPEND HDR_WX winsparkle-wrapper.h)
+endif()
 
 set(
     RES_WX
@@ -756,6 +762,25 @@ add_executable(
     ${VBAM_ICON_PATH}
     ${CM_STUFF}
 )
+
+if(WIN32 AND (AMD64 OR X86_32))
+    if(NOT DEFINED WINSPARKLE_BIN_RELEASE_DIR)
+        set(WINSPARKLE_BIN_RELEASE_DIR ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0)
+    endif()
+
+    target_include_directories(
+        visualboyadvance-m
+        PRIVATE ${WINSPARKLE_BIN_RELEASE_DIR}/include
+    )
+
+    if(AMD64)
+        set(WINSPARKLE_DLL ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0/x64/Release/WinSparkle.dll)
+    else()
+        set(WINSPARKLE_DLL ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0/Release/WinSparkle.dll)
+    endif()
+
+    configure_file(winsparkle-path.h.in ${CMAKE_BINARY_DIR}/winsparkle-path.h)
+endif()
 
 target_link_libraries(
     visualboyadvance-m
