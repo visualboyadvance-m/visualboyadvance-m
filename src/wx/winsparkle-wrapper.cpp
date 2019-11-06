@@ -23,6 +23,18 @@ func_win_sparkle_cleanup              winsparkle_cleanup              = nullptr;
 
 wxString *temp_file_name = nullptr;
 
+WinSparkleDllWrapper *instance = nullptr;
+
+WinSparkleDllWrapper *WinSparkleDllWrapper::GetInstance()
+{
+    if (instance)
+	return instance;
+
+    instance = new WinSparkleDllWrapper();
+
+    return instance;
+}
+
 WinSparkleDllWrapper::WinSparkleDllWrapper()
 {
     wxFile temp_file;

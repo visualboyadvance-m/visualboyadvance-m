@@ -452,7 +452,7 @@ bool wxvbamApp::OnInit()
     frame->Show(true);
 
 #if defined(__WXMSW__) && !defined(NO_ONLINEUPDATES)
-    winsparkle = new WinSparkleDllWrapper();
+    winsparkle = WinSparkleDllWrapper::GetInstance();
 #endif
 
 #ifndef NO_ONLINEUPDATES

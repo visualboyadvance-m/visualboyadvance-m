@@ -3,9 +3,12 @@
 
 #define WINSPARKLE_DLL_RC 300
 
-struct WinSparkleDllWrapper {
-    WinSparkleDllWrapper();
+class WinSparkleDllWrapper {
+public:
+    static WinSparkleDllWrapper *GetInstance();
     ~WinSparkleDllWrapper();
+private:
+    WinSparkleDllWrapper();
 };
 
 void win_sparkle_init();
