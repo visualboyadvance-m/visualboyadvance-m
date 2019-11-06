@@ -1,0 +1,6 @@
+#ifndef WINSPARKLE_RC_H
+#define WINSPARKLE_RC_H
+
+#define WINSPARKLE_DLL_RC 300
+
+#endif /* WINSPARKLE_RC_H */

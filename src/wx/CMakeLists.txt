@@ -696,12 +696,11 @@ set(
     # from external source with minor modifications
     widgets/wx/checkedlistctrl.h
     ../common/version_cpp.h
-    winsparkle-wrapper.h
 )
 
 if(WIN32)
     list(APPEND SRC_WX winsparkle-wrapper.cpp)
-    list(APPEND HDR_WX winsparkle-wrapper.h)
+    list(APPEND HDR_WX winsparkle-wrapper.h winsparkle-rc.h)
 endif()
 
 set(

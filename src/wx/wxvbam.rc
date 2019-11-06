@@ -5,7 +5,7 @@ AAAAA_MAINICON ICON "icons/vbam.ico"
 
 #include "version.h"
 
-#include "winsparkle-wrapper.h"
+#include "winsparkle-rc.h"
 #include "winsparkle-path.h"
 
 /////////////////////////////////////////////////////////////////////////////
