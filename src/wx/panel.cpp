@@ -1567,7 +1567,7 @@ public:
                 return 0;
             }
 
-            //src += instride;
+            src += instride;
 
             // interframe blending filter
             // definitely not thread safe by default
