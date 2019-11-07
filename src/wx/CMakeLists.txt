@@ -698,7 +698,7 @@ set(
     ../common/version_cpp.h
 )
 
-if(WIN32)
+if(WIN32 AND (AMD64 OR X86_32) AND ENABLE_ONLINEUPDATES)
     list(APPEND SRC_WX winsparkle-wrapper.cpp)
     list(APPEND HDR_WX winsparkle-wrapper.h winsparkle-rc.h)
 endif()
@@ -762,7 +762,7 @@ add_executable(
     ${CM_STUFF}
 )
 
-if(WIN32 AND (AMD64 OR X86_32))
+if(WIN32 AND (AMD64 OR X86_32) AND ENABLE_ONLINEUPDATES)
     if(NOT DEFINED WINSPARKLE_BIN_RELEASE_DIR)
         set(WINSPARKLE_BIN_RELEASE_DIR ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0)
     endif()
