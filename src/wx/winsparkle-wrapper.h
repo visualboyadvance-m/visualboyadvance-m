@@ -9,9 +9,9 @@
 class WinSparkleDllWrapper {
 public:
     static WinSparkleDllWrapper *GetInstance();
-    ~WinSparkleDllWrapper();
 private:
     WinSparkleDllWrapper();
+    ~WinSparkleDllWrapper();
 
     wxDynamicLibrary *winsparkle_dll = nullptr;
 

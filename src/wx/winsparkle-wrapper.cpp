@@ -4,16 +4,11 @@
 #include "winsparkle-wrapper.h"
 #include "wx/msw/private.h"
 
-static WinSparkleDllWrapper *instance = nullptr;
-
 WinSparkleDllWrapper *WinSparkleDllWrapper::GetInstance()
 {
-    if (instance)
-	return instance;
+    static WinSparkleDllWrapper instance;
 
-    instance = new WinSparkleDllWrapper();
-
-    return instance;
+    return &instance;
 }
 
 WinSparkleDllWrapper::WinSparkleDllWrapper()
@@ -57,28 +52,28 @@ WinSparkleDllWrapper::~WinSparkleDllWrapper()
 
 void win_sparkle_init()
 {
-    instance->winsparkle_init();
+    WinSparkleDllWrapper::GetInstance()->winsparkle_init();
 }
 
 void win_sparkle_check_update_with_ui()
 {
-    instance->winsparkle_check_update_with_ui();
+    WinSparkleDllWrapper::GetInstance()->winsparkle_check_update_with_ui();
 }
 
 
 void win_sparkle_set_appcast_url(const char *url)
 {
-    instance->winsparkle_set_appcast_url(url);
+    WinSparkleDllWrapper::GetInstance()->winsparkle_set_appcast_url(url);
 }
 
 
 void win_sparkle_set_app_details(const wchar_t *company_name, const wchar_t *app_name, const wchar_t *app_version)
 {
-    instance->winsparkle_set_app_details(company_name, app_name, app_version);
+    WinSparkleDllWrapper::GetInstance()->winsparkle_set_app_details(company_name, app_name, app_version);
 }
 
 
 void win_sparkle_cleanup()
 {
-    instance->winsparkle_cleanup();
+    WinSparkleDllWrapper::GetInstance()->winsparkle_cleanup();
 }
