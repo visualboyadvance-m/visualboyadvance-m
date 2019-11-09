@@ -198,7 +198,7 @@ static void init_check_for_updates()
     wxString version(vbam_version);
     //win_sparkle_set_appcast_url("https://github.com/visualboyadvance-m/visualboyadvance-m/data/appcast.xml");
     win_sparkle_set_appcast_url("https://raw.githubusercontent.com/visualboyadvance-m/visualboyadvance-m/update-checker/data/appcast.xml");
-    win_sparkle_set_app_details(L"visualboyadvance-m", L"VisualBoyAdvance-M", version.c_str());
+    win_sparkle_set_app_details(L"visualboyadvance-m", L"VisualBoyAdvance-M", version.wc_str());
     win_sparkle_init();
 #endif // __WXMSW__
 }
@@ -450,10 +450,6 @@ bool wxvbamApp::OnInit()
     if (isFullscreen && wxGetApp().pending_load != wxEmptyString)
 	frame->ShowFullScreen(isFullscreen);
     frame->Show(true);
-
-#if defined(__WXMSW__) && !defined(NO_ONLINEUPDATES)
-    winsparkle = new WinSparkleDllWrapper();
-#endif
 
 #ifndef NO_ONLINEUPDATES
     init_check_for_updates();
@@ -710,7 +706,6 @@ wxvbamApp::~wxvbamApp() {
 
 #if defined(__WXMSW__) && !defined(NO_ONLINEUPDATES)
     win_sparkle_cleanup();
-    delete winsparkle;
 #endif
 }
 

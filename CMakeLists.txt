@@ -141,7 +141,17 @@ endif()
 
 option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
 
-option(ENABLE_ONLINEUPDATES "Enable online update checks" ON)
+set(ONLINEUPDATES_DEFAULT OFF)
+
+if(WIN32 AND (AMD64 OR X86_32))
+
+# currently we do not turn this on until we do more work on this feature
+#
+#  set(ONLINEUPDATES_DEFAULT ON) # use winsparkle
+
+endif()
+
+option(ENABLE_ONLINEUPDATES "Enable online update checks" ${ONLINEUPDATES_DEFAULT})
 
 set(LTO_DEFAULT ON)
 
