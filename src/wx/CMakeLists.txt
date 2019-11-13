@@ -15,6 +15,8 @@ endif()
 
 include(VbamFunctions)
 
+set(VBAM_LIBS ${VBAMCORE_LIBS})
+
 if(WIN32)
     # not yet implemented
     option(ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" OFF)
@@ -46,6 +48,8 @@ if(ENABLE_OPENAL)
 	if(OPENAL_STATIC OR (WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)))
 		add_definitions(-DAL_LIBTYPE_STATIC)
 	endif()
+
+        list(APPEND VBAM_LIBS ${OPENAL_LIBRARY})
 else()
     add_definitions(-DNO_OAL)
 endif()
@@ -58,18 +62,15 @@ if(NOT ENABLE_XAUDIO2)
     add_definitions(-DNO_XAUDIO2)
 endif()
 
-if(NOT ENABLE_FAUDIO)
-    add_definitions(-DNO_FAUDIO)
-endif()
-
 if(NOT ENABLE_DIRECT3D)
     add_definitions(-DNO_D3D)
 endif()
 
-unset(FAUDIO_LIBS)
 if(ENABLE_FAUDIO)
     find_package(FAudio REQUIRED)
-    set(FAUDIO_LIBS FAudio)
+    list(APPEND VBAM_LIBS FAudio)
+else()
+    add_definitions(-DNO_FAUDIO)
 endif()
 
 # on unix we have to check for X11 before we overwrite all the compile/link
@@ -79,7 +80,7 @@ if(NOT WIN32 AND NOT APPLE)
 
     if(X11_X11_LIB AND X11_Xscreensaver_LIB)
         include_directories(${X11_INCLUDE_DIR})
-        set(EXTRA_X11_LIBS ${X11_X11_LIB} ${X11_Xscreensaver_LIB})
+        list(APPEND VBAM_LIBS ${X11_X11_LIB} ${X11_Xscreensaver_LIB})
         add_definitions(-DHAVE_XSS)
     endif()
 endif()
@@ -419,7 +420,7 @@ int main(int argc, char** argv) {
             include_directories(${GTK4_INCLUDE_DIRS})
             link_directories(${GTK4_LIBRARY_DIRS})
             add_compile_options(${GTK4_CFLAGS_OTHER})
-            set(GTK_LIBRARIES ${GTK4_LIBRARIES})
+            list(APPEND VBAM_LIBS ${GTK4_LIBRARIES})
         elseif(WX_USING_GTK3)
             pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
             if(NOT GTK3_INCLUDE_DIRS)
@@ -428,7 +429,7 @@ int main(int argc, char** argv) {
             include_directories(${GTK3_INCLUDE_DIRS})
             link_directories(${GTK3_LIBRARY_DIRS})
             add_compile_options(${GTK3_CFLAGS_OTHER})
-            set(GTK_LIBRARIES ${GTK3_LIBRARIES})
+            list(APPEND VBAM_LIBS ${GTK3_LIBRARIES})
         else()
             check_cxx_symbol_exists(__WXGTK20__ ${WX_CONFIG_H} WX_USING_GTK2)
             if(WX_USING_GTK2)
@@ -438,7 +439,7 @@ int main(int argc, char** argv) {
                     include_directories(${GTK2_INCLUDE_DIRS})
                     link_directories(${GTK2_LIBRARY_DIRS})
                     add_compile_options(${GTK2_CFLAGS_OTHER})
-                    set(GTK_LIBRARIES ${GTK2_LIBRARIES})
+                    list(APPEND VBAM_LIBS ${GTK2_LIBRARIES})
                 else()
                     # and if that fails, use the cmake module
                     find_package(GTK2 REQUIRED gtk)
@@ -447,7 +448,7 @@ int main(int argc, char** argv) {
                     endif()
                     include_directories(${GTK2_INCLUDE_DIRS})
                     add_compile_options(${GTK2_DEFINITIONS})
-                    set(GTK_LIBRARIES ${GTK2_LIBRARIES})
+                    list(APPEND VBAM_LIBS ${GTK2_LIBRARIES})
                 endif()
             else()
                 find_package(GTK REQUIRED gtk)
@@ -456,6 +457,7 @@ int main(int argc, char** argv) {
                 endif()
                 include_directories(${GTK_INCLUDE_DIRS})
                 add_compile_options(${GTK_DEFINITIONS})
+                list(APPEND VBAM_LIBS ${GTK_LIBRARIES})
             endif()
         endif()
     endif()
@@ -729,14 +731,14 @@ endif()
 
 if(WIN32)
     set(SRC_WX ${SRC_WX} wxvbam.rc dsound.cpp)
-    set(DIRECTX_LIBRARIES dxguid dsound ws2_32)
+    list(APPEND VBAM_LIBS dxguid dsound ws2_32)
     if(MSVC)
         # workaround for some symbols needed by static SDL2.lib
-        set(DIRECTX_LIBRARIES ${DIRECTX_LIBRARIES} imm32 version)
+        list(APPEND VBAM_LIBS imm32 version)
     endif()
     # not strictly directx, but win32-related
     if(ENABLE_DEBUGGER)
-        set(DIRECTX_LIBRARIES ${DIRECTX_LIBRARIES} wsock32)
+        list(APPEND VBAM_LIBS wsock32)
     endif()
 endif()
 
@@ -783,18 +785,17 @@ endif()
 
 target_link_libraries(
     visualboyadvance-m
-    ${VBAMCORE_LIBS}
     ${wxWidgets_LIBRARIES}
-    ${FFMPEG_LIBRARIES}
-    ${DIRECTX_LIBRARIES}
-    ${GTK_LIBRARIES}
-    ${OPENAL_LIBRARY}
-    ${FAUDIO_LIBS}
-    ${EXTRA_X11_LIBS}
+    ${VBAM_LIBS}
 )
 
 if(ENABLE_FFMPEG)
     join("${FFMPEG_LDFLAGS}" " " FFMPEG_LDFLAGS_STR)
+
+    target_link_libraries(
+        visualboyadvance-m
+        ${FFMPEG_LIBRARIES}
+    )
 
     set_target_properties(
         visualboyadvance-m
