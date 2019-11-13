@@ -13,6 +13,7 @@ matrix:
         - env: BUILD_ENV=ubuntu-trusty XVFB_RUN=1
           dist: trusty
         - env: BUILD_ENV=ubuntu-xenial XVFB_RUN=1
+        - env: BUILD_ENV=ubuntu-xenial-minimal INSTALLDEPS_ARGS="--no-openal --no-ffmpeg" XVFB_RUN=1
         - env: BUILD_ENV=ubuntu-xenial XVFB_RUN=1 CC=clang CXX=clang++
         - env: BUILD_ENV=mingw-w64
         - env: BUILD_ENV=mingw-w32
@@ -40,7 +41,7 @@ before_install:
         esac
     - |
         if [ "$BUILD_ENV" != libretro ]; then
-            ./installdeps $ARG
+            ./installdeps $INSTALLDEPS_ARGS $ARG
             DIR=build
         else
             DIR=src/libretro
