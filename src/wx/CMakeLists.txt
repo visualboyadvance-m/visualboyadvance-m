@@ -48,6 +48,7 @@ if(ENABLE_OPENAL)
 	endif()
 else()
     add_definitions(-DNO_OAL)
+    unset(OPENAL_LIBRARY CACHE)
 endif()
 
 if(APPLE)
