@@ -4,28 +4,26 @@
 // This is my own SDL-based joystick handler, since wxJoystick is brain-dead.
 // It's geared towards keyboard emulation
 
-// To use, create a wxSDLJoy object Add() the joysticks you want to monitor.
-// wxSDLJoy derives from wxTimer, so you can pause it with Stop() and
-// resume with Start().
+// To use, create a wxSDLJoy object Add() the joysticks you want to monitor and
+// Attach() the target window to receive events.
 //
 //   The target window will receive EVT_SDLJOY events of type wxSDLJoyEvent.
 
+#include <vector>
+#include <unordered_map>
 #include <wx/event.h>
 #include <wx/timer.h>
+#include <SDL_gamecontroller.h>
+#include "../common/contains.h"
 
-struct wxSDLJoyState;
+struct wxSDLJoyState {
+    SDL_GameController* dev = nullptr;
+    std::unordered_map<uint8_t, int8_t> axis;
+};
 
 class wxSDLJoy : public wxTimer {
 public:
-    // if analog, send events for all axis movement
-    // otherwise, only send events when values cross the 50% mark
-    // and max out values
-    wxSDLJoy(bool analog = false);
-    // but flag can be set later
-    void SetAnalog(bool analog = true)
-    {
-        digital = !analog;
-    };
+    wxSDLJoy();
     // send events to this handler
     // If NULL (default), send to window with keyboard focus
     wxEvtHandler* Attach(wxEvtHandler*);
@@ -33,43 +31,29 @@ public:
     // -1 == add all
     // If joy > # of joysticks, it is ignored
     // This will start polling if a valid joystick is selected
-    void Add(int joy = -1);
+    void Add(int8_t joy = -1);
     // remove a joystick from the polled sticks
     // -1 == remove all
     // If joy > # of joysticks, it is ignored
     // This will stop polling if all joysticks are disabled
-    void Remove(int joy = -1);
+    void Remove(int8_t joy = -1);
     // query if a stick is being polled
-    bool IsPolling(int joy);
-    // query # of joysticks
-    int GetNumJoysticks()
-    {
-        return njoy;
-    }
-    // query # of axes on given joystick
-    // 0 is returned if joy is invalid
-    int GetNumAxes(int joy);
-    // query # of hats on given joystick
-    // 0 is returned if joy is invalid
-    int GetNumHats(int joy);
-    // query # of buttons on given joystick
-    // 0 is returned if joy is invalid
-    int GetNumButtons(int joy);
+    bool IsPolling(uint8_t joy) { return contains(joystate, joy); }
 
     // true = currently rumbling, false = turn off rumbling
-    void SetRumble(bool b) { rumbling = b; }
+    void SetRumble(bool do_rumble);
+
+    void Poll();
 
     virtual ~wxSDLJoy();
 
 protected:
-    bool digital;
-    int njoy;
-    wxSDLJoyState* joystate;
-    wxEvtHandler* evthandler;
-    bool nosticks;
-    bool rumbling = false;
+    // used to continue rumbling on a timer
     void Notify();
-    uint16_t poll_time_ms = 50;
+private:
+    std::unordered_map<uint8_t, wxSDLJoyState> joystate;
+    wxEvtHandler* evthandler;
+    bool add_all = false, rumbling = false;
 };
 
 enum {
@@ -86,8 +70,8 @@ class wxSDLJoyEvent : public wxCommandEvent {
 
 public:
     // Default constructor
-    wxSDLJoyEvent(wxEventType commandType = wxEVT_NULL, int id = 0)
-        : wxCommandEvent(commandType, id)
+    wxSDLJoyEvent(wxEventType commandType = wxEVT_NULL)
+        : wxCommandEvent(commandType)
     {
     }
     // accessors

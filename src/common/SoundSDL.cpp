@@ -17,6 +17,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <SDL_events.h>
 #include "SoundSDL.h"
 #include "ConfigManager.h"
 #include "../gba/Globals.h"
@@ -147,6 +148,12 @@ bool SoundSDL::init(long sampleRate) {
     mutex          = SDL_CreateMutex();
     data_available = SDL_CreateSemaphore(0);
     data_read      = SDL_CreateSemaphore(1);
+
+    // turn off audio events because we are not processing them
+#if SDL_VERSION_ATLEAST(2, 0, 4)
+    SDL_EventState(SDL_AUDIODEVICEADDED,   SDL_IGNORE);
+    SDL_EventState(SDL_AUDIODEVICEREMOVED, SDL_IGNORE);
+#endif
 
     return initialized = true;
 }
