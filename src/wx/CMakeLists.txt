@@ -681,6 +681,7 @@ endif()
 set(
     HDR_WX
     wxvbam.h
+    wxlogdebug.h
     drawing.h
     filters.h
     ioregs.h
@@ -698,6 +699,8 @@ set(
     # from external source with minor modifications
     widgets/wx/checkedlistctrl.h
     ../common/version_cpp.h
+    ../common/range.hpp
+    ../common/contains.h
 )
 
 if(WIN32 AND (AMD64 OR X86_32) AND ENABLE_ONLINEUPDATES)

@@ -1,5 +1,6 @@
 #include "../common/ConfigManager.h"
 #include "wxvbam.h"
+#include <vector>
 #include <algorithm>
 #include <wx/display.h>
 #include "strutils.h"
@@ -151,22 +152,20 @@ wxJoyKeyBinding defkeys_keyboard[NUM_KEYS] = {
     WJKB(WXK_SPACE), WJKB(0), WJKB(0)
 };
 
-wxJoyKeyBinding defkeys_joystick[NUM_KEYS] = {
-    WJKB(0, WXJB_HAT_N, 1), WJKB(0, WXJB_HAT_S, 1), WJKB(0, WXJB_HAT_W, 1), WJKB(0, WXJB_HAT_E, 1),
-    WJKB(0, WXJB_BUTTON, 1), WJKB(1, WXJB_BUTTON, 1), WJKB(4, WXJB_BUTTON, 1), WJKB(5, WXJB_BUTTON, 1),
-    WJKB(6, WXJB_BUTTON, 1), WJKB(7, WXJB_BUTTON, 1),
-    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
-    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
-    WJKB(0), WJKB(0), WJKB(0)
-};
-
-wxJoyKeyBinding extrakeys_joystick[NUM_KEYS] = {
-    WJKB(1, WXJB_AXIS_MINUS, 1), WJKB(1, WXJB_AXIS_PLUS, 1), WJKB(0, WXJB_AXIS_MINUS, 1), WJKB(0, WXJB_AXIS_PLUS, 1),
-    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
-    WJKB(0), WJKB(0),
-    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
-    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
-    WJKB(0), WJKB(0), WJKB(0)
+std::vector<std::vector<wxJoyKeyBinding>> defkeys_joystick = {
+    { WJKB(11, WXJB_BUTTON, 1), WJKB(1, WXJB_AXIS_MINUS, 1), WJKB(3, WXJB_AXIS_MINUS, 1) },
+    { WJKB(12, WXJB_BUTTON, 1), WJKB(1, WXJB_AXIS_PLUS,  1), WJKB(3, WXJB_AXIS_PLUS,  1) },
+    { WJKB(13, WXJB_BUTTON, 1), WJKB(0, WXJB_AXIS_MINUS, 1), WJKB(2, WXJB_AXIS_MINUS, 1) },
+    { WJKB(14, WXJB_BUTTON, 1), WJKB(0, WXJB_AXIS_PLUS,  1), WJKB(2, WXJB_AXIS_PLUS,  1) },
+    { WJKB(0, WXJB_BUTTON, 1) },
+    { WJKB(1, WXJB_BUTTON, 1) },
+    { WJKB(2, WXJB_BUTTON, 1), WJKB( 9, WXJB_BUTTON, 1), WJKB(4, WXJB_AXIS_PLUS,  1) },
+    { WJKB(3, WXJB_BUTTON, 1), WJKB(10, WXJB_BUTTON, 1), WJKB(5, WXJB_AXIS_PLUS,  1) },
+    { WJKB(4, WXJB_BUTTON, 1) },
+    { WJKB(6, WXJB_BUTTON, 1) },
+    {}, {}, {}, {},
+    {}, {}, {}, {},
+    {}, {}, {}
 };
 
 wxAcceleratorEntry_v sys_accels;
@@ -372,12 +371,12 @@ bool opt_lt(const opt_desc& opt1, const opt_desc& opt2)
 void set_default_keys()
 {
     for (int i = 0; i < NUM_KEYS; i++) {
+        gopts.joykey_bindings[0][i].clear();
+
         if (defkeys_keyboard[i].key)
             gopts.joykey_bindings[0][i].push_back(defkeys_keyboard[i]);
-        if (defkeys_joystick[i].joy)
-            gopts.joykey_bindings[0][i].push_back(defkeys_joystick[i]);
-        if (extrakeys_joystick[i].joy)
-            gopts.joykey_bindings[0][i].push_back(extrakeys_joystick[i]);
+        for (auto bind : defkeys_joystick[i])
+            gopts.joykey_bindings[0][i].push_back(bind);
     }
 }
 

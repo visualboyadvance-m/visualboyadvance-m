@@ -955,13 +955,13 @@ void GameArea::Resume()
 void GameArea::OnIdle(wxIdleEvent& event)
 {
     wxString pl = wxGetApp().pending_load;
+    MainFrame* mf = wxGetApp().frame;
 
     if (pl.size()) {
         // sometimes this gets into a loop if LoadGame() called before
         // clearing pending_load.  weird.
         wxGetApp().pending_load = wxEmptyString;
         LoadGame(pl);
-        MainFrame* mf = wxGetApp().frame;
 
 #ifndef NO_DEBUGGER
         if (gdbBreakOnLoad)
@@ -1095,6 +1095,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
             CheckLinkConnection();
 
 #endif
+        mf->PollJoysticks();
     } else {
         was_paused = true;
 
@@ -1122,7 +1123,6 @@ void GameArea::OnIdle(wxIdleEvent& event)
             wxLogInfo(_("Error writing rewind state"));
         else {
             if (!num_rewind_states) {
-                MainFrame* mf = wxGetApp().frame;
                 mf->cmd_enable |= CMDEN_REWIND;
                 mf->enable_menus();
             }
