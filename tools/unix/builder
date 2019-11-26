@@ -6,6 +6,6 @@ export BUILD_ROOT="$HOME/vbam-build-unix"
 
 . "$(dirname "$0")/../builder/core.sh"
 
-table_line_append DIST_ARGS glib '--disable-libmount'
+table_line_append DIST_ARGS glib -Dlibmount=false
 
 builder "$@"

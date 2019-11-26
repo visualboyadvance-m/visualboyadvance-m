@@ -13,7 +13,7 @@ export CFLAGS="$CFLAGS${CFLAGS:+ }-static-libgcc -static-libstdc++ -static -lpth
 export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
 export OBJCXXFLAGS="$OBJCXXFLAGS${OBJCXXFLAGS:+ }-static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
 export LDFLAGS="$LDFLAGS${LDFLAGS:+ }-static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
-export LIBS="-lpthread -lm"
+export LIBS="-lpthread -lm -lole32"
 
 export UUID_LIBS="-luuid_mingw -luuid"
 
@@ -282,13 +282,14 @@ table_line_append DIST_PATCHES $libicu " \
     https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0007-actually-move-to-bin.mingw.patch \
     https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0008-data-install-dir.mingw.patch \
     https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0009-fix-bindir-in-config.mingw.patch \
-    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0010-msys-rules-for-makefiles.mingw.patch \
     https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0011-sbin-dir.mingw.patch \
     https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0012-libprefix.mingw.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0014-mingwize-pkgdata.mingw.patch \
     https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0015-debug.mingw.patch \
     https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0016-icu-pkgconfig.patch \
     https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0017-icu-config-versioning.patch \
     https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0021-mingw-static-libraries-without-s.patch \
+    https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-icu/0023-fix-twice-include-platform_make_fragment.patch \
 "
 
 table_line_append DIST_PRE_BUILD $libicu ":; sed -E -i.bak 's/@echo -n /@printf \"%s\" /g' config/mh-mingw*;"
@@ -346,7 +347,7 @@ table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg "--extra-ldflags='-Wl,-allow-m
 
 table_line_append DIST_ARGS gettext "--enable-threads=windows"
 
-table_line_append DIST_ARGS glib "--with-threads=posix --disable-libelf"
+table_line_append DIST_ARGS glib -Dforce_posix_threads=true
 
 table_line_append  DIST_PATCHES glib "\
     https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-glib2/0001-Update-g_fopen-g_open-and-g_creat-to-open-with-FILE_.patch \

@@ -85,7 +85,6 @@ table_line_append DIST_PATCHES m4 '-p0 https://raw.githubusercontent.com/macport
 # these are only applicable for cross-compiling to 32 bits
 if [ "$target_cpu" = i386 ]; then
     # some dists will not cross compile without a CONFIG_SITE
-    table_line_append DIST_ARGS glib '--host= --build='
     table_line_append DIST_ARGS pkgconfig '--host= --build='
     table_line_append DIST_ARGS docbook2x '--host= --build='
 

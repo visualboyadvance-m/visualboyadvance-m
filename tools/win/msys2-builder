@@ -140,6 +140,8 @@ EOF
     target_env_base 2>/dev/null || :
 }
 
+table_line_replace DIST_BUILD_OVERRIDES ninja "python configure.py && ninja -j $NUM_CPUS && cp -af ./ninja \"\$BUILD_ROOT/root/bin\""
+
 table_line_append DIST_PRE_BUILD c2man ":; \
     sed -i.bak '/test -d c:\\//,/^fi\$/d' Configure; \
 "

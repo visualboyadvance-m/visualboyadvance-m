@@ -119,7 +119,7 @@ DISTS=$DISTS'
     xorg-macros     https://www.x.org/archive//individual/util/util-macros-1.19.1.tar.bz2                       share/pkgconfig/xorg-macros.pc
     help2man        https://ftp.gnu.org/gnu/help2man/help2man-1.47.5.tar.xz                                     bin/help2man
     libiconv        https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz                                   lib/libiconv.a
-    gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-0.19.8.1.tar.xz                                    lib/libintl.a
+    gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-0.19.8.1.tar.xz                                  lib/libintl.a
     getopt          http://frodo.looijaard.name/system/files/software/getopt/getopt-1.1.6.tar.gz                bin/getopt
     gsed            http://ftp.gnu.org/gnu/sed/sed-4.4.tar.xz                                                   bin/sed
     bison           https://ftp.gnu.org/gnu/bison/bison-3.0.5.tar.xz                                            bin/bison
@@ -128,7 +128,7 @@ DISTS=$DISTS'
     flex            https://github.com/westes/flex/archive/e7d45afc6aeb49745f17d21ddba4848e0c0118fc.tar.gz      bin/flex
     xmlto           https://releases.pagure.org/xmlto/xmlto-0.0.28.tar.bz2                                      bin/xmlto
     gperf           http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz                                           bin/gperf
-    libicu          https://github.com/unicode-org/icu/releases/download/release-63-rc/icu4c-63rc-src.tgz       lib/libicud*t*.a
+    libicu          https://github.com/unicode-org/icu/releases/download/release-65-1/icu4c-65_1-src.tgz        lib/libicud*t*.a
     pkgconfig       https://pkgconfig.freedesktop.org/releases/pkg-config-0.29.2.tar.gz                         bin/pkg-config
     nasm            http://repo.or.cz/nasm.git/snapshot/53371ddd17b685f8880c22b8b698e494e0f1059b.tar.gz         bin/nasm
     yasm            http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz                             bin/yasm
@@ -172,7 +172,7 @@ DISTS=$DISTS'
     intltool        https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz                bin/intltoolize
     ninja           https://github.com/ninja-build/ninja/archive/v1.9.0.tar.gz                                  bin/ninja
     meson           https://github.com/mesonbuild/meson/releases/download/0.51.2/meson-0.51.2.tar.gz            bin/meson
-    glib            https://github.com/GNOME/glib/archive/2.58.1.tar.gz                                         lib/libglib-2.0.a
+    glib            https://github.com/GNOME/glib/archive/2.62.2.tar.gz                                         lib/libglib-2.0.a
     libgpg-error    https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.36.tar.bz2                     lib/libgpg-error.a
     libgcrypt       https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.5.tar.bz2                          lib/libgcrypt.a
     libsecret       http://ftp.gnome.org/pub/gnome/sources/libsecret/0.19/libsecret-0.19.1.tar.xz               lib/libsecret-1.a
@@ -266,7 +266,6 @@ DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     python2         autoreconf
     python3         autoreconf
     libxml2-python  python
-    glib            autoreconf
     graphviz        autoreconf
     docbook2x       autoreconf
     libvorbis       autoreconf
@@ -374,7 +373,6 @@ DIST_ARGS="$DIST_ARGS
     graphviz    --disable-ltdl --without-x --disable-swig CFLAGS=\"-include \$PWD/declspec.h \$CFLAGS\"
     python2     --with-ensurepip --with-system-expat
     python3     --with-ensurepip --with-system-expat
-    glib        --with-libiconv=gnu
     bakefile    --enable-shared
     XML-Parser  EXPATINCPATH=\"\$BUILD_ROOT/root/include\" EXPATLIBPATH=\"\$BUILD_ROOT/root/lib\"
     doxygen     -DICONV_ACCEPTS_NONCONST_INPUT:BOOL=FALSE -DICONV_ACCEPTS_CONST_INPUT:BOOL=TRUE
@@ -695,7 +693,7 @@ msys2_install_core_deps() {
     done
 
     # install
-    pacman --noconfirm --needed -S make tar patch diffutils ccache perl msys2-w32api-headers msys2-runtime-devel gcc gcc-libs mpfr windows-default-manifest python python2 pass "$@"
+    pacman --noconfirm --needed -S make tar patch diffutils ccache perl msys2-w32api-headers msys2-runtime-devel gcc gcc-libs mpfr windows-default-manifest python python2 pass ninja "$@"
 
     # make sure msys perl takes precedence over mingw perl if the latter is installed
     mkdir -p "$BUILD_ROOT/root/bin"
@@ -1679,12 +1677,21 @@ install_dist() {
 
     # if there is an extra prefix, like e.g. 'msys64' on msys2 before 'usr/',
     # remove it
-    if ([ "$(list_length destdir/*)" -eq 1 ] && [ ! -d destdir${prefix} ]) || \
+    if ([ "$(list_length destdir/*)" -eq 1 ] && [ ! -d "destdir${prefix}" ]) || \
        ([ "$(list_length destdir/*)" -eq 2 ] && [ "$(find destdir${prefix} -type f 2>/dev/null | wc -l)" -eq 0 ]); then
-        mv destdir/${prefix}/* tmp-usr
+        mv "destdir/${prefix}"/* tmp-usr
         rm -rf destdir/*
-        mkdir -p destdir${prefix%/*}
-        mv tmp-usr destdir${prefix}
+        mkdir -p "destdir${prefix%/*}"
+        mv tmp-usr "destdir${prefix}"
+    fi
+
+    # if there is no prefix in the destdir, create it
+    if [ ! -d "destdir${prefix}" ]; then
+        find destdir -maxdepth 1 -mindepth 1 | \
+        while read -r installed; do
+            mkdir -p "destdir${prefix}"
+            mv "$installed" "destdir${prefix}"
+        done
     fi
 
     # move libs out of platforms dirs like lib/x86_64-linux-gnu/ and lib64/
