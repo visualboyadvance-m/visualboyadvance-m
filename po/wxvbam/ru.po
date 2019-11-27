@@ -7,7 +7,7 @@
 # Alexey Ter <lexalamer@mail.ru>, 2016
 # Anton Fedenko <gang296@mail.ru>, 2015
 # Artem Abramov <aabramovrussia@yandex.com>, 2015
-# dartraiden, 2015
+# 85f5ad14c5f803c69d22f4aeb4ef6a7e, 2015
 # tjtxtfh <inactive+tjtxtfh@transifex.com>, 2015
 # Алексей Гаврилов <flexxx_seva@mail.ru>, 2018
 # Михаил Михаил <sined116@gmail.com>, 2016
@@ -16,7 +16,7 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-06 19:39-0300\n"
-"PO-Revision-Date: 2019-09-10 12:41+0000\n"
+"PO-Revision-Date: 2019-11-23 00:36+0000\n"
 "Last-Translator: bgK\n"
 "Language-Team: Russian (http://www.transifex.com/bgk/vba-m/language/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -2357,19 +2357,19 @@ msgstr "Основные"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:26
 msgid "Check for updates:"
-msgstr "Проверить обновления"
+msgstr ""
 
 #: ../src/wx/xrc/GeneralConfig.xrc:33
 msgid "&Never"
-msgstr "Никогда"
+msgstr ""
 
 #: ../src/wx/xrc/GeneralConfig.xrc:42
 msgid "&Daily"
-msgstr "Ежедневно"
+msgstr ""
 
 #: ../src/wx/xrc/GeneralConfig.xrc:50
 msgid "&Weekly"
-msgstr "Еженедельно"
+msgstr ""
 
 #: ../src/wx/xrc/GeneralConfig.xrc:64
 msgid "Screenshot Format:"

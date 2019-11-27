@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-06 19:39-0300\n"
-"PO-Revision-Date: 2019-10-10 23:36+0000\n"
+"PO-Revision-Date: 2019-11-27 22:18+0000\n"
 "Last-Translator: Damian Drakon <dragon1590@gmail.com>\n"
 "Language-Team: Polish (Poland) (http://www.transifex.com/bgk/vba-m/language/pl_PL/)\n"
 "MIME-Version: 1.0\n"
@@ -351,7 +351,7 @@ msgstr "Pliki zapisu gry emulatora VisualBoyAdvance|*.sgm"
 #: ../src/wx/cmdevents.cpp:1775
 #, c-format
 msgid "Current state slot #%d"
-msgstr ""
+msgstr "Bieżące gniazdo zapisu stanu gry #%d"
 
 #: ../src/wx/cmdevents.cpp:2044
 msgid "Sound enabled"
@@ -2350,19 +2350,19 @@ msgstr "Ogólne"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:26
 msgid "Check for updates:"
-msgstr "Sprawdź dostępność aktualizacji:"
+msgstr ""
 
 #: ../src/wx/xrc/GeneralConfig.xrc:33
 msgid "&Never"
-msgstr "Nigdy"
+msgstr ""
 
 #: ../src/wx/xrc/GeneralConfig.xrc:42
 msgid "&Daily"
-msgstr "Codziennie"
+msgstr ""
 
 #: ../src/wx/xrc/GeneralConfig.xrc:50
 msgid "&Weekly"
-msgstr "Co tydzień"
+msgstr ""
 
 #: ../src/wx/xrc/GeneralConfig.xrc:64
 msgid "Screenshot Format:"
@@ -2959,7 +2959,7 @@ msgstr "Odtwarzanie"
 
 #: ../src/wx/xrc/MainMenu.xrc:208
 msgid "&Quit"
-msgstr ""
+msgstr "Wyjdź"
 
 #: ../src/wx/xrc/MainMenu.xrc:212
 msgid "&Emulation"
@@ -3096,11 +3096,11 @@ msgstr "6x"
 
 #: ../src/wx/xrc/MainMenu.xrc:339
 msgid "Change pixel filter"
-msgstr ""
+msgstr "Zmień filtr pikseli"
 
 #: ../src/wx/xrc/MainMenu.xrc:342
 msgid "Change interframe blending"
-msgstr ""
+msgstr "Zmień mieszanie międzyklatkowe"
 
 #: ../src/wx/xrc/MainMenu.xrc:345
 msgid "&Retain aspect ratio"
@@ -3108,7 +3108,7 @@ msgstr "Zachowaj proporcje"
 
 #: ../src/wx/xrc/MainMenu.xrc:349
 msgid "Enable MMX"
-msgstr ""
+msgstr "Włącz MMX"
 
 #: ../src/wx/xrc/MainMenu.xrc:354
 msgid "&Bilinear filter"

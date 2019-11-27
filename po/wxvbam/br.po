@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-06 19:39-0300\n"
-"PO-Revision-Date: 2019-10-18 15:25+0000\n"
+"PO-Revision-Date: 2019-11-23 10:17+0000\n"
 "Last-Translator: Irriep Nala Novram <allannkorh@yahoo.fr>\n"
 "Language-Team: Breton (http://www.transifex.com/bgk/vba-m/language/br/)\n"
 "MIME-Version: 1.0\n"
@@ -2354,15 +2354,15 @@ msgstr "Gwiriañ war-lerc'h hizivadurioù:"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:33
 msgid "&Never"
-msgstr "Morse"
+msgstr "&Morse"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:42
 msgid "&Daily"
-msgstr "Bemdez"
+msgstr "Bem&dez"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:50
 msgid "&Weekly"
-msgstr "Bep-sizhun"
+msgstr "&Bep-sizhun"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:64
 msgid "Screenshot Format:"

@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-06 19:39-0300\n"
-"PO-Revision-Date: 2019-09-14 15:08+0000\n"
+"PO-Revision-Date: 2019-11-23 03:03+0000\n"
 "Last-Translator: Jeremy Belpois <jeremy.belpois.einstein@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/bgk/vba-m/language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -2353,19 +2353,19 @@ msgstr "Umum"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:26
 msgid "Check for updates:"
-msgstr "Cek pembaruan"
+msgstr "Periksa pembaruan:"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:33
 msgid "&Never"
-msgstr "&Tidak pernah"
+msgstr "&Tidak Pernah"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:42
 msgid "&Daily"
-msgstr "&Setiap hari"
+msgstr "& Harian"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:50
 msgid "&Weekly"
-msgstr "&Setiap minggu"
+msgstr "&Mingguan"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:64
 msgid "Screenshot Format:"

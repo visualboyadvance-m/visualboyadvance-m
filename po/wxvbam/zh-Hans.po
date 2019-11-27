@@ -4,6 +4,7 @@
 # 
 # Translators:
 # b t <babypandas886@gmail.com>, 2015
+# horcus Yuan <1257425379@qq.com>, 2019
 # pngai <pngai@ymail.com>, 2016
 # pngai <pngai@ymail.com>, 2016
 # Rythm Tse <ksusix@gmail.com>, 2016
@@ -16,7 +17,7 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-06 19:39-0300\n"
-"PO-Revision-Date: 2019-10-07 15:24+0000\n"
+"PO-Revision-Date: 2019-11-27 03:07+0000\n"
 "Last-Translator: 天绝星 <c.cejhb@gmail.com>\n"
 "Language-Team: Chinese Simplified (http://www.transifex.com/bgk/vba-m/language/zh-Hans/)\n"
 "MIME-Version: 1.0\n"
@@ -2357,7 +2358,7 @@ msgstr "通用"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:26
 msgid "Check for updates:"
-msgstr "检测更新:"
+msgstr "检查更新:"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:33
 msgid "&Never"

@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-06 19:39-0300\n"
-"PO-Revision-Date: 2019-10-07 15:25+0000\n"
+"PO-Revision-Date: 2019-11-27 03:06+0000\n"
 "Last-Translator: 天绝星 <c.cejhb@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/bgk/vba-m/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -2356,7 +2356,7 @@ msgstr "通用"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:26
 msgid "Check for updates:"
-msgstr "检测更新:"
+msgstr "检查更新:"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:33
 msgid "&Never"

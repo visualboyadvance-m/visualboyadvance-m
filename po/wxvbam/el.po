@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-06 19:39-0300\n"
-"PO-Revision-Date: 2019-09-10 12:41+0000\n"
+"PO-Revision-Date: 2019-11-23 00:36+0000\n"
 "Last-Translator: bgK\n"
 "Language-Team: Greek (http://www.transifex.com/bgk/vba-m/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -2350,19 +2350,19 @@ msgstr "Γενικά"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:26
 msgid "Check for updates:"
-msgstr "Έλεγχος για ενημερώσεις:"
+msgstr ""
 
 #: ../src/wx/xrc/GeneralConfig.xrc:33
 msgid "&Never"
-msgstr "Ποτέ"
+msgstr ""
 
 #: ../src/wx/xrc/GeneralConfig.xrc:42
 msgid "&Daily"
-msgstr "Ημερησίως"
+msgstr ""
 
 #: ../src/wx/xrc/GeneralConfig.xrc:50
 msgid "&Weekly"
-msgstr "Εβδομαδιαία"
+msgstr ""
 
 #: ../src/wx/xrc/GeneralConfig.xrc:64
 msgid "Screenshot Format:"

@@ -3,14 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Marco Ruhl <marcoruhl@hotmail.de>, 2019
+# Overtry <marcoruhl@hotmail.de>, 2019
+# Overtry <marcoruhl@hotmail.de>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-06 19:39-0300\n"
-"PO-Revision-Date: 2019-10-27 00:34+0000\n"
-"Last-Translator: Marco Ruhl <marcoruhl@hotmail.de>\n"
+"PO-Revision-Date: 2019-11-23 21:36+0000\n"
+"Last-Translator: Overtry <marcoruhl@hotmail.de>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/bgk/vba-m/language/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -109,15 +110,15 @@ msgstr "ROM+MBC3+RAM"
 
 #: ../src/wx/cmdevents.cpp:644
 msgid "ROM+MBC3+RAM+BATT"
-msgstr ""
+msgstr "ROM+MBC3+RAM+BATT"
 
 #: ../src/wx/cmdevents.cpp:648
 msgid "ROM+MBC5"
-msgstr ""
+msgstr "ROM+MBC5"
 
 #: ../src/wx/cmdevents.cpp:652
 msgid "ROM+MBC5+RAM"
-msgstr ""
+msgstr "ROM+MBC5+RAM"
 
 #: ../src/wx/cmdevents.cpp:656
 msgid "ROM+MBC5+RAM+BATT"
