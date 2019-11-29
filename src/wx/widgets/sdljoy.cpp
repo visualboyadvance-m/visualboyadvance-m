@@ -147,9 +147,18 @@ void wxSDLJoy::Remove(int8_t joy_n)
     add_all = false;
 
     if (joy_n < 0) {
+        for (auto joy : joystate) {
+            if (auto dev = std::get<1>(joy).dev)
+                SDL_GameControllerClose(dev);
+        }
+
         joystate.clear();
+
         return;
     }
+
+    if (auto dev = joystate[joy_n].dev)
+        SDL_GameControllerClose(dev);
 
     joystate.erase(joy_n);
 }
