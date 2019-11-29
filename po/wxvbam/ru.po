@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-06 19:39-0300\n"
-"PO-Revision-Date: 2019-11-23 00:36+0000\n"
+"POT-Creation-Date: 2019-11-22 23:25+0000\n"
+"PO-Revision-Date: 2019-11-28 01:25+0000\n"
 "Last-Translator: bgK\n"
 "Language-Team: Russian (http://www.transifex.com/bgk/vba-m/language/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -170,12 +170,12 @@ msgstr "ROM+HuC-3"
 msgid "ROM+HuC-1"
 msgstr "ROM+HuC-1"
 
-#: ../src/wx/cmdevents.cpp:746 ../src/wx/guiinit.cpp:1829
+#: ../src/wx/cmdevents.cpp:746 ../src/wx/guiinit.cpp:1839
 #: ../src/wx/xrc/DisplayConfig.xrc:85 ../src/wx/xrc/DisplayConfig.xrc:135
 #: ../src/wx/xrc/DisplayConfig.xrc:221
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:32
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:204
-#: ../src/wx/xrc/GeneralConfig.xrc:152 ../src/wx/xrc/SoundConfig.xrc:219
+#: ../src/wx/xrc/GeneralConfig.xrc:114 ../src/wx/xrc/SoundConfig.xrc:219
 #: ../src/wx/xrc/SoundConfig.xrc:309 ../src/wx/xrc/SpeedupConfig.xrc:45
 #: ../src/wx/xrc/SpeedupConfig.xrc:120
 msgid "None"
@@ -208,7 +208,7 @@ msgstr "Импорт файла аппаратного сохранения ун
 msgid "Confirm import"
 msgstr "Подтвердить импортирование"
 
-#: ../src/wx/cmdevents.cpp:898 ../src/wx/panel.cpp:344
+#: ../src/wx/cmdevents.cpp:898 ../src/wx/panel.cpp:350
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Загружено аппаратное сохранение %s"
@@ -291,7 +291,7 @@ msgstr "Ошибка загрузки файла снапшота %s"
 msgid "Wrote battery %s"
 msgstr "Записано аппаратное сохранение %s"
 
-#: ../src/wx/cmdevents.cpp:1091 ../src/wx/panel.cpp:651
+#: ../src/wx/cmdevents.cpp:1091 ../src/wx/panel.cpp:656
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Ошибка записи аппаратного сохранения %s"
@@ -409,18 +409,18 @@ msgstr ""
 msgid "Using interframe blending #%d"
 msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2747
+#: ../src/wx/cmdevents.cpp:2752
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Эмулятор Nintendo GameBoy (+Color+Advance)"
 
-#: ../src/wx/cmdevents.cpp:2748
+#: ../src/wx/cmdevents.cpp:2753
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Защищено авторскими правами (C) 1999-2003 Forgotten\nЗащищено авторскими правами (C) 2004-2006 VBA development team\nЗащищено авторскими правами (C) 2007-2017 VBA-M development team"
 
-#: ../src/wx/cmdevents.cpp:2749
+#: ../src/wx/cmdevents.cpp:2754
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -436,11 +436,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Эта программа бесплатна: Вы можете её распространять\nи/или изменять под лицензией GNU General Public License,\nопубликованной Free Software Foundation, версии 2\nили (на Ваш выбор) любой последующей версии.\n\nЭта программа распространяется в надежде быть полезной,\nно БЕЗ КАКОЙ-ЛИБО ГАРАНТИИ. Для подробностей\nсмотрите лицензию GNU General Public License.\n\nВы получите копию лицензии вместе с программой\nили смотрите по ссылке http://www.gnu.org/licenses ."
 
-#: ../src/wx/cmdevents.cpp:3011
+#: ../src/wx/cmdevents.cpp:3018
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LAN-соединение уже активно. Отключите соединение для разрыва подключения."
 
-#: ../src/wx/cmdevents.cpp:3017
+#: ../src/wx/cmdevents.cpp:3024
 msgid "Network is not supported in local mode."
 msgstr "Сеть не поддерживается в локальном режиме."
 
@@ -558,7 +558,7 @@ msgstr "Выбрать файл чит-кодов"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Файлы чит-кодов VBA (*.clt)|*.clt|Файлы чит-кодов CHT (*.cht)|*.cht"
 
-#: ../src/wx/guiinit.cpp:239 ../src/wx/panel.cpp:401
+#: ../src/wx/guiinit.cpp:239 ../src/wx/panel.cpp:407
 msgid "Loaded cheats"
 msgstr "Загружен файл чит-кодов"
 
@@ -644,122 +644,122 @@ msgstr "%d кадров = %.2f мс"
 msgid "Default device"
 msgstr "Устройство по умолчанию"
 
-#: ../src/wx/guiinit.cpp:1709
+#: ../src/wx/guiinit.cpp:1719
 msgid "Desktop mode"
 msgstr "Режим рабочего стола"
 
-#: ../src/wx/guiinit.cpp:1716
+#: ../src/wx/guiinit.cpp:1726
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %d бит @ %d Гц"
 
-#: ../src/wx/guiinit.cpp:1870
+#: ../src/wx/guiinit.cpp:1880
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Не найдено подходящих rpi-плагинов в %s"
 
-#: ../src/wx/guiinit.cpp:1890 ../src/wx/xrc/DisplayConfig.xrc:107
+#: ../src/wx/guiinit.cpp:1900 ../src/wx/xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "Плагин"
 
-#: ../src/wx/guiinit.cpp:1918
+#: ../src/wx/guiinit.cpp:1928
 msgid "Please select a plugin or a different filter"
 msgstr "Пожалуйста, выберите плагин или другой фильтр"
 
-#: ../src/wx/guiinit.cpp:1919
+#: ../src/wx/guiinit.cpp:1929
 msgid "Plugin selection error"
 msgstr "Ошибка выбора плагина"
 
-#: ../src/wx/guiinit.cpp:2118
+#: ../src/wx/guiinit.cpp:2128
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr "Будут удалены все пользовательские сочетания клавиш. Вы уверены?"
 
-#: ../src/wx/guiinit.cpp:2118
+#: ../src/wx/guiinit.cpp:2128
 msgid "Confirm"
 msgstr "Подтвердить"
 
-#: ../src/wx/guiinit.cpp:2712
+#: ../src/wx/guiinit.cpp:2722
 msgid "Main icon not found"
 msgstr "Главный значок не найден"
 
-#: ../src/wx/guiinit.cpp:2722
+#: ../src/wx/guiinit.cpp:2732
 msgid "Browse"
 msgstr ""
 
-#: ../src/wx/guiinit.cpp:2736
+#: ../src/wx/guiinit.cpp:2746
 msgid "Main display panel not found"
 msgstr "Главная панель экрана не найдена"
 
-#: ../src/wx/guiinit.cpp:2875
+#: ../src/wx/guiinit.cpp:2895
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Повторяющееся сочетание клавиш: %s для %s и %s; оставлено первое"
 
-#: ../src/wx/guiinit.cpp:2889
+#: ../src/wx/guiinit.cpp:2909
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Сочетание клавиш %s для %s перезаписывает %s ; оставлено для меню"
 
-#: ../src/wx/guiinit.cpp:3013
+#: ../src/wx/guiinit.cpp:3039
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Неверный пункт меню %s удалён"
 
-#: ../src/wx/guiinit.cpp:3208
+#: ../src/wx/guiinit.cpp:3234
 msgid "Code"
 msgstr "Код"
 
-#: ../src/wx/guiinit.cpp:3217
+#: ../src/wx/guiinit.cpp:3243
 msgid "Description"
 msgstr "Описание"
 
-#: ../src/wx/guiinit.cpp:3291 ../src/wx/xrc/CheatAdd.xrc:31
+#: ../src/wx/guiinit.cpp:3317 ../src/wx/xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Адрес"
 
-#: ../src/wx/guiinit.cpp:3292
+#: ../src/wx/guiinit.cpp:3318
 msgid "Old Value"
 msgstr "Старое значение"
 
-#: ../src/wx/guiinit.cpp:3293
+#: ../src/wx/guiinit.cpp:3319
 msgid "New Value"
 msgstr "Новое значение"
 
-#: ../src/wx/guiinit.cpp:3836
+#: ../src/wx/guiinit.cpp:3839
 msgid "Menu commands"
 msgstr "Команды меню"
 
-#: ../src/wx/guiinit.cpp:3859
+#: ../src/wx/guiinit.cpp:3862
 msgid "Other commands"
 msgstr "Другие команды"
 
-#: ../src/wx/guiinit.cpp:3970
+#: ../src/wx/guiinit.cpp:3973
 msgid "JoyBus host invalid; disabling"
 msgstr "Хост JoyBus неверен; отключено"
 
-#: ../src/wx/opts.cpp:555 ../src/wx/opts.cpp:851
+#: ../src/wx/opts.cpp:548 ../src/wx/opts.cpp:849
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "Неверное значение %s для параметра %s; верные значения %s%s%s"
 
-#: ../src/wx/opts.cpp:572 ../src/wx/opts.cpp:863
+#: ../src/wx/opts.cpp:565 ../src/wx/opts.cpp:861
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Неверное значение %d для параметра %s; верные значения %d - %d"
 
-#: ../src/wx/opts.cpp:579 ../src/wx/opts.cpp:588 ../src/wx/opts.cpp:871
-#: ../src/wx/opts.cpp:879
+#: ../src/wx/opts.cpp:572 ../src/wx/opts.cpp:581 ../src/wx/opts.cpp:869
+#: ../src/wx/opts.cpp:877
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Неверное значение %f для %s; верные значения: %f - %f"
 
-#: ../src/wx/opts.cpp:648 ../src/wx/opts.cpp:669 ../src/wx/opts.cpp:948
-#: ../src/wx/opts.cpp:974
+#: ../src/wx/opts.cpp:641 ../src/wx/opts.cpp:662 ../src/wx/opts.cpp:946
+#: ../src/wx/opts.cpp:972
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Неверно назначена клавиша %s для %s"
 
-#: ../src/wx/opts.cpp:834
+#: ../src/wx/opts.cpp:832
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Неверное значение параметра %s - %s проигнорировано"
@@ -778,7 +778,7 @@ msgstr "Проблема загрузки файла"
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Невозможно загрузить Game Boy ROM-файл %s"
 
-#: ../src/wx/panel.cpp:185 ../src/wx/panel.cpp:275
+#: ../src/wx/panel.cpp:185 ../src/wx/panel.cpp:281
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Невозможно загрузить файл BIOS %s"
@@ -788,103 +788,103 @@ msgstr "Невозможно загрузить файл BIOS %s"
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Невозможно загрузить Game Boy Advance ROM-файл %s"
 
-#: ../src/wx/panel.cpp:434
+#: ../src/wx/panel.cpp:439
 msgid " player "
 msgstr "игрок"
 
-#: ../src/wx/panel.cpp:599
+#: ../src/wx/panel.cpp:604
 #, c-format
 msgid "Loaded state %s"
 msgstr "Загружено сохранение %s"
 
-#: ../src/wx/panel.cpp:599
+#: ../src/wx/panel.cpp:604
 #, c-format
 msgid "Error loading state %s"
 msgstr "Ошибка загрузки сохранения %s"
 
-#: ../src/wx/panel.cpp:623
+#: ../src/wx/panel.cpp:628
 #, c-format
 msgid "Saved state %s"
 msgstr "Сохранение игры %s"
 
-#: ../src/wx/panel.cpp:623
+#: ../src/wx/panel.cpp:628
 #, c-format
 msgid "Error saving state %s"
 msgstr "Ошибка сохранения игры %s"
 
-#: ../src/wx/panel.cpp:827
+#: ../src/wx/panel.cpp:832
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "Полноэкранный режим %dx%d-%d@%d не поддерживается; поиск другого"
 
-#: ../src/wx/panel.cpp:865
+#: ../src/wx/panel.cpp:870
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "Полноэкранный режим %dx%d-%d@%d не поддерживается"
 
-#: ../src/wx/panel.cpp:870
+#: ../src/wx/panel.cpp:875
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Верный режим: %dx%d-%d@%d"
 
-#: ../src/wx/panel.cpp:878
+#: ../src/wx/panel.cpp:883
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "Выбран режим %dx%d-%d@%d"
 
-#: ../src/wx/panel.cpp:882
+#: ../src/wx/panel.cpp:887
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Не удалось сменить режим на %dx%d-%d@%d"
 
-#: ../src/wx/panel.cpp:966
+#: ../src/wx/panel.cpp:971
 msgid "Not a valid GBA cartridge"
 msgstr "Неверный GBA-картридж"
 
-#: ../src/wx/panel.cpp:1107
+#: ../src/wx/panel.cpp:1113
 msgid "No memory for rewinding"
 msgstr "Нет памяти для перемотки назад"
 
-#: ../src/wx/panel.cpp:1117
+#: ../src/wx/panel.cpp:1123
 msgid "Error writing rewind state"
 msgstr "Ошибка записи состояния перемотки"
 
-#: ../src/wx/panel.cpp:2329
+#: ../src/wx/panel.cpp:2334
 msgid "memory allocation error"
 msgstr "ошибка выделения памяти"
 
-#: ../src/wx/panel.cpp:2332
+#: ../src/wx/panel.cpp:2337
 msgid "error initializing codec"
 msgstr "ошибка инициализации кодека"
 
-#: ../src/wx/panel.cpp:2335
+#: ../src/wx/panel.cpp:2340
 msgid "error writing to output file"
 msgstr "ошибка записи в файл вывода"
 
-#: ../src/wx/panel.cpp:2338
+#: ../src/wx/panel.cpp:2343
 msgid "can't guess output format from file name"
 msgstr "невозможно определить формат вывода по имени файла"
 
-#: ../src/wx/panel.cpp:2343
+#: ../src/wx/panel.cpp:2348
 msgid "programming error; aborting!"
 msgstr "ошибка в коде программы; отмена записи!"
 
-#: ../src/wx/panel.cpp:2360 ../src/wx/panel.cpp:2391
+#: ../src/wx/panel.cpp:2365 ../src/wx/panel.cpp:2396
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Невозможно начать запись в %s (%s)"
 
-#: ../src/wx/panel.cpp:2419
+#: ../src/wx/panel.cpp:2424
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Ошибка аудио/видеозаписи (%s); отменено"
 
-#: ../src/wx/panel.cpp:2425
+#: ../src/wx/panel.cpp:2430
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Ошибка аудиозаписи (%s); отменено"
 
-#: ../src/wx/panel.cpp:2435
+#: ../src/wx/panel.cpp:2440
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Ошибка видеозаписи (%s); отменено"
@@ -929,37 +929,37 @@ msgstr "%d%%(%d, %d fps)"
 msgid "%d%%"
 msgstr "%d%%"
 
-#: ../src/wx/sys.cpp:757 ../src/wx/xrc/GBPrinter.xrc:65
+#: ../src/wx/sys.cpp:760 ../src/wx/xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "&Отменить"
 
-#: ../src/wx/sys.cpp:791
+#: ../src/wx/sys.cpp:794
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "Файлы изображений (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: ../src/wx/sys.cpp:800
+#: ../src/wx/sys.cpp:803
 msgid "Save printer image to"
 msgstr "Сохранение распечатки в файл"
 
-#: ../src/wx/sys.cpp:814 ../src/wx/sys.cpp:997
+#: ../src/wx/sys.cpp:817 ../src/wx/sys.cpp:1000
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "Вывод принтера записан в %s"
 
-#: ../src/wx/sys.cpp:819 ../src/wx/sys.cpp:890
+#: ../src/wx/sys.cpp:822 ../src/wx/sys.cpp:893
 msgid "&Close"
 msgstr "&Закрыть"
 
-#: ../src/wx/sys.cpp:885
+#: ../src/wx/sys.cpp:888
 msgid "Printed"
 msgstr "Распечатано"
 
-#: ../src/wx/sys.cpp:1187
+#: ../src/wx/sys.cpp:1190
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "Ошибка открытия псевдотерминала TTY: %s"
 
-#: ../src/wx/sys.cpp:1286
+#: ../src/wx/sys.cpp:1289
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "Ошибка настройки серверного сокета (%d)"
@@ -1052,75 +1052,75 @@ msgstr "G:"
 msgid "B:"
 msgstr "B:"
 
-#: ../src/wx/wxvbam.cpp:203
+#: ../src/wx/wxvbam.cpp:222
 msgid "visualboyadvance-m"
 msgstr "visualboyadvance-m"
 
-#: ../src/wx/wxvbam.cpp:417
+#: ../src/wx/wxvbam.cpp:436
 msgid "Could not create main window"
 msgstr "Невозможно создать главное окно"
 
-#: ../src/wx/wxvbam.cpp:484
+#: ../src/wx/wxvbam.cpp:507
 msgid "Save built-in XRC file and exit"
 msgstr "Сохранить встроенный XRC-файл и выйти"
 
-#: ../src/wx/wxvbam.cpp:487
+#: ../src/wx/wxvbam.cpp:510
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Сохранить встроенный файл vba-over.ini и выйти"
 
-#: ../src/wx/wxvbam.cpp:490
+#: ../src/wx/wxvbam.cpp:513
 msgid "Print configuration path and exit"
 msgstr "Напечатать путь к конфигурации и выйти"
 
-#: ../src/wx/wxvbam.cpp:493
+#: ../src/wx/wxvbam.cpp:516
 msgid "Start in full-screen mode"
 msgstr "Запускать в полноэкранном режиме"
 
-#: ../src/wx/wxvbam.cpp:497
+#: ../src/wx/wxvbam.cpp:520
 msgid "Delete shared link state first, if it exists"
 msgstr "Удалить файл состояния подключения, если он существует"
 
-#: ../src/wx/wxvbam.cpp:504
+#: ../src/wx/wxvbam.cpp:527
 msgid "List all settable options and exit"
 msgstr "Вывести все изменяемые параметры и выйти"
 
-#: ../src/wx/wxvbam.cpp:507
+#: ../src/wx/wxvbam.cpp:530
 msgid "ROM file"
 msgstr "ROM-файл"
 
-#: ../src/wx/wxvbam.cpp:509
+#: ../src/wx/wxvbam.cpp:532
 msgid "<config>=<value>"
 msgstr "<параметр>=<значение>"
 
-#: ../src/wx/wxvbam.cpp:540
+#: ../src/wx/wxvbam.cpp:563
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr "Ошибка конфигурации: не удалось найти встроенный xrc-файл"
 
-#: ../src/wx/wxvbam.cpp:548
+#: ../src/wx/wxvbam.cpp:571
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Запись встроенного файла конфигурации в %s.\nДля переназначения параметров удалите из файла все разделы, кроме изменённых. Правильные названия разделов можно найти в файлах .xrc или .xrs в папке:"
 
-#: ../src/wx/wxvbam.cpp:563
+#: ../src/wx/wxvbam.cpp:586
 msgid "Configuration is read from, in order:"
 msgstr "Конфигурация прочитана из файлов, по порядку:"
 
-#: ../src/wx/wxvbam.cpp:577
+#: ../src/wx/wxvbam.cpp:600
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
 msgstr "Записан встроенный файл конфигурации в %s\nДля перезаписи параметров удалите из файла все разделы, кроме изменённых. Названия разделов можно найти в файлах в папке:"
 
-#: ../src/wx/wxvbam.cpp:583
+#: ../src/wx/wxvbam.cpp:606
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tвстроенный"
 
-#: ../src/wx/wxvbam.cpp:594
+#: ../src/wx/wxvbam.cpp:617
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1128,13 +1128,13 @@ msgid ""
 "\n"
 msgstr "Параметры, установленные из командной строки сохраняются, если любые изменения конфигурации сделаны из интерфейса программы.\n\nДля значений true и false используются цифры 1 и 0 соответственно\n"
 
-#: ../src/wx/wxvbam.cpp:615
+#: ../src/wx/wxvbam.cpp:638
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Команды для настройки клавиатуры:\n"
 
-#: ../src/wx/wxvbam.cpp:649
+#: ../src/wx/wxvbam.cpp:672
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Неверный параметр конфигурации или выбрано несколько ROM-файлов:\n"
 
@@ -1202,6 +1202,16 @@ msgstr "RAW_CONTROL"
 #: ../src/wx/widgets/keyedit.cpp:240
 msgid "CONTROL"
 msgstr "CONTROL"
+
+#: ../src/wx/widgets/sdljoy.cpp:105
+#, c-format
+msgid "Connected game controller %d"
+msgstr ""
+
+#: ../src/wx/widgets/sdljoy.cpp:115
+#, c-format
+msgid "Disconnected game controller %d"
+msgstr ""
 
 #: ../src/wx/xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
@@ -2356,152 +2366,136 @@ msgid "General"
 msgstr "Основные"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:26
-msgid "Check for updates:"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:33
-msgid "&Never"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:42
-msgid "&Daily"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:50
-msgid "&Weekly"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:64
 msgid "Screenshot Format:"
 msgstr "Формат сриншота:"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:71
+#: ../src/wx/xrc/GeneralConfig.xrc:33
 msgid "&PNG"
 msgstr "PNG"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:80
+#: ../src/wx/xrc/GeneralConfig.xrc:42
 msgid "&BMP"
 msgstr "BMP"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:95
+#: ../src/wx/xrc/GeneralConfig.xrc:57
 msgid "&Rewind interval :"
 msgstr "Интервал перемотки:"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:96
+#: ../src/wx/xrc/GeneralConfig.xrc:58
 msgid "If not empty or 0, enable rewind (seconds)"
 msgstr "Если не пустое значение или 0, то включить перемотку (секунд)"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:105
+#: ../src/wx/xrc/GeneralConfig.xrc:67
 msgid "seconds (0-600); 0 = disable"
 msgstr "Секунды (0-600); 0 = Выключить"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:116
+#: ../src/wx/xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
 msgstr "Throttle"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:134 ../src/wx/xrc/SpeedupConfig.xrc:27
+#: ../src/wx/xrc/GeneralConfig.xrc:96 ../src/wx/xrc/SpeedupConfig.xrc:27
 #, c-format
 msgid "% of normal:"
 msgstr "% oт нормы :"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:144
+#: ../src/wx/xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
 msgstr "0 = no throttle"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:153 ../src/wx/xrc/SpeedupConfig.xrc:46
+#: ../src/wx/xrc/GeneralConfig.xrc:115 ../src/wx/xrc/SpeedupConfig.xrc:46
 msgid "25%"
 msgstr "25 %"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:154 ../src/wx/xrc/SpeedupConfig.xrc:47
+#: ../src/wx/xrc/GeneralConfig.xrc:116 ../src/wx/xrc/SpeedupConfig.xrc:47
 msgid "50%"
 msgstr "50 %"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:155 ../src/wx/xrc/SpeedupConfig.xrc:48
+#: ../src/wx/xrc/GeneralConfig.xrc:117 ../src/wx/xrc/SpeedupConfig.xrc:48
 msgid "75%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:156 ../src/wx/xrc/SoundConfig.xrc:45
+#: ../src/wx/xrc/GeneralConfig.xrc:118 ../src/wx/xrc/SoundConfig.xrc:45
 #: ../src/wx/xrc/SpeedupConfig.xrc:49
 msgid "100%"
 msgstr "100 %"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:157 ../src/wx/xrc/SpeedupConfig.xrc:50
+#: ../src/wx/xrc/GeneralConfig.xrc:119 ../src/wx/xrc/SpeedupConfig.xrc:50
 msgid "125%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:158 ../src/wx/xrc/SpeedupConfig.xrc:51
+#: ../src/wx/xrc/GeneralConfig.xrc:120 ../src/wx/xrc/SpeedupConfig.xrc:51
 msgid "150%"
 msgstr "150%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:159 ../src/wx/xrc/SpeedupConfig.xrc:52
+#: ../src/wx/xrc/GeneralConfig.xrc:121 ../src/wx/xrc/SpeedupConfig.xrc:52
 msgid "175%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:160 ../src/wx/xrc/SpeedupConfig.xrc:53
+#: ../src/wx/xrc/GeneralConfig.xrc:122 ../src/wx/xrc/SpeedupConfig.xrc:53
 msgid "200%"
 msgstr "200 %"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:161 ../src/wx/xrc/SpeedupConfig.xrc:54
+#: ../src/wx/xrc/GeneralConfig.xrc:123 ../src/wx/xrc/SpeedupConfig.xrc:54
 msgid "225%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:162 ../src/wx/xrc/SpeedupConfig.xrc:55
+#: ../src/wx/xrc/GeneralConfig.xrc:124 ../src/wx/xrc/SpeedupConfig.xrc:55
 msgid "250%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:163 ../src/wx/xrc/SpeedupConfig.xrc:56
+#: ../src/wx/xrc/GeneralConfig.xrc:125 ../src/wx/xrc/SpeedupConfig.xrc:56
 msgid "275%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:164 ../src/wx/xrc/SpeedupConfig.xrc:57
+#: ../src/wx/xrc/GeneralConfig.xrc:126 ../src/wx/xrc/SpeedupConfig.xrc:57
 msgid "300%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:165 ../src/wx/xrc/SpeedupConfig.xrc:58
+#: ../src/wx/xrc/GeneralConfig.xrc:127 ../src/wx/xrc/SpeedupConfig.xrc:58
 msgid "325%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:166 ../src/wx/xrc/SpeedupConfig.xrc:59
+#: ../src/wx/xrc/GeneralConfig.xrc:128 ../src/wx/xrc/SpeedupConfig.xrc:59
 msgid "350%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:167 ../src/wx/xrc/SpeedupConfig.xrc:60
+#: ../src/wx/xrc/GeneralConfig.xrc:129 ../src/wx/xrc/SpeedupConfig.xrc:60
 msgid "375%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:168 ../src/wx/xrc/SpeedupConfig.xrc:61
+#: ../src/wx/xrc/GeneralConfig.xrc:130 ../src/wx/xrc/SpeedupConfig.xrc:61
 msgid "400%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:169 ../src/wx/xrc/SpeedupConfig.xrc:62
+#: ../src/wx/xrc/GeneralConfig.xrc:131 ../src/wx/xrc/SpeedupConfig.xrc:62
 msgid "425%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:170 ../src/wx/xrc/SpeedupConfig.xrc:63
+#: ../src/wx/xrc/GeneralConfig.xrc:132 ../src/wx/xrc/SpeedupConfig.xrc:63
 msgid "450%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:171 ../src/wx/xrc/SpeedupConfig.xrc:64
+#: ../src/wx/xrc/GeneralConfig.xrc:133 ../src/wx/xrc/SpeedupConfig.xrc:64
 msgid "475%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:172 ../src/wx/xrc/SpeedupConfig.xrc:65
+#: ../src/wx/xrc/GeneralConfig.xrc:134 ../src/wx/xrc/SpeedupConfig.xrc:65
 msgid "500%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:173 ../src/wx/xrc/SpeedupConfig.xrc:66
+#: ../src/wx/xrc/GeneralConfig.xrc:135 ../src/wx/xrc/SpeedupConfig.xrc:66
 msgid "525%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:174 ../src/wx/xrc/SpeedupConfig.xrc:67
+#: ../src/wx/xrc/GeneralConfig.xrc:136 ../src/wx/xrc/SpeedupConfig.xrc:67
 msgid "550%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:175 ../src/wx/xrc/SpeedupConfig.xrc:68
+#: ../src/wx/xrc/GeneralConfig.xrc:137 ../src/wx/xrc/SpeedupConfig.xrc:68
 msgid "575%"
 msgstr ""
 
-#: ../src/wx/xrc/GeneralConfig.xrc:176 ../src/wx/xrc/SpeedupConfig.xrc:69
+#: ../src/wx/xrc/GeneralConfig.xrc:138 ../src/wx/xrc/SpeedupConfig.xrc:69
 msgid "600%"
 msgstr ""
 
@@ -3412,6 +3406,10 @@ msgstr "VBA-M  техподдержка и форум"
 #: ../src/wx/xrc/MainMenu.xrc:701
 msgid "Translations"
 msgstr "Переводы"
+
+#: ../src/wx/xrc/MainMenu.xrc:709
+msgid "Check for updates"
+msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:712
 msgid "&Factory Reset..."

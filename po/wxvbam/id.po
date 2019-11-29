@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-06 19:39-0300\n"
-"PO-Revision-Date: 2019-11-23 03:03+0000\n"
+"POT-Creation-Date: 2019-11-22 23:25+0000\n"
+"PO-Revision-Date: 2019-11-28 05:41+0000\n"
 "Last-Translator: Jeremy Belpois <jeremy.belpois.einstein@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/bgk/vba-m/language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -166,12 +166,12 @@ msgstr "ROM+HuC-3"
 msgid "ROM+HuC-1"
 msgstr "ROM+HuC-1"
 
-#: ../src/wx/cmdevents.cpp:746 ../src/wx/guiinit.cpp:1829
+#: ../src/wx/cmdevents.cpp:746 ../src/wx/guiinit.cpp:1839
 #: ../src/wx/xrc/DisplayConfig.xrc:85 ../src/wx/xrc/DisplayConfig.xrc:135
 #: ../src/wx/xrc/DisplayConfig.xrc:221
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:32
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:204
-#: ../src/wx/xrc/GeneralConfig.xrc:152 ../src/wx/xrc/SoundConfig.xrc:219
+#: ../src/wx/xrc/GeneralConfig.xrc:114 ../src/wx/xrc/SoundConfig.xrc:219
 #: ../src/wx/xrc/SoundConfig.xrc:309 ../src/wx/xrc/SpeedupConfig.xrc:45
 #: ../src/wx/xrc/SpeedupConfig.xrc:120
 msgid "None"
@@ -204,7 +204,7 @@ msgstr "Mengimpor file baterai akan menghapus simpanan permainan (secara permane
 msgid "Confirm import"
 msgstr "Konfirmasi untuk mengimpor"
 
-#: ../src/wx/cmdevents.cpp:898 ../src/wx/panel.cpp:344
+#: ../src/wx/cmdevents.cpp:898 ../src/wx/panel.cpp:350
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Baterai yang dimuat %s"
@@ -287,7 +287,7 @@ msgstr "Terjadi kesalahan dalam memuat file snapshot %s"
 msgid "Wrote battery %s"
 msgstr "Menyimpan baterai %s"
 
-#: ../src/wx/cmdevents.cpp:1091 ../src/wx/panel.cpp:651
+#: ../src/wx/cmdevents.cpp:1091 ../src/wx/panel.cpp:656
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Terjadi kesalahan dalam menyimpan baterai %s"
@@ -405,18 +405,18 @@ msgstr "Menggunakan filter pixel #%d"
 msgid "Using interframe blending #%d"
 msgstr "Menggunakan penyamaran antarbingkai #%d"
 
-#: ../src/wx/cmdevents.cpp:2747
+#: ../src/wx/cmdevents.cpp:2752
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Emulator Nintendo GameBoy (+Color+Advance)."
 
-#: ../src/wx/cmdevents.cpp:2748
+#: ../src/wx/cmdevents.cpp:2753
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Hak Cipta © 1999-2003 Forgotten\nHak Cipta © 2004-2006 Tim pengembangan VBA\nHak Cipta © 2007-2017 Tim pengembangan VBA-M"
 
-#: ../src/wx/cmdevents.cpp:2749
+#: ../src/wx/cmdevents.cpp:2754
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -432,11 +432,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Program ini termasuk dalam perangkat lunak bebas: anda dapat mendistribusikan ulang dan/atau merubah\nprogram ini sesuai dengan GNU General Public License yang telah dipublikasikan oleh\nFree Software Foundation, baik menurut Lisensi versi 2, maupun\n(sesuai dengan pilihan anda) versi lainnya yang lebih baru.\n\nProgram ini didistribusikan dengan harapan bahwa program ini akan dapat berguna,\nnamun program ini didistribusikan TANPA JAMINAN APAPUN; bahkan dengan jaminan untuk DIPERJUAL BELIKAN ataupun AKAN SESUAI UNTUK TUJUAN TERTENTU sekalipun. Lihat\nGNU General Public License untuk informasi lebih lanjut.\n\nAnda dapat memperoleh salinan dari GNU General Public License\nbersama dengan program ini. Jika anda tidak memperolehnya, anda dapat melihatnya di http://www.gnu.org/licenses ."
 
-#: ../src/wx/cmdevents.cpp:3011
+#: ../src/wx/cmdevents.cpp:3018
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "Hubungan LAN sudah aktif. Putuskan mode hubung untuk memutuskan hubungan."
 
-#: ../src/wx/cmdevents.cpp:3017
+#: ../src/wx/cmdevents.cpp:3024
 msgid "Network is not supported in local mode."
 msgstr "Fitur jaringan tidak didukung dalam mode lokal."
 
@@ -554,7 +554,7 @@ msgstr "Pilih file cheat"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Daftar cheat VBA (*.clt)|*.clt|Daftar cheat CHT (*.cht)|*.cht"
 
-#: ../src/wx/guiinit.cpp:239 ../src/wx/panel.cpp:401
+#: ../src/wx/guiinit.cpp:239 ../src/wx/panel.cpp:407
 msgid "Loaded cheats"
 msgstr "Cheat yang dimuat"
 
@@ -640,122 +640,122 @@ msgstr "%d frame = %.2f ms"
 msgid "Default device"
 msgstr "Perangkat default"
 
-#: ../src/wx/guiinit.cpp:1709
+#: ../src/wx/guiinit.cpp:1719
 msgid "Desktop mode"
 msgstr "Mode desktop"
 
-#: ../src/wx/guiinit.cpp:1716
+#: ../src/wx/guiinit.cpp:1726
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: ../src/wx/guiinit.cpp:1870
+#: ../src/wx/guiinit.cpp:1880
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Tidak menemukan plugin rpi yang dapat digunakan di %s"
 
-#: ../src/wx/guiinit.cpp:1890 ../src/wx/xrc/DisplayConfig.xrc:107
+#: ../src/wx/guiinit.cpp:1900 ../src/wx/xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "Plugin"
 
-#: ../src/wx/guiinit.cpp:1918
+#: ../src/wx/guiinit.cpp:1928
 msgid "Please select a plugin or a different filter"
 msgstr "Tolong pilih plugin atau filter yang berbeda"
 
-#: ../src/wx/guiinit.cpp:1919
+#: ../src/wx/guiinit.cpp:1929
 msgid "Plugin selection error"
 msgstr "Terjadi kesalahan pada pemilihan plugin"
 
-#: ../src/wx/guiinit.cpp:2118
+#: ../src/wx/guiinit.cpp:2128
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr "Ini akan mengosongkan semua pemercepat yang telah diatur oleh pengguna. Apakah anda yakin?"
 
-#: ../src/wx/guiinit.cpp:2118
+#: ../src/wx/guiinit.cpp:2128
 msgid "Confirm"
 msgstr "Konfirmasi"
 
-#: ../src/wx/guiinit.cpp:2712
+#: ../src/wx/guiinit.cpp:2722
 msgid "Main icon not found"
 msgstr "Ikon utama tidak ditemukan"
 
-#: ../src/wx/guiinit.cpp:2722
+#: ../src/wx/guiinit.cpp:2732
 msgid "Browse"
 msgstr "Jelajah"
 
-#: ../src/wx/guiinit.cpp:2736
+#: ../src/wx/guiinit.cpp:2746
 msgid "Main display panel not found"
 msgstr "Panel layar utama tidak ditemukan"
 
-#: ../src/wx/guiinit.cpp:2875
+#: ../src/wx/guiinit.cpp:2895
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Menu pemercepat terduplikasi: %s untuk %s dan %s; menyimpan menu pertama"
 
-#: ../src/wx/guiinit.cpp:2889
+#: ../src/wx/guiinit.cpp:2909
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Menu pemercepat %s untuk %s menimpa menu default untuk %s ; menggunakan menu"
 
-#: ../src/wx/guiinit.cpp:3013
+#: ../src/wx/guiinit.cpp:3039
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Menu item %s tidak valid; menghapus"
 
-#: ../src/wx/guiinit.cpp:3208
+#: ../src/wx/guiinit.cpp:3234
 msgid "Code"
 msgstr "Kode"
 
-#: ../src/wx/guiinit.cpp:3217
+#: ../src/wx/guiinit.cpp:3243
 msgid "Description"
 msgstr "Deskripsi"
 
-#: ../src/wx/guiinit.cpp:3291 ../src/wx/xrc/CheatAdd.xrc:31
+#: ../src/wx/guiinit.cpp:3317 ../src/wx/xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Alamat"
 
-#: ../src/wx/guiinit.cpp:3292
+#: ../src/wx/guiinit.cpp:3318
 msgid "Old Value"
 msgstr "Nilai Lama"
 
-#: ../src/wx/guiinit.cpp:3293
+#: ../src/wx/guiinit.cpp:3319
 msgid "New Value"
 msgstr "Nilai Baru"
 
-#: ../src/wx/guiinit.cpp:3836
+#: ../src/wx/guiinit.cpp:3839
 msgid "Menu commands"
 msgstr "Perintah menu"
 
-#: ../src/wx/guiinit.cpp:3859
+#: ../src/wx/guiinit.cpp:3862
 msgid "Other commands"
 msgstr "Perintah lainnya"
 
-#: ../src/wx/guiinit.cpp:3970
+#: ../src/wx/guiinit.cpp:3973
 msgid "JoyBus host invalid; disabling"
 msgstr "Host JoyBus tidak valid; menonaktifkan"
 
-#: ../src/wx/opts.cpp:555 ../src/wx/opts.cpp:851
+#: ../src/wx/opts.cpp:548 ../src/wx/opts.cpp:849
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "Nilai %s tidak valid untuk pilihan %s; nilai yang valid adalah %s%s%s"
 
-#: ../src/wx/opts.cpp:572 ../src/wx/opts.cpp:863
+#: ../src/wx/opts.cpp:565 ../src/wx/opts.cpp:861
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Nilai %d tidak valid untuk pilihan %s; nilai yang valid adalah %d - %d"
 
-#: ../src/wx/opts.cpp:579 ../src/wx/opts.cpp:588 ../src/wx/opts.cpp:871
-#: ../src/wx/opts.cpp:879
+#: ../src/wx/opts.cpp:572 ../src/wx/opts.cpp:581 ../src/wx/opts.cpp:869
+#: ../src/wx/opts.cpp:877
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Nilai %f salah untuk pilihan %s; nilai yang benar adalah %f - %f"
 
-#: ../src/wx/opts.cpp:648 ../src/wx/opts.cpp:669 ../src/wx/opts.cpp:948
-#: ../src/wx/opts.cpp:974
+#: ../src/wx/opts.cpp:641 ../src/wx/opts.cpp:662 ../src/wx/opts.cpp:946
+#: ../src/wx/opts.cpp:972
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Pengikatan tombol %s tidak valid untuk %s"
 
-#: ../src/wx/opts.cpp:834
+#: ../src/wx/opts.cpp:832
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Pilihan flag %s tidak valid - %s diabaikan"
@@ -774,7 +774,7 @@ msgstr "Terjadi kesalahan ketika memuat file"
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Tidak dapat memuat ROM Game Boy %s"
 
-#: ../src/wx/panel.cpp:185 ../src/wx/panel.cpp:275
+#: ../src/wx/panel.cpp:185 ../src/wx/panel.cpp:281
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Tidak dapat memuat BIOS %s"
@@ -784,103 +784,103 @@ msgstr "Tidak dapat memuat BIOS %s"
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Tidak dapat memuat ROM Game Boy Advance %s"
 
-#: ../src/wx/panel.cpp:434
+#: ../src/wx/panel.cpp:439
 msgid " player "
 msgstr "pemain"
 
-#: ../src/wx/panel.cpp:599
+#: ../src/wx/panel.cpp:604
 #, c-format
 msgid "Loaded state %s"
 msgstr "State yang dimuat %s"
 
-#: ../src/wx/panel.cpp:599
+#: ../src/wx/panel.cpp:604
 #, c-format
 msgid "Error loading state %s"
 msgstr "Terjadi kesalahan dalam memuat state %s"
 
-#: ../src/wx/panel.cpp:623
+#: ../src/wx/panel.cpp:628
 #, c-format
 msgid "Saved state %s"
 msgstr "State yang disimpan %s"
 
-#: ../src/wx/panel.cpp:623
+#: ../src/wx/panel.cpp:628
 #, c-format
 msgid "Error saving state %s"
 msgstr "Terjadi kesalahan dalam menyimpan state %s"
 
-#: ../src/wx/panel.cpp:827
+#: ../src/wx/panel.cpp:832
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "Mode layar penuh %dx%d-%d@%d tidak didukung; mencari mode yang lain"
 
-#: ../src/wx/panel.cpp:865
+#: ../src/wx/panel.cpp:870
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "Mode layar penuh %dx%d-%d@%d tidak didukung"
 
-#: ../src/wx/panel.cpp:870
+#: ../src/wx/panel.cpp:875
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Mode yang valid: %dx%d-%d@%d"
 
-#: ../src/wx/panel.cpp:878
+#: ../src/wx/panel.cpp:883
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "Pilih mode %dx%d-%d@%d"
 
-#: ../src/wx/panel.cpp:882
+#: ../src/wx/panel.cpp:887
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Gagal merubah mode ke %dx%d-%d@%d"
 
-#: ../src/wx/panel.cpp:966
+#: ../src/wx/panel.cpp:971
 msgid "Not a valid GBA cartridge"
 msgstr "Bukan merupakan cartridge GBA yang valid"
 
-#: ../src/wx/panel.cpp:1107
+#: ../src/wx/panel.cpp:1113
 msgid "No memory for rewinding"
 msgstr "Tidak ada memori untuk memuat state mundur"
 
-#: ../src/wx/panel.cpp:1117
+#: ../src/wx/panel.cpp:1123
 msgid "Error writing rewind state"
 msgstr "Terjadi kesalahan dalam menyimpan state mundur"
 
-#: ../src/wx/panel.cpp:2329
+#: ../src/wx/panel.cpp:2334
 msgid "memory allocation error"
 msgstr "terjadi kesalahan dalam mengalokasikan memori"
 
-#: ../src/wx/panel.cpp:2332
+#: ../src/wx/panel.cpp:2337
 msgid "error initializing codec"
 msgstr "terjadi kesalahan dalam menginisialisasikan codec"
 
-#: ../src/wx/panel.cpp:2335
+#: ../src/wx/panel.cpp:2340
 msgid "error writing to output file"
 msgstr "terjadi kesalahan dalam menyimpan file keluaran"
 
-#: ../src/wx/panel.cpp:2338
+#: ../src/wx/panel.cpp:2343
 msgid "can't guess output format from file name"
 msgstr "tidak dapat menebak format keluaran dari nama file"
 
-#: ../src/wx/panel.cpp:2343
+#: ../src/wx/panel.cpp:2348
 msgid "programming error; aborting!"
 msgstr "terjadi kesalama dalam pemrograman; membatalkan perintah!"
 
-#: ../src/wx/panel.cpp:2360 ../src/wx/panel.cpp:2391
+#: ../src/wx/panel.cpp:2365 ../src/wx/panel.cpp:2396
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Tidak dapat memulai rekaman ke %s (%s)"
 
-#: ../src/wx/panel.cpp:2419
+#: ../src/wx/panel.cpp:2424
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Terjadi kesalahan dalam merekam audio/video (%s); membatalkan perintah"
 
-#: ../src/wx/panel.cpp:2425
+#: ../src/wx/panel.cpp:2430
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Terjadi kesalahan dalam merekam audio (%s); membatalkan perintah"
 
-#: ../src/wx/panel.cpp:2435
+#: ../src/wx/panel.cpp:2440
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Terjadi kesalahan dalam merekam video (%s); membatalkan perintah"
@@ -925,37 +925,37 @@ msgstr "%d%%(%d, %d fps)"
 msgid "%d%%"
 msgstr "%d%%"
 
-#: ../src/wx/sys.cpp:757 ../src/wx/xrc/GBPrinter.xrc:65
+#: ../src/wx/sys.cpp:760 ../src/wx/xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "&Buang"
 
-#: ../src/wx/sys.cpp:791
+#: ../src/wx/sys.cpp:794
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "File gambar (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: ../src/wx/sys.cpp:800
+#: ../src/wx/sys.cpp:803
 msgid "Save printer image to"
 msgstr "Simpan gambar printer ke"
 
-#: ../src/wx/sys.cpp:814 ../src/wx/sys.cpp:997
+#: ../src/wx/sys.cpp:817 ../src/wx/sys.cpp:1000
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "Simpan hasil printer ke %s"
 
-#: ../src/wx/sys.cpp:819 ../src/wx/sys.cpp:890
+#: ../src/wx/sys.cpp:822 ../src/wx/sys.cpp:893
 msgid "&Close"
 msgstr "&Keluar"
 
-#: ../src/wx/sys.cpp:885
+#: ../src/wx/sys.cpp:888
 msgid "Printed"
 msgstr "Tercetak"
 
-#: ../src/wx/sys.cpp:1187
+#: ../src/wx/sys.cpp:1190
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "Terjadi kesalahan dalam membuka pseudo tty: %s"
 
-#: ../src/wx/sys.cpp:1286
+#: ../src/wx/sys.cpp:1289
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "Terjadi kesalahan dalam mempersiapkan socket server (%d)"
@@ -1048,75 +1048,75 @@ msgstr "G:"
 msgid "B:"
 msgstr "B:"
 
-#: ../src/wx/wxvbam.cpp:203
+#: ../src/wx/wxvbam.cpp:222
 msgid "visualboyadvance-m"
 msgstr "visualboyadvance-m"
 
-#: ../src/wx/wxvbam.cpp:417
+#: ../src/wx/wxvbam.cpp:436
 msgid "Could not create main window"
 msgstr "Tidak dapat membuat window utama"
 
-#: ../src/wx/wxvbam.cpp:484
+#: ../src/wx/wxvbam.cpp:507
 msgid "Save built-in XRC file and exit"
 msgstr "Simpan file XRC built-in dan keluar"
 
-#: ../src/wx/wxvbam.cpp:487
+#: ../src/wx/wxvbam.cpp:510
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Simpan vba-over.ini built-in dan keluar"
 
-#: ../src/wx/wxvbam.cpp:490
+#: ../src/wx/wxvbam.cpp:513
 msgid "Print configuration path and exit"
 msgstr "Cetak jalur konfigurasi dan keluar"
 
-#: ../src/wx/wxvbam.cpp:493
+#: ../src/wx/wxvbam.cpp:516
 msgid "Start in full-screen mode"
 msgstr "Mulai dalam mode layar penuh"
 
-#: ../src/wx/wxvbam.cpp:497
+#: ../src/wx/wxvbam.cpp:520
 msgid "Delete shared link state first, if it exists"
 msgstr "Hapus state hubungan yang dibagikan terlebih dahulu, jika ada"
 
-#: ../src/wx/wxvbam.cpp:504
+#: ../src/wx/wxvbam.cpp:527
 msgid "List all settable options and exit"
 msgstr "Tampilkan semua pilihan yang dapat diubah dan keluar"
 
-#: ../src/wx/wxvbam.cpp:507
+#: ../src/wx/wxvbam.cpp:530
 msgid "ROM file"
 msgstr "File ROM"
 
-#: ../src/wx/wxvbam.cpp:509
+#: ../src/wx/wxvbam.cpp:532
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: ../src/wx/wxvbam.cpp:540
+#: ../src/wx/wxvbam.cpp:563
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr "Error pada konfigurasi/build: tidak dapat menemukan xrc built-in"
 
-#: ../src/wx/wxvbam.cpp:548
+#: ../src/wx/wxvbam.cpp:571
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Menyimpan konfigurasi built-in ke %s.\nUntuk menimpa, hapus semua node kecuali node root yang telah diubah. Pertama-tama temukan node root dengan nama yang benar pada file .xrc atau .xrs apapun yang berada dalam path pencarian file timpahan built-in berikut:"
 
-#: ../src/wx/wxvbam.cpp:563
+#: ../src/wx/wxvbam.cpp:586
 msgid "Configuration is read from, in order:"
 msgstr "Konfigurasi dibaca dari, secara berurutan:"
 
-#: ../src/wx/wxvbam.cpp:577
+#: ../src/wx/wxvbam.cpp:600
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
 msgstr "Menulis file timpahan built-in ke %s\nUntuk menimpa, hapus semua bagian kecuali bagian yang telah diubah. Bagian yang pertama kali ditemukan yang digunakan dari path pencarian:"
 
-#: ../src/wx/wxvbam.cpp:583
+#: ../src/wx/wxvbam.cpp:606
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tbuilt-in"
 
-#: ../src/wx/wxvbam.cpp:594
+#: ../src/wx/wxvbam.cpp:617
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1124,13 +1124,13 @@ msgid ""
 "\n"
 msgstr "Pilihan yang diubah dari command line disimpan jika terjadi perubahan konfigurasi yang dilakukan melalui user interface.\n\nUntuk pilihan flag, nilai benar dan salah ditetapkan dengan 1 dan 0, secara berurutan.\n\n"
 
-#: ../src/wx/wxvbam.cpp:615
+#: ../src/wx/wxvbam.cpp:638
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Perintah yang tersedia untuk pilihan Keyboard/* adalah:\n\n"
 
-#: ../src/wx/wxvbam.cpp:649
+#: ../src/wx/wxvbam.cpp:672
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Terjadi pemilihan konfigurasi yang buruk atau pemilihan lebih dari satu file ROM:\n"
 
@@ -1198,6 +1198,16 @@ msgstr "RAW_CONTROL"
 #: ../src/wx/widgets/keyedit.cpp:240
 msgid "CONTROL"
 msgstr "KONTROL"
+
+#: ../src/wx/widgets/sdljoy.cpp:105
+#, c-format
+msgid "Connected game controller %d"
+msgstr "Kontroler permainan yang tersambung %d"
+
+#: ../src/wx/widgets/sdljoy.cpp:115
+#, c-format
+msgid "Disconnected game controller %d"
+msgstr "Kontroler permainan yang terputus %d"
 
 #: ../src/wx/xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
@@ -2352,152 +2362,136 @@ msgid "General"
 msgstr "Umum"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:26
-msgid "Check for updates:"
-msgstr "Periksa pembaruan:"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:33
-msgid "&Never"
-msgstr "&Tidak Pernah"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:42
-msgid "&Daily"
-msgstr "& Harian"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:50
-msgid "&Weekly"
-msgstr "&Mingguan"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:64
 msgid "Screenshot Format:"
 msgstr "Format Screenshot:"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:71
+#: ../src/wx/xrc/GeneralConfig.xrc:33
 msgid "&PNG"
 msgstr "&PNG"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:80
+#: ../src/wx/xrc/GeneralConfig.xrc:42
 msgid "&BMP"
 msgstr "&BMP"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:95
+#: ../src/wx/xrc/GeneralConfig.xrc:57
 msgid "&Rewind interval :"
 msgstr "&Interval Putar Balik :"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:96
+#: ../src/wx/xrc/GeneralConfig.xrc:58
 msgid "If not empty or 0, enable rewind (seconds)"
 msgstr "Jika tidak kosong atau 0, aktifkan putar balik (dalam detik)"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:105
+#: ../src/wx/xrc/GeneralConfig.xrc:67
 msgid "seconds (0-600); 0 = disable"
 msgstr "detik (0-600); 0 = non aktifkan"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:116
+#: ../src/wx/xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
 msgstr "&Throttle"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:134 ../src/wx/xrc/SpeedupConfig.xrc:27
+#: ../src/wx/xrc/GeneralConfig.xrc:96 ../src/wx/xrc/SpeedupConfig.xrc:27
 #, c-format
 msgid "% of normal:"
 msgstr "% of normal:"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:144
+#: ../src/wx/xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
 msgstr "0 = non aktifkan throttle"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:153 ../src/wx/xrc/SpeedupConfig.xrc:46
+#: ../src/wx/xrc/GeneralConfig.xrc:115 ../src/wx/xrc/SpeedupConfig.xrc:46
 msgid "25%"
 msgstr "25%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:154 ../src/wx/xrc/SpeedupConfig.xrc:47
+#: ../src/wx/xrc/GeneralConfig.xrc:116 ../src/wx/xrc/SpeedupConfig.xrc:47
 msgid "50%"
 msgstr "50%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:155 ../src/wx/xrc/SpeedupConfig.xrc:48
+#: ../src/wx/xrc/GeneralConfig.xrc:117 ../src/wx/xrc/SpeedupConfig.xrc:48
 msgid "75%"
 msgstr "75%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:156 ../src/wx/xrc/SoundConfig.xrc:45
+#: ../src/wx/xrc/GeneralConfig.xrc:118 ../src/wx/xrc/SoundConfig.xrc:45
 #: ../src/wx/xrc/SpeedupConfig.xrc:49
 msgid "100%"
 msgstr "100%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:157 ../src/wx/xrc/SpeedupConfig.xrc:50
+#: ../src/wx/xrc/GeneralConfig.xrc:119 ../src/wx/xrc/SpeedupConfig.xrc:50
 msgid "125%"
 msgstr "125%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:158 ../src/wx/xrc/SpeedupConfig.xrc:51
+#: ../src/wx/xrc/GeneralConfig.xrc:120 ../src/wx/xrc/SpeedupConfig.xrc:51
 msgid "150%"
 msgstr "150%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:159 ../src/wx/xrc/SpeedupConfig.xrc:52
+#: ../src/wx/xrc/GeneralConfig.xrc:121 ../src/wx/xrc/SpeedupConfig.xrc:52
 msgid "175%"
 msgstr "175%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:160 ../src/wx/xrc/SpeedupConfig.xrc:53
+#: ../src/wx/xrc/GeneralConfig.xrc:122 ../src/wx/xrc/SpeedupConfig.xrc:53
 msgid "200%"
 msgstr "200%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:161 ../src/wx/xrc/SpeedupConfig.xrc:54
+#: ../src/wx/xrc/GeneralConfig.xrc:123 ../src/wx/xrc/SpeedupConfig.xrc:54
 msgid "225%"
 msgstr "225%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:162 ../src/wx/xrc/SpeedupConfig.xrc:55
+#: ../src/wx/xrc/GeneralConfig.xrc:124 ../src/wx/xrc/SpeedupConfig.xrc:55
 msgid "250%"
 msgstr "250%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:163 ../src/wx/xrc/SpeedupConfig.xrc:56
+#: ../src/wx/xrc/GeneralConfig.xrc:125 ../src/wx/xrc/SpeedupConfig.xrc:56
 msgid "275%"
 msgstr "275%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:164 ../src/wx/xrc/SpeedupConfig.xrc:57
+#: ../src/wx/xrc/GeneralConfig.xrc:126 ../src/wx/xrc/SpeedupConfig.xrc:57
 msgid "300%"
 msgstr "300%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:165 ../src/wx/xrc/SpeedupConfig.xrc:58
+#: ../src/wx/xrc/GeneralConfig.xrc:127 ../src/wx/xrc/SpeedupConfig.xrc:58
 msgid "325%"
 msgstr "325%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:166 ../src/wx/xrc/SpeedupConfig.xrc:59
+#: ../src/wx/xrc/GeneralConfig.xrc:128 ../src/wx/xrc/SpeedupConfig.xrc:59
 msgid "350%"
 msgstr "350%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:167 ../src/wx/xrc/SpeedupConfig.xrc:60
+#: ../src/wx/xrc/GeneralConfig.xrc:129 ../src/wx/xrc/SpeedupConfig.xrc:60
 msgid "375%"
 msgstr "375%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:168 ../src/wx/xrc/SpeedupConfig.xrc:61
+#: ../src/wx/xrc/GeneralConfig.xrc:130 ../src/wx/xrc/SpeedupConfig.xrc:61
 msgid "400%"
 msgstr "400%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:169 ../src/wx/xrc/SpeedupConfig.xrc:62
+#: ../src/wx/xrc/GeneralConfig.xrc:131 ../src/wx/xrc/SpeedupConfig.xrc:62
 msgid "425%"
 msgstr "425%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:170 ../src/wx/xrc/SpeedupConfig.xrc:63
+#: ../src/wx/xrc/GeneralConfig.xrc:132 ../src/wx/xrc/SpeedupConfig.xrc:63
 msgid "450%"
 msgstr "450%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:171 ../src/wx/xrc/SpeedupConfig.xrc:64
+#: ../src/wx/xrc/GeneralConfig.xrc:133 ../src/wx/xrc/SpeedupConfig.xrc:64
 msgid "475%"
 msgstr "475%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:172 ../src/wx/xrc/SpeedupConfig.xrc:65
+#: ../src/wx/xrc/GeneralConfig.xrc:134 ../src/wx/xrc/SpeedupConfig.xrc:65
 msgid "500%"
 msgstr "500%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:173 ../src/wx/xrc/SpeedupConfig.xrc:66
+#: ../src/wx/xrc/GeneralConfig.xrc:135 ../src/wx/xrc/SpeedupConfig.xrc:66
 msgid "525%"
 msgstr "525%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:174 ../src/wx/xrc/SpeedupConfig.xrc:67
+#: ../src/wx/xrc/GeneralConfig.xrc:136 ../src/wx/xrc/SpeedupConfig.xrc:67
 msgid "550%"
 msgstr "550%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:175 ../src/wx/xrc/SpeedupConfig.xrc:68
+#: ../src/wx/xrc/GeneralConfig.xrc:137 ../src/wx/xrc/SpeedupConfig.xrc:68
 msgid "575%"
 msgstr "575%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:176 ../src/wx/xrc/SpeedupConfig.xrc:69
+#: ../src/wx/xrc/GeneralConfig.xrc:138 ../src/wx/xrc/SpeedupConfig.xrc:69
 msgid "600%"
 msgstr "600%"
 
@@ -3408,6 +3402,10 @@ msgstr "Dukungan &Forum VBA-M"
 #: ../src/wx/xrc/MainMenu.xrc:701
 msgid "Translations"
 msgstr "Terjemahan"
+
+#: ../src/wx/xrc/MainMenu.xrc:709
+msgid "Check for updates"
+msgstr "Periksa pembaruan"
 
 #: ../src/wx/xrc/MainMenu.xrc:712
 msgid "&Factory Reset..."
