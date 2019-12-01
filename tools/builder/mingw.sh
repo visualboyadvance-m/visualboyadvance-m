@@ -8,11 +8,11 @@ export CROSS_OS=windows
 
 BUILD_ENV=$BUILD_ENV$(cat <<EOF
 
-export CPPFLAGS="$CPPFLAGS${CPPFLAGS:+ }-DMINGW_HAS_SECURE_API"
-export CFLAGS="$CFLAGS${CFLAGS:+ }-static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
-export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
-export OBJCXXFLAGS="$OBJCXXFLAGS${OBJCXXFLAGS:+ }-static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
-export LDFLAGS="$LDFLAGS${LDFLAGS:+ }-static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -lm"
+export CPPFLAGS="$CPPFLAGS${CPPFLAGS:+ }-DMINGW_HAS_SECURE_API -DFFI_STATIC_BUILD"
+export CFLAGS="$CFLAGS${CFLAGS:+ }-static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -DFFI_STATIC_BUILD -lm"
+export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -DFFI_STATIC_BUILD -lm"
+export OBJCXXFLAGS="$OBJCXXFLAGS${OBJCXXFLAGS:+ }-static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -DFFI_STATIC_BUILD -lm"
+export LDFLAGS="$LDFLAGS${LDFLAGS:+ }-static-libgcc -static-libstdc++ -static -lpthread -DMINGW_HAS_SECURE_API -DFFI_STATIC_BUILD -lm"
 export LIBS="-lpthread -lm -lole32"
 
 export UUID_LIBS="-luuid_mingw -luuid"
@@ -101,6 +101,9 @@ OUUID_LIBS="\$UUID_LIBS"
 OSTRIP="\$STRIP"
 OPATH="\$PATH"
 
+OCONFIGURE_REQUIRED_ARGS="\$CONFIGURE_REQUIRED_ARGS"
+OCMAKE_REQUIRED_ARGS="\$CMAKE_REQUIRED_ARGS"
+
 $BUILD_ENV
 
 export CC="$HOST_CC"
@@ -115,11 +118,11 @@ export UUID_LIBS="$HOST_UUID_LIBS"
 export STRIP="$HOST_STRIP"
 export PATH="$BUILD_ROOT/host/bin:\$PATH"
 
-OCONFIGURE_REQUIRED_ARGS="\$CONFIGURE_REQUIRED_ARGS"
-OCMAKE_REQUIRED_ARGS="\$CMAKE_REQUIRED_ARGS"
-
 CONFIGURE_REQUIRED_ARGS="\$(puts "\$CONFIGURE_REQUIRED_ARGS" | sed 's/--host[^ ]*//g')"
 CMAKE_REQUIRED_ARGS="\$(puts "\$CMAKE_REQUIRED_ARGS" | sed 's/-DCMAKE_TOOLCHAIN_FILE=[^ ]*//g')"
+
+unset TARGET_ENV
+export HOST_ENV=1
 EOF
     fi
 
@@ -164,6 +167,8 @@ CONFIGURE_REQUIRED_ARGS="\$OCONFIGURE_REQUIRED_ARGS"
 CMAKE_REQUIRED_ARGS="\$OCMAKE_REQUIRED_ARGS"
 OCONFIGURE_REQUIRED_ARGS= OCMAKE_REQUIRED_ARGS=
 
+unset HOST_ENV
+export TARGET_ENV=1
 $BUILD_ENV
 EOF
     fi

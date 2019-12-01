@@ -221,10 +221,6 @@ FFMPEG_DISTS='
 
 : ${PATH_SEP:=':'}
 
-# these two can be set to always be included regardless of overrides
-export CONFIGURE_REQUIRED_ARGS="$CONFIGURE_REQUIRED_ARGS"
-export CMAKE_REQUIRED_ARGS="$CMAKE_REQUIRED_ARGS"
-
 export CMAKE_BASE_ARGS="$CMAKE_BASE_ARGS -DBUILD_SHARED_LIBS=NO -DENABLE_SHARED=NO -DCMAKE_PREFIX_PATH:FILEPATH=\"\$CMAKE_PREFIX_PATH\" -DCMAKE_BUILD_TYPE=Release"
 
 export CONFIGURE_INSTALL_ARGS="--prefix=/usr --sysconfdir=/etc"
@@ -241,7 +237,7 @@ fi
 
 export CONFIGURE_ARGS="$CONFIGURE_ARGS --disable-shared --enable-static $CONFIGURE_INSTALL_ARGS"
 export CMAKE_ARGS="$CMAKE_BASE_ARGS $CMAKE_ARGS $CMAKE_INSTALL_ARGS"
-export MESON_ARGS="--buildtype release --default-library static -Dintrospection=false $MESON_INSTALL_ARGS"
+export MESON_ARGS="$MESON_BASE_ARGS --buildtype release --default-library static -Dintrospection=false $MESON_INSTALL_ARGS"
 
 DIST_PATCHES=$DIST_PATCHES'
     m4              https://raw.githubusercontent.com/gentoo/gentoo/master/sys-devel/m4/files/m4-1.4.18-glibc228.patch
@@ -334,7 +330,7 @@ DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
     XML-SAX     echo no | PERL_MM_USE_DEFAULT=0 perl Makefile.PL
     wxwidgets   ./configure \$CONFIGURE_REQUIRED_ARGS --disable-shared --prefix=/usr --enable-stl --disable-precomp-headers --enable-cxx11 --enable-permissive --with-opengl --with-libpng
     libvpx      ./configure --disable-shared --enable-static --prefix=/usr --disable-unit-tests --disable-tools --disable-docs --disable-examples
-    ffmpeg      ./configure --disable-shared --enable-static --prefix=/usr --pkg-config-flags=--static --enable-nonfree --extra-version=tessus --enable-avisynth --enable-fontconfig --enable-gpl --enable-version3 --enable-libass --enable-libbluray --enable-libfreetype --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopus --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzmq --enable-openssl --enable-lzma --extra-cflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-cxxflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-objcflags='-DMODPLUG_STATIC -DZMQ_STATIC'
+    ffmpeg      ./configure --disable-shared --enable-static --prefix=/usr --pkg-config-flags=--static --enable-nonfree --extra-version=tessus --enable-avisynth --enable-fontconfig --enable-gpl --enable-version3 --enable-libass --enable-libbluray --enable-libfreetype --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopus --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzmq --enable-openssl --enable-lzma --extra-cflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-cxxflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-objcflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-libs=-liconv
 "
 
 DIST_BUILD_OVERRIDES="$DIST_BUILD_OVERRIDES
@@ -483,6 +479,10 @@ pre_build_all() {
 setup() {
     detect_os
 
+    mkdir -p "$BUILD_ROOT/tmp"
+
+    rm -rf "$BUILD_ROOT/tmp/"*
+
     mkdir -p "$BUILD_ROOT/root/include"
     [ -L "$BUILD_ROOT/root/inc" ] || ln -s "$BUILD_ROOT/root/include" "$BUILD_ROOT/root/inc"
 
@@ -620,7 +620,7 @@ debian_install_core_deps() {
     installing_core_deps
 
     sudo apt-get -qq update || :
-    sudo apt-get -qy install build-essential g++ curl ccache perl
+    sudo apt-get -qy install build-essential g++ curl ccache perl meson
 
     done_msg
 }
@@ -628,13 +628,13 @@ debian_install_core_deps() {
 fedora_install_core_deps() {
     installing_core_deps
 
-    sudo dnf install -y --nogpgcheck --best --allowerasing gcc gcc-c++ make redhat-rpm-config curl perl ccache file patch findutils
+    sudo dnf install -y --nogpgcheck --best --allowerasing gcc gcc-c++ make redhat-rpm-config curl perl ccache file patch findutils meson
 }
 
 suse_install_core_deps() {
     installing_core_deps
 
-    sudo zypper in -y gcc gcc-c++ binutils glibc-devel-static make curl perl ccache file patch
+    sudo zypper in -y gcc gcc-c++ binutils glibc-devel-static make curl perl ccache file patch meson
 }
 
 arch_install_core_deps() {
@@ -650,7 +650,7 @@ arch_install_core_deps() {
     sudo pacman -Sy
 
     # not using the base-devel group because it can break gcc-multilib
-    sudo pacman --noconfirm --needed -S $gcc_pkg binutils file grep gawk gzip make patch sed util-linux curl ccache perl
+    sudo pacman --noconfirm --needed -S $gcc_pkg binutils file grep gawk gzip make patch sed util-linux curl ccache perl meson
 
     done_msg
 }
@@ -659,7 +659,7 @@ solus_install_core_deps() {
     installing_core_deps
 
     sudo eopkg -y update-repo
-    sudo eopkg -y install -c system.devel curl perl
+    sudo eopkg -y install -c system.devel curl perl meson
 
     done_msg
 }
@@ -725,7 +725,7 @@ cygwin_install_core_deps() {
         set -- "$@" "${target}-${p}"
     done
 
-    apt-cyg install make tar patch diffutils ccache perl m4 cygwin32-w32api-headers gcc-core gcc-g++ mpfr windows-default-manifest python2 libncurses-devel "$@"
+    apt-cyg install make tar patch diffutils ccache perl m4 cygwin32-w32api-headers gcc-core gcc-g++ mpfr windows-default-manifest python2 libncurses-devel meson "$@"
 
     # alias python2 to python
     ln -sf /usr/bin/python2.exe "$BUILD_ROOT/root/bin/python.exe"
@@ -748,7 +748,7 @@ mac_install_core_deps() {
         error 'Please install Mac Homebrew: [35m;https://brew.sh/[0m'
     fi
 
-    brew -v install perl
+    brew -v install perl meson
 }
 
 setup_tmp_dir() {
@@ -1660,9 +1660,9 @@ make_install() {
     cd ..
 
     if grep -Eq 'DESTDIR|cmake_install\.cmake' $(find . -name Makefile -o -name makefile -o -name '*.mk' -o -name '*.mak') 2>/dev/null; then
-        echo_run make install prefix="${prefix}" PREFIX="${prefix}" DESTDIR="$PWD/destdir" "$@" || :
+        echo_eval_run make install $(dist_make_args $current_dist) prefix="${prefix}" PREFIX="${prefix}" DESTDIR="$PWD/destdir" "$@" || :
     else
-        echo_run make install prefix="$PWD/destdir${prefix}" PREFIX="$PWD/destdir${prefix}" INSTALL_PREFIX="$PWD/destdir${prefix}" INSTALL_ROOT="$PWD/destdir${prefix}" INSTALLTOP="/..${prefix}/" "$@" || :
+        echo_eval_run make install $(dist_make_args $current_dist) prefix="$PWD/destdir${prefix}" PREFIX="$PWD/destdir${prefix}" INSTALL_PREFIX="$PWD/destdir${prefix}" INSTALL_ROOT="$PWD/destdir${prefix}" INSTALLTOP="/..${prefix}/" "$@" || :
     fi
 }
 
