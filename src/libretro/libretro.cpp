@@ -581,8 +581,8 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
 
    if (type == IMAGE_GB) {
       aspect = !gbBorderOn ? (10.0 / 9.0) : (8.0 / 7.0);
-      maxWidth = sgbWidth;
-      maxHeight = sgbHeight;
+      maxWidth = !gbBorderOn ? gbWidth : sgbWidth;
+      maxHeight = !gbBorderOn ? gbHeight : sgbHeight;
    }
 
    info->geometry.base_width = systemWidth;
