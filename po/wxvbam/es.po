@@ -10,13 +10,14 @@
 # Marco123V <MarcoVillalejos@hotmail.com>, 2015
 # MELERIX, 2015
 # MELERIX, 2015
+# Ruben Nava, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-22 23:25+0000\n"
-"PO-Revision-Date: 2019-11-28 01:25+0000\n"
-"Last-Translator: bgK\n"
+"PO-Revision-Date: 2019-12-01 02:47+0000\n"
+"Last-Translator: Ruben Nava <rubennava_dario@hotmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/bgk/vba-m/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -357,7 +358,7 @@ msgstr "Archivos de juego guardado de VisualBoyAdvance|*.sgm"
 #: ../src/wx/cmdevents.cpp:1775
 #, c-format
 msgid "Current state slot #%d"
-msgstr ""
+msgstr "Lote de estado actual #%d"
 
 #: ../src/wx/cmdevents.cpp:2044
 msgid "Sound enabled"
@@ -401,12 +402,12 @@ msgstr "Esperando por GDB..."
 #: ../src/wx/cmdevents.cpp:2609
 #, c-format
 msgid "Using pixel filter #%d"
-msgstr ""
+msgstr "Usando filtro de pixel #%d"
 
 #: ../src/wx/cmdevents.cpp:2624
 #, c-format
 msgid "Using interframe blending #%d"
-msgstr ""
+msgstr "Usando mezclado de cuadros #%d"
 
 #: ../src/wx/cmdevents.cpp:2752
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
@@ -485,19 +486,19 @@ msgstr "dsbSecondary->Lock() fallido: %08x"
 
 #: ../src/wx/faudio.cpp:32
 msgid "FAudio: Enumerating devices failed!"
-msgstr ""
+msgstr "FAudio: ¡Enumeracion de dispositivos fallo!"
 
 #: ../src/wx/faudio.cpp:67 ../src/wx/faudio.cpp:352
 msgid "The FAudio interface failed to initialize!"
-msgstr ""
+msgstr "¡La interfaz FAudio fallo al inicializar!"
 
 #: ../src/wx/faudio.cpp:384
 msgid "FAudio: Creating mastering voice failed!"
-msgstr ""
+msgstr "FAuio: ¡Creando de masterización de voz fallo!"
 
 #: ../src/wx/faudio.cpp:395
 msgid "FAudio: Creating source voice failed!"
-msgstr ""
+msgstr "FAudio: ¡Creando voz fuente fallo!"
 
 #: ../src/wx/gfxviewers.cpp:1141
 msgid "Select output file and type"
@@ -683,7 +684,7 @@ msgstr "Icono principal no encontrado"
 
 #: ../src/wx/guiinit.cpp:2732
 msgid "Browse"
-msgstr ""
+msgstr "Buscar"
 
 #: ../src/wx/guiinit.cpp:2746
 msgid "Main display panel not found"
@@ -1180,7 +1181,7 @@ msgstr "Meta-"
 
 #: ../src/wx/widgets/keyedit.cpp:127 ../src/wx/widgets/keyedit.cpp:128
 msgid "Num"
-msgstr ""
+msgstr "Num"
 
 #: ../src/wx/widgets/keyedit.cpp:201
 msgid "Meta+"
@@ -1205,12 +1206,12 @@ msgstr "CONTROL"
 #: ../src/wx/widgets/sdljoy.cpp:105
 #, c-format
 msgid "Connected game controller %d"
-msgstr ""
+msgstr "Conectado control de juego %d"
 
 #: ../src/wx/widgets/sdljoy.cpp:115
 #, c-format
 msgid "Disconnected game controller %d"
-msgstr ""
+msgstr "Desconectado control de juego %d"
 
 #: ../src/wx/xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
@@ -1861,12 +1862,12 @@ msgstr "Archivo de Bios :"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file :"
-msgstr ""
+msgstr "Archivo BIOS actual :"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:122
 #: ../src/wx/xrc/GameBoyConfig.xrc:138 ../src/wx/xrc/GameBoyConfig.xrc:159
 msgid "(None)"
-msgstr ""
+msgstr "(Nada)"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:136
 #: ../src/wx/xrc/GameBoyConfig.xrc:168
@@ -1973,7 +1974,7 @@ msgstr "Sistema"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:84
 msgid "GB Boot &ROM file :"
-msgstr ""
+msgstr "Archivo &ROM de Boot GB :"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:91 ../src/wx/xrc/GameBoyConfig.xrc:113
 msgid "Select A File"
@@ -1985,11 +1986,11 @@ msgstr "archivo ROM de Arranque de GBC :"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:131
 msgid "Current GB BIOS file :"
-msgstr ""
+msgstr "Archivo de BIOS GB actual :"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:152
 msgid "Current GBC BIOS file :"
-msgstr ""
+msgstr "Archivo BIOS GBC actual :"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:186
 msgid "User 1"
@@ -2411,7 +2412,7 @@ msgstr "50%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:117 ../src/wx/xrc/SpeedupConfig.xrc:48
 msgid "75%"
-msgstr ""
+msgstr "75%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:118 ../src/wx/xrc/SoundConfig.xrc:45
 #: ../src/wx/xrc/SpeedupConfig.xrc:49
@@ -2420,7 +2421,7 @@ msgstr "100%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:119 ../src/wx/xrc/SpeedupConfig.xrc:50
 msgid "125%"
-msgstr ""
+msgstr "125%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:120 ../src/wx/xrc/SpeedupConfig.xrc:51
 msgid "150%"
@@ -2428,7 +2429,7 @@ msgstr "150%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:121 ../src/wx/xrc/SpeedupConfig.xrc:52
 msgid "175%"
-msgstr ""
+msgstr "175%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:122 ../src/wx/xrc/SpeedupConfig.xrc:53
 msgid "200%"
@@ -2436,67 +2437,67 @@ msgstr "200%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:123 ../src/wx/xrc/SpeedupConfig.xrc:54
 msgid "225%"
-msgstr ""
+msgstr "225%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:124 ../src/wx/xrc/SpeedupConfig.xrc:55
 msgid "250%"
-msgstr ""
+msgstr "250%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:125 ../src/wx/xrc/SpeedupConfig.xrc:56
 msgid "275%"
-msgstr ""
+msgstr "275%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:126 ../src/wx/xrc/SpeedupConfig.xrc:57
 msgid "300%"
-msgstr ""
+msgstr "300%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:127 ../src/wx/xrc/SpeedupConfig.xrc:58
 msgid "325%"
-msgstr ""
+msgstr "325%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:128 ../src/wx/xrc/SpeedupConfig.xrc:59
 msgid "350%"
-msgstr ""
+msgstr "350%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:129 ../src/wx/xrc/SpeedupConfig.xrc:60
 msgid "375%"
-msgstr ""
+msgstr "375%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:130 ../src/wx/xrc/SpeedupConfig.xrc:61
 msgid "400%"
-msgstr ""
+msgstr "400%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:131 ../src/wx/xrc/SpeedupConfig.xrc:62
 msgid "425%"
-msgstr ""
+msgstr "425%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:132 ../src/wx/xrc/SpeedupConfig.xrc:63
 msgid "450%"
-msgstr ""
+msgstr "450%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:133 ../src/wx/xrc/SpeedupConfig.xrc:64
 msgid "475%"
-msgstr ""
+msgstr "475%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:134 ../src/wx/xrc/SpeedupConfig.xrc:65
 msgid "500%"
-msgstr ""
+msgstr "500%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:135 ../src/wx/xrc/SpeedupConfig.xrc:66
 msgid "525%"
-msgstr ""
+msgstr "525%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:136 ../src/wx/xrc/SpeedupConfig.xrc:67
 msgid "550%"
-msgstr ""
+msgstr "550%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:137 ../src/wx/xrc/SpeedupConfig.xrc:68
 msgid "575%"
-msgstr ""
+msgstr "575%"
 
 #: ../src/wx/xrc/GeneralConfig.xrc:138 ../src/wx/xrc/SpeedupConfig.xrc:69
 msgid "600%"
-msgstr ""
+msgstr "600%"
 
 #: ../src/wx/xrc/IOViewer.xrc:4
 msgid "IO Viewer"
@@ -2695,7 +2696,7 @@ msgstr "Predeterminados"
 
 #: ../src/wx/xrc/JoyPanel.xrc:529
 msgid "Clear All"
-msgstr ""
+msgstr "Limpiar Todo"
 
 #: ../src/wx/xrc/LinkConfig.xrc:4
 msgid "Link configuration"
@@ -2763,7 +2764,7 @@ msgstr "&Archivo"
 
 #: ../src/wx/xrc/MainMenu.xrc:7
 msgid "Open..."
-msgstr ""
+msgstr "Abrir..."
 
 #: ../src/wx/xrc/MainMenu.xrc:10
 msgid "Open &GB..."
@@ -2807,7 +2808,7 @@ msgstr "Mas &reciente"
 
 #: ../src/wx/xrc/MainMenu.xrc:44
 msgid "Load current state slot"
-msgstr ""
+msgstr "Cargar lote de estado actual"
 
 #: ../src/wx/xrc/MainMenu.xrc:47
 msgid "&Auto load most recent"
@@ -2871,11 +2872,11 @@ msgstr "&Ranura mas antigua"
 
 #: ../src/wx/xrc/MainMenu.xrc:101
 msgid "Save current state slot"
-msgstr ""
+msgstr "Guardar lote de estado actual"
 
 #: ../src/wx/xrc/MainMenu.xrc:104
 msgid "Increase state slot number and save"
-msgstr ""
+msgstr "Incrementar numero de lote de estado y guardar"
 
 #: ../src/wx/xrc/MainMenu.xrc:139
 msgid "To &File ..."
@@ -2887,11 +2888,11 @@ msgstr "&Guardar estado"
 
 #: ../src/wx/xrc/MainMenu.xrc:144
 msgid "Increase state slot number"
-msgstr ""
+msgstr "Incrementar numero de lote de estado"
 
 #: ../src/wx/xrc/MainMenu.xrc:147
 msgid "Decrease state slot number"
-msgstr ""
+msgstr "Reducir numero de lote de estado"
 
 #: ../src/wx/xrc/MainMenu.xrc:152 ../src/wx/xrc/MainMenu.xrc:164
 msgid "&Battery file..."
@@ -2959,7 +2960,7 @@ msgstr "&Reproducir"
 
 #: ../src/wx/xrc/MainMenu.xrc:208
 msgid "&Quit"
-msgstr ""
+msgstr "&Salir"
 
 #: ../src/wx/xrc/MainMenu.xrc:212
 msgid "&Emulation"
@@ -3068,39 +3069,39 @@ msgstr "&Iniciar en pantalla completa"
 
 #: ../src/wx/xrc/MainMenu.xrc:318
 msgid "&Scaled resize"
-msgstr ""
+msgstr "Tamaño de &Escalado&"
 
 #: ../src/wx/xrc/MainMenu.xrc:320
 msgid "&1x"
-msgstr ""
+msgstr "&1x"
 
 #: ../src/wx/xrc/MainMenu.xrc:323
 msgid "&2x"
-msgstr ""
+msgstr "&2x"
 
 #: ../src/wx/xrc/MainMenu.xrc:326
 msgid "&3x"
-msgstr ""
+msgstr "&3x"
 
 #: ../src/wx/xrc/MainMenu.xrc:329
 msgid "&4x"
-msgstr ""
+msgstr "&4x"
 
 #: ../src/wx/xrc/MainMenu.xrc:332
 msgid "&5x"
-msgstr ""
+msgstr "&5x"
 
 #: ../src/wx/xrc/MainMenu.xrc:335
 msgid "&6x"
-msgstr ""
+msgstr "&6x"
 
 #: ../src/wx/xrc/MainMenu.xrc:339
 msgid "Change pixel filter"
-msgstr ""
+msgstr "Cambiar filtro de pixel"
 
 #: ../src/wx/xrc/MainMenu.xrc:342
 msgid "Change interframe blending"
-msgstr ""
+msgstr "Cambiar mezclado de cuadros-intermedios"
 
 #: ../src/wx/xrc/MainMenu.xrc:345
 msgid "&Retain aspect ratio"
@@ -3108,7 +3109,7 @@ msgstr "&Mantener relación de aspecto"
 
 #: ../src/wx/xrc/MainMenu.xrc:349
 msgid "Enable MMX"
-msgstr ""
+msgstr "Activar MMX"
 
 #: ../src/wx/xrc/MainMenu.xrc:354
 msgid "&Bilinear filter"
@@ -3136,15 +3137,15 @@ msgstr "&Audio"
 
 #: ../src/wx/xrc/MainMenu.xrc:388
 msgid "&Increase volume"
-msgstr ""
+msgstr "&Aumentar volumen"
 
 #: ../src/wx/xrc/MainMenu.xrc:392
 msgid "&Decrease volume"
-msgstr ""
+msgstr "&Reducir volumen"
 
 #: ../src/wx/xrc/MainMenu.xrc:396
 msgid "&Toggle sound"
-msgstr ""
+msgstr "&Activar/Desactivar sonido"
 
 #: ../src/wx/xrc/MainMenu.xrc:401
 msgid "&GBA sound interpolation"
@@ -3188,7 +3189,7 @@ msgstr "&R"
 
 #: ../src/wx/xrc/MainMenu.xrc:444
 msgid "&Autohold"
-msgstr ""
+msgstr "&Autosostener"
 
 #: ../src/wx/xrc/MainMenu.xrc:488
 msgid "&Game Boy Advance"
@@ -3236,7 +3237,7 @@ msgstr "&General ..."
 
 #: ../src/wx/xrc/MainMenu.xrc:538
 msgid "&Speedup / Turbo ..."
-msgstr ""
+msgstr "&Aceleracion / Turbo ..."
 
 #: ../src/wx/xrc/MainMenu.xrc:541
 msgid "D&irectories ..."
@@ -3324,7 +3325,7 @@ msgstr "&Visor de Tile..."
 
 #: ../src/wx/xrc/MainMenu.xrc:613
 msgid "Show all video layers"
-msgstr ""
+msgstr "Mostrar todas las capas de video"
 
 #: ../src/wx/xrc/MainMenu.xrc:617
 msgid "BG &0"
@@ -3408,15 +3409,15 @@ msgstr "Traducciones"
 
 #: ../src/wx/xrc/MainMenu.xrc:709
 msgid "Check for updates"
-msgstr ""
+msgstr "Buscar actualizaciones"
 
 #: ../src/wx/xrc/MainMenu.xrc:712
 msgid "&Factory Reset..."
-msgstr ""
+msgstr "&Reseteo de Fabrica..."
 
 #: ../src/wx/xrc/MainMenu.xrc:716
 msgid "&About..."
-msgstr ""
+msgstr "&Acerca..."
 
 #: ../src/wx/xrc/MapViewer.xrc:4
 msgid "Map Viewer"
@@ -3601,7 +3602,7 @@ msgstr "XAudio2"
 
 #: ../src/wx/xrc/SoundConfig.xrc:132
 msgid "FAudio"
-msgstr ""
+msgstr "FAudio"
 
 #: ../src/wx/xrc/SoundConfig.xrc:146
 msgid "Device"
@@ -3649,127 +3650,127 @@ msgstr "Filtrado de sonido"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:4
 msgid "SpeedUp / Turbo Settings"
-msgstr ""
+msgstr "Configuracion de Aceleracion / Turbo"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:9
 msgid "Speedup Throttle"
-msgstr ""
+msgstr "Velocidad de Aceleracion"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:84
 msgid "Speedup Frame Skip"
-msgstr ""
+msgstr "Salto de Cuadros por Aceleracion"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:102
 msgid "# of frames:"
-msgstr ""
+msgstr "# de cuadros"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:121
 msgid "1"
-msgstr ""
+msgstr "1"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:125
 msgid "5"
-msgstr ""
+msgstr "5"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:126
 msgid "6"
-msgstr ""
+msgstr "6"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:127
 msgid "7"
-msgstr ""
+msgstr "7"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:128
 msgid "8"
-msgstr ""
+msgstr "8"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:129
 msgid "9"
-msgstr ""
+msgstr "9"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:130
 msgid "10"
-msgstr ""
+msgstr "10"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:131
 msgid "11"
-msgstr ""
+msgstr "11"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:132
 msgid "12"
-msgstr ""
+msgstr "12"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:133
 msgid "13"
-msgstr ""
+msgstr "13"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:134
 msgid "14"
-msgstr ""
+msgstr "14"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:135
 msgid "15"
-msgstr ""
+msgstr "15"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:136
 msgid "16"
-msgstr ""
+msgstr "16"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:137
 msgid "17"
-msgstr ""
+msgstr "17"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:138
 msgid "18"
-msgstr ""
+msgstr "18"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:139
 msgid "19"
-msgstr ""
+msgstr "19"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:140
 msgid "20"
-msgstr ""
+msgstr "20"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:141
 msgid "21"
-msgstr ""
+msgstr "21"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:142
 msgid "22"
-msgstr ""
+msgstr "22"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:143
 msgid "23"
-msgstr ""
+msgstr "23"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:144
 msgid "24"
-msgstr ""
+msgstr "24"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:145
 msgid "25"
-msgstr ""
+msgstr "25"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:146
 msgid "26"
-msgstr ""
+msgstr "26"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:147
 msgid "27"
-msgstr ""
+msgstr "27"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:148
 msgid "28"
-msgstr ""
+msgstr "28"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:149
 msgid "29"
-msgstr ""
+msgstr "29"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:150
 msgid "30"
-msgstr ""
+msgstr "30"
 
 #: ../src/wx/xrc/TileViewer.xrc:4
 msgid "Tile Viewer"
