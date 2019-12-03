@@ -54,14 +54,14 @@ void wxSDLJoy::Poll()
                     auto prev_val = !val;
 
                     if (handler) {
-                        wxSDLJoyEvent* ev = new wxSDLJoyEvent(wxEVT_SDLJOY);
-                        ev->joy           = joy;
-                        ev->ctrl_type     = WXSDLJOY_BUTTON;
-                        ev->ctrl_idx      = but;
-                        ev->ctrl_val      = val;
-                        ev->prev_val      = prev_val;
+                        wxSDLJoyEvent ev(wxEVT_SDLJOY);
+                        ev.joy           = joy;
+                        ev.ctrl_type     = WXSDLJOY_BUTTON;
+                        ev.ctrl_idx      = but;
+                        ev.ctrl_val      = val;
+                        ev.prev_val      = prev_val;
 
-                        handler->QueueEvent(ev);
+                        handler->ProcessEvent(ev);
                     }
 
                     wxLogDebug("GOT SDL_CONTROLLERBUTTON: joy:%d but:%d val:%d prev_val:%d", joy, but, val, prev_val);
@@ -78,14 +78,14 @@ void wxSDLJoy::Poll()
                     auto prev_val = joystate[joy].axis[axis];
 
                     if (handler && val != prev_val) {
-                        wxSDLJoyEvent* ev = new wxSDLJoyEvent(wxEVT_SDLJOY);
-                        ev->joy           = joy;
-                        ev->ctrl_type     = WXSDLJOY_AXIS;
-                        ev->ctrl_idx      = axis;
-                        ev->ctrl_val      = val;
-                        ev->prev_val      = prev_val;
+                        wxSDLJoyEvent ev(wxEVT_SDLJOY);
+                        ev.joy           = joy;
+                        ev.ctrl_type     = WXSDLJOY_AXIS;
+                        ev.ctrl_idx      = axis;
+                        ev.ctrl_val      = val;
+                        ev.prev_val      = prev_val;
 
-                        handler->QueueEvent(ev);
+                        handler->ProcessEvent(ev);
 
                         joystate[joy].axis[axis] = val;
 
