@@ -71,18 +71,29 @@ if(VCPKG_TARGET_TRIPLET)
         list(APPEND VCPKG_DEPS_QUALIFIED ${pkg}:${VCPKG_TARGET_TRIPLET})
     endforeach()
 
-    # build our deps
     if(WIN32)
-        execute_process(
-            COMMAND vcpkg install ${VCPKG_DEPS_QUALIFIED}
-            WORKING_DIRECTORY ${VCPKG_ROOT}
-        )
+        set(vcpkg_exe vcpkg)
     else()
-        execute_process(
-            COMMAND ./vcpkg install ${VCPKG_DEPS_QUALIFIED}
-            WORKING_DIRECTORY ${VCPKG_ROOT}
-        )
+        set(vcpkg_exe ./vcpkg)
     endif()
+
+    # update portfiles
+    execute_process(
+        COMMAND ${vcpkg_exe} update
+        WORKING_DIRECTORY ${VCPKG_ROOT}
+    )
+
+    # build our deps
+    execute_process(
+        COMMAND ${vcpkg_exe} install ${VCPKG_DEPS_QUALIFIED}
+        WORKING_DIRECTORY ${VCPKG_ROOT}
+    )
+
+    # make sure we have the latest versions
+    execute_process(
+        COMMAND ${vcpkg_exe} upgrade --no-dry-run
+        WORKING_DIRECTORY ${VCPKG_ROOT}
+    )
 
     if(WIN32 AND VCPKG_TARGET_TRIPLET MATCHES x64)
         set(CMAKE_GENERATOR_PLATFORM x64 CACHE STRING "visual studio build architecture" FORCE)
