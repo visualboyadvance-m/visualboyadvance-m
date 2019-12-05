@@ -1396,7 +1396,7 @@ build_dist() {
             fi
             dist_post_configure "$current_dist"
             eval "set -- $(dist_ninja_args "$current_dist")"
-            echo_run ninja -j $NUM_CPUS "$@"
+            echo_run ninja "$@"
 
             if [ -z "$install_override" ]; then
                 rm -rf destdir
@@ -1506,7 +1506,7 @@ build_dist() {
             fi
             dist_post_configure "$current_dist"
             eval "set -- $(dist_ninja_args "$current_dist")"
-            echo_run ninja -j$NUM_CPUS "$@"
+            echo_run ninja "$@"
 
             if [ -z "$install_override" ]; then
                 rm -rf destdir
@@ -2227,7 +2227,12 @@ dist_ninja_args() {
     current_dist=$1
     [ -n "$current_dist" ] || die 'dist_ninja_args: dist name required'
 
-    puts "-v $(table_line DIST_MAKE_ARGS $current_dist)" || :
+    _num_cpus=$NUM_CPUS
+
+    # ninja hits the open file limit on windows
+    [ "$os" = windows ] && [ $_num_cpus -gt 32 ] && _num_cpus=32
+
+    puts "-v $(table_line DIST_MAKE_ARGS $current_dist) -j $_num_cpus" || :
 }
 
 dist_make_install_args() {
