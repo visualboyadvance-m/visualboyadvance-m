@@ -50,6 +50,8 @@ public:
 protected:
     // used to continue rumbling on a timer
     void Notify();
+    void ConnectController(uint8_t joy);
+    void DisconnectController(uint8_t joy);
 private:
     std::unordered_map<uint8_t, wxSDLJoyState> joystate;
     wxEvtHandler* evthandler;

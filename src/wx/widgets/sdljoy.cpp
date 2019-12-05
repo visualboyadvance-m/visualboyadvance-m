@@ -100,7 +100,8 @@ void wxSDLJoy::Poll()
                 auto joy = e.cdevice.which;
 
                 if (add_all || contains(joystate, joy)) {
-                    joystate[joy].dev = SDL_GameControllerOpen(joy);
+                    DisconnectController(joy);
+                    ConnectController(joy);
 
                     systemScreenMessage(wxString::Format(_("Connected game controller %d"), joy + 1));
                 }
@@ -111,13 +112,29 @@ void wxSDLJoy::Poll()
                 auto joy = e.cdevice.which;
 
                 if (contains(joystate, joy)) {
-                    joystate[joy].dev = nullptr;
+                    DisconnectController(joy);
 
                     systemScreenMessage(wxString::Format(_("Disconnected game controller %d"), joy + 1));
                 }
                 break;
             }
         }
+    }
+}
+
+void wxSDLJoy::ConnectController(uint8_t joy)
+{
+    if (!(joystate[joy].dev = SDL_GameControllerOpen(joy)))
+        wxLogDebug("SDL_GameControllerOpen(%d) failed: %s", joy, SDL_GetError());
+}
+
+void wxSDLJoy::DisconnectController(uint8_t joy)
+{
+    if (auto& dev = joystate[joy].dev) {
+        if (SDL_GameControllerGetAttached(dev))
+            SDL_GameControllerClose(dev);
+
+        dev = nullptr;
     }
 }
 
@@ -132,14 +149,14 @@ void wxSDLJoy::Add(int8_t joy_n)
 {
     if (joy_n < 0) {
         for (uint8_t joy : range(0, SDL_NumJoysticks()))
-            joystate[joy].dev = SDL_GameControllerOpen(joy);
+            ConnectController(joy);
 
         add_all = true;
 
         return;
     }
 
-    joystate[joy_n].dev = SDL_GameControllerOpen(joy_n);
+    ConnectController(joy_n);
 }
 
 void wxSDLJoy::Remove(int8_t joy_n)
@@ -147,19 +164,15 @@ void wxSDLJoy::Remove(int8_t joy_n)
     add_all = false;
 
     if (joy_n < 0) {
-        for (auto joy : joystate) {
-            if (auto dev = std::get<1>(joy).dev)
-                SDL_GameControllerClose(dev);
-        }
+        for (auto joy : joystate)
+            DisconnectController(std::get<0>(joy));
 
         joystate.clear();
 
         return;
     }
 
-    if (auto dev = joystate[joy_n].dev)
-        SDL_GameControllerClose(dev);
-
+    DisconnectController(joy_n);
     joystate.erase(joy_n);
 }
 
