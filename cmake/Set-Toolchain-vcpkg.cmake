@@ -95,8 +95,14 @@ if(VCPKG_TARGET_TRIPLET)
         WORKING_DIRECTORY ${VCPKG_ROOT}
     )
 
-    if(WIN32 AND VCPKG_TARGET_TRIPLET MATCHES x64)
+    if(WIN32 AND VCPKG_TARGET_TRIPLET MATCHES x64 AND CMAKE_GENERATOR MATCHES "Visual Studio")
         set(CMAKE_GENERATOR_PLATFORM x64 CACHE STRING "visual studio build architecture" FORCE)
+    endif()
+
+    if(NOT CMAKE_GENERATOR MATCHES "Visual Studio")
+        # set toolchain to VS for e.g. Ninja or jom
+        set(CMAKE_C_COMPILER   cl CACHE STRING "Microsoft C/C++ Compiler" FORCE)
+        set(CMAKE_CXX_COMPILER cl CACHE STRING "Microsoft C/C++ Compiler" FORCE)
     endif()
 
     set(CMAKE_TOOLCHAIN_FILE ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake CACHE FILEPATH "vcpkg toolchain" FORCE)

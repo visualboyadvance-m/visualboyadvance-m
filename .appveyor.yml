@@ -1,0 +1,39 @@
+version: '{build}'
+
+image:
+  - Visual Studio 2017
+
+build:
+  verbosity: detailed
+
+configuration:
+  - Release
+
+platform:
+  - x64
+
+environment:
+  matrix:
+    - arch: Win64
+
+matrix:
+  fast_finish: true
+
+install:
+  - set NINJA_URL="https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-win.zip"
+  - appveyor DownloadFile %NINJA_URL% -FileName ninja.zip
+  - 7z x ninja.zip -oc:\projects\ninja > nul
+  - set PATH=c:\projects\ninja;%PATH%
+  - ninja --version
+
+before_build:
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64
+
+build_script:
+  - mkdir build
+  - cd build
+  - cmake .. -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_BUILD_TYPE=Release -G Ninja
+  - ninja
+
+cache:
+  - c:\projects\vcpkg\installed

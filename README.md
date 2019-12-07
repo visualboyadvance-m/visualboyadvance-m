@@ -59,7 +59,7 @@ make -j`nproc`
 Solus, OpenSUSE, Gentoo and RHEL/CentOS) and Mac OS X (homebrew, macports or
 fink.)
 
-The Ninja cmake generator is also now supported (except for Visual Studio.)
+The Ninja cmake generator is also now supported.
 
 ## Building a Libretro core
 
@@ -88,8 +88,8 @@ To build in the visual studio command prompt, use something like this:
 ```
 mkdir build
 cd build
-cmake .. -DVCPKG_TARGET_TRIPLET=x64-windows
-msbuild -m -p:BuildInParallel=true -p:Configuration=Release .\ALL_BUILD.vcxproj 
+cmake .. -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_BUILD_TYPE=Release -G Ninja
+ninja
 ```
 
 This support is new and we are still working out some issues, including support
