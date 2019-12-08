@@ -285,11 +285,7 @@ find_package(SDL2 REQUIRED)
 add_definitions(${SDL2_DEFINITIONS})
 
 if(WIN32)
-    find_library(SETUPAPI_LIBRARY SetupAPI)
-
-    if(SETUPAPI_LIBRARY)
-        set(SDL2_LIBRARY ${SDL2_LIBRARY} ${SETUPAPI_LIBRARY})
-    endif()
+    set(SDL2_LIBRARY ${SDL2_LIBRARY} setupapi)
 endif()
 
 # set the standard libraries all ports use
