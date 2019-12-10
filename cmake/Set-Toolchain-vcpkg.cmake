@@ -1,6 +1,12 @@
+macro(check_git_status)
+    if(NOT git_status EQUAL 0)
+        message(FATAL_ERROR "Error updating vcpkg from git, please make sure git for windows is installed correctly, it can be installed from Visual Studio components")
+    endif()
+endmacro()
+
 if(VCPKG_TARGET_TRIPLET)
     if(NOT DEFINED ENV{VCPKG_ROOT})
-        get_filename_component(VCPKG_ROOT ${CMAKE_SOURCE_DIR}/../vcpkg ABSOLUTE)
+        get_filename_component(VCPKG_ROOT ${CMAKE_PROJECT_DIR}/../vcpkg ABSOLUTE)
         set(ENV{VCPKG_ROOT} ${VCPKG_ROOT})
     else()
         set(VCPKG_ROOT $ENV{VCPKG_ROOT})
@@ -15,9 +21,7 @@ if(VCPKG_TARGET_TRIPLET)
             WORKING_DIRECTORY ${vcpkg_root_parent}
         )
 
-        if(NOT git_status EQUAL 0)
-            message(FATAL_ERROR "Error cloning vcpkg from git, please make sure git for windows is installed correctly, it can be installed from Visual Studio components")
-        endif()
+        check_git_status()
     else()
         # this is the case when we cache vcpkg/installed with the appveyor build cache
         if(NOT EXISTS ${VCPKG_ROOT}/.git)
@@ -36,35 +40,58 @@ if(VCPKG_TARGET_TRIPLET)
                     RESULT_VARIABLE git_status
                     WORKING_DIRECTORY ${VCPKG_ROOT}
                 )
-                
-                if(NOT git_status EQUAL 0)
-                    break()
-                endif()
+
+                check_git_status()
             endforeach()
         else()
             execute_process(
-                COMMAND git pull --rebase
+                COMMAND git fetch origin
                 RESULT_VARIABLE git_status
                 WORKING_DIRECTORY ${VCPKG_ROOT}
             )
+            check_git_status()
+
+            execute_process(
+                COMMAND git status
+                RESULT_VARIABLE git_status
+                OUTPUT_VARIABLE git_status_text
+                WORKING_DIRECTORY ${VCPKG_ROOT}
+            )
+            check_git_status()
+
+            set(git_up_to_date FALSE)
+
+            if(git_status_text MATCHES "Your branch is up to date with")
+                set(git_up_to_date TRUE)
+            endif()
+
+            if(NOT git_up_to_date)
+                execute_process(
+                    COMMAND git pull --rebase
+                    RESULT_VARIABLE git_status
+                    WORKING_DIRECTORY ${VCPKG_ROOT}
+                )
+
+                check_git_status()
+            endif()
         endif()
 
-        if(NOT git_status EQUAL 0)
-            message(FATAL_ERROR "Error updating vcpkg from git, please make sure git for windows is installed correctly, it can be installed from Visual Studio components")
-        endif()
+        check_git_status()
     endif()
 
-    # build latest vcpkg
-    if(WIN32)
-        execute_process(
-            COMMAND bootstrap-vcpkg.bat
-            WORKING_DIRECTORY ${VCPKG_ROOT}
-        )
-    else()
-        execute_process(
-            COMMAND ./bootstrap-vcpkg.sh
-            WORKING_DIRECTORY ${VCPKG_ROOT}
-        )
+    # build latest vcpkg, if needed
+    if(NOT git_up_to_date)
+        if(WIN32)
+            execute_process(
+                COMMAND bootstrap-vcpkg.bat
+                WORKING_DIRECTORY ${VCPKG_ROOT}
+            )
+        else()
+            execute_process(
+                COMMAND ./bootstrap-vcpkg.sh
+                WORKING_DIRECTORY ${VCPKG_ROOT}
+            )
+        endif()
     endif()
 
     foreach(pkg ${VCPKG_DEPS})
@@ -99,7 +126,7 @@ if(VCPKG_TARGET_TRIPLET)
         set(CMAKE_GENERATOR_PLATFORM x64 CACHE STRING "visual studio build architecture" FORCE)
     endif()
 
-    if(NOT CMAKE_GENERATOR MATCHES "Visual Studio")
+    if(WIN32 AND (NOT CMAKE_GENERATOR MATCHES "Visual Studio"))
         # set toolchain to VS for e.g. Ninja or jom
         set(CMAKE_C_COMPILER   cl CACHE STRING "Microsoft C/C++ Compiler" FORCE)
         set(CMAKE_CXX_COMPILER cl CACHE STRING "Microsoft C/C++ Compiler" FORCE)

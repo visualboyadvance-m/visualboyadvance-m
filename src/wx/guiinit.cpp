@@ -2698,7 +2698,7 @@ void MainFrame::BindAppIcon() {
 #ifdef __WXMSW__
     if (IsWindowsVistaOrGreater()) {
         wxDynamicLibrary comctl32("comctl32", wxDL_DEFAULT | wxDL_QUIET);
-        func_LoadIconWithScaleDown load_icon_scaled = reinterpret_cast<func_LoadIconWithScaleDown>(comctl32.GetSymbol("LoadIconWithScaleDown"));
+        func_LoadIconWithScaleDown load_icon_scaled = reinterpret_cast<func_LoadIconWithScaleDown>(comctl32.GetSymbolAorW("LoadIconWithScaleDown"));
         int icon_set_count = 0;
 
         HICON hIconLg;

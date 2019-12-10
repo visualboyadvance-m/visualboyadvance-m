@@ -101,36 +101,38 @@ FIND_PATH(SDL2_INCLUDE_DIR SDL.h
 
 SET(CURRENT_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
 
-IF(SDL2_STATIC)
-    IF(WIN32)
-        SET(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a)
-    ELSE(WIN32)
-        SET(CMAKE_FIND_LIBRARY_SUFFIXES .a)
-    ENDIF(WIN32)
-ENDIF(SDL2_STATIC)
+if(SDL2_STATIC)
+    if(WIN32)
+	set(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a)
+    else()
+	set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
+    endif()
+endif()
+
+unset(lib_suffix)
+if(MSVC AND CMAKE_BUILD_TYPE MATCHES Debug)
+    set(lib_suffix d)
+endif()
 
 FIND_LIBRARY(SDL2_LIBRARY_TEMP
-	NAMES SDL2
+	NAMES SDL2${lib_suffix}
 	HINTS $ENV{SDL2DIR}
 	PATH_SUFFIXES lib64 lib lib/x64 lib/x86
 	PATHS ${SDL2_SEARCH_PATHS}
 )
 
-IF(NOT SDL2_BUILDING_LIBRARY)
-	IF(NOT ${SDL2_INCLUDE_DIR} MATCHES ".framework")
-		# Non-OS X framework versions expect you to also dynamically link to
-		# SDL2main. This is mainly for Windows and OS X. Other (Unix) platforms
-		# seem to provide SDL2main for compatibility even though they don't
-		# necessarily need it.
-		FIND_LIBRARY(SDL2MAIN_LIBRARY
-			NAMES SDL2main
-			HINTS
-			$ENV{SDL2DIR}
-			PATH_SUFFIXES lib64 lib lib/x64 lib/x86
-			PATHS ${SDL2_SEARCH_PATHS}
-		)
-	ENDIF(NOT ${SDL2_INCLUDE_DIR} MATCHES ".framework")
-ENDIF(NOT SDL2_BUILDING_LIBRARY)
+if(NOT (SDL2_BUILDING_LIBRARY OR ${SDL2_INCLUDE_DIR} MATCHES ".framework"))
+    # Non-OS X framework versions expect you to also dynamically link to
+    # SDL2main. This is mainly for Windows and OS X. Other (Unix) platforms
+    # seem to provide SDL2main for compatibility even though they don't
+    # necessarily need it.
+    find_library(SDL2MAIN_LIBRARY
+	NAMES SDL2main${lib_suffix}
+	HINTS $ENV{SDL2DIR}
+	PATH_SUFFIXES lib64 lib lib/x64 lib/x86
+	PATHS ${SDL2_SEARCH_PATHS}
+    )
+endif()
 
 SET(CMAKE_FIND_LIBRARY_SUFFIXES ${CURRENT_FIND_LIBRARY_SUFFIXES})
 UNSET(CURRENT_FIND_LIBRARY_SUFFIXES)
@@ -156,11 +158,9 @@ ENDIF(MINGW)
 
 IF(SDL2_LIBRARY_TEMP)
 	# For SDL2main
-	IF(NOT SDL2_BUILDING_LIBRARY)
-		IF(SDL2MAIN_LIBRARY)
-			SET(SDL2_LIBRARY_TEMP ${SDL2MAIN_LIBRARY} ${SDL2_LIBRARY_TEMP})
-		ENDIF(SDL2MAIN_LIBRARY)
-	ENDIF(NOT SDL2_BUILDING_LIBRARY)
+	if(SDL2MAIN_LIBRARY AND NOT MSVC)
+	    SET(SDL2_LIBRARY_TEMP ${SDL2MAIN_LIBRARY} ${SDL2_LIBRARY_TEMP})
+	endif()
 
 	# For OS X, SDL2 uses Cocoa as a backend so it must link to Cocoa.
 	# CMake doesn't display the -framework Cocoa string in the UI even

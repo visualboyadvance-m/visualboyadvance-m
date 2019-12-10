@@ -15,7 +15,18 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 set(VCPKG_DEPS zlib libpng SDL2 SFML gettext wxWidgets)
 
+if(NOT DEFINED ENV{APPVEYOR})
+    # job goes over time limit if building ffmpeg
+    list(APPEND VCPKG_DEPS ffmpeg)
+endif()
+
 include(Set-Toolchain-vcpkg)
+
+set(VBAM_STATIC_DEFAULT OFF)
+
+if(VCPKG_TARGET_TRIPLET MATCHES -static OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)
+    set(VBAM_STATIC_DEFAULT ON)
+endif()
 
 project(VBA-M C CXX)
 
@@ -41,7 +52,7 @@ option(ENABLE_WX "Build the wxWidgets port" ON)
 option(ENABLE_DEBUGGER "Enable the debugger" ON)
 option(ENABLE_ASAN "Enable -fsanitize=<option>, address by default, requires debug build" OFF)
 
-option(VBAM_STATIC "Try to link all libraries statically" OFF)
+option(VBAM_STATIC "Try to link all libraries statically" ${VBAM_STATIC_DEFAULT})
 
 if(VBAM_STATIC)
     set(SDL2_STATIC ON)
@@ -100,6 +111,8 @@ if(ENABLE_ASM_SCALERS)
     option(ENABLE_MMX "Enable MMX" ${MMX_DEFAULT})
 endif()
 
+find_package(PkgConfig)
+
 set(ENABLE_LINK_DEFAULT OFF)
 
 # msys2 does not have static sfml libs atm
@@ -120,23 +133,31 @@ option(ENABLE_LIRC "Enable LIRC support" OFF)
 
 set(FFMPEG_DEFAULT OFF)
 
-find_package(PkgConfig)
+set(FFMPEG_COMPONENTS         AVCODEC            AVFORMAT            SWSCALE          AVUTIL            SWRESAMPLE)
+set(FFMPEG_COMPONENT_VERSIONS AVCODEC>=58.18.100 AVFORMAT>=58.12.100 SWSCALE>=5.1.100 AVUTIL>=56.14.100 SWRESAMPLE>=3.1.100)
 
-set(FFMPEG_LIBS_LIST libavcodec>=58.18.100 libavformat>=58.12.100 libswscale>=5.1.100 libavutil>=56.14.100 libswresample>=3.1.100)
+macro(check_ffmpeg_component_versions)
+    # check versions, but only if pkgconfig is available
+    if(FFMPEG_FOUND AND PKG_CONFIG_FOUND AND NOT CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
+        foreach(component ${FFMPEG_COMPONENT_VERSIONS})
+            string(REPLACE ">=" ";" parts ${component})
+            list(GET parts 0 name)
+            list(GET parts 1 version)
 
-if(PKGCONFIG_FOUND)
-    set(FFMPEG_DEFAULT ON)
+            if((NOT DEFINED ${name}_VERSION) OR ${name}_VERSION VERSION_LESS ${version})
+                set(FFMPEG_FOUND OFF)
+            endif()
+        endforeach()
+    endif()
+endmacro()
 
-    foreach(ffmpeg_lib ${FFMPEG_LIBS_LIST})
-        string(REGEX REPLACE ">=.*" "" ffmpeg_lib_name ${ffmpeg_lib})
+set(FFMPEG_DEFAULT ON)
 
-        pkg_check_modules(FFMPEG_LIB_${ffmpeg_lib_name} ${ffmpeg_lib} QUIET)
+find_package(FFmpeg COMPONENTS ${FFMPEG_COMPONENTS})
+check_ffmpeg_component_versions()
 
-        if(NOT FFMPEG_LIB_${ffmpeg_lib_name}_FOUND)
-            set(FFMPEG_DEFAULT OFF)
-            break()
-        endif()
-    endforeach()
+if(NOT FFMPEG_FOUND)
+    set(FFMPEG_DEFAULT OFF)
 endif()
 
 option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
@@ -155,7 +176,7 @@ option(ENABLE_ONLINEUPDATES "Enable online update checks" ${ONLINEUPDATES_DEFAUL
 
 set(LTO_DEFAULT ON)
 
-# lto produces buggy binaries for 64 bit win32
+# gcc lto produces buggy binaries for 64 bit mingw
 # and we generally don't want it when debugging because it makes linking slow
 if(CMAKE_BUILD_TYPE MATCHES Debug OR (WIN32 AND CMAKE_COMPILER_IS_GNUCXX AND AMD64))
     set(LTO_DEFAULT OFF)
@@ -266,23 +287,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
 endif()
 
 find_package(OpenGL REQUIRED)
-
-find_package(PNG REQUIRED)
-
-if(EXISTS /etc/redhat-release)
-    set(FEDORA_HOST ON)
-endif()
-
-if((APPLE AND NOT MACPORTS) OR (WIN32 AND FEDORA_HOST))
-    set(SDL2_STATIC ON)
-endif()
-
-if(WIN32 AND SDL2_STATIC)
-    set(SDL2_BUILDING_LIBRARY TRUE) # try not to link SDL2main
-endif()
-
-find_package(SDL2 REQUIRED)
-add_definitions(${SDL2_DEFINITIONS})
+find_package(PNG    REQUIRED)
+find_package(SDL2   REQUIRED)
 
 if(WIN32)
     set(SDL2_LIBRARY ${SDL2_LIBRARY} setupapi)
@@ -301,29 +307,19 @@ set(
 )
 
 if(ENABLE_FFMPEG)
-    find_package(PkgConfig REQUIRED)
-
-    pkg_check_modules(FFMPEG REQUIRED ${FFMPEG_LIBS_LIST})
-
-    if(FFMPEG_STATIC)
-        set(FFMPEG_LIBRARIES ${FFMPEG_STATIC_LIBRARIES})
-        set(FFMPEG_LDFLAGS   ${FFMPEG_STATIC_LDFLAGS} ${FFMPEG_STATIC_OTHER_LDFLAGS})
-
-        if(APPLE)
-            set(FFMPEG_LDFLAGS ${FFMPEG_LDFLAGS} -framework CoreText -framework ApplicationServices)
-        endif()
-    else()
-        set(FFMPEG_LIBRARIES ${FFMPEG_LIBRARIES})
-        set(FFMPEG_LDFLAGS   ${FFMPEG_LDFLAGS} ${FFMPEG_OTHER_LDFLAGS})
+    if(NOT FFMPEG_LIBRARIES)
+        message(FATAL_ERROR "ENABLE_FFMPEG was specified, but required versions of ffmpeg libraries cannot be found!")
     endif()
+
+    if(APPLE)
+        set(FFMPEG_LDFLAGS ${FFMPEG_LDFLAGS} -framework CoreText -framework ApplicationServices)
+    endif()
+else()
+    add_definitions(-DNO_FFMPEG)
 endif()
 
 if(NOT ENABLE_ONLINEUPDATES)
   add_definitions(-DNO_ONLINEUPDATES)
-endif()
-
-if(NOT ENABLE_FFMPEG)
-  add_definitions(-DNO_FFMPEG)
 endif()
 
 if(ENABLE_LIRC)
@@ -634,10 +630,43 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     set(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${MY_C_LINKER_FLAGS_STR}")
     set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${MY_C_LINKER_FLAGS_STR}")
 elseif(MSVC)
+    # first remove all warnings flags, otherwise there is a warning about overriding them
+    string(REGEX REPLACE "/[Ww][^ ]+" "" CMAKE_C_FLAGS   ${CMAKE_C_FLAGS})
+    string(REGEX REPLACE "/[Ww][^ ]+" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+
     if(CMAKE_BUILD_TYPE STREQUAL Debug)
         add_compile_options(/W4)
     else()
-        add_compile_options(/W0)
+        add_compile_options(/w)
+
+        if(ENABLE_LTO)
+            add_compile_options(/GL)
+
+            set(CMAKE_EXE_LINKER_FLAGS          "${CMAKE_EXE_LINKER_FLAGS}          /LTCG")
+            set(CMAKE_SHARED_LINKER_FLAGS       "${CMAKE_SHARED_LINKER_FLAGS}       /LTCG")
+            set(CMAKE_MODULE_LINKER_FLAGS       "${CMAKE_MODULE_LINKER_FLAGS}       /LTCG")
+            set(CMAKE_STATIC_LINKER_FLAGS       "${CMAKE_STATIC_LINKER_FLAGS}       /LTCG")
+        endif()
+    endif()
+
+    if(VBAM_STATIC)
+        string(REGEX REPLACE "/MDd?" "" CMAKE_C_FLAGS                  ${CMAKE_CXX_FLAGS})
+        string(REGEX REPLACE "/MDd?" "" CMAKE_C_FLAGS_MINSIZEREL       ${CMAKE_CXX_FLAGS})
+        string(REGEX REPLACE "/MDd?" "" CMAKE_C_FLAGS_RELEASE          ${CMAKE_CXX_FLAGS})
+        string(REGEX REPLACE "/MDd?" "" CMAKE_C_FLAGS_RELWITHDEBINFO   ${CMAKE_CXX_FLAGS})
+        string(REGEX REPLACE "/MDd?" "" CMAKE_C_FLAGS_DEBUG            ${CMAKE_CXX_FLAGS})
+
+        string(REGEX REPLACE "/MDd?" "" CMAKE_CXX_FLAGS                ${CMAKE_CXX_FLAGS})
+        string(REGEX REPLACE "/MDd?" "" CMAKE_CXX_FLAGS_MINSIZEREL     ${CMAKE_CXX_FLAGS})
+        string(REGEX REPLACE "/MDd?" "" CMAKE_CXX_FLAGS_RELEASE        ${CMAKE_CXX_FLAGS})
+        string(REGEX REPLACE "/MDd?" "" CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS})
+        string(REGEX REPLACE "/MDd?" "" CMAKE_CXX_FLAGS_DEBUG          ${CMAKE_CXX_FLAGS})
+
+        if(CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo")
+            add_compile_options(/MTd)
+        else()
+            add_compile_options(/MT)
+        endif()
     endif()
 endif()
 
@@ -959,7 +988,7 @@ if(ENABLE_SDL)
     set_property(TARGET vbam PROPERTY CXX_STANDARD_REQUIRED ON)
 
     if(WIN32)
-        set(WIN32_LIBRARIES wsock32 ws2_32)
+        set(WIN32_LIBRARIES wsock32 ws2_32 winmm version imm32)
     endif()
 
     if(ENABLE_LIRC)
@@ -972,6 +1001,11 @@ if(ENABLE_SDL)
         ${WIN32_LIBRARIES}
         ${LIRC_CLIENT_LIBRARY}
     )
+
+    if(WIN32)
+        target_link_libraries(vbam ${SDL2MAIN_LIBRARY})
+    endif()
+
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vbam${CMAKE_EXECUTABLE_SUFFIX} DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 
     if(WIN32)

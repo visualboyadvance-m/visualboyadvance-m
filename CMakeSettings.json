@@ -2,48 +2,84 @@
   "configurations": [
     {
       "name": "x64-Debug",
-      "generator": "Visual Studio 15 2017",
+      "generator": "Ninja",
       "configurationType": "Debug",
       "inheritEnvironments": [
         "msvc_x64"
       ],
       "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
       "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
-      "cmakeCommandArgs": "-DVCPKG_TARGET_TRIPLET=x64-windows",
-      "ctestCommandArgs": ""
+      "cmakeCommandArgs": "-DVCPKG_TARGET_TRIPLET=x64-windows -DENABLE_SDL=TRUE"
     }, {
       "name": "x64-Release",
-      "generator": "Visual Studio 15 2017",
+      "generator": "Ninja",
       "configurationType": "Release",
       "inheritEnvironments": [
         "msvc_x64"
       ],
       "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
       "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
-      "cmakeCommandArgs": "-DVCPKG_TARGET_TRIPLET=x64-windows",
-      "ctestCommandArgs": ""
+      "cmakeCommandArgs": "-DVCPKG_TARGET_TRIPLET=x64-windows -DENABLE_SDL=TRUE"
     }, {
       "name": "x86-Debug",
-      "generator": "Visual Studio 15 2017",
+      "generator": "Ninja",
       "configurationType": "Debug",
       "inheritEnvironments": [
         "msvc_x86"
       ],
       "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
       "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
-      "cmakeCommandArgs": "-DVCPKG_TARGET_TRIPLET=x86-windows",
-      "ctestCommandArgs": ""
+      "cmakeCommandArgs": "-DVCPKG_TARGET_TRIPLET=x86-windows -DENABLE_SDL=TRUE"
     }, {
       "name": "x86-Release",
-      "generator": "Visual Studio 15 2017",
+      "generator": "Ninja",
       "configurationType": "Release",
       "inheritEnvironments": [
         "msvc_x86"
       ],
       "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
       "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
-      "cmakeCommandArgs": "-DVCPKG_TARGET_TRIPLET=x86-windows",
-      "ctestCommandArgs": ""
+      "cmakeCommandArgs": "-DVCPKG_TARGET_TRIPLET=x86-windows -DENABLE_SDL=TRUE"
+    }, {
+      "name": "x64-static-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [
+        "msvc_x64"
+      ],
+      "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
+      "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
+      "cmakeCommandArgs": "-DVCPKG_TARGET_TRIPLET=x64-windows-static -DENABLE_SDL=TRUE"
+    }, {
+      "name": "x64-static-Release",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "inheritEnvironments": [
+        "msvc_x64"
+      ],
+      "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
+      "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
+      "cmakeCommandArgs": "-DVCPKG_TARGET_TRIPLET=x64-windows-static -DENABLE_SDL=TRUE"
+    }, {
+      "name": "x86-static-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [
+        "msvc_x86"
+      ],
+      "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
+      "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
+      "cmakeCommandArgs": "-DVCPKG_TARGET_TRIPLET=x86-windows-static -DENABLE_SDL=TRUE"
+    }, {
+      "name": "x86-static-Release",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "inheritEnvironments": [
+        "msvc_x86"
+      ],
+      "buildRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\build\\${name}",
+      "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
+      "cmakeCommandArgs": "-DVCPKG_TARGET_TRIPLET=x86-windows-static -DENABLE_SDL=TRUE"
     }
   ]
 }

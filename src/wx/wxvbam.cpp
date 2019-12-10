@@ -32,6 +32,15 @@
 IMPLEMENT_APP(wxvbamApp)
 IMPLEMENT_DYNAMIC_CLASS(MainFrame, wxFrame)
 
+#ifdef WIN32_CONSOLE_APP
+#include <windows.h>
+
+int main(int argc, char** argv)
+{
+    return WinMain(::GetModuleHandle(NULL), 0, 0, 0);
+}
+#endif
+
 // Initializer for struct cmditem
 cmditem new_cmditem(const wxString cmd, const wxString name, int cmd_id,
                     int mask_flags, wxMenuItem* mi)
@@ -204,17 +213,27 @@ static void init_check_for_updates()
 }
 #endif // NO_ONLINEUPDATES
 
+#ifdef __WXMSW__
+#include <wx/msw/private.h>
+#include <windows.h>
+#endif
+
 bool wxvbamApp::OnInit()
 {
     // set up logging
 #ifndef NDEBUG
     wxLog::SetLogLevel(wxLOG_Trace);
 #endif
-    // turn off output buffering on Windows to support mintty
 #ifdef __WXMSW__
+    // in windows console mode debug builds, redirect e.g. --help to stderr
+#ifndef NDEBUG
+    wxMessageOutput::Set(new wxMessageOutputStderr());
+#endif
+    // turn off output buffering to support windows consoles
     setvbuf(stdout, NULL, _IONBF, 0);
     setvbuf(stderr, NULL, _IONBF, 0);
-    dup2(1, 2); // redirect stderr to stdout
+    // redirect stderr to stdout
+    dup2(1, 2);
 #endif
     using_wayland = IsItWayland();
 
@@ -471,6 +490,7 @@ int wxvbamApp::OnRun()
     }
 }
 
+// called on --help
 bool wxvbamApp::OnCmdLineHelp(wxCmdLineParser& parser)
 {
     wxApp::OnCmdLineHelp(parser);

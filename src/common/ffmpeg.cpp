@@ -133,8 +133,8 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
         }
     }
     aenc->channels = av_get_channel_layout_nb_channels(aenc->channel_layout);
-    aenc->time_base = (AVRational){ 1, aenc->sample_rate };
-    ast->time_base = (AVRational){ 1, STREAM_FRAME_RATE };
+    aenc->time_base = { 1, aenc->sample_rate };
+    ast->time_base  = { 1, STREAM_FRAME_RATE };
     // open and use codec on stream
     int nb_samples;
     if (avcodec_open2(aenc, acodec, NULL) < 0)
@@ -248,7 +248,7 @@ recording::MediaRet recording::MediaRecorder::setup_video_stream(int width, int 
     st = avformat_new_stream(oc, NULL);
     if (!st) return MRET_ERR_NOMEM;
     st->id = oc->nb_streams - 1;
-    st->time_base = (AVRational){ 1, STREAM_FRAME_RATE };
+    st->time_base = { 1, STREAM_FRAME_RATE };
     // video codec
     vcodec = avcodec_find_encoder(fmt->video_codec);
     if (!vcodec) return MRET_ERR_FMTGUESS;
@@ -593,7 +593,7 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
         return MRET_ERR_RECORDING;
     }
     audioframe->data[3] = audioframe->data[2] = audioframe->data[1] = audioframe->data[0];
-    audioframe->pts = av_rescale_q(samplesCount, (AVRational){1, c->sample_rate}, c->time_base);
+    audioframe->pts = av_rescale_q(samplesCount, {1, c->sample_rate}, c->time_base);
     samplesCount += dst_nb_samples;
 
     got_packet = avcodec_receive_packet(c, &pkt);
@@ -603,7 +603,7 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
     }
     if (!got_packet)
     {
-        av_packet_rescale_ts(&pkt, (AVRational){ 1, c->sample_rate }, ast->time_base);
+        av_packet_rescale_ts(&pkt, { 1, c->sample_rate }, ast->time_base);
         pkt.stream_index = ast->index;
         //log_packet(oc, &pkt);
         if (av_interleaved_write_frame(oc, &pkt) < 0)

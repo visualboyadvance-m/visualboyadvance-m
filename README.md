@@ -75,10 +75,17 @@ Copy vbam_libretro.so to your RetroArch cores directory.
 ## Visual Studio Support
 
 For visual studio, dependency management is handled automatically with vcpkg,
-just clone the repository with git and build with cmake. You can do this from
-the developer command line as well. 2019 will not work yet for building
-dependencies, but you can build the dependencies in 2017 and then use the
-project from 2019.
+From the Visual Studio GUI, just clone the repository with git and build with
+the cmake configurations provided.
+
+If the GUI does not detect cmake, go to `File -> Open -> CMake` and open the
+`CMakeLists.txt`.
+
+If you are using 2017, make sure you have all the latest updates, some issues
+with cmake projects in the GUI have been fixed.
+
+You can also build from the developer command prompt or powershell with the
+environment loaded.
 
 Using your own user-wide installation of vcpkg is supported, just make sure the
 environment variable `VCPKG_ROOT` is set.
@@ -88,12 +95,11 @@ To build in the visual studio command prompt, use something like this:
 ```
 mkdir build
 cd build
-cmake .. -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_BUILD_TYPE=Release -G Ninja
+cmake .. -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_BUILD_TYPE=Debug -G Ninja
 ninja
 ```
 
-This support is new and we are still working out some issues, including support
-for static builds.
+This support is new and we are still working out some issues.
 
 ## Dependencies
 

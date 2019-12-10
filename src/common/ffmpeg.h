@@ -8,6 +8,18 @@
 #define __STDC_CONSTANT_MACROS
 
 extern "C" {
+/* From: http://redino.net/blog/2013/12/uint64_c-defined-including-libavformatavformat-h-vs-2008/ */
+
+#include <stdint.h>
+
+#ifndef INT64_C
+#define INT64_C(c) (c ## LL)
+#endif
+
+#ifndef UINT64_C
+#define UINT64_C(c) (c ## ULL)
+#endif
+
 #include <libavformat/avformat.h>
 #include <libavutil/avassert.h>
 #include <libavutil/channel_layout.h>

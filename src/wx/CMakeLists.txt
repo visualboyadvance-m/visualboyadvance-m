@@ -90,39 +90,89 @@ endif()
 if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
     # set up wxwidgets stuff
     set(libtype u)
-    set(suffix -rel)
+    unset(arch_suffix)
     unset(path_prefix)
+    set(build_suffix -rel)
 
     if(CMAKE_BUILD_TYPE MATCHES Debug)
         set(libtype ud)
-        set(suffix -dbg)
         set(path_prefix debug)
+        set(build_suffix -dbg)
 
         add_definitions(-D_DEBUG)
     endif()
 
-    add_definitions(-D_UNICODE -DUNICODE -DWXUSINGDLL -DwxUSE_GUI=1 -D__WXMSW__)
-    include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/${path_prefix}/lib/msw${libtype})
-    include_directories(${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/include)
-    set(wxWidgets_LIB_DIR ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/${path_prefix}/lib)
+    set(build_suffix_rel -rel)
+    set(build_suffix_dbg -dbg)
+
+    if(VCPKG_TARGET_TRIPLET MATCHES -static)
+        set(arch_suffix  -static)
+
+        set(build_suffix_rel -static-rel)
+        set(build_suffix_dbg -static-dbg)
+
+        set(build_suffix -static${build_suffix})
+    else()
+        add_definitions(-DWXUSINGDLL)
+    endif()
+
+    add_definitions(-D_UNICODE -DUNICODE -DwxUSE_GUI=1 -D__WXMSW__)
+
+    set(common_prefix    ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix})
+    set(dbg_prefix       ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix}/debug)
+    set(installed_prefix ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix}/${path_prefix})
+
+    set(build_prefix_rel ${_VCPKG_ROOT_DIR}/buildtrees/wxwidgets/${WINARCH}-windows${build_suffix_rel})
+    set(build_prefix_dbg ${_VCPKG_ROOT_DIR}/buildtrees/wxwidgets/${WINARCH}-windows${build_suffix_dbg})
+
+    set(build_prefix     ${_VCPKG_ROOT_DIR}/buildtrees/wxwidgets/${WINARCH}-windows${build_suffix})
+
+    include_directories(${installed_prefix}/lib/msw${libtype})
+    include_directories(${common_prefix}/include)
+    set(wxWidgets_LIB_DIR ${installed_prefix}/lib)
     set(wxWidgets_LIBRARIES
         ${wxWidgets_LIB_DIR}/wxbase31${libtype}_net.lib
         ${wxWidgets_LIB_DIR}/wxbase31${libtype}_xml.lib
         ${wxWidgets_LIB_DIR}/wxmsw31${libtype}_core.lib
         ${wxWidgets_LIB_DIR}/wxmsw31${libtype}_gl.lib
         ${wxWidgets_LIB_DIR}/wxmsw31${libtype}_xrc.lib
+        ${wxWidgets_LIB_DIR}/wxmsw31${libtype}_html.lib
         ${wxWidgets_LIB_DIR}/wxbase31${libtype}.lib
         winmm comctl32 oleacc rpcrt4 shlwapi version wsock32 opengl32
     )
 
-    if(NOT EXISTS ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/${path_prefix}/bin/wxrc.exe)
-        file(
-            COPY ${_VCPKG_ROOT_DIR}/buildtrees/wxwidgets/${WINARCH}-windows${suffix}/lib/wxrc.exe
-            DESTINATION ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/${path_prefix}/bin
+    if(EXISTS ${wxWidgets_LIB_DIR}/wxregex${libtype}.lib)
+        list(APPEND wxWidgets_LIBRARIES ${wxWidgets_LIB_DIR}/wxregex${libtype}.lib)
+    endif()
+
+    if(VCPKG_TARGET_TRIPLET MATCHES -static)
+        unset(deb_suffix)
+        if(CMAKE_BUILD_TYPE MATCHES Debug)
+            set(deb_suffix d)
+        endif()
+
+        list(APPEND wxWidgets_LIBRARIES
+            ${wxWidgets_LIB_DIR}/jpeg${deb_suffix}.lib
+            ${wxWidgets_LIB_DIR}/tiff${deb_suffix}.lib
+            ${wxWidgets_LIB_DIR}/lzma${deb_suffix}.lib
+            ${wxWidgets_LIB_DIR}/expat.lib
         )
     endif()
 
-    set(WXRC ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows/${path_prefix}/bin/wxrc.exe)
+    if(NOT EXISTS ${installed_prefix}/bin/wxrc.exe)
+        # Need to copy both the release and debug versions out of the build tree, because
+        # appveyor does not cache the build trees.
+        file(
+            COPY ${build_prefix_rel}/lib/wxrc.exe
+            DESTINATION ${common_prefix}/bin
+        )
+        file(
+            COPY ${build_prefix_dbg}/lib/wxrc.exe
+            DESTINATION ${dbg_prefix}/bin
+        )
+    endif()
+
+    set(WXRC ${installed_prefix}/bin/wxrc.exe)
 
     if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/zip.exe)
         # get zip binary for wxrc
@@ -134,8 +184,17 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
     endif()
 
     # SDL2.dll does not get copied to build dir
-    if(NOT EXISTS ${CMAKE_BINARY_DIR}/SDL2.dll)
-        file(COPY ${_VCPKG_ROOT_DIR}/installed/${WINARCH}-windows/${path_prefix}/bin/SDL2.dll DESTINATION ${CMAKE_BINARY_DIR})
+    if(NOT VCPKG_TARGET_TRIPLET MATCHES -static)
+        unset(deb_suffix)
+        if(CMAKE_BUILD_TYPE MATCHES Debug)
+            set(deb_suffix d)
+        endif()
+
+        set(dll_path ${installed_prefix}/bin/SDL2${deb_suffix}.dll)
+
+        if(NOT EXISTS ${CMAKE_BINARY_DIR}/SDL2${deb_suffix}.dll AND EXISTS ${dll_path})
+            file(COPY ${dll_path} DESTINATION ${CMAKE_BINARY_DIR})
+        endif()
     endif()
 else()
     if(CMAKE_BUILD_TYPE MATCHES Debug)
@@ -793,17 +852,23 @@ target_link_libraries(
 )
 
 if(ENABLE_FFMPEG)
-    join("${FFMPEG_LDFLAGS}" " " FFMPEG_LDFLAGS_STR)
+    if(WIN32)
+        list(APPEND FFMPEG_LIBRARIES secur32 bcrypt)
+    endif()
 
     target_link_libraries(
         visualboyadvance-m
         ${FFMPEG_LIBRARIES}
     )
 
-    set_target_properties(
-        visualboyadvance-m
-        PROPERTIES LINK_FLAGS ${FFMPEG_LDFLAGS_STR}
-    )
+    if(FFMPEG_LDFLAGS)
+        join("${FFMPEG_LDFLAGS}" " " FFMPEG_LDFLAGS_STR)
+
+        set_target_properties(
+            visualboyadvance-m
+            PROPERTIES LINK_FLAGS ${FFMPEG_LDFLAGS_STR}
+        )
+    endif()
 endif()
 
 # link libgcc/libstdc++ statically on mingw
@@ -835,6 +900,15 @@ if(CMAKE_COMPILER_IS_GNUCXX)
                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             )
         endif()
+    endif()
+elseif(MSVC)
+    # the debug lib libcmtd is linked in debug mode, so don't link the normal version
+    # also make the app a console app in debug mode
+    set_target_properties(visualboyadvance-m PROPERTIES LINK_FLAGS_DEBUG "/nodefaultlib:libcmt /subsystem:console")
+
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+        # to get the debug console mode app to work correctly
+        target_compile_definitions(visualboyadvance-m PRIVATE -DWIN32_CONSOLE_APP)
     endif()
 endif()
 

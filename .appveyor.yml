@@ -7,14 +7,17 @@ build:
   verbosity: detailed
 
 configuration:
+  - Debug
   - Release
 
 platform:
   - x64
+  - x86
 
 environment:
   matrix:
-    - arch: Win64
+    - STATIC: " "
+    - STATIC: "-static"
 
 matrix:
   fast_finish: true
@@ -27,13 +30,23 @@ install:
   - ninja --version
 
 before_build:
-  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" %PLATFORM%
 
 build_script:
   - mkdir build
   - cd build
-  - cmake .. -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_BUILD_TYPE=Release -G Ninja
+  - cmake .. -DVCPKG_TARGET_TRIPLET=%PLATFORM%-windows%STATIC% -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DENABLE_SDL=TRUE -G Ninja
   - ninja
 
+# only debug builds are console mode apps, in them test --help
+for:
+-
+  matrix:
+    except:
+      - configuration: Release
+
+  test_script:
+    - .\visualboyadvance-m.exe --help
+
 cache:
-  - c:\projects\vcpkg\installed
+  - c:\vcpkg\installed
