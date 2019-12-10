@@ -763,10 +763,12 @@ void sdlReadBattery()
 
 void sdlReadDesktopVideoMode()
 {
-    SDL_DisplayMode dm;
-    SDL_GetDesktopDisplayMode(SDL_GetWindowDisplayIndex(window), &dm);
-    desktopWidth = dm.w;
-    desktopHeight = dm.h;
+    if (window) {
+        SDL_DisplayMode dm;
+        SDL_GetDesktopDisplayMode(SDL_GetWindowDisplayIndex(window), &dm);
+        desktopWidth = dm.w;
+        desktopHeight = dm.h;
+    }
 }
 
 static void sdlResizeVideo()
