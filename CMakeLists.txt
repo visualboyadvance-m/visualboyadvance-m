@@ -15,8 +15,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 set(VCPKG_DEPS zlib libpng SDL2 SFML gettext wxWidgets)
 
-if(NOT DEFINED ENV{APPVEYOR})
-    # job goes over time limit if building ffmpeg
+# appveyor job goes over time limit if building ffmpeg during initial cache
+# generation. So build initial cache without ffmpeg.
+#if(NOT DEFINED ENV{APPVEYOR})
+if(1)
     list(APPEND VCPKG_DEPS ffmpeg)
 endif()
 
