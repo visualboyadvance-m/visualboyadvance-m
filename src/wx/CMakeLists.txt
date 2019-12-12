@@ -528,6 +528,28 @@ endif() # wxWidgets checks
 
 if(CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
     find_package(unofficial-gettext REQUIRED)
+
+    if(MSVC)
+        # install gettext tools from nuget
+
+        # first fetch the nuget binary
+        if(NOT EXISTS ${CMAKE_BINARY_DIR}/nuget.exe)
+            file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" ${CMAKE_BINARY_DIR}/nuget.exe)
+        endif()
+
+        # install the Gettext.Tools package
+        execute_process(
+            COMMAND nuget.exe install Gettext.Tools -OutputDirectory ${CMAKE_BINARY_DIR}/nuget
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+        # find the path to the binaries in the package and add them to find path
+        file(GLOB pkg ${CMAKE_BINARY_DIR}/nuget/*)
+
+        list(APPEND CMAKE_PROGRAM_PATH ${pkg}/tools/bin)
+
+        find_package(Gettext REQUIRED)
+    endif()
 else()
     find_package(Gettext REQUIRED)
 
