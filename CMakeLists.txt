@@ -275,7 +275,23 @@ if(AMD64 AND (ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS OR ENABLE_MMX))
 endif()
 
 if(ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS)
+    if(MSVC)
+        if(NOT EXISTS ${CMAKE_BINARY_DIR}/nuget.exe)
+            file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" ${CMAKE_BINARY_DIR}/nuget.exe)
+        endif()
+
+        execute_process(
+            COMMAND nuget.exe install nasm2 -OutputDirectory ${CMAKE_BINARY_DIR}/nuget
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+        file(GLOB pkg ${CMAKE_BINARY_DIR}/nuget/nasm2*)
+
+        list(APPEND CMAKE_PROGRAM_PATH ${pkg}/tools)
+    endif()
+
     enable_language(ASM_NASM)
+
     set(ASM_ENABLED ON)
 endif()
 

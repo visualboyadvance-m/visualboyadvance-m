@@ -544,7 +544,7 @@ if(CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
         )
 
         # find the path to the binaries in the package and add them to find path
-        file(GLOB pkg ${CMAKE_BINARY_DIR}/nuget/*)
+        file(GLOB pkg ${CMAKE_BINARY_DIR}/nuget/Gettext.Tools*)
 
         list(APPEND CMAKE_PROGRAM_PATH ${pkg}/tools/bin)
 
