@@ -153,13 +153,15 @@ macro(check_ffmpeg_component_versions)
     endif()
 endmacro()
 
-set(FFMPEG_DEFAULT ON)
+if(((NOT DEFINED ENABLE_FFMPEG) AND (NOT (WIN32 AND X86))) OR ENABLE_FFMPEG)
+    set(FFMPEG_DEFAULT ON)
 
-find_package(FFmpeg COMPONENTS ${FFMPEG_COMPONENTS})
-check_ffmpeg_component_versions()
+    find_package(FFmpeg COMPONENTS ${FFMPEG_COMPONENTS})
+    check_ffmpeg_component_versions()
 
-if(NOT FFMPEG_FOUND)
-    set(FFMPEG_DEFAULT OFF)
+    if(NOT FFMPEG_FOUND)
+        set(FFMPEG_DEFAULT OFF)
+    endif()
 endif()
 
 option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})

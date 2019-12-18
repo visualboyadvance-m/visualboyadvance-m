@@ -16,9 +16,11 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "[xX]86|i[3-9]86|[aA][mM][dD]64")
     if(CMAKE_C_SIZEOF_DATA_PTR EQUAL 4) # 32 bit
         set(ASM_DEFAULT ON)
         set(X86_32 ON)
+        set(X86 ON)
 	set(WINARCH x86)
     else()
         set(AMD64 ON)
+        set(X64 ON)
 	set(WINARCH x64)
     endif()
 
