@@ -3,6 +3,7 @@
 set -e
 
 target_bits=64
+target_cpu_family=x86_64
 target_cpu=x86_64
 lib_suffix=64
 target_endian=little
@@ -13,6 +14,7 @@ case "$1" in
         ;;
     -32)
         target_bits=32
+        target_cpu_family=x86
         target_cpu=i686
         lib_suffix=
         shift
@@ -71,7 +73,7 @@ meson() {
         cat >$BUILD_ROOT/tmp/meson_cross_$$.txt <<EOF
 [host_machine]
 system     = 'windows'
-cpu_family = '$target_cpu'
+cpu_family = '$target_cpu_family'
 cpu        = '$target_cpu'
 endian     = '$target_endian'
 

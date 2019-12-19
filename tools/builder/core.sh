@@ -210,7 +210,6 @@ DISTS=$DISTS'
     ffmpeg          https://ffmpeg.org/releases/ffmpeg-4.2.1.tar.bz2                                            lib/libavformat.a
 '
 
-# for now we don't build ffmpeg because game recording is broken
 BUILD_FFMPEG=1
 
 FFMPEG_DISTS='
@@ -479,6 +478,9 @@ pre_build_all() {
 setup() {
     detect_os
 
+    target_os=${CROSS_OS:-$os}
+    target_bits=${target_bits:-$bits}
+
     mkdir -p "$BUILD_ROOT/tmp"
 
     rm -rf "$BUILD_ROOT/tmp/"*
@@ -505,6 +507,12 @@ setup() {
     [ -L bin/gmake ] || ln -s "$(command -v make)" bin/gmake
 
     cd "$OPWD"
+
+    # Don't use ffmpeg for 32 bit windows builds for XP compat and to make the
+    # binary smaller.
+    if [ "$target_os" = windows ] && [ "$target_bits" -eq 32 ]; then
+        BUILD_FFMPEG=
+    fi
 
     if [ -z "$BUILD_FFMPEG" ]; then
         for dist in $FFMPEG_DISTS; do
@@ -2636,9 +2644,6 @@ die() {
 build_project() {
     puts "${NL}[32mBuilding project: [1;34m$CHECKOUT[0m${NL}${NL}"
 
-    target_os=${CROSS_OS:-$os}
-    target_bits=${target_bits:-$bits}
-
     dist_pre_build project
 
     mkdir -p "$BUILD_ROOT/project"
@@ -2648,8 +2653,8 @@ build_project() {
 
     lto=ON
 
-    # FIXME: LTO still broken on 64 bit mingw
-    if [ "$target_os" = windows ] && [ "$target_bits" = 64 ]; then
+    # FIXME: LTO still broken on 64 bit mingw, and now 32 bit mingw too
+    if [ "$target_os" = windows ]; then
         lto=OFF
     fi
 
