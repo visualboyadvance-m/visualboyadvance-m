@@ -1,5 +1,6 @@
 #pragma code_page(65001)
-AAAAA_MAINICON ICON "icons/vbam.ico"
+
+AAAAA_MAINICON ICON "icons/visualboyadvance-m.ico"
 
 #include "wx/msw/wx.rc"
 
@@ -39,12 +40,12 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "VBA-M comes with NO WARRANTY. Use it at your own risk."
+            VALUE "Comments", "VisualBoyAdvance-M comes with NO WARRANTY. Use it at your own risk."
             VALUE "CompanyName", "http://vba-m.com/"
             VALUE "FileDescription", "VisualBoyAdvance-M"
             VALUE "FileVersion", VER_FILEVERSION_STR
-            VALUE "InternalName", "VBA-M"
-            VALUE "LegalCopyright", "Copyright © 2008-2019 VBA-M development team"
+            VALUE "InternalName", "wxvbam"
+            VALUE "LegalCopyright", "Copyright © 2008-2019 VisualBoyAdvance-M development team"
             VALUE "OriginalFilename", "VisualBoyAdvance-M.exe"
             VALUE "ProductName", "VisualBoyAdvance-M"
             VALUE "ProductVersion", VER_PRODUCTVERSION_STR

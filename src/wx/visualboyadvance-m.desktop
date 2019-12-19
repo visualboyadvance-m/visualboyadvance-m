@@ -1,7 +1,6 @@
 [Desktop Entry]
-Version=1.0
 Type=Application
-Name=VBA-M
+Name=visualboyadvance-m
 GenericName=Game Boy Advance Emulator
 Comment=Nintendo Game Boy Advance Emulator
 Exec=visualboyadvance-m %f

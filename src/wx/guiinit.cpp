@@ -31,7 +31,7 @@
 // ImageMagick makes the name wxvbam, but wx expects wxvbam_xpm
 #define wxvbam wxvbam_xpm
 const
-#include "xrc/vbam.xpm"
+#include "xrc/visualboyadvance-m.xpm"
 #undef wxvbam
 #endif
 

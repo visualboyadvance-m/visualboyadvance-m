@@ -751,7 +751,7 @@ set(
     cmdhandlers.h
     cmd-evtable.h
     # icon File
-    xrc/vbam.xpm
+    xrc/visualboyadvance-m.xpm
     ../common/version.cpp
 )
 
@@ -828,7 +828,7 @@ endif()
 
 link_directories(${CMAKE_BINARY_DIR})
 
-set(VBAM_ICON vbam.icns)
+set(VBAM_ICON visualboyadvance-m.icns)
 
 set(VBAM_ICON_PATH ${CMAKE_CURRENT_SOURCE_DIR}/icons/${VBAM_ICON})
 
@@ -935,7 +935,9 @@ elseif(MSVC)
 endif()
 
 if(NOT WIN32 AND NOT APPLE)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/wxvbam.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
+    install(FILES     ${CMAKE_CURRENT_SOURCE_DIR}/visualboyadvance-m.desktop     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
+    install(FILES     ${CMAKE_CURRENT_SOURCE_DIR}/visualboyadvance-m.appdata.xml DESTINATION ${CMAKE_INSTALL_PREFIX}/share/appdata)
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/icons/sizes/                   DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor)
 endif()
 
 if(APPLE)

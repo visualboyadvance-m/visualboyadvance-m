@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+ <id>visualboyadvance-m.desktop</id>
+ <metadata_license>CC-BY-SA-3.0</metadata_license>
+ <project_license>GPL-2.0</project_license>
+ <name>VisualBoyAdvance-M</name>
+ <summary>VisualBoyAdvance-M, a high compatibility Gameboy Advance Emulator</summary>
+ <description>
+  <p>
+    VisualBoyAdvance-M is a Nintendo Game Boy Emulator with high compatibility
+    with commercial games. It emulates the Nintendo Game Boy Advance hand held
+    console, in addition to the original Game Boy systems and its Super and
+    Color variants. VisualBoyAdvance-M is the continued development of the now
+    inactive VisualBoy Advance project, with many improvements from various
+    forks.
+  </p>
+ </description>
+ <url type="homepage">http://vba-m.com/</url>
+ <url type="bugtracker">https://github.com/visualboyadvance-m/visualboyadvance-m/issues</url>
+ <update_contact>zachbacon_at_vba-m.com</update_contact>
+</component>
