@@ -20,6 +20,7 @@
 [![Join the chat at https://gitter.im/visualboyadvance-m/Lobby](https://badges.gitter.im/visualboyadvance-m/Lobby.svg)](https://gitter.im/visualboyadvance-m/Lobby)
 [![travis](https://travis-ci.org/visualboyadvance-m/visualboyadvance-m.svg?branch=master)](https://travis-ci.org/visualboyadvance-m/visualboyadvance-m)
 [![appveyor](https://ci.appveyor.com/api/projects/status/5ckx25vct1q1ovfc?svg=true)](https://ci.appveyor.com/project/ZachBacon65337/visualboyadvance-m-2ys5r)
+[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/visualboyadvance-m)
 
 # Visual Boy Advance - M
 
@@ -293,3 +294,5 @@ If you have multiple small commits for a change, please try to use `git rebase
 good commit messages!) See:
 https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History if you are new to
 this.
+
+
