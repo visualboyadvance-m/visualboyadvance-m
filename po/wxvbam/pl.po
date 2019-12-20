@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-22 23:25+0000\n"
-"PO-Revision-Date: 2019-12-03 19:58+0000\n"
+"PO-Revision-Date: 2019-12-18 09:15+0000\n"
 "Last-Translator: Damian Drakon <dragon1590@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/bgk/vba-m/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -3205,35 +3205,35 @@ msgstr "Użyj pliku BIOS"
 
 #: ../src/wx/xrc/MainMenu.xrc:502
 msgid "&Debug print"
-msgstr ""
+msgstr "Wydruk debugowania"
 
 #: ../src/wx/xrc/MainMenu.xrc:513
 msgid "&GB printer"
-msgstr ""
+msgstr "Drukarka GB"
 
 #: ../src/wx/xrc/MainMenu.xrc:517
 msgid "&Gather a full page before printing"
-msgstr ""
+msgstr "Opóźnij wydruk, aż strona się zapełni"
 
 #: ../src/wx/xrc/MainMenu.xrc:521
 msgid "&Save printouts as screen captures"
-msgstr ""
+msgstr "Zapisz wydruki jako zrzuty ekranu"
 
 #: ../src/wx/xrc/MainMenu.xrc:526
 msgid "&Use GB BIOS file"
-msgstr ""
+msgstr "Użyj pliku BIOS konsoli GB"
 
 #: ../src/wx/xrc/MainMenu.xrc:530
 msgid "&Use GBC BIOS file"
-msgstr ""
+msgstr "Użyj pliku BIOS konsoli GBC"
 
 #: ../src/wx/xrc/MainMenu.xrc:535
 msgid "&General ..."
-msgstr ""
+msgstr "Ogólne..."
 
 #: ../src/wx/xrc/MainMenu.xrc:538
 msgid "&Speedup / Turbo ..."
-msgstr ""
+msgstr "Przyśpieszenie/Turbo..."
 
 #: ../src/wx/xrc/MainMenu.xrc:541
 msgid "D&irectories ..."
@@ -3433,19 +3433,19 @@ msgstr ""
 
 #: ../src/wx/xrc/MapViewer.xrc:35
 msgid "BG0"
-msgstr "BG0"
+msgstr "Tło0"
 
 #: ../src/wx/xrc/MapViewer.xrc:41
 msgid "BG1"
-msgstr ""
+msgstr "Tło1"
 
 #: ../src/wx/xrc/MapViewer.xrc:46
 msgid "BG2"
-msgstr ""
+msgstr "Tło2"
 
 #: ../src/wx/xrc/MapViewer.xrc:51
 msgid "BG3"
-msgstr ""
+msgstr "Tło3"
 
 #: ../src/wx/xrc/MapViewer.xrc:84
 msgid "Map Base:"
@@ -3550,7 +3550,7 @@ msgstr "Ustawienia dźwięku"
 
 #: ../src/wx/xrc/SoundConfig.xrc:16
 msgid "Volume :"
-msgstr "Głośność :"
+msgstr "Głośność:"
 
 #: ../src/wx/xrc/SoundConfig.xrc:34
 msgid "Mute"
@@ -3558,11 +3558,11 @@ msgstr "Wycisz"
 
 #: ../src/wx/xrc/SoundConfig.xrc:54 ../src/wx/xrc/SoundConfig.xrc:320
 msgid "Maximum"
-msgstr "Maksymalny"
+msgstr "Maksymalna"
 
 #: ../src/wx/xrc/SoundConfig.xrc:71
 msgid "Sample rate :"
-msgstr "Częstotliwość próbkowania :"
+msgstr "Częstotliwość próbkowania:"
 
 #: ../src/wx/xrc/SoundConfig.xrc:77
 msgid "48 KHz"
@@ -3598,7 +3598,7 @@ msgstr "XAudio2"
 
 #: ../src/wx/xrc/SoundConfig.xrc:132
 msgid "FAudio"
-msgstr ""
+msgstr "FAudio"
 
 #: ../src/wx/xrc/SoundConfig.xrc:146
 msgid "Device"

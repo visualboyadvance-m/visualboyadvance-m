@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-22 23:25+0000\n"
-"PO-Revision-Date: 2019-12-03 19:59+0000\n"
+"PO-Revision-Date: 2019-12-18 09:15+0000\n"
 "Last-Translator: Damian Drakon <dragon1590@gmail.com>\n"
 "Language-Team: Polish (Poland) (http://www.transifex.com/bgk/vba-m/language/pl_PL/)\n"
 "MIME-Version: 1.0\n"
@@ -3202,35 +3202,35 @@ msgstr "Użyj pliku BIOS"
 
 #: ../src/wx/xrc/MainMenu.xrc:502
 msgid "&Debug print"
-msgstr ""
+msgstr "Wydruk debugowania"
 
 #: ../src/wx/xrc/MainMenu.xrc:513
 msgid "&GB printer"
-msgstr ""
+msgstr "Drukarka GB"
 
 #: ../src/wx/xrc/MainMenu.xrc:517
 msgid "&Gather a full page before printing"
-msgstr ""
+msgstr "Opóźnij wydruk, aż strona się zapełni"
 
 #: ../src/wx/xrc/MainMenu.xrc:521
 msgid "&Save printouts as screen captures"
-msgstr ""
+msgstr "Zapisz wydruki jako zrzuty ekranu"
 
 #: ../src/wx/xrc/MainMenu.xrc:526
 msgid "&Use GB BIOS file"
-msgstr ""
+msgstr "Użyj pliku BIOS konsoli GB"
 
 #: ../src/wx/xrc/MainMenu.xrc:530
 msgid "&Use GBC BIOS file"
-msgstr ""
+msgstr "Użyj pliku BIOS konsoli GBC"
 
 #: ../src/wx/xrc/MainMenu.xrc:535
 msgid "&General ..."
-msgstr ""
+msgstr "Ogólne..."
 
 #: ../src/wx/xrc/MainMenu.xrc:538
 msgid "&Speedup / Turbo ..."
-msgstr ""
+msgstr "Przyśpieszenie/Turbo..."
 
 #: ../src/wx/xrc/MainMenu.xrc:541
 msgid "D&irectories ..."
@@ -3398,7 +3398,7 @@ msgstr "Forum wsparcia programu VBA-M"
 
 #: ../src/wx/xrc/MainMenu.xrc:701
 msgid "Translations"
-msgstr ""
+msgstr "Tłumaczenia"
 
 #: ../src/wx/xrc/MainMenu.xrc:709
 msgid "Check for updates"
@@ -3430,19 +3430,19 @@ msgstr ""
 
 #: ../src/wx/xrc/MapViewer.xrc:35
 msgid "BG0"
-msgstr ""
+msgstr "Tło0"
 
 #: ../src/wx/xrc/MapViewer.xrc:41
 msgid "BG1"
-msgstr ""
+msgstr "Tło1"
 
 #: ../src/wx/xrc/MapViewer.xrc:46
 msgid "BG2"
-msgstr ""
+msgstr "Tło2"
 
 #: ../src/wx/xrc/MapViewer.xrc:51
 msgid "BG3"
-msgstr ""
+msgstr "Tło3"
 
 #: ../src/wx/xrc/MapViewer.xrc:84
 msgid "Map Base:"
@@ -3455,19 +3455,19 @@ msgstr ""
 #: ../src/wx/xrc/MapViewer.xrc:100 ../src/wx/xrc/MemSelRegion.xrc:22
 #: ../src/wx/xrc/OAMViewer.xrc:77
 msgid "Size:"
-msgstr ""
+msgstr "Rozmiar:"
 
 #: ../src/wx/xrc/MapViewer.xrc:108 ../src/wx/xrc/OAMViewer.xrc:45
 msgid "Colors:"
-msgstr ""
+msgstr "Kolory:"
 
 #: ../src/wx/xrc/MapViewer.xrc:124
 msgid "Mosaic:"
-msgstr ""
+msgstr "Mozaika:"
 
 #: ../src/wx/xrc/MapViewer.xrc:132
 msgid "Overflow:"
-msgstr ""
+msgstr "Przepełnienie:"
 
 #: ../src/wx/xrc/MemViewer.xrc:4
 msgid "Memory Viewer"
@@ -3487,7 +3487,7 @@ msgstr "32-bitowy"
 
 #: ../src/wx/xrc/MemViewer.xrc:83
 msgid "Current address:"
-msgstr ""
+msgstr "Obecny adres:"
 
 #: ../src/wx/xrc/MemViewer.xrc:108
 msgid "&Load..."
@@ -3495,19 +3495,19 @@ msgstr "Wczytaj..."
 
 #: ../src/wx/xrc/NetLink.xrc:4
 msgid "Start Network Link"
-msgstr ""
+msgstr "Włącz połączenie sieciowe"
 
 #: ../src/wx/xrc/NetLink.xrc:11
 msgid "Server"
-msgstr ""
+msgstr "Serwer"
 
 #: ../src/wx/xrc/NetLink.xrc:19
 msgid "Client"
-msgstr ""
+msgstr "Klient"
 
 #: ../src/wx/xrc/NetLink.xrc:32
 msgid "Players:"
-msgstr ""
+msgstr "Liczba graczy:"
 
 #: ../src/wx/xrc/NetLink.xrc:41 ../src/wx/xrc/SpeedupConfig.xrc:122
 msgid "2"
@@ -3523,7 +3523,7 @@ msgstr "4"
 
 #: ../src/wx/xrc/NetLink.xrc:67
 msgid "Server:"
-msgstr ""
+msgstr "Serwer:"
 
 #: ../src/wx/xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
@@ -3531,7 +3531,7 @@ msgstr "Przeglądarka OAM"
 
 #: ../src/wx/xrc/OAMViewer.xrc:85
 msgid "Rot.:"
-msgstr ""
+msgstr "Rot.:"
 
 #: ../src/wx/xrc/PaletteViewer.xrc:4
 msgid "Palette Viewer"
@@ -3543,11 +3543,11 @@ msgstr "Zmień kolor tła..."
 
 #: ../src/wx/xrc/SoundConfig.xrc:4
 msgid "Sound Settings"
-msgstr ""
+msgstr "Ustawienia dźwięku"
 
 #: ../src/wx/xrc/SoundConfig.xrc:16
 msgid "Volume :"
-msgstr ""
+msgstr "Głośność:"
 
 #: ../src/wx/xrc/SoundConfig.xrc:34
 msgid "Mute"
@@ -3555,11 +3555,11 @@ msgstr "Wycisz"
 
 #: ../src/wx/xrc/SoundConfig.xrc:54 ../src/wx/xrc/SoundConfig.xrc:320
 msgid "Maximum"
-msgstr ""
+msgstr "Maksymalna"
 
 #: ../src/wx/xrc/SoundConfig.xrc:71
 msgid "Sample rate :"
-msgstr ""
+msgstr "Częstotliwość próbkowania:"
 
 #: ../src/wx/xrc/SoundConfig.xrc:77
 msgid "48 KHz"
@@ -3579,7 +3579,7 @@ msgstr "11 KHz"
 
 #: ../src/wx/xrc/SoundConfig.xrc:103
 msgid "SDL"
-msgstr ""
+msgstr "SDL"
 
 #: ../src/wx/xrc/SoundConfig.xrc:111
 msgid "OpenAL"
@@ -3587,19 +3587,19 @@ msgstr "OpenAL"
 
 #: ../src/wx/xrc/SoundConfig.xrc:118
 msgid "DirectSound"
-msgstr ""
+msgstr "DirectSound"
 
 #: ../src/wx/xrc/SoundConfig.xrc:125
 msgid "XAudio2"
-msgstr ""
+msgstr "XAudio2"
 
 #: ../src/wx/xrc/SoundConfig.xrc:132
 msgid "FAudio"
-msgstr ""
+msgstr "FAudio"
 
 #: ../src/wx/xrc/SoundConfig.xrc:146
 msgid "Device"
-msgstr ""
+msgstr "Urządzenie"
 
 #: ../src/wx/xrc/SoundConfig.xrc:154
 msgid "Enable stereo upmixing"

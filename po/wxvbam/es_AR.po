@@ -4,13 +4,14 @@
 # 
 # Translators:
 # micro nine <micronine24@gmail.com>, 2018
+# Nicolas Padrani <nicolas6.padrani@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-22 23:25+0000\n"
-"PO-Revision-Date: 2019-11-28 01:25+0000\n"
-"Last-Translator: bgK\n"
+"PO-Revision-Date: 2019-12-10 21:11+0000\n"
+"Last-Translator: Nicolas Padrani <nicolas6.padrani@gmail.com>\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/bgk/vba-m/language/es_AR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,7 +25,7 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy"
 " Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "Archivos GameBoy Advance\n(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Archivo GameBoy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr "Archivos de GameBoy Advance\n(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Archivo GameBoy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: ../src/wx/cmdevents.cpp:117
 msgid "Open ROM file"
@@ -44,7 +45,7 @@ msgstr "Abrir archivo ROM de GameBoy"
 msgid ""
 "GameBoy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "Archivos GameBoy Color\n(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr "Archivos de GameBoy Color\n(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: ../src/wx/cmdevents.cpp:165
 msgid "Open GBC ROM file"
@@ -61,107 +62,107 @@ msgstr "ROM"
 
 #: ../src/wx/cmdevents.cpp:596
 msgid "ROM+MBC1"
-msgstr ""
+msgstr "ROM+MBC1"
 
 #: ../src/wx/cmdevents.cpp:600
 msgid "ROM+MBC1+RAM"
-msgstr ""
+msgstr "ROM+MBC1+RAM"
 
 #: ../src/wx/cmdevents.cpp:604
 msgid "ROM+MBC1+RAM+BATT"
-msgstr ""
+msgstr "ROM+MBC1+RAM+BATT"
 
 #: ../src/wx/cmdevents.cpp:608
 msgid "ROM+MBC2"
-msgstr ""
+msgstr "ROM+MBC2"
 
 #: ../src/wx/cmdevents.cpp:612
 msgid "ROM+MBC2+BATT"
-msgstr ""
+msgstr "ROM+MBC2+BATT"
 
 #: ../src/wx/cmdevents.cpp:616
 msgid "ROM+MMM01"
-msgstr ""
+msgstr "ROM+MMM01"
 
 #: ../src/wx/cmdevents.cpp:620
 msgid "ROM+MMM01+RAM"
-msgstr ""
+msgstr "ROM+MMM01+RAM"
 
 #: ../src/wx/cmdevents.cpp:624
 msgid "ROM+MMM01+RAM+BATT"
-msgstr ""
+msgstr "ROM+MMM01+RAM+BATT"
 
 #: ../src/wx/cmdevents.cpp:628
 msgid "ROM+MBC3+TIMER+BATT"
-msgstr ""
+msgstr "ROM+MBC3+TIMER+BATT"
 
 #: ../src/wx/cmdevents.cpp:632
 msgid "ROM+MBC3+TIMER+RAM+BATT"
-msgstr ""
+msgstr "ROM+MBC3+TIMER+RAM+BATT"
 
 #: ../src/wx/cmdevents.cpp:636
 msgid "ROM+MBC3"
-msgstr ""
+msgstr "ROM+MBC3"
 
 #: ../src/wx/cmdevents.cpp:640
 msgid "ROM+MBC3+RAM"
-msgstr ""
+msgstr "ROM+MBC3+RAM"
 
 #: ../src/wx/cmdevents.cpp:644
 msgid "ROM+MBC3+RAM+BATT"
-msgstr ""
+msgstr "ROM+MBC3+RAM+BATT"
 
 #: ../src/wx/cmdevents.cpp:648
 msgid "ROM+MBC5"
-msgstr ""
+msgstr "ROM+MBC5"
 
 #: ../src/wx/cmdevents.cpp:652
 msgid "ROM+MBC5+RAM"
-msgstr ""
+msgstr "ROM+MBC5+RAM"
 
 #: ../src/wx/cmdevents.cpp:656
 msgid "ROM+MBC5+RAM+BATT"
-msgstr ""
+msgstr "ROM+MBC5+RAM+BATT"
 
 #: ../src/wx/cmdevents.cpp:660
 msgid "ROM+MBC5+RUMBLE"
-msgstr ""
+msgstr "ROM+MBC5+RUMBLE"
 
 #: ../src/wx/cmdevents.cpp:664
 msgid "ROM+MBC5+RUMBLE+RAM"
-msgstr ""
+msgstr "ROM+MBC5+RUMBLE+RAM"
 
 #: ../src/wx/cmdevents.cpp:668
 msgid "ROM+MBC5+RUMBLE+RAM+BATT"
-msgstr ""
+msgstr "ROM+MBC5+RUMBLE+RAM+BATT"
 
 #: ../src/wx/cmdevents.cpp:672
 msgid "ROM+MBC7+BATT"
-msgstr ""
+msgstr "ROM+MBC7+BATT"
 
 #: ../src/wx/cmdevents.cpp:676 ../src/wx/guiinit.cpp:734
 msgid "GameGenie"
-msgstr ""
+msgstr "GameGenie"
 
 #: ../src/wx/cmdevents.cpp:680
 msgid "GameShark V3.0"
-msgstr ""
+msgstr "GameShark V3.0"
 
 #: ../src/wx/cmdevents.cpp:684
 msgid "ROM+POCKET CAMERA"
-msgstr ""
+msgstr "ROM+POCKET CAMERA"
 
 #: ../src/wx/cmdevents.cpp:688
 msgid "ROM+BANDAI TAMA5"
-msgstr ""
+msgstr "ROM+BANDAI TAMA5"
 
 #: ../src/wx/cmdevents.cpp:692
 msgid "ROM+HuC-3"
-msgstr ""
+msgstr "ROM+HuC-3"
 
 #: ../src/wx/cmdevents.cpp:696
 msgid "ROM+HuC-1"
-msgstr ""
+msgstr "ROM+HuC-1"
 
 #: ../src/wx/cmdevents.cpp:746 ../src/wx/guiinit.cpp:1839
 #: ../src/wx/xrc/DisplayConfig.xrc:85 ../src/wx/xrc/DisplayConfig.xrc:135
@@ -172,7 +173,7 @@ msgstr ""
 #: ../src/wx/xrc/SoundConfig.xrc:309 ../src/wx/xrc/SpeedupConfig.xrc:45
 #: ../src/wx/xrc/SpeedupConfig.xrc:120
 msgid "None"
-msgstr ""
+msgstr "Nada"
 
 #: ../src/wx/cmdevents.cpp:845 ../src/wx/cmdevents.cpp:861
 msgid "Select Dot Code file"
@@ -184,11 +185,11 @@ msgstr ""
 
 #: ../src/wx/cmdevents.cpp:882 ../src/wx/cmdevents.cpp:1077
 msgid "Select battery file"
-msgstr ""
+msgstr "Seleccionar archivo de batería"
 
 #: ../src/wx/cmdevents.cpp:883 ../src/wx/cmdevents.cpp:1078
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
-msgstr ""
+msgstr "Archivo de batería (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 
 #: ../src/wx/cmdevents.cpp:891
 msgid ""
@@ -204,12 +205,12 @@ msgstr ""
 #: ../src/wx/cmdevents.cpp:898 ../src/wx/panel.cpp:350
 #, c-format
 msgid "Loaded battery %s"
-msgstr ""
+msgstr "Batería cargada%s"
 
 #: ../src/wx/cmdevents.cpp:900
 #, c-format
 msgid "Error loading battery %s"
-msgstr ""
+msgstr "Error al cargar batería%s"
 
 #: ../src/wx/cmdevents.cpp:909
 msgid "Select code file"
@@ -411,7 +412,7 @@ msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
-msgstr ""
+msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2017 VBA-M development team"
 
 #: ../src/wx/cmdevents.cpp:2754
 msgid ""
@@ -427,7 +428,7 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program.  If not, see http://www.gnu.org/licenses ."
-msgstr ""
+msgstr "This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see http://www.gnu.org/licenses ."
 
 #: ../src/wx/cmdevents.cpp:3018
 msgid "LAN link is already active.  Disable link mode to disconnect."
