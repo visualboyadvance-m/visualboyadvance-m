@@ -9,8 +9,10 @@
 //
 //   The target window will receive EVT_SDLJOY events of type wxSDLJoyEvent.
 
+#include <array>
 #include <vector>
 #include <unordered_map>
+#include <wx/time.h>
 #include <wx/event.h>
 #include <wx/timer.h>
 #include <SDL_gamecontroller.h>
@@ -18,7 +20,8 @@
 
 struct wxSDLJoyState {
     SDL_GameController* dev = nullptr;
-    std::unordered_map<uint8_t, int8_t> axis;
+    std::array<int16_t, SDL_CONTROLLER_AXIS_MAX>   axis{};
+    std::array<uint8_t, SDL_CONTROLLER_BUTTON_MAX> button{};
 };
 
 class wxSDLJoy : public wxTimer {
@@ -52,10 +55,15 @@ protected:
     void Notify();
     void ConnectController(uint8_t joy);
     void DisconnectController(uint8_t joy);
+
+    const uint8_t POLL_TIME_MS = 10;
+
 private:
     std::unordered_map<uint8_t, wxSDLJoyState> joystate;
     wxEvtHandler* evthandler;
     bool add_all = false, rumbling = false;
+
+    wxLongLong last_poll = wxGetUTCTimeMillis();
 };
 
 enum {
