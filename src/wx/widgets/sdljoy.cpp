@@ -150,6 +150,8 @@ void wxSDLJoy::Poll()
 
     if (do_poll) {
         for (auto&& joy : joystate) {
+            if (!joy.second.dev) continue;
+
             for (uint8_t but = 0; but < SDL_CONTROLLER_BUTTON_MAX; but++) {
                 auto last_state = joy.second.button[but];
                 auto state      = SDL_GameControllerGetButton(joy.second.dev, static_cast<SDL_GameControllerButton>(but));
@@ -237,8 +239,8 @@ void wxSDLJoy::Remove(int8_t joy_n)
     add_all = false;
 
     if (joy_n < 0) {
-        for (auto joy : joystate)
-            DisconnectController(std::get<0>(joy));
+        for (auto&& joy : joystate)
+            DisconnectController(joy.first);
 
         joystate.clear();
 
