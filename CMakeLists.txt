@@ -1007,6 +1007,11 @@ if(ENABLE_SDL)
         set(WIN32_LIBRARIES wsock32 ws2_32 winmm version imm32)
     endif()
 
+    if(MSVC)
+        # the debug lib libcmtd is linked in debug mode, so don't link the normal version
+        set_target_properties(vbam PROPERTIES LINK_FLAGS_DEBUG "/nodefaultlib:libcmt")
+    endif()
+
     if(ENABLE_LIRC)
         set(LIRC_CLIENT_LIBRARY lirc_client)
     endif()
