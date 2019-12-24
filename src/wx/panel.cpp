@@ -1095,13 +1095,14 @@ void GameArea::OnIdle(wxIdleEvent& event)
             CheckLinkConnection();
 
 #endif
-        mf->PollJoysticks();
     } else {
         was_paused = true;
 
         if (paused)
             SetExtraStyle(GetExtraStyle() & ~wxWS_EX_PROCESS_IDLE);
     }
+
+    mf->PollJoysticks();
 
     if (do_rewind && emusys->emuWriteMemState) {
         if (!rewind_mem) {
