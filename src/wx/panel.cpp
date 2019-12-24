@@ -1070,6 +1070,8 @@ void GameArea::OnIdle(wxIdleEvent& event)
         w->SetFocus();
     }
 
+    mf->PollJoysticks();
+
     if (!paused) {
         HidePointer();
         event.RequestMore();
@@ -1101,8 +1103,6 @@ void GameArea::OnIdle(wxIdleEvent& event)
         if (paused)
             SetExtraStyle(GetExtraStyle() & ~wxWS_EX_PROCESS_IDLE);
     }
-
-    mf->PollJoysticks();
 
     if (do_rewind && emusys->emuWriteMemState) {
         if (!rewind_mem) {
