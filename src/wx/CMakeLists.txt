@@ -181,6 +181,8 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
         execute_process(
             COMMAND powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('${CMAKE_CURRENT_BINARY_DIR}/infozip_binaries_win32.zip', '${CMAKE_CURRENT_BINARY_DIR}'); }"
         )
+
+        set(ZIP_PROGRAM ${CMAKE_CURRENT_BINARY_DIR}/zip.exe CACHE STRING "zip compressor executable" FORCE)
     endif()
 
     # SDL2.dll does not get copied to build dir
@@ -568,6 +570,12 @@ include_directories(widgets)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+find_program(ZIP_PROGRAM zip DOC "zip compressor executable")
+
+if(NOT ZIP_PROGRAM)
+    message(FATAL_ERROR "The zip compressor program is required for building.")
+endif()
+
 set(XRC_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/xrc/AccelConfig.xrc
     ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CheatAdd.xrc
@@ -940,6 +948,107 @@ if(NOT WIN32 AND NOT APPLE)
     install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/icons/sizes/                   DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor)
 endif()
 
+# make the translations.zip for windows builds
+if(ENABLE_NLS AND WIN32)
+    add_custom_command(
+            OUTPUT ${CMAKE_BINARY_DIR}/translations.zip
+            COMMAND ${CMAKE_COMMAND} -D "ZIP_PROGRAM=${ZIP_PROGRAM}" -P ${CMAKE_CURRENT_SOURCE_DIR}/make-translations-zip.cmake
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            DEPENDS translations make-translations-zip.cmake
+    )
+
+    add_custom_target(translations-zip DEPENDS ${CMAKE_BINARY_DIR}/translations.zip)
+
+    add_dependencies(visualboyadvance-m translations-zip)
+endif()
+
+option(UPSTREAM_RELEASE "do some release automation tasks" OFF)
+
+if(UPSTREAM_RELEASE AND WIN32)
+    set(home $ENV{HOME})
+
+    if(NOT CMAKE_CROSSCOMPILING AND "$ENV{MSYSTEM_PREFIX}" STREQUAL "")
+        set(home $ENV{USERPROFILE})
+    endif()
+
+    # rewrite backslashes to slashes, needed for msys osslsigncode
+    string(REGEX REPLACE "\\\\" "/" home ${home})
+
+    set(cert ${home}/.codesign/windows_comodo.pkcs12)
+
+    if(EXISTS ${cert})
+        if(MSVC)
+            find_program(SIGNTOOL_PROGRAM signtool)
+
+            if(SIGNTOOL_PROGRAM)
+                add_custom_command(
+                    TARGET visualboyadvance-m
+                    POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy visualboyadvance-m.exe visualboyadvance-m-unsigned.exe
+                    COMMAND ${SIGNTOOL_PROGRAM} sign /f ${cert} /p "vbam3!13" /tr http://timestamp.digicert.com /du https://github.com/visualboyadvance-m/visualboyadvance-m /a visualboyadvance-m.exe
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                )
+            endif()
+        else()
+            find_program(OSSLSIGNCODE_PROGRAM osslsigncode)
+
+            if(OSSLSIGNCODE_PROGRAM)
+                add_custom_command(
+                    TARGET visualboyadvance-m
+                    POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E rename visualboyadvance-m.exe visualboyadvance-m-unsigned.exe
+                    COMMAND ${OSSLSIGNCODE_PROGRAM} sign -pkcs12 ${cert} -pass "vbam3!13" -t http://timestamp.digicert.com -n visualboyadvance-m -i https://github.com/visualboyadvance-m/visualboyadvance-m -in visualboyadvance-m-unsigned.exe -out visualboyadvance-m.exe
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                )
+            endif()
+        endif()
+    endif()
+
+    set(exezip visualboyadvance-m-Win-${BITS}bit.zip)
+
+    add_custom_command(
+        TARGET visualboyadvance-m
+        POST_BUILD
+        COMMAND ${ZIP_PROGRAM} -9 ${exezip} visualboyadvance-m.exe
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+
+    find_program(GPG_PROGRAM gpg)
+
+    if(GPG_PROGRAM)
+        add_custom_command(
+            OUTPUT ${CMAKE_BINARY_DIR}/translations.zip.asc
+            COMMAND ${GPG_PROGRAM} --detach-sign -a ${CMAKE_BINARY_DIR}/translations.zip
+            DEPENDS translations-zip
+        )
+
+        add_custom_target(translations-zip-sig DEPENDS ${CMAKE_BINARY_DIR}/translations.zip.asc)
+
+        add_dependencies(visualboyadvance-m translations-zip-sig)
+
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E remove ${exezip}.asc
+            COMMAND ${GPG_PROGRAM} --detach-sign -a ${exezip}
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+    endif()
+
+    if(NOT MSVC AND NOT CMAKE_BUILD_TYPE MATCHES Debug)
+        find_program(STRIP_PROGRAM strip)
+
+        if(STRIP_PROGRAM)
+            add_custom_command(
+                TARGET visualboyadvance-m
+                POST_BUILD
+                COMMAND ${STRIP_PROGRAM} visualboyadvance-m.exe
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            )
+        endif()
+    endif()
+endif()
+
 if(APPLE)
     # this should set ROM file types correctly
     set_property(TARGET visualboyadvance-m APPEND PROPERTY MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/wxplist.in)
@@ -959,6 +1068,73 @@ if(APPLE)
         add_custom_command(
             TARGET visualboyadvance-m POST_BUILD
             COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/mac-translations.cmake
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+    endif()
+endif()
+
+if(UPSTREAM_RELEASE AND APPLE)
+    if(NOT CMAKE_BUILD_TYPE MATCHES Debug)
+        find_program(STRIP_PROGRAM strip)
+
+        if(STRIP_PROGRAM)
+            add_custom_command(
+                TARGET visualboyadvance-m
+                POST_BUILD
+                COMMAND ${STRIP_PROGRAM} visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            )
+        endif()
+    endif()
+
+    if(DEFINED ENV{LOGIN_KEYCHAIN_PASSWORD})
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND /bin/sh -c "security unlock-keychain -p \"\$LOGIN_KEYCHAIN_PASSWORD\" ~/Library/Keychains/login.keychain*"
+        )
+
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND codesign -s "Developer ID Application" --deep ./visualboyadvance-m.app
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+    else()
+        message(WARNING "Set the environment variable LOGIN_KEYCHAIN_PASSWORD to your login keychain password to codesign.")
+    endif()
+
+    set(appzip visualboyadvance-m-Mac-${BITS}bit.zip)
+
+    add_custom_command(
+        TARGET visualboyadvance-m
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E remove ${appzip}
+        COMMAND ${ZIP_PROGRAM} -9r ${appzip} ./visualboyadvance-m.app
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+
+    find_program(GPG_PROGRAM gpg)
+
+    if(GPG_PROGRAM)
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E remove ${appzip}.asc
+            COMMAND ${GPG_PROGRAM} --detach-sign -a ${appzip}
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+    endif()
+endif()
+
+if(UPSTREAM_RELEASE AND NOT WIN32 AND NOT APPLE AND NOT CMAKE_BUILD_TYPE MATCHES Debug)
+    find_program(STRIP_PROGRAM strip)
+
+    if(STRIP_PROGRAM)
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND ${STRIP_PROGRAM} visualboyadvance-m
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
     endif()

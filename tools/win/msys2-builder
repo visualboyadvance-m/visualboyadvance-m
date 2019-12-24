@@ -10,6 +10,7 @@ case "$1" in
             OPWD=$PWD
             export MSYSTEM=MINGW32
             . /etc/profile || :
+            . ~/.bashrc 2>/dev/null || :
             cd "$OPWD"
         fi
         ;;
@@ -20,6 +21,7 @@ case "$1" in
             OPWD=$PWD
             export MSYSTEM=MINGW64
             . /etc/profile || :
+            . ~/.bashrc 2>/dev/null || :
             cd "$OPWD"
         fi
         ;;
@@ -92,7 +94,7 @@ export TMP_DIR="$BUILD_ROOT/tmp_$$"
 
 BUILD_ENV=$BUILD_ENV$(cat <<'EOF'
 
-# on don't translate prefix and defines by default
+# don't translate prefix and defines by default
 export MSYS2_ARG_CONV_EXCL="-D;/usr;/etc"
 
 EOF

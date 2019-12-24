@@ -76,7 +76,7 @@ endif()
 
 # use ccache if available, and not already enabled on the command line
 # but not with ninja and msys ccache on msys2
-if(NOT (WIN32 AND (NOT $ENV{MSYSTEM} STREQUAL "") AND CMAKE_GENERATOR STREQUAL Ninja))
+if(NOT (WIN32 AND NOT "$ENV{MSYSTEM_PREFIX}" STREQUAL "" AND CMAKE_GENERATOR STREQUAL Ninja))
     if(NOT CMAKE_CXX_COMPILER_LAUNCHER AND NOT CMAKE_C_COMPILER_LAUNCHER)
         find_program(CCACHE_FOUND ccache)
         if(CCACHE_FOUND)
@@ -262,7 +262,7 @@ else()
 endif()
 
 # hack for ninja in msys2
-if(WIN32 AND CMAKE_GENERATOR STREQUAL Ninja AND (NOT $ENV{MSYSTEM} STREQUAL ""))
+if(WIN32 AND CMAKE_GENERATOR STREQUAL Ninja AND NOT "$ENV{MSYSTEM_PREFIX}" STREQUAL "")
     set(MSYS ON)
 endif()
 

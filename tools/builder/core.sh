@@ -2658,55 +2658,8 @@ build_project() {
         lto=OFF
     fi
 
-    echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=${lto} $CMAKE_ARGS $PROJECT_ARGS $@
+    echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=${lto} -DUPSTREAM_RELEASE=TRUE $CMAKE_ARGS $PROJECT_ARGS $@
     echo_run make -j$NUM_CPUS VERBOSE=1
-
-    if [ "$target_os" = mac ]; then
-        $STRIP visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m
-
-        # unlock keychain for codesigning certificate
-        security -v unlock-keychain ~/Library/Keychains/login.keychain* || :
-
-        codesign -s "Developer ID Application" --deep ./visualboyadvance-m.app || :
-
-        zip=./visualboyadvance-m-Mac-${target_bits:-$bits}bit.zip
-
-        rm -f $zip
-        zip -9r $zip ./visualboyadvance-m.app
-
-        rm -f $zip.asc
-        gpg --detach-sign -a $zip || :
-    elif [ "$target_os" != windows ] && path_exists visualboyadvance-m; then
-        $STRIP visualboyadvance-m
-    elif [ "$target_os" = windows ] && path_exists visualboyadvance-m.exe; then
-        $STRIP visualboyadvance-m.exe
-
-        mv visualboyadvance-m.exe visualboyadvance-m-unsigned.exe
-
-        message 'Press ENTER to use your GPG passphrase to unlock your code-signing certificate...'
-        read -r dummy
-
-        osslsigncode sign -pkcs12 ~/.codesign/windows_comodo.pkcs12 -pass "$(pass vbam-windows-codesign-cert)" \
-            -n visualboyadvance-m -i https://github.com/visualboyadvance-m/visualboyadvance-m \
-            -in visualboyadvance-m-unsigned.exe -out visualboyadvance-m.exe || cp visualboyadvance-m-unsigned.exe visualboyadvance-m.exe
-
-        zip=./visualboyadvance-m-Win-${target_bits:-$bits}bit.zip
-
-        rm -f $zip
-        zip -9 $zip ./visualboyadvance-m.exe
-
-        rm -f translations.zip
-
-        make install DESTDIR=./destdir
-        cd destdir/usr/share/locale
-        zip -9r ../../../../translations.zip *
-        cd ../../../..
-
-        rm -f $zip.asc translations.zip.asc
-
-        gpg --detach-sign -a $zip || :
-        gpg --detach-sign -a translations.zip || :
-    fi
 
     dist_post_build project
 

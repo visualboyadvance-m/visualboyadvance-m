@@ -1,8 +1,8 @@
 file(GLOB po_files "${CMAKE_CURRENT_SOURCE_DIR}/*.po")
 
-GETTEXT_CREATE_TRANSLATIONS(
+gettext_create_translations(
 	wxvbam.pot
         ${po_files}
 )
 
-ADD_DEPENDENCIES(visualboyadvance-m translations)
+add_dependencies(visualboyadvance-m translations)
