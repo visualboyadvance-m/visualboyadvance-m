@@ -83,6 +83,7 @@ macro(find_component _component _pkgconfig _library _header)
   )
 
   set(${_component}_DEFINITIONS  ${PC_${_component}_CFLAGS_OTHER} CACHE STRING "The ${_component} CFLAGS.")
+  set(${_component}_LDFLAGS      ${PC_${_component}_LDFLAGS}      CACHE STRING "The ${_component} LDFLAGS.")
   set(${_component}_VERSION      ${PC_${_component}_VERSION}      CACHE STRING "The ${_component} version number.")
 
   set_component_found(${_component})
@@ -113,8 +114,9 @@ if (NOT FFMPEG_LIBRARIES)
   foreach (_component ${FFmpeg_FIND_COMPONENTS})
     if (${_component}_FOUND)
       # message(STATUS "Required component ${_component} present.")
-      set(FFMPEG_LIBRARIES   ${FFMPEG_LIBRARIES}   ${${_component}_LIBRARIES})
-      set(FFMPEG_DEFINITIONS ${FFMPEG_DEFINITIONS} ${${_component}_DEFINITIONS})
+      list(APPEND FFMPEG_LIBRARIES    ${${_component}_LIBRARIES})
+      list(APPEND FFMPEG_DEFINITIONS  ${${_component}_DEFINITIONS})
+      list(APPEND FFMPEG_LDFLAGS      ${${_component}_LDFLAGS})
       list(APPEND FFMPEG_INCLUDE_DIRS ${${_component}_INCLUDE_DIRS})
     else ()
       # message(STATUS "Required component ${_component} missing.")
@@ -128,10 +130,12 @@ if (NOT FFMPEG_LIBRARIES)
 
   # cache the vars.
   set(FFMPEG_INCLUDE_DIRS ${FFMPEG_INCLUDE_DIRS} CACHE STRING "The FFmpeg include directories." FORCE)
-  set(FFMPEG_LIBRARIES    ${FFMPEG_LIBRARIES}    CACHE STRING "The FFmpeg libraries." FORCE)
-  set(FFMPEG_DEFINITIONS  ${FFMPEG_DEFINITIONS}  CACHE STRING "The FFmpeg cflags." FORCE)
+  set(FFMPEG_LIBRARIES    ${FFMPEG_LIBRARIES}    CACHE STRING "The FFmpeg libraries."           FORCE)
+  set(FFMPEG_DEFINITIONS  ${FFMPEG_DEFINITIONS}  CACHE STRING "The FFmpeg CFLAGS."              FORCE)
+  set(FFMPEG_LDFLAGS      ${FFMPEG_LDFLAGS}      CACHE STRING "The FFmpeg LDFLAGS."             FORCE)
 
   mark_as_advanced(FFMPEG_INCLUDE_DIRS
+                   FFMPEG_LDFLAGS
                    FFMPEG_LIBRARIES
                    FFMPEG_DEFINITIONS)
 
@@ -143,9 +147,9 @@ foreach (_component AVCODEC AVDEVICE AVFORMAT AVUTIL POSTPROCESS SWSCALE)
 endforeach ()
 
 # Compile the list of required vars
-set(_FFmpeg_REQUIRED_VARS FFMPEG_LIBRARIES FFMPEG_INCLUDE_DIRS)
+set(_FFmpeg_REQUIRED_VARS FFMPEG_LIBRARIES FFMPEG_LDFLAGS FFMPEG_INCLUDE_DIRS)
 foreach (_component ${FFmpeg_FIND_COMPONENTS})
-  list(APPEND _FFmpeg_REQUIRED_VARS ${_component}_LIBRARIES ${_component}_INCLUDE_DIRS)
+  list(APPEND _FFmpeg_REQUIRED_VARS ${_component}_LIBRARIES ${_component}_LDFLAGS ${_component}_INCLUDE_DIRS)
 endforeach ()
 
 # Give a nice error message if some of the required vars are missing.
