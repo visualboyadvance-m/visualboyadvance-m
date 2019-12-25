@@ -27,6 +27,14 @@ case "$1" in
         ;;
 esac
 
+# Need to use Xcode 9 for 32 bit builds on Mojave and newer.
+# Place it in /Applications/Xcode9.app .
+if [ "$target_bits" -eq 32 ] && [ -d /Applications/Xcode9.app ]; then
+    PREV_XCODE=$(xcode-select -p)
+    printf "\nSetting Xcode9 as the default Xcode for 32 bit build...\n\n"
+    sudo xcode-select -s /Applications/Xcode9.app/Contents/Developer
+fi
+
 export BUILD_ROOT="$HOME/vbam-build-mac-${target_bits}bit"
 
 BUILD_ENV=$(cat <<EOF
@@ -117,3 +125,8 @@ table_line_append DIST_ARGS libmodplug "CC=clang++ CXX=clang++"
 table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg "--disable-videotoolbox --extra-ldflags='-framework CoreText'"
 
 builder "$@"
+
+if [ -n "$PREV_XCODE" ]; then
+    printf "\nRe-setting '$PREV_XCODE' as the default Xcode...\n\n"
+    sudo xcode-select -s "$PREV_XCODE"
+fi

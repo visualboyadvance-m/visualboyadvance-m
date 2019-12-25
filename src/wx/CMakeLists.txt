@@ -967,7 +967,7 @@ option(UPSTREAM_RELEASE "do some release automation tasks" OFF)
 if(UPSTREAM_RELEASE AND WIN32)
     set(home $ENV{HOME})
 
-    if(NOT CMAKE_CROSSCOMPILING AND "$ENV{MSYSTEM_PREFIX}" STREQUAL "")
+    if(NOT CMAKE_CROSSCOMPILING AND NOT DEFINED ENV{MSYSTEM_PREFIX})
         set(home $ENV{USERPROFILE})
     endif()
 
@@ -1018,6 +1018,8 @@ if(UPSTREAM_RELEASE AND WIN32)
     if(GPG_PROGRAM)
         add_custom_command(
             OUTPUT ${CMAKE_BINARY_DIR}/translations.zip.asc
+            COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/translations.zip.asc
+            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
             COMMAND ${GPG_PROGRAM} --detach-sign -a ${CMAKE_BINARY_DIR}/translations.zip
             DEPENDS translations-zip
         )
@@ -1030,6 +1032,7 @@ if(UPSTREAM_RELEASE AND WIN32)
             TARGET visualboyadvance-m
             POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E remove ${exezip}.asc
+            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
             COMMAND ${GPG_PROGRAM} --detach-sign -a ${exezip}
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
@@ -1091,7 +1094,7 @@ if(UPSTREAM_RELEASE AND APPLE)
         add_custom_command(
             TARGET visualboyadvance-m
             POST_BUILD
-            COMMAND /bin/sh -c "security unlock-keychain -p \"\$LOGIN_KEYCHAIN_PASSWORD\" ~/Library/Keychains/login.keychain*"
+            COMMAND /bin/sh -c "security unlock-keychain -p \"$$LOGIN_KEYCHAIN_PASSWORD\" ~/Library/Keychains/login.keychain*"
         )
 
         add_custom_command(
@@ -1121,6 +1124,7 @@ if(UPSTREAM_RELEASE AND APPLE)
             TARGET visualboyadvance-m
             POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E remove ${appzip}.asc
+            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
             COMMAND ${GPG_PROGRAM} --detach-sign -a ${appzip}
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
