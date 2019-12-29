@@ -1,9 +1,9 @@
 name: visualboyadvance-m
-version: 2.1.4
 summary: Nintendo Game Boy Advance Emulator
 description: |
   An open-source Nintendo Game Boy, Super Game Boy, Game Boy Advance Emulators.
 
+adopt-info: vbam
 grade: stable
 confinement: strict
 base: core18
@@ -47,9 +47,16 @@ parts:
     build-environment:
       - CFLAGS: -I$SNAPCRAFT_STAGE/lib/wx/include/gtk3-unicode-3.0
       - CXXFLAGS: -I$SNAPCRAFT_STAGE/lib/wx/include/gtk3-unicode-3.0
-    source: https://github.com/visualboyadvance-m/visualboyadvance-m/archive/v2.1.4.tar.gz
+    source: https://github.com/visualboyadvance-m/visualboyadvance-m.git
+    override-pull: |
+      snapcraftctl pull
+      last_commit="$(git describe)"
+      snapcraftctl set-version "${last_commit}"
+      
+      sed -i.bak -e 's|Icon=vbam|Icon=/share/icons/hicolor/scalable/apps/visualboyadvance-m.svg|g' src/wx/visualboyadvance-m.desktop
     plugin: cmake
     stage-packages:
+      - git
       - libsdl2-2.0-0
       - libsfml-network2.4
       - libsfml-system2.4
