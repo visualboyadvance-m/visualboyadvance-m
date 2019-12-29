@@ -4,7 +4,7 @@ description: |
   An open-source Nintendo Game Boy, Super Game Boy, Game Boy Advance Emulators.
 
 adopt-info: vbam
-grade: stable
+grade: devel
 confinement: strict
 base: core18
 
