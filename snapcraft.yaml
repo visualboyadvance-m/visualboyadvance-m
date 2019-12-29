@@ -55,7 +55,6 @@ parts:
       sed -i.bak -e 's|Icon=visualboyadvance-m|Icon=/usr/share/icons/hicolor/scalable/apps/visualboyadvance-m.svg|g' src/wx/visualboyadvance-m.desktop
     plugin: cmake
     stage-packages:
-      - git
       - libsdl2-2.0-0
       - libsfml-network2.4
       - libsfml-system2.4
@@ -76,6 +75,7 @@ parts:
       - gcc
       - make
       - cmake
+      - nasm
       - pkg-config
       - git
       - zip
