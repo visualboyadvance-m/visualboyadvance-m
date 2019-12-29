@@ -52,8 +52,7 @@ parts:
       snapcraftctl pull
       last_commit="$(git describe)"
       snapcraftctl set-version "${last_commit}"
-      
-      sed -i.bak -e 's|Icon=vbam|Icon=/share/icons/hicolor/scalable/apps/visualboyadvance-m.svg|g' src/wx/visualboyadvance-m.desktop
+      sed -i.bak -e 's|Icon=visualboyadvance-m|Icon=/usr/share/icons/hicolor/scalable/apps/visualboyadvance-m.svg|g' src/wx/visualboyadvance-m.desktop
     plugin: cmake
     stage-packages:
       - git
@@ -88,11 +87,12 @@ parts:
     configflags:
       - -DENABLE_OPENAL=ON
       - -DENABLE_SDL=OFF
+      - -DCMAKE_INSTALL_PREFIX=/usr
 
 apps:
   visualboyadvance-m:
-    command: bin/visualboyadvance-m
-    desktop: share/applications/visualboyadvance-m.desktop
+    command: usr/bin/visualboyadvance-m
+    desktop: usr/share/applications/visualboyadvance-m.desktop
     extensions: [gnome-3-28]
     environment:
       LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
