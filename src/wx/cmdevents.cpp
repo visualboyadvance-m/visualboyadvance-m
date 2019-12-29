@@ -2748,7 +2748,7 @@ EVT_HANDLER(wxID_ABOUT, "About...")
     // setting website, icon, license uses custom aboutbox on win32 & macosx
     // but at least win32 standard about is nothing special
     ai.SetWebSite(wxT("http://www.vba-m.com/"));
-    ai.SetIcon(GetIcon());
+    ai.SetIcon(GetIcons().GetIcon(wxSize(32, 32), wxIconBundle::FALLBACK_NEAREST_LARGER));
     ai.SetDescription(_("Nintendo GameBoy (+Color+Advance) emulator."));
     ai.SetCopyright(_("Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2017 VBA-M development team"));
     ai.SetLicense(_("This program is free software: you can redistribute it and/or modify\n"
