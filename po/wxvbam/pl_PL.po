@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-22 23:25+0000\n"
-"PO-Revision-Date: 2019-12-18 09:15+0000\n"
+"PO-Revision-Date: 2019-12-30 10:21+0000\n"
 "Last-Translator: Damian Drakon <dragon1590@gmail.com>\n"
 "Language-Team: Polish (Poland) (http://www.transifex.com/bgk/vba-m/language/pl_PL/)\n"
 "MIME-Version: 1.0\n"
@@ -2701,7 +2701,7 @@ msgstr "Limit czasu łącza (w milisekundach)"
 
 #: ../src/wx/xrc/Logging.xrc:4
 msgid "Logging"
-msgstr "Rejestrowanie"
+msgstr "Tworzenie dziennika"
 
 #: ../src/wx/xrc/Logging.xrc:13
 msgid "SW&I"
@@ -3234,55 +3234,55 @@ msgstr "Przyśpieszenie/Turbo..."
 
 #: ../src/wx/xrc/MainMenu.xrc:541
 msgid "D&irectories ..."
-msgstr ""
+msgstr "Katalogi..."
 
 #: ../src/wx/xrc/MainMenu.xrc:544
 msgid "&Key Shortcuts ..."
-msgstr ""
+msgstr "Skróty klawiszowe..."
 
 #: ../src/wx/xrc/MainMenu.xrc:548
 msgid "&Tools"
-msgstr ""
+msgstr "Narzędzia"
 
 #: ../src/wx/xrc/MainMenu.xrc:550
 msgid "&Cheats"
-msgstr ""
+msgstr "Kody"
 
 #: ../src/wx/xrc/MainMenu.xrc:552
 msgid "List &cheats ..."
-msgstr ""
+msgstr "Lista kodów..."
 
 #: ../src/wx/xrc/MainMenu.xrc:555
 msgid "Find c&heat ..."
-msgstr ""
+msgstr "Znajdź kod..."
 
 #: ../src/wx/xrc/MainMenu.xrc:559
 msgid "A&utomatically save/load cheats"
-msgstr ""
+msgstr "Automatycznie zapisz/wczytaj kody"
 
 #: ../src/wx/xrc/MainMenu.xrc:563
 msgid "&Enable cheats"
-msgstr ""
+msgstr "Włącz kody"
 
 #: ../src/wx/xrc/MainMenu.xrc:570
 msgid "&Break into GDB"
-msgstr ""
+msgstr "Włam się do GDB"
 
 #: ../src/wx/xrc/MainMenu.xrc:574
 msgid "&Configure port..."
-msgstr ""
+msgstr "Konfiguruj port..."
 
 #: ../src/wx/xrc/MainMenu.xrc:577
 msgid "&Break on load"
-msgstr ""
+msgstr "Włamanie przy wczytywania"
 
 #: ../src/wx/xrc/MainMenu.xrc:582
 msgid "&Disconnect"
-msgstr ""
+msgstr "Rozłącz się"
 
 #: ../src/wx/xrc/MainMenu.xrc:584
 msgid "&GDB"
-msgstr ""
+msgstr "GDB"
 
 #: ../src/wx/xrc/MainMenu.xrc:587
 msgid "&Disassemble..."
@@ -3290,7 +3290,7 @@ msgstr "Deasembluj..."
 
 #: ../src/wx/xrc/MainMenu.xrc:590
 msgid "&Logging..."
-msgstr ""
+msgstr "Tworzenie dziennika..."
 
 #: ../src/wx/xrc/MainMenu.xrc:593
 msgid "&IO Viewer..."
@@ -3318,7 +3318,7 @@ msgstr "Przeglądarka kafelków..."
 
 #: ../src/wx/xrc/MainMenu.xrc:613
 msgid "Show all video layers"
-msgstr ""
+msgstr "Pokaż wszystkie warstwy wideo"
 
 #: ../src/wx/xrc/MainMenu.xrc:617
 msgid "BG &0"
@@ -3338,23 +3338,23 @@ msgstr "Tło 3"
 
 #: ../src/wx/xrc/MainMenu.xrc:637
 msgid "&OBJ"
-msgstr ""
+msgstr "OBJ"
 
 #: ../src/wx/xrc/MainMenu.xrc:642
 msgid "&WIN 0"
-msgstr ""
+msgstr "WIN 0"
 
 #: ../src/wx/xrc/MainMenu.xrc:647
 msgid "W&IN 1"
-msgstr ""
+msgstr "WIN 1"
 
 #: ../src/wx/xrc/MainMenu.xrc:652
 msgid "O&BJ WIN"
-msgstr ""
+msgstr "OBJ WIN"
 
 #: ../src/wx/xrc/MainMenu.xrc:656
 msgid "&View Layers"
-msgstr ""
+msgstr "Zobacz warstwy"
 
 #: ../src/wx/xrc/MainMenu.xrc:660
 msgid "Channel &1"
@@ -3402,7 +3402,7 @@ msgstr "Tłumaczenia"
 
 #: ../src/wx/xrc/MainMenu.xrc:709
 msgid "Check for updates"
-msgstr ""
+msgstr "Sprawdź dostępność aktualizacji"
 
 #: ../src/wx/xrc/MainMenu.xrc:712
 msgid "&Factory Reset..."
@@ -3410,7 +3410,7 @@ msgstr "Przywracanie ustawień fabrycznych..."
 
 #: ../src/wx/xrc/MainMenu.xrc:716
 msgid "&About..."
-msgstr ""
+msgstr "O programie..."
 
 #: ../src/wx/xrc/MapViewer.xrc:4
 msgid "Map Viewer"
@@ -3418,15 +3418,15 @@ msgstr "Przeglądarka map"
 
 #: ../src/wx/xrc/MapViewer.xrc:16
 msgid "Frame 0"
-msgstr ""
+msgstr "Klatka 0"
 
 #: ../src/wx/xrc/MapViewer.xrc:22
 msgid "Frame 1"
-msgstr ""
+msgstr "Klatka 1"
 
 #: ../src/wx/xrc/MapViewer.xrc:25
 msgid "Frame"
-msgstr ""
+msgstr "Klatka"
 
 #: ../src/wx/xrc/MapViewer.xrc:35
 msgid "BG0"
@@ -3446,11 +3446,11 @@ msgstr "Tło3"
 
 #: ../src/wx/xrc/MapViewer.xrc:84
 msgid "Map Base:"
-msgstr ""
+msgstr "Podstawa mapy:"
 
 #: ../src/wx/xrc/MapViewer.xrc:92
 msgid "Char Base:"
-msgstr ""
+msgstr "Char Base:"
 
 #: ../src/wx/xrc/MapViewer.xrc:100 ../src/wx/xrc/MemSelRegion.xrc:22
 #: ../src/wx/xrc/OAMViewer.xrc:77
@@ -3603,59 +3603,59 @@ msgstr "Urządzenie"
 
 #: ../src/wx/xrc/SoundConfig.xrc:154
 msgid "Enable stereo upmixing"
-msgstr ""
+msgstr "Włącz ulepszanie dźwięku stereo"
 
 #: ../src/wx/xrc/SoundConfig.xrc:161
 msgid "Enable hardware acceleration"
-msgstr ""
+msgstr "Włącz akcelerację sprzętową"
 
 #: ../src/wx/xrc/SoundConfig.xrc:190
 msgid "Number of sound buffers:"
-msgstr ""
+msgstr "Liczba buforów dźwięku:"
 
 #: ../src/wx/xrc/SoundConfig.xrc:198
 msgid "Advanced"
-msgstr ""
+msgstr "Zaawansowane"
 
 #: ../src/wx/xrc/SoundConfig.xrc:230
 msgid "Lots"
-msgstr ""
+msgstr "Dużo"
 
 #: ../src/wx/xrc/SoundConfig.xrc:239
 msgid "Echo"
-msgstr ""
+msgstr "Echo"
 
 #: ../src/wx/xrc/SoundConfig.xrc:247
 msgid "Stereo"
-msgstr ""
+msgstr "Stereo"
 
 #: ../src/wx/xrc/SoundConfig.xrc:258
 msgid "Center"
-msgstr ""
+msgstr "Środek"
 
 #: ../src/wx/xrc/SoundConfig.xrc:269
 msgid "Left/Right"
-msgstr ""
+msgstr "Lewo/Prawo"
 
 #: ../src/wx/xrc/SoundConfig.xrc:298
 msgid "Sound filtering"
-msgstr ""
+msgstr "Filtrowanie dźwięku"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:4
 msgid "SpeedUp / Turbo Settings"
-msgstr ""
+msgstr "Ustawienia Przyśpieszenia/Turbo"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:9
 msgid "Speedup Throttle"
-msgstr ""
+msgstr "Kontrola prędkości przyśpieszenia"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:84
 msgid "Speedup Frame Skip"
-msgstr ""
+msgstr "Pomijanie klatek przyśpieszenia"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:102
 msgid "# of frames:"
-msgstr ""
+msgstr "Liczba klatek:"
 
 #: ../src/wx/xrc/SpeedupConfig.xrc:121
 msgid "1"
