@@ -50,7 +50,7 @@ parts:
     source: https://github.com/visualboyadvance-m/visualboyadvance-m.git
     override-pull: |
       snapcraftctl pull
-      last_commit="$(git describe)"
+      last_commit="$(git describe | sed 's/^v//; s/-.*-/-/')"
       snapcraftctl set-version "${last_commit}"
       sed -i.bak -e 's|Icon=visualboyadvance-m|Icon=/usr/share/icons/hicolor/scalable/apps/visualboyadvance-m.svg|g' src/wx/visualboyadvance-m.desktop
     plugin: cmake
