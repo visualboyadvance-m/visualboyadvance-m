@@ -165,6 +165,9 @@ const char* GetSaveDotCodeFile();
 void SetLoadDotCodeFile(const char* szFile);
 void SetSaveDotCodeFile(const char* szFile);
 
+// Updates romSize and realloc rom pointer if needed after soft-patching
+void gbaUpdateRomSize(int size);
+
 extern struct EmulatedSystem GBASystem;
 
 #define R13_IRQ 18

@@ -223,6 +223,8 @@ void GameArea::LoadGame(const wxString& name)
             int size = 0x2000000 < rom_size ? 0x2000000 : rom_size;
             applyPatch(pfn.GetFullPath().mb_str(), &rom, &size);
             // that means we no longer really know rom_size either <sigh>
+            
+            gbaUpdateRomSize(size);
         }
 
         wxFileConfig* cfg = wxGetApp().overrides;
