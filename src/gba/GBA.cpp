@@ -458,6 +458,23 @@ variable_desc saveGameStruct[] = {
 
 static int romSize = SIZE_ROM;
 
+void gbaUpdateRomSize(int size)
+{
+    // Only change memory block if new size is larger
+    if (size > romSize) {
+        romSize = size;
+
+        uint8_t* tmp = (uint8_t*)realloc(rom, SIZE_ROM);
+        rom = tmp;
+
+        uint16_t* temp = (uint16_t*)(rom + ((romSize + 1) & ~1));
+        for (int i = (romSize + 1) & ~1; i < SIZE_ROM; i += 2) {
+            WRITE16LE(temp, (i >> 1) & 0xFFFF);
+            temp++;
+        }
+    }
+}
+
 #ifdef PROFILING
 void cpuProfil(profile_segment* seg)
 {
@@ -1506,7 +1523,7 @@ int CPULoadRom(const char* szFile)
 
     uint16_t* temp = (uint16_t*)(rom + ((romSize + 1) & ~1));
     int i;
-    for (i = (romSize + 1) & ~1; i < romSize; i += 2) {
+    for (i = (romSize + 1) & ~1; i < SIZE_ROM; i += 2) {
         WRITE16LE(temp, (i >> 1) & 0xFFFF);
         temp++;
     }

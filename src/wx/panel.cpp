@@ -133,12 +133,16 @@ void GameArea::LoadGame(const wxString& name)
 
         if (!pfn.IsFileReadable()) {
             pfn.SetExt(wxT("ups"));
+			
+			if (!pfn.IsFileReadable()) {
+				pfn.SetExt(wxT("bps"));
 
-            if (!pfn.IsFileReadable()) {
-                pfn.SetExt(wxT("ppf"));
-                loadpatch = pfn.IsFileReadable();
-            }
-        }
+				if (!pfn.IsFileReadable()) {
+					pfn.SetExt(wxT("ppf"));
+					loadpatch = pfn.IsFileReadable();
+				}
+			}
+		}
     }
 
     if (t == IMAGE_GB) {
@@ -219,6 +223,8 @@ void GameArea::LoadGame(const wxString& name)
             int size = 0x2000000 < rom_size ? 0x2000000 : rom_size;
             applyPatch(pfn.GetFullPath().mb_str(), &rom, &size);
             // that means we no longer really know rom_size either <sigh>
+            
+            gbaUpdateRomSize(size);
         }
 
         wxFileConfig* cfg = wxGetApp().overrides;
