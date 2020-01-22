@@ -13,6 +13,10 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
+if(TAG_RELEASE)
+    include(MakeReleaseCommitAndTag)
+endif()
+
 set(VCPKG_DEPS zlib libpng SDL2 SFML gettext wxWidgets)
 
 # appveyor job goes over time limit if building ffmpeg during initial cache

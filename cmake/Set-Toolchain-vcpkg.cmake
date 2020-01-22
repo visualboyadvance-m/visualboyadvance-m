@@ -21,7 +21,7 @@ function(vcpkg_get_first_upgrade vcpkg_exe)
     string(REGEX REPLACE "\r?\n" ";" upgrade_lines "${upgradable}")
 
     foreach(line ${upgrade_lines})
-        if(${line} MATCHES "^  [* ] ")
+        if(line MATCHES "^  [* ] ")
             string(REGEX REPLACE "^  [* ] " "" first_upgrade ${line})
             set(first_upgrade ${first_upgrade} PARENT_SCOPE)
             return()
