@@ -182,8 +182,6 @@ Ignore the following cmake error.
         endif()
 
         file(APPEND ${work_file} "${fi_line}" "\n")
-
-        fi_check_done()
     endwhile()
 
     # Convert to UNIX line endings on Windows, just copy the file otherwise.
@@ -241,6 +239,12 @@ Run the following commands to push the release commit and tag:
 
     git push
     git push --tags
+
+**** TO UNDO THE RELEASE ****
+
+To rollback these changes, run this command:
+
+    cmake .. -DTAG_RELEASE=UNDO
 
 Ignore the "configuration incomplete" message following, this mode does not
 build anything.
