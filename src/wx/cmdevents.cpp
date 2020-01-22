@@ -1197,7 +1197,7 @@ EVT_HANDLER_MASK(RecordSoundStartRecording, "Start sound recording...", CMDEN_NS
             ext.Replace(wxT(","), wxT(";*."));
             ext.insert(0, wxT("*."));
 
-            if (sound_extno < 0 && ext.find(wxT("*.mp3")) != wxString::npos)
+            if (sound_extno < 0 && ext.find(wxT("*.wav")) != wxString::npos)
                 sound_extno = extno;
 
             sound_exts.append(ext);
