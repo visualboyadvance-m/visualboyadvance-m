@@ -146,10 +146,19 @@ foreach (_component AVCODEC AVDEVICE AVFORMAT AVUTIL POSTPROCESS SWSCALE)
   set_component_found(${_component})
 endforeach ()
 
+# message(STATUS "FFmpeg_FIND_COMPONENTS: ${FFmpeg_FIND_COMPONENTS}")
+# message(STATUS "FFMPEG_LIBRARIES: ${FFMPEG_LIBRARIES}")
+# message(STATUS "FFMPEG_LDFLAGS: ${FFMPEG_LDFLAGS}")
+# message(STATUS "FFMPEG_INCLUDE_DIRS: ${FFMPEG_INCLUDE_DIRS}")
+
 # Compile the list of required vars
-set(_FFmpeg_REQUIRED_VARS FFMPEG_LIBRARIES FFMPEG_LDFLAGS FFMPEG_INCLUDE_DIRS)
+set(_FFmpeg_REQUIRED_VARS FFMPEG_LIBRARIES FFMPEG_INCLUDE_DIRS)
 foreach (_component ${FFmpeg_FIND_COMPONENTS})
-  list(APPEND _FFmpeg_REQUIRED_VARS ${_component}_LIBRARIES ${_component}_LDFLAGS ${_component}_INCLUDE_DIRS)
+  # message(STATUS "${_component}_LIBRARIES: ${${_component}_LIBRARIES}")
+  # message(STATUS "${_component}_LDFLAGS: ${${_component}_LDFLAGS}")
+  # message(STATUS "${_component}_INCLUDE_DIRS: ${${_component}_INCLUDE_DIRS}")
+
+  list(APPEND _FFmpeg_REQUIRED_VARS ${_component}_LIBRARIES ${_component}_INCLUDE_DIRS)
 endforeach ()
 
 # Give a nice error message if some of the required vars are missing.
