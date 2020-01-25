@@ -116,7 +116,7 @@ static int64_t readSignVarPtr(FILE* f)
 {
     int64_t offset = readVarPtr(f);
     bool sign =  offset & 1;
-    
+
     offset = offset >> 1;
     if (sign) {
         offset = -offset;
@@ -325,7 +325,7 @@ static bool patchApplyBPS(const char* patchname, uint8_t** rom, int* size)
 
     fseeko64(f, 0, SEEK_SET);
     uint32_t crc = computePatchCRC(f, patchSize - 4);
-    
+
     if (crc != patchCRC) {
         fclose(f);
         return false;
@@ -357,13 +357,13 @@ static bool patchApplyBPS(const char* patchname, uint8_t** rom, int* size)
         fclose(f);
         return false;
     }
-    
+
     uint8_t* new_rom = (uint8_t*)calloc(1, dataSize);
-    
+
     int64_t length = 0;
     uint8_t action = 0;
     uint32_t outputOffset = 0, sourceRelativeOffset = 0, targetRelativeOffset = 0;
-    
+
     while (ftello64(f) < patchSize - 12) {
         length = readVarPtr(f);
         action = length & 3 ;
@@ -389,30 +389,23 @@ static bool patchApplyBPS(const char* patchname, uint8_t** rom, int* size)
         case 3: // targetCopy
             targetRelativeOffset += readSignVarPtr(f);
             while(length--) { // yes, copy from alredy patched rom, and only 1 byte at time (pseudo-rle)
-                new_rom[outputOffset++] = new_rom[targetRelativeOffset++]; 
+                new_rom[outputOffset++] = new_rom[targetRelativeOffset++];
             }
             break;
         }
     }
-    
+
     crc = crc32(0L, Z_NULL, 0);
     crc = crc32(crc, new_rom, dataSize);
-    
-    // TODO
-    if(crc == dstCRC) {
-#if 1
+
+    if(crc == dstCRC)
+    {
         if (dataSize > *size) {
-            // SIGSEGV in /src/gba/GBA.cpp:3313 [*((uint16_t*)&rom[0x1fe209c]) = 0xdffa; // SWI 0xFA]
             *rom = (uint8_t*)realloc(*rom, dataSize);
-        } 
+        }
         memcpy(*rom, new_rom, dataSize);
         *size = dataSize;
         free(new_rom);
-#else
-        free(*rom);
-        *rom = new_rom;
-        *size = dataSize;
-#endif
     }
 
     fclose(f);
@@ -601,10 +594,6 @@ static bool patchApplyPPF(const char* patchname, uint8_t** rom, int* size)
 }
 
 #endif
-
-// HINT: new format(.ext) => aditional changes in 
-//              sdl/SDL.cpp>>>main (~1600)  
-//              wx/panel.cpp>>>GameArea::LoadGame (~130)
 
 bool applyPatch(const char* patchname, uint8_t** rom, int* size)
 {

@@ -12,7 +12,8 @@ struct supportedCodecs {
 
 const supportedCodecs audioSupported[] = {
     { AV_CODEC_ID_MP3, "MP3 (MPEG audio layer 3)", "mp3" },
-    { AV_CODEC_ID_AAC, "ADTS AAC (Advanced Audio Coding)", "aac,adts" }
+    { AV_CODEC_ID_AAC, "ADTS AAC (Advanced Audio Coding)", "aac,adts" },
+    { AV_CODEC_ID_PCM_S16LE, "WAV / WAVE (Waveform Audio)", "wav" }
 };
 
 const supportedCodecs videoSupported[] = {
@@ -120,7 +121,7 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
             }
         }
     }
-    if (!isSupported) return MRET_ERR_NOCODEC;
+    if (!isSupported && acodec->supported_samplerates) return MRET_ERR_NOCODEC;
     aenc->channels = av_get_channel_layout_nb_channels(aenc->channel_layout);
     aenc->channel_layout = AV_CH_LAYOUT_STEREO;
     if (acodec->channel_layouts)
@@ -143,7 +144,10 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
         return MRET_ERR_BUFSIZE;
     // number of samples per frame
     if (aenc->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE)
-        nb_samples = 10000;
+    {
+        //nb_samples = 10000; // can be any value, but we use our aud buffer size
+        nb_samples = 1470;
+    }
     else
         nb_samples = aenc->frame_size;
     // audio frame for input
@@ -552,6 +556,16 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
     int realLength = length / sizeof *aud;
     bool isMissing = false;
     int cp = -1;
+
+    if (c->frame_size == 0) // no compression/limit for audio frames
+    {
+        int maxCopy = realLength;
+        memcpy(audioBuffer + posInAudioBuffer, aud, maxCopy * 2);
+        posInAudioBuffer += maxCopy;
+        samplesInAudioBuffer += (maxCopy / 2);
+        aud += maxCopy;
+    }
+
     if (samplesInAudioBuffer < c->frame_size)
     {
         int missingSamples = (c->frame_size - samplesInAudioBuffer);
@@ -568,7 +582,7 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
             cp = realLength - maxCopy;
         }
     }
-    if (samplesInAudioBuffer != c->frame_size) // not enough samples
+    if (samplesInAudioBuffer != c->frame_size && (c->frame_size > 0 || samplesInAudioBuffer != realLength)) // not enough samples
     {
         return MRET_OK;
     }
