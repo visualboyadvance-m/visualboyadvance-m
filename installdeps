@@ -108,7 +108,8 @@ Examples:
   [32m./installdeps [1;35mm32[0m                    # make a 32 bit binary for the host OS
   [32m./installdeps [1;35mwin32[0m                  # cross-compile for 32 bit windows (Debian/Ubuntu, Arch Linux or MSYS2)
   [32m./installdeps [1;35mMinGW-w64-i686[0m         # likewise
-  [32m./installdeps [1;35mMinGW-w64-x86_64[0m       # cross-compile for 64 bit windows (Debian/Ubuntu, Arch Linux or MSYS2)
+  [32m./installdeps [1;35mwin64[0m                  # cross-compile for 64 bit windows (Debian/Ubuntu, Arch Linux or MSYS2)
+  [32m./installdeps [1;35mMinGW-w64-x86_64[0m       # likewise
 EOF
 }
 
@@ -260,7 +261,7 @@ check_cross() {
     fi
 
     case "$target" in
-        win32|mingw*)
+        win32|win64|mingw*)
             if [ -z "$arch_linux" -a -z "$msys2" -a -z "$debian" -a -z "$fedora" ]; then
                 error 'win32 cross compiling targets are only supported on Debian/Ubuntu, Fedora, Arch and MSYS2 at the moment'
             fi
@@ -269,12 +270,15 @@ check_cross() {
                 win32)
                     target='mingw-w64-i686'
                     ;;
+                win64)
+                    target='mingw-w64-x86_64'
+                    ;;
                 mingw-w64-i686)
                     ;;
                 mingw-w64-x86_64)
                     ;;
                 *)
-                    error "target must be one of 'm32', 'win32', 'MinGW-w64-i686' or 'MinGW-w64-x86_64'"
+                    error "target must be one of 'm32', 'win32', 'MinGW-w64-i686', 'win64' or 'MinGW-w64-x86_64'"
                     ;;
             esac
 
@@ -331,7 +335,7 @@ debian_installdeps() {
           wx_lib_dev=libwxgtk3.0-dev
         fi
 
-        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev libpng-dev libsdl2-dev libsdl2-2.0 libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev libsfml-dev $sfml_libs $glew_lib $wx_lib $wx_lib_dev libgtk2.0-dev libgtk-3-dev ccache zip"
+        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev libpng-dev libsdl2-dev libsdl2-2.0 libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev libsfml-dev $sfml_libs $glew_lib $wx_lib $wx_lib_dev libgtk2.0-dev libgtk-3-dev ccache zip ninja-build"
 
         [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs libopenal-dev"
         [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs libavcodec-dev libavformat-dev libswscale-dev libavutil-dev $libswresample_dev"
@@ -391,7 +395,7 @@ debian_installdeps() {
         done
         check sudo apt-get --allow-unauthenticated -qq -y update
         # native wx-common needed for wxrc executable
-        check sudo apt-get --allow-unauthenticated -qy install build-essential cmake ccache wx-common "$@"
+        check sudo apt-get --allow-unauthenticated -qy install build-essential cmake ninja-build ccache wx-common "$@"
     fi
 
     build_instructions
@@ -544,18 +548,18 @@ fedora_installdeps() {
         case "$target" in
             mingw-w64-i686)
                 target=mingw32
-                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-i686.cmake"
+                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-i686-static.cmake"
                 ;;
             mingw-w64-x86_64)
                 target=mingw64
-                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-x86_64.cmake"
+                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-x86_64-static.cmake"
                 ;;
             *)
                 error 'unknown cross target (this should not happen)'
                 ;;
         esac
         # install static deps
-        for pkg in zlib gettext libpng SDL2 wxWidgets; do
+        for pkg in zlib gettext libpng SDL2 wxWidgets3; do
             set -- "$@" "${target}-${pkg}-static"
         done
         # install deps that are not available as static
@@ -770,7 +774,7 @@ suse_installdeps() {
     check_cross
     installing
 
-    tools="make cmake ccache nasm gettext-tools pkg-config ccache zip sfml2-devel"
+    tools="make cmake ccache nasm gettext-tools pkg-config ccache zip sfml2-devel ninja"
 
     libs="gcc gcc-c++ libpng16-devel libSDL2-devel wxWidgets-3_0-devel" # ffmpeg-devel
 
@@ -824,7 +828,7 @@ archlinux_installdeps() {
 
     # common needed dev packages
     # not using the base-devel group because it can break gcc-multilib
-    check $pacman --noconfirm --needed -S binutils file grep gawk gzip libtool make patch sed util-linux nasm cmake ccache pkg-config git ccache zip
+    check $pacman --noconfirm --needed -S binutils file grep gawk gzip libtool make patch sed util-linux nasm cmake ccache pkg-config git ccache zip ninja
 
     gtk=gtk3
 
@@ -950,7 +954,7 @@ solus_installdeps() {
 
     check sudo eopkg -y update-repo
     check sudo eopkg -y install -c system.devel
-    check sudo eopkg -y install git ccache
+    check sudo eopkg -y install git ccache ninja
 
     set -- sdl2-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel
 
@@ -1019,7 +1023,7 @@ gentoo_installdeps() {
 
     check sudo emerge-webrsync
 
-    ebuilds="gcc make cmake ccache binutils libsdl2 libsfml wxGTK zlib dev-util/pkgconfig nasm"
+    ebuilds="gcc make cmake ccache binutils libsdl2 libsfml wxGTK zlib dev-util/pkgconfig nasm dev-util/ninja"
 
     [ -n "$ENABLE_OPENAL" ] && ebuilds="$ebuilds media-libs/openal"
 
@@ -1039,7 +1043,7 @@ windows_installdeps() {
     # update catalogs
     check pacman -Sy
 
-    pkgs="SDL2 sfml wxWidgets zlib binutils cmake crt-git extra-cmake-modules gcc gcc-libs gcc-libgfortran gdb headers-git make pkg-config tools-git windows-default-manifest libmangle-git nasm"
+    pkgs="SDL2 sfml wxWidgets zlib binutils cmake crt-git extra-cmake-modules gcc gcc-libs gcc-libgfortran gdb headers-git make pkg-config tools-git windows-default-manifest libmangle-git nasm ninja"
 
     [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs openal"
     [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs ffmpeg"
@@ -1098,7 +1102,7 @@ brew_installdeps() {
 
     check brew -v update
 
-    brews="nasm cmake ccache gettext libpng pkg-config sdl2 wxmac ccache"
+    brews="nasm cmake ccache gettext libpng pkg-config sdl2 wxmac ccache ninja"
 
     [ -n "$ENABLE_FFMPEG" ] && brews="$brews ffmpeg"
 
@@ -1128,7 +1132,7 @@ macports_installdeps() {
 
     check sudo port -v selfupdate
 
-    ports="cmake ccache nasm gettext libpng pkgconfig libsdl2 sfml wxWidgets-3.0 libiconv"
+    ports="cmake ccache nasm gettext libpng pkgconfig libsdl2 sfml wxWidgets-3.0 libiconv ninja"
 
     [ -n "$ENABLE_FFMPEG" ] && ports="$ports ffmpeg"
 
@@ -1144,7 +1148,7 @@ fink_installdeps() {
 
     check sudo fink -vy selfupdate
 
-    pkgs="cmake ccache nasm libgettext8-dev gettext-tools libpng16 pkgconfig sdl2 wxwidgets300-osxcocoa libiconv-dev sfml24-dev ccache"
+    pkgs="cmake ccache nasm libgettext8-dev gettext-tools libpng16 pkgconfig sdl2 wxwidgets300-osxcocoa libiconv-dev sfml24-dev ccache ninja"
 
     [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs ffmpeg"
 
@@ -1160,8 +1164,8 @@ build_instructions() {
 
 $pre_build
 mkdir -p build && cd build
-$CMAKE .. $cmake_flags
-make $(jobs_flag)
+$CMAKE .. $cmake_flags -G Ninja
+ninja
 $post_build
 
 EOF

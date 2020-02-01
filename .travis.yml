@@ -57,8 +57,8 @@ script:
     - mkdir -p -- "$DIR"
     - cd -- "$DIR"
     - if [ "$BUILD_ENV" != libretro ]; then $CMAKE $CMAKE_ARGS ..; fi
-    - make
-    - if [ "$BUILD_ENV" != libretro ]; then make install DESTDIR=/tmp/VBAM; fi
+    - if [ "$BUILD_ENV" != libretro ]; then ninja; else make; fi
+    - if [ "$BUILD_ENV" != libretro ]; then DESTDIR=/tmp/VBAM ninja install; fi
     - |
         if [ "$BUILD_ENV" = mac ]; then
             ./$PRGNAM.app/Contents/MacOS/$PRGNAM --help
@@ -68,7 +68,7 @@ script:
 
 env:
     global:
-        - CMAKE_ARGS=""
+        - CMAKE_ARGS="-G Ninja"
         - ENABLE_SDL=1
         - MAKEFLAGS="-j2"
         - PRGNAM=visualboyadvance-m

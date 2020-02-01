@@ -2,6 +2,10 @@ if(COMMAND cmake_policy)
     cmake_policy(SET CMP0003 NEW) # link to full path of libs
     cmake_policy(SET CMP0005 NEW) # escapes in add_definitions
 
+    if(POLICY CMP0074)
+        cmake_policy(SET CMP0074 NEW) # use Package_ROOT if set
+    endif()
+
     if(POLICY CMP0077)
         cmake_policy(SET CMP0077 NEW) # use vars for options
     endif()
@@ -30,7 +34,7 @@ include(Set-Toolchain-vcpkg)
 
 set(VBAM_STATIC_DEFAULT OFF)
 
-if(VCPKG_TARGET_TRIPLET MATCHES -static OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)
+if(VCPKG_TARGET_TRIPLET MATCHES -static OR CMAKE_TOOLCHAIN_FILE MATCHES "mxe|-static")
     set(VBAM_STATIC_DEFAULT ON)
 endif()
 
@@ -66,17 +70,13 @@ if(VBAM_STATIC)
     set(FFMPEG_STATIC ON)
     set(SSP_STATIC ON)
     set(OPENAL_STATIC ON)
+    set_property(GLOBAL PROPERTY LINK_SEARCH_START_STATIC ON)
+    set_property(GLOBAL PROPERTY LINK_SEARCH_END_STATIC   ON)
+
+    if(NOT MSVC)
+        list(INSERT CMAKE_FIND_LIBRARY_SUFFIXES 0 .a)
+    endif()
 endif()
-
-set(ENABLE_BUNDLED_LIBS_DEFAULT OFF)
-
-# on visual studio use all bundled stuff
-if(MSVC)
-    set(ENABLE_BUNDLED_LIBS_DEFAULT ON)
-endif()
-
-# XXX: do some stuff with this
-#option(ENABLE_BUNDLED_LIBS "Use bundled libraries instead of system libraries" ${ENABLE_BUNDLED_LIBS_DEFAULT})
 
 # use ccache if available, and not already enabled on the command line
 # but not with ninja and msys ccache on msys2
@@ -186,7 +186,7 @@ set(LTO_DEFAULT ON)
 
 # gcc lto produces buggy binaries for 64 bit mingw
 # and we generally don't want it when debugging because it makes linking slow
-if(CMAKE_BUILD_TYPE MATCHES Debug OR (WIN32 AND CMAKE_COMPILER_IS_GNUCXX AND AMD64))
+if(CMAKE_BUILD_TYPE MATCHES Debug OR (WIN32 AND CMAKE_COMPILER_IS_GNUCXX))
     set(LTO_DEFAULT OFF)
 endif()
 
