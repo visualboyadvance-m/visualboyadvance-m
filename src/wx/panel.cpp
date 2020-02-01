@@ -49,11 +49,11 @@ GameArea::GameArea()
 }
 
 
-static void checkOverrides(uint rom_crc32, wxString id)
+static void checkOverrides(unsigned int romCrc32, wxString id)
 {
     wxString crc32;
     wxString identifier;
-    crc32.Printf(wxT("%08X"), rom_crc32);
+    crc32.Printf(wxT("%08X"), romCrc32);
 
     //const char *aux = crc32.mb_str(wxConvUTF8);
     //const char *aux2 = id.mb_str(wxConvUTF8);
