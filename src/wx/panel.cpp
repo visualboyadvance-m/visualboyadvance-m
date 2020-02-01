@@ -48,6 +48,32 @@ GameArea::GameArea()
     Init_2xSaI(32);
 }
 
+
+static void checkOverrides(uint rom_crc32, wxString id)
+{
+    wxString crc32;
+    wxString identifier;
+    crc32.Printf(wxT("%08X"), rom_crc32);
+
+    //const char *aux = crc32.mb_str(wxConvUTF8);
+    //const char *aux2 = id.mb_str(wxConvUTF8);
+    //fprintf(stderr, "\n\n%s -- %s\n\n", aux, aux2);
+
+    if (id == wxString("AZLE") && wxString("8E91CD13") != crc32) { // Legend of Zelda, A Link to The Past ROM hacks
+        cpuSaveType = 2; // SRAM
+    }
+    else if (id == wxString("BPRE") && wxString("DD88761C") != crc32) { // Pokemon Fire Red 1.0 ROM hacks
+        rtcEnabled = true;
+        rtcEnable(rtcEnabled);
+        flashSetSize(131072);
+        cpuSaveType = 3; // FLASH 0x20000
+    }
+    else {
+        cpuSaveType = 0;
+    }
+}
+
+
 void GameArea::LoadGame(const wxString& name)
 {
     rom_scene_rls = wxT("-");
@@ -133,7 +159,7 @@ void GameArea::LoadGame(const wxString& name)
 
         if (!pfn.IsFileReadable()) {
             pfn.SetExt(wxT("ups"));
-			
+
 			if (!pfn.IsFileReadable()) {
 				pfn.SetExt(wxT("bps"));
 
@@ -223,12 +249,15 @@ void GameArea::LoadGame(const wxString& name)
             int size = 0x2000000 < rom_size ? 0x2000000 : rom_size;
             applyPatch(pfn.GetFullPath().mb_str(), &rom, &size);
             // that means we no longer really know rom_size either <sigh>
-            
+
             gbaUpdateRomSize(size);
         }
 
         wxFileConfig* cfg = wxGetApp().overrides;
         wxString id = wxString((const char*)&rom[0xac], wxConvLibc, 4);
+
+        // check for overrides here:
+        checkOverrides(crc32(0L, rom, rom_size), id);
 
         if (cfg->HasGroup(id)) {
             cfg->SetPath(id);
