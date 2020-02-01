@@ -577,6 +577,7 @@ extern uint32_t line3[240];
 
 void CPUUpdateRenderBuffers(bool force)
 {
+    layerEnable = layerSettings & DISPCNT;
     if (!(layerEnable & 0x0100) || force) {
         CLEAR_ARRAY(line0);
     }
