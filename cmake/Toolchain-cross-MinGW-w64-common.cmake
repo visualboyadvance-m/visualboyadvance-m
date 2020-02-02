@@ -1,4 +1,6 @@
-SET(CMAKE_SYSTEM_NAME Windows)
+set(CMAKE_SYSTEM_NAME Windows)
+
+set(CMAKE_SYSTEM_PROCESSOR ${CROSS_ARCH})
 
 set(COMPILER_PREFIX "${CROSS_ARCH}-w64-mingw32")
 
@@ -7,9 +9,9 @@ unset(CMAKE_C_COMPILER      CACHE)
 unset(CMAKE_CXX_COMPILER    CACHE)
 unset(PKG_CONFIG_EXECUTABLE CACHE)
 
-# which compilers to use for C and C++
-find_program(CMAKE_RC_COMPILER NAMES ${COMPILER_PREFIX}-windres)
-find_program(CMAKE_C_COMPILER NAMES ${COMPILER_PREFIX}-gcc)
+# Which compilers to use for C and C++.
+find_program(CMAKE_RC_COMPILER  NAMES ${COMPILER_PREFIX}-windres)
+find_program(CMAKE_C_COMPILER   NAMES ${COMPILER_PREFIX}-gcc)
 find_program(CMAKE_CXX_COMPILER NAMES ${COMPILER_PREFIX}-g++)
 
 SET(CMAKE_FIND_ROOT_PATH
@@ -51,8 +53,8 @@ endforeach()
 
 set(wxWidgets_CONFIG_EXECUTABLE ${wx_conf} CACHE FILEPATH "path to wx-config script for the desired wxWidgets configuration" FORCE)
 
-# find the right static zlib
 if(CMAKE_TOOLCHAIN_FILE MATCHES -static)
+    # find the right static zlib
     foreach(p ${CMAKE_FIND_ROOT_PATH})
         if(EXISTS ${p}/lib/libz.a)
             set(ZLIB_ROOT ${p} CACHE FILEPATH "where to find zlib" FORCE)

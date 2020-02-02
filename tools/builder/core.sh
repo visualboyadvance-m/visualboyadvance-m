@@ -130,7 +130,7 @@ DISTS=$DISTS'
     gperf           http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz                                           bin/gperf
     libicu          https://github.com/unicode-org/icu/releases/download/release-65-1/icu4c-65_1-src.tgz        lib/libicud*t*.a
     pkgconfig       https://pkgconfig.freedesktop.org/releases/pkg-config-0.29.2.tar.gz                         bin/pkg-config
-    nasm            http://repo.or.cz/nasm.git/snapshot/53371ddd17b685f8880c22b8b698e494e0f1059b.tar.gz         bin/nasm
+    nasm            https://www.nasm.us/pub/nasm/snapshots/20191023/nasm-2.15rc0-20191023.tar.xz                bin/nasm
     yasm            http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz                             bin/yasm
     pcre            https://ftp.pcre.org/pub/pcre/pcre-8.41.tar.bz2                                             lib/libpcre.a
     libffi          ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz                                         lib/libffi.a
@@ -143,8 +143,8 @@ DISTS=$DISTS'
     docbook2x       https://downloads.sourceforge.net/project/docbook2x/docbook2x/0.8.8/docbook2X-0.8.8.tar.gz  bin/docbook2man
     expat           https://github.com/libexpat/libexpat/archive/R_2_2_4.tar.gz                                 lib/libexpat.a
     libpng          https://download.sourceforge.net/libpng/libpng-1.6.37.tar.xz                                lib/libpng.a
-    libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/1.5.2.tar.gz                         lib/libjpeg.a
-    libtiff         http://download.osgeo.org/libtiff/tiff-4.0.9.tar.gz                                         lib/libtiff.a
+    libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/2.0.4.tar.gz                         lib/libjpeg.a
+    libtiff         http://download.osgeo.org/libtiff/tiff-4.1.0.tar.gz                                         lib/libtiff.a
 #    libcroco        http://ftp.gnome.org/pub/gnome/sources/libcroco/0.6/libcroco-0.6.12.tar.xz                  lib/libcroco-0.6.a
     libuuid         https://downloads.sourceforge.net/project/libuuid/libuuid-1.0.3.tar.gz                      lib/libuuid.a
     freetype        http://download.savannah.gnu.org/releases/freetype/freetype-2.10.0.tar.bz2                  lib/libfreetype.a
@@ -183,7 +183,7 @@ DISTS=$DISTS'
     harfbuzz        https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-1.7.5.tar.bz2                lib/libharfbuzz.a
     sfml            https://github.com/SFML/SFML/archive/013d053277c980946bc7761a2a088f1cbb788f8c.tar.gz        lib/libsfml-system-s.a
     shared-mime-info http://freedesktop.org/~hadess/shared-mime-info-1.9.tar.xz                                 bin/update-mime-database
-    wxwidgets       https://github.com/wxWidgets/wxWidgets/archive/1753ed403765269bf9f6d3bb540f7e77a8758e39.tar.gz lib/libwx_baseu-3.1*.a
+    wxwidgets       https://github.com/wxWidgets/wxWidgets/archive/55efc9e60742d0de61e39556084d09f2332b99be.tar.gz lib/libwx_baseu-3.1*.a
     graphite2       https://github.com/silnrsi/graphite/archive/ce0e793f22127d7ba6422d440bd83b58f864ef7e.tar.gz lib/libgraphite2.a
     xvidcore        http://downloads.xvid.org/downloads/xvidcore-1.3.5.tar.bz2                                  lib/libxvidcore.a
     fribidi         https://github.com/fribidi/fribidi/releases/download/v1.0.1/fribidi-1.0.1.tar.bz2           lib/libfribidi.a
@@ -373,6 +373,8 @@ DIST_ARGS="$DIST_ARGS
     doxygen     -DICONV_ACCEPTS_NONCONST_INPUT:BOOL=FALSE -DICONV_ACCEPTS_CONST_INPUT:BOOL=TRUE
     sfml        -DSFML_USE_SYSTEM_DEPS=TRUE
     libcroco    --disable-Bsymbolic
+    libjpeg-turbo -DWITH_JPEG8=ON -DWITH_SIMD=OFF
+    libtiff     --disable-lzma
     freetype    --with-harfbuzz=no
     harfbuzz    --with-cairo=no --with-icu=no
     graphite2   -DGRAPHITE2_NFILEFACE=ON -DGRAPHITE2_TESTS=OFF -DGRAPHITE2_DOCS=OFF
