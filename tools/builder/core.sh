@@ -374,7 +374,7 @@ DIST_ARGS="$DIST_ARGS
     sfml        -DSFML_USE_SYSTEM_DEPS=TRUE
     libcroco    --disable-Bsymbolic
     libjpeg-turbo -DWITH_JPEG8=ON -DWITH_SIMD=OFF
-    libtiff     --disable-lzma
+    libtiff     --disable-lzma --disable-webp
     freetype    --with-harfbuzz=no
     harfbuzz    --with-cairo=no --with-icu=no
     graphite2   -DGRAPHITE2_NFILEFACE=ON -DGRAPHITE2_TESTS=OFF -DGRAPHITE2_DOCS=OFF
