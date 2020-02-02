@@ -512,6 +512,7 @@ setup() {
     # binary smaller.
     if [ "$target_os" = windows ] && [ "$target_bits" -eq 32 ]; then
         BUILD_FFMPEG=
+        PROJECT_ARGS="$PROJECT_ARGS -DENABLE_OPENAL=NO"
     fi
 
     if [ -z "$BUILD_FFMPEG" ]; then
