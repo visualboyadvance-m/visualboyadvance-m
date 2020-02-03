@@ -673,6 +673,10 @@ void load_opts()
         }
     }
 
+    // Make sure linkTimeout is not set to 1, which was the previous default.
+    if (linkTimeout <= 1)
+        linkTimeout = 500;
+
     // recent is special
     // Recent does not get written with defaults
     cfg->SetPath(wxT("/Recent"));
