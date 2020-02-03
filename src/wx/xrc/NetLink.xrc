@@ -76,6 +76,19 @@
             <flag>wxALL|wxEXPAND</flag>
             <border>5</border>
           </object>
+          <object class="sizeritem">
+            <object class="wxStaticText" name="ServerPortLab">
+              <label>Port:</label>
+            </object>
+            <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxTextCtrl" name="ServerPort"/>
+            <option>1</option>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
         </object>
         <flag>wxEXPAND</flag>
       </object>

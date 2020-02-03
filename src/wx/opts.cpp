@@ -223,6 +223,7 @@ opt_desc opts[] = {
     BOOLOPT("GBA/LinkAuto", "LinkAuto", wxTRANSLATE("Enable link at boot"), gopts.link_auto),
     INTOPT("GBA/LinkFast", "SpeedOn", wxTRANSLATE("Enable faster network protocol by default"), linkHacks, 0, 1),
     STROPT("GBA/LinkHost", "", wxTRANSLATE("Default network link client host"), gopts.link_host),
+    UINTOPT("GBA/LinkPort", "", wxTRANSLATE("Default network link port (server and client)"), gopts.link_port, 0, 65535),
     INTOPT("GBA/LinkProto", "LinkProto", wxTRANSLATE("Default network protocol"), gopts.link_proto, 0, 1),
     INTOPT("GBA/LinkTimeout", "LinkTimeout", wxTRANSLATE("Link timeout (ms)"), linkTimeout, 0, 9999999),
     INTOPT("GBA/LinkType", "LinkType", wxTRANSLATE("Link cable type"), gopts.gba_link_type, 0, 5),
@@ -359,6 +360,7 @@ opts_t::opts_t()
     autoPatch = true;
     // quick fix for issues #48 and #445
     link_host = "127.0.0.1";
+    link_port = 5738;
 }
 
 // for binary_search() and friends

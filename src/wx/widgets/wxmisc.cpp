@@ -1,4 +1,9 @@
 // utility widgets
+
+#include <cctype>
+#include <string>
+#include <algorithm>
+
 #include "wx/wxmisc.h"
 #include <wx/wx.h>
 #include <wx/spinctrl.h>
@@ -443,34 +448,60 @@ wxUIntValidator::wxUIntValidator(uint32_t* _val)
 
 bool wxUIntValidator::TransferToWindow()
 {
-    wxSpinCtrl* ctrl = wxDynamicCast(GetWindow(), wxSpinCtrl);
-    if (ctrl && uint_val) {
-        ctrl->SetValue(*uint_val);
-        return true;
+    if (uint_val) {
+        wxSpinCtrl* spin = wxDynamicCast(GetWindow(), wxSpinCtrl);
+        if (spin) {
+            spin->SetValue(*uint_val);
+            return true;
+        }
+
+        wxTextCtrl* txt = wxDynamicCast(GetWindow(), wxTextCtrl);
+        if (txt) {
+            txt->SetValue(wxString::Format(wxT("%d"), *uint_val));
+            return true;
+        }
     }
+
     return false;
 }
 
 bool wxUIntValidator::TransferFromWindow()
 {
-    wxSpinCtrl* ctrl = wxDynamicCast(GetWindow(), wxSpinCtrl);
-    if (ctrl && uint_val) {
-        *uint_val = ctrl->GetValue();
-        return true;
+    if (uint_val) {
+        wxSpinCtrl* spin = wxDynamicCast(GetWindow(), wxSpinCtrl);
+        if (spin) {
+            *uint_val = spin->GetValue();
+            return true;
+        }
+
+        wxTextCtrl* txt = wxDynamicCast(GetWindow(), wxTextCtrl);
+        if (txt) {
+            *uint_val = wxAtoi(txt->GetValue());
+            return true;
+        }
     }
+
     return false;
 }
 
 bool wxUIntValidator::Validate(wxWindow* parent)
 {
     (void)parent; // unused params
-    wxSpinCtrl* ctrl = wxDynamicCast(GetWindow(), wxSpinCtrl);
 
-    if (ctrl) {
-        if (ctrl->GetValue() >= 0) {
+    wxSpinCtrl* spin = wxDynamicCast(GetWindow(), wxSpinCtrl);
+    if (spin) {
+        if (spin->GetValue() >= 0) {
             return true;
         }
         return false;
+    }
+
+    wxTextCtrl* txt = wxDynamicCast(GetWindow(), wxTextCtrl);
+    if (txt) {
+        std::string val = std::string(txt->GetValue().mb_str());
+
+        return !val.empty()
+            && std::find_if(val.begin(), val.end(), [](unsigned char c) { return !std::isdigit(c); }) == val.end();
     }
 
     return false;

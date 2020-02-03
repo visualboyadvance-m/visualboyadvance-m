@@ -98,7 +98,10 @@ bool gba_link_enabled = false;
 bool speedhack = true;
 
 #define LOCAL_LINK_NAME "VBA link memory"
-#define IP_LINK_PORT 5738
+
+#include <stdint.h>
+
+uint32_t IP_LINK_PORT = 5738;
 
 #include "../common/Port.h"
 #include "GBA.h"

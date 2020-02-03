@@ -89,6 +89,8 @@ public:
         if (!dlg->Validate() || !dlg->TransferDataFromWindow())
             return;
 
+        IP_LINK_PORT = gopts.link_port;
+
         if (!server) {
             bool valid = SetLinkServerHost(gopts.link_host.utf8_str());
 
@@ -3181,6 +3183,11 @@ bool MainFrame::BindControls()
         tc = SafeXRCCTRL<wxTextCtrl>(d, n);                   \
         tc->SetValidator(wxPositiveDoubleValidator(&o));      \
     } while (0)
+#define getutc(n, o)                                          \
+    do {                                                      \
+        tc = SafeXRCCTRL<wxTextCtrl>(d, n);                   \
+        tc->SetValidator(wxUIntValidator(&o));                \
+    } while (0)
 #ifndef NO_LINK
         {
             net_link_handler.dlg = d;
@@ -3199,6 +3206,7 @@ bool MainFrame::BindControls()
             addrber(lab, true);
             gettc("ServerIP", gopts.link_host);
             addrber(tc, true);
+            getutc("ServerPort", gopts.link_port);
             wxWindow* okb = d->FindWindow(wxID_OK);
 
             if (okb) // may be gone if style guidlines removed it

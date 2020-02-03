@@ -1,6 +1,10 @@
 #ifndef GBA_GBALINK_H
 #define GBA_GBALINK_H
 
+#include <stdint.h>
+
+extern uint32_t IP_LINK_PORT;
+
 /**
  * Link modes to be passed to InitLink
  */
