@@ -193,7 +193,7 @@ int linkAuto;
 int linkHacks = 1;
 int linkMode;
 int linkNumPlayers;
-int linkTimeout = 1;
+int linkTimeout = 500;
 int maxScale;
 int mouseCounter = 0;
 int movieFrame;
@@ -521,7 +521,13 @@ void LoadConfig()
 	linkHostAddr = ReadPrefString("LinkHost", "localhost");
 	linkMode = ReadPref("LinkMode", 0); // LINK_DISCONNECTED = 0
 	linkNumPlayers = ReadPref("LinkNumPlayers", 2);
-	linkTimeout = ReadPref("LinkTimeout", 1);
+
+	linkTimeout = ReadPref("LinkTimeout", 500);
+
+	// Previous default was 1, which is very wrong.
+	if (linkTimeout <= 1)
+	    linkTimeout = 500;
+
 	loadDotCodeFile = ReadPrefString("loadDotCodeFile");
 	maxScale = ReadPref("maxScale", 0);
 	movieRecordDir = ReadPrefString("movieRecordDir");
