@@ -356,6 +356,8 @@ debian_installdeps() {
                 ;;
         esac
 
+        pre_build='export PATH="$PATH:/usr/lib/mxe/usr/bin"'
+
         debian_rel=$(lsb_release -a 2>/dev/null | sed -En 's/^Codename:[[:space:]]*//p')
 
         case "$debian_rel" in
@@ -394,8 +396,17 @@ debian_installdeps() {
             set -- "$@" "mxe-${target}-$dep"
         done
         check sudo apt-get --allow-unauthenticated -qq -y update
-        # native wx-common needed for wxrc executable
+
+        # Native wx-common needed for wxrc executable.
         check sudo apt-get --allow-unauthenticated -qy install build-essential cmake ninja-build ccache wx-common "$@"
+
+        # The ccache symlink is broken in some versions of these mxe packages.
+        ccache_link=/usr/lib/mxe/.ccache/bin/ccache
+
+        if [ ! -e "$ccache_link" ]; then
+            sudo mkdir -p ${ccache_link%/*}
+            sudo ln -sf /usr/bin/ccache "$ccache_link"
+        fi
     fi
 
     build_instructions
