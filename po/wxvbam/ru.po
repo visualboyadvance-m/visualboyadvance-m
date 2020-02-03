@@ -9,6 +9,7 @@
 # Artem Abramov <aabramovrussia@yandex.com>, 2015
 # 85f5ad14c5f803c69d22f4aeb4ef6a7e, 2015
 # tjtxtfh <inactive+tjtxtfh@transifex.com>, 2015
+# ав а <teorex3@gmail.com>, 2020
 # Алексей Гаврилов <flexxx_seva@mail.ru>, 2018
 # Михаил Михаил <sined116@gmail.com>, 2016
 msgid ""
@@ -16,8 +17,8 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-22 23:25+0000\n"
-"PO-Revision-Date: 2019-11-28 01:25+0000\n"
-"Last-Translator: bgK\n"
+"PO-Revision-Date: 2020-02-02 20:43+0000\n"
+"Last-Translator: ав а <teorex3@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/bgk/vba-m/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -358,7 +359,7 @@ msgstr "Сохранения VisualBoyAdvance|*.sgm"
 #: ../src/wx/cmdevents.cpp:1775
 #, c-format
 msgid "Current state slot #%d"
-msgstr ""
+msgstr "Текущий слот сохранения #%d"
 
 #: ../src/wx/cmdevents.cpp:2044
 msgid "Sound enabled"
@@ -402,12 +403,12 @@ msgstr "Ожидание ответа от GDB..."
 #: ../src/wx/cmdevents.cpp:2609
 #, c-format
 msgid "Using pixel filter #%d"
-msgstr ""
+msgstr "Использовать пиксельный фильтр #%d"
 
 #: ../src/wx/cmdevents.cpp:2624
 #, c-format
 msgid "Using interframe blending #%d"
-msgstr ""
+msgstr "Использовать межкадровое смешивание #%d"
 
 #: ../src/wx/cmdevents.cpp:2752
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
@@ -490,7 +491,7 @@ msgstr ""
 
 #: ../src/wx/faudio.cpp:67 ../src/wx/faudio.cpp:352
 msgid "The FAudio interface failed to initialize!"
-msgstr ""
+msgstr "Интерфейс FAudio не удалось инициализировать!"
 
 #: ../src/wx/faudio.cpp:384
 msgid "FAudio: Creating mastering voice failed!"
@@ -684,7 +685,7 @@ msgstr "Главный значок не найден"
 
 #: ../src/wx/guiinit.cpp:2732
 msgid "Browse"
-msgstr ""
+msgstr "Обзор"
 
 #: ../src/wx/guiinit.cpp:2746
 msgid "Main display panel not found"
@@ -1181,7 +1182,7 @@ msgstr "Meta-"
 
 #: ../src/wx/widgets/keyedit.cpp:127 ../src/wx/widgets/keyedit.cpp:128
 msgid "Num"
-msgstr ""
+msgstr "Num"
 
 #: ../src/wx/widgets/keyedit.cpp:201
 msgid "Meta+"
@@ -1206,12 +1207,12 @@ msgstr "CONTROL"
 #: ../src/wx/widgets/sdljoy.cpp:105
 #, c-format
 msgid "Connected game controller %d"
-msgstr ""
+msgstr "Подключен игровой контроллер %d"
 
 #: ../src/wx/widgets/sdljoy.cpp:115
 #, c-format
 msgid "Disconnected game controller %d"
-msgstr ""
+msgstr "Отключен игровой контроллер %d"
 
 #: ../src/wx/xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
@@ -1862,12 +1863,12 @@ msgstr "Файл BIOS :"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file :"
-msgstr ""
+msgstr "Текущий BIOS файл :"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:122
 #: ../src/wx/xrc/GameBoyConfig.xrc:138 ../src/wx/xrc/GameBoyConfig.xrc:159
 msgid "(None)"
-msgstr ""
+msgstr "(Нет)"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:136
 #: ../src/wx/xrc/GameBoyConfig.xrc:168
@@ -1986,11 +1987,11 @@ msgstr "Загрузка GBC Rom файла:"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:131
 msgid "Current GB BIOS file :"
-msgstr ""
+msgstr "Текущий файл GB BIOS:"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:152
 msgid "Current GBC BIOS file :"
-msgstr ""
+msgstr "Текущий файл GBC BIOS:"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:186
 msgid "User 1"
@@ -2219,7 +2220,7 @@ msgstr "Обновить"
 #: ../src/wx/xrc/GBMapViewer.xrc:157 ../src/wx/xrc/Logging.xrc:112
 #: ../src/wx/xrc/MapViewer.xrc:219
 msgid "&Save"
-msgstr "Сохраннить"
+msgstr "&Сохранить"
 
 #: ../src/wx/xrc/GBOAMViewer.xrc:13 ../src/wx/xrc/OAMViewer.xrc:14
 msgid "Sprite:"
@@ -2253,7 +2254,7 @@ msgstr "Bank:"
 #: ../src/wx/xrc/MemViewer.xrc:115 ../src/wx/xrc/OAMViewer.xrc:162
 #: ../src/wx/xrc/TileViewer.xrc:168
 msgid "&Save..."
-msgstr "Сохраннить"
+msgstr "&Сохранить как..."
 
 #: ../src/wx/xrc/GBPaletteViewer.xrc:8 ../src/wx/xrc/PaletteViewer.xrc:9
 msgid "Click on a color for more information"
@@ -2696,7 +2697,7 @@ msgstr "Все по умолчанию"
 
 #: ../src/wx/xrc/JoyPanel.xrc:529
 msgid "Clear All"
-msgstr ""
+msgstr "Очистить все"
 
 #: ../src/wx/xrc/LinkConfig.xrc:4
 msgid "Link configuration"
@@ -2764,7 +2765,7 @@ msgstr "Файл"
 
 #: ../src/wx/xrc/MainMenu.xrc:7
 msgid "Open..."
-msgstr ""
+msgstr "Открыть..."
 
 #: ../src/wx/xrc/MainMenu.xrc:10
 msgid "Open &GB..."
@@ -2808,7 +2809,7 @@ msgstr "Самые последние"
 
 #: ../src/wx/xrc/MainMenu.xrc:44
 msgid "Load current state slot"
-msgstr ""
+msgstr "Загрузить текущий слот сохранения"
 
 #: ../src/wx/xrc/MainMenu.xrc:47
 msgid "&Auto load most recent"
@@ -2872,11 +2873,11 @@ msgstr "Самая старая ячейка"
 
 #: ../src/wx/xrc/MainMenu.xrc:101
 msgid "Save current state slot"
-msgstr ""
+msgstr "Сохранить текущий слот сохранения"
 
 #: ../src/wx/xrc/MainMenu.xrc:104
 msgid "Increase state slot number and save"
-msgstr ""
+msgstr "Повысить номер слота сохранения и запомнить"
 
 #: ../src/wx/xrc/MainMenu.xrc:139
 msgid "To &File ..."
@@ -2888,11 +2889,11 @@ msgstr "Сохранить состояние"
 
 #: ../src/wx/xrc/MainMenu.xrc:144
 msgid "Increase state slot number"
-msgstr ""
+msgstr "Повысить номер слота сохранения"
 
 #: ../src/wx/xrc/MainMenu.xrc:147
 msgid "Decrease state slot number"
-msgstr ""
+msgstr "Понизить номер слота сохранения"
 
 #: ../src/wx/xrc/MainMenu.xrc:152 ../src/wx/xrc/MainMenu.xrc:164
 msgid "&Battery file..."
@@ -2960,7 +2961,7 @@ msgstr "Играть"
 
 #: ../src/wx/xrc/MainMenu.xrc:208
 msgid "&Quit"
-msgstr ""
+msgstr "&Выход"
 
 #: ../src/wx/xrc/MainMenu.xrc:212
 msgid "&Emulation"
@@ -3069,7 +3070,7 @@ msgstr "Запускать в полноэкранном режиме"
 
 #: ../src/wx/xrc/MainMenu.xrc:318
 msgid "&Scaled resize"
-msgstr ""
+msgstr "&Изменить масштаб"
 
 #: ../src/wx/xrc/MainMenu.xrc:320
 msgid "&1x"
@@ -3097,11 +3098,11 @@ msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:339
 msgid "Change pixel filter"
-msgstr ""
+msgstr "Изменить пиксельный фильтр"
 
 #: ../src/wx/xrc/MainMenu.xrc:342
 msgid "Change interframe blending"
-msgstr ""
+msgstr "Изменить межкадровое смешивание"
 
 #: ../src/wx/xrc/MainMenu.xrc:345
 msgid "&Retain aspect ratio"
@@ -3109,7 +3110,7 @@ msgstr "Сохранить соотношение"
 
 #: ../src/wx/xrc/MainMenu.xrc:349
 msgid "Enable MMX"
-msgstr ""
+msgstr "Включить MMX"
 
 #: ../src/wx/xrc/MainMenu.xrc:354
 msgid "&Bilinear filter"
@@ -3137,15 +3138,15 @@ msgstr "&Аудио"
 
 #: ../src/wx/xrc/MainMenu.xrc:388
 msgid "&Increase volume"
-msgstr ""
+msgstr "&Повысить громкость"
 
 #: ../src/wx/xrc/MainMenu.xrc:392
 msgid "&Decrease volume"
-msgstr ""
+msgstr "&Понизить громкость"
 
 #: ../src/wx/xrc/MainMenu.xrc:396
 msgid "&Toggle sound"
-msgstr ""
+msgstr "&Переключить звук"
 
 #: ../src/wx/xrc/MainMenu.xrc:401
 msgid "&GBA sound interpolation"
@@ -3189,7 +3190,7 @@ msgstr "&R"
 
 #: ../src/wx/xrc/MainMenu.xrc:444
 msgid "&Autohold"
-msgstr ""
+msgstr "&Автоудержание"
 
 #: ../src/wx/xrc/MainMenu.xrc:488
 msgid "&Game Boy Advance"
@@ -3241,7 +3242,7 @@ msgstr ""
 
 #: ../src/wx/xrc/MainMenu.xrc:541
 msgid "D&irectories ..."
-msgstr "Дериктория"
+msgstr "Директории..."
 
 #: ../src/wx/xrc/MainMenu.xrc:544
 msgid "&Key Shortcuts ..."
@@ -3293,7 +3294,7 @@ msgstr "GDB"
 
 #: ../src/wx/xrc/MainMenu.xrc:587
 msgid "&Disassemble..."
-msgstr "Разрыв"
+msgstr "&Disassemble..."
 
 #: ../src/wx/xrc/MainMenu.xrc:590
 msgid "&Logging..."
@@ -3325,7 +3326,7 @@ msgstr "Просмотр тайла"
 
 #: ../src/wx/xrc/MainMenu.xrc:613
 msgid "Show all video layers"
-msgstr ""
+msgstr "Показать все слои видео"
 
 #: ../src/wx/xrc/MainMenu.xrc:617
 msgid "BG &0"
@@ -3409,15 +3410,15 @@ msgstr "Переводы"
 
 #: ../src/wx/xrc/MainMenu.xrc:709
 msgid "Check for updates"
-msgstr ""
+msgstr "Проверить обновления"
 
 #: ../src/wx/xrc/MainMenu.xrc:712
 msgid "&Factory Reset..."
-msgstr ""
+msgstr "&Сброс к настройкам по умолчанию..."
 
 #: ../src/wx/xrc/MainMenu.xrc:716
 msgid "&About..."
-msgstr ""
+msgstr "&О программе..."
 
 #: ../src/wx/xrc/MapViewer.xrc:4
 msgid "Map Viewer"
@@ -3470,11 +3471,11 @@ msgstr "Цветов:"
 
 #: ../src/wx/xrc/MapViewer.xrc:124
 msgid "Mosaic:"
-msgstr "Мозайки"
+msgstr "Мозаика:"
 
 #: ../src/wx/xrc/MapViewer.xrc:132
 msgid "Overflow:"
-msgstr "Переполнение"
+msgstr "Переполнение:"
 
 #: ../src/wx/xrc/MemViewer.xrc:4
 msgid "Memory Viewer"

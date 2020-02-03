@@ -4,6 +4,7 @@
 # 
 # Translators:
 # RootCore <administrator@root-core.net>, 2019
+# DerKampfKruemmel <redcookiehunter@gmail.com>, 2020
 # Diren Cangöz <direncangoez@googlemail.com>, 2015
 # Diren Cangöz <direncangoez@googlemail.com>, 2015
 # RootCore <administrator@root-core.net>, 2019
@@ -17,8 +18,8 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-22 23:25+0000\n"
-"PO-Revision-Date: 2019-11-28 15:54+0000\n"
-"Last-Translator: Overtry <marcoruhl@hotmail.de>\n"
+"PO-Revision-Date: 2020-01-20 16:28+0000\n"
+"Last-Translator: DerKampfKruemmel <redcookiehunter@gmail.com>\n"
 "Language-Team: German (http://www.transifex.com/bgk/vba-m/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -389,7 +390,7 @@ msgstr "GDB-Verbindung"
 #: ../src/wx/cmdevents.cpp:2202
 #, c-format
 msgid "Waiting for connection at %s"
-msgstr "Warte auf Verbindung auf %s"
+msgstr "Warte auf Verbindung bei %s"
 
 #: ../src/wx/cmdevents.cpp:2209
 #, c-format
@@ -1744,7 +1745,7 @@ msgstr "Frames auslassen"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:177
 msgid "&Number of frames to skip :"
-msgstr "A&nzahl der Frames, die ausgelassen werden soll:"
+msgstr "&Anzahl der Frames, die ausgelassen werden soll:"
 
 #: ../src/wx/xrc/DisplayConfig.xrc:199
 msgid "Speed"
@@ -1923,7 +1924,7 @@ msgstr "Spiegelung:"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:254
 msgid "&Defaults"
-msgstr "Standards"
+msgstr "&Standards"
 
 #: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:261
 msgid "Game Overrides"
@@ -1975,11 +1976,11 @@ msgstr "System"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:84
 msgid "GB Boot &ROM file :"
-msgstr "GB Boot-&ROM Datei :"
+msgstr "GB Boot &ROM Datei :"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:91 ../src/wx/xrc/GameBoyConfig.xrc:113
 msgid "Select A File"
-msgstr "Datei auswählen:"
+msgstr "Datei auswählen"
 
 #: ../src/wx/xrc/GameBoyConfig.xrc:106
 msgid "GBC Boot ROM &file :"
