@@ -955,11 +955,13 @@ endif()
 
 # make the translations.zip for windows builds
 if(ENABLE_NLS AND WIN32)
+    file(GLOB catalogs ${CMAKE_BINARY_DIR}/po/wxvbam/*.gmo)
+
     add_custom_command(
             OUTPUT ${CMAKE_BINARY_DIR}/translations.zip
             COMMAND ${CMAKE_COMMAND} -D "ZIP_PROGRAM=${ZIP_PROGRAM}" -P ${CMAKE_CURRENT_SOURCE_DIR}/make-translations-zip.cmake
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            DEPENDS translations make-translations-zip.cmake
+            DEPENDS translations make-translations-zip.cmake ${catalogs}
     )
 
     add_custom_target(translations-zip DEPENDS ${CMAKE_BINARY_DIR}/translations.zip)
