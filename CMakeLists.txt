@@ -17,12 +17,12 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-if(TAG_RELEASE)
-    include(MakeReleaseCommitAndTag)
-endif()
-
 if(UPDATE_APPCAST)
     include(UpdateAppcast)
+endif()
+
+if(TAG_RELEASE)
+    include(MakeReleaseCommitAndTag)
 endif()
 
 set(VCPKG_DEPS zlib libpng SDL2 SFML gettext wxWidgets)
