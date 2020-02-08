@@ -67,7 +67,8 @@ function(make_release_commit_and_tag)
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )
 
-    string(REGEX REPLACE "\r?\n" ";" git_tags_lines ${git_tags})
+    string(REGEX REPLACE ";"     "\\\\;" git_tags_lines "${git_tags}")
+    string(REGEX REPLACE "\r?\n" ";"     git_tags_lines "${git_tags_lines}")
 
     foreach(line ${git_tags_lines})
         if(line MATCHES "^v[0-9]")

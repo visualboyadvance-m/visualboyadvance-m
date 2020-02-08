@@ -21,6 +21,10 @@ if(TAG_RELEASE)
     include(MakeReleaseCommitAndTag)
 endif()
 
+if(UPDATE_APPCAST)
+    include(UpdateAppcast)
+endif()
+
 set(VCPKG_DEPS zlib libpng SDL2 SFML gettext wxWidgets)
 
 # appveyor job goes over time limit if building ffmpeg during initial cache
