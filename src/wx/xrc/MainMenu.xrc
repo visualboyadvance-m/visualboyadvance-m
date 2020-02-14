@@ -28,10 +28,16 @@
       <object class="separator"/>
       <object class="wxMenu">
         <label>_e-Reader</label>
-        <object class="wxMenuItem" name="LoadDotCodeFile">
+        <object class="wxMenuItem" name="ResetLoadingDotCodeFile">
+          <label>_Reset Loading Dot Code</label>
+        </object>
+        <object class="wxMenuItem" name="SetLoadingDotCodeFile">
           <label>_Load Dot Code...</label>
         </object>
-        <object class="wxMenuItem" name="SaveDotCodeFile">
+        <object class="wxMenuItem" name="ResetSavingDotCodeFile">
+          <label>_Reset Saving Dot Code</label>
+        </object>
+        <object class="wxMenuItem" name="SetSavingDotCodeFile">
           <label>_Save Dot Code...</label>
         </object>
       </object>

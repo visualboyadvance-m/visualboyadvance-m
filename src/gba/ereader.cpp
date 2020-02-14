@@ -232,7 +232,7 @@ void BIOS_EReader_ScanCard(int swi_num)
 
         const char* loadDotCodeFile = GetLoadDotCodeFile();
 
-        if (loadDotCodeFile == 0) {
+        if (!*loadDotCodeFile) {
             reg[0].I = 0x301;
             return;
         }
