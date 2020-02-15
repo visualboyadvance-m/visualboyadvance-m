@@ -837,11 +837,14 @@ EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB | CMDEN_GBA)
     }
 }
 
-static wxString loaddotcodefile_path;
-static wxString savedotcodefile_path;
-
-EVT_HANDLER_MASK(LoadDotCodeFile, "Load e-Reader Dot Code...", CMDEN_GBA)
+EVT_HANDLER_MASK(ResetLoadingDotCodeFile, "Reset Loading e-Reader Dot Code", CMDEN_GBA)
 {
+    ResetLoadDotCodeFile();
+}
+
+EVT_HANDLER_MASK(SetLoadingDotCodeFile, "Load e-Reader Dot Code...", CMDEN_GBA)
+{
+    static wxString loaddotcodefile_path;
     wxFileDialog dlg(this, _("Select Dot Code file"), loaddotcodefile_path, wxEmptyString,
         _(
                          "e-Reader Dot Code (*.bin;*.raw)|"
@@ -853,11 +856,17 @@ EVT_HANDLER_MASK(LoadDotCodeFile, "Load e-Reader Dot Code...", CMDEN_GBA)
         return;
 
     loaddotcodefile_path = dlg.GetPath();
-    SetLoadDotCodeFile(loaddotcodefile_path.mb_str(wxConvUTF8));
+    SetLoadDotCodeFile(loaddotcodefile_path.mb_str());
 }
 
-EVT_HANDLER_MASK(SaveDotCodeFile, "Save e-Reader Dot Code...", CMDEN_GBA)
+EVT_HANDLER_MASK(ResetSavingDotCodeFile, "Reset Saving e-Reader Dot Code", CMDEN_GBA)
 {
+    ResetLoadDotCodeFile();
+}
+
+EVT_HANDLER_MASK(SetSavingDotCodeFile, "Save e-Reader Dot Code...", CMDEN_GBA)
+{
+    static wxString savedotcodefile_path;
     wxFileDialog dlg(this, _("Select Dot Code file"), savedotcodefile_path, wxEmptyString,
         _(
                          "e-Reader Dot Code (*.bin;*.raw)|"
@@ -869,7 +878,7 @@ EVT_HANDLER_MASK(SaveDotCodeFile, "Save e-Reader Dot Code...", CMDEN_GBA)
         return;
 
     savedotcodefile_path = dlg.GetPath();
-    SetSaveDotCodeFile(savedotcodefile_path.mb_str(wxConvUTF8));
+    SetSaveDotCodeFile(savedotcodefile_path.mb_str());
 }
 
 static wxString batimp_path;

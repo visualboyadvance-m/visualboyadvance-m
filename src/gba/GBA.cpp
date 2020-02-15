@@ -1712,9 +1712,29 @@ const char* GetSaveDotCodeFile()
     return saveDotCodeFile;
 }
 
+void ResetLoadDotCodeFile()
+{
+	if(loadDotCodeFile)
+	{
+        free((char*)loadDotCodeFile);
+    }
+
+    loadDotCodeFile = strdup("");
+}
+
 void SetLoadDotCodeFile(const char* szFile)
 {
     loadDotCodeFile = strdup(szFile);
+}
+
+void ResetSaveDotCodeFile()
+{
+    if (saveDotCodeFile)
+    {
+        free((char*)saveDotCodeFile);
+    }
+
+    saveDotCodeFile = strdup("");
 }
 
 void SetSaveDotCodeFile(const char* szFile)
