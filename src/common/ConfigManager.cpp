@@ -501,10 +501,10 @@ void LoadConfig()
 	fsWidth = ReadPref("fsWidth", 800);
 	fullScreen = ReadPrefHex("fullScreen");
 	fullScreenStretch = ReadPref("stretch", 0);
-	gbBorderAutomatic = ReadPref("borderAutomatic", 0);
+	gbBorderAutomatic = ReadPref("borderAutomatic", 1);
 	gbBorderOn = ReadPrefHex("borderOn");
 	gbColorOption = ReadPref("colorOption", 0);
-	gbEmulatorType = ReadPref("emulatorType", 1);
+	gbEmulatorType = ReadPref("emulatorType", 0);
 	gbFrameSkip = ReadPref("gbFrameSkip", 0);
 	gbPaletteOption = ReadPref("gbPaletteOption", 0);
 	gbSoundSetDeclicking(ReadPref("gbSoundDeclicking", 1));
