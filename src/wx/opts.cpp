@@ -208,6 +208,8 @@ opt_desc opts[] = {
 
     /// GB
     STROPT("GB/BiosFile", "", wxTRANSLATE("BIOS file to use for GB, if enabled"), gopts.gb_bios),
+    INTOPT("GB/ColorOption", "GBColorOption", wxTRANSLATE("GB color enhancement, if enabled"), gbColorOption, 0, 1),
+    BOOLOPT("GB/LCDFilter", "GBLcdFilter", wxTRANSLATE("Apply LCD filter, if enabled"), gbLcdFilter),
     STROPT("GB/GBCBiosFile", "", wxTRANSLATE("BIOS file to use for GBC, if enabled"), gopts.gbc_bios),
     NOOPT(wxT("GB/Palette0"), "", wxTRANSLATE("The default palette, as 8 comma-separated 4-digit hex integers (rgb555).")),
     NOOPT(wxT("GB/Palette1"), "", wxTRANSLATE("The first user palette, as 8 comma-separated 4-digit hex integers (rgb555).")),
@@ -219,6 +221,7 @@ opt_desc opts[] = {
 
     /// GBA
     STROPT("GBA/BiosFile", "", wxTRANSLATE("BIOS file to use, if enabled"), gopts.gba_bios),
+    BOOLOPT("GBA/LCDFilter", "GBALcdFilter", wxTRANSLATE("Apply LCD filter, if enabled"), gbaLcdFilter),
 #ifndef NO_LINK
     BOOLOPT("GBA/LinkAuto", "LinkAuto", wxTRANSLATE("Enable link at boot"), gopts.link_auto),
     INTOPT("GBA/LinkFast", "SpeedOn", wxTRANSLATE("Enable faster network protocol by default"), linkHacks, 0, 1),

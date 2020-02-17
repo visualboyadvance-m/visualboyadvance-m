@@ -2883,6 +2883,26 @@ EVT_HANDLER(AGBPrinter, "Enable AGB printer")
     update_opts();
 }
 
+EVT_HANDLER(GBALcdFilter, "Enable LCD filter")
+{
+    GetMenuOptionBool("GBALcdFilter", gbaLcdFilter);
+    utilUpdateSystemColorMaps(gbaLcdFilter);
+    update_opts();
+}
+
+EVT_HANDLER(GBLcdFilter, "Enable LCD filter")
+{
+    GetMenuOptionBool("GBLcdFilter", gbLcdFilter);
+    utilUpdateSystemColorMaps(gbLcdFilter);
+    update_opts();
+}
+
+EVT_HANDLER(GBColorOption, "Enable GB color option")
+{
+    GetMenuOptionInt("GBColorOption", gbColorOption, 1);
+    update_opts();
+}
+
 EVT_HANDLER(ApplyPatches, "Apply IPS/UPS/IPF patches if found")
 {
     GetMenuOptionInt("ApplyPatches", autoPatch, 1);

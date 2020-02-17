@@ -25,6 +25,8 @@ extern bool mirroringEnable;
 extern bool parseDebug;
 extern bool speedHack;
 extern bool speedup;
+extern bool gbaLcdFilter;
+extern bool gbLcdFilter;
 extern char *rewindMemory;
 extern const char *aviRecordDir;
 extern const char *biosFileNameGB;

@@ -508,6 +508,10 @@
           <label>_Debug print</label>
           <checkable>1</checkable>
         </object>
+        <object class="wxMenuItem" name="GBALcdFilter">
+          <label>_LCD Filter</label>
+          <checkable>1</checkable>
+        </object>
       </object>
       <object class="wxMenu">
         <label>_Game Boy</label>
@@ -515,6 +519,14 @@
           <label>Configure ...</label>
         </object>
         <object class="separator"/>
+        <object class="wxMenuItem" name="GBColorOption">
+          <label>_GB color option</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="GBLcdFilter">
+          <label>_LCD Filter</label>
+          <checkable>1</checkable>
+        </object>
         <object class="wxMenuItem" name="Printer">
           <label>_GB printer</label>
           <checkable>1</checkable>

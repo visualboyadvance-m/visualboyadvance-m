@@ -1082,6 +1082,9 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
     mf->PollJoysticks();
 
+    if (loaded == IMAGE_GBA) utilUpdateSystemColorMaps(gbaLcdFilter);
+    else if (loaded == IMAGE_GB) utilUpdateSystemColorMaps(gbLcdFilter);
+
     if (!paused) {
         HidePointer();
         event.RequestMore();
@@ -1469,8 +1472,7 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
         RGB_LOW_BITS_MASK = 0x0421;
     }
 
-    // FIXME: should be "true" for GBA carts if lcd mode selected
-    // which means this needs to be re-run at pref change time
+    // needs to be run once before the first draw
     utilUpdateSystemColorMaps(false);
 }
 
