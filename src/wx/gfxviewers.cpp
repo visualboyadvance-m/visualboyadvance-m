@@ -1582,6 +1582,44 @@ public:
         }
     }
 
+    void SaveGBATile(wxCommandEvent& ev)
+    {
+        (void)ev; // unused params
+        GameArea* panel = wxGetApp().frame->GetPanel();
+        wxString bmp_save_dir = wxGetApp().frame->GetGamePath(gopts.scrshot_dir);
+        // no attempt is made here to translate the dialog type name
+        // it's just a suggested name, anyway
+        wxString def_name = panel->game_name() + wxT('-') + dname;
+        def_name.resize(def_name.size() - 6); // strlen("Viewer")
+
+        if (captureFormat)
+            def_name += wxT(".bmp");
+        else
+            def_name += wxT(".png");
+
+        wxFileDialog dlg(GetGrandParent(), _("Select output file"), bmp_save_dir, def_name,
+            _("PNG images|*.png|BMP images|*.bmp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+        dlg.SetFilterIndex(captureFormat);
+        int ret = dlg.ShowModal();
+        bmp_save_dir = dlg.GetDirectory();
+
+        if (ret != wxID_OK)
+            return;
+
+        wxBitmap obmp = gv->bm->GetSubBitmap(wxRect(0, 0, gv->bmw, gv->bmh));
+        wxString fn = dlg.GetPath();
+        wxBitmapType fmt = dlg.GetFilterIndex() ? wxBITMAP_TYPE_BMP : wxBITMAP_TYPE_PNG;
+
+        if (fn.size() > 4) {
+            if (wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".bmp"), false))
+                fmt = wxBITMAP_TYPE_BMP;
+            else if (wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".png"), false))
+                fmt = wxBITMAP_TYPE_PNG;
+        }
+
+        obmp.SaveFile(fn, fmt);
+    }
+
 protected:
     int charbase, is256, palette;
     wxControl *tileno, *addr;
@@ -1591,6 +1629,7 @@ protected:
 };
 
 BEGIN_EVENT_TABLE(TileViewer, GfxViewer)
+EVT_BUTTON(XRCID("SaveGBATile"), TileViewer::SaveGBATile)
 EVT_GFX_CLICK(wxID_ANY, TileViewer::UpdateMouseInfoEv)
 END_EVENT_TABLE()
 
@@ -1685,6 +1724,44 @@ public:
         }
     }
 
+    void SaveGBTile(wxCommandEvent& ev)
+    {
+        (void)ev; // unused params
+        GameArea* panel = wxGetApp().frame->GetPanel();
+        wxString bmp_save_dir = wxGetApp().frame->GetGamePath(gopts.scrshot_dir);
+        // no attempt is made here to translate the dialog type name
+        // it's just a suggested name, anyway
+        wxString def_name = panel->game_name() + wxT('-') + dname;
+        def_name.resize(def_name.size() - 6); // strlen("Viewer")
+
+        if (captureFormat)
+            def_name += wxT(".bmp");
+        else
+            def_name += wxT(".png");
+
+        wxFileDialog dlg(GetGrandParent(), _("Select output file"), bmp_save_dir, def_name,
+            _("PNG images|*.png|BMP images|*.bmp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+        dlg.SetFilterIndex(captureFormat);
+        int ret = dlg.ShowModal();
+        bmp_save_dir = dlg.GetDirectory();
+
+        if (ret != wxID_OK)
+            return;
+
+        wxBitmap obmp = gv->bm->GetSubBitmap(wxRect(0, 0, gv->bmw, gv->bmh));
+        wxString fn = dlg.GetPath();
+        wxBitmapType fmt = dlg.GetFilterIndex() ? wxBITMAP_TYPE_BMP : wxBITMAP_TYPE_PNG;
+
+        if (fn.size() > 4) {
+            if (wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".bmp"), false))
+                fmt = wxBITMAP_TYPE_BMP;
+            else if (wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".png"), false))
+                fmt = wxBITMAP_TYPE_PNG;
+        }
+
+        obmp.SaveFile(fn, fmt);
+    }
+
 protected:
     int bank, charbase, palette;
     wxControl *addr, *tileno;
@@ -1694,6 +1771,7 @@ protected:
 };
 
 BEGIN_EVENT_TABLE(GBTileViewer, GfxViewer)
+EVT_BUTTON(XRCID("SaveGBTile"), GBTileViewer::SaveGBTile)
 EVT_GFX_CLICK(wxID_ANY, GBTileViewer::UpdateMouseInfoEv)
 END_EVENT_TABLE()
 }
