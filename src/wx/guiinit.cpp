@@ -3597,7 +3597,7 @@ bool MainFrame::BindControls()
             /// System and peripherals
             ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "SaveType", wxGenericValidator(&cpuSaveType));
             BatConfigHandler.type = ch;
-            ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "FlashSize", wxGenericValidator(&winFlashSize));
+            ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "FlashSize", wxGenericValidator(&optFlashSize));
             BatConfigHandler.size = ch;
             d->Connect(XRCID("SaveType"), wxEVT_COMMAND_CHOICE_SELECTED,
                 wxCommandEventHandler(BatConfig_t::ChangeType),

@@ -241,7 +241,7 @@ void GameArea::LoadGame(const wxString& name)
             int fsz = cfg->Read(wxT("flashSize"), (long)0);
 
             if (fsz != 0x10000 && fsz != 0x20000)
-                fsz = 0x10000 << winFlashSize;
+                fsz = 0x10000 << optFlashSize;
 
             flashSetSize(fsz);
             ovSaveType = cfg->Read(wxT("saveType"), cpuSaveType);
@@ -258,7 +258,7 @@ void GameArea::LoadGame(const wxString& name)
             cfg->SetPath(wxT("/"));
         } else {
             rtcEnable(rtcEnabled);
-            flashSetSize(0x10000 << winFlashSize);
+            flashSetSize(0x10000 << optFlashSize);
 
             if (cpuSaveType < 0 || cpuSaveType > 5)
                 cpuSaveType = 0;

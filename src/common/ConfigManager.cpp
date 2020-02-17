@@ -248,7 +248,6 @@ int windowMaximized;
 int windowPositionX, bkpPosX = 0;
 int windowPositionY, bkpPosY = 0;
 uint32_t windowWidth;
-int winFlashSize;
 int winGbBorderOn;
 int winGbPrinterEnabled;
 int winPauseNextFrame;
@@ -534,7 +533,7 @@ void LoadConfig()
 	maxScale = ReadPref("maxScale", 0);
 	movieRecordDir = ReadPrefString("movieRecordDir");
 	openGL = ReadPrefHex("openGL");
-	optFlashSize = ReadPrefHex("flashSize");
+	optFlashSize = ReadPref("flashSize", 0);
 	pauseWhenInactive = ReadPref("pauseWhenInactive", 1);
 	recentFreeze = ReadPref("recentFreeze", 0);
 	rewindTimer = ReadPref("rewindTimer", 0);
@@ -569,7 +568,6 @@ void LoadConfig()
 	windowPositionX = ReadPref("windowX", -1);
 	windowPositionY = ReadPref("windowY", -1);
 	windowWidth = ReadPref("windowWidth", 0);
-	winFlashSize = ReadPref("flashSize", 0x10000);
 	winGbBorderOn = ReadPref("borderOn", 0);
 	winGbPrinterEnabled = ReadPref("gbPrinter", 0);
 
@@ -1334,6 +1332,8 @@ int ReadOpts(int argc, char ** argv)
 			// --opt-flash-size
 			if (optarg) {
 				optFlashSize = atoi(optarg);
+                                if (optFlashSize < 0 || optFlashSize > 1)
+                                    optFlashSize = 0;
 			}
 			break;
 

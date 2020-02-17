@@ -569,7 +569,7 @@ void load_opts()
             cfg->Read(opt.opt, &opt.curint, *opt.intopt);
 
             if (opt.curint < opt.min || opt.curint > opt.max) {
-                wxLogWarning(_("Invalid value %d for option %s; valid values are %d - %d"), opt.curint, opt.opt.c_str(), opt.min, opt.max);
+                wxLogWarning(_("Invalid value %d for option %s; valid values are %d - %d"), opt.curint, opt.opt.c_str(), int(opt.min), int(opt.max));
             } else
                 *opt.intopt = opt.curint;
         } else if (opt.doubleopt) {
