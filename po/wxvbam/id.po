@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-22 23:25+0000\n"
-"PO-Revision-Date: 2019-11-28 05:41+0000\n"
-"Last-Translator: Jeremy Belpois <jeremy.belpois.einstein@gmail.com>\n"
+"POT-Creation-Date: 2020-02-17 08:32+0000\n"
+"PO-Revision-Date: 2020-02-17 08:45+0000\n"
+"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/bgk/vba-m/language/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,7 +21,423 @@ msgstr ""
 "Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../src/wx/cmdevents.cpp:105
+#: wxvbam.cpp:240
+msgid "visualboyadvance-m"
+msgstr "visualboyadvance-m"
+
+#: wxvbam.cpp:454
+msgid "Could not create main window"
+msgstr "Tidak dapat membuat window utama"
+
+#: wxvbam.cpp:526
+msgid "Save built-in XRC file and exit"
+msgstr "Simpan file XRC built-in dan keluar"
+
+#: wxvbam.cpp:529
+msgid "Save built-in vba-over.ini and exit"
+msgstr "Simpan vba-over.ini built-in dan keluar"
+
+#: wxvbam.cpp:532
+msgid "Print configuration path and exit"
+msgstr "Cetak jalur konfigurasi dan keluar"
+
+#: wxvbam.cpp:535
+msgid "Start in full-screen mode"
+msgstr "Mulai dalam mode layar penuh"
+
+#: wxvbam.cpp:539
+msgid "Delete shared link state first, if it exists"
+msgstr "Hapus state hubungan yang dibagikan terlebih dahulu, jika ada"
+
+#: wxvbam.cpp:546
+msgid "List all settable options and exit"
+msgstr "Tampilkan semua pilihan yang dapat diubah dan keluar"
+
+#: wxvbam.cpp:549
+msgid "ROM file"
+msgstr "File ROM"
+
+#: wxvbam.cpp:551
+msgid "<config>=<value>"
+msgstr "<config>=<value>"
+
+#: wxvbam.cpp:582
+msgid "Configuration/build error: can't find built-in xrc"
+msgstr "Error pada konfigurasi/build: tidak dapat menemukan xrc built-in"
+
+#: wxvbam.cpp:590
+#, c-format
+msgid ""
+"Wrote built-in configuration to %s.\n"
+"To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
+msgstr "Menyimpan konfigurasi built-in ke %s.\nUntuk menimpa, hapus semua node kecuali node root yang telah diubah. Pertama-tama temukan node root dengan nama yang benar pada file .xrc atau .xrs apapun yang berada dalam path pencarian file timpahan built-in berikut:"
+
+#: wxvbam.cpp:605
+msgid "Configuration is read from, in order:"
+msgstr "Konfigurasi dibaca dari, secara berurutan:"
+
+#: wxvbam.cpp:619
+#, c-format
+msgid ""
+"Wrote built-in override file to %s\n"
+"To override, delete all but changed section.  First found section is used from search path:"
+msgstr "Menulis file timpahan built-in ke %s\nUntuk menimpa, hapus semua bagian kecuali bagian yang telah diubah. Bagian yang pertama kali ditemukan yang digunakan dari path pencarian:"
+
+#: wxvbam.cpp:625
+msgid ""
+"\n"
+"\tbuilt-in"
+msgstr "\n\tbuilt-in"
+
+#: wxvbam.cpp:636
+msgid ""
+"Options set from the command line are saved if any configuration changes are made in the user interface.\n"
+"\n"
+"For flag options, true and false are specified as 1 and 0, respectively.\n"
+"\n"
+msgstr "Pilihan yang diubah dari command line disimpan jika terjadi perubahan konfigurasi yang dilakukan melalui user interface.\n\nUntuk pilihan flag, nilai benar dan salah ditetapkan dengan 1 dan 0, secara berurutan.\n\n"
+
+#: wxvbam.cpp:657
+msgid ""
+"The commands available for the Keyboard/* option are:\n"
+"\n"
+msgstr "Perintah yang tersedia untuk pilihan Keyboard/* adalah:\n\n"
+
+#: wxvbam.cpp:691
+msgid "Bad configuration option or multiple ROM files given:\n"
+msgstr "Terjadi pemilihan konfigurasi yang buruk atau pemilihan lebih dari satu file ROM:\n"
+
+#: guiinit.cpp:77
+msgid "Start!"
+msgstr "Mulai!"
+
+#: guiinit.cpp:82 xrc/NetLink.xrc:99
+msgid "Connect"
+msgstr "Hubungkan"
+
+#: guiinit.cpp:98
+msgid "You must enter a valid host name"
+msgstr "Anda harus memasukan nama host yang valid"
+
+#: guiinit.cpp:99
+msgid "Host name invalid"
+msgstr "Nama host tidak valid"
+
+#: guiinit.cpp:117
+msgid "Waiting for clients..."
+msgstr "Menunggu klien..."
+
+#: guiinit.cpp:118
+#, c-format
+msgid "Server IP address is: %s\n"
+msgstr "Alamat IP server adalah: %s\n"
+
+#: guiinit.cpp:120
+msgid "Waiting for connection..."
+msgstr "Menunggu hubungan..."
+
+#: guiinit.cpp:121
+#, c-format
+msgid "Connecting to %s\n"
+msgstr "Sedang menghubungkan ke %s\n"
+
+#: guiinit.cpp:154
+msgid ""
+"Error occurred.\n"
+"Please try again."
+msgstr "Terjadi kesalahan.\nCoba lagi."
+
+#: guiinit.cpp:221 guiinit.cpp:274
+msgid "Select cheat file"
+msgstr "Pilih file cheat"
+
+#: guiinit.cpp:222
+msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
+msgstr "Daftar cheat VBA (*.clt)|*.clt|Daftar cheat CHT (*.cht)|*.cht"
+
+#: guiinit.cpp:241 panel.cpp:413
+msgid "Loaded cheats"
+msgstr "Cheat yang dimuat"
+
+#: guiinit.cpp:275
+msgid "VBA cheat lists (*.clt)|*.clt"
+msgstr "Daftar cheat VBA (*.clt)|*.clt"
+
+#: guiinit.cpp:293
+msgid "Saved cheats"
+msgstr "Cheat yang disimpan"
+
+#: guiinit.cpp:324 guiinit.cpp:343
+msgid "Restore old values?"
+msgstr "Kembalikan nilai sebelumnya?"
+
+#: guiinit.cpp:325 guiinit.cpp:344
+msgid "Removing cheats"
+msgstr "Melepaskan cheat"
+
+#: guiinit.cpp:735 xrc/JoyPanel.xrc:364
+msgid "GameShark"
+msgstr "GameShark"
+
+#: guiinit.cpp:736 cmdevents.cpp:676
+msgid "GameGenie"
+msgstr "GameGenie"
+
+#: guiinit.cpp:738
+msgid "Generic Code"
+msgstr "Kode Generik"
+
+#: guiinit.cpp:739
+msgid "GameShark Advance"
+msgstr "GameShark Advance"
+
+#: guiinit.cpp:740
+msgid "CodeBreaker Advance"
+msgstr "CodeBreaker Advance"
+
+#: guiinit.cpp:741
+msgid "Flashcart CHT"
+msgstr "Flashcart CHT"
+
+#: guiinit.cpp:809 guiinit.cpp:1064
+msgid "Number cannot be empty"
+msgstr "Angka tidak boleh kosong"
+
+#: guiinit.cpp:847
+#, c-format
+msgid "Search produced %d results.  Please refine better"
+msgstr "Pencarian memberikan %d hasil. Tolong gunakan kata kunci yang lebih jelas"
+
+#: guiinit.cpp:859
+msgid "Search produced no results"
+msgstr "Pencarian tidak memberikan hasil"
+
+#: guiinit.cpp:1022
+msgid "8-bit "
+msgstr "8-bit "
+
+#: guiinit.cpp:1026
+msgid "16-bit "
+msgstr "16-bit "
+
+#: guiinit.cpp:1030
+msgid "32-bit "
+msgstr "32-bit "
+
+#: guiinit.cpp:1036
+msgid "signed decimal"
+msgstr "desimal bertanda"
+
+#: guiinit.cpp:1040
+msgid "unsigned decimal"
+msgstr "desimal tidak bertanda"
+
+#: guiinit.cpp:1044
+msgid "unsigned hexadecimal"
+msgstr "heksadesimal tidak bertanda"
+
+#: guiinit.cpp:1522
+#, c-format
+msgid "%d frames = %.2f ms"
+msgstr "%d frame = %.2f ms"
+
+#: guiinit.cpp:1534
+msgid "Default device"
+msgstr "Perangkat default"
+
+#: guiinit.cpp:1721
+msgid "Desktop mode"
+msgstr "Mode desktop"
+
+#: guiinit.cpp:1728
+#, c-format
+msgid "%d x %d - %dbpp @ %dHz"
+msgstr "%d x %d - %dbpp @ %dHz"
+
+#: guiinit.cpp:1841 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
+#: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
+#: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
+#: xrc/GeneralConfig.xrc:114 xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
+#: xrc/SpeedupConfig.xrc:45 xrc/SpeedupConfig.xrc:120
+msgid "None"
+msgstr "Tidak ada"
+
+#: guiinit.cpp:1882
+#, c-format
+msgid "No usable rpi plugins found in %s"
+msgstr "Tidak menemukan plugin rpi yang dapat digunakan di %s"
+
+#: guiinit.cpp:1902 xrc/DisplayConfig.xrc:107
+msgid "Plugin"
+msgstr "Plugin"
+
+#: guiinit.cpp:1930
+msgid "Please select a plugin or a different filter"
+msgstr "Tolong pilih plugin atau filter yang berbeda"
+
+#: guiinit.cpp:1931
+msgid "Plugin selection error"
+msgstr "Terjadi kesalahan pada pemilihan plugin"
+
+#: guiinit.cpp:2130
+msgid "This will clear all user-defined accelerators.  Are you sure?"
+msgstr "Ini akan mengosongkan semua pemercepat yang telah diatur oleh pengguna. Apakah anda yakin?"
+
+#: guiinit.cpp:2130
+msgid "Confirm"
+msgstr "Konfirmasi"
+
+#: guiinit.cpp:2724
+msgid "Main icon not found"
+msgstr "Ikon utama tidak ditemukan"
+
+#: guiinit.cpp:2734
+msgid "Browse"
+msgstr "Jelajah"
+
+#: guiinit.cpp:2748
+msgid "Main display panel not found"
+msgstr "Panel layar utama tidak ditemukan"
+
+#: guiinit.cpp:2897
+#, c-format
+msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
+msgstr "Menu pemercepat terduplikasi: %s untuk %s dan %s; menyimpan menu pertama"
+
+#: guiinit.cpp:2911
+#, c-format
+msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
+msgstr "Menu pemercepat %s untuk %s menimpa menu default untuk %s ; menggunakan menu"
+
+#: guiinit.cpp:3041
+#, c-format
+msgid "Invalid menu item %s; removing"
+msgstr "Menu item %s tidak valid; menghapus"
+
+#: guiinit.cpp:3242
+msgid "Code"
+msgstr "Kode"
+
+#: guiinit.cpp:3251
+msgid "Description"
+msgstr "Deskripsi"
+
+#: guiinit.cpp:3325 xrc/CheatAdd.xrc:31
+msgid "Address"
+msgstr "Alamat"
+
+#: guiinit.cpp:3326
+msgid "Old Value"
+msgstr "Nilai Lama"
+
+#: guiinit.cpp:3327
+msgid "New Value"
+msgstr "Nilai Baru"
+
+#: guiinit.cpp:3847
+msgid "Menu commands"
+msgstr "Perintah menu"
+
+#: guiinit.cpp:3870
+msgid "Other commands"
+msgstr "Perintah lainnya"
+
+#: guiinit.cpp:3981
+msgid "JoyBus host invalid; disabling"
+msgstr "Host JoyBus tidak valid; menonaktifkan"
+
+#: viewers.cpp:560
+msgid "Text files (*.txt;*.log)|*.txt;*.log|"
+msgstr "File teks (*.txt;*.log)|*.txt;*.log|"
+
+#: viewers.cpp:562 viewers.cpp:772 cmdevents.cpp:1158 cmdevents.cpp:1236
+#: cmdevents.cpp:1306 cmdevents.cpp:1333 viewsupt.cpp:1168
+msgid "Select output file"
+msgstr "Pilih file keluaran"
+
+#: viewers.cpp:698 viewers.cpp:770
+msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
+msgstr "Memory dump (*.dmp;*.bin)|*.dmp;*.bin|"
+
+#: viewers.cpp:700
+msgid "Select memory dump file"
+msgstr "Pilih file memory dump"
+
+#: viewers.cpp:814
+msgid "0x00000000 - BIOS"
+msgstr "0x00000000 - BIOS"
+
+#: viewers.cpp:815
+msgid "0x02000000 - WRAM"
+msgstr "0x02000000 - WRAM"
+
+#: viewers.cpp:816
+msgid "0x03000000 - IRAM"
+msgstr "0x03000000 - IRAM"
+
+#: viewers.cpp:817
+msgid "0x04000000 - I/O"
+msgstr "0x04000000 - I/O"
+
+#: viewers.cpp:818
+msgid "0x05000000 - PALETTE"
+msgstr "0x05000000 - PALETTE"
+
+#: viewers.cpp:819
+msgid "0x06000000 - VRAM"
+msgstr "0x06000000 - VRAM"
+
+#: viewers.cpp:820
+msgid "0x07000000 - OAM"
+msgstr "0x07000000 - OAM"
+
+#: viewers.cpp:821
+msgid "0x08000000 - ROM"
+msgstr "0x08000000 - ROM"
+
+#: viewers.cpp:924
+msgid "0x0000 - ROM"
+msgstr "0x0000 - ROM"
+
+#: viewers.cpp:925
+msgid "0x4000 - ROM"
+msgstr "0x4000 - ROM"
+
+#: viewers.cpp:926
+msgid "0x8000 - VRAM"
+msgstr "0x8000 - VRAM"
+
+#: viewers.cpp:927
+msgid "0xA000 - SRAM"
+msgstr "0xA000 - SRAM"
+
+#: viewers.cpp:928
+msgid "0xC000 - RAM"
+msgstr "0xC000 - RAM"
+
+#: viewers.cpp:929
+msgid "0xD000 - WRAM"
+msgstr "0xD000 - WRAM"
+
+#: viewers.cpp:930
+msgid "0xFF00 - I/O"
+msgstr "0xFF00 - I/O"
+
+#: viewers.cpp:931
+msgid "0xFF80 - RAM"
+msgstr "0xFF80 - RAM"
+
+#: gfxviewers.cpp:1141
+msgid "Select output file and type"
+msgstr "Pilih tipe dan file keluaran"
+
+#: gfxviewers.cpp:1142
+msgid ""
+"Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
+"Table (*.act)|*.act"
+msgstr "Palet Windows (*.pal)|*.pal|Palet PaintShop(*.pal)|*.pal|Tabel Warna Adobe(*.act)|*.act"
+
+#: cmdevents.cpp:105
 msgid ""
 "GameBoy Advance Files "
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy"
@@ -29,394 +445,369 @@ msgid ""
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "File GameBoy Advance (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: ../src/wx/cmdevents.cpp:117
+#: cmdevents.cpp:117
 msgid "Open ROM file"
 msgstr "Buka file ROM"
 
-#: ../src/wx/cmdevents.cpp:134
+#: cmdevents.cpp:134
 msgid ""
 "GameBoy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "File GameBoy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: ../src/wx/cmdevents.cpp:141
+#: cmdevents.cpp:141
 msgid "Open GB ROM file"
 msgstr "Buka file GB ROM"
 
-#: ../src/wx/cmdevents.cpp:158
+#: cmdevents.cpp:158
 msgid ""
 "GameBoy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "File GameBoy Color (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: ../src/wx/cmdevents.cpp:165
+#: cmdevents.cpp:165
 msgid "Open GBC ROM file"
 msgstr "Buka file GBC ROM"
 
-#: ../src/wx/cmdevents.cpp:584 ../src/wx/cmdevents.cpp:700
-#: ../src/wx/cmdevents.cpp:739 ../src/wx/cmdevents.cpp:812
+#: cmdevents.cpp:584 cmdevents.cpp:700 cmdevents.cpp:739 cmdevents.cpp:812
 msgid "Unknown"
 msgstr "Tak diketahui"
 
-#: ../src/wx/cmdevents.cpp:592
+#: cmdevents.cpp:592
 msgid "ROM"
 msgstr "ROM"
 
-#: ../src/wx/cmdevents.cpp:596
+#: cmdevents.cpp:596
 msgid "ROM+MBC1"
 msgstr "ROM+MBC1"
 
-#: ../src/wx/cmdevents.cpp:600
+#: cmdevents.cpp:600
 msgid "ROM+MBC1+RAM"
 msgstr "ROM+MBC1+RAM"
 
-#: ../src/wx/cmdevents.cpp:604
+#: cmdevents.cpp:604
 msgid "ROM+MBC1+RAM+BATT"
 msgstr "ROM+MBC1+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:608
+#: cmdevents.cpp:608
 msgid "ROM+MBC2"
 msgstr "ROM+MBC2"
 
-#: ../src/wx/cmdevents.cpp:612
+#: cmdevents.cpp:612
 msgid "ROM+MBC2+BATT"
 msgstr "ROM+MBC2+BATT"
 
-#: ../src/wx/cmdevents.cpp:616
+#: cmdevents.cpp:616
 msgid "ROM+MMM01"
 msgstr "ROM+MMM01"
 
-#: ../src/wx/cmdevents.cpp:620
+#: cmdevents.cpp:620
 msgid "ROM+MMM01+RAM"
 msgstr "ROM+MMM01+RAM"
 
-#: ../src/wx/cmdevents.cpp:624
+#: cmdevents.cpp:624
 msgid "ROM+MMM01+RAM+BATT"
 msgstr "ROM+MMM01+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:628
+#: cmdevents.cpp:628
 msgid "ROM+MBC3+TIMER+BATT"
 msgstr "ROM+MBC3+TIMER+BATT"
 
-#: ../src/wx/cmdevents.cpp:632
+#: cmdevents.cpp:632
 msgid "ROM+MBC3+TIMER+RAM+BATT"
 msgstr "ROM+MBC3+TIMER+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:636
+#: cmdevents.cpp:636
 msgid "ROM+MBC3"
 msgstr "ROM+MBC3"
 
-#: ../src/wx/cmdevents.cpp:640
+#: cmdevents.cpp:640
 msgid "ROM+MBC3+RAM"
 msgstr "ROM+MBC3+RAM"
 
-#: ../src/wx/cmdevents.cpp:644
+#: cmdevents.cpp:644
 msgid "ROM+MBC3+RAM+BATT"
 msgstr "ROM+MBC3+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:648
+#: cmdevents.cpp:648
 msgid "ROM+MBC5"
 msgstr "ROM+MBC5"
 
-#: ../src/wx/cmdevents.cpp:652
+#: cmdevents.cpp:652
 msgid "ROM+MBC5+RAM"
 msgstr "ROM+MBC5+RAM"
 
-#: ../src/wx/cmdevents.cpp:656
+#: cmdevents.cpp:656
 msgid "ROM+MBC5+RAM+BATT"
 msgstr "ROM+MBC5+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:660
+#: cmdevents.cpp:660
 msgid "ROM+MBC5+RUMBLE"
 msgstr "ROM+MBC5+RUMBLE"
 
-#: ../src/wx/cmdevents.cpp:664
+#: cmdevents.cpp:664
 msgid "ROM+MBC5+RUMBLE+RAM"
 msgstr "ROM+MBC5+RUMBLE+RAM"
 
-#: ../src/wx/cmdevents.cpp:668
+#: cmdevents.cpp:668
 msgid "ROM+MBC5+RUMBLE+RAM+BATT"
 msgstr "ROM+MBC5+RUMBLE+RAM+BATT"
 
-#: ../src/wx/cmdevents.cpp:672
+#: cmdevents.cpp:672
 msgid "ROM+MBC7+BATT"
 msgstr "ROM+MBC7+BATT"
 
-#: ../src/wx/cmdevents.cpp:676 ../src/wx/guiinit.cpp:734
-msgid "GameGenie"
-msgstr "GameGenie"
-
-#: ../src/wx/cmdevents.cpp:680
+#: cmdevents.cpp:680
 msgid "GameShark V3.0"
 msgstr "GameShark V3.0"
 
-#: ../src/wx/cmdevents.cpp:684
+#: cmdevents.cpp:684
 msgid "ROM+POCKET CAMERA"
 msgstr "ROM+POCKET CAMERA"
 
-#: ../src/wx/cmdevents.cpp:688
+#: cmdevents.cpp:688
 msgid "ROM+BANDAI TAMA5"
 msgstr "ROM+BANDAI TAMA5"
 
-#: ../src/wx/cmdevents.cpp:692
+#: cmdevents.cpp:692
 msgid "ROM+HuC-3"
 msgstr "ROM+HuC-3"
 
-#: ../src/wx/cmdevents.cpp:696
+#: cmdevents.cpp:696
 msgid "ROM+HuC-1"
 msgstr "ROM+HuC-1"
 
-#: ../src/wx/cmdevents.cpp:746 ../src/wx/guiinit.cpp:1839
-#: ../src/wx/xrc/DisplayConfig.xrc:85 ../src/wx/xrc/DisplayConfig.xrc:135
-#: ../src/wx/xrc/DisplayConfig.xrc:221
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:32
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:204
-#: ../src/wx/xrc/GeneralConfig.xrc:114 ../src/wx/xrc/SoundConfig.xrc:219
-#: ../src/wx/xrc/SoundConfig.xrc:309 ../src/wx/xrc/SpeedupConfig.xrc:45
-#: ../src/wx/xrc/SpeedupConfig.xrc:120
-msgid "None"
-msgstr "Tidak ada"
-
-#: ../src/wx/cmdevents.cpp:845 ../src/wx/cmdevents.cpp:861
+#: cmdevents.cpp:848 cmdevents.cpp:870
 msgid "Select Dot Code file"
 msgstr "Pilih file Dot Code"
 
-#: ../src/wx/cmdevents.cpp:847 ../src/wx/cmdevents.cpp:863
+#: cmdevents.cpp:850 cmdevents.cpp:872
 msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 msgstr "Dot Code e-Reader (*.bin;*.raw)|*.bin;*.raw"
 
-#: ../src/wx/cmdevents.cpp:882 ../src/wx/cmdevents.cpp:1077
+#: cmdevents.cpp:891 cmdevents.cpp:1086
 msgid "Select battery file"
 msgstr "Pilih file baterai"
 
-#: ../src/wx/cmdevents.cpp:883 ../src/wx/cmdevents.cpp:1078
+#: cmdevents.cpp:892 cmdevents.cpp:1087
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "File baterai (*.sav)|*.sav|Simpanan Flash (*.dat)|*.dat"
 
-#: ../src/wx/cmdevents.cpp:891
+#: cmdevents.cpp:900
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
 msgstr "Mengimpor file baterai akan menghapus simpanan permainan (secara permanen setelah penyimpanan ini dilakukan). Apakah anda ingin melanjutkan?"
 
-#: ../src/wx/cmdevents.cpp:892 ../src/wx/cmdevents.cpp:920
-#: ../src/wx/cmdevents.cpp:1040
+#: cmdevents.cpp:901 cmdevents.cpp:929 cmdevents.cpp:1049
 msgid "Confirm import"
 msgstr "Konfirmasi untuk mengimpor"
 
-#: ../src/wx/cmdevents.cpp:898 ../src/wx/panel.cpp:350
+#: cmdevents.cpp:907 panel.cpp:356
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Baterai yang dimuat %s"
 
-#: ../src/wx/cmdevents.cpp:900
+#: cmdevents.cpp:909
 #, c-format
 msgid "Error loading battery %s"
 msgstr "Terjadi kesalahan dalam memuat baterai %s"
 
-#: ../src/wx/cmdevents.cpp:909
+#: cmdevents.cpp:918
 msgid "Select code file"
 msgstr "Pilih file kode"
 
-#: ../src/wx/cmdevents.cpp:910
+#: cmdevents.cpp:919
 msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
 msgstr "File Kode Gameshark (*.spc;*.xpc)|*.spc;*.xpc"
 
-#: ../src/wx/cmdevents.cpp:910
+#: cmdevents.cpp:919
 msgid "Gameshark Code File (*.gcf)|*.gcf"
 msgstr "File Kode Gameshark (*.gcf)|*.gcf"
 
-#: ../src/wx/cmdevents.cpp:919
+#: cmdevents.cpp:928
 msgid ""
 "Importing a code file will replace any loaded cheats.  Do you want to "
 "continue?"
 msgstr "Mengimpor file kode akan menimpa cheat yang sudah dimuat. Apakah anda ingin melanjutkan?"
 
-#: ../src/wx/cmdevents.cpp:936
+#: cmdevents.cpp:945
 #, c-format
 msgid "Cannot open file %s"
 msgstr "Tidak dapat membuka file %s"
 
-#: ../src/wx/cmdevents.cpp:946
+#: cmdevents.cpp:955
 #, c-format
 msgid "Unsupported code file %s"
 msgstr "File kode tidak didukung %s"
 
-#: ../src/wx/cmdevents.cpp:1016
+#: cmdevents.cpp:1025
 #, c-format
 msgid "Loaded code file %s"
 msgstr "File kode yang dimuat %s"
 
-#: ../src/wx/cmdevents.cpp:1018
+#: cmdevents.cpp:1027
 #, c-format
 msgid "Error loading code file %s"
 msgstr "Terjadi kesalahan dalam memuat file kode %s"
 
-#: ../src/wx/cmdevents.cpp:1029 ../src/wx/cmdevents.cpp:1105
+#: cmdevents.cpp:1038 cmdevents.cpp:1114
 msgid "Select snapshot file"
 msgstr "Pilih file snapshot"
 
-#: ../src/wx/cmdevents.cpp:1030
+#: cmdevents.cpp:1039
 msgid ""
 "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots "
 "(*.gsv)|*.gsv"
 msgstr "Snapshot GS & PAC (*.sps;*.xps)|*.sps;*.xps|Snapshot GameShark SP (*.gsv)|*.gsv"
 
-#: ../src/wx/cmdevents.cpp:1030
+#: cmdevents.cpp:1039
 msgid "Gameboy Snapshot (*.gbs)|*.gbs"
 msgstr "Snapshot Gameboy (*.gbs)|*.gbs"
 
-#: ../src/wx/cmdevents.cpp:1039
+#: cmdevents.cpp:1048
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
 msgstr "Mengimpor file snapshot akan menghapus simpanan permainan (secara permanen setelah penyimpanan ini dilakukan). Apakah anda ingin melanjutkan?"
 
-#: ../src/wx/cmdevents.cpp:1064
+#: cmdevents.cpp:1073
 #, c-format
 msgid "Loaded snapshot file %s"
 msgstr "File snapshot yang dimuat %s"
 
-#: ../src/wx/cmdevents.cpp:1066
+#: cmdevents.cpp:1075
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr "Terjadi kesalahan dalam memuat file snapshot %s"
 
-#: ../src/wx/cmdevents.cpp:1089
+#: cmdevents.cpp:1098
 #, c-format
 msgid "Wrote battery %s"
 msgstr "Menyimpan baterai %s"
 
-#: ../src/wx/cmdevents.cpp:1091 ../src/wx/panel.cpp:656
+#: cmdevents.cpp:1100 panel.cpp:662
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Terjadi kesalahan dalam menyimpan baterai %s"
 
-#: ../src/wx/cmdevents.cpp:1099
+#: cmdevents.cpp:1108
 msgid "EEPROM saves cannot be exported"
 msgstr "Simpanan EEPROM tidak dapat diekspor"
 
-#: ../src/wx/cmdevents.cpp:1106
+#: cmdevents.cpp:1115
 msgid "Gameshark Snapshot (*.sps)|*.sps"
 msgstr "Snapshot Gameshark (*.sps)|*.sps"
 
-#: ../src/wx/cmdevents.cpp:1120
+#: cmdevents.cpp:1129
 msgid "Exported from VisualBoyAdvance-M"
 msgstr "Diekspor dari VisualBoyAdvance-M"
 
-#: ../src/wx/cmdevents.cpp:1132
+#: cmdevents.cpp:1141
 #, c-format
 msgid "Saved snapshot file %s"
 msgstr "File snapshot yang disimpan %s"
 
-#: ../src/wx/cmdevents.cpp:1134
+#: cmdevents.cpp:1143
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr "Terjadi kesalahan dalam meyimpan file snapshot %s"
 
-#: ../src/wx/cmdevents.cpp:1149 ../src/wx/cmdevents.cpp:1227
-#: ../src/wx/cmdevents.cpp:1297 ../src/wx/cmdevents.cpp:1324
-#: ../src/wx/viewers.cpp:562 ../src/wx/viewers.cpp:772
-#: ../src/wx/viewsupt.cpp:1168
-msgid "Select output file"
-msgstr "Pilih file keluaran"
-
-#: ../src/wx/cmdevents.cpp:1150 ../src/wx/viewsupt.cpp:1169
+#: cmdevents.cpp:1159 viewsupt.cpp:1169
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "Gambar PNG|*.png|Gambar BMP|*.bmp"
 
-#: ../src/wx/cmdevents.cpp:1174 ../src/wx/sys.cpp:442
+#: cmdevents.cpp:1183 sys.cpp:442
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "Menyimpan snapshot %s"
 
-#: ../src/wx/cmdevents.cpp:1195 ../src/wx/cmdevents.cpp:1265
+#: cmdevents.cpp:1204 cmdevents.cpp:1274
 msgid " files ("
 msgstr "file ("
 
-#: ../src/wx/cmdevents.cpp:1325 ../src/wx/cmdevents.cpp:1346
+#: cmdevents.cpp:1334 cmdevents.cpp:1355
 msgid "VBA Movie files|*.vmv"
 msgstr "File Film VBA|*.vmv"
 
-#: ../src/wx/cmdevents.cpp:1345
+#: cmdevents.cpp:1354
 msgid "Select file"
 msgstr "Pilih file"
 
-#: ../src/wx/cmdevents.cpp:1630 ../src/wx/cmdevents.cpp:1723
+#: cmdevents.cpp:1639 cmdevents.cpp:1732
 msgid "Select state file"
 msgstr "Pilih file state"
 
-#: ../src/wx/cmdevents.cpp:1631 ../src/wx/cmdevents.cpp:1724
+#: cmdevents.cpp:1640 cmdevents.cpp:1733
 msgid "VisualBoyAdvance saved game files|*.sgm"
 msgstr "File simpanan permainan VisualBoyAdvance|*.sgm"
 
-#: ../src/wx/cmdevents.cpp:1754 ../src/wx/cmdevents.cpp:1764
-#: ../src/wx/cmdevents.cpp:1775
+#: cmdevents.cpp:1763 cmdevents.cpp:1773 cmdevents.cpp:1784
 #, c-format
 msgid "Current state slot #%d"
 msgstr "Slot keadaan saat ini #%d"
 
-#: ../src/wx/cmdevents.cpp:2044
+#: cmdevents.cpp:2053
 msgid "Sound enabled"
 msgstr "Nyalakan suara"
 
-#: ../src/wx/cmdevents.cpp:2044
+#: cmdevents.cpp:2053
 msgid "Sound disabled"
 msgstr "Matikan suara"
 
-#: ../src/wx/cmdevents.cpp:2057 ../src/wx/cmdevents.cpp:2071
+#: cmdevents.cpp:2066 cmdevents.cpp:2080
 #, c-format
 msgid "Volume: %d%%"
 msgstr "Volume: %d%%"
 
-#: ../src/wx/cmdevents.cpp:2146
+#: cmdevents.cpp:2155
 msgid "Set to 0 for pseudo tty"
 msgstr "Ubah ke 0 untuk pseudo tty"
 
-#: ../src/wx/cmdevents.cpp:2148
+#: cmdevents.cpp:2157
 msgid "Port to wait for connection:"
 msgstr " Port untuk menunggu koneksi:"
 
-#: ../src/wx/cmdevents.cpp:2149
+#: cmdevents.cpp:2158
 msgid "GDB Connection"
 msgstr "Koneksi GDB"
 
-#: ../src/wx/cmdevents.cpp:2202
+#: cmdevents.cpp:2211
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "Menunggu koneksi pada %s"
 
-#: ../src/wx/cmdevents.cpp:2209
+#: cmdevents.cpp:2218
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "Menunggu koneksi pada port %d"
 
-#: ../src/wx/cmdevents.cpp:2212
+#: cmdevents.cpp:2221
 msgid "Waiting for GDB..."
 msgstr "Menunggu GDB"
 
-#: ../src/wx/cmdevents.cpp:2609
+#: cmdevents.cpp:2618
 #, c-format
 msgid "Using pixel filter #%d"
 msgstr "Menggunakan filter pixel #%d"
 
-#: ../src/wx/cmdevents.cpp:2624
+#: cmdevents.cpp:2633
 #, c-format
 msgid "Using interframe blending #%d"
 msgstr "Menggunakan penyamaran antarbingkai #%d"
 
-#: ../src/wx/cmdevents.cpp:2752
+#: cmdevents.cpp:2761
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Emulator Nintendo GameBoy (+Color+Advance)."
 
-#: ../src/wx/cmdevents.cpp:2753
+#: cmdevents.cpp:2762
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Hak Cipta © 1999-2003 Forgotten\nHak Cipta © 2004-2006 Tim pengembangan VBA\nHak Cipta © 2007-2017 Tim pengembangan VBA-M"
 
-#: ../src/wx/cmdevents.cpp:2754
+#: cmdevents.cpp:2763
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -432,3374 +823,2913 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Program ini termasuk dalam perangkat lunak bebas: anda dapat mendistribusikan ulang dan/atau merubah\nprogram ini sesuai dengan GNU General Public License yang telah dipublikasikan oleh\nFree Software Foundation, baik menurut Lisensi versi 2, maupun\n(sesuai dengan pilihan anda) versi lainnya yang lebih baru.\n\nProgram ini didistribusikan dengan harapan bahwa program ini akan dapat berguna,\nnamun program ini didistribusikan TANPA JAMINAN APAPUN; bahkan dengan jaminan untuk DIPERJUAL BELIKAN ataupun AKAN SESUAI UNTUK TUJUAN TERTENTU sekalipun. Lihat\nGNU General Public License untuk informasi lebih lanjut.\n\nAnda dapat memperoleh salinan dari GNU General Public License\nbersama dengan program ini. Jika anda tidak memperolehnya, anda dapat melihatnya di http://www.gnu.org/licenses ."
 
-#: ../src/wx/cmdevents.cpp:3018
+#: cmdevents.cpp:3027
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "Hubungan LAN sudah aktif. Putuskan mode hubung untuk memutuskan hubungan."
 
-#: ../src/wx/cmdevents.cpp:3024
+#: cmdevents.cpp:3033
 msgid "Network is not supported in local mode."
 msgstr "Fitur jaringan tidak didukung dalam mode lokal."
 
-#: ../src/wx/dsound.cpp:90 ../src/wx/dsound.cpp:104
-#, c-format
-msgid "Cannot create DirectSound %08x"
-msgstr "Tidak dapat membuat DirectSound %08x"
-
-#: ../src/wx/dsound.cpp:109
-#, c-format
-msgid "Cannot SetCooperativeLevel %08x"
-msgstr "Tidak dapat MenyimpanTingkatKoperatif %08x"
-
-#: ../src/wx/dsound.cpp:123
-#, c-format
-msgid "Cannot CreateSoundBuffer %08x"
-msgstr "Tidak dapat MembuatBufferSuara %08x"
-
-#: ../src/wx/dsound.cpp:142
-#, c-format
-msgid "CreateSoundBuffer(primary) failed %08x"
-msgstr "PembuatanBufferSuara(utama) gagal %08x"
-
-#: ../src/wx/dsound.cpp:159
-#, c-format
-msgid "CreateSoundBuffer(secondary) failed %08x"
-msgstr "PembuatanBufferSuara(cadangan) gagal %08x"
-
-#: ../src/wx/dsound.cpp:164
-#, c-format
-msgid "dsbSecondary->SetCurrentPosition failed %08x"
-msgstr "dsbSecondary->MenyimpanPosisiSaatIni gagal %08x"
-
-#: ../src/wx/dsound.cpp:187
-#, c-format
-msgid "Cannot Play primary %08x"
-msgstr "Tidak dapat Memainkan utama %08x"
-
-#: ../src/wx/dsound.cpp:322
-#, c-format
-msgid "dsbSecondary->Lock() failed: %08x"
-msgstr "dsbSecondary->Lock() gagal: %08x"
-
-#: ../src/wx/faudio.cpp:32
-msgid "FAudio: Enumerating devices failed!"
-msgstr "FAudio: Penyebutan perangkat gagal!"
-
-#: ../src/wx/faudio.cpp:67 ../src/wx/faudio.cpp:352
-msgid "The FAudio interface failed to initialize!"
-msgstr "Antarmuka FAudio gagal dijalankan!"
-
-#: ../src/wx/faudio.cpp:384
-msgid "FAudio: Creating mastering voice failed!"
-msgstr "FAudio: Penciptaan suara master gagal!"
-
-#: ../src/wx/faudio.cpp:395
-msgid "FAudio: Creating source voice failed!"
-msgstr "FAudio: Penciptaan suara sumber gagal!"
-
-#: ../src/wx/gfxviewers.cpp:1141
-msgid "Select output file and type"
-msgstr "Pilih tipe dan file keluaran"
-
-#: ../src/wx/gfxviewers.cpp:1142
-msgid ""
-"Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
-"Table (*.act)|*.act"
-msgstr "Palet Windows (*.pal)|*.pal|Palet PaintShop(*.pal)|*.pal|Tabel Warna Adobe(*.act)|*.act"
-
-#: ../src/wx/guiinit.cpp:77
-msgid "Start!"
-msgstr "Mulai!"
-
-#: ../src/wx/guiinit.cpp:82 ../src/wx/xrc/NetLink.xrc:86
-msgid "Connect"
-msgstr "Hubungkan"
-
-#: ../src/wx/guiinit.cpp:96
-msgid "You must enter a valid host name"
-msgstr "Anda harus memasukan nama host yang valid"
-
-#: ../src/wx/guiinit.cpp:97
-msgid "Host name invalid"
-msgstr "Nama host tidak valid"
-
-#: ../src/wx/guiinit.cpp:115
-msgid "Waiting for clients..."
-msgstr "Menunggu klien..."
-
-#: ../src/wx/guiinit.cpp:116
-#, c-format
-msgid "Server IP address is: %s\n"
-msgstr "Alamat IP server adalah: %s\n"
-
-#: ../src/wx/guiinit.cpp:118
-msgid "Waiting for connection..."
-msgstr "Menunggu hubungan..."
-
-#: ../src/wx/guiinit.cpp:119
-#, c-format
-msgid "Connecting to %s\n"
-msgstr "Sedang menghubungkan ke %s\n"
-
-#: ../src/wx/guiinit.cpp:152
-msgid ""
-"Error occurred.\n"
-"Please try again."
-msgstr "Terjadi kesalahan.\nCoba lagi."
-
-#: ../src/wx/guiinit.cpp:219 ../src/wx/guiinit.cpp:272
-msgid "Select cheat file"
-msgstr "Pilih file cheat"
-
-#: ../src/wx/guiinit.cpp:220
-msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
-msgstr "Daftar cheat VBA (*.clt)|*.clt|Daftar cheat CHT (*.cht)|*.cht"
-
-#: ../src/wx/guiinit.cpp:239 ../src/wx/panel.cpp:407
-msgid "Loaded cheats"
-msgstr "Cheat yang dimuat"
-
-#: ../src/wx/guiinit.cpp:273
-msgid "VBA cheat lists (*.clt)|*.clt"
-msgstr "Daftar cheat VBA (*.clt)|*.clt"
-
-#: ../src/wx/guiinit.cpp:291
-msgid "Saved cheats"
-msgstr "Cheat yang disimpan"
-
-#: ../src/wx/guiinit.cpp:322 ../src/wx/guiinit.cpp:341
-msgid "Restore old values?"
-msgstr "Kembalikan nilai sebelumnya?"
-
-#: ../src/wx/guiinit.cpp:323 ../src/wx/guiinit.cpp:342
-msgid "Removing cheats"
-msgstr "Melepaskan cheat"
-
-#: ../src/wx/guiinit.cpp:733 ../src/wx/xrc/JoyPanel.xrc:364
-msgid "GameShark"
-msgstr "GameShark"
-
-#: ../src/wx/guiinit.cpp:736
-msgid "Generic Code"
-msgstr "Kode Generik"
-
-#: ../src/wx/guiinit.cpp:737
-msgid "GameShark Advance"
-msgstr "GameShark Advance"
-
-#: ../src/wx/guiinit.cpp:738
-msgid "CodeBreaker Advance"
-msgstr "CodeBreaker Advance"
-
-#: ../src/wx/guiinit.cpp:739
-msgid "Flashcart CHT"
-msgstr "Flashcart CHT"
-
-#: ../src/wx/guiinit.cpp:807 ../src/wx/guiinit.cpp:1062
-msgid "Number cannot be empty"
-msgstr "Angka tidak boleh kosong"
-
-#: ../src/wx/guiinit.cpp:845
-#, c-format
-msgid "Search produced %d results.  Please refine better"
-msgstr "Pencarian memberikan %d hasil. Tolong gunakan kata kunci yang lebih jelas"
-
-#: ../src/wx/guiinit.cpp:857
-msgid "Search produced no results"
-msgstr "Pencarian tidak memberikan hasil"
-
-#: ../src/wx/guiinit.cpp:1020
-msgid "8-bit "
-msgstr "8-bit "
-
-#: ../src/wx/guiinit.cpp:1024
-msgid "16-bit "
-msgstr "16-bit "
-
-#: ../src/wx/guiinit.cpp:1028
-msgid "32-bit "
-msgstr "32-bit "
-
-#: ../src/wx/guiinit.cpp:1034
-msgid "signed decimal"
-msgstr "desimal bertanda"
-
-#: ../src/wx/guiinit.cpp:1038
-msgid "unsigned decimal"
-msgstr "desimal tidak bertanda"
-
-#: ../src/wx/guiinit.cpp:1042
-msgid "unsigned hexadecimal"
-msgstr "heksadesimal tidak bertanda"
-
-#: ../src/wx/guiinit.cpp:1520
-#, c-format
-msgid "%d frames = %.2f ms"
-msgstr "%d frame = %.2f ms"
-
-#: ../src/wx/guiinit.cpp:1532
-msgid "Default device"
-msgstr "Perangkat default"
-
-#: ../src/wx/guiinit.cpp:1719
-msgid "Desktop mode"
-msgstr "Mode desktop"
-
-#: ../src/wx/guiinit.cpp:1726
-#, c-format
-msgid "%d x %d - %dbpp @ %dHz"
-msgstr "%d x %d - %dbpp @ %dHz"
-
-#: ../src/wx/guiinit.cpp:1880
-#, c-format
-msgid "No usable rpi plugins found in %s"
-msgstr "Tidak menemukan plugin rpi yang dapat digunakan di %s"
-
-#: ../src/wx/guiinit.cpp:1900 ../src/wx/xrc/DisplayConfig.xrc:107
-msgid "Plugin"
-msgstr "Plugin"
-
-#: ../src/wx/guiinit.cpp:1928
-msgid "Please select a plugin or a different filter"
-msgstr "Tolong pilih plugin atau filter yang berbeda"
-
-#: ../src/wx/guiinit.cpp:1929
-msgid "Plugin selection error"
-msgstr "Terjadi kesalahan pada pemilihan plugin"
-
-#: ../src/wx/guiinit.cpp:2128
-msgid "This will clear all user-defined accelerators.  Are you sure?"
-msgstr "Ini akan mengosongkan semua pemercepat yang telah diatur oleh pengguna. Apakah anda yakin?"
-
-#: ../src/wx/guiinit.cpp:2128
-msgid "Confirm"
-msgstr "Konfirmasi"
-
-#: ../src/wx/guiinit.cpp:2722
-msgid "Main icon not found"
-msgstr "Ikon utama tidak ditemukan"
-
-#: ../src/wx/guiinit.cpp:2732
-msgid "Browse"
-msgstr "Jelajah"
-
-#: ../src/wx/guiinit.cpp:2746
-msgid "Main display panel not found"
-msgstr "Panel layar utama tidak ditemukan"
-
-#: ../src/wx/guiinit.cpp:2895
-#, c-format
-msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
-msgstr "Menu pemercepat terduplikasi: %s untuk %s dan %s; menyimpan menu pertama"
-
-#: ../src/wx/guiinit.cpp:2909
-#, c-format
-msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
-msgstr "Menu pemercepat %s untuk %s menimpa menu default untuk %s ; menggunakan menu"
-
-#: ../src/wx/guiinit.cpp:3039
-#, c-format
-msgid "Invalid menu item %s; removing"
-msgstr "Menu item %s tidak valid; menghapus"
-
-#: ../src/wx/guiinit.cpp:3234
-msgid "Code"
-msgstr "Kode"
-
-#: ../src/wx/guiinit.cpp:3243
-msgid "Description"
-msgstr "Deskripsi"
-
-#: ../src/wx/guiinit.cpp:3317 ../src/wx/xrc/CheatAdd.xrc:31
-msgid "Address"
-msgstr "Alamat"
-
-#: ../src/wx/guiinit.cpp:3318
-msgid "Old Value"
-msgstr "Nilai Lama"
-
-#: ../src/wx/guiinit.cpp:3319
-msgid "New Value"
-msgstr "Nilai Baru"
-
-#: ../src/wx/guiinit.cpp:3839
-msgid "Menu commands"
-msgstr "Perintah menu"
-
-#: ../src/wx/guiinit.cpp:3862
-msgid "Other commands"
-msgstr "Perintah lainnya"
-
-#: ../src/wx/guiinit.cpp:3973
-msgid "JoyBus host invalid; disabling"
-msgstr "Host JoyBus tidak valid; menonaktifkan"
-
-#: ../src/wx/opts.cpp:548 ../src/wx/opts.cpp:849
+#: opts.cpp:550 opts.cpp:855
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "Nilai %s tidak valid untuk pilihan %s; nilai yang valid adalah %s%s%s"
 
-#: ../src/wx/opts.cpp:565 ../src/wx/opts.cpp:861
+#: opts.cpp:567 opts.cpp:867
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Nilai %d tidak valid untuk pilihan %s; nilai yang valid adalah %d - %d"
 
-#: ../src/wx/opts.cpp:572 ../src/wx/opts.cpp:581 ../src/wx/opts.cpp:869
-#: ../src/wx/opts.cpp:877
+#: opts.cpp:574 opts.cpp:583 opts.cpp:875 opts.cpp:883
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Nilai %f salah untuk pilihan %s; nilai yang benar adalah %f - %f"
 
-#: ../src/wx/opts.cpp:641 ../src/wx/opts.cpp:662 ../src/wx/opts.cpp:946
-#: ../src/wx/opts.cpp:972
+#: opts.cpp:643 opts.cpp:664 opts.cpp:952 opts.cpp:978
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Pengikatan tombol %s tidak valid untuk %s"
 
-#: ../src/wx/opts.cpp:832
+#: opts.cpp:838
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Pilihan flag %s tidak valid - %s diabaikan"
 
-#: ../src/wx/panel.cpp:90
-#, c-format
-msgid "%s is not a valid ROM file"
-msgstr "%s bukan merupakan file ROM yang valid"
-
-#: ../src/wx/panel.cpp:91 ../src/wx/panel.cpp:148 ../src/wx/panel.cpp:209
-msgid "Problem loading file"
-msgstr "Terjadi kesalahan ketika memuat file"
-
-#: ../src/wx/panel.cpp:147
-#, c-format
-msgid "Unable to load Game Boy ROM %s"
-msgstr "Tidak dapat memuat ROM Game Boy %s"
-
-#: ../src/wx/panel.cpp:185 ../src/wx/panel.cpp:281
-#, c-format
-msgid "Could not load BIOS %s"
-msgstr "Tidak dapat memuat BIOS %s"
-
-#: ../src/wx/panel.cpp:208
-#, c-format
-msgid "Unable to load Game Boy Advance ROM %s"
-msgstr "Tidak dapat memuat ROM Game Boy Advance %s"
-
-#: ../src/wx/panel.cpp:439
-msgid " player "
-msgstr "pemain"
-
-#: ../src/wx/panel.cpp:604
-#, c-format
-msgid "Loaded state %s"
-msgstr "State yang dimuat %s"
-
-#: ../src/wx/panel.cpp:604
-#, c-format
-msgid "Error loading state %s"
-msgstr "Terjadi kesalahan dalam memuat state %s"
-
-#: ../src/wx/panel.cpp:628
-#, c-format
-msgid "Saved state %s"
-msgstr "State yang disimpan %s"
-
-#: ../src/wx/panel.cpp:628
-#, c-format
-msgid "Error saving state %s"
-msgstr "Terjadi kesalahan dalam menyimpan state %s"
-
-#: ../src/wx/panel.cpp:832
-#, c-format
-msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
-msgstr "Mode layar penuh %dx%d-%d@%d tidak didukung; mencari mode yang lain"
-
-#: ../src/wx/panel.cpp:870
-#, c-format
-msgid "Fullscreen mode %dx%d-%d@%d not supported"
-msgstr "Mode layar penuh %dx%d-%d@%d tidak didukung"
-
-#: ../src/wx/panel.cpp:875
-#, c-format
-msgid "Valid mode: %dx%d-%d@%d"
-msgstr "Mode yang valid: %dx%d-%d@%d"
-
-#: ../src/wx/panel.cpp:883
-#, c-format
-msgid "Chose mode %dx%d-%d@%d"
-msgstr "Pilih mode %dx%d-%d@%d"
-
-#: ../src/wx/panel.cpp:887
-#, c-format
-msgid "Failed to change mode to %dx%d-%d@%d"
-msgstr "Gagal merubah mode ke %dx%d-%d@%d"
-
-#: ../src/wx/panel.cpp:971
-msgid "Not a valid GBA cartridge"
-msgstr "Bukan merupakan cartridge GBA yang valid"
-
-#: ../src/wx/panel.cpp:1113
-msgid "No memory for rewinding"
-msgstr "Tidak ada memori untuk memuat state mundur"
-
-#: ../src/wx/panel.cpp:1123
-msgid "Error writing rewind state"
-msgstr "Terjadi kesalahan dalam menyimpan state mundur"
-
-#: ../src/wx/panel.cpp:2334
-msgid "memory allocation error"
-msgstr "terjadi kesalahan dalam mengalokasikan memori"
-
-#: ../src/wx/panel.cpp:2337
-msgid "error initializing codec"
-msgstr "terjadi kesalahan dalam menginisialisasikan codec"
-
-#: ../src/wx/panel.cpp:2340
-msgid "error writing to output file"
-msgstr "terjadi kesalahan dalam menyimpan file keluaran"
-
-#: ../src/wx/panel.cpp:2343
-msgid "can't guess output format from file name"
-msgstr "tidak dapat menebak format keluaran dari nama file"
-
-#: ../src/wx/panel.cpp:2348
-msgid "programming error; aborting!"
-msgstr "terjadi kesalama dalam pemrograman; membatalkan perintah!"
-
-#: ../src/wx/panel.cpp:2365 ../src/wx/panel.cpp:2396
-#, c-format
-msgid "Unable to begin recording to %s (%s)"
-msgstr "Tidak dapat memulai rekaman ke %s (%s)"
-
-#: ../src/wx/panel.cpp:2424
-#, c-format
-msgid "Error in audio/video recording (%s); aborting"
-msgstr "Terjadi kesalahan dalam merekam audio/video (%s); membatalkan perintah"
-
-#: ../src/wx/panel.cpp:2430
-#, c-format
-msgid "Error in audio recording (%s); aborting"
-msgstr "Terjadi kesalahan dalam merekam audio (%s); membatalkan perintah"
-
-#: ../src/wx/panel.cpp:2440
-#, c-format
-msgid "Error in video recording (%s); aborting"
-msgstr "Terjadi kesalahan dalam merekam video (%s); membatalkan perintah"
-
-#: ../src/wx/sys.cpp:117 ../src/wx/sys.cpp:173
+#: sys.cpp:117 sys.cpp:173
 msgid "No game in progress to record"
 msgstr "Tidak sedang memainkan permainan; tidak dapat merekam"
 
-#: ../src/wx/sys.cpp:130
+#: sys.cpp:130
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "Tidak dapat membuka file keluaran %s"
 
-#: ../src/wx/sys.cpp:137 ../src/wx/sys.cpp:157 ../src/wx/sys.cpp:303
+#: sys.cpp:137 sys.cpp:157 sys.cpp:303
 msgid "Error writing game recording"
 msgstr "Terjadi kesalahan dalam menyimpan rekaman permainan"
 
-#: ../src/wx/sys.cpp:178
+#: sys.cpp:178
 msgid "Cannot play game recording while recording"
 msgstr "Tidak dapat memutar rekaman permainan ketika sedang merekam"
 
-#: ../src/wx/sys.cpp:191
+#: sys.cpp:191
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "Tidak dapat membuka file rekaman %s"
 
-#: ../src/wx/sys.cpp:198 ../src/wx/sys.cpp:208
+#: sys.cpp:198 sys.cpp:208
 msgid "Error reading game recording"
 msgstr "Terjadi kesalahan dalam membaca rekaman permainan"
 
-#: ../src/wx/sys.cpp:314
+#: sys.cpp:314
 msgid "Playback ended"
 msgstr "Pemutaran berakhir"
 
-#: ../src/wx/sys.cpp:333
+#: sys.cpp:333
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr "%d%%(%d, %d fps)"
 
-#: ../src/wx/sys.cpp:341
+#: sys.cpp:341
 #, c-format
 msgid "%d%%"
 msgstr "%d%%"
 
-#: ../src/wx/sys.cpp:760 ../src/wx/xrc/GBPrinter.xrc:65
+#: sys.cpp:760 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "&Buang"
 
-#: ../src/wx/sys.cpp:794
+#: sys.cpp:794
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "File gambar (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: ../src/wx/sys.cpp:803
+#: sys.cpp:803
 msgid "Save printer image to"
 msgstr "Simpan gambar printer ke"
 
-#: ../src/wx/sys.cpp:817 ../src/wx/sys.cpp:1000
+#: sys.cpp:817 sys.cpp:1000
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "Simpan hasil printer ke %s"
 
-#: ../src/wx/sys.cpp:822 ../src/wx/sys.cpp:893
+#: sys.cpp:822 sys.cpp:893
 msgid "&Close"
 msgstr "&Keluar"
 
-#: ../src/wx/sys.cpp:888
+#: sys.cpp:888
 msgid "Printed"
 msgstr "Tercetak"
 
-#: ../src/wx/sys.cpp:1190
+#: sys.cpp:1190
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "Terjadi kesalahan dalam membuka pseudo tty: %s"
 
-#: ../src/wx/sys.cpp:1289
+#: sys.cpp:1289
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "Terjadi kesalahan dalam mempersiapkan socket server (%d)"
 
-#: ../src/wx/viewers.cpp:560
-msgid "Text files (*.txt;*.log)|*.txt;*.log|"
-msgstr "File teks (*.txt;*.log)|*.txt;*.log|"
+#: panel.cpp:90
+#, c-format
+msgid "%s is not a valid ROM file"
+msgstr "%s bukan merupakan file ROM yang valid"
 
-#: ../src/wx/viewers.cpp:698 ../src/wx/viewers.cpp:770
-msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
-msgstr "Memory dump (*.dmp;*.bin)|*.dmp;*.bin|"
+#: panel.cpp:91 panel.cpp:152 panel.cpp:213
+msgid "Problem loading file"
+msgstr "Terjadi kesalahan ketika memuat file"
 
-#: ../src/wx/viewers.cpp:700
-msgid "Select memory dump file"
-msgstr "Pilih file memory dump"
+#: panel.cpp:151
+#, c-format
+msgid "Unable to load Game Boy ROM %s"
+msgstr "Tidak dapat memuat ROM Game Boy %s"
 
-#: ../src/wx/viewers.cpp:814
-msgid "0x00000000 - BIOS"
-msgstr "0x00000000 - BIOS"
+#: panel.cpp:189 panel.cpp:287
+#, c-format
+msgid "Could not load BIOS %s"
+msgstr "Tidak dapat memuat BIOS %s"
 
-#: ../src/wx/viewers.cpp:815
-msgid "0x02000000 - WRAM"
-msgstr "0x02000000 - WRAM"
+#: panel.cpp:212
+#, c-format
+msgid "Unable to load Game Boy Advance ROM %s"
+msgstr "Tidak dapat memuat ROM Game Boy Advance %s"
 
-#: ../src/wx/viewers.cpp:816
-msgid "0x03000000 - IRAM"
-msgstr "0x03000000 - IRAM"
+#: panel.cpp:445
+msgid " player "
+msgstr "pemain"
 
-#: ../src/wx/viewers.cpp:817
-msgid "0x04000000 - I/O"
-msgstr "0x04000000 - I/O"
+#: panel.cpp:610
+#, c-format
+msgid "Loaded state %s"
+msgstr "State yang dimuat %s"
 
-#: ../src/wx/viewers.cpp:818
-msgid "0x05000000 - PALETTE"
-msgstr "0x05000000 - PALETTE"
+#: panel.cpp:610
+#, c-format
+msgid "Error loading state %s"
+msgstr "Terjadi kesalahan dalam memuat state %s"
 
-#: ../src/wx/viewers.cpp:819
-msgid "0x06000000 - VRAM"
-msgstr "0x06000000 - VRAM"
+#: panel.cpp:634
+#, c-format
+msgid "Saved state %s"
+msgstr "State yang disimpan %s"
 
-#: ../src/wx/viewers.cpp:820
-msgid "0x07000000 - OAM"
-msgstr "0x07000000 - OAM"
+#: panel.cpp:634
+#, c-format
+msgid "Error saving state %s"
+msgstr "Terjadi kesalahan dalam menyimpan state %s"
 
-#: ../src/wx/viewers.cpp:821
-msgid "0x08000000 - ROM"
-msgstr "0x08000000 - ROM"
+#: panel.cpp:838
+#, c-format
+msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
+msgstr "Mode layar penuh %dx%d-%d@%d tidak didukung; mencari mode yang lain"
 
-#: ../src/wx/viewers.cpp:924
-msgid "0x0000 - ROM"
-msgstr "0x0000 - ROM"
+#: panel.cpp:876
+#, c-format
+msgid "Fullscreen mode %dx%d-%d@%d not supported"
+msgstr "Mode layar penuh %dx%d-%d@%d tidak didukung"
 
-#: ../src/wx/viewers.cpp:925
-msgid "0x4000 - ROM"
-msgstr "0x4000 - ROM"
+#: panel.cpp:881
+#, c-format
+msgid "Valid mode: %dx%d-%d@%d"
+msgstr "Mode yang valid: %dx%d-%d@%d"
 
-#: ../src/wx/viewers.cpp:926
-msgid "0x8000 - VRAM"
-msgstr "0x8000 - VRAM"
+#: panel.cpp:889
+#, c-format
+msgid "Chose mode %dx%d-%d@%d"
+msgstr "Pilih mode %dx%d-%d@%d"
 
-#: ../src/wx/viewers.cpp:927
-msgid "0xA000 - SRAM"
-msgstr "0xA000 - SRAM"
+#: panel.cpp:893
+#, c-format
+msgid "Failed to change mode to %dx%d-%d@%d"
+msgstr "Gagal merubah mode ke %dx%d-%d@%d"
 
-#: ../src/wx/viewers.cpp:928
-msgid "0xC000 - RAM"
-msgstr "0xC000 - RAM"
+#: panel.cpp:977
+msgid "Not a valid GBA cartridge"
+msgstr "Bukan merupakan cartridge GBA yang valid"
 
-#: ../src/wx/viewers.cpp:929
-msgid "0xD000 - WRAM"
-msgstr "0xD000 - WRAM"
+#: panel.cpp:1120
+msgid "No memory for rewinding"
+msgstr "Tidak ada memori untuk memuat state mundur"
 
-#: ../src/wx/viewers.cpp:930
-msgid "0xFF00 - I/O"
-msgstr "0xFF00 - I/O"
+#: panel.cpp:1130
+msgid "Error writing rewind state"
+msgstr "Terjadi kesalahan dalam menyimpan state mundur"
 
-#: ../src/wx/viewers.cpp:931
-msgid "0xFF80 - RAM"
-msgstr "0xFF80 - RAM"
+#: panel.cpp:2341
+msgid "memory allocation error"
+msgstr "terjadi kesalahan dalam mengalokasikan memori"
 
-#: ../src/wx/viewsupt.cpp:776
+#: panel.cpp:2344
+msgid "error initializing codec"
+msgstr "terjadi kesalahan dalam menginisialisasikan codec"
+
+#: panel.cpp:2347
+msgid "error writing to output file"
+msgstr "terjadi kesalahan dalam menyimpan file keluaran"
+
+#: panel.cpp:2350
+msgid "can't guess output format from file name"
+msgstr "tidak dapat menebak format keluaran dari nama file"
+
+#: panel.cpp:2355
+msgid "programming error; aborting!"
+msgstr "terjadi kesalama dalam pemrograman; membatalkan perintah!"
+
+#: panel.cpp:2372 panel.cpp:2403
+#, c-format
+msgid "Unable to begin recording to %s (%s)"
+msgstr "Tidak dapat memulai rekaman ke %s (%s)"
+
+#: panel.cpp:2431
+#, c-format
+msgid "Error in audio/video recording (%s); aborting"
+msgstr "Terjadi kesalahan dalam merekam audio/video (%s); membatalkan perintah"
+
+#: panel.cpp:2437
+#, c-format
+msgid "Error in audio recording (%s); aborting"
+msgstr "Terjadi kesalahan dalam merekam audio (%s); membatalkan perintah"
+
+#: panel.cpp:2447
+#, c-format
+msgid "Error in video recording (%s); aborting"
+msgstr "Terjadi kesalahan dalam merekam video (%s); membatalkan perintah"
+
+#: viewsupt.cpp:776
 msgid "R:"
 msgstr "R:"
 
-#: ../src/wx/viewsupt.cpp:781
+#: viewsupt.cpp:781
 msgid "G:"
 msgstr "G:"
 
-#: ../src/wx/viewsupt.cpp:786
+#: viewsupt.cpp:786
 msgid "B:"
 msgstr "B:"
 
-#: ../src/wx/wxvbam.cpp:222
-msgid "visualboyadvance-m"
-msgstr "visualboyadvance-m"
-
-#: ../src/wx/wxvbam.cpp:436
-msgid "Could not create main window"
-msgstr "Tidak dapat membuat window utama"
-
-#: ../src/wx/wxvbam.cpp:507
-msgid "Save built-in XRC file and exit"
-msgstr "Simpan file XRC built-in dan keluar"
-
-#: ../src/wx/wxvbam.cpp:510
-msgid "Save built-in vba-over.ini and exit"
-msgstr "Simpan vba-over.ini built-in dan keluar"
-
-#: ../src/wx/wxvbam.cpp:513
-msgid "Print configuration path and exit"
-msgstr "Cetak jalur konfigurasi dan keluar"
-
-#: ../src/wx/wxvbam.cpp:516
-msgid "Start in full-screen mode"
-msgstr "Mulai dalam mode layar penuh"
-
-#: ../src/wx/wxvbam.cpp:520
-msgid "Delete shared link state first, if it exists"
-msgstr "Hapus state hubungan yang dibagikan terlebih dahulu, jika ada"
-
-#: ../src/wx/wxvbam.cpp:527
-msgid "List all settable options and exit"
-msgstr "Tampilkan semua pilihan yang dapat diubah dan keluar"
-
-#: ../src/wx/wxvbam.cpp:530
-msgid "ROM file"
-msgstr "File ROM"
-
-#: ../src/wx/wxvbam.cpp:532
-msgid "<config>=<value>"
-msgstr "<config>=<value>"
-
-#: ../src/wx/wxvbam.cpp:563
-msgid "Configuration/build error: can't find built-in xrc"
-msgstr "Error pada konfigurasi/build: tidak dapat menemukan xrc built-in"
-
-#: ../src/wx/wxvbam.cpp:571
-#, c-format
-msgid ""
-"Wrote built-in configuration to %s.\n"
-"To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr "Menyimpan konfigurasi built-in ke %s.\nUntuk menimpa, hapus semua node kecuali node root yang telah diubah. Pertama-tama temukan node root dengan nama yang benar pada file .xrc atau .xrs apapun yang berada dalam path pencarian file timpahan built-in berikut:"
-
-#: ../src/wx/wxvbam.cpp:586
-msgid "Configuration is read from, in order:"
-msgstr "Konfigurasi dibaca dari, secara berurutan:"
-
-#: ../src/wx/wxvbam.cpp:600
-#, c-format
-msgid ""
-"Wrote built-in override file to %s\n"
-"To override, delete all but changed section.  First found section is used from search path:"
-msgstr "Menulis file timpahan built-in ke %s\nUntuk menimpa, hapus semua bagian kecuali bagian yang telah diubah. Bagian yang pertama kali ditemukan yang digunakan dari path pencarian:"
-
-#: ../src/wx/wxvbam.cpp:606
-msgid ""
-"\n"
-"\tbuilt-in"
-msgstr "\n\tbuilt-in"
-
-#: ../src/wx/wxvbam.cpp:617
-msgid ""
-"Options set from the command line are saved if any configuration changes are made in the user interface.\n"
-"\n"
-"For flag options, true and false are specified as 1 and 0, respectively.\n"
-"\n"
-msgstr "Pilihan yang diubah dari command line disimpan jika terjadi perubahan konfigurasi yang dilakukan melalui user interface.\n\nUntuk pilihan flag, nilai benar dan salah ditetapkan dengan 1 dan 0, secara berurutan.\n\n"
-
-#: ../src/wx/wxvbam.cpp:638
-msgid ""
-"The commands available for the Keyboard/* option are:\n"
-"\n"
-msgstr "Perintah yang tersedia untuk pilihan Keyboard/* adalah:\n\n"
-
-#: ../src/wx/wxvbam.cpp:672
-msgid "Bad configuration option or multiple ROM files given:\n"
-msgstr "Terjadi pemilihan konfigurasi yang buruk atau pemilihan lebih dari satu file ROM:\n"
-
-#: ../src/wx/xaudio2.cpp:35
-msgid "XAudio2: Enumerating devices failed!"
-msgstr "XAudio2: Gagal menghitung perangkat!"
-
-#: ../src/wx/xaudio2.cpp:69 ../src/wx/xaudio2.cpp:353
-msgid "The XAudio2 interface failed to initialize!"
-msgstr "Interface XAudio2 gagal menginisialisasi!"
-
-#: ../src/wx/xaudio2.cpp:384
-msgid "XAudio2: Creating mastering voice failed!"
-msgstr "XAudio2: Gagal membuat suara master!"
-
-#: ../src/wx/xaudio2.cpp:393
-msgid "XAudio2: Creating source voice failed!"
-msgstr "XAudio2: Gagal membuat suara sumber!"
-
-#: ../src/wx/viewsupt.h:61
-#, c-format
-msgid "Unable to load dialog %s from resources"
-msgstr "Tidak dapat memuat dialog %s dari sumber"
-
-#: ../src/wx/widgets/keyedit.cpp:94 ../src/wx/widgets/keyedit.cpp:232
+#: widgets/keyedit.cpp:94 widgets/keyedit.cpp:232
 msgid "SHIFT"
 msgstr "SHIFT"
 
-#: ../src/wx/widgets/keyedit.cpp:98 ../src/wx/widgets/keyedit.cpp:231
+#: widgets/keyedit.cpp:98 widgets/keyedit.cpp:231
 msgid "ALT"
 msgstr "ALT"
 
-#: ../src/wx/widgets/keyedit.cpp:102 ../src/wx/widgets/keyedit.cpp:239
+#: widgets/keyedit.cpp:102 widgets/keyedit.cpp:239
 msgid "CTRL"
 msgstr "CTRL"
 
-#: ../src/wx/widgets/keyedit.cpp:108 ../src/wx/widgets/keyedit.cpp:233
+#: widgets/keyedit.cpp:108 widgets/keyedit.cpp:233
 msgid "RAWCTRL"
 msgstr "RAWCTRL"
 
-#: ../src/wx/widgets/keyedit.cpp:122 ../src/wx/widgets/keyedit.cpp:200
+#: widgets/keyedit.cpp:122 widgets/keyedit.cpp:200
 msgid "Meta-"
 msgstr "Meta-"
 
-#: ../src/wx/widgets/keyedit.cpp:127 ../src/wx/widgets/keyedit.cpp:128
+#: widgets/keyedit.cpp:127 widgets/keyedit.cpp:128
 msgid "Num"
 msgstr "Num"
 
-#: ../src/wx/widgets/keyedit.cpp:201
+#: widgets/keyedit.cpp:201
 msgid "Meta+"
 msgstr "Meta+"
 
-#: ../src/wx/widgets/keyedit.cpp:234
+#: widgets/keyedit.cpp:234
 msgid "RAW_CTRL"
 msgstr "RAW_CTRL"
 
-#: ../src/wx/widgets/keyedit.cpp:235
+#: widgets/keyedit.cpp:235
 msgid "RAWCONTROL"
 msgstr "RAWCONTROL"
 
-#: ../src/wx/widgets/keyedit.cpp:236
+#: widgets/keyedit.cpp:236
 msgid "RAW_CONTROL"
 msgstr "RAW_CONTROL"
 
-#: ../src/wx/widgets/keyedit.cpp:240
+#: widgets/keyedit.cpp:240
 msgid "CONTROL"
 msgstr "KONTROL"
 
-#: ../src/wx/widgets/sdljoy.cpp:105
+#: widgets/sdljoy.cpp:115
 #, c-format
 msgid "Connected game controller %d"
 msgstr "Kontroler permainan yang tersambung %d"
 
-#: ../src/wx/widgets/sdljoy.cpp:115
+#: widgets/sdljoy.cpp:129
 #, c-format
 msgid "Disconnected game controller %d"
 msgstr "Kontroler permainan yang terputus %d"
 
-#: ../src/wx/xrc/AccelConfig.xrc:4
+#: dsound.cpp:90 dsound.cpp:104
+#, c-format
+msgid "Cannot create DirectSound %08x"
+msgstr "Tidak dapat membuat DirectSound %08x"
+
+#: dsound.cpp:109
+#, c-format
+msgid "Cannot SetCooperativeLevel %08x"
+msgstr "Tidak dapat MenyimpanTingkatKoperatif %08x"
+
+#: dsound.cpp:123
+#, c-format
+msgid "Cannot CreateSoundBuffer %08x"
+msgstr "Tidak dapat MembuatBufferSuara %08x"
+
+#: dsound.cpp:142
+#, c-format
+msgid "CreateSoundBuffer(primary) failed %08x"
+msgstr "PembuatanBufferSuara(utama) gagal %08x"
+
+#: dsound.cpp:159
+#, c-format
+msgid "CreateSoundBuffer(secondary) failed %08x"
+msgstr "PembuatanBufferSuara(cadangan) gagal %08x"
+
+#: dsound.cpp:164
+#, c-format
+msgid "dsbSecondary->SetCurrentPosition failed %08x"
+msgstr "dsbSecondary->MenyimpanPosisiSaatIni gagal %08x"
+
+#: dsound.cpp:187
+#, c-format
+msgid "Cannot Play primary %08x"
+msgstr "Tidak dapat Memainkan utama %08x"
+
+#: dsound.cpp:322
+#, c-format
+msgid "dsbSecondary->Lock() failed: %08x"
+msgstr "dsbSecondary->Lock() gagal: %08x"
+
+#: viewsupt.h:61
+#, c-format
+msgid "Unable to load dialog %s from resources"
+msgstr "Tidak dapat memuat dialog %s dari sumber"
+
+#: xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
 msgstr "Shortcut Tombol"
 
-#: ../src/wx/xrc/AccelConfig.xrc:13
+#: xrc/AccelConfig.xrc:13
 msgid "Co&mmands:"
 msgstr "Pe&rintah:"
 
-#: ../src/wx/xrc/AccelConfig.xrc:34
+#: xrc/AccelConfig.xrc:34
 msgid "Current Keys:"
 msgstr "Tombol Saat Ini:"
 
-#: ../src/wx/xrc/AccelConfig.xrc:53
+#: xrc/AccelConfig.xrc:53
 msgid "&Assign"
 msgstr "&Tetapkan"
 
-#: ../src/wx/xrc/AccelConfig.xrc:60
+#: xrc/AccelConfig.xrc:60
 msgid "&Remove"
 msgstr "&Hapuskan"
 
-#: ../src/wx/xrc/AccelConfig.xrc:67
+#: xrc/AccelConfig.xrc:67
 msgid "Re&set All"
 msgstr "Re&set Semua"
 
-#: ../src/wx/xrc/AccelConfig.xrc:81
+#: xrc/AccelConfig.xrc:81
 msgid "Currently assigned to:"
 msgstr "Saat ini ditugaskan ke:"
 
-#: ../src/wx/xrc/AccelConfig.xrc:96
+#: xrc/AccelConfig.xrc:96
 msgid "Shortcut Key:"
 msgstr "Tombol Shortcut:"
 
-#: ../src/wx/xrc/CheatAdd.xrc:4
+#: xrc/CheatAdd.xrc:4
 msgid "Add Cheat"
 msgstr "Tambah Cheat"
 
-#: ../src/wx/xrc/CheatAdd.xrc:9 ../src/wx/xrc/CheatEdit.xrc:9
+#: xrc/CheatAdd.xrc:9 xrc/CheatEdit.xrc:9
 msgid "&Description"
 msgstr "Deskripsi"
 
-#: ../src/wx/xrc/CheatAdd.xrc:53
+#: xrc/CheatAdd.xrc:53
 msgid "&Value"
 msgstr "&Nilai"
 
-#: ../src/wx/xrc/CheatAdd.xrc:77
+#: xrc/CheatAdd.xrc:77
 msgid "Format"
 msgstr "Format"
 
-#: ../src/wx/xrc/CheatCreate.xrc:4
+#: xrc/CheatCreate.xrc:4
 msgid "Cheat Search"
 msgstr "Cari Cheat"
 
-#: ../src/wx/xrc/CheatCreate.xrc:23
+#: xrc/CheatCreate.xrc:23
 msgid "E&qual"
 msgstr "Sama&dengan"
 
-#: ../src/wx/xrc/CheatCreate.xrc:31
+#: xrc/CheatCreate.xrc:31
 msgid "&Not equal"
 msgstr "&Tidak sama dengan"
 
-#: ../src/wx/xrc/CheatCreate.xrc:38
+#: xrc/CheatCreate.xrc:38
 msgid "&Less than"
 msgstr "&Kurang dari"
 
-#: ../src/wx/xrc/CheatCreate.xrc:45
+#: xrc/CheatCreate.xrc:45
 msgid "L&ess or equal"
 msgstr "Ku&rang dari atau sama dengan"
 
-#: ../src/wx/xrc/CheatCreate.xrc:52
+#: xrc/CheatCreate.xrc:52
 msgid "&Greater than"
 msgstr "&Lebih besar dari"
 
-#: ../src/wx/xrc/CheatCreate.xrc:59
+#: xrc/CheatCreate.xrc:59
 msgid "G&reater or equal"
 msgstr "Le&bih besar dari atau sama dengan"
 
-#: ../src/wx/xrc/CheatCreate.xrc:64
+#: xrc/CheatCreate.xrc:64
 msgid "Compare type"
 msgstr "Bandingkan tipe"
 
-#: ../src/wx/xrc/CheatCreate.xrc:77
+#: xrc/CheatCreate.xrc:77
 msgid "S&igned"
 msgstr "Ber&tanda"
 
-#: ../src/wx/xrc/CheatCreate.xrc:85
+#: xrc/CheatCreate.xrc:85
 msgid "&Unsigned"
 msgstr "&Tidak bertanda"
 
-#: ../src/wx/xrc/CheatCreate.xrc:92
+#: xrc/CheatCreate.xrc:92
 msgid "&Hexadecimal"
 msgstr "&Heksadesimal"
 
-#: ../src/wx/xrc/CheatCreate.xrc:97
+#: xrc/CheatCreate.xrc:97
 msgid "Signed/Unsigned"
 msgstr "Bertanda/Tidak bertanda"
 
-#: ../src/wx/xrc/CheatCreate.xrc:107
+#: xrc/CheatCreate.xrc:107
 msgid "&8 bits"
 msgstr "&8 bit"
 
-#: ../src/wx/xrc/CheatCreate.xrc:115
+#: xrc/CheatCreate.xrc:115
 msgid "&16 bits"
 msgstr "&16 bit"
 
-#: ../src/wx/xrc/CheatCreate.xrc:122
+#: xrc/CheatCreate.xrc:122
 msgid "&32 bits"
 msgstr "&32 bit"
 
-#: ../src/wx/xrc/CheatCreate.xrc:127
+#: xrc/CheatCreate.xrc:127
 msgid "Data size"
 msgstr "Ukuran data"
 
-#: ../src/wx/xrc/CheatCreate.xrc:144
+#: xrc/CheatCreate.xrc:144
 msgid "Ol&d value"
 msgstr "Ni&lai lama"
 
-#: ../src/wx/xrc/CheatCreate.xrc:152
+#: xrc/CheatCreate.xrc:152
 msgid "Specific &value"
 msgstr "Nilai &spesifik"
 
-#: ../src/wx/xrc/CheatCreate.xrc:163
+#: xrc/CheatCreate.xrc:163
 msgid "Search value"
 msgstr "Nilai pencarian"
 
-#: ../src/wx/xrc/CheatCreate.xrc:181
+#: xrc/CheatCreate.xrc:181
 msgid "&Search"
 msgstr "&Cari"
 
-#: ../src/wx/xrc/CheatCreate.xrc:188
+#: xrc/CheatCreate.xrc:188
 msgid "U&pdate Old"
 msgstr "Per&barui Data Lama"
 
-#: ../src/wx/xrc/CheatCreate.xrc:195 ../src/wx/xrc/JoyPanel.xrc:29
-#: ../src/wx/xrc/JoyPanel.xrc:52 ../src/wx/xrc/JoyPanel.xrc:75
-#: ../src/wx/xrc/JoyPanel.xrc:98 ../src/wx/xrc/JoyPanel.xrc:121
-#: ../src/wx/xrc/JoyPanel.xrc:144 ../src/wx/xrc/JoyPanel.xrc:167
-#: ../src/wx/xrc/JoyPanel.xrc:191 ../src/wx/xrc/JoyPanel.xrc:214
-#: ../src/wx/xrc/JoyPanel.xrc:237 ../src/wx/xrc/JoyPanel.xrc:268
-#: ../src/wx/xrc/JoyPanel.xrc:290 ../src/wx/xrc/JoyPanel.xrc:312
-#: ../src/wx/xrc/JoyPanel.xrc:334 ../src/wx/xrc/JoyPanel.xrc:356
-#: ../src/wx/xrc/JoyPanel.xrc:378 ../src/wx/xrc/JoyPanel.xrc:400
-#: ../src/wx/xrc/JoyPanel.xrc:422 ../src/wx/xrc/JoyPanel.xrc:444
-#: ../src/wx/xrc/JoyPanel.xrc:475 ../src/wx/xrc/JoyPanel.xrc:497
-#: ../src/wx/xrc/Logging.xrc:119
+#: xrc/CheatCreate.xrc:195 xrc/JoyPanel.xrc:29 xrc/JoyPanel.xrc:52
+#: xrc/JoyPanel.xrc:75 xrc/JoyPanel.xrc:98 xrc/JoyPanel.xrc:121
+#: xrc/JoyPanel.xrc:144 xrc/JoyPanel.xrc:167 xrc/JoyPanel.xrc:191
+#: xrc/JoyPanel.xrc:214 xrc/JoyPanel.xrc:237 xrc/JoyPanel.xrc:268
+#: xrc/JoyPanel.xrc:290 xrc/JoyPanel.xrc:312 xrc/JoyPanel.xrc:334
+#: xrc/JoyPanel.xrc:356 xrc/JoyPanel.xrc:378 xrc/JoyPanel.xrc:400
+#: xrc/JoyPanel.xrc:422 xrc/JoyPanel.xrc:444 xrc/JoyPanel.xrc:475
+#: xrc/JoyPanel.xrc:497 xrc/Logging.xrc:119
 msgid "&Clear"
 msgstr "&Kosongkan"
 
-#: ../src/wx/xrc/CheatCreate.xrc:202
+#: xrc/CheatCreate.xrc:202
 msgid "&Add cheat"
 msgstr "&Tambah cheat"
 
-#: ../src/wx/xrc/CheatEdit.xrc:4
+#: xrc/CheatEdit.xrc:4
 msgid "Edit Cheat"
 msgstr "Atur Cheat"
 
-#: ../src/wx/xrc/CheatEdit.xrc:31 ../src/wx/xrc/MainMenu.xrc:269
+#: xrc/CheatEdit.xrc:31 xrc/MainMenu.xrc:275
 msgid "&Type"
 msgstr "&Tipe"
 
-#: ../src/wx/xrc/CheatEdit.xrc:53
+#: xrc/CheatEdit.xrc:53
 msgid "C&odes"
 msgstr "K&ode"
 
-#: ../src/wx/xrc/CheatList.xrc:4
+#: xrc/CheatList.xrc:4
 msgid "Cheat List"
 msgstr "Daftar Cheat"
 
-#: ../src/wx/xrc/CheatList.xrc:11
+#: xrc/CheatList.xrc:11
 msgid "Open cheat list"
 msgstr "Buka daftar cheat"
 
-#: ../src/wx/xrc/CheatList.xrc:15
+#: xrc/CheatList.xrc:15
 msgid "Save cheat list"
 msgstr "Simpan daftar cheat"
 
-#: ../src/wx/xrc/CheatList.xrc:20
+#: xrc/CheatList.xrc:20
 msgid "Add new cheat"
 msgstr "Tambah cheat baru"
 
-#: ../src/wx/xrc/CheatList.xrc:24
+#: xrc/CheatList.xrc:24
 msgid "Delete selected cheat"
 msgstr "Hapus cheat yang dipilih"
 
-#: ../src/wx/xrc/CheatList.xrc:29
+#: xrc/CheatList.xrc:29
 msgid "Delete all cheats"
 msgstr "Hapus semua cheat"
 
-#: ../src/wx/xrc/CheatList.xrc:35
+#: xrc/CheatList.xrc:35
 msgid "Toggle all Cheats"
 msgstr "Toggle semua Cheat"
 
-#: ../src/wx/xrc/DirectoriesConfig.xrc:4
+#: xrc/DirectoriesConfig.xrc:4
 msgid "Directories"
 msgstr "Direktori"
 
-#: ../src/wx/xrc/DirectoriesConfig.xrc:11
-#: ../src/wx/xrc/DirectoriesConfig.xrc:18
+#: xrc/DirectoriesConfig.xrc:11 xrc/DirectoriesConfig.xrc:18
 msgid "Game Boy Advance ROMs"
 msgstr "ROM Game Boy Advance"
 
-#: ../src/wx/xrc/DirectoriesConfig.xrc:27
-#: ../src/wx/xrc/DirectoriesConfig.xrc:34
+#: xrc/DirectoriesConfig.xrc:27 xrc/DirectoriesConfig.xrc:34
 msgid "Game Boy ROMs"
 msgstr "ROM Game Boy"
 
-#: ../src/wx/xrc/DirectoriesConfig.xrc:42
-#: ../src/wx/xrc/DirectoriesConfig.xrc:49
+#: xrc/DirectoriesConfig.xrc:42 xrc/DirectoriesConfig.xrc:49
 msgid "Game Boy Color ROMs"
 msgstr "ROM Game Boy Color"
 
-#: ../src/wx/xrc/DirectoriesConfig.xrc:57
-#: ../src/wx/xrc/DirectoriesConfig.xrc:64
+#: xrc/DirectoriesConfig.xrc:57 xrc/DirectoriesConfig.xrc:64
 msgid "Native Saves"
 msgstr "Simpanan Asli"
 
-#: ../src/wx/xrc/DirectoriesConfig.xrc:72
-#: ../src/wx/xrc/DirectoriesConfig.xrc:79
+#: xrc/DirectoriesConfig.xrc:72 xrc/DirectoriesConfig.xrc:79
 msgid "Emulator Saves"
 msgstr "Simpanan Emulator"
 
-#: ../src/wx/xrc/DirectoriesConfig.xrc:87
-#: ../src/wx/xrc/DirectoriesConfig.xrc:94
+#: xrc/DirectoriesConfig.xrc:87 xrc/DirectoriesConfig.xrc:94
 msgid "Screenshots"
 msgstr "Screenshot"
 
-#: ../src/wx/xrc/DirectoriesConfig.xrc:102
-#: ../src/wx/xrc/DirectoriesConfig.xrc:109
+#: xrc/DirectoriesConfig.xrc:102 xrc/DirectoriesConfig.xrc:109
 msgid "Recordings"
 msgstr "Rekaman"
 
-#: ../src/wx/xrc/Disassemble.xrc:4
+#: xrc/Disassemble.xrc:4
 msgid "Disassemble"
 msgstr "Membongkar"
 
-#: ../src/wx/xrc/Disassemble.xrc:15
+#: xrc/Disassemble.xrc:15
 msgid "&Automatic"
 msgstr "&Otomatis"
 
-#: ../src/wx/xrc/Disassemble.xrc:23
+#: xrc/Disassemble.xrc:23
 msgid "A&RM"
 msgstr "A&RM"
 
-#: ../src/wx/xrc/Disassemble.xrc:30
+#: xrc/Disassemble.xrc:30
 msgid "&THUMB"
 msgstr "&THUMB"
 
-#: ../src/wx/xrc/Disassemble.xrc:45 ../src/wx/xrc/GBDisassemble.xrc:18
-#: ../src/wx/xrc/MemViewer.xrc:47
+#: xrc/Disassemble.xrc:45 xrc/GBDisassemble.xrc:18 xrc/MemViewer.xrc:47
 msgid "&Go"
 msgstr "&Jalankan"
 
-#: ../src/wx/xrc/Disassemble.xrc:73
+#: xrc/Disassemble.xrc:73
 msgid "R0:"
 msgstr "R0:"
 
-#: ../src/wx/xrc/Disassemble.xrc:83 ../src/wx/xrc/Disassemble.xrc:100
-#: ../src/wx/xrc/Disassemble.xrc:117 ../src/wx/xrc/Disassemble.xrc:134
-#: ../src/wx/xrc/Disassemble.xrc:151 ../src/wx/xrc/Disassemble.xrc:168
-#: ../src/wx/xrc/Disassemble.xrc:185 ../src/wx/xrc/Disassemble.xrc:202
-#: ../src/wx/xrc/Disassemble.xrc:219 ../src/wx/xrc/Disassemble.xrc:236
-#: ../src/wx/xrc/Disassemble.xrc:253 ../src/wx/xrc/Disassemble.xrc:270
-#: ../src/wx/xrc/Disassemble.xrc:287 ../src/wx/xrc/Disassemble.xrc:304
-#: ../src/wx/xrc/Disassemble.xrc:321 ../src/wx/xrc/Disassemble.xrc:338
-#: ../src/wx/xrc/Disassemble.xrc:355
+#: xrc/Disassemble.xrc:83 xrc/Disassemble.xrc:100 xrc/Disassemble.xrc:117
+#: xrc/Disassemble.xrc:134 xrc/Disassemble.xrc:151 xrc/Disassemble.xrc:168
+#: xrc/Disassemble.xrc:185 xrc/Disassemble.xrc:202 xrc/Disassemble.xrc:219
+#: xrc/Disassemble.xrc:236 xrc/Disassemble.xrc:253 xrc/Disassemble.xrc:270
+#: xrc/Disassemble.xrc:287 xrc/Disassemble.xrc:304 xrc/Disassemble.xrc:321
+#: xrc/Disassemble.xrc:338 xrc/Disassemble.xrc:355
 msgid "00000000"
 msgstr "00000000"
 
-#: ../src/wx/xrc/Disassemble.xrc:90
+#: xrc/Disassemble.xrc:90
 msgid "R1:"
 msgstr "R1:"
 
-#: ../src/wx/xrc/Disassemble.xrc:107
+#: xrc/Disassemble.xrc:107
 msgid "R2:"
 msgstr "R2:"
 
-#: ../src/wx/xrc/Disassemble.xrc:124
+#: xrc/Disassemble.xrc:124
 msgid "R3:"
 msgstr "R3:"
 
-#: ../src/wx/xrc/Disassemble.xrc:141
+#: xrc/Disassemble.xrc:141
 msgid "R4:"
 msgstr "R4:"
 
-#: ../src/wx/xrc/Disassemble.xrc:158
+#: xrc/Disassemble.xrc:158
 msgid "R5:"
 msgstr "R5:"
 
-#: ../src/wx/xrc/Disassemble.xrc:175
+#: xrc/Disassemble.xrc:175
 msgid "R6:"
 msgstr "R6:"
 
-#: ../src/wx/xrc/Disassemble.xrc:192
+#: xrc/Disassemble.xrc:192
 msgid "R7:"
 msgstr "R7:"
 
-#: ../src/wx/xrc/Disassemble.xrc:209
+#: xrc/Disassemble.xrc:209
 msgid "R8:"
 msgstr "R8:"
 
-#: ../src/wx/xrc/Disassemble.xrc:226
+#: xrc/Disassemble.xrc:226
 msgid "R9:"
 msgstr "R9:"
 
-#: ../src/wx/xrc/Disassemble.xrc:243
+#: xrc/Disassemble.xrc:243
 msgid "R10:"
 msgstr "R10:"
 
-#: ../src/wx/xrc/Disassemble.xrc:260
+#: xrc/Disassemble.xrc:260
 msgid "R11:"
 msgstr "R11:"
 
-#: ../src/wx/xrc/Disassemble.xrc:277
+#: xrc/Disassemble.xrc:277
 msgid "R12:"
 msgstr "R12:"
 
-#: ../src/wx/xrc/Disassemble.xrc:294 ../src/wx/xrc/GBDisassemble.xrc:111
+#: xrc/Disassemble.xrc:294 xrc/GBDisassemble.xrc:111
 msgid "SP:"
 msgstr "SP:"
 
-#: ../src/wx/xrc/Disassemble.xrc:311
+#: xrc/Disassemble.xrc:311
 msgid "LR:"
 msgstr "LR:"
 
-#: ../src/wx/xrc/Disassemble.xrc:328 ../src/wx/xrc/GBDisassemble.xrc:128
+#: xrc/Disassemble.xrc:328 xrc/GBDisassemble.xrc:128
 msgid "PC:"
 msgstr "PC:"
 
-#: ../src/wx/xrc/Disassemble.xrc:345
+#: xrc/Disassemble.xrc:345
 msgid "CPSR:"
 msgstr "CPSR:"
 
-#: ../src/wx/xrc/Disassemble.xrc:362 ../src/wx/xrc/GBDisassemble.xrc:185
+#: xrc/Disassemble.xrc:362 xrc/GBDisassemble.xrc:185
 msgid "N"
 msgstr "N"
 
-#: ../src/wx/xrc/Disassemble.xrc:369
+#: xrc/Disassemble.xrc:369
 msgid "I"
 msgstr "I"
 
-#: ../src/wx/xrc/Disassemble.xrc:376 ../src/wx/xrc/GBDisassemble.xrc:179
+#: xrc/Disassemble.xrc:376 xrc/GBDisassemble.xrc:179
 msgid "Z"
 msgstr "Z"
 
-#: ../src/wx/xrc/Disassemble.xrc:383
+#: xrc/Disassemble.xrc:383
 msgid "F"
 msgstr "F"
 
-#: ../src/wx/xrc/Disassemble.xrc:390 ../src/wx/xrc/GBDisassemble.xrc:197
+#: xrc/Disassemble.xrc:390 xrc/GBDisassemble.xrc:197
 msgid "C"
 msgstr "C"
 
-#: ../src/wx/xrc/Disassemble.xrc:397
+#: xrc/Disassemble.xrc:397
 msgid "T"
 msgstr "T"
 
-#: ../src/wx/xrc/Disassemble.xrc:404
+#: xrc/Disassemble.xrc:404
 msgid "V"
 msgstr "V"
 
-#: ../src/wx/xrc/Disassemble.xrc:414 ../src/wx/xrc/MapViewer.xrc:76
-#: ../src/wx/xrc/OAMViewer.xrc:37
+#: xrc/Disassemble.xrc:414 xrc/MapViewer.xrc:76 xrc/OAMViewer.xrc:37
 msgid "Mode:"
 msgstr "Mode:"
 
-#: ../src/wx/xrc/Disassemble.xrc:424 ../src/wx/xrc/GBDisassemble.xrc:172
+#: xrc/Disassemble.xrc:424 xrc/GBDisassemble.xrc:172
 msgid "00"
 msgstr "00"
 
-#: ../src/wx/xrc/Disassemble.xrc:443 ../src/wx/xrc/GBDisassemble.xrc:212
-#: ../src/wx/xrc/GBOAMViewer.xrc:93 ../src/wx/xrc/GBPaletteViewer.xrc:105
-#: ../src/wx/xrc/GBTileViewer.xrc:75 ../src/wx/xrc/IOViewer.xrc:318
-#: ../src/wx/xrc/MemViewer.xrc:72 ../src/wx/xrc/OAMViewer.xrc:109
-#: ../src/wx/xrc/PaletteViewer.xrc:81 ../src/wx/xrc/TileViewer.xrc:91
+#: xrc/Disassemble.xrc:443 xrc/GBDisassemble.xrc:212 xrc/GBOAMViewer.xrc:93
+#: xrc/GBPaletteViewer.xrc:105 xrc/GBTileViewer.xrc:75 xrc/IOViewer.xrc:318
+#: xrc/MemViewer.xrc:72 xrc/OAMViewer.xrc:109 xrc/PaletteViewer.xrc:81
+#: xrc/TileViewer.xrc:91
 msgid "Automatic &update"
 msgstr "Pembaruan &otomatis"
 
-#: ../src/wx/xrc/Disassemble.xrc:453 ../src/wx/xrc/GBDisassemble.xrc:222
+#: xrc/Disassemble.xrc:453 xrc/GBDisassemble.xrc:222
 msgid "G&oto PC"
 msgstr "K&e PC"
 
-#: ../src/wx/xrc/Disassemble.xrc:460 ../src/wx/xrc/GBDisassemble.xrc:229
+#: xrc/Disassemble.xrc:460 xrc/GBDisassemble.xrc:229
 msgid "Re&fresh"
 msgstr "Mu&at ulang"
 
-#: ../src/wx/xrc/Disassemble.xrc:467 ../src/wx/xrc/GBDisassemble.xrc:236
+#: xrc/Disassemble.xrc:467 xrc/GBDisassemble.xrc:236
 msgid "&Next"
 msgstr "&Berikutnya"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:4
+#: xrc/DisplayConfig.xrc:4
 msgid "Display settings"
 msgstr "Pengaturan layar"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:15
+#: xrc/DisplayConfig.xrc:15
 msgid "Output module"
 msgstr "Modul keluaran"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:33
+#: xrc/DisplayConfig.xrc:33
 msgid "Simple"
 msgstr "Simpel"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:40
+#: xrc/DisplayConfig.xrc:40
 msgid "Quartz2D"
 msgstr "Quartz2D"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:47
+#: xrc/DisplayConfig.xrc:47
 msgid "OpenGL"
 msgstr "OpenGL"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:54
+#: xrc/DisplayConfig.xrc:54
 msgid "Direct3D 9"
 msgstr "Direct3D 9"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:65
+#: xrc/DisplayConfig.xrc:65
 msgid "Filters"
 msgstr "Filter"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:79
+#: xrc/DisplayConfig.xrc:79
 msgid "Display filter :"
 msgstr "Penyaring layar:"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:86
+#: xrc/DisplayConfig.xrc:86
 msgid "2xSaI"
 msgstr "2xSaI"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:87
+#: xrc/DisplayConfig.xrc:87
 msgid "Super 2xSaI"
 msgstr "Super 2xSaI"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:88
+#: xrc/DisplayConfig.xrc:88
 msgid "Super Eagle"
 msgstr "Super Eagle"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:89
+#: xrc/DisplayConfig.xrc:89
 msgid "Pixelate"
 msgstr "Pixelate"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:90
+#: xrc/DisplayConfig.xrc:90
 msgid "Advance MAME Scale2x"
 msgstr "Advance MAME Skala2x"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:91
+#: xrc/DisplayConfig.xrc:91
 msgid "Bilinear"
 msgstr "Bilinear"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:92
+#: xrc/DisplayConfig.xrc:92
 msgid "Bilinear Plus"
 msgstr "Bilinear Plus"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:93
+#: xrc/DisplayConfig.xrc:93
 msgid "Scanlines"
 msgstr "Garis scan"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:94
+#: xrc/DisplayConfig.xrc:94
 msgid "TV Mode"
 msgstr "Mode TV"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:95
+#: xrc/DisplayConfig.xrc:95
 msgid "HQ 2x"
 msgstr "HQ 2x"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:96
+#: xrc/DisplayConfig.xrc:96
 msgid "LQ 2x"
 msgstr "LQ 2x"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:97
+#: xrc/DisplayConfig.xrc:97
 msgid "Simple 2x"
 msgstr "Simpel 2x"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:98
+#: xrc/DisplayConfig.xrc:98
 msgid "Simple 3x"
 msgstr "Simpel 3x"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:99
+#: xrc/DisplayConfig.xrc:99
 msgid "HQ 3x"
 msgstr "HQ 3x"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:100
+#: xrc/DisplayConfig.xrc:100
 msgid "Simple 4x"
 msgstr "Simpel 4x"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:101
+#: xrc/DisplayConfig.xrc:101
 msgid "HQ 4x"
 msgstr "HQ 4x"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:102
+#: xrc/DisplayConfig.xrc:102
 msgid "xBRZ 2x"
 msgstr "xBRZ 2x"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:103
+#: xrc/DisplayConfig.xrc:103
 msgid "xBRZ 3x"
 msgstr "xBRZ 3x"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:104
+#: xrc/DisplayConfig.xrc:104
 msgid "xBRZ 4x"
 msgstr "xBRZ 4x"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:105
+#: xrc/DisplayConfig.xrc:105
 msgid "xBRZ 5x"
 msgstr "xBRZ 5x"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:106
+#: xrc/DisplayConfig.xrc:106
 msgid "xBRZ 6x"
 msgstr "xBRZ 6x"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:115
+#: xrc/DisplayConfig.xrc:115
 msgid "Plugin :"
 msgstr "Plugin :"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:127
+#: xrc/DisplayConfig.xrc:127
 msgid "Interframe blending :"
 msgstr "Interframe blending :"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:136
+#: xrc/DisplayConfig.xrc:136
 msgid "Smart interframe blending"
 msgstr "Smart interframe blending"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:137
+#: xrc/DisplayConfig.xrc:137
 msgid "Interframe motion blur"
 msgstr "Interframe motion blur"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:151 ../src/wx/xrc/SoundConfig.xrc:91
+#: xrc/DisplayConfig.xrc:151 xrc/SoundConfig.xrc:91
 msgid "Basic"
 msgstr "Dasar"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:159
+#: xrc/DisplayConfig.xrc:159
 msgid "Frame Skip"
 msgstr "Frame Skip"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:177
+#: xrc/DisplayConfig.xrc:177
 msgid "&Number of frames to skip :"
 msgstr "&Jumlah frame yang dilewati"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:199
+#: xrc/DisplayConfig.xrc:199
 msgid "Speed"
 msgstr "Kecepatan"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:215
+#: xrc/DisplayConfig.xrc:215
 msgid "Speed indicator :"
 msgstr "Indikator kecepatan :"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:222
+#: xrc/DisplayConfig.xrc:222
 msgid "Percentage"
 msgstr "Persentase"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:223
+#: xrc/DisplayConfig.xrc:223
 msgid "Detailed"
 msgstr "Detail"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:237
+#: xrc/DisplayConfig.xrc:237
 msgid "On-Screen Display"
 msgstr "Tampilan Pada Layar"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:247
+#: xrc/DisplayConfig.xrc:247
 msgid "Default magnification :"
 msgstr "Pembesaran default :"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:266
+#: xrc/DisplayConfig.xrc:266
 msgid "Maximum magnification factor :"
 msgstr "Faktor pembesaran maksimum :"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:267
+#: xrc/DisplayConfig.xrc:267
 msgid "0 = no maximum"
 msgstr "0 = tidak ada maksimum"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:275
+#: xrc/DisplayConfig.xrc:275
 msgid "0 = no limit"
 msgstr "0 = tidak ada batasan"
 
-#: ../src/wx/xrc/DisplayConfig.xrc:285
+#: xrc/DisplayConfig.xrc:285
 msgid "Zoom"
 msgstr "Perbesar"
 
-#: ../src/wx/xrc/ExportSPS.xrc:10
+#: xrc/ExportSPS.xrc:10
 msgid "Title:"
 msgstr "Judul:"
 
-#: ../src/wx/xrc/ExportSPS.xrc:22
+#: xrc/ExportSPS.xrc:22
 msgid "Description:"
 msgstr "Deskripsi:"
 
-#: ../src/wx/xrc/ExportSPS.xrc:34
+#: xrc/ExportSPS.xrc:34
 msgid "Notes:"
 msgstr "Catatan:"
 
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:4
-msgid "Game Boy Advance settings"
-msgstr "Pengaturan Game Boy Advance"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:21
-msgid "Save type :"
-msgstr "Tipe penyimpanan :"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:27
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:199
-#: ../src/wx/xrc/GameBoyConfig.xrc:29 ../src/wx/xrc/GameBoyConfig.xrc:59
-msgid "Automatic"
-msgstr "Otomatis"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:28
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:200
-msgid "EEPROM"
-msgstr "EEPROM"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:29
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:201
-msgid "SRAM"
-msgstr "SRAM"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:30
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:202
-msgid "Flash"
-msgstr "Flash"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:31
-msgid "EEPROM + Sensor"
-msgstr "EEPROM + Sensor"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:43
-msgid "Flash size :"
-msgstr "Ukuran flash :"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:49
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:221
-msgid "64K"
-msgstr "64K"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:50
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:222
-msgid "128K"
-msgstr "128K"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:64
-msgid "Detect Now"
-msgstr "Deteksi Sekarang"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:69
-msgid "Cartridge"
-msgstr "Cartridge"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:77
-msgid "Save type"
-msgstr "Tipe penyimpanan"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:92
-msgid "Bios file :"
-msgstr "File Bios"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:115
-msgid "Current BIOS file :"
-msgstr "Berkas BIOS saat ini :"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:122
-#: ../src/wx/xrc/GameBoyConfig.xrc:138 ../src/wx/xrc/GameBoyConfig.xrc:159
-msgid "(None)"
-msgstr "(Tidak ada)"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:136
-#: ../src/wx/xrc/GameBoyConfig.xrc:168
-msgid "Boot ROM"
-msgstr "Boot ROM"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:146
-msgid "Game Code"
-msgstr "Kode Permainan"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:160
-msgid "Comment"
-msgstr "Komentar"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:172
-msgid "Real Time Clock:"
-msgstr "Waktu Sekarang"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:180
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:198
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:220
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:238
-#: ../src/wx/xrc/GameBoyConfig.xrc:180
-msgid "Default"
-msgstr "Default"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:181
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:239
-msgid "Disabled"
-msgstr "Non aktifkan"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:182
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:240
-msgid "Enabled"
-msgstr "Aktifkan"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:190
-msgid "Save Type:"
-msgstr "Tipe penyimpanan:"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:203
-msgid "EEPROM+Sensor"
-msgstr "EEPROM+Sensor"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:212
-msgid "Flash Size:"
-msgstr "Ukuran Flash:"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:230
-msgid "Mirroring:"
-msgstr "Mirroring:"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:254
-msgid "&Defaults"
-msgstr "&Default"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:261
-msgid "Game Overrides"
-msgstr "Timpahan Permainan"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:4
-msgid "GameBoy settings"
-msgstr "Pengaturan GameBoy"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:20
-msgid "Emulated &system :"
-msgstr "Sistem yang &ditiru"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:30
-msgid "Game Boy Color"
-msgstr "Game Boy Color"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:31
-msgid "Super Game Boy"
-msgstr "Super Game Boy"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:32 ../src/wx/xrc/SoundConfig.xrc:290
-msgid "Game Boy"
-msgstr "Game Boy"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:33 ../src/wx/xrc/SoundConfig.xrc:335
-msgid "Game Boy Advance"
-msgstr "Game Boy Advance"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:34
-msgid "Super Game Boy 2"
-msgstr "Super Game Boy 2"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:48
-msgid "Display &borders :"
-msgstr "Display &borders :"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:57
-msgid "Never"
-msgstr "Never"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:58
-msgid "Always"
-msgstr "Always"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:72
-msgid "System"
-msgstr "System"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:84
-msgid "GB Boot &ROM file :"
-msgstr "Berkas GB Boot & ROM :"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:91 ../src/wx/xrc/GameBoyConfig.xrc:113
-msgid "Select A File"
-msgstr "Pilih File"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:106
-msgid "GBC Boot ROM &file :"
-msgstr "File Boot ROM &GBC :"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:131
-msgid "Current GB BIOS file :"
-msgstr "Berkas BIOS GB saat ini :"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:152
-msgid "Current GBC BIOS file :"
-msgstr "Berkas BIOS GBC saat ini :"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:186
-msgid "User 1"
-msgstr "Pengguna 1"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:192
-msgid "User 2"
-msgstr "Pengguna 2"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:198
-msgid "Custom Colors"
-msgstr "Warna Kustom"
-
-#: ../src/wx/xrc/GBAROMInfo.xrc:4 ../src/wx/xrc/GBROMInfo.xrc:4
+#: xrc/GBAROMInfo.xrc:4 xrc/GBROMInfo.xrc:4
 msgid "Rom Information"
 msgstr "Informasi Rom"
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:11 ../src/wx/xrc/GBROMInfo.xrc:12
+#: xrc/GBAROMInfo.xrc:11 xrc/GBROMInfo.xrc:12
 msgid "Game title:"
 msgstr "Judul permainan:"
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:23
+#: xrc/GBAROMInfo.xrc:23
 msgid "Internal title:"
 msgstr "Judul internal:"
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:35
+#: xrc/GBAROMInfo.xrc:35
 msgid "Scene Release:"
 msgstr "Tempat Keluaran:"
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:47
+#: xrc/GBAROMInfo.xrc:47
 msgid "Release Number:"
 msgstr "Nomor Keluaran:"
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:59
+#: xrc/GBAROMInfo.xrc:59
 msgid "CRC32:"
 msgstr "CRC32:"
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:71
+#: xrc/GBAROMInfo.xrc:71
 msgid "Game code:"
 msgstr "Kode permainan:"
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:83 ../src/wx/xrc/GBROMInfo.xrc:24
+#: xrc/GBAROMInfo.xrc:83 xrc/GBROMInfo.xrc:24
 msgid "Maker code:"
 msgstr "Kode pembuat:"
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:95 ../src/wx/xrc/GBROMInfo.xrc:36
+#: xrc/GBAROMInfo.xrc:95 xrc/GBROMInfo.xrc:36
 msgid "Maker name:"
 msgstr "Nama pembuat:"
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:107
+#: xrc/GBAROMInfo.xrc:107
 msgid "Main unit code:"
 msgstr "Kode unit utama:"
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:119
+#: xrc/GBAROMInfo.xrc:119
 msgid "Device type:"
 msgstr "Tipe perangkat:"
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:131 ../src/wx/xrc/GBROMInfo.xrc:72
+#: xrc/GBAROMInfo.xrc:131 xrc/GBROMInfo.xrc:72
 msgid "ROM version:"
 msgstr "Versi ROM:"
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:143 ../src/wx/xrc/GBROMInfo.xrc:84
+#: xrc/GBAROMInfo.xrc:143 xrc/GBROMInfo.xrc:84
 msgid "CRC:"
 msgstr "CRC:"
 
-#: ../src/wx/xrc/GBAROMInfo.xrc:150
+#: xrc/GBAROMInfo.xrc:150
 msgid "ROM Information"
 msgstr "Informasi ROM"
 
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:10 ../src/wx/xrc/JoyPanel.xrc:247
+#: xrc/GBColorPrefPanel.xrc:10 xrc/JoyPanel.xrc:247
 msgid "Standard"
 msgstr "Standar"
 
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:11
+#: xrc/GBColorPrefPanel.xrc:11
 msgid "Blue Sea"
 msgstr "Langit Biru"
 
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:12
+#: xrc/GBColorPrefPanel.xrc:12
 msgid "Dark Night"
 msgstr "Malam Gelap"
 
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:13
+#: xrc/GBColorPrefPanel.xrc:13
 msgid "Green Forest"
 msgstr "Hutan Hijau"
 
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:14
+#: xrc/GBColorPrefPanel.xrc:14
 msgid "Hot Desert"
 msgstr "Gurun Panas"
 
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:15
+#: xrc/GBColorPrefPanel.xrc:15
 msgid "Pink Dreams"
 msgstr "Mimpi Pink"
 
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:16
+#: xrc/GBColorPrefPanel.xrc:16
 msgid "Weird Colors"
 msgstr "Warna Aneh"
 
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:17
+#: xrc/GBColorPrefPanel.xrc:17
 msgid "Real GB Colors"
 msgstr "Warna Asli GB"
 
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:18
+#: xrc/GBColorPrefPanel.xrc:18
 msgid "Real 'GB on GBASP' Colors"
 msgstr "Warna Asli 'GB di GBASP'"
 
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:46 ../src/wx/xrc/GBPaletteViewer.xrc:17
-#: ../src/wx/xrc/MapViewer.xrc:54 ../src/wx/xrc/PaletteViewer.xrc:19
+#: xrc/GBColorPrefPanel.xrc:46 xrc/GBPaletteViewer.xrc:17 xrc/MapViewer.xrc:54
+#: xrc/PaletteViewer.xrc:19
 msgid "Background"
 msgstr "Latar belakang"
 
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:74
+#: xrc/GBColorPrefPanel.xrc:74
 msgid "Sprites"
 msgstr "Sprite"
 
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:84
+#: xrc/GBColorPrefPanel.xrc:84
 msgid "Use this palette"
 msgstr "Gunakan palet ini"
 
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:94
+#: xrc/GBColorPrefPanel.xrc:94
 msgid "Restore"
 msgstr "Kembalikan"
 
-#: ../src/wx/xrc/GBDisassemble.xrc:43
+#: xrc/GBDisassemble.xrc:43
 msgid "AF:"
 msgstr "AF:"
 
-#: ../src/wx/xrc/GBDisassemble.xrc:53 ../src/wx/xrc/GBDisassemble.xrc:70
-#: ../src/wx/xrc/GBDisassemble.xrc:87 ../src/wx/xrc/GBDisassemble.xrc:104
-#: ../src/wx/xrc/GBDisassemble.xrc:121 ../src/wx/xrc/GBDisassemble.xrc:138
-#: ../src/wx/xrc/GBDisassemble.xrc:155
+#: xrc/GBDisassemble.xrc:53 xrc/GBDisassemble.xrc:70 xrc/GBDisassemble.xrc:87
+#: xrc/GBDisassemble.xrc:104 xrc/GBDisassemble.xrc:121
+#: xrc/GBDisassemble.xrc:138 xrc/GBDisassemble.xrc:155
 msgid "0000"
 msgstr "0000"
 
-#: ../src/wx/xrc/GBDisassemble.xrc:60
+#: xrc/GBDisassemble.xrc:60
 msgid "BC:"
 msgstr "BC:"
 
-#: ../src/wx/xrc/GBDisassemble.xrc:77
+#: xrc/GBDisassemble.xrc:77
 msgid "DE:"
 msgstr "DE:"
 
-#: ../src/wx/xrc/GBDisassemble.xrc:94
+#: xrc/GBDisassemble.xrc:94
 msgid "HL:"
 msgstr "HL:"
 
-#: ../src/wx/xrc/GBDisassemble.xrc:145
+#: xrc/GBDisassemble.xrc:145
 msgid "IFF:"
 msgstr "IFF:"
 
-#: ../src/wx/xrc/GBDisassemble.xrc:162
+#: xrc/GBDisassemble.xrc:162
 msgid "LY:"
 msgstr "LY:"
 
-#: ../src/wx/xrc/GBDisassemble.xrc:191
+#: xrc/GBDisassemble.xrc:191
 msgid "H"
 msgstr "H"
 
-#: ../src/wx/xrc/GBMapViewer.xrc:14
+#: xrc/GBMapViewer.xrc:14
 msgid "0x8000"
 msgstr "0x8000"
 
-#: ../src/wx/xrc/GBMapViewer.xrc:20
+#: xrc/GBMapViewer.xrc:20
 msgid "0x8800"
 msgstr "0x8800"
 
-#: ../src/wx/xrc/GBMapViewer.xrc:23 ../src/wx/xrc/GBTileViewer.xrc:42
-#: ../src/wx/xrc/TileViewer.xrc:58
+#: xrc/GBMapViewer.xrc:23 xrc/GBTileViewer.xrc:42 xrc/TileViewer.xrc:58
 msgid "Char Base"
 msgstr "Basis Karakter"
 
-#: ../src/wx/xrc/GBMapViewer.xrc:33
+#: xrc/GBMapViewer.xrc:33
 msgid "0x9800"
 msgstr "0x9800"
 
-#: ../src/wx/xrc/GBMapViewer.xrc:39
+#: xrc/GBMapViewer.xrc:39
 msgid "0x9C00"
 msgstr "0x9C00"
 
-#: ../src/wx/xrc/GBMapViewer.xrc:42
+#: xrc/GBMapViewer.xrc:42
 msgid "Map Base"
 msgstr "Basis Map"
 
-#: ../src/wx/xrc/GBMapViewer.xrc:54 ../src/wx/xrc/GBOAMViewer.xrc:88
-#: ../src/wx/xrc/GBTileViewer.xrc:68 ../src/wx/xrc/MapViewer.xrc:62
-#: ../src/wx/xrc/OAMViewer.xrc:104 ../src/wx/xrc/TileViewer.xrc:84
+#: xrc/GBMapViewer.xrc:54 xrc/GBOAMViewer.xrc:88 xrc/GBTileViewer.xrc:68
+#: xrc/MapViewer.xrc:62 xrc/OAMViewer.xrc:104 xrc/TileViewer.xrc:84
 msgid "Stretch to &fit"
 msgstr "Regangkan sampai &cocok"
 
-#: ../src/wx/xrc/GBMapViewer.xrc:59 ../src/wx/xrc/MapViewer.xrc:67
+#: xrc/GBMapViewer.xrc:59 xrc/MapViewer.xrc:67
 msgid "Auto &update"
 msgstr "Pembaruan &otomatis"
 
-#: ../src/wx/xrc/GBMapViewer.xrc:74 ../src/wx/xrc/GBTileViewer.xrc:99
-#: ../src/wx/xrc/MapViewer.xrc:144 ../src/wx/xrc/MemSelRegion.xrc:10
-#: ../src/wx/xrc/PaletteViewer.xrc:50 ../src/wx/xrc/TileViewer.xrc:115
+#: xrc/GBMapViewer.xrc:74 xrc/GBTileViewer.xrc:99 xrc/MapViewer.xrc:144
+#: xrc/MemSelRegion.xrc:10 xrc/PaletteViewer.xrc:50 xrc/TileViewer.xrc:115
 msgid "Address:"
 msgstr "Alamat:"
 
-#: ../src/wx/xrc/GBMapViewer.xrc:82 ../src/wx/xrc/GBOAMViewer.xrc:37
-#: ../src/wx/xrc/GBTileViewer.xrc:91 ../src/wx/xrc/MapViewer.xrc:152
-#: ../src/wx/xrc/OAMViewer.xrc:61 ../src/wx/xrc/TileViewer.xrc:107
+#: xrc/GBMapViewer.xrc:82 xrc/GBOAMViewer.xrc:37 xrc/GBTileViewer.xrc:91
+#: xrc/MapViewer.xrc:152 xrc/OAMViewer.xrc:61 xrc/TileViewer.xrc:107
 msgid "Tile:"
 msgstr "Tile:"
 
-#: ../src/wx/xrc/GBMapViewer.xrc:90 ../src/wx/xrc/MapViewer.xrc:160
+#: xrc/GBMapViewer.xrc:90 xrc/MapViewer.xrc:160
 msgid "Flip:"
 msgstr "Putar:"
 
-#: ../src/wx/xrc/GBMapViewer.xrc:98 ../src/wx/xrc/GBTileViewer.xrc:50
-#: ../src/wx/xrc/MapViewer.xrc:168 ../src/wx/xrc/TileViewer.xrc:66
+#: xrc/GBMapViewer.xrc:98 xrc/GBTileViewer.xrc:50 xrc/MapViewer.xrc:168
+#: xrc/TileViewer.xrc:66
 msgid "Palette:"
 msgstr "Palet:"
 
-#: ../src/wx/xrc/GBMapViewer.xrc:106 ../src/wx/xrc/MapViewer.xrc:116
+#: xrc/GBMapViewer.xrc:106 xrc/MapViewer.xrc:116
 msgid "Priority:"
 msgstr "Prioritas:"
 
-#: ../src/wx/xrc/GBMapViewer.xrc:152 ../src/wx/xrc/GBOAMViewer.xrc:142
-#: ../src/wx/xrc/GBPaletteViewer.xrc:114 ../src/wx/xrc/GBTileViewer.xrc:145
-#: ../src/wx/xrc/IOViewer.xrc:327 ../src/wx/xrc/MapViewer.xrc:214
-#: ../src/wx/xrc/MemViewer.xrc:101 ../src/wx/xrc/OAMViewer.xrc:155
-#: ../src/wx/xrc/PaletteViewer.xrc:100 ../src/wx/xrc/TileViewer.xrc:161
+#: xrc/GBMapViewer.xrc:152 xrc/GBOAMViewer.xrc:142 xrc/GBPaletteViewer.xrc:114
+#: xrc/GBTileViewer.xrc:145 xrc/IOViewer.xrc:327 xrc/MapViewer.xrc:214
+#: xrc/MemViewer.xrc:101 xrc/OAMViewer.xrc:155 xrc/PaletteViewer.xrc:100
+#: xrc/TileViewer.xrc:161
 msgid "&Refresh"
 msgstr "&Muat ulang"
 
-#: ../src/wx/xrc/GBMapViewer.xrc:157 ../src/wx/xrc/Logging.xrc:112
-#: ../src/wx/xrc/MapViewer.xrc:219
+#: xrc/GBMapViewer.xrc:157 xrc/Logging.xrc:112 xrc/MapViewer.xrc:219
 msgid "&Save"
 msgstr "&Simpan"
 
-#: ../src/wx/xrc/GBOAMViewer.xrc:13 ../src/wx/xrc/OAMViewer.xrc:14
+#: xrc/GBOAMViewer.xrc:13 xrc/OAMViewer.xrc:14
 msgid "Sprite:"
 msgstr "Sprite:"
 
-#: ../src/wx/xrc/GBOAMViewer.xrc:29 ../src/wx/xrc/OAMViewer.xrc:29
+#: xrc/GBOAMViewer.xrc:29 xrc/OAMViewer.xrc:29
 msgid "Pos:"
 msgstr "Pos:"
 
-#: ../src/wx/xrc/GBOAMViewer.xrc:45 ../src/wx/xrc/OAMViewer.xrc:69
+#: xrc/GBOAMViewer.xrc:45 xrc/OAMViewer.xrc:69
 msgid "Prio:"
 msgstr "Prio:"
 
-#: ../src/wx/xrc/GBOAMViewer.xrc:53
+#: xrc/GBOAMViewer.xrc:53
 msgid "OAP:"
 msgstr "OAP:"
 
-#: ../src/wx/xrc/GBOAMViewer.xrc:61 ../src/wx/xrc/OAMViewer.xrc:53
+#: xrc/GBOAMViewer.xrc:61 xrc/OAMViewer.xrc:53
 msgid "Pal:"
 msgstr "Pal:"
 
-#: ../src/wx/xrc/GBOAMViewer.xrc:69 ../src/wx/xrc/OAMViewer.xrc:93
+#: xrc/GBOAMViewer.xrc:69 xrc/OAMViewer.xrc:93
 msgid "Flags:"
 msgstr "Flag:"
 
-#: ../src/wx/xrc/GBOAMViewer.xrc:77
+#: xrc/GBOAMViewer.xrc:77
 msgid "Bank:"
 msgstr "Bank:"
 
-#: ../src/wx/xrc/GBOAMViewer.xrc:149 ../src/wx/xrc/GBTileViewer.xrc:152
-#: ../src/wx/xrc/MemViewer.xrc:115 ../src/wx/xrc/OAMViewer.xrc:162
-#: ../src/wx/xrc/TileViewer.xrc:168
+#: xrc/GBOAMViewer.xrc:149 xrc/GBTileViewer.xrc:152 xrc/MemViewer.xrc:115
+#: xrc/OAMViewer.xrc:162 xrc/TileViewer.xrc:168
 msgid "&Save..."
 msgstr "&Simpan..."
 
-#: ../src/wx/xrc/GBPaletteViewer.xrc:8 ../src/wx/xrc/PaletteViewer.xrc:9
+#: xrc/GBPaletteViewer.xrc:8 xrc/PaletteViewer.xrc:9
 msgid "Click on a color for more information"
 msgstr "Klik pada warna untuk mendapatkan informasi lebih lanjut"
 
-#: ../src/wx/xrc/GBPaletteViewer.xrc:27 ../src/wx/xrc/PaletteViewer.xrc:105
+#: xrc/GBPaletteViewer.xrc:27 xrc/PaletteViewer.xrc:105
 msgid "Save &BG..."
 msgstr "Simpan &BG..."
 
-#: ../src/wx/xrc/GBPaletteViewer.xrc:38 ../src/wx/xrc/PaletteViewer.xrc:33
+#: xrc/GBPaletteViewer.xrc:38 xrc/PaletteViewer.xrc:33
 msgid "Sprite"
 msgstr "Sprite"
 
-#: ../src/wx/xrc/GBPaletteViewer.xrc:48 ../src/wx/xrc/PaletteViewer.xrc:111
+#: xrc/GBPaletteViewer.xrc:48 xrc/PaletteViewer.xrc:111
 msgid "Save &Sprite..."
 msgstr "Simpan &Sprite..."
 
-#: ../src/wx/xrc/GBPaletteViewer.xrc:67
+#: xrc/GBPaletteViewer.xrc:67
 msgid "Index:"
 msgstr "Indeks:"
 
-#: ../src/wx/xrc/GBPaletteViewer.xrc:79 ../src/wx/xrc/IOViewer.xrc:21
-#: ../src/wx/xrc/PaletteViewer.xrc:62
+#: xrc/GBPaletteViewer.xrc:79 xrc/IOViewer.xrc:21 xrc/PaletteViewer.xrc:62
 msgid "Value:"
 msgstr "Nilai:"
 
-#: ../src/wx/xrc/GBPrinter.xrc:21
+#: xrc/GBPrinter.xrc:21
 msgid "Print Si&ze"
 msgstr "U&kuran Cetak"
 
-#: ../src/wx/xrc/GBPrinter.xrc:29
+#: xrc/GBPrinter.xrc:29
 msgid "1x"
 msgstr "1x"
 
-#: ../src/wx/xrc/GBPrinter.xrc:30
+#: xrc/GBPrinter.xrc:30
 msgid "2x"
 msgstr "2x"
 
-#: ../src/wx/xrc/GBPrinter.xrc:31
+#: xrc/GBPrinter.xrc:31
 msgid "3x"
 msgstr "3x"
 
-#: ../src/wx/xrc/GBPrinter.xrc:32
+#: xrc/GBPrinter.xrc:32
 msgid "4x"
 msgstr "4x"
 
-#: ../src/wx/xrc/GBPrinter.xrc:58
+#: xrc/GBPrinter.xrc:58
 msgid "C&ontinue"
 msgstr "L&anjutkan"
 
-#: ../src/wx/xrc/GBROMInfo.xrc:48
+#: xrc/GBROMInfo.xrc:48
 msgid "Unit code:"
 msgstr "Kode unit:"
 
-#: ../src/wx/xrc/GBROMInfo.xrc:60
+#: xrc/GBROMInfo.xrc:60
 msgid "Cartridge type:"
 msgstr "Tipe cartridge:"
 
-#: ../src/wx/xrc/GBROMInfo.xrc:96
+#: xrc/GBROMInfo.xrc:96
 msgid "Color:"
 msgstr "Warna:"
 
-#: ../src/wx/xrc/GBROMInfo.xrc:108
+#: xrc/GBROMInfo.xrc:108
 msgid "ROM size:"
 msgstr "Ukuran ROM:"
 
-#: ../src/wx/xrc/GBROMInfo.xrc:120
+#: xrc/GBROMInfo.xrc:120
 msgid "RAM size:"
 msgstr "Ukuran RAM:"
 
-#: ../src/wx/xrc/GBROMInfo.xrc:132
+#: xrc/GBROMInfo.xrc:132
 msgid "Dest. code:"
 msgstr "Kode tujuan:"
 
-#: ../src/wx/xrc/GBROMInfo.xrc:144
+#: xrc/GBROMInfo.xrc:144
 msgid "License code:"
 msgstr "Kode lisensi:"
 
-#: ../src/wx/xrc/GBROMInfo.xrc:156
+#: xrc/GBROMInfo.xrc:156
 msgid "Checksum:"
 msgstr "Checksum:"
 
-#: ../src/wx/xrc/GBTileViewer.xrc:14
+#: xrc/GBTileViewer.xrc:14
 msgid "&0"
 msgstr "&0"
 
-#: ../src/wx/xrc/GBTileViewer.xrc:20 ../src/wx/xrc/MainMenu.xrc:52
-#: ../src/wx/xrc/MainMenu.xrc:108
+#: xrc/GBTileViewer.xrc:20 xrc/MainMenu.xrc:58 xrc/MainMenu.xrc:114
 msgid "&1"
 msgstr "&1"
 
-#: ../src/wx/xrc/GBTileViewer.xrc:23
+#: xrc/GBTileViewer.xrc:23
 msgid "VRAM Bank"
 msgstr "VRAM Bank"
 
-#: ../src/wx/xrc/GBTileViewer.xrc:33
+#: xrc/GBTileViewer.xrc:33
 msgid "0x&8000"
 msgstr "0x&8000"
 
-#: ../src/wx/xrc/GBTileViewer.xrc:39
+#: xrc/GBTileViewer.xrc:39
 msgid "0x&8800"
 msgstr "0x&8800"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:4
+#: xrc/GameBoyAdvanceConfig.xrc:4
+msgid "Game Boy Advance settings"
+msgstr "Pengaturan Game Boy Advance"
+
+#: xrc/GameBoyAdvanceConfig.xrc:21
+msgid "Save type :"
+msgstr "Tipe penyimpanan :"
+
+#: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
+#: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
+msgid "Automatic"
+msgstr "Otomatis"
+
+#: xrc/GameBoyAdvanceConfig.xrc:28 xrc/GameBoyAdvanceConfig.xrc:200
+msgid "EEPROM"
+msgstr "EEPROM"
+
+#: xrc/GameBoyAdvanceConfig.xrc:29 xrc/GameBoyAdvanceConfig.xrc:201
+msgid "SRAM"
+msgstr "SRAM"
+
+#: xrc/GameBoyAdvanceConfig.xrc:30 xrc/GameBoyAdvanceConfig.xrc:202
+msgid "Flash"
+msgstr "Flash"
+
+#: xrc/GameBoyAdvanceConfig.xrc:31
+msgid "EEPROM + Sensor"
+msgstr "EEPROM + Sensor"
+
+#: xrc/GameBoyAdvanceConfig.xrc:43
+msgid "Flash size :"
+msgstr "Ukuran flash :"
+
+#: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
+msgid "64K"
+msgstr "64K"
+
+#: xrc/GameBoyAdvanceConfig.xrc:50 xrc/GameBoyAdvanceConfig.xrc:222
+msgid "128K"
+msgstr "128K"
+
+#: xrc/GameBoyAdvanceConfig.xrc:64
+msgid "Detect Now"
+msgstr "Deteksi Sekarang"
+
+#: xrc/GameBoyAdvanceConfig.xrc:69
+msgid "Cartridge"
+msgstr "Cartridge"
+
+#: xrc/GameBoyAdvanceConfig.xrc:77
+msgid "Save type"
+msgstr "Tipe penyimpanan"
+
+#: xrc/GameBoyAdvanceConfig.xrc:92
+msgid "Bios file :"
+msgstr "File Bios"
+
+#: xrc/GameBoyAdvanceConfig.xrc:115
+msgid "Current BIOS file :"
+msgstr "Berkas BIOS saat ini :"
+
+#: xrc/GameBoyAdvanceConfig.xrc:122 xrc/GameBoyConfig.xrc:138
+#: xrc/GameBoyConfig.xrc:159
+msgid "(None)"
+msgstr "(Tidak ada)"
+
+#: xrc/GameBoyAdvanceConfig.xrc:136 xrc/GameBoyConfig.xrc:168
+msgid "Boot ROM"
+msgstr "Boot ROM"
+
+#: xrc/GameBoyAdvanceConfig.xrc:146
+msgid "Game Code"
+msgstr "Kode Permainan"
+
+#: xrc/GameBoyAdvanceConfig.xrc:160
+msgid "Comment"
+msgstr "Komentar"
+
+#: xrc/GameBoyAdvanceConfig.xrc:172
+msgid "Real Time Clock:"
+msgstr "Waktu Sekarang"
+
+#: xrc/GameBoyAdvanceConfig.xrc:180 xrc/GameBoyAdvanceConfig.xrc:198
+#: xrc/GameBoyAdvanceConfig.xrc:220 xrc/GameBoyAdvanceConfig.xrc:238
+#: xrc/GameBoyConfig.xrc:180
+msgid "Default"
+msgstr "Default"
+
+#: xrc/GameBoyAdvanceConfig.xrc:181 xrc/GameBoyAdvanceConfig.xrc:239
+msgid "Disabled"
+msgstr "Non aktifkan"
+
+#: xrc/GameBoyAdvanceConfig.xrc:182 xrc/GameBoyAdvanceConfig.xrc:240
+msgid "Enabled"
+msgstr "Aktifkan"
+
+#: xrc/GameBoyAdvanceConfig.xrc:190
+msgid "Save Type:"
+msgstr "Tipe penyimpanan:"
+
+#: xrc/GameBoyAdvanceConfig.xrc:203
+msgid "EEPROM+Sensor"
+msgstr "EEPROM+Sensor"
+
+#: xrc/GameBoyAdvanceConfig.xrc:212
+msgid "Flash Size:"
+msgstr "Ukuran Flash:"
+
+#: xrc/GameBoyAdvanceConfig.xrc:230
+msgid "Mirroring:"
+msgstr "Mirroring:"
+
+#: xrc/GameBoyAdvanceConfig.xrc:254
+msgid "&Defaults"
+msgstr "&Default"
+
+#: xrc/GameBoyAdvanceConfig.xrc:261
+msgid "Game Overrides"
+msgstr "Timpahan Permainan"
+
+#: xrc/GameBoyConfig.xrc:4
+msgid "GameBoy settings"
+msgstr "Pengaturan GameBoy"
+
+#: xrc/GameBoyConfig.xrc:20
+msgid "Emulated &system :"
+msgstr "Sistem yang &ditiru"
+
+#: xrc/GameBoyConfig.xrc:30
+msgid "Game Boy Color"
+msgstr "Game Boy Color"
+
+#: xrc/GameBoyConfig.xrc:31
+msgid "Super Game Boy"
+msgstr "Super Game Boy"
+
+#: xrc/GameBoyConfig.xrc:32 xrc/SoundConfig.xrc:290
+msgid "Game Boy"
+msgstr "Game Boy"
+
+#: xrc/GameBoyConfig.xrc:33 xrc/SoundConfig.xrc:335
+msgid "Game Boy Advance"
+msgstr "Game Boy Advance"
+
+#: xrc/GameBoyConfig.xrc:34
+msgid "Super Game Boy 2"
+msgstr "Super Game Boy 2"
+
+#: xrc/GameBoyConfig.xrc:48
+msgid "Display &borders :"
+msgstr "Display &borders :"
+
+#: xrc/GameBoyConfig.xrc:57
+msgid "Never"
+msgstr "Never"
+
+#: xrc/GameBoyConfig.xrc:58
+msgid "Always"
+msgstr "Always"
+
+#: xrc/GameBoyConfig.xrc:72
+msgid "System"
+msgstr "System"
+
+#: xrc/GameBoyConfig.xrc:84
+msgid "GB Boot &ROM file :"
+msgstr "Berkas GB Boot & ROM :"
+
+#: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
+msgid "Select A File"
+msgstr "Pilih File"
+
+#: xrc/GameBoyConfig.xrc:106
+msgid "GBC Boot ROM &file :"
+msgstr "File Boot ROM &GBC :"
+
+#: xrc/GameBoyConfig.xrc:131
+msgid "Current GB BIOS file :"
+msgstr "Berkas BIOS GB saat ini :"
+
+#: xrc/GameBoyConfig.xrc:152
+msgid "Current GBC BIOS file :"
+msgstr "Berkas BIOS GBC saat ini :"
+
+#: xrc/GameBoyConfig.xrc:186
+msgid "User 1"
+msgstr "Pengguna 1"
+
+#: xrc/GameBoyConfig.xrc:192
+msgid "User 2"
+msgstr "Pengguna 2"
+
+#: xrc/GameBoyConfig.xrc:198
+msgid "Custom Colors"
+msgstr "Warna Kustom"
+
+#: xrc/GeneralConfig.xrc:4
 msgid "General settings"
 msgstr "Pengaturan umum"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:9
+#: xrc/GeneralConfig.xrc:9
 msgid "General"
 msgstr "Umum"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:26
+#: xrc/GeneralConfig.xrc:26
 msgid "Screenshot Format:"
 msgstr "Format Screenshot:"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:33
+#: xrc/GeneralConfig.xrc:33
 msgid "&PNG"
 msgstr "&PNG"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:42
+#: xrc/GeneralConfig.xrc:42
 msgid "&BMP"
 msgstr "&BMP"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:57
+#: xrc/GeneralConfig.xrc:57
 msgid "&Rewind interval :"
 msgstr "&Interval Putar Balik :"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:58
+#: xrc/GeneralConfig.xrc:58
 msgid "If not empty or 0, enable rewind (seconds)"
 msgstr "Jika tidak kosong atau 0, aktifkan putar balik (dalam detik)"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:67
+#: xrc/GeneralConfig.xrc:67
 msgid "seconds (0-600); 0 = disable"
 msgstr "detik (0-600); 0 = non aktifkan"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:78
+#: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
 msgstr "&Throttle"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:96 ../src/wx/xrc/SpeedupConfig.xrc:27
+#: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 #, c-format
 msgid "% of normal:"
 msgstr "% of normal:"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:106
+#: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
 msgstr "0 = non aktifkan throttle"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:115 ../src/wx/xrc/SpeedupConfig.xrc:46
+#: xrc/GeneralConfig.xrc:115 xrc/SpeedupConfig.xrc:46
 msgid "25%"
 msgstr "25%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:116 ../src/wx/xrc/SpeedupConfig.xrc:47
+#: xrc/GeneralConfig.xrc:116 xrc/SpeedupConfig.xrc:47
 msgid "50%"
 msgstr "50%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:117 ../src/wx/xrc/SpeedupConfig.xrc:48
+#: xrc/GeneralConfig.xrc:117 xrc/SpeedupConfig.xrc:48
 msgid "75%"
 msgstr "75%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:118 ../src/wx/xrc/SoundConfig.xrc:45
-#: ../src/wx/xrc/SpeedupConfig.xrc:49
+#: xrc/GeneralConfig.xrc:118 xrc/SoundConfig.xrc:45 xrc/SpeedupConfig.xrc:49
 msgid "100%"
 msgstr "100%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:119 ../src/wx/xrc/SpeedupConfig.xrc:50
+#: xrc/GeneralConfig.xrc:119 xrc/SpeedupConfig.xrc:50
 msgid "125%"
 msgstr "125%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:120 ../src/wx/xrc/SpeedupConfig.xrc:51
+#: xrc/GeneralConfig.xrc:120 xrc/SpeedupConfig.xrc:51
 msgid "150%"
 msgstr "150%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:121 ../src/wx/xrc/SpeedupConfig.xrc:52
+#: xrc/GeneralConfig.xrc:121 xrc/SpeedupConfig.xrc:52
 msgid "175%"
 msgstr "175%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:122 ../src/wx/xrc/SpeedupConfig.xrc:53
+#: xrc/GeneralConfig.xrc:122 xrc/SpeedupConfig.xrc:53
 msgid "200%"
 msgstr "200%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:123 ../src/wx/xrc/SpeedupConfig.xrc:54
+#: xrc/GeneralConfig.xrc:123 xrc/SpeedupConfig.xrc:54
 msgid "225%"
 msgstr "225%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:124 ../src/wx/xrc/SpeedupConfig.xrc:55
+#: xrc/GeneralConfig.xrc:124 xrc/SpeedupConfig.xrc:55
 msgid "250%"
 msgstr "250%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:125 ../src/wx/xrc/SpeedupConfig.xrc:56
+#: xrc/GeneralConfig.xrc:125 xrc/SpeedupConfig.xrc:56
 msgid "275%"
 msgstr "275%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:126 ../src/wx/xrc/SpeedupConfig.xrc:57
+#: xrc/GeneralConfig.xrc:126 xrc/SpeedupConfig.xrc:57
 msgid "300%"
 msgstr "300%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:127 ../src/wx/xrc/SpeedupConfig.xrc:58
+#: xrc/GeneralConfig.xrc:127 xrc/SpeedupConfig.xrc:58
 msgid "325%"
 msgstr "325%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:128 ../src/wx/xrc/SpeedupConfig.xrc:59
+#: xrc/GeneralConfig.xrc:128 xrc/SpeedupConfig.xrc:59
 msgid "350%"
 msgstr "350%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:129 ../src/wx/xrc/SpeedupConfig.xrc:60
+#: xrc/GeneralConfig.xrc:129 xrc/SpeedupConfig.xrc:60
 msgid "375%"
 msgstr "375%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:130 ../src/wx/xrc/SpeedupConfig.xrc:61
+#: xrc/GeneralConfig.xrc:130 xrc/SpeedupConfig.xrc:61
 msgid "400%"
 msgstr "400%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:131 ../src/wx/xrc/SpeedupConfig.xrc:62
+#: xrc/GeneralConfig.xrc:131 xrc/SpeedupConfig.xrc:62
 msgid "425%"
 msgstr "425%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:132 ../src/wx/xrc/SpeedupConfig.xrc:63
+#: xrc/GeneralConfig.xrc:132 xrc/SpeedupConfig.xrc:63
 msgid "450%"
 msgstr "450%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:133 ../src/wx/xrc/SpeedupConfig.xrc:64
+#: xrc/GeneralConfig.xrc:133 xrc/SpeedupConfig.xrc:64
 msgid "475%"
 msgstr "475%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:134 ../src/wx/xrc/SpeedupConfig.xrc:65
+#: xrc/GeneralConfig.xrc:134 xrc/SpeedupConfig.xrc:65
 msgid "500%"
 msgstr "500%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:135 ../src/wx/xrc/SpeedupConfig.xrc:66
+#: xrc/GeneralConfig.xrc:135 xrc/SpeedupConfig.xrc:66
 msgid "525%"
 msgstr "525%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:136 ../src/wx/xrc/SpeedupConfig.xrc:67
+#: xrc/GeneralConfig.xrc:136 xrc/SpeedupConfig.xrc:67
 msgid "550%"
 msgstr "550%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:137 ../src/wx/xrc/SpeedupConfig.xrc:68
+#: xrc/GeneralConfig.xrc:137 xrc/SpeedupConfig.xrc:68
 msgid "575%"
 msgstr "575%"
 
-#: ../src/wx/xrc/GeneralConfig.xrc:138 ../src/wx/xrc/SpeedupConfig.xrc:69
+#: xrc/GeneralConfig.xrc:138 xrc/SpeedupConfig.xrc:69
 msgid "600%"
 msgstr "600%"
 
-#: ../src/wx/xrc/IOViewer.xrc:4
+#: xrc/IOViewer.xrc:4
 msgid "IO Viewer"
 msgstr "Tampilan IO"
 
-#: ../src/wx/xrc/IOViewer.xrc:10
+#: xrc/IOViewer.xrc:10
 msgid "a"
 msgstr "a"
 
-#: ../src/wx/xrc/IOViewer.xrc:11
+#: xrc/IOViewer.xrc:11
 msgid "b"
 msgstr "b"
 
-#: ../src/wx/xrc/IOViewer.xrc:47
+#: xrc/IOViewer.xrc:47
 msgid "15 "
 msgstr "15 "
 
-#: ../src/wx/xrc/IOViewer.xrc:64
+#: xrc/IOViewer.xrc:64
 msgid "14 "
 msgstr "14 "
 
-#: ../src/wx/xrc/IOViewer.xrc:81
+#: xrc/IOViewer.xrc:81
 msgid "13 "
 msgstr "13 "
 
-#: ../src/wx/xrc/IOViewer.xrc:98
+#: xrc/IOViewer.xrc:98
 msgid "12 "
 msgstr "12 "
 
-#: ../src/wx/xrc/IOViewer.xrc:115
+#: xrc/IOViewer.xrc:115
 msgid "11 "
 msgstr "11 "
 
-#: ../src/wx/xrc/IOViewer.xrc:132
+#: xrc/IOViewer.xrc:132
 msgid "10 "
 msgstr "10 "
 
-#: ../src/wx/xrc/IOViewer.xrc:149
+#: xrc/IOViewer.xrc:149
 msgid "9 "
 msgstr "9 "
 
-#: ../src/wx/xrc/IOViewer.xrc:166
+#: xrc/IOViewer.xrc:166
 msgid "8 "
 msgstr "8 "
 
-#: ../src/wx/xrc/IOViewer.xrc:183
+#: xrc/IOViewer.xrc:183
 msgid "7 "
 msgstr "7 "
 
-#: ../src/wx/xrc/IOViewer.xrc:200
+#: xrc/IOViewer.xrc:200
 msgid "6 "
 msgstr "6 "
 
-#: ../src/wx/xrc/IOViewer.xrc:217
+#: xrc/IOViewer.xrc:217
 msgid "5 "
 msgstr "5 "
 
-#: ../src/wx/xrc/IOViewer.xrc:234
+#: xrc/IOViewer.xrc:234
 msgid "4 "
 msgstr "4 "
 
-#: ../src/wx/xrc/IOViewer.xrc:251
+#: xrc/IOViewer.xrc:251
 msgid "3 "
 msgstr "3 "
 
-#: ../src/wx/xrc/IOViewer.xrc:268
+#: xrc/IOViewer.xrc:268
 msgid "2 "
 msgstr "2 "
 
-#: ../src/wx/xrc/IOViewer.xrc:285
+#: xrc/IOViewer.xrc:285
 msgid "1 "
 msgstr "1 "
 
-#: ../src/wx/xrc/IOViewer.xrc:302
+#: xrc/IOViewer.xrc:302
 msgid "0 "
 msgstr "0 "
 
-#: ../src/wx/xrc/JoypadConfig.xrc:4
-msgid "Joypad Configuration"
-msgstr "Konfigurasi Joypad"
-
-#: ../src/wx/xrc/JoypadConfig.xrc:13
-msgid "Player 1"
-msgstr "Pemain 1"
-
-#: ../src/wx/xrc/JoypadConfig.xrc:19
-msgid "Player 2"
-msgstr "Pemain 2"
-
-#: ../src/wx/xrc/JoypadConfig.xrc:25
-msgid "Player 3"
-msgstr "Pemain 3"
-
-#: ../src/wx/xrc/JoypadConfig.xrc:31
-msgid "Player 4"
-msgstr "Pemain 4"
-
-#: ../src/wx/xrc/JoyPanel.xrc:8
+#: xrc/JoyPanel.xrc:8
 msgid ""
 "Click a field and press a key or move joystick to add.  Press backspace to "
 "delete last added key.  Resize window or click inside and move pointer to "
 "see entire contents if too small."
 msgstr "Klik kolom lalu tekan tombol atau gerakkan joystick untuk menambahkan tombol. Tekan backspace untuk menghapus tombol yang terakhir ditambahkan. Perbesar window atau klik di dalamnya lalu gerakkan pointer untuk melihat seluruh konten jika konten terlalu kecil."
 
-#: ../src/wx/xrc/JoyPanel.xrc:14 ../src/wx/xrc/MainMenu.xrc:446
+#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:452
 msgid "Up"
 msgstr "Atas"
 
-#: ../src/wx/xrc/JoyPanel.xrc:37
+#: xrc/JoyPanel.xrc:37
 msgid "A"
 msgstr "A"
 
-#: ../src/wx/xrc/JoyPanel.xrc:60 ../src/wx/xrc/MainMenu.xrc:450
+#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:456
 msgid "Down"
 msgstr "Bawah"
 
-#: ../src/wx/xrc/JoyPanel.xrc:83
+#: xrc/JoyPanel.xrc:83
 msgid "B"
 msgstr "B"
 
-#: ../src/wx/xrc/JoyPanel.xrc:106 ../src/wx/xrc/MainMenu.xrc:454
+#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:460
 msgid "Left"
 msgstr "Kiri"
 
-#: ../src/wx/xrc/JoyPanel.xrc:129
+#: xrc/JoyPanel.xrc:129
 msgid "L"
 msgstr "L"
 
-#: ../src/wx/xrc/JoyPanel.xrc:152 ../src/wx/xrc/MainMenu.xrc:458
+#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:464
 msgid "Right"
 msgstr "Kanan"
 
-#: ../src/wx/xrc/JoyPanel.xrc:175
+#: xrc/JoyPanel.xrc:175
 msgid "R"
 msgstr "R"
 
-#: ../src/wx/xrc/JoyPanel.xrc:199 ../src/wx/xrc/MainMenu.xrc:478
+#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:484
 msgid "Select"
 msgstr "Select"
 
-#: ../src/wx/xrc/JoyPanel.xrc:222 ../src/wx/xrc/MainMenu.xrc:482
+#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:488
 msgid "Start"
 msgstr "Start"
 
-#: ../src/wx/xrc/JoyPanel.xrc:254
+#: xrc/JoyPanel.xrc:254
 msgid "Motion Up"
 msgstr "Gerakan ke Atas"
 
-#: ../src/wx/xrc/JoyPanel.xrc:276
+#: xrc/JoyPanel.xrc:276
 msgid "Autofire A"
 msgstr "Tekan otomatis A"
 
-#: ../src/wx/xrc/JoyPanel.xrc:298
+#: xrc/JoyPanel.xrc:298
 msgid "Motion Down"
 msgstr "Gerakan ke Bawah"
 
-#: ../src/wx/xrc/JoyPanel.xrc:320
+#: xrc/JoyPanel.xrc:320
 msgid "Autofire B"
 msgstr "Tekan otomatis B"
 
-#: ../src/wx/xrc/JoyPanel.xrc:342
+#: xrc/JoyPanel.xrc:342
 msgid "Motion Left/Dark"
 msgstr "Gerakan ke Kiri/Gelap"
 
-#: ../src/wx/xrc/JoyPanel.xrc:386
+#: xrc/JoyPanel.xrc:386
 msgid "Motion Right/Light"
 msgstr "Gerakan ke Kanan/Terang"
 
-#: ../src/wx/xrc/JoyPanel.xrc:408
+#: xrc/JoyPanel.xrc:408
 msgid "Speed Up"
 msgstr "Percepat"
 
-#: ../src/wx/xrc/JoyPanel.xrc:430
+#: xrc/JoyPanel.xrc:430
 msgid "Spin Left"
 msgstr "Putar ke Kiri"
 
-#: ../src/wx/xrc/JoyPanel.xrc:461
+#: xrc/JoyPanel.xrc:461
 msgid "Spin Right"
 msgstr "Putar ke Kanan"
 
-#: ../src/wx/xrc/JoyPanel.xrc:483
+#: xrc/JoyPanel.xrc:483
 msgid "Screenshot"
 msgstr "Screenshot"
 
-#: ../src/wx/xrc/JoyPanel.xrc:507
+#: xrc/JoyPanel.xrc:507
 msgid "Special"
 msgstr "Tombol Khusus"
 
-#: ../src/wx/xrc/JoyPanel.xrc:515
+#: xrc/JoyPanel.xrc:515
 msgid "Use as default"
 msgstr "Gunakan sebagai default"
 
-#: ../src/wx/xrc/JoyPanel.xrc:522
+#: xrc/JoyPanel.xrc:522
 msgid "Defaults"
 msgstr "Default"
 
-#: ../src/wx/xrc/JoyPanel.xrc:529
+#: xrc/JoyPanel.xrc:529
 msgid "Clear All"
 msgstr "Bersihkan Semua"
 
-#: ../src/wx/xrc/LinkConfig.xrc:4
+#: xrc/JoypadConfig.xrc:4
+msgid "Joypad Configuration"
+msgstr "Konfigurasi Joypad"
+
+#: xrc/JoypadConfig.xrc:13
+msgid "Player 1"
+msgstr "Pemain 1"
+
+#: xrc/JoypadConfig.xrc:19
+msgid "Player 2"
+msgstr "Pemain 2"
+
+#: xrc/JoypadConfig.xrc:25
+msgid "Player 3"
+msgstr "Pemain 3"
+
+#: xrc/JoypadConfig.xrc:31
+msgid "Player 4"
+msgstr "Pemain 4"
+
+#: xrc/LinkConfig.xrc:4
 msgid "Link configuration"
 msgstr "Konfigurasi hubungan"
 
-#: ../src/wx/xrc/LinkConfig.xrc:11
+#: xrc/LinkConfig.xrc:11
 msgid "Link timeout (in milliseconds)"
 msgstr "Timeout hubungan (dalam mili detik)"
 
-#: ../src/wx/xrc/Logging.xrc:4
+#: xrc/Logging.xrc:4
 msgid "Logging"
 msgstr "Menyimpan log"
 
-#: ../src/wx/xrc/Logging.xrc:13
+#: xrc/Logging.xrc:13
 msgid "SW&I"
 msgstr "SW&I"
 
-#: ../src/wx/xrc/Logging.xrc:20
+#: xrc/Logging.xrc:20
 msgid "Unaligned &memory"
 msgstr "Memori &paralel"
 
-#: ../src/wx/xrc/Logging.xrc:27
+#: xrc/Logging.xrc:27
 msgid "Illegal &write"
 msgstr "Penyimpanan &ilegal"
 
-#: ../src/wx/xrc/Logging.xrc:34
+#: xrc/Logging.xrc:34
 msgid "Illegal &read"
 msgstr "Pembacaan &ilegal"
 
-#: ../src/wx/xrc/Logging.xrc:41
+#: xrc/Logging.xrc:41
 msgid "DMA &0"
 msgstr "DMA &0"
 
-#: ../src/wx/xrc/Logging.xrc:48
+#: xrc/Logging.xrc:48
 msgid "DMA &1"
 msgstr "DMA &1"
 
-#: ../src/wx/xrc/Logging.xrc:55
+#: xrc/Logging.xrc:55
 msgid "DMA &2"
 msgstr "DMA &2"
 
-#: ../src/wx/xrc/Logging.xrc:62
+#: xrc/Logging.xrc:62
 msgid "DMA &3"
 msgstr "DMA &3"
 
-#: ../src/wx/xrc/Logging.xrc:69
+#: xrc/Logging.xrc:69
 msgid "&Undefined instruction"
 msgstr "&Instruksi tidak terdefinisi"
 
-#: ../src/wx/xrc/Logging.xrc:76
+#: xrc/Logging.xrc:76
 msgid "&AGBPrint"
 msgstr "&AGBPrint"
 
-#: ../src/wx/xrc/Logging.xrc:83
+#: xrc/Logging.xrc:83
 msgid "Soun&d output"
 msgstr "Kelu&aran suara"
 
-#: ../src/wx/xrc/Logging.xrc:88
+#: xrc/Logging.xrc:88
 msgid "Verbose"
 msgstr "Verbose"
 
-#: ../src/wx/xrc/MainMenu.xrc:5
+#: xrc/MainMenu.xrc:5
 msgid "&File"
 msgstr "&File"
 
-#: ../src/wx/xrc/MainMenu.xrc:7
+#: xrc/MainMenu.xrc:7
 msgid "Open..."
 msgstr "Buka..."
 
-#: ../src/wx/xrc/MainMenu.xrc:10
+#: xrc/MainMenu.xrc:10
 msgid "Open &GB..."
 msgstr "Buka &GB..."
 
-#: ../src/wx/xrc/MainMenu.xrc:13
+#: xrc/MainMenu.xrc:13
 msgid "Open GB&C..."
 msgstr "Buka GB&C..."
 
-#: ../src/wx/xrc/MainMenu.xrc:16
+#: xrc/MainMenu.xrc:16
 msgid "Open rece&nt"
 msgstr "Buka yang ter&akhir dibuka"
 
-#: ../src/wx/xrc/MainMenu.xrc:18
+#: xrc/MainMenu.xrc:18
 msgid "&Reset recent list"
 msgstr "&Hapus daftar terbaru"
 
-#: ../src/wx/xrc/MainMenu.xrc:21
+#: xrc/MainMenu.xrc:21
 msgid "&Freeze recent list"
 msgstr "&Bekukan daftar terbaru"
 
-#: ../src/wx/xrc/MainMenu.xrc:26
+#: xrc/MainMenu.xrc:26
 msgid "ROM in&formation..."
 msgstr "Informasi RO&M..."
 
-#: ../src/wx/xrc/MainMenu.xrc:30
+#: xrc/MainMenu.xrc:30
 msgid "&e-Reader"
 msgstr "&e-Reader"
 
-#: ../src/wx/xrc/MainMenu.xrc:32
+#: xrc/MainMenu.xrc:32
+msgid "&Reset Loading Dot Code"
+msgstr ""
+
+#: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
 msgstr "&Muat Dot Code..."
 
-#: ../src/wx/xrc/MainMenu.xrc:35
+#: xrc/MainMenu.xrc:38
+msgid "&Reset Saving Dot Code"
+msgstr ""
+
+#: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
 msgstr "&Simpan Dot Code..."
 
-#: ../src/wx/xrc/MainMenu.xrc:41
+#: xrc/MainMenu.xrc:47
 msgid "Most &recent"
 msgstr "Ter&baru"
 
-#: ../src/wx/xrc/MainMenu.xrc:44
+#: xrc/MainMenu.xrc:50
 msgid "Load current state slot"
 msgstr "Muat slot keadaan saat ini"
 
-#: ../src/wx/xrc/MainMenu.xrc:47
+#: xrc/MainMenu.xrc:53
 msgid "&Auto load most recent"
 msgstr "&Muat otomatis yang terbaru"
 
-#: ../src/wx/xrc/MainMenu.xrc:55 ../src/wx/xrc/MainMenu.xrc:111
+#: xrc/MainMenu.xrc:61 xrc/MainMenu.xrc:117
 msgid "&2"
 msgstr "&2"
 
-#: ../src/wx/xrc/MainMenu.xrc:58 ../src/wx/xrc/MainMenu.xrc:114
+#: xrc/MainMenu.xrc:64 xrc/MainMenu.xrc:120
 msgid "&3"
 msgstr "&3"
 
-#: ../src/wx/xrc/MainMenu.xrc:61 ../src/wx/xrc/MainMenu.xrc:117
+#: xrc/MainMenu.xrc:67 xrc/MainMenu.xrc:123
 msgid "&4"
 msgstr "&4"
 
-#: ../src/wx/xrc/MainMenu.xrc:64 ../src/wx/xrc/MainMenu.xrc:120
+#: xrc/MainMenu.xrc:70 xrc/MainMenu.xrc:126
 msgid "&5"
 msgstr "&5"
 
-#: ../src/wx/xrc/MainMenu.xrc:67 ../src/wx/xrc/MainMenu.xrc:123
+#: xrc/MainMenu.xrc:73 xrc/MainMenu.xrc:129
 msgid "&6"
 msgstr "&6"
 
-#: ../src/wx/xrc/MainMenu.xrc:70 ../src/wx/xrc/MainMenu.xrc:126
+#: xrc/MainMenu.xrc:76 xrc/MainMenu.xrc:132
 msgid "&7"
 msgstr "&7"
 
-#: ../src/wx/xrc/MainMenu.xrc:73 ../src/wx/xrc/MainMenu.xrc:129
+#: xrc/MainMenu.xrc:79 xrc/MainMenu.xrc:135
 msgid "&8"
 msgstr "&8"
 
-#: ../src/wx/xrc/MainMenu.xrc:76 ../src/wx/xrc/MainMenu.xrc:132
+#: xrc/MainMenu.xrc:82 xrc/MainMenu.xrc:138
 msgid "&9"
 msgstr "&9"
 
-#: ../src/wx/xrc/MainMenu.xrc:79 ../src/wx/xrc/MainMenu.xrc:135
+#: xrc/MainMenu.xrc:85 xrc/MainMenu.xrc:141
 msgid "1&0"
 msgstr "1&0"
 
-#: ../src/wx/xrc/MainMenu.xrc:83
+#: xrc/MainMenu.xrc:89
 msgid "From &File ..."
 msgstr "Dari &File ..."
 
-#: ../src/wx/xrc/MainMenu.xrc:87
+#: xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
 msgstr "Jangan ubah simpanan &baterai"
 
-#: ../src/wx/xrc/MainMenu.xrc:91
+#: xrc/MainMenu.xrc:97
 msgid "Do not change &cheat list"
 msgstr "Jangan ubah daftar &cheat"
 
-#: ../src/wx/xrc/MainMenu.xrc:94
+#: xrc/MainMenu.xrc:100
 msgid "&Load state"
 msgstr "&Muat state"
 
-#: ../src/wx/xrc/MainMenu.xrc:98
+#: xrc/MainMenu.xrc:104
 msgid "&Oldest slot"
 msgstr "&Slot terlama"
 
-#: ../src/wx/xrc/MainMenu.xrc:101
+#: xrc/MainMenu.xrc:107
 msgid "Save current state slot"
 msgstr "Simpan slot keadaan saat ini"
 
-#: ../src/wx/xrc/MainMenu.xrc:104
+#: xrc/MainMenu.xrc:110
 msgid "Increase state slot number and save"
 msgstr "Tambah jumlah slot keadaan lalu simpan"
 
-#: ../src/wx/xrc/MainMenu.xrc:139
+#: xrc/MainMenu.xrc:145
 msgid "To &File ..."
 msgstr "Ke &File ..."
 
-#: ../src/wx/xrc/MainMenu.xrc:141
+#: xrc/MainMenu.xrc:147
 msgid "&Save state"
 msgstr "&Simpan state"
 
-#: ../src/wx/xrc/MainMenu.xrc:144
+#: xrc/MainMenu.xrc:150
 msgid "Increase state slot number"
 msgstr "Tambah jumlah slot keadaan"
 
-#: ../src/wx/xrc/MainMenu.xrc:147
+#: xrc/MainMenu.xrc:153
 msgid "Decrease state slot number"
 msgstr "Kurangi jumlah slot keadaan"
 
-#: ../src/wx/xrc/MainMenu.xrc:152 ../src/wx/xrc/MainMenu.xrc:164
+#: xrc/MainMenu.xrc:158 xrc/MainMenu.xrc:170
 msgid "&Battery file..."
 msgstr "&File baterai..."
 
-#: ../src/wx/xrc/MainMenu.xrc:155
+#: xrc/MainMenu.xrc:161
 msgid "Gameshark &code file..."
 msgstr "File &kode Gameshark"
 
-#: ../src/wx/xrc/MainMenu.xrc:158 ../src/wx/xrc/MainMenu.xrc:167
+#: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
 msgid "&Gameshark snapshot..."
 msgstr "&Snapshot Gameshark..."
 
-#: ../src/wx/xrc/MainMenu.xrc:160
+#: xrc/MainMenu.xrc:166
 msgid "&Import"
 msgstr "&Impor"
 
-#: ../src/wx/xrc/MainMenu.xrc:169
+#: xrc/MainMenu.xrc:175
 msgid "&Export"
 msgstr "&Ekspor"
 
-#: ../src/wx/xrc/MainMenu.xrc:173
+#: xrc/MainMenu.xrc:179
 msgid "Screen capt&ure..."
 msgstr "Simpan gam&bar..."
 
-#: ../src/wx/xrc/MainMenu.xrc:177
+#: xrc/MainMenu.xrc:183
 msgid "Start &sound recording..."
 msgstr "Memulai &rekaman suara..."
 
-#: ../src/wx/xrc/MainMenu.xrc:180
+#: xrc/MainMenu.xrc:186
 msgid "Stop s&ound recording"
 msgstr "Hentikan re&kaman suara"
 
-#: ../src/wx/xrc/MainMenu.xrc:183
+#: xrc/MainMenu.xrc:189
 msgid "Start &video recording..."
 msgstr "Memulai &rekaman video..."
 
-#: ../src/wx/xrc/MainMenu.xrc:186
+#: xrc/MainMenu.xrc:192
 msgid "Stop v&ideo recording"
 msgstr "Hentikan re&kaman video"
 
-#: ../src/wx/xrc/MainMenu.xrc:189
+#: xrc/MainMenu.xrc:195
 msgid "Start &game recording..."
 msgstr "Memulai &rekaman permainan..."
 
-#: ../src/wx/xrc/MainMenu.xrc:192
+#: xrc/MainMenu.xrc:198
 msgid "Stop g&ame recording"
 msgstr "Hentikan re&kaman permainan"
 
-#: ../src/wx/xrc/MainMenu.xrc:194
+#: xrc/MainMenu.xrc:200
 msgid "&Record"
 msgstr "&Rekam"
 
-#: ../src/wx/xrc/MainMenu.xrc:198
+#: xrc/MainMenu.xrc:204
 msgid "Start playing &movie..."
 msgstr "Mulai mainkan &film..."
 
-#: ../src/wx/xrc/MainMenu.xrc:201
+#: xrc/MainMenu.xrc:207
 msgid "Stop playing m&ovie"
 msgstr "Berhenti memainkan fi&lm"
 
-#: ../src/wx/xrc/MainMenu.xrc:203
+#: xrc/MainMenu.xrc:209
 msgid "&Play"
 msgstr "&Mainkan"
 
-#: ../src/wx/xrc/MainMenu.xrc:208
+#: xrc/MainMenu.xrc:214
 msgid "&Quit"
 msgstr "&Keluar"
 
-#: ../src/wx/xrc/MainMenu.xrc:212
+#: xrc/MainMenu.xrc:218
 msgid "&Emulation"
 msgstr "&Tiruan"
 
-#: ../src/wx/xrc/MainMenu.xrc:214
+#: xrc/MainMenu.xrc:220
 msgid "&Pause"
 msgstr "&Hentikan"
 
-#: ../src/wx/xrc/MainMenu.xrc:218
+#: xrc/MainMenu.xrc:224
 msgid "&Next frame"
 msgstr "&Frame berikutnya"
 
-#: ../src/wx/xrc/MainMenu.xrc:221
+#: xrc/MainMenu.xrc:227
 msgid "Re&wind"
 msgstr "Pu&tar balik"
 
-#: ../src/wx/xrc/MainMenu.xrc:225
+#: xrc/MainMenu.xrc:231
 msgid "Toggle &full screen"
 msgstr "Toggle &layar penuh"
 
-#: ../src/wx/xrc/MainMenu.xrc:232
+#: xrc/MainMenu.xrc:238
 msgid "&Turbo mode"
 msgstr "&Mode turbo"
 
-#: ../src/wx/xrc/MainMenu.xrc:236
+#: xrc/MainMenu.xrc:242
 msgid "&VSync"
 msgstr "&VSync"
 
-#: ../src/wx/xrc/MainMenu.xrc:240
+#: xrc/MainMenu.xrc:246
 msgid "&Auto skip frames"
 msgstr "&Lewati frame secara otomatis"
 
-#: ../src/wx/xrc/MainMenu.xrc:245
+#: xrc/MainMenu.xrc:251
 msgid "&Skip BIOS"
 msgstr "&Lewati BIOS"
 
-#: ../src/wx/xrc/MainMenu.xrc:249
+#: xrc/MainMenu.xrc:255
 msgid "&Auto IPS/UPS/IPF patch"
 msgstr "&Patch IPS/UPS/IPF secara otomatis"
 
-#: ../src/wx/xrc/MainMenu.xrc:253
+#: xrc/MainMenu.xrc:259
 msgid "&Pause when inactive"
 msgstr "&Hentikan ketika tidak aktif"
 
-#: ../src/wx/xrc/MainMenu.xrc:258
+#: xrc/MainMenu.xrc:264
 msgid "&Reset"
 msgstr "&Muat ulang"
 
-#: ../src/wx/xrc/MainMenu.xrc:262
+#: xrc/MainMenu.xrc:268
 msgid "&Options"
 msgstr "&Pilihan"
 
-#: ../src/wx/xrc/MainMenu.xrc:264
+#: xrc/MainMenu.xrc:270
 msgid "&Link"
 msgstr "&Hubungan"
 
-#: ../src/wx/xrc/MainMenu.xrc:266
+#: xrc/MainMenu.xrc:272
 msgid "Start &Network Link ..."
 msgstr "Memulai &Hubungan Jaringan ..."
 
-#: ../src/wx/xrc/MainMenu.xrc:271
+#: xrc/MainMenu.xrc:277
 msgid "&Nothing"
 msgstr "&Tidak menggunakan apapun"
 
-#: ../src/wx/xrc/MainMenu.xrc:275
+#: xrc/MainMenu.xrc:281
 msgid "&Cable"
 msgstr "&Kabel"
 
-#: ../src/wx/xrc/MainMenu.xrc:279
+#: xrc/MainMenu.xrc:285
 msgid "&Wireless"
 msgstr "&Nirkabel"
 
-#: ../src/wx/xrc/MainMenu.xrc:283
+#: xrc/MainMenu.xrc:289
 msgid "&GameCube"
 msgstr "&GameCube"
 
-#: ../src/wx/xrc/MainMenu.xrc:287 ../src/wx/xrc/MainMenu.xrc:507
+#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:513
 msgid "&Game Boy"
 msgstr "&Game Boy"
 
-#: ../src/wx/xrc/MainMenu.xrc:292
+#: xrc/MainMenu.xrc:298
 msgid "&Local mode"
 msgstr "&Mode lokal"
 
-#: ../src/wx/xrc/MainMenu.xrc:296
+#: xrc/MainMenu.xrc:302
 msgid "&Link at boot"
 msgstr "&Hubungkan saat booting"
 
-#: ../src/wx/xrc/MainMenu.xrc:300
+#: xrc/MainMenu.xrc:306
 msgid "&Speed hack"
 msgstr "&Hack kecepatan"
 
-#: ../src/wx/xrc/MainMenu.xrc:304 ../src/wx/xrc/MainMenu.xrc:310
-#: ../src/wx/xrc/MainMenu.xrc:385 ../src/wx/xrc/MainMenu.xrc:421
+#: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:391
+#: xrc/MainMenu.xrc:427
 msgid "&Configure ..."
 msgstr "&Konfigurasi ..."
 
-#: ../src/wx/xrc/MainMenu.xrc:308
+#: xrc/MainMenu.xrc:314
 msgid "&Video"
 msgstr "&Video"
 
-#: ../src/wx/xrc/MainMenu.xrc:314
+#: xrc/MainMenu.xrc:320
 msgid "&Start in full screen"
 msgstr "&Buka dengan layar penuh"
 
-#: ../src/wx/xrc/MainMenu.xrc:318
+#: xrc/MainMenu.xrc:324
 msgid "&Scaled resize"
 msgstr "&Penyesuaian ukuran"
 
-#: ../src/wx/xrc/MainMenu.xrc:320
+#: xrc/MainMenu.xrc:326
 msgid "&1x"
 msgstr "&1x"
 
-#: ../src/wx/xrc/MainMenu.xrc:323
+#: xrc/MainMenu.xrc:329
 msgid "&2x"
 msgstr "&2x"
 
-#: ../src/wx/xrc/MainMenu.xrc:326
+#: xrc/MainMenu.xrc:332
 msgid "&3x"
 msgstr "&3x"
 
-#: ../src/wx/xrc/MainMenu.xrc:329
+#: xrc/MainMenu.xrc:335
 msgid "&4x"
 msgstr "&4x"
 
-#: ../src/wx/xrc/MainMenu.xrc:332
+#: xrc/MainMenu.xrc:338
 msgid "&5x"
 msgstr "&5x"
 
-#: ../src/wx/xrc/MainMenu.xrc:335
+#: xrc/MainMenu.xrc:341
 msgid "&6x"
 msgstr "&6x"
 
-#: ../src/wx/xrc/MainMenu.xrc:339
+#: xrc/MainMenu.xrc:345
 msgid "Change pixel filter"
 msgstr "Ubah filter pixel"
 
-#: ../src/wx/xrc/MainMenu.xrc:342
+#: xrc/MainMenu.xrc:348
 msgid "Change interframe blending"
 msgstr "Ubah penyamaran antarbingkai"
 
-#: ../src/wx/xrc/MainMenu.xrc:345
+#: xrc/MainMenu.xrc:351
 msgid "&Retain aspect ratio"
 msgstr "&Pertahankan rasio aspek"
 
-#: ../src/wx/xrc/MainMenu.xrc:349
+#: xrc/MainMenu.xrc:355
 msgid "Enable MMX"
 msgstr "Aktifkan MMX"
 
-#: ../src/wx/xrc/MainMenu.xrc:354
+#: xrc/MainMenu.xrc:360
 msgid "&Bilinear filter"
 msgstr "&Filter bilinear"
 
-#: ../src/wx/xrc/MainMenu.xrc:365
+#: xrc/MainMenu.xrc:371
 msgid "&Keep window on top"
 msgstr "&Pastikan window paling atas"
 
-#: ../src/wx/xrc/MainMenu.xrc:370
+#: xrc/MainMenu.xrc:376
 msgid "&Status bar"
 msgstr "&Baris menu"
 
-#: ../src/wx/xrc/MainMenu.xrc:374
+#: xrc/MainMenu.xrc:380
 msgid "&Disable on-screen display"
 msgstr "&Non aktifkan tampilan pada layar"
 
-#: ../src/wx/xrc/MainMenu.xrc:378
+#: xrc/MainMenu.xrc:384
 msgid "&Transparent on-screen display"
 msgstr "&Tampilan transparan pada layar"
 
-#: ../src/wx/xrc/MainMenu.xrc:383
+#: xrc/MainMenu.xrc:389
 msgid "&Audio"
 msgstr "&Audio"
 
-#: ../src/wx/xrc/MainMenu.xrc:388
+#: xrc/MainMenu.xrc:394
 msgid "&Increase volume"
 msgstr "&Tingkatkan volume"
 
-#: ../src/wx/xrc/MainMenu.xrc:392
+#: xrc/MainMenu.xrc:398
 msgid "&Decrease volume"
 msgstr "&Kurangi volume"
 
-#: ../src/wx/xrc/MainMenu.xrc:396
+#: xrc/MainMenu.xrc:402
 msgid "&Toggle sound"
 msgstr "&Jungkit suara"
 
-#: ../src/wx/xrc/MainMenu.xrc:401
+#: xrc/MainMenu.xrc:407
 msgid "&GBA sound interpolation"
 msgstr "&Interpolasi suara GBA"
 
-#: ../src/wx/xrc/MainMenu.xrc:406
+#: xrc/MainMenu.xrc:412
 msgid "&GB sound enhancement"
 msgstr "&Peningkatan suara GB"
 
-#: ../src/wx/xrc/MainMenu.xrc:410
+#: xrc/MainMenu.xrc:416
 msgid "&GB surround sound effect"
 msgstr "&GB surround sound effect"
 
-#: ../src/wx/xrc/MainMenu.xrc:414
+#: xrc/MainMenu.xrc:420
 msgid "&GB sound declicking"
 msgstr "&GB sound declicking"
 
-#: ../src/wx/xrc/MainMenu.xrc:419
+#: xrc/MainMenu.xrc:425
 msgid "&Input"
 msgstr "&Input"
 
-#: ../src/wx/xrc/MainMenu.xrc:425
+#: xrc/MainMenu.xrc:431
 msgid "&Autofire"
 msgstr "&Tekan otomatis"
 
-#: ../src/wx/xrc/MainMenu.xrc:427 ../src/wx/xrc/MainMenu.xrc:462
+#: xrc/MainMenu.xrc:433 xrc/MainMenu.xrc:468
 msgid "&A"
 msgstr "&A"
 
-#: ../src/wx/xrc/MainMenu.xrc:431 ../src/wx/xrc/MainMenu.xrc:466
+#: xrc/MainMenu.xrc:437 xrc/MainMenu.xrc:472
 msgid "&B"
 msgstr "&B"
 
-#: ../src/wx/xrc/MainMenu.xrc:435 ../src/wx/xrc/MainMenu.xrc:470
+#: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
 msgid "&L"
 msgstr "&L"
 
-#: ../src/wx/xrc/MainMenu.xrc:439 ../src/wx/xrc/MainMenu.xrc:474
+#: xrc/MainMenu.xrc:445 xrc/MainMenu.xrc:480
 msgid "&R"
 msgstr "&R"
 
-#: ../src/wx/xrc/MainMenu.xrc:444
+#: xrc/MainMenu.xrc:450
 msgid "&Autohold"
 msgstr "&Tahan otomatis"
 
-#: ../src/wx/xrc/MainMenu.xrc:488
+#: xrc/MainMenu.xrc:494
 msgid "&Game Boy Advance"
 msgstr "&Game Boy Advance"
 
-#: ../src/wx/xrc/MainMenu.xrc:490 ../src/wx/xrc/MainMenu.xrc:509
+#: xrc/MainMenu.xrc:496 xrc/MainMenu.xrc:515
 msgid "Configure ..."
 msgstr "Konfigurasi ..."
 
-#: ../src/wx/xrc/MainMenu.xrc:494
+#: xrc/MainMenu.xrc:500
 msgid "&Real-time clock"
 msgstr "&Waktu sebenarnya"
 
-#: ../src/wx/xrc/MainMenu.xrc:498
+#: xrc/MainMenu.xrc:504
 msgid "&Use BIOS file"
 msgstr "&Gunakan file BIOS"
 
-#: ../src/wx/xrc/MainMenu.xrc:502
+#: xrc/MainMenu.xrc:508
 msgid "&Debug print"
 msgstr "&Debug cetakan"
 
-#: ../src/wx/xrc/MainMenu.xrc:513
+#: xrc/MainMenu.xrc:519
 msgid "&GB printer"
 msgstr "&Printer GB"
 
-#: ../src/wx/xrc/MainMenu.xrc:517
+#: xrc/MainMenu.xrc:523
 msgid "&Gather a full page before printing"
 msgstr "&Kumpulkan halaman penuh sebelum mencetak"
 
-#: ../src/wx/xrc/MainMenu.xrc:521
+#: xrc/MainMenu.xrc:527
 msgid "&Save printouts as screen captures"
 msgstr "&Simpan cetakan sebagai screen capture"
 
-#: ../src/wx/xrc/MainMenu.xrc:526
+#: xrc/MainMenu.xrc:532
 msgid "&Use GB BIOS file"
 msgstr "&Gunakan file GB BIOS"
 
-#: ../src/wx/xrc/MainMenu.xrc:530
+#: xrc/MainMenu.xrc:536
 msgid "&Use GBC BIOS file"
 msgstr "&Gunakan file GBC BIOS"
 
-#: ../src/wx/xrc/MainMenu.xrc:535
+#: xrc/MainMenu.xrc:541
 msgid "&General ..."
 msgstr "&Umum ..."
 
-#: ../src/wx/xrc/MainMenu.xrc:538
+#: xrc/MainMenu.xrc:544
 msgid "&Speedup / Turbo ..."
 msgstr "&Percepat / Turbo ..."
 
-#: ../src/wx/xrc/MainMenu.xrc:541
+#: xrc/MainMenu.xrc:547
 msgid "D&irectories ..."
 msgstr "D&irektori ..."
 
-#: ../src/wx/xrc/MainMenu.xrc:544
+#: xrc/MainMenu.xrc:550
 msgid "&Key Shortcuts ..."
 msgstr "&Shortcut Tombol ..."
 
-#: ../src/wx/xrc/MainMenu.xrc:548
+#: xrc/MainMenu.xrc:554
 msgid "&Tools"
 msgstr "&Alat"
 
-#: ../src/wx/xrc/MainMenu.xrc:550
+#: xrc/MainMenu.xrc:556
 msgid "&Cheats"
 msgstr "&Cheat"
 
-#: ../src/wx/xrc/MainMenu.xrc:552
+#: xrc/MainMenu.xrc:558
 msgid "List &cheats ..."
 msgstr "Daftar &cheat ..."
 
-#: ../src/wx/xrc/MainMenu.xrc:555
+#: xrc/MainMenu.xrc:561
 msgid "Find c&heat ..."
 msgstr "Cari c&heat ..."
 
-#: ../src/wx/xrc/MainMenu.xrc:559
+#: xrc/MainMenu.xrc:565
 msgid "A&utomatically save/load cheats"
 msgstr "Simpan/muat cheat secara o&tomatis"
 
-#: ../src/wx/xrc/MainMenu.xrc:563
+#: xrc/MainMenu.xrc:569
 msgid "&Enable cheats"
 msgstr "Aktifkan cheat"
 
-#: ../src/wx/xrc/MainMenu.xrc:570
+#: xrc/MainMenu.xrc:576
 msgid "&Break into GDB"
 msgstr "&Pisahkan ke dalam GDB"
 
-#: ../src/wx/xrc/MainMenu.xrc:574
+#: xrc/MainMenu.xrc:580
 msgid "&Configure port..."
 msgstr "&Konfigurasi port..."
 
-#: ../src/wx/xrc/MainMenu.xrc:577
+#: xrc/MainMenu.xrc:583
 msgid "&Break on load"
 msgstr "&Pisahkan ketika memuat"
 
-#: ../src/wx/xrc/MainMenu.xrc:582
+#: xrc/MainMenu.xrc:588
 msgid "&Disconnect"
 msgstr "&Putuskan hubungan"
 
-#: ../src/wx/xrc/MainMenu.xrc:584
+#: xrc/MainMenu.xrc:590
 msgid "&GDB"
 msgstr "&GDB"
 
-#: ../src/wx/xrc/MainMenu.xrc:587
+#: xrc/MainMenu.xrc:593
 msgid "&Disassemble..."
 msgstr "&Membongkar..."
 
-#: ../src/wx/xrc/MainMenu.xrc:590
+#: xrc/MainMenu.xrc:596
 msgid "&Logging..."
 msgstr "&Membuat log..."
 
-#: ../src/wx/xrc/MainMenu.xrc:593
+#: xrc/MainMenu.xrc:599
 msgid "&IO Viewer..."
 msgstr "&Tampilan IO..."
 
-#: ../src/wx/xrc/MainMenu.xrc:596
+#: xrc/MainMenu.xrc:602
 msgid "&Map Viewer..."
 msgstr "&Tampilan Map..."
 
-#: ../src/wx/xrc/MainMenu.xrc:599
+#: xrc/MainMenu.xrc:605
 msgid "M&emory Viewer..."
 msgstr "T&ampilan Memori..."
 
-#: ../src/wx/xrc/MainMenu.xrc:602
+#: xrc/MainMenu.xrc:608
 msgid "&OAM Viewer..."
 msgstr "&Tampilan OAM..."
 
-#: ../src/wx/xrc/MainMenu.xrc:605
+#: xrc/MainMenu.xrc:611
 msgid "&Palette Viewer..."
 msgstr "&Tampilan Palet..."
 
-#: ../src/wx/xrc/MainMenu.xrc:608
+#: xrc/MainMenu.xrc:614
 msgid "&Tile Viewer..."
 msgstr "&Tampilan Tile..."
 
-#: ../src/wx/xrc/MainMenu.xrc:613
+#: xrc/MainMenu.xrc:619
 msgid "Show all video layers"
 msgstr "Tampilkan seluruh lapisan video"
 
-#: ../src/wx/xrc/MainMenu.xrc:617
+#: xrc/MainMenu.xrc:623
 msgid "BG &0"
 msgstr "BG &0"
 
-#: ../src/wx/xrc/MainMenu.xrc:622
+#: xrc/MainMenu.xrc:628
 msgid "BG &1"
 msgstr "BG &1"
 
-#: ../src/wx/xrc/MainMenu.xrc:627
+#: xrc/MainMenu.xrc:633
 msgid "BG &2"
 msgstr "BG &2"
 
-#: ../src/wx/xrc/MainMenu.xrc:632
+#: xrc/MainMenu.xrc:638
 msgid "BG &3"
 msgstr "BG &3"
 
-#: ../src/wx/xrc/MainMenu.xrc:637
+#: xrc/MainMenu.xrc:643
 msgid "&OBJ"
 msgstr "&OBJ"
 
-#: ../src/wx/xrc/MainMenu.xrc:642
+#: xrc/MainMenu.xrc:648
 msgid "&WIN 0"
 msgstr "&WIN 0"
 
-#: ../src/wx/xrc/MainMenu.xrc:647
+#: xrc/MainMenu.xrc:653
 msgid "W&IN 1"
 msgstr "W&IN 1"
 
-#: ../src/wx/xrc/MainMenu.xrc:652
+#: xrc/MainMenu.xrc:658
 msgid "O&BJ WIN"
 msgstr "O&BJ WIN"
 
-#: ../src/wx/xrc/MainMenu.xrc:656
+#: xrc/MainMenu.xrc:662
 msgid "&View Layers"
 msgstr "&Lihat Layer"
 
-#: ../src/wx/xrc/MainMenu.xrc:660
+#: xrc/MainMenu.xrc:666
 msgid "Channel &1"
 msgstr "Kanal &1"
 
-#: ../src/wx/xrc/MainMenu.xrc:665
+#: xrc/MainMenu.xrc:671
 msgid "Channel &2"
 msgstr "Kanal &2"
 
-#: ../src/wx/xrc/MainMenu.xrc:670
+#: xrc/MainMenu.xrc:676
 msgid "Channel &3"
 msgstr "Kanal &3"
 
-#: ../src/wx/xrc/MainMenu.xrc:675
+#: xrc/MainMenu.xrc:681
 msgid "Channel &4"
 msgstr "Kanal &4"
 
-#: ../src/wx/xrc/MainMenu.xrc:680
+#: xrc/MainMenu.xrc:686
 msgid "Direct Sound &A"
 msgstr "Suara Langsung &A"
 
-#: ../src/wx/xrc/MainMenu.xrc:685
+#: xrc/MainMenu.xrc:691
 msgid "Direct Sound &B"
 msgstr "Suara Langsung &B"
 
-#: ../src/wx/xrc/MainMenu.xrc:689
+#: xrc/MainMenu.xrc:695
 msgid "&Sound Channels"
 msgstr "&Kanal Suara"
 
-#: ../src/wx/xrc/MainMenu.xrc:693
+#: xrc/MainMenu.xrc:699
 msgid "&Help"
 msgstr "&Bantuan"
 
-#: ../src/wx/xrc/MainMenu.xrc:695
+#: xrc/MainMenu.xrc:701
 msgid "Report &Bugs"
 msgstr "Laporkan &Bug"
 
-#: ../src/wx/xrc/MainMenu.xrc:698
+#: xrc/MainMenu.xrc:704
 msgid "VBA-M Support &Forum"
 msgstr "Dukungan &Forum VBA-M"
 
-#: ../src/wx/xrc/MainMenu.xrc:701
+#: xrc/MainMenu.xrc:707
 msgid "Translations"
 msgstr "Terjemahan"
 
-#: ../src/wx/xrc/MainMenu.xrc:709
+#: xrc/MainMenu.xrc:715
 msgid "Check for updates"
 msgstr "Periksa pembaruan"
 
-#: ../src/wx/xrc/MainMenu.xrc:712
+#: xrc/MainMenu.xrc:718
 msgid "&Factory Reset..."
 msgstr "&Reset Pabrik..."
 
-#: ../src/wx/xrc/MainMenu.xrc:716
+#: xrc/MainMenu.xrc:722
 msgid "&About..."
 msgstr "&Ikhtisar..."
 
-#: ../src/wx/xrc/MapViewer.xrc:4
+#: xrc/MapViewer.xrc:4
 msgid "Map Viewer"
 msgstr "Tampilan Map"
 
-#: ../src/wx/xrc/MapViewer.xrc:16
+#: xrc/MapViewer.xrc:16
 msgid "Frame 0"
 msgstr "Frame 0"
 
-#: ../src/wx/xrc/MapViewer.xrc:22
+#: xrc/MapViewer.xrc:22
 msgid "Frame 1"
 msgstr "Frame 1"
 
-#: ../src/wx/xrc/MapViewer.xrc:25
+#: xrc/MapViewer.xrc:25
 msgid "Frame"
 msgstr "Frame"
 
-#: ../src/wx/xrc/MapViewer.xrc:35
+#: xrc/MapViewer.xrc:35
 msgid "BG0"
 msgstr "BG0"
 
-#: ../src/wx/xrc/MapViewer.xrc:41
+#: xrc/MapViewer.xrc:41
 msgid "BG1"
 msgstr "BG1"
 
-#: ../src/wx/xrc/MapViewer.xrc:46
+#: xrc/MapViewer.xrc:46
 msgid "BG2"
 msgstr "BG2"
 
-#: ../src/wx/xrc/MapViewer.xrc:51
+#: xrc/MapViewer.xrc:51
 msgid "BG3"
 msgstr "BG3"
 
-#: ../src/wx/xrc/MapViewer.xrc:84
+#: xrc/MapViewer.xrc:84
 msgid "Map Base:"
 msgstr "Basis Map:"
 
-#: ../src/wx/xrc/MapViewer.xrc:92
+#: xrc/MapViewer.xrc:92
 msgid "Char Base:"
 msgstr "Basis Karakter:"
 
-#: ../src/wx/xrc/MapViewer.xrc:100 ../src/wx/xrc/MemSelRegion.xrc:22
-#: ../src/wx/xrc/OAMViewer.xrc:77
+#: xrc/MapViewer.xrc:100 xrc/MemSelRegion.xrc:22 xrc/OAMViewer.xrc:77
 msgid "Size:"
 msgstr "Ukuran:"
 
-#: ../src/wx/xrc/MapViewer.xrc:108 ../src/wx/xrc/OAMViewer.xrc:45
+#: xrc/MapViewer.xrc:108 xrc/OAMViewer.xrc:45
 msgid "Colors:"
 msgstr "Warna:"
 
-#: ../src/wx/xrc/MapViewer.xrc:124
+#: xrc/MapViewer.xrc:124
 msgid "Mosaic:"
 msgstr "Mosaik:"
 
-#: ../src/wx/xrc/MapViewer.xrc:132
+#: xrc/MapViewer.xrc:132
 msgid "Overflow:"
 msgstr "Overflow:"
 
-#: ../src/wx/xrc/MemViewer.xrc:4
+#: xrc/MemViewer.xrc:4
 msgid "Memory Viewer"
 msgstr "Tampilan Memori"
 
-#: ../src/wx/xrc/MemViewer.xrc:17
+#: xrc/MemViewer.xrc:17
 msgid "&8-bit"
 msgstr "&8-bit"
 
-#: ../src/wx/xrc/MemViewer.xrc:25
+#: xrc/MemViewer.xrc:25
 msgid "&16-bit"
 msgstr "&16-bit"
 
-#: ../src/wx/xrc/MemViewer.xrc:32
+#: xrc/MemViewer.xrc:32
 msgid "&32-bit"
 msgstr "&32-bit"
 
-#: ../src/wx/xrc/MemViewer.xrc:83
+#: xrc/MemViewer.xrc:83
 msgid "Current address:"
 msgstr "Alamat saat ini:"
 
-#: ../src/wx/xrc/MemViewer.xrc:108
+#: xrc/MemViewer.xrc:108
 msgid "&Load..."
 msgstr "&Memuat..."
 
-#: ../src/wx/xrc/NetLink.xrc:4
+#: xrc/NetLink.xrc:4
 msgid "Start Network Link"
 msgstr "Memulai Hubungan Jaringan"
 
-#: ../src/wx/xrc/NetLink.xrc:11
+#: xrc/NetLink.xrc:11
 msgid "Server"
 msgstr "Server"
 
-#: ../src/wx/xrc/NetLink.xrc:19
+#: xrc/NetLink.xrc:19
 msgid "Client"
 msgstr "Klien"
 
-#: ../src/wx/xrc/NetLink.xrc:32
+#: xrc/NetLink.xrc:32
 msgid "Players:"
 msgstr "Pemain:"
 
-#: ../src/wx/xrc/NetLink.xrc:41 ../src/wx/xrc/SpeedupConfig.xrc:122
+#: xrc/NetLink.xrc:41 xrc/SpeedupConfig.xrc:122
 msgid "2"
 msgstr "2"
 
-#: ../src/wx/xrc/NetLink.xrc:49 ../src/wx/xrc/SpeedupConfig.xrc:123
+#: xrc/NetLink.xrc:49 xrc/SpeedupConfig.xrc:123
 msgid "3"
 msgstr "3"
 
-#: ../src/wx/xrc/NetLink.xrc:56 ../src/wx/xrc/SpeedupConfig.xrc:124
+#: xrc/NetLink.xrc:56 xrc/SpeedupConfig.xrc:124
 msgid "4"
 msgstr "4"
 
-#: ../src/wx/xrc/NetLink.xrc:67
+#: xrc/NetLink.xrc:67
 msgid "Server:"
 msgstr "Server:"
 
-#: ../src/wx/xrc/OAMViewer.xrc:4
+#: xrc/NetLink.xrc:81
+msgid "Port:"
+msgstr ""
+
+#: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
 msgstr "Tampilan OAM"
 
-#: ../src/wx/xrc/OAMViewer.xrc:85
+#: xrc/OAMViewer.xrc:85
 msgid "Rot.:"
 msgstr "Rot.:"
 
-#: ../src/wx/xrc/PaletteViewer.xrc:4
+#: xrc/PaletteViewer.xrc:4
 msgid "Palette Viewer"
 msgstr "Tampilan Palet"
 
-#: ../src/wx/xrc/PaletteViewer.xrc:88
+#: xrc/PaletteViewer.xrc:88
 msgid "C&hange backdrop color..."
 msgstr "U&bah warna backdrop..."
 
-#: ../src/wx/xrc/SoundConfig.xrc:4
+#: xrc/SoundConfig.xrc:4
 msgid "Sound Settings"
 msgstr "Pengaturan Suara"
 
-#: ../src/wx/xrc/SoundConfig.xrc:16
+#: xrc/SoundConfig.xrc:16
 msgid "Volume :"
 msgstr "Volume :"
 
-#: ../src/wx/xrc/SoundConfig.xrc:34
+#: xrc/SoundConfig.xrc:34
 msgid "Mute"
 msgstr "Diam"
 
-#: ../src/wx/xrc/SoundConfig.xrc:54 ../src/wx/xrc/SoundConfig.xrc:320
+#: xrc/SoundConfig.xrc:54 xrc/SoundConfig.xrc:320
 msgid "Maximum"
 msgstr "Maksimum"
 
-#: ../src/wx/xrc/SoundConfig.xrc:71
+#: xrc/SoundConfig.xrc:71
 msgid "Sample rate :"
 msgstr "Tingkat sampel :"
 
-#: ../src/wx/xrc/SoundConfig.xrc:77
+#: xrc/SoundConfig.xrc:77
 msgid "48 KHz"
 msgstr "48 KHz"
 
-#: ../src/wx/xrc/SoundConfig.xrc:78
+#: xrc/SoundConfig.xrc:78
 msgid "44.1 KHz"
 msgstr "44.1 KHz"
 
-#: ../src/wx/xrc/SoundConfig.xrc:79
+#: xrc/SoundConfig.xrc:79
 msgid "22 KHz"
 msgstr "22 KHz"
 
-#: ../src/wx/xrc/SoundConfig.xrc:80
+#: xrc/SoundConfig.xrc:80
 msgid "11 KHz"
 msgstr "11 KHz"
 
-#: ../src/wx/xrc/SoundConfig.xrc:103
+#: xrc/SoundConfig.xrc:103
 msgid "SDL"
 msgstr "SDL"
 
-#: ../src/wx/xrc/SoundConfig.xrc:111
+#: xrc/SoundConfig.xrc:111
 msgid "OpenAL"
 msgstr "OpenAL"
 
-#: ../src/wx/xrc/SoundConfig.xrc:118
+#: xrc/SoundConfig.xrc:118
 msgid "DirectSound"
 msgstr "DirectSound"
 
-#: ../src/wx/xrc/SoundConfig.xrc:125
+#: xrc/SoundConfig.xrc:125
 msgid "XAudio2"
 msgstr "XAudio2"
 
-#: ../src/wx/xrc/SoundConfig.xrc:132
+#: xrc/SoundConfig.xrc:132
 msgid "FAudio"
 msgstr "FAudio"
 
-#: ../src/wx/xrc/SoundConfig.xrc:146
+#: xrc/SoundConfig.xrc:146
 msgid "Device"
 msgstr "Perangkat"
 
-#: ../src/wx/xrc/SoundConfig.xrc:154
+#: xrc/SoundConfig.xrc:154
 msgid "Enable stereo upmixing"
 msgstr "Aktifkan stereo upmixing"
 
-#: ../src/wx/xrc/SoundConfig.xrc:161
+#: xrc/SoundConfig.xrc:161
 msgid "Enable hardware acceleration"
 msgstr "Aktifkan pemercepat perangkat keras"
 
-#: ../src/wx/xrc/SoundConfig.xrc:190
+#: xrc/SoundConfig.xrc:190
 msgid "Number of sound buffers:"
 msgstr "Jumlah buffer suara:"
 
-#: ../src/wx/xrc/SoundConfig.xrc:198
+#: xrc/SoundConfig.xrc:198
 msgid "Advanced"
 msgstr "Lebih lanjut"
 
-#: ../src/wx/xrc/SoundConfig.xrc:230
+#: xrc/SoundConfig.xrc:230
 msgid "Lots"
 msgstr "Banyak"
 
-#: ../src/wx/xrc/SoundConfig.xrc:239
+#: xrc/SoundConfig.xrc:239
 msgid "Echo"
 msgstr "Echo"
 
-#: ../src/wx/xrc/SoundConfig.xrc:247
+#: xrc/SoundConfig.xrc:247
 msgid "Stereo"
 msgstr "Stereo"
 
-#: ../src/wx/xrc/SoundConfig.xrc:258
+#: xrc/SoundConfig.xrc:258
 msgid "Center"
 msgstr "Tengah"
 
-#: ../src/wx/xrc/SoundConfig.xrc:269
+#: xrc/SoundConfig.xrc:269
 msgid "Left/Right"
 msgstr "Kiri/Kanan"
 
-#: ../src/wx/xrc/SoundConfig.xrc:298
+#: xrc/SoundConfig.xrc:298
 msgid "Sound filtering"
 msgstr "Filter suara"
 
-#: ../src/wx/xrc/SpeedupConfig.xrc:4
-msgid "SpeedUp / Turbo Settings"
-msgstr "Pengaturan Pemercepat / Turbo"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:9
-msgid "Speedup Throttle"
-msgstr "Tuas Pemercepat"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:84
-msgid "Speedup Frame Skip"
-msgstr "Pemercepat Frame Skip"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:102
-msgid "# of frames:"
-msgstr "# jumlah frame:"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:121
-msgid "1"
-msgstr "1"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:125
-msgid "5"
-msgstr "5"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:126
-msgid "6"
-msgstr "6"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:127
-msgid "7"
-msgstr "7"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:128
-msgid "8"
-msgstr "8"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:129
-msgid "9"
-msgstr "9"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:130
-msgid "10"
-msgstr "10"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:131
-msgid "11"
-msgstr "11"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:132
-msgid "12"
-msgstr "12"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:133
-msgid "13"
-msgstr "13"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:134
-msgid "14"
-msgstr "14"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:135
-msgid "15"
-msgstr "15"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:136
-msgid "16"
-msgstr "16"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:137
-msgid "17"
-msgstr "17"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:138
-msgid "18"
-msgstr "18"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:139
-msgid "19"
-msgstr "19"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:140
-msgid "20"
-msgstr "20"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:141
-msgid "21"
-msgstr "21"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:142
-msgid "22"
-msgstr "22"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:143
-msgid "23"
-msgstr "23"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:144
-msgid "24"
-msgstr "24"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:145
-msgid "25"
-msgstr "25"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:146
-msgid "26"
-msgstr "26"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:147
-msgid "27"
-msgstr "27"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:148
-msgid "28"
-msgstr "28"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:149
-msgid "29"
-msgstr "29"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:150
-msgid "30"
-msgstr "30"
-
-#: ../src/wx/xrc/TileViewer.xrc:4
+#: xrc/TileViewer.xrc:4
 msgid "Tile Viewer"
 msgstr "Tampilan Tile"
 
-#: ../src/wx/xrc/TileViewer.xrc:15
+#: xrc/TileViewer.xrc:15
 msgid "1&6"
 msgstr "1&6"
 
-#: ../src/wx/xrc/TileViewer.xrc:21
+#: xrc/TileViewer.xrc:21
 msgid "&256"
 msgstr "&256"
 
-#: ../src/wx/xrc/TileViewer.xrc:24
+#: xrc/TileViewer.xrc:24
 msgid "Colors"
 msgstr "Warna"
 
-#: ../src/wx/xrc/TileViewer.xrc:34
+#: xrc/TileViewer.xrc:34
 msgid "0x600&0000"
 msgstr "0x600&0000"
 
-#: ../src/wx/xrc/TileViewer.xrc:40
+#: xrc/TileViewer.xrc:40
 msgid "0x600&4000"
 msgstr "0x600&4000"
 
-#: ../src/wx/xrc/TileViewer.xrc:45
+#: xrc/TileViewer.xrc:45
 msgid "0x600&8000"
 msgstr "0x600&8000"
 
-#: ../src/wx/xrc/TileViewer.xrc:50
+#: xrc/TileViewer.xrc:50
 msgid "0x600&C000"
 msgstr "0x600&C000"
 
-#: ../src/wx/xrc/TileViewer.xrc:55
+#: xrc/TileViewer.xrc:55
 msgid "0x60&10000"
 msgstr "0x60&10000"
+
+#: xrc/SpeedupConfig.xrc:4
+msgid "SpeedUp / Turbo Settings"
+msgstr "Pengaturan Pemercepat / Turbo"
+
+#: xrc/SpeedupConfig.xrc:9
+msgid "Speedup Throttle"
+msgstr "Tuas Pemercepat"
+
+#: xrc/SpeedupConfig.xrc:84
+msgid "Speedup Frame Skip"
+msgstr "Pemercepat Frame Skip"
+
+#: xrc/SpeedupConfig.xrc:102
+msgid "# of frames:"
+msgstr "# jumlah frame:"
+
+#: xrc/SpeedupConfig.xrc:121
+msgid "1"
+msgstr "1"
+
+#: xrc/SpeedupConfig.xrc:125
+msgid "5"
+msgstr "5"
+
+#: xrc/SpeedupConfig.xrc:126
+msgid "6"
+msgstr "6"
+
+#: xrc/SpeedupConfig.xrc:127
+msgid "7"
+msgstr "7"
+
+#: xrc/SpeedupConfig.xrc:128
+msgid "8"
+msgstr "8"
+
+#: xrc/SpeedupConfig.xrc:129
+msgid "9"
+msgstr "9"
+
+#: xrc/SpeedupConfig.xrc:130
+msgid "10"
+msgstr "10"
+
+#: xrc/SpeedupConfig.xrc:131
+msgid "11"
+msgstr "11"
+
+#: xrc/SpeedupConfig.xrc:132
+msgid "12"
+msgstr "12"
+
+#: xrc/SpeedupConfig.xrc:133
+msgid "13"
+msgstr "13"
+
+#: xrc/SpeedupConfig.xrc:134
+msgid "14"
+msgstr "14"
+
+#: xrc/SpeedupConfig.xrc:135
+msgid "15"
+msgstr "15"
+
+#: xrc/SpeedupConfig.xrc:136
+msgid "16"
+msgstr "16"
+
+#: xrc/SpeedupConfig.xrc:137
+msgid "17"
+msgstr "17"
+
+#: xrc/SpeedupConfig.xrc:138
+msgid "18"
+msgstr "18"
+
+#: xrc/SpeedupConfig.xrc:139
+msgid "19"
+msgstr "19"
+
+#: xrc/SpeedupConfig.xrc:140
+msgid "20"
+msgstr "20"
+
+#: xrc/SpeedupConfig.xrc:141
+msgid "21"
+msgstr "21"
+
+#: xrc/SpeedupConfig.xrc:142
+msgid "22"
+msgstr "22"
+
+#: xrc/SpeedupConfig.xrc:143
+msgid "23"
+msgstr "23"
+
+#: xrc/SpeedupConfig.xrc:144
+msgid "24"
+msgstr "24"
+
+#: xrc/SpeedupConfig.xrc:145
+msgid "25"
+msgstr "25"
+
+#: xrc/SpeedupConfig.xrc:146
+msgid "26"
+msgstr "26"
+
+#: xrc/SpeedupConfig.xrc:147
+msgid "27"
+msgstr "27"
+
+#: xrc/SpeedupConfig.xrc:148
+msgid "28"
+msgstr "28"
+
+#: xrc/SpeedupConfig.xrc:149
+msgid "29"
+msgstr "29"
+
+#: xrc/SpeedupConfig.xrc:150
+msgid "30"
+msgstr "30"
