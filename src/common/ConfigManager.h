@@ -139,7 +139,6 @@ extern int windowMaximized;
 extern int windowPositionX, bkpPosX;
 extern int windowPositionY, bkpPosY;
 extern uint32_t windowWidth;
-extern int winFlashSize;
 extern int winGbBorderOn;
 extern int winGbPrinterEnabled;
 extern int winPauseNextFrame;
