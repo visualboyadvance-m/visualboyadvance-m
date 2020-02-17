@@ -533,39 +533,41 @@ int main(int argc, char** argv) {
     endif()
 endif() # wxWidgets checks
 
-if(CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
-    find_package(unofficial-gettext REQUIRED)
+if(ENABLE_NLS)
+   if(CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
+       find_package(unofficial-gettext REQUIRED)
 
-    if(MSVC)
-        # install gettext tools from nuget
+       if(MSVC)
+           # install gettext tools from nuget
 
-        # first fetch the nuget binary
-        if(NOT EXISTS ${CMAKE_BINARY_DIR}/nuget.exe)
-            file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" ${CMAKE_BINARY_DIR}/nuget.exe)
-        endif()
+           # first fetch the nuget binary
+           if(NOT EXISTS ${CMAKE_BINARY_DIR}/nuget.exe)
+               file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" ${CMAKE_BINARY_DIR}/nuget.exe)
+           endif()
 
-        # install the Gettext.Tools package
-        execute_process(
-            COMMAND nuget.exe install Gettext.Tools -OutputDirectory ${CMAKE_BINARY_DIR}/nuget
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        )
+           # install the Gettext.Tools package
+           execute_process(
+               COMMAND nuget.exe install Gettext.Tools -OutputDirectory ${CMAKE_BINARY_DIR}/nuget
+               WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+           )
 
-        # find the path to the binaries in the package and add them to find path
-        file(GLOB pkg ${CMAKE_BINARY_DIR}/nuget/Gettext.Tools*)
+           # find the path to the binaries in the package and add them to find path
+           file(GLOB pkg ${CMAKE_BINARY_DIR}/nuget/Gettext.Tools*)
 
-        list(APPEND CMAKE_PROGRAM_PATH ${pkg}/tools/bin)
+           list(APPEND CMAKE_PROGRAM_PATH ${pkg}/tools/bin)
 
-        find_package(Gettext REQUIRED)
-    endif()
-else()
-    find_package(Gettext REQUIRED)
+           find_package(Gettext REQUIRED)
+       endif()
+   else()
+       find_package(Gettext REQUIRED)
+   endif()
 
-    find_program(XGETTEXT xgettext)
-    find_program(MSGINIT msginit)
+   find_program(XGETTEXT xgettext)
+   find_program(MSGINIT  msginit)
 
-    if(ENABLE_NLS AND (NOT XGETTEXT OR NOT MSGINIT))
-       message(SEND_ERROR "Cannot find gettext ${XGETTEXT} ${MSGINIT}")
-    endif()
+   if(NOT XGETTEXT OR NOT MSGINIT)
+      message(SEND_ERROR "Cannot find gettext xgettext:'${XGETTEXT}' msginit:'${MSGINIT}'")
+   endif()
 endif()
 
 # contrib widgets
@@ -581,47 +583,48 @@ if(NOT ZIP_PROGRAM)
     message(FATAL_ERROR "The zip compressor program is required for building.")
 endif()
 
-set(XRC_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/AccelConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CheatAdd.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CheatCreate.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CheatEdit.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CheatList.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CodeSelect.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/DirectoriesConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/Disassemble.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/DisplayConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/ExportSPS.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBAROMInfo.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBColorPrefPanel.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBDisassemble.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBMapViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBOAMViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBPaletteViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBPrinter.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBROMInfo.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBTileViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GameBoyAdvanceConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GameBoyConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GeneralConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/IOViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/JoyPanel.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/JoypadConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/LinkConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/Logging.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MainFrame.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MainIcon.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MainMenu.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MapViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MemSelRegion.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MemViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/NetLink.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/OAMViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/PaletteViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/SoundConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/TileViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/SpeedupConfig.xrc
-    )
+set(
+    XRC_SOURCES
+    xrc/AccelConfig.xrc
+    xrc/CheatAdd.xrc
+    xrc/CheatCreate.xrc
+    xrc/CheatEdit.xrc
+    xrc/CheatList.xrc
+    xrc/CodeSelect.xrc
+    xrc/DirectoriesConfig.xrc
+    xrc/Disassemble.xrc
+    xrc/DisplayConfig.xrc
+    xrc/ExportSPS.xrc
+    xrc/GBAROMInfo.xrc
+    xrc/GBColorPrefPanel.xrc
+    xrc/GBDisassemble.xrc
+    xrc/GBMapViewer.xrc
+    xrc/GBOAMViewer.xrc
+    xrc/GBPaletteViewer.xrc
+    xrc/GBPrinter.xrc
+    xrc/GBROMInfo.xrc
+    xrc/GBTileViewer.xrc
+    xrc/GameBoyAdvanceConfig.xrc
+    xrc/GameBoyConfig.xrc
+    xrc/GeneralConfig.xrc
+    xrc/IOViewer.xrc
+    xrc/JoyPanel.xrc
+    xrc/JoypadConfig.xrc
+    xrc/LinkConfig.xrc
+    xrc/Logging.xrc
+    xrc/MainFrame.xrc
+    xrc/MainIcon.xrc
+    xrc/MainMenu.xrc
+    xrc/MapViewer.xrc
+    xrc/MemSelRegion.xrc
+    xrc/MemViewer.xrc
+    xrc/NetLink.xrc
+    xrc/OAMViewer.xrc
+    xrc/PaletteViewer.xrc
+    xrc/SoundConfig.xrc
+    xrc/TileViewer.xrc
+    xrc/SpeedupConfig.xrc
+)
 
 # wxrc does not support xrs files in -c output (> 10x compression)
 # we do it using the bin2c.c utility
@@ -688,22 +691,10 @@ if(NOT WXRC)
     set(WXRC wxrc)
 endif()
 
-if(CMAKE_HOST_SYSTEM_NAME STREQUAL CYGWIN)
-    # pass xrc sources through cygpath in case we only have native wxrc
-    set(new_xrc_sources)
-
-    foreach(xrc ${XRC_SOURCES})
-        execute_process(COMMAND cygpath -m ${xrc} OUTPUT_VARIABLE win_path OUTPUT_STRIP_TRAILING_WHITESPACE)
-        list(APPEND new_xrc_sources ${win_path})
-    endforeach()
-
-    set(XRC_SOURCES ${new_xrc_sources})
-endif()
-
 add_custom_command(
-    OUTPUT wxvbam.xrs
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMAND ${WXRC} ${XRC_SOURCES} "--output=wxvbam.xrs"
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/wxvbam.xrs
+    COMMAND ${WXRC} ${XRC_SOURCES} -o ${CMAKE_CURRENT_BINARY_DIR}/wxvbam.xrs
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS ${XRC_SOURCES}
 )
 
@@ -756,20 +747,11 @@ set(
     ../sdl/text.cpp
     # from external source with minor modifications
     widgets/checkedlistctrl.cpp
-    # generated
-    cmdtab.cpp
-    # generated includes must be explicitly listed
-    builtin-xrc.h
-    builtin-over.h
-    cmdhandlers.h
-    cmd-evtable.h
-    # icon File
-    xrc/visualboyadvance-m.xpm
     ../common/version.cpp
 )
 
 if(APPLE)
-    set(SRC_WX ${SRC_WX} macsupport.mm)
+    set(SRC_WX ${SRC_WX} ${CMAKE_CURRENT_SOURCE_DIR}/macsupport.mm)
 endif()
 
 set(
@@ -806,6 +788,15 @@ set(
     RES_WX
     ${XRC_SOURCES}
     ../vba-over.ini
+    # icon File
+    xrc/visualboyadvance-m.xpm
+    # generated includes must be explicitly listed
+    ${CMAKE_CURRENT_BINARY_DIR}/builtin-xrc.h
+    ${CMAKE_CURRENT_BINARY_DIR}/builtin-over.h
+    ${CMAKE_CURRENT_BINARY_DIR}/cmdhandlers.h
+    ${CMAKE_CURRENT_BINARY_DIR}/cmd-evtable.h
+    # generated
+    ${CMAKE_CURRENT_BINARY_DIR}/cmdtab.cpp
 )
 
 set(
@@ -814,29 +805,24 @@ set(
 )
 
 if(ENABLE_OPENAL)
-    set(SRC_WX ${SRC_WX} openal.cpp)
-    set(HDR_WX ${HDR_WX} openal.h)
+   list(APPEND SRC_WX openal.cpp)
+   list(APPEND HDR_WX openal.h)
 endif()
 
 if(ENABLE_XAUDIO2)
-    set(SRC_WX ${SRC_WX} xaudio2.cpp)
+   list(APPEND SRC_WX xaudio2.cpp)
 endif()
 
 if(ENABLE_FAUDIO)
-    set(SRC_WX ${SRC_WX} faudio.cpp)
+   list(APPEND SRC_WX faudio.cpp)
 endif()
 
 if(WIN32)
-    set(SRC_WX ${SRC_WX} wxvbam.rc dsound.cpp)
-    list(APPEND VBAM_LIBS dxguid dsound ws2_32)
-    if(MSVC)
-        # workaround for some symbols needed by static SDL2.lib
-        list(APPEND VBAM_LIBS imm32 version)
-    endif()
-    # not strictly directx, but win32-related
-    if(ENABLE_DEBUGGER)
-        list(APPEND VBAM_LIBS wsock32)
-    endif()
+    list(APPEND SRC_WX dsound.cpp)
+
+    list(APPEND RES_WX wxvbam.rc)
+
+    list(APPEND VBAM_LIBS dxguid dsound wsock32 ws2_32 imm32 version)
 endif()
 
 link_directories(${CMAKE_BINARY_DIR})
@@ -953,7 +939,7 @@ if(NOT WIN32 AND NOT APPLE)
     install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/icons/sizes/                   DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor)
 endif()
 
-# make the translations.zip for windows builds
+# Make the translations.zip for windows builds.
 if(ENABLE_NLS AND WIN32)
     file(GLOB catalogs ${CMAKE_BINARY_DIR}/po/wxvbam/*.gmo)
 
@@ -967,6 +953,38 @@ if(ENABLE_NLS AND WIN32)
     add_custom_target(translations-zip DEPENDS ${CMAKE_BINARY_DIR}/translations.zip)
 
     add_dependencies(visualboyadvance-m translations-zip)
+endif()
+
+# Update the gettext pot source.
+# Do this automatically instead of manually to make sure we don't forget to update.
+if(ENABLE_NLS)
+    add_custom_command(
+        OUTPUT ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
+        COMMAND ${WXRC} -g ${XRC_SOURCES} -o ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        DEPENDS ${XRC_SOURCES}
+    )
+
+    add_custom_target(xrc-strings DEPENDS ${CMAKE_BINARY_DIR}/wx-xrc-strings.h)
+
+    add_custom_command(
+        OUTPUT ${CMAKE_BINARY_DIR}/wxvbam.pot
+        COMMAND ${XGETTEXT} -k_ -kN_ -o ${CMAKE_BINARY_DIR}/wxvbam.pot ${SRC_WX} ${HDR_WX} ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
+        DEPENDS ${SRC_WX} ${HDR_WX} ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+
+    add_custom_target(gettext-pot DEPENDS ${CMAKE_BINARY_DIR}/wxvbam.pot)
+
+    add_dependencies(gettext-pot xrc-strings)
+
+    add_dependencies(visualboyadvance-m gettext-pot)
+
+    add_custom_command(
+        TARGET visualboyadvance-m
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -D SRC_DIR=${CMAKE_SOURCE_DIR}/po/wxvbam -D BIN_DIR=${CMAKE_BINARY_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/check-pot-updated.cmake
+    )
 endif()
 
 option(UPSTREAM_RELEASE "do some release automation tasks" OFF)
