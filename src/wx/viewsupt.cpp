@@ -1174,7 +1174,7 @@ void GfxViewer::SaveBMP(wxCommandEvent& ev)
     if (ret != wxID_OK)
         return;
 
-    wxBitmap obmp = gv->bm->GetSubBitmap(wxRect(0, 0, gv->bmh, gv->bmh));
+    wxBitmap obmp = gv->bm->GetSubBitmap(wxRect(0, 0, gv->bmw, gv->bmh));
     wxString fn = dlg.GetPath();
     wxBitmapType fmt = dlg.GetFilterIndex() ? wxBITMAP_TYPE_BMP : wxBITMAP_TYPE_PNG;
 
@@ -1200,6 +1200,8 @@ BEGIN_EVENT_TABLE(GfxViewer, Viewer)
 EVT_CHECKBOX(XRCID("Stretch"), GfxViewer::StretchTog)
 EVT_BUTTON(XRCID("Refresh"), GfxViewer::RefreshEv)
 EVT_BUTTON(XRCID("Save"), GfxViewer::SaveBMP)
+EVT_BUTTON(XRCID("SaveGBOAM"), GfxViewer::SaveBMP)
+EVT_BUTTON(XRCID("SaveGBAOAM"), GfxViewer::SaveBMP)
 END_EVENT_TABLE()
 
 IMPLEMENT_DYNAMIC_CLASS(DispCheckBox, wxCheckBox)

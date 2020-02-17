@@ -145,7 +145,7 @@
             <border>5</border>
           </object>
           <object class="sizeritem">
-            <object class="wxButton" name="wxID_SAVE">
+            <object class="wxButton" name="SaveGBOAM">
               <label>_Save...</label>
             </object>
             <flag>wxALL|wxALIGN_CENTRE_HORIZONTAL</flag>
