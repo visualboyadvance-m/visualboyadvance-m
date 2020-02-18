@@ -1110,10 +1110,10 @@ void MainFrame::MenuPopped(wxMenuEvent& evt)
     if (popped)
         panel->ShowPointer();
 
-    if (menus_opened)
-        panel->Pause();
-    else if (!IsPaused())
-        panel->Resume();
+    //if (menus_opened)
+    //    panel->Pause();
+    //else if (!IsPaused())
+    //    panel->Resume();
 }
 
 void MainFrame::SetMenusOpened(bool state)
@@ -1155,7 +1155,7 @@ void MainFrame::StartModal()
     // pointer when dialog popped up
     // it will auto-hide again once game resumes
     panel->ShowPointer();
-    panel->Pause();
+    //panel->Pause();
     ++dialog_opened;
 }
 
