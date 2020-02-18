@@ -10,6 +10,7 @@
 #include <wx/log.h>
 #include <wx/propdlg.h>
 #include <wx/datetime.h>
+#include <wx/timer.h>
 
 #include "wx/joyedit.h"
 #include "wx/keyedit.h"
@@ -203,6 +204,17 @@ class GameArea;
 
 class LogDialog;
 
+#ifdef __WXMSW__
+class RenderTimer : public wxTimer
+{
+    GameArea* panel;
+public:
+    RenderTimer(GameArea* panel);
+    void Notify();
+    void start();
+};
+#endif // __WXMSW__
+
 // true if pause should happen at next frame
 extern bool pause_next;
 
@@ -210,6 +222,15 @@ class MainFrame : public wxFrame {
 public:
     MainFrame();
     ~MainFrame();
+
+    void OnClose(wxCloseEvent& ev)
+    {
+        (void)ev; // unused params
+#ifdef __WXMSW__
+        timer->Stop();
+        ev.Skip();
+#endif // __WXMSW__
+    }
 
     bool BindControls();
     void MenuOptionIntMask(const char* menuName, int& field, int mask);
@@ -330,6 +351,9 @@ protected:
 
 private:
     GameArea* panel;
+#ifdef __WXMSW__
+    RenderTimer* timer;
+#endif // __WXMSW__
 
     // the various reasons the game might be paused
     bool paused;
@@ -598,6 +622,7 @@ public:
 
     virtual wxWindow* GetWindow() { return this; }
 
+
 protected:
     MainFrame* main_frame;
 
@@ -639,6 +664,9 @@ protected:
 
     DECLARE_DYNAMIC_CLASS(GameArea)
     DECLARE_EVENT_TABLE()
+
+private:
+    friend class RenderTimer;
 };
 
 // wxString version of OSD message

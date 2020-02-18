@@ -739,6 +739,9 @@ MainFrame::MainFrame()
 
 MainFrame::~MainFrame()
 {
+#ifdef __WXMSW__
+    delete timer;
+#endif // __WXMSW__
 #ifndef NO_LINK
     CloseLink();
 #endif
@@ -765,6 +768,7 @@ EVT_SIZE(MainFrame::OnSize)
 // Windows, TODO: this needs to be fixed properly
 //
 #ifdef __WXMSW__
+EVT_CLOSE(MainFrame::OnClose)
 EVT_MENU_OPEN(MainFrame::MenuPopped)
 EVT_MENU_CLOSE(MainFrame::MenuPopped)
 EVT_MENU_HIGHLIGHT_ALL(MainFrame::MenuPopped)
@@ -1292,3 +1296,23 @@ int wxvbamApp::FilterEvent(wxEvent& event)
         return frame->FilterEvent(event);
     return wxApp::FilterEvent(event);
 }
+
+
+#ifdef __WXMSW__
+RenderTimer::RenderTimer(GameArea* panel) : wxTimer()
+{
+    RenderTimer::panel = panel;
+}
+
+void RenderTimer::Notify()
+{
+    wxIdleEvent event;
+    wxIdleEvent& evt = event;
+    panel->OnIdle(evt);
+}
+
+void RenderTimer::start()
+{
+    wxTimer::Start(1);
+}
+#endif // __WXMSW__
