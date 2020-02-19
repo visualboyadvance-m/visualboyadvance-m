@@ -6,14 +6,14 @@
 # aquatorrent, 2015
 # Chizuru <saiber.one1@gmail.com>, 2015
 # Jeremy Belpois <jeremy.belpois.einstein@gmail.com>, 2019
-# Jeremy Belpois <jeremy.belpois.einstein@gmail.com>, 2019
+# Jeremy Belpois <jeremy.belpois.einstein@gmail.com>, 2019-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-02-17 08:32+0000\n"
-"PO-Revision-Date: 2020-02-17 08:45+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"PO-Revision-Date: 2020-02-19 01:38+0000\n"
+"Last-Translator: Jeremy Belpois <jeremy.belpois.einstein@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/bgk/vba-m/language/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2711,7 +2711,7 @@ msgstr "&e-Reader"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
-msgstr ""
+msgstr "&Ulangi Pemuatan Dot Code"
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
@@ -2719,7 +2719,7 @@ msgstr "&Muat Dot Code..."
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr ""
+msgstr "&Ulangi Penyimpanan Dot Code"
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
@@ -3456,7 +3456,7 @@ msgstr "Server:"
 
 #: xrc/NetLink.xrc:81
 msgid "Port:"
-msgstr ""
+msgstr "Lubang:"
 
 #: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
