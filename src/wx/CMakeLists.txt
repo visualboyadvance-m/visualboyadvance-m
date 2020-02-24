@@ -746,8 +746,12 @@ set(
     ../common/version.cpp
 )
 
+set(ALL_SRC_WX ${SRC_WX})
+
+list(APPEND ALL_SRC_WX ${CMAKE_CURRENT_SOURCE_DIR}/macsupport.mm)
+
 if(APPLE)
-    set(SRC_WX ${SRC_WX} ${CMAKE_CURRENT_SOURCE_DIR}/macsupport.mm)
+    list(APPEND SRC_WX ${CMAKE_CURRENT_SOURCE_DIR}/macsupport.mm)
 endif()
 
 set(
@@ -775,6 +779,11 @@ set(
     ../common/contains.h
 )
 
+set(ALL_HDR_WX ${HDR_WX})
+
+list(APPEND ALL_SRC_WX winsparkle-wrapper.cpp)
+list(APPEND ALL_HDR_WX winsparkle-wrapper.h winsparkle-rc.h)
+
 if(WIN32 AND (AMD64 OR X86_32) AND ENABLE_ONLINEUPDATES)
     list(APPEND SRC_WX winsparkle-wrapper.cpp)
     list(APPEND HDR_WX winsparkle-wrapper.h winsparkle-rc.h)
@@ -800,18 +809,27 @@ set(
     copy-events.cmake
 )
 
+list(APPEND ALL_SRC_WX openal.cpp)
+list(APPEND ALL_HDR_WX openal.h)
+
 if(ENABLE_OPENAL)
    list(APPEND SRC_WX openal.cpp)
    list(APPEND HDR_WX openal.h)
 endif()
 
+list(APPEND ALL_SRC_WX xaudio2.cpp)
+
 if(ENABLE_XAUDIO2)
    list(APPEND SRC_WX xaudio2.cpp)
 endif()
 
+list(APPEND ALL_SRC_WX faudio.cpp)
+
 if(ENABLE_FAUDIO)
    list(APPEND SRC_WX faudio.cpp)
 endif()
+
+list(APPEND ALL_SRC_WX dsound.cpp)
 
 if(WIN32)
     list(APPEND SRC_WX dsound.cpp)
@@ -965,8 +983,8 @@ if(ENABLE_NLS)
 
     add_custom_command(
         OUTPUT ${CMAKE_BINARY_DIR}/wxvbam.pot
-        COMMAND ${XGETTEXT} -k_ -kN_ -o ${CMAKE_BINARY_DIR}/wxvbam.pot ${SRC_WX} ${HDR_WX} ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
-        DEPENDS ${SRC_WX} ${HDR_WX} ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
+        COMMAND ${XGETTEXT} -k_ -kN_ -o ${CMAKE_BINARY_DIR}/wxvbam.pot ${ALL_SRC_WX} ${ALL_HDR_WX} ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
+        DEPENDS ${ALL_SRC_WX} ${ALL_HDR_WX} ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
 

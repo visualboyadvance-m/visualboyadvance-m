@@ -10,7 +10,7 @@ macro(read_pot path var)
 
     # Ignore timestamp.
     foreach(line IN LISTS ${var}_file)
-        if(NOT line MATCHES [=[^"POT-Creation-Date: ]=])
+        if(NOT (line MATCHES [=[^"POT-Creation-Date: ]=] OR line MATCHES "^#"))
             list(APPEND ${var} ${line})
         endif()
     endforeach()

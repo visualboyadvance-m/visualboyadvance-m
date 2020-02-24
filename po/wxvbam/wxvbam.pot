@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-24 20:36+0000\n"
+"POT-Creation-Date: 2020-02-24 20:58+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1140,6 +1140,22 @@ msgstr ""
 
 #: xaudio2.cpp:393
 msgid "XAudio2: Creating source voice failed!"
+msgstr ""
+
+#: faudio.cpp:32
+msgid "FAudio: Enumerating devices failed!"
+msgstr ""
+
+#: faudio.cpp:67 faudio.cpp:352
+msgid "The FAudio interface failed to initialize!"
+msgstr ""
+
+#: faudio.cpp:384
+msgid "FAudio: Creating mastering voice failed!"
+msgstr ""
+
+#: faudio.cpp:395
+msgid "FAudio: Creating source voice failed!"
 msgstr ""
 
 #: dsound.cpp:90 dsound.cpp:104
