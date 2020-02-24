@@ -26,11 +26,7 @@ if(WIN32)
     # not yet implemented
     option(ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" OFF)
 
-    if(NOT CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
-        option(ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ON)
-    else()
-        option(ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" OFF)
-    endif()
+    option(ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ON)
 endif()
 
 option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" OFF)

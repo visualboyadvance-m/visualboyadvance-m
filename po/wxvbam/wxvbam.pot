@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-17 08:32+0000\n"
+"POT-Creation-Date: 2020-02-24 20:36+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1124,6 +1124,22 @@ msgstr ""
 #: widgets/sdljoy.cpp:129
 #, c-format
 msgid "Disconnected game controller %d"
+msgstr ""
+
+#: xaudio2.cpp:35
+msgid "XAudio2: Enumerating devices failed!"
+msgstr ""
+
+#: xaudio2.cpp:69 xaudio2.cpp:353
+msgid "The XAudio2 interface failed to initialize!"
+msgstr ""
+
+#: xaudio2.cpp:384
+msgid "XAudio2: Creating mastering voice failed!"
+msgstr ""
+
+#: xaudio2.cpp:393
+msgid "XAudio2: Creating source voice failed!"
 msgstr ""
 
 #: dsound.cpp:90 dsound.cpp:104
