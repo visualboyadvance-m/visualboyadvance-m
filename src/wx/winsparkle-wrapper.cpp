@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <string>
 #include <stdexcept>
 
@@ -50,12 +51,16 @@ WinSparkleDllWrapper::~WinSparkleDllWrapper()
     delete winsparkle_dll;
 
     // Wait for the program to exit and release the DLL before deleting the temp file, otherwise access is denied.
-    const auto shell_cmd = std::string("ping -n 3 127.0.0.1 > nul&set _file=") + temp_file_name + "&call del %^_file%";
+    char executable[] = "cmd.exe";
+    char cmd_switch[] = "/c";
 
-    const char* cmd[]{
-	"cmd.exe",
-	"/c",
-	shell_cmd.c_str(),
+    char shell_cmd[500];
+    snprintf(shell_cmd, 500, "ping -n 3 127.0.0.1 > nul&set _file=%s&call del %%^_file%%", temp_file_name.mb_str().data());
+
+    char* cmd[]{
+	executable,
+	cmd_switch,
+	shell_cmd,
 	NULL
     };
 
