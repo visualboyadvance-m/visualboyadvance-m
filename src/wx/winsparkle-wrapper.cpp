@@ -1,5 +1,7 @@
+#include <string>
 #include <stdexcept>
 
+#include <wx/utils.h>
 #include "wxvbam.h"
 #include "winsparkle-wrapper.h"
 #include "wx/msw/private.h"
@@ -47,7 +49,17 @@ WinSparkleDllWrapper::~WinSparkleDllWrapper()
 {
     delete winsparkle_dll;
 
-    wxRemoveFile(temp_file_name);
+    // Wait for the program to exit and release the DLL before deleting the temp file, otherwise access is denied.
+    const auto shell_cmd = std::string("ping -n 3 127.0.0.1 > nul&set _file=") + temp_file_name + "&call del %^_file%";
+
+    const char* cmd[]{
+	"cmd.exe",
+	"/c",
+	shell_cmd.c_str(),
+	NULL
+    };
+
+    wxExecute(cmd, wxEXEC_ASYNC | wxEXEC_HIDE_CONSOLE);
 }
 
 void win_sparkle_init()
