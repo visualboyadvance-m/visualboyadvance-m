@@ -283,18 +283,4 @@ This may be a bit of a hassle, but it helps us out immensely.
 
 ## Contributing
 
-Please keep in mind that this app needs to run on Windows, Linux and macOS at
-the very least, so code should be portable and/or use the appropriate `#ifdef`s
-and the like when needed.
-
-Please try to craft a good commit message, this post by the great tpope explains
-how to do so:
-http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
-
-If you have multiple small commits for a change, please try to use `git rebase
--i` (interactive rebase) to squash them into one or a few logical commits (with
-good commit messages!) See:
-https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History if you are new to
-this.
-
-
+See the [Developer Manual](/DEVELOPER-MANUAL.md).
