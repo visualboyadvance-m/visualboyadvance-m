@@ -159,12 +159,7 @@ function(vcpkg_set_toolchain)
 
     if(DEFINED first_upgrade)
         execute_process(
-            COMMAND ${vcpkg_exe} remove ${first_upgrade}
-            WORKING_DIRECTORY ${VCPKG_ROOT}
-        )
-
-        execute_process(
-            COMMAND ${vcpkg_exe} install ${first_upgrade}
+            COMMAND ${vcpkg_exe} upgrade --no-dry-run ${first_upgrade}
             WORKING_DIRECTORY ${VCPKG_ROOT}
         )
     endif()
