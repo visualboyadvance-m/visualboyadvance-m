@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-17 08:32+0000\n"
-"PO-Revision-Date: 2020-02-17 08:45+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"POT-Creation-Date: 2020-02-24 20:58+0000\n"
+"PO-Revision-Date: 2020-02-26 16:31+0000\n"
+"Last-Translator: Model T800\n"
 "Language-Team: Hungarian (http://www.transifex.com/bgk/vba-m/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1119,6 +1119,38 @@ msgstr "%d játékvezérlő csatlakoztatva"
 #, c-format
 msgid "Disconnected game controller %d"
 msgstr "%d játékvezérlő leválasztva"
+
+#: xaudio2.cpp:35
+msgid "XAudio2: Enumerating devices failed!"
+msgstr "XAudio2: Az eszközök beolvasása sikertelen!"
+
+#: xaudio2.cpp:69 xaudio2.cpp:353
+msgid "The XAudio2 interface failed to initialize!"
+msgstr "Az XAudio2 felület indítása sikertelen!"
+
+#: xaudio2.cpp:384
+msgid "XAudio2: Creating mastering voice failed!"
+msgstr "XAudio2: A főhang létrehozása sikertelen!"
+
+#: xaudio2.cpp:393
+msgid "XAudio2: Creating source voice failed!"
+msgstr "XAudio2: A forráshang létrehozása sikertelen!"
+
+#: faudio.cpp:32
+msgid "FAudio: Enumerating devices failed!"
+msgstr "FAudio: Az eszközök beolvasása sikertelen!"
+
+#: faudio.cpp:67 faudio.cpp:352
+msgid "The FAudio interface failed to initialize!"
+msgstr "Az FAudio felület indítása sikertelen!"
+
+#: faudio.cpp:384
+msgid "FAudio: Creating mastering voice failed!"
+msgstr "FAudio: A főhang létrehozása sikertelen!"
+
+#: faudio.cpp:395
+msgid "FAudio: Creating source voice failed!"
+msgstr "FAudio: A forráshang létrehozása sikertelen!"
 
 #: dsound.cpp:90 dsound.cpp:104
 #, c-format
@@ -2709,7 +2741,7 @@ msgstr "&e-Reader"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
-msgstr ""
+msgstr "Dot Kód Betöltés Visszaállítás"
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
@@ -2717,7 +2749,7 @@ msgstr "Dot Kód betö&ltése..."
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr ""
+msgstr "Dot Kód Mentés Visszaállítás"
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
@@ -3454,7 +3486,7 @@ msgstr "Szerver:"
 
 #: xrc/NetLink.xrc:81
 msgid "Port:"
-msgstr ""
+msgstr "Port:"
 
 #: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"

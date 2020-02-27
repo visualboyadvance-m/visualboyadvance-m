@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-17 08:32+0000\n"
-"PO-Revision-Date: 2020-02-17 08:45+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"POT-Creation-Date: 2020-02-24 20:58+0000\n"
+"PO-Revision-Date: 2020-02-25 00:45+0000\n"
+"Last-Translator: bgK\n"
 "Language-Team: Japanese (http://www.transifex.com/bgk/vba-m/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1120,6 +1120,38 @@ msgstr ""
 #: widgets/sdljoy.cpp:129
 #, c-format
 msgid "Disconnected game controller %d"
+msgstr ""
+
+#: xaudio2.cpp:35
+msgid "XAudio2: Enumerating devices failed!"
+msgstr ""
+
+#: xaudio2.cpp:69 xaudio2.cpp:353
+msgid "The XAudio2 interface failed to initialize!"
+msgstr ""
+
+#: xaudio2.cpp:384
+msgid "XAudio2: Creating mastering voice failed!"
+msgstr ""
+
+#: xaudio2.cpp:393
+msgid "XAudio2: Creating source voice failed!"
+msgstr ""
+
+#: faudio.cpp:32
+msgid "FAudio: Enumerating devices failed!"
+msgstr ""
+
+#: faudio.cpp:67 faudio.cpp:352
+msgid "The FAudio interface failed to initialize!"
+msgstr ""
+
+#: faudio.cpp:384
+msgid "FAudio: Creating mastering voice failed!"
+msgstr ""
+
+#: faudio.cpp:395
+msgid "FAudio: Creating source voice failed!"
 msgstr ""
 
 #: dsound.cpp:90 dsound.cpp:104
