@@ -1115,6 +1115,19 @@ if(APPLE)
     endif()
 endif()
 
+if(NOT WIN32 AND NOT APPLE)
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy   ${CMAKE_BINARY_DIR}/visualboyadvance-m ${CMAKE_BINARY_DIR}/visualboyadvance-m.real
+            COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/visualboyadvance-m
+            COMMAND ${CMAKE_COMMAND} -E copy   ${CMAKE_CURRENT_SOURCE_DIR}/linux-shell-wrapper.sh ${CMAKE_BINARY_DIR}/visualboyadvance-m
+            COMMAND chmod +x ${CMAKE_BINARY_DIR}/visualboyadvance-m
+        )
+
+        install(PROGRAMS ${CMAKE_BINARY_DIR}/visualboyadvance-m.real DESTINATION bin)
+endif()
+
 if(UPSTREAM_RELEASE AND APPLE)
     if(NOT CMAKE_BUILD_TYPE MATCHES Debug)
         find_program(STRIP_PROGRAM strip)
