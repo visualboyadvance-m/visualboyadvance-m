@@ -5059,8 +5059,10 @@ void gbEmulate(int ticksToStop)
                                         ticksToStop = 0;
                                 }
                                 gbFrameSkipCount = 0;
-                            } else
+                            } else {
                                 gbFrameSkipCount++;
+                                systemSendScreen();
+                            }
 
                             frameDone = true;
 
@@ -5211,6 +5213,8 @@ void gbEmulate(int ticksToStop)
                                 if (systemPauseOnFrame())
                                     ticksToStop = 0;
                             }
+                        } else {
+                            systemSendScreen();
                         }
 
                         gbFrameCount++;

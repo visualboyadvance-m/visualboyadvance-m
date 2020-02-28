@@ -1704,6 +1704,10 @@ void systemDrawScreen(void)
     video_cb(pix, systemWidth, systemHeight, pitch);
 }
 
+void systemSendScreen(void)
+{
+}
+
 void systemFrame(void)
 {
     has_frame = 1;

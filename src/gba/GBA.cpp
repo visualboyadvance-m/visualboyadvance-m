@@ -3884,8 +3884,10 @@ void CPULoop(int ticks)
                             if (frameCount >= framesToSkip) {
                                 systemDrawScreen();
                                 frameCount = 0;
-                            } else
+                            } else {
                                 frameCount++;
+                                systemSendScreen();
+                            }
                             if (systemPauseOnFrame())
                                 ticks = 0;
 
