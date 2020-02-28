@@ -2885,21 +2885,32 @@ EVT_HANDLER(AGBPrinter, "Enable AGB printer")
 
 EVT_HANDLER(GBALcdFilter, "Enable LCD filter")
 {
-    GetMenuOptionBool("GBALcdFilter", gbaLcdFilter);
+    bool menuPress;
+    GetMenuOptionBool("GBALcdFilter", menuPress);
+    toggleBooleanVar(&menuPress, &gbaLcdFilter);
+    SetMenuOption("GBALcdFilter", gbaLcdFilter ? 1 : 0);
     utilUpdateSystemColorMaps(gbaLcdFilter);
     update_opts();
 }
 
 EVT_HANDLER(GBLcdFilter, "Enable LCD filter")
 {
-    GetMenuOptionBool("GBLcdFilter", gbLcdFilter);
+    bool menuPress;
+    GetMenuOptionBool("GBLcdFilter", menuPress);
+    toggleBooleanVar(&menuPress, &gbLcdFilter);
+    SetMenuOption("GBLcdFilter", gbLcdFilter ? 1 : 0);
     utilUpdateSystemColorMaps(gbLcdFilter);
     update_opts();
 }
 
 EVT_HANDLER(GBColorOption, "Enable GB color option")
 {
-    GetMenuOptionInt("GBColorOption", gbColorOption, 1);
+    bool menuPress;
+    bool intVar = gbColorOption ? true : false;
+    GetMenuOptionBool("GBColorOption", menuPress);
+    toggleBooleanVar(&menuPress, &intVar);
+    SetMenuOption("GBColorOption", intVar ? 1 : 0);
+    gbColorOption = intVar ? 1 : 0;
     update_opts();
 }
 
