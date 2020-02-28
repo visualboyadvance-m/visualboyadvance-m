@@ -72,6 +72,14 @@ void systemMessage(int id, const char* fmt, ...)
     wxLogError(wxT("%s"), wxString(buf, wxConvUTF8).c_str());
 }
 
+void systemSendScreen()
+{
+#ifndef NO_FFMPEG
+    GameArea* ga = wxGetApp().frame->GetPanel();
+    if (ga) ga->AddFrame(pix);
+#endif
+}
+
 static int frames = 0;
 
 void systemDrawScreen()
