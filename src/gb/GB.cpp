@@ -778,6 +778,34 @@ static const uint16_t gbColorizationPaletteData[32][3][4] = {
 #define GBSAVE_GAME_VERSION_12 12
 #define GBSAVE_GAME_VERSION GBSAVE_GAME_VERSION_12
 
+
+static bool gbCheckRomHeader(void)
+{
+    const uint8_t nlogo[16] = {
+        0xCE, 0xED, 0x66, 0x66, 0xCC, 0x0D, 0x00, 0x0B,
+        0x03, 0x73, 0x00, 0x83, 0x00, 0x0C, 0x00, 0x0D
+    };
+
+    // Game Genie
+    if ((gbRom[2] == 0x6D) && (gbRom[5] == 0x47) && (gbRom[6] == 0x65) && (gbRom[7] == 0x6E) &&
+            (gbRom[8] == 0x69) && (gbRom[9] == 0x65) && (gbRom[0xA] == 0x28) && (gbRom[0xB] == 0x54)) {
+        return true;
+
+    // Game Shark
+    } else if (((gbRom[0x104] == 0x44) && (gbRom[0x156] == 0xEA) && (gbRom[0x158] == 0x7F) && (gbRom[0x159] == 0xEA) && (gbRom[0x15B] == 0x7F)) ||
+            ((gbRom[0x165] == 0x3E) && (gbRom[0x166] == 0xD9) && (gbRom[0x16D] == 0xE1) && (gbRom[0x16E] == 0x7F))) {
+        return true;
+
+    // check for 1st 16 bytes of nintendo logo
+    } else {
+        uint8_t header[16];
+        memcpy(header, &gbRom[0x104], 16);
+        if (!memcmp(header, nlogo, 16))
+            return true;
+    }
+    return false;
+}
+
 void setColorizerHack(bool value)
 {
     allow_colorizer_hack = value;
@@ -4153,6 +4181,9 @@ bool gbLoadRom(const char* szFile)
         bios = NULL;
     }
     bios = (uint8_t*)calloc(1, 0x900);
+
+    if (!gbCheckRomHeader())
+        return false;
 
     return gbUpdateSizes();
 }
