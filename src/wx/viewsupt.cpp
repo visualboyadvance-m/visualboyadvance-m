@@ -776,17 +776,29 @@ ColorView::ColorView(wxWindow* parent, wxWindowID id)
     wxStaticText* lab = new wxStaticText(this, wxID_ANY, _("R:"));
     gs->Add(lab, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
     rt = new wxStaticText(this, wxID_ANY, wxT("255"), wxDefaultPosition,
+#if !defined(__WXGTK__)
         wxDefaultSize, wxST_NO_AUTORESIZE);
+#else
+        wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL);
+#endif // !defined(__WXGTK__)
     gs->Add(rt, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
     lab = new wxStaticText(this, wxID_ANY, _("G:"));
     gs->Add(lab, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
     gt = new wxStaticText(this, wxID_ANY, wxT("255"), wxDefaultPosition,
+#if !defined(__WXGTK__)
         wxDefaultSize, wxST_NO_AUTORESIZE);
+#else
+        wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL);
+#endif // !defined(__WXGTK__)
     gs->Add(gt, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
     lab = new wxStaticText(this, wxID_ANY, _("B:"));
     gs->Add(lab, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
     bt = new wxStaticText(this, wxID_ANY, wxT("255"), wxDefaultPosition,
+#if !defined(__WXGTK__)
         wxDefaultSize, wxST_NO_AUTORESIZE);
+#else
+        wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL);
+#endif // !defined(__WXGTK__)
     gs->Add(bt, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
     sz->Add(gs);
     sz->Layout();
