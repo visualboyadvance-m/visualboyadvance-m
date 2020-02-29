@@ -968,6 +968,12 @@ if(ENABLE_DEBUGGER)
     )
 endif()
 
+set(
+    HDR_STB_IMAGE
+    headers/stb/stb_image.h
+    headers/stb/stb_image_write.h
+)
+
 include_directories(
     ${ZLIB_INCLUDE_DIR}
     fex
@@ -997,6 +1003,7 @@ add_library(
     ${HDR_FILTERS}
     ${SRC_DEBUGGER}
     ${HDR_DEBUGGER}
+    ${HDR_STB_IMAGE}
 )
 add_dependencies(vbamcore generate)
 set_property(TARGET vbamcore PROPERTY CXX_STANDARD 11)
