@@ -182,6 +182,18 @@ endif()
 
 option(ENABLE_ONLINEUPDATES "Enable online update checks" ${ONLINEUPDATES_DEFAULT})
 
+set(TIMER_LOOP_DEFAULT OFF)
+
+if(WIN32 AND (X64 OR X86))
+    set(TIMER_LOOP_DEFAULT ON)
+endif()
+
+option(ENABLE_TIMER_LOOP "Enable timer based main loop" ${TIMER_LOOP_DEFAULT})
+
+if(ENABLE_TIMER_LOOP)
+    add_definitions(-DTIMER_LOOP)
+endif()
+
 set(LTO_DEFAULT ON)
 
 # gcc lto produces buggy binaries for 64 bit mingw

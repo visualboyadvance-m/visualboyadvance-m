@@ -2764,10 +2764,10 @@ bool MainFrame::BindControls()
         return false;
     }
 
-#ifdef __WXMSW__
+#ifdef TIMER_LOOP
     timer = new RenderTimer(panel);
     timer->start();
-#endif // __WXMSW__
+#endif // TIMER_LOOP
 
     panel->SetMainFrame(this);
 

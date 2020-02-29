@@ -739,9 +739,9 @@ MainFrame::MainFrame()
 
 MainFrame::~MainFrame()
 {
-#ifdef __WXMSW__
+#ifdef TIMER_LOOP
     delete timer;
-#endif // __WXMSW__
+#endif // TIMER_LOOP
 #ifndef NO_LINK
     CloseLink();
 #endif
@@ -1298,7 +1298,7 @@ int wxvbamApp::FilterEvent(wxEvent& event)
 }
 
 
-#ifdef __WXMSW__
+#ifdef TIMER_LOOP
 RenderTimer::RenderTimer(GameArea* panel) : wxTimer()
 {
     RenderTimer::panel = panel;
@@ -1315,4 +1315,4 @@ void RenderTimer::start()
 {
     wxTimer::Start(1);
 }
-#endif // __WXMSW__
+#endif // TIMER_LOOP

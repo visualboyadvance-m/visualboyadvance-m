@@ -204,7 +204,7 @@ class GameArea;
 
 class LogDialog;
 
-#ifdef __WXMSW__
+#ifdef TIMER_LOOP
 class RenderTimer : public wxTimer
 {
     GameArea* panel;
@@ -213,7 +213,7 @@ public:
     void Notify();
     void start();
 };
-#endif // __WXMSW__
+#endif // TIMER_LOOP
 
 // true if pause should happen at next frame
 extern bool pause_next;
@@ -226,10 +226,10 @@ public:
     void OnClose(wxCloseEvent& ev)
     {
         (void)ev; // unused params
-#ifdef __WXMSW__
+#ifdef TIMER_LOOP
         timer->Stop();
         ev.Skip();
-#endif // __WXMSW__
+#endif // TIMER_LOOP
     }
 
     bool BindControls();
@@ -351,9 +351,9 @@ protected:
 
 private:
     GameArea* panel;
-#ifdef __WXMSW__
+#ifdef TIMER_LOOP
     RenderTimer* timer;
-#endif // __WXMSW__
+#endif // TIMER_LOOP
 
     // the various reasons the game might be paused
     bool paused;
@@ -622,7 +622,6 @@ public:
 
     virtual wxWindow* GetWindow() { return this; }
 
-
 protected:
     MainFrame* main_frame;
 
@@ -665,8 +664,10 @@ protected:
     DECLARE_DYNAMIC_CLASS(GameArea)
     DECLARE_EVENT_TABLE()
 
+#ifdef TIMER_LOOP
 private:
     friend class RenderTimer;
+#endif // TIMER_LOOP
 };
 
 // wxString version of OSD message

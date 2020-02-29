@@ -182,6 +182,7 @@ Here is the complete list:
 | ENABLE_LIRC           | Enable LIRC support                                                  | OFF                   |
 | ENABLE_FFMPEG         | Enable ffmpeg A/V recording                                          | AUTO                  |
 | ENABLE_ONLINEUPDATES  | Enable online update checks                                          | ON                    |
+| ENABLE_TIMER_LOOP     | Enable timer based main loop (**EXPERIMENTAL**)                      | OFF except for Win32  |
 | ENABLE_LTO            | Compile with Link Time Optimization (gcc and clang only)             | ON for release build  |
 | ENABLE_GBA_LOGGING    | Enable extended GBA logging                                          | ON                    |
 | ENABLE_DIRECT3D       | Direct3D rendering for wxWidgets (Windows, **NOT IMPLEMENTED!!!**)   | ON                    |
