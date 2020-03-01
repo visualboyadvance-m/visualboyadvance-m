@@ -113,7 +113,8 @@ history clean:
 
 - Push code changes to a branch first, so they can run through the CI.
   Differences in what different compilers allow is a problem that comes up
-  **VERY** frequently.
+  **VERY** frequently. As well as incompatibilities between different
+  configurations for both the C++ code and any supporting code.
 
 ### Windows Native Development Environment Setup
 
