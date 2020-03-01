@@ -25,7 +25,7 @@ if(TAG_RELEASE)
     include(MakeReleaseCommitAndTag)
 endif()
 
-set(VCPKG_DEPS zlib libpng SDL2 SFML gettext wxWidgets)
+set(VCPKG_DEPS zlib SDL2 SFML gettext wxWidgets)
 
 # appveyor job goes over time limit if building ffmpeg during initial cache
 # generation. So build initial cache without ffmpeg.
@@ -311,7 +311,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
 endif()
 
 find_package(OpenGL REQUIRED)
-find_package(PNG    REQUIRED)
 find_package(SDL2   REQUIRED)
 
 if(WIN32)
@@ -327,7 +326,6 @@ set(
     ${SFML_LIBRARIES}
     ${OPENGL_LIBRARIES}
     ${ZLIB_LIBRARY}
-    ${PNG_LIBRARY}
 )
 
 if(ENABLE_FFMPEG)
@@ -977,7 +975,6 @@ set(
 include_directories(
     ${ZLIB_INCLUDE_DIR}
     fex
-    ${PNG_INCLUDE_DIR}
     ${SDL2_INCLUDE_DIR}
 )
 

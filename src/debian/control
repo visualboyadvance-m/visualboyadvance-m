@@ -4,7 +4,6 @@ Priority: optional
 Maintainer: Sérgio Benjamim <sergio_br2@yahoo.com.br>
 Build-Depends:	debhelper (>= 9),
 				cmake (>= 2.6.0),
-				libpng12-dev, 
 				imagemagick, 
 				libopenal-dev, 
 				libsdl2.0-dev, 

@@ -152,11 +152,14 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
             set(deb_suffix d)
         endif()
 
+        file(GLOB png_lib ${wxWidgets_LIB_DIR}/libpng*.lib)
+
         list(APPEND wxWidgets_LIBRARIES
             ${wxWidgets_LIB_DIR}/jpeg${deb_suffix}.lib
             ${wxWidgets_LIB_DIR}/tiff${deb_suffix}.lib
             ${wxWidgets_LIB_DIR}/lzma${deb_suffix}.lib
             ${wxWidgets_LIB_DIR}/expat.lib
+            ${png_lib}
         )
     endif()
 

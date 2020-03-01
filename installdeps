@@ -194,7 +194,7 @@ freebsd_installdeps() {
 
     check sudo pkg update
 
-    pkgs="llvm-devel cmake ccache nasm ffmpeg gettext-tools gettext png pkgconf sdl2 sfml wx31-gtk3 iconv zip ninja"
+    pkgs="llvm-devel cmake ccache nasm ffmpeg gettext-tools gettext pkgconf sdl2 sfml wx31-gtk3 iconv zip ninja"
 
     [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs ffmpeg"
 
@@ -335,7 +335,7 @@ debian_installdeps() {
           wx_lib_dev=libwxgtk3.0-dev
         fi
 
-        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev libpng-dev libsdl2-dev libsdl2-2.0 libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev libsfml-dev $sfml_libs $glew_lib $wx_lib $wx_lib_dev libgtk2.0-dev libgtk-3-dev ccache zip ninja-build"
+        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev libsdl2-dev libsdl2-2.0 libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev libsfml-dev $sfml_libs $glew_lib $wx_lib $wx_lib_dev libgtk2.0-dev libgtk-3-dev ccache zip ninja-build"
 
         [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs libopenal-dev"
         [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs libavcodec-dev libavformat-dev libswscale-dev libavutil-dev $libswresample_dev"
@@ -482,7 +482,7 @@ fedora_installdeps() {
             # this is sometimes necessary for rawhide
             set -- --exclude='glibc32*'
         fi
-        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel libpng-devel SDL2-devel SFML-devel openal-soft-devel wxGTK3-devel gtk3-devel; do
+        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel SDL2-devel SFML-devel openal-soft-devel wxGTK3-devel gtk3-devel; do
             case $pkg in
                 *ffmpeg*)
                     [ -z "$ENABLE_FFMPEG" ] && continue
@@ -570,7 +570,7 @@ fedora_installdeps() {
                 ;;
         esac
         # install static deps
-        for pkg in zlib gettext libpng SDL2 wxWidgets3; do
+        for pkg in zlib gettext SDL2 wxWidgets3; do
             set -- "$@" "${target}-${pkg}-static"
         done
         # install deps that are not available as static
@@ -668,7 +668,7 @@ rhel_installdeps() {
 
         warning='RHEL does not currently have SFML packages, LINK support will be disabled'
 
-        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel libpng-devel SDL2-devel openal-soft-devel wxGTK3-devel gtk3-devel; do
+        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel SDL2-devel openal-soft-devel wxGTK3-devel gtk3-devel; do
             case $pkg in
                 *ffmpeg*)
                     [ -z "$ENABLE_FFMPEG" ] && continue
@@ -756,7 +756,7 @@ rhel_installdeps() {
                 ;;
         esac
         # install static deps
-        for pkg in zlib gettext libpng SDL2 wxWidgets; do
+        for pkg in zlib gettext SDL2 wxWidgets; do
             set -- "$@" "${target}-${pkg}-static"
         done
         # install deps that are not available as static
@@ -787,7 +787,7 @@ suse_installdeps() {
 
     tools="make cmake ccache nasm gettext-tools pkg-config ccache zip sfml2-devel ninja"
 
-    libs="gcc gcc-c++ libpng16-devel libSDL2-devel wxWidgets-3_0-devel" # ffmpeg-devel
+    libs="gcc gcc-c++ libSDL2-devel wxWidgets-3_0-devel" # ffmpeg-devel
 
     [ -n "$ENABLE_OPENAL" ] && libs="$libs openal-soft-devel"
     # ffmpeg requires packman repos
@@ -845,7 +845,7 @@ archlinux_installdeps() {
 
     $pacman -Q gtk3-classic >/dev/null 2>&1 && gtk=gtk3-classic
 
-    libs="zlib mesa gettext libpng sdl2 wxgtk3 $gtk sfml"
+    libs="zlib mesa gettext sdl2 wxgtk3 $gtk sfml"
 
     [ -n "$ENABLE_OPENAL" ] && libs="$libs openal"
     [ -n "$ENABLE_FFMPEG" ] && libs="$libs ffmpeg"
@@ -937,7 +937,7 @@ EOF
           fi
         done
 
-        deps="zlib gettext libpng pkg-config sdl2 wxmsw"
+        deps="zlib gettext pkg-config sdl2 wxmsw"
 
         [ -n "$ENABLE_OPENAL" ] && deps="$deps openal"
 
@@ -1113,7 +1113,7 @@ brew_installdeps() {
 
     check brew -v update
 
-    brews="nasm cmake ccache gettext libpng pkg-config sdl2 wxmac ccache ninja"
+    brews="nasm cmake ccache gettext pkg-config sdl2 wxmac ccache ninja"
 
     [ -n "$ENABLE_FFMPEG" ] && brews="$brews ffmpeg"
 
@@ -1143,7 +1143,7 @@ macports_installdeps() {
 
     check sudo port -v selfupdate
 
-    ports="cmake ccache nasm gettext libpng pkgconfig libsdl2 sfml wxWidgets-3.0 libiconv ninja"
+    ports="cmake ccache nasm gettext pkgconfig libsdl2 sfml wxWidgets-3.0 libiconv ninja"
 
     [ -n "$ENABLE_FFMPEG" ] && ports="$ports ffmpeg"
 
@@ -1159,7 +1159,7 @@ fink_installdeps() {
 
     check sudo fink -vy selfupdate
 
-    pkgs="cmake ccache nasm libgettext8-dev gettext-tools libpng16 pkgconfig sdl2 wxwidgets300-osxcocoa libiconv-dev sfml24-dev ccache ninja"
+    pkgs="cmake ccache nasm libgettext8-dev gettext-tools pkgconfig sdl2 wxwidgets300-osxcocoa libiconv-dev sfml24-dev ccache ninja"
 
     [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs ffmpeg"
 
