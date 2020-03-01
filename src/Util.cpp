@@ -13,11 +13,17 @@
 
 #include <zlib.h>
 
-#ifndef NO_PNG
+
+#define STB_IMAGE_IMPLEMENTATION
 extern "C" {
-#include <png.h>
+#include "../headers/stb/stb_image.h"
 }
-#endif
+
+#define STBI_MSC_SECURE_CRT
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+extern "C" {
+#include "../headers/stb/stb_image_write.h"
+}
 
 #include "NLS.h"
 #include "System.h"
@@ -179,127 +185,72 @@ void utilReadScreenPixels(uint8_t *dest, int w, int h)
         }
 }
 
+#define CHANNEL_NUM 3 // RGB
+
 bool utilWritePNGFile(const char *fileName, int w, int h, uint8_t *pix)
 {
-#ifndef NO_PNG
-        uint8_t writeBuffer[512 * 3];
-
-        FILE *fp = fopen(fileName, "wb");
-
-        if (!fp) {
-                systemMessage(MSG_ERROR_CREATING_FILE, N_("Error creating file %s"), fileName);
-                return false;
-        }
-
-        png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-        if (!png_ptr) {
-                fclose(fp);
-                return false;
-        }
-
-        png_infop info_ptr = png_create_info_struct(png_ptr);
-
-        if (!info_ptr) {
-                png_destroy_write_struct(&png_ptr, NULL);
-                fclose(fp);
-                return false;
-        }
-
-        if (setjmp(png_jmpbuf(png_ptr))) {
-                png_destroy_write_struct(&png_ptr, NULL);
-                fclose(fp);
-                return false;
-        }
-
-        png_init_io(png_ptr, fp);
-
-        png_set_IHDR(png_ptr,
-                     info_ptr,
-                     w,
-                     h,
-                     8,
-                     PNG_COLOR_TYPE_RGB,
-                     PNG_INTERLACE_NONE,
-                     PNG_COMPRESSION_TYPE_DEFAULT,
-                     PNG_FILTER_TYPE_DEFAULT);
-
-        png_write_info(png_ptr, info_ptr);
+        uint8_t writeBuffer[512 * CHANNEL_NUM];
 
         uint8_t *b = writeBuffer;
 
         int sizeX = w;
         int sizeY = h;
 
-        switch (systemColorDepth) {
-        case 16: {
-                uint16_t *p = (uint16_t *)(pix + (w + 2) * 2); // skip first black line
-                for (int y = 0; y < sizeY; y++) {
-                        for (int x = 0; x < sizeX; x++) {
-                                uint16_t v = *p++;
+        switch (systemColorDepth)
+        {
+            case 16: {
+                    uint16_t *p = (uint16_t *)(pix + (w + 2) * 2); // skip first black line
+                    for (int y = 0; y < sizeY; y++) {
+                            for (int x = 0; x < sizeX; x++) {
+                                    uint16_t v = *p++;
 
-                                *b++ = ((v >> systemRedShift) & 0x001f) << 3;   // R
-                                *b++ = ((v >> systemGreenShift) & 0x001f) << 3; // G
-                                *b++ = ((v >> systemBlueShift) & 0x01f) << 3;   // B
-                        }
-                        p++; // skip black pixel for filters
-                        p++; // skip black pixel for filters
-                        png_write_row(png_ptr, writeBuffer);
+                                    *b++ = ((v >> systemRedShift) & 0x001f) << 3;   // R
+                                    *b++ = ((v >> systemGreenShift) & 0x001f) << 3; // G
+                                    *b++ = ((v >> systemBlueShift) & 0x01f) << 3;   // B
+                            }
+                            p++; // skip black pixel for filters
+                            p++; // skip black pixel for filters
+                            b = writeBuffer;
+                    }
+            } break;
+            case 24: {
+                    uint8_t *pixU8 = (uint8_t *)pix;
+                    for (int y = 0; y < sizeY; y++) {
+                            for (int x = 0; x < sizeX; x++) {
+                                    if (systemRedShift < systemBlueShift) {
+                                            *b++ = *pixU8++; // R
+                                            *b++ = *pixU8++; // G
+                                            *b++ = *pixU8++; // B
+                                    } else {
+                                            int blue = *pixU8++;
+                                            int green = *pixU8++;
+                                            int red = *pixU8++;
 
-                        b = writeBuffer;
-                }
-        } break;
-        case 24: {
-                uint8_t *pixU8 = (uint8_t *)pix;
-                for (int y = 0; y < sizeY; y++) {
-                        for (int x = 0; x < sizeX; x++) {
-                                if (systemRedShift < systemBlueShift) {
-                                        *b++ = *pixU8++; // R
-                                        *b++ = *pixU8++; // G
-                                        *b++ = *pixU8++; // B
-                                } else {
-                                        int blue = *pixU8++;
-                                        int green = *pixU8++;
-                                        int red = *pixU8++;
+                                            *b++ = red;
+                                            *b++ = green;
+                                            *b++ = blue;
+                                    }
+                            }
+                            b = writeBuffer;
+                    }
+            } break;
+            case 32: {
+                    uint32_t *pixU32 = (uint32_t *)(pix + 4 * (w + 1));
+                    for (int y = 0; y < sizeY; y++) {
+                            for (int x = 0; x < sizeX; x++) {
+                                    uint32_t v = *pixU32++;
 
-                                        *b++ = red;
-                                        *b++ = green;
-                                        *b++ = blue;
-                                }
-                        }
-                        png_write_row(png_ptr, writeBuffer);
-
-                        b = writeBuffer;
-                }
-        } break;
-        case 32: {
-                uint32_t *pixU32 = (uint32_t *)(pix + 4 * (w + 1));
-                for (int y = 0; y < sizeY; y++) {
-                        for (int x = 0; x < sizeX; x++) {
-                                uint32_t v = *pixU32++;
-
-                                *b++ = ((v >> systemRedShift) & 0x001f) << 3;   // R
-                                *b++ = ((v >> systemGreenShift) & 0x001f) << 3; // G
-                                *b++ = ((v >> systemBlueShift) & 0x001f) << 3;  // B
-                        }
-                        pixU32++;
-
-                        png_write_row(png_ptr, writeBuffer);
-
-                        b = writeBuffer;
-                }
-        } break;
+                                    *b++ = ((v >> systemRedShift) & 0x001f) << 3;   // R
+                                    *b++ = ((v >> systemGreenShift) & 0x001f) << 3; // G
+                                    *b++ = ((v >> systemBlueShift) & 0x001f) << 3;  // B
+                            }
+                            pixU32++;
+                            b = writeBuffer;
+                    }
+            } break;
         }
 
-        png_write_end(png_ptr, info_ptr);
-
-        png_destroy_write_struct(&png_ptr, &info_ptr);
-
-        fclose(fp);
-
-        return true;
-#else
-        return false;
-#endif
+        return (0 != stbi_write_png(fileName, w, h, CHANNEL_NUM, writeBuffer, w * CHANNEL_NUM));
 }
 
 void utilPutDword(uint8_t *p, uint32_t value)
