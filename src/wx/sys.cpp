@@ -705,7 +705,7 @@ PrintDialog::PrintDialog(const uint16_t* data, int lines, bool cont):
     npw(1),
     nph(1)
 {
-    dlg = wxStaticCast(wxGetApp().frame->FindWindow(XRCID("GBPrinter")), wxDialog);
+    dlg = wxStaticCast(wxGetApp().frame->FindWindowByName("GBPrinter"), wxDialog);
     p = XRCCTRL(*dlg, "Preview", wxPanel);
     wxScrolledWindow* pp = wxStaticCast(p->GetParent(), wxScrolledWindow);
     wxSize sz(320, lines * 2);
