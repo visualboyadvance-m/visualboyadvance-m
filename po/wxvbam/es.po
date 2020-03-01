@@ -9,15 +9,15 @@
 # javidg96, 2015
 # Marco123V <MarcoVillalejos@hotmail.com>, 2015
 # MELERIX, 2015
-# MELERIX, 2015
+# MELERIX, 2015,2020
 # Ruben Nava, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-02-24 20:58+0000\n"
-"PO-Revision-Date: 2020-02-25 00:45+0000\n"
-"Last-Translator: bgK\n"
+"PO-Revision-Date: 2020-02-29 22:05+0000\n"
+"Last-Translator: MELERIX\n"
 "Language-Team: Spanish (http://www.transifex.com/bgk/vba-m/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -63,7 +63,7 @@ msgstr "Archivo ROM"
 
 #: wxvbam.cpp:551
 msgid "<config>=<value>"
-msgstr "<configuración>=<valor>"
+msgstr "<config>=<value>"
 
 #: wxvbam.cpp:582
 msgid "Configuration/build error: can't find built-in xrc"
@@ -1128,35 +1128,35 @@ msgstr "Desconectado control de juego %d"
 
 #: xaudio2.cpp:35
 msgid "XAudio2: Enumerating devices failed!"
-msgstr ""
+msgstr "XAudio2: ¡Enumerando dispositivos fallido!"
 
 #: xaudio2.cpp:69 xaudio2.cpp:353
 msgid "The XAudio2 interface failed to initialize!"
-msgstr ""
+msgstr "¡La interfaz XAudio2 fallo al inicializar!"
 
 #: xaudio2.cpp:384
 msgid "XAudio2: Creating mastering voice failed!"
-msgstr ""
+msgstr "XAudio2: ¡Creando masterización de voz fallido!"
 
 #: xaudio2.cpp:393
 msgid "XAudio2: Creating source voice failed!"
-msgstr ""
+msgstr "XAudio2: ¡Creando fuente de voz fallido!"
 
 #: faudio.cpp:32
 msgid "FAudio: Enumerating devices failed!"
-msgstr ""
+msgstr "FAudio: ¡Enumerando dispositivos fallido!"
 
 #: faudio.cpp:67 faudio.cpp:352
 msgid "The FAudio interface failed to initialize!"
-msgstr ""
+msgstr "¡La interfaz FAudio fallo al inicializar!"
 
 #: faudio.cpp:384
 msgid "FAudio: Creating mastering voice failed!"
-msgstr ""
+msgstr "FAudio: ¡Creando masterización de voz fallido!"
 
 #: faudio.cpp:395
 msgid "FAudio: Creating source voice failed!"
-msgstr ""
+msgstr "FAudio: ¡Creando fuente de voz fallido!"
 
 #: dsound.cpp:90 dsound.cpp:104
 #, c-format
@@ -2059,7 +2059,7 @@ msgstr "4x"
 
 #: xrc/GBPrinter.xrc:58
 msgid "C&ontinue"
-msgstr "C%ontinuar"
+msgstr "C&ontinuar"
 
 #: xrc/GBROMInfo.xrc:48
 msgid "Unit code:"
@@ -2747,7 +2747,7 @@ msgstr "&e-Reader"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
-msgstr ""
+msgstr "&Reiniciar Cargado de Código de Puntos"
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
@@ -2755,7 +2755,7 @@ msgstr "&Cargar Código de Puntos..."
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr ""
+msgstr "&Reiniciar Guardado de Código de Puntos"
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
@@ -3492,7 +3492,7 @@ msgstr "Servidor:"
 
 #: xrc/NetLink.xrc:81
 msgid "Port:"
-msgstr ""
+msgstr "Puerto:"
 
 #: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
