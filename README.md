@@ -119,7 +119,6 @@ And the following development libraries:
 - [mesa](https://mesa3d.org/) (if using X11 or any OpenGL otherwise)
 - [ffmpeg](https://ffmpeg.org/) (optional, at least version `4.0.4`, for game recording)
 - [gettext](https://www.gnu.org/software/gettext/) and gettext-tools (optional, with ENABLE_NLS)
-- [libpng](http://www.libpng.org/pub/png/libpng.html) (required)
 - [SDL2](https://www.libsdl.org/) (required)
 - [SFML](https://www.sfml-dev.org/) (optional, for link)
 - [OpenAL](https://www.openal.org/) or [openal-soft](https://kcat.strangesoft.net/openal.html) (optional, a sound interface)
