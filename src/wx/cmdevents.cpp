@@ -2883,7 +2883,7 @@ EVT_HANDLER(AGBPrinter, "Enable AGB printer")
     update_opts();
 }
 
-EVT_HANDLER(GBALcdFilter, "Enable LCD filter")
+EVT_HANDLER_MASK(GBALcdFilter, "Enable LCD filter", CMDEN_GBA)
 {
     bool menuPress;
     GetMenuOptionBool("GBALcdFilter", menuPress);
@@ -2893,7 +2893,7 @@ EVT_HANDLER(GBALcdFilter, "Enable LCD filter")
     update_opts();
 }
 
-EVT_HANDLER(GBLcdFilter, "Enable LCD filter")
+EVT_HANDLER_MASK(GBLcdFilter, "Enable LCD filter", CMDEN_GB)
 {
     bool menuPress;
     GetMenuOptionBool("GBLcdFilter", menuPress);
