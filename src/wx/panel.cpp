@@ -1078,12 +1078,14 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
         // set focus to panel
         w->SetFocus();
+
+        // generate system color maps (after output module init)
+        if (loaded == IMAGE_GBA) utilUpdateSystemColorMaps(gbaLcdFilter);
+        else if (loaded == IMAGE_GB) utilUpdateSystemColorMaps(gbLcdFilter);
+        else utilUpdateSystemColorMaps(false);
     }
 
     mf->PollJoysticks();
-
-    if (loaded == IMAGE_GBA) utilUpdateSystemColorMaps(gbaLcdFilter);
-    else if (loaded == IMAGE_GB) utilUpdateSystemColorMaps(gbLcdFilter);
 
     if (!paused) {
         HidePointer();
@@ -1471,9 +1473,6 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
         systemBlueShift = 0;
         RGB_LOW_BITS_MASK = 0x0421;
     }
-
-    // needs to be run once before the first draw
-    utilUpdateSystemColorMaps(false);
 }
 
 DrawingPanel::DrawingPanel(wxWindow* parent, int _width, int _height)
