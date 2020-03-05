@@ -246,6 +246,46 @@ if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
     # of files that depend on version.h
     include(GetGitRevisionDescription)
     get_git_head_revision(REFSPEC COMMITHASH)
+
+    # Make sure old tags are gone from all clones.
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} tag -l
+        OUTPUT_VARIABLE git_tags
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+
+    string(REGEX REPLACE ";"     "\\\\;" git_tags_lines "${git_tags}")
+    string(REGEX REPLACE "\r?\n" ";"     git_tags_lines "${git_tags_lines}")
+
+    set(found_old_tags FALSE)
+
+    foreach(tag ${git_tags_lines})
+        if(NOT tag MATCHES "^v[0-9]")
+            set(found_old_tags TRUE)
+            break()
+        endif()
+    endforeach()
+
+    if(found_old_tags)
+        # Delete all tags and fetch them from the origin.
+
+        foreach(tag ${git_tags_lines})
+            execute_process(
+                COMMAND ${GIT_EXECUTABLE} tag -d ${tag}
+                OUTPUT_QUIET
+                ERROR_QUIET
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            )
+        endforeach()
+
+        execute_process(
+            COMMAND ${GIT_EXECUTABLE} fetch --tags
+            OUTPUT_QUIET
+            ERROR_QUIET
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        )
+    endif()
 endif()
 
 # no git or no tags, use ChangeLog
