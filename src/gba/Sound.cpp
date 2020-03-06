@@ -518,6 +518,8 @@ int soundGetEnable()
 
 void soundReset()
 {
+    if (!soundDriver)
+        return;
     soundDriver->reset();
 
     remake_stereo_buffer();
