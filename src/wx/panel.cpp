@@ -172,7 +172,9 @@ void GameArea::LoadGame(const wxString& name)
         gb_effects_config.echo = (float)gopts.gb_echo / 100.0;
         gb_effects_config.stereo = (float)gopts.gb_stereo / 100.0;
         gbSoundSetDeclicking(gopts.gb_declick);
-        soundInit();
+        if (!soundInit()) {
+            wxLogError(_("Could not initialize the sound driver!"));
+        }
         soundSetEnable(gopts.sound_en);
         gbSoundSetSampleRate(!gopts.sound_qual ? 48000 : 44100 / (1 << (gopts.sound_qual - 1)));
         soundSetVolume((float)gopts.sound_vol / 100.0);
@@ -271,7 +273,9 @@ void GameArea::LoadGame(const wxString& name)
 
         doMirroring(mirroringEnable);
         // start sound; this must happen before CPU stuff
-        soundInit();
+        if (!soundInit()) {
+            wxLogError(_("Could not initialize the sound driver!"));
+        }
         soundSetEnable(gopts.sound_en);
         soundSetSampleRate(!gopts.sound_qual ? 48000 : 44100 / (1 << (gopts.sound_qual - 1)));
         soundSetVolume((float)gopts.sound_vol / 100.0);

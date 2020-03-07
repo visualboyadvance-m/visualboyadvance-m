@@ -2667,7 +2667,10 @@ EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)
             // or init-only options
             (oapi == AUD_XAUDIO2 && oupmix != gopts.upmix) || (oapi == AUD_FAUDIO && oupmix != gopts.upmix) || (oapi == AUD_DIRECTSOUND && ohw != gopts.dsound_hw_accel))) {
         soundShutdown();
-        soundInit();
+
+        if (!soundInit()) {
+            wxLogError(_("Could not initialize the sound driver!"));
+        }
     }
 
     soundSetVolume((float)gopts.sound_vol / 100.0);
