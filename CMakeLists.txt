@@ -280,7 +280,7 @@ if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
         endforeach()
 
         execute_process(
-            COMMAND ${GIT_EXECUTABLE} fetch --tags
+            COMMAND ${GIT_EXECUTABLE} fetch --tags origin
             OUTPUT_QUIET
             ERROR_QUIET
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
