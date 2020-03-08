@@ -133,7 +133,7 @@ void GameArea::LoadGame(const wxString& name)
 
         if (!pfn.IsFileReadable()) {
             pfn.SetExt(wxT("ups"));
-			
+
 			if (!pfn.IsFileReadable()) {
 				pfn.SetExt(wxT("bps"));
 
@@ -225,7 +225,7 @@ void GameArea::LoadGame(const wxString& name)
             int size = 0x2000000 < rom_size ? 0x2000000 : rom_size;
             applyPatch(pfn.GetFullPath().mb_str(), &rom, &size);
             // that means we no longer really know rom_size either <sigh>
-            
+
             gbaUpdateRomSize(size);
         }
 
@@ -2219,34 +2219,53 @@ void GLDrawingPanel::DrawingPanelInit()
 #endif
     glClearColor(0.0, 0.0, 0.0, 1.0);
 // non-portable vsync code
-#if defined(__WXGTK__) && defined(GLX_SGI_swap_control)
-    static PFNGLXSWAPINTERVALSGIPROC si = NULL;
+#if defined(__WXGTK__)
+    static PFNGLXSWAPINTERVALSGIPROC glXSwapIntervalSGI = NULL;
+    static PFNGLXSWAPINTERVALMESAPROC glXSwapIntervalMESA = NULL;
 
-    if (!si)
-        si = (PFNGLXSWAPINTERVALSGIPROC)glXGetProcAddress((const GLubyte*)"glxSwapIntervalSGI");
+    char* glxQuery = (char*)glXQueryExtensionsString(glXGetCurrentDisplay(), 0);
 
-    if (si)
-        si(vsync);
+    if (strstr(glxQuery, "GLX_SGI_swap_control") != NULL)
+    {
+        glXSwapIntervalSGI = reinterpret_cast<PFNGLXSWAPINTERVALSGIPROC>(glXGetProcAddress(reinterpret_cast<const unsigned char*>("glXSwapIntervalSGI")));
 
-#else
-#if defined(__WXMSW__) && defined(WGL_EXT_swap_control)
-    static PFNWGLSWAPINTERVALEXTPROC si = NULL;
+        if (glXSwapIntervalSGI)
+            glXSwapIntervalSGI(vsync);
+        else
+            systemScreenMessage(_("Failed to set glXSwapIntervalSGI"));
+    }
+    else if (strstr(glxQuery, "GLX_MESA_swap_control") != NULL)
+    {
+        glXSwapIntervalMESA = reinterpret_cast<PFNGLXSWAPINTERVALMESAPROC>(glXGetProcAddress(reinterpret_cast<const unsigned char*>("glXSwapIntervalMESA")));
 
-    if (!si)
-        si = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
+        if (glXSwapIntervalMESA)
+            glXSwapIntervalMESA(vsync);
+        else
+            systemScreenMessage(_("Failed to set glXSwapIntervalMESA"));
+    }
+#elif defined(__WXMSW__)
+    typedef char* (*wglext)();
+    wglext wglGetExtensionsString = (wglext)wglGetProcAddress("wglGetExtensionsString");
+    if (wglGetExtensionsString == NULL || strstr(wglGetExtensionsString(), "WGL_EXT_swap_control") == 0) {
+        if (wglGetExtensionsString == NULL)
+            systemScreenMessage(_("No support for wglGetExtensionsString"));
+        else
+            systemScreenMessage(_("No support for WGL_EXT_swap_control"));
+    }
 
-    if (si)
-        si(vsync);
-
-#else
-#ifdef __WXMAC__
+    typedef bool (*PFNWGLSWAPINTERVALEXTPROC)(int);
+    static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = NULL;
+    wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
+    if (wglSwapIntervalEXT)
+        wglSwapIntervalEXT(vsync);
+    else
+        systemScreenMessage(_("Failed to set wglSwapIntervalEXT"));
+#elif defined(__WXMAC__)
     int swap_interval = vsync ? 1 : 0;
     CGLContextObj cgl_context = CGLGetCurrentContext();
     CGLSetParameter(cgl_context, kCGLCPSwapInterval, &swap_interval);
 #else
-//#warning no vsync support on this platform
-#endif
-#endif
+    systemScreenMessage(_("No VSYNC available on this platform"));
 #endif
 }
 
