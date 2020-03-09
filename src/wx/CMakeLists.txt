@@ -1048,10 +1048,16 @@ if(UPSTREAM_RELEASE AND WIN32)
 
     set(exezip visualboyadvance-m-Win-${BITS}bit.zip)
 
+    unset(pdb_file)
+
+    if(MSVC AND CMAKE_BUILD_TYPE MATCHES Debug)
+        set(pdb_file visualboyadvance-m.pdb)
+    endif()
+
     add_custom_command(
         TARGET visualboyadvance-m
         POST_BUILD
-        COMMAND ${ZIP_PROGRAM} -9 ${exezip} visualboyadvance-m.exe
+        COMMAND ${ZIP_PROGRAM} -9 ${exezip} visualboyadvance-m.exe ${pdb_file}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
