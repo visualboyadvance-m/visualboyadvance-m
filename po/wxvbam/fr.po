@@ -20,8 +20,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-24 20:58+0000\n"
-"PO-Revision-Date: 2020-02-25 00:45+0000\n"
+"POT-Creation-Date: 2020-03-07 13:29+0000\n"
+"PO-Revision-Date: 2020-03-08 00:52+0000\n"
 "Last-Translator: bgK\n"
 "Language-Team: French (http://www.transifex.com/bgk/vba-m/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -164,7 +164,7 @@ msgstr "Sélectionner un fichier de codes de triche"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Codes de triche VBA (*.clt)|*.clt|Codes de triche CHT (*.cht)|*.cht"
 
-#: guiinit.cpp:241 panel.cpp:413
+#: guiinit.cpp:241 panel.cpp:417
 msgid "Loaded cheats"
 msgstr "Codes de triche chargés"
 
@@ -612,7 +612,7 @@ msgstr "En important une sauvegarde native, toutes les sauvegardes de jeu seront
 msgid "Confirm import"
 msgstr "Confirmer l'importation"
 
-#: cmdevents.cpp:907 panel.cpp:356
+#: cmdevents.cpp:907 panel.cpp:360
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Sauvegarde native %s chargée"
@@ -695,7 +695,7 @@ msgstr "Erreur durant le chargement de l'instantané %s"
 msgid "Wrote battery %s"
 msgstr "Sauvegarde native %s écrite"
 
-#: cmdevents.cpp:1100 panel.cpp:662
+#: cmdevents.cpp:1100 panel.cpp:666
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Erreur durant l'écriture de la sauvegarde native %s"
@@ -805,18 +805,22 @@ msgstr "Vous utiliser le filtre pixel #%d"
 msgid "Using interframe blending #%d"
 msgstr ""
 
-#: cmdevents.cpp:2761
+#: cmdevents.cpp:2672 panel.cpp:176 panel.cpp:277
+msgid "Could not initialize the sound driver!"
+msgstr ""
+
+#: cmdevents.cpp:2764
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Émulateur Nintendo GameBoy (+Color+Advance)."
 
-#: cmdevents.cpp:2762
+#: cmdevents.cpp:2765
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2017 VBA-M development team"
 
-#: cmdevents.cpp:2763
+#: cmdevents.cpp:2766
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -832,11 +836,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3027
+#: cmdevents.cpp:3030
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "La connexion LAN est déjà active. Désactiver le mode Link pour se déconnecter."
 
-#: cmdevents.cpp:3033
+#: cmdevents.cpp:3036
 msgid "Network is not supported in local mode."
 msgstr "Réseau non supporté en mode local."
 
@@ -945,7 +949,7 @@ msgstr "Erreur de la configuration du socket du serveur (%d)"
 msgid "%s is not a valid ROM file"
 msgstr "%s n'est pas une ROM valide"
 
-#: panel.cpp:91 panel.cpp:152 panel.cpp:213
+#: panel.cpp:91 panel.cpp:152 panel.cpp:215
 msgid "Problem loading file"
 msgstr "Problème durant le chargement du fichier"
 
@@ -954,113 +958,113 @@ msgstr "Problème durant le chargement du fichier"
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Impossible de charger la ROM Game Boy %s"
 
-#: panel.cpp:189 panel.cpp:287
+#: panel.cpp:191 panel.cpp:291
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Impossible de charger le BIOS %s"
 
-#: panel.cpp:212
+#: panel.cpp:214
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Impossible de charger la ROM Game Boy Advance %s"
 
-#: panel.cpp:445
+#: panel.cpp:449
 msgid " player "
 msgstr "joueur"
 
-#: panel.cpp:610
+#: panel.cpp:614
 #, c-format
 msgid "Loaded state %s"
 msgstr "État %s chargé"
 
-#: panel.cpp:610
+#: panel.cpp:614
 #, c-format
 msgid "Error loading state %s"
 msgstr "Erreur durant le chargement de l'état %s"
 
-#: panel.cpp:634
+#: panel.cpp:638
 #, c-format
 msgid "Saved state %s"
 msgstr "État %s chargé"
 
-#: panel.cpp:634
+#: panel.cpp:638
 #, c-format
 msgid "Error saving state %s"
 msgstr "Erreur durant la sauvegarde de l'état %s"
 
-#: panel.cpp:838
+#: panel.cpp:842
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "Mode plein écran %dx%d-%d@%d non supporté ; à la recherche d'un autre"
 
-#: panel.cpp:876
+#: panel.cpp:880
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "Mode plein écran %dx%d-%d@%d non supporté"
 
-#: panel.cpp:881
+#: panel.cpp:885
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Mode valide : %dx%d-%d@%d"
 
-#: panel.cpp:889
+#: panel.cpp:893
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "Mode %dx%d-%d@%d choisi"
 
-#: panel.cpp:893
+#: panel.cpp:897
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Echec du changement de mode à %dx%d-%d@%d"
 
-#: panel.cpp:977
+#: panel.cpp:981
 msgid "Not a valid GBA cartridge"
 msgstr "Cartouche GBA non valide"
 
-#: panel.cpp:1120
+#: panel.cpp:1124
 msgid "No memory for rewinding"
 msgstr "Mémoire insuffisante pour le rembobinage"
 
-#: panel.cpp:1130
+#: panel.cpp:1134
 msgid "Error writing rewind state"
 msgstr "Erreur durant l'écriture de l'état du rembobinage"
 
-#: panel.cpp:2341
+#: panel.cpp:2345
 msgid "memory allocation error"
 msgstr "Erreur d'allocation mémoire"
 
-#: panel.cpp:2344
+#: panel.cpp:2348
 msgid "error initializing codec"
 msgstr "Erreur durant l'initialisation du codec"
 
-#: panel.cpp:2347
+#: panel.cpp:2351
 msgid "error writing to output file"
 msgstr "Erreur durant l'écriture du fichier de sortie"
 
-#: panel.cpp:2350
+#: panel.cpp:2354
 msgid "can't guess output format from file name"
 msgstr "Ne peut pas deviner l'extension du nom du fichier de sortie"
 
-#: panel.cpp:2355
+#: panel.cpp:2359
 msgid "programming error; aborting!"
 msgstr "Erreur de programmation : interruption immédiate !"
 
-#: panel.cpp:2372 panel.cpp:2403
+#: panel.cpp:2376 panel.cpp:2407
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Impossible de démarrer l'enregistrement à %s (%s)"
 
-#: panel.cpp:2431
+#: panel.cpp:2435
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Erreur durant l'enregistrement audio/vidéo (%s) : interruption immédiate !"
 
-#: panel.cpp:2437
+#: panel.cpp:2441
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Erreur durant l'enregistrement audio (%s) ; interruption immédiate !"
 
-#: panel.cpp:2447
+#: panel.cpp:2451
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Erreur durant l'enregistrement vidéo (%s) ; interruption immédiate !"

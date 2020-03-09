@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-24 20:58+0000\n"
-"PO-Revision-Date: 2020-02-25 00:45+0000\n"
+"POT-Creation-Date: 2020-03-07 13:29+0000\n"
+"PO-Revision-Date: 2020-03-08 00:52+0000\n"
 "Last-Translator: bgK\n"
 "Language-Team: Czech (http://www.transifex.com/bgk/vba-m/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -156,7 +156,7 @@ msgstr "Vyberte soubor s cheaty"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Seznam cheatů VBA (*.clt)|*.cltlSeznam cheatů CHT (*.cht)|*.cht"
 
-#: guiinit.cpp:241 panel.cpp:413
+#: guiinit.cpp:241 panel.cpp:417
 msgid "Loaded cheats"
 msgstr "Načtené cheaty"
 
@@ -604,7 +604,7 @@ msgstr "Importování souboru s baterií odstraní všechny uložené hry (natvr
 msgid "Confirm import"
 msgstr "Potvrdit import"
 
-#: cmdevents.cpp:907 panel.cpp:356
+#: cmdevents.cpp:907 panel.cpp:360
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Nahrána baterie %s"
@@ -687,7 +687,7 @@ msgstr "Chyba při nahrávání snapshot souboru %s"
 msgid "Wrote battery %s"
 msgstr "Zapsána baterie %s"
 
-#: cmdevents.cpp:1100 panel.cpp:662
+#: cmdevents.cpp:1100 panel.cpp:666
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Chyba zapisování baterie %s"
@@ -797,18 +797,22 @@ msgstr ""
 msgid "Using interframe blending #%d"
 msgstr ""
 
-#: cmdevents.cpp:2761
+#: cmdevents.cpp:2672 panel.cpp:176 panel.cpp:277
+msgid "Could not initialize the sound driver!"
+msgstr ""
+
+#: cmdevents.cpp:2764
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Emulátor Nintendo GameBoy (+Color+Advance)."
 
-#: cmdevents.cpp:2762
+#: cmdevents.cpp:2765
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr " Autorská práva (C) 1999-2003 Zapomenuté\nAutorská práva (C) 2004-2006 VBA vývojový tým\nAutorská práva (C) 2007-2017 VBA-M vývojový tým"
 
-#: cmdevents.cpp:2763
+#: cmdevents.cpp:2766
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -824,11 +828,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Tento program je svobodný software: můžete jej šířit a upravovat podle ustanovení GNU General Public Licence, vydávané Free Software Foundation a to buď podle 2. verze této Licence, nebo (podle vašeho uvážení) kterékoli pozdější verze.\n\nTento program je rozšiřován v naději, že bude užitečný, avšak BEZ JAKÉKOLIV ZÁRUKY. Neposkytují se ani odvozené záruky PRODEJNOSTI anebo VHODNOSTI PRO URČITÝ ÚČEL. Další podrobnosti hledejte v Obecné veřejné licenci GNU.\n\nKopii Obecné veřejné licence GNU jste měli obdržet spolu s tímto programem. Pokud se tak nestalo, najdete ji zde: <http://www.gnu.org/licenses/>."
 
-#: cmdevents.cpp:3027
+#: cmdevents.cpp:3030
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LAN spojení je již aktivní. Zakažte režim propojení pro odpojení."
 
-#: cmdevents.cpp:3033
+#: cmdevents.cpp:3036
 msgid "Network is not supported in local mode."
 msgstr "Síť není podporována v místním režimu."
 
@@ -937,7 +941,7 @@ msgstr "Chyba při nastavování soketu serveru (%d)"
 msgid "%s is not a valid ROM file"
 msgstr "%s není platný soubor ROM"
 
-#: panel.cpp:91 panel.cpp:152 panel.cpp:213
+#: panel.cpp:91 panel.cpp:152 panel.cpp:215
 msgid "Problem loading file"
 msgstr "Chyba při načítání souboru"
 
@@ -946,113 +950,113 @@ msgstr "Chyba při načítání souboru"
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Nelze načíst Game Boy ROM %s"
 
-#: panel.cpp:189 panel.cpp:287
+#: panel.cpp:191 panel.cpp:291
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Nelze načíst BIOS %s"
 
-#: panel.cpp:212
+#: panel.cpp:214
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Nelze načíst Game Boy Advance ROM %s"
 
-#: panel.cpp:445
+#: panel.cpp:449
 msgid " player "
 msgstr " hráč "
 
-#: panel.cpp:610
+#: panel.cpp:614
 #, c-format
 msgid "Loaded state %s"
 msgstr "Stav %s načten"
 
-#: panel.cpp:610
+#: panel.cpp:614
 #, c-format
 msgid "Error loading state %s"
 msgstr "Chyba při načítání stavu %s"
 
-#: panel.cpp:634
+#: panel.cpp:638
 #, c-format
 msgid "Saved state %s"
 msgstr "Stav %s uložen"
 
-#: panel.cpp:634
+#: panel.cpp:638
 #, c-format
 msgid "Error saving state %s"
 msgstr "Chyba při ukládání stavu %s"
 
-#: panel.cpp:838
+#: panel.cpp:842
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "Režim celé obrazovky %dx%d-%d@%d není podporován; hledá se jiný"
 
-#: panel.cpp:876
+#: panel.cpp:880
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "Režim celé obrazovky %dx%d-%d@%d není podporován"
 
-#: panel.cpp:881
+#: panel.cpp:885
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Platný režim: %dx%d-%d@%d"
 
-#: panel.cpp:889
+#: panel.cpp:893
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "Zvolen režim %dx%d-%d@%d"
 
-#: panel.cpp:893
+#: panel.cpp:897
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Nelze změnit režim na %dx%d-%d@%d"
 
-#: panel.cpp:977
+#: panel.cpp:981
 msgid "Not a valid GBA cartridge"
 msgstr "Není platná karta GBA"
 
-#: panel.cpp:1120
+#: panel.cpp:1124
 msgid "No memory for rewinding"
 msgstr "Žádná paměť pro přetočení"
 
-#: panel.cpp:1130
+#: panel.cpp:1134
 msgid "Error writing rewind state"
 msgstr "Chyba při zápisu stavu přetočení"
 
-#: panel.cpp:2341
+#: panel.cpp:2345
 msgid "memory allocation error"
 msgstr "chyba přidělení paměti"
 
-#: panel.cpp:2344
+#: panel.cpp:2348
 msgid "error initializing codec"
 msgstr "chyba při zavádění kodeku"
 
-#: panel.cpp:2347
+#: panel.cpp:2351
 msgid "error writing to output file"
 msgstr "chyba při zápisu do výstupního souboru"
 
-#: panel.cpp:2350
+#: panel.cpp:2354
 msgid "can't guess output format from file name"
 msgstr "nešlo odhadnout výstupní formát z názvu souboru"
 
-#: panel.cpp:2355
+#: panel.cpp:2359
 msgid "programming error; aborting!"
 msgstr "chyba programování; probíhá ukončování!"
 
-#: panel.cpp:2372 panel.cpp:2403
+#: panel.cpp:2376 panel.cpp:2407
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Nelze zahájit nahrávání do %s (%s)"
 
-#: panel.cpp:2431
+#: panel.cpp:2435
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Chyba při nahrávání videa/zvuku (%s); nahrávání ukončeno"
 
-#: panel.cpp:2437
+#: panel.cpp:2441
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Chyba při nahrávání zvuku (%s); nahrávání ukončeno"
 
-#: panel.cpp:2447
+#: panel.cpp:2451
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Chyba při nahrávání videa (%s); nahrávání ukončeno"

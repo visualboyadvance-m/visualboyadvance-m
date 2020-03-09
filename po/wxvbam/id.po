@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-24 20:58+0000\n"
-"PO-Revision-Date: 2020-03-03 03:23+0000\n"
-"Last-Translator: Jeremy Belpois <jeremy.belpois.einstein@gmail.com>\n"
+"POT-Creation-Date: 2020-03-07 13:29+0000\n"
+"PO-Revision-Date: 2020-03-08 00:52+0000\n"
+"Last-Translator: bgK\n"
 "Language-Team: Indonesian (http://www.transifex.com/bgk/vba-m/language/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -155,7 +155,7 @@ msgstr "Pilih file cheat"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Daftar cheat VBA (*.clt)|*.clt|Daftar cheat CHT (*.cht)|*.cht"
 
-#: guiinit.cpp:241 panel.cpp:413
+#: guiinit.cpp:241 panel.cpp:417
 msgid "Loaded cheats"
 msgstr "Cheat yang dimuat"
 
@@ -603,7 +603,7 @@ msgstr "Mengimpor file baterai akan menghapus simpanan permainan (secara permane
 msgid "Confirm import"
 msgstr "Konfirmasi untuk mengimpor"
 
-#: cmdevents.cpp:907 panel.cpp:356
+#: cmdevents.cpp:907 panel.cpp:360
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Baterai yang dimuat %s"
@@ -686,7 +686,7 @@ msgstr "Terjadi kesalahan dalam memuat file snapshot %s"
 msgid "Wrote battery %s"
 msgstr "Menyimpan baterai %s"
 
-#: cmdevents.cpp:1100 panel.cpp:662
+#: cmdevents.cpp:1100 panel.cpp:666
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Terjadi kesalahan dalam menyimpan baterai %s"
@@ -796,18 +796,22 @@ msgstr "Menggunakan filter pixel #%d"
 msgid "Using interframe blending #%d"
 msgstr "Menggunakan penyamaran antarbingkai #%d"
 
-#: cmdevents.cpp:2761
+#: cmdevents.cpp:2672 panel.cpp:176 panel.cpp:277
+msgid "Could not initialize the sound driver!"
+msgstr ""
+
+#: cmdevents.cpp:2764
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Emulator Nintendo GameBoy (+Color+Advance)."
 
-#: cmdevents.cpp:2762
+#: cmdevents.cpp:2765
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Hak Cipta © 1999-2003 Forgotten\nHak Cipta © 2004-2006 Tim pengembangan VBA\nHak Cipta © 2007-2017 Tim pengembangan VBA-M"
 
-#: cmdevents.cpp:2763
+#: cmdevents.cpp:2766
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -823,11 +827,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Program ini termasuk dalam perangkat lunak bebas: anda dapat mendistribusikan ulang dan/atau merubah\nprogram ini sesuai dengan GNU General Public License yang telah dipublikasikan oleh\nFree Software Foundation, baik menurut Lisensi versi 2, maupun\n(sesuai dengan pilihan anda) versi lainnya yang lebih baru.\n\nProgram ini didistribusikan dengan harapan bahwa program ini akan dapat berguna,\nnamun program ini didistribusikan TANPA JAMINAN APAPUN; bahkan dengan jaminan untuk DIPERJUAL BELIKAN ataupun AKAN SESUAI UNTUK TUJUAN TERTENTU sekalipun. Lihat\nGNU General Public License untuk informasi lebih lanjut.\n\nAnda dapat memperoleh salinan dari GNU General Public License\nbersama dengan program ini. Jika anda tidak memperolehnya, anda dapat melihatnya di http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3027
+#: cmdevents.cpp:3030
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "Hubungan LAN sudah aktif. Putuskan mode hubung untuk memutuskan hubungan."
 
-#: cmdevents.cpp:3033
+#: cmdevents.cpp:3036
 msgid "Network is not supported in local mode."
 msgstr "Fitur jaringan tidak didukung dalam mode lokal."
 
@@ -936,7 +940,7 @@ msgstr "Terjadi kesalahan dalam mempersiapkan socket server (%d)"
 msgid "%s is not a valid ROM file"
 msgstr "%s bukan merupakan file ROM yang valid"
 
-#: panel.cpp:91 panel.cpp:152 panel.cpp:213
+#: panel.cpp:91 panel.cpp:152 panel.cpp:215
 msgid "Problem loading file"
 msgstr "Terjadi kesalahan ketika memuat file"
 
@@ -945,113 +949,113 @@ msgstr "Terjadi kesalahan ketika memuat file"
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Tidak dapat memuat ROM Game Boy %s"
 
-#: panel.cpp:189 panel.cpp:287
+#: panel.cpp:191 panel.cpp:291
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Tidak dapat memuat BIOS %s"
 
-#: panel.cpp:212
+#: panel.cpp:214
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Tidak dapat memuat ROM Game Boy Advance %s"
 
-#: panel.cpp:445
+#: panel.cpp:449
 msgid " player "
 msgstr "pemain"
 
-#: panel.cpp:610
+#: panel.cpp:614
 #, c-format
 msgid "Loaded state %s"
 msgstr "State yang dimuat %s"
 
-#: panel.cpp:610
+#: panel.cpp:614
 #, c-format
 msgid "Error loading state %s"
 msgstr "Terjadi kesalahan dalam memuat state %s"
 
-#: panel.cpp:634
+#: panel.cpp:638
 #, c-format
 msgid "Saved state %s"
 msgstr "State yang disimpan %s"
 
-#: panel.cpp:634
+#: panel.cpp:638
 #, c-format
 msgid "Error saving state %s"
 msgstr "Terjadi kesalahan dalam menyimpan state %s"
 
-#: panel.cpp:838
+#: panel.cpp:842
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "Mode layar penuh %dx%d-%d@%d tidak didukung; mencari mode yang lain"
 
-#: panel.cpp:876
+#: panel.cpp:880
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "Mode layar penuh %dx%d-%d@%d tidak didukung"
 
-#: panel.cpp:881
+#: panel.cpp:885
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Mode yang valid: %dx%d-%d@%d"
 
-#: panel.cpp:889
+#: panel.cpp:893
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "Pilih mode %dx%d-%d@%d"
 
-#: panel.cpp:893
+#: panel.cpp:897
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Gagal merubah mode ke %dx%d-%d@%d"
 
-#: panel.cpp:977
+#: panel.cpp:981
 msgid "Not a valid GBA cartridge"
 msgstr "Bukan merupakan cartridge GBA yang valid"
 
-#: panel.cpp:1120
+#: panel.cpp:1124
 msgid "No memory for rewinding"
 msgstr "Tidak ada memori untuk memuat state mundur"
 
-#: panel.cpp:1130
+#: panel.cpp:1134
 msgid "Error writing rewind state"
 msgstr "Terjadi kesalahan dalam menyimpan state mundur"
 
-#: panel.cpp:2341
+#: panel.cpp:2345
 msgid "memory allocation error"
 msgstr "terjadi kesalahan dalam mengalokasikan memori"
 
-#: panel.cpp:2344
+#: panel.cpp:2348
 msgid "error initializing codec"
 msgstr "terjadi kesalahan dalam menginisialisasikan codec"
 
-#: panel.cpp:2347
+#: panel.cpp:2351
 msgid "error writing to output file"
 msgstr "terjadi kesalahan dalam menyimpan file keluaran"
 
-#: panel.cpp:2350
+#: panel.cpp:2354
 msgid "can't guess output format from file name"
 msgstr "tidak dapat menebak format keluaran dari nama file"
 
-#: panel.cpp:2355
+#: panel.cpp:2359
 msgid "programming error; aborting!"
 msgstr "terjadi kesalama dalam pemrograman; membatalkan perintah!"
 
-#: panel.cpp:2372 panel.cpp:2403
+#: panel.cpp:2376 panel.cpp:2407
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Tidak dapat memulai rekaman ke %s (%s)"
 
-#: panel.cpp:2431
+#: panel.cpp:2435
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Terjadi kesalahan dalam merekam audio/video (%s); membatalkan perintah"
 
-#: panel.cpp:2437
+#: panel.cpp:2441
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Terjadi kesalahan dalam merekam audio (%s); membatalkan perintah"
 
-#: panel.cpp:2447
+#: panel.cpp:2451
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Terjadi kesalahan dalam merekam video (%s); membatalkan perintah"

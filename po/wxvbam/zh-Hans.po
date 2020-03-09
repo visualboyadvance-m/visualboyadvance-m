@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-24 20:58+0000\n"
-"PO-Revision-Date: 2020-02-25 00:45+0000\n"
+"POT-Creation-Date: 2020-03-07 13:29+0000\n"
+"PO-Revision-Date: 2020-03-08 00:52+0000\n"
 "Last-Translator: bgK\n"
 "Language-Team: Chinese Simplified (http://www.transifex.com/bgk/vba-m/language/zh-Hans/)\n"
 "MIME-Version: 1.0\n"
@@ -160,7 +160,7 @@ msgstr "选择金手指"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA 金手指列表 (*.clt)|*.clt|CHT 金手指列表 (*.cht)|*.cht"
 
-#: guiinit.cpp:241 panel.cpp:413
+#: guiinit.cpp:241 panel.cpp:417
 msgid "Loaded cheats"
 msgstr "打开金手指"
 
@@ -608,7 +608,7 @@ msgstr "导入电池文件将删除之前保存的游戏进度 (直到下次写�
 msgid "Confirm import"
 msgstr "确认导入"
 
-#: cmdevents.cpp:907 panel.cpp:356
+#: cmdevents.cpp:907 panel.cpp:360
 #, c-format
 msgid "Loaded battery %s"
 msgstr "读取电池 %s"
@@ -691,7 +691,7 @@ msgstr "快照文件读取错误 %s"
 msgid "Wrote battery %s"
 msgstr "写入电池 %s"
 
-#: cmdevents.cpp:1100 panel.cpp:662
+#: cmdevents.cpp:1100 panel.cpp:666
 #, c-format
 msgid "Error writing battery %s"
 msgstr "写入电池错误 %s"
@@ -801,18 +801,22 @@ msgstr "正在使用像素滤镜 #%d"
 msgid "Using interframe blending #%d"
 msgstr "正在使用帧间混合 #%d"
 
-#: cmdevents.cpp:2761
+#: cmdevents.cpp:2672 panel.cpp:176 panel.cpp:277
+msgid "Could not initialize the sound driver!"
+msgstr ""
+
+#: cmdevents.cpp:2764
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "任天堂 GameBoy (+Color+Advance) 模拟器。"
 
-#: cmdevents.cpp:2762
+#: cmdevents.cpp:2765
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "版权 (C) 1999-2003 Forgotten\n版权 (C) 2004-2006 VBA 开发团队\n版权 (C) 2007-2017 VBA-M 开发团队"
 
-#: cmdevents.cpp:2763
+#: cmdevents.cpp:2766
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -828,11 +832,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "本程序是自由软件: 你可以在自由软件基金会公布的 GNU 通用发布\n许可证条款下重新分发和/或修改此软件，依自己意愿许可证 V2 版或\n任意更新版许可证选其一即可。\n\n本程序希望是能有作用的分发出去，但【无任何担保】；甚至没有隐含\n的【可销售性】或【特定用途的适用性】保证。请查阅 GNU 通用发布\n许可证了解更多信息。\n\n你应该已经收到 GNU 通用发布许可证的副本以及本程序。\n如果没有，请查看 http://www.gnu.org/licenses 。"
 
-#: cmdevents.cpp:3027
+#: cmdevents.cpp:3030
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "局域网连接已激活，禁用连接模式即可断开联网。"
 
-#: cmdevents.cpp:3033
+#: cmdevents.cpp:3036
 msgid "Network is not supported in local mode."
 msgstr "本地模式不支持网络"
 
@@ -941,7 +945,7 @@ msgstr "设置服务器接口错误 (%d)"
 msgid "%s is not a valid ROM file"
 msgstr "%s 不是有效的 ROM 文件"
 
-#: panel.cpp:91 panel.cpp:152 panel.cpp:213
+#: panel.cpp:91 panel.cpp:152 panel.cpp:215
 msgid "Problem loading file"
 msgstr "载入文件错误"
 
@@ -950,113 +954,113 @@ msgstr "载入文件错误"
 msgid "Unable to load Game Boy ROM %s"
 msgstr "无法载入 Game Boy ROM %s"
 
-#: panel.cpp:189 panel.cpp:287
+#: panel.cpp:191 panel.cpp:291
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "无法载入 BIOS %s"
 
-#: panel.cpp:212
+#: panel.cpp:214
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "无法载入 Game Boy Advance ROM %s"
 
-#: panel.cpp:445
+#: panel.cpp:449
 msgid " player "
 msgstr "玩家"
 
-#: panel.cpp:610
+#: panel.cpp:614
 #, c-format
 msgid "Loaded state %s"
 msgstr "载入状态 %s"
 
-#: panel.cpp:610
+#: panel.cpp:614
 #, c-format
 msgid "Error loading state %s"
 msgstr "载入状态错误 %s"
 
-#: panel.cpp:634
+#: panel.cpp:638
 #, c-format
 msgid "Saved state %s"
 msgstr "保存状态 %s"
 
-#: panel.cpp:634
+#: panel.cpp:638
 #, c-format
 msgid "Error saving state %s"
 msgstr "保存状态错误 %s"
 
-#: panel.cpp:838
+#: panel.cpp:842
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "不支持 %dx%d-%d@%d 全屏模式，选择其他模式"
 
-#: panel.cpp:876
+#: panel.cpp:880
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "不支持 %dx%d-%d@%d 全屏模式"
 
-#: panel.cpp:881
+#: panel.cpp:885
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "有效模式: %dx%d-%d@%d"
 
-#: panel.cpp:889
+#: panel.cpp:893
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "选择模式 %dx%d-%d@%d"
 
-#: panel.cpp:893
+#: panel.cpp:897
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "切换模式失败 %dx%d-%d@%d"
 
-#: panel.cpp:977
+#: panel.cpp:981
 msgid "Not a valid GBA cartridge"
 msgstr "无效 GBA 卡带"
 
-#: panel.cpp:1120
+#: panel.cpp:1124
 msgid "No memory for rewinding"
 msgstr "没有用于回退的内存"
 
-#: panel.cpp:1130
+#: panel.cpp:1134
 msgid "Error writing rewind state"
 msgstr "回写状态错误"
 
-#: panel.cpp:2341
+#: panel.cpp:2345
 msgid "memory allocation error"
 msgstr "内存分配错误"
 
-#: panel.cpp:2344
+#: panel.cpp:2348
 msgid "error initializing codec"
 msgstr "初始化代码错误"
 
-#: panel.cpp:2347
+#: panel.cpp:2351
 msgid "error writing to output file"
 msgstr "回写输出文件错误"
 
-#: panel.cpp:2350
+#: panel.cpp:2354
 msgid "can't guess output format from file name"
 msgstr "无法从文件名猜测输出格式"
 
-#: panel.cpp:2355
+#: panel.cpp:2359
 msgid "programming error; aborting!"
 msgstr "程序错误!"
 
-#: panel.cpp:2372 panel.cpp:2403
+#: panel.cpp:2376 panel.cpp:2407
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "不能开始录制到 %s (%s)"
 
-#: panel.cpp:2431
+#: panel.cpp:2435
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "录制音频/视频时错误 (%s); 正在中止"
 
-#: panel.cpp:2437
+#: panel.cpp:2441
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "录制音频时错误 (%s); 正在中止"
 
-#: panel.cpp:2447
+#: panel.cpp:2451
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "录制视频时错误 (%s); 正在中止"

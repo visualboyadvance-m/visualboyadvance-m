@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-24 20:58+0000\n"
-"PO-Revision-Date: 2020-02-25 00:45+0000\n"
+"POT-Creation-Date: 2020-03-07 13:29+0000\n"
+"PO-Revision-Date: 2020-03-08 00:52+0000\n"
 "Last-Translator: bgK\n"
 "Language-Team: Italian (Italy) (http://www.transifex.com/bgk/vba-m/language/it_IT/)\n"
 "MIME-Version: 1.0\n"
@@ -158,7 +158,7 @@ msgstr "Seleziona il file dei trucchi"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Lista di trucchi VBA (*.clt)|*.clt|Lista trucchi CHT (*.cht)|*.cht"
 
-#: guiinit.cpp:241 panel.cpp:413
+#: guiinit.cpp:241 panel.cpp:417
 msgid "Loaded cheats"
 msgstr "Trucchi caricati"
 
@@ -606,7 +606,7 @@ msgstr "Importare un file battery cancellerà qualsiasi gioco salvato (permanent
 msgid "Confirm import"
 msgstr "Conferma importazione"
 
-#: cmdevents.cpp:907 panel.cpp:356
+#: cmdevents.cpp:907 panel.cpp:360
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Batteria %s caricata"
@@ -689,7 +689,7 @@ msgstr "Errore nel caricare la snapshot %s"
 msgid "Wrote battery %s"
 msgstr "Batteria scritta %s"
 
-#: cmdevents.cpp:1100 panel.cpp:662
+#: cmdevents.cpp:1100 panel.cpp:666
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Errore nello scrivere la batteria %s"
@@ -799,18 +799,22 @@ msgstr ""
 msgid "Using interframe blending #%d"
 msgstr ""
 
-#: cmdevents.cpp:2761
+#: cmdevents.cpp:2672 panel.cpp:176 panel.cpp:277
+msgid "Could not initialize the sound driver!"
+msgstr ""
+
+#: cmdevents.cpp:2764
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Nintendo GameBoy (+Color+Advance) emulator."
 
-#: cmdevents.cpp:2762
+#: cmdevents.cpp:2765
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2017 VBA-M development team"
 
-#: cmdevents.cpp:2763
+#: cmdevents.cpp:2766
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -826,11 +830,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Questo programma è un software gratuito: puoi ridistribuirlo e/o modificarlo\nsotto i termini della GNU General Public License pubblicata dalla\nFree Software Foundation, sia la versione due della licenza, o\n(a tua scelta) una qualunque versione successiva.\n\nQuesto programma è distribuito nella speranza che sia utile,\nma SENZA ALCUNA GARANZIA; senza nemmeno l'implicita garanzia di\nRESO o RIMBORSO.\nGuarda la GNU General Public License per maggiori dettagli.\n\nDovresti aver ricevuto una copia della GNU General Public License\nassieme a questo programma. Se no, guarda http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3027
+#: cmdevents.cpp:3030
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "Il collegamento LAN è già attivo. Disabilitare la modalità link per disconnetterlo."
 
-#: cmdevents.cpp:3033
+#: cmdevents.cpp:3036
 msgid "Network is not supported in local mode."
 msgstr "La rete non è supportata in modalità locale."
 
@@ -939,7 +943,7 @@ msgstr "errore di impostazione del socket server (%d)"
 msgid "%s is not a valid ROM file"
 msgstr "%s non è una ROM valida"
 
-#: panel.cpp:91 panel.cpp:152 panel.cpp:213
+#: panel.cpp:91 panel.cpp:152 panel.cpp:215
 msgid "Problem loading file"
 msgstr "Problema nel caricare il file"
 
@@ -948,113 +952,113 @@ msgstr "Problema nel caricare il file"
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Impossibile caricare la Game Boy ROM %s"
 
-#: panel.cpp:189 panel.cpp:287
+#: panel.cpp:191 panel.cpp:291
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Non posso caricare il BIOS %s"
 
-#: panel.cpp:212
+#: panel.cpp:214
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Non posso caricare la Game Boy Advance ROM %s"
 
-#: panel.cpp:445
+#: panel.cpp:449
 msgid " player "
 msgstr "giocatore"
 
-#: panel.cpp:610
+#: panel.cpp:614
 #, c-format
 msgid "Loaded state %s"
 msgstr "Caricare lo stato %s"
 
-#: panel.cpp:610
+#: panel.cpp:614
 #, c-format
 msgid "Error loading state %s"
 msgstr "Errore nel caricare lo stato %s"
 
-#: panel.cpp:634
+#: panel.cpp:638
 #, c-format
 msgid "Saved state %s"
 msgstr "Stato salvato %s"
 
-#: panel.cpp:634
+#: panel.cpp:638
 #, c-format
 msgid "Error saving state %s"
 msgstr "Errore nel salvare lo stato %s"
 
-#: panel.cpp:838
+#: panel.cpp:842
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "Modalità schermo intero %dx%d-%d@%d non supportata; guardo per un'altra"
 
-#: panel.cpp:876
+#: panel.cpp:880
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "Modalità schermo intero %dx%d-%d@%d  non supportata"
 
-#: panel.cpp:881
+#: panel.cpp:885
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Modalità valida: %dx%d-%d@%d "
 
-#: panel.cpp:889
+#: panel.cpp:893
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "Modalità scelta %dx%d-%d@%d "
 
-#: panel.cpp:893
+#: panel.cpp:897
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Ho fallito nel cambiate modalità da %dx%d-%d@%d "
 
-#: panel.cpp:977
+#: panel.cpp:981
 msgid "Not a valid GBA cartridge"
 msgstr "Non è una cartuccia GBA valida"
 
-#: panel.cpp:1120
+#: panel.cpp:1124
 msgid "No memory for rewinding"
 msgstr "Non c'è un salvataggio da caricare"
 
-#: panel.cpp:1130
+#: panel.cpp:1134
 msgid "Error writing rewind state"
 msgstr "Errore nel salvare lo stato"
 
-#: panel.cpp:2341
+#: panel.cpp:2345
 msgid "memory allocation error"
 msgstr "Errore nell'allocazione della memoria"
 
-#: panel.cpp:2344
+#: panel.cpp:2348
 msgid "error initializing codec"
 msgstr "errore nell'inizializzazione del codec"
 
-#: panel.cpp:2347
+#: panel.cpp:2351
 msgid "error writing to output file"
 msgstr "errore nella scrittura del file di destinazione"
 
-#: panel.cpp:2350
+#: panel.cpp:2354
 msgid "can't guess output format from file name"
 msgstr "non posso indovinare il formato di destinazione dal nome del file"
 
-#: panel.cpp:2355
+#: panel.cpp:2359
 msgid "programming error; aborting!"
 msgstr "errore di programmazione; annullamento in corso!"
 
-#: panel.cpp:2372 panel.cpp:2403
+#: panel.cpp:2376 panel.cpp:2407
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Impossibile iniziare a registrare %s (%s)"
 
-#: panel.cpp:2431
+#: panel.cpp:2435
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Errore con audio/video registrazione (%s); interruzione"
 
-#: panel.cpp:2437
+#: panel.cpp:2441
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Errore con registrazione audio (%s); interruzione"
 
-#: panel.cpp:2447
+#: panel.cpp:2451
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Errore con registrazione video (%s); interruzione"
