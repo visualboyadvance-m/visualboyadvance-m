@@ -2220,23 +2220,32 @@ void GLDrawingPanel::DrawingPanelInit()
     glClearColor(0.0, 0.0, 0.0, 1.0);
 // non-portable vsync code
 #if defined(__WXGTK__)
+    static PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT = NULL;
     static PFNGLXSWAPINTERVALSGIPROC glXSwapIntervalSGI = NULL;
     static PFNGLXSWAPINTERVALMESAPROC glXSwapIntervalMESA = NULL;
 
     char* glxQuery = (char*)glXQueryExtensionsString(glXGetCurrentDisplay(), 0);
 
+    if (strstr(glxQuery, "GLX_EXT_swap_control") != NULL)
+    {
+        glXSwapIntervalEXT = reinterpret_cast<PFNGLXSWAPINTERVALEXTPROC>(glXGetProcAddress((const GLubyte*)"glXSwapIntervalEXT"));
+        if (glXSwapIntervalEXT)
+            glXSwapIntervalEXT(glXGetCurrentDisplay(), glXGetCurrentDrawable(), vsync);
+        else
+            systemScreenMessage(_("Failed to set glXSwapIntervalEXT"));
+    }
     if (strstr(glxQuery, "GLX_SGI_swap_control") != NULL)
     {
-        glXSwapIntervalSGI = reinterpret_cast<PFNGLXSWAPINTERVALSGIPROC>(glXGetProcAddress(reinterpret_cast<const unsigned char*>("glXSwapIntervalSGI")));
+        glXSwapIntervalSGI = reinterpret_cast<PFNGLXSWAPINTERVALSGIPROC>(glXGetProcAddress((const GLubyte*)("glXSwapIntervalSGI")));
 
         if (glXSwapIntervalSGI)
             glXSwapIntervalSGI(vsync);
         else
             systemScreenMessage(_("Failed to set glXSwapIntervalSGI"));
     }
-    else if (strstr(glxQuery, "GLX_MESA_swap_control") != NULL)
+    if (strstr(glxQuery, "GLX_MESA_swap_control") != NULL)
     {
-        glXSwapIntervalMESA = reinterpret_cast<PFNGLXSWAPINTERVALMESAPROC>(glXGetProcAddress(reinterpret_cast<const unsigned char*>("glXSwapIntervalMESA")));
+        glXSwapIntervalMESA = reinterpret_cast<PFNGLXSWAPINTERVALMESAPROC>(glXGetProcAddress((const GLubyte*)("glXSwapIntervalMESA")));
 
         if (glXSwapIntervalMESA)
             glXSwapIntervalMESA(vsync);
