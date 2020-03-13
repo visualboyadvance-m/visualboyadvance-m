@@ -1007,42 +1007,37 @@ endif()
 option(UPSTREAM_RELEASE "do some release automation tasks" OFF)
 
 if(UPSTREAM_RELEASE AND WIN32)
-    set(home $ENV{HOME})
+    set(home "$ENV{HOME}")
 
     if(NOT CMAKE_CROSSCOMPILING AND NOT DEFINED ENV{MSYSTEM_PREFIX})
-        set(home $ENV{USERPROFILE})
+        set(home "$ENV{USERPROFILE}")
     endif()
 
     # rewrite backslashes to slashes, needed for msys osslsigncode
-    string(REGEX REPLACE "\\\\" "/" home ${home})
+    string(REGEX REPLACE "\\\\" "/" home "${home}")
 
-    set(cert ${home}/.codesign/windows_comodo.pkcs12)
+    set(cert "${home}/.codesign/windows_comodo.pkcs12")
 
-    if(EXISTS ${cert})
-        if(MSVC)
-            find_program(SIGNTOOL_PROGRAM signtool)
+    if(EXISTS "${cert}")
+        find_program(OSSLSIGNCODE_PROGRAM osslsigncode)
+        find_program(SIGNTOOL_PROGRAM     signtool)
 
-            if(SIGNTOOL_PROGRAM)
-                add_custom_command(
-                    TARGET visualboyadvance-m
-                    POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy visualboyadvance-m.exe visualboyadvance-m-unsigned.exe
-                    COMMAND ${SIGNTOOL_PROGRAM} sign /f ${cert} /p "vbam3!13" /tr http://timestamp.digicert.com /du https://github.com/visualboyadvance-m/visualboyadvance-m /a visualboyadvance-m.exe
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        if(OSSLSIGNCODE_PROGRAM)
+            add_custom_command(
+                TARGET visualboyadvance-m
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E rename visualboyadvance-m.exe visualboyadvance-m-unsigned.exe
+                COMMAND ${OSSLSIGNCODE_PROGRAM} sign -pkcs12 ${cert} -pass "vbam3!13" -t http://timestamp.digicert.com -n visualboyadvance-m -i https://github.com/visualboyadvance-m/visualboyadvance-m -in visualboyadvance-m-unsigned.exe -out visualboyadvance-m.exe
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                 )
-            endif()
-        else()
-            find_program(OSSLSIGNCODE_PROGRAM osslsigncode)
-
-            if(OSSLSIGNCODE_PROGRAM)
-                add_custom_command(
-                    TARGET visualboyadvance-m
-                    POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E rename visualboyadvance-m.exe visualboyadvance-m-unsigned.exe
-                    COMMAND ${OSSLSIGNCODE_PROGRAM} sign -pkcs12 ${cert} -pass "vbam3!13" -t http://timestamp.digicert.com -n visualboyadvance-m -i https://github.com/visualboyadvance-m/visualboyadvance-m -in visualboyadvance-m-unsigned.exe -out visualboyadvance-m.exe
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        elseif(SIGNTOOL_PROGRAM)
+            add_custom_command(
+                TARGET visualboyadvance-m
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy visualboyadvance-m.exe visualboyadvance-m-unsigned.exe
+                COMMAND ${SIGNTOOL_PROGRAM} sign /f ${cert} /p "vbam3!13" /tr http://timestamp.digicert.com /du https://github.com/visualboyadvance-m/visualboyadvance-m /a visualboyadvance-m.exe
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                 )
-            endif()
         endif()
     endif()
 
