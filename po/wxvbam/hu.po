@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-07 13:29+0000\n"
-"PO-Revision-Date: 2020-03-08 15:36+0000\n"
+"POT-Creation-Date: 2020-03-13 14:40+0000\n"
+"PO-Revision-Date: 2020-03-13 18:27+0000\n"
 "Last-Translator: Model T800\n"
 "Language-Team: Hungarian (http://www.transifex.com/bgk/vba-m/language/hu/)\n"
 "MIME-Version: 1.0\n"
@@ -1018,42 +1018,70 @@ msgstr "Visszajátszáshoz kevés a memória"
 msgid "Error writing rewind state"
 msgstr "Hiba a visszajátszás-állás írásakor"
 
-#: panel.cpp:2345
+#: panel.cpp:2235
+msgid "Failed to set glXSwapIntervalEXT"
+msgstr "A glXSwapIntervalEXT beállítása sikertelen"
+
+#: panel.cpp:2244
+msgid "Failed to set glXSwapIntervalSGI"
+msgstr "A glXSwapIntervalSGI beállítása sikertelen"
+
+#: panel.cpp:2253
+msgid "Failed to set glXSwapIntervalMESA"
+msgstr "A glXSwapIntervalMESA beállítása sikertelen"
+
+#: panel.cpp:2260
+msgid "No support for wglGetExtensionsString"
+msgstr "A wglGetExtensionsString nem támogatott"
+
+#: panel.cpp:2262
+msgid "No support for WGL_EXT_swap_control"
+msgstr "A WGL_EXT_swap_control nem támogatott"
+
+#: panel.cpp:2271
+msgid "Failed to set wglSwapIntervalEXT"
+msgstr "A wglSwapIntervalEXT beállítása sikertelen"
+
+#: panel.cpp:2277
+msgid "No VSYNC available on this platform"
+msgstr "Nincs VSYNC ezen a platformon"
+
+#: panel.cpp:2373
 msgid "memory allocation error"
 msgstr "memóriakioszási hiba"
 
-#: panel.cpp:2348
+#: panel.cpp:2376
 msgid "error initializing codec"
 msgstr "hiba a kodek inicializálásnál"
 
-#: panel.cpp:2351
+#: panel.cpp:2379
 msgid "error writing to output file"
 msgstr "hiba a kimeneti fájl írásakor"
 
-#: panel.cpp:2354
+#: panel.cpp:2382
 msgid "can't guess output format from file name"
 msgstr "a fájlnévből nem állapítható meg a kimenet formátuma"
 
-#: panel.cpp:2359
+#: panel.cpp:2387
 msgid "programming error; aborting!"
 msgstr "programhiba; megszakítás!"
 
-#: panel.cpp:2376 panel.cpp:2407
+#: panel.cpp:2404 panel.cpp:2435
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Nem lehet megkezdeni a rögzítést ide: %s (%s)"
 
-#: panel.cpp:2435
+#: panel.cpp:2463
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Hiba a hang/videó rögzítésekor (%s); megszakítás"
 
-#: panel.cpp:2441
+#: panel.cpp:2469
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Hiba a hangrögzítéskor (%s); megszakítás"
 
-#: panel.cpp:2451
+#: panel.cpp:2479
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Hiba a videórögzítéskor (%s); megszakítás"

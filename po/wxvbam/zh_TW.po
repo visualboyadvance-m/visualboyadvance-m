@@ -18,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-07 13:29+0000\n"
-"PO-Revision-Date: 2020-03-12 17:17+0000\n"
+"POT-Creation-Date: 2020-03-13 14:40+0000\n"
+"PO-Revision-Date: 2020-03-13 15:22+0000\n"
 "Last-Translator: Ching Wen Cheng <chingwen.cheng@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/bgk/vba-m/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -1027,42 +1027,70 @@ msgstr "沒有記憶體可用來倒帶"
 msgid "Error writing rewind state"
 msgstr "回寫狀態錯誤"
 
-#: panel.cpp:2345
+#: panel.cpp:2235
+msgid "Failed to set glXSwapIntervalEXT"
+msgstr "設置 glXSwapIntervalEXT 失敗"
+
+#: panel.cpp:2244
+msgid "Failed to set glXSwapIntervalSGI"
+msgstr "設置 glXSwapIntervalSGI 失敗"
+
+#: panel.cpp:2253
+msgid "Failed to set glXSwapIntervalMESA"
+msgstr "設置 glXSwapIntervalMESA 失敗"
+
+#: panel.cpp:2260
+msgid "No support for wglGetExtensionsString"
+msgstr "不支援 wglGetExtensionsString"
+
+#: panel.cpp:2262
+msgid "No support for WGL_EXT_swap_control"
+msgstr "不支援 WGL_EXT_swap_control"
+
+#: panel.cpp:2271
+msgid "Failed to set wglSwapIntervalEXT"
+msgstr "設置 wglSwapIntervalEXT 失敗"
+
+#: panel.cpp:2277
+msgid "No VSYNC available on this platform"
+msgstr "在此平台無法使用垂直同步"
+
+#: panel.cpp:2373
 msgid "memory allocation error"
 msgstr "記憶體配置錯誤"
 
-#: panel.cpp:2348
+#: panel.cpp:2376
 msgid "error initializing codec"
 msgstr "解碼器初始化錯誤"
 
-#: panel.cpp:2351
+#: panel.cpp:2379
 msgid "error writing to output file"
 msgstr "輸出檔寫入錯誤"
 
-#: panel.cpp:2354
+#: panel.cpp:2382
 msgid "can't guess output format from file name"
 msgstr "從檔名猜測輸出格式失敗"
 
-#: panel.cpp:2359
+#: panel.cpp:2387
 msgid "programming error; aborting!"
 msgstr "程式錯誤，正在停止!"
 
-#: panel.cpp:2376 panel.cpp:2407
+#: panel.cpp:2404 panel.cpp:2435
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "不能開始錄製到 %s (%s)"
 
-#: panel.cpp:2435
+#: panel.cpp:2463
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "錄製 (%s) 聲音/影像錯誤; 停止中"
 
-#: panel.cpp:2441
+#: panel.cpp:2469
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "錄製 (%s) 聲音; 停止中"
 
-#: panel.cpp:2451
+#: panel.cpp:2479
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "錄製 (%s) 影像錯誤; 停止中"

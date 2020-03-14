@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-07 13:29+0000\n"
-"PO-Revision-Date: 2020-03-08 00:52+0000\n"
-"Last-Translator: bgK\n"
+"POT-Creation-Date: 2020-03-13 14:40+0000\n"
+"PO-Revision-Date: 2020-03-13 14:41+0000\n"
+"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/bgk/vba-m/language/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1018,42 +1018,70 @@ msgstr ""
 msgid "Error writing rewind state"
 msgstr ""
 
-#: panel.cpp:2345
+#: panel.cpp:2235
+msgid "Failed to set glXSwapIntervalEXT"
+msgstr ""
+
+#: panel.cpp:2244
+msgid "Failed to set glXSwapIntervalSGI"
+msgstr ""
+
+#: panel.cpp:2253
+msgid "Failed to set glXSwapIntervalMESA"
+msgstr ""
+
+#: panel.cpp:2260
+msgid "No support for wglGetExtensionsString"
+msgstr ""
+
+#: panel.cpp:2262
+msgid "No support for WGL_EXT_swap_control"
+msgstr ""
+
+#: panel.cpp:2271
+msgid "Failed to set wglSwapIntervalEXT"
+msgstr ""
+
+#: panel.cpp:2277
+msgid "No VSYNC available on this platform"
+msgstr ""
+
+#: panel.cpp:2373
 msgid "memory allocation error"
 msgstr ""
 
-#: panel.cpp:2348
+#: panel.cpp:2376
 msgid "error initializing codec"
 msgstr ""
 
-#: panel.cpp:2351
+#: panel.cpp:2379
 msgid "error writing to output file"
 msgstr ""
 
-#: panel.cpp:2354
+#: panel.cpp:2382
 msgid "can't guess output format from file name"
 msgstr ""
 
-#: panel.cpp:2359
+#: panel.cpp:2387
 msgid "programming error; aborting!"
 msgstr ""
 
-#: panel.cpp:2376 panel.cpp:2407
+#: panel.cpp:2404 panel.cpp:2435
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr ""
 
-#: panel.cpp:2435
+#: panel.cpp:2463
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr ""
 
-#: panel.cpp:2441
+#: panel.cpp:2469
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr ""
 
-#: panel.cpp:2451
+#: panel.cpp:2479
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr ""
