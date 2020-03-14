@@ -1006,6 +1006,17 @@ endif()
 
 option(UPSTREAM_RELEASE "do some release automation tasks" OFF)
 
+find_program(GPG_PROGRAM gpg)
+
+if(GPG_PROGRAM)
+    execute_process(
+        COMMAND ${GPG_PROGRAM} -k
+        OUTPUT_VARIABLE GPG_KEYS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+endif()
+
 if(UPSTREAM_RELEASE AND WIN32)
     set(home "$ENV{HOME}")
 
@@ -1056,9 +1067,7 @@ if(UPSTREAM_RELEASE AND WIN32)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
-    find_program(GPG_PROGRAM gpg)
-
-    if(GPG_PROGRAM)
+    if(GPG_KEYS)
         add_custom_command(
             OUTPUT ${CMAKE_BINARY_DIR}/translations.zip.asc
             COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/translations.zip.asc
@@ -1160,9 +1169,7 @@ if(UPSTREAM_RELEASE AND APPLE)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
-    find_program(GPG_PROGRAM gpg)
-
-    if(GPG_PROGRAM)
+    if(GPG_KEYS)
         add_custom_command(
             TARGET visualboyadvance-m
             POST_BUILD
