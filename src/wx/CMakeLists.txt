@@ -1052,7 +1052,11 @@ if(UPSTREAM_RELEASE AND WIN32)
         endif()
     endif()
 
-    set(exezip visualboyadvance-m-Win-${BITS}bit.zip)
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+        set(exezip visualboyadvance-m-Win-${BITS}bit-debug.zip)
+    else()
+        set(exezip visualboyadvance-m-Win-${BITS}bit.zip)
+    endif()
 
     unset(pdb_file)
 
