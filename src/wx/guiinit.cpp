@@ -76,6 +76,20 @@ public:
         (void)ev; // unused params
         okb->SetLabel(_("Start!"));
     }
+    void BindServerIP(wxCommandEvent& ev)
+    {
+        (void)ev; // unused param
+        auto *tc = XRCCTRL(*dlg, "ServerIP", wxTextCtrl);
+        tc->SetValidator(wxTextValidator(wxFILTER_NONE, &gopts.server_ip));
+        tc->SetValue(gopts.server_ip);
+    }
+    void BindLinkHost(wxCommandEvent& ev)
+    {
+        (void)ev; // unused param
+        auto *tc = XRCCTRL(*dlg, "ServerIP", wxTextCtrl);
+        tc->SetValidator(wxTextValidator(wxFILTER_NONE, &gopts.link_host));
+        tc->SetValue(gopts.link_host);
+    }
     void ClientOKButton(wxCommandEvent& ev)
     {
         (void)ev; // unused params
@@ -89,7 +103,8 @@ public:
         if (!dlg->Validate() || !dlg->TransferDataFromWindow())
             return;
 
-        IP_LINK_PORT = gopts.link_port;
+        IP_LINK_PORT         = gopts.link_port;
+        IP_LINK_BIND_ADDRESS = gopts.server_ip;
 
         if (!server) {
             bool valid = SetLinkServerHost(gopts.link_host.utf8_str());
@@ -3203,9 +3218,7 @@ bool MainFrame::BindControls()
             getrbi("Link4P", net_link_handler.n_players, 4);
             addrber(rb, false);
             getlab("ServerIPLab");
-            addrber(lab, true);
             gettc("ServerIP", gopts.link_host);
-            addrber(tc, true);
             getutc("ServerPort", gopts.link_port);
             wxWindow* okb = d->FindWindow(wxID_OK);
 
@@ -3219,6 +3232,15 @@ bool MainFrame::BindControls()
                     wxCommandEventHandler(NetLink_t::ClientOKButton),
                     NULL, &net_link_handler);
             }
+
+            // Bind server IP when the server radio button is selected.
+            d->Connect(XRCID("Server"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
+                wxCommandEventHandler(NetLink_t::BindServerIP),
+                NULL, &net_link_handler);
+            // Bind client link_host when client radio button is selected.
+            d->Connect(XRCID("Client"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
+                wxCommandEventHandler(NetLink_t::BindLinkHost),
+                NULL, &net_link_handler);
 
             // this should intercept wxID_OK before the dialog handler gets it
             d->Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED,

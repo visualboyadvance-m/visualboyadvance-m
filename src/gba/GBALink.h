@@ -5,6 +5,8 @@
 
 extern uint32_t IP_LINK_PORT;
 
+extern std::string IP_LINK_BIND_ADDRESS;
+
 /**
  * Link modes to be passed to InitLink
  */
