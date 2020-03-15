@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Damian Drakon <dragon1590@gmail.com>, 2019
+# Damian Drakon <dragon1590@gmail.com>, 2019-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-03-13 14:40+0000\n"
-"PO-Revision-Date: 2020-03-13 14:41+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"PO-Revision-Date: 2020-03-14 17:05+0000\n"
+"Last-Translator: Damian Drakon <dragon1590@gmail.com>\n"
 "Language-Team: Polish (Poland) (http://www.transifex.com/bgk/vba-m/language/pl_PL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -795,7 +795,7 @@ msgstr "Używane mieszanie międzyklatkowe #%d"
 
 #: cmdevents.cpp:2672 panel.cpp:176 panel.cpp:277
 msgid "Could not initialize the sound driver!"
-msgstr ""
+msgstr "Nie można zainicjować sterownika dźwięku!"
 
 #: cmdevents.cpp:2764
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
@@ -1019,31 +1019,31 @@ msgstr "Niepowodzenie przy zapisywaniu stanu przewijania wstecz"
 
 #: panel.cpp:2235
 msgid "Failed to set glXSwapIntervalEXT"
-msgstr ""
+msgstr "Nie udało się ustawić glXSwapIntervalEXT"
 
 #: panel.cpp:2244
 msgid "Failed to set glXSwapIntervalSGI"
-msgstr ""
+msgstr "Nie udało się ustawić glXSwapIntervalSGI"
 
 #: panel.cpp:2253
 msgid "Failed to set glXSwapIntervalMESA"
-msgstr ""
+msgstr "Nie udało się ustawić glXSwapIntervalMESA"
 
 #: panel.cpp:2260
 msgid "No support for wglGetExtensionsString"
-msgstr ""
+msgstr "Brak wsparcia dla wglGetExtensionsString"
 
 #: panel.cpp:2262
 msgid "No support for WGL_EXT_swap_control"
-msgstr ""
+msgstr "Brak wsparcia dla WGL_EXT_swap_control"
 
 #: panel.cpp:2271
 msgid "Failed to set wglSwapIntervalEXT"
-msgstr ""
+msgstr "Nie udało się ustawić wglSwapIntervalEXT"
 
 #: panel.cpp:2277
 msgid "No VSYNC available on this platform"
-msgstr ""
+msgstr "VSYNC jest niedostępne na tej platformie"
 
 #: panel.cpp:2373
 msgid "memory allocation error"
@@ -1153,35 +1153,35 @@ msgstr "Odłączono kontroler gier %d"
 
 #: xaudio2.cpp:35
 msgid "XAudio2: Enumerating devices failed!"
-msgstr ""
+msgstr "XAudio2: Wykrywanie urządzeń nie powiodło się!"
 
 #: xaudio2.cpp:69 xaudio2.cpp:353
 msgid "The XAudio2 interface failed to initialize!"
-msgstr ""
+msgstr "Nie udało się zainicjować interfejsu XAudio2!"
 
 #: xaudio2.cpp:384
 msgid "XAudio2: Creating mastering voice failed!"
-msgstr ""
+msgstr "XAudio2: Tworzenie masterowania głosu nie powiodło się!"
 
 #: xaudio2.cpp:393
 msgid "XAudio2: Creating source voice failed!"
-msgstr ""
+msgstr "XAudio2: Tworzenie głosu źródłowego nie powiodło się!"
 
 #: faudio.cpp:32
 msgid "FAudio: Enumerating devices failed!"
-msgstr ""
+msgstr "FAudio: Urządzenia wyliczające zawiodły!"
 
 #: faudio.cpp:67 faudio.cpp:352
 msgid "The FAudio interface failed to initialize!"
-msgstr ""
+msgstr "Nie można zainicjować interfejsu FAudio!"
 
 #: faudio.cpp:384
 msgid "FAudio: Creating mastering voice failed!"
-msgstr ""
+msgstr "FAudio: Tworzenie masterowania głosu nie powiodło się!"
 
 #: faudio.cpp:395
 msgid "FAudio: Creating source voice failed!"
-msgstr ""
+msgstr "FAudio: Tworzenie głosu źródłowego nie powiodło się!"
 
 #: dsound.cpp:90 dsound.cpp:104
 #, c-format
@@ -2772,7 +2772,7 @@ msgstr "e-Reader"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
-msgstr ""
+msgstr "Zresetuj wczytywanie Dot Code"
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
@@ -2780,7 +2780,7 @@ msgstr "Wczytaj Dot Code..."
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr ""
+msgstr "Zresetuj zapisywanie Dot Code"
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
@@ -3517,7 +3517,7 @@ msgstr "Serwer:"
 
 #: xrc/NetLink.xrc:81
 msgid "Port:"
-msgstr ""
+msgstr "Port:"
 
 #: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
