@@ -1309,10 +1309,11 @@ void RenderTimer::Notify()
     wxIdleEvent event;
     wxIdleEvent& evt = event;
     panel->OnIdle(evt);
+    wxTimer::StartOnce(1);
 }
 
 void RenderTimer::start()
 {
-    wxTimer::Start(1);
+    wxTimer::StartOnce(1);
 }
 #endif // TIMER_LOOP
