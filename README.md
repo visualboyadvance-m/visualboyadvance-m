@@ -27,18 +27,20 @@
 
 Game Boy Advance Emulator
 
-The Forum is here: https://vba-m.com/forums/
-
 Windows and Mac builds are in the [releases tab](https://github.com/visualboyadvance-m/visualboyadvance-m/releases).
 
-Your distribution may have packages available as well, search for "vbam" or "visualboyadvance-m".
+Nightly builds are [here](http://win.vba-m.com/nightly).
+
+Your distribution may have packages available as well, search for
+`visualboyadvance-m` or `vbam`.
 
 It is also generally very easy to build from source, see below.
 
 If you are using the windows binary release and you need localization, unzip
 the `translations.zip` to the same directory as the executable.
 
-If you are having issues, try resetting the config file first, go to `Help -> Factory Reset`.
+If you are having issues, try resetting the config file first, go to `Help ->
+Factory Reset`.
 
 ## Building
 
@@ -53,26 +55,24 @@ cd visualboyadvance-m
 # ./installdeps will give you build instructions, which will be similar to:
 
 mkdir build && cd build
-cmake ..
-make -j`nproc`
+cmake .. -G Ninja
+ninja
 ```
 
 `./installdeps` is supported on MSys2, Linux (Debian/Ubuntu, Fedora, Arch,
 Solus, OpenSUSE, Gentoo and RHEL/CentOS) and Mac OS X (homebrew, macports or
 fink.)
 
-The Ninja cmake generator is also now supported.
-
 ## Building a Libretro core
 
-```
 Clone this repo and then,
-$ cd src
-$ cd libretro
-$ make
+
+```bash
+cd src/libretro
+make -j`nproc`
+```
 
 Copy vbam_libretro.so to your RetroArch cores directory.
-```
 
 ## Visual Studio Support
 
@@ -101,8 +101,6 @@ cmake .. -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_BUILD_TYPE=Debug -G N
 ninja
 ```
 
-This support is new and we are still working out some issues.
-
 ## Dependencies
 
 If your OS is not supported, you will need the following:
@@ -122,7 +120,7 @@ And the following development libraries:
 - [SDL2](https://www.libsdl.org/) (required)
 - [SFML](https://www.sfml-dev.org/) (optional, for link)
 - [OpenAL](https://www.openal.org/) or [openal-soft](https://kcat.strangesoft.net/openal.html) (optional, a sound interface)
-- [wxWidgets](https://wxwidgets.org/) (required for GUI, 2.8 is still supported, --enable-stl is supported)
+- [wxWidgets](https://wxwidgets.org/) (required for GUI, 2.8 and non-stl builds are no longer supported)
 
 On Linux and similar, you also need the version of GTK your wxWidgets is linked
 to (usually 2 or 3) and the xorg development libraries.
@@ -158,14 +156,14 @@ The CMake code tries to guess reasonable defaults for options, but you can
 override them, for example:
 
 ```shell
-cmake .. -DENABLE_LINK=NO
+cmake .. -DENABLE_LINK=NO -G Ninja
 ```
 
-Of particular interest is making **RELEASE** or **DEBUG** builds, the default
-mode is **RELEASE**, to make a **DEBUG** build use something like:
+Of particular interest is making **Release** or **Debug** builds, the default
+mode is **Release**, to make a **Debug** build use something like:
 
 ```shell
-cmake .. -DCMAKE_BUILD_TYPE=Debug
+cmake .. -DCMAKE_BUILD_TYPE=Debug -G Ninja
 ```
 
 Here is the complete list:
@@ -225,13 +223,12 @@ System -> Advanced system settings -> Environment Variables.)
 If you want to package the binary, you will need to include the MinGW DLLs it
 depends on, they can install to the same directory as the binary.
 
-For our own builds, we use MXE to make static builds.
+Our own builds are static.
 
 ## Debug Messages
 
 We have an override for `wxLogDebug()` to make it work even in non-debug builds
-of wx and on windows, even in mintty. Using this function for console debug
-messages is recommended.
+of wx and on windows, even in mintty.
 
 It works like `printf()`, e.g.:
 
@@ -239,6 +236,17 @@ It works like `printf()`, e.g.:
 int foo = 42;
 wxLogDebug(wxT("the value of foo = %d"), foo);
 ```
+
+From the core etc. the usual:
+
+```cpp
+fprintf(stderr, "...", ...);
+```
+
+will work fine.
+
+You need a debug build for this to work or to even have a console on Windows.
+Pass `-DCMAKE_BUILD_TYPE=Debug` to cmake.
 
 ## Reporting Crash Bugs
 
