@@ -1,7 +1,8 @@
 // This file was written by denopqrihg
 // with major changes by tjm
 #include <stdio.h>
-#include <string.h>
+#include <cstring>
+#include <string>
 
 // malloc.h does not seem to exist on Mac OS 10.7 and is an error on FreeBSD
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__)
@@ -49,45 +50,6 @@ enum siocnt_lo_32bit {
     SIO_IRQ_ENABLE = 0x4000
 };
 
-#ifdef __clang__
-
-// don't define these min/max functions, they don't compile
-
-#else
-
-// The usual min/max functions for built-in types.
-//
-// template<typename T> T min( T x, T y ) { return x < y ? x : y; }
-// template<typename T> T max( T x, T y ) { return x > y ? x : y; }
-#define BLARGG_DEF_MIN_MAX(type)                  \
-    static inline type blargg_min(type x, type y) \
-    {                                             \
-        if (y < x)                                \
-            x = y;                                \
-        return x;                                 \
-    }                                             \
-    static inline type blargg_max(type x, type y) \
-    {                                             \
-        if (x < y)                                \
-            x = y;                                \
-        return x;                                 \
-    }
-
-BLARGG_DEF_MIN_MAX(int)
-BLARGG_DEF_MIN_MAX(unsigned)
-BLARGG_DEF_MIN_MAX(long)
-BLARGG_DEF_MIN_MAX(unsigned long)
-BLARGG_DEF_MIN_MAX(float)
-BLARGG_DEF_MIN_MAX(double)
-
-#undef min
-#define min blargg_min
-
-#undef max
-#define max blargg_max
-
-#endif // not clang
-
 // Joybus
 bool gba_joybus_enabled = false;
 bool gba_joybus_active = false;
@@ -102,6 +64,8 @@ bool speedhack = true;
 #include <stdint.h>
 
 uint32_t IP_LINK_PORT = 5738;
+
+std::string IP_LINK_BIND_ADDRESS = "*";
 
 #include "../common/Port.h"
 #include "GBA.h"
@@ -567,8 +531,12 @@ void GetLinkServerHost(char* const host, size_t size)
 
     if (linkDriver && linkDriver->mode == LINK_GAMECUBE_DOLPHIN)
         strncpy(host, joybusHostAddr.toString().c_str(), size);
-    else if (lanlink.server)
-        strncpy(host, sf::IpAddress::getLocalAddress().toString().c_str(), size);
+    else if (lanlink.server) {
+        if (IP_LINK_BIND_ADDRESS == "*")
+            strncpy(host, sf::IpAddress::getLocalAddress().toString().c_str(), size);
+        else
+            strncpy(host, IP_LINK_BIND_ADDRESS.c_str(), size);
+    }
     else
         strncpy(host, lc.serveraddr.toString().c_str(), size);
 }
@@ -1077,7 +1045,9 @@ static ConnectionState InitSocket()
 
         // too bad Listen() doesn't take an address as well
         // then again, old code used INADDR_ANY anyway
-        if (lanlink.tcplistener.listen(IP_LINK_PORT) == sf::Socket::Error)
+        sf::IpAddress bind_ip = IP_LINK_BIND_ADDRESS == "*" ? sf::IpAddress::Any : IP_LINK_BIND_ADDRESS;
+
+        if (lanlink.tcplistener.listen(IP_LINK_PORT, bind_ip) == sf::Socket::Error)
             // Note: old code closed socket & retried once on bind failure
             return LINK_ERROR; // FIXME: error code?
         else

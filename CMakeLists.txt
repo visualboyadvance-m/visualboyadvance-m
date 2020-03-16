@@ -131,7 +131,7 @@ if(WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe) AND NO
     set(SFML_STATIC_LIBRARIES TRUE)
 endif()
 
-find_package(SFML 2 COMPONENTS network system)
+find_package(SFML 2.4 COMPONENTS network system)
 
 if(SFML_FOUND)
     set(ENABLE_LINK_DEFAULT ON)

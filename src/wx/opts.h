@@ -38,6 +38,7 @@ extern struct opts_t {
     wxString gba_bios;
     int gba_link_type;
     wxString link_host;
+    wxString server_ip;
     uint32_t link_port;
     int link_proto;
     bool link_auto;
