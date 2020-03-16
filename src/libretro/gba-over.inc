@@ -408,6 +408,8 @@
     {"Super Mario Advance 4 - Super Mario Bros 3 - Super Mario Advance 4 v1.1 (USA)","AX4E",131072,3,0,0,0},
     {"Super Mario Advance 4 - Super Mario Bros. 3 (Europe)(En,Fr,De,Es,It)","AX4P", 131072, 3,  0,  0,  0},
     {"Super Mario Advance 4 (Japan)",                   "AX4J", 131072, 3,  0,  0,  0},
+    {"Super Monkey Ball Jr. (USA)",                   "ALUE", 8192, 1,  0,  0,  0},
+    {"Super Monkey Ball Jr. (Europe)",                   "ALUP", 8192, 1,  0,  0,  0},
     {"Sweet Cookie Pie (Japan)",        "ABGJ", 8192,   1,  0,  0,  0},
     {"Sylvanian Families - Fashion Designer ni Naritai! - Kurumi-risu no Onnanoko (Japan)",     "BSFJ", 8192,   1,  0,  0,  0},
     {"Sylvanian Families - Yousei no Stick to Fushigi no Ki - Marron-inu no Onnanoko (Japan)",      "BS5J", 8192,   1,  0,  0,  0},
