@@ -1114,10 +1114,14 @@ void MainFrame::MenuPopped(wxMenuEvent& evt)
     if (popped)
         panel->ShowPointer();
 
-    //if (menus_opened)
-    //    panel->Pause();
-    //else if (!IsPaused())
-    //    panel->Resume();
+#if !defined(TIMER_LOOP) && defined(__WXMSW__)
+    // on Windows and without using the timer, we get annoying sound loops
+    // while browsing menus
+    if (menus_opened)
+        panel->Pause();
+    else if (!IsPaused())
+        panel->Resume();
+#endif // !defined(TIMER_LOOP) && defined(__WXMSW__)
 }
 
 void MainFrame::SetMenusOpened(bool state)
@@ -1159,7 +1163,11 @@ void MainFrame::StartModal()
     // pointer when dialog popped up
     // it will auto-hide again once game resumes
     panel->ShowPointer();
-    //panel->Pause();
+#if !defined(TIMER_LOOP) && defined(__WXMSW__)
+    // on Windows and without using the timer, we get annoying sound loops
+    // while browsing menus
+    panel->Pause();
+#endif // !defined(TIMER_LOOP) && defined(__WXMSW__)
     ++dialog_opened;
 }
 
