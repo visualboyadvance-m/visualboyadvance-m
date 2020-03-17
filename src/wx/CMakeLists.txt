@@ -1017,6 +1017,8 @@ if(GPG_PROGRAM)
     )
 endif()
 
+option(ZIP_SUFFIX [=[suffix for release zip files, e.g.  "-somebranch".zip]=] "")
+
 if(UPSTREAM_RELEASE AND WIN32)
     set(home "$ENV{HOME}")
 
@@ -1053,9 +1055,9 @@ if(UPSTREAM_RELEASE AND WIN32)
     endif()
 
     if(CMAKE_BUILD_TYPE MATCHES Debug)
-        set(exezip visualboyadvance-m-Win-${BITS}bit-debug.zip)
+        set(exezip visualboyadvance-m-Win-${BITS}bit-debug${ZIP_SUFFIX}.zip)
     else()
-        set(exezip visualboyadvance-m-Win-${BITS}bit.zip)
+        set(exezip visualboyadvance-m-Win-${BITS}bit${ZIP_SUFFIX}.zip)
     endif()
 
     unset(pdb_file)
@@ -1163,7 +1165,7 @@ if(UPSTREAM_RELEASE AND APPLE)
         message(WARNING "Set the environment variable LOGIN_KEYCHAIN_PASSWORD to your login keychain password to codesign.")
     endif()
 
-    set(appzip visualboyadvance-m-Mac-${BITS}bit.zip)
+    set(appzip visualboyadvance-m-Mac-${BITS}bit${ZIP_SUFFIX}.zip)
 
     add_custom_command(
         TARGET visualboyadvance-m
@@ -1203,3 +1205,5 @@ install(
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     BUNDLE  DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+# vim:sw=4 tw=0
