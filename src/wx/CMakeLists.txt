@@ -1017,7 +1017,11 @@ if(GPG_PROGRAM)
     )
 endif()
 
-option(ZIP_SUFFIX [=[suffix for release zip files, e.g.  "-somebranch".zip]=] "")
+option(ZIP_SUFFIX [=[suffix for release zip files, e.g.  "-somebranch".zip]=] OFF)
+
+if(NOT ZIP_SUFFIX)
+    set(ZIP_SUFFIX "")
+endif()
 
 if(UPSTREAM_RELEASE AND WIN32)
     set(home "$ENV{HOME}")
