@@ -25,7 +25,9 @@
 
 # Visual Boy Advance - M
 
-Game Boy Advance Emulator
+Game Boy and Game Boy Advance Emulator
+
+The forums are [here](http://board.vba-m.com/).
 
 Windows and Mac builds are in the [releases tab](https://github.com/visualboyadvance-m/visualboyadvance-m/releases).
 
