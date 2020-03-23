@@ -2819,7 +2819,7 @@ bool MainFrame::BindControls()
                 continue;
 	    }
 #endif
-#if defined(NO_ONLINEUPDATES) || !defined(__WXMSW__)
+#if defined(NO_ONLINEUPDATES)
 	    if (cmdtab[i].cmd_id == XRCID("UpdateEmu"))
 	    {
                 if (mi)

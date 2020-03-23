@@ -2714,18 +2714,14 @@ EVT_HANDLER(Customize, "Customize UI...")
 }
 
 #ifndef NO_ONLINEUPDATES
-#ifdef __WXMSW__
-#include "winsparkle-wrapper.h"
-#endif
-#endif
+#include "autoupdater/autoupdater.h"
+#endif // NO_ONLINEUPDATES
 
 EVT_HANDLER(UpdateEmu, "Check for updates...")
 {
 #ifndef NO_ONLINEUPDATES
-#ifdef __WXMSW__
-    win_sparkle_check_update_with_ui();
-#endif
-#endif
+    checkUpdatesUi();
+#endif // NO_ONLINEUPDATES
 }
 
 EVT_HANDLER(FactoryReset, "Factory Reset...")
