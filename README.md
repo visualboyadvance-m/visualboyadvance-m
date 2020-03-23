@@ -27,11 +27,11 @@
 
 Game Boy and Game Boy Advance Emulator
 
-The forums are [here](http://board.vba-m.com/).
+The forums are [here](https://board.vba-m.com/).
 
 Windows and Mac builds are in the [releases tab](https://github.com/visualboyadvance-m/visualboyadvance-m/releases).
 
-Nightly builds are [here](http://win.vba-m.com/nightly).
+Nightly builds are [here](https://win.vba-m.com/nightly/).
 
 Your distribution may have packages available as well, search for
 `visualboyadvance-m` or `vbam`.
