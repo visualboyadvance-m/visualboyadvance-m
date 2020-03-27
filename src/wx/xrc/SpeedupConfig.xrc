@@ -42,7 +42,7 @@
               <object class="sizeritem">
                 <object class="wxChoice" name="SpeedupThrottleSel">
                   <content>
-                    <item>None</item>
+                    <item>Full Speed/No Limit</item>
                     <item>25%</item>
                     <item>50%</item>
                     <item>75%</item>
@@ -80,84 +80,10 @@
         <border>5</border>
       </object>
       <object class="sizeritem">
-        <object class="wxStaticText">
-          <label>Speedup Frame Skip</label>
-          <font>
-            <weight>bold</weight>
-          </font>
+        <object class="wxCheckBox" name="SpeedupThrottleFrameSkip">
+          <label>Frame skip</label>
         </object>
         <flag>wxALL</flag>
-        <border>5</border>
-      </object>
-      <object class="sizeritem">
-        <object class="wxBoxSizer">
-          <orient>wxVERTICAL</orient>
-          <object class="sizeritem">
-            <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
-            <object class="wxBoxSizer">
-              <orient>wxHORIZONTAL</orient>
-              <object class="sizeritem">
-                <object class="wxStaticText">
-                  <label># of frames:</label>
-                  <size>60,-1d</size>
-                </object>
-                <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxSpinCtrl" name="SpeedupFrameSkip">
-                  <value>9</value>
-                  <min>0</min>
-                  <max>30</max>
-                </object>
-                <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxChoice" name="SpeedupFrameSkipSel">
-                  <content>
-                    <item>None</item>
-                    <item>1</item>
-                    <item>2</item>
-                    <item>3</item>
-                    <item>4</item>
-                    <item>5</item>
-                    <item>6</item>
-                    <item>7</item>
-                    <item>8</item>
-                    <item>9</item>
-                    <item>10</item>
-                    <item>11</item>
-                    <item>12</item>
-                    <item>13</item>
-                    <item>14</item>
-                    <item>15</item>
-                    <item>16</item>
-                    <item>17</item>
-                    <item>18</item>
-                    <item>19</item>
-                    <item>20</item>
-                    <item>21</item>
-                    <item>22</item>
-                    <item>23</item>
-                    <item>24</item>
-                    <item>25</item>
-                    <item>26</item>
-                    <item>27</item>
-                    <item>28</item>
-                    <item>29</item>
-                    <item>30</item>
-                  </content>
-                  <size>40,-1d</size>
-                </object>
-                <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-                <border>5</border>
-              </object>
-            </object>
-          </object>
-        </object>
-        <flag>wxALL|wxEXPAND</flag>
         <border>5</border>
       </object>
       <object class="sizeritem">

@@ -1,3 +1,4 @@
+#include <cmath>
 #include <memory.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -3792,25 +3793,28 @@ void CPULoop(int ticks)
                 } else {
                     int framesToSkip = systemFrameSkip;
 
-#ifndef __LIBRETRO__
                     static bool speedup_throttle_set = false;
+#ifndef __LIBRETRO__
                     static uint32_t last_throttle;
 
                     if ((joy >> 10) & 1) {
-                        if (speedup_throttle != 0) {
-                            if (!speedup_throttle_set && throttle != speedup_throttle) {
-                                last_throttle = throttle;
-                                throttle = speedup_throttle;
-                                soundSetThrottle(speedup_throttle);
-                                speedup_throttle_set = true;
+                        if (speedup_throttle != 100 && !speedup_throttle_set && throttle != speedup_throttle) {
+                            last_throttle = throttle;
+                            throttle = speedup_throttle;
+                            soundSetThrottle(speedup_throttle);
+                            speedup_throttle_set = true;
+                        }
+
+                        if (speedup_throttle_set) {
+                            if (speedup_throttle_frame_skip) {
+                                if (speedup_throttle == 0)
+                                    framesToSkip += 9;
+                                else if (speedup_throttle > 100)
+                                    framesToSkip += std::ceil(double(speedup_throttle) / 100.0) - 1;
                             }
                         }
-                        else {
-                            if (speedup_frame_skip)
-                                framesToSkip = speedup_frame_skip;
-
-                            speedup_throttle_set = false;
-                        }
+                        else
+                            framesToSkip = 9;
                     }
                     else if (speedup_throttle_set) {
                         throttle = last_throttle;
@@ -3855,11 +3859,7 @@ void CPULoop(int ticks)
 
                             speedup = false;
 
-#ifndef __LIBRETRO__
-                            if (ext & 1 && speedup_throttle == 0)
-#else
-                            if (ext & 1)
-#endif
+                            if (ext & 1 && !speedup_throttle_set)
                                 speedup = true;
 
                             capture = (ext & 2) ? true : false;

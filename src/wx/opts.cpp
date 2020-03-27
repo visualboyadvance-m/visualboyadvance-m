@@ -292,7 +292,7 @@ opt_desc opts[] = {
     INTOPT("preferences/skipSaveGameBattery", "", wxTRANSLATE("Do not overwrite native (battery) save when loading state"), skipSaveGameBattery, 0, 1),
     UINTOPT("preferences/throttle", "", wxTRANSLATE("Throttle game speed, even when accelerated (0-500%, 0 = no throttle)"), throttle, 0, 600),
     UINTOPT("preferences/speedupThrottle", "", wxTRANSLATE("Set throttle for speedup key (0-600%, 0 = no throttle)"), speedup_throttle, 0, 600),
-    UINTOPT("preferences/speedupFrameSkip", "", wxTRANSLATE("Set frame skip for speedup key (0-30)"), speedup_frame_skip, 0, 30),
+    BOOLOPT("preferences/speedupThrottleFrameSkip", "", wxTRANSLATE("Use frame skip for speedup throttle"), speedup_throttle_frame_skip),
     INTOPT("preferences/useBiosGB", "BootRomGB", wxTRANSLATE("Use the specified BIOS file for GB"), useBiosFileGB, 0, 1),
     INTOPT("preferences/useBiosGBA", "BootRomEn", wxTRANSLATE("Use the specified BIOS file"), useBiosFileGBA, 0, 1),
     INTOPT("preferences/useBiosGBC", "BootRomGBC", wxTRANSLATE("Use the specified BIOS file for GBC"), useBiosFileGBC, 0, 1),
