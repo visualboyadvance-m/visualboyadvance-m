@@ -111,7 +111,7 @@
               <object class="sizeritem">
                 <object class="wxChoice" name="ThrottleSel">
                   <content>
-                    <item>None</item>
+                    <item>Full Speed/No Limit</item>
                     <item>25%</item>
                     <item>50%</item>
                     <item>75%</item>

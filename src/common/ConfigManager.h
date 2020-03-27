@@ -147,7 +147,7 @@ extern uint32_t movieLastJoypad;
 extern uint32_t movieNextJoypad;
 extern uint32_t throttle;
 extern uint32_t speedup_throttle;
-extern uint32_t speedup_frame_skip;
+extern bool speedup_throttle_frame_skip;
 
 extern int preparedCheats;
 extern const char *preparedCheatCodes[MAX_CHEATS];

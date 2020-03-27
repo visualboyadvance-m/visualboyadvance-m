@@ -1,4 +1,5 @@
 //#include "../win32/stdafx.h" // would fix LNK2005 linker errors for MSVC
+#include <cmath>
 #include <assert.h>
 #include <memory.h>
 #include <stdio.h>
@@ -4944,25 +4945,28 @@ void gbEmulate(int ticksToStop)
                 if ((gbLcdTicksDelayed <= 0) && (gbLCDChangeHappened)) {
                     int framesToSkip = systemFrameSkip;
 
-#ifndef __LIBRETRO__
                     static bool speedup_throttle_set = false;
+#ifndef __LIBRETRO__
                     static uint32_t last_throttle;
 
                     if ((gbJoymask[0] >> 10) & 1) {
-                        if (speedup_throttle != 0) {
-                            if (!speedup_throttle_set && throttle != speedup_throttle) {
-                                last_throttle = throttle;
-                                throttle = speedup_throttle;
-                                soundSetThrottle(speedup_throttle);
-                                speedup_throttle_set = true;
+                        if (speedup_throttle != 100 && !speedup_throttle_set && throttle != speedup_throttle) {
+                            last_throttle = throttle;
+                            throttle = speedup_throttle;
+                            soundSetThrottle(speedup_throttle);
+                            speedup_throttle_set = true;
+                        }
+
+                        if (speedup_throttle_set) {
+                            if (speedup_throttle_frame_skip) {
+                                if (speedup_throttle == 0)
+                                    framesToSkip += 9;
+                                else if (speedup_throttle > 100)
+                                    framesToSkip += std::ceil(double(speedup_throttle) / 100.0) - 1;
                             }
                         }
-                        else {
-                            if (speedup_frame_skip)
-                                framesToSkip = speedup_frame_skip;
-
-                            speedup_throttle_set = false;
-                        }
+                        else
+                            framesToSkip = 9;
                     }
                     else if (speedup_throttle_set) {
                         throttle = last_throttle;
@@ -5033,11 +5037,7 @@ void gbEmulate(int ticksToStop)
 
                             speedup = false;
 
-#ifndef __LIBRETRO__
-                            if (newmask & 1 && speedup_throttle == 0)
-#else
-                            if (newmask & 1)
-#endif
+                            if (newmask & 1 && !speedup_throttle_set)
                                 speedup = true;
 
                             gbCapture = (newmask & 2) ? true : false;
