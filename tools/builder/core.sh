@@ -108,7 +108,7 @@ DISTS=$DISTS'
     zlib            https://www.zlib.net/zlib-1.2.11.tar.gz                                                     lib/libz.a
     ccache          https://www.samba.org/ftp/ccache/ccache-3.4.3.tar.xz                                        bin/ccache
     zip             https://downloads.sourceforge.net/project/infozip/Zip%203.x%20%28latest%29/3.0/zip30.tar.gz                 bin/zip
-    openssl         https://www.openssl.org/source/openssl-1.1.1c.tar.gz                                        lib/libssl.a
+    openssl         https://www.openssl.org/source/openssl-1.1.1f.tar.gz                                        lib/libssl.a
     curl            https://curl.haxx.se/download/curl-7.65.3.tar.xz                                            lib/libcurl.a
     cmake           https://cmake.org/files/v3.13/cmake-3.13.0-rc1.tar.gz                                       bin/cmake
     m4              http://ftp.gnu.org/gnu/m4/m4-1.4.18.tar.xz                                                  bin/m4
@@ -120,7 +120,7 @@ DISTS=$DISTS'
     help2man        https://ftp.gnu.org/gnu/help2man/help2man-1.47.5.tar.xz                                     bin/help2man
     libiconv        https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz                                   lib/libiconv.a
     gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-0.19.8.1.tar.xz                                  lib/libintl.a
-    getopt          http://frodo.looijaard.name/system/files/software/getopt/getopt-1.1.6.tar.gz                bin/getopt
+    getopt          https://fossies.org/linux/misc/getopt-1.1.6.tar.gz                                          bin/getopt
     gsed            http://ftp.gnu.org/gnu/sed/sed-4.4.tar.xz                                                   bin/sed
     bison           https://ftp.gnu.org/gnu/bison/bison-3.0.5.tar.xz                                            bin/bison
     texinfo         http://ftp.gnu.org/gnu/texinfo/texinfo-6.5.tar.xz                                           bin/makeinfo
@@ -130,7 +130,7 @@ DISTS=$DISTS'
     gperf           http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz                                           bin/gperf
     libicu          https://github.com/unicode-org/icu/releases/download/release-65-1/icu4c-65_1-src.tgz        lib/libicud*t*.a
     pkgconfig       https://pkgconfig.freedesktop.org/releases/pkg-config-0.29.2.tar.gz                         bin/pkg-config
-    nasm            https://www.nasm.us/pub/nasm/snapshots/20191023/nasm-2.15rc0-20191023.tar.xz                bin/nasm
+    nasm            https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.xz                      bin/nasm
     yasm            http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz                             bin/yasm
     pcre            https://ftp.pcre.org/pub/pcre/pcre-8.41.tar.bz2                                             lib/libpcre.a
     libffi          ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz                                         lib/libffi.a
@@ -206,7 +206,7 @@ DISTS=$DISTS'
     libx265         https://bitbucket.org/multicoreware/x265/downloads/x265_3.1.2.tar.gz                        lib/libx265.a
     libxavs         https://github.com/Distrotech/xavs/archive/distrotech-xavs-git.tar.gz                       lib/libxavs.a
     libzmq          https://github.com/zeromq/libzmq/releases/download/v4.2.2/zeromq-4.2.2.tar.gz               lib/libzmq.a
-#   libzvbi         https://downloads.sourceforge.net/project/zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2           lib/libzvbi.a
+#    libzvbi         https://downloads.sourceforge.net/project/zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2           lib/libzvbi.a
     ffmpeg          https://ffmpeg.org/releases/ffmpeg-4.2.1.tar.bz2                                            lib/libavformat.a
 '
 
