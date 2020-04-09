@@ -105,7 +105,7 @@ void gbCheatsSaveCheatList(const char* file)
 {
     if (gbCheatNumber == 0)
         return;
-    FILE* f = fopen(file, "wb");
+    FILE* f = utilOpenFile(file, "wb");
     if (f == NULL)
         return;
     int version = 1;
@@ -125,7 +125,7 @@ bool gbCheatsLoadCheatList(const char* file)
 
     int count = 0;
 
-    FILE* f = fopen(file, "rb");
+    FILE* f = utilOpenFile(file, "rb");
 
     if (f == NULL)
         return false;
@@ -396,7 +396,7 @@ void gbCheatDisable(int i)
 
 bool gbCheatReadGSCodeFile(const char* fileName)
 {
-    FILE* file = fopen(fileName, "rb");
+    FILE* file = utilOpenFile(fileName, "rb");
 
     if (!file) {
         systemMessage(MSG_CANNOT_OPEN_FILE, N_("Cannot open file %s"), fileName);

@@ -145,7 +145,7 @@ static uLong computePatchCRC(FILE* f, unsigned int size)
 static bool patchApplyIPS(const char* patchname, uint8_t** r, int* s)
 {
     // from the IPS spec at http://zerosoft.zophar.net/ips.htm
-    FILE* f = fopen(patchname, "rb");
+    FILE* f = utilOpenFile(patchname, "rb");
     if (!f)
         return false;
 
@@ -207,7 +207,7 @@ static bool patchApplyUPS(const char* patchname, uint8_t** rom, int* size)
 {
     int64_t srcCRC, dstCRC, patchCRC;
 
-    FILE* f = fopen(patchname, "rb");
+    FILE* f = utilOpenFile(patchname, "rb");
     if (!f)
         return false;
 
@@ -297,7 +297,7 @@ static bool patchApplyBPS(const char* patchname, uint8_t** rom, int* size)
 {
     int64_t srcCRC, dstCRC, patchCRC;
 
-    FILE* f = fopen(patchname, "rb");
+    FILE* f = utilOpenFile(patchname, "rb");
     if (!f)
         return false;
 
@@ -570,7 +570,7 @@ static bool patchApplyPPF3(FILE* f, uint8_t** rom, int* size)
 
 static bool patchApplyPPF(const char* patchname, uint8_t** rom, int* size)
 {
-    FILE* f = fopen(patchname, "rb");
+    FILE* f = utilOpenFile(patchname, "rb");
     if (!f)
         return false;
 

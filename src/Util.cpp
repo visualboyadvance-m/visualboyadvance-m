@@ -72,6 +72,45 @@ bool FileExists(const char *filename)
 #endif
 }
 
+#ifdef _WIN32
+#include <windows.h>
+
+wchar_t* utf8ToUtf16(const char *utf8)
+{
+    wchar_t *utf16 = nullptr;
+    size_t size = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL , 0);
+    if (size == 0) return nullptr; // error
+    utf16 = new wchar_t[size];
+    size = MultiByteToWideChar(CP_UTF8, 0, utf8 , -1, utf16, size);
+    if (size == 0) {
+        delete[] utf16;
+        return nullptr; // error
+    }
+    return utf16;
+}
+#endif // _WIN32
+
+FILE* utilOpenFile(const char *filename, const char *mode)
+{
+    FILE *f = NULL;
+#ifdef _WIN32
+    wchar_t *wfilename = utf8ToUtf16(filename);
+    if (!wfilename) return nullptr;
+    wchar_t *wmode = utf8ToUtf16(mode);
+    if (!wmode) {
+        delete[] wfilename;
+        return nullptr;
+    }
+
+    f = _wfopen(wfilename, wmode);
+    delete[] wfilename;
+    delete[] wmode;
+#else
+    f = fopen(filename, mode);
+#endif // _WIN32
+    return f;
+}
+
 // Get user-specific config dir manually.
 // apple:   ~/Library/Application Support/
 // windows: %APPDATA%/
@@ -504,10 +543,6 @@ static bool utilIsImage(const char *file)
         return utilIsGBAImage(file) || utilIsGBImage(file);
 }
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-
 IMAGE_TYPE utilFindType(const char *file, char (&buffer)[2048]);
 
 IMAGE_TYPE utilFindType(const char *file)
@@ -590,7 +625,7 @@ uint8_t *utilLoad(const char *file, bool (*accept)(const char *), uint8_t *data,
 
         if (size > MAX_CART_SIZE)
                 return NULL;
-        
+
         uint8_t *image = data;
 
         if (image == NULL) {
@@ -722,6 +757,19 @@ void utilWriteData(gzFile gzFile, variable_desc *data)
         }
 }
 
+gzFile utilAutoGzOpen(const char *file, const char *mode)
+{
+#ifdef _WIN32
+        wchar_t *wfile = utf8ToUtf16(file);
+        if (!wfile) return nullptr;
+        gzFile handler = gzopen_w(wfile, mode);
+        delete[] wfile;
+        return handler;
+#else
+        return gzopen(file, mode);
+#endif
+}
+
 gzFile utilGzOpen(const char *file, const char *mode)
 {
         utilGzWriteFunc = (int(ZEXPORT *)(gzFile, void *const, unsigned int))gzwrite;
@@ -729,7 +777,7 @@ gzFile utilGzOpen(const char *file, const char *mode)
         utilGzCloseFunc = gzclose;
         utilGzSeekFunc = gzseek;
 
-        return gzopen(file, mode);
+        return utilAutoGzOpen(file, mode);
 }
 
 gzFile utilMemGzOpen(char *memory, int available, const char *mode)

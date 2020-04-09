@@ -81,7 +81,7 @@ void GameArea::LoadGame(const wxString& name)
 
     // auto-conversion of wxCharBuffer to const char * seems broken
     // so save underlying wxCharBuffer (or create one of none is used)
-    wxCharBuffer fnb(fnfn.GetFullPath().mb_str(wxConvUTF8));
+    wxCharBuffer fnb(UTF8(fnfn.GetFullPath()));
     const char* fn = fnb.data();
     IMAGE_TYPE t = badfile ? IMAGE_UNKNOWN : utilFindType(fn);
 
@@ -158,7 +158,7 @@ void GameArea::LoadGame(const wxString& name)
 
         if (loadpatch) {
             int size = rom_size;
-            applyPatch(pfn.GetFullPath().mb_str(), &gbRom, &size);
+            applyPatch(UTF8(pfn.GetFullPath()), &gbRom, &size);
 
             if (size != (int)rom_size)
                 gbUpdateSizes();
@@ -183,7 +183,9 @@ void GameArea::LoadGame(const wxString& name)
         gbGetHardwareType();
 
         bool use_bios  =  gbCgbMode ? useBiosFileGBC : useBiosFileGB;
-        const char* fn = (gbCgbMode ? gopts.gbc_bios : gopts.gb_bios).mb_str();
+
+        wxCharBuffer fnb(UTF8((gbCgbMode ? gopts.gbc_bios : gopts.gb_bios)));
+        const char* fn = fnb.data();
 
         gbCPUInit(fn, use_bios);
 
@@ -223,7 +225,7 @@ void GameArea::LoadGame(const wxString& name)
             // don't use real rom size or it might try to resize rom[]
             // instead, use known size of rom[]
             int size = 0x2000000 < rom_size ? 0x2000000 : rom_size;
-            applyPatch(pfn.GetFullPath().mb_str(), &rom, &size);
+            applyPatch(UTF8(pfn.GetFullPath()), &rom, &size);
             // that means we no longer really know rom_size either <sigh>
 
             gbaUpdateRomSize(size);
@@ -285,7 +287,7 @@ void GameArea::LoadGame(const wxString& name)
 
         rtcEnableRumble(true);
 
-        CPUInit(gopts.gba_bios.mb_fn_str(), useBiosFileGBA);
+        CPUInit(UTF8(gopts.gba_bios), useBiosFileGBA);
 
         if (useBiosFileGBA && !useBios) {
             wxLogError(_("Could not load BIOS %s"), gopts.gba_bios.mb_str());
@@ -355,9 +357,9 @@ void GameArea::LoadGame(const wxString& name)
         bname.append(wxT(".sav"));
         wxFileName bat(batdir, bname);
 
-        if (emusys->emuReadBattery(bat.GetFullPath().mb_str())) {
+        if (emusys->emuReadBattery(UTF8(bat.GetFullPath()))) {
             wxString msg;
-            msg.Printf(_("Loaded battery %s"), bat.GetFullPath().mb_str());
+            msg.Printf(_("Loaded battery %s"), bat.GetFullPath().wc_str());
             systemScreenMessage(msg);
 
             if (cpuSaveType == 0 && ovSaveType == 0 && t == IMAGE_GBA) {
@@ -409,9 +411,9 @@ void GameArea::LoadGame(const wxString& name)
             bool cld;
 
             if (loaded == IMAGE_GB)
-                cld = gbCheatsLoadCheatList(cfn.GetFullPath().mb_fn_str());
+                cld = gbCheatsLoadCheatList(UTF8(cfn.GetFullPath()));
             else
-                cld = cheatsLoadCheatList(cfn.GetFullPath().mb_fn_str());
+                cld = cheatsLoadCheatList(UTF8(cfn.GetFullPath()));
 
             if (cld) {
                 systemScreenMessage(_("Loaded cheats"));
@@ -424,7 +426,7 @@ void GameArea::LoadGame(const wxString& name)
 
     if (gopts.link_auto) {
         linkMode = mf->GetConfiguredLinkMode();
-        BootLink(linkMode, gopts.link_host.mb_str(wxConvUTF8), linkTimeout, linkHacks, linkNumPlayers);
+        BootLink(linkMode, UTF8(gopts.link_host), linkTimeout, linkHacks, linkNumPlayers);
     }
 
 #endif
@@ -496,12 +498,12 @@ void GameArea::UnloadGame(bool destruct)
             if (!gbCheatNumber)
                 wxRemoveFile(cfn.GetFullPath());
             else
-                gbCheatsSaveCheatList(cfn.GetFullPath().mb_fn_str());
+                gbCheatsSaveCheatList(UTF8(cfn.GetFullPath()));
         } else {
             if (!cheatsNumber)
                 wxRemoveFile(cfn.GetFullPath());
             else
-                cheatsSaveCheatList(cfn.GetFullPath().mb_fn_str());
+                cheatsSaveCheatList(UTF8(cfn.GetFullPath()));
         }
     }
 
@@ -578,14 +580,14 @@ bool GameArea::LoadState()
 bool GameArea::LoadState(int slot)
 {
     wxString fname;
-    fname.Printf(SAVESLOT_FMT, game_name().mb_str(), slot);
+    fname.Printf(SAVESLOT_FMT, game_name().wc_str(), slot);
     return LoadState(wxFileName(statedir, fname));
 }
 
 bool GameArea::LoadState(const wxFileName& fname)
 {
     // FIXME: first save to backup state if not backup state
-    bool ret = emusys->emuReadState(fname.GetFullPath().mb_fn_str());
+    bool ret = emusys->emuReadState(UTF8(fname.GetFullPath()));
 
     if (ret && num_rewind_states) {
         MainFrame* mf = wxGetApp().frame;
@@ -612,7 +614,7 @@ bool GameArea::LoadState(const wxFileName& fname)
 
     wxString msg;
     msg.Printf(ret ? _("Loaded state %s") : _("Error loading state %s"),
-        fname.GetFullPath().mb_str());
+        fname.GetFullPath().wc_str());
     systemScreenMessage(msg);
     return ret;
 }
@@ -625,18 +627,18 @@ bool GameArea::SaveState()
 bool GameArea::SaveState(int slot)
 {
     wxString fname;
-    fname.Printf(SAVESLOT_FMT, game_name().mb_str(), slot);
+    fname.Printf(SAVESLOT_FMT, game_name().wc_str(), slot);
     return SaveState(wxFileName(statedir, fname));
 }
 
 bool GameArea::SaveState(const wxFileName& fname)
 {
     // FIXME: first copy to backup state if not backup state
-    bool ret = emusys->emuWriteState(fname.GetFullPath().mb_fn_str());
+    bool ret = emusys->emuWriteState(UTF8(fname.GetFullPath()));
     wxGetApp().frame->update_state_ts(true);
     wxString msg;
     msg.Printf(ret ? _("Saved state %s") : _("Error saving state %s"),
-        fname.GetFullPath().mb_str());
+        fname.GetFullPath().wc_str());
     systemScreenMessage(msg);
     return ret;
 }
@@ -662,7 +664,7 @@ void GameArea::SaveBattery()
     // FIXME: add option to support ring of backups
     // of course some games just write battery way too often for such
     // a thing to be useful
-    if (!emusys->emuWriteBattery(fn.mb_str()))
+    if (!emusys->emuWriteBattery(UTF8(fn)))
         wxLogError(_("Error writing battery %s"), fn.mb_str());
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
@@ -1858,7 +1860,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
         if (panel->osdstat.size())
             drawText(todraw + outstride * (systemColorDepth != 24), outstride,
-                10, 20, panel->osdstat.mb_str(), showSpeedTransparent);
+                10, 20, UTF8(panel->osdstat), showSpeedTransparent);
 
         if (!disableStatusMessages && !panel->osdtext.empty()) {
             if (systemGetClock() - panel->osdtime < OSD_TIME) {
@@ -1866,7 +1868,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                 int linelen = std::ceil(width * scale - 20) / 8;
                 int nlines = (message.size() + linelen - 1) / linelen;
                 int cury = height - 14 - nlines * 10;
-                char* buf = strdup(message.mb_str());
+                char* buf = strdup(UTF8(message));
                 char* ptr = buf;
 
                 while (nlines > 1) {
@@ -2394,7 +2396,7 @@ void GameArea::StartVidRecording(const wxString& fname)
     recording::MediaRet ret;
 
     vid_rec.SetSampleRate(soundGetSampleRate());
-    if ((ret = vid_rec.Record(fname.mb_str(), basic_width, basic_height,
+    if ((ret = vid_rec.Record(UTF8(fname), basic_width, basic_height,
              systemColorDepth))
         != recording::MRET_OK)
         wxLogError(_("Unable to begin recording to %s (%s)"), fname.mb_str(),
@@ -2425,7 +2427,7 @@ void GameArea::StartSoundRecording(const wxString& fname)
     recording::MediaRet ret;
 
     snd_rec.SetSampleRate(soundGetSampleRate());
-    if ((ret = snd_rec.Record(fname.mb_str())) != recording::MRET_OK)
+    if ((ret = snd_rec.Record(UTF8(fname))) != recording::MRET_OK)
         wxLogError(_("Unable to begin recording to %s (%s)"), fname.mb_str(),
             media_err(ret));
     else {

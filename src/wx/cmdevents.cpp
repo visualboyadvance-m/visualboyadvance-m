@@ -856,7 +856,7 @@ EVT_HANDLER_MASK(SetLoadingDotCodeFile, "Load e-Reader Dot Code...", CMDEN_GBA)
         return;
 
     loaddotcodefile_path = dlg.GetPath();
-    SetLoadDotCodeFile(loaddotcodefile_path.mb_str());
+    SetLoadDotCodeFile(UTF8(loaddotcodefile_path));
 }
 
 EVT_HANDLER_MASK(ResetSavingDotCodeFile, "Reset Saving e-Reader Dot Code", CMDEN_GBA)
@@ -878,7 +878,7 @@ EVT_HANDLER_MASK(SetSavingDotCodeFile, "Save e-Reader Dot Code...", CMDEN_GBA)
         return;
 
     savedotcodefile_path = dlg.GetPath();
-    SetSaveDotCodeFile(savedotcodefile_path.mb_str());
+    SetSaveDotCodeFile(UTF8(savedotcodefile_path));
 }
 
 static wxString batimp_path;
@@ -903,10 +903,10 @@ EVT_HANDLER_MASK(ImportBatteryFile, "Import battery file...", CMDEN_GB | CMDEN_G
     if (ret == wxYES) {
         wxString msg;
 
-        if (panel->emusys->emuReadBattery(fn.mb_fn_str()))
-            msg.Printf(_("Loaded battery %s"), fn.c_str());
+        if (panel->emusys->emuReadBattery(UTF8(fn)))
+            msg.Printf(_("Loaded battery %s"), fn.wc_str());
         else
-            msg.Printf(_("Error loading battery %s"), fn.c_str());
+            msg.Printf(_("Error loading battery %s"), fn.wc_str());
 
         systemScreenMessage(msg);
     }
@@ -936,7 +936,7 @@ EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import GameShark code file...", CMDEN
             // FIXME: this routine will not work on big-endian systems
             // if the underlying file format is little-endian
             // (fix in gb/gbCheats.cpp)
-            res = gbCheatReadGSCodeFile(fn.mb_fn_str());
+            res = gbCheatReadGSCodeFile(UTF8(fn));
         else {
             // need to select game first
             wxFFile f(fn, wxT("rb"));
@@ -1018,13 +1018,13 @@ EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import GameShark code file...", CMDEN
             // FIXME: this routine will not work on big-endian systems
             // if the underlying file format is little-endian
             // (fix in gba/Cheats.cpp)
-            res = cheatsImportGSACodeFile(fn.mb_fn_str(), game, v3);
+            res = cheatsImportGSACodeFile(UTF8(fn), game, v3);
         }
 
         if (res)
-            msg.Printf(_("Loaded code file %s"), fn.c_str());
+            msg.Printf(_("Loaded code file %s"), fn.wc_str());
         else
-            msg.Printf(_("Error loading code file %s"), fn.c_str());
+            msg.Printf(_("Error loading code file %s"), fn.wc_str());
 
         systemScreenMessage(msg);
     }
@@ -1053,7 +1053,7 @@ EVT_HANDLER_MASK(ImportGamesharkActionReplaySnapshot,
         bool res;
 
         if (panel->game_type() == IMAGE_GB)
-            res = gbReadGSASnapshot(fn.mb_fn_str());
+            res = gbReadGSASnapshot(UTF8(fn));
         else {
             bool gsv = fn.size() >= 4 && wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".gsv"), false);
 
@@ -1061,18 +1061,18 @@ EVT_HANDLER_MASK(ImportGamesharkActionReplaySnapshot,
                 // FIXME: this will fail on big-endian machines if
                 // file format is little-endian
                 // fix in GBA.cpp
-                res = CPUReadGSASPSnapshot(fn.mb_fn_str());
+                res = CPUReadGSASPSnapshot(UTF8(fn));
             else
                 // FIXME: this will fail on big-endian machines if
                 // file format is little-endian
                 // fix in GBA.cpp
-                res = CPUReadGSASnapshot(fn.mb_fn_str());
+                res = CPUReadGSASnapshot(UTF8(fn));
         }
 
         if (res)
-            msg.Printf(_("Loaded snapshot file %s"), fn.c_str());
+            msg.Printf(_("Loaded snapshot file %s"), fn.wc_str());
         else
-            msg.Printf(_("Error loading snapshot file %s"), fn.c_str());
+            msg.Printf(_("Error loading snapshot file %s"), fn.wc_str());
 
         systemScreenMessage(msg);
     }
@@ -1094,10 +1094,10 @@ EVT_HANDLER_MASK(ExportBatteryFile, "Export battery file...", CMDEN_GB | CMDEN_G
     wxString fn = dlg.GetPath();
     wxString msg;
 
-    if (panel->emusys->emuWriteBattery(fn.mb_fn_str()))
-        msg.Printf(_("Wrote battery %s"), fn.c_str());
+    if (panel->emusys->emuWriteBattery(UTF8(fn)))
+        msg.Printf(_("Wrote battery %s"), fn.wc_str());
     else
-        msg.Printf(_("Error writing battery %s"), fn.c_str());
+        msg.Printf(_("Error writing battery %s"), fn.wc_str());
 
     systemScreenMessage(msg);
 }
@@ -1138,9 +1138,9 @@ EVT_HANDLER_MASK(ExportGamesharkSnapshot, "Export GameShark snapshot...", CMDEN_
     // fix in GBA.cpp
     if (CPUWriteGSASnapshot(fn.utf8_str(), tit->GetValue().utf8_str(),
             dsc->GetValue().utf8_str(), n->GetValue().utf8_str()))
-        msg.Printf(_("Saved snapshot file %s"), fn.c_str());
+        msg.Printf(_("Saved snapshot file %s"), fn.wc_str());
     else
-        msg.Printf(_("Error saving snapshot file %s"), fn.c_str());
+        msg.Printf(_("Error saving snapshot file %s"), fn.wc_str());
 
     systemScreenMessage(msg);
 }
@@ -1175,12 +1175,12 @@ EVT_HANDLER_MASK(ScreenCapture, "Screen capture...", CMDEN_GB | CMDEN_GBA)
     }
 
     if (fmt == 0)
-        panel->emusys->emuWritePNG(fn.mb_fn_str());
+        panel->emusys->emuWritePNG(UTF8(fn));
     else
-        panel->emusys->emuWriteBMP(fn.mb_fn_str());
+        panel->emusys->emuWriteBMP(UTF8(fn));
 
     wxString msg;
-    msg.Printf(_("Wrote snapshot %s"), fn.c_str());
+    msg.Printf(_("Wrote snapshot %s"), fn.wc_str());
     systemScreenMessage(msg);
 }
 
@@ -2208,7 +2208,7 @@ void MainFrame::GDBBreak()
                 if (!debugOpenPty())
                     return;
 
-                msg.Printf(_("Waiting for connection at %s"), debugGetSlavePty().c_str());
+                msg.Printf(_("Waiting for connection at %s"), debugGetSlavePty().wc_str());
             } else
 #endif
             {

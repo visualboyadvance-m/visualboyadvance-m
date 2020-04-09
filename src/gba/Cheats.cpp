@@ -2035,7 +2035,7 @@ void cheatsAddGSACode(const char* code, const char* desc, bool v3)
 
 bool cheatsImportGSACodeFile(const char* name, int game, bool v3)
 {
-    FILE* f = fopen(name, "rb");
+    FILE* f = utilOpenFile(name, "rb");
     if (!f)
         return false;
 
@@ -2587,7 +2587,7 @@ void cheatsReadGame(gzFile file, int version)
     cheatsNumber = 0;
 
     cheatsNumber = utilReadInt(file);
-    
+
     if (cheatsNumber > MAX_CHEATS)
         cheatsNumber = MAX_CHEATS;
 
@@ -2674,7 +2674,7 @@ void cheatsSaveCheatList(const char* file)
 {
     if (cheatsNumber == 0)
         return;
-    FILE* f = fopen(file, "wb");
+    FILE* f = utilOpenFile(file, "wb");
     if (f == NULL)
         return;
     int version = 1;
@@ -2691,7 +2691,7 @@ bool cheatsLoadCheatList(const char* file)
 
     int count = 0;
 
-    FILE* f = fopen(file, "rb");
+    FILE* f = utilOpenFile(file, "rb");
 
     if (f == NULL)
         return false;
