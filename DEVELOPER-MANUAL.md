@@ -10,6 +10,10 @@
     - [Commit Message](#commit-message)
     - [Collaboration on a Branch](#collaboration-on-a-branch)
     - [Commits from Maintainers](#commits-from-maintainers)
+  - [Strings, Character Sets and Translations](#strings-character-sets-and-translations)
+    - [Pulling Updated Translations](#pulling-updated-translations)
+    - [Translations Message Catalog](#translations-message-catalog)
+    - [Interaction with non-wxWidgets Code](#interaction-with-non-wxwidgets-code)
   - [Windows Native Development Environment Setup](#windows-native-development-environment-setup)
   - [PowerShell Notes](#powershell-notes)
   - [Release Process](#release-process)
@@ -115,6 +119,80 @@ history clean:
   Differences in what different compilers allow is a problem that comes up
   **VERY** frequently. As well as incompatibilities between different
   configurations for both the C++ code and any supporting code.
+
+
+### Strings, Character Sets and Translations
+
+#### Pulling Updated Translations
+
+Once in a while it is necessary to pull new and updated translations from
+transifex.
+
+For this you need the transifex client, available for Windows as well from
+chocolatey as `transifex-client`.
+
+To pull translations run:
+
+```bash
+tx pull -af
+```
+
+then check `git status` and if any message catalogs were updated, commit the
+result as:
+
+```bash
+git commit -a --signoff -S -m'Transifex pull.'
+git push
+```
+
+#### Translations Message Catalog
+
+Strings that need to be translated by our wonderful translators on transifex
+(thank you guys very much) need to be enclosed in `_("...")`, for example:
+
+```cpp
+wxLogError(_("error: something very wrong"));
+```
+
+The next time you run cmake after adding a string to be translated, the `.pot`
+message catalog source will be regenerated, and you will see a loud message
+telling you to push to transifex.
+
+Strings in the XRC XML GUI definition files are automatically added to the
+message catalog as well.
+
+If you are working on a branch or a PR, don't push to transifex until it has
+been merged to master.
+
+Once it is, push it with:
+
+```bash
+tx push -s
+```
+
+#### Interaction with non-wxWidgets Code
+
+Use our `UTF8(...)` function to force any `wxString` to UTF-8 for use by other
+libraries, screen output or OS APIs. For example:
+
+```cpp
+fprintf(STDERR, "Error: %s\n", UTF8(err_msg));
+```
+
+There is one exception to this, when using `wxString::Printf()` and such, you
+can't pass another `wxString` to the `%s` format directly, use something like
+this:
+
+```cpp
+wxString err;
+err.Printf("Cannot read file: %s", fname.wc_str());
+```
+
+this uses the `wchar_t` UTF-16 representation on Windows and does nothing
+elsewhere.
+
+For calling Windows APIs with strings, use the wide char `W` variants and the
+`wc_str()` method as well.
 
 ### Windows Native Development Environment Setup
 
