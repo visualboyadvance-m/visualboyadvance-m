@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-13 14:40+0000\n"
-"PO-Revision-Date: 2020-03-13 14:41+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"POT-Creation-Date: 2020-03-27 09:03+0000\n"
+"PO-Revision-Date: 2020-04-10 13:11+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Greek (http://www.transifex.com/bgk/vba-m/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -108,238 +108,237 @@ msgstr "Λάθος επιλογή διαμόρφωσης ή πολλά δοθέ�
 msgid "Start!"
 msgstr "Έναρξη!"
 
-#: guiinit.cpp:82 xrc/NetLink.xrc:99
+#: guiinit.cpp:96 xrc/NetLink.xrc:99
 msgid "Connect"
 msgstr "Σύνδεση"
 
-#: guiinit.cpp:98
+#: guiinit.cpp:113
 msgid "You must enter a valid host name"
 msgstr "Πρέπει να εισάγετε ένα έγκυρο όνομα υπολογιστή"
 
-#: guiinit.cpp:99
+#: guiinit.cpp:114
 msgid "Host name invalid"
 msgstr "Μη έγκυρο όνομα υπολογιστή"
 
-#: guiinit.cpp:117
+#: guiinit.cpp:132
 msgid "Waiting for clients..."
 msgstr "Αναμονή για συνδέσεις..."
 
-#: guiinit.cpp:118
+#: guiinit.cpp:133
 #, c-format
 msgid "Server IP address is: %s\n"
 msgstr "Η διεύθυνση IP του διακομιστή είναι: %s\n"
 
-#: guiinit.cpp:120
+#: guiinit.cpp:135
 msgid "Waiting for connection..."
 msgstr "Αναμονή για σύνδεση..."
 
-#: guiinit.cpp:121
+#: guiinit.cpp:136
 #, c-format
 msgid "Connecting to %s\n"
 msgstr "Σύνδεση σε %s\n"
 
-#: guiinit.cpp:154
+#: guiinit.cpp:169
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr "Προέκυψε σφάλμα.\nΠαρακαλούμε δοκιμάστε ξανά."
 
-#: guiinit.cpp:221 guiinit.cpp:274
+#: guiinit.cpp:236 guiinit.cpp:289
 msgid "Select cheat file"
 msgstr "Επιλογή αρχείου κωδικών"
 
-#: guiinit.cpp:222
+#: guiinit.cpp:237
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Λίστες κωδικών VBA (*.clt)|*.clt|Λίστες κωδικών CHT (*.cht)|*.cht"
 
-#: guiinit.cpp:241 panel.cpp:417
+#: guiinit.cpp:256 panel.cpp:417
 msgid "Loaded cheats"
 msgstr "Φορτώθηκαν κωδικοί"
 
-#: guiinit.cpp:275
+#: guiinit.cpp:290
 msgid "VBA cheat lists (*.clt)|*.clt"
 msgstr "Λίστες κωδικών VBA (*.clt)|*.clt"
 
-#: guiinit.cpp:293
+#: guiinit.cpp:308
 msgid "Saved cheats"
 msgstr "Αποθηκεύτηκαν κωδικοί"
 
-#: guiinit.cpp:324 guiinit.cpp:343
+#: guiinit.cpp:339 guiinit.cpp:358
 msgid "Restore old values?"
 msgstr "Επαναφορά προηγούμενων τιμών;"
 
-#: guiinit.cpp:325 guiinit.cpp:344
+#: guiinit.cpp:340 guiinit.cpp:359
 msgid "Removing cheats"
 msgstr "Αφαίρεση κωδικών"
 
-#: guiinit.cpp:735 xrc/JoyPanel.xrc:364
+#: guiinit.cpp:750 xrc/JoyPanel.xrc:364
 msgid "GameShark"
 msgstr "GameShark"
 
-#: guiinit.cpp:736 cmdevents.cpp:676
+#: guiinit.cpp:751 cmdevents.cpp:676
 msgid "GameGenie"
 msgstr "GameGenie"
 
-#: guiinit.cpp:738
+#: guiinit.cpp:753
 msgid "Generic Code"
 msgstr "Γενικός κωδικός"
 
-#: guiinit.cpp:739
+#: guiinit.cpp:754
 msgid "GameShark Advance"
 msgstr "GameShark Advance"
 
-#: guiinit.cpp:740
+#: guiinit.cpp:755
 msgid "CodeBreaker Advance"
 msgstr "CodeBreaker Advance"
 
-#: guiinit.cpp:741
+#: guiinit.cpp:756
 msgid "Flashcart CHT"
 msgstr "Flashcart CHT"
 
-#: guiinit.cpp:809 guiinit.cpp:1064
+#: guiinit.cpp:824 guiinit.cpp:1079
 msgid "Number cannot be empty"
 msgstr "Ο αριθμός δεν μπορεί να είναι κενός"
 
-#: guiinit.cpp:847
+#: guiinit.cpp:862
 #, c-format
 msgid "Search produced %d results.  Please refine better"
 msgstr "Η αναζήτηση επέστρεψε %d αποτελέσματα. Παρακαλούμε προσδιορίστε καλύτερα"
 
-#: guiinit.cpp:859
+#: guiinit.cpp:874
 msgid "Search produced no results"
 msgstr "Η αναζήτηση δεν επέστρεψε αποτελέσματα"
 
-#: guiinit.cpp:1022
+#: guiinit.cpp:1037
 msgid "8-bit "
 msgstr "8-bit "
 
-#: guiinit.cpp:1026
+#: guiinit.cpp:1041
 msgid "16-bit "
 msgstr "16-bit "
 
-#: guiinit.cpp:1030
+#: guiinit.cpp:1045
 msgid "32-bit "
 msgstr "32-bit "
 
-#: guiinit.cpp:1036
+#: guiinit.cpp:1051
 msgid "signed decimal"
 msgstr "προσημασμένος δεκαδικός"
 
-#: guiinit.cpp:1040
+#: guiinit.cpp:1055
 msgid "unsigned decimal"
 msgstr "μη προσημασμένος δεκαδικός"
 
-#: guiinit.cpp:1044
+#: guiinit.cpp:1059
 msgid "unsigned hexadecimal"
 msgstr "μη προσημασμένος δεκαεξαδικός"
 
-#: guiinit.cpp:1522
+#: guiinit.cpp:1537
 #, c-format
 msgid "%d frames = %.2f ms"
 msgstr "%d καρέ = %.2f ms"
 
-#: guiinit.cpp:1534
+#: guiinit.cpp:1549
 msgid "Default device"
 msgstr "Προεπιλεγμένη συσκευή"
 
-#: guiinit.cpp:1721
+#: guiinit.cpp:1736
 msgid "Desktop mode"
 msgstr "Λειτουργία desktop"
 
-#: guiinit.cpp:1728
+#: guiinit.cpp:1743
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: guiinit.cpp:1841 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
+#: guiinit.cpp:1856 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
-#: xrc/GeneralConfig.xrc:114 xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
-#: xrc/SpeedupConfig.xrc:45 xrc/SpeedupConfig.xrc:120
+#: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
 msgid "None"
 msgstr "Κανένα"
 
-#: guiinit.cpp:1882
+#: guiinit.cpp:1897
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Δεν βρέθηκαν χρήσιμες επεκτάσεις rpi στο %s"
 
-#: guiinit.cpp:1902 xrc/DisplayConfig.xrc:107
+#: guiinit.cpp:1917 xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "Επέκταση"
 
-#: guiinit.cpp:1930
+#: guiinit.cpp:1945
 msgid "Please select a plugin or a different filter"
 msgstr "Επιλέξτε μια επέκταση ή ένα διαφορετικό φίλτρο"
 
-#: guiinit.cpp:1931
+#: guiinit.cpp:1946
 msgid "Plugin selection error"
 msgstr "Σφάλμα επιλογής επέκτασης"
 
-#: guiinit.cpp:2130
+#: guiinit.cpp:2145
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr "Αυτό θα διαγράψει όλους τους επιταχυντές που ορίστηκαν από τον χρήστη. Είστε σίγουροι;"
 
-#: guiinit.cpp:2130
+#: guiinit.cpp:2145
 msgid "Confirm"
 msgstr "Επιβεβαίωση"
 
-#: guiinit.cpp:2724
+#: guiinit.cpp:2681
 msgid "Main icon not found"
 msgstr "Το κύριο εικονίδιο δεν βρέθηκε"
 
-#: guiinit.cpp:2734
+#: guiinit.cpp:2691
 msgid "Browse"
 msgstr ""
 
-#: guiinit.cpp:2748
+#: guiinit.cpp:2705
 msgid "Main display panel not found"
 msgstr "Το πάνελ κύριας προβολής δεν βρέθηκε"
 
-#: guiinit.cpp:2897
+#: guiinit.cpp:2854
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Διπλότυπος επιταχυντής μενού: %s για %s και %s, θα κρατηθεί ο πρώτος"
 
-#: guiinit.cpp:2911
+#: guiinit.cpp:2868
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Ο επιταχυντής μενού %s για %s παρακάμπτει την προεπιλογή για %s, διατηρείται το μενού"
 
-#: guiinit.cpp:3041
+#: guiinit.cpp:2998
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Μη έγκυρο αντικείμενο μενού %s, θα αφαιρεθεί"
 
-#: guiinit.cpp:3242
+#: guiinit.cpp:3206
 msgid "Code"
 msgstr "Κωδικός"
 
-#: guiinit.cpp:3251
+#: guiinit.cpp:3215
 msgid "Description"
 msgstr "Περιγραφή"
 
-#: guiinit.cpp:3325 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3289 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Διεύθυνση"
 
-#: guiinit.cpp:3326
+#: guiinit.cpp:3290
 msgid "Old Value"
 msgstr "Προηγούμενη τιμή"
 
-#: guiinit.cpp:3327
+#: guiinit.cpp:3291
 msgid "New Value"
 msgstr "Νέα τιμή"
 
-#: guiinit.cpp:3847
+#: guiinit.cpp:3799
 msgid "Menu commands"
 msgstr "Εντολές μενού"
 
-#: guiinit.cpp:3870
+#: guiinit.cpp:3822
 msgid "Other commands"
 msgstr "Άλλες εντολές"
 
-#: guiinit.cpp:3981
+#: guiinit.cpp:3933
 msgid "JoyBus host invalid; disabling"
 msgstr "Μη έγκυρος JoyBus host, απενεργοποίηση"
 
@@ -832,27 +831,27 @@ msgstr "Η σύνδεση LAN είναι ήδη ενεργή. Απενεργοπ
 msgid "Network is not supported in local mode."
 msgstr "Το δίκτυο δεν υποστηρίζεται σε τοπική λειτουργία."
 
-#: opts.cpp:550 opts.cpp:855
+#: opts.cpp:552 opts.cpp:857
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "Μη έγκυρη τιμή %s για την επιλογή %s, οι έγκυρες τιμές είναι %s%s%s"
 
-#: opts.cpp:567 opts.cpp:867
+#: opts.cpp:569 opts.cpp:869
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Μη έγκυρη τιμή %d για την επιλογή %s, οι έγκυρες τιμές είναι %d - %d"
 
-#: opts.cpp:574 opts.cpp:583 opts.cpp:875 opts.cpp:883
+#: opts.cpp:576 opts.cpp:585 opts.cpp:877 opts.cpp:885
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Μη έγκυρη τιμή %f για την επιλογή %s. Οι έγκυρες τιμές είναι %f - %f"
 
-#: opts.cpp:643 opts.cpp:664 opts.cpp:952 opts.cpp:978
+#: opts.cpp:645 opts.cpp:666 opts.cpp:954 opts.cpp:980
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Μη έγκυρη αντιστοίχιση πλήκτρου %s για %s"
 
-#: opts.cpp:838
+#: opts.cpp:840
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Μη έγκυρη επιλογή σημαίας %s - %s αγνοήθηκε"
@@ -1065,22 +1064,22 @@ msgstr "αδυναμία υπόθεσης μορφής εξόδου από το 
 msgid "programming error; aborting!"
 msgstr "προγραμματιστικό σφάλμα, τερματισμός!"
 
-#: panel.cpp:2404 panel.cpp:2435
+#: panel.cpp:2399 panel.cpp:2429
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Αδυναμία έναρξης εγγραφής σε %s (%s)"
 
-#: panel.cpp:2463
+#: panel.cpp:2457
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Σφάλμα στην εγγραφή ήχου/βίντεο (%s), τερματισμός"
 
-#: panel.cpp:2469
+#: panel.cpp:2463
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Σφάλμα στην εγγραφή ήχου (%s), τερματισμός"
 
-#: panel.cpp:2479
+#: panel.cpp:2473
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Σφάλμα στην εγγραφή βίντεο (%s), τερματισμός"
@@ -2379,6 +2378,10 @@ msgstr "% του κανονικού"
 msgid "0 = no throttle"
 msgstr "0 = χωρίς περιορισμό"
 
+#: xrc/GeneralConfig.xrc:114 xrc/SpeedupConfig.xrc:45
+msgid "Full Speed/No Limit"
+msgstr ""
+
 #: xrc/GeneralConfig.xrc:115 xrc/SpeedupConfig.xrc:46
 msgid "25%"
 msgstr "25%"
@@ -3499,15 +3502,15 @@ msgstr "Πελάτης"
 msgid "Players:"
 msgstr "Παίκτες:"
 
-#: xrc/NetLink.xrc:41 xrc/SpeedupConfig.xrc:122
+#: xrc/NetLink.xrc:41
 msgid "2"
 msgstr "2"
 
-#: xrc/NetLink.xrc:49 xrc/SpeedupConfig.xrc:123
+#: xrc/NetLink.xrc:49
 msgid "3"
 msgstr "3"
 
-#: xrc/NetLink.xrc:56 xrc/SpeedupConfig.xrc:124
+#: xrc/NetLink.xrc:56
 msgid "4"
 msgstr "4"
 
@@ -3680,117 +3683,5 @@ msgid "Speedup Throttle"
 msgstr ""
 
 #: xrc/SpeedupConfig.xrc:84
-msgid "Speedup Frame Skip"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:102
-msgid "# of frames:"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:121
-msgid "1"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:125
-msgid "5"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:126
-msgid "6"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:127
-msgid "7"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:128
-msgid "8"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:129
-msgid "9"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:130
-msgid "10"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:131
-msgid "11"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:132
-msgid "12"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:133
-msgid "13"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:134
-msgid "14"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:135
-msgid "15"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:136
-msgid "16"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:137
-msgid "17"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:138
-msgid "18"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:139
-msgid "19"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:140
-msgid "20"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:141
-msgid "21"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:142
-msgid "22"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:143
-msgid "23"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:144
-msgid "24"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:145
-msgid "25"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:146
-msgid "26"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:147
-msgid "27"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:148
-msgid "28"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:149
-msgid "29"
-msgstr ""
-
-#: xrc/SpeedupConfig.xrc:150
-msgid "30"
+msgid "Frame skip"
 msgstr ""

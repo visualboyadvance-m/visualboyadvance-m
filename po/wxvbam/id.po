@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-13 14:40+0000\n"
-"PO-Revision-Date: 2020-03-13 14:41+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"POT-Creation-Date: 2020-03-27 09:03+0000\n"
+"PO-Revision-Date: 2020-04-10 13:11+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Indonesian (http://www.transifex.com/bgk/vba-m/language/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -111,238 +111,237 @@ msgstr "Terjadi pemilihan konfigurasi yang buruk atau pemilihan lebih dari satu 
 msgid "Start!"
 msgstr "Mulai!"
 
-#: guiinit.cpp:82 xrc/NetLink.xrc:99
+#: guiinit.cpp:96 xrc/NetLink.xrc:99
 msgid "Connect"
 msgstr "Hubungkan"
 
-#: guiinit.cpp:98
+#: guiinit.cpp:113
 msgid "You must enter a valid host name"
 msgstr "Anda harus memasukan nama host yang valid"
 
-#: guiinit.cpp:99
+#: guiinit.cpp:114
 msgid "Host name invalid"
 msgstr "Nama host tidak valid"
 
-#: guiinit.cpp:117
+#: guiinit.cpp:132
 msgid "Waiting for clients..."
 msgstr "Menunggu klien..."
 
-#: guiinit.cpp:118
+#: guiinit.cpp:133
 #, c-format
 msgid "Server IP address is: %s\n"
 msgstr "Alamat IP server adalah: %s\n"
 
-#: guiinit.cpp:120
+#: guiinit.cpp:135
 msgid "Waiting for connection..."
 msgstr "Menunggu hubungan..."
 
-#: guiinit.cpp:121
+#: guiinit.cpp:136
 #, c-format
 msgid "Connecting to %s\n"
 msgstr "Sedang menghubungkan ke %s\n"
 
-#: guiinit.cpp:154
+#: guiinit.cpp:169
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr "Terjadi kesalahan.\nCoba lagi."
 
-#: guiinit.cpp:221 guiinit.cpp:274
+#: guiinit.cpp:236 guiinit.cpp:289
 msgid "Select cheat file"
 msgstr "Pilih file cheat"
 
-#: guiinit.cpp:222
+#: guiinit.cpp:237
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Daftar cheat VBA (*.clt)|*.clt|Daftar cheat CHT (*.cht)|*.cht"
 
-#: guiinit.cpp:241 panel.cpp:417
+#: guiinit.cpp:256 panel.cpp:417
 msgid "Loaded cheats"
 msgstr "Cheat yang dimuat"
 
-#: guiinit.cpp:275
+#: guiinit.cpp:290
 msgid "VBA cheat lists (*.clt)|*.clt"
 msgstr "Daftar cheat VBA (*.clt)|*.clt"
 
-#: guiinit.cpp:293
+#: guiinit.cpp:308
 msgid "Saved cheats"
 msgstr "Cheat yang disimpan"
 
-#: guiinit.cpp:324 guiinit.cpp:343
+#: guiinit.cpp:339 guiinit.cpp:358
 msgid "Restore old values?"
 msgstr "Kembalikan nilai sebelumnya?"
 
-#: guiinit.cpp:325 guiinit.cpp:344
+#: guiinit.cpp:340 guiinit.cpp:359
 msgid "Removing cheats"
 msgstr "Melepaskan cheat"
 
-#: guiinit.cpp:735 xrc/JoyPanel.xrc:364
+#: guiinit.cpp:750 xrc/JoyPanel.xrc:364
 msgid "GameShark"
 msgstr "GameShark"
 
-#: guiinit.cpp:736 cmdevents.cpp:676
+#: guiinit.cpp:751 cmdevents.cpp:676
 msgid "GameGenie"
 msgstr "GameGenie"
 
-#: guiinit.cpp:738
+#: guiinit.cpp:753
 msgid "Generic Code"
 msgstr "Kode Generik"
 
-#: guiinit.cpp:739
+#: guiinit.cpp:754
 msgid "GameShark Advance"
 msgstr "GameShark Advance"
 
-#: guiinit.cpp:740
+#: guiinit.cpp:755
 msgid "CodeBreaker Advance"
 msgstr "CodeBreaker Advance"
 
-#: guiinit.cpp:741
+#: guiinit.cpp:756
 msgid "Flashcart CHT"
 msgstr "Flashcart CHT"
 
-#: guiinit.cpp:809 guiinit.cpp:1064
+#: guiinit.cpp:824 guiinit.cpp:1079
 msgid "Number cannot be empty"
 msgstr "Angka tidak boleh kosong"
 
-#: guiinit.cpp:847
+#: guiinit.cpp:862
 #, c-format
 msgid "Search produced %d results.  Please refine better"
 msgstr "Pencarian memberikan %d hasil. Tolong gunakan kata kunci yang lebih jelas"
 
-#: guiinit.cpp:859
+#: guiinit.cpp:874
 msgid "Search produced no results"
 msgstr "Pencarian tidak memberikan hasil"
 
-#: guiinit.cpp:1022
+#: guiinit.cpp:1037
 msgid "8-bit "
 msgstr "8-bit "
 
-#: guiinit.cpp:1026
+#: guiinit.cpp:1041
 msgid "16-bit "
 msgstr "16-bit "
 
-#: guiinit.cpp:1030
+#: guiinit.cpp:1045
 msgid "32-bit "
 msgstr "32-bit "
 
-#: guiinit.cpp:1036
+#: guiinit.cpp:1051
 msgid "signed decimal"
 msgstr "desimal bertanda"
 
-#: guiinit.cpp:1040
+#: guiinit.cpp:1055
 msgid "unsigned decimal"
 msgstr "desimal tidak bertanda"
 
-#: guiinit.cpp:1044
+#: guiinit.cpp:1059
 msgid "unsigned hexadecimal"
 msgstr "heksadesimal tidak bertanda"
 
-#: guiinit.cpp:1522
+#: guiinit.cpp:1537
 #, c-format
 msgid "%d frames = %.2f ms"
 msgstr "%d frame = %.2f ms"
 
-#: guiinit.cpp:1534
+#: guiinit.cpp:1549
 msgid "Default device"
 msgstr "Perangkat default"
 
-#: guiinit.cpp:1721
+#: guiinit.cpp:1736
 msgid "Desktop mode"
 msgstr "Mode desktop"
 
-#: guiinit.cpp:1728
+#: guiinit.cpp:1743
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: guiinit.cpp:1841 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
+#: guiinit.cpp:1856 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
-#: xrc/GeneralConfig.xrc:114 xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
-#: xrc/SpeedupConfig.xrc:45 xrc/SpeedupConfig.xrc:120
+#: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
 msgid "None"
 msgstr "Tidak ada"
 
-#: guiinit.cpp:1882
+#: guiinit.cpp:1897
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Tidak menemukan plugin rpi yang dapat digunakan di %s"
 
-#: guiinit.cpp:1902 xrc/DisplayConfig.xrc:107
+#: guiinit.cpp:1917 xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "Plugin"
 
-#: guiinit.cpp:1930
+#: guiinit.cpp:1945
 msgid "Please select a plugin or a different filter"
 msgstr "Tolong pilih plugin atau filter yang berbeda"
 
-#: guiinit.cpp:1931
+#: guiinit.cpp:1946
 msgid "Plugin selection error"
 msgstr "Terjadi kesalahan pada pemilihan plugin"
 
-#: guiinit.cpp:2130
+#: guiinit.cpp:2145
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr "Ini akan mengosongkan semua pemercepat yang telah diatur oleh pengguna. Apakah anda yakin?"
 
-#: guiinit.cpp:2130
+#: guiinit.cpp:2145
 msgid "Confirm"
 msgstr "Konfirmasi"
 
-#: guiinit.cpp:2724
+#: guiinit.cpp:2681
 msgid "Main icon not found"
 msgstr "Ikon utama tidak ditemukan"
 
-#: guiinit.cpp:2734
+#: guiinit.cpp:2691
 msgid "Browse"
 msgstr "Jelajah"
 
-#: guiinit.cpp:2748
+#: guiinit.cpp:2705
 msgid "Main display panel not found"
 msgstr "Panel layar utama tidak ditemukan"
 
-#: guiinit.cpp:2897
+#: guiinit.cpp:2854
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Menu pemercepat terduplikasi: %s untuk %s dan %s; menyimpan menu pertama"
 
-#: guiinit.cpp:2911
+#: guiinit.cpp:2868
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Menu pemercepat %s untuk %s menimpa menu default untuk %s ; menggunakan menu"
 
-#: guiinit.cpp:3041
+#: guiinit.cpp:2998
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Menu item %s tidak valid; menghapus"
 
-#: guiinit.cpp:3242
+#: guiinit.cpp:3206
 msgid "Code"
 msgstr "Kode"
 
-#: guiinit.cpp:3251
+#: guiinit.cpp:3215
 msgid "Description"
 msgstr "Deskripsi"
 
-#: guiinit.cpp:3325 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3289 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Alamat"
 
-#: guiinit.cpp:3326
+#: guiinit.cpp:3290
 msgid "Old Value"
 msgstr "Nilai Lama"
 
-#: guiinit.cpp:3327
+#: guiinit.cpp:3291
 msgid "New Value"
 msgstr "Nilai Baru"
 
-#: guiinit.cpp:3847
+#: guiinit.cpp:3799
 msgid "Menu commands"
 msgstr "Perintah menu"
 
-#: guiinit.cpp:3870
+#: guiinit.cpp:3822
 msgid "Other commands"
 msgstr "Perintah lainnya"
 
-#: guiinit.cpp:3981
+#: guiinit.cpp:3933
 msgid "JoyBus host invalid; disabling"
 msgstr "Host JoyBus tidak valid; menonaktifkan"
 
@@ -835,27 +834,27 @@ msgstr "Hubungan LAN sudah aktif. Putuskan mode hubung untuk memutuskan hubungan
 msgid "Network is not supported in local mode."
 msgstr "Fitur jaringan tidak didukung dalam mode lokal."
 
-#: opts.cpp:550 opts.cpp:855
+#: opts.cpp:552 opts.cpp:857
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "Nilai %s tidak valid untuk pilihan %s; nilai yang valid adalah %s%s%s"
 
-#: opts.cpp:567 opts.cpp:867
+#: opts.cpp:569 opts.cpp:869
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Nilai %d tidak valid untuk pilihan %s; nilai yang valid adalah %d - %d"
 
-#: opts.cpp:574 opts.cpp:583 opts.cpp:875 opts.cpp:883
+#: opts.cpp:576 opts.cpp:585 opts.cpp:877 opts.cpp:885
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Nilai %f salah untuk pilihan %s; nilai yang benar adalah %f - %f"
 
-#: opts.cpp:643 opts.cpp:664 opts.cpp:952 opts.cpp:978
+#: opts.cpp:645 opts.cpp:666 opts.cpp:954 opts.cpp:980
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Pengikatan tombol %s tidak valid untuk %s"
 
-#: opts.cpp:838
+#: opts.cpp:840
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Pilihan flag %s tidak valid - %s diabaikan"
@@ -1068,22 +1067,22 @@ msgstr "tidak dapat menebak format keluaran dari nama file"
 msgid "programming error; aborting!"
 msgstr "terjadi kesalama dalam pemrograman; membatalkan perintah!"
 
-#: panel.cpp:2404 panel.cpp:2435
+#: panel.cpp:2399 panel.cpp:2429
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Tidak dapat memulai rekaman ke %s (%s)"
 
-#: panel.cpp:2463
+#: panel.cpp:2457
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Terjadi kesalahan dalam merekam audio/video (%s); membatalkan perintah"
 
-#: panel.cpp:2469
+#: panel.cpp:2463
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Terjadi kesalahan dalam merekam audio (%s); membatalkan perintah"
 
-#: panel.cpp:2479
+#: panel.cpp:2473
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Terjadi kesalahan dalam merekam video (%s); membatalkan perintah"
@@ -2382,6 +2381,10 @@ msgstr "% of normal:"
 msgid "0 = no throttle"
 msgstr "0 = non aktifkan throttle"
 
+#: xrc/GeneralConfig.xrc:114 xrc/SpeedupConfig.xrc:45
+msgid "Full Speed/No Limit"
+msgstr ""
+
 #: xrc/GeneralConfig.xrc:115 xrc/SpeedupConfig.xrc:46
 msgid "25%"
 msgstr "25%"
@@ -3502,15 +3505,15 @@ msgstr "Klien"
 msgid "Players:"
 msgstr "Pemain:"
 
-#: xrc/NetLink.xrc:41 xrc/SpeedupConfig.xrc:122
+#: xrc/NetLink.xrc:41
 msgid "2"
 msgstr "2"
 
-#: xrc/NetLink.xrc:49 xrc/SpeedupConfig.xrc:123
+#: xrc/NetLink.xrc:49
 msgid "3"
 msgstr "3"
 
-#: xrc/NetLink.xrc:56 xrc/SpeedupConfig.xrc:124
+#: xrc/NetLink.xrc:56
 msgid "4"
 msgstr "4"
 
@@ -3683,117 +3686,5 @@ msgid "Speedup Throttle"
 msgstr "Tuas Pemercepat"
 
 #: xrc/SpeedupConfig.xrc:84
-msgid "Speedup Frame Skip"
-msgstr "Pemercepat Frame Skip"
-
-#: xrc/SpeedupConfig.xrc:102
-msgid "# of frames:"
-msgstr "# jumlah frame:"
-
-#: xrc/SpeedupConfig.xrc:121
-msgid "1"
-msgstr "1"
-
-#: xrc/SpeedupConfig.xrc:125
-msgid "5"
-msgstr "5"
-
-#: xrc/SpeedupConfig.xrc:126
-msgid "6"
-msgstr "6"
-
-#: xrc/SpeedupConfig.xrc:127
-msgid "7"
-msgstr "7"
-
-#: xrc/SpeedupConfig.xrc:128
-msgid "8"
-msgstr "8"
-
-#: xrc/SpeedupConfig.xrc:129
-msgid "9"
-msgstr "9"
-
-#: xrc/SpeedupConfig.xrc:130
-msgid "10"
-msgstr "10"
-
-#: xrc/SpeedupConfig.xrc:131
-msgid "11"
-msgstr "11"
-
-#: xrc/SpeedupConfig.xrc:132
-msgid "12"
-msgstr "12"
-
-#: xrc/SpeedupConfig.xrc:133
-msgid "13"
-msgstr "13"
-
-#: xrc/SpeedupConfig.xrc:134
-msgid "14"
-msgstr "14"
-
-#: xrc/SpeedupConfig.xrc:135
-msgid "15"
-msgstr "15"
-
-#: xrc/SpeedupConfig.xrc:136
-msgid "16"
-msgstr "16"
-
-#: xrc/SpeedupConfig.xrc:137
-msgid "17"
-msgstr "17"
-
-#: xrc/SpeedupConfig.xrc:138
-msgid "18"
-msgstr "18"
-
-#: xrc/SpeedupConfig.xrc:139
-msgid "19"
-msgstr "19"
-
-#: xrc/SpeedupConfig.xrc:140
-msgid "20"
-msgstr "20"
-
-#: xrc/SpeedupConfig.xrc:141
-msgid "21"
-msgstr "21"
-
-#: xrc/SpeedupConfig.xrc:142
-msgid "22"
-msgstr "22"
-
-#: xrc/SpeedupConfig.xrc:143
-msgid "23"
-msgstr "23"
-
-#: xrc/SpeedupConfig.xrc:144
-msgid "24"
-msgstr "24"
-
-#: xrc/SpeedupConfig.xrc:145
-msgid "25"
-msgstr "25"
-
-#: xrc/SpeedupConfig.xrc:146
-msgid "26"
-msgstr "26"
-
-#: xrc/SpeedupConfig.xrc:147
-msgid "27"
-msgstr "27"
-
-#: xrc/SpeedupConfig.xrc:148
-msgid "28"
-msgstr "28"
-
-#: xrc/SpeedupConfig.xrc:149
-msgid "29"
-msgstr "29"
-
-#: xrc/SpeedupConfig.xrc:150
-msgid "30"
-msgstr "30"
+msgid "Frame skip"
+msgstr ""
