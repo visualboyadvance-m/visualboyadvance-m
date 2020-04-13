@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-27 09:03+0000\n"
-"PO-Revision-Date: 2020-04-10 13:11+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2020-04-12 00:19+0000\n"
+"PO-Revision-Date: 2020-04-12 00:20+0000\n"
+"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/bgk/vba-m/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -348,8 +348,9 @@ msgstr "조이버스 호스트 무효; 비활성화"
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr "텍스트 파일 (*.txt;*.log)|*.txt;*.log|"
 
-#: viewers.cpp:562 viewers.cpp:772 cmdevents.cpp:1158 cmdevents.cpp:1236
-#: cmdevents.cpp:1306 cmdevents.cpp:1333 viewsupt.cpp:1168
+#: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
+#: cmdevents.cpp:1158 cmdevents.cpp:1236 cmdevents.cpp:1306 cmdevents.cpp:1333
+#: viewsupt.cpp:1180
 msgid "Select output file"
 msgstr "출력 파일을 선택"
 
@@ -434,6 +435,11 @@ msgid ""
 "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
 "Table (*.act)|*.act"
 msgstr "윈도우즈 팔레트 (*.pal)|*.pal|페인트샵 팔레트 (*.pal)|*.pal|어도비 컬러 테이블 (*.act)|*.act"
+
+#: gfxviewers.cpp:1601 gfxviewers.cpp:1743 cmdevents.cpp:1159
+#: viewsupt.cpp:1181
+msgid "PNG images|*.png|BMP images|*.bmp"
+msgstr "PNG 이미지|*.png|BMP 이미지|*.bmp"
 
 #: cmdevents.cpp:105
 msgid ""
@@ -711,11 +717,7 @@ msgstr "%s 스냅샷 파일이 저장됨"
 msgid "Error saving snapshot file %s"
 msgstr "%s 스냅샷 파일 저장 오류"
 
-#: cmdevents.cpp:1159 viewsupt.cpp:1169
-msgid "PNG images|*.png|BMP images|*.bmp"
-msgstr "PNG 이미지|*.png|BMP 이미지|*.bmp"
-
-#: cmdevents.cpp:1183 sys.cpp:442
+#: cmdevents.cpp:1183 sys.cpp:450
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "%s 스냅샷이 기록됨"
@@ -825,110 +827,110 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "이 프로그램은 자유 소프트웨어입니다. 소프트웨어의 피양도자는 자유\n소프트웨어 재단이 공표한 GNU 일반 공중 사용 허가서 2판 또는 그\n이후 판을 임의로 선택해서, 그 규정에 따라 프로그램을 개작하거나 \n재배포할 수 있습니다. \n\n이 프로그램은 유용하게 사용될 수 있으리라는 희망에서 배포되고\n있지만, 특정한 목적에 맞는 적합성 여부나 판매용으로 사용할 수 \n있으리라는 묵시적인 보증을 포함한 어떠한 형태의 보증도 제공하지 \n않습니다. 보다 자세한 사항에 대해서는 GNU 일반 공중 사용 허가서를\n참고하시기 바랍니다.\n\nGNU 일반 공중 사용 허가서는 이 프로그램과 함께 제공됩니다. 만약,\n이 문서가 누락되어 있다면 http://www.gnu.org/licenses 를\n참조 바랍니다."
 
-#: cmdevents.cpp:3030
+#: cmdevents.cpp:3061
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LAN 연결이 이미 활성화 상태입니다. 연결해체를 위해 연결 모드를 비활성화 하십시오."
 
-#: cmdevents.cpp:3036
+#: cmdevents.cpp:3067
 msgid "Network is not supported in local mode."
 msgstr "로컬 모드에서는 네트워크가 지원되지 않습니다."
 
-#: opts.cpp:552 opts.cpp:857
+#: opts.cpp:555 opts.cpp:860
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "%s 값은 %s 옵션에 대해 무효함; 유효한 값은 %s%s%s"
 
-#: opts.cpp:569 opts.cpp:869
+#: opts.cpp:572 opts.cpp:872
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "%d 값은 %s 옵션에 대해 무효함; 유효한 값은 %d - %d"
 
-#: opts.cpp:576 opts.cpp:585 opts.cpp:877 opts.cpp:885
+#: opts.cpp:579 opts.cpp:588 opts.cpp:880 opts.cpp:888
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "%f 값은 %s 옵션에 대해 무효함; 유효한 값은 %f - %f"
 
-#: opts.cpp:645 opts.cpp:666 opts.cpp:954 opts.cpp:980
+#: opts.cpp:648 opts.cpp:669 opts.cpp:957 opts.cpp:983
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "%s : %s 에 대한 무효한 키 설정"
 
-#: opts.cpp:840
+#: opts.cpp:843
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "무효한 플래그 옵션 %s - %s 무시됨"
 
-#: sys.cpp:117 sys.cpp:173
+#: sys.cpp:125 sys.cpp:181
 msgid "No game in progress to record"
 msgstr "녹화할 진행 중인 게임이 없습니다."
 
-#: sys.cpp:130
+#: sys.cpp:138
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "출력파일 %s을 열 수 없습니다."
 
-#: sys.cpp:137 sys.cpp:157 sys.cpp:303
+#: sys.cpp:145 sys.cpp:165 sys.cpp:311
 msgid "Error writing game recording"
 msgstr "게임 녹화를 기록할 수 없습니다."
 
-#: sys.cpp:178
+#: sys.cpp:186
 msgid "Cannot play game recording while recording"
 msgstr "녹화중에는 게임 녹화를 재생할 수 없습니다."
 
-#: sys.cpp:191
+#: sys.cpp:199
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "녹화 파일 %s 을 열 수 없습니다."
 
-#: sys.cpp:198 sys.cpp:208
+#: sys.cpp:206 sys.cpp:216
 msgid "Error reading game recording"
 msgstr "게임 녹화를 읽을 수 없습니다."
 
-#: sys.cpp:314
+#: sys.cpp:322
 msgid "Playback ended"
 msgstr "재생 종료."
 
-#: sys.cpp:333
+#: sys.cpp:341
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr "%d%%(%d, %d fps)"
 
-#: sys.cpp:341
+#: sys.cpp:349
 #, c-format
 msgid "%d%%"
 msgstr "%d%%"
 
-#: sys.cpp:760 xrc/GBPrinter.xrc:65
+#: sys.cpp:768 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "버리기(&D)"
 
-#: sys.cpp:794
+#: sys.cpp:802
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "이미지 파일 (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:803
+#: sys.cpp:811
 msgid "Save printer image to"
 msgstr "프린터 이미지 저장 : "
 
-#: sys.cpp:817 sys.cpp:1000
+#: sys.cpp:825 sys.cpp:1008
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "프린터 결과를 %s에 기록했습니다."
 
-#: sys.cpp:822 sys.cpp:893
+#: sys.cpp:830 sys.cpp:901
 msgid "&Close"
 msgstr "닫기(&C)"
 
-#: sys.cpp:888
+#: sys.cpp:896
 msgid "Printed"
 msgstr "인쇄됨"
 
-#: sys.cpp:1190
+#: sys.cpp:1198
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "가상 tty %s를 열 수 없습니다."
 
-#: sys.cpp:1289
+#: sys.cpp:1297
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "서버 소켓 셋업 에러 (%d)"
@@ -1010,63 +1012,63 @@ msgstr "%dx%d-%d@%d 모드로 변경 실패함"
 msgid "Not a valid GBA cartridge"
 msgstr "유효한 GBA 카트리지가 아님"
 
-#: panel.cpp:1124
+#: panel.cpp:1129
 msgid "No memory for rewinding"
 msgstr "되감기 메모리 없음"
 
-#: panel.cpp:1134
+#: panel.cpp:1139
 msgid "Error writing rewind state"
 msgstr "되감기 상태 쓰기 오류"
 
-#: panel.cpp:2235
+#: panel.cpp:2236
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2244
+#: panel.cpp:2245
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:2253
+#: panel.cpp:2254
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:2260
+#: panel.cpp:2261
 msgid "No support for wglGetExtensionsString"
 msgstr ""
 
-#: panel.cpp:2262
+#: panel.cpp:2263
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:2271
+#: panel.cpp:2272
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2277
+#: panel.cpp:2278
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:2373
+#: panel.cpp:2374
 msgid "memory allocation error"
 msgstr "메모리 할당 오류"
 
-#: panel.cpp:2376
+#: panel.cpp:2377
 msgid "error initializing codec"
 msgstr "코덱 초기화 오류"
 
-#: panel.cpp:2379
+#: panel.cpp:2380
 msgid "error writing to output file"
 msgstr "출력 파일 쓰기 오류"
 
-#: panel.cpp:2382
+#: panel.cpp:2383
 msgid "can't guess output format from file name"
 msgstr "파일명에서 출력포맷을 알 수 없습니다."
 
-#: panel.cpp:2387
+#: panel.cpp:2388
 msgid "programming error; aborting!"
 msgstr "프로그래밍 오류; 종료합니다!"
 
-#: panel.cpp:2399 panel.cpp:2429
+#: panel.cpp:2400 panel.cpp:2429
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "%s (%s)부터 기록을 시작할 수 없습니다."
@@ -1090,11 +1092,11 @@ msgstr "(%s) 에서 비디오 녹화 오류; 종료합니다."
 msgid "R:"
 msgstr "R:"
 
-#: viewsupt.cpp:781
+#: viewsupt.cpp:785
 msgid "G:"
 msgstr "G:"
 
-#: viewsupt.cpp:786
+#: viewsupt.cpp:794
 msgid "B:"
 msgstr "B:"
 
@@ -3027,7 +3029,7 @@ msgstr "무선(&W)"
 msgid "&GameCube"
 msgstr "게임 큐브(&G)"
 
-#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:513
+#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:517
 msgid "&Game Boy"
 msgstr "게임 보이(&G)"
 
@@ -3184,7 +3186,7 @@ msgstr ""
 msgid "&Game Boy Advance"
 msgstr "게임 보이 어드밴스(&G)"
 
-#: xrc/MainMenu.xrc:496 xrc/MainMenu.xrc:515
+#: xrc/MainMenu.xrc:496 xrc/MainMenu.xrc:519
 msgid "Configure ..."
 msgstr "구성설정..."
 
@@ -3200,211 +3202,219 @@ msgstr "BIOS 파일을 사용(&U)"
 msgid "&Debug print"
 msgstr "디버그 프린트(&D)"
 
-#: xrc/MainMenu.xrc:519
+#: xrc/MainMenu.xrc:512 xrc/MainMenu.xrc:527
+msgid "&LCD Filter"
+msgstr ""
+
+#: xrc/MainMenu.xrc:523
+msgid "&GB color option"
+msgstr ""
+
+#: xrc/MainMenu.xrc:531
 msgid "&GB printer"
 msgstr "게임 보이 프린터(&G)"
 
-#: xrc/MainMenu.xrc:523
+#: xrc/MainMenu.xrc:535
 msgid "&Gather a full page before printing"
 msgstr "출력 전 모든 페이지를 모으기(&G)"
 
-#: xrc/MainMenu.xrc:527
+#: xrc/MainMenu.xrc:539
 msgid "&Save printouts as screen captures"
 msgstr "스크린 캡쳐로 저장하기(&S)"
 
-#: xrc/MainMenu.xrc:532
+#: xrc/MainMenu.xrc:544
 msgid "&Use GB BIOS file"
 msgstr "게임 보이 BIOS 파일을 사용(&U)"
 
-#: xrc/MainMenu.xrc:536
+#: xrc/MainMenu.xrc:548
 msgid "&Use GBC BIOS file"
 msgstr "게임 보이 컬러 BIOS 파일을 사용(&U)"
 
-#: xrc/MainMenu.xrc:541
+#: xrc/MainMenu.xrc:553
 msgid "&General ..."
 msgstr "일반(&G)..."
 
-#: xrc/MainMenu.xrc:544
+#: xrc/MainMenu.xrc:556
 msgid "&Speedup / Turbo ..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:547
+#: xrc/MainMenu.xrc:559
 msgid "D&irectories ..."
 msgstr "디렉토리(&I)..."
 
-#: xrc/MainMenu.xrc:550
+#: xrc/MainMenu.xrc:562
 msgid "&Key Shortcuts ..."
 msgstr "단축키(&K)..."
 
-#: xrc/MainMenu.xrc:554
+#: xrc/MainMenu.xrc:566
 msgid "&Tools"
 msgstr "도구(&T)"
 
-#: xrc/MainMenu.xrc:556
+#: xrc/MainMenu.xrc:568
 msgid "&Cheats"
 msgstr "치트(&C)"
 
-#: xrc/MainMenu.xrc:558
+#: xrc/MainMenu.xrc:570
 msgid "List &cheats ..."
 msgstr "치트 목록(&C)..."
 
-#: xrc/MainMenu.xrc:561
+#: xrc/MainMenu.xrc:573
 msgid "Find c&heat ..."
 msgstr "치트 찾기(&H)..."
 
-#: xrc/MainMenu.xrc:565
+#: xrc/MainMenu.xrc:577
 msgid "A&utomatically save/load cheats"
 msgstr "치트 자동으로 저장/불러오기(&U)"
 
-#: xrc/MainMenu.xrc:569
+#: xrc/MainMenu.xrc:581
 msgid "&Enable cheats"
 msgstr "치트 사용(&E)"
 
-#: xrc/MainMenu.xrc:576
+#: xrc/MainMenu.xrc:588
 msgid "&Break into GDB"
 msgstr "GDB로 브레이크(&B)"
 
-#: xrc/MainMenu.xrc:580
+#: xrc/MainMenu.xrc:592
 msgid "&Configure port..."
 msgstr "포트 구성(&C)..."
 
-#: xrc/MainMenu.xrc:583
+#: xrc/MainMenu.xrc:595
 msgid "&Break on load"
 msgstr "로드 시 브레이크(&B)"
 
-#: xrc/MainMenu.xrc:588
+#: xrc/MainMenu.xrc:600
 msgid "&Disconnect"
 msgstr "연결 끊기(&D)"
 
-#: xrc/MainMenu.xrc:590
+#: xrc/MainMenu.xrc:602
 msgid "&GDB"
 msgstr "&GDB"
 
-#: xrc/MainMenu.xrc:593
+#: xrc/MainMenu.xrc:605
 msgid "&Disassemble..."
 msgstr "디스어셈블(&D)..."
 
-#: xrc/MainMenu.xrc:596
+#: xrc/MainMenu.xrc:608
 msgid "&Logging..."
 msgstr "기록(&L)..."
 
-#: xrc/MainMenu.xrc:599
+#: xrc/MainMenu.xrc:611
 msgid "&IO Viewer..."
 msgstr "입출력 뷰어(&I)..."
 
-#: xrc/MainMenu.xrc:602
+#: xrc/MainMenu.xrc:614
 msgid "&Map Viewer..."
 msgstr "맵 뷰어(&M)..."
 
-#: xrc/MainMenu.xrc:605
+#: xrc/MainMenu.xrc:617
 msgid "M&emory Viewer..."
 msgstr "메모리 뷰어(&E)..."
 
-#: xrc/MainMenu.xrc:608
+#: xrc/MainMenu.xrc:620
 msgid "&OAM Viewer..."
 msgstr "OAM 뷰어(&O)..."
 
-#: xrc/MainMenu.xrc:611
+#: xrc/MainMenu.xrc:623
 msgid "&Palette Viewer..."
 msgstr "팔레트 뷰어(&P)..."
 
-#: xrc/MainMenu.xrc:614
+#: xrc/MainMenu.xrc:626
 msgid "&Tile Viewer..."
 msgstr "타일 뷰어(&T)..."
 
-#: xrc/MainMenu.xrc:619
+#: xrc/MainMenu.xrc:631
 msgid "Show all video layers"
 msgstr ""
 
-#: xrc/MainMenu.xrc:623
+#: xrc/MainMenu.xrc:635
 msgid "BG &0"
 msgstr "BG &0"
 
-#: xrc/MainMenu.xrc:628
+#: xrc/MainMenu.xrc:640
 msgid "BG &1"
 msgstr "BG &1"
 
-#: xrc/MainMenu.xrc:633
+#: xrc/MainMenu.xrc:645
 msgid "BG &2"
 msgstr "BG &2"
 
-#: xrc/MainMenu.xrc:638
+#: xrc/MainMenu.xrc:650
 msgid "BG &3"
 msgstr "BG &3"
 
-#: xrc/MainMenu.xrc:643
+#: xrc/MainMenu.xrc:655
 msgid "&OBJ"
 msgstr "개체(&O)"
 
-#: xrc/MainMenu.xrc:648
+#: xrc/MainMenu.xrc:660
 msgid "&WIN 0"
 msgstr "창 0(&W)"
 
-#: xrc/MainMenu.xrc:653
+#: xrc/MainMenu.xrc:665
 msgid "W&IN 1"
 msgstr "창 1(&I)"
 
-#: xrc/MainMenu.xrc:658
+#: xrc/MainMenu.xrc:670
 msgid "O&BJ WIN"
 msgstr "개체 창(&B)"
 
-#: xrc/MainMenu.xrc:662
+#: xrc/MainMenu.xrc:674
 msgid "&View Layers"
 msgstr "레이어 보기(&V)"
 
-#: xrc/MainMenu.xrc:666
+#: xrc/MainMenu.xrc:678
 msgid "Channel &1"
 msgstr "채널 &1"
 
-#: xrc/MainMenu.xrc:671
+#: xrc/MainMenu.xrc:683
 msgid "Channel &2"
 msgstr "채널 &2"
 
-#: xrc/MainMenu.xrc:676
+#: xrc/MainMenu.xrc:688
 msgid "Channel &3"
 msgstr "채널 &3"
 
-#: xrc/MainMenu.xrc:681
+#: xrc/MainMenu.xrc:693
 msgid "Channel &4"
 msgstr "채널 &4"
 
-#: xrc/MainMenu.xrc:686
+#: xrc/MainMenu.xrc:698
 msgid "Direct Sound &A"
 msgstr "다이렉트 사운드 &A"
 
-#: xrc/MainMenu.xrc:691
+#: xrc/MainMenu.xrc:703
 msgid "Direct Sound &B"
 msgstr "다이렉트 사운드 &B"
 
-#: xrc/MainMenu.xrc:695
+#: xrc/MainMenu.xrc:707
 msgid "&Sound Channels"
 msgstr "사운드 채널(&S)"
 
-#: xrc/MainMenu.xrc:699
+#: xrc/MainMenu.xrc:711
 msgid "&Help"
 msgstr "도움말(&H)"
 
-#: xrc/MainMenu.xrc:701
+#: xrc/MainMenu.xrc:713
 msgid "Report &Bugs"
 msgstr "버그 제보(&B)"
 
-#: xrc/MainMenu.xrc:704
+#: xrc/MainMenu.xrc:716
 msgid "VBA-M Support &Forum"
 msgstr "VBA-M 지원 포럼(&F)"
 
-#: xrc/MainMenu.xrc:707
+#: xrc/MainMenu.xrc:719
 msgid "Translations"
 msgstr "번역하기"
 
-#: xrc/MainMenu.xrc:715
+#: xrc/MainMenu.xrc:727
 msgid "Check for updates"
 msgstr ""
 
-#: xrc/MainMenu.xrc:718
+#: xrc/MainMenu.xrc:730
 msgid "&Factory Reset..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:722
+#: xrc/MainMenu.xrc:734
 msgid "&About..."
 msgstr ""
 

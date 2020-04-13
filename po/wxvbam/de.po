@@ -18,9 +18,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-27 09:03+0000\n"
-"PO-Revision-Date: 2020-04-10 13:11+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2020-04-12 00:19+0000\n"
+"PO-Revision-Date: 2020-04-12 00:20+0000\n"
+"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: German (http://www.transifex.com/bgk/vba-m/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -356,8 +356,9 @@ msgstr "JoyBus-Host ungültig; wird deaktiviert."
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr "Textdateien (*.txt;*.log)|*.txt;*.log|"
 
-#: viewers.cpp:562 viewers.cpp:772 cmdevents.cpp:1158 cmdevents.cpp:1236
-#: cmdevents.cpp:1306 cmdevents.cpp:1333 viewsupt.cpp:1168
+#: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
+#: cmdevents.cpp:1158 cmdevents.cpp:1236 cmdevents.cpp:1306 cmdevents.cpp:1333
+#: viewsupt.cpp:1180
 msgid "Select output file"
 msgstr "Ausgabedatei wählen"
 
@@ -442,6 +443,11 @@ msgid ""
 "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
 "Table (*.act)|*.act"
 msgstr "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color Farbtabelle (*.act)|*.act"
+
+#: gfxviewers.cpp:1601 gfxviewers.cpp:1743 cmdevents.cpp:1159
+#: viewsupt.cpp:1181
+msgid "PNG images|*.png|BMP images|*.bmp"
+msgstr "PNG Bilder|*.png|BMP Bilder|*.bmp"
 
 #: cmdevents.cpp:105
 msgid ""
@@ -719,11 +725,7 @@ msgstr "Snapshot-Datei %s gespeichert"
 msgid "Error saving snapshot file %s"
 msgstr "Fehler beim Speichern der Snapshot-Datei %s"
 
-#: cmdevents.cpp:1159 viewsupt.cpp:1169
-msgid "PNG images|*.png|BMP images|*.bmp"
-msgstr "PNG Bilder|*.png|BMP Bilder|*.bmp"
-
-#: cmdevents.cpp:1183 sys.cpp:442
+#: cmdevents.cpp:1183 sys.cpp:450
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "Snapshot %s geschrieben"
@@ -833,110 +835,110 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, entweder gemäß Version 2 der Lizenz oder (Ihrer Entscheidung nach) jeder späteren Version.\n\nDie Veröffentlichung dieses Programms erfolgt in der Hoffnung, dass es Ihnen von Nutzen sein wird, aber OHNE JEGLICHE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.\n\nSie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, gehen Sie auf http://www.gnu.de/documents/index.de.html ."
 
-#: cmdevents.cpp:3030
+#: cmdevents.cpp:3061
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LAN-Link ist bereits aktiv. Deaktivieren Sie den Linkmodus zum Trennen der Verbindung."
 
-#: cmdevents.cpp:3036
+#: cmdevents.cpp:3067
 msgid "Network is not supported in local mode."
 msgstr "Netzwerk wird in lokalem Modus nicht unterstützt."
 
-#: opts.cpp:552 opts.cpp:857
+#: opts.cpp:555 opts.cpp:860
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "Ungültiger Wert %s für Option %s; gültige Werte sind %s%s%s."
 
-#: opts.cpp:569 opts.cpp:869
+#: opts.cpp:572 opts.cpp:872
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Ungültiger Wert %d für Option %s; gültige Werte sind %d -%d."
 
-#: opts.cpp:576 opts.cpp:585 opts.cpp:877 opts.cpp:885
+#: opts.cpp:579 opts.cpp:588 opts.cpp:880 opts.cpp:888
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Ungültiger Wert 1 %f für Option 2 %s; gültige Werte sind 1 %f-1 %f"
 
-#: opts.cpp:645 opts.cpp:666 opts.cpp:954 opts.cpp:980
+#: opts.cpp:648 opts.cpp:669 opts.cpp:957 opts.cpp:983
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Ungültige Tastenkombination %s für %s."
 
-#: opts.cpp:840
+#: opts.cpp:843
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Ungültiges Flag %s - %s wird ignoriert."
 
-#: sys.cpp:117 sys.cpp:173
+#: sys.cpp:125 sys.cpp:181
 msgid "No game in progress to record"
 msgstr "Es läuft kein Spiel, das aufgenommen werden kann."
 
-#: sys.cpp:130
+#: sys.cpp:138
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "Kann Ausgabedatei %s nicht öffnen"
 
-#: sys.cpp:137 sys.cpp:157 sys.cpp:303
+#: sys.cpp:145 sys.cpp:165 sys.cpp:311
 msgid "Error writing game recording"
 msgstr "Fehler beim Schreiben von Spiel-Aufzeichnung"
 
-#: sys.cpp:178
+#: sys.cpp:186
 msgid "Cannot play game recording while recording"
 msgstr "Abspielen von Spiel-Aufnahme während Aufnahme nicht möglich."
 
-#: sys.cpp:191
+#: sys.cpp:199
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "Kann Aufzeichnungsdatei %s nicht öffnen"
 
-#: sys.cpp:198 sys.cpp:208
+#: sys.cpp:206 sys.cpp:216
 msgid "Error reading game recording"
 msgstr "Fehler beim Lesen von Spiel-Aufnahme"
 
-#: sys.cpp:314
+#: sys.cpp:322
 msgid "Playback ended"
 msgstr "Aufzeichnung wurde abgespielt."
 
-#: sys.cpp:333
+#: sys.cpp:341
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr "%d%%(%d, %d fps)"
 
-#: sys.cpp:341
+#: sys.cpp:349
 #, c-format
 msgid "%d%%"
 msgstr "%d%%"
 
-#: sys.cpp:760 xrc/GBPrinter.xrc:65
+#: sys.cpp:768 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "Verwerfen"
 
-#: sys.cpp:794
+#: sys.cpp:802
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "Bilddateien (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:803
+#: sys.cpp:811
 msgid "Save printer image to"
 msgstr "Druckerbild speichern in"
 
-#: sys.cpp:817 sys.cpp:1000
+#: sys.cpp:825 sys.cpp:1008
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "Druckerbild gespeichert in %s"
 
-#: sys.cpp:822 sys.cpp:893
+#: sys.cpp:830 sys.cpp:901
 msgid "&Close"
 msgstr "S&chließen"
 
-#: sys.cpp:888
+#: sys.cpp:896
 msgid "Printed"
 msgstr "Ausdruck fertig"
 
-#: sys.cpp:1190
+#: sys.cpp:1198
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "Fehler beim Öffnen von Pseudo-TTY: %s"
 
-#: sys.cpp:1289
+#: sys.cpp:1297
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "Fehler beim Einrichten von Server-Socket (%d)"
@@ -1018,63 +1020,63 @@ msgstr "Konnte Anzeigemodus nicht auf %dx%d-%d@%d umstellen."
 msgid "Not a valid GBA cartridge"
 msgstr "Keine gültige GBA-Steckkarte"
 
-#: panel.cpp:1124
+#: panel.cpp:1129
 msgid "No memory for rewinding"
 msgstr "Kein freier Speicher für Zurückspuhl-Datei"
 
-#: panel.cpp:1134
+#: panel.cpp:1139
 msgid "Error writing rewind state"
 msgstr "Fehler beim Speichern von Zurückspuhl-Datei"
 
-#: panel.cpp:2235
+#: panel.cpp:2236
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2244
+#: panel.cpp:2245
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:2253
+#: panel.cpp:2254
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:2260
+#: panel.cpp:2261
 msgid "No support for wglGetExtensionsString"
 msgstr ""
 
-#: panel.cpp:2262
+#: panel.cpp:2263
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:2271
+#: panel.cpp:2272
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2277
+#: panel.cpp:2278
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:2373
+#: panel.cpp:2374
 msgid "memory allocation error"
 msgstr "Fehler bei Speicherzuweisung"
 
-#: panel.cpp:2376
+#: panel.cpp:2377
 msgid "error initializing codec"
 msgstr "Fehler bei Initialisierung von Codec"
 
-#: panel.cpp:2379
+#: panel.cpp:2380
 msgid "error writing to output file"
 msgstr "Fehler beim Schreiben in Ausgabedatei"
 
-#: panel.cpp:2382
+#: panel.cpp:2383
 msgid "can't guess output format from file name"
 msgstr "Konnte Ausgabeformat nicht von Dateiendung ableiten"
 
-#: panel.cpp:2387
+#: panel.cpp:2388
 msgid "programming error; aborting!"
 msgstr "Programmierfehler! Abbruch!"
 
-#: panel.cpp:2399 panel.cpp:2429
+#: panel.cpp:2400 panel.cpp:2429
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Konnte nicht mit Aufnahme nach %s beginnen (%s)"
@@ -1098,11 +1100,11 @@ msgstr "Fehler bei Video-Aufnahme (%s). Abbruch!"
 msgid "R:"
 msgstr "R:"
 
-#: viewsupt.cpp:781
+#: viewsupt.cpp:785
 msgid "G:"
 msgstr "G:"
 
-#: viewsupt.cpp:786
+#: viewsupt.cpp:794
 msgid "B:"
 msgstr "B:"
 
@@ -3035,7 +3037,7 @@ msgstr "&Drahtlos"
 msgid "&GameCube"
 msgstr "&GameCube"
 
-#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:513
+#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:517
 msgid "&Game Boy"
 msgstr "&Game Boy"
 
@@ -3192,7 +3194,7 @@ msgstr "&Autohold"
 msgid "&Game Boy Advance"
 msgstr "&Game Boy Advance"
 
-#: xrc/MainMenu.xrc:496 xrc/MainMenu.xrc:515
+#: xrc/MainMenu.xrc:496 xrc/MainMenu.xrc:519
 msgid "Configure ..."
 msgstr "Konfigurieren..."
 
@@ -3208,211 +3210,219 @@ msgstr "&BIOS-Datei verwenden"
 msgid "&Debug print"
 msgstr "&Debug-Ausgabe"
 
-#: xrc/MainMenu.xrc:519
+#: xrc/MainMenu.xrc:512 xrc/MainMenu.xrc:527
+msgid "&LCD Filter"
+msgstr ""
+
+#: xrc/MainMenu.xrc:523
+msgid "&GB color option"
+msgstr ""
+
+#: xrc/MainMenu.xrc:531
 msgid "&GB printer"
 msgstr "&GB Drucker"
 
-#: xrc/MainMenu.xrc:523
+#: xrc/MainMenu.xrc:535
 msgid "&Gather a full page before printing"
 msgstr "Ausdruck hinauszö&gern, bis Seite voll ist"
 
-#: xrc/MainMenu.xrc:527
+#: xrc/MainMenu.xrc:539
 msgid "&Save printouts as screen captures"
 msgstr "Au&sdruck als Screenshot speichern"
 
-#: xrc/MainMenu.xrc:532
+#: xrc/MainMenu.xrc:544
 msgid "&Use GB BIOS file"
 msgstr "GB BIOS-Datei verwenden"
 
-#: xrc/MainMenu.xrc:536
+#: xrc/MainMenu.xrc:548
 msgid "&Use GBC BIOS file"
 msgstr "GBC BIOS-Datei verwenden"
 
-#: xrc/MainMenu.xrc:541
+#: xrc/MainMenu.xrc:553
 msgid "&General ..."
 msgstr "All&gemeines..."
 
-#: xrc/MainMenu.xrc:544
+#: xrc/MainMenu.xrc:556
 msgid "&Speedup / Turbo ..."
 msgstr "Be&schleunigung / Turbo ..."
 
-#: xrc/MainMenu.xrc:547
+#: xrc/MainMenu.xrc:559
 msgid "D&irectories ..."
 msgstr "Verze&ichnisse..."
 
-#: xrc/MainMenu.xrc:550
+#: xrc/MainMenu.xrc:562
 msgid "&Key Shortcuts ..."
 msgstr "Tasten&kürzel..."
 
-#: xrc/MainMenu.xrc:554
+#: xrc/MainMenu.xrc:566
 msgid "&Tools"
 msgstr "Hilfsmi&ttel"
 
-#: xrc/MainMenu.xrc:556
+#: xrc/MainMenu.xrc:568
 msgid "&Cheats"
 msgstr "&Cheats"
 
-#: xrc/MainMenu.xrc:558
+#: xrc/MainMenu.xrc:570
 msgid "List &cheats ..."
 msgstr "&Cheats auflisten..."
 
-#: xrc/MainMenu.xrc:561
+#: xrc/MainMenu.xrc:573
 msgid "Find c&heat ..."
 msgstr "C&heat suchen..."
 
-#: xrc/MainMenu.xrc:565
+#: xrc/MainMenu.xrc:577
 msgid "A&utomatically save/load cheats"
 msgstr "Cheats a&utomatisch laden/speichern"
 
-#: xrc/MainMenu.xrc:569
+#: xrc/MainMenu.xrc:581
 msgid "&Enable cheats"
 msgstr "Ch&eats aktivieren"
 
-#: xrc/MainMenu.xrc:576
+#: xrc/MainMenu.xrc:588
 msgid "&Break into GDB"
 msgstr "In den GD&B springen"
 
-#: xrc/MainMenu.xrc:580
+#: xrc/MainMenu.xrc:592
 msgid "&Configure port..."
 msgstr "Port konfigurieren..."
 
-#: xrc/MainMenu.xrc:583
+#: xrc/MainMenu.xrc:595
 msgid "&Break on load"
 msgstr "&Beim Laden anhalten"
 
-#: xrc/MainMenu.xrc:588
+#: xrc/MainMenu.xrc:600
 msgid "&Disconnect"
 msgstr "Verbin&dung trennen"
 
-#: xrc/MainMenu.xrc:590
+#: xrc/MainMenu.xrc:602
 msgid "&GDB"
 msgstr "&GDB"
 
-#: xrc/MainMenu.xrc:593
+#: xrc/MainMenu.xrc:605
 msgid "&Disassemble..."
 msgstr "&Disassemblieren..."
 
-#: xrc/MainMenu.xrc:596
+#: xrc/MainMenu.xrc:608
 msgid "&Logging..."
 msgstr "Protoko&ll anlegen..."
 
-#: xrc/MainMenu.xrc:599
+#: xrc/MainMenu.xrc:611
 msgid "&IO Viewer..."
 msgstr "&IO-Betrachter..."
 
-#: xrc/MainMenu.xrc:602
+#: xrc/MainMenu.xrc:614
 msgid "&Map Viewer..."
 msgstr "&Map-Betrachter..."
 
-#: xrc/MainMenu.xrc:605
+#: xrc/MainMenu.xrc:617
 msgid "M&emory Viewer..."
 msgstr "Sp&eicher-Betrachter..."
 
-#: xrc/MainMenu.xrc:608
+#: xrc/MainMenu.xrc:620
 msgid "&OAM Viewer..."
 msgstr "&OAM-Betrachter..."
 
-#: xrc/MainMenu.xrc:611
+#: xrc/MainMenu.xrc:623
 msgid "&Palette Viewer..."
 msgstr "&Paletten-Betrachter..."
 
-#: xrc/MainMenu.xrc:614
+#: xrc/MainMenu.xrc:626
 msgid "&Tile Viewer..."
 msgstr "Kachel-Be&trachter..."
 
-#: xrc/MainMenu.xrc:619
+#: xrc/MainMenu.xrc:631
 msgid "Show all video layers"
 msgstr "Alle Video-Ebenen anzeigen"
 
-#: xrc/MainMenu.xrc:623
+#: xrc/MainMenu.xrc:635
 msgid "BG &0"
 msgstr "BG &0"
 
-#: xrc/MainMenu.xrc:628
+#: xrc/MainMenu.xrc:640
 msgid "BG &1"
 msgstr "BG &1"
 
-#: xrc/MainMenu.xrc:633
+#: xrc/MainMenu.xrc:645
 msgid "BG &2"
 msgstr "BG &2"
 
-#: xrc/MainMenu.xrc:638
+#: xrc/MainMenu.xrc:650
 msgid "BG &3"
 msgstr "BG &3"
 
-#: xrc/MainMenu.xrc:643
+#: xrc/MainMenu.xrc:655
 msgid "&OBJ"
 msgstr "&OBJ"
 
-#: xrc/MainMenu.xrc:648
+#: xrc/MainMenu.xrc:660
 msgid "&WIN 0"
 msgstr "&WIN 0"
 
-#: xrc/MainMenu.xrc:653
+#: xrc/MainMenu.xrc:665
 msgid "W&IN 1"
 msgstr "W&IN 1"
 
-#: xrc/MainMenu.xrc:658
+#: xrc/MainMenu.xrc:670
 msgid "O&BJ WIN"
 msgstr "O&BJ WIN"
 
-#: xrc/MainMenu.xrc:662
+#: xrc/MainMenu.xrc:674
 msgid "&View Layers"
 msgstr "Ebenen anzeigen"
 
-#: xrc/MainMenu.xrc:666
+#: xrc/MainMenu.xrc:678
 msgid "Channel &1"
 msgstr "Kanal &1"
 
-#: xrc/MainMenu.xrc:671
+#: xrc/MainMenu.xrc:683
 msgid "Channel &2"
 msgstr "Kanal &2"
 
-#: xrc/MainMenu.xrc:676
+#: xrc/MainMenu.xrc:688
 msgid "Channel &3"
 msgstr "Kanal &3"
 
-#: xrc/MainMenu.xrc:681
+#: xrc/MainMenu.xrc:693
 msgid "Channel &4"
 msgstr "Kanal &4"
 
-#: xrc/MainMenu.xrc:686
+#: xrc/MainMenu.xrc:698
 msgid "Direct Sound &A"
 msgstr "Direct Sound &A"
 
-#: xrc/MainMenu.xrc:691
+#: xrc/MainMenu.xrc:703
 msgid "Direct Sound &B"
 msgstr "Direct Sound &B"
 
-#: xrc/MainMenu.xrc:695
+#: xrc/MainMenu.xrc:707
 msgid "&Sound Channels"
 msgstr "Tonkanäle"
 
-#: xrc/MainMenu.xrc:699
+#: xrc/MainMenu.xrc:711
 msgid "&Help"
 msgstr "&Hilfe"
 
-#: xrc/MainMenu.xrc:701
+#: xrc/MainMenu.xrc:713
 msgid "Report &Bugs"
 msgstr "Fehler melden"
 
-#: xrc/MainMenu.xrc:704
+#: xrc/MainMenu.xrc:716
 msgid "VBA-M Support &Forum"
 msgstr "VBA-M Hilfe-&Forum"
 
-#: xrc/MainMenu.xrc:707
+#: xrc/MainMenu.xrc:719
 msgid "Translations"
 msgstr "Übersetzungen"
 
-#: xrc/MainMenu.xrc:715
+#: xrc/MainMenu.xrc:727
 msgid "Check for updates"
 msgstr "Auf Updates prüfen"
 
-#: xrc/MainMenu.xrc:718
+#: xrc/MainMenu.xrc:730
 msgid "&Factory Reset..."
 msgstr "&Werkseinstellungen..."
 
-#: xrc/MainMenu.xrc:722
+#: xrc/MainMenu.xrc:734
 msgid "&About..."
 msgstr "&Über..."
 
