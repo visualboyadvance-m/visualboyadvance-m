@@ -15,13 +15,14 @@
 # Marcus Crisostomo <marcus.crisostomo@yahoo.com.br>, 2014-2015
 # Marcus Rerre <marcus.rerre@gmail.com>, 2017
 # Mateus Santos <sonicheats@gmail.com>, 2017
+# Mateus Valente <mateusvalente2001@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-12 00:19+0000\n"
-"PO-Revision-Date: 2020-04-12 00:20+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"PO-Revision-Date: 2020-04-18 01:48+0000\n"
+"Last-Translator: Mateus Valente <mateusvalente2001@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/bgk/vba-m/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -818,7 +819,7 @@ msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
-msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 Equipe do VBA\nCopyright (C) 2007-2017 Equipe do VBA-M"
+msgstr "Copyright (C) 1999-2003 Esquecido\nCopyright (C) 2004-2006 Equipe do VBA\nCopyright (C) 2007-2017 Equipe do VBA-M"
 
 #: cmdevents.cpp:2766
 msgid ""
@@ -1131,7 +1132,7 @@ msgstr "Meta-"
 
 #: widgets/keyedit.cpp:127 widgets/keyedit.cpp:128
 msgid "Num"
-msgstr ""
+msgstr "Número"
 
 #: widgets/keyedit.cpp:201
 msgid "Meta+"
@@ -1156,44 +1157,44 @@ msgstr "CONTROL"
 #: widgets/sdljoy.cpp:115
 #, c-format
 msgid "Connected game controller %d"
-msgstr ""
+msgstr "Controle de jogo conectado %d"
 
 #: widgets/sdljoy.cpp:129
 #, c-format
 msgid "Disconnected game controller %d"
-msgstr ""
+msgstr "Controle de jogo desconectado %d"
 
 #: xaudio2.cpp:35
 msgid "XAudio2: Enumerating devices failed!"
-msgstr ""
+msgstr "XAudio2: Enumeração de dispositivos falhou!"
 
 #: xaudio2.cpp:69 xaudio2.cpp:353
 msgid "The XAudio2 interface failed to initialize!"
-msgstr ""
+msgstr "A inicialização da interface XAudio2 falhou!"
 
 #: xaudio2.cpp:384
 msgid "XAudio2: Creating mastering voice failed!"
-msgstr ""
+msgstr "XAudio2: Criação de voz masterizada falhou!"
 
 #: xaudio2.cpp:393
 msgid "XAudio2: Creating source voice failed!"
-msgstr ""
+msgstr "XAudio2: Criação de voz primária falhou!"
 
 #: faudio.cpp:32
 msgid "FAudio: Enumerating devices failed!"
-msgstr ""
+msgstr "FAudio: Enumeração de dispositivos falhou!"
 
 #: faudio.cpp:67 faudio.cpp:352
 msgid "The FAudio interface failed to initialize!"
-msgstr ""
+msgstr "A inicialização da interface FAudio falhou!"
 
 #: faudio.cpp:384
 msgid "FAudio: Creating mastering voice failed!"
-msgstr ""
+msgstr "FAudio: Criação de voz masterizada falhou!"
 
 #: faudio.cpp:395
 msgid "FAudio: Creating source voice failed!"
-msgstr ""
+msgstr "FAudio: Criação de voz primária falhou!"
 
 #: dsound.cpp:90 dsound.cpp:104
 #, c-format
@@ -2393,7 +2394,7 @@ msgstr "0 = sem aceleração"
 
 #: xrc/GeneralConfig.xrc:114 xrc/SpeedupConfig.xrc:45
 msgid "Full Speed/No Limit"
-msgstr ""
+msgstr "Velocidade Máxima/Sem Limite"
 
 #: xrc/GeneralConfig.xrc:115 xrc/SpeedupConfig.xrc:46
 msgid "25%"
@@ -2788,7 +2789,7 @@ msgstr "&e-Reader"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
-msgstr ""
+msgstr "& Redefinir Dot Code Carregado"
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
@@ -2796,7 +2797,7 @@ msgstr "Carregar Dot Code..."
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr ""
+msgstr "&Redefinir Dot Code Salvo"
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
@@ -2876,7 +2877,7 @@ msgstr "Salvar slot atual"
 
 #: xrc/MainMenu.xrc:110
 msgid "Increase state slot number and save"
-msgstr ""
+msgstr "Incrementar o número do slot do estado atual e salvar"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File ..."
@@ -2888,11 +2889,11 @@ msgstr "&Salvar estado"
 
 #: xrc/MainMenu.xrc:150
 msgid "Increase state slot number"
-msgstr ""
+msgstr "Incrementar o slot do estado atual"
 
 #: xrc/MainMenu.xrc:153
 msgid "Decrease state slot number"
-msgstr ""
+msgstr "Decrementar o slot do estado atual"
 
 #: xrc/MainMenu.xrc:158 xrc/MainMenu.xrc:170
 msgid "&Battery file..."
@@ -3101,7 +3102,7 @@ msgstr "Trocar filtro"
 
 #: xrc/MainMenu.xrc:348
 msgid "Change interframe blending"
-msgstr ""
+msgstr "Mudar mesclagem de quadros"
 
 #: xrc/MainMenu.xrc:351
 msgid "&Retain aspect ratio"
@@ -3213,11 +3214,11 @@ msgstr "Imprimir &debug"
 
 #: xrc/MainMenu.xrc:512 xrc/MainMenu.xrc:527
 msgid "&LCD Filter"
-msgstr ""
+msgstr "&Filtro LCD"
 
 #: xrc/MainMenu.xrc:523
 msgid "&GB color option"
-msgstr ""
+msgstr "&Opção de Cores GB"
 
 #: xrc/MainMenu.xrc:531
 msgid "&GB printer"
@@ -3281,7 +3282,7 @@ msgstr "Habilitar trapaças"
 
 #: xrc/MainMenu.xrc:588
 msgid "&Break into GDB"
-msgstr "&Usar GDB"
+msgstr "&Pausa em GDB"
 
 #: xrc/MainMenu.xrc:592
 msgid "&Configure port..."
@@ -3541,7 +3542,7 @@ msgstr "Servidor:"
 
 #: xrc/NetLink.xrc:81
 msgid "Port:"
-msgstr ""
+msgstr "Porta:"
 
 #: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
@@ -3613,7 +3614,7 @@ msgstr "XAudio2"
 
 #: xrc/SoundConfig.xrc:132
 msgid "FAudio"
-msgstr ""
+msgstr "FAudio"
 
 #: xrc/SoundConfig.xrc:146
 msgid "Device"
@@ -3705,4 +3706,4 @@ msgstr "Valor de aceleração"
 
 #: xrc/SpeedupConfig.xrc:84
 msgid "Frame skip"
-msgstr ""
+msgstr "Saltar quadros"
