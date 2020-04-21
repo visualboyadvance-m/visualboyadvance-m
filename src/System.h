@@ -5,6 +5,10 @@
 
 #define winlog log
 
+#ifdef __LIBRETRO__
+#define utilOpenFile fopen
+#endif
+
 class SoundDriver;
 
 struct EmulatedSystem {

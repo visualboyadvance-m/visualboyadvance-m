@@ -951,7 +951,7 @@ bool CPUReadState(const char* file)
 bool CPUExportEepromFile(const char* fileName)
 {
     if (eepromInUse) {
-        FILE* file = fopen(fileName, "wb");
+        FILE* file = utilOpenFile(fileName, "wb");
 
         if (!file) {
             systemMessage(MSG_ERROR_CREATING_FILE, N_("Error creating file %s"),
@@ -976,7 +976,7 @@ bool CPUExportEepromFile(const char* fileName)
 bool CPUWriteBatteryFile(const char* fileName)
 {
     if ((saveType) && (saveType != GBA_SAVE_NONE)) {
-        FILE* file = fopen(fileName, "wb");
+        FILE* file = utilOpenFile(fileName, "wb");
 
         if (!file) {
             systemMessage(MSG_ERROR_CREATING_FILE, N_("Error creating file %s"),
@@ -1011,7 +1011,7 @@ bool CPUWriteBatteryFile(const char* fileName)
 bool CPUReadGSASnapshot(const char* fileName)
 {
     int i;
-    FILE* file = fopen(fileName, "rb");
+    FILE* file = utilOpenFile(fileName, "rb");
 
     if (!file) {
         systemMessage(MSG_CANNOT_OPEN_FILE, N_("Cannot open file %s"), fileName);
@@ -1080,8 +1080,8 @@ bool CPUReadGSASPSnapshot(const char* fileName)
     const size_t footerpos = 0x42c, footersz = 4;
 
     char footer[footersz + 1], romname[namesz + 1], savename[namesz + 1];
-    ;
-    FILE* file = fopen(fileName, "rb");
+
+    FILE* file = utilOpenFile(fileName, "rb");
 
     if (!file) {
         systemMessage(MSG_CANNOT_OPEN_FILE, N_("Cannot open file %s"), fileName);
@@ -1134,7 +1134,7 @@ bool CPUWriteGSASnapshot(const char* fileName,
     const char* desc,
     const char* notes)
 {
-    FILE* file = fopen(fileName, "wb");
+    FILE* file = utilOpenFile(fileName, "wb");
 
     if (!file) {
         systemMessage(MSG_CANNOT_OPEN_FILE, N_("Cannot open file %s"), fileName);
@@ -1191,7 +1191,7 @@ bool CPUWriteGSASnapshot(const char* fileName,
 
 bool CPUImportEepromFile(const char* fileName)
 {
-    FILE* file = fopen(fileName, "rb");
+    FILE* file = utilOpenFile(fileName, "rb");
 
     if (!file)
         return false;
@@ -1235,7 +1235,7 @@ bool CPUImportEepromFile(const char* fileName)
 
 bool CPUReadBatteryFile(const char* fileName)
 {
-    FILE* file = fopen(fileName, "rb");
+    FILE* file = utilOpenFile(fileName, "rb");
 
     if (!file)
         return false;
@@ -1488,7 +1488,7 @@ int CPULoadRom(const char* szFile)
 
 #ifndef NO_DEBUGGER
     if (CPUIsELF(szFile)) {
-        FILE* f = fopen(szFile, "rb");
+        FILE* f = utilOpenFile(szFile, "rb");
         if (!f) {
             systemMessage(MSG_ERROR_OPENING_IMAGE, N_("Error opening image %s"),
                 szFile);
@@ -1715,8 +1715,7 @@ const char* GetSaveDotCodeFile()
 
 void ResetLoadDotCodeFile()
 {
-	if(loadDotCodeFile)
-	{
+    if (loadDotCodeFile) {
         free((char*)loadDotCodeFile);
     }
 
@@ -1730,8 +1729,7 @@ void SetLoadDotCodeFile(const char* szFile)
 
 void ResetSaveDotCodeFile()
 {
-    if (saveDotCodeFile)
-    {
+    if (saveDotCodeFile) {
         free((char*)saveDotCodeFile);
     }
 

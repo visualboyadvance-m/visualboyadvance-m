@@ -758,7 +758,7 @@ void SaveConfigFile()
 
 	if (configFile != NULL)
 	{
-		FILE *f = fopen(configFile, "w");
+		FILE *f = utilOpenFile(configFile, "w");
 		if (f == NULL) {
                         char err_msg[4096] = "unknown error";
                         strncpy(err_msg, strerror(errno), 4096);
@@ -896,7 +896,7 @@ int ReadOpts(int argc, char ** argv)
 				log("Missing config file name\n");
 				break;
 			}
-			FILE *f = fopen(optarg, "r");
+			FILE *f = utilOpenFile(optarg, "r");
 			if (f == NULL) {
 				log("File not found %s\n", optarg);
 				break;

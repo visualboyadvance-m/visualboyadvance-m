@@ -2860,7 +2860,7 @@ void gbReset()
 void gbWriteSaveMBC1(const char* name)
 {
     if (gbRam) {
-        FILE* gzFile = fopen(name, "wb");
+        FILE* gzFile = utilOpenFile(name, "wb");
 
         if (gzFile == NULL) {
             systemMessage(MSG_ERROR_CREATING_FILE, N_("Error creating file %s"), name);
@@ -2879,7 +2879,7 @@ void gbWriteSaveMBC1(const char* name)
 void gbWriteSaveMBC2(const char* name)
 {
     if (gbRam) {
-        FILE* file = fopen(name, "wb");
+        FILE* file = utilOpenFile(name, "wb");
 
         if (file == NULL) {
             systemMessage(MSG_ERROR_CREATING_FILE, N_("Error creating file %s"), name);
@@ -2898,7 +2898,7 @@ void gbWriteSaveMBC2(const char* name)
 void gbWriteSaveMBC3(const char* name, bool extendedSave)
 {
     if (gbRam || extendedSave) {
-        FILE* gzFile = fopen(name, "wb");
+        FILE* gzFile = utilOpenFile(name, "wb");
         if (gbRam) {
 
             if (gzFile == NULL) {
@@ -2925,7 +2925,7 @@ void gbWriteSaveMBC3(const char* name, bool extendedSave)
 void gbWriteSaveMBC5(const char* name)
 {
     if (gbRam) {
-        FILE* gzFile = fopen(name, "wb");
+        FILE* gzFile = utilOpenFile(name, "wb");
 
         if (gzFile == NULL) {
             systemMessage(MSG_ERROR_CREATING_FILE, N_("Error creating file %s"), name);
@@ -2944,7 +2944,7 @@ void gbWriteSaveMBC5(const char* name)
 void gbWriteSaveMBC7(const char* name)
 {
     if (gbRam) {
-        FILE* file = fopen(name, "wb");
+        FILE* file = utilOpenFile(name, "wb");
 
         if (file == NULL) {
             systemMessage(MSG_ERROR_CREATING_FILE, N_("Error creating file %s"), name);
@@ -2962,7 +2962,7 @@ void gbWriteSaveMBC7(const char* name)
 
 void gbWriteSaveTAMA5(const char* name, bool extendedSave)
 {
-    FILE* gzFile = fopen(name, "wb");
+    FILE* gzFile = utilOpenFile(name, "wb");
 
     if (gzFile == NULL) {
         systemMessage(MSG_ERROR_CREATING_FILE, N_("Error creating file %s"), name);
@@ -2991,7 +2991,7 @@ void gbWriteSaveTAMA5(const char* name, bool extendedSave)
 void gbWriteSaveMMM01(const char* name)
 {
     if (gbRam) {
-        FILE* gzFile = fopen(name, "wb");
+        FILE* gzFile = utilOpenFile(name, "wb");
 
         if (gzFile == NULL) {
             systemMessage(MSG_ERROR_CREATING_FILE, N_("Error creating file %s"), name);
@@ -3010,7 +3010,7 @@ void gbWriteSaveMMM01(const char* name)
 bool gbReadSaveMBC1(const char* name)
 {
     if (gbRam) {
-        gzFile gzFile = gzopen(name, "rb");
+        gzFile gzFile = utilAutoGzOpen(name, "rb");
 
         if (gzFile == NULL) {
             return false;
@@ -3052,7 +3052,7 @@ bool gbReadSaveMBC1(const char* name)
 bool gbReadSaveMBC2(const char* name)
 {
     if (gbRam) {
-        FILE* file = fopen(name, "rb");
+        FILE* file = utilOpenFile(name, "rb");
 
         if (file == NULL) {
             return false;
@@ -3095,7 +3095,7 @@ bool gbReadSaveMBC2(const char* name)
 
 bool gbReadSaveMBC3(const char* name)
 {
-    gzFile gzFile = gzopen(name, "rb");
+    gzFile gzFile = utilAutoGzOpen(name, "rb");
 
     if (gzFile == NULL) {
         return false;
@@ -3151,7 +3151,7 @@ bool gbReadSaveMBC3(const char* name)
 bool gbReadSaveMBC5(const char* name)
 {
     if (gbRam) {
-        gzFile gzFile = gzopen(name, "rb");
+        gzFile gzFile = utilAutoGzOpen(name, "rb");
 
         if (gzFile == NULL) {
             return false;
@@ -3193,7 +3193,7 @@ bool gbReadSaveMBC5(const char* name)
 bool gbReadSaveMBC7(const char* name)
 {
     if (gbRam) {
-        FILE* file = fopen(name, "rb");
+        FILE* file = utilOpenFile(name, "rb");
 
         if (file == NULL) {
             return false;
@@ -3236,7 +3236,7 @@ bool gbReadSaveMBC7(const char* name)
 
 bool gbReadSaveTAMA5(const char* name)
 {
-    gzFile gzFile = gzopen(name, "rb");
+    gzFile gzFile = utilAutoGzOpen(name, "rb");
 
     if (gzFile == NULL) {
         return false;
@@ -3295,7 +3295,7 @@ bool gbReadSaveTAMA5(const char* name)
 bool gbReadSaveMMM01(const char* name)
 {
     if (gbRam) {
-        gzFile gzFile = gzopen(name, "rb");
+        gzFile gzFile = utilAutoGzOpen(name, "rb");
 
         if (gzFile == NULL) {
             return false;
@@ -3489,7 +3489,7 @@ bool gbReadBatteryFile(const char* file)
 
 bool gbReadGSASnapshot(const char* fileName)
 {
-    FILE* file = fopen(fileName, "rb");
+    FILE* file = utilOpenFile(fileName, "rb");
 
     if (!file) {
         systemMessage(MSG_CANNOT_OPEN_FILE, N_("Cannot open file %s"), fileName);

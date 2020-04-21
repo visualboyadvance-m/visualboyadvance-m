@@ -246,10 +246,10 @@ public:
             bool cld;
 
             if (isgb)
-                cld = gbCheatsLoadCheatList(cheatfn.mb_fn_str());
+                cld = gbCheatsLoadCheatList(UTF8(cheatfn));
             else {
                 if (cheatfn.EndsWith(wxT(".clt"))) {
-                    cld = cheatsLoadCheatList(cheatfn.mb_fn_str());
+                    cld = cheatsLoadCheatList(UTF8(cheatfn));
 
                     if (cld) {
                         *dirty = cheatfn != deffn;
@@ -298,9 +298,9 @@ public:
 
             // note that there is no way to test for succes of save
             if (isgb)
-                gbCheatsSaveCheatList(cheatfn.mb_fn_str());
+                gbCheatsSaveCheatList(UTF8(cheatfn));
             else
-                cheatsSaveCheatList(cheatfn.mb_fn_str());
+                cheatsSaveCheatList(UTF8(cheatfn));
 
             if (cheatfn == deffn)
                 *dirty = false;

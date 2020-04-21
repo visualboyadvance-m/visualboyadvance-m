@@ -970,7 +970,7 @@ void MainFrame::update_state_ts(bool force)
 
         if (panel->game_type() != IMAGE_UNKNOWN) {
             wxString fn;
-            fn.Printf(SAVESLOT_FMT, panel->game_name().c_str(), i + 1);
+            fn.Printf(SAVESLOT_FMT, panel->game_name().wc_str(), i + 1);
             wxFileName fp(panel->state_dir(), fn);
             wxDateTime ts; // = wxInvalidDateTime
 

@@ -141,7 +141,7 @@ void systemStartGameRecording(const wxString& fname)
 
     fn[fn.size() - 1] = wxT('0');
 
-    if (!panel->emusys->emuWriteState(fn.mb_fn_str())) {
+    if (!panel->emusys->emuWriteState(UTF8(fn))) {
         wxLogError(_("Error writing game recording"));
         game_file.Close();
         return;
@@ -212,7 +212,7 @@ void systemStartGamePlayback(const wxString& fname)
     game_next_joypad = wxUINT32_SWAP_ON_BE(jp);
     fn[fn.size() - 1] = wxT('0');
 
-    if (!panel->emusys->emuReadState(fn.mb_fn_str())) {
+    if (!panel->emusys->emuReadState(UTF8(fn))) {
         wxLogError(_("Error reading game recording"));
         game_file.Close();
         return;
@@ -442,12 +442,12 @@ void systemScreenCapture(int num)
     fn.Mkdir(0777, wxPATH_MKDIR_FULL);
 
     if (captureFormat == 0)
-        panel->emusys->emuWritePNG(fn.GetFullPath().mb_fn_str());
+        panel->emusys->emuWritePNG(UTF8(fn.GetFullPath()));
     else // if(gopts.cap_format == 1)
-        panel->emusys->emuWriteBMP(fn.GetFullPath().mb_fn_str());
+        panel->emusys->emuWriteBMP(UTF8(fn.GetFullPath()));
 
     wxString msg;
-    msg.Printf(_("Wrote snapshot %s"), fn.GetFullPath().c_str());
+    msg.Printf(_("Wrote snapshot %s"), fn.GetFullPath().wc_str());
     systemScreenMessage(msg);
 }
 
@@ -822,7 +822,7 @@ void PrintDialog::DoSave(wxCommandEvent&)
 
     if (scimg.SaveFile(of)) {
         wxString msg;
-        msg.Printf(_("Wrote printer output to %s"), of.c_str());
+        msg.Printf(_("Wrote printer output to %s"), of.wc_str());
         systemScreenMessage(msg);
         wxButton* cb = wxStaticCast(dlg->FindWindow(wxID_CANCEL), wxButton);
 
@@ -1001,11 +1001,11 @@ void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int con
         systemGreenShift = 5;
         systemBlueShift = 0;
         wxString of = fn.GetFullPath();
-        bool ret = captureFormat == 0 ? utilWritePNGFile(of.mb_fn_str(), 160, lines, (uint8_t*)to_print) : utilWriteBMPFile(of.mb_fn_str(), 160, lines, (uint8_t*)to_print);
+        bool ret = captureFormat == 0 ? utilWritePNGFile(UTF8(of), 160, lines, (uint8_t*)to_print) : utilWriteBMPFile(UTF8(of), 160, lines, (uint8_t*)to_print);
 
         if (ret) {
             wxString msg;
-            msg.Printf(_("Wrote printer output to %s"), of.c_str());
+            msg.Printf(_("Wrote printer output to %s"), of.wc_str());
             systemScreenMessage(msg);
         }
 
@@ -1040,7 +1040,7 @@ void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int con
 void systemScreenMessage(const wxString& msg)
 {
     if (wxGetApp().frame && wxGetApp().frame->IsShown()) {
-        wxPuts(msg);
+        wxPuts(UTF8(msg)); // show **something** on terminal
         MainFrame* f = wxGetApp().frame;
         GameArea* panel = f->GetPanel();
 
