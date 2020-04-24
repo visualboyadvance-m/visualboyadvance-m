@@ -361,8 +361,15 @@ void mapperMBC3ROM(uint16_t address, uint8_t value)
     case 0x0000: // RAM enable register
         gbDataMBC3.mapperRAMEnable = ((value & 0x0a) == 0x0a ? 1 : 0);
         break;
-    case 0x2000: // ROM bank select
-        value = value & 0x7f;
+    case 0x2000: { // ROM bank select
+        // 4MiB, MBC30
+        bool mbc30 = gbRomSize == 0x00400000;
+
+        if (mbc30)
+            value = value & 0xff; // 4MiB
+        else
+            value = value & 0x7f; // 2MiB
+
         if (value == 0)
             value = 1;
         if (value == gbDataMBC3.mapperROMBank)
@@ -371,13 +378,16 @@ void mapperMBC3ROM(uint16_t address, uint8_t value)
         tmpAddress = value << 14;
 
         tmpAddress &= gbRomSizeMask;
+
         gbDataMBC3.mapperROMBank = value;
+
         gbMemoryMap[0x04] = &gbRom[tmpAddress];
         gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
         gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
         gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
 
         break;
+    }
     case 0x4000: // RAM bank select
         if (value < 8) {
             if (value == gbDataMBC3.mapperRAMBank)
