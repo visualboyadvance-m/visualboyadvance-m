@@ -84,6 +84,9 @@ extern struct opts_t {
     /// Recent
     wxFileHistory* recent;
 
+    /// UI Config
+    bool hide_menu_bar;
+
     /// wxWindows
     // wxWidgets-generated options (opaque)
 } gopts;

@@ -3,6 +3,7 @@
 #include <cstring>
 #include <vector>
 #include <wx/dcbuffer.h>
+#include <wx/menu.h>
 #include <SDL_joystick.h>
 
 #include "../common/version_cpp.h"
@@ -15,6 +16,10 @@
 #include "drawing.h"
 #include "filters.h"
 #include "wxvbam.h"
+
+#ifdef __WXMSW__
+#include <windows.h>
+#endif
 
 // release all buttons currently pressed
 static void clear_input_press();
@@ -925,7 +930,7 @@ GameArea::~GameArea()
 void GameArea::OnKillFocus(wxFocusEvent& ev)
 {
     clear_input_press();
-    ev.Skip(true);
+    ev.Skip();
 }
 
 void GameArea::Pause()
@@ -1038,8 +1043,15 @@ void GameArea::OnIdle(wxIdleEvent& event)
         // the userdata is freed on disconnect/destruction
         this->Connect(wxEVT_SIZE,          wxSizeEventHandler(GameArea::OnSize),           NULL, this);
 
-        // we need to check if the buttons stayed pressed when focus the panel
+        // We need to check if the buttons stayed pressed when focus the panel.
         w->Connect(wxEVT_KILL_FOCUS,       wxFocusEventHandler(GameArea::OnKillFocus),     NULL, this);
+
+        // Update mouse last-used timers on mouse events etc..
+        w->Connect(wxEVT_MOTION,           wxMouseEventHandler(GameArea::MouseEvent),      NULL, this);
+        w->Connect(wxEVT_LEFT_DOWN,        wxMouseEventHandler(GameArea::MouseEvent),      NULL, this);
+        w->Connect(wxEVT_RIGHT_DOWN,       wxMouseEventHandler(GameArea::MouseEvent),      NULL, this);
+        w->Connect(wxEVT_MIDDLE_DOWN,      wxMouseEventHandler(GameArea::MouseEvent),      NULL, this);
+        w->Connect(wxEVT_MOUSEWHEEL,       wxMouseEventHandler(GameArea::MouseEvent),      NULL, this);
 
         w->SetBackgroundStyle(wxBG_STYLE_CUSTOM);
         w->SetSize(wxSize(basic_width, basic_height));
@@ -1091,6 +1103,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
     if (!paused) {
         HidePointer();
+        HideMenuBar();
         event.RequestMore();
 
 #ifndef NO_DEBUGGER
@@ -1119,6 +1132,8 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
         if (paused)
             SetExtraStyle(GetExtraStyle() & ~wxWS_EX_PROCESS_IDLE);
+
+        ShowMenuBar();
     }
 
     if (do_rewind && emusys->emuWriteMemState) {
@@ -1302,7 +1317,7 @@ void GameArea::OnKeyDown(wxKeyEvent& ev)
         wxWakeUpIdle();
     }
     else {
-        ev.Skip(true);
+        ev.Skip();
     }
 }
 
@@ -1314,7 +1329,7 @@ void GameArea::OnKeyUp(wxKeyEvent& ev)
         wxWakeUpIdle();
     }
     else {
-        ev.Skip(true);
+        ev.Skip();
     }
 }
 
@@ -1338,7 +1353,7 @@ void GameArea::OnSize(wxSizeEvent& ev)
     if (panel)
         panel->OnSize(ev);
 
-    ev.Skip(true);
+    ev.Skip();
 }
 
 #if defined(__WXGTK__) && defined(HAVE_XSS)
@@ -2001,7 +2016,7 @@ void DrawingPanelBase::DrawOSD(wxWindowDC& dc)
 
 void DrawingPanelBase::OnSize(wxSizeEvent& ev)
 {
-    ev.Skip(true);
+    ev.Skip();
 }
 
 DrawingPanelBase::~DrawingPanelBase()
@@ -2285,7 +2300,7 @@ void GLDrawingPanel::OnSize(wxSizeEvent& ev)
 {
     AdjustViewport();
 
-    ev.Skip(true);
+    ev.Skip();
 }
 
 void GLDrawingPanel::AdjustViewport()
@@ -2478,17 +2493,22 @@ void GameArea::AddFrame(const uint8_t* data)
 }
 #endif
 
-void GameArea::ShowPointer()
+void GameArea::MouseEvent(wxMouseEvent& ev)
 {
-    if (fullscreen)
-        return;
-
     mouse_active_time = systemGetClock();
 
-    if (!pointer_blanked)
-        return;
+    ShowPointer();
+    ShowMenuBar();
+
+    ev.Skip();
+}
+
+void GameArea::ShowPointer()
+{
+    if (!pointer_blanked || fullscreen) return;
 
     pointer_blanked = false;
+
     SetCursor(wxNullCursor);
 
     if (panel)
@@ -2497,12 +2517,11 @@ void GameArea::ShowPointer()
 
 void GameArea::HidePointer()
 {
-    if (pointer_blanked)
-        return;
+    if (pointer_blanked || !main_frame) return;
 
     // FIXME: make time configurable
     if ((fullscreen || (systemGetClock() - mouse_active_time) > 3000) &&
-        !(main_frame && (main_frame->MenusOpened() || main_frame->DialogOpened()))) {
+        !(main_frame->MenusOpened() || main_frame->DialogOpened())) {
         pointer_blanked = true;
         SetCursor(wxCursor(wxCURSOR_BLANK));
 
@@ -2510,6 +2529,44 @@ void GameArea::HidePointer()
         if (panel)
             panel->GetWindow()->SetCursor(wxCursor(wxCURSOR_BLANK));
     }
+}
+
+// We do not hide the menubar on mac, on mac it is not part of the main frame
+// and the user can adjust hiding behavior herself.
+void GameArea::HideMenuBar()
+{
+#ifndef __WXMAC__
+    if (!main_frame || menu_bar_hidden || !gopts.hide_menu_bar) return;
+
+    if (((systemGetClock() - mouse_active_time) > 3000) && !main_frame->MenusOpened()) {
+#ifdef __WXMSW__
+        current_hmenu = static_cast<HMENU>(main_frame->GetMenuBar()->GetHMenu());
+        ::SetMenu(main_frame->GetHandle(), nullptr);
+#else
+        main_frame->GetMenuBar()->Hide();
+#endif
+        SendSizeEvent();
+        menu_bar_hidden = true;
+    }
+#endif
+}
+
+void GameArea::ShowMenuBar()
+{
+#ifndef __WXMAC__
+    if (!main_frame || !menu_bar_hidden) return;
+
+#ifdef __WXMSW__
+    if (current_hmenu != nullptr) {
+        ::SetMenu(main_frame->GetHandle(), current_hmenu);
+        current_hmenu = nullptr;
+    }
+#else
+    main_frame->GetMenuBar()->Show();
+#endif
+    SendSizeEvent();
+    menu_bar_hidden = false;
+#endif
 }
 
 // stub HiDPI methods, see macsupport.mm for the Mac support

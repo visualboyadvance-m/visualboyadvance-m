@@ -561,6 +561,9 @@
         <object class="wxMenuItem" name="Customize">
           <label>_Key Shortcuts ...</label>
         </object>
+        <object class="wxMenuItem" name="UIConfigure">
+          <label>_UI Settings ...</label>
+        </object>
     </object>
     <object class="wxMenu">
       <label>_Tools</label>

@@ -2326,6 +2326,14 @@ EVT_HANDLER(SpeedupConfigure, "Speedup / Turbo options...")
         update_opts();
 }
 
+EVT_HANDLER(UIConfigure, "UI Settings...")
+{
+    wxDialog* dlg = GetXRCDialog("UIConfig");
+
+    if (ShowModal(dlg) == wxID_OK)
+        update_opts();
+}
+
 EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
 {
     wxDialog* dlg = GetXRCDialog("GameBoyConfig");

@@ -2907,14 +2907,22 @@ bool MainFrame::BindControls()
         // remove this item from the menu completely
         wxMenuItem* gdbmi = XRCITEM("GDBMenu");
         gdbmi->GetMenu()->Remove(gdbmi);
-        gdbmi = NULL;
+        gdbmi = nullptr;
 #endif
 #ifdef NO_LINK
         // remove this item from the menu completely
         wxMenuItem* linkmi = XRCITEM("LinkMenu");
         linkmi->GetMenu()->Remove(linkmi);
-        linkmi = NULL;
+        linkmi = nullptr;
 #endif
+
+#ifdef __WXMAC__
+        // Remove UI Config menu item, because it only has an option that does nothing on mac.
+        wxMenuItem* ui_config_mi = XRCITEM("UIConfigure");
+        ui_config_mi->GetMenu()->Remove(ui_config_mi);
+        ui_config_mi = nullptr;
+#endif
+
 
         // if a recent menu is present, save its location
         wxMenuItem* recentmi = XRCITEM("RecentMenu");
@@ -3424,6 +3432,10 @@ bool MainFrame::BindControls()
             d->Connect(wxEVT_SHOW, wxShowEventHandler(SpeedupThrottleCtrl_t::Init),
                 NULL, &speedup_throttle_ctrl);
             d->Fit();
+        }
+        d = LoadXRCDialog("UIConfig");
+        {
+            getcbb("HideMenuBar", gopts.hide_menu_bar);
         }
 #define getcbbe(n, o) getbe(n, o, cb, wxCheckBox, CB)
         wxBoolIntEnValidator* bienval;
