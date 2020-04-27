@@ -306,6 +306,9 @@ opt_desc opts[] = {
     INTOPT("geometry/windowX", "X", wxTRANSLATE("Window axis X position at startup"), windowPositionX, -1, 99999),
     INTOPT("geometry/windowY", "Y", wxTRANSLATE("Window axis Y position at startup"), windowPositionY, -1, 99999),
 
+    /// UI
+    BOOLOPT("ui/hideMenuBar", "", wxTRANSLATE("Hide menu bar when mouse is inactive"), gopts.hide_menu_bar),
+
     /// Sound
     ENUMOPT("Sound/AudioAPI", "", wxTRANSLATE("Sound API; if unsupported, default API will be used"), gopts.audio_api, wxTRANSLATE("sdl|openal|directsound|xaudio2|faudio")),
     STROPT("Sound/AudioDevice", "", wxTRANSLATE("Device ID of chosen audio device for chosen driver"), gopts.audio_dev),
@@ -366,6 +369,8 @@ opts_t::opts_t()
     link_host = "127.0.0.1";
     server_ip = "*";
     link_port = 5738;
+
+    hide_menu_bar = true;
 }
 
 // for binary_search() and friends

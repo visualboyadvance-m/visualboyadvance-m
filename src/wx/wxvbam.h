@@ -305,7 +305,7 @@ public:
     // call this to update the viewers once a frame:
     void UpdateViewers();
 
-    virtual bool MenusOpened() { return menus_opened != 0; }
+    virtual bool MenusOpened() { return menus_opened; }
 
     virtual void SetMenusOpened(bool state);
 
@@ -315,7 +315,7 @@ public:
 
     bool IsPaused(bool incendental = false)
     {
-        return (paused && !pause_next && !incendental) || menus_opened || dialog_opened;
+        return (paused && !pause_next && !incendental) || dialog_opened;
     }
 
     void PollJoysticks() { joy.Poll(); }
@@ -331,9 +331,8 @@ protected:
 private:
     GameArea* panel;
 
-    // the various reasons the game might be paused
-    bool paused;
-    int menus_opened, dialog_opened;
+    bool paused, menus_opened;
+    int dialog_opened;
 
     bool autoLoadMostRecent;
     // copy of top-level menu bar as a context menu
@@ -473,6 +472,11 @@ enum audioapi { AUD_SDL,
 #define OSD_TIME 3000
 
 class DrawingPanelBase;
+
+#ifdef __WXMSW__
+// For saving menu handle.
+#include <windows.h>
+#endif
 
 class GameArea : public wxPanel, public HiDPIAware {
 public:
@@ -628,14 +632,16 @@ protected:
 public:
     void ShowPointer();
     void HidePointer();
+    void HideMenuBar();
+    void ShowMenuBar();
 
 protected:
-    void MouseEvent(wxMouseEvent&)
-    {
-        ShowPointer();
-    }
-    bool pointer_blanked;
+    void MouseEvent(wxMouseEvent&);
+    bool pointer_blanked, menu_bar_hidden = false;
     uint32_t mouse_active_time;
+#ifdef __WXMSW__
+    HMENU current_hmenu = nullptr;
+#endif
 
     DECLARE_DYNAMIC_CLASS(GameArea)
     DECLARE_EVENT_TABLE()

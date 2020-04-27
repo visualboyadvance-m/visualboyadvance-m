@@ -755,20 +755,11 @@ EVT_DROP_FILES(MainFrame::OnDropFile)
 // for window geometry
 EVT_MOVE(MainFrame::OnMove)
 EVT_SIZE(MainFrame::OnSize)
-// pause game if menu pops up
-//
-// This is a feature most people don't like, and it causes problems with
-// keyboard game keys on mac, so we will disable it for now.
-//
-// On Windows, there will still be a pause because of how the windows event
-// model works, in addition the audio will loop with SDL, so we still pause on
-// Windows, TODO: this needs to be fixed properly
-//
-#ifdef __WXMSW__
+
+// For tracking menubar state.
 EVT_MENU_OPEN(MainFrame::MenuPopped)
 EVT_MENU_CLOSE(MainFrame::MenuPopped)
 EVT_MENU_HIGHLIGHT_ALL(MainFrame::MenuPopped)
-#endif
 
 END_EVENT_TABLE()
 
@@ -1069,65 +1060,43 @@ int MainFrame::newest_state_slot()
     return ns + 1;
 }
 
-// disable emulator loop while menus are popped up
-// not sure how to match up w/ down other than counting...
-// only msw is guaranteed to only give one up & one down event for entire
-// menu browsing
-// if there is ever a mismatch, the game will freeze and there is no way
-// to detect if it's doing that
-
-// FIXME: this does not work.
-// Not all open events are followed by close events.
-// Removing the nesting counter may help, but on wxGTK I still get lockups.
 void MainFrame::MenuPopped(wxMenuEvent& evt)
 {
-    bool popped = evt.GetEventType() != wxEVT_MENU_CLOSE;
-#if 0
-
-	if (popped)
-		++menus_opened;
-	else
-		--menus_opened;
-
-	if (menus_opened < 0) // how could this ever be???
-		menus_opened = 0;
-
-#else
-
-    if (popped)
-        menus_opened = 1;
+    // We consider the menu closed when the main menubar or system menu is closed, not any submenus.
+    // On Windows nullptr is the system menu.
+    if (evt.GetEventType() == wxEVT_MENU_CLOSE && (evt.GetMenu() == nullptr || evt.GetMenu()->GetMenuBar() == GetMenuBar()))
+        SetMenusOpened(false);
     else
-        menus_opened = 0;
+        SetMenusOpened(true);
 
-#endif
-
-    // workaround for lack of wxGTK mouse motion events: unblank
-    // pointer when menu popped up
-    // of course this does not help in finding the menus in the first place
-    // the user is better off clicking in the window or entering/
-    // exiting the window (which does generate a mouse event)
-    // it will auto-hide again once game resumes
-    if (popped)
-        panel->ShowPointer();
-
-    //if (menus_opened)
-    //    panel->Pause();
-    //else if (!IsPaused())
-    //    panel->Resume();
+    evt.Skip();
 }
 
+// Pause game if menu pops up.
+//
+// This is a feature most people don't like, and it causes problems with
+// keyboard game keys on mac, so we will disable it for now.
+//
+// On Windows, there will still be a pause because of how the windows event
+// model works, in addition the audio will loop with SDL, so we still pause on
+// Windows.
+//
+// TODO: This needs to be fixed properly.
+//
 void MainFrame::SetMenusOpened(bool state)
 {
-    if (state) {
-        menus_opened = 1;
+    if ((menus_opened = state)) {
+#ifdef __WXMSW__
         paused       = true;
         panel->Pause();
+#endif
     }
     else {
-        menus_opened = 0;
+#ifdef __WXMSW__
         paused       = false;
         pause_next   = false;
         panel->Resume();
+#endif
     }
 }
 
