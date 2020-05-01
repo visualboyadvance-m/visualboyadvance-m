@@ -2818,6 +2818,13 @@ EVT_HANDLER(Bilinear, "Use bilinear filter with 3d renderer")
 EVT_HANDLER(RetainAspect, "Retain aspect ratio when resizing")
 {
     GetMenuOptionBool("RetainAspect", gopts.retain_aspect);
+
+    // Force new panel with new aspect ratio options.
+    if (panel->panel) {
+        panel->panel->Destroy();
+        panel->panel = nullptr;
+    }
+
     update_opts();
 }
 

@@ -1052,21 +1052,25 @@ void GameArea::OnIdle(wxIdleEvent& event)
         AdjustMinSize();
         AdjustSize(false);
 
-        unsigned frame_priority = 0;
+        unsigned frame_priority = gopts.retain_aspect ? 0 : 1;
+
+        GetSizer()->Clear();
 
         // add spacers on top and bottom to center panel vertically
         // but not on 2.8 which does not handle this correctly
+        if (gopts.retain_aspect)
 #if wxCHECK_VERSION(2, 9, 0)
-        GetSizer()->Add(0, 0, wxEXPAND);
+            GetSizer()->Add(0, 0, wxEXPAND);
 #else
-        frame_priority = 1;
+            frame_priority = 1;
 #endif
 
         // this triggers an assertion dialog in <= 3.1.2 in debug mode
         GetSizer()->Add(w, frame_priority, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER | wxEXPAND) : wxEXPAND);
 
 #if wxCHECK_VERSION(2, 9, 0)
-        GetSizer()->Add(0, 0, wxEXPAND);
+        if (gopts.retain_aspect)
+            GetSizer()->Add(0, 0, wxEXPAND);
 #endif
 
         Layout();
