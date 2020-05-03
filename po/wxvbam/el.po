@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-12 00:19+0000\n"
-"PO-Revision-Date: 2020-04-12 00:20+0000\n"
+"POT-Creation-Date: 2020-04-27 20:23+0000\n"
+"PO-Revision-Date: 2020-05-02 13:17+0000\n"
 "Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/bgk/vba-m/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -152,7 +152,7 @@ msgstr "Επιλογή αρχείου κωδικών"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Λίστες κωδικών VBA (*.clt)|*.clt|Λίστες κωδικών CHT (*.cht)|*.cht"
 
-#: guiinit.cpp:256 panel.cpp:417
+#: guiinit.cpp:256 panel.cpp:424
 msgid "Loaded cheats"
 msgstr "Φορτώθηκαν κωδικοί"
 
@@ -305,40 +305,40 @@ msgstr "Διπλότυπος επιταχυντής μενού: %s για %s κ�
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Ο επιταχυντής μενού %s για %s παρακάμπτει την προεπιλογή για %s, διατηρείται το μενού"
 
-#: guiinit.cpp:2998
+#: guiinit.cpp:3006
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Μη έγκυρο αντικείμενο μενού %s, θα αφαιρεθεί"
 
-#: guiinit.cpp:3206
+#: guiinit.cpp:3214
 msgid "Code"
 msgstr "Κωδικός"
 
-#: guiinit.cpp:3215
+#: guiinit.cpp:3223
 msgid "Description"
 msgstr "Περιγραφή"
 
-#: guiinit.cpp:3289 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3297 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Διεύθυνση"
 
-#: guiinit.cpp:3290
+#: guiinit.cpp:3298
 msgid "Old Value"
 msgstr "Προηγούμενη τιμή"
 
-#: guiinit.cpp:3291
+#: guiinit.cpp:3299
 msgid "New Value"
 msgstr "Νέα τιμή"
 
-#: guiinit.cpp:3799
+#: guiinit.cpp:3811
 msgid "Menu commands"
 msgstr "Εντολές μενού"
 
-#: guiinit.cpp:3822
+#: guiinit.cpp:3834
 msgid "Other commands"
 msgstr "Άλλες εντολές"
 
-#: guiinit.cpp:3933
+#: guiinit.cpp:3945
 msgid "JoyBus host invalid; disabling"
 msgstr "Μη έγκυρος JoyBus host, απενεργοποίηση"
 
@@ -605,7 +605,7 @@ msgstr "Η εισαγωγή αρχείου μπαταρίας θα σβήσει 
 msgid "Confirm import"
 msgstr "Επιβεβαίωση εισαγωγής"
 
-#: cmdevents.cpp:907 panel.cpp:360
+#: cmdevents.cpp:907 panel.cpp:367
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Φορτώθηκε η μπαταρία %s"
@@ -688,7 +688,7 @@ msgstr "Σφάλμα φόρτωσης αρχείου στιγμιότυπου %s
 msgid "Wrote battery %s"
 msgstr "Εγγραφή μπαταρίας %s"
 
-#: cmdevents.cpp:1100 panel.cpp:666
+#: cmdevents.cpp:1100 panel.cpp:673
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Σφάλμα εγγραφής μπαταρίας %s"
@@ -784,32 +784,32 @@ msgstr "Αναμονή για σύνδεση στη θύρα %d"
 msgid "Waiting for GDB..."
 msgstr "Αναμονή για GDB..."
 
-#: cmdevents.cpp:2618
+#: cmdevents.cpp:2626
 #, c-format
 msgid "Using pixel filter #%d"
 msgstr ""
 
-#: cmdevents.cpp:2633
+#: cmdevents.cpp:2641
 #, c-format
 msgid "Using interframe blending #%d"
 msgstr ""
 
-#: cmdevents.cpp:2672 panel.cpp:176 panel.cpp:277
+#: cmdevents.cpp:2680 panel.cpp:181 panel.cpp:284
 msgid "Could not initialize the sound driver!"
 msgstr ""
 
-#: cmdevents.cpp:2764
+#: cmdevents.cpp:2772
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Εξομοιωτής Nintendo GameBoy (+Color+Advance)."
 
-#: cmdevents.cpp:2765
+#: cmdevents.cpp:2773
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2017 VBA-M development team"
 
-#: cmdevents.cpp:2766
+#: cmdevents.cpp:2774
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -825,35 +825,35 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3061
+#: cmdevents.cpp:3069
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "Η σύνδεση LAN είναι ήδη ενεργή. Απενεργοποιήστε τη λειτουργία σύνδεσης για να αποσυνδεθείτε."
 
-#: cmdevents.cpp:3067
+#: cmdevents.cpp:3075
 msgid "Network is not supported in local mode."
 msgstr "Το δίκτυο δεν υποστηρίζεται σε τοπική λειτουργία."
 
-#: opts.cpp:555 opts.cpp:860
+#: opts.cpp:560 opts.cpp:865
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "Μη έγκυρη τιμή %s για την επιλογή %s, οι έγκυρες τιμές είναι %s%s%s"
 
-#: opts.cpp:572 opts.cpp:872
+#: opts.cpp:577 opts.cpp:877
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Μη έγκυρη τιμή %d για την επιλογή %s, οι έγκυρες τιμές είναι %d - %d"
 
-#: opts.cpp:579 opts.cpp:588 opts.cpp:880 opts.cpp:888
+#: opts.cpp:584 opts.cpp:593 opts.cpp:885 opts.cpp:893
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Μη έγκυρη τιμή %f για την επιλογή %s. Οι έγκυρες τιμές είναι %f - %f"
 
-#: opts.cpp:648 opts.cpp:669 opts.cpp:957 opts.cpp:983
+#: opts.cpp:653 opts.cpp:674 opts.cpp:962 opts.cpp:988
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Μη έγκυρη αντιστοίχιση πλήκτρου %s για %s"
 
-#: opts.cpp:843
+#: opts.cpp:848
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Μη έγκυρη επιλογή σημαίας %s - %s αγνοήθηκε"
@@ -933,155 +933,155 @@ msgstr "Σφάλμα ανοίγματος ψευδο-tty: %s"
 msgid "Error setting up server socket (%d)"
 msgstr "Σφάλμα ρύθμισης θύρας διακομιστή (%d)"
 
-#: panel.cpp:90
+#: panel.cpp:95
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "Το %s δεν είναι έγκυρο αρχείο ROM"
 
-#: panel.cpp:91 panel.cpp:152 panel.cpp:215
+#: panel.cpp:96 panel.cpp:157 panel.cpp:222
 msgid "Problem loading file"
 msgstr "Πρόβλημα φόρτωσης αρχείου"
 
-#: panel.cpp:151
+#: panel.cpp:156
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Αδυναμία φόρτωσης Game Boy ROM %s"
 
-#: panel.cpp:191 panel.cpp:291
+#: panel.cpp:198 panel.cpp:298
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Αδυναμία φόρτωσης BIOS %s"
 
-#: panel.cpp:214
+#: panel.cpp:221
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Αδυναμία φόρτωσης Game Boy Advance ROM %s"
 
-#: panel.cpp:449
+#: panel.cpp:456
 msgid " player "
 msgstr "παίκτης"
 
-#: panel.cpp:614
+#: panel.cpp:621
 #, c-format
 msgid "Loaded state %s"
 msgstr "Φορτώθηκε η κατάσταση %s"
 
-#: panel.cpp:614
+#: panel.cpp:621
 #, c-format
 msgid "Error loading state %s"
 msgstr "Σφάλμα φόρτωσης κατάστασης %s"
 
-#: panel.cpp:638
+#: panel.cpp:645
 #, c-format
 msgid "Saved state %s"
 msgstr "Αποθηκεύτηκε η κατάσταση %s"
 
-#: panel.cpp:638
+#: panel.cpp:645
 #, c-format
 msgid "Error saving state %s"
 msgstr "Σφάλμα αποθήκευσης κατάστασης %s"
 
-#: panel.cpp:842
+#: panel.cpp:849
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "Η λειτουργία πλήρους οθόνης %dx%d-%d@%d δεν υποστηρίζεται, αναζήτηση για άλλη"
 
-#: panel.cpp:880
+#: panel.cpp:887
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "Η λειτουργία πλήρους οθόνης %dx%d-%d@%d δεν υποστηρίζεται"
 
-#: panel.cpp:885
+#: panel.cpp:892
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Έγκυρη λειτουργία: %dx%d-%d@%d"
 
-#: panel.cpp:893
+#: panel.cpp:900
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "Επιλέχθηκε η λειτουργία %dx%d-%d@%d"
 
-#: panel.cpp:897
+#: panel.cpp:904
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Αποτυχία αλλαγής λειτουργίας σε %dx%d-%d@%d"
 
-#: panel.cpp:981
+#: panel.cpp:988
 msgid "Not a valid GBA cartridge"
 msgstr "Μη έγκυρη κασέτα GBA"
 
-#: panel.cpp:1129
+#: panel.cpp:1146
 msgid "No memory for rewinding"
 msgstr "Ελλιπής μνήμη για επανάληψη"
 
-#: panel.cpp:1139
+#: panel.cpp:1156
 msgid "Error writing rewind state"
 msgstr "Σφάλμα εγγραφής κατάστασης επανάληψης"
 
-#: panel.cpp:2236
+#: panel.cpp:2253
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2245
+#: panel.cpp:2262
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:2254
+#: panel.cpp:2271
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:2261
+#: panel.cpp:2278
 msgid "No support for wglGetExtensionsString"
 msgstr ""
 
-#: panel.cpp:2263
+#: panel.cpp:2280
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:2272
+#: panel.cpp:2289
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2278
+#: panel.cpp:2295
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:2374
+#: panel.cpp:2391
 msgid "memory allocation error"
 msgstr "σφάλμα κατανομής μνήμης"
 
-#: panel.cpp:2377
+#: panel.cpp:2394
 msgid "error initializing codec"
 msgstr "σφάλμα αρχικοποίησης codec"
 
-#: panel.cpp:2380
+#: panel.cpp:2397
 msgid "error writing to output file"
 msgstr "σφάλμα εγγραφής σε αρχείο εξόδου"
 
-#: panel.cpp:2383
+#: panel.cpp:2400
 msgid "can't guess output format from file name"
 msgstr "αδυναμία υπόθεσης μορφής εξόδου από το όνομα αρχείου"
 
-#: panel.cpp:2388
+#: panel.cpp:2405
 msgid "programming error; aborting!"
 msgstr "προγραμματιστικό σφάλμα, τερματισμός!"
 
-#: panel.cpp:2400 panel.cpp:2429
+#: panel.cpp:2417 panel.cpp:2446
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Αδυναμία έναρξης εγγραφής σε %s (%s)"
 
-#: panel.cpp:2457
+#: panel.cpp:2474
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Σφάλμα στην εγγραφή ήχου/βίντεο (%s), τερματισμός"
 
-#: panel.cpp:2463
+#: panel.cpp:2480
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Σφάλμα στην εγγραφή ήχου (%s), τερματισμός"
 
-#: panel.cpp:2473
+#: panel.cpp:2490
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Σφάλμα στην εγγραφή βίντεο (%s), τερματισμός"
@@ -3244,175 +3244,179 @@ msgstr "Φάκελοι ..."
 msgid "&Key Shortcuts ..."
 msgstr "Συντομεύσεις πλήκτρων ..."
 
-#: xrc/MainMenu.xrc:566
+#: xrc/MainMenu.xrc:565
+msgid "&UI Settings ..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:569
 msgid "&Tools"
 msgstr "Εργαλεία"
 
-#: xrc/MainMenu.xrc:568
+#: xrc/MainMenu.xrc:571
 msgid "&Cheats"
 msgstr "Κωδικοί"
 
-#: xrc/MainMenu.xrc:570
+#: xrc/MainMenu.xrc:573
 msgid "List &cheats ..."
 msgstr "Λίστα κωδικών ..."
 
-#: xrc/MainMenu.xrc:573
+#: xrc/MainMenu.xrc:576
 msgid "Find c&heat ..."
 msgstr "Εύρεση κωδικού ..."
 
-#: xrc/MainMenu.xrc:577
+#: xrc/MainMenu.xrc:580
 msgid "A&utomatically save/load cheats"
 msgstr "Αυτόματη αποθήκευση/φόρτωση κωδικών"
 
-#: xrc/MainMenu.xrc:581
+#: xrc/MainMenu.xrc:584
 msgid "&Enable cheats"
 msgstr "Ενεργοποίηση κωδικών"
 
-#: xrc/MainMenu.xrc:588
+#: xrc/MainMenu.xrc:591
 msgid "&Break into GDB"
 msgstr "Διακοπή και χρήση GDB"
 
-#: xrc/MainMenu.xrc:592
+#: xrc/MainMenu.xrc:595
 msgid "&Configure port..."
 msgstr "Ρύθμιση θύρας..."
 
-#: xrc/MainMenu.xrc:595
+#: xrc/MainMenu.xrc:598
 msgid "&Break on load"
 msgstr "Διακοπή στην εκκίνηση"
 
-#: xrc/MainMenu.xrc:600
+#: xrc/MainMenu.xrc:603
 msgid "&Disconnect"
 msgstr "Αποσύνδεση"
 
-#: xrc/MainMenu.xrc:602
+#: xrc/MainMenu.xrc:605
 msgid "&GDB"
 msgstr "&GDB"
 
-#: xrc/MainMenu.xrc:605
+#: xrc/MainMenu.xrc:608
 msgid "&Disassemble..."
 msgstr "Αποσυναρμολόγηση..."
 
-#: xrc/MainMenu.xrc:608
+#: xrc/MainMenu.xrc:611
 msgid "&Logging..."
 msgstr "Καταγραφή..."
 
-#: xrc/MainMenu.xrc:611
+#: xrc/MainMenu.xrc:614
 msgid "&IO Viewer..."
 msgstr "Προβολή &IO..."
 
-#: xrc/MainMenu.xrc:614
+#: xrc/MainMenu.xrc:617
 msgid "&Map Viewer..."
 msgstr "Προβολή &Map..."
 
-#: xrc/MainMenu.xrc:617
+#: xrc/MainMenu.xrc:620
 msgid "M&emory Viewer..."
 msgstr "Προβολή μνήμης..."
 
-#: xrc/MainMenu.xrc:620
+#: xrc/MainMenu.xrc:623
 msgid "&OAM Viewer..."
 msgstr "Προβολή &OAM..."
 
-#: xrc/MainMenu.xrc:623
+#: xrc/MainMenu.xrc:626
 msgid "&Palette Viewer..."
 msgstr "Προβολή παλέτας..."
 
-#: xrc/MainMenu.xrc:626
+#: xrc/MainMenu.xrc:629
 msgid "&Tile Viewer..."
 msgstr "Προβολή πλακιδίων..."
 
-#: xrc/MainMenu.xrc:631
+#: xrc/MainMenu.xrc:634
 msgid "Show all video layers"
 msgstr ""
 
-#: xrc/MainMenu.xrc:635
+#: xrc/MainMenu.xrc:638
 msgid "BG &0"
 msgstr "BG &0"
 
-#: xrc/MainMenu.xrc:640
+#: xrc/MainMenu.xrc:643
 msgid "BG &1"
 msgstr "BG &1"
 
-#: xrc/MainMenu.xrc:645
+#: xrc/MainMenu.xrc:648
 msgid "BG &2"
 msgstr "BG &2"
 
-#: xrc/MainMenu.xrc:650
+#: xrc/MainMenu.xrc:653
 msgid "BG &3"
 msgstr "BG &3"
 
-#: xrc/MainMenu.xrc:655
+#: xrc/MainMenu.xrc:658
 msgid "&OBJ"
 msgstr "&OBJ"
 
-#: xrc/MainMenu.xrc:660
+#: xrc/MainMenu.xrc:663
 msgid "&WIN 0"
 msgstr "&WIN 0"
 
-#: xrc/MainMenu.xrc:665
+#: xrc/MainMenu.xrc:668
 msgid "W&IN 1"
 msgstr "W&IN 1"
 
-#: xrc/MainMenu.xrc:670
+#: xrc/MainMenu.xrc:673
 msgid "O&BJ WIN"
 msgstr "O&BJ WIN"
 
-#: xrc/MainMenu.xrc:674
+#: xrc/MainMenu.xrc:677
 msgid "&View Layers"
 msgstr "Προβολή επιπέδων"
 
-#: xrc/MainMenu.xrc:678
+#: xrc/MainMenu.xrc:681
 msgid "Channel &1"
 msgstr "Κανάλι &1"
 
-#: xrc/MainMenu.xrc:683
+#: xrc/MainMenu.xrc:686
 msgid "Channel &2"
 msgstr "Κανάλι &2"
 
-#: xrc/MainMenu.xrc:688
+#: xrc/MainMenu.xrc:691
 msgid "Channel &3"
 msgstr "Κανάλι &3"
 
-#: xrc/MainMenu.xrc:693
+#: xrc/MainMenu.xrc:696
 msgid "Channel &4"
 msgstr "Κανάλι &4"
 
-#: xrc/MainMenu.xrc:698
+#: xrc/MainMenu.xrc:701
 msgid "Direct Sound &A"
 msgstr "Άμεσος ήχος &A"
 
-#: xrc/MainMenu.xrc:703
+#: xrc/MainMenu.xrc:706
 msgid "Direct Sound &B"
 msgstr "Άμεσος ήχος &B"
 
-#: xrc/MainMenu.xrc:707
+#: xrc/MainMenu.xrc:710
 msgid "&Sound Channels"
 msgstr "Κανάλια ήχου"
 
-#: xrc/MainMenu.xrc:711
+#: xrc/MainMenu.xrc:714
 msgid "&Help"
 msgstr "Βοήθεια"
 
-#: xrc/MainMenu.xrc:713
+#: xrc/MainMenu.xrc:716
 msgid "Report &Bugs"
 msgstr "Αναφορά σφαλμάτων"
 
-#: xrc/MainMenu.xrc:716
+#: xrc/MainMenu.xrc:719
 msgid "VBA-M Support &Forum"
 msgstr "Φόρουμ υποστήριξης VBA-M"
 
-#: xrc/MainMenu.xrc:719
+#: xrc/MainMenu.xrc:722
 msgid "Translations"
 msgstr "Μεταφράσεις"
 
-#: xrc/MainMenu.xrc:727
+#: xrc/MainMenu.xrc:730
 msgid "Check for updates"
 msgstr ""
 
-#: xrc/MainMenu.xrc:730
+#: xrc/MainMenu.xrc:733
 msgid "&Factory Reset..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:734
+#: xrc/MainMenu.xrc:737
 msgid "&About..."
 msgstr ""
 
@@ -3694,4 +3698,12 @@ msgstr ""
 
 #: xrc/SpeedupConfig.xrc:84
 msgid "Frame skip"
+msgstr ""
+
+#: xrc/UIConfig.xrc:4
+msgid "User Interface Settings"
+msgstr ""
+
+#: xrc/UIConfig.xrc:9
+msgid "Hide Menu Bar"
 msgstr ""

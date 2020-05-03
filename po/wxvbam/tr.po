@@ -13,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-12 00:19+0000\n"
-"PO-Revision-Date: 2020-04-19 22:38+0000\n"
-"Last-Translator: abc Def <hdogan1974@gmail.com>\n"
+"POT-Creation-Date: 2020-04-27 20:23+0000\n"
+"PO-Revision-Date: 2020-05-02 13:17+0000\n"
+"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: Turkish (http://www.transifex.com/bgk/vba-m/language/tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -157,7 +157,7 @@ msgstr "Hile dosyası seçin"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA hile listesi uzantıları (*.clt)|*.clt|CHT hile listeleri (*.cht)|*.cht"
 
-#: guiinit.cpp:256 panel.cpp:417
+#: guiinit.cpp:256 panel.cpp:424
 msgid "Loaded cheats"
 msgstr "Hileleri yükle"
 
@@ -310,40 +310,40 @@ msgstr "Menu hızlandırıcısını kopyala:%siçin%sve%s; İlk seçenek tutulur
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Menü hızlandırıcı %siçin%svarsayılanı %siçin geçersiz kılar; Menü tutulur"
 
-#: guiinit.cpp:2998
+#: guiinit.cpp:3006
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Geçersiz menü ögesi %s; siliniyor"
 
-#: guiinit.cpp:3206
+#: guiinit.cpp:3214
 msgid "Code"
 msgstr "Kod"
 
-#: guiinit.cpp:3215
+#: guiinit.cpp:3223
 msgid "Description"
 msgstr "Açıklama"
 
-#: guiinit.cpp:3289 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3297 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Adres"
 
-#: guiinit.cpp:3290
+#: guiinit.cpp:3298
 msgid "Old Value"
 msgstr "Eski Değer"
 
-#: guiinit.cpp:3291
+#: guiinit.cpp:3299
 msgid "New Value"
 msgstr "Yeni Değer"
 
-#: guiinit.cpp:3799
+#: guiinit.cpp:3811
 msgid "Menu commands"
 msgstr "Menü komutları"
 
-#: guiinit.cpp:3822
+#: guiinit.cpp:3834
 msgid "Other commands"
 msgstr "Diğer komutlar"
 
-#: guiinit.cpp:3933
+#: guiinit.cpp:3945
 msgid "JoyBus host invalid; disabling"
 msgstr "JoyBus sunucusu geçersiz; kapatılıyor"
 
@@ -610,7 +610,7 @@ msgstr "Pil dosyası içe aktarmak oyun savelerinizi siler(geri dönüşü yok!)
 msgid "Confirm import"
 msgstr "Almayı onayla"
 
-#: cmdevents.cpp:907 panel.cpp:360
+#: cmdevents.cpp:907 panel.cpp:367
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Pil dosyası yüklendi %s"
@@ -693,7 +693,7 @@ msgstr "Snapshot yüklenirken hata oluştu %s"
 msgid "Wrote battery %s"
 msgstr "Pil yazıldı %s"
 
-#: cmdevents.cpp:1100 panel.cpp:666
+#: cmdevents.cpp:1100 panel.cpp:673
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Pil yazımında hata %s"
@@ -789,32 +789,32 @@ msgstr "Şu port bağlantı için beklemede %d"
 msgid "Waiting for GDB..."
 msgstr "GDB bekleniyor..."
 
-#: cmdevents.cpp:2618
+#: cmdevents.cpp:2626
 #, c-format
 msgid "Using pixel filter #%d"
 msgstr ""
 
-#: cmdevents.cpp:2633
+#: cmdevents.cpp:2641
 #, c-format
 msgid "Using interframe blending #%d"
 msgstr ""
 
-#: cmdevents.cpp:2672 panel.cpp:176 panel.cpp:277
+#: cmdevents.cpp:2680 panel.cpp:181 panel.cpp:284
 msgid "Could not initialize the sound driver!"
 msgstr ""
 
-#: cmdevents.cpp:2764
+#: cmdevents.cpp:2772
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Nintendo GameBoy (+Color+Advance) emülatörü."
 
-#: cmdevents.cpp:2765
+#: cmdevents.cpp:2773
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Telif hakkı (C) 1999-2003 Forgotten\nTelif hakkı (C) 2004-2006 VBA geliştirme/yazılım takımı\nTelif Hakkı (C) 2007-2017 VBA-M geliştirme/yazılım takımı"
 
-#: cmdevents.cpp:2766
+#: cmdevents.cpp:2774
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -830,35 +830,35 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Bu ücretsiz bir programdır:Free Software Foundation'ın yayımladığı GNU General Public lisansına uygun olarak paylaşılabilir üzerinde değişiklikler yapılabilir (lisansın 2. versiyonu yada sonrasında çıkan versiyonu, sizin tercihinizdir.)\n\nBu program işe yaraması amacı ile yazılmıştır, ancak HİÇBİR GARANTİ içermez; ima edilen TİCARETE UYGUNLUK garantisi yada BELLİ BİR AMACA UYGUNLUK garantisi bile içermez. Daha fazla bilgi için GNU General Public Lisansını inceleyiniz.\n\nBu programın içinde GNU General Public lisansının bir kopyasının da bulunması gerekir. Eğer bu kopya programdan çıkmadıysa, http://www.gnu.org/licenses sitesinden Lisansa ulaşabilirsiniz."
 
-#: cmdevents.cpp:3061
+#: cmdevents.cpp:3069
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LAN link modu aktif. Bağlantıyı kesmek için Link modunu kapatınız."
 
-#: cmdevents.cpp:3067
+#: cmdevents.cpp:3075
 msgid "Network is not supported in local mode."
 msgstr "Local modda ağ desteği yoktur."
 
-#: opts.cpp:555 opts.cpp:860
+#: opts.cpp:560 opts.cpp:865
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "%sayar için geçersiz değer %s; Geçerli değerler %s%s%s"
 
-#: opts.cpp:572 opts.cpp:872
+#: opts.cpp:577 opts.cpp:877
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "seçenek %siçin geçersiz değer %d; Geçerli değerler %d-%d"
 
-#: opts.cpp:579 opts.cpp:588 opts.cpp:880 opts.cpp:888
+#: opts.cpp:584 opts.cpp:593 opts.cpp:885 opts.cpp:893
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Seçenek %siçin geçersiz değer %f; Geçerli değerler %f-%f"
 
-#: opts.cpp:648 opts.cpp:669 opts.cpp:957 opts.cpp:983
+#: opts.cpp:653 opts.cpp:674 opts.cpp:962 opts.cpp:988
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "%siçin%sgeçersiz tuş bağlantısı"
 
-#: opts.cpp:843
+#: opts.cpp:848
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Geçersiz bayrak seçeneği%s-%sgörmezden geliniyor"
@@ -938,155 +938,155 @@ msgstr "pseudo tty:%saçılırken hata oluştu"
 msgid "Error setting up server socket (%d)"
 msgstr "Sunucu soketi hazırlanırken hata oluştu (%d)"
 
-#: panel.cpp:90
+#: panel.cpp:95
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%sbir ROM dosyası değil."
 
-#: panel.cpp:91 panel.cpp:152 panel.cpp:215
+#: panel.cpp:96 panel.cpp:157 panel.cpp:222
 msgid "Problem loading file"
 msgstr "Dosya yüklenirken hata"
 
-#: panel.cpp:151
+#: panel.cpp:156
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Game Boy ROM'u %s yüklenemiyor"
 
-#: panel.cpp:191 panel.cpp:291
+#: panel.cpp:198 panel.cpp:298
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "BIOS yüklenemedi %s"
 
-#: panel.cpp:214
+#: panel.cpp:221
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Game Boy Advance ROM'u %syüklenemiyor"
 
-#: panel.cpp:449
+#: panel.cpp:456
 msgid " player "
 msgstr "oyuncu"
 
-#: panel.cpp:614
+#: panel.cpp:621
 #, c-format
 msgid "Loaded state %s"
 msgstr "%s Durum kaydı yüklendi"
 
-#: panel.cpp:614
+#: panel.cpp:621
 #, c-format
 msgid "Error loading state %s"
 msgstr "%s durum kaydı yüklenirken hata oluştu"
 
-#: panel.cpp:638
+#: panel.cpp:645
 #, c-format
 msgid "Saved state %s"
 msgstr "%s Durum kaydı alındı"
 
-#: panel.cpp:638
+#: panel.cpp:645
 #, c-format
 msgid "Error saving state %s"
 msgstr "%sdurum kaydı alınamadı"
 
-#: panel.cpp:842
+#: panel.cpp:849
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "%dx%d-%d@%dçözünürlüğünde tam ekran modu desteklenmiyor; başka çözünürlük aranıyor"
 
-#: panel.cpp:880
+#: panel.cpp:887
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "%dx%d-%d@%d çözünürlüğünde Tam ekran modu desteklenmiyor"
 
-#: panel.cpp:885
+#: panel.cpp:892
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Geçerli çözünürlük: %dx%d-%d@%d"
 
-#: panel.cpp:893
+#: panel.cpp:900
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "%dx%d-%d@%d çözünürlüğünü seç"
 
-#: panel.cpp:897
+#: panel.cpp:904
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "çözünürlük %dx%d-%d@%d'e geçirilemedi"
 
-#: panel.cpp:981
+#: panel.cpp:988
 msgid "Not a valid GBA cartridge"
 msgstr "Geçerli bir GBA kartuşu değil"
 
-#: panel.cpp:1129
+#: panel.cpp:1146
 msgid "No memory for rewinding"
 msgstr "Geri sarma özelliği için yaterli hafıza yok"
 
-#: panel.cpp:1139
+#: panel.cpp:1156
 msgid "Error writing rewind state"
 msgstr "Geri sarma durumu yazılırken hata oluştu"
 
-#: panel.cpp:2236
+#: panel.cpp:2253
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2245
+#: panel.cpp:2262
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:2254
+#: panel.cpp:2271
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:2261
+#: panel.cpp:2278
 msgid "No support for wglGetExtensionsString"
 msgstr ""
 
-#: panel.cpp:2263
+#: panel.cpp:2280
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:2272
+#: panel.cpp:2289
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2278
+#: panel.cpp:2295
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:2374
+#: panel.cpp:2391
 msgid "memory allocation error"
 msgstr "Hafıza atama hatası"
 
-#: panel.cpp:2377
+#: panel.cpp:2394
 msgid "error initializing codec"
 msgstr "Codec başlatılırken hata"
 
-#: panel.cpp:2380
+#: panel.cpp:2397
 msgid "error writing to output file"
 msgstr "Çıktı dosyası yazılırken hata"
 
-#: panel.cpp:2383
+#: panel.cpp:2400
 msgid "can't guess output format from file name"
 msgstr "Çıktı formatı, dosya isminden anlaşılamıyor"
 
-#: panel.cpp:2388
+#: panel.cpp:2405
 msgid "programming error; aborting!"
 msgstr "Programlama hatası; İşlem durduruluyor!"
 
-#: panel.cpp:2400 panel.cpp:2429
+#: panel.cpp:2417 panel.cpp:2446
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "%s(%s) buraya görüntü kaydı başlatılamıyor"
 
-#: panel.cpp:2457
+#: panel.cpp:2474
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Ses ve görüntü kaydında hata (%s); İşlem durduruluyor"
 
-#: panel.cpp:2463
+#: panel.cpp:2480
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Ses kaydı hatası (%s); İptal ediliyor"
 
-#: panel.cpp:2473
+#: panel.cpp:2490
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Video kaydı hatası (%s); İptal ediliyor"
@@ -3249,175 +3249,179 @@ msgstr "K&lasörler..."
 msgid "&Key Shortcuts ..."
 msgstr "&Tuş kısayolları"
 
-#: xrc/MainMenu.xrc:566
+#: xrc/MainMenu.xrc:565
+msgid "&UI Settings ..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:569
 msgid "&Tools"
 msgstr "&Araçlar"
 
-#: xrc/MainMenu.xrc:568
+#: xrc/MainMenu.xrc:571
 msgid "&Cheats"
 msgstr "&Hileler"
 
-#: xrc/MainMenu.xrc:570
+#: xrc/MainMenu.xrc:573
 msgid "List &cheats ..."
 msgstr "&Hileleri listele..."
 
-#: xrc/MainMenu.xrc:573
+#: xrc/MainMenu.xrc:576
 msgid "Find c&heat ..."
 msgstr "H&ile bul..."
 
-#: xrc/MainMenu.xrc:577
+#: xrc/MainMenu.xrc:580
 msgid "A&utomatically save/load cheats"
 msgstr "Hilelerei o&tomatik olarak yükle ve kaydet"
 
-#: xrc/MainMenu.xrc:581
+#: xrc/MainMenu.xrc:584
 msgid "&Enable cheats"
 msgstr "&Hileleri aktif et"
 
-#: xrc/MainMenu.xrc:588
+#: xrc/MainMenu.xrc:591
 msgid "&Break into GDB"
 msgstr "&GDB'ye gir"
 
-#: xrc/MainMenu.xrc:592
+#: xrc/MainMenu.xrc:595
 msgid "&Configure port..."
 msgstr "Port &ayarla..."
 
-#: xrc/MainMenu.xrc:595
+#: xrc/MainMenu.xrc:598
 msgid "&Break on load"
 msgstr "&Yüklendiğinde durdur"
 
-#: xrc/MainMenu.xrc:600
+#: xrc/MainMenu.xrc:603
 msgid "&Disconnect"
 msgstr "&Bağlantıyı kes"
 
-#: xrc/MainMenu.xrc:602
+#: xrc/MainMenu.xrc:605
 msgid "&GDB"
 msgstr "&GDB"
 
-#: xrc/MainMenu.xrc:605
+#: xrc/MainMenu.xrc:608
 msgid "&Disassemble..."
 msgstr "&Parçala/kaynak kodu al..."
 
-#: xrc/MainMenu.xrc:608
+#: xrc/MainMenu.xrc:611
 msgid "&Logging..."
 msgstr "&Günlük tutuluyor..."
 
-#: xrc/MainMenu.xrc:611
+#: xrc/MainMenu.xrc:614
 msgid "&IO Viewer..."
 msgstr "&G/Ç izleyici..."
 
-#: xrc/MainMenu.xrc:614
+#: xrc/MainMenu.xrc:617
 msgid "&Map Viewer..."
 msgstr "&Harita izleyici..."
 
-#: xrc/MainMenu.xrc:617
+#: xrc/MainMenu.xrc:620
 msgid "M&emory Viewer..."
 msgstr "H&afıza izleyici..."
 
-#: xrc/MainMenu.xrc:620
+#: xrc/MainMenu.xrc:623
 msgid "&OAM Viewer..."
 msgstr "&OAM izleyici..."
 
-#: xrc/MainMenu.xrc:623
+#: xrc/MainMenu.xrc:626
 msgid "&Palette Viewer..."
 msgstr "&Palet izleyici..."
 
-#: xrc/MainMenu.xrc:626
+#: xrc/MainMenu.xrc:629
 msgid "&Tile Viewer..."
 msgstr "&Desen izleyici..."
 
-#: xrc/MainMenu.xrc:631
+#: xrc/MainMenu.xrc:634
 msgid "Show all video layers"
 msgstr ""
 
-#: xrc/MainMenu.xrc:635
+#: xrc/MainMenu.xrc:638
 msgid "BG &0"
 msgstr "Arka Plan &0"
 
-#: xrc/MainMenu.xrc:640
+#: xrc/MainMenu.xrc:643
 msgid "BG &1"
 msgstr "Arka Plan &1"
 
-#: xrc/MainMenu.xrc:645
+#: xrc/MainMenu.xrc:648
 msgid "BG &2"
 msgstr "Arka Plan &2"
 
-#: xrc/MainMenu.xrc:650
+#: xrc/MainMenu.xrc:653
 msgid "BG &3"
 msgstr "Arka Plan &3"
 
-#: xrc/MainMenu.xrc:655
+#: xrc/MainMenu.xrc:658
 msgid "&OBJ"
 msgstr "&Nesne"
 
-#: xrc/MainMenu.xrc:660
+#: xrc/MainMenu.xrc:663
 msgid "&WIN 0"
 msgstr "&Ön Plan 0"
 
-#: xrc/MainMenu.xrc:665
+#: xrc/MainMenu.xrc:668
 msgid "W&IN 1"
 msgstr "W&IN 1"
 
-#: xrc/MainMenu.xrc:670
+#: xrc/MainMenu.xrc:673
 msgid "O&BJ WIN"
 msgstr "O&BJ WIN"
 
-#: xrc/MainMenu.xrc:674
+#: xrc/MainMenu.xrc:677
 msgid "&View Layers"
 msgstr "&Katmanları gör"
 
-#: xrc/MainMenu.xrc:678
+#: xrc/MainMenu.xrc:681
 msgid "Channel &1"
 msgstr "Kanal &1"
 
-#: xrc/MainMenu.xrc:683
+#: xrc/MainMenu.xrc:686
 msgid "Channel &2"
 msgstr "Kanal &2"
 
-#: xrc/MainMenu.xrc:688
+#: xrc/MainMenu.xrc:691
 msgid "Channel &3"
 msgstr "Kanal &3"
 
-#: xrc/MainMenu.xrc:693
+#: xrc/MainMenu.xrc:696
 msgid "Channel &4"
 msgstr "Kanal &4"
 
-#: xrc/MainMenu.xrc:698
+#: xrc/MainMenu.xrc:701
 msgid "Direct Sound &A"
 msgstr "Direct Sound &A"
 
-#: xrc/MainMenu.xrc:703
+#: xrc/MainMenu.xrc:706
 msgid "Direct Sound &B"
 msgstr "Direct Sound &B"
 
-#: xrc/MainMenu.xrc:707
+#: xrc/MainMenu.xrc:710
 msgid "&Sound Channels"
 msgstr "&Ses kanalları"
 
-#: xrc/MainMenu.xrc:711
+#: xrc/MainMenu.xrc:714
 msgid "&Help"
 msgstr "Yardım"
 
-#: xrc/MainMenu.xrc:713
+#: xrc/MainMenu.xrc:716
 msgid "Report &Bugs"
 msgstr "Hata Bildirme"
 
-#: xrc/MainMenu.xrc:716
+#: xrc/MainMenu.xrc:719
 msgid "VBA-M Support &Forum"
 msgstr "VBA-M Destek Hattı"
 
-#: xrc/MainMenu.xrc:719
+#: xrc/MainMenu.xrc:722
 msgid "Translations"
 msgstr "Çeviriler"
 
-#: xrc/MainMenu.xrc:727
+#: xrc/MainMenu.xrc:730
 msgid "Check for updates"
 msgstr ""
 
-#: xrc/MainMenu.xrc:730
+#: xrc/MainMenu.xrc:733
 msgid "&Factory Reset..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:734
+#: xrc/MainMenu.xrc:737
 msgid "&About..."
 msgstr ""
 
@@ -3699,4 +3703,12 @@ msgstr ""
 
 #: xrc/SpeedupConfig.xrc:84
 msgid "Frame skip"
+msgstr ""
+
+#: xrc/UIConfig.xrc:4
+msgid "User Interface Settings"
+msgstr ""
+
+#: xrc/UIConfig.xrc:9
+msgid "Hide Menu Bar"
 msgstr ""

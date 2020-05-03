@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-12 00:19+0000\n"
-"PO-Revision-Date: 2020-04-12 00:20+0000\n"
+"POT-Creation-Date: 2020-04-27 20:23+0000\n"
+"PO-Revision-Date: 2020-05-02 13:17+0000\n"
 "Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: Italian (Italy) (http://www.transifex.com/bgk/vba-m/language/it_IT/)\n"
 "MIME-Version: 1.0\n"
@@ -161,7 +161,7 @@ msgstr "Seleziona il file dei trucchi"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Liste trucchi VBA (*.clt)|*.clt|Liste trucchi CHT (*.cht)|*.cht"
 
-#: guiinit.cpp:256 panel.cpp:417
+#: guiinit.cpp:256 panel.cpp:424
 msgid "Loaded cheats"
 msgstr "Trucchi caricati"
 
@@ -314,40 +314,40 @@ msgstr "Acceleratore del menu doppione: %s per %s e %s; tengo il primo"
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Acceleratore del menu %s per %s sovrascrive quello di base per %s ; mantengo il menu"
 
-#: guiinit.cpp:2998
+#: guiinit.cpp:3006
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Oggetto menu invalido %s; lo rimuovo"
 
-#: guiinit.cpp:3206
+#: guiinit.cpp:3214
 msgid "Code"
 msgstr "Codice"
 
-#: guiinit.cpp:3215
+#: guiinit.cpp:3223
 msgid "Description"
 msgstr "Descrizione"
 
-#: guiinit.cpp:3289 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3297 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Indirizzo"
 
-#: guiinit.cpp:3290
+#: guiinit.cpp:3298
 msgid "Old Value"
 msgstr "Vecchio valore"
 
-#: guiinit.cpp:3291
+#: guiinit.cpp:3299
 msgid "New Value"
 msgstr "Nuovo valore"
 
-#: guiinit.cpp:3799
+#: guiinit.cpp:3811
 msgid "Menu commands"
 msgstr "Menu comandi"
 
-#: guiinit.cpp:3822
+#: guiinit.cpp:3834
 msgid "Other commands"
 msgstr "Altri comandi"
 
-#: guiinit.cpp:3933
+#: guiinit.cpp:3945
 msgid "JoyBus host invalid; disabling"
 msgstr "Host JoyBus invalido; lo disabilito"
 
@@ -614,7 +614,7 @@ msgstr "Importare un file battery cancellerà qualsiasi gioco salvato (permanent
 msgid "Confirm import"
 msgstr "Conferma importazione"
 
-#: cmdevents.cpp:907 panel.cpp:360
+#: cmdevents.cpp:907 panel.cpp:367
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Batteria %s caricata"
@@ -697,7 +697,7 @@ msgstr "Errore nel caricare la snapshot %s"
 msgid "Wrote battery %s"
 msgstr "Batteria scritta %s"
 
-#: cmdevents.cpp:1100 panel.cpp:666
+#: cmdevents.cpp:1100 panel.cpp:673
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Errore nello scrivere la batteria %s"
@@ -793,32 +793,32 @@ msgstr "Aspetto la connessione sulla porta %d"
 msgid "Waiting for GDB..."
 msgstr "Aspettando il GDB..."
 
-#: cmdevents.cpp:2618
+#: cmdevents.cpp:2626
 #, c-format
 msgid "Using pixel filter #%d"
 msgstr "Filtro pixel in uso: #%d"
 
-#: cmdevents.cpp:2633
+#: cmdevents.cpp:2641
 #, c-format
 msgid "Using interframe blending #%d"
 msgstr "Interframe blending in uso: #%d"
 
-#: cmdevents.cpp:2672 panel.cpp:176 panel.cpp:277
+#: cmdevents.cpp:2680 panel.cpp:181 panel.cpp:284
 msgid "Could not initialize the sound driver!"
 msgstr "Impossibile far partire il driver per i suoni!"
 
-#: cmdevents.cpp:2764
+#: cmdevents.cpp:2772
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Nintendo GameBoy (+Color+Advance) emulator."
 
-#: cmdevents.cpp:2765
+#: cmdevents.cpp:2773
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2017 VBA-M development team"
 
-#: cmdevents.cpp:2766
+#: cmdevents.cpp:2774
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -834,35 +834,35 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Questo programma è un software gratuito: puoi ridistribuirlo e/o modificarlo\nrispettando i termini della GNU General Public License pubblicata dalla\nFree Software Foundation, sia la versione due della licenza, o\n(a tua scelta) una qualunque versione successiva.\n\nQuesto programma è distribuito nella speranza che sia utile,\nma SENZA ALCUNA GARANZIA; senza neppure la garanzia di\nCOMMERCIABILITÀ o IDONEITÀ PER FINALITÀ PARTICOLARI.\nConsulta la GNU General Public License per maggiori dettagli.\n\nDovresti aver ricevuto una copia della GNU General Public License\nassieme a questo programma. Altrimenti, consulta http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3061
+#: cmdevents.cpp:3069
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "Il collegamento LAN è già attivo. Disabilitare la modalità link per disconnetterlo."
 
-#: cmdevents.cpp:3067
+#: cmdevents.cpp:3075
 msgid "Network is not supported in local mode."
 msgstr "La rete non è supportata in modalità locale."
 
-#: opts.cpp:555 opts.cpp:860
+#: opts.cpp:560 opts.cpp:865
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "Valore non valido %s per l'opzione %s; i valori validi sono %s%s%s"
 
-#: opts.cpp:572 opts.cpp:872
+#: opts.cpp:577 opts.cpp:877
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Valore non valido %d per l'opzione %s; I valori validi sono %d - %d"
 
-#: opts.cpp:579 opts.cpp:588 opts.cpp:880 opts.cpp:888
+#: opts.cpp:584 opts.cpp:593 opts.cpp:885 opts.cpp:893
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Valore %f per l'opzione %s; i valori validi sono %f - %f"
 
-#: opts.cpp:648 opts.cpp:669 opts.cpp:957 opts.cpp:983
+#: opts.cpp:653 opts.cpp:674 opts.cpp:962 opts.cpp:988
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Tasto obbligatorio non valido %s per %s"
 
-#: opts.cpp:843
+#: opts.cpp:848
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Opzione scelta non valida %s - %s ignorata"
@@ -942,155 +942,155 @@ msgstr "l'apertura di pseudo tty Errore: %s"
 msgid "Error setting up server socket (%d)"
 msgstr "errore di impostazione del socket server (%d)"
 
-#: panel.cpp:90
+#: panel.cpp:95
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s non è una ROM valida"
 
-#: panel.cpp:91 panel.cpp:152 panel.cpp:215
+#: panel.cpp:96 panel.cpp:157 panel.cpp:222
 msgid "Problem loading file"
 msgstr "Problema nel caricare il file"
 
-#: panel.cpp:151
+#: panel.cpp:156
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Impossibile caricare la Game Boy ROM %s"
 
-#: panel.cpp:191 panel.cpp:291
+#: panel.cpp:198 panel.cpp:298
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Non posso caricare il BIOS %s"
 
-#: panel.cpp:214
+#: panel.cpp:221
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Non posso caricare la Game Boy Advance ROM %s"
 
-#: panel.cpp:449
+#: panel.cpp:456
 msgid " player "
 msgstr "giocatore"
 
-#: panel.cpp:614
+#: panel.cpp:621
 #, c-format
 msgid "Loaded state %s"
 msgstr "Caricare lo stato %s"
 
-#: panel.cpp:614
+#: panel.cpp:621
 #, c-format
 msgid "Error loading state %s"
 msgstr "Errore nel caricare lo stato %s"
 
-#: panel.cpp:638
+#: panel.cpp:645
 #, c-format
 msgid "Saved state %s"
 msgstr "Stato salvato %s"
 
-#: panel.cpp:638
+#: panel.cpp:645
 #, c-format
 msgid "Error saving state %s"
 msgstr "Errore nel salvare lo stato %s"
 
-#: panel.cpp:842
+#: panel.cpp:849
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "Modalità schermo intero %dx%d-%d@%d non supportata; guardo per un'altra"
 
-#: panel.cpp:880
+#: panel.cpp:887
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "Modalità schermo intero %dx%d-%d@%d  non supportata"
 
-#: panel.cpp:885
+#: panel.cpp:892
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Modalità valida: %dx%d-%d@%d "
 
-#: panel.cpp:893
+#: panel.cpp:900
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "Modalità scelta %dx%d-%d@%d "
 
-#: panel.cpp:897
+#: panel.cpp:904
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Ho fallito nel cambiate modalità da %dx%d-%d@%d "
 
-#: panel.cpp:981
+#: panel.cpp:988
 msgid "Not a valid GBA cartridge"
 msgstr "Non è una cartuccia GBA valida"
 
-#: panel.cpp:1129
+#: panel.cpp:1146
 msgid "No memory for rewinding"
 msgstr "Non c'è un salvataggio da caricare"
 
-#: panel.cpp:1139
+#: panel.cpp:1156
 msgid "Error writing rewind state"
 msgstr "Errore nel salvare lo stato"
 
-#: panel.cpp:2236
+#: panel.cpp:2253
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Assegnazione glXSwapIntervalEXT fallita"
 
-#: panel.cpp:2245
+#: panel.cpp:2262
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Assegnazione glXSwapIntervalSGI fallita"
 
-#: panel.cpp:2254
+#: panel.cpp:2271
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Assegnazione glXSwapIntervalMESA fallita"
 
-#: panel.cpp:2261
+#: panel.cpp:2278
 msgid "No support for wglGetExtensionsString"
 msgstr "wglGetExtensionsString non supportato"
 
-#: panel.cpp:2263
+#: panel.cpp:2280
 msgid "No support for WGL_EXT_swap_control"
 msgstr "WGL_EXT_swap_control non supportato"
 
-#: panel.cpp:2272
+#: panel.cpp:2289
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Assegnazione wglSwapIntervalEXT fallita"
 
-#: panel.cpp:2278
+#: panel.cpp:2295
 msgid "No VSYNC available on this platform"
 msgstr "V-Sync non disponibile su questa piattaforma"
 
-#: panel.cpp:2374
+#: panel.cpp:2391
 msgid "memory allocation error"
 msgstr "Errore nell'allocazione della memoria"
 
-#: panel.cpp:2377
+#: panel.cpp:2394
 msgid "error initializing codec"
 msgstr "errore nell'inizializzazione del codec"
 
-#: panel.cpp:2380
+#: panel.cpp:2397
 msgid "error writing to output file"
 msgstr "errore nella scrittura del file di destinazione"
 
-#: panel.cpp:2383
+#: panel.cpp:2400
 msgid "can't guess output format from file name"
 msgstr "non posso indovinare il formato di destinazione dal nome del file"
 
-#: panel.cpp:2388
+#: panel.cpp:2405
 msgid "programming error; aborting!"
 msgstr "errore di programmazione; annullamento in corso!"
 
-#: panel.cpp:2400 panel.cpp:2429
+#: panel.cpp:2417 panel.cpp:2446
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Impossibile iniziare a registrare %s (%s)"
 
-#: panel.cpp:2457
+#: panel.cpp:2474
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Errore con audio/video registrazione (%s); interruzione"
 
-#: panel.cpp:2463
+#: panel.cpp:2480
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Errore con registrazione audio (%s); interruzione"
 
-#: panel.cpp:2473
+#: panel.cpp:2490
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Errore con registrazione video (%s); interruzione"
@@ -3253,175 +3253,179 @@ msgstr "C&artelle ..."
 msgid "&Key Shortcuts ..."
 msgstr "&Scorciatoie da Tastiera ..."
 
-#: xrc/MainMenu.xrc:566
+#: xrc/MainMenu.xrc:565
+msgid "&UI Settings ..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:569
 msgid "&Tools"
 msgstr "&Strumenti"
 
-#: xrc/MainMenu.xrc:568
+#: xrc/MainMenu.xrc:571
 msgid "&Cheats"
 msgstr "&Trucchi"
 
-#: xrc/MainMenu.xrc:570
+#: xrc/MainMenu.xrc:573
 msgid "List &cheats ..."
 msgstr "Lista &trucchi ..."
 
-#: xrc/MainMenu.xrc:573
+#: xrc/MainMenu.xrc:576
 msgid "Find c&heat ..."
 msgstr "Trova t&rucco ..."
 
-#: xrc/MainMenu.xrc:577
+#: xrc/MainMenu.xrc:580
 msgid "A&utomatically save/load cheats"
 msgstr "Salva/Carica automaticamente trucchi"
 
-#: xrc/MainMenu.xrc:581
+#: xrc/MainMenu.xrc:584
 msgid "&Enable cheats"
 msgstr "&Abilita trucchi"
 
-#: xrc/MainMenu.xrc:588
+#: xrc/MainMenu.xrc:591
 msgid "&Break into GDB"
 msgstr "&Entra in GDB"
 
-#: xrc/MainMenu.xrc:592
+#: xrc/MainMenu.xrc:595
 msgid "&Configure port..."
 msgstr "&Configura porta..."
 
-#: xrc/MainMenu.xrc:595
+#: xrc/MainMenu.xrc:598
 msgid "&Break on load"
 msgstr "&Ferma al caricamento"
 
-#: xrc/MainMenu.xrc:600
+#: xrc/MainMenu.xrc:603
 msgid "&Disconnect"
 msgstr "&Disconnetti"
 
-#: xrc/MainMenu.xrc:602
+#: xrc/MainMenu.xrc:605
 msgid "&GDB"
 msgstr "&GDB"
 
-#: xrc/MainMenu.xrc:605
+#: xrc/MainMenu.xrc:608
 msgid "&Disassemble..."
 msgstr "&Disassembla..."
 
-#: xrc/MainMenu.xrc:608
+#: xrc/MainMenu.xrc:611
 msgid "&Logging..."
 msgstr "&Logging..."
 
-#: xrc/MainMenu.xrc:611
+#: xrc/MainMenu.xrc:614
 msgid "&IO Viewer..."
 msgstr "&Visualizzatore IO..."
 
-#: xrc/MainMenu.xrc:614
+#: xrc/MainMenu.xrc:617
 msgid "&Map Viewer..."
 msgstr "&Visualizzatore Mappa..."
 
-#: xrc/MainMenu.xrc:617
+#: xrc/MainMenu.xrc:620
 msgid "M&emory Viewer..."
 msgstr "V&isualizzatore Memoria..."
 
-#: xrc/MainMenu.xrc:620
+#: xrc/MainMenu.xrc:623
 msgid "&OAM Viewer..."
 msgstr "&Visore OAM..."
 
-#: xrc/MainMenu.xrc:623
+#: xrc/MainMenu.xrc:626
 msgid "&Palette Viewer..."
 msgstr "&Visualizzatore Tavolozza..."
 
-#: xrc/MainMenu.xrc:626
+#: xrc/MainMenu.xrc:629
 msgid "&Tile Viewer..."
 msgstr "&Visualizatore Tile..."
 
-#: xrc/MainMenu.xrc:631
+#: xrc/MainMenu.xrc:634
 msgid "Show all video layers"
 msgstr "Mostra tutti i livelli video"
 
-#: xrc/MainMenu.xrc:635
+#: xrc/MainMenu.xrc:638
 msgid "BG &0"
 msgstr "BG &0"
 
-#: xrc/MainMenu.xrc:640
+#: xrc/MainMenu.xrc:643
 msgid "BG &1"
 msgstr "BG &1"
 
-#: xrc/MainMenu.xrc:645
+#: xrc/MainMenu.xrc:648
 msgid "BG &2"
 msgstr "BG &2"
 
-#: xrc/MainMenu.xrc:650
+#: xrc/MainMenu.xrc:653
 msgid "BG &3"
 msgstr "BG &3"
 
-#: xrc/MainMenu.xrc:655
+#: xrc/MainMenu.xrc:658
 msgid "&OBJ"
 msgstr "&OBJ"
 
-#: xrc/MainMenu.xrc:660
+#: xrc/MainMenu.xrc:663
 msgid "&WIN 0"
 msgstr "&WIN 0"
 
-#: xrc/MainMenu.xrc:665
+#: xrc/MainMenu.xrc:668
 msgid "W&IN 1"
 msgstr "W&IN 1"
 
-#: xrc/MainMenu.xrc:670
+#: xrc/MainMenu.xrc:673
 msgid "O&BJ WIN"
 msgstr "O&BJ WIN"
 
-#: xrc/MainMenu.xrc:674
+#: xrc/MainMenu.xrc:677
 msgid "&View Layers"
 msgstr "&Mostra Piani"
 
-#: xrc/MainMenu.xrc:678
+#: xrc/MainMenu.xrc:681
 msgid "Channel &1"
 msgstr "Canale &1"
 
-#: xrc/MainMenu.xrc:683
+#: xrc/MainMenu.xrc:686
 msgid "Channel &2"
 msgstr "Canale &2"
 
-#: xrc/MainMenu.xrc:688
+#: xrc/MainMenu.xrc:691
 msgid "Channel &3"
 msgstr "Canale &3"
 
-#: xrc/MainMenu.xrc:693
+#: xrc/MainMenu.xrc:696
 msgid "Channel &4"
 msgstr "Canale &4"
 
-#: xrc/MainMenu.xrc:698
+#: xrc/MainMenu.xrc:701
 msgid "Direct Sound &A"
 msgstr "Suono Diretto &A"
 
-#: xrc/MainMenu.xrc:703
+#: xrc/MainMenu.xrc:706
 msgid "Direct Sound &B"
 msgstr "Suono Diretto &B"
 
-#: xrc/MainMenu.xrc:707
+#: xrc/MainMenu.xrc:710
 msgid "&Sound Channels"
 msgstr "&Canali Suono"
 
-#: xrc/MainMenu.xrc:711
+#: xrc/MainMenu.xrc:714
 msgid "&Help"
 msgstr "&Aiuto"
 
-#: xrc/MainMenu.xrc:713
+#: xrc/MainMenu.xrc:716
 msgid "Report &Bugs"
 msgstr "Segnalazione &Bug"
 
-#: xrc/MainMenu.xrc:716
+#: xrc/MainMenu.xrc:719
 msgid "VBA-M Support &Forum"
 msgstr "&Forum di Supporto VBA-M"
 
-#: xrc/MainMenu.xrc:719
+#: xrc/MainMenu.xrc:722
 msgid "Translations"
 msgstr "Traduzione"
 
-#: xrc/MainMenu.xrc:727
+#: xrc/MainMenu.xrc:730
 msgid "Check for updates"
 msgstr "Controlla aggiornamenti"
 
-#: xrc/MainMenu.xrc:730
+#: xrc/MainMenu.xrc:733
 msgid "&Factory Reset..."
 msgstr "&Ripristino impostazioni di fabbrica..."
 
-#: xrc/MainMenu.xrc:734
+#: xrc/MainMenu.xrc:737
 msgid "&About..."
 msgstr "&Maggiori informazioni..."
 
@@ -3703,4 +3707,12 @@ msgstr ""
 
 #: xrc/SpeedupConfig.xrc:84
 msgid "Frame skip"
+msgstr ""
+
+#: xrc/UIConfig.xrc:4
+msgid "User Interface Settings"
+msgstr ""
+
+#: xrc/UIConfig.xrc:9
+msgid "Hide Menu Bar"
 msgstr ""
