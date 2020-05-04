@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "wxvbam.h"
 #include "wx/sdljoy.h"
 #include "SDL.h"
@@ -8,6 +9,9 @@
 
 using namespace Range;
 
+// For testing a GameController as a Joystick:
+//#define SDL_IsGameController(x) false
+
 DEFINE_EVENT_TYPE(wxEVT_SDLJOY)
 
 wxSDLJoy::wxSDLJoy()
@@ -16,8 +20,10 @@ wxSDLJoy::wxSDLJoy()
 {
     // Start up joystick if not already started
     // FIXME: check for errors
+    SDL_Init(SDL_INIT_JOYSTICK);
     SDL_Init(SDL_INIT_GAMECONTROLLER);
     SDL_GameControllerEventState(SDL_ENABLE);
+    SDL_JoystickEventState(SDL_ENABLE);
 }
 
 wxSDLJoy::~wxSDLJoy()
@@ -49,6 +55,9 @@ void wxSDLJoy::Poll()
             {
                 auto joy = e.cbutton.which;
 
+                if (!SDL_IsGameController(joy))
+                    break;
+
                 if (contains(joystate, joy)) {
                     auto but      = e.cbutton.button;
                     auto val      = e.cbutton.state;
@@ -77,6 +86,9 @@ void wxSDLJoy::Poll()
             case SDL_CONTROLLERAXISMOTION:
             {
                 auto joy = e.caxis.which;
+
+                if (!SDL_IsGameController(joy))
+                    break;
 
                 if (contains(joystate, joy)) {
                     auto axis     = e.caxis.axis;
@@ -108,6 +120,9 @@ void wxSDLJoy::Poll()
             {
                 auto joy = e.cdevice.which;
 
+                if (!SDL_IsGameController(joy))
+                    break;
+
                 if (add_all || contains(joystate, joy)) {
                     DisconnectController(joy);
                     ConnectController(joy);
@@ -133,10 +148,111 @@ void wxSDLJoy::Poll()
 
                 break;
             }
+
+            // Joystck events for non-GameControllers.
+
+            case SDL_JOYBUTTONDOWN:
+            case SDL_JOYBUTTONUP:
+            {
+                auto joy = e.jbutton.which;
+
+                if (SDL_IsGameController(joy))
+                    break;
+
+                if (contains(joystate, joy)) {
+                    auto but      = e.jbutton.button;
+                    auto val      = e.jbutton.state;
+                    auto prev_val = joystate[joy].button[but];
+
+                    if (handler && val != prev_val) {
+                        wxSDLJoyEvent ev(wxEVT_SDLJOY);
+                        ev.joy           = joy;
+                        ev.ctrl_type     = WXSDLJOY_BUTTON;
+                        ev.ctrl_idx      = but;
+                        ev.ctrl_val      = val;
+                        ev.prev_val      = prev_val;
+
+                        handler->ProcessEvent(ev);
+                    }
+
+                    joystate[joy].button[but] = val;
+
+                    wxLogDebug("GOT SDL_JOYBUTTON: joy:%d but:%d val:%d prev_val:%d", joy, but, val, prev_val);
+                }
+
+                got_event = true;
+
+                break;
+            }
+            case SDL_JOYAXISMOTION:
+            {
+                auto joy = e.jaxis.which;
+
+                if (SDL_IsGameController(joy))
+                    break;
+
+                if (contains(joystate, joy)) {
+                    auto axis     = e.jaxis.axis;
+                    auto val      = axisval(e.jaxis.value);
+                    auto prev_val = joystate[joy].axis[axis];
+
+                    if (handler && val != prev_val) {
+                        wxSDLJoyEvent ev(wxEVT_SDLJOY);
+                        ev.joy           = joy;
+                        ev.ctrl_type     = WXSDLJOY_AXIS;
+                        ev.ctrl_idx      = axis;
+                        ev.ctrl_val      = val;
+                        ev.prev_val      = prev_val;
+
+                        handler->ProcessEvent(ev);
+
+                        joystate[joy].axis[axis] = val;
+
+                        wxLogDebug("GOT SDL_JOYAXISMOTION: joy:%d axis:%d val:%d prev_val:%d", joy, axis, val, prev_val);
+                    }
+                }
+
+                got_event = true;
+
+                break;
+            }
+            case SDL_JOYDEVICEADDED:
+            {
+                auto joy = e.cdevice.which;
+
+                if (SDL_IsGameController(joy))
+                    break;
+
+                if (add_all || contains(joystate, joy)) {
+                    DisconnectController(joy);
+                    ConnectController(joy);
+
+                    systemScreenMessage(wxString::Format(_("Connected joystick %d"), joy + 1));
+                }
+
+                got_event = true;
+
+                break;
+            }
+            case SDL_JOYDEVICEREMOVED:
+            {
+                auto joy = e.cdevice.which;
+
+                if (SDL_IsGameController(joy))
+                    break;
+
+                if (contains(joystate, joy)) {
+                    DisconnectController(joy);
+
+                    systemScreenMessage(wxString::Format(_("Disconnected joystick %d"), joy + 1));
+                }
+
+                got_event = true;
+
+                break;
+            }
         }
     }
-
-    // I am only doing this shit because hotplug support is fucking broken in SDL right now.
 
     bool do_poll  = false;
     wxLongLong tm = wxGetUTCTimeMillis();
@@ -152,45 +268,90 @@ void wxSDLJoy::Poll()
         for (auto&& joy : joystate) {
             if (!joy.second.dev) continue;
 
-            for (uint8_t but = 0; but < SDL_CONTROLLER_BUTTON_MAX; but++) {
-                auto last_state = joy.second.button[but];
-                auto state      = SDL_GameControllerGetButton(joy.second.dev, static_cast<SDL_GameControllerButton>(but));
+            if (SDL_IsGameController(joy.first)) {
+                for (uint8_t but = 0; but < SDL_CONTROLLER_BUTTON_MAX; but++) {
+                    auto last_state = joy.second.button[but];
+                    auto state      = SDL_GameControllerGetButton(joy.second.dev, static_cast<SDL_GameControllerButton>(but));
 
-                if (last_state != state) {
-                    if (handler) {
+                    if (last_state != state) {
+                        if (handler) {
+                            wxSDLJoyEvent ev(wxEVT_SDLJOY);
+                            ev.joy           = joy.first;
+                            ev.ctrl_type     = WXSDLJOY_BUTTON;
+                            ev.ctrl_idx      = but;
+                            ev.ctrl_val      = state;
+                            ev.prev_val      = last_state;
+
+                            handler->ProcessEvent(ev);
+                        }
+
+                        joy.second.button[but] = state;
+
+                        wxLogDebug("POLLED SDL_CONTROLLERBUTTON: joy:%d but:%d val:%d prev_val:%d", joy.first, but, state, last_state);
+                    }
+                }
+
+                for (uint8_t axis = 0; axis < SDL_CONTROLLER_AXIS_MAX; axis++) {
+                    auto val      = axisval(SDL_GameControllerGetAxis(joy.second.dev, static_cast<SDL_GameControllerAxis>(axis)));
+                    auto prev_val = joy.second.axis[axis];
+
+                    if (handler && val != prev_val) {
                         wxSDLJoyEvent ev(wxEVT_SDLJOY);
                         ev.joy           = joy.first;
-                        ev.ctrl_type     = WXSDLJOY_BUTTON;
-                        ev.ctrl_idx      = but;
-                        ev.ctrl_val      = state;
-                        ev.prev_val      = last_state;
+                        ev.ctrl_type     = WXSDLJOY_AXIS;
+                        ev.ctrl_idx      = axis;
+                        ev.ctrl_val      = val;
+                        ev.prev_val      = prev_val;
 
                         handler->ProcessEvent(ev);
+
+                        joy.second.axis[axis] = val;
+
+                        wxLogDebug("POLLED SDL_CONTROLLERAXISMOTION: joy:%d axis:%d val:%d prev_val:%d", joy.first, axis, val, prev_val);
                     }
-
-                    joy.second.button[but] = state;
-
-                    wxLogDebug("POLLED SDL_CONTROLLERBUTTON: joy:%d but:%d val:%d prev_val:%d", joy.first, but, state, last_state);
                 }
             }
+            else {
+                for (uint8_t but = 0; but < SDL_JoystickNumButtons(joy.second.dev); but++) {
+                    auto last_state = joy.second.button[but];
+                    auto state      = SDL_JoystickGetButton(joy.second.dev, but);
 
-            for (uint8_t axis = 0; axis < SDL_CONTROLLER_AXIS_MAX; axis++) {
-                auto val      = axisval(SDL_GameControllerGetAxis(joy.second.dev, static_cast<SDL_GameControllerAxis>(axis)));
-                auto prev_val = joy.second.axis[axis];
+                    if (last_state != state) {
+                        if (handler) {
+                            wxSDLJoyEvent ev(wxEVT_SDLJOY);
+                            ev.joy           = joy.first;
+                            ev.ctrl_type     = WXSDLJOY_BUTTON;
+                            ev.ctrl_idx      = but;
+                            ev.ctrl_val      = state;
+                            ev.prev_val      = last_state;
 
-                if (handler && val != prev_val) {
-                    wxSDLJoyEvent ev(wxEVT_SDLJOY);
-                    ev.joy           = joy.first;
-                    ev.ctrl_type     = WXSDLJOY_AXIS;
-                    ev.ctrl_idx      = axis;
-                    ev.ctrl_val      = val;
-                    ev.prev_val      = prev_val;
+                            handler->ProcessEvent(ev);
+                        }
 
-                    handler->ProcessEvent(ev);
+                        joy.second.button[but] = state;
 
-                    joy.second.axis[axis] = val;
+                        wxLogDebug("POLLED SDL_JOYBUTTON: joy:%d but:%d val:%d prev_val:%d", joy.first, but, state, last_state);
+                    }
+                }
 
-                    wxLogDebug("POLLED SDL_CONTROLLERAXISMOTION: joy:%d axis:%d val:%d prev_val:%d", joy.first, axis, val, prev_val);
+                for (uint8_t axis = 0; axis < SDL_JoystickNumAxes(joy.second.dev); axis++) {
+                    auto val      = axisval(SDL_JoystickGetAxis(joy.second.dev, axis));
+                    auto prev_val = joy.second.axis[axis];
+
+                    if (handler && val != prev_val) {
+                        wxSDLJoyEvent ev(wxEVT_SDLJOY);
+                        ev.joy           = joy.first;
+                        ev.ctrl_type     = WXSDLJOY_AXIS;
+                        ev.ctrl_idx      = axis;
+                        ev.ctrl_val      = val;
+                        ev.prev_val      = prev_val;
+
+                        handler->ProcessEvent(ev);
+
+                        joy.second.axis[axis] = val;
+
+                        wxLogDebug("POLLED SDL_JOYAXISMOTION: joy:%d axis:%d val:%d prev_val:%d", joy.first, axis, val, prev_val);
+                    }
                 }
             }
         }
@@ -199,15 +360,31 @@ void wxSDLJoy::Poll()
 
 void wxSDLJoy::ConnectController(uint8_t joy)
 {
-    if (!(joystate[joy].dev = SDL_GameControllerOpen(joy)))
-        wxLogDebug("SDL_GameControllerOpen(%d) failed: %s", joy, SDL_GetError());
+    if (SDL_IsGameController(joy)) {
+        if (!(joystate[joy].dev = SDL_GameControllerOpen(joy))) {
+            wxLogDebug("SDL_GameControllerOpen(%d) failed: %s", joy, SDL_GetError());
+            return;
+        }
+    }
+    else {
+        if (!(joystate[joy].dev = SDL_JoystickOpen(joy))) {
+            wxLogDebug("SDL_JoystickOpen(%d) failed: %s", joy, SDL_GetError());
+            return;
+        }
+    }
 }
 
 void wxSDLJoy::DisconnectController(uint8_t joy)
 {
     if (auto& dev = joystate[joy].dev) {
-        if (SDL_GameControllerGetAttached(dev))
-            SDL_GameControllerClose(dev);
+        if (SDL_IsGameController(joy)) {
+            if (SDL_GameControllerGetAttached(dev))
+                SDL_GameControllerClose(dev);
+        }
+        else {
+            if (SDL_JoystickGetAttached(dev))
+                SDL_JoystickClose(dev);
+        }
 
         dev = nullptr;
     }
@@ -256,9 +433,9 @@ void wxSDLJoy::SetRumble(bool do_rumble)
     rumbling = do_rumble;
 
 #if SDL_VERSION_ATLEAST(2, 0, 9)
-    // do rumble only on device 0
+    // Do rumble only on device 0, and only if it's a GameController.
     auto dev = joystate[0].dev;
-    if (dev) {
+    if (dev && SDL_IsGameController(0)) {
         if (rumbling) {
             SDL_GameControllerRumble(dev, 0xFFFF, 0xFFFF, 300);
             if (!IsRunning())
@@ -269,12 +446,44 @@ void wxSDLJoy::SetRumble(bool do_rumble)
             Stop();
         }
     }
-    else
-        Stop();
 #endif
 }
 
 void wxSDLJoy::Notify()
 {
     SetRumble(rumbling);
+}
+
+wxSDLJoyDev::operator SDL_GameController*&()
+{
+    return dev_gc;
+}
+
+SDL_GameController*& wxSDLJoyDev::operator=(SDL_GameController* ptr)
+{
+    dev_gc = ptr;
+    return dev_gc;
+}
+
+
+wxSDLJoyDev::operator SDL_Joystick*&()
+{
+    return dev_js;
+}
+
+SDL_Joystick*& wxSDLJoyDev::operator=(SDL_Joystick* ptr)
+{
+    dev_js = ptr;
+    return dev_js;
+}
+
+wxSDLJoyDev::operator bool()
+{
+    return dev_gc != nullptr;
+}
+
+std::nullptr_t& wxSDLJoyDev::operator=(std::nullptr_t&& null_ptr)
+{
+    dev_gc = null_ptr;
+    return null_ptr;
 }
