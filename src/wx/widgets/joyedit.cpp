@@ -68,7 +68,18 @@ int wxJoyKeyTextCtrl::DigitalButton(wxSDLJoyEvent& event)
 
 void wxJoyKeyTextCtrl::OnJoy(wxSDLJoyEvent& event)
 {
-    short val = event.GetControlValue();
+    static wxLongLong last_event = 0;
+
+    int val  = event.GetControlValue();
+    int type = event.GetControlType();
+
+    // Filter consecutive axis motions within 300ms, as this adds two bindings
+    // +1/-1 instead of the one intended.
+    if (type == WXSDLJOY_AXIS && wxGetUTCTimeMillis() - last_event < 300)
+        return;
+
+    last_event = wxGetUTCTimeMillis();
+
     int mod = DigitalButton(event);
     int key = event.GetControlIndex(), joy = event.GetJoy() + 1;
 

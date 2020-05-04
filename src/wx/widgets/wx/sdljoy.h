@@ -9,19 +9,39 @@
 //
 //   The target window will receive EVT_SDLJOY events of type wxSDLJoyEvent.
 
+#include <cstddef>
 #include <array>
 #include <vector>
 #include <unordered_map>
 #include <wx/time.h>
 #include <wx/event.h>
 #include <wx/timer.h>
+#include <SDL_joystick.h>
 #include <SDL_gamecontroller.h>
 #include "../common/contains.h"
 
+struct wxSDLJoyDev {
+    private:
+        union {
+            SDL_GameController* dev_gc = nullptr;
+            SDL_Joystick*       dev_js;
+        };
+    public:
+        operator SDL_GameController*&();
+        SDL_GameController*& operator=(SDL_GameController* ptr);
+
+        operator SDL_Joystick*&();
+        SDL_Joystick*& operator=(SDL_Joystick* ptr);
+
+        operator bool();
+
+        std::nullptr_t& operator=(std::nullptr_t&& null_ptr);
+};
+
 struct wxSDLJoyState {
-    SDL_GameController* dev = nullptr;
-    std::array<int16_t, SDL_CONTROLLER_AXIS_MAX>   axis{};
-    std::array<uint8_t, SDL_CONTROLLER_BUTTON_MAX> button{};
+    wxSDLJoyDev dev;
+    std::unordered_map<uint8_t, int16_t> axis{};
+    std::unordered_map<uint8_t, uint8_t> button{};
 };
 
 class wxSDLJoy : public wxTimer {
