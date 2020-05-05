@@ -8,15 +8,15 @@
 # Rythm Tse <ksusix@gmail.com>, 2016
 # Xuntao Chi <1139954766@qq.com>, 2019
 # 后海游泳大老爷 <my.yuicn@gmail.com>, 2015
-# 天绝星 <c.cejhb@gmail.com>, 2017,2019
+# 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020
 # 沈舒超 <ssc19940105@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-27 20:23+0000\n"
-"PO-Revision-Date: 2020-05-02 13:17+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"POT-Creation-Date: 2020-05-04 01:24+0000\n"
+"PO-Revision-Date: 2020-05-05 13:44+0000\n"
+"Last-Translator: 天绝星 <c.cejhb@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/bgk/vba-m/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -242,7 +242,7 @@ msgstr "十六进制-无符号"
 #: guiinit.cpp:1537
 #, c-format
 msgid "%d frames = %.2f ms"
-msgstr "%d frames = %.2f ms"
+msgstr "%d 帧 = %.2f 毫秒"
 
 #: guiinit.cpp:1549
 msgid "Default device"
@@ -275,7 +275,7 @@ msgstr "插件"
 
 #: guiinit.cpp:1945
 msgid "Please select a plugin or a different filter"
-msgstr "请选择一个插件或过滤器"
+msgstr "请选择一个插件或其他滤镜"
 
 #: guiinit.cpp:1946
 msgid "Plugin selection error"
@@ -802,7 +802,7 @@ msgstr "正在使用帧间混合 #%d"
 
 #: cmdevents.cpp:2680 panel.cpp:181 panel.cpp:284
 msgid "Could not initialize the sound driver!"
-msgstr ""
+msgstr "无法初始化声音驱动！"
 
 #: cmdevents.cpp:2772
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
@@ -831,11 +831,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "本程序是自由软件: 你可以在自由软件基金会公布的 GNU 通用发布\n许可证条款下重新分发和/或修改此软件，依自己意愿许可证 V2 版或\n任意更新版许可证选其一即可。\n\n本程序希望是能有作用的分发出去，但【无任何担保】；甚至没有隐含\n的【可销售性】或【特定用途的适用性】保证。请查阅 GNU 通用发布\n许可证了解更多信息。\n\n你应该已经收到 GNU 通用发布许可证的副本以及本程序。\n如果没有，请查看 http://www.gnu.org/licenses 。"
 
-#: cmdevents.cpp:3069
+#: cmdevents.cpp:3076
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "局域网连接已激活，禁用连接模式即可断开联网。"
 
-#: cmdevents.cpp:3075
+#: cmdevents.cpp:3082
 msgid "Network is not supported in local mode."
 msgstr "本地模式不支持网络"
 
@@ -1016,78 +1016,78 @@ msgstr "切换模式失败 %dx%d-%d@%d"
 msgid "Not a valid GBA cartridge"
 msgstr "无效 GBA 卡带"
 
-#: panel.cpp:1146
+#: panel.cpp:1150
 msgid "No memory for rewinding"
 msgstr "没有用于回退的内存"
 
-#: panel.cpp:1156
+#: panel.cpp:1160
 msgid "Error writing rewind state"
 msgstr "回写状态错误"
 
-#: panel.cpp:2253
+#: panel.cpp:2257
 msgid "Failed to set glXSwapIntervalEXT"
-msgstr ""
+msgstr "设置 glXSwapIntervalEXT 失败"
 
-#: panel.cpp:2262
+#: panel.cpp:2266
 msgid "Failed to set glXSwapIntervalSGI"
-msgstr ""
+msgstr "设置 glXSwapIntervalSGI 失败"
 
-#: panel.cpp:2271
+#: panel.cpp:2275
 msgid "Failed to set glXSwapIntervalMESA"
-msgstr ""
+msgstr "设置 glXSwapIntervalMESA 失败"
 
-#: panel.cpp:2278
+#: panel.cpp:2282
 msgid "No support for wglGetExtensionsString"
-msgstr ""
+msgstr "不支持 wglGetExtensionsString"
 
-#: panel.cpp:2280
+#: panel.cpp:2284
 msgid "No support for WGL_EXT_swap_control"
-msgstr ""
+msgstr "不支持 WGL_EXT_swap_control"
 
-#: panel.cpp:2289
+#: panel.cpp:2293
 msgid "Failed to set wglSwapIntervalEXT"
-msgstr ""
+msgstr "设置 wglSwapIntervalEXT 失败"
 
-#: panel.cpp:2295
+#: panel.cpp:2299
 msgid "No VSYNC available on this platform"
-msgstr ""
+msgstr "垂直同步在该平台上不可用 "
 
-#: panel.cpp:2391
+#: panel.cpp:2395
 msgid "memory allocation error"
 msgstr "内存分配错误"
 
-#: panel.cpp:2394
+#: panel.cpp:2398
 msgid "error initializing codec"
 msgstr "初始化代码错误"
 
-#: panel.cpp:2397
+#: panel.cpp:2401
 msgid "error writing to output file"
 msgstr "回写输出文件错误"
 
-#: panel.cpp:2400
+#: panel.cpp:2404
 msgid "can't guess output format from file name"
 msgstr "无法从文件名猜测输出格式"
 
-#: panel.cpp:2405
+#: panel.cpp:2409
 msgid "programming error; aborting!"
 msgstr "程序错误!"
 
-#: panel.cpp:2417 panel.cpp:2446
+#: panel.cpp:2421 panel.cpp:2450
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "不能开始录制到 %s (%s)"
 
-#: panel.cpp:2474
+#: panel.cpp:2478
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "录制音频/视频时错误 (%s); 正在中止"
 
-#: panel.cpp:2480
+#: panel.cpp:2484
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "录制音频时错误 (%s); 正在中止"
 
-#: panel.cpp:2490
+#: panel.cpp:2494
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "录制视频时错误 (%s); 正在中止"
@@ -1148,47 +1148,57 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:115
+#: widgets/sdljoy.cpp:129
 #, c-format
 msgid "Connected game controller %d"
 msgstr "已连接游戏控制器 %d"
 
-#: widgets/sdljoy.cpp:129
+#: widgets/sdljoy.cpp:143
 #, c-format
 msgid "Disconnected game controller %d"
 msgstr "已断开游戏控制器 %d"
 
+#: widgets/sdljoy.cpp:229
+#, c-format
+msgid "Connected joystick %d"
+msgstr "已连接摇杆 %d"
+
+#: widgets/sdljoy.cpp:246
+#, c-format
+msgid "Disconnected joystick %d"
+msgstr "已断开摇杆 %d"
+
 #: xaudio2.cpp:35
 msgid "XAudio2: Enumerating devices failed!"
-msgstr ""
+msgstr "XAudio2: 枚举设备失败！"
 
 #: xaudio2.cpp:69 xaudio2.cpp:353
 msgid "The XAudio2 interface failed to initialize!"
-msgstr ""
+msgstr "XAudio2 接口初始化失败！"
 
 #: xaudio2.cpp:384
 msgid "XAudio2: Creating mastering voice failed!"
-msgstr ""
+msgstr "XAudio2:  创建主语音失败！"
 
 #: xaudio2.cpp:393
 msgid "XAudio2: Creating source voice failed!"
-msgstr ""
+msgstr "XAudio2: 创建源语音失败！"
 
 #: faudio.cpp:32
 msgid "FAudio: Enumerating devices failed!"
-msgstr ""
+msgstr "FAudio: 枚举设备失败！"
 
 #: faudio.cpp:67 faudio.cpp:352
 msgid "The FAudio interface failed to initialize!"
-msgstr ""
+msgstr "FAudio 接口初始化失败！"
 
 #: faudio.cpp:384
 msgid "FAudio: Creating mastering voice failed!"
-msgstr ""
+msgstr "FAudio:  创建主语音失败！"
 
 #: faudio.cpp:395
 msgid "FAudio: Creating source voice failed!"
-msgstr ""
+msgstr "FAudio: 创建源语音失败！"
 
 #: dsound.cpp:90 dsound.cpp:104
 #, c-format
@@ -1632,7 +1642,7 @@ msgstr "Direct3D 9"
 
 #: xrc/DisplayConfig.xrc:65
 msgid "Filters"
-msgstr "过滤器"
+msgstr "滤镜"
 
 #: xrc/DisplayConfig.xrc:79
 msgid "Display filter :"
@@ -2388,7 +2398,7 @@ msgstr "0 = 无节流器"
 
 #: xrc/GeneralConfig.xrc:114 xrc/SpeedupConfig.xrc:45
 msgid "Full Speed/No Limit"
-msgstr ""
+msgstr "全速/无限制"
 
 #: xrc/GeneralConfig.xrc:115 xrc/SpeedupConfig.xrc:46
 msgid "25%"
@@ -2783,7 +2793,7 @@ msgstr "e-Reader(&E)"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
-msgstr ""
+msgstr "重置载入的点代码...(&R)"
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
@@ -2791,7 +2801,7 @@ msgstr "载入点代码...(&L)"
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr ""
+msgstr "重置保存的点代码...(&R)"
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
@@ -3208,11 +3218,11 @@ msgstr "调试打印(&D)"
 
 #: xrc/MainMenu.xrc:512 xrc/MainMenu.xrc:527
 msgid "&LCD Filter"
-msgstr ""
+msgstr "LCD 滤镜(&L)"
 
 #: xrc/MainMenu.xrc:523
 msgid "&GB color option"
-msgstr ""
+msgstr "GB 颜色选项(&G)"
 
 #: xrc/MainMenu.xrc:531
 msgid "&GB printer"
@@ -3252,7 +3262,7 @@ msgstr "快捷键(&K)"
 
 #: xrc/MainMenu.xrc:565
 msgid "&UI Settings ..."
-msgstr ""
+msgstr "界面设置...(&U)"
 
 #: xrc/MainMenu.xrc:569
 msgid "&Tools"
@@ -3540,7 +3550,7 @@ msgstr "服务器:"
 
 #: xrc/NetLink.xrc:81
 msgid "Port:"
-msgstr ""
+msgstr "端口:"
 
 #: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
@@ -3704,12 +3714,12 @@ msgstr "加速瓶颈"
 
 #: xrc/SpeedupConfig.xrc:84
 msgid "Frame skip"
-msgstr ""
+msgstr "跳帧"
 
 #: xrc/UIConfig.xrc:4
 msgid "User Interface Settings"
-msgstr ""
+msgstr "用户界面设置"
 
 #: xrc/UIConfig.xrc:9
 msgid "Hide Menu Bar"
-msgstr ""
+msgstr "隐藏菜单栏"

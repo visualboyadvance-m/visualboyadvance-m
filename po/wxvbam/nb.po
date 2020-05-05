@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-27 20:23+0000\n"
-"PO-Revision-Date: 2020-05-02 13:17+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"POT-Creation-Date: 2020-05-04 01:24+0000\n"
+"PO-Revision-Date: 2020-05-05 12:37+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/bgk/vba-m/language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -828,11 +828,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Dette programmet er basert på åpen kildekode:  Du kan redistribuere den, \nog/eller modifisere under vilkårene som beskrevet i GNU General Public License \nslik den er publisert av \"the Free Software Foundation\", enten versjon 2 \nav lisensen, eller (som følge av ditt valg) en hvilken som helst senere versjon.\n\nDette programmet er blitt distribuert i håp om at det vil være til nytte \nfor deg, men UTEN NOEN FORM FOR GARANTI; selv uten en eventuell \nimplisert garanti som følge av VIDERESALG eller \nEGNETHET FOR ET BESTEMT FORMÅL. \nDet henvises til GNU General Public License for en mer detaljert beskrivelse.\n\nDu skal ha mottatt en kopi av GNU General Public License\nsammen \nmed dette programmet,  hvis ikke dette er tilfellet, \nse http://www.gnu.org/licenses .\n\n-----\n\nImportant note from translator: This is a free translation into Norwegian \nfor the convenience to the end user. It is not accurate, \nand thus the original disclaimer in English (below) is regarded \nas the correct to use in any eventual legal matter.\n\n-----\n\nThis program is free software: you can redistribute it and/or modify \nit under the terms of the GNU General Public License as published \nby the Free Software Foundation, either version 2 of the License, \nor (at your option) any later version.  \n\nThis program is distributed in the hope that it will be useful, \nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the \nGNU General Public License for more details.\n\nYou should have received a copy of \nthe GNU General Public License\nalong with this program. If not, see \nhttp://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3069
+#: cmdevents.cpp:3076
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LAN linken er allerede aktiv. Deaktivér link-modus for å koble fra."
 
-#: cmdevents.cpp:3075
+#: cmdevents.cpp:3082
 msgid "Network is not supported in local mode."
 msgstr "Nettverk er ikke støttet i lokalmodus."
 
@@ -1013,78 +1013,78 @@ msgstr "Kunne ikke bytte til modus %dx%d-%d@%d"
 msgid "Not a valid GBA cartridge"
 msgstr "Ikke en gyldig GBA kassett"
 
-#: panel.cpp:1146
+#: panel.cpp:1150
 msgid "No memory for rewinding"
 msgstr "Intet minne for tilbakespoling"
 
-#: panel.cpp:1156
+#: panel.cpp:1160
 msgid "Error writing rewind state"
 msgstr "Feil under skriving av tilbakespolingstilstand"
 
-#: panel.cpp:2253
+#: panel.cpp:2257
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2262
+#: panel.cpp:2266
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:2271
+#: panel.cpp:2275
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:2278
+#: panel.cpp:2282
 msgid "No support for wglGetExtensionsString"
 msgstr ""
 
-#: panel.cpp:2280
+#: panel.cpp:2284
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:2289
+#: panel.cpp:2293
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2295
+#: panel.cpp:2299
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:2391
+#: panel.cpp:2395
 msgid "memory allocation error"
 msgstr "minneallokeringsfeil"
 
-#: panel.cpp:2394
+#: panel.cpp:2398
 msgid "error initializing codec"
 msgstr "feil under initialisering av kodek"
 
-#: panel.cpp:2397
+#: panel.cpp:2401
 msgid "error writing to output file"
 msgstr "feil under skriving av ut-fil"
 
-#: panel.cpp:2400
+#: panel.cpp:2404
 msgid "can't guess output format from file name"
 msgstr "kunne ikke bestemme format fra filnavn"
 
-#: panel.cpp:2405
+#: panel.cpp:2409
 msgid "programming error; aborting!"
 msgstr "programmeringsfeil; avbryter!"
 
-#: panel.cpp:2417 panel.cpp:2446
+#: panel.cpp:2421 panel.cpp:2450
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Kunne ikke starte opptak til %s (%s)"
 
-#: panel.cpp:2474
+#: panel.cpp:2478
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Feil i lyd-/videoopptak (%s); avbryter"
 
-#: panel.cpp:2480
+#: panel.cpp:2484
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Feil i lydopptak (%s); avbryter"
 
-#: panel.cpp:2490
+#: panel.cpp:2494
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Feil i videoopptak (%s); avbryter"
@@ -1145,14 +1145,24 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:115
+#: widgets/sdljoy.cpp:129
 #, c-format
 msgid "Connected game controller %d"
 msgstr ""
 
-#: widgets/sdljoy.cpp:129
+#: widgets/sdljoy.cpp:143
 #, c-format
 msgid "Disconnected game controller %d"
+msgstr ""
+
+#: widgets/sdljoy.cpp:229
+#, c-format
+msgid "Connected joystick %d"
+msgstr ""
+
+#: widgets/sdljoy.cpp:246
+#, c-format
+msgid "Disconnected joystick %d"
 msgstr ""
 
 #: xaudio2.cpp:35

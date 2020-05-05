@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-27 20:23+0000\n"
-"PO-Revision-Date: 2020-05-02 13:17+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"POT-Creation-Date: 2020-05-04 01:24+0000\n"
+"PO-Revision-Date: 2020-05-05 12:37+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Malay (Malaysia) (http://www.transifex.com/bgk/vba-m/language/ms_MY/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -825,11 +825,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Program ini adalah perisian bebas: anda boleh edar semula ia dan/atau\nubahsuai ia di bawah terma Lesen Awam Am GNU sepertimana yang disiarkan\noleh Free Software Foundation. sama ada versi 2 dari Lesen, atau (mengikut\npilihan anda) mana-mana versi terkemudian.\n\nProgram ini diedar dengan harapan ia berguna, tetapi TANPA APA JUA\nJAMINAN; dan juga jaminan daripada KEBOLEHPASARAN atau KESESUAIAN\nATAS APA JUA TUJUAN. Sila rujuk Lesen Awam Am GNU untuk maklumat\nlanjut.\n\nAnda seharusnya menerima satu salinan Lesen Awam Am GNU bersama\n-sama program ini. Jika tiada, sila rujuk http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3069
+#: cmdevents.cpp:3076
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "Pautan LAN sudah aktif. Lumpuhkan mod paut untuk putuskan."
 
-#: cmdevents.cpp:3075
+#: cmdevents.cpp:3082
 msgid "Network is not supported in local mode."
 msgstr "Rangkaian tidak disokong dalam mod setempat."
 
@@ -1010,78 +1010,78 @@ msgstr "Gagal mengubah mod ke %dx%d-%d@%d"
 msgid "Not a valid GBA cartridge"
 msgstr "Bukan katrij GBA yang sah"
 
-#: panel.cpp:1146
+#: panel.cpp:1150
 msgid "No memory for rewinding"
 msgstr "Tiada ingatan untuk dimandirkan"
 
-#: panel.cpp:1156
+#: panel.cpp:1160
 msgid "Error writing rewind state"
 msgstr "Ralat menulis keadaan mandir"
 
-#: panel.cpp:2253
+#: panel.cpp:2257
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2262
+#: panel.cpp:2266
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:2271
+#: panel.cpp:2275
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:2278
+#: panel.cpp:2282
 msgid "No support for wglGetExtensionsString"
 msgstr ""
 
-#: panel.cpp:2280
+#: panel.cpp:2284
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:2289
+#: panel.cpp:2293
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2295
+#: panel.cpp:2299
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:2391
+#: panel.cpp:2395
 msgid "memory allocation error"
 msgstr "ralat peruntukan ingatan"
 
-#: panel.cpp:2394
+#: panel.cpp:2398
 msgid "error initializing codec"
 msgstr "ralat mengawalkan kodeks"
 
-#: panel.cpp:2397
+#: panel.cpp:2401
 msgid "error writing to output file"
 msgstr "ralat menulis ke fail output"
 
-#: panel.cpp:2400
+#: panel.cpp:2404
 msgid "can't guess output format from file name"
 msgstr "tidak dapat teka format output dari nama fail"
 
-#: panel.cpp:2405
+#: panel.cpp:2409
 msgid "programming error; aborting!"
 msgstr "ralat pengaturcaraan; dihenti paksa!"
 
-#: panel.cpp:2417 panel.cpp:2446
+#: panel.cpp:2421 panel.cpp:2450
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Tidak dapat memulakan rakaman pada %s (%s)"
 
-#: panel.cpp:2474
+#: panel.cpp:2478
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Ralat dalam rakaman audio/video (%s); dihenti paksa"
 
-#: panel.cpp:2480
+#: panel.cpp:2484
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Ralat dalam rakaman (%s); dihenti paksa"
 
-#: panel.cpp:2490
+#: panel.cpp:2494
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Ralat dalam rakaman video (%s); dihenti paksa"
@@ -1142,14 +1142,24 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:115
+#: widgets/sdljoy.cpp:129
 #, c-format
 msgid "Connected game controller %d"
 msgstr ""
 
-#: widgets/sdljoy.cpp:129
+#: widgets/sdljoy.cpp:143
 #, c-format
 msgid "Disconnected game controller %d"
+msgstr ""
+
+#: widgets/sdljoy.cpp:229
+#, c-format
+msgid "Connected joystick %d"
+msgstr ""
+
+#: widgets/sdljoy.cpp:246
+#, c-format
+msgid "Disconnected joystick %d"
 msgstr ""
 
 #: xaudio2.cpp:35

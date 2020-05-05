@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# ChaoPang Chiu <bensonitachi@gmail.com>, 2020
 # Ching Wen Cheng <chingwen.cheng@gmail.com>, 2020
 # Fanlan <fanlanzhang@gmail.com>, 2015
 # Fanlan <fanlanzhang@gmail.com>, 2015
@@ -18,9 +19,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-27 20:23+0000\n"
-"PO-Revision-Date: 2020-05-02 13:17+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"POT-Creation-Date: 2020-05-04 01:24+0000\n"
+"PO-Revision-Date: 2020-05-05 12:37+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/bgk/vba-m/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -835,11 +836,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3069
+#: cmdevents.cpp:3076
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "區網連接已開啟。禁用連接模式。"
 
-#: cmdevents.cpp:3075
+#: cmdevents.cpp:3082
 msgid "Network is not supported in local mode."
 msgstr "網路不支持本地模式。"
 
@@ -1020,78 +1021,78 @@ msgstr "無法切換到 %dx%d-%d@%d 模式"
 msgid "Not a valid GBA cartridge"
 msgstr "不是有效的 GBA 卡匣"
 
-#: panel.cpp:1146
+#: panel.cpp:1150
 msgid "No memory for rewinding"
 msgstr "沒有記憶體可用來倒帶"
 
-#: panel.cpp:1156
+#: panel.cpp:1160
 msgid "Error writing rewind state"
 msgstr "回寫狀態錯誤"
 
-#: panel.cpp:2253
+#: panel.cpp:2257
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "設置 glXSwapIntervalEXT 失敗"
 
-#: panel.cpp:2262
+#: panel.cpp:2266
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "設置 glXSwapIntervalSGI 失敗"
 
-#: panel.cpp:2271
+#: panel.cpp:2275
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "設置 glXSwapIntervalMESA 失敗"
 
-#: panel.cpp:2278
+#: panel.cpp:2282
 msgid "No support for wglGetExtensionsString"
 msgstr "不支援 wglGetExtensionsString"
 
-#: panel.cpp:2280
+#: panel.cpp:2284
 msgid "No support for WGL_EXT_swap_control"
 msgstr "不支援 WGL_EXT_swap_control"
 
-#: panel.cpp:2289
+#: panel.cpp:2293
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "設置 wglSwapIntervalEXT 失敗"
 
-#: panel.cpp:2295
+#: panel.cpp:2299
 msgid "No VSYNC available on this platform"
 msgstr "在此平台無法使用垂直同步"
 
-#: panel.cpp:2391
+#: panel.cpp:2395
 msgid "memory allocation error"
 msgstr "記憶體配置錯誤"
 
-#: panel.cpp:2394
+#: panel.cpp:2398
 msgid "error initializing codec"
 msgstr "解碼器初始化錯誤"
 
-#: panel.cpp:2397
+#: panel.cpp:2401
 msgid "error writing to output file"
 msgstr "輸出檔寫入錯誤"
 
-#: panel.cpp:2400
+#: panel.cpp:2404
 msgid "can't guess output format from file name"
 msgstr "從檔名猜測輸出格式失敗"
 
-#: panel.cpp:2405
+#: panel.cpp:2409
 msgid "programming error; aborting!"
 msgstr "程式錯誤，正在停止!"
 
-#: panel.cpp:2417 panel.cpp:2446
+#: panel.cpp:2421 panel.cpp:2450
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "不能開始錄製到 %s (%s)"
 
-#: panel.cpp:2474
+#: panel.cpp:2478
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "錄製 (%s) 聲音/影像錯誤; 停止中"
 
-#: panel.cpp:2480
+#: panel.cpp:2484
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "錄製 (%s) 聲音; 停止中"
 
-#: panel.cpp:2490
+#: panel.cpp:2494
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "錄製 (%s) 影像錯誤; 停止中"
@@ -1152,15 +1153,25 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:115
+#: widgets/sdljoy.cpp:129
 #, c-format
 msgid "Connected game controller %d"
 msgstr "已連接遊戲控制器 %d"
 
-#: widgets/sdljoy.cpp:129
+#: widgets/sdljoy.cpp:143
 #, c-format
 msgid "Disconnected game controller %d"
 msgstr "已斷開遊戲控制器 %d"
+
+#: widgets/sdljoy.cpp:229
+#, c-format
+msgid "Connected joystick %d"
+msgstr ""
+
+#: widgets/sdljoy.cpp:246
+#, c-format
+msgid "Disconnected joystick %d"
+msgstr ""
 
 #: xaudio2.cpp:35
 msgid "XAudio2: Enumerating devices failed!"
@@ -3256,7 +3267,7 @@ msgstr "快捷鍵(&K)"
 
 #: xrc/MainMenu.xrc:565
 msgid "&UI Settings ..."
-msgstr ""
+msgstr "和使用者介面設定…"
 
 #: xrc/MainMenu.xrc:569
 msgid "&Tools"
@@ -3712,8 +3723,8 @@ msgstr "跳幀"
 
 #: xrc/UIConfig.xrc:4
 msgid "User Interface Settings"
-msgstr ""
+msgstr "使用者介面設定"
 
 #: xrc/UIConfig.xrc:9
 msgid "Hide Menu Bar"
-msgstr ""
+msgstr "隱藏選單列"

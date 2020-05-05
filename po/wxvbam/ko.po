@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-27 20:23+0000\n"
-"PO-Revision-Date: 2020-05-02 13:17+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"POT-Creation-Date: 2020-05-04 01:24+0000\n"
+"PO-Revision-Date: 2020-05-05 12:37+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Korean (http://www.transifex.com/bgk/vba-m/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -827,11 +827,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "이 프로그램은 자유 소프트웨어입니다. 소프트웨어의 피양도자는 자유\n소프트웨어 재단이 공표한 GNU 일반 공중 사용 허가서 2판 또는 그\n이후 판을 임의로 선택해서, 그 규정에 따라 프로그램을 개작하거나 \n재배포할 수 있습니다. \n\n이 프로그램은 유용하게 사용될 수 있으리라는 희망에서 배포되고\n있지만, 특정한 목적에 맞는 적합성 여부나 판매용으로 사용할 수 \n있으리라는 묵시적인 보증을 포함한 어떠한 형태의 보증도 제공하지 \n않습니다. 보다 자세한 사항에 대해서는 GNU 일반 공중 사용 허가서를\n참고하시기 바랍니다.\n\nGNU 일반 공중 사용 허가서는 이 프로그램과 함께 제공됩니다. 만약,\n이 문서가 누락되어 있다면 http://www.gnu.org/licenses 를\n참조 바랍니다."
 
-#: cmdevents.cpp:3069
+#: cmdevents.cpp:3076
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LAN 연결이 이미 활성화 상태입니다. 연결해체를 위해 연결 모드를 비활성화 하십시오."
 
-#: cmdevents.cpp:3075
+#: cmdevents.cpp:3082
 msgid "Network is not supported in local mode."
 msgstr "로컬 모드에서는 네트워크가 지원되지 않습니다."
 
@@ -1012,78 +1012,78 @@ msgstr "%dx%d-%d@%d 모드로 변경 실패함"
 msgid "Not a valid GBA cartridge"
 msgstr "유효한 GBA 카트리지가 아님"
 
-#: panel.cpp:1146
+#: panel.cpp:1150
 msgid "No memory for rewinding"
 msgstr "되감기 메모리 없음"
 
-#: panel.cpp:1156
+#: panel.cpp:1160
 msgid "Error writing rewind state"
 msgstr "되감기 상태 쓰기 오류"
 
-#: panel.cpp:2253
+#: panel.cpp:2257
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2262
+#: panel.cpp:2266
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:2271
+#: panel.cpp:2275
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:2278
+#: panel.cpp:2282
 msgid "No support for wglGetExtensionsString"
 msgstr ""
 
-#: panel.cpp:2280
+#: panel.cpp:2284
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:2289
+#: panel.cpp:2293
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2295
+#: panel.cpp:2299
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:2391
+#: panel.cpp:2395
 msgid "memory allocation error"
 msgstr "메모리 할당 오류"
 
-#: panel.cpp:2394
+#: panel.cpp:2398
 msgid "error initializing codec"
 msgstr "코덱 초기화 오류"
 
-#: panel.cpp:2397
+#: panel.cpp:2401
 msgid "error writing to output file"
 msgstr "출력 파일 쓰기 오류"
 
-#: panel.cpp:2400
+#: panel.cpp:2404
 msgid "can't guess output format from file name"
 msgstr "파일명에서 출력포맷을 알 수 없습니다."
 
-#: panel.cpp:2405
+#: panel.cpp:2409
 msgid "programming error; aborting!"
 msgstr "프로그래밍 오류; 종료합니다!"
 
-#: panel.cpp:2417 panel.cpp:2446
+#: panel.cpp:2421 panel.cpp:2450
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "%s (%s)부터 기록을 시작할 수 없습니다."
 
-#: panel.cpp:2474
+#: panel.cpp:2478
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "(%s) 에서 오디오/비디오 녹화 오류; 종료합니다."
 
-#: panel.cpp:2480
+#: panel.cpp:2484
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "(%s) 에서 오디오 녹음 오류; 종료합니다."
 
-#: panel.cpp:2490
+#: panel.cpp:2494
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "(%s) 에서 비디오 녹화 오류; 종료합니다."
@@ -1144,14 +1144,24 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:115
+#: widgets/sdljoy.cpp:129
 #, c-format
 msgid "Connected game controller %d"
 msgstr ""
 
-#: widgets/sdljoy.cpp:129
+#: widgets/sdljoy.cpp:143
 #, c-format
 msgid "Disconnected game controller %d"
+msgstr ""
+
+#: widgets/sdljoy.cpp:229
+#, c-format
+msgid "Connected joystick %d"
+msgstr ""
+
+#: widgets/sdljoy.cpp:246
+#, c-format
+msgid "Disconnected joystick %d"
 msgstr ""
 
 #: xaudio2.cpp:35
