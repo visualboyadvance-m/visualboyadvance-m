@@ -739,6 +739,7 @@ set(
     viewsupt.cpp
     wayland.cpp
     strutils.cpp
+    wxutil.cpp
     widgets/keyedit.cpp
     widgets/joyedit.cpp
     widgets/sdljoy.cpp
@@ -769,6 +770,7 @@ set(
     viewsupt.h
     wxhead.h
     wayland.h
+    wxutil.h
     widgets/wx/keyedit.h
     widgets/wx/joyedit.h
     widgets/wx/sdljoy.h

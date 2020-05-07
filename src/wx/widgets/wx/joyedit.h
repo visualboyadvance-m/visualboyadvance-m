@@ -51,9 +51,9 @@ public:
     // convert wxSDLJoyEvent's type+val into mod (WXJB_*)
     static int DigitalButton(wxSDLJoyEvent& event);
     // convert mod+key to accel string, separated by -
-    static wxString ToString(int mod, int key, int joy);
+    static wxString ToString(int mod, int key, int joy, bool isConfig = false);
     // convert multiple keys, separated by multikey
-    static wxString ToString(wxJoyKeyBinding_v keys, wxChar sep = wxT(','));
+    static wxString ToString(wxJoyKeyBinding_v keys, wxChar sep = wxT(','), bool isConfig = false);
     // parses single key string into mod+key
     static bool FromString(const wxString& s, int& mod, int& key, int& joy);
     // parse multi-key string into array
@@ -61,6 +61,11 @@ public:
     static wxJoyKeyBinding_v FromString(const wxString& s, wxChar sep = wxT(','));
     // parse a single key in given wxChar array up to given len
     static bool ParseString(const wxString& s, int len, int& mod, int& key, int& joy);
+    // parse multi-key string into array
+    // returns empty array on parse errors
+    static wxAcceleratorEntry_v ToAccelFromString(const wxString& s, wxChar sep = wxT(','));
+    // convert multiple keys, separated by multikey
+    static wxString FromAccelToString(wxAcceleratorEntry_v keys, wxChar sep = wxT(','), bool isConfig = false);
 
 protected:
     void OnJoy(wxSDLJoyEvent&);

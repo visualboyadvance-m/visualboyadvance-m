@@ -720,6 +720,8 @@ MainFrame::MainFrame()
     , dialog_opened(0)
     , focused(false)
 {
+    jpoll = new JoystickPoller();
+    this->Connect(wxID_ANY, wxEVT_SHOW, wxShowEventHandler(JoystickPoller::ShowDialog), jpoll, jpoll);
 }
 
 MainFrame::~MainFrame()
@@ -846,7 +848,7 @@ int MainFrame::FilterEvent(wxEvent& event)
     if (event.GetEventType() == wxEVT_KEY_DOWN && !menus_opened && !dialog_opened)
     {
         wxKeyEvent& ke = (wxKeyEvent&)event;
-        int keyCode = ke.GetKeyCode();
+        int keyCode = getKeyboardKeyCode(ke);
         int keyMod = ke.GetModifiers();
         wxAcceleratorEntry_v accels = wxGetApp().GetAccels();
         for (size_t i = 0; i < accels.size(); ++i)
@@ -857,6 +859,25 @@ int MainFrame::FilterEvent(wxEvent& event)
                  GetEventHandler()->ProcessEvent(evh);
                  return true;
 	     }
+    }
+    else if (event.GetEventType() == wxEVT_SDLJOY && !menus_opened && !dialog_opened)
+    {
+        wxSDLJoyEvent& je = (wxSDLJoyEvent&)event;
+        if (je.GetControlValue() == 0) return -1; // joystick button UP
+        int key = je.GetControlIndex();
+        int mod = wxJoyKeyTextCtrl::DigitalButton(je);
+        int joy = je.GetJoy() + 1;
+        wxString label = wxJoyKeyTextCtrl::ToString(mod, key, joy);
+        wxAcceleratorEntry_v accels = wxGetApp().GetAccels();
+        for (size_t i = 0; i < accels.size(); ++i) {
+             if (label == accels[i].GetUkey())
+             {
+                 wxCommandEvent evh(wxEVT_COMMAND_MENU_SELECTED, accels[i].GetCommand());
+                 evh.SetEventObject(this);
+                 GetEventHandler()->ProcessEvent(evh);
+                 return true;
+	     }
+        }
     }
     return -1;
 }
@@ -886,8 +907,11 @@ wxString MainFrame::GetGamePath(wxString path)
 
 void MainFrame::SetJoystick()
 {
-    bool anyjoy = false;
+    /* Remove all attached joysticks to avoid errors while
+     * destroying and creating the GameArea `panel`. */
     joy.Remove();
+
+    set_global_accels();
 
     if (!emulating)
         return;
@@ -895,20 +919,25 @@ void MainFrame::SetJoystick()
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < NUM_KEYS; j++) {
             wxJoyKeyBinding_v b = gopts.joykey_bindings[i][j];
-
             for (size_t k = 0; k < b.size(); k++) {
                 int jn = b[k].joy;
-
                 if (jn) {
-                    if (!anyjoy) {
-                        anyjoy = true;
-                        joy.Attach(panel);
-                    }
-
                     joy.Add(jn - 1);
                 }
             }
         }
+}
+
+void MainFrame::StopPoll()
+{
+    if (jpoll && jpoll->IsRunning())
+        jpoll->Stop();
+}
+
+void MainFrame::StartPoll()
+{
+    if (jpoll && !jpoll->IsRunning())
+        jpoll->Start();
 }
 
 void MainFrame::enable_menus()

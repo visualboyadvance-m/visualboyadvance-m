@@ -8,8 +8,9 @@
 #include <vector>
 #include <wx/accel.h>
 #include <wx/textctrl.h>
+#include "wxutil.h"
 
-typedef std::vector<wxAcceleratorEntry> wxAcceleratorEntry_v;
+typedef std::vector<wxAcceleratorEntryUnicode> wxAcceleratorEntry_v;
 
 class wxKeyTextCtrl : public wxTextCtrl {
 public:
@@ -51,9 +52,12 @@ public:
     }
 
     // convert mod+key to accel string, separated by -
-    static wxString ToString(int mod, int key);
+    static wxString ToString(int mod, int key, bool isConfig = false);
     // convert multiple keys, separated by multikey
-    static wxString ToString(wxAcceleratorEntry_v keys, wxChar sep = wxT(','));
+    static wxString ToString(wxAcceleratorEntry_v keys, wxChar sep = wxT(','), bool isConfig = false);
+    // convert mod+key to candidate accel string, separated by -
+    // this *should* work, but may fail for unicode chars
+    static wxString ToCandidateString(int mod, int key);
     // parses single key string into mod+key
     static bool FromString(const wxString& s, int& mod, int& key);
     // parse multi-key string into accelentry array
@@ -115,6 +119,7 @@ const struct {
     wxString display_name;
 } keys_with_display_names[] = {
     { WXK_BACK,              wxTRANSLATE("Back"),           wxTRANSLATE("Backspace") },
+    { WXK_DELETE,            wxTRANSLATE("Delete"),         wxTRANSLATE("Delete") },
     { WXK_PAGEUP,            wxTRANSLATE("PageUp"),         wxTRANSLATE("Page Up") },
     { WXK_PAGEDOWN,          wxTRANSLATE("PageDown"),       wxTRANSLATE("Page Down") },
     { WXK_NUMLOCK,           wxTRANSLATE("Num_lock"),       wxTRANSLATE("Num Lock") },

@@ -99,7 +99,7 @@
                 <border>5</border>
               </object>
               <object class="sizeritem">
-                <object class="wxTextCtrl" name="Shortcut" subclass="wxKeyTextCtrl">
+                <object class="wxTextCtrl" name="Shortcut" subclass="wxJoyKeyTextCtrl">
                   <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
                 </object>
                 <flag>wxALL|wxEXPAND</flag>

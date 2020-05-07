@@ -4953,7 +4953,6 @@ void gbEmulate(int ticksToStop)
                     if (turbo_button_pressed) {
                         if (!speedup_throttle_set && throttle != speedup_throttle) {
                             last_throttle = throttle;
-                            //throttle = speedup_throttle;
                             soundSetThrottle(speedup_throttle);
                             speedup_throttle_set = true;
                         }
@@ -4970,7 +4969,6 @@ void gbEmulate(int ticksToStop)
                             framesToSkip = speedup_frame_skip;
                     }
                     else if (speedup_throttle_set) {
-                        //throttle = last_throttle;
                         soundSetThrottle(last_throttle);
 
                         speedup_throttle_set = false;

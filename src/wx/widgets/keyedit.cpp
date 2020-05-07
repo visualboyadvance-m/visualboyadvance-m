@@ -1,9 +1,16 @@
+#include <wx/tokenzr.h>
 #include <wx/log.h>
 #include "wx/keyedit.h"
+#include "strutils.h"
 
 IMPLEMENT_DYNAMIC_CLASS(wxKeyTextCtrl, wxTextCtrl)
 
 BEGIN_EVENT_TABLE(wxKeyTextCtrl, wxTextCtrl)
+// EVT_CHAR is better than EVT_KEY_DOWN here because it is where
+// the raw key events will have been cooked using whatever recipes
+// are in effect from the os, locale, international keyboard
+// settings, etc. But we shouldn't need it for now, otherwise
+// we would have problems detecting letter cases.
 EVT_KEY_DOWN(wxKeyTextCtrl::OnKeyDown)
 EVT_KEY_UP(wxKeyTextCtrl::OnKeyUp)
 END_EVENT_TABLE()
@@ -11,7 +18,11 @@ END_EVENT_TABLE()
 void wxKeyTextCtrl::OnKeyDown(wxKeyEvent& event)
 {
     lastmod = event.GetModifiers();
-    lastkey = event.GetKeyCode();
+    lastkey = getKeyboardKeyCode(event);
+    if (lastkey != WXK_NONE) // not a control character
+    {
+        KeyboardInputMap::AddMap(ToCandidateString(lastmod, lastkey), lastkey, lastmod);
+    }
 }
 
 void wxKeyTextCtrl::OnKeyUp(wxKeyEvent& event)
@@ -47,7 +58,7 @@ void wxKeyTextCtrl::OnKeyUp(wxKeyEvent& event)
         } else
             Clear();
     } else {
-        wxString nv = ToString(mod, key);
+        wxString nv = ToCandidateString(mod, key);
 
         if (nv.empty())
             return;
@@ -66,18 +77,35 @@ void wxKeyTextCtrl::OnKeyUp(wxKeyEvent& event)
         Navigate();
 }
 
-wxString wxKeyTextCtrl::ToString(int mod, int key)
+wxString wxKeyTextCtrl::ToString(int mod, int key, bool isConfig)
+{
+    wxString s = ToCandidateString(mod, key);
+    // Check for unicode char. It is not possible to use it for
+    // wxAcceleratorEntry `FromString`
+    wxLogNull disable_logging;
+    wxAcceleratorEntryUnicode aeTest;
+    if (!aeTest.FromString(s) || !s.IsAscii()) {
+        if (!KeyboardInputMap::GetMap(s, key, mod) || isConfig) {
+            wxString unicodeChar;
+            unicodeChar.Printf("%d:%d", key, mod);
+            return unicodeChar;
+        }
+    }
+    return s;
+}
+
+wxString wxKeyTextCtrl::ToCandidateString(int mod, int key)
 {
     // wx ignores non-alnum printable chars
     // actually, wx gives an assertion error, so it's best to filter out
     // before passing to ToString()
-    bool char_override = key > 32 && key < WXK_START && !wxIsalnum(key);
+    bool char_override = key > 32 && key < WXK_START && !wxIsalnum(key) && key != WXK_DELETE;
     // wx also ignores modifiers (and does not report meta at all)
     bool mod_override = key == WXK_SHIFT || key == WXK_CONTROL || key == WXK_ALT || key == WXK_RAW_CONTROL;
-    wxAcceleratorEntry ae(mod, char_override || mod_override ? WXK_F1 : key);
+    wxAcceleratorEntryUnicode ae(mod, char_override || mod_override ? WXK_F1 : key);
     // Note: wx translates unconditionally (2.8.12, 2.9.1)!
     // So any strings added below must also be translated unconditionally
-    wxString s = ae.ToString();
+    wxString s = ae.ToRawString();
 
     if (char_override || mod_override) {
         size_t l = s.rfind(wxT('-'));
@@ -150,11 +178,10 @@ wxString wxKeyTextCtrl::ToString(int mod, int key)
         s.Replace(display_name_tr, name_tr, true);
         s.Replace(display_name,    name,    true);
     }
-
     return s;
 }
 
-wxString wxKeyTextCtrl::ToString(wxAcceleratorEntry_v keys, wxChar sep)
+wxString wxKeyTextCtrl::ToString(wxAcceleratorEntry_v keys, wxChar sep, bool isConfig)
 {
     wxString ret;
 
@@ -162,7 +189,7 @@ wxString wxKeyTextCtrl::ToString(wxAcceleratorEntry_v keys, wxChar sep)
         if (i > 0)
             ret += sep;
 
-        wxString key = ToString(keys[i].GetFlags(), keys[i].GetKeyCode());
+        wxString key = ToString(keys[i].GetFlags(), keys[i].GetKeyCode(), isConfig);
 
         if (key.empty())
             return wxEmptyString;
@@ -173,6 +200,21 @@ wxString wxKeyTextCtrl::ToString(wxAcceleratorEntry_v keys, wxChar sep)
     return ret;
 }
 
+static bool checkForPairKeyMod(const wxString& s, int& mod, int& key)
+{
+    long ulkey, ulmod;
+    // key:mod as pair
+    auto pair = str_split(s, ":");
+    if (pair.size() == 2 && pair[0].ToLong(&ulkey) && pair[1].ToLong(&ulmod))
+    {
+        key = (int)ulkey;
+        mod = (int)ulmod;
+        KeyboardInputMap::AddMap(wxKeyTextCtrl::ToCandidateString(mod, key), key, mod);
+        return true;
+    }
+    return false;
+}
+
 bool wxKeyTextCtrl::ParseString(const wxString& s, int len, int& mod, int& key)
 {
     mod = key = 0;
@@ -180,9 +222,15 @@ bool wxKeyTextCtrl::ParseString(const wxString& s, int len, int& mod, int& key)
     if (!s || !len)
         return false;
 
+    if (checkForPairKeyMod(s, mod, key))
+        return true;
+
+    if (KeyboardInputMap::GetMap(s, key, mod))
+        return true;
+
     wxString a = wxT('\t');
     a.Append(s.Left(len));
-    wxAcceleratorEntry ae;
+    wxAcceleratorEntryUnicode ae;
 #ifndef __WXMAC__
 #define check_meta(str)                                                        \
     do {                                                                       \
@@ -260,29 +308,12 @@ wxAcceleratorEntry_v wxKeyTextCtrl::FromString(const wxString& s, wxChar sep)
 {
     wxAcceleratorEntry_v ret, empty;
     int mod, key;
-    size_t len = s.size();
 
-    for (size_t lastkey = len - 1; (lastkey = s.rfind(sep, lastkey)) != wxString::npos; lastkey--) {
-        if (lastkey == len - 1) {
-            // sep as accel
-            if (!lastkey)
-                break;
-
-            if (s[lastkey - 1] == wxT('-') || s[lastkey - 1] == wxT('+') || s[lastkey - 1] == sep)
-                continue;
-        }
-
-        if (!ParseString(s.Mid(lastkey + 1), len - lastkey - 1, mod, key))
+    for (const auto& token : str_split_with_sep(s, sep)) {
+        if (!ParseString(token, token.size(), mod, key))
             return empty;
-
-        ret.insert(ret.begin(), wxAcceleratorEntry(mod, key));
-        len = lastkey;
+        ret.insert(ret.begin(), wxAcceleratorEntryUnicode(mod, key));
     }
-
-    if (!ParseString(s, len, mod, key))
-        return empty;
-
-    ret.insert(ret.begin(), wxAcceleratorEntry(mod, key));
     return ret;
 }
 

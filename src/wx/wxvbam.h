@@ -33,6 +33,7 @@
 #include "../gba/Sound.h"
 
 #include "wxlogdebug.h"
+#include "wxutil.h"
 
 template <typename T>
 void CheckPointer(T pointer)
@@ -203,6 +204,8 @@ class GameArea;
 
 class LogDialog;
 
+class JoystickPoller;
+
 // true if pause should happen at next frame
 extern bool pause_next;
 
@@ -320,6 +323,10 @@ public:
 
     void PollJoysticks() { joy.Poll(); }
 
+    // poll joysticks with timer
+    void StopPoll();
+    void StartPoll();
+
     // required for building from xrc
     DECLARE_DYNAMIC_CLASS(MainFrame);
     // required for event handling
@@ -345,9 +352,10 @@ private:
     checkable_mi_array_t checkable_mi;
     // recent menu item accels
     wxMenu* recent;
-    wxAcceleratorEntry recent_accel[10];
+    wxAcceleratorEntryUnicode recent_accel[10];
     // joystick reader
     wxSDLJoy joy;
+    JoystickPoller* jpoll = nullptr;
 
     // helper function for adding menu to accel editor
     void add_menu_accels(wxTreeCtrl* tc, wxTreeItemId& parent, wxMenu* menu);
@@ -381,6 +389,20 @@ public:
     virtual wxWindow* GetWindow() = 0;
 private:
     double hidpi_scale_factor;
+};
+
+// a class for polling joystick keys
+class JoystickPoller : public wxTimer {
+    public:
+        void Notify() {
+            wxGetApp().frame->PollJoysticks();
+        }
+        void ShowDialog(wxShowEvent& ev) {
+            if (ev.IsShown())
+                Start(50);
+            else
+                Stop();
+        }
 };
 
 // a helper class to avoid forgetting StopModal()

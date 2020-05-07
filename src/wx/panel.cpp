@@ -16,6 +16,7 @@
 #include "drawing.h"
 #include "filters.h"
 #include "wxvbam.h"
+#include "wxutil.h"
 
 #ifdef __WXMSW__
 #include <windows.h>
@@ -317,6 +318,7 @@ void GameArea::LoadGame(const wxString& name)
     emulating = true;
     was_paused = true;
     MainFrame* mf = wxGetApp().frame;
+    mf->StopPoll();
     mf->SetJoystick();
     mf->cmd_enable &= ~(CMDEN_GB | CMDEN_GBA);
     mf->cmd_enable |= ONLOAD_CMDEN;
@@ -567,6 +569,7 @@ void GameArea::UnloadGame(bool destruct)
     mf->enable_menus();
     mf->SetJoystick();
     mf->ResetCheatSearch();
+    mf->StartPoll();
 
     if (rewind_mem)
         num_rewind_states = 0;
@@ -1032,8 +1035,6 @@ void GameArea::OnIdle(wxIdleEvent& event)
         wxWindow* w = panel->GetWindow();
 
         // set up event handlers
-        // use both CHAR_HOOK and KEY_DOWN in case CHAR_HOOK does not work for whatever reason
-        w->Connect(wxEVT_CHAR_HOOK,        wxKeyEventHandler(GameArea::OnKeyDown),         NULL, this);
         w->Connect(wxEVT_KEY_DOWN,         wxKeyEventHandler(GameArea::OnKeyDown),         NULL, this);
         w->Connect(wxEVT_KEY_UP,           wxKeyEventHandler(GameArea::OnKeyUp),           NULL, this);
         w->Connect(wxEVT_PAINT,            wxPaintEventHandler(GameArea::PaintEv),         NULL, this);
@@ -1313,27 +1314,18 @@ static void draw_black_background(wxWindow* win) {
 
 void GameArea::OnKeyDown(wxKeyEvent& ev)
 {
-    // check if the key is pressed indeed and then process it
-    wxKeyCode keyCode = (wxKeyCode)ev.GetKeyCode();
-    if (wxGetKeyState(keyCode) && process_key_press(true, ev.GetKeyCode(), ev.GetModifiers())) {
-        ev.Skip(false);
-        ev.StopPropagation();
+    int kc = getKeyboardKeyCode(ev);
+    if (process_key_press(true, kc, ev.GetModifiers())) {
         wxWakeUpIdle();
     }
-    else {
-        ev.Skip();
-    }
+    ev.Skip();
 }
 
 void GameArea::OnKeyUp(wxKeyEvent& ev)
 {
-    if (process_key_press(false, ev.GetKeyCode(), ev.GetModifiers())) {
-        ev.Skip(false);
-        ev.StopPropagation();
+    int kc = getKeyboardKeyCode(ev);
+    if (process_key_press(false, kc, ev.GetModifiers())) {
         wxWakeUpIdle();
-    }
-    else {
-        ev.Skip();
     }
 }
 

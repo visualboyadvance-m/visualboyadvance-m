@@ -119,7 +119,7 @@ opt_desc new_opt_desc(wxString opt = wxT(""), const char* cmd = NULL, wxString d
 
 extern const int num_opts;
 
-extern const wxAcceleratorEntry default_accels[];
+extern const wxAcceleratorEntryUnicode default_accels[];
 extern const int num_def_accels;
 
 // call to setup default keys.

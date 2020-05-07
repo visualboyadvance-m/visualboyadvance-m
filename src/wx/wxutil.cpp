@@ -1,0 +1,84 @@
+#include "wxutil.h"
+#include "../common/contains.h"
+
+
+int getKeyboardKeyCode(wxKeyEvent& event)
+{
+    int uc = event.GetUnicodeKey();
+    if (uc != WXK_NONE) {
+        if (uc < 32)
+            return WXK_NONE;
+        return uc;
+    }
+    else {
+        return event.GetKeyCode();
+    }
+}
+
+
+wxAcceleratorEntryUnicode::wxAcceleratorEntryUnicode(wxAcceleratorEntry *accel)
+  : wxAcceleratorEntry(accel->GetFlags(), accel->GetKeyCode(), accel->GetCommand(), accel->GetMenuItem())
+{
+    init(accel->GetFlags(), accel->GetKeyCode());
+}
+
+
+wxAcceleratorEntryUnicode::wxAcceleratorEntryUnicode(int flags, int keyCode, int cmd, wxMenuItem *item)
+  : wxAcceleratorEntry(flags, keyCode, cmd, item)
+{
+    init(flags, keyCode);
+}
+
+
+wxAcceleratorEntryUnicode::wxAcceleratorEntryUnicode(wxString uKey, int joy, int flags, int keyCode, int cmd, wxMenuItem *item)
+  : wxAcceleratorEntry(flags, keyCode, cmd, item)
+{
+    ukey = uKey;
+    joystick = joy;
+}
+
+
+void wxAcceleratorEntryUnicode::Set(wxString uKey, int joy, int flags, int keyCode, int cmd, wxMenuItem *item)
+{
+    ukey = uKey;
+    joystick = joy;
+    wxAcceleratorEntry::Set(flags, keyCode, cmd, item);
+}
+
+
+void wxAcceleratorEntryUnicode::init(int flags, int keyCode)
+{
+    joystick = 0;
+    if (!(flags == 0 && keyCode == 0)) {
+        ukey.Printf("%d:%d", keyCode, flags);
+    }
+}
+
+
+KeyboardInputMap* KeyboardInputMap::getInstance()
+{
+    static KeyboardInputMap instance;
+    return &instance;
+}
+
+
+KeyboardInputMap::KeyboardInputMap(){}
+
+
+void KeyboardInputMap::AddMap(wxString keyStr, int key, int mod)
+{
+    KeyboardInputMap* singleton = getInstance();
+    singleton->keysMap[keyStr.wc_str()] = singleton->newPair(key, mod);
+}
+
+
+bool KeyboardInputMap::GetMap(wxString keyStr, int &key, int &mod)
+{
+    KeyboardInputMap* singleton = getInstance();
+    if (contains(singleton->keysMap, keyStr.wc_str())) {
+        key = singleton->keysMap.at(keyStr.wc_str()).key;
+        mod = singleton->keysMap.at(keyStr.wc_str()).mod;
+        return true;
+    }
+    return false;
+}
