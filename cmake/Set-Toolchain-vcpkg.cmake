@@ -22,9 +22,21 @@ function(vcpkg_get_first_upgrade vcpkg_exe)
 
     foreach(line ${upgrade_lines})
         if(line MATCHES "^  [* ] ")
-            string(REGEX REPLACE "^  [* ] " "" first_upgrade ${line})
-            set(first_upgrade ${first_upgrade} PARENT_SCOPE)
-            return()
+            string(REGEX REPLACE "^  [* ] " "" pkg ${line})
+
+            # Check if package is up-to-date, but would be rebuilt due to other dependencies.
+            execute_process(
+                COMMAND ${vcpkg_exe} upgrade ${pkg}
+                OUTPUT_VARIABLE pkg_upgrade
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+                ERROR_QUIET
+                WORKING_DIRECTORY ${VCPKG_ROOT}
+            )
+
+            if(NOT pkg_upgrade MATCHES up-to-date)
+                set(first_upgrade ${pkg} PARENT_SCOPE)
+                return()
+            endif()
         endif()
     endforeach()
 endfunction()
