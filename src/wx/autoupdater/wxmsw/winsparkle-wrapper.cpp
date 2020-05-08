@@ -7,12 +7,14 @@
 #include "winsparkle-wrapper.h"
 #include "wx/msw/private.h"
 
+
 WinSparkleDllWrapper *WinSparkleDllWrapper::GetInstance()
 {
     static WinSparkleDllWrapper instance;
 
     return &instance;
 }
+
 
 WinSparkleDllWrapper::WinSparkleDllWrapper()
 {
@@ -46,31 +48,23 @@ WinSparkleDllWrapper::WinSparkleDllWrapper()
     winsparkle_cleanup              = reinterpret_cast<func_win_sparkle_cleanup>(winsparkle_dll->GetSymbol("win_sparkle_cleanup"));
 }
 
+
 WinSparkleDllWrapper::~WinSparkleDllWrapper()
 {
+    HMODULE hMod = winsparkle_dll->Detach();
+    while(::FreeLibrary(hMod)) {
+        wxMilliSleep(50);
+    }
     delete winsparkle_dll;
-
-    // Wait for the program to exit and release the DLL before deleting the temp file, otherwise access is denied.
-    char executable[] = "cmd.exe";
-    char cmd_switch[] = "/c";
-
-    char shell_cmd[500];
-    snprintf(shell_cmd, 500, "ping -n 3 127.0.0.1 > nul&set _file=%s&call del %%^_file%%", temp_file_name.mb_str().data());
-
-    char* cmd[]{
-	executable,
-	cmd_switch,
-	shell_cmd,
-	NULL
-    };
-
-    wxExecute(cmd, wxEXEC_ASYNC | wxEXEC_HIDE_CONSOLE);
+    wxRemoveFile(temp_file_name);
 }
+
 
 void win_sparkle_init()
 {
     WinSparkleDllWrapper::GetInstance()->winsparkle_init();
 }
+
 
 void win_sparkle_check_update_with_ui()
 {

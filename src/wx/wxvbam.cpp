@@ -41,6 +41,10 @@ int main(int argc, char** argv)
 }
 #endif
 
+#ifndef NO_ONLINEUPDATES
+#include "autoupdater/autoupdater.h"
+#endif // NO_ONLINEUPDATES
+
 // Initializer for struct cmditem
 cmditem new_cmditem(const wxString cmd, const wxString name, int cmd_id,
                     int mask_flags, wxMenuItem* mi)
@@ -193,24 +197,6 @@ wxString wxvbamApp::GetAbsolutePath(wxString path)
 
     return path;
 }
-
-#ifndef NO_ONLINEUPDATES
-#include "../common/version_cpp.h"
-
-#ifdef __WXMSW__
-#include "winsparkle-wrapper.h"
-#endif // __WXMSW__
-
-static void init_check_for_updates()
-{
-#ifdef __WXMSW__
-    wxString version(vbam_version);
-    win_sparkle_set_appcast_url("http://data.vba-m.com/appcast.xml");
-    win_sparkle_set_app_details(L"visualboyadvance-m", L"VisualBoyAdvance-M", version.wc_str());
-    win_sparkle_init();
-#endif // __WXMSW__
-}
-#endif // NO_ONLINEUPDATES
 
 #ifdef __WXMSW__
 #include <wx/msw/private.h>
@@ -470,9 +456,8 @@ bool wxvbamApp::OnInit()
     frame->Show(true);
 
 #ifndef NO_ONLINEUPDATES
-    init_check_for_updates();
+    initAutoupdater();
 #endif
-
     return true;
 }
 
@@ -723,8 +708,8 @@ wxvbamApp::~wxvbamApp() {
     }
     delete overrides;
 
-#if defined(__WXMSW__) && !defined(NO_ONLINEUPDATES)
-    win_sparkle_cleanup();
+#ifndef NO_ONLINEUPDATES
+    shutdownAutoupdater();
 #endif
 }
 

@@ -50,7 +50,7 @@ Ignore the following cmake error.
 
     execute_process(
         COMMAND ${GIT_EXECUTABLE} clone git@github.com:visualboyadvance-m/visualboyadvance-m.github.io web-data
-	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
     # Rewrite appcast.xml.
