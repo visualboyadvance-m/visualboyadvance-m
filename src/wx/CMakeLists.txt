@@ -1222,7 +1222,7 @@ if(APPLE AND (UPSTREAM_RELEASE OR ENABLE_ONLINEUPDATES))
         add_custom_command(
             TARGET visualboyadvance-m
             POST_BUILD
-            COMMAND codesign --sign "Developer ID Application" --force ./visualboyadvance-m.app
+            COMMAND codesign --sign "Developer ID Application" --force --deep ./visualboyadvance-m.app
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
