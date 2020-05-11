@@ -196,10 +196,6 @@ For calling Windows APIs with strings, use the wide char `W` variants and the
 
 ### Windows Native Development Environment Setup
 
-Install Visual Studio 2019:
-
-You just want the core and C++ packages.
-
 Install the chocolatey package manager:
 
 - Press Win+X and open Windows PowerShell (administrator).
@@ -215,100 +211,57 @@ Close the administrator PowerShell window and open it again.
 Install some chocolatey packages:
 
 ```powershell
-choco install ag dejavufonts git gpg4win hackfont microsoft-windows-terminal poshgit powershell-preview vim-tux zip unzip notepadplusplus openssh diffutils
+choco install -y visualstudio2019community visualstudio2019-workload-nativedesktop ag dejavufonts git gpg4win hackfont microsoft-windows-terminal powershell-preview vim-tux zip unzip notepadplusplus openssh diffutils neovim
 ```
 
 Launch the terminal and choose Settings from the tab drop-down, this will open
 the settings json in visual studio.
 
-Add the Tango Dark Theme to the theme section:
+Change the powershell (and not the "windows powershell") profile like so:
 
 ```json
-    {
-      "background": "#000000",
-      "black": "#000000",
-      "blue": "#3465a4",
-      "brightBlack": "#555753",
-      "brightBlue": "#729fcf",
-      "brightCyan": "#34e2e2",
-      "brightGreen": "#8ae234",
-      "brightPurple": "#ad7fa8",
-      "brightRed": "#ef2929",
-      "brightWhite": "#eeeeec",
-      "brightYellow": "#fce94f",
-      "cyan": "#06989a",
-      "foreground": "#d3d7cf",
-      "green": "#4e9a06",
-      "name": "Tango Dark",
-      "purple": "#75507b",
-      "red": "#cc0000",
-      "white": "#d3d7cf",
-      "yellow": "#c4a000"
-    }
+{
+    "name": "PowerShell",
+    "source": "Windows.Terminal.PowershellCore",
+    // If you want a background image, set the path here:
+    //"backgroundImage": "file://c:/users/rkitover/Pictures/wallpapers/wallhaven-01ge81.jpg",
+    "backgroundImageOpacity": 0.32,
+    "backgroundImageStretchMode": "uniformToFill",
+    "fontFace": "Hack",
+    "fontSize": 10,
+    "colorScheme": "Tango Dark",
+    "cursorShape": "filledBox"
+},
 ```
 
-Change the powershell profile like so:
+Make sure it is set as the default profile.
+
+You can use tab shortcuts to get a sort of tmux for powershell, using the same
+bindings as kitty, add this to the "keybindings" section:
 
 ```json
-      {
-        "acrylicOpacity": 0.5,
-        "closeOnExit": true,
-        "colorScheme": "Tango Dark",
-        "commandline": "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe",
-        "cursorColor": "#FFFFFF",
-        "cursorShape": "filledBox",
-        "fontFace": "Hack",
-        "fontSize": 10,
-        "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
-        "historySize": 30001,
-        "icon": "ms-appx:///ProfileIcons/{574e775e-4f2a-5b96-ac1e-a2962a402336}.png",
-        "backgroundImage": "ms-appdata:///roaming/wallhaven-127481.jpg",
-        "backgroundImageOpacity": 0.32,
-        "backgroundImageStretchMode": "uniformToFill",
-        "name": "PowerShell Core",
-        "padding": "0, 0, 0, 0",
-        "snapOnInput": true,
-        "startingDirectory": "%USERPROFILE%",
-        "useAcrylic": false
-      },
+{
+    "command" : "newTab",
+    "keys" :
+    [
+        "ctrl+shift+t"
+    ]
+},
+{
+    "command" : "nextTab",
+    "keys" :
+    [
+        "ctrl+shift+right"
+    ]
+},
+{
+    "command" : "prevTab",
+    "keys" :
+    [
+        "ctrl+shift+left"
+    ]
+},
 ```
-
-Notice I have a background image, if you want to install one, follow this
-guide:
-
-https://www.thomasmaurer.ch/2019/09/how-to-change-the-windows-terminal-background-image/
-
-Change the settings for the tab shortcuts if you want, I use the same config as
-kitty:
-
-```json
-            {
-                "command" : "newTab",
-                "keys" : 
-                [
-                    "ctrl+shift+t"
-                ]
-            },
-            {
-                "command" : "nextTab",
-                "keys" : 
-                [
-                    "ctrl+shift+right"
-                ]
-            },
-            {
-                "command" : "prevTab",
-                "keys" : 
-                [
-                    "ctrl+shift+left"
-                ]
-            },
-```
-
-This works kind of like a tmux for powershell!
-
-The keys to copy a mouse selection are `Ctrl-Shift-C` like in kitty, to paste
-`Ctrl-Shift-V`.
 
 Now add some useful things to your powershell profile:
 
@@ -318,92 +271,107 @@ Run:
 notepad++ $profile
 ```
 
-Here's mine, most importantly the Visual Studio environment setup:
+(or vim.)
+
+Here's mine, most importantly the Visual Studio environment setup.
+
+If you use my posh-git prompt, you'll need the git version of posh-git:
+
+```powershell
+mkdir ~/source/repos
+cd ~/source/repos
+git clone https://github.com/dahlbyk/posh-git
+```
+
+Alternately install "poshgit" from chocolatey.
 
 ```powershell
 chcp 65001 > $null
 
-Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+set-executionpolicy -scope currentuser remotesigned
 
-Set-Culture en-US
+set-culture en-US
 
-$env:EDITOR        = 'C:/Program\ Files/Vim/vim82/vim.exe'
-$env:VBAM_NO_PAUSE = 1
+ri env:TERM
+$env:EDITOR = 'c:/tools/neovim/neovim/bin/nvim.exe'
+set-alias -name vim -val /tools/neovim/neovim/bin/nvim
 
 function megs {
-    ls $args | select Name, @{Name="MegaBytes"; Expression={$_.Length / 1MB}}
+    gci $args | select mode, lastwritetime, @{name="MegaBytes"; expression = { [math]::round($_.length / 1MB, 2) }}, name
 }
 
 function cmconf {
-    ag 'CMAKE_BUILD_TYPE|VCPKG_TARGET_TRIPLET' CMakeCache.txt
+    ag 'CMAKE_BUILD_TYPE|VCPKG_TARGET_TRIPLET|UPSTREAM_RELEASE' CMakeCache.txt
 }
 
-function sudo {
-    ssh localhost $args
+function pgrep {
+    get-ciminstance win32_process -filter "name like '%$($args[0])%' OR commandline like '%$($args[0])%'" | select processid, name, commandline
 }
 
-Set-Alias -name notepad -val "C:\Program Files\Notepad++\notepad++.exe"
-Set-Alias -name which   -val Get-Command
-Set-Alias -name grep    -val ag
+function pkill {
+    pgrep $args | select processid | stop-process
+}
+
+function taskslog {
+    get-winevent 'Microsoft-Windows-TaskScheduler/Operational'
+}
+
+set-alias -name notepad -val '/program files/notepad++/notepad++'
+set-alias -name which   -val get-command
+set-alias -name grep    -val ag
 
 # For vimdiff etc., install diffutils from choco.
-if (Test-Path Alias:diff) {
-    Remove-Item Alias:diff -force
-}
+if (test-path alias:diff) { remove-item -force alias:diff }
 
 # Load VS env only once.
 if (-not $env:VSCMD_VER) {
-    pushd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build"
-    cmd /c "vcvars64.bat & set" | where { $_ -match '=' } | %{
-        $v = $_.split('=')
-        Set-Item -Force -Path ("ENV:"+$v[0]) -Value $v[1]
+    pushd '/program files (x86)/microsoft visual studio/2019/community/vc/auxiliary/build'
+    cmd /c 'vcvars64.bat & set' | where { $_ -match '=' } | %{
+        $var,$val = $_.split('=')
+        set-item -force "env:$var" -value $val
     }
     popd
 }
 
 # Chocolatey profile
-$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-if (Test-Path($ChocolateyProfile)) {
-    Import-Module "$ChocolateyProfile"
+$chocolatey_profile = "$env:chocolateyinstall\helpers\chocolateyprofile.psm1"
+
+if (test-path $chocolatey_profile) { import-module $chocolatey_profile }
+
+import-module ~/source/repos/posh-git/src/posh-git.psd1
+
+function global:PromptWriteErrorInfo() {
+    if ($global:gitpromptvalues.dollarquestion) {
+        "`e[0;32m✔`e[0m"
+    }
+    else {
+        "`e[0;31m✘`e[0m"
+    }
 }
 
-Import-Module 'C:\tools\poshgit\dahlbyk-posh-git-9bda399\src\posh-git.psd1'
+$gitpromptsettings.defaultpromptabbreviatehomedirectory      = $true
 
-Import-Module PSReadLine
+$gitpromptsettings.defaultpromptprefix.text                  = '$(PromptWriteErrorInfo) '
 
-$HistoryFilePath = Join-Path ([Environment]::GetFolderPath('UserProfile')) .ps_history
+$gitpromptsettings.defaultpromptwritestatusfirst             = $false
+$gitpromptsettings.defaultpromptbeforesuffix.text            = "`n$env:USERNAME@$env:COMPUTERNAME "
+$gitpromptsettings.defaultpromptbeforesuffix.foregroundcolor = 0x87CEFA
+$gitpromptsettings.defaultpromptsuffix.foregroundcolor       = 0xDC143C
 
-Register-EngineEvent PowerShell.Exiting -Action { Get-History | Export-Clixml $HistoryFilePath } | out-null
+import-module psreadline
 
-if (Test-path $HistoryFilePath) { Import-Clixml $HistoryFilePath | Add-History }
+if (-not (test-path ~/.ps_history)) {
+    new-item -itemtype file ~/.ps_history
+}
 
-Set-PSReadLineOption -EditMode Emacs
+register-engineevent powershell.exiting -action { get-history | export-clixml ~/.ps_history } | out-null
 
-Set-PSReadlineKeyHandler -Key UpArrow   -Function HistorySearchBackward
+import-clixml ~/.ps_history | add-history *> $null
 
-Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward
-```
-
-You may want to add an alias for your favorite editor.
-
-Relaunch the terminal.
-
-Add the powershell community extensions, to get a port of less and some other goodies:
-
-```powershell
-Find-Package pscx | Install-Package -Force -Scope CurrentUser -AllowClobber
-```
-
-and restart your shell.
-
-Unrelated, but to get the up/down arrow history search behavior in bash, add
-the following to your `~/.inputrc`:
-
-```inputrc
-## arrow up
-"\e[A":history-search-backward
-## arrow down
-"\e[B":history-search-forward
+set-psreadlineoption     -editmode emacs
+set-psreadlinekeyhandler -key tab       -function tabcompletenext
+set-psreadlinekeyhandler -key uparrow   -function historysearchbackward
+set-psreadlinekeyhandler -key downarrow -function historysearchforward
 ```
 
 To set notepad++ as the git commit editor, run this command:
@@ -451,13 +419,6 @@ if (has('win32') || has('gui_win32')) && executable('pwsh')
 endif
 ```
 
-To use neovim instead of vim, install the neovim chocolatey package and use this $profile setup:
-
-```powershell
-$env:EDITOR = 'C:/tools/neovim/Neovim/bin/nvim.exe'
-Set-Alias -name vim -val nvim
-```
-
 To use gvim instead of console vim, you could try this `$profile` set up:
 
 ```powershell
@@ -484,11 +445,10 @@ endif
 If you don't know how to use vim and want to learn, run `vimtutor`, it takes
 about half an hour.
 
-Now to set up gpg.
+To set up gpg:
 
-I recommend not using a passphrase so as not to deal with passphrase prompts,
-which are a huge pain and break both ssh and release automation. If you have a
-passphrase and want to remove it see:
+I don't use a passphrase on my key, because gpg-agent constantly causes me
+grief, if you want to remove yours see:
 
 http://www.peterscheie.com/unix/automating_signing_with_GPG.html
 
@@ -503,8 +463,6 @@ Tell git to always sign commits:
 ```powershell
 git config --global commit.gpgsign true
 ```
-
-Now your development/build environment is ready!
 
 To set up ssh into your powershell environment, which allows doing builds
 remotely etc., edit the registry as described here to set powershell-preview as
@@ -533,6 +491,8 @@ For example:
 alias | ag sort
 ```
 
+The above $profile aliases grep to ag.
+
 Powershell itself provides a nice way to do simple grep/sed operations:
 
 ```powershell
@@ -544,35 +504,35 @@ cmd /c date /T | %{ $_ -replace '.*(\d\d)/(\d\d)/(\d\d\d\d).*','$3-$1-$2' }
 For `ls -ltr` use:
 
 ```powershell
-ls | sort lastwritetime
+gci | sort lastwritetime
 ```
 
 You can use the `-Recurse` flag for `Get-ChildItem` (`ls`, `gci`) as a
 substitute for `find`, e.g.:
 
 ```powershell
-ls -rec *.xrc
+gci -rec *.xrc
 ```
 
 Now combine this with the awesome powershell object pipeline to e.g. delete all
 vim undo files:
 
 ```powershell
-ls -rec .*un~ | rm
+gci -rec .*un~ | ri
 ```
 
-You will notice that `Remove-Item` (`rm`) does not take multiple space
+You will notice that `Remove-Item` (`rm, ri`) does not take multiple space
 separated items, you must separate them by commas, eg.:
 
 ```powershell
 1..4 | %{ni foo$_; ni bar$_}
-rm foo*, bar*
+ri foo*, bar*
 ```
 
 The equivalent of `rm -rf` to delete a directory is:
 
 ```powershell
-rm -rec -for dir
+ri -rec -for dir
 ```
 
 The best replacement for `sudo` is to set up the openssh server with the shell
@@ -580,10 +540,8 @@ in the registry pointing to powershell-preview, commands run over ssh are
 elevated. For example:
 
 ```powershell
-ssh localhost choco upgrade all
+ssh localhost choco upgrade -y all
 ```
-
-the above `$profile` example has an alias for this.
 
 It should not take you very long to learn enough basic usage for your dev
 workflow. There is a lot of good info on powershell out there on blogs and
