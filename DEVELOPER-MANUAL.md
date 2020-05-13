@@ -309,7 +309,7 @@ function pgrep {
 }
 
 function pkill {
-    pgrep $args | select processid | stop-process
+    pgrep $args | %{ stop-process $_.processid }
 }
 
 function taskslog {
@@ -521,13 +521,19 @@ vim undo files:
 gci -rec .*un~ | ri
 ```
 
-You will notice that `Remove-Item` (`rm, ri`) does not take multiple space
-separated items, you must separate them by commas, eg.:
+You will notice that cmdlets like `Remove-Item` (`rm`, `ri`), `Copy-Item`
+(`cp`, `cpi`) etc. do not take multiple space separated items, you must
+separate them by commas, eg.:
 
 ```powershell
-1..4 | %{ni foo$_; ni bar$_}
+1..4 | %{ni foo$_, bar$_}
+mkdir tmpdir
+cpi foo*, bar* tmpdir
 ri foo*, bar*
+ri -rec tmpdir
 ```
+
+Comma separated items is the list syntax on powershell.
 
 The equivalent of `rm -rf` to delete a directory is:
 
