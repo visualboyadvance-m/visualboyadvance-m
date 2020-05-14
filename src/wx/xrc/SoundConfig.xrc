@@ -42,7 +42,7 @@
                   </object>
                   <object class="sizeritem">
                     <object class="wxButton" name="Volume100">
-                      <label>100%</label>
+                      <label translate="0">100%</label>
                     </object>
                   </object>
                   <object class="spacer">

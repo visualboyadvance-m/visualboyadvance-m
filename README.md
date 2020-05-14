@@ -204,6 +204,10 @@ Note for distro packagers, we use the CMake module
 [GNUInstallDirs](https://cmake.org/cmake/help/v2.8.12/cmake.html#module:GNUInstallDirs)
 to configure installation directories.
 
+On Unix to use a different version of wxWidgets, set
+`wxWidgets_CONFIG_EXECUTABLE` to the path to the `wx-config` script you want to
+use.
+
 ## MSys2 Notes
 
 To run the resulting binary, you can simply type:

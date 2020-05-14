@@ -3792,11 +3792,12 @@ void CPULoop(int ticks)
                     int framesToSkip = systemFrameSkip;
 
                     static bool speedup_throttle_set = false;
+                    bool turbo_button_pressed        = (joy >> 10) & 1;
 #ifndef __LIBRETRO__
                     static uint32_t last_throttle;
 
-                    if ((joy >> 10) & 1) {
-                        if (speedup_throttle != 100 && !speedup_throttle_set && throttle != speedup_throttle) {
+                    if (turbo_button_pressed) {
+                        if (!speedup_throttle_set && throttle != speedup_throttle) {
                             last_throttle = throttle;
                             throttle = speedup_throttle;
                             soundSetThrottle(speedup_throttle);
@@ -3806,13 +3807,13 @@ void CPULoop(int ticks)
                         if (speedup_throttle_set) {
                             if (speedup_throttle_frame_skip) {
                                 if (speedup_throttle == 0)
-                                    framesToSkip += 9;
+                                    framesToSkip += speedup_frame_skip;
                                 else if (speedup_throttle > 100)
                                     framesToSkip += std::ceil(double(speedup_throttle) / 100.0) - 1;
                             }
                         }
                         else
-                            framesToSkip = 9;
+                            framesToSkip = speedup_frame_skip;
                     }
                     else if (speedup_throttle_set) {
                         throttle = last_throttle;
@@ -3821,7 +3822,7 @@ void CPULoop(int ticks)
                         speedup_throttle_set = false;
                     }
 #else
-                    if ((joy >> 10) & 1)
+                    if (turbo_button_pressed)
                         framesToSkip = 9;
 #endif
 
