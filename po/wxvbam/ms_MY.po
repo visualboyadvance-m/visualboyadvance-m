@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-04 01:24+0000\n"
-"PO-Revision-Date: 2020-05-05 12:37+0000\n"
+"POT-Creation-Date: 2020-05-09 07:12+0000\n"
+"PO-Revision-Date: 2020-05-15 12:32+0000\n"
 "Last-Translator: Transifex Bot <>\n"
 "Language-Team: Malay (Malaysia) (http://www.transifex.com/bgk/vba-m/language/ms_MY/)\n"
 "MIME-Version: 1.0\n"
@@ -18,75 +18,75 @@ msgstr ""
 "Language: ms_MY\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: wxvbam.cpp:240
+#: wxvbam.cpp:226
 msgid "visualboyadvance-m"
 msgstr "visualboyadvance-m"
 
-#: wxvbam.cpp:454
+#: wxvbam.cpp:440
 msgid "Could not create main window"
 msgstr "Tidak dapat cipta tetingkap utama"
 
-#: wxvbam.cpp:526
+#: wxvbam.cpp:511
 msgid "Save built-in XRC file and exit"
 msgstr "Simpan fail terbina-dalam XRC kemudian keluar"
 
-#: wxvbam.cpp:529
+#: wxvbam.cpp:514
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Simpan vba-over.ini terbina-dalam kemudian keluar"
 
-#: wxvbam.cpp:532
+#: wxvbam.cpp:517
 msgid "Print configuration path and exit"
 msgstr "Cetak laluan konfigurasi kemudian keluar"
 
-#: wxvbam.cpp:535
+#: wxvbam.cpp:520
 msgid "Start in full-screen mode"
 msgstr "Mula dalam mod skrin-penuh"
 
-#: wxvbam.cpp:539
+#: wxvbam.cpp:524
 msgid "Delete shared link state first, if it exists"
 msgstr "Padam keadaan pautan terkongsi dahulu, jika ia wujud"
 
-#: wxvbam.cpp:546
+#: wxvbam.cpp:531
 msgid "List all settable options and exit"
 msgstr "Senarai semua pilih boleh ditetapkan kemudian keluar"
 
-#: wxvbam.cpp:549
+#: wxvbam.cpp:534
 msgid "ROM file"
 msgstr "Fail ROM"
 
-#: wxvbam.cpp:551
+#: wxvbam.cpp:536
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:582
+#: wxvbam.cpp:567
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr "Ralat konfigurasi/binaan: tidak dapat cari xrc terbina-dalam"
 
-#: wxvbam.cpp:590
+#: wxvbam.cpp:575
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Tulis konfigurasi terbina-dalam pada %s.\nUntuk batalkan, buang semua tetapi ubah nod(s) root. Nod root bagi nama betul pertama ditemui dalam mana-mana fail .xrc atau .xrs dalam pembatalan terbina-dalam bagi laluan gelinter berikut:"
 
-#: wxvbam.cpp:605
+#: wxvbam.cpp:590
 msgid "Configuration is read from, in order:"
 msgstr "Konfigurasi yang dibaca, dalam tertib:"
 
-#: wxvbam.cpp:619
+#: wxvbam.cpp:604
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
 msgstr "Tulis fail pembatalan terbina-dalam pada %s\nUntuk batalkan, padam semua selain dari seksyen berubah. Seksyen yang pertama ditemui digunakan dari laluan gelintar:"
 
-#: wxvbam.cpp:625
+#: wxvbam.cpp:610
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tterbina-dalam"
 
-#: wxvbam.cpp:636
+#: wxvbam.cpp:621
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -94,13 +94,13 @@ msgid ""
 "\n"
 msgstr "Pilihan ditetapkan dari senarai perintah disimpan jika ada perubahan konfigurasi dibuat dalam antaramuka pengguna.\n\nUntuk pilihan bendera, benar dan palsu dinyatakan sebagai 1 dan 0.\n\n"
 
-#: wxvbam.cpp:657
+#: wxvbam.cpp:642
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Perintah tersedia untuk pilihane Papan Kekunci/* adalah:\n\n"
 
-#: wxvbam.cpp:691
+#: wxvbam.cpp:676
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Pilihan konfigurasi teruk atau fail ROM berbilang diberikan:\n"
 
@@ -283,62 +283,62 @@ msgstr "Ini akan mengosongkan semua pemecut ditakrif-pengguna. Anda pasti?"
 msgid "Confirm"
 msgstr "Sahkan"
 
-#: guiinit.cpp:2681
+#: guiinit.cpp:2712
 msgid "Main icon not found"
 msgstr "Ikon utama tidak ditemui"
 
-#: guiinit.cpp:2691
+#: guiinit.cpp:2722
 msgid "Browse"
 msgstr ""
 
-#: guiinit.cpp:2705
+#: guiinit.cpp:2736
 msgid "Main display panel not found"
 msgstr "Panel paparan utama tidak ditemui"
 
-#: guiinit.cpp:2854
+#: guiinit.cpp:2885
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Pemecut menu pendua: %s bagi%s dan%s; kekalkan yang pertama"
 
-#: guiinit.cpp:2868
+#: guiinit.cpp:2899
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Pemecut menu %s untuk %s membatalkan lalai bagi %s ; kekalkan menu"
 
-#: guiinit.cpp:3006
+#: guiinit.cpp:3037
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Item menu %s tidak sah; dibuang"
 
-#: guiinit.cpp:3214
+#: guiinit.cpp:3245
 msgid "Code"
 msgstr "Kod"
 
-#: guiinit.cpp:3223
+#: guiinit.cpp:3254
 msgid "Description"
 msgstr "Keterangan"
 
-#: guiinit.cpp:3297 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3328 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Alamat"
 
-#: guiinit.cpp:3298
+#: guiinit.cpp:3329
 msgid "Old Value"
 msgstr "Nilai Lama"
 
-#: guiinit.cpp:3299
+#: guiinit.cpp:3330
 msgid "New Value"
 msgstr "Nilai Baharu"
 
-#: guiinit.cpp:3811
+#: guiinit.cpp:3846
 msgid "Menu commands"
 msgstr "Perintah menu"
 
-#: guiinit.cpp:3834
+#: guiinit.cpp:3869
 msgid "Other commands"
 msgstr "Perintah lain"
 
-#: guiinit.cpp:3945
+#: guiinit.cpp:3980
 msgid "JoyBus host invalid; disabling"
 msgstr "Hos JoyBus tidak sah; dilumpuhkan"
 
@@ -798,18 +798,18 @@ msgstr ""
 msgid "Could not initialize the sound driver!"
 msgstr ""
 
-#: cmdevents.cpp:2772
+#: cmdevents.cpp:2768
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Emulator Nintendo GameBoy (+Color+Advance)."
 
-#: cmdevents.cpp:2773
+#: cmdevents.cpp:2769
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Hakcipta (C) 1999-2003 Forgotten\nHakcipta (C) 2004-2006 Pasukan pembangunan VBA\nHakcipta (C) 2007-2017 Pasukan pembangunan VBA-M"
 
-#: cmdevents.cpp:2774
+#: cmdevents.cpp:2770
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -825,35 +825,35 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Program ini adalah perisian bebas: anda boleh edar semula ia dan/atau\nubahsuai ia di bawah terma Lesen Awam Am GNU sepertimana yang disiarkan\noleh Free Software Foundation. sama ada versi 2 dari Lesen, atau (mengikut\npilihan anda) mana-mana versi terkemudian.\n\nProgram ini diedar dengan harapan ia berguna, tetapi TANPA APA JUA\nJAMINAN; dan juga jaminan daripada KEBOLEHPASARAN atau KESESUAIAN\nATAS APA JUA TUJUAN. Sila rujuk Lesen Awam Am GNU untuk maklumat\nlanjut.\n\nAnda seharusnya menerima satu salinan Lesen Awam Am GNU bersama\n-sama program ini. Jika tiada, sila rujuk http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3076
+#: cmdevents.cpp:3072
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "Pautan LAN sudah aktif. Lumpuhkan mod paut untuk putuskan."
 
-#: cmdevents.cpp:3082
+#: cmdevents.cpp:3078
 msgid "Network is not supported in local mode."
 msgstr "Rangkaian tidak disokong dalam mod setempat."
 
-#: opts.cpp:560 opts.cpp:865
+#: opts.cpp:561 opts.cpp:866
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "Nilai %s tidak sah bagi pilihan %s; nilai sah adalah %s%s%s"
 
-#: opts.cpp:577 opts.cpp:877
+#: opts.cpp:578 opts.cpp:878
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Nilai %d tidak sah bagi pilihan %s; nilai sah adalah %d - %d"
 
-#: opts.cpp:584 opts.cpp:593 opts.cpp:885 opts.cpp:893
+#: opts.cpp:585 opts.cpp:594 opts.cpp:886 opts.cpp:894
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Nilai %f tidak sah bagi pilihan %s; nilai sah adalah %f - %f"
 
-#: opts.cpp:653 opts.cpp:674 opts.cpp:962 opts.cpp:988
+#: opts.cpp:654 opts.cpp:675 opts.cpp:963 opts.cpp:989
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Pengikatan kekunci %s tidak sah bagi %s"
 
-#: opts.cpp:848
+#: opts.cpp:849
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Pilihan bendera %s tidak sah - %s diabaikan"
@@ -1142,22 +1142,22 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:129
+#: widgets/sdljoy.cpp:130
 #, c-format
 msgid "Connected game controller %d"
 msgstr ""
 
-#: widgets/sdljoy.cpp:143
+#: widgets/sdljoy.cpp:144
 #, c-format
 msgid "Disconnected game controller %d"
 msgstr ""
 
-#: widgets/sdljoy.cpp:229
+#: widgets/sdljoy.cpp:230
 #, c-format
 msgid "Connected joystick %d"
 msgstr ""
 
-#: widgets/sdljoy.cpp:246
+#: widgets/sdljoy.cpp:247
 #, c-format
 msgid "Disconnected joystick %d"
 msgstr ""
@@ -2390,104 +2390,8 @@ msgstr "% biasa:"
 msgid "0 = no throttle"
 msgstr "0 = tanpa throttle"
 
-#: xrc/GeneralConfig.xrc:114 xrc/SpeedupConfig.xrc:45
-msgid "Full Speed/No Limit"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:115 xrc/SpeedupConfig.xrc:46
-msgid "25%"
-msgstr "25%"
-
-#: xrc/GeneralConfig.xrc:116 xrc/SpeedupConfig.xrc:47
-msgid "50%"
-msgstr "50%"
-
-#: xrc/GeneralConfig.xrc:117 xrc/SpeedupConfig.xrc:48
-msgid "75%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:118 xrc/SoundConfig.xrc:45 xrc/SpeedupConfig.xrc:49
-msgid "100%"
-msgstr "100%"
-
-#: xrc/GeneralConfig.xrc:119 xrc/SpeedupConfig.xrc:50
-msgid "125%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:120 xrc/SpeedupConfig.xrc:51
-msgid "150%"
-msgstr "150%"
-
-#: xrc/GeneralConfig.xrc:121 xrc/SpeedupConfig.xrc:52
-msgid "175%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:122 xrc/SpeedupConfig.xrc:53
-msgid "200%"
-msgstr "200%"
-
-#: xrc/GeneralConfig.xrc:123 xrc/SpeedupConfig.xrc:54
-msgid "225%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:124 xrc/SpeedupConfig.xrc:55
-msgid "250%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:125 xrc/SpeedupConfig.xrc:56
-msgid "275%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:126 xrc/SpeedupConfig.xrc:57
-msgid "300%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:127 xrc/SpeedupConfig.xrc:58
-msgid "325%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:128 xrc/SpeedupConfig.xrc:59
-msgid "350%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:129 xrc/SpeedupConfig.xrc:60
-msgid "375%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:130 xrc/SpeedupConfig.xrc:61
-msgid "400%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:131 xrc/SpeedupConfig.xrc:62
-msgid "425%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:132 xrc/SpeedupConfig.xrc:63
-msgid "450%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:133 xrc/SpeedupConfig.xrc:64
-msgid "475%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:134 xrc/SpeedupConfig.xrc:65
-msgid "500%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:135 xrc/SpeedupConfig.xrc:66
-msgid "525%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:136 xrc/SpeedupConfig.xrc:67
-msgid "550%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:137 xrc/SpeedupConfig.xrc:68
-msgid "575%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:138 xrc/SpeedupConfig.xrc:69
-msgid "600%"
+#: xrc/GeneralConfig.xrc:114 xrc/SpeedupConfig.xrc:36
+msgid "Unlimited"
 msgstr ""
 
 #: xrc/IOViewer.xrc:4
@@ -3706,7 +3610,7 @@ msgstr ""
 msgid "Speedup Throttle"
 msgstr ""
 
-#: xrc/SpeedupConfig.xrc:84
+#: xrc/SpeedupConfig.xrc:83
 msgid "Frame skip"
 msgstr ""
 

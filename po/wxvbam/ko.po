@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-04 01:24+0000\n"
-"PO-Revision-Date: 2020-05-05 12:37+0000\n"
+"POT-Creation-Date: 2020-05-09 07:12+0000\n"
+"PO-Revision-Date: 2020-05-15 12:32+0000\n"
 "Last-Translator: Transifex Bot <>\n"
 "Language-Team: Korean (http://www.transifex.com/bgk/vba-m/language/ko/)\n"
 "MIME-Version: 1.0\n"
@@ -20,75 +20,75 @@ msgstr ""
 "Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: wxvbam.cpp:240
+#: wxvbam.cpp:226
 msgid "visualboyadvance-m"
 msgstr "visualboyadvance-m"
 
-#: wxvbam.cpp:454
+#: wxvbam.cpp:440
 msgid "Could not create main window"
 msgstr "메인 윈도우를 생성할 수 없습니다."
 
-#: wxvbam.cpp:526
+#: wxvbam.cpp:511
 msgid "Save built-in XRC file and exit"
 msgstr "built-in XRC 파일을 저장하고 종료합니다."
 
-#: wxvbam.cpp:529
+#: wxvbam.cpp:514
 msgid "Save built-in vba-over.ini and exit"
 msgstr "built-in vba-over.ini 를 저장하고 종료합니다."
 
-#: wxvbam.cpp:532
+#: wxvbam.cpp:517
 msgid "Print configuration path and exit"
 msgstr "설정 경로를 출력하고 종료합니다."
 
-#: wxvbam.cpp:535
+#: wxvbam.cpp:520
 msgid "Start in full-screen mode"
 msgstr "전체화면으로 시작"
 
-#: wxvbam.cpp:539
+#: wxvbam.cpp:524
 msgid "Delete shared link state first, if it exists"
 msgstr "shared link state 파일이 존재한다면 삭제합니다."
 
-#: wxvbam.cpp:546
+#: wxvbam.cpp:531
 msgid "List all settable options and exit"
 msgstr "설정 가능한 옵션을 나열하고 종료합니다."
 
-#: wxvbam.cpp:549
+#: wxvbam.cpp:534
 msgid "ROM file"
 msgstr "ROM 파일"
 
-#: wxvbam.cpp:551
+#: wxvbam.cpp:536
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:582
+#: wxvbam.cpp:567
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr "설정/빌드 오류: built-in XRC를 찾을 수 없습니다."
 
-#: wxvbam.cpp:590
+#: wxvbam.cpp:575
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "빌트인 설정을 %s에 기록했습니다.\n오버라이드 하기 위해서는, 변경된 root node(들)을 제외한 모든것을 제거하세요. 다음 검색경로의 모든 .xrc 혹은 .xrs 파일에서 먼저 검색된 정확한 이름의 root node가 오버라이드 됩니다:"
 
-#: wxvbam.cpp:605
+#: wxvbam.cpp:590
 msgid "Configuration is read from, in order:"
 msgstr "설정은 다음으로부터 순서대로 불러옵니다 :"
 
-#: wxvbam.cpp:619
+#: wxvbam.cpp:604
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
 msgstr "빌트인 오버라이드 파일을 %s에 기록했습니다.\n오버라이드 하기 위해서는, 변경된 섹션을 제외한 모든 것을 지워주세요. 검색 경로에서 먼저 찾아낸 섹션이 사용됩니다:"
 
-#: wxvbam.cpp:625
+#: wxvbam.cpp:610
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\t빌트인"
 
-#: wxvbam.cpp:636
+#: wxvbam.cpp:621
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -96,13 +96,13 @@ msgid ""
 "\n"
 msgstr "유저 인터페이스에서 어떤 설정 변경이라도 일어나면, 커맨드 라인에서 설정된 옵션이 저장됩니다.\n\n플래그 옵션은, true 와 false는 각각 1과 0으로 지정됩니다.\n\n"
 
-#: wxvbam.cpp:657
+#: wxvbam.cpp:642
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Keyboard/* 옵션으로 사용가능한 커맨드:\n\n"
 
-#: wxvbam.cpp:691
+#: wxvbam.cpp:676
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "설정 옵션이 잘못되었거나, 여러개의 ROM 파일이 주어졌습니다:\n"
 
@@ -285,62 +285,62 @@ msgstr "모든 사용자 정의 가속기를 지우게 됩니다. 지우시겠�
 msgid "Confirm"
 msgstr "승인"
 
-#: guiinit.cpp:2681
+#: guiinit.cpp:2712
 msgid "Main icon not found"
 msgstr "메인 아이콘을 찾을 수 없음"
 
-#: guiinit.cpp:2691
+#: guiinit.cpp:2722
 msgid "Browse"
 msgstr ""
 
-#: guiinit.cpp:2705
+#: guiinit.cpp:2736
 msgid "Main display panel not found"
 msgstr "메인 디스플레이 패널을 찾을 수 없음"
 
-#: guiinit.cpp:2854
+#: guiinit.cpp:2885
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "메뉴 가속기 복제: %s 는 %s 와 %s용; 첫 번째 유지"
 
-#: guiinit.cpp:2868
+#: guiinit.cpp:2899
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "%s 메뉴 가속기 (%s에 대해) 는 %s에 대한 초기값을 덮어씌움 ; 메뉴 유지"
 
-#: guiinit.cpp:3006
+#: guiinit.cpp:3037
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "무효한 %s 메뉴 항목 ; 제거"
 
-#: guiinit.cpp:3214
+#: guiinit.cpp:3245
 msgid "Code"
 msgstr "코드"
 
-#: guiinit.cpp:3223
+#: guiinit.cpp:3254
 msgid "Description"
 msgstr "설명"
 
-#: guiinit.cpp:3297 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3328 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "주소"
 
-#: guiinit.cpp:3298
+#: guiinit.cpp:3329
 msgid "Old Value"
 msgstr "이전 값"
 
-#: guiinit.cpp:3299
+#: guiinit.cpp:3330
 msgid "New Value"
 msgstr "새 값"
 
-#: guiinit.cpp:3811
+#: guiinit.cpp:3846
 msgid "Menu commands"
 msgstr "메뉴 명령"
 
-#: guiinit.cpp:3834
+#: guiinit.cpp:3869
 msgid "Other commands"
 msgstr "그 외 명령"
 
-#: guiinit.cpp:3945
+#: guiinit.cpp:3980
 msgid "JoyBus host invalid; disabling"
 msgstr "조이버스 호스트 무효; 비활성화"
 
@@ -800,18 +800,18 @@ msgstr ""
 msgid "Could not initialize the sound driver!"
 msgstr ""
 
-#: cmdevents.cpp:2772
+#: cmdevents.cpp:2768
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "닌텐도 게임 보이 (+컬러+어드밴스) 에뮬레이터"
 
-#: cmdevents.cpp:2773
+#: cmdevents.cpp:2769
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA 개발팀\nCopyright (C) 2007-2017 VBA-M 개발팀"
 
-#: cmdevents.cpp:2774
+#: cmdevents.cpp:2770
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -827,35 +827,35 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "이 프로그램은 자유 소프트웨어입니다. 소프트웨어의 피양도자는 자유\n소프트웨어 재단이 공표한 GNU 일반 공중 사용 허가서 2판 또는 그\n이후 판을 임의로 선택해서, 그 규정에 따라 프로그램을 개작하거나 \n재배포할 수 있습니다. \n\n이 프로그램은 유용하게 사용될 수 있으리라는 희망에서 배포되고\n있지만, 특정한 목적에 맞는 적합성 여부나 판매용으로 사용할 수 \n있으리라는 묵시적인 보증을 포함한 어떠한 형태의 보증도 제공하지 \n않습니다. 보다 자세한 사항에 대해서는 GNU 일반 공중 사용 허가서를\n참고하시기 바랍니다.\n\nGNU 일반 공중 사용 허가서는 이 프로그램과 함께 제공됩니다. 만약,\n이 문서가 누락되어 있다면 http://www.gnu.org/licenses 를\n참조 바랍니다."
 
-#: cmdevents.cpp:3076
+#: cmdevents.cpp:3072
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LAN 연결이 이미 활성화 상태입니다. 연결해체를 위해 연결 모드를 비활성화 하십시오."
 
-#: cmdevents.cpp:3082
+#: cmdevents.cpp:3078
 msgid "Network is not supported in local mode."
 msgstr "로컬 모드에서는 네트워크가 지원되지 않습니다."
 
-#: opts.cpp:560 opts.cpp:865
+#: opts.cpp:561 opts.cpp:866
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "%s 값은 %s 옵션에 대해 무효함; 유효한 값은 %s%s%s"
 
-#: opts.cpp:577 opts.cpp:877
+#: opts.cpp:578 opts.cpp:878
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "%d 값은 %s 옵션에 대해 무효함; 유효한 값은 %d - %d"
 
-#: opts.cpp:584 opts.cpp:593 opts.cpp:885 opts.cpp:893
+#: opts.cpp:585 opts.cpp:594 opts.cpp:886 opts.cpp:894
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "%f 값은 %s 옵션에 대해 무효함; 유효한 값은 %f - %f"
 
-#: opts.cpp:653 opts.cpp:674 opts.cpp:962 opts.cpp:988
+#: opts.cpp:654 opts.cpp:675 opts.cpp:963 opts.cpp:989
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "%s : %s 에 대한 무효한 키 설정"
 
-#: opts.cpp:848
+#: opts.cpp:849
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "무효한 플래그 옵션 %s - %s 무시됨"
@@ -1144,22 +1144,22 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:129
+#: widgets/sdljoy.cpp:130
 #, c-format
 msgid "Connected game controller %d"
 msgstr ""
 
-#: widgets/sdljoy.cpp:143
+#: widgets/sdljoy.cpp:144
 #, c-format
 msgid "Disconnected game controller %d"
 msgstr ""
 
-#: widgets/sdljoy.cpp:229
+#: widgets/sdljoy.cpp:230
 #, c-format
 msgid "Connected joystick %d"
 msgstr ""
 
-#: widgets/sdljoy.cpp:246
+#: widgets/sdljoy.cpp:247
 #, c-format
 msgid "Disconnected joystick %d"
 msgstr ""
@@ -2392,104 +2392,8 @@ msgstr "보통에서 몇 % :"
 msgid "0 = no throttle"
 msgstr "0 = 조절판 없음"
 
-#: xrc/GeneralConfig.xrc:114 xrc/SpeedupConfig.xrc:45
-msgid "Full Speed/No Limit"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:115 xrc/SpeedupConfig.xrc:46
-msgid "25%"
-msgstr "25%"
-
-#: xrc/GeneralConfig.xrc:116 xrc/SpeedupConfig.xrc:47
-msgid "50%"
-msgstr "50%"
-
-#: xrc/GeneralConfig.xrc:117 xrc/SpeedupConfig.xrc:48
-msgid "75%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:118 xrc/SoundConfig.xrc:45 xrc/SpeedupConfig.xrc:49
-msgid "100%"
-msgstr "100%"
-
-#: xrc/GeneralConfig.xrc:119 xrc/SpeedupConfig.xrc:50
-msgid "125%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:120 xrc/SpeedupConfig.xrc:51
-msgid "150%"
-msgstr "150%"
-
-#: xrc/GeneralConfig.xrc:121 xrc/SpeedupConfig.xrc:52
-msgid "175%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:122 xrc/SpeedupConfig.xrc:53
-msgid "200%"
-msgstr "200%"
-
-#: xrc/GeneralConfig.xrc:123 xrc/SpeedupConfig.xrc:54
-msgid "225%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:124 xrc/SpeedupConfig.xrc:55
-msgid "250%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:125 xrc/SpeedupConfig.xrc:56
-msgid "275%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:126 xrc/SpeedupConfig.xrc:57
-msgid "300%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:127 xrc/SpeedupConfig.xrc:58
-msgid "325%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:128 xrc/SpeedupConfig.xrc:59
-msgid "350%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:129 xrc/SpeedupConfig.xrc:60
-msgid "375%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:130 xrc/SpeedupConfig.xrc:61
-msgid "400%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:131 xrc/SpeedupConfig.xrc:62
-msgid "425%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:132 xrc/SpeedupConfig.xrc:63
-msgid "450%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:133 xrc/SpeedupConfig.xrc:64
-msgid "475%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:134 xrc/SpeedupConfig.xrc:65
-msgid "500%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:135 xrc/SpeedupConfig.xrc:66
-msgid "525%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:136 xrc/SpeedupConfig.xrc:67
-msgid "550%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:137 xrc/SpeedupConfig.xrc:68
-msgid "575%"
-msgstr ""
-
-#: xrc/GeneralConfig.xrc:138 xrc/SpeedupConfig.xrc:69
-msgid "600%"
+#: xrc/GeneralConfig.xrc:114 xrc/SpeedupConfig.xrc:36
+msgid "Unlimited"
 msgstr ""
 
 #: xrc/IOViewer.xrc:4
@@ -3708,7 +3612,7 @@ msgstr ""
 msgid "Speedup Throttle"
 msgstr ""
 
-#: xrc/SpeedupConfig.xrc:84
+#: xrc/SpeedupConfig.xrc:83
 msgid "Frame skip"
 msgstr ""
 

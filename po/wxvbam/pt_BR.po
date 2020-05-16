@@ -20,8 +20,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-04 01:24+0000\n"
-"PO-Revision-Date: 2020-05-05 12:37+0000\n"
+"POT-Creation-Date: 2020-05-09 07:12+0000\n"
+"PO-Revision-Date: 2020-05-15 12:32+0000\n"
 "Last-Translator: Transifex Bot <>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/bgk/vba-m/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -30,75 +30,75 @@ msgstr ""
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: wxvbam.cpp:240
+#: wxvbam.cpp:226
 msgid "visualboyadvance-m"
 msgstr "visualboyadvance-m"
 
-#: wxvbam.cpp:454
+#: wxvbam.cpp:440
 msgid "Could not create main window"
 msgstr "Não foi possível criar janela principal"
 
-#: wxvbam.cpp:526
+#: wxvbam.cpp:511
 msgid "Save built-in XRC file and exit"
 msgstr "Salvar arquivo embutido XRC e sair"
 
-#: wxvbam.cpp:529
+#: wxvbam.cpp:514
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Salvar vba-over.ini embutido e sair"
 
-#: wxvbam.cpp:532
+#: wxvbam.cpp:517
 msgid "Print configuration path and exit"
 msgstr "Imprimir caminho de configuração e sair"
 
-#: wxvbam.cpp:535
+#: wxvbam.cpp:520
 msgid "Start in full-screen mode"
 msgstr "Iniciar em modo tela-cheia"
 
-#: wxvbam.cpp:539
+#: wxvbam.cpp:524
 msgid "Delete shared link state first, if it exists"
 msgstr "Excluir estado de link compartilhado primeiro, se existir"
 
-#: wxvbam.cpp:546
+#: wxvbam.cpp:531
 msgid "List all settable options and exit"
 msgstr "Listar todos as opções de configuração e sair"
 
-#: wxvbam.cpp:549
+#: wxvbam.cpp:534
 msgid "ROM file"
 msgstr "Arquivo ROM"
 
-#: wxvbam.cpp:551
+#: wxvbam.cpp:536
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:582
+#: wxvbam.cpp:567
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr "Erro de configuração / build: não é possível encontrar xrc embutido"
 
-#: wxvbam.cpp:590
+#: wxvbam.cpp:575
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Escreveu configuração embutida para %s.\nPara substituir, remova todos o(s) nó(s) modificados. Primeiro encontre o nó raiz do nome correto em todos os arquivos .xrc or .xrs substituindo nos seguintes caminhos de busca embutidos:"
 
-#: wxvbam.cpp:605
+#: wxvbam.cpp:590
 msgid "Configuration is read from, in order:"
 msgstr "A configuração é lida de, em ordem:"
 
-#: wxvbam.cpp:619
+#: wxvbam.cpp:604
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
 msgstr "Escreveu arquivo de substituição embutido para %s\nPara substituir, delete todas as seções modificadas. Primeira seção encontrada é usada do caminho de busca:"
 
-#: wxvbam.cpp:625
+#: wxvbam.cpp:610
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n⇥embutido"
 
-#: wxvbam.cpp:636
+#: wxvbam.cpp:621
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -106,13 +106,13 @@ msgid ""
 "\n"
 msgstr "As opções definidas a partir da linha de comando são salvas se todas as alterações de configuração são feitas na interface do usuário.\n\nPara opções de flag, true e false estão especificados como 1 e 0, respectivamente.\n\n"
 
-#: wxvbam.cpp:657
+#: wxvbam.cpp:642
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Os comandos disponíveis para opções do Teclado/* são:\n\n"
 
-#: wxvbam.cpp:691
+#: wxvbam.cpp:676
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Má configuração de opções ou arquivos ROM múltiplos fornecidos:\n"
 
@@ -295,62 +295,62 @@ msgstr "Isso limpará todos os aceleradores definidos pelo usuário. Você tem c
 msgid "Confirm"
 msgstr "Confirmar"
 
-#: guiinit.cpp:2681
+#: guiinit.cpp:2712
 msgid "Main icon not found"
 msgstr "Ícone principal não encontrado"
 
-#: guiinit.cpp:2691
+#: guiinit.cpp:2722
 msgid "Browse"
 msgstr "Navegar"
 
-#: guiinit.cpp:2705
+#: guiinit.cpp:2736
 msgid "Main display panel not found"
 msgstr "Painel de exibição principal não encontrado"
 
-#: guiinit.cpp:2854
+#: guiinit.cpp:2885
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Duplicar acelerador de menu: %s para %s e %s; mantendo primeiro"
 
-#: guiinit.cpp:2868
+#: guiinit.cpp:2899
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Acelerador de menu %s para %s substitui o padrão para %s ; mantendo menu"
 
-#: guiinit.cpp:3006
+#: guiinit.cpp:3037
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Item de menu inválido %s; removendo"
 
-#: guiinit.cpp:3214
+#: guiinit.cpp:3245
 msgid "Code"
 msgstr "Código"
 
-#: guiinit.cpp:3223
+#: guiinit.cpp:3254
 msgid "Description"
 msgstr "Descrição"
 
-#: guiinit.cpp:3297 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3328 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Endereço"
 
-#: guiinit.cpp:3298
+#: guiinit.cpp:3329
 msgid "Old Value"
 msgstr "Valor Antigo"
 
-#: guiinit.cpp:3299
+#: guiinit.cpp:3330
 msgid "New Value"
 msgstr "Valor Novo"
 
-#: guiinit.cpp:3811
+#: guiinit.cpp:3846
 msgid "Menu commands"
 msgstr "Comandos do menu"
 
-#: guiinit.cpp:3834
+#: guiinit.cpp:3869
 msgid "Other commands"
 msgstr "Outros comandos"
 
-#: guiinit.cpp:3945
+#: guiinit.cpp:3980
 msgid "JoyBus host invalid; disabling"
 msgstr "Host JoyBus inválido; desativando"
 
@@ -810,18 +810,18 @@ msgstr "Usar mesclagem de quadros #%d"
 msgid "Could not initialize the sound driver!"
 msgstr "Não foi possível inicializar o driver de som! "
 
-#: cmdevents.cpp:2772
+#: cmdevents.cpp:2768
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Emulador de Nintendo GameBoy (+Color+Advance)."
 
-#: cmdevents.cpp:2773
+#: cmdevents.cpp:2769
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Esquecido\nCopyright (C) 2004-2006 Equipe do VBA\nCopyright (C) 2007-2017 Equipe do VBA-M"
 
-#: cmdevents.cpp:2774
+#: cmdevents.cpp:2770
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -837,35 +837,35 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Este programa é um software livre: você pode redistribuí-lo e/ou modificá-lo\nde acordo com os termos da GNU General Public License como publicado pela\nFree Sotware Foundation, bem como a versão 2 da Licença, ou (na sua opção)\nqualquer versão posterior.\n\nEste programa é distribuído na esperança que o mesmo seja útil,\nmas SEM QUALQUER GARANTIA; sem mesmo a garantia implícita de\nCOMERCIALIZAÇÃO ou ADEQUAÇÃO PARA PROPÓSITOS PESSOAIS. Consulte\na GNU General Public License para mais detalhes.\n\nVocê deve ter recebido uma cópia da GNU General Public License\njunto com este programa. Se não recebeu, veja em http://www.gnu.org/licenses."
 
-#: cmdevents.cpp:3076
+#: cmdevents.cpp:3072
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "O link LAN já está ativo. Desative o modo link para ser desconectado."
 
-#: cmdevents.cpp:3082
+#: cmdevents.cpp:3078
 msgid "Network is not supported in local mode."
 msgstr "Rede não é suportada em modo local."
 
-#: opts.cpp:560 opts.cpp:865
+#: opts.cpp:561 opts.cpp:866
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "Valor inválido %s para a opção %s; valores válidos são %s%s%s"
 
-#: opts.cpp:577 opts.cpp:877
+#: opts.cpp:578 opts.cpp:878
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Valores inválidos %d para a opção %s; valores válidos são %d - %d"
 
-#: opts.cpp:584 opts.cpp:593 opts.cpp:885 opts.cpp:893
+#: opts.cpp:585 opts.cpp:594 opts.cpp:886 opts.cpp:894
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "valor inválido %f para a opção %s; valores válidos são %f - %f"
 
-#: opts.cpp:653 opts.cpp:674 opts.cpp:962 opts.cpp:988
+#: opts.cpp:654 opts.cpp:675 opts.cpp:963 opts.cpp:989
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Chave obrigatória inválida %s para %s"
 
-#: opts.cpp:848
+#: opts.cpp:849
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Opção de flag inválida %s - %s ignorada"
@@ -1154,22 +1154,22 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:129
+#: widgets/sdljoy.cpp:130
 #, c-format
 msgid "Connected game controller %d"
 msgstr "Controle de jogo conectado %d"
 
-#: widgets/sdljoy.cpp:143
+#: widgets/sdljoy.cpp:144
 #, c-format
 msgid "Disconnected game controller %d"
 msgstr "Controle de jogo desconectado %d"
 
-#: widgets/sdljoy.cpp:229
+#: widgets/sdljoy.cpp:230
 #, c-format
 msgid "Connected joystick %d"
 msgstr ""
 
-#: widgets/sdljoy.cpp:246
+#: widgets/sdljoy.cpp:247
 #, c-format
 msgid "Disconnected joystick %d"
 msgstr ""
@@ -2402,105 +2402,9 @@ msgstr "% do normal:"
 msgid "0 = no throttle"
 msgstr "0 = sem aceleração"
 
-#: xrc/GeneralConfig.xrc:114 xrc/SpeedupConfig.xrc:45
-msgid "Full Speed/No Limit"
-msgstr "Velocidade Máxima/Sem Limite"
-
-#: xrc/GeneralConfig.xrc:115 xrc/SpeedupConfig.xrc:46
-msgid "25%"
-msgstr "25%"
-
-#: xrc/GeneralConfig.xrc:116 xrc/SpeedupConfig.xrc:47
-msgid "50%"
-msgstr "50%"
-
-#: xrc/GeneralConfig.xrc:117 xrc/SpeedupConfig.xrc:48
-msgid "75%"
-msgstr "75%"
-
-#: xrc/GeneralConfig.xrc:118 xrc/SoundConfig.xrc:45 xrc/SpeedupConfig.xrc:49
-msgid "100%"
-msgstr "100%"
-
-#: xrc/GeneralConfig.xrc:119 xrc/SpeedupConfig.xrc:50
-msgid "125%"
-msgstr "125%"
-
-#: xrc/GeneralConfig.xrc:120 xrc/SpeedupConfig.xrc:51
-msgid "150%"
-msgstr "150%"
-
-#: xrc/GeneralConfig.xrc:121 xrc/SpeedupConfig.xrc:52
-msgid "175%"
-msgstr "175%"
-
-#: xrc/GeneralConfig.xrc:122 xrc/SpeedupConfig.xrc:53
-msgid "200%"
-msgstr "200%"
-
-#: xrc/GeneralConfig.xrc:123 xrc/SpeedupConfig.xrc:54
-msgid "225%"
-msgstr "225%"
-
-#: xrc/GeneralConfig.xrc:124 xrc/SpeedupConfig.xrc:55
-msgid "250%"
-msgstr "250%"
-
-#: xrc/GeneralConfig.xrc:125 xrc/SpeedupConfig.xrc:56
-msgid "275%"
-msgstr "275%"
-
-#: xrc/GeneralConfig.xrc:126 xrc/SpeedupConfig.xrc:57
-msgid "300%"
-msgstr "300%"
-
-#: xrc/GeneralConfig.xrc:127 xrc/SpeedupConfig.xrc:58
-msgid "325%"
-msgstr "325%"
-
-#: xrc/GeneralConfig.xrc:128 xrc/SpeedupConfig.xrc:59
-msgid "350%"
-msgstr "350%"
-
-#: xrc/GeneralConfig.xrc:129 xrc/SpeedupConfig.xrc:60
-msgid "375%"
-msgstr "375%"
-
-#: xrc/GeneralConfig.xrc:130 xrc/SpeedupConfig.xrc:61
-msgid "400%"
-msgstr "400%"
-
-#: xrc/GeneralConfig.xrc:131 xrc/SpeedupConfig.xrc:62
-msgid "425%"
-msgstr "425%"
-
-#: xrc/GeneralConfig.xrc:132 xrc/SpeedupConfig.xrc:63
-msgid "450%"
-msgstr "450%"
-
-#: xrc/GeneralConfig.xrc:133 xrc/SpeedupConfig.xrc:64
-msgid "475%"
-msgstr "475%"
-
-#: xrc/GeneralConfig.xrc:134 xrc/SpeedupConfig.xrc:65
-msgid "500%"
-msgstr "500%"
-
-#: xrc/GeneralConfig.xrc:135 xrc/SpeedupConfig.xrc:66
-msgid "525%"
-msgstr "525%"
-
-#: xrc/GeneralConfig.xrc:136 xrc/SpeedupConfig.xrc:67
-msgid "550%"
-msgstr "550%"
-
-#: xrc/GeneralConfig.xrc:137 xrc/SpeedupConfig.xrc:68
-msgid "575%"
-msgstr "575%"
-
-#: xrc/GeneralConfig.xrc:138 xrc/SpeedupConfig.xrc:69
-msgid "600%"
-msgstr "600%"
+#: xrc/GeneralConfig.xrc:114 xrc/SpeedupConfig.xrc:36
+msgid "Unlimited"
+msgstr ""
 
 #: xrc/IOViewer.xrc:4
 msgid "IO Viewer"
@@ -3718,7 +3622,7 @@ msgstr "Configuração de Acelerador/Turbo"
 msgid "Speedup Throttle"
 msgstr "Valor de aceleração"
 
-#: xrc/SpeedupConfig.xrc:84
+#: xrc/SpeedupConfig.xrc:83
 msgid "Frame skip"
 msgstr "Saltar quadros"
 

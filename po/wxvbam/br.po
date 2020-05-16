@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-04 01:24+0000\n"
-"PO-Revision-Date: 2020-05-05 12:37+0000\n"
+"POT-Creation-Date: 2020-05-09 07:12+0000\n"
+"PO-Revision-Date: 2020-05-15 12:32+0000\n"
 "Last-Translator: Transifex Bot <>\n"
 "Language-Team: Breton (http://www.transifex.com/bgk/vba-m/language/br/)\n"
 "MIME-Version: 1.0\n"
@@ -18,75 +18,75 @@ msgstr ""
 "Language: br\n"
 "Plural-Forms: nplurals=5; plural=((n%10 == 1) && (n%100 != 11) && (n%100 !=71) && (n%100 !=91) ? 0 :(n%10 == 2) && (n%100 != 12) && (n%100 !=72) && (n%100 !=92) ? 1 :(n%10 ==3 || n%10==4 || n%10==9) && (n%100 < 10 || n% 100 > 19) && (n%100 < 70 || n%100 > 79) && (n%100 < 90 || n%100 > 99) ? 2 :(n != 0 && n % 1000000 == 0) ? 3 : 4);\n"
 
-#: wxvbam.cpp:240
+#: wxvbam.cpp:226
 msgid "visualboyadvance-m"
 msgstr "visualboyadvance-m"
 
-#: wxvbam.cpp:454
+#: wxvbam.cpp:440
 msgid "Could not create main window"
 msgstr "N'hall ket krouiñ ar prenestr-pennañ"
 
-#: wxvbam.cpp:526
+#: wxvbam.cpp:511
 msgid "Save built-in XRC file and exit"
 msgstr "Enrollañ ar restr XRC enframmet ha kuitait"
 
-#: wxvbam.cpp:529
+#: wxvbam.cpp:514
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Enrollañ ar restr vba-over.ini enframmet ha kuitait"
 
-#: wxvbam.cpp:532
+#: wxvbam.cpp:517
 msgid "Print configuration path and exit"
 msgstr "Moulla hent ar c'hefluniadur ha kuitaat"
 
-#: wxvbam.cpp:535
+#: wxvbam.cpp:520
 msgid "Start in full-screen mode"
 msgstr "Kregiñ e-barzh ar mod skramm-leun"
 
-#: wxvbam.cpp:539
+#: wxvbam.cpp:524
 msgid "Delete shared link state first, if it exists"
 msgstr "Diverkañ stad ar c'hevreadur rannet da gentañ mar plij, ma 'z eus anezhañ"
 
-#: wxvbam.cpp:546
+#: wxvbam.cpp:531
 msgid "List all settable options and exit"
 msgstr "Listennañ an holl zibarzhioù kefluniadus ha kuitaat"
 
-#: wxvbam.cpp:549
+#: wxvbam.cpp:534
 msgid "ROM file"
 msgstr "Restr ROM"
 
-#: wxvbam.cpp:551
+#: wxvbam.cpp:536
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:582
+#: wxvbam.cpp:567
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr "Fazi kefluniadur/savadur: n'hall ket bezañ kavet ar restr XRC enframmet"
 
-#: wxvbam.cpp:590
+#: wxvbam.cpp:575
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Skrivet ez eus bet ur c'hefluniadur enframmet evit %s.\nEvit erlec'hiañ, dilemel an holl skoulmoù-gwrizienn kemmet. Skoulm-gwrizienn an anv reizh e-barzh an holl restroù .xrc pe .xrs e-barzh an erlec'hiadennoù hent enklask da-heul enframmet:"
 
-#: wxvbam.cpp:605
+#: wxvbam.cpp:590
 msgid "Configuration is read from, in order:"
 msgstr "Ar c'hefluniadur a zo lennet adalek, en urzh:"
 
-#: wxvbam.cpp:619
+#: wxvbam.cpp:604
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
 msgstr "Skrivet ez eus bet ur c'hefluniadur enframmet evit %s\nEvit nullañ, diverkañ ar rann a-bezh, nemet ar pezh a zo bet kemmet. Ar rann gentañ a zo kavet a zo implijet adalek an hent enklask:"
 
-#: wxvbam.cpp:625
+#: wxvbam.cpp:610
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tbuilt-in"
 
-#: wxvbam.cpp:636
+#: wxvbam.cpp:621
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -94,13 +94,13 @@ msgid ""
 "\n"
 msgstr "An dibarzhioù ensavet adalek al linenn urzhiad a zo enrollet ma vez ur chañchamant kefluniadur e etrefas an implijer.\n\nEvit an dibarzhioù lec'hiañ, an talvoudegezhioù gwir ha gaou a zo spisaet evel 1 ha 0.\n"
 
-#: wxvbam.cpp:657
+#: wxvbam.cpp:642
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "An urzhiadoù hegerz evit an dibarzh Klavier/* a zo:\n\n"
 
-#: wxvbam.cpp:691
+#: wxvbam.cpp:676
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Kefluniadur fall an dibarzhioù pe restroù ROM-lies roet:\n"
 
@@ -283,62 +283,62 @@ msgstr "An dra-mañ a netao ar fonuserien termenet gant an implijer. Ha sur oc'h
 msgid "Confirm"
 msgstr "Kadarnaat"
 
-#: guiinit.cpp:2681
+#: guiinit.cpp:2712
 msgid "Main icon not found"
 msgstr "Arlun-pennañ nann-kavet"
 
-#: guiinit.cpp:2691
+#: guiinit.cpp:2722
 msgid "Browse"
 msgstr "Merdeiñ"
 
-#: guiinit.cpp:2705
+#: guiinit.cpp:2736
 msgid "Main display panel not found"
 msgstr "Panel diskouez-pennañ nann-kavet"
 
-#: guiinit.cpp:2854
+#: guiinit.cpp:2885
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Eilañ lañser ar fonusaer: %s evit %s ha %s ; an hini kentañ a vo gwarnet"
 
-#: guiinit.cpp:2868
+#: guiinit.cpp:2899
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Lañser fonusaer %s evit %s nullañ dre ziouer evit %s ; al lañser a vo gwarnet"
 
-#: guiinit.cpp:3006
+#: guiinit.cpp:3037
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Elfenn al lañser %s nann-talvoudus; o tiverkañ"
 
-#: guiinit.cpp:3214
+#: guiinit.cpp:3245
 msgid "Code"
 msgstr "Kod"
 
-#: guiinit.cpp:3223
+#: guiinit.cpp:3254
 msgid "Description"
 msgstr "Deskrivadur"
 
-#: guiinit.cpp:3297 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3328 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Chomlec'h"
 
-#: guiinit.cpp:3298
+#: guiinit.cpp:3329
 msgid "Old Value"
 msgstr "Talvoudegezh kozh"
 
-#: guiinit.cpp:3299
+#: guiinit.cpp:3330
 msgid "New Value"
 msgstr "Talvoudegezh nevez"
 
-#: guiinit.cpp:3811
+#: guiinit.cpp:3846
 msgid "Menu commands"
 msgstr "Lañser an urzhiadoù"
 
-#: guiinit.cpp:3834
+#: guiinit.cpp:3869
 msgid "Other commands"
 msgstr "Urzhiadoù all"
 
-#: guiinit.cpp:3945
+#: guiinit.cpp:3980
 msgid "JoyBus host invalid; disabling"
 msgstr "Ostiz JoyBus nann-dalvoudus; o titalvoudekaat"
 
@@ -798,18 +798,18 @@ msgstr "Oc'h implijout ar meskladur ebarzhstern #%d"
 msgid "Could not initialize the sound driver!"
 msgstr ""
 
-#: cmdevents.cpp:2772
+#: cmdevents.cpp:2768
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Emulator evit Nitendo Gameboy (+Color+Advance)."
 
-#: cmdevents.cpp:2773
+#: cmdevents.cpp:2769
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Disoñjet\nCopyright (C) 2004-2006 VBA skipailh diorroerien\nCopyright (C) 2007-2017 VBA-M skipailh diorroerien"
 
-#: cmdevents.cpp:2774
+#: cmdevents.cpp:2770
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -825,35 +825,35 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Ar program-mañ a zo ur meziant frank anezhañ: gallout a reoc'h e zasparzhañ ha/pe e gemmañ\ndindan termenoù al Lisañs GNU Publik Hollek evel embannet gant\nar Free Software Foundation, pe ar stumm 2 eus al Lisañs, pe\n(diouzh ho tibab) forzh peseurt stumm deuet er-maez diwezhatoc'h.\n\nDasparzhet eo ar program-mañ gant ar spi ma vo servijus da vat,\nmet HEP GWARANT EBET; hep ar gwarant empleget eus\nar C'HALITE KENWERZHEL PE AN AZASADUR D'UN IMPLIJ PERSONEL.\nGwelit al Lisañs GNU Publik Hollek evit kaout muioc'h a vunudoù.\n\nResevet ho peus normalamant un eiladenn deus al Lisañs GNU Publik Hollek\nstag gant ar program-mañ. Ma n'ho peus ket, kit da welet http://www.gnu.org/licenses."
 
-#: cmdevents.cpp:3076
+#: cmdevents.cpp:3072
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "Oberiant emañ dija al liamm LAN. Diweredekait ar mod liamm evit digevreañ."
 
-#: cmdevents.cpp:3082
+#: cmdevents.cpp:3078
 msgid "Network is not supported in local mode."
 msgstr "Ne vez ket degemeret ar rouedad e mod lec'hel."
 
-#: opts.cpp:560 opts.cpp:865
+#: opts.cpp:561 opts.cpp:866
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "Talvoud diwir %s evit an opsionoù %s; an talvoudegezhioù mat a zo %s%s%s"
 
-#: opts.cpp:577 opts.cpp:877
+#: opts.cpp:578 opts.cpp:878
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Talvoud diwir %d evit an opsionoù %s; an talvoudegezhioù mat a zo %d - %d"
 
-#: opts.cpp:584 opts.cpp:593 opts.cpp:885 opts.cpp:893
+#: opts.cpp:585 opts.cpp:594 opts.cpp:886 opts.cpp:894
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Talvoud diwir %f evit an opsionoù %s; an talvoudegezhioù mat a zo %f - %f"
 
-#: opts.cpp:653 opts.cpp:674 opts.cpp:962 opts.cpp:988
+#: opts.cpp:654 opts.cpp:675 opts.cpp:963 opts.cpp:989
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Blokad an touchennoù direizh %s evit %s"
 
-#: opts.cpp:848
+#: opts.cpp:849
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Opsionoù Flag direizh %s - %s graet van outo"
@@ -1142,22 +1142,22 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:129
+#: widgets/sdljoy.cpp:130
 #, c-format
 msgid "Connected game controller %d"
 msgstr ""
 
-#: widgets/sdljoy.cpp:143
+#: widgets/sdljoy.cpp:144
 #, c-format
 msgid "Disconnected game controller %d"
 msgstr ""
 
-#: widgets/sdljoy.cpp:229
+#: widgets/sdljoy.cpp:230
 #, c-format
 msgid "Connected joystick %d"
 msgstr ""
 
-#: widgets/sdljoy.cpp:246
+#: widgets/sdljoy.cpp:247
 #, c-format
 msgid "Disconnected joystick %d"
 msgstr ""
@@ -2390,105 +2390,9 @@ msgstr "% eus an normal:"
 msgid "0 = no throttle"
 msgstr "0=buanadur ebet"
 
-#: xrc/GeneralConfig.xrc:114 xrc/SpeedupConfig.xrc:45
-msgid "Full Speed/No Limit"
+#: xrc/GeneralConfig.xrc:114 xrc/SpeedupConfig.xrc:36
+msgid "Unlimited"
 msgstr ""
-
-#: xrc/GeneralConfig.xrc:115 xrc/SpeedupConfig.xrc:46
-msgid "25%"
-msgstr "25%"
-
-#: xrc/GeneralConfig.xrc:116 xrc/SpeedupConfig.xrc:47
-msgid "50%"
-msgstr "50%"
-
-#: xrc/GeneralConfig.xrc:117 xrc/SpeedupConfig.xrc:48
-msgid "75%"
-msgstr "75%"
-
-#: xrc/GeneralConfig.xrc:118 xrc/SoundConfig.xrc:45 xrc/SpeedupConfig.xrc:49
-msgid "100%"
-msgstr "100%"
-
-#: xrc/GeneralConfig.xrc:119 xrc/SpeedupConfig.xrc:50
-msgid "125%"
-msgstr "125%"
-
-#: xrc/GeneralConfig.xrc:120 xrc/SpeedupConfig.xrc:51
-msgid "150%"
-msgstr "150%"
-
-#: xrc/GeneralConfig.xrc:121 xrc/SpeedupConfig.xrc:52
-msgid "175%"
-msgstr "175%"
-
-#: xrc/GeneralConfig.xrc:122 xrc/SpeedupConfig.xrc:53
-msgid "200%"
-msgstr "200%"
-
-#: xrc/GeneralConfig.xrc:123 xrc/SpeedupConfig.xrc:54
-msgid "225%"
-msgstr "225%"
-
-#: xrc/GeneralConfig.xrc:124 xrc/SpeedupConfig.xrc:55
-msgid "250%"
-msgstr "250%"
-
-#: xrc/GeneralConfig.xrc:125 xrc/SpeedupConfig.xrc:56
-msgid "275%"
-msgstr "275%"
-
-#: xrc/GeneralConfig.xrc:126 xrc/SpeedupConfig.xrc:57
-msgid "300%"
-msgstr "300%"
-
-#: xrc/GeneralConfig.xrc:127 xrc/SpeedupConfig.xrc:58
-msgid "325%"
-msgstr "325%"
-
-#: xrc/GeneralConfig.xrc:128 xrc/SpeedupConfig.xrc:59
-msgid "350%"
-msgstr "350%"
-
-#: xrc/GeneralConfig.xrc:129 xrc/SpeedupConfig.xrc:60
-msgid "375%"
-msgstr "375%"
-
-#: xrc/GeneralConfig.xrc:130 xrc/SpeedupConfig.xrc:61
-msgid "400%"
-msgstr "400%"
-
-#: xrc/GeneralConfig.xrc:131 xrc/SpeedupConfig.xrc:62
-msgid "425%"
-msgstr "425%"
-
-#: xrc/GeneralConfig.xrc:132 xrc/SpeedupConfig.xrc:63
-msgid "450%"
-msgstr "450%"
-
-#: xrc/GeneralConfig.xrc:133 xrc/SpeedupConfig.xrc:64
-msgid "475%"
-msgstr "475%"
-
-#: xrc/GeneralConfig.xrc:134 xrc/SpeedupConfig.xrc:65
-msgid "500%"
-msgstr "500%"
-
-#: xrc/GeneralConfig.xrc:135 xrc/SpeedupConfig.xrc:66
-msgid "525%"
-msgstr "525%"
-
-#: xrc/GeneralConfig.xrc:136 xrc/SpeedupConfig.xrc:67
-msgid "550%"
-msgstr "550%"
-
-#: xrc/GeneralConfig.xrc:137 xrc/SpeedupConfig.xrc:68
-msgid "575%"
-msgstr "575%"
-
-#: xrc/GeneralConfig.xrc:138 xrc/SpeedupConfig.xrc:69
-msgid "600%"
-msgstr "600%"
 
 #: xrc/IOViewer.xrc:4
 msgid "IO Viewer"
@@ -3706,7 +3610,7 @@ msgstr "Arventennoù SpeedUp / Turbo"
 msgid "Speedup Throttle"
 msgstr "Fonnusaer"
 
-#: xrc/SpeedupConfig.xrc:84
+#: xrc/SpeedupConfig.xrc:83
 msgid "Frame skip"
 msgstr ""
 
