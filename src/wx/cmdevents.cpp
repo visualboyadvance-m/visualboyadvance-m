@@ -3097,21 +3097,33 @@ EVT_HANDLER_MASK(LanLink, "Start Network link", CMDEN_LINK_ANY)
 
 EVT_HANDLER(LinkType0Nothing, "Link nothing")
 {
+#ifndef NO_LINK
+    CloseLink();
+#endif
     SetLinkTypeMenu("LinkType0Nothing", 0);
 }
 
 EVT_HANDLER(LinkType1Cable, "Link cable")
 {
+#ifndef NO_LINK
+    CloseLink();
+#endif
     SetLinkTypeMenu("LinkType1Cable", 1);
 }
 
 EVT_HANDLER(LinkType2Wireless, "Link wireless")
 {
+#ifndef NO_LINK
+    CloseLink();
+#endif
     SetLinkTypeMenu("LinkType2Wireless", 2);
 }
 
 EVT_HANDLER(LinkType3GameCube, "Link GameCube")
 {
+#ifndef NO_LINK
+    CloseLink();
+#endif
     SetLinkTypeMenu("LinkType3GameCube", 3);
 }
 
