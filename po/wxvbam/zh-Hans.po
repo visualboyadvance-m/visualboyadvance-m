@@ -17,8 +17,8 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-05-09 07:12+0000\n"
-"PO-Revision-Date: 2020-05-15 12:32+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2020-05-23 10:41+0000\n"
+"Last-Translator: 天绝星 <c.cejhb@gmail.com>\n"
 "Language-Team: Chinese Simplified (http://www.transifex.com/bgk/vba-m/language/zh-Hans/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2400,7 +2400,7 @@ msgstr "0 = 无节流器"
 
 #: xrc/GeneralConfig.xrc:114 xrc/SpeedupConfig.xrc:36
 msgid "Unlimited"
-msgstr ""
+msgstr "无限制"
 
 #: xrc/IOViewer.xrc:4
 msgid "IO Viewer"
