@@ -8,7 +8,7 @@
 # Anton Fedenko <gang296@mail.ru>, 2015
 # Artem Abramov <aabramovrussia@yandex.com>, 2015
 # 85f5ad14c5f803c69d22f4aeb4ef6a7e, 2015
-# tjtxtfh <inactive+tjtxtfh@transifex.com>, 2015
+# 74dffd932c00dbbb41918c687b127233_b4301a9 <3295ddb221a13e599d1c8fb3215ca8da_372329>, 2015
 # ав а <teorex3@gmail.com>, 2020
 # Алексей Гаврилов <flexxx_seva@mail.ru>, 2018
 # Михаил Михаил <sined116@gmail.com>, 2016

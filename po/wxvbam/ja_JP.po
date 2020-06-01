@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# YAMAGUCHI Rei <inactive+shirounagi@transifex.com>, 2018
+# a3133e67d2aed6e988c30c5985554ea8_695ac6e <4f0e15ec6c89de2363f13e3bfa21f388_660035>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"

@@ -4,7 +4,7 @@
 # 
 # Translators:
 # Claes-Göran Nydahl <goldug@gmail.com>, 2019
-# [deleted], 2015
+# 59031d6847a58cccc64d8da23d16ff59_48f0fae, 2015
 # [deleted], 2015
 # Sebastian Rasmussen <sebras@gmail.com>, 2020
 # Sebastian Rasmussen <sebras@gmail.com>, 2018
