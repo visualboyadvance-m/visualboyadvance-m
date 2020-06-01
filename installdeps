@@ -1034,13 +1034,19 @@ gentoo_installdeps() {
 
     check sudo emerge-webrsync
 
-    ebuilds="gcc make cmake ccache binutils libsdl2 libsfml wxGTK zlib dev-util/pkgconfig nasm dev-util/ninja"
+    # We want the gtk3 slot for wxWidgets.
+    wx_slot=$(equery -qC list -p -F '$slot' x11-libs/wxGTK | grep gtk3 | sort -rV | head -1)
+
+    ebuilds="\
+      sys-devel/gcc      sys-devel/make     dev-util/cmake          dev-util/ccache sys-devel/binutils \
+      media-libs/libsdl2 media-libs/libsfml x11-libs/wxGTK:$wx_slot sys-libs/zlib   dev-util/pkgconf \
+      dev-lang/nasm      dev-util/ninja"
 
     [ -n "$ENABLE_OPENAL" ] && ebuilds="$ebuilds media-libs/openal"
 
     [ -n "$ENABLE_FFMPEG" ] && ebuilds="$ebuilds media-video/ffmpeg"
 
-    check sudo emerge -vuDUa $ebuilds
+    check sudo emerge -vn $ebuilds
 
     build_instructions
 }
