@@ -1060,36 +1060,37 @@ void gbWriteMemory(uint16_t address, uint8_t value)
     case 0x02: {
         gbSerialOn = (value & 0x80);
 #ifndef NO_LINK
-        //trying to detect whether the game has exited multiplay mode, pokemon blue start w/ 0x7e while pocket racing start w/ 0x7c
+        // trying to detect whether the game has exited multiplay mode, pokemon blue start w/ 0x7e while pocket racing start w/ 0x7c
         if (EmuReseted || (gbMemory[0xff02] & 0x7c) || (value & 0x7c) || (!(value & 0x81))) {
             LinkFirstTime = true;
         }
         EmuReseted = false;
         gbMemory[0xff02] = value;
-        if (gbSerialOn && (GetLinkMode() == LINK_GAMEBOY_IPC || GetLinkMode() == LINK_GAMEBOY_SOCKET
-        || GetLinkMode() == LINK_DISCONNECTED || winGbPrinterEnabled)) {
-
+#else
+        gbMemory[0xff02] = value;
+#endif // NO_LINK
+        if (gbSerialOn) {
             gbSerialTicks = GBSERIAL_CLOCK_TICKS;
-
+#ifndef NO_LINK
             LinkIsWaiting = true;
-
-            //Do data exchange, master initiate the transfer
-            //may cause visual artifact if not processed immediately, is it due to IRQ stuff or invalid data being exchanged?
-            if ((value & 1)) { //internal clock
-                if (gbSerialFunction) {
+            // May cause visual artifact if not processed immediately,
+            // is it due to IRQ stuff or invalid data being exchanged?
+            if (gbMemory[0xff02] & 1) {
+                if (gbSerialFunction && winGbPrinterEnabled) {
                     gbSIO_SC = value;
-                    gbMemory[0xff01] = gbSerialFunction(gbMemory[0xff01]); //gbSerialFunction/gbStartLink/gbPrinter
-                } else
-                    gbMemory[0xff01] = 0xff;
-                gbMemory[0xff02] &= 0x7f;
-                gbSerialOn = 0;
-                gbMemory[0xff0f] = register_IF |= 8;
+                    gbMemory[0xff01] = gbSerialFunction(gbMemory[0xff01]);
+                    gbMemory[0xff02] &= 0x7f;
+                    gbSerialOn = 0;
+                    gbMemory[0xff0f] = register_IF |= 8;
+                }
             }
+#else
+            LinkIsWaiting = false;
+#endif // NO_LINK
         }
 
         gbSerialBits = 0;
         return;
-#endif
     }
 
     case 0x04: {
@@ -5239,88 +5240,69 @@ void gbEmulate(int ticksToStop)
         static int SIOctr = 0;
         SIOctr++;
         if (SIOctr % 5)
-            //Transfer Started
-            if (gbSerialOn && (GetLinkMode() == LINK_GAMEBOY_IPC || GetLinkMode() == LINK_GAMEBOY_SOCKET)) {
-#ifdef OLD_GB_LINK
-                if (linkConnected) {
-                    gbSerialTicks -= clockTicks;
+        if (gbSerialOn) {
+            if(gbMemory[0xff02] & 1) { //internal clocks (master)
+                gbSerialTicks -= clockTicks;
+                // overflow
+                while (gbSerialTicks <= 0) {
+                    // shift serial byte to right and put a 1 bit in its place
+                    //      gbMemory[0xff01] = 0x80 | (gbMemory[0xff01]>>1);
+                    // increment number of shifted bits
+                    gbSerialBits++;
+                    if (gbSerialBits >= 8) {
+                        // end of transmission
+                        gbSerialTicks = 0;
+                        gbSerialBits = 0;
 
-                    while (gbSerialTicks <= 0) {
-                        // increment number of shifted bits
-                        gbSerialBits++;
-                        linkProc();
-                        if (gbSerialOn && (gbMemory[0xff02] & 1)) {
-                            if (gbSerialBits == 8) {
-                                gbSerialBits = 0;
+                        if (!winGbPrinterEnabled) {
+                            if (gbSerialFunction) // external device
+                                gbMemory[0xff01] = gbSerialFunction(gbMemory[0xff01]);
+                            else
                                 gbMemory[0xff01] = 0xff;
-                                gbMemory[0xff02] &= 0x7f;
-                                gbSerialOn = 0;
-                                gbMemory[0xff0f] = register_IF |= 8;
-                                gbSerialTicks = 0;
-                            }
-                        }
-                        gbSerialTicks += GBSERIAL_CLOCK_TICKS;
-                    }
-                } else {
-#endif
-                    if (gbMemory[0xff02] & 1) { //internal clocks (master)
-                        gbSerialTicks -= clockTicks;
-
-                        // overflow
-                        while (gbSerialTicks <= 0) {
-                            // shift serial byte to right and put a 1 bit in its place
-                            //      gbMemory[0xff01] = 0x80 | (gbMemory[0xff01]>>1);
-                            // increment number of shifted bits
-                            gbSerialBits++;
-                            if (gbSerialBits >= 8) {
-                                // end of transmission
-                                gbSerialTicks = 0;
-                                gbSerialBits = 0;
-                            } else
-                                gbSerialTicks += GBSERIAL_CLOCK_TICKS;
-                        }
-                    } else //external clocks (slave)
-                    {
-                        gbSerialTicks -= clockTicks;
-
-                        // overflow
-                        while (gbSerialTicks <= 0) {
-                            // shift serial byte to right and put a 1 bit in its place
-                            //      gbMemory[0xff01] = 0x80 | (gbMemory[0xff01]>>1);
-                            // increment number of shifted bits
-                            gbSerialBits++;
-                            if (gbSerialBits >= 8) {
-                                // end of transmission
-                                uint16_t dat = 0;
-                                if (LinkIsWaiting)
-                                    if (gbSerialFunction) { // external device
-                                        gbSIO_SC = gbMemory[0xff02];
-                                        if (!LinkFirstTime) {
-                                            dat = (gbSerialFunction(gbMemory[0xff01]) << 8) | 1;
-                                        } else //external clock not suppose to start a transfer, but there are time where both side using external clock and couldn't communicate properly
-                                        {
-                                            if (gbMemory)
-                                                gbSerialOn = (gbMemory[0xff02] & 0x80);
-                                            dat = gbLinkUpdate(gbMemory[0xff01], gbSerialOn);
-                                        }
-                                        gbMemory[0xff01] = (dat >> 8);
-                                    } //else
-                                gbSerialTicks = 0;
-                                if ((dat & 1) && (gbMemory[0xff02] & 0x80)) //(dat & 1)==1 when reply data received
-                                {
-                                    gbMemory[0xff02] &= 0x7f;
-                                    gbSerialOn = 0;
-                                    gbMemory[0xff0f] = register_IF |= 8;
-                                }
-                                gbSerialBits = 0;
-                            } else
-                                gbSerialTicks += GBSERIAL_CLOCK_TICKS;
+                            gbMemory[0xff02] &= 0x7f;
+                            gbSerialOn = 0;
+                            register_IF |= 8;
                         }
                     }
-#ifdef OLD_GB_LINK
+                    else gbSerialTicks += GBSERIAL_CLOCK_TICKS;
                 }
-#endif
             }
+            else //external clocks (slave)
+            {
+                gbSerialTicks -= clockTicks;
+                // overflow
+                while (gbSerialTicks <= 0) {
+                    // shift serial byte to right and put a 1 bit in its place
+                    //      gbMemory[0xff01] = 0x80 | (gbMemory[0xff01]>>1);
+                    // increment number of shifted bits
+                    gbSerialBits++;
+                    if (gbSerialBits >= 8) {
+                        // end of transmission
+                        uint16_t dat = 0;
+                        if (LinkIsWaiting)
+                            if (gbSerialFunction) { // external device
+                                gbSIO_SC = gbMemory[0xff02];
+                                if (!LinkFirstTime) {
+                                    dat = (gbSerialFunction(gbMemory[0xff01]) << 8) | 1;
+                                }
+                                else { //external clock not suppose to start a transfer, but there are time where both side using external clock and couldn't communicate properly
+			            gbSerialOn = (gbMemory[0xff02] & 0x80);
+			            dat = gbLinkUpdate(gbMemory[0xff01], gbSerialOn);
+			        }
+			        gbMemory[0xff01] = (dat >> 8);
+                            }
+                        gbSerialTicks = 0;
+                        if ((dat & 1) && (gbMemory[0xff02] & 0x80)) {
+                            gbMemory[0xff02] &= 0x7f;
+                            gbSerialOn = 0;
+                            gbMemory[0xff0f] = register_IF |= 8;
+                        }
+                        gbSerialBits = 0;
+                    }
+                    else gbSerialTicks += GBSERIAL_CLOCK_TICKS;
+                }
+            }
+	}
 #endif
         // TODO: evaluate and fix this
         // On VBA-M (gb core running twice as fast?), each vblank is uses 35112 cycles.
