@@ -1085,14 +1085,6 @@ void gbWriteMemory(uint16_t address, uint8_t value)
                 gbSerialOn = 0;
                 gbMemory[0xff0f] = register_IF |= 8;
             }
-#ifdef OLD_GB_LINK
-            if (linkConnected) {
-                if (value & 1) {
-                    linkSendByte(0x100 | gbMemory[0xFF01]);
-                    Sleep(5);
-                }
-            }
-#endif
         }
 
         gbSerialBits = 0;
