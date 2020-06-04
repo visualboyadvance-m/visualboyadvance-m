@@ -4,19 +4,20 @@
 # 
 # Translators:
 # Alexis Anstett <arkaniste54@gmail.com>, 2020
-# BenjaminSiskoo <siskoo@tradu-france.com>, 2018
+# Benjamin Siskoo <siskoo@tradu-france.com>, 2020
+# Benjamin Siskoo <siskoo@tradu-france.com>, 2018
 # Nyu, 2018
 # Nyu, 2018
 # Simon NOIRHOMME <sim041004@hotmail.com>, 2019
-# BenjaminSiskoo <siskoo@tradu-france.com>, 2018
+# Benjamin Siskoo <siskoo@tradu-france.com>, 2018
 # Thibault <thibaultbruneliere@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-05-09 07:12+0000\n"
-"PO-Revision-Date: 2020-05-15 12:32+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2020-06-04 10:48+0000\n"
+"Last-Translator: Benjamin Siskoo <siskoo@tradu-france.com>\n"
 "Language-Team: French (France) (http://www.transifex.com/bgk/vba-m/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -802,7 +803,7 @@ msgstr "Utilisation du mélange inter-image #%d"
 
 #: cmdevents.cpp:2680 panel.cpp:181 panel.cpp:284
 msgid "Could not initialize the sound driver!"
-msgstr ""
+msgstr "Ne peut pas initialiser le pilote son !"
 
 #: cmdevents.cpp:2768
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
@@ -1026,31 +1027,31 @@ msgstr "Erreur d'écriture pour l'état de rembobinage"
 
 #: panel.cpp:2257
 msgid "Failed to set glXSwapIntervalEXT"
-msgstr ""
+msgstr "Echec du paramétrage du glXSwapIntervalEXT"
 
 #: panel.cpp:2266
 msgid "Failed to set glXSwapIntervalSGI"
-msgstr ""
+msgstr "Echec du paramétrage du glXSwapIntervalSGI"
 
 #: panel.cpp:2275
 msgid "Failed to set glXSwapIntervalMESA"
-msgstr ""
+msgstr "Echec du paramétrage du glXSwapIntervalMESA"
 
 #: panel.cpp:2282
 msgid "No support for wglGetExtensionsString"
-msgstr ""
+msgstr "Ne supporte pas wglGetExtensionsString"
 
 #: panel.cpp:2284
 msgid "No support for WGL_EXT_swap_control"
-msgstr ""
+msgstr "Ne supporte pas WGL_EXT_swap_control"
 
 #: panel.cpp:2293
 msgid "Failed to set wglSwapIntervalEXT"
-msgstr ""
+msgstr "Echec du paramétrage de wglSwapIntervalEXT"
 
 #: panel.cpp:2299
 msgid "No VSYNC available on this platform"
-msgstr ""
+msgstr "Aucune VSYNC n'est disponible sur cette plateforme"
 
 #: panel.cpp:2395
 msgid "memory allocation error"
@@ -1161,44 +1162,44 @@ msgstr "Manette de jeu déconnectée %d "
 #: widgets/sdljoy.cpp:230
 #, c-format
 msgid "Connected joystick %d"
-msgstr ""
+msgstr "Joystick connecté %d"
 
 #: widgets/sdljoy.cpp:247
 #, c-format
 msgid "Disconnected joystick %d"
-msgstr ""
+msgstr "Joystick déconnecté %d"
 
 #: xaudio2.cpp:35
 msgid "XAudio2: Enumerating devices failed!"
-msgstr ""
+msgstr "XAudio2 : échec du dénombrement des périphériques !"
 
 #: xaudio2.cpp:69 xaudio2.cpp:353
 msgid "The XAudio2 interface failed to initialize!"
-msgstr ""
+msgstr " 100% match \nL'interface XAudio2 a échoué à l'initialisation !"
 
 #: xaudio2.cpp:384
 msgid "XAudio2: Creating mastering voice failed!"
-msgstr ""
+msgstr "XAudio2 : la création de la voix maître a échoué !"
 
 #: xaudio2.cpp:393
 msgid "XAudio2: Creating source voice failed!"
-msgstr ""
+msgstr "XAudio2 :  la création de la voix source a échoué !"
 
 #: faudio.cpp:32
 msgid "FAudio: Enumerating devices failed!"
-msgstr ""
+msgstr "FAudio : échec du dénombrement des périphériques !"
 
 #: faudio.cpp:67 faudio.cpp:352
 msgid "The FAudio interface failed to initialize!"
-msgstr ""
+msgstr " 100% match \nL'interface XAudio2 a échoué à l'initialisation !"
 
 #: faudio.cpp:384
 msgid "FAudio: Creating mastering voice failed!"
-msgstr ""
+msgstr "FAudio : échec de la création de la voix maître !"
 
 #: faudio.cpp:395
 msgid "FAudio: Creating source voice failed!"
-msgstr ""
+msgstr "FAudio : échec de la création de la voix source !"
 
 #: dsound.cpp:90 dsound.cpp:104
 #, c-format
@@ -2398,7 +2399,7 @@ msgstr "0 = pas d'accélération"
 
 #: xrc/GeneralConfig.xrc:114 xrc/SpeedupConfig.xrc:36
 msgid "Unlimited"
-msgstr ""
+msgstr "Illimité"
 
 #: xrc/IOViewer.xrc:4
 msgid "IO Viewer"
@@ -2577,7 +2578,7 @@ msgstr "Défauts"
 
 #: xrc/JoyPanel.xrc:529
 msgid "Clear All"
-msgstr ""
+msgstr "Tout vider"
 
 #: xrc/JoypadConfig.xrc:4
 msgid "Joypad Configuration"
@@ -2697,7 +2698,7 @@ msgstr "&e-Reader"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
-msgstr ""
+msgstr "&Redémarrer le Chargement du Code Dot"
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
@@ -2705,7 +2706,7 @@ msgstr "&Charger un code Dot..."
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr ""
+msgstr "&Redémarrer la Sauvegarde du Code Dot"
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
@@ -2717,7 +2718,7 @@ msgstr "Le plus &récent"
 
 #: xrc/MainMenu.xrc:50
 msgid "Load current state slot"
-msgstr ""
+msgstr "Charger l'Emplacement d'Etat en cours"
 
 #: xrc/MainMenu.xrc:53
 msgid "&Auto load most recent"
@@ -2781,11 +2782,11 @@ msgstr "Emplacement le &plus ancien"
 
 #: xrc/MainMenu.xrc:107
 msgid "Save current state slot"
-msgstr ""
+msgstr "Sauvegarder l'Emplacement d'Etat en cours"
 
 #: xrc/MainMenu.xrc:110
 msgid "Increase state slot number and save"
-msgstr ""
+msgstr "Augmenter le nombre d'emplacement d'état et sauvegarder"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File ..."
@@ -2797,11 +2798,11 @@ msgstr "&Sauvegarder un état"
 
 #: xrc/MainMenu.xrc:150
 msgid "Increase state slot number"
-msgstr ""
+msgstr "Augmenter le nombre d'emplacement d'état"
 
 #: xrc/MainMenu.xrc:153
 msgid "Decrease state slot number"
-msgstr ""
+msgstr "Diminuer le nombre d'emplacement d'état"
 
 #: xrc/MainMenu.xrc:158 xrc/MainMenu.xrc:170
 msgid "&Battery file..."
@@ -2869,7 +2870,7 @@ msgstr "&Jouer"
 
 #: xrc/MainMenu.xrc:214
 msgid "&Quit"
-msgstr ""
+msgstr "&Quitter"
 
 #: xrc/MainMenu.xrc:218
 msgid "&Emulation"
@@ -2978,39 +2979,39 @@ msgstr "&Démarrer en plein écran"
 
 #: xrc/MainMenu.xrc:324
 msgid "&Scaled resize"
-msgstr ""
+msgstr "Redimensionner la mise à l'&Echelle"
 
 #: xrc/MainMenu.xrc:326
 msgid "&1x"
-msgstr ""
+msgstr "&1x"
 
 #: xrc/MainMenu.xrc:329
 msgid "&2x"
-msgstr ""
+msgstr "&2x"
 
 #: xrc/MainMenu.xrc:332
 msgid "&3x"
-msgstr ""
+msgstr "&3x"
 
 #: xrc/MainMenu.xrc:335
 msgid "&4x"
-msgstr ""
+msgstr "&4x"
 
 #: xrc/MainMenu.xrc:338
 msgid "&5x"
-msgstr ""
+msgstr "&5x"
 
 #: xrc/MainMenu.xrc:341
 msgid "&6x"
-msgstr ""
+msgstr "&6x"
 
 #: xrc/MainMenu.xrc:345
 msgid "Change pixel filter"
-msgstr ""
+msgstr "Changer le filtre du Pixel"
 
 #: xrc/MainMenu.xrc:348
 msgid "Change interframe blending"
-msgstr ""
+msgstr "Changer le mélange inter-image"
 
 #: xrc/MainMenu.xrc:351
 msgid "&Retain aspect ratio"
@@ -3018,7 +3019,7 @@ msgstr "Conse&rver les proportions"
 
 #: xrc/MainMenu.xrc:355
 msgid "Enable MMX"
-msgstr ""
+msgstr "Activer le MMX"
 
 #: xrc/MainMenu.xrc:360
 msgid "&Bilinear filter"
@@ -3054,7 +3055,7 @@ msgstr "Baisser le volume"
 
 #: xrc/MainMenu.xrc:402
 msgid "&Toggle sound"
-msgstr ""
+msgstr "&Changer le Son"
 
 #: xrc/MainMenu.xrc:407
 msgid "&GBA sound interpolation"
@@ -3098,7 +3099,7 @@ msgstr "&R"
 
 #: xrc/MainMenu.xrc:450
 msgid "&Autohold"
-msgstr ""
+msgstr "Maintenir &Auto"
 
 #: xrc/MainMenu.xrc:494
 msgid "&Game Boy Advance"
@@ -3122,11 +3123,11 @@ msgstr "Imprimer le &débug"
 
 #: xrc/MainMenu.xrc:512 xrc/MainMenu.xrc:527
 msgid "&LCD Filter"
-msgstr ""
+msgstr "Filtre &LCD"
 
 #: xrc/MainMenu.xrc:523
 msgid "&GB color option"
-msgstr ""
+msgstr "Option Couleur de la &GB"
 
 #: xrc/MainMenu.xrc:531
 msgid "&GB printer"
@@ -3154,7 +3155,7 @@ msgstr "&Général..."
 
 #: xrc/MainMenu.xrc:556
 msgid "&Speedup / Turbo ..."
-msgstr ""
+msgstr "&Accélérer / Turbo"
 
 #: xrc/MainMenu.xrc:559
 msgid "D&irectories ..."
@@ -3166,7 +3167,7 @@ msgstr "Raccourcis des &touches..."
 
 #: xrc/MainMenu.xrc:565
 msgid "&UI Settings ..."
-msgstr ""
+msgstr "Paramétrages de l'&IU"
 
 #: xrc/MainMenu.xrc:569
 msgid "&Tools"
@@ -3246,7 +3247,7 @@ msgstr "Visualiseur de &tuile..."
 
 #: xrc/MainMenu.xrc:634
 msgid "Show all video layers"
-msgstr ""
+msgstr "Afficher toutes le couches vidéos"
 
 #: xrc/MainMenu.xrc:638
 msgid "BG &0"
@@ -3330,7 +3331,7 @@ msgstr "Traductions"
 
 #: xrc/MainMenu.xrc:730
 msgid "Check for updates"
-msgstr ""
+msgstr "Vérifier les mises à jour :"
 
 #: xrc/MainMenu.xrc:733
 msgid "&Factory Reset..."
@@ -3338,7 +3339,7 @@ msgstr "Réinitialisation"
 
 #: xrc/MainMenu.xrc:737
 msgid "&About..."
-msgstr ""
+msgstr "&A Propos De..."
 
 #: xrc/MapViewer.xrc:4
 msgid "Map Viewer"
@@ -3454,7 +3455,7 @@ msgstr "Serveur :"
 
 #: xrc/NetLink.xrc:81
 msgid "Port:"
-msgstr ""
+msgstr "Port :"
 
 #: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
@@ -3526,7 +3527,7 @@ msgstr "XAudio2"
 
 #: xrc/SoundConfig.xrc:132
 msgid "FAudio"
-msgstr ""
+msgstr "FAudio"
 
 #: xrc/SoundConfig.xrc:146
 msgid "Device"
@@ -3610,20 +3611,20 @@ msgstr "0x60&10000"
 
 #: xrc/SpeedupConfig.xrc:4
 msgid "SpeedUp / Turbo Settings"
-msgstr ""
+msgstr "Paramétrages Accélération / Turbo"
 
 #: xrc/SpeedupConfig.xrc:9
 msgid "Speedup Throttle"
-msgstr ""
+msgstr "&Accélérer"
 
 #: xrc/SpeedupConfig.xrc:83
 msgid "Frame skip"
-msgstr ""
+msgstr "Saut d'Image"
 
 #: xrc/UIConfig.xrc:4
 msgid "User Interface Settings"
-msgstr ""
+msgstr "Paramétrage de l'Interface Utilisateur"
 
 #: xrc/UIConfig.xrc:9
 msgid "Hide Menu Bar"
-msgstr ""
+msgstr "Cacher la Barre de Menu"

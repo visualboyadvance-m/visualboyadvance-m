@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# BenjaminSiskoo <siskoo@tradu-france.com>, 2015-2016
+# Benjamin Siskoo <siskoo@tradu-france.com>, 2015-2016
 # Cissou <lestiennes.cyril@gmail.com>, 2015
 # Jack, 2015
 # Jack, 2015
