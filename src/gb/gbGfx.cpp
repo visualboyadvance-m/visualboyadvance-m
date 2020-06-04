@@ -433,7 +433,7 @@ void gbDrawSpriteTile(int tile, int x, int y, int t, int flags,
     int a = 0;
     int b = 0;
 
-    if (gbCgbMode && (flags & 0x08)) {
+    if (gbCgbMode && (flags & 0x08) && !(gbMemory[0xff6c] & 1)) {
         a = bank1[address++];
         b = bank1[address++];
     } else {
