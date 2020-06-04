@@ -690,7 +690,7 @@ void gbSgbMultiRequest()
             gbSgbFourPlayers = 1;
         else
             gbSgbFourPlayers = 0;
-        gbSgbNextController = 0x0e;
+        gbSgbNextController = 0x0f;
     } else {
         gbSgbFourPlayers = 0;
         gbSgbMultiplayer = 0;
