@@ -66,7 +66,7 @@ main() {
 
     frameworks="$app_bundle/Contents/Frameworks"
 
-    mkdir -p "$frameworks" 2>/dev/null
+    mkdir -p "$frameworks"
 
     scan_libs "$@" | fully_resolve_links | sort -u | \
     while read lib; do
@@ -147,8 +147,7 @@ lib_scan() {
         IFS='
 '
         for lib in $(otool -L "$bin" 2>/dev/null \
-            | awk '/^([^ \t]|([ \t]*\/(System|usr\/lib)\/))/ { next } \
-                   { sub("^[ \t]*", ""); sub("[ \t]*\\(.*\\)[ \t]*$", ""); print }'); do
+              | sed -E '1d; s/^[[:space:]]*//; \,^(/System|/usr/lib),d; s/[[:space:]]+\([^()]+\)[[:space:]]*$//'); do
 
             [ "$lib" = "$bin" ] && continue
 
@@ -297,8 +296,7 @@ install_name_tool() {
 
     if ! command install_name_tool "$@" >"$out_file" 2>&1; then
         if grep -Eq -i 'permission  denied|bad file descriptor' "$out_file"; then
-            if ! command sudo install_name_tool "$@" >"$out_file" 2>&1; then
-                cat "$out_file" >&2
+            if ! command sudo install_name_tool "$@"; then
                 return 1
             fi
         elif ! grep -Eq -i 'would duplicate path' "$out_file"; then
