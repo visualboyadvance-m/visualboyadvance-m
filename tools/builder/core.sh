@@ -110,7 +110,7 @@ DISTS=$DISTS'
     zip             https://downloads.sourceforge.net/project/infozip/Zip%203.x%20%28latest%29/3.0/zip30.tar.gz                 bin/zip
     openssl         https://www.openssl.org/source/openssl-1.1.1f.tar.gz                                        lib/libssl.a
     curl            https://curl.haxx.se/download/curl-7.65.3.tar.xz                                            lib/libcurl.a
-    cmake           https://cmake.org/files/v3.13/cmake-3.13.0-rc1.tar.gz                                       bin/cmake
+    cmake           https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3.tar.gz              bin/cmake
     m4              http://ftp.gnu.org/gnu/m4/m4-1.4.18.tar.xz                                                  bin/m4
     autoconf        https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz                                       bin/autoconf
     autoconf-archive http://mirror.team-cymru.org/gnu/autoconf-archive/autoconf-archive-2017.09.28.tar.xz       share/aclocal/ax_check_gl.m4
@@ -181,7 +181,7 @@ DISTS=$DISTS'
     libogg          http://downloads.xiph.org/releases/ogg/libogg-1.3.4.tar.xz                                  lib/libogg.a
     libvorbis       https://github.com/xiph/vorbis/archive/v1.3.6.tar.gz                                        lib/libvorbis.a
     harfbuzz        https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-1.7.5.tar.bz2                lib/libharfbuzz.a
-    sfml            https://github.com/SFML/SFML/archive/013d053277c980946bc7761a2a088f1cbb788f8c.tar.gz        lib/libsfml-system-s.a
+    sfml            https://github.com/SFML/SFML/archive/0337568846584fffcee38036880f9f48888c8b7c.tar.gz        lib/libsfml-system-s.a
     shared-mime-info http://freedesktop.org/~hadess/shared-mime-info-1.9.tar.xz                                 bin/update-mime-database
     wxwidgets       https://github.com/wxWidgets/wxWidgets/archive/55efc9e60742d0de61e39556084d09f2332b99be.tar.gz lib/libwx_baseu-3.1*.a
     graphite2       https://github.com/silnrsi/graphite/archive/ce0e793f22127d7ba6422d440bd83b58f864ef7e.tar.gz lib/libgraphite2.a
@@ -2652,7 +2652,7 @@ build_project() {
     mkdir -p "$BUILD_ROOT/project"
     cd "$BUILD_ROOT/project"
 
-    rm -f visualboyadvance-m.exe
+    rm -rf visualboyadvance-m.exe visualboyadvance-m.app
 
     lto=ON
 

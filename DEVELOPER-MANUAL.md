@@ -22,7 +22,6 @@
     - [64-bit Windows Binary](#64-bit-windows-binary)
     - [32-bit Windows Binary](#32-bit-windows-binary)
     - [64-bit Mac Binary](#64-bit-mac-binary)
-    - [32-bit Mac Binary](#32-bit-mac-binary)
     - [Final steps](#final-steps)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -678,24 +677,6 @@ Collect the following files from `~/vbam-build-mac-64bit/project`:
 - `visualboyadvance-m-Mac-64bit.zip`
 - `visualboyadvance-m-Mac-64bit.zip.asc`
 
-#### 32-bit Mac Binary
-
-If using Mojave or later, you will need Xcode 9 installed side-by-side with
-your OS Xcode, it should be installed to `/Applications/Xcode9.app`.  You can
-obtain it from Apple developer downloads, or alternative sources which should
-not be difficult to find.
-
-Other requirements are the same as for the 64-bit binary.
-
-```bash
-/usr/local/bin/bash tools/osx/builder -32
-```
-
-Collect the following files from `~/vbam-build-mac-32bit/project`:
-
-- `visualboyadvance-m-Mac-32bit.zip`
-- `visualboyadvance-m-Mac-32bit.zip.asc`
-
 #### Final steps
 
 Go to the github releases tab, and make a release for the tag you pushed
@@ -710,8 +691,6 @@ Upload all files collected during the earlier builds, the complete list is:
 
 - `translations.zip`
 - `translations.zip.asc`
-- `visualboyadvance-m-Mac-32bit.zip`
-- `visualboyadvance-m-Mac-32bit.zip.asc`
 - `visualboyadvance-m-Mac-64bit.zip`
 - `visualboyadvance-m-Mac-64bit.zip.asc`
 - `visualboyadvance-m-Win-32bit.zip`

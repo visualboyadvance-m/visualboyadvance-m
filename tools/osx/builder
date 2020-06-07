@@ -2,6 +2,9 @@
 
 set -e
 
+LANG=C LC_COLLATE=C LC_CTYPE=C LC_MESSAGES=C LC_MONETARY=C LC_NUMERIC=C LC_TIME=C LC_ALL=C
+export LANG LC_COLLATE LC_CTYPE LC_MESSAGES LC_MONETARY LC_NUMERIC LC_TIME LC_ALL
+
 ## bash 3 does not work for this code
 #if [ -z "$IN_DASH" ]; then
 #    if command -v dash >/dev/null; then
@@ -121,6 +124,10 @@ table_line_append DIST_PRE_BUILD ffmpeg "sed -i.bak 's/-lstdc++/-lc++/g' configu
 table_line_append DIST_CONFIGURE_OVERRIDES wxwidgets  "--with-macosx-version-min=\$MACOSX_DEPLOYMENT_TARGET LDFLAGS=\"\$LDFLAGS -stdlib=libc++\""
 
 table_line_append DIST_ARGS libmodplug "CC=clang++ CXX=clang++"
+
+table_line_append DIST_PRE_BUILD libvpx " \
+    sed -E -i.bak 's/(-mmacosx-version-min=)[[:digit:].]+/\1'\$MACOSX_DEPLOYMENT_TARGET'/g' build/make/configure.sh; \
+"
 
 table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg "--disable-videotoolbox --extra-ldflags='-framework CoreText'"
 
