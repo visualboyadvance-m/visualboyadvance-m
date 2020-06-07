@@ -230,7 +230,7 @@ void utilReadScreenPixels(uint8_t *dest, int w, int h)
 
 bool utilWritePNGFile(const char *fileName, int w, int h, uint8_t *pix)
 {
-        uint8_t writeBuffer[512 * CHANNEL_NUM];
+        uint8_t *writeBuffer = new uint8_t[w * h * CHANNEL_NUM];
 
         uint8_t *b = writeBuffer;
 
@@ -251,7 +251,6 @@ bool utilWritePNGFile(const char *fileName, int w, int h, uint8_t *pix)
                             }
                             p++; // skip black pixel for filters
                             p++; // skip black pixel for filters
-                            b = writeBuffer;
                     }
             } break;
             case 24: {
@@ -272,7 +271,6 @@ bool utilWritePNGFile(const char *fileName, int w, int h, uint8_t *pix)
                                             *b++ = blue;
                                     }
                             }
-                            b = writeBuffer;
                     }
             } break;
             case 32: {
@@ -286,12 +284,13 @@ bool utilWritePNGFile(const char *fileName, int w, int h, uint8_t *pix)
                                     *b++ = ((v >> systemBlueShift) & 0x001f) << 3;  // B
                             }
                             pixU32++;
-                            b = writeBuffer;
                     }
             } break;
         }
 
-        return (0 != stbi_write_png(fileName, w, h, CHANNEL_NUM, writeBuffer, w * CHANNEL_NUM));
+        bool ret = (0 != stbi_write_png(fileName, w, h, CHANNEL_NUM, writeBuffer, w * CHANNEL_NUM));
+        delete[] writeBuffer;
+        return ret;
 }
 
 void utilPutDword(uint8_t *p, uint32_t value)
