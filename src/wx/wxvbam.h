@@ -639,6 +639,7 @@ protected:
     void MouseEvent(wxMouseEvent&);
     bool pointer_blanked, menu_bar_hidden = false;
     uint32_t mouse_active_time;
+    wxPoint mouse_last_pos;
 #ifdef __WXMSW__
     HMENU current_hmenu = nullptr;
 #endif
