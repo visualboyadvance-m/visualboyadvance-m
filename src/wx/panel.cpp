@@ -2501,8 +2501,15 @@ void GameArea::MouseEvent(wxMouseEvent& ev)
 {
     mouse_active_time = systemGetClock();
 
-    ShowPointer();
-    ShowMenuBar();
+    wxPoint cur_pos = wxGetMousePosition();
+
+    // Ignore small movements.
+    if (!ev.Moving() || (std::abs(cur_pos.x - mouse_last_pos.x) >= 11 && std::abs(cur_pos.y - mouse_last_pos.y) >= 11)) {
+        ShowPointer();
+        ShowMenuBar();
+    }
+
+    mouse_last_pos = cur_pos;
 
     ev.Skip();
 }
