@@ -1318,7 +1318,6 @@ void GameArea::OnKeyDown(wxKeyEvent& ev)
     if (process_key_press(true, kc, ev.GetModifiers())) {
         wxWakeUpIdle();
     }
-    ev.Skip();
 }
 
 void GameArea::OnKeyUp(wxKeyEvent& ev)
