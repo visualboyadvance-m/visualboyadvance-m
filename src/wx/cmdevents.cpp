@@ -2706,7 +2706,6 @@ EVT_HANDLER(EmulatorDirectories, "Directories...")
 EVT_HANDLER(JoypadConfigure, "Joypad options...")
 {
     wxDialog* dlg = GetXRCDialog("JoypadConfig");
-    joy.Attach(NULL);
     joy.Add();
 
     if (ShowModal(dlg) == wxID_OK)
@@ -2718,9 +2717,12 @@ EVT_HANDLER(JoypadConfigure, "Joypad options...")
 EVT_HANDLER(Customize, "Customize UI...")
 {
     wxDialog* dlg = GetXRCDialog("AccelConfig");
+    joy.Add();
 
     if (ShowModal(dlg) == wxID_OK)
         update_opts();
+
+    SetJoystick();
 }
 
 #ifndef NO_ONLINEUPDATES
@@ -3068,6 +3070,9 @@ void SetLinkTypeMenu(const char* type, int value)
     mf->SetMenuOption(type, 1);
     gopts.gba_link_type = value;
     update_opts();
+#ifndef NO_LINK
+    CloseLink();
+#endif
     mf->EnableNetworkMenu();
 }
 

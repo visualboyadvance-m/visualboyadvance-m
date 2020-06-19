@@ -1,4 +1,5 @@
 #include "strutils.h"
+#include <wx/tokenzr.h>
 
 // From: https://stackoverflow.com/a/7408245/262458
 //
@@ -18,6 +19,25 @@ wxArrayString str_split(const wxString& text, const wxString& sep) {
 
     tokens.Add(text.substr(start));
 
+    return tokens;
+}
+
+wxArrayString str_split_with_sep(const wxString& text, const wxString& sep)
+{
+    wxArrayString tokens;
+    bool sepIsTokenToo = false;
+    wxStringTokenizer tokenizer(text, sep, wxTOKEN_RET_EMPTY_ALL);
+    while (tokenizer.HasMoreTokens()) {
+        wxString token = tokenizer.GetNextToken();
+        if (token.IsEmpty()) {
+            if (!sepIsTokenToo) {
+                sepIsTokenToo = true;
+                tokens.Add(sep);
+            }
+            continue;
+        }
+        tokens.Add(token);
+    }
     return tokens;
 }
 

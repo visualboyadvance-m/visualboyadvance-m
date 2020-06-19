@@ -1,6 +1,7 @@
 #include "viewsupt.h"
 #include "../common/ConfigManager.h"
 #include "wxvbam.h"
+#include "wxutil.h"
 
 namespace Viewers {
 void Viewer::CloseDlg(wxCloseEvent& ev)
@@ -415,7 +416,7 @@ void MemView::ShowCaret()
 
 void MemView::KeyEvent(wxKeyEvent& ev)
 {
-    uint32_t k = ev.GetKeyCode();
+    uint32_t k = getKeyboardKeyCode(ev);
     int nnib = 2 << fmt;
 
     switch (k) {

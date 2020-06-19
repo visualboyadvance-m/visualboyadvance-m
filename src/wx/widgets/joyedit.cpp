@@ -1,4 +1,6 @@
+#include <wx/tokenzr.h>
 #include "wx/joyedit.h"
+#include "strutils.h"
 
 // FIXME: suppport analog/digital flag on per-axis basis
 
@@ -104,10 +106,10 @@ void wxJoyKeyTextCtrl::OnJoy(wxSDLJoyEvent& event)
         Navigate();
 }
 
-wxString wxJoyKeyTextCtrl::ToString(int mod, int key, int joy)
+wxString wxJoyKeyTextCtrl::ToString(int mod, int key, int joy, bool isConfig)
 {
     if (!joy)
-        return wxKeyTextCtrl::ToString(mod, key);
+        return wxKeyTextCtrl::ToString(mod, key, isConfig);
 
     wxString s;
     // Note: wx translates unconditionally (2.8.12, 2.9.1)!
@@ -165,7 +167,7 @@ wxString wxJoyKeyTextCtrl::ToString(int mod, int key, int joy)
     return s;
 }
 
-wxString wxJoyKeyTextCtrl::ToString(wxJoyKeyBinding_v keys, wxChar sep)
+wxString wxJoyKeyTextCtrl::ToString(wxJoyKeyBinding_v keys, wxChar sep, bool isConfig)
 {
     wxString ret;
 
@@ -173,7 +175,26 @@ wxString wxJoyKeyTextCtrl::ToString(wxJoyKeyBinding_v keys, wxChar sep)
         if (i > 0)
             ret += sep;
 
-        wxString key = ToString(keys[i].mod, keys[i].key, keys[i].joy);
+        wxString key = ToString(keys[i].mod, keys[i].key, keys[i].joy, isConfig);
+
+        if (key.empty())
+            return wxEmptyString;
+
+        ret += key;
+    }
+
+    return ret;
+}
+
+wxString wxJoyKeyTextCtrl::FromAccelToString(wxAcceleratorEntry_v keys, wxChar sep, bool isConfig)
+{
+    wxString ret;
+
+    for (size_t i = 0; i < keys.size(); i++) {
+        if (i > 0)
+            ret += sep;
+
+        wxString key = ToString(keys[i].GetFlags(), keys[i].GetKeyCode(), keys[i].GetJoystick(), isConfig);
 
         if (key.empty())
             return wxEmptyString;
@@ -262,19 +283,16 @@ static bool ParseJoy(const wxString& s, int len, int& mod, int& key, int& joy)
     } else if (is_ctrl(hatre)) {
         hatre.GetMatch(&b, &l, 1);
         key = simple_atoi(p.Mid(b), l);
-#define check_dir(n, d) else if (hatre.GetMatch(&b, &l, n) && l > 0) mod = WXJB_HAT_##d
-
-        if (0)
-            ;
+#define check_dir(n, d) if (hatre.GetMatch(&b, &l, n) && l > 0) mod = WXJB_HAT_##d
 
         check_dir(3, N);
-        check_dir(4, S);
-        check_dir(5, E);
-        check_dir(6, W);
-        check_dir(7, NE);
-        check_dir(8, SE);
-        check_dir(9, SW);
-        check_dir(10, NW);
+        else check_dir(4, S);
+        else check_dir(5, E);
+        else check_dir(6, W);
+        else check_dir(7, NE);
+        else check_dir(8, SE);
+        else check_dir(9, SW);
+        else check_dir(10, NW);
     } else {
         joy = 0;
         return false;
@@ -300,34 +318,30 @@ wxJoyKeyBinding_v wxJoyKeyTextCtrl::FromString(const wxString& s, wxChar sep)
 {
     wxJoyKeyBinding_v ret, empty;
     int mod, key, joy;
-    size_t len = s.size();
-
-    if (!len)
+    if (s.size() == 0)
         return empty;
 
-    for (size_t lastkey = len - 1; (lastkey = s.rfind(sep, lastkey)) != wxString::npos; lastkey--) {
-        if (lastkey == len - 1) {
-            // sep as accel
-            if (!lastkey)
-                break;
-
-            if (s[lastkey - 1] == wxT('-') || s[lastkey - 1] == wxT('+') || s[lastkey - 1] == sep)
-                continue;
-        }
-
-        if (!ParseString(s.Mid(lastkey + 1), len - lastkey - 1, mod, key, joy))
+    for (const auto& token : str_split_with_sep(s, sep)) {
+        if (!ParseString(token, token.size(), mod, key, joy))
             return empty;
-
         wxJoyKeyBinding jb = { key, mod, joy };
         ret.insert(ret.begin(), jb);
-        len = lastkey;
     }
+    return ret;
+}
 
-    if (!ParseString(s, len, mod, key, joy))
+wxAcceleratorEntry_v wxJoyKeyTextCtrl::ToAccelFromString(const wxString& s, wxChar sep)
+{
+    wxAcceleratorEntry_v ret, empty;
+    int mod, key, joy;
+    if (s.size() == 0)
         return empty;
 
-    wxJoyKeyBinding jb = { key, mod, joy };
-    ret.insert(ret.begin(), jb);
+    for (const auto& token : str_split_with_sep(s, sep)) {
+        if (!ParseString(token, token.size(), mod, key, joy))
+            return empty;
+        ret.insert(ret.begin(), wxAcceleratorEntryUnicode(token, joy, mod, key));
+    }
     return ret;
 }
 
