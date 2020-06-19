@@ -852,7 +852,8 @@ int MainFrame::FilterEvent(wxEvent& event)
         int keyMod = ke.GetModifiers();
         wxAcceleratorEntry_v accels = wxGetApp().GetAccels();
         for (size_t i = 0; i < accels.size(); ++i)
-             if (keyCode == accels[i].GetKeyCode() && keyMod == accels[i].GetFlags())
+             if (keyCode == accels[i].GetKeyCode() && keyMod == accels[i].GetFlags()
+                 && accels[i].GetCommand() != XRCID("NOOP"))
              {
                  wxCommandEvent evh(wxEVT_COMMAND_MENU_SELECTED, accels[i].GetCommand());
                  evh.SetEventObject(this);
