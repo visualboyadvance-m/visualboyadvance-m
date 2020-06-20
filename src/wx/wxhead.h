@@ -68,7 +68,7 @@
 static inline void DoSetAccel(wxMenuItem* mi, wxAcceleratorEntryUnicode* acc)
 {
     // cannot use SDL keybinding as text without wx assertion error
-    if (!acc || acc->GetJoystick() != 0) return;
+    if (acc && acc->GetJoystick() != 0) return;
 
     wxString lab = mi->GetItemLabel();
     size_t tab = lab.find(wxT('\t'));

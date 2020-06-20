@@ -2124,7 +2124,7 @@ public:
             if ((sys_accels[i].GetFlags() == selmod && sys_accels[i].GetKeyCode() == selkey)
                 || (seljoy != 0 && sys_accels[i].GetUkey() == selstr)) // joystick system bindings?
             {
-                wxAcceleratorEntryUnicode ne(sys_accels[i].GetUkey(), sys_accels[i].GetJoystick(), selmod, selkey, XRCID("NOOP"));
+                wxAcceleratorEntryUnicode ne(selstr, seljoy, selmod, selkey, XRCID("NOOP"));
                 user_accels.push_back(ne);
             }
 
@@ -2597,6 +2597,7 @@ void MainFrame::set_global_accels()
         // the last is chosen so menu overrides non-menu and user overrides
         // system
         int cmd = cmdtab[i].cmd_id;
+        if (cmd == XRCID("NOOP")) continue;
         int last_accel = -1;
 
         for (size_t j = 0; j < accels.size(); ++j)
