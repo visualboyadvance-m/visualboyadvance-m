@@ -89,7 +89,7 @@
                   <orient>wxHORIZONTAL</orient>
                   <object class="sizeritem">
                     <object class="wxStaticText" name="BootRomLab">
-                      <label>Bios file :</label>
+                      <label>BIOS file :</label>
                     </object>
                     <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                     <border>5</border>

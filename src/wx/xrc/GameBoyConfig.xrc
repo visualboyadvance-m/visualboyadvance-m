@@ -88,7 +88,7 @@
               </object>
               <object class="sizeritem">
                 <object class="wxFilePickerCtrl" name="BootRom">
-                  <message>Select A File</message>
+                  <message>Select a File</message>
                   <wildcard>BIOS files (*.bin;*.rom)|*.bin;*.rom|All files|*</wildcard>
                   <size>472,30</size>
                 </object>
@@ -110,7 +110,7 @@
               </object>
               <object class="sizeritem">
                 <object class="wxFilePickerCtrl" name="CBootRom">
-                  <message>Select A File</message>
+                  <message>Select a File</message>
                   <wildcard>BIOS files (*.bin;*.rom)|*.bin;*.rom|All files|*</wildcard>
                   <size>472,30</size>
                 </object>
