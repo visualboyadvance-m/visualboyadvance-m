@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-09 07:12+0000\n"
-"PO-Revision-Date: 2020-05-15 12:32+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2020-06-21 19:40+0000\n"
+"PO-Revision-Date: 2020-06-21 20:07+0000\n"
+"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/bgk/vba-m/language/sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -158,7 +158,7 @@ msgstr "Välj fuskfil"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA fusklistor (*.clt)|*.clt|CHT fusklistor (*.cht)|*.cht"
 
-#: guiinit.cpp:256 panel.cpp:424
+#: guiinit.cpp:256 panel.cpp:426
 msgid "Loaded cheats"
 msgstr "Laddade fusk"
 
@@ -248,103 +248,103 @@ msgstr "%d frames = %.2f ms"
 msgid "Default device"
 msgstr "Standardenhet"
 
-#: guiinit.cpp:1736
+#: guiinit.cpp:1723
 msgid "Desktop mode"
 msgstr "Skrivbordsläge"
 
-#: guiinit.cpp:1743
+#: guiinit.cpp:1730
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: guiinit.cpp:1856 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
+#: guiinit.cpp:1843 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
 msgid "None"
 msgstr "Inga"
 
-#: guiinit.cpp:1897
+#: guiinit.cpp:1884
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Inga användbara rpi plugins funna i %s"
 
-#: guiinit.cpp:1917 xrc/DisplayConfig.xrc:107
+#: guiinit.cpp:1904 xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "Plugin"
 
-#: guiinit.cpp:1945
+#: guiinit.cpp:1932
 msgid "Please select a plugin or a different filter"
 msgstr "Var vänlig välj ett plugin eller ett annat filter"
 
-#: guiinit.cpp:1946
+#: guiinit.cpp:1933
 msgid "Plugin selection error"
 msgstr "Fel vid val av plugin"
 
-#: guiinit.cpp:2145
+#: guiinit.cpp:2146
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr "Det här kommer att rensa alla användardefinierade acceleratorer. Är du säker?"
 
-#: guiinit.cpp:2145
+#: guiinit.cpp:2146
 msgid "Confirm"
 msgstr "Bekräfta"
 
-#: guiinit.cpp:2712
+#: guiinit.cpp:2734
 msgid "Main icon not found"
 msgstr "Huvudikon ej funnen"
 
-#: guiinit.cpp:2722
+#: guiinit.cpp:2744
 msgid "Browse"
 msgstr "Bläddra"
 
-#: guiinit.cpp:2736
+#: guiinit.cpp:2758
 msgid "Main display panel not found"
 msgstr "Huvudvisningspanel ej funnen"
 
-#: guiinit.cpp:2885
+#: guiinit.cpp:2907
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Duplicera menyaccelerator: %s för %s och %s; behåller första"
 
-#: guiinit.cpp:2899
+#: guiinit.cpp:2921
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Menyaccelerator %s för %s överskrider standard för %s ; behåller meny"
 
-#: guiinit.cpp:3037
+#: guiinit.cpp:3059
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Ogiltigt menyföremål %s; tar bort"
 
-#: guiinit.cpp:3245
+#: guiinit.cpp:3267
 msgid "Code"
 msgstr "Kod"
 
-#: guiinit.cpp:3254
+#: guiinit.cpp:3276
 msgid "Description"
 msgstr "Beskrivning"
 
-#: guiinit.cpp:3328 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3350 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Adress"
 
-#: guiinit.cpp:3329
+#: guiinit.cpp:3351
 msgid "Old Value"
 msgstr "Gammalt värde"
 
-#: guiinit.cpp:3330
+#: guiinit.cpp:3352
 msgid "New Value"
 msgstr "Nytt värde"
 
-#: guiinit.cpp:3846
+#: guiinit.cpp:3873
 msgid "Menu commands"
 msgstr "Menykommandon"
 
-#: guiinit.cpp:3869
+#: guiinit.cpp:3896
 msgid "Other commands"
 msgstr "Andra kommandon"
 
-#: guiinit.cpp:3980
+#: guiinit.cpp:4007
 msgid "JoyBus host invalid; disabling"
 msgstr "JoyBus värd ogiltig; inaktiverar"
 
@@ -354,7 +354,7 @@ msgstr "Textfiler (*.txt;*.log)|*.txt;*.log|"
 
 #: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
 #: cmdevents.cpp:1158 cmdevents.cpp:1236 cmdevents.cpp:1306 cmdevents.cpp:1333
-#: viewsupt.cpp:1180
+#: viewsupt.cpp:1181
 msgid "Select output file"
 msgstr "Välj utdatafil"
 
@@ -441,7 +441,7 @@ msgid ""
 msgstr "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color Table (*.act)|*.act"
 
 #: gfxviewers.cpp:1601 gfxviewers.cpp:1743 cmdevents.cpp:1159
-#: viewsupt.cpp:1181
+#: viewsupt.cpp:1182
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG bilder|*.png|BMP bilder|*.bmp"
 
@@ -611,7 +611,7 @@ msgstr "Importen av en batterifil kommer att radera alla sparade spel (permanent
 msgid "Confirm import"
 msgstr "Bekräfta import"
 
-#: cmdevents.cpp:907 panel.cpp:367
+#: cmdevents.cpp:907 panel.cpp:369
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Laddade batteri %s"
@@ -694,7 +694,7 @@ msgstr "Fel vid laddning av ögonblicksfil %s"
 msgid "Wrote battery %s"
 msgstr "Skrev batteri %s"
 
-#: cmdevents.cpp:1100 panel.cpp:673
+#: cmdevents.cpp:1100 panel.cpp:676
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Fel vid skrivning av batteri %s"
@@ -790,32 +790,32 @@ msgstr "Väntar på anslutning vid port %d"
 msgid "Waiting for GDB..."
 msgstr "Väntar på GDB..."
 
-#: cmdevents.cpp:2626
+#: cmdevents.cpp:2636
 #, c-format
 msgid "Using pixel filter #%d"
 msgstr "Använd pixelfilter #%d"
 
-#: cmdevents.cpp:2641
+#: cmdevents.cpp:2651
 #, c-format
 msgid "Using interframe blending #%d"
 msgstr "Använd mellanbildstoning #%d"
 
-#: cmdevents.cpp:2680 panel.cpp:181 panel.cpp:284
+#: cmdevents.cpp:2690 panel.cpp:182 panel.cpp:285
 msgid "Could not initialize the sound driver!"
 msgstr ""
 
-#: cmdevents.cpp:2768
+#: cmdevents.cpp:2780
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Nintendo GameBoy (+Color+Advance) emulator."
 
-#: cmdevents.cpp:2769
+#: cmdevents.cpp:2781
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA-utvecklingsgrupp\nCopyright (C) 2007-2017 VBA-M-utvecklingsgrupp"
 
-#: cmdevents.cpp:2770
+#: cmdevents.cpp:2782
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -831,35 +831,35 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Det här programmet är fri mjukvara: du kan omdistribuera det och/eller modifiera\ndet under villkoren av GNU General Public License som publiceras av\nthe Free Software Foundation, antingen version 2 av licensen, eller\n(om du så vill) vilken som helst senare version. \n\nDet här programmet distribueras i förhoppningen om att det kommer att fylla sin funktion,\nmen UTAN NÅGON FORM AV GARANTI; till och med utan den antydda garantin av\nSÄLJBARHET eller LÄMPLIGHET FÖR ETT VISST ÄNDAMÅL. Se\nGNU General Public License för mer detaljer.\n\nDu skall ha fått en kopia av GNU General Public License\ntillsammans med detta program. Om inte, se http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3072
+#: cmdevents.cpp:3087
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LAN länk är redan aktiv. Inaktivera länkläge för att koppla ifrån."
 
-#: cmdevents.cpp:3078
+#: cmdevents.cpp:3093
 msgid "Network is not supported in local mode."
 msgstr "Nätverk stöds inte i lokalläge."
 
-#: opts.cpp:561 opts.cpp:866
+#: opts.cpp:561 opts.cpp:864
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "Ogiltigt värde %s för alternativet %s; giltiga värden är %s%s%s"
 
-#: opts.cpp:578 opts.cpp:878
+#: opts.cpp:578 opts.cpp:876
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Ogiltigt värde %d för alternativet %s; giltiga värden är %d - %d"
 
-#: opts.cpp:585 opts.cpp:594 opts.cpp:886 opts.cpp:894
+#: opts.cpp:585 opts.cpp:594 opts.cpp:884 opts.cpp:892
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Ogiltigt värde %f för alternativ %s; giltiga värden är %f - %f"
 
-#: opts.cpp:654 opts.cpp:675 opts.cpp:963 opts.cpp:989
+#: opts.cpp:654 opts.cpp:675 opts.cpp:960 opts.cpp:986
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Ogiltig tangentbindning %s för %s"
 
-#: opts.cpp:849
+#: opts.cpp:847
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Ogiltigt flaggalternativ %s - %s ignoreras"
@@ -939,212 +939,212 @@ msgstr "Fel vid öppnande av pseudo tty: %s"
 msgid "Error setting up server socket (%d)"
 msgstr "Fel vid inrättande av server sockel (%d)"
 
-#: panel.cpp:95
+#: panel.cpp:96
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s är inte en giltig ROM fil"
 
-#: panel.cpp:96 panel.cpp:157 panel.cpp:222
+#: panel.cpp:97 panel.cpp:158 panel.cpp:223
 msgid "Problem loading file"
 msgstr "Problem vid laddning av fil"
 
-#: panel.cpp:156
+#: panel.cpp:157
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Oförmögen att ladda Game Boy ROM %s"
 
-#: panel.cpp:198 panel.cpp:298
+#: panel.cpp:199 panel.cpp:299
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Kunde inte ladda BIOS %s"
 
-#: panel.cpp:221
+#: panel.cpp:222
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Oförmögen att ladda Game Boy Advance ROM %s"
 
-#: panel.cpp:456
+#: panel.cpp:458
 msgid " player "
 msgstr " spelare "
 
-#: panel.cpp:621
+#: panel.cpp:624
 #, c-format
 msgid "Loaded state %s"
 msgstr "Laddade tillstånd %s"
 
-#: panel.cpp:621
+#: panel.cpp:624
 #, c-format
 msgid "Error loading state %s"
 msgstr "Fel vid laddning av tillstånd %s"
 
-#: panel.cpp:645
+#: panel.cpp:648
 #, c-format
 msgid "Saved state %s"
 msgstr "Sparade tillstånd %s"
 
-#: panel.cpp:645
+#: panel.cpp:648
 #, c-format
 msgid "Error saving state %s"
 msgstr "Fel vid sparande av tillstånd %s"
 
-#: panel.cpp:849
+#: panel.cpp:852
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "Helskärmsläge %dx%d-%d@%d stöds inte; letar efter annan"
 
-#: panel.cpp:887
+#: panel.cpp:890
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "Helskärmsläge %dx%d-%d@%d stöds inte"
 
-#: panel.cpp:892
+#: panel.cpp:895
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Giltigt läge: %dx%d-%d@%d"
 
-#: panel.cpp:900
+#: panel.cpp:903
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "Välj läge %dx%d-%d@%d"
 
-#: panel.cpp:904
+#: panel.cpp:907
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Misslyckades att ändra läge till %dx%d-%d@%d"
 
-#: panel.cpp:988
+#: panel.cpp:991
 msgid "Not a valid GBA cartridge"
 msgstr "Inte en giltig GBA kassett"
 
-#: panel.cpp:1150
+#: panel.cpp:1151
 msgid "No memory for rewinding"
 msgstr "Inget minne för återspolning"
 
-#: panel.cpp:1160
+#: panel.cpp:1161
 msgid "Error writing rewind state"
 msgstr "Fel vid skrivande av återspolningstillstånd"
 
-#: panel.cpp:2257
+#: panel.cpp:2248
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2266
+#: panel.cpp:2257
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:2275
+#: panel.cpp:2266
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:2282
+#: panel.cpp:2273
 msgid "No support for wglGetExtensionsString"
 msgstr ""
 
-#: panel.cpp:2284
+#: panel.cpp:2275
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:2293
+#: panel.cpp:2284
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2299
+#: panel.cpp:2290
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:2395
+#: panel.cpp:2386
 msgid "memory allocation error"
 msgstr "Minnesfördelningsfel"
 
-#: panel.cpp:2398
+#: panel.cpp:2389
 msgid "error initializing codec"
 msgstr "Fel vid initialisering av kodek"
 
-#: panel.cpp:2401
+#: panel.cpp:2392
 msgid "error writing to output file"
 msgstr "Fel vid skrivande till utdatafil"
 
-#: panel.cpp:2404
+#: panel.cpp:2395
 msgid "can't guess output format from file name"
 msgstr "Kan inte gissa utdataformat från filnamn"
 
-#: panel.cpp:2409
+#: panel.cpp:2400
 msgid "programming error; aborting!"
 msgstr "programmeringsfel; avbryter!"
 
-#: panel.cpp:2421 panel.cpp:2450
+#: panel.cpp:2412 panel.cpp:2441
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Oförmögen att börja inspelning till %s (%s)"
 
-#: panel.cpp:2478
+#: panel.cpp:2469
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Fel i ljud/videoinspelning (%s); avbryter"
 
-#: panel.cpp:2484
+#: panel.cpp:2475
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Fel i ljudinspelning (%s); avbryter"
 
-#: panel.cpp:2494
+#: panel.cpp:2485
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Fel i videoinspelning (%s); avbryter"
 
-#: viewsupt.cpp:776
+#: viewsupt.cpp:777
 msgid "R:"
 msgstr "R:"
 
-#: viewsupt.cpp:785
+#: viewsupt.cpp:786
 msgid "G:"
 msgstr "G:"
 
-#: viewsupt.cpp:794
+#: viewsupt.cpp:795
 msgid "B:"
 msgstr "B:"
 
-#: widgets/keyedit.cpp:94 widgets/keyedit.cpp:232
+#: widgets/keyedit.cpp:122 widgets/keyedit.cpp:280
 msgid "SHIFT"
 msgstr "SKIFT"
 
-#: widgets/keyedit.cpp:98 widgets/keyedit.cpp:231
+#: widgets/keyedit.cpp:126 widgets/keyedit.cpp:279
 msgid "ALT"
 msgstr "ALT"
 
-#: widgets/keyedit.cpp:102 widgets/keyedit.cpp:239
+#: widgets/keyedit.cpp:130 widgets/keyedit.cpp:287
 msgid "CTRL"
 msgstr "CTRL"
 
-#: widgets/keyedit.cpp:108 widgets/keyedit.cpp:233
+#: widgets/keyedit.cpp:136 widgets/keyedit.cpp:281
 msgid "RAWCTRL"
 msgstr "RÅCTRL"
 
-#: widgets/keyedit.cpp:122 widgets/keyedit.cpp:200
+#: widgets/keyedit.cpp:150 widgets/keyedit.cpp:248
 msgid "Meta-"
 msgstr "Meta-"
 
-#: widgets/keyedit.cpp:127 widgets/keyedit.cpp:128
+#: widgets/keyedit.cpp:155 widgets/keyedit.cpp:156
 msgid "Num"
 msgstr "Num"
 
-#: widgets/keyedit.cpp:201
+#: widgets/keyedit.cpp:249
 msgid "Meta+"
 msgstr "Meta+"
 
-#: widgets/keyedit.cpp:234
+#: widgets/keyedit.cpp:282
 msgid "RAW_CTRL"
 msgstr "RÅ_CTRL"
 
-#: widgets/keyedit.cpp:235
+#: widgets/keyedit.cpp:283
 msgid "RAWCONTROL"
 msgstr "RÅCONTROL"
 
-#: widgets/keyedit.cpp:236
+#: widgets/keyedit.cpp:284
 msgid "RAW_CONTROL"
 msgstr "RÅ_CONTROL"
 
-#: widgets/keyedit.cpp:240
+#: widgets/keyedit.cpp:288
 msgid "CONTROL"
 msgstr "CONTROL"
 
@@ -2209,8 +2209,8 @@ msgid "Save type"
 msgstr "Sparningstyp"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
-msgid "Bios file :"
-msgstr "Bios-fil :"
+msgid "BIOS file :"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file :"
@@ -2324,8 +2324,8 @@ msgid "GB Boot &ROM file :"
 msgstr "GB Boot&ROM-fil :"
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
-msgid "Select A File"
-msgstr "Välj en fil"
+msgid "Select a File"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:106
 msgid "GBC Boot ROM &file :"
@@ -2396,7 +2396,7 @@ msgstr "% of normalt:"
 msgid "0 = no throttle"
 msgstr "0 = ingen strypning"
 
-#: xrc/GeneralConfig.xrc:114 xrc/SpeedupConfig.xrc:36
+#: xrc/GeneralConfig.xrc:114
 msgid "Unlimited"
 msgstr ""
 
@@ -3616,7 +3616,7 @@ msgstr "Turboinställningar"
 msgid "Speedup Throttle"
 msgstr "Uppsnabbningsbegränsning"
 
-#: xrc/SpeedupConfig.xrc:83
+#: xrc/SpeedupConfig.xrc:50
 msgid "Frame skip"
 msgstr ""
 

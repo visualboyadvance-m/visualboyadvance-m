@@ -10,12 +10,12 @@ msgstr ""
 "POT-Creation-Date: 2020-06-21 19:40+0000\n"
 "PO-Revision-Date: 2020-06-21 20:07+0000\n"
 "Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
-"Language-Team: Croatian (http://www.transifex.com/bgk/vba-m/language/hr/)\n"
+"Language-Team: English (Poland) (http://www.transifex.com/bgk/vba-m/language/en_PL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: hr\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Language: en_PL\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: wxvbam.cpp:226
 msgid "visualboyadvance-m"
@@ -173,15 +173,15 @@ msgstr ""
 
 #: guiinit.cpp:750 xrc/JoyPanel.xrc:364
 msgid "GameShark"
-msgstr "GameShark"
+msgstr ""
 
 #: guiinit.cpp:751 cmdevents.cpp:676
 msgid "GameGenie"
-msgstr "GameGenie"
+msgstr ""
 
 #: guiinit.cpp:753
 msgid "Generic Code"
-msgstr "Generični kod"
+msgstr ""
 
 #: guiinit.cpp:754
 msgid "GameShark Advance"
@@ -189,7 +189,7 @@ msgstr ""
 
 #: guiinit.cpp:755
 msgid "CodeBreaker Advance"
-msgstr "Napredni CodeBreaker"
+msgstr ""
 
 #: guiinit.cpp:756
 msgid "Flashcart CHT"
@@ -255,7 +255,7 @@ msgstr ""
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
 msgid "None"
-msgstr "Ništa"
+msgstr ""
 
 #: guiinit.cpp:1884
 #, c-format
@@ -1403,27 +1403,27 @@ msgstr ""
 
 #: xrc/CheatList.xrc:11
 msgid "Open cheat list"
-msgstr "Otvori listu varanja"
+msgstr ""
 
 #: xrc/CheatList.xrc:15
 msgid "Save cheat list"
-msgstr "Spremi listu varanja"
+msgstr ""
 
 #: xrc/CheatList.xrc:20
 msgid "Add new cheat"
-msgstr "Dodaj novu varku"
+msgstr ""
 
 #: xrc/CheatList.xrc:24
 msgid "Delete selected cheat"
-msgstr "Obriši odabranu varku"
+msgstr ""
 
 #: xrc/CheatList.xrc:29
 msgid "Delete all cheats"
-msgstr "Obriši sve varke"
+msgstr ""
 
 #: xrc/CheatList.xrc:35
 msgid "Toggle all Cheats"
-msgstr "Označi sva Varanja"
+msgstr ""
 
 #: xrc/DirectoriesConfig.xrc:4
 msgid "Directories"
@@ -1627,7 +1627,7 @@ msgstr ""
 
 #: xrc/DisplayConfig.xrc:47
 msgid "OpenGL"
-msgstr "OpenGL"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:54
 msgid "Direct3D 9"
@@ -1643,19 +1643,19 @@ msgstr ""
 
 #: xrc/DisplayConfig.xrc:86
 msgid "2xSaI"
-msgstr "2xSal"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:87
 msgid "Super 2xSaI"
-msgstr "Napredni 2xSal"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:88
 msgid "Super Eagle"
-msgstr "Napredni Eagle"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:89
 msgid "Pixelate"
-msgstr "Pikseliziraj"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:90
 msgid "Advance MAME Scale2x"
@@ -1663,19 +1663,19 @@ msgstr ""
 
 #: xrc/DisplayConfig.xrc:91
 msgid "Bilinear"
-msgstr "Dvije linije"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:92
 msgid "Bilinear Plus"
-msgstr "Dvije linije plus"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:93
 msgid "Scanlines"
-msgstr "Scanlines"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:94
 msgid "TV Mode"
-msgstr "Mod TV-a"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:95
 msgid "HQ 2x"
@@ -1735,11 +1735,11 @@ msgstr ""
 
 #: xrc/DisplayConfig.xrc:136
 msgid "Smart interframe blending"
-msgstr "pametno mješanje sučelja"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:137
 msgid "Interframe motion blur"
-msgstr "motion blur sučelja"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:151 xrc/SoundConfig.xrc:91
 msgid "Basic"
@@ -1763,11 +1763,11 @@ msgstr ""
 
 #: xrc/DisplayConfig.xrc:222
 msgid "Percentage"
-msgstr "Postotak"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:223
 msgid "Detailed"
-msgstr "Detaljno"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:237
 msgid "On-Screen Display"
@@ -2150,7 +2150,7 @@ msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:4
 msgid "Game Boy Advance settings"
-msgstr "Game Boy Advance postavke"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:21
 msgid "Save type :"
@@ -2159,23 +2159,23 @@ msgstr ""
 #: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
 #: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
 msgid "Automatic"
-msgstr "Automatsko"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:28 xrc/GameBoyAdvanceConfig.xrc:200
 msgid "EEPROM"
-msgstr "EEPROM"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:29 xrc/GameBoyAdvanceConfig.xrc:201
 msgid "SRAM"
-msgstr "SRAM"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:30 xrc/GameBoyAdvanceConfig.xrc:202
 msgid "Flash"
-msgstr "Bljesak"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:31
 msgid "EEPROM + Sensor"
-msgstr "EEPROM + Senzor"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:43
 msgid "Flash size :"
@@ -2270,7 +2270,7 @@ msgstr ""
 
 #: xrc/GameBoyConfig.xrc:4
 msgid "GameBoy settings"
-msgstr "GameBoy postavke"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:20
 msgid "Emulated &system :"
@@ -2278,23 +2278,23 @@ msgstr ""
 
 #: xrc/GameBoyConfig.xrc:30
 msgid "Game Boy Color"
-msgstr "Game Boy Color"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:31
 msgid "Super Game Boy"
-msgstr "Super Game Boy"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:32 xrc/SoundConfig.xrc:290
 msgid "Game Boy"
-msgstr "Game Boy"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:33 xrc/SoundConfig.xrc:335
 msgid "Game Boy Advance"
-msgstr "Game Boy Advance"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:34
 msgid "Super Game Boy 2"
-msgstr "Super Game Boy 2"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:48
 msgid "Display &borders :"
@@ -2478,7 +2478,7 @@ msgstr ""
 
 #: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:452
 msgid "Up"
-msgstr "Gore"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:37
 msgid "A"
@@ -2486,7 +2486,7 @@ msgstr ""
 
 #: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:456
 msgid "Down"
-msgstr "Dolje"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:83
 msgid "B"
@@ -2494,7 +2494,7 @@ msgstr ""
 
 #: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:460
 msgid "Left"
-msgstr "Lijevo"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:129
 msgid "L"
@@ -2502,7 +2502,7 @@ msgstr ""
 
 #: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:464
 msgid "Right"
-msgstr "Desno"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:175
 msgid "R"
@@ -3475,7 +3475,7 @@ msgstr ""
 
 #: xrc/SoundConfig.xrc:34
 msgid "Mute"
-msgstr "Tiho"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:54 xrc/SoundConfig.xrc:320
 msgid "Maximum"

@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-09 07:12+0000\n"
-"PO-Revision-Date: 2020-05-15 12:32+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2020-06-21 19:40+0000\n"
+"PO-Revision-Date: 2020-06-21 20:07+0000\n"
+"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/bgk/vba-m/language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -155,7 +155,7 @@ msgstr "Velg juksefil"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA juksekode-lister (*.clt)|*.clt|CHT kode-lister (*.cht)|*.cht"
 
-#: guiinit.cpp:256 panel.cpp:424
+#: guiinit.cpp:256 panel.cpp:426
 msgid "Loaded cheats"
 msgstr "Lastet juksekoder"
 
@@ -245,103 +245,103 @@ msgstr "%d bilder = %.2f ms"
 msgid "Default device"
 msgstr "Standard enhet"
 
-#: guiinit.cpp:1736
+#: guiinit.cpp:1723
 msgid "Desktop mode"
 msgstr "Skrivebordsmodus"
 
-#: guiinit.cpp:1743
+#: guiinit.cpp:1730
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: guiinit.cpp:1856 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
+#: guiinit.cpp:1843 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
 msgid "None"
 msgstr "Ingen"
 
-#: guiinit.cpp:1897
+#: guiinit.cpp:1884
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Ingen brukbare rpi plugins funnet i %s"
 
-#: guiinit.cpp:1917 xrc/DisplayConfig.xrc:107
+#: guiinit.cpp:1904 xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "Plugin"
 
-#: guiinit.cpp:1945
+#: guiinit.cpp:1932
 msgid "Please select a plugin or a different filter"
 msgstr "Velg en plugin eller et annet filter"
 
-#: guiinit.cpp:1946
+#: guiinit.cpp:1933
 msgid "Plugin selection error"
 msgstr "Feil under valg av plugin"
 
-#: guiinit.cpp:2145
+#: guiinit.cpp:2146
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr "Dette vil fjerne alle brukerdefinerte akseleratorer. Er du sikker?"
 
-#: guiinit.cpp:2145
+#: guiinit.cpp:2146
 msgid "Confirm"
 msgstr "Bekreft"
 
-#: guiinit.cpp:2712
+#: guiinit.cpp:2734
 msgid "Main icon not found"
 msgstr "Hovedikon ikke funnet"
 
-#: guiinit.cpp:2722
+#: guiinit.cpp:2744
 msgid "Browse"
 msgstr ""
 
-#: guiinit.cpp:2736
+#: guiinit.cpp:2758
 msgid "Main display panel not found"
 msgstr "Primært visningspanel ikke funnet"
 
-#: guiinit.cpp:2885
+#: guiinit.cpp:2907
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Overflødig menyakselerator: %s for %s og %s; bruker første"
 
-#: guiinit.cpp:2899
+#: guiinit.cpp:2921
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Menyakseleratoren %s for %s overstyrer standarden for %s ; beholder meny"
 
-#: guiinit.cpp:3037
+#: guiinit.cpp:3059
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Ugyldig menyvalg %s; fjernes"
 
-#: guiinit.cpp:3245
+#: guiinit.cpp:3267
 msgid "Code"
 msgstr "Kode"
 
-#: guiinit.cpp:3254
+#: guiinit.cpp:3276
 msgid "Description"
 msgstr "Beskrivelse"
 
-#: guiinit.cpp:3328 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3350 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Adresse"
 
-#: guiinit.cpp:3329
+#: guiinit.cpp:3351
 msgid "Old Value"
 msgstr "Gammel verdi"
 
-#: guiinit.cpp:3330
+#: guiinit.cpp:3352
 msgid "New Value"
 msgstr "Ny verdi"
 
-#: guiinit.cpp:3846
+#: guiinit.cpp:3873
 msgid "Menu commands"
 msgstr "Menyvalg"
 
-#: guiinit.cpp:3869
+#: guiinit.cpp:3896
 msgid "Other commands"
 msgstr "Andre valg"
 
-#: guiinit.cpp:3980
+#: guiinit.cpp:4007
 msgid "JoyBus host invalid; disabling"
 msgstr "JoyBus vert ugyldig; deaktiveres"
 
@@ -351,7 +351,7 @@ msgstr "Tekstfiler (*.txt;*.log)|*.txt;*.log|"
 
 #: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
 #: cmdevents.cpp:1158 cmdevents.cpp:1236 cmdevents.cpp:1306 cmdevents.cpp:1333
-#: viewsupt.cpp:1180
+#: viewsupt.cpp:1181
 msgid "Select output file"
 msgstr "Velg ut-fil"
 
@@ -438,7 +438,7 @@ msgid ""
 msgstr "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color Table (*.act)|*.act"
 
 #: gfxviewers.cpp:1601 gfxviewers.cpp:1743 cmdevents.cpp:1159
-#: viewsupt.cpp:1181
+#: viewsupt.cpp:1182
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG bilder |*.png|BMP bilder |*.bmp"
 
@@ -608,7 +608,7 @@ msgstr "Importering av en batterifil vil slette alle lagrede spill (permanent et
 msgid "Confirm import"
 msgstr "Bekreft importering"
 
-#: cmdevents.cpp:907 panel.cpp:367
+#: cmdevents.cpp:907 panel.cpp:369
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Lastet batteri %s"
@@ -691,7 +691,7 @@ msgstr "Feil under lasting av snapshot %s"
 msgid "Wrote battery %s"
 msgstr "Lagret batteri %s"
 
-#: cmdevents.cpp:1100 panel.cpp:673
+#: cmdevents.cpp:1100 panel.cpp:676
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Feil under lagring av batteri %s"
@@ -787,32 +787,32 @@ msgstr "Venter på tilkobling på port %d"
 msgid "Waiting for GDB..."
 msgstr "Venter på GDB..."
 
-#: cmdevents.cpp:2626
+#: cmdevents.cpp:2636
 #, c-format
 msgid "Using pixel filter #%d"
 msgstr ""
 
-#: cmdevents.cpp:2641
+#: cmdevents.cpp:2651
 #, c-format
 msgid "Using interframe blending #%d"
 msgstr ""
 
-#: cmdevents.cpp:2680 panel.cpp:181 panel.cpp:284
+#: cmdevents.cpp:2690 panel.cpp:182 panel.cpp:285
 msgid "Could not initialize the sound driver!"
 msgstr ""
 
-#: cmdevents.cpp:2768
+#: cmdevents.cpp:2780
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Nintendo GameBoy (+Color+Advance) emulator."
 
-#: cmdevents.cpp:2769
+#: cmdevents.cpp:2781
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Kopirett © 1999-2003 Forgotten\nKopirett © 2004-2006 VBA utviklingslag\nKopirett © 2007-2017 VBA-M utviklingslag"
 
-#: cmdevents.cpp:2770
+#: cmdevents.cpp:2782
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -828,35 +828,35 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Dette programmet er basert på åpen kildekode:  Du kan redistribuere den, \nog/eller modifisere under vilkårene som beskrevet i GNU General Public License \nslik den er publisert av \"the Free Software Foundation\", enten versjon 2 \nav lisensen, eller (som følge av ditt valg) en hvilken som helst senere versjon.\n\nDette programmet er blitt distribuert i håp om at det vil være til nytte \nfor deg, men UTEN NOEN FORM FOR GARANTI; selv uten en eventuell \nimplisert garanti som følge av VIDERESALG eller \nEGNETHET FOR ET BESTEMT FORMÅL. \nDet henvises til GNU General Public License for en mer detaljert beskrivelse.\n\nDu skal ha mottatt en kopi av GNU General Public License\nsammen \nmed dette programmet,  hvis ikke dette er tilfellet, \nse http://www.gnu.org/licenses .\n\n-----\n\nImportant note from translator: This is a free translation into Norwegian \nfor the convenience to the end user. It is not accurate, \nand thus the original disclaimer in English (below) is regarded \nas the correct to use in any eventual legal matter.\n\n-----\n\nThis program is free software: you can redistribute it and/or modify \nit under the terms of the GNU General Public License as published \nby the Free Software Foundation, either version 2 of the License, \nor (at your option) any later version.  \n\nThis program is distributed in the hope that it will be useful, \nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the \nGNU General Public License for more details.\n\nYou should have received a copy of \nthe GNU General Public License\nalong with this program. If not, see \nhttp://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3072
+#: cmdevents.cpp:3087
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LAN linken er allerede aktiv. Deaktivér link-modus for å koble fra."
 
-#: cmdevents.cpp:3078
+#: cmdevents.cpp:3093
 msgid "Network is not supported in local mode."
 msgstr "Nettverk er ikke støttet i lokalmodus."
 
-#: opts.cpp:561 opts.cpp:866
+#: opts.cpp:561 opts.cpp:864
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "Ugyldig verdi %s for valg %s; gyldige verdier er %s%s%s"
 
-#: opts.cpp:578 opts.cpp:878
+#: opts.cpp:578 opts.cpp:876
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Ugyldig verdi %d for valg %s; gyldige verdier er %d - %d"
 
-#: opts.cpp:585 opts.cpp:594 opts.cpp:886 opts.cpp:894
+#: opts.cpp:585 opts.cpp:594 opts.cpp:884 opts.cpp:892
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Ugyldig verdi %f for valg %s; gyldige verdier er %f - %f"
 
-#: opts.cpp:654 opts.cpp:675 opts.cpp:963 opts.cpp:989
+#: opts.cpp:654 opts.cpp:675 opts.cpp:960 opts.cpp:986
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Ugyldig nøkkelbinding %s for %s"
 
-#: opts.cpp:849
+#: opts.cpp:847
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Ugyldig flagg %s - %s ignoreres"
@@ -936,212 +936,212 @@ msgstr "Feil under åpning av pseudo tty: %s"
 msgid "Error setting up server socket (%d)"
 msgstr "Feil under oppsett av serverkobling (%d)"
 
-#: panel.cpp:95
+#: panel.cpp:96
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s er ikke en gyldig ROM fil"
 
-#: panel.cpp:96 panel.cpp:157 panel.cpp:222
+#: panel.cpp:97 panel.cpp:158 panel.cpp:223
 msgid "Problem loading file"
 msgstr "Feil under lasting av fil"
 
-#: panel.cpp:156
+#: panel.cpp:157
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Kunne ikke laste Game Boy ROM %s"
 
-#: panel.cpp:198 panel.cpp:298
+#: panel.cpp:199 panel.cpp:299
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Kunne ikke laste BIOS %s"
 
-#: panel.cpp:221
+#: panel.cpp:222
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Kunne ikke laste Game Boy Advance ROM %s"
 
-#: panel.cpp:456
+#: panel.cpp:458
 msgid " player "
 msgstr "avspiller"
 
-#: panel.cpp:621
+#: panel.cpp:624
 #, c-format
 msgid "Loaded state %s"
 msgstr "Lastet tilstand %s"
 
-#: panel.cpp:621
+#: panel.cpp:624
 #, c-format
 msgid "Error loading state %s"
 msgstr "Kunne ikke laste tilstand %s"
 
-#: panel.cpp:645
+#: panel.cpp:648
 #, c-format
 msgid "Saved state %s"
 msgstr "Lagret tilstand %s"
 
-#: panel.cpp:645
+#: panel.cpp:648
 #, c-format
 msgid "Error saving state %s"
 msgstr "Feil under lagring av tilstand %s"
 
-#: panel.cpp:849
+#: panel.cpp:852
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "Fullskjermsmodusen %dx%d-%d@%d er ikke støttet; leter etter alternativ"
 
-#: panel.cpp:887
+#: panel.cpp:890
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "Fullskjermsmodusen %dx%d-%d@%d er ikke støttet"
 
-#: panel.cpp:892
+#: panel.cpp:895
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Gyldig modus: %dx%d-%d@%d"
 
-#: panel.cpp:900
+#: panel.cpp:903
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "Valgte modus %dx%d-%d@%d"
 
-#: panel.cpp:904
+#: panel.cpp:907
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Kunne ikke bytte til modus %dx%d-%d@%d"
 
-#: panel.cpp:988
+#: panel.cpp:991
 msgid "Not a valid GBA cartridge"
 msgstr "Ikke en gyldig GBA kassett"
 
-#: panel.cpp:1150
+#: panel.cpp:1151
 msgid "No memory for rewinding"
 msgstr "Intet minne for tilbakespoling"
 
-#: panel.cpp:1160
+#: panel.cpp:1161
 msgid "Error writing rewind state"
 msgstr "Feil under skriving av tilbakespolingstilstand"
 
-#: panel.cpp:2257
+#: panel.cpp:2248
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2266
+#: panel.cpp:2257
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:2275
+#: panel.cpp:2266
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:2282
+#: panel.cpp:2273
 msgid "No support for wglGetExtensionsString"
 msgstr ""
 
-#: panel.cpp:2284
+#: panel.cpp:2275
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:2293
+#: panel.cpp:2284
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2299
+#: panel.cpp:2290
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:2395
+#: panel.cpp:2386
 msgid "memory allocation error"
 msgstr "minneallokeringsfeil"
 
-#: panel.cpp:2398
+#: panel.cpp:2389
 msgid "error initializing codec"
 msgstr "feil under initialisering av kodek"
 
-#: panel.cpp:2401
+#: panel.cpp:2392
 msgid "error writing to output file"
 msgstr "feil under skriving av ut-fil"
 
-#: panel.cpp:2404
+#: panel.cpp:2395
 msgid "can't guess output format from file name"
 msgstr "kunne ikke bestemme format fra filnavn"
 
-#: panel.cpp:2409
+#: panel.cpp:2400
 msgid "programming error; aborting!"
 msgstr "programmeringsfeil; avbryter!"
 
-#: panel.cpp:2421 panel.cpp:2450
+#: panel.cpp:2412 panel.cpp:2441
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Kunne ikke starte opptak til %s (%s)"
 
-#: panel.cpp:2478
+#: panel.cpp:2469
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Feil i lyd-/videoopptak (%s); avbryter"
 
-#: panel.cpp:2484
+#: panel.cpp:2475
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Feil i lydopptak (%s); avbryter"
 
-#: panel.cpp:2494
+#: panel.cpp:2485
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Feil i videoopptak (%s); avbryter"
 
-#: viewsupt.cpp:776
+#: viewsupt.cpp:777
 msgid "R:"
 msgstr "R:"
 
-#: viewsupt.cpp:785
+#: viewsupt.cpp:786
 msgid "G:"
 msgstr "G:"
 
-#: viewsupt.cpp:794
+#: viewsupt.cpp:795
 msgid "B:"
 msgstr "B:"
 
-#: widgets/keyedit.cpp:94 widgets/keyedit.cpp:232
+#: widgets/keyedit.cpp:122 widgets/keyedit.cpp:280
 msgid "SHIFT"
 msgstr "SHIFT"
 
-#: widgets/keyedit.cpp:98 widgets/keyedit.cpp:231
+#: widgets/keyedit.cpp:126 widgets/keyedit.cpp:279
 msgid "ALT"
 msgstr "ALT"
 
-#: widgets/keyedit.cpp:102 widgets/keyedit.cpp:239
+#: widgets/keyedit.cpp:130 widgets/keyedit.cpp:287
 msgid "CTRL"
 msgstr "CTRL"
 
-#: widgets/keyedit.cpp:108 widgets/keyedit.cpp:233
+#: widgets/keyedit.cpp:136 widgets/keyedit.cpp:281
 msgid "RAWCTRL"
 msgstr "RAWCTRL"
 
-#: widgets/keyedit.cpp:122 widgets/keyedit.cpp:200
+#: widgets/keyedit.cpp:150 widgets/keyedit.cpp:248
 msgid "Meta-"
 msgstr "Meta-"
 
-#: widgets/keyedit.cpp:127 widgets/keyedit.cpp:128
+#: widgets/keyedit.cpp:155 widgets/keyedit.cpp:156
 msgid "Num"
 msgstr ""
 
-#: widgets/keyedit.cpp:201
+#: widgets/keyedit.cpp:249
 msgid "Meta+"
 msgstr "Meta+"
 
-#: widgets/keyedit.cpp:234
+#: widgets/keyedit.cpp:282
 msgid "RAW_CTRL"
 msgstr "RAW_CTRL"
 
-#: widgets/keyedit.cpp:235
+#: widgets/keyedit.cpp:283
 msgid "RAWCONTROL"
 msgstr "RAWCONTROL"
 
-#: widgets/keyedit.cpp:236
+#: widgets/keyedit.cpp:284
 msgid "RAW_CONTROL"
 msgstr "RAW_CONTROL"
 
-#: widgets/keyedit.cpp:240
+#: widgets/keyedit.cpp:288
 msgid "CONTROL"
 msgstr "CONTROL"
 
@@ -2206,8 +2206,8 @@ msgid "Save type"
 msgstr "Lagrefil-type :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
-msgid "Bios file :"
-msgstr "Bios-fil : "
+msgid "BIOS file :"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file :"
@@ -2321,8 +2321,8 @@ msgid "GB Boot &ROM file :"
 msgstr ""
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
-msgid "Select A File"
-msgstr "Velg fil"
+msgid "Select a File"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:106
 msgid "GBC Boot ROM &file :"
@@ -2393,7 +2393,7 @@ msgstr "% av normal"
 msgid "0 = no throttle"
 msgstr "0 = Ingen struping"
 
-#: xrc/GeneralConfig.xrc:114 xrc/SpeedupConfig.xrc:36
+#: xrc/GeneralConfig.xrc:114
 msgid "Unlimited"
 msgstr ""
 
@@ -3613,7 +3613,7 @@ msgstr ""
 msgid "Speedup Throttle"
 msgstr ""
 
-#: xrc/SpeedupConfig.xrc:83
+#: xrc/SpeedupConfig.xrc:50
 msgid "Frame skip"
 msgstr ""
 
