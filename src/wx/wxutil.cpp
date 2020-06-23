@@ -77,16 +77,16 @@ KeyboardInputMap::KeyboardInputMap(){}
 void KeyboardInputMap::AddMap(wxString keyStr, int key, int mod)
 {
     KeyboardInputMap* singleton = getInstance();
-    singleton->keysMap[keyStr.wc_str()] = singleton->newPair(key, mod);
+    singleton->keysMap[keyStr.ToStdWstring()] = singleton->newPair(key, mod);
 }
 
 
 bool KeyboardInputMap::GetMap(wxString keyStr, int &key, int &mod)
 {
     KeyboardInputMap* singleton = getInstance();
-    if (contains(singleton->keysMap, keyStr.wc_str())) {
-        key = singleton->keysMap.at(keyStr.wc_str()).key;
-        mod = singleton->keysMap.at(keyStr.wc_str()).mod;
+    if (contains(singleton->keysMap, keyStr.ToStdWstring())) {
+        key = singleton->keysMap.at(keyStr.ToStdWstring()).key;
+        mod = singleton->keysMap.at(keyStr.ToStdWstring()).mod;
         return true;
     }
     return false;
