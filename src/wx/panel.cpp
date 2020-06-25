@@ -2290,12 +2290,12 @@ void GLDrawingPanel::DrawingPanelInit()
     }
 #elif defined(__WXMSW__)
     typedef char* (*wglext)();
-    wglext wglGetExtensionsString = (wglext)wglGetProcAddress("wglGetExtensionsString");
-    if (wglGetExtensionsString == NULL || strstr(wglGetExtensionsString(), "WGL_EXT_swap_control") == 0) {
-        if (wglGetExtensionsString == NULL)
-            systemScreenMessage(_("No support for wglGetExtensionsString"));
-        else
-            systemScreenMessage(_("No support for WGL_EXT_swap_control"));
+    wglext wglGetExtensionsStringEXT = (wglext)wglGetProcAddress("wglGetExtensionsStringEXT");
+    if (wglGetExtensionsStringEXT == NULL) {
+        systemScreenMessage(_("No support for wglGetExtensionsStringEXT"));
+    }
+    else if (strstr(wglGetExtensionsStringEXT(), "WGL_EXT_swap_control") == 0) {
+        systemScreenMessage(_("No support for WGL_EXT_swap_control"));
     }
 
     typedef bool (*PFNWGLSWAPINTERVALEXTPROC)(int);
