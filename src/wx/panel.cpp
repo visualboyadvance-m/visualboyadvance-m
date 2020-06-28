@@ -17,6 +17,7 @@
 #include "filters.h"
 #include "wxvbam.h"
 #include "wxutil.h"
+#include "wayland.h"
 
 #ifdef __WXMSW__
 #include <windows.h>
@@ -1312,10 +1313,32 @@ static void draw_black_background(wxWindow* win) {
     dc.DrawRectangle(0, 0, w, h);
 }
 
+static bool is_key_pressed(wxKeyEvent& ev)
+{
+    auto kc = ev.GetKeyCode();
+
+    // Under Wayland or if the key is unicode, we can't use wxGetKeyState().
+    if (IsItWayland() || kc == WXK_NONE)
+        return true;
+
+    return wxGetKeyState(static_cast<wxKeyCode>(kc));
+}
+
+static bool is_key_released(wxKeyEvent& ev)
+{
+    auto kc = ev.GetKeyCode();
+
+    // Under Wayland or if the key is unicode, we can't use wxGetKeyState().
+    if (IsItWayland() || kc == WXK_NONE)
+        return true;
+
+    return !wxGetKeyState(static_cast<wxKeyCode>(kc));
+}
+
 void GameArea::OnKeyDown(wxKeyEvent& ev)
 {
     int kc = getKeyboardKeyCode(ev);
-    if (process_key_press(true, kc, ev.GetModifiers())) {
+    if (is_key_pressed(ev) && process_key_press(true, kc, ev.GetModifiers())) {
         wxWakeUpIdle();
     }
 }
@@ -1323,7 +1346,7 @@ void GameArea::OnKeyDown(wxKeyEvent& ev)
 void GameArea::OnKeyUp(wxKeyEvent& ev)
 {
     int kc = getKeyboardKeyCode(ev);
-    if (process_key_press(false, kc, ev.GetModifiers())) {
+    if (is_key_released(ev) && process_key_press(false, kc, ev.GetModifiers())) {
         wxWakeUpIdle();
     }
 }
