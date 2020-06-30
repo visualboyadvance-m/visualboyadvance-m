@@ -10,6 +10,10 @@ matrix:
     include:
         - env: BUILD_ENV=ubuntu-bionic XVFB_RUN=1
           dist: bionic
+        - env: BUILD_ENV=utf8 XVFB_RUN=1
+          dist: bionic
+        - env: BUILD_ENV=nostl XVFB_RUN=1
+          dist: bionic
         - env: BUILD_ENV=ubuntu-trusty XVFB_RUN=1
           dist: trusty
         - env: BUILD_ENV=ubuntu-xenial XVFB_RUN=1
@@ -54,6 +58,20 @@ before_script:
         if [ -n "$ENABLE_SDL" ]; then
             CMAKE_ARGS="$CMAKE_ARGS -DENABLE_SDL=ON"
         fi
+        case "$BUILD_ENV" in
+            utf8|nostl)
+                sudo apt-get -y install stow libwxgtk3.0-gtk3-dev
+                (
+                    cd /
+                    sudo curl -LO 'http://cachemiss.com/files/wxWidgets-gtk3-'"$BUILD_ENV"'-3.0.5.tar.gz'
+                    sudo tar zxvf wxWidgets-gtk3-"$BUILD_ENV"-3.0.5.tar.gz
+                    cd /usr/local/stow
+                    sudo stow wxWidgets-gtk3-"$BUILD_ENV"-3.0.5
+                )
+                export LD_LIBRARY_PATH=/usr/local/lib
+                CMAKE_ARGS="$CMAKE_ARGS -DwxWidgets_CONFIG_EXECUTABLE=/usr/local/bin/wx-config -DWXRC=/usr/local/bin/wxrc"
+                ;;
+        esac
 
 script:
     - mkdir -p -- "$DIR"
