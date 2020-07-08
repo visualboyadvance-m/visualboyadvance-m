@@ -1251,7 +1251,7 @@ DEFINE_ALU_INSN_C(1F, 3F, MVNS, YES)
         clockTicks += 3;                                               \
     if (busPrefetchCount == 0)                                         \
         busPrefetchCount = ((busPrefetchCount + 1) << clockTicks) - 1; \
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    clockTicks += CYCLES + 1 + codeTicksAccess32(armNextPC);
 
 #define OP_MUL \
     reg[dest].I = reg[mult].I * rs;
