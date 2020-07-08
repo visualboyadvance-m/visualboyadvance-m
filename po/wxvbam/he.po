@@ -4,13 +4,14 @@
 # 
 # Translators:
 # Ds886 <daniel.ashkenazi@gmail.com>, 2020
+# Ds886 <daniel.ashkenazi@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-06-21 19:40+0000\n"
-"PO-Revision-Date: 2020-06-21 20:07+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"PO-Revision-Date: 2020-07-02 05:10+0000\n"
+"Last-Translator: Ds886 <daniel.ashkenazi@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/bgk/vba-m/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -28,7 +29,7 @@ msgstr "לא יכל ליצור את החלון המרכזי"
 
 #: wxvbam.cpp:511
 msgid "Save built-in XRC file and exit"
-msgstr "שמור את הקובץ XRC הבסיסי  וצא"
+msgstr "‏שמור את הקובץ ‎XRC ‏הבסיסי  וצא"
 
 #: wxvbam.cpp:514
 msgid "Save built-in vba-over.ini and exit"
@@ -102,7 +103,7 @@ msgstr "אלה הפקודות הזמינות עבור המקלדת\\* האפשר
 
 #: wxvbam.cpp:676
 msgid "Bad configuration option or multiple ROM files given:\n"
-msgstr "ישנה בעיה  בהגדרות שנבחרו או ניתנו מספר רב של קבצי ROM:\n"
+msgstr "ישנה בעיה  בהגדרות שנבחרו או ניתנו מספר רב של קבצי רום:\n"
 
 #: guiinit.cpp:77
 msgid "Start!"
@@ -127,7 +128,7 @@ msgstr "מחכה למשתמשים..."
 #: guiinit.cpp:133
 #, c-format
 msgid "Server IP address is: %s\n"
-msgstr "כתובת ה-IP של השרת היא: %s\n"
+msgstr "‏כתובת ה-‎IP ‏של השרת היא: %s\n"
 
 #: guiinit.cpp:135
 msgid "Waiting for connection..."
@@ -150,7 +151,7 @@ msgstr "בחר קובץ רמאויות"
 
 #: guiinit.cpp:237
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
-msgstr "רשימת רמאויות של VBA (*.clt)|*.clt|CHT רשימת רמאויות (*.cht)|*.cht"
+msgstr "‏רשימת רמאויות של ‎VBA (*.clt)|*.clt| ‏רשימת רמאויות CHT ‎(*.cht)|*.cht"
 
 #: guiinit.cpp:256 panel.cpp:426
 msgid "Loaded cheats"
@@ -459,7 +460,7 @@ msgstr "קבצי GameBoy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*
 
 #: cmdevents.cpp:141
 msgid "Open GB ROM file"
-msgstr "פתח קובץ רום ל-GB "
+msgstr "‏פתח קובץ רום ל-‎GB "
 
 #: cmdevents.cpp:158
 msgid ""
@@ -469,7 +470,7 @@ msgstr "קבצי GameBoy Color(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.
 
 #: cmdevents.cpp:165
 msgid "Open GBC ROM file"
-msgstr "פתח קובץ רום ל-GBC"
+msgstr "‏פתח קובץ רום ל-‎GBC"
 
 #: cmdevents.cpp:584 cmdevents.cpp:700 cmdevents.cpp:739 cmdevents.cpp:812
 msgid "Unknown"
@@ -760,7 +761,7 @@ msgstr "עוצמת שמע: %d%%"
 
 #: cmdevents.cpp:2155
 msgid "Set to 0 for pseudo tty"
-msgstr "קבע ל-0 בשביל מצב דמוי tty"
+msgstr "‏קבע ל-0 בשביל מצב דמוי ‎tty"
 
 #: cmdevents.cpp:2157
 msgid "Port to wait for connection:"
@@ -768,7 +769,7 @@ msgstr "פורט בשביל להמתין לחיבור:"
 
 #: cmdevents.cpp:2158
 msgid "GDB Connection"
-msgstr "חיבור GDB"
+msgstr "‏חיבור ‎GDB"
 
 #: cmdevents.cpp:2211
 #, c-format
@@ -782,7 +783,7 @@ msgstr "מחכה לחיבור בפורט %d"
 
 #: cmdevents.cpp:2221
 msgid "Waiting for GDB..."
-msgstr "מחכה ל-GDB..."
+msgstr "‏מחכה ל-‎GDB..."
 
 #: cmdevents.cpp:2636
 #, c-format
@@ -800,7 +801,7 @@ msgstr "לא יכל לאתחל את הדרייבר לשמע!"
 
 #: cmdevents.cpp:2780
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
-msgstr "אמולטור ל-Nintendo GameBoy (+Color+Advance) "
+msgstr "‏אמולטור ל-‎Nintendo GameBoy (+Color+Advance) "
 
 #: cmdevents.cpp:2781
 msgid ""
@@ -3188,7 +3189,7 @@ msgstr "אפשר רמאויות"
 
 #: xrc/MainMenu.xrc:591
 msgid "&Break into GDB"
-msgstr "שבור אל GDB"
+msgstr "עצור  אל GDB"
 
 #: xrc/MainMenu.xrc:595
 msgid "&Configure port..."
@@ -3384,7 +3385,7 @@ msgstr "צבע:"
 
 #: xrc/MapViewer.xrc:124
 msgid "Mosaic:"
-msgstr "פסיפס: "
+msgstr "מוזיאק: "
 
 #: xrc/MapViewer.xrc:132
 msgid "Overflow:"
