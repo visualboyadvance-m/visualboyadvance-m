@@ -2132,6 +2132,7 @@ void CPUSoftwareInterrupt(int comment)
         break;
     case 0x0A:
         BIOS_ArcTan2();
+        reg[3].I = 0x170;
         break;
     case 0x0B: {
         int len = (reg[2].I & 0x1FFFFF) >> 1;
