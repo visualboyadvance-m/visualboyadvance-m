@@ -664,53 +664,6 @@ int systemGetSensorZ()
     return sensorz[gopts.default_stick - 1] / 10;
 }
 
-class PrintDialog : public wxEvtHandler, public wxPrintout {
-public:
-    PrintDialog(const uint16_t* data, int lines, bool cont);
-    ~PrintDialog();
-    int ShowModal()
-    {
-        dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
-
-        if (gopts.keep_on_top)
-            dlg->SetWindowStyle(dlg->GetWindowStyle() | wxSTAY_ON_TOP);
-        else
-            dlg->SetWindowStyle(dlg->GetWindowStyle() & ~wxSTAY_ON_TOP);
-
-        CheckPointer(wxGetApp().frame);
-        return wxGetApp().frame->ShowModal(dlg);
-    }
-
-private:
-    void DoSave(wxCommandEvent&);
-    void DoPrint(wxCommandEvent&);
-    void ChangeMag(wxCommandEvent&);
-    void ShowImg(wxPaintEvent&);
-    bool OnPrintPage(int pno);
-    void OnPreparePrinting();
-    bool HasPage(int pno) { return pno <= npw * nph; }
-    void GetPageInfo(int* minp, int* maxp, int* pfrom, int* pto)
-    {
-        *minp = 1;
-        *maxp = npw * nph;
-        *pfrom = 1;
-        *pto = 1;
-    }
-
-    wxDialog* dlg;
-    wxPanel* p;
-    wxImage img;
-    wxBitmap* bmp;
-    wxControlWithItems* mag;
-
-    static wxPrintData* printdata;
-    static wxPageSetupDialogData* pagedata;
-    wxRect margins;
-    int npw, nph;
-
-    DECLARE_CLASS(PrintDialog)
-};
-
 IMPLEMENT_CLASS(PrintDialog, wxEvtHandler)
 
 PrintDialog::PrintDialog(const uint16_t* data, int lines, bool cont):
@@ -1022,6 +975,9 @@ void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int con
         return;
     }
 
+#ifndef NO_THREAD_MAINLOOP
+    panel->RequestGBPrinter(to_print, &accum_prdata, lines, feed, &accum_prdata_len, &accum_prdata_size);
+#else
     PrintDialog dlg(to_print, lines, !(feed & 15));
     int ret = dlg.ShowModal();
 
@@ -1041,6 +997,7 @@ void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int con
             memcpy(accum_prdata, to_print, accum_prdata_len * 2);
         }
     }
+#endif
 }
 
 void systemScreenMessage(const wxString& msg)

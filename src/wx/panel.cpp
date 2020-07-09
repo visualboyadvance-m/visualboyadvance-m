@@ -58,6 +58,7 @@ GameArea::GameArea()
     Bind(WX_THREAD_REQUEST_UPDATEDRAWPANEL, &GameArea::RequestUpdateDrawPanel, this);
     Bind(WX_THREAD_REQUEST_DRAWFRAME, &GameArea::RequestDrawFrame, this);
     Bind(WX_THREAD_REQUEST_UPDATESTATUSBAR, &GameArea::RequestUpdateStatusBar, this);
+    Bind(WX_THREAD_REQUEST_GBPRINTER, &GameArea::ShowPrinter, this);
 #endif
 }
 
@@ -1147,6 +1148,55 @@ void GameArea::RequestStatusBar(int speed, int frames)
     event->SetPayload(speed);
     event->SetExtraLong(frames); // should probably use payload too
     wxQueueEvent(this, event);
+}
+
+struct PrinterDataDialog {
+    uint16_t* to_print;
+    uint16_t** accum_prdata;
+    int lines, feed;
+    int *accum_prdata_len, *accum_prdata_size;
+};
+PrinterDataDialog printerDataDialog;
+
+void GameArea::RequestGBPrinter(uint16_t* to_print, uint16_t** accum_prdata, int lines, int feed, int *accum_prdata_len, int *accum_prdata_size)
+{
+    wxThreadEvent *event = new wxThreadEvent(WX_THREAD_REQUEST_GBPRINTER);
+    printerDataDialog = {to_print, accum_prdata, lines, feed, accum_prdata_len, accum_prdata_size};
+    event->SetPayload(&printerDataDialog);
+    wxQueueEvent(this, event);
+}
+
+void GameArea::ShowPrinter(wxThreadEvent& event)
+{
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+    PrinterDataDialog *pdd = event.GetPayload<PrinterDataDialog*>();
+
+    uint16_t* to_print = pdd->to_print;
+    uint16_t** accum_prdata = pdd->accum_prdata;
+    int lines = pdd->lines;
+    int feed = pdd->feed;
+    int *accum_prdata_len = pdd->accum_prdata_len;
+    int *accum_prdata_size = pdd->accum_prdata_size;
+
+    PrintDialog dlg(to_print, lines, !(feed & 15));
+    int ret = dlg.ShowModal();
+
+    if (ret == wxID_OK) {
+        *accum_prdata_len = (lines + 1) * 162;
+
+        if (to_print != *accum_prdata) {
+            if (*accum_prdata_size < *accum_prdata_len) {
+                if (!(*accum_prdata_size))
+                    *accum_prdata = (uint16_t*)calloc(*accum_prdata_len, 2);
+                else
+                    *accum_prdata = (uint16_t*)realloc(*accum_prdata, *accum_prdata_len * 2);
+
+                *accum_prdata_size = *accum_prdata_len;
+            }
+
+            memcpy(*accum_prdata, to_print, *accum_prdata_len * 2);
+        }
+    }
 }
 
 void GameArea::RequestDrawFrame(wxThreadEvent& WXUNUSED(event))
