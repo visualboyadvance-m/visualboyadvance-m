@@ -25,7 +25,7 @@ matrix:
         - env: BUILD_ENV=libretro CC=clang CXX=clang++
         - env: BUILD_ENV=mac
           os: osx
-          osx_image: xcode10.2
+          osx_image: xcode12
           install: export PATH="/usr/local/opt/ccache/libexec:$PATH"
 
 before_install:
