@@ -511,6 +511,7 @@ wxDEFINE_EVENT(WX_THREAD_REQUEST_UPDATEDRAWPANEL, wxThreadEvent);
 wxDEFINE_EVENT(WX_THREAD_REQUEST_DRAWFRAME, wxThreadEvent);
 wxDEFINE_EVENT(WX_THREAD_REQUEST_UPDATESTATUSBAR, wxThreadEvent);
 wxDEFINE_EVENT(WX_THREAD_REQUEST_GBPRINTER, wxThreadEvent);
+wxDEFINE_EVENT(WX_THREAD_REQUEST_UPDATELOG, wxThreadEvent);
 #endif // NO_THREAD_MAINLOOP
 
 class GameArea : public wxPanel, public HiDPIAware
@@ -533,6 +534,8 @@ public:
     void RequestStatusBar(int speed, int frames);
     void RequestGBPrinter(uint16_t*, uint16_t**, int, int, int*, int*);
     void ShowPrinter(wxThreadEvent&);
+    void RequestUpdateLog(wxThreadEvent&);
+    void UpdateLog();
 #endif
 
     void DestroyDrawingPanel();

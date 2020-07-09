@@ -1287,12 +1287,15 @@ void log(const char* defaultMsg, ...)
     wxGetApp().log.append(msg);
 
     if (wxGetApp().IsMainLoopRunning()) {
+#ifndef NO_THREAD_MAINLOOP
+        wxGetApp().frame->GetPanel()->UpdateLog();
+#else
         LogDialog* d = wxGetApp().frame->logdlg;
 
         if (d && d->IsShown()) {
             d->Update();
         }
-
-        systemScreenMessage(msg);
+#endif
+        //systemScreenMessage(msg);
     }
 }

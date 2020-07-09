@@ -59,6 +59,7 @@ GameArea::GameArea()
     Bind(WX_THREAD_REQUEST_DRAWFRAME, &GameArea::RequestDrawFrame, this);
     Bind(WX_THREAD_REQUEST_UPDATESTATUSBAR, &GameArea::RequestUpdateStatusBar, this);
     Bind(WX_THREAD_REQUEST_GBPRINTER, &GameArea::ShowPrinter, this);
+    Bind(WX_THREAD_REQUEST_UPDATELOG, &GameArea::RequestUpdateLog, this);
 #endif
 }
 
@@ -1211,7 +1212,6 @@ void GameArea::RequestDrawFrame(wxThreadEvent& WXUNUSED(event))
 
 void GameArea::RequestUpdateStatusBar(wxThreadEvent& event)
 {
-    //wxCriticalSectionLocker lock(MainFrame::emulationCS);
     MainFrame* f = wxGetApp().frame;
     int speed = event.GetPayload<int>();
     int frames = event.GetExtraLong(); // should probably use payload too
@@ -1234,6 +1234,24 @@ void GameArea::RequestUpdateStatusBar(wxThreadEvent& event)
 
     wxGetApp().frame->SetStatusText(s, 1);
 }
+
+void GameArea::UpdateLog()
+{
+    wxQueueEvent(this, new wxThreadEvent(WX_THREAD_REQUEST_UPDATELOG));
+}
+
+void GameArea::RequestUpdateLog(wxThreadEvent& WXUNUSED(event))
+{
+#ifndef NO_THREAD_MAINLOOP
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+#endif
+    LogDialog* d = wxGetApp().frame->logdlg;
+
+    if (d && d->IsShown()) {
+        d->Update();
+    }
+}
+
 #endif // NO_THREAD_MAINLOOP
 
 void GameArea::DestroyDrawingPanel()
