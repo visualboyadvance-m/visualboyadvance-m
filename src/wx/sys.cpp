@@ -86,18 +86,20 @@ void systemDrawScreen()
 {
     frames++;
     MainFrame* mf = wxGetApp().frame;
-    mf->UpdateViewers();
     // FIXME: Sm60FPS crap and sondBufferLow crap
     GameArea* ga = mf->GetPanel();
 #ifndef NO_FFMPEG
-
     if (ga)
         ga->AddFrame(pix);
-
 #endif
 
+#ifndef NO_THREAD_MAINLOOP
+    ga->RequestDraw();
+#else
+    mf->UpdateViewers();
     if (ga && ga->panel)
         ga->panel->DrawArea(&pix);
+#endif
 }
 
 // record a game "movie"
@@ -337,6 +339,9 @@ uint32_t systemReadJoypad(int joy)
 void systemShowSpeed(int speed)
 {
     MainFrame* f = wxGetApp().frame;
+#ifndef NO_THREAD_MAINLOOP
+    f->GetPanel()->RequestStatusBar(speed, frames);
+#else
     wxString s;
     s.Printf(_("%d%%(%d, %d fps)"), speed, systemFrameSkip, frames * speed / 100);
 
@@ -355,6 +360,7 @@ void systemShowSpeed(int speed)
     }
 
     wxGetApp().frame->SetStatusText(s, 1);
+#endif // NO_THREAD_MAINLOOP
     frames = 0;
 }
 

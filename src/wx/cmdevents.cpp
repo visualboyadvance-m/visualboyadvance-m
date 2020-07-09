@@ -2297,6 +2297,10 @@ EVT_HANDLER(GeneralConfigure, "General options...")
     if (ShowModal(dlg) == wxID_OK)
         update_opts();
 
+#ifndef NO_THREAD_MAINLOOP
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+#endif
+
     if (panel->game_type() != IMAGE_UNKNOWN)
         soundSetThrottle(throttle);
 
@@ -2598,6 +2602,10 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
     if (ShowModal(dlg) != wxID_OK)
         return;
 
+#ifndef NO_THREAD_MAINLOOP
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+#endif
+
     if (frameSkip >= 0)
         systemFrameSkip = frameSkip;
 
@@ -2609,16 +2617,16 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
         panel->ShowFullScreen(true);
     }
 
-    if (panel->panel) {
-        panel->panel->Destroy();
-        panel->panel = NULL;
-    }
+    panel->DestroyDrawingPanel();
 
     update_opts();
 }
 
 EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
 {
+#ifndef NO_THREAD_MAINLOOP
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+#endif
     int filt = gopts.filter;
 
     if ((filt == FF_PLUGIN || ++gopts.filter == FF_PLUGIN) && gopts.filter_plugin.empty()) {
@@ -2627,10 +2635,7 @@ EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
 
     update_opts();
 
-    if (panel->panel) {
-        panel->panel->Destroy();
-        panel->panel = NULL;
-    }
+    panel->DestroyDrawingPanel();
 
     wxString msg;
     msg.Printf(_("Using pixel filter #%d"), gopts.filter);
@@ -2639,13 +2644,13 @@ EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
 
 EVT_HANDLER_MASK(ChangeIFB, "Change Interframe Blending", CMDEN_NREC_ANY)
 {
+#ifndef NO_THREAD_MAINLOOP
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+#endif
     gopts.ifb = (gopts.ifb + 1) % 3;
     update_opts();
 
-    if (panel->panel) {
-        panel->panel->Destroy();
-        panel->panel = NULL;
-    }
+    panel->DestroyDrawingPanel();
 
     wxString msg;
     msg.Printf(_("Using interframe blending #%d"), gopts.ifb);
@@ -2833,13 +2838,13 @@ EVT_HANDLER(Bilinear, "Use bilinear filter with 3d renderer")
 
 EVT_HANDLER(RetainAspect, "Retain aspect ratio when resizing")
 {
+#ifndef NO_THREAD_MAINLOOP
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+#endif
     GetMenuOptionBool("RetainAspect", gopts.retain_aspect);
 
     // Force new panel with new aspect ratio options.
-    if (panel->panel) {
-        panel->panel->Destroy();
-        panel->panel = nullptr;
-    }
+    panel->DestroyDrawingPanel();
 
     update_opts();
 }

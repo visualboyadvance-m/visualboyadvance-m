@@ -53,10 +53,19 @@ GameArea::GameArea()
     systemColorDepth = 32;
     hq2x_init(32);
     Init_2xSaI(32);
+
+#ifndef NO_THREAD_MAINLOOP
+    Bind(WX_THREAD_REQUEST_UPDATEDRAWPANEL, &GameArea::RequestUpdateDrawPanel, this);
+    Bind(WX_THREAD_REQUEST_DRAWFRAME, &GameArea::RequestDrawFrame, this);
+    Bind(WX_THREAD_REQUEST_UPDATESTATUSBAR, &GameArea::RequestUpdateStatusBar, this);
+#endif
 }
 
 void GameArea::LoadGame(const wxString& name)
 {
+#ifndef NO_THREAD_MAINLOOP
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+#endif
     rom_scene_rls = wxT("-");
     rom_scene_rls_name = wxT("-");
     rom_name = wxT("");
@@ -553,10 +562,7 @@ void GameArea::UnloadGame(bool destruct)
 
     // in destructor, panel should be auto-deleted by wx since all panels
     // are derived from a window attached as child to GameArea
-    if (panel)
-        panel->Destroy();
-
-    panel = NULL;
+    DestroyDrawingPanel();
 
     // close any game-related viewer windows
     // in destructor, viewer windows are in process of being deleted anyway
@@ -595,6 +601,9 @@ bool GameArea::LoadState(int slot)
 
 bool GameArea::LoadState(const wxFileName& fname)
 {
+#ifndef NO_THREAD_MAINLOOP
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+#endif
     // FIXME: first save to backup state if not backup state
     bool ret = emusys->emuReadState(UTF8(fname.GetFullPath()));
 
@@ -642,6 +651,9 @@ bool GameArea::SaveState(int slot)
 
 bool GameArea::SaveState(const wxFileName& fname)
 {
+#ifndef NO_THREAD_MAINLOOP
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+#endif
     // FIXME: first copy to backup state if not backup state
     bool ret = emusys->emuWriteState(UTF8(fname.GetFullPath()));
     wxGetApp().frame->update_state_ts(true);
@@ -681,6 +693,9 @@ void GameArea::SaveBattery()
 
 void GameArea::AddBorder()
 {
+#ifndef NO_THREAD_MAINLOOP
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+#endif
     if (basic_width != GBWidth)
         return;
 
@@ -693,14 +708,14 @@ void GameArea::AddBorder()
     wxGetApp().frame->Fit();
     GetSizer()->Detach(panel->GetWindow());
 
-    if (panel)
-        panel->Destroy();
-
-    panel = NULL;
+    DestroyDrawingPanel();
 }
 
 void GameArea::DelBorder()
 {
+#ifndef NO_THREAD_MAINLOOP
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+#endif
     if (basic_width != SGBWidth)
         return;
 
@@ -712,10 +727,7 @@ void GameArea::DelBorder()
     wxGetApp().frame->Fit();
     GetSizer()->Detach(panel->GetWindow());
 
-    if (panel)
-        panel->Destroy();
-
-    panel = NULL;
+    DestroyDrawingPanel();
 }
 
 void GameArea::AdjustMinSize()
@@ -751,6 +763,9 @@ void GameArea::LowerMinSize()
 
 void GameArea::AdjustSize(bool force)
 {
+#ifndef NO_THREAD_MAINLOOP
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+#endif
     AdjustMinSize();
 
     if (fullscreen)
@@ -774,6 +789,9 @@ void GameArea::AdjustSize(bool force)
 
 void GameArea::ShowFullScreen(bool full)
 {
+#ifndef NO_THREAD_MAINLOOP
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+#endif
     if (full == fullscreen) {
         // in case the tlw somehow lost its mind, force it to proper mode
         if (wxGetApp().frame->IsFullScreen() != fullscreen)
@@ -791,10 +809,7 @@ void GameArea::ShowFullScreen(bool full)
 
     // just in case screen mode is going to change, go ahead and preemptively
     // delete panel to be recreated immediately after resize
-    if (panel) {
-        panel->Destroy();
-        panel = NULL;
-    }
+    DestroyDrawingPanel();
 
     // Windows does not restore old window size/pos
     // at least under Wine
@@ -939,6 +954,9 @@ void GameArea::OnKillFocus(wxFocusEvent& ev)
 
 void GameArea::Pause()
 {
+#ifndef NO_THREAD_MAINLOOP
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+#endif
     if (paused)
         return;
 
@@ -961,6 +979,9 @@ void GameArea::Pause()
 
 void GameArea::Resume()
 {
+#ifndef NO_THREAD_MAINLOOP
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+#endif
     if (!paused)
         return;
 
@@ -971,6 +992,206 @@ void GameArea::Resume()
         soundResume();
 
     SetFocus();
+}
+
+#ifndef NO_THREAD_MAINLOOP
+wxCriticalSection MainFrame::emulationCS;
+
+wxThread::ExitCode GameArea::Entry()
+{
+    MainFrame* mf = wxGetApp().frame;
+    while (!GetThread()->TestDestroy()) {
+        {
+            wxCriticalSectionLocker lock(MainFrame::emulationCS);
+            if (emusys) {
+                if (!panel)
+                    wxQueueEvent(GetEventHandler(), new wxThreadEvent(WX_THREAD_REQUEST_UPDATEDRAWPANEL));
+                mf->PollJoysticks();
+                if (!paused) {
+                    emusys->emuMain(emusys->emuCount);
+                }
+	    }
+        }
+        wxMilliSleep(5);
+    }
+    return (wxThread::ExitCode)0;
+}
+
+void GameArea::StopEmulationThread()
+{
+    if (GetThread() && GetThread()->IsRunning())
+        GetThread()->Delete(); // it will exit after next `TestDestroy()`
+}
+
+void GameArea::StartEmulationThread()
+{
+    if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
+    {
+        wxLogError(_("Could not create emulation thread!"));
+        return;
+    }
+    if (GetThread()->Run() != wxTHREAD_NO_ERROR)
+    {
+        wxLogError(_("Could not run emulation thread!"));
+        return;
+    }
+}
+
+void GameArea::RequestUpdateDrawPanel(wxThreadEvent& WXUNUSED(event))
+{
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+    MainFrame* mf = wxGetApp().frame;
+    if (!panel) {
+        switch (gopts.render_method) {
+        case RND_SIMPLE:
+            panel = new BasicDrawingPanel(this, basic_width, basic_height);
+            break;
+#ifdef __WXMAC__
+        case RND_QUARTZ2D:
+            panel = new Quartz2DDrawingPanel(this, basic_width, basic_height);
+            break;
+#endif
+#ifndef NO_OGL
+        case RND_OPENGL:
+            panel = new GLDrawingPanel(this, basic_width, basic_height);
+            break;
+#endif
+#if defined(__WXMSW__) && !defined(NO_D3D)
+        case RND_DIRECT3D:
+            panel = new DXDrawingPanel(this, basic_width, basic_height);
+            break;
+#endif
+        }
+
+        wxWindow* w = panel->GetWindow();
+
+        // set up event handlers
+        w->Connect(wxEVT_KEY_DOWN,         wxKeyEventHandler(GameArea::OnKeyDown),         NULL, this);
+        w->Connect(wxEVT_KEY_UP,           wxKeyEventHandler(GameArea::OnKeyUp),           NULL, this);
+        w->Connect(wxEVT_PAINT,            wxPaintEventHandler(GameArea::PaintEv),         NULL, this);
+        w->Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(GameArea::EraseBackground), NULL, this);
+
+        // set userdata so we know it's the panel and not the frame being resized
+        // the userdata is freed on disconnect/destruction
+        this->Connect(wxEVT_SIZE,          wxSizeEventHandler(GameArea::OnSize),           NULL, this);
+
+        // We need to check if the buttons stayed pressed when focus the panel.
+        w->Connect(wxEVT_KILL_FOCUS,       wxFocusEventHandler(GameArea::OnKillFocus),     NULL, this);
+
+        // Update mouse last-used timers on mouse events etc..
+        w->Connect(wxEVT_MOTION,           wxMouseEventHandler(GameArea::MouseEvent),      NULL, this);
+        w->Connect(wxEVT_LEFT_DOWN,        wxMouseEventHandler(GameArea::MouseEvent),      NULL, this);
+        w->Connect(wxEVT_RIGHT_DOWN,       wxMouseEventHandler(GameArea::MouseEvent),      NULL, this);
+        w->Connect(wxEVT_MIDDLE_DOWN,      wxMouseEventHandler(GameArea::MouseEvent),      NULL, this);
+        w->Connect(wxEVT_MOUSEWHEEL,       wxMouseEventHandler(GameArea::MouseEvent),      NULL, this);
+
+        w->SetBackgroundStyle(wxBG_STYLE_CUSTOM);
+        w->SetSize(wxSize(basic_width, basic_height));
+
+        if (maxScale)
+            w->SetMaxSize(wxSize(basic_width * maxScale,
+                basic_height * maxScale));
+
+        // if user changed Display/Scale config, this needs to run
+        AdjustMinSize();
+        AdjustSize(false);
+
+        unsigned frame_priority = gopts.retain_aspect ? 0 : 1;
+
+        GetSizer()->Clear();
+
+        // add spacers on top and bottom to center panel vertically
+        // but not on 2.8 which does not handle this correctly
+        if (gopts.retain_aspect)
+#if wxCHECK_VERSION(2, 9, 0)
+            GetSizer()->Add(0, 0, wxEXPAND);
+#else
+            frame_priority = 1;
+#endif
+
+        // this triggers an assertion dialog in <= 3.1.2 in debug mode
+        GetSizer()->Add(w, frame_priority, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER | wxEXPAND) : wxEXPAND);
+
+#if wxCHECK_VERSION(2, 9, 0)
+        if (gopts.retain_aspect)
+            GetSizer()->Add(0, 0, wxEXPAND);
+#endif
+
+        Layout();
+
+#if wxCHECK_VERSION(2, 9, 0)
+        SendSizeEvent();
+#endif
+
+        if (pointer_blanked)
+            w->SetCursor(wxCursor(wxCURSOR_BLANK));
+
+        // set focus to panel
+        w->SetFocus();
+
+        // generate system color maps (after output module init)
+        if (loaded == IMAGE_GBA) utilUpdateSystemColorMaps(gbaLcdFilter);
+        else if (loaded == IMAGE_GB) utilUpdateSystemColorMaps(gbLcdFilter);
+        else utilUpdateSystemColorMaps(false);
+    }
+}
+
+void GameArea::RequestDraw()
+{
+    wxQueueEvent(this, new wxThreadEvent(WX_THREAD_REQUEST_DRAWFRAME));
+}
+
+void GameArea::RequestStatusBar(int speed, int frames)
+{
+    wxThreadEvent *event = new wxThreadEvent(WX_THREAD_REQUEST_UPDATESTATUSBAR);
+    event->SetPayload(speed);
+    event->SetExtraLong(frames); // should probably use payload too
+    wxQueueEvent(this, event);
+}
+
+void GameArea::RequestDrawFrame(wxThreadEvent& WXUNUSED(event))
+{
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+    MainFrame* mf = wxGetApp().frame;
+    mf->UpdateViewers();
+    if (panel) {
+        panel->DrawArea(&pix);
+    }
+}
+
+void GameArea::RequestUpdateStatusBar(wxThreadEvent& event)
+{
+    //wxCriticalSectionLocker lock(MainFrame::emulationCS);
+    MainFrame* f = wxGetApp().frame;
+    int speed = event.GetPayload<int>();
+    int frames = event.GetExtraLong(); // should probably use payload too
+    wxString s;
+    s.Printf(_("%d%%(%d, %d fps)"), speed, systemFrameSkip, frames * speed / 100);
+
+    switch (showSpeed) {
+    case SS_NONE:
+        f->GetPanel()->osdstat.clear();
+        break;
+
+    case SS_PERCENT:
+        f->GetPanel()->osdstat.Printf(_("%d%%"), speed);
+        break;
+
+    case SS_DETAILED:
+        f->GetPanel()->osdstat = s;
+        break;
+    }
+
+    wxGetApp().frame->SetStatusText(s, 1);
+}
+#endif // NO_THREAD_MAINLOOP
+
+void GameArea::DestroyDrawingPanel()
+{
+    if (panel) {
+        panel->Destroy();
+        panel = nullptr;
+    }
 }
 
 void GameArea::OnIdle(wxIdleEvent& event)
@@ -1416,7 +1637,9 @@ void GameArea::OnSDLJoy(wxSDLJoyEvent& ev)
 }
 
 BEGIN_EVENT_TABLE(GameArea, wxPanel)
+#ifdef NO_THREAD_MAINLOOP
 EVT_IDLE(GameArea::OnIdle)
+#endif
 EVT_SDLJOY(GameArea::OnSDLJoy)
 // FIXME: wxGTK does not generate motion events in MainFrame (not sure
 // what to do about it)

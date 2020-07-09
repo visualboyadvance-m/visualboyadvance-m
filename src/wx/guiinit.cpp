@@ -4028,5 +4028,8 @@ bool MainFrame::BindControls()
     panel->SetFrameTitle();
     // All OK; activate idle loop
     panel->SetExtraStyle(panel->GetExtraStyle() | wxWS_EX_PROCESS_IDLE);
+#ifndef NO_THREAD_MAINLOOP
+    panel->StartEmulationThread();
+#endif
     return true;
 }

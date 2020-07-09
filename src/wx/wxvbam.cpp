@@ -726,6 +726,9 @@ MainFrame::MainFrame()
 
 MainFrame::~MainFrame()
 {
+#ifndef NO_THREAD_MAINLOOP
+    GetPanel()->StopEmulationThread();
+#endif
 #ifndef NO_LINK
     CloseLink();
 #endif
@@ -772,6 +775,10 @@ void MainFrame::OnDropFile(wxDropFilesEvent& event)
     wxString* f = event.GetFiles();
     // ignore all but last
     wxGetApp().pending_load = f[event.GetNumberOfFiles() - 1];
+
+#ifndef NO_THREAD_MAINLOOP
+    GetPanel()->LoadGame(wxGetApp().pending_load);
+#endif
 }
 
 void MainFrame::OnMenu(wxContextMenuEvent& event)
@@ -845,6 +852,9 @@ void MainFrame::OnSize(wxSizeEvent& event)
 
 int MainFrame::FilterEvent(wxEvent& event)
 {
+#ifndef NO_THREAD_MAINLOOP
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+#endif
     if (event.GetEventType() == wxEVT_KEY_DOWN && !menus_opened && !dialog_opened)
     {
         wxKeyEvent& ke = (wxKeyEvent&)event;
@@ -1101,17 +1111,17 @@ void MainFrame::MenuPopped(wxMenuEvent& evt)
 void MainFrame::SetMenusOpened(bool state)
 {
     if ((menus_opened = state)) {
-#ifdef __WXMSW__
-        paused       = true;
-        panel->Pause();
-#endif
-    }
-    else {
-#ifdef __WXMSW__
-        paused       = false;
-        pause_next   = false;
-        panel->Resume();
-#endif
+//#ifdef __WXMSW__
+//        paused       = true;
+//        panel->Pause();
+//#endif
+//    }
+//    else {
+//#ifdef __WXMSW__
+//        paused       = false;
+//        pause_next   = false;
+//        panel->Resume();
+//#endif
     }
 }
 

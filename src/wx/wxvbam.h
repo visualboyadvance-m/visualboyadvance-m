@@ -214,6 +214,10 @@ public:
     MainFrame();
     ~MainFrame();
 
+#ifndef NO_THREAD_MAINLOOP
+    static wxCriticalSection emulationCS;
+#endif
+
     bool BindControls();
     void MenuOptionIntMask(const char* menuName, int& field, int mask);
     void MenuOptionIntRadioValue(const char* menuName, int& field, int mask);
@@ -500,10 +504,35 @@ class DrawingPanelBase;
 #include <windows.h>
 #endif
 
-class GameArea : public wxPanel, public HiDPIAware {
+#ifndef NO_THREAD_MAINLOOP
+#include <wx/thread.h>
+
+wxDEFINE_EVENT(WX_THREAD_REQUEST_UPDATEDRAWPANEL, wxThreadEvent);
+wxDEFINE_EVENT(WX_THREAD_REQUEST_DRAWFRAME, wxThreadEvent);
+wxDEFINE_EVENT(WX_THREAD_REQUEST_UPDATESTATUSBAR, wxThreadEvent);
+#endif // NO_THREAD_MAINLOOP
+
+class GameArea : public wxPanel, public HiDPIAware
+#ifndef NO_THREAD_MAINLOOP
+                 , public wxThreadHelper
+#endif
+{
 public:
     GameArea();
     virtual ~GameArea();
+
+#ifndef NO_THREAD_MAINLOOP
+    virtual wxThread::ExitCode Entry();
+    void StartEmulationThread();
+    void StopEmulationThread();
+    void RequestUpdateDrawPanel(wxThreadEvent&);
+    void RequestDrawFrame(wxThreadEvent&);
+    void RequestUpdateStatusBar(wxThreadEvent&);
+    void RequestDraw();
+    void RequestStatusBar(int speed, int frames);
+#endif
+
+    void DestroyDrawingPanel();
 
     virtual void SetMainFrame(MainFrame* parent) { main_frame = parent; }
 
