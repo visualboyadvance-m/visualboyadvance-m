@@ -94,7 +94,9 @@ void systemDrawScreen()
 #endif
 
 #ifndef NO_THREAD_MAINLOOP
-    ga->RequestDraw();
+    if (ga && ga->panel) {
+        ga->RequestDraw();
+    }
 #else
     mf->UpdateViewers();
     if (ga && ga->panel)

@@ -28,41 +28,6 @@ static void clear_input_press();
 
 int emulating;
 
-IMPLEMENT_DYNAMIC_CLASS(GameArea, wxPanel)
-
-GameArea::GameArea()
-    : wxPanel()
-    , panel(NULL)
-    , emusys(NULL)
-    , was_paused(false)
-    , rewind_time(0)
-    , do_rewind(false)
-    , rewind_mem(0)
-    , num_rewind_states(0)
-    , loaded(IMAGE_UNKNOWN)
-    , basic_width(GBAWidth)
-    , basic_height(GBAHeight)
-    , fullscreen(false)
-    , paused(false)
-    , pointer_blanked(false)
-    , mouse_active_time(0)
-{
-    SetSizer(new wxBoxSizer(wxVERTICAL));
-    // all renderers prefer 32-bit
-    // well, "simple" prefers 24-bit, but that's not available for filters
-    systemColorDepth = 32;
-    hq2x_init(32);
-    Init_2xSaI(32);
-
-#ifndef NO_THREAD_MAINLOOP
-    Bind(WX_THREAD_REQUEST_UPDATEDRAWPANEL, &GameArea::RequestUpdateDrawPanel, this);
-    Bind(WX_THREAD_REQUEST_DRAWFRAME, &GameArea::RequestDrawFrame, this);
-    Bind(WX_THREAD_REQUEST_UPDATESTATUSBAR, &GameArea::RequestUpdateStatusBar, this);
-    Bind(WX_THREAD_REQUEST_GBPRINTER, &GameArea::ShowPrinter, this);
-    Bind(WX_THREAD_REQUEST_UPDATELOG, &GameArea::RequestUpdateLog, this);
-#endif
-}
-
 void GameArea::LoadGame(const wxString& name)
 {
 #ifndef NO_THREAD_MAINLOOP
@@ -996,25 +961,75 @@ void GameArea::Resume()
     SetFocus();
 }
 
+IMPLEMENT_DYNAMIC_CLASS(GameArea, wxPanel)
+
+GameArea::GameArea()
+    : wxPanel()
+    , panel(NULL)
+    , emusys(NULL)
+    , was_paused(false)
+    , rewind_time(0)
+    , do_rewind(false)
+    , rewind_mem(0)
+    , num_rewind_states(0)
+    , loaded(IMAGE_UNKNOWN)
+    , basic_width(GBAWidth)
+    , basic_height(GBAHeight)
+    , fullscreen(false)
+    , paused(false)
+    , pointer_blanked(false)
+    , mouse_active_time(0)
+{
+    SetSizer(new wxBoxSizer(wxVERTICAL));
+    // all renderers prefer 32-bit
+    // well, "simple" prefers 24-bit, but that's not available for filters
+    systemColorDepth = 32;
+    hq2x_init(32);
+    Init_2xSaI(32);
+
+#ifndef NO_THREAD_MAINLOOP
+    Bind(WX_THREAD_REQUEST_UPDATEDRAWPANEL, &GameArea::RequestUpdateDrawPanel, this);
+    Bind(WX_THREAD_REQUEST_DRAWFRAME, &GameArea::RequestDrawFrame, this);
+    Bind(WX_THREAD_REQUEST_UPDATESTATUSBAR, &GameArea::RequestUpdateStatusBar, this);
+    Bind(WX_THREAD_REQUEST_GBPRINTER, &GameArea::ShowPrinter, this);
+    Bind(WX_THREAD_REQUEST_UPDATELOG, &GameArea::RequestUpdateLog, this);
+#endif
+}
+
 #ifndef NO_THREAD_MAINLOOP
 wxCriticalSection MainFrame::emulationCS;
 
+void GameArea::RequestDraw()
+{
+    wxQueueEvent(this, new wxThreadEvent(WX_THREAD_REQUEST_DRAWFRAME));
+}
+
+void GameArea::RequestDrawFrame(wxThreadEvent& WXUNUSED(event))
+{
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
+    MainFrame* mf = wxGetApp().frame;
+    mf->UpdateViewers();
+    if (panel) {
+        panel->DrawArea(&pix);
+    }
+}
+
 wxThread::ExitCode GameArea::Entry()
 {
-    MainFrame* mf = wxGetApp().frame;
     while (!GetThread()->TestDestroy()) {
         {
             wxCriticalSectionLocker lock(MainFrame::emulationCS);
             if (emusys) {
-                if (!panel)
-                    wxQueueEvent(GetEventHandler(), new wxThreadEvent(WX_THREAD_REQUEST_UPDATEDRAWPANEL));
-                mf->PollJoysticks();
-                if (!paused) {
+                wxGetApp().frame->PollJoysticks();
+                if (!panel) {
+                    wxQueueEvent(this, new wxThreadEvent(WX_THREAD_REQUEST_UPDATEDRAWPANEL));
+                }
+                if (!paused && panel) {
                     emusys->emuMain(emusys->emuCount);
                 }
 	    }
         }
-        wxMilliSleep(5);
+        wxMilliSleep(1);
     }
     return (wxThread::ExitCode)0;
 }
@@ -1042,7 +1057,6 @@ void GameArea::StartEmulationThread()
 void GameArea::RequestUpdateDrawPanel(wxThreadEvent& WXUNUSED(event))
 {
     wxCriticalSectionLocker lock(MainFrame::emulationCS);
-    MainFrame* mf = wxGetApp().frame;
     if (!panel) {
         switch (gopts.render_method) {
         case RND_SIMPLE:
@@ -1138,11 +1152,6 @@ void GameArea::RequestUpdateDrawPanel(wxThreadEvent& WXUNUSED(event))
     }
 }
 
-void GameArea::RequestDraw()
-{
-    wxQueueEvent(this, new wxThreadEvent(WX_THREAD_REQUEST_DRAWFRAME));
-}
-
 void GameArea::RequestStatusBar(int speed, int frames)
 {
     wxThreadEvent *event = new wxThreadEvent(WX_THREAD_REQUEST_UPDATESTATUSBAR);
@@ -1200,18 +1209,9 @@ void GameArea::ShowPrinter(wxThreadEvent& event)
     }
 }
 
-void GameArea::RequestDrawFrame(wxThreadEvent& WXUNUSED(event))
-{
-    wxCriticalSectionLocker lock(MainFrame::emulationCS);
-    MainFrame* mf = wxGetApp().frame;
-    mf->UpdateViewers();
-    if (panel) {
-        panel->DrawArea(&pix);
-    }
-}
-
 void GameArea::RequestUpdateStatusBar(wxThreadEvent& event)
 {
+    wxCriticalSectionLocker lock(MainFrame::emulationCS);
     MainFrame* f = wxGetApp().frame;
     int speed = event.GetPayload<int>();
     int frames = event.GetExtraLong(); // should probably use payload too

@@ -1091,7 +1091,7 @@ void MainFrame::MenuPopped(wxMenuEvent& evt)
     // On Windows nullptr is the system menu.
     if (evt.GetEventType() == wxEVT_MENU_CLOSE && (evt.GetMenu() == nullptr || evt.GetMenu()->GetMenuBar() == GetMenuBar()))
         SetMenusOpened(false);
-    else
+    else if (evt.GetEventType() == wxEVT_MENU_OPEN)
         SetMenusOpened(true);
 
     evt.Skip();
