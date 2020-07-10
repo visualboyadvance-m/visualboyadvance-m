@@ -39,14 +39,9 @@ build_script:
   - ninja
 
 # only debug builds are console mode apps, in them test --help
-for:
--
-  matrix:
-    except:
-      - configuration: Release
-
-  test_script:
-    - .\visualboyadvance-m.exe --help
+test_script:
+  - if not %CONFIGURATION%==Release .\visualboyadvance-m.exe --help
+  - ctest -V
 
 cache:
   - c:\vcpkg\installed

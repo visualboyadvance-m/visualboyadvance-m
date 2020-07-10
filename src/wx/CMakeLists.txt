@@ -1288,4 +1288,8 @@ install(
     BUNDLE  DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-# vim:sw=4 tw=0
+if(BUILD_TESTING AND (NOT CMAKE_CROSSCOMPILING))
+    add_subdirectory(tests)
+endif()
+
+# vim:sw=4 et tw=0:

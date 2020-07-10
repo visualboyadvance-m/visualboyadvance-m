@@ -3,8 +3,8 @@
 
 // From: https://stackoverflow.com/a/7408245/262458
 //
-// modified to ignore empty tokens
-wxArrayString str_split(const wxString& text, const wxString& sep) {
+// Modified to ignore empty tokens or return sep for them.
+wxArrayString str_split(const wxString& text, const wxString& sep, bool empty_token_is_sep) {
     wxArrayString tokens;
     size_t start = 0, end = 0;
 
@@ -13,32 +13,25 @@ wxArrayString str_split(const wxString& text, const wxString& sep) {
 
         if (token.length())
 	    tokens.Add(token);
+        else if (empty_token_is_sep)
+            tokens.Add(sep);
 
-	start = end + 1;
+	start = end + sep.length();
     }
 
-    tokens.Add(text.substr(start));
+    // Last token.
+    wxString token = text.substr(start);
+    if (token.length())
+        tokens.Add(token);
+    else if (empty_token_is_sep)
+        tokens.Add(sep);
 
     return tokens;
 }
 
 wxArrayString str_split_with_sep(const wxString& text, const wxString& sep)
 {
-    wxArrayString tokens;
-    bool sepIsTokenToo = false;
-    wxStringTokenizer tokenizer(text, sep, wxTOKEN_RET_EMPTY_ALL);
-    while (tokenizer.HasMoreTokens()) {
-        wxString token = tokenizer.GetNextToken();
-        if (token.IsEmpty()) {
-            if (!sepIsTokenToo) {
-                sepIsTokenToo = true;
-                tokens.Add(sep);
-            }
-            continue;
-        }
-        tokens.Add(token);
-    }
-    return tokens;
+    return str_split(text, sep, true);
 }
 
 size_t vec_find(wxArrayString& opts, const wxString& val) {
