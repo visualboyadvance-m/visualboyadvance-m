@@ -13,6 +13,10 @@ if(COMMAND cmake_policy)
     if(POLICY CMP0043)
         cmake_policy(SET CMP0043 NEW) # for wxWidgets, use generator expressions
     endif()
+
+    if(POLICY CMP0048)
+        cmake_policy(SET CMP0048 NEW) # set CMAKE_PROJECT_VERSION*
+    endif()
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
@@ -52,6 +56,12 @@ endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build Type" FORCE)
+endif()
+
+include(CTest)
+
+if(BUILD_TESTING)
+    enable_testing()
 endif()
 
 set(ALL_TARGETS fex visualboyadvance-m vbamcore vbam)
@@ -1012,14 +1022,15 @@ endif()
 
 set(
     HDR_STB_IMAGE
-    headers/stb/stb_image.h
-    headers/stb/stb_image_write.h
+    third_party/include/stb/stb_image.h
+    third_party/include/stb/stb_image_write.h
 )
 
 include_directories(
     ${ZLIB_INCLUDE_DIR}
     fex
     ${SDL2_INCLUDE_DIR}
+    third_party/include/stb
 )
 
 if(ENABLE_FFMPEG)
@@ -1130,3 +1141,5 @@ set(CPACK_PACKAGE_VERSION_MINOR "0")
 set(CPACK_PACKAGE_VERSION_PATCH "0-Git-" ${COMMITHASH})
 list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
 include(CPack)
+
+# vim:sw=4 et tw=0:

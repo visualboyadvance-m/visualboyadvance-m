@@ -85,6 +85,7 @@ script:
         elif [ -n "$XVFB_RUN" ]; then
             xvfb-run -a ./$PRGNAM --help
         fi
+        ctest -V
 
 env:
     global:

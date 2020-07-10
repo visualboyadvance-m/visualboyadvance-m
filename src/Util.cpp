@@ -16,13 +16,13 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 extern "C" {
-#include "../headers/stb/stb_image.h"
+#include "stb_image.h"
 }
 
 #define STBI_MSC_SECURE_CRT
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 extern "C" {
-#include "../headers/stb/stb_image_write.h"
+#include "stb_image_write.h"
 }
 
 #include "NLS.h"
