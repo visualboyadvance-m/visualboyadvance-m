@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Alexander Angulo <alex.angulo2001@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-06-21 19:40+0000\n"
-"PO-Revision-Date: 2020-06-21 20:07+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"PO-Revision-Date: 2020-07-13 01:41+0000\n"
+"Last-Translator: Alexander Angulo <alex.angulo2001@gmail.com>\n"
 "Language-Team: Spanish (Chile) (http://www.transifex.com/bgk/vba-m/language/es_CL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,27 +20,27 @@ msgstr ""
 
 #: wxvbam.cpp:226
 msgid "visualboyadvance-m"
-msgstr ""
+msgstr "visualboyadvance-m"
 
 #: wxvbam.cpp:440
 msgid "Could not create main window"
-msgstr ""
+msgstr "No se puede crear la ventana principal"
 
 #: wxvbam.cpp:511
 msgid "Save built-in XRC file and exit"
-msgstr ""
+msgstr "Guardar archivo XRC creado y salir"
 
 #: wxvbam.cpp:514
 msgid "Save built-in vba-over.ini and exit"
-msgstr ""
+msgstr "Guardar archivo vba-over.ini y salir"
 
 #: wxvbam.cpp:517
 msgid "Print configuration path and exit"
-msgstr ""
+msgstr "Guardar ruta de configuración y salir"
 
 #: wxvbam.cpp:520
 msgid "Start in full-screen mode"
-msgstr ""
+msgstr "Comenzar en pantalla completa"
 
 #: wxvbam.cpp:524
 msgid "Delete shared link state first, if it exists"
@@ -126,26 +127,26 @@ msgstr ""
 #: guiinit.cpp:133
 #, c-format
 msgid "Server IP address is: %s\n"
-msgstr ""
+msgstr "Dirección IP del servidor es: %s\n"
 
 #: guiinit.cpp:135
 msgid "Waiting for connection..."
-msgstr ""
+msgstr "Esperando por una conección..."
 
 #: guiinit.cpp:136
 #, c-format
 msgid "Connecting to %s\n"
-msgstr ""
+msgstr "Conectando a %s\n"
 
 #: guiinit.cpp:169
 msgid ""
 "Error occurred.\n"
 "Please try again."
-msgstr ""
+msgstr "Un error ocurrió\nPor favor inténtalo renuevo ."
 
 #: guiinit.cpp:236 guiinit.cpp:289
 msgid "Select cheat file"
-msgstr ""
+msgstr "Selección archivo de trampas"
 
 #: guiinit.cpp:237
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
@@ -153,7 +154,7 @@ msgstr ""
 
 #: guiinit.cpp:256 panel.cpp:426
 msgid "Loaded cheats"
-msgstr ""
+msgstr "Trampas cargadas"
 
 #: guiinit.cpp:290
 msgid "VBA cheat lists (*.clt)|*.clt"
@@ -161,64 +162,64 @@ msgstr ""
 
 #: guiinit.cpp:308
 msgid "Saved cheats"
-msgstr ""
+msgstr "Trucos guardados"
 
 #: guiinit.cpp:339 guiinit.cpp:358
 msgid "Restore old values?"
-msgstr ""
+msgstr "¿Restaurar valores antiguos?"
 
 #: guiinit.cpp:340 guiinit.cpp:359
 msgid "Removing cheats"
-msgstr ""
+msgstr "Removiendo trucos"
 
 #: guiinit.cpp:750 xrc/JoyPanel.xrc:364
 msgid "GameShark"
-msgstr ""
+msgstr "GameShark"
 
 #: guiinit.cpp:751 cmdevents.cpp:676
 msgid "GameGenie"
-msgstr ""
+msgstr "GameGenie"
 
 #: guiinit.cpp:753
 msgid "Generic Code"
-msgstr ""
+msgstr "Código Genérico"
 
 #: guiinit.cpp:754
 msgid "GameShark Advance"
-msgstr ""
+msgstr "GameShark Advance"
 
 #: guiinit.cpp:755
 msgid "CodeBreaker Advance"
-msgstr ""
+msgstr "CodeBreaker Advance"
 
 #: guiinit.cpp:756
 msgid "Flashcart CHT"
-msgstr ""
+msgstr "Flashcart CHT"
 
 #: guiinit.cpp:824 guiinit.cpp:1079
 msgid "Number cannot be empty"
-msgstr ""
+msgstr "Valor no puede estar vacio"
 
 #: guiinit.cpp:862
 #, c-format
 msgid "Search produced %d results.  Please refine better"
-msgstr ""
+msgstr "Su búsqueda presento %dresultados. Por favor precise su búsqueda "
 
 #: guiinit.cpp:874
 msgid "Search produced no results"
-msgstr ""
+msgstr "Su búsqueda no presento resultados"
 
 #: guiinit.cpp:1037
 msgid "8-bit "
-msgstr ""
+msgstr "8-bit"
 
 #: guiinit.cpp:1041
 msgid "16-bit "
-msgstr ""
+msgstr "16-bit"
 
 #: guiinit.cpp:1045
 msgid "32-bit "
-msgstr ""
+msgstr "32-bit"
 
 #: guiinit.cpp:1051
 msgid "signed decimal"
@@ -235,44 +236,44 @@ msgstr ""
 #: guiinit.cpp:1537
 #, c-format
 msgid "%d frames = %.2f ms"
-msgstr ""
+msgstr "%dcuadros = %.2fmilisegundos"
 
 #: guiinit.cpp:1549
 msgid "Default device"
-msgstr ""
+msgstr "Dispositivo predeterminado"
 
 #: guiinit.cpp:1723
 msgid "Desktop mode"
-msgstr ""
+msgstr "Modo escritorio"
 
 #: guiinit.cpp:1730
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
-msgstr ""
+msgstr "%d x %d - %d bpp @ %dHz"
 
 #: guiinit.cpp:1843 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
 msgid "None"
-msgstr ""
+msgstr "Nada"
 
 #: guiinit.cpp:1884
 #, c-format
 msgid "No usable rpi plugins found in %s"
-msgstr ""
+msgstr "No se encontraron plugins rpi utilizables en %s"
 
 #: guiinit.cpp:1904 xrc/DisplayConfig.xrc:107
 msgid "Plugin"
-msgstr ""
+msgstr "Plugin"
 
 #: guiinit.cpp:1932
 msgid "Please select a plugin or a different filter"
-msgstr ""
+msgstr "Por favor escoja un plugin o un filtro diferente"
 
 #: guiinit.cpp:1933
 msgid "Plugin selection error"
-msgstr ""
+msgstr "Error en selección de plugin"
 
 #: guiinit.cpp:2146
 msgid "This will clear all user-defined accelerators.  Are you sure?"
@@ -280,11 +281,11 @@ msgstr ""
 
 #: guiinit.cpp:2146
 msgid "Confirm"
-msgstr ""
+msgstr "Confirmar"
 
 #: guiinit.cpp:2734
 msgid "Main icon not found"
-msgstr ""
+msgstr "Icono principal no encontrado"
 
 #: guiinit.cpp:2744
 msgid "Browse"
@@ -307,15 +308,15 @@ msgstr ""
 #: guiinit.cpp:3059
 #, c-format
 msgid "Invalid menu item %s; removing"
-msgstr ""
+msgstr "Item del menu %s; removiendo"
 
 #: guiinit.cpp:3267
 msgid "Code"
-msgstr ""
+msgstr "Codigo"
 
 #: guiinit.cpp:3276
 msgid "Description"
-msgstr ""
+msgstr "Descripción"
 
 #: guiinit.cpp:3350 xrc/CheatAdd.xrc:31
 msgid "Address"
@@ -323,19 +324,19 @@ msgstr ""
 
 #: guiinit.cpp:3351
 msgid "Old Value"
-msgstr ""
+msgstr "Valor Antiguo"
 
 #: guiinit.cpp:3352
 msgid "New Value"
-msgstr ""
+msgstr "Valor Nuevo"
 
 #: guiinit.cpp:3873
 msgid "Menu commands"
-msgstr ""
+msgstr "Comandos del menú"
 
 #: guiinit.cpp:3896
 msgid "Other commands"
-msgstr ""
+msgstr "Otros comandos"
 
 #: guiinit.cpp:4007
 msgid "JoyBus host invalid; disabling"
@@ -343,7 +344,7 @@ msgstr ""
 
 #: viewers.cpp:560
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
-msgstr ""
+msgstr "Archivos de texto (*.txt;*.log)|*.txt;*log|"
 
 #: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
 #: cmdevents.cpp:1158 cmdevents.cpp:1236 cmdevents.cpp:1306 cmdevents.cpp:1333
@@ -361,7 +362,7 @@ msgstr ""
 
 #: viewers.cpp:814
 msgid "0x00000000 - BIOS"
-msgstr ""
+msgstr "0x00000000 - BIOS"
 
 #: viewers.cpp:815
 msgid "0x02000000 - WRAM"
@@ -448,7 +449,7 @@ msgstr ""
 
 #: cmdevents.cpp:117
 msgid "Open ROM file"
-msgstr ""
+msgstr "Abrir archivador ROM"
 
 #: cmdevents.cpp:134
 msgid ""
@@ -458,7 +459,7 @@ msgstr ""
 
 #: cmdevents.cpp:141
 msgid "Open GB ROM file"
-msgstr ""
+msgstr "Abrir archivo GB ROM"
 
 #: cmdevents.cpp:158
 msgid ""
@@ -468,55 +469,55 @@ msgstr ""
 
 #: cmdevents.cpp:165
 msgid "Open GBC ROM file"
-msgstr ""
+msgstr "Abrir archivo GBC ROM"
 
 #: cmdevents.cpp:584 cmdevents.cpp:700 cmdevents.cpp:739 cmdevents.cpp:812
 msgid "Unknown"
-msgstr ""
+msgstr "Desconocido"
 
 #: cmdevents.cpp:592
 msgid "ROM"
-msgstr ""
+msgstr "ROM"
 
 #: cmdevents.cpp:596
 msgid "ROM+MBC1"
-msgstr ""
+msgstr "ROM+MBC1"
 
 #: cmdevents.cpp:600
 msgid "ROM+MBC1+RAM"
-msgstr ""
+msgstr "ROM+MBC1+RAM"
 
 #: cmdevents.cpp:604
 msgid "ROM+MBC1+RAM+BATT"
-msgstr ""
+msgstr "ROM+MBC1+RAM+BATT"
 
 #: cmdevents.cpp:608
 msgid "ROM+MBC2"
-msgstr ""
+msgstr "ROM+MBC2"
 
 #: cmdevents.cpp:612
 msgid "ROM+MBC2+BATT"
-msgstr ""
+msgstr "ROM+MBC2+BATT"
 
 #: cmdevents.cpp:616
 msgid "ROM+MMM01"
-msgstr ""
+msgstr "ROM+MMM01"
 
 #: cmdevents.cpp:620
 msgid "ROM+MMM01+RAM"
-msgstr ""
+msgstr "ROM+MMM01+RAM"
 
 #: cmdevents.cpp:624
 msgid "ROM+MMM01+RAM+BATT"
-msgstr ""
+msgstr "ROM+MMM01+RAM+BATT"
 
 #: cmdevents.cpp:628
 msgid "ROM+MBC3+TIMER+BATT"
-msgstr ""
+msgstr "ROM+MBC3+TIMER+BATT"
 
 #: cmdevents.cpp:632
 msgid "ROM+MBC3+TIMER+RAM+BATT"
-msgstr ""
+msgstr "ROM+MBC3+TIMER+RAM+BATT"
 
 #: cmdevents.cpp:636
 msgid "ROM+MBC3"

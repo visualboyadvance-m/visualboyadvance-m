@@ -10,6 +10,7 @@
 # Edênis Freindorfer Azevedo, 2019
 # erdrsd gfdfd <654654564@64564564.com>, 2017
 # Gustavo Canedo <gknedo@gmail.com>, 2015
+# Leonardo Vieira de Souza <leonardo.v.souza@gmail.com>, 2020
 # Lucas Guerra <luke.guerra@hotmail.com>, 2014
 # Charles Fernando da Silva <eu.charles@hotmail.com>, 2013
 # Marcus Crisostomo <marcus.crisostomo@yahoo.com.br>, 2014-2015
@@ -21,8 +22,8 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-06-21 19:40+0000\n"
-"PO-Revision-Date: 2020-06-21 20:07+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"PO-Revision-Date: 2020-07-15 22:06+0000\n"
+"Last-Translator: Leonardo Vieira de Souza <leonardo.v.souza@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/bgk/vba-m/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1167,12 +1168,12 @@ msgstr "Controle de jogo desconectado %d"
 #: widgets/sdljoy.cpp:230
 #, c-format
 msgid "Connected joystick %d"
-msgstr ""
+msgstr "Controle %d conectado"
 
 #: widgets/sdljoy.cpp:247
 #, c-format
 msgid "Disconnected joystick %d"
-msgstr ""
+msgstr "Controle %d desconectado"
 
 #: xaudio2.cpp:35
 msgid "XAudio2: Enumerating devices failed!"
@@ -2216,7 +2217,7 @@ msgstr "Tipo de salvamento"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file :"
-msgstr ""
+msgstr "Arquivo BIOS :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file :"
@@ -2331,7 +2332,7 @@ msgstr "Arquivo de inicialização do GB/ROM:"
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
-msgstr ""
+msgstr "Selecione um Arquivo"
 
 #: xrc/GameBoyConfig.xrc:106
 msgid "GBC Boot ROM &file :"
@@ -2404,7 +2405,7 @@ msgstr "0 = sem aceleração"
 
 #: xrc/GeneralConfig.xrc:114
 msgid "Unlimited"
-msgstr ""
+msgstr "Ilimitado"
 
 #: xrc/IOViewer.xrc:4
 msgid "IO Viewer"
@@ -3172,7 +3173,7 @@ msgstr "Atalhos de tecla..."
 
 #: xrc/MainMenu.xrc:565
 msgid "&UI Settings ..."
-msgstr ""
+msgstr "&Configurações de Interface de Usuário ..."
 
 #: xrc/MainMenu.xrc:569
 msgid "&Tools"
@@ -3628,8 +3629,8 @@ msgstr "Saltar quadros"
 
 #: xrc/UIConfig.xrc:4
 msgid "User Interface Settings"
-msgstr ""
+msgstr "Configurações de Interface de Usuário"
 
 #: xrc/UIConfig.xrc:9
 msgid "Hide Menu Bar"
-msgstr ""
+msgstr "Ocultar Barra de Menu"
