@@ -722,6 +722,7 @@ MainFrame::MainFrame()
 {
     jpoll = new JoystickPoller();
     this->Connect(wxID_ANY, wxEVT_SHOW, wxShowEventHandler(JoystickPoller::ShowDialog), jpoll, jpoll);
+    AttachJoystickHandler(this);
 }
 
 MainFrame::~MainFrame()
@@ -859,7 +860,7 @@ int MainFrame::FilterEvent(wxEvent& event)
                  evh.SetEventObject(this);
                  GetEventHandler()->ProcessEvent(evh);
                  return true;
-	     }
+         }
     }
     else if (event.GetEventType() == wxEVT_SDLJOY && !menus_opened && !dialog_opened)
     {

@@ -104,9 +104,11 @@ void wxSDLJoy::Poll()
                         ev.prev_val      = prev_val;
 
                         handler->ProcessEvent(ev);
+                    }
 
-                        joystate[joy].axis[axis] = val;
+                    joystate[joy].axis[axis] = val;
 
+                    if (val != prev_val) {
                         wxLogDebug("GOT SDL_CONTROLLERAXISMOTION: joy:%d axis:%d val:%d prev_val:%d", joy, axis, val, prev_val);
                     }
                 }
@@ -205,9 +207,11 @@ void wxSDLJoy::Poll()
                         ev.prev_val      = prev_val;
 
                         handler->ProcessEvent(ev);
+                    }
 
-                        joystate[joy].axis[axis] = val;
+                    joystate[joy].axis[axis] = val;
 
+                    if (val != prev_val) {
                         wxLogDebug("GOT SDL_JOYAXISMOTION: joy:%d axis:%d val:%d prev_val:%d", joy, axis, val, prev_val);
                     }
                 }
@@ -393,6 +397,7 @@ void wxSDLJoy::DisconnectController(uint8_t joy)
 wxEvtHandler* wxSDLJoy::Attach(wxEvtHandler* handler)
 {
     wxEvtHandler* prev = evthandler;
+    wxLogDebug("New joystick handler attached: %p", handler);
     evthandler = handler;
     return prev;
 }

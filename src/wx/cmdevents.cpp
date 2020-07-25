@@ -2707,10 +2707,12 @@ EVT_HANDLER(JoypadConfigure, "Joypad options...")
 {
     wxDialog* dlg = GetXRCDialog("JoypadConfig");
     joy.Add();
+    joy.Attach(nullptr);
 
     if (ShowModal(dlg) == wxID_OK)
         update_opts();
 
+    joy.Attach(wxGetApp().frame);
     SetJoystick();
 }
 
@@ -2718,10 +2720,12 @@ EVT_HANDLER(Customize, "Customize UI...")
 {
     wxDialog* dlg = GetXRCDialog("AccelConfig");
     joy.Add();
+    joy.Attach(nullptr);
 
     if (ShowModal(dlg) == wxID_OK)
         update_opts();
 
+    joy.Attach(wxGetApp().frame);
     SetJoystick();
 }
 

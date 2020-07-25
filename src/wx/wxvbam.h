@@ -321,6 +321,8 @@ public:
         return (paused && !pause_next && !incendental) || dialog_opened;
     }
 
+    void AttachJoystickHandler(wxEvtHandler* handler) { joy.Attach(handler); }
+
     void PollJoysticks() { joy.Poll(); }
 
     // poll joysticks with timer
@@ -397,6 +399,7 @@ class JoystickPoller : public wxTimer {
         void Notify() {
             wxGetApp().frame->PollJoysticks();
         }
+        // This isn't called for dialogs but actually only for main window. Is this intended?
         void ShowDialog(wxShowEvent& ev) {
             if (ev.IsShown())
                 Start(50);
