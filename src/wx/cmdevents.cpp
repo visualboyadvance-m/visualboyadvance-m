@@ -1565,6 +1565,36 @@ EVT_HANDLER(JoypadAutoholdStart, "Autohold Start (toggle)")
     GetMenuOptionInt(keyName, autohold, keym);
 }
 
+#include "background-input.h"
+
+EVT_HANDLER(AllowKeyboardBackgroundInput, "Allow keyboard background input (toggle)")
+{
+    bool menuPress;
+    GetMenuOptionBool("AllowKeyboardBackgroundInput", menuPress);
+    toggleBooleanVar(&menuPress, &allowKeyboardBackgroundInput);
+    SetMenuOption("AllowKeyboardBackgroundInput", allowKeyboardBackgroundInput ? 1 : 0);
+
+    disableKeyboardBackgroundInput();
+
+    if (allowKeyboardBackgroundInput) {
+        if (panel && panel->panel) {
+            enableKeyboardBackgroundInput(panel->panel->GetWindow());
+        }
+    }
+
+    update_opts();
+}
+
+EVT_HANDLER(AllowJoystickBackgroundInput, "Allow joystick background input (toggle)")
+{
+    bool menuPress;
+    GetMenuOptionBool("AllowJoystickBackgroundInput", menuPress);
+    toggleBooleanVar(&menuPress, &allowJoystickBackgroundInput);
+    SetMenuOption("AllowJoystickBackgroundInput", allowJoystickBackgroundInput ? 1 : 0);
+
+    update_opts();
+}
+
 EVT_HANDLER_MASK(LoadGameRecent, "Load most recent save", CMDEN_SAVST)
 {
     panel->LoadState();
@@ -2611,7 +2641,7 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
 
     if (panel->panel) {
         panel->panel->Destroy();
-        panel->panel = NULL;
+        panel->panel = nullptr;
     }
 
     update_opts();
@@ -2629,7 +2659,7 @@ EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
 
     if (panel->panel) {
         panel->panel->Destroy();
-        panel->panel = NULL;
+        panel->panel = nullptr;
     }
 
     wxString msg;
@@ -2644,7 +2674,7 @@ EVT_HANDLER_MASK(ChangeIFB, "Change Interframe Blending", CMDEN_NREC_ANY)
 
     if (panel->panel) {
         panel->panel->Destroy();
-        panel->panel = NULL;
+        panel->panel = nullptr;
     }
 
     wxString msg;
