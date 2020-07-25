@@ -75,6 +75,7 @@ protected:
     void Notify();
     void ConnectController(uint8_t joy);
     void DisconnectController(uint8_t joy);
+    void CreateAndSendEvent(wxEvtHandler* handler, unsigned short joy, unsigned short ctrl_type, unsigned short ctrl_idx, short ctrl_val, short prev_val);
 
     const uint8_t POLL_TIME_MS = 10;
 
