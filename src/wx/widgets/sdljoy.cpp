@@ -41,6 +41,24 @@ static int16_t axisval(int16_t x)
     return 0;
 }
 
+void wxSDLJoy::CreateAndSendEvent(wxEvtHandler* handler, unsigned short joy, unsigned short ctrl_type, unsigned short ctrl_idx, short ctrl_val, short prev_val)
+{
+    if (!handler) {
+        GameArea *panel = wxGetApp().frame->GetPanel();
+        if (panel) handler = panel->GetEventHandler();
+        else return;
+    }
+
+    wxSDLJoyEvent *ev = new wxSDLJoyEvent(wxEVT_SDLJOY);
+    ev->joy           = joy;
+    ev->ctrl_type     = ctrl_type;
+    ev->ctrl_idx      = ctrl_idx;
+    ev->ctrl_val      = ctrl_val;
+    ev->prev_val      = prev_val;
+
+    wxQueueEvent(handler, ev);
+}
+
 void wxSDLJoy::Poll()
 {
     wxEvtHandler* handler = evthandler ? evthandler : wxWindow::FindFocus();
@@ -63,20 +81,13 @@ void wxSDLJoy::Poll()
                     auto val      = e.cbutton.state;
                     auto prev_val = joystate[joy].button[but];
 
-                    if (handler && val != prev_val) {
-                        wxSDLJoyEvent ev(wxEVT_SDLJOY);
-                        ev.joy           = joy;
-                        ev.ctrl_type     = WXSDLJOY_BUTTON;
-                        ev.ctrl_idx      = but;
-                        ev.ctrl_val      = val;
-                        ev.prev_val      = prev_val;
+                    if (val != prev_val) {
+                        CreateAndSendEvent(handler, joy, WXSDLJOY_BUTTON, but, val, prev_val);
 
-                        handler->ProcessEvent(ev);
+                        joystate[joy].button[but] = val;
+
+                        wxLogDebug("GOT SDL_CONTROLLERBUTTON: joy:%d but:%d val:%d prev_val:%d", joy, but, val, prev_val);
                     }
-
-                    joystate[joy].button[but] = val;
-
-                    wxLogDebug("GOT SDL_CONTROLLERBUTTON: joy:%d but:%d val:%d prev_val:%d", joy, but, val, prev_val);
                 }
 
                 got_event = true;
@@ -95,15 +106,8 @@ void wxSDLJoy::Poll()
                     auto val      = axisval(e.caxis.value);
                     auto prev_val = joystate[joy].axis[axis];
 
-                    if (handler && val != prev_val) {
-                        wxSDLJoyEvent ev(wxEVT_SDLJOY);
-                        ev.joy           = joy;
-                        ev.ctrl_type     = WXSDLJOY_AXIS;
-                        ev.ctrl_idx      = axis;
-                        ev.ctrl_val      = val;
-                        ev.prev_val      = prev_val;
-
-                        handler->ProcessEvent(ev);
+                    if (val != prev_val) {
+                        CreateAndSendEvent(handler, joy, WXSDLJOY_AXIS, axis, val, prev_val);
 
                         joystate[joy].axis[axis] = val;
 
@@ -164,20 +168,13 @@ void wxSDLJoy::Poll()
                     auto val      = e.jbutton.state;
                     auto prev_val = joystate[joy].button[but];
 
-                    if (handler && val != prev_val) {
-                        wxSDLJoyEvent ev(wxEVT_SDLJOY);
-                        ev.joy           = joy;
-                        ev.ctrl_type     = WXSDLJOY_BUTTON;
-                        ev.ctrl_idx      = but;
-                        ev.ctrl_val      = val;
-                        ev.prev_val      = prev_val;
+                    if (val != prev_val) {
+                        CreateAndSendEvent(handler, joy, WXSDLJOY_BUTTON, but, val, prev_val);
 
-                        handler->ProcessEvent(ev);
+                        joystate[joy].button[but] = val;
+
+                        wxLogDebug("GOT SDL_JOYBUTTON: joy:%d but:%d val:%d prev_val:%d", joy, but, val, prev_val);
                     }
-
-                    joystate[joy].button[but] = val;
-
-                    wxLogDebug("GOT SDL_JOYBUTTON: joy:%d but:%d val:%d prev_val:%d", joy, but, val, prev_val);
                 }
 
                 got_event = true;
@@ -196,15 +193,8 @@ void wxSDLJoy::Poll()
                     auto val      = axisval(e.jaxis.value);
                     auto prev_val = joystate[joy].axis[axis];
 
-                    if (handler && val != prev_val) {
-                        wxSDLJoyEvent ev(wxEVT_SDLJOY);
-                        ev.joy           = joy;
-                        ev.ctrl_type     = WXSDLJOY_AXIS;
-                        ev.ctrl_idx      = axis;
-                        ev.ctrl_val      = val;
-                        ev.prev_val      = prev_val;
-
-                        handler->ProcessEvent(ev);
+                    if (val != prev_val) {
+                        CreateAndSendEvent(handler, joy, WXSDLJOY_AXIS, axis, val, prev_val);
 
                         joystate[joy].axis[axis] = val;
 
@@ -274,16 +264,7 @@ void wxSDLJoy::Poll()
                     auto state      = SDL_GameControllerGetButton(joy.second.dev, static_cast<SDL_GameControllerButton>(but));
 
                     if (last_state != state) {
-                        if (handler) {
-                            wxSDLJoyEvent ev(wxEVT_SDLJOY);
-                            ev.joy           = joy.first;
-                            ev.ctrl_type     = WXSDLJOY_BUTTON;
-                            ev.ctrl_idx      = but;
-                            ev.ctrl_val      = state;
-                            ev.prev_val      = last_state;
-
-                            handler->ProcessEvent(ev);
-                        }
+                        CreateAndSendEvent(handler, joy.first, WXSDLJOY_BUTTON, but, state, last_state);
 
                         joy.second.button[but] = state;
 
@@ -295,15 +276,8 @@ void wxSDLJoy::Poll()
                     auto val      = axisval(SDL_GameControllerGetAxis(joy.second.dev, static_cast<SDL_GameControllerAxis>(axis)));
                     auto prev_val = joy.second.axis[axis];
 
-                    if (handler && val != prev_val) {
-                        wxSDLJoyEvent ev(wxEVT_SDLJOY);
-                        ev.joy           = joy.first;
-                        ev.ctrl_type     = WXSDLJOY_AXIS;
-                        ev.ctrl_idx      = axis;
-                        ev.ctrl_val      = val;
-                        ev.prev_val      = prev_val;
-
-                        handler->ProcessEvent(ev);
+                    if (val != prev_val) {
+                        CreateAndSendEvent(handler, joy.first, WXSDLJOY_AXIS, axis, val, prev_val);
 
                         joy.second.axis[axis] = val;
 
@@ -317,16 +291,7 @@ void wxSDLJoy::Poll()
                     auto state      = SDL_JoystickGetButton(joy.second.dev, but);
 
                     if (last_state != state) {
-                        if (handler) {
-                            wxSDLJoyEvent ev(wxEVT_SDLJOY);
-                            ev.joy           = joy.first;
-                            ev.ctrl_type     = WXSDLJOY_BUTTON;
-                            ev.ctrl_idx      = but;
-                            ev.ctrl_val      = state;
-                            ev.prev_val      = last_state;
-
-                            handler->ProcessEvent(ev);
-                        }
+                        CreateAndSendEvent(handler, joy.first, WXSDLJOY_BUTTON, but, state, last_state);
 
                         joy.second.button[but] = state;
 
@@ -338,15 +303,8 @@ void wxSDLJoy::Poll()
                     auto val      = axisval(SDL_JoystickGetAxis(joy.second.dev, axis));
                     auto prev_val = joy.second.axis[axis];
 
-                    if (handler && val != prev_val) {
-                        wxSDLJoyEvent ev(wxEVT_SDLJOY);
-                        ev.joy           = joy.first;
-                        ev.ctrl_type     = WXSDLJOY_AXIS;
-                        ev.ctrl_idx      = axis;
-                        ev.ctrl_val      = val;
-                        ev.prev_val      = prev_val;
-
-                        handler->ProcessEvent(ev);
+                    if (val != prev_val) {
+                        CreateAndSendEvent(handler, joy.first, WXSDLJOY_AXIS, axis, val, prev_val);
 
                         joy.second.axis[axis] = val;
 
