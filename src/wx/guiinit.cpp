@@ -26,6 +26,10 @@
 #include "../common/ConfigManager.h"
 #include "../gba/CheatSearch.h"
 
+#if defined(__WXGTK__)
+#include "wayland.h"
+#endif
+
 // The program icon, in case it's missing from .xrc (MSW gets it from .rc file)
 #if !defined(__WXMSW__) && !defined(__WXPM__)
 // ImageMagick makes the name wxvbam, but wx expects wxvbam_xpm
@@ -2826,6 +2830,22 @@ bool MainFrame::BindControls()
 #ifndef GBA_LOGGING
 
             if (cmdtab[i].cmd_id == XRCID("Logging")) {
+                if (mi)
+                    mi->GetMenu()->Remove(mi);
+
+                cmdtab[i].cmd_id = XRCID("NOOP");
+                cmdtab[i].mi = NULL;
+                continue;
+            }
+
+#endif
+#if defined(__WXMAC__) || defined(__WXGTK__)
+
+            if (cmdtab[i].cmd_id == XRCID("AllowKeyboardBackgroundInput")
+#if defined(__WXGTK__)
+                && IsItWayland()
+#endif
+               ) {
                 if (mi)
                     mi->GetMenu()->Remove(mi);
 

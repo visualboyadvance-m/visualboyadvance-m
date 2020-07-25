@@ -426,6 +426,14 @@
         <object class="wxMenuItem" name="JoypadConfigure">
           <label>_Configure ...</label>
         </object>
+        <object class="wxMenuItem" name="AllowKeyboardBackgroundInput">
+          <label>Allow _keyboard background input</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="AllowJoystickBackgroundInput">
+          <label>Allow _joystick background input</label>
+          <checkable>1</checkable>
+        </object>
         <object class="separator"/>
         <object class="wxMenu">
           <label>_Autofire</label>

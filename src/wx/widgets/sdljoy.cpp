@@ -45,8 +45,10 @@ void wxSDLJoy::CreateAndSendEvent(wxEvtHandler* handler, unsigned short joy, uns
 {
     if (!handler) {
         GameArea *panel = wxGetApp().frame->GetPanel();
-        if (panel) handler = panel->GetEventHandler();
-        else return;
+        if (panel && allowJoystickBackgroundInput)
+            handler = panel->GetEventHandler();
+        else
+            return;
     }
 
     wxSDLJoyEvent *ev = new wxSDLJoyEvent(wxEVT_SDLJOY);
