@@ -34,11 +34,15 @@ function(vcpkg_get_first_upgrade vcpkg_exe)
             )
 
             if(NOT pkg_upgrade MATCHES up-to-date)
-                set(first_upgrade ${pkg} PARENT_SCOPE)
-                return()
+                # Prefer upgrading zlib before anything else.
+                if(NOT first_upgrade OR pkg MATCHES zlib)
+                    set(first_upgrade ${pkg})
+                endif()
             endif()
         endif()
     endforeach()
+
+    set(first_upgrade ${first_upgrade} PARENT_SCOPE)
 endfunction()
 
 function(vcpkg_set_toolchain)
