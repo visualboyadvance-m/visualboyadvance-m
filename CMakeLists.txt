@@ -46,6 +46,25 @@ if(VCPKG_TARGET_TRIPLET MATCHES -static OR CMAKE_TOOLCHAIN_FILE MATCHES "mxe|-st
     set(VBAM_STATIC_DEFAULT ON)
 endif()
 
+# Use ccache if available and not already enabled on the command line.
+# This has to be done before the project() call.
+if(NOT (CMAKE_CXX_COMPILER_LAUNCHER OR CMAKE_CXX_COMPILER MATCHES ccache))
+    find_program(CCACHE_EXECUTABLE ccache)
+    if(CCACHE_EXECUTABLE)
+        message(STATUS "Enabling ccache")
+
+        if(CMAKE_VERSION VERSION_LESS 3.4.0)
+            # FIXME: This method currently breaks for native ccache on windows
+            # with the visual studio resource compiler.
+            set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE_EXECUTABLE})
+        else()
+            set(CMAKE_C_COMPILER_LAUNCHER        ${CCACHE_EXECUTABLE} CACHE STRING "C compiler launcher"     FORCE)
+            set(CMAKE_CXX_COMPILER_LAUNCHER      ${CCACHE_EXECUTABLE} CACHE STRING "C++ compiler launcher"   FORCE)
+            set(CMAKE_ASM_NASM_COMPILER_LAUNCHER ${CCACHE_EXECUTABLE} CACHE STRING "nasm assembler launcher" FORCE)
+        endif()
+    endif()
+endif()
+
 project(VBA-M C CXX)
 
 cmake_minimum_required(VERSION 2.8.12)
@@ -89,18 +108,6 @@ if(VBAM_STATIC)
 
     if(NOT MSVC)
         list(INSERT CMAKE_FIND_LIBRARY_SUFFIXES 0 .a)
-    endif()
-endif()
-
-# use ccache if available, and not already enabled on the command line
-# but not with ninja and msys ccache on msys2
-if(NOT (WIN32 AND NOT "$ENV{MSYSTEM_PREFIX}" STREQUAL "" AND CMAKE_GENERATOR STREQUAL Ninja))
-    if(NOT CMAKE_CXX_COMPILER_LAUNCHER AND NOT CMAKE_C_COMPILER_LAUNCHER)
-        find_program(CCACHE_FOUND ccache)
-        if(CCACHE_FOUND)
-            set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-            set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-        endif(CCACHE_FOUND)
     endif()
 endif()
 
