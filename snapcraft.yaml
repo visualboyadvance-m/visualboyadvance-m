@@ -73,6 +73,7 @@ parts:
     build-packages:
       - g++
       - gcc
+      - gettext
       - make
       - cmake
       - nasm
