@@ -35,11 +35,12 @@ class Multi_Buffer
         };
         virtual channel_t channel(int index) BLARGG_PURE(;)
 
-            // See Blip_Buffer.h
-            virtual blargg_err_t set_sample_rate(long rate, int msec = blip_default_length)
-                BLARGG_PURE(;) virtual void clock_rate(long)
-                    BLARGG_PURE({}) virtual void bass_freq(int) BLARGG_PURE({}) virtual void clear()
-                        BLARGG_PURE({}) long sample_rate() const;
+        // See Blip_Buffer.h
+        virtual blargg_err_t set_sample_rate(long rate, int msec = blip_default_length) BLARGG_PURE(;)
+        virtual void clock_rate(long) BLARGG_PURE({}) 
+        virtual void bass_freq(int) BLARGG_PURE({}) 
+        virtual void clear() BLARGG_PURE({})
+        long sample_rate() const;
 
         // Length of buffer, in milliseconds
         int length() const;
