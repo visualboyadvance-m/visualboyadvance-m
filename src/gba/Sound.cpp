@@ -540,6 +540,10 @@ bool soundInit()
     if (!soundDriver->init(soundSampleRate))
         return false;
 
+    if (!stereo_buffer) {
+        remake_stereo_buffer();
+    }
+
     soundPaused = true;
     return true;
 }
