@@ -1220,10 +1220,8 @@ struct game_key {
     wxJoyKeyBinding_v& b;
 };
 
-static std::vector<game_key>* game_keys_pressed(int key, int mod, int joy)
+static void game_keys_pressed(int key, int mod, int joy, std::vector<game_key>* vec)
 {
-    auto vec = new std::vector<game_key>;
-
     for (int player = 0; player < 4; player++)
         for (int key_num = 0; key_num < NUM_KEYS; key_num++) {
             wxJoyKeyBinding_v& b = gopts.joykey_bindings[player][key_num];
@@ -1232,8 +1230,6 @@ static std::vector<game_key>* game_keys_pressed(int key, int mod, int joy)
                 if (b[bind_num].key == key && b[bind_num].mod == mod && b[bind_num].joy == joy)
                     vec->push_back({player, key_num, (int)bind_num, b});
         }
-
-    return vec;
 }
 
 static bool process_key_press(bool down, int key, int mod, int joy = 0)
@@ -1267,9 +1263,10 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
         if (keys_pressed[kpno].key == key && keys_pressed[kpno].mod == mod && keys_pressed[kpno].joy == joy)
             break;
 
-    auto game_keys = game_keys_pressed(key, mod, joy);
+    std::vector<game_key> game_keys;
+    game_keys_pressed(key, mod, joy, &game_keys);
 
-    const bool is_game_key = game_keys->size();
+    const bool is_game_key = game_keys.size();
 
     if (kpno < keys_pressed.size()) {
         // double press is noop
@@ -1287,7 +1284,7 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
         keys_pressed.push_back({key, mod, joy});
     }
 
-    for (auto&& game_key : *game_keys) {
+    for (auto&& game_key : game_keys) {
         if (down) {
             // press button
             joypress[game_key.player] |= bmask[game_key.key_num];
@@ -1312,8 +1309,6 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
             }
         }
     }
-
-    delete game_keys;
 
     return is_game_key;
 }
