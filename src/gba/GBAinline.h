@@ -297,7 +297,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
         } else {
             int param = reg[15].I;
             if (armState)
-                param += (address & 2)
+                param += (address & 2);
             value = CPUReadHalfWordQuick(param);
         }
 #ifdef GBA_LOGGING
