@@ -56,6 +56,7 @@ static bool option_forceRTCenable = false;
 static bool option_showAdvancedOptions = false;
 static double option_sndFiltering = 0.5;
 static unsigned option_gbPalette = 0;
+static bool option_lcdfilter = false;
 
 static unsigned retropad_device[4] = {0};
 static unsigned systemWidth = gbaWidth;
@@ -1211,6 +1212,16 @@ static void update_variables(bool startup)
         gbColorOption = (!strcmp(var.value, "enabled")) ? 1 : 0;
     }
 
+    var.key = "vbam_lcdfilter";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        bool prev_lcdfilter = option_lcdfilter;
+        option_lcdfilter = (!strcmp(var.value, "enabled")) ? true : false;
+        if (prev_lcdfilter != option_lcdfilter)
+            utilUpdateSystemColorMaps(option_lcdfilter);
+    }
+
     var.key = "vbam_show_advanced_options";
     var.value = NULL;
 
@@ -1539,8 +1550,8 @@ bool retro_load_game(const struct retro_game_info *game)
       return false;
    }
 
+   utilUpdateSystemColorMaps(option_lcdfilter);
    update_variables(true);
-   utilUpdateSystemColorMaps(false);
    soundInit();
 
    if (type == IMAGE_GBA) {
