@@ -103,16 +103,17 @@ static inline uint32_t CPUReadMemory(uint32_t address)
     case 5:
         value = READ32LE(((uint32_t*)&paletteRAM[address & 0x3fC]));
         break;
-    case 6:
-        address = (address & 0x1fffc);
-        if (((DISPCNT & 7) > 2) && ((address & 0x1C000) == 0x18000)) {
+    case 6: {
+        unsigned addr = (address & 0x1fffc);
+        if (((DISPCNT & 7) > 2) && ((addr & 0x1C000) == 0x18000)) {
             value = 0;
             break;
         }
-        if ((address & 0x18000) == 0x18000)
-            address &= 0x17fff;
-        value = READ32LE(((uint32_t*)&vram[address]));
+        if ((addr & 0x18000) == 0x18000)
+            addr &= 0x17fff;
+        value = READ32LE(((uint32_t*)&vram[addr]));
         break;
+    }
     case 7:
         value = READ32LE(((uint32_t*)&oam[address & 0x3FC]));
         break;
@@ -253,16 +254,17 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
     case 5:
         value = READ16LE(((uint16_t*)&paletteRAM[address & 0x3fe]));
         break;
-    case 6:
-        address = (address & 0x1fffe);
-        if (((DISPCNT & 7) > 2) && ((address & 0x1C000) == 0x18000)) {
+    case 6: {
+        unsigned addr = (address & 0x1fffe);
+        if (((DISPCNT & 7) > 2) && ((addr & 0x1C000) == 0x18000)) {
             value = 0;
             break;
         }
-        if ((address & 0x18000) == 0x18000)
-            address &= 0x17fff;
-        value = READ16LE(((uint16_t*)&vram[address]));
+        if ((addr & 0x18000) == 0x18000)
+            addr &= 0x17fff;
+        value = READ16LE(((uint16_t*)&vram[addr]));
         break;
+    }
     case 7:
         value = READ16LE(((uint16_t*)&oam[address & 0x3fe]));
         break;
@@ -293,11 +295,10 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
         if (cpuDmaHack) {
             value = cpuDmaLast & 0xFFFF;
         } else {
-            if (armState) {
-                value = CPUReadHalfWordQuick(reg[15].I + (address & 2));
-            } else {
-                value = CPUReadHalfWordQuick(reg[15].I);
-            }
+            int param = reg[15].I;
+            if (armState)
+                param += (address & 2)
+            value = CPUReadHalfWordQuick(param);
         }
 #ifdef GBA_LOGGING
         if (systemVerbose & VERBOSE_ILLEGAL_READ) {
