@@ -1146,9 +1146,9 @@ static INSN_REGPARM void thumb43_1(uint32_t opcode)
     reg[dest].I = reg[(opcode >> 3) & 7].I * rm;
     if (((int32_t)rm) < 0)
         rm = ~rm;
-    if ((rm & 0xFFFFFF00) == 0)
-        clockTicks += 0;
-    else if ((rm & 0xFFFF0000) == 0)
+    if ((rm & 0xFFFFFF00) == 0) {
+        // clockTicks += 0;
+    } else if ((rm & 0xFFFF0000) == 0)
         clockTicks += 1;
     else if ((rm & 0xFF000000) == 0)
         clockTicks += 2;
@@ -1594,7 +1594,7 @@ static INSN_REGPARM void thumbBC(uint32_t opcode)
     POP_REG(64, 6);
     POP_REG(128, 7);
     reg[13].I = temp;
-    clockTicks = 2 + codeTicksAccess16(armNextPC);
+    clockTicks += 2 + codeTicksAccess16(armNextPC);
 }
 
 // POP {Rlist, PC}
@@ -1625,7 +1625,7 @@ static INSN_REGPARM void thumbBD(uint32_t opcode)
     reg[13].I = temp;
     THUMB_PREFETCH;
     busPrefetchCount = 0;
-    clockTicks += 3 + codeTicksAccess16(armNextPC) + codeTicksAccess16(armNextPC);
+    clockTicks += 3 + (codeTicksAccess16(armNextPC) * 2);
 }
 
 // Load/store multiple ////////////////////////////////////////////////////
@@ -1673,7 +1673,7 @@ static INSN_REGPARM void thumbC0(uint32_t opcode)
     THUMB_STM_REG(32, 5, regist);
     THUMB_STM_REG(64, 6, regist);
     THUMB_STM_REG(128, 7, regist);
-    clockTicks = 1 + codeTicksAccess16(armNextPC);
+    clockTicks += 1 + codeTicksAccess16(armNextPC);
 }
 
 // LDM R0~R7!, {Rlist}
@@ -1694,7 +1694,7 @@ static INSN_REGPARM void thumbC8(uint32_t opcode)
     THUMB_LDM_REG(32, 5);
     THUMB_LDM_REG(64, 6);
     THUMB_LDM_REG(128, 7);
-    clockTicks = 2 + codeTicksAccess16(armNextPC);
+    clockTicks += 2 + codeTicksAccess16(armNextPC);
     if (!(opcode & (1 << regist)))
         reg[regist].I = temp;
 }
@@ -1703,7 +1703,7 @@ static INSN_REGPARM void thumbC8(uint32_t opcode)
 #define THUMB_CONDITIONAL_BRANCH(COND)                                  \
     UPDATE_OLDREG;                                                      \
     clockTicks = codeTicksAccessSeq16(armNextPC) + 1;                   \
-    if (COND) {                                                         \
+    if ((bool)COND) {                                                         \
         uint32_t offset = (uint32_t)((int8_t)(opcode & 0xFF)) << 1;     \
         reg[15].I += offset;                                            \
         armNextPC = reg[15].I;                                          \

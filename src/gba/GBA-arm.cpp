@@ -1251,7 +1251,7 @@ DEFINE_ALU_INSN_C(1F, 3F, MVNS, YES)
         clockTicks += 3;                                               \
     if (busPrefetchCount == 0)                                         \
         busPrefetchCount = ((busPrefetchCount + 1) << clockTicks) - 1; \
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    clockTicks += CYCLES + 1 + codeTicksAccess32(armNextPC);
 
 #define OP_MUL \
     reg[dest].I = reg[mult].I * rs;
@@ -2581,8 +2581,7 @@ static INSN_REGPARM void armA00(uint32_t opcode)
     armNextPC = reg[15].I;
     reg[15].I += 4;
     ARM_PREFETCH;
-    clockTicks = codeTicksAccessSeq32(armNextPC) + 1;
-    clockTicks = (clockTicks * 2) + codeTicksAccess32(armNextPC) + 1;
+    clockTicks = (codeTicksAccessSeq32(armNextPC) * 2) + codeTicksAccess32(armNextPC) + 3;
     busPrefetchCount = 0;
 }
 
@@ -2595,8 +2594,7 @@ static INSN_REGPARM void armB00(uint32_t opcode)
     armNextPC = reg[15].I;
     reg[15].I += 4;
     ARM_PREFETCH;
-    clockTicks = codeTicksAccessSeq32(armNextPC) + 1;
-    clockTicks = (clockTicks * 2) + codeTicksAccess32(armNextPC) + 1;
+    clockTicks = (codeTicksAccessSeq32(armNextPC) * 2) + codeTicksAccess32(armNextPC) + 3;
     busPrefetchCount = 0;
 }
 
@@ -2612,8 +2610,7 @@ static INSN_REGPARM void armE01(uint32_t opcode)
 // SWI <comment>
 static INSN_REGPARM void armF00(uint32_t opcode)
 {
-    clockTicks = codeTicksAccessSeq32(armNextPC) + 1;
-    clockTicks = (clockTicks * 2) + codeTicksAccess32(armNextPC) + 1;
+    clockTicks = (codeTicksAccessSeq32(armNextPC) * 2) + codeTicksAccess32(armNextPC) + 3;
     busPrefetchCount = 0;
     CPUSoftwareInterrupt(opcode & 0x00FFFFFF);
 }
