@@ -33,6 +33,8 @@
 #include "../gb/gbSGB.h"
 #include "../gb/gbSound.h"
 
+#include "../filters/interframe.hpp"
+
 #define FRAMERATE  (16777216.0 / 280896.0) // 59.73
 #define SAMPLERATE 32768.0
 
@@ -57,6 +59,8 @@ static bool option_showAdvancedOptions = false;
 static double option_sndFiltering = 0.5;
 static unsigned option_gbPalette = 0;
 static bool option_lcdfilter = false;
+// filters
+static IFBFilterFunc ifb_filter_func = NULL;
 
 static unsigned retropad_device[4] = {0};
 static unsigned systemWidth = gbaWidth;
@@ -67,7 +71,7 @@ static IMAGE_TYPE type = IMAGE_UNKNOWN;
 // global vars
 uint16_t systemColorMap16[0x10000];
 uint32_t systemColorMap32[0x10000];
-int RGB_LOW_BITS_MASK = 0;
+int RGB_LOW_BITS_MASK = 0x821; // used for 16bit inter-frame filters
 int systemRedShift = 0;
 int systemBlueShift = 0;
 int systemGreenShift = 0;
@@ -1222,6 +1226,30 @@ static void update_variables(bool startup)
             utilUpdateSystemColorMaps(option_lcdfilter);
     }
 
+    var.key = "vbam_interframeblending";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        if (!strcmp(var.value, "smart"))
+        {
+            if (systemColorDepth == 16)
+                ifb_filter_func = SmartIB;
+            else
+                ifb_filter_func = SmartIB32;
+        }
+        else if (!strcmp(var.value, "motion blur"))
+        {
+            if (systemColorDepth == 16)
+                ifb_filter_func = MotionBlurIB;
+            else
+                ifb_filter_func = MotionBlurIB32;
+        }
+        else
+            ifb_filter_func = NULL;
+    }
+    else
+        ifb_filter_func = NULL;
+
     var.key = "vbam_show_advanced_options";
     var.value = NULL;
 
@@ -1712,6 +1740,8 @@ bool systemCanChangeSoundQuality(void)
 void systemDrawScreen(void)
 {
     unsigned pitch = systemWidth * (systemColorDepth >> 3);
+    if (ifb_filter_func)
+        ifb_filter_func(pix, pitch, systemWidth, systemHeight);
     video_cb(pix, systemWidth, systemHeight, pitch);
 }
 
