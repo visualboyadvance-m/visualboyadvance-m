@@ -1693,7 +1693,7 @@ public:
             }
         }
     }
-} JoyPadConfigHandler[4];
+} JoyPadConfigHandler[NUM_JOYPADS];
 
 // manage fullscreen mode widget
 // technically, it's more than a validator: it modifies the widget as well
@@ -3791,7 +3791,7 @@ bool MainFrame::BindControls()
         wxDialog* joyDialog = LoadXRCropertySheetDialog("JoypadConfig");
         wxFarRadio* r = 0;
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < NUM_JOYPADS; i++) {
             wxString pn;
             // NOTE: wx2.9.1 behaves differently for referenced nodes
             // than 2.8!  Unless there is an actual child node, the ID field
@@ -3838,6 +3838,13 @@ bool MainFrame::BindControls()
                     wxCommandEventHandler(JoyPadConfig_t::JoypadConfigButtons),
                     NULL, &JoyPadConfigHandler[i]);
             }
+
+            // poll the joystick	
+            JoystickPoller* jpoll = new JoystickPoller();
+
+            w->Connect(wxID_ANY, wxEVT_SHOW,
+                wxShowEventHandler(JoystickPoller::ShowDialog),
+                jpoll, jpoll);
 
             joyDialog->Fit();
         }

@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#define NUM_JOYPADS 4
 #define NUM_KEYS 21
 extern const wxString joynames[NUM_KEYS];
 extern wxJoyKeyBinding defkeys_keyboard[NUM_KEYS];  // keyboard defaults
