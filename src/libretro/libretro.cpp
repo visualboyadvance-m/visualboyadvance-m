@@ -194,7 +194,7 @@ static struct palettes_t defaultGBPalettes[] = {
     },
     {
         "Weird Colors",
-        { 0x621F, 0x401F, 0x001F, 0x2010, 0x621F, 0x401F, 0x001F, 0x2010 }
+        { 0x621F, 0x401F, 0x001F, 0x2010, 0x621F, 0x401F, 0x001F, 0x2010 },
     },
     {
         "Real GB Colors",
@@ -635,9 +635,9 @@ void retro_init(void)
    bool yes = true;
    environ_cb(RETRO_ENVIRONMENT_SET_SUPPORT_ACHIEVEMENTS, &yes);
 
-   if (environ_cb(RETRO_ENVIRONMENT_GET_RUMBLE_INTERFACE, &rumble)) {
+   if (environ_cb(RETRO_ENVIRONMENT_GET_RUMBLE_INTERFACE, &rumble))
       rumble_cb = rumble.set_rumble_state;
-   } else
+   else
       rumble_cb = NULL;
 }
 
@@ -1324,6 +1324,7 @@ static void update_variables(bool startup)
 #define ROUND(x)    floor((x) + 0.5)
 #define ASTICK_MAX  0x8000
 static int analog_x, analog_y, analog_z;
+static uint32_t input_buf[MAX_PLAYERS] = { 0 };
 
 static void updateInput_MotionSensors(void)
 {
@@ -1405,6 +1406,45 @@ void updateInput_SolarSensor(void)
     }
 }
 
+// Update joypads
+static void updateInput_Joypad(void)
+{
+    unsigned max_buttons = MAX_BUTTONS - ((type == IMAGE_GB) ? 2 : 0); // gb only has 8 buttons
+
+    for (unsigned port = 0; port < MAX_PLAYERS; port++)
+    {
+        // Reset input states
+        input_buf[port] = 0;
+
+        if (retropad_device[port] == RETRO_DEVICE_JOYPAD) {
+            for (unsigned button = 0; button < max_buttons; button++)
+                input_buf[port] |= input_cb(port, RETRO_DEVICE_JOYPAD, 0, binds[button]) << button;
+
+            if (option_turboEnable) {
+                /* Handle Turbo A & B buttons */
+                for (unsigned tbutton = 0; tbutton < TURBO_BUTTONS; tbutton++) {
+                    if (input_cb(port, RETRO_DEVICE_JOYPAD, 0, turbo_binds[tbutton])) {
+                        if (!turbo_delay_counter[port][tbutton])
+                            input_buf[port] |= 1 << tbutton;
+                        turbo_delay_counter[port][tbutton]++;
+                        if (turbo_delay_counter[port][tbutton] > option_turboDelay)
+                            /* Reset the toggle if delay value is reached */
+                            turbo_delay_counter[port][tbutton] = 0;
+                    }
+                    else
+                        /* If the button is not pressed, just reset the toggle */
+                        turbo_delay_counter[port][tbutton] = 0;
+                }
+            }
+            // Do not allow opposing directions
+            if ((input_buf[port] & 0x30) == 0x30)
+                input_buf[port] &= ~(0x30);
+            else if ((input_buf[port] & 0xC0) == 0xC0)
+                input_buf[port] &= ~(0xC0);
+        }
+    }
+}
+
 static bool firstrun = true;
 static unsigned has_frame;
 
@@ -1441,6 +1481,7 @@ void retro_run(void)
 
     poll_cb();
 
+    updateInput_Joypad();
     updateInput_SolarSensor();
     updateInput_MotionSensors();
 
@@ -1779,40 +1820,9 @@ void systemMessage(int, const char* fmt, ...)
 
 uint32_t systemReadJoypad(int which)
 {
-    uint32_t J = 0;
-    unsigned i, buttons = MAX_BUTTONS - ((type == IMAGE_GB) ? 2 : 0); // gb only has 8 buttons
-
     if (which == -1)
         which = 0;
-
-    if (retropad_device[which] == RETRO_DEVICE_JOYPAD) {
-        for (i = 0; i < buttons; i++)
-            J |= input_cb(which, RETRO_DEVICE_JOYPAD, 0, binds[i]) << i;
-
-        if (option_turboEnable) {
-            /* Handle Turbo A & B buttons */
-            for (i = 0; i < TURBO_BUTTONS; i++) {
-                if (input_cb(which, RETRO_DEVICE_JOYPAD, 0, turbo_binds[i])) {
-                    if (!turbo_delay_counter[which][i])
-                        J |= 1 << i;
-                    turbo_delay_counter[which][i]++;
-                    if (turbo_delay_counter[which][i] > option_turboDelay)
-                        /* Reset the toggle if delay value is reached */
-                        turbo_delay_counter[which][i] = 0;
-                } else
-                    /* If the button is not pressed, just reset the toggle */
-                    turbo_delay_counter[which][i] = 0;
-            }
-        }
-    }
-
-    // Do not allow opposing directions
-    if ((J & 0x30) == 0x30)
-        J &= ~(0x30);
-    else if ((J & 0xC0) == 0xC0)
-        J &= ~(0xC0);
-
-    return J;
+    return input_buf[which];
 }
 
 static void systemUpdateSolarSensor(int v)
