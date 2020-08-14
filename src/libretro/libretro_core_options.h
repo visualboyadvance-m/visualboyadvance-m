@@ -190,6 +190,29 @@ struct retro_core_option_definition option_defs_us[] = {
         "disabled"
     },
     {
+        "vbam_lcdfilter",
+        "LCD Color Filter",
+        "TODO:",
+        {
+            { "disabled",  NULL },
+            { "enabled",   NULL },
+            { NULL, NULL },
+        },
+        "disabled"
+    },
+    {
+        "vbam_interframeblending",
+        "Interframe Blending",
+        "TODO:",
+        {
+            { "disabled",  NULL },
+            { "smart",   NULL },
+            { "motion blur",   NULL },
+            { NULL, NULL },
+        },
+        "disabled"
+    },
+    {
         "vbam_turboenable",
         "Enable Turbo Buttons",
         "Enable or disable gamepad turbo buttons.",

@@ -59,3 +59,8 @@ SOURCES_CXX += \
 	$(CORE_DIR)/gb/gbMemory.cpp \
 	$(CORE_DIR)/gb/gbSGB.cpp \
 	$(CORE_DIR)/gb/gbSound.cpp
+
+# Filters
+SOURCES_CXX += \
+	$(CORE_DIR)/filters/interframe.cpp \
+	$(CORE_DIR)/gba/gbafilter.cpp

@@ -14,6 +14,7 @@ vcpkg/*
 *.so
 *.dll
 *.exe
+.vscode
 
 # vim swap files
 *.sw?

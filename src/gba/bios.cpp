@@ -42,6 +42,11 @@ int16_t sineTable[256] = {
     (int16_t)0xF384, (int16_t)0xF50F, (int16_t)0xF69C, (int16_t)0xF82B, (int16_t)0xF9BB, (int16_t)0xFB4B, (int16_t)0xFCDD, (int16_t)0xFE6E
 };
 
+// 2020-08-12 - negativeExponent
+// Fix ArcTan and ArcTan2 based on mgba's hle bios fixes
+// https://github.com/mgba-emu/mgba/commit/14dc01409c9e971ea0697f5017b45d0db6a7faf5#diff-8f06a143a9fd912c83209f935d3aca25
+// https://github.com/mgba-emu/mgba/commit/b154457857d3367a4c0196a4abadeeb6c850ffdf#diff-8f06a143a9fd912c83209f935d3aca25
+
 void BIOS_ArcTan()
 {
 #ifdef GBA_LOGGING
@@ -53,7 +58,7 @@ void BIOS_ArcTan()
 #endif
 
     int32_t i = reg[0].I;
-    int32_t a = -((i*i) >> 14);
+    int32_t a = -((i * i) >> 14);
     int32_t b = ((0xA9 * a) >> 14) + 0x390;
     b = ((b * a) >> 14) + 0x91C;
     b = ((b * a) >> 14) + 0xFB6;
@@ -111,6 +116,7 @@ void BIOS_ArcTan2()
         }
     }
     reg[0].I = res;
+    reg[3].I = 0x170;
 
 #ifdef GBA_LOGGING
     if (systemVerbose & VERBOSE_SWI) {
