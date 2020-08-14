@@ -184,10 +184,16 @@ function(vcpkg_set_toolchain)
         set(CMAKE_GENERATOR_PLATFORM x64 CACHE STRING "visual studio build architecture" FORCE)
     endif()
 
-    if(WIN32 AND (NOT CMAKE_GENERATOR MATCHES "Visual Studio"))
-        # set toolchain to VS for e.g. Ninja or jom
-        set(CMAKE_C_COMPILER   cl CACHE STRING "Microsoft C/C++ Compiler" FORCE)
-        set(CMAKE_CXX_COMPILER cl CACHE STRING "Microsoft C/C++ Compiler" FORCE)
+    if(WIN32 AND NOT CMAKE_GENERATOR MATCHES "Visual Studio")
+        if(VCPKG_TARGET_TRIPLET MATCHES "^x[68][46]-windows-")
+            # set toolchain to VS for e.g. Ninja or jom
+            set(CMAKE_C_COMPILER   cl CACHE STRING "Microsoft C/C++ Compiler" FORCE)
+            set(CMAKE_CXX_COMPILER cl CACHE STRING "Microsoft C/C++ Compiler" FORCE)
+        elseif(VCPKG_TARGET_TRIPLET MATCHES "^x[68][46]-mingw-")
+            # set toolchain to MinGW for e.g. Ninja or jom
+            set(CMAKE_C_COMPILER   gcc CACHE STRING "MinGW GCC C Compiler"   FORCE)
+            set(CMAKE_CXX_COMPILER g++ CACHE STRING "MinGW G++ C++ Compiler" FORCE)
+        endif()
     endif()
 
     set(CMAKE_TOOLCHAIN_FILE ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake CACHE FILEPATH "vcpkg toolchain" FORCE)
