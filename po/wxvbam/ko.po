@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-21 19:40+0000\n"
-"PO-Revision-Date: 2020-06-21 20:07+0000\n"
+"POT-Creation-Date: 2020-08-17 17:30+0000\n"
+"PO-Revision-Date: 2020-08-17 18:34+0000\n"
 "Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/bgk/vba-m/language/ko/)\n"
 "MIME-Version: 1.0\n"
@@ -154,7 +154,7 @@ msgstr "치트 파일을 선택"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA 치트 목록 (*.clt)|*.clt|CHT 치트 목록 (*.cht)|*.cht"
 
-#: guiinit.cpp:256 panel.cpp:426
+#: guiinit.cpp:256 panel.cpp:427
 msgid "Loaded cheats"
 msgstr "치트 불러옴"
 
@@ -607,7 +607,7 @@ msgstr "배터리 파일 가져올 시 저장된 게임을 지울 수도 있습�
 msgid "Confirm import"
 msgstr "가져오기 승인"
 
-#: cmdevents.cpp:907 panel.cpp:369
+#: cmdevents.cpp:907 panel.cpp:370
 #, c-format
 msgid "Loaded battery %s"
 msgstr "%s 배터리를 불러옴"
@@ -690,7 +690,7 @@ msgstr "%s 스냅샷 파일 불러오기 오류"
 msgid "Wrote battery %s"
 msgstr "%s 배터리가 기록됨"
 
-#: cmdevents.cpp:1100 panel.cpp:676
+#: cmdevents.cpp:1100 panel.cpp:677
 #, c-format
 msgid "Error writing battery %s"
 msgstr "%s 배터리 기록 오류"
@@ -796,7 +796,7 @@ msgstr ""
 msgid "Using interframe blending #%d"
 msgstr ""
 
-#: cmdevents.cpp:2690 panel.cpp:182 panel.cpp:285
+#: cmdevents.cpp:2690 panel.cpp:183 panel.cpp:286
 msgid "Could not initialize the sound driver!"
 msgstr ""
 
@@ -935,155 +935,155 @@ msgstr "가상 tty %s를 열 수 없습니다."
 msgid "Error setting up server socket (%d)"
 msgstr "서버 소켓 셋업 에러 (%d)"
 
-#: panel.cpp:96
+#: panel.cpp:97
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s는 유효한 ROM 파일이 아님"
 
-#: panel.cpp:97 panel.cpp:158 panel.cpp:223
+#: panel.cpp:98 panel.cpp:159 panel.cpp:224
 msgid "Problem loading file"
 msgstr "파일 불러오기 문제"
 
-#: panel.cpp:157
+#: panel.cpp:158
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "%s 게임 보이 ROM을 불러올 수 없음"
 
-#: panel.cpp:199 panel.cpp:299
+#: panel.cpp:200 panel.cpp:300
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "%s BIOS를 불러올 수 없음"
 
-#: panel.cpp:222
+#: panel.cpp:223
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "%s 게임 보이 어드밴스 ROM을 불러올 수 없음"
 
-#: panel.cpp:458
+#: panel.cpp:459
 msgid " player "
 msgstr " 사용자 "
 
-#: panel.cpp:624
+#: panel.cpp:625
 #, c-format
 msgid "Loaded state %s"
 msgstr "상태 %s 불러옴"
 
-#: panel.cpp:624
+#: panel.cpp:625
 #, c-format
 msgid "Error loading state %s"
 msgstr "상태 %s 불러오기 오류"
 
-#: panel.cpp:648
+#: panel.cpp:649
 #, c-format
 msgid "Saved state %s"
 msgstr "상태 %s 저장됨"
 
-#: panel.cpp:648
+#: panel.cpp:649
 #, c-format
 msgid "Error saving state %s"
 msgstr "상태 %s 저장 오류"
 
-#: panel.cpp:852
+#: panel.cpp:853
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "전체화면 모드 %dx%d-%d@%d 는 지원되지 않음; 다른 해상도 찾기"
 
-#: panel.cpp:890
+#: panel.cpp:891
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "전체화면 모드 %dx%d-%d@%d 는 지원되지 않음"
 
-#: panel.cpp:895
+#: panel.cpp:896
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "유효한 모드: %dx%d-%d@%d"
 
-#: panel.cpp:903
+#: panel.cpp:904
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "선택된 모드 %dx%d-%d@%d"
 
-#: panel.cpp:907
+#: panel.cpp:908
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "%dx%d-%d@%d 모드로 변경 실패함"
 
-#: panel.cpp:991
+#: panel.cpp:992
 msgid "Not a valid GBA cartridge"
 msgstr "유효한 GBA 카트리지가 아님"
 
-#: panel.cpp:1151
+#: panel.cpp:1152
 msgid "No memory for rewinding"
 msgstr "되감기 메모리 없음"
 
-#: panel.cpp:1161
+#: panel.cpp:1162
 msgid "Error writing rewind state"
 msgstr "되감기 상태 쓰기 오류"
 
-#: panel.cpp:2248
+#: panel.cpp:2271
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2257
+#: panel.cpp:2280
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:2266
+#: panel.cpp:2289
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:2273
-msgid "No support for wglGetExtensionsString"
+#: panel.cpp:2295
+msgid "No support for wglGetExtensionsStringEXT"
 msgstr ""
 
-#: panel.cpp:2275
+#: panel.cpp:2298
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:2284
+#: panel.cpp:2307
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2290
+#: panel.cpp:2313
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:2386
+#: panel.cpp:2409
 msgid "memory allocation error"
 msgstr "메모리 할당 오류"
 
-#: panel.cpp:2389
+#: panel.cpp:2412
 msgid "error initializing codec"
 msgstr "코덱 초기화 오류"
 
-#: panel.cpp:2392
+#: panel.cpp:2415
 msgid "error writing to output file"
 msgstr "출력 파일 쓰기 오류"
 
-#: panel.cpp:2395
+#: panel.cpp:2418
 msgid "can't guess output format from file name"
 msgstr "파일명에서 출력포맷을 알 수 없습니다."
 
-#: panel.cpp:2400
+#: panel.cpp:2423
 msgid "programming error; aborting!"
 msgstr "프로그래밍 오류; 종료합니다!"
 
-#: panel.cpp:2412 panel.cpp:2441
+#: panel.cpp:2435 panel.cpp:2464
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "%s (%s)부터 기록을 시작할 수 없습니다."
 
-#: panel.cpp:2469
+#: panel.cpp:2492
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "(%s) 에서 오디오/비디오 녹화 오류; 종료합니다."
 
-#: panel.cpp:2475
+#: panel.cpp:2498
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "(%s) 에서 오디오 녹음 오류; 종료합니다."
 
-#: panel.cpp:2485
+#: panel.cpp:2508
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "(%s) 에서 비디오 녹화 오류; 종료합니다."

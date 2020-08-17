@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-21 19:40+0000\n"
-"PO-Revision-Date: 2020-06-21 20:07+0000\n"
+"POT-Creation-Date: 2020-08-17 17:30+0000\n"
+"PO-Revision-Date: 2020-08-17 18:34+0000\n"
 "Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/bgk/vba-m/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -158,7 +158,7 @@ msgstr "选择金手指"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA 金手指列表 (*.clt)|*.clt|CHT 金手指列表 (*.cht)|*.cht"
 
-#: guiinit.cpp:256 panel.cpp:426
+#: guiinit.cpp:256 panel.cpp:427
 msgid "Loaded cheats"
 msgstr "打开金手指"
 
@@ -611,7 +611,7 @@ msgstr "导入电池文件将删除之前保存的游戏进度 (直到下次写�
 msgid "Confirm import"
 msgstr "确认导入"
 
-#: cmdevents.cpp:907 panel.cpp:369
+#: cmdevents.cpp:907 panel.cpp:370
 #, c-format
 msgid "Loaded battery %s"
 msgstr "读取电池 %s"
@@ -694,7 +694,7 @@ msgstr "快照文件读取错误 %s"
 msgid "Wrote battery %s"
 msgstr "写入电池 %s"
 
-#: cmdevents.cpp:1100 panel.cpp:676
+#: cmdevents.cpp:1100 panel.cpp:677
 #, c-format
 msgid "Error writing battery %s"
 msgstr "写入电池错误 %s"
@@ -800,7 +800,7 @@ msgstr "正在使用像素滤镜 #%d"
 msgid "Using interframe blending #%d"
 msgstr "正在使用帧间混合 #%d"
 
-#: cmdevents.cpp:2690 panel.cpp:182 panel.cpp:285
+#: cmdevents.cpp:2690 panel.cpp:183 panel.cpp:286
 msgid "Could not initialize the sound driver!"
 msgstr "无法初始化声音驱动！"
 
@@ -939,155 +939,155 @@ msgstr "打开伪 tty 错误: %s"
 msgid "Error setting up server socket (%d)"
 msgstr "设置服务器接口错误 (%d)"
 
-#: panel.cpp:96
+#: panel.cpp:97
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s 不是有效的 ROM 文件"
 
-#: panel.cpp:97 panel.cpp:158 panel.cpp:223
+#: panel.cpp:98 panel.cpp:159 panel.cpp:224
 msgid "Problem loading file"
 msgstr "载入文件错误"
 
-#: panel.cpp:157
+#: panel.cpp:158
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "无法载入 Game Boy ROM %s"
 
-#: panel.cpp:199 panel.cpp:299
+#: panel.cpp:200 panel.cpp:300
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "无法载入 BIOS %s"
 
-#: panel.cpp:222
+#: panel.cpp:223
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "无法载入 Game Boy Advance ROM %s"
 
-#: panel.cpp:458
+#: panel.cpp:459
 msgid " player "
 msgstr "玩家"
 
-#: panel.cpp:624
+#: panel.cpp:625
 #, c-format
 msgid "Loaded state %s"
 msgstr "载入状态 %s"
 
-#: panel.cpp:624
+#: panel.cpp:625
 #, c-format
 msgid "Error loading state %s"
 msgstr "载入状态错误 %s"
 
-#: panel.cpp:648
+#: panel.cpp:649
 #, c-format
 msgid "Saved state %s"
 msgstr "保存状态 %s"
 
-#: panel.cpp:648
+#: panel.cpp:649
 #, c-format
 msgid "Error saving state %s"
 msgstr "保存状态错误 %s"
 
-#: panel.cpp:852
+#: panel.cpp:853
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "不支持 %dx%d-%d@%d 全屏模式，选择其他模式"
 
-#: panel.cpp:890
+#: panel.cpp:891
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "不支持 %dx%d-%d@%d 全屏模式"
 
-#: panel.cpp:895
+#: panel.cpp:896
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "有效模式: %dx%d-%d@%d"
 
-#: panel.cpp:903
+#: panel.cpp:904
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "选择模式 %dx%d-%d@%d"
 
-#: panel.cpp:907
+#: panel.cpp:908
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "切换模式失败 %dx%d-%d@%d"
 
-#: panel.cpp:991
+#: panel.cpp:992
 msgid "Not a valid GBA cartridge"
 msgstr "无效 GBA 卡带"
 
-#: panel.cpp:1151
+#: panel.cpp:1152
 msgid "No memory for rewinding"
 msgstr "没有用于回退的内存"
 
-#: panel.cpp:1161
+#: panel.cpp:1162
 msgid "Error writing rewind state"
 msgstr "回写状态错误"
 
-#: panel.cpp:2248
+#: panel.cpp:2271
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "设置 glXSwapIntervalEXT 失败"
 
-#: panel.cpp:2257
+#: panel.cpp:2280
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "设置 glXSwapIntervalSGI 失败"
 
-#: panel.cpp:2266
+#: panel.cpp:2289
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "设置 glXSwapIntervalMESA 失败"
 
-#: panel.cpp:2273
-msgid "No support for wglGetExtensionsString"
-msgstr "不支持 wglGetExtensionsString"
+#: panel.cpp:2295
+msgid "No support for wglGetExtensionsStringEXT"
+msgstr ""
 
-#: panel.cpp:2275
+#: panel.cpp:2298
 msgid "No support for WGL_EXT_swap_control"
 msgstr "不支持 WGL_EXT_swap_control"
 
-#: panel.cpp:2284
+#: panel.cpp:2307
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "设置 wglSwapIntervalEXT 失败"
 
-#: panel.cpp:2290
+#: panel.cpp:2313
 msgid "No VSYNC available on this platform"
 msgstr "垂直同步在该平台上不可用 "
 
-#: panel.cpp:2386
+#: panel.cpp:2409
 msgid "memory allocation error"
 msgstr "内存分配错误"
 
-#: panel.cpp:2389
+#: panel.cpp:2412
 msgid "error initializing codec"
 msgstr "初始化代码错误"
 
-#: panel.cpp:2392
+#: panel.cpp:2415
 msgid "error writing to output file"
 msgstr "回写输出文件错误"
 
-#: panel.cpp:2395
+#: panel.cpp:2418
 msgid "can't guess output format from file name"
 msgstr "无法从文件名猜测输出格式"
 
-#: panel.cpp:2400
+#: panel.cpp:2423
 msgid "programming error; aborting!"
 msgstr "程序错误!"
 
-#: panel.cpp:2412 panel.cpp:2441
+#: panel.cpp:2435 panel.cpp:2464
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "不能开始录制到 %s (%s)"
 
-#: panel.cpp:2469
+#: panel.cpp:2492
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "录制音频/视频时错误 (%s); 正在中止"
 
-#: panel.cpp:2475
+#: panel.cpp:2498
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "录制音频时错误 (%s); 正在中止"
 
-#: panel.cpp:2485
+#: panel.cpp:2508
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "录制视频时错误 (%s); 正在中止"
