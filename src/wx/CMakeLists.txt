@@ -158,7 +158,7 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
             ${wxWidgets_LIB_DIR}/jpeg${deb_suffix}.lib
             ${wxWidgets_LIB_DIR}/tiff${deb_suffix}.lib
             ${wxWidgets_LIB_DIR}/lzma${deb_suffix}.lib
-            ${wxWidgets_LIB_DIR}/expat.lib
+            ${wxWidgets_LIB_DIR}/libexpat${deb_suffix}MD.lib
             ${png_lib}
         )
     endif()
