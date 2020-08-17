@@ -2,6 +2,28 @@ if(NOT DEFINED VCPKG_TARGET_TRIPLET)
     return()
 endif()
 
+function(vcpkg_seconds)
+    if(CMAKE_HOST_SYSTEM MATCHES Windows OR ((NOT DEFINED CMAKE_HOST_SYSTEM) AND WIN32))
+        execute_process(
+            COMMAND cmd /c echo %TIME:~0,8%
+            OUTPUT_VARIABLE time
+        )
+    else()
+        execute_process(
+            COMMAND date +'%H:%M:%S'
+            OUTPUT_VARIABLE time
+        )
+    endif()
+
+    string(SUBSTRING "${time}" 0 2 hours)
+    string(SUBSTRING "${time}" 3 2 minutes)
+    string(SUBSTRING "${time}" 6 2 secs)
+
+    math(EXPR seconds "(${hours} * 60 * 60) + (${minutes} * 60) + ${secs}")
+
+    set(seconds ${seconds} PARENT_SCOPE)
+endfunction()
+
 function(vcpkg_check_git_status git_status)
     if(NOT git_status EQUAL 0)
         message(FATAL_ERROR "Error updating vcpkg from git, please make sure git for windows is installed correctly, it can be installed from Visual Studio components")
@@ -164,20 +186,58 @@ function(vcpkg_set_toolchain)
         WORKING_DIRECTORY ${VCPKG_ROOT}
     )
 
-    # build our deps
+    # Get number of seconds since midnight (might be wrong if am/pm is in effect on Windows.)
+    vcpkg_seconds()
+    set(began ${seconds})
+
+    # Limit total installation time to 30 minutes to not overrun CI time limit.
+    math(EXPR time_limit "${began} + (30 * 60)")
+
+    # Install core deps.
     execute_process(
         COMMAND ${vcpkg_exe} install ${VCPKG_DEPS_QUALIFIED}
         WORKING_DIRECTORY ${VCPKG_ROOT}
     )
 
-    # If ports have been updated, rebuild cache one at a time to not overrun the CI time limit.
-    vcpkg_get_first_upgrade(${vcpkg_exe})
+    # Install optional deps, within time limit.
+    list(LENGTH VCPKG_DEPS_OPTIONAL optionals_list_len)
+    math(EXPR optionals_list_last "${optionals_list_len} - 1")
 
-    if(DEFINED first_upgrade)
-        execute_process(
-            COMMAND ${vcpkg_exe} upgrade --no-dry-run ${first_upgrade}
-            WORKING_DIRECTORY ${VCPKG_ROOT}
-        )
+    foreach(i RANGE 0 ${optionals_list_last} 2)
+        list(GET VCPKG_DEPS_OPTIONAL ${i} dep)
+
+        math(EXPR var_idx "${i} + 1")
+
+        list(GET VCPKG_DEPS_OPTIONAL ${var_idx} var)
+
+        vcpkg_seconds()
+
+        if(seconds LESS time_limit)
+            set(dep_qualified "${dep}:${VCPKG_TARGET_TRIPLET}")
+
+            execute_process(
+                COMMAND ${vcpkg_exe} install ${dep_qualified}
+                WORKING_DIRECTORY ${VCPKG_ROOT}
+            )
+
+            set(${var} ON)
+        else()
+            set(${var} OFF)
+        endif()
+    endforeach()
+
+    # If ports have been updated, and there is time, rebuild cache one at a time to not overrun the CI time limit.
+    vcpkg_seconds()
+
+    if(seconds LESS time_limit)
+        vcpkg_get_first_upgrade(${vcpkg_exe})
+
+        if(DEFINED first_upgrade)
+            execute_process(
+                COMMAND ${vcpkg_exe} upgrade --no-dry-run ${first_upgrade}
+                WORKING_DIRECTORY ${VCPKG_ROOT}
+            )
+        endif()
     endif()
 
     if(WIN32 AND VCPKG_TARGET_TRIPLET MATCHES x64 AND CMAKE_GENERATOR MATCHES "Visual Studio")

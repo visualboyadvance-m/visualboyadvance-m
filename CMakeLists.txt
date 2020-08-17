@@ -29,14 +29,8 @@ if(TAG_RELEASE)
     include(MakeReleaseCommitAndTag)
 endif()
 
-set(VCPKG_DEPS zlib SDL2 SFML gettext wxWidgets)
-
-# appveyor job goes over time limit if building ffmpeg during initial cache
-# generation. So build initial cache without ffmpeg.
-#if(NOT DEFINED ENV{APPVEYOR})
-if(1)
-    list(APPEND VCPKG_DEPS ffmpeg)
-endif()
+set(VCPKG_DEPS          zlib SDL2 SFML gettext wxWidgets)
+set(VCPKG_DEPS_OPTIONAL ffmpeg ENABLE_FFMPEG)
 
 include(Set-Toolchain-vcpkg)
 
