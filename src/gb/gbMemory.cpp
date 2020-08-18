@@ -362,7 +362,9 @@ void mapperMBC3ROM(uint16_t address, uint8_t value)
         gbDataMBC3.mapperRAMEnable = ((value & 0x0a) == 0x0a ? 1 : 0);
         break;
     case 0x2000: // ROM bank select
-        value = value & 0x7f;
+        // MBC3 has 2MB rom size, anything above that is a 4MB MBC30
+        if (gbRomSize < 0x200000)
+            value &= 0x7f;
         if (value == 0)
             value = 1;
         if (value == gbDataMBC3.mapperROMBank)
