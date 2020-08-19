@@ -2,6 +2,15 @@
 #include <cmath>
 #include <cstring>
 #include <vector>
+
+#if defined(__WXGTK__) && defined(HAVE_XSS)
+    #include <X11/Xlib.h>
+    #define Status int
+    #include <X11/extensions/scrnsaver.h>
+    #include <gdk/gdkx.h>
+    #include <gtk/gtk.h>
+#endif
+
 #include <wx/dcbuffer.h>
 #include <wx/menu.h>
 #include <SDL_joystick.h>
@@ -319,7 +328,7 @@ void GameArea::LoadGame(const wxString& name)
     emulating = true;
     was_paused = true;
     MainFrame* mf = wxGetApp().frame;
-    mf->StopPoll();
+    mf->StopJoyPollTimer();
     mf->SetJoystick();
     mf->cmd_enable &= ~(CMDEN_GB | CMDEN_GBA);
     mf->cmd_enable |= ONLOAD_CMDEN;
@@ -570,7 +579,7 @@ void GameArea::UnloadGame(bool destruct)
     mf->enable_menus();
     mf->SetJoystick();
     mf->ResetCheatSearch();
-    mf->StartPoll();
+    mf->StartJoyPollTimer();
 
     if (rewind_mem)
         num_rewind_states = 0;
@@ -1373,14 +1382,6 @@ void GameArea::OnSize(wxSizeEvent& ev)
 
     ev.Skip();
 }
-
-#if defined(__WXGTK__) && defined(HAVE_XSS)
-    #include <X11/Xlib.h>
-    #define Status int
-    #include <X11/extensions/scrnsaver.h>
-    #include <gdk/gdkx.h>
-    #include <gtk/gtk.h>
-#endif
 
 void GameArea::OnSDLJoy(wxSDLJoyEvent& ev)
 {

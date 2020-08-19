@@ -2708,8 +2708,15 @@ EVT_HANDLER(JoypadConfigure, "Joypad options...")
     wxDialog* dlg = GetXRCDialog("JoypadConfig");
     joy.Add();
 
+    auto frame = wxGetApp().frame;
+    bool joy_timer = frame->IsJoyPollTimerRunning();
+
+    if (!joy_timer) frame->StartJoyPollTimer();
+
     if (ShowModal(dlg) == wxID_OK)
         update_opts();
+
+    if (!joy_timer) frame->StopJoyPollTimer();
 
     SetJoystick();
 }
@@ -2719,8 +2726,15 @@ EVT_HANDLER(Customize, "Customize UI...")
     wxDialog* dlg = GetXRCDialog("AccelConfig");
     joy.Add();
 
+    auto frame = wxGetApp().frame;
+    bool joy_timer = frame->IsJoyPollTimerRunning();
+
+    if (!joy_timer) frame->StartJoyPollTimer();
+
     if (ShowModal(dlg) == wxID_OK)
         update_opts();
+
+    if (!joy_timer) frame->StopJoyPollTimer();
 
     SetJoystick();
 }

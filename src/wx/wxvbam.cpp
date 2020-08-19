@@ -929,16 +929,21 @@ void MainFrame::SetJoystick()
         }
 }
 
-void MainFrame::StopPoll()
+void MainFrame::StopJoyPollTimer()
 {
     if (jpoll && jpoll->IsRunning())
         jpoll->Stop();
 }
 
-void MainFrame::StartPoll()
+void MainFrame::StartJoyPollTimer()
 {
     if (jpoll && !jpoll->IsRunning())
         jpoll->Start();
+}
+
+bool MainFrame::IsJoyPollTimerRunning()
+{
+    return jpoll->IsRunning();
 }
 
 void MainFrame::enable_menus()

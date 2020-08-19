@@ -323,9 +323,10 @@ public:
 
     void PollJoysticks() { joy.Poll(); }
 
-    // poll joysticks with timer
-    void StopPoll();
-    void StartPoll();
+    // Poll joysticks with timer.
+    void StartJoyPollTimer();
+    void StopJoyPollTimer();
+    bool IsJoyPollTimerRunning();
 
     // required for building from xrc
     DECLARE_DYNAMIC_CLASS(MainFrame);
