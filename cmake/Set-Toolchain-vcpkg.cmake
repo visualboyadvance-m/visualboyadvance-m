@@ -209,10 +209,11 @@ function(vcpkg_set_toolchain)
         math(EXPR var_idx "${i} + 1")
 
         list(GET VCPKG_DEPS_OPTIONAL ${var_idx} var)
+        set(val "${${var}}")
 
         vcpkg_seconds()
 
-        if(seconds LESS time_limit)
+        if(seconds LESS time_limit AND (val OR val STREQUAL ""))
             set(dep_qualified "${dep}:${VCPKG_TARGET_TRIPLET}")
 
             execute_process(
