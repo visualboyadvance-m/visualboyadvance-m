@@ -1462,11 +1462,11 @@ void retro_run(void)
             case 0x0f:
             case 0x10:
                 /* Check if any RTC has been loaded, zero value means nothing has been loaded. */
-                if (!gbDataMBC3.mapperSeconds && !gbDataMBC3.mapperLSeconds && !gbDataMBC3.mapperLastTime)
+                if (!gbDataMBC3.mapperLastTime)
                     initRTC = true;
                 break;
             case 0xfd:
-                if (!gbDataTAMA5.mapperSeconds && !gbDataTAMA5.mapperLSeconds && !gbDataTAMA5.mapperLastTime)
+                if (!gbDataTAMA5.mapperLastTime)
                     initRTC = true;
                 break;
             }
