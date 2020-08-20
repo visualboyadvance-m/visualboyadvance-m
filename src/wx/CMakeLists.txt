@@ -163,11 +163,13 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
         )
     endif()
 
-    if(DEFINED ENV{APPVEYOR})
+#    if(DEFINED ENV{APPVEYOR})
+    if(TRUE)
         # For some reason, the vcpkg built wxrc fails on appveyor.
         set(WXRC ${CMAKE_SOURCE_DIR}/dependencies/wxrc.exe)
     else()
         set(WXRC ${common_prefix}/tools/wxwidgets/wxrc.exe)
+        # This one sometimes fails to find its dlls.
     endif()
 
     if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/zip.exe)
