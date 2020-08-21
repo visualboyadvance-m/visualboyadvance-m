@@ -209,18 +209,18 @@ option(ENABLE_LTO "Compile with Link Time Optimization (gcc and clang only)" ${L
 
 if(WIN32 OR CMAKE_TOOLCHAIN_FILE MATCHES "[Mm][Ii][Nn][Gg][Ww]")
     # Win32 deps submodule
+    set(git_checkout FALSE)
+
+    if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
+        set(git_checkout TRUE)
+        execute_process(
+            COMMAND git submodule update --init --remote --recursive
+            RESULT_VARIABLE git_status
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        )
+    endif()
+
     if(NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
-        set(git_checkout FALSE)
-
-        if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
-            set(git_checkout TRUE)
-            execute_process(
-                COMMAND git submodule update --init --remote --recursive
-                RESULT_VARIABLE git_status
-                WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-            )
-        endif()
-
         if(NOT (git_checkout AND git_status EQUAL 0))
             message(FATAL_ERROR "Please pull in git submodules, e.g.\nrun: git submodule update --init --remote --recursive")
         endif()
