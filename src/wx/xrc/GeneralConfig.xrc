@@ -102,7 +102,7 @@
                 <object class="wxSpinCtrl" name="Throttle">
                   <value>0</value>
                   <min>0</min>
-                  <max>1000</max>
+                  <max>450</max>
                   <tooltip>0 = no throttle</tooltip>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
@@ -130,12 +130,6 @@
                     <item translate="0">400%</item>
                     <item translate="0">425%</item>
                     <item translate="0">450%</item>
-                    <item translate="0">475%</item>
-                    <item translate="0">500%</item>
-                    <item translate="0">525%</item>
-                    <item translate="0">550%</item>
-                    <item translate="0">575%</item>
-                    <item translate="0">600%</item>
                   </content>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>

@@ -194,8 +194,8 @@ bool DirectSound::init(long sampleRate)
 void DirectSound::setThrottle(unsigned short throttle_) {
     HRESULT hr;
 
-    if (!throttle_)
-        throttle_ = 100;
+    if (throttle_ == 0)
+        throttle_ = 450; // Close to upper bound on frequency.
 
     long freq = soundGetSampleRate();
 
