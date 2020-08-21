@@ -257,9 +257,9 @@ uint32_t autoFrameSkipLastTime;
 uint32_t movieLastJoypad;
 uint32_t movieNextJoypad;
 uint32_t throttle = 100;
-uint32_t speedup_throttle = 0;
+uint32_t speedup_throttle = 100;
 uint32_t speedup_frame_skip = 9;
-bool speedup_throttle_frame_skip = true;
+bool speedup_throttle_frame_skip = false;
 
 const char* preparedCheatCodes[MAX_CHEATS];
 
@@ -557,9 +557,9 @@ void LoadConfig()
 	soundRecordDir = ReadPrefString("soundRecordDir");
 	threadPriority = ReadPref("priority", 2);
 	throttle = ReadPref("throttle", 100);
-	speedup_throttle = ReadPref("speedupThrottle", 0);
+	speedup_throttle = ReadPref("speedupThrottle", 100);
 	speedup_frame_skip = ReadPref("speedupFrameSkip", 9);
-	speedup_throttle_frame_skip = ReadPref("speedupThrottleFrameSkip", 1);
+	speedup_throttle_frame_skip = ReadPref("speedupThrottleFrameSkip", 0);
 	tripleBuffering = ReadPref("tripleBuffering", 0);
 	useBios = ReadPrefHex("useBiosGBA");
 	useBiosFileGB = ReadPref("useBiosGB", 0);
