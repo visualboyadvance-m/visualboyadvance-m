@@ -67,6 +67,25 @@ function(vcpkg_get_first_upgrade vcpkg_exe)
     set(first_upgrade ${first_upgrade} PARENT_SCOPE)
 endfunction()
 
+function(vcpkg_deps_fixup vcpkg_exe)
+    # Get installed list.
+    execute_process(
+        COMMAND ${vcpkg_exe} list
+        OUTPUT_VARIABLE pkg_list
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+        WORKING_DIRECTORY ${VCPKG_ROOT}
+    )
+
+    # If libvorbis is NOT installed but libogg is, remove libvorbis recursively.
+    if(pkg_list MATCHES libogg AND (NOT pkg_list MATCHES libvorbis))
+        execute_process(
+            COMMAND "${vcpkg_exe}" remove --recurse libogg:${VCPKG_TARGET_TRIPLET}
+            WORKING_DIRECTORY ${VCPKG_ROOT}
+        )
+    endif()
+endfunction()
+
 function(vcpkg_set_toolchain)
     if(NOT DEFINED ENV{VCPKG_ROOT})
         if(WIN32)
@@ -192,6 +211,8 @@ function(vcpkg_set_toolchain)
 
     # Limit total installation time to 30 minutes to not overrun CI time limit.
     math(EXPR time_limit "${began} + (30 * 60)")
+
+    vcpkg_deps_fixup("${vcpkg_exe}")
 
     # Install core deps.
     execute_process(
