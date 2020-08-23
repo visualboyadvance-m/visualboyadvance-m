@@ -281,9 +281,6 @@ check_cross() {
                     error "target must be one of 'm32', 'win32', 'MinGW-w64-i686', 'win64' or 'MinGW-w64-x86_64'"
                     ;;
             esac
-
-            # get the necessary win32 headers
-            check git submodule update --init --remote --recursive
             ;;
         m32|-m32)
             target=m32
@@ -398,7 +395,7 @@ debian_installdeps() {
         check sudo apt-get --allow-unauthenticated -qq -y update
 
         # Native wx-common needed for wxrc executable.
-        check sudo apt-get --allow-unauthenticated -qy install build-essential cmake ninja-build ccache wx-common "$@"
+        check sudo apt-get --allow-unauthenticated -qy install build-essential cmake ninja-build ccache wx-common git "$@"
 
         # The ccache symlink is broken in some versions of these mxe packages.
         ccache_link=/usr/lib/mxe/.ccache/bin/ccache
@@ -407,6 +404,9 @@ debian_installdeps() {
             sudo mkdir -p ${ccache_link%/*}
             sudo ln -sf /usr/bin/ccache "$ccache_link"
         fi
+
+        # get the necessary win32 headers
+        git submodule update --init --remote --recursive
     fi
 
     build_instructions
@@ -579,6 +579,9 @@ fedora_installdeps() {
                 set -- "$@" "${target}-${pkg}"
             done
         fi
+
+        # get the necessary win32 headers
+        git submodule update --init --remote --recursive
 
         warning='SFML is required for LINK support, Fedora does not currently have a MinGW SFML package, if you want LINK support you will need to install it manually'
     fi
@@ -766,6 +769,9 @@ rhel_installdeps() {
             done
         fi
 
+        # get the necessary win32 headers
+        git submodule update --init --remote --recursive
+
         warning='SFML is required for LINK support, RHEL/EPEL does not currently have a MinGW SFML package, if you want LINK support you will need to install it manually'
     fi
 
@@ -951,6 +957,9 @@ EOF
         done
         [ $# -gt 0 ] && check $pacman --noconfirm --needed -S "$@"
 
+        # get the necessary win32 headers
+        git submodule update --init --remote --recursive
+
         warning 'SFML is required for LINK support, the SFML package in AUR is currently broken, if you want LINK support you will need to install it manually'
     fi
 
@@ -1071,9 +1080,10 @@ windows_installdeps() {
     done
 
     # install
-    check pacman --noconfirm --needed -S git make zip ccache "$@"
+    check pacman --noconfirm --needed -S git make zip "$@"
 
-    cmake_flags="$cmake_flags -G 'MSYS Makefiles'"
+    # get the necessary win32 headers
+    check git submodule update --init --remote --recursive
 
     if [ "$MSYSTEM" = MSYS ]; then
         case "$target" in
@@ -1180,7 +1190,7 @@ build_instructions() {
 [32mDone! To build do:[0m
 
 $pre_build
-mkdir -p build && cd build
+mkdir build && cd build
 $CMAKE .. $cmake_flags -G Ninja
 ninja
 $post_build
