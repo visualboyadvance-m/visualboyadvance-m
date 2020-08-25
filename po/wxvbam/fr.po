@@ -15,14 +15,15 @@
 # Nizar <nizar.doghri@gmail.com>, 2015
 # Nyu Nyu <Vba-m@filzmail.com>, 2016
 # Nyu Nyu <VBA-MFR@yopmail.com>, 2016-2019
+# Thibault <thibaultbruneliere@gmail.com>, 2020
 # x y <edgar_2008_04@yahoo.fr>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-08-17 17:30+0000\n"
-"PO-Revision-Date: 2020-08-17 18:34+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"PO-Revision-Date: 2020-08-23 12:39+0000\n"
+"Last-Translator: Thibault <thibaultbruneliere@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/bgk/vba-m/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1056,7 +1057,7 @@ msgstr ""
 
 #: panel.cpp:2313
 msgid "No VSYNC available on this platform"
-msgstr ""
+msgstr "Pas de VSYNC possible sur cette plateforme"
 
 #: panel.cpp:2409
 msgid "memory allocation error"
@@ -2216,11 +2217,11 @@ msgstr "Type de sauvegarde"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file :"
-msgstr ""
+msgstr "Fichier BIOS :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file :"
-msgstr ""
+msgstr "Fichier BIOS actuel:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:122 xrc/GameBoyConfig.xrc:138
 #: xrc/GameBoyConfig.xrc:159
@@ -2331,7 +2332,7 @@ msgstr ""
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
-msgstr ""
+msgstr "Sélectionnez un fichier"
 
 #: xrc/GameBoyConfig.xrc:106
 msgid "GBC Boot ROM &file :"
@@ -3024,7 +3025,7 @@ msgstr "&Conserver le rapport hauteur/largeur d'image"
 
 #: xrc/MainMenu.xrc:355
 msgid "Enable MMX"
-msgstr ""
+msgstr "Activer MMX"
 
 #: xrc/MainMenu.xrc:360
 msgid "&Bilinear filter"
@@ -3052,11 +3053,11 @@ msgstr "&Audio"
 
 #: xrc/MainMenu.xrc:394
 msgid "&Increase volume"
-msgstr ""
+msgstr "&Monter le volume"
 
 #: xrc/MainMenu.xrc:398
 msgid "&Decrease volume"
-msgstr ""
+msgstr "&Baisser le volume"
 
 #: xrc/MainMenu.xrc:402
 msgid "&Toggle sound"
@@ -3336,7 +3337,7 @@ msgstr "Traductions"
 
 #: xrc/MainMenu.xrc:730
 msgid "Check for updates"
-msgstr ""
+msgstr "Vérifier les mises à jour"
 
 #: xrc/MainMenu.xrc:733
 msgid "&Factory Reset..."
@@ -3344,7 +3345,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:737
 msgid "&About..."
-msgstr ""
+msgstr "&À propos"
 
 #: xrc/MapViewer.xrc:4
 msgid "Map Viewer"
@@ -3532,7 +3533,7 @@ msgstr "XAudio2"
 
 #: xrc/SoundConfig.xrc:132
 msgid "FAudio"
-msgstr ""
+msgstr "FAudio"
 
 #: xrc/SoundConfig.xrc:146
 msgid "Device"
@@ -3628,8 +3629,8 @@ msgstr ""
 
 #: xrc/UIConfig.xrc:4
 msgid "User Interface Settings"
-msgstr ""
+msgstr "Paramètres de l'interface utilisateur"
 
 #: xrc/UIConfig.xrc:9
 msgid "Hide Menu Bar"
-msgstr ""
+msgstr "Cacher la barre de menu"
