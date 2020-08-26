@@ -1,3 +1,7 @@
+if(POLICY CMP0012)
+    cmake_policy(SET CMP0012 NEW) # Saner if() behavior.
+endif()
+
 if(NOT DEFINED VCPKG_TARGET_TRIPLET)
     return()
 endif()
@@ -42,20 +46,14 @@ function(vcpkg_get_first_upgrade vcpkg_exe)
 
     string(REGEX REPLACE "\r?\n" ";" upgrade_lines "${upgradable}")
 
+    unset(first_upgrade)
+
     foreach(line ${upgrade_lines})
-        if(line MATCHES "^  [* ] ")
-            string(REGEX REPLACE "^  [* ] " "" pkg ${line})
+        if(line MATCHES "^  [* ] [^ ]*:")
+            string(REGEX REPLACE "^  [* ] ([^[]+).*" "\\1" pkg     ${line})
+            string(REGEX REPLACE "^[^:]+:(.+)$"      "\\1" triplet ${line})
 
-            # Check if package is up-to-date, but would be rebuilt due to other dependencies.
-            execute_process(
-                COMMAND ${vcpkg_exe} upgrade ${pkg}
-                OUTPUT_VARIABLE pkg_upgrade
-                OUTPUT_STRIP_TRAILING_WHITESPACE
-                ERROR_QUIET
-                WORKING_DIRECTORY ${VCPKG_ROOT}
-            )
-
-            if(NOT pkg_upgrade MATCHES up-to-date)
+            if(triplet STREQUAL "${VCPKG_TARGET_TRIPLET}")
                 # Prefer upgrading zlib before anything else.
                 if(NOT first_upgrade OR pkg MATCHES zlib)
                     set(first_upgrade ${pkg})
@@ -64,7 +62,9 @@ function(vcpkg_get_first_upgrade vcpkg_exe)
         endif()
     endforeach()
 
-    set(first_upgrade ${first_upgrade} PARENT_SCOPE)
+    if(DEFINED first_upgrade)
+        set(first_upgrade ${first_upgrade} PARENT_SCOPE)
+    endif()
 endfunction()
 
 function(vcpkg_deps_fixup vcpkg_exe)
@@ -80,10 +80,28 @@ function(vcpkg_deps_fixup vcpkg_exe)
     # If libvorbis is NOT installed but libogg is, remove libvorbis recursively.
     if(pkg_list MATCHES libogg AND (NOT pkg_list MATCHES libvorbis))
         execute_process(
-            COMMAND "${vcpkg_exe}" remove --recurse libogg:${VCPKG_TARGET_TRIPLET}
+            COMMAND ${vcpkg_exe} remove --recurse libogg:${VCPKG_TARGET_TRIPLET}
             WORKING_DIRECTORY ${VCPKG_ROOT}
         )
     endif()
+endfunction()
+
+function(vcpkg_remove_optional_deps vcpkg_exe)
+    list(LENGTH VCPKG_DEPS_OPTIONAL optionals_list_len)
+    math(EXPR optionals_list_last "${optionals_list_len} - 1")
+
+    unset(deps)
+
+    foreach(i RANGE 0 ${optionals_list_last} 2)
+        list(GET VCPKG_DEPS_OPTIONAL ${i} dep)
+
+        list(APPEND deps ${dep}:${VCPKG_TARGET_TRIPLET})
+    endforeach()
+
+    execute_process(
+        COMMAND ${vcpkg_exe} remove --recurse ${deps}
+        WORKING_DIRECTORY ${VCPKG_ROOT}
+    )
 endfunction()
 
 function(vcpkg_set_toolchain)
@@ -209,8 +227,8 @@ function(vcpkg_set_toolchain)
     vcpkg_seconds()
     set(began ${seconds})
 
-    # Limit total installation time to 30 minutes to not overrun CI time limit.
-    math(EXPR time_limit "${began} + (30 * 60)")
+    # Limit total installation time to 20 minutes to not overrun CI time limit.
+    math(EXPR time_limit "${began} + (20 * 60)")
 
     vcpkg_deps_fixup("${vcpkg_exe}")
 
@@ -219,6 +237,26 @@ function(vcpkg_set_toolchain)
         COMMAND ${vcpkg_exe} install ${VCPKG_DEPS_QUALIFIED}
         WORKING_DIRECTORY ${VCPKG_ROOT}
     )
+
+    # If ports have been updated, and there is time, rebuild cache one at a time to not overrun the CI time limit.
+    vcpkg_seconds()
+
+    if(seconds LESS time_limit)
+        vcpkg_get_first_upgrade(${vcpkg_exe})
+
+        if(DEFINED first_upgrade)
+            # If we have to upgrade zlib, remove optional deps first so that
+            # the build doesn't overrun the CI time limit.
+            if(first_upgrade STREQUAL "zlib")
+                vcpkg_remove_optional_deps(${vcpkg_exe})
+            endif()
+
+            execute_process(
+                COMMAND ${vcpkg_exe} upgrade --no-dry-run "${first_upgrade}:${VCPKG_TARGET_TRIPLET}"
+                WORKING_DIRECTORY ${VCPKG_ROOT}
+            )
+        endif()
+    endif()
 
     # Install optional deps, within time limit.
     list(LENGTH VCPKG_DEPS_OPTIONAL optionals_list_len)
@@ -234,7 +272,7 @@ function(vcpkg_set_toolchain)
 
         vcpkg_seconds()
 
-        if(seconds LESS time_limit AND (val OR val STREQUAL ""))
+        if("${val}" OR (seconds LESS time_limit AND ("${val}" OR "${val}" STREQUAL "")))
             set(dep_qualified "${dep}:${VCPKG_TARGET_TRIPLET}")
 
             execute_process(
@@ -247,20 +285,6 @@ function(vcpkg_set_toolchain)
             set(${var} OFF)
         endif()
     endforeach()
-
-    # If ports have been updated, and there is time, rebuild cache one at a time to not overrun the CI time limit.
-    vcpkg_seconds()
-
-    if(seconds LESS time_limit)
-        vcpkg_get_first_upgrade(${vcpkg_exe})
-
-        if(DEFINED first_upgrade)
-            execute_process(
-                COMMAND ${vcpkg_exe} upgrade --no-dry-run ${first_upgrade}
-                WORKING_DIRECTORY ${VCPKG_ROOT}
-            )
-        endif()
-    endif()
 
     if(WIN32 AND VCPKG_TARGET_TRIPLET MATCHES x64 AND CMAKE_GENERATOR MATCHES "Visual Studio")
         set(CMAKE_GENERATOR_PLATFORM x64 CACHE STRING "visual studio build architecture" FORCE)

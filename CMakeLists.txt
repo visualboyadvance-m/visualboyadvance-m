@@ -17,6 +17,14 @@ if(COMMAND cmake_policy)
     if(POLICY CMP0048)
         cmake_policy(SET CMP0048 NEW) # set CMAKE_PROJECT_VERSION*
     endif()
+
+    if(POLICY CMP0011)
+        cmake_policy(SET CMP0011 NEW) # Policy PUSH/POP for scripts.
+    endif()
+
+    if(POLICY CMP0012)
+        cmake_policy(SET CMP0012 NEW) # Saner if() behavior.
+    endif()
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
@@ -29,8 +37,12 @@ if(TAG_RELEASE)
     include(MakeReleaseCommitAndTag)
 endif()
 
-set(VCPKG_DEPS          zlib SDL2 SFML gettext wxWidgets)
-set(VCPKG_DEPS_OPTIONAL ffmpeg ENABLE_FFMPEG)
+set(VCPKG_DEPS          zlib SDL2 gettext wxWidgets)
+
+set(VCPKG_DEPS_OPTIONAL
+    SFML   ENABLE_LINK
+    ffmpeg ENABLE_FFMPEG
+)
 
 include(Set-Toolchain-vcpkg)
 
