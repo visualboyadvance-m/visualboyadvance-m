@@ -1,13 +1,4 @@
-src/wx/builtin-over.h
-src/wx/builtin-xrc.h
-src/wx/cmd-evtable.h
-src/wx/cmdhandlers.h
-src/wx/cmdtab.cpp
-src/wx/wxvbam.xrs
-*build*/*
-cmake-build*
-dependencies/*
-vcpkg/*
+/*build*/*
 .vs/*
 .idea
 *.o
