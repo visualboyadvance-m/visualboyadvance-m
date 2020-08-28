@@ -522,7 +522,7 @@ void wxvbamApp::OnInitCmdLine(wxCmdLineParser& cl)
         { wxCMD_LINE_SWITCH, t("f"), t("fullscreen"),
             N_("Start in full-screen mode"),
 	    wxCMD_LINE_VAL_NONE, 0 },
-        { wxCMD_LINE_OPTION, t("c"), NULL,
+        { wxCMD_LINE_OPTION, t("c"), t("config"),
             N_("Set a configuration file"),
         wxCMD_LINE_VAL_STRING, 0 },
 #if !defined(NO_LINK) && !defined(__WXMSW__)
