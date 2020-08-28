@@ -104,7 +104,7 @@ public:
     }
 
     // the main configuration
-    wxFileConfig* cfg;
+    wxFileConfig* cfg = nullptr;
     // vba-over.ini
     wxFileConfig* overrides = nullptr;
 
