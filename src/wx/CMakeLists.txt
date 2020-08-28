@@ -992,14 +992,14 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     endif()
 elseif(MSVC)
     # the debug lib libcmtd is linked in debug mode, so don't link the normal version
-    # also make the app a console app in debug mode
     set_target_properties(visualboyadvance-m PROPERTIES LINK_FLAGS_DEBUG "/nodefaultlib:libcmt /subsystem:console")
-
-    if(CMAKE_BUILD_TYPE MATCHES Debug)
-        # to get the debug console mode app to work correctly
-        target_compile_definitions(visualboyadvance-m PRIVATE -DWIN32_CONSOLE_APP)
-    endif()
 endif()
+
+# Make the app a console app in debug mode to get log messages.
+if(WIN32 AND CMAKE_BUILD_TYPE MATCHES Debug)
+    target_compile_definitions(visualboyadvance-m PRIVATE -DWIN32_CONSOLE_APP)
+endif()
+
 
 if(NOT WIN32 AND NOT APPLE)
     install(FILES     ${CMAKE_CURRENT_SOURCE_DIR}/visualboyadvance-m.desktop     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
