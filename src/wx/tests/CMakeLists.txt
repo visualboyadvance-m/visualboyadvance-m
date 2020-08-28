@@ -1,8 +1,8 @@
-include(Catch)
+include(doctest)
 
-include_directories("${CMAKE_SOURCE_DIR}/third_party/include/catch2")
+include_directories("${CMAKE_SOURCE_DIR}/third_party/include/doctest")
 
-function(add_catch2_test test_src)
+function(add_doctest_test test_src)
     string(REGEX REPLACE ".cpp$" "" test_name "${test_src}")
 
     add_executable("${test_name}" "${ARGV}")
@@ -16,7 +16,7 @@ function(add_catch2_test test_src)
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests"
     )
 
-    catch_discover_tests("${test_name}")
+    doctest_discover_tests("${test_name}")
 endfunction()
 
-add_catch2_test(strutils.cpp ../strutils.h ../strutils.cpp)
+add_doctest_test(strutils.cpp ../strutils.h ../strutils.cpp)

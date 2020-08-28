@@ -28,17 +28,17 @@ if(NOT EXISTS "${TEST_EXECUTABLE}")
     "Specified test executable '${TEST_EXECUTABLE}' does not exist"
   )
 endif()
+
+if("${spec}" MATCHES .)
+  set(spec "--test-case=${spec}")
+endif()
+
 execute_process(
-  COMMAND ${TEST_EXECUTOR} "${TEST_EXECUTABLE}" ${spec} --list-test-names-only
+  COMMAND ${TEST_EXECUTOR} "${TEST_EXECUTABLE}" ${spec} --list-test-cases
   OUTPUT_VARIABLE output
   RESULT_VARIABLE result
 )
-# Catch --list-test-names-only reports the number of tests, so 0 is... surprising
-if(${result} EQUAL 0)
-  message(WARNING
-    "Test executable '${TEST_EXECUTABLE}' contains no tests!\n"
-  )
-elseif(${result} LESS 0)
+if(NOT ${result} EQUAL 0)
   message(FATAL_ERROR
     "Error running test executable '${TEST_EXECUTABLE}':\n"
     "  Result: ${result}\n"
@@ -50,18 +50,18 @@ string(REPLACE "\n" ";" output "${output}")
 
 # Parse output
 foreach(line ${output})
+  if("${line}" STREQUAL "===============================================================================" OR "${line}" MATCHES [==[^\[doctest\] ]==])
+    continue()
+  endif()
   set(test ${line})
-  # Escape characters in test case names that would be parsed by Catch2
-  set(test_name ${test})
-  foreach(char , [ ])
-    string(REPLACE ${char} "\\${char}" test_name ${test_name})
-  endforeach(char)
+  # use escape commas to handle properly test cases with commas inside the name
+  string(REPLACE "," "\\," test_name ${test})
   # ...and add to script
   add_command(add_test
     "${prefix}${test}${suffix}"
     ${TEST_EXECUTOR}
     "${TEST_EXECUTABLE}"
-    "${test_name}"
+    "--test-case=${test_name}"
     ${extra_args}
   )
   add_command(set_tests_properties

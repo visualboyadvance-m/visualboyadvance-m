@@ -1,8 +1,8 @@
-#define CATCH_CONFIG_MAIN
 #include "strutils.h"
-#include "catch.hpp"
 
-TEST_CASE("str_split() basic test", "[str_split]") {
+#include "tests.hpp"
+
+TEST_CASE("str_split() basic test") {
     wxString foo = "foo|bar|baz";
 
     auto vec = str_split(foo, '|');
@@ -14,7 +14,7 @@ TEST_CASE("str_split() basic test", "[str_split]") {
     REQUIRE(vec[2] == "baz");
 }
 
-TEST_CASE("str_split() multi-char separator", "[str_split]") {
+TEST_CASE("str_split() multi-char separator") {
     wxString foo = "foo|-|bar|-|baz";
 
     auto vec = str_split(foo, "|-|");
@@ -26,7 +26,7 @@ TEST_CASE("str_split() multi-char separator", "[str_split]") {
     REQUIRE(vec[2] == "baz");
 }
 
-TEST_CASE("str_split() skips empty tokens", "[str_split]") {
+TEST_CASE("str_split() skips empty tokens") {
     wxString foo = "|-|foo|-||-|bar|-|baz|-|";
 
     auto vec = str_split(foo, "|-|");
@@ -38,7 +38,7 @@ TEST_CASE("str_split() skips empty tokens", "[str_split]") {
     REQUIRE(vec[2] == "baz");
 }
 
-TEST_CASE("str_split() empty input", "[str_split]") {
+TEST_CASE("str_split() empty input") {
     wxString foo;
 
     auto vec = str_split(foo, "|-|");
@@ -46,7 +46,7 @@ TEST_CASE("str_split() empty input", "[str_split]") {
     REQUIRE(vec.size() == 0);
 }
 
-TEST_CASE("str_split() no tokens, just separators", "[str_split]") {
+TEST_CASE("str_split() no tokens, just separators") {
     wxString foo = "|-||-||-||-||-|";
 
     auto vec = str_split(foo, "|-|");
@@ -54,7 +54,7 @@ TEST_CASE("str_split() no tokens, just separators", "[str_split]") {
     REQUIRE(vec.size() == 0);
 }
 
-TEST_CASE("str_split_with_sep() basic test", "[str_split_with_sep]") {
+TEST_CASE("str_split_with_sep() basic test") {
     wxString foo = "foo|bar|baz|";
 
     auto vec = str_split_with_sep(foo, '|');
@@ -67,7 +67,7 @@ TEST_CASE("str_split_with_sep() basic test", "[str_split_with_sep]") {
     REQUIRE(vec[3] == "|");
 }
 
-TEST_CASE("str_split_with_sep() multi-char sep", "[str_split_with_sep]") {
+TEST_CASE("str_split_with_sep() multi-char sep") {
     wxString foo = "foo|-|bar|-|baz|-|";
 
     auto vec = str_split_with_sep(foo, "|-|");
@@ -80,7 +80,7 @@ TEST_CASE("str_split_with_sep() multi-char sep", "[str_split_with_sep]") {
     REQUIRE(vec[3] == "|-|");
 }
 
-TEST_CASE("str_split_with_sep() multiple sep tokens", "[str_split_with_sep]") {
+TEST_CASE("str_split_with_sep() multiple sep tokens") {
     wxString foo = "|-|foo|-||-|bar|-|baz|-|";
 
     auto vec = str_split_with_sep(foo, "|-|");
