@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-17 17:30+0000\n"
+"POT-Creation-Date: 2020-08-27 19:38-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,47 +21,51 @@ msgstr ""
 msgid "visualboyadvance-m"
 msgstr ""
 
-#: wxvbam.cpp:440
+#: wxvbam.cpp:443
 msgid "Could not create main window"
 msgstr ""
 
-#: wxvbam.cpp:511
+#: wxvbam.cpp:514
 msgid "Save built-in XRC file and exit"
 msgstr ""
 
-#: wxvbam.cpp:514
+#: wxvbam.cpp:517
 msgid "Save built-in vba-over.ini and exit"
 msgstr ""
 
-#: wxvbam.cpp:517
+#: wxvbam.cpp:520
 msgid "Print configuration path and exit"
 msgstr ""
 
-#: wxvbam.cpp:520
+#: wxvbam.cpp:523
 msgid "Start in full-screen mode"
 msgstr ""
 
-#: wxvbam.cpp:524
+#: wxvbam.cpp:526
+msgid "Set a configuration file"
+msgstr ""
+
+#: wxvbam.cpp:530
 msgid "Delete shared link state first, if it exists"
 msgstr ""
 
-#: wxvbam.cpp:531
+#: wxvbam.cpp:537
 msgid "List all settable options and exit"
 msgstr ""
 
-#: wxvbam.cpp:534
+#: wxvbam.cpp:540
 msgid "ROM file"
 msgstr ""
 
-#: wxvbam.cpp:536
+#: wxvbam.cpp:542
 msgid "<config>=<value>"
 msgstr ""
 
-#: wxvbam.cpp:567
+#: wxvbam.cpp:573
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr ""
 
-#: wxvbam.cpp:575
+#: wxvbam.cpp:581
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
@@ -70,11 +74,11 @@ msgid ""
 "built-in:"
 msgstr ""
 
-#: wxvbam.cpp:590
+#: wxvbam.cpp:596
 msgid "Configuration is read from, in order:"
 msgstr ""
 
-#: wxvbam.cpp:604
+#: wxvbam.cpp:610
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
@@ -82,13 +86,13 @@ msgid ""
 "from search path:"
 msgstr ""
 
-#: wxvbam.cpp:610
+#: wxvbam.cpp:616
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr ""
 
-#: wxvbam.cpp:621
+#: wxvbam.cpp:627
 msgid ""
 "Options set from the command line are saved if any configuration changes are "
 "made in the user interface.\n"
@@ -97,13 +101,17 @@ msgid ""
 "\n"
 msgstr ""
 
-#: wxvbam.cpp:642
+#: wxvbam.cpp:648
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr ""
 
-#: wxvbam.cpp:676
+#: wxvbam.cpp:660
+msgid "Configuration file not found."
+msgstr ""
+
+#: wxvbam.cpp:693
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr ""
 
@@ -155,7 +163,7 @@ msgstr ""
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr ""
 
-#: guiinit.cpp:256 panel.cpp:427
+#: guiinit.cpp:256 panel.cpp:436
 msgid "Loaded cheats"
 msgstr ""
 
@@ -611,7 +619,7 @@ msgstr ""
 msgid "Confirm import"
 msgstr ""
 
-#: cmdevents.cpp:907 panel.cpp:370
+#: cmdevents.cpp:907 panel.cpp:379
 #, c-format
 msgid "Loaded battery %s"
 msgstr ""
@@ -694,7 +702,7 @@ msgstr ""
 msgid "Wrote battery %s"
 msgstr ""
 
-#: cmdevents.cpp:1100 panel.cpp:677
+#: cmdevents.cpp:1100 panel.cpp:686
 #, c-format
 msgid "Error writing battery %s"
 msgstr ""
@@ -800,22 +808,22 @@ msgstr ""
 msgid "Using interframe blending #%d"
 msgstr ""
 
-#: cmdevents.cpp:2690 panel.cpp:183 panel.cpp:286
+#: cmdevents.cpp:2690 panel.cpp:192 panel.cpp:295
 msgid "Could not initialize the sound driver!"
 msgstr ""
 
-#: cmdevents.cpp:2780
+#: cmdevents.cpp:2794
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr ""
 
-#: cmdevents.cpp:2781
+#: cmdevents.cpp:2795
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr ""
 
-#: cmdevents.cpp:2782
+#: cmdevents.cpp:2796
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -831,11 +839,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr ""
 
-#: cmdevents.cpp:3087
+#: cmdevents.cpp:3101
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr ""
 
-#: cmdevents.cpp:3093
+#: cmdevents.cpp:3107
 msgid "Network is not supported in local mode."
 msgstr ""
 
@@ -939,155 +947,155 @@ msgstr ""
 msgid "Error setting up server socket (%d)"
 msgstr ""
 
-#: panel.cpp:97
+#: panel.cpp:106
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr ""
 
-#: panel.cpp:98 panel.cpp:159 panel.cpp:224
+#: panel.cpp:107 panel.cpp:168 panel.cpp:233
 msgid "Problem loading file"
 msgstr ""
 
-#: panel.cpp:158
+#: panel.cpp:167
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr ""
 
-#: panel.cpp:200 panel.cpp:300
+#: panel.cpp:209 panel.cpp:309
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr ""
 
-#: panel.cpp:223
+#: panel.cpp:232
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr ""
 
-#: panel.cpp:459
+#: panel.cpp:468
 msgid " player "
 msgstr ""
 
-#: panel.cpp:625
+#: panel.cpp:634
 #, c-format
 msgid "Loaded state %s"
 msgstr ""
 
-#: panel.cpp:625
+#: panel.cpp:634
 #, c-format
 msgid "Error loading state %s"
 msgstr ""
 
-#: panel.cpp:649
+#: panel.cpp:658
 #, c-format
 msgid "Saved state %s"
 msgstr ""
 
-#: panel.cpp:649
+#: panel.cpp:658
 #, c-format
 msgid "Error saving state %s"
 msgstr ""
 
-#: panel.cpp:853
+#: panel.cpp:862
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr ""
 
-#: panel.cpp:891
+#: panel.cpp:900
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr ""
 
-#: panel.cpp:896
+#: panel.cpp:905
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr ""
 
-#: panel.cpp:904
+#: panel.cpp:913
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr ""
 
-#: panel.cpp:908
+#: panel.cpp:917
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr ""
 
-#: panel.cpp:992
+#: panel.cpp:1001
 msgid "Not a valid GBA cartridge"
 msgstr ""
 
-#: panel.cpp:1152
+#: panel.cpp:1161
 msgid "No memory for rewinding"
 msgstr ""
 
-#: panel.cpp:1162
+#: panel.cpp:1171
 msgid "Error writing rewind state"
 msgstr ""
 
-#: panel.cpp:2271
+#: panel.cpp:2272
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2280
+#: panel.cpp:2281
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:2289
+#: panel.cpp:2290
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:2295
+#: panel.cpp:2296
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr ""
 
-#: panel.cpp:2298
+#: panel.cpp:2299
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:2307
+#: panel.cpp:2308
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2313
+#: panel.cpp:2314
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:2409
+#: panel.cpp:2410
 msgid "memory allocation error"
 msgstr ""
 
-#: panel.cpp:2412
+#: panel.cpp:2413
 msgid "error initializing codec"
 msgstr ""
 
-#: panel.cpp:2415
+#: panel.cpp:2416
 msgid "error writing to output file"
 msgstr ""
 
-#: panel.cpp:2418
+#: panel.cpp:2419
 msgid "can't guess output format from file name"
 msgstr ""
 
-#: panel.cpp:2423
+#: panel.cpp:2424
 msgid "programming error; aborting!"
 msgstr ""
 
-#: panel.cpp:2435 panel.cpp:2464
+#: panel.cpp:2436 panel.cpp:2465
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr ""
 
-#: panel.cpp:2492
+#: panel.cpp:2493
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr ""
 
-#: panel.cpp:2498
+#: panel.cpp:2499
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr ""
 
-#: panel.cpp:2508
+#: panel.cpp:2509
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr ""
