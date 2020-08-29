@@ -10,8 +10,8 @@ matrix:
     include:
         - env: BUILD_ENV=ubuntu-bionic XVFB_RUN=1
           dist: bionic
-        - env: BUILD_ENV=utf8 XVFB_RUN=1
-          dist: bionic
+#        - env: BUILD_ENV=utf8 XVFB_RUN=1
+#          dist: bionic
         - env: BUILD_ENV=nostl XVFB_RUN=1
           dist: bionic
         - env: BUILD_ENV=ubuntu-trusty XVFB_RUN=1
