@@ -963,6 +963,23 @@ bool MainFrame::IsJoyPollTimerRunning()
     return jpoll->IsRunning();
 }
 
+wxEvtHandler* MainFrame::GetJoyEventHandler()
+{
+    auto focused_window = wxWindow::FindFocus();
+
+    if (focused_window)
+        return focused_window;
+
+    auto panel = GetPanel();
+    if (!panel)
+        return nullptr;
+
+    if (allowJoystickBackgroundInput)
+        return panel->GetEventHandler();
+
+    return nullptr;
+}
+
 void MainFrame::enable_menus()
 {
     for (int i = 0; i < ncmds; i++)
