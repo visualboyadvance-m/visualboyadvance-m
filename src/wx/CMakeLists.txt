@@ -573,46 +573,46 @@ endif()
 
 set(
     XRC_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/AccelConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CheatAdd.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CheatCreate.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CheatEdit.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CheatList.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/CodeSelect.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/DirectoriesConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/Disassemble.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/DisplayConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/ExportSPS.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBAROMInfo.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBColorPrefPanel.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBDisassemble.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBMapViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBOAMViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBPaletteViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBPrinter.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBROMInfo.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GBTileViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GameBoyAdvanceConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GameBoyConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/GeneralConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/IOViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/JoyPanel.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/JoypadConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/LinkConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/Logging.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MainFrame.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MainIcon.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MainMenu.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MapViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MemSelRegion.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/MemViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/NetLink.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/OAMViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/PaletteViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/SoundConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/TileViewer.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/SpeedupConfig.xrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/xrc/UIConfig.xrc
+    xrc/AccelConfig.xrc
+    xrc/CheatAdd.xrc
+    xrc/CheatCreate.xrc
+    xrc/CheatEdit.xrc
+    xrc/CheatList.xrc
+    xrc/CodeSelect.xrc
+    xrc/DirectoriesConfig.xrc
+    xrc/Disassemble.xrc
+    xrc/DisplayConfig.xrc
+    xrc/ExportSPS.xrc
+    xrc/GBAROMInfo.xrc
+    xrc/GBColorPrefPanel.xrc
+    xrc/GBDisassemble.xrc
+    xrc/GBMapViewer.xrc
+    xrc/GBOAMViewer.xrc
+    xrc/GBPaletteViewer.xrc
+    xrc/GBPrinter.xrc
+    xrc/GBROMInfo.xrc
+    xrc/GBTileViewer.xrc
+    xrc/GameBoyAdvanceConfig.xrc
+    xrc/GameBoyConfig.xrc
+    xrc/GeneralConfig.xrc
+    xrc/IOViewer.xrc
+    xrc/JoyPanel.xrc
+    xrc/JoypadConfig.xrc
+    xrc/LinkConfig.xrc
+    xrc/Logging.xrc
+    xrc/MainFrame.xrc
+    xrc/MainIcon.xrc
+    xrc/MainMenu.xrc
+    xrc/MapViewer.xrc
+    xrc/MemSelRegion.xrc
+    xrc/MemViewer.xrc
+    xrc/NetLink.xrc
+    xrc/OAMViewer.xrc
+    xrc/PaletteViewer.xrc
+    xrc/SoundConfig.xrc
+    xrc/TileViewer.xrc
+    xrc/SpeedupConfig.xrc
+    xrc/UIConfig.xrc
 )
 
 # wxrc does not support xrs files in -c output (> 10x compression)
@@ -683,7 +683,7 @@ endif()
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/wxvbam.xrs
     COMMAND ${CMAKE_COMMAND} -E env "PATH=$ENV{PATH}" ${WXRC} ${XRC_SOURCES} -o ${CMAKE_CURRENT_BINARY_DIR}/wxvbam.xrs
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS ${XRC_SOURCES}
 )
 
@@ -1029,7 +1029,7 @@ if(ENABLE_NLS)
     add_custom_command(
         OUTPUT ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
         COMMAND ${CMAKE_COMMAND} -E env "PATH=$ENV{PATH}" ${WXRC} -g ${XRC_SOURCES} -o ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         DEPENDS ${XRC_SOURCES}
     )
 
