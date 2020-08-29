@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-17 17:30+0000\n"
-"PO-Revision-Date: 2020-08-17 22:23+0000\n"
-"Last-Translator: Model T800\n"
+"POT-Creation-Date: 2020-08-29 20:11+0000\n"
+"PO-Revision-Date: 2020-08-29 21:22+0000\n"
+"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: Hungarian (Hungary) (http://www.transifex.com/bgk/vba-m/language/hu_HU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,71 +24,75 @@ msgstr ""
 msgid "visualboyadvance-m"
 msgstr "visualboyadvance-m"
 
-#: wxvbam.cpp:440
+#: wxvbam.cpp:443
 msgid "Could not create main window"
 msgstr "A főablak nem nyitható meg"
 
-#: wxvbam.cpp:511
+#: wxvbam.cpp:514
 msgid "Save built-in XRC file and exit"
 msgstr "Beépített XRC fájl mentése és kilépés"
 
-#: wxvbam.cpp:514
+#: wxvbam.cpp:517
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Beépített vba-over.ini mentése és kilépés"
 
-#: wxvbam.cpp:517
+#: wxvbam.cpp:520
 msgid "Print configuration path and exit"
 msgstr "Konfigurációs útvonal kiírása és kilépés"
 
-#: wxvbam.cpp:520
+#: wxvbam.cpp:523
 msgid "Start in full-screen mode"
 msgstr "Indítás teljesképernyős módban"
 
-#: wxvbam.cpp:524
+#: wxvbam.cpp:526
+msgid "Set a configuration file"
+msgstr ""
+
+#: wxvbam.cpp:530
 msgid "Delete shared link state first, if it exists"
 msgstr "Megosztott hivatkozás állapotának törlése elsőként, ha létezik"
 
-#: wxvbam.cpp:531
+#: wxvbam.cpp:537
 msgid "List all settable options and exit"
 msgstr "Összes beállítható elem listázása, majd kilépés"
 
-#: wxvbam.cpp:534
+#: wxvbam.cpp:540
 msgid "ROM file"
 msgstr "ROM fájl"
 
-#: wxvbam.cpp:536
+#: wxvbam.cpp:542
 msgid "<config>=<value>"
 msgstr "<elem>=<érték>"
 
-#: wxvbam.cpp:567
+#: wxvbam.cpp:573
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr "Konfiguráció/felépítés hiba: nem található beépített xrc"
 
-#: wxvbam.cpp:575
+#: wxvbam.cpp:581
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "A beépített konfiguráció elmentve ide: %s.\nFelülbíráláshoz törölj mindent a módosított főelem(ek)en kívül.  A következő keresési útvonalon lévő bármely .xrc vagy .xrs fájlban található megfelelő nevű főelem, felülírja a beépítettet:"
 
-#: wxvbam.cpp:590
+#: wxvbam.cpp:596
 msgid "Configuration is read from, in order:"
 msgstr "Kiolvasási sorrendben, a konfiguráció a következő:"
 
-#: wxvbam.cpp:604
+#: wxvbam.cpp:610
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
 msgstr "A beépített felülbírálási fájl elmentve ide: %s\nFelülíráshoz törölj mindent a módosított szakaszon kívül. A következő keresési útvonal első fellelt szakasza lesz használva:"
 
-#: wxvbam.cpp:610
+#: wxvbam.cpp:616
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tbeépített"
 
-#: wxvbam.cpp:621
+#: wxvbam.cpp:627
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -96,251 +100,255 @@ msgid ""
 "\n"
 msgstr "A parancssorból kezdeményezett beállítási módosítások akkor kerülnek mentésre, ha a felhasználói felületről is változtatás történik.\n\nFájljelölő beállításoknál, a TRUE és FALSE, 1 és 0-ként lesz meghatározva.\n\n"
 
-#: wxvbam.cpp:642
+#: wxvbam.cpp:648
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "A billentyűzethez rendelkezésre álló parancsok:\n\n"
 
-#: wxvbam.cpp:676
+#: wxvbam.cpp:660
+msgid "Configuration file not found."
+msgstr ""
+
+#: wxvbam.cpp:693
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Hibás konfigurációs beállítás, vagy több ROM fájl lett megadva:\n"
 
-#: guiinit.cpp:77
+#: guiinit.cpp:81
 msgid "Start!"
 msgstr "Kezdés!"
 
-#: guiinit.cpp:96 xrc/NetLink.xrc:99
+#: guiinit.cpp:100 xrc/NetLink.xrc:99
 msgid "Connect"
 msgstr "Csatlakozás"
 
-#: guiinit.cpp:113
+#: guiinit.cpp:117
 msgid "You must enter a valid host name"
 msgstr "Adj meg egy létező gazda nevet"
 
-#: guiinit.cpp:114
+#: guiinit.cpp:118
 msgid "Host name invalid"
 msgstr "A gazdanév nem létezik"
 
-#: guiinit.cpp:132
+#: guiinit.cpp:136
 msgid "Waiting for clients..."
 msgstr "Várakozás kliensekre..."
 
-#: guiinit.cpp:133
+#: guiinit.cpp:137
 #, c-format
 msgid "Server IP address is: %s\n"
 msgstr "A szerver IP címe: %s\n"
 
-#: guiinit.cpp:135
+#: guiinit.cpp:139
 msgid "Waiting for connection..."
 msgstr "Várakozás kapcsolódásra..."
 
-#: guiinit.cpp:136
+#: guiinit.cpp:140
 #, c-format
 msgid "Connecting to %s\n"
 msgstr "Kapcsolódás ehhez: %s\n"
 
-#: guiinit.cpp:169
+#: guiinit.cpp:173
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr "Hiba történt.\nPróbáld újra."
 
-#: guiinit.cpp:236 guiinit.cpp:289
+#: guiinit.cpp:240 guiinit.cpp:293
 msgid "Select cheat file"
 msgstr "Válassz csalás fájlt"
 
-#: guiinit.cpp:237
+#: guiinit.cpp:241
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA csaláslista (*.clt)|*.clt|CHT csaláslista (*.cht)|*.cht"
 
-#: guiinit.cpp:256 panel.cpp:427
+#: guiinit.cpp:260 panel.cpp:436
 msgid "Loaded cheats"
 msgstr "Betöltött csalások"
 
-#: guiinit.cpp:290
+#: guiinit.cpp:294
 msgid "VBA cheat lists (*.clt)|*.clt"
 msgstr "VBA csaláslista (*.clt)|*.clt"
 
-#: guiinit.cpp:308
+#: guiinit.cpp:312
 msgid "Saved cheats"
 msgstr "Mentett csalások"
 
-#: guiinit.cpp:339 guiinit.cpp:358
+#: guiinit.cpp:343 guiinit.cpp:362
 msgid "Restore old values?"
 msgstr "Visszaállítod a régi értékeket?"
 
-#: guiinit.cpp:340 guiinit.cpp:359
+#: guiinit.cpp:344 guiinit.cpp:363
 msgid "Removing cheats"
 msgstr "Csalások eltávolítása"
 
-#: guiinit.cpp:750 xrc/JoyPanel.xrc:364
+#: guiinit.cpp:754 xrc/JoyPanel.xrc:364
 msgid "GameShark"
 msgstr "GameShark"
 
-#: guiinit.cpp:751 cmdevents.cpp:676
+#: guiinit.cpp:755 cmdevents.cpp:676
 msgid "GameGenie"
 msgstr "GameGenie"
 
-#: guiinit.cpp:753
+#: guiinit.cpp:757
 msgid "Generic Code"
 msgstr "Általános Kód"
 
-#: guiinit.cpp:754
+#: guiinit.cpp:758
 msgid "GameShark Advance"
 msgstr "GameShark Advance"
 
-#: guiinit.cpp:755
+#: guiinit.cpp:759
 msgid "CodeBreaker Advance"
 msgstr "CodeBreaker Advance"
 
-#: guiinit.cpp:756
+#: guiinit.cpp:760
 msgid "Flashcart CHT"
 msgstr "Flashcart CHT"
 
-#: guiinit.cpp:824 guiinit.cpp:1079
+#: guiinit.cpp:828 guiinit.cpp:1083
 msgid "Number cannot be empty"
 msgstr "A szám mező nem lehet üres"
 
-#: guiinit.cpp:862
+#: guiinit.cpp:866
 #, c-format
 msgid "Search produced %d results.  Please refine better"
 msgstr "A keresés %d találatot eredményezett, így finomításra szorul"
 
-#: guiinit.cpp:874
+#: guiinit.cpp:878
 msgid "Search produced no results"
 msgstr "A keresés nem járt eredménnyel"
 
-#: guiinit.cpp:1037
+#: guiinit.cpp:1041
 msgid "8-bit "
 msgstr "8-bit "
 
-#: guiinit.cpp:1041
+#: guiinit.cpp:1045
 msgid "16-bit "
 msgstr "16-bit "
 
-#: guiinit.cpp:1045
+#: guiinit.cpp:1049
 msgid "32-bit "
 msgstr "32-bit "
 
-#: guiinit.cpp:1051
+#: guiinit.cpp:1055
 msgid "signed decimal"
 msgstr "előjeles decimális"
 
-#: guiinit.cpp:1055
+#: guiinit.cpp:1059
 msgid "unsigned decimal"
 msgstr "előjel nélküli decimális"
 
-#: guiinit.cpp:1059
+#: guiinit.cpp:1063
 msgid "unsigned hexadecimal"
 msgstr "előjel nélküli hexadecimális"
 
-#: guiinit.cpp:1537
+#: guiinit.cpp:1541
 #, c-format
 msgid "%d frames = %.2f ms"
 msgstr "%d képkocka = %.2f ms"
 
-#: guiinit.cpp:1549
+#: guiinit.cpp:1553
 msgid "Default device"
 msgstr "Alapértelmezett eszköz"
 
-#: guiinit.cpp:1723
+#: guiinit.cpp:1727
 msgid "Desktop mode"
 msgstr "Asztali mód"
 
-#: guiinit.cpp:1730
+#: guiinit.cpp:1734
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: guiinit.cpp:1843 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
+#: guiinit.cpp:1847 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
 msgid "None"
 msgstr "Nincs"
 
-#: guiinit.cpp:1884
+#: guiinit.cpp:1888
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "A %s helyen nincs használható RPI bővítmény"
 
-#: guiinit.cpp:1904 xrc/DisplayConfig.xrc:107
+#: guiinit.cpp:1908 xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "Bővítmény"
 
-#: guiinit.cpp:1932
+#: guiinit.cpp:1936
 msgid "Please select a plugin or a different filter"
 msgstr "Válassz bővítményt, vagy másféle szűrőt"
 
-#: guiinit.cpp:1933
+#: guiinit.cpp:1937
 msgid "Plugin selection error"
 msgstr "Hiba a bővítmény választásnál"
 
-#: guiinit.cpp:2146
+#: guiinit.cpp:2150
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr "Ez eltávolít minden felhasználói gyorsítót. Biztosan vagy benne?"
 
-#: guiinit.cpp:2146
+#: guiinit.cpp:2150
 msgid "Confirm"
 msgstr "Megerősít"
 
-#: guiinit.cpp:2734
+#: guiinit.cpp:2738
 msgid "Main icon not found"
 msgstr "A főikon nem található"
 
-#: guiinit.cpp:2744
+#: guiinit.cpp:2748
 msgid "Browse"
 msgstr "Tallózás"
 
-#: guiinit.cpp:2758
+#: guiinit.cpp:2762
 msgid "Main display panel not found"
 msgstr "A főkijelző nem található"
 
-#: guiinit.cpp:2907
+#: guiinit.cpp:2927
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "A %s menü-gyorsgomb duplán csatolt: %s és %s; az első lesz megtartva"
 
-#: guiinit.cpp:2921
+#: guiinit.cpp:2941
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "A %s menü-gyorsgomb ehhez: %s, felülírja az eredetit ehhez: %s ; menü megtartása"
 
-#: guiinit.cpp:3059
+#: guiinit.cpp:3079
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "A %s érvénytelen menüelem; eltávolítás"
 
-#: guiinit.cpp:3267
+#: guiinit.cpp:3287
 msgid "Code"
 msgstr "Kód"
 
-#: guiinit.cpp:3276
+#: guiinit.cpp:3296
 msgid "Description"
 msgstr "Leírás"
 
-#: guiinit.cpp:3350 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3370 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Cím"
 
-#: guiinit.cpp:3351
+#: guiinit.cpp:3371
 msgid "Old Value"
 msgstr "Régi Érték"
 
-#: guiinit.cpp:3352
+#: guiinit.cpp:3372
 msgid "New Value"
 msgstr "Új Érték"
 
-#: guiinit.cpp:3873
+#: guiinit.cpp:3893
 msgid "Menu commands"
 msgstr "Menü parancsok"
 
-#: guiinit.cpp:3896
+#: guiinit.cpp:3916
 msgid "Other commands"
 msgstr "Egyéb parancsok"
 
-#: guiinit.cpp:4007
+#: guiinit.cpp:4027
 msgid "JoyBus host invalid; disabling"
 msgstr "A JoyBus gazda érvénytelen; letiltás"
 
@@ -607,7 +615,7 @@ msgstr "Egy battery fájl importálása töröl minden játékállás mentést (
 msgid "Confirm import"
 msgstr "Importálás megerősítése"
 
-#: cmdevents.cpp:907 panel.cpp:370
+#: cmdevents.cpp:907 panel.cpp:379
 #, c-format
 msgid "Loaded battery %s"
 msgstr "%s battery betöltve"
@@ -690,7 +698,7 @@ msgstr "A %s pillanatkép fájl betöltése sikertelen"
 msgid "Wrote battery %s"
 msgstr "%s battery megírva"
 
-#: cmdevents.cpp:1100 panel.cpp:677
+#: cmdevents.cpp:1100 panel.cpp:687
 #, c-format
 msgid "Error writing battery %s"
 msgstr "A %s battery írása sikertelen"
@@ -734,84 +742,84 @@ msgstr "VBA Mozgókép fájlok|*.vmv"
 msgid "Select file"
 msgstr "Válassz fájlt"
 
-#: cmdevents.cpp:1639 cmdevents.cpp:1732
+#: cmdevents.cpp:1669 cmdevents.cpp:1762
 msgid "Select state file"
 msgstr "Válassz mentett játékállást"
 
-#: cmdevents.cpp:1640 cmdevents.cpp:1733
+#: cmdevents.cpp:1670 cmdevents.cpp:1763
 msgid "VisualBoyAdvance saved game files|*.sgm"
 msgstr "VisualBoyAdvance játékmentés fájlok|*.sgm"
 
-#: cmdevents.cpp:1763 cmdevents.cpp:1773 cmdevents.cpp:1784
+#: cmdevents.cpp:1793 cmdevents.cpp:1803 cmdevents.cpp:1814
 #, c-format
 msgid "Current state slot #%d"
 msgstr "#%d Játékállás hely"
 
-#: cmdevents.cpp:2053
+#: cmdevents.cpp:2083
 msgid "Sound enabled"
 msgstr "Hang bekapcsolva"
 
-#: cmdevents.cpp:2053
+#: cmdevents.cpp:2083
 msgid "Sound disabled"
 msgstr "Hang kikapcsolva"
 
-#: cmdevents.cpp:2066 cmdevents.cpp:2080
+#: cmdevents.cpp:2096 cmdevents.cpp:2110
 #, c-format
 msgid "Volume: %d%%"
 msgstr "Hangerő: %d%%"
 
-#: cmdevents.cpp:2155
+#: cmdevents.cpp:2185
 msgid "Set to 0 for pseudo tty"
 msgstr "Ál-TTY-hez állítsd 0-ra"
 
-#: cmdevents.cpp:2157
+#: cmdevents.cpp:2187
 msgid "Port to wait for connection:"
 msgstr "Kapcsolatokhoz figyelt port:"
 
-#: cmdevents.cpp:2158
+#: cmdevents.cpp:2188
 msgid "GDB Connection"
 msgstr "GDB Kapcsolat"
 
-#: cmdevents.cpp:2211
+#: cmdevents.cpp:2241
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "Várakozás a kapcsolódásra itt: %s"
 
-#: cmdevents.cpp:2218
+#: cmdevents.cpp:2248
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "Kapcsolódás kezdeményezése a %d porton"
 
-#: cmdevents.cpp:2221
+#: cmdevents.cpp:2251
 msgid "Waiting for GDB..."
 msgstr "Várakozás a GDB-re"
 
-#: cmdevents.cpp:2636
+#: cmdevents.cpp:2666
 #, c-format
 msgid "Using pixel filter #%d"
 msgstr "Alkalmazott pixelszűrő:  #%d"
 
-#: cmdevents.cpp:2651
+#: cmdevents.cpp:2681
 #, c-format
 msgid "Using interframe blending #%d"
 msgstr "Képkockaátmenet elmosás: #%d"
 
-#: cmdevents.cpp:2690 panel.cpp:183 panel.cpp:286
+#: cmdevents.cpp:2720 panel.cpp:193 panel.cpp:296
 msgid "Could not initialize the sound driver!"
 msgstr "A hang meghajtóprogramja nem indítható!"
 
-#: cmdevents.cpp:2780
+#: cmdevents.cpp:2824
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Nintendo GameBoy (+Color+Advance) emulátor."
 
-#: cmdevents.cpp:2781
+#: cmdevents.cpp:2825
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA fejlesztői csapat\nCopyright (C) 2007-2017 VBA-M fejlesztői csapat"
 
-#: cmdevents.cpp:2782
+#: cmdevents.cpp:2826
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -827,35 +835,35 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Ez a program ingyenes alkalmazás: terjesztheti és/vagy módosíthatja\na Free Software Foundation által kiadott GNU Általános Nyilvános\nLincenc előírásaival összhangban, legyen szó annak második, vagy\n(tetszés szerinti) bármely későbbi változatáról.\n\nA program azért készült, hogy remélhetőleg hasznos legyen, de nincs\nSEMMIFÉLE GARANCIA rá, még a feltételezhető HELYES MŰKÖDÉSRE és arra\nsem, hogy bármely EGYEDI CÉLNAK megfelel. További részletekért\ntekintse meg a GNU Általános Nyilvános Lincenct.\n\nA programhoz mellékelve kell legyen a Licenc egy példánya. Ha\nmégsem, itt megtalálja: http://gnu.hu/gpl.html ."
 
-#: cmdevents.cpp:3087
+#: cmdevents.cpp:3131
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "A LAN összeköttetés már aktív. Kapcsold ki az összekötés módot a bontáshoz."
 
-#: cmdevents.cpp:3093
+#: cmdevents.cpp:3137
 msgid "Network is not supported in local mode."
 msgstr "Helyi módban hálózat nem támogatott."
 
-#: opts.cpp:561 opts.cpp:864
+#: opts.cpp:563 opts.cpp:866
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "A %s érvénytelen érték a %s opcióhoz; használható értékek: %s%s%s"
 
-#: opts.cpp:578 opts.cpp:876
+#: opts.cpp:580 opts.cpp:878
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "A %d érvénytelen érték a %s opcióhoz; használható értékek: %d - %d"
 
-#: opts.cpp:585 opts.cpp:594 opts.cpp:884 opts.cpp:892
+#: opts.cpp:587 opts.cpp:596 opts.cpp:886 opts.cpp:894
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "A %f érvénytelen érték a %s opcióhoz; használható értékek: %f - %f"
 
-#: opts.cpp:654 opts.cpp:675 opts.cpp:960 opts.cpp:986
+#: opts.cpp:656 opts.cpp:677 opts.cpp:962 opts.cpp:988
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "A %s - %s érvénytelen billentyű hozzárendelés"
 
-#: opts.cpp:847
+#: opts.cpp:849
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Az érvénytelen jelölőopció %s - %s elutasítva"
@@ -935,155 +943,155 @@ msgstr "Hiba az ál-TTY megnyitásakor: %s"
 msgid "Error setting up server socket (%d)"
 msgstr "Hiba a szerver socket beállításakor (%d)"
 
-#: panel.cpp:97
+#: panel.cpp:107
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s nem létező ROM fájl"
 
-#: panel.cpp:98 panel.cpp:159 panel.cpp:224
+#: panel.cpp:108 panel.cpp:169 panel.cpp:234
 msgid "Problem loading file"
 msgstr "Probléma a fájl betöltésénél"
 
-#: panel.cpp:158
+#: panel.cpp:168
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "A %s Game Boy ROM nem tölthető be"
 
-#: panel.cpp:200 panel.cpp:300
+#: panel.cpp:210 panel.cpp:310
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "A %s BIOS nem tölthető be"
 
-#: panel.cpp:223
+#: panel.cpp:233
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "A %s Game Boy Advance ROM nem tölthető be"
 
-#: panel.cpp:459
+#: panel.cpp:468
 msgid " player "
 msgstr " játékos "
 
-#: panel.cpp:625
+#: panel.cpp:635
 #, c-format
 msgid "Loaded state %s"
 msgstr "A %s játékállás betöltve"
 
-#: panel.cpp:625
+#: panel.cpp:635
 #, c-format
 msgid "Error loading state %s"
 msgstr "Hiba a %s játékállás betöltésekor"
 
-#: panel.cpp:649
+#: panel.cpp:659
 #, c-format
 msgid "Saved state %s"
 msgstr "A %s játékállás mentve"
 
-#: panel.cpp:649
+#: panel.cpp:659
 #, c-format
 msgid "Error saving state %s"
 msgstr "Hiba a %s játékállás mentésekor"
 
-#: panel.cpp:853
+#: panel.cpp:863
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "A teljesképernyős mód %dx%d-%d@%d nem támogatott; másik keresése"
 
-#: panel.cpp:891
+#: panel.cpp:901
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "A teljesképernyős mód %dx%d-%d@%d nem támogatott"
 
-#: panel.cpp:896
+#: panel.cpp:906
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Érvényes mód: %dx%d-%d@%d"
 
-#: panel.cpp:904
+#: panel.cpp:914
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "%dx%d-%d@%d mód választva"
 
-#: panel.cpp:908
+#: panel.cpp:918
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Nem sikerült %dx%d-%d@%d módra váltani"
 
-#: panel.cpp:992
+#: panel.cpp:1002
 msgid "Not a valid GBA cartridge"
 msgstr "Érvénytelen GBA bővítőkártya"
 
-#: panel.cpp:1152
+#: panel.cpp:1166
 msgid "No memory for rewinding"
 msgstr "Visszajátszáshoz kevés a memória"
 
-#: panel.cpp:1162
+#: panel.cpp:1176
 msgid "Error writing rewind state"
 msgstr "Hiba a visszajátszás-állás írásakor"
 
-#: panel.cpp:2271
+#: panel.cpp:2274
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "A glXSwapIntervalEXT beállítása sikertelen"
 
-#: panel.cpp:2280
+#: panel.cpp:2283
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "A glXSwapIntervalSGI beállítása sikertelen"
 
-#: panel.cpp:2289
+#: panel.cpp:2292
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "A glXSwapIntervalMESA beállítása sikertelen"
 
-#: panel.cpp:2295
+#: panel.cpp:2298
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "A wglGetExtensionsStringEXT nem támogatott"
 
-#: panel.cpp:2298
+#: panel.cpp:2301
 msgid "No support for WGL_EXT_swap_control"
 msgstr "A WGL_EXT_swap_control nem támogatott"
 
-#: panel.cpp:2307
+#: panel.cpp:2310
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "A wglSwapIntervalEXT beállítása sikertelen"
 
-#: panel.cpp:2313
+#: panel.cpp:2316
 msgid "No VSYNC available on this platform"
 msgstr "Nincs VSYNC ezen a platformon"
 
-#: panel.cpp:2409
+#: panel.cpp:2412
 msgid "memory allocation error"
 msgstr "memóriakioszási hiba"
 
-#: panel.cpp:2412
+#: panel.cpp:2415
 msgid "error initializing codec"
 msgstr "hiba a kodek inicializálásnál"
 
-#: panel.cpp:2415
+#: panel.cpp:2418
 msgid "error writing to output file"
 msgstr "hiba a kimeneti fájl írásakor"
 
-#: panel.cpp:2418
+#: panel.cpp:2421
 msgid "can't guess output format from file name"
 msgstr "a fájlnévből nem állapítható meg a kimenet formátuma"
 
-#: panel.cpp:2423
+#: panel.cpp:2426
 msgid "programming error; aborting!"
 msgstr "programhiba; megszakítás!"
 
-#: panel.cpp:2435 panel.cpp:2464
+#: panel.cpp:2438 panel.cpp:2467
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Nem lehet megkezdeni a rögzítést ide: %s (%s)"
 
-#: panel.cpp:2492
+#: panel.cpp:2495
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Hiba a hang/videó rögzítésekor (%s); megszakítás"
 
-#: panel.cpp:2498
+#: panel.cpp:2501
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Hiba a hangrögzítéskor (%s); megszakítás"
 
-#: panel.cpp:2508
+#: panel.cpp:2511
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Hiba a videórögzítéskor (%s); megszakítás"
@@ -1144,22 +1152,22 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:130
+#: widgets/sdljoy.cpp:136
 #, c-format
 msgid "Connected game controller %d"
 msgstr "%d játékvezérlő csatlakoztatva"
 
-#: widgets/sdljoy.cpp:144
+#: widgets/sdljoy.cpp:150
 #, c-format
 msgid "Disconnected game controller %d"
 msgstr "%d játékvezérlő leválasztva"
 
-#: widgets/sdljoy.cpp:230
+#: widgets/sdljoy.cpp:222
 #, c-format
 msgid "Connected joystick %d"
 msgstr "Joystick %d csatlakoztatva"
 
-#: widgets/sdljoy.cpp:247
+#: widgets/sdljoy.cpp:239
 #, c-format
 msgid "Disconnected joystick %d"
 msgstr "Joystick %d lekapcsolódva"
@@ -2479,7 +2487,7 @@ msgid ""
 "see entire contents if too small."
 msgstr "Hozzáadáshoz kattints egy mezőre, majd nyomj egy gombot, vagy mozgasd a joystickot.  Az utoljára hozzáadott kulcs törléséhez nyomj backspace-t.  Ha túl kicsi az ablak, méretezd át, vagy kattints bele és mozgasd a mutatót az összes tartalom megtekintéséhez."
 
-#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:452
+#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:460
 msgid "Up"
 msgstr "Fel"
 
@@ -2487,7 +2495,7 @@ msgstr "Fel"
 msgid "A"
 msgstr "A"
 
-#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:456
+#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:464
 msgid "Down"
 msgstr "Le"
 
@@ -2495,7 +2503,7 @@ msgstr "Le"
 msgid "B"
 msgstr "B"
 
-#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:460
+#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:468
 msgid "Left"
 msgstr "Balra"
 
@@ -2503,7 +2511,7 @@ msgstr "Balra"
 msgid "L"
 msgstr "L"
 
-#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:464
+#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:472
 msgid "Right"
 msgstr "Jobbra"
 
@@ -2511,11 +2519,11 @@ msgstr "Jobbra"
 msgid "R"
 msgstr "R"
 
-#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:484
+#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:492
 msgid "Select"
 msgstr "Select"
 
-#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:488
+#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:496
 msgid "Start"
 msgstr "Start"
 
@@ -2943,7 +2951,7 @@ msgstr "Vezetéknélküli"
 msgid "&GameCube"
 msgstr "&GameCube"
 
-#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:517
+#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:525
 msgid "&Game Boy"
 msgstr "&Game Boy"
 
@@ -3072,267 +3080,275 @@ msgstr "&GB kattogó hang tompítása"
 msgid "&Input"
 msgstr "Bevite&l"
 
-#: xrc/MainMenu.xrc:431
+#: xrc/MainMenu.xrc:430
+msgid "Allow &keyboard background input"
+msgstr ""
+
+#: xrc/MainMenu.xrc:434
+msgid "Allow &joystick background input"
+msgstr ""
+
+#: xrc/MainMenu.xrc:439
 msgid "&Autofire"
 msgstr "&Auto-tűz"
 
-#: xrc/MainMenu.xrc:433 xrc/MainMenu.xrc:468
+#: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
 msgid "&A"
 msgstr "&A"
 
-#: xrc/MainMenu.xrc:437 xrc/MainMenu.xrc:472
+#: xrc/MainMenu.xrc:445 xrc/MainMenu.xrc:480
 msgid "&B"
 msgstr "&B"
 
-#: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
+#: xrc/MainMenu.xrc:449 xrc/MainMenu.xrc:484
 msgid "&L"
 msgstr "&L"
 
-#: xrc/MainMenu.xrc:445 xrc/MainMenu.xrc:480
+#: xrc/MainMenu.xrc:453 xrc/MainMenu.xrc:488
 msgid "&R"
 msgstr "&R"
 
-#: xrc/MainMenu.xrc:450
+#: xrc/MainMenu.xrc:458
 msgid "&Autohold"
 msgstr "&Auto-Tartás"
 
-#: xrc/MainMenu.xrc:494
+#: xrc/MainMenu.xrc:502
 msgid "&Game Boy Advance"
 msgstr "&Game Boy Advance"
 
-#: xrc/MainMenu.xrc:496 xrc/MainMenu.xrc:519
+#: xrc/MainMenu.xrc:504 xrc/MainMenu.xrc:527
 msgid "Configure ..."
 msgstr "Konfigurálás ..."
 
-#: xrc/MainMenu.xrc:500
+#: xrc/MainMenu.xrc:508
 msgid "&Real-time clock"
 msgstr "Valósidejű Ó&ra (RTC)"
 
-#: xrc/MainMenu.xrc:504
+#: xrc/MainMenu.xrc:512
 msgid "&Use BIOS file"
 msgstr "BIOS fájl használata"
 
-#: xrc/MainMenu.xrc:508
+#: xrc/MainMenu.xrc:516
 msgid "&Debug print"
 msgstr "Hibakeresés nyomtatás"
 
-#: xrc/MainMenu.xrc:512 xrc/MainMenu.xrc:527
+#: xrc/MainMenu.xrc:520 xrc/MainMenu.xrc:535
 msgid "&LCD Filter"
 msgstr "&LCD Szűrő"
 
-#: xrc/MainMenu.xrc:523
+#: xrc/MainMenu.xrc:531
 msgid "&GB color option"
 msgstr "&GB színbeállítás"
 
-#: xrc/MainMenu.xrc:531
+#: xrc/MainMenu.xrc:539
 msgid "&GB printer"
 msgstr "&GB nyomtató"
 
-#: xrc/MainMenu.xrc:535
+#: xrc/MainMenu.xrc:543
 msgid "&Gather a full page before printing"
 msgstr "Nyomtatás csak a teljes oldal me&glétekor"
 
-#: xrc/MainMenu.xrc:539
+#: xrc/MainMenu.xrc:547
 msgid "&Save printouts as screen captures"
 msgstr "Nyomtatás menté&se képernyőképként"
 
-#: xrc/MainMenu.xrc:544
+#: xrc/MainMenu.xrc:552
 msgid "&Use GB BIOS file"
 msgstr "GB BIOS fájl használata"
 
-#: xrc/MainMenu.xrc:548
+#: xrc/MainMenu.xrc:556
 msgid "&Use GBC BIOS file"
 msgstr "GBC BIOS fájl használata"
 
-#: xrc/MainMenu.xrc:553
+#: xrc/MainMenu.xrc:561
 msgid "&General ..."
 msgstr "Általános ..."
 
-#: xrc/MainMenu.xrc:556
+#: xrc/MainMenu.xrc:564
 msgid "&Speedup / Turbo ..."
 msgstr "Gyor&sítás / Turbo ..."
 
-#: xrc/MainMenu.xrc:559
+#: xrc/MainMenu.xrc:567
 msgid "D&irectories ..."
 msgstr "Könyvtárak ..."
 
-#: xrc/MainMenu.xrc:562
+#: xrc/MainMenu.xrc:570
 msgid "&Key Shortcuts ..."
 msgstr "Gyorsbillentyű&k ..."
 
-#: xrc/MainMenu.xrc:565
+#: xrc/MainMenu.xrc:573
 msgid "&UI Settings ..."
 msgstr "Felület Beállítások ..."
 
-#: xrc/MainMenu.xrc:569
+#: xrc/MainMenu.xrc:577
 msgid "&Tools"
 msgstr "Eszközök"
 
-#: xrc/MainMenu.xrc:571
+#: xrc/MainMenu.xrc:579
 msgid "&Cheats"
 msgstr "&Csalások"
 
-#: xrc/MainMenu.xrc:573
+#: xrc/MainMenu.xrc:581
 msgid "List &cheats ..."
 msgstr "&Csalások listázása ..."
 
-#: xrc/MainMenu.xrc:576
+#: xrc/MainMenu.xrc:584
 msgid "Find c&heat ..."
 msgstr "Csalások keresése ..."
 
-#: xrc/MainMenu.xrc:580
+#: xrc/MainMenu.xrc:588
 msgid "A&utomatically save/load cheats"
 msgstr "Csalások automata mentése/betöltése"
 
-#: xrc/MainMenu.xrc:584
+#: xrc/MainMenu.xrc:592
 msgid "&Enable cheats"
 msgstr "Csalások &engedélyezése"
 
-#: xrc/MainMenu.xrc:591
+#: xrc/MainMenu.xrc:599
 msgid "&Break into GDB"
 msgstr "GD&B feltörése"
 
-#: xrc/MainMenu.xrc:595
+#: xrc/MainMenu.xrc:603
 msgid "&Configure port..."
 msgstr "Port konfigurálás..."
 
-#: xrc/MainMenu.xrc:598
+#: xrc/MainMenu.xrc:606
 msgid "&Break on load"
 msgstr "Szünet terheléskor"
 
-#: xrc/MainMenu.xrc:603
+#: xrc/MainMenu.xrc:611
 msgid "&Disconnect"
 msgstr "Lecsatlakozás"
 
-#: xrc/MainMenu.xrc:605
+#: xrc/MainMenu.xrc:613
 msgid "&GDB"
 msgstr "&GDB"
 
-#: xrc/MainMenu.xrc:608
+#: xrc/MainMenu.xrc:616
 msgid "&Disassemble..."
 msgstr "Visszafejtés..."
 
-#: xrc/MainMenu.xrc:611
+#: xrc/MainMenu.xrc:619
 msgid "&Logging..."
 msgstr "Nap&lózás..."
 
-#: xrc/MainMenu.xrc:614
+#: xrc/MainMenu.xrc:622
 msgid "&IO Viewer..."
 msgstr "&IO Betekintő..."
 
-#: xrc/MainMenu.xrc:617
+#: xrc/MainMenu.xrc:625
 msgid "&Map Viewer..."
 msgstr "&Térkép Megtekintő..."
 
-#: xrc/MainMenu.xrc:620
+#: xrc/MainMenu.xrc:628
 msgid "M&emory Viewer..."
 msgstr "M&emória Vizsgáló..."
 
-#: xrc/MainMenu.xrc:623
+#: xrc/MainMenu.xrc:631
 msgid "&OAM Viewer..."
 msgstr "&OAM Nézegető..."
 
-#: xrc/MainMenu.xrc:626
+#: xrc/MainMenu.xrc:634
 msgid "&Palette Viewer..."
 msgstr "Szín&paletta Betekintő..."
 
-#: xrc/MainMenu.xrc:629
+#: xrc/MainMenu.xrc:637
 msgid "&Tile Viewer..."
 msgstr "Csempe Meg&tekintő..."
 
-#: xrc/MainMenu.xrc:634
+#: xrc/MainMenu.xrc:642
 msgid "Show all video layers"
 msgstr "Összes képréteg megjelenítése"
 
-#: xrc/MainMenu.xrc:638
+#: xrc/MainMenu.xrc:646
 msgid "BG &0"
 msgstr "BG &0"
 
-#: xrc/MainMenu.xrc:643
+#: xrc/MainMenu.xrc:651
 msgid "BG &1"
 msgstr "BG &1"
 
-#: xrc/MainMenu.xrc:648
+#: xrc/MainMenu.xrc:656
 msgid "BG &2"
 msgstr "BG &2"
 
-#: xrc/MainMenu.xrc:653
+#: xrc/MainMenu.xrc:661
 msgid "BG &3"
 msgstr "BG &3"
 
-#: xrc/MainMenu.xrc:658
+#: xrc/MainMenu.xrc:666
 msgid "&OBJ"
 msgstr "&OBJ"
 
-#: xrc/MainMenu.xrc:663
+#: xrc/MainMenu.xrc:671
 msgid "&WIN 0"
 msgstr "&WIN 0"
 
-#: xrc/MainMenu.xrc:668
+#: xrc/MainMenu.xrc:676
 msgid "W&IN 1"
 msgstr "W&IN 1"
 
-#: xrc/MainMenu.xrc:673
+#: xrc/MainMenu.xrc:681
 msgid "O&BJ WIN"
 msgstr "O&BJ WIN"
 
-#: xrc/MainMenu.xrc:677
+#: xrc/MainMenu.xrc:685
 msgid "&View Layers"
 msgstr "Képrétegek"
 
-#: xrc/MainMenu.xrc:681
+#: xrc/MainMenu.xrc:689
 msgid "Channel &1"
 msgstr "Csatorna &1"
 
-#: xrc/MainMenu.xrc:686
+#: xrc/MainMenu.xrc:694
 msgid "Channel &2"
 msgstr "Csatorna &2"
 
-#: xrc/MainMenu.xrc:691
+#: xrc/MainMenu.xrc:699
 msgid "Channel &3"
 msgstr "Csatorna &3"
 
-#: xrc/MainMenu.xrc:696
+#: xrc/MainMenu.xrc:704
 msgid "Channel &4"
 msgstr "Csatorna &4"
 
-#: xrc/MainMenu.xrc:701
+#: xrc/MainMenu.xrc:709
 msgid "Direct Sound &A"
 msgstr "Direct Sound &A"
 
-#: xrc/MainMenu.xrc:706
+#: xrc/MainMenu.xrc:714
 msgid "Direct Sound &B"
 msgstr "Direct Sound &B"
 
-#: xrc/MainMenu.xrc:710
+#: xrc/MainMenu.xrc:718
 msgid "&Sound Channels"
 msgstr "Hang&csatornák"
 
-#: xrc/MainMenu.xrc:714
+#: xrc/MainMenu.xrc:722
 msgid "&Help"
 msgstr "Súgó"
 
-#: xrc/MainMenu.xrc:716
+#: xrc/MainMenu.xrc:724
 msgid "Report &Bugs"
 msgstr "Hibák jelentése"
 
-#: xrc/MainMenu.xrc:719
+#: xrc/MainMenu.xrc:727
 msgid "VBA-M Support &Forum"
 msgstr "VBA-M Támogatási &Fórum"
 
-#: xrc/MainMenu.xrc:722
+#: xrc/MainMenu.xrc:730
 msgid "Translations"
 msgstr "Fordítások"
 
-#: xrc/MainMenu.xrc:730
+#: xrc/MainMenu.xrc:738
 msgid "Check for updates"
 msgstr "Frissítések keresése"
 
-#: xrc/MainMenu.xrc:733
+#: xrc/MainMenu.xrc:741
 msgid "&Factory Reset..."
 msgstr "Alaphelyzet Visszaállítás..."
 
-#: xrc/MainMenu.xrc:737
+#: xrc/MainMenu.xrc:745
 msgid "&About..."
 msgstr "Névjegy..."
 

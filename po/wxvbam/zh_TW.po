@@ -19,9 +19,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-17 17:30+0000\n"
-"PO-Revision-Date: 2020-08-22 01:32+0000\n"
-"Last-Translator: Ching Wen Cheng <chingwen.cheng@gmail.com>\n"
+"POT-Creation-Date: 2020-08-29 20:11+0000\n"
+"PO-Revision-Date: 2020-08-29 21:22+0000\n"
+"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/bgk/vba-m/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,71 +33,75 @@ msgstr ""
 msgid "visualboyadvance-m"
 msgstr "visualboyadvance-m"
 
-#: wxvbam.cpp:440
+#: wxvbam.cpp:443
 msgid "Could not create main window"
 msgstr "無法開啟主視窗"
 
-#: wxvbam.cpp:511
+#: wxvbam.cpp:514
 msgid "Save built-in XRC file and exit"
 msgstr "儲存內建 XRC 檔並且離開"
 
-#: wxvbam.cpp:514
+#: wxvbam.cpp:517
 msgid "Save built-in vba-over.ini and exit"
 msgstr "儲存內建 vba-over.ini 並且離開"
 
-#: wxvbam.cpp:517
+#: wxvbam.cpp:520
 msgid "Print configuration path and exit"
 msgstr "列印設定路徑並且離開"
 
-#: wxvbam.cpp:520
+#: wxvbam.cpp:523
 msgid "Start in full-screen mode"
 msgstr "以全螢幕模式開始"
 
-#: wxvbam.cpp:524
+#: wxvbam.cpp:526
+msgid "Set a configuration file"
+msgstr ""
+
+#: wxvbam.cpp:530
 msgid "Delete shared link state first, if it exists"
 msgstr "請先刪除共享連線狀態，假如它存在的話"
 
-#: wxvbam.cpp:531
+#: wxvbam.cpp:537
 msgid "List all settable options and exit"
 msgstr "列出所有可設定的選項並且離開"
 
-#: wxvbam.cpp:534
+#: wxvbam.cpp:540
 msgid "ROM file"
 msgstr "ROM 檔案"
 
-#: wxvbam.cpp:536
+#: wxvbam.cpp:542
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:567
+#: wxvbam.cpp:573
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr "設定/建立錯誤: 無法找到內建的 xrc"
 
-#: wxvbam.cpp:575
+#: wxvbam.cpp:581
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "將內建設定寫入到 %s。\n如果要覆蓋，請刪除所有未更動的根節點。 首先在以下搜索覆蓋內建路徑裡找到的任何 .xrc 或 .xrs 檔案中找出正確名稱的根節點 :"
 
-#: wxvbam.cpp:590
+#: wxvbam.cpp:596
 msgid "Configuration is read from, in order:"
 msgstr "設定按順序從中讀取:"
 
-#: wxvbam.cpp:604
+#: wxvbam.cpp:610
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
 msgstr "將內建覆蓋檔案寫入到 %s。\n如果要覆蓋，請刪除所有未更動的部分。 首先在搜索路徑裡找到正在使用的部分:"
 
-#: wxvbam.cpp:610
+#: wxvbam.cpp:616
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\t內建"
 
-#: wxvbam.cpp:621
+#: wxvbam.cpp:627
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -105,251 +109,255 @@ msgid ""
 "\n"
 msgstr "如果在使用者介面設定任何選項，則保存由命令列來的選項設。\n\n對於旗標選項，true 和 false分別被指定為 1 和 0 。\n\n"
 
-#: wxvbam.cpp:642
+#: wxvbam.cpp:648
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "可用於鍵盤/*選項的指令:\n\n"
 
-#: wxvbam.cpp:676
+#: wxvbam.cpp:660
+msgid "Configuration file not found."
+msgstr ""
+
+#: wxvbam.cpp:693
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "錯誤的選項設定或多個 ROM 檔案被指定:\n"
 
-#: guiinit.cpp:77
+#: guiinit.cpp:81
 msgid "Start!"
 msgstr "開始!"
 
-#: guiinit.cpp:96 xrc/NetLink.xrc:99
+#: guiinit.cpp:100 xrc/NetLink.xrc:99
 msgid "Connect"
 msgstr "連接"
 
-#: guiinit.cpp:113
+#: guiinit.cpp:117
 msgid "You must enter a valid host name"
 msgstr "您必須輸入一個有效的主機名"
 
-#: guiinit.cpp:114
+#: guiinit.cpp:118
 msgid "Host name invalid"
 msgstr "主機名無效"
 
-#: guiinit.cpp:132
+#: guiinit.cpp:136
 msgid "Waiting for clients..."
 msgstr "等待客戶端..."
 
-#: guiinit.cpp:133
+#: guiinit.cpp:137
 #, c-format
 msgid "Server IP address is: %s\n"
 msgstr "伺服器IP位置:%s\n"
 
-#: guiinit.cpp:135
+#: guiinit.cpp:139
 msgid "Waiting for connection..."
 msgstr "等候連接……"
 
-#: guiinit.cpp:136
+#: guiinit.cpp:140
 #, c-format
 msgid "Connecting to %s\n"
 msgstr "連接 %s\n"
 
-#: guiinit.cpp:169
+#: guiinit.cpp:173
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr "發生錯誤。\n請重試。"
 
-#: guiinit.cpp:236 guiinit.cpp:289
+#: guiinit.cpp:240 guiinit.cpp:293
 msgid "Select cheat file"
 msgstr "選擇金手指代碼表"
 
-#: guiinit.cpp:237
+#: guiinit.cpp:241
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA 金手指代碼表 (*.clt)|*.clt|CHT 金手指代碼表 (*.cht)|*.cht"
 
-#: guiinit.cpp:256 panel.cpp:427
+#: guiinit.cpp:260 panel.cpp:436
 msgid "Loaded cheats"
 msgstr "已讀取金手指"
 
-#: guiinit.cpp:290
+#: guiinit.cpp:294
 msgid "VBA cheat lists (*.clt)|*.clt"
 msgstr "VBA 金手指代碼表 (*.clt)|*.clt"
 
-#: guiinit.cpp:308
+#: guiinit.cpp:312
 msgid "Saved cheats"
 msgstr "已儲存金手指"
 
-#: guiinit.cpp:339 guiinit.cpp:358
+#: guiinit.cpp:343 guiinit.cpp:362
 msgid "Restore old values?"
 msgstr "恢復舊值?"
 
-#: guiinit.cpp:340 guiinit.cpp:359
+#: guiinit.cpp:344 guiinit.cpp:363
 msgid "Removing cheats"
 msgstr "移除金手指"
 
-#: guiinit.cpp:750 xrc/JoyPanel.xrc:364
+#: guiinit.cpp:754 xrc/JoyPanel.xrc:364
 msgid "GameShark"
 msgstr "GameShark"
 
-#: guiinit.cpp:751 cmdevents.cpp:676
+#: guiinit.cpp:755 cmdevents.cpp:676
 msgid "GameGenie"
 msgstr "GameGenie"
 
-#: guiinit.cpp:753
+#: guiinit.cpp:757
 msgid "Generic Code"
 msgstr "通用代碼"
 
-#: guiinit.cpp:754
+#: guiinit.cpp:758
 msgid "GameShark Advance"
 msgstr "GameShark Advance"
 
-#: guiinit.cpp:755
+#: guiinit.cpp:759
 msgid "CodeBreaker Advance"
 msgstr "CodeBreaker Advance"
 
-#: guiinit.cpp:756
+#: guiinit.cpp:760
 msgid "Flashcart CHT"
 msgstr "燒錄卡 CHT"
 
-#: guiinit.cpp:824 guiinit.cpp:1079
+#: guiinit.cpp:828 guiinit.cpp:1083
 msgid "Number cannot be empty"
 msgstr "號碼不可為空"
 
-#: guiinit.cpp:862
+#: guiinit.cpp:866
 #, c-format
 msgid "Search produced %d results.  Please refine better"
 msgstr "搜尋到%d個結果。請做更好的優化"
 
-#: guiinit.cpp:874
+#: guiinit.cpp:878
 msgid "Search produced no results"
 msgstr "沒有搜尋到結果"
 
-#: guiinit.cpp:1037
+#: guiinit.cpp:1041
 msgid "8-bit "
 msgstr "8-bit "
 
-#: guiinit.cpp:1041
+#: guiinit.cpp:1045
 msgid "16-bit "
 msgstr "16-bit "
 
-#: guiinit.cpp:1045
+#: guiinit.cpp:1049
 msgid "32-bit "
 msgstr "32-bit "
 
-#: guiinit.cpp:1051
+#: guiinit.cpp:1055
 msgid "signed decimal"
 msgstr "有符號十進位數"
 
-#: guiinit.cpp:1055
+#: guiinit.cpp:1059
 msgid "unsigned decimal"
 msgstr "無符號十進位數"
 
-#: guiinit.cpp:1059
+#: guiinit.cpp:1063
 msgid "unsigned hexadecimal"
 msgstr "無符號十六進位數"
 
-#: guiinit.cpp:1537
+#: guiinit.cpp:1541
 #, c-format
 msgid "%d frames = %.2f ms"
 msgstr "%d frames = %.2f ms"
 
-#: guiinit.cpp:1549
+#: guiinit.cpp:1553
 msgid "Default device"
 msgstr "預設裝置"
 
-#: guiinit.cpp:1723
+#: guiinit.cpp:1727
 msgid "Desktop mode"
 msgstr "桌面模式"
 
-#: guiinit.cpp:1730
+#: guiinit.cpp:1734
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: guiinit.cpp:1843 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
+#: guiinit.cpp:1847 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
 msgid "None"
 msgstr "無"
 
-#: guiinit.cpp:1884
+#: guiinit.cpp:1888
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "在%s找不到可用的 rpi 外掛元件"
 
-#: guiinit.cpp:1904 xrc/DisplayConfig.xrc:107
+#: guiinit.cpp:1908 xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "插件"
 
-#: guiinit.cpp:1932
+#: guiinit.cpp:1936
 msgid "Please select a plugin or a different filter"
 msgstr "請選取一個插件或一個不同的過濾器"
 
-#: guiinit.cpp:1933
+#: guiinit.cpp:1937
 msgid "Plugin selection error"
 msgstr "插件選取錯誤"
 
-#: guiinit.cpp:2146
+#: guiinit.cpp:2150
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr "這將清除所有使用者的加速器設定。你確定嗎?"
 
-#: guiinit.cpp:2146
+#: guiinit.cpp:2150
 msgid "Confirm"
 msgstr "確認"
 
-#: guiinit.cpp:2734
+#: guiinit.cpp:2738
 msgid "Main icon not found"
 msgstr "主圖示未找到"
 
-#: guiinit.cpp:2744
+#: guiinit.cpp:2748
 msgid "Browse"
 msgstr "瀏覽"
 
-#: guiinit.cpp:2758
+#: guiinit.cpp:2762
 msgid "Main display panel not found"
 msgstr "主顯示螢幕未找到"
 
-#: guiinit.cpp:2907
+#: guiinit.cpp:2927
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "複製選單加速器:%s於%s和%s；保持第一"
 
-#: guiinit.cpp:2921
+#: guiinit.cpp:2941
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "選單加速器%s%s的預設覆蓋%s的；保存選單"
 
-#: guiinit.cpp:3059
+#: guiinit.cpp:3079
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "無效的選單項%s；去除"
 
-#: guiinit.cpp:3267
+#: guiinit.cpp:3287
 msgid "Code"
 msgstr "代碼"
 
-#: guiinit.cpp:3276
+#: guiinit.cpp:3296
 msgid "Description"
 msgstr "描述"
 
-#: guiinit.cpp:3350 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3370 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "位址"
 
-#: guiinit.cpp:3351
+#: guiinit.cpp:3371
 msgid "Old Value"
 msgstr "舊數值"
 
-#: guiinit.cpp:3352
+#: guiinit.cpp:3372
 msgid "New Value"
 msgstr "新數值"
 
-#: guiinit.cpp:3873
+#: guiinit.cpp:3893
 msgid "Menu commands"
 msgstr "選單指令"
 
-#: guiinit.cpp:3896
+#: guiinit.cpp:3916
 msgid "Other commands"
 msgstr "其他指令"
 
-#: guiinit.cpp:4007
+#: guiinit.cpp:4027
 msgid "JoyBus host invalid; disabling"
 msgstr "遊戲總線主機無效;禁用"
 
@@ -616,7 +624,7 @@ msgstr "匯入電池記憶檔將會抹除現有的存檔（下次存檔後就永
 msgid "Confirm import"
 msgstr "匯入確認"
 
-#: cmdevents.cpp:907 panel.cpp:370
+#: cmdevents.cpp:907 panel.cpp:379
 #, c-format
 msgid "Loaded battery %s"
 msgstr "已讀取電池記憶檔 %s"
@@ -699,7 +707,7 @@ msgstr "讀取快照檔%s時發生錯誤"
 msgid "Wrote battery %s"
 msgstr "寫入電池記憶檔 %s"
 
-#: cmdevents.cpp:1100 panel.cpp:677
+#: cmdevents.cpp:1100 panel.cpp:687
 #, c-format
 msgid "Error writing battery %s"
 msgstr "寫入電池記憶檔%s時發生錯誤"
@@ -743,84 +751,84 @@ msgstr "VBA 影像檔|*.vmv"
 msgid "Select file"
 msgstr "選擇檔案"
 
-#: cmdevents.cpp:1639 cmdevents.cpp:1732
+#: cmdevents.cpp:1669 cmdevents.cpp:1762
 msgid "Select state file"
 msgstr "選擇即時紀錄檔"
 
-#: cmdevents.cpp:1640 cmdevents.cpp:1733
+#: cmdevents.cpp:1670 cmdevents.cpp:1763
 msgid "VisualBoyAdvance saved game files|*.sgm"
 msgstr "VisualBoyAdvance saved game files|*.sgm"
 
-#: cmdevents.cpp:1763 cmdevents.cpp:1773 cmdevents.cpp:1784
+#: cmdevents.cpp:1793 cmdevents.cpp:1803 cmdevents.cpp:1814
 #, c-format
 msgid "Current state slot #%d"
 msgstr "現在的儲存槽 #%d"
 
-#: cmdevents.cpp:2053
+#: cmdevents.cpp:2083
 msgid "Sound enabled"
 msgstr "音效已啟動"
 
-#: cmdevents.cpp:2053
+#: cmdevents.cpp:2083
 msgid "Sound disabled"
 msgstr "音效已關閉"
 
-#: cmdevents.cpp:2066 cmdevents.cpp:2080
+#: cmdevents.cpp:2096 cmdevents.cpp:2110
 #, c-format
 msgid "Volume: %d%%"
 msgstr "音量：%d%%"
 
-#: cmdevents.cpp:2155
+#: cmdevents.cpp:2185
 msgid "Set to 0 for pseudo tty"
 msgstr "虛擬終端設置為0"
 
-#: cmdevents.cpp:2157
+#: cmdevents.cpp:2187
 msgid "Port to wait for connection:"
 msgstr "等待連接的連接埠:"
 
-#: cmdevents.cpp:2158
+#: cmdevents.cpp:2188
 msgid "GDB Connection"
 msgstr "GDB 連接"
 
-#: cmdevents.cpp:2211
+#: cmdevents.cpp:2241
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "等待連接 %s"
 
-#: cmdevents.cpp:2218
+#: cmdevents.cpp:2248
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "在連接埠 %d 等候連接"
 
-#: cmdevents.cpp:2221
+#: cmdevents.cpp:2251
 msgid "Waiting for GDB..."
 msgstr "正在等候 GDB ……"
 
-#: cmdevents.cpp:2636
+#: cmdevents.cpp:2666
 #, c-format
 msgid "Using pixel filter #%d"
 msgstr "使用像素濾波器 #%d"
 
-#: cmdevents.cpp:2651
+#: cmdevents.cpp:2681
 #, c-format
 msgid "Using interframe blending #%d"
 msgstr "使用幀間混合 #%d"
 
-#: cmdevents.cpp:2690 panel.cpp:183 panel.cpp:286
+#: cmdevents.cpp:2720 panel.cpp:193 panel.cpp:296
 msgid "Could not initialize the sound driver!"
 msgstr "無法初始化聲音驅動程式!"
 
-#: cmdevents.cpp:2780
+#: cmdevents.cpp:2824
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "任天堂 GameBoy (+Color+Advance) 模擬器。"
 
-#: cmdevents.cpp:2781
+#: cmdevents.cpp:2825
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2017 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2017 VBA-M development team"
 
-#: cmdevents.cpp:2782
+#: cmdevents.cpp:2826
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -836,35 +844,35 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3087
+#: cmdevents.cpp:3131
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "區網連接已開啟。禁用連接模式。"
 
-#: cmdevents.cpp:3093
+#: cmdevents.cpp:3137
 msgid "Network is not supported in local mode."
 msgstr "網路不支持本地模式。"
 
-#: opts.cpp:561 opts.cpp:864
+#: opts.cpp:563 opts.cpp:866
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "無效值 %s 的選項 %s; 有效值為 %s%s%s"
 
-#: opts.cpp:578 opts.cpp:876
+#: opts.cpp:580 opts.cpp:878
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "無效值 %d 的選項 %s; 有效值為 %d - %d"
 
-#: opts.cpp:585 opts.cpp:594 opts.cpp:884 opts.cpp:892
+#: opts.cpp:587 opts.cpp:596 opts.cpp:886 opts.cpp:894
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "無效值 %f 的選項 %s; 有效值為 %f - %f"
 
-#: opts.cpp:654 opts.cpp:675 opts.cpp:960 opts.cpp:986
+#: opts.cpp:656 opts.cpp:677 opts.cpp:962 opts.cpp:988
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "%s 鍵不能綁訂為 %s"
 
-#: opts.cpp:847
+#: opts.cpp:849
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "無效設置 %s - %s 以忽略"
@@ -944,155 +952,155 @@ msgstr "開啟錯誤 pseudo tty: %s"
 msgid "Error setting up server socket (%d)"
 msgstr "設定伺服器 socket (%d) 錯誤"
 
-#: panel.cpp:97
+#: panel.cpp:107
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s 不是有效的 ROM 檔案"
 
-#: panel.cpp:98 panel.cpp:159 panel.cpp:224
+#: panel.cpp:108 panel.cpp:169 panel.cpp:234
 msgid "Problem loading file"
 msgstr "讀取檔案時發生問題"
 
-#: panel.cpp:158
+#: panel.cpp:168
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "無法讀取 Game Boy ROM %s"
 
-#: panel.cpp:200 panel.cpp:300
+#: panel.cpp:210 panel.cpp:310
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "無法讀取 BIOS %s"
 
-#: panel.cpp:223
+#: panel.cpp:233
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "無法讀取 Game Boy Advance ROM %s"
 
-#: panel.cpp:459
+#: panel.cpp:468
 msgid " player "
 msgstr " 播放器 "
 
-#: panel.cpp:625
+#: panel.cpp:635
 #, c-format
 msgid "Loaded state %s"
 msgstr "已讀取即時紀錄檔 %s"
 
-#: panel.cpp:625
+#: panel.cpp:635
 #, c-format
 msgid "Error loading state %s"
 msgstr "讀取即時紀錄檔時發生錯誤 %s"
 
-#: panel.cpp:649
+#: panel.cpp:659
 #, c-format
 msgid "Saved state %s"
 msgstr "已完成即時紀錄 %s"
 
-#: panel.cpp:649
+#: panel.cpp:659
 #, c-format
 msgid "Error saving state %s"
 msgstr "即時記錄時發生錯誤 %s"
 
-#: panel.cpp:853
+#: panel.cpp:863
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "不支援全螢幕模式 %dx%d-%d@%d， 尋找其他模式"
 
-#: panel.cpp:891
+#: panel.cpp:901
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "不支援全螢幕模式 %dx%d-%d@%d"
 
-#: panel.cpp:896
+#: panel.cpp:906
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "有效模式：%dx%d-%d@%d"
 
-#: panel.cpp:904
+#: panel.cpp:914
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "選擇模式：%dx%d-%d@%d"
 
-#: panel.cpp:908
+#: panel.cpp:918
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "無法切換到 %dx%d-%d@%d 模式"
 
-#: panel.cpp:992
+#: panel.cpp:1002
 msgid "Not a valid GBA cartridge"
 msgstr "不是有效的 GBA 卡匣"
 
-#: panel.cpp:1152
+#: panel.cpp:1166
 msgid "No memory for rewinding"
 msgstr "沒有記憶體可用來倒帶"
 
-#: panel.cpp:1162
+#: panel.cpp:1176
 msgid "Error writing rewind state"
 msgstr "回寫狀態錯誤"
 
-#: panel.cpp:2271
+#: panel.cpp:2274
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "設置 glXSwapIntervalEXT 失敗"
 
-#: panel.cpp:2280
+#: panel.cpp:2283
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "設置 glXSwapIntervalSGI 失敗"
 
-#: panel.cpp:2289
+#: panel.cpp:2292
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "設置 glXSwapIntervalMESA 失敗"
 
-#: panel.cpp:2295
+#: panel.cpp:2298
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "不支援 wglGetExtensionsStringEXT"
 
-#: panel.cpp:2298
+#: panel.cpp:2301
 msgid "No support for WGL_EXT_swap_control"
 msgstr "不支援 WGL_EXT_swap_control"
 
-#: panel.cpp:2307
+#: panel.cpp:2310
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "設置 wglSwapIntervalEXT 失敗"
 
-#: panel.cpp:2313
+#: panel.cpp:2316
 msgid "No VSYNC available on this platform"
 msgstr "在此平台無法使用垂直同步"
 
-#: panel.cpp:2409
+#: panel.cpp:2412
 msgid "memory allocation error"
 msgstr "記憶體配置錯誤"
 
-#: panel.cpp:2412
+#: panel.cpp:2415
 msgid "error initializing codec"
 msgstr "解碼器初始化錯誤"
 
-#: panel.cpp:2415
+#: panel.cpp:2418
 msgid "error writing to output file"
 msgstr "輸出檔寫入錯誤"
 
-#: panel.cpp:2418
+#: panel.cpp:2421
 msgid "can't guess output format from file name"
 msgstr "從檔名猜測輸出格式失敗"
 
-#: panel.cpp:2423
+#: panel.cpp:2426
 msgid "programming error; aborting!"
 msgstr "程式錯誤，正在停止!"
 
-#: panel.cpp:2435 panel.cpp:2464
+#: panel.cpp:2438 panel.cpp:2467
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "不能開始錄製到 %s (%s)"
 
-#: panel.cpp:2492
+#: panel.cpp:2495
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "錄製 (%s) 聲音/影像錯誤; 停止中"
 
-#: panel.cpp:2498
+#: panel.cpp:2501
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "錄製 (%s) 聲音; 停止中"
 
-#: panel.cpp:2508
+#: panel.cpp:2511
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "錄製 (%s) 影像錯誤; 停止中"
@@ -1153,22 +1161,22 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:130
+#: widgets/sdljoy.cpp:136
 #, c-format
 msgid "Connected game controller %d"
 msgstr "已連接遊戲控制器 %d"
 
-#: widgets/sdljoy.cpp:144
+#: widgets/sdljoy.cpp:150
 #, c-format
 msgid "Disconnected game controller %d"
 msgstr "已斷開遊戲控制器 %d"
 
-#: widgets/sdljoy.cpp:230
+#: widgets/sdljoy.cpp:222
 #, c-format
 msgid "Connected joystick %d"
 msgstr "已連接的搖桿 %d"
 
-#: widgets/sdljoy.cpp:247
+#: widgets/sdljoy.cpp:239
 #, c-format
 msgid "Disconnected joystick %d"
 msgstr "未連接的搖桿 %d"
@@ -2488,7 +2496,7 @@ msgid ""
 "see entire contents if too small."
 msgstr "點擊一個字段並且按一個按鍵或是移動搖桿來進行添加的動作。 按倒退鍵來刪除最後一個添加的按鍵。 假如太小的話，請縮放視窗或是點擊內部並且移動游標來看整個內容。"
 
-#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:452
+#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:460
 msgid "Up"
 msgstr "上"
 
@@ -2496,7 +2504,7 @@ msgstr "上"
 msgid "A"
 msgstr "A"
 
-#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:456
+#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:464
 msgid "Down"
 msgstr "下"
 
@@ -2504,7 +2512,7 @@ msgstr "下"
 msgid "B"
 msgstr "B"
 
-#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:460
+#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:468
 msgid "Left"
 msgstr "左"
 
@@ -2512,7 +2520,7 @@ msgstr "左"
 msgid "L"
 msgstr "L"
 
-#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:464
+#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:472
 msgid "Right"
 msgstr "右"
 
@@ -2520,11 +2528,11 @@ msgstr "右"
 msgid "R"
 msgstr "R"
 
-#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:484
+#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:492
 msgid "Select"
 msgstr "選擇"
 
-#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:488
+#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:496
 msgid "Start"
 msgstr "開始"
 
@@ -2952,7 +2960,7 @@ msgstr "無線(&W)"
 msgid "&GameCube"
 msgstr "&GameCube"
 
-#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:517
+#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:525
 msgid "&Game Boy"
 msgstr "&Game Boy"
 
@@ -3081,267 +3089,275 @@ msgstr "&GB 聲音降噪"
 msgid "&Input"
 msgstr "控制(&I)"
 
-#: xrc/MainMenu.xrc:431
+#: xrc/MainMenu.xrc:430
+msgid "Allow &keyboard background input"
+msgstr ""
+
+#: xrc/MainMenu.xrc:434
+msgid "Allow &joystick background input"
+msgstr ""
+
+#: xrc/MainMenu.xrc:439
 msgid "&Autofire"
 msgstr "自動連擊(&A)"
 
-#: xrc/MainMenu.xrc:433 xrc/MainMenu.xrc:468
+#: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
 msgid "&A"
 msgstr "&A"
 
-#: xrc/MainMenu.xrc:437 xrc/MainMenu.xrc:472
+#: xrc/MainMenu.xrc:445 xrc/MainMenu.xrc:480
 msgid "&B"
 msgstr "&B"
 
-#: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
+#: xrc/MainMenu.xrc:449 xrc/MainMenu.xrc:484
 msgid "&L"
 msgstr "&L"
 
-#: xrc/MainMenu.xrc:445 xrc/MainMenu.xrc:480
+#: xrc/MainMenu.xrc:453 xrc/MainMenu.xrc:488
 msgid "&R"
 msgstr "&R"
 
-#: xrc/MainMenu.xrc:450
+#: xrc/MainMenu.xrc:458
 msgid "&Autohold"
 msgstr "自動保留(&A)"
 
-#: xrc/MainMenu.xrc:494
+#: xrc/MainMenu.xrc:502
 msgid "&Game Boy Advance"
 msgstr "&Game Boy Advance"
 
-#: xrc/MainMenu.xrc:496 xrc/MainMenu.xrc:519
+#: xrc/MainMenu.xrc:504 xrc/MainMenu.xrc:527
 msgid "Configure ..."
 msgstr "設定 ..."
 
-#: xrc/MainMenu.xrc:500
+#: xrc/MainMenu.xrc:508
 msgid "&Real-time clock"
 msgstr "真實時鐘(&R)"
 
-#: xrc/MainMenu.xrc:504
+#: xrc/MainMenu.xrc:512
 msgid "&Use BIOS file"
 msgstr "使用 BIOS 檔案(&U)"
 
-#: xrc/MainMenu.xrc:508
+#: xrc/MainMenu.xrc:516
 msgid "&Debug print"
 msgstr "&Debug 列印"
 
-#: xrc/MainMenu.xrc:512 xrc/MainMenu.xrc:527
+#: xrc/MainMenu.xrc:520 xrc/MainMenu.xrc:535
 msgid "&LCD Filter"
 msgstr "&LCD 濾鏡"
 
-#: xrc/MainMenu.xrc:523
+#: xrc/MainMenu.xrc:531
 msgid "&GB color option"
 msgstr "&GB 顏色選項"
 
-#: xrc/MainMenu.xrc:531
+#: xrc/MainMenu.xrc:539
 msgid "&GB printer"
 msgstr "&GB 印表機"
 
-#: xrc/MainMenu.xrc:535
+#: xrc/MainMenu.xrc:543
 msgid "&Gather a full page before printing"
 msgstr "在列印前匯集在一整頁(&G)"
 
-#: xrc/MainMenu.xrc:539
+#: xrc/MainMenu.xrc:547
 msgid "&Save printouts as screen captures"
 msgstr "將列印輸出另存為螢幕截圖(&S)"
 
-#: xrc/MainMenu.xrc:544
+#: xrc/MainMenu.xrc:552
 msgid "&Use GB BIOS file"
 msgstr "使用 GB BIOS 檔案(&U)"
 
-#: xrc/MainMenu.xrc:548
+#: xrc/MainMenu.xrc:556
 msgid "&Use GBC BIOS file"
 msgstr "使用 GBC BIOS 檔案(&U)"
 
-#: xrc/MainMenu.xrc:553
+#: xrc/MainMenu.xrc:561
 msgid "&General ..."
 msgstr "一般設定(&G)"
 
-#: xrc/MainMenu.xrc:556
+#: xrc/MainMenu.xrc:564
 msgid "&Speedup / Turbo ..."
 msgstr "加速/超頻(&S) ..."
 
-#: xrc/MainMenu.xrc:559
+#: xrc/MainMenu.xrc:567
 msgid "D&irectories ..."
 msgstr "資料夾(&I)"
 
-#: xrc/MainMenu.xrc:562
+#: xrc/MainMenu.xrc:570
 msgid "&Key Shortcuts ..."
 msgstr "快捷鍵(&K)"
 
-#: xrc/MainMenu.xrc:565
+#: xrc/MainMenu.xrc:573
 msgid "&UI Settings ..."
 msgstr "和使用者介面設定…"
 
-#: xrc/MainMenu.xrc:569
+#: xrc/MainMenu.xrc:577
 msgid "&Tools"
 msgstr "工具(&O)"
 
-#: xrc/MainMenu.xrc:571
+#: xrc/MainMenu.xrc:579
 msgid "&Cheats"
 msgstr "金手指(&C)"
 
-#: xrc/MainMenu.xrc:573
+#: xrc/MainMenu.xrc:581
 msgid "List &cheats ..."
 msgstr "列出金手指代碼(&C)"
 
-#: xrc/MainMenu.xrc:576
+#: xrc/MainMenu.xrc:584
 msgid "Find c&heat ..."
 msgstr "收尋金手指(&h) ..."
 
-#: xrc/MainMenu.xrc:580
+#: xrc/MainMenu.xrc:588
 msgid "A&utomatically save/load cheats"
 msgstr "自動儲存/讀取金手指代碼(&U)"
 
-#: xrc/MainMenu.xrc:584
+#: xrc/MainMenu.xrc:592
 msgid "&Enable cheats"
 msgstr "啟動金手指(&E)"
 
-#: xrc/MainMenu.xrc:591
+#: xrc/MainMenu.xrc:599
 msgid "&Break into GDB"
 msgstr "GDB中斷除錯(&B)"
 
-#: xrc/MainMenu.xrc:595
+#: xrc/MainMenu.xrc:603
 msgid "&Configure port..."
 msgstr "設定端口(&C)"
 
-#: xrc/MainMenu.xrc:598
+#: xrc/MainMenu.xrc:606
 msgid "&Break on load"
 msgstr "加載時中斷(&B)"
 
-#: xrc/MainMenu.xrc:603
+#: xrc/MainMenu.xrc:611
 msgid "&Disconnect"
 msgstr "斷線(&D)"
 
-#: xrc/MainMenu.xrc:605
+#: xrc/MainMenu.xrc:613
 msgid "&GDB"
 msgstr "&GDB"
 
-#: xrc/MainMenu.xrc:608
+#: xrc/MainMenu.xrc:616
 msgid "&Disassemble..."
 msgstr "反組譯(&D)..."
 
-#: xrc/MainMenu.xrc:611
+#: xrc/MainMenu.xrc:619
 msgid "&Logging..."
 msgstr "日誌(&L)..."
 
-#: xrc/MainMenu.xrc:614
+#: xrc/MainMenu.xrc:622
 msgid "&IO Viewer..."
 msgstr "&IO 檢視器..."
 
-#: xrc/MainMenu.xrc:617
+#: xrc/MainMenu.xrc:625
 msgid "&Map Viewer..."
 msgstr "圖層檢視器(&M)..."
 
-#: xrc/MainMenu.xrc:620
+#: xrc/MainMenu.xrc:628
 msgid "M&emory Viewer..."
 msgstr "記憶體檢視器(&e)..."
 
-#: xrc/MainMenu.xrc:623
+#: xrc/MainMenu.xrc:631
 msgid "&OAM Viewer..."
 msgstr "&OAM 檢視器..."
 
-#: xrc/MainMenu.xrc:626
+#: xrc/MainMenu.xrc:634
 msgid "&Palette Viewer..."
 msgstr "調色盤檢視器(&P)..."
 
-#: xrc/MainMenu.xrc:629
+#: xrc/MainMenu.xrc:637
 msgid "&Tile Viewer..."
 msgstr "碎片檢視器...(&T)"
 
-#: xrc/MainMenu.xrc:634
+#: xrc/MainMenu.xrc:642
 msgid "Show all video layers"
 msgstr "顯示所有視訊圖層"
 
-#: xrc/MainMenu.xrc:638
+#: xrc/MainMenu.xrc:646
 msgid "BG &0"
 msgstr "BG &0"
 
-#: xrc/MainMenu.xrc:643
+#: xrc/MainMenu.xrc:651
 msgid "BG &1"
 msgstr "BG &1"
 
-#: xrc/MainMenu.xrc:648
+#: xrc/MainMenu.xrc:656
 msgid "BG &2"
 msgstr "BG &2"
 
-#: xrc/MainMenu.xrc:653
+#: xrc/MainMenu.xrc:661
 msgid "BG &3"
 msgstr "BG &3"
 
-#: xrc/MainMenu.xrc:658
+#: xrc/MainMenu.xrc:666
 msgid "&OBJ"
 msgstr "&OBJ"
 
-#: xrc/MainMenu.xrc:663
+#: xrc/MainMenu.xrc:671
 msgid "&WIN 0"
 msgstr "&WIN 0"
 
-#: xrc/MainMenu.xrc:668
+#: xrc/MainMenu.xrc:676
 msgid "W&IN 1"
 msgstr "W&IN 1"
 
-#: xrc/MainMenu.xrc:673
+#: xrc/MainMenu.xrc:681
 msgid "O&BJ WIN"
 msgstr "O&BJ WIN"
 
-#: xrc/MainMenu.xrc:677
+#: xrc/MainMenu.xrc:685
 msgid "&View Layers"
 msgstr "檢視圖層(&V)"
 
-#: xrc/MainMenu.xrc:681
+#: xrc/MainMenu.xrc:689
 msgid "Channel &1"
 msgstr "聲道 &1"
 
-#: xrc/MainMenu.xrc:686
+#: xrc/MainMenu.xrc:694
 msgid "Channel &2"
 msgstr "聲道 &2"
 
-#: xrc/MainMenu.xrc:691
+#: xrc/MainMenu.xrc:699
 msgid "Channel &3"
 msgstr "聲道 &3"
 
-#: xrc/MainMenu.xrc:696
+#: xrc/MainMenu.xrc:704
 msgid "Channel &4"
 msgstr "聲道 &4"
 
-#: xrc/MainMenu.xrc:701
+#: xrc/MainMenu.xrc:709
 msgid "Direct Sound &A"
 msgstr "Direct Sound &A"
 
-#: xrc/MainMenu.xrc:706
+#: xrc/MainMenu.xrc:714
 msgid "Direct Sound &B"
 msgstr "Direct Sound &B"
 
-#: xrc/MainMenu.xrc:710
+#: xrc/MainMenu.xrc:718
 msgid "&Sound Channels"
 msgstr "聲道(&S)"
 
-#: xrc/MainMenu.xrc:714
+#: xrc/MainMenu.xrc:722
 msgid "&Help"
 msgstr "說明(&H)"
 
-#: xrc/MainMenu.xrc:716
+#: xrc/MainMenu.xrc:724
 msgid "Report &Bugs"
 msgstr "回報程式瑕疵(&B)"
 
-#: xrc/MainMenu.xrc:719
+#: xrc/MainMenu.xrc:727
 msgid "VBA-M Support &Forum"
 msgstr "VBA-M 線上支援及論壇(&F)"
 
-#: xrc/MainMenu.xrc:722
+#: xrc/MainMenu.xrc:730
 msgid "Translations"
 msgstr "協助翻譯"
 
-#: xrc/MainMenu.xrc:730
+#: xrc/MainMenu.xrc:738
 msgid "Check for updates"
 msgstr "檢查更新"
 
-#: xrc/MainMenu.xrc:733
+#: xrc/MainMenu.xrc:741
 msgid "&Factory Reset..."
 msgstr "恢復預設值(&F)"
 
-#: xrc/MainMenu.xrc:737
+#: xrc/MainMenu.xrc:745
 msgid "&About..."
 msgstr "關於(&A) (繁化 by Scott V1.0)"
 
