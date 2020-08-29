@@ -328,6 +328,8 @@ public:
     void StopJoyPollTimer();
     bool IsJoyPollTimerRunning();
 
+    wxEvtHandler* GetJoyEventHandler();
+
     // required for building from xrc
     DECLARE_DYNAMIC_CLASS(MainFrame);
     // required for event handling

@@ -3,7 +3,6 @@
 #include "wx/sdljoy.h"
 #include "SDL.h"
 #include <SDL_events.h>
-#include <wx/window.h>
 #include "../common/range.hpp"
 #include "../common/contains.h"
 
@@ -16,7 +15,6 @@ DEFINE_EVENT_TYPE(wxEVT_SDLJOY)
 
 wxSDLJoy::wxSDLJoy()
     : wxTimer()
-    , evthandler(nullptr)
 {
     // Start up joystick if not already started
     // FIXME: check for errors
@@ -41,15 +39,12 @@ static int16_t axisval(int16_t x)
     return 0;
 }
 
-void wxSDLJoy::CreateAndSendEvent(wxEvtHandler* handler, unsigned short joy, unsigned short ctrl_type, unsigned short ctrl_idx, short ctrl_val, short prev_val)
+void wxSDLJoy::CreateAndSendEvent(unsigned short joy, unsigned short ctrl_type, unsigned short ctrl_idx, short ctrl_val, short prev_val)
 {
-    if (!handler) {
-        GameArea *panel = wxGetApp().frame->GetPanel();
-        if (panel && allowJoystickBackgroundInput)
-            handler = panel->GetEventHandler();
-        else
-            return;
-    }
+    auto handler = wxGetApp().frame->GetJoyEventHandler();
+
+    if (!handler)
+        return;
 
     wxSDLJoyEvent *ev = new wxSDLJoyEvent(wxEVT_SDLJOY);
     ev->joy           = joy;
@@ -63,7 +58,6 @@ void wxSDLJoy::CreateAndSendEvent(wxEvtHandler* handler, unsigned short joy, uns
 
 void wxSDLJoy::Poll()
 {
-    wxEvtHandler* handler = evthandler ? evthandler : wxWindow::FindFocus();
     SDL_Event e;
 
     bool got_event = false;
@@ -84,7 +78,7 @@ void wxSDLJoy::Poll()
                     auto prev_val = joystate[joy].button[but];
 
                     if (val != prev_val) {
-                        CreateAndSendEvent(handler, joy, WXSDLJOY_BUTTON, but, val, prev_val);
+                        CreateAndSendEvent(joy, WXSDLJOY_BUTTON, but, val, prev_val);
 
                         joystate[joy].button[but] = val;
 
@@ -109,7 +103,7 @@ void wxSDLJoy::Poll()
                     auto prev_val = joystate[joy].axis[axis];
 
                     if (val != prev_val) {
-                        CreateAndSendEvent(handler, joy, WXSDLJOY_AXIS, axis, val, prev_val);
+                        CreateAndSendEvent(joy, WXSDLJOY_AXIS, axis, val, prev_val);
 
                         joystate[joy].axis[axis] = val;
 
@@ -171,7 +165,7 @@ void wxSDLJoy::Poll()
                     auto prev_val = joystate[joy].button[but];
 
                     if (val != prev_val) {
-                        CreateAndSendEvent(handler, joy, WXSDLJOY_BUTTON, but, val, prev_val);
+                        CreateAndSendEvent(joy, WXSDLJOY_BUTTON, but, val, prev_val);
 
                         joystate[joy].button[but] = val;
 
@@ -196,7 +190,7 @@ void wxSDLJoy::Poll()
                     auto prev_val = joystate[joy].axis[axis];
 
                     if (val != prev_val) {
-                        CreateAndSendEvent(handler, joy, WXSDLJOY_AXIS, axis, val, prev_val);
+                        CreateAndSendEvent(joy, WXSDLJOY_AXIS, axis, val, prev_val);
 
                         joystate[joy].axis[axis] = val;
 
@@ -266,7 +260,7 @@ void wxSDLJoy::Poll()
                     auto state      = SDL_GameControllerGetButton(joy.second.dev, static_cast<SDL_GameControllerButton>(but));
 
                     if (last_state != state) {
-                        CreateAndSendEvent(handler, joy.first, WXSDLJOY_BUTTON, but, state, last_state);
+                        CreateAndSendEvent(joy.first, WXSDLJOY_BUTTON, but, state, last_state);
 
                         joy.second.button[but] = state;
 
@@ -279,7 +273,7 @@ void wxSDLJoy::Poll()
                     auto prev_val = joy.second.axis[axis];
 
                     if (val != prev_val) {
-                        CreateAndSendEvent(handler, joy.first, WXSDLJOY_AXIS, axis, val, prev_val);
+                        CreateAndSendEvent(joy.first, WXSDLJOY_AXIS, axis, val, prev_val);
 
                         joy.second.axis[axis] = val;
 
@@ -293,7 +287,7 @@ void wxSDLJoy::Poll()
                     auto state      = SDL_JoystickGetButton(joy.second.dev, but);
 
                     if (last_state != state) {
-                        CreateAndSendEvent(handler, joy.first, WXSDLJOY_BUTTON, but, state, last_state);
+                        CreateAndSendEvent(joy.first, WXSDLJOY_BUTTON, but, state, last_state);
 
                         joy.second.button[but] = state;
 
@@ -306,7 +300,7 @@ void wxSDLJoy::Poll()
                     auto prev_val = joy.second.axis[axis];
 
                     if (val != prev_val) {
-                        CreateAndSendEvent(handler, joy.first, WXSDLJOY_AXIS, axis, val, prev_val);
+                        CreateAndSendEvent(joy.first, WXSDLJOY_AXIS, axis, val, prev_val);
 
                         joy.second.axis[axis] = val;
 
@@ -348,13 +342,6 @@ void wxSDLJoy::DisconnectController(uint8_t joy)
 
         dev = nullptr;
     }
-}
-
-wxEvtHandler* wxSDLJoy::Attach(wxEvtHandler* handler)
-{
-    wxEvtHandler* prev = evthandler;
-    evthandler = handler;
-    return prev;
 }
 
 void wxSDLJoy::Add(int8_t joy_n)

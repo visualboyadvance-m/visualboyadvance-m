@@ -4,8 +4,7 @@
 // This is my own SDL-based joystick handler, since wxJoystick is brain-dead.
 // It's geared towards keyboard emulation
 
-// To use, create a wxSDLJoy object Add() the joysticks you want to monitor and
-// Attach() the target window to receive events.
+// To use, create a wxSDLJoy object Add() the joysticks you want to monitor.
 //
 //   The target window will receive EVT_SDLJOY events of type wxSDLJoyEvent.
 
@@ -47,9 +46,6 @@ struct wxSDLJoyState {
 class wxSDLJoy : public wxTimer {
 public:
     wxSDLJoy();
-    // send events to this handler
-    // If NULL (default), send to window with keyboard focus
-    wxEvtHandler* Attach(wxEvtHandler*);
     // add another joystick to the list of polled sticks
     // -1 == add all
     // If joy > # of joysticks, it is ignored
@@ -75,13 +71,12 @@ protected:
     void Notify();
     void ConnectController(uint8_t joy);
     void DisconnectController(uint8_t joy);
-    void CreateAndSendEvent(wxEvtHandler* handler, unsigned short joy, unsigned short ctrl_type, unsigned short ctrl_idx, short ctrl_val, short prev_val);
+    void CreateAndSendEvent(unsigned short joy, unsigned short ctrl_type, unsigned short ctrl_idx, short ctrl_val, short prev_val);
 
     const uint8_t POLL_TIME_MS = 10;
 
 private:
     std::unordered_map<uint8_t, wxSDLJoyState> joystate;
-    wxEvtHandler* evthandler;
     bool add_all = false, rumbling = false;
 
     wxLongLong last_poll = wxGetUTCTimeMillis();
