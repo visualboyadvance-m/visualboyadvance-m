@@ -214,6 +214,10 @@ public:
     MainFrame();
     ~MainFrame();
 
+#ifndef NO_THREAD_MAINLOOP
+    static wxCriticalSection emulationCS;
+#endif
+
     bool BindControls();
     void MenuOptionIntMask(const char* menuName, int& field, int mask);
     void MenuOptionIntRadioValue(const char* menuName, int& field, int mask);
@@ -501,10 +505,41 @@ class DrawingPanelBase;
 #include <windows.h>
 #endif
 
-class GameArea : public wxPanel, public HiDPIAware {
+#ifndef NO_THREAD_MAINLOOP
+#include <wx/thread.h>
+
+wxDEFINE_EVENT(WX_THREAD_REQUEST_UPDATEDRAWPANEL, wxThreadEvent);
+wxDEFINE_EVENT(WX_THREAD_REQUEST_DRAWFRAME, wxThreadEvent);
+wxDEFINE_EVENT(WX_THREAD_REQUEST_UPDATESTATUSBAR, wxThreadEvent);
+wxDEFINE_EVENT(WX_THREAD_REQUEST_GBPRINTER, wxThreadEvent);
+wxDEFINE_EVENT(WX_THREAD_REQUEST_UPDATELOG, wxThreadEvent);
+#endif // NO_THREAD_MAINLOOP
+
+class GameArea : public wxPanel, public HiDPIAware
+#ifndef NO_THREAD_MAINLOOP
+                 , public wxThreadHelper
+#endif
+{
 public:
     GameArea();
     virtual ~GameArea();
+
+#ifndef NO_THREAD_MAINLOOP
+    virtual wxThread::ExitCode Entry();
+    void StartEmulationThread();
+    void StopEmulationThread();
+    void RequestUpdateDrawPanel(wxThreadEvent&);
+    void RequestDrawFrame(wxThreadEvent&);
+    void RequestUpdateStatusBar(wxThreadEvent&);
+    void RequestDraw();
+    void RequestStatusBar(int speed, int frames);
+    void RequestGBPrinter(uint16_t*, uint16_t**, int, int, int*, int*);
+    void ShowPrinter(wxThreadEvent&);
+    void RequestUpdateLog(wxThreadEvent&);
+    void UpdateLog();
+#endif
+
+    void DestroyDrawingPanel();
 
     virtual void SetMainFrame(MainFrame* parent) { main_frame = parent; }
 
@@ -747,6 +782,53 @@ private:
 };
 
 #include "opts.h"
+
+class PrintDialog : public wxEvtHandler, public wxPrintout {
+public:
+    PrintDialog(const uint16_t* data, int lines, bool cont);
+    ~PrintDialog();
+    int ShowModal()
+    {
+        dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
+
+        if (gopts.keep_on_top)
+            dlg->SetWindowStyle(dlg->GetWindowStyle() | wxSTAY_ON_TOP);
+        else
+            dlg->SetWindowStyle(dlg->GetWindowStyle() & ~wxSTAY_ON_TOP);
+
+        CheckPointer(wxGetApp().frame);
+        return wxGetApp().frame->ShowModal(dlg);
+    }
+
+private:
+    void DoSave(wxCommandEvent&);
+    void DoPrint(wxCommandEvent&);
+    void ChangeMag(wxCommandEvent&);
+    void ShowImg(wxPaintEvent&);
+    bool OnPrintPage(int pno);
+    void OnPreparePrinting();
+    bool HasPage(int pno) { return pno <= npw * nph; }
+    void GetPageInfo(int* minp, int* maxp, int* pfrom, int* pto)
+    {
+        *minp = 1;
+        *maxp = npw * nph;
+        *pfrom = 1;
+        *pto = 1;
+    }
+
+    wxDialog* dlg;
+    wxPanel* p;
+    wxImage img;
+    wxBitmap* bmp;
+    wxControlWithItems* mag;
+
+    static wxPrintData* printdata;
+    static wxPageSetupDialogData* pagedata;
+    wxRect margins;
+    int npw, nph;
+
+    DECLARE_CLASS(PrintDialog)
+};
 
 // I should add this to SoundDriver, but wxArrayString is wx-specific
 // I suppose I could make subclass wxSoundDriver.  maybe later.

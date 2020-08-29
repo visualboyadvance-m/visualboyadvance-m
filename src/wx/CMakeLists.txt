@@ -22,6 +22,12 @@ include(VbamFunctions)
 
 set(VBAM_LIBS ${VBAMCORE_LIBS})
 
+option(ENABLE_THREAD_MAINLOOP "Enable separate thread for emulator main loop for WX port" OFF)
+
+if(NOT ENABLE_THREAD_MAINLOOP)
+    add_definitions(-DNO_THREAD_MAINLOOP)
+endif()
+
 if(WIN32)
     # not yet implemented
     option(ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" OFF)

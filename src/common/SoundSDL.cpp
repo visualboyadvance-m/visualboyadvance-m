@@ -25,8 +25,9 @@
 
 extern int emulating;
 
-// Hold up to 300 ms of data in the ring buffer
-const double SoundSDL::buftime = 0.300;
+// Hold up to 50 ms of data in the ring buffer
+// 3 frames
+const double SoundSDL::buftime = 0.050;
 
 SoundSDL::SoundSDL():
     samples_buf(0),
