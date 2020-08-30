@@ -172,7 +172,7 @@ linux_installdeps() {
         fedora_installdeps
     elif [ -f /etc/redhat-release ] || [ -f /etc/centos-release ]; then
         rhel_installdeps
-    elif [ -f /etc/arch-release ]; then
+    elif [[ -f /etc/arch-release || -f /etc/artix-release ]]; then
         archlinux_installdeps
     elif [ -f /etc/solus-release ]; then
         solus_installdeps
@@ -182,6 +182,9 @@ linux_installdeps() {
         case "$(. /etc/os-release; echo "$ID_LIKE")" in
             *suse*)
                 suse_installdeps
+                ;;
+            *arch*)
+                archlinux_installdeps
                 ;;
         esac
     else
