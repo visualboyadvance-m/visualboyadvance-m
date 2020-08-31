@@ -329,6 +329,7 @@ void GameArea::LoadGame(const wxString& name)
     emulating = true;
     was_paused = true;
     MainFrame* mf = wxGetApp().frame;
+    mf->StopJoyPollTimer();
     mf->SetJoystick();
     mf->cmd_enable &= ~(CMDEN_GB | CMDEN_GBA);
     mf->cmd_enable |= ONLOAD_CMDEN;
@@ -579,6 +580,7 @@ void GameArea::UnloadGame(bool destruct)
     mf->cmd_enable &= UNLOAD_CMDEN_KEEP;
     mf->update_state_ts(true);
     mf->enable_menus();
+    mf->StartJoyPollTimer();
     mf->SetJoystick();
     mf->ResetCheatSearch();
 
