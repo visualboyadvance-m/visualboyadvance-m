@@ -969,6 +969,8 @@ void GameArea::Pause()
 
     if (loaded != IMAGE_UNKNOWN)
         soundPause();
+
+    wxGetApp().frame->StartJoyPollTimer();
 }
 
 void GameArea::Resume()
@@ -981,6 +983,8 @@ void GameArea::Resume()
 
     if (loaded != IMAGE_UNKNOWN)
         soundResume();
+
+    wxGetApp().frame->StopJoyPollTimer();
 
     SetFocus();
 }
