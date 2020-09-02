@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-29 20:11+0000\n"
+"POT-Creation-Date: 2020-09-01 18:22-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -839,35 +839,35 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr ""
 
-#: cmdevents.cpp:3131
+#: cmdevents.cpp:3125
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr ""
 
-#: cmdevents.cpp:3137
+#: cmdevents.cpp:3131
 msgid "Network is not supported in local mode."
 msgstr ""
 
-#: opts.cpp:563 opts.cpp:866
+#: opts.cpp:561 opts.cpp:864
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr ""
 
-#: opts.cpp:580 opts.cpp:878
+#: opts.cpp:578 opts.cpp:876
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr ""
 
-#: opts.cpp:587 opts.cpp:596 opts.cpp:886 opts.cpp:894
+#: opts.cpp:585 opts.cpp:594 opts.cpp:884 opts.cpp:892
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr ""
 
-#: opts.cpp:656 opts.cpp:677 opts.cpp:962 opts.cpp:988
+#: opts.cpp:654 opts.cpp:675 opts.cpp:960 opts.cpp:986
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr ""
 
-#: opts.cpp:849
+#: opts.cpp:847
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr ""
@@ -995,107 +995,107 @@ msgstr ""
 msgid "Error saving state %s"
 msgstr ""
 
-#: panel.cpp:863
+#: panel.cpp:865
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr ""
 
-#: panel.cpp:901
+#: panel.cpp:903
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr ""
 
-#: panel.cpp:906
+#: panel.cpp:908
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr ""
 
-#: panel.cpp:914
+#: panel.cpp:916
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr ""
 
-#: panel.cpp:918
+#: panel.cpp:920
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr ""
 
-#: panel.cpp:1002
+#: panel.cpp:1004
 msgid "Not a valid GBA cartridge"
 msgstr ""
 
-#: panel.cpp:1166
+#: panel.cpp:1168
 msgid "No memory for rewinding"
 msgstr ""
 
-#: panel.cpp:1176
+#: panel.cpp:1178
 msgid "Error writing rewind state"
 msgstr ""
 
-#: panel.cpp:2274
+#: panel.cpp:2272
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2283
+#: panel.cpp:2281
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:2292
+#: panel.cpp:2290
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:2298
+#: panel.cpp:2296
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr ""
 
-#: panel.cpp:2301
+#: panel.cpp:2299
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:2310
+#: panel.cpp:2308
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2316
+#: panel.cpp:2314
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:2412
+#: panel.cpp:2410
 msgid "memory allocation error"
 msgstr ""
 
-#: panel.cpp:2415
+#: panel.cpp:2413
 msgid "error initializing codec"
 msgstr ""
 
-#: panel.cpp:2418
+#: panel.cpp:2416
 msgid "error writing to output file"
 msgstr ""
 
-#: panel.cpp:2421
+#: panel.cpp:2419
 msgid "can't guess output format from file name"
 msgstr ""
 
-#: panel.cpp:2426
+#: panel.cpp:2424
 msgid "programming error; aborting!"
 msgstr ""
 
-#: panel.cpp:2438 panel.cpp:2467
+#: panel.cpp:2436 panel.cpp:2465
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr ""
 
-#: panel.cpp:2495
+#: panel.cpp:2493
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr ""
 
-#: panel.cpp:2501
+#: panel.cpp:2499
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr ""
 
-#: panel.cpp:2511
+#: panel.cpp:2509
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr ""
@@ -1156,22 +1156,22 @@ msgstr ""
 msgid "CONTROL"
 msgstr ""
 
-#: widgets/sdljoy.cpp:136
+#: widgets/sdljoy.cpp:130
 #, c-format
 msgid "Connected game controller %d"
 msgstr ""
 
-#: widgets/sdljoy.cpp:150
+#: widgets/sdljoy.cpp:144
 #, c-format
 msgid "Disconnected game controller %d"
 msgstr ""
 
-#: widgets/sdljoy.cpp:222
+#: widgets/sdljoy.cpp:216
 #, c-format
 msgid "Connected joystick %d"
 msgstr ""
 
-#: widgets/sdljoy.cpp:239
+#: widgets/sdljoy.cpp:233
 #, c-format
 msgid "Disconnected joystick %d"
 msgstr ""
@@ -2491,7 +2491,7 @@ msgid ""
 "see entire contents if too small."
 msgstr ""
 
-#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:460
+#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:455
 msgid "Up"
 msgstr ""
 
@@ -2499,7 +2499,7 @@ msgstr ""
 msgid "A"
 msgstr ""
 
-#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:464
+#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:459
 msgid "Down"
 msgstr ""
 
@@ -2507,7 +2507,7 @@ msgstr ""
 msgid "B"
 msgstr ""
 
-#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:468
+#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:463
 msgid "Left"
 msgstr ""
 
@@ -2515,7 +2515,7 @@ msgstr ""
 msgid "L"
 msgstr ""
 
-#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:472
+#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:467
 msgid "Right"
 msgstr ""
 
@@ -2523,11 +2523,11 @@ msgstr ""
 msgid "R"
 msgstr ""
 
-#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:492
+#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:487
 msgid "Select"
 msgstr ""
 
-#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:496
+#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:491
 msgid "Start"
 msgstr ""
 
@@ -2955,7 +2955,7 @@ msgstr ""
 msgid "&GameCube"
 msgstr ""
 
-#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:525
+#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:520
 msgid "&Game Boy"
 msgstr ""
 
@@ -2971,8 +2971,8 @@ msgstr ""
 msgid "&Speed hack"
 msgstr ""
 
-#: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:391
-#: xrc/MainMenu.xrc:427
+#: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:386
+#: xrc/MainMenu.xrc:422
 msgid "&Configure ..."
 msgstr ""
 
@@ -3028,331 +3028,327 @@ msgstr ""
 msgid "Enable MMX"
 msgstr ""
 
-#: xrc/MainMenu.xrc:360
-msgid "&Bilinear filter"
-msgstr ""
-
-#: xrc/MainMenu.xrc:371
+#: xrc/MainMenu.xrc:366
 msgid "&Keep window on top"
 msgstr ""
 
-#: xrc/MainMenu.xrc:376
+#: xrc/MainMenu.xrc:371
 msgid "&Status bar"
 msgstr ""
 
-#: xrc/MainMenu.xrc:380
+#: xrc/MainMenu.xrc:375
 msgid "&Disable on-screen display"
 msgstr ""
 
-#: xrc/MainMenu.xrc:384
+#: xrc/MainMenu.xrc:379
 msgid "&Transparent on-screen display"
 msgstr ""
 
-#: xrc/MainMenu.xrc:389
+#: xrc/MainMenu.xrc:384
 msgid "&Audio"
 msgstr ""
 
-#: xrc/MainMenu.xrc:394
+#: xrc/MainMenu.xrc:389
 msgid "&Increase volume"
 msgstr ""
 
-#: xrc/MainMenu.xrc:398
+#: xrc/MainMenu.xrc:393
 msgid "&Decrease volume"
 msgstr ""
 
-#: xrc/MainMenu.xrc:402
+#: xrc/MainMenu.xrc:397
 msgid "&Toggle sound"
 msgstr ""
 
-#: xrc/MainMenu.xrc:407
+#: xrc/MainMenu.xrc:402
 msgid "&GBA sound interpolation"
 msgstr ""
 
-#: xrc/MainMenu.xrc:412
+#: xrc/MainMenu.xrc:407
 msgid "&GB sound enhancement"
 msgstr ""
 
-#: xrc/MainMenu.xrc:416
+#: xrc/MainMenu.xrc:411
 msgid "&GB surround sound effect"
 msgstr ""
 
-#: xrc/MainMenu.xrc:420
+#: xrc/MainMenu.xrc:415
 msgid "&GB sound declicking"
 msgstr ""
 
-#: xrc/MainMenu.xrc:425
+#: xrc/MainMenu.xrc:420
 msgid "&Input"
 msgstr ""
 
-#: xrc/MainMenu.xrc:430
+#: xrc/MainMenu.xrc:425
 msgid "Allow &keyboard background input"
 msgstr ""
 
-#: xrc/MainMenu.xrc:434
+#: xrc/MainMenu.xrc:429
 msgid "Allow &joystick background input"
 msgstr ""
 
-#: xrc/MainMenu.xrc:439
+#: xrc/MainMenu.xrc:434
 msgid "&Autofire"
 msgstr ""
 
-#: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
+#: xrc/MainMenu.xrc:436 xrc/MainMenu.xrc:471
 msgid "&A"
 msgstr ""
 
-#: xrc/MainMenu.xrc:445 xrc/MainMenu.xrc:480
+#: xrc/MainMenu.xrc:440 xrc/MainMenu.xrc:475
 msgid "&B"
 msgstr ""
 
-#: xrc/MainMenu.xrc:449 xrc/MainMenu.xrc:484
+#: xrc/MainMenu.xrc:444 xrc/MainMenu.xrc:479
 msgid "&L"
 msgstr ""
 
-#: xrc/MainMenu.xrc:453 xrc/MainMenu.xrc:488
+#: xrc/MainMenu.xrc:448 xrc/MainMenu.xrc:483
 msgid "&R"
 msgstr ""
 
-#: xrc/MainMenu.xrc:458
+#: xrc/MainMenu.xrc:453
 msgid "&Autohold"
 msgstr ""
 
-#: xrc/MainMenu.xrc:502
+#: xrc/MainMenu.xrc:497
 msgid "&Game Boy Advance"
 msgstr ""
 
-#: xrc/MainMenu.xrc:504 xrc/MainMenu.xrc:527
+#: xrc/MainMenu.xrc:499 xrc/MainMenu.xrc:522
 msgid "Configure ..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:508
+#: xrc/MainMenu.xrc:503
 msgid "&Real-time clock"
 msgstr ""
 
-#: xrc/MainMenu.xrc:512
+#: xrc/MainMenu.xrc:507
 msgid "&Use BIOS file"
 msgstr ""
 
-#: xrc/MainMenu.xrc:516
+#: xrc/MainMenu.xrc:511
 msgid "&Debug print"
 msgstr ""
 
-#: xrc/MainMenu.xrc:520 xrc/MainMenu.xrc:535
+#: xrc/MainMenu.xrc:515 xrc/MainMenu.xrc:530
 msgid "&LCD Filter"
 msgstr ""
 
-#: xrc/MainMenu.xrc:531
+#: xrc/MainMenu.xrc:526
 msgid "&GB color option"
 msgstr ""
 
-#: xrc/MainMenu.xrc:539
+#: xrc/MainMenu.xrc:534
 msgid "&GB printer"
 msgstr ""
 
-#: xrc/MainMenu.xrc:543
+#: xrc/MainMenu.xrc:538
 msgid "&Gather a full page before printing"
 msgstr ""
 
-#: xrc/MainMenu.xrc:547
+#: xrc/MainMenu.xrc:542
 msgid "&Save printouts as screen captures"
 msgstr ""
 
-#: xrc/MainMenu.xrc:552
+#: xrc/MainMenu.xrc:547
 msgid "&Use GB BIOS file"
 msgstr ""
 
-#: xrc/MainMenu.xrc:556
+#: xrc/MainMenu.xrc:551
 msgid "&Use GBC BIOS file"
 msgstr ""
 
-#: xrc/MainMenu.xrc:561
+#: xrc/MainMenu.xrc:556
 msgid "&General ..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:564
+#: xrc/MainMenu.xrc:559
 msgid "&Speedup / Turbo ..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:567
+#: xrc/MainMenu.xrc:562
 msgid "D&irectories ..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:570
+#: xrc/MainMenu.xrc:565
 msgid "&Key Shortcuts ..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:573
+#: xrc/MainMenu.xrc:568
 msgid "&UI Settings ..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:577
+#: xrc/MainMenu.xrc:572
 msgid "&Tools"
 msgstr ""
 
-#: xrc/MainMenu.xrc:579
+#: xrc/MainMenu.xrc:574
 msgid "&Cheats"
 msgstr ""
 
-#: xrc/MainMenu.xrc:581
+#: xrc/MainMenu.xrc:576
 msgid "List &cheats ..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:584
+#: xrc/MainMenu.xrc:579
 msgid "Find c&heat ..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:588
+#: xrc/MainMenu.xrc:583
 msgid "A&utomatically save/load cheats"
 msgstr ""
 
-#: xrc/MainMenu.xrc:592
+#: xrc/MainMenu.xrc:587
 msgid "&Enable cheats"
 msgstr ""
 
-#: xrc/MainMenu.xrc:599
+#: xrc/MainMenu.xrc:594
 msgid "&Break into GDB"
 msgstr ""
 
-#: xrc/MainMenu.xrc:603
+#: xrc/MainMenu.xrc:598
 msgid "&Configure port..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:606
+#: xrc/MainMenu.xrc:601
 msgid "&Break on load"
 msgstr ""
 
-#: xrc/MainMenu.xrc:611
+#: xrc/MainMenu.xrc:606
 msgid "&Disconnect"
 msgstr ""
 
-#: xrc/MainMenu.xrc:613
+#: xrc/MainMenu.xrc:608
 msgid "&GDB"
 msgstr ""
 
-#: xrc/MainMenu.xrc:616
+#: xrc/MainMenu.xrc:611
 msgid "&Disassemble..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:619
+#: xrc/MainMenu.xrc:614
 msgid "&Logging..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:622
+#: xrc/MainMenu.xrc:617
 msgid "&IO Viewer..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:625
+#: xrc/MainMenu.xrc:620
 msgid "&Map Viewer..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:628
+#: xrc/MainMenu.xrc:623
 msgid "M&emory Viewer..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:631
+#: xrc/MainMenu.xrc:626
 msgid "&OAM Viewer..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:634
+#: xrc/MainMenu.xrc:629
 msgid "&Palette Viewer..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:637
+#: xrc/MainMenu.xrc:632
 msgid "&Tile Viewer..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:642
+#: xrc/MainMenu.xrc:637
 msgid "Show all video layers"
 msgstr ""
 
-#: xrc/MainMenu.xrc:646
+#: xrc/MainMenu.xrc:641
 msgid "BG &0"
 msgstr ""
 
-#: xrc/MainMenu.xrc:651
+#: xrc/MainMenu.xrc:646
 msgid "BG &1"
 msgstr ""
 
-#: xrc/MainMenu.xrc:656
+#: xrc/MainMenu.xrc:651
 msgid "BG &2"
 msgstr ""
 
-#: xrc/MainMenu.xrc:661
+#: xrc/MainMenu.xrc:656
 msgid "BG &3"
 msgstr ""
 
-#: xrc/MainMenu.xrc:666
+#: xrc/MainMenu.xrc:661
 msgid "&OBJ"
 msgstr ""
 
-#: xrc/MainMenu.xrc:671
+#: xrc/MainMenu.xrc:666
 msgid "&WIN 0"
 msgstr ""
 
-#: xrc/MainMenu.xrc:676
+#: xrc/MainMenu.xrc:671
 msgid "W&IN 1"
 msgstr ""
 
-#: xrc/MainMenu.xrc:681
+#: xrc/MainMenu.xrc:676
 msgid "O&BJ WIN"
 msgstr ""
 
-#: xrc/MainMenu.xrc:685
+#: xrc/MainMenu.xrc:680
 msgid "&View Layers"
 msgstr ""
 
-#: xrc/MainMenu.xrc:689
+#: xrc/MainMenu.xrc:684
 msgid "Channel &1"
 msgstr ""
 
-#: xrc/MainMenu.xrc:694
+#: xrc/MainMenu.xrc:689
 msgid "Channel &2"
 msgstr ""
 
-#: xrc/MainMenu.xrc:699
+#: xrc/MainMenu.xrc:694
 msgid "Channel &3"
 msgstr ""
 
-#: xrc/MainMenu.xrc:704
+#: xrc/MainMenu.xrc:699
 msgid "Channel &4"
 msgstr ""
 
-#: xrc/MainMenu.xrc:709
+#: xrc/MainMenu.xrc:704
 msgid "Direct Sound &A"
 msgstr ""
 
-#: xrc/MainMenu.xrc:714
+#: xrc/MainMenu.xrc:709
 msgid "Direct Sound &B"
 msgstr ""
 
-#: xrc/MainMenu.xrc:718
+#: xrc/MainMenu.xrc:713
 msgid "&Sound Channels"
 msgstr ""
 
-#: xrc/MainMenu.xrc:722
+#: xrc/MainMenu.xrc:717
 msgid "&Help"
 msgstr ""
 
-#: xrc/MainMenu.xrc:724
+#: xrc/MainMenu.xrc:719
 msgid "Report &Bugs"
 msgstr ""
 
-#: xrc/MainMenu.xrc:727
+#: xrc/MainMenu.xrc:722
 msgid "VBA-M Support &Forum"
 msgstr ""
 
-#: xrc/MainMenu.xrc:730
+#: xrc/MainMenu.xrc:725
 msgid "Translations"
 msgstr ""
 
-#: xrc/MainMenu.xrc:738
+#: xrc/MainMenu.xrc:733
 msgid "Check for updates"
 msgstr ""
 
-#: xrc/MainMenu.xrc:741
+#: xrc/MainMenu.xrc:736
 msgid "&Factory Reset..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:745
+#: xrc/MainMenu.xrc:740
 msgid "&About..."
 msgstr ""
 

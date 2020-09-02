@@ -355,11 +355,6 @@
           <label>Enable MMX</label>
           <checkable>1</checkable>
         </object>
-        <object class="separator"/>
-        <object class="wxMenuItem" name="Bilinear">
-          <label>_Bilinear filter</label>
-          <checkable>1</checkable>
-        </object>
 <!--
         <object class="wxMenuItem" name="Multithread">
           <label>_Multithread filter</label>

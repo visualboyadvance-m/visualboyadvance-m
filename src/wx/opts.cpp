@@ -187,7 +187,6 @@ opt_desc new_opt_desc(wxString opt, const char* cmd, wxString desc,
 // Both for better user display and for (fast) searching by name
 opt_desc opts[] = {
     /// Display
-    BOOLOPT("Display/Bilinear", "Bilinear", wxTRANSLATE("Use bilinear filter with 3d renderer"), gopts.bilinear),
     ENUMOPT("Display/Filter", "", wxTRANSLATE("Full-screen filter to apply"), gopts.filter,
         wxTRANSLATE("none|2xsai|super2xsai|supereagle|pixelate|advmame|"
                     L"bilinear|bilinearplus|scanlines|tvmode|hq2x|lq2x|"
@@ -361,7 +360,6 @@ opts_t::opts_t()
     gb_stereo = 15;
     gb_declick = true;
     gba_sound_filter = 50;
-    bilinear = true;
     default_stick = 1;
 
     recent = new wxFileHistory(10);

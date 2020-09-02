@@ -2869,12 +2869,6 @@ EVT_HANDLER(wxID_ABOUT, "About...")
     wxAboutBox(ai);
 }
 
-EVT_HANDLER(Bilinear, "Use bilinear filter with 3d renderer")
-{
-    GetMenuOptionBool("Bilinear", gopts.bilinear);
-    update_opts();
-}
-
 EVT_HANDLER(RetainAspect, "Retain aspect ratio when resizing")
 {
     GetMenuOptionBool("RetainAspect", gopts.retain_aspect);

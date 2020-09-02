@@ -2233,10 +2233,6 @@ void GLDrawingPanel::DrawingPanelInit()
     glEndList();
     glGenTextures(1, &texid);
     glBindTexture(GL_TEXTURE_2D, texid);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-        gopts.bilinear ? GL_LINEAR : GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-        gopts.bilinear ? GL_LINEAR : GL_NEAREST);
 
 #define int_fmt out_16 ? GL_RGB5 : GL_RGB
 #define tex_fmt out_16 ? GL_BGRA : GL_RGBA, \

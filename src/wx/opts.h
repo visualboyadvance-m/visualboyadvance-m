@@ -15,7 +15,6 @@ extern struct opts_t {
     // I instead organized this by opts.cpp table order
 
     /// Display
-    bool bilinear;
     int filter;
     wxString filter_plugin;
     int ifb;
