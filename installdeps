@@ -172,8 +172,6 @@ linux_installdeps() {
         fedora_installdeps
     elif [ -f /etc/redhat-release ] || [ -f /etc/centos-release ]; then
         rhel_installdeps
-    elif [ -f /etc/arch-release ]; then
-        archlinux_installdeps
     elif [ -f /etc/solus-release ]; then
         solus_installdeps
     elif [ -f /etc/gentoo-release ]; then
@@ -184,6 +182,8 @@ linux_installdeps() {
                 suse_installdeps
                 ;;
         esac
+    elif [ -x /usr/bin/pacman ]; then
+        archlinux_installdeps
     else
         error "Don't know how to install deps on your version of Linux"
     fi
