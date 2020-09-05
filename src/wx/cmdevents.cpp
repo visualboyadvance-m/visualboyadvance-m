@@ -2872,6 +2872,11 @@ EVT_HANDLER(wxID_ABOUT, "About...")
 EVT_HANDLER(Bilinear, "Use bilinear filter with 3d renderer")
 {
     GetMenuOptionBool("Bilinear", gopts.bilinear);
+    // Force new panel with new bilinear option
+    if (panel->panel) {
+        panel->panel->Destroy();
+        panel->panel = nullptr;
+    }
     update_opts();
 }
 
