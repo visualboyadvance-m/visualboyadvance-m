@@ -18,8 +18,7 @@ wxSDLJoy::wxSDLJoy()
 {
     // Start up joystick if not already started
     // FIXME: check for errors
-    SDL_Init(SDL_INIT_JOYSTICK);
-    SDL_Init(SDL_INIT_GAMECONTROLLER);
+    SDL_Init(SDL_INIT_JOYSTICK|SDL_INIT_GAMECONTROLLER);
     SDL_GameControllerEventState(SDL_ENABLE);
     SDL_JoystickEventState(SDL_ENABLE);
 }
@@ -69,20 +68,18 @@ void wxSDLJoy::Poll()
             {
                 auto joy = e.cbutton.which;
 
-                if (!SDL_IsGameController(joy))
-                    break;
-
-                if (contains(joystate, joy)) {
+                if (contains(instance_map, joy)) {
+                    auto& state   = *(instance_map[joy]);
                     auto but      = e.cbutton.button;
                     auto val      = e.cbutton.state;
-                    auto prev_val = joystate[joy].button[but];
+                    auto prev_val = state.button[but];
 
                     if (val != prev_val) {
-                        CreateAndSendEvent(joy, WXSDLJOY_BUTTON, but, val, prev_val);
+                        CreateAndSendEvent(state.index, WXSDLJOY_BUTTON, but, val, prev_val);
 
-                        joystate[joy].button[but] = val;
+                        state.button[but] = val;
 
-                        wxLogDebug("GOT SDL_CONTROLLERBUTTON: joy:%d but:%d val:%d prev_val:%d", joy, but, val, prev_val);
+                        wxLogDebug("GOT SDL_CONTROLLERBUTTON: joy:%d but:%d val:%d prev_val:%d", state.index, but, val, prev_val);
                     }
                 }
 
@@ -94,20 +91,18 @@ void wxSDLJoy::Poll()
             {
                 auto joy = e.caxis.which;
 
-                if (!SDL_IsGameController(joy))
-                    break;
-
-                if (contains(joystate, joy)) {
+                if (contains(instance_map, joy)) {
+                    auto& state   = *(instance_map[joy]);
                     auto axis     = e.caxis.axis;
                     auto val      = axisval(e.caxis.value);
-                    auto prev_val = joystate[joy].axis[axis];
+                    auto prev_val = state.axis[axis];
 
                     if (val != prev_val) {
-                        CreateAndSendEvent(joy, WXSDLJOY_AXIS, axis, val, prev_val);
+                        CreateAndSendEvent(state.index, WXSDLJOY_AXIS, axis, val, prev_val);
 
-                        joystate[joy].axis[axis] = val;
+                        state.axis[axis] = val;
 
-                        wxLogDebug("GOT SDL_CONTROLLERAXISMOTION: joy:%d axis:%d val:%d prev_val:%d", joy, axis, val, prev_val);
+                        wxLogDebug("GOT SDL_CONTROLLERAXISMOTION: joy:%d axis:%d val:%d prev_val:%d", state.index, axis, val, prev_val);
                     }
                 }
 
@@ -116,18 +111,15 @@ void wxSDLJoy::Poll()
                 break;
             }
             case SDL_CONTROLLERDEVICEADDED:
-            case SDL_CONTROLLERDEVICEREMAPPED:
             {
                 auto joy = e.cdevice.which;
 
-                if (!SDL_IsGameController(joy))
-                    break;
-
                 if (add_all || contains(joystate, joy)) {
-                    DisconnectController(joy);
-                    ConnectController(joy);
+                    RemapControllers();
+                    auto& state = joystate[joy];
 
-                    systemScreenMessage(wxString::Format(_("Connected game controller %d"), joy + 1));
+                    if (state.dev)
+                        systemScreenMessage(wxString::Format(_("Connected game controller %d: %s"), joy, SDL_GameControllerName(state.dev)));
                 }
 
                 got_event = true;
@@ -138,10 +130,11 @@ void wxSDLJoy::Poll()
             {
                 auto joy = e.cdevice.which;
 
-                if (contains(joystate, joy)) {
-                    DisconnectController(joy);
+                if (contains(instance_map, joy)) {
+                    auto index = instance_map[joy]->index;
+                    RemapControllers();
 
-                    systemScreenMessage(wxString::Format(_("Disconnected game controller %d"), joy + 1));
+                    systemScreenMessage(wxString::Format(_("Disconnected game controller %d"), index));
                 }
 
                 got_event = true;
@@ -156,20 +149,22 @@ void wxSDLJoy::Poll()
             {
                 auto joy = e.jbutton.which;
 
-                if (SDL_IsGameController(joy))
-                    break;
+                if (contains(instance_map, joy)) {
+                    auto& state   = *(instance_map[joy]);
 
-                if (contains(joystate, joy)) {
+                    if (SDL_IsGameController(state.index))
+                        break;
+
                     auto but      = e.jbutton.button;
                     auto val      = e.jbutton.state;
-                    auto prev_val = joystate[joy].button[but];
+                    auto prev_val = state.button[but];
 
                     if (val != prev_val) {
-                        CreateAndSendEvent(joy, WXSDLJOY_BUTTON, but, val, prev_val);
+                        CreateAndSendEvent(state.index, WXSDLJOY_BUTTON, but, val, prev_val);
 
-                        joystate[joy].button[but] = val;
+                        state.button[but] = val;
 
-                        wxLogDebug("GOT SDL_JOYBUTTON: joy:%d but:%d val:%d prev_val:%d", joy, but, val, prev_val);
+                        wxLogDebug("GOT SDL_JOYBUTTON: joy:%d but:%d val:%d prev_val:%d", state.index, but, val, prev_val);
                     }
                 }
 
@@ -181,20 +176,22 @@ void wxSDLJoy::Poll()
             {
                 auto joy = e.jaxis.which;
 
-                if (SDL_IsGameController(joy))
-                    break;
+                if (contains(instance_map, joy)) {
+                    auto& state   = *(instance_map[joy]);
 
-                if (contains(joystate, joy)) {
+                    if (SDL_IsGameController(state.index))
+                        break;
+
                     auto axis     = e.jaxis.axis;
                     auto val      = axisval(e.jaxis.value);
-                    auto prev_val = joystate[joy].axis[axis];
+                    auto prev_val = state.axis[axis];
 
                     if (val != prev_val) {
-                        CreateAndSendEvent(joy, WXSDLJOY_AXIS, axis, val, prev_val);
+                        CreateAndSendEvent(state.index, WXSDLJOY_AXIS, axis, val, prev_val);
 
-                        joystate[joy].axis[axis] = val;
+                        state.axis[axis] = val;
 
-                        wxLogDebug("GOT SDL_JOYAXISMOTION: joy:%d axis:%d val:%d prev_val:%d", joy, axis, val, prev_val);
+                        wxLogDebug("GOT SDL_JOYAXISMOTION: joy:%d axis:%d val:%d prev_val:%d", state.index, axis, val, prev_val);
                     }
                 }
 
@@ -204,16 +201,17 @@ void wxSDLJoy::Poll()
             }
             case SDL_JOYDEVICEADDED:
             {
-                auto joy = e.cdevice.which;
+                auto joy = e.jdevice.which;
 
                 if (SDL_IsGameController(joy))
                     break;
 
                 if (add_all || contains(joystate, joy)) {
-                    DisconnectController(joy);
-                    ConnectController(joy);
+                    RemapControllers();
+                    auto& state = joystate[joy];
 
-                    systemScreenMessage(wxString::Format(_("Connected joystick %d"), joy + 1));
+                    if (state.dev)
+                        systemScreenMessage(wxString::Format(_("Connected joystick %d: %s"), joy, SDL_JoystickName(state.dev)));
                 }
 
                 got_event = true;
@@ -222,15 +220,13 @@ void wxSDLJoy::Poll()
             }
             case SDL_JOYDEVICEREMOVED:
             {
-                auto joy = e.cdevice.which;
+                auto joy = e.jdevice.which;
 
-                if (SDL_IsGameController(joy))
-                    break;
+                if (contains(instance_map, joy)) {
+                    auto index = instance_map[joy]->index;
+                    RemapControllers();
 
-                if (contains(joystate, joy)) {
-                    DisconnectController(joy);
-
-                    systemScreenMessage(wxString::Format(_("Disconnected joystick %d"), joy + 1));
+                    systemScreenMessage(wxString::Format(_("Disconnected joystick %d"), index));
                 }
 
                 got_event = true;
@@ -314,34 +310,59 @@ void wxSDLJoy::Poll()
 
 void wxSDLJoy::ConnectController(uint8_t joy)
 {
-    if (SDL_IsGameController(joy)) {
-        if (!(joystate[joy].dev = SDL_GameControllerOpen(joy))) {
-            wxLogDebug("SDL_GameControllerOpen(%d) failed: %s", joy, SDL_GetError());
-            return;
+    SDL_Joystick* js_dev = nullptr;
+    bool is_gc;
+
+    if ((is_gc = SDL_IsGameController(joy))) {
+        auto dev = SDL_GameControllerOpen(joy);
+
+        if (dev) {
+            joystate[joy].dev = dev;
+
+            js_dev = SDL_GameControllerGetJoystick(dev);
         }
     }
     else {
-        if (!(joystate[joy].dev = SDL_JoystickOpen(joy))) {
-            wxLogDebug("SDL_JoystickOpen(%d) failed: %s", joy, SDL_GetError());
-            return;
-        }
+        if ((js_dev = SDL_JoystickOpen(joy)))
+            joystate[joy].dev = js_dev;
+    }
+
+    if (js_dev) {
+        auto instance = SDL_JoystickInstanceID(js_dev);
+
+        instance_map[instance] = &(joystate[joy]);
+
+        joystate[joy].instance = instance;
+    }
+
+    joystate[joy].index = joy;
+    joystate[joy].is_gc = is_gc;
+}
+
+void wxSDLJoy::RemapControllers()
+{
+    for (auto&& joy : joystate) {
+        auto& state = joy.second;
+
+        DisconnectController(state);
+        ConnectController(joy.first);
     }
 }
 
-void wxSDLJoy::DisconnectController(uint8_t joy)
+void wxSDLJoy::DisconnectController(wxSDLJoyState& state)
 {
-    if (auto& dev = joystate[joy].dev) {
-        if (SDL_IsGameController(joy)) {
-            if (SDL_GameControllerGetAttached(dev))
-                SDL_GameControllerClose(dev);
+    if (auto& dev = state.dev) {
+        if (state.is_gc) {
+            SDL_GameControllerClose(dev);
         }
         else {
-            if (SDL_JoystickGetAttached(dev))
-                SDL_JoystickClose(dev);
+            SDL_JoystickClose(dev);
         }
 
         dev = nullptr;
     }
+
+    instance_map.erase(state.instance);
 }
 
 void wxSDLJoy::Add(int8_t joy_n)
@@ -364,14 +385,14 @@ void wxSDLJoy::Remove(int8_t joy_n)
 
     if (joy_n < 0) {
         for (auto&& joy : joystate)
-            DisconnectController(joy.first);
+            DisconnectController(joy.second);
 
         joystate.clear();
 
         return;
     }
 
-    DisconnectController(joy_n);
+    DisconnectController(joystate[joy_n]);
     joystate.erase(joy_n);
 }
 
