@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-29 20:11+0000\n"
-"PO-Revision-Date: 2020-08-29 21:22+0000\n"
+"POT-Creation-Date: 2020-09-05 19:36+0000\n"
+"PO-Revision-Date: 2020-09-05 19:37+0000\n"
 "Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/bgk/vba-m/language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -163,7 +163,7 @@ msgstr "Pilih file cheat"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Daftar cheat VBA (*.clt)|*.clt|Daftar cheat CHT (*.cht)|*.cht"
 
-#: guiinit.cpp:260 panel.cpp:436
+#: guiinit.cpp:260 panel.cpp:437
 msgid "Loaded cheats"
 msgstr "Cheat yang dimuat"
 
@@ -616,7 +616,7 @@ msgstr "Mengimpor file baterai akan menghapus simpanan permainan (secara permane
 msgid "Confirm import"
 msgstr "Konfirmasi untuk mengimpor"
 
-#: cmdevents.cpp:907 panel.cpp:379
+#: cmdevents.cpp:907 panel.cpp:380
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Baterai yang dimuat %s"
@@ -699,7 +699,7 @@ msgstr "Terjadi kesalahan dalam memuat file snapshot %s"
 msgid "Wrote battery %s"
 msgstr "Menyimpan baterai %s"
 
-#: cmdevents.cpp:1100 panel.cpp:687
+#: cmdevents.cpp:1100 panel.cpp:689
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Terjadi kesalahan dalam menyimpan baterai %s"
@@ -968,131 +968,131 @@ msgstr "Tidak dapat memuat BIOS %s"
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Tidak dapat memuat ROM Game Boy Advance %s"
 
-#: panel.cpp:468
+#: panel.cpp:469
 msgid " player "
 msgstr "pemain"
 
-#: panel.cpp:635
+#: panel.cpp:637
 #, c-format
 msgid "Loaded state %s"
 msgstr "State yang dimuat %s"
 
-#: panel.cpp:635
+#: panel.cpp:637
 #, c-format
 msgid "Error loading state %s"
 msgstr "Terjadi kesalahan dalam memuat state %s"
 
-#: panel.cpp:659
+#: panel.cpp:661
 #, c-format
 msgid "Saved state %s"
 msgstr "State yang disimpan %s"
 
-#: panel.cpp:659
+#: panel.cpp:661
 #, c-format
 msgid "Error saving state %s"
 msgstr "Terjadi kesalahan dalam menyimpan state %s"
 
-#: panel.cpp:863
+#: panel.cpp:865
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "Mode layar penuh %dx%d-%d@%d tidak didukung; mencari mode yang lain"
 
-#: panel.cpp:901
+#: panel.cpp:903
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "Mode layar penuh %dx%d-%d@%d tidak didukung"
 
-#: panel.cpp:906
+#: panel.cpp:908
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Mode yang valid: %dx%d-%d@%d"
 
-#: panel.cpp:914
+#: panel.cpp:916
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "Pilih mode %dx%d-%d@%d"
 
-#: panel.cpp:918
+#: panel.cpp:920
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Gagal merubah mode ke %dx%d-%d@%d"
 
-#: panel.cpp:1002
+#: panel.cpp:1008
 msgid "Not a valid GBA cartridge"
 msgstr "Bukan merupakan cartridge GBA yang valid"
 
-#: panel.cpp:1166
+#: panel.cpp:1172
 msgid "No memory for rewinding"
 msgstr "Tidak ada memori untuk memuat state mundur"
 
-#: panel.cpp:1176
+#: panel.cpp:1182
 msgid "Error writing rewind state"
 msgstr "Terjadi kesalahan dalam menyimpan state mundur"
 
-#: panel.cpp:2274
+#: panel.cpp:2280
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2283
+#: panel.cpp:2289
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:2292
+#: panel.cpp:2298
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:2298
+#: panel.cpp:2304
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr ""
 
-#: panel.cpp:2301
+#: panel.cpp:2307
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:2310
+#: panel.cpp:2316
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2316
+#: panel.cpp:2322
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:2412
+#: panel.cpp:2418
 msgid "memory allocation error"
 msgstr "terjadi kesalahan dalam mengalokasikan memori"
 
-#: panel.cpp:2415
+#: panel.cpp:2421
 msgid "error initializing codec"
 msgstr "terjadi kesalahan dalam menginisialisasikan codec"
 
-#: panel.cpp:2418
+#: panel.cpp:2424
 msgid "error writing to output file"
 msgstr "terjadi kesalahan dalam menyimpan file keluaran"
 
-#: panel.cpp:2421
+#: panel.cpp:2427
 msgid "can't guess output format from file name"
 msgstr "tidak dapat menebak format keluaran dari nama file"
 
-#: panel.cpp:2426
+#: panel.cpp:2432
 msgid "programming error; aborting!"
 msgstr "terjadi kesalama dalam pemrograman; membatalkan perintah!"
 
-#: panel.cpp:2438 panel.cpp:2467
+#: panel.cpp:2444 panel.cpp:2473
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Tidak dapat memulai rekaman ke %s (%s)"
 
-#: panel.cpp:2495
+#: panel.cpp:2501
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Terjadi kesalahan dalam merekam audio/video (%s); membatalkan perintah"
 
-#: panel.cpp:2501
+#: panel.cpp:2507
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Terjadi kesalahan dalam merekam audio (%s); membatalkan perintah"
 
-#: panel.cpp:2511
+#: panel.cpp:2517
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Terjadi kesalahan dalam merekam video (%s); membatalkan perintah"
@@ -1153,22 +1153,22 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "KONTROL"
 
-#: widgets/sdljoy.cpp:136
+#: widgets/sdljoy.cpp:122
 #, c-format
-msgid "Connected game controller %d"
-msgstr "Kontroler permainan yang tersambung %d"
+msgid "Connected game controller %d: %s"
+msgstr ""
 
-#: widgets/sdljoy.cpp:150
+#: widgets/sdljoy.cpp:137
 #, c-format
 msgid "Disconnected game controller %d"
 msgstr "Kontroler permainan yang terputus %d"
 
-#: widgets/sdljoy.cpp:222
+#: widgets/sdljoy.cpp:214
 #, c-format
-msgid "Connected joystick %d"
+msgid "Connected joystick %d: %s"
 msgstr ""
 
-#: widgets/sdljoy.cpp:239
+#: widgets/sdljoy.cpp:229
 #, c-format
 msgid "Disconnected joystick %d"
 msgstr ""

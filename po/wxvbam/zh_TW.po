@@ -19,8 +19,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-29 20:11+0000\n"
-"PO-Revision-Date: 2020-08-29 21:22+0000\n"
+"POT-Creation-Date: 2020-09-05 19:36+0000\n"
+"PO-Revision-Date: 2020-09-05 19:37+0000\n"
 "Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/bgk/vba-m/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -55,7 +55,7 @@ msgstr "以全螢幕模式開始"
 
 #: wxvbam.cpp:526
 msgid "Set a configuration file"
-msgstr ""
+msgstr "設置設定檔"
 
 #: wxvbam.cpp:530
 msgid "Delete shared link state first, if it exists"
@@ -117,7 +117,7 @@ msgstr "可用於鍵盤/*選項的指令:\n\n"
 
 #: wxvbam.cpp:660
 msgid "Configuration file not found."
-msgstr ""
+msgstr "找不到設定檔"
 
 #: wxvbam.cpp:693
 msgid "Bad configuration option or multiple ROM files given:\n"
@@ -171,7 +171,7 @@ msgstr "選擇金手指代碼表"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA 金手指代碼表 (*.clt)|*.clt|CHT 金手指代碼表 (*.cht)|*.cht"
 
-#: guiinit.cpp:260 panel.cpp:436
+#: guiinit.cpp:260 panel.cpp:437
 msgid "Loaded cheats"
 msgstr "已讀取金手指"
 
@@ -624,7 +624,7 @@ msgstr "匯入電池記憶檔將會抹除現有的存檔（下次存檔後就永
 msgid "Confirm import"
 msgstr "匯入確認"
 
-#: cmdevents.cpp:907 panel.cpp:379
+#: cmdevents.cpp:907 panel.cpp:380
 #, c-format
 msgid "Loaded battery %s"
 msgstr "已讀取電池記憶檔 %s"
@@ -707,7 +707,7 @@ msgstr "讀取快照檔%s時發生錯誤"
 msgid "Wrote battery %s"
 msgstr "寫入電池記憶檔 %s"
 
-#: cmdevents.cpp:1100 panel.cpp:687
+#: cmdevents.cpp:1100 panel.cpp:689
 #, c-format
 msgid "Error writing battery %s"
 msgstr "寫入電池記憶檔%s時發生錯誤"
@@ -976,131 +976,131 @@ msgstr "無法讀取 BIOS %s"
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "無法讀取 Game Boy Advance ROM %s"
 
-#: panel.cpp:468
+#: panel.cpp:469
 msgid " player "
 msgstr " 播放器 "
 
-#: panel.cpp:635
+#: panel.cpp:637
 #, c-format
 msgid "Loaded state %s"
 msgstr "已讀取即時紀錄檔 %s"
 
-#: panel.cpp:635
+#: panel.cpp:637
 #, c-format
 msgid "Error loading state %s"
 msgstr "讀取即時紀錄檔時發生錯誤 %s"
 
-#: panel.cpp:659
+#: panel.cpp:661
 #, c-format
 msgid "Saved state %s"
 msgstr "已完成即時紀錄 %s"
 
-#: panel.cpp:659
+#: panel.cpp:661
 #, c-format
 msgid "Error saving state %s"
 msgstr "即時記錄時發生錯誤 %s"
 
-#: panel.cpp:863
+#: panel.cpp:865
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "不支援全螢幕模式 %dx%d-%d@%d， 尋找其他模式"
 
-#: panel.cpp:901
+#: panel.cpp:903
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "不支援全螢幕模式 %dx%d-%d@%d"
 
-#: panel.cpp:906
+#: panel.cpp:908
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "有效模式：%dx%d-%d@%d"
 
-#: panel.cpp:914
+#: panel.cpp:916
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "選擇模式：%dx%d-%d@%d"
 
-#: panel.cpp:918
+#: panel.cpp:920
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "無法切換到 %dx%d-%d@%d 模式"
 
-#: panel.cpp:1002
+#: panel.cpp:1008
 msgid "Not a valid GBA cartridge"
 msgstr "不是有效的 GBA 卡匣"
 
-#: panel.cpp:1166
+#: panel.cpp:1172
 msgid "No memory for rewinding"
 msgstr "沒有記憶體可用來倒帶"
 
-#: panel.cpp:1176
+#: panel.cpp:1182
 msgid "Error writing rewind state"
 msgstr "回寫狀態錯誤"
 
-#: panel.cpp:2274
+#: panel.cpp:2280
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "設置 glXSwapIntervalEXT 失敗"
 
-#: panel.cpp:2283
+#: panel.cpp:2289
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "設置 glXSwapIntervalSGI 失敗"
 
-#: panel.cpp:2292
+#: panel.cpp:2298
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "設置 glXSwapIntervalMESA 失敗"
 
-#: panel.cpp:2298
+#: panel.cpp:2304
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "不支援 wglGetExtensionsStringEXT"
 
-#: panel.cpp:2301
+#: panel.cpp:2307
 msgid "No support for WGL_EXT_swap_control"
 msgstr "不支援 WGL_EXT_swap_control"
 
-#: panel.cpp:2310
+#: panel.cpp:2316
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "設置 wglSwapIntervalEXT 失敗"
 
-#: panel.cpp:2316
+#: panel.cpp:2322
 msgid "No VSYNC available on this platform"
 msgstr "在此平台無法使用垂直同步"
 
-#: panel.cpp:2412
+#: panel.cpp:2418
 msgid "memory allocation error"
 msgstr "記憶體配置錯誤"
 
-#: panel.cpp:2415
+#: panel.cpp:2421
 msgid "error initializing codec"
 msgstr "解碼器初始化錯誤"
 
-#: panel.cpp:2418
+#: panel.cpp:2424
 msgid "error writing to output file"
 msgstr "輸出檔寫入錯誤"
 
-#: panel.cpp:2421
+#: panel.cpp:2427
 msgid "can't guess output format from file name"
 msgstr "從檔名猜測輸出格式失敗"
 
-#: panel.cpp:2426
+#: panel.cpp:2432
 msgid "programming error; aborting!"
 msgstr "程式錯誤，正在停止!"
 
-#: panel.cpp:2438 panel.cpp:2467
+#: panel.cpp:2444 panel.cpp:2473
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "不能開始錄製到 %s (%s)"
 
-#: panel.cpp:2495
+#: panel.cpp:2501
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "錄製 (%s) 聲音/影像錯誤; 停止中"
 
-#: panel.cpp:2501
+#: panel.cpp:2507
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "錄製 (%s) 聲音; 停止中"
 
-#: panel.cpp:2511
+#: panel.cpp:2517
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "錄製 (%s) 影像錯誤; 停止中"
@@ -1161,22 +1161,22 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:136
+#: widgets/sdljoy.cpp:122
 #, c-format
-msgid "Connected game controller %d"
-msgstr "已連接遊戲控制器 %d"
+msgid "Connected game controller %d: %s"
+msgstr ""
 
-#: widgets/sdljoy.cpp:150
+#: widgets/sdljoy.cpp:137
 #, c-format
 msgid "Disconnected game controller %d"
 msgstr "已斷開遊戲控制器 %d"
 
-#: widgets/sdljoy.cpp:222
+#: widgets/sdljoy.cpp:214
 #, c-format
-msgid "Connected joystick %d"
-msgstr "已連接的搖桿 %d"
+msgid "Connected joystick %d: %s"
+msgstr ""
 
-#: widgets/sdljoy.cpp:239
+#: widgets/sdljoy.cpp:229
 #, c-format
 msgid "Disconnected joystick %d"
 msgstr "未連接的搖桿 %d"
@@ -3091,11 +3091,11 @@ msgstr "控制(&I)"
 
 #: xrc/MainMenu.xrc:430
 msgid "Allow &keyboard background input"
-msgstr ""
+msgstr "允許鍵盤背景輸入(&K)"
 
 #: xrc/MainMenu.xrc:434
 msgid "Allow &joystick background input"
-msgstr ""
+msgstr "允許搖桿背景輸入(&J)"
 
 #: xrc/MainMenu.xrc:439
 msgid "&Autofire"

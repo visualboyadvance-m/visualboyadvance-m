@@ -20,8 +20,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-29 20:11+0000\n"
-"PO-Revision-Date: 2020-08-29 21:22+0000\n"
+"POT-Creation-Date: 2020-09-05 19:36+0000\n"
+"PO-Revision-Date: 2020-09-05 19:37+0000\n"
 "Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: German (http://www.transifex.com/bgk/vba-m/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -172,7 +172,7 @@ msgstr "Cheat-Datei auswählen"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA Cheat-Liste (*.clt)|*.clt|CHT Cheat-Liste (*.cht)|*.cht"
 
-#: guiinit.cpp:260 panel.cpp:436
+#: guiinit.cpp:260 panel.cpp:437
 msgid "Loaded cheats"
 msgstr "Cheats geladen"
 
@@ -625,7 +625,7 @@ msgstr "Das Importieren einer Batterie-Datei löscht alle Speicherstände (nach 
 msgid "Confirm import"
 msgstr "Import bestätigen"
 
-#: cmdevents.cpp:907 panel.cpp:379
+#: cmdevents.cpp:907 panel.cpp:380
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Batterie geladen %s"
@@ -708,7 +708,7 @@ msgstr "Fehler beim Laden der Snapshot-Datei %s"
 msgid "Wrote battery %s"
 msgstr "Batterie %s geschrieben"
 
-#: cmdevents.cpp:1100 panel.cpp:687
+#: cmdevents.cpp:1100 panel.cpp:689
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Fehler beim Schreiben der Batterie %s"
@@ -977,131 +977,131 @@ msgstr "Konnte BIOS %s nicht laden"
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Konnte Game Boy Advance ROM %s nicht laden"
 
-#: panel.cpp:468
+#: panel.cpp:469
 msgid " player "
 msgstr " Spieler "
 
-#: panel.cpp:635
+#: panel.cpp:637
 #, c-format
 msgid "Loaded state %s"
 msgstr "Savestate %s geladen"
 
-#: panel.cpp:635
+#: panel.cpp:637
 #, c-format
 msgid "Error loading state %s"
 msgstr "Fehler beim Laden von Savestate %s"
 
-#: panel.cpp:659
+#: panel.cpp:661
 #, c-format
 msgid "Saved state %s"
 msgstr "Savestate %s gespeichert"
 
-#: panel.cpp:659
+#: panel.cpp:661
 #, c-format
 msgid "Error saving state %s"
 msgstr "Fehler beim Speichern von Savestate %s"
 
-#: panel.cpp:863
+#: panel.cpp:865
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "Vollbildmodus %dx%d-%d@%d wird nicht unterstützt; probiere einen anderen aus"
 
-#: panel.cpp:901
+#: panel.cpp:903
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "Vollbildmodus %dx%d-%d@%d wird nicht unterstützt"
 
-#: panel.cpp:906
+#: panel.cpp:908
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Gültiger Modus: %dx%d-%d@%d"
 
-#: panel.cpp:914
+#: panel.cpp:916
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "Modus %dx%d-%d@%d ausgewählt"
 
-#: panel.cpp:918
+#: panel.cpp:920
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Konnte Anzeigemodus nicht auf %dx%d-%d@%d umstellen"
 
-#: panel.cpp:1002
+#: panel.cpp:1008
 msgid "Not a valid GBA cartridge"
 msgstr "Keine gültige GBA-Steckkarte"
 
-#: panel.cpp:1166
+#: panel.cpp:1172
 msgid "No memory for rewinding"
 msgstr "Kein freier Speicher für Zurückspuhl-Datei"
 
-#: panel.cpp:1176
+#: panel.cpp:1182
 msgid "Error writing rewind state"
 msgstr "Fehler beim Speichern von Zurückspuhl-Datei"
 
-#: panel.cpp:2274
+#: panel.cpp:2280
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Das belegen von glXSwapIntervalEXT ist fehlgeschlagen"
 
-#: panel.cpp:2283
+#: panel.cpp:2289
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Das belegen von glXSwapIntervalSGI ist fehlgeschlagen"
 
-#: panel.cpp:2292
+#: panel.cpp:2298
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Das belegen von glXSwapIntervalMESA ist fehlgeschlagen"
 
-#: panel.cpp:2298
+#: panel.cpp:2304
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr ""
 
-#: panel.cpp:2301
+#: panel.cpp:2307
 msgid "No support for WGL_EXT_swap_control"
 msgstr "Keine Unterstützung von WGL_EXT_swap_control"
 
-#: panel.cpp:2310
+#: panel.cpp:2316
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Das belegen von wglSwapIntervalEXT ist fehlgeschlagen"
 
-#: panel.cpp:2316
+#: panel.cpp:2322
 msgid "No VSYNC available on this platform"
 msgstr "VSYNC ist auf dieser Plattform nicht verfügbar"
 
-#: panel.cpp:2412
+#: panel.cpp:2418
 msgid "memory allocation error"
 msgstr "Fehler bei Speicherzuweisung"
 
-#: panel.cpp:2415
+#: panel.cpp:2421
 msgid "error initializing codec"
 msgstr "Fehler bei Initialisierung von Codec"
 
-#: panel.cpp:2418
+#: panel.cpp:2424
 msgid "error writing to output file"
 msgstr "Fehler beim Schreiben in Ausgabedatei"
 
-#: panel.cpp:2421
+#: panel.cpp:2427
 msgid "can't guess output format from file name"
 msgstr "Konnte Ausgabeformat nicht von Dateiendung ableiten"
 
-#: panel.cpp:2426
+#: panel.cpp:2432
 msgid "programming error; aborting!"
 msgstr "Programmierfehler! Abbruch!"
 
-#: panel.cpp:2438 panel.cpp:2467
+#: panel.cpp:2444 panel.cpp:2473
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Konnte nicht mit Aufnahme nach %s beginnen (%s)"
 
-#: panel.cpp:2495
+#: panel.cpp:2501
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Fehler bei Audio/Video-Aufnahme (%s). Abbruch"
 
-#: panel.cpp:2501
+#: panel.cpp:2507
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Fehler bei Audio-Aufnahme (%s). Abbruch"
 
-#: panel.cpp:2511
+#: panel.cpp:2517
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Fehler bei Video-Aufnahme (%s). Abbruch"
@@ -1162,22 +1162,22 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "STEUERUNG"
 
-#: widgets/sdljoy.cpp:136
+#: widgets/sdljoy.cpp:122
 #, c-format
-msgid "Connected game controller %d"
-msgstr "Verbundene Spiel Controller %d"
+msgid "Connected game controller %d: %s"
+msgstr ""
 
-#: widgets/sdljoy.cpp:150
+#: widgets/sdljoy.cpp:137
 #, c-format
 msgid "Disconnected game controller %d"
 msgstr "Getrennte Spiel Controller %d"
 
-#: widgets/sdljoy.cpp:222
+#: widgets/sdljoy.cpp:214
 #, c-format
-msgid "Connected joystick %d"
-msgstr "Verbundenes Gamepad %d"
+msgid "Connected joystick %d: %s"
+msgstr ""
 
-#: widgets/sdljoy.cpp:239
+#: widgets/sdljoy.cpp:229
 #, c-format
 msgid "Disconnected joystick %d"
 msgstr "Getrenntes Gamepad %d"
