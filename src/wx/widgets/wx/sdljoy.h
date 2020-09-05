@@ -20,25 +20,28 @@
 #include "../common/contains.h"
 
 struct wxSDLJoyDev {
-    private:
-        union {
-            SDL_GameController* dev_gc = nullptr;
-            SDL_Joystick*       dev_js;
-        };
-    public:
-        operator SDL_GameController*&();
-        SDL_GameController*& operator=(SDL_GameController* ptr);
+private:
+    union {
+        SDL_GameController* dev_gc = nullptr;
+        SDL_Joystick*       dev_js;
+    };
+public:
+    operator SDL_GameController*&();
+    SDL_GameController*& operator=(SDL_GameController* ptr);
 
-        operator SDL_Joystick*&();
-        SDL_Joystick*& operator=(SDL_Joystick* ptr);
+    operator SDL_Joystick*&();
+    SDL_Joystick*& operator=(SDL_Joystick* ptr);
 
-        operator bool();
+    operator bool();
 
-        std::nullptr_t& operator=(std::nullptr_t&& null_ptr);
+    std::nullptr_t& operator=(std::nullptr_t&& null_ptr);
 };
 
 struct wxSDLJoyState {
     wxSDLJoyDev dev;
+    uint8_t index = 0;
+    bool is_gc = true;
+    SDL_JoystickID instance = 0;
     std::unordered_map<uint8_t, int16_t> axis{};
     std::unordered_map<uint8_t, uint8_t> button{};
 };
@@ -70,13 +73,15 @@ protected:
     // used to continue rumbling on a timer
     void Notify();
     void ConnectController(uint8_t joy);
-    void DisconnectController(uint8_t joy);
+    void RemapControllers();
+    void DisconnectController(wxSDLJoyState& dev);
     void CreateAndSendEvent(unsigned short joy, unsigned short ctrl_type, unsigned short ctrl_idx, short ctrl_val, short prev_val);
 
-    const uint8_t POLL_TIME_MS = 10;
+    const uint8_t POLL_TIME_MS = 25;
 
 private:
     std::unordered_map<uint8_t, wxSDLJoyState> joystate;
+    std::unordered_map<SDL_JoystickID, wxSDLJoyState*> instance_map;
     bool add_all = false, rumbling = false;
 
     wxLongLong last_poll = wxGetUTCTimeMillis();
