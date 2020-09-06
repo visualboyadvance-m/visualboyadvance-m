@@ -19,8 +19,8 @@ wxJoyKeyBinding newWxJoyKeyBinding(int key, int mod, int joy)
 
 int wxJoyKeyTextCtrl::DigitalButton(wxSDLJoyEvent& event)
 {
-    int sdlval = event.GetControlValue();
-    int sdltype = event.GetControlType();
+    int16_t sdlval = event.control_value();
+    wxSDLControl sdltype = event.control();
 
     switch (sdltype) {
     case WXSDLJOY_AXIS:
@@ -72,8 +72,8 @@ void wxJoyKeyTextCtrl::OnJoy(wxSDLJoyEvent& event)
 {
     static wxLongLong last_event = 0;
 
-    int val  = event.GetControlValue();
-    int type = event.GetControlType();
+    int16_t val  = event.control_value();
+    wxSDLControl type = event.control();
 
     // Filter consecutive axis motions within 300ms, as this adds two bindings
     // +1/-1 instead of the one intended.
@@ -83,7 +83,8 @@ void wxJoyKeyTextCtrl::OnJoy(wxSDLJoyEvent& event)
     last_event = wxGetUTCTimeMillis();
 
     int mod = DigitalButton(event);
-    int key = event.GetControlIndex(), joy = event.GetJoy() + 1;
+    uint8_t key = event.control_index();
+    unsigned joy = event.player_index();
 
     if (!val || mod < 0)
         return;

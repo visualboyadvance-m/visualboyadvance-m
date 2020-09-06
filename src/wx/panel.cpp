@@ -1391,25 +1391,25 @@ void GameArea::OnSize(wxSizeEvent& ev)
 
 void GameArea::OnSDLJoy(wxSDLJoyEvent& ev)
 {
-    int key = ev.GetControlIndex();
+    int key = ev.control_index();
     int mod = wxJoyKeyTextCtrl::DigitalButton(ev);
-    int joy = ev.GetJoy() + 1;
+    int joy = ev.player_index();
 
     // mutually exclusive key types unpress their opposite
     if (mod == WXJB_AXIS_PLUS) {
         process_key_press(false, key, WXJB_AXIS_MINUS, joy);
-        process_key_press(ev.GetControlValue() != 0, key, mod, joy);
+        process_key_press(ev.control_value() != 0, key, mod, joy);
     } else if (mod == WXJB_AXIS_MINUS) {
         process_key_press(false, key, WXJB_AXIS_PLUS, joy);
-        process_key_press(ev.GetControlValue() != 0, key, mod, joy);
+        process_key_press(ev.control_value() != 0, key, mod, joy);
     } else if (mod >= WXJB_HAT_FIRST && mod <= WXJB_HAT_LAST) {
-        int value = ev.GetControlValue();
+        int value = ev.control_value();
         process_key_press(value & SDL_HAT_UP, key, WXJB_HAT_N, joy);
         process_key_press(value & SDL_HAT_DOWN, key, WXJB_HAT_S, joy);
         process_key_press(value & SDL_HAT_RIGHT, key, WXJB_HAT_E, joy);
         process_key_press(value & SDL_HAT_LEFT, key, WXJB_HAT_W, joy);
     } else
-        process_key_press(ev.GetControlValue() != 0, key, mod, joy);
+        process_key_press(ev.control_value() != 0, key, mod, joy);
 
     // tell Linux to turn off the screensaver/screen-blank if joystick button was pressed
     // this shouldn't be necessary of course
