@@ -109,8 +109,8 @@ static void get_config_path(wxPathList& path, bool exists = true)
     }
     else
     {
-	// config is in $HOME/.vbam/
-	add_nonstandard_path(old_config);
+        // config is in $HOME/.vbam/
+        add_nonstandard_path(old_config);
     }
 #endif
 
@@ -240,7 +240,7 @@ bool wxvbamApp::OnInit()
         return false;
 
     if (console_mode)
-	return true;
+        return true;
 
     // prepare for loading xrc files
     wxXmlResource* xr = wxXmlResource::Get();
@@ -449,13 +449,13 @@ bool wxvbamApp::OnInit()
         return false;
 
     if (x >= 0 && y >= 0 && width > 0 && height > 0)
-	frame->SetSize(x, y, width, height);
+        frame->SetSize(x, y, width, height);
 
     if (isMaximized)
         frame->Maximize();
 
     if (isFullscreen && wxGetApp().pending_load != wxEmptyString)
-	frame->ShowFullScreen(isFullscreen);
+        frame->ShowFullScreen(isFullscreen);
     frame->Show(true);
 
 #ifndef NO_ONLINEUPDATES
@@ -468,12 +468,12 @@ int wxvbamApp::OnRun()
 {
     if (console_mode)
     {
-	// we could check for our own error codes here...
-	return console_status;
+        // we could check for our own error codes here...
+        return console_status;
     }
     else
     {
-	return wxApp::OnRun();
+        return wxApp::OnRun();
     }
 }
 
@@ -512,30 +512,30 @@ void wxvbamApp::OnInitCmdLine(wxCmdLineParser& cl)
     static wxCmdLineEntryDesc opttab[] = {
         { wxCMD_LINE_OPTION, NULL, t("save-xrc"),
             N_("Save built-in XRC file and exit"),
-	    wxCMD_LINE_VAL_STRING, 0 },
+            wxCMD_LINE_VAL_STRING, 0 },
         { wxCMD_LINE_OPTION, NULL, t("save-over"),
             N_("Save built-in vba-over.ini and exit"),
-	    wxCMD_LINE_VAL_STRING, 0 },
+            wxCMD_LINE_VAL_STRING, 0 },
         { wxCMD_LINE_SWITCH, NULL, t("print-cfg-path"),
             N_("Print configuration path and exit"),
-	    wxCMD_LINE_VAL_NONE, 0 },
+            wxCMD_LINE_VAL_NONE, 0 },
         { wxCMD_LINE_SWITCH, t("f"), t("fullscreen"),
             N_("Start in full-screen mode"),
-	    wxCMD_LINE_VAL_NONE, 0 },
+            wxCMD_LINE_VAL_NONE, 0 },
         { wxCMD_LINE_OPTION, t("c"), t("config"),
             N_("Set a configuration file"),
-        wxCMD_LINE_VAL_STRING, 0 },
+            wxCMD_LINE_VAL_STRING, 0 },
 #if !defined(NO_LINK) && !defined(__WXMSW__)
         { wxCMD_LINE_SWITCH, t("s"), t("delete-shared-state"),
             N_("Delete shared link state first, if it exists"),
-	    wxCMD_LINE_VAL_NONE, 0 },
+            wxCMD_LINE_VAL_NONE, 0 },
 #endif
         // stupid wx cmd line parser doesn't support duplicate options
-        //	{ wxCMD_LINE_OPTION, t("o"),  t("option"),
-        //		_("Set configuration option; <opt>=<value> or help for list"),
+        //    { wxCMD_LINE_OPTION, t("o"),  t("option"),
+        //        _("Set configuration option; <opt>=<value> or help for list"),
         { wxCMD_LINE_SWITCH, t("o"), t("list-options"),
             N_("List all settable options and exit"),
-	    wxCMD_LINE_VAL_NONE, 0 },
+            wxCMD_LINE_VAL_NONE, 0 },
         { wxCMD_LINE_PARAM, NULL, NULL,
             N_("ROM file"), wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
         { wxCMD_LINE_PARAM, NULL, NULL,
@@ -720,8 +720,8 @@ wxString wxvbamApp::GetDataDir()
 wxvbamApp::~wxvbamApp() {
     if (home != NULL)
     {
-	free(home);
-	home = NULL;
+        free(home);
+        home = NULL;
     }
     delete overrides;
 
@@ -797,8 +797,8 @@ void MainFrame::OnMenu(wxContextMenuEvent& event)
         wxPoint p(event.GetPosition());
 #if 0 // wx actually recommends ignoring the position
 
-		if (p != wxDefaultPosition)
-			p = ScreenToClient(p);
+        if (p != wxDefaultPosition)
+            p = ScreenToClient(p);
 
 #endif
         PopupMenu(ctx_menu, p);
@@ -839,16 +839,16 @@ void MainFrame::OnSize(wxSizeEvent& event)
     bool isMaximized = IsMaximized();
     if (!isFullscreen && !isMaximized)
     {
-	if (height > 0 && width > 0)
-	{
-	    windowHeight = height;
-	    windowWidth = width;
-	}
-	if (x >= 0 && y >= 0)
-	{
-	    windowPositionX = x;
-	    windowPositionY = y;
-	}
+        if (height > 0 && width > 0)
+        {
+            windowHeight = height;
+            windowWidth = width;
+        }
+        if (x >= 0 && y >= 0)
+        {
+            windowPositionX = x;
+            windowPositionY = y;
+        }
     }
     else
     {
@@ -876,25 +876,26 @@ int MainFrame::FilterEvent(wxEvent& event)
                  evh.SetEventObject(this);
                  GetEventHandler()->ProcessEvent(evh);
                  return true;
-	     }
+         }
     }
     else if (event.GetEventType() == wxEVT_SDLJOY && !menus_opened && !dialog_opened)
     {
         wxSDLJoyEvent& je = (wxSDLJoyEvent&)event;
-        if (je.GetControlValue() == 0) return -1; // joystick button UP
-        int key = je.GetControlIndex();
+        if (je.control_value() == 0) return -1; // joystick button UP
+        uint8_t key = je.control_index();
         int mod = wxJoyKeyTextCtrl::DigitalButton(je);
-        int joy = je.GetJoy() + 1;
+        int joy = je.player_index();
         wxString label = wxJoyKeyTextCtrl::ToString(mod, key, joy);
         wxAcceleratorEntry_v accels = wxGetApp().GetAccels();
-        for (size_t i = 0; i < accels.size(); ++i) {
-             if (label == accels[i].GetUkey())
-             {
-                 wxCommandEvent evh(wxEVT_COMMAND_MENU_SELECTED, accels[i].GetCommand());
-                 evh.SetEventObject(this);
-                 GetEventHandler()->ProcessEvent(evh);
-                 return true;
-	     }
+        for (size_t i = 0; i < accels.size(); ++i)
+        {
+            if (label == accels[i].GetUkey())
+            {
+                wxCommandEvent evh(wxEVT_COMMAND_MENU_SELECTED, accels[i].GetCommand());
+                evh.SetEventObject(this);
+                GetEventHandler()->ProcessEvent(evh);
+                return true;
+            }
         }
     }
     return -1;
@@ -916,8 +917,8 @@ wxString MainFrame::GetGamePath(wxString path)
 
     if (!wxIsWritable(game_path))
     {
-	game_path = wxGetApp().GetAbsolutePath(wxString((get_xdg_user_data_home() + DOT_DIR).c_str(), wxConvLibc));
-	wxFileName::Mkdir(game_path, 0777, wxPATH_MKDIR_FULL);
+        game_path = wxGetApp().GetAbsolutePath(wxString((get_xdg_user_data_home() + DOT_DIR).c_str(), wxConvLibc));
+        wxFileName::Mkdir(game_path, 0777, wxPATH_MKDIR_FULL);
     }
 
     return game_path;
@@ -927,23 +928,26 @@ void MainFrame::SetJoystick()
 {
     /* Remove all attached joysticks to avoid errors while
      * destroying and creating the GameArea `panel`. */
-    joy.Remove();
+    joy.StopPolling();
 
     set_global_accels();
 
     if (!emulating)
         return;
 
-    for (int i = 0; i < 4; i++)
+    std::unordered_set<unsigned> needed_joysticks;
+    for (int i = 0; i < 4; i++) {
         for (int j = 0; j < NUM_KEYS; j++) {
             wxJoyKeyBinding_v b = gopts.joykey_bindings[i][j];
             for (size_t k = 0; k < b.size(); k++) {
                 int jn = b[k].joy;
                 if (jn) {
-                    joy.Add(jn - 1);
+                    needed_joysticks.insert(jn);
                 }
             }
         }
+    }
+    joy.PollJoysticks(needed_joysticks);
 }
 
 void MainFrame::StopJoyPollTimer()

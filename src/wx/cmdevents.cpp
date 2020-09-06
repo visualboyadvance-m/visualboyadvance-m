@@ -2736,7 +2736,7 @@ EVT_HANDLER(EmulatorDirectories, "Directories...")
 EVT_HANDLER(JoypadConfigure, "Joypad options...")
 {
     wxDialog* dlg = GetXRCDialog("JoypadConfig");
-    joy.Add();
+    joy.PollAllJoysticks();
 
     auto frame = wxGetApp().frame;
     bool joy_timer = frame->IsJoyPollTimerRunning();
@@ -2754,7 +2754,7 @@ EVT_HANDLER(JoypadConfigure, "Joypad options...")
 EVT_HANDLER(Customize, "Customize UI...")
 {
     wxDialog* dlg = GetXRCDialog("AccelConfig");
-    joy.Add();
+    joy.PollAllJoysticks();
 
     auto frame = wxGetApp().frame;
     bool joy_timer = frame->IsJoyPollTimerRunning();

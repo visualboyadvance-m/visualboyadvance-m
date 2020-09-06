@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-05 19:36+0000\n"
+"POT-Creation-Date: 2020-09-05 21:42-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1156,17 +1156,7 @@ msgstr ""
 msgid "CONTROL"
 msgstr ""
 
-#: widgets/sdljoy.cpp:122
-#, c-format
-msgid "Connected game controller %d: %s"
-msgstr ""
-
-#: widgets/sdljoy.cpp:137
-#, c-format
-msgid "Disconnected game controller %d"
-msgstr ""
-
-#: widgets/sdljoy.cpp:214
+#: widgets/sdljoy.cpp:107
 #, c-format
 msgid "Connected joystick %d: %s"
 msgstr ""

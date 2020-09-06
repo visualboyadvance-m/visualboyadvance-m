@@ -1,138 +1,103 @@
 #ifndef JOYEVT_H
 #define JOYEVT_H
 
-// This is my own SDL-based joystick handler, since wxJoystick is brain-dead.
-// It's geared towards keyboard emulation
-
-// To use, create a wxSDLJoy object Add() the joysticks you want to monitor.
-//
-//   The target window will receive EVT_SDLJOY events of type wxSDLJoyEvent.
-
-#include <cstddef>
-#include <array>
-#include <vector>
+#include <memory>
+#include <unordered_set>
 #include <unordered_map>
 #include <wx/time.h>
 #include <wx/event.h>
-#include <wx/timer.h>
 #include <SDL_joystick.h>
 #include <SDL_gamecontroller.h>
-#include "../common/contains.h"
+#include <SDL_events.h>
 
-struct wxSDLJoyDev {
-private:
-    union {
-        SDL_GameController* dev_gc = nullptr;
-        SDL_Joystick*       dev_js;
-    };
+// The different types of supported controls.
+enum wxSDLControl {
+    WXSDLJOY_AXIS,  // Control value is signed 16
+    WXSDLJOY_HAT,   // Control value is bitmask NESW/URDL
+    WXSDLJOY_BUTTON // Control value is 0 or 1
+};
+
+// Represents a Joystick event.
+class wxSDLJoyEvent : public wxCommandEvent {
 public:
-    operator SDL_GameController*&();
-    SDL_GameController*& operator=(SDL_GameController* ptr);
+    wxSDLJoyEvent(
+        unsigned player_index,
+        wxSDLControl control,
+        uint8_t control_index,
+        int16_t control_value);
+    virtual ~wxSDLJoyEvent() = default;
 
-    operator SDL_Joystick*&();
-    SDL_Joystick*& operator=(SDL_Joystick* ptr);
+    unsigned player_index() const { return player_index_; }
+    wxSDLControl control() const { return control_; }
+    uint8_t control_index() const { return control_index_; }
+    int16_t control_value() const { return control_value_; }
 
-    operator bool();
-
-    std::nullptr_t& operator=(std::nullptr_t&& null_ptr);
+private:
+    unsigned player_index_;
+    wxSDLControl control_;
+    uint8_t control_index_;
+    int16_t control_value_;
 };
 
-struct wxSDLJoyState {
-    wxSDLJoyDev dev;
-    uint8_t index = 0;
-    bool is_gc = true;
-    SDL_JoystickID instance = 0;
-    std::unordered_map<uint8_t, int16_t> axis{};
-    std::unordered_map<uint8_t, uint8_t> button{};
-};
+class wxSDLJoyState;
 
-class wxSDLJoy : public wxTimer {
+// This is my own SDL-based joystick handler, since wxJoystick is brain-dead.
+// It's geared towards keyboard emulation.
+//
+// After initilization, use PollJoystick() or PollAllJoysticks() for the
+// joysticks you wish to monitor. The target window will then receive
+// EVT_SDLJOY events of type wxSDLJoyEvent.
+// Handling of the player_index() value is different depending on the polling
+// mode. After calls to PollJoysticks(), that value will remain constant for a
+// given device, even if other joysticks disconnect. This ensures the joystick
+// remains active during gameplay even if other joysticks disconnect.
+// However, after calls to PollAllJoysticks(), all joysticks are re-connected
+// on joystick connect/disconnect. This ensures the right player_index() value
+// is sent to the UI during input event configuration.
+class wxSDLJoy {
 public:
     wxSDLJoy();
-    // add another joystick to the list of polled sticks
-    // -1 == add all
-    // If joy > # of joysticks, it is ignored
-    // This will start polling if a valid joystick is selected
-    void Add(int8_t joy = -1);
-    // remove a joystick from the polled sticks
-    // -1 == remove all
-    // If joy > # of joysticks, it is ignored
-    // This will stop polling if all joysticks are disabled
-    void Remove(int8_t joy = -1);
-    // query if a stick is being polled
-    bool IsPolling(uint8_t joy) { return contains(joystate, joy); }
+    ~wxSDLJoy();
 
-    // true = currently rumbling, false = turn off rumbling
-    void SetRumble(bool do_rumble);
+    // Adds a set of joysticks to the list of polled joysticks.
+    // This will disconnect every active joysticks, and reactivates the ones
+    // matching an index in |indexes|. Missing joysticks will be connected if
+    // they connect later on.
+    void PollJoysticks(std::unordered_set<unsigned> indexes);
 
+    // Adds all joysticks to the list of polled joysticks. This will
+    // disconnect every active joysticks, reconnect them and start polling.
+    void PollAllJoysticks();
+
+    // Removes all joysticks from the list of polled joysticks.
+    // This will stop polling.
+    void StopPolling();
+
+    // Activates or deactivates rumble on active joysticks.
+    void SetRumble(bool activate_rumble);
+
+    // Polls active joysticks and empties the SDL event buffer.
     void Poll();
 
-    virtual ~wxSDLJoy();
-
-protected:
-    // used to continue rumbling on a timer
-    void Notify();
-    void ConnectController(uint8_t joy);
-    void RemapControllers();
-    void DisconnectController(wxSDLJoyState& dev);
-    void CreateAndSendEvent(unsigned short joy, unsigned short ctrl_type, unsigned short ctrl_idx, short ctrl_val, short prev_val);
-
-    const uint8_t POLL_TIME_MS = 25;
-
 private:
-    std::unordered_map<uint8_t, wxSDLJoyState> joystate;
-    std::unordered_map<SDL_JoystickID, wxSDLJoyState*> instance_map;
-    bool add_all = false, rumbling = false;
+    // Reconnects all controllers.
+    void RemapControllers();
 
-    wxLongLong last_poll = wxGetUTCTimeMillis();
-};
+    // Helper method to find a joystick state from a joystick ID.
+    // Returns nullptr if not present.
+    wxSDLJoyState* FindJoyState(const SDL_JoystickID& joy_id);
 
-enum {
-    // The types of supported controls
-    // values are signed-16 for axis, 0/1 for button
-    // hat is bitmask NESW/URDL
-    WXSDLJOY_AXIS,
-    WXSDLJOY_HAT,
-    WXSDLJOY_BUTTON
-};
+    // Map of SDL joystick ID to joystick state. Only contains active joysticks.
+    std::unordered_map<SDL_JoystickID, std::unique_ptr<wxSDLJoyState>> joystick_states_;
 
-class wxSDLJoyEvent : public wxCommandEvent {
-    friend class wxSDLJoy;
+    // Set of requested SDL joystick indexes.
+    std::unordered_set<int> requested_sdl_indexes_;
 
-public:
-    // Default constructor
-    wxSDLJoyEvent(wxEventType commandType = wxEVT_NULL)
-        : wxCommandEvent(commandType)
-    {
-    }
-    // accessors
-    unsigned short GetJoy()
-    {
-        return joy;
-    }
-    unsigned short GetControlType()
-    {
-        return ctrl_type;
-    }
-    unsigned short GetControlIndex()
-    {
-        return ctrl_idx;
-    }
-    short GetControlValue()
-    {
-        return ctrl_val;
-    }
-    short GetControlPrevValue()
-    {
-        return prev_val;
-    }
+    // Set to true when we are actively polling controllers.
+    bool is_polling_active_ = false;
 
-protected:
-    unsigned short joy;
-    unsigned short ctrl_type;
-    unsigned short ctrl_idx;
-    short ctrl_val;
-    short prev_val;
+    // Timestamp when the latest poll was done.
+    wxLongLong last_poll_ = wxGetUTCTimeMillis();
 };
 
 // Note: this means sdljoy can't be part of a library w/o extra work
