@@ -1,10 +1,17 @@
 #include <cstddef>
+#include <unordered_set>
 #include "wxvbam.h"
 #include "wx/sdljoy.h"
 #include "SDL.h"
 #include <SDL_events.h>
 #include "../common/range.hpp"
 #include "../common/contains.h"
+
+// Use these as a joystick and not as a GameController.
+static const std::unordered_set<std::string> JOYSTICK_OVERRIDES{
+    "Nintendo Switch Pro Controller",
+    "Mayflash GameCube Controller Adapter"
+};
 
 using namespace Range;
 
@@ -70,6 +77,10 @@ void wxSDLJoy::Poll()
 
                 if (contains(instance_map, joy)) {
                     auto& state   = *(instance_map[joy]);
+
+                    if (!state.is_gc)
+                        break;
+
                     auto but      = e.cbutton.button;
                     auto val      = e.cbutton.state;
                     auto prev_val = state.button[but];
@@ -93,6 +104,10 @@ void wxSDLJoy::Poll()
 
                 if (contains(instance_map, joy)) {
                     auto& state   = *(instance_map[joy]);
+
+                    if (!state.is_gc)
+                        break;
+
                     auto axis     = e.caxis.axis;
                     auto val      = axisval(e.caxis.value);
                     auto prev_val = state.axis[axis];
@@ -114,13 +129,8 @@ void wxSDLJoy::Poll()
             {
                 auto joy = e.cdevice.which;
 
-                if (add_all || contains(joystate, joy)) {
+                if (add_all || contains(joystate, joy))
                     RemapControllers();
-                    auto& state = joystate[joy];
-
-                    if (state.dev)
-                        systemScreenMessage(wxString::Format(_("Connected game controller %d: %s"), joy, SDL_GameControllerName(state.dev)));
-                }
 
                 got_event = true;
 
@@ -130,12 +140,8 @@ void wxSDLJoy::Poll()
             {
                 auto joy = e.cdevice.which;
 
-                if (contains(instance_map, joy)) {
-                    auto index = instance_map[joy]->index;
+                if (contains(instance_map, joy))
                     RemapControllers();
-
-                    systemScreenMessage(wxString::Format(_("Disconnected game controller %d"), index));
-                }
 
                 got_event = true;
 
@@ -152,7 +158,7 @@ void wxSDLJoy::Poll()
                 if (contains(instance_map, joy)) {
                     auto& state   = *(instance_map[joy]);
 
-                    if (SDL_IsGameController(state.index))
+                    if (state.is_gc)
                         break;
 
                     auto but      = e.jbutton.button;
@@ -179,7 +185,7 @@ void wxSDLJoy::Poll()
                 if (contains(instance_map, joy)) {
                     auto& state   = *(instance_map[joy]);
 
-                    if (SDL_IsGameController(state.index))
+                    if (state.is_gc)
                         break;
 
                     auto axis     = e.jaxis.axis;
@@ -206,13 +212,8 @@ void wxSDLJoy::Poll()
                 if (SDL_IsGameController(joy))
                     break;
 
-                if (add_all || contains(joystate, joy)) {
+                if (add_all || contains(joystate, joy))
                     RemapControllers();
-                    auto& state = joystate[joy];
-
-                    if (state.dev)
-                        systemScreenMessage(wxString::Format(_("Connected joystick %d: %s"), joy, SDL_JoystickName(state.dev)));
-                }
 
                 got_event = true;
 
@@ -222,12 +223,8 @@ void wxSDLJoy::Poll()
             {
                 auto joy = e.jdevice.which;
 
-                if (contains(instance_map, joy)) {
-                    auto index = instance_map[joy]->index;
+                if (contains(instance_map, joy))
                     RemapControllers();
-
-                    systemScreenMessage(wxString::Format(_("Disconnected joystick %d"), index));
-                }
 
                 got_event = true;
 
@@ -250,7 +247,7 @@ void wxSDLJoy::Poll()
         for (auto&& joy : joystate) {
             if (!joy.second.dev) continue;
 
-            if (SDL_IsGameController(joy.first)) {
+            if (joy.second.is_gc) {
                 for (uint8_t but = 0; but < SDL_CONTROLLER_BUTTON_MAX; but++) {
                     auto last_state = joy.second.button[but];
                     auto state      = SDL_GameControllerGetButton(joy.second.dev, static_cast<SDL_GameControllerButton>(but));
@@ -312,19 +309,37 @@ void wxSDLJoy::ConnectController(uint8_t joy)
 {
     SDL_Joystick* js_dev = nullptr;
     bool is_gc;
+    std::string name;
 
     if ((is_gc = SDL_IsGameController(joy))) {
         auto dev = SDL_GameControllerOpen(joy);
 
         if (dev) {
-            joystate[joy].dev = dev;
-
+            name   = SDL_GameControllerName(dev);
             js_dev = SDL_GameControllerGetJoystick(dev);
+
+            std::string extra_msg;
+
+            if (contains(JOYSTICK_OVERRIDES, name)) {
+                is_gc             = false;
+                joystate[joy].dev = js_dev;
+                extra_msg         = "as joystick";
+            }
+            else {
+                joystate[joy].dev = dev;
+            }
+
+            systemScreenMessage(wxString::Format(_("Connected game controller") + " %d: '%s' %s", joy, name, extra_msg));
         }
     }
     else {
-        if ((js_dev = SDL_JoystickOpen(joy)))
+        if ((js_dev = SDL_JoystickOpen(joy))) {
             joystate[joy].dev = js_dev;
+
+            name = SDL_JoystickName(js_dev);
+
+            systemScreenMessage(wxString::Format(_("Connected joystick") + " %d: '%s'", joy, name));
+        }
     }
 
     if (js_dev) {
@@ -337,6 +352,7 @@ void wxSDLJoy::ConnectController(uint8_t joy)
 
     joystate[joy].index = joy;
     joystate[joy].is_gc = is_gc;
+    joystate[joy].name  = name;
 }
 
 void wxSDLJoy::RemapControllers()
@@ -354,9 +370,11 @@ void wxSDLJoy::DisconnectController(wxSDLJoyState& state)
     if (auto& dev = state.dev) {
         if (state.is_gc) {
             SDL_GameControllerClose(dev);
+            systemScreenMessage(wxString::Format(_("Disconnected game controller") + " %d", state.index));
         }
         else {
             SDL_JoystickClose(dev);
+            systemScreenMessage(wxString::Format(_("Disconnected joystick") + " %d", state.index));
         }
 
         dev = nullptr;
