@@ -204,10 +204,6 @@ else()
     #    set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -luuid -lwinspool")
     #endif()
 
-    if(CMAKE_PREFIX_PATH)
-        set(wxWidgets_CONFIG_OPTIONS "--prefix=${CMAKE_PREFIX_PATH}")
-    endif()
-
     set(wxWidgets_USE_UNICODE ON)
 
     # Check for gtk4 then gtk3 packages first, some dists like arch rename the
