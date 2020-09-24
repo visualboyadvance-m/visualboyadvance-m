@@ -68,14 +68,17 @@ function(check_clean_exit var)
 endfunction()
 
 function(find_wx_util var util)
-    # on win32, including cross builds we prefer the plain utility name first from PATH
-    if(WIN32)
-        set(conf_suffixes  "" gtk4u gtk4 gtk3u gtk3 gtk2u gtk2)
-        set(major_versions "" 4 3 2)
-    else()
-        set(conf_suffixes  gtk4u gtk4 gtk3u gtk3 gtk2u gtk2 "")
-        set(major_versions 4 3 2 "")
+    if(WIN32 OR EXISTS /etc/gentoo-release)
+      # On win32, including cross builds we prefer the plain utility name
+      # first from PATH.
+      # On Gentoo /usr/bin/wx-config loads the eselected build, so we want
+      # to try that first.
+      set(conf_suffixes  "")
+      set(major_versions "")
     endif()
+
+    list(APPEND conf_suffixes  gtk4u gtk4 gtk3u gtk3 gtk2u gtk2 "")
+    list(APPEND major_versions 4 3 2 "")
 
     foreach(conf_suffix IN LISTS conf_suffixes)
         foreach(major_version IN LISTS major_versions)
