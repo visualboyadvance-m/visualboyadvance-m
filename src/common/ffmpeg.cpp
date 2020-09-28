@@ -601,12 +601,10 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
     int dst_nb_samples = av_rescale_rnd(swr_get_delay(swr, c->sample_rate) + audioframeTmp->nb_samples, c->sample_rate, c->sample_rate, AV_ROUND_UP);
     av_assert0(dst_nb_samples == audioframeTmp->nb_samples);
 
-    audioframeTmp->data[3] = audioframeTmp->data[2] = audioframeTmp->data[1] = audioframeTmp->data[0];
     if (swr_convert(swr, audioframe->data, audioframe->nb_samples, (const uint8_t **)audioframeTmp->data, audioframeTmp->nb_samples) < 0)
     {
         return MRET_ERR_RECORDING;
     }
-    audioframe->data[3] = audioframe->data[2] = audioframe->data[1] = audioframe->data[0];
     audioframe->pts = av_rescale_q(samplesCount, {1, c->sample_rate}, c->time_base);
     samplesCount += dst_nb_samples;
 
