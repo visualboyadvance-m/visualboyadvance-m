@@ -28,8 +28,8 @@ export BUILD_ENV
 : ${HOST_CXX:=ccache g++}
 : ${HOST_CPPFLAGS:="-I\$BUILD_ROOT/root/include"}
 : ${HOST_CFLAGS:="-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -pthread -lm"}
-: ${HOST_CXXFLAGS:="-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"}
-: ${HOST_OBJCXXFLAGS:="-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm"}
+: ${HOST_CXXFLAGS:="-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm"}
+: ${HOST_OBJCXXFLAGS:="-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm"}
 : ${HOST_LDFLAGS:="-fPIC -L\$BUILD_ROOT/root/lib -pthread -lm"}
 : ${HOST_LIBS:=-lm}
 : ${HOST_UUID_LIBS:=}

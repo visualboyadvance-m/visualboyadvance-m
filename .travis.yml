@@ -14,8 +14,6 @@ matrix:
 #          dist: bionic
 #        - env: BUILD_ENV=nostl XVFB_RUN=1
 #          dist: bionic
-        - env: BUILD_ENV=ubuntu-trusty XVFB_RUN=1
-          dist: trusty
         - env: BUILD_ENV=ubuntu-xenial XVFB_RUN=1
         - env: BUILD_ENV=ubuntu-xenial-minimal INSTALLDEPS_ARGS="--no-openal --no-ffmpeg" XVFB_RUN=1
         - env: BUILD_ENV=ubuntu-xenial XVFB_RUN=1 CC=clang CXX=clang++

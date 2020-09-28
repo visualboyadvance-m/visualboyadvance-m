@@ -42,8 +42,8 @@ esac
 
 export CPPFLAGS="$CPPFLAGS${CPPFLAGS:+ }-I\$BUILD_ROOT/root/include -DCURL_STATICLIB -DGRAPHITE2_STATIC"
 export CFLAGS="$CFLAGS${CFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -pthread -lm -DCURL_STATICLIB -DGRAPHITE2_STATIC"
-export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm -DCURL_STATICLIB -DGRAPHITE2_STATIC"
-export OBJCXXFLAGS="$OBJCXXFLAGS${OBJCXXFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++11 -fpermissive -pthread -lm -DCURL_STATICLIB -DGRAPHITE2_STATIC"
+export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -DCURL_STATICLIB -DGRAPHITE2_STATIC"
+export OBJCXXFLAGS="$OBJCXXFLAGS${OBJCXXFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -DCURL_STATICLIB -DGRAPHITE2_STATIC"
 export LDFLAGS="$LDFLAGS${LDFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -pthread -lm"
 export STRIP="\${STRIP:-strip}"
 

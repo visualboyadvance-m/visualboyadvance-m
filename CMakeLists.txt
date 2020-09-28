@@ -678,7 +678,13 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
 
     include(CheckCXXCompilerFlag)
 
-    set(MY_CXX_FLAGS -std=gnu++11 -fexceptions)
+    check_cxx_compiler_flag(-std=gnu++17 GNUPP17_FLAG)
+
+    if(NOT GNUPP17_FLAG)
+        message(FATAL_ERROR "Your compiler does not support -std=gnu++17.")
+    endif()
+
+    set(MY_CXX_FLAGS -std=gnu++17 -fexceptions)
 
     foreach(ARG ${MY_CXX_FLAGS})
         set(MY_CXX_FLAGS_STR "${MY_CXX_FLAGS_STR} ${ARG}")
@@ -723,6 +729,8 @@ elseif(MSVC)
     # first remove all warnings flags, otherwise there is a warning about overriding them
     string(REGEX REPLACE "/[Ww][^ ]+" "" CMAKE_C_FLAGS   ${CMAKE_C_FLAGS})
     string(REGEX REPLACE "/[Ww][^ ]+" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+
+    add_compile_options(/std:c++17)
 
     if(CMAKE_BUILD_TYPE STREQUAL Debug)
         add_compile_options(/W4)
