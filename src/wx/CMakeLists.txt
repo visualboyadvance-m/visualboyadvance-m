@@ -919,17 +919,19 @@ if(APPLE AND ENABLE_ONLINEUPDATES)
     # The following commands *should* be run to make sure Sparkle is not going
     # to bug randomly (version=1.23)
     set(CCS2 cp -a ${SPARKLE_FRAMEWORK} ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks/Sparkle.framework)
-    set(CCS3 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleVersion -string "${VERSION}")
-    set(CCS4 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUEnableAutomaticChecks -bool YES)
-    #set(CCS5 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUPublicEDKey -string "${PUBLIC_KEY}")
-    set(CCS6 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUFeedURL -string "${APPCAST_URL}")
+    set(CCS3 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleVersion            -string "${VERSION}")
+    set(CCS4 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleShortVersionString -string "${VERSION}")
+    set(CCS5 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUEnableAutomaticChecks -bool YES)
+    #set(CCS6 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUPublicEDKey -string "${PUBLIC_KEY}")
+    set(CCS7 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUFeedURL -string "${APPCAST_URL}")
     add_custom_command(TARGET visualboyadvance-m POST_BUILD
       COMMAND ${CCS1}
       COMMAND ${CCS2}
       COMMAND ${CCS3}
       COMMAND ${CCS4}
-      #COMMAND ${CCS5}
-      COMMAND ${CCS6}
+      COMMAND ${CCS5}
+      #COMMAND ${CCS6}
+      COMMAND ${CCS7}
     )
 
     TARGET_LINK_LIBRARIES(visualboyadvance-m ${SPARKLE_FRAMEWORK})
