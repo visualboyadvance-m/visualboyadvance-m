@@ -360,14 +360,14 @@ debian_installdeps() {
         case "$debian_rel" in
             bionic|stretch|trusty|xenial)
                 ;;
-            buster|cosmic|disco)
-                debian_rel=bionic
-                ;;
             yakkety|zesty|artful)
                 debian_rel=xenial
                 ;;
-            *)
+            utopic|vivid|wily)
                 debian_rel=trusty
+                ;;
+            *)
+                debian_rel=bionic
                 ;;
         esac
 
