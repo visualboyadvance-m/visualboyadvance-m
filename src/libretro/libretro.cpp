@@ -38,6 +38,10 @@
 #define FRAMERATE  (16777216.0 / 280896.0) // 59.73
 #define SAMPLERATE 32768.0
 
+#ifndef VBAM_VERSION
+#define VBAM_VERSION "2.1.3"
+#endif
+
 static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
 static retro_input_poll_t poll_cb;

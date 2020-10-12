@@ -158,6 +158,13 @@ else ifneq (,$(findstring ios,$(platform)))
 	  CXX = clang++ -arch armv7 -isysroot $(IOSSDK)
 	endif
 	CFLAGS += -DIOS
+   ifeq ($(platform), ios-arm64)
+     CXX = clang++ -arch armv7 -isysroot $(IOSSDK)
+     CC = clang -arch arm64 -isysroot $(IOSSDK)
+   else
+     CC = clang -arch armv7 -isysroot $(IOSSDK)
+     CXX = clang++ -arch armv7 -isysroot $(IOSSDK)
+   endif   
 	ifeq ($(platform),$(filter $(platform),ios9 ios-arm64))
 	  CC     += -miphoneos-version-min=8.0
 	  CXX    += -miphoneos-version-min=8.0
@@ -168,6 +175,15 @@ else ifneq (,$(findstring ios,$(platform)))
 	  CFLAGS += -miphoneos-version-min=5.0
 	endif
 	TILED_RENDERING=1
+
+else ifeq ($(platform), tvos-arm64)
+   TARGET := $(TARGET_NAME)_libretro_tvos.dylib
+   fpic := -fPIC
+   SHARED := -dynamiclib -DLSB_FIRST
+ifeq ($(IOSSDK),)
+   IOSSDK := $(shell xcodebuild -version -sdk appletvos Path)
+endif
+   TILED_RENDERING = 1
 
 # Theos iOS
 else ifeq ($(platform), theos_ios)
