@@ -943,9 +943,11 @@ target_link_libraries(
     ${VBAM_LIBS}
 )
 
+set(WIN32_MEDIA_FOUNDATION_LIBS dxva2 evr mf mfplat mfplay mfreadwrite mfuuid amstrmid)
+
 if(ENABLE_FFMPEG)
     if(WIN32)
-        list(APPEND FFMPEG_LIBRARIES secur32 bcrypt)
+        list(APPEND FFMPEG_LIBRARIES secur32 bcrypt ${WIN32_MEDIA_FOUNDATION_LIBS})
     endif()
 
     target_link_libraries(
