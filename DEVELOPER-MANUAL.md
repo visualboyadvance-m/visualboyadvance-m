@@ -15,7 +15,13 @@
     - [Translations Message Catalog](#translations-message-catalog)
     - [Interaction with non-wxWidgets Code](#interaction-with-non-wxwidgets-code)
   - [Windows Native Development Environment Setup](#windows-native-development-environment-setup)
-  - [PowerShell Notes](#powershell-notes)
+    - [Install Chocolatey and Some Packages](#install-chocolatey-and-some-packages)
+    - [Chocolatey Usage Notes](#chocolatey-usage-notes)
+    - [Configure the Terminal](#configure-the-terminal)
+    - [Setting up Vim](#setting-up-vim)
+    - [Set up PowerShell Profile](#set-up-powershell-profile)
+    - [PowerShell Usage Notes](#powershell-usage-notes)
+    - [Miscellaneous](#miscellaneous)
   - [Release Process](#release-process)
     - [Environment](#environment)
     - [Release Commit and Tag](#release-commit-and-tag)
@@ -195,14 +201,18 @@ For calling Windows APIs with strings, use the wide char `W` variants and the
 
 ### Windows Native Development Environment Setup
 
-Install the chocolatey package manager:
+#### Install Chocolatey and Some Packages
+
+Make sure developer mode is turned on in Windows settings, this is necessary for
+making unprivileged symlinks.
 
 - Press Win+X and open Windows PowerShell (administrator).
 
-- Run this command:
+- Run these commands:
 
 ```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+Set-ExecutionPolicy -Scope LocalMachine -Force RemoteSigned
+iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 ```
 
 Close the administrator PowerShell window and open it again.
@@ -210,69 +220,194 @@ Close the administrator PowerShell window and open it again.
 Install some chocolatey packages:
 
 ```powershell
-choco install -y visualstudio2019community visualstudio2019-workload-nativedesktop ag dejavufonts git gpg4win hackfont microsoft-windows-terminal powershell-preview vim-tux zip unzip notepadplusplus openssh diffutils neovim
+choco install -y visualstudio2019community --params "--locale en-US"
+choco install -y visualstudio2019-workload-nativedesktop
+choco install -y hackfont dejavufonts ripgrep git gpg4win microsoft-windows-terminal powershell-core vim neovim zip unzip notepadplusplus openssh diffutils ntop.portable grep gawk sed less transifex-client
 ```
+
+#### Chocolatey Usage Notes
+
+Here are some commands for using the Chocolatey package manager.
+
+To search for a package:
+
+```powershell
+choco search patch
+```
+
+To get the description of a package:
+
+```powershell
+choco info patch
+```
+
+To install a package:
+
+```powershell
+choco install -y patch
+```
+
+To uninstall a package:
+
+
+```powershell
+choco uninstall -y patch
+```
+
+To list installed packages:
+
+```powershell
+choco list --local
+```
+
+To update all installed packages:
+
+```powershell
+choco update -y all
+```
+
+#### Configure the Terminal
 
 Launch the terminal and choose Settings from the tab drop-down, this will open
 the settings json in visual studio.
 
-Change the powershell (and not the "windows powershell") profile like so:
+In the global settings, above the `"profiles"` section, add:
 
 ```json
+// If enabled, selections are automatically copied to your clipboard.
+"copyOnSelect": true,
+// If enabled, formatted data is also copied to your clipboard
+"copyFormatting": true,
+"useTabSwitcher": false,
+"wordDelimiters": " ",
+"largePasteWarning": false,
+"multiLinePasteWarning": false,
+```
+
+In the `"profiles"` `"defaults"` section add:
+
+```json
+"defaults":
 {
-    "name": "PowerShell",
-    "source": "Windows.Terminal.PowershellCore",
-    // If you want a background image, set the path here:
-    //"backgroundImage": "file://c:/users/rkitover/Pictures/wallpapers/wallhaven-01ge81.jpg",
-    "backgroundImageOpacity": 0.32,
-    "backgroundImageStretchMode": "uniformToFill",
+    // Put settings here that you want to apply to all profiles.
     "fontFace": "Hack",
     "fontSize": 10,
+    "antialiasingMode": "cleartype",
+    "cursorShape": "filledBox",
     "colorScheme": "Tango Dark",
-    "cursorShape": "filledBox"
+    "closeOnExit": "always"
 },
 ```
 
-Make sure it is set as the default profile.
-
-You can use tab shortcuts to get a sort of tmux for powershell, using the same
-bindings as kitty, add this to the "keybindings" section:
+In the `"actions"` section add these keybindings:
 
 ```json
-{
-    "command" : "newTab",
-    "keys" :
-    [
-        "ctrl+shift+t"
-    ]
-},
-{
-    "command" : "nextTab",
-    "keys" :
-    [
-        "ctrl+shift+right"
-    ]
-},
-{
-    "command" : "prevTab",
-    "keys" :
-    [
-        "ctrl+shift+left"
-    ]
-},
+{ "command": { "action": "newTab"  }, "keys": "ctrl+shift+t" },
+{ "command": { "action": "nextTab" }, "keys": "ctrl+shift+right" },
+{ "command": { "action": "prevTab" }, "keys": "ctrl+shift+left" }
 ```
 
-Now add some useful things to your powershell profile:
+And **REMOVE** the `ctrl+v` binding, if you want to use `ctrl+v` in vim (visual
+line selection.)
+
+This gives you a sort of "tmux" for powershell using tabs.
+
+Restart the terminal.
+
+#### Setting up Vim
+
+If you don't use vim, just add an alias for your favorite editor in your
+powershell `$profile`, and set `$env:EDITOR` so that git can open it for commit
+messages etc.. I will explain how to do this below.
+
+If you are using neovim, make some adjustments to the following instructions,
+and do the following:
+
+```powershell
+mkdir ~/.vim
+ni -itemtype symboliclink ~/AppData/Local/nvim -target ~/.vim
+ni -itemtype symboliclink ~/.vim/init.vim      -target ~/.vimrc
+```
+
+You can edit your powershell profile with `vim $profile`, and reload it with `.
+$profile`.
+
+Add the following to your `$profile`:
+
+```powershell
+if ($env:TERM) { ri env:TERM }
+$env:EDITOR = resolve-path ~/bin/vim.bat
+```
+
+In `~/bin/vim.bat` put the following:
+
+```bat
+@echo off
+set TERM=
+c:/windows/vim.bat %*
+```
+
+This is needed for git to work correctly with native vim.
+
+Some suggestions for your `~/.vimrc`:
+
+```vim
+set encoding=utf8
+set langmenu=en_US.UTF-8
+let g:is_bash=1
+set formatlistpat=^\\s*\\%([-*][\ \\t]\\\|\\d+[\\]:.)}\\t\ ]\\)\\s*
+set ruler bg=dark nohlsearch bs=2 ai fo+=n modeline belloff=all
+set fileformats=unix,dos
+
+" Add vcpkg includes to include search path to get completions for C++.
+let g:home = fnamemodify('~', ':p')
+
+if isdirectory(g:home . 'source/repos/vcpkg/installed/x64-windows-static/include')
+  let &path .= ',' . g:home . 'source/repos/vcpkg/installed/x64-windows-static/include'
+endif
+
+if isdirectory(g:home . 'source/repos/vcpkg/installed/x64-windows-static/include/SDL2')
+  let &path .= ',' . g:home . 'source/repos/vcpkg/installed/x64-windows-static/include/SDL2'
+endif
+
+set termguicolors
+au ColorScheme * hi Normal guibg=#000000
+
+if (has('win32') || has('gui_win32')) && executable('pwsh')
+    set shell=pwsh
+    set shellcmdflag=\ -ExecutionPolicy\ RemoteSigned\ -NoProfile\ -Nologo\ -NonInteractive\ -Command
+endif
+
+filetype plugin indent on
+syntax enable
+
+au BufRead COMMIT_EDITMSG,*.md setlocal spell
+```
+
+I use this color scheme, which is a fork of Apprentice for black backgrounds:
+
+https://github.com/rkitover/Apprentice
+
+You can add with Plug or pathogen or whatever you prefer.
+
+All of this works with neovim.
+
+#### Set up PowerShell Profile
+
+Now add some useful things to your powershell profile, I will present some of
+mine below:
 
 Run:
 
 ```powershell
-notepad++ $profile
+vim $profile
 ```
 
-(or vim.)
+or
 
-Here's mine, most importantly the Visual Studio environment setup.
+```powershell
+notepad $profile
+```
 
 If you use my posh-git prompt, you'll need the git version of posh-git:
 
@@ -282,7 +417,8 @@ cd ~/source/repos
 git clone https://github.com/dahlbyk/posh-git
 ```
 
-Alternately install "poshgit" from chocolatey.
+Here is a profile to get you started, it has a few examples of functions and
+aliases which you will invariably write for yourself:
 
 ```powershell
 chcp 65001 > $null
@@ -291,16 +427,15 @@ set-executionpolicy -scope currentuser remotesigned
 
 set-culture en-US
 
-ri env:TERM
-$env:EDITOR = 'c:/tools/neovim/neovim/bin/nvim.exe'
-set-alias -name vim -val /tools/neovim/neovim/bin/nvim
+$terminal_settings     = (resolve-path ~/AppData/Local/Packages/Microsoft.WindowsTerminal_*/LocalState/settings.json)
+$terminal_settings_dir = (resolve-path ~/AppData/Local/Packages/Microsoft.WindowsTerminal_*/LocalState)
 
 function megs {
-    gci $args | select mode, lastwritetime, @{name="MegaBytes"; expression = { [math]::round($_.length / 1MB, 2) }}, name
+    gci -rec $args | select mode, lastwritetime, @{name="MegaBytes"; expression = { [math]::round($_.length / 1MB, 2) }}, name
 }
 
 function cmconf {
-    ag 'CMAKE_BUILD_TYPE|VCPKG_TARGET_TRIPLET|UPSTREAM_RELEASE' CMakeCache.txt
+    grep -E --color 'CMAKE_BUILD_TYPE|VCPKG_TARGET_TRIPLET|UPSTREAM_RELEASE' CMakeCache.txt
 }
 
 function pgrep {
@@ -312,19 +447,41 @@ function pkill {
 }
 
 function taskslog {
-    get-winevent 'Microsoft-Windows-TaskScheduler/Operational'
+    get-winevent 'Microsoft-Windows-TaskScheduler/Operational' 
 }
 
-set-alias -name notepad -val '/program files/notepad++/notepad++'
-set-alias -name which   -val get-command
-set-alias -name grep    -val ag
+function ntop { ntop.exe -s 'CPU%' $args }
 
-# For vimdiff etc., install diffutils from choco.
+function head {
+    $lines = if ($args.length -and $args[0] -match '^-(.+)') { $null,$args = $args; $matches[1] } else { 10 }
+    
+    if (!$args.length) {
+        $input | select -first $lines
+    }
+    else {
+        gc $args | select -first $lines
+    }
+}
+
+set-alias -name which   -val get-command
+set-alias -name notepad -val '/program files/notepad++/notepad++'
+
 if (test-path alias:diff) { remove-item -force alias:diff }
 
 # Load VS env only once.
-if (-not $env:VSCMD_VER) {
-    pushd '/program files (x86)/microsoft visual studio/2019/community/vc/auxiliary/build'
+foreach ($vs_type in 'buildtools','community') {
+    $vs_path="/program files (x86)/microsoft visual studio/2019/${vs_type}/vc/auxiliary/build"
+
+    if (test-path $vs_path) {
+        break
+    }
+    else {
+        $vs_path=$null
+    }
+}
+
+if ($vs_path -and -not $env:VSCMD_VER) {
+    pushd $vs_path
     cmd /c 'vcvars64.bat & set' | where { $_ -match '=' } | %{
         $var,$val = $_.split('=')
         set-item -force "env:$var" -value $val
@@ -341,10 +498,10 @@ import-module ~/source/repos/posh-git/src/posh-git.psd1
 
 function global:PromptWriteErrorInfo() {
     if ($global:gitpromptvalues.dollarquestion) {
-        "`e[0;32m✔`e[0m"
+        ([char]27) + '[0;32mv' + ([char]27) + '[0m'
     }
     else {
-        "`e[0;31m✘`e[0m"
+        ([char]27) + '[0;31mx' + ([char]27) + '[0m'
     }
 }
 
@@ -353,19 +510,11 @@ $gitpromptsettings.defaultpromptabbreviatehomedirectory      = $true
 $gitpromptsettings.defaultpromptprefix.text                  = '$(PromptWriteErrorInfo) '
 
 $gitpromptsettings.defaultpromptwritestatusfirst             = $false
-$gitpromptsettings.defaultpromptbeforesuffix.text            = "`n$env:USERNAME@$env:COMPUTERNAME "
+$gitpromptsettings.defaultpromptbeforesuffix.text            = "`n$env:USERNAME@$($env:COMPUTERNAME.ToLower()) "
 $gitpromptsettings.defaultpromptbeforesuffix.foregroundcolor = 0x87CEFA
 $gitpromptsettings.defaultpromptsuffix.foregroundcolor       = 0xDC143C
 
 import-module psreadline
-
-if (-not (test-path ~/.ps_history)) {
-    new-item -itemtype file ~/.ps_history
-}
-
-register-engineevent powershell.exiting -action { get-history | export-clixml ~/.ps_history } | out-null
-
-import-clixml ~/.ps_history | add-history *> $null
 
 set-psreadlineoption     -editmode emacs
 set-psreadlinekeyhandler -key tab       -function tabcompletenext
@@ -373,131 +522,94 @@ set-psreadlinekeyhandler -key uparrow   -function historysearchbackward
 set-psreadlinekeyhandler -key downarrow -function historysearchforward
 ```
 
-To set notepad++ as the git commit editor, run this command:
+This profile works for "Windows PowerShell", the powershell you launch from the
+`Win+X` menu as well. But the profile is in a different file, so you will need
+to copy it there too.
+
+#### PowerShell Usage Notes
+
+PowerShell is very different from unix shells, in both usage and programming.
+
+This section won't teach you PowerShell, but it will give you enough
+information to use it as a shell and a springboard for further exploration.
+
+You can get a list of aliases with `alias` and lookup specific aliases with e.g.
+`alias ri`. It allows globs, e.g. to see aliases starting with `s` do `alias
+s*`.
+
+You can get help text for any cmdlet via its long name or alias with `help`. To
+use `less` instead of the default pager, do e.g.: `help gci | less`.
+
+I suggest using the short forms of PowerShell aliases instead of the POSIX
+aliases, this forces your brain into PowerShell mode so you will mix things up
+less often, with the exception of a couple of things like `mkdir` and the alias
+above for `which`.
+
+Here is a few:
+
+| PowerShell alias | Full cmdlet + Params          | POSIX command     |
+|------------------|-------------------------------|-------------------|
+| sl               | Set-Location                  | cd                |
+| gci              | Get-ChildItem                 | ls                |
+| gi               | Get-Item                      | ls -d             |
+| cpi              | Copy-Item                     | cp -r             |
+| ri               | Remove-Item                   | rm                |
+| ri -for          | Remove-Item -Force            | rm -f             |
+| ri -rec -for     | Remove-Item -Force -Recurse   | rm -rf            |
+| gc               | Get-Content                   | cat               |
+| mi               | Move-Item                     | mv                |
+| mkdir            | New-Item -ItemType Directory  | mkdir             |
+| which (custom)   | Get-Command                   | command -v, which |
+| gci -rec         | Get-ChildItem -Recurse        | find              |
+| ni               | New-Item                      | touch <new-file>  |
+| sort             | Sort-Object                   | sort              |
+| sort -u          | Sort-Object -Unique           | sort -u           |
+
+This will get you around and doing stuff, the usage is slightly different
+however.
+
+For one thing commands like `cpi` (`Copy-Item`) take a list of files differently
+from POSIX, they must be a PowerShell list, which means separated by commas. For
+example, to copy `file1` and `file2` to `dest-dir`, you would do:
 
 ```powershell
-git config --global core.editor "'C:/Program Files/Notepad++/notepad++.exe' -multiInst -notabbar -nosession"
+cpi file1,file2 dest-dir
 ```
 
-To configure truecolor support for vim, add this to your `~/.vimrc`:
-
-```vim
-if !has('gui-running')
-  set bg=dark
-  set termguicolors
-endif
-```
-
-To use 256 color support instead, use this:
-
-```vim
-if !has('gui-running')
-  set bg=dark
-  set t_Co=256
-endif
-```
-
-I also recommend adding this to spellcheck commit messages:
-
-```vim
-au BufRead COMMIT_EDITMSG setlocal spell
-```
-
-The most important thing that should be in your `~/.vimrc` is of course:
-
-```vim
-filetype plugin indent on
-```
-
-To use powershell as the vim internal shell instead of cmd, put this into `~/.vimrc`:
-
-```vim
-if (has('win32') || has('gui_win32')) && executable('pwsh')
-    set shell=pwsh
-    set shellcmdflag=\ -ExecutionPolicy\ RemoteSigned\ -NoProfile\ -Nologo\ -NonInteractive\ -Command
-endif
-```
-
-To use gvim instead of console vim, you could try this `$profile` set up:
+To remove `file1` and `file2` you would do:
 
 ```powershell
-$env:EDITOR = 'C:/Program\ Files/Vim/vim82/gvim.exe --servername main --remote-tab-silent'
-
-function vim {
-    & 'C:/Program Files/Vim/vim82/gvim.exe' --servername main --remote-tab-silent $args
-}
+ri file1,file2
 ```
 
-Along with the code to save/restore window position from:
-
-https://vim.fandom.com/wiki/Restore_screen_size_and_position
-
-I also use an autocommand to keep the window vertically maximized despite tab
-bar changes:
-
-```vim
-if has('gui_running')
-  au BufEnter * set lines=999
-endif
-```
-
-If you don't know how to use vim and want to learn, run `vimtutor`, it takes
-about half an hour.
-
-To set up gpg:
-
-I don't use a passphrase on my key, because gpg-agent constantly causes me
-grief, if you want to remove yours see:
-
-http://www.peterscheie.com/unix/automating_signing_with_GPG.html
-
-Configure git to use gpg4win:
+You can list multiple globs in these lists as well as files and directories
+etc., for example:
 
 ```powershell
-git config --global gpg.program "c:/Program Files (x86)/GnuPG/bin/gpg.exe"
+ri .*.un~,.*.sw?
 ```
 
-Tell git to always sign commits:
+The commands `grep`, `sed`, `awk`, `diff`, `patch`, `less`, `zip`, `unzip`,
+`ssh`, `vim`, `nvim` (neovim) are the same as in Linux and were installed in the
+list of packages installed from Chocolatey above.
 
-```powershell
-git config --global commit.gpgsign true
+The commands `curl` and `tar` are now standard Windows commands.
+
+For an `htop` replacement, use `ntop` (installed in the list of Chocolatey
+packages above.) with my wrapper function in the sample `$profile`.
+
+Redirection for files and commands works like in POSIX on a basic level, that
+is, you can expect `<`, `>` and `|` to redirect files and commands like you
+would expect on a POSIX shell. `/dev/null` is `$null`, so the equivalent of
+
+```bash
+cmd >/dev/null 2>&1
 ```
 
-To set up ssh into your powershell environment, which allows doing builds
-remotely etc., edit the registry as described here to set powershell-preview as
-the default shell:
-
-https://github.com/PowerShell/Win32-OpenSSH/wiki/DefaultShell
-
-Follow this guide to set up the server:
-
-https://github.com/PowerShell/Win32-OpenSSH/wiki/Install-Win32-OpenSSH
-
-### PowerShell Notes
-
-PowerShell is very different from traditional UNIX shells, I am very new to it
-myself, but I will pass on some tips here.
-
-First, read this guide:
-
-https://mathieubuisson.github.io/powershell-linux-bash/
-
-You can use `ag` to both search and as a substitute for `grep`.
-
-For example:
+would be:
 
 ```powershell
-alias | ag sort
-```
-
-The above $profile aliases grep to ag.
-
-Powershell itself provides a nice way to do simple grep/sed operations:
-
-```powershell
-alias | where { $_ -match '^se' } | select Name, ResolvedCommand
-get-process | where { $_ -notmatch 'svchost' }
-cmd /c date /T | %{ $_ -replace '.*(\d\d)/(\d\d)/(\d\d\d\d).*','$3-$1-$2' }
+cmd *> $null
 ```
 
 For `ls -ltr` use:
@@ -506,51 +618,91 @@ For `ls -ltr` use:
 gci | sort lastwritetime
 ```
 
-You can use the `-Recurse` flag for `Get-ChildItem` (`ls`, `gci`) as a
-substitute for `find`, e.g.:
+Parameters can be completed with `tab`, so in the case above you could write
+`lastw<tab>`.
+
+To make a symbolic link, do:
 
 ```powershell
-gci -rec *.xrc
+ni -itemtype symboliclink name-of-link -target path-to-source
 ```
 
-Now combine this with the awesome powershell object pipeline to e.g. delete all
-vim undo files:
+again the parameters `-ItemType` and `SymbolicLink` can be `tab` completed.
+
+For a `find` replacement, use the `-Recurse` flag to `gci`, e.g.:
 
 ```powershell
-gci -rec .*un~ | ri
+gci -rec *.cpp
 ```
 
-You will notice that cmdlets like `Remove-Item` (`rm`, `ri`), `Copy-Item`
-(`cp`, `cpi`) etc. do not take multiple space separated items, you must
-separate them by commas, eg.:
+PowerShell supports an amazing new system called the "object pipeline", what
+this means is that you can pass objects around via pipelines and inspect their
+properties, call methods on them, etc..
+
+Here is an example of using the object pipeline to delete all vim undo files:
 
 ```powershell
-1..4 | %{ni foo$_, bar$_}
-mkdir tmpdir
-cpi foo*, bar* tmpdir
-ri foo*, bar*
-ri -rec tmpdir
+gci -rec .*.un~ | ri
 ```
 
-Comma separated items is the list syntax on powershell.
+it's that simple, `ri` notices that the input objects are files, and removes
+them.
 
-The equivalent of `rm -rf` to delete a directory is:
+You can access the piped-in input in your own functions as the special `$input`
+variable, like in the `head` example in the profile above.
+
+Here is a more typical example:
 
 ```powershell
-ri -rec -for dir
+get-process | ?{ $_.name -notmatch 'svchost' } | %{ $_.name } | sort -uniq
 ```
 
-The best replacement for `sudo` is to set up the openssh server with the shell
-in the registry pointing to powershell-preview, commands run over ssh are
-elevated. For example:
+here `?{ ... }` is like filter/grep block and `%{ ... }` is like apply/map.
+
+In PowerShell, the backtick `` ` `` is the escape character, and you can use it
+at the end of a line, escaping the line end as a line continuation character. In
+regular expressions, the backslash `\` is the escape character, like everywhere
+else.
+
+Here are a couple more example of PowerShell one-liners:
 
 ```powershell
-ssh localhost choco upgrade -y all
+# Name and command mapping for aliases starting with 'se'.
+alias se* | select name, resolvedcommand
+
+# Create new empty files foo1 .. foo7.
+1..7 | %{ ni "foo$_" }
+
+# Find the import libraries in the Windows SDK with symbol names matching
+# 'MessageBox'.
+gci '/program files (x86)/windows kits/10/lib/10.*/um/x64/*.lib' | `
+  %{ $_.name; dumpbin -headers $_ | grep MessageBox }
 ```
 
-It should not take you very long to learn enough basic usage for your dev
-workflow. There is a lot of good info on powershell out there on blogs and
-stackoverflow/superuser etc..
+#### Miscellaneous
+
+To get transparency in Microsoft terminal, use this AutoHotkey script:
+
+```autohotkey
+#NoEnv
+SendMode Input
+SetWorkingDir %A_ScriptDir%
+
+; Toggle window transparency.
+#^Esc::
+WinGet, TransLevel, Transparent, A
+If (TransLevel = 255) {
+    WinSet, Transparent, 205, A
+} Else {
+    WinSet, Transparent, 255, A
+}
+return
+```
+
+This will toggle transparency in a window when you press `Ctrl+Win+Esc`, you
+have to press it twice the first time.
+
+Thanks to @munael for this tip.
 
 ### Release Process
 
