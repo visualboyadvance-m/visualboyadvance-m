@@ -11,6 +11,7 @@
 #include <cstddef>
 #include <array>
 #include <vector>
+#include <string>
 #include <unordered_map>
 #include <wx/time.h>
 #include <wx/event.h>
@@ -41,6 +42,7 @@ struct wxSDLJoyState {
     wxSDLJoyDev dev;
     uint8_t index = 0;
     bool is_gc = true;
+    std::string name;
     SDL_JoystickID instance = 0;
     std::unordered_map<uint8_t, int16_t> axis{};
     std::unordered_map<uint8_t, uint8_t> button{};
