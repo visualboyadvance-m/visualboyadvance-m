@@ -521,40 +521,34 @@ int main(int argc, char** argv) {
 endif() # wxWidgets checks
 
 if(ENABLE_NLS)
-   if(CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
-       find_package(unofficial-gettext REQUIRED)
+    if(MSVC)
+        # Install gettext tools from nuget.
 
-       if(MSVC)
-           # install gettext tools from nuget
+        # First fetch the nuget binary.
+        if(NOT EXISTS ${CMAKE_BINARY_DIR}/nuget.exe)
+            file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" ${CMAKE_BINARY_DIR}/nuget.exe)
+        endif()
 
-           # first fetch the nuget binary
-           if(NOT EXISTS ${CMAKE_BINARY_DIR}/nuget.exe)
-               file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" ${CMAKE_BINARY_DIR}/nuget.exe)
-           endif()
+        # Install the Gettext.Tools package.
+        execute_process(
+            COMMAND nuget.exe install Gettext.Tools -OutputDirectory ${CMAKE_BINARY_DIR}/nuget
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            )
 
-           # install the Gettext.Tools package
-           execute_process(
-               COMMAND nuget.exe install Gettext.Tools -OutputDirectory ${CMAKE_BINARY_DIR}/nuget
-               WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-           )
+        # Find the path to the binaries in the package and add them to find path.
+        file(GLOB pkg ${CMAKE_BINARY_DIR}/nuget/Gettext.Tools*)
 
-           # find the path to the binaries in the package and add them to find path
-           file(GLOB pkg ${CMAKE_BINARY_DIR}/nuget/Gettext.Tools*)
+        list(APPEND CMAKE_PROGRAM_PATH ${pkg}/tools/bin)
+    endif()
 
-           list(APPEND CMAKE_PROGRAM_PATH ${pkg}/tools/bin)
+    find_package(Gettext REQUIRED)
 
-           find_package(Gettext REQUIRED)
-       endif()
-   else()
-       find_package(Gettext REQUIRED)
-   endif()
+    find_program(XGETTEXT xgettext)
+    find_program(MSGINIT  msginit)
 
-   find_program(XGETTEXT xgettext)
-   find_program(MSGINIT  msginit)
-
-   if(NOT XGETTEXT OR NOT MSGINIT)
-      message(SEND_ERROR "Cannot find gettext xgettext:'${XGETTEXT}' msginit:'${MSGINIT}'")
-   endif()
+    if(NOT XGETTEXT OR NOT MSGINIT)
+        message(SEND_ERROR "Cannot find gettext xgettext:'${XGETTEXT}' msginit:'${MSGINIT}'")
+    endif()
 endif()
 
 # contrib widgets
