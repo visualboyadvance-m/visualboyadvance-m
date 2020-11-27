@@ -708,10 +708,17 @@ void StartGPLink(uint16_t value)
         break;
 
     case GP:
-#if (defined __WIN32__ || defined _WIN32)
-        if (GetLinkMode() == LINK_RFU_IPC)
-            rfu_state = RFU_INIT;
-#endif
+        // General purpose mode, for circuit reset and Final Fantasy Tactics.
+        // Thanks to @JackoboLeChocobo for this info.
+        switch (value) {
+            case 0x8055:
+                value = 0x8052;
+                break;
+            case 0x8022:
+                value = 0x8025;
+                break;
+        }
+        UPDATE_REG(COMM_RCNT, value);
         break;
     }
 }
