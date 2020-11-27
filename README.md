@@ -33,6 +33,8 @@ Windows and Mac builds are in the [releases tab](https://github.com/visualboyadv
 
 Nightly builds are [here](https://win.vba-m.com/nightly/).
 
+**PLESE TEST THE NIGHTLY OR MASTER BEFORE REPORTING ISSUES**
+
 Your distribution may have packages available as well, search for
 `visualboyadvance-m` or `vbam`.
 

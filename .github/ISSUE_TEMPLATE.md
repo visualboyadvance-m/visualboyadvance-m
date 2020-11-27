@@ -1,3 +1,13 @@
+<!---
+
+BEFORE REPORTING AN ISSUE PLEASE TRY THE NIGHTLY FROM:
+
+http://win.vba-m.com/nightly
+
+On Linux build master from source or use the edge snap.
+
+-->
+
 <!--- Please fill out this form and delete any sections you are not using. -->
 
 ### Expected behavior
