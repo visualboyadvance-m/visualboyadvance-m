@@ -69,12 +69,15 @@ endfunction()
 
 function(find_wx_util var util)
     if(WIN32 OR EXISTS /etc/gentoo-release)
-      # On win32, including cross builds we prefer the plain utility name
-      # first from PATH.
-      # On Gentoo /usr/bin/wx-config loads the eselected build, so we want
-      # to try that first.
-      set(conf_suffixes  "")
-      set(major_versions "")
+        # On win32, including cross builds we prefer the plain utility name
+        # first from PATH.
+        #
+        # On Gentoo /usr/bin/wx-config loads the eselected build, so we want
+        # to try that first.
+        #
+        # This makes a one element of empty string list.
+        set(conf_suffixes  ";")
+        set(major_versions ";")
     endif()
 
     list(APPEND conf_suffixes  gtk4u gtk4 gtk3u gtk3 gtk2u gtk2 "")
@@ -132,3 +135,5 @@ function(find_wx_util var util)
         set(${var} ${util} PARENT_SCOPE)
     endforeach()
 endfunction()
+
+# vim:sw=4 sts et:
