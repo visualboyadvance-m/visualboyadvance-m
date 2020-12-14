@@ -321,10 +321,10 @@ bool sdlCheckDirectory(const char* dir)
     }
 }
 
-char* sdlGetFilename(char* name)
+char* sdlGetFilename(const char* name)
 {
     char path[1024];
-    char *filename = strrchr(name, FILE_SEP);
+    const char *filename = strrchr(name, FILE_SEP);
     if (filename)
         strcpy(path, filename + 1);
     else
@@ -332,10 +332,10 @@ char* sdlGetFilename(char* name)
     return strdup(path);
 }
 
-char* sdlGetFilePath(char* name)
+char* sdlGetFilePath(const char* name)
 {
     char path[1024];
-    char *filename = strrchr(name, FILE_SEP);
+    const char *filename = strrchr(name, FILE_SEP);
     if (filename) {
 		size_t length = strlen(name) - strlen(filename);
         memcpy(path, name, length);
