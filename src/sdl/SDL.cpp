@@ -384,10 +384,10 @@ FILE* sdlFindFile(const char* name)
     }
 
 #ifdef _WIN32
-    char* home = getenv("USERPROFILE");
-    if (home != NULL) {
-        fprintf(stdout, "Searching user profile directory: %s\n", home);
-        sprintf(path, "%s%c%s", home, FILE_SEP, name);
+    char* profileDir = getenv("USERPROFILE");
+    if (profileDir != NULL) {
+        fprintf(stdout, "Searching user profile directory: %s\n", profileDir);
+        sprintf(path, "%s%c%s", profileDir, FILE_SEP, name);
         f = fopen(path, "r");
         if (f != NULL)
             return f;
