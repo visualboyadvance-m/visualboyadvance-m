@@ -55,7 +55,7 @@ void SoundSDL::read(uint16_t* stream, int length) {
     if (length <= 0)
         return;
 
-    SDL_memset(stream, audio_spec.silence, length);
+    SDL_memset(stream, 0, length);
 
     // if not initialzed, paused or shutting down, do nothing
     if (!initialized || !emulating)
@@ -117,11 +117,6 @@ void SoundSDL::write(uint16_t * finalWave, int length) {
 bool SoundSDL::init(long sampleRate) {
     if (initialized) deinit();
 
-    // no sound on windows unless we do this
-#ifdef _WIN32
-    SDL_setenv("SDL_AUDIODRIVER", "directsound", true);
-#endif
-
     SDL_AudioSpec audio;
     SDL_memset(&audio, 0, sizeof(audio));
 
@@ -136,7 +131,7 @@ bool SoundSDL::init(long sampleRate) {
 
     if (!SDL_WasInit(SDL_INIT_AUDIO)) SDL_Init(SDL_INIT_AUDIO);
 
-    sound_device = SDL_OpenAudioDevice(NULL, 0, &audio, &audio_spec, SDL_AUDIO_ALLOW_ANY_CHANGE);
+    sound_device = SDL_OpenAudioDevice(NULL, 0, &audio, NULL, 0);
 
     if(sound_device == 0) {
         std::cerr << "Failed to open audio: " << SDL_GetError() << std::endl;
