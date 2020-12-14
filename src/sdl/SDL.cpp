@@ -337,15 +337,15 @@ char* sdlGetFilePath(const char* name)
     char path[1024];
     const char *filename = strrchr(name, FILE_SEP);
     if (filename) {
-		size_t length = strlen(name) - strlen(filename);
+        size_t length = strlen(name) - strlen(filename);
         memcpy(path, name, length);
         path[length] = '\0';
-	}
+    }
     else {
-		path[0] = '.';
-		path[1] = FILE_SEP;
-		path[2] = '\0';
-	}
+        path[0] = '.';
+        path[1] = FILE_SEP;
+        path[2] = '\0';
+    }
     return strdup(path);
 }
 
@@ -739,7 +739,7 @@ void sdlWriteBattery()
     bool result = emulator.emuWriteBattery(buffer);
 
     if (result)
-	systemMessage(0, "Wrote battery '%s'", buffer);
+        systemMessage(0, "Wrote battery '%s'", buffer);
 
     freeSafe(gameFile);
     freeSafe(gameDir);
@@ -1516,7 +1516,7 @@ void SetHomeConfigDir()
     sprintf(homeConfigDir, "%s%s", get_xdg_user_config_home().c_str(), DOT_DIR);
     struct stat s;
     if (stat(homeDataDir, &s) == -1 || !S_ISDIR(s.st_mode))
-	mkdir(homeDataDir, 0755);
+        mkdir(homeDataDir, 0755);
 }
 
 void SetHomeDataDir()
@@ -1524,7 +1524,7 @@ void SetHomeDataDir()
     sprintf(homeDataDir, "%s%s", get_xdg_user_data_home().c_str(), DOT_DIR);
     struct stat s;
     if (stat(homeDataDir, &s) == -1 || !S_ISDIR(s.st_mode))
-	mkdir(homeDataDir, 0755);
+        mkdir(homeDataDir, 0755);
 }
 
 int main(int argc, char** argv)
@@ -2136,7 +2136,7 @@ void systemScreenCapture(int a)
     }
 
     if (result)
-	systemScreenMessage("Screen capture");
+        systemScreenMessage("Screen capture");
 
     freeSafe(gameFile);
     freeSafe(gameDir);
