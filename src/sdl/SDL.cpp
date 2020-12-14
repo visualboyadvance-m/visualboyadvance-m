@@ -307,17 +307,17 @@ bool sdlCheckDirectory(const char* dir)
 
     if (stat(dir, &buf) == 0)
     {
-	if (!(buf.st_mode & S_IFDIR))
-	{
-	    fprintf(stderr, "Error: %s is not a directory\n", dir);
-	    return false;
-	}
-	return true;
+        if (!(buf.st_mode & S_IFDIR))
+        {
+            fprintf(stderr, "Error: %s is not a directory\n", dir);
+            return false;
+        }
+        return true;
     }
     else
     {
-	fprintf(stderr, "Error: %s does not exist\n", dir);
-	return false;
+        fprintf(stderr, "Error: %s does not exist\n", dir);
+        return false;
     }
 }
 
@@ -471,7 +471,7 @@ static void sdlOpenGLVideoResize()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
         openGL == 2 ? GL_LINEAR : GL_NEAREST);
 
-    // Calculate texture size as a the smallest working power of two
+    // Calculate texture size as the smallest working power of two
     float n1 = log10((float)destWidth) / log10(2.0f);
     float n2 = log10((float)destHeight) / log10(2.0f);
     float n = (n1 > n2) ? n1 : n2;
