@@ -366,7 +366,7 @@ FILE* sdlFindFile(const char* name)
 
     fprintf(stdout, "Searching for file %s\n", name);
 
-    if (GETCWD(buffer, 2048)) {
+    if (GETCWD(buffer, sizeof(buffer))) {
         fprintf(stdout, "Searching current directory: %s\n", buffer);
     }
 
@@ -398,8 +398,8 @@ FILE* sdlFindFile(const char* name)
 
         if (path != NULL) {
             fprintf(stdout, "Searching PATH\n");
-            strncpy(buffer, path, 4096);
-            buffer[4095] = 0;
+            strncpy(buffer, path, sizeof(buffer));
+            buffer[sizeof(buffer) - 1] = 0;
             char* tok = strtok(buffer, PATH_SEP);
 
             while (tok) {
