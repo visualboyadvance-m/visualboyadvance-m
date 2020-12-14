@@ -4,6 +4,8 @@ BEFORE REPORTING AN ISSUE PLEASE TRY THE NIGHTLY FROM:
 
 http://win.vba-m.com/nightly
 
+AND DO A FACTORY RESET!
+
 On Linux build master from source or use the edge snap.
 
 -->
