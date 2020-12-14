@@ -323,23 +323,29 @@ bool sdlCheckDirectory(const char* dir)
 
 char* sdlGetFilename(char* name)
 {
-    char path[1024] = ""; // avoid warning about uninitialised value
+    char path[1024];
     char *filename = strrchr(name, FILE_SEP);
     if (filename)
-        strncpy(path, filename + 1, strlen(filename));
+        strcpy(path, filename + 1);
     else
-        sprintf(path, "%s", name);
+        strcpy(path, name);
     return strdup(path);
 }
 
 char* sdlGetFilePath(char* name)
 {
-    char path[1024] = ""; // avoid warning about uninitialised value
+    char path[1024];
     char *filename = strrchr(name, FILE_SEP);
-    if (filename)
-        strncpy(path, name, strlen(name) - strlen(filename));
-    else
-        sprintf(path, "%c%c", '.', FILE_SEP);
+    if (filename) {
+		size_t length = strlen(name) - strlen(filename);
+        memcpy(path, name, length);
+        path[length] = '\0';
+	}
+    else {
+		path[0] = '.';
+		path[1] = FILE_SEP;
+		path[2] = '\0';
+	}
     return strdup(path);
 }
 
