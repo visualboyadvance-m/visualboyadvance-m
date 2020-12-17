@@ -12,13 +12,14 @@
 # MELERIX, 2015
 # MELERIX, 2015,2020
 # Ruben Nava, 2019
+# Sebastián Espinoza <endsades@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-05 19:36+0000\n"
-"PO-Revision-Date: 2020-09-05 19:37+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"POT-Creation-Date: 2020-09-05 21:42-0700\n"
+"PO-Revision-Date: 2020-10-19 11:17+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Spanish (http://www.transifex.com/bgk/vba-m/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -114,7 +115,7 @@ msgstr "Los comandos disponibles para el Teclado/* opción son:\n\n"
 
 #: wxvbam.cpp:660
 msgid "Configuration file not found."
-msgstr ""
+msgstr "No se encontró el archivo de configuración"
 
 #: wxvbam.cpp:693
 msgid "Bad configuration option or multiple ROM files given:\n"
@@ -1158,17 +1159,7 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:122
-#, c-format
-msgid "Connected game controller %d: %s"
-msgstr ""
-
-#: widgets/sdljoy.cpp:137
-#, c-format
-msgid "Disconnected game controller %d"
-msgstr "Desconectado control de juego %d"
-
-#: widgets/sdljoy.cpp:214
+#: widgets/sdljoy.cpp:107
 #, c-format
 msgid "Connected joystick %d: %s"
 msgstr ""
@@ -2220,7 +2211,7 @@ msgstr "Tipo de guardado"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file :"
-msgstr ""
+msgstr "archivo de BIOS"
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file :"
@@ -2335,7 +2326,7 @@ msgstr "Archivo &ROM de Boot GB :"
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
-msgstr ""
+msgstr "Seleccionar un archivo"
 
 #: xrc/GameBoyConfig.xrc:106
 msgid "GBC Boot ROM &file :"

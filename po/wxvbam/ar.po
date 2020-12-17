@@ -3,15 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Djamal DRIHEM <drihem.trad@gmail.com>, 2020
 # Kareem Olim <kakakoky@hotmail.com>, 2018
 # Mohammad Diab <thelegendmohammad@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-05 19:36+0000\n"
-"PO-Revision-Date: 2020-09-05 19:37+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
+"POT-Creation-Date: 2020-09-05 21:42-0700\n"
+"PO-Revision-Date: 2020-10-19 11:17+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Arabic (http://www.transifex.com/bgk/vba-m/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,51 +22,51 @@ msgstr ""
 
 #: wxvbam.cpp:226
 msgid "visualboyadvance-m"
-msgstr ""
+msgstr "visualboyadvance-m"
 
 #: wxvbam.cpp:443
 msgid "Could not create main window"
-msgstr ""
+msgstr "تعذر إنشاء النافذة الرئيسية"
 
 #: wxvbam.cpp:514
 msgid "Save built-in XRC file and exit"
-msgstr ""
+msgstr "حفظ ملف XRC المدمج و تسجيل الخروج"
 
 #: wxvbam.cpp:517
 msgid "Save built-in vba-over.ini and exit"
-msgstr ""
+msgstr "حفظ ملف vba-over.ini و تسجيل الخروج"
 
 #: wxvbam.cpp:520
 msgid "Print configuration path and exit"
-msgstr ""
+msgstr "طباعة مسار الإعدادات و تسجيل الخروج"
 
 #: wxvbam.cpp:523
 msgid "Start in full-screen mode"
-msgstr ""
+msgstr "ابدأ في نمط الشاشة الكاملة"
 
 #: wxvbam.cpp:526
 msgid "Set a configuration file"
-msgstr ""
+msgstr "تعيين ملف الإعدادات"
 
 #: wxvbam.cpp:530
 msgid "Delete shared link state first, if it exists"
-msgstr ""
+msgstr "حذف وضع الرابط المشترك أولا، إذا وجد"
 
 #: wxvbam.cpp:537
 msgid "List all settable options and exit"
-msgstr ""
+msgstr "إدراج قائمة الخيارات الممكنة و تسجيل الخروج"
 
 #: wxvbam.cpp:540
 msgid "ROM file"
-msgstr ""
+msgstr "ملف ROM"
 
 #: wxvbam.cpp:542
 msgid "<config>=<value>"
-msgstr ""
+msgstr "<config>=<value>"
 
 #: wxvbam.cpp:573
 msgid "Configuration/build error: can't find built-in xrc"
-msgstr ""
+msgstr "خطأ في الإعدادات/البناء: تعذر العثور على xrc مدمج"
 
 #: wxvbam.cpp:581
 #, c-format
@@ -89,7 +90,7 @@ msgstr ""
 msgid ""
 "\n"
 "\tbuilt-in"
-msgstr ""
+msgstr "\n\tمدمج"
 
 #: wxvbam.cpp:627
 msgid ""
@@ -115,47 +116,47 @@ msgstr ""
 
 #: guiinit.cpp:81
 msgid "Start!"
-msgstr ""
+msgstr "إبدأ!"
 
 #: guiinit.cpp:100 xrc/NetLink.xrc:99
 msgid "Connect"
-msgstr ""
+msgstr "ربط الإتصال"
 
 #: guiinit.cpp:117
 msgid "You must enter a valid host name"
-msgstr ""
+msgstr "يجب إدخال اسم مضيف صالح"
 
 #: guiinit.cpp:118
 msgid "Host name invalid"
-msgstr ""
+msgstr "إسم المضيف غير صالح"
 
 #: guiinit.cpp:136
 msgid "Waiting for clients..."
-msgstr ""
+msgstr "في انتظار العملاء..."
 
 #: guiinit.cpp:137
 #, c-format
 msgid "Server IP address is: %s\n"
-msgstr ""
+msgstr "عنوان خادم الـ IP  هو: %s\n"
 
 #: guiinit.cpp:139
 msgid "Waiting for connection..."
-msgstr ""
+msgstr "في انتظار الاتصال..."
 
 #: guiinit.cpp:140
 #, c-format
 msgid "Connecting to %s\n"
-msgstr ""
+msgstr "ربط الإتصال بـ %s\n"
 
 #: guiinit.cpp:173
 msgid ""
 "Error occurred.\n"
 "Please try again."
-msgstr ""
+msgstr "حصل خطأ.\nيرجى إعادة المحاولة من جديد."
 
 #: guiinit.cpp:240 guiinit.cpp:293
 msgid "Select cheat file"
-msgstr ""
+msgstr "تحديد ملف الغش"
 
 #: guiinit.cpp:241
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
@@ -1151,17 +1152,7 @@ msgstr ""
 msgid "CONTROL"
 msgstr ""
 
-#: widgets/sdljoy.cpp:122
-#, c-format
-msgid "Connected game controller %d: %s"
-msgstr ""
-
-#: widgets/sdljoy.cpp:137
-#, c-format
-msgid "Disconnected game controller %d"
-msgstr ""
-
-#: widgets/sdljoy.cpp:214
+#: widgets/sdljoy.cpp:107
 #, c-format
 msgid "Connected joystick %d: %s"
 msgstr ""
