@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-05 21:42-0700\n"
-"PO-Revision-Date: 2020-10-19 11:17+0000\n"
+"POT-Creation-Date: 2020-12-05 11:34+0000\n"
+"PO-Revision-Date: 2020-12-17 05:28+0000\n"
 "Last-Translator: Transifex Bot <>\n"
 "Language-Team: Greek (http://www.transifex.com/bgk/vba-m/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -291,62 +291,62 @@ msgstr "Αυτό θα διαγράψει όλους τους επιταχυντ�
 msgid "Confirm"
 msgstr "Επιβεβαίωση"
 
-#: guiinit.cpp:2738
+#: guiinit.cpp:2740
 msgid "Main icon not found"
 msgstr "Το κύριο εικονίδιο δεν βρέθηκε"
 
-#: guiinit.cpp:2748
+#: guiinit.cpp:2750
 msgid "Browse"
 msgstr ""
 
-#: guiinit.cpp:2762
+#: guiinit.cpp:2764
 msgid "Main display panel not found"
 msgstr "Το πάνελ κύριας προβολής δεν βρέθηκε"
 
-#: guiinit.cpp:2927
+#: guiinit.cpp:2929
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Διπλότυπος επιταχυντής μενού: %s για %s και %s, θα κρατηθεί ο πρώτος"
 
-#: guiinit.cpp:2941
+#: guiinit.cpp:2943
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Ο επιταχυντής μενού %s για %s παρακάμπτει την προεπιλογή για %s, διατηρείται το μενού"
 
-#: guiinit.cpp:3079
+#: guiinit.cpp:3081
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Μη έγκυρο αντικείμενο μενού %s, θα αφαιρεθεί"
 
-#: guiinit.cpp:3287
+#: guiinit.cpp:3289
 msgid "Code"
 msgstr "Κωδικός"
 
-#: guiinit.cpp:3296
+#: guiinit.cpp:3298
 msgid "Description"
 msgstr "Περιγραφή"
 
-#: guiinit.cpp:3370 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3372 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Διεύθυνση"
 
-#: guiinit.cpp:3371
+#: guiinit.cpp:3373
 msgid "Old Value"
 msgstr "Προηγούμενη τιμή"
 
-#: guiinit.cpp:3372
+#: guiinit.cpp:3374
 msgid "New Value"
 msgstr "Νέα τιμή"
 
-#: guiinit.cpp:3893
+#: guiinit.cpp:3895
 msgid "Menu commands"
 msgstr "Εντολές μενού"
 
-#: guiinit.cpp:3916
+#: guiinit.cpp:3918
 msgid "Other commands"
 msgstr "Άλλες εντολές"
 
-#: guiinit.cpp:4027
+#: guiinit.cpp:4029
 msgid "JoyBus host invalid; disabling"
 msgstr "Μη έγκυρος JoyBus host, απενεργοποίηση"
 
@@ -814,8 +814,8 @@ msgstr "Εξομοιωτής Nintendo GameBoy (+Color+Advance)."
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
-"Copyright (C) 2007-2017 VBA-M development team"
-msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2017 VBA-M development team"
+"Copyright (C) 2007-2020 VBA-M development team"
+msgstr ""
 
 #: cmdevents.cpp:2826
 msgid ""
@@ -833,11 +833,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3131
+#: cmdevents.cpp:3136
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "Η σύνδεση LAN είναι ήδη ενεργή. Απενεργοποιήστε τη λειτουργία σύνδεσης για να αποσυνδεθείτε."
 
-#: cmdevents.cpp:3137
+#: cmdevents.cpp:3142
 msgid "Network is not supported in local mode."
 msgstr "Το δίκτυο δεν υποστηρίζεται σε τοπική λειτουργία."
 
@@ -1150,12 +1150,12 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:107
+#: widgets/sdljoy.cpp:137
 #, c-format
 msgid "Connected joystick %d: %s"
 msgstr ""
 
-#: widgets/sdljoy.cpp:229
+#: widgets/sdljoy.cpp:152
 #, c-format
 msgid "Disconnected joystick %d"
 msgstr ""

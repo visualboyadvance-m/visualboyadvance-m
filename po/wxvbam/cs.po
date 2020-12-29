@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-05 21:42-0700\n"
-"PO-Revision-Date: 2020-10-19 11:17+0000\n"
+"POT-Creation-Date: 2020-12-05 11:34+0000\n"
+"PO-Revision-Date: 2020-12-17 05:28+0000\n"
 "Last-Translator: Transifex Bot <>\n"
 "Language-Team: Czech (http://www.transifex.com/bgk/vba-m/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -295,62 +295,62 @@ msgstr "Toto smaže všechny uživatelské zkratky. Jste si jisti?"
 msgid "Confirm"
 msgstr "Potvrdit"
 
-#: guiinit.cpp:2738
+#: guiinit.cpp:2740
 msgid "Main icon not found"
 msgstr "Hlavní ikona nenalezena"
 
-#: guiinit.cpp:2748
+#: guiinit.cpp:2750
 msgid "Browse"
 msgstr ""
 
-#: guiinit.cpp:2762
+#: guiinit.cpp:2764
 msgid "Main display panel not found"
 msgstr "Panel hlavního displeje nenalezen"
 
-#: guiinit.cpp:2927
+#: guiinit.cpp:2929
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Duplictní zkratka nabídky: %s pro %s a %s; ponechána první"
 
-#: guiinit.cpp:2941
+#: guiinit.cpp:2943
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Klávesová zkratka nabídky %s pro %s přepisuje výchozí pro %s ; ponechána zkratka nabídky"
 
-#: guiinit.cpp:3079
+#: guiinit.cpp:3081
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Neplatná položka nabídky %s; odstraňování"
 
-#: guiinit.cpp:3287
+#: guiinit.cpp:3289
 msgid "Code"
 msgstr "Kód"
 
-#: guiinit.cpp:3296
+#: guiinit.cpp:3298
 msgid "Description"
 msgstr "Popis"
 
-#: guiinit.cpp:3370 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3372 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Adresa"
 
-#: guiinit.cpp:3371
+#: guiinit.cpp:3373
 msgid "Old Value"
 msgstr "Stará hodnota"
 
-#: guiinit.cpp:3372
+#: guiinit.cpp:3374
 msgid "New Value"
 msgstr "Nová hodnota"
 
-#: guiinit.cpp:3893
+#: guiinit.cpp:3895
 msgid "Menu commands"
 msgstr "Příkazy nabídky"
 
-#: guiinit.cpp:3916
+#: guiinit.cpp:3918
 msgid "Other commands"
 msgstr "Jiné příkazy"
 
-#: guiinit.cpp:4027
+#: guiinit.cpp:4029
 msgid "JoyBus host invalid; disabling"
 msgstr "Neplatný hostitel JoyBus; probíhá vypínání"
 
@@ -818,8 +818,8 @@ msgstr "Emulátor Nintendo GameBoy (+Color+Advance)."
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
-"Copyright (C) 2007-2017 VBA-M development team"
-msgstr " Autorská práva (C) 1999-2003 Zapomenuté\nAutorská práva (C) 2004-2006 VBA vývojový tým\nAutorská práva (C) 2007-2017 VBA-M vývojový tým"
+"Copyright (C) 2007-2020 VBA-M development team"
+msgstr ""
 
 #: cmdevents.cpp:2826
 msgid ""
@@ -837,11 +837,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Tento program je svobodný software: můžete jej šířit a upravovat podle ustanovení GNU General Public Licence, vydávané Free Software Foundation a to buď podle 2. verze této Licence, nebo (podle vašeho uvážení) kterékoli pozdější verze.\n\nTento program je rozšiřován v naději, že bude užitečný, avšak BEZ JAKÉKOLIV ZÁRUKY. Neposkytují se ani odvozené záruky PRODEJNOSTI anebo VHODNOSTI PRO URČITÝ ÚČEL. Další podrobnosti hledejte v Obecné veřejné licenci GNU.\n\nKopii Obecné veřejné licence GNU jste měli obdržet spolu s tímto programem. Pokud se tak nestalo, najdete ji zde: <http://www.gnu.org/licenses/>."
 
-#: cmdevents.cpp:3131
+#: cmdevents.cpp:3136
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LAN spojení je již aktivní. Zakažte režim propojení pro odpojení."
 
-#: cmdevents.cpp:3137
+#: cmdevents.cpp:3142
 msgid "Network is not supported in local mode."
 msgstr "Síť není podporována v místním režimu."
 
@@ -1154,12 +1154,12 @@ msgstr ""
 msgid "CONTROL"
 msgstr ""
 
-#: widgets/sdljoy.cpp:107
+#: widgets/sdljoy.cpp:137
 #, c-format
 msgid "Connected joystick %d: %s"
 msgstr ""
 
-#: widgets/sdljoy.cpp:229
+#: widgets/sdljoy.cpp:152
 #, c-format
 msgid "Disconnected joystick %d"
 msgstr ""

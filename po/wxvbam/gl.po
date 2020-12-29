@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-05 21:42-0700\n"
-"PO-Revision-Date: 2020-10-19 11:17+0000\n"
+"POT-Creation-Date: 2020-12-05 11:34+0000\n"
+"PO-Revision-Date: 2020-12-17 05:28+0000\n"
 "Last-Translator: Transifex Bot <>\n"
 "Language-Team: Galician (http://www.transifex.com/bgk/vba-m/language/gl/)\n"
 "MIME-Version: 1.0\n"
@@ -293,62 +293,62 @@ msgstr "Isto limpará todos os aceleradores definidos polo usuario. Estás segur
 msgid "Confirm"
 msgstr "Confirmar"
 
-#: guiinit.cpp:2738
+#: guiinit.cpp:2740
 msgid "Main icon not found"
 msgstr "Non se atopa a icona principal"
 
-#: guiinit.cpp:2748
+#: guiinit.cpp:2750
 msgid "Browse"
 msgstr "Explorar"
 
-#: guiinit.cpp:2762
+#: guiinit.cpp:2764
 msgid "Main display panel not found"
 msgstr "Non se atopa o panel de visualización principal"
 
-#: guiinit.cpp:2927
+#: guiinit.cpp:2929
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Duplicar menú acelerador: %s para %s e %s; mantendo primeiro"
 
-#: guiinit.cpp:2941
+#: guiinit.cpp:2943
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "O menú acelerador %s para %s anúlase por defecto para %s ; mantendo menú"
 
-#: guiinit.cpp:3079
+#: guiinit.cpp:3081
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Elemento do menú non válido %s; eliminando"
 
-#: guiinit.cpp:3287
+#: guiinit.cpp:3289
 msgid "Code"
 msgstr "Código"
 
-#: guiinit.cpp:3296
+#: guiinit.cpp:3298
 msgid "Description"
 msgstr "Descrición"
 
-#: guiinit.cpp:3370 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3372 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Enderezo"
 
-#: guiinit.cpp:3371
+#: guiinit.cpp:3373
 msgid "Old Value"
 msgstr "Valor antigo"
 
-#: guiinit.cpp:3372
+#: guiinit.cpp:3374
 msgid "New Value"
 msgstr "Novo valor"
 
-#: guiinit.cpp:3893
+#: guiinit.cpp:3895
 msgid "Menu commands"
 msgstr "Menú de comandos"
 
-#: guiinit.cpp:3916
+#: guiinit.cpp:3918
 msgid "Other commands"
 msgstr "Outros comandos"
 
-#: guiinit.cpp:4027
+#: guiinit.cpp:4029
 msgid "JoyBus host invalid; disabling"
 msgstr "Servidor JoyBus non válido; desactivando"
 
@@ -816,8 +816,8 @@ msgstr "Emulador de Nintendo GameBoy (+Color+Advance) ."
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
-"Copyright (C) 2007-2017 VBA-M development team"
-msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 Equipo de desenvolvemento VBA\nCopyright (C) 2007-2017 Equipo de desenvolvemento VBA-M"
+"Copyright (C) 2007-2020 VBA-M development team"
+msgstr ""
 
 #: cmdevents.cpp:2826
 msgid ""
@@ -835,11 +835,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Este programa é gratuíto: podes redistribuílo e/ou modificalo\nbaixo os termos da GNU General Public License segundo o publicado pola\nFree Software Foundation, xa sexa a versión 2 da Licenza, ou\n(á túa escolla) calquera versión posterior.\n\nEste programa distribúese coa finalidade de ser de utilidade,\npero SEN NINGUNHA GARANTÍA; incluso sen a garantía implícita de\nCOMERCIABILIDADE ou AXUSTE PARA UN PROPÓSITO PARTICULAR.  Revisa a\nLicencia Pública Xeral de GNU para máis detalles.\n\nDeberas recibir unha copia da Licencia Pública Xeral de GNU\nxunto con este programa.  De non ser así, revisa http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3131
+#: cmdevents.cpp:3136
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "A ligazón LAN xa está activa. Desactiva o modo ligazón para desconectar."
 
-#: cmdevents.cpp:3137
+#: cmdevents.cpp:3142
 msgid "Network is not supported in local mode."
 msgstr "A rede non se admite no modo local."
 
@@ -1152,12 +1152,12 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:107
+#: widgets/sdljoy.cpp:137
 #, c-format
 msgid "Connected joystick %d: %s"
 msgstr "Panca de control conectada %d: %s"
 
-#: widgets/sdljoy.cpp:229
+#: widgets/sdljoy.cpp:152
 #, c-format
 msgid "Disconnected joystick %d"
 msgstr "Panca de control desconectada %d"

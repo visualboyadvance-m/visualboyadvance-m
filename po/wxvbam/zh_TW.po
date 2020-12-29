@@ -19,8 +19,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-05 21:42-0700\n"
-"PO-Revision-Date: 2020-10-19 11:17+0000\n"
+"POT-Creation-Date: 2020-12-05 11:34+0000\n"
+"PO-Revision-Date: 2020-12-17 05:28+0000\n"
 "Last-Translator: Transifex Bot <>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/bgk/vba-m/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -302,62 +302,62 @@ msgstr "這將清除所有使用者的加速器設定。你確定嗎?"
 msgid "Confirm"
 msgstr "確認"
 
-#: guiinit.cpp:2738
+#: guiinit.cpp:2740
 msgid "Main icon not found"
 msgstr "主圖示未找到"
 
-#: guiinit.cpp:2748
+#: guiinit.cpp:2750
 msgid "Browse"
 msgstr "瀏覽"
 
-#: guiinit.cpp:2762
+#: guiinit.cpp:2764
 msgid "Main display panel not found"
 msgstr "主顯示螢幕未找到"
 
-#: guiinit.cpp:2927
+#: guiinit.cpp:2929
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "複製選單加速器:%s於%s和%s；保持第一"
 
-#: guiinit.cpp:2941
+#: guiinit.cpp:2943
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "選單加速器%s%s的預設覆蓋%s的；保存選單"
 
-#: guiinit.cpp:3079
+#: guiinit.cpp:3081
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "無效的選單項%s；去除"
 
-#: guiinit.cpp:3287
+#: guiinit.cpp:3289
 msgid "Code"
 msgstr "代碼"
 
-#: guiinit.cpp:3296
+#: guiinit.cpp:3298
 msgid "Description"
 msgstr "描述"
 
-#: guiinit.cpp:3370 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3372 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "位址"
 
-#: guiinit.cpp:3371
+#: guiinit.cpp:3373
 msgid "Old Value"
 msgstr "舊數值"
 
-#: guiinit.cpp:3372
+#: guiinit.cpp:3374
 msgid "New Value"
 msgstr "新數值"
 
-#: guiinit.cpp:3893
+#: guiinit.cpp:3895
 msgid "Menu commands"
 msgstr "選單指令"
 
-#: guiinit.cpp:3916
+#: guiinit.cpp:3918
 msgid "Other commands"
 msgstr "其他指令"
 
-#: guiinit.cpp:4027
+#: guiinit.cpp:4029
 msgid "JoyBus host invalid; disabling"
 msgstr "遊戲總線主機無效;禁用"
 
@@ -825,8 +825,8 @@ msgstr "任天堂 GameBoy (+Color+Advance) 模擬器。"
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
-"Copyright (C) 2007-2017 VBA-M development team"
-msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2017 VBA-M development team"
+"Copyright (C) 2007-2020 VBA-M development team"
+msgstr ""
 
 #: cmdevents.cpp:2826
 msgid ""
@@ -844,11 +844,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3131
+#: cmdevents.cpp:3136
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "區網連接已開啟。禁用連接模式。"
 
-#: cmdevents.cpp:3137
+#: cmdevents.cpp:3142
 msgid "Network is not supported in local mode."
 msgstr "網路不支持本地模式。"
 
@@ -1161,12 +1161,12 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:107
+#: widgets/sdljoy.cpp:137
 #, c-format
 msgid "Connected joystick %d: %s"
 msgstr "已連結的搖桿 %d: %s"
 
-#: widgets/sdljoy.cpp:229
+#: widgets/sdljoy.cpp:152
 #, c-format
 msgid "Disconnected joystick %d"
 msgstr "未連接的搖桿 %d"

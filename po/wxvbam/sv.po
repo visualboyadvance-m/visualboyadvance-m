@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-05 21:42-0700\n"
-"PO-Revision-Date: 2020-10-19 11:17+0000\n"
+"POT-Creation-Date: 2020-12-05 11:34+0000\n"
+"PO-Revision-Date: 2020-12-17 05:28+0000\n"
 "Last-Translator: Transifex Bot <>\n"
 "Language-Team: Swedish (http://www.transifex.com/bgk/vba-m/language/sv/)\n"
 "MIME-Version: 1.0\n"
@@ -298,62 +298,62 @@ msgstr "Det här kommer att rensa alla användardefinierade acceleratorer. Är d
 msgid "Confirm"
 msgstr "Bekräfta"
 
-#: guiinit.cpp:2738
+#: guiinit.cpp:2740
 msgid "Main icon not found"
 msgstr "Huvudikon ej funnen"
 
-#: guiinit.cpp:2748
+#: guiinit.cpp:2750
 msgid "Browse"
 msgstr "Bläddra"
 
-#: guiinit.cpp:2762
+#: guiinit.cpp:2764
 msgid "Main display panel not found"
 msgstr "Huvudvisningspanel ej funnen"
 
-#: guiinit.cpp:2927
+#: guiinit.cpp:2929
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Duplicera menyaccelerator: %s för %s och %s; behåller första"
 
-#: guiinit.cpp:2941
+#: guiinit.cpp:2943
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Menyaccelerator %s för %s överskrider standard för %s ; behåller meny"
 
-#: guiinit.cpp:3079
+#: guiinit.cpp:3081
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Ogiltigt menyföremål %s; tar bort"
 
-#: guiinit.cpp:3287
+#: guiinit.cpp:3289
 msgid "Code"
 msgstr "Kod"
 
-#: guiinit.cpp:3296
+#: guiinit.cpp:3298
 msgid "Description"
 msgstr "Beskrivning"
 
-#: guiinit.cpp:3370 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3372 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Adress"
 
-#: guiinit.cpp:3371
+#: guiinit.cpp:3373
 msgid "Old Value"
 msgstr "Gammalt värde"
 
-#: guiinit.cpp:3372
+#: guiinit.cpp:3374
 msgid "New Value"
 msgstr "Nytt värde"
 
-#: guiinit.cpp:3893
+#: guiinit.cpp:3895
 msgid "Menu commands"
 msgstr "Menykommandon"
 
-#: guiinit.cpp:3916
+#: guiinit.cpp:3918
 msgid "Other commands"
 msgstr "Andra kommandon"
 
-#: guiinit.cpp:4027
+#: guiinit.cpp:4029
 msgid "JoyBus host invalid; disabling"
 msgstr "JoyBus värd ogiltig; inaktiverar"
 
@@ -821,8 +821,8 @@ msgstr "Nintendo GameBoy (+Color+Advance) emulator."
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
-"Copyright (C) 2007-2017 VBA-M development team"
-msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA-utvecklingsgrupp\nCopyright (C) 2007-2017 VBA-M-utvecklingsgrupp"
+"Copyright (C) 2007-2020 VBA-M development team"
+msgstr ""
 
 #: cmdevents.cpp:2826
 msgid ""
@@ -840,11 +840,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Det här programmet är fri mjukvara: du kan omdistribuera det och/eller modifiera\ndet under villkoren av GNU General Public License som publiceras av\nthe Free Software Foundation, antingen version 2 av licensen, eller\n(om du så vill) vilken som helst senare version. \n\nDet här programmet distribueras i förhoppningen om att det kommer att fylla sin funktion,\nmen UTAN NÅGON FORM AV GARANTI; till och med utan den antydda garantin av\nSÄLJBARHET eller LÄMPLIGHET FÖR ETT VISST ÄNDAMÅL. Se\nGNU General Public License för mer detaljer.\n\nDu skall ha fått en kopia av GNU General Public License\ntillsammans med detta program. Om inte, se http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3131
+#: cmdevents.cpp:3136
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LAN länk är redan aktiv. Inaktivera länkläge för att koppla ifrån."
 
-#: cmdevents.cpp:3137
+#: cmdevents.cpp:3142
 msgid "Network is not supported in local mode."
 msgstr "Nätverk stöds inte i lokalläge."
 
@@ -1157,12 +1157,12 @@ msgstr "RÅ_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:107
+#: widgets/sdljoy.cpp:137
 #, c-format
 msgid "Connected joystick %d: %s"
 msgstr "Ansluten styrspak %d: %s"
 
-#: widgets/sdljoy.cpp:229
+#: widgets/sdljoy.cpp:152
 #, c-format
 msgid "Disconnected joystick %d"
 msgstr ""

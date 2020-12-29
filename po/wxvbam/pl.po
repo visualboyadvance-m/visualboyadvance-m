@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-05 21:42-0700\n"
-"PO-Revision-Date: 2020-10-19 11:17+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2020-12-05 11:34+0000\n"
+"PO-Revision-Date: 2020-12-18 01:31+0000\n"
+"Last-Translator: Damian Drakon <dragon1590@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/bgk/vba-m/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -294,62 +294,62 @@ msgstr "To działanie spowoduje usunięcie wszystkich akceleratorów zdefiniowan
 msgid "Confirm"
 msgstr "Potwierdź "
 
-#: guiinit.cpp:2738
+#: guiinit.cpp:2740
 msgid "Main icon not found"
 msgstr "Nie znaleziono głównej ikony"
 
-#: guiinit.cpp:2748
+#: guiinit.cpp:2750
 msgid "Browse"
 msgstr "Przeglądaj"
 
-#: guiinit.cpp:2762
+#: guiinit.cpp:2764
 msgid "Main display panel not found"
 msgstr "Nie znaleziono głównego panelu wyświetlacza"
 
-#: guiinit.cpp:2927
+#: guiinit.cpp:2929
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Zduplikowanie skrótu klawiszowego: %s dla %s i %s; pierwszy zostaje zachowany"
 
-#: guiinit.cpp:2941
+#: guiinit.cpp:2943
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Skrót klawiszowy %s dla %s zastępuje domyślny dla %s ; menu zostaje zachowane"
 
-#: guiinit.cpp:3079
+#: guiinit.cpp:3081
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Nieprawidłowy element menu %s; usuwanie"
 
-#: guiinit.cpp:3287
+#: guiinit.cpp:3289
 msgid "Code"
 msgstr "Kod"
 
-#: guiinit.cpp:3296
+#: guiinit.cpp:3298
 msgid "Description"
 msgstr "Opis"
 
-#: guiinit.cpp:3370 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3372 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Adres"
 
-#: guiinit.cpp:3371
+#: guiinit.cpp:3373
 msgid "Old Value"
 msgstr "Stara Wartość"
 
-#: guiinit.cpp:3372
+#: guiinit.cpp:3374
 msgid "New Value"
 msgstr "Nowa Wartość"
 
-#: guiinit.cpp:3893
+#: guiinit.cpp:3895
 msgid "Menu commands"
 msgstr "Polecenia menu"
 
-#: guiinit.cpp:3916
+#: guiinit.cpp:3918
 msgid "Other commands"
 msgstr "Inne polecenia"
 
-#: guiinit.cpp:4027
+#: guiinit.cpp:4029
 msgid "JoyBus host invalid; disabling"
 msgstr "Nieprawidłowy host JoyBus; wyłączanie"
 
@@ -817,8 +817,8 @@ msgstr "Emulator konsoli Nintendo GameBoy (+Color+Advance)."
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
-"Copyright (C) 2007-2017 VBA-M development team"
-msgstr "Prawa Autorskie (C) 1999-2003 Forgotten\nPrawa Autorskie (C) 2004-2006 VBA development team\nPrawa Autorskie (C) 2007-2017 VBA-M development team"
+"Copyright (C) 2007-2020 VBA-M development team"
+msgstr "Prawo autorskie (C) 1999-2003 Forgotten\nPrawo autorskie (C) 2004-2006 VBA development team\nPrawo autorskie (C) 2007-2020 VBA-M development team"
 
 #: cmdevents.cpp:2826
 msgid ""
@@ -836,11 +836,11 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Ten program jest darmowym oprogramowaniem: możesz go rozpowszechniać\nlub modyfikować zgodnie z warunkami 2, albo (wedle własnego uznania)\ndowolnej późniejszej, wersji Powszechnej Licencji Publicznej GNU\nopublikowanej przez Free Software Foundation.\n\nTen program jest rozpowszechniany w nadziei, że będzie przydatny, ale BEZ\nŻADNEJ GWARANCJI; bez nawet dorozumianej gwarancji PRZYDATNOŚCI\nHANDLOWEJ lub PRZYDATNOŚCI DO OKREŚLONEGO CELU. Więcej informacji\nmożna znaleźć w Powszechnej Licencji Publicznej GNU.\n\nWraz z tym programem powinieneś otrzymać kopię Powszechnej Licencji\nPublicznej GNU. Jeśli tak się nie stanie, zobacz http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3131
+#: cmdevents.cpp:3136
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "Połączenie LAN jest już aktywne. Wyłącz tryb połączenia aby się rozłączyć."
 
-#: cmdevents.cpp:3137
+#: cmdevents.cpp:3142
 msgid "Network is not supported in local mode."
 msgstr "W trybie lokalnym sieć nie jest wspierana."
 
@@ -1153,12 +1153,12 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:107
+#: widgets/sdljoy.cpp:137
 #, c-format
 msgid "Connected joystick %d: %s"
 msgstr "Podłączono joystick %d: %s"
 
-#: widgets/sdljoy.cpp:229
+#: widgets/sdljoy.cpp:152
 #, c-format
 msgid "Disconnected joystick %d"
 msgstr "Odłączono joystick %d"
