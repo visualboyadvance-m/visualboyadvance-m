@@ -878,7 +878,8 @@ void sdlInitVideo()
 
     sdlResizeVideo();
 }
-#if defined(KMOD_GUI)
+
+#ifndef KMOD_META
 #define KMOD_META KMOD_GUI
 #endif
 
