@@ -3,14 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# mp hdte <mphdte@gmail.com>, 2020
 # park seungbin <parksengbin48@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2020-12-17 05:28+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2020-12-30 05:42+0000\n"
+"Last-Translator: mp hdte <mphdte@gmail.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/bgk/vba-m/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,75 +21,75 @@ msgstr ""
 
 #: wxvbam.cpp:226
 msgid "visualboyadvance-m"
-msgstr ""
+msgstr "visualboyadvance-m"
 
 #: wxvbam.cpp:443
 msgid "Could not create main window"
-msgstr ""
+msgstr "메인 윈도우를 생성할 수 없습니다."
 
 #: wxvbam.cpp:514
 msgid "Save built-in XRC file and exit"
-msgstr ""
+msgstr "built-in XRC 파일을 저장하고 종료합니다."
 
 #: wxvbam.cpp:517
 msgid "Save built-in vba-over.ini and exit"
-msgstr ""
+msgstr "built-in vba-over.ini 를 저장하고 종료합니다."
 
 #: wxvbam.cpp:520
 msgid "Print configuration path and exit"
-msgstr ""
+msgstr "설정 경로를 출력하고 종료합니다."
 
 #: wxvbam.cpp:523
 msgid "Start in full-screen mode"
-msgstr ""
+msgstr "전체화면으로 시작합니다."
 
 #: wxvbam.cpp:526
 msgid "Set a configuration file"
-msgstr ""
+msgstr "구성 설정 파일을 설정합니다."
 
 #: wxvbam.cpp:530
 msgid "Delete shared link state first, if it exists"
-msgstr ""
+msgstr "shared link state 파일이 존재한다면 삭제합니다."
 
 #: wxvbam.cpp:537
 msgid "List all settable options and exit"
-msgstr ""
+msgstr "설정 가능한 옵션을 나열하고 종료합니다."
 
 #: wxvbam.cpp:540
 msgid "ROM file"
-msgstr ""
+msgstr "ROM 파일"
 
 #: wxvbam.cpp:542
 msgid "<config>=<value>"
-msgstr ""
+msgstr "<config>=<value>"
 
 #: wxvbam.cpp:573
 msgid "Configuration/build error: can't find built-in xrc"
-msgstr ""
+msgstr "설정/빌드 오류: built-in XRC를 찾을 수 없습니다."
 
 #: wxvbam.cpp:581
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr ""
+msgstr "빌트 인 설정을 %s에 기록했습니다.\n오버라이드 하기 위해서는, 변경된 root node(들)을 제외한 모든 것을 제거하세요. 다음 검색 경로의 모든 .xrc 혹은 .xrs 파일에서 먼저 검색된 정확한 이름의 root node가 오버라이드 됩니다:"
 
 #: wxvbam.cpp:596
 msgid "Configuration is read from, in order:"
-msgstr ""
+msgstr "설정은 다음으로부터 순서대로 불러옵니다 :"
 
 #: wxvbam.cpp:610
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
-msgstr ""
+msgstr "빌트 인 오버라이드 파일을 %s에 기록했습니다.\n오버라이드 하기 위해서는, 변경된 섹션을 제외한 모든 것을 지워주세요. 검색 경로에서 먼저 찾아낸 섹션이 사용됩니다:"
 
 #: wxvbam.cpp:616
 msgid ""
 "\n"
 "\tbuilt-in"
-msgstr ""
+msgstr "\n\t빌트인"
 
 #: wxvbam.cpp:627
 msgid ""
@@ -96,21 +97,21 @@ msgid ""
 "\n"
 "For flag options, true and false are specified as 1 and 0, respectively.\n"
 "\n"
-msgstr ""
+msgstr "사용자 인터페이스에서 설정 변경이 일어나면, 어떤 라인에서 선택 옵션이 저장됩니다. \n\n플래그 옵션은, true와 false는 1과 0으로 지정됩니다.\n\n"
 
 #: wxvbam.cpp:648
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
-msgstr ""
+msgstr "키보드 / * 옵션으로 사용 가능한 수준 :\n\n"
 
 #: wxvbam.cpp:660
 msgid "Configuration file not found."
-msgstr ""
+msgstr "구성 설정 파일을 찾을 수 없습니다."
 
 #: wxvbam.cpp:693
 msgid "Bad configuration option or multiple ROM files given:\n"
-msgstr ""
+msgstr "설정 옵션이 잘못되었거나, 여러 개의 ROM 파일이 주어졌습니다:\n"
 
 #: guiinit.cpp:81
 msgid "Start!"
@@ -122,7 +123,7 @@ msgstr "연결"
 
 #: guiinit.cpp:117
 msgid "You must enter a valid host name"
-msgstr ""
+msgstr "유효한 호스트 이름을 입력해야 합니다"
 
 #: guiinit.cpp:118
 msgid "Host name invalid"
@@ -186,32 +187,32 @@ msgstr "게임샤크"
 
 #: guiinit.cpp:755 cmdevents.cpp:676
 msgid "GameGenie"
-msgstr ""
+msgstr "게임 지니"
 
 #: guiinit.cpp:757
 msgid "Generic Code"
-msgstr ""
+msgstr "제네릭 코드"
 
 #: guiinit.cpp:758
 msgid "GameShark Advance"
-msgstr ""
+msgstr "게임 샤크 어드밴스"
 
 #: guiinit.cpp:759
 msgid "CodeBreaker Advance"
-msgstr ""
+msgstr "코드 브레이커 어드밴스"
 
 #: guiinit.cpp:760
 msgid "Flashcart CHT"
-msgstr ""
+msgstr "플래시카트 CHT"
 
 #: guiinit.cpp:828 guiinit.cpp:1083
 msgid "Number cannot be empty"
-msgstr ""
+msgstr "번호는 비워 둘 수 없습니다"
 
 #: guiinit.cpp:866
 #, c-format
 msgid "Search produced %d results.  Please refine better"
-msgstr ""
+msgstr "%d개의 검색 결과가 있습니다. 좀 더 세분화하십시오"
 
 #: guiinit.cpp:878
 msgid "Search produced no results"
@@ -231,24 +232,24 @@ msgstr "32비트"
 
 #: guiinit.cpp:1055
 msgid "signed decimal"
-msgstr ""
+msgstr "부호화 10진수"
 
 #: guiinit.cpp:1059
 msgid "unsigned decimal"
-msgstr ""
+msgstr "부호없는 10진수"
 
 #: guiinit.cpp:1063
 msgid "unsigned hexadecimal"
-msgstr ""
+msgstr "부호없는 16진수"
 
 #: guiinit.cpp:1541
 #, c-format
 msgid "%d frames = %.2f ms"
-msgstr ""
+msgstr "%d 프레임 =  %.2f ms"
 
 #: guiinit.cpp:1553
 msgid "Default device"
-msgstr ""
+msgstr "기본 장치"
 
 #: guiinit.cpp:1727
 msgid "Desktop mode"
@@ -257,19 +258,19 @@ msgstr "데스크탑 모드"
 #: guiinit.cpp:1734
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
-msgstr ""
+msgstr "%d x %d - %d bpp @ %d Hz"
 
 #: guiinit.cpp:1847 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
 msgid "None"
-msgstr ""
+msgstr "없음"
 
 #: guiinit.cpp:1888
 #, c-format
 msgid "No usable rpi plugins found in %s"
-msgstr ""
+msgstr "%s에서 사용가능한 rpi 플러그인을 찾을 수 없음"
 
 #: guiinit.cpp:1908 xrc/DisplayConfig.xrc:107
 msgid "Plugin"
@@ -277,7 +278,7 @@ msgstr "플러그인"
 
 #: guiinit.cpp:1936
 msgid "Please select a plugin or a different filter"
-msgstr ""
+msgstr "플러그인이나 다른 필터를 선택하십시오"
 
 #: guiinit.cpp:1937
 msgid "Plugin selection error"
@@ -285,7 +286,7 @@ msgstr "플러그인 선택 오류"
 
 #: guiinit.cpp:2150
 msgid "This will clear all user-defined accelerators.  Are you sure?"
-msgstr ""
+msgstr "모든 사용자 정의 가속기를 지우게 됩니다. 지우시겠습니까?"
 
 #: guiinit.cpp:2150
 msgid "Confirm"
@@ -293,30 +294,30 @@ msgstr "확인"
 
 #: guiinit.cpp:2740
 msgid "Main icon not found"
-msgstr ""
+msgstr "메인 아이콘을 찾을 수 없음"
 
 #: guiinit.cpp:2750
 msgid "Browse"
-msgstr ""
+msgstr "Browse"
 
 #: guiinit.cpp:2764
 msgid "Main display panel not found"
-msgstr ""
+msgstr "메인 디스플레이 패널을 찾을 수 없음"
 
 #: guiinit.cpp:2929
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
-msgstr ""
+msgstr "메뉴 가속기 복제: %s는 %s와 %s용; 첫 번째 유지"
 
 #: guiinit.cpp:2943
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
-msgstr ""
+msgstr "%s 메뉴 가속기 (%s에 대해) 는 %s에 대한 초기값을 덮어씌움 ; 메뉴 유지"
 
 #: guiinit.cpp:3081
 #, c-format
 msgid "Invalid menu item %s; removing"
-msgstr ""
+msgstr "무효한 %s메뉴 항목 ; 제거"
 
 #: guiinit.cpp:3289
 msgid "Code"
@@ -340,19 +341,19 @@ msgstr "새로운 값"
 
 #: guiinit.cpp:3895
 msgid "Menu commands"
-msgstr ""
+msgstr "메뉴 명령"
 
 #: guiinit.cpp:3918
 msgid "Other commands"
-msgstr ""
+msgstr "그 외 명령"
 
 #: guiinit.cpp:4029
 msgid "JoyBus host invalid; disabling"
-msgstr ""
+msgstr "조이버스 호스트 무효; 비활성화"
 
 #: viewers.cpp:560
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
-msgstr ""
+msgstr "텍스트 파일 (*.txt;*.log)|*.txt;*.log|"
 
 #: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
 #: cmdevents.cpp:1158 cmdevents.cpp:1236 cmdevents.cpp:1306 cmdevents.cpp:1333
@@ -362,11 +363,11 @@ msgstr "출력파일 선택"
 
 #: viewers.cpp:698 viewers.cpp:770
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
-msgstr ""
+msgstr "메모리 덤프 (*.dmp;*.bin)|*.dmp;*.bin|"
 
 #: viewers.cpp:700
 msgid "Select memory dump file"
-msgstr ""
+msgstr "메모리 덤프 파일을 선택"
 
 #: viewers.cpp:814
 msgid "0x00000000 - BIOS"
@@ -434,18 +435,18 @@ msgstr ""
 
 #: gfxviewers.cpp:1141
 msgid "Select output file and type"
-msgstr ""
+msgstr "출력 파일 및 형식 선택"
 
 #: gfxviewers.cpp:1142
 msgid ""
 "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
 "Table (*.act)|*.act"
-msgstr ""
+msgstr "윈도우즈 팔레트 (*.pal)|*.pal| 페인트샵 팔레트 (*.pal)|*.pal| 어도비 컬러 테이블 (*.act)|*.act"
 
 #: gfxviewers.cpp:1601 gfxviewers.cpp:1743 cmdevents.cpp:1159
 #: viewsupt.cpp:1182
 msgid "PNG images|*.png|BMP images|*.bmp"
-msgstr ""
+msgstr "PNG 이미지|*.png|BMP 이미지|*.bmp"
 
 #: cmdevents.cpp:105
 msgid ""
@@ -481,7 +482,7 @@ msgstr "게임보이컬러 롬 파일 열기"
 
 #: cmdevents.cpp:584 cmdevents.cpp:700 cmdevents.cpp:739 cmdevents.cpp:812
 msgid "Unknown"
-msgstr ""
+msgstr "알 수 없음"
 
 #: cmdevents.cpp:592
 msgid "ROM"
@@ -589,7 +590,7 @@ msgstr ""
 
 #: cmdevents.cpp:848 cmdevents.cpp:870
 msgid "Select Dot Code file"
-msgstr ""
+msgstr "닷 코드 파일을 선택"
 
 #: cmdevents.cpp:850 cmdevents.cpp:872
 msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
@@ -597,7 +598,7 @@ msgstr ""
 
 #: cmdevents.cpp:891 cmdevents.cpp:1086
 msgid "Select battery file"
-msgstr ""
+msgstr "배터리 파일을 선택"
 
 #: cmdevents.cpp:892 cmdevents.cpp:1087
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
@@ -607,7 +608,7 @@ msgstr ""
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
-msgstr "배터리 파일을 가져오면 저장된 게임이 모두 지워집니다. 계속하시겠습니까?"
+msgstr "배터리 파일을 가져오면 저장된 게임이 모두 지워집니다. (다음 쓰기 후에 영구적으로) 계속하시겠습니까?"
 
 #: cmdevents.cpp:901 cmdevents.cpp:929 cmdevents.cpp:1049
 msgid "Confirm import"
@@ -621,7 +622,7 @@ msgstr "%s를 로드한 배터리"
 #: cmdevents.cpp:909
 #, c-format
 msgid "Error loading battery %s"
-msgstr ""
+msgstr "%s 배터리 불러오기 오류"
 
 #: cmdevents.cpp:918
 msgid "Select code file"
@@ -639,7 +640,7 @@ msgstr ""
 msgid ""
 "Importing a code file will replace any loaded cheats.  Do you want to "
 "continue?"
-msgstr ""
+msgstr "코드 파일 가져오기 시 이미 불러온 치트를 지울 수도 있습니다. 계속 하시겠습니까?"
 
 #: cmdevents.cpp:945
 #, c-format
@@ -649,17 +650,17 @@ msgstr "%s파일을 열수 없습니다"
 #: cmdevents.cpp:955
 #, c-format
 msgid "Unsupported code file %s"
-msgstr ""
+msgstr "%s 코드 파일을 지원하지 않음"
 
 #: cmdevents.cpp:1025
 #, c-format
 msgid "Loaded code file %s"
-msgstr ""
+msgstr "%s 코드 파일을 불러옴"
 
 #: cmdevents.cpp:1027
 #, c-format
 msgid "Error loading code file %s"
-msgstr ""
+msgstr "%s 코드 파일 불러오기 오류"
 
 #: cmdevents.cpp:1038 cmdevents.cpp:1114
 msgid "Select snapshot file"
@@ -679,12 +680,12 @@ msgstr "게임보이 스넵샷 (*.gbs)|*.gbs"
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
-msgstr ""
+msgstr "스냅샷 파일 가져오기 시 이미 저장된 게임을 지울 수도 있습니다 (다음 기록 이후 영구적으로). 계속 하시겠습니까?"
 
 #: cmdevents.cpp:1073
 #, c-format
 msgid "Loaded snapshot file %s"
-msgstr ""
+msgstr "%s 스냅샷 파일을 불러옴"
 
 #: cmdevents.cpp:1075
 #, c-format
@@ -694,16 +695,16 @@ msgstr "로드중 %s 스넵샷 파일 에러"
 #: cmdevents.cpp:1098
 #, c-format
 msgid "Wrote battery %s"
-msgstr ""
+msgstr "%s 배터리가 기록됨"
 
 #: cmdevents.cpp:1100 panel.cpp:689
 #, c-format
 msgid "Error writing battery %s"
-msgstr ""
+msgstr "%s 배터리 기록 오류"
 
 #: cmdevents.cpp:1108
 msgid "EEPROM saves cannot be exported"
-msgstr ""
+msgstr "EEPROM 저장 방식은 내보낼 수 없음"
 
 #: cmdevents.cpp:1115
 msgid "Gameshark Snapshot (*.sps)|*.sps"
@@ -711,7 +712,7 @@ msgstr ""
 
 #: cmdevents.cpp:1129
 msgid "Exported from VisualBoyAdvance-M"
-msgstr ""
+msgstr "VisualBoyAdvance-M으로부터 내보내짐"
 
 #: cmdevents.cpp:1141
 #, c-format
@@ -726,7 +727,7 @@ msgstr "스넵샷%s저장 중 에러"
 #: cmdevents.cpp:1183 sys.cpp:450
 #, c-format
 msgid "Wrote snapshot %s"
-msgstr ""
+msgstr "%s 스냅샷이 기록됨"
 
 #: cmdevents.cpp:1204 cmdevents.cpp:1274
 msgid " files ("
@@ -742,7 +743,7 @@ msgstr "파일 선택"
 
 #: cmdevents.cpp:1669 cmdevents.cpp:1762
 msgid "Select state file"
-msgstr ""
+msgstr "스테이트 파일을 선택"
 
 #: cmdevents.cpp:1670 cmdevents.cpp:1763
 msgid "VisualBoyAdvance saved game files|*.sgm"
@@ -751,7 +752,7 @@ msgstr ""
 #: cmdevents.cpp:1793 cmdevents.cpp:1803 cmdevents.cpp:1814
 #, c-format
 msgid "Current state slot #%d"
-msgstr ""
+msgstr "현재 상태 슬롯 # %d"
 
 #: cmdevents.cpp:2083
 msgid "Sound enabled"
@@ -764,7 +765,7 @@ msgstr "소리 끄기"
 #: cmdevents.cpp:2096 cmdevents.cpp:2110
 #, c-format
 msgid "Volume: %d%%"
-msgstr ""
+msgstr "음량: %d %%"
 
 #: cmdevents.cpp:2185
 msgid "Set to 0 for pseudo tty"
@@ -772,7 +773,7 @@ msgstr ""
 
 #: cmdevents.cpp:2187
 msgid "Port to wait for connection:"
-msgstr ""
+msgstr "연결 대기용 포트:"
 
 #: cmdevents.cpp:2188
 msgid "GDB Connection"
@@ -781,7 +782,7 @@ msgstr "GDB 연결"
 #: cmdevents.cpp:2241
 #, c-format
 msgid "Waiting for connection at %s"
-msgstr ""
+msgstr "%s로 연결 대기 중"
 
 #: cmdevents.cpp:2248
 #, c-format
@@ -790,21 +791,21 @@ msgstr "포트%d에 연결중이니 기다려주세요"
 
 #: cmdevents.cpp:2251
 msgid "Waiting for GDB..."
-msgstr ""
+msgstr "GDB 대기 중..."
 
 #: cmdevents.cpp:2666
 #, c-format
 msgid "Using pixel filter #%d"
-msgstr ""
+msgstr "픽셀 필터 사용 #%d"
 
 #: cmdevents.cpp:2681
 #, c-format
 msgid "Using interframe blending #%d"
-msgstr ""
+msgstr "인터프레임 혼합 사용 #%d"
 
 #: cmdevents.cpp:2720 panel.cpp:193 panel.cpp:296
 msgid "Could not initialize the sound driver!"
-msgstr ""
+msgstr "사운드 드라이버를 초기화할 수 없습니다!"
 
 #: cmdevents.cpp:2824
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
@@ -831,11 +832,11 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program.  If not, see http://www.gnu.org/licenses ."
-msgstr ""
+msgstr "이 프로그램은 자유 소프트웨어입니다. 당신은 Free Software Foundation이 공표한 GNU 일반 공중 라이선스 버전 2 또는 (당신의 선택에 따라) 그 이후 버전을 임의로 선택해서 그 규정에 따라 프로그램을 수정하거나 재배포할 수 있습니다.\n\n이 프로그램은 유용하게 사용될 수 있을 것이라는 희망에서 배포되고 있지만 어떠한 형태의 보증도 제공하지 않습니다. 상품성 또는 특정 목적 적합성에 대한 묵시적 보증 역시 제공하지 않습니다. 보다 자세한 내용은 GNU 일반 공중 라이선스를 참고하시기 바랍니다.\n\n GNU General Public License는 이 프로그램과 함께 제공됩니다. 그렇지 않은 경우 http://www.gnu.org/licenses 를 참조하십시오."
 
 #: cmdevents.cpp:3136
 msgid "LAN link is already active.  Disable link mode to disconnect."
-msgstr ""
+msgstr "LAN 연결이 이미 활성화 상태입니다. 연결해체를 위해 연결 모드를 비활성화 하십시오."
 
 #: cmdevents.cpp:3142
 msgid "Network is not supported in local mode."

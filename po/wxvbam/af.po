@@ -3,38 +3,27 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Damián Cabello Jiménez <jdamiancabello@gmail.com>, 2018
-# MELERIX, 2015
-# Ein Striker <ein.striker@gmail.com>, 2017
-# javidg96, 2015
-# jorge perez <theghostxxaz@gmail.com>, 2021
-# Marco123V <MarcoVillalejos@hotmail.com>, 2015
-# Marco Yurazeck <luthias@gmail.com>, 2020
-# MELERIX, 2015
-# MELERIX, 2015,2020
-# Ruben Nava, 2019
-# Sebastián Espinoza <endsades@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2021-01-02 03:02+0000\n"
-"Last-Translator: jorge perez <theghostxxaz@gmail.com>\n"
-"Language-Team: Spanish (http://www.transifex.com/bgk/vba-m/language/es/)\n"
+"PO-Revision-Date: 2011-12-03 19:42+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Afrikaans (http://www.transifex.com/bgk/vba-m/language/af/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: es\n"
+"Language: af\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: wxvbam.cpp:226
 msgid "visualboyadvance-m"
-msgstr "visualboyadvance-m"
+msgstr ""
 
 #: wxvbam.cpp:443
 msgid "Could not create main window"
-msgstr "No se puede crear la ventana principal"
+msgstr ""
 
 #: wxvbam.cpp:514
 msgid "Save built-in XRC file and exit"
