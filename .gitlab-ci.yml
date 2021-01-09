@@ -26,7 +26,11 @@ include:
   # Linux 64-bit
   - project: 'libretro-infrastructure/ci-templates'
     file: '/linux-x64.yml'
-    
+
+  # Linux 32-bit
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/linux-i686.yml'
+
   # MacOS 64-bit
   - project: 'libretro-infrastructure/ci-templates'
     file: '/osx-x64.yml'
@@ -35,7 +39,11 @@ include:
   # Android
   - project: 'libretro-infrastructure/ci-templates'
     file: '/android-jni.yml'
-    
+
+  # iOS 9
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/ios9.yml'
+
   ################################## CONSOLES ################################
   # PlayStation Vita
   - project: 'libretro-infrastructure/ci-templates'
@@ -73,7 +81,13 @@ libretro-build-linux-x64:
   extends:
     - .libretro-linux-x64-make-default
     - .core-defs
-    
+
+# Linux 32-bit
+libretro-build-linux-i686:
+  extends:
+    - .libretro-linux-i686-make-default
+    - .core-defs
+
 # MacOS 64-bit
 libretro-build-osx-x64:
   extends:
@@ -103,6 +117,12 @@ android-x86_64:
 android-x86:
   extends:
     - .libretro-android-jni-x86
+    - .core-defs
+
+# iOS 9
+libretro-build-ios-9:
+  extends:
+    - .libretro-ios9-make-default
     - .core-defs
 
 ################################### CONSOLES #################################
