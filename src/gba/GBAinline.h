@@ -289,6 +289,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
             // no need to swap this
             value = flashRead(address) * 0x0101;
         }
+    break;
     // default
     default:
     unreadable:
