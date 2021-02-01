@@ -67,11 +67,17 @@ fi
 
 table_line_remove DISTS flex
 table_line_remove DISTS libsecret
+table_line_remove DISTS c2man
+table_line_remove DISTS graphviz
 
 # issues with perl modules linked to our libs and brew perl
 table_line_remove DISTS shared-mime-info
 
 table_line_replace DIST_PREFIX libuuid /usr/stow/libuuid
+
+table_line_append DIST_PRE_BUILD zip " \
+    sed -i.bak 's/-DZMEM//g; s/-DNO_DIR//g;' unix/configure \
+"
 
 if [ "$target_cpu" = i386 ]; then
     table_line_replace DIST_CONFIGURE_OVERRIDES openssl './Configure darwin-i386-cc no-shared --prefix=/usr --openssldir=/etc/ssl'
@@ -121,7 +127,9 @@ table_line_append  DIST_PRE_BUILD       libmodplug " \
 table_line_append DIST_PRE_BUILD libzmq "sed -i.bak 's/-lstdc++/-lc++/g' src/libzmq.pc.in"
 table_line_append DIST_PRE_BUILD ffmpeg "sed -i.bak 's/-lstdc++/-lc++/g' configure"
 
-table_line_append DIST_CONFIGURE_OVERRIDES wxwidgets  "--with-macosx-version-min=\$MACOSX_DEPLOYMENT_TARGET LDFLAGS=\"\$LDFLAGS -stdlib=libc++\""
+table_line_replace DISTS wxwidgets "https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.5.1/wxWidgets-3.0.5.1.tar.bz2 lib/libwx_baseu-3.0*.a"
+
+table_line_append DIST_CONFIGURE_OVERRIDES wxwidgets  "--with-macosx-version-min=\$MACOSX_DEPLOYMENT_TARGET LDFLAGS=\"\$LDFLAGS -stdlib=libc++\" --disable-stl"
 
 table_line_append DIST_ARGS libmodplug "CC=clang++ CXX=clang++"
 
@@ -130,6 +138,8 @@ table_line_append DIST_PRE_BUILD libvpx " \
 "
 
 table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg "--disable-videotoolbox --extra-ldflags='-framework CoreText'"
+
+table_line_append DIST_PATCHES ffmpeg "-p0 https://gist.githubusercontent.com/rkitover/db75d083b74617b186eec11965c1da74/raw/20da2f8c6d8c02ce284096c5e805ae671351cc6e/ffmpeg-macos10-7.patch"
 
 builder "$@"
 
