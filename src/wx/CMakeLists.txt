@@ -1202,35 +1202,25 @@ if(APPLE AND (UPSTREAM_RELEASE OR ENABLE_ONLINEUPDATES))
         endif()
     endif()
 
-    if(DEFINED ENV{LOGIN_KEYCHAIN_PASSWORD})
-        add_custom_command(
-            TARGET visualboyadvance-m
-            POST_BUILD
-            COMMAND /bin/sh -c "security unlock-keychain -p \"$$LOGIN_KEYCHAIN_PASSWORD\" ~/Library/Keychains/login.keychain*"
-        )
+    add_custom_command(
+        TARGET visualboyadvance-m
+        POST_BUILD
+        COMMAND codesign --sign "Developer ID Application" --force --deep ./visualboyadvance-m.app
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
 
-        add_custom_command(
-            TARGET visualboyadvance-m
-            POST_BUILD
-            COMMAND codesign --sign "Developer ID Application" --force --deep ./visualboyadvance-m.app
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        )
-
-        if(EXISTS ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks)
-            # Sign frameworks individually, like Xcode.
-            file(GLOB frameworks ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks/*)
-            foreach(framework ${frameworks})
-                message(STATUS "Signing framework: " ${framework})
-                add_custom_command(
-                    TARGET visualboyadvance-m
-                    POST_BUILD
-                    COMMAND codesign --sign "Developer ID Application" --force ${framework}
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                )
-            endforeach()
-        endif()
-    else()
-        message(WARNING "Set the environment variable LOGIN_KEYCHAIN_PASSWORD to your login keychain password to codesign.")
+    if(EXISTS ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks)
+        # Sign frameworks individually, like Xcode.
+        file(GLOB frameworks ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks/*)
+        foreach(framework ${frameworks})
+            message(STATUS "Signing framework: " ${framework})
+            add_custom_command(
+                TARGET visualboyadvance-m
+                POST_BUILD
+                COMMAND codesign --sign "Developer ID Application" --force ${framework}
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            )
+        endforeach()
     endif()
 
     if(UPSTREAM_RELEASE)
@@ -1240,7 +1230,7 @@ if(APPLE AND (UPSTREAM_RELEASE OR ENABLE_ONLINEUPDATES))
             TARGET visualboyadvance-m
             POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E remove ${appzip}
-            COMMAND ${ZIP_PROGRAM} -9r ${appzip} ./visualboyadvance-m.app
+            COMMAND ${ZIP_PROGRAM} -9yr ${appzip} ./visualboyadvance-m.app
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 

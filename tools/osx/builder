@@ -65,10 +65,9 @@ fi
 
 . "$(dirname "$0")/../builder/core.sh"
 
-table_line_remove DISTS flex
-table_line_remove DISTS libsecret
-table_line_remove DISTS c2man
-table_line_remove DISTS graphviz
+for dist in flex libsecret c2man graphviz zip; do
+    table_line_remove DISTS "$dist"
+done
 
 # issues with perl modules linked to our libs and brew perl
 table_line_remove DISTS shared-mime-info
