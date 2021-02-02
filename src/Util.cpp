@@ -866,7 +866,14 @@ void utilGBAFindSave(const int size)
         if (detectedSaveType == 4) {
                 detectedSaveType = 3;
         }
-        rtcEnable(rtcFound);
+
+        //
+        // Force enable real time clock
+        // as required by certain games
+        //
+
+        rtcEnable(true);
+
         rtcEnableRumble(!rtcFound);
         saveType = detectedSaveType;
         flashSetSize(flashSize);
