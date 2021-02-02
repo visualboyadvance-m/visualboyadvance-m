@@ -31,7 +31,7 @@ The forums are [here](https://board.vba-m.com/).
 
 Windows and Mac builds are in the [releases tab](https://github.com/visualboyadvance-m/visualboyadvance-m/releases).
 
-Nightly builds are [here](https://win.vba-m.com/nightly/).
+Nightly builds for Windows and Mac are [here](https://win.vba-m.com/nightly/).
 
 **PLESE TEST THE NIGHTLY OR MASTER WITH A FACTORY RESET BEFORE REPORTING
 ISSUES**
