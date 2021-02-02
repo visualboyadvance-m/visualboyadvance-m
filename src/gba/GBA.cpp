@@ -1594,14 +1594,15 @@ int CPULoadRom(const char* szFile)
 
 int CPULoadRomData(const char* data, int size)
 {
-    romSize = SIZE_ROM;
     if (rom != NULL) {
         CPUCleanUp();
     }
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    rom = (uint8_t*)malloc(SIZE_ROM);
+    romSize = size % 2 == 0 ? size : size + 1;
+
+    rom = (uint8_t*)malloc(romSize);
     if (rom == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "ROM");
@@ -1616,7 +1617,6 @@ int CPULoadRomData(const char* data, int size)
 
     uint8_t* whereToLoad = cpuIsMultiBoot ? workRAM : rom;
 
-    romSize = size % 2 == 0 ? size : size + 1;
     memcpy(whereToLoad, data, size);
 
     uint16_t* temp = (uint16_t*)(rom + ((romSize + 1) & ~1));
