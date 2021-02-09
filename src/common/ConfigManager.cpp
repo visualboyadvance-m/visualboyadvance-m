@@ -228,7 +228,7 @@ int showSpeedTransparent;
 int sizeX;
 int sizeY;
 int skipBios = 0;
-int skipSaveGameBattery = false;
+int skipSaveGameBattery = true;
 int skipSaveGameCheats = false;
 int soundRecording;
 int speedupToggle;
@@ -554,7 +554,7 @@ void LoadConfig()
 	showSpeed = ReadPref("showSpeed", 0);
 	showSpeedTransparent = ReadPref("showSpeedTransparent", 1);
 	skipBios = ReadPref("skipBios", 0);
-	skipSaveGameBattery = ReadPref("skipSaveGameBattery", 0);
+	skipSaveGameBattery = ReadPref("skipSaveGameBattery", 1);
 	skipSaveGameCheats = ReadPref("skipSaveGameCheats", 0);
 	soundFiltering = (float)ReadPref("gbaSoundFiltering", 50) / 100.0f;
 	soundInterpolation = ReadPref("gbaSoundInterpolation", 1);

@@ -374,6 +374,8 @@ opts_t::opts_t()
     link_port = 5738;
 
     hide_menu_bar = true;
+
+    skipSaveGameBattery = true;
 }
 
 // for binary_search() and friends
