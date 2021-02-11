@@ -10,13 +10,14 @@
 # 后海游泳大老爷 <my.yuicn@gmail.com>, 2015
 # 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020
 # 沈舒超 <ssc19940105@gmail.com>, 2015
+# 王晨旭 <wcxu21@126.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2020-12-18 05:58+0000\n"
-"Last-Translator: 天绝星 <c.cejhb@gmail.com>\n"
+"PO-Revision-Date: 2021-01-31 09:23+0000\n"
+"Last-Translator: 王晨旭 <wcxu21@126.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/bgk/vba-m/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2051,7 +2052,7 @@ msgstr "Bank:"
 #: xrc/GBOAMViewer.xrc:149 xrc/GBTileViewer.xrc:152 xrc/MemViewer.xrc:115
 #: xrc/OAMViewer.xrc:162 xrc/TileViewer.xrc:168
 msgid "&Save..."
-msgstr "保存...(&S)"
+msgstr "保存(&S)..."
 
 #: xrc/GBPaletteViewer.xrc:8 xrc/PaletteViewer.xrc:9
 msgid "Click on a color for more information"
@@ -2059,7 +2060,7 @@ msgstr "单击一个颜色以获取更多信息"
 
 #: xrc/GBPaletteViewer.xrc:27 xrc/PaletteViewer.xrc:105
 msgid "Save &BG..."
-msgstr "保存 BG...(&B)"
+msgstr "保存 BG(&B)..."
 
 #: xrc/GBPaletteViewer.xrc:38 xrc/PaletteViewer.xrc:33
 msgid "Sprite"
@@ -2067,7 +2068,7 @@ msgstr "精灵块"
 
 #: xrc/GBPaletteViewer.xrc:48 xrc/PaletteViewer.xrc:111
 msgid "Save &Sprite..."
-msgstr "保存精灵块...(&S)"
+msgstr "保存精灵块(&S)..."
 
 #: xrc/GBPaletteViewer.xrc:67
 msgid "Index:"
@@ -2283,7 +2284,7 @@ msgstr "模拟系统(&S) :"
 
 #: xrc/GameBoyConfig.xrc:30
 msgid "Game Boy Color"
-msgstr "Game Boy Color"
+msgstr "Game Boy 颜色"
 
 #: xrc/GameBoyConfig.xrc:31
 msgid "Super Game Boy"
@@ -2667,11 +2668,11 @@ msgstr "打开..."
 
 #: xrc/MainMenu.xrc:10
 msgid "Open &GB..."
-msgstr "打开 GB...(&G)"
+msgstr "打开 GB(&G)..."
 
 #: xrc/MainMenu.xrc:13
 msgid "Open GB&C..."
-msgstr "打开 GBC...(&C)"
+msgstr "打开 GBC(&C)..."
 
 #: xrc/MainMenu.xrc:16
 msgid "Open rece&nt"
@@ -2695,19 +2696,19 @@ msgstr "e-Reader(&E)"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
-msgstr "重置载入的点代码...(&R)"
+msgstr "重置载入的点代码(&R)"
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
-msgstr "载入点代码...(&L)"
+msgstr "载入点代码(&L)..."
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr "重置保存的点代码...(&R)"
+msgstr "重置保存的点代码(&R)..."
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
-msgstr "保存点代码...(&S)"
+msgstr "保存点代码(&S)..."
 
 #: xrc/MainMenu.xrc:47
 msgid "Most &recent"
@@ -2759,7 +2760,7 @@ msgstr "1&0"
 
 #: xrc/MainMenu.xrc:89
 msgid "From &File ..."
-msgstr "来自文件...(&F)"
+msgstr "从文件(&F)..."
 
 #: xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
@@ -2787,7 +2788,7 @@ msgstr "增加状态插槽号并保存"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File ..."
-msgstr "到文件...(&F)"
+msgstr "到文件(&F)..."
 
 #: xrc/MainMenu.xrc:147
 msgid "&Save state"
@@ -2803,15 +2804,15 @@ msgstr "减少状态插槽号"
 
 #: xrc/MainMenu.xrc:158 xrc/MainMenu.xrc:170
 msgid "&Battery file..."
-msgstr "电池文件...(&B)"
+msgstr "电池文件(&B)..."
 
 #: xrc/MainMenu.xrc:161
 msgid "Gameshark &code file..."
-msgstr "Gameshark 代码文件...(&C)"
+msgstr "Gameshark 代码文件(&C)..."
 
 #: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
 msgid "&Gameshark snapshot..."
-msgstr "Gameshark 快照...(&G)"
+msgstr "Gameshark 快照(&G)..."
 
 #: xrc/MainMenu.xrc:166
 msgid "&Import"
@@ -2823,11 +2824,11 @@ msgstr "导出(&E)"
 
 #: xrc/MainMenu.xrc:179
 msgid "Screen capt&ure..."
-msgstr "屏幕捕获...(&U)"
+msgstr "屏幕捕获(&U)..."
 
 #: xrc/MainMenu.xrc:183
 msgid "Start &sound recording..."
-msgstr "开始录制声音...(&S)"
+msgstr "开始录制声音(&S)..."
 
 #: xrc/MainMenu.xrc:186
 msgid "Stop s&ound recording"
@@ -2835,7 +2836,7 @@ msgstr "停止录制声音(&O)"
 
 #: xrc/MainMenu.xrc:189
 msgid "Start &video recording..."
-msgstr "开始录制视频...(&V)"
+msgstr "开始录制视频(&V)..."
 
 #: xrc/MainMenu.xrc:192
 msgid "Stop v&ideo recording"
@@ -2843,7 +2844,7 @@ msgstr "停止录制视频(&I)"
 
 #: xrc/MainMenu.xrc:195
 msgid "Start &game recording..."
-msgstr "开始录制游戏...(&G)"
+msgstr "开始录制游戏(&G)..."
 
 #: xrc/MainMenu.xrc:198
 msgid "Stop g&ame recording"
@@ -2855,7 +2856,7 @@ msgstr "录制(&R)"
 
 #: xrc/MainMenu.xrc:204
 msgid "Start playing &movie..."
-msgstr "开始播放影片...(&M)"
+msgstr "开始播放影片(&M)..."
 
 #: xrc/MainMenu.xrc:207
 msgid "Stop playing m&ovie"
@@ -2927,7 +2928,7 @@ msgstr "连接(&L)"
 
 #: xrc/MainMenu.xrc:272
 msgid "Start &Network Link ..."
-msgstr "开始网络连接 ...(&N)"
+msgstr "开始网络连接(&N)..."
 
 #: xrc/MainMenu.xrc:277
 msgid "&Nothing"
@@ -2964,7 +2965,7 @@ msgstr "速度破解(&S)"
 #: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:391
 #: xrc/MainMenu.xrc:427
 msgid "&Configure ..."
-msgstr "配置 ...(&C)"
+msgstr "配置(&C)..."
 
 #: xrc/MainMenu.xrc:314
 msgid "&Video"
@@ -3104,7 +3105,7 @@ msgstr "&R"
 
 #: xrc/MainMenu.xrc:458
 msgid "&Autohold"
-msgstr "自动保留(&A)"
+msgstr "自动保持(&A)"
 
 #: xrc/MainMenu.xrc:502
 msgid "&Game Boy Advance"
@@ -3172,7 +3173,7 @@ msgstr "快捷键(&K)"
 
 #: xrc/MainMenu.xrc:573
 msgid "&UI Settings ..."
-msgstr "界面设置...(&U)"
+msgstr "界面设置(&U)..."
 
 #: xrc/MainMenu.xrc:577
 msgid "&Tools"
@@ -3184,11 +3185,11 @@ msgstr "金手指(&C)"
 
 #: xrc/MainMenu.xrc:581
 msgid "List &cheats ..."
-msgstr "金手指列表 ...(&C)"
+msgstr "金手指列表(&C)..."
 
 #: xrc/MainMenu.xrc:584
 msgid "Find c&heat ..."
-msgstr "搜索金手指 ...(&H)"
+msgstr "搜索金手指(&H)..."
 
 #: xrc/MainMenu.xrc:588
 msgid "A&utomatically save/load cheats"
@@ -3204,7 +3205,7 @@ msgstr "切入 GDB(&B)"
 
 #: xrc/MainMenu.xrc:603
 msgid "&Configure port..."
-msgstr "配置端口...(&C)"
+msgstr "配置端口(&C)..."
 
 #: xrc/MainMenu.xrc:606
 msgid "&Break on load"
@@ -3220,35 +3221,35 @@ msgstr "GDB(&G)"
 
 #: xrc/MainMenu.xrc:616
 msgid "&Disassemble..."
-msgstr "反编译...(&D)"
+msgstr "反编译(&D)..."
 
 #: xrc/MainMenu.xrc:619
 msgid "&Logging..."
-msgstr "日志...(&L)"
+msgstr "日志(&L)..."
 
 #: xrc/MainMenu.xrc:622
 msgid "&IO Viewer..."
-msgstr "IO 查看器...(&I)"
+msgstr "IO 查看器(&I)..."
 
 #: xrc/MainMenu.xrc:625
 msgid "&Map Viewer..."
-msgstr "图层查看器...(&M)"
+msgstr "图层查看器(&M)..."
 
 #: xrc/MainMenu.xrc:628
 msgid "M&emory Viewer..."
-msgstr "内存查看器...(&E)"
+msgstr "内存查看器(&E)..."
 
 #: xrc/MainMenu.xrc:631
 msgid "&OAM Viewer..."
-msgstr "OAM 查看器...(&O)"
+msgstr "OAM 查看器(&O)..."
 
 #: xrc/MainMenu.xrc:634
 msgid "&Palette Viewer..."
-msgstr "调色板查看器...(&P)"
+msgstr "调色板查看器(&P)..."
 
 #: xrc/MainMenu.xrc:637
 msgid "&Tile Viewer..."
-msgstr "碎片查看器...(&T)"
+msgstr "碎片查看器(&T)..."
 
 #: xrc/MainMenu.xrc:642
 msgid "Show all video layers"
@@ -3316,11 +3317,11 @@ msgstr "Direct Sound &B"
 
 #: xrc/MainMenu.xrc:718
 msgid "&Sound Channels"
-msgstr "&声道"
+msgstr "声道(&S)"
 
 #: xrc/MainMenu.xrc:722
 msgid "&Help"
-msgstr "&帮助"
+msgstr "帮助(&H)"
 
 #: xrc/MainMenu.xrc:724
 msgid "Report &Bugs"
@@ -3344,7 +3345,7 @@ msgstr "恢复默认设置"
 
 #: xrc/MainMenu.xrc:745
 msgid "&About..."
-msgstr "关于...(&A)"
+msgstr "关于(&A)..."
 
 #: xrc/MapViewer.xrc:4
 msgid "Map Viewer"
@@ -3352,11 +3353,11 @@ msgstr "图层查看器"
 
 #: xrc/MapViewer.xrc:16
 msgid "Frame 0"
-msgstr "Frame 0"
+msgstr "帧 0"
 
 #: xrc/MapViewer.xrc:22
 msgid "Frame 1"
-msgstr "Frame 1"
+msgstr "帧 1"
 
 #: xrc/MapViewer.xrc:25
 msgid "Frame"
@@ -3424,7 +3425,7 @@ msgstr "当前地址: "
 
 #: xrc/MemViewer.xrc:108
 msgid "&Load..."
-msgstr "载入...(&L)"
+msgstr "载入(&L)..."
 
 #: xrc/NetLink.xrc:4
 msgid "Start Network Link"
@@ -3476,7 +3477,7 @@ msgstr "调色板"
 
 #: xrc/PaletteViewer.xrc:88
 msgid "C&hange backdrop color..."
-msgstr "更改背景颜色...(&H)"
+msgstr "更改背景颜色(&H)..."
 
 #: xrc/SoundConfig.xrc:4
 msgid "Sound Settings"

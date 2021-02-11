@@ -13,13 +13,14 @@
 # teorex <teorex3@gmail.com>, 2020
 # Алексей Гаврилов <flexxx_seva@mail.ru>, 2018
 # Михаил Михаил <sined116@gmail.com>, 2016
+# Радмир Амиров <darkmantro79@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2020-12-17 05:28+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2021-01-19 11:18+0000\n"
+"Last-Translator: Радмир Амиров <darkmantro79@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/bgk/vba-m/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -813,7 +814,7 @@ msgstr "Использовать межкадровое смешивание #%d
 
 #: cmdevents.cpp:2720 panel.cpp:193 panel.cpp:296
 msgid "Could not initialize the sound driver!"
-msgstr ""
+msgstr "Не удалось инициализировать звуковые драйвера!"
 
 #: cmdevents.cpp:2824
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
@@ -1061,7 +1062,7 @@ msgstr ""
 
 #: panel.cpp:2322
 msgid "No VSYNC available on this platform"
-msgstr ""
+msgstr "VSYNC не доступна на данной платформе"
 
 #: panel.cpp:2418
 msgid "memory allocation error"

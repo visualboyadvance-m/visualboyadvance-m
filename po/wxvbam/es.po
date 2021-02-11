@@ -8,6 +8,7 @@
 # Ein Striker <ein.striker@gmail.com>, 2017
 # javidg96, 2015
 # jorge perez <theghostxxaz@gmail.com>, 2021
+# Jose Castillo <josecastillo.prz85@gmail.com>, 2021
 # Marco123V <MarcoVillalejos@hotmail.com>, 2015
 # Marco Yurazeck <luthias@gmail.com>, 2020
 # MELERIX, 2015
@@ -19,8 +20,8 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2021-01-02 03:02+0000\n"
-"Last-Translator: jorge perez <theghostxxaz@gmail.com>\n"
+"PO-Revision-Date: 2021-02-01 11:36+0000\n"
+"Last-Translator: Jose Castillo <josecastillo.prz85@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/bgk/vba-m/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -54,7 +55,7 @@ msgstr ""
 
 #: wxvbam.cpp:526
 msgid "Set a configuration file"
-msgstr ""
+msgstr "Asignar un archivo de configuración"
 
 #: wxvbam.cpp:530
 msgid "Delete shared link state first, if it exists"
@@ -66,7 +67,7 @@ msgstr ""
 
 #: wxvbam.cpp:540
 msgid "ROM file"
-msgstr ""
+msgstr "Archivo ROM"
 
 #: wxvbam.cpp:542
 msgid "<config>=<value>"
@@ -116,7 +117,7 @@ msgstr ""
 
 #: wxvbam.cpp:660
 msgid "Configuration file not found."
-msgstr ""
+msgstr "Archivo de configuración no encontrado."
 
 #: wxvbam.cpp:693
 msgid "Bad configuration option or multiple ROM files given:\n"
@@ -124,11 +125,11 @@ msgstr ""
 
 #: guiinit.cpp:81
 msgid "Start!"
-msgstr ""
+msgstr "¡Comenzar!"
 
 #: guiinit.cpp:100 xrc/NetLink.xrc:99
 msgid "Connect"
-msgstr ""
+msgstr "Conectar"
 
 #: guiinit.cpp:117
 msgid "You must enter a valid host name"
@@ -136,11 +137,11 @@ msgstr ""
 
 #: guiinit.cpp:118
 msgid "Host name invalid"
-msgstr ""
+msgstr "La dirección IP del servidor es: %s"
 
 #: guiinit.cpp:136
 msgid "Waiting for clients..."
-msgstr ""
+msgstr "Esperando clientes..."
 
 #: guiinit.cpp:137
 #, c-format
@@ -149,12 +150,12 @@ msgstr ""
 
 #: guiinit.cpp:139
 msgid "Waiting for connection..."
-msgstr ""
+msgstr "Esperando conexión..."
 
 #: guiinit.cpp:140
 #, c-format
 msgid "Connecting to %s\n"
-msgstr ""
+msgstr "Conectando a %s \n"
 
 #: guiinit.cpp:173
 msgid ""
@@ -164,7 +165,7 @@ msgstr ""
 
 #: guiinit.cpp:240 guiinit.cpp:293
 msgid "Select cheat file"
-msgstr ""
+msgstr "Seleccionar archivo de trucos"
 
 #: guiinit.cpp:241
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
@@ -172,7 +173,7 @@ msgstr ""
 
 #: guiinit.cpp:260 panel.cpp:437
 msgid "Loaded cheats"
-msgstr ""
+msgstr "Trucos cargados"
 
 #: guiinit.cpp:294
 msgid "VBA cheat lists (*.clt)|*.clt"
@@ -180,15 +181,15 @@ msgstr ""
 
 #: guiinit.cpp:312
 msgid "Saved cheats"
-msgstr ""
+msgstr "Trucos guardados"
 
 #: guiinit.cpp:343 guiinit.cpp:362
 msgid "Restore old values?"
-msgstr ""
+msgstr "¿Restaurar valores anteriores?"
 
 #: guiinit.cpp:344 guiinit.cpp:363
 msgid "Removing cheats"
-msgstr ""
+msgstr "Eliminando trucos"
 
 #: guiinit.cpp:754 xrc/JoyPanel.xrc:364
 msgid "GameShark"
@@ -221,23 +222,23 @@ msgstr ""
 #: guiinit.cpp:866
 #, c-format
 msgid "Search produced %d results.  Please refine better"
-msgstr ""
+msgstr "La búsqueda encontró %d resultados. Por favor especifique más"
 
 #: guiinit.cpp:878
 msgid "Search produced no results"
-msgstr ""
+msgstr "La búsqueda no encontró resultados"
 
 #: guiinit.cpp:1041
 msgid "8-bit "
-msgstr ""
+msgstr "8-bit"
 
 #: guiinit.cpp:1045
 msgid "16-bit "
-msgstr ""
+msgstr "16-bit"
 
 #: guiinit.cpp:1049
 msgid "32-bit "
-msgstr ""
+msgstr "32-bit"
 
 #: guiinit.cpp:1055
 msgid "signed decimal"
@@ -258,11 +259,11 @@ msgstr ""
 
 #: guiinit.cpp:1553
 msgid "Default device"
-msgstr ""
+msgstr "Dispositivo por defecto"
 
 #: guiinit.cpp:1727
 msgid "Desktop mode"
-msgstr ""
+msgstr "Modo escritorio"
 
 #: guiinit.cpp:1734
 #, c-format
@@ -274,16 +275,16 @@ msgstr ""
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
 msgid "None"
-msgstr ""
+msgstr "Ninguno"
 
 #: guiinit.cpp:1888
 #, c-format
 msgid "No usable rpi plugins found in %s"
-msgstr ""
+msgstr "No se puede usar el complemento rpi encontrado en %s"
 
 #: guiinit.cpp:1908 xrc/DisplayConfig.xrc:107
 msgid "Plugin"
-msgstr ""
+msgstr "Complemento"
 
 #: guiinit.cpp:1936
 msgid "Please select a plugin or a different filter"
@@ -291,27 +292,27 @@ msgstr ""
 
 #: guiinit.cpp:1937
 msgid "Plugin selection error"
-msgstr ""
+msgstr "Error de selección de complemento"
 
 #: guiinit.cpp:2150
 msgid "This will clear all user-defined accelerators.  Are you sure?"
-msgstr ""
+msgstr "Esto borrará todos los aceleradores definidos por el usuario. ¿Estás seguro?"
 
 #: guiinit.cpp:2150
 msgid "Confirm"
-msgstr ""
+msgstr "Confirmar"
 
 #: guiinit.cpp:2740
 msgid "Main icon not found"
-msgstr ""
+msgstr "Icono principal no encontrado"
 
 #: guiinit.cpp:2750
 msgid "Browse"
-msgstr ""
+msgstr "Navegador"
 
 #: guiinit.cpp:2764
 msgid "Main display panel not found"
-msgstr ""
+msgstr "Panel de visualización principal no encontrado"
 
 #: guiinit.cpp:2929
 #, c-format
@@ -326,35 +327,35 @@ msgstr ""
 #: guiinit.cpp:3081
 #, c-format
 msgid "Invalid menu item %s; removing"
-msgstr ""
+msgstr "Elemento de menú %s no válido; eliminando"
 
 #: guiinit.cpp:3289
 msgid "Code"
-msgstr ""
+msgstr "Código"
 
 #: guiinit.cpp:3298
 msgid "Description"
-msgstr ""
+msgstr "Descripción"
 
 #: guiinit.cpp:3372 xrc/CheatAdd.xrc:31
 msgid "Address"
-msgstr ""
+msgstr "Dirección"
 
 #: guiinit.cpp:3373
 msgid "Old Value"
-msgstr ""
+msgstr "Valor anterior"
 
 #: guiinit.cpp:3374
 msgid "New Value"
-msgstr ""
+msgstr "Nuevo valor"
 
 #: guiinit.cpp:3895
 msgid "Menu commands"
-msgstr ""
+msgstr "Menú de comandos"
 
 #: guiinit.cpp:3918
 msgid "Other commands"
-msgstr ""
+msgstr "Otros comandos"
 
 #: guiinit.cpp:4029
 msgid "JoyBus host invalid; disabling"
@@ -362,13 +363,13 @@ msgstr ""
 
 #: viewers.cpp:560
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
-msgstr ""
+msgstr "Archivos de texto (*.txt;*.log)|*.txt;*log|"
 
 #: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
 #: cmdevents.cpp:1158 cmdevents.cpp:1236 cmdevents.cpp:1306 cmdevents.cpp:1333
 #: viewsupt.cpp:1181
 msgid "Select output file"
-msgstr ""
+msgstr "Seleccionar archivo de salida"
 
 #: viewers.cpp:698 viewers.cpp:770
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
@@ -444,7 +445,7 @@ msgstr ""
 
 #: gfxviewers.cpp:1141
 msgid "Select output file and type"
-msgstr ""
+msgstr "Seleccionar archivo de salida y tipo"
 
 #: gfxviewers.cpp:1142
 msgid ""
@@ -467,7 +468,7 @@ msgstr ""
 
 #: cmdevents.cpp:117
 msgid "Open ROM file"
-msgstr ""
+msgstr "Abrir archivo ROM"
 
 #: cmdevents.cpp:134
 msgid ""
@@ -477,7 +478,7 @@ msgstr ""
 
 #: cmdevents.cpp:141
 msgid "Open GB ROM file"
-msgstr ""
+msgstr "Abrir archivo GB ROM"
 
 #: cmdevents.cpp:158
 msgid ""
@@ -487,75 +488,75 @@ msgstr ""
 
 #: cmdevents.cpp:165
 msgid "Open GBC ROM file"
-msgstr ""
+msgstr "Abrir archivo GBC ROM"
 
 #: cmdevents.cpp:584 cmdevents.cpp:700 cmdevents.cpp:739 cmdevents.cpp:812
 msgid "Unknown"
-msgstr ""
+msgstr "Desconocido"
 
 #: cmdevents.cpp:592
 msgid "ROM"
-msgstr ""
+msgstr "ROM"
 
 #: cmdevents.cpp:596
 msgid "ROM+MBC1"
-msgstr ""
+msgstr "ROM+MBC1"
 
 #: cmdevents.cpp:600
 msgid "ROM+MBC1+RAM"
-msgstr ""
+msgstr "ROM+MBC1+RAM"
 
 #: cmdevents.cpp:604
 msgid "ROM+MBC1+RAM+BATT"
-msgstr ""
+msgstr "ROM+MBC1+RAM+BATT"
 
 #: cmdevents.cpp:608
 msgid "ROM+MBC2"
-msgstr ""
+msgstr "ROM+MBC2"
 
 #: cmdevents.cpp:612
 msgid "ROM+MBC2+BATT"
-msgstr ""
+msgstr "ROM+MBC2+BATT"
 
 #: cmdevents.cpp:616
 msgid "ROM+MMM01"
-msgstr ""
+msgstr "ROM+MMM01"
 
 #: cmdevents.cpp:620
 msgid "ROM+MMM01+RAM"
-msgstr ""
+msgstr "ROM+MMM01+RAM"
 
 #: cmdevents.cpp:624
 msgid "ROM+MMM01+RAM+BATT"
-msgstr ""
+msgstr "ROM+MMM01+RAM+BATT"
 
 #: cmdevents.cpp:628
 msgid "ROM+MBC3+TIMER+BATT"
-msgstr ""
+msgstr "ROM+MBC3+TIMER+BATT"
 
 #: cmdevents.cpp:632
 msgid "ROM+MBC3+TIMER+RAM+BATT"
-msgstr ""
+msgstr "ROM+MBC3+TIMER+RAM+BATT"
 
 #: cmdevents.cpp:636
 msgid "ROM+MBC3"
-msgstr ""
+msgstr "ROM+MBC3"
 
 #: cmdevents.cpp:640
 msgid "ROM+MBC3+RAM"
-msgstr ""
+msgstr "ROM+MBC3+RAM"
 
 #: cmdevents.cpp:644
 msgid "ROM+MBC3+RAM+BATT"
-msgstr ""
+msgstr "ROM+MBC3+RAM+BATT"
 
 #: cmdevents.cpp:648
 msgid "ROM+MBC5"
-msgstr ""
+msgstr "ROM+MBC5"
 
 #: cmdevents.cpp:652
 msgid "ROM+MBC5+RAM"
-msgstr ""
+msgstr "ROM+MBC5+RAM"
 
 #: cmdevents.cpp:656
 msgid "ROM+MBC5+RAM+BATT"
@@ -631,7 +632,7 @@ msgstr ""
 #: cmdevents.cpp:909
 #, c-format
 msgid "Error loading battery %s"
-msgstr ""
+msgstr "Error al cargar la batería %s"
 
 #: cmdevents.cpp:918
 msgid "Select code file"
@@ -654,7 +655,7 @@ msgstr ""
 #: cmdevents.cpp:945
 #, c-format
 msgid "Cannot open file %s"
-msgstr ""
+msgstr "no se puede abrir el archivo %s"
 
 #: cmdevents.cpp:955
 #, c-format
@@ -3356,15 +3357,15 @@ msgstr ""
 
 #: xrc/MapViewer.xrc:16
 msgid "Frame 0"
-msgstr ""
+msgstr "Fotograma 0"
 
 #: xrc/MapViewer.xrc:22
 msgid "Frame 1"
-msgstr ""
+msgstr "Fotograma 1"
 
 #: xrc/MapViewer.xrc:25
 msgid "Frame"
-msgstr ""
+msgstr "Fotograma"
 
 #: xrc/MapViewer.xrc:35
 msgid "BG0"
@@ -3392,15 +3393,15 @@ msgstr ""
 
 #: xrc/MapViewer.xrc:100 xrc/MemSelRegion.xrc:22 xrc/OAMViewer.xrc:77
 msgid "Size:"
-msgstr ""
+msgstr "Tamaño:"
 
 #: xrc/MapViewer.xrc:108 xrc/OAMViewer.xrc:45
 msgid "Colors:"
-msgstr ""
+msgstr "Colores:"
 
 #: xrc/MapViewer.xrc:124
 msgid "Mosaic:"
-msgstr ""
+msgstr "Mosaico:"
 
 #: xrc/MapViewer.xrc:132
 msgid "Overflow:"
@@ -3424,11 +3425,11 @@ msgstr ""
 
 #: xrc/MemViewer.xrc:83
 msgid "Current address:"
-msgstr ""
+msgstr "Dirección actual:"
 
 #: xrc/MemViewer.xrc:108
 msgid "&Load..."
-msgstr ""
+msgstr "&Carga..."
 
 #: xrc/NetLink.xrc:4
 msgid "Start Network Link"
@@ -3436,15 +3437,15 @@ msgstr ""
 
 #: xrc/NetLink.xrc:11
 msgid "Server"
-msgstr ""
+msgstr "Servidor"
 
 #: xrc/NetLink.xrc:19
 msgid "Client"
-msgstr ""
+msgstr "Cliente"
 
 #: xrc/NetLink.xrc:32
 msgid "Players:"
-msgstr ""
+msgstr "Jugadores:"
 
 #: xrc/NetLink.xrc:41
 msgid "2"
@@ -3460,11 +3461,11 @@ msgstr ""
 
 #: xrc/NetLink.xrc:67
 msgid "Server:"
-msgstr ""
+msgstr "Servidor:"
 
 #: xrc/NetLink.xrc:81
 msgid "Port:"
-msgstr ""
+msgstr "Puerto:"
 
 #: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
@@ -3484,23 +3485,23 @@ msgstr ""
 
 #: xrc/SoundConfig.xrc:4
 msgid "Sound Settings"
-msgstr ""
+msgstr "Ajuste de sonidos"
 
 #: xrc/SoundConfig.xrc:16
 msgid "Volume :"
-msgstr ""
+msgstr "Volumen:"
 
 #: xrc/SoundConfig.xrc:34
 msgid "Mute"
-msgstr ""
+msgstr "Silencio"
 
 #: xrc/SoundConfig.xrc:54 xrc/SoundConfig.xrc:320
 msgid "Maximum"
-msgstr ""
+msgstr "Máximo"
 
 #: xrc/SoundConfig.xrc:71
 msgid "Sample rate :"
-msgstr ""
+msgstr "Tasa de muestreo:"
 
 #: xrc/SoundConfig.xrc:77
 msgid "48 KHz"
@@ -3540,7 +3541,7 @@ msgstr ""
 
 #: xrc/SoundConfig.xrc:146
 msgid "Device"
-msgstr ""
+msgstr "Dispositivo"
 
 #: xrc/SoundConfig.xrc:154
 msgid "Enable stereo upmixing"
@@ -3556,7 +3557,7 @@ msgstr ""
 
 #: xrc/SoundConfig.xrc:198
 msgid "Advanced"
-msgstr ""
+msgstr "Avanzado"
 
 #: xrc/SoundConfig.xrc:230
 msgid "Lots"
@@ -3564,23 +3565,23 @@ msgstr ""
 
 #: xrc/SoundConfig.xrc:239
 msgid "Echo"
-msgstr ""
+msgstr "Repetir"
 
 #: xrc/SoundConfig.xrc:247
 msgid "Stereo"
-msgstr ""
+msgstr "Estéreo"
 
 #: xrc/SoundConfig.xrc:258
 msgid "Center"
-msgstr ""
+msgstr "Centro"
 
 #: xrc/SoundConfig.xrc:269
 msgid "Left/Right"
-msgstr ""
+msgstr "Izquierda/Derecha"
 
 #: xrc/SoundConfig.xrc:298
 msgid "Sound filtering"
-msgstr ""
+msgstr "Filtrado de sonido"
 
 #: xrc/TileViewer.xrc:4
 msgid "Tile Viewer"
@@ -3596,31 +3597,31 @@ msgstr ""
 
 #: xrc/TileViewer.xrc:24
 msgid "Colors"
-msgstr ""
+msgstr "Colores"
 
 #: xrc/TileViewer.xrc:34
 msgid "0x600&0000"
-msgstr ""
+msgstr "0x600&0000"
 
 #: xrc/TileViewer.xrc:40
 msgid "0x600&4000"
-msgstr ""
+msgstr "0x600&4000"
 
 #: xrc/TileViewer.xrc:45
 msgid "0x600&8000"
-msgstr ""
+msgstr "0x600&8000"
 
 #: xrc/TileViewer.xrc:50
 msgid "0x600&C000"
-msgstr ""
+msgstr "0x600&C000"
 
 #: xrc/TileViewer.xrc:55
 msgid "0x60&10000"
-msgstr ""
+msgstr "0x60&10000"
 
 #: xrc/SpeedupConfig.xrc:4
 msgid "SpeedUp / Turbo Settings"
-msgstr ""
+msgstr "Aceleración / Ajustes del turbo"
 
 #: xrc/SpeedupConfig.xrc:9
 msgid "Speedup Throttle"
@@ -3628,12 +3629,12 @@ msgstr ""
 
 #: xrc/SpeedupConfig.xrc:50
 msgid "Frame skip"
-msgstr ""
+msgstr "Saltar fotograma"
 
 #: xrc/UIConfig.xrc:4
 msgid "User Interface Settings"
-msgstr ""
+msgstr "Ajustes de la interfaz de usuario"
 
 #: xrc/UIConfig.xrc:9
 msgid "Hide Menu Bar"
-msgstr ""
+msgstr "Ocultar barra de menú"
