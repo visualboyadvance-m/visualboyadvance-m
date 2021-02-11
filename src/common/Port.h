@@ -3,7 +3,7 @@
 
 #include "Types.h"
 
-#ifdef __CELLOS_LV2__
+#ifdef __PS3__
 /* PlayStation3 */
 #include <ppu_intrinsics.h>
 #endif

@@ -20,6 +20,9 @@ else ifneq ($(findstring MINGW,$(shell uname -a)),)
 else ifneq ($(findstring Darwin,$(shell uname -a)),)
 	platform = osx
 	arch = intel
+ifeq ($(shell uname -p),arm)
+	arch = arm
+endif
 ifeq ($(shell uname -p),powerpc)
 	arch = ppc
 endif
@@ -36,6 +39,9 @@ EXE_EXT = .exe
 else ifneq ($(findstring Darwin,$(shell uname -a)),)
 	system_platform = osx
 	arch = intel
+ifeq ($(shell uname -p),arm)
+	arch = arm
+endif
 ifeq ($(shell uname -p),powerpc)
 	arch = ppc
 endif
@@ -138,7 +144,24 @@ else ifeq ($(platform), osx)
 	endif
 	OSXVER = `sw_vers -productVersion | cut -d. -f 2`
 	OSX_LT_MAVERICKS = `(( $(OSXVER) <= 9)) && echo "YES"`
-	fpic += -mmacosx-version-min=10.2
+	MINVERSION =
+ifeq ($(OSX_LT_MAVERICKS),"YES")
+	MINVERSION = -mmacosx-version-min=10.2
+else
+	MINVERSION = -mmacosx-version-min=10.7
+endif
+ifeq ($(shell uname -p),arm)
+	MINVERSION =
+endif
+   ifeq ($(CROSS_COMPILE),1)
+		TARGET_RULE   = -target $(LIBRETRO_APPLE_PLATFORM) -isysroot $(LIBRETRO_APPLE_ISYSROOT)
+		CFLAGS   += $(TARGET_RULE)
+		CPPFLAGS += $(TARGET_RULE)
+		CXXFLAGS += $(TARGET_RULE)
+		LDFLAGS  += $(TARGET_RULE)
+		MINVERSION =
+   endif
+	fpic += $(MINVERSION) -stdlib=libc++
 	SHARED := -dynamiclib
 	TILED_RENDERING=1
 
@@ -207,28 +230,6 @@ else ifeq ($(platform), qnx)
 	PLATFORM_DEFINES := -D__BLACKBERRY_QNX__ -marm -mcpu=cortex-a9 -mfpu=neon -mfloat-abi=softfp
 	TILED_RENDERING=1
 
-# PS3
-else ifeq ($(platform), ps3)
-	TARGET := $(TARGET_NAME)_libretro_$(platform).a
-	CC = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-gcc.exe
-	CXX = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-gcc.exe
-	AR = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-ar.exe
-	ENDIANNESS_DEFINES += -DMSB_FIRST
-	PLATFORM_DEFINES := -D__CELLOS_LV2__ -D__POWERPC__ -D__ppc__
-	STATIC_LINKING=1
-	TILED_RENDERING=1
-
-# PS3 (SNC)
-else ifeq ($(platform), sncps3)
-	TARGET := $(TARGET_NAME)_libretro_ps3.a
-	CC = $(CELL_SDK)/host-win32/sn/bin/ps3ppusnc.exe
-	CXX = $(CELL_SDK)/host-win32/sn/bin/ps3ppusnc.exe
-	AR = $(CELL_SDK)/host-win32/sn/bin/ps3snarl.exe
-	ENDIANNESS_DEFINES += -DMSB_FIRST
-	PLATFORM_DEFINES := -D__CELLOS_LV2__ -D__POWERPC__ -D__ppc__
-	STATIC_LINKING=1
-	TILED_RENDERING=1
-
 # Lightweight PS3 Homebrew SDK
 else ifeq ($(platform), psl1ght)
 	TARGET := $(TARGET_NAME)_libretro_psl1ght.a
@@ -236,7 +237,7 @@ else ifeq ($(platform), psl1ght)
 	CXX = $(PS3DEV)/ppu/bin/ppu-g++$(EXE_EXT)
 	AR = $(PS3DEV)/ppu/bin/ppu-ar$(EXE_EXT)
 	ENDIANNESS_DEFINES += -DMSB_FIRST
-	PLATFORM_DEFINES := -D__CELLOS_LV2__ -D__POWERPC__ -D__ppc__
+	PLATFORM_DEFINES := -D__PS3__ -D__POWERPC__ -D__ppc__
 	STATIC_LINKING=1
 	TILED_RENDERING=1
 

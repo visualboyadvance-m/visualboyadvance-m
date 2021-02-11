@@ -1,8 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
-#ifndef __CELLOS_LV2__
 #include <getopt.h>
-#endif
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
