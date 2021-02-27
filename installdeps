@@ -177,9 +177,12 @@ linux_installdeps() {
     elif [ -f /etc/gentoo-release ]; then
         gentoo_installdeps
     elif [ -f /etc/os-release ]; then
-        case "$(. /etc/os-release; echo "$ID_LIKE")" in
+        case "$(. /etc/os-release; echo "${ID_LIKE:-$ID}")" in
             *suse*)
                 suse_installdeps
+                ;;
+            nixos)
+                nixos_installdeps
                 ;;
         esac
     elif [ -x /usr/bin/pacman ]; then
@@ -807,6 +810,18 @@ suse_installdeps() {
     build_instructions
 }
 
+nixos_installdeps() {
+    nixos=1
+
+    cat <<EOF
+
+[32mTo build run:[0m
+
+nix-shell --command 'mkdir build; cd build; $CMAKE .. $cmake_flags -G Ninja; ninja'
+
+EOF
+}
+
 archlinux_require_yaourt() {
     if ! command -v yaourt >/dev/null; then
         (
@@ -1199,3 +1214,5 @@ EOF
 }
 
 main "$@"
+
+# vim:et sw=4:
