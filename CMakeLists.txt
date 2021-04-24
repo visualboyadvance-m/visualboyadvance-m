@@ -730,7 +730,7 @@ elseif(MSVC)
     string(REGEX REPLACE "/[Ww][^ ]+" "" CMAKE_C_FLAGS   ${CMAKE_C_FLAGS})
     string(REGEX REPLACE "/[Ww][^ ]+" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 
-    add_compile_options(/std:c++17 -D__STDC_LIMIT_MACROS)
+    add_compile_options($<$<COMPILE_LANGUAGE:CXX>:/std:c++17> -D__STDC_LIMIT_MACROS)
 
     if(CMAKE_BUILD_TYPE STREQUAL Debug)
         add_compile_options(/W4)

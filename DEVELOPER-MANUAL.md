@@ -21,6 +21,7 @@
     - [Setting up Vim](#setting-up-vim)
     - [Set up PowerShell Profile](#set-up-powershell-profile)
     - [PowerShell Usage Notes](#powershell-usage-notes)
+    - [VS Code configuration](#vs-code-configuration)
     - [Miscellaneous](#miscellaneous)
   - [Release Process](#release-process)
     - [Environment](#environment)
@@ -750,6 +751,61 @@ alias se* | select name, resolvedcommand
 gci '/program files (x86)/windows kits/10/lib/10.*/um/x64/*.lib' | `
   %{ $_.name; dumpbin -headers $_ | grep MessageBox }
 ```
+
+#### VS Code Configuration
+
+As an alternative to Visual Studio, there is basic support for building with VS
+Code - only for building on x64. After having installed the
+[Chocolatey packages](#install-chocolatey-and-some-packages), install Vcpkg from
+its [GitHub repository](https://github.com/microsoft/vcpkg). From a shell in the
+Vcpkg directory, run the following:
+
+```
+bootstrap-vcpkg.bat
+vcpkg integrate install
+```
+
+The output should be something similar to this:
+```
+Applied user-wide integration for this vcpkg root.
+
+All MSBuild C++ projects can now #include any installed libraries.
+Linking will be handled automatically.
+Installing new libraries will make them instantly available.
+
+CMake projects should use: "-DCMAKE_TOOLCHAIN_FILE=path/to/scripts/buildsystems/vcpkg.cmake"
+```
+
+Make note of the path for the `CMAKE_TOOCLHAIN_FILE` option, you will need it
+later.
+
+In VS Code, install the following VS Code extensions:
+* C/C++
+* CMake
+* CMake Tools
+
+The CMakeTools extension should be able to find the Visual Studio
+toolchains and pre-configure them. Toolchains are referred to as "kits" in the
+CMakeTools extension. Since we only support x64 for now, you should select a 64
+bits toolchain. If you've followed the rest of these instructions, it should be
+"Visual Studio Community 2019 Release - amd64".
+
+In the visualboyadvance-m repository, add the following in
+`.vscode/settings.json` (this is a file containing per-workspace settings
+overrides):
+
+```json
+{
+    "cmake.generator": "Ninja",
+    "cmake.configureSettings": {
+        "CMAKE_TOOLCHAIN_FILE": "C:\\Users\\steel\\src\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
+    },
+    "cmake.buildDirectory" : "${workspaceRoot}/build/${buildKit}/${variant:buildType}-${variant:linkage}-${variant:useffmpeg}",
+}
+```
+
+Put the proper path for the `CMAKE_TOOCLHAIN_FILE` option you took note of
+earlier.
 
 #### Miscellaneous
 
