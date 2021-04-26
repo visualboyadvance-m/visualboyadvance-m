@@ -17,17 +17,17 @@ wxJoyKeyBinding newWxJoyKeyBinding(int key, int mod, int joy)
     return tmp;
 }
 
-int wxJoyKeyTextCtrl::DigitalButton(wxSDLJoyEvent& event)
+int wxJoyKeyTextCtrl::DigitalButton(wxJoyEvent& event)
 {
     int16_t sdlval = event.control_value();
-    wxSDLControl sdltype = event.control();
+    wxJoyControl sdltype = event.control();
 
     switch (sdltype) {
-    case WXSDLJOY_AXIS:
+    case wxJoyControl::Axis:
         // for val = 0 return arbitrary direction; val means "off"
         return sdlval > 0 ? WXJB_AXIS_PLUS : WXJB_AXIS_MINUS;
 
-    case WXSDLJOY_HAT:
+    case wxJoyControl::Hat:
 
         /* URDL = 1248 */
         switch (sdlval) {
@@ -59,7 +59,7 @@ int wxJoyKeyTextCtrl::DigitalButton(wxSDLJoyEvent& event)
             return WXJB_HAT_N; // arbitrary direction; val = 0 means "off"
         }
 
-    case WXSDLJOY_BUTTON:
+    case wxJoyControl::Button:
         return WXJB_BUTTON;
 
     default:
@@ -68,23 +68,23 @@ int wxJoyKeyTextCtrl::DigitalButton(wxSDLJoyEvent& event)
     }
 }
 
-void wxJoyKeyTextCtrl::OnJoy(wxSDLJoyEvent& event)
+void wxJoyKeyTextCtrl::OnJoy(wxJoyEvent& event)
 {
     static wxLongLong last_event = 0;
 
     int16_t val  = event.control_value();
-    wxSDLControl type = event.control();
+    wxJoyControl type = event.control();
 
     // Filter consecutive axis motions within 300ms, as this adds two bindings
     // +1/-1 instead of the one intended.
-    if (type == WXSDLJOY_AXIS && wxGetUTCTimeMillis() - last_event < 300)
+    if (type == wxJoyControl::Axis && wxGetUTCTimeMillis() - last_event < 300)
         return;
 
     last_event = wxGetUTCTimeMillis();
 
     int mod = DigitalButton(event);
     uint8_t key = event.control_index();
-    unsigned joy = event.player_index();
+    unsigned joy = event.joystick().player_index();
 
     if (!val || mod < 0)
         return;

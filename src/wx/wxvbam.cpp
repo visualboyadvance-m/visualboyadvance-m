@@ -877,13 +877,13 @@ int MainFrame::FilterEvent(wxEvent& event)
                 return wxEventFilter::Event_Processed;
         }
     }
-    else if (event.GetEventType() == wxEVT_SDLJOY && !menus_opened && !dialog_opened)
+    else if (event.GetEventType() == wxEVT_JOY && !menus_opened && !dialog_opened)
     {
-        wxSDLJoyEvent& je = (wxSDLJoyEvent&)event;
+        wxJoyEvent& je = (wxJoyEvent&)event;
         if (je.control_value() == 0) return -1; // joystick button UP
         uint8_t key = je.control_index();
         int mod = wxJoyKeyTextCtrl::DigitalButton(je);
-        int joy = je.player_index();
+        int joy = je.joystick().player_index();
         wxString label = wxJoyKeyTextCtrl::ToString(mod, key, joy);
         wxAcceleratorEntry_v accels = wxGetApp().GetAccels();
         for (size_t i = 0; i < accels.size(); ++i)
@@ -934,14 +934,15 @@ void MainFrame::SetJoystick()
     if (!emulating)
         return;
 
-    std::unordered_set<unsigned> needed_joysticks;
+    std::set<wxJoystick> needed_joysticks;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < NUM_KEYS; j++) {
             wxJoyKeyBinding_v b = gopts.joykey_bindings[i][j];
             for (size_t k = 0; k < b.size(); k++) {
                 int jn = b[k].joy;
                 if (jn) {
-                    needed_joysticks.insert(jn);
+                    needed_joysticks.insert(
+                        wxJoystick::FromLegacyPlayerIndex(jn));
                 }
             }
         }

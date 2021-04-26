@@ -360,7 +360,7 @@ private:
     wxMenu* recent;
     wxAcceleratorEntryUnicode recent_accel[10];
     // joystick reader
-    wxSDLJoy joy;
+    wxJoyPoller joy;
     JoystickPoller* jpoll = nullptr;
 
     // helper function for adding menu to accel editor
@@ -647,7 +647,7 @@ protected:
     void OnIdle(wxIdleEvent&);
     void OnKeyDown(wxKeyEvent& ev);
     void OnKeyUp(wxKeyEvent& ev);
-    void OnSDLJoy(wxSDLJoyEvent& ev);
+    void OnSDLJoy(wxJoyEvent& ev);
     void PaintEv(wxPaintEvent& ev);
     void EraseBackground(wxEraseEvent& ev);
     void OnSize(wxSizeEvent& ev);
