@@ -2581,11 +2581,12 @@ void MainFrame::set_global_accels()
     // the menus will be added now
 
     // first, zero out menu item on all accels
-    std::unordered_set<unsigned> needed_joysticks;
+    std::set<wxJoystick> needed_joysticks;
     for (size_t i = 0; i < accels.size(); ++i) {
         accels[i].Set(accels[i].GetUkey(), accels[i].GetJoystick(), accels[i].GetFlags(), accels[i].GetKeyCode(), accels[i].GetCommand());
         if (accels[i].GetJoystick()) {
-            needed_joysticks.insert(accels[i].GetJoystick());
+            needed_joysticks.insert(
+                wxJoystick::FromLegacyPlayerIndex(accels[i].GetJoystick()));
         }
     }
     joy.PollJoysticks(needed_joysticks);

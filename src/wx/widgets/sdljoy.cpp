@@ -47,15 +47,51 @@ const wxLongLong kPollTimeInterval(25);
 // For testing a GameController as a Joystick:
 //#define SDL_IsGameController(x) false
 
-DEFINE_EVENT_TYPE(wxEVT_SDLJOY)
+DEFINE_EVENT_TYPE(wxEVT_JOY)
 
-wxSDLJoyEvent::wxSDLJoyEvent(
-    unsigned player_index,
-    wxSDLControl control,
+// static
+wxJoystick wxJoystick::Invalid() {
+    return wxJoystick(kInvalidSdlIndex);
+}
+
+// static
+wxJoystick wxJoystick::FromLegacyPlayerIndex(unsigned player_index) {
+    assert(player_index != 0);
+    return wxJoystick(player_index - 1);
+}
+
+wxString wxJoystick::ToString() {
+    return wxString::Format("Joy%d", sdl_index_ + 1);
+}
+
+bool wxJoystick::operator==(const wxJoystick& other) const {
+    return sdl_index_ == other.sdl_index_;
+}
+bool wxJoystick::operator!=(const wxJoystick& other) const {
+    return !(*this == other);
+}
+bool wxJoystick::operator<(const wxJoystick& other) const {
+    return sdl_index_ < other.sdl_index_;
+}
+bool wxJoystick::operator<=(const wxJoystick& other) const {
+    return !(*this > other);
+}
+bool wxJoystick::operator>(const wxJoystick& other) const {
+    return other < *this;
+}
+bool wxJoystick::operator>=(const wxJoystick& other) const {
+    return !(*this < other);
+}
+
+wxJoystick::wxJoystick(int sdl_index) : sdl_index_(sdl_index) {}
+
+wxJoyEvent::wxJoyEvent(
+    wxJoystick joystick,
+    wxJoyControl control,
     uint8_t control_index,
     int16_t control_value) :
-        wxCommandEvent(wxEVT_SDLJOY),
-        player_index_(player_index),
+        wxCommandEvent(wxEVT_JOY),
+        joystick_(joystick),
         control_(control),
         control_index_(control_index),
         control_value_(control_value) {}
@@ -66,6 +102,7 @@ wxSDLJoyEvent::wxSDLJoyEvent(
 class wxSDLJoyState : public wxTimer {
 public:
     explicit wxSDLJoyState(int sdl_index);
+    explicit wxSDLJoyState(wxJoystick joystick);
     ~wxSDLJoyState() override;
 
     // Disable copy constructor and assignment. This is to prevent double
@@ -94,8 +131,8 @@ private:
     // Used to rumble on a timer.
     void Notify() override;
 
-    // The Joystick player index.
-    unsigned player_index_;
+    // The Joystick abstraction for UI events.
+    wxJoystick wx_joystick_;
 
     // SDL Joystick ID used for events.
     SDL_JoystickID joystick_id_;
@@ -104,7 +141,7 @@ private:
     SDL_GameController* game_controller_ = nullptr;
 
     // The SDL Joystick instance.
-    SDL_Joystick* joystick_ = nullptr;
+    SDL_Joystick* sdl_joystick_ = nullptr;
 
     // Current state of Joystick axis.
     std::unordered_map<uint8_t, int16_t> axis_{};
@@ -120,47 +157,50 @@ private:
 };
 
 wxSDLJoyState::wxSDLJoyState(int sdl_index)
-    : player_index_(sdl_index + 1) {
+    : wxSDLJoyState(wxJoystick(sdl_index)) {}
+
+wxSDLJoyState::wxSDLJoyState(wxJoystick joystick) : wx_joystick_(joystick) {
+    int sdl_index = wx_joystick_.sdl_index_;
     if (SDL_IsGameController(sdl_index)) {
         game_controller_ = SDL_GameControllerOpen(sdl_index);
         if (game_controller_)
-            joystick_ = SDL_GameControllerGetJoystick(game_controller_);
+            sdl_joystick_ = SDL_GameControllerGetJoystick(game_controller_);
     } else {
-        joystick_ = SDL_JoystickOpen(sdl_index);
+        sdl_joystick_ = SDL_JoystickOpen(sdl_index);
     }
 
-    if (!joystick_)
+    if (!sdl_joystick_)
         return;
 
-    joystick_id_ = SDL_JoystickInstanceID(joystick_);
+    joystick_id_ = SDL_JoystickInstanceID(sdl_joystick_);
     systemScreenMessage(
-        wxString::Format(_("Connected joystick %d: %s"),
-                            player_index_, SDL_JoystickNameForIndex(sdl_index)));
+        wxString::Format(_("Connected %s: %s"),
+            wx_joystick_.ToString(), SDL_JoystickNameForIndex(sdl_index)));
 }
 
 wxSDLJoyState::~wxSDLJoyState() {
     // Nothing to do if this object is not initialized.
-    if (!joystick_)
+    if (!sdl_joystick_)
         return;
 
     if (game_controller_)
         SDL_GameControllerClose(game_controller_);
     else
-        SDL_JoystickClose(joystick_);
+        SDL_JoystickClose(sdl_joystick_);
 
     systemScreenMessage(
-        wxString::Format(_("Disconnected joystick %d"), player_index_));
+        wxString::Format(_("Disconnected %s"), wx_joystick_.ToString()));
 }
 
 bool wxSDLJoyState::IsValid() const {
-    return joystick_;
+    return sdl_joystick_;
 }
 
 void wxSDLJoyState::ProcessEvent(int32_t event_type,
                                  uint8_t control_index,
                                  int16_t control_value) {
     int16_t previous_value = 0;
-    wxSDLControl control;
+    wxJoyControl control;
     bool value_changed = false;
 
     switch (event_type) {
@@ -173,7 +213,7 @@ void wxSDLJoyState::ProcessEvent(int32_t event_type,
     // Fallhrough.
     case SDL_CONTROLLERBUTTONDOWN:
     case SDL_CONTROLLERBUTTONUP:
-        control = wxSDLControl::WXSDLJOY_BUTTON;
+        control = wxJoyControl::Button;
         previous_value = buttons_[control_index];
         if (previous_value != control_value) {
             buttons_[control_index] = control_value;
@@ -186,7 +226,7 @@ void wxSDLJoyState::ProcessEvent(int32_t event_type,
         if (game_controller_) {
             return;
         }
-        control = wxSDLControl::WXSDLJOY_HAT;
+        control = wxJoyControl::Hat;
         previous_value = hats_[control_index];
         if (previous_value != control_value) {
             hats_[control_index] = control_value;
@@ -201,7 +241,7 @@ void wxSDLJoyState::ProcessEvent(int32_t event_type,
         }
     // Fallhrough.
     case SDL_CONTROLLERAXISMOTION:
-        control = wxSDLControl::WXSDLJOY_AXIS;
+        control = wxJoyControl::Axis;
         previous_value = axis_[control_index];
         if (previous_value != control_value) {
             axis_[control_index] = control_value;
@@ -216,17 +256,18 @@ void wxSDLJoyState::ProcessEvent(int32_t event_type,
     }
 
     if (value_changed) {
-        wxLogDebug("GOT %s: joy:%d ctrl_idx:%d val:%d prev_val:%d",
-                   SDLEventTypeToDebugString(event_type), player_index_,
-                   control_index, control_value, previous_value);
+        wxLogDebug("GOT %s: %s ctrl_idx:%d val:%d prev_val:%d",
+                   SDLEventTypeToDebugString(event_type),
+                   wx_joystick_.ToString(), control_index, control_value,
+                   previous_value);
 
         auto handler = wxGetApp().frame->GetJoyEventHandler();
         if (!handler)
             return;
 
         wxQueueEvent(handler,
-                     new wxSDLJoyEvent(
-                         player_index_, control, control_index, control_value));
+                     new wxJoyEvent(
+                         wx_joystick_, control, control_index, control_value));
     }
 }
 
@@ -255,26 +296,26 @@ void wxSDLJoyState::Poll() {
                 ProcessEvent(SDL_CONTROLLERAXISMOTION, axis, current_value);
         }
     } else {
-        for (uint8_t but = 0; but < SDL_JoystickNumButtons(joystick_); but++) {
+        for (uint8_t but = 0; but < SDL_JoystickNumButtons(sdl_joystick_); but++) {
             uint16_t previous_value = buttons_[but];
-            uint16_t current_value = SDL_JoystickGetButton(joystick_, but);
+            uint16_t current_value = SDL_JoystickGetButton(sdl_joystick_, but);
 
             if (previous_value != current_value)
                 ProcessEvent(SDL_JOYBUTTONUP, but, current_value);
         }
 
-        for (uint8_t axis = 0; axis < SDL_JoystickNumAxes(joystick_); axis++) {
+        for (uint8_t axis = 0; axis < SDL_JoystickNumAxes(sdl_joystick_); axis++) {
             uint16_t previous_value = axis_[axis];
             uint16_t current_value =
-                AxisValueToDirection(SDL_JoystickGetButton(joystick_, axis));
+                AxisValueToDirection(SDL_JoystickGetButton(sdl_joystick_, axis));
 
             if (previous_value != current_value)
                 ProcessEvent(SDL_JOYAXISMOTION, axis, current_value);
         }
 
-        for (uint8_t hat = 0; hat < SDL_JoystickNumHats(joystick_); hat++) {
+        for (uint8_t hat = 0; hat < SDL_JoystickNumHats(sdl_joystick_); hat++) {
             uint16_t previous_value = hats_[hat];
-            uint16_t current_value = SDL_JoystickGetHat(joystick_, hat);
+            uint16_t current_value = SDL_JoystickGetHat(sdl_joystick_, hat);
 
             if (previous_value != current_value)
                 ProcessEvent(SDL_JOYHATMOTION, hat, current_value);
@@ -304,7 +345,7 @@ void wxSDLJoyState::Notify() {
     SetRumble(rumbling_);
 }
 
-wxSDLJoy::wxSDLJoy() {
+wxJoyPoller::wxJoyPoller() {
     // Start up joystick if not already started
     // FIXME: check for errors
     SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
@@ -312,14 +353,14 @@ wxSDLJoy::wxSDLJoy() {
     SDL_JoystickEventState(SDL_ENABLE);
 }
 
-wxSDLJoy::~wxSDLJoy() {
+wxJoyPoller::~wxJoyPoller() {
     // It is necessary to free all SDL resources before quitting SDL.
     joystick_states_.clear();
     SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
     SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
 }
 
-void wxSDLJoy::Poll() {
+void wxJoyPoller::Poll() {
     SDL_Event e;
     bool got_event = false;
 
@@ -421,7 +462,7 @@ void wxSDLJoy::Poll() {
     }
 }
 
-void wxSDLJoy::RemapControllers() {
+void wxJoyPoller::RemapControllers() {
     if (!is_polling_active_) {
         // Nothing to do when we're not actively polling.
         return;
@@ -429,7 +470,7 @@ void wxSDLJoy::RemapControllers() {
 
     joystick_states_.clear();
 
-    if (requested_sdl_indexes_.empty()) {
+    if (requested_joysticks_.empty()) {
         // Connect all joysticks.
         for (int i = 0; i < SDL_NumJoysticks(); i++) {
             std::unique_ptr<wxSDLJoyState> joy_state(new wxSDLJoyState(i));
@@ -440,9 +481,9 @@ void wxSDLJoy::RemapControllers() {
         }
     } else {
         // Only attempt to add the joysticks we care about.
-        for (const int& sdl_index : requested_sdl_indexes_) {
+        for (const wxJoystick& joystick : requested_joysticks_) {
             std::unique_ptr<wxSDLJoyState> joy_state(
-                new wxSDLJoyState(sdl_index));
+                new wxSDLJoyState(joystick));
             if (joy_state->IsValid()) {
                 joystick_states_.emplace(
                     joy_state->joystick_id(), std::move(joy_state));
@@ -451,45 +492,41 @@ void wxSDLJoy::RemapControllers() {
     }
 }
 
-wxSDLJoyState* wxSDLJoy::FindJoyState(const SDL_JoystickID& joy_id) {
+wxSDLJoyState* wxJoyPoller::FindJoyState(const SDL_JoystickID& joy_id) {
     const auto iter = joystick_states_.find(joy_id);
     if (iter == joystick_states_.end())
         return nullptr;
     return iter->second.get();
 }
 
-void wxSDLJoy::PollJoysticks(std::unordered_set<unsigned> indexes) {
+void wxJoyPoller::PollJoysticks(std::set<wxJoystick> joysticks) {
     // Reset the polling state.
     StopPolling();
 
-    if (indexes.empty()) {
+    if (joysticks.empty()) {
         // Nothing to poll. Return early.
         return;
     }
 
     is_polling_active_ = true;
-    std::for_each(
-        indexes.begin(), indexes.end(),
-        [&](const unsigned& player_index) {
-            requested_sdl_indexes_.insert(player_index - 1);
-        });
+    requested_joysticks_ = joysticks;
     RemapControllers();
 }
 
-void wxSDLJoy::PollAllJoysticks() {
+void wxJoyPoller::PollAllJoysticks() {
     // Reset the polling state.
     StopPolling();
     is_polling_active_ = true;
     RemapControllers();
 }
 
-void wxSDLJoy::StopPolling() {
+void wxJoyPoller::StopPolling() {
     joystick_states_.clear();
-    requested_sdl_indexes_.clear();
+    requested_joysticks_.clear();
     is_polling_active_ = false;
 }
 
-void wxSDLJoy::SetRumble(bool activate_rumble) {
+void wxJoyPoller::SetRumble(bool activate_rumble) {
     if (joystick_states_.empty())
         return;
 

@@ -48,8 +48,8 @@ public:
 
     // key is event.GetControlIndex(), and joy is event.GetJoy() + 1
     // mod is derived from GetControlValue() and GetControlType():
-    // convert wxSDLJoyEvent's type+val into mod (WXJB_*)
-    static int DigitalButton(wxSDLJoyEvent& event);
+    // convert wxJoyEvent's type+val into mod (WXJB_*)
+    static int DigitalButton(wxJoyEvent& event);
     // convert mod+key to accel string, separated by -
     static wxString ToString(int mod, int key, int joy, bool isConfig = false);
     // convert multiple keys, separated by multikey
@@ -68,7 +68,7 @@ public:
     static wxString FromAccelToString(wxAcceleratorEntry_v keys, wxChar sep = wxT(','), bool isConfig = false);
 
 protected:
-    void OnJoy(wxSDLJoyEvent&);
+    void OnJoy(wxJoyEvent&);
 
     DECLARE_DYNAMIC_CLASS(wxJoyKeyTextCtrl);
     DECLARE_EVENT_TABLE();

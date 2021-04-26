@@ -1399,11 +1399,11 @@ void GameArea::OnSize(wxSizeEvent& ev)
     ev.Skip();
 }
 
-void GameArea::OnSDLJoy(wxSDLJoyEvent& ev)
+void GameArea::OnSDLJoy(wxJoyEvent& ev)
 {
     int key = ev.control_index();
     int mod = wxJoyKeyTextCtrl::DigitalButton(ev);
-    int joy = ev.player_index();
+    int joy = ev.joystick().player_index();
 
     // mutually exclusive key types unpress their opposite
     if (mod == WXJB_AXIS_PLUS) {

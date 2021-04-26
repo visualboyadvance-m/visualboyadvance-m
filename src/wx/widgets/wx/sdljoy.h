@@ -1,8 +1,9 @@
-#ifndef JOYEVT_H
-#define JOYEVT_H
+#ifndef _WX_SDLJOY_H
+#define _WX_SDLJOY_H
 
 #include <memory>
-#include <unordered_set>
+#include <set>
+#include <map>
 #include <unordered_map>
 #include <wx/time.h>
 #include <wx/event.h>
@@ -10,60 +11,99 @@
 #include <SDL_gamecontroller.h>
 #include <SDL_events.h>
 
+// Forward declarations.
+class wxSDLJoyState;
+class wxJoyPoller;
+
 // The different types of supported controls.
-enum wxSDLControl {
-    WXSDLJOY_AXIS,  // Control value is signed 16
-    WXSDLJOY_HAT,   // Control value is bitmask NESW/URDL
-    WXSDLJOY_BUTTON // Control value is 0 or 1
+enum class wxJoyControl {
+    Axis = 0, // Control value is signed 16
+    Hat,      // Control value is bitmask NESW/URDL
+    Button    // Control value is 0 or 1
+};
+
+// Abstraction for a single joystick. In the current implementation, this
+// encapsulates an |sdl_index_|. Creation of these objects should only be
+// handled by wxSDLJoyState, with the exception of the legacy player_index
+// constructor, which should eventually go away.
+class wxJoystick {
+public:
+    static wxJoystick Invalid();
+
+    // TODO: Remove this constructor once the transition to the new UserInput
+    // type is complete.
+    static wxJoystick FromLegacyPlayerIndex(unsigned player_index);
+
+    virtual ~wxJoystick() = default;
+
+    wxString ToString();
+
+    // TODO: Remove this API once the transition to the new UserInput type is
+    // complete.
+    unsigned player_index() { return sdl_index_ + 1; }
+
+    bool operator==(const wxJoystick& other) const;
+    bool operator!=(const wxJoystick& other) const;
+    bool operator<(const wxJoystick& other) const;
+    bool operator<=(const wxJoystick& other) const;
+    bool operator>(const wxJoystick& other) const;
+    bool operator>=(const wxJoystick& other) const;
+
+private:
+    static const int kInvalidSdlIndex = -1;
+    friend class wxSDLJoyState;
+
+    wxJoystick() = delete;
+    wxJoystick(int sdl_index);
+
+    int sdl_index_;
 };
 
 // Represents a Joystick event.
-class wxSDLJoyEvent : public wxCommandEvent {
+class wxJoyEvent : public wxCommandEvent {
 public:
-    wxSDLJoyEvent(
-        unsigned player_index,
-        wxSDLControl control,
+    wxJoyEvent(
+        wxJoystick joystick,
+        wxJoyControl control,
         uint8_t control_index,
         int16_t control_value);
-    virtual ~wxSDLJoyEvent() = default;
+    virtual ~wxJoyEvent() = default;
 
-    unsigned player_index() const { return player_index_; }
-    wxSDLControl control() const { return control_; }
+    wxJoystick joystick() const { return joystick_; }
+    wxJoyControl control() const { return control_; }
     uint8_t control_index() const { return control_index_; }
     int16_t control_value() const { return control_value_; }
 
 private:
-    unsigned player_index_;
-    wxSDLControl control_;
+    wxJoystick joystick_;
+    wxJoyControl control_;
     uint8_t control_index_;
     int16_t control_value_;
 };
-
-class wxSDLJoyState;
 
 // This is my own SDL-based joystick handler, since wxJoystick is brain-dead.
 // It's geared towards keyboard emulation.
 //
 // After initilization, use PollJoystick() or PollAllJoysticks() for the
-// joysticks you wish to monitor. The target window will then receive
-// EVT_SDLJOY events of type wxSDLJoyEvent.
-// Handling of the player_index() value is different depending on the polling
-// mode. After calls to PollJoysticks(), that value will remain constant for a
-// given device, even if other joysticks disconnect. This ensures the joystick
-// remains active during gameplay even if other joysticks disconnect.
+// joysticks you wish to monitor. The target window will then receive EVT_SDLJOY
+// events of type wxJoyEvent.
+// Handling of the wxJoystick value is different depending on the polling mode.
+// After calls to PollJoysticks(), that value will remain constant for a given
+// device, even if other joysticks disconnect. This ensures the joystick remains
+// active during gameplay even if other joysticks disconnect.
 // However, after calls to PollAllJoysticks(), all joysticks are re-connected
-// on joystick connect/disconnect. This ensures the right player_index() value
-// is sent to the UI during input event configuration.
-class wxSDLJoy {
+// on joystick connect/disconnect. This ensures the right wxJoystick value is
+// sent to the UI during input event configuration.
+class wxJoyPoller {
 public:
-    wxSDLJoy();
-    ~wxSDLJoy();
+    wxJoyPoller();
+    ~wxJoyPoller();
 
     // Adds a set of joysticks to the list of polled joysticks.
     // This will disconnect every active joysticks, and reactivates the ones
-    // matching an index in |indexes|. Missing joysticks will be connected if
+    // matching an index in |joysticks|. Missing joysticks will be connected if
     // they connect later on.
-    void PollJoysticks(std::unordered_set<unsigned> indexes);
+    void PollJoysticks(std::set<wxJoystick> joysticks);
 
     // Adds all joysticks to the list of polled joysticks. This will
     // disconnect every active joysticks, reconnect them and start polling.
@@ -91,7 +131,7 @@ private:
     std::unordered_map<SDL_JoystickID, std::unique_ptr<wxSDLJoyState>> joystick_states_;
 
     // Set of requested SDL joystick indexes.
-    std::unordered_set<int> requested_sdl_indexes_;
+    std::set<wxJoystick> requested_joysticks_;
 
     // Set to true when we are actively polling controllers.
     bool is_polling_active_ = false;
@@ -101,15 +141,15 @@ private:
 };
 
 // Note: this means sdljoy can't be part of a library w/o extra work
-DECLARE_LOCAL_EVENT_TYPE(wxEVT_SDLJOY, -1)
-typedef void (wxEvtHandler::*wxSDLJoyEventFunction)(wxSDLJoyEvent&);
+DECLARE_LOCAL_EVENT_TYPE(wxEVT_JOY, -1)
+typedef void (wxEvtHandler::*wxJoyEventFunction)(wxJoyEvent&);
 #define EVT_SDLJOY(fn)                                                   \
-    DECLARE_EVENT_TABLE_ENTRY(wxEVT_SDLJOY,                              \
+    DECLARE_EVENT_TABLE_ENTRY(wxEVT_JOY,                              \
         wxID_ANY,                                                        \
         wxID_ANY,                                                        \
         (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction) \
-            wxStaticCastEvent(wxSDLJoyEventFunction, &fn),               \
+            wxStaticCastEvent(wxJoyEventFunction, &fn),               \
         (wxObject*)NULL)                                                 \
     ,
 
-#endif /* JOYEVT_H */
+#endif /* _WX_SDLJOY_H */
