@@ -87,8 +87,10 @@ int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 int emulating = 0;
 
+#ifdef BKPT_SUPPORT
 void (*dbgOutput)(const char* s, uint32_t addr);
 void (*dbgSignal)(int sig, int number);
+#endif
 
 // Dummy vars/funcs for serial io emulation without LINK communication related stuff
 #ifndef NO_LINK
