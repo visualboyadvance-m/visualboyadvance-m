@@ -82,11 +82,9 @@ int systemRedShift = 0;
 int systemBlueShift = 0;
 int systemGreenShift = 0;
 int systemColorDepth = 32;
-int systemDebug = 0;
 int systemVerbose = 0;
 int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
-int systemSpeed = 0;
 int emulating = 0;
 
 void (*dbgOutput)(const char* s, uint32_t addr);

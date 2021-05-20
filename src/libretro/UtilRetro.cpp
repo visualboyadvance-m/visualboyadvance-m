@@ -43,14 +43,6 @@ bool cpuIsMultiBoot      = false;
 const char* loadDotCodeFile;
 const char* saveDotCodeFile;
 
-extern int systemColorDepth;
-extern int systemRedShift;
-extern int systemGreenShift;
-extern int systemBlueShift;
-
-extern uint16_t systemColorMap16[0x10000];
-extern uint32_t systemColorMap32[0x10000];
-
 bool utilWritePNGFile(const char* fileName, int w, int h, uint8_t* pix)
 {
     return false;
