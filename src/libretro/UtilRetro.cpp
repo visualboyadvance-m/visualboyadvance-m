@@ -158,7 +158,7 @@ uint8_t *utilLoad(const char *file, bool (*accept)(const char *), uint8_t *data,
         }
     }
 
-    if (fread(image, 1, size, fp) != size) {
+    if (fread(image, 1, size, fp) != (size_t)size) {
         log("Failed to read from %s", file);
         fclose(fp);
         return NULL;
