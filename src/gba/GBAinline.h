@@ -133,8 +133,8 @@ static inline uint32_t CPUReadMemory(uint32_t address)
     case 15:
         if (cpuFlashEnabled | cpuSramEnabled) { // no need to swap this
             value = flashRead(address) * 0x01010101;
+            break;
         }
-        break;
     // default
     default:
     unreadable:
@@ -288,6 +288,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
         if (cpuFlashEnabled | cpuSramEnabled) {
             // no need to swap this
             value = flashRead(address) * 0x0101;
+            break;
         }
     // default
     default:
@@ -638,7 +639,7 @@ static inline void CPUWriteHalfWord(uint32_t address, uint16_t value)
             (*cpuSaveGameFunc)(address, (uint8_t)value);
             break;
         }
-        goto unwritable;
+        // fallthrough
     default:
     unwritable:
 #ifdef GBA_LOGGING
