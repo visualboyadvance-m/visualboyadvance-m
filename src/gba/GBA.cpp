@@ -49,8 +49,9 @@ bool busPrefetchEnable = false;
 uint32_t busPrefetchCount = 0;
 int cpuDmaTicksToUpdate = 0;
 int cpuDmaCount = 0;
-bool cpuDmaHack = false;
+bool cpuDmaRunning = false;
 uint32_t cpuDmaLast = 0;
+uint32_t cpuDmaPC = 0;
 int dummyAddress = 0;
 
 bool cpuBreakLoop = false;
@@ -1506,7 +1507,7 @@ int CPULoadRom(const char* szFile)
 
     uint16_t* temp = (uint16_t*)(rom + ((romSize + 1) & ~1));
     int i;
-    for (i = (romSize + 1) & ~1; i < romSize; i += 2) {
+    for (i = (romSize + 1) & ~1; i < SIZE_ROM; i += 2) {
         WRITE16LE(temp, (i >> 1) & 0xFFFF);
         temp++;
     }
@@ -1599,7 +1600,7 @@ int CPULoadRomData(const char* data, int size)
 
     uint16_t* temp = (uint16_t*)(rom + ((romSize + 1) & ~1));
     int i;
-    for (i = (romSize + 1) & ~1; i < romSize; i += 2) {
+    for (i = (romSize + 1) & ~1; i < SIZE_ROM; i += 2) {
         WRITE16LE(temp, (i >> 1) & 0xFFFF);
         temp++;
     }
@@ -2302,7 +2303,8 @@ void doDMA(uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t c, int t
     int dw = 0;
     int sc = c;
 
-    cpuDmaHack = true;
+    cpuDmaRunning = true;
+    cpuDmaPC = reg[15].I;
     cpuDmaCount = c;
     // This is done to get the correct waitstates.
     if (sm > 15)
@@ -2367,7 +2369,7 @@ void doDMA(uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t c, int t
     }
 
     cpuDmaTicksToUpdate += totalTicks;
-    cpuDmaHack = false;
+    cpuDmaRunning = false;
 }
 
 void CPUCheckDMA(int reason, int dmamask)
@@ -3595,7 +3597,7 @@ void CPUReset()
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    cpuDmaHack = false;
+    cpuDmaRunning = false;
 
     lastTime = systemGetClock();
 

@@ -63,6 +63,7 @@ static bool option_showAdvancedOptions = false;
 static double option_sndFiltering = 0.5;
 static unsigned option_gbPalette = 0;
 static bool option_lcdfilter = false;
+
 // filters
 static IFBFilterFunc ifb_filter_func = NULL;
 
@@ -71,6 +72,7 @@ static unsigned systemWidth = gbaWidth;
 static unsigned systemHeight = gbaHeight;
 static EmulatedSystem* core = NULL;
 static IMAGE_TYPE type = IMAGE_UNKNOWN;
+static bool libretro_supports_bitmasks = false;
 
 // global vars
 uint16_t systemColorMap16[0x10000];
@@ -80,15 +82,15 @@ int systemRedShift = 0;
 int systemBlueShift = 0;
 int systemGreenShift = 0;
 int systemColorDepth = 32;
-int systemDebug = 0;
 int systemVerbose = 0;
 int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
-int systemSpeed = 0;
 int emulating = 0;
 
+#ifdef BKPT_SUPPORT
 void (*dbgOutput)(const char* s, uint32_t addr);
 void (*dbgSignal)(int sig, int number);
+#endif
 
 // Dummy vars/funcs for serial io emulation without LINK communication related stuff
 #ifndef NO_LINK
@@ -643,6 +645,12 @@ void retro_init(void)
       rumble_cb = rumble.set_rumble_state;
    else
       rumble_cb = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL))
+   {
+      libretro_supports_bitmasks = true;
+      log_cb(RETRO_LOG_INFO, "SET_SUPPORT_INPUT_BITMASK: yes\n");
+   }
 }
 
 static const char *gbGetCartridgeType(void)
@@ -978,6 +986,7 @@ void retro_deinit(void)
     emulating = 0;
     core->emuCleanUp();
     soundShutdown();
+    libretro_supports_bitmasks = false;
 }
 
 void retro_reset(void)
@@ -1414,6 +1423,7 @@ void updateInput_SolarSensor(void)
 static void updateInput_Joypad(void)
 {
     unsigned max_buttons = MAX_BUTTONS - ((type == IMAGE_GB) ? 2 : 0); // gb only has 8 buttons
+    int16_t inbuf = 0;
 
     for (unsigned port = 0; port < MAX_PLAYERS; port++)
     {
@@ -1421,8 +1431,16 @@ static void updateInput_Joypad(void)
         input_buf[port] = 0;
 
         if (retropad_device[port] == RETRO_DEVICE_JOYPAD) {
+            if (libretro_supports_bitmasks)
+                inbuf = input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
+            else
+            {
+                for (int i = 0; i < (RETRO_DEVICE_ID_JOYPAD_R3 + 1); i++)
+                    inbuf |= input_cb(0, RETRO_DEVICE_JOYPAD, 0, i) ? (1 << i) : 0;
+            }
+
             for (unsigned button = 0; button < max_buttons; button++)
-                input_buf[port] |= input_cb(port, RETRO_DEVICE_JOYPAD, 0, binds[button]) << button;
+                input_buf[port] |= (inbuf & (1 << binds[button])) ? (1 << button) : 0;
 
             if (option_turboEnable) {
                 /* Handle Turbo A & B buttons */
