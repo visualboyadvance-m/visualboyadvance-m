@@ -3038,11 +3038,27 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         cpuNextEvent = cpuTotalTicks;
         break;
 
-#ifndef NO_LINK
     case COMM_SIOCNT:
+#ifndef NO_LINK
         StartLink(value);
+#else
+        if (!ioMem)
+            return;
+
+        if (value & 0x80) {
+            value &= 0xff7f;
+            if (value & 1 && (value & 0x4000)) {
+                UPDATE_REG(COMM_SIOCNT, 0xFF);
+                IF |= 0x80;
+                UPDATE_REG(0x202, IF);
+                value &= 0x7f7f;
+            }
+        }
+        UPDATE_REG(COMM_SIOCNT, value);
+#endif
         break;
 
+#ifndef NO_LINK
     case COMM_SIODATA8:
         UPDATE_REG(COMM_SIODATA8, value);
         break;
@@ -3057,11 +3073,19 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         UPDATE_REG(0x132, value & 0xC3FF);
         break;
 
-#ifndef NO_LINK
+
     case COMM_RCNT:
+#ifndef NO_LINK
         StartGPLink(value);
+#else
+        if (!ioMem)
+            return;
+
+        UPDATE_REG(COMM_RCNT, value);
+#endif
         break;
 
+#ifndef NO_LINK
     case COMM_JOYCNT: {
         uint16_t cur = READ16LE(&ioMem[COMM_JOYCNT]);
 
