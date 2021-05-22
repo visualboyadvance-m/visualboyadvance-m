@@ -1065,10 +1065,13 @@ void gbWriteMemory(uint16_t address, uint8_t value)
             }
 #endif
         }
-
+#else
+        gbMemory[0xff02] = value;
+        if (gbSerialOn)
+            gbSerialTicks = GBSERIAL_CLOCK_TICKS;
+#endif
         gbSerialBits = 0;
         return;
-#endif
     }
 
     case 0x04: {
@@ -1893,11 +1896,11 @@ uint8_t gbReadMemory(uint16_t address)
             return gbMemory[0xff01];
         case 0x02:
             return (gbMemory[0xff02]);
-            case 0x03:
-                log("Undocumented Memory register read %04x PC=%04x\n",
+        case 0x03:
+            log("Undocumented Memory register read %04x PC=%04x\n",
                 address,
                 PC.W);
-                return 0xff;
+            return 0xff;
         case 0x04:
             return register_DIV;
         case 0x05:
@@ -5295,6 +5298,27 @@ void gbEmulate(int ticksToStop)
                 }
 #endif
             }
+#else
+        static int SIOctr = 0;
+        SIOctr++;
+        if (SIOctr % 5) {
+            if (gbSerialOn) {
+                if  (gbMemory[0xff02] & 1) {
+                    gbSerialTicks -= clockTicks;
+                    while (gbSerialTicks <= 0) {
+                        gbMemory[0xff01] = (gbMemory[0xff01] << 1) | 1;
+                        gbSerialBits++;
+                        if (gbSerialBits >= 8) {
+                            gbMemory[0xff02] &= 0x7f;
+                            gbMemory[0xff0f] = register_IF |= 8;
+                            gbSerialOn = 0;
+                            gbSerialBits = 0;
+                        } else
+                            gbSerialTicks += GBSERIAL_CLOCK_TICKS;
+                    }
+                }
+            }
+        }
 #endif
         // TODO: evaluate and fix this
         // On VBA-M (gb core running twice as fast?), each vblank is uses 35112 cycles.
