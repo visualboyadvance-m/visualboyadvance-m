@@ -4,6 +4,7 @@ LIBRETRO_DIR := $(CORE_DIR)/libretro
 
 FRONTEND_SUPPORTS_RGB565 := 1
 TILED_RENDERING          := 1
+NO_LINK                  := 1
 
 include $(LIBRETRO_DIR)/Makefile.common
 
@@ -16,6 +17,10 @@ CURRENT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null)
 
 ifneq ($(CURRENT_COMMIT),$(TAG_COMMIT))
 COREFLAGS += -DGIT_COMMIT=\"$(CURRENT_COMMIT)\"
+endif
+
+ifeq ($(NO_LINK), 1)
+COREFLAGS += -DNO_LINK
 endif
 
 include $(CLEAR_VARS)
