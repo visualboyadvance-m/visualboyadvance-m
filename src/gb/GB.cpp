@@ -4376,6 +4376,7 @@ bool gbUpdateSizes()
     case 0x1e:
     case 0x22:
     case 0xfd:
+    case 0xfe:
     case 0xff:
         gbBattery = 1;
         break;
@@ -4399,6 +4400,7 @@ bool gbUpdateSizes()
     case 0x0f:
     case 0x10: // mbc3
     case 0xfd: // tama5
+    case 0xfe:
         gbRTCPresent = 1;
         break;
     default:

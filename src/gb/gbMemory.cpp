@@ -1000,13 +1000,32 @@ mapperHuC3 gbDataHuC3 = {
     0, // RAM read value
     0, // Register 1
     0, // Register 2
-    0, // Register 3
-    0, // Register 4
-    0, // Register 5
-    0, // Register 6
-    0, // Register 7
-    0  // Register 8
+    0, // DateTime
+    0, // WritingTime
+    0, // ModeFlag
+    0, // ClockShift
+    0  // lastTime
 };
+
+void memoryupdateHuC3Latch() {
+	uint64_t now = time(NULL);
+    uint64_t diff = now - gbDataHuC3.mapperLastTime;
+
+    if (diff > 0) {
+        unsigned minute = (diff / 60) % 1440;
+        unsigned day = (diff / 86400) & 0xFFF;
+
+        gbDataHuC3.mapperDateTime = (day << 12) | minute;
+    }
+}
+
+void memoryupdateHuC3Clock() {
+    uint64_t now = time(NULL);
+    unsigned minute = (gbDataHuC3.mapperWritingTime & 0xFFF) % 1440;
+    unsigned day = (gbDataHuC3.mapperWritingTime & 0xFFF000) >> 12;
+
+    gbDataHuC3.mapperLastTime = now - minute * 60 - day * 86400;
+}
 
 // HuC3 ROM write registers
 void mapperHuC3ROM(uint16_t address, uint8_t value)
@@ -1066,7 +1085,7 @@ uint8_t mapperHuC3ReadRAM(uint16_t address)
 // HuC3 RAM write
 void mapperHuC3RAM(uint16_t address, uint8_t value)
 {
-    int* p;
+    //int* p;
 
     if (gbDataHuC3.mapperRAMFlag < 0x0b || gbDataHuC3.mapperRAMFlag > 0x0e) {
         if (gbDataHuC3.mapperRAMEnable) {
@@ -1082,20 +1101,43 @@ void mapperHuC3RAM(uint16_t address, uint8_t value)
             } else {
                 switch (value & 0xf0) {
                 case 0x10:
-                    p = &gbDataHuC3.mapperRegister2;
+                    /*p = &gbDataHuC3.mapperRegister2;
                     gbDataHuC3.mapperRAMValue = *(p + gbDataHuC3.mapperRegister1++);
                     if (gbDataHuC3.mapperRegister1 > 6)
-                        gbDataHuC3.mapperRegister1 = 0;
+                        gbDataHuC3.mapperRegister1 = 0;*/
+
+                    // read time
+                    memoryupdateHuC3Latch();
+                    if (gbDataHuC3.mapperModeFlag == HUC3_READ) {
+                        gbDataHuC3.mapperRAMValue = (gbDataHuC3.mapperDateTime >> gbDataHuC3.mapperClockShift) & 0x0F;
+                        gbDataHuC3.mapperClockShift += 4;
+                        if (gbDataHuC3.mapperClockShift > 24)
+                            gbDataHuC3.mapperClockShift = 0;
+                    }
                     break;
                 case 0x30:
-                    p = &gbDataHuC3.mapperRegister2;
+                    /*p = &gbDataHuC3.mapperRegister2;
                     *(p + gbDataHuC3.mapperRegister1++) = value & 0x0f;
                     if (gbDataHuC3.mapperRegister1 > 6)
                         gbDataHuC3.mapperRegister1 = 0;
-                    gbDataHuC3.mapperAddress = (gbDataHuC3.mapperRegister6 << 24) | (gbDataHuC3.mapperRegister5 << 16) | (gbDataHuC3.mapperRegister4 << 8) | (gbDataHuC3.mapperRegister3 << 4) | (gbDataHuC3.mapperRegister2);
+                    gbDataHuC3.mapperAddress = (gbDataHuC3.mapperRegister6 << 24) | (gbDataHuC3.mapperRegister5 << 16) | (gbDataHuC3.mapperRegister4 << 8) | (gbDataHuC3.mapperRegister3 << 4) | (gbDataHuC3.mapperRegister2);*/
+
+                    // write time
+                    if (gbDataHuC3.mapperModeFlag == HUC3_WRITE) {
+                        if (gbDataHuC3.mapperClockShift == 0)
+                            gbDataHuC3.mapperWritingTime = 0;
+                        if (gbDataHuC3.mapperClockShift <= 24) {
+                            gbDataHuC3.mapperWritingTime |= (value & 0x0F) << gbDataHuC3.mapperClockShift;
+                            gbDataHuC3.mapperClockShift += 4;
+                            if (gbDataHuC3.mapperClockShift == 24) {
+                                memoryupdateHuC3Clock();
+                                gbDataHuC3.mapperModeFlag = HUC3_READ;
+                            }
+                        }
+                    }
                     break;
                 case 0x40:
-                    gbDataHuC3.mapperRegister1 = (gbDataHuC3.mapperRegister1 & 0xf0) | (value & 0x0f);
+                    /*gbDataHuC3.mapperRegister1 = (gbDataHuC3.mapperRegister1 & 0xf0) | (value & 0x0f);
                     gbDataHuC3.mapperRegister2 = (gbDataHuC3.mapperAddress & 0x0f);
                     gbDataHuC3.mapperRegister3 = ((gbDataHuC3.mapperAddress >> 4) & 0x0f);
                     gbDataHuC3.mapperRegister4 = ((gbDataHuC3.mapperAddress >> 8) & 0x0f);
@@ -1103,13 +1145,35 @@ void mapperHuC3RAM(uint16_t address, uint8_t value)
                     gbDataHuC3.mapperRegister6 = ((gbDataHuC3.mapperAddress >> 24) & 0x0f);
                     gbDataHuC3.mapperRegister7 = 0;
                     gbDataHuC3.mapperRegister8 = 0;
-                    gbDataHuC3.mapperRAMValue = 0;
+                    gbDataHuC3.mapperRAMValue = 0;*/
+
+                    // some kind of mode shift
+                    switch(value & 0x0F) {
+                    case 0x0:
+                        // shift reset?
+                        gbDataHuC3.mapperClockShift = 0;
+                        break;
+                    case 0x3:
+                        // write time?
+                        gbDataHuC3.mapperModeFlag = HUC3_WRITE;
+                        gbDataHuC3.mapperClockShift = 0;
+                        break;
+                    case 0x7:
+                        gbDataHuC3.mapperModeFlag = HUC3_READ;
+                        gbDataHuC3.mapperClockShift = 0;
+                        break;
+                        // others are unimplemented so far
+                    }
                     break;
                 case 0x50:
-                    gbDataHuC3.mapperRegister1 = (gbDataHuC3.mapperRegister1 & 0x0f) | ((value << 4) & 0x0f);
+                    //gbDataHuC3.mapperRegister1 = (gbDataHuC3.mapperRegister1 & 0x0f) | ((value << 4) & 0x0f);
+                    break;
+                case 0x60:
+                    gbDataHuC3.mapperModeFlag = HUC3_READ; // ???
+                    gbDataHuC3.mapperRAMValue = 1;
                     break;
                 default:
-                    gbDataHuC3.mapperRAMValue = 1;
+                    //gbDataHuC3.mapperRAMValue = 1;
                     break;
                 }
             }

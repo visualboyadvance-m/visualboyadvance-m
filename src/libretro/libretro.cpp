@@ -161,6 +161,9 @@ static void set_gbPalette(void)
     }
 }
 
+extern void memoryupdateHuC3Clock();
+extern void memoryupdateHuC3Latch();
+
 static void* gb_rtcdata_prt(void)
 {
     switch (gbRomType) {
@@ -169,6 +172,8 @@ static void* gb_rtcdata_prt(void)
         return &gbDataMBC3.mapperSeconds;
     case 0xfd: // TAMA5 + extended
         return &gbDataTAMA5.mapperSeconds;
+    case 0xfe: // HuC3 + Clock
+        return &gbDataHuC3.mapperDateTime;
     }
     return NULL;
 }
@@ -181,6 +186,8 @@ static size_t gb_rtcdata_size(void)
         return MBC3_RTC_DATA_SIZE;
     case 0xfd: // TAMA5 + extended
         return TAMA5_RTC_DATA_SIZE;
+    case 0xfe: // HuC3 + Clock
+        return HUC3_RTC_DATA_SIZE;
     }
     return 0;
 }
@@ -230,6 +237,10 @@ static void gbInitRTC(void)
             }
             gbDataTAMA5.mapperControl = (gbDataTAMA5.mapperControl & 0xfe) | (lt->tm_yday > 255 ? 1 : 0);
         }
+        break;
+    case 0xfe:
+        //memoryupdateHuC3Clock();
+        memoryupdateHuC3Latch();
         break;
     }
 }
@@ -298,7 +309,7 @@ void* retro_get_memory_data(unsigned id)
             data = (gbCgbMode ? gbVram : (gbMemory + 0x8000));
             break;
         case RETRO_MEMORY_RTC:
-            if (gbBattery && gbRTCPresent)
+            //if (gbBattery/* && gbRTCPresent*/)
                 data = gb_rtcdata_prt();
             break;
         }
@@ -1423,6 +1434,10 @@ void retro_run(void)
                 break;
             case 0xfd:
                 if (!gbDataTAMA5.mapperLastTime)
+                    initRTC = true;
+                break;
+            case 0xfe:
+                if (!gbDataHuC3.mapperLastTime)
                     initRTC = true;
                 break;
             }
