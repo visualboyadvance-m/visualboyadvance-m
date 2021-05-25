@@ -309,7 +309,7 @@ void* retro_get_memory_data(unsigned id)
             data = (gbCgbMode ? gbVram : (gbMemory + 0x8000));
             break;
         case RETRO_MEMORY_RTC:
-            //if (gbBattery/* && gbRTCPresent*/)
+            if (gbRTCPresent)
                 data = gb_rtcdata_prt();
             break;
         }
@@ -357,7 +357,8 @@ size_t retro_get_memory_size(unsigned id)
             size = gbCgbMode ? 0x4000 : 0x2000;
             break;
         case RETRO_MEMORY_RTC:
-            size = gb_rtcdata_size();
+            if (gbRTCPresent)
+                size = gb_rtcdata_size();
             break;
         }
         break;
