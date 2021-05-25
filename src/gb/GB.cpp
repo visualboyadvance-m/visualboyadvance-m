@@ -5515,6 +5515,8 @@ unsigned int gbWriteSaveState(uint8_t* data, unsigned)
     utilWriteMem(data, &gbDataMBC5, sizeof(gbDataMBC5));
     utilWriteMem(data, &gbDataHuC1, sizeof(gbDataHuC1));
     utilWriteMem(data, &gbDataHuC3, sizeof(gbDataHuC3));
+    if (gbRomType == 0xfe) // HuC3 rtc data
+        utilWriteMem(data, &gbRTCHuC3, sizeof(gbRTCHuC3));
     utilWriteMem(data, &gbDataTAMA5, sizeof(gbDataTAMA5));
     if (gbTAMA5ram != NULL)
         utilWriteMem(data, gbTAMA5ram, gbTAMA5ramSize);
@@ -5632,6 +5634,8 @@ bool gbReadSaveState(const uint8_t* data, unsigned)
     utilReadMem(&gbDataMBC5, data, sizeof(gbDataMBC5));
     utilReadMem(&gbDataHuC1, data, sizeof(gbDataHuC1));
     utilReadMem(&gbDataHuC3, data, sizeof(gbDataHuC3));
+    if (gbRomType == 0xfe) // HuC3 rtc data
+        utilReadMem(&gbRTCHuC3, data, sizeof(gbRTCHuC3));
     utilReadMem(&gbDataTAMA5, data, sizeof(gbDataTAMA5));
     if (gbTAMA5ram != NULL) {
         utilReadMem(gbTAMA5ram, data, gbTAMA5ramSize);

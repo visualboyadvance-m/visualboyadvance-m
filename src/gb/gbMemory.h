@@ -77,12 +77,6 @@ struct mapperHuC1 {
     int mapperRAMAddress;
 };
 
-enum {
-    HUC3_READ = 0,
-    HUC3_WRITE = 1,
-    HUC3_NONE = 2
-};
-
 struct mapperHuC3 {
     int mapperRAMEnable;
     int mapperROMBank;
@@ -93,14 +87,29 @@ struct mapperHuC3 {
     int mapperRAMValue;
     int mapperRegister1;
     int mapperRegister2;
-    int mapperDateTime;
-    int mapperWritingTime;
-    int mapperModeFlag;
-    int mapperClockShift;
+    int mapperRegister3;
+    int mapperRegister4;
+    int mapperRegister5;
+    int mapperRegister6;
+    int mapperRegister7;
+    int mapperRegister8;
+};
+
+enum {
+    HUC3_READ = 0,
+    HUC3_WRITE = 1,
+    HUC3_NONE = 2
+};
+
+struct mapperHuC3RTC {
     union {
         time_t mapperLastTime;
         uint64_t _time_pad; /* so that 32bit and 64bit saves are compatible */
     };
+    uint32_t mapperDateTime;
+    uint32_t mapperWritingTime;
+    uint32_t mapperModeFlag;
+    uint32_t mapperClockShift;
 };
 
 struct mapperTAMA5 {
@@ -155,6 +164,7 @@ extern mapperMBC3 gbDataMBC3;
 extern mapperMBC5 gbDataMBC5;
 extern mapperHuC1 gbDataHuC1;
 extern mapperHuC3 gbDataHuC3;
+extern mapperHuC3RTC gbRTCHuC3;
 extern mapperTAMA5 gbDataTAMA5;
 extern mapperMMM01 gbDataMMM01;
 extern mapperGS3 gbDataGS3;

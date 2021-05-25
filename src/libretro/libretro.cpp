@@ -173,7 +173,7 @@ static void* gb_rtcdata_prt(void)
     case 0xfd: // TAMA5 + extended
         return &gbDataTAMA5.mapperSeconds;
     case 0xfe: // HuC3 + Clock
-        return &gbDataHuC3.mapperDateTime;
+        return &gbRTCHuC3.mapperLastTime;
     }
     return NULL;
 }
@@ -187,7 +187,7 @@ static size_t gb_rtcdata_size(void)
     case 0xfd: // TAMA5 + extended
         return TAMA5_RTC_DATA_SIZE;
     case 0xfe: // HuC3 + Clock
-        return HUC3_RTC_DATA_SIZE;
+        return sizeof(gbRTCHuC3);
     }
     return 0;
 }
@@ -1438,7 +1438,7 @@ void retro_run(void)
                     initRTC = true;
                 break;
             case 0xfe:
-                if (!gbDataHuC3.mapperLastTime)
+                if (!gbRTCHuC3.mapperLastTime)
                     initRTC = true;
                 break;
             }
