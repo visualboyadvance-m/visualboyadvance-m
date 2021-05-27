@@ -161,9 +161,6 @@ static void set_gbPalette(void)
     }
 }
 
-extern void memoryupdateHuC3Clock();
-extern void memoryupdateHuC3Latch();
-
 static void* gb_rtcdata_prt(void)
 {
     switch (gbRomType) {
@@ -187,7 +184,7 @@ static size_t gb_rtcdata_size(void)
     case 0xfd: // TAMA5 + extended
         return TAMA5_RTC_DATA_SIZE;
     case 0xfe: // HuC3 + Clock
-        return sizeof(gbRTCHuC3);
+        return sizeof(gbRTCHuC3.mapperLastTime);
     }
     return 0;
 }
@@ -239,8 +236,7 @@ static void gbInitRTC(void)
         }
         break;
     case 0xfe:
-        //memoryupdateHuC3Clock();
-        memoryupdateHuC3Latch();
+        gbRTCHuC3.mapperLastTime = rawtime;
         break;
     }
 }

@@ -2764,6 +2764,8 @@ void gbReset()
 
     memset(&gbDataHuC3, 0, sizeof(gbDataHuC3));
     gbDataHuC3.mapperROMBank = 1;
+    gbDataHuC3.mapperRAMValue = 1;
+    gbRTCHuC3.memoryTimerRead = 1;
 
     memset(&gbDataTAMA5, 0, 26 * sizeof(int));
     gbDataTAMA5.mapperROMBank = 1;

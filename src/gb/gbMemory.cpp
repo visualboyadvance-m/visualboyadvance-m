@@ -1016,19 +1016,16 @@ mapperHuC3RTC gbRTCHuC3 = {
     0 // ClockShift
 };
 
-void memoryupdateHuC3Latch() {
+void memoryUpdateHuC3Latch() {
 	uint64_t now = time(NULL);
     uint64_t diff = now - gbRTCHuC3.mapperLastTime;
+    unsigned minute = (diff / 60) % 1440;
+    unsigned day = (diff / 86400) & 0xFFF;
 
-    if (diff > 0) {
-        unsigned minute = (diff / 60) % 1440;
-        unsigned day = (diff / 86400) & 0xFFF;
-
-        gbRTCHuC3.mapperDateTime = (day << 12) | minute;
-    }
+    gbRTCHuC3.mapperDateTime = (day << 12) | minute;
 }
 
-void memoryupdateHuC3Clock() {
+void memoryUpdateHuC3Clock() {
     uint64_t now = time(NULL);
     unsigned minute = (gbRTCHuC3.mapperWritingTime & 0xFFF) % 1440;
     unsigned day = (gbRTCHuC3.mapperWritingTime & 0xFFF000) >> 12;
@@ -1105,9 +1102,10 @@ void mapperHuC3RAM(uint16_t address, uint8_t value)
         }
     } else {
         if (gbDataHuC3.mapperRAMFlag == 0x0b) {
-            if (value == 0x62) {
-                gbDataHuC3.mapperRAMValue = 1;
-            } else {
+            //if (value == 0x62) {
+                //gbDataHuC3.mapperRAMValue = 1;
+            //} else
+            {
                 switch (value & 0xf0) {
                 case 0x10:
                     /*p = &gbDataHuC3.mapperRegister2;
@@ -1116,8 +1114,8 @@ void mapperHuC3RAM(uint16_t address, uint8_t value)
                         gbDataHuC3.mapperRegister1 = 0;*/
 
                     // read time
-                    memoryupdateHuC3Latch();
-                    if (gbRTCHuC3.mapperModeFlag == HUC3_READ) {
+                    memoryUpdateHuC3Latch();
+                    if (gbRTCHuC3.memoryTimerRead) {
                         gbDataHuC3.mapperRAMValue = (gbRTCHuC3.mapperDateTime >> gbRTCHuC3.mapperClockShift) & 0x0F;
                         gbRTCHuC3.mapperClockShift += 4;
                         if (gbRTCHuC3.mapperClockShift > 24)
@@ -1132,15 +1130,15 @@ void mapperHuC3RAM(uint16_t address, uint8_t value)
                     gbDataHuC3.mapperAddress = (gbDataHuC3.mapperRegister6 << 24) | (gbDataHuC3.mapperRegister5 << 16) | (gbDataHuC3.mapperRegister4 << 8) | (gbDataHuC3.mapperRegister3 << 4) | (gbDataHuC3.mapperRegister2);*/
 
                     // write time
-                    if (gbRTCHuC3.mapperModeFlag == HUC3_WRITE) {
+                    if (!gbRTCHuC3.memoryTimerRead) {
                         if (gbRTCHuC3.mapperClockShift == 0)
                             gbRTCHuC3.mapperWritingTime = 0;
-                        if (gbRTCHuC3.mapperClockShift <= 24) {
+                        if (gbRTCHuC3.mapperClockShift < 24) {
                             gbRTCHuC3.mapperWritingTime |= (value & 0x0F) << gbRTCHuC3.mapperClockShift;
                             gbRTCHuC3.mapperClockShift += 4;
                             if (gbRTCHuC3.mapperClockShift == 24) {
-                                memoryupdateHuC3Clock();
-                                gbRTCHuC3.mapperModeFlag = HUC3_READ;
+                                memoryUpdateHuC3Clock();
+                                gbRTCHuC3.memoryTimerRead = 1;
                             }
                         }
                     }
@@ -1164,11 +1162,11 @@ void mapperHuC3RAM(uint16_t address, uint8_t value)
                         break;
                     case 0x3:
                         // write time?
-                        gbRTCHuC3.mapperModeFlag = HUC3_WRITE;
+                        gbRTCHuC3.memoryTimerRead = 0;
                         gbRTCHuC3.mapperClockShift = 0;
                         break;
                     case 0x7:
-                        gbRTCHuC3.mapperModeFlag = HUC3_READ;
+                        gbRTCHuC3.memoryTimerRead = 1;
                         gbRTCHuC3.mapperClockShift = 0;
                         break;
                         // others are unimplemented so far
@@ -1178,8 +1176,8 @@ void mapperHuC3RAM(uint16_t address, uint8_t value)
                     //gbDataHuC3.mapperRegister1 = (gbDataHuC3.mapperRegister1 & 0x0f) | ((value << 4) & 0x0f);
                     break;
                 case 0x60:
-                    gbRTCHuC3.mapperModeFlag = HUC3_READ; // ???
-                    gbDataHuC3.mapperRAMValue = 1;
+                    gbRTCHuC3.memoryTimerRead = 1; // ???
+                    //gbDataHuC3.mapperRAMValue = 1;
                     break;
                 default:
                     //gbDataHuC3.mapperRAMValue = 1;

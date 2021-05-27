@@ -95,21 +95,16 @@ struct mapperHuC3 {
     int mapperRegister8;
 };
 
-enum {
-    HUC3_READ = 0,
-    HUC3_WRITE = 1,
-    HUC3_NONE = 2
-};
-
 struct mapperHuC3RTC {
     union {
         time_t mapperLastTime;
         uint64_t _time_pad; /* so that 32bit and 64bit saves are compatible */
     };
-    uint32_t mapperDateTime;
-    uint32_t mapperWritingTime;
-    uint32_t mapperModeFlag;
-    uint32_t mapperClockShift;
+    unsigned mapperDateTime;
+    unsigned mapperWritingTime;
+    unsigned memoryTimerRead;
+    unsigned mapperClockShift;
+    unsigned reserved[4];
 };
 
 struct mapperTAMA5 {
