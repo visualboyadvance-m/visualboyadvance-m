@@ -4,13 +4,14 @@
 # 
 # Translators:
 # Alexander Angulo <alex.angulo2001@gmail.com>, 2020
+# Jorge Ratti <valentinaratti123@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2020-12-17 05:28+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2021-05-25 21:55+0000\n"
+"Last-Translator: Jorge Ratti <valentinaratti123@gmail.com>\n"
 "Language-Team: Spanish (Chile) (http://www.transifex.com/bgk/vba-m/language/es_CL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -44,19 +45,19 @@ msgstr "Comenzar en pantalla completa"
 
 #: wxvbam.cpp:526
 msgid "Set a configuration file"
-msgstr ""
+msgstr "Ingresar archivo de configuración"
 
 #: wxvbam.cpp:530
 msgid "Delete shared link state first, if it exists"
-msgstr ""
+msgstr "Borrar estado de enlace compartido primero, si aún existe"
 
 #: wxvbam.cpp:537
 msgid "List all settable options and exit"
-msgstr ""
+msgstr "Listar todas las opciones disponibles y salir"
 
 #: wxvbam.cpp:540
 msgid "ROM file"
-msgstr ""
+msgstr "Archivo ROM"
 
 #: wxvbam.cpp:542
 msgid "<config>=<value>"
@@ -64,7 +65,7 @@ msgstr ""
 
 #: wxvbam.cpp:573
 msgid "Configuration/build error: can't find built-in xrc"
-msgstr ""
+msgstr "Error de Configuración/build: no se pudo encontrar built-in xrc"
 
 #: wxvbam.cpp:581
 #, c-format
@@ -96,7 +97,7 @@ msgid ""
 "\n"
 "For flag options, true and false are specified as 1 and 0, respectively.\n"
 "\n"
-msgstr ""
+msgstr "El Set de opciones de la línea de comando será guardado si se hace algún cambio en la configuración de la Interfaz de usuario.\n\nPara opciones de reporte, verdadero y falso se especifican como 1 y 0, respectivamente.\n\n"
 
 #: wxvbam.cpp:648
 msgid ""
@@ -110,7 +111,7 @@ msgstr ""
 
 #: wxvbam.cpp:693
 msgid "Bad configuration option or multiple ROM files given:\n"
-msgstr ""
+msgstr "Mala opción de configuración o múltiples archivos ROM  ingresados:\n"
 
 #: guiinit.cpp:81
 msgid "Start!"
@@ -118,7 +119,7 @@ msgstr ""
 
 #: guiinit.cpp:100 xrc/NetLink.xrc:99
 msgid "Connect"
-msgstr ""
+msgstr "Conectar"
 
 #: guiinit.cpp:117
 msgid "You must enter a valid host name"
@@ -130,7 +131,7 @@ msgstr ""
 
 #: guiinit.cpp:136
 msgid "Waiting for clients..."
-msgstr ""
+msgstr "Esperando por clientes..."
 
 #: guiinit.cpp:137
 #, c-format

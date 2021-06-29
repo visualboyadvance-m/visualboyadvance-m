@@ -14,15 +14,16 @@
 # Michele Rebughini <michelerebughini@gmail.com>, 2020
 # OTTO X <blg.dpnx@gmail.com>, 2015
 # Picat <pichu474android@gmail.com>, 2016
-# Seb47TV <seb47tv@gmail.com>, 2016
-# Seb47TV <seb47tv@gmail.com>, 2016
+# Seb47 <seb47tv@gmail.com>, 2021
+# Seb47 <seb47tv@gmail.com>, 2016
+# Seb47 <seb47tv@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2020-12-17 05:28+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2021-05-20 23:04+0000\n"
+"Last-Translator: Seb47 <seb47tv@gmail.com>\n"
 "Language-Team: Italian (Italy) (http://www.transifex.com/bgk/vba-m/language/it_IT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -56,7 +57,7 @@ msgstr "Avvia in modalità schermo intero"
 
 #: wxvbam.cpp:526
 msgid "Set a configuration file"
-msgstr ""
+msgstr "Imposta un file di configurazione"
 
 #: wxvbam.cpp:530
 msgid "Delete shared link state first, if it exists"
@@ -118,7 +119,7 @@ msgstr "I comandi disponibili per la Tastiera/* option sono:\n\n"
 
 #: wxvbam.cpp:660
 msgid "Configuration file not found."
-msgstr ""
+msgstr "File di configurazione non trovato"
 
 #: wxvbam.cpp:693
 msgid "Bad configuration option or multiple ROM files given:\n"
@@ -827,7 +828,7 @@ msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr ""
+msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA team di sviluppo\nCopyright (C) 2007-2020 VBA-M team di sviluppo"
 
 #: cmdevents.cpp:2826
 msgid ""
@@ -843,7 +844,7 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program.  If not, see http://www.gnu.org/licenses ."
-msgstr "Questo programma è un software gratuito: puoi ridistribuirlo e/o modificarlo\nrispettando i termini della GNU General Public License pubblicata dalla\nFree Software Foundation, sia la versione due della licenza, o\n(a tua scelta) una qualunque versione successiva.\n\nQuesto programma è distribuito nella speranza che sia utile,\nma SENZA ALCUNA GARANZIA; senza neppure la garanzia di\nCOMMERCIABILITÀ o IDONEITÀ PER FINALITÀ PARTICOLARI.\nConsulta la GNU General Public License per maggiori dettagli.\n\nDovresti aver ricevuto una copia della GNU General Public License\nassieme a questo programma. Altrimenti, consulta http://www.gnu.org/licenses ."
+msgstr "Questo programma è un software gratuito: puoi ridistribuirlo e/o modificarlo\nrispettando i termini della GNU General Public License pubblicata dalla\nFree Software Foundation, sia la versione 2 della licenza, o\n(a tua scelta) una qualunque versione successiva.\n\nQuesto programma è distribuito nella speranza che sia utile,\nma SENZA ALCUNA GARANZIA; senza neppure la garanzia di\nCOMMERCIABILITÀ o IDONEITÀ PER FINALITÀ PARTICOLARI.\nConsulta la GNU General Public License per maggiori dettagli.\n\nDovresti aver ricevuto una copia della GNU General Public License\nassieme a questo programma. Altrimenti, consulta http://www.gnu.org/licenses ."
 
 #: cmdevents.cpp:3136
 msgid "LAN link is already active.  Disable link mode to disconnect."
@@ -1052,7 +1053,7 @@ msgstr "Assegnazione glXSwapIntervalMESA fallita"
 
 #: panel.cpp:2304
 msgid "No support for wglGetExtensionsStringEXT"
-msgstr ""
+msgstr "Nessun supporto per wglGetExtensionsStringEXT"
 
 #: panel.cpp:2307
 msgid "No support for WGL_EXT_swap_control"
@@ -1165,12 +1166,12 @@ msgstr "CONTROL"
 #: widgets/sdljoy.cpp:137
 #, c-format
 msgid "Connected joystick %d: %s"
-msgstr ""
+msgstr "Joystick Collegato %d:%s"
 
 #: widgets/sdljoy.cpp:152
 #, c-format
 msgid "Disconnected joystick %d"
-msgstr ""
+msgstr "Joystick disconnesso %d"
 
 #: xaudio2.cpp:35
 msgid "XAudio2: Enumerating devices failed!"
@@ -2214,7 +2215,7 @@ msgstr "Tipo di salvataggio"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file :"
-msgstr ""
+msgstr "File BIOS:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file :"
@@ -2329,7 +2330,7 @@ msgstr "File GB Boot &ROM:"
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
-msgstr ""
+msgstr "Seleziona un file"
 
 #: xrc/GameBoyConfig.xrc:106
 msgid "GBC Boot ROM &file :"
@@ -2337,11 +2338,11 @@ msgstr "File ROM di avvio GBC :"
 
 #: xrc/GameBoyConfig.xrc:131
 msgid "Current GB BIOS file :"
-msgstr "File BIOS (GB) corrente: "
+msgstr "File BIOS GB corrente: "
 
 #: xrc/GameBoyConfig.xrc:152
 msgid "Current GBC BIOS file :"
-msgstr "File BIOS (GBC) corrente:"
+msgstr "File BIOS GBC corrente:"
 
 #: xrc/GameBoyConfig.xrc:186
 msgid "User 1"
@@ -2402,7 +2403,7 @@ msgstr "0 = senza limite"
 
 #: xrc/GeneralConfig.xrc:114
 msgid "Unlimited"
-msgstr ""
+msgstr "Illimitato"
 
 #: xrc/IOViewer.xrc:4
 msgid "IO Viewer"
@@ -3082,11 +3083,11 @@ msgstr "&Input"
 
 #: xrc/MainMenu.xrc:430
 msgid "Allow &keyboard background input"
-msgstr ""
+msgstr "Consenti l'input &tastiera in background"
 
 #: xrc/MainMenu.xrc:434
 msgid "Allow &joystick background input"
-msgstr ""
+msgstr "Consenti l'input &joystick in background"
 
 #: xrc/MainMenu.xrc:439
 msgid "&Autofire"
@@ -3134,11 +3135,11 @@ msgstr "&Stampa debug"
 
 #: xrc/MainMenu.xrc:520 xrc/MainMenu.xrc:535
 msgid "&LCD Filter"
-msgstr ""
+msgstr "Filtro &LCD"
 
 #: xrc/MainMenu.xrc:531
 msgid "&GB color option"
-msgstr ""
+msgstr "Opzioni di colore &GB"
 
 #: xrc/MainMenu.xrc:539
 msgid "&GB printer"
@@ -3178,7 +3179,7 @@ msgstr "&Scorciatoie da Tastiera ..."
 
 #: xrc/MainMenu.xrc:573
 msgid "&UI Settings ..."
-msgstr ""
+msgstr "Impostazioni &UI ..."
 
 #: xrc/MainMenu.xrc:577
 msgid "&Tools"
@@ -3626,16 +3627,16 @@ msgstr "Impostazioni SpeedUp / Turbo"
 
 #: xrc/SpeedupConfig.xrc:9
 msgid "Speedup Throttle"
-msgstr ""
+msgstr "Acceleratore"
 
 #: xrc/SpeedupConfig.xrc:50
 msgid "Frame skip"
-msgstr ""
+msgstr "Salta Frame"
 
 #: xrc/UIConfig.xrc:4
 msgid "User Interface Settings"
-msgstr ""
+msgstr "Impostazioni Interfaccia Utente"
 
 #: xrc/UIConfig.xrc:9
 msgid "Hide Menu Bar"
-msgstr ""
+msgstr "Nascondi La Barra Dei Menù"

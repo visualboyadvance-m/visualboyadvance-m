@@ -9,6 +9,7 @@
 # javidg96, 2015
 # jorge perez <theghostxxaz@gmail.com>, 2021
 # Jose Castillo <josecastillo.prz85@gmail.com>, 2021
+# Manu 3L <comokaka777@gmail.com>, 2021
 # Marco123V <MarcoVillalejos@hotmail.com>, 2015
 # Marco Yurazeck <luthias@gmail.com>, 2020
 # MELERIX, 2015
@@ -20,8 +21,8 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2021-02-01 11:36+0000\n"
-"Last-Translator: Jose Castillo <josecastillo.prz85@gmail.com>\n"
+"PO-Revision-Date: 2021-03-21 19:51+0000\n"
+"Last-Translator: Manu 3L <comokaka777@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/bgk/vba-m/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -146,7 +147,7 @@ msgstr "Esperando clientes..."
 #: guiinit.cpp:137
 #, c-format
 msgid "Server IP address is: %s\n"
-msgstr ""
+msgstr "La dirección del servidor IP es: %s\n"
 
 #: guiinit.cpp:139
 msgid "Waiting for connection..."
@@ -161,7 +162,7 @@ msgstr "Conectando a %s \n"
 msgid ""
 "Error occurred.\n"
 "Please try again."
-msgstr ""
+msgstr "Ha ocurrido un error.\nPor favor, inténtelo de nuevo."
 
 #: guiinit.cpp:240 guiinit.cpp:293
 msgid "Select cheat file"
@@ -201,7 +202,7 @@ msgstr ""
 
 #: guiinit.cpp:757
 msgid "Generic Code"
-msgstr ""
+msgstr "Código Genérico"
 
 #: guiinit.cpp:758
 msgid "GameShark Advance"
@@ -217,7 +218,7 @@ msgstr ""
 
 #: guiinit.cpp:828 guiinit.cpp:1083
 msgid "Number cannot be empty"
-msgstr ""
+msgstr "El número no puede estar vacío"
 
 #: guiinit.cpp:866
 #, c-format
@@ -636,7 +637,7 @@ msgstr "Error al cargar la batería %s"
 
 #: cmdevents.cpp:918
 msgid "Select code file"
-msgstr ""
+msgstr "Seleccionar archivo de código"
 
 #: cmdevents.cpp:919
 msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
@@ -650,7 +651,7 @@ msgstr ""
 msgid ""
 "Importing a code file will replace any loaded cheats.  Do you want to "
 "continue?"
-msgstr ""
+msgstr "Importar un archivo de código reemplazará cualquier truco cargado. ¿Desea continuar?"
 
 #: cmdevents.cpp:945
 #, c-format
@@ -670,7 +671,7 @@ msgstr ""
 #: cmdevents.cpp:1027
 #, c-format
 msgid "Error loading code file %s"
-msgstr ""
+msgstr "Error al cargar el archivo de código%s"
 
 #: cmdevents.cpp:1038 cmdevents.cpp:1114
 msgid "Select snapshot file"
@@ -897,7 +898,7 @@ msgstr ""
 #: sys.cpp:199
 #, c-format
 msgid "Cannot open recording file %s"
-msgstr ""
+msgstr "No se puede abrir el archivo de grabación%s"
 
 #: sys.cpp:206 sys.cpp:216
 msgid "Error reading game recording"
@@ -905,7 +906,7 @@ msgstr ""
 
 #: sys.cpp:322
 msgid "Playback ended"
-msgstr ""
+msgstr "Acabo la repetición"
 
 #: sys.cpp:341
 #, c-format
@@ -959,7 +960,7 @@ msgstr ""
 
 #: panel.cpp:108 panel.cpp:169 panel.cpp:234
 msgid "Problem loading file"
-msgstr ""
+msgstr "Problema al cargar el archivo"
 
 #: panel.cpp:168
 #, c-format
@@ -969,7 +970,7 @@ msgstr ""
 #: panel.cpp:210 panel.cpp:310
 #, c-format
 msgid "Could not load BIOS %s"
-msgstr ""
+msgstr "No se pudo cargar la BIOS%s"
 
 #: panel.cpp:233
 #, c-format
@@ -978,27 +979,27 @@ msgstr ""
 
 #: panel.cpp:469
 msgid " player "
-msgstr ""
+msgstr "jugador"
 
 #: panel.cpp:637
 #, c-format
 msgid "Loaded state %s"
-msgstr ""
+msgstr "Estado cargado%s"
 
 #: panel.cpp:637
 #, c-format
 msgid "Error loading state %s"
-msgstr ""
+msgstr "Error al cargar el estado%s"
 
 #: panel.cpp:661
 #, c-format
 msgid "Saved state %s"
-msgstr ""
+msgstr "Estado guardado%s"
 
 #: panel.cpp:661
 #, c-format
 msgid "Error saving state %s"
-msgstr ""
+msgstr "Error al cargar el estado guardado%s"
 
 #: panel.cpp:865
 #, c-format
@@ -1008,7 +1009,7 @@ msgstr ""
 #: panel.cpp:903
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
-msgstr ""
+msgstr "Modo pantalla completa %dx%d-%d@%d no soportado"
 
 #: panel.cpp:908
 #, c-format
@@ -1027,7 +1028,7 @@ msgstr ""
 
 #: panel.cpp:1008
 msgid "Not a valid GBA cartridge"
-msgstr ""
+msgstr "Cartucho de GBA no válido"
 
 #: panel.cpp:1172
 msgid "No memory for rewinding"
@@ -1083,7 +1084,7 @@ msgstr ""
 
 #: panel.cpp:2432
 msgid "programming error; aborting!"
-msgstr ""
+msgstr "error de programación, ¡abortando!"
 
 #: panel.cpp:2444 panel.cpp:2473
 #, c-format
@@ -1282,7 +1283,7 @@ msgstr ""
 
 #: xrc/CheatAdd.xrc:4
 msgid "Add Cheat"
-msgstr ""
+msgstr "Añadir truco"
 
 #: xrc/CheatAdd.xrc:9 xrc/CheatEdit.xrc:9
 msgid "&Description"
@@ -1294,11 +1295,11 @@ msgstr ""
 
 #: xrc/CheatAdd.xrc:77
 msgid "Format"
-msgstr ""
+msgstr "Formato"
 
 #: xrc/CheatCreate.xrc:4
 msgid "Cheat Search"
-msgstr ""
+msgstr "Buscar truco"
 
 #: xrc/CheatCreate.xrc:23
 msgid "E&qual"
@@ -1358,7 +1359,7 @@ msgstr ""
 
 #: xrc/CheatCreate.xrc:127
 msgid "Data size"
-msgstr ""
+msgstr "Tamaño de los datos"
 
 #: xrc/CheatCreate.xrc:144
 msgid "Ol&d value"
@@ -1370,7 +1371,7 @@ msgstr ""
 
 #: xrc/CheatCreate.xrc:163
 msgid "Search value"
-msgstr ""
+msgstr "Buscar valor"
 
 #: xrc/CheatCreate.xrc:181
 msgid "&Search"
@@ -1397,7 +1398,7 @@ msgstr ""
 
 #: xrc/CheatEdit.xrc:4
 msgid "Edit Cheat"
-msgstr ""
+msgstr "Editar truco"
 
 #: xrc/CheatEdit.xrc:31 xrc/MainMenu.xrc:275
 msgid "&Type"
@@ -2296,7 +2297,7 @@ msgstr ""
 
 #: xrc/GameBoyConfig.xrc:32 xrc/SoundConfig.xrc:290
 msgid "Game Boy"
-msgstr ""
+msgstr "Game Boy"
 
 #: xrc/GameBoyConfig.xrc:33 xrc/SoundConfig.xrc:335
 msgid "Game Boy Advance"
@@ -2304,7 +2305,7 @@ msgstr ""
 
 #: xrc/GameBoyConfig.xrc:34
 msgid "Super Game Boy 2"
-msgstr ""
+msgstr "Super Game Boy 2"
 
 #: xrc/GameBoyConfig.xrc:48
 msgid "Display &borders :"
@@ -2312,15 +2313,15 @@ msgstr ""
 
 #: xrc/GameBoyConfig.xrc:57
 msgid "Never"
-msgstr ""
+msgstr "Nunca"
 
 #: xrc/GameBoyConfig.xrc:58
 msgid "Always"
-msgstr ""
+msgstr "Siempre"
 
 #: xrc/GameBoyConfig.xrc:72
 msgid "System"
-msgstr ""
+msgstr "Sistema"
 
 #: xrc/GameBoyConfig.xrc:84
 msgid "GB Boot &ROM file :"
@@ -2328,7 +2329,7 @@ msgstr ""
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
-msgstr ""
+msgstr "Selecciona un archivo"
 
 #: xrc/GameBoyConfig.xrc:106
 msgid "GBC Boot ROM &file :"
@@ -2344,27 +2345,27 @@ msgstr ""
 
 #: xrc/GameBoyConfig.xrc:186
 msgid "User 1"
-msgstr ""
+msgstr "Usuario 1"
 
 #: xrc/GameBoyConfig.xrc:192
 msgid "User 2"
-msgstr ""
+msgstr "Usuario 2"
 
 #: xrc/GameBoyConfig.xrc:198
 msgid "Custom Colors"
-msgstr ""
+msgstr "Colores personalizados"
 
 #: xrc/GeneralConfig.xrc:4
 msgid "General settings"
-msgstr ""
+msgstr "Opciones generales"
 
 #: xrc/GeneralConfig.xrc:9
 msgid "General"
-msgstr ""
+msgstr "General"
 
 #: xrc/GeneralConfig.xrc:26
 msgid "Screenshot Format:"
-msgstr ""
+msgstr "Formato de la captura de pantalla:"
 
 #: xrc/GeneralConfig.xrc:33
 msgid "&PNG"
@@ -2564,7 +2565,7 @@ msgstr ""
 
 #: xrc/JoyPanel.xrc:483
 msgid "Screenshot"
-msgstr ""
+msgstr "Capturas de pantalla"
 
 #: xrc/JoyPanel.xrc:507
 msgid "Special"
@@ -2588,19 +2589,19 @@ msgstr ""
 
 #: xrc/JoypadConfig.xrc:13
 msgid "Player 1"
-msgstr ""
+msgstr "Jugador 1"
 
 #: xrc/JoypadConfig.xrc:19
 msgid "Player 2"
-msgstr ""
+msgstr "Jugador 2"
 
 #: xrc/JoypadConfig.xrc:25
 msgid "Player 3"
-msgstr ""
+msgstr "Jugador 3"
 
 #: xrc/JoypadConfig.xrc:31
 msgid "Player 4"
-msgstr ""
+msgstr "Jugador 4"
 
 #: xrc/LinkConfig.xrc:4
 msgid "Link configuration"
@@ -3009,7 +3010,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:345
 msgid "Change pixel filter"
-msgstr ""
+msgstr "Cambiar el filtro de píxeles"
 
 #: xrc/MainMenu.xrc:348
 msgid "Change interframe blending"
@@ -3337,7 +3338,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:730
 msgid "Translations"
-msgstr ""
+msgstr "Traducciones"
 
 #: xrc/MainMenu.xrc:738
 msgid "Check for updates"
@@ -3409,7 +3410,7 @@ msgstr ""
 
 #: xrc/MemViewer.xrc:4
 msgid "Memory Viewer"
-msgstr ""
+msgstr "Visor de memoria"
 
 #: xrc/MemViewer.xrc:17
 msgid "&8-bit"
@@ -3449,15 +3450,15 @@ msgstr "Jugadores:"
 
 #: xrc/NetLink.xrc:41
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: xrc/NetLink.xrc:49
 msgid "3"
-msgstr ""
+msgstr "3"
 
 #: xrc/NetLink.xrc:56
 msgid "4"
-msgstr ""
+msgstr "4"
 
 #: xrc/NetLink.xrc:67
 msgid "Server:"

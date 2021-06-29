@@ -5,13 +5,14 @@
 # Translators:
 # Ghostbird <gijsbertth@gmail.com>, 2012
 # M the Hane <meesdh@hotmail.com>, 2018-2019
+# Spencer, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2020-12-17 05:28+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2021-05-06 23:40+0000\n"
+"Last-Translator: Spencer\n"
 "Language-Team: Dutch (http://www.transifex.com/bgk/vba-m/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -298,7 +299,7 @@ msgstr "Hoofd icoon niet gevonden"
 
 #: guiinit.cpp:2750
 msgid "Browse"
-msgstr ""
+msgstr "Bladeren"
 
 #: guiinit.cpp:2764
 msgid "Main display panel not found"
@@ -2658,7 +2659,7 @@ msgstr "&Bestand"
 
 #: xrc/MainMenu.xrc:7
 msgid "Open..."
-msgstr ""
+msgstr "Openen..."
 
 #: xrc/MainMenu.xrc:10
 msgid "Open &GB..."

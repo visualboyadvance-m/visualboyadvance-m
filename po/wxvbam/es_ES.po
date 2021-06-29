@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Andreu van Walré, 2021
+# Carlos Aguadero <aguaderomartincarlos@gmail.com>, 2021
 # Daniel Carrasco <danielmadrid19@gmail.com>, 2016
 # Sergio . <serchoyt@gmail.com>, 2018
 msgid ""
@@ -11,8 +12,8 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2021-01-14 15:04+0000\n"
-"Last-Translator: Andreu van Walré\n"
+"PO-Revision-Date: 2021-04-26 07:01+0000\n"
+"Last-Translator: Carlos Aguadero <aguaderomartincarlos@gmail.com>\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/bgk/vba-m/language/es_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,7 +23,7 @@ msgstr ""
 
 #: wxvbam.cpp:226
 msgid "visualboyadvance-m"
-msgstr ""
+msgstr "visualboyadvance-m"
 
 #: wxvbam.cpp:443
 msgid "Could not create main window"
@@ -46,7 +47,7 @@ msgstr "Iniciar en modo pantalla completa"
 
 #: wxvbam.cpp:526
 msgid "Set a configuration file"
-msgstr ""
+msgstr "Selecione archivo de configuracion"
 
 #: wxvbam.cpp:530
 msgid "Delete shared link state first, if it exists"
@@ -58,11 +59,11 @@ msgstr ""
 
 #: wxvbam.cpp:540
 msgid "ROM file"
-msgstr ""
+msgstr "Archivo ROM"
 
 #: wxvbam.cpp:542
 msgid "<config>=<value>"
-msgstr ""
+msgstr "<config>=<value>"
 
 #: wxvbam.cpp:573
 msgid "Configuration/build error: can't find built-in xrc"
@@ -108,7 +109,7 @@ msgstr ""
 
 #: wxvbam.cpp:660
 msgid "Configuration file not found."
-msgstr ""
+msgstr "No funciona archivo de configuracion."
 
 #: wxvbam.cpp:693
 msgid "Bad configuration option or multiple ROM files given:\n"
@@ -120,7 +121,7 @@ msgstr ""
 
 #: guiinit.cpp:100 xrc/NetLink.xrc:99
 msgid "Connect"
-msgstr ""
+msgstr "Conectado"
 
 #: guiinit.cpp:117
 msgid "You must enter a valid host name"
@@ -128,11 +129,11 @@ msgstr ""
 
 #: guiinit.cpp:118
 msgid "Host name invalid"
-msgstr ""
+msgstr "Nombre de la Host invalido"
 
 #: guiinit.cpp:136
 msgid "Waiting for clients..."
-msgstr "Esperando clientes..."
+msgstr "Esperando al Cliente"
 
 #: guiinit.cpp:137
 #, c-format
@@ -141,7 +142,7 @@ msgstr "La IP del servidor es: %s\n"
 
 #: guiinit.cpp:139
 msgid "Waiting for connection..."
-msgstr ""
+msgstr "Esperando conexion..."
 
 #: guiinit.cpp:140
 #, c-format
@@ -156,7 +157,7 @@ msgstr "Se ha producido un error.\nInténtalo de nuevo"
 
 #: guiinit.cpp:240 guiinit.cpp:293
 msgid "Select cheat file"
-msgstr ""
+msgstr "Seleccionar archivo de trucos"
 
 #: guiinit.cpp:241
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
@@ -164,7 +165,7 @@ msgstr ""
 
 #: guiinit.cpp:260 panel.cpp:437
 msgid "Loaded cheats"
-msgstr ""
+msgstr "Trucos cargados"
 
 #: guiinit.cpp:294
 msgid "VBA cheat lists (*.clt)|*.clt"
@@ -180,11 +181,11 @@ msgstr ""
 
 #: guiinit.cpp:344 guiinit.cpp:363
 msgid "Removing cheats"
-msgstr ""
+msgstr "Borrando trucos"
 
 #: guiinit.cpp:754 xrc/JoyPanel.xrc:364
 msgid "GameShark"
-msgstr ""
+msgstr "GameShark"
 
 #: guiinit.cpp:755 cmdevents.cpp:676
 msgid "GameGenie"
@@ -192,15 +193,15 @@ msgstr "GameGenie"
 
 #: guiinit.cpp:757
 msgid "Generic Code"
-msgstr ""
+msgstr "Codigo Generico"
 
 #: guiinit.cpp:758
 msgid "GameShark Advance"
-msgstr ""
+msgstr "GameShark avanzado"
 
 #: guiinit.cpp:759
 msgid "CodeBreaker Advance"
-msgstr ""
+msgstr "CodeBreaker Avanzado"
 
 #: guiinit.cpp:760
 msgid "Flashcart CHT"
@@ -221,15 +222,15 @@ msgstr "La búsqueda no produjo resultados"
 
 #: guiinit.cpp:1041
 msgid "8-bit "
-msgstr ""
+msgstr "8-bit"
 
 #: guiinit.cpp:1045
 msgid "16-bit "
-msgstr ""
+msgstr "16-bit"
 
 #: guiinit.cpp:1049
 msgid "32-bit "
-msgstr ""
+msgstr "32-bit"
 
 #: guiinit.cpp:1055
 msgid "signed decimal"
@@ -246,7 +247,7 @@ msgstr ""
 #: guiinit.cpp:1541
 #, c-format
 msgid "%d frames = %.2f ms"
-msgstr ""
+msgstr "%d frames = %.2f ms"
 
 #: guiinit.cpp:1553
 msgid "Default device"
@@ -259,7 +260,7 @@ msgstr "Modo escritorio"
 #: guiinit.cpp:1734
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
-msgstr ""
+msgstr "%d x %d - %dbpp @ %dHz"
 
 #: guiinit.cpp:1847 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
@@ -275,15 +276,15 @@ msgstr ""
 
 #: guiinit.cpp:1908 xrc/DisplayConfig.xrc:107
 msgid "Plugin"
-msgstr ""
+msgstr "Plugin"
 
 #: guiinit.cpp:1936
 msgid "Please select a plugin or a different filter"
-msgstr ""
+msgstr "Porfavor seleccine un plugin o un filtro distinto"
 
 #: guiinit.cpp:1937
 msgid "Plugin selection error"
-msgstr ""
+msgstr "Error en la seleccion de plugin"
 
 #: guiinit.cpp:2150
 msgid "This will clear all user-defined accelerators.  Are you sure?"
@@ -291,7 +292,7 @@ msgstr ""
 
 #: guiinit.cpp:2150
 msgid "Confirm"
-msgstr ""
+msgstr "Confirmar"
 
 #: guiinit.cpp:2740
 msgid "Main icon not found"
@@ -299,7 +300,7 @@ msgstr ""
 
 #: guiinit.cpp:2750
 msgid "Browse"
-msgstr ""
+msgstr "Buscador"
 
 #: guiinit.cpp:2764
 msgid "Main display panel not found"
@@ -322,15 +323,15 @@ msgstr ""
 
 #: guiinit.cpp:3289
 msgid "Code"
-msgstr ""
+msgstr "Codigo"
 
 #: guiinit.cpp:3298
 msgid "Description"
-msgstr ""
+msgstr "Descripcion"
 
 #: guiinit.cpp:3372 xrc/CheatAdd.xrc:31
 msgid "Address"
-msgstr ""
+msgstr "Direccion"
 
 #: guiinit.cpp:3373
 msgid "Old Value"
@@ -342,7 +343,7 @@ msgstr "Valor nuevo"
 
 #: guiinit.cpp:3895
 msgid "Menu commands"
-msgstr ""
+msgstr "Menu de comandos"
 
 #: guiinit.cpp:3918
 msgid "Other commands"
@@ -360,7 +361,7 @@ msgstr ""
 #: cmdevents.cpp:1158 cmdevents.cpp:1236 cmdevents.cpp:1306 cmdevents.cpp:1333
 #: viewsupt.cpp:1181
 msgid "Select output file"
-msgstr ""
+msgstr "Seleccion archivo de salida"
 
 #: viewers.cpp:698 viewers.cpp:770
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
@@ -372,67 +373,67 @@ msgstr ""
 
 #: viewers.cpp:814
 msgid "0x00000000 - BIOS"
-msgstr ""
+msgstr "0x00000000 - BIOS"
 
 #: viewers.cpp:815
 msgid "0x02000000 - WRAM"
-msgstr ""
+msgstr "0x02000000 - WRAM"
 
 #: viewers.cpp:816
 msgid "0x03000000 - IRAM"
-msgstr ""
+msgstr "0x03000000 - IRAM"
 
 #: viewers.cpp:817
 msgid "0x04000000 - I/O"
-msgstr ""
+msgstr "0x04000000 - I/O"
 
 #: viewers.cpp:818
 msgid "0x05000000 - PALETTE"
-msgstr ""
+msgstr "0x05000000 - PALETTE"
 
 #: viewers.cpp:819
 msgid "0x06000000 - VRAM"
-msgstr ""
+msgstr "0x06000000 - VRAM"
 
 #: viewers.cpp:820
 msgid "0x07000000 - OAM"
-msgstr ""
+msgstr "0x07000000 - OAM"
 
 #: viewers.cpp:821
 msgid "0x08000000 - ROM"
-msgstr ""
+msgstr "0x08000000 - ROM"
 
 #: viewers.cpp:924
 msgid "0x0000 - ROM"
-msgstr ""
+msgstr "0x0000 - ROM"
 
 #: viewers.cpp:925
 msgid "0x4000 - ROM"
-msgstr ""
+msgstr "0x4000 - ROM"
 
 #: viewers.cpp:926
 msgid "0x8000 - VRAM"
-msgstr ""
+msgstr "0x8000 - VRAM"
 
 #: viewers.cpp:927
 msgid "0xA000 - SRAM"
-msgstr ""
+msgstr "0xA000 - SRAM"
 
 #: viewers.cpp:928
 msgid "0xC000 - RAM"
-msgstr ""
+msgstr "0xC000 - RAM"
 
 #: viewers.cpp:929
 msgid "0xD000 - WRAM"
-msgstr ""
+msgstr "0xD000 - WRAM"
 
 #: viewers.cpp:930
 msgid "0xFF00 - I/O"
-msgstr ""
+msgstr "0xFF00 - I/O"
 
 #: viewers.cpp:931
 msgid "0xFF80 - RAM"
-msgstr ""
+msgstr "0xFF80 - RAM"
 
 #: gfxviewers.cpp:1141
 msgid "Select output file and type"
@@ -817,7 +818,7 @@ msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr ""
+msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2020 VBA-M development team"
 
 #: cmdevents.cpp:2826
 msgid ""
@@ -833,7 +834,7 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program.  If not, see http://www.gnu.org/licenses ."
-msgstr ""
+msgstr "This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see http://www.gnu.org/licenses ."
 
 #: cmdevents.cpp:3136
 msgid "LAN link is already active.  Disable link mode to disconnect."
@@ -901,16 +902,16 @@ msgstr "Repetición terminada"
 #: sys.cpp:341
 #, c-format
 msgid "%d%%(%d, %d fps)"
-msgstr ""
+msgstr "%d%%(%d, %d fps)"
 
 #: sys.cpp:349
 #, c-format
 msgid "%d%%"
-msgstr ""
+msgstr "%d%%"
 
 #: sys.cpp:768 xrc/GBPrinter.xrc:65
 msgid "&Discard"
-msgstr ""
+msgstr "&Discard"
 
 #: sys.cpp:802
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
@@ -1098,59 +1099,59 @@ msgstr ""
 
 #: viewsupt.cpp:777
 msgid "R:"
-msgstr ""
+msgstr "R:"
 
 #: viewsupt.cpp:786
 msgid "G:"
-msgstr ""
+msgstr "G:"
 
 #: viewsupt.cpp:795
 msgid "B:"
-msgstr ""
+msgstr "B:"
 
 #: widgets/keyedit.cpp:122 widgets/keyedit.cpp:280
 msgid "SHIFT"
-msgstr ""
+msgstr "SHIFT"
 
 #: widgets/keyedit.cpp:126 widgets/keyedit.cpp:279
 msgid "ALT"
-msgstr ""
+msgstr "ALT"
 
 #: widgets/keyedit.cpp:130 widgets/keyedit.cpp:287
 msgid "CTRL"
-msgstr ""
+msgstr "CTRL"
 
 #: widgets/keyedit.cpp:136 widgets/keyedit.cpp:281
 msgid "RAWCTRL"
-msgstr ""
+msgstr "RAWCTRL"
 
 #: widgets/keyedit.cpp:150 widgets/keyedit.cpp:248
 msgid "Meta-"
-msgstr ""
+msgstr "Meta-"
 
 #: widgets/keyedit.cpp:155 widgets/keyedit.cpp:156
 msgid "Num"
-msgstr ""
+msgstr "Num"
 
 #: widgets/keyedit.cpp:249
 msgid "Meta+"
-msgstr ""
+msgstr "Meta+"
 
 #: widgets/keyedit.cpp:282
 msgid "RAW_CTRL"
-msgstr ""
+msgstr "RAW_CTRL"
 
 #: widgets/keyedit.cpp:283
 msgid "RAWCONTROL"
-msgstr ""
+msgstr "RAWCONTROL"
 
 #: widgets/keyedit.cpp:284
 msgid "RAW_CONTROL"
-msgstr ""
+msgstr "RAW_CONTROL"
 
 #: widgets/keyedit.cpp:288
 msgid "CONTROL"
-msgstr ""
+msgstr "CONTROL"
 
 #: widgets/sdljoy.cpp:137
 #, c-format
@@ -1337,15 +1338,15 @@ msgstr ""
 
 #: xrc/CheatCreate.xrc:107
 msgid "&8 bits"
-msgstr ""
+msgstr "&8 bits"
 
 #: xrc/CheatCreate.xrc:115
 msgid "&16 bits"
-msgstr ""
+msgstr "&16 bits"
 
 #: xrc/CheatCreate.xrc:122
 msgid "&32 bits"
-msgstr ""
+msgstr "&32 bits"
 
 #: xrc/CheatCreate.xrc:127
 msgid "Data size"
@@ -1480,7 +1481,7 @@ msgstr ""
 
 #: xrc/Disassemble.xrc:73
 msgid "R0:"
-msgstr ""
+msgstr "R0:"
 
 #: xrc/Disassemble.xrc:83 xrc/Disassemble.xrc:100 xrc/Disassemble.xrc:117
 #: xrc/Disassemble.xrc:134 xrc/Disassemble.xrc:151 xrc/Disassemble.xrc:168
@@ -1489,99 +1490,99 @@ msgstr ""
 #: xrc/Disassemble.xrc:287 xrc/Disassemble.xrc:304 xrc/Disassemble.xrc:321
 #: xrc/Disassemble.xrc:338 xrc/Disassemble.xrc:355
 msgid "00000000"
-msgstr ""
+msgstr "00000000"
 
 #: xrc/Disassemble.xrc:90
 msgid "R1:"
-msgstr ""
+msgstr "R1:"
 
 #: xrc/Disassemble.xrc:107
 msgid "R2:"
-msgstr ""
+msgstr "R2:"
 
 #: xrc/Disassemble.xrc:124
 msgid "R3:"
-msgstr ""
+msgstr "R3:"
 
 #: xrc/Disassemble.xrc:141
 msgid "R4:"
-msgstr ""
+msgstr "R4:"
 
 #: xrc/Disassemble.xrc:158
 msgid "R5:"
-msgstr ""
+msgstr "R5:"
 
 #: xrc/Disassemble.xrc:175
 msgid "R6:"
-msgstr ""
+msgstr "R6:"
 
 #: xrc/Disassemble.xrc:192
 msgid "R7:"
-msgstr ""
+msgstr "R7:"
 
 #: xrc/Disassemble.xrc:209
 msgid "R8:"
-msgstr ""
+msgstr "R8:"
 
 #: xrc/Disassemble.xrc:226
 msgid "R9:"
-msgstr ""
+msgstr "R9:"
 
 #: xrc/Disassemble.xrc:243
 msgid "R10:"
-msgstr ""
+msgstr "R10:"
 
 #: xrc/Disassemble.xrc:260
 msgid "R11:"
-msgstr ""
+msgstr "R11:"
 
 #: xrc/Disassemble.xrc:277
 msgid "R12:"
-msgstr ""
+msgstr "R12:"
 
 #: xrc/Disassemble.xrc:294 xrc/GBDisassemble.xrc:111
 msgid "SP:"
-msgstr ""
+msgstr "SP:"
 
 #: xrc/Disassemble.xrc:311
 msgid "LR:"
-msgstr ""
+msgstr "LR:"
 
 #: xrc/Disassemble.xrc:328 xrc/GBDisassemble.xrc:128
 msgid "PC:"
-msgstr ""
+msgstr "PC:"
 
 #: xrc/Disassemble.xrc:345
 msgid "CPSR:"
-msgstr ""
+msgstr "CPSR:"
 
 #: xrc/Disassemble.xrc:362 xrc/GBDisassemble.xrc:185
 msgid "N"
-msgstr ""
+msgstr "N"
 
 #: xrc/Disassemble.xrc:369
 msgid "I"
-msgstr ""
+msgstr "I"
 
 #: xrc/Disassemble.xrc:376 xrc/GBDisassemble.xrc:179
 msgid "Z"
-msgstr ""
+msgstr "Z"
 
 #: xrc/Disassemble.xrc:383
 msgid "F"
-msgstr ""
+msgstr "F"
 
 #: xrc/Disassemble.xrc:390 xrc/GBDisassemble.xrc:197
 msgid "C"
-msgstr ""
+msgstr "C"
 
 #: xrc/Disassemble.xrc:397
 msgid "T"
-msgstr ""
+msgstr "T"
 
 #: xrc/Disassemble.xrc:404
 msgid "V"
-msgstr ""
+msgstr "V"
 
 #: xrc/Disassemble.xrc:414 xrc/MapViewer.xrc:76 xrc/OAMViewer.xrc:37
 msgid "Mode:"
@@ -1589,7 +1590,7 @@ msgstr ""
 
 #: xrc/Disassemble.xrc:424 xrc/GBDisassemble.xrc:172
 msgid "00"
-msgstr ""
+msgstr "00"
 
 #: xrc/Disassemble.xrc:443 xrc/GBDisassemble.xrc:212 xrc/GBOAMViewer.xrc:93
 #: xrc/GBPaletteViewer.xrc:105 xrc/GBTileViewer.xrc:75 xrc/IOViewer.xrc:318
@@ -1624,15 +1625,15 @@ msgstr ""
 
 #: xrc/DisplayConfig.xrc:40
 msgid "Quartz2D"
-msgstr ""
+msgstr "Quartz2D"
 
 #: xrc/DisplayConfig.xrc:47
 msgid "OpenGL"
-msgstr ""
+msgstr "OpenGL"
 
 #: xrc/DisplayConfig.xrc:54
 msgid "Direct3D 9"
-msgstr ""
+msgstr "Direct3D 9"
 
 #: xrc/DisplayConfig.xrc:65
 msgid "Filters"
@@ -1644,91 +1645,91 @@ msgstr ""
 
 #: xrc/DisplayConfig.xrc:86
 msgid "2xSaI"
-msgstr ""
+msgstr "2xSaI"
 
 #: xrc/DisplayConfig.xrc:87
 msgid "Super 2xSaI"
-msgstr ""
+msgstr "Super 2xSaI"
 
 #: xrc/DisplayConfig.xrc:88
 msgid "Super Eagle"
-msgstr ""
+msgstr "Super Eagle"
 
 #: xrc/DisplayConfig.xrc:89
 msgid "Pixelate"
-msgstr ""
+msgstr "Pixelate"
 
 #: xrc/DisplayConfig.xrc:90
 msgid "Advance MAME Scale2x"
-msgstr ""
+msgstr "Advance MAME Scale2x"
 
 #: xrc/DisplayConfig.xrc:91
 msgid "Bilinear"
-msgstr ""
+msgstr "Bilinear"
 
 #: xrc/DisplayConfig.xrc:92
 msgid "Bilinear Plus"
-msgstr ""
+msgstr "Bilinear Plus"
 
 #: xrc/DisplayConfig.xrc:93
 msgid "Scanlines"
-msgstr ""
+msgstr "Scanlines"
 
 #: xrc/DisplayConfig.xrc:94
 msgid "TV Mode"
-msgstr ""
+msgstr "TV Mode"
 
 #: xrc/DisplayConfig.xrc:95
 msgid "HQ 2x"
-msgstr ""
+msgstr "HQ 2x"
 
 #: xrc/DisplayConfig.xrc:96
 msgid "LQ 2x"
-msgstr ""
+msgstr "LQ 2x"
 
 #: xrc/DisplayConfig.xrc:97
 msgid "Simple 2x"
-msgstr ""
+msgstr "Simple 2x"
 
 #: xrc/DisplayConfig.xrc:98
 msgid "Simple 3x"
-msgstr ""
+msgstr "Simple 3x"
 
 #: xrc/DisplayConfig.xrc:99
 msgid "HQ 3x"
-msgstr ""
+msgstr "HQ 3x"
 
 #: xrc/DisplayConfig.xrc:100
 msgid "Simple 4x"
-msgstr ""
+msgstr "Simple 4x"
 
 #: xrc/DisplayConfig.xrc:101
 msgid "HQ 4x"
-msgstr ""
+msgstr "HQ 4x"
 
 #: xrc/DisplayConfig.xrc:102
 msgid "xBRZ 2x"
-msgstr ""
+msgstr "xBRZ 2x"
 
 #: xrc/DisplayConfig.xrc:103
 msgid "xBRZ 3x"
-msgstr ""
+msgstr "xBRZ 3x"
 
 #: xrc/DisplayConfig.xrc:104
 msgid "xBRZ 4x"
-msgstr ""
+msgstr "xBRZ 4x"
 
 #: xrc/DisplayConfig.xrc:105
 msgid "xBRZ 5x"
-msgstr ""
+msgstr "xBRZ 5x"
 
 #: xrc/DisplayConfig.xrc:106
 msgid "xBRZ 6x"
-msgstr ""
+msgstr "xBRZ 6x"
 
 #: xrc/DisplayConfig.xrc:115
 msgid "Plugin :"
-msgstr ""
+msgstr "Plugin :"
 
 #: xrc/DisplayConfig.xrc:127
 msgid "Interframe blending :"
@@ -1828,7 +1829,7 @@ msgstr ""
 
 #: xrc/GBAROMInfo.xrc:59
 msgid "CRC32:"
-msgstr ""
+msgstr "CRC32:"
 
 #: xrc/GBAROMInfo.xrc:71
 msgid "Game code:"
@@ -1856,7 +1857,7 @@ msgstr ""
 
 #: xrc/GBAROMInfo.xrc:143 xrc/GBROMInfo.xrc:84
 msgid "CRC:"
-msgstr ""
+msgstr "CRC:"
 
 #: xrc/GBAROMInfo.xrc:150
 msgid "ROM Information"
@@ -1917,45 +1918,45 @@ msgstr ""
 
 #: xrc/GBDisassemble.xrc:43
 msgid "AF:"
-msgstr ""
+msgstr "AF:"
 
 #: xrc/GBDisassemble.xrc:53 xrc/GBDisassemble.xrc:70 xrc/GBDisassemble.xrc:87
 #: xrc/GBDisassemble.xrc:104 xrc/GBDisassemble.xrc:121
 #: xrc/GBDisassemble.xrc:138 xrc/GBDisassemble.xrc:155
 msgid "0000"
-msgstr ""
+msgstr "0000"
 
 #: xrc/GBDisassemble.xrc:60
 msgid "BC:"
-msgstr ""
+msgstr "BC:"
 
 #: xrc/GBDisassemble.xrc:77
 msgid "DE:"
-msgstr ""
+msgstr "DE:"
 
 #: xrc/GBDisassemble.xrc:94
 msgid "HL:"
-msgstr ""
+msgstr "HL:"
 
 #: xrc/GBDisassemble.xrc:145
 msgid "IFF:"
-msgstr ""
+msgstr "IFF:"
 
 #: xrc/GBDisassemble.xrc:162
 msgid "LY:"
-msgstr ""
+msgstr "LY:"
 
 #: xrc/GBDisassemble.xrc:191
 msgid "H"
-msgstr ""
+msgstr "H"
 
 #: xrc/GBMapViewer.xrc:14
 msgid "0x8000"
-msgstr ""
+msgstr "0x8000"
 
 #: xrc/GBMapViewer.xrc:20
 msgid "0x8800"
-msgstr ""
+msgstr "0x8800"
 
 #: xrc/GBMapViewer.xrc:23 xrc/GBTileViewer.xrc:42 xrc/TileViewer.xrc:58
 msgid "Char Base"
@@ -1963,11 +1964,11 @@ msgstr ""
 
 #: xrc/GBMapViewer.xrc:33
 msgid "0x9800"
-msgstr ""
+msgstr "0x9800"
 
 #: xrc/GBMapViewer.xrc:39
 msgid "0x9C00"
-msgstr ""
+msgstr "0x9C00"
 
 #: xrc/GBMapViewer.xrc:42
 msgid "Map Base"
@@ -2022,27 +2023,27 @@ msgstr ""
 
 #: xrc/GBOAMViewer.xrc:29 xrc/OAMViewer.xrc:29
 msgid "Pos:"
-msgstr ""
+msgstr "Pos:"
 
 #: xrc/GBOAMViewer.xrc:45 xrc/OAMViewer.xrc:69
 msgid "Prio:"
-msgstr ""
+msgstr "Prio:"
 
 #: xrc/GBOAMViewer.xrc:53
 msgid "OAP:"
-msgstr ""
+msgstr "OAP:"
 
 #: xrc/GBOAMViewer.xrc:61 xrc/OAMViewer.xrc:53
 msgid "Pal:"
-msgstr ""
+msgstr "Pal:"
 
 #: xrc/GBOAMViewer.xrc:69 xrc/OAMViewer.xrc:93
 msgid "Flags:"
-msgstr ""
+msgstr "Flags:"
 
 #: xrc/GBOAMViewer.xrc:77
 msgid "Bank:"
-msgstr ""
+msgstr "Bank:"
 
 #: xrc/GBOAMViewer.xrc:149 xrc/GBTileViewer.xrc:152 xrc/MemViewer.xrc:115
 #: xrc/OAMViewer.xrc:162 xrc/TileViewer.xrc:168
@@ -2079,19 +2080,19 @@ msgstr ""
 
 #: xrc/GBPrinter.xrc:29
 msgid "1x"
-msgstr ""
+msgstr "1x"
 
 #: xrc/GBPrinter.xrc:30
 msgid "2x"
-msgstr ""
+msgstr "2x"
 
 #: xrc/GBPrinter.xrc:31
 msgid "3x"
-msgstr ""
+msgstr "3x"
 
 #: xrc/GBPrinter.xrc:32
 msgid "4x"
-msgstr ""
+msgstr "4x"
 
 #: xrc/GBPrinter.xrc:58
 msgid "C&ontinue"
@@ -2131,11 +2132,11 @@ msgstr ""
 
 #: xrc/GBTileViewer.xrc:14
 msgid "&0"
-msgstr ""
+msgstr "&0"
 
 #: xrc/GBTileViewer.xrc:20 xrc/MainMenu.xrc:58 xrc/MainMenu.xrc:114
 msgid "&1"
-msgstr ""
+msgstr "&1"
 
 #: xrc/GBTileViewer.xrc:23
 msgid "VRAM Bank"
@@ -2143,11 +2144,11 @@ msgstr ""
 
 #: xrc/GBTileViewer.xrc:33
 msgid "0x&8000"
-msgstr ""
+msgstr "0x&8000"
 
 #: xrc/GBTileViewer.xrc:39
 msgid "0x&8800"
-msgstr ""
+msgstr "0x&8800"
 
 #: xrc/GameBoyAdvanceConfig.xrc:4
 msgid "Game Boy Advance settings"
@@ -2164,19 +2165,19 @@ msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:28 xrc/GameBoyAdvanceConfig.xrc:200
 msgid "EEPROM"
-msgstr ""
+msgstr "EEPROM"
 
 #: xrc/GameBoyAdvanceConfig.xrc:29 xrc/GameBoyAdvanceConfig.xrc:201
 msgid "SRAM"
-msgstr ""
+msgstr "SRAM"
 
 #: xrc/GameBoyAdvanceConfig.xrc:30 xrc/GameBoyAdvanceConfig.xrc:202
 msgid "Flash"
-msgstr ""
+msgstr "Flash"
 
 #: xrc/GameBoyAdvanceConfig.xrc:31
 msgid "EEPROM + Sensor"
-msgstr ""
+msgstr "EEPROM + Sensor"
 
 #: xrc/GameBoyAdvanceConfig.xrc:43
 msgid "Flash size :"
@@ -2184,11 +2185,11 @@ msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
 msgid "64K"
-msgstr ""
+msgstr "64K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:50 xrc/GameBoyAdvanceConfig.xrc:222
 msgid "128K"
-msgstr ""
+msgstr "128K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:64
 msgid "Detect Now"
@@ -2279,23 +2280,23 @@ msgstr ""
 
 #: xrc/GameBoyConfig.xrc:30
 msgid "Game Boy Color"
-msgstr ""
+msgstr "Game Boy Color"
 
 #: xrc/GameBoyConfig.xrc:31
 msgid "Super Game Boy"
-msgstr ""
+msgstr "Super Game Boy"
 
 #: xrc/GameBoyConfig.xrc:32 xrc/SoundConfig.xrc:290
 msgid "Game Boy"
-msgstr ""
+msgstr "Game Boy"
 
 #: xrc/GameBoyConfig.xrc:33 xrc/SoundConfig.xrc:335
 msgid "Game Boy Advance"
-msgstr ""
+msgstr "Game Boy Advance"
 
 #: xrc/GameBoyConfig.xrc:34
 msgid "Super Game Boy 2"
-msgstr ""
+msgstr "Super Game Boy 2"
 
 #: xrc/GameBoyConfig.xrc:48
 msgid "Display &borders :"
@@ -2335,11 +2336,11 @@ msgstr ""
 
 #: xrc/GameBoyConfig.xrc:186
 msgid "User 1"
-msgstr ""
+msgstr "User 1"
 
 #: xrc/GameBoyConfig.xrc:192
 msgid "User 2"
-msgstr ""
+msgstr "User 2"
 
 #: xrc/GameBoyConfig.xrc:198
 msgid "Custom Colors"
@@ -2359,11 +2360,11 @@ msgstr ""
 
 #: xrc/GeneralConfig.xrc:33
 msgid "&PNG"
-msgstr ""
+msgstr "&PNG"
 
 #: xrc/GeneralConfig.xrc:42
 msgid "&BMP"
-msgstr ""
+msgstr "&BMP"
 
 #: xrc/GeneralConfig.xrc:57
 msgid "&Rewind interval :"
@@ -2400,75 +2401,75 @@ msgstr ""
 
 #: xrc/IOViewer.xrc:10
 msgid "a"
-msgstr ""
+msgstr "a"
 
 #: xrc/IOViewer.xrc:11
 msgid "b"
-msgstr ""
+msgstr "b"
 
 #: xrc/IOViewer.xrc:47
 msgid "15 "
-msgstr ""
+msgstr "15 "
 
 #: xrc/IOViewer.xrc:64
 msgid "14 "
-msgstr ""
+msgstr "14 "
 
 #: xrc/IOViewer.xrc:81
 msgid "13 "
-msgstr ""
+msgstr "13 "
 
 #: xrc/IOViewer.xrc:98
 msgid "12 "
-msgstr ""
+msgstr "12 "
 
 #: xrc/IOViewer.xrc:115
 msgid "11 "
-msgstr ""
+msgstr "11 "
 
 #: xrc/IOViewer.xrc:132
 msgid "10 "
-msgstr ""
+msgstr "10 "
 
 #: xrc/IOViewer.xrc:149
 msgid "9 "
-msgstr ""
+msgstr "9 "
 
 #: xrc/IOViewer.xrc:166
 msgid "8 "
-msgstr ""
+msgstr "8 "
 
 #: xrc/IOViewer.xrc:183
 msgid "7 "
-msgstr ""
+msgstr "7 "
 
 #: xrc/IOViewer.xrc:200
 msgid "6 "
-msgstr ""
+msgstr "6 "
 
 #: xrc/IOViewer.xrc:217
 msgid "5 "
-msgstr ""
+msgstr "5 "
 
 #: xrc/IOViewer.xrc:234
 msgid "4 "
-msgstr ""
+msgstr "4 "
 
 #: xrc/IOViewer.xrc:251
 msgid "3 "
-msgstr ""
+msgstr "3 "
 
 #: xrc/IOViewer.xrc:268
 msgid "2 "
-msgstr ""
+msgstr "2 "
 
 #: xrc/IOViewer.xrc:285
 msgid "1 "
-msgstr ""
+msgstr "1 "
 
 #: xrc/IOViewer.xrc:302
 msgid "0 "
-msgstr ""
+msgstr "0 "
 
 #: xrc/JoyPanel.xrc:8
 msgid ""
@@ -2483,7 +2484,7 @@ msgstr ""
 
 #: xrc/JoyPanel.xrc:37
 msgid "A"
-msgstr ""
+msgstr "A"
 
 #: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:464
 msgid "Down"
@@ -2491,7 +2492,7 @@ msgstr ""
 
 #: xrc/JoyPanel.xrc:83
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:468
 msgid "Left"
@@ -2499,7 +2500,7 @@ msgstr ""
 
 #: xrc/JoyPanel.xrc:129
 msgid "L"
-msgstr ""
+msgstr "L"
 
 #: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:472
 msgid "Right"
@@ -2507,15 +2508,15 @@ msgstr ""
 
 #: xrc/JoyPanel.xrc:175
 msgid "R"
-msgstr ""
+msgstr "R"
 
 #: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:492
 msgid "Select"
-msgstr ""
+msgstr "Select"
 
 #: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:496
 msgid "Start"
-msgstr ""
+msgstr "Start"
 
 #: xrc/JoyPanel.xrc:254
 msgid "Motion Up"
@@ -2579,19 +2580,19 @@ msgstr ""
 
 #: xrc/JoypadConfig.xrc:13
 msgid "Player 1"
-msgstr ""
+msgstr "Player 1"
 
 #: xrc/JoypadConfig.xrc:19
 msgid "Player 2"
-msgstr ""
+msgstr "Player 2"
 
 #: xrc/JoypadConfig.xrc:25
 msgid "Player 3"
-msgstr ""
+msgstr "Player 3"
 
 #: xrc/JoypadConfig.xrc:31
 msgid "Player 4"
-msgstr ""
+msgstr "Player 4"
 
 #: xrc/LinkConfig.xrc:4
 msgid "Link configuration"
@@ -2623,19 +2624,19 @@ msgstr ""
 
 #: xrc/Logging.xrc:41
 msgid "DMA &0"
-msgstr ""
+msgstr "DMA &0"
 
 #: xrc/Logging.xrc:48
 msgid "DMA &1"
-msgstr ""
+msgstr "DMA &1"
 
 #: xrc/Logging.xrc:55
 msgid "DMA &2"
-msgstr ""
+msgstr "DMA &2"
 
 #: xrc/Logging.xrc:62
 msgid "DMA &3"
-msgstr ""
+msgstr "DMA &3"
 
 #: xrc/Logging.xrc:69
 msgid "&Undefined instruction"
@@ -2687,7 +2688,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:30
 msgid "&e-Reader"
-msgstr ""
+msgstr "&e-Reader"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
@@ -2719,39 +2720,39 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:61 xrc/MainMenu.xrc:117
 msgid "&2"
-msgstr ""
+msgstr "&2"
 
 #: xrc/MainMenu.xrc:64 xrc/MainMenu.xrc:120
 msgid "&3"
-msgstr ""
+msgstr "&3"
 
 #: xrc/MainMenu.xrc:67 xrc/MainMenu.xrc:123
 msgid "&4"
-msgstr ""
+msgstr "&4"
 
 #: xrc/MainMenu.xrc:70 xrc/MainMenu.xrc:126
 msgid "&5"
-msgstr ""
+msgstr "&5"
 
 #: xrc/MainMenu.xrc:73 xrc/MainMenu.xrc:129
 msgid "&6"
-msgstr ""
+msgstr "&6"
 
 #: xrc/MainMenu.xrc:76 xrc/MainMenu.xrc:132
 msgid "&7"
-msgstr ""
+msgstr "&7"
 
 #: xrc/MainMenu.xrc:79 xrc/MainMenu.xrc:135
 msgid "&8"
-msgstr ""
+msgstr "&8"
 
 #: xrc/MainMenu.xrc:82 xrc/MainMenu.xrc:138
 msgid "&9"
-msgstr ""
+msgstr "&9"
 
 #: xrc/MainMenu.xrc:85 xrc/MainMenu.xrc:141
 msgid "1&0"
-msgstr ""
+msgstr "1&0"
 
 #: xrc/MainMenu.xrc:89
 msgid "From &File ..."
@@ -2931,19 +2932,19 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:281
 msgid "&Cable"
-msgstr ""
+msgstr "&Cable"
 
 #: xrc/MainMenu.xrc:285
 msgid "&Wireless"
-msgstr ""
+msgstr "&Wireless"
 
 #: xrc/MainMenu.xrc:289
 msgid "&GameCube"
-msgstr ""
+msgstr "&GameCube"
 
 #: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:525
 msgid "&Game Boy"
-msgstr ""
+msgstr "&Game Boy"
 
 #: xrc/MainMenu.xrc:298
 msgid "&Local mode"
@@ -2964,7 +2965,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:314
 msgid "&Video"
-msgstr ""
+msgstr "&Video"
 
 #: xrc/MainMenu.xrc:320
 msgid "&Start in full screen"
@@ -2976,27 +2977,27 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:326
 msgid "&1x"
-msgstr ""
+msgstr "&1x"
 
 #: xrc/MainMenu.xrc:329
 msgid "&2x"
-msgstr ""
+msgstr "&2x"
 
 #: xrc/MainMenu.xrc:332
 msgid "&3x"
-msgstr ""
+msgstr "&3x"
 
 #: xrc/MainMenu.xrc:335
 msgid "&4x"
-msgstr ""
+msgstr "&4x"
 
 #: xrc/MainMenu.xrc:338
 msgid "&5x"
-msgstr ""
+msgstr "&5x"
 
 #: xrc/MainMenu.xrc:341
 msgid "&6x"
-msgstr ""
+msgstr "&6x"
 
 #: xrc/MainMenu.xrc:345
 msgid "Change pixel filter"
@@ -3036,7 +3037,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:389
 msgid "&Audio"
-msgstr ""
+msgstr "&Audio"
 
 #: xrc/MainMenu.xrc:394
 msgid "&Increase volume"
@@ -3084,19 +3085,19 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
 msgid "&A"
-msgstr ""
+msgstr "&A"
 
 #: xrc/MainMenu.xrc:445 xrc/MainMenu.xrc:480
 msgid "&B"
-msgstr ""
+msgstr "&B"
 
 #: xrc/MainMenu.xrc:449 xrc/MainMenu.xrc:484
 msgid "&L"
-msgstr ""
+msgstr "&L"
 
 #: xrc/MainMenu.xrc:453 xrc/MainMenu.xrc:488
 msgid "&R"
-msgstr ""
+msgstr "&R"
 
 #: xrc/MainMenu.xrc:458
 msgid "&Autohold"
@@ -3104,7 +3105,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:502
 msgid "&Game Boy Advance"
-msgstr ""
+msgstr "&Game Boy Advance"
 
 #: xrc/MainMenu.xrc:504 xrc/MainMenu.xrc:527
 msgid "Configure ..."
@@ -3252,35 +3253,35 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:646
 msgid "BG &0"
-msgstr ""
+msgstr "BG &0"
 
 #: xrc/MainMenu.xrc:651
 msgid "BG &1"
-msgstr ""
+msgstr "BG &1"
 
 #: xrc/MainMenu.xrc:656
 msgid "BG &2"
-msgstr ""
+msgstr "BG &2"
 
 #: xrc/MainMenu.xrc:661
 msgid "BG &3"
-msgstr ""
+msgstr "BG &3"
 
 #: xrc/MainMenu.xrc:666
 msgid "&OBJ"
-msgstr ""
+msgstr "&OBJ"
 
 #: xrc/MainMenu.xrc:671
 msgid "&WIN 0"
-msgstr ""
+msgstr "&WIN 0"
 
 #: xrc/MainMenu.xrc:676
 msgid "W&IN 1"
-msgstr ""
+msgstr "W&IN 1"
 
 #: xrc/MainMenu.xrc:681
 msgid "O&BJ WIN"
-msgstr ""
+msgstr "O&BJ WIN"
 
 #: xrc/MainMenu.xrc:685
 msgid "&View Layers"
@@ -3288,27 +3289,27 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:689
 msgid "Channel &1"
-msgstr ""
+msgstr "Channel &1"
 
 #: xrc/MainMenu.xrc:694
 msgid "Channel &2"
-msgstr ""
+msgstr "Channel &2"
 
 #: xrc/MainMenu.xrc:699
 msgid "Channel &3"
-msgstr ""
+msgstr "Channel &3"
 
 #: xrc/MainMenu.xrc:704
 msgid "Channel &4"
-msgstr ""
+msgstr "Channel &4"
 
 #: xrc/MainMenu.xrc:709
 msgid "Direct Sound &A"
-msgstr ""
+msgstr "Direct Sound &A"
 
 #: xrc/MainMenu.xrc:714
 msgid "Direct Sound &B"
-msgstr ""
+msgstr "Direct Sound &B"
 
 #: xrc/MainMenu.xrc:718
 msgid "&Sound Channels"
@@ -3348,31 +3349,31 @@ msgstr ""
 
 #: xrc/MapViewer.xrc:16
 msgid "Frame 0"
-msgstr ""
+msgstr "Frame 0"
 
 #: xrc/MapViewer.xrc:22
 msgid "Frame 1"
-msgstr ""
+msgstr "Frame 1"
 
 #: xrc/MapViewer.xrc:25
 msgid "Frame"
-msgstr ""
+msgstr "Frame"
 
 #: xrc/MapViewer.xrc:35
 msgid "BG0"
-msgstr ""
+msgstr "BG0"
 
 #: xrc/MapViewer.xrc:41
 msgid "BG1"
-msgstr ""
+msgstr "BG1"
 
 #: xrc/MapViewer.xrc:46
 msgid "BG2"
-msgstr ""
+msgstr "BG2"
 
 #: xrc/MapViewer.xrc:51
 msgid "BG3"
-msgstr ""
+msgstr "BG3"
 
 #: xrc/MapViewer.xrc:84
 msgid "Map Base:"
@@ -3404,15 +3405,15 @@ msgstr ""
 
 #: xrc/MemViewer.xrc:17
 msgid "&8-bit"
-msgstr ""
+msgstr "&8-bit"
 
 #: xrc/MemViewer.xrc:25
 msgid "&16-bit"
-msgstr ""
+msgstr "&16-bit"
 
 #: xrc/MemViewer.xrc:32
 msgid "&32-bit"
-msgstr ""
+msgstr "&32-bit"
 
 #: xrc/MemViewer.xrc:83
 msgid "Current address:"
@@ -3440,15 +3441,15 @@ msgstr ""
 
 #: xrc/NetLink.xrc:41
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: xrc/NetLink.xrc:49
 msgid "3"
-msgstr ""
+msgstr "3"
 
 #: xrc/NetLink.xrc:56
 msgid "4"
-msgstr ""
+msgstr "4"
 
 #: xrc/NetLink.xrc:67
 msgid "Server:"
@@ -3496,39 +3497,39 @@ msgstr ""
 
 #: xrc/SoundConfig.xrc:77
 msgid "48 KHz"
-msgstr ""
+msgstr "48 KHz"
 
 #: xrc/SoundConfig.xrc:78
 msgid "44.1 KHz"
-msgstr ""
+msgstr "44.1 KHz"
 
 #: xrc/SoundConfig.xrc:79
 msgid "22 KHz"
-msgstr ""
+msgstr "22 KHz"
 
 #: xrc/SoundConfig.xrc:80
 msgid "11 KHz"
-msgstr ""
+msgstr "11 KHz"
 
 #: xrc/SoundConfig.xrc:103
 msgid "SDL"
-msgstr ""
+msgstr "SDL"
 
 #: xrc/SoundConfig.xrc:111
 msgid "OpenAL"
-msgstr ""
+msgstr "OpenAL"
 
 #: xrc/SoundConfig.xrc:118
 msgid "DirectSound"
-msgstr ""
+msgstr "DirectSound"
 
 #: xrc/SoundConfig.xrc:125
 msgid "XAudio2"
-msgstr ""
+msgstr "XAudio2"
 
 #: xrc/SoundConfig.xrc:132
 msgid "FAudio"
-msgstr ""
+msgstr "FAudio"
 
 #: xrc/SoundConfig.xrc:146
 msgid "Device"
@@ -3580,11 +3581,11 @@ msgstr ""
 
 #: xrc/TileViewer.xrc:15
 msgid "1&6"
-msgstr ""
+msgstr "1&6"
 
 #: xrc/TileViewer.xrc:21
 msgid "&256"
-msgstr ""
+msgstr "&256"
 
 #: xrc/TileViewer.xrc:24
 msgid "Colors"
@@ -3592,23 +3593,23 @@ msgstr "Colores"
 
 #: xrc/TileViewer.xrc:34
 msgid "0x600&0000"
-msgstr ""
+msgstr "0x600&0000"
 
 #: xrc/TileViewer.xrc:40
 msgid "0x600&4000"
-msgstr ""
+msgstr "0x600&4000"
 
 #: xrc/TileViewer.xrc:45
 msgid "0x600&8000"
-msgstr ""
+msgstr "0x600&8000"
 
 #: xrc/TileViewer.xrc:50
 msgid "0x600&C000"
-msgstr ""
+msgstr "0x600&C000"
 
 #: xrc/TileViewer.xrc:55
 msgid "0x60&10000"
-msgstr ""
+msgstr "0x60&10000"
 
 #: xrc/SpeedupConfig.xrc:4
 msgid "SpeedUp / Turbo Settings"

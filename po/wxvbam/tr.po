@@ -10,14 +10,14 @@
 # Justice League <denizden788@gmail.com>, 2020
 # Bone Cruncher (SilentChaos) <mrzabuzaxtr@gmail.com>, 2018
 # Sinan H., 2016,2018
-# Tmp341, 2016
+# Tmp341, 2016,2021
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2020-12-17 05:28+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2021-02-25 15:28+0000\n"
+"Last-Translator: Tmp341\n"
 "Language-Team: Turkish (http://www.transifex.com/bgk/vba-m/language/tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -51,7 +51,7 @@ msgstr "Programı tam ekran modunda başlat"
 
 #: wxvbam.cpp:526
 msgid "Set a configuration file"
-msgstr ""
+msgstr "Ayar dosyası belirleyin"
 
 #: wxvbam.cpp:530
 msgid "Delete shared link state first, if it exists"
@@ -113,7 +113,7 @@ msgstr "Klavye ile kullanılabilecek komutlar/* şunlar:\n"
 
 #: wxvbam.cpp:660
 msgid "Configuration file not found."
-msgstr ""
+msgstr "Ayar dosyası bulunamadı."
 
 #: wxvbam.cpp:693
 msgid "Bad configuration option or multiple ROM files given:\n"
@@ -758,7 +758,7 @@ msgstr "VisualBoyAdvance kayıt uzantısı\\*.sgm"
 #: cmdevents.cpp:1793 cmdevents.cpp:1803 cmdevents.cpp:1814
 #, c-format
 msgid "Current state slot #%d"
-msgstr ""
+msgstr "Şimdiki durum yeri #%d"
 
 #: cmdevents.cpp:2083
 msgid "Sound enabled"
@@ -802,16 +802,16 @@ msgstr "GDB bekleniyor..."
 #: cmdevents.cpp:2666
 #, c-format
 msgid "Using pixel filter #%d"
-msgstr ""
+msgstr "Kullanılan piksel filtresi #%d"
 
 #: cmdevents.cpp:2681
 #, c-format
 msgid "Using interframe blending #%d"
-msgstr ""
+msgstr "Kullanılan çerçeveler arası harmanlama #%d"
 
 #: cmdevents.cpp:2720 panel.cpp:193 panel.cpp:296
 msgid "Could not initialize the sound driver!"
-msgstr ""
+msgstr "Ses sürücüsü başlatılamadı!"
 
 #: cmdevents.cpp:2824
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
@@ -822,7 +822,7 @@ msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr ""
+msgstr "Telif Hakkı (C) 1999-2003 Forgotten\nTelif Hakkı (C) 2004-2006 VBA Geliştirici Takımı\nTelif Hakkı (C) 2007-2020 VBA-M Geliştirici Takımı"
 
 #: cmdevents.cpp:2826
 msgid ""
@@ -1035,31 +1035,31 @@ msgstr "Geri sarma durumu yazılırken hata oluştu"
 
 #: panel.cpp:2280
 msgid "Failed to set glXSwapIntervalEXT"
-msgstr ""
+msgstr "glXSwapIntervalEXT Ayarlanamadı"
 
 #: panel.cpp:2289
 msgid "Failed to set glXSwapIntervalSGI"
-msgstr ""
+msgstr "glXSwapIntervalSGI Ayarlanamadı"
 
 #: panel.cpp:2298
 msgid "Failed to set glXSwapIntervalMESA"
-msgstr ""
+msgstr "glXSwapIntervalMESA Ayarlanamadı"
 
 #: panel.cpp:2304
 msgid "No support for wglGetExtensionsStringEXT"
-msgstr ""
+msgstr "wglGetExtensionsStringEXT desteği yok"
 
 #: panel.cpp:2307
 msgid "No support for WGL_EXT_swap_control"
-msgstr ""
+msgstr "WGL_EXT_swap_control desteği yok"
 
 #: panel.cpp:2316
 msgid "Failed to set wglSwapIntervalEXT"
-msgstr ""
+msgstr "wglSwapIntervalEXT Ayarlanamadı"
 
 #: panel.cpp:2322
 msgid "No VSYNC available on this platform"
-msgstr ""
+msgstr "Bu platform için Dikey Eşitleme mevcut değil"
 
 #: panel.cpp:2418
 msgid "memory allocation error"
@@ -1160,12 +1160,12 @@ msgstr "CONTROL"
 #: widgets/sdljoy.cpp:137
 #, c-format
 msgid "Connected joystick %d: %s"
-msgstr ""
+msgstr "Bağlı joystick %d: %s"
 
 #: widgets/sdljoy.cpp:152
 #, c-format
 msgid "Disconnected joystick %d"
-msgstr ""
+msgstr "Bağlantısı kesilen joystick %d"
 
 #: xaudio2.cpp:35
 msgid "XAudio2: Enumerating devices failed!"
@@ -2213,12 +2213,12 @@ msgstr "BIOS dosyası :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file :"
-msgstr ""
+msgstr "Şu anki BIOS dosyası :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:122 xrc/GameBoyConfig.xrc:138
 #: xrc/GameBoyConfig.xrc:159
 msgid "(None)"
-msgstr ""
+msgstr "(Hiçbiri)"
 
 #: xrc/GameBoyAdvanceConfig.xrc:136 xrc/GameBoyConfig.xrc:168
 msgid "Boot ROM"
@@ -3337,15 +3337,15 @@ msgstr "Çeviriler"
 
 #: xrc/MainMenu.xrc:738
 msgid "Check for updates"
-msgstr ""
+msgstr "Güncellemelere Bak"
 
 #: xrc/MainMenu.xrc:741
 msgid "&Factory Reset..."
-msgstr ""
+msgstr "&Fabrika Ayarlarına Döndür..."
 
 #: xrc/MainMenu.xrc:745
 msgid "&About..."
-msgstr ""
+msgstr "H&akkında..."
 
 #: xrc/MapViewer.xrc:4
 msgid "Map Viewer"
@@ -3461,7 +3461,7 @@ msgstr "Sunucu"
 
 #: xrc/NetLink.xrc:81
 msgid "Port:"
-msgstr ""
+msgstr "Port:"
 
 #: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
