@@ -299,6 +299,10 @@ In the `"profiles"` `"defaults"` section add:
 },
 ```
 
+I prefer `IBM Plex Mono` which you can install from:
+
+https://github.com/IBM/plex
+
 In the `"actions"` section add these keybindings:
 
 ```json
@@ -428,7 +432,6 @@ set-executionpolicy -scope currentuser remotesigned
 set-culture en-US
 
 $terminal_settings     = (resolve-path ~/AppData/Local/Packages/Microsoft.WindowsTerminal_*/LocalState/settings.json)
-$terminal_settings_dir = (resolve-path ~/AppData/Local/Packages/Microsoft.WindowsTerminal_*/LocalState)
 
 function megs {
     gci -rec $args | select mode, lastwritetime, @{name="MegaBytes"; expression = { [math]::round($_.length / 1MB, 2) }}, name
@@ -449,6 +452,8 @@ function pkill {
 function taskslog {
     get-winevent 'Microsoft-Windows-TaskScheduler/Operational' 
 }
+
+function ltr { $input | sort lastwritetime }
 
 function ntop { ntop.exe -s 'CPU%' $args }
 
@@ -524,7 +529,12 @@ set-psreadlinekeyhandler -key downarrow -function historysearchforward
 
 This profile works for "Windows PowerShell", the powershell you launch from the
 `Win+X` menu as well. But the profile is in a different file, so you will need
-to copy it there too.
+to copy it there too:
+
+```powershell
+mkdir ~/Documents/WindowsPowerShell
+cpi ~/Documents/PowerShell/Microsoft.Powershell_profile.ps1 ~/Documents/WindowsPowerShell
+```
 
 #### PowerShell Usage Notes
 
@@ -589,9 +599,9 @@ etc., for example:
 ri .*.un~,.*.sw?
 ```
 
-The commands `grep`, `sed`, `awk`, `diff`, `patch`, `less`, `zip`, `unzip`,
-`ssh`, `vim`, `nvim` (neovim) are the same as in Linux and were installed in the
-list of packages installed from Chocolatey above.
+The commands `grep`, `sed`, `awk`, `rg`, `diff`, `patch`, `less`, `zip`,
+`unzip`, `ssh`, `vim`, `nvim` (neovim) are the same as in Linux and were
+installed in the list of packages installed from Chocolatey above.
 
 The commands `curl` and `tar` are now standard Windows commands.
 
@@ -616,6 +626,12 @@ For `ls -ltr` use:
 
 ```powershell
 gci | sort lastwritetime
+```
+
+Or the alias in my profile:
+
+```powershell
+gci | ltr
 ```
 
 Parameters can be completed with `tab`, so in the case above you could write
