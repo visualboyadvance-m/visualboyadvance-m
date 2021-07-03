@@ -220,9 +220,10 @@ Close the administrator PowerShell window and open it again.
 Install some chocolatey packages:
 
 ```powershell
-choco install -y visualstudio2019community --params "--locale en-US"
+choco install -y visualstudio2019community --params '--locale en-US'
 choco install -y visualstudio2019-workload-nativedesktop
-choco install -y hackfont dejavufonts ripgrep git gpg4win microsoft-windows-terminal powershell-core vim neovim zip unzip notepadplusplus openssh diffutils ntop.portable grep gawk sed less transifex-client
+choco install -y hackfont dejavufonts ripgrep git gpg4win microsoft-windows-terminal powershell-core vim neovim zip unzip notepadplusplus diffutils ntop.portable grep gawk sed less transifex-client
+choco install -y openssh --params '/SSHServerFeature /SSHAgentFeature /PathSpecsToProbeForShellEXEString:$env:programfiles\PowerShell\*\pwsh.exe'
 ```
 
 #### Chocolatey Usage Notes
@@ -431,7 +432,10 @@ set-executionpolicy -scope currentuser remotesigned
 
 set-culture en-US
 
-$terminal_settings     = (resolve-path ~/AppData/Local/Packages/Microsoft.WindowsTerminal_*/LocalState/settings.json)
+$terminal_settings = resolve-path ~/AppData/Local/Packages/Microsoft.WindowsTerminal_*/LocalState/settings.json
+
+if ($env:TERM) { ri env:TERM }
+$env:EDITOR = resolve-path ~/bin/vim.bat
 
 function megs {
     gci -rec $args | select mode, lastwritetime, @{name="MegaBytes"; expression = { [math]::round($_.length / 1MB, 2) }}, name
@@ -536,6 +540,40 @@ mkdir ~/Documents/WindowsPowerShell
 cpi ~/Documents/PowerShell/Microsoft.Powershell_profile.ps1 ~/Documents/WindowsPowerShell
 ```
 
+#### Setting up gpg
+
+Make this symlink:
+
+```powershell
+sl ~
+mkdir .gnupg
+ni -itemtype symboliclink ~/AppData/Roaming/gnupg -target $(resolve-path ~/.gnupg)
+```
+
+Then you can copy your `.gnupg` over, without the socket files.
+
+To configure git to use it, do the following:
+
+```powershell
+git config --global commit.gpgsign true
+git config --global gpg.program 'C:\Program Files (x86)\GnuPG\bin\gpg.exe'
+```
+
+#### Setting up sshd
+
+Edit `\ProgramData\ssh\sshd_config` and remove or comment out this section:
+
+```
+Match Group administrators
+       AuthorizedKeysFile __PROGRAMDATA__/ssh/administrators_authorized_keys
+```
+
+Then run:
+
+```powershell
+restart-service sshd
+```
+
 #### PowerShell Usage Notes
 
 PowerShell is very different from unix shells, in both usage and programming.
@@ -549,6 +587,9 @@ s*`.
 
 You can get help text for any cmdlet via its long name or alias with `help`. To
 use `less` instead of the default pager, do e.g.: `help gci | less`.
+
+For the `git` man pages, do `git help <command>` to open the man page in your
+browser, e.g. `git help config`.
 
 I suggest using the short forms of PowerShell aliases instead of the POSIX
 aliases, this forces your brain into PowerShell mode so you will mix things up
