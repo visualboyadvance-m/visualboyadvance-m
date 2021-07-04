@@ -869,14 +869,14 @@ int MainFrame::FilterEvent(wxEvent& event)
         int keyMod = ke.GetModifiers();
         wxAcceleratorEntry_v accels = wxGetApp().GetAccels();
         for (size_t i = 0; i < accels.size(); ++i)
-             if (keyCode == accels[i].GetKeyCode() && keyMod == accels[i].GetFlags()
-                 && accels[i].GetCommand() != XRCID("NOOP"))
-             {
-                 wxCommandEvent evh(wxEVT_COMMAND_MENU_SELECTED, accels[i].GetCommand());
-                 evh.SetEventObject(this);
-                 GetEventHandler()->ProcessEvent(evh);
-                 return true;
-         }
+            if (keyCode == accels[i].GetKeyCode() && keyMod == accels[i].GetFlags()
+                && accels[i].GetCommand() != XRCID("NOOP"))
+            {
+                wxCommandEvent evh(wxEVT_COMMAND_MENU_SELECTED, accels[i].GetCommand());
+                evh.SetEventObject(this);
+                GetEventHandler()->ProcessEvent(evh);
+                return wxEventFilter::Event_Processed;
+        }
     }
     else if (event.GetEventType() == wxEVT_SDLJOY && !menus_opened && !dialog_opened)
     {
@@ -894,11 +894,11 @@ int MainFrame::FilterEvent(wxEvent& event)
                 wxCommandEvent evh(wxEVT_COMMAND_MENU_SELECTED, accels[i].GetCommand());
                 evh.SetEventObject(this);
                 GetEventHandler()->ProcessEvent(evh);
-                return true;
+                return wxEventFilter::Event_Processed;
             }
         }
     }
-    return -1;
+    return wxEventFilter::Event_Skip;
 }
 
 wxString MainFrame::GetGamePath(wxString path)
