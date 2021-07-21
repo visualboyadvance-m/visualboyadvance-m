@@ -529,11 +529,17 @@ if(ENABLE_NLS)
             file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" ${CMAKE_BINARY_DIR}/nuget.exe)
         endif()
 
+        # Add nuget package source.
+        execute_process(
+            COMMAND nuget sources add -Name "NuGet official package source" -Source "https://api.nuget.org/v3/index.json"
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
         # Install the Gettext.Tools package.
         execute_process(
             COMMAND nuget.exe install Gettext.Tools -OutputDirectory ${CMAKE_BINARY_DIR}/nuget
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            )
+        )
 
         # Find the path to the binaries in the package and add them to find path.
         file(GLOB pkg ${CMAKE_BINARY_DIR}/nuget/Gettext.Tools*)
