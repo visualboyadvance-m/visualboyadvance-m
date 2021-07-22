@@ -223,6 +223,9 @@ Install some chocolatey packages:
 choco install -y visualstudio2019community --params '--locale en-US'
 choco install -y visualstudio2019-workload-nativedesktop
 choco install -y hackfont dejavufonts ripgrep git gpg4win microsoft-windows-terminal powershell-core vim neovim zip unzip notepadplusplus diffutils ntop.portable grep gawk sed less transifex-client
+# Copy your .ssh over to your profile directly first preferrably:
+stop-service ssh-agent
+sc.exe delete ssh-agent
 choco install -y openssh --params '/SSHServerFeature /SSHAgentFeature /PathSpecsToProbeForShellEXEString:$env:programfiles\PowerShell\*\pwsh.exe'
 ```
 
@@ -573,6 +576,18 @@ Then run:
 ```powershell
 restart-service sshd
 ```
+
+If you've installed openssh before copying over your `~/.ssh`, you will need to
+fix permissions on your `authorized_keys` files, the easiest way to do
+that is to re-run the installer with `--force`:
+
+```powershell
+choco install -y --force openssh --params '/SSHServerFeature /SSHAgentFeature /PathSpecsToProbeForShellEXEString:$env:programfiles\PowerShell\*\pwsh.exe'
+```
+
+If you need to fix permissions on your private key, follow these instructions:
+
+https://superuser.com/a/1329702/226829
 
 #### PowerShell Usage Notes
 
