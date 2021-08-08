@@ -176,6 +176,8 @@ linux_installdeps() {
         solus_installdeps
     elif [ -f /etc/gentoo-release ]; then
         gentoo_installdeps
+    elif [ -x /usr/bin/pacman ]; then
+        archlinux_installdeps
     elif [ -f /etc/os-release ]; then
         case "$(. /etc/os-release; echo "${ID_LIKE:-$ID}")" in
             *suse*)
@@ -184,9 +186,10 @@ linux_installdeps() {
             nixos)
                 nixos_installdeps
                 ;;
+            *)
+                error "Don't know how to install deps on your version of Linux"
+                ;;
         esac
-    elif [ -x /usr/bin/pacman ]; then
-        archlinux_installdeps
     else
         error "Don't know how to install deps on your version of Linux"
     fi
