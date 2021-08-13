@@ -166,7 +166,7 @@ int captureFormat = 0;
 int cheatsEnabled = true;
 int cpuDisableSfx = false;
 int cpuSaveType = 0;
-int enableMMX = 1;
+int enableMMX;
 int disableStatusMessages = 0;
 int dsoundDisableHardwareAcceleration;
 int filterHeight;
