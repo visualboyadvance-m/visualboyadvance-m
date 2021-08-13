@@ -2995,7 +2995,7 @@ EVT_HANDLER(ApplyPatches, "Apply IPS/UPS/IPF patches if found")
 EVT_HANDLER(MMX, "Enable MMX")
 {
 #ifdef MMX
-    GetMenuOptionInt("MMX", disableMMX, 1);
+    GetMenuOptionInt("MMX", enableMMX, 1);
     update_opts();
 #endif
 }

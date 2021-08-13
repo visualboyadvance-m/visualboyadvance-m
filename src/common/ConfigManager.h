@@ -56,7 +56,7 @@ extern int cheatsEnabled;
 extern int cpuDisableSfx;
 extern int cpuSaveType;
 extern int dinputKeyFocus;
-extern int disableMMX;
+extern int enableMMX;
 extern int disableStatusMessages;
 extern int dsoundDisableHardwareAcceleration;
 extern int filterHeight;
