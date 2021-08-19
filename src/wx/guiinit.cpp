@@ -3067,7 +3067,7 @@ bool MainFrame::BindControls()
         MenuOptionIntMask("JoypadAutoholdR", autohold, KEYM_R);
         MenuOptionIntMask("JoypadAutoholdSelect", autohold, KEYM_SELECT);
         MenuOptionIntMask("JoypadAutoholdStart", autohold, KEYM_START);
-        MenuOptionIntMask("MMX", disableMMX, 1);
+        MenuOptionIntMask("MMX", enableMMX, 1);
         MenuOptionBool("EmulatorSpeedupToggle", turbo);
         MenuOptionIntRadioValue("LinkType0Nothing", gopts.gba_link_type, 0);
         MenuOptionIntRadioValue("LinkType1Cable", gopts.gba_link_type, 1);

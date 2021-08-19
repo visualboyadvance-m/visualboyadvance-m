@@ -264,7 +264,7 @@ opt_desc opts[] = {
     INTOPT("preferences/captureFormat", "", wxTRANSLATE("Screen capture file format"), captureFormat, 0, 1),
     INTOPT("preferences/cheatsEnabled", "", wxTRANSLATE("Enable cheats"), cheatsEnabled, 0, 1),
 #ifdef MMX
-    INTOPT("preferences/disableMMX", "MMX", wxTRANSLATE("Enable MMX"), disableMMX, 0, 1),
+    INTOPT("preferences/enableMMX", "MMX", wxTRANSLATE("Enable MMX"), enableMMX, 0, 1),
 #endif
     INTOPT("preferences/disableStatus", "NoStatusMsg", wxTRANSLATE("Disable on-screen status messages"), disableStatusMessages, 0, 1),
     INTOPT("preferences/emulatorType", "", wxTRANSLATE("Type of system to emulate"), gbEmulatorType, 0, 5),

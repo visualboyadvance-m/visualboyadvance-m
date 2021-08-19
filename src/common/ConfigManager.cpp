@@ -166,7 +166,7 @@ int captureFormat = 0;
 int cheatsEnabled = true;
 int cpuDisableSfx = false;
 int cpuSaveType = 0;
-int disableMMX;
+int enableMMX;
 int disableStatusMessages = 0;
 int dsoundDisableHardwareAcceleration;
 int filterHeight;
@@ -307,7 +307,7 @@ struct option argOptions[] = {
 	{ "cpu-disable-sfx", no_argument, &cpuDisableSfx, 1 },
 	{ "cpu-save-type", required_argument, 0, OPT_CPU_SAVE_TYPE },
 	{ "debug", no_argument, 0, 'd' },
-	{ "disable-mmx", no_argument, &disableMMX, 1 },
+	{ "enable-mmx", no_argument, &enableMMX, 1 },
 	{ "disable-sfx", no_argument, &cpuDisableSfx, 1 },
 	{ "disable-status-messages", no_argument, &disableStatusMessages, 1 },
 	{ "dotcode-file-name-load", required_argument, 0, OPT_DOTCODE_FILE_NAME_LOAD },
@@ -495,7 +495,7 @@ void LoadConfig()
 	cheatsEnabled = ReadPref("cheatsEnabled", 0);
 	cpuDisableSfx = ReadPref("disableSfx", 0);
 	cpuSaveType = ReadPrefHex("saveType");
-	disableMMX = ReadPref("disableMMX", 0);
+	enableMMX = ReadPref("enableMMX", 1);
 	disableStatusMessages = ReadPrefHex("disableStatus");
 	filterMT = ReadPref("filterEnableMultiThreading", 0);
 	filter = ReadPref("filter", 0);
