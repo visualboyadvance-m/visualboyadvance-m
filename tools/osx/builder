@@ -28,6 +28,11 @@ case "$1" in
         target_cpu=i386
         shift
         ;;
+    -arm64)
+        target_bits=arm64
+        target_cpu=arm64
+        shift
+        ;;
 esac
 
 # Need to use Xcode 9 for 32 bit builds on Mojave and newer.
