@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Nguyen Tri Dung <gt451853@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2020-12-17 05:28+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2021-07-03 08:30+0000\n"
+"Last-Translator: Nguyen Tri Dung <gt451853@gmail.com>\n"
 "Language-Team: English (United States) (http://www.transifex.com/bgk/vba-m/language/en_US/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,27 +24,27 @@ msgstr ""
 
 #: wxvbam.cpp:443
 msgid "Could not create main window"
-msgstr ""
+msgstr "Không thể tạo cửa sổ chính"
 
 #: wxvbam.cpp:514
 msgid "Save built-in XRC file and exit"
-msgstr ""
+msgstr "Lưu tệp XRC tích hợp sẵn và thoát"
 
 #: wxvbam.cpp:517
 msgid "Save built-in vba-over.ini and exit"
-msgstr ""
+msgstr "Lưu tệp vba-over.ini tích hợp sẵn và thoát"
 
 #: wxvbam.cpp:520
 msgid "Print configuration path and exit"
-msgstr ""
+msgstr "In đường dẫn cấu hình và thoát"
 
 #: wxvbam.cpp:523
 msgid "Start in full-screen mode"
-msgstr ""
+msgstr "Mở ở chế độ toàn màn hình"
 
 #: wxvbam.cpp:526
 msgid "Set a configuration file"
-msgstr ""
+msgstr "Đặt một tệp cấu hình"
 
 #: wxvbam.cpp:530
 msgid "Delete shared link state first, if it exists"

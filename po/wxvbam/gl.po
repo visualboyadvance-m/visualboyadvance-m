@@ -5,14 +5,14 @@
 # Translators:
 # José Riveiro Edrosa <joseriveiroedrosa@gmail.com>, 2016
 # Rubén <feiticeiro2010@hotmail.es>, 2015-2016,2018
-# Toño Calo <enfeitizador@gmail.com>, 2020
+# Toño Calo <enfeitizador@gmail.com>, 2020-2021
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2020-12-17 05:28+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2021-09-02 22:58+0000\n"
+"Last-Translator: Toño Calo <enfeitizador@gmail.com>\n"
 "Language-Team: Galician (http://www.transifex.com/bgk/vba-m/language/gl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -46,7 +46,7 @@ msgstr "Iniciar en modo pantalla completa"
 
 #: wxvbam.cpp:526
 msgid "Set a configuration file"
-msgstr "Establecer un ficheiro de configuración"
+msgstr "Estabelecer un ficheiro de configuración"
 
 #: wxvbam.cpp:530
 msgid "Delete shared link state first, if it exists"
@@ -54,7 +54,7 @@ msgstr "Borrar estado da ligazón compartida, se existe"
 
 #: wxvbam.cpp:537
 msgid "List all settable options and exit"
-msgstr "Enumera todas as opcións configurables e saír"
+msgstr "Enumera todas as opcións configurábeis e saír"
 
 #: wxvbam.cpp:540
 msgid "ROM file"
@@ -98,13 +98,13 @@ msgid ""
 "\n"
 "For flag options, true and false are specified as 1 and 0, respectively.\n"
 "\n"
-msgstr "As opcións establecidas dende a liña de comandos gárdanse se se fan cambios na interface de usuario.\n\nPara as opcións do indicador, certo e falso especifícanse como 1 e 0, respectivamente.\n\n"
+msgstr "As opcións estabelecidas dende a liña de comandos gárdanse se se fan cambios na interface de usuario.\n\nPara as opcións do indicador, certo e falso especifícanse como 1 e 0, respectivamente.\n\n"
 
 #: wxvbam.cpp:648
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
-msgstr "Os comandos dispoñibles para a opción teclado/* son:\n\n"
+msgstr "Os comandos dispoñíbeis para a opción teclado/* son:\n\n"
 
 #: wxvbam.cpp:660
 msgid "Configuration file not found."
@@ -246,7 +246,7 @@ msgstr "hexadecimal sen firmar"
 #: guiinit.cpp:1541
 #, c-format
 msgid "%d frames = %.2f ms"
-msgstr "%d cadros = %.2f ms"
+msgstr "%d fotogramas = %.2f ms"
 
 #: guiinit.cpp:1553
 msgid "Default device"
@@ -271,7 +271,7 @@ msgstr "Nada"
 #: guiinit.cpp:1888
 #, c-format
 msgid "No usable rpi plugins found in %s"
-msgstr "Non se atoparon complementos rpi aproveitables en %s"
+msgstr "Non se atoparon complementos rpi aproveitábeis en %s"
 
 #: guiinit.cpp:1908 xrc/DisplayConfig.xrc:107
 msgid "Plugin"
@@ -770,7 +770,7 @@ msgstr "Volume: %d%%"
 
 #: cmdevents.cpp:2185
 msgid "Set to 0 for pseudo tty"
-msgstr "Establecer a 0 para pseudo tty"
+msgstr "Estabelecer a 0 para pseudo tty"
 
 #: cmdevents.cpp:2187
 msgid "Port to wait for connection:"
@@ -802,7 +802,7 @@ msgstr "Usando filtro de pixel #%d"
 #: cmdevents.cpp:2681
 #, c-format
 msgid "Using interframe blending #%d"
-msgstr "Usando mestura entre cadros #%d"
+msgstr "Usando mestura entre fotogramas #%d"
 
 #: cmdevents.cpp:2720 panel.cpp:193 panel.cpp:296
 msgid "Could not initialize the sound driver!"
@@ -817,7 +817,7 @@ msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr ""
+msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2020 VBA-M development team"
 
 #: cmdevents.cpp:2826
 msgid ""
@@ -1030,15 +1030,15 @@ msgstr "Erro escribindo avance rebobinado"
 
 #: panel.cpp:2280
 msgid "Failed to set glXSwapIntervalEXT"
-msgstr "Erro ao establecer glXSwapIntervalEXT"
+msgstr "Erro ao estabelecer glXSwapIntervalEXT"
 
 #: panel.cpp:2289
 msgid "Failed to set glXSwapIntervalSGI"
-msgstr "Erro ao establecer glXSwapIntervalSGI"
+msgstr "Erro ao estabelecer glXSwapIntervalSGI"
 
 #: panel.cpp:2298
 msgid "Failed to set glXSwapIntervalMESA"
-msgstr "Erro ao establecer glXSwapIntervalMESA"
+msgstr "Erro ao estabelecer glXSwapIntervalMESA"
 
 #: panel.cpp:2304
 msgid "No support for wglGetExtensionsStringEXT"
@@ -1050,11 +1050,11 @@ msgstr "Sen asistencia para WGL_EXT_swap_control"
 
 #: panel.cpp:2316
 msgid "Failed to set wglSwapIntervalEXT"
-msgstr "Erro ao establecer wglSwapIntervalEXT"
+msgstr "Erro ao estabelecer wglSwapIntervalEXT"
 
 #: panel.cpp:2322
 msgid "No VSYNC available on this platform"
-msgstr "A VSYNC non está dispoñible nesta plataforma"
+msgstr "A VSYNC non está dispoñíbel nesta plataforma"
 
 #: panel.cpp:2418
 msgid "memory allocation error"
@@ -1202,7 +1202,7 @@ msgstr "Non se puido crear DirectSound %08x"
 #: dsound.cpp:109
 #, c-format
 msgid "Cannot SetCooperativeLevel %08x"
-msgstr "Non se puido establecer CooperativeLevel %08x"
+msgstr "Non se puido estabelecer CooperativeLevel %08x"
 
 #: dsound.cpp:123
 #, c-format
@@ -1261,7 +1261,7 @@ msgstr "Elimina&r"
 
 #: xrc/AccelConfig.xrc:67
 msgid "Re&set All"
-msgstr "Re&stablecer todo"
+msgstr "Re&stabelecer todo"
 
 #: xrc/AccelConfig.xrc:81
 msgid "Currently assigned to:"
@@ -1672,7 +1672,7 @@ msgstr "Bilinear Plus"
 
 #: xrc/DisplayConfig.xrc:93
 msgid "Scanlines"
-msgstr "Scanlines"
+msgstr "Liñas de exploración"
 
 #: xrc/DisplayConfig.xrc:94
 msgid "TV Mode"
@@ -1732,15 +1732,15 @@ msgstr "Complemento :"
 
 #: xrc/DisplayConfig.xrc:127
 msgid "Interframe blending :"
-msgstr "Mestura entre cadros :"
+msgstr "Mestura entre fotogramas :"
 
 #: xrc/DisplayConfig.xrc:136
 msgid "Smart interframe blending"
-msgstr "Mestura entre cadros intelixente"
+msgstr "Mestura entre fotogramas intelixente"
 
 #: xrc/DisplayConfig.xrc:137
 msgid "Interframe motion blur"
-msgstr "Desenfoque de movemento entre cadros"
+msgstr "Desenfoque de movemento entre fotogramas"
 
 #: xrc/DisplayConfig.xrc:151 xrc/SoundConfig.xrc:91
 msgid "Basic"
@@ -1748,11 +1748,11 @@ msgstr "Básico"
 
 #: xrc/DisplayConfig.xrc:159
 msgid "Frame Skip"
-msgstr "Saltar cadro"
+msgstr "Omitir fotograma"
 
 #: xrc/DisplayConfig.xrc:177
 msgid "&Number of frames to skip :"
-msgstr "&Número de cadros a saltar :"
+msgstr "&Número de fotogramas a saltar :"
 
 #: xrc/DisplayConfig.xrc:199
 msgid "Speed"
@@ -1980,7 +1980,7 @@ msgstr "Estricar para &coller"
 
 #: xrc/GBMapViewer.xrc:59 xrc/MapViewer.xrc:67
 msgid "Auto &update"
-msgstr "Ac&ulización auto."
+msgstr "Act&ulización automática"
 
 #: xrc/GBMapViewer.xrc:74 xrc/GBTileViewer.xrc:99 xrc/MapViewer.xrc:144
 #: xrc/MemSelRegion.xrc:10 xrc/PaletteViewer.xrc:50 xrc/TileViewer.xrc:115
@@ -2263,7 +2263,7 @@ msgstr "Espello:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:254
 msgid "&Defaults"
-msgstr "&Predeterminados"
+msgstr "Pre&determinados"
 
 #: xrc/GameBoyAdvanceConfig.xrc:261
 msgid "Game Overrides"
@@ -2475,7 +2475,7 @@ msgid ""
 "Click a field and press a key or move joystick to add.  Press backspace to "
 "delete last added key.  Resize window or click inside and move pointer to "
 "see entire contents if too small."
-msgstr "Clic nun campo e preme a tecla ou move a panca de manda para engadir.  Preme retroceso para eliminar a última tecla engadida.  Cambia o tamaño da xanela ou preme dentro e move o apuntador para ver todo o contido de ser moi pequeno."
+msgstr "Clic nun campo e preme a tecla ou move a panca de mando para engadir.  Preme retroceso para eliminar a última tecla engadida.  Cambia o tamaño da xanela ou preme dentro e move o apuntador para ver todo o contido de ser moi pequeno."
 
 #: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:460
 msgid "Up"
@@ -2523,7 +2523,7 @@ msgstr "Movemento arriba"
 
 #: xrc/JoyPanel.xrc:276
 msgid "Autofire A"
-msgstr "Disparo automático A"
+msgstr "Pulsado automático A"
 
 #: xrc/JoyPanel.xrc:298
 msgid "Motion Down"
@@ -2531,7 +2531,7 @@ msgstr "Movemento abaixo"
 
 #: xrc/JoyPanel.xrc:320
 msgid "Autofire B"
-msgstr "Disparo automático B"
+msgstr "Pulsado automático B"
 
 #: xrc/JoyPanel.xrc:342
 msgid "Motion Left/Dark"
@@ -2575,7 +2575,7 @@ msgstr "Limpar todos"
 
 #: xrc/JoypadConfig.xrc:4
 msgid "Joypad Configuration"
-msgstr "Configuración do Joypad"
+msgstr "Configuración do mando"
 
 #: xrc/JoypadConfig.xrc:13
 msgid "Player 1"
@@ -2675,7 +2675,7 @@ msgstr "Abrir rece&nte"
 
 #: xrc/MainMenu.xrc:18
 msgid "&Reset recent list"
-msgstr "&Restablecer lista de recentes"
+msgstr "&Restabelecer lista de recentes"
 
 #: xrc/MainMenu.xrc:21
 msgid "&Freeze recent list"
@@ -2691,7 +2691,7 @@ msgstr "&e-Reader"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
-msgstr "&Restablecer a carga de Código de Puntos"
+msgstr "&Restabelecer a carga de Código de Puntos"
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
@@ -2699,7 +2699,7 @@ msgstr "&Cargar Código de Puntos..."
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr "&Restablecer gardado de Código de Puntos"
+msgstr "&Restabelecer gardado de Código de Puntos"
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
@@ -2851,7 +2851,7 @@ msgstr "G&ravar"
 
 #: xrc/MainMenu.xrc:204
 msgid "Start playing &movie..."
-msgstr "Comezar a reproducir fil&me..."
+msgstr "Co&mezar a reproducir filme..."
 
 #: xrc/MainMenu.xrc:207
 msgid "Stop playing m&ovie"
@@ -2875,7 +2875,7 @@ msgstr "&Pausa"
 
 #: xrc/MainMenu.xrc:224
 msgid "&Next frame"
-msgstr "Segui&nte cadro"
+msgstr "Segui&nte fotograma"
 
 #: xrc/MainMenu.xrc:227
 msgid "Re&wind"
@@ -2895,7 +2895,7 @@ msgstr "&VSync"
 
 #: xrc/MainMenu.xrc:246
 msgid "&Auto skip frames"
-msgstr "S&alto de cadros automático"
+msgstr "S&alto de fotogramas automático"
 
 #: xrc/MainMenu.xrc:251
 msgid "&Skip BIOS"
@@ -2911,7 +2911,7 @@ msgstr "&Pausar cando non está activo"
 
 #: xrc/MainMenu.xrc:264
 msgid "&Reset"
-msgstr "&Restablecer"
+msgstr "&Restabelecer"
 
 #: xrc/MainMenu.xrc:268
 msgid "&Options"
@@ -3004,7 +3004,7 @@ msgstr "Cambiar filtro de pixel"
 
 #: xrc/MainMenu.xrc:348
 msgid "Change interframe blending"
-msgstr "Cambiar mestura entre cadros"
+msgstr "Cambiar mestura entre fotogramas"
 
 #: xrc/MainMenu.xrc:351
 msgid "&Retain aspect ratio"
@@ -3080,7 +3080,7 @@ msgstr "Permitir entrada de fondo da &panca de mando"
 
 #: xrc/MainMenu.xrc:439
 msgid "&Autofire"
-msgstr "Disparo &automático"
+msgstr "Pulsación &automática"
 
 #: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
 msgid "&A"
@@ -3348,15 +3348,15 @@ msgstr "Visor de mapa"
 
 #: xrc/MapViewer.xrc:16
 msgid "Frame 0"
-msgstr "Cadro 0"
+msgstr "Fotograma 0"
 
 #: xrc/MapViewer.xrc:22
 msgid "Frame 1"
-msgstr "Cadro 1"
+msgstr "Fotograma 1"
 
 #: xrc/MapViewer.xrc:25
 msgid "Frame"
-msgstr "Cadro"
+msgstr "Fotograma"
 
 #: xrc/MapViewer.xrc:35
 msgid "BG0"
@@ -3620,7 +3620,7 @@ msgstr "Limitador de aceleración"
 
 #: xrc/SpeedupConfig.xrc:50
 msgid "Frame skip"
-msgstr "Salto de cadro"
+msgstr "Omitir fotograma"
 
 #: xrc/UIConfig.xrc:4
 msgid "User Interface Settings"

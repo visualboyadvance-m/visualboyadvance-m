@@ -6,14 +6,15 @@
 # Andreu van Walré, 2021
 # Carlos Aguadero <aguaderomartincarlos@gmail.com>, 2021
 # Daniel Carrasco <danielmadrid19@gmail.com>, 2016
+# Jorge Hdez Schez <jorjolo2004@gmail.com>, 2021
 # Sergio . <serchoyt@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2021-04-26 07:01+0000\n"
-"Last-Translator: Carlos Aguadero <aguaderomartincarlos@gmail.com>\n"
+"PO-Revision-Date: 2021-06-29 12:48+0000\n"
+"Last-Translator: Jorge Hdez Schez <jorjolo2004@gmail.com>\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/bgk/vba-m/language/es_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,11 +24,11 @@ msgstr ""
 
 #: wxvbam.cpp:226
 msgid "visualboyadvance-m"
-msgstr "visualboyadvance-m"
+msgstr "visualboyadvance"
 
 #: wxvbam.cpp:443
 msgid "Could not create main window"
-msgstr ""
+msgstr "No se pudo crear la ventana principal"
 
 #: wxvbam.cpp:514
 msgid "Save built-in XRC file and exit"
@@ -39,7 +40,7 @@ msgstr ""
 
 #: wxvbam.cpp:520
 msgid "Print configuration path and exit"
-msgstr ""
+msgstr "Imprimir camino de configuración y salir"
 
 #: wxvbam.cpp:523
 msgid "Start in full-screen mode"
@@ -55,7 +56,7 @@ msgstr ""
 
 #: wxvbam.cpp:537
 msgid "List all settable options and exit"
-msgstr ""
+msgstr "Mostrar todas las opciones configurables y salir"
 
 #: wxvbam.cpp:540
 msgid "ROM file"
@@ -67,7 +68,7 @@ msgstr "<config>=<value>"
 
 #: wxvbam.cpp:573
 msgid "Configuration/build error: can't find built-in xrc"
-msgstr ""
+msgstr "Error de fábrica/configuración: No se puede encontrar built-in xrc"
 
 #: wxvbam.cpp:581
 #, c-format
@@ -109,7 +110,7 @@ msgstr ""
 
 #: wxvbam.cpp:660
 msgid "Configuration file not found."
-msgstr "No funciona archivo de configuracion."
+msgstr "No funciona el archivo de configuracion."
 
 #: wxvbam.cpp:693
 msgid "Bad configuration option or multiple ROM files given:\n"
@@ -129,7 +130,7 @@ msgstr ""
 
 #: guiinit.cpp:118
 msgid "Host name invalid"
-msgstr "Nombre de la Host invalido"
+msgstr "Nombre del host invalido"
 
 #: guiinit.cpp:136
 msgid "Waiting for clients..."
@@ -197,11 +198,11 @@ msgstr "Codigo Generico"
 
 #: guiinit.cpp:758
 msgid "GameShark Advance"
-msgstr "GameShark avanzado"
+msgstr "GameShark Advance"
 
 #: guiinit.cpp:759
 msgid "CodeBreaker Advance"
-msgstr "CodeBreaker Avanzado"
+msgstr "CodeBreaker Advance"
 
 #: guiinit.cpp:760
 msgid "Flashcart CHT"
@@ -284,7 +285,7 @@ msgstr "Porfavor seleccine un plugin o un filtro distinto"
 
 #: guiinit.cpp:1937
 msgid "Plugin selection error"
-msgstr "Error en la seleccion de plugin"
+msgstr "Error en la seleccion del plugin"
 
 #: guiinit.cpp:2150
 msgid "This will clear all user-defined accelerators.  Are you sure?"

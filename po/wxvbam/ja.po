@@ -7,13 +7,14 @@
 # Kuso Bully <aaadsaaads@yahoo.co.jp>, 2018
 # Mach555 <aimmasayukitone@yahoo.co.jp>, 2015
 # Mutuda Katuo <afetser@gmail.com>, 2017
+# 色月 すみれ <nlive0107@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2020-12-17 05:28+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2021-07-02 03:42+0000\n"
+"Last-Translator: 色月 すみれ <nlive0107@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/bgk/vba-m/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,11 +32,11 @@ msgstr "メインウィンドウを作成できませんでした"
 
 #: wxvbam.cpp:514
 msgid "Save built-in XRC file and exit"
-msgstr ""
+msgstr "XRCファイルを保存して終了"
 
 #: wxvbam.cpp:517
 msgid "Save built-in vba-over.ini and exit"
-msgstr ""
+msgstr "vba-over.ini を保存して終了"
 
 #: wxvbam.cpp:520
 msgid "Print configuration path and exit"
