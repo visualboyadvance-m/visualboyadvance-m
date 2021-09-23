@@ -288,7 +288,6 @@ struct option argOptions[] = {
 	{ "auto-frame-skip", required_argument, 0, OPT_AUTO_FRAME_SKIP },
 	{ "auto-load-most-recent", no_argument, &autoLoadMostRecent, 1 },
 	{ "auto-patch", no_argument, &autoPatch, 1 },
-	{ "auto-save-cheat-list", no_argument, &autoSaveLoadCheatList, 1 },
 	{ "auto-save-load-cheat-list", no_argument, &autoSaveLoadCheatList, 1 },
 	{ "autofire", required_argument, 0, OPT_AUTOFIRE },
 	{ "avi-record-dir", required_argument, 0, OPT_AVI_RECORD_DIR },
@@ -485,7 +484,7 @@ void LoadConfig()
 	autoFrameSkip = ReadPref("autoFrameSkip", 0);
 	autoLoadMostRecent = ReadPref("autoLoadMostRecent", 0);
 	autoPatch = ReadPref("autoPatch", 1);
-	autoSaveLoadCheatList = ReadPref("autoSaveCheatList", 1);
+	autoSaveLoadCheatList = ReadPref("autoSaveLoadCheatList", 1);
 	aviRecordDir = ReadPrefString("aviRecordDir");
 	batteryDir = ReadPrefString("batteryDir");
 	biosFileNameGB = ReadPrefString("biosFileGB");
