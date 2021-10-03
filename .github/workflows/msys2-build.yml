@@ -26,6 +26,7 @@ jobs:
             mingw-w64-clang-x86_64-wxmsw3.1
             mingw-w64-clang-x86_64-sfml
             mingw-w64-clang-x86_64-SDL2
+            zip
       - name: Configure
         run: >-
           cmake -B build -G Ninja
