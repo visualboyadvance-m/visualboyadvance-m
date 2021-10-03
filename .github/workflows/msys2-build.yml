@@ -15,6 +15,7 @@ jobs:
 
       - uses: msys2/setup-msys2@v2
         with:
+          msystem: CLANG64
           install: >-
             mingw-w64-clang-x86_64-toolchain
             mingw-w64-clang-x86_64-pkg-config
