@@ -26,6 +26,7 @@ jobs:
             mingw-w64-clang-x86_64-SDL2
       - name: Configure
         run: >-
+          git submodule update --init --remote --recursive
           cmake -B build -G Ninja
       - name: Build
         run: ninja -C build
