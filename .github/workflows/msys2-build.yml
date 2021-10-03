@@ -12,12 +12,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with: 
+          submodules: true
 
       - uses: msys2/setup-msys2@v2
         with:
           msystem: CLANG64
           install: >-
-            git
             mingw-w64-clang-x86_64-toolchain
             mingw-w64-clang-x86_64-pkg-config
             mingw-w64-clang-x86_64-cmake
@@ -26,8 +27,6 @@ jobs:
             mingw-w64-clang-x86_64-sfml
             mingw-w64-clang-x86_64-SDL2
       - name: Configure
-        run: >-
-          "C:\Program Files\Git\bin\git.exe" submodule update --init --remote --recursive
         run: >-
           cmake -B build -G Ninja
       - name: Build
