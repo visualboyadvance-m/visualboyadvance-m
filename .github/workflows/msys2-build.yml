@@ -4,6 +4,8 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      MSYSTEM: CLANG64
     defaults:
       run:
         shell: msys2 {0}
