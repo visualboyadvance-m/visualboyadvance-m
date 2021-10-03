@@ -1,0 +1,31 @@
+name: MSYS2 Build
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          install: >-
+            mingw-w64-clang-x86_64-toolchain
+            mingw-w64-clang-x86_64-pkg-config
+            mingw-w64-clang-x86_64-cmake
+            mingw-w64-clang-x86_64-ninja
+            mingw-w64-clang-x86_64-wxmsw3.1
+            mingw-w64-clang-x86_64-sfml
+            mingw-w64-clang-x86_64-SDL2
+      - name: Configure
+        run: >-
+          cmake -B build -G Ninja
+      - name: Build
+        run: ninja -C build
+
+      - name: Install
+        run: ninja -C build install
