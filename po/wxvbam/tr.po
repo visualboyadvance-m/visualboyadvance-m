@@ -5,6 +5,7 @@
 # Translators:
 # abc Def <hdogan1974@gmail.com>, 2020
 # Ali Ozderya <ozozderya@gmail.com>, 2015,2017
+# boran roni, 2021
 # Justice League <denizden788@gmail.com>, 2020
 # Erdoğan Şahin, 2016
 # Justice League <denizden788@gmail.com>, 2020
@@ -16,8 +17,8 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2021-02-25 15:28+0000\n"
-"Last-Translator: Tmp341\n"
+"PO-Revision-Date: 2021-10-01 20:23+0000\n"
+"Last-Translator: boran roni\n"
 "Language-Team: Turkish (http://www.transifex.com/bgk/vba-m/language/tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1169,11 +1170,11 @@ msgstr "Bağlantısı kesilen joystick %d"
 
 #: xaudio2.cpp:35
 msgid "XAudio2: Enumerating devices failed!"
-msgstr ""
+msgstr "XAudio2: cihaz numaralandırması yapılamadı!"
 
 #: xaudio2.cpp:69 xaudio2.cpp:353
 msgid "The XAudio2 interface failed to initialize!"
-msgstr ""
+msgstr "XAudio2 arayüzü başlatılamadı!"
 
 #: xaudio2.cpp:384
 msgid "XAudio2: Creating mastering voice failed!"
@@ -1181,15 +1182,15 @@ msgstr ""
 
 #: xaudio2.cpp:393
 msgid "XAudio2: Creating source voice failed!"
-msgstr ""
+msgstr "XAudio2: Kaynak seslerin oluşturulması başarısız!"
 
 #: faudio.cpp:32
 msgid "FAudio: Enumerating devices failed!"
-msgstr ""
+msgstr "FAudio: cihaz numaralandırması yapılamadı!"
 
 #: faudio.cpp:67 faudio.cpp:352
 msgid "The FAudio interface failed to initialize!"
-msgstr ""
+msgstr "FAudio arayüzü başlatılamadı!"
 
 #: faudio.cpp:384
 msgid "FAudio: Creating mastering voice failed!"
@@ -1197,7 +1198,7 @@ msgstr ""
 
 #: faudio.cpp:395
 msgid "FAudio: Creating source voice failed!"
-msgstr ""
+msgstr "Faudio: Kaynak seslerin oluşturulması başarısız!"
 
 #: dsound.cpp:90 dsound.cpp:104
 #, c-format
@@ -2320,7 +2321,7 @@ msgstr "Sistem"
 
 #: xrc/GameBoyConfig.xrc:84
 msgid "GB Boot &ROM file :"
-msgstr ""
+msgstr "GB başlat &ROM dosyası :"
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
@@ -2332,11 +2333,11 @@ msgstr "GBC Açılış ROM'u"
 
 #: xrc/GameBoyConfig.xrc:131
 msgid "Current GB BIOS file :"
-msgstr ""
+msgstr "Şuanki GB BIOS dosyası:"
 
 #: xrc/GameBoyConfig.xrc:152
 msgid "Current GBC BIOS file :"
-msgstr ""
+msgstr "Şuanki GBC BIOS dosyası:"
 
 #: xrc/GameBoyConfig.xrc:186
 msgid "User 1"
@@ -2397,7 +2398,7 @@ msgstr "0=Hızlandırma iptal"
 
 #: xrc/GeneralConfig.xrc:114
 msgid "Unlimited"
-msgstr ""
+msgstr "Limitsiz"
 
 #: xrc/IOViewer.xrc:4
 msgid "IO Viewer"
@@ -2696,7 +2697,7 @@ msgstr "&e-okuyucu"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
-msgstr ""
+msgstr "&Dot Kodu Yüklemeyi Sıfırla"
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
@@ -2704,7 +2705,7 @@ msgstr "&Dot kodu yükle..."
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr ""
+msgstr "&Dot Kodu Kaydetmeyi Sıfırla"
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
@@ -2716,7 +2717,7 @@ msgstr "En yakın zamanda kullanılanlar"
 
 #: xrc/MainMenu.xrc:50
 msgid "Load current state slot"
-msgstr ""
+msgstr "Şuanki State Slotu yükle"
 
 #: xrc/MainMenu.xrc:53
 msgid "&Auto load most recent"
@@ -2780,11 +2781,11 @@ msgstr "&En eski slot"
 
 #: xrc/MainMenu.xrc:107
 msgid "Save current state slot"
-msgstr ""
+msgstr "Şuanki State Slotu kaydet"
 
 #: xrc/MainMenu.xrc:110
 msgid "Increase state slot number and save"
-msgstr ""
+msgstr "State slot numarasını arttır ve kaydet"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File ..."
@@ -2796,11 +2797,11 @@ msgstr "&Durum kaydı"
 
 #: xrc/MainMenu.xrc:150
 msgid "Increase state slot number"
-msgstr ""
+msgstr "State slot numarasını arttır"
 
 #: xrc/MainMenu.xrc:153
 msgid "Decrease state slot number"
-msgstr ""
+msgstr "State slot numarasını azalt"
 
 #: xrc/MainMenu.xrc:158 xrc/MainMenu.xrc:170
 msgid "&Battery file..."
@@ -2868,7 +2869,7 @@ msgstr "&Oyna"
 
 #: xrc/MainMenu.xrc:214
 msgid "&Quit"
-msgstr ""
+msgstr "&Çıkış"
 
 #: xrc/MainMenu.xrc:218
 msgid "&Emulation"
@@ -2977,7 +2978,7 @@ msgstr "&Tam ekran başlat"
 
 #: xrc/MainMenu.xrc:324
 msgid "&Scaled resize"
-msgstr ""
+msgstr "&Ölçekli boyutlandırma"
 
 #: xrc/MainMenu.xrc:326
 msgid "&1x"
@@ -3005,11 +3006,11 @@ msgstr "&6x"
 
 #: xrc/MainMenu.xrc:345
 msgid "Change pixel filter"
-msgstr ""
+msgstr "Piksel filtresini değiştir"
 
 #: xrc/MainMenu.xrc:348
 msgid "Change interframe blending"
-msgstr ""
+msgstr "Kareler arası karışmayı değiştir"
 
 #: xrc/MainMenu.xrc:351
 msgid "&Retain aspect ratio"
@@ -3017,7 +3018,7 @@ msgstr "&görüntü oranını koru"
 
 #: xrc/MainMenu.xrc:355
 msgid "Enable MMX"
-msgstr ""
+msgstr "MMX etkinleştir"
 
 #: xrc/MainMenu.xrc:360
 msgid "&Bilinear filter"
@@ -3045,15 +3046,15 @@ msgstr "&Ses"
 
 #: xrc/MainMenu.xrc:394
 msgid "&Increase volume"
-msgstr ""
+msgstr "Sesi arttır"
 
 #: xrc/MainMenu.xrc:398
 msgid "&Decrease volume"
-msgstr ""
+msgstr "Sesi azalt"
 
 #: xrc/MainMenu.xrc:402
 msgid "&Toggle sound"
-msgstr ""
+msgstr "Sesi aç/kapa"
 
 #: xrc/MainMenu.xrc:407
 msgid "&GBA sound interpolation"
@@ -3077,11 +3078,11 @@ msgstr "&Girdi"
 
 #: xrc/MainMenu.xrc:430
 msgid "Allow &keyboard background input"
-msgstr ""
+msgstr "Arkaplanda &klavye girişlerine izin ver"
 
 #: xrc/MainMenu.xrc:434
 msgid "Allow &joystick background input"
-msgstr ""
+msgstr "Arkaplanda &joystick girişlerine izin ver"
 
 #: xrc/MainMenu.xrc:439
 msgid "&Autofire"
@@ -3105,7 +3106,7 @@ msgstr "&R"
 
 #: xrc/MainMenu.xrc:458
 msgid "&Autohold"
-msgstr ""
+msgstr "&oto-bekleme"
 
 #: xrc/MainMenu.xrc:502
 msgid "&Game Boy Advance"
@@ -3129,11 +3130,11 @@ msgstr "&Hata ayıklama çıktısı al"
 
 #: xrc/MainMenu.xrc:520 xrc/MainMenu.xrc:535
 msgid "&LCD Filter"
-msgstr ""
+msgstr "&LCD Filtre"
 
 #: xrc/MainMenu.xrc:531
 msgid "&GB color option"
-msgstr ""
+msgstr "&GB renk ayarı"
 
 #: xrc/MainMenu.xrc:539
 msgid "&GB printer"
@@ -3161,7 +3162,7 @@ msgstr "&Genel..."
 
 #: xrc/MainMenu.xrc:564
 msgid "&Speedup / Turbo ..."
-msgstr ""
+msgstr "&Hızlandırma/Turbo"
 
 #: xrc/MainMenu.xrc:567
 msgid "D&irectories ..."
@@ -3173,7 +3174,7 @@ msgstr "&Tuş kısayolları"
 
 #: xrc/MainMenu.xrc:573
 msgid "&UI Settings ..."
-msgstr ""
+msgstr "&UI Ayarları"
 
 #: xrc/MainMenu.xrc:577
 msgid "&Tools"
@@ -3253,7 +3254,7 @@ msgstr "&Desen izleyici..."
 
 #: xrc/MainMenu.xrc:642
 msgid "Show all video layers"
-msgstr ""
+msgstr "Tüm video katmanlarını göster"
 
 #: xrc/MainMenu.xrc:646
 msgid "BG &0"
@@ -3533,7 +3534,7 @@ msgstr "XAudio2"
 
 #: xrc/SoundConfig.xrc:132
 msgid "FAudio"
-msgstr ""
+msgstr "FAudio"
 
 #: xrc/SoundConfig.xrc:146
 msgid "Device"
@@ -3617,7 +3618,7 @@ msgstr "0x60&10000"
 
 #: xrc/SpeedupConfig.xrc:4
 msgid "SpeedUp / Turbo Settings"
-msgstr ""
+msgstr "Hızlandırma/Turbo Ayarları"
 
 #: xrc/SpeedupConfig.xrc:9
 msgid "Speedup Throttle"
@@ -3625,12 +3626,12 @@ msgstr ""
 
 #: xrc/SpeedupConfig.xrc:50
 msgid "Frame skip"
-msgstr ""
+msgstr "Kare atlaması"
 
 #: xrc/UIConfig.xrc:4
 msgid "User Interface Settings"
-msgstr ""
+msgstr "Arayüz ayarları"
 
 #: xrc/UIConfig.xrc:9
 msgid "Hide Menu Bar"
-msgstr ""
+msgstr "Menü çubuğunu sakla"
