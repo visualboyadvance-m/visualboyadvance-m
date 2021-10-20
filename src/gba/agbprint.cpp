@@ -63,7 +63,6 @@ void agbPrintFlush()
 #ifdef BKPT_SUPPORT
         dbgOutput("Did you forget to call AGBPrintInit?\n", 0);
 #endif
-        log("AGBprint: Did you forget to call AGBPrintInit?\n");
         // get rid of the text otherwise we will continue to be called
         debuggerWriteHalfWord(0x9fe20fc, put);
         return;
@@ -73,18 +72,15 @@ void agbPrintFlush()
 
     while (get != put) {
         char c = data[get++];
+#ifdef BKPT_SUPPORT
         char s[2];
         s[0] = c;
         s[1] = 0;
-
-        message[index++] = s[0];
-
         if (systemVerbose & VERBOSE_AGBPRINT)
 	{
 #ifdef BKPT_SUPPORT
             dbgOutput(s, 0);
 #endif
-	}
         if (c == '\n')
             break;
     }

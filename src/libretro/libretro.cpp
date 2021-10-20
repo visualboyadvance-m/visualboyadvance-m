@@ -63,6 +63,7 @@ static bool option_showAdvancedOptions = false;
 static double option_sndFiltering = 0.5;
 static unsigned option_gbPalette = 0;
 static bool option_lcdfilter = false;
+
 // filters
 static IFBFilterFunc ifb_filter_func = NULL;
 
@@ -71,6 +72,7 @@ static unsigned systemWidth = gbaWidth;
 static unsigned systemHeight = gbaHeight;
 static EmulatedSystem* core = NULL;
 static IMAGE_TYPE type = IMAGE_UNKNOWN;
+static bool libretro_supports_bitmasks = false;
 
 // global vars
 uint16_t systemColorMap16[0x10000];
@@ -80,80 +82,14 @@ int systemRedShift = 0;
 int systemBlueShift = 0;
 int systemGreenShift = 0;
 int systemColorDepth = 32;
-int systemDebug = 0;
 int systemVerbose = 0;
 int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
-int systemSpeed = 0;
 int emulating = 0;
 
+#ifdef BKPT_SUPPORT
 void (*dbgOutput)(const char* s, uint32_t addr);
 void (*dbgSignal)(int sig, int number);
-
-// Dummy vars/funcs for serial io emulation without LINK communication related stuff
-#ifndef NO_LINK
-#include "../gba/GBALink.h"
-uint8_t gbSIO_SC;
-bool LinkIsWaiting;
-bool LinkFirstTime;
-bool EmuReseted;
-int winGbPrinterEnabled;
-bool gba_joybus_active = false;
-
-#define UPDATE_REG(address, value) WRITE16LE(((uint16_t*)&ioMem[address]), value)
-
-LinkMode GetLinkMode()
-{
-    return LINK_DISCONNECTED;
-}
-
-void StartGPLink(uint16_t value)
-{
-    if (!ioMem)
-        return;
-
-    UPDATE_REG(COMM_RCNT, value);
-}
-
-void LinkUpdate(int ticks)
-{
-}
-
-void StartLink(uint16_t siocnt)
-{
-/*    log("'s' siocnt = %04x\n", siocnt); */
-
-    if (!ioMem)
-        return;
-
-    if(siocnt & 0x80)
-    {
-        siocnt &= 0xff7f;
-        if(siocnt & 1 && (siocnt & 0x4000))
-        {
-            UPDATE_REG(COMM_SIOCNT, 0xFF);
-            IF |= 0x80;
-            UPDATE_REG(0x202, IF);
-            siocnt &= 0x7f7f;
-        }
-    }
-    UPDATE_REG(COMM_SIOCNT, siocnt);
-}
-
-void CheckLinkConnection()
-{
-}
-
-void gbInitLink()
-{
-   LinkIsWaiting = false;
-   LinkFirstTime = true;
-}
-
-uint16_t gbLinkUpdate(uint8_t b, int gbSerialOn) //used on external clock
-{
-   return (b << 8);
-}
 #endif
 
 #define GS555(x) (x | (x << 5) | (x << 10))
@@ -233,6 +169,8 @@ static void* gb_rtcdata_prt(void)
         return &gbDataMBC3.mapperSeconds;
     case 0xfd: // TAMA5 + extended
         return &gbDataTAMA5.mapperSeconds;
+    case 0xfe: // HuC3 + Clock
+        return &gbRTCHuC3.mapperLastTime;
     }
     return NULL;
 }
@@ -245,6 +183,8 @@ static size_t gb_rtcdata_size(void)
         return MBC3_RTC_DATA_SIZE;
     case 0xfd: // TAMA5 + extended
         return TAMA5_RTC_DATA_SIZE;
+    case 0xfe: // HuC3 + Clock
+        return sizeof(gbRTCHuC3.mapperLastTime);
     }
     return 0;
 }
@@ -294,6 +234,9 @@ static void gbInitRTC(void)
             }
             gbDataTAMA5.mapperControl = (gbDataTAMA5.mapperControl & 0xfe) | (lt->tm_yday > 255 ? 1 : 0);
         }
+        break;
+    case 0xfe:
+        gbRTCHuC3.mapperLastTime = rawtime;
         break;
     }
 }
@@ -362,7 +305,7 @@ void* retro_get_memory_data(unsigned id)
             data = (gbCgbMode ? gbVram : (gbMemory + 0x8000));
             break;
         case RETRO_MEMORY_RTC:
-            if (gbBattery && gbRTCPresent)
+            if (gbRTCPresent)
                 data = gb_rtcdata_prt();
             break;
         }
@@ -410,7 +353,8 @@ size_t retro_get_memory_size(unsigned id)
             size = gbCgbMode ? 0x4000 : 0x2000;
             break;
         case RETRO_MEMORY_RTC:
-            size = gb_rtcdata_size();
+            if (gbRTCPresent)
+                size = gb_rtcdata_size();
             break;
         }
         break;
@@ -643,6 +587,12 @@ void retro_init(void)
       rumble_cb = rumble.set_rumble_state;
    else
       rumble_cb = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL))
+   {
+      libretro_supports_bitmasks = true;
+      log_cb(RETRO_LOG_INFO, "SET_SUPPORT_INPUT_BITMASK: yes\n");
+   }
 }
 
 static const char *gbGetCartridgeType(void)
@@ -978,6 +928,7 @@ void retro_deinit(void)
     emulating = 0;
     core->emuCleanUp();
     soundShutdown();
+    libretro_supports_bitmasks = false;
 }
 
 void retro_reset(void)
@@ -1414,6 +1365,7 @@ void updateInput_SolarSensor(void)
 static void updateInput_Joypad(void)
 {
     unsigned max_buttons = MAX_BUTTONS - ((type == IMAGE_GB) ? 2 : 0); // gb only has 8 buttons
+    int16_t inbuf = 0;
 
     for (unsigned port = 0; port < MAX_PLAYERS; port++)
     {
@@ -1421,8 +1373,16 @@ static void updateInput_Joypad(void)
         input_buf[port] = 0;
 
         if (retropad_device[port] == RETRO_DEVICE_JOYPAD) {
+            if (libretro_supports_bitmasks)
+                inbuf = input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
+            else
+            {
+                for (int i = 0; i < (RETRO_DEVICE_ID_JOYPAD_R3 + 1); i++)
+                    inbuf |= input_cb(0, RETRO_DEVICE_JOYPAD, 0, i) ? (1 << i) : 0;
+            }
+
             for (unsigned button = 0; button < max_buttons; button++)
-                input_buf[port] |= input_cb(port, RETRO_DEVICE_JOYPAD, 0, binds[button]) << button;
+                input_buf[port] |= (inbuf & (1 << binds[button])) ? (1 << button) : 0;
 
             if (option_turboEnable) {
                 /* Handle Turbo A & B buttons */
@@ -1471,6 +1431,10 @@ void retro_run(void)
                 break;
             case 0xfd:
                 if (!gbDataTAMA5.mapperLastTime)
+                    initRTC = true;
+                break;
+            case 0xfe:
+                if (!gbRTCHuC3.mapperLastTime)
                     initRTC = true;
                 break;
             }

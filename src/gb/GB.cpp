@@ -1094,10 +1094,13 @@ void gbWriteMemory(uint16_t address, uint8_t value)
             }
 #endif
         }
-
+#else
+        gbMemory[0xff02] = value;
+        if (gbSerialOn)
+            gbSerialTicks = GBSERIAL_CLOCK_TICKS;
+#endif
         gbSerialBits = 0;
         return;
-#endif
     }
 
     case 0x04: {
@@ -1922,11 +1925,11 @@ uint8_t gbReadMemory(uint16_t address)
             return gbMemory[0xff01];
         case 0x02:
             return (gbMemory[0xff02]);
-            case 0x03:
-                log("Undocumented Memory register read %04x PC=%04x\n",
+        case 0x03:
+            log("Undocumented Memory register read %04x PC=%04x\n",
                 address,
                 PC.W);
-                return 0xff;
+            return 0xff;
         case 0x04:
             return register_DIV;
         case 0x05:
@@ -2790,6 +2793,8 @@ void gbReset()
 
     memset(&gbDataHuC3, 0, sizeof(gbDataHuC3));
     gbDataHuC3.mapperROMBank = 1;
+    gbDataHuC3.mapperRAMValue = 1;
+    gbRTCHuC3.memoryTimerRead = 1;
 
     memset(&gbDataTAMA5, 0, 26 * sizeof(int));
     gbDataTAMA5.mapperROMBank = 1;
@@ -4405,6 +4410,7 @@ bool gbUpdateSizes()
     case 0x1e:
     case 0x22:
     case 0xfd:
+    case 0xfe:
     case 0xff:
         gbBattery = 1;
         break;
@@ -4428,6 +4434,7 @@ bool gbUpdateSizes()
     case 0x0f:
     case 0x10: // mbc3
     case 0xfd: // tama5
+    case 0xfe:
         gbRTCPresent = 1;
         break;
     default:
@@ -5324,6 +5331,27 @@ void gbEmulate(int ticksToStop)
                 }
 #endif
             }
+#else
+        static int SIOctr = 0;
+        SIOctr++;
+        if (SIOctr % 5) {
+            if (gbSerialOn) {
+                if  (gbMemory[0xff02] & 1) {
+                    gbSerialTicks -= clockTicks;
+                    while (gbSerialTicks <= 0) {
+                        gbMemory[0xff01] = (gbMemory[0xff01] << 1) | 1;
+                        gbSerialBits++;
+                        if (gbSerialBits >= 8) {
+                            gbMemory[0xff02] &= 0x7f;
+                            gbMemory[0xff0f] = register_IF |= 8;
+                            gbSerialOn = 0;
+                            gbSerialBits = 0;
+                        } else
+                            gbSerialTicks += GBSERIAL_CLOCK_TICKS;
+                    }
+                }
+            }
+        }
 #endif
         // TODO: evaluate and fix this
         // On VBA-M (gb core running twice as fast?), each vblank is uses 35112 cycles.
@@ -5518,6 +5546,8 @@ unsigned int gbWriteSaveState(uint8_t* data, unsigned)
     utilWriteMem(data, &gbDataMBC5, sizeof(gbDataMBC5));
     utilWriteMem(data, &gbDataHuC1, sizeof(gbDataHuC1));
     utilWriteMem(data, &gbDataHuC3, sizeof(gbDataHuC3));
+    if (gbRomType == 0xfe) // HuC3 rtc data
+        utilWriteMem(data, &gbRTCHuC3, sizeof(gbRTCHuC3));
     utilWriteMem(data, &gbDataTAMA5, sizeof(gbDataTAMA5));
     if (gbTAMA5ram != NULL)
         utilWriteMem(data, gbTAMA5ram, gbTAMA5ramSize);
@@ -5635,6 +5665,8 @@ bool gbReadSaveState(const uint8_t* data, unsigned)
     utilReadMem(&gbDataMBC5, data, sizeof(gbDataMBC5));
     utilReadMem(&gbDataHuC1, data, sizeof(gbDataHuC1));
     utilReadMem(&gbDataHuC3, data, sizeof(gbDataHuC3));
+    if (gbRomType == 0xfe) // HuC3 rtc data
+        utilReadMem(&gbRTCHuC3, data, sizeof(gbRTCHuC3));
     utilReadMem(&gbDataTAMA5, data, sizeof(gbDataTAMA5));
     if (gbTAMA5ram != NULL) {
         utilReadMem(gbTAMA5ram, data, gbTAMA5ramSize);

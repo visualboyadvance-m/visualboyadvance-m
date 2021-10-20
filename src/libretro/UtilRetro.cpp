@@ -43,14 +43,6 @@ bool cpuIsMultiBoot      = false;
 const char* loadDotCodeFile;
 const char* saveDotCodeFile;
 
-extern int systemColorDepth;
-extern int systemRedShift;
-extern int systemGreenShift;
-extern int systemBlueShift;
-
-extern uint16_t systemColorMap16[0x10000];
-extern uint32_t systemColorMap32[0x10000];
-
 bool utilWritePNGFile(const char* fileName, int w, int h, uint8_t* pix)
 {
     return false;
@@ -158,7 +150,7 @@ uint8_t *utilLoad(const char *file, bool (*accept)(const char *), uint8_t *data,
         }
     }
 
-    if (fread(image, 1, size, fp) != size) {
+    if (fread(image, 1, size, fp) != (size_t)size) {
         log("Failed to read from %s", file);
         fclose(fp);
         return NULL;

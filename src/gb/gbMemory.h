@@ -95,6 +95,18 @@ struct mapperHuC3 {
     int mapperRegister8;
 };
 
+struct mapperHuC3RTC {
+    union {
+        time_t mapperLastTime;
+        uint64_t _time_pad; /* so that 32bit and 64bit saves are compatible */
+    };
+    unsigned mapperDateTime;
+    unsigned mapperWritingTime;
+    unsigned memoryTimerRead;
+    unsigned mapperClockShift;
+    unsigned reserved[4];
+};
+
 struct mapperTAMA5 {
     int mapperRAMEnable;
     int mapperROMBank;
@@ -147,6 +159,7 @@ extern mapperMBC3 gbDataMBC3;
 extern mapperMBC5 gbDataMBC5;
 extern mapperHuC1 gbDataHuC1;
 extern mapperHuC3 gbDataHuC3;
+extern mapperHuC3RTC gbRTCHuC3;
 extern mapperTAMA5 gbDataTAMA5;
 extern mapperMMM01 gbDataMMM01;
 extern mapperGS3 gbDataGS3;
@@ -195,5 +208,7 @@ extern void memoryUpdateMapGS3();
 #define MBC3_RTC_DATA_SIZE  sizeof(int) * 10 + sizeof(uint64_t)
 
 #define TAMA5_RTC_DATA_SIZE sizeof(int) * 14 + sizeof(uint64_t)
+
+#define HUC3_RTC_DATA_SIZE sizeof(int) * 4 + sizeof(uint64_t)
 
 #endif // GBMEMORY_H

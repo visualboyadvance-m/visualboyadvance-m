@@ -50,8 +50,9 @@ bool busPrefetchEnable = false;
 uint32_t busPrefetchCount = 0;
 int cpuDmaTicksToUpdate = 0;
 int cpuDmaCount = 0;
-bool cpuDmaHack = false;
+bool cpuDmaRunning = false;
 uint32_t cpuDmaLast = 0;
+uint32_t cpuDmaPC = 0;
 int dummyAddress = 0;
 
 bool cpuBreakLoop = false;
@@ -1621,7 +1622,7 @@ int CPULoadRomData(const char* data, int size)
 
     uint16_t* temp = (uint16_t*)(rom + ((romSize + 1) & ~1));
     int i;
-    for (i = (romSize + 1) & ~1; i < romSize; i += 2) {
+    for (i = (romSize + 1) & ~1; i < SIZE_ROM; i += 2) {
         WRITE16LE(temp, (i >> 1) & 0xFFFF);
         temp++;
     }
@@ -2343,7 +2344,8 @@ void doDMA(uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t c, int t
     int dw = 0;
     int sc = c;
 
-    cpuDmaHack = true;
+    cpuDmaRunning = true;
+    cpuDmaPC = reg[15].I;
     cpuDmaCount = c;
     // This is done to get the correct waitstates.
     if (sm > 15)
@@ -2408,7 +2410,7 @@ void doDMA(uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t c, int t
     }
 
     cpuDmaTicksToUpdate += totalTicks;
-    cpuDmaHack = false;
+    cpuDmaRunning = false;
 }
 
 void CPUCheckDMA(int reason, int dmamask)
@@ -3077,11 +3079,27 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         cpuNextEvent = cpuTotalTicks;
         break;
 
-#ifndef NO_LINK
     case COMM_SIOCNT:
+#ifndef NO_LINK
         StartLink(value);
+#else
+        if (!ioMem)
+            return;
+
+        if (value & 0x80) {
+            value &= 0xff7f;
+            if (value & 1 && (value & 0x4000)) {
+                UPDATE_REG(COMM_SIOCNT, 0xFF);
+                IF |= 0x80;
+                UPDATE_REG(0x202, IF);
+                value &= 0x7f7f;
+            }
+        }
+        UPDATE_REG(COMM_SIOCNT, value);
+#endif
         break;
 
+#ifndef NO_LINK
     case COMM_SIODATA8:
         UPDATE_REG(COMM_SIODATA8, value);
         break;
@@ -3096,11 +3114,19 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         UPDATE_REG(0x132, value & 0xC3FF);
         break;
 
-#ifndef NO_LINK
+
     case COMM_RCNT:
+#ifndef NO_LINK
         StartGPLink(value);
+#else
+        if (!ioMem)
+            return;
+
+        UPDATE_REG(COMM_RCNT, value);
+#endif
         break;
 
+#ifndef NO_LINK
     case COMM_JOYCNT: {
         uint16_t cur = READ16LE(&ioMem[COMM_JOYCNT]);
 
@@ -3636,7 +3662,7 @@ void CPUReset()
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    cpuDmaHack = false;
+    cpuDmaRunning = false;
 
     lastTime = systemGetClock();
 

@@ -192,7 +192,7 @@ struct retro_core_option_definition option_defs_us[] = {
     {
         "vbam_lcdfilter",
         "LCD Color Filter",
-        "TODO:",
+        "Darkens the onscreen colors by applying a screen filter.",
         {
             { "disabled",  NULL },
             { "enabled",   NULL },
@@ -203,11 +203,11 @@ struct retro_core_option_definition option_defs_us[] = {
     {
         "vbam_interframeblending",
         "Interframe Blending",
-        "TODO:",
+        "Simulates LCD ghosting effects. 'Smart' attempts to detect screen flickering, and only performs a 50:50 mix on affected pixels, while 'Motion Blur' mimics natural LCD response times by combining multiple buffered frames. 'Smart' blending is required when playing games that aggressively exploit LCD ghosting for transparency effects (Wave Race, Chikyuu Kaihou Gun ZAS, F-Zero, the Boktai series...).",
         {
             { "disabled",  NULL },
-            { "smart",   NULL },
-            { "motion blur",   NULL },
+            { "smart",   "Smart" },
+            { "motion blur",   "Motion Blur" },
             { NULL, NULL },
         },
         "disabled"
