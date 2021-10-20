@@ -55,10 +55,6 @@ void agbPrintFlush()
     uint16_t put = debuggerReadHalfWord(0x9fe20fe);
 
     uint32_t address = (debuggerReadHalfWord(0x9fe20fa) << 16);
-
-    char message[0x10000];
-    size_t index = 0;
-
     if (address != 0xfd0000 && address != 0x1fd0000) {
 #ifdef BKPT_SUPPORT
         dbgOutput("Did you forget to call AGBPrintInit?\n", 0);
@@ -77,18 +73,10 @@ void agbPrintFlush()
         s[0] = c;
         s[1] = 0;
         if (systemVerbose & VERBOSE_AGBPRINT)
-	{
-#ifdef BKPT_SUPPORT
             dbgOutput(s, 0);
 #endif
         if (c == '\n')
             break;
-    }
-
-    message[index] = '\0';
-    if (systemVerbose & VERBOSE_AGBPRINT)
-    {
-        log("AGBPrint: %s\n", message);
     }
     debuggerWriteHalfWord(0x9fe20fc, get);
 }
