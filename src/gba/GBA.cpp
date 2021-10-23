@@ -50,9 +50,8 @@ bool busPrefetchEnable = false;
 uint32_t busPrefetchCount = 0;
 int cpuDmaTicksToUpdate = 0;
 int cpuDmaCount = 0;
-bool cpuDmaRunning = false;
+bool cpuDmaHack = false;
 uint32_t cpuDmaLast = 0;
-uint32_t cpuDmaPC = 0;
 int dummyAddress = 0;
 
 bool cpuBreakLoop = false;
@@ -2344,8 +2343,7 @@ void doDMA(uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t c, int t
     int dw = 0;
     int sc = c;
 
-    cpuDmaRunning = true;
-    cpuDmaPC = reg[15].I;
+    cpuDmaHack = true;
     cpuDmaCount = c;
     // This is done to get the correct waitstates.
     if (sm > 15)
@@ -2410,7 +2408,7 @@ void doDMA(uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t c, int t
     }
 
     cpuDmaTicksToUpdate += totalTicks;
-    cpuDmaRunning = false;
+    cpuDmaHack = false;
 }
 
 void CPUCheckDMA(int reason, int dmamask)
@@ -3662,7 +3660,7 @@ void CPUReset()
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    cpuDmaRunning = false;
+    cpuDmaHack = false;
 
     lastTime = systemGetClock();
 
