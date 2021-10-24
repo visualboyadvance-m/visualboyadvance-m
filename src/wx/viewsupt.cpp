@@ -1,5 +1,4 @@
 #include "viewsupt.h"
-#include "../common/ConfigManager.h"
 #include "wxvbam.h"
 #include "wxutil.h"
 

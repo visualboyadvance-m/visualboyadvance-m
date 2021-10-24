@@ -535,6 +535,10 @@
           <label>_LCD Filter</label>
           <checkable>1</checkable>
         </object>
+        <object class="wxMenuItem" name="ColorizerHack">
+          <label>_GB Colorizer Hack (requires restart)</label>
+          <checkable>1</checkable>
+        </object>        
         <object class="wxMenuItem" name="Printer">
           <label>_GB printer</label>
           <checkable>1</checkable>
@@ -549,7 +553,7 @@
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="BootRomGB">
-          <label>_Use GB BIOS file</label>
+          <label>_Use GB BIOS file (requires restart)</label>
           <checkable>1</checkable>
         </object>
         <object class="wxMenuItem" name="BootRomGBC">

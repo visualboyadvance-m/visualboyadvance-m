@@ -16,7 +16,6 @@
 #include <SDL_joystick.h>
 
 #include "../common/version_cpp.h"
-#include "../common/ConfigManager.h"
 #include "../common/Patch.h"
 #include "../gb/gbPrinter.h"
 #include "../gba/RTC.h"
@@ -199,7 +198,18 @@ void GameArea::LoadGame(const wxString& name)
         soundSetThrottle(throttle);
         gbGetHardwareType();
 
-        bool use_bios  =  gbCgbMode ? useBiosFileGBC : useBiosFileGB;
+
+        // Disable bios loading when using colorizer hack.
+        if (useBiosFileGB && colorizerHack) {
+            wxLogError(_("Cannot use GB BIOS file when Colorizer Hack is enabled, disabling GB BIOS file."));
+            useBiosFileGB = 0;
+            update_opts();
+        }
+
+        // Set up the core for the colorizer hack.
+        setColorizerHack(colorizerHack);
+
+        bool use_bios = gbCgbMode ? useBiosFileGBC : useBiosFileGB;
 
         wxCharBuffer fnb(UTF8((gbCgbMode ? gopts.gbc_bios : gopts.gb_bios)));
         const char* fn = fnb.data();

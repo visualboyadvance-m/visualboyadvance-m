@@ -16,11 +16,10 @@
 #include "wx/sdljoy.h"
 #include "wx/wxmisc.h"
 #include "wxhead.h"
-#ifndef NO_FFMPEG
-#include "../common/ffmpeg.h"
-#endif
 
 /* yeah, they aren't needed globally, but I'm too lazy to limit where needed */
+#include "../common/ConfigManager.h"
+
 #include "../System.h"
 #include "../Util.h"
 #include "../gb/gb.h"
@@ -31,6 +30,10 @@
 #include "../gba/GBALink.h"
 #include "../gba/Globals.h"
 #include "../gba/Sound.h"
+
+#ifndef NO_FFMPEG
+#include "../common/ffmpeg.h"
+#endif
 
 #include "wxlogdebug.h"
 #include "wxutil.h"

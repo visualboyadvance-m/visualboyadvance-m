@@ -23,7 +23,6 @@
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
 
-#include "../common/ConfigManager.h"
 #include "../gba/CheatSearch.h"
 
 #if defined(__WXGTK__)
@@ -3050,6 +3049,7 @@ bool MainFrame::BindControls()
         MenuOptionIntMask("VideoLayersOBJWIN", layerSettings, (1 << 15));
         MenuOptionBool("CheatsAutoSaveLoad", gopts.autoload_cheats);
         MenuOptionIntMask("CheatsEnable", cheatsEnabled, 1);
+        SetMenuOption("ColorizerHack", colorizerHack ? 1 : 0);
         MenuOptionIntMask("KeepSaves", skipSaveGameBattery, 1);
         MenuOptionIntMask("KeepCheats", skipSaveGameCheats, 1);
         MenuOptionBool("LoadGameAutoLoad", gopts.autoload_state);

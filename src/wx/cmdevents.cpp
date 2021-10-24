@@ -11,7 +11,6 @@
 #include <wx/msgdlg.h>
 
 #include "../common/version_cpp.h"
-#include "../common/ConfigManager.h"
 #include "../gb/gbPrinter.h"
 #include "../gba/agbprint.h"
 
@@ -1875,6 +1874,22 @@ EVT_HANDLER(CheatsEnable, "Enable cheats (toggle)")
     update_opts();
 }
 
+EVT_HANDLER(ColorizerHack, "Enable Colorizer Hack (toggle)")
+{
+    int val = 0;
+    GetMenuOptionInt("ColorizerHack", val, 1);
+
+    if (val == 1 && useBiosFileGB == 1) {
+        wxLogError(_("Cannot use Colorizer Hack when GB BIOS File is enabled."));
+        val = 0;
+        SetMenuOption("ColorizerHack", 0);
+    }
+
+    colorizerHack = val;
+
+    update_opts();
+}
+
 // Debug menu
 EVT_HANDLER_MASK(VideoLayersBG0, "Video layer BG0 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
@@ -3079,7 +3094,17 @@ EVT_HANDLER(BootRomEn, "Use the specified BIOS file for GBA")
 
 EVT_HANDLER(BootRomGB, "Use the specified BIOS file for GB")
 {
-    GetMenuOptionInt("BootRomGB", useBiosFileGB, 1);
+    int val = 0;
+    GetMenuOptionInt("BootRomGB", val, 1);
+
+    if (val == 1 && colorizerHack == 1) {
+        wxLogError(_("Cannot use GB BIOS when Colorizer Hack is enabled."));
+        val = 0;
+        SetMenuOption("BootRomGB", 0);
+    }
+
+    useBiosFileGB = val;
+
     update_opts();
 }
 

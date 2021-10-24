@@ -1,4 +1,3 @@
-#include "../common/ConfigManager.h"
 #include "../common/SoundSDL.h"
 #include "wxvbam.h"
 #include "SDL.h"
