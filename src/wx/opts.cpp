@@ -209,6 +209,7 @@ opt_desc opts[] = {
     /// GB
     STROPT("GB/BiosFile", "", wxTRANSLATE("BIOS file to use for GB, if enabled"), gopts.gb_bios),
     INTOPT("GB/ColorOption", "GBColorOption", wxTRANSLATE("GB color enhancement, if enabled"), gbColorOption, 0, 1),
+    BOOLOPT("GB/ColorizerHack", "ColorizerHack", wxTRANSLATE("Enable DX Colorization Hacks"), gopts.colorizer_hack),
     BOOLOPT("GB/LCDFilter", "GBLcdFilter", wxTRANSLATE("Apply LCD filter, if enabled"), gbLcdFilter),
     STROPT("GB/GBCBiosFile", "", wxTRANSLATE("BIOS file to use for GBC, if enabled"), gopts.gbc_bios),
     NOOPT(wxT("GB/Palette0"), "", wxTRANSLATE("The default palette, as 8 comma-separated 4-digit hex integers (rgb555).")),
@@ -263,6 +264,7 @@ opt_desc opts[] = {
     INTOPT("preferences/borderOn", "", wxTRANSLATE("Always enable border"), gbBorderOn, 0, 1),
     INTOPT("preferences/captureFormat", "", wxTRANSLATE("Screen capture file format"), captureFormat, 0, 1),
     INTOPT("preferences/cheatsEnabled", "", wxTRANSLATE("Enable cheats"), cheatsEnabled, 0, 1),
+
 #ifdef MMX
     INTOPT("preferences/enableMMX", "MMX", wxTRANSLATE("Enable MMX"), enableMMX, 0, 1),
 #endif

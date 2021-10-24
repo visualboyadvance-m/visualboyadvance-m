@@ -53,6 +53,7 @@ extern int autoSaveLoadCheatList;
 extern int aviRecording;
 extern int captureFormat;
 extern int cheatsEnabled;
+extern int ColorizerHack;
 extern int cpuDisableSfx;
 extern int cpuSaveType;
 extern int dinputKeyFocus;

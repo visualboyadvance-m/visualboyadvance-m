@@ -3050,6 +3050,7 @@ bool MainFrame::BindControls()
         MenuOptionIntMask("VideoLayersOBJWIN", layerSettings, (1 << 15));
         MenuOptionBool("CheatsAutoSaveLoad", gopts.autoload_cheats);
         MenuOptionIntMask("CheatsEnable", cheatsEnabled, 1);
+        MenuOptionBool("ColorizerHack", gopts.colorizer_hack);
         MenuOptionIntMask("KeepSaves", skipSaveGameBattery, 1);
         MenuOptionIntMask("KeepCheats", skipSaveGameCheats, 1);
         MenuOptionBool("LoadGameAutoLoad", gopts.autoload_state);

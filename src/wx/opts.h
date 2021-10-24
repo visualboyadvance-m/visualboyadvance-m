@@ -27,6 +27,7 @@ extern struct opts_t {
     bool keep_on_top;
 
     /// GB
+    bool colorizer_hack;
     wxString gb_bios;
     wxString gbc_bios;
     // uint16_t systemGbPalette[8*3];

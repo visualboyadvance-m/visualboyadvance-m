@@ -1875,6 +1875,16 @@ EVT_HANDLER(CheatsEnable, "Enable cheats (toggle)")
     update_opts();
 }
 
+// New
+EVT_HANDLER(ColorizerHack, "Enable Colorizer Hack (toggle)")
+{
+    bool menuPress;
+    GetMenuOptionBool("ColorizerHack", menuPress);
+    toggleBooleanVar(&menuPress, &gopts.colorizer_hack);
+    SetMenuOption("ColorizerHack", gopts.colorizer_hack ? 1 : 0);
+    update_opts();
+}
+
 // Debug menu
 EVT_HANDLER_MASK(VideoLayersBG0, "Video layer BG0 (toggle)", CMDEN_GB | CMDEN_GBA)
 {

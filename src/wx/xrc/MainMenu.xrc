@@ -535,6 +535,10 @@
           <label>_LCD Filter</label>
           <checkable>1</checkable>
         </object>
+        <object class="wxMenuItem" name="ColorizerHack">
+          <label>_GB Colorizer Hack (Needs Restart)</label>
+          <checkable>1</checkable>
+        </object>        
         <object class="wxMenuItem" name="Printer">
           <label>_GB printer</label>
           <checkable>1</checkable>

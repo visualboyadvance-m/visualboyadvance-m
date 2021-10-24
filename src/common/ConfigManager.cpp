@@ -164,6 +164,7 @@ int autoSaveLoadCheatList;
 int aviRecording;
 int captureFormat = 0;
 int cheatsEnabled = true;
+int ColorizerHack;
 int cpuDisableSfx = false;
 int cpuSaveType = 0;
 int enableMMX;
@@ -302,6 +303,7 @@ struct option argOptions[] = {
 	{ "cheat", required_argument, 0, OPT_CHEAT },
 	{ "cheats-enabled", no_argument, &cheatsEnabled, 1 },
 	{ "color-option", no_argument, &gbColorOption, 1 },
+	{ "Colorizer-Hack", no_argument, &ColorizerHack, 1 },
 	{ "config", required_argument, 0, 'c' },
 	{ "cpu-disable-sfx", no_argument, &cpuDisableSfx, 1 },
 	{ "cpu-save-type", required_argument, 0, OPT_CPU_SAVE_TYPE },
@@ -492,6 +494,7 @@ void LoadConfig()
 	biosFileNameGBC = ReadPrefString("biosFileGBC");
 	captureFormat = ReadPref("captureFormat", 0);
 	cheatsEnabled = ReadPref("cheatsEnabled", 0);
+	ColorizerHack = ReadPref("ColorizerHack", 1);
 	cpuDisableSfx = ReadPref("disableSfx", 0);
 	cpuSaveType = ReadPrefHex("saveType");
 	enableMMX = ReadPref("enableMMX", 1);

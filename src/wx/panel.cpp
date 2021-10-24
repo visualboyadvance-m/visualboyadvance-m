@@ -199,7 +199,15 @@ void GameArea::LoadGame(const wxString& name)
         soundSetThrottle(throttle);
         gbGetHardwareType();
 
+
+        //Set up the core for the colorizer hack
+        setColorizerHack(gopts.colorizer_hack);
+
         bool use_bios  =  gbCgbMode ? useBiosFileGBC : useBiosFileGB;
+
+        // Disable bios loading when using Colorizer hack
+        if (gopts.colorizer_hack)
+            use_bios = false;
 
         wxCharBuffer fnb(UTF8((gbCgbMode ? gopts.gbc_bios : gopts.gb_bios)));
         const char* fn = fnb.data();
