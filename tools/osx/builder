@@ -1,4 +1,4 @@
-#!/opt/homebrew/bin/bash
+#!/usr/local/bin/bash
 
 set -e
 
@@ -42,6 +42,9 @@ if [ "$target_bits" -eq 32 ] && [ -d /Applications/Xcode9.app ]; then
     printf "\nSetting Xcode9 as the default Xcode for 32 bit build...\n\n"
     sudo xcode-select -s /Applications/Xcode9.app/Contents/Developer
 fi
+
+# Unlink brew wxwidgets if installed because it interferes with ours.
+brew unlink wxwidgets >/dev/null 2>&1
 
 export BUILD_ROOT="$HOME/vbam-build-mac-${target_bits}bit"
 
@@ -100,9 +103,6 @@ table_line_append DIST_EXTRA_CFLAGS ffmpeg "-include \"$(xcode-select -p)\"/Plat
 # -Wl,-no_compact_unwind must be passed in LDFLAGS to openssl
 table_line_append DIST_MAKE_ARGS openssl "LDFLAGS=\"\$LDFLAGS\""
 
-# m4 crashes on 10.13
-table_line_append DIST_PATCHES m4 '-p0 https://raw.githubusercontent.com/macports/macports-ports/edf0ee1e2cf/devel/m4/files/secure_snprintf.patch'
-
 # these are only applicable for cross-compiling to 32 bits
 if [ "$target_cpu" = i386 ]; then
     # some dists will not cross compile without a CONFIG_SITE
@@ -151,3 +151,6 @@ if [ -n "$PREV_XCODE" ]; then
     printf "\nRe-setting '$PREV_XCODE' as the default Xcode...\n\n"
     sudo xcode-select -s "$PREV_XCODE"
 fi
+
+# Link brew wxwidgets back if installed.
+brew link wxwidgets >/dev/null 2>&1

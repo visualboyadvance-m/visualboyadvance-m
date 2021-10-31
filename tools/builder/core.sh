@@ -111,7 +111,7 @@ DISTS=$DISTS'
     openssl         https://www.openssl.org/source/openssl-1.1.1f.tar.gz                                        lib/libssl.a
     curl            https://curl.haxx.se/download/curl-7.65.3.tar.xz                                            lib/libcurl.a
     cmake           https://github.com/Kitware/CMake/releases/download/v3.19.4/cmake-3.19.4.tar.gz              bin/cmake
-    m4              http://ftp.gnu.org/gnu/m4/m4-1.4.18.tar.xz                                                  bin/m4
+    m4              http://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.xz                                                  bin/m4
     autoconf        https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz                                       bin/autoconf
     autoconf-archive http://mirror.team-cymru.org/gnu/autoconf-archive/autoconf-archive-2017.09.28.tar.xz       share/aclocal/ax_check_gl.m4
     automake        https://ftp.gnu.org/gnu/automake/automake-1.15.1.tar.xz                                     bin/automake
@@ -135,7 +135,7 @@ DISTS=$DISTS'
     pcre            https://ftp.pcre.org/pub/pcre/pcre-8.41.tar.bz2                                             lib/libpcre.a
     libffi          ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz                                         lib/libffi.a
     c2man           https://github.com/fribidi/c2man/archive/577ed4095383ef5284225d45709e6b5f0598a064.tar.gz    bin/c2man
-    libxml2         https://gitlab.gnome.org/GNOME/libxml2/repository/archive.tar.bz2?ref=f93ca3e1              lib/libxml2.a
+    libxml2         ftp://xmlsoft.org/libxml2/libxml2-2.9.12.tar.gz                                             lib/libxml2.a
     libxslt         https://github.com/GNOME/libxslt/archive/v1.1.33-rc2.tar.gz                                 lib/libxslt.a
     XML-NamespaceSupport https://cpan.metacpan.org/authors/id/P/PE/PERIGRIN/XML-NamespaceSupport-1.12.tar.gz    perl5/lib/perl5/XML/NamespaceSupport.pm
     XML-SAX-Base    https://cpan.metacpan.org/authors/id/G/GR/GRANTM/XML-SAX-Base-1.09.tar.gz                   perl5/lib/perl5/XML/SAX/Base.pm
@@ -165,7 +165,7 @@ DISTS=$DISTS'
     python2         https://www.python.org/ftp/python/2.7.15/Python-2.7.15.tar.xz                               bin/python
     python3         https://www.python.org/ftp/python/3.9.1/Python-3.9.1.tar.xz                                 bin/python3
     swig            https://downloads.sourceforge.net/project/swig/swig/swig-3.0.12/swig-3.0.12.tar.gz          bin/swig
-    libxml2-python  https://gitlab.gnome.org/GNOME/libxml2/repository/archive.tar.bz2?ref=f93ca3e1              lib/python2.7/site-packages/libxml2.py
+    libxml2-python  ftp://xmlsoft.org/libxml2/libxml2-2.9.12.tar.gz                                             lib/python2.7/site-packages/libxml2.py
     doxygen         https://downloads.sourceforge.net/project/doxygen/rel-1.8.14/doxygen-1.8.14.src.tar.gz      bin/doxygen
     bakefile        https://github.com/vslavik/bakefile/archive/33c270a565ba0954cca9611b2443593b2e9e698a.tar.gz bin/bakefile_gen
     XML-Parser      https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.44.tar.gz                      perl5/man/man3/XML*Parser.3*
@@ -183,7 +183,7 @@ DISTS=$DISTS'
     harfbuzz        https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-1.7.5.tar.bz2                lib/libharfbuzz.a
     sfml            https://github.com/SFML/SFML/archive/0337568846584fffcee38036880f9f48888c8b7c.tar.gz        lib/libsfml-system-s.a
     shared-mime-info http://freedesktop.org/~hadess/shared-mime-info-1.9.tar.xz                                 bin/update-mime-database
-    wxwidgets       https://github.com/wxWidgets/wxWidgets/archive/0d04792116c3c2cb715e538981738db7e7090d76.tar.gz lib/libwx_baseu-3.1*.a
+    wxwidgets       https://github.com/wxWidgets/wxWidgets/archive/9cc0c9a082e0c3b2a4c14e3c6811de0e3a1a3799.tar.gz lib/libwx_baseu-3.1*.a
     graphite2       https://github.com/silnrsi/graphite/archive/ce0e793f22127d7ba6422d440bd83b58f864ef7e.tar.gz lib/libgraphite2.a
     xvidcore        http://downloads.xvid.org/downloads/xvidcore-1.3.5.tar.bz2                                  lib/libxvidcore.a
     fribidi         https://github.com/fribidi/fribidi/releases/download/v1.0.1/fribidi-1.0.1.tar.bz2           lib/libfribidi.a
@@ -241,7 +241,6 @@ export CMAKE_ARGS="$CMAKE_BASE_ARGS $CMAKE_ARGS $CMAKE_INSTALL_ARGS"
 export MESON_ARGS="$MESON_BASE_ARGS --buildtype release --default-library static -Dintrospection=false $MESON_INSTALL_ARGS"
 
 DIST_PATCHES=$DIST_PATCHES'
-    m4              https://raw.githubusercontent.com/gentoo/gentoo/master/sys-devel/m4/files/m4-1.4.18-glibc228.patch
     docbook2x       https://gist.githubusercontent.com/rkitover/0b5dcc95a0703a9b0e0e7eb6d325a98e/raw/e256d2fad8d19633ac8abe02a0d1e119063d1fd9/docbook2x.patch
     ccache          https://gist.githubusercontent.com/rkitover/4dd30c2841a2131be8715038f538d622/raw/40a8f0f50aa6ca5f9658a0c37aa17393cc80c109/ccache-3.4.2-msys.patch
     graphite2       https://gist.githubusercontent.com/rkitover/e753f41a7f6461ad412c2d076ec24e0f/raw/d0c2b8cccd556e407e15da8a2e739a902bd1a3b5/graphite2-static-cmake-opts.patch
