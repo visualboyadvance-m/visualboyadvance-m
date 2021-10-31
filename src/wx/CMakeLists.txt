@@ -1115,9 +1115,9 @@ if(UPSTREAM_RELEASE AND WIN32)
     endif()
 
     if(CMAKE_BUILD_TYPE MATCHES Debug)
-        set(exezip visualboyadvance-m-Win-${BITS}bit-debug${ZIP_SUFFIX}.zip)
+        set(exezip visualboyadvance-m-Win-${ARCH_NAME}-debug${ZIP_SUFFIX}.zip)
     else()
-        set(exezip visualboyadvance-m-Win-${BITS}bit${ZIP_SUFFIX}.zip)
+        set(exezip visualboyadvance-m-Win-${ARCH_NAME}${ZIP_SUFFIX}.zip)
     endif()
 
     unset(pdb_file)
@@ -1137,7 +1137,7 @@ if(UPSTREAM_RELEASE AND WIN32)
         add_custom_command(
             OUTPUT ${CMAKE_BINARY_DIR}/translations.zip.asc
             COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/translations.zip.asc
-            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
+#            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
             COMMAND ${GPG_PROGRAM} --detach-sign -a ${CMAKE_BINARY_DIR}/translations.zip
             DEPENDS translations-zip
         )
@@ -1150,7 +1150,7 @@ if(UPSTREAM_RELEASE AND WIN32)
             TARGET visualboyadvance-m
             POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E remove ${exezip}.asc
-            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
+#            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
             COMMAND ${GPG_PROGRAM} --detach-sign -a ${exezip}
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
@@ -1211,7 +1211,7 @@ if(APPLE AND (UPSTREAM_RELEASE OR ENABLE_ONLINEUPDATES))
     add_custom_command(
         TARGET visualboyadvance-m
         POST_BUILD
-        COMMAND codesign --sign "Developer ID Application" --force --deep ./visualboyadvance-m.app
+        VERBATIM COMMAND sh -c [=[codesign --sign "Developer ID Application" --force --deep ./visualboyadvance-m.app || :]=]
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
@@ -1230,7 +1230,7 @@ if(APPLE AND (UPSTREAM_RELEASE OR ENABLE_ONLINEUPDATES))
     endif()
 
     if(UPSTREAM_RELEASE)
-        set(appzip visualboyadvance-m-Mac-${BITS}bit${ZIP_SUFFIX}.zip)
+        set(appzip visualboyadvance-m-Mac-${ARCH_NAME}${ZIP_SUFFIX}.zip)
 
         add_custom_command(
             TARGET visualboyadvance-m
@@ -1245,7 +1245,7 @@ if(APPLE AND (UPSTREAM_RELEASE OR ENABLE_ONLINEUPDATES))
                 TARGET visualboyadvance-m
                 POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E remove ${appzip}.asc
-                COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
+#                COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
                 COMMAND ${GPG_PROGRAM} --detach-sign -a ${appzip}
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             )
