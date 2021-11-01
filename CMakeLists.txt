@@ -343,8 +343,8 @@ if(APPLE)
 endif()
 
 # We do not support amd64 asm yet
-if(AMD64 AND (ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS OR ENABLE_MMX))
-    message(FATAL_ERROR "The options ASM_CORE, ASM_SCALERS and MMX are not supported on AMD64 yet.")
+if(X86_64 AND (ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS OR ENABLE_MMX))
+    message(FATAL_ERROR "The options ASM_CORE, ASM_SCALERS and MMX are not supported on X86_64 yet.")
 endif()
 
 if(ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS)
@@ -516,6 +516,8 @@ ProcessorCount(num_cpus)
 
 # Compiler stuff
 
+option(UPSTREAM_RELEASE "do some optimizations and release automation tasks" OFF)
+
 if(CMAKE_C_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     include(LLVMToolchain)
 endif()
@@ -551,7 +553,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
 
     unset(MY_C_OPT_FLAGS)
 
-    if(X86_32 OR AMD64)
+    if(X86_32 OR X86_64)
         set(MY_C_OPT_FLAGS -mfpmath=sse -msse2)
     endif()
 
@@ -563,9 +565,24 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         set(MY_C_OPT_FLAGS ${MY_C_OPT_FLAGS} -O2)
     endif()
 
-    # only use -mtune=generic on PC architectures
-    if(X86_32 OR AMD64)
-        set(MY_C_OPT_FLAGS ${MY_C_OPT_FLAGS} -mtune=generic)
+    # Common flags.
+    set(MY_C_FLAGS -pipe -Wformat -Wformat-security -feliminate-unused-debug-types)
+
+    # Enable some optimizations for our upstream binary builds.
+    if(UPSTREAM_RELEASE)
+        # Optimize for Core2 and tune for Rocketlake on macOS and Zen3 for the rest
+        # on X86_64.
+        if(X86_64)
+            set(MY_C_FLAGS ${MY_C_FLAGS} -march=core2)
+            if(APPLE)
+                set(MY_C_FLAGS ${MY_C_FLAGS} -mtune=rocketlake)
+            else()
+                set(MY_C_FLAGS ${MY_C_FLAGS} -mtune=znver3)
+            endif()
+        # Optimize for pentium-mmx and tune for Core2 on X86_32.
+        elseif(X86_32)
+            set(MY_C_FLAGS ${MY_C_FLAGS} -march=pentium-mmx -mtune=core2)
+        endif()
     endif()
 
     # common debug flags
@@ -595,9 +612,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
             message(FATAL_ERROR "asan not available to compiler.")
         endif()
     endif()
-
-    # common flags
-    set(MY_C_FLAGS -pipe -Wformat -Wformat-security -feliminate-unused-debug-types)
 
     if(ENABLE_SSP AND CMAKE_BUILD_TYPE STREQUAL Debug)
         if(WIN32)
@@ -780,8 +794,8 @@ elseif("${CMAKE_SYSTEM}" MATCHES "Linux")
     add_definitions(-DELF)
 endif()
 
-if(AMD64)
-    add_definitions(-D__AMD64__)
+if(X86_64)
+    add_definitions(-D__AMD64__ -D__X86_64__)
 endif()
 
 add_subdirectory (fex)

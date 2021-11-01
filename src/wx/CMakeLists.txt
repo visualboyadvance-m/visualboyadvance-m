@@ -91,7 +91,7 @@ endif()
 
 # on VS with vcpkg we can't use FindwxWidgets, we have to set everything up
 # manually because the package is broken
-if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR AMD64))
+if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR X86_64))
     # set up wxwidgets stuff
     set(libtype u)
     unset(arch_suffix)
@@ -373,7 +373,7 @@ int main(int argc, char** argv)
             set(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} -fpermissive -w "-I${CMAKE_SOURCE_DIR}/dependencies/minhook/include")
             set(CMAKE_REQUIRED_LIBRARIES   ${CMAKE_REQUIRED_LIBRARIES}   -Wl,--subsystem,console)
 
-            if(AMD64)
+            if(X86_64)
                 set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "${CMAKE_SOURCE_DIR}/dependencies/minhook/libMinHook_64.a")
             else() # assume 32 bit windows
                 set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "${CMAKE_SOURCE_DIR}/dependencies/minhook/libMinHook.a")
@@ -783,7 +783,7 @@ list(APPEND ALL_SRC_WX autoupdater/wxmsw/winsparkle-wrapper.cpp)
 list(APPEND ALL_HDR_WX autoupdater/wxmsw/winsparkle-wrapper.h)
 list(APPEND ALL_HDR_WX autoupdater/wxmsw/winsparkle-rc.h)
 
-if(WIN32 AND (AMD64 OR X86_32) AND ENABLE_ONLINEUPDATES)
+if(WIN32 AND (X86_64 OR X86_32) AND ENABLE_ONLINEUPDATES)
     list(APPEND SRC_WX autoupdater/wxmsw/autoupdater.cpp)
     list(APPEND HDR_WX autoupdater/autoupdater.h)
     list(APPEND SRC_WX autoupdater/wxmsw/winsparkle-wrapper.cpp)
@@ -876,7 +876,7 @@ add_executable(
     ${CM_STUFF}
 )
 
-if(WIN32 AND (AMD64 OR X86_32) AND ENABLE_ONLINEUPDATES)
+if(WIN32 AND (X86_64 OR X86_32) AND ENABLE_ONLINEUPDATES)
     if(NOT DEFINED WINSPARKLE_BIN_RELEASE_DIR)
         set(WINSPARKLE_BIN_RELEASE_DIR ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0)
     endif()
@@ -886,7 +886,7 @@ if(WIN32 AND (AMD64 OR X86_32) AND ENABLE_ONLINEUPDATES)
         PRIVATE ${WINSPARKLE_BIN_RELEASE_DIR}/include
     )
 
-    if(AMD64)
+    if(X86_64)
         set(WINSPARKLE_DLL ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0/x64/Release/WinSparkle.dll)
     else()
         set(WINSPARKLE_DLL ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0/Release/WinSparkle.dll)
@@ -1059,8 +1059,6 @@ if(ENABLE_NLS)
         COMMAND ${CMAKE_COMMAND} -D SRC_DIR=${CMAKE_SOURCE_DIR}/po/wxvbam -D BIN_DIR=${CMAKE_BINARY_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/check-pot-updated.cmake
     )
 endif()
-
-option(UPSTREAM_RELEASE "do some release automation tasks" OFF)
 
 find_program(GPG_PROGRAM gpg)
 
