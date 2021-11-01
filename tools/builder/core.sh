@@ -2671,10 +2671,21 @@ build_project() {
         lto=OFF
     fi
 
-    echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=${lto} -DUPSTREAM_RELEASE=TRUE $CMAKE_ARGS $PROJECT_ARGS $@
-    echo_run make -j$NUM_CPUS VERBOSE=1
-
+    # Release build.
+    puts "${NL}[32mBuilding Release...[0m${NL}${NL}"
+    mkdir release && cd release
+    echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=${lto} -DUPSTREAM_RELEASE=TRUE $CMAKE_ARGS $PROJECT_ARGS -G Ninja $@
+    echo_run ninja -j$NUM_CPUS -v
     dist_post_build project
+    cd ..
+
+    # Debug build.
+    puts "${NL}[32mBuilding Debug...[0m${NL}${NL}"
+    mkdir debug && cd debug
+    echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=${lto} -DUPSTREAM_RELEASE=TRUE $CMAKE_ARGS $PROJECT_ARGS -DCMAKE_BUILD_TYPE=Debug -G Ninja $@
+    echo_run ninja -j$NUM_CPUS -v
+    dist_post_build project
+    cd ..
 
     puts "${NL}[32mBuild Successful!!![0m${NL}${NL}Build results can be found in: [1;34m$BUILD_ROOT/project[0m${NL}${NL}"
 }

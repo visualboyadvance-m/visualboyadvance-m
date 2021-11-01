@@ -1223,14 +1223,18 @@ if(APPLE AND (UPSTREAM_RELEASE OR ENABLE_ONLINEUPDATES))
             add_custom_command(
                 TARGET visualboyadvance-m
                 POST_BUILD
-                COMMAND codesign --sign "Developer ID Application" --force ${framework}
+                VERBATIM COMMAND sh -c "codesign --sign 'Developer ID Application' --force ${framework} || :"
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             )
         endforeach()
     endif()
 
     if(UPSTREAM_RELEASE)
-        set(appzip visualboyadvance-m-Mac-${ARCH_NAME}${ZIP_SUFFIX}.zip)
+       if(CMAKE_BUILD_TYPE MATCHES Debug)
+          set(appzip visualboyadvance-m-Mac-${ARCH_NAME}-debug${ZIP_SUFFIX}.zip)
+       else()
+          set(appzip visualboyadvance-m-Mac-${ARCH_NAME}${ZIP_SUFFIX}.zip)
+       endif()
 
         add_custom_command(
             TARGET visualboyadvance-m
