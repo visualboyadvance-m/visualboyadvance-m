@@ -1,6 +1,5 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [visualboyadvance-m Developer Manual](#visualboyadvance-m-developer-manual)
   - [Issues Policies](#issues-policies)
@@ -15,13 +14,6 @@
     - [Translations Message Catalog](#translations-message-catalog)
     - [Interaction with non-wxWidgets Code](#interaction-with-non-wxwidgets-code)
   - [Windows Native Development Environment Setup](#windows-native-development-environment-setup)
-    - [Install Chocolatey and Some Packages](#install-chocolatey-and-some-packages)
-    - [Chocolatey Usage Notes](#chocolatey-usage-notes)
-    - [Configure the Terminal](#configure-the-terminal)
-    - [Setting up Vim](#setting-up-vim)
-    - [Set up PowerShell Profile](#set-up-powershell-profile)
-    - [PowerShell Usage Notes](#powershell-usage-notes)
-    - [Miscellaneous](#miscellaneous)
   - [Release Process](#release-process)
     - [Environment](#environment)
     - [Release Commit and Tag](#release-commit-and-tag)
