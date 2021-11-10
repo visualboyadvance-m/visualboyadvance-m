@@ -278,14 +278,18 @@ the settings json in visual studio.
 In the global settings, above the `"profiles"` section, add:
 
 ```json
+"copyFormatting": "all",
+"focusFollowMouse": true,
 // If enabled, selections are automatically copied to your clipboard.
 "copyOnSelect": true,
 // If enabled, formatted data is also copied to your clipboard
 "copyFormatting": true,
-"useTabSwitcher": false,
+"tabSwitcherMode": "disabled",
+"tabWidthMode": "compact",
 "wordDelimiters": " ",
 "largePasteWarning": false,
 "multiLinePasteWarning": false,
+"windowingBehavior": "useAnyExisting",
 ```
 
 In the `"profiles"` `"defaults"` section add:
@@ -294,11 +298,18 @@ In the `"profiles"` `"defaults"` section add:
 "defaults":
 {
     // Put settings here that you want to apply to all profiles.
-    "fontFace": "Hack",
-    "fontSize": 10,
+    "adjustIndistinguishableColors": false,
+    "font": 
+    {
+        "face": "Hack",
+        "size": 11
+    },
     "antialiasingMode": "cleartype",
     "cursorShape": "filledBox",
     "colorScheme": "Tango Dark",
+    "intenseTextStyle": "bold",
+    "padding": "0",
+    "scrollbarState": "hidden"
     "closeOnExit": "always"
 },
 ```
