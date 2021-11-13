@@ -66,7 +66,7 @@ uint32_t gradientARGB(uint32_t pixFront, uint32_t pixBack) //find intermediate c
 
 inline double fastSqrt(double n)
 {
-#if (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
+#if ((defined(__GNUC__) && !defined(__riscv)) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
     __asm__ ("fsqrt" : "+t" (n));
     return n;
 #elif defined(_MSC_VER) && defined(_M_IX86)
