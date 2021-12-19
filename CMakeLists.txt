@@ -798,7 +798,9 @@ if(X86_64)
     add_definitions(-D__AMD64__ -D__X86_64__)
 endif()
 
-add_subdirectory (fex)
+if(NOT TRANSLATIONS_ONLY)
+    add_subdirectory(fex)
+endif()
 
 set(
     SRC_MAIN
@@ -1074,29 +1076,31 @@ if(ENABLE_FFMPEG)
     )
 endif()
 
-add_library(
-    vbamcore
-    STATIC
-    ${PROJECT_SRCS}
-    ${SRC_MAIN}
-    ${HDR_MAIN}
-    ${SRC_GBA}
-    ${HDR_GBA}
-    ${SRC_GB}
-    ${HDR_GB}
-    ${SRC_APU}
-    ${HDR_APU}
-    ${SRC_FILTERS}
-    ${HDR_FILTERS}
-    ${SRC_DEBUGGER}
-    ${HDR_DEBUGGER}
-    ${HDR_STB_IMAGE}
-)
-add_dependencies(vbamcore generate)
-set_property(TARGET vbamcore PROPERTY CXX_STANDARD 11)
-set_property(TARGET vbamcore PROPERTY CXX_STANDARD_REQUIRED ON)
+if(NOT TRANSLATIONS_ONLY)
+    add_library(
+        vbamcore
+        STATIC
+        ${PROJECT_SRCS}
+        ${SRC_MAIN}
+        ${HDR_MAIN}
+        ${SRC_GBA}
+        ${HDR_GBA}
+        ${SRC_GB}
+        ${HDR_GB}
+        ${SRC_APU}
+        ${HDR_APU}
+        ${SRC_FILTERS}
+        ${HDR_FILTERS}
+        ${SRC_DEBUGGER}
+        ${HDR_DEBUGGER}
+        ${HDR_STB_IMAGE}
+    )
+    add_dependencies(vbamcore generate)
+    set_property(TARGET vbamcore PROPERTY CXX_STANDARD 11)
+    set_property(TARGET vbamcore PROPERTY CXX_STANDARD_REQUIRED ON)
+endif()
 
-if(ENABLE_SDL)
+if((NOT TRANSLATIONS_ONLY) AND ENABLE_SDL)
     add_executable(
         vbam
         WIN32

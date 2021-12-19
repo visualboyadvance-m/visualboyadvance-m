@@ -203,6 +203,7 @@ Here is the complete list:
 | SSP_STATIC            | Try to link static gcc stack protector library (gcc only)            | OFF except Win32      |
 | OPENAL_STATIC         | Try to link static OpenAL libraries                                  | OFF                   |
 | SSP_STATIC            | Link gcc stack protecter libssp statically (gcc, with ENABLE_SSP)    | OFF                   |
+| TRANSLATIONS_ONLY     | Build only the translations.zip and nothing else                     | OFF                   |
 
 Note for distro packagers, we use the CMake module
 [GNUInstallDirs](https://cmake.org/cmake/help/v2.8.12/cmake.html#module:GNUInstallDirs)

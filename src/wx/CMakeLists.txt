@@ -281,7 +281,8 @@ else()
 
     if((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         AND NOT CMAKE_CROSSCOMPILING
-        AND NOT CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
+        AND NOT CMAKE_SYSTEM_NAME STREQUAL FreeBSD
+        AND NOT TRANSLATIONS_ONLY)
 
         set(ABI_CHECK TRUE)
     endif()
@@ -865,167 +866,167 @@ if(APPLE)
     set(CMAKE_INSTALL_RPATH "@loader_path/../Frameworks")
 endif()
 
-add_executable(
-    visualboyadvance-m
-    WIN32
-    MACOSX_BUNDLE
-    ${SRC_WX}
-    ${HDR_WX}
-    ${RES_WX}
-    ${VBAM_ICON_PATH}
-    ${CM_STUFF}
-)
+if(NOT TRANSLATIONS_ONLY)
+    add_executable(
+        visualboyadvance-m
+        WIN32
+        MACOSX_BUNDLE
+        ${SRC_WX}
+        ${HDR_WX}
+        ${RES_WX}
+        ${VBAM_ICON_PATH}
+        ${CM_STUFF}
+    )
 
-if(WIN32 AND (X86_64 OR X86_32) AND ENABLE_ONLINEUPDATES)
-    if(NOT DEFINED WINSPARKLE_BIN_RELEASE_DIR)
-        set(WINSPARKLE_BIN_RELEASE_DIR ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0)
+    if(WIN32 AND (X86_64 OR X86_32) AND ENABLE_ONLINEUPDATES)
+        if(NOT DEFINED WINSPARKLE_BIN_RELEASE_DIR)
+            set(WINSPARKLE_BIN_RELEASE_DIR ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0)
+        endif()
+
+        target_include_directories(
+            visualboyadvance-m
+            PRIVATE ${WINSPARKLE_BIN_RELEASE_DIR}/include
+        )
+
+        if(X86_64)
+            set(WINSPARKLE_DLL ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0/x64/Release/WinSparkle.dll)
+        else()
+            set(WINSPARKLE_DLL ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0/Release/WinSparkle.dll)
+        endif()
+
+        configure_file(autoupdater/wxmsw/winsparkle-path.h.in ${CMAKE_BINARY_DIR}/winsparkle-path.h)
     endif()
 
-    target_include_directories(
-        visualboyadvance-m
-        PRIVATE ${WINSPARKLE_BIN_RELEASE_DIR}/include
-    )
+    if(APPLE AND ENABLE_ONLINEUPDATES)
 
-    if(X86_64)
-        set(WINSPARKLE_DLL ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0/x64/Release/WinSparkle.dll)
-    else()
-        set(WINSPARKLE_DLL ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0/Release/WinSparkle.dll)
-    endif()
+        include(FetchContent)
+        FetchContent_Declare(Sparkle
+            URL "https://github.com/sparkle-project/Sparkle/releases/download/1.23.0/Sparkle-1.23.0.tar.bz2"
+            URL_HASH SHA512=fa7e9736d4319bf839cd5e11177d1ddac78c38048be7e59b5c94ea76c9ffc02919dd17890295d21b7f0e35afe0ec9aba9ba36912caed6e5017420345f9f66682
+        )
+        FetchContent_MakeAvailable(Sparkle)
 
-    configure_file(autoupdater/wxmsw/winsparkle-path.h.in ${CMAKE_BINARY_DIR}/winsparkle-path.h)
-endif()
+        find_library(SPARKLE_FRAMEWORK
+          NAMES Sparkle
+          HINTS ${sparkle_SOURCE_DIR}
+        )
+        find_path(SPARKLE_INCLUDE_DIR Sparkle.h HINTS ${SPARKLE_FRAMEWORK}/Headers)
+        target_include_directories(
+            visualboyadvance-m
+            PRIVATE ${SPARKLE_INCLUDE_DIR}
+        )
 
-if(APPLE AND ENABLE_ONLINEUPDATES)
+        set(APPCAST_URL "https://data.vba-m.com/appcast.xml")
+        set(CCS1 mkdir -p ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks)
+        # The following commands *should* be run to make sure Sparkle is not going
+        # to bug randomly (version=1.23)
+        set(CCS2 cp -a ${SPARKLE_FRAMEWORK} ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks/Sparkle.framework)
+        set(CCS3 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleVersion            -string "${VERSION}")
+        set(CCS4 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleShortVersionString -string "${VERSION}")
+        set(CCS5 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUEnableAutomaticChecks -bool YES)
+        #set(CCS6 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUPublicEDKey -string "${PUBLIC_KEY}")
+        set(CCS7 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUFeedURL -string "${APPCAST_URL}")
+        add_custom_command(TARGET visualboyadvance-m POST_BUILD
+          COMMAND ${CCS1}
+          COMMAND ${CCS2}
+          COMMAND ${CCS3}
+          COMMAND ${CCS4}
+          COMMAND ${CCS5}
+          #COMMAND ${CCS6}
+          COMMAND ${CCS7}
+        )
 
-    include(FetchContent)
-    FetchContent_Declare(Sparkle
-        URL "https://github.com/sparkle-project/Sparkle/releases/download/1.23.0/Sparkle-1.23.0.tar.bz2"
-        URL_HASH SHA512=fa7e9736d4319bf839cd5e11177d1ddac78c38048be7e59b5c94ea76c9ffc02919dd17890295d21b7f0e35afe0ec9aba9ba36912caed6e5017420345f9f66682
-    )
-    FetchContent_MakeAvailable(Sparkle)
-
-    find_library(SPARKLE_FRAMEWORK
-      NAMES Sparkle
-      HINTS ${sparkle_SOURCE_DIR}
-    )
-    find_path(SPARKLE_INCLUDE_DIR Sparkle.h HINTS ${SPARKLE_FRAMEWORK}/Headers)
-    target_include_directories(
-        visualboyadvance-m
-        PRIVATE ${SPARKLE_INCLUDE_DIR}
-    )
-
-    set(APPCAST_URL "https://data.vba-m.com/appcast.xml")
-    set(CCS1 mkdir -p ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks)
-    # The following commands *should* be run to make sure Sparkle is not going
-    # to bug randomly (version=1.23)
-    set(CCS2 cp -a ${SPARKLE_FRAMEWORK} ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks/Sparkle.framework)
-    set(CCS3 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleVersion            -string "${VERSION}")
-    set(CCS4 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleShortVersionString -string "${VERSION}")
-    set(CCS5 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUEnableAutomaticChecks -bool YES)
-    #set(CCS6 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUPublicEDKey -string "${PUBLIC_KEY}")
-    set(CCS7 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUFeedURL -string "${APPCAST_URL}")
-    add_custom_command(TARGET visualboyadvance-m POST_BUILD
-      COMMAND ${CCS1}
-      COMMAND ${CCS2}
-      COMMAND ${CCS3}
-      COMMAND ${CCS4}
-      COMMAND ${CCS5}
-      #COMMAND ${CCS6}
-      COMMAND ${CCS7}
-    )
-
-    TARGET_LINK_LIBRARIES(visualboyadvance-m ${SPARKLE_FRAMEWORK})
-endif()
-
-target_link_libraries(
-    visualboyadvance-m
-    ${wxWidgets_LIBRARIES}
-    ${VBAM_LIBS}
-)
-
-set(WIN32_MEDIA_FOUNDATION_LIBS dxva2 evr mf mfplat mfplay mfreadwrite mfuuid amstrmid)
-
-if(ENABLE_FFMPEG)
-    if(WIN32)
-        list(APPEND FFMPEG_LIBRARIES secur32 bcrypt ${WIN32_MEDIA_FOUNDATION_LIBS})
+        TARGET_LINK_LIBRARIES(visualboyadvance-m ${SPARKLE_FRAMEWORK})
     endif()
 
     target_link_libraries(
         visualboyadvance-m
-        ${FFMPEG_LIBRARIES}
+        ${wxWidgets_LIBRARIES}
+        ${VBAM_LIBS}
     )
 
-    if(FFMPEG_LDFLAGS)
-        join("${FFMPEG_LDFLAGS}" " " FFMPEG_LDFLAGS_STR)
+    set(WIN32_MEDIA_FOUNDATION_LIBS dxva2 evr mf mfplat mfplay mfreadwrite mfuuid amstrmid)
 
-        set_target_properties(
-            visualboyadvance-m
-            PROPERTIES LINK_FLAGS ${FFMPEG_LDFLAGS_STR}
-        )
-    endif()
-endif()
-
-# link libgcc/libstdc++ statically on mingw
-# and adjust link command when making a static binary
-if(CMAKE_COMPILER_IS_GNUCXX)
-    if(WIN32)
-        # Build a console app in debug mode on Windows
-        if(CMAKE_BUILD_TYPE MATCHES Debug)
-            set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,--subsystem,console")
-        else()
-            set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,--subsystem,windows")
-        endif()
-    endif()
-
-    if(VBAM_STATIC)
-        # some dists don't have a static libpthread
-        set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread ")
-
+    if(ENABLE_FFMPEG)
         if(WIN32)
-            add_custom_command(
-                TARGET visualboyadvance-m PRE_LINK
-                COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/msys-link-static.cmake
-                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-            )
-        else()
-            add_custom_command(
-                TARGET visualboyadvance-m PRE_LINK
-                COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/link-static.cmake
-                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            list(APPEND FFMPEG_LIBRARIES secur32 bcrypt ${WIN32_MEDIA_FOUNDATION_LIBS})
+        endif()
+
+        target_link_libraries(
+            visualboyadvance-m
+            ${FFMPEG_LIBRARIES}
+        )
+
+        if(FFMPEG_LDFLAGS)
+            join("${FFMPEG_LDFLAGS}" " " FFMPEG_LDFLAGS_STR)
+
+            set_target_properties(
+                visualboyadvance-m
+                PROPERTIES LINK_FLAGS ${FFMPEG_LDFLAGS_STR}
             )
         endif()
     endif()
-elseif(MSVC)
-    # the debug lib libcmtd is linked in debug mode, so don't link the normal version
-    set_target_properties(visualboyadvance-m PROPERTIES LINK_FLAGS_DEBUG "/nodefaultlib:libcmt /subsystem:console")
+
+    # link libgcc/libstdc++ statically on mingw
+    # and adjust link command when making a static binary
+    if(CMAKE_COMPILER_IS_GNUCXX)
+        if(WIN32)
+            # Build a console app in debug mode on Windows
+            if(CMAKE_BUILD_TYPE MATCHES Debug)
+                set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,--subsystem,console")
+            else()
+                set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,--subsystem,windows")
+            endif()
+        endif()
+
+        if(VBAM_STATIC)
+            # some dists don't have a static libpthread
+            set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread ")
+
+            if(WIN32)
+                add_custom_command(
+                    TARGET visualboyadvance-m PRE_LINK
+                    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/msys-link-static.cmake
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                )
+            else()
+                add_custom_command(
+                    TARGET visualboyadvance-m PRE_LINK
+                    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/link-static.cmake
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                )
+            endif()
+        endif()
+    elseif(MSVC)
+        # the debug lib libcmtd is linked in debug mode, so don't link the normal version
+        set_target_properties(visualboyadvance-m PROPERTIES LINK_FLAGS_DEBUG "/nodefaultlib:libcmt /subsystem:console")
+    endif()
+
+    # Make the app a console app in debug mode to get log messages.
+    if(WIN32 AND CMAKE_BUILD_TYPE MATCHES Debug)
+        target_compile_definitions(visualboyadvance-m PRIVATE -DWIN32_CONSOLE_APP)
+    endif()
+
+
+    if(NOT WIN32 AND NOT APPLE)
+        install(FILES     ${CMAKE_CURRENT_SOURCE_DIR}/visualboyadvance-m.desktop     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
+        install(FILES     ${CMAKE_CURRENT_SOURCE_DIR}/visualboyadvance-m.appdata.xml DESTINATION ${CMAKE_INSTALL_PREFIX}/share/appdata)
+        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/icons/sizes/                   DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor)
+    endif()
 endif()
 
-# Make the app a console app in debug mode to get log messages.
-if(WIN32 AND CMAKE_BUILD_TYPE MATCHES Debug)
-    target_compile_definitions(visualboyadvance-m PRIVATE -DWIN32_CONSOLE_APP)
-endif()
-
-
-if(NOT WIN32 AND NOT APPLE)
-    install(FILES     ${CMAKE_CURRENT_SOURCE_DIR}/visualboyadvance-m.desktop     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
-    install(FILES     ${CMAKE_CURRENT_SOURCE_DIR}/visualboyadvance-m.appdata.xml DESTINATION ${CMAKE_INSTALL_PREFIX}/share/appdata)
-    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/icons/sizes/                   DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor)
-endif()
+option(TRANSLATIONS_ONLY "Build only the translations.zip" OFF)
 
 # Make the translations.zip for windows builds.
-if(ENABLE_NLS AND WIN32)
+if(ENABLE_NLS)
     file(GLOB catalogs ${CMAKE_BINARY_DIR}/po/wxvbam/*.gmo)
 
-    add_custom_command(
-            OUTPUT ${CMAKE_BINARY_DIR}/translations.zip
+    add_custom_target(
+            translations-zip ALL
             COMMAND ${CMAKE_COMMAND} -D "ZIP_PROGRAM=${ZIP_PROGRAM}" -P ${CMAKE_CURRENT_SOURCE_DIR}/make-translations-zip.cmake
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             DEPENDS translations make-translations-zip.cmake ${catalogs}
     )
-
-    add_custom_target(translations-zip DEPENDS ${CMAKE_BINARY_DIR}/translations.zip)
-
-    add_dependencies(visualboyadvance-m translations-zip)
 endif()
 
 # Update the gettext pot source.
@@ -1051,231 +1052,233 @@ if(ENABLE_NLS)
 
     add_dependencies(gettext-pot xrc-strings)
 
-    add_dependencies(visualboyadvance-m gettext-pot)
+    add_dependencies(translations-zip gettext-pot)
 
     add_custom_command(
-        TARGET visualboyadvance-m
+        TARGET translations-zip
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -D SRC_DIR=${CMAKE_SOURCE_DIR}/po/wxvbam -D BIN_DIR=${CMAKE_BINARY_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/check-pot-updated.cmake
     )
 endif()
 
-find_program(GPG_PROGRAM gpg)
+if(NOT TRANSLATIONS_ONLY)
+    find_program(GPG_PROGRAM gpg)
 
-if(GPG_PROGRAM)
-    execute_process(
-        COMMAND ${GPG_PROGRAM} -k
-        OUTPUT_VARIABLE GPG_KEYS
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        ERROR_QUIET
-    )
-endif()
-
-option(ZIP_SUFFIX [=[suffix for release zip files, e.g.  "-somebranch".zip]=] OFF)
-
-if(NOT ZIP_SUFFIX)
-    set(ZIP_SUFFIX "")
-endif()
-
-if(UPSTREAM_RELEASE AND WIN32)
-    set(home "$ENV{HOME}")
-
-    if(NOT CMAKE_CROSSCOMPILING AND NOT DEFINED ENV{MSYSTEM_PREFIX})
-        set(home "$ENV{USERPROFILE}")
-    endif()
-
-    # rewrite backslashes to slashes, needed for msys osslsigncode
-    string(REGEX REPLACE "\\\\" "/" home "${home}")
-
-    set(cert "${home}/.codesign/windows_comodo.pkcs12")
-
-    if(EXISTS "${cert}")
-        find_program(OSSLSIGNCODE_PROGRAM osslsigncode)
-        find_program(SIGNTOOL_PROGRAM     signtool)
-
-        if(OSSLSIGNCODE_PROGRAM)
-            add_custom_command(
-                TARGET visualboyadvance-m
-                POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E rename visualboyadvance-m.exe visualboyadvance-m-unsigned.exe
-                COMMAND ${OSSLSIGNCODE_PROGRAM} sign -pkcs12 ${cert} -pass "vbam3!13" -t http://timestamp.digicert.com -n visualboyadvance-m -i https://github.com/visualboyadvance-m/visualboyadvance-m -in visualboyadvance-m-unsigned.exe -out visualboyadvance-m.exe
-                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                )
-        elseif(SIGNTOOL_PROGRAM)
-            add_custom_command(
-                TARGET visualboyadvance-m
-                POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy visualboyadvance-m.exe visualboyadvance-m-unsigned.exe
-                COMMAND ${SIGNTOOL_PROGRAM} sign /f ${cert} /p "vbam3!13" /tr http://timestamp.digicert.com /du https://github.com/visualboyadvance-m/visualboyadvance-m /a visualboyadvance-m.exe
-                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                )
-        endif()
-    endif()
-
-    if(CMAKE_BUILD_TYPE MATCHES Debug)
-        set(exezip visualboyadvance-m-Win-${ARCH_NAME}-debug${ZIP_SUFFIX}.zip)
-    else()
-        set(exezip visualboyadvance-m-Win-${ARCH_NAME}${ZIP_SUFFIX}.zip)
-    endif()
-
-    unset(pdb_file)
-
-    if(MSVC AND CMAKE_BUILD_TYPE MATCHES Debug)
-        set(pdb_file visualboyadvance-m.pdb)
-    endif()
-
-    add_custom_command(
-        TARGET visualboyadvance-m
-        POST_BUILD
-        COMMAND ${ZIP_PROGRAM} -9 ${exezip} visualboyadvance-m.exe ${pdb_file}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    )
-
-    if(GPG_KEYS)
-        add_custom_command(
-            OUTPUT ${CMAKE_BINARY_DIR}/translations.zip.asc
-            COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/translations.zip.asc
-#            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
-            COMMAND ${GPG_PROGRAM} --detach-sign -a ${CMAKE_BINARY_DIR}/translations.zip
-            DEPENDS translations-zip
+    if(GPG_PROGRAM)
+        execute_process(
+            COMMAND ${GPG_PROGRAM} -k
+            OUTPUT_VARIABLE GPG_KEYS
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
         )
+    endif()
 
-        add_custom_target(translations-zip-sig DEPENDS ${CMAKE_BINARY_DIR}/translations.zip.asc)
+    option(ZIP_SUFFIX [=[suffix for release zip files, e.g.  "-somebranch".zip]=] OFF)
 
-        add_dependencies(visualboyadvance-m translations-zip-sig)
+    if(NOT ZIP_SUFFIX)
+        set(ZIP_SUFFIX "")
+    endif()
+
+    if(UPSTREAM_RELEASE AND WIN32)
+        set(home "$ENV{HOME}")
+
+        if(NOT CMAKE_CROSSCOMPILING AND NOT DEFINED ENV{MSYSTEM_PREFIX})
+            set(home "$ENV{USERPROFILE}")
+        endif()
+
+        # rewrite backslashes to slashes, needed for msys osslsigncode
+        string(REGEX REPLACE "\\\\" "/" home "${home}")
+
+        set(cert "${home}/.codesign/windows_comodo.pkcs12")
+
+        if(EXISTS "${cert}")
+            find_program(OSSLSIGNCODE_PROGRAM osslsigncode)
+            find_program(SIGNTOOL_PROGRAM     signtool)
+
+            if(OSSLSIGNCODE_PROGRAM)
+                add_custom_command(
+                    TARGET visualboyadvance-m
+                    POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E rename visualboyadvance-m.exe visualboyadvance-m-unsigned.exe
+                    COMMAND ${OSSLSIGNCODE_PROGRAM} sign -pkcs12 ${cert} -pass "vbam3!13" -t http://timestamp.digicert.com -n visualboyadvance-m -i https://github.com/visualboyadvance-m/visualboyadvance-m -in visualboyadvance-m-unsigned.exe -out visualboyadvance-m.exe
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                    )
+            elseif(SIGNTOOL_PROGRAM)
+                add_custom_command(
+                    TARGET visualboyadvance-m
+                    POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy visualboyadvance-m.exe visualboyadvance-m-unsigned.exe
+                    COMMAND ${SIGNTOOL_PROGRAM} sign /f ${cert} /p "vbam3!13" /tr http://timestamp.digicert.com /du https://github.com/visualboyadvance-m/visualboyadvance-m /a visualboyadvance-m.exe
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                    )
+            endif()
+        endif()
+
+        if(CMAKE_BUILD_TYPE MATCHES Debug)
+            set(exezip visualboyadvance-m-Win-${ARCH_NAME}-debug${ZIP_SUFFIX}.zip)
+        else()
+            set(exezip visualboyadvance-m-Win-${ARCH_NAME}${ZIP_SUFFIX}.zip)
+        endif()
+
+        unset(pdb_file)
+
+        if(MSVC AND CMAKE_BUILD_TYPE MATCHES Debug)
+            set(pdb_file visualboyadvance-m.pdb)
+        endif()
 
         add_custom_command(
             TARGET visualboyadvance-m
             POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E remove ${exezip}.asc
-#            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
-            COMMAND ${GPG_PROGRAM} --detach-sign -a ${exezip}
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        )
-    endif()
-
-    if(NOT MSVC AND NOT CMAKE_BUILD_TYPE MATCHES Debug)
-        find_program(STRIP_PROGRAM strip)
-
-        if(STRIP_PROGRAM)
-            add_custom_command(
-                TARGET visualboyadvance-m
-                POST_BUILD
-                COMMAND ${STRIP_PROGRAM} visualboyadvance-m.exe
-                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            )
-        endif()
-    endif()
-endif()
-
-if(APPLE)
-    # this should set ROM file types correctly
-    set_property(TARGET visualboyadvance-m APPEND PROPERTY MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/wxplist.in)
-    set(MACOSX_BUNDLE_ICON_FILE ${VBAM_ICON})
-    set_source_files_properties(${VBAM_ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-
-    # bundle dylibs and relink them for releasing .app
-    # also install translations into the .app
-    # but only in Release mode
-    if(NOT CMAKE_BUILD_TYPE MATCHES Debug)
-        add_custom_command(
-            TARGET visualboyadvance-m POST_BUILD
-            COMMAND ${CMAKE_SOURCE_DIR}/tools/osx/third_party_libs_tool ./visualboyadvance-m.app
-            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-        )
-
-        add_custom_command(
-            TARGET visualboyadvance-m POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/mac-translations.cmake
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        )
-    endif()
-endif()
-
-if(APPLE AND (UPSTREAM_RELEASE OR ENABLE_ONLINEUPDATES))
-    if(NOT CMAKE_BUILD_TYPE MATCHES Debug)
-        find_program(STRIP_PROGRAM strip)
-
-        if(STRIP_PROGRAM)
-            add_custom_command(
-                TARGET visualboyadvance-m
-                POST_BUILD
-                COMMAND ${STRIP_PROGRAM} visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m
-                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            )
-        endif()
-    endif()
-
-    add_custom_command(
-        TARGET visualboyadvance-m
-        POST_BUILD
-        VERBATIM COMMAND sh -c [=[codesign --sign "Developer ID Application" --force --deep ./visualboyadvance-m.app || :]=]
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    )
-
-    if(EXISTS ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks)
-        # Sign frameworks individually, like Xcode.
-        file(GLOB frameworks ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks/*)
-        foreach(framework ${frameworks})
-            message(STATUS "Signing framework: " ${framework})
-            add_custom_command(
-                TARGET visualboyadvance-m
-                POST_BUILD
-                VERBATIM COMMAND sh -c "codesign --sign 'Developer ID Application' --force ${framework} || :"
-                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            )
-        endforeach()
-    endif()
-
-    if(UPSTREAM_RELEASE)
-       if(CMAKE_BUILD_TYPE MATCHES Debug)
-          set(appzip visualboyadvance-m-Mac-${ARCH_NAME}-debug${ZIP_SUFFIX}.zip)
-       else()
-          set(appzip visualboyadvance-m-Mac-${ARCH_NAME}${ZIP_SUFFIX}.zip)
-       endif()
-
-        add_custom_command(
-            TARGET visualboyadvance-m
-            POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E remove ${appzip}
-            COMMAND ${ZIP_PROGRAM} -9yr ${appzip} ./visualboyadvance-m.app
+            COMMAND ${ZIP_PROGRAM} -9 ${exezip} visualboyadvance-m.exe ${pdb_file}
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
         if(GPG_KEYS)
             add_custom_command(
+                OUTPUT ${CMAKE_BINARY_DIR}/translations.zip.asc
+                COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/translations.zip.asc
+    #            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
+                COMMAND ${GPG_PROGRAM} --detach-sign -a ${CMAKE_BINARY_DIR}/translations.zip
+                DEPENDS translations-zip
+            )
+
+            add_custom_target(translations-zip-sig DEPENDS ${CMAKE_BINARY_DIR}/translations.zip.asc)
+
+            add_dependencies(visualboyadvance-m translations-zip-sig)
+
+            add_custom_command(
                 TARGET visualboyadvance-m
                 POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E remove ${appzip}.asc
-#                COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
-                COMMAND ${GPG_PROGRAM} --detach-sign -a ${appzip}
+                COMMAND ${CMAKE_COMMAND} -E remove ${exezip}.asc
+    #            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
+                COMMAND ${GPG_PROGRAM} --detach-sign -a ${exezip}
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            )
+        endif()
+
+        if(NOT MSVC AND NOT CMAKE_BUILD_TYPE MATCHES Debug)
+            find_program(STRIP_PROGRAM strip)
+
+            if(STRIP_PROGRAM)
+                add_custom_command(
+                    TARGET visualboyadvance-m
+                    POST_BUILD
+                    COMMAND ${STRIP_PROGRAM} visualboyadvance-m.exe
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                )
+            endif()
+        endif()
+    endif()
+
+    if(APPLE)
+        # this should set ROM file types correctly
+        set_property(TARGET visualboyadvance-m APPEND PROPERTY MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/wxplist.in)
+        set(MACOSX_BUNDLE_ICON_FILE ${VBAM_ICON})
+        set_source_files_properties(${VBAM_ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+
+        # bundle dylibs and relink them for releasing .app
+        # also install translations into the .app
+        # but only in Release mode
+        if(NOT CMAKE_BUILD_TYPE MATCHES Debug)
+            add_custom_command(
+                TARGET visualboyadvance-m POST_BUILD
+                COMMAND ${CMAKE_SOURCE_DIR}/tools/osx/third_party_libs_tool ./visualboyadvance-m.app
+                WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+            )
+
+            add_custom_command(
+                TARGET visualboyadvance-m POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/mac-translations.cmake
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             )
         endif()
     endif()
-endif()
 
-if(UPSTREAM_RELEASE AND NOT WIN32 AND NOT APPLE AND NOT CMAKE_BUILD_TYPE MATCHES Debug)
-    find_program(STRIP_PROGRAM strip)
+    if(APPLE AND (UPSTREAM_RELEASE OR ENABLE_ONLINEUPDATES))
+        if(NOT CMAKE_BUILD_TYPE MATCHES Debug)
+            find_program(STRIP_PROGRAM strip)
 
-    if(STRIP_PROGRAM)
+            if(STRIP_PROGRAM)
+                add_custom_command(
+                    TARGET visualboyadvance-m
+                    POST_BUILD
+                    COMMAND ${STRIP_PROGRAM} visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                )
+            endif()
+        endif()
+
         add_custom_command(
             TARGET visualboyadvance-m
             POST_BUILD
-            COMMAND ${STRIP_PROGRAM} visualboyadvance-m
+            VERBATIM COMMAND sh -c [=[codesign --sign "Developer ID Application" --force --deep ./visualboyadvance-m.app || :]=]
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
+
+        if(EXISTS ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks)
+            # Sign frameworks individually, like Xcode.
+            file(GLOB frameworks ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks/*)
+            foreach(framework ${frameworks})
+                message(STATUS "Signing framework: " ${framework})
+                add_custom_command(
+                    TARGET visualboyadvance-m
+                    POST_BUILD
+                    VERBATIM COMMAND sh -c "codesign --sign 'Developer ID Application' --force ${framework} || :"
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                )
+            endforeach()
+        endif()
+
+        if(UPSTREAM_RELEASE)
+           if(CMAKE_BUILD_TYPE MATCHES Debug)
+              set(appzip visualboyadvance-m-Mac-${ARCH_NAME}-debug${ZIP_SUFFIX}.zip)
+           else()
+              set(appzip visualboyadvance-m-Mac-${ARCH_NAME}${ZIP_SUFFIX}.zip)
+           endif()
+
+            add_custom_command(
+                TARGET visualboyadvance-m
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E remove ${appzip}
+                COMMAND ${ZIP_PROGRAM} -9yr ${appzip} ./visualboyadvance-m.app
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            )
+
+            if(GPG_KEYS)
+                add_custom_command(
+                    TARGET visualboyadvance-m
+                    POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E remove ${appzip}.asc
+    #                COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
+                    COMMAND ${GPG_PROGRAM} --detach-sign -a ${appzip}
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                )
+            endif()
+        endif()
     endif()
-endif()
 
-install(
-    TARGETS visualboyadvance-m
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    BUNDLE  DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
+    if(UPSTREAM_RELEASE AND NOT WIN32 AND NOT APPLE AND NOT CMAKE_BUILD_TYPE MATCHES Debug)
+        find_program(STRIP_PROGRAM strip)
 
-if(BUILD_TESTING AND (NOT CMAKE_CROSSCOMPILING))
-    add_subdirectory(tests)
+        if(STRIP_PROGRAM)
+            add_custom_command(
+                TARGET visualboyadvance-m
+                POST_BUILD
+                COMMAND ${STRIP_PROGRAM} visualboyadvance-m
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            )
+        endif()
+    endif()
+
+    install(
+        TARGETS visualboyadvance-m
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        BUNDLE  DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+
+    if(BUILD_TESTING AND (NOT CMAKE_CROSSCOMPILING))
+        add_subdirectory(tests)
+    endif()
 endif()
 
 # vim:sw=4 et tw=0:
