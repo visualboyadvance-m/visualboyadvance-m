@@ -2671,9 +2671,12 @@ build_project() {
         lto=OFF
     fi
 
+    rm -rf   release debug
+    mkdir -p release debug
+
     # Release build.
     puts "${NL}[32mBuilding Release...[0m${NL}${NL}"
-    mkdir release && cd release
+    cd release
     echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=${lto} -DUPSTREAM_RELEASE=TRUE $CMAKE_ARGS $PROJECT_ARGS -G Ninja $@
     echo_run ninja -j$NUM_CPUS -v
     dist_post_build project
@@ -2681,7 +2684,7 @@ build_project() {
 
     # Debug build.
     puts "${NL}[32mBuilding Debug...[0m${NL}${NL}"
-    mkdir debug && cd debug
+    cd debug
     echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DVBAM_STATIC=ON -DENABLE_LTO=${lto} -DUPSTREAM_RELEASE=TRUE $CMAKE_ARGS $PROJECT_ARGS -DCMAKE_BUILD_TYPE=Debug -G Ninja $@
     echo_run ninja -j$NUM_CPUS -v
     dist_post_build project
