@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2020-12-17 05:28+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2021-11-24 21:24+0000\n"
+"PO-Revision-Date: 2021-11-25 18:01+0000\n"
+"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
 "Language-Team: French (France) (http://www.transifex.com/bgk/vba-m/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -25,79 +25,79 @@ msgstr ""
 "Language: fr_FR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: wxvbam.cpp:226
+#: wxvbam.cpp:225
 msgid "visualboyadvance-m"
 msgstr "visualboyadvance-m"
 
-#: wxvbam.cpp:443
+#: wxvbam.cpp:442
 msgid "Could not create main window"
 msgstr "Ne peut pas créer la fenêtre principale"
 
-#: wxvbam.cpp:514
+#: wxvbam.cpp:513
 msgid "Save built-in XRC file and exit"
 msgstr "Sauvegarder le fichier XRC intégré et quitter"
 
-#: wxvbam.cpp:517
+#: wxvbam.cpp:516
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Sauvegarder vba-over.ini intégré et quitter"
 
-#: wxvbam.cpp:520
+#: wxvbam.cpp:519
 msgid "Print configuration path and exit"
 msgstr "Imprimer le chemin de configuration et quitter"
 
-#: wxvbam.cpp:523
+#: wxvbam.cpp:522
 msgid "Start in full-screen mode"
 msgstr "Démarrer en mode plein écran"
 
-#: wxvbam.cpp:526
+#: wxvbam.cpp:525
 msgid "Set a configuration file"
 msgstr ""
 
-#: wxvbam.cpp:530
+#: wxvbam.cpp:529
 msgid "Delete shared link state first, if it exists"
 msgstr "Effacer d'abord l'état du lien partagé, s'il existe"
 
-#: wxvbam.cpp:537
+#: wxvbam.cpp:536
 msgid "List all settable options and exit"
 msgstr "Lister toutes les options configurables et quitter"
 
-#: wxvbam.cpp:540
+#: wxvbam.cpp:539
 msgid "ROM file"
 msgstr "Fichier ROM"
 
-#: wxvbam.cpp:542
+#: wxvbam.cpp:541
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:573
+#: wxvbam.cpp:572
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr "Erreur de configuration/assemblage : ne peut pas trouver le fichier xrc intégré"
 
-#: wxvbam.cpp:581
+#: wxvbam.cpp:580
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Écrire la configuration intégrée vers %s.\nPour passer outre, tout enlever sauf le(s) nœud(s) de racine modifié(s).  D'abord trouver le nœud racine au nom correct dans tous les fichiers .xrc ou .xrs dans le chemin de recherche suivant overrides built-in:"
 
-#: wxvbam.cpp:596
+#: wxvbam.cpp:595
 msgid "Configuration is read from, in order:"
 msgstr "La configuration est lue depuis, dans l'ordre :"
 
-#: wxvbam.cpp:610
+#: wxvbam.cpp:609
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
 msgstr "Écrire le fichier override intégré vers %s\nPour passer outre, tout supprimer sauf la section changée.  La première section trouvée est utlisée depuis le chemin de recherche :"
 
-#: wxvbam.cpp:616
+#: wxvbam.cpp:615
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tintégré"
 
-#: wxvbam.cpp:627
+#: wxvbam.cpp:626
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -105,217 +105,217 @@ msgid ""
 "\n"
 msgstr "Les options définies depuis la ligne de commande sont sauvegardées si des changements de configuration sont faits dans l'interface utilisateur.\n\nPour les options flag, vrai et faux sont spécifiés comme 1 et 0, respectivement.\n\n"
 
-#: wxvbam.cpp:648
+#: wxvbam.cpp:647
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Les commandes disponibles pour l'option du Clavier/* sont :\n\n"
 
-#: wxvbam.cpp:660
+#: wxvbam.cpp:659
 msgid "Configuration file not found."
 msgstr ""
 
-#: wxvbam.cpp:693
+#: wxvbam.cpp:692
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "L'option de mauvaise configuration ou des fichiers ROM multiples donnés :\n"
 
-#: guiinit.cpp:81
+#: guiinit.cpp:80
 msgid "Start!"
 msgstr "Démarrer !"
 
-#: guiinit.cpp:100 xrc/NetLink.xrc:99
+#: guiinit.cpp:99 xrc/NetLink.xrc:99
 msgid "Connect"
 msgstr "Connecter"
 
-#: guiinit.cpp:117
+#: guiinit.cpp:116
 msgid "You must enter a valid host name"
 msgstr "Vous devez entrer un nom d'hôte valide"
 
-#: guiinit.cpp:118
+#: guiinit.cpp:117
 msgid "Host name invalid"
 msgstr "Nom d'hôte invalide"
 
-#: guiinit.cpp:136
+#: guiinit.cpp:135
 msgid "Waiting for clients..."
 msgstr "En Attente de Clients..."
 
-#: guiinit.cpp:137
+#: guiinit.cpp:136
 #, c-format
 msgid "Server IP address is: %s\n"
 msgstr "L'adresse IP du serveur est : %s\n"
 
-#: guiinit.cpp:139
+#: guiinit.cpp:138
 msgid "Waiting for connection..."
 msgstr "En attente de connexion..."
 
-#: guiinit.cpp:140
+#: guiinit.cpp:139
 #, c-format
 msgid "Connecting to %s\n"
 msgstr "Se connecte à %s\n"
 
-#: guiinit.cpp:173
+#: guiinit.cpp:172
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr "Une erreur s'est produite.\nVeuillez réessayer."
 
-#: guiinit.cpp:240 guiinit.cpp:293
+#: guiinit.cpp:239 guiinit.cpp:292
 msgid "Select cheat file"
 msgstr "Sélectionner un fichier de code de triche"
 
-#: guiinit.cpp:241
+#: guiinit.cpp:240
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Listes de codes de triche VBA (*.clt)|*.clt|Listes de codes de triche CHT (*.cht)|*.cht"
 
-#: guiinit.cpp:260 panel.cpp:437
+#: guiinit.cpp:259 panel.cpp:447
 msgid "Loaded cheats"
 msgstr "Codes de triche chargés"
 
-#: guiinit.cpp:294
+#: guiinit.cpp:293
 msgid "VBA cheat lists (*.clt)|*.clt"
 msgstr "Listes de codes de triche VBA (*.clt)|*.clt"
 
-#: guiinit.cpp:312
+#: guiinit.cpp:311
 msgid "Saved cheats"
 msgstr "Codes de triche sauvegardés"
 
-#: guiinit.cpp:343 guiinit.cpp:362
+#: guiinit.cpp:342 guiinit.cpp:361
 msgid "Restore old values?"
 msgstr "Restaurer les anciennes valeurs ?"
 
-#: guiinit.cpp:344 guiinit.cpp:363
+#: guiinit.cpp:343 guiinit.cpp:362
 msgid "Removing cheats"
 msgstr "Suppression des codes de triche"
 
-#: guiinit.cpp:754 xrc/JoyPanel.xrc:364
+#: guiinit.cpp:753 xrc/JoyPanel.xrc:364
 msgid "GameShark"
 msgstr "GameShark"
 
-#: guiinit.cpp:755 cmdevents.cpp:676
+#: guiinit.cpp:754 cmdevents.cpp:675
 msgid "GameGenie"
 msgstr "Game Génie"
 
-#: guiinit.cpp:757
+#: guiinit.cpp:756
 msgid "Generic Code"
 msgstr "Code Générique"
 
-#: guiinit.cpp:758
+#: guiinit.cpp:757
 msgid "GameShark Advance"
 msgstr "GameShark Advance"
 
-#: guiinit.cpp:759
+#: guiinit.cpp:758
 msgid "CodeBreaker Advance"
 msgstr "CodeBreaker Advance"
 
-#: guiinit.cpp:760
+#: guiinit.cpp:759
 msgid "Flashcart CHT"
 msgstr "Flashcart CHT"
 
-#: guiinit.cpp:828 guiinit.cpp:1083
+#: guiinit.cpp:827 guiinit.cpp:1082
 msgid "Number cannot be empty"
 msgstr "Le nombre ne peut pas être vide"
 
-#: guiinit.cpp:866
+#: guiinit.cpp:865
 #, c-format
 msgid "Search produced %d results.  Please refine better"
 msgstr "La recherche a trouvé %d résultats. Veuillez mieux affiner"
 
-#: guiinit.cpp:878
+#: guiinit.cpp:877
 msgid "Search produced no results"
 msgstr "La recherche n'a trouvé aucun résultat"
 
-#: guiinit.cpp:1041
+#: guiinit.cpp:1040
 msgid "8-bit "
 msgstr "8-bit "
 
-#: guiinit.cpp:1045
+#: guiinit.cpp:1044
 msgid "16-bit "
 msgstr "16-bit "
 
-#: guiinit.cpp:1049
+#: guiinit.cpp:1048
 msgid "32-bit "
 msgstr "32-bit "
 
-#: guiinit.cpp:1055
+#: guiinit.cpp:1054
 msgid "signed decimal"
 msgstr "décimal signé"
 
-#: guiinit.cpp:1059
+#: guiinit.cpp:1058
 msgid "unsigned decimal"
 msgstr "décimal non signé"
 
-#: guiinit.cpp:1063
+#: guiinit.cpp:1062
 msgid "unsigned hexadecimal"
 msgstr "hexadécimal non signé "
 
-#: guiinit.cpp:1541
+#: guiinit.cpp:1540
 #, c-format
 msgid "%d frames = %.2f ms"
 msgstr "%d images = %.2f ms"
 
-#: guiinit.cpp:1553
+#: guiinit.cpp:1552
 msgid "Default device"
 msgstr "Périphérique par défaut"
 
-#: guiinit.cpp:1727
+#: guiinit.cpp:1726
 msgid "Desktop mode"
 msgstr "Mode Bureau"
 
-#: guiinit.cpp:1734
+#: guiinit.cpp:1733
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: guiinit.cpp:1847 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
+#: guiinit.cpp:1846 cmdevents.cpp:745 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
 msgid "None"
 msgstr "Aucun"
 
-#: guiinit.cpp:1888
+#: guiinit.cpp:1887
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Aucun plugin RPI utilisable n'a été trouvé dans %s"
 
-#: guiinit.cpp:1908 xrc/DisplayConfig.xrc:107
+#: guiinit.cpp:1907 xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "Module externe"
 
-#: guiinit.cpp:1936
+#: guiinit.cpp:1935
 msgid "Please select a plugin or a different filter"
 msgstr "Veuillez sélectionner un module externe ou un filtre différent"
 
-#: guiinit.cpp:1937
+#: guiinit.cpp:1936
 msgid "Plugin selection error"
 msgstr "Erreur de sélection du module externe"
 
-#: guiinit.cpp:2150
+#: guiinit.cpp:2149
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr "Ceci videra tous les accélérateurs définis par l'utilisateur. Êtes-vous sûr ?"
 
-#: guiinit.cpp:2150
+#: guiinit.cpp:2149
 msgid "Confirm"
 msgstr "Confirmer"
 
-#: guiinit.cpp:2740
+#: guiinit.cpp:2739
 msgid "Main icon not found"
 msgstr "L'icône principal n'a pas été trouvé"
 
-#: guiinit.cpp:2750
+#: guiinit.cpp:2749
 msgid "Browse"
 msgstr "Navigateur"
 
-#: guiinit.cpp:2764
+#: guiinit.cpp:2763
 msgid "Main display panel not found"
 msgstr "L'onglet d'affichage principal n'a pas été trouvé"
 
-#: guiinit.cpp:2929
+#: guiinit.cpp:2928
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Dupliquer le menu accélérateur : %s pour %s et %s; garde le premier"
 
-#: guiinit.cpp:2943
+#: guiinit.cpp:2942
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Menu accélérateur %s pour %s annuler par défaut pour %s ; garde le menu"
@@ -362,8 +362,8 @@ msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr "Fichiers texte (*.txt;*.log)|*.txt;*.log|"
 
 #: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
-#: cmdevents.cpp:1158 cmdevents.cpp:1236 cmdevents.cpp:1306 cmdevents.cpp:1333
-#: viewsupt.cpp:1181
+#: cmdevents.cpp:1157 cmdevents.cpp:1235 cmdevents.cpp:1305 cmdevents.cpp:1332
+#: viewsupt.cpp:1180
 msgid "Select output file"
 msgstr "Sélectionner le fichier de sortie"
 
@@ -449,12 +449,12 @@ msgid ""
 "Table (*.act)|*.act"
 msgstr "Palette Windows (*.pal)|*.pal|Palette PaintShop (*.pal)|*.pal|Table de Couleur Adobe (*.act)|*.act"
 
-#: gfxviewers.cpp:1601 gfxviewers.cpp:1743 cmdevents.cpp:1159
-#: viewsupt.cpp:1182
+#: gfxviewers.cpp:1601 gfxviewers.cpp:1743 cmdevents.cpp:1158
+#: viewsupt.cpp:1181
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "Images PNG|*.png|Images BMP|*.bmp"
 
-#: cmdevents.cpp:105
+#: cmdevents.cpp:104
 msgid ""
 "GameBoy Advance Files "
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy"
@@ -462,369 +462,373 @@ msgid ""
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "Fichiers GameBoy Advance (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Fichiers Gameboy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:117
+#: cmdevents.cpp:116
 msgid "Open ROM file"
 msgstr "Ouvrir un Fichier ROM"
 
-#: cmdevents.cpp:134
+#: cmdevents.cpp:133
 msgid ""
 "GameBoy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "Fichiers GameBoy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:141
+#: cmdevents.cpp:140
 msgid "Open GB ROM file"
 msgstr "Ouvrir un Fichier ROM GB"
 
-#: cmdevents.cpp:158
+#: cmdevents.cpp:157
 msgid ""
 "GameBoy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "Fichiers GameBoy Color (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:165
+#: cmdevents.cpp:164
 msgid "Open GBC ROM file"
 msgstr "Ouvrir un Fichier ROM GBC"
 
-#: cmdevents.cpp:584 cmdevents.cpp:700 cmdevents.cpp:739 cmdevents.cpp:812
+#: cmdevents.cpp:583 cmdevents.cpp:699 cmdevents.cpp:738 cmdevents.cpp:811
 msgid "Unknown"
 msgstr "Inconnu"
 
-#: cmdevents.cpp:592
+#: cmdevents.cpp:591
 msgid "ROM"
 msgstr "ROM"
 
-#: cmdevents.cpp:596
+#: cmdevents.cpp:595
 msgid "ROM+MBC1"
 msgstr "ROM+MBC1"
 
-#: cmdevents.cpp:600
+#: cmdevents.cpp:599
 msgid "ROM+MBC1+RAM"
 msgstr "ROM+MBC1+RAM "
 
-#: cmdevents.cpp:604
+#: cmdevents.cpp:603
 msgid "ROM+MBC1+RAM+BATT"
 msgstr "ROM+MBC1+RAM+BATT"
 
-#: cmdevents.cpp:608
+#: cmdevents.cpp:607
 msgid "ROM+MBC2"
 msgstr "ROM+MBC2 "
 
-#: cmdevents.cpp:612
+#: cmdevents.cpp:611
 msgid "ROM+MBC2+BATT"
 msgstr "ROM+MBC2+BATT "
 
-#: cmdevents.cpp:616
+#: cmdevents.cpp:615
 msgid "ROM+MMM01"
 msgstr "ROM+MBC2+BATT "
 
-#: cmdevents.cpp:620
+#: cmdevents.cpp:619
 msgid "ROM+MMM01+RAM"
 msgstr "ROM+MMM01+RAM "
 
-#: cmdevents.cpp:624
+#: cmdevents.cpp:623
 msgid "ROM+MMM01+RAM+BATT"
 msgstr "ROM+MMM01+RAM+BATT "
 
-#: cmdevents.cpp:628
+#: cmdevents.cpp:627
 msgid "ROM+MBC3+TIMER+BATT"
 msgstr "ROM+MBC3+TIMER+BATT "
 
-#: cmdevents.cpp:632
+#: cmdevents.cpp:631
 msgid "ROM+MBC3+TIMER+RAM+BATT"
 msgstr "ROM+MBC3+TIMER+RAM+BATT"
 
-#: cmdevents.cpp:636
+#: cmdevents.cpp:635
 msgid "ROM+MBC3"
 msgstr "ROM+MBC3 "
 
-#: cmdevents.cpp:640
+#: cmdevents.cpp:639
 msgid "ROM+MBC3+RAM"
 msgstr "ROM+MBC3+RAM"
 
-#: cmdevents.cpp:644
+#: cmdevents.cpp:643
 msgid "ROM+MBC3+RAM+BATT"
 msgstr "ROM+MBC3+RAM+BATT "
 
-#: cmdevents.cpp:648
+#: cmdevents.cpp:647
 msgid "ROM+MBC5"
 msgstr "ROM+MBC5 "
 
-#: cmdevents.cpp:652
+#: cmdevents.cpp:651
 msgid "ROM+MBC5+RAM"
 msgstr "ROM+MBC5+RAM "
 
-#: cmdevents.cpp:656
+#: cmdevents.cpp:655
 msgid "ROM+MBC5+RAM+BATT"
 msgstr "ROM+MBC5+RAM+BATT "
 
-#: cmdevents.cpp:660
+#: cmdevents.cpp:659
 msgid "ROM+MBC5+RUMBLE"
 msgstr "ROM+MBC5+RUMBLE "
 
-#: cmdevents.cpp:664
+#: cmdevents.cpp:663
 msgid "ROM+MBC5+RUMBLE+RAM"
 msgstr "ROM+MBC5+RUMBLE+RAM "
 
-#: cmdevents.cpp:668
+#: cmdevents.cpp:667
 msgid "ROM+MBC5+RUMBLE+RAM+BATT"
 msgstr "ROM+MBC5+RUMBLE+RAM+BATT "
 
-#: cmdevents.cpp:672
+#: cmdevents.cpp:671
 msgid "ROM+MBC7+BATT"
 msgstr "ROM+MBC7+BATT "
 
-#: cmdevents.cpp:680
+#: cmdevents.cpp:679
 msgid "GameShark V3.0"
 msgstr "GameShark V3.0 "
 
-#: cmdevents.cpp:684
+#: cmdevents.cpp:683
 msgid "ROM+POCKET CAMERA"
 msgstr "ROM+POCKET CAMERA "
 
-#: cmdevents.cpp:688
+#: cmdevents.cpp:687
 msgid "ROM+BANDAI TAMA5"
 msgstr "ROM+BANDAI TAMA5 "
 
-#: cmdevents.cpp:692
+#: cmdevents.cpp:691
 msgid "ROM+HuC-3"
 msgstr "ROM+HuC-3 "
 
-#: cmdevents.cpp:696
+#: cmdevents.cpp:695
 msgid "ROM+HuC-1"
 msgstr "ROM+HuC-1 "
 
-#: cmdevents.cpp:848 cmdevents.cpp:870
+#: cmdevents.cpp:847 cmdevents.cpp:869
 msgid "Select Dot Code file"
 msgstr "Choisir le fichier Code Dot"
 
-#: cmdevents.cpp:850 cmdevents.cpp:872
+#: cmdevents.cpp:849 cmdevents.cpp:871
 msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 msgstr "Code Dot e-Reader (*.bin;*.raw)|*.bin;*.raw"
 
-#: cmdevents.cpp:891 cmdevents.cpp:1086
+#: cmdevents.cpp:890 cmdevents.cpp:1085
 msgid "Select battery file"
 msgstr "Choisir un fichier batterie"
 
-#: cmdevents.cpp:892 cmdevents.cpp:1087
+#: cmdevents.cpp:891 cmdevents.cpp:1086
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "Fichier Batterie (*.sav)|*.sav|Sauvegarde Flash (*.dat)|*.dat"
 
-#: cmdevents.cpp:900
+#: cmdevents.cpp:899
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
 msgstr "L'importation d'un fichier batterie effacera tous les jeux sauvegardés (et de manière définitive après l'écriture suivante). Souhaitez-vous continuer ?"
 
-#: cmdevents.cpp:901 cmdevents.cpp:929 cmdevents.cpp:1049
+#: cmdevents.cpp:900 cmdevents.cpp:928 cmdevents.cpp:1048
 msgid "Confirm import"
 msgstr "Confirmer l'importation"
 
-#: cmdevents.cpp:907 panel.cpp:380
+#: cmdevents.cpp:906 panel.cpp:390
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Batterie chargée %s"
 
-#: cmdevents.cpp:909
+#: cmdevents.cpp:908
 #, c-format
 msgid "Error loading battery %s"
 msgstr "Erreur de chargement de la batterie %s"
 
-#: cmdevents.cpp:918
+#: cmdevents.cpp:917
 msgid "Select code file"
 msgstr "Sélectionner un fichier code"
 
-#: cmdevents.cpp:919
+#: cmdevents.cpp:918
 msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
 msgstr "Fichier Code Gameshark (*.spc;*.xpc)|*.spc;*.xpc"
 
-#: cmdevents.cpp:919
+#: cmdevents.cpp:918
 msgid "Gameshark Code File (*.gcf)|*.gcf"
 msgstr "Fichier Code Gameshark (*.gcf)|*.gcf "
 
-#: cmdevents.cpp:928
+#: cmdevents.cpp:927
 msgid ""
 "Importing a code file will replace any loaded cheats.  Do you want to "
 "continue?"
 msgstr "L'importation d'un fichier code remplacera tous les codes de triche chargés. Souhaitez-vous continuer ?"
 
-#: cmdevents.cpp:945
+#: cmdevents.cpp:944
 #, c-format
 msgid "Cannot open file %s"
 msgstr "Ne peut pas ouvrir le fichier %s"
 
-#: cmdevents.cpp:955
+#: cmdevents.cpp:954
 #, c-format
 msgid "Unsupported code file %s"
 msgstr "Fichier code non supporté %s"
 
-#: cmdevents.cpp:1025
+#: cmdevents.cpp:1024
 #, c-format
 msgid "Loaded code file %s"
 msgstr "Chargement d'un fichier code %s"
 
-#: cmdevents.cpp:1027
+#: cmdevents.cpp:1026
 #, c-format
 msgid "Error loading code file %s"
 msgstr "Erreur de chargement du fichier code %s"
 
-#: cmdevents.cpp:1038 cmdevents.cpp:1114
+#: cmdevents.cpp:1037 cmdevents.cpp:1113
 msgid "Select snapshot file"
 msgstr "Sélectionner une copie d'écran"
 
-#: cmdevents.cpp:1039
+#: cmdevents.cpp:1038
 msgid ""
 "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots "
 "(*.gsv)|*.gsv"
 msgstr "Copies d'Écran GS & PAC (*.sps;*.xps)|*.sps;*.xps|Copies d'Écran GameShark SP (*.gsv)|*.gsv"
 
-#: cmdevents.cpp:1039
+#: cmdevents.cpp:1038
 msgid "Gameboy Snapshot (*.gbs)|*.gbs"
 msgstr "Copies d'Écran Gameboy (*.gbs)|*.gbs"
 
-#: cmdevents.cpp:1048
+#: cmdevents.cpp:1047
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
 msgstr "L'importation d'un fichier de copie d'écran effacera toutes les sauvegardes de jeux (et ce de manière définitive après l'écriture suivante). Souhaitez-vous continuer ?"
 
-#: cmdevents.cpp:1073
+#: cmdevents.cpp:1072
 #, c-format
 msgid "Loaded snapshot file %s"
 msgstr "Copie d'écran chargée %s"
 
-#: cmdevents.cpp:1075
+#: cmdevents.cpp:1074
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr "Erreur de chargement du fichier de copie d'écran %s"
 
-#: cmdevents.cpp:1098
+#: cmdevents.cpp:1097
 #, c-format
 msgid "Wrote battery %s"
 msgstr "Écriture de la batterie %s"
 
-#: cmdevents.cpp:1100 panel.cpp:689
+#: cmdevents.cpp:1099 panel.cpp:699
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Erreur d'écriture sur la batterie %s"
 
-#: cmdevents.cpp:1108
+#: cmdevents.cpp:1107
 msgid "EEPROM saves cannot be exported"
 msgstr "Les sauvegardes de l'EEPROM ne peuvent pas être exportées"
 
-#: cmdevents.cpp:1115
+#: cmdevents.cpp:1114
 msgid "Gameshark Snapshot (*.sps)|*.sps"
 msgstr "Copies d'Écran Gameshark (*.sps)|*.sps"
 
-#: cmdevents.cpp:1129
+#: cmdevents.cpp:1128
 msgid "Exported from VisualBoyAdvance-M"
 msgstr "Exporté depuis VisualBoyAdvance-M"
 
-#: cmdevents.cpp:1141
+#: cmdevents.cpp:1140
 #, c-format
 msgid "Saved snapshot file %s"
 msgstr "Fichier de copie d'écran sauvegardé %s"
 
-#: cmdevents.cpp:1143
+#: cmdevents.cpp:1142
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr "Erreur de sauvegarde du fichier de copie d'écran %s"
 
-#: cmdevents.cpp:1183 sys.cpp:450
+#: cmdevents.cpp:1182 sys.cpp:449
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "Écriture de la copie d'écran %s"
 
-#: cmdevents.cpp:1204 cmdevents.cpp:1274
+#: cmdevents.cpp:1203 cmdevents.cpp:1273
 msgid " files ("
 msgstr " fichiers ("
 
-#: cmdevents.cpp:1334 cmdevents.cpp:1355
+#: cmdevents.cpp:1333 cmdevents.cpp:1354
 msgid "VBA Movie files|*.vmv"
 msgstr "Fichiers Film VBA|*.vmv"
 
-#: cmdevents.cpp:1354
+#: cmdevents.cpp:1353
 msgid "Select file"
 msgstr "Sélectionner un fichier"
 
-#: cmdevents.cpp:1669 cmdevents.cpp:1762
+#: cmdevents.cpp:1668 cmdevents.cpp:1761
 msgid "Select state file"
 msgstr "Sélectionner un fichier d'état"
 
-#: cmdevents.cpp:1670 cmdevents.cpp:1763
+#: cmdevents.cpp:1669 cmdevents.cpp:1762
 msgid "VisualBoyAdvance saved game files|*.sgm"
 msgstr "Fichiers de sauvegardes VisualBoyAdvance|*.sgm"
 
-#: cmdevents.cpp:1793 cmdevents.cpp:1803 cmdevents.cpp:1814
+#: cmdevents.cpp:1792 cmdevents.cpp:1802 cmdevents.cpp:1813
 #, c-format
 msgid "Current state slot #%d"
 msgstr "Etat de l'emplacement actuel #%d"
 
-#: cmdevents.cpp:2083
+#: cmdevents.cpp:1883
+msgid "Cannot use Colorizer Hack when GB BIOS File is enabled."
+msgstr ""
+
+#: cmdevents.cpp:2098
 msgid "Sound enabled"
 msgstr "Son activé"
 
-#: cmdevents.cpp:2083
+#: cmdevents.cpp:2098
 msgid "Sound disabled"
 msgstr "Son désactivé"
 
-#: cmdevents.cpp:2096 cmdevents.cpp:2110
+#: cmdevents.cpp:2111 cmdevents.cpp:2125
 #, c-format
 msgid "Volume: %d%%"
 msgstr "Volume : %d %%"
 
-#: cmdevents.cpp:2185
+#: cmdevents.cpp:2200
 msgid "Set to 0 for pseudo tty"
 msgstr "Mettre sur 0 pour le pseudo tty"
 
-#: cmdevents.cpp:2187
+#: cmdevents.cpp:2202
 msgid "Port to wait for connection:"
 msgstr "Port en attente de connexion :"
 
-#: cmdevents.cpp:2188
+#: cmdevents.cpp:2203
 msgid "GDB Connection"
 msgstr "Connexion GDB"
 
-#: cmdevents.cpp:2241
+#: cmdevents.cpp:2256
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "En attente de connexion sur %s"
 
-#: cmdevents.cpp:2248
+#: cmdevents.cpp:2263
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "En attente de connexion sur le port %d"
 
-#: cmdevents.cpp:2251
+#: cmdevents.cpp:2266
 msgid "Waiting for GDB..."
 msgstr "En attente de GDB..."
 
-#: cmdevents.cpp:2666
+#: cmdevents.cpp:2681
 #, c-format
 msgid "Using pixel filter #%d"
 msgstr "Filtre pixel en cours d'utilisation #%d"
 
-#: cmdevents.cpp:2681
+#: cmdevents.cpp:2696
 #, c-format
 msgid "Using interframe blending #%d"
 msgstr "Utilisation du mélange inter-image #%d"
 
-#: cmdevents.cpp:2720 panel.cpp:193 panel.cpp:296
+#: cmdevents.cpp:2735 panel.cpp:192 panel.cpp:306
 msgid "Could not initialize the sound driver!"
 msgstr "Ne peut pas initialiser le pilote son !"
 
-#: cmdevents.cpp:2824
+#: cmdevents.cpp:2839
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Émulateur Nintendo GameBoy (+Color+Advance)."
 
-#: cmdevents.cpp:2825
+#: cmdevents.cpp:2840
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr ""
 
-#: cmdevents.cpp:2826
+#: cmdevents.cpp:2841
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -840,276 +844,286 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Ce programme est un logiciel libre : vous pouvez le redistribuer et/ou le modifier sous les conditions de la GNU General Public License telle qu'elle est publiée par la Free Software Foundation, soit la version 2 de la Licence, ou (selon votre choix) toute autre version supérieure.\n\nCe programme est distribué dans l'espoir qu'il sera utile, mais SANS AUCUNE GARANTIE ; sans même l'implication de la garantie d'une COMMERCIALISATION ou LORS D'UN USAGE EN PARTICULIER. Consultez les conditions de la \nLicence GNU General Public pour plus de détails.\n\nVous devez avoir reçu une copie de la Licence GNU General Public License avec ce programme, si non, consultez le site  http://www.gnu.org/licenses."
 
-#: cmdevents.cpp:3136
+#: cmdevents.cpp:3101
+msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
+msgstr ""
+
+#: cmdevents.cpp:3161
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "Le lien LAN est déjà actif. Désactiver le mode Lien pour se déconnecter."
 
-#: cmdevents.cpp:3142
+#: cmdevents.cpp:3167
 msgid "Network is not supported in local mode."
 msgstr "Le réseau n'est pas supporté en mode local."
 
-#: opts.cpp:563 opts.cpp:866
+#: opts.cpp:566 opts.cpp:869
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "Valeur Invalide %s pour l'option %s;les valeurs invalides sont %s%s%s"
 
-#: opts.cpp:580 opts.cpp:878
+#: opts.cpp:583 opts.cpp:881
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Valeur Invalide %d pour l'option %s; les valeurs valides sont %d - %d"
 
-#: opts.cpp:587 opts.cpp:596 opts.cpp:886 opts.cpp:894
+#: opts.cpp:590 opts.cpp:599 opts.cpp:889 opts.cpp:897
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Valeur invalide %f pour l'option %s; les valeurs valides sont %f - %f"
 
-#: opts.cpp:656 opts.cpp:677 opts.cpp:962 opts.cpp:988
+#: opts.cpp:659 opts.cpp:680 opts.cpp:965 opts.cpp:991
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Définition de la touche invalide %s pour %s"
 
-#: opts.cpp:849
+#: opts.cpp:852
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Option du flag invalide %s - %s ignorés"
 
-#: sys.cpp:125 sys.cpp:181
+#: sys.cpp:124 sys.cpp:180
 msgid "No game in progress to record"
 msgstr "Aucun jeu en cours à enregistrer"
 
-#: sys.cpp:138
+#: sys.cpp:137
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "Ne peut pas ouvrir le fichier de sortie %s"
 
-#: sys.cpp:145 sys.cpp:165 sys.cpp:311
+#: sys.cpp:144 sys.cpp:164 sys.cpp:310
 msgid "Error writing game recording"
 msgstr "Erreur d'écriture de l'enregistrement du jeu"
 
-#: sys.cpp:186
+#: sys.cpp:185
 msgid "Cannot play game recording while recording"
 msgstr "Ne peut pas lancer l'enregistrement du jeu pendant l'enregistrement"
 
-#: sys.cpp:199
+#: sys.cpp:198
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "Ne peut pas ouvrir le fichier d'enregistrement %s"
 
-#: sys.cpp:206 sys.cpp:216
+#: sys.cpp:205 sys.cpp:215
 msgid "Error reading game recording"
 msgstr "Erreur de l'enregistrement de lecture du jeu"
 
-#: sys.cpp:322
+#: sys.cpp:321
 msgid "Playback ended"
 msgstr "Playback terminé"
 
-#: sys.cpp:341
+#: sys.cpp:340
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr "%d%%(%d, %d ips)"
 
-#: sys.cpp:349
+#: sys.cpp:348
 #, c-format
 msgid "%d%%"
 msgstr "%d%%"
 
-#: sys.cpp:768 xrc/GBPrinter.xrc:65
+#: sys.cpp:767 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "&Jeter"
 
-#: sys.cpp:802
+#: sys.cpp:801
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "Fichiers image (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:811
+#: sys.cpp:810
 msgid "Save printer image to"
 msgstr "Sauvegarder l'image de l'imprimante vers"
 
-#: sys.cpp:825 sys.cpp:1008
+#: sys.cpp:824 sys.cpp:1007
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "Ecrire la sortie de l'imprimante vers %s"
 
-#: sys.cpp:830 sys.cpp:901
+#: sys.cpp:829 sys.cpp:900
 msgid "&Close"
 msgstr "&Fermer"
 
-#: sys.cpp:896
+#: sys.cpp:895
 msgid "Printed"
 msgstr "Imprimé"
 
-#: sys.cpp:1198
+#: sys.cpp:1197
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "Erreur de l'ouverture du pseudo tty: %s"
 
-#: sys.cpp:1297
+#: sys.cpp:1296
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "Erreur du paramétrage du socket du serveur (%d)"
 
-#: panel.cpp:107
+#: panel.cpp:106
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s n'est pas un fichier ROM valide"
 
-#: panel.cpp:108 panel.cpp:169 panel.cpp:234
+#: panel.cpp:107 panel.cpp:168 panel.cpp:244
 msgid "Problem loading file"
 msgstr "Problème de chargement du fichier"
 
-#: panel.cpp:168
+#: panel.cpp:167
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Ne peut pas charger la ROM Game Boy %s"
 
-#: panel.cpp:210 panel.cpp:310
+#: panel.cpp:204
+msgid ""
+"Cannot use GB BIOS file when Colorizer Hack is enabled, disabling GB BIOS "
+"file."
+msgstr ""
+
+#: panel.cpp:220 panel.cpp:320
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Ne peut pas charger le BIOS %s"
 
-#: panel.cpp:233
+#: panel.cpp:243
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Ne peut pas charger la ROM Game Boy Advance %s"
 
-#: panel.cpp:469
+#: panel.cpp:479
 msgid " player "
 msgstr "joueur"
 
-#: panel.cpp:637
+#: panel.cpp:647
 #, c-format
 msgid "Loaded state %s"
 msgstr "État chargé %s"
 
-#: panel.cpp:637
+#: panel.cpp:647
 #, c-format
 msgid "Error loading state %s"
 msgstr "Erreur de chargement d'état %s"
 
-#: panel.cpp:661
+#: panel.cpp:671
 #, c-format
 msgid "Saved state %s"
 msgstr "État sauvegardé %s"
 
-#: panel.cpp:661
+#: panel.cpp:671
 #, c-format
 msgid "Error saving state %s"
 msgstr "Erreur de sauvegarde d'état %s"
 
-#: panel.cpp:865
+#: panel.cpp:875
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "Mode plein écran %dx%d-%d@%d non supporté ; recherche d'un autre mode"
 
-#: panel.cpp:903
+#: panel.cpp:913
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "Le mode plein écran %dx%d-%d@%d non supporté"
 
-#: panel.cpp:908
+#: panel.cpp:918
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Mode valide : %dx%d-%d@%d"
 
-#: panel.cpp:916
+#: panel.cpp:926
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "Choisir un mode %dx%d-%d@%d"
 
-#: panel.cpp:920
+#: panel.cpp:930
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "A échoué pour le changement de mode vers %dx%d-%d@%d"
 
-#: panel.cpp:1008
+#: panel.cpp:1018
 msgid "Not a valid GBA cartridge"
 msgstr "N'est pas une cartouche GBA valide"
 
-#: panel.cpp:1172
+#: panel.cpp:1182
 msgid "No memory for rewinding"
 msgstr "Pas de mémoire pour le rembobinage"
 
-#: panel.cpp:1182
+#: panel.cpp:1192
 msgid "Error writing rewind state"
 msgstr "Erreur d'écriture pour l'état de rembobinage"
 
-#: panel.cpp:2280
+#: panel.cpp:2290
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Echec du paramétrage du glXSwapIntervalEXT"
 
-#: panel.cpp:2289
+#: panel.cpp:2299
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Echec du paramétrage du glXSwapIntervalSGI"
 
-#: panel.cpp:2298
+#: panel.cpp:2308
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Echec du paramétrage du glXSwapIntervalMESA"
 
-#: panel.cpp:2304
+#: panel.cpp:2314
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr ""
 
-#: panel.cpp:2307
+#: panel.cpp:2317
 msgid "No support for WGL_EXT_swap_control"
 msgstr "Ne supporte pas WGL_EXT_swap_control"
 
-#: panel.cpp:2316
+#: panel.cpp:2326
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Echec du paramétrage de wglSwapIntervalEXT"
 
-#: panel.cpp:2322
+#: panel.cpp:2332
 msgid "No VSYNC available on this platform"
 msgstr "Aucune VSYNC n'est disponible sur cette plateforme"
 
-#: panel.cpp:2418
+#: panel.cpp:2428
 msgid "memory allocation error"
 msgstr "erreur d'allocation de la mémoire"
 
-#: panel.cpp:2421
+#: panel.cpp:2431
 msgid "error initializing codec"
 msgstr "erreur d'initialisation du codec"
 
-#: panel.cpp:2424
+#: panel.cpp:2434
 msgid "error writing to output file"
 msgstr "erreur d'écriture du fichier de sortie"
 
-#: panel.cpp:2427
+#: panel.cpp:2437
 msgid "can't guess output format from file name"
 msgstr "ne peut pas deviner le format de sortie du nom de fichier"
 
-#: panel.cpp:2432
+#: panel.cpp:2442
 msgid "programming error; aborting!"
 msgstr "erreur de programmation ; arrêt !"
 
-#: panel.cpp:2444 panel.cpp:2473
+#: panel.cpp:2454 panel.cpp:2483
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Ne peut pas commencer l'enregistrement de %s (%s)"
 
-#: panel.cpp:2501
+#: panel.cpp:2511
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Erreur dans l'enregistrement audio/vidéo (%s); arrêt"
 
-#: panel.cpp:2507
+#: panel.cpp:2517
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Erreur dans l'enregistrement audio (%s) ; arrêt"
 
-#: panel.cpp:2517
+#: panel.cpp:2527
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Erreur dans l'enregistrement vidéo (%s) ; arrêt"
 
-#: viewsupt.cpp:777
+#: viewsupt.cpp:776
 msgid "R:"
 msgstr "R :"
 
-#: viewsupt.cpp:786
+#: viewsupt.cpp:785
 msgid "G:"
 msgstr "G :"
 
-#: viewsupt.cpp:795
+#: viewsupt.cpp:794
 msgid "B:"
 msgstr "B :"
 
@@ -1167,74 +1181,74 @@ msgstr ""
 msgid "Disconnected joystick %d"
 msgstr "Joystick déconnecté %d"
 
-#: xaudio2.cpp:35
+#: xaudio2.cpp:34
 msgid "XAudio2: Enumerating devices failed!"
 msgstr "XAudio2 : échec du dénombrement des périphériques !"
 
-#: xaudio2.cpp:69 xaudio2.cpp:353
+#: xaudio2.cpp:68 xaudio2.cpp:352
 msgid "The XAudio2 interface failed to initialize!"
 msgstr " 100% match \nL'interface XAudio2 a échoué à l'initialisation !"
 
-#: xaudio2.cpp:384
+#: xaudio2.cpp:383
 msgid "XAudio2: Creating mastering voice failed!"
 msgstr "XAudio2 : la création de la voix maître a échoué !"
 
-#: xaudio2.cpp:393
+#: xaudio2.cpp:392
 msgid "XAudio2: Creating source voice failed!"
 msgstr "XAudio2 :  la création de la voix source a échoué !"
 
-#: faudio.cpp:32
+#: faudio.cpp:31
 msgid "FAudio: Enumerating devices failed!"
 msgstr "FAudio : échec du dénombrement des périphériques !"
 
-#: faudio.cpp:67 faudio.cpp:352
+#: faudio.cpp:66 faudio.cpp:351
 msgid "The FAudio interface failed to initialize!"
 msgstr " 100% match \nL'interface XAudio2 a échoué à l'initialisation !"
 
-#: faudio.cpp:384
+#: faudio.cpp:383
 msgid "FAudio: Creating mastering voice failed!"
 msgstr "FAudio : échec de la création de la voix maître !"
 
-#: faudio.cpp:395
+#: faudio.cpp:394
 msgid "FAudio: Creating source voice failed!"
 msgstr "FAudio : échec de la création de la voix source !"
 
-#: dsound.cpp:90 dsound.cpp:104
+#: dsound.cpp:89 dsound.cpp:103
 #, c-format
 msgid "Cannot create DirectSound %08x"
 msgstr "Ne peut pas créer DirectSound %08x"
 
-#: dsound.cpp:109
+#: dsound.cpp:108
 #, c-format
 msgid "Cannot SetCooperativeLevel %08x"
 msgstr "Ne peut pas SetCooperativeLevel %08x"
 
-#: dsound.cpp:123
+#: dsound.cpp:122
 #, c-format
 msgid "Cannot CreateSoundBuffer %08x"
 msgstr "Ne peut pas CreateSoundBuffer %08x"
 
-#: dsound.cpp:142
+#: dsound.cpp:141
 #, c-format
 msgid "CreateSoundBuffer(primary) failed %08x"
 msgstr "CreateSoundBuffer(primary) a échoué %08x"
 
-#: dsound.cpp:159
+#: dsound.cpp:158
 #, c-format
 msgid "CreateSoundBuffer(secondary) failed %08x"
 msgstr "CreateSoundBuffer(secondary) a échoué %08x"
 
-#: dsound.cpp:164
+#: dsound.cpp:163
 #, c-format
 msgid "dsbSecondary->SetCurrentPosition failed %08x"
 msgstr "dsbSecondary->SetCurrentPosition a échoué %08x"
 
-#: dsound.cpp:187
+#: dsound.cpp:186
 #, c-format
 msgid "Cannot Play primary %08x"
 msgstr "Ne peut pas lancer le primaire %08x"
 
-#: dsound.cpp:322
+#: dsound.cpp:321
 #, c-format
 msgid "dsbSecondary->Lock() failed: %08x"
 msgstr "dsbSecondary->Lock() a échoué : %08x"
@@ -3136,214 +3150,218 @@ msgid "&GB color option"
 msgstr "Option Couleur de la &GB"
 
 #: xrc/MainMenu.xrc:539
+msgid "&GB Colorizer Hack (requires restart)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:543
 msgid "&GB printer"
 msgstr "Imprimante &GB"
 
-#: xrc/MainMenu.xrc:543
+#: xrc/MainMenu.xrc:547
 msgid "&Gather a full page before printing"
 msgstr "&Assembler une page complète avant d'imprimer"
 
-#: xrc/MainMenu.xrc:547
+#: xrc/MainMenu.xrc:551
 msgid "&Save printouts as screen captures"
 msgstr "&Sauvegarder les sorties d'impression en tant que captures d'écrans"
 
-#: xrc/MainMenu.xrc:552
-msgid "&Use GB BIOS file"
-msgstr "&Utiliser le fichier BIOS GB"
-
 #: xrc/MainMenu.xrc:556
+msgid "&Use GB BIOS file (requires restart)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:560
 msgid "&Use GBC BIOS file"
 msgstr "&Utiliser le fichier BIOS GBC"
 
-#: xrc/MainMenu.xrc:561
+#: xrc/MainMenu.xrc:565
 msgid "&General ..."
 msgstr "&Général..."
 
-#: xrc/MainMenu.xrc:564
+#: xrc/MainMenu.xrc:568
 msgid "&Speedup / Turbo ..."
 msgstr "&Accélérer / Turbo"
 
-#: xrc/MainMenu.xrc:567
+#: xrc/MainMenu.xrc:571
 msgid "D&irectories ..."
 msgstr "Réperto&ires..."
 
-#: xrc/MainMenu.xrc:570
+#: xrc/MainMenu.xrc:574
 msgid "&Key Shortcuts ..."
 msgstr "Raccourcis des &touches..."
 
-#: xrc/MainMenu.xrc:573
+#: xrc/MainMenu.xrc:577
 msgid "&UI Settings ..."
 msgstr "Paramétrages de l'&IU"
 
-#: xrc/MainMenu.xrc:577
+#: xrc/MainMenu.xrc:581
 msgid "&Tools"
 msgstr "Ou&tils"
 
-#: xrc/MainMenu.xrc:579
+#: xrc/MainMenu.xrc:583
 msgid "&Cheats"
 msgstr "&Codes de triche"
 
-#: xrc/MainMenu.xrc:581
+#: xrc/MainMenu.xrc:585
 msgid "List &cheats ..."
 msgstr "Liste de &codes de triche..."
 
-#: xrc/MainMenu.xrc:584
+#: xrc/MainMenu.xrc:588
 msgid "Find c&heat ..."
 msgstr "Trouver un c&ode de triche..."
 
-#: xrc/MainMenu.xrc:588
+#: xrc/MainMenu.xrc:592
 msgid "A&utomatically save/load cheats"
 msgstr "Sauvegarder/charger a&utomatiquement les codes de triche"
 
-#: xrc/MainMenu.xrc:592
+#: xrc/MainMenu.xrc:596
 msgid "&Enable cheats"
 msgstr "&Activer les codes de triche"
 
-#: xrc/MainMenu.xrc:599
+#: xrc/MainMenu.xrc:603
 msgid "&Break into GDB"
 msgstr "&Rupture dans le GDB"
 
-#: xrc/MainMenu.xrc:603
+#: xrc/MainMenu.xrc:607
 msgid "&Configure port..."
 msgstr "&Configurer le port..."
 
-#: xrc/MainMenu.xrc:606
+#: xrc/MainMenu.xrc:610
 msgid "&Break on load"
 msgstr "&Rupture au chargement"
 
-#: xrc/MainMenu.xrc:611
+#: xrc/MainMenu.xrc:615
 msgid "&Disconnect"
 msgstr "&Déconnecter"
 
-#: xrc/MainMenu.xrc:613
+#: xrc/MainMenu.xrc:617
 msgid "&GDB"
 msgstr "&GDB"
 
-#: xrc/MainMenu.xrc:616
+#: xrc/MainMenu.xrc:620
 msgid "&Disassemble..."
 msgstr "&Désassembler..."
 
-#: xrc/MainMenu.xrc:619
+#: xrc/MainMenu.xrc:623
 msgid "&Logging..."
 msgstr "&Journalisation..."
 
-#: xrc/MainMenu.xrc:622
+#: xrc/MainMenu.xrc:626
 msgid "&IO Viewer..."
 msgstr "Visualiseur &ES..."
 
-#: xrc/MainMenu.xrc:625
+#: xrc/MainMenu.xrc:629
 msgid "&Map Viewer..."
 msgstr "Visualiseur &MAP..."
 
-#: xrc/MainMenu.xrc:628
+#: xrc/MainMenu.xrc:632
 msgid "M&emory Viewer..."
 msgstr "Visualiseur de mémoir&e..."
 
-#: xrc/MainMenu.xrc:631
+#: xrc/MainMenu.xrc:635
 msgid "&OAM Viewer..."
 msgstr "Visualiseur &OAM..."
 
-#: xrc/MainMenu.xrc:634
+#: xrc/MainMenu.xrc:638
 msgid "&Palette Viewer..."
 msgstr "Visualiseur de &palette..."
 
-#: xrc/MainMenu.xrc:637
+#: xrc/MainMenu.xrc:641
 msgid "&Tile Viewer..."
 msgstr "Visualiseur de &tuile..."
 
-#: xrc/MainMenu.xrc:642
+#: xrc/MainMenu.xrc:646
 msgid "Show all video layers"
 msgstr "Afficher toutes le couches vidéos"
 
-#: xrc/MainMenu.xrc:646
+#: xrc/MainMenu.xrc:650
 msgid "BG &0"
 msgstr "BG &0"
 
-#: xrc/MainMenu.xrc:651
+#: xrc/MainMenu.xrc:655
 msgid "BG &1"
 msgstr "BG &1"
 
-#: xrc/MainMenu.xrc:656
+#: xrc/MainMenu.xrc:660
 msgid "BG &2"
 msgstr "BG &2"
 
-#: xrc/MainMenu.xrc:661
+#: xrc/MainMenu.xrc:665
 msgid "BG &3"
 msgstr "BG &3"
 
-#: xrc/MainMenu.xrc:666
+#: xrc/MainMenu.xrc:670
 msgid "&OBJ"
 msgstr "&OBJ"
 
-#: xrc/MainMenu.xrc:671
+#: xrc/MainMenu.xrc:675
 msgid "&WIN 0"
 msgstr "&WIN 0"
 
-#: xrc/MainMenu.xrc:676
+#: xrc/MainMenu.xrc:680
 msgid "W&IN 1"
 msgstr "W&IN 1"
 
-#: xrc/MainMenu.xrc:681
+#: xrc/MainMenu.xrc:685
 msgid "O&BJ WIN"
 msgstr "O&BJ WIN"
 
-#: xrc/MainMenu.xrc:685
+#: xrc/MainMenu.xrc:689
 msgid "&View Layers"
 msgstr "&Visualiseur de couches"
 
-#: xrc/MainMenu.xrc:689
+#: xrc/MainMenu.xrc:693
 msgid "Channel &1"
 msgstr "Canal &1"
 
-#: xrc/MainMenu.xrc:694
+#: xrc/MainMenu.xrc:698
 msgid "Channel &2"
 msgstr "Canal &2"
 
-#: xrc/MainMenu.xrc:699
+#: xrc/MainMenu.xrc:703
 msgid "Channel &3"
 msgstr "Canal &3"
 
-#: xrc/MainMenu.xrc:704
+#: xrc/MainMenu.xrc:708
 msgid "Channel &4"
 msgstr "Canal &4"
 
-#: xrc/MainMenu.xrc:709
+#: xrc/MainMenu.xrc:713
 msgid "Direct Sound &A"
 msgstr "Direct Sound &A"
 
-#: xrc/MainMenu.xrc:714
+#: xrc/MainMenu.xrc:718
 msgid "Direct Sound &B"
 msgstr "Direct Sound &B"
 
-#: xrc/MainMenu.xrc:718
+#: xrc/MainMenu.xrc:722
 msgid "&Sound Channels"
 msgstr "Canaux &son"
 
-#: xrc/MainMenu.xrc:722
+#: xrc/MainMenu.xrc:726
 msgid "&Help"
 msgstr "&Aide"
 
-#: xrc/MainMenu.xrc:724
+#: xrc/MainMenu.xrc:728
 msgid "Report &Bugs"
 msgstr "Rapporter des &bogues"
 
-#: xrc/MainMenu.xrc:727
+#: xrc/MainMenu.xrc:731
 msgid "VBA-M Support &Forum"
 msgstr "&Forum de support pour VBA-M"
 
-#: xrc/MainMenu.xrc:730
+#: xrc/MainMenu.xrc:734
 msgid "Translations"
 msgstr "Traductions"
 
-#: xrc/MainMenu.xrc:738
+#: xrc/MainMenu.xrc:742
 msgid "Check for updates"
 msgstr "Vérifier les mises à jour :"
 
-#: xrc/MainMenu.xrc:741
+#: xrc/MainMenu.xrc:745
 msgid "&Factory Reset..."
 msgstr "Réinitialisation"
 
-#: xrc/MainMenu.xrc:745
+#: xrc/MainMenu.xrc:749
 msgid "&About..."
 msgstr "&A Propos De..."
 
