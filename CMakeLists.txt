@@ -44,6 +44,10 @@ set(VCPKG_DEPS_OPTIONAL
     ffmpeg ENABLE_FFMPEG
 )
 
+set(VCPKG_DEPS_OPTIONAL_ARM64_BLACKLIST
+    ffmpeg
+)
+
 include(Set-Toolchain-vcpkg)
 
 set(VBAM_STATIC_DEFAULT OFF)

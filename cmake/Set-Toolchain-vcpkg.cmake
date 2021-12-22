@@ -265,6 +265,16 @@ function(vcpkg_set_toolchain)
     foreach(i RANGE 0 ${optionals_list_last} 2)
         list(GET VCPKG_DEPS_OPTIONAL ${i} dep)
 
+        set(skip FALSE)
+
+        if(VCPKG_TARGET_TRIPLET MATCHES "^arm64-")
+            foreach(blacklisted_dep IN LISTS VCPKG_DEPS_OPTIONAL_ARM64_BLACKLIST)
+                if(dep STREQUAL blacklisted_dep)
+                    set(skip TRUE)
+                endif()
+            endforeach()
+        endif()
+
         math(EXPR var_idx "${i} + 1")
 
         list(GET VCPKG_DEPS_OPTIONAL ${var_idx} var)
@@ -272,7 +282,7 @@ function(vcpkg_set_toolchain)
 
         vcpkg_seconds()
 
-        if("${val}" OR (seconds LESS time_limit AND ("${val}" OR "${val}" STREQUAL "")))
+        if(NOT skip AND ("${val}" OR (seconds LESS time_limit AND ("${val}" OR "${val}" STREQUAL ""))))
             set(dep_qualified "${dep}:${VCPKG_TARGET_TRIPLET}")
 
             execute_process(
@@ -286,16 +296,20 @@ function(vcpkg_set_toolchain)
         endif()
     endforeach()
 
-    if(WIN32 AND VCPKG_TARGET_TRIPLET MATCHES x64 AND CMAKE_GENERATOR MATCHES "Visual Studio")
-        set(CMAKE_GENERATOR_PLATFORM x64 CACHE STRING "visual studio build architecture" FORCE)
+    if(WIN32 AND CMAKE_GENERATOR MATCHES "Visual Studio")
+        if(VCPKG_TARGET_TRIPLET MATCHES "^x64-")
+            set(CMAKE_GENERATOR_PLATFORM x64 CACHE STRING "visual studio build architecture" FORCE)
+        elseif(VCPKG_TARGET_TRIPLET MATCHES "^arm64-")
+            set(CMAKE_GENERATOR_PLATFORM arm64 CACHE STRING "visual studio build architecture" FORCE)
+        endif()
     endif()
 
     if(WIN32 AND NOT CMAKE_GENERATOR MATCHES "Visual Studio")
-        if(VCPKG_TARGET_TRIPLET MATCHES "^x[68][46]-windows-")
+        if(VCPKG_TARGET_TRIPLET MATCHES "^(x[68][46]|arm64)-windows-")
             # set toolchain to VS for e.g. Ninja or jom
             set(CMAKE_C_COMPILER   cl CACHE STRING "Microsoft C/C++ Compiler" FORCE)
             set(CMAKE_CXX_COMPILER cl CACHE STRING "Microsoft C/C++ Compiler" FORCE)
-        elseif(VCPKG_TARGET_TRIPLET MATCHES "^x[68][46]-mingw-")
+        elseif(VCPKG_TARGET_TRIPLET MATCHES "^(x[68][46]|arm64)-mingw-")
             # set toolchain to MinGW for e.g. Ninja or jom
             set(CMAKE_C_COMPILER   gcc CACHE STRING "MinGW GCC C Compiler"   FORCE)
             set(CMAKE_CXX_COMPILER g++ CACHE STRING "MinGW G++ C++ Compiler" FORCE)
