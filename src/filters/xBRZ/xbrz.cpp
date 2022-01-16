@@ -76,8 +76,10 @@ inline double fastSqrt(double n)
         fld n
         fsqrt
     }
-#else // defined(_MSC_VER) && defined(_M_X64) OR other platforms
-    // VisualStudio x86_64 does not allow inline ASM
+#elif defined(_MSC_VER)
+    // On MSVC x64 use intrinsic with /Oi and /fp:fast
+    return sqrt(n);
+#else // Other platforms.
     return std::sqrt(n);
 #endif
 }
