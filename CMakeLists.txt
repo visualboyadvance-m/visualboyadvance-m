@@ -749,7 +749,14 @@ elseif(MSVC)
     if(CMAKE_BUILD_TYPE STREQUAL Debug)
         add_compile_options(/W4)
     else()
-        add_compile_options(/w /O2)
+        add_compile_options(/w)
+
+        if(X86_32)
+            add_compile_options(/Ot /Oy /Ob3 /GF /Gy)
+        else()
+            add_compile_options(/O2 /Ob3)
+        endif()
+
 
         if(ENABLE_LTO)
             add_compile_options(/GL)
