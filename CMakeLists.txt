@@ -25,6 +25,10 @@ if(COMMAND cmake_policy)
     if(POLICY CMP0012)
         cmake_policy(SET CMP0012 NEW) # Saner if() behavior.
     endif()
+
+    if(POLICY CMP0060)
+        cmake_policy(SET CMP0060 NEW) # Full lib paths.
+    endif()
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
@@ -184,7 +188,7 @@ macro(check_ffmpeg_component_versions)
     endif()
 endmacro()
 
-if(((NOT DEFINED ENABLE_FFMPEG) AND (NOT (WIN32 AND X86))) OR ENABLE_FFMPEG)
+if(NOT DEFINED ENABLE_FFMPEG OR ENABLE_FFMPEG)
     set(FFMPEG_DEFAULT ON)
 
     find_package(FFmpeg COMPONENTS ${FFMPEG_COMPONENTS})
@@ -337,6 +341,20 @@ if(WIN32 AND CMAKE_GENERATOR STREQUAL Ninja AND NOT "$ENV{MSYSTEM_PREFIX}" STREQ
     set(MSYS ON)
 endif()
 
+include(VbamFunctions)
+
+if(MSYS AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+    if($ENV{MSYSTEM} STREQUAL CLANG64)
+        cygpath(prefix "$ENV{MSYSTEM_PREFIX}/x86_64-w64-mingw32")
+        list(APPEND CMAKE_PREFIX_PATH "${prefix}")
+    elseif($ENV{MSYSTEM} STREQUAL CLANG32)
+        cygpath(prefix "$ENV{MSYSTEM_PREFIX}/i686-w64-mingw32")
+        list(APPEND CMAKE_PREFIX_PATH "${prefix}")
+    endif()
+
+    set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" CACHE INTERNAL "prefix search path for find_XXXX" FORCE)
+endif()
+
 # Add support for Homebrew, MacPorts and Fink on OS X
 if(APPLE)
     include(MacPackageManagers)
@@ -402,6 +420,16 @@ if(ENABLE_FFMPEG)
 
     if(APPLE)
         set(FFMPEG_LDFLAGS ${FFMPEG_LDFLAGS} -framework CoreText -framework ApplicationServices)
+    elseif(WIN32)
+        list(APPEND FFMPEG_LIBRARIES secur32 bcrypt ${WIN32_MEDIA_FOUNDATION_LIBS})
+
+        if(MSYS AND VBAM_STATIC)
+            foreach(lib tiff jbig lzma)
+                cygpath(lib "$ENV{MSYSTEM_PREFIX}/lib/lib${lib}.a")
+
+                list(APPEND FFMPEG_LIBRARIES "${lib}")
+            endforeach()
+        endif()
     endif()
 else()
     add_definitions(-DNO_FFMPEG)
@@ -566,23 +594,20 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     endif()
 
     # Common flags.
-    set(MY_C_FLAGS -pipe -Wformat -Wformat-security -feliminate-unused-debug-types)
+    set(MY_C_FLAGS -pipe -Wno-unused-command-line-argument -Wformat -Wformat-security -feliminate-unused-debug-types)
 
-    # Enable some optimizations for our upstream binary builds.
-    if(UPSTREAM_RELEASE)
-        # Optimize for Core2 and tune for Rocketlake on macOS and Zen3 for the rest
-        # on X86_64.
-        if(X86_64)
-            set(MY_C_FLAGS ${MY_C_FLAGS} -march=core2)
-            if(APPLE)
-                set(MY_C_FLAGS ${MY_C_FLAGS} -mtune=rocketlake)
-            else()
-                set(MY_C_FLAGS ${MY_C_FLAGS} -mtune=znver3)
-            endif()
-        # Optimize for pentium-mmx and tune for Core2 on X86_32.
-        elseif(X86_32)
-            set(MY_C_FLAGS ${MY_C_FLAGS} -march=pentium-mmx -mtune=core2)
+    # Optimize for Core2 and tune for Rocketlake on macOS and Zen3 for the rest
+    # on X86_64.
+    if(X86_64)
+        set(MY_C_FLAGS ${MY_C_FLAGS} -march=core2)
+        if(APPLE)
+            set(MY_C_FLAGS ${MY_C_FLAGS} -mtune=rocketlake)
+        else()
+            set(MY_C_FLAGS ${MY_C_FLAGS} -mtune=znver3)
         endif()
+    # Optimize for pentium-mmx and tune for Core2 on X86_32.
+    elseif(X86_32)
+        set(MY_C_FLAGS ${MY_C_FLAGS} -march=pentium-mmx -mtune=core2)
     endif()
 
     # common debug flags

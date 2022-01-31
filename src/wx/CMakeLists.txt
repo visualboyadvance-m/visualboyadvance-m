@@ -422,7 +422,7 @@ int main(int argc, char** argv)
         if(WX_ABI_FOUND_MATCH)
             # add C++ flags
             if(CMAKE_COMPILER_IS_GNUCXX)
-                string(REGEX REPLACE "<FLAGS>" "<FLAGS> -fabi-version=${WX_ABI_VERSION} " CMAKE_CXX_COMPILE_OBJECT ${CMAKE_CXX_COMPILE_OBJECT})
+                string(REGEX REPLACE "<FLAGS>" "<FLAGS> -fabi-version=${WX_ABI_VERSION} " CMAKE_CXX_COMPILE_OBJECT "${CMAKE_CXX_COMPILE_OBJECT}")
                 set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -fabi-version=${WX_ABI_VERSION}")
             elseif(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
                 string(REGEX REPLACE "<FLAGS>" "<FLAGS> -D__GXX_ABI_VERSION=10${WX_ABI_VERSION} " CMAKE_CXX_COMPILE_OBJECT ${CMAKE_CXX_COMPILE_OBJECT})
@@ -939,6 +939,27 @@ if(NOT TRANSLATIONS_ONLY)
         TARGET_LINK_LIBRARIES(visualboyadvance-m ${SPARKLE_FRAMEWORK})
     endif()
 
+    # On MSYS2 transform wx lib paths to native paths for Ninja.
+    if(MSYS)
+        set(libs "")
+
+        foreach(lib ${wxWidgets_LIBRARIES})
+            if(NOT lib MATCHES "^(-Wl,|-mwindows$|-pipe$)")
+                if(lib MATCHES "^/")
+                    cygpath(lib "${lib}")
+                endif()
+
+                if(VBAM_STATIC AND lib MATCHES "^-l(wx.*|jpeg|tiff|jbig|lzma|expat)$")
+                    cygpath(lib "$ENV{MSYSTEM_PREFIX}/lib/lib${CMAKE_MATCH_1}.a")
+                endif()
+
+                list(APPEND libs "${lib}")
+            endif()
+        endforeach()
+
+        set(wxWidgets_LIBRARIES "${libs}")
+    endif()
+
     target_link_libraries(
         visualboyadvance-m
         ${wxWidgets_LIBRARIES}
@@ -948,10 +969,6 @@ if(NOT TRANSLATIONS_ONLY)
     set(WIN32_MEDIA_FOUNDATION_LIBS dxva2 evr mf mfplat mfplay mfreadwrite mfuuid amstrmid)
 
     if(ENABLE_FFMPEG)
-        if(WIN32)
-            list(APPEND FFMPEG_LIBRARIES secur32 bcrypt ${WIN32_MEDIA_FOUNDATION_LIBS})
-        endif()
-
         target_link_libraries(
             visualboyadvance-m
             ${FFMPEG_LIBRARIES}

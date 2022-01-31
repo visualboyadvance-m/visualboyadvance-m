@@ -68,7 +68,7 @@ function(check_clean_exit var)
 endfunction()
 
 function(find_wx_util var util)
-    if(WIN32 OR EXISTS /etc/gentoo-release)
+    if(EXISTS /etc/gentoo-release)
         # On win32, including cross builds we prefer the plain utility name
         # first from PATH.
         #
@@ -78,6 +78,12 @@ function(find_wx_util var util)
         # This makes a one element of empty string list.
         set(conf_suffixes  ";")
         set(major_versions ";")
+    elseif(WIN32)
+        set(major_versions ";")
+    endif()
+
+    if(VBAM_STATIC)
+        list(APPEND conf_suffixes static)
     endif()
 
     list(APPEND conf_suffixes  gtk4u gtk4 gtk3u gtk3 gtk2u gtk2 "")
