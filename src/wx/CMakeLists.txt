@@ -966,8 +966,6 @@ if(NOT TRANSLATIONS_ONLY)
         ${VBAM_LIBS}
     )
 
-    set(WIN32_MEDIA_FOUNDATION_LIBS dxva2 evr mf mfplat mfplay mfreadwrite mfuuid amstrmid)
-
     if(ENABLE_FFMPEG)
         target_link_libraries(
             visualboyadvance-m

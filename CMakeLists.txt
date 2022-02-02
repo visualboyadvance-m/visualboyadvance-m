@@ -421,6 +421,7 @@ if(ENABLE_FFMPEG)
     if(APPLE)
         set(FFMPEG_LDFLAGS ${FFMPEG_LDFLAGS} -framework CoreText -framework ApplicationServices)
     elseif(WIN32)
+        set(WIN32_MEDIA_FOUNDATION_LIBS dxva2 evr mf mfplat mfplay mfreadwrite mfuuid amstrmid)
         list(APPEND FFMPEG_LIBRARIES secur32 bcrypt ${WIN32_MEDIA_FOUNDATION_LIBS})
 
         if(MSYS AND VBAM_STATIC)
