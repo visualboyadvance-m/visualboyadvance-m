@@ -58,20 +58,16 @@ endif()
 
 # Use ccache if available and not already enabled on the command line.
 # This has to be done before the project() call.
-if(NOT (CMAKE_CXX_COMPILER_LAUNCHER OR CMAKE_CXX_COMPILER MATCHES ccache))
+
+if(NOT (VCPKG_TARGET_TRIPLET OR CMAKE_CXX_COMPILER_LAUNCHER OR CMAKE_CXX_COMPILER MATCHES ccache))
     find_program(CCACHE_EXECUTABLE ccache)
     if(CCACHE_EXECUTABLE)
         message(STATUS "Enabling ccache")
 
-        if(CMAKE_VERSION VERSION_LESS 3.4.0)
-            # FIXME: This method currently breaks for native ccache on windows
-            # with the visual studio resource compiler.
-            set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE_EXECUTABLE})
-        else()
-            set(CMAKE_C_COMPILER_LAUNCHER        ${CCACHE_EXECUTABLE} CACHE STRING "C compiler launcher"     FORCE)
-            set(CMAKE_CXX_COMPILER_LAUNCHER      ${CCACHE_EXECUTABLE} CACHE STRING "C++ compiler launcher"   FORCE)
-            set(CMAKE_ASM_NASM_COMPILER_LAUNCHER ${CCACHE_EXECUTABLE} CACHE STRING "nasm assembler launcher" FORCE)
-        endif()
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE_EXECUTABLE})
+        set(CMAKE_C_COMPILER_LAUNCHER        ${CCACHE_EXECUTABLE} CACHE STRING "C compiler launcher"     FORCE)
+        set(CMAKE_CXX_COMPILER_LAUNCHER      ${CCACHE_EXECUTABLE} CACHE STRING "C++ compiler launcher"   FORCE)
+        set(CMAKE_ASM_NASM_COMPILER_LAUNCHER ${CCACHE_EXECUTABLE} CACHE STRING "nasm assembler launcher" FORCE)
     endif()
 endif()
 
@@ -85,6 +81,8 @@ endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build Type" FORCE)
+elseif(NOT CMAKE_BUILD_TYPE MATCHES "^(Release|Debug|RelWithDebInfo|MinSizeRel)$")
+    message(FATAL_ERROR "Invalid CMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}', must be one of: 'Release', 'Debug', 'RelWithDebInfo' or 'MinSizeRel'")
 endif()
 
 include(CTest)
@@ -547,6 +545,8 @@ ProcessorCount(num_cpus)
 
 option(UPSTREAM_RELEASE "do some optimizations and release automation tasks" OFF)
 
+include(SetCompilerLinkerFlags)
+
 if(CMAKE_C_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     include(LLVMToolchain)
 endif()
@@ -770,47 +770,38 @@ elseif(MSVC)
     string(REGEX REPLACE "/[Ww][^ ]+" "" CMAKE_C_FLAGS   ${CMAKE_C_FLAGS})
     string(REGEX REPLACE "/[Ww][^ ]+" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 
-    add_compile_options(/std:c++17 -D__STDC_LIMIT_MACROS /fp:fast /Oi)
-
-    if(CMAKE_BUILD_TYPE STREQUAL Debug)
-        add_compile_options(/W4)
-    else()
-        add_compile_options(/w)
-
-        if(X86_32)
-            add_compile_options(/Ot /Oy /Ob3 /GF /Gy)
-        else()
-            add_compile_options(/O2 /Ob3)
-        endif()
-
-
-        if(ENABLE_LTO)
-            add_compile_options(/GL)
-
-            set(CMAKE_EXE_LINKER_FLAGS          "${CMAKE_EXE_LINKER_FLAGS}          /LTCG")
-            set(CMAKE_SHARED_LINKER_FLAGS       "${CMAKE_SHARED_LINKER_FLAGS}       /LTCG")
-            set(CMAKE_MODULE_LINKER_FLAGS       "${CMAKE_MODULE_LINKER_FLAGS}       /LTCG")
-            set(CMAKE_STATIC_LINKER_FLAGS       "${CMAKE_STATIC_LINKER_FLAGS}       /LTCG")
-        endif()
-    endif()
+    add_compiler_flags(/std:c++17 -D__STDC_LIMIT_MACROS /fp:fast /Oi)
 
     if(VBAM_STATIC)
-        string(REGEX REPLACE "/MDd?" "" CMAKE_C_FLAGS                  ${CMAKE_CXX_FLAGS})
-        string(REGEX REPLACE "/MDd?" "" CMAKE_C_FLAGS_MINSIZEREL       ${CMAKE_CXX_FLAGS})
-        string(REGEX REPLACE "/MDd?" "" CMAKE_C_FLAGS_RELEASE          ${CMAKE_CXX_FLAGS})
-        string(REGEX REPLACE "/MDd?" "" CMAKE_C_FLAGS_RELWITHDEBINFO   ${CMAKE_CXX_FLAGS})
-        string(REGEX REPLACE "/MDd?" "" CMAKE_C_FLAGS_DEBUG            ${CMAKE_CXX_FLAGS})
+        set(runtime "/MT")
+    else()
+        set(runtime "/MD")
+    endif()
 
-        string(REGEX REPLACE "/MDd?" "" CMAKE_CXX_FLAGS                ${CMAKE_CXX_FLAGS})
-        string(REGEX REPLACE "/MDd?" "" CMAKE_CXX_FLAGS_MINSIZEREL     ${CMAKE_CXX_FLAGS})
-        string(REGEX REPLACE "/MDd?" "" CMAKE_CXX_FLAGS_RELEASE        ${CMAKE_CXX_FLAGS})
-        string(REGEX REPLACE "/MDd?" "" CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS})
-        string(REGEX REPLACE "/MDd?" "" CMAKE_CXX_FLAGS_DEBUG          ${CMAKE_CXX_FLAGS})
+    if(CMAKE_BUILD_TYPE STREQUAL Debug)
+        set(runtime "${runtime}d")
 
-        if(CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo")
-            add_compile_options(/MTd)
+        add_compiler_flags(${runtime} /W4 /Ob0 /Od /RTC1 /DDEBUG)
+    else()
+        add_compiler_flags(/w /DNDEBUG)
+
+        if(CMAKE_BUILD_TYPE STREQUAL Release)
+            if(X86_32)
+                add_compiler_flags(${runtime} /Ot /Oy /GF /Gy /Ob3)
+            else()
+                add_compiler_flags(${runtime} /O2 /Ob3)
+            endif()
+        elseif(CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo)
+            add_compiler_flags(${runtime} /Zi /Ob1)
+        elseif(CMAKE_BUILD_TYPE STREQUAL MinSizeRel)
+            add_compiler_flags(${runtime} /O1 /Ob1)
         else()
-            add_compile_options(/MT)
+            message(FATAL_ERROR "Unknown CMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}'")
+        endif()
+
+        if(ENABLE_LTO)
+            add_compiler_flags(/GL)
+            add_linker_flags(/LTCG)
         endif()
     endif()
 endif()

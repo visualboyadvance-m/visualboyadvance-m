@@ -1,3 +1,13 @@
+# From: https://stackoverflow.com/a/41416298/262458
+function(REMOVE_DUPES ARG_STR OUTPUT)
+  set(ARG_LIST ${ARG_STR})
+  separate_arguments(ARG_LIST)
+  list(REMOVE_DUPLICATES ARG_LIST)
+  string (REGEX REPLACE "([^\\]|^);" "\\1 " _TMP_STR "${ARG_LIST}")
+  string (REGEX REPLACE "[\\](.)" "\\1" _TMP_STR "${_TMP_STR}") #fixes escaping
+  set (${OUTPUT} "${_TMP_STR}" PARENT_SCOPE)
+endfunction()
+
 # From: https://stackoverflow.com/a/7216542
 function(JOIN VALUES GLUE OUTPUT)
   string (REGEX REPLACE "([^\\]|^);" "\\1${GLUE}" _TMP_STR "${VALUES}")
