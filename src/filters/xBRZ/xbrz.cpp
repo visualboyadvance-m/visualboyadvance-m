@@ -69,13 +69,6 @@ inline double fastSqrt(double n)
 #if (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
     __asm__ ("fsqrt" : "+t" (n));
     return n;
-#elif defined(_MSC_VER) && defined(_M_IX86)
-    // speeds up xBRZ by about 9% compared to std::sqrt which internally uses
-    // the same assembler instructions but adds some "fluff"
-    __asm {
-        fld n
-        fsqrt
-    }
 #elif defined(_MSC_VER)
     // On MSVC x64 use intrinsic with /Oi and /fp:fast
     return sqrt(n);
