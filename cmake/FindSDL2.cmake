@@ -110,7 +110,7 @@ if(SDL2_STATIC)
 endif()
 
 unset(lib_suffix)
-if(MSVC AND CMAKE_BUILD_TYPE MATCHES Debug)
+if(MSVC AND CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
     set(lib_suffix d)
 endif()
 

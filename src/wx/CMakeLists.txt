@@ -98,7 +98,7 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR X86_64))
     unset(path_prefix)
     set(build_suffix -rel)
 
-    if(CMAKE_BUILD_TYPE MATCHES Debug)
+    if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
         set(libtype ud)
         set(path_prefix debug)
         set(build_suffix -dbg)
@@ -151,14 +151,14 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR X86_64))
 
     if(VCPKG_TARGET_TRIPLET MATCHES -static)
         unset(deb_suffix)
-        if(CMAKE_BUILD_TYPE MATCHES Debug)
+        if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
             set(deb_suffix d)
         endif()
 
         file(GLOB png_lib ${wxWidgets_LIB_DIR}/libpng*.lib)
 
         list(APPEND wxWidgets_LIBRARIES
-            ${wxWidgets_LIB_DIR}/jpeg${deb_suffix}.lib
+            ${wxWidgets_LIB_DIR}/jpeg.lib
             ${wxWidgets_LIB_DIR}/tiff${deb_suffix}.lib
             ${wxWidgets_LIB_DIR}/lzma${deb_suffix}.lib
             ${wxWidgets_LIB_DIR}/libexpat${deb_suffix}MD.lib
@@ -184,7 +184,7 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR X86_64))
     # SDL2.dll does not get copied to build dir
     if(NOT VCPKG_TARGET_TRIPLET MATCHES -static)
         unset(deb_suffix)
-        if(CMAKE_BUILD_TYPE MATCHES Debug)
+        if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
             set(deb_suffix d)
         endif()
 
@@ -195,7 +195,7 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR X86_64))
         endif()
     endif()
 else()
-    if(CMAKE_BUILD_TYPE MATCHES Debug)
+    if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
         set(wxWidgets_USE_DEBUG ON) # noop if wx is compiled with --disable-debug, like in Mac Homebrew atm
     endif()
 
@@ -235,7 +235,7 @@ else()
 
     include_directories(${wxWidgets_INCLUDE_DIRS})
 
-    if(CMAKE_BUILD_TYPE MATCHES Debug)
+    if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
         # tell wx to enable debug mode if possible, if the cmake module did not do it for us
         execute_process(COMMAND "${wxWidgets_CONFIG_EXECUTABLE} --debug=yes" RESULT_VARIABLE WX_CONFIG_DEBUG OUTPUT_QUIET ERROR_QUIET)
 
@@ -987,7 +987,7 @@ if(NOT TRANSLATIONS_ONLY)
     if(CMAKE_COMPILER_IS_GNUCXX)
         if(WIN32)
             # Build a console app in debug mode on Windows
-            if(CMAKE_BUILD_TYPE MATCHES Debug)
+            if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
                 set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,--subsystem,console")
             else()
                 set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,--subsystem,windows")
@@ -1018,7 +1018,7 @@ if(NOT TRANSLATIONS_ONLY)
     endif()
 
     # Make the app a console app in debug mode to get log messages.
-    if(WIN32 AND CMAKE_BUILD_TYPE MATCHES Debug)
+    if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL Debug)
         target_compile_definitions(visualboyadvance-m PRIVATE -DWIN32_CONSOLE_APP)
     endif()
 
@@ -1129,7 +1129,7 @@ if(NOT TRANSLATIONS_ONLY)
             endif()
         endif()
 
-        if(CMAKE_BUILD_TYPE MATCHES Debug)
+        if(CMAKE_BUILD_TYPE STREQUAL Debug)
             set(exezip visualboyadvance-m-Win-${ARCH_NAME}-debug${ZIP_SUFFIX}.zip)
         else()
             set(exezip visualboyadvance-m-Win-${ARCH_NAME}${ZIP_SUFFIX}.zip)
@@ -1137,7 +1137,7 @@ if(NOT TRANSLATIONS_ONLY)
 
         unset(pdb_file)
 
-        if(MSVC AND CMAKE_BUILD_TYPE MATCHES Debug)
+        if(MSVC AND CMAKE_BUILD_TYPE STREQUAL Debug)
             set(pdb_file visualboyadvance-m.pdb)
         endif()
 
@@ -1171,7 +1171,7 @@ if(NOT TRANSLATIONS_ONLY)
             )
         endif()
 
-        if(NOT MSVC AND NOT CMAKE_BUILD_TYPE MATCHES Debug)
+        if(NOT MSVC AND CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
             find_program(STRIP_PROGRAM strip)
 
             if(STRIP_PROGRAM)
@@ -1194,7 +1194,7 @@ if(NOT TRANSLATIONS_ONLY)
         # bundle dylibs and relink them for releasing .app
         # also install translations into the .app
         # but only in Release mode
-        if(NOT CMAKE_BUILD_TYPE MATCHES Debug)
+        if(CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
             add_custom_command(
                 TARGET visualboyadvance-m POST_BUILD
                 COMMAND ${CMAKE_SOURCE_DIR}/tools/osx/third_party_libs_tool ./visualboyadvance-m.app
@@ -1210,7 +1210,7 @@ if(NOT TRANSLATIONS_ONLY)
     endif()
 
     if(APPLE AND (UPSTREAM_RELEASE OR ENABLE_ONLINEUPDATES))
-        if(NOT CMAKE_BUILD_TYPE MATCHES Debug)
+        if(CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
             find_program(STRIP_PROGRAM strip)
 
             if(STRIP_PROGRAM)
@@ -1245,7 +1245,7 @@ if(NOT TRANSLATIONS_ONLY)
         endif()
 
         if(UPSTREAM_RELEASE)
-           if(CMAKE_BUILD_TYPE MATCHES Debug)
+           if(CMAKE_BUILD_TYPE STREQUAL Debug)
               set(appzip visualboyadvance-m-Mac-${ARCH_NAME}-debug${ZIP_SUFFIX}.zip)
            else()
               set(appzip visualboyadvance-m-Mac-${ARCH_NAME}${ZIP_SUFFIX}.zip)
@@ -1272,7 +1272,7 @@ if(NOT TRANSLATIONS_ONLY)
         endif()
     endif()
 
-    if(UPSTREAM_RELEASE AND NOT WIN32 AND NOT APPLE AND NOT CMAKE_BUILD_TYPE MATCHES Debug)
+    if(UPSTREAM_RELEASE AND NOT WIN32 AND NOT APPLE AND CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
         find_program(STRIP_PROGRAM strip)
 
         if(STRIP_PROGRAM)
