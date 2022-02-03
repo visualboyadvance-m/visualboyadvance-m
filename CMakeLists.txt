@@ -582,32 +582,24 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
 
     unset(MY_C_OPT_FLAGS)
 
-    if(X86_32 OR X86_64)
-        set(MY_C_OPT_FLAGS -mfpmath=sse -msse2)
-    endif()
-
     # common optimization flags
-    if(NOT (APPLE AND CMAKE_CXX_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.3))
-        set(MY_C_OPT_FLAGS ${MY_C_OPT_FLAGS} -O2 -fomit-frame-pointer ${LTO_FLAGS})
-    else()
-        # LTO and -fomit-frame-pointer generate broken binaries on Lion with XCode 4.2 tools
-        set(MY_C_OPT_FLAGS ${MY_C_OPT_FLAGS} -O2)
-    endif()
+    set(MY_C_OPT_FLAGS ${MY_C_OPT_FLAGS} -O3 -fomit-frame-pointer ${LTO_FLAGS})
 
     # Common flags.
     set(MY_C_FLAGS -pipe -Wno-unused-command-line-argument -Wformat -Wformat-security -feliminate-unused-debug-types)
 
     # Optimize for Core2 and tune for Rocketlake on macOS and Zen3 for the rest
     # on X86_64.
-    if(X86_64)
-        set(MY_C_FLAGS ${MY_C_FLAGS} -march=core2)
+    if(X86_64 OR X86_32 AND NOT XP_RELEASE)
+        set(MY_C_FLAGS ${MY_C_FLAGS} -march=core2 -mfpmath=both -msse2 -ffast-math)
         if(APPLE)
             set(MY_C_FLAGS ${MY_C_FLAGS} -mtune=rocketlake)
         else()
             set(MY_C_FLAGS ${MY_C_FLAGS} -mtune=znver3)
         endif()
-    # Optimize for pentium-mmx and tune for Core2 on X86_32.
-    elseif(X86_32)
+    # Optimize for pentium-mmx and tune for Core2 on X86_32 for XP
+    # builds.
+    elseif(XP_RELEASE)
         set(MY_C_FLAGS ${MY_C_FLAGS} -march=pentium-mmx -mtune=core2)
     endif()
 
