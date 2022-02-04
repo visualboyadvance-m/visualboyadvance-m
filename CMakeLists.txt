@@ -397,7 +397,7 @@ find_package(OpenGL REQUIRED)
 find_package(SDL2   REQUIRED)
 
 if(WIN32)
-    set(SDL2_LIBRARY ${SDL2_LIBRARY} setupapi)
+    set(SDL2_LIBRARY ${SDL2_LIBRARY} setupapi winmm)
 endif()
 
 # set the standard libraries all ports use
