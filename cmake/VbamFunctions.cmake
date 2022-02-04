@@ -78,22 +78,23 @@ function(check_clean_exit var)
 endfunction()
 
 function(find_wx_util var util)
-    if(EXISTS /etc/gentoo-release)
-        # On win32, including cross builds we prefer the plain utility name
-        # first from PATH.
+    if(WIN32 OR EXISTS /etc/gentoo-release)
+        # On win32, including cross builds we prefer the plain utility
+        # name first from PATH, with the exception of -static for static
+        # builds.
         #
-        # On Gentoo /usr/bin/wx-config loads the eselected build, so we want
-        # to try that first.
+        # On Gentoo /usr/bin/wx-config loads the eselected build, so we
+        # want to try that first.
         #
         # This makes a one element of empty string list.
-        set(conf_suffixes  ";")
-        set(major_versions ";")
-    elseif(WIN32)
-        set(major_versions ";")
-    endif()
 
-    if(VBAM_STATIC)
-        list(APPEND conf_suffixes static)
+        if(VBAM_STATIC)
+            set(conf_suffixes "static;")
+        else()
+            set(conf_suffixes  ";")
+        endif()
+
+        set(major_versions ";")
     endif()
 
     list(APPEND conf_suffixes  gtk4u gtk4 gtk3u gtk3 gtk2u gtk2 "")
