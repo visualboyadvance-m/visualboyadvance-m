@@ -1111,6 +1111,13 @@ windows_installdeps() {
         set -- "$@" "${target}-${p}"
     done
 
+    case "$target" in
+        *clang*)
+            # We use gcc windres for now, llvm-rc is sometimes broken.
+            set -- "$@" mingw-w64-x86_64-binutils
+        ;;
+    esac
+
     # install
     check pacman --noconfirm --needed -S git make zip "$@"
 
