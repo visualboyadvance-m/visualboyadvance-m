@@ -352,13 +352,13 @@ int main(int argc, char** argv)
     if (MH_Initialize() != MH_OK) return 1;
 
     // Create a hook for MessageBoxW and MessageBoxA
-    if (MH_CreateHook(&MessageBoxW, &DetourMessageBoxW, reinterpret_cast<LPVOID*>(&fpMessageBoxW)) != MH_OK)
+    if (MH_CreateHook(reinterpret_cast<LPVOID>(&MessageBoxW), reinterpret_cast<LPVOID>(&DetourMessageBoxW), reinterpret_cast<LPVOID*>(&fpMessageBoxW)) != MH_OK)
         return 1;
-    if (MH_CreateHook(&MessageBoxA, &DetourMessageBoxA, reinterpret_cast<LPVOID*>(&fpMessageBoxA)) != MH_OK)
+    if (MH_CreateHook(reinterpret_cast<LPVOID>(&MessageBoxA), reinterpret_cast<LPVOID>(&DetourMessageBoxA), reinterpret_cast<LPVOID*>(&fpMessageBoxA)) != MH_OK)
         return 1;
 
-    if (MH_EnableHook(&MessageBoxW) != MH_OK) return 1;
-    if (MH_EnableHook(&MessageBoxA) != MH_OK) return 1;
+    if (MH_EnableHook(reinterpret_cast<LPVOID>(&MessageBoxW)) != MH_OK) return 1;
+    if (MH_EnableHook(reinterpret_cast<LPVOID>(&MessageBoxA)) != MH_OK) return 1;
 #endif
 
     wxEntry(argc, argv);
@@ -948,27 +948,6 @@ if(NOT TRANSLATIONS_ONLY)
         )
 
         TARGET_LINK_LIBRARIES(visualboyadvance-m ${SPARKLE_FRAMEWORK})
-    endif()
-
-    # On MSYS2 transform wx lib paths to native paths for Ninja.
-    if(MSYS)
-        set(libs "")
-
-        foreach(lib ${wxWidgets_LIBRARIES})
-            if(NOT lib MATCHES "^(-Wl,|-mwindows$|-pipe$)")
-                if(lib MATCHES "^/")
-                    cygpath(lib "${lib}")
-                endif()
-
-                if(VBAM_STATIC AND lib MATCHES "^-l(wx.*|jpeg|tiff|jbig|lzma|expat)$")
-                    cygpath(lib "$ENV{MSYSTEM_PREFIX}/lib/lib${CMAKE_MATCH_1}.a")
-                endif()
-
-                list(APPEND libs "${lib}")
-            endif()
-        endforeach()
-
-        set(wxWidgets_LIBRARIES "${libs}")
     endif()
 
     target_link_libraries(

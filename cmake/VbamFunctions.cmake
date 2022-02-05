@@ -15,21 +15,26 @@ function(JOIN VALUES GLUE OUTPUT)
   set (${OUTPUT} "${_TMP_STR}" PARENT_SCOPE)
 endfunction()
 
-# convert msys paths like /c/foo to windows paths like c:/foo
-# for variables set by FindWxWidgets
+# On MSYS2 transform wx lib paths to native paths for Ninja.
 function(normalize_wx_paths)
     if(MSYS)
-        unset(new_paths)
-        foreach(p ${wxWidgets_LIBRARY_DIRS})
-            execute_process(COMMAND cygpath -m "${p}" OUTPUT_VARIABLE p_win OUTPUT_STRIP_TRAILING_WHITESPACE)
-            list(APPEND new_paths "${p_win}")
+        set(libs "")
+
+        foreach(lib ${wxWidgets_LIBRARIES})
+            if(NOT lib MATCHES "^(-Wl,|-mwindows$|-pipe$)")
+                if(lib MATCHES "^/")
+                    cygpath(lib "${lib}")
+                endif()
+
+                if(VBAM_STATIC AND lib MATCHES "^-l(wx.*|jpeg|tiff|jbig|lzma|expat)$")
+                    cygpath(lib "$ENV{MSYSTEM_PREFIX}/lib/lib${CMAKE_MATCH_1}.a")
+                endif()
+
+                list(APPEND libs "${lib}")
+            endif()
         endforeach()
 
-        set(wxWidgets_LIBRARY_DIRS ${new_paths} PARENT_SCOPE)
-
-        string(REGEX REPLACE "((^| )[^/]*)/([a-zA-Z])/" "\\1\\3:/" new_libs "${wxWidgets_LIBRARIES}")
-
-        set(wxWidgets_LIBRARIES ${new_libs} PARENT_SCOPE)
+        set(wxWidgets_LIBRARIES "${libs}" PARENT_SCOPE)
     endif()
 endfunction()
 
