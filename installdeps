@@ -81,23 +81,16 @@ quit() {
 usage() {
     cat <<'EOF'
 Usage: [32m./installdeps [1;35m[TARGET][0m
-Try to install the dependencies needed for this project appropriately on the
-host OS.
+
+Try to install the dependencies needed for this project appropriately on the host OS.
 
 This program may require [1;35msudo[0m.
 
-A cross-compile target may be specified as the only parameter, of either
-[1;35mm32[0m which targets the host in 32 bit mode (e.g. x86 on an amd64
-host) or [1;35mwin32[0m, [1;35mMinGW-w64-i686[0m or
-[1;35mMinGW-w64-x86_64[0m.  [1;35mwin32[0m is an alias for
-[1;35mMinGW-w64-i686[0m to target Windows via MinGW.  Cross compiling for
-Windows is only supported on Debian/Ubuntu, Fedora, Arch Linux and MSYS2.
+A cross-compile target may be specified as the only parameter, of either [1;35mm32[0m which targets the host in 32 bit mode (e.g. x86 on an amd64 host) or [1;35mwin32[0m, [1;35mMinGW-w64-i686[0m or [1;35mMinGW-w64-x86_64[0m.  [1;35mwin32[0m is an alias for [1;35mMinGW-w64-i686[0m to target Windows via MinGW.  Cross compiling for Windows is only supported on Debian/Ubuntu, Fedora, Arch Linux and MSYS2.
 
-On MSYS2 dependencies are installed for 32 or 64 bit native Windows targets
-based on which shell you started (the value of $MSYSTEM) unless you specify one
-or the other. You can specify a cross target of [1;35mm32[0m or
-[1;35mm64[0m as aliases for the 32 bit or 64 bit targets respectively.
-MSYS2 POSIX layer builds are not supported.
+On MSYS2 the [1;35mMinGW-w64-clang-x86_64[0m target for CLANG64 and the [1;35mMinGW-w64-clang-i686[0m target for CLANG32 are also supported.
+
+On MSYS2 dependencies are installed for 32 or 64 bit native Windows targets based on which shell you started (the value of $MSYSTEM) unless you specify one or the other. You can specify a cross target of [1;35mm32[0m or [1;35mm64[0m as aliases for the 32 bit or 64 bit MinGW gcc targets respectively. MSYS2 POSIX layer builds are not supported.
 
   [1m-h, --help, --usage[0m                Show this help screen and exit.
   [1m--no-openal[0m                        Do not install OpenAL dependencies.
@@ -254,6 +247,12 @@ check_cross() {
                 MINGW64)
                     target='mingw-w64-x86_64'
                     ;;
+                CLANG32)
+                    target='mingw-w64-clang-i686'
+                    ;;
+                CLANG64)
+                    target='mingw-w64-clang-x86_64'
+                    ;;
                 MSYS)
                     error 'host builds in MSYS mode are not supported, supply a target or start a MINGW shell'
                     ;;
@@ -279,12 +278,10 @@ check_cross() {
                 win64)
                     target='mingw-w64-x86_64'
                     ;;
-                mingw-w64-i686)
-                    ;;
-                mingw-w64-x86_64)
+                mingw-w64-x86_64|mingw-w64-i686|mingw-w64-clang-x86_64|mingw-w64-clang-i686)
                     ;;
                 *)
-                    error "target must be one of 'm32', 'win32', 'MinGW-w64-i686', 'win64' or 'MinGW-w64-x86_64'"
+                    error "target must be one of 'm32', 'win32', 'win64', or one of the MinGW/clang targets supported by MSYS2: mingw-w64-[clang-](x86_64|i686)."
                     ;;
             esac
             ;;
@@ -1087,7 +1084,24 @@ windows_installdeps() {
     # update catalogs
     check pacman -Sy
 
-    pkgs="SDL2 sfml wxWidgets zlib binutils cmake crt-git extra-cmake-modules gcc gcc-libs gcc-libgfortran gdb headers-git make pkg-config tools-git windows-default-manifest libmangle-git nasm ninja"
+    pkgs=
+
+    case "$target" in
+        *clang*)
+            pkgs="lldb"
+            ;;
+        *)
+            pkgs="$pkgs gcc gcc-libs gcc-libgfortran"
+            ;;
+    esac
+
+    case "$target" in
+        *i686*)
+            pkgs="$pkgs nasm"
+            ;;
+    esac
+
+    pkgs="$pkgs SDL2 sfml wxWidgets zlib binutils cmake crt-git extra-cmake-modules headers-git make pkgconf tools-git windows-default-manifest libmangle-git ninja gdb ccache"
 
     [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs openal"
     [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs ffmpeg"
@@ -1096,6 +1110,13 @@ windows_installdeps() {
     for p in $pkgs; do
         set -- "$@" "${target}-${p}"
     done
+
+    case "$target" in
+        *clang*)
+            # We use gcc windres for now, llvm-rc is sometimes broken.
+            set -- "$@" mingw-w64-x86_64-binutils
+        ;;
+    esac
 
     # install
     check pacman --noconfirm --needed -S git make zip "$@"

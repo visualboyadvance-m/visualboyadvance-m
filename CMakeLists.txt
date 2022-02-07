@@ -25,6 +25,10 @@ if(COMMAND cmake_policy)
     if(POLICY CMP0012)
         cmake_policy(SET CMP0012 NEW) # Saner if() behavior.
     endif()
+
+    if(POLICY CMP0060)
+        cmake_policy(SET CMP0060 NEW) # Full lib paths.
+    endif()
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
@@ -54,20 +58,16 @@ endif()
 
 # Use ccache if available and not already enabled on the command line.
 # This has to be done before the project() call.
-if(NOT (CMAKE_CXX_COMPILER_LAUNCHER OR CMAKE_CXX_COMPILER MATCHES ccache))
+
+if(NOT (VCPKG_TARGET_TRIPLET OR CMAKE_CXX_COMPILER_LAUNCHER OR CMAKE_CXX_COMPILER MATCHES ccache))
     find_program(CCACHE_EXECUTABLE ccache)
     if(CCACHE_EXECUTABLE)
         message(STATUS "Enabling ccache")
 
-        if(CMAKE_VERSION VERSION_LESS 3.4.0)
-            # FIXME: This method currently breaks for native ccache on windows
-            # with the visual studio resource compiler.
-            set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE_EXECUTABLE})
-        else()
-            set(CMAKE_C_COMPILER_LAUNCHER        ${CCACHE_EXECUTABLE} CACHE STRING "C compiler launcher"     FORCE)
-            set(CMAKE_CXX_COMPILER_LAUNCHER      ${CCACHE_EXECUTABLE} CACHE STRING "C++ compiler launcher"   FORCE)
-            set(CMAKE_ASM_NASM_COMPILER_LAUNCHER ${CCACHE_EXECUTABLE} CACHE STRING "nasm assembler launcher" FORCE)
-        endif()
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE_EXECUTABLE})
+        set(CMAKE_C_COMPILER_LAUNCHER        ${CCACHE_EXECUTABLE} CACHE STRING "C compiler launcher"     FORCE)
+        set(CMAKE_CXX_COMPILER_LAUNCHER      ${CCACHE_EXECUTABLE} CACHE STRING "C++ compiler launcher"   FORCE)
+        set(CMAKE_ASM_NASM_COMPILER_LAUNCHER ${CCACHE_EXECUTABLE} CACHE STRING "nasm assembler launcher" FORCE)
     endif()
 endif()
 
@@ -81,6 +81,8 @@ endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build Type" FORCE)
+elseif(NOT CMAKE_BUILD_TYPE MATCHES "^(Release|Debug|RelWithDebInfo|MinSizeRel)$")
+    message(FATAL_ERROR "Invalid CMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}', must be one of: 'Release', 'Debug', 'RelWithDebInfo' or 'MinSizeRel'")
 endif()
 
 include(CTest)
@@ -184,7 +186,7 @@ macro(check_ffmpeg_component_versions)
     endif()
 endmacro()
 
-if(((NOT DEFINED ENABLE_FFMPEG) AND (NOT (WIN32 AND X86))) OR ENABLE_FFMPEG)
+if(NOT DEFINED ENABLE_FFMPEG OR ENABLE_FFMPEG)
     set(FFMPEG_DEFAULT ON)
 
     find_package(FFmpeg COMPONENTS ${FFMPEG_COMPONENTS})
@@ -213,7 +215,7 @@ set(LTO_DEFAULT ON)
 
 # gcc lto produces buggy binaries for 64 bit mingw
 # and we generally don't want it when debugging because it makes linking slow
-if(CMAKE_BUILD_TYPE MATCHES Debug OR (WIN32 AND CMAKE_COMPILER_IS_GNUCXX))
+if(CMAKE_BUILD_TYPE STREQUAL Debug OR (WIN32 AND CMAKE_COMPILER_IS_GNUCXX))
     set(LTO_DEFAULT OFF)
 endif()
 
@@ -326,7 +328,7 @@ include_directories(${CMAKE_BINARY_DIR})
 string(REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+).*" "\\1,\\2,\\3,0" WIN_VERSION "${VERSION}")
 configure_file("${CMAKE_SOURCE_DIR}/src/version.h.in" "${CMAKE_BINARY_DIR}/version.h" @ONLY)
 
-if(CMAKE_BUILD_TYPE MATCHES Debug)
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
     add_definitions(-DDEBUG)
 else()
     add_definitions(-DNDEBUG)
@@ -335,6 +337,20 @@ endif()
 # hack for ninja in msys2
 if(WIN32 AND CMAKE_GENERATOR STREQUAL Ninja AND NOT "$ENV{MSYSTEM_PREFIX}" STREQUAL "")
     set(MSYS ON)
+endif()
+
+include(VbamFunctions)
+
+if(MSYS AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+    if($ENV{MSYSTEM} STREQUAL CLANG64)
+        cygpath(prefix "$ENV{MSYSTEM_PREFIX}/x86_64-w64-mingw32")
+        list(APPEND CMAKE_PREFIX_PATH "${prefix}")
+    elseif($ENV{MSYSTEM} STREQUAL CLANG32)
+        cygpath(prefix "$ENV{MSYSTEM_PREFIX}/i686-w64-mingw32")
+        list(APPEND CMAKE_PREFIX_PATH "${prefix}")
+    endif()
+
+    set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" CACHE INTERNAL "prefix search path for find_XXXX" FORCE)
 endif()
 
 # Add support for Homebrew, MacPorts and Fink on OS X
@@ -381,7 +397,7 @@ find_package(OpenGL REQUIRED)
 find_package(SDL2   REQUIRED)
 
 if(WIN32)
-    set(SDL2_LIBRARY ${SDL2_LIBRARY} setupapi)
+    set(SDL2_LIBRARY ${SDL2_LIBRARY} setupapi winmm)
 endif()
 
 # set the standard libraries all ports use
@@ -402,6 +418,17 @@ if(ENABLE_FFMPEG)
 
     if(APPLE)
         set(FFMPEG_LDFLAGS ${FFMPEG_LDFLAGS} -framework CoreText -framework ApplicationServices)
+    elseif(WIN32)
+        set(WIN32_MEDIA_FOUNDATION_LIBS dxva2 evr mf mfplat mfplay mfreadwrite mfuuid amstrmid)
+        list(APPEND FFMPEG_LIBRARIES secur32 bcrypt ${WIN32_MEDIA_FOUNDATION_LIBS})
+
+        if(MSYS AND VBAM_STATIC)
+            foreach(lib tiff jbig lzma)
+                cygpath(lib "$ENV{MSYSTEM_PREFIX}/lib/lib${lib}.a")
+
+                list(APPEND FFMPEG_LIBRARIES "${lib}")
+            endforeach()
+        endif()
     endif()
 else()
     add_definitions(-DNO_FFMPEG)
@@ -518,6 +545,8 @@ ProcessorCount(num_cpus)
 
 option(UPSTREAM_RELEASE "do some optimizations and release automation tasks" OFF)
 
+include(SetCompilerLinkerFlags)
+
 if(CMAKE_C_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     include(LLVMToolchain)
 endif()
@@ -566,23 +595,20 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     endif()
 
     # Common flags.
-    set(MY_C_FLAGS -pipe -Wformat -Wformat-security -feliminate-unused-debug-types)
+    set(MY_C_FLAGS -pipe -Wno-unused-command-line-argument -Wformat -Wformat-security -feliminate-unused-debug-types)
 
-    # Enable some optimizations for our upstream binary builds.
-    if(UPSTREAM_RELEASE)
-        # Optimize for Core2 and tune for Rocketlake on macOS and Zen3 for the rest
-        # on X86_64.
-        if(X86_64)
-            set(MY_C_FLAGS ${MY_C_FLAGS} -march=core2)
-            if(APPLE)
-                set(MY_C_FLAGS ${MY_C_FLAGS} -mtune=rocketlake)
-            else()
-                set(MY_C_FLAGS ${MY_C_FLAGS} -mtune=znver3)
-            endif()
-        # Optimize for pentium-mmx and tune for Core2 on X86_32.
-        elseif(X86_32)
-            set(MY_C_FLAGS ${MY_C_FLAGS} -march=pentium-mmx -mtune=core2)
+    # Optimize for Core2 and tune for Rocketlake on macOS and Zen3 for the rest
+    # on X86_64.
+    if(X86_64)
+        set(MY_C_FLAGS ${MY_C_FLAGS} -march=core2)
+        if(APPLE)
+            set(MY_C_FLAGS ${MY_C_FLAGS} -mtune=rocketlake)
+        else()
+            set(MY_C_FLAGS ${MY_C_FLAGS} -mtune=znver3)
         endif()
+    # Optimize for pentium-mmx and tune for Core2 on X86_32.
+    elseif(X86_32)
+        set(MY_C_FLAGS ${MY_C_FLAGS} -march=pentium-mmx -mtune=core2)
     endif()
 
     # common debug flags
@@ -675,7 +701,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
         set(MY_C_FLAGS ${MY_C_FLAGS} -static-libgcc -static-libstdc++)
     endif()
 
-    if(CMAKE_BUILD_TYPE MATCHES Debug)
+    if(CMAKE_BUILD_TYPE STREQUAL Debug)
         set(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_DBG_FLAGS} -Wall -Wextra)
     else()
         set(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_OPT_FLAGS} -Wno-error)
@@ -744,40 +770,38 @@ elseif(MSVC)
     string(REGEX REPLACE "/[Ww][^ ]+" "" CMAKE_C_FLAGS   ${CMAKE_C_FLAGS})
     string(REGEX REPLACE "/[Ww][^ ]+" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 
-    add_compile_options(/std:c++17 -D__STDC_LIMIT_MACROS)
-
-    if(CMAKE_BUILD_TYPE STREQUAL Debug)
-        add_compile_options(/W4)
-    else()
-        add_compile_options(/w)
-
-        if(ENABLE_LTO)
-            add_compile_options(/GL)
-
-            set(CMAKE_EXE_LINKER_FLAGS          "${CMAKE_EXE_LINKER_FLAGS}          /LTCG")
-            set(CMAKE_SHARED_LINKER_FLAGS       "${CMAKE_SHARED_LINKER_FLAGS}       /LTCG")
-            set(CMAKE_MODULE_LINKER_FLAGS       "${CMAKE_MODULE_LINKER_FLAGS}       /LTCG")
-            set(CMAKE_STATIC_LINKER_FLAGS       "${CMAKE_STATIC_LINKER_FLAGS}       /LTCG")
-        endif()
-    endif()
+    add_compiler_flags(/std:c++17 -D__STDC_LIMIT_MACROS /fp:fast /Oi)
 
     if(VBAM_STATIC)
-        string(REGEX REPLACE "/MDd?" "" CMAKE_C_FLAGS                  ${CMAKE_CXX_FLAGS})
-        string(REGEX REPLACE "/MDd?" "" CMAKE_C_FLAGS_MINSIZEREL       ${CMAKE_CXX_FLAGS})
-        string(REGEX REPLACE "/MDd?" "" CMAKE_C_FLAGS_RELEASE          ${CMAKE_CXX_FLAGS})
-        string(REGEX REPLACE "/MDd?" "" CMAKE_C_FLAGS_RELWITHDEBINFO   ${CMAKE_CXX_FLAGS})
-        string(REGEX REPLACE "/MDd?" "" CMAKE_C_FLAGS_DEBUG            ${CMAKE_CXX_FLAGS})
+        set(runtime "/MT")
+    else()
+        set(runtime "/MD")
+    endif()
 
-        string(REGEX REPLACE "/MDd?" "" CMAKE_CXX_FLAGS                ${CMAKE_CXX_FLAGS})
-        string(REGEX REPLACE "/MDd?" "" CMAKE_CXX_FLAGS_MINSIZEREL     ${CMAKE_CXX_FLAGS})
-        string(REGEX REPLACE "/MDd?" "" CMAKE_CXX_FLAGS_RELEASE        ${CMAKE_CXX_FLAGS})
-        string(REGEX REPLACE "/MDd?" "" CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS})
-        string(REGEX REPLACE "/MDd?" "" CMAKE_CXX_FLAGS_DEBUG          ${CMAKE_CXX_FLAGS})
+    if(CMAKE_BUILD_TYPE STREQUAL Debug)
+        set(runtime "${runtime}d")
 
-        if(CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo")
-            add_compile_options(/MTd)
+        add_compiler_flags(${runtime} /W4 /Ob0 /Od /RTC1 /DDEBUG)
+    else()
+        add_compiler_flags(/w /DNDEBUG)
+
+        if(CMAKE_BUILD_TYPE STREQUAL Release)
+            if(X86_32)
+                add_compiler_flags(${runtime} /Ot /Oy /GF /Gy /Ob3)
+            else()
+                add_compiler_flags(${runtime} /O2 /Ob3)
+            endif()
+        elseif(CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo)
+            add_compiler_flags(${runtime} /Zi /Ob1)
+        elseif(CMAKE_BUILD_TYPE STREQUAL MinSizeRel)
+            add_compiler_flags(${runtime} /O1 /Ob1)
         else()
-            add_compile_options(/MT)
+            message(FATAL_ERROR "Unknown CMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}'")
+        endif()
+
+        if(ENABLE_LTO)
+            add_compiler_flags(/GL)
+            add_linker_flags(/LTCG)
         endif()
     endif()
 endif()
@@ -798,7 +822,9 @@ if(X86_64)
     add_definitions(-D__AMD64__ -D__X86_64__)
 endif()
 
-add_subdirectory (fex)
+if(NOT TRANSLATIONS_ONLY)
+    add_subdirectory(fex)
+endif()
 
 set(
     SRC_MAIN
@@ -1074,29 +1100,31 @@ if(ENABLE_FFMPEG)
     )
 endif()
 
-add_library(
-    vbamcore
-    STATIC
-    ${PROJECT_SRCS}
-    ${SRC_MAIN}
-    ${HDR_MAIN}
-    ${SRC_GBA}
-    ${HDR_GBA}
-    ${SRC_GB}
-    ${HDR_GB}
-    ${SRC_APU}
-    ${HDR_APU}
-    ${SRC_FILTERS}
-    ${HDR_FILTERS}
-    ${SRC_DEBUGGER}
-    ${HDR_DEBUGGER}
-    ${HDR_STB_IMAGE}
-)
-add_dependencies(vbamcore generate)
-set_property(TARGET vbamcore PROPERTY CXX_STANDARD 11)
-set_property(TARGET vbamcore PROPERTY CXX_STANDARD_REQUIRED ON)
+if(NOT TRANSLATIONS_ONLY)
+    add_library(
+        vbamcore
+        STATIC
+        ${PROJECT_SRCS}
+        ${SRC_MAIN}
+        ${HDR_MAIN}
+        ${SRC_GBA}
+        ${HDR_GBA}
+        ${SRC_GB}
+        ${HDR_GB}
+        ${SRC_APU}
+        ${HDR_APU}
+        ${SRC_FILTERS}
+        ${HDR_FILTERS}
+        ${SRC_DEBUGGER}
+        ${HDR_DEBUGGER}
+        ${HDR_STB_IMAGE}
+    )
+    add_dependencies(vbamcore generate)
+    set_property(TARGET vbamcore PROPERTY CXX_STANDARD 11)
+    set_property(TARGET vbamcore PROPERTY CXX_STANDARD_REQUIRED ON)
+endif()
 
-if(ENABLE_SDL)
+if((NOT TRANSLATIONS_ONLY) AND ENABLE_SDL)
     add_executable(
         vbam
         WIN32

@@ -1,3 +1,13 @@
+# From: https://stackoverflow.com/a/41416298/262458
+function(REMOVE_DUPES ARG_STR OUTPUT)
+  set(ARG_LIST ${ARG_STR})
+  separate_arguments(ARG_LIST)
+  list(REMOVE_DUPLICATES ARG_LIST)
+  string (REGEX REPLACE "([^\\]|^);" "\\1 " _TMP_STR "${ARG_LIST}")
+  string (REGEX REPLACE "[\\](.)" "\\1" _TMP_STR "${_TMP_STR}") #fixes escaping
+  set (${OUTPUT} "${_TMP_STR}" PARENT_SCOPE)
+endfunction()
+
 # From: https://stackoverflow.com/a/7216542
 function(JOIN VALUES GLUE OUTPUT)
   string (REGEX REPLACE "([^\\]|^);" "\\1${GLUE}" _TMP_STR "${VALUES}")
@@ -5,21 +15,26 @@ function(JOIN VALUES GLUE OUTPUT)
   set (${OUTPUT} "${_TMP_STR}" PARENT_SCOPE)
 endfunction()
 
-# convert msys paths like /c/foo to windows paths like c:/foo
-# for variables set by FindWxWidgets
+# On MSYS2 transform wx lib paths to native paths for Ninja.
 function(normalize_wx_paths)
     if(MSYS)
-        unset(new_paths)
-        foreach(p ${wxWidgets_LIBRARY_DIRS})
-            execute_process(COMMAND cygpath -m "${p}" OUTPUT_VARIABLE p_win OUTPUT_STRIP_TRAILING_WHITESPACE)
-            list(APPEND new_paths "${p_win}")
+        set(libs "")
+
+        foreach(lib ${wxWidgets_LIBRARIES})
+            if(NOT lib MATCHES "^(-Wl,|-mwindows$|-pipe$)")
+                if(lib MATCHES "^/")
+                    cygpath(lib "${lib}")
+                endif()
+
+                if(VBAM_STATIC AND lib MATCHES "^-l(wx.*|jpeg|tiff|jbig|lzma|expat)$")
+                    cygpath(lib "$ENV{MSYSTEM_PREFIX}/lib/lib${CMAKE_MATCH_1}.a")
+                endif()
+
+                list(APPEND libs "${lib}")
+            endif()
         endforeach()
 
-        set(wxWidgets_LIBRARY_DIRS ${new_paths} PARENT_SCOPE)
-
-        string(REGEX REPLACE "((^| )[^/]*)/([a-zA-Z])/" "\\1\\3:/" new_libs "${wxWidgets_LIBRARIES}")
-
-        set(wxWidgets_LIBRARIES ${new_libs} PARENT_SCOPE)
+        set(wxWidgets_LIBRARIES "${libs}" PARENT_SCOPE)
     endif()
 endfunction()
 
@@ -69,14 +84,21 @@ endfunction()
 
 function(find_wx_util var util)
     if(WIN32 OR EXISTS /etc/gentoo-release)
-        # On win32, including cross builds we prefer the plain utility name
-        # first from PATH.
+        # On win32, including cross builds we prefer the plain utility
+        # name first from PATH, with the exception of -static for static
+        # builds.
         #
-        # On Gentoo /usr/bin/wx-config loads the eselected build, so we want
-        # to try that first.
+        # On Gentoo /usr/bin/wx-config loads the eselected build, so we
+        # want to try that first.
         #
         # This makes a one element of empty string list.
-        set(conf_suffixes  ";")
+
+        if(VBAM_STATIC)
+            set(conf_suffixes "static;")
+        else()
+            set(conf_suffixes  ";")
+        endif()
+
         set(major_versions ";")
     endif()
 

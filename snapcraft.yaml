@@ -6,7 +6,7 @@ description: |
 adopt-info: vbam
 grade: devel
 confinement: strict
-base: core18
+base: core20
 
 plugs:
 

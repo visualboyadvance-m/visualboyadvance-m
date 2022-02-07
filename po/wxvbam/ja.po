@@ -4,17 +4,20 @@
 # 
 # Translators:
 # Hinaloe <hina@hinaloe.net>, 2017
+# Giovanni Schiano-Moriello, 2022
+# Hinaloe <hina@hinaloe.net>, 2017
 # Kuso Bully <aaadsaaads@yahoo.co.jp>, 2018
 # Mach555 <aimmasayukitone@yahoo.co.jp>, 2015
 # Mutuda Katuo <afetser@gmail.com>, 2017
+# Okubo Shohei <stream.larn3@gmail.com>, 2021
 # 色月 すみれ <nlive0107@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-05 11:34+0000\n"
-"PO-Revision-Date: 2021-07-02 03:42+0000\n"
-"Last-Translator: 色月 すみれ <nlive0107@gmail.com>\n"
+"POT-Creation-Date: 2021-11-24 21:24+0000\n"
+"PO-Revision-Date: 2022-01-12 05:59+0000\n"
+"Last-Translator: Giovanni Schiano-Moriello\n"
 "Language-Team: Japanese (http://www.transifex.com/bgk/vba-m/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,297 +25,297 @@ msgstr ""
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: wxvbam.cpp:226
+#: wxvbam.cpp:225
 msgid "visualboyadvance-m"
-msgstr ""
+msgstr "visualboyadvance-m"
 
-#: wxvbam.cpp:443
+#: wxvbam.cpp:442
 msgid "Could not create main window"
 msgstr "メインウィンドウを作成できませんでした"
 
-#: wxvbam.cpp:514
+#: wxvbam.cpp:513
 msgid "Save built-in XRC file and exit"
 msgstr "XRCファイルを保存して終了"
 
-#: wxvbam.cpp:517
+#: wxvbam.cpp:516
 msgid "Save built-in vba-over.ini and exit"
 msgstr "vba-over.ini を保存して終了"
 
-#: wxvbam.cpp:520
+#: wxvbam.cpp:519
 msgid "Print configuration path and exit"
-msgstr ""
+msgstr "設定ファイルのパスを出力して終了"
 
-#: wxvbam.cpp:523
+#: wxvbam.cpp:522
 msgid "Start in full-screen mode"
 msgstr "全画面表示で開始"
 
-#: wxvbam.cpp:526
+#: wxvbam.cpp:525
 msgid "Set a configuration file"
-msgstr ""
+msgstr "設定ファイルをセット"
 
-#: wxvbam.cpp:530
+#: wxvbam.cpp:529
 msgid "Delete shared link state first, if it exists"
 msgstr ""
 
-#: wxvbam.cpp:537
+#: wxvbam.cpp:536
 msgid "List all settable options and exit"
 msgstr ""
 
-#: wxvbam.cpp:540
+#: wxvbam.cpp:539
 msgid "ROM file"
 msgstr "ROMファイル"
 
-#: wxvbam.cpp:542
+#: wxvbam.cpp:541
 msgid "<config>=<value>"
-msgstr ""
+msgstr "<config>=<value>"
 
-#: wxvbam.cpp:573
+#: wxvbam.cpp:572
 msgid "Configuration/build error: can't find built-in xrc"
-msgstr ""
+msgstr "設定/ビルドエラー: 組み込みxrcを見つけることができません"
 
-#: wxvbam.cpp:581
+#: wxvbam.cpp:580
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr ""
 
-#: wxvbam.cpp:596
+#: wxvbam.cpp:595
 msgid "Configuration is read from, in order:"
 msgstr ""
 
-#: wxvbam.cpp:610
+#: wxvbam.cpp:609
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
 msgstr ""
 
-#: wxvbam.cpp:616
+#: wxvbam.cpp:615
 msgid ""
 "\n"
 "\tbuilt-in"
-msgstr ""
+msgstr "\n\t組み込み"
 
-#: wxvbam.cpp:627
+#: wxvbam.cpp:626
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
 "For flag options, true and false are specified as 1 and 0, respectively.\n"
 "\n"
-msgstr ""
+msgstr "ユーザーインターフェイスで構成を変更するとコマンドラインからの設定されたオプションが保存されます。.\n\nフラグオプションの場合、trueとfalseにそれぞれ1と0を指定できます。\n\n"
 
-#: wxvbam.cpp:648
+#: wxvbam.cpp:647
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr ""
 
-#: wxvbam.cpp:660
+#: wxvbam.cpp:659
 msgid "Configuration file not found."
-msgstr ""
+msgstr "設定ファイルが見つかりません。"
 
-#: wxvbam.cpp:693
+#: wxvbam.cpp:692
 msgid "Bad configuration option or multiple ROM files given:\n"
-msgstr ""
+msgstr "設定オプションが不正か、複数のロムファイルが読み込まれました。\n"
 
-#: guiinit.cpp:81
+#: guiinit.cpp:80
 msgid "Start!"
-msgstr "開始！"
+msgstr "開始!"
 
-#: guiinit.cpp:100 xrc/NetLink.xrc:99
+#: guiinit.cpp:99 xrc/NetLink.xrc:99
 msgid "Connect"
 msgstr "接続"
 
-#: guiinit.cpp:117
+#: guiinit.cpp:116
 msgid "You must enter a valid host name"
 msgstr "有効なホスト名を入力してください"
 
-#: guiinit.cpp:118
+#: guiinit.cpp:117
 msgid "Host name invalid"
 msgstr "ホスト名が無効"
 
-#: guiinit.cpp:136
+#: guiinit.cpp:135
 msgid "Waiting for clients..."
-msgstr "クライアントを待機中・・・"
+msgstr "クライアントを待機中…"
 
-#: guiinit.cpp:137
+#: guiinit.cpp:136
 #, c-format
 msgid "Server IP address is: %s\n"
-msgstr "サーバーIPアドレスは： %s\n"
+msgstr "サーバーIPアドレスは: %s\n\n"
+
+#: guiinit.cpp:138
+msgid "Waiting for connection..."
+msgstr "接続を待機中…"
 
 #: guiinit.cpp:139
-msgid "Waiting for connection..."
-msgstr "接続を待機中・・・"
-
-#: guiinit.cpp:140
 #, c-format
 msgid "Connecting to %s\n"
 msgstr "%s に接続中\n"
 
-#: guiinit.cpp:173
+#: guiinit.cpp:172
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr "エラーが発生しました。\nもう一度試して下さい。"
 
-#: guiinit.cpp:240 guiinit.cpp:293
+#: guiinit.cpp:239 guiinit.cpp:292
 msgid "Select cheat file"
 msgstr "チートファイルを選択"
 
-#: guiinit.cpp:241
+#: guiinit.cpp:240
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA チートリスト (*.clt)|*.clt|CHT チートリスト (*.cht)|*.cht"
 
-#: guiinit.cpp:260 panel.cpp:437
+#: guiinit.cpp:259 panel.cpp:447
 msgid "Loaded cheats"
 msgstr "チートを読み込みました"
 
-#: guiinit.cpp:294
+#: guiinit.cpp:293
 msgid "VBA cheat lists (*.clt)|*.clt"
 msgstr "VBAチートリスト (*.clt)|*.clt"
 
-#: guiinit.cpp:312
+#: guiinit.cpp:311
 msgid "Saved cheats"
 msgstr "チートを保存しました"
 
-#: guiinit.cpp:343 guiinit.cpp:362
+#: guiinit.cpp:342 guiinit.cpp:361
 msgid "Restore old values?"
-msgstr "以前の値に戻しますか？"
+msgstr "以前の値に戻しますか?"
 
-#: guiinit.cpp:344 guiinit.cpp:363
+#: guiinit.cpp:343 guiinit.cpp:362
 msgid "Removing cheats"
 msgstr "チートコードを消す"
 
-#: guiinit.cpp:754 xrc/JoyPanel.xrc:364
+#: guiinit.cpp:753 xrc/JoyPanel.xrc:364
 msgid "GameShark"
 msgstr "GameShark"
 
-#: guiinit.cpp:755 cmdevents.cpp:676
+#: guiinit.cpp:754 cmdevents.cpp:675
 msgid "GameGenie"
 msgstr "GameGenie"
 
-#: guiinit.cpp:757
+#: guiinit.cpp:756
 msgid "Generic Code"
-msgstr ""
+msgstr "Generic Code"
 
-#: guiinit.cpp:758
+#: guiinit.cpp:757
 msgid "GameShark Advance"
 msgstr "GameShark Advance"
 
-#: guiinit.cpp:759
+#: guiinit.cpp:758
 msgid "CodeBreaker Advance"
 msgstr "CodeBreaker Advance"
 
-#: guiinit.cpp:760
+#: guiinit.cpp:759
 msgid "Flashcart CHT"
 msgstr "Flashcart CHT"
 
-#: guiinit.cpp:828 guiinit.cpp:1083
+#: guiinit.cpp:827 guiinit.cpp:1082
 msgid "Number cannot be empty"
-msgstr ""
+msgstr "値を空白にすることはできません"
 
-#: guiinit.cpp:866
+#: guiinit.cpp:865
 #, c-format
 msgid "Search produced %d results.  Please refine better"
-msgstr ""
+msgstr "%d 件の検索結果があります。 精度をより高めてください"
 
-#: guiinit.cpp:878
+#: guiinit.cpp:877
 msgid "Search produced no results"
 msgstr "検索結果は0件でした"
 
-#: guiinit.cpp:1041
+#: guiinit.cpp:1040
 msgid "8-bit "
-msgstr "8ビット"
+msgstr "8ビット "
 
-#: guiinit.cpp:1045
+#: guiinit.cpp:1044
 msgid "16-bit "
-msgstr "16ビット"
+msgstr "16ビット "
 
-#: guiinit.cpp:1049
+#: guiinit.cpp:1048
 msgid "32-bit "
-msgstr "32ビット"
+msgstr "32ビット "
 
-#: guiinit.cpp:1055
+#: guiinit.cpp:1054
 msgid "signed decimal"
-msgstr ""
+msgstr "符号付き10進数"
 
-#: guiinit.cpp:1059
+#: guiinit.cpp:1058
 msgid "unsigned decimal"
-msgstr ""
+msgstr "符号無し10進数"
 
-#: guiinit.cpp:1063
+#: guiinit.cpp:1062
 msgid "unsigned hexadecimal"
-msgstr ""
+msgstr "符号無し16進数"
 
-#: guiinit.cpp:1541
+#: guiinit.cpp:1540
 #, c-format
 msgid "%d frames = %.2f ms"
 msgstr "%d フレーム = %.2f ms"
 
-#: guiinit.cpp:1553
+#: guiinit.cpp:1552
 msgid "Default device"
 msgstr "既定のデバイス"
 
-#: guiinit.cpp:1727
+#: guiinit.cpp:1726
 msgid "Desktop mode"
 msgstr "デスクトップ画面モード"
 
-#: guiinit.cpp:1734
+#: guiinit.cpp:1733
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: guiinit.cpp:1847 cmdevents.cpp:746 xrc/DisplayConfig.xrc:85
+#: guiinit.cpp:1846 cmdevents.cpp:745 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
 msgid "None"
 msgstr "なし"
 
-#: guiinit.cpp:1888
+#: guiinit.cpp:1887
 #, c-format
 msgid "No usable rpi plugins found in %s"
-msgstr ""
+msgstr "%s に使用可能なrpiプラグインが見つかりませんでした"
 
-#: guiinit.cpp:1908 xrc/DisplayConfig.xrc:107
+#: guiinit.cpp:1907 xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "プラグイン"
 
-#: guiinit.cpp:1936
+#: guiinit.cpp:1935
 msgid "Please select a plugin or a different filter"
 msgstr "プラグインや別の動画フィルターを選択してください"
 
-#: guiinit.cpp:1937
+#: guiinit.cpp:1936
 msgid "Plugin selection error"
 msgstr "プラグイン選択エラー"
 
-#: guiinit.cpp:2150
+#: guiinit.cpp:2149
 msgid "This will clear all user-defined accelerators.  Are you sure?"
-msgstr "全てのユーザー定義のアクセラレータを消去します。よろしいですね？"
+msgstr "全てのユーザー定義のアクセラレータを消去します。よろしいですか？"
 
-#: guiinit.cpp:2150
+#: guiinit.cpp:2149
 msgid "Confirm"
 msgstr "承認"
 
-#: guiinit.cpp:2740
+#: guiinit.cpp:2739
 msgid "Main icon not found"
 msgstr "メインアイコンが見つかりません"
 
-#: guiinit.cpp:2750
+#: guiinit.cpp:2749
 msgid "Browse"
-msgstr ""
+msgstr "ブラウズ"
 
-#: guiinit.cpp:2764
+#: guiinit.cpp:2763
 msgid "Main display panel not found"
-msgstr ""
+msgstr "メインディスプレイパネルが見つかりませんでした"
 
-#: guiinit.cpp:2929
+#: guiinit.cpp:2928
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr ""
 
-#: guiinit.cpp:2943
+#: guiinit.cpp:2942
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr ""
@@ -359,8 +362,8 @@ msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr "テキストファイル (*.txt;*.log)|*.txt;*.log|"
 
 #: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
-#: cmdevents.cpp:1158 cmdevents.cpp:1236 cmdevents.cpp:1306 cmdevents.cpp:1333
-#: viewsupt.cpp:1181
+#: cmdevents.cpp:1157 cmdevents.cpp:1235 cmdevents.cpp:1305 cmdevents.cpp:1332
+#: viewsupt.cpp:1180
 msgid "Select output file"
 msgstr "出力ファイルを選択"
 
@@ -370,7 +373,7 @@ msgstr "メモリーダンプ (*.dmp;*.bin)|*.dmp;*.bin|"
 
 #: viewers.cpp:700
 msgid "Select memory dump file"
-msgstr ""
+msgstr "メモリダンプファイルを選択"
 
 #: viewers.cpp:814
 msgid "0x00000000 - BIOS"
@@ -446,12 +449,12 @@ msgid ""
 "Table (*.act)|*.act"
 msgstr "Windowsパレット形式 (*.pal)|*.pal|PaintShopパレット形式 (*.pal)|*.pal|Adobe カラーテーブル形式 (*.act)|*.act"
 
-#: gfxviewers.cpp:1601 gfxviewers.cpp:1743 cmdevents.cpp:1159
-#: viewsupt.cpp:1182
+#: gfxviewers.cpp:1601 gfxviewers.cpp:1743 cmdevents.cpp:1158
+#: viewsupt.cpp:1181
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG画像|*.png|BMP画像|*.bmp"
 
-#: cmdevents.cpp:105
+#: cmdevents.cpp:104
 msgid ""
 "GameBoy Advance Files "
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy"
@@ -459,369 +462,373 @@ msgid ""
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "ゲームボーイアドバンスファイル (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|ゲームボーイファイル (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:117
+#: cmdevents.cpp:116
 msgid "Open ROM file"
 msgstr "ROMファイルを開く"
 
-#: cmdevents.cpp:134
+#: cmdevents.cpp:133
 msgid ""
 "GameBoy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "ゲームボーイファイル (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:141
+#: cmdevents.cpp:140
 msgid "Open GB ROM file"
 msgstr "ゲームボーイのROMファイルを開く"
 
-#: cmdevents.cpp:158
+#: cmdevents.cpp:157
 msgid ""
 "GameBoy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "ゲームボーイカラーファイル (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:165
+#: cmdevents.cpp:164
 msgid "Open GBC ROM file"
 msgstr "ゲームボーイカラーのROMファイルを開く"
 
-#: cmdevents.cpp:584 cmdevents.cpp:700 cmdevents.cpp:739 cmdevents.cpp:812
+#: cmdevents.cpp:583 cmdevents.cpp:699 cmdevents.cpp:738 cmdevents.cpp:811
 msgid "Unknown"
 msgstr "不明"
 
-#: cmdevents.cpp:592
+#: cmdevents.cpp:591
 msgid "ROM"
 msgstr "ROM"
 
-#: cmdevents.cpp:596
+#: cmdevents.cpp:595
 msgid "ROM+MBC1"
 msgstr "ROM+MBC1"
 
-#: cmdevents.cpp:600
+#: cmdevents.cpp:599
 msgid "ROM+MBC1+RAM"
 msgstr "ROM+MBC1+RAM"
 
-#: cmdevents.cpp:604
+#: cmdevents.cpp:603
 msgid "ROM+MBC1+RAM+BATT"
 msgstr "ROM+MBC1+RAM+BATT"
 
-#: cmdevents.cpp:608
+#: cmdevents.cpp:607
 msgid "ROM+MBC2"
 msgstr "ROM+MBC2"
 
-#: cmdevents.cpp:612
+#: cmdevents.cpp:611
 msgid "ROM+MBC2+BATT"
 msgstr "ROM+MBC2+BATT"
 
-#: cmdevents.cpp:616
+#: cmdevents.cpp:615
 msgid "ROM+MMM01"
 msgstr "ROM+MMM01"
 
-#: cmdevents.cpp:620
+#: cmdevents.cpp:619
 msgid "ROM+MMM01+RAM"
 msgstr "ROM+MMM01+RAM"
 
-#: cmdevents.cpp:624
+#: cmdevents.cpp:623
 msgid "ROM+MMM01+RAM+BATT"
 msgstr "ROM+MMM01+RAM+BATT"
 
-#: cmdevents.cpp:628
+#: cmdevents.cpp:627
 msgid "ROM+MBC3+TIMER+BATT"
 msgstr "ROM+MBC3+TIMER+BATT"
 
-#: cmdevents.cpp:632
+#: cmdevents.cpp:631
 msgid "ROM+MBC3+TIMER+RAM+BATT"
 msgstr "ROM+MBC3+TIMER+RAM+BATT"
 
-#: cmdevents.cpp:636
+#: cmdevents.cpp:635
 msgid "ROM+MBC3"
 msgstr "ROM+MBC3"
 
-#: cmdevents.cpp:640
+#: cmdevents.cpp:639
 msgid "ROM+MBC3+RAM"
 msgstr "ROM+MBC3+RAM"
 
-#: cmdevents.cpp:644
+#: cmdevents.cpp:643
 msgid "ROM+MBC3+RAM+BATT"
 msgstr "ROM+MBC3+RAM+BATT"
 
-#: cmdevents.cpp:648
+#: cmdevents.cpp:647
 msgid "ROM+MBC5"
 msgstr "ROM+MBC5"
 
-#: cmdevents.cpp:652
+#: cmdevents.cpp:651
 msgid "ROM+MBC5+RAM"
 msgstr "ROM+MBC5+RAM"
 
-#: cmdevents.cpp:656
+#: cmdevents.cpp:655
 msgid "ROM+MBC5+RAM+BATT"
 msgstr "ROM+MBC5+RAM+BATT"
 
-#: cmdevents.cpp:660
+#: cmdevents.cpp:659
 msgid "ROM+MBC5+RUMBLE"
 msgstr "ROM+MBC5+RUMBLE"
 
-#: cmdevents.cpp:664
+#: cmdevents.cpp:663
 msgid "ROM+MBC5+RUMBLE+RAM"
 msgstr "ROM+MBC5+RUMBLE+RAM"
 
-#: cmdevents.cpp:668
+#: cmdevents.cpp:667
 msgid "ROM+MBC5+RUMBLE+RAM+BATT"
 msgstr "ROM+MBC5+RUMBLE+RAM+BATT"
 
-#: cmdevents.cpp:672
+#: cmdevents.cpp:671
 msgid "ROM+MBC7+BATT"
 msgstr "ROM+MBC7+BATT"
 
-#: cmdevents.cpp:680
+#: cmdevents.cpp:679
 msgid "GameShark V3.0"
 msgstr "GameShark V3.0"
 
-#: cmdevents.cpp:684
+#: cmdevents.cpp:683
 msgid "ROM+POCKET CAMERA"
 msgstr "ROM+ポケットカメラ"
 
-#: cmdevents.cpp:688
+#: cmdevents.cpp:687
 msgid "ROM+BANDAI TAMA5"
 msgstr "ROM+BANDAI TAMA5"
 
-#: cmdevents.cpp:692
+#: cmdevents.cpp:691
 msgid "ROM+HuC-3"
 msgstr "ROM+HuC-3"
 
-#: cmdevents.cpp:696
+#: cmdevents.cpp:695
 msgid "ROM+HuC-1"
 msgstr "ROM+HuC-1"
 
-#: cmdevents.cpp:848 cmdevents.cpp:870
+#: cmdevents.cpp:847 cmdevents.cpp:869
 msgid "Select Dot Code file"
 msgstr "ドットコードファイルを選択"
 
-#: cmdevents.cpp:850 cmdevents.cpp:872
+#: cmdevents.cpp:849 cmdevents.cpp:871
 msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 msgstr "カードe ドットコードファイル (*.bin;*.raw)|*.bin;*.raw"
 
-#: cmdevents.cpp:891 cmdevents.cpp:1086
+#: cmdevents.cpp:890 cmdevents.cpp:1085
 msgid "Select battery file"
 msgstr "バッテリーファイルを選択"
 
-#: cmdevents.cpp:892 cmdevents.cpp:1087
+#: cmdevents.cpp:891 cmdevents.cpp:1086
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "バッテリーファイル (*.sav) | *. sav|フラッシュセーブファイル (*.dat) | * .dat"
 
-#: cmdevents.cpp:900
+#: cmdevents.cpp:899
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
 msgstr "バッテリーファイルをインポートすると、(上書き後は永久に)保存されているセーブデータは全て消去されます。続行しますか？"
 
-#: cmdevents.cpp:901 cmdevents.cpp:929 cmdevents.cpp:1049
+#: cmdevents.cpp:900 cmdevents.cpp:928 cmdevents.cpp:1048
 msgid "Confirm import"
 msgstr "取り込みを確認"
 
-#: cmdevents.cpp:907 panel.cpp:380
+#: cmdevents.cpp:906 panel.cpp:390
 #, c-format
 msgid "Loaded battery %s"
 msgstr "バッテリーファイル %s を読み込みました"
 
-#: cmdevents.cpp:909
+#: cmdevents.cpp:908
 #, c-format
 msgid "Error loading battery %s"
 msgstr "%sのバッテリー読み込みエラーが発生しました"
 
-#: cmdevents.cpp:918
+#: cmdevents.cpp:917
 msgid "Select code file"
 msgstr "コードファイルを選択"
 
-#: cmdevents.cpp:919
+#: cmdevents.cpp:918
 msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
 msgstr "Gameshark コードファイル (*.spc;*.xpc)|*.spc;*.xpc"
 
-#: cmdevents.cpp:919
+#: cmdevents.cpp:918
 msgid "Gameshark Code File (*.gcf)|*.gcf"
 msgstr "Gameshark コードファイル (*.gcf)|*.gcf"
 
-#: cmdevents.cpp:928
+#: cmdevents.cpp:927
 msgid ""
 "Importing a code file will replace any loaded cheats.  Do you want to "
 "continue?"
 msgstr "コードファイルを取り込むと読み込んだ全てのチートが置き換えられます。続行しますか？"
 
-#: cmdevents.cpp:945
+#: cmdevents.cpp:944
 #, c-format
 msgid "Cannot open file %s"
 msgstr "ファイル %s を開けません"
 
-#: cmdevents.cpp:955
+#: cmdevents.cpp:954
 #, c-format
 msgid "Unsupported code file %s"
 msgstr "サポートされていないコードファイル %s"
 
-#: cmdevents.cpp:1025
+#: cmdevents.cpp:1024
 #, c-format
 msgid "Loaded code file %s"
 msgstr "コードファイル %s を読み込みました"
 
-#: cmdevents.cpp:1027
+#: cmdevents.cpp:1026
 #, c-format
 msgid "Error loading code file %s"
 msgstr "コードファイル %s を読み込み中にエラー"
 
-#: cmdevents.cpp:1038 cmdevents.cpp:1114
+#: cmdevents.cpp:1037 cmdevents.cpp:1113
 msgid "Select snapshot file"
 msgstr "スナップショットファイルを選択"
 
-#: cmdevents.cpp:1039
+#: cmdevents.cpp:1038
 msgid ""
 "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots "
 "(*.gsv)|*.gsv"
 msgstr "GS & PAC スナップショット (*.sps;*.xps)|*.sps;*.xps|GameShark SP スナップショット (*.gsv)|*.gsv"
 
-#: cmdevents.cpp:1039
+#: cmdevents.cpp:1038
 msgid "Gameboy Snapshot (*.gbs)|*.gbs"
-msgstr " ゲームボーイスナップショット (*.gbs)|*.gbs"
+msgstr "ゲームボーイスナップショット (*.gbs)|*.gbs"
 
-#: cmdevents.cpp:1048
+#: cmdevents.cpp:1047
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
 msgstr "スナップショットファイルを読み込むと、(上書き後は永久に)保存されているセーブデータは全て消去されます。続行しますか？"
 
-#: cmdevents.cpp:1073
+#: cmdevents.cpp:1072
 #, c-format
 msgid "Loaded snapshot file %s"
 msgstr "スナップショットファイル %s を読み込みました"
 
-#: cmdevents.cpp:1075
+#: cmdevents.cpp:1074
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr "スナップショットファイル %s を読み込み中にエラー"
 
-#: cmdevents.cpp:1098
+#: cmdevents.cpp:1097
 #, c-format
 msgid "Wrote battery %s"
 msgstr "記録しました%s"
 
-#: cmdevents.cpp:1100 panel.cpp:689
+#: cmdevents.cpp:1099 panel.cpp:699
 #, c-format
 msgid "Error writing battery %s"
 msgstr "記録に失敗しました%s"
 
-#: cmdevents.cpp:1108
+#: cmdevents.cpp:1107
 msgid "EEPROM saves cannot be exported"
 msgstr "EEPROMセーブはエクスポートできません"
 
-#: cmdevents.cpp:1115
+#: cmdevents.cpp:1114
 msgid "Gameshark Snapshot (*.sps)|*.sps"
 msgstr "Gameshark スナップショット (*.sps)|*.sps"
 
-#: cmdevents.cpp:1129
+#: cmdevents.cpp:1128
 msgid "Exported from VisualBoyAdvance-M"
 msgstr "VisualBoyAdvance-Mからエクスポート"
 
-#: cmdevents.cpp:1141
+#: cmdevents.cpp:1140
 #, c-format
 msgid "Saved snapshot file %s"
 msgstr "スナップショットファイル %s を保存しました"
 
-#: cmdevents.cpp:1143
+#: cmdevents.cpp:1142
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr "スナップショットファイル %s を保存中にエラー"
 
-#: cmdevents.cpp:1183 sys.cpp:450
+#: cmdevents.cpp:1182 sys.cpp:449
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "スナップショット %s を書き出しました"
 
-#: cmdevents.cpp:1204 cmdevents.cpp:1274
+#: cmdevents.cpp:1203 cmdevents.cpp:1273
 msgid " files ("
-msgstr "ファイル ("
+msgstr " ファイル ("
 
-#: cmdevents.cpp:1334 cmdevents.cpp:1355
+#: cmdevents.cpp:1333 cmdevents.cpp:1354
 msgid "VBA Movie files|*.vmv"
 msgstr "VBA動画ファイル|*.vmv"
 
-#: cmdevents.cpp:1354
+#: cmdevents.cpp:1353
 msgid "Select file"
 msgstr "ファイルを選択"
 
-#: cmdevents.cpp:1669 cmdevents.cpp:1762
+#: cmdevents.cpp:1668 cmdevents.cpp:1761
 msgid "Select state file"
 msgstr "状態ファイルを選択"
 
-#: cmdevents.cpp:1670 cmdevents.cpp:1763
+#: cmdevents.cpp:1669 cmdevents.cpp:1762
 msgid "VisualBoyAdvance saved game files|*.sgm"
 msgstr "VisualBoyAdvance セーブゲームファイル|*.sgm"
 
-#: cmdevents.cpp:1793 cmdevents.cpp:1803 cmdevents.cpp:1814
+#: cmdevents.cpp:1792 cmdevents.cpp:1802 cmdevents.cpp:1813
 #, c-format
 msgid "Current state slot #%d"
-msgstr ""
+msgstr "現在のステートスロット番号 #%d"
 
-#: cmdevents.cpp:2083
+#: cmdevents.cpp:1883
+msgid "Cannot use Colorizer Hack when GB BIOS File is enabled."
+msgstr "GB BIOS Fileが有効な場合、Colorizer Hackは使用できません。"
+
+#: cmdevents.cpp:2098
 msgid "Sound enabled"
 msgstr "音声を有効化"
 
-#: cmdevents.cpp:2083
+#: cmdevents.cpp:2098
 msgid "Sound disabled"
 msgstr "音声を無効化"
 
-#: cmdevents.cpp:2096 cmdevents.cpp:2110
+#: cmdevents.cpp:2111 cmdevents.cpp:2125
 #, c-format
 msgid "Volume: %d%%"
 msgstr "音量： %d%%"
 
-#: cmdevents.cpp:2185
+#: cmdevents.cpp:2200
 msgid "Set to 0 for pseudo tty"
-msgstr ""
+msgstr "仮想端末として0番を使用"
 
-#: cmdevents.cpp:2187
+#: cmdevents.cpp:2202
 msgid "Port to wait for connection:"
-msgstr ""
+msgstr "接続を待機するポート番号:"
 
-#: cmdevents.cpp:2188
+#: cmdevents.cpp:2203
 msgid "GDB Connection"
-msgstr ""
+msgstr "GDB Connection"
 
-#: cmdevents.cpp:2241
+#: cmdevents.cpp:2256
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "%s への接続を待機中"
 
-#: cmdevents.cpp:2248
+#: cmdevents.cpp:2263
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "ポート %d での接続を待機中"
 
-#: cmdevents.cpp:2251
+#: cmdevents.cpp:2266
 msgid "Waiting for GDB..."
-msgstr ""
-
-#: cmdevents.cpp:2666
-#, c-format
-msgid "Using pixel filter #%d"
-msgstr ""
+msgstr "GDBを待機しています…"
 
 #: cmdevents.cpp:2681
 #, c-format
+msgid "Using pixel filter #%d"
+msgstr "ピクセルフィルタに#%dを使用"
+
+#: cmdevents.cpp:2696
+#, c-format
 msgid "Using interframe blending #%d"
-msgstr ""
+msgstr "インターフェースブレンディングに#%d を使用"
 
-#: cmdevents.cpp:2720 panel.cpp:193 panel.cpp:296
+#: cmdevents.cpp:2735 panel.cpp:192 panel.cpp:306
 msgid "Could not initialize the sound driver!"
-msgstr ""
+msgstr "サウンドドライバを初期化できませんでした!"
 
-#: cmdevents.cpp:2824
+#: cmdevents.cpp:2839
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Nintendo GameBoy (+Color+Advance) emulator."
 
-#: cmdevents.cpp:2825
+#: cmdevents.cpp:2840
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr ""
+msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2020 VBA-M development team"
 
-#: cmdevents.cpp:2826
+#: cmdevents.cpp:2841
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -837,276 +844,286 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3136
+#: cmdevents.cpp:3101
+msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
+msgstr "Colorizer Hackが有効な場合、GB BIOSは使用できません。"
+
+#: cmdevents.cpp:3161
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LANリンクはすでに動作中です。切断するにはリンクモードを無効にします。"
 
-#: cmdevents.cpp:3142
+#: cmdevents.cpp:3167
 msgid "Network is not supported in local mode."
 msgstr "ネットワークはローカルモードではサポートされません。"
 
-#: opts.cpp:563 opts.cpp:866
+#: opts.cpp:566 opts.cpp:869
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
-msgstr ""
+msgstr "%s は %sのオプションとして不正な値です。有効な値は %s%s%s"
 
-#: opts.cpp:580 opts.cpp:878
+#: opts.cpp:583 opts.cpp:881
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
-msgstr ""
+msgstr "%d は %sのオプションとして不正な値です。 有効な値は %d - %d"
 
-#: opts.cpp:587 opts.cpp:596 opts.cpp:886 opts.cpp:894
+#: opts.cpp:590 opts.cpp:599 opts.cpp:889 opts.cpp:897
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
-msgstr ""
+msgstr "%fは %sのオプションとして不正な値です。 有効な値は %f - %f"
 
-#: opts.cpp:656 opts.cpp:677 opts.cpp:962 opts.cpp:988
+#: opts.cpp:659 opts.cpp:680 opts.cpp:965 opts.cpp:991
 #, c-format
 msgid "Invalid key binding %s for %s"
-msgstr ""
+msgstr "%s キーを %s へ割り当てることはできません"
 
-#: opts.cpp:849
+#: opts.cpp:852
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
-msgstr ""
+msgstr "%s は無効なフラグオプションです。- %sは無視されます"
 
-#: sys.cpp:125 sys.cpp:181
+#: sys.cpp:124 sys.cpp:180
 msgid "No game in progress to record"
 msgstr "記録する進行中のゲームは有りません"
 
-#: sys.cpp:138
+#: sys.cpp:137
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "出力ファイル %s を開けません"
 
-#: sys.cpp:145 sys.cpp:165 sys.cpp:311
+#: sys.cpp:144 sys.cpp:164 sys.cpp:310
 msgid "Error writing game recording"
 msgstr "ゲーム記録を書き出し中にエラー"
 
-#: sys.cpp:186
+#: sys.cpp:185
 msgid "Cannot play game recording while recording"
-msgstr ""
+msgstr "記録中に新たに記録することはできません"
 
-#: sys.cpp:199
+#: sys.cpp:198
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "録画ファイル %s を開けません"
 
-#: sys.cpp:206 sys.cpp:216
+#: sys.cpp:205 sys.cpp:215
 msgid "Error reading game recording"
 msgstr "ゲーム記録を読み込み中にエラー"
 
-#: sys.cpp:322
+#: sys.cpp:321
 msgid "Playback ended"
-msgstr ""
+msgstr "プレイバック終了"
 
-#: sys.cpp:341
+#: sys.cpp:340
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr "%d%%(%d, %d fps)"
 
-#: sys.cpp:349
+#: sys.cpp:348
 #, c-format
 msgid "%d%%"
 msgstr "%d%%"
 
-#: sys.cpp:768 xrc/GBPrinter.xrc:65
+#: sys.cpp:767 xrc/GBPrinter.xrc:65
 msgid "&Discard"
-msgstr ""
+msgstr "破棄"
 
-#: sys.cpp:802
+#: sys.cpp:801
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "イメージファイル (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:811
+#: sys.cpp:810
 msgid "Save printer image to"
-msgstr ""
+msgstr "プリンターイメージを保存"
 
-#: sys.cpp:825 sys.cpp:1008
+#: sys.cpp:824 sys.cpp:1007
 #, c-format
 msgid "Wrote printer output to %s"
-msgstr ""
+msgstr "プリンタ出力を%sへ書き出しました"
 
-#: sys.cpp:830 sys.cpp:901
+#: sys.cpp:829 sys.cpp:900
 msgid "&Close"
 msgstr "ROMを閉じる(&C)"
 
-#: sys.cpp:896
+#: sys.cpp:895
 msgid "Printed"
 msgstr ""
 
-#: sys.cpp:1198
+#: sys.cpp:1197
 #, c-format
 msgid "Error opening pseudo tty: %s"
-msgstr ""
+msgstr "仮想端末を開く際にエラーが発生しました: %s"
 
-#: sys.cpp:1297
+#: sys.cpp:1296
 #, c-format
 msgid "Error setting up server socket (%d)"
-msgstr ""
+msgstr "サーバーソケットのセットアップ時にエラーが発生しました(%d)"
 
-#: panel.cpp:107
+#: panel.cpp:106
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s は有効なROMファイルではありません"
 
-#: panel.cpp:108 panel.cpp:169 panel.cpp:234
+#: panel.cpp:107 panel.cpp:168 panel.cpp:244
 msgid "Problem loading file"
 msgstr "ファイル読み込み中に問題が発生"
 
-#: panel.cpp:168
+#: panel.cpp:167
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "ゲームボーイROM %s を読み込むことが出来ません"
 
-#: panel.cpp:210 panel.cpp:310
+#: panel.cpp:204
+msgid ""
+"Cannot use GB BIOS file when Colorizer Hack is enabled, disabling GB BIOS "
+"file."
+msgstr "Colorizer Hack使用時、GB BIOSファイルは使用できません。GB BIOSファイルを無効にします。"
+
+#: panel.cpp:220 panel.cpp:320
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "BIOS %s を読み込めませんでした"
 
-#: panel.cpp:233
+#: panel.cpp:243
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "ゲームボーイアドバンスROM %s を読み込むことが出来ません"
 
-#: panel.cpp:469
+#: panel.cpp:479
 msgid " player "
-msgstr ""
+msgstr " プレイヤー "
 
-#: panel.cpp:637
+#: panel.cpp:647
 #, c-format
 msgid "Loaded state %s"
-msgstr ""
+msgstr "ロードされたステート%s"
 
-#: panel.cpp:637
+#: panel.cpp:647
 #, c-format
 msgid "Error loading state %s"
 msgstr ""
 
-#: panel.cpp:661
+#: panel.cpp:671
 #, c-format
 msgid "Saved state %s"
-msgstr ""
+msgstr "セーブされたステート%s"
 
-#: panel.cpp:661
+#: panel.cpp:671
 #, c-format
 msgid "Error saving state %s"
 msgstr ""
 
-#: panel.cpp:865
+#: panel.cpp:875
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
-msgstr ""
+msgstr "全画面モード%dx%d-%d@%d はサポートされていません 他のモードを探してください"
 
-#: panel.cpp:903
+#: panel.cpp:913
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
-msgstr ""
+msgstr "全画面モード%dx%d-%d@%dはサポートされていません"
 
-#: panel.cpp:908
+#: panel.cpp:918
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
-msgstr ""
+msgstr "有効なモード: %dx%d-%d@%d"
 
-#: panel.cpp:916
+#: panel.cpp:926
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
-msgstr ""
+msgstr "%dx%d-%d@%dモードを選択しました"
 
-#: panel.cpp:920
+#: panel.cpp:930
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
-msgstr ""
+msgstr "モードを%dx%d-%d@%dへ変更できませんでした"
 
-#: panel.cpp:1008
+#: panel.cpp:1018
 msgid "Not a valid GBA cartridge"
 msgstr "有効なGBAカートリッジではありません"
 
-#: panel.cpp:1172
+#: panel.cpp:1182
 msgid "No memory for rewinding"
 msgstr "巻き戻しのためのメモリが有りません"
 
-#: panel.cpp:1182
+#: panel.cpp:1192
 msgid "Error writing rewind state"
 msgstr "巻き戻し状態を書き出し中にエラー"
 
-#: panel.cpp:2280
+#: panel.cpp:2290
 msgid "Failed to set glXSwapIntervalEXT"
-msgstr ""
+msgstr "glXSwapIntervalEXTの設定に失敗しました"
 
-#: panel.cpp:2289
+#: panel.cpp:2299
 msgid "Failed to set glXSwapIntervalSGI"
-msgstr ""
+msgstr "glXSwapIntervalSGIの設定に失敗しました"
 
-#: panel.cpp:2298
+#: panel.cpp:2308
 msgid "Failed to set glXSwapIntervalMESA"
-msgstr ""
+msgstr "glXSwapIntervalMESAの設定に失敗しました"
 
-#: panel.cpp:2304
+#: panel.cpp:2314
 msgid "No support for wglGetExtensionsStringEXT"
-msgstr ""
+msgstr "wglGetExtensionsStringEXTはサポートされていません"
 
-#: panel.cpp:2307
+#: panel.cpp:2317
 msgid "No support for WGL_EXT_swap_control"
-msgstr ""
+msgstr "WGL_EXT_swap_controlはサポートされていません"
 
-#: panel.cpp:2316
+#: panel.cpp:2326
 msgid "Failed to set wglSwapIntervalEXT"
-msgstr ""
+msgstr "wglSwapIntervalEXTの設定に失敗しました"
 
-#: panel.cpp:2322
+#: panel.cpp:2332
 msgid "No VSYNC available on this platform"
-msgstr ""
+msgstr "このプラットフォームでは垂直同期を使えません"
 
-#: panel.cpp:2418
+#: panel.cpp:2428
 msgid "memory allocation error"
 msgstr "メモリ確保エラー"
 
-#: panel.cpp:2421
+#: panel.cpp:2431
 msgid "error initializing codec"
-msgstr ""
+msgstr "コーデックの初期化に失敗しました"
 
-#: panel.cpp:2424
+#: panel.cpp:2434
 msgid "error writing to output file"
 msgstr "出力ファイルへの書き出し中にエラー"
 
-#: panel.cpp:2427
+#: panel.cpp:2437
 msgid "can't guess output format from file name"
 msgstr "ファイル名から出力形式を推定できません"
 
-#: panel.cpp:2432
+#: panel.cpp:2442
 msgid "programming error; aborting!"
 msgstr "プログラミングエラー。異常終了しました！"
 
-#: panel.cpp:2444 panel.cpp:2473
+#: panel.cpp:2454 panel.cpp:2483
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
-msgstr ""
+msgstr "%sへの記録を開始できませんでした。(%s)"
 
-#: panel.cpp:2501
+#: panel.cpp:2511
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "録音・録画中にエラー (%s) 、中断しています"
 
-#: panel.cpp:2507
+#: panel.cpp:2517
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "録音中にエラー (%s) 、中断しています"
 
-#: panel.cpp:2517
+#: panel.cpp:2527
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "録画中にエラー (%s) 、中断しています"
 
-#: viewsupt.cpp:777
+#: viewsupt.cpp:776
 msgid "R:"
 msgstr "R:"
 
-#: viewsupt.cpp:786
+#: viewsupt.cpp:785
 msgid "G:"
 msgstr "G:"
 
-#: viewsupt.cpp:795
+#: viewsupt.cpp:794
 msgid "B:"
 msgstr "B:"
 
@@ -1124,31 +1141,31 @@ msgstr "CTRL"
 
 #: widgets/keyedit.cpp:136 widgets/keyedit.cpp:281
 msgid "RAWCTRL"
-msgstr ""
+msgstr "RAWCTRL"
 
 #: widgets/keyedit.cpp:150 widgets/keyedit.cpp:248
 msgid "Meta-"
-msgstr ""
+msgstr "Meta-"
 
 #: widgets/keyedit.cpp:155 widgets/keyedit.cpp:156
 msgid "Num"
-msgstr ""
+msgstr "Num"
 
 #: widgets/keyedit.cpp:249
 msgid "Meta+"
-msgstr ""
+msgstr "Meta+"
 
 #: widgets/keyedit.cpp:282
 msgid "RAW_CTRL"
-msgstr ""
+msgstr "RAW_CTRL"
 
 #: widgets/keyedit.cpp:283
 msgid "RAWCONTROL"
-msgstr ""
+msgstr "RAWCONTROL"
 
 #: widgets/keyedit.cpp:284
 msgid "RAW_CONTROL"
-msgstr ""
+msgstr "RAW_CONTROL"
 
 #: widgets/keyedit.cpp:288
 msgid "CONTROL"
@@ -1157,81 +1174,81 @@ msgstr "CONTROL"
 #: widgets/sdljoy.cpp:137
 #, c-format
 msgid "Connected joystick %d: %s"
-msgstr ""
+msgstr "ゲームパッド%dを接続しました: %s"
 
 #: widgets/sdljoy.cpp:152
 #, c-format
 msgid "Disconnected joystick %d"
-msgstr ""
+msgstr "ゲームパッド%d を切断しました"
 
-#: xaudio2.cpp:35
+#: xaudio2.cpp:34
 msgid "XAudio2: Enumerating devices failed!"
-msgstr ""
+msgstr "XAudio2: デバイスを列挙できませんでした!"
 
-#: xaudio2.cpp:69 xaudio2.cpp:353
+#: xaudio2.cpp:68 xaudio2.cpp:352
 msgid "The XAudio2 interface failed to initialize!"
-msgstr ""
+msgstr "XAudio2 インターフェースを初期化できませんでした!"
 
-#: xaudio2.cpp:384
+#: xaudio2.cpp:383
 msgid "XAudio2: Creating mastering voice failed!"
-msgstr ""
+msgstr "XAudio2: マスタリングボイスの作成に失敗しました!"
 
-#: xaudio2.cpp:393
+#: xaudio2.cpp:392
 msgid "XAudio2: Creating source voice failed!"
-msgstr ""
+msgstr "XAudio2: 音源の作成に失敗しました!"
 
-#: faudio.cpp:32
+#: faudio.cpp:31
 msgid "FAudio: Enumerating devices failed!"
-msgstr ""
+msgstr "FAudio2: デバイスを列挙できませんでした!"
 
-#: faudio.cpp:67 faudio.cpp:352
+#: faudio.cpp:66 faudio.cpp:351
 msgid "The FAudio interface failed to initialize!"
-msgstr ""
+msgstr "FAudioのインターフェースを初期化できませんでした!"
 
-#: faudio.cpp:384
+#: faudio.cpp:383
 msgid "FAudio: Creating mastering voice failed!"
-msgstr ""
+msgstr "FAudio2: マスタリングボイスの作成に失敗しました!"
 
-#: faudio.cpp:395
+#: faudio.cpp:394
 msgid "FAudio: Creating source voice failed!"
-msgstr ""
+msgstr "FAudio2: 音源の作成に失敗しました!"
 
-#: dsound.cpp:90 dsound.cpp:104
+#: dsound.cpp:89 dsound.cpp:103
 #, c-format
 msgid "Cannot create DirectSound %08x"
 msgstr "DirectSoundを作成できません %08x"
 
-#: dsound.cpp:109
+#: dsound.cpp:108
 #, c-format
 msgid "Cannot SetCooperativeLevel %08x"
 msgstr "Cannot SetCooperativeLevel %08x"
 
-#: dsound.cpp:123
+#: dsound.cpp:122
 #, c-format
 msgid "Cannot CreateSoundBuffer %08x"
 msgstr "Cannot CreateSoundBuffer %08x"
 
-#: dsound.cpp:142
+#: dsound.cpp:141
 #, c-format
 msgid "CreateSoundBuffer(primary) failed %08x"
 msgstr "CreateSoundBuffer(primary) failed %08x"
 
-#: dsound.cpp:159
+#: dsound.cpp:158
 #, c-format
 msgid "CreateSoundBuffer(secondary) failed %08x"
 msgstr "CreateSoundBuffer(secondary) failed %08x"
 
-#: dsound.cpp:164
+#: dsound.cpp:163
 #, c-format
 msgid "dsbSecondary->SetCurrentPosition failed %08x"
 msgstr "dsbSecondary->SetCurrentPosition failed %08x"
 
-#: dsound.cpp:187
+#: dsound.cpp:186
 #, c-format
 msgid "Cannot Play primary %08x"
 msgstr "Cannot Play primary %08x"
 
-#: dsound.cpp:322
+#: dsound.cpp:321
 #, c-format
 msgid "dsbSecondary->Lock() failed: %08x"
 msgstr "dsbSecondary->Lock() failed: %08x"
@@ -1239,7 +1256,7 @@ msgstr "dsbSecondary->Lock() failed: %08x"
 #: viewsupt.h:61
 #, c-format
 msgid "Unable to load dialog %s from resources"
-msgstr ""
+msgstr "リソースからダイアログ%sを読み込めませんでした"
 
 #: xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
@@ -1247,31 +1264,31 @@ msgstr "キーショートカット"
 
 #: xrc/AccelConfig.xrc:13
 msgid "Co&mmands:"
-msgstr "コマンド"
+msgstr "コマンド(&m):"
 
 #: xrc/AccelConfig.xrc:34
 msgid "Current Keys:"
-msgstr "現在のキー："
+msgstr "現在のキー:"
 
 #: xrc/AccelConfig.xrc:53
 msgid "&Assign"
-msgstr "割り当て"
+msgstr "割り当て(&A)"
 
 #: xrc/AccelConfig.xrc:60
 msgid "&Remove"
-msgstr "消去"
+msgstr "消去(&R)"
 
 #: xrc/AccelConfig.xrc:67
 msgid "Re&set All"
-msgstr "全消去"
+msgstr "全消去(&s)"
 
 #: xrc/AccelConfig.xrc:81
 msgid "Currently assigned to:"
-msgstr "そのキーは以下のコマンドにも割り当てられています"
+msgstr "そのキーは以下のコマンドに割り当てられています:"
 
 #: xrc/AccelConfig.xrc:96
 msgid "Shortcut Key:"
-msgstr "ショートカットキー："
+msgstr "ショートカットキー:"
 
 #: xrc/CheatAdd.xrc:4
 msgid "Add Cheat"
@@ -1287,7 +1304,7 @@ msgstr "値(&V)"
 
 #: xrc/CheatAdd.xrc:77
 msgid "Format"
-msgstr ""
+msgstr "フォーマット"
 
 #: xrc/CheatCreate.xrc:4
 msgid "Cheat Search"
@@ -1295,47 +1312,47 @@ msgstr "チートサーチ"
 
 #: xrc/CheatCreate.xrc:23
 msgid "E&qual"
-msgstr "＝＝ 等しい"
+msgstr "同じ値"
 
 #: xrc/CheatCreate.xrc:31
 msgid "&Not equal"
-msgstr "！＝ 等しくない"
+msgstr "違う値"
 
 #: xrc/CheatCreate.xrc:38
 msgid "&Less than"
-msgstr "＜＜ より小さい"
+msgstr "より小さい値"
 
 #: xrc/CheatCreate.xrc:45
 msgid "L&ess or equal"
-msgstr "＜＝ 以下"
+msgstr "以下の値"
 
 #: xrc/CheatCreate.xrc:52
 msgid "&Greater than"
-msgstr "＞＞ より大きい"
+msgstr "より大きい値"
 
 #: xrc/CheatCreate.xrc:59
 msgid "G&reater or equal"
-msgstr "＞＝ 以上"
+msgstr "以上の値"
 
 #: xrc/CheatCreate.xrc:64
 msgid "Compare type"
-msgstr ""
+msgstr "比較タイプ"
 
 #: xrc/CheatCreate.xrc:77
 msgid "S&igned"
-msgstr ""
+msgstr "符号付き"
 
 #: xrc/CheatCreate.xrc:85
 msgid "&Unsigned"
-msgstr ""
+msgstr "符号無し"
 
 #: xrc/CheatCreate.xrc:92
 msgid "&Hexadecimal"
-msgstr ""
+msgstr "16進数"
 
 #: xrc/CheatCreate.xrc:97
 msgid "Signed/Unsigned"
-msgstr ""
+msgstr "値の形式"
 
 #: xrc/CheatCreate.xrc:107
 msgid "&8 bits"
@@ -1355,23 +1372,23 @@ msgstr "データ量"
 
 #: xrc/CheatCreate.xrc:144
 msgid "Ol&d value"
-msgstr ""
+msgstr "前回の値"
 
 #: xrc/CheatCreate.xrc:152
 msgid "Specific &value"
-msgstr ""
+msgstr "特定の値"
 
 #: xrc/CheatCreate.xrc:163
 msgid "Search value"
-msgstr ""
+msgstr "値を検索"
 
 #: xrc/CheatCreate.xrc:181
 msgid "&Search"
-msgstr ""
+msgstr "検索(&S)"
 
 #: xrc/CheatCreate.xrc:188
 msgid "U&pdate Old"
-msgstr ""
+msgstr "前回の値を更新(&p)"
 
 #: xrc/CheatCreate.xrc:195 xrc/JoyPanel.xrc:29 xrc/JoyPanel.xrc:52
 #: xrc/JoyPanel.xrc:75 xrc/JoyPanel.xrc:98 xrc/JoyPanel.xrc:121
@@ -1382,11 +1399,11 @@ msgstr ""
 #: xrc/JoyPanel.xrc:422 xrc/JoyPanel.xrc:444 xrc/JoyPanel.xrc:475
 #: xrc/JoyPanel.xrc:497 xrc/Logging.xrc:119
 msgid "&Clear"
-msgstr ""
+msgstr "消去(&C)"
 
 #: xrc/CheatCreate.xrc:202
 msgid "&Add cheat"
-msgstr ""
+msgstr "チートを追加(&A)"
 
 #: xrc/CheatEdit.xrc:4
 msgid "Edit Cheat"
@@ -1394,11 +1411,11 @@ msgstr "チートを編集"
 
 #: xrc/CheatEdit.xrc:31 xrc/MainMenu.xrc:275
 msgid "&Type"
-msgstr ""
+msgstr "タイプ(&T)"
 
 #: xrc/CheatEdit.xrc:53
 msgid "C&odes"
-msgstr ""
+msgstr "コード(&o)"
 
 #: xrc/CheatList.xrc:4
 msgid "Cheat List"
@@ -1446,11 +1463,11 @@ msgstr "ゲームボーイカラーROM"
 
 #: xrc/DirectoriesConfig.xrc:57 xrc/DirectoriesConfig.xrc:64
 msgid "Native Saves"
-msgstr ""
+msgstr "ゲームのセーブデータ"
 
 #: xrc/DirectoriesConfig.xrc:72 xrc/DirectoriesConfig.xrc:79
 msgid "Emulator Saves"
-msgstr ""
+msgstr "ステートセーブデータ"
 
 #: xrc/DirectoriesConfig.xrc:87 xrc/DirectoriesConfig.xrc:94
 msgid "Screenshots"
@@ -1458,27 +1475,27 @@ msgstr "スクリーンショット"
 
 #: xrc/DirectoriesConfig.xrc:102 xrc/DirectoriesConfig.xrc:109
 msgid "Recordings"
-msgstr ""
+msgstr "記録ファイル"
 
 #: xrc/Disassemble.xrc:4
 msgid "Disassemble"
-msgstr ""
+msgstr "逆アセンブル"
 
 #: xrc/Disassemble.xrc:15
 msgid "&Automatic"
-msgstr ""
+msgstr "自動認識(&A)"
 
 #: xrc/Disassemble.xrc:23
 msgid "A&RM"
-msgstr ""
+msgstr "ARM"
 
 #: xrc/Disassemble.xrc:30
 msgid "&THUMB"
-msgstr ""
+msgstr "THUMB"
 
 #: xrc/Disassemble.xrc:45 xrc/GBDisassemble.xrc:18 xrc/MemViewer.xrc:47
 msgid "&Go"
-msgstr ""
+msgstr "ジャンプ"
 
 #: xrc/Disassemble.xrc:73
 msgid "R0:"
@@ -1587,7 +1604,7 @@ msgstr "V"
 
 #: xrc/Disassemble.xrc:414 xrc/MapViewer.xrc:76 xrc/OAMViewer.xrc:37
 msgid "Mode:"
-msgstr "モード："
+msgstr "モード:"
 
 #: xrc/Disassemble.xrc:424 xrc/GBDisassemble.xrc:172
 msgid "00"
@@ -1598,19 +1615,19 @@ msgstr "00"
 #: xrc/MemViewer.xrc:72 xrc/OAMViewer.xrc:109 xrc/PaletteViewer.xrc:81
 #: xrc/TileViewer.xrc:91
 msgid "Automatic &update"
-msgstr ""
+msgstr "自動更新(&u)"
 
 #: xrc/Disassemble.xrc:453 xrc/GBDisassemble.xrc:222
 msgid "G&oto PC"
-msgstr ""
+msgstr "PCへジャンプ"
 
 #: xrc/Disassemble.xrc:460 xrc/GBDisassemble.xrc:229
 msgid "Re&fresh"
-msgstr ""
+msgstr "更新"
 
 #: xrc/Disassemble.xrc:467 xrc/GBDisassemble.xrc:236
 msgid "&Next"
-msgstr ""
+msgstr "次へ"
 
 #: xrc/DisplayConfig.xrc:4
 msgid "Display settings"
@@ -1626,7 +1643,7 @@ msgstr "Simple"
 
 #: xrc/DisplayConfig.xrc:40
 msgid "Quartz2D"
-msgstr ""
+msgstr "Quartz2D"
 
 #: xrc/DisplayConfig.xrc:47
 msgid "OpenGL"
@@ -1642,7 +1659,7 @@ msgstr "フィルタ"
 
 #: xrc/DisplayConfig.xrc:79
 msgid "Display filter :"
-msgstr ""
+msgstr "ディスプレイフィルタ:"
 
 #: xrc/DisplayConfig.xrc:86
 msgid "2xSaI"
@@ -1658,7 +1675,7 @@ msgstr "Super Eagle"
 
 #: xrc/DisplayConfig.xrc:89
 msgid "Pixelate"
-msgstr ""
+msgstr "Pixelate"
 
 #: xrc/DisplayConfig.xrc:90
 msgid "Advance MAME Scale2x"
@@ -1726,7 +1743,7 @@ msgstr "xBRZ 5x"
 
 #: xrc/DisplayConfig.xrc:106
 msgid "xBRZ 6x"
-msgstr ""
+msgstr "xBRZ 6x"
 
 #: xrc/DisplayConfig.xrc:115
 msgid "Plugin :"
@@ -1734,15 +1751,15 @@ msgstr "プラグイン："
 
 #: xrc/DisplayConfig.xrc:127
 msgid "Interframe blending :"
-msgstr ""
+msgstr "相互フレームブレンディング:"
 
 #: xrc/DisplayConfig.xrc:136
 msgid "Smart interframe blending"
-msgstr ""
+msgstr "スマート"
 
 #: xrc/DisplayConfig.xrc:137
 msgid "Interframe motion blur"
-msgstr ""
+msgstr "モーションブラー"
 
 #: xrc/DisplayConfig.xrc:151 xrc/SoundConfig.xrc:91
 msgid "Basic"
@@ -1754,7 +1771,7 @@ msgstr "フレームスキップ"
 
 #: xrc/DisplayConfig.xrc:177
 msgid "&Number of frames to skip :"
-msgstr "スキップするフレーム数"
+msgstr "スキップするフレーム数:"
 
 #: xrc/DisplayConfig.xrc:199
 msgid "Speed"
@@ -1778,15 +1795,15 @@ msgstr "画面上の表示"
 
 #: xrc/DisplayConfig.xrc:247
 msgid "Default magnification :"
-msgstr "デフォルトの倍率"
+msgstr "デフォルトの倍率:"
 
 #: xrc/DisplayConfig.xrc:266
 msgid "Maximum magnification factor :"
-msgstr ""
+msgstr "最大倍率:"
 
 #: xrc/DisplayConfig.xrc:267
 msgid "0 = no maximum"
-msgstr ""
+msgstr "0 = 上限なし"
 
 #: xrc/DisplayConfig.xrc:275
 msgid "0 = no limit"
@@ -1846,11 +1863,11 @@ msgstr "メーカー名:"
 
 #: xrc/GBAROMInfo.xrc:107
 msgid "Main unit code:"
-msgstr ""
+msgstr "メインユニットコード:"
 
 #: xrc/GBAROMInfo.xrc:119
 msgid "Device type:"
-msgstr ""
+msgstr "デバイスタイプ:"
 
 #: xrc/GBAROMInfo.xrc:131 xrc/GBROMInfo.xrc:72
 msgid "ROM version:"
@@ -1866,7 +1883,7 @@ msgstr "ROM情報"
 
 #: xrc/GBColorPrefPanel.xrc:10 xrc/JoyPanel.xrc:247
 msgid "Standard"
-msgstr ""
+msgstr "標準"
 
 #: xrc/GBColorPrefPanel.xrc:11
 msgid "Blue Sea"
@@ -1961,7 +1978,7 @@ msgstr "0x8800"
 
 #: xrc/GBMapViewer.xrc:23 xrc/GBTileViewer.xrc:42 xrc/TileViewer.xrc:58
 msgid "Char Base"
-msgstr ""
+msgstr "キャラベース"
 
 #: xrc/GBMapViewer.xrc:33
 msgid "0x9800"
@@ -1973,54 +1990,54 @@ msgstr "0x9C00"
 
 #: xrc/GBMapViewer.xrc:42
 msgid "Map Base"
-msgstr ""
+msgstr "マップベース"
 
 #: xrc/GBMapViewer.xrc:54 xrc/GBOAMViewer.xrc:88 xrc/GBTileViewer.xrc:68
 #: xrc/MapViewer.xrc:62 xrc/OAMViewer.xrc:104 xrc/TileViewer.xrc:84
 msgid "Stretch to &fit"
-msgstr ""
+msgstr "引き伸ばす"
 
 #: xrc/GBMapViewer.xrc:59 xrc/MapViewer.xrc:67
 msgid "Auto &update"
-msgstr ""
+msgstr "自動更新"
 
 #: xrc/GBMapViewer.xrc:74 xrc/GBTileViewer.xrc:99 xrc/MapViewer.xrc:144
 #: xrc/MemSelRegion.xrc:10 xrc/PaletteViewer.xrc:50 xrc/TileViewer.xrc:115
 msgid "Address:"
-msgstr ""
+msgstr "アドレス:"
 
 #: xrc/GBMapViewer.xrc:82 xrc/GBOAMViewer.xrc:37 xrc/GBTileViewer.xrc:91
 #: xrc/MapViewer.xrc:152 xrc/OAMViewer.xrc:61 xrc/TileViewer.xrc:107
 msgid "Tile:"
-msgstr ""
+msgstr "タイル:"
 
 #: xrc/GBMapViewer.xrc:90 xrc/MapViewer.xrc:160
 msgid "Flip:"
-msgstr ""
+msgstr "フリップ:"
 
 #: xrc/GBMapViewer.xrc:98 xrc/GBTileViewer.xrc:50 xrc/MapViewer.xrc:168
 #: xrc/TileViewer.xrc:66
 msgid "Palette:"
-msgstr ""
+msgstr "パレット:"
 
 #: xrc/GBMapViewer.xrc:106 xrc/MapViewer.xrc:116
 msgid "Priority:"
-msgstr ""
+msgstr "優先度:"
 
 #: xrc/GBMapViewer.xrc:152 xrc/GBOAMViewer.xrc:142 xrc/GBPaletteViewer.xrc:114
 #: xrc/GBTileViewer.xrc:145 xrc/IOViewer.xrc:327 xrc/MapViewer.xrc:214
 #: xrc/MemViewer.xrc:101 xrc/OAMViewer.xrc:155 xrc/PaletteViewer.xrc:100
 #: xrc/TileViewer.xrc:161
 msgid "&Refresh"
-msgstr ""
+msgstr "更新(&R)"
 
 #: xrc/GBMapViewer.xrc:157 xrc/Logging.xrc:112 xrc/MapViewer.xrc:219
 msgid "&Save"
-msgstr ""
+msgstr "保存(&S)"
 
 #: xrc/GBOAMViewer.xrc:13 xrc/OAMViewer.xrc:14
 msgid "Sprite:"
-msgstr ""
+msgstr "スプライト番号:"
 
 #: xrc/GBOAMViewer.xrc:29 xrc/OAMViewer.xrc:29
 msgid "Pos:"
@@ -2053,31 +2070,31 @@ msgstr "保存...(&S)"
 
 #: xrc/GBPaletteViewer.xrc:8 xrc/PaletteViewer.xrc:9
 msgid "Click on a color for more information"
-msgstr ""
+msgstr "色をクリックして詳細を確認"
 
 #: xrc/GBPaletteViewer.xrc:27 xrc/PaletteViewer.xrc:105
 msgid "Save &BG..."
-msgstr ""
+msgstr "BGを保存…"
 
 #: xrc/GBPaletteViewer.xrc:38 xrc/PaletteViewer.xrc:33
 msgid "Sprite"
-msgstr ""
+msgstr "スプライト"
 
 #: xrc/GBPaletteViewer.xrc:48 xrc/PaletteViewer.xrc:111
 msgid "Save &Sprite..."
-msgstr ""
+msgstr "スプライトを保存…"
 
 #: xrc/GBPaletteViewer.xrc:67
 msgid "Index:"
-msgstr ""
+msgstr "インデックス:"
 
 #: xrc/GBPaletteViewer.xrc:79 xrc/IOViewer.xrc:21 xrc/PaletteViewer.xrc:62
 msgid "Value:"
-msgstr ""
+msgstr "値:"
 
 #: xrc/GBPrinter.xrc:21
 msgid "Print Si&ze"
-msgstr ""
+msgstr "サイズを出力"
 
 #: xrc/GBPrinter.xrc:29
 msgid "1x"
@@ -2097,39 +2114,39 @@ msgstr "4x"
 
 #: xrc/GBPrinter.xrc:58
 msgid "C&ontinue"
-msgstr ""
+msgstr "続ける"
 
 #: xrc/GBROMInfo.xrc:48
 msgid "Unit code:"
-msgstr ""
+msgstr "ユニットコード:"
 
 #: xrc/GBROMInfo.xrc:60
 msgid "Cartridge type:"
-msgstr ""
+msgstr "カートリッジタイプ:"
 
 #: xrc/GBROMInfo.xrc:96
 msgid "Color:"
-msgstr ""
+msgstr "色:"
 
 #: xrc/GBROMInfo.xrc:108
 msgid "ROM size:"
-msgstr ""
+msgstr "ROM size:"
 
 #: xrc/GBROMInfo.xrc:120
 msgid "RAM size:"
-msgstr ""
+msgstr "RAM size:"
 
 #: xrc/GBROMInfo.xrc:132
 msgid "Dest. code:"
-msgstr ""
+msgstr "Dest.code:"
 
 #: xrc/GBROMInfo.xrc:144
 msgid "License code:"
-msgstr ""
+msgstr "ライセンスコード:"
 
 #: xrc/GBROMInfo.xrc:156
 msgid "Checksum:"
-msgstr ""
+msgstr "チェックサム:"
 
 #: xrc/GBTileViewer.xrc:14
 msgid "&0"
@@ -2141,7 +2158,7 @@ msgstr "&1"
 
 #: xrc/GBTileViewer.xrc:23
 msgid "VRAM Bank"
-msgstr ""
+msgstr "VRAM Bank"
 
 #: xrc/GBTileViewer.xrc:33
 msgid "0x&8000"
@@ -2157,7 +2174,7 @@ msgstr "ゲームボーイアドバンスの設定"
 
 #: xrc/GameBoyAdvanceConfig.xrc:21
 msgid "Save type :"
-msgstr ""
+msgstr "セーブタイプ:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
 #: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
@@ -2182,7 +2199,7 @@ msgstr "EEPROM + Sensor"
 
 #: xrc/GameBoyAdvanceConfig.xrc:43
 msgid "Flash size :"
-msgstr ""
+msgstr "Flash size:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
 msgid "64K"
@@ -2202,20 +2219,20 @@ msgstr "カートリッジ"
 
 #: xrc/GameBoyAdvanceConfig.xrc:77
 msgid "Save type"
-msgstr ""
+msgstr "セーブタイプ"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file :"
-msgstr ""
+msgstr "BIOS ファイル:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file :"
-msgstr ""
+msgstr "現在のBIOSファイル:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:122 xrc/GameBoyConfig.xrc:138
 #: xrc/GameBoyConfig.xrc:159
 msgid "(None)"
-msgstr ""
+msgstr "(なし)"
 
 #: xrc/GameBoyAdvanceConfig.xrc:136 xrc/GameBoyConfig.xrc:168
 msgid "Boot ROM"
@@ -2223,15 +2240,15 @@ msgstr "Boot ROM"
 
 #: xrc/GameBoyAdvanceConfig.xrc:146
 msgid "Game Code"
-msgstr ""
+msgstr "ゲームコード"
 
 #: xrc/GameBoyAdvanceConfig.xrc:160
 msgid "Comment"
-msgstr ""
+msgstr "コメント"
 
 #: xrc/GameBoyAdvanceConfig.xrc:172
 msgid "Real Time Clock:"
-msgstr ""
+msgstr "現実の時計:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:180 xrc/GameBoyAdvanceConfig.xrc:198
 #: xrc/GameBoyAdvanceConfig.xrc:220 xrc/GameBoyAdvanceConfig.xrc:238
@@ -2249,7 +2266,7 @@ msgstr "有効"
 
 #: xrc/GameBoyAdvanceConfig.xrc:190
 msgid "Save Type:"
-msgstr ""
+msgstr "セーブタイプ:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:203
 msgid "EEPROM+Sensor"
@@ -2257,11 +2274,11 @@ msgstr "EEPROM+Sensor"
 
 #: xrc/GameBoyAdvanceConfig.xrc:212
 msgid "Flash Size:"
-msgstr ""
+msgstr "メモリサイズ:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:230
 msgid "Mirroring:"
-msgstr ""
+msgstr "ミラーリング:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:254
 msgid "&Defaults"
@@ -2277,7 +2294,7 @@ msgstr "ゲームボーイ 設定"
 
 #: xrc/GameBoyConfig.xrc:20
 msgid "Emulated &system :"
-msgstr "エミュレートする機種"
+msgstr "エミュレートする機種:"
 
 #: xrc/GameBoyConfig.xrc:30
 msgid "Game Boy Color"
@@ -2301,15 +2318,15 @@ msgstr "スーパーゲームボーイ2"
 
 #: xrc/GameBoyConfig.xrc:48
 msgid "Display &borders :"
-msgstr "画面枠"
+msgstr "画面枠:"
 
 #: xrc/GameBoyConfig.xrc:57
 msgid "Never"
-msgstr ""
+msgstr "しない"
 
 #: xrc/GameBoyConfig.xrc:58
 msgid "Always"
-msgstr ""
+msgstr "常に行う"
 
 #: xrc/GameBoyConfig.xrc:72
 msgid "System"
@@ -2317,11 +2334,11 @@ msgstr "システム"
 
 #: xrc/GameBoyConfig.xrc:84
 msgid "GB Boot &ROM file :"
-msgstr ""
+msgstr "GB Boot ROMファイル:"
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
-msgstr ""
+msgstr "ファイルを選択"
 
 #: xrc/GameBoyConfig.xrc:106
 msgid "GBC Boot ROM &file :"
@@ -2329,11 +2346,11 @@ msgstr "GBC Boot ROM ファイル:"
 
 #: xrc/GameBoyConfig.xrc:131
 msgid "Current GB BIOS file :"
-msgstr ""
+msgstr "現在のGB BIOSファイル:"
 
 #: xrc/GameBoyConfig.xrc:152
 msgid "Current GBC BIOS file :"
-msgstr ""
+msgstr "現在のGCB BIOSファイル:"
 
 #: xrc/GameBoyConfig.xrc:186
 msgid "User 1"
@@ -2369,19 +2386,19 @@ msgstr "&BMP"
 
 #: xrc/GeneralConfig.xrc:57
 msgid "&Rewind interval :"
-msgstr ""
+msgstr "巻き戻しの間隔:"
 
 #: xrc/GeneralConfig.xrc:58
 msgid "If not empty or 0, enable rewind (seconds)"
-msgstr ""
+msgstr "0または空白以外の値で有効(秒)"
 
 #: xrc/GeneralConfig.xrc:67
 msgid "seconds (0-600); 0 = disable"
-msgstr ""
+msgstr "秒数(0~600) 0=無効"
 
 #: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
-msgstr ""
+msgstr "スロットル"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 #, c-format
@@ -2390,15 +2407,15 @@ msgstr ""
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
-msgstr ""
+msgstr "0 = 加速なし"
 
 #: xrc/GeneralConfig.xrc:114
 msgid "Unlimited"
-msgstr ""
+msgstr "制限なし"
 
 #: xrc/IOViewer.xrc:4
 msgid "IO Viewer"
-msgstr ""
+msgstr "IO ビュワー"
 
 #: xrc/IOViewer.xrc:10
 msgid "a"
@@ -2477,7 +2494,7 @@ msgid ""
 "Click a field and press a key or move joystick to add.  Press backspace to "
 "delete last added key.  Resize window or click inside and move pointer to "
 "see entire contents if too small."
-msgstr ""
+msgstr "フィールドをクリックしてキーを押下またはパッドを動かして追加します。 バックスペースキーで最後に追加されたキーを削除します。 もし見づらい場合はウィンドウの大きさを変更するかフィールド内をドラッグしてください。"
 
 #: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:460
 msgid "Up"
@@ -2521,7 +2538,7 @@ msgstr "スタート"
 
 #: xrc/JoyPanel.xrc:254
 msgid "Motion Up"
-msgstr ""
+msgstr "上（モーションセンサー）"
 
 #: xrc/JoyPanel.xrc:276
 msgid "Autofire A"
@@ -2529,7 +2546,7 @@ msgstr "A（連射）"
 
 #: xrc/JoyPanel.xrc:298
 msgid "Motion Down"
-msgstr ""
+msgstr "下（モーションセンサー）"
 
 #: xrc/JoyPanel.xrc:320
 msgid "Autofire B"
@@ -2537,23 +2554,23 @@ msgstr "B（連射）"
 
 #: xrc/JoyPanel.xrc:342
 msgid "Motion Left/Dark"
-msgstr ""
+msgstr "左（モーションセンサー）/暗く"
 
 #: xrc/JoyPanel.xrc:386
 msgid "Motion Right/Light"
-msgstr ""
+msgstr "右（モーションセンサー）/明るく"
 
 #: xrc/JoyPanel.xrc:408
 msgid "Speed Up"
-msgstr ""
+msgstr "スピードアップ"
 
 #: xrc/JoyPanel.xrc:430
 msgid "Spin Left"
-msgstr ""
+msgstr "左スピン"
 
 #: xrc/JoyPanel.xrc:461
 msgid "Spin Right"
-msgstr ""
+msgstr "右スピン"
 
 #: xrc/JoyPanel.xrc:483
 msgid "Screenshot"
@@ -2561,11 +2578,11 @@ msgstr "スクリーンショット"
 
 #: xrc/JoyPanel.xrc:507
 msgid "Special"
-msgstr ""
+msgstr "特殊"
 
 #: xrc/JoyPanel.xrc:515
 msgid "Use as default"
-msgstr ""
+msgstr "既定値として設定"
 
 #: xrc/JoyPanel.xrc:522
 msgid "Defaults"
@@ -2573,7 +2590,7 @@ msgstr "既定値"
 
 #: xrc/JoyPanel.xrc:529
 msgid "Clear All"
-msgstr ""
+msgstr "全消去"
 
 #: xrc/JoypadConfig.xrc:4
 msgid "Joypad Configuration"
@@ -2605,7 +2622,7 @@ msgstr "タイムアウトまでの時間（ミリ秒）"
 
 #: xrc/Logging.xrc:4
 msgid "Logging"
-msgstr ""
+msgstr "ログ"
 
 #: xrc/Logging.xrc:13
 msgid "SW&I"
@@ -2613,15 +2630,15 @@ msgstr "SW&I"
 
 #: xrc/Logging.xrc:20
 msgid "Unaligned &memory"
-msgstr "Unaligned &memory"
+msgstr "非同期メモリ"
 
 #: xrc/Logging.xrc:27
 msgid "Illegal &write"
-msgstr "Illegal &write"
+msgstr "不正な書き込み"
 
 #: xrc/Logging.xrc:34
 msgid "Illegal &read"
-msgstr "Illegal &read"
+msgstr "不正な読み込み"
 
 #: xrc/Logging.xrc:41
 msgid "DMA &0"
@@ -2641,11 +2658,11 @@ msgstr "DMA &3"
 
 #: xrc/Logging.xrc:69
 msgid "&Undefined instruction"
-msgstr "&Undefined instruction"
+msgstr "未定義の命令"
 
 #: xrc/Logging.xrc:76
 msgid "&AGBPrint"
-msgstr "&AGBPrint"
+msgstr "AGBプリント"
 
 #: xrc/Logging.xrc:83
 msgid "Soun&d output"
@@ -2661,7 +2678,7 @@ msgstr "ファイル(&F)"
 
 #: xrc/MainMenu.xrc:7
 msgid "Open..."
-msgstr ""
+msgstr "開く…"
 
 #: xrc/MainMenu.xrc:10
 msgid "Open &GB..."
@@ -2693,7 +2710,7 @@ msgstr "カードeリーダー(&e)"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
-msgstr ""
+msgstr "読み込みしたドットコードをリセット(&R)"
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
@@ -2701,7 +2718,7 @@ msgstr "ドットコードの読込...(&L)"
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr ""
+msgstr "保存したドットコードをリセット(&R)"
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
@@ -2713,7 +2730,7 @@ msgstr "最新のステート(&r)"
 
 #: xrc/MainMenu.xrc:50
 msgid "Load current state slot"
-msgstr ""
+msgstr "現在のステートスロットからロードする"
 
 #: xrc/MainMenu.xrc:53
 msgid "&Auto load most recent"
@@ -2761,11 +2778,11 @@ msgstr "ファイルからロード...(&F)"
 
 #: xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
-msgstr ""
+msgstr "セーブデータを変更しない(&b)"
 
 #: xrc/MainMenu.xrc:97
 msgid "Do not change &cheat list"
-msgstr ""
+msgstr "チートリストを変更しない(&c)"
 
 #: xrc/MainMenu.xrc:100
 msgid "&Load state"
@@ -2773,15 +2790,15 @@ msgstr "ステートロード(&L)"
 
 #: xrc/MainMenu.xrc:104
 msgid "&Oldest slot"
-msgstr ""
+msgstr "最も古いスロット(&O)"
 
 #: xrc/MainMenu.xrc:107
 msgid "Save current state slot"
-msgstr ""
+msgstr "現在のステートスロットにセーブ"
 
 #: xrc/MainMenu.xrc:110
 msgid "Increase state slot number and save"
-msgstr ""
+msgstr "ステートスロット番号を増加させセーブ"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File ..."
@@ -2793,23 +2810,23 @@ msgstr "ステートセーブ(&S)"
 
 #: xrc/MainMenu.xrc:150
 msgid "Increase state slot number"
-msgstr ""
+msgstr "ステートスロットの値を増加"
 
 #: xrc/MainMenu.xrc:153
 msgid "Decrease state slot number"
-msgstr ""
+msgstr "ステートスロットの値を減少"
 
 #: xrc/MainMenu.xrc:158 xrc/MainMenu.xrc:170
 msgid "&Battery file..."
-msgstr ""
+msgstr "セーブデータファイル… (&B)"
 
 #: xrc/MainMenu.xrc:161
 msgid "Gameshark &code file..."
-msgstr ""
+msgstr "Gameshark コードファイル…(%c)"
 
 #: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
 msgid "&Gameshark snapshot..."
-msgstr ""
+msgstr "Gameshark スナップショットファイル…(&G)"
 
 #: xrc/MainMenu.xrc:166
 msgid "&Import"
@@ -2841,11 +2858,11 @@ msgstr "録画を停止...(&i)"
 
 #: xrc/MainMenu.xrc:195
 msgid "Start &game recording..."
-msgstr ""
+msgstr "ゲームプレイの記録を開始…(&g)"
 
 #: xrc/MainMenu.xrc:198
 msgid "Stop g&ame recording"
-msgstr ""
+msgstr "ゲームプレイの記録を停止(&a)"
 
 #: xrc/MainMenu.xrc:200
 msgid "&Record"
@@ -2853,19 +2870,19 @@ msgstr "記録(&R)"
 
 #: xrc/MainMenu.xrc:204
 msgid "Start playing &movie..."
-msgstr ""
+msgstr "ゲームプレイを再生(&m)"
 
 #: xrc/MainMenu.xrc:207
 msgid "Stop playing m&ovie"
-msgstr ""
+msgstr "ゲームプレイを停止(&o)"
 
 #: xrc/MainMenu.xrc:209
 msgid "&Play"
-msgstr "再開"
+msgstr "再開(&P)"
 
 #: xrc/MainMenu.xrc:214
 msgid "&Quit"
-msgstr ""
+msgstr "終了(&Q)"
 
 #: xrc/MainMenu.xrc:218
 msgid "&Emulation"
@@ -2873,23 +2890,23 @@ msgstr "エミュレーション(&E)"
 
 #: xrc/MainMenu.xrc:220
 msgid "&Pause"
-msgstr "一時停止"
+msgstr "一時停止(&P)"
 
 #: xrc/MainMenu.xrc:224
 msgid "&Next frame"
-msgstr "次のフレーム"
+msgstr "次のフレーム(&N)"
 
 #: xrc/MainMenu.xrc:227
 msgid "Re&wind"
-msgstr ""
+msgstr "巻き戻し(&w)"
 
 #: xrc/MainMenu.xrc:231
 msgid "Toggle &full screen"
-msgstr ""
+msgstr "全画面表示に切替(&f)"
 
 #: xrc/MainMenu.xrc:238
 msgid "&Turbo mode"
-msgstr ""
+msgstr "ターボモード(&T)"
 
 #: xrc/MainMenu.xrc:242
 msgid "&VSync"
@@ -2949,7 +2966,7 @@ msgstr "ゲームボーイ(&G)"
 
 #: xrc/MainMenu.xrc:298
 msgid "&Local mode"
-msgstr ""
+msgstr "ローカル通信(&L)"
 
 #: xrc/MainMenu.xrc:302
 msgid "&Link at boot"
@@ -2974,39 +2991,39 @@ msgstr "全画面表示で開始(&S)"
 
 #: xrc/MainMenu.xrc:324
 msgid "&Scaled resize"
-msgstr ""
+msgstr "拡大率を変更(&S)"
 
 #: xrc/MainMenu.xrc:326
 msgid "&1x"
-msgstr ""
+msgstr "&1x"
 
 #: xrc/MainMenu.xrc:329
 msgid "&2x"
-msgstr ""
+msgstr "&2x"
 
 #: xrc/MainMenu.xrc:332
 msgid "&3x"
-msgstr ""
+msgstr "&3x"
 
 #: xrc/MainMenu.xrc:335
 msgid "&4x"
-msgstr ""
+msgstr "&4x"
 
 #: xrc/MainMenu.xrc:338
 msgid "&5x"
-msgstr ""
+msgstr "&5x"
 
 #: xrc/MainMenu.xrc:341
 msgid "&6x"
-msgstr ""
+msgstr "&6x"
 
 #: xrc/MainMenu.xrc:345
 msgid "Change pixel filter"
-msgstr ""
+msgstr "pixelフィルタを変更"
 
 #: xrc/MainMenu.xrc:348
 msgid "Change interframe blending"
-msgstr ""
+msgstr "インターフェースブレンディングの変更"
 
 #: xrc/MainMenu.xrc:351
 msgid "&Retain aspect ratio"
@@ -3014,11 +3031,11 @@ msgstr "アスペクト比を固定(&R)"
 
 #: xrc/MainMenu.xrc:355
 msgid "Enable MMX"
-msgstr ""
+msgstr "MMX を有効化"
 
 #: xrc/MainMenu.xrc:360
 msgid "&Bilinear filter"
-msgstr ""
+msgstr "バイリニア補間(&B)"
 
 #: xrc/MainMenu.xrc:371
 msgid "&Keep window on top"
@@ -3042,31 +3059,31 @@ msgstr "サウンド(&A)"
 
 #: xrc/MainMenu.xrc:394
 msgid "&Increase volume"
-msgstr ""
+msgstr "音量を上げる(&I)"
 
 #: xrc/MainMenu.xrc:398
 msgid "&Decrease volume"
-msgstr ""
+msgstr "音量を下げる(&D)"
 
 #: xrc/MainMenu.xrc:402
 msgid "&Toggle sound"
-msgstr ""
+msgstr "音声の出力切り替え"
 
 #: xrc/MainMenu.xrc:407
 msgid "&GBA sound interpolation"
-msgstr ""
+msgstr "GBAサウンド補間"
 
 #: xrc/MainMenu.xrc:412
 msgid "&GB sound enhancement"
-msgstr ""
+msgstr "GBのサウンド増大"
 
 #: xrc/MainMenu.xrc:416
 msgid "&GB surround sound effect"
-msgstr ""
+msgstr "GBのサラウンド音声効果"
 
 #: xrc/MainMenu.xrc:420
 msgid "&GB sound declicking"
-msgstr ""
+msgstr "GB 音声のクリック除去"
 
 #: xrc/MainMenu.xrc:425
 msgid "&Input"
@@ -3074,11 +3091,11 @@ msgstr "入力(&I)"
 
 #: xrc/MainMenu.xrc:430
 msgid "Allow &keyboard background input"
-msgstr ""
+msgstr "非アクティブ時のキーボード入力を許可"
 
 #: xrc/MainMenu.xrc:434
 msgid "Allow &joystick background input"
-msgstr ""
+msgstr "非アクティブ時のパッド入力を許可"
 
 #: xrc/MainMenu.xrc:439
 msgid "&Autofire"
@@ -3102,7 +3119,7 @@ msgstr "&R"
 
 #: xrc/MainMenu.xrc:458
 msgid "&Autohold"
-msgstr ""
+msgstr "オートホールド"
 
 #: xrc/MainMenu.xrc:502
 msgid "&Game Boy Advance"
@@ -3114,7 +3131,7 @@ msgstr "設定..."
 
 #: xrc/MainMenu.xrc:508
 msgid "&Real-time clock"
-msgstr ""
+msgstr "PC時刻を使用"
 
 #: xrc/MainMenu.xrc:512
 msgid "&Use BIOS file"
@@ -3122,231 +3139,235 @@ msgstr "BIOSファイルを使用(&U)"
 
 #: xrc/MainMenu.xrc:516
 msgid "&Debug print"
-msgstr ""
+msgstr "デバッグ情報を出力"
 
 #: xrc/MainMenu.xrc:520 xrc/MainMenu.xrc:535
 msgid "&LCD Filter"
-msgstr ""
+msgstr "LCDフィルタ"
 
 #: xrc/MainMenu.xrc:531
 msgid "&GB color option"
-msgstr ""
+msgstr "GB color オプション"
 
 #: xrc/MainMenu.xrc:539
+msgid "&GB Colorizer Hack (requires restart)"
+msgstr "GB Colorizer Hack(再起動が必要)"
+
+#: xrc/MainMenu.xrc:543
 msgid "&GB printer"
 msgstr "接続 ポケットプリンタ(&G)"
 
-#: xrc/MainMenu.xrc:543
-msgid "&Gather a full page before printing"
-msgstr ""
-
 #: xrc/MainMenu.xrc:547
-msgid "&Save printouts as screen captures"
-msgstr ""
+msgid "&Gather a full page before printing"
+msgstr "プリント前にページ全体を収集"
 
-#: xrc/MainMenu.xrc:552
-msgid "&Use GB BIOS file"
-msgstr "GB BIOSファイルを使用(&U)"
+#: xrc/MainMenu.xrc:551
+msgid "&Save printouts as screen captures"
+msgstr "プリントアウトをスクリーンキャプチャとして保存"
 
 #: xrc/MainMenu.xrc:556
+msgid "&Use GB BIOS file (requires restart)"
+msgstr "GB BIOSファイルを使用(再起動が必要) (&U)"
+
+#: xrc/MainMenu.xrc:560
 msgid "&Use GBC BIOS file"
 msgstr "GBC BIOSファイルを使用(&U)"
 
-#: xrc/MainMenu.xrc:561
+#: xrc/MainMenu.xrc:565
 msgid "&General ..."
 msgstr "VBA本体の設定...(&G)"
 
-#: xrc/MainMenu.xrc:564
+#: xrc/MainMenu.xrc:568
 msgid "&Speedup / Turbo ..."
-msgstr ""
+msgstr "速度とターボの設定…"
 
-#: xrc/MainMenu.xrc:567
+#: xrc/MainMenu.xrc:571
 msgid "D&irectories ..."
 msgstr "フォルダの設定...(&i)"
 
-#: xrc/MainMenu.xrc:570
+#: xrc/MainMenu.xrc:574
 msgid "&Key Shortcuts ..."
 msgstr "ホットキーの設定...(&K)"
 
-#: xrc/MainMenu.xrc:573
-msgid "&UI Settings ..."
-msgstr ""
-
 #: xrc/MainMenu.xrc:577
+msgid "&UI Settings ..."
+msgstr "UI設定…"
+
+#: xrc/MainMenu.xrc:581
 msgid "&Tools"
 msgstr "ツール(&T)"
 
-#: xrc/MainMenu.xrc:579
+#: xrc/MainMenu.xrc:583
 msgid "&Cheats"
 msgstr "チート(&C)"
 
-#: xrc/MainMenu.xrc:581
+#: xrc/MainMenu.xrc:585
 msgid "List &cheats ..."
 msgstr "チートリストを表示...(&c)"
 
-#: xrc/MainMenu.xrc:584
+#: xrc/MainMenu.xrc:588
 msgid "Find c&heat ..."
 msgstr "チートサーチ...(&h)"
 
-#: xrc/MainMenu.xrc:588
+#: xrc/MainMenu.xrc:592
 msgid "A&utomatically save/load cheats"
 msgstr "チートの保存/読込を自動で行う(&u)"
 
-#: xrc/MainMenu.xrc:592
+#: xrc/MainMenu.xrc:596
 msgid "&Enable cheats"
 msgstr "チートの有効化(&E)"
 
-#: xrc/MainMenu.xrc:599
-msgid "&Break into GDB"
-msgstr ""
-
 #: xrc/MainMenu.xrc:603
+msgid "&Break into GDB"
+msgstr "GDBに接続"
+
+#: xrc/MainMenu.xrc:607
 msgid "&Configure port..."
-msgstr ""
+msgstr "ポート設定…"
 
-#: xrc/MainMenu.xrc:606
+#: xrc/MainMenu.xrc:610
 msgid "&Break on load"
-msgstr ""
+msgstr "読み込みの中断"
 
-#: xrc/MainMenu.xrc:611
+#: xrc/MainMenu.xrc:615
 msgid "&Disconnect"
 msgstr "切断"
 
-#: xrc/MainMenu.xrc:613
+#: xrc/MainMenu.xrc:617
 msgid "&GDB"
 msgstr "&GDB"
 
-#: xrc/MainMenu.xrc:616
+#: xrc/MainMenu.xrc:620
 msgid "&Disassemble..."
-msgstr ""
+msgstr "逆アセンブル…(&D)"
 
-#: xrc/MainMenu.xrc:619
+#: xrc/MainMenu.xrc:623
 msgid "&Logging..."
 msgstr "ログウィンドウ...(&L)"
 
-#: xrc/MainMenu.xrc:622
+#: xrc/MainMenu.xrc:626
 msgid "&IO Viewer..."
-msgstr "&IO Viewer..."
+msgstr "&IO ビュワー…"
 
-#: xrc/MainMenu.xrc:625
+#: xrc/MainMenu.xrc:629
 msgid "&Map Viewer..."
-msgstr "&Map Viewer..."
+msgstr "マップビュワー…"
 
-#: xrc/MainMenu.xrc:628
+#: xrc/MainMenu.xrc:632
 msgid "M&emory Viewer..."
-msgstr "M&emory Viewer..."
+msgstr "メモリビュワー…"
 
-#: xrc/MainMenu.xrc:631
+#: xrc/MainMenu.xrc:635
 msgid "&OAM Viewer..."
-msgstr "&OAM Viewer..."
+msgstr "&OAM ビュワー…"
 
-#: xrc/MainMenu.xrc:634
+#: xrc/MainMenu.xrc:638
 msgid "&Palette Viewer..."
-msgstr "&Palette Viewer..."
+msgstr "パレットビュワー…"
 
-#: xrc/MainMenu.xrc:637
+#: xrc/MainMenu.xrc:641
 msgid "&Tile Viewer..."
-msgstr "&Tile Viewer..."
-
-#: xrc/MainMenu.xrc:642
-msgid "Show all video layers"
-msgstr ""
+msgstr "タイルビュワー…"
 
 #: xrc/MainMenu.xrc:646
+msgid "Show all video layers"
+msgstr "すべてのビデオレイヤーを表示"
+
+#: xrc/MainMenu.xrc:650
 msgid "BG &0"
 msgstr "BG &0"
 
-#: xrc/MainMenu.xrc:651
+#: xrc/MainMenu.xrc:655
 msgid "BG &1"
 msgstr "BG &1"
 
-#: xrc/MainMenu.xrc:656
+#: xrc/MainMenu.xrc:660
 msgid "BG &2"
 msgstr "BG &2"
 
-#: xrc/MainMenu.xrc:661
+#: xrc/MainMenu.xrc:665
 msgid "BG &3"
 msgstr "BG &3"
 
-#: xrc/MainMenu.xrc:666
+#: xrc/MainMenu.xrc:670
 msgid "&OBJ"
 msgstr "&OBJ"
 
-#: xrc/MainMenu.xrc:671
+#: xrc/MainMenu.xrc:675
 msgid "&WIN 0"
 msgstr "&WIN 0"
 
-#: xrc/MainMenu.xrc:676
+#: xrc/MainMenu.xrc:680
 msgid "W&IN 1"
 msgstr "W&IN 1"
 
-#: xrc/MainMenu.xrc:681
+#: xrc/MainMenu.xrc:685
 msgid "O&BJ WIN"
 msgstr "O&BJ WIN"
 
-#: xrc/MainMenu.xrc:685
+#: xrc/MainMenu.xrc:689
 msgid "&View Layers"
 msgstr "&View Layers"
 
-#: xrc/MainMenu.xrc:689
+#: xrc/MainMenu.xrc:693
 msgid "Channel &1"
 msgstr "Channel &1"
 
-#: xrc/MainMenu.xrc:694
+#: xrc/MainMenu.xrc:698
 msgid "Channel &2"
 msgstr "Channel &2"
 
-#: xrc/MainMenu.xrc:699
+#: xrc/MainMenu.xrc:703
 msgid "Channel &3"
 msgstr "Channel &3"
 
-#: xrc/MainMenu.xrc:704
+#: xrc/MainMenu.xrc:708
 msgid "Channel &4"
 msgstr "Channel &4"
 
-#: xrc/MainMenu.xrc:709
+#: xrc/MainMenu.xrc:713
 msgid "Direct Sound &A"
 msgstr "Direct Sound &A"
 
-#: xrc/MainMenu.xrc:714
+#: xrc/MainMenu.xrc:718
 msgid "Direct Sound &B"
 msgstr "Direct Sound &B"
 
-#: xrc/MainMenu.xrc:718
+#: xrc/MainMenu.xrc:722
 msgid "&Sound Channels"
 msgstr "&Sound Channels"
 
-#: xrc/MainMenu.xrc:722
+#: xrc/MainMenu.xrc:726
 msgid "&Help"
 msgstr "ヘルプ(&H)"
 
-#: xrc/MainMenu.xrc:724
+#: xrc/MainMenu.xrc:728
 msgid "Report &Bugs"
 msgstr "バグの報告(&B)"
 
-#: xrc/MainMenu.xrc:727
+#: xrc/MainMenu.xrc:731
 msgid "VBA-M Support &Forum"
 msgstr "サポートフォーラム"
 
-#: xrc/MainMenu.xrc:730
+#: xrc/MainMenu.xrc:734
 msgid "Translations"
 msgstr "翻訳に参加"
 
-#: xrc/MainMenu.xrc:738
+#: xrc/MainMenu.xrc:742
 msgid "Check for updates"
-msgstr ""
-
-#: xrc/MainMenu.xrc:741
-msgid "&Factory Reset..."
-msgstr ""
+msgstr "アップデートを確認"
 
 #: xrc/MainMenu.xrc:745
+msgid "&Factory Reset..."
+msgstr "設定を初期化…(&F)"
+
+#: xrc/MainMenu.xrc:749
 msgid "&About..."
-msgstr ""
+msgstr "バージョン情報 (&A)"
 
 #: xrc/MapViewer.xrc:4
 msgid "Map Viewer"
-msgstr "Map Viewer"
+msgstr "マップビュワー"
 
 #: xrc/MapViewer.xrc:16
 msgid "Frame 0"
@@ -3378,11 +3399,11 @@ msgstr "BG3"
 
 #: xrc/MapViewer.xrc:84
 msgid "Map Base:"
-msgstr ""
+msgstr "マップベース:"
 
 #: xrc/MapViewer.xrc:92
 msgid "Char Base:"
-msgstr ""
+msgstr "キャラベース:"
 
 #: xrc/MapViewer.xrc:100 xrc/MemSelRegion.xrc:22 xrc/OAMViewer.xrc:77
 msgid "Size:"
@@ -3394,11 +3415,11 @@ msgstr "色:"
 
 #: xrc/MapViewer.xrc:124
 msgid "Mosaic:"
-msgstr ""
+msgstr "モザイク:"
 
 #: xrc/MapViewer.xrc:132
 msgid "Overflow:"
-msgstr ""
+msgstr "オーバーフロー:"
 
 #: xrc/MemViewer.xrc:4
 msgid "Memory Viewer"
@@ -3418,15 +3439,15 @@ msgstr "32ビット"
 
 #: xrc/MemViewer.xrc:83
 msgid "Current address:"
-msgstr ""
+msgstr "現在のアドレス:"
 
 #: xrc/MemViewer.xrc:108
 msgid "&Load..."
-msgstr ""
+msgstr "読み込む…"
 
 #: xrc/NetLink.xrc:4
 msgid "Start Network Link"
-msgstr ""
+msgstr "通信を開始...(&N)"
 
 #: xrc/NetLink.xrc:11
 msgid "Server"
@@ -3438,7 +3459,7 @@ msgstr "クライアント"
 
 #: xrc/NetLink.xrc:32
 msgid "Players:"
-msgstr ""
+msgstr "プレイヤー:"
 
 #: xrc/NetLink.xrc:41
 msgid "2"
@@ -3454,27 +3475,27 @@ msgstr "4"
 
 #: xrc/NetLink.xrc:67
 msgid "Server:"
-msgstr "サーバー："
+msgstr "サーバー:"
 
 #: xrc/NetLink.xrc:81
 msgid "Port:"
-msgstr ""
+msgstr "ポート番号:"
 
 #: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
-msgstr "OAM Viewer"
+msgstr "OAM ビュワー"
 
 #: xrc/OAMViewer.xrc:85
 msgid "Rot.:"
-msgstr ""
+msgstr "回転:"
 
 #: xrc/PaletteViewer.xrc:4
 msgid "Palette Viewer"
-msgstr "Palette Viewer"
+msgstr "パレットビュワー"
 
 #: xrc/PaletteViewer.xrc:88
 msgid "C&hange backdrop color..."
-msgstr ""
+msgstr "背景色を変更…(&h)"
 
 #: xrc/SoundConfig.xrc:4
 msgid "Sound Settings"
@@ -3482,7 +3503,7 @@ msgstr "サウンド設定"
 
 #: xrc/SoundConfig.xrc:16
 msgid "Volume :"
-msgstr "音量："
+msgstr "音量:"
 
 #: xrc/SoundConfig.xrc:34
 msgid "Mute"
@@ -3494,7 +3515,7 @@ msgstr "最大"
 
 #: xrc/SoundConfig.xrc:71
 msgid "Sample rate :"
-msgstr "サンプルレート"
+msgstr "サンプルレート:"
 
 #: xrc/SoundConfig.xrc:77
 msgid "48 KHz"
@@ -3530,7 +3551,7 @@ msgstr "XAudio2"
 
 #: xrc/SoundConfig.xrc:132
 msgid "FAudio"
-msgstr ""
+msgstr "FAudio"
 
 #: xrc/SoundConfig.xrc:146
 msgid "Device"
@@ -3538,15 +3559,15 @@ msgstr "デバイス"
 
 #: xrc/SoundConfig.xrc:154
 msgid "Enable stereo upmixing"
-msgstr ""
+msgstr "ステレオアップミキシングを有効化"
 
 #: xrc/SoundConfig.xrc:161
 msgid "Enable hardware acceleration"
-msgstr ""
+msgstr "ハードウェアアクセラレーションを有効化"
 
 #: xrc/SoundConfig.xrc:190
 msgid "Number of sound buffers:"
-msgstr ""
+msgstr "スキップするフレーム数:"
 
 #: xrc/SoundConfig.xrc:198
 msgid "Advanced"
@@ -3554,7 +3575,7 @@ msgstr "高度"
 
 #: xrc/SoundConfig.xrc:230
 msgid "Lots"
-msgstr ""
+msgstr "多い"
 
 #: xrc/SoundConfig.xrc:239
 msgid "Echo"
@@ -3614,20 +3635,20 @@ msgstr "0x60&10000"
 
 #: xrc/SpeedupConfig.xrc:4
 msgid "SpeedUp / Turbo Settings"
-msgstr ""
+msgstr "速度とターボの設定"
 
 #: xrc/SpeedupConfig.xrc:9
 msgid "Speedup Throttle"
-msgstr ""
+msgstr "速度"
 
 #: xrc/SpeedupConfig.xrc:50
 msgid "Frame skip"
-msgstr ""
+msgstr "フレームスキップ"
 
 #: xrc/UIConfig.xrc:4
 msgid "User Interface Settings"
-msgstr ""
+msgstr "UI設定"
 
 #: xrc/UIConfig.xrc:9
 msgid "Hide Menu Bar"
-msgstr ""
+msgstr "メニューバーを非表示"

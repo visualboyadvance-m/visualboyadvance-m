@@ -26,7 +26,6 @@
 #include "builtin-xrc.h"
 
 // The built-in vba-over.ini
-#include "../common/ConfigManager.h"
 #include "builtin-over.h"
 
 IMPLEMENT_APP(wxvbamApp)
