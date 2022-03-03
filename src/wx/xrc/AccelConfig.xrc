@@ -105,24 +105,37 @@
                 <flag>wxALL|wxEXPAND</flag>
                 <border>5</border>
               </object>
+              <object class="sizeritem">
+                <object class="wxStdDialogButtonSizer">
+                  <object class="button">
+                    <object class="wxButton" name="wxID_OK"/>
+                  </object>
+                  <object class="button">
+                    <object class="wxButton" name="wxID_CANCEL"/>
+                  </object>
+                </object>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
               <orient>wxVERTICAL</orient>
             </object>
             <flag>wxEXPAND</flag>
           </object>
-        </object>
-      </object>
-      <object class="sizeritem">
-        <object class="wxStdDialogButtonSizer">
-          <object class="button">
-            <object class="wxButton" name="wxID_OK"/>
+          <object class="sizeritem">
+            <object class="wxBoxSizer">
+              <object class="sizeritem">
+                <object class="wxCheckBox" name="ToggleFnKeyShortcuts">
+                  <label>Disable Function Keys</label>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <orient>wxVERTICAL</orient>
+            </object>
           </object>
-          <object class="button">
-            <object class="wxButton" name="wxID_CANCEL"/>
-          </object>
-        </object>
-        <flag>wxALL|wxEXPAND</flag>
-        <border>5</border>
+        </object> 
       </object>
+
     </object>
   </object>
 </resource>

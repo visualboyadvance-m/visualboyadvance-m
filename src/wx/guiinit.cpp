@@ -11,6 +11,10 @@
 #include <algorithm>
 #include <stdexcept>
 #include <typeinfo>
+#include <tuple>
+using namespace std;
+#include <map>
+using namespace std;
 
 #include <wx/checkedlistctrl.h>
 #include <wx/clrpicker.h>
@@ -2007,6 +2011,7 @@ public:
     wxWindow *asb, *remb;
     wxJoyKeyTextCtrl* key;
     wxControl* curas;
+    wxCheckBox* tfks;
 
     // since this is not the actual dialog, derived from wxDialog, which is
     // the normal way of doing things, do init on the show event instead of
@@ -2029,6 +2034,7 @@ public:
         asb->Enable(false);
         remb->Enable(false);
         curas->SetLabel(wxT(""));
+        tfks->Enable();
         accels = wxGetApp().frame->get_accels(user_accels);
     }
 
@@ -2149,6 +2155,7 @@ public:
         if (user_accels.empty() || wxMessageBox(_("This will clear all user-defined accelerators.  Are you sure?"), _("Confirm"), wxYES_NO) != wxYES)
             return;
 
+        tfks->SetValue(false);
         user_accels.clear();
         accels = wxGetApp().frame->sys_accels;
         tc->Unselect();
@@ -2247,6 +2254,61 @@ public:
         treeid_to_name(cmd, lab, tc, tc->GetRootItem());
         curas->SetLabel(lab);
     }
+
+    void ToggleFunctionKeyShortcuts(wxCommandEvent& evt)
+    {
+        (void)evt; // Unused param.
+        std::unordered_set<int> fnKeys = { WXK_F1, WXK_F2, WXK_F3, WXK_F4, WXK_F5, WXK_F6, WXK_F7, WXK_F8, WXK_F9, WXK_F10 };
+
+        if (tfks->GetValue() == true) {
+            for (size_t i = 0; i < user_accels.size(); ++i) {
+                if (fnKeys.count(user_accels[i].GetKeyCode()) == 1) { 
+                    user_accels[i].Set(user_accels[i].GetUkey(), user_accels[i].GetJoystick(), user_accels[i].GetFlags(), user_accels[i].GetKeyCode(), XRCID("NOOP"));
+                }
+            }
+
+            for (size_t i = 0; i < accels.size(); ++i) {
+                if (fnKeys.count(accels[i].GetKeyCode()) == 1) { 
+                    accels[i].Set(accels[i].GetUkey(), accels[i].GetJoystick(), accels[i].GetFlags(), accels[i].GetKeyCode(), XRCID("NOOP"));
+                }
+            }
+
+        }
+
+        else if (tfks->GetValue() == false) {
+            std::map<tuple<int, int>, int> orig_commands;
+
+            wxAcceleratorEntry_v &orig_accels = wxGetApp().frame->sys_accels;
+            for (wxAcceleratorEntry_v::iterator e = orig_accels.begin(); e < orig_accels.end(); ++e) {
+                if (fnKeys.count(e->GetKeyCode()) == 1) {
+                    std::tuple<int,int> _key;
+                    std::get<0>(_key) = e->GetKeyCode();
+                    std::get<1>(_key) = e->GetFlags();
+                    orig_commands[_key] = e->GetCommand();
+                }
+            }
+            for (size_t i = 0; i < user_accels.size(); ++i) {
+                if (fnKeys.count(user_accels[i].GetKeyCode()) == 1) { 
+                    std::tuple<int, int> lookup1;
+                    std::get<0>(lookup1) = user_accels[i].GetKeyCode();
+                    std::get<1>(lookup1) = user_accels[i].GetFlags();
+                    int orig_command1 = (orig_commands.find(lookup1)->second);
+                    user_accels[i].Set(user_accels[i].GetUkey(), user_accels[i].GetJoystick(), user_accels[i].GetFlags(), user_accels[i].GetKeyCode(), orig_command1 );
+                }
+            }
+            for (size_t i = 0; i < accels.size(); ++i) {
+                if (fnKeys.count(accels[i].GetKeyCode()) == 1) { 
+                    std::tuple<int, int> lookup2;
+                    std::get<0>(lookup2) = accels[i].GetKeyCode();
+                    std::get<1>(lookup2) = accels[i].GetFlags();
+                    int orig_command2 = (orig_commands.find(lookup2)->second);
+                    accels[i].Set(accels[i].GetUkey(), accels[i].GetJoystick(), accels[i].GetFlags(), accels[i].GetKeyCode(), orig_command2);
+                }
+            }
+        }
+
+    }
+
 } accel_config_handler;
 
 // build initial accel tree control from menu
@@ -3886,6 +3948,7 @@ bool MainFrame::BindControls()
             accel_config_handler.remb = SafeXRCCTRL<wxButton>(d, "Remove");
             accel_config_handler.key = SafeXRCCTRL<wxJoyKeyTextCtrl>(d, "Shortcut");
             accel_config_handler.curas = SafeXRCCTRL<wxControl>(d, "AlreadyThere");
+            accel_config_handler.tfks = SafeXRCCTRL<wxCheckBox>(d, "ToggleFnKeyShortcuts");
             accel_config_handler.key->MoveBeforeInTabOrder(accel_config_handler.asb);
             accel_config_handler.key->SetMultikey(0);
             accel_config_handler.key->SetClearable(false);
@@ -3978,6 +4041,9 @@ bool MainFrame::BindControls()
                 NULL, &accel_config_handler);
             d->Connect(XRCID("Shortcut"), wxEVT_COMMAND_TEXT_UPDATED,
                 wxCommandEventHandler(AccelConfig_t::CheckKey),
+                NULL, &accel_config_handler);
+            d->Connect(wxEVT_CHECKBOX,
+                wxCommandEventHandler(AccelConfig_t::ToggleFunctionKeyShortcuts),
                 NULL, &accel_config_handler);
             d->Fit();
         }
