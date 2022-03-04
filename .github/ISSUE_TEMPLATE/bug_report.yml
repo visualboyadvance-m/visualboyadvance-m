@@ -11,8 +11,7 @@ body:
   - type: markdown
     attributes:
       value: |
-            PLEASE TRY THE NIGHTLY FROM: http://win.vba-m.com/nightly
-            AND TRY A FACTORY RESET FROM THE HELP MENU
+            Please try the nightly build from: http://win.vba-m.com/nightly and factory resetting the emulator from the Help menu.
             On Linux build master from source or use the edge snap.
   - type: textarea
     id: what-should-happen
@@ -110,6 +109,6 @@ body:
   - type: markdown
     attributes:
       value: |
-            please try to troubleshoot using the information on this page:
-            https://wiki.archlinux.org/index.php/Gamepad **BEFORE** filing an issue. We use SDL for joystick support, any problems will generally be an issue with SDL and **NOT** the emulator.
+            please try to troubleshoot using the information on this page:h ttps://wiki.archlinux.org/index.php/Gamepad **BEFORE** filing an issue. 
+            We use SDL for joystick support, any problems will generally be an issue with SDL and **NOT** the emulator.
             If relevant, the joystick you are using and the drivers you are using for it:
