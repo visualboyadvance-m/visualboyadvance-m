@@ -69,7 +69,7 @@ body:
             Filter Used?:
     validations:
       required: true      
-- type: textarea
+  - type: textarea
     id: SysInfo
     attributes:
       label: Specifications and Build details
