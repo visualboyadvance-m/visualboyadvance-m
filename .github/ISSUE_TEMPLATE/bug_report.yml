@@ -55,7 +55,9 @@ body:
             Title:
             GB, GBC or GBA:
             ROM CODE: (File > ROM Information)
-            BIOS Used?:
+            BIOS Used?: (Share crc hash)
+            SAVE TYPE: (Attach MPK, Battery or Savestate here)
+            Clean, Intro'd or Hacked?:(Attach Patch here)
     validations:
       required: true
   - type: textarea
