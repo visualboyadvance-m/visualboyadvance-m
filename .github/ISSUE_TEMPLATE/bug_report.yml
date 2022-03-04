@@ -1,0 +1,104 @@
+name: Bug Report
+description: If you experience a bug in the Emulator, please open an issue here and fill out the template.
+title: "[Bug]: "
+labels: ["bug", "triage"]
+assignees: 
+  - 
+body:
+  - type: textarea
+    id: what-should-happen
+    attributes:
+      label: Expected behavior?
+      description: How was the emulator supposed to behave
+      placeholder: Tell us what you expect to see!; use screenshots if necessary.
+      value: 
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Actual behavior?
+      description: Describe the issue you encountered.
+      placeholder: Tell us what you see!; use screenshots if necessary.
+      value: 
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce the problem
+      description: "How do you trigger this bug? Please walk us through it step by step."
+      value: |
+            1.
+            2.
+            3.
+            4.
+            5.
+            ...
+    validations:
+      required: true
+  - type: textarea
+    id: error-messages
+    attributes:
+      label: Error messages?
+      description: Was there an error message?
+      placeholder: List any exception messages here!; use screenshots if necessary.
+      value: 
+    validations:
+      required: true
+  - type: textarea
+    id: Rom_Details
+    attributes:
+      label: What game were you playing
+      description: "What is the specific rom that you encountered an issue with"
+      value: |
+            Title:
+            GB, GBC or GBA:
+            ROM CODE: (File > ROM Information)
+            BIOS Used?:
+    validations:
+      required: true
+  - type: textarea
+    id: Settings
+    attributes:
+      label: What settings are you using?
+      description: "Please list them"
+      value: |
+            Video driver (simple, opengl):
+            Sound driver (directsound, xaudio, openal, SDL):
+            Filter Used?:
+    validations:
+      required: true      
+- type: textarea
+    id: SysInfo
+    attributes:
+      label: Specifications and Build details
+      description: "List your system information, you can obtain this from MSINFO32 and the emulators Titlebar."
+      value: |
+            VBA-M: (include commit version number and whether you are using the 32-bit or 64-bit version)
+            OS: (include version and OS build number using WinVer if on Windows):
+            If using Linux, specify if using xorg or Wayland:
+            CPU:
+            GPU:
+            RAM:
+    validations:
+      required: true
+  - type: checkboxes
+    id: Copyright_Compliance
+    attributes:
+      label: Copyright Compliance
+      description: Please do not attach any files that infringe on the copyright of Nintendo or its partners.
+      options:
+        - label: There are no infringing files attached to this bug report.
+          required: true
+- type: markdown
+    attributes:
+      value: "## FAQ's and a warning"      
+- type: markdown
+    attributes:
+      value: |
+            If you are having issues with a plugin that isn't included with and supported by the Project64 team, we cannot support you other then pointing you to the developer of those plugins.
+            
+            Please join the Discord first and ask questions and ask for support there first. If the issue should require an open GitHub issue, somebody will ask you to open one. We have a lot of people in the Discord who are more then happy to help you with any issues you may be having!
+            
+            Please avoid opening issues if you do not meet the minimum requirements for Project64. These are outlined in the README for this repository.
