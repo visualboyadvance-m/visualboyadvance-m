@@ -46,3 +46,15 @@ body:
       value: 
     validations:
       required: true
+  - type: textarea
+    id: Rom_Details
+    attributes:
+      label: What game were you playing
+      description: "What is the specific rom that you encountered an issue with"
+      value: |
+            Title:
+            GB, GBC or GBA:
+            ROM CODE: (File > ROM Information)
+            BIOS Used?:
+    validations:
+      required: true
