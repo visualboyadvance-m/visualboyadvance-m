@@ -1,5 +1,7 @@
 blank_issues_enabled: false
 contact_links:
+  - name: VBA-M Forum
+    url: https://board.vba-m.com/
+    about: For general questions and support please join our forum or our
   - name: VBA-M IRC Channel
     url: https://web.libera.chat/#vba-m
-    about: For general questions and support please join us on IRC
