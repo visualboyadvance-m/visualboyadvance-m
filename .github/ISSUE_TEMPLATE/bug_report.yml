@@ -64,7 +64,7 @@ body:
             If this is a crash bug, and you have the time and inclination, please provide a symbolic backtrace.
             Instructions for doing so are [here](https://github.com/visualboyadvance-m/visualboyadvance-m/blob/master/README.md#reporting-crash-bugs).
     validations:
-      required: true
+      required: false
   - type: textarea
     id: Rom_Details
     attributes:
