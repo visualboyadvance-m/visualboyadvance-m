@@ -1,0 +1,115 @@
+name: Bug Report
+description: If you experience a bug in the Emulator, please open an issue here and fill out the template.
+title: "[Bug]: "
+labels: ["bug", "triage"]
+assignees: 
+  - 
+body:
+  - type: markdown
+    attributes:
+      value: "## BEFORE REPORTING AN ISSUE"      
+  - type: markdown
+    attributes:
+      value: |
+            Please try the nightly build from: http://win.vba-m.com/nightly and factory resetting the emulator from the Help menu.
+            On Linux build master from source or use the edge snap.
+  - type: markdown
+    attributes:
+      value: "## If your joystick or gamepad isn't working in Linux"      
+  - type: markdown
+    attributes:
+      value: |
+            Please try to troubleshoot using the information on this page:h ttps://wiki.archlinux.org/index.php/Gamepad **BEFORE** filing an issue. 
+            We use SDL for joystick support, any problems will generally be an issue with SDL and **NOT** the emulator.
+            If relevant, the joystick you are using and the drivers you are using for it:          
+  - type: textarea
+    id: what-should-happen
+    attributes:
+      label: Expected behavior?
+      description: How was the emulator supposed to behave
+      placeholder: Tell us what you expect to see!; use screenshots if necessary.
+      value: 
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Actual behavior?
+      description: Describe the issue you encountered.
+      placeholder: Tell us what you see!; use screenshots if necessary.
+      value: 
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce the problem
+      description: "How do you trigger this bug? Please walk us through it step by step."
+      value: |
+            1.
+            2.
+            3.
+            4.
+            5.
+            ...
+    validations:
+      required: true
+  - type: textarea
+    id: error-messages
+    attributes:
+      label: Error messages?
+      description: Was there an error message?
+      placeholder: List any exception messages here!; use screenshots if necessary.
+      value: |
+            If this is a crash bug, and you have the time and inclination, please provide a symbolic backtrace.
+            Instructions for doing so are [here](https://github.com/visualboyadvance-m/visualboyadvance-m/blob/master/README.md#reporting-crash-bugs).
+    validations:
+      required: false
+  - type: textarea
+    id: Rom_Details
+    attributes:
+      label: What game were you playing
+      description: "What is the specific rom that you encountered an issue with"
+      value: |
+            <Some of this information can be provided with a screenshot of Rom Information, SAVE TYPE for GBA titles can be obtained from Options > Game Boy Advance > Config>
+            Title:
+            GB, GBC or GBA:
+            ROM CODE: 
+            BIOS Used?: (Share crc hash)
+            SAVE TYPE: (Attach Battery or Savestate here)
+            Clean, Intro'd or Hacked?:(Attach Patch here)
+    validations:
+      required: false
+  - type: textarea
+    id: Settings
+    attributes:
+      label: What settings are you using?
+      description: "Please list them"
+      value: |
+            Video driver (simple, opengl):
+            Sound driver (directsound, xaudio, openal, SDL):
+            Scale Filter Used?:
+    validations:
+      required: true
+  - type: textarea
+    id: SysInfo
+    attributes:
+      label: Specifications and Build details
+      description: "List your system information, you can obtain this from MSINFO32 and the emulators Titlebar."
+      value: |
+            VBA-M: (include commit version number and whether you are using the 32-bit or 64-bit version)
+            OS: (include version and OS build number using WinVer if on Windows):
+            If using Linux, specify if using xorg or Wayland:
+            CPU:
+            GPU:
+            RAM:
+    validations:
+      required: true
+  - type: checkboxes
+    id: Copyright_Compliance
+    attributes:
+      label: Copyright Compliance
+      description: Please do not attach any files that infringe on the copyright of Nintendo or its partners.
+      options:
+        - label: There are no infringing files attached to this bug report.
+          required: true
