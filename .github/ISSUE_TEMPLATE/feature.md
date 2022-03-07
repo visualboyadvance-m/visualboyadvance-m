@@ -1,13 +1,13 @@
 ---
 name: Feature request
 about: Create a Feature request to suggest improvements and additions.
-title: "[Enhancement]: "
+title: "[Feature request]: "
 labels: "enhancement"
 assignees: ''
 
 ---
 
-### Please inlcude [Feature request] at the beginning of the title
+### Please include [Feature request] at the beginning of the title
 
 ### Feature desired:
 - 
