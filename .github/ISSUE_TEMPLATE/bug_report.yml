@@ -13,6 +13,15 @@ body:
       value: |
             Please try the nightly build from: http://win.vba-m.com/nightly and factory resetting the emulator from the Help menu.
             On Linux build master from source or use the edge snap.
+  - type: markdown
+    attributes:
+      value: "## If your joystick or gamepad isn't working in Linux"      
+  - type: markdown
+    attributes:
+      value: |
+            Please try to troubleshoot using the information on this page:h ttps://wiki.archlinux.org/index.php/Gamepad **BEFORE** filing an issue. 
+            We use SDL for joystick support, any problems will generally be an issue with SDL and **NOT** the emulator.
+            If relevant, the joystick you are using and the drivers you are using for it:          
   - type: textarea
     id: what-should-happen
     attributes:
@@ -103,12 +112,3 @@ body:
       options:
         - label: There are no infringing files attached to this bug report.
           required: true
-  - type: markdown
-    attributes:
-      value: "## If your joystick or gamepad isn't working in Linux"      
-  - type: markdown
-    attributes:
-      value: |
-            Please try to troubleshoot using the information on this page:h ttps://wiki.archlinux.org/index.php/Gamepad **BEFORE** filing an issue. 
-            We use SDL for joystick support, any problems will generally be an issue with SDL and **NOT** the emulator.
-            If relevant, the joystick you are using and the drivers you are using for it:
