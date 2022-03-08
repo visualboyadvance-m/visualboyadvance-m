@@ -2308,7 +2308,7 @@ void GLDrawingPanel::DrawingPanelInit()
             systemScreenMessage(_("Failed to set glXSwapIntervalMESA"));
     }
 #elif defined(__WXMSW__)
-    typedef char* (*wglext)();
+    typedef const char* (*wglext)();
     wglext wglGetExtensionsStringEXT = (wglext)wglGetProcAddress("wglGetExtensionsStringEXT");
     if (wglGetExtensionsStringEXT == NULL) {
         systemScreenMessage(_("No support for wglGetExtensionsStringEXT"));
@@ -2317,7 +2317,7 @@ void GLDrawingPanel::DrawingPanelInit()
         systemScreenMessage(_("No support for WGL_EXT_swap_control"));
     }
 
-    typedef bool (*PFNWGLSWAPINTERVALEXTPROC)(int);
+    typedef BOOL (__stdcall *PFNWGLSWAPINTERVALEXTPROC)(BOOL);
     static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = NULL;
     wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
     if (wglSwapIntervalEXT)

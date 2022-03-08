@@ -787,7 +787,7 @@ elseif(MSVC)
 
         if(CMAKE_BUILD_TYPE STREQUAL Release)
             if(X86_32)
-                add_compiler_flags(${runtime} /Ot /Oy /GF /Gy /Ob3)
+                add_compiler_flags(${runtime} /O2 /Ob3)
             else()
                 add_compiler_flags(${runtime} /O2 /Ob3)
             endif()
