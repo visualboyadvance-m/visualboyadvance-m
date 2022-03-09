@@ -1,0 +1,34 @@
+name: Feature request
+description: If you would like a new feature in Project64 or its default plugins, please open an issue here and fill out the template.
+title: "[Feature request]: "
+labels: ["enhancement"]
+assignees: 
+     - null
+body:
+  - type: textarea
+    id: feature-request
+    attributes:
+      label: Request box
+      description: What feature would you like to see added?
+      placeholder: Tell us what you would like to see added to Visual Boy Advance - M!
+      value: null
+    validations:
+      required: true
+  - type: textarea
+    id: reason-why
+    attributes:
+      label: Reason box
+      description: Provide reasoning for the new feature
+      placeholder: Tell us why you'd like to see this feature added
+      value: null
+    validations:
+      required: true
+  - type: textarea
+    id: Examples
+    attributes:
+      label: Examples
+      description: Provide examples of this feature
+      placeholder: Provide examples or screenshots of this feature in other software
+      value: null
+    validations:
+      required: true
