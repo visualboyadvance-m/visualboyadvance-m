@@ -8,6 +8,7 @@
 # Damián Cabello Jiménez <jdamiancabello@gmail.com>, 2018
 # MELERIX, 2015
 # Ein Striker <ein.striker@gmail.com>, 2017
+# Fran Lopez, 2022
 # javidg96, 2015
 # jorge perez <theghostxxaz@gmail.com>, 2021
 # Jose Castillo <josecastillo.prz85@gmail.com>, 2021
@@ -23,8 +24,8 @@ msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-24 21:24+0000\n"
-"PO-Revision-Date: 2021-11-28 06:41+0000\n"
-"Last-Translator: Alain Richell Rodriguez Blazquez\n"
+"PO-Revision-Date: 2011-12-03 19:42+0000\n"
+"Last-Translator: Fran Lopez, 2022\n"
 "Language-Team: Spanish (http://www.transifex.com/bgk/vba-m/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -85,7 +86,7 @@ msgstr "Error de configuracion/compilacion: no se encuentra el archivo integrado
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr ""
+msgstr "Escrita configuración integrada en %s\nPara anular, elimine todos los nodos raíz excepto los modificados. Primero encuentre el nodo raíz del nombre correcto en cualquier archivo .xrc o .xrs en las siguientes anulaciones de ruta de búsqueda integradas:"
 
 #: wxvbam.cpp:595
 msgid "Configuration is read from, in order:"
@@ -96,13 +97,13 @@ msgstr "La configuracion es leida desde, en orden:"
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
-msgstr ""
+msgstr "Escrita sobreescritura integrada en archivo en %s\nPara anular, elimine todas las secciones menos las modificadas. La primera sección encontrada se usa desde esta ruta de búsqueda:"
 
 #: wxvbam.cpp:615
 msgid ""
 "\n"
 "\tbuilt-in"
-msgstr ""
+msgstr "\n\tIntegrado(a)"
 
 #: wxvbam.cpp:626
 msgid ""
@@ -110,13 +111,13 @@ msgid ""
 "\n"
 "For flag options, true and false are specified as 1 and 0, respectively.\n"
 "\n"
-msgstr ""
+msgstr "Las opciones establecidas desde la línea de comandos se guardan si se realizan cambios de configuración en la interfaz de usuario.\n\nPara las opciones marcadas, verdadero y falso se especifican como 1 y 0, respectivamente.\n\n"
 
 #: wxvbam.cpp:647
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
-msgstr ""
+msgstr "Los comandos disponibles para la opción de Teclado/* son:\n\n"
 
 #: wxvbam.cpp:659
 msgid "Configuration file not found."
@@ -124,7 +125,7 @@ msgstr "Archivo de configuración no encontrado."
 
 #: wxvbam.cpp:692
 msgid "Bad configuration option or multiple ROM files given:\n"
-msgstr ""
+msgstr "Se ha proporcionado una mala configuración o se han recibido múltiples archivos ROM:\n"
 
 #: guiinit.cpp:80
 msgid "Start!"
@@ -136,7 +137,7 @@ msgstr "Conectar"
 
 #: guiinit.cpp:116
 msgid "You must enter a valid host name"
-msgstr ""
+msgstr "Debe introducir un nombre de host válido"
 
 #: guiinit.cpp:117
 msgid "Host name invalid"
@@ -172,7 +173,7 @@ msgstr "Seleccionar archivo de trucos"
 
 #: guiinit.cpp:240
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
-msgstr ""
+msgstr "Lista de trucos de VBA (*.clt)|*.clt|CHT lista de trucos (*.cht)|*.cht"
 
 #: guiinit.cpp:259 panel.cpp:447
 msgid "Loaded cheats"
@@ -180,7 +181,7 @@ msgstr "Trucos cargados"
 
 #: guiinit.cpp:293
 msgid "VBA cheat lists (*.clt)|*.clt"
-msgstr ""
+msgstr "Lista de trucos de VBA (*.clt)|*.clt"
 
 #: guiinit.cpp:311
 msgid "Saved cheats"
@@ -196,11 +197,11 @@ msgstr "Eliminando trucos"
 
 #: guiinit.cpp:753 xrc/JoyPanel.xrc:364
 msgid "GameShark"
-msgstr ""
+msgstr "GameShark"
 
 #: guiinit.cpp:754 cmdevents.cpp:675
 msgid "GameGenie"
-msgstr ""
+msgstr "GameGenie"
 
 #: guiinit.cpp:756
 msgid "Generic Code"
@@ -208,15 +209,15 @@ msgstr "Código Genérico"
 
 #: guiinit.cpp:757
 msgid "GameShark Advance"
-msgstr ""
+msgstr "GameShark Advance"
 
 #: guiinit.cpp:758
 msgid "CodeBreaker Advance"
-msgstr ""
+msgstr "CodeBreaker Advance"
 
 #: guiinit.cpp:759
 msgid "Flashcart CHT"
-msgstr ""
+msgstr "Flashcart CHT"
 
 #: guiinit.cpp:827 guiinit.cpp:1082
 msgid "Number cannot be empty"
@@ -245,20 +246,20 @@ msgstr "32-bit"
 
 #: guiinit.cpp:1054
 msgid "signed decimal"
-msgstr ""
+msgstr "decimal firmado"
 
 #: guiinit.cpp:1058
 msgid "unsigned decimal"
-msgstr ""
+msgstr "decimal no firmado"
 
 #: guiinit.cpp:1062
 msgid "unsigned hexadecimal"
-msgstr ""
+msgstr "hexadecimal no firmado"
 
 #: guiinit.cpp:1540
 #, c-format
 msgid "%d frames = %.2f ms"
-msgstr ""
+msgstr "%d frames = %.2f ms"
 
 #: guiinit.cpp:1552
 msgid "Default device"
@@ -271,7 +272,7 @@ msgstr "Modo escritorio"
 #: guiinit.cpp:1733
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
-msgstr ""
+msgstr "%d x %d - %dbpp @ %dHz"
 
 #: guiinit.cpp:1846 cmdevents.cpp:745 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
@@ -291,7 +292,7 @@ msgstr "Complemento"
 
 #: guiinit.cpp:1935
 msgid "Please select a plugin or a different filter"
-msgstr ""
+msgstr "Por favor, selecciona un plugin o un filtro diferente"
 
 #: guiinit.cpp:1936
 msgid "Plugin selection error"
@@ -320,12 +321,12 @@ msgstr "Panel de visualización principal no encontrado"
 #: guiinit.cpp:2928
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
-msgstr ""
+msgstr "Duplicar el acelerador del menú: %s por %s y %s; quedándose con el primero"
 
 #: guiinit.cpp:2942
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
-msgstr ""
+msgstr "Acelerador del menú %s por %s sobrescribe por defecto a %s ; manteniendo el menú"
 
 #: guiinit.cpp:3081
 #, c-format
@@ -362,7 +363,7 @@ msgstr "Otros comandos"
 
 #: guiinit.cpp:4029
 msgid "JoyBus host invalid; disabling"
-msgstr ""
+msgstr "host de JoyBus invalido; deshabilitando"
 
 #: viewers.cpp:560
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
@@ -376,75 +377,75 @@ msgstr "Seleccionar archivo de salida"
 
 #: viewers.cpp:698 viewers.cpp:770
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
-msgstr ""
+msgstr "Volcados de memoria (*.dmp;*.bin)|*.dmp;*.bin|"
 
 #: viewers.cpp:700
 msgid "Select memory dump file"
-msgstr ""
+msgstr "selecciona el archivo de volcado de memoria"
 
 #: viewers.cpp:814
 msgid "0x00000000 - BIOS"
-msgstr ""
+msgstr "0x00000000 - BIOS"
 
 #: viewers.cpp:815
 msgid "0x02000000 - WRAM"
-msgstr ""
+msgstr "0x02000000 - WRAM"
 
 #: viewers.cpp:816
 msgid "0x03000000 - IRAM"
-msgstr ""
+msgstr "0x03000000 - IRAM"
 
 #: viewers.cpp:817
 msgid "0x04000000 - I/O"
-msgstr ""
+msgstr "0x04000000 - I/O"
 
 #: viewers.cpp:818
 msgid "0x05000000 - PALETTE"
-msgstr ""
+msgstr "0x05000000 - PALETA"
 
 #: viewers.cpp:819
 msgid "0x06000000 - VRAM"
-msgstr ""
+msgstr "0x06000000 - VRAM"
 
 #: viewers.cpp:820
 msgid "0x07000000 - OAM"
-msgstr ""
+msgstr "0x07000000 - OAM"
 
 #: viewers.cpp:821
 msgid "0x08000000 - ROM"
-msgstr ""
+msgstr "0x08000000 - ROM"
 
 #: viewers.cpp:924
 msgid "0x0000 - ROM"
-msgstr ""
+msgstr "0x0000 - ROM"
 
 #: viewers.cpp:925
 msgid "0x4000 - ROM"
-msgstr ""
+msgstr "0x4000 - ROM"
 
 #: viewers.cpp:926
 msgid "0x8000 - VRAM"
-msgstr ""
+msgstr "0x8000 - VRAM"
 
 #: viewers.cpp:927
 msgid "0xA000 - SRAM"
-msgstr ""
+msgstr "0xA000 - SRAM"
 
 #: viewers.cpp:928
 msgid "0xC000 - RAM"
-msgstr ""
+msgstr "0xC000 - RAM"
 
 #: viewers.cpp:929
 msgid "0xD000 - WRAM"
-msgstr ""
+msgstr "0xD000 - WRAM"
 
 #: viewers.cpp:930
 msgid "0xFF00 - I/O"
-msgstr ""
+msgstr "0xFF00 - I/O"
 
 #: viewers.cpp:931
 msgid "0xFF80 - RAM"
-msgstr ""
+msgstr "0xFF80 - RAM"
 
 #: gfxviewers.cpp:1141
 msgid "Select output file and type"
@@ -454,12 +455,12 @@ msgstr "Seleccionar archivo de salida y tipo"
 msgid ""
 "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
 "Table (*.act)|*.act"
-msgstr ""
+msgstr "Paleta de elementos de Windows (*.pal)|*.pal|Paleta de PaintShop (*.pal)|*.pal|Tabla de color de Adobe (*.act)|*.act"
 
 #: gfxviewers.cpp:1601 gfxviewers.cpp:1743 cmdevents.cpp:1158
 #: viewsupt.cpp:1181
 msgid "PNG images|*.png|BMP images|*.bmp"
-msgstr ""
+msgstr "Imágenes PNG|*.png| Imágenes BMP|*.bmp"
 
 #: cmdevents.cpp:104
 msgid ""
@@ -467,7 +468,7 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy"
 " Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Archivos de GameBoy Advance:\n(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|;)\n\nArchivos de GameBoy\n(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|;)"
 
 #: cmdevents.cpp:116
 msgid "Open ROM file"
@@ -477,7 +478,7 @@ msgstr "Abrir archivo ROM"
 msgid ""
 "GameBoy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Archivos de GameBoy\n(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|;)"
 
 #: cmdevents.cpp:140
 msgid "Open GB ROM file"
@@ -487,7 +488,7 @@ msgstr "Abrir archivo GB ROM"
 msgid ""
 "GameBoy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Archivos de GameBoy Color\n(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|;)"
 
 #: cmdevents.cpp:164
 msgid "Open GBC ROM file"
@@ -563,43 +564,43 @@ msgstr "ROM+MBC5+RAM"
 
 #: cmdevents.cpp:655
 msgid "ROM+MBC5+RAM+BATT"
-msgstr ""
+msgstr "ROM+MBC5+RAM+BATT"
 
 #: cmdevents.cpp:659
 msgid "ROM+MBC5+RUMBLE"
-msgstr ""
+msgstr "ROM+MBC5+RUMBLE"
 
 #: cmdevents.cpp:663
 msgid "ROM+MBC5+RUMBLE+RAM"
-msgstr ""
+msgstr "ROM+MBC5+RUMBLE+RAM"
 
 #: cmdevents.cpp:667
 msgid "ROM+MBC5+RUMBLE+RAM+BATT"
-msgstr ""
+msgstr "ROM+MBC5+RUMBLE+RAM+BATT"
 
 #: cmdevents.cpp:671
 msgid "ROM+MBC7+BATT"
-msgstr ""
+msgstr "ROM+MBC7+BATT"
 
 #: cmdevents.cpp:679
 msgid "GameShark V3.0"
-msgstr ""
+msgstr "GameShark V3.0"
 
 #: cmdevents.cpp:683
 msgid "ROM+POCKET CAMERA"
-msgstr ""
+msgstr "ROM+POCKET CAMERA"
 
 #: cmdevents.cpp:687
 msgid "ROM+BANDAI TAMA5"
-msgstr ""
+msgstr "ROM+BANDAI TAMA5"
 
 #: cmdevents.cpp:691
 msgid "ROM+HuC-3"
-msgstr ""
+msgstr "ROM+HuC-3"
 
 #: cmdevents.cpp:695
 msgid "ROM+HuC-1"
-msgstr ""
+msgstr "ROM+HuC-1"
 
 #: cmdevents.cpp:847 cmdevents.cpp:869
 msgid "Select Dot Code file"
@@ -611,26 +612,26 @@ msgstr ""
 
 #: cmdevents.cpp:890 cmdevents.cpp:1085
 msgid "Select battery file"
-msgstr ""
+msgstr "Selecciona un archivo de bateria"
 
 #: cmdevents.cpp:891 cmdevents.cpp:1086
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
-msgstr ""
+msgstr "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 
 #: cmdevents.cpp:899
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
-msgstr ""
+msgstr "La importación de un archivo de batería borrara todos las partidas guardadas (permanentemente después de esta línea de texto). ¿Deseas continuar?"
 
 #: cmdevents.cpp:900 cmdevents.cpp:928 cmdevents.cpp:1048
 msgid "Confirm import"
-msgstr ""
+msgstr "Confirmar importacion"
 
 #: cmdevents.cpp:906 panel.cpp:390
 #, c-format
 msgid "Loaded battery %s"
-msgstr ""
+msgstr "batería cargada %s"
 
 #: cmdevents.cpp:908
 #, c-format
@@ -677,7 +678,7 @@ msgstr "Error al cargar el archivo de código%s"
 
 #: cmdevents.cpp:1037 cmdevents.cpp:1113
 msgid "Select snapshot file"
-msgstr ""
+msgstr "Selecciona el archivo de foto"
 
 #: cmdevents.cpp:1038
 msgid ""
