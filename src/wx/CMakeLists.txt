@@ -159,8 +159,8 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR X86_64))
 
         list(APPEND wxWidgets_LIBRARIES
             ${wxWidgets_LIB_DIR}/jpeg.lib
+            ${wxWidgets_LIB_DIR}/lzma.lib
             ${wxWidgets_LIB_DIR}/tiff${deb_suffix}.lib
-            ${wxWidgets_LIB_DIR}/lzma${deb_suffix}.lib
             ${wxWidgets_LIB_DIR}/libexpat${deb_suffix}MD.lib
             ${png_lib}
         )
