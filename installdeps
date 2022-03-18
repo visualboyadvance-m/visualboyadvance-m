@@ -1230,7 +1230,7 @@ build_instructions() {
 
 $pre_build
 mkdir build && cd build
-$CMAKE .. $cmake_flags -G Ninja
+$CMAKE .. -DCMAKE_BUILD_TYPE=Release $cmake_flags -G Ninja
 ninja
 $post_build
 
