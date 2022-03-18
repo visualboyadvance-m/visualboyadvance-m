@@ -119,7 +119,7 @@ DISTS=$DISTS'
     xorg-macros     https://www.x.org/archive//individual/util/util-macros-1.19.1.tar.bz2                       share/pkgconfig/xorg-macros.pc
     help2man        https://ftp.gnu.org/gnu/help2man/help2man-1.47.5.tar.xz                                     bin/help2man
     libiconv        https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz                                   lib/libiconv.a
-    gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-0.19.8.1.tar.xz                                  lib/libintl.a
+    gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-0.21.tar.xz                                  lib/libintl.a
     getopt          https://fossies.org/linux/misc/getopt-1.1.6.tar.gz                                          bin/getopt
     gsed            http://ftp.gnu.org/gnu/sed/sed-4.4.tar.xz                                                   bin/sed
     bison           https://ftp.gnu.org/gnu/bison/bison-3.0.5.tar.xz                                            bin/bison
