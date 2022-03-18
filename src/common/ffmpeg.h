@@ -20,6 +20,7 @@ extern "C" {
 #define UINT64_C(c) (c ## ULL)
 #endif
 
+#include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/avassert.h>
 #include <libavutil/channel_layout.h>
@@ -90,7 +91,7 @@ class MediaRecorder
         bool isRecording;
         int sampleRate;
         AVFormatContext *oc;
-        AVOutputFormat *fmt;
+        const AVOutputFormat *fmt;
         // pic info
         AVPixelFormat pixfmt;
         int pixsize, linesize;
@@ -98,7 +99,7 @@ class MediaRecorder
         struct SwsContext *sws;
         // stream info
         AVStream *st;
-        AVCodec *vcodec;
+        const AVCodec *vcodec;
         AVCodecContext *enc;
         int64_t npts; // for video frame pts
         AVFrame *frameIn;
@@ -106,7 +107,7 @@ class MediaRecorder
         // audio
         bool audioOnlyRecording;
         struct SwrContext *swr;
-        AVCodec *acodec;
+        const AVCodec *acodec;
         AVStream *ast;
         AVCodecContext *aenc;
         int samplesCount; // for audio frame pts generation
