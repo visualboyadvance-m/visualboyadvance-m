@@ -1168,7 +1168,7 @@ brew_installdeps() {
 
     check brew -v update
 
-    brews="nasm cmake ccache gettext pkg-config sdl2 wxmac ccache ninja"
+    brews="nasm cmake ccache gettext pkg-config sdl2 wxwidgets ccache ninja"
 
     [ -n "$ENABLE_FFMPEG" ] && brews="$brews ffmpeg"
 
@@ -1177,17 +1177,16 @@ brew_installdeps() {
         brews="$brews sfml"
 #    fi
 
-    set --
-    for f in $brews; do
-        if brew info "$f" | grep -Eq '^Not installed$'; then
-            set -- "$@" "$f"
-        fi
-    done
-    [ $# -gt 0 ] && check brew -v install "$@"
+    check brew -v install -f $brews
 
-    brew link gettext --force
+    for brew in gettext wxwidgets ffmpeg; do
+        brew unlink $brew
+        brew link   $brew --force
+    done
 
     brew -v cleanup
+
+    cmake_flags='-DENABLE_FFMPEG=FALSE'
 
     build_instructions
 }
