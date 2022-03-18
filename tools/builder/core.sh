@@ -114,7 +114,7 @@ DISTS=$DISTS'
     m4              http://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.xz                                                  bin/m4
     autoconf        https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz                                       bin/autoconf
     autoconf-archive http://mirror.team-cymru.org/gnu/autoconf-archive/autoconf-archive-2017.09.28.tar.xz       share/aclocal/ax_check_gl.m4
-    automake        https://ftp.gnu.org/gnu/automake/automake-1.15.1.tar.xz                                     bin/automake
+    automake        https://ftp.gnu.org/gnu/automake/automake-1.16.5.tar.xz                                     bin/automake
     libtool         https://ftp.gnu.org/gnu/libtool/libtool-2.4.6.tar.xz                                        bin/libtool
     xorg-macros     https://www.x.org/archive//individual/util/util-macros-1.19.1.tar.bz2                       share/pkgconfig/xorg-macros.pc
     help2man        https://ftp.gnu.org/gnu/help2man/help2man-1.47.5.tar.xz                                     bin/help2man
