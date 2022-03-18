@@ -126,11 +126,6 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR X86_64))
     set(dbg_prefix       ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix}/debug)
     set(installed_prefix ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix}/${path_prefix})
 
-    set(build_prefix_rel ${_VCPKG_ROOT_DIR}/buildtrees/wxwidgets/${WINARCH}-windows${build_suffix_rel})
-    set(build_prefix_dbg ${_VCPKG_ROOT_DIR}/buildtrees/wxwidgets/${WINARCH}-windows${build_suffix_dbg})
-
-    set(build_prefix     ${_VCPKG_ROOT_DIR}/buildtrees/wxwidgets/${WINARCH}-windows${build_suffix})
-
     include_directories(${installed_prefix}/lib/msw${libtype})
     include_directories(${common_prefix}/include)
     set(wxWidgets_LIB_DIR ${installed_prefix}/lib)
