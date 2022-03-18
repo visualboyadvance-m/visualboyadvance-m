@@ -150,15 +150,16 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR X86_64))
             set(deb_suffix d)
         endif()
 
-        file(GLOB png_lib ${wxWidgets_LIB_DIR}/libpng*.lib)
+        foreach(lib_name libpng jpeg lzma tiff libexpat)
+            file(
+                GLOB lib_file
+                ${wxWidgets_LIB_DIR}/${lib_name}*.lib
+            )
 
-        list(APPEND wxWidgets_LIBRARIES
-            ${wxWidgets_LIB_DIR}/jpeg.lib
-            ${wxWidgets_LIB_DIR}/lzma.lib
-            ${wxWidgets_LIB_DIR}/tiff${deb_suffix}.lib
-            ${wxWidgets_LIB_DIR}/libexpat${deb_suffix}MD.lib
-            ${png_lib}
-        )
+            if(lib_file)
+                list(APPEND wxWidgets_LIBRARIES ${lib_file})
+            endif()
+        endforeach()
     endif()
 
     set(WXRC ${common_prefix}/tools/wxwidgets/wxrc.exe)
