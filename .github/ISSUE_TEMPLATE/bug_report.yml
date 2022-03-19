@@ -11,7 +11,7 @@ body:
   - type: markdown
     attributes:
       value: |
-            Please try the nightly build from: http://win.vba-m.com/nightly and factory resetting the emulator from the Help menu.
+            Please try the nightly build from: https://nightly.vba-m.com and factory resetting the emulator from the Help menu.
             On Linux build master from source or use the edge snap.
   - type: markdown
     attributes:
