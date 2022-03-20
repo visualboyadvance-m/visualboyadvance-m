@@ -1186,8 +1186,6 @@ brew_installdeps() {
 
     brew -v cleanup
 
-    cmake_flags='-DENABLE_FFMPEG=FALSE'
-
     build_instructions
 }
 
