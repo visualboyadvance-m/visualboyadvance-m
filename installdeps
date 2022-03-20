@@ -1179,7 +1179,7 @@ brew_installdeps() {
 
     check brew -v install -f $brews
 
-    for brew in gettext wxwidgets ffmpeg; do
+    for brew in gettext wxwidgets; do
         brew unlink $brew
         brew link   $brew --force
     done
