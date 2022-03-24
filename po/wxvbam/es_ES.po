@@ -8,13 +8,14 @@
 # Daniel Carrasco <danielmadrid19@gmail.com>, 2016
 # Jorge Hdez Schez <jorjolo2004@gmail.com>, 2021
 # Sergio . <serchoyt@gmail.com>, 2018
+# XxGamer JavixX, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-24 21:24+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Jorge Hdez Schez <jorjolo2004@gmail.com>, 2021\n"
+"Last-Translator: XxGamer JavixX, 2022\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/bgk/vba-m/language/es_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1656,7 +1657,7 @@ msgstr ""
 
 #: xrc/DisplayConfig.xrc:79
 msgid "Display filter :"
-msgstr ""
+msgstr "Filtros:"
 
 #: xrc/DisplayConfig.xrc:86
 msgid "2xSaI"
@@ -3216,7 +3217,7 @@ msgstr "&Activar trucos"
 
 #: xrc/MainMenu.xrc:603
 msgid "&Break into GDB"
-msgstr ""
+msgstr "Insertar depurador GNU"
 
 #: xrc/MainMenu.xrc:607
 msgid "&Configure port..."
@@ -3484,7 +3485,7 @@ msgstr ""
 
 #: xrc/OAMViewer.xrc:85
 msgid "Rot.:"
-msgstr ""
+msgstr "Rotación:"
 
 #: xrc/PaletteViewer.xrc:4
 msgid "Palette Viewer"
