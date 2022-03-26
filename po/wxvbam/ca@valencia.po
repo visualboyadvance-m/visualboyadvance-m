@@ -52,7 +52,7 @@ msgstr "Elimine primer l'estat de connexió compartit, si existix"
 
 #: wxvbam.cpp:536
 msgid "List all settable options and exit"
-msgstr ""
+msgstr "Llistar totes les opcions configurables i eixir"
 
 #: wxvbam.cpp:539
 msgid "ROM file"

@@ -4,7 +4,7 @@
 # 
 # Translators:
 # Maharishi Aguirre, 2021
-# Nguyen Tri Dung <gt451853@gmail.com>, 2021
+# Nguyễn Trí Dũng <gt451853@gmail.com>, 2021
 # XxGamer JavixX, 2022
 msgid ""
 msgstr ""

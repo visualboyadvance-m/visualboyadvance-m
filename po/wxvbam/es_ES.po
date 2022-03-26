@@ -1106,12 +1106,12 @@ msgstr ""
 #: panel.cpp:2517
 #, c-format
 msgid "Error in audio recording (%s); aborting"
-msgstr ""
+msgstr "Error en la grabación de audio (%s); abortando"
 
 #: panel.cpp:2527
 #, c-format
 msgid "Error in video recording (%s); aborting"
-msgstr ""
+msgstr "Error en la grabación de video (%s); abortando"
 
 #: viewsupt.cpp:776
 msgid "R:"
@@ -1172,12 +1172,12 @@ msgstr "CONTROL"
 #: widgets/sdljoy.cpp:137
 #, c-format
 msgid "Connected joystick %d: %s"
-msgstr ""
+msgstr "Joystick Conectado %d: %s"
 
 #: widgets/sdljoy.cpp:152
 #, c-format
 msgid "Disconnected joystick %d"
-msgstr ""
+msgstr "Joystick Desconectado %d"
 
 #: xaudio2.cpp:34
 msgid "XAudio2: Enumerating devices failed!"
@@ -2172,7 +2172,7 @@ msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:21
 msgid "Save type :"
-msgstr ""
+msgstr "Tipo de guardado:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
 #: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
@@ -2217,7 +2217,7 @@ msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:77
 msgid "Save type"
-msgstr ""
+msgstr "Tipo de guardado:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file :"
@@ -2264,7 +2264,7 @@ msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:190
 msgid "Save Type:"
-msgstr ""
+msgstr "Tipo de Guardado:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:203
 msgid "EEPROM+Sensor"
@@ -2804,7 +2804,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:147
 msgid "&Save state"
-msgstr ""
+msgstr "&Guardar el estado"
 
 #: xrc/MainMenu.xrc:150
 msgid "Increase state slot number"
