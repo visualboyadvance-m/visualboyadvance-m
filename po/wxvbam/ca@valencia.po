@@ -71,18 +71,18 @@ msgstr ""
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr ""
+msgstr "Va escriure la configuració integrada en %s.\nPer a anul·lar, elimine tots els node(s) arrel excepte els modificats. Primer troba el node arrel del nom correcte en qualsevol arxiu .xrc o .xrs en les següents anul·lacions de ruta de busca incorporades:"
 
 #: wxvbam.cpp:595
 msgid "Configuration is read from, in order:"
-msgstr ""
+msgstr "La configuració es llig, en orde:"
 
 #: wxvbam.cpp:609
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
-msgstr ""
+msgstr "Va escriure l'arxiu d'anul·lació incorporat para %s\nPer a anul·lar, elimine totes les seccions menys les modificades. La primera secció trobada s'usa des de la ruta de busca:"
 
 #: wxvbam.cpp:615
 msgid ""
@@ -96,7 +96,7 @@ msgid ""
 "\n"
 "For flag options, true and false are specified as 1 and 0, respectively.\n"
 "\n"
-msgstr ""
+msgstr "Les opcions establides des de la línia de comandos es guarden si es realitzen canvis de configuració en la interfície d'usuari.\n\nPer a les opcions de marca, verdader i fals s'especifiquen com 1 i 0, respectivament.\n\n"
 
 #: wxvbam.cpp:647
 msgid ""
@@ -170,7 +170,7 @@ msgstr ""
 
 #: guiinit.cpp:311
 msgid "Saved cheats"
-msgstr ""
+msgstr "Guardar trucs"
 
 #: guiinit.cpp:342 guiinit.cpp:361
 msgid "Restore old values?"
@@ -190,7 +190,7 @@ msgstr "GameGenie"
 
 #: guiinit.cpp:756
 msgid "Generic Code"
-msgstr ""
+msgstr "Codi Genèric"
 
 #: guiinit.cpp:757
 msgid "GameShark Advance"
@@ -198,7 +198,7 @@ msgstr "GameShark Advance"
 
 #: guiinit.cpp:758
 msgid "CodeBreaker Advance"
-msgstr ""
+msgstr "\"CodeBreaker\" Avançat"
 
 #: guiinit.cpp:759
 msgid "Flashcart CHT"
@@ -320,7 +320,7 @@ msgstr ""
 
 #: guiinit.cpp:3289
 msgid "Code"
-msgstr ""
+msgstr "Codi"
 
 #: guiinit.cpp:3298
 msgid "Description"
@@ -589,11 +589,11 @@ msgstr "ROM+HuC-1"
 
 #: cmdevents.cpp:847 cmdevents.cpp:869
 msgid "Select Dot Code file"
-msgstr ""
+msgstr "Seleccione \"Arxiu Dot Code\""
 
 #: cmdevents.cpp:849 cmdevents.cpp:871
 msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr ""
+msgstr "\"e-Reader\" \"Dot Code\" (*.bin;*.raw)|*.bin;*.raw"
 
 #: cmdevents.cpp:890 cmdevents.cpp:1085
 msgid "Select battery file"
@@ -601,13 +601,13 @@ msgstr ""
 
 #: cmdevents.cpp:891 cmdevents.cpp:1086
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
-msgstr ""
+msgstr "Arxiu bateria (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 
 #: cmdevents.cpp:899
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
-msgstr ""
+msgstr "Importar un arxiu de bateria esborrarà tots els jocs guardats (permanentment després de la pròxima escriptura). Vols continuar?"
 
 #: cmdevents.cpp:900 cmdevents.cpp:928 cmdevents.cpp:1048
 msgid "Confirm import"
@@ -625,21 +625,21 @@ msgstr ""
 
 #: cmdevents.cpp:917
 msgid "Select code file"
-msgstr ""
+msgstr "Seleccione arxiu de codi"
 
 #: cmdevents.cpp:918
 msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
-msgstr ""
+msgstr "Arxiu de Codi Gameshark (*.spc;*.xpc)|*.spc;*.xpc"
 
 #: cmdevents.cpp:918
 msgid "Gameshark Code File (*.gcf)|*.gcf"
-msgstr ""
+msgstr "Arxiu de Codi Gameshark (*.gcf)|*.gcf"
 
 #: cmdevents.cpp:927
 msgid ""
 "Importing a code file will replace any loaded cheats.  Do you want to "
 "continue?"
-msgstr ""
+msgstr "La importació d'un arxiu de codi reemplaçarà qualsevol truc carregat. Vols continuar?"
 
 #: cmdevents.cpp:944
 #, c-format
@@ -649,17 +649,17 @@ msgstr ""
 #: cmdevents.cpp:954
 #, c-format
 msgid "Unsupported code file %s"
-msgstr ""
+msgstr "arxiu de codi incompatible %s"
 
 #: cmdevents.cpp:1024
 #, c-format
 msgid "Loaded code file %s"
-msgstr ""
+msgstr "Arxiu de codi carregat %s"
 
 #: cmdevents.cpp:1026
 #, c-format
 msgid "Error loading code file %s"
-msgstr ""
+msgstr "Error al carregar l'arxiu de codi %s"
 
 #: cmdevents.cpp:1037 cmdevents.cpp:1113
 msgid "Select snapshot file"
@@ -679,7 +679,7 @@ msgstr ""
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
-msgstr ""
+msgstr "La importació d'un arxiu d'instantània esborrarà tots els jocs guardats (permanentment després de la pròxima escriptura). Vols continuar?"
 
 #: cmdevents.cpp:1072
 #, c-format
@@ -716,7 +716,7 @@ msgstr ""
 #: cmdevents.cpp:1140
 #, c-format
 msgid "Saved snapshot file %s"
-msgstr ""
+msgstr "Archivo de instantánea guardado %s"
 
 #: cmdevents.cpp:1142
 #, c-format
@@ -746,7 +746,7 @@ msgstr ""
 
 #: cmdevents.cpp:1669 cmdevents.cpp:1762
 msgid "VisualBoyAdvance saved game files|*.sgm"
-msgstr ""
+msgstr "Guardar arxius de joc VisualBoyAdvance | *.sgm"
 
 #: cmdevents.cpp:1792 cmdevents.cpp:1802 cmdevents.cpp:1813
 #, c-format
@@ -924,7 +924,7 @@ msgstr ""
 
 #: sys.cpp:810
 msgid "Save printer image to"
-msgstr ""
+msgstr "Guardar imatge d'impressora en"
 
 #: sys.cpp:824 sys.cpp:1007
 #, c-format
@@ -996,7 +996,7 @@ msgstr ""
 #: panel.cpp:671
 #, c-format
 msgid "Saved state %s"
-msgstr ""
+msgstr "Guardar estat %s"
 
 #: panel.cpp:671
 #, c-format
@@ -1074,7 +1074,7 @@ msgstr ""
 
 #: panel.cpp:2431
 msgid "error initializing codec"
-msgstr ""
+msgstr "error a l'inicialitzar el códec"
 
 #: panel.cpp:2434
 msgid "error writing to output file"
@@ -1110,27 +1110,27 @@ msgstr ""
 
 #: viewsupt.cpp:776
 msgid "R:"
-msgstr ""
+msgstr "R:"
 
 #: viewsupt.cpp:785
 msgid "G:"
-msgstr ""
+msgstr "G:"
 
 #: viewsupt.cpp:794
 msgid "B:"
-msgstr ""
+msgstr "B:"
 
 #: widgets/keyedit.cpp:122 widgets/keyedit.cpp:280
 msgid "SHIFT"
-msgstr ""
+msgstr "SHIFT"
 
 #: widgets/keyedit.cpp:126 widgets/keyedit.cpp:279
 msgid "ALT"
-msgstr ""
+msgstr "ALT"
 
 #: widgets/keyedit.cpp:130 widgets/keyedit.cpp:287
 msgid "CTRL"
-msgstr ""
+msgstr "CTRL"
 
 #: widgets/keyedit.cpp:136 widgets/keyedit.cpp:281
 msgid "RAWCTRL"
@@ -1142,7 +1142,7 @@ msgstr ""
 
 #: widgets/keyedit.cpp:155 widgets/keyedit.cpp:156
 msgid "Num"
-msgstr ""
+msgstr "Num"
 
 #: widgets/keyedit.cpp:249
 msgid "Meta+"
@@ -1420,7 +1420,7 @@ msgstr ""
 
 #: xrc/CheatList.xrc:15
 msgid "Save cheat list"
-msgstr ""
+msgstr "Guardar llista de trucs"
 
 #: xrc/CheatList.xrc:20
 msgid "Add new cheat"
@@ -1456,11 +1456,11 @@ msgstr "ROMs Game Boy Color"
 
 #: xrc/DirectoriesConfig.xrc:57 xrc/DirectoriesConfig.xrc:64
 msgid "Native Saves"
-msgstr ""
+msgstr "Guardats natius"
 
 #: xrc/DirectoriesConfig.xrc:72 xrc/DirectoriesConfig.xrc:79
 msgid "Emulator Saves"
-msgstr ""
+msgstr "Guardats de l'emulador"
 
 #: xrc/DirectoriesConfig.xrc:87 xrc/DirectoriesConfig.xrc:94
 msgid "Screenshots"
@@ -1844,11 +1844,11 @@ msgstr "CRC32:"
 
 #: xrc/GBAROMInfo.xrc:71
 msgid "Game code:"
-msgstr ""
+msgstr "Codi de joc:"
 
 #: xrc/GBAROMInfo.xrc:83 xrc/GBROMInfo.xrc:24
 msgid "Maker code:"
-msgstr ""
+msgstr "Codi del fabricant:"
 
 #: xrc/GBAROMInfo.xrc:95 xrc/GBROMInfo.xrc:36
 msgid "Maker name:"
@@ -1856,7 +1856,7 @@ msgstr ""
 
 #: xrc/GBAROMInfo.xrc:107
 msgid "Main unit code:"
-msgstr ""
+msgstr "Principal unitat de codi:"
 
 #: xrc/GBAROMInfo.xrc:119
 msgid "Device type:"
@@ -2111,7 +2111,7 @@ msgstr ""
 
 #: xrc/GBROMInfo.xrc:48
 msgid "Unit code:"
-msgstr ""
+msgstr "Unitat de codi:"
 
 #: xrc/GBROMInfo.xrc:60
 msgid "Cartridge type:"
@@ -2212,7 +2212,7 @@ msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:77
 msgid "Save type"
-msgstr ""
+msgstr "Guardar tipus"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file :"
@@ -2233,7 +2233,7 @@ msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:146
 msgid "Game Code"
-msgstr ""
+msgstr "Codi de joc"
 
 #: xrc/GameBoyAdvanceConfig.xrc:160
 msgid "Comment"
@@ -2259,7 +2259,7 @@ msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:190
 msgid "Save Type:"
-msgstr ""
+msgstr "Guardar tipus:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:203
 msgid "EEPROM+Sensor"
@@ -2408,7 +2408,7 @@ msgstr ""
 
 #: xrc/IOViewer.xrc:4
 msgid "IO Viewer"
-msgstr ""
+msgstr "Visualitzador IO "
 
 #: xrc/IOViewer.xrc:10
 msgid "a"
@@ -2699,23 +2699,23 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:30
 msgid "&e-Reader"
-msgstr ""
+msgstr "&e-Reader"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
-msgstr ""
+msgstr "&Restablir codi de punt de càrrega"
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
-msgstr ""
+msgstr "&Codi de punts cargado..."
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr ""
+msgstr "&Restablir codi de punt de guardat"
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
-msgstr ""
+msgstr "&Guardar codi de punto..."
 
 #: xrc/MainMenu.xrc:47
 msgid "Most &recent"
@@ -2771,7 +2771,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
-msgstr ""
+msgstr "&No canvie el guardat de bateria"
 
 #: xrc/MainMenu.xrc:97
 msgid "Do not change &cheat list"
@@ -2787,11 +2787,11 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:107
 msgid "Save current state slot"
-msgstr ""
+msgstr "Guardar ranura d'estat actual"
 
 #: xrc/MainMenu.xrc:110
 msgid "Increase state slot number and save"
-msgstr ""
+msgstr "Augmente el número de ranura de l'estat i estalvie"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File ..."
@@ -2799,7 +2799,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:147
 msgid "&Save state"
-msgstr ""
+msgstr "&Guardar estat"
 
 #: xrc/MainMenu.xrc:150
 msgid "Increase state slot number"
@@ -2815,7 +2815,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:161
 msgid "Gameshark &code file..."
-msgstr ""
+msgstr "&Arxiu de codi Gameshark..."
 
 #: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
 msgid "&Gameshark snapshot..."
@@ -3156,7 +3156,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:551
 msgid "&Save printouts as screen captures"
-msgstr ""
+msgstr "&Guardar impressions com a captures de pantalla"
 
 #: xrc/MainMenu.xrc:556
 msgid "&Use GB BIOS file (requires restart)"
@@ -3204,7 +3204,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:592
 msgid "A&utomatically save/load cheats"
-msgstr ""
+msgstr "Guardar/cargar trucs automàticament"
 
 #: xrc/MainMenu.xrc:596
 msgid "&Enable cheats"

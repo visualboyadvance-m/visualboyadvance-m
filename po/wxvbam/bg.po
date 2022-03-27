@@ -721,105 +721,105 @@ msgstr "Запазен файл снимка %s"
 #: cmdevents.cpp:1142
 #, c-format
 msgid "Error saving snapshot file %s"
-msgstr ""
+msgstr "Грешка при запазване на файл снимка %s"
 
 #: cmdevents.cpp:1182 sys.cpp:449
 #, c-format
 msgid "Wrote snapshot %s"
-msgstr ""
+msgstr "Записана снимка %s"
 
 #: cmdevents.cpp:1203 cmdevents.cpp:1273
 msgid " files ("
-msgstr ""
+msgstr " файлове ("
 
 #: cmdevents.cpp:1333 cmdevents.cpp:1354
 msgid "VBA Movie files|*.vmv"
-msgstr ""
+msgstr "VBA файлове филми|*.vmv"
 
 #: cmdevents.cpp:1353
 msgid "Select file"
-msgstr ""
+msgstr "Избери файл"
 
 #: cmdevents.cpp:1668 cmdevents.cpp:1761
 msgid "Select state file"
-msgstr ""
+msgstr "Избери файл състояние"
 
 #: cmdevents.cpp:1669 cmdevents.cpp:1762
 msgid "VisualBoyAdvance saved game files|*.sgm"
-msgstr ""
+msgstr "VisualBoyAdvance файлове за запазени игри|*.sgm"
 
 #: cmdevents.cpp:1792 cmdevents.cpp:1802 cmdevents.cpp:1813
 #, c-format
 msgid "Current state slot #%d"
-msgstr ""
+msgstr "Текущ слот за състояние #%d"
 
 #: cmdevents.cpp:1883
 msgid "Cannot use Colorizer Hack when GB BIOS File is enabled."
-msgstr ""
+msgstr "Не може да се използва Colorizer Hack, когато GB BIOS файл е разрешен."
 
 #: cmdevents.cpp:2098
 msgid "Sound enabled"
-msgstr ""
+msgstr "Звук разрешен"
 
 #: cmdevents.cpp:2098
 msgid "Sound disabled"
-msgstr ""
+msgstr "Звук забранен"
 
 #: cmdevents.cpp:2111 cmdevents.cpp:2125
 #, c-format
 msgid "Volume: %d%%"
-msgstr ""
+msgstr "Гръмкост: %d%%"
 
 #: cmdevents.cpp:2200
 msgid "Set to 0 for pseudo tty"
-msgstr ""
+msgstr "Задай към 0 за псевдо tty"
 
 #: cmdevents.cpp:2202
 msgid "Port to wait for connection:"
-msgstr ""
+msgstr "Порт за изчакване за връзка:"
 
 #: cmdevents.cpp:2203
 msgid "GDB Connection"
-msgstr ""
+msgstr "GDB връзка"
 
 #: cmdevents.cpp:2256
 #, c-format
 msgid "Waiting for connection at %s"
-msgstr ""
+msgstr "Чакане за връзка при %s"
 
 #: cmdevents.cpp:2263
 #, c-format
 msgid "Waiting for connection on port %d"
-msgstr ""
+msgstr "Чакане за връзка на порт %d"
 
 #: cmdevents.cpp:2266
 msgid "Waiting for GDB..."
-msgstr ""
+msgstr "Чакане за GDB..."
 
 #: cmdevents.cpp:2681
 #, c-format
 msgid "Using pixel filter #%d"
-msgstr ""
+msgstr "Използва се пиксел филтър #%d"
 
 #: cmdevents.cpp:2696
 #, c-format
 msgid "Using interframe blending #%d"
-msgstr ""
+msgstr "Използва се междукадрово смесване #%d"
 
 #: cmdevents.cpp:2735 panel.cpp:192 panel.cpp:306
 msgid "Could not initialize the sound driver!"
-msgstr ""
+msgstr "Не можа да се инициализира звуковият драйвер!"
 
 #: cmdevents.cpp:2839
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
-msgstr ""
+msgstr "Nintendo GameBoy (+Color+Advance) емулатор."
 
 #: cmdevents.cpp:2840
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr ""
+msgstr "Авторско право (C) 1999-2003 Forgotten\nАвторско право (C) 2004-2006 VBA development team\nАвторско право (C) 2007-2020 VBA-M development team"
 
 #: cmdevents.cpp:2841
 msgid ""
@@ -835,553 +835,553 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program.  If not, see http://www.gnu.org/licenses ."
-msgstr ""
+msgstr "Тази програма е свободен софтуер: вие можете да я преразпределяте и/или модифицирате\nпод условията на Общият публичен лиценз на GNU, публикувани от\nФондацията за свободен софтуер, или версия 2 на Лиценза, или\n(по ваш избор) всякаква следваща версия.\n\nТази програма се разпределя с надеждата, че ще бъде полезна,\nно БЕЗ ВСЯКАКВА ГАРАНЦИЯ; без дори подразбиращата се гаранция на\nТЪРГОВОСТ или ПРИГОДНОСТ ЗА КОНКРЕТНА ЦЕЛ. Вижте\nОбщият публичен лиценз на GNU за повече подробности.\n\nВие би трябвало да сте получили копие на Общият публичен лиценз на GNU\nзаедно с тази програма. Ако не, вижте http://www.gnu.org/licenses ."
 
 #: cmdevents.cpp:3101
 msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
-msgstr ""
+msgstr "Не може да се използва GB BIOS, когато Colorizer Hack е разрешен."
 
 #: cmdevents.cpp:3161
 msgid "LAN link is already active.  Disable link mode to disconnect."
-msgstr ""
+msgstr "LAN връзка е вече активен. Забранете режим връзка да прекъснете връзката."
 
 #: cmdevents.cpp:3167
 msgid "Network is not supported in local mode."
-msgstr ""
+msgstr "Мрежа не се поддържа в локален режим."
 
 #: opts.cpp:566 opts.cpp:869
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
-msgstr ""
+msgstr "Невалидна стойност %s за опция %s; валидни стойности са %s%s%s"
 
 #: opts.cpp:583 opts.cpp:881
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
-msgstr ""
+msgstr "Невалидна стойност %d за опция %s; валидни стойности са %d - %d"
 
 #: opts.cpp:590 opts.cpp:599 opts.cpp:889 opts.cpp:897
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
-msgstr ""
+msgstr "Невалидна стойност %f за опция %s; валидни стойности са %f - %f"
 
 #: opts.cpp:659 opts.cpp:680 opts.cpp:965 opts.cpp:991
 #, c-format
 msgid "Invalid key binding %s for %s"
-msgstr ""
+msgstr "Невалидно подвързване на клавиш %s за %s"
 
 #: opts.cpp:852
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
-msgstr ""
+msgstr "Невалидна флаг опция %s - %s пренебрегната"
 
 #: sys.cpp:124 sys.cpp:180
 msgid "No game in progress to record"
-msgstr ""
+msgstr "Няма игра в напредък за запис"
 
 #: sys.cpp:137
 #, c-format
 msgid "Cannot open output file %s"
-msgstr ""
+msgstr "Не може да се отвори изходен файл %s"
 
 #: sys.cpp:144 sys.cpp:164 sys.cpp:310
 msgid "Error writing game recording"
-msgstr ""
+msgstr "Грешка при записване на запис на игра"
 
 #: sys.cpp:185
 msgid "Cannot play game recording while recording"
-msgstr ""
+msgstr "Не може да се възпроизвежда запис на игра, докато се записва"
 
 #: sys.cpp:198
 #, c-format
 msgid "Cannot open recording file %s"
-msgstr ""
+msgstr "Не може да се отвори файл за запис %s"
 
 #: sys.cpp:205 sys.cpp:215
 msgid "Error reading game recording"
-msgstr ""
+msgstr "Грешка при четене на запис на игра"
 
 #: sys.cpp:321
 msgid "Playback ended"
-msgstr ""
+msgstr "Възпроизвеждане приключи"
 
 #: sys.cpp:340
 #, c-format
 msgid "%d%%(%d, %d fps)"
-msgstr ""
+msgstr "%d%%(%d, %d кзс)"
 
 #: sys.cpp:348
 #, c-format
 msgid "%d%%"
-msgstr ""
+msgstr "%d%%"
 
 #: sys.cpp:767 xrc/GBPrinter.xrc:65
 msgid "&Discard"
-msgstr ""
+msgstr "&Отхвърли"
 
 #: sys.cpp:801
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
-msgstr ""
+msgstr "Файлове на образи (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
 #: sys.cpp:810
 msgid "Save printer image to"
-msgstr ""
+msgstr "Запази образ на принтер към"
 
 #: sys.cpp:824 sys.cpp:1007
 #, c-format
 msgid "Wrote printer output to %s"
-msgstr ""
+msgstr "Записан изход на принтер към %s"
 
 #: sys.cpp:829 sys.cpp:900
 msgid "&Close"
-msgstr ""
+msgstr "&Затвори"
 
 #: sys.cpp:895
 msgid "Printed"
-msgstr ""
+msgstr "Отпечатан"
 
 #: sys.cpp:1197
 #, c-format
 msgid "Error opening pseudo tty: %s"
-msgstr ""
+msgstr "Грешка при отваряне на псевдо tty: %s"
 
 #: sys.cpp:1296
 #, c-format
 msgid "Error setting up server socket (%d)"
-msgstr ""
+msgstr "Грешка при настройване на сървърно гнездо (%d)"
 
 #: panel.cpp:106
 #, c-format
 msgid "%s is not a valid ROM file"
-msgstr ""
+msgstr "%s не е валиден ROM файл"
 
 #: panel.cpp:107 panel.cpp:168 panel.cpp:244
 msgid "Problem loading file"
-msgstr ""
+msgstr "Проблем при зареждане на файл"
 
 #: panel.cpp:167
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
-msgstr ""
+msgstr "Не може да се зареди Game Boy ROM %s"
 
 #: panel.cpp:204
 msgid ""
 "Cannot use GB BIOS file when Colorizer Hack is enabled, disabling GB BIOS "
 "file."
-msgstr ""
+msgstr "Не може да се използва GB BIOS, когато Colorizer Hack е разрешен, забранява се GB BIOS файл."
 
 #: panel.cpp:220 panel.cpp:320
 #, c-format
 msgid "Could not load BIOS %s"
-msgstr ""
+msgstr "Не можа да се зареди BIOS %s"
 
 #: panel.cpp:243
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
-msgstr ""
+msgstr "Не може да се зареди Game Boy Advance ROM %s"
 
 #: panel.cpp:479
 msgid " player "
-msgstr ""
+msgstr " играч "
 
 #: panel.cpp:647
 #, c-format
 msgid "Loaded state %s"
-msgstr ""
+msgstr "Заредено състояние %s"
 
 #: panel.cpp:647
 #, c-format
 msgid "Error loading state %s"
-msgstr ""
+msgstr "Грешка при зареждане на състояние %s"
 
 #: panel.cpp:671
 #, c-format
 msgid "Saved state %s"
-msgstr ""
+msgstr "Запазено състояние %s"
 
 #: panel.cpp:671
 #, c-format
 msgid "Error saving state %s"
-msgstr ""
+msgstr "Грешка при запазване на състояние %s"
 
 #: panel.cpp:875
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
-msgstr ""
+msgstr "Режим на цял екран %dx%d-%d@%d не се поддържа; търсене за друг"
 
 #: panel.cpp:913
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
-msgstr ""
+msgstr "Режим на цял екран %dx%d-%d@%d не се поддържа"
 
 #: panel.cpp:918
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
-msgstr ""
+msgstr "Валиден режим: %dx%d-%d@%d"
 
 #: panel.cpp:926
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
-msgstr ""
+msgstr "Избран режим %dx%d-%d@%d"
 
 #: panel.cpp:930
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
-msgstr ""
+msgstr "Неуспешна смяна на режим към %dx%d-%d@%d"
 
 #: panel.cpp:1018
 msgid "Not a valid GBA cartridge"
-msgstr ""
+msgstr "Не е валидна GBA касета"
 
 #: panel.cpp:1182
 msgid "No memory for rewinding"
-msgstr ""
+msgstr "Няма памет за пренавиване"
 
 #: panel.cpp:1192
 msgid "Error writing rewind state"
-msgstr ""
+msgstr "Грешка при записване на състояние за пренавиване"
 
 #: panel.cpp:2290
 msgid "Failed to set glXSwapIntervalEXT"
-msgstr ""
+msgstr "Неуспешно задаване на glXSwapIntervalEXT"
 
 #: panel.cpp:2299
 msgid "Failed to set glXSwapIntervalSGI"
-msgstr ""
+msgstr "Неуспешно задаване на glXSwapIntervalSGI"
 
 #: panel.cpp:2308
 msgid "Failed to set glXSwapIntervalMESA"
-msgstr ""
+msgstr "Неуспешно задаване на glXSwapIntervalMESA"
 
 #: panel.cpp:2314
 msgid "No support for wglGetExtensionsStringEXT"
-msgstr ""
+msgstr "Няма поддръжка за wglGetExtensionsStringEXT"
 
 #: panel.cpp:2317
 msgid "No support for WGL_EXT_swap_control"
-msgstr ""
+msgstr "Няма поддръжка за WGL_EXT_swap_control"
 
 #: panel.cpp:2326
 msgid "Failed to set wglSwapIntervalEXT"
-msgstr ""
+msgstr "Неуспешно задаване на wglSwapIntervalEXT"
 
 #: panel.cpp:2332
 msgid "No VSYNC available on this platform"
-msgstr ""
+msgstr "Не е наличен VSYNC на тази платформа"
 
 #: panel.cpp:2428
 msgid "memory allocation error"
-msgstr ""
+msgstr "грешка при заделяне на памет"
 
 #: panel.cpp:2431
 msgid "error initializing codec"
-msgstr ""
+msgstr "грешка при инициализиране на кодек"
 
 #: panel.cpp:2434
 msgid "error writing to output file"
-msgstr ""
+msgstr "грешка при запис на изходен файл"
 
 #: panel.cpp:2437
 msgid "can't guess output format from file name"
-msgstr ""
+msgstr "не може да се познае изходен формат от файлово име"
 
 #: panel.cpp:2442
 msgid "programming error; aborting!"
-msgstr ""
+msgstr "програмна грешка; прекратяване!"
 
 #: panel.cpp:2454 panel.cpp:2483
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
-msgstr ""
+msgstr "Не може да се започне записване към %s (%s)"
 
 #: panel.cpp:2511
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
-msgstr ""
+msgstr "Грешка в/ъв аудио/видео записване (%s); прекратяване"
 
 #: panel.cpp:2517
 #, c-format
 msgid "Error in audio recording (%s); aborting"
-msgstr ""
+msgstr "Грешка в аудио записване (%s); прекратяване"
 
 #: panel.cpp:2527
 #, c-format
 msgid "Error in video recording (%s); aborting"
-msgstr ""
+msgstr "Грешка във видео записване (%s); прекратяване"
 
 #: viewsupt.cpp:776
 msgid "R:"
-msgstr ""
+msgstr "Ч:"
 
 #: viewsupt.cpp:785
 msgid "G:"
-msgstr ""
+msgstr "З:"
 
 #: viewsupt.cpp:794
 msgid "B:"
-msgstr ""
+msgstr "С:"
 
 #: widgets/keyedit.cpp:122 widgets/keyedit.cpp:280
 msgid "SHIFT"
-msgstr ""
+msgstr "SHIFT"
 
 #: widgets/keyedit.cpp:126 widgets/keyedit.cpp:279
 msgid "ALT"
-msgstr ""
+msgstr "ALT"
 
 #: widgets/keyedit.cpp:130 widgets/keyedit.cpp:287
 msgid "CTRL"
-msgstr ""
+msgstr "CTRL"
 
 #: widgets/keyedit.cpp:136 widgets/keyedit.cpp:281
 msgid "RAWCTRL"
-msgstr ""
+msgstr "RAWCTRL"
 
 #: widgets/keyedit.cpp:150 widgets/keyedit.cpp:248
 msgid "Meta-"
-msgstr ""
+msgstr "Meta-"
 
 #: widgets/keyedit.cpp:155 widgets/keyedit.cpp:156
 msgid "Num"
-msgstr ""
+msgstr "Num"
 
 #: widgets/keyedit.cpp:249
 msgid "Meta+"
-msgstr ""
+msgstr "Meta+"
 
 #: widgets/keyedit.cpp:282
 msgid "RAW_CTRL"
-msgstr ""
+msgstr "RAW_CTRL"
 
 #: widgets/keyedit.cpp:283
 msgid "RAWCONTROL"
-msgstr ""
+msgstr "RAWCONTROL"
 
 #: widgets/keyedit.cpp:284
 msgid "RAW_CONTROL"
-msgstr ""
+msgstr "RAW_CONTROL"
 
 #: widgets/keyedit.cpp:288
 msgid "CONTROL"
-msgstr ""
+msgstr "CONTROL"
 
 #: widgets/sdljoy.cpp:137
 #, c-format
 msgid "Connected joystick %d: %s"
-msgstr ""
+msgstr "Свързан джойстик %d: %s"
 
 #: widgets/sdljoy.cpp:152
 #, c-format
 msgid "Disconnected joystick %d"
-msgstr ""
+msgstr "Изключен джойстик %d"
 
 #: xaudio2.cpp:34
 msgid "XAudio2: Enumerating devices failed!"
-msgstr ""
+msgstr "XAudio2: Изброяване на устройствата неуспешно!"
 
 #: xaudio2.cpp:68 xaudio2.cpp:352
 msgid "The XAudio2 interface failed to initialize!"
-msgstr ""
+msgstr "XAudio2 интерфейсът не успя да се инициализира!"
 
 #: xaudio2.cpp:383
 msgid "XAudio2: Creating mastering voice failed!"
-msgstr ""
+msgstr "XAudio2: Създаване на мастъринг глас неуспешно!"
 
 #: xaudio2.cpp:392
 msgid "XAudio2: Creating source voice failed!"
-msgstr ""
+msgstr "XAudio2: Създаване на глас източник неуспешно!"
 
 #: faudio.cpp:31
 msgid "FAudio: Enumerating devices failed!"
-msgstr ""
+msgstr "FAudio: Изброяване на устройствата неуспешно!"
 
 #: faudio.cpp:66 faudio.cpp:351
 msgid "The FAudio interface failed to initialize!"
-msgstr ""
+msgstr "FAudio интерфейсът не успя да се инициализира!"
 
 #: faudio.cpp:383
 msgid "FAudio: Creating mastering voice failed!"
-msgstr ""
+msgstr "FAudio: Създаване на мастъринг глас неуспешно!"
 
 #: faudio.cpp:394
 msgid "FAudio: Creating source voice failed!"
-msgstr ""
+msgstr "FAudio: Създаване на глас източник неуспешно!"
 
 #: dsound.cpp:89 dsound.cpp:103
 #, c-format
 msgid "Cannot create DirectSound %08x"
-msgstr ""
+msgstr "Не може да се създаде DirectSound %08x"
 
 #: dsound.cpp:108
 #, c-format
 msgid "Cannot SetCooperativeLevel %08x"
-msgstr ""
+msgstr "Не може да се зададе кооперативно ниво %08x"
 
 #: dsound.cpp:122
 #, c-format
 msgid "Cannot CreateSoundBuffer %08x"
-msgstr ""
+msgstr "Не може да се създаде звуков буфер %08x"
 
 #: dsound.cpp:141
 #, c-format
 msgid "CreateSoundBuffer(primary) failed %08x"
-msgstr ""
+msgstr "CreateSoundBuffer(първичен) неуспешно %08x"
 
 #: dsound.cpp:158
 #, c-format
 msgid "CreateSoundBuffer(secondary) failed %08x"
-msgstr ""
+msgstr "CreateSoundBuffer(вторичен) неуспешно %08x"
 
 #: dsound.cpp:163
 #, c-format
 msgid "dsbSecondary->SetCurrentPosition failed %08x"
-msgstr ""
+msgstr "dsbSecondary->SetCurrentPosition неуспешно %08x"
 
 #: dsound.cpp:186
 #, c-format
 msgid "Cannot Play primary %08x"
-msgstr ""
+msgstr "Не може да се възпроизведе първичен %08x"
 
 #: dsound.cpp:321
 #, c-format
 msgid "dsbSecondary->Lock() failed: %08x"
-msgstr ""
+msgstr "dsbSecondary->Lock() неуспешно: %08x"
 
 #: viewsupt.h:61
 #, c-format
 msgid "Unable to load dialog %s from resources"
-msgstr ""
+msgstr "Не може да се зареди диалог %s от ресурси"
 
 #: xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
-msgstr ""
+msgstr "Клавишни преки пътища"
 
 #: xrc/AccelConfig.xrc:13
 msgid "Co&mmands:"
-msgstr ""
+msgstr "Ко&манди:"
 
 #: xrc/AccelConfig.xrc:34
 msgid "Current Keys:"
-msgstr ""
+msgstr "Текущи клавиши:"
 
 #: xrc/AccelConfig.xrc:53
 msgid "&Assign"
-msgstr ""
+msgstr "&Назначи"
 
 #: xrc/AccelConfig.xrc:60
 msgid "&Remove"
-msgstr ""
+msgstr "&Премахни"
 
 #: xrc/AccelConfig.xrc:67
 msgid "Re&set All"
-msgstr ""
+msgstr "Ну&лирай всички"
 
 #: xrc/AccelConfig.xrc:81
 msgid "Currently assigned to:"
-msgstr ""
+msgstr "Текущо назначени към:"
 
 #: xrc/AccelConfig.xrc:96
 msgid "Shortcut Key:"
-msgstr ""
+msgstr "Клавиш за пряк път:"
 
 #: xrc/CheatAdd.xrc:4
 msgid "Add Cheat"
-msgstr ""
+msgstr "Добави чийт"
 
 #: xrc/CheatAdd.xrc:9 xrc/CheatEdit.xrc:9
 msgid "&Description"
-msgstr ""
+msgstr "&Описание"
 
 #: xrc/CheatAdd.xrc:53
 msgid "&Value"
-msgstr ""
+msgstr "&Стойност"
 
 #: xrc/CheatAdd.xrc:77
 msgid "Format"
-msgstr ""
+msgstr "Формат"
 
 #: xrc/CheatCreate.xrc:4
 msgid "Cheat Search"
-msgstr ""
+msgstr "Търсене на чийт"
 
 #: xrc/CheatCreate.xrc:23
 msgid "E&qual"
-msgstr ""
+msgstr "Р&авно"
 
 #: xrc/CheatCreate.xrc:31
 msgid "&Not equal"
-msgstr ""
+msgstr "&Не равно"
 
 #: xrc/CheatCreate.xrc:38
 msgid "&Less than"
-msgstr ""
+msgstr "&По-малко"
 
 #: xrc/CheatCreate.xrc:45
 msgid "L&ess or equal"
-msgstr ""
+msgstr "По-&малко или равно"
 
 #: xrc/CheatCreate.xrc:52
 msgid "&Greater than"
-msgstr ""
+msgstr "&По-голямо"
 
 #: xrc/CheatCreate.xrc:59
 msgid "G&reater or equal"
-msgstr ""
+msgstr "По-&голямо или равно"
 
 #: xrc/CheatCreate.xrc:64
 msgid "Compare type"
-msgstr ""
+msgstr "Тип за сравнение"
 
 #: xrc/CheatCreate.xrc:77
 msgid "S&igned"
-msgstr ""
+msgstr "Със &знак"
 
 #: xrc/CheatCreate.xrc:85
 msgid "&Unsigned"
-msgstr ""
+msgstr "&Без знак"
 
 #: xrc/CheatCreate.xrc:92
 msgid "&Hexadecimal"
-msgstr ""
+msgstr "&Шестнадесетично"
 
 #: xrc/CheatCreate.xrc:97
 msgid "Signed/Unsigned"
-msgstr ""
+msgstr "Със знак/Без знак"
 
 #: xrc/CheatCreate.xrc:107
 msgid "&8 bits"
-msgstr ""
+msgstr "&8 бита"
 
 #: xrc/CheatCreate.xrc:115
 msgid "&16 bits"
-msgstr ""
+msgstr "&16 бита"
 
 #: xrc/CheatCreate.xrc:122
 msgid "&32 bits"
-msgstr ""
+msgstr "&32 бита"
 
 #: xrc/CheatCreate.xrc:127
 msgid "Data size"
-msgstr ""
+msgstr "Размер на данни"
 
 #: xrc/CheatCreate.xrc:144
 msgid "Ol&d value"
-msgstr ""
+msgstr "Ст&ара стойност"
 
 #: xrc/CheatCreate.xrc:152
 msgid "Specific &value"
-msgstr ""
+msgstr "Специфична &стойност"
 
 #: xrc/CheatCreate.xrc:163
 msgid "Search value"
-msgstr ""
+msgstr "Търси стойност"
 
 #: xrc/CheatCreate.xrc:181
 msgid "&Search"
-msgstr ""
+msgstr "&Търси"
 
 #: xrc/CheatCreate.xrc:188
 msgid "U&pdate Old"
-msgstr ""
+msgstr "О&бнови стар"
 
 #: xrc/CheatCreate.xrc:195 xrc/JoyPanel.xrc:29 xrc/JoyPanel.xrc:52
 #: xrc/JoyPanel.xrc:75 xrc/JoyPanel.xrc:98 xrc/JoyPanel.xrc:121
@@ -1392,107 +1392,107 @@ msgstr ""
 #: xrc/JoyPanel.xrc:422 xrc/JoyPanel.xrc:444 xrc/JoyPanel.xrc:475
 #: xrc/JoyPanel.xrc:497 xrc/Logging.xrc:119
 msgid "&Clear"
-msgstr ""
+msgstr "&Изчисти"
 
 #: xrc/CheatCreate.xrc:202
 msgid "&Add cheat"
-msgstr ""
+msgstr "&Добави чийт"
 
 #: xrc/CheatEdit.xrc:4
 msgid "Edit Cheat"
-msgstr ""
+msgstr "Редактирай чийт"
 
 #: xrc/CheatEdit.xrc:31 xrc/MainMenu.xrc:275
 msgid "&Type"
-msgstr ""
+msgstr "&Тип"
 
 #: xrc/CheatEdit.xrc:53
 msgid "C&odes"
-msgstr ""
+msgstr "К&одове"
 
 #: xrc/CheatList.xrc:4
 msgid "Cheat List"
-msgstr ""
+msgstr "Чийт списък"
 
 #: xrc/CheatList.xrc:11
 msgid "Open cheat list"
-msgstr ""
+msgstr "Отвори чийт списък"
 
 #: xrc/CheatList.xrc:15
 msgid "Save cheat list"
-msgstr ""
+msgstr "Запази чийт списък"
 
 #: xrc/CheatList.xrc:20
 msgid "Add new cheat"
-msgstr ""
+msgstr "Добави нов чийт"
 
 #: xrc/CheatList.xrc:24
 msgid "Delete selected cheat"
-msgstr ""
+msgstr "Изтрий избрания чийт"
 
 #: xrc/CheatList.xrc:29
 msgid "Delete all cheats"
-msgstr ""
+msgstr "Изтрий всички чийтове"
 
 #: xrc/CheatList.xrc:35
 msgid "Toggle all Cheats"
-msgstr ""
+msgstr "Превключи всички чийтове"
 
 #: xrc/DirectoriesConfig.xrc:4
 msgid "Directories"
-msgstr ""
+msgstr "Директории"
 
 #: xrc/DirectoriesConfig.xrc:11 xrc/DirectoriesConfig.xrc:18
 msgid "Game Boy Advance ROMs"
-msgstr ""
+msgstr "Game Boy Advance ROM-ове"
 
 #: xrc/DirectoriesConfig.xrc:27 xrc/DirectoriesConfig.xrc:34
 msgid "Game Boy ROMs"
-msgstr ""
+msgstr "Game Boy ROM-ове"
 
 #: xrc/DirectoriesConfig.xrc:42 xrc/DirectoriesConfig.xrc:49
 msgid "Game Boy Color ROMs"
-msgstr ""
+msgstr "Game Boy Color ROM-ове"
 
 #: xrc/DirectoriesConfig.xrc:57 xrc/DirectoriesConfig.xrc:64
 msgid "Native Saves"
-msgstr ""
+msgstr "Запазвания на конзолата"
 
 #: xrc/DirectoriesConfig.xrc:72 xrc/DirectoriesConfig.xrc:79
 msgid "Emulator Saves"
-msgstr ""
+msgstr "Запазвания на емулатора"
 
 #: xrc/DirectoriesConfig.xrc:87 xrc/DirectoriesConfig.xrc:94
 msgid "Screenshots"
-msgstr ""
+msgstr "Екранни снимки"
 
 #: xrc/DirectoriesConfig.xrc:102 xrc/DirectoriesConfig.xrc:109
 msgid "Recordings"
-msgstr ""
+msgstr "Записи"
 
 #: xrc/Disassemble.xrc:4
 msgid "Disassemble"
-msgstr ""
+msgstr "Разглоби"
 
 #: xrc/Disassemble.xrc:15
 msgid "&Automatic"
-msgstr ""
+msgstr "&Автоматично"
 
 #: xrc/Disassemble.xrc:23
 msgid "A&RM"
-msgstr ""
+msgstr "A&RM"
 
 #: xrc/Disassemble.xrc:30
 msgid "&THUMB"
-msgstr ""
+msgstr "&THUMB"
 
 #: xrc/Disassemble.xrc:45 xrc/GBDisassemble.xrc:18 xrc/MemViewer.xrc:47
 msgid "&Go"
-msgstr ""
+msgstr "&Отиди"
 
 #: xrc/Disassemble.xrc:73
 msgid "R0:"
-msgstr ""
+msgstr "R0:"
 
 #: xrc/Disassemble.xrc:83 xrc/Disassemble.xrc:100 xrc/Disassemble.xrc:117
 #: xrc/Disassemble.xrc:134 xrc/Disassemble.xrc:151 xrc/Disassemble.xrc:168
@@ -1501,2147 +1501,2147 @@ msgstr ""
 #: xrc/Disassemble.xrc:287 xrc/Disassemble.xrc:304 xrc/Disassemble.xrc:321
 #: xrc/Disassemble.xrc:338 xrc/Disassemble.xrc:355
 msgid "00000000"
-msgstr ""
+msgstr "00000000"
 
 #: xrc/Disassemble.xrc:90
 msgid "R1:"
-msgstr ""
+msgstr "R1:"
 
 #: xrc/Disassemble.xrc:107
 msgid "R2:"
-msgstr ""
+msgstr "R2:"
 
 #: xrc/Disassemble.xrc:124
 msgid "R3:"
-msgstr ""
+msgstr "R3:"
 
 #: xrc/Disassemble.xrc:141
 msgid "R4:"
-msgstr ""
+msgstr "R4:"
 
 #: xrc/Disassemble.xrc:158
 msgid "R5:"
-msgstr ""
+msgstr "R5:"
 
 #: xrc/Disassemble.xrc:175
 msgid "R6:"
-msgstr ""
+msgstr "R6:"
 
 #: xrc/Disassemble.xrc:192
 msgid "R7:"
-msgstr ""
+msgstr "R7:"
 
 #: xrc/Disassemble.xrc:209
 msgid "R8:"
-msgstr ""
+msgstr "R8:"
 
 #: xrc/Disassemble.xrc:226
 msgid "R9:"
-msgstr ""
+msgstr "R9:"
 
 #: xrc/Disassemble.xrc:243
 msgid "R10:"
-msgstr ""
+msgstr "R10:"
 
 #: xrc/Disassemble.xrc:260
 msgid "R11:"
-msgstr ""
+msgstr "R11:"
 
 #: xrc/Disassemble.xrc:277
 msgid "R12:"
-msgstr ""
+msgstr "R12:"
 
 #: xrc/Disassemble.xrc:294 xrc/GBDisassemble.xrc:111
 msgid "SP:"
-msgstr ""
+msgstr "SP:"
 
 #: xrc/Disassemble.xrc:311
 msgid "LR:"
-msgstr ""
+msgstr "LR:"
 
 #: xrc/Disassemble.xrc:328 xrc/GBDisassemble.xrc:128
 msgid "PC:"
-msgstr ""
+msgstr "PC:"
 
 #: xrc/Disassemble.xrc:345
 msgid "CPSR:"
-msgstr ""
+msgstr "CPSR:"
 
 #: xrc/Disassemble.xrc:362 xrc/GBDisassemble.xrc:185
 msgid "N"
-msgstr ""
+msgstr "N"
 
 #: xrc/Disassemble.xrc:369
 msgid "I"
-msgstr ""
+msgstr "I"
 
 #: xrc/Disassemble.xrc:376 xrc/GBDisassemble.xrc:179
 msgid "Z"
-msgstr ""
+msgstr "Z"
 
 #: xrc/Disassemble.xrc:383
 msgid "F"
-msgstr ""
+msgstr "F"
 
 #: xrc/Disassemble.xrc:390 xrc/GBDisassemble.xrc:197
 msgid "C"
-msgstr ""
+msgstr "C"
 
 #: xrc/Disassemble.xrc:397
 msgid "T"
-msgstr ""
+msgstr "T"
 
 #: xrc/Disassemble.xrc:404
 msgid "V"
-msgstr ""
+msgstr "V"
 
 #: xrc/Disassemble.xrc:414 xrc/MapViewer.xrc:76 xrc/OAMViewer.xrc:37
 msgid "Mode:"
-msgstr ""
+msgstr "Режим:"
 
 #: xrc/Disassemble.xrc:424 xrc/GBDisassemble.xrc:172
 msgid "00"
-msgstr ""
+msgstr "00"
 
 #: xrc/Disassemble.xrc:443 xrc/GBDisassemble.xrc:212 xrc/GBOAMViewer.xrc:93
 #: xrc/GBPaletteViewer.xrc:105 xrc/GBTileViewer.xrc:75 xrc/IOViewer.xrc:318
 #: xrc/MemViewer.xrc:72 xrc/OAMViewer.xrc:109 xrc/PaletteViewer.xrc:81
 #: xrc/TileViewer.xrc:91
 msgid "Automatic &update"
-msgstr ""
+msgstr "Автоматично &обновяване"
 
 #: xrc/Disassemble.xrc:453 xrc/GBDisassemble.xrc:222
 msgid "G&oto PC"
-msgstr ""
+msgstr "О&тиди към PC"
 
 #: xrc/Disassemble.xrc:460 xrc/GBDisassemble.xrc:229
 msgid "Re&fresh"
-msgstr ""
+msgstr "Об&нови"
 
 #: xrc/Disassemble.xrc:467 xrc/GBDisassemble.xrc:236
 msgid "&Next"
-msgstr ""
+msgstr "&Следващ"
 
 #: xrc/DisplayConfig.xrc:4
 msgid "Display settings"
-msgstr ""
+msgstr "Настройки на дисплей"
 
 #: xrc/DisplayConfig.xrc:15
 msgid "Output module"
-msgstr ""
+msgstr "Изходен модул"
 
 #: xrc/DisplayConfig.xrc:33
 msgid "Simple"
-msgstr ""
+msgstr "Прост"
 
 #: xrc/DisplayConfig.xrc:40
 msgid "Quartz2D"
-msgstr ""
+msgstr "Quartz2D"
 
 #: xrc/DisplayConfig.xrc:47
 msgid "OpenGL"
-msgstr ""
+msgstr "OpenGL"
 
 #: xrc/DisplayConfig.xrc:54
 msgid "Direct3D 9"
-msgstr ""
+msgstr "Direct3D 9"
 
 #: xrc/DisplayConfig.xrc:65
 msgid "Filters"
-msgstr ""
+msgstr "Филтри"
 
 #: xrc/DisplayConfig.xrc:79
 msgid "Display filter :"
-msgstr ""
+msgstr "Дисплей филтър :"
 
 #: xrc/DisplayConfig.xrc:86
 msgid "2xSaI"
-msgstr ""
+msgstr "2xSaI"
 
 #: xrc/DisplayConfig.xrc:87
 msgid "Super 2xSaI"
-msgstr ""
+msgstr "Super 2xSaI"
 
 #: xrc/DisplayConfig.xrc:88
 msgid "Super Eagle"
-msgstr ""
+msgstr "Super Eagle"
 
 #: xrc/DisplayConfig.xrc:89
 msgid "Pixelate"
-msgstr ""
+msgstr "Пикселирай"
 
 #: xrc/DisplayConfig.xrc:90
 msgid "Advance MAME Scale2x"
-msgstr ""
+msgstr "Напреднал MAME Scale2x"
 
 #: xrc/DisplayConfig.xrc:91
 msgid "Bilinear"
-msgstr ""
+msgstr "Билинейно"
 
 #: xrc/DisplayConfig.xrc:92
 msgid "Bilinear Plus"
-msgstr ""
+msgstr "Билинейно плюс"
 
 #: xrc/DisplayConfig.xrc:93
 msgid "Scanlines"
-msgstr ""
+msgstr "Сканлинии"
 
 #: xrc/DisplayConfig.xrc:94
 msgid "TV Mode"
-msgstr ""
+msgstr "ТВ режим"
 
 #: xrc/DisplayConfig.xrc:95
 msgid "HQ 2x"
-msgstr ""
+msgstr "HQ 2x"
 
 #: xrc/DisplayConfig.xrc:96
 msgid "LQ 2x"
-msgstr ""
+msgstr "LQ 2x"
 
 #: xrc/DisplayConfig.xrc:97
 msgid "Simple 2x"
-msgstr ""
+msgstr "Прост 2x"
 
 #: xrc/DisplayConfig.xrc:98
 msgid "Simple 3x"
-msgstr ""
+msgstr "Прост 3x"
 
 #: xrc/DisplayConfig.xrc:99
 msgid "HQ 3x"
-msgstr ""
+msgstr "HQ 3x"
 
 #: xrc/DisplayConfig.xrc:100
 msgid "Simple 4x"
-msgstr ""
+msgstr "Прост 4x"
 
 #: xrc/DisplayConfig.xrc:101
 msgid "HQ 4x"
-msgstr ""
+msgstr "HQ 4x"
 
 #: xrc/DisplayConfig.xrc:102
 msgid "xBRZ 2x"
-msgstr ""
+msgstr "xBRZ 2x"
 
 #: xrc/DisplayConfig.xrc:103
 msgid "xBRZ 3x"
-msgstr ""
+msgstr "xBRZ 3x"
 
 #: xrc/DisplayConfig.xrc:104
 msgid "xBRZ 4x"
-msgstr ""
+msgstr "xBRZ 4x"
 
 #: xrc/DisplayConfig.xrc:105
 msgid "xBRZ 5x"
-msgstr ""
+msgstr "xBRZ 5x"
 
 #: xrc/DisplayConfig.xrc:106
 msgid "xBRZ 6x"
-msgstr ""
+msgstr "xBRZ 6x"
 
 #: xrc/DisplayConfig.xrc:115
 msgid "Plugin :"
-msgstr ""
+msgstr "Добавка :"
 
 #: xrc/DisplayConfig.xrc:127
 msgid "Interframe blending :"
-msgstr ""
+msgstr "Междукадрово смесване :"
 
 #: xrc/DisplayConfig.xrc:136
 msgid "Smart interframe blending"
-msgstr ""
+msgstr "Умно междукадрово смесване"
 
 #: xrc/DisplayConfig.xrc:137
 msgid "Interframe motion blur"
-msgstr ""
+msgstr "Междукадрово замъгляване при движение"
 
 #: xrc/DisplayConfig.xrc:151 xrc/SoundConfig.xrc:91
 msgid "Basic"
-msgstr ""
+msgstr "Основно"
 
 #: xrc/DisplayConfig.xrc:159
 msgid "Frame Skip"
-msgstr ""
+msgstr "Прескачане на кадри"
 
 #: xrc/DisplayConfig.xrc:177
 msgid "&Number of frames to skip :"
-msgstr ""
+msgstr "&Брой на кадри за прескачане :"
 
 #: xrc/DisplayConfig.xrc:199
 msgid "Speed"
-msgstr ""
+msgstr "Скорост"
 
 #: xrc/DisplayConfig.xrc:215
 msgid "Speed indicator :"
-msgstr ""
+msgstr "Индикатор за скорост :"
 
 #: xrc/DisplayConfig.xrc:222
 msgid "Percentage"
-msgstr ""
+msgstr "Процент"
 
 #: xrc/DisplayConfig.xrc:223
 msgid "Detailed"
-msgstr ""
+msgstr "Подробно"
 
 #: xrc/DisplayConfig.xrc:237
 msgid "On-Screen Display"
-msgstr ""
+msgstr "Екранен дисплей"
 
 #: xrc/DisplayConfig.xrc:247
 msgid "Default magnification :"
-msgstr ""
+msgstr "Увеличение по подразбиране :"
 
 #: xrc/DisplayConfig.xrc:266
 msgid "Maximum magnification factor :"
-msgstr ""
+msgstr "Максимален фактор на увеличение :"
 
 #: xrc/DisplayConfig.xrc:267
 msgid "0 = no maximum"
-msgstr ""
+msgstr "0 = без максимум"
 
 #: xrc/DisplayConfig.xrc:275
 msgid "0 = no limit"
-msgstr ""
+msgstr "0 = без ограничение"
 
 #: xrc/DisplayConfig.xrc:285
 msgid "Zoom"
-msgstr ""
+msgstr "Приближи"
 
 #: xrc/ExportSPS.xrc:10
 msgid "Title:"
-msgstr ""
+msgstr "Заглавие:"
 
 #: xrc/ExportSPS.xrc:22
 msgid "Description:"
-msgstr ""
+msgstr "Описание:"
 
 #: xrc/ExportSPS.xrc:34
 msgid "Notes:"
-msgstr ""
+msgstr "Бележки:"
 
 #: xrc/GBAROMInfo.xrc:4 xrc/GBROMInfo.xrc:4
 msgid "Rom Information"
-msgstr ""
+msgstr "Rom информация"
 
 #: xrc/GBAROMInfo.xrc:11 xrc/GBROMInfo.xrc:12
 msgid "Game title:"
-msgstr ""
+msgstr "Заглавие на игра:"
 
 #: xrc/GBAROMInfo.xrc:23
 msgid "Internal title:"
-msgstr ""
+msgstr "Вътрешно заглавие:"
 
 #: xrc/GBAROMInfo.xrc:35
 msgid "Scene Release:"
-msgstr ""
+msgstr "Излизане на сцена:"
 
 #: xrc/GBAROMInfo.xrc:47
 msgid "Release Number:"
-msgstr ""
+msgstr "Номер на излизане:"
 
 #: xrc/GBAROMInfo.xrc:59
 msgid "CRC32:"
-msgstr ""
+msgstr "CRC32:"
 
 #: xrc/GBAROMInfo.xrc:71
 msgid "Game code:"
-msgstr ""
+msgstr "Код на игра:"
 
 #: xrc/GBAROMInfo.xrc:83 xrc/GBROMInfo.xrc:24
 msgid "Maker code:"
-msgstr ""
+msgstr "Код на създател:"
 
 #: xrc/GBAROMInfo.xrc:95 xrc/GBROMInfo.xrc:36
 msgid "Maker name:"
-msgstr ""
+msgstr "Име на създател:"
 
 #: xrc/GBAROMInfo.xrc:107
 msgid "Main unit code:"
-msgstr ""
+msgstr "Код на главна единица:"
 
 #: xrc/GBAROMInfo.xrc:119
 msgid "Device type:"
-msgstr ""
+msgstr "Тип на устройство:"
 
 #: xrc/GBAROMInfo.xrc:131 xrc/GBROMInfo.xrc:72
 msgid "ROM version:"
-msgstr ""
+msgstr "ROM версия:"
 
 #: xrc/GBAROMInfo.xrc:143 xrc/GBROMInfo.xrc:84
 msgid "CRC:"
-msgstr ""
+msgstr "CRC:"
 
 #: xrc/GBAROMInfo.xrc:150
 msgid "ROM Information"
-msgstr ""
+msgstr "ROM информация"
 
 #: xrc/GBColorPrefPanel.xrc:10 xrc/JoyPanel.xrc:247
 msgid "Standard"
-msgstr ""
+msgstr "Стандартен"
 
 #: xrc/GBColorPrefPanel.xrc:11
 msgid "Blue Sea"
-msgstr ""
+msgstr "Синьо море"
 
 #: xrc/GBColorPrefPanel.xrc:12
 msgid "Dark Night"
-msgstr ""
+msgstr "Тъмна нощ"
 
 #: xrc/GBColorPrefPanel.xrc:13
 msgid "Green Forest"
-msgstr ""
+msgstr "Зелена гора"
 
 #: xrc/GBColorPrefPanel.xrc:14
 msgid "Hot Desert"
-msgstr ""
+msgstr "Гореща пустиня"
 
 #: xrc/GBColorPrefPanel.xrc:15
 msgid "Pink Dreams"
-msgstr ""
+msgstr "Розови сънища"
 
 #: xrc/GBColorPrefPanel.xrc:16
 msgid "Weird Colors"
-msgstr ""
+msgstr "Странни цветове"
 
 #: xrc/GBColorPrefPanel.xrc:17
 msgid "Real GB Colors"
-msgstr ""
+msgstr "Истнски GB цветове"
 
 #: xrc/GBColorPrefPanel.xrc:18
 msgid "Real 'GB on GBASP' Colors"
-msgstr ""
+msgstr "Истински 'GB на GBASP' цветове"
 
 #: xrc/GBColorPrefPanel.xrc:46 xrc/GBPaletteViewer.xrc:17 xrc/MapViewer.xrc:54
 #: xrc/PaletteViewer.xrc:19
 msgid "Background"
-msgstr ""
+msgstr "Фон"
 
 #: xrc/GBColorPrefPanel.xrc:74
 msgid "Sprites"
-msgstr ""
+msgstr "Спрайтове"
 
 #: xrc/GBColorPrefPanel.xrc:84
 msgid "Use this palette"
-msgstr ""
+msgstr "Използвай тази палитра"
 
 #: xrc/GBColorPrefPanel.xrc:94
 msgid "Restore"
-msgstr ""
+msgstr "Възстанови"
 
 #: xrc/GBDisassemble.xrc:43
 msgid "AF:"
-msgstr ""
+msgstr "AF:"
 
 #: xrc/GBDisassemble.xrc:53 xrc/GBDisassemble.xrc:70 xrc/GBDisassemble.xrc:87
 #: xrc/GBDisassemble.xrc:104 xrc/GBDisassemble.xrc:121
 #: xrc/GBDisassemble.xrc:138 xrc/GBDisassemble.xrc:155
 msgid "0000"
-msgstr ""
+msgstr "0000"
 
 #: xrc/GBDisassemble.xrc:60
 msgid "BC:"
-msgstr ""
+msgstr "BC:"
 
 #: xrc/GBDisassemble.xrc:77
 msgid "DE:"
-msgstr ""
+msgstr "DE:"
 
 #: xrc/GBDisassemble.xrc:94
 msgid "HL:"
-msgstr ""
+msgstr "HL:"
 
 #: xrc/GBDisassemble.xrc:145
 msgid "IFF:"
-msgstr ""
+msgstr "IFF:"
 
 #: xrc/GBDisassemble.xrc:162
 msgid "LY:"
-msgstr ""
+msgstr "LY:"
 
 #: xrc/GBDisassemble.xrc:191
 msgid "H"
-msgstr ""
+msgstr "H"
 
 #: xrc/GBMapViewer.xrc:14
 msgid "0x8000"
-msgstr ""
+msgstr "0x8000"
 
 #: xrc/GBMapViewer.xrc:20
 msgid "0x8800"
-msgstr ""
+msgstr "0x8800"
 
 #: xrc/GBMapViewer.xrc:23 xrc/GBTileViewer.xrc:42 xrc/TileViewer.xrc:58
 msgid "Char Base"
-msgstr ""
+msgstr "Знакова база"
 
 #: xrc/GBMapViewer.xrc:33
 msgid "0x9800"
-msgstr ""
+msgstr "0x9800"
 
 #: xrc/GBMapViewer.xrc:39
 msgid "0x9C00"
-msgstr ""
+msgstr "0x9C00"
 
 #: xrc/GBMapViewer.xrc:42
 msgid "Map Base"
-msgstr ""
+msgstr "Таблична база"
 
 #: xrc/GBMapViewer.xrc:54 xrc/GBOAMViewer.xrc:88 xrc/GBTileViewer.xrc:68
 #: xrc/MapViewer.xrc:62 xrc/OAMViewer.xrc:104 xrc/TileViewer.xrc:84
 msgid "Stretch to &fit"
-msgstr ""
+msgstr "Разтегни до &побиране"
 
 #: xrc/GBMapViewer.xrc:59 xrc/MapViewer.xrc:67
 msgid "Auto &update"
-msgstr ""
+msgstr "Авто &обновяване"
 
 #: xrc/GBMapViewer.xrc:74 xrc/GBTileViewer.xrc:99 xrc/MapViewer.xrc:144
 #: xrc/MemSelRegion.xrc:10 xrc/PaletteViewer.xrc:50 xrc/TileViewer.xrc:115
 msgid "Address:"
-msgstr ""
+msgstr "Адрес:"
 
 #: xrc/GBMapViewer.xrc:82 xrc/GBOAMViewer.xrc:37 xrc/GBTileViewer.xrc:91
 #: xrc/MapViewer.xrc:152 xrc/OAMViewer.xrc:61 xrc/TileViewer.xrc:107
 msgid "Tile:"
-msgstr ""
+msgstr "Плочка:"
 
 #: xrc/GBMapViewer.xrc:90 xrc/MapViewer.xrc:160
 msgid "Flip:"
-msgstr ""
+msgstr "Обръщане:"
 
 #: xrc/GBMapViewer.xrc:98 xrc/GBTileViewer.xrc:50 xrc/MapViewer.xrc:168
 #: xrc/TileViewer.xrc:66
 msgid "Palette:"
-msgstr ""
+msgstr "Палитра:"
 
 #: xrc/GBMapViewer.xrc:106 xrc/MapViewer.xrc:116
 msgid "Priority:"
-msgstr ""
+msgstr "Приоритет:"
 
 #: xrc/GBMapViewer.xrc:152 xrc/GBOAMViewer.xrc:142 xrc/GBPaletteViewer.xrc:114
 #: xrc/GBTileViewer.xrc:145 xrc/IOViewer.xrc:327 xrc/MapViewer.xrc:214
 #: xrc/MemViewer.xrc:101 xrc/OAMViewer.xrc:155 xrc/PaletteViewer.xrc:100
 #: xrc/TileViewer.xrc:161
 msgid "&Refresh"
-msgstr ""
+msgstr "&Обнови"
 
 #: xrc/GBMapViewer.xrc:157 xrc/Logging.xrc:112 xrc/MapViewer.xrc:219
 msgid "&Save"
-msgstr ""
+msgstr "&Запази"
 
 #: xrc/GBOAMViewer.xrc:13 xrc/OAMViewer.xrc:14
 msgid "Sprite:"
-msgstr ""
+msgstr "Спрайт:"
 
 #: xrc/GBOAMViewer.xrc:29 xrc/OAMViewer.xrc:29
 msgid "Pos:"
-msgstr ""
+msgstr "Поз.:"
 
 #: xrc/GBOAMViewer.xrc:45 xrc/OAMViewer.xrc:69
 msgid "Prio:"
-msgstr ""
+msgstr "Прио.:"
 
 #: xrc/GBOAMViewer.xrc:53
 msgid "OAP:"
-msgstr ""
+msgstr "OAP:"
 
 #: xrc/GBOAMViewer.xrc:61 xrc/OAMViewer.xrc:53
 msgid "Pal:"
-msgstr ""
+msgstr "Пал.:"
 
 #: xrc/GBOAMViewer.xrc:69 xrc/OAMViewer.xrc:93
 msgid "Flags:"
-msgstr ""
+msgstr "Флагове:"
 
 #: xrc/GBOAMViewer.xrc:77
 msgid "Bank:"
-msgstr ""
+msgstr "Банка:"
 
 #: xrc/GBOAMViewer.xrc:149 xrc/GBTileViewer.xrc:152 xrc/MemViewer.xrc:115
 #: xrc/OAMViewer.xrc:162 xrc/TileViewer.xrc:168
 msgid "&Save..."
-msgstr ""
+msgstr "&Запази..."
 
 #: xrc/GBPaletteViewer.xrc:8 xrc/PaletteViewer.xrc:9
 msgid "Click on a color for more information"
-msgstr ""
+msgstr "Щракнете на цвят за повече информация"
 
 #: xrc/GBPaletteViewer.xrc:27 xrc/PaletteViewer.xrc:105
 msgid "Save &BG..."
-msgstr ""
+msgstr "Запази &фон..."
 
 #: xrc/GBPaletteViewer.xrc:38 xrc/PaletteViewer.xrc:33
 msgid "Sprite"
-msgstr ""
+msgstr "Спрайт"
 
 #: xrc/GBPaletteViewer.xrc:48 xrc/PaletteViewer.xrc:111
 msgid "Save &Sprite..."
-msgstr ""
+msgstr "Запази &спрайт..."
 
 #: xrc/GBPaletteViewer.xrc:67
 msgid "Index:"
-msgstr ""
+msgstr "Индекс:"
 
 #: xrc/GBPaletteViewer.xrc:79 xrc/IOViewer.xrc:21 xrc/PaletteViewer.xrc:62
 msgid "Value:"
-msgstr ""
+msgstr "Стойност:"
 
 #: xrc/GBPrinter.xrc:21
 msgid "Print Si&ze"
-msgstr ""
+msgstr "Ра&змер на печат"
 
 #: xrc/GBPrinter.xrc:29
 msgid "1x"
-msgstr ""
+msgstr "1x"
 
 #: xrc/GBPrinter.xrc:30
 msgid "2x"
-msgstr ""
+msgstr "2x"
 
 #: xrc/GBPrinter.xrc:31
 msgid "3x"
-msgstr ""
+msgstr "3x"
 
 #: xrc/GBPrinter.xrc:32
 msgid "4x"
-msgstr ""
+msgstr "4x"
 
 #: xrc/GBPrinter.xrc:58
 msgid "C&ontinue"
-msgstr ""
+msgstr "П&родължи"
 
 #: xrc/GBROMInfo.xrc:48
 msgid "Unit code:"
-msgstr ""
+msgstr "Код на единица:"
 
 #: xrc/GBROMInfo.xrc:60
 msgid "Cartridge type:"
-msgstr ""
+msgstr "Тип на касета:"
 
 #: xrc/GBROMInfo.xrc:96
 msgid "Color:"
-msgstr ""
+msgstr "Цвят:"
 
 #: xrc/GBROMInfo.xrc:108
 msgid "ROM size:"
-msgstr ""
+msgstr "ROM размер:"
 
 #: xrc/GBROMInfo.xrc:120
 msgid "RAM size:"
-msgstr ""
+msgstr "RAM размер:"
 
 #: xrc/GBROMInfo.xrc:132
 msgid "Dest. code:"
-msgstr ""
+msgstr "Код на местонах.:"
 
 #: xrc/GBROMInfo.xrc:144
 msgid "License code:"
-msgstr ""
+msgstr "Код на лиценз:"
 
 #: xrc/GBROMInfo.xrc:156
 msgid "Checksum:"
-msgstr ""
+msgstr "Контролна сума:"
 
 #: xrc/GBTileViewer.xrc:14
 msgid "&0"
-msgstr ""
+msgstr "&0"
 
 #: xrc/GBTileViewer.xrc:20 xrc/MainMenu.xrc:58 xrc/MainMenu.xrc:114
 msgid "&1"
-msgstr ""
+msgstr "&1"
 
 #: xrc/GBTileViewer.xrc:23
 msgid "VRAM Bank"
-msgstr ""
+msgstr "VRAM банка"
 
 #: xrc/GBTileViewer.xrc:33
 msgid "0x&8000"
-msgstr ""
+msgstr "0x&8000"
 
 #: xrc/GBTileViewer.xrc:39
 msgid "0x&8800"
-msgstr ""
+msgstr "0x&8800"
 
 #: xrc/GameBoyAdvanceConfig.xrc:4
 msgid "Game Boy Advance settings"
-msgstr ""
+msgstr "Game Boy Advance настройки"
 
 #: xrc/GameBoyAdvanceConfig.xrc:21
 msgid "Save type :"
-msgstr ""
+msgstr "Тип на запазване :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
 #: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
 msgid "Automatic"
-msgstr ""
+msgstr "Автоматично"
 
 #: xrc/GameBoyAdvanceConfig.xrc:28 xrc/GameBoyAdvanceConfig.xrc:200
 msgid "EEPROM"
-msgstr ""
+msgstr "EEPROM"
 
 #: xrc/GameBoyAdvanceConfig.xrc:29 xrc/GameBoyAdvanceConfig.xrc:201
 msgid "SRAM"
-msgstr ""
+msgstr "SRAM"
 
 #: xrc/GameBoyAdvanceConfig.xrc:30 xrc/GameBoyAdvanceConfig.xrc:202
 msgid "Flash"
-msgstr ""
+msgstr "Флаш"
 
 #: xrc/GameBoyAdvanceConfig.xrc:31
 msgid "EEPROM + Sensor"
-msgstr ""
+msgstr "EEPROM + Сензор"
 
 #: xrc/GameBoyAdvanceConfig.xrc:43
 msgid "Flash size :"
-msgstr ""
+msgstr "Размер на флаш :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
 msgid "64K"
-msgstr ""
+msgstr "64K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:50 xrc/GameBoyAdvanceConfig.xrc:222
 msgid "128K"
-msgstr ""
+msgstr "128K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:64
 msgid "Detect Now"
-msgstr ""
+msgstr "Открий сега"
 
 #: xrc/GameBoyAdvanceConfig.xrc:69
 msgid "Cartridge"
-msgstr ""
+msgstr "Касета"
 
 #: xrc/GameBoyAdvanceConfig.xrc:77
 msgid "Save type"
-msgstr ""
+msgstr "Тип на запазване"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file :"
-msgstr ""
+msgstr "BIOS файл :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file :"
-msgstr ""
+msgstr "Текущ BIOS файл :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:122 xrc/GameBoyConfig.xrc:138
 #: xrc/GameBoyConfig.xrc:159
 msgid "(None)"
-msgstr ""
+msgstr "(Никакъв)"
 
 #: xrc/GameBoyAdvanceConfig.xrc:136 xrc/GameBoyConfig.xrc:168
 msgid "Boot ROM"
-msgstr ""
+msgstr "Зареждащ ROM"
 
 #: xrc/GameBoyAdvanceConfig.xrc:146
 msgid "Game Code"
-msgstr ""
+msgstr "Код на игра"
 
 #: xrc/GameBoyAdvanceConfig.xrc:160
 msgid "Comment"
-msgstr ""
+msgstr "Коментар"
 
 #: xrc/GameBoyAdvanceConfig.xrc:172
 msgid "Real Time Clock:"
-msgstr ""
+msgstr "Часовник за реално време"
 
 #: xrc/GameBoyAdvanceConfig.xrc:180 xrc/GameBoyAdvanceConfig.xrc:198
 #: xrc/GameBoyAdvanceConfig.xrc:220 xrc/GameBoyAdvanceConfig.xrc:238
 #: xrc/GameBoyConfig.xrc:180
 msgid "Default"
-msgstr ""
+msgstr "По подразбиране"
 
 #: xrc/GameBoyAdvanceConfig.xrc:181 xrc/GameBoyAdvanceConfig.xrc:239
 msgid "Disabled"
-msgstr ""
+msgstr "Забранен"
 
 #: xrc/GameBoyAdvanceConfig.xrc:182 xrc/GameBoyAdvanceConfig.xrc:240
 msgid "Enabled"
-msgstr ""
+msgstr "Разрешен"
 
 #: xrc/GameBoyAdvanceConfig.xrc:190
 msgid "Save Type:"
-msgstr ""
+msgstr "Тип на запазване:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:203
 msgid "EEPROM+Sensor"
-msgstr ""
+msgstr "EEPROM+Сензор"
 
 #: xrc/GameBoyAdvanceConfig.xrc:212
 msgid "Flash Size:"
-msgstr ""
+msgstr "Размер на флаш:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:230
 msgid "Mirroring:"
-msgstr ""
+msgstr "Огледално:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:254
 msgid "&Defaults"
-msgstr ""
+msgstr "&По подразбирания"
 
 #: xrc/GameBoyAdvanceConfig.xrc:261
 msgid "Game Overrides"
-msgstr ""
+msgstr "Отменяния на игра"
 
 #: xrc/GameBoyConfig.xrc:4
 msgid "GameBoy settings"
-msgstr ""
+msgstr "GameBoy настройки"
 
 #: xrc/GameBoyConfig.xrc:20
 msgid "Emulated &system :"
-msgstr ""
+msgstr "Емулирана &система :"
 
 #: xrc/GameBoyConfig.xrc:30
 msgid "Game Boy Color"
-msgstr ""
+msgstr "Game Boy Color"
 
 #: xrc/GameBoyConfig.xrc:31
 msgid "Super Game Boy"
-msgstr ""
+msgstr "Super Game Boy"
 
 #: xrc/GameBoyConfig.xrc:32 xrc/SoundConfig.xrc:290
 msgid "Game Boy"
-msgstr ""
+msgstr "Game Boy"
 
 #: xrc/GameBoyConfig.xrc:33 xrc/SoundConfig.xrc:335
 msgid "Game Boy Advance"
-msgstr ""
+msgstr "Game Boy Advance"
 
 #: xrc/GameBoyConfig.xrc:34
 msgid "Super Game Boy 2"
-msgstr ""
+msgstr "Super Game Boy 2"
 
 #: xrc/GameBoyConfig.xrc:48
 msgid "Display &borders :"
-msgstr ""
+msgstr "Граници на &дисплей :"
 
 #: xrc/GameBoyConfig.xrc:57
 msgid "Never"
-msgstr ""
+msgstr "Никога"
 
 #: xrc/GameBoyConfig.xrc:58
 msgid "Always"
-msgstr ""
+msgstr "Винаги"
 
 #: xrc/GameBoyConfig.xrc:72
 msgid "System"
-msgstr ""
+msgstr "Система"
 
 #: xrc/GameBoyConfig.xrc:84
 msgid "GB Boot &ROM file :"
-msgstr ""
+msgstr "GB зареждащ &ROM файл :"
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
-msgstr ""
+msgstr "Избери файл"
 
 #: xrc/GameBoyConfig.xrc:106
 msgid "GBC Boot ROM &file :"
-msgstr ""
+msgstr "GBC зареждащ ROM &файл :"
 
 #: xrc/GameBoyConfig.xrc:131
 msgid "Current GB BIOS file :"
-msgstr ""
+msgstr "Текущ GB BIOS файл :"
 
 #: xrc/GameBoyConfig.xrc:152
 msgid "Current GBC BIOS file :"
-msgstr ""
+msgstr "Текущ GBC BIOS файл :"
 
 #: xrc/GameBoyConfig.xrc:186
 msgid "User 1"
-msgstr ""
+msgstr "Потребител 1"
 
 #: xrc/GameBoyConfig.xrc:192
 msgid "User 2"
-msgstr ""
+msgstr "Потребител 2"
 
 #: xrc/GameBoyConfig.xrc:198
 msgid "Custom Colors"
-msgstr ""
+msgstr "Потребителски цветове"
 
 #: xrc/GeneralConfig.xrc:4
 msgid "General settings"
-msgstr ""
+msgstr "Основни настройки"
 
 #: xrc/GeneralConfig.xrc:9
 msgid "General"
-msgstr ""
+msgstr "Основни"
 
 #: xrc/GeneralConfig.xrc:26
 msgid "Screenshot Format:"
-msgstr ""
+msgstr "Формат на екранна снимка:"
 
 #: xrc/GeneralConfig.xrc:33
 msgid "&PNG"
-msgstr ""
+msgstr "&PNG"
 
 #: xrc/GeneralConfig.xrc:42
 msgid "&BMP"
-msgstr ""
+msgstr "&BMP"
 
 #: xrc/GeneralConfig.xrc:57
 msgid "&Rewind interval :"
-msgstr ""
+msgstr "Интервал на &пренавиване :"
 
 #: xrc/GeneralConfig.xrc:58
 msgid "If not empty or 0, enable rewind (seconds)"
-msgstr ""
+msgstr "Ако не е празно или 0, разреши пренавиване (секунди)"
 
 #: xrc/GeneralConfig.xrc:67
 msgid "seconds (0-600); 0 = disable"
-msgstr ""
+msgstr "секунди (0-600); 0 = забрани"
 
 #: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
-msgstr ""
+msgstr "&Дроселиране"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 #, c-format
 msgid "% of normal:"
-msgstr ""
+msgstr "% от нормално:"
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
-msgstr ""
+msgstr "0 = без дроселиране"
 
 #: xrc/GeneralConfig.xrc:114
 msgid "Unlimited"
-msgstr ""
+msgstr "Неограничено"
 
 #: xrc/IOViewer.xrc:4
 msgid "IO Viewer"
-msgstr ""
+msgstr "ВИ преглеждач"
 
 #: xrc/IOViewer.xrc:10
 msgid "a"
-msgstr ""
+msgstr "a"
 
 #: xrc/IOViewer.xrc:11
 msgid "b"
-msgstr ""
+msgstr "b"
 
 #: xrc/IOViewer.xrc:47
 msgid "15 "
-msgstr ""
+msgstr "15 "
 
 #: xrc/IOViewer.xrc:64
 msgid "14 "
-msgstr ""
+msgstr "14 "
 
 #: xrc/IOViewer.xrc:81
 msgid "13 "
-msgstr ""
+msgstr "13 "
 
 #: xrc/IOViewer.xrc:98
 msgid "12 "
-msgstr ""
+msgstr "12 "
 
 #: xrc/IOViewer.xrc:115
 msgid "11 "
-msgstr ""
+msgstr "11 "
 
 #: xrc/IOViewer.xrc:132
 msgid "10 "
-msgstr ""
+msgstr "10 "
 
 #: xrc/IOViewer.xrc:149
 msgid "9 "
-msgstr ""
+msgstr "9 "
 
 #: xrc/IOViewer.xrc:166
 msgid "8 "
-msgstr ""
+msgstr "8 "
 
 #: xrc/IOViewer.xrc:183
 msgid "7 "
-msgstr ""
+msgstr "7 "
 
 #: xrc/IOViewer.xrc:200
 msgid "6 "
-msgstr ""
+msgstr "6 "
 
 #: xrc/IOViewer.xrc:217
 msgid "5 "
-msgstr ""
+msgstr "5 "
 
 #: xrc/IOViewer.xrc:234
 msgid "4 "
-msgstr ""
+msgstr "4 "
 
 #: xrc/IOViewer.xrc:251
 msgid "3 "
-msgstr ""
+msgstr "3 "
 
 #: xrc/IOViewer.xrc:268
 msgid "2 "
-msgstr ""
+msgstr "2 "
 
 #: xrc/IOViewer.xrc:285
 msgid "1 "
-msgstr ""
+msgstr "1 "
 
 #: xrc/IOViewer.xrc:302
 msgid "0 "
-msgstr ""
+msgstr "0 "
 
 #: xrc/JoyPanel.xrc:8
 msgid ""
 "Click a field and press a key or move joystick to add.  Press backspace to "
 "delete last added key.  Resize window or click inside and move pointer to "
 "see entire contents if too small."
-msgstr ""
+msgstr "Щракнете на поле и натиснете клавиш или местете джойстик за да добавите.  Натиснете backspace за да изтриете последно добавен клавиш.  Преоразмерете прозореца или щракнете вътре и местете показалеца за видите цели съдържания, ако са твърде малки."
 
 #: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:460
 msgid "Up"
-msgstr ""
+msgstr "Нагоре"
 
 #: xrc/JoyPanel.xrc:37
 msgid "A"
-msgstr ""
+msgstr "A"
 
 #: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:464
 msgid "Down"
-msgstr ""
+msgstr "Надолу"
 
 #: xrc/JoyPanel.xrc:83
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:468
 msgid "Left"
-msgstr ""
+msgstr "Наляво"
 
 #: xrc/JoyPanel.xrc:129
 msgid "L"
-msgstr ""
+msgstr "L"
 
 #: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:472
 msgid "Right"
-msgstr ""
+msgstr "Надясно"
 
 #: xrc/JoyPanel.xrc:175
 msgid "R"
-msgstr ""
+msgstr "R"
 
 #: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:492
 msgid "Select"
-msgstr ""
+msgstr "Избери"
 
 #: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:496
 msgid "Start"
-msgstr ""
+msgstr "Започни"
 
 #: xrc/JoyPanel.xrc:254
 msgid "Motion Up"
-msgstr ""
+msgstr "Движение нагоре"
 
 #: xrc/JoyPanel.xrc:276
 msgid "Autofire A"
-msgstr ""
+msgstr "Автоогън A"
 
 #: xrc/JoyPanel.xrc:298
 msgid "Motion Down"
-msgstr ""
+msgstr "Движение надолу"
 
 #: xrc/JoyPanel.xrc:320
 msgid "Autofire B"
-msgstr ""
+msgstr "Автоогън B"
 
 #: xrc/JoyPanel.xrc:342
 msgid "Motion Left/Dark"
-msgstr ""
+msgstr "Движение наляво/тъмно"
 
 #: xrc/JoyPanel.xrc:386
 msgid "Motion Right/Light"
-msgstr ""
+msgstr "Движение надясно/светло"
 
 #: xrc/JoyPanel.xrc:408
 msgid "Speed Up"
-msgstr ""
+msgstr "Забързай"
 
 #: xrc/JoyPanel.xrc:430
 msgid "Spin Left"
-msgstr ""
+msgstr "Завърти наляво"
 
 #: xrc/JoyPanel.xrc:461
 msgid "Spin Right"
-msgstr ""
+msgstr "Завърти надясно"
 
 #: xrc/JoyPanel.xrc:483
 msgid "Screenshot"
-msgstr ""
+msgstr "Екранна снимка"
 
 #: xrc/JoyPanel.xrc:507
 msgid "Special"
-msgstr ""
+msgstr "Специален"
 
 #: xrc/JoyPanel.xrc:515
 msgid "Use as default"
-msgstr ""
+msgstr "Използвай като по подразбиране"
 
 #: xrc/JoyPanel.xrc:522
 msgid "Defaults"
-msgstr ""
+msgstr "По подразбирания"
 
 #: xrc/JoyPanel.xrc:529
 msgid "Clear All"
-msgstr ""
+msgstr "Изчисти всичко"
 
 #: xrc/JoypadConfig.xrc:4
 msgid "Joypad Configuration"
-msgstr ""
+msgstr "Джойпад конфигурация"
 
 #: xrc/JoypadConfig.xrc:13
 msgid "Player 1"
-msgstr ""
+msgstr "Играч 1"
 
 #: xrc/JoypadConfig.xrc:19
 msgid "Player 2"
-msgstr ""
+msgstr "Играч 2"
 
 #: xrc/JoypadConfig.xrc:25
 msgid "Player 3"
-msgstr ""
+msgstr "Играч 3"
 
 #: xrc/JoypadConfig.xrc:31
 msgid "Player 4"
-msgstr ""
+msgstr "Играч 4"
 
 #: xrc/LinkConfig.xrc:4
 msgid "Link configuration"
-msgstr ""
+msgstr "Конфигурация за връзка"
 
 #: xrc/LinkConfig.xrc:11
 msgid "Link timeout (in milliseconds)"
-msgstr ""
+msgstr "Изтекло време за връзка (в милисекунди)"
 
 #: xrc/Logging.xrc:4
 msgid "Logging"
-msgstr ""
+msgstr "Логване"
 
 #: xrc/Logging.xrc:13
 msgid "SW&I"
-msgstr ""
+msgstr "SW&I"
 
 #: xrc/Logging.xrc:20
 msgid "Unaligned &memory"
-msgstr ""
+msgstr "Неподравнена &памет"
 
 #: xrc/Logging.xrc:27
 msgid "Illegal &write"
-msgstr ""
+msgstr "Непозволен &запис"
 
 #: xrc/Logging.xrc:34
 msgid "Illegal &read"
-msgstr ""
+msgstr "Непозволено &четене"
 
 #: xrc/Logging.xrc:41
 msgid "DMA &0"
-msgstr ""
+msgstr "DMA &0"
 
 #: xrc/Logging.xrc:48
 msgid "DMA &1"
-msgstr ""
+msgstr "DMA &1"
 
 #: xrc/Logging.xrc:55
 msgid "DMA &2"
-msgstr ""
+msgstr "DMA &2"
 
 #: xrc/Logging.xrc:62
 msgid "DMA &3"
-msgstr ""
+msgstr "DMA &3"
 
 #: xrc/Logging.xrc:69
 msgid "&Undefined instruction"
-msgstr ""
+msgstr "&Неопределена инструкция"
 
 #: xrc/Logging.xrc:76
 msgid "&AGBPrint"
-msgstr ""
+msgstr "&AGBPrint"
 
 #: xrc/Logging.xrc:83
 msgid "Soun&d output"
-msgstr ""
+msgstr "Звуко&в изход"
 
 #: xrc/Logging.xrc:88
 msgid "Verbose"
-msgstr ""
+msgstr "Многословно"
 
 #: xrc/MainMenu.xrc:5
 msgid "&File"
-msgstr ""
+msgstr "&Файл"
 
 #: xrc/MainMenu.xrc:7
 msgid "Open..."
-msgstr ""
+msgstr "Отвори..."
 
 #: xrc/MainMenu.xrc:10
 msgid "Open &GB..."
-msgstr ""
+msgstr "Отвори &GB..."
 
 #: xrc/MainMenu.xrc:13
 msgid "Open GB&C..."
-msgstr ""
+msgstr "Отвори GB&C..."
 
 #: xrc/MainMenu.xrc:16
 msgid "Open rece&nt"
-msgstr ""
+msgstr "Отвори скорош&ни"
 
 #: xrc/MainMenu.xrc:18
 msgid "&Reset recent list"
-msgstr ""
+msgstr "&Нулирай списъка със скорошни"
 
 #: xrc/MainMenu.xrc:21
 msgid "&Freeze recent list"
-msgstr ""
+msgstr "&Замрази списъка със скорошни"
 
 #: xrc/MainMenu.xrc:26
 msgid "ROM in&formation..."
-msgstr ""
+msgstr "ROM ин&формация..."
 
 #: xrc/MainMenu.xrc:30
 msgid "&e-Reader"
-msgstr ""
+msgstr "&e-Reader"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
-msgstr ""
+msgstr "&Нулирай зареждане на точков код"
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
-msgstr ""
+msgstr "&Зареди точков код..."
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr ""
+msgstr "&Нулирай запазване на точков код"
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
-msgstr ""
+msgstr "&Запази точков код..."
 
 #: xrc/MainMenu.xrc:47
 msgid "Most &recent"
-msgstr ""
+msgstr "Най-&скорошни"
 
 #: xrc/MainMenu.xrc:50
 msgid "Load current state slot"
-msgstr ""
+msgstr "Зареди текущ слот на състояние"
 
 #: xrc/MainMenu.xrc:53
 msgid "&Auto load most recent"
-msgstr ""
+msgstr "&Авто зареди най-скорошен"
 
 #: xrc/MainMenu.xrc:61 xrc/MainMenu.xrc:117
 msgid "&2"
-msgstr ""
+msgstr "&2"
 
 #: xrc/MainMenu.xrc:64 xrc/MainMenu.xrc:120
 msgid "&3"
-msgstr ""
+msgstr "&3"
 
 #: xrc/MainMenu.xrc:67 xrc/MainMenu.xrc:123
 msgid "&4"
-msgstr ""
+msgstr "&4"
 
 #: xrc/MainMenu.xrc:70 xrc/MainMenu.xrc:126
 msgid "&5"
-msgstr ""
+msgstr "&5"
 
 #: xrc/MainMenu.xrc:73 xrc/MainMenu.xrc:129
 msgid "&6"
-msgstr ""
+msgstr "&6"
 
 #: xrc/MainMenu.xrc:76 xrc/MainMenu.xrc:132
 msgid "&7"
-msgstr ""
+msgstr "&7"
 
 #: xrc/MainMenu.xrc:79 xrc/MainMenu.xrc:135
 msgid "&8"
-msgstr ""
+msgstr "&8"
 
 #: xrc/MainMenu.xrc:82 xrc/MainMenu.xrc:138
 msgid "&9"
-msgstr ""
+msgstr "&9"
 
 #: xrc/MainMenu.xrc:85 xrc/MainMenu.xrc:141
 msgid "1&0"
-msgstr ""
+msgstr "1&0"
 
 #: xrc/MainMenu.xrc:89
 msgid "From &File ..."
-msgstr ""
+msgstr "От &файл ..."
 
 #: xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
-msgstr ""
+msgstr "Не променяй &батерийно запазване"
 
 #: xrc/MainMenu.xrc:97
 msgid "Do not change &cheat list"
-msgstr ""
+msgstr "Не променяй &чийт списък"
 
 #: xrc/MainMenu.xrc:100
 msgid "&Load state"
-msgstr ""
+msgstr "&Зареди състояние"
 
 #: xrc/MainMenu.xrc:104
 msgid "&Oldest slot"
-msgstr ""
+msgstr "&Най-стар слот"
 
 #: xrc/MainMenu.xrc:107
 msgid "Save current state slot"
-msgstr ""
+msgstr "Запази текущ слот на състояние"
 
 #: xrc/MainMenu.xrc:110
 msgid "Increase state slot number and save"
-msgstr ""
+msgstr "Увеличи номер на слот на състояние и запази"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File ..."
-msgstr ""
+msgstr "Към &файл ..."
 
 #: xrc/MainMenu.xrc:147
 msgid "&Save state"
-msgstr ""
+msgstr "&Запази състояние"
 
 #: xrc/MainMenu.xrc:150
 msgid "Increase state slot number"
-msgstr ""
+msgstr "Увеличи номер на слот на състояние"
 
 #: xrc/MainMenu.xrc:153
 msgid "Decrease state slot number"
-msgstr ""
+msgstr "Намали номер на слот на състояние"
 
 #: xrc/MainMenu.xrc:158 xrc/MainMenu.xrc:170
 msgid "&Battery file..."
-msgstr ""
+msgstr "&Батериен файл..."
 
 #: xrc/MainMenu.xrc:161
 msgid "Gameshark &code file..."
-msgstr ""
+msgstr "Gameshark &код файл..."
 
 #: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
 msgid "&Gameshark snapshot..."
-msgstr ""
+msgstr "&Gameshark снимка..."
 
 #: xrc/MainMenu.xrc:166
 msgid "&Import"
-msgstr ""
+msgstr "&Внеси"
 
 #: xrc/MainMenu.xrc:175
 msgid "&Export"
-msgstr ""
+msgstr "&Изнеси"
 
 #: xrc/MainMenu.xrc:179
 msgid "Screen capt&ure..."
-msgstr ""
+msgstr "Захв&ащане на екран..."
 
 #: xrc/MainMenu.xrc:183
 msgid "Start &sound recording..."
-msgstr ""
+msgstr "Започни &звукозапис..."
 
 #: xrc/MainMenu.xrc:186
 msgid "Stop s&ound recording"
-msgstr ""
+msgstr "Спри з&вукозапис"
 
 #: xrc/MainMenu.xrc:189
 msgid "Start &video recording..."
-msgstr ""
+msgstr "Започни &видеозапис..."
 
 #: xrc/MainMenu.xrc:192
 msgid "Stop v&ideo recording"
-msgstr ""
+msgstr "Спри в&идеозапис"
 
 #: xrc/MainMenu.xrc:195
 msgid "Start &game recording..."
-msgstr ""
+msgstr "Започни &запис на игра..."
 
 #: xrc/MainMenu.xrc:198
 msgid "Stop g&ame recording"
-msgstr ""
+msgstr "Спри з&апис на игра"
 
 #: xrc/MainMenu.xrc:200
 msgid "&Record"
-msgstr ""
+msgstr "&Запис"
 
 #: xrc/MainMenu.xrc:204
 msgid "Start playing &movie..."
-msgstr ""
+msgstr "Започни възпроизвеждане на &филм..."
 
 #: xrc/MainMenu.xrc:207
 msgid "Stop playing m&ovie"
-msgstr ""
+msgstr "Спри възпроизвеждане на ф&илм"
 
 #: xrc/MainMenu.xrc:209
 msgid "&Play"
-msgstr ""
+msgstr "&Възпроизвеждане"
 
 #: xrc/MainMenu.xrc:214
 msgid "&Quit"
-msgstr ""
+msgstr "&Излез"
 
 #: xrc/MainMenu.xrc:218
 msgid "&Emulation"
-msgstr ""
+msgstr "&Емулация"
 
 #: xrc/MainMenu.xrc:220
 msgid "&Pause"
-msgstr ""
+msgstr "&Пауза"
 
 #: xrc/MainMenu.xrc:224
 msgid "&Next frame"
-msgstr ""
+msgstr "&Следващ кадър"
 
 #: xrc/MainMenu.xrc:227
 msgid "Re&wind"
-msgstr ""
+msgstr "Пре&навиване"
 
 #: xrc/MainMenu.xrc:231
 msgid "Toggle &full screen"
-msgstr ""
+msgstr "Превключи &цял екран"
 
 #: xrc/MainMenu.xrc:238
 msgid "&Turbo mode"
-msgstr ""
+msgstr "&Турбо режим"
 
 #: xrc/MainMenu.xrc:242
 msgid "&VSync"
-msgstr ""
+msgstr "&VSync"
 
 #: xrc/MainMenu.xrc:246
 msgid "&Auto skip frames"
-msgstr ""
+msgstr "&Авто прескачане на кадри"
 
 #: xrc/MainMenu.xrc:251
 msgid "&Skip BIOS"
-msgstr ""
+msgstr "&Прескочи BIOS"
 
 #: xrc/MainMenu.xrc:255
 msgid "&Auto IPS/UPS/IPF patch"
-msgstr ""
+msgstr "&Авто IPS/UPS/IPF пач"
 
 #: xrc/MainMenu.xrc:259
 msgid "&Pause when inactive"
-msgstr ""
+msgstr "&Пауза, когато е неактивен"
 
 #: xrc/MainMenu.xrc:264
 msgid "&Reset"
-msgstr ""
+msgstr "&Нулирай"
 
 #: xrc/MainMenu.xrc:268
 msgid "&Options"
-msgstr ""
+msgstr "&Опции"
 
 #: xrc/MainMenu.xrc:270
 msgid "&Link"
-msgstr ""
+msgstr "&Връзка"
 
 #: xrc/MainMenu.xrc:272
 msgid "Start &Network Link ..."
-msgstr ""
+msgstr "Стартирай &мрежова връзка ..."
 
 #: xrc/MainMenu.xrc:277
 msgid "&Nothing"
-msgstr ""
+msgstr "&Нищо"
 
 #: xrc/MainMenu.xrc:281
 msgid "&Cable"
-msgstr ""
+msgstr "&Кабел"
 
 #: xrc/MainMenu.xrc:285
 msgid "&Wireless"
-msgstr ""
+msgstr "&Безжично"
 
 #: xrc/MainMenu.xrc:289
 msgid "&GameCube"
-msgstr ""
+msgstr "&GameCube"
 
 #: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:525
 msgid "&Game Boy"
-msgstr ""
+msgstr "&Game Boy"
 
 #: xrc/MainMenu.xrc:298
 msgid "&Local mode"
-msgstr ""
+msgstr "&Локален режим"
 
 #: xrc/MainMenu.xrc:302
 msgid "&Link at boot"
-msgstr ""
+msgstr "&Връзка при зареждане"
 
 #: xrc/MainMenu.xrc:306
 msgid "&Speed hack"
-msgstr ""
+msgstr "&Скоростен хак"
 
 #: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:391
 #: xrc/MainMenu.xrc:427
 msgid "&Configure ..."
-msgstr ""
+msgstr "&Конфигурирай ..."
 
 #: xrc/MainMenu.xrc:314
 msgid "&Video"
-msgstr ""
+msgstr "&Видео"
 
 #: xrc/MainMenu.xrc:320
 msgid "&Start in full screen"
-msgstr ""
+msgstr "&Започни в цял екран"
 
 #: xrc/MainMenu.xrc:324
 msgid "&Scaled resize"
-msgstr ""
+msgstr "&Мащабирано преоразмеряване"
 
 #: xrc/MainMenu.xrc:326
 msgid "&1x"
-msgstr ""
+msgstr "&1x"
 
 #: xrc/MainMenu.xrc:329
 msgid "&2x"
-msgstr ""
+msgstr "&2x"
 
 #: xrc/MainMenu.xrc:332
 msgid "&3x"
-msgstr ""
+msgstr "&3x"
 
 #: xrc/MainMenu.xrc:335
 msgid "&4x"
-msgstr ""
+msgstr "&4x"
 
 #: xrc/MainMenu.xrc:338
 msgid "&5x"
-msgstr ""
+msgstr "&5x"
 
 #: xrc/MainMenu.xrc:341
 msgid "&6x"
-msgstr ""
+msgstr "&6x"
 
 #: xrc/MainMenu.xrc:345
 msgid "Change pixel filter"
-msgstr ""
+msgstr "Смени пиксел филтър"
 
 #: xrc/MainMenu.xrc:348
 msgid "Change interframe blending"
-msgstr ""
+msgstr "Смени междукадрово смесване"
 
 #: xrc/MainMenu.xrc:351
 msgid "&Retain aspect ratio"
-msgstr ""
+msgstr "&Запази съотношение на страните"
 
 #: xrc/MainMenu.xrc:355
 msgid "Enable MMX"
-msgstr ""
+msgstr "Разреши MMX"
 
 #: xrc/MainMenu.xrc:360
 msgid "&Bilinear filter"
-msgstr ""
+msgstr "&Билинеен филтър"
 
 #: xrc/MainMenu.xrc:371
 msgid "&Keep window on top"
-msgstr ""
+msgstr "&Дръж прозореца отгоре"
 
 #: xrc/MainMenu.xrc:376
 msgid "&Status bar"
-msgstr ""
+msgstr "&Лента на състоянието"
 
 #: xrc/MainMenu.xrc:380
 msgid "&Disable on-screen display"
-msgstr ""
+msgstr "&Забрани екранен дисплей"
 
 #: xrc/MainMenu.xrc:384
 msgid "&Transparent on-screen display"
-msgstr ""
+msgstr "&Прозрачен екранен дисплей"
 
 #: xrc/MainMenu.xrc:389
 msgid "&Audio"
-msgstr ""
+msgstr "&Аудио"
 
 #: xrc/MainMenu.xrc:394
 msgid "&Increase volume"
-msgstr ""
+msgstr "&Увеличи гръмкост"
 
 #: xrc/MainMenu.xrc:398
 msgid "&Decrease volume"
-msgstr ""
+msgstr "&Намали гръмкост"
 
 #: xrc/MainMenu.xrc:402
 msgid "&Toggle sound"
-msgstr ""
+msgstr "&Превключи звук"
 
 #: xrc/MainMenu.xrc:407
 msgid "&GBA sound interpolation"
-msgstr ""
+msgstr "&GBA звукова интерполация"
 
 #: xrc/MainMenu.xrc:412
 msgid "&GB sound enhancement"
-msgstr ""
+msgstr "&GB звуково подобрение"
 
 #: xrc/MainMenu.xrc:416
 msgid "&GB surround sound effect"
-msgstr ""
+msgstr "&GB ефект на съраунд звук"
 
 #: xrc/MainMenu.xrc:420
 msgid "&GB sound declicking"
-msgstr ""
+msgstr "&GB звуково намаляване на щракания"
 
 #: xrc/MainMenu.xrc:425
 msgid "&Input"
-msgstr ""
+msgstr "&Въвеждане"
 
 #: xrc/MainMenu.xrc:430
 msgid "Allow &keyboard background input"
-msgstr ""
+msgstr "Позволи &фоново въвеждане от клавиатура"
 
 #: xrc/MainMenu.xrc:434
 msgid "Allow &joystick background input"
-msgstr ""
+msgstr "Позволи &фоново въвеждане от джойстик"
 
 #: xrc/MainMenu.xrc:439
 msgid "&Autofire"
-msgstr ""
+msgstr "&Автоогън"
 
 #: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
 msgid "&A"
-msgstr ""
+msgstr "&A"
 
 #: xrc/MainMenu.xrc:445 xrc/MainMenu.xrc:480
 msgid "&B"
-msgstr ""
+msgstr "&B"
 
 #: xrc/MainMenu.xrc:449 xrc/MainMenu.xrc:484
 msgid "&L"
-msgstr ""
+msgstr "&L"
 
 #: xrc/MainMenu.xrc:453 xrc/MainMenu.xrc:488
 msgid "&R"
-msgstr ""
+msgstr "&R"
 
 #: xrc/MainMenu.xrc:458
 msgid "&Autohold"
-msgstr ""
+msgstr "&Автозадържане"
 
 #: xrc/MainMenu.xrc:502
 msgid "&Game Boy Advance"
-msgstr ""
+msgstr "&Game Boy Advance"
 
 #: xrc/MainMenu.xrc:504 xrc/MainMenu.xrc:527
 msgid "Configure ..."
-msgstr ""
+msgstr "Конфигурирай ..."
 
 #: xrc/MainMenu.xrc:508
 msgid "&Real-time clock"
-msgstr ""
+msgstr "&Часовник за реално време"
 
 #: xrc/MainMenu.xrc:512
 msgid "&Use BIOS file"
-msgstr ""
+msgstr "&Използвай BIOS файл"
 
 #: xrc/MainMenu.xrc:516
 msgid "&Debug print"
-msgstr ""
+msgstr "&Дебъг печат"
 
 #: xrc/MainMenu.xrc:520 xrc/MainMenu.xrc:535
 msgid "&LCD Filter"
-msgstr ""
+msgstr "&LCD филтър"
 
 #: xrc/MainMenu.xrc:531
 msgid "&GB color option"
-msgstr ""
+msgstr "&GB цветова опция"
 
 #: xrc/MainMenu.xrc:539
 msgid "&GB Colorizer Hack (requires restart)"
-msgstr ""
+msgstr "&GB Colorizer Hack (изисква повторно стартиране)"
 
 #: xrc/MainMenu.xrc:543
 msgid "&GB printer"
-msgstr ""
+msgstr "&GB принтер"
 
 #: xrc/MainMenu.xrc:547
 msgid "&Gather a full page before printing"
-msgstr ""
+msgstr "&Събери пълна страница преди печатане"
 
 #: xrc/MainMenu.xrc:551
 msgid "&Save printouts as screen captures"
-msgstr ""
+msgstr "&Запази разпечатки като екранни захващания"
 
 #: xrc/MainMenu.xrc:556
 msgid "&Use GB BIOS file (requires restart)"
-msgstr ""
+msgstr "&Използвай GB BIOS файл (изисква повторно стартиране)"
 
 #: xrc/MainMenu.xrc:560
 msgid "&Use GBC BIOS file"
-msgstr ""
+msgstr "&Използвай GBC BIOS файл"
 
 #: xrc/MainMenu.xrc:565
 msgid "&General ..."
-msgstr ""
+msgstr "&Основни ..."
 
 #: xrc/MainMenu.xrc:568
 msgid "&Speedup / Turbo ..."
-msgstr ""
+msgstr "&Забързване / Турбо ..."
 
 #: xrc/MainMenu.xrc:571
 msgid "D&irectories ..."
-msgstr ""
+msgstr "Д&иректории ..."
 
 #: xrc/MainMenu.xrc:574
 msgid "&Key Shortcuts ..."
-msgstr ""
+msgstr "&Клавишни преки пътища ..."
 
 #: xrc/MainMenu.xrc:577
 msgid "&UI Settings ..."
-msgstr ""
+msgstr "&ПИ настройки ..."
 
 #: xrc/MainMenu.xrc:581
 msgid "&Tools"
-msgstr ""
+msgstr "&Инструменти"
 
 #: xrc/MainMenu.xrc:583
 msgid "&Cheats"
-msgstr ""
+msgstr "&Чийтове"
 
 #: xrc/MainMenu.xrc:585
 msgid "List &cheats ..."
-msgstr ""
+msgstr "Изброй &чийтове ..."
 
 #: xrc/MainMenu.xrc:588
 msgid "Find c&heat ..."
-msgstr ""
+msgstr "Намери ч&ийт ..."
 
 #: xrc/MainMenu.xrc:592
 msgid "A&utomatically save/load cheats"
-msgstr ""
+msgstr "А&втоматично запази/зареди чийтове"
 
 #: xrc/MainMenu.xrc:596
 msgid "&Enable cheats"
-msgstr ""
+msgstr "&Разреши чийтове"
 
 #: xrc/MainMenu.xrc:603
 msgid "&Break into GDB"
-msgstr ""
+msgstr "&Пробий в GDB"
 
 #: xrc/MainMenu.xrc:607
 msgid "&Configure port..."
-msgstr ""
+msgstr "&Конфигурирай порт..."
 
 #: xrc/MainMenu.xrc:610
 msgid "&Break on load"
-msgstr ""
+msgstr "&Пробий при зареждане"
 
 #: xrc/MainMenu.xrc:615
 msgid "&Disconnect"
-msgstr ""
+msgstr "&Прекъсни"
 
 #: xrc/MainMenu.xrc:617
 msgid "&GDB"
-msgstr ""
+msgstr "&GDB"
 
 #: xrc/MainMenu.xrc:620
 msgid "&Disassemble..."
-msgstr ""
+msgstr "&Разглоби..."
 
 #: xrc/MainMenu.xrc:623
 msgid "&Logging..."
-msgstr ""
+msgstr "&Логване..."
 
 #: xrc/MainMenu.xrc:626
 msgid "&IO Viewer..."
-msgstr ""
+msgstr "&ВИ преглеждач"
 
 #: xrc/MainMenu.xrc:629
 msgid "&Map Viewer..."
-msgstr ""
+msgstr "&Табличен преглеждач..."
 
 #: xrc/MainMenu.xrc:632
 msgid "M&emory Viewer..."
-msgstr ""
+msgstr "&Паметен преглеждач..."
 
 #: xrc/MainMenu.xrc:635
 msgid "&OAM Viewer..."
-msgstr ""
+msgstr "&OAM преглеждач..."
 
 #: xrc/MainMenu.xrc:638
 msgid "&Palette Viewer..."
-msgstr ""
+msgstr "&Палитрен преглеждач..."
 
 #: xrc/MainMenu.xrc:641
 msgid "&Tile Viewer..."
-msgstr ""
+msgstr "&Плочков преглеждач..."
 
 #: xrc/MainMenu.xrc:646
 msgid "Show all video layers"
-msgstr ""
+msgstr "Покажи всички видео слоеве"
 
 #: xrc/MainMenu.xrc:650
 msgid "BG &0"
-msgstr ""
+msgstr "BG &0"
 
 #: xrc/MainMenu.xrc:655
 msgid "BG &1"
-msgstr ""
+msgstr "BG &1"
 
 #: xrc/MainMenu.xrc:660
 msgid "BG &2"
-msgstr ""
+msgstr "BG &2"
 
 #: xrc/MainMenu.xrc:665
 msgid "BG &3"
-msgstr ""
+msgstr "BG &3"
 
 #: xrc/MainMenu.xrc:670
 msgid "&OBJ"
-msgstr ""
+msgstr "&OBJ"
 
 #: xrc/MainMenu.xrc:675
 msgid "&WIN 0"
-msgstr ""
+msgstr "&WIN 0"
 
 #: xrc/MainMenu.xrc:680
 msgid "W&IN 1"
-msgstr ""
+msgstr "W&IN 1"
 
 #: xrc/MainMenu.xrc:685
 msgid "O&BJ WIN"
-msgstr ""
+msgstr "O&BJ WIN"
 
 #: xrc/MainMenu.xrc:689
 msgid "&View Layers"
-msgstr ""
+msgstr "&Прегледай слоеве"
 
 #: xrc/MainMenu.xrc:693
 msgid "Channel &1"
-msgstr ""
+msgstr "Канал &1"
 
 #: xrc/MainMenu.xrc:698
 msgid "Channel &2"
-msgstr ""
+msgstr "Канал &2"
 
 #: xrc/MainMenu.xrc:703
 msgid "Channel &3"
-msgstr ""
+msgstr "Канал &3"
 
 #: xrc/MainMenu.xrc:708
 msgid "Channel &4"
-msgstr ""
+msgstr "Канал &4"
 
 #: xrc/MainMenu.xrc:713
 msgid "Direct Sound &A"
-msgstr ""
+msgstr "Direct Sound &A"
 
 #: xrc/MainMenu.xrc:718
 msgid "Direct Sound &B"
-msgstr ""
+msgstr "Direct Sound &B"
 
 #: xrc/MainMenu.xrc:722
 msgid "&Sound Channels"
-msgstr ""
+msgstr "&Звукови канали"
 
 #: xrc/MainMenu.xrc:726
 msgid "&Help"
-msgstr ""
+msgstr "&Помощ"
 
 #: xrc/MainMenu.xrc:728
 msgid "Report &Bugs"
-msgstr ""
+msgstr "Докладвай &грешки"
 
 #: xrc/MainMenu.xrc:731
 msgid "VBA-M Support &Forum"
-msgstr ""
+msgstr "VBA-M &форум за поддръжка"
 
 #: xrc/MainMenu.xrc:734
 msgid "Translations"
-msgstr ""
+msgstr "Преводи"
 
 #: xrc/MainMenu.xrc:742
 msgid "Check for updates"
-msgstr ""
+msgstr "Провери за обновления"
 
 #: xrc/MainMenu.xrc:745
 msgid "&Factory Reset..."
-msgstr ""
+msgstr "&Фабрично нулиране..."
 
 #: xrc/MainMenu.xrc:749
 msgid "&About..."
-msgstr ""
+msgstr "&Относно..."
 
 #: xrc/MapViewer.xrc:4
 msgid "Map Viewer"
-msgstr ""
+msgstr "Табличен преглеждач"
 
 #: xrc/MapViewer.xrc:16
 msgid "Frame 0"
-msgstr ""
+msgstr "Кадър 0"
 
 #: xrc/MapViewer.xrc:22
 msgid "Frame 1"
-msgstr ""
+msgstr "Кадър 1"
 
 #: xrc/MapViewer.xrc:25
 msgid "Frame"
-msgstr ""
+msgstr "Кадър"
 
 #: xrc/MapViewer.xrc:35
 msgid "BG0"
-msgstr ""
+msgstr "BG0"
 
 #: xrc/MapViewer.xrc:41
 msgid "BG1"
-msgstr ""
+msgstr "BG1"
 
 #: xrc/MapViewer.xrc:46
 msgid "BG2"
-msgstr ""
+msgstr "BG2"
 
 #: xrc/MapViewer.xrc:51
 msgid "BG3"
-msgstr ""
+msgstr "BG3"
 
 #: xrc/MapViewer.xrc:84
 msgid "Map Base:"
-msgstr ""
+msgstr "Таблична база:"
 
 #: xrc/MapViewer.xrc:92
 msgid "Char Base:"
-msgstr ""
+msgstr "Знакова база:"
 
 #: xrc/MapViewer.xrc:100 xrc/MemSelRegion.xrc:22 xrc/OAMViewer.xrc:77
 msgid "Size:"
-msgstr ""
+msgstr "Размер:"
 
 #: xrc/MapViewer.xrc:108 xrc/OAMViewer.xrc:45
 msgid "Colors:"
-msgstr ""
+msgstr "Цветове:"
 
 #: xrc/MapViewer.xrc:124
 msgid "Mosaic:"
-msgstr ""
+msgstr "Мозайка:"
 
 #: xrc/MapViewer.xrc:132
 msgid "Overflow:"
-msgstr ""
+msgstr "Препълване:"
 
 #: xrc/MemViewer.xrc:4
 msgid "Memory Viewer"
-msgstr ""
+msgstr "&Паметен преглеждач..."
 
 #: xrc/MemViewer.xrc:17
 msgid "&8-bit"
-msgstr ""
+msgstr "&8-бита"
 
 #: xrc/MemViewer.xrc:25
 msgid "&16-bit"
-msgstr ""
+msgstr "&16-бита"
 
 #: xrc/MemViewer.xrc:32
 msgid "&32-bit"
-msgstr ""
+msgstr "&32-бита"
 
 #: xrc/MemViewer.xrc:83
 msgid "Current address:"
-msgstr ""
+msgstr "Текущ адрес:"
 
 #: xrc/MemViewer.xrc:108
 msgid "&Load..."
-msgstr ""
+msgstr "&Зареди..."
 
 #: xrc/NetLink.xrc:4
 msgid "Start Network Link"
-msgstr ""
+msgstr "Стартирай мрежова връзка"
 
 #: xrc/NetLink.xrc:11
 msgid "Server"
-msgstr ""
+msgstr "Сървър"
 
 #: xrc/NetLink.xrc:19
 msgid "Client"
-msgstr ""
+msgstr "Клиент"
 
 #: xrc/NetLink.xrc:32
 msgid "Players:"
-msgstr ""
+msgstr "Играчи:"
 
 #: xrc/NetLink.xrc:41
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: xrc/NetLink.xrc:49
 msgid "3"
-msgstr ""
+msgstr "3"
 
 #: xrc/NetLink.xrc:56
 msgid "4"
-msgstr ""
+msgstr "4"
 
 #: xrc/NetLink.xrc:67
 msgid "Server:"
-msgstr ""
+msgstr "Сървър:"
 
 #: xrc/NetLink.xrc:81
 msgid "Port:"
-msgstr ""
+msgstr "Порт:"
 
 #: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
-msgstr ""
+msgstr "OAM преглеждач"
 
 #: xrc/OAMViewer.xrc:85
 msgid "Rot.:"
-msgstr ""
+msgstr "Рот.:"
 
 #: xrc/PaletteViewer.xrc:4
 msgid "Palette Viewer"
-msgstr ""
+msgstr "Палитрен преглеждач"
 
 #: xrc/PaletteViewer.xrc:88
 msgid "C&hange backdrop color..."
-msgstr ""
+msgstr "П&ромени фонов цвят..."
 
 #: xrc/SoundConfig.xrc:4
 msgid "Sound Settings"
-msgstr ""
+msgstr "Звукови настройки"
 
 #: xrc/SoundConfig.xrc:16
 msgid "Volume :"
-msgstr ""
+msgstr "Гръмкост :"
 
 #: xrc/SoundConfig.xrc:34
 msgid "Mute"
-msgstr ""
+msgstr "Заглуши"
 
 #: xrc/SoundConfig.xrc:54 xrc/SoundConfig.xrc:320
 msgid "Maximum"
-msgstr ""
+msgstr "Максимум"
 
 #: xrc/SoundConfig.xrc:71
 msgid "Sample rate :"
-msgstr ""
+msgstr "Честота на дискретизация :"
 
 #: xrc/SoundConfig.xrc:77
 msgid "48 KHz"
-msgstr ""
+msgstr "48 КХц"
 
 #: xrc/SoundConfig.xrc:78
 msgid "44.1 KHz"
-msgstr ""
+msgstr "44.1 КХц"
 
 #: xrc/SoundConfig.xrc:79
 msgid "22 KHz"
-msgstr ""
+msgstr "22 КХц"
 
 #: xrc/SoundConfig.xrc:80
 msgid "11 KHz"
-msgstr ""
+msgstr "11 КХц"
 
 #: xrc/SoundConfig.xrc:103
 msgid "SDL"
-msgstr ""
+msgstr "SDL"
 
 #: xrc/SoundConfig.xrc:111
 msgid "OpenAL"
-msgstr ""
+msgstr "OpenAL"
 
 #: xrc/SoundConfig.xrc:118
 msgid "DirectSound"
-msgstr ""
+msgstr "DirectSound"
 
 #: xrc/SoundConfig.xrc:125
 msgid "XAudio2"
-msgstr ""
+msgstr "XAudio2"
 
 #: xrc/SoundConfig.xrc:132
 msgid "FAudio"
-msgstr ""
+msgstr "FAudio"
 
 #: xrc/SoundConfig.xrc:146
 msgid "Device"
-msgstr ""
+msgstr "Устройство"
 
 #: xrc/SoundConfig.xrc:154
 msgid "Enable stereo upmixing"
-msgstr ""
+msgstr "Разреши стерео миксиране"
 
 #: xrc/SoundConfig.xrc:161
 msgid "Enable hardware acceleration"
-msgstr ""
+msgstr "Разреши хардуерно ускорение"
 
 #: xrc/SoundConfig.xrc:190
 msgid "Number of sound buffers:"
-msgstr ""
+msgstr "Брой звукови буфери:"
 
 #: xrc/SoundConfig.xrc:198
 msgid "Advanced"
-msgstr ""
+msgstr "Разширени"
 
 #: xrc/SoundConfig.xrc:230
 msgid "Lots"
-msgstr ""
+msgstr "Много"
 
 #: xrc/SoundConfig.xrc:239
 msgid "Echo"
-msgstr ""
+msgstr "Ехо"
 
 #: xrc/SoundConfig.xrc:247
 msgid "Stereo"
-msgstr ""
+msgstr "Стерео"
 
 #: xrc/SoundConfig.xrc:258
 msgid "Center"
-msgstr ""
+msgstr "Център"
 
 #: xrc/SoundConfig.xrc:269
 msgid "Left/Right"
-msgstr ""
+msgstr "Ляв/Десен"
 
 #: xrc/SoundConfig.xrc:298
 msgid "Sound filtering"
-msgstr ""
+msgstr "Звуково филтриране"
 
 #: xrc/TileViewer.xrc:4
 msgid "Tile Viewer"
-msgstr ""
+msgstr "Плочков преглеждач"
 
 #: xrc/TileViewer.xrc:15
 msgid "1&6"
-msgstr ""
+msgstr "1&6"
 
 #: xrc/TileViewer.xrc:21
 msgid "&256"
-msgstr ""
+msgstr "&256"
 
 #: xrc/TileViewer.xrc:24
 msgid "Colors"
-msgstr ""
+msgstr "Цветове"
 
 #: xrc/TileViewer.xrc:34
 msgid "0x600&0000"
-msgstr ""
+msgstr "0x600&0000"
 
 #: xrc/TileViewer.xrc:40
 msgid "0x600&4000"
-msgstr ""
+msgstr "0x600&4000"
 
 #: xrc/TileViewer.xrc:45
 msgid "0x600&8000"
-msgstr ""
+msgstr "0x600&8000"
 
 #: xrc/TileViewer.xrc:50
 msgid "0x600&C000"
-msgstr ""
+msgstr "0x600&C000"
 
 #: xrc/TileViewer.xrc:55
 msgid "0x60&10000"
-msgstr ""
+msgstr "0x60&10000"
 
 #: xrc/SpeedupConfig.xrc:4
 msgid "SpeedUp / Turbo Settings"
-msgstr ""
+msgstr "Забързване / Турбо настройки"
 
 #: xrc/SpeedupConfig.xrc:9
 msgid "Speedup Throttle"
-msgstr ""
+msgstr "Дроселиране на забързване"
 
 #: xrc/SpeedupConfig.xrc:50
 msgid "Frame skip"
-msgstr ""
+msgstr "Прескачане на кадри"
 
 #: xrc/UIConfig.xrc:4
 msgid "User Interface Settings"
-msgstr ""
+msgstr "Настройки на потребителски интерфейс"
 
 #: xrc/UIConfig.xrc:9
 msgid "Hide Menu Bar"
-msgstr ""
+msgstr "Скрий лентата на менюто"
