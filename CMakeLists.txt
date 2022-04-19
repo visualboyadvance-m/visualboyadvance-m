@@ -103,6 +103,11 @@ option(ENABLE_WX "Build the wxWidgets port" ON)
 option(ENABLE_DEBUGGER "Enable the debugger" ON)
 option(ENABLE_ASAN "Enable -fsanitize=<option>, address by default, requires debug build" OFF)
 
+# Default to static builds on MinGW and all MSYS2 envs.
+if(MINGW OR (NOT "$ENV{MSYSTEM_PREFIX}" STREQUAL ""))
+    set(VBAM_STATIC_DEFAULT ON)
+endif()
+
 option(VBAM_STATIC "Try to link all libraries statically" ${VBAM_STATIC_DEFAULT})
 
 if(VBAM_STATIC)
