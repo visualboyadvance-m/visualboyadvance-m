@@ -88,7 +88,7 @@ This program may require [1;35msudo[0m.
 
 A cross-compile target may be specified as the only parameter, of either [1;35mm32[0m which targets the host in 32 bit mode (e.g. x86 on an amd64 host) or [1;35mwin32[0m, [1;35mMinGW-w64-i686[0m or [1;35mMinGW-w64-x86_64[0m.  [1;35mwin32[0m is an alias for [1;35mMinGW-w64-i686[0m to target Windows via MinGW.  Cross compiling for Windows is only supported on Debian/Ubuntu, Fedora, Arch Linux and MSYS2.
 
-On MSYS2 the [1;35mMinGW-w64-clang-x86_64[0m target for CLANG64 and the [1;35mMinGW-w64-clang-i686[0m target for CLANG32 are also supported.
+On MSYS2 the [1;35mMinGW-w64-clang-x86_64[0m target for CLANG64 and the [1;35mMinGW-w64-clang-i686[0m target for CLANG32 are also supported, as well as [1;35mMinGW-w64-ucrt-x86_64[0m for UCRT64.
 
 On MSYS2 dependencies are installed for 32 or 64 bit native Windows targets based on which shell you started (the value of $MSYSTEM) unless you specify one or the other. You can specify a cross target of [1;35mm32[0m or [1;35mm64[0m as aliases for the 32 bit or 64 bit MinGW gcc targets respectively. MSYS2 POSIX layer builds are not supported.
 
@@ -253,6 +253,9 @@ check_cross() {
                 CLANG64)
                     target='mingw-w64-clang-x86_64'
                     ;;
+                UCRT64)
+                    target='mingw-w64-ucrt-x86_64'
+                    ;;
                 MSYS)
                     error 'host builds in MSYS mode are not supported, supply a target or start a MINGW shell'
                     ;;
@@ -278,10 +281,10 @@ check_cross() {
                 win64)
                     target='mingw-w64-x86_64'
                     ;;
-                mingw-w64-x86_64|mingw-w64-i686|mingw-w64-clang-x86_64|mingw-w64-clang-i686)
+                mingw-w64-x86_64|mingw-w64-i686|mingw-w64-clang-x86_64|mingw-w64-ucrt-x86_64|mingw-w64-clang-i686)
                     ;;
                 *)
-                    error "target must be one of 'm32', 'win32', 'win64', or one of the MinGW/clang targets supported by MSYS2: mingw-w64-[clang-](x86_64|i686)."
+                    error "target must be one of 'm32', 'win32', 'win64', or one of the MinGW/clang/ucrt targets supported by MSYS2: mingw-w64-[clang|ucrt]-(x86_64|i686)."
                     ;;
             esac
             ;;
