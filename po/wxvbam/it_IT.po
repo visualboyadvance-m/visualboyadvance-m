@@ -10,6 +10,7 @@
 # Davide, 2020
 # Emanuele Baserga <emanuelebaserga@hotmail.it>, 2019
 # Picat <pichu474android@gmail.com>, 2016
+# Giulio Serroni, 2022
 # Luca Bonello <fenopiu@gmail.com>, 2016
 # Michele Rebughini <michelerebughini@gmail.com>, 2020
 # OTTO X <blg.dpnx@gmail.com>, 2015
@@ -23,7 +24,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-24 21:24+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Seb47 <seb47tv@gmail.com>, 2021\n"
+"Last-Translator: Giulio Serroni, 2022\n"
 "Language-Team: Italian (Italy) (http://www.transifex.com/bgk/vba-m/language/it_IT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -768,7 +769,7 @@ msgstr "Slot attuale #%d"
 
 #: cmdevents.cpp:1883
 msgid "Cannot use Colorizer Hack when GB BIOS File is enabled."
-msgstr ""
+msgstr "Impossibile usare Colorizer Hack quando il file GB BIOS è abilitato."
 
 #: cmdevents.cpp:2098
 msgid "Sound enabled"
@@ -852,7 +853,7 @@ msgstr "Questo programma è un software gratuito: puoi ridistribuirlo e/o modifi
 
 #: cmdevents.cpp:3101
 msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
-msgstr ""
+msgstr "Impossibile usare GB BIOS quando Colorizer Hack è abilitato."
 
 #: cmdevents.cpp:3161
 msgid "LAN link is already active.  Disable link mode to disconnect."
@@ -980,7 +981,7 @@ msgstr "Impossibile caricare la Game Boy ROM %s"
 msgid ""
 "Cannot use GB BIOS file when Colorizer Hack is enabled, disabling GB BIOS "
 "file."
-msgstr ""
+msgstr "Impossibile usare GB BIOS quando Colorizer Hack è abilitato, disabilitare il file GB BIOS"
 
 #: panel.cpp:220 panel.cpp:320
 #, c-format
@@ -3157,7 +3158,7 @@ msgstr "Opzioni di colore &GB"
 
 #: xrc/MainMenu.xrc:539
 msgid "&GB Colorizer Hack (requires restart)"
-msgstr ""
+msgstr "&GB Colorizer Hack (richiede il riavvio)"
 
 #: xrc/MainMenu.xrc:543
 msgid "&GB printer"
@@ -3173,7 +3174,7 @@ msgstr "&Salva stampati come catture di schermo"
 
 #: xrc/MainMenu.xrc:556
 msgid "&Use GB BIOS file (requires restart)"
-msgstr ""
+msgstr "&Usa il file GB BIOS (richiede il riavvio)"
 
 #: xrc/MainMenu.xrc:560
 msgid "&Use GBC BIOS file"
