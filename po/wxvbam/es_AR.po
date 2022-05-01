@@ -5,13 +5,14 @@
 # Translators:
 # micro nine <micronine24@gmail.com>, 2018
 # Nicolas Padrani <nicolas6.padrani@gmail.com>, 2019
+# Norma griselda, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-24 21:24+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Nicolas Padrani <nicolas6.padrani@gmail.com>, 2019\n"
+"Last-Translator: Norma griselda, 2022\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/bgk/vba-m/language/es_AR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,7 +22,7 @@ msgstr ""
 
 #: wxvbam.cpp:225
 msgid "visualboyadvance-m"
-msgstr ""
+msgstr "visualboyadvance-m"
 
 #: wxvbam.cpp:442
 msgid "Could not create main window"
