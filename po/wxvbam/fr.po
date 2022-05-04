@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Benjamin Siskoo <siskoo@tradu-france.com>, 2015-2016,2020
+# Boris Djekornom, 2022
 # Cissou <lestiennes.cyril@gmail.com>, 2015
 # Eequiis Vásquez, 2022
 # Jack, 2015
@@ -24,7 +25,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-24 21:24+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Eequiis Vásquez, 2022\n"
+"Last-Translator: Boris Djekornom, 2022\n"
 "Language-Team: French (http://www.transifex.com/bgk/vba-m/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -38,65 +39,65 @@ msgstr "visualboyadvance-m"
 
 #: wxvbam.cpp:442
 msgid "Could not create main window"
-msgstr "Ne peut pas créer la fenêtre principale"
+msgstr "ne peut pas créer la fenêtre principale"
 
 #: wxvbam.cpp:513
 msgid "Save built-in XRC file and exit"
-msgstr "Sauvegarder le fichier XRC intégré et quitter"
+msgstr "sauvegarder le fichier XRC intégré et quitter"
 
 #: wxvbam.cpp:516
 msgid "Save built-in vba-over.ini and exit"
-msgstr "Sauvegarder le fichier vba-over.ini intégré et quitter"
+msgstr "sauvegarder le fichier vba-over.ini intégré et quitter"
 
 #: wxvbam.cpp:519
 msgid "Print configuration path and exit"
-msgstr "Imprimer la route de la configuration et quitter"
+msgstr "imprimer la route de la configuration et quitter"
 
 #: wxvbam.cpp:522
 msgid "Start in full-screen mode"
-msgstr "Démarrer en mode plein écran"
+msgstr "démarrer en mode plein écran"
 
 #: wxvbam.cpp:525
 msgid "Set a configuration file"
-msgstr "Choisir un fichier de confguration"
+msgstr "choisir un fichier de confguration"
 
 #: wxvbam.cpp:529
 msgid "Delete shared link state first, if it exists"
-msgstr "Supprimer le premier état de connexion partagé, si il existe"
+msgstr "supprimer le premier état de connexion partagé, si il existe"
 
 #: wxvbam.cpp:536
 msgid "List all settable options and exit"
-msgstr "Lister toutes les options paramétrables et quitter"
+msgstr "lister toutes les options paramétrables et quitter"
 
 #: wxvbam.cpp:539
 msgid "ROM file"
-msgstr "Fichier ROM"
+msgstr "fichier ROM"
 
 #: wxvbam.cpp:541
 msgid "<config>=<value>"
-msgstr "<config>=<valeur>"
+msgstr "<config>=<value>"
 
 #: wxvbam.cpp:572
 msgid "Configuration/build error: can't find built-in xrc"
-msgstr "Erreur de configuration/création : ne peut pas trouver le fichier XRC intégré"
+msgstr "erreur de configuration/création : ne peut pas trouver le fichier XRC intégré"
 
 #: wxvbam.cpp:580
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr "Écriture de la configuration intégrée pour remplacer 1%s. suppression de tous les nœuds racine sauf ceux qui ont été modifiés. Le premier nœud racine trouvé de nom correct dans un fichier .xrc ou .xrs dans le chemin de recherche suivant remplace le nœud racine intégré :"
+msgstr "écriture de la configuration intégrée pour remplacer 1%s. suppression de tous les nœuds racine sauf ceux qui ont été modifiés. Le premier nœud racine trouvé de nom correct dans un fichier .xrc ou .xrs dans le chemin de recherche suivant remplace le nœud racine intégré :"
 
 #: wxvbam.cpp:595
 msgid "Configuration is read from, in order:"
-msgstr "La configuration est lue depuis, dans l'ordre :"
+msgstr "la configuration est lue depuis, dans l'ordre :"
 
 #: wxvbam.cpp:609
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
-msgstr "Écriture d'un fichier d'annulation intégré dans %sPour annuler, supprimer tout sauf la section modifiée. La première section trouvée est utilisée à partir du chemin de recherche :"
+msgstr "écriture d'un fichier d'annulation intégré dans %sPour annuler, supprimer tout sauf la section modifiée. La première section trouvée est utilisée à partir du chemin de recherche :"
 
 #: wxvbam.cpp:615
 msgid ""
@@ -110,17 +111,17 @@ msgid ""
 "\n"
 "For flag options, true and false are specified as 1 and 0, respectively.\n"
 "\n"
-msgstr "Les options instanciées depuis la ligne de commande sont sauvegardées si il y a des changements de configuration dans l'interface utilisateur.\n\nPour les options de repère, les valeurs true et false sont spécifiées comme 1 et 0, respectivement.\n\n"
+msgstr "les options instanciées depuis la ligne de commande sont sauvegardées si il y a des changements de configuration dans l'interface utilisateur.\n\nPour les options de repère, les valeurs true et false sont spécifiées comme 1 et 0, respectivement.\n\n"
 
 #: wxvbam.cpp:647
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
-msgstr "Les commandes disponibles pour l'option Clavier/* sont :\n\n"
+msgstr "les commandes disponibles pour l'option Clavier/* sont :\n\n"
 
 #: wxvbam.cpp:659
 msgid "Configuration file not found."
-msgstr "Le fichier de configuration n'a pas été trouvé."
+msgstr "le fichier de configuration n'a pas été trouvé."
 
 #: wxvbam.cpp:692
 msgid "Bad configuration option or multiple ROM files given:\n"
@@ -833,7 +834,7 @@ msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr ""
+msgstr "Copyright (C) 1999-2003 Oublié\nCopyright (C) 2004-2006 Équipe de développement VBA\nCopyright (C) 2007-2020 Équipe de développement VBA-M"
 
 #: cmdevents.cpp:2841
 msgid ""
