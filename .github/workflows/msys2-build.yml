@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        run: >-
+        run: |
           git config --global core.autocrlf true
         
 
