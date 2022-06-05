@@ -22,12 +22,12 @@ jobs:
           update: true
           install: >-
             mingw-w64-clang-x86_64-toolchain
-            mingw-w64-clang-x86_64-pkg-config
+            mingw-w64-clang-x86_64-pkgconf
             mingw-w64-clang-x86_64-ffmpeg
             mingw-w64-clang-x86_64-FAudio
             mingw-w64-clang-x86_64-cmake
             mingw-w64-clang-x86_64-ninja
-            mingw-w64-clang-x86_64-wxmsw3.1
+            mingw-w64-clang-x86_64-wxWidgets
             mingw-w64-clang-x86_64-sfml
             mingw-w64-clang-x86_64-SDL2
             zip
