@@ -1327,11 +1327,55 @@ static wxString mov_path;
 
 EVT_HANDLER_MASK(RecordMovieStartRecording, "Start game recording...", CMDEN_NGREC)
 {
+    static wxString mov_exts;
+    static int mov_extno;
+    static wxString mov_path;
+
+    if (!mov_exts.size()) {
+        mov_extno = -1;
+        int extno = 0;
+
+        std::vector<char*> fmts = getSupMovNames();
+        std::vector<char*> exts = getSupMovExts();
+
+        for (size_t i = 0; i < fmts.size(); ++i)
+        {
+            mov_exts.append(wxString(fmts[i], wxConvLibc));
+            mov_exts.append(_(" files ("));
+            wxString ext(exts[i], wxConvLibc);
+            ext.Replace(wxT(","), wxT(";*."));
+            ext.insert(0, wxT("*."));
+
+            if (mov_extno < 0 && ext.find(wxT("*.vmv")) != wxString::npos)
+                mov_extno = extno;
+
+            mov_exts.append(ext);
+            mov_exts.append(wxT(")|"));
+            mov_exts.append(ext);
+            mov_exts.append(wxT('|'));
+            extno++;
+        }
+
+        if (mov_extno < 0)
+            mov_extno = extno;
+    }
+
     mov_path = GetGamePath(gopts.recording_dir);
-    wxString def_name = panel->game_name() + wxT(".vmv");
+    wxString def_name = panel->game_name();
+    wxString extoff = mov_exts;
+
+    for (int i = 0; i < mov_extno; i++) {
+        extoff = extoff.Mid(extoff.Find(wxT('|')) + 1);
+        extoff = extoff.Mid(extoff.Find(wxT('|')) + 1);
+    }
+
+    extoff = extoff.Mid(extoff.Find(wxT('|')) + 2); // skip *
+    def_name += extoff.Left(wxStrcspn(extoff, wxT(";|")));
     wxFileDialog dlg(this, _("Select output file"), mov_path, def_name,
-        _("VBA Movie files|*.vmv"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+        mov_exts, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+    dlg.SetFilterIndex(mov_extno);
     int ret = ShowModal(&dlg);
+    mov_extno = dlg.GetFilterIndex();
     mov_path = dlg.GetDirectory();
 
     if (ret != wxID_OK)
@@ -1347,12 +1391,56 @@ EVT_HANDLER_MASK(RecordMovieStopRecording, "Stop game recording", CMDEN_GREC)
 
 EVT_HANDLER_MASK(PlayMovieStartPlaying, "Start playing movie...", CMDEN_NGREC | CMDEN_NGPLAY)
 {
+    static wxString mov_exts;
+    static int mov_extno;
+    static wxString mov_path;
+
+    if (!mov_exts.size()) {
+        mov_extno = -1;
+        int extno = 0;
+
+        std::vector<char*> fmts = getSupMovNames();
+        std::vector<char*> exts = getSupMovExts();
+
+        for (size_t i = 0; i < fmts.size(); ++i)
+        {
+            mov_exts.append(wxString(fmts[i], wxConvLibc));
+            mov_exts.append(_(" files ("));
+            wxString ext(exts[i], wxConvLibc);
+            ext.Replace(wxT(","), wxT(";*."));
+            ext.insert(0, wxT("*."));
+
+            if (mov_extno < 0 && ext.find(wxT("*.vmv")) != wxString::npos)
+                mov_extno = extno;
+
+            mov_exts.append(ext);
+            mov_exts.append(wxT(")|"));
+            mov_exts.append(ext);
+            mov_exts.append(wxT('|'));
+            extno++;
+        }
+
+        if (mov_extno < 0)
+            mov_extno = extno;
+    }
+
     mov_path = GetGamePath(gopts.recording_dir);
     systemStopGamePlayback();
-    wxString def_name = panel->game_name() + wxT(".vmv");
+    wxString def_name = panel->game_name();
+    wxString extoff = mov_exts;
+
+    for (int i = 0; i < mov_extno; i++) {
+        extoff = extoff.Mid(extoff.Find(wxT('|')) + 1);
+        extoff = extoff.Mid(extoff.Find(wxT('|')) + 1);
+    }
+
+    extoff = extoff.Mid(extoff.Find(wxT('|')) + 2); // skip *
+    def_name += extoff.Left(wxStrcspn(extoff, wxT(";|")));
     wxFileDialog dlg(this, _("Select file"), mov_path, def_name,
-        _("VBA Movie files|*.vmv"), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+        mov_exts, wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+    dlg.SetFilterIndex(mov_extno);
     int ret = ShowModal(&dlg);
+    mov_extno = dlg.GetFilterIndex();
     mov_path = dlg.GetDirectory();
 
     if (ret != wxID_OK)

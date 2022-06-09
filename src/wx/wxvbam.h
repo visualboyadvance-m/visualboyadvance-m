@@ -794,6 +794,17 @@ extern bool debugStartListen(int port);
 extern bool debugWaitSocket();
 #endif
 
+// supported movie format for game recording
+enum MVFormatID {
+    MV_FORMAT_ID_NONE,
+
+    /* movie formats */
+    MV_FORMAT_ID_VMV,
+    MV_FORMAT_ID_VMD,
+};
+std::vector<char*> getSupMovNames();
+std::vector<char*> getSupMovExts();
+
 // perhaps these functions should not be called systemXXX
 // perhaps they should move to panel.cpp/GameArea
 // but they must integrate with systemReadJoypad

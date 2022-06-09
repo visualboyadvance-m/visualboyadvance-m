@@ -110,8 +110,44 @@ void systemDrawScreen()
 //        <timestamp>.32 = frames since start of movie
 //        <joypad>.32 = default joypad reading at that time
 //     }
+//  <name>.vmd = keystroke log; all values little-endian ints:
+//     <version>.32 = 1
+//     for every joypad change (init to 0) and once at end of movie {
+//        <timestamp>.32 = frames since the previous change
+//        <joypad>.32 = default joypad reading at that time
+//     }
 //  <name>.vm0 = saved state
 
+struct supportedMovie {
+    MVFormatID formatId;
+    char const* longName;
+    char const* exts;
+};
+
+const supportedMovie movieSupported[] = {
+    { MV_FORMAT_ID_VMV, "VBA Movie", "vmv" },
+    { MV_FORMAT_ID_VMD, "VBA Movie (Diff Format)", "vmd"},
+};
+
+std::vector<char*> getSupMovNames()
+{
+    std::vector<char*> result;
+    size_t size = sizeof(movieSupported) / sizeof(movieSupported[0]);
+    for (size_t i = 0; i < size; ++i)
+        result.push_back((char*)movieSupported[i].longName);
+    return result;
+}
+
+std::vector<char*> getSupMovExts()
+{
+    std::vector<char*> result;
+    size_t size = sizeof(movieSupported) / sizeof(movieSupported[0]);
+    for (size_t i = 0; i < size; ++i)
+        result.push_back((char*)movieSupported[i].exts);
+    return result;
+}
+
+enum MVFormatID recording_format;
 wxFFile game_file;
 bool game_recording, game_playback;
 uint32_t game_frame;
@@ -129,7 +165,11 @@ void systemStartGameRecording(const wxString& fname)
     systemStopGamePlayback();
     wxString fn = fname;
 
-    if (fn.size() < 4 || !wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".vmv"), false))
+    recording_format = MV_FORMAT_ID_VMV;
+
+    if (fn.size() >= 4 && wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".vmd"), true))
+        recording_format = MV_FORMAT_ID_VMD;
+    else if (fn.size() < 4 || !wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".vmv"), false))
         fn.append(wxT(".vmv"));
 
     uint32_t version = 1;
@@ -190,7 +230,11 @@ void systemStartGamePlayback(const wxString& fname)
     systemStopGamePlayback();
     wxString fn = fname;
 
-    if (fn.size() < 4 || !wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".vmv"), false))
+    recording_format = MV_FORMAT_ID_VMV;
+
+    if (fn.size() >= 4 && wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".vmd"), true))
+        recording_format = MV_FORMAT_ID_VMD;
+    else if (fn.size() < 4 || !wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".vmv"), false))
         fn.append(wxT(".vmv"));
 
     uint32_t version;
@@ -310,22 +354,52 @@ uint32_t systemReadJoypad(int joy)
                 game_recording = false;
                 wxLogError(_("Error writing game recording"));
             }
+
+            if (recording_format == MV_FORMAT_ID_VMD)
+                game_frame = 0;
         }
     } else if (game_playback) {
-        while (game_frame >= game_next_frame) {
-            game_joypad = game_next_joypad;
-            uint32_t gf, jp;
+        switch (recording_format) {
+        case MV_FORMAT_ID_VMD:
+            if (game_frame >= game_next_frame) {
+                game_joypad = game_next_joypad;
+                uint32_t gf, jp;
 
-            if (game_file.Read(&gf, sizeof(gf)) != sizeof(gf) || game_file.Read(&jp, sizeof(jp)) != sizeof(jp)) {
-                game_file.Close();
-                game_playback = false;
-                wxString msg(_("Playback ended"));
-                systemScreenMessage(msg);
-                break;
+                if (game_file.Read(&gf, sizeof(gf)) != sizeof(gf) || game_file.Read(&jp, sizeof(jp)) != sizeof(jp)) {
+                    game_file.Close();
+                    game_playback = false;
+                    wxString msg(_("Playback ended"));
+                    systemScreenMessage(msg);
+                    break;
+                }
+
+                game_next_frame = wxUINT32_SWAP_ON_BE(gf);
+                game_next_joypad = wxUINT32_SWAP_ON_BE(jp);
+
+                game_frame = 0;
             }
+            break;
 
-            game_next_frame = wxUINT32_SWAP_ON_BE(gf);
-            game_next_joypad = wxUINT32_SWAP_ON_BE(jp);
+        case MV_FORMAT_ID_VMV:
+            while (game_frame >= game_next_frame) {
+                game_joypad = game_next_joypad;
+                uint32_t gf, jp;
+
+                if (game_file.Read(&gf, sizeof(gf)) != sizeof(gf) || game_file.Read(&jp, sizeof(jp)) != sizeof(jp)) {
+                    game_file.Close();
+                    game_playback = false;
+                    wxString msg(_("Playback ended"));
+                    systemScreenMessage(msg);
+                    break;
+                }
+
+                game_next_frame = wxUINT32_SWAP_ON_BE(gf);
+                game_next_joypad = wxUINT32_SWAP_ON_BE(jp);
+            }
+            break;
+
+        default:
+            break;
         }
 
         ret = game_joypad;
