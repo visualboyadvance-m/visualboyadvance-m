@@ -110,13 +110,15 @@ void systemDrawScreen()
 //        <timestamp>.32 = frames since start of movie
 //        <joypad>.32 = default joypad reading at that time
 //     }
+//  <name>.vm0 = saved state
+// 
 //  <name>.vmd = keystroke log; all values little-endian ints:
 //     <version>.32 = 1
 //     for every joypad change (init to 0) and once at end of movie {
 //        <timestamp>.32 = frames since the previous change
 //        <joypad>.32 = default joypad reading at that time
 //     }
-//  <name>.vm0 = saved state
+//  <name>.vm1 = saved state
 
 struct supportedMovie {
     MVFormatID formatId;
@@ -180,6 +182,9 @@ void systemStartGameRecording(const wxString& fname)
     }
 
     fn[fn.size() - 1] = wxT('0');
+
+    if (recording_format == MV_FORMAT_ID_VMD)
+        fn[fn.size() - 1] = wxT('1');
 
     if (!panel->emusys->emuWriteState(UTF8(fn))) {
         wxLogError(_("Error writing game recording"));
@@ -255,6 +260,9 @@ void systemStartGamePlayback(const wxString& fname)
     game_next_frame = wxUINT32_SWAP_ON_BE(gf);
     game_next_joypad = wxUINT32_SWAP_ON_BE(jp);
     fn[fn.size() - 1] = wxT('0');
+
+    if (recording_format == MV_FORMAT_ID_VMD)
+        fn[fn.size() - 1] = wxT('1');
 
     if (!panel->emusys->emuReadState(UTF8(fn))) {
         wxLogError(_("Error reading game recording"));
