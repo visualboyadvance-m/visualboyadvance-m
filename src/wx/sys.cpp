@@ -374,8 +374,7 @@ uint32_t systemReadJoypad(int joy)
                 uint32_t gf, jp;
 
                 if (game_file.Read(&gf, sizeof(gf)) != sizeof(gf) || game_file.Read(&jp, sizeof(jp)) != sizeof(jp)) {
-                    game_file.Close();
-                    game_playback = false;
+                    systemStopGamePlayback();
                     wxString msg(_("Playback ended"));
                     systemScreenMessage(msg);
                     break;
@@ -394,8 +393,7 @@ uint32_t systemReadJoypad(int joy)
                 uint32_t gf, jp;
 
                 if (game_file.Read(&gf, sizeof(gf)) != sizeof(gf) || game_file.Read(&jp, sizeof(jp)) != sizeof(jp)) {
-                    game_file.Close();
-                    game_playback = false;
+                    systemStopGamePlayback();
                     wxString msg(_("Playback ended"));
                     systemScreenMessage(msg);
                     break;
