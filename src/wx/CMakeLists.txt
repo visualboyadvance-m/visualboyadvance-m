@@ -150,7 +150,7 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR X86_64))
             set(deb_suffix d)
         endif()
 
-        foreach(lib_name libpng jpeg lzma tiff libexpat)
+        foreach(lib_name libpng jpeg lzma tiff libexpat pcre2)
             file(
                 GLOB lib_file
                 ${wxWidgets_LIB_DIR}/${lib_name}*.lib
