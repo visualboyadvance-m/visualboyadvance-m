@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Lina sanz ortiz, 2022
+# Samuel Santos, 2022
 # Santiago Henao Patiño <santihenao03.sh@gmail.com>, 2020
 # victor julio barragan malagon <somarictor2011@gmail.com>, 2021
 # Yulian Estevan, 2021
@@ -14,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-24 21:24+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Lina sanz ortiz, 2022\n"
+"Last-Translator: Samuel Santos, 2022\n"
 "Language-Team: Spanish (Colombia) (http://www.transifex.com/bgk/vba-m/language/es_CO/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,43 +25,43 @@ msgstr ""
 
 #: wxvbam.cpp:225
 msgid "visualboyadvance-m"
-msgstr "visualboyadvance"
+msgstr "visualboyadvance-m"
 
 #: wxvbam.cpp:442
 msgid "Could not create main window"
-msgstr "No se pudo crear la ventana principal"
+msgstr "Could not create main window"
 
 #: wxvbam.cpp:513
 msgid "Save built-in XRC file and exit"
-msgstr "Guarde el archivo XRC incorporado y salga"
+msgstr "Save built-in XRC file and exit"
 
 #: wxvbam.cpp:516
 msgid "Save built-in vba-over.ini and exit"
-msgstr "Guarde vba-over.ini integrado y salga"
+msgstr "Save built-in vba-over.ini and exit"
 
 #: wxvbam.cpp:519
 msgid "Print configuration path and exit"
-msgstr "Imprimir ruta de configuración y salir"
+msgstr "Print configuration path and exit"
 
 #: wxvbam.cpp:522
 msgid "Start in full-screen mode"
-msgstr "Iniciar en modo de pantalla completa"
+msgstr "Start in full-screen mode"
 
 #: wxvbam.cpp:525
 msgid "Set a configuration file"
-msgstr "Establecer un archivo de configuración"
+msgstr "Set a configuration file"
 
 #: wxvbam.cpp:529
 msgid "Delete shared link state first, if it exists"
-msgstr "Primero elimine el estado del enlace compartido, si existe"
+msgstr "Delete shared link state first, if it exists"
 
 #: wxvbam.cpp:536
 msgid "List all settable options and exit"
-msgstr "Mostrar todas las opciones configurables y salir"
+msgstr "List all settable options and exit"
 
 #: wxvbam.cpp:539
 msgid "ROM file"
-msgstr "Archivo ROM"
+msgstr "ROM file"
 
 #: wxvbam.cpp:541
 msgid "<config>=<value>"
@@ -68,31 +69,31 @@ msgstr "<config>=<value>"
 
 #: wxvbam.cpp:572
 msgid "Configuration/build error: can't find built-in xrc"
-msgstr "Configuracion/Error de construncion: no se encontro xrc incorporado"
+msgstr "Configuration/build error: can't find built-in xrc"
 
 #: wxvbam.cpp:580
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr "Escribió la configuración incorporada para%s.\nPara anular. remueva todos los nodo(s) root excepto los modificados. Primero encuentra un nodo root de nombre correcto en cualquier archivo .xrc or .xrs en la siguiente ruta de busqueda anula la funcion incorporada"
+msgstr "Wrote built-in configuration to %s.\nTo override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 
 #: wxvbam.cpp:595
 msgid "Configuration is read from, in order:"
-msgstr "La configuración es leída por, en orden:"
+msgstr "Configuration is read from, in order:"
 
 #: wxvbam.cpp:609
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
-msgstr "Escriba el archivo de anulacion incorporado en %s\nPara anular, elimine todas las secciones excepto las modificadas.  La primera sección encontrada se usa desde la ruta de búsqueda:"
+msgstr "Wrote built-in override file to %s\nTo override, delete all but changed section.  First found section is used from search path:"
 
 #: wxvbam.cpp:615
 msgid ""
 "\n"
 "\tbuilt-in"
-msgstr "\n\tincorporadp"
+msgstr "\n\tbuilt-in"
 
 #: wxvbam.cpp:626
 msgid ""
@@ -100,89 +101,89 @@ msgid ""
 "\n"
 "For flag options, true and false are specified as 1 and 0, respectively.\n"
 "\n"
-msgstr "Las opciones establecidas desde la línea de comando se guardan si se realizan cambios de configuración en la interfaz de usuario. \n\nPara las opciones de bandera, verdadero y falso se especifican como 1 y 0, respectivamente.\n\n"
+msgstr "Options set from the command line are saved if any configuration changes are made in the user interface.\n\nFor flag options, true and false are specified as 1 and 0, respectively.\n\n"
 
 #: wxvbam.cpp:647
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
-msgstr "Los comandos están disponibles para el Teclado/*\nlas opciones son:\n\n"
+msgstr "The commands available for the Keyboard/* option are:\n\n"
 
 #: wxvbam.cpp:659
 msgid "Configuration file not found."
-msgstr "Configuracion de archivo no encontrada."
+msgstr "Configuration file not found."
 
 #: wxvbam.cpp:692
 msgid "Bad configuration option or multiple ROM files given:\n"
-msgstr "Mala opcion de configuracion o multiples archivos ROM dan:\n"
+msgstr "Bad configuration option or multiple ROM files given:\n"
 
 #: guiinit.cpp:80
 msgid "Start!"
-msgstr "Empieza!"
+msgstr "Start!"
 
 #: guiinit.cpp:99 xrc/NetLink.xrc:99
 msgid "Connect"
-msgstr "Conectar"
+msgstr "Connect"
 
 #: guiinit.cpp:116
 msgid "You must enter a valid host name"
-msgstr "Debes introducir un nombre valido para mostrar aqui"
+msgstr "You must enter a valid host name"
 
 #: guiinit.cpp:117
 msgid "Host name invalid"
-msgstr "Nombre para mostar invalido"
+msgstr "Host name invalid"
 
 #: guiinit.cpp:135
 msgid "Waiting for clients..."
-msgstr "Esperando por clientes"
+msgstr "Waiting for clients..."
 
 #: guiinit.cpp:136
 #, c-format
 msgid "Server IP address is: %s\n"
-msgstr "La dirección IP del servidor es: %s\n"
+msgstr "Server IP address is: %s\n"
 
 #: guiinit.cpp:138
 msgid "Waiting for connection..."
-msgstr "Esperando por la conexión "
+msgstr "Waiting for connection..."
 
 #: guiinit.cpp:139
 #, c-format
 msgid "Connecting to %s\n"
-msgstr "Conectando a %s\n"
+msgstr "Connecting to %s\n"
 
 #: guiinit.cpp:172
 msgid ""
 "Error occurred.\n"
 "Please try again."
-msgstr "Ups! a ocurrido un error.\nPor favor intente de nuevo."
+msgstr "Error occurred.\nPlease try again."
 
 #: guiinit.cpp:239 guiinit.cpp:292
 msgid "Select cheat file"
-msgstr "Seleciona un archivo de trampa"
+msgstr "Select cheat file"
 
 #: guiinit.cpp:240
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
-msgstr "VBA listas de trampas (*.clt)|*.clt|CHT  listas de trampas  (*.cht)|*.cht"
+msgstr "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 
 #: guiinit.cpp:259 panel.cpp:447
 msgid "Loaded cheats"
-msgstr "Trampas cargadas"
+msgstr "Loaded cheats"
 
 #: guiinit.cpp:293
 msgid "VBA cheat lists (*.clt)|*.clt"
-msgstr "VBA listas de trampas (*.clt)|*.clt"
+msgstr "VBA cheat lists (*.clt)|*.clt"
 
 #: guiinit.cpp:311
 msgid "Saved cheats"
-msgstr "Trampas cargadas"
+msgstr "Saved cheats"
 
 #: guiinit.cpp:342 guiinit.cpp:361
 msgid "Restore old values?"
-msgstr "Restaurar valores viejos?"
+msgstr "Restore old values?"
 
 #: guiinit.cpp:343 guiinit.cpp:362
 msgid "Removing cheats"
-msgstr "Removiendo trampas"
+msgstr "Removing cheats"
 
 #: guiinit.cpp:753 xrc/JoyPanel.xrc:364
 msgid "GameShark"
@@ -194,7 +195,7 @@ msgstr "GameGenie"
 
 #: guiinit.cpp:756
 msgid "Generic Code"
-msgstr "Codigo Generico"
+msgstr "Generic Code"
 
 #: guiinit.cpp:757
 msgid "GameShark Advance"
@@ -210,40 +211,40 @@ msgstr "Flashcart CHT"
 
 #: guiinit.cpp:827 guiinit.cpp:1082
 msgid "Number cannot be empty"
-msgstr "El numero no puede estar vacio"
+msgstr "Number cannot be empty"
 
 #: guiinit.cpp:865
 #, c-format
 msgid "Search produced %d results.  Please refine better"
-msgstr "Busqueda producida %d Resultados. Por favor refina mejor"
+msgstr "Search produced %d results.  Please refine better"
 
 #: guiinit.cpp:877
 msgid "Search produced no results"
-msgstr "Búsqueda no producida sin resultados"
+msgstr "Search produced no results"
 
 #: guiinit.cpp:1040
 msgid "8-bit "
-msgstr "8-bits"
+msgstr "8-bit "
 
 #: guiinit.cpp:1044
 msgid "16-bit "
-msgstr "16-bits"
+msgstr "16-bit "
 
 #: guiinit.cpp:1048
 msgid "32-bit "
-msgstr "32-bits"
+msgstr "32-bit "
 
 #: guiinit.cpp:1054
 msgid "signed decimal"
-msgstr "decimal asignado"
+msgstr "signed decimal"
 
 #: guiinit.cpp:1058
 msgid "unsigned decimal"
-msgstr "decimal no asignado"
+msgstr "unsigned decimal"
 
 #: guiinit.cpp:1062
 msgid "unsigned hexadecimal"
-msgstr "no asignado hexadecimal"
+msgstr "unsigned hexadecimal"
 
 #: guiinit.cpp:1540
 #, c-format
@@ -252,23 +253,23 @@ msgstr "%d frames = %.2f ms"
 
 #: guiinit.cpp:1552
 msgid "Default device"
-msgstr "Dispositivo por defecto"
+msgstr "Default device"
 
 #: guiinit.cpp:1726
 msgid "Desktop mode"
-msgstr "Modo de escritorio"
+msgstr "Desktop mode"
 
 #: guiinit.cpp:1733
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
-msgstr "%d x %d - %d bpp @ %d Hz"
+msgstr "%d x %d - %dbpp @ %dHz"
 
 #: guiinit.cpp:1846 cmdevents.cpp:745 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
 msgid "None"
-msgstr "Nada"
+msgstr "None"
 
 #: guiinit.cpp:1887
 #, c-format
@@ -281,96 +282,96 @@ msgstr "Plugin"
 
 #: guiinit.cpp:1935
 msgid "Please select a plugin or a different filter"
-msgstr "Por favor selecciona un plugin o un diferente filtro"
+msgstr "Please select a plugin or a different filter"
 
 #: guiinit.cpp:1936
 msgid "Plugin selection error"
-msgstr "Error de seleccion de plugin"
+msgstr "Plugin selection error"
 
 #: guiinit.cpp:2149
 msgid "This will clear all user-defined accelerators.  Are you sure?"
-msgstr "Esto borrará todos los aceleradores definidos por el usuario. ¿Está seguro?"
+msgstr "This will clear all user-defined accelerators.  Are you sure?"
 
 #: guiinit.cpp:2149
 msgid "Confirm"
-msgstr "Confirmar"
+msgstr "Confirm"
 
 #: guiinit.cpp:2739
 msgid "Main icon not found"
-msgstr "Icono principal no encontrado"
+msgstr "Main icon not found"
 
 #: guiinit.cpp:2749
 msgid "Browse"
-msgstr "Browser"
+msgstr "Browse"
 
 #: guiinit.cpp:2763
 msgid "Main display panel not found"
-msgstr "Panel de visualización principal no encontrado"
+msgstr "Main display panel not found"
 
 #: guiinit.cpp:2928
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
-msgstr "Duplicar acelerador de menu: %s for %s and %s; keeping first"
+msgstr "Duplicate menu accelerator: %s for %s and %s; keeping first"
 
 #: guiinit.cpp:2942
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
-msgstr "Acelerador de menu %s for %s anula el valor predeterminado para %s ; mantener el menú"
+msgstr "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 
 #: guiinit.cpp:3081
 #, c-format
 msgid "Invalid menu item %s; removing"
-msgstr "Objeto invalido de ítem del menu %s; removiendo"
+msgstr "Invalid menu item %s; removing"
 
 #: guiinit.cpp:3289
 msgid "Code"
-msgstr "Codigo"
+msgstr "Code"
 
 #: guiinit.cpp:3298
 msgid "Description"
-msgstr "Descripción "
+msgstr "Description"
 
 #: guiinit.cpp:3372 xrc/CheatAdd.xrc:31
 msgid "Address"
-msgstr "Direccion"
+msgstr "Address"
 
 #: guiinit.cpp:3373
 msgid "Old Value"
-msgstr "Viejo valor"
+msgstr "Old Value"
 
 #: guiinit.cpp:3374
 msgid "New Value"
-msgstr "Nuevo Valor"
+msgstr "New Value"
 
 #: guiinit.cpp:3895
 msgid "Menu commands"
-msgstr "Menu de comandos"
+msgstr "Menu commands"
 
 #: guiinit.cpp:3918
 msgid "Other commands"
-msgstr "Otros comandos"
+msgstr "Other commands"
 
 #: guiinit.cpp:4029
 msgid "JoyBus host invalid; disabling"
-msgstr "JoyBus visita invalida; deshabilitando "
+msgstr "JoyBus host invalid; disabling"
 
 #: viewers.cpp:560
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
-msgstr "Archivos de texto (*.txt;*.log)|*.txt;*.log|"
+msgstr "Text files (*.txt;*.log)|*.txt;*.log|"
 
 #: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
 #: cmdevents.cpp:1157 cmdevents.cpp:1235 cmdevents.cpp:1305 cmdevents.cpp:1332
 #: viewsupt.cpp:1180
 msgid "Select output file"
-msgstr "Seleccionar archivo de salida"
+msgstr "Select output file"
 
 #: viewers.cpp:698 viewers.cpp:770
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
-msgstr "Memoria desecha (*.dmp;*.bin)|*.dmp;*.bin|"
+msgstr "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
 
 #: viewers.cpp:700
 msgid "Select memory dump file"
-msgstr "Selecciona un archivo de memoria desecho"
+msgstr "Select memory dump file"
 
 #: viewers.cpp:814
 msgid "0x00000000 - BIOS"
@@ -390,7 +391,7 @@ msgstr "0x04000000 - I/O"
 
 #: viewers.cpp:818
 msgid "0x05000000 - PALETTE"
-msgstr "0x05000000 - PALETA"
+msgstr "0x05000000 - PALETTE"
 
 #: viewers.cpp:819
 msgid "0x06000000 - VRAM"
@@ -438,18 +439,18 @@ msgstr "0xFF80 - RAM"
 
 #: gfxviewers.cpp:1141
 msgid "Select output file and type"
-msgstr "Selecciona la salida del archivo and tipo"
+msgstr "Select output file and type"
 
 #: gfxviewers.cpp:1142
 msgid ""
 "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
 "Table (*.act)|*.act"
-msgstr "Paleta de Windows (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color Table (*.act)|*.act"
+msgstr "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color Table (*.act)|*.act"
 
 #: gfxviewers.cpp:1601 gfxviewers.cpp:1743 cmdevents.cpp:1158
 #: viewsupt.cpp:1181
 msgid "PNG images|*.png|BMP images|*.bmp"
-msgstr "Imagenes PNG*.png|BMP images|*.bmp"
+msgstr "PNG images|*.png|BMP images|*.bmp"
 
 #: cmdevents.cpp:104
 msgid ""
@@ -457,35 +458,35 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy"
 " Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "Archivos de la GameBoy Advance (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr "GameBoy Advance Files (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:116
 msgid "Open ROM file"
-msgstr "Abrir archivo ROM"
+msgstr "Open ROM file"
 
 #: cmdevents.cpp:133
 msgid ""
 "GameBoy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "Archivos de GameBoy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr "GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:140
 msgid "Open GB ROM file"
-msgstr "Abrir archivo GB ROM"
+msgstr "Open GB ROM file"
 
 #: cmdevents.cpp:157
 msgid ""
 "GameBoy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "Archivos de GameBoy Color Files\n(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr "GameBoy Color Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:164
 msgid "Open GBC ROM file"
-msgstr "Abrir archivo GBC ROM"
+msgstr "Open GBC ROM file"
 
 #: cmdevents.cpp:583 cmdevents.cpp:699 cmdevents.cpp:738 cmdevents.cpp:811
 msgid "Unknown"
-msgstr "Desconocido"
+msgstr "Unknown"
 
 #: cmdevents.cpp:591
 msgid "ROM"
@@ -577,7 +578,7 @@ msgstr "GameShark V3.0"
 
 #: cmdevents.cpp:683
 msgid "ROM+POCKET CAMERA"
-msgstr "ROM+POCKET CAMARA"
+msgstr "ROM+POCKET CAMERA"
 
 #: cmdevents.cpp:687
 msgid "ROM+BANDAI TAMA5"
@@ -593,226 +594,226 @@ msgstr "ROM+HuC-1"
 
 #: cmdevents.cpp:847 cmdevents.cpp:869
 msgid "Select Dot Code file"
-msgstr "Seleccione el archivo de código de puntos"
+msgstr "Select Dot Code file"
 
 #: cmdevents.cpp:849 cmdevents.cpp:871
 msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr "Código de punto del e-Reader (* .bin; *. raw) | * .bin; *. raw"
+msgstr "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 
 #: cmdevents.cpp:890 cmdevents.cpp:1085
 msgid "Select battery file"
-msgstr "Selecciona un archivo de bateria"
+msgstr "Select battery file"
 
 #: cmdevents.cpp:891 cmdevents.cpp:1086
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
-msgstr "Archivo de bateria (*.sav)|*.sav|Flash save (*.dat)|*.dat"
+msgstr "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 
 #: cmdevents.cpp:899
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
-msgstr "La importacion de un archivo de bateria borrara todos los juegos guardados (permanentemente despues de esta linea de texto). ¿Deseas continuar?"
+msgstr "Importing a battery file will erase any saved games (permanently after the next write).  Do you want to continue?"
 
 #: cmdevents.cpp:900 cmdevents.cpp:928 cmdevents.cpp:1048
 msgid "Confirm import"
-msgstr "Confirmar importacion"
+msgstr "Confirm import"
 
 #: cmdevents.cpp:906 panel.cpp:390
 #, c-format
 msgid "Loaded battery %s"
-msgstr "batería cargada %s"
+msgstr "Loaded battery %s"
 
 #: cmdevents.cpp:908
 #, c-format
 msgid "Error loading battery %s"
-msgstr "Error al cargar la bateria %s"
+msgstr "Error loading battery %s"
 
 #: cmdevents.cpp:917
 msgid "Select code file"
-msgstr "Selecciona el codigo del archivo"
+msgstr "Select code file"
 
 #: cmdevents.cpp:918
 msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
-msgstr "Gameshark Archivo de Código (*.spc;*.xpc)|*.spc;*.xpc"
+msgstr "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
 
 #: cmdevents.cpp:918
 msgid "Gameshark Code File (*.gcf)|*.gcf"
-msgstr "Gameshark Archivo de Código (*.gcf)|*.gcf"
+msgstr "Gameshark Code File (*.gcf)|*.gcf"
 
 #: cmdevents.cpp:927
 msgid ""
 "Importing a code file will replace any loaded cheats.  Do you want to "
 "continue?"
-msgstr "Importar un archivo de código remplazara cualquier trampa cargada. ¿Deseas continuar?"
+msgstr "Importing a code file will replace any loaded cheats.  Do you want to continue?"
 
 #: cmdevents.cpp:944
 #, c-format
 msgid "Cannot open file %s"
-msgstr "No se puede abrir el archivo %s"
+msgstr "Cannot open file %s"
 
 #: cmdevents.cpp:954
 #, c-format
 msgid "Unsupported code file %s"
-msgstr "No soportado archivo de codigo %s"
+msgstr "Unsupported code file %s"
 
 #: cmdevents.cpp:1024
 #, c-format
 msgid "Loaded code file %s"
-msgstr "Cargado archivo de codigo %s"
+msgstr "Loaded code file %s"
 
 #: cmdevents.cpp:1026
 #, c-format
 msgid "Error loading code file %s"
-msgstr "Error al cargar el archivo de codigo %s"
+msgstr "Error loading code file %s"
 
 #: cmdevents.cpp:1037 cmdevents.cpp:1113
 msgid "Select snapshot file"
-msgstr "Selecciona el archivo de foto"
+msgstr "Select snapshot file"
 
 #: cmdevents.cpp:1038
 msgid ""
 "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots "
 "(*.gsv)|*.gsv"
-msgstr "GS & PAC FOTOS (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots (*.gsv)|*.gsv"
+msgstr "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots (*.gsv)|*.gsv"
 
 #: cmdevents.cpp:1038
 msgid "Gameboy Snapshot (*.gbs)|*.gbs"
-msgstr "GameBoy foto Gameboy Snapshot (*.gbs)|*.gbs"
+msgstr "Gameboy Snapshot (*.gbs)|*.gbs"
 
 #: cmdevents.cpp:1047
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
-msgstr "Importar un archivo de foto borrara cualquier juego guardado (permanente despues de este texto). ¿Deseas continuar?"
+msgstr "Importing a snapshot file will erase any saved games (permanently after the next write).  Do you want to continue?"
 
 #: cmdevents.cpp:1072
 #, c-format
 msgid "Loaded snapshot file %s"
-msgstr "Archivo de foto cargado %s"
+msgstr "Loaded snapshot file %s"
 
 #: cmdevents.cpp:1074
 #, c-format
 msgid "Error loading snapshot file %s"
-msgstr "Error al cargar el archivo de foto %s"
+msgstr "Error loading snapshot file %s"
 
 #: cmdevents.cpp:1097
 #, c-format
 msgid "Wrote battery %s"
-msgstr "Sobrescribir  batería %s"
+msgstr "Wrote battery %s"
 
 #: cmdevents.cpp:1099 panel.cpp:699
 #, c-format
 msgid "Error writing battery %s"
-msgstr "Error al sobrescribir la bateria %s"
+msgstr "Error writing battery %s"
 
 #: cmdevents.cpp:1107
 msgid "EEPROM saves cannot be exported"
-msgstr "Guardados de EEPROM no pueden ser exportados"
+msgstr "EEPROM saves cannot be exported"
 
 #: cmdevents.cpp:1114
 msgid "Gameshark Snapshot (*.sps)|*.sps"
-msgstr "Gameshark Foto (*.sps)|*.sps"
+msgstr "Gameshark Snapshot (*.sps)|*.sps"
 
 #: cmdevents.cpp:1128
 msgid "Exported from VisualBoyAdvance-M"
-msgstr "Exportado de VisualBoyAdvance-M"
+msgstr "Exported from VisualBoyAdvance-M"
 
 #: cmdevents.cpp:1140
 #, c-format
 msgid "Saved snapshot file %s"
-msgstr "archivo de foto Guardado %s"
+msgstr "Saved snapshot file %s"
 
 #: cmdevents.cpp:1142
 #, c-format
 msgid "Error saving snapshot file %s"
-msgstr "Error al guardar el archivo de foto %s"
+msgstr "Error saving snapshot file %s"
 
 #: cmdevents.cpp:1182 sys.cpp:449
 #, c-format
 msgid "Wrote snapshot %s"
-msgstr "Sobrescribir foto %s"
+msgstr "Wrote snapshot %s"
 
 #: cmdevents.cpp:1203 cmdevents.cpp:1273
 msgid " files ("
-msgstr "Archivos ("
+msgstr " files ("
 
 #: cmdevents.cpp:1333 cmdevents.cpp:1354
 msgid "VBA Movie files|*.vmv"
-msgstr "VBA archivos de Películas files|*.vmv"
+msgstr "VBA Movie files|*.vmv"
 
 #: cmdevents.cpp:1353
 msgid "Select file"
-msgstr "Seleccionar archivo"
+msgstr "Select file"
 
 #: cmdevents.cpp:1668 cmdevents.cpp:1761
 msgid "Select state file"
-msgstr "Seleccionar estado de archivo"
+msgstr "Select state file"
 
 #: cmdevents.cpp:1669 cmdevents.cpp:1762
 msgid "VisualBoyAdvance saved game files|*.sgm"
-msgstr "VisualBoyAdvance Juego guardado archivos|*.sgm"
+msgstr "VisualBoyAdvance saved game files|*.sgm"
 
 #: cmdevents.cpp:1792 cmdevents.cpp:1802 cmdevents.cpp:1813
 #, c-format
 msgid "Current state slot #%d"
-msgstr "Ocurrente espacio de estado #%d"
+msgstr "Current state slot #%d"
 
 #: cmdevents.cpp:1883
 msgid "Cannot use Colorizer Hack when GB BIOS File is enabled."
-msgstr "No se puede usar el \"Colorizer Hack\" cuando GB BIOS esta activado."
+msgstr "Cannot use Colorizer Hack when GB BIOS File is enabled."
 
 #: cmdevents.cpp:2098
 msgid "Sound enabled"
-msgstr "Sonido activado"
+msgstr "Sound enabled"
 
 #: cmdevents.cpp:2098
 msgid "Sound disabled"
-msgstr "Sonido desactivado"
+msgstr "Sound disabled"
 
 #: cmdevents.cpp:2111 cmdevents.cpp:2125
 #, c-format
 msgid "Volume: %d%%"
-msgstr "Volumen: %d%%"
+msgstr "Volume: %d%%"
 
 #: cmdevents.cpp:2200
 msgid "Set to 0 for pseudo tty"
-msgstr "Establecer a 0 por pseudo tty"
+msgstr "Set to 0 for pseudo tty"
 
 #: cmdevents.cpp:2202
 msgid "Port to wait for connection:"
-msgstr "Puerto para esperar la conexión: …"
+msgstr "Port to wait for connection:"
 
 #: cmdevents.cpp:2203
 msgid "GDB Connection"
-msgstr "Coneccion de GDB"
+msgstr "GDB Connection"
 
 #: cmdevents.cpp:2256
 #, c-format
 msgid "Waiting for connection at %s"
-msgstr "Esperando la conexion en %s"
+msgstr "Waiting for connection at %s"
 
 #: cmdevents.cpp:2263
 #, c-format
 msgid "Waiting for connection on port %d"
-msgstr "Esperando la conexión en el puerto %d"
+msgstr "Waiting for connection on port %d"
 
 #: cmdevents.cpp:2266
 msgid "Waiting for GDB..."
-msgstr "Esperando por GDB..."
+msgstr "Waiting for GDB..."
 
 #: cmdevents.cpp:2681
 #, c-format
 msgid "Using pixel filter #%d"
-msgstr "Usando filtro de pixeles #%d"
+msgstr "Using pixel filter #%d"
 
 #: cmdevents.cpp:2696
 #, c-format
 msgid "Using interframe blending #%d"
-msgstr "Usando \"Interframe blending\" #%d"
+msgstr "Using interframe blending #%d"
 
 #: cmdevents.cpp:2735 panel.cpp:192 panel.cpp:306
 msgid "Could not initialize the sound driver!"
-msgstr "¡No se pudo iniciar el controlador de sonido!"
+msgstr "Could not initialize the sound driver!"
 
 #: cmdevents.cpp:2839
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
@@ -823,7 +824,7 @@ msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr "Copyright (C) 1999-2003 Olvidado\nCopyright (C) 2004-2006 VBA Equipo de desarollo\nCopyright (C) 2007-2020 VBA-M Equipo de desarollo"
+msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2020 VBA-M development team"
 
 #: cmdevents.cpp:2841
 msgid ""
@@ -839,79 +840,79 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program.  If not, see http://www.gnu.org/licenses ."
-msgstr "Este programa de sofware es gratis tu puedes redistribuirlo y/o modificar\nbajo los terminos de licensia publica GNU publicada por\nla \"Free Software Foundation,\" ya sea la version 2 de la licensia, o\n(a su eleccion) cualquier version posterior\n\nEste programa es distribuido con la esperanza de que sea de utilidad, pero SIN NINGUNA GARANTIA; siquiera la garantia implicita de COMERCIABILIDAD O APTITUD PARA UN PROPOSITO PARTICULAR. Ver la\nlicensia publica general GNU para ver mas detalles. \n\nDebería haber recibido una copia de la Licencia Pública General GNU\njunto con este programa. De lo contrario, consulte http://www.gnu.org/licenses."
+msgstr "This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see http://www.gnu.org/licenses ."
 
 #: cmdevents.cpp:3101
 msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
-msgstr "No puedes usar GB BIOS cuando el \"Colorizer hack\" esta activado"
+msgstr "Cannot use GB BIOS when Colorizer Hack is enabled."
 
 #: cmdevents.cpp:3161
 msgid "LAN link is already active.  Disable link mode to disconnect."
-msgstr "LAN link esta realmente activa.  Desactiva el modo link para desconectarse"
+msgstr "LAN link is already active.  Disable link mode to disconnect."
 
 #: cmdevents.cpp:3167
 msgid "Network is not supported in local mode."
-msgstr "La red no esta soportada en el modo local"
+msgstr "Network is not supported in local mode."
 
 #: opts.cpp:566 opts.cpp:869
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
-msgstr "valor invalido  %s para opción %s; los valores validos son %s%s%s "
+msgstr "Invalid value %s for option %s; valid values are %s%s%s"
 
 #: opts.cpp:583 opts.cpp:881
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
-msgstr "Valor invalido %d para opciones %s; los valores validos son %d - %d"
+msgstr "Invalid value %d for option %s; valid values are %d - %d"
 
 #: opts.cpp:590 opts.cpp:599 opts.cpp:889 opts.cpp:897
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
-msgstr "Valor invalido %f para opciones %s; los valores validos son %f - %f"
+msgstr "Invalid value %f for option %s; valid values are %f - %f"
 
 #: opts.cpp:659 opts.cpp:680 opts.cpp:965 opts.cpp:991
 #, c-format
 msgid "Invalid key binding %s for %s"
-msgstr "configuracion de tecla invalido %s para %s"
+msgstr "Invalid key binding %s for %s"
 
 #: opts.cpp:852
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
-msgstr "invalida opcion de bandera %s - %s ignored"
+msgstr "Invalid flag option %s - %s ignored"
 
 #: sys.cpp:124 sys.cpp:180
 msgid "No game in progress to record"
-msgstr "No juego en progreso para grabar"
+msgstr "No game in progress to record"
 
 #: sys.cpp:137
 #, c-format
 msgid "Cannot open output file %s"
-msgstr "No se puede abrir el archivo de salida %s"
+msgstr "Cannot open output file %s"
 
 #: sys.cpp:144 sys.cpp:164 sys.cpp:310
 msgid "Error writing game recording"
-msgstr "error al sobrescribir la grabación del juego"
+msgstr "Error writing game recording"
 
 #: sys.cpp:185
 msgid "Cannot play game recording while recording"
-msgstr "No se puede jugar cuando se esta grabando"
+msgstr "Cannot play game recording while recording"
 
 #: sys.cpp:198
 #, c-format
 msgid "Cannot open recording file %s"
-msgstr "No se puede abrir el archivo de grabacion %s"
+msgstr "Cannot open recording file %s"
 
 #: sys.cpp:205 sys.cpp:215
 msgid "Error reading game recording"
-msgstr "Error al leer el juego grabado"
+msgstr "Error reading game recording"
 
 #: sys.cpp:321
 msgid "Playback ended"
-msgstr "Reproducion finalizada"
+msgstr "Playback ended"
 
 #: sys.cpp:340
 #, c-format
 msgid "%d%%(%d, %d fps)"
-msgstr "9%d%%(%d,%d fps)"
+msgstr "%d%%(%d, %d fps)"
 
 #: sys.cpp:348
 #, c-format
@@ -920,197 +921,197 @@ msgstr "%d%%"
 
 #: sys.cpp:767 xrc/GBPrinter.xrc:65
 msgid "&Discard"
-msgstr "&Descartar"
+msgstr "&Discard"
 
 #: sys.cpp:801
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
-msgstr "Archivos de imagenes (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
+msgstr "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
 #: sys.cpp:810
 msgid "Save printer image to"
-msgstr "Guardar la imagen de la impresora en:"
+msgstr "Save printer image to"
 
 #: sys.cpp:824 sys.cpp:1007
 #, c-format
 msgid "Wrote printer output to %s"
-msgstr "Escribir la salida de la impresora a %s"
+msgstr "Wrote printer output to %s"
 
 #: sys.cpp:829 sys.cpp:900
 msgid "&Close"
-msgstr "&Cerrar"
+msgstr "&Close"
 
 #: sys.cpp:895
 msgid "Printed"
-msgstr "Impreso"
+msgstr "Printed"
 
 #: sys.cpp:1197
 #, c-format
 msgid "Error opening pseudo tty: %s"
-msgstr "Error al abrir \"Pseudo tty\": %s"
+msgstr "Error opening pseudo tty: %s"
 
 #: sys.cpp:1296
 #, c-format
 msgid "Error setting up server socket (%d)"
-msgstr "Error al configurar el \"socket\" del servidor (%d)"
+msgstr "Error setting up server socket (%d)"
 
 #: panel.cpp:106
 #, c-format
 msgid "%s is not a valid ROM file"
-msgstr "%s este no es un archivo ROM valido"
+msgstr "%s is not a valid ROM file"
 
 #: panel.cpp:107 panel.cpp:168 panel.cpp:244
 msgid "Problem loading file"
-msgstr "¡Ups! hubo un problema al cargar el archivo"
+msgstr "Problem loading file"
 
 #: panel.cpp:167
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
-msgstr "No se pudo cargar el ROM de la GameBoy %s"
+msgstr "Unable to load Game Boy ROM %s"
 
 #: panel.cpp:204
 msgid ""
 "Cannot use GB BIOS file when Colorizer Hack is enabled, disabling GB BIOS "
 "file."
-msgstr "No se puede usar el GB BIOS cuando el \"Colorizer Hack\" esta activado, Desactivando archivo GB BIOS ......"
+msgstr "Cannot use GB BIOS file when Colorizer Hack is enabled, disabling GB BIOS file."
 
 #: panel.cpp:220 panel.cpp:320
 #, c-format
 msgid "Could not load BIOS %s"
-msgstr "¡Ups! No se pudo cargar el BIOS %s"
+msgstr "Could not load BIOS %s"
 
 #: panel.cpp:243
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
-msgstr "¡Ups! No se  pudo cargar el \"GameBoy Advance Rom\" %s"
+msgstr "Unable to load Game Boy Advance ROM %s"
 
 #: panel.cpp:479
 msgid " player "
-msgstr "Jugador"
+msgstr " player "
 
 #: panel.cpp:647
 #, c-format
 msgid "Loaded state %s"
-msgstr "¡Estado cargado con exito! %s"
+msgstr "Loaded state %s"
 
 #: panel.cpp:647
 #, c-format
 msgid "Error loading state %s"
-msgstr "¡Ups! Error al cargar el estado %s"
+msgstr "Error loading state %s"
 
 #: panel.cpp:671
 #, c-format
 msgid "Saved state %s"
-msgstr "¡Estado  Guardado con exito! %s"
+msgstr "Saved state %s"
 
 #: panel.cpp:671
 #, c-format
 msgid "Error saving state %s"
-msgstr "¡Ups! No hubo éxito al guardar el estado \"Error al guardar el estado\" %s"
+msgstr "Error saving state %s"
 
 #: panel.cpp:875
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
-msgstr "Modo pantalla completa %dx%d-%d@%d no soportado; buscando a otro ….."
+msgstr "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 
 #: panel.cpp:913
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
-msgstr "Modo pantalla completa %dx%d-%d@%d No soportado"
+msgstr "Fullscreen mode %dx%d-%d@%d not supported"
 
 #: panel.cpp:918
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
-msgstr "Modo valido: %dx%d-%d@%d"
+msgstr "Valid mode: %dx%d-%d@%d"
 
 #: panel.cpp:926
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
-msgstr "Escoge el modo %dx%d-%d@%d"
+msgstr "Chose mode %dx%d-%d@%d"
 
 #: panel.cpp:930
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
-msgstr "¡Ups! Fallo al cambiar el modo a %dx%d-%d@%d"
+msgstr "Failed to change mode to %dx%d-%d@%d"
 
 #: panel.cpp:1018
 msgid "Not a valid GBA cartridge"
-msgstr " hm... No es un cartucho de GBA valido"
+msgstr "Not a valid GBA cartridge"
 
 #: panel.cpp:1182
 msgid "No memory for rewinding"
-msgstr "Sin memoria para rebobinar"
+msgstr "No memory for rewinding"
 
 #: panel.cpp:1192
 msgid "Error writing rewind state"
-msgstr "Error al escribir el estado de rebobinacion"
+msgstr "Error writing rewind state"
 
 #: panel.cpp:2290
 msgid "Failed to set glXSwapIntervalEXT"
-msgstr "¡Ups! ha habido un fallo al poner \"glXSwapIntervalEXT\""
+msgstr "Failed to set glXSwapIntervalEXT"
 
 #: panel.cpp:2299
 msgid "Failed to set glXSwapIntervalSGI"
-msgstr "¡Ups! ha habido un fallo al poner \"glXSwapIntervalSGl\""
+msgstr "Failed to set glXSwapIntervalSGI"
 
 #: panel.cpp:2308
 msgid "Failed to set glXSwapIntervalMESA"
-msgstr "¡Ups! habido un fallo al poner \"glXSwapIntervalMESA\""
+msgstr "Failed to set glXSwapIntervalMESA"
 
 #: panel.cpp:2314
 msgid "No support for wglGetExtensionsStringEXT"
-msgstr "¡Que Mal! No se puede soportar \"wglGetExtensionsStringEXT\""
+msgstr "No support for wglGetExtensionsStringEXT"
 
 #: panel.cpp:2317
 msgid "No support for WGL_EXT_swap_control"
-msgstr "¡Que Mal! No se puede soportar \"WGL_EXT_swap_control\""
+msgstr "No support for WGL_EXT_swap_control"
 
 #: panel.cpp:2326
 msgid "Failed to set wglSwapIntervalEXT"
-msgstr "¡Ups! ha habido un fallo al poner \"wglSwapIntervalEXT\""
+msgstr "Failed to set wglSwapIntervalEXT"
 
 #: panel.cpp:2332
 msgid "No VSYNC available on this platform"
-msgstr "¡Que Mal! No hay VSYNC disponible en esta plataforma"
+msgstr "No VSYNC available on this platform"
 
 #: panel.cpp:2428
 msgid "memory allocation error"
-msgstr "¡Ups! Ha habido un error en la alocacion de la memoria"
+msgstr "memory allocation error"
 
 #: panel.cpp:2431
 msgid "error initializing codec"
-msgstr "¡Ups! Error al inicializar \"codec\""
+msgstr "error initializing codec"
 
 #: panel.cpp:2434
 msgid "error writing to output file"
-msgstr "¡Ups! Error al escribir el archivo de salida"
+msgstr "error writing to output file"
 
 #: panel.cpp:2437
 msgid "can't guess output format from file name"
-msgstr "no puedo adivinar el formato de salida del nombre del archivo"
+msgstr "can't guess output format from file name"
 
 #: panel.cpp:2442
 msgid "programming error; aborting!"
-msgstr "Error de programación; ¡espera aborten aborten! abortando proceso...."
+msgstr "programming error; aborting!"
 
 #: panel.cpp:2454 panel.cpp:2483
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
-msgstr " ¡Que Mal! No se puede comenzar a grabar en %s (%s)"
+msgstr "Unable to begin recording to %s (%s)"
 
 #: panel.cpp:2511
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
-msgstr "¡Ups! Error en la grabación de audio o video (%s); Abortando"
+msgstr "Error in audio/video recording (%s); aborting"
 
 #: panel.cpp:2517
 #, c-format
 msgid "Error in audio recording (%s); aborting"
-msgstr "¡Ups! Error en la grabación del audio (%s); abortando"
+msgstr "Error in audio recording (%s); aborting"
 
 #: panel.cpp:2527
 #, c-format
 msgid "Error in video recording (%s); aborting"
-msgstr "¡Ups! Error en la grabacion de vieo (%s); abortando"
+msgstr "Error in video recording (%s); aborting"
 
 #: viewsupt.cpp:776
 msgid "R:"
@@ -1171,177 +1172,177 @@ msgstr "CONTROL"
 #: widgets/sdljoy.cpp:137
 #, c-format
 msgid "Connected joystick %d: %s"
-msgstr "joystick Conectado %d: %s"
+msgstr "Connected joystick %d: %s"
 
 #: widgets/sdljoy.cpp:152
 #, c-format
 msgid "Disconnected joystick %d"
-msgstr "joystick Desconectado %d"
+msgstr "Disconnected joystick %d"
 
 #: xaudio2.cpp:34
 msgid "XAudio2: Enumerating devices failed!"
-msgstr "XAudio2: ¡Ups! Enumeracion de dispositivos fallida"
+msgstr "XAudio2: Enumerating devices failed!"
 
 #: xaudio2.cpp:68 xaudio2.cpp:352
 msgid "The XAudio2 interface failed to initialize!"
-msgstr "¡Ups! ¡La interfaz de XAudio2 a fallado al inicializar!"
+msgstr "The XAudio2 interface failed to initialize!"
 
 #: xaudio2.cpp:383
 msgid "XAudio2: Creating mastering voice failed!"
-msgstr "XAudio2: ¡Ups! ¡Fallo la Masterización de voz!"
+msgstr "XAudio2: Creating mastering voice failed!"
 
 #: xaudio2.cpp:392
 msgid "XAudio2: Creating source voice failed!"
-msgstr "XAudio2 ¡Ups! ¡Error al crear la voz de origen!"
+msgstr "XAudio2: Creating source voice failed!"
 
 #: faudio.cpp:31
 msgid "FAudio: Enumerating devices failed!"
-msgstr "FAudio: ¡Ups! ¡Fallo la enumeracion de dispositivos!"
+msgstr "FAudio: Enumerating devices failed!"
 
 #: faudio.cpp:66 faudio.cpp:351
 msgid "The FAudio interface failed to initialize!"
-msgstr "¡Ups! ¡La interfaz FAudio fallo al  inicializar!"
+msgstr "The FAudio interface failed to initialize!"
 
 #: faudio.cpp:383
 msgid "FAudio: Creating mastering voice failed!"
-msgstr "FAudio: ¡Ups! ¡Fallo al crear la materizacion de voz!"
+msgstr "FAudio: Creating mastering voice failed!"
 
 #: faudio.cpp:394
 msgid "FAudio: Creating source voice failed!"
-msgstr "FAudio: ¡Ups! ¡Falló la creación de la voz de origen!"
+msgstr "FAudio: Creating source voice failed!"
 
 #: dsound.cpp:89 dsound.cpp:103
 #, c-format
 msgid "Cannot create DirectSound %08x"
-msgstr "¡Que Mal! No se puede crear un sonido directo %08x"
+msgstr "Cannot create DirectSound %08x"
 
 #: dsound.cpp:108
 #, c-format
 msgid "Cannot SetCooperativeLevel %08x"
-msgstr "¡Ups! No se Puede \"SetCooperativeLevel\" = \"Establecer el nivel cooperativo\" %08x"
+msgstr "Cannot SetCooperativeLevel %08x"
 
 #: dsound.cpp:122
 #, c-format
 msgid "Cannot CreateSoundBuffer %08x"
-msgstr "¡Ups! No se puede \"CreateSoundBuffer\" = \"Crear un amortiguador de sonido\" %08x"
+msgstr "Cannot CreateSoundBuffer %08x"
 
 #: dsound.cpp:141
 #, c-format
 msgid "CreateSoundBuffer(primary) failed %08x"
-msgstr "\"CreateSoundBuffer(primary)\" = \"Crear amortiguador de sonido Primario\" Fallido %08x"
+msgstr "CreateSoundBuffer(primary) failed %08x"
 
 #: dsound.cpp:158
 #, c-format
 msgid "CreateSoundBuffer(secondary) failed %08x"
-msgstr "\"CreateSoundBuffer(secondary)\" = \"Crear amortiguador de sonido Secundario\" Fallido %08x"
+msgstr "CreateSoundBuffer(secondary) failed %08x"
 
 #: dsound.cpp:163
 #, c-format
 msgid "dsbSecondary->SetCurrentPosition failed %08x"
-msgstr "dsbSecundario->AjustarLaPosicionOcurrente fallido \"SetCurrentPosition\" %08x"
+msgstr "dsbSecondary->SetCurrentPosition failed %08x"
 
 #: dsound.cpp:186
 #, c-format
 msgid "Cannot Play primary %08x"
-msgstr "No se puede jugar primario %08x"
+msgstr "Cannot Play primary %08x"
 
 #: dsound.cpp:321
 #, c-format
 msgid "dsbSecondary->Lock() failed: %08x"
-msgstr "dsbSecundario->\"Lock()\" = \"Cerrar\" fallido: %08x"
+msgstr "dsbSecondary->Lock() failed: %08x"
 
 #: viewsupt.h:61
 #, c-format
 msgid "Unable to load dialog %s from resources"
-msgstr "No se puede cargar el diálogo %s de recursos"
+msgstr "Unable to load dialog %s from resources"
 
 #: xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
-msgstr "Atajo de teclas"
+msgstr "Key Shortcuts"
 
 #: xrc/AccelConfig.xrc:13
 msgid "Co&mmands:"
-msgstr "Co&mandos:"
+msgstr "Co&mmands:"
 
 #: xrc/AccelConfig.xrc:34
 msgid "Current Keys:"
-msgstr "Teclas actuales:"
+msgstr "Current Keys:"
 
 #: xrc/AccelConfig.xrc:53
 msgid "&Assign"
-msgstr "&Asignar"
+msgstr "&Assign"
 
 #: xrc/AccelConfig.xrc:60
 msgid "&Remove"
-msgstr "&Remover"
+msgstr "&Remove"
 
 #: xrc/AccelConfig.xrc:67
 msgid "Re&set All"
-msgstr "Re&setear todo"
+msgstr "Re&set All"
 
 #: xrc/AccelConfig.xrc:81
 msgid "Currently assigned to:"
-msgstr "actualmente asignado para:"
+msgstr "Currently assigned to:"
 
 #: xrc/AccelConfig.xrc:96
 msgid "Shortcut Key:"
-msgstr "Atajo de tecla:"
+msgstr "Shortcut Key:"
 
 #: xrc/CheatAdd.xrc:4
 msgid "Add Cheat"
-msgstr "Add Truco/Trampa"
+msgstr "Add Cheat"
 
 #: xrc/CheatAdd.xrc:9 xrc/CheatEdit.xrc:9
 msgid "&Description"
-msgstr "&Descripción"
+msgstr "&Description"
 
 #: xrc/CheatAdd.xrc:53
 msgid "&Value"
-msgstr "&Valor"
+msgstr "&Value"
 
 #: xrc/CheatAdd.xrc:77
 msgid "Format"
-msgstr "Formato"
+msgstr "Format"
 
 #: xrc/CheatCreate.xrc:4
 msgid "Cheat Search"
-msgstr "Buscar Trampa/Truco"
+msgstr "Cheat Search"
 
 #: xrc/CheatCreate.xrc:23
 msgid "E&qual"
-msgstr "I&gual"
+msgstr "E&qual"
 
 #: xrc/CheatCreate.xrc:31
 msgid "&Not equal"
-msgstr "&No es igual"
+msgstr "&Not equal"
 
 #: xrc/CheatCreate.xrc:38
 msgid "&Less than"
-msgstr "&Menos que"
+msgstr "&Less than"
 
 #: xrc/CheatCreate.xrc:45
 msgid "L&ess or equal"
-msgstr "M&enos o igual"
+msgstr "L&ess or equal"
 
 #: xrc/CheatCreate.xrc:52
 msgid "&Greater than"
-msgstr "&Mas grande que"
+msgstr "&Greater than"
 
 #: xrc/CheatCreate.xrc:59
 msgid "G&reater or equal"
-msgstr "M&ayor o igual"
+msgstr "G&reater or equal"
 
 #: xrc/CheatCreate.xrc:64
 msgid "Compare type"
-msgstr "Comparar el tipo"
+msgstr "Compare type"
 
 #: xrc/CheatCreate.xrc:77
 msgid "S&igned"
-msgstr "F&irmado"
+msgstr "S&igned"
 
 #: xrc/CheatCreate.xrc:85
 msgid "&Unsigned"
-msgstr "&No firmado"
+msgstr "&Unsigned"
 
 #: xrc/CheatCreate.xrc:92
 msgid "&Hexadecimal"
@@ -1349,7 +1350,7 @@ msgstr "&Hexadecimal"
 
 #: xrc/CheatCreate.xrc:97
 msgid "Signed/Unsigned"
-msgstr "Firmado/No firmado"
+msgstr "Signed/Unsigned"
 
 #: xrc/CheatCreate.xrc:107
 msgid "&8 bits"
@@ -1357,7 +1358,7 @@ msgstr "&8 bits"
 
 #: xrc/CheatCreate.xrc:115
 msgid "&16 bits"
-msgstr "%16 bits"
+msgstr "&16 bits"
 
 #: xrc/CheatCreate.xrc:122
 msgid "&32 bits"
@@ -1365,27 +1366,27 @@ msgstr "&32 bits"
 
 #: xrc/CheatCreate.xrc:127
 msgid "Data size"
-msgstr "Tamaño de datos"
+msgstr "Data size"
 
 #: xrc/CheatCreate.xrc:144
 msgid "Ol&d value"
-msgstr "Vi&ejo valor"
+msgstr "Ol&d value"
 
 #: xrc/CheatCreate.xrc:152
 msgid "Specific &value"
-msgstr "Especificar &valor"
+msgstr "Specific &value"
 
 #: xrc/CheatCreate.xrc:163
 msgid "Search value"
-msgstr "Buscar valor"
+msgstr "Search value"
 
 #: xrc/CheatCreate.xrc:181
 msgid "&Search"
-msgstr "&Buscar"
+msgstr "&Search"
 
 #: xrc/CheatCreate.xrc:188
 msgid "U&pdate Old"
-msgstr "A&ctualizar viejo"
+msgstr "U&pdate Old"
 
 #: xrc/CheatCreate.xrc:195 xrc/JoyPanel.xrc:29 xrc/JoyPanel.xrc:52
 #: xrc/JoyPanel.xrc:75 xrc/JoyPanel.xrc:98 xrc/JoyPanel.xrc:121
@@ -1396,99 +1397,99 @@ msgstr "A&ctualizar viejo"
 #: xrc/JoyPanel.xrc:422 xrc/JoyPanel.xrc:444 xrc/JoyPanel.xrc:475
 #: xrc/JoyPanel.xrc:497 xrc/Logging.xrc:119
 msgid "&Clear"
-msgstr "&Borrar"
+msgstr "&Clear"
 
 #: xrc/CheatCreate.xrc:202
 msgid "&Add cheat"
-msgstr "&Añadir Trampa/Truco"
+msgstr "&Add cheat"
 
 #: xrc/CheatEdit.xrc:4
 msgid "Edit Cheat"
-msgstr "Editar trampa/truco"
+msgstr "Edit Cheat"
 
 #: xrc/CheatEdit.xrc:31 xrc/MainMenu.xrc:275
 msgid "&Type"
-msgstr "&Tipo"
+msgstr "&Type"
 
 #: xrc/CheatEdit.xrc:53
 msgid "C&odes"
-msgstr "C&odigos"
+msgstr "C&odes"
 
 #: xrc/CheatList.xrc:4
 msgid "Cheat List"
-msgstr "Lista de Trampas/Trucos"
+msgstr "Cheat List"
 
 #: xrc/CheatList.xrc:11
 msgid "Open cheat list"
-msgstr "Abrir lista de Trampas/Trucos"
+msgstr "Open cheat list"
 
 #: xrc/CheatList.xrc:15
 msgid "Save cheat list"
-msgstr "Guardar lista de Trampas/Trucos"
+msgstr "Save cheat list"
 
 #: xrc/CheatList.xrc:20
 msgid "Add new cheat"
-msgstr "Añadir nuevo/a Trampa/Truco"
+msgstr "Add new cheat"
 
 #: xrc/CheatList.xrc:24
 msgid "Delete selected cheat"
-msgstr "seleccionar Trampa/Truco borrado/a"
+msgstr "Delete selected cheat"
 
 #: xrc/CheatList.xrc:29
 msgid "Delete all cheats"
-msgstr "Borrar todos los/as Trampas/Trucos"
+msgstr "Delete all cheats"
 
 #: xrc/CheatList.xrc:35
 msgid "Toggle all Cheats"
-msgstr "Cambiar todas las trampas"
+msgstr "Toggle all Cheats"
 
 #: xrc/DirectoriesConfig.xrc:4
 msgid "Directories"
-msgstr "Directorios"
+msgstr "Directories"
 
 #: xrc/DirectoriesConfig.xrc:11 xrc/DirectoriesConfig.xrc:18
 msgid "Game Boy Advance ROMs"
-msgstr "ROMs de Game Boy Advance"
+msgstr "Game Boy Advance ROMs"
 
 #: xrc/DirectoriesConfig.xrc:27 xrc/DirectoriesConfig.xrc:34
 msgid "Game Boy ROMs"
-msgstr "ROMs de Game Boy "
+msgstr "Game Boy ROMs"
 
 #: xrc/DirectoriesConfig.xrc:42 xrc/DirectoriesConfig.xrc:49
 msgid "Game Boy Color ROMs"
-msgstr "ROMs de Game Boy Color"
+msgstr "Game Boy Color ROMs"
 
 #: xrc/DirectoriesConfig.xrc:57 xrc/DirectoriesConfig.xrc:64
 msgid "Native Saves"
-msgstr "Guardados nativos"
+msgstr "Native Saves"
 
 #: xrc/DirectoriesConfig.xrc:72 xrc/DirectoriesConfig.xrc:79
 msgid "Emulator Saves"
-msgstr "Guardados de emulador"
+msgstr "Emulator Saves"
 
 #: xrc/DirectoriesConfig.xrc:87 xrc/DirectoriesConfig.xrc:94
 msgid "Screenshots"
-msgstr "Capturas de pantalla"
+msgstr "Screenshots"
 
 #: xrc/DirectoriesConfig.xrc:102 xrc/DirectoriesConfig.xrc:109
 msgid "Recordings"
-msgstr "Grabaciones"
+msgstr "Recordings"
 
 #: xrc/Disassemble.xrc:4
 msgid "Disassemble"
-msgstr "Desmontar"
+msgstr "Disassemble"
 
 #: xrc/Disassemble.xrc:15
 msgid "&Automatic"
-msgstr "&Automatico"
+msgstr "&Automatic"
 
 #: xrc/Disassemble.xrc:23
 msgid "A&RM"
-msgstr "B&RAZO"
+msgstr "A&RM"
 
 #: xrc/Disassemble.xrc:30
 msgid "&THUMB"
-msgstr "&PULGAR"
+msgstr "&THUMB"
 
 #: xrc/Disassemble.xrc:45 xrc/GBDisassemble.xrc:18 xrc/MemViewer.xrc:47
 msgid "&Go"
@@ -1601,7 +1602,7 @@ msgstr "V"
 
 #: xrc/Disassemble.xrc:414 xrc/MapViewer.xrc:76 xrc/OAMViewer.xrc:37
 msgid "Mode:"
-msgstr "Modo:"
+msgstr "Mode:"
 
 #: xrc/Disassemble.xrc:424 xrc/GBDisassemble.xrc:172
 msgid "00"
@@ -1612,27 +1613,27 @@ msgstr "00"
 #: xrc/MemViewer.xrc:72 xrc/OAMViewer.xrc:109 xrc/PaletteViewer.xrc:81
 #: xrc/TileViewer.xrc:91
 msgid "Automatic &update"
-msgstr "Actualización &automática"
+msgstr "Automatic &update"
 
 #: xrc/Disassemble.xrc:453 xrc/GBDisassemble.xrc:222
 msgid "G&oto PC"
-msgstr "I&R a PC"
+msgstr "G&oto PC"
 
 #: xrc/Disassemble.xrc:460 xrc/GBDisassemble.xrc:229
 msgid "Re&fresh"
-msgstr "Ac&tualizar"
+msgstr "Re&fresh"
 
 #: xrc/Disassemble.xrc:467 xrc/GBDisassemble.xrc:236
 msgid "&Next"
-msgstr "&Siguiente"
+msgstr "&Next"
 
 #: xrc/DisplayConfig.xrc:4
 msgid "Display settings"
-msgstr "Configuraciones de pantalla"
+msgstr "Display settings"
 
 #: xrc/DisplayConfig.xrc:15
 msgid "Output module"
-msgstr "Modulo de salida"
+msgstr "Output module"
 
 #: xrc/DisplayConfig.xrc:33
 msgid "Simple"
@@ -1640,27 +1641,27 @@ msgstr "Simple"
 
 #: xrc/DisplayConfig.xrc:40
 msgid "Quartz2D"
-msgstr "Cuarzo2D"
+msgstr "Quartz2D"
 
 #: xrc/DisplayConfig.xrc:47
 msgid "OpenGL"
-msgstr "AbrirGL"
+msgstr "OpenGL"
 
 #: xrc/DisplayConfig.xrc:54
 msgid "Direct3D 9"
-msgstr "Directo3D 9"
+msgstr "Direct3D 9"
 
 #: xrc/DisplayConfig.xrc:65
 msgid "Filters"
-msgstr "Filtros"
+msgstr "Filters"
 
 #: xrc/DisplayConfig.xrc:79
 msgid "Display filter :"
-msgstr "Filtro de visualización :"
+msgstr "Display filter :"
 
 #: xrc/DisplayConfig.xrc:86
 msgid "2xSaI"
-msgstr "2xSal"
+msgstr "2xSaI"
 
 #: xrc/DisplayConfig.xrc:87
 msgid "Super 2xSaI"
@@ -1668,23 +1669,23 @@ msgstr "Super 2xSaI"
 
 #: xrc/DisplayConfig.xrc:88
 msgid "Super Eagle"
-msgstr "Super aguila"
+msgstr "Super Eagle"
 
 #: xrc/DisplayConfig.xrc:89
 msgid "Pixelate"
-msgstr "Pixelar"
+msgstr "Pixelate"
 
 #: xrc/DisplayConfig.xrc:90
 msgid "Advance MAME Scale2x"
-msgstr "Escala avanzada de MAME2x"
+msgstr "Advance MAME Scale2x"
 
 #: xrc/DisplayConfig.xrc:91
 msgid "Bilinear"
-msgstr "Bilineal"
+msgstr "Bilinear"
 
 #: xrc/DisplayConfig.xrc:92
 msgid "Bilinear Plus"
-msgstr "Bilineal Plus"
+msgstr "Bilinear Plus"
 
 #: xrc/DisplayConfig.xrc:93
 msgid "Scanlines"
@@ -1692,7 +1693,7 @@ msgstr "Scanlines"
 
 #: xrc/DisplayConfig.xrc:94
 msgid "TV Mode"
-msgstr "Modo TV"
+msgstr "TV Mode"
 
 #: xrc/DisplayConfig.xrc:95
 msgid "HQ 2x"
@@ -1700,7 +1701,7 @@ msgstr "HQ 2x"
 
 #: xrc/DisplayConfig.xrc:96
 msgid "LQ 2x"
-msgstr "LQ 2X"
+msgstr "LQ 2x"
 
 #: xrc/DisplayConfig.xrc:97
 msgid "Simple 2x"
@@ -1748,47 +1749,47 @@ msgstr "Plugin :"
 
 #: xrc/DisplayConfig.xrc:127
 msgid "Interframe blending :"
-msgstr "Mezcla de Interframe :"
+msgstr "Interframe blending :"
 
 #: xrc/DisplayConfig.xrc:136
 msgid "Smart interframe blending"
-msgstr "Mezcla inteligente de Interframe"
+msgstr "Smart interframe blending"
 
 #: xrc/DisplayConfig.xrc:137
 msgid "Interframe motion blur"
-msgstr "desenfoque de moviento de interframe"
+msgstr "Interframe motion blur"
 
 #: xrc/DisplayConfig.xrc:151 xrc/SoundConfig.xrc:91
 msgid "Basic"
-msgstr "Basico"
+msgstr "Basic"
 
 #: xrc/DisplayConfig.xrc:159
 msgid "Frame Skip"
-msgstr "Saltar Fotograma"
+msgstr "Frame Skip"
 
 #: xrc/DisplayConfig.xrc:177
 msgid "&Number of frames to skip :"
-msgstr "&Numero de fotogramas para saltar"
+msgstr "&Number of frames to skip :"
 
 #: xrc/DisplayConfig.xrc:199
 msgid "Speed"
-msgstr "Velocidad"
+msgstr "Speed"
 
 #: xrc/DisplayConfig.xrc:215
 msgid "Speed indicator :"
-msgstr "Indicador de velocidad :"
+msgstr "Speed indicator :"
 
 #: xrc/DisplayConfig.xrc:222
 msgid "Percentage"
-msgstr "Porcentaje"
+msgstr "Percentage"
 
 #: xrc/DisplayConfig.xrc:223
 msgid "Detailed"
-msgstr "Detallado"
+msgstr "Detailed"
 
 #: xrc/DisplayConfig.xrc:237
 msgid "On-Screen Display"
-msgstr "Visualizacion en-pantalla"
+msgstr "On-Screen Display"
 
 #: xrc/DisplayConfig.xrc:247
 msgid "Default magnification :"
@@ -1796,15 +1797,15 @@ msgstr "Default magnification :"
 
 #: xrc/DisplayConfig.xrc:266
 msgid "Maximum magnification factor :"
-msgstr "Factor de aumento máximo :"
+msgstr "Maximum magnification factor :"
 
 #: xrc/DisplayConfig.xrc:267
 msgid "0 = no maximum"
-msgstr "0 = no maximo"
+msgstr "0 = no maximum"
 
 #: xrc/DisplayConfig.xrc:275
 msgid "0 = no limit"
-msgstr "0 = sin limite"
+msgstr "0 = no limit"
 
 #: xrc/DisplayConfig.xrc:285
 msgid "Zoom"
@@ -1812,35 +1813,35 @@ msgstr "Zoom"
 
 #: xrc/ExportSPS.xrc:10
 msgid "Title:"
-msgstr "Titulo:"
+msgstr "Title:"
 
 #: xrc/ExportSPS.xrc:22
 msgid "Description:"
-msgstr "Descripción "
+msgstr "Description:"
 
 #: xrc/ExportSPS.xrc:34
 msgid "Notes:"
-msgstr "Notas:"
+msgstr "Notes:"
 
 #: xrc/GBAROMInfo.xrc:4 xrc/GBROMInfo.xrc:4
 msgid "Rom Information"
-msgstr "Informacion de Rom"
+msgstr "Rom Information"
 
 #: xrc/GBAROMInfo.xrc:11 xrc/GBROMInfo.xrc:12
 msgid "Game title:"
-msgstr "Titulo del juego:"
+msgstr "Game title:"
 
 #: xrc/GBAROMInfo.xrc:23
 msgid "Internal title:"
-msgstr "Titulo Interno"
+msgstr "Internal title:"
 
 #: xrc/GBAROMInfo.xrc:35
 msgid "Scene Release:"
-msgstr "Lanzamiento de escena "
+msgstr "Scene Release:"
 
 #: xrc/GBAROMInfo.xrc:47
 msgid "Release Number:"
-msgstr "Numero de version:"
+msgstr "Release Number:"
 
 #: xrc/GBAROMInfo.xrc:59
 msgid "CRC32:"
@@ -1848,27 +1849,27 @@ msgstr "CRC32:"
 
 #: xrc/GBAROMInfo.xrc:71
 msgid "Game code:"
-msgstr "Codigo del juego:"
+msgstr "Game code:"
 
 #: xrc/GBAROMInfo.xrc:83 xrc/GBROMInfo.xrc:24
 msgid "Maker code:"
-msgstr "Codigo de frabrica:"
+msgstr "Maker code:"
 
 #: xrc/GBAROMInfo.xrc:95 xrc/GBROMInfo.xrc:36
 msgid "Maker name:"
-msgstr "Nombre de fabrica:"
+msgstr "Maker name:"
 
 #: xrc/GBAROMInfo.xrc:107
 msgid "Main unit code:"
-msgstr "Código de la unidad principal:"
+msgstr "Main unit code:"
 
 #: xrc/GBAROMInfo.xrc:119
 msgid "Device type:"
-msgstr "Tipo de dispositivo"
+msgstr "Device type:"
 
 #: xrc/GBAROMInfo.xrc:131 xrc/GBROMInfo.xrc:72
 msgid "ROM version:"
-msgstr "Version de ROM:"
+msgstr "ROM version:"
 
 #: xrc/GBAROMInfo.xrc:143 xrc/GBROMInfo.xrc:84
 msgid "CRC:"
@@ -1876,48 +1877,48 @@ msgstr "CRC:"
 
 #: xrc/GBAROMInfo.xrc:150
 msgid "ROM Information"
-msgstr "Informacion de ROM"
+msgstr "ROM Information"
 
 #: xrc/GBColorPrefPanel.xrc:10 xrc/JoyPanel.xrc:247
 msgid "Standard"
-msgstr "Estandar"
+msgstr "Standard"
 
 #: xrc/GBColorPrefPanel.xrc:11
 msgid "Blue Sea"
-msgstr "Mar azul"
+msgstr "Blue Sea"
 
 #: xrc/GBColorPrefPanel.xrc:12
 msgid "Dark Night"
-msgstr "Noche Negra"
+msgstr "Dark Night"
 
 #: xrc/GBColorPrefPanel.xrc:13
 msgid "Green Forest"
-msgstr "Bosque Verde"
+msgstr "Green Forest"
 
 #: xrc/GBColorPrefPanel.xrc:14
 msgid "Hot Desert"
-msgstr "Desierto caliente"
+msgstr "Hot Desert"
 
 #: xrc/GBColorPrefPanel.xrc:15
 msgid "Pink Dreams"
-msgstr "Sueños rosados"
+msgstr "Pink Dreams"
 
 #: xrc/GBColorPrefPanel.xrc:16
 msgid "Weird Colors"
-msgstr "Colores extraños"
+msgstr "Weird Colors"
 
 #: xrc/GBColorPrefPanel.xrc:17
 msgid "Real GB Colors"
-msgstr "Colores reales de la GB"
+msgstr "Real GB Colors"
 
 #: xrc/GBColorPrefPanel.xrc:18
 msgid "Real 'GB on GBASP' Colors"
-msgstr "Colores reales de 'GB en GBASP'"
+msgstr "Real 'GB on GBASP' Colors"
 
 #: xrc/GBColorPrefPanel.xrc:46 xrc/GBPaletteViewer.xrc:17 xrc/MapViewer.xrc:54
 #: xrc/PaletteViewer.xrc:19
 msgid "Background"
-msgstr "Fondo"
+msgstr "Background"
 
 #: xrc/GBColorPrefPanel.xrc:74
 msgid "Sprites"
@@ -1925,11 +1926,11 @@ msgstr "Sprites"
 
 #: xrc/GBColorPrefPanel.xrc:84
 msgid "Use this palette"
-msgstr "Usar esta paleta"
+msgstr "Use this palette"
 
 #: xrc/GBColorPrefPanel.xrc:94
 msgid "Restore"
-msgstr "Restaurar"
+msgstr "Restore"
 
 #: xrc/GBDisassemble.xrc:43
 msgid "AF:"
@@ -1987,21 +1988,21 @@ msgstr "0x9C00"
 
 #: xrc/GBMapViewer.xrc:42
 msgid "Map Base"
-msgstr "Base del mapa"
+msgstr "Map Base"
 
 #: xrc/GBMapViewer.xrc:54 xrc/GBOAMViewer.xrc:88 xrc/GBTileViewer.xrc:68
 #: xrc/MapViewer.xrc:62 xrc/OAMViewer.xrc:104 xrc/TileViewer.xrc:84
 msgid "Stretch to &fit"
-msgstr "Estirar para &caber"
+msgstr "Stretch to &fit"
 
 #: xrc/GBMapViewer.xrc:59 xrc/MapViewer.xrc:67
 msgid "Auto &update"
-msgstr "Actualización &Automática"
+msgstr "Auto &update"
 
 #: xrc/GBMapViewer.xrc:74 xrc/GBTileViewer.xrc:99 xrc/MapViewer.xrc:144
 #: xrc/MemSelRegion.xrc:10 xrc/PaletteViewer.xrc:50 xrc/TileViewer.xrc:115
 msgid "Address:"
-msgstr "Direccion:"
+msgstr "Address:"
 
 #: xrc/GBMapViewer.xrc:82 xrc/GBOAMViewer.xrc:37 xrc/GBTileViewer.xrc:91
 #: xrc/MapViewer.xrc:152 xrc/OAMViewer.xrc:61 xrc/TileViewer.xrc:107
@@ -2010,27 +2011,27 @@ msgstr "Tile:"
 
 #: xrc/GBMapViewer.xrc:90 xrc/MapViewer.xrc:160
 msgid "Flip:"
-msgstr "Voltear:"
+msgstr "Flip:"
 
 #: xrc/GBMapViewer.xrc:98 xrc/GBTileViewer.xrc:50 xrc/MapViewer.xrc:168
 #: xrc/TileViewer.xrc:66
 msgid "Palette:"
-msgstr "Paleta:"
+msgstr "Palette:"
 
 #: xrc/GBMapViewer.xrc:106 xrc/MapViewer.xrc:116
 msgid "Priority:"
-msgstr "Prioridad :"
+msgstr "Priority:"
 
 #: xrc/GBMapViewer.xrc:152 xrc/GBOAMViewer.xrc:142 xrc/GBPaletteViewer.xrc:114
 #: xrc/GBTileViewer.xrc:145 xrc/IOViewer.xrc:327 xrc/MapViewer.xrc:214
 #: xrc/MemViewer.xrc:101 xrc/OAMViewer.xrc:155 xrc/PaletteViewer.xrc:100
 #: xrc/TileViewer.xrc:161
 msgid "&Refresh"
-msgstr "&Actulizar"
+msgstr "&Refresh"
 
 #: xrc/GBMapViewer.xrc:157 xrc/Logging.xrc:112 xrc/MapViewer.xrc:219
 msgid "&Save"
-msgstr "&Guardar"
+msgstr "&Save"
 
 #: xrc/GBOAMViewer.xrc:13 xrc/OAMViewer.xrc:14
 msgid "Sprite:"
@@ -2054,24 +2055,24 @@ msgstr "Pal:"
 
 #: xrc/GBOAMViewer.xrc:69 xrc/OAMViewer.xrc:93
 msgid "Flags:"
-msgstr "Banderas:"
+msgstr "Flags:"
 
 #: xrc/GBOAMViewer.xrc:77
 msgid "Bank:"
-msgstr "Banco:"
+msgstr "Bank:"
 
 #: xrc/GBOAMViewer.xrc:149 xrc/GBTileViewer.xrc:152 xrc/MemViewer.xrc:115
 #: xrc/OAMViewer.xrc:162 xrc/TileViewer.xrc:168
 msgid "&Save..."
-msgstr "&Guardar..."
+msgstr "&Save..."
 
 #: xrc/GBPaletteViewer.xrc:8 xrc/PaletteViewer.xrc:9
 msgid "Click on a color for more information"
-msgstr "Has click en un color para mas informacion"
+msgstr "Click on a color for more information"
 
 #: xrc/GBPaletteViewer.xrc:27 xrc/PaletteViewer.xrc:105
 msgid "Save &BG..."
-msgstr "Guardar &BG"
+msgstr "Save &BG..."
 
 #: xrc/GBPaletteViewer.xrc:38 xrc/PaletteViewer.xrc:33
 msgid "Sprite"
@@ -2079,19 +2080,19 @@ msgstr "Sprite"
 
 #: xrc/GBPaletteViewer.xrc:48 xrc/PaletteViewer.xrc:111
 msgid "Save &Sprite..."
-msgstr "Guardar &Sprite..."
+msgstr "Save &Sprite..."
 
 #: xrc/GBPaletteViewer.xrc:67
 msgid "Index:"
-msgstr "Indice:"
+msgstr "Index:"
 
 #: xrc/GBPaletteViewer.xrc:79 xrc/IOViewer.xrc:21 xrc/PaletteViewer.xrc:62
 msgid "Value:"
-msgstr "Valor:"
+msgstr "Value:"
 
 #: xrc/GBPrinter.xrc:21
 msgid "Print Si&ze"
-msgstr "Imprimir Ta&maño"
+msgstr "Print Si&ze"
 
 #: xrc/GBPrinter.xrc:29
 msgid "1x"
@@ -2111,15 +2112,15 @@ msgstr "4x"
 
 #: xrc/GBPrinter.xrc:58
 msgid "C&ontinue"
-msgstr "C&ontinuar"
+msgstr "C&ontinue"
 
 #: xrc/GBROMInfo.xrc:48
 msgid "Unit code:"
-msgstr "Codigo de unidad:"
+msgstr "Unit code:"
 
 #: xrc/GBROMInfo.xrc:60
 msgid "Cartridge type:"
-msgstr "Tipo de cartucho"
+msgstr "Cartridge type:"
 
 #: xrc/GBROMInfo.xrc:96
 msgid "Color:"
@@ -2127,23 +2128,23 @@ msgstr "Color:"
 
 #: xrc/GBROMInfo.xrc:108
 msgid "ROM size:"
-msgstr "Tamaño de ROM:"
+msgstr "ROM size:"
 
 #: xrc/GBROMInfo.xrc:120
 msgid "RAM size:"
-msgstr "Tamaño de RAM"
+msgstr "RAM size:"
 
 #: xrc/GBROMInfo.xrc:132
 msgid "Dest. code:"
-msgstr "Codi. de destino:"
+msgstr "Dest. code:"
 
 #: xrc/GBROMInfo.xrc:144
 msgid "License code:"
-msgstr "Código de licencia: "
+msgstr "License code:"
 
 #: xrc/GBROMInfo.xrc:156
 msgid "Checksum:"
-msgstr "Suma de comprobación:"
+msgstr "Checksum:"
 
 #: xrc/GBTileViewer.xrc:14
 msgid "&0"
@@ -2155,7 +2156,7 @@ msgstr "&1"
 
 #: xrc/GBTileViewer.xrc:23
 msgid "VRAM Bank"
-msgstr "Banco de VRAM"
+msgstr "VRAM Bank"
 
 #: xrc/GBTileViewer.xrc:33
 msgid "0x&8000"
@@ -2167,16 +2168,16 @@ msgstr "0x&8800"
 
 #: xrc/GameBoyAdvanceConfig.xrc:4
 msgid "Game Boy Advance settings"
-msgstr "Configuraciones de Game boy Advance"
+msgstr "Game Boy Advance settings"
 
 #: xrc/GameBoyAdvanceConfig.xrc:21
 msgid "Save type :"
-msgstr " tipo de guardado:"
+msgstr "Save type :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
 #: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
 msgid "Automatic"
-msgstr "Automatico"
+msgstr "Automatic"
 
 #: xrc/GameBoyAdvanceConfig.xrc:28 xrc/GameBoyAdvanceConfig.xrc:200
 msgid "EEPROM"
@@ -2188,7 +2189,7 @@ msgstr "SRAM"
 
 #: xrc/GameBoyAdvanceConfig.xrc:30 xrc/GameBoyAdvanceConfig.xrc:202
 msgid "Flash"
-msgstr "Destello"
+msgstr "Flash"
 
 #: xrc/GameBoyAdvanceConfig.xrc:31
 msgid "EEPROM + Sensor"
@@ -2196,7 +2197,7 @@ msgstr "EEPROM + Sensor"
 
 #: xrc/GameBoyAdvanceConfig.xrc:43
 msgid "Flash size :"
-msgstr "Tamaño de destello :"
+msgstr "Flash size :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
 msgid "64K"
@@ -2208,7 +2209,7 @@ msgstr "128K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:64
 msgid "Detect Now"
-msgstr "Detectar ahora"
+msgstr "Detect Now"
 
 #: xrc/GameBoyAdvanceConfig.xrc:69
 msgid "Cartridge"
@@ -2216,54 +2217,54 @@ msgstr "Cartridge"
 
 #: xrc/GameBoyAdvanceConfig.xrc:77
 msgid "Save type"
-msgstr "Tipo de Guardado"
+msgstr "Save type"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file :"
-msgstr "Archivo BIOS:"
+msgstr "BIOS file :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file :"
-msgstr "Actual archivo BIOS :"
+msgstr "Current BIOS file :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:122 xrc/GameBoyConfig.xrc:138
 #: xrc/GameBoyConfig.xrc:159
 msgid "(None)"
-msgstr "(Nada)"
+msgstr "(None)"
 
 #: xrc/GameBoyAdvanceConfig.xrc:136 xrc/GameBoyConfig.xrc:168
 msgid "Boot ROM"
-msgstr "ROM de arranque"
+msgstr "Boot ROM"
 
 #: xrc/GameBoyAdvanceConfig.xrc:146
 msgid "Game Code"
-msgstr "Codigo del juego"
+msgstr "Game Code"
 
 #: xrc/GameBoyAdvanceConfig.xrc:160
 msgid "Comment"
-msgstr "Comenta"
+msgstr "Comment"
 
 #: xrc/GameBoyAdvanceConfig.xrc:172
 msgid "Real Time Clock:"
-msgstr "Reloj del tiempo real:"
+msgstr "Real Time Clock:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:180 xrc/GameBoyAdvanceConfig.xrc:198
 #: xrc/GameBoyAdvanceConfig.xrc:220 xrc/GameBoyAdvanceConfig.xrc:238
 #: xrc/GameBoyConfig.xrc:180
 msgid "Default"
-msgstr "Defecto"
+msgstr "Default"
 
 #: xrc/GameBoyAdvanceConfig.xrc:181 xrc/GameBoyAdvanceConfig.xrc:239
 msgid "Disabled"
-msgstr "Desactivado"
+msgstr "Disabled"
 
 #: xrc/GameBoyAdvanceConfig.xrc:182 xrc/GameBoyAdvanceConfig.xrc:240
 msgid "Enabled"
-msgstr "Activado"
+msgstr "Enabled"
 
 #: xrc/GameBoyAdvanceConfig.xrc:190
 msgid "Save Type:"
-msgstr "Tipo de Guardado"
+msgstr "Save Type:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:203
 msgid "EEPROM+Sensor"
@@ -2271,27 +2272,27 @@ msgstr "EEPROM+Sensor"
 
 #: xrc/GameBoyAdvanceConfig.xrc:212
 msgid "Flash Size:"
-msgstr "Tamaño de destello:"
+msgstr "Flash Size:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:230
 msgid "Mirroring:"
-msgstr "Reflejo:"
+msgstr "Mirroring:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:254
 msgid "&Defaults"
-msgstr "&Defectos"
+msgstr "&Defaults"
 
 #: xrc/GameBoyAdvanceConfig.xrc:261
 msgid "Game Overrides"
-msgstr "Anulaciones del juego"
+msgstr "Game Overrides"
 
 #: xrc/GameBoyConfig.xrc:4
 msgid "GameBoy settings"
-msgstr "Configuraciones de GameBoy"
+msgstr "GameBoy settings"
 
 #: xrc/GameBoyConfig.xrc:20
 msgid "Emulated &system :"
-msgstr "Emulado y &sistema:"
+msgstr "Emulated &system :"
 
 #: xrc/GameBoyConfig.xrc:30
 msgid "Game Boy Color"
@@ -2315,55 +2316,55 @@ msgstr "Super Game Boy 2"
 
 #: xrc/GameBoyConfig.xrc:48
 msgid "Display &borders :"
-msgstr "Pantalla y &bordes:"
+msgstr "Display &borders :"
 
 #: xrc/GameBoyConfig.xrc:57
 msgid "Never"
-msgstr "Nunca"
+msgstr "Never"
 
 #: xrc/GameBoyConfig.xrc:58
 msgid "Always"
-msgstr "Siempre"
+msgstr "Always"
 
 #: xrc/GameBoyConfig.xrc:72
 msgid "System"
-msgstr "Sistema"
+msgstr "System"
 
 #: xrc/GameBoyConfig.xrc:84
 msgid "GB Boot &ROM file :"
-msgstr "GB Boot &archivo ROM:"
+msgstr "GB Boot &ROM file :"
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
-msgstr "Selecciona un Archivo"
+msgstr "Select a File"
 
 #: xrc/GameBoyConfig.xrc:106
 msgid "GBC Boot ROM &file :"
-msgstr "GBC Boot ROM &Archivo |:"
+msgstr "GBC Boot ROM &file :"
 
 #: xrc/GameBoyConfig.xrc:131
 msgid "Current GB BIOS file :"
-msgstr "Actual Archivo GB BIOS :"
+msgstr "Current GB BIOS file :"
 
 #: xrc/GameBoyConfig.xrc:152
 msgid "Current GBC BIOS file :"
-msgstr "Actual Archivo GBC BIOS :"
+msgstr "Current GBC BIOS file :"
 
 #: xrc/GameBoyConfig.xrc:186
 msgid "User 1"
-msgstr "Usuario 1"
+msgstr "User 1"
 
 #: xrc/GameBoyConfig.xrc:192
 msgid "User 2"
-msgstr "Usuario 2"
+msgstr "User 2"
 
 #: xrc/GameBoyConfig.xrc:198
 msgid "Custom Colors"
-msgstr "Colores customizados"
+msgstr "Custom Colors"
 
 #: xrc/GeneralConfig.xrc:4
 msgid "General settings"
-msgstr "Configuraciones Generales"
+msgstr "General settings"
 
 #: xrc/GeneralConfig.xrc:9
 msgid "General"
@@ -2371,7 +2372,7 @@ msgstr "General"
 
 #: xrc/GeneralConfig.xrc:26
 msgid "Screenshot Format:"
-msgstr "Formato de captura de pantalla:"
+msgstr "Screenshot Format:"
 
 #: xrc/GeneralConfig.xrc:33
 msgid "&PNG"
@@ -2383,36 +2384,36 @@ msgstr "&BMP"
 
 #: xrc/GeneralConfig.xrc:57
 msgid "&Rewind interval :"
-msgstr "&Intervalo de rebobinado:"
+msgstr "&Rewind interval :"
 
 #: xrc/GeneralConfig.xrc:58
 msgid "If not empty or 0, enable rewind (seconds)"
-msgstr "Si no esta vacio o es 0, activa el rebobinado (segundos)"
+msgstr "If not empty or 0, enable rewind (seconds)"
 
 #: xrc/GeneralConfig.xrc:67
 msgid "seconds (0-600); 0 = disable"
-msgstr "segundos (0-600); 0 = desactivar"
+msgstr "seconds (0-600); 0 = disable"
 
 #: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
-msgstr "&Acelerador"
+msgstr "&Throttle"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 #, c-format
 msgid "% of normal:"
-msgstr "% o normal:"
+msgstr "% of normal:"
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
-msgstr "0 = Sin acelerador"
+msgstr "0 = no throttle"
 
 #: xrc/GeneralConfig.xrc:114
 msgid "Unlimited"
-msgstr "Ilimitado"
+msgstr "Unlimited"
 
 #: xrc/IOViewer.xrc:4
 msgid "IO Viewer"
-msgstr "IO espectador"
+msgstr "IO Viewer"
 
 #: xrc/IOViewer.xrc:10
 msgid "a"
@@ -2424,78 +2425,78 @@ msgstr "b"
 
 #: xrc/IOViewer.xrc:47
 msgid "15 "
-msgstr "15"
+msgstr "15 "
 
 #: xrc/IOViewer.xrc:64
 msgid "14 "
-msgstr "14"
+msgstr "14 "
 
 #: xrc/IOViewer.xrc:81
 msgid "13 "
-msgstr "13"
+msgstr "13 "
 
 #: xrc/IOViewer.xrc:98
 msgid "12 "
-msgstr "12"
+msgstr "12 "
 
 #: xrc/IOViewer.xrc:115
 msgid "11 "
-msgstr "11"
+msgstr "11 "
 
 #: xrc/IOViewer.xrc:132
 msgid "10 "
-msgstr "10"
+msgstr "10 "
 
 #: xrc/IOViewer.xrc:149
 msgid "9 "
-msgstr "9"
+msgstr "9 "
 
 #: xrc/IOViewer.xrc:166
 msgid "8 "
-msgstr "8"
+msgstr "8 "
 
 #: xrc/IOViewer.xrc:183
 msgid "7 "
-msgstr "7"
+msgstr "7 "
 
 #: xrc/IOViewer.xrc:200
 msgid "6 "
-msgstr "6"
+msgstr "6 "
 
 #: xrc/IOViewer.xrc:217
 msgid "5 "
-msgstr "5"
+msgstr "5 "
 
 #: xrc/IOViewer.xrc:234
 msgid "4 "
-msgstr "4"
+msgstr "4 "
 
 #: xrc/IOViewer.xrc:251
 msgid "3 "
-msgstr "3"
+msgstr "3 "
 
 #: xrc/IOViewer.xrc:268
 msgid "2 "
-msgstr "2"
+msgstr "2 "
 
 #: xrc/IOViewer.xrc:285
 msgid "1 "
-msgstr "1"
+msgstr "1 "
 
 #: xrc/IOViewer.xrc:302
 msgid "0 "
-msgstr "0"
+msgstr "0 "
 
 #: xrc/JoyPanel.xrc:8
 msgid ""
 "Click a field and press a key or move joystick to add.  Press backspace to "
 "delete last added key.  Resize window or click inside and move pointer to "
 "see entire contents if too small."
-msgstr "Haga clic en un campo y presione una tecla o mueva el joystick para agregar. Presione la tecla de borrar para eliminar la última tecla agregada. Cambie el tamaño de la ventana o haga clic en el interior y mueva el puntero para ver el contenido completo si es demasiado pequeño."
+msgstr "Click a field and press a key or move joystick to add.  Press backspace to delete last added key.  Resize window or click inside and move pointer to see entire contents if too small."
 
 #: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:460
 msgid "Up"
-msgstr "Arriba"
+msgstr "Up"
 
 #: xrc/JoyPanel.xrc:37
 msgid "A"
@@ -2503,7 +2504,7 @@ msgstr "A"
 
 #: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:464
 msgid "Down"
-msgstr "Abajo"
+msgstr "Down"
 
 #: xrc/JoyPanel.xrc:83
 msgid "B"
@@ -2511,7 +2512,7 @@ msgstr "B"
 
 #: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:468
 msgid "Left"
-msgstr "Izquierda"
+msgstr "Left"
 
 #: xrc/JoyPanel.xrc:129
 msgid "L"
@@ -2519,7 +2520,7 @@ msgstr "L"
 
 #: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:472
 msgid "Right"
-msgstr "Derecha"
+msgstr "Right"
 
 #: xrc/JoyPanel.xrc:175
 msgid "R"
@@ -2527,99 +2528,99 @@ msgstr "R"
 
 #: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:492
 msgid "Select"
-msgstr "Seleccionar"
+msgstr "Select"
 
 #: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:496
 msgid "Start"
-msgstr "Empezar"
+msgstr "Start"
 
 #: xrc/JoyPanel.xrc:254
 msgid "Motion Up"
-msgstr "Movimiento hacia arriba"
+msgstr "Motion Up"
 
 #: xrc/JoyPanel.xrc:276
 msgid "Autofire A"
-msgstr "Auto Presionar A"
+msgstr "Autofire A"
 
 #: xrc/JoyPanel.xrc:298
 msgid "Motion Down"
-msgstr "Movimiento hacia abajo"
+msgstr "Motion Down"
 
 #: xrc/JoyPanel.xrc:320
 msgid "Autofire B"
-msgstr "Auto Presionar B "
+msgstr "Autofire B"
 
 #: xrc/JoyPanel.xrc:342
 msgid "Motion Left/Dark"
-msgstr "Movimiento a la izquierda / \"Dark\" \"oscuro\""
+msgstr "Motion Left/Dark"
 
 #: xrc/JoyPanel.xrc:386
 msgid "Motion Right/Light"
-msgstr "Motion Right/ \"Light\" \"Luz\""
+msgstr "Motion Right/Light"
 
 #: xrc/JoyPanel.xrc:408
 msgid "Speed Up"
-msgstr "Subir La velocidad"
+msgstr "Speed Up"
 
 #: xrc/JoyPanel.xrc:430
 msgid "Spin Left"
-msgstr "Girar hacia la izquierda"
+msgstr "Spin Left"
 
 #: xrc/JoyPanel.xrc:461
 msgid "Spin Right"
-msgstr "Girar hacia la derecha"
+msgstr "Spin Right"
 
 #: xrc/JoyPanel.xrc:483
 msgid "Screenshot"
-msgstr "Captura de pantalla"
+msgstr "Screenshot"
 
 #: xrc/JoyPanel.xrc:507
 msgid "Special"
-msgstr "Especial"
+msgstr "Special"
 
 #: xrc/JoyPanel.xrc:515
 msgid "Use as default"
-msgstr "Usar Como preterminado"
+msgstr "Use as default"
 
 #: xrc/JoyPanel.xrc:522
 msgid "Defaults"
-msgstr "Defecto"
+msgstr "Defaults"
 
 #: xrc/JoyPanel.xrc:529
 msgid "Clear All"
-msgstr "Borrar todo"
+msgstr "Clear All"
 
 #: xrc/JoypadConfig.xrc:4
 msgid "Joypad Configuration"
-msgstr "Configuracion de Joypad"
+msgstr "Joypad Configuration"
 
 #: xrc/JoypadConfig.xrc:13
 msgid "Player 1"
-msgstr "Jugador 1"
+msgstr "Player 1"
 
 #: xrc/JoypadConfig.xrc:19
 msgid "Player 2"
-msgstr "Jugador 2"
+msgstr "Player 2"
 
 #: xrc/JoypadConfig.xrc:25
 msgid "Player 3"
-msgstr "Jugador 3"
+msgstr "Player 3"
 
 #: xrc/JoypadConfig.xrc:31
 msgid "Player 4"
-msgstr "Jugador 4"
+msgstr "Player 4"
 
 #: xrc/LinkConfig.xrc:4
 msgid "Link configuration"
-msgstr "Configuracion de link"
+msgstr "Link configuration"
 
 #: xrc/LinkConfig.xrc:11
 msgid "Link timeout (in milliseconds)"
-msgstr "Limite de tiempo de conexión agotado (en milisegundos )"
+msgstr "Link timeout (in milliseconds)"
 
 #: xrc/Logging.xrc:4
 msgid "Logging"
-msgstr "Inicio de sesion"
+msgstr "Logging"
 
 #: xrc/Logging.xrc:13
 msgid "SW&I"
@@ -2627,15 +2628,15 @@ msgstr "SW&I"
 
 #: xrc/Logging.xrc:20
 msgid "Unaligned &memory"
-msgstr "Memoria no &alineada"
+msgstr "Unaligned &memory"
 
 #: xrc/Logging.xrc:27
 msgid "Illegal &write"
-msgstr "Escritura &Ilegal"
+msgstr "Illegal &write"
 
 #: xrc/Logging.xrc:34
 msgid "Illegal &read"
-msgstr "Lectura &ilegal"
+msgstr "Illegal &read"
 
 #: xrc/Logging.xrc:41
 msgid "DMA &0"
@@ -2655,7 +2656,7 @@ msgstr "DMA &3"
 
 #: xrc/Logging.xrc:69
 msgid "&Undefined instruction"
-msgstr "&Instrucción indefinida"
+msgstr "&Undefined instruction"
 
 #: xrc/Logging.xrc:76
 msgid "&AGBPrint"
@@ -2663,43 +2664,43 @@ msgstr "&AGBPrint"
 
 #: xrc/Logging.xrc:83
 msgid "Soun&d output"
-msgstr "Salida de sonid&o"
+msgstr "Soun&d output"
 
 #: xrc/Logging.xrc:88
 msgid "Verbose"
-msgstr "verboso"
+msgstr "Verbose"
 
 #: xrc/MainMenu.xrc:5
 msgid "&File"
-msgstr "&Archivo"
+msgstr "&File"
 
 #: xrc/MainMenu.xrc:7
 msgid "Open..."
-msgstr "Abrir..."
+msgstr "Open..."
 
 #: xrc/MainMenu.xrc:10
 msgid "Open &GB..."
-msgstr "Abrir &GB..."
+msgstr "Open &GB..."
 
 #: xrc/MainMenu.xrc:13
 msgid "Open GB&C..."
-msgstr "Abrir GB&C..."
+msgstr "Open GB&C..."
 
 #: xrc/MainMenu.xrc:16
 msgid "Open rece&nt"
-msgstr "Abrir recien&te"
+msgstr "Open rece&nt"
 
 #: xrc/MainMenu.xrc:18
 msgid "&Reset recent list"
-msgstr "&Resetear lista reciente"
+msgstr "&Reset recent list"
 
 #: xrc/MainMenu.xrc:21
 msgid "&Freeze recent list"
-msgstr "&Congelar la lista reciente"
+msgstr "&Freeze recent list"
 
 #: xrc/MainMenu.xrc:26
 msgid "ROM in&formation..."
-msgstr "Informacion de RO&M"
+msgstr "ROM in&formation..."
 
 #: xrc/MainMenu.xrc:30
 msgid "&e-Reader"
@@ -2707,31 +2708,31 @@ msgstr "&e-Reader"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
-msgstr "&Resetear cargando código de puntos"
+msgstr "&Reset Loading Dot Code"
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
-msgstr "&Cargar código de puntos..."
+msgstr "&Load Dot Code..."
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr "&Resetear Guardando el código de puntos"
+msgstr "&Reset Saving Dot Code"
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
-msgstr "&Guardar código de puntos"
+msgstr "&Save Dot Code..."
 
 #: xrc/MainMenu.xrc:47
 msgid "Most &recent"
-msgstr "Mas &reciente"
+msgstr "Most &recent"
 
 #: xrc/MainMenu.xrc:50
 msgid "Load current state slot"
-msgstr "Cargar actual espacio de estado"
+msgstr "Load current state slot"
 
 #: xrc/MainMenu.xrc:53
 msgid "&Auto load most recent"
-msgstr "&Auto cargar el mas reciente"
+msgstr "&Auto load most recent"
 
 #: xrc/MainMenu.xrc:61 xrc/MainMenu.xrc:117
 msgid "&2"
@@ -2771,55 +2772,55 @@ msgstr "1&0"
 
 #: xrc/MainMenu.xrc:89
 msgid "From &File ..."
-msgstr "Desde el &Archivo ..."
+msgstr "From &File ..."
 
 #: xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
-msgstr "No cambiar &Guardar bateria"
+msgstr "Do not change &battery save"
 
 #: xrc/MainMenu.xrc:97
 msgid "Do not change &cheat list"
-msgstr "No cambiar &lista de trampas"
+msgstr "Do not change &cheat list"
 
 #: xrc/MainMenu.xrc:100
 msgid "&Load state"
-msgstr "&Cargar estado"
+msgstr "&Load state"
 
 #: xrc/MainMenu.xrc:104
 msgid "&Oldest slot"
-msgstr "&Espacio antiguo"
+msgstr "&Oldest slot"
 
 #: xrc/MainMenu.xrc:107
 msgid "Save current state slot"
-msgstr "Guardar el espacio actual"
+msgstr "Save current state slot"
 
 #: xrc/MainMenu.xrc:110
 msgid "Increase state slot number and save"
-msgstr "Aumentar el numero de espacio de estado y guardar"
+msgstr "Increase state slot number and save"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File ..."
-msgstr "Al &Archivo ..."
+msgstr "To &File ..."
 
 #: xrc/MainMenu.xrc:147
 msgid "&Save state"
-msgstr "&Guardar el estado"
+msgstr "&Save state"
 
 #: xrc/MainMenu.xrc:150
 msgid "Increase state slot number"
-msgstr "Aumentar el Numero de espacios"
+msgstr "Increase state slot number"
 
 #: xrc/MainMenu.xrc:153
 msgid "Decrease state slot number"
-msgstr "Disminuir el numero de espacio"
+msgstr "Decrease state slot number"
 
 #: xrc/MainMenu.xrc:158 xrc/MainMenu.xrc:170
 msgid "&Battery file..."
-msgstr "&Archivo de bateria"
+msgstr "&Battery file..."
 
 #: xrc/MainMenu.xrc:161
 msgid "Gameshark &code file..."
-msgstr "Codigo de Gameshark &archivo de codigo..."
+msgstr "Gameshark &code file..."
 
 #: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
 msgid "&Gameshark snapshot..."
@@ -2831,79 +2832,79 @@ msgstr "&Import"
 
 #: xrc/MainMenu.xrc:175
 msgid "&Export"
-msgstr "&Exportar"
+msgstr "&Export"
 
 #: xrc/MainMenu.xrc:179
 msgid "Screen capt&ure..."
-msgstr "captura de pant&alla"
+msgstr "Screen capt&ure..."
 
 #: xrc/MainMenu.xrc:183
 msgid "Start &sound recording..."
-msgstr "Empezar &Grabar sonido"
+msgstr "Start &sound recording..."
 
 #: xrc/MainMenu.xrc:186
 msgid "Stop s&ound recording"
-msgstr "Detener G&rabar sonido"
+msgstr "Stop s&ound recording"
 
 #: xrc/MainMenu.xrc:189
 msgid "Start &video recording..."
-msgstr "Empezar &Grabar video"
+msgstr "Start &video recording..."
 
 #: xrc/MainMenu.xrc:192
 msgid "Stop v&ideo recording"
-msgstr "Detener G&rabar video"
+msgstr "Stop v&ideo recording"
 
 #: xrc/MainMenu.xrc:195
 msgid "Start &game recording..."
-msgstr "Empezar &grabar juego"
+msgstr "Start &game recording..."
 
 #: xrc/MainMenu.xrc:198
 msgid "Stop g&ame recording"
-msgstr "Detener g&rabar juego"
+msgstr "Stop g&ame recording"
 
 #: xrc/MainMenu.xrc:200
 msgid "&Record"
-msgstr "&Grabar"
+msgstr "&Record"
 
 #: xrc/MainMenu.xrc:204
 msgid "Start playing &movie..."
-msgstr "Iniciar una &pelicula..."
+msgstr "Start playing &movie..."
 
 #: xrc/MainMenu.xrc:207
 msgid "Stop playing m&ovie"
-msgstr "Detener una p&elicula"
+msgstr "Stop playing m&ovie"
 
 #: xrc/MainMenu.xrc:209
 msgid "&Play"
-msgstr "&Jugar"
+msgstr "&Play"
 
 #: xrc/MainMenu.xrc:214
 msgid "&Quit"
-msgstr "&Salir"
+msgstr "&Quit"
 
 #: xrc/MainMenu.xrc:218
 msgid "&Emulation"
-msgstr "&Emulacion"
+msgstr "&Emulation"
 
 #: xrc/MainMenu.xrc:220
 msgid "&Pause"
-msgstr "&Pausar"
+msgstr "&Pause"
 
 #: xrc/MainMenu.xrc:224
 msgid "&Next frame"
-msgstr "&Siguiente Fotograma"
+msgstr "&Next frame"
 
 #: xrc/MainMenu.xrc:227
 msgid "Re&wind"
-msgstr "&Rebobinar"
+msgstr "Re&wind"
 
 #: xrc/MainMenu.xrc:231
 msgid "Toggle &full screen"
-msgstr "Cambiar a &pantalla completa"
+msgstr "Toggle &full screen"
 
 #: xrc/MainMenu.xrc:238
 msgid "&Turbo mode"
-msgstr "&Modo turbo"
+msgstr "&Turbo mode"
 
 #: xrc/MainMenu.xrc:242
 msgid "&VSync"
@@ -2911,39 +2912,39 @@ msgstr "&VSync"
 
 #: xrc/MainMenu.xrc:246
 msgid "&Auto skip frames"
-msgstr "&saltar automáticamente Fotogramas"
+msgstr "&Auto skip frames"
 
 #: xrc/MainMenu.xrc:251
 msgid "&Skip BIOS"
-msgstr "&Saltar BIOS"
+msgstr "&Skip BIOS"
 
 #: xrc/MainMenu.xrc:255
 msgid "&Auto IPS/UPS/IPF patch"
-msgstr "&Auto IPS/UPS/IPF parche"
+msgstr "&Auto IPS/UPS/IPF patch"
 
 #: xrc/MainMenu.xrc:259
 msgid "&Pause when inactive"
-msgstr "&Pausar cuando se esta inactivo"
+msgstr "&Pause when inactive"
 
 #: xrc/MainMenu.xrc:264
 msgid "&Reset"
-msgstr "&Resetear"
+msgstr "&Reset"
 
 #: xrc/MainMenu.xrc:268
 msgid "&Options"
-msgstr "&Opciones"
+msgstr "&Options"
 
 #: xrc/MainMenu.xrc:270
 msgid "&Link"
-msgstr "&link"
+msgstr "&Link"
 
 #: xrc/MainMenu.xrc:272
 msgid "Start &Network Link ..."
-msgstr "Empezar &Enlace de red ..."
+msgstr "Start &Network Link ..."
 
 #: xrc/MainMenu.xrc:277
 msgid "&Nothing"
-msgstr "&Nada"
+msgstr "&Nothing"
 
 #: xrc/MainMenu.xrc:281
 msgid "&Cable"
@@ -2951,7 +2952,7 @@ msgstr "&Cable"
 
 #: xrc/MainMenu.xrc:285
 msgid "&Wireless"
-msgstr "&Inalámbrico"
+msgstr "&Wireless"
 
 #: xrc/MainMenu.xrc:289
 msgid "&GameCube"
@@ -2963,20 +2964,20 @@ msgstr "&Game Boy"
 
 #: xrc/MainMenu.xrc:298
 msgid "&Local mode"
-msgstr "&Modo local"
+msgstr "&Local mode"
 
 #: xrc/MainMenu.xrc:302
 msgid "&Link at boot"
-msgstr "&Enlace en \"boot\""
+msgstr "&Link at boot"
 
 #: xrc/MainMenu.xrc:306
 msgid "&Speed hack"
-msgstr "&Hack de velocidad \"Speed hack\""
+msgstr "&Speed hack"
 
 #: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:391
 #: xrc/MainMenu.xrc:427
 msgid "&Configure ..."
-msgstr "&Configurar ..."
+msgstr "&Configure ..."
 
 #: xrc/MainMenu.xrc:314
 msgid "&Video"
@@ -2984,11 +2985,11 @@ msgstr "&Video"
 
 #: xrc/MainMenu.xrc:320
 msgid "&Start in full screen"
-msgstr "&Empezar en pantalla completa"
+msgstr "&Start in full screen"
 
 #: xrc/MainMenu.xrc:324
 msgid "&Scaled resize"
-msgstr "&Cambio de tamaño a escala"
+msgstr "&Scaled resize"
 
 #: xrc/MainMenu.xrc:326
 msgid "&1x"
@@ -3016,39 +3017,39 @@ msgstr "&6x"
 
 #: xrc/MainMenu.xrc:345
 msgid "Change pixel filter"
-msgstr "Cambiar filtro de pixeles"
+msgstr "Change pixel filter"
 
 #: xrc/MainMenu.xrc:348
 msgid "Change interframe blending"
-msgstr "Cambiar \"interframe blending\""
+msgstr "Change interframe blending"
 
 #: xrc/MainMenu.xrc:351
 msgid "&Retain aspect ratio"
-msgstr "&Conservar la relación de aspecto"
+msgstr "&Retain aspect ratio"
 
 #: xrc/MainMenu.xrc:355
 msgid "Enable MMX"
-msgstr "Activar MMX"
+msgstr "Enable MMX"
 
 #: xrc/MainMenu.xrc:360
 msgid "&Bilinear filter"
-msgstr "&Filtro bilineal"
+msgstr "&Bilinear filter"
 
 #: xrc/MainMenu.xrc:371
 msgid "&Keep window on top"
-msgstr "&Mantenga la ventana abierta y en el top"
+msgstr "&Keep window on top"
 
 #: xrc/MainMenu.xrc:376
 msgid "&Status bar"
-msgstr "&Barra de estatus"
+msgstr "&Status bar"
 
 #: xrc/MainMenu.xrc:380
 msgid "&Disable on-screen display"
-msgstr "&Desactivar la visualización en pantalla"
+msgstr "&Disable on-screen display"
 
 #: xrc/MainMenu.xrc:384
 msgid "&Transparent on-screen display"
-msgstr "&Visualización en pantalla transparente"
+msgstr "&Transparent on-screen display"
 
 #: xrc/MainMenu.xrc:389
 msgid "&Audio"
@@ -3056,47 +3057,47 @@ msgstr "&Audio"
 
 #: xrc/MainMenu.xrc:394
 msgid "&Increase volume"
-msgstr "&Incrementar volumen"
+msgstr "&Increase volume"
 
 #: xrc/MainMenu.xrc:398
 msgid "&Decrease volume"
-msgstr "&Disminuir volumen"
+msgstr "&Decrease volume"
 
 #: xrc/MainMenu.xrc:402
 msgid "&Toggle sound"
-msgstr "&Cambiar sonido"
+msgstr "&Toggle sound"
 
 #: xrc/MainMenu.xrc:407
 msgid "&GBA sound interpolation"
-msgstr "&Interpolación de sonido de la GB"
+msgstr "&GBA sound interpolation"
 
 #: xrc/MainMenu.xrc:412
 msgid "&GB sound enhancement"
-msgstr "&Mejora de sonido GB"
+msgstr "&GB sound enhancement"
 
 #: xrc/MainMenu.xrc:416
 msgid "&GB surround sound effect"
-msgstr "&Efecto de sonido envolvente GB"
+msgstr "&GB surround sound effect"
 
 #: xrc/MainMenu.xrc:420
 msgid "&GB sound declicking"
-msgstr "&GB rechazo de sonido"
+msgstr "&GB sound declicking"
 
 #: xrc/MainMenu.xrc:425
 msgid "&Input"
-msgstr "&aporte"
+msgstr "&Input"
 
 #: xrc/MainMenu.xrc:430
 msgid "Allow &keyboard background input"
-msgstr "Permitir y entrada de teclado en segundo plano"
+msgstr "Allow &keyboard background input"
 
 #: xrc/MainMenu.xrc:434
 msgid "Allow &joystick background input"
-msgstr "Permitir entrada de fondo y joystick"
+msgstr "Allow &joystick background input"
 
 #: xrc/MainMenu.xrc:439
 msgid "&Autofire"
-msgstr "&auto presionar/disparar"
+msgstr "&Autofire"
 
 #: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
 msgid "&A"
@@ -3116,7 +3117,7 @@ msgstr "&R"
 
 #: xrc/MainMenu.xrc:458
 msgid "&Autohold"
-msgstr "&Auto mantener"
+msgstr "&Autohold"
 
 #: xrc/MainMenu.xrc:502
 msgid "&Game Boy Advance"
@@ -3124,31 +3125,31 @@ msgstr "&Game Boy Advance"
 
 #: xrc/MainMenu.xrc:504 xrc/MainMenu.xrc:527
 msgid "Configure ..."
-msgstr "Configurar ..."
+msgstr "Configure ..."
 
 #: xrc/MainMenu.xrc:508
 msgid "&Real-time clock"
-msgstr "&Reloj del tiempo real"
+msgstr "&Real-time clock"
 
 #: xrc/MainMenu.xrc:512
 msgid "&Use BIOS file"
-msgstr "&Usar el archivo BIOS"
+msgstr "&Use BIOS file"
 
 #: xrc/MainMenu.xrc:516
 msgid "&Debug print"
-msgstr "&Impresion \"debug\"|"
+msgstr "&Debug print"
 
 #: xrc/MainMenu.xrc:520 xrc/MainMenu.xrc:535
 msgid "&LCD Filter"
-msgstr "&LCD Filtro"
+msgstr "&LCD Filter"
 
 #: xrc/MainMenu.xrc:531
 msgid "&GB color option"
-msgstr "&GB Opcion de color"
+msgstr "&GB color option"
 
 #: xrc/MainMenu.xrc:539
 msgid "&GB Colorizer Hack (requires restart)"
-msgstr "&GB \"Colorizer Hack\" (requiere resetear)"
+msgstr "&GB Colorizer Hack (requires restart)"
 
 #: xrc/MainMenu.xrc:543
 msgid "&GB printer"
@@ -3156,19 +3157,19 @@ msgstr "&GB printer"
 
 #: xrc/MainMenu.xrc:547
 msgid "&Gather a full page before printing"
-msgstr "&reúna una página completa antes de imprimir"
+msgstr "&Gather a full page before printing"
 
 #: xrc/MainMenu.xrc:551
 msgid "&Save printouts as screen captures"
-msgstr "&Guardar impresiones siendo capturas de pantalla"
+msgstr "&Save printouts as screen captures"
 
 #: xrc/MainMenu.xrc:556
 msgid "&Use GB BIOS file (requires restart)"
-msgstr "&Usar archivo GB BIOS (requiere resetear)"
+msgstr "&Use GB BIOS file (requires restart)"
 
 #: xrc/MainMenu.xrc:560
 msgid "&Use GBC BIOS file"
-msgstr "&Usar archivo GB BIOS"
+msgstr "&Use GBC BIOS file"
 
 #: xrc/MainMenu.xrc:565
 msgid "&General ..."
@@ -3176,59 +3177,59 @@ msgstr "&General ..."
 
 #: xrc/MainMenu.xrc:568
 msgid "&Speedup / Turbo ..."
-msgstr "&Subir velocidad / Turbo ..."
+msgstr "&Speedup / Turbo ..."
 
 #: xrc/MainMenu.xrc:571
 msgid "D&irectories ..."
-msgstr "D&irectorios ..."
+msgstr "D&irectories ..."
 
 #: xrc/MainMenu.xrc:574
 msgid "&Key Shortcuts ..."
-msgstr "&Atajo de teclas"
+msgstr "&Key Shortcuts ..."
 
 #: xrc/MainMenu.xrc:577
 msgid "&UI Settings ..."
-msgstr "&Configuraciones de UI"
+msgstr "&UI Settings ..."
 
 #: xrc/MainMenu.xrc:581
 msgid "&Tools"
-msgstr "&Herramientas \"Tools\""
+msgstr "&Tools"
 
 #: xrc/MainMenu.xrc:583
 msgid "&Cheats"
-msgstr "&Trampas / Trucos"
+msgstr "&Cheats"
 
 #: xrc/MainMenu.xrc:585
 msgid "List &cheats ..."
-msgstr "Lista de &Trampas"
+msgstr "List &cheats ..."
 
 #: xrc/MainMenu.xrc:588
 msgid "Find c&heat ..."
-msgstr "Encontrar una T&rampa ..."
+msgstr "Find c&heat ..."
 
 #: xrc/MainMenu.xrc:592
 msgid "A&utomatically save/load cheats"
-msgstr "A&utomaticamente Guardar/Cargar Trampas"
+msgstr "A&utomatically save/load cheats"
 
 #: xrc/MainMenu.xrc:596
 msgid "&Enable cheats"
-msgstr "&Activar trampas"
+msgstr "&Enable cheats"
 
 #: xrc/MainMenu.xrc:603
 msgid "&Break into GDB"
-msgstr "&Romper dentro de GDB"
+msgstr "&Break into GDB"
 
 #: xrc/MainMenu.xrc:607
 msgid "&Configure port..."
-msgstr "&Configurar el puerto"
+msgstr "&Configure port..."
 
 #: xrc/MainMenu.xrc:610
 msgid "&Break on load"
-msgstr "&Romper con carga"
+msgstr "&Break on load"
 
 #: xrc/MainMenu.xrc:615
 msgid "&Disconnect"
-msgstr "&Desconectar"
+msgstr "&Disconnect"
 
 #: xrc/MainMenu.xrc:617
 msgid "&GDB"
@@ -3236,39 +3237,39 @@ msgstr "&GDB"
 
 #: xrc/MainMenu.xrc:620
 msgid "&Disassemble..."
-msgstr "&Desmontar ..."
+msgstr "&Disassemble..."
 
 #: xrc/MainMenu.xrc:623
 msgid "&Logging..."
-msgstr "&Iniciando sesión "
+msgstr "&Logging..."
 
 #: xrc/MainMenu.xrc:626
 msgid "&IO Viewer..."
-msgstr "&Visor de IO ..."
+msgstr "&IO Viewer..."
 
 #: xrc/MainMenu.xrc:629
 msgid "&Map Viewer..."
-msgstr "&Visor de mapas ..."
+msgstr "&Map Viewer..."
 
 #: xrc/MainMenu.xrc:632
 msgid "M&emory Viewer..."
-msgstr "V&isor de memoria..."
+msgstr "M&emory Viewer..."
 
 #: xrc/MainMenu.xrc:635
 msgid "&OAM Viewer..."
-msgstr "&Visor de OAM ..."
+msgstr "&OAM Viewer..."
 
 #: xrc/MainMenu.xrc:638
 msgid "&Palette Viewer..."
-msgstr "&Visor de paleta..."
+msgstr "&Palette Viewer..."
 
 #: xrc/MainMenu.xrc:641
 msgid "&Tile Viewer..."
-msgstr "&Visor de mosaicos ..."
+msgstr "&Tile Viewer..."
 
 #: xrc/MainMenu.xrc:646
 msgid "Show all video layers"
-msgstr "Mostrar todas las capas de video"
+msgstr "Show all video layers"
 
 #: xrc/MainMenu.xrc:650
 msgid "BG &0"
@@ -3292,91 +3293,91 @@ msgstr "&OBJ"
 
 #: xrc/MainMenu.xrc:675
 msgid "&WIN 0"
-msgstr "&Ganar 0"
+msgstr "&WIN 0"
 
 #: xrc/MainMenu.xrc:680
 msgid "W&IN 1"
-msgstr "G&nar 1"
+msgstr "W&IN 1"
 
 #: xrc/MainMenu.xrc:685
 msgid "O&BJ WIN"
-msgstr "O&BJ ganar"
+msgstr "O&BJ WIN"
 
 #: xrc/MainMenu.xrc:689
 msgid "&View Layers"
-msgstr "&Ver capas"
+msgstr "&View Layers"
 
 #: xrc/MainMenu.xrc:693
 msgid "Channel &1"
-msgstr "Canal &1"
+msgstr "Channel &1"
 
 #: xrc/MainMenu.xrc:698
 msgid "Channel &2"
-msgstr "Canal &2"
+msgstr "Channel &2"
 
 #: xrc/MainMenu.xrc:703
 msgid "Channel &3"
-msgstr "Canal &3"
+msgstr "Channel &3"
 
 #: xrc/MainMenu.xrc:708
 msgid "Channel &4"
-msgstr "Canal &4"
+msgstr "Channel &4"
 
 #: xrc/MainMenu.xrc:713
 msgid "Direct Sound &A"
-msgstr "Sonido directo &A"
+msgstr "Direct Sound &A"
 
 #: xrc/MainMenu.xrc:718
 msgid "Direct Sound &B"
-msgstr "Sonido Directo &B"
+msgstr "Direct Sound &B"
 
 #: xrc/MainMenu.xrc:722
 msgid "&Sound Channels"
-msgstr "&Sonar canales"
+msgstr "&Sound Channels"
 
 #: xrc/MainMenu.xrc:726
 msgid "&Help"
-msgstr "&Ayuda"
+msgstr "&Help"
 
 #: xrc/MainMenu.xrc:728
 msgid "Report &Bugs"
-msgstr "Reportar &Bugs"
+msgstr "Report &Bugs"
 
 #: xrc/MainMenu.xrc:731
 msgid "VBA-M Support &Forum"
-msgstr "VBA-M soporte &Foro"
+msgstr "VBA-M Support &Forum"
 
 #: xrc/MainMenu.xrc:734
 msgid "Translations"
-msgstr "Traducciones\n Traducción actual Español Hecha únicamente Por lo mejor de kwai Versión 0.5 Beta"
+msgstr "Translations"
 
 #: xrc/MainMenu.xrc:742
 msgid "Check for updates"
-msgstr "¡Mira Por actualizaciones anímate! ¡No seas flojo!"
+msgstr "Check for updates"
 
 #: xrc/MainMenu.xrc:745
 msgid "&Factory Reset..."
-msgstr "&Restablecimiento de fábrica … ¿Enserio lo vas hacer? esto borrara todo, con todo digo todo si haces click otra vez lo vas a restablecer a fabrica ¿deseas continuar? si fuera tu no lo haría"
+msgstr "&Factory Reset..."
 
 #: xrc/MainMenu.xrc:749
 msgid "&About..."
-msgstr "&Acerca de..."
+msgstr "&About..."
 
 #: xrc/MapViewer.xrc:4
 msgid "Map Viewer"
-msgstr "Visor de mapas"
+msgstr "Map Viewer"
 
 #: xrc/MapViewer.xrc:16
 msgid "Frame 0"
-msgstr "Fotograma 0"
+msgstr "Frame 0"
 
 #: xrc/MapViewer.xrc:22
 msgid "Frame 1"
-msgstr "Fotograma 1"
+msgstr "Frame 1"
 
 #: xrc/MapViewer.xrc:25
 msgid "Frame"
-msgstr "Fotograma"
+msgstr "Frame"
 
 #: xrc/MapViewer.xrc:35
 msgid "BG0"
@@ -3404,23 +3405,23 @@ msgstr "Char Base:"
 
 #: xrc/MapViewer.xrc:100 xrc/MemSelRegion.xrc:22 xrc/OAMViewer.xrc:77
 msgid "Size:"
-msgstr "Tamaño:"
+msgstr "Size:"
 
 #: xrc/MapViewer.xrc:108 xrc/OAMViewer.xrc:45
 msgid "Colors:"
-msgstr "Colores:"
+msgstr "Colors:"
 
 #: xrc/MapViewer.xrc:124
 msgid "Mosaic:"
-msgstr "Mosaico:"
+msgstr "Mosaic:"
 
 #: xrc/MapViewer.xrc:132
 msgid "Overflow:"
-msgstr "Desbordamiento = \"Overflow:\""
+msgstr "Overflow:"
 
 #: xrc/MemViewer.xrc:4
 msgid "Memory Viewer"
-msgstr "Visor de memoria"
+msgstr "Memory Viewer"
 
 #: xrc/MemViewer.xrc:17
 msgid "&8-bit"
@@ -3436,27 +3437,27 @@ msgstr "&32-bit"
 
 #: xrc/MemViewer.xrc:83
 msgid "Current address:"
-msgstr "Dirección actuak"
+msgstr "Current address:"
 
 #: xrc/MemViewer.xrc:108
 msgid "&Load..."
-msgstr "&Cargar"
+msgstr "&Load..."
 
 #: xrc/NetLink.xrc:4
 msgid "Start Network Link"
-msgstr "Iniciar enlace de red"
+msgstr "Start Network Link"
 
 #: xrc/NetLink.xrc:11
 msgid "Server"
-msgstr "Servidor"
+msgstr "Server"
 
 #: xrc/NetLink.xrc:19
 msgid "Client"
-msgstr "Cliente"
+msgstr "Client"
 
 #: xrc/NetLink.xrc:32
 msgid "Players:"
-msgstr "Jugadores"
+msgstr "Players:"
 
 #: xrc/NetLink.xrc:41
 msgid "2"
@@ -3476,11 +3477,11 @@ msgstr "Server:"
 
 #: xrc/NetLink.xrc:81
 msgid "Port:"
-msgstr "Puerto:"
+msgstr "Port:"
 
 #: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
-msgstr "Visor de OAM"
+msgstr "OAM Viewer"
 
 #: xrc/OAMViewer.xrc:85
 msgid "Rot.:"
@@ -3488,31 +3489,31 @@ msgstr "Rot.:"
 
 #: xrc/PaletteViewer.xrc:4
 msgid "Palette Viewer"
-msgstr "Visor de paleta"
+msgstr "Palette Viewer"
 
 #: xrc/PaletteViewer.xrc:88
 msgid "C&hange backdrop color..."
-msgstr "c&ambiar el color de fondo..."
+msgstr "C&hange backdrop color..."
 
 #: xrc/SoundConfig.xrc:4
 msgid "Sound Settings"
-msgstr "Opciones de Sonido"
+msgstr "Sound Settings"
 
 #: xrc/SoundConfig.xrc:16
 msgid "Volume :"
-msgstr "Volumen :"
+msgstr "Volume :"
 
 #: xrc/SoundConfig.xrc:34
 msgid "Mute"
-msgstr "Mutear"
+msgstr "Mute"
 
 #: xrc/SoundConfig.xrc:54 xrc/SoundConfig.xrc:320
 msgid "Maximum"
-msgstr "Maximo"
+msgstr "Maximum"
 
 #: xrc/SoundConfig.xrc:71
 msgid "Sample rate :"
-msgstr "Frecuencia de muestreo:"
+msgstr "Sample rate :"
 
 #: xrc/SoundConfig.xrc:77
 msgid "48 KHz"
@@ -3536,11 +3537,11 @@ msgstr "SDL"
 
 #: xrc/SoundConfig.xrc:111
 msgid "OpenAL"
-msgstr "AbrirAL"
+msgstr "OpenAL"
 
 #: xrc/SoundConfig.xrc:118
 msgid "DirectSound"
-msgstr "Sonido Directo"
+msgstr "DirectSound"
 
 #: xrc/SoundConfig.xrc:125
 msgid "XAudio2"
@@ -3552,27 +3553,27 @@ msgstr "FAudio"
 
 #: xrc/SoundConfig.xrc:146
 msgid "Device"
-msgstr "Dispositivo"
+msgstr "Device"
 
 #: xrc/SoundConfig.xrc:154
 msgid "Enable stereo upmixing"
-msgstr "Activar el estereo \"upmixing\""
+msgstr "Enable stereo upmixing"
 
 #: xrc/SoundConfig.xrc:161
 msgid "Enable hardware acceleration"
-msgstr "Activar la aceleración de hardware"
+msgstr "Enable hardware acceleration"
 
 #: xrc/SoundConfig.xrc:190
 msgid "Number of sound buffers:"
-msgstr "numero de amortiguadores de sonido:"
+msgstr "Number of sound buffers:"
 
 #: xrc/SoundConfig.xrc:198
 msgid "Advanced"
-msgstr "Avanzado"
+msgstr "Advanced"
 
 #: xrc/SoundConfig.xrc:230
 msgid "Lots"
-msgstr "Espacios"
+msgstr "Lots"
 
 #: xrc/SoundConfig.xrc:239
 msgid "Echo"
@@ -3580,23 +3581,23 @@ msgstr "Echo"
 
 #: xrc/SoundConfig.xrc:247
 msgid "Stereo"
-msgstr "Estereo"
+msgstr "Stereo"
 
 #: xrc/SoundConfig.xrc:258
 msgid "Center"
-msgstr "Centro"
+msgstr "Center"
 
 #: xrc/SoundConfig.xrc:269
 msgid "Left/Right"
-msgstr "Izquierda/Derecha"
+msgstr "Left/Right"
 
 #: xrc/SoundConfig.xrc:298
 msgid "Sound filtering"
-msgstr "Filtracion de sonido"
+msgstr "Sound filtering"
 
 #: xrc/TileViewer.xrc:4
 msgid "Tile Viewer"
-msgstr "visor de mosaicos"
+msgstr "Tile Viewer"
 
 #: xrc/TileViewer.xrc:15
 msgid "1&6"
@@ -3608,7 +3609,7 @@ msgstr "&256"
 
 #: xrc/TileViewer.xrc:24
 msgid "Colors"
-msgstr "Colores"
+msgstr "Colors"
 
 #: xrc/TileViewer.xrc:34
 msgid "0x600&0000"
@@ -3632,20 +3633,20 @@ msgstr "0x60&10000"
 
 #: xrc/SpeedupConfig.xrc:4
 msgid "SpeedUp / Turbo Settings"
-msgstr "Subir velocidad / Opciones de Turbo"
+msgstr "SpeedUp / Turbo Settings"
 
 #: xrc/SpeedupConfig.xrc:9
 msgid "Speedup Throttle"
-msgstr "\"Speedup Throttle\""
+msgstr "Speedup Throttle"
 
 #: xrc/SpeedupConfig.xrc:50
 msgid "Frame skip"
-msgstr "Saltar Fotograma"
+msgstr "Frame skip"
 
 #: xrc/UIConfig.xrc:4
 msgid "User Interface Settings"
-msgstr "Configuraciones de interfaz"
+msgstr "User Interface Settings"
 
 #: xrc/UIConfig.xrc:9
 msgid "Hide Menu Bar"
-msgstr "Esconder la barra del menu"
+msgstr "Hide Menu Bar"
