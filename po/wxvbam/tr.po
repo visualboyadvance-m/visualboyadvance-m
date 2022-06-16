@@ -10,7 +10,7 @@
 # Erdoğan Şahin, 2016
 # Justice League <denizden788@gmail.com>, 2020
 # Bone Cruncher (SilentChaos) <mrzabuzaxtr@gmail.com>, 2018
-# Sinan H., 2016,2018
+# Sinan H., 2016,2018,2022
 # Tmp341, 2016,2021
 msgid ""
 msgstr ""
@@ -18,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-24 21:24+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: boran roni, 2021\n"
+"Last-Translator: Sinan H., 2016,2018,2022\n"
 "Language-Team: Turkish (http://www.transifex.com/bgk/vba-m/language/tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -44,11 +44,11 @@ msgstr "Dahili vba-over.ini dosyasını kaydet ve çık"
 
 #: wxvbam.cpp:519
 msgid "Print configuration path and exit"
-msgstr "Ayar yolunu print et ve çık"
+msgstr "Ayar yolunu yazdır ve çık"
 
 #: wxvbam.cpp:522
 msgid "Start in full-screen mode"
-msgstr "Programı tam ekran modunda başlat"
+msgstr "Programı tam ekran kipinde başlat"
 
 #: wxvbam.cpp:525
 msgid "Set a configuration file"
@@ -56,7 +56,7 @@ msgstr "Ayar dosyası belirleyin"
 
 #: wxvbam.cpp:529
 msgid "Delete shared link state first, if it exists"
-msgstr "Eğer varsa, önce paylaşımlı link durumu dosyasını sil"
+msgstr "Eğer varsa, öncelikle paylaşımlı bağlantı durumunu sil"
 
 #: wxvbam.cpp:536
 msgid "List all settable options and exit"
@@ -104,7 +104,7 @@ msgid ""
 "\n"
 "For flag options, true and false are specified as 1 and 0, respectively.\n"
 "\n"
-msgstr "Komut ekranında yapılan ayarlar ancak arayüz içinde herhangibir ayar değişikliği yapılırsa kayıt edilir.\n\nBayrak seçenekleri; 1=doğru , 0=yanlış şeklindedir\n\n"
+msgstr "Komut ekranında yapılan ayarlar ancak arayüz içinde herhangi bir ayar değişikliği yapılırsa kayıt edilir.\n\nBayrak seçenekleri; 1=doğru , 0=yanlış şeklindedir\n\n"
 
 #: wxvbam.cpp:647
 msgid ""
@@ -130,7 +130,7 @@ msgstr "Bağlan"
 
 #: guiinit.cpp:116
 msgid "You must enter a valid host name"
-msgstr "Geçerli bir sunucu ismi girmelisiniz"
+msgstr "Geçerli bir sunucu adı girmelisiniz"
 
 #: guiinit.cpp:117
 msgid "Host name invalid"
@@ -210,7 +210,7 @@ msgstr "CodeBreaker Advance"
 
 #: guiinit.cpp:759
 msgid "Flashcart CHT"
-msgstr "Flashcart CHT"
+msgstr "Bellek kartı CHT"
 
 #: guiinit.cpp:827 guiinit.cpp:1082
 msgid "Number cannot be empty"
@@ -219,7 +219,7 @@ msgstr "Numara boş bırakılamaz"
 #: guiinit.cpp:865
 #, c-format
 msgid "Search produced %d results.  Please refine better"
-msgstr "Arama sonunda %d sonuç bulundu. Lütfen daha spesifik birşey aratın"
+msgstr "Arama sonunda %d sonuç bulundu. Lütfen daha detaylı arama yapınız"
 
 #: guiinit.cpp:877
 msgid "Search produced no results"
@@ -252,7 +252,7 @@ msgstr "işaretsiz onaltılık"
 #: guiinit.cpp:1540
 #, c-format
 msgid "%d frames = %.2f ms"
-msgstr "%dkare= %.2f ms"
+msgstr "%d kare = %.2f ms"
 
 #: guiinit.cpp:1552
 msgid "Default device"
@@ -260,7 +260,7 @@ msgstr "Varsayılan cihaz"
 
 #: guiinit.cpp:1726
 msgid "Desktop mode"
-msgstr "Masaüstü modu"
+msgstr "Masaüstü kipi"
 
 #: guiinit.cpp:1733
 #, c-format
@@ -277,7 +277,7 @@ msgstr "Hiçbiri"
 #: guiinit.cpp:1887
 #, c-format
 msgid "No usable rpi plugins found in %s"
-msgstr "%s'da kullanılabilir rpi pluginleri mevcut değil"
+msgstr "%s'da kullanılabilir bir rpi eklentisi bulunamadı"
 
 #: guiinit.cpp:1907 xrc/DisplayConfig.xrc:107
 msgid "Plugin"
@@ -285,11 +285,11 @@ msgstr "Eklenti"
 
 #: guiinit.cpp:1935
 msgid "Please select a plugin or a different filter"
-msgstr "Lütfen bir plugin yada farklı bir filtre seçiniz"
+msgstr "Lütfen bir eklenti ya da farklı bir filtre seçiniz"
 
 #: guiinit.cpp:1936
 msgid "Plugin selection error"
-msgstr "Plugin seçim hatası"
+msgstr "Eklenti seçim hatası"
 
 #: guiinit.cpp:2149
 msgid "This will clear all user-defined accelerators.  Are you sure?"
@@ -301,11 +301,11 @@ msgstr "Onayla"
 
 #: guiinit.cpp:2739
 msgid "Main icon not found"
-msgstr "Ana ikon bulunamadı"
+msgstr "Ana simge bulunamadı"
 
 #: guiinit.cpp:2749
 msgid "Browse"
-msgstr "Göz at"
+msgstr "Gözat"
 
 #: guiinit.cpp:2763
 msgid "Main display panel not found"
@@ -461,7 +461,7 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy"
 " Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "GameBoy Advance Dosyaları (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr "GameBoy Advance Dosyaları (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy Dosyaları (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:116
 msgid "Open ROM file"
@@ -577,7 +577,7 @@ msgstr "ROM+MBC7+BATT"
 
 #: cmdevents.cpp:679
 msgid "GameShark V3.0"
-msgstr "GameShark V3.0"
+msgstr "GameShark S3.0"
 
 #: cmdevents.cpp:683
 msgid "ROM+POCKET CAMERA"
@@ -605,31 +605,31 @@ msgstr "e-Reader Dot Kodu (*.bin;*.raw)|*.bin;*.raw"
 
 #: cmdevents.cpp:890 cmdevents.cpp:1085
 msgid "Select battery file"
-msgstr "Batarya dosyasını seçin"
+msgstr "Kartuş dosyasını seçin"
 
 #: cmdevents.cpp:891 cmdevents.cpp:1086
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
-msgstr "Pil dosyası (*.sav) *.sav/Flaş kaydı(*.dat)*.dat"
+msgstr "Kartuş dosyası (*.sav) *.sav/Bellek kaydı(*.dat)*.dat"
 
 #: cmdevents.cpp:899
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
-msgstr "Pil dosyası içe aktarmak oyun savelerinizi siler(geri dönüşü yok!) . Devam etmek istiyor musunuz?"
+msgstr "Kartuş dosyasını içe aktarmak oyun kayıtlarınızı silecektir (geri dönüşü yok!) . Devam etmek istiyor musunuz?"
 
 #: cmdevents.cpp:900 cmdevents.cpp:928 cmdevents.cpp:1048
 msgid "Confirm import"
-msgstr "Almayı onayla"
+msgstr "İçe aktarmayı onayla"
 
 #: cmdevents.cpp:906 panel.cpp:390
 #, c-format
 msgid "Loaded battery %s"
-msgstr "Pil dosyası yüklendi %s"
+msgstr "Kartuş dosyası yüklendi : %s"
 
 #: cmdevents.cpp:908
 #, c-format
 msgid "Error loading battery %s"
-msgstr "Pil yükleme hatası %s"
+msgstr "Kartuş yükleme hatası : %s"
 
 #: cmdevents.cpp:917
 msgid "Select code file"
@@ -647,7 +647,7 @@ msgstr "Gameshark uzantıları (*.gcf)|*.gcf"
 msgid ""
 "Importing a code file will replace any loaded cheats.  Do you want to "
 "continue?"
-msgstr "Herhangi bir hile kodu içe aktarmak, yüklü olan kodların yerini alır. Devam edilsin mi?"
+msgstr "Herhangi bir hile kodunu içe aktarmak, yüklü olan kodların yerini alır. Devam edilsin mi?"
 
 #: cmdevents.cpp:944
 #, c-format
@@ -671,43 +671,43 @@ msgstr "%s adlı kod dosyası yüklenemedi"
 
 #: cmdevents.cpp:1037 cmdevents.cpp:1113
 msgid "Select snapshot file"
-msgstr "Hile snapshot dosyası seçiniz"
+msgstr "Hile kayıt dosyası seçiniz"
 
 #: cmdevents.cpp:1038
 msgid ""
 "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots "
 "(*.gsv)|*.gsv"
-msgstr "GS ve PAC snapshot uzantıları (*.sps*.xps)*.sps*.xps\\GameShark SP snapshot uzantıları (*gsv)*.gsv"
+msgstr "GS ve PAC kayıt uzantıları (*.sps*.xps)*.sps*.xps\\GameShark SP kayıt uzantıları (*gsv)*.gsv"
 
 #: cmdevents.cpp:1038
 msgid "Gameboy Snapshot (*.gbs)|*.gbs"
-msgstr "Gameboy snapshot uzantısı (*.gbs)*.gbs"
+msgstr "Gameboy kayıt uzantısı (*.gbs)*.gbs"
 
 #: cmdevents.cpp:1047
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
-msgstr "Herhangibir snapshot dosyası yüklemek tüm kayıtlı oyunlarınızı silecektir (geri döndürülemez!). Devam edilsin mi?"
+msgstr "Herhangi bir kayıt dosyası yüklemek tüm kayıtlı oyunlarınızı silecektir (geri döndürülemez!). Devam edilsin mi?"
 
 #: cmdevents.cpp:1072
 #, c-format
 msgid "Loaded snapshot file %s"
-msgstr "Snapshot dosyası yüklendi %s"
+msgstr "Kayıt dosyası yüklendi : %s"
 
 #: cmdevents.cpp:1074
 #, c-format
 msgid "Error loading snapshot file %s"
-msgstr "Snapshot yüklenirken hata oluştu %s"
+msgstr "Kayıt yüklenirken hata oluştu : %s"
 
 #: cmdevents.cpp:1097
 #, c-format
 msgid "Wrote battery %s"
-msgstr "Pil yazıldı %s"
+msgstr "Kartuş yazıldı : %s"
 
 #: cmdevents.cpp:1099 panel.cpp:699
 #, c-format
 msgid "Error writing battery %s"
-msgstr "Pil yazımında hata %s"
+msgstr "Kartuş yazımında hata : %s"
 
 #: cmdevents.cpp:1107
 msgid "EEPROM saves cannot be exported"
@@ -715,26 +715,26 @@ msgstr "EEPROM kayıtları dışa aktarılamaz"
 
 #: cmdevents.cpp:1114
 msgid "Gameshark Snapshot (*.sps)|*.sps"
-msgstr "Gameshark Snapshot uzantısı (*.sps)*.sps"
+msgstr "Gameshark kayıt uzantısı (*.sps)*.sps"
 
 #: cmdevents.cpp:1128
 msgid "Exported from VisualBoyAdvance-M"
-msgstr "VisualBoyAdvance-M emulatöründen çıkarılmıştır"
+msgstr "VisualBoyAdvance-M uygulamasından alınmıştır"
 
 #: cmdevents.cpp:1140
 #, c-format
 msgid "Saved snapshot file %s"
-msgstr "Snapshot dosyası kaydedildi %s"
+msgstr "Dosya kaydedildi : %s"
 
 #: cmdevents.cpp:1142
 #, c-format
 msgid "Error saving snapshot file %s"
-msgstr "Snapshot kaydedilirken hata oluştu %s"
+msgstr "Kaydedilirken bir hata oluştu : %s"
 
 #: cmdevents.cpp:1182 sys.cpp:449
 #, c-format
 msgid "Wrote snapshot %s"
-msgstr "snapshot kaydedildi %s"
+msgstr "Kayıt yapıldı : %s"
 
 #: cmdevents.cpp:1203 cmdevents.cpp:1273
 msgid " files ("
@@ -759,11 +759,11 @@ msgstr "VisualBoyAdvance kayıt uzantısı\\*.sgm"
 #: cmdevents.cpp:1792 cmdevents.cpp:1802 cmdevents.cpp:1813
 #, c-format
 msgid "Current state slot #%d"
-msgstr "Şimdiki durum yeri #%d"
+msgstr "Geçerli durum kaydı #%d"
 
 #: cmdevents.cpp:1883
 msgid "Cannot use Colorizer Hack when GB BIOS File is enabled."
-msgstr ""
+msgstr "GB BIOS Dosyası seçiliyken Renklendirici Hilesi kullanılamaz."
 
 #: cmdevents.cpp:2098
 msgid "Sound enabled"
@@ -784,7 +784,7 @@ msgstr "Pseudo tty 0'a ayarlansın"
 
 #: cmdevents.cpp:2202
 msgid "Port to wait for connection:"
-msgstr "Bağlantı için uygun port:"
+msgstr "Bağlantı noktası:"
 
 #: cmdevents.cpp:2203
 msgid "GDB Connection"
@@ -798,7 +798,7 @@ msgstr "Bağlantı bekleniyor %s"
 #: cmdevents.cpp:2263
 #, c-format
 msgid "Waiting for connection on port %d"
-msgstr "Şu port bağlantı için beklemede %d"
+msgstr "Bağlantı için beklenilen nokta : %d"
 
 #: cmdevents.cpp:2266
 msgid "Waiting for GDB..."
@@ -820,7 +820,7 @@ msgstr "Ses sürücüsü başlatılamadı!"
 
 #: cmdevents.cpp:2839
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
-msgstr "Nintendo GameBoy (+Color+Advance) emülatörü."
+msgstr "Nintendo GameBoy (+Color+Advance) öykünücüsü."
 
 #: cmdevents.cpp:2840
 msgid ""
@@ -843,19 +843,19 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program.  If not, see http://www.gnu.org/licenses ."
-msgstr "Bu ücretsiz bir programdır:Free Software Foundation'ın yayımladığı GNU General Public lisansına uygun olarak paylaşılabilir üzerinde değişiklikler yapılabilir (lisansın 2. versiyonu yada sonrasında çıkan versiyonu, sizin tercihinizdir.)\n\nBu program işe yaraması amacı ile yazılmıştır, ancak HİÇBİR GARANTİ içermez; ima edilen TİCARETE UYGUNLUK garantisi yada BELLİ BİR AMACA UYGUNLUK garantisi bile içermez. Daha fazla bilgi için GNU General Public Lisansını inceleyiniz.\n\nBu programın içinde GNU General Public lisansının bir kopyasının da bulunması gerekir. Eğer bu kopya programdan çıkmadıysa, http://www.gnu.org/licenses sitesinden Lisansa ulaşabilirsiniz."
+msgstr "Bu ücretsiz bir programdır:Free Software Foundation'ın yayımladığı GNU General Public lisansına uygun olarak paylaşılabilir, üzerinde değişiklikler yapılabilir (lisansın 2. sürümü ya da sonrasında çıkan sürümü, sizin tercihinizdir.)\n\nBu program işe yaraması amacı ile yazılmıştır, ancak HİÇBİR GARANTİ içermez; ima edilen TİCARETE UYGUNLUK garantisi ya da BELLİ BİR AMACA UYGUNLUK garantisi bile içermez. Daha fazla bilgi için GNU General Public Lisansını inceleyiniz.\n\nBu programın içinde GNU General Public lisansının bir kopyasının da bulunması gerekir. Eğer bu kopya programdan çıkmadıysa, http://www.gnu.org/licenses sitesinden Lisansa ulaşabilirsiniz."
 
 #: cmdevents.cpp:3101
 msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
-msgstr ""
+msgstr "Renklendirme Hilesi açıkken GB BIOS kullanılamaz."
 
 #: cmdevents.cpp:3161
 msgid "LAN link is already active.  Disable link mode to disconnect."
-msgstr "LAN link modu aktif. Bağlantıyı kesmek için Link modunu kapatınız."
+msgstr "LAN bağlantı kipi zaten açık. Bağlantıyı kesmek için bağlantı kipini kapatınız."
 
 #: cmdevents.cpp:3167
 msgid "Network is not supported in local mode."
-msgstr "Local modda ağ desteği yoktur."
+msgstr "Yerel kipte ağ desteği yoktur."
 
 #: opts.cpp:566 opts.cpp:869
 #, c-format
@@ -884,12 +884,12 @@ msgstr "Geçersiz bayrak seçeneği%s-%sgörmezden geliniyor"
 
 #: sys.cpp:124 sys.cpp:180
 msgid "No game in progress to record"
-msgstr "Görüntü/ses kaydı alınabiliecek bir oyun çalışmamaktadır"
+msgstr "Görüntü/ses kaydı alınabilecek bir oyun çalışmamaktadır"
 
 #: sys.cpp:137
 #, c-format
 msgid "Cannot open output file %s"
-msgstr "%s Çıktı dosyası açılamıyor "
+msgstr "%s çıktı dosyası açılamıyor "
 
 #: sys.cpp:144 sys.cpp:164 sys.cpp:310
 msgid "Error writing game recording"
@@ -950,7 +950,7 @@ msgstr "Çıktı alındı"
 #: sys.cpp:1197
 #, c-format
 msgid "Error opening pseudo tty: %s"
-msgstr "pseudo tty:%saçılırken hata oluştu"
+msgstr "sahte tty:%saçılırken hata oluştu"
 
 #: sys.cpp:1296
 #, c-format
@@ -975,7 +975,7 @@ msgstr "Game Boy ROM'u %s yüklenemiyor"
 msgid ""
 "Cannot use GB BIOS file when Colorizer Hack is enabled, disabling GB BIOS "
 "file."
-msgstr ""
+msgstr "GB BIOS Dosyası seçiliyken Renklendirici Hilesi kullanılamaz. GB BIOS dosyası kullanımı iptal ediliyor."
 
 #: panel.cpp:220 panel.cpp:320
 #, c-format
@@ -1014,12 +1014,12 @@ msgstr "%sdurum kaydı alınamadı"
 #: panel.cpp:875
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
-msgstr "%dx%d-%d@%dçözünürlüğünde tam ekran modu desteklenmiyor; başka çözünürlük aranıyor"
+msgstr "%dx%d-%d@%dçözünürlüğünde tam ekran kipi desteklenmiyor; başka çözünürlük aranıyor"
 
 #: panel.cpp:913
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
-msgstr "%dx%d-%d@%d çözünürlüğünde Tam ekran modu desteklenmiyor"
+msgstr "%dx%d-%d@%d çözünürlüğünde Tam ekran kipi desteklenmiyor"
 
 #: panel.cpp:918
 #, c-format
@@ -1082,7 +1082,7 @@ msgstr "Hafıza atama hatası"
 
 #: panel.cpp:2431
 msgid "error initializing codec"
-msgstr "Codec başlatılırken hata"
+msgstr "Çözücü başlatılırken hata"
 
 #: panel.cpp:2434
 msgid "error writing to output file"
@@ -1090,7 +1090,7 @@ msgstr "Çıktı dosyası yazılırken hata"
 
 #: panel.cpp:2437
 msgid "can't guess output format from file name"
-msgstr "Çıktı formatı, dosya isminden anlaşılamıyor"
+msgstr "çıktı biçimi, dosya adından anlaşılamıyor"
 
 #: panel.cpp:2442
 msgid "programming error; aborting!"
@@ -1118,15 +1118,15 @@ msgstr "Video kaydı hatası (%s); İptal ediliyor"
 
 #: viewsupt.cpp:776
 msgid "R:"
-msgstr "R:"
+msgstr "K:"
 
 #: viewsupt.cpp:785
 msgid "G:"
-msgstr "G:"
+msgstr "Y:"
 
 #: viewsupt.cpp:794
 msgid "B:"
-msgstr "B:"
+msgstr "M:"
 
 #: widgets/keyedit.cpp:122 widgets/keyedit.cpp:280
 msgid "SHIFT"
@@ -1175,12 +1175,12 @@ msgstr "CONTROL"
 #: widgets/sdljoy.cpp:137
 #, c-format
 msgid "Connected joystick %d: %s"
-msgstr "Bağlı joystick %d: %s"
+msgstr "Bağlı oyun çubuğu %d: %s"
 
 #: widgets/sdljoy.cpp:152
 #, c-format
 msgid "Disconnected joystick %d"
-msgstr "Bağlantısı kesilen joystick %d"
+msgstr "Bağlantısı kesilen oyun çubuğu %d"
 
 #: xaudio2.cpp:34
 msgid "XAudio2: Enumerating devices failed!"
@@ -1192,7 +1192,7 @@ msgstr "XAudio2 arayüzü başlatılamadı!"
 
 #: xaudio2.cpp:383
 msgid "XAudio2: Creating mastering voice failed!"
-msgstr ""
+msgstr "XAudio2: Ana ses oluşturulamadı!"
 
 #: xaudio2.cpp:392
 msgid "XAudio2: Creating source voice failed!"
@@ -1208,7 +1208,7 @@ msgstr "FAudio arayüzü başlatılamadı!"
 
 #: faudio.cpp:383
 msgid "FAudio: Creating mastering voice failed!"
-msgstr ""
+msgstr "FAudio: Ana ses oluşturulamadı!"
 
 #: faudio.cpp:394
 msgid "FAudio: Creating source voice failed!"
@@ -1257,7 +1257,7 @@ msgstr "dsbSecondary->Lock()  başarısız %08x"
 #: viewsupt.h:61
 #, c-format
 msgid "Unable to load dialog %s from resources"
-msgstr "Özkaynak kullanılarak diyalog penceresi%soluşturma başarısız"
+msgstr "Kaynaktan diyalog penceresi %s oluşturma başarısız"
 
 #: xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
@@ -1281,7 +1281,7 @@ msgstr "&Sil"
 
 #: xrc/AccelConfig.xrc:67
 msgid "Re&set All"
-msgstr "Hepsini Re&setle"
+msgstr "Hepsini Sı&fırla"
 
 #: xrc/AccelConfig.xrc:81
 msgid "Currently assigned to:"
@@ -1305,7 +1305,7 @@ msgstr "&Değer"
 
 #: xrc/CheatAdd.xrc:77
 msgid "Format"
-msgstr "Format"
+msgstr "Biçim"
 
 #: xrc/CheatCreate.xrc:4
 msgid "Cheat Search"
@@ -1349,7 +1349,7 @@ msgstr "&işaretsiz"
 
 #: xrc/CheatCreate.xrc:92
 msgid "&Hexadecimal"
-msgstr "&Hexadecimal/onaltılık"
+msgstr "&Onaltılık"
 
 #: xrc/CheatCreate.xrc:97
 msgid "Signed/Unsigned"
@@ -1369,7 +1369,7 @@ msgstr "&32 bit"
 
 #: xrc/CheatCreate.xrc:127
 msgid "Data size"
-msgstr "Data boyutu"
+msgstr "Veri boyutu"
 
 #: xrc/CheatCreate.xrc:144
 msgid "Ol&d value"
@@ -1452,15 +1452,15 @@ msgstr "Klasörler"
 
 #: xrc/DirectoriesConfig.xrc:11 xrc/DirectoriesConfig.xrc:18
 msgid "Game Boy Advance ROMs"
-msgstr "Game Boy Advance ROMları"
+msgstr "Game Boy Advance ROM'ları"
 
 #: xrc/DirectoriesConfig.xrc:27 xrc/DirectoriesConfig.xrc:34
 msgid "Game Boy ROMs"
-msgstr "Game Boy ROMları"
+msgstr "Game Boy ROM'ları"
 
 #: xrc/DirectoriesConfig.xrc:42 xrc/DirectoriesConfig.xrc:49
 msgid "Game Boy Color ROMs"
-msgstr "Game Boy Color ROMları"
+msgstr "Game Boy Color ROM'ları"
 
 #: xrc/DirectoriesConfig.xrc:57 xrc/DirectoriesConfig.xrc:64
 msgid "Native Saves"
@@ -1468,7 +1468,7 @@ msgstr "Orjinal oyun kayıtları"
 
 #: xrc/DirectoriesConfig.xrc:72 xrc/DirectoriesConfig.xrc:79
 msgid "Emulator Saves"
-msgstr "Emulator kayıtları"
+msgstr "Öykünme Kayıtları"
 
 #: xrc/DirectoriesConfig.xrc:87 xrc/DirectoriesConfig.xrc:94
 msgid "Screenshots"
@@ -1492,7 +1492,7 @@ msgstr "A&RM"
 
 #: xrc/Disassemble.xrc:30
 msgid "&THUMB"
-msgstr "&BAŞ PARMAK"
+msgstr "&BAŞ"
 
 #: xrc/Disassemble.xrc:45 xrc/GBDisassemble.xrc:18 xrc/MemViewer.xrc:47
 msgid "&Go"
@@ -1565,7 +1565,7 @@ msgstr "SP:"
 
 #: xrc/Disassemble.xrc:311
 msgid "LR:"
-msgstr "LR:"
+msgstr "SK:"
 
 #: xrc/Disassemble.xrc:328 xrc/GBDisassemble.xrc:128
 msgid "PC:"
@@ -1605,7 +1605,7 @@ msgstr "V"
 
 #: xrc/Disassemble.xrc:414 xrc/MapViewer.xrc:76 xrc/OAMViewer.xrc:37
 msgid "Mode:"
-msgstr "Mod:"
+msgstr "Kip:"
 
 #: xrc/Disassemble.xrc:424 xrc/GBDisassemble.xrc:172
 msgid "00"
@@ -1620,7 +1620,7 @@ msgstr "Otomatik &güncelle"
 
 #: xrc/Disassemble.xrc:453 xrc/GBDisassemble.xrc:222
 msgid "G&oto PC"
-msgstr "Bilgisayar git"
+msgstr "Bilgisayara git"
 
 #: xrc/Disassemble.xrc:460 xrc/GBDisassemble.xrc:229
 msgid "Re&fresh"
@@ -1628,11 +1628,11 @@ msgstr "Ye&nile"
 
 #: xrc/Disassemble.xrc:467 xrc/GBDisassemble.xrc:236
 msgid "&Next"
-msgstr "&sonraki"
+msgstr "&Sonraki"
 
 #: xrc/DisplayConfig.xrc:4
 msgid "Display settings"
-msgstr "Ekran/grafik ayarları"
+msgstr "Görüntü ayarları"
 
 #: xrc/DisplayConfig.xrc:15
 msgid "Output module"
@@ -1660,7 +1660,7 @@ msgstr "Filtreler"
 
 #: xrc/DisplayConfig.xrc:79
 msgid "Display filter :"
-msgstr "Ekran filtreleri"
+msgstr "Görüntü filtresi :"
 
 #: xrc/DisplayConfig.xrc:86
 msgid "2xSaI"
@@ -1676,7 +1676,7 @@ msgstr "Super Eagle"
 
 #: xrc/DisplayConfig.xrc:89
 msgid "Pixelate"
-msgstr "Pixelate"
+msgstr "Piksel"
 
 #: xrc/DisplayConfig.xrc:90
 msgid "Advance MAME Scale2x"
@@ -1684,15 +1684,15 @@ msgstr "Advance MAME Scale2x"
 
 #: xrc/DisplayConfig.xrc:91
 msgid "Bilinear"
-msgstr "Bilinear"
+msgstr "Çift doğrusal"
 
 #: xrc/DisplayConfig.xrc:92
 msgid "Bilinear Plus"
-msgstr "Bilinear Plus"
+msgstr "Çift Doğrusal Ekstra"
 
 #: xrc/DisplayConfig.xrc:93
 msgid "Scanlines"
-msgstr "Scanlines"
+msgstr "Tarama deseni"
 
 #: xrc/DisplayConfig.xrc:94
 msgid "TV Mode"
@@ -1708,11 +1708,11 @@ msgstr "LQ 2x"
 
 #: xrc/DisplayConfig.xrc:97
 msgid "Simple 2x"
-msgstr "Simple 2x"
+msgstr "Temel 2x"
 
 #: xrc/DisplayConfig.xrc:98
 msgid "Simple 3x"
-msgstr "Simple 3x"
+msgstr "Temel 3x"
 
 #: xrc/DisplayConfig.xrc:99
 msgid "HQ 3x"
@@ -1720,7 +1720,7 @@ msgstr "HQ 3x"
 
 #: xrc/DisplayConfig.xrc:100
 msgid "Simple 4x"
-msgstr "Simple 4x"
+msgstr "Temel 4x"
 
 #: xrc/DisplayConfig.xrc:101
 msgid "HQ 4x"
@@ -1748,7 +1748,7 @@ msgstr "xBRZ 6x"
 
 #: xrc/DisplayConfig.xrc:115
 msgid "Plugin :"
-msgstr "Plugin :"
+msgstr "Eklenti :"
 
 #: xrc/DisplayConfig.xrc:127
 msgid "Interframe blending :"
@@ -1760,11 +1760,11 @@ msgstr "Akıllı karelerarası karıştırma"
 
 #: xrc/DisplayConfig.xrc:137
 msgid "Interframe motion blur"
-msgstr "Karelerarası hareket bulanıklılık efekti"
+msgstr "Karelerarası bulanıklaştırma efekti"
 
 #: xrc/DisplayConfig.xrc:151 xrc/SoundConfig.xrc:91
 msgid "Basic"
-msgstr "Basic"
+msgstr "Temel"
 
 #: xrc/DisplayConfig.xrc:159
 msgid "Frame Skip"
@@ -1800,15 +1800,15 @@ msgstr "Varsayılan büyütme miktarı"
 
 #: xrc/DisplayConfig.xrc:266
 msgid "Maximum magnification factor :"
-msgstr "Maksimum büyütme miktarı"
+msgstr "En fazla büyütme miktarı"
 
 #: xrc/DisplayConfig.xrc:267
 msgid "0 = no maximum"
-msgstr "0= maksimum değil"
+msgstr "0= en fazla değil"
 
 #: xrc/DisplayConfig.xrc:275
 msgid "0 = no limit"
-msgstr "0= Limitsiz"
+msgstr "0= Sınırsız"
 
 #: xrc/DisplayConfig.xrc:285
 msgid "Zoom"
@@ -1828,7 +1828,7 @@ msgstr "Notlar:"
 
 #: xrc/GBAROMInfo.xrc:4 xrc/GBROMInfo.xrc:4
 msgid "Rom Information"
-msgstr "Rom bilgisi"
+msgstr "Rom Bilgisi"
 
 #: xrc/GBAROMInfo.xrc:11 xrc/GBROMInfo.xrc:12
 msgid "Game title:"
@@ -1840,11 +1840,11 @@ msgstr "İç başlık"
 
 #: xrc/GBAROMInfo.xrc:35
 msgid "Scene Release:"
-msgstr "Sahne/topluluk yayını "
+msgstr "Topluluk yayını:"
 
 #: xrc/GBAROMInfo.xrc:47
 msgid "Release Number:"
-msgstr "Çıkış Numarası"
+msgstr "Çıkış Numarası:"
 
 #: xrc/GBAROMInfo.xrc:59
 msgid "CRC32:"
@@ -1864,7 +1864,7 @@ msgstr "Yapımcı:"
 
 #: xrc/GBAROMInfo.xrc:107
 msgid "Main unit code:"
-msgstr "Ana ünite kodu:"
+msgstr "Ana birim kodu:"
 
 #: xrc/GBAROMInfo.xrc:119
 msgid "Device type:"
@@ -1872,7 +1872,7 @@ msgstr "Cihaz türü:"
 
 #: xrc/GBAROMInfo.xrc:131 xrc/GBROMInfo.xrc:72
 msgid "ROM version:"
-msgstr "ROM versiyonu:"
+msgstr "ROM sürümü:"
 
 #: xrc/GBAROMInfo.xrc:143 xrc/GBROMInfo.xrc:84
 msgid "CRC:"
@@ -1925,7 +1925,7 @@ msgstr "Arkaplan"
 
 #: xrc/GBColorPrefPanel.xrc:74
 msgid "Sprites"
-msgstr "Sprite grafikler"
+msgstr "Çift boyutlu grafikler"
 
 #: xrc/GBColorPrefPanel.xrc:84
 msgid "Use this palette"
@@ -1933,7 +1933,7 @@ msgstr "Bu paleti kullan"
 
 #: xrc/GBColorPrefPanel.xrc:94
 msgid "Restore"
-msgstr "Eski haline döncür"
+msgstr "Eski haline döndür"
 
 #: xrc/GBDisassemble.xrc:43
 msgid "AF:"
@@ -2000,7 +2000,7 @@ msgstr "Tüm ekrana sığacak şekilde genişlet"
 
 #: xrc/GBMapViewer.xrc:59 xrc/MapViewer.xrc:67
 msgid "Auto &update"
-msgstr "Oto  &güncelleme"
+msgstr "Otomatik &güncelleme"
 
 #: xrc/GBMapViewer.xrc:74 xrc/GBTileViewer.xrc:99 xrc/MapViewer.xrc:144
 #: xrc/MemSelRegion.xrc:10 xrc/PaletteViewer.xrc:50 xrc/TileViewer.xrc:115
@@ -2014,7 +2014,7 @@ msgstr "Desen:"
 
 #: xrc/GBMapViewer.xrc:90 xrc/MapViewer.xrc:160
 msgid "Flip:"
-msgstr "döndürme:"
+msgstr "Döndürme:"
 
 #: xrc/GBMapViewer.xrc:98 xrc/GBTileViewer.xrc:50 xrc/MapViewer.xrc:168
 #: xrc/TileViewer.xrc:66
@@ -2038,15 +2038,15 @@ msgstr "&Kaydet"
 
 #: xrc/GBOAMViewer.xrc:13 xrc/OAMViewer.xrc:14
 msgid "Sprite:"
-msgstr "Sprite grafik:"
+msgstr "Çift boyutlu grafik:"
 
 #: xrc/GBOAMViewer.xrc:29 xrc/OAMViewer.xrc:29
 msgid "Pos:"
-msgstr "Pos:"
+msgstr "Yerleşim:"
 
 #: xrc/GBOAMViewer.xrc:45 xrc/OAMViewer.xrc:69
 msgid "Prio:"
-msgstr "Prio:"
+msgstr "Öncelik:"
 
 #: xrc/GBOAMViewer.xrc:53
 msgid "OAP:"
@@ -2062,7 +2062,7 @@ msgstr "Bayraklar:"
 
 #: xrc/GBOAMViewer.xrc:77
 msgid "Bank:"
-msgstr "Bank:"
+msgstr "Taban:"
 
 #: xrc/GBOAMViewer.xrc:149 xrc/GBTileViewer.xrc:152 xrc/MemViewer.xrc:115
 #: xrc/OAMViewer.xrc:162 xrc/TileViewer.xrc:168
@@ -2079,11 +2079,11 @@ msgstr "&BG Kaydet..."
 
 #: xrc/GBPaletteViewer.xrc:38 xrc/PaletteViewer.xrc:33
 msgid "Sprite"
-msgstr "Sprite grafik"
+msgstr "Çift boyutlu grafik"
 
 #: xrc/GBPaletteViewer.xrc:48 xrc/PaletteViewer.xrc:111
 msgid "Save &Sprite..."
-msgstr "&Sprite grafik kaydet..."
+msgstr "&Çift boyutlu grafik kaydet..."
 
 #: xrc/GBPaletteViewer.xrc:67
 msgid "Index:"
@@ -2119,7 +2119,7 @@ msgstr "D&evam"
 
 #: xrc/GBROMInfo.xrc:48
 msgid "Unit code:"
-msgstr "Ünite kodu:"
+msgstr "Birim kodu:"
 
 #: xrc/GBROMInfo.xrc:60
 msgid "Cartridge type:"
@@ -2139,7 +2139,7 @@ msgstr "RAM boyutu:"
 
 #: xrc/GBROMInfo.xrc:132
 msgid "Dest. code:"
-msgstr "Dest. kod:"
+msgstr "Hedef kod:"
 
 #: xrc/GBROMInfo.xrc:144
 msgid "License code:"
@@ -2147,7 +2147,7 @@ msgstr "Lisans kodu:"
 
 #: xrc/GBROMInfo.xrc:156
 msgid "Checksum:"
-msgstr "Checksum:"
+msgstr "Kontrol:"
 
 #: xrc/GBTileViewer.xrc:14
 msgid "&0"
@@ -2159,7 +2159,7 @@ msgstr "&1"
 
 #: xrc/GBTileViewer.xrc:23
 msgid "VRAM Bank"
-msgstr "VRAM Bankası"
+msgstr "VRAM Tabanı"
 
 #: xrc/GBTileViewer.xrc:33
 msgid "0x&8000"
@@ -2192,7 +2192,7 @@ msgstr "SRAM"
 
 #: xrc/GameBoyAdvanceConfig.xrc:30 xrc/GameBoyAdvanceConfig.xrc:202
 msgid "Flash"
-msgstr "Flaş"
+msgstr "Bellek"
 
 #: xrc/GameBoyAdvanceConfig.xrc:31
 msgid "EEPROM + Sensor"
@@ -2200,7 +2200,7 @@ msgstr "EEPROM + Sensör"
 
 #: xrc/GameBoyAdvanceConfig.xrc:43
 msgid "Flash size :"
-msgstr "Flaş boyutu:"
+msgstr "Bellek boyutu:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
 msgid "64K"
@@ -2220,7 +2220,7 @@ msgstr "Kaset"
 
 #: xrc/GameBoyAdvanceConfig.xrc:77
 msgid "Save type"
-msgstr "Save tipi"
+msgstr "Kayıt tipi"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file :"
@@ -2228,7 +2228,7 @@ msgstr "BIOS dosyası :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file :"
-msgstr "Şu anki BIOS dosyası :"
+msgstr "Geçerli BIOS dosyası :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:122 xrc/GameBoyConfig.xrc:138
 #: xrc/GameBoyConfig.xrc:159
@@ -2267,7 +2267,7 @@ msgstr "Açık"
 
 #: xrc/GameBoyAdvanceConfig.xrc:190
 msgid "Save Type:"
-msgstr "Save Tipi:"
+msgstr "Kayıt Tipi:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:203
 msgid "EEPROM+Sensor"
@@ -2275,7 +2275,7 @@ msgstr "EEPROM+Sensör"
 
 #: xrc/GameBoyAdvanceConfig.xrc:212
 msgid "Flash Size:"
-msgstr "Flaş Boyutu:"
+msgstr "Bellek Boyutu:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:230
 msgid "Mirroring:"
@@ -2295,7 +2295,7 @@ msgstr "GameBoy ayarları"
 
 #: xrc/GameBoyConfig.xrc:20
 msgid "Emulated &system :"
-msgstr "Emule edilen &sistem"
+msgstr "Öykünülecek &sistem :"
 
 #: xrc/GameBoyConfig.xrc:30
 msgid "Game Boy Color"
@@ -2335,7 +2335,7 @@ msgstr "Sistem"
 
 #: xrc/GameBoyConfig.xrc:84
 msgid "GB Boot &ROM file :"
-msgstr "GB başlat &ROM dosyası :"
+msgstr "GB Başlatma &ROM'u"
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
@@ -2347,11 +2347,11 @@ msgstr "GBC Açılış ROM'u"
 
 #: xrc/GameBoyConfig.xrc:131
 msgid "Current GB BIOS file :"
-msgstr "Şuanki GB BIOS dosyası:"
+msgstr "Geçerli GB BIOS dosyası:"
 
 #: xrc/GameBoyConfig.xrc:152
 msgid "Current GBC BIOS file :"
-msgstr "Şuanki GBC BIOS dosyası:"
+msgstr "Geçerli GBC BIOS dosyası:"
 
 #: xrc/GameBoyConfig.xrc:186
 msgid "User 1"
@@ -2375,7 +2375,7 @@ msgstr "Genel"
 
 #: xrc/GeneralConfig.xrc:26
 msgid "Screenshot Format:"
-msgstr "Ekran resmi formatı:"
+msgstr "Ekran resmi biçimi:"
 
 #: xrc/GeneralConfig.xrc:33
 msgid "&PNG"
@@ -2399,7 +2399,7 @@ msgstr "saniye (0-600); 0=kapalı"
 
 #: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
-msgstr "&Hızlandır"
+msgstr "&Hızlandırma"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 #, c-format
@@ -2412,7 +2412,7 @@ msgstr "0=Hızlandırma iptal"
 
 #: xrc/GeneralConfig.xrc:114
 msgid "Unlimited"
-msgstr "Limitsiz"
+msgstr "Sınırsız"
 
 #: xrc/IOViewer.xrc:4
 msgid "IO Viewer"
@@ -2495,7 +2495,7 @@ msgid ""
 "Click a field and press a key or move joystick to add.  Press backspace to "
 "delete last added key.  Resize window or click inside and move pointer to "
 "see entire contents if too small."
-msgstr "Ekranda bulunan gameboy tuş alanlarından birine tıklayın, ardından o tuş ile eşleştirmek istediğiniz kol tuşunuza ya da klavye tuşunuza basın, ekleme işlemi tamamdır. Eğer eski bir tuş eşleşmesini silmek isterseniz, yine alanlardan birine tıklayınn ve ardından klavyenizin backspace tuşuna basın, silme işlemi tamamdır. Eğer tuş ayarlama ekranı küçükse pencereyi büyütün yada ekranı aşağı yukarı çekerek tüm tuş bilgilerine ulaşın. "
+msgstr "Ekranda bulunan gameboy tuş alanlarından birine tıklayın, ardından o tuş ile eşleştirmek istediğiniz kol tuşunuza ya da klavye tuşunuza basın. Son eklenen eşleştirmeyi silmek için klavyeden Geri \"Sil\" tuşuna basın. Eğer tuş ayarlama ekranı küçükse pencereyi büyütün ya da ekranı aşağı yukarı çekerek tüm tuş bilgilerine ulaşın. "
 
 #: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:460
 msgid "Up"
@@ -2531,35 +2531,35 @@ msgstr "R"
 
 #: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:492
 msgid "Select"
-msgstr "Select"
+msgstr "Seç"
 
 #: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:496
 msgid "Start"
-msgstr "Start"
+msgstr "Başlat"
 
 #: xrc/JoyPanel.xrc:254
 msgid "Motion Up"
-msgstr "Motion Up"
+msgstr "Üst Hareket"
 
 #: xrc/JoyPanel.xrc:276
 msgid "Autofire A"
-msgstr "Autofire A"
+msgstr "Oto. tıkla A"
 
 #: xrc/JoyPanel.xrc:298
 msgid "Motion Down"
-msgstr "Motion Down"
+msgstr "Alt Hareket"
 
 #: xrc/JoyPanel.xrc:320
 msgid "Autofire B"
-msgstr "Autofire B"
+msgstr "Oto. tıkla B"
 
 #: xrc/JoyPanel.xrc:342
 msgid "Motion Left/Dark"
-msgstr "Motion Left/Dark"
+msgstr "Sol/Karanlık Hareket"
 
 #: xrc/JoyPanel.xrc:386
 msgid "Motion Right/Light"
-msgstr "Motion Right/Light"
+msgstr "Sağ/Aydınlık Hareket"
 
 #: xrc/JoyPanel.xrc:408
 msgid "Speed Up"
@@ -2567,11 +2567,11 @@ msgstr "Hızlandır"
 
 #: xrc/JoyPanel.xrc:430
 msgid "Spin Left"
-msgstr "Spin Left"
+msgstr "Sola Dön"
 
 #: xrc/JoyPanel.xrc:461
 msgid "Spin Right"
-msgstr "Spin Right"
+msgstr "Sağa Dön"
 
 #: xrc/JoyPanel.xrc:483
 msgid "Screenshot"
@@ -2591,7 +2591,7 @@ msgstr "Varsayılanlar"
 
 #: xrc/JoyPanel.xrc:529
 msgid "Clear All"
-msgstr "Hepsini Temizle/Sil"
+msgstr "Tümünü Temizle"
 
 #: xrc/JoypadConfig.xrc:4
 msgid "Joypad Configuration"
@@ -2615,11 +2615,11 @@ msgstr "Oyuncu 4"
 
 #: xrc/LinkConfig.xrc:4
 msgid "Link configuration"
-msgstr "Link kablosu ayarları"
+msgstr "Bağlantı ayarları"
 
 #: xrc/LinkConfig.xrc:11
 msgid "Link timeout (in milliseconds)"
-msgstr "Link bağlantı zaman aşımı (milisaniye olarak)"
+msgstr "Bağlantı zaman aşımı (milisaniye)"
 
 #: xrc/Logging.xrc:4
 msgid "Logging"
@@ -2635,11 +2635,11 @@ msgstr "Sıralanmamış &hafıza"
 
 #: xrc/Logging.xrc:27
 msgid "Illegal &write"
-msgstr "İllegal &yazım"
+msgstr "Yasadışı &yazım"
 
 #: xrc/Logging.xrc:34
 msgid "Illegal &read"
-msgstr "illegal &okuma"
+msgstr "Yasadışı &okuma"
 
 #: xrc/Logging.xrc:41
 msgid "DMA &0"
@@ -2675,11 +2675,11 @@ msgstr "Ayrıntılı günlük"
 
 #: xrc/MainMenu.xrc:5
 msgid "&File"
-msgstr "&dosya"
+msgstr "&Dosya"
 
 #: xrc/MainMenu.xrc:7
 msgid "Open..."
-msgstr "Aç"
+msgstr "Aç..."
 
 #: xrc/MainMenu.xrc:10
 msgid "Open &GB..."
@@ -2707,7 +2707,7 @@ msgstr "ROM bil&gisi"
 
 #: xrc/MainMenu.xrc:30
 msgid "&e-Reader"
-msgstr "&e-okuyucu"
+msgstr "&e-Okuyucu"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
@@ -2731,7 +2731,7 @@ msgstr "En yakın zamanda kullanılanlar"
 
 #: xrc/MainMenu.xrc:50
 msgid "Load current state slot"
-msgstr "Şuanki State Slotu yükle"
+msgstr "Geçerli durum kaydını yükle"
 
 #: xrc/MainMenu.xrc:53
 msgid "&Auto load most recent"
@@ -2791,15 +2791,15 @@ msgstr "&Durum kaydı yükle"
 
 #: xrc/MainMenu.xrc:104
 msgid "&Oldest slot"
-msgstr "&En eski slot"
+msgstr "&En eski durum kaydı"
 
 #: xrc/MainMenu.xrc:107
 msgid "Save current state slot"
-msgstr "Şuanki State Slotu kaydet"
+msgstr "Geçerli durum kaydını yap"
 
 #: xrc/MainMenu.xrc:110
 msgid "Increase state slot number and save"
-msgstr "State slot numarasını arttır ve kaydet"
+msgstr "Durum kaydı sayısını arttır ve kaydet"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File ..."
@@ -2811,11 +2811,11 @@ msgstr "&Durum kaydı"
 
 #: xrc/MainMenu.xrc:150
 msgid "Increase state slot number"
-msgstr "State slot numarasını arttır"
+msgstr "Durum kaydı sayısını arttır"
 
 #: xrc/MainMenu.xrc:153
 msgid "Decrease state slot number"
-msgstr "State slot numarasını azalt"
+msgstr "Durum kaydı sayısını azalt"
 
 #: xrc/MainMenu.xrc:158 xrc/MainMenu.xrc:170
 msgid "&Battery file..."
@@ -2827,7 +2827,7 @@ msgstr "Gameshark &kod dosyası..."
 
 #: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
 msgid "&Gameshark snapshot..."
-msgstr "&Gameshark hile snapshot'ı..."
+msgstr "&Gameshark hile kaydı..."
 
 #: xrc/MainMenu.xrc:166
 msgid "&Import"
@@ -2879,7 +2879,7 @@ msgstr "F&ilm oynatmayı sonlandır"
 
 #: xrc/MainMenu.xrc:209
 msgid "&Play"
-msgstr "&Oyna"
+msgstr "&Oynat"
 
 #: xrc/MainMenu.xrc:214
 msgid "&Quit"
@@ -2887,11 +2887,11 @@ msgstr "&Çıkış"
 
 #: xrc/MainMenu.xrc:218
 msgid "&Emulation"
-msgstr "&Emülasyon"
+msgstr "&Öykünme"
 
 #: xrc/MainMenu.xrc:220
 msgid "&Pause"
-msgstr "&Ara var"
+msgstr "&Duraklat"
 
 #: xrc/MainMenu.xrc:224
 msgid "&Next frame"
@@ -2899,15 +2899,15 @@ msgstr "&Sonraki kare"
 
 #: xrc/MainMenu.xrc:227
 msgid "Re&wind"
-msgstr "Geri&sar"
+msgstr "Geri &sar"
 
 #: xrc/MainMenu.xrc:231
 msgid "Toggle &full screen"
-msgstr "&Tam ekran aç"
+msgstr "&Tam ekrana geç"
 
 #: xrc/MainMenu.xrc:238
 msgid "&Turbo mode"
-msgstr "&Turbo modu"
+msgstr "&Hız kipi"
 
 #: xrc/MainMenu.xrc:242
 msgid "&VSync"
@@ -2927,7 +2927,7 @@ msgstr "&Otomatik IPS/UPS/IPF yaması"
 
 #: xrc/MainMenu.xrc:259
 msgid "&Pause when inactive"
-msgstr "&Pasifken ara ver"
+msgstr "&Arkaplanda duraklat"
 
 #: xrc/MainMenu.xrc:264
 msgid "&Reset"
@@ -2943,7 +2943,7 @@ msgstr "&Bağlantı"
 
 #: xrc/MainMenu.xrc:272
 msgid "Start &Network Link ..."
-msgstr "&Ağ linki başlat..."
+msgstr "&Ağ bağlantısı başlat..."
 
 #: xrc/MainMenu.xrc:277
 msgid "&Nothing"
@@ -2951,7 +2951,7 @@ msgstr "&Hiç"
 
 #: xrc/MainMenu.xrc:281
 msgid "&Cable"
-msgstr "&Koblo"
+msgstr "&Kablolu"
 
 #: xrc/MainMenu.xrc:285
 msgid "&Wireless"
@@ -2967,15 +2967,15 @@ msgstr "&Game Boy"
 
 #: xrc/MainMenu.xrc:298
 msgid "&Local mode"
-msgstr "&Yerel mod"
+msgstr "&Yerel kip"
 
 #: xrc/MainMenu.xrc:302
 msgid "&Link at boot"
-msgstr "Açılışta &Link kablosunu aktif et ve bağlan"
+msgstr "Açılışta &bağlan"
 
 #: xrc/MainMenu.xrc:306
 msgid "&Speed hack"
-msgstr "&Hız hacki"
+msgstr "&Hız hilesi"
 
 #: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:391
 #: xrc/MainMenu.xrc:427
@@ -3024,11 +3024,11 @@ msgstr "Piksel filtresini değiştir"
 
 #: xrc/MainMenu.xrc:348
 msgid "Change interframe blending"
-msgstr "Kareler arası karışmayı değiştir"
+msgstr "Kareler arası karıştırmayı değiştir"
 
 #: xrc/MainMenu.xrc:351
 msgid "&Retain aspect ratio"
-msgstr "&görüntü oranını koru"
+msgstr "&Görüntü oranını koru"
 
 #: xrc/MainMenu.xrc:355
 msgid "Enable MMX"
@@ -3036,7 +3036,7 @@ msgstr "MMX etkinleştir"
 
 #: xrc/MainMenu.xrc:360
 msgid "&Bilinear filter"
-msgstr "&Bilinear filtre"
+msgstr "&Çift doğrusal filtre"
 
 #: xrc/MainMenu.xrc:371
 msgid "&Keep window on top"
@@ -3044,7 +3044,7 @@ msgstr "&VBA penceresini hep en üstte tut"
 
 #: xrc/MainMenu.xrc:376
 msgid "&Status bar"
-msgstr "&Durum barı"
+msgstr "&Durum çubuğu"
 
 #: xrc/MainMenu.xrc:380
 msgid "&Disable on-screen display"
@@ -3052,7 +3052,7 @@ msgstr "&OSD'yi devre dışı bırak"
 
 #: xrc/MainMenu.xrc:384
 msgid "&Transparent on-screen display"
-msgstr "&OSD transparan olsun"
+msgstr "&OSD şeffaf olsun"
 
 #: xrc/MainMenu.xrc:389
 msgid "&Audio"
@@ -3072,7 +3072,7 @@ msgstr "Sesi aç/kapa"
 
 #: xrc/MainMenu.xrc:407
 msgid "&GBA sound interpolation"
-msgstr "&GBA ses aradeğerlemesi"
+msgstr "&GBA ses tekrarlaştırması"
 
 #: xrc/MainMenu.xrc:412
 msgid "&GB sound enhancement"
@@ -3080,11 +3080,11 @@ msgstr "&GB ses iyileştirme"
 
 #: xrc/MainMenu.xrc:416
 msgid "&GB surround sound effect"
-msgstr "&GB surround ses efekti"
+msgstr "&GB çevresel ses efekti"
 
 #: xrc/MainMenu.xrc:420
 msgid "&GB sound declicking"
-msgstr "&GB ses dekliklenmesi"
+msgstr "&GB ses kesilmesi"
 
 #: xrc/MainMenu.xrc:425
 msgid "&Input"
@@ -3096,11 +3096,11 @@ msgstr "Arkaplanda &klavye girişlerine izin ver"
 
 #: xrc/MainMenu.xrc:434
 msgid "Allow &joystick background input"
-msgstr "Arkaplanda &joystick girişlerine izin ver"
+msgstr "Arkaplanda &oyun çubuğu girişlerine izin ver"
 
 #: xrc/MainMenu.xrc:439
 msgid "&Autofire"
-msgstr "&Oto Ateş"
+msgstr "&Otomatik tıklama"
 
 #: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
 msgid "&A"
@@ -3120,7 +3120,7 @@ msgstr "&R"
 
 #: xrc/MainMenu.xrc:458
 msgid "&Autohold"
-msgstr "&oto-bekleme"
+msgstr "&Otomatik basılı tutma"
 
 #: xrc/MainMenu.xrc:502
 msgid "&Game Boy Advance"
@@ -3152,11 +3152,11 @@ msgstr "&GB renk ayarı"
 
 #: xrc/MainMenu.xrc:539
 msgid "&GB Colorizer Hack (requires restart)"
-msgstr ""
+msgstr "&GB Renklendirici hilesi (yeniden başlatma gerektirir)"
 
 #: xrc/MainMenu.xrc:543
 msgid "&GB printer"
-msgstr "&GB printer"
+msgstr "&GB yazıcı"
 
 #: xrc/MainMenu.xrc:547
 msgid "&Gather a full page before printing"
@@ -3168,7 +3168,7 @@ msgstr "&Kağıda basmak yerine ekran resmi olarak kaydet"
 
 #: xrc/MainMenu.xrc:556
 msgid "&Use GB BIOS file (requires restart)"
-msgstr ""
+msgstr "GB &BIOS dosyası kullan (yeniden başlatma gerektirir)"
 
 #: xrc/MainMenu.xrc:560
 msgid "&Use GBC BIOS file"
@@ -3180,7 +3180,7 @@ msgstr "&Genel..."
 
 #: xrc/MainMenu.xrc:568
 msgid "&Speedup / Turbo ..."
-msgstr "&Hızlandırma/Turbo"
+msgstr "&Hızlandırma"
 
 #: xrc/MainMenu.xrc:571
 msgid "D&irectories ..."
@@ -3192,7 +3192,7 @@ msgstr "&Tuş kısayolları"
 
 #: xrc/MainMenu.xrc:577
 msgid "&UI Settings ..."
-msgstr "&UI Ayarları"
+msgstr "&Arayüz Ayarları"
 
 #: xrc/MainMenu.xrc:581
 msgid "&Tools"
@@ -3212,7 +3212,7 @@ msgstr "H&ile bul..."
 
 #: xrc/MainMenu.xrc:592
 msgid "A&utomatically save/load cheats"
-msgstr "Hilelerei o&tomatik olarak yükle ve kaydet"
+msgstr "Hileleri o&tomatik olarak yükle ve kaydet"
 
 #: xrc/MainMenu.xrc:596
 msgid "&Enable cheats"
@@ -3224,7 +3224,7 @@ msgstr "&GDB'ye gir"
 
 #: xrc/MainMenu.xrc:607
 msgid "&Configure port..."
-msgstr "Port &ayarla..."
+msgstr "Bağlantı noktası &ayarla..."
 
 #: xrc/MainMenu.xrc:610
 msgid "&Break on load"
@@ -3244,7 +3244,7 @@ msgstr "&Parçala/kaynak kodu al..."
 
 #: xrc/MainMenu.xrc:623
 msgid "&Logging..."
-msgstr "&Günlük tutuluyor..."
+msgstr "&Günlük..."
 
 #: xrc/MainMenu.xrc:626
 msgid "&IO Viewer..."
@@ -3296,15 +3296,15 @@ msgstr "&Nesne"
 
 #: xrc/MainMenu.xrc:675
 msgid "&WIN 0"
-msgstr "&Ön Plan 0"
+msgstr "Pencere &0"
 
 #: xrc/MainMenu.xrc:680
 msgid "W&IN 1"
-msgstr "W&IN 1"
+msgstr "P&encere 1"
 
 #: xrc/MainMenu.xrc:685
 msgid "O&BJ WIN"
-msgstr "O&BJ WIN"
+msgstr "Pencere Ne&sne"
 
 #: xrc/MainMenu.xrc:689
 msgid "&View Layers"
@@ -3356,7 +3356,7 @@ msgstr "Çeviriler"
 
 #: xrc/MainMenu.xrc:742
 msgid "Check for updates"
-msgstr "Güncellemelere Bak"
+msgstr "Güncelleştirmeler"
 
 #: xrc/MainMenu.xrc:745
 msgid "&Factory Reset..."
@@ -3448,7 +3448,7 @@ msgstr "&Yükle..."
 
 #: xrc/NetLink.xrc:4
 msgid "Start Network Link"
-msgstr "Ağ link bağlantısı başlat"
+msgstr "Ağ bağlantısını başlat"
 
 #: xrc/NetLink.xrc:11
 msgid "Server"
@@ -3480,7 +3480,7 @@ msgstr "Sunucu"
 
 #: xrc/NetLink.xrc:81
 msgid "Port:"
-msgstr "Port:"
+msgstr "Bağ. Noktası:"
 
 #: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
@@ -3488,7 +3488,7 @@ msgstr "OAM izleyici"
 
 #: xrc/OAMViewer.xrc:85
 msgid "Rot.:"
-msgstr "Dön.:"
+msgstr "Döndürme:"
 
 #: xrc/PaletteViewer.xrc:4
 msgid "Palette Viewer"
@@ -3512,11 +3512,11 @@ msgstr "Sessiz"
 
 #: xrc/SoundConfig.xrc:54 xrc/SoundConfig.xrc:320
 msgid "Maximum"
-msgstr "Maksimum"
+msgstr "En fazla"
 
 #: xrc/SoundConfig.xrc:71
 msgid "Sample rate :"
-msgstr "Örnek oran"
+msgstr "Örnek oranı :"
 
 #: xrc/SoundConfig.xrc:77
 msgid "48 KHz"
@@ -3576,7 +3576,7 @@ msgstr "Gelişmiş"
 
 #: xrc/SoundConfig.xrc:230
 msgid "Lots"
-msgstr "Çokça"
+msgstr "Çok"
 
 #: xrc/SoundConfig.xrc:239
 msgid "Echo"
@@ -3636,11 +3636,11 @@ msgstr "0x60&10000"
 
 #: xrc/SpeedupConfig.xrc:4
 msgid "SpeedUp / Turbo Settings"
-msgstr "Hızlandırma/Turbo Ayarları"
+msgstr "Hızlandırma Ayarları"
 
 #: xrc/SpeedupConfig.xrc:9
 msgid "Speedup Throttle"
-msgstr ""
+msgstr "Hızlandırma Oranı"
 
 #: xrc/SpeedupConfig.xrc:50
 msgid "Frame skip"
@@ -3652,4 +3652,4 @@ msgstr "Arayüz ayarları"
 
 #: xrc/UIConfig.xrc:9
 msgid "Hide Menu Bar"
-msgstr "Menü çubuğunu sakla"
+msgstr "Menü çubuğunu gizle"
