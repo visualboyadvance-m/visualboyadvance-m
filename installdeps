@@ -320,9 +320,15 @@ debian_installdeps() {
     if [ -z "$target" ]; then
         sudo apt-get -qq -y update
 
-        sfml_libs=$(apt-cache search libsfml | grep -E 'graphics|window|network' | sed 's/ - .*//')
+        sfml_libs=
 
-        glew_lib=$(apt-cache search libglew | grep '^libglew[0-9]' | sed 's/ - .*//')
+        for lib in graphics window network; do
+            sfml_libs="$sfml_libs $(apt-cache search "libsfml-$lib" | sed 's/ - .*//' | sort -r | head -1)"
+        done
+
+        glew_lib=$(apt-cache search libglew | grep '^libglew[0-9]' | sed 's/ - .*//' | sort -r | head -1)
+
+        sdl_lib=$(apt-cache search '^libsdl2-2.0' | sed 's/ - .*//' | sort -r | head -1)
 
         # not present in trusty
         if [ -n "$ENABLE_FFMPEG" ]; then
@@ -338,7 +344,7 @@ debian_installdeps() {
           wx_lib_dev=libwxgtk3.0-dev
         fi
 
-        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev libsdl2-dev libsdl2-2.0 libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev libsfml-dev $sfml_libs $glew_lib $wx_lib $wx_lib_dev libgtk2.0-dev libgtk-3-dev ccache zip ninja-build"
+        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev libsdl2-dev $sdl_lib libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev libsfml-dev $sfml_libs $glew_lib $wx_lib $wx_lib_dev libgtk2.0-dev libgtk-3-dev ccache zip ninja-build"
 
         [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs libopenal-dev"
         [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs libavcodec-dev libavformat-dev libswscale-dev libavutil-dev $libswresample_dev"
