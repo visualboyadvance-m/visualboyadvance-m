@@ -2,7 +2,7 @@
 #include "../common/contains.h"
 
 
-int getKeyboardKeyCode(wxKeyEvent& event)
+int getKeyboardKeyCode(const wxKeyEvent& event)
 {
     int uc = event.GetUnicodeKey();
     if (uc != WXK_NONE) {

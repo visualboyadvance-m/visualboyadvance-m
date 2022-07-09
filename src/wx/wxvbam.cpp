@@ -27,6 +27,7 @@
 
 // The built-in vba-over.ini
 #include "builtin-over.h"
+#include "wx/userinput.h"
 
 IMPLEMENT_APP(wxvbamApp)
 IMPLEMENT_DYNAMIC_CLASS(MainFrame, wxFrame)
@@ -881,10 +882,7 @@ int MainFrame::FilterEvent(wxEvent& event)
     {
         wxJoyEvent& je = (wxJoyEvent&)event;
         if (je.control_value() == 0) return -1; // joystick button UP
-        uint8_t key = je.control_index();
-        int mod = wxJoyKeyTextCtrl::DigitalButton(je);
-        int joy = je.joystick().player_index();
-        wxString label = wxJoyKeyTextCtrl::ToString(mod, key, joy);
+        wxString label = wxUserInput::FromJoyEvent(je).ToString();
         wxAcceleratorEntry_v accels = wxGetApp().GetAccels();
         for (size_t i = 0; i < accels.size(); ++i)
         {

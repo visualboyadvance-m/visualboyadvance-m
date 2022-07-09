@@ -23,6 +23,8 @@
 #include "../sdl/text.h"
 #include "drawing.h"
 #include "filters.h"
+#include "wx/joyedit.h"
+#include "wx/userinput.h"
 #include "wxvbam.h"
 #include "wxutil.h"
 #include "wayland.h"
@@ -1217,7 +1219,7 @@ static uint32_t bmask[NUM_KEYS] = {
     KEYM_GS
 };
 
-static wxJoyKeyBinding_v keys_pressed;
+static std::set<wxUserInput> keys_pressed;
 
 static void clear_input_press()
 {
@@ -1236,6 +1238,7 @@ struct game_key {
     wxJoyKeyBinding_v& b;
 };
 
+// Populates |vec| with the game keys currently pressed.
 static void game_keys_pressed(int key, int mod, int joy, std::vector<game_key>* vec)
 {
     for (int player = 0; player < 4; player++)
@@ -1248,56 +1251,32 @@ static void game_keys_pressed(int key, int mod, int joy, std::vector<game_key>* 
         }
 }
 
-static bool process_key_press(bool down, int key, int mod, int joy = 0)
+static bool process_user_input(bool down, const wxUserInput& user_input)
 {
-    // modifier-only key releases do not set the modifier flag
-    // so we set it here to match key release events to key press events
-    switch (key) {
-        case WXK_SHIFT:
-            mod |= wxMOD_SHIFT;
-            break;
-        case WXK_ALT:
-            mod |= wxMOD_ALT;
-            break;
-        case WXK_CONTROL:
-            mod |= wxMOD_CONTROL;
-            break;
-#ifdef __WXMAC__
-        case WXK_RAW_CONTROL:
-            mod |= wxMOD_RAW_CONTROL;
-            break;
-#endif
-        default:
-            if (joy == 0) mod = 0;
-            break;
-    }
-
-    // check if key is already pressed
-    size_t kpno;
-
-    for (kpno = 0; kpno < keys_pressed.size(); kpno++)
-        if (keys_pressed[kpno].key == key && keys_pressed[kpno].mod == mod && keys_pressed[kpno].joy == joy)
-            break;
+    int key = user_input.key();
+    int mod = user_input.mod();
+    int joy = user_input.joy();
 
     std::vector<game_key> game_keys;
     game_keys_pressed(key, mod, joy, &game_keys);
+    const bool is_game_key = !game_keys.empty();
 
-    const bool is_game_key = game_keys.size();
-
-    if (kpno < keys_pressed.size()) {
+    // check if key is already pressed
+    auto iter = keys_pressed.find(user_input);
+    if (iter != keys_pressed.end()) {
         // double press is noop
         if (down)
             return is_game_key;
 
         // if released, forget it
-        keys_pressed.erase(keys_pressed.begin() + kpno);
+        iter = keys_pressed.erase(iter);
     } else {
         // double release is noop
         if (!down)
             return is_game_key;
 
         // otherwise remember it
-        keys_pressed.push_back({key, mod, joy});
+        keys_pressed.emplace(user_input);
     }
 
     for (auto&& game_key : game_keys) {
@@ -1313,12 +1292,7 @@ static bool process_key_press(bool down, int key, int mod, int joy = 0)
             for (bind2 = 0; bind2 < game_key.b.size(); bind2++) {
                 if ((size_t)game_key.bind_num == bind2 || (b[bind2].key == key && b[bind2].mod == mod && b[bind2].joy == joy))
                     continue;
-
-                for (kpno = 0; kpno < keys_pressed.size(); kpno++)
-                    if (keys_pressed[kpno].key == b[bind2].key && keys_pressed[kpno].mod == b[bind2].mod && keys_pressed[kpno].joy == b[bind2].joy)
-                        break;
             }
-
             if (bind2 == b.size()) {
                 // release button
                 joypress[game_key.player] &= ~bmask[game_key.key_num];
@@ -1338,42 +1312,63 @@ static void draw_black_background(wxWindow* win) {
     dc.DrawRectangle(0, 0, w, h);
 }
 
-static bool is_key_pressed(wxKeyEvent& ev)
+static void process_keyboard_event(const wxKeyEvent& ev, bool down)
 {
-    auto kc = ev.GetKeyCode();
+    int kc = ev.GetKeyCode();
 
     // Under Wayland or if the key is unicode, we can't use wxGetKeyState().
-    if (IsItWayland() || kc == WXK_NONE)
-        return true;
+    if (!IsItWayland() && kc != WXK_NONE) {
+        // Check if the key state corresponds to the event.
+        if (down != wxGetKeyState(static_cast<wxKeyCode>(kc))) {
+            return;
+        }
+    }
 
-    return wxGetKeyState(static_cast<wxKeyCode>(kc));
-}
+    int key = getKeyboardKeyCode(ev);
+    int mod = ev.GetModifiers();
 
-static bool is_key_released(wxKeyEvent& ev)
-{
-    auto kc = ev.GetKeyCode();
+    if (key == WXK_NONE) {
+        return;
+    }
 
-    // Under Wayland or if the key is unicode, we can't use wxGetKeyState().
-    if (IsItWayland() || kc == WXK_NONE)
-        return true;
+    // modifier-only key releases do not set the modifier flag
+    // so we set it here to match key release events to key press events
+    switch (key) {
+        case WXK_SHIFT:
+            mod |= wxMOD_SHIFT;
+            break;
+        case WXK_ALT:
+            mod |= wxMOD_ALT;
+            break;
+        case WXK_CONTROL:
+            mod |= wxMOD_CONTROL;
+            break;
+#ifdef __WXMAC__
+        case WXK_RAW_CONTROL:
+            mod |= wxMOD_RAW_CONTROL;
+            break;
+#endif
+        default:
+            // This resets mod for any non-modifier key. This has the side
+            // effect of not being able to set up a modifier+key for a game
+            // control.
+            mod = 0;
+            break;
+    }
 
-    return !wxGetKeyState(static_cast<wxKeyCode>(kc));
+    if (process_user_input(down, wxUserInput::FromLegacyJoyKeyBinding({key, mod, 0}))) {
+        wxWakeUpIdle();
+    };
 }
 
 void GameArea::OnKeyDown(wxKeyEvent& ev)
 {
-    int kc = getKeyboardKeyCode(ev);
-    if (is_key_pressed(ev) && process_key_press(true, kc, ev.GetModifiers())) {
-        wxWakeUpIdle();
-    }
+    process_keyboard_event(ev, true);
 }
 
 void GameArea::OnKeyUp(wxKeyEvent& ev)
 {
-    int kc = getKeyboardKeyCode(ev);
-    if (is_key_released(ev) && process_key_press(false, kc, ev.GetModifiers())) {
-        wxWakeUpIdle();
-    }
+    process_keyboard_event(ev, false);
 }
 
 // these three are forwarded to the DrawingPanel instance
@@ -1406,20 +1401,22 @@ void GameArea::OnSDLJoy(wxJoyEvent& ev)
     int joy = ev.joystick().player_index();
 
     // mutually exclusive key types unpress their opposite
+    // TODO: Move creation of these "ghost" events to wxJoyPoller.
     if (mod == WXJB_AXIS_PLUS) {
-        process_key_press(false, key, WXJB_AXIS_MINUS, joy);
-        process_key_press(ev.control_value() != 0, key, mod, joy);
+        process_user_input(false, wxUserInput::FromLegacyJoyKeyBinding({key, WXJB_AXIS_MINUS, joy}));
+        process_user_input(ev.control_value() != 0, wxUserInput::FromJoyEvent(ev));
     } else if (mod == WXJB_AXIS_MINUS) {
-        process_key_press(false, key, WXJB_AXIS_PLUS, joy);
-        process_key_press(ev.control_value() != 0, key, mod, joy);
+        process_user_input(false, wxUserInput::FromLegacyJoyKeyBinding({key, WXJB_AXIS_PLUS, joy}));
+        process_user_input(ev.control_value() != 0, wxUserInput::FromJoyEvent(ev));
     } else if (mod >= WXJB_HAT_FIRST && mod <= WXJB_HAT_LAST) {
         int value = ev.control_value();
-        process_key_press(value & SDL_HAT_UP, key, WXJB_HAT_N, joy);
-        process_key_press(value & SDL_HAT_DOWN, key, WXJB_HAT_S, joy);
-        process_key_press(value & SDL_HAT_RIGHT, key, WXJB_HAT_E, joy);
-        process_key_press(value & SDL_HAT_LEFT, key, WXJB_HAT_W, joy);
-    } else
-        process_key_press(ev.control_value() != 0, key, mod, joy);
+        process_user_input(value & SDL_HAT_UP, wxUserInput::FromLegacyJoyKeyBinding({key, WXJB_HAT_N, joy}));
+        process_user_input(value & SDL_HAT_DOWN, wxUserInput::FromLegacyJoyKeyBinding({key, WXJB_HAT_S, joy}));
+        process_user_input(value & SDL_HAT_RIGHT, wxUserInput::FromLegacyJoyKeyBinding({key, WXJB_HAT_E, joy}));
+        process_user_input(value & SDL_HAT_LEFT, wxUserInput::FromLegacyJoyKeyBinding({key, WXJB_HAT_W, joy}));
+    } else {
+        process_user_input(ev.control_value() != 0, wxUserInput::FromJoyEvent(ev));
+    }
 
     // tell Linux to turn off the screensaver/screen-blank if joystick button was pressed
     // this shouldn't be necessary of course

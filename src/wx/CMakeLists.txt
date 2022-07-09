@@ -728,6 +728,7 @@ set(
     wxutil.cpp
     widgets/keyedit.cpp
     widgets/joyedit.cpp
+    widgets/userinput.cpp
     widgets/sdljoy.cpp
     widgets/wxmisc.cpp
     # probably ought to be in common
@@ -761,6 +762,7 @@ set(
     widgets/wx/keyedit.h
     widgets/wx/joyedit.h
     widgets/wx/sdljoy.h
+    widgets/wx/userinput.h
     widgets/wx/webupdatedef.h
     widgets/wx/wxmisc.h
     # probably ought to be in common
