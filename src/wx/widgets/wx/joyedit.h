@@ -49,7 +49,7 @@ public:
     // key is event.GetControlIndex(), and joy is event.GetJoy() + 1
     // mod is derived from GetControlValue() and GetControlType():
     // convert wxJoyEvent's type+val into mod (WXJB_*)
-    static int DigitalButton(wxJoyEvent& event);
+    static int DigitalButton(const wxJoyEvent& event);
     // convert mod+key to accel string, separated by -
     static wxString ToString(int mod, int key, int joy, bool isConfig = false);
     // convert multiple keys, separated by multikey

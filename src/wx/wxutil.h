@@ -3,7 +3,7 @@
 
 #include <wx/event.h>
 
-int getKeyboardKeyCode(wxKeyEvent& event);
+int getKeyboardKeyCode(const wxKeyEvent& event);
 
 #include <wx/accel.h>
 

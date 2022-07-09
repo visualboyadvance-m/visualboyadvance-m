@@ -1,6 +1,9 @@
-#include <wx/tokenzr.h>
 #include "wx/joyedit.h"
+
+#include <wx/tokenzr.h>
+
 #include "strutils.h"
+#include "wx/userinput.h"
 
 // FIXME: suppport analog/digital flag on per-axis basis
 
@@ -17,7 +20,7 @@ wxJoyKeyBinding newWxJoyKeyBinding(int key, int mod, int joy)
     return tmp;
 }
 
-int wxJoyKeyTextCtrl::DigitalButton(wxJoyEvent& event)
+int wxJoyKeyTextCtrl::DigitalButton(const wxJoyEvent& event)
 {
     int16_t sdlval = event.control_value();
     wxJoyControl sdltype = event.control();
@@ -72,24 +75,17 @@ void wxJoyKeyTextCtrl::OnJoy(wxJoyEvent& event)
 {
     static wxLongLong last_event = 0;
 
-    int16_t val  = event.control_value();
-    wxJoyControl type = event.control();
-
     // Filter consecutive axis motions within 300ms, as this adds two bindings
     // +1/-1 instead of the one intended.
-    if (type == wxJoyControl::Axis && wxGetUTCTimeMillis() - last_event < 300)
+    if (event.control() == wxJoyControl::Axis && wxGetUTCTimeMillis() - last_event < 300)
         return;
 
     last_event = wxGetUTCTimeMillis();
 
-    int mod = DigitalButton(event);
-    uint8_t key = event.control_index();
-    unsigned joy = event.joystick().player_index();
-
-    if (!val || mod < 0)
+    if (!event.control_value() || DigitalButton(event) < 0)
         return;
 
-    wxString nv = ToString(mod, key, joy);
+    wxString nv = wxUserInput::FromJoyEvent(event).ToString();
 
     if (nv.empty())
         return;
