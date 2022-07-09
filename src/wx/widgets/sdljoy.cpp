@@ -4,7 +4,6 @@
 #include <wx/timer.h>
 #include <SDL.h>
 
-#include "../common/contains.h"
 #include "../wxvbam.h"
 
 namespace {
@@ -38,9 +37,6 @@ static int16_t AxisValueToDirection(int16_t x) {
 
     return 0;
 }
-
-// The interval between 2 polls in ms.
-const wxLongLong kPollTimeInterval(25);
 
 } // namespace
 
@@ -114,12 +110,9 @@ public:
     bool IsValid() const;
 
     // Processes an SDL event.
-    void ProcessEvent(int32_t event_type,
-                      uint8_t control_index,
-                      int16_t control_value);
-
-    // Polls the current state of the joystick and sends events as needed.
-    void Poll();
+    void ProcessSDLEvent(int32_t event_type,
+                         uint8_t control_index,
+                         int16_t control_value);
 
     // Activates or deactivates rumble.
     void SetRumble(bool activate_rumble);
@@ -196,9 +189,9 @@ bool wxSDLJoyState::IsValid() const {
     return sdl_joystick_;
 }
 
-void wxSDLJoyState::ProcessEvent(int32_t event_type,
-                                 uint8_t control_index,
-                                 int16_t control_value) {
+void wxSDLJoyState::ProcessSDLEvent(int32_t event_type,
+                                    uint8_t control_index,
+                                    int16_t control_value) {
     int16_t previous_value = 0;
     wxJoyControl control;
     bool value_changed = false;
@@ -210,7 +203,7 @@ void wxSDLJoyState::ProcessEvent(int32_t event_type,
         if (game_controller_) {
             return;
         }
-    // Fallhrough.
+    // Fallthrough.
     case SDL_CONTROLLERBUTTONDOWN:
     case SDL_CONTROLLERBUTTONUP:
         control = wxJoyControl::Button;
@@ -239,7 +232,7 @@ void wxSDLJoyState::ProcessEvent(int32_t event_type,
         if (game_controller_) {
             return;
         }
-    // Fallhrough.
+    // Fallthrough.
     case SDL_CONTROLLERAXISMOTION:
         control = wxJoyControl::Axis;
         previous_value = axis_[control_index];
@@ -268,58 +261,6 @@ void wxSDLJoyState::ProcessEvent(int32_t event_type,
         wxQueueEvent(handler,
                      new wxJoyEvent(
                          wx_joystick_, control, control_index, control_value));
-    }
-}
-
-void wxSDLJoyState::Poll() {
-    if (game_controller_) {
-        for (uint8_t but = 0; but < SDL_CONTROLLER_BUTTON_MAX; but++) {
-            uint16_t previous_value = buttons_[but];
-            uint16_t current_value =
-                SDL_GameControllerGetButton(
-                    game_controller_,
-                    static_cast<SDL_GameControllerButton>(but));
-
-            if (previous_value != current_value)
-                ProcessEvent(SDL_CONTROLLERBUTTONUP, but, current_value);
-        }
-
-        for (uint8_t axis = 0; axis < SDL_CONTROLLER_AXIS_MAX; axis++) {
-            uint16_t previous_value = axis_[axis];
-            uint16_t current_value =
-                AxisValueToDirection(
-                    SDL_GameControllerGetAxis(
-                        game_controller_,
-                        static_cast<SDL_GameControllerAxis>(axis)));
-
-            if (previous_value != current_value)
-                ProcessEvent(SDL_CONTROLLERAXISMOTION, axis, current_value);
-        }
-    } else {
-        for (uint8_t but = 0; but < SDL_JoystickNumButtons(sdl_joystick_); but++) {
-            uint16_t previous_value = buttons_[but];
-            uint16_t current_value = SDL_JoystickGetButton(sdl_joystick_, but);
-
-            if (previous_value != current_value)
-                ProcessEvent(SDL_JOYBUTTONUP, but, current_value);
-        }
-
-        for (uint8_t axis = 0; axis < SDL_JoystickNumAxes(sdl_joystick_); axis++) {
-            uint16_t previous_value = axis_[axis];
-            uint16_t current_value =
-                AxisValueToDirection(SDL_JoystickGetButton(sdl_joystick_, axis));
-
-            if (previous_value != current_value)
-                ProcessEvent(SDL_JOYAXISMOTION, axis, current_value);
-        }
-
-        for (uint8_t hat = 0; hat < SDL_JoystickNumHats(sdl_joystick_); hat++) {
-            uint16_t previous_value = hats_[hat];
-            uint16_t current_value = SDL_JoystickGetHat(sdl_joystick_, hat);
-
-            if (previous_value != current_value)
-                ProcessEvent(SDL_JOYHATMOTION, hat, current_value);
-        }
     }
 }
 
@@ -362,7 +303,6 @@ wxJoyPoller::~wxJoyPoller() {
 
 void wxJoyPoller::Poll() {
     SDL_Event e;
-    bool got_event = false;
 
     while (SDL_PollEvent(&e)) {
         switch (e.type) {
@@ -371,10 +311,9 @@ void wxJoyPoller::Poll() {
         {
             wxSDLJoyState* joy_state = FindJoyState(e.cbutton.which);
             if (joy_state) {
-                joy_state->ProcessEvent(
+                joy_state->ProcessSDLEvent(
                     e.type, e.cbutton.button, e.cbutton.state);
             }
-            got_event = true;
             break;
         }
 
@@ -382,10 +321,9 @@ void wxJoyPoller::Poll() {
         {
             wxSDLJoyState* joy_state = FindJoyState(e.caxis.which);
             if (joy_state) {
-                joy_state->ProcessEvent(
+                joy_state->ProcessSDLEvent(
                     e.type, e.caxis.axis, AxisValueToDirection(e.caxis.value));
             }
-            got_event = true;
             break;
         }
 
@@ -401,10 +339,9 @@ void wxJoyPoller::Poll() {
         {
             wxSDLJoyState* joy_state = FindJoyState(e.jbutton.which);
             if (joy_state) {
-                joy_state->ProcessEvent(
+                joy_state->ProcessSDLEvent(
                     e.type, e.jbutton.button, e.jbutton.state);
             }
-            got_event = true;
             break;
         }
 
@@ -412,10 +349,9 @@ void wxJoyPoller::Poll() {
         {
             wxSDLJoyState* joy_state = FindJoyState(e.jaxis.which);
             if (joy_state) {
-                joy_state->ProcessEvent(
+                joy_state->ProcessSDLEvent(
                     e.type, e.jaxis.axis, AxisValueToDirection(e.jaxis.value));
             }
-            got_event = true;
             break;
         }
 
@@ -423,10 +359,9 @@ void wxJoyPoller::Poll() {
         {
             wxSDLJoyState* joy_state = FindJoyState(e.jhat.which);
             if (joy_state) {
-                joy_state->ProcessEvent(
-                    e.type, e.jhat.hat, AxisValueToDirection(e.jhat.value));
+                joy_state->ProcessSDLEvent(
+                    e.type, e.jhat.hat, e.jhat.value);
             }
-            got_event = true;
             break;
         }
 
@@ -434,14 +369,12 @@ void wxJoyPoller::Poll() {
         {
             // Always remap all controllers.
             RemapControllers();
-            got_event = true;
             break;
         }
 
         case SDL_JOYDEVICEREMOVED:
         {
             joystick_states_.erase(e.jdevice.which);
-            got_event = true;
             break;
         }
 
@@ -449,16 +382,6 @@ void wxJoyPoller::Poll() {
             // Ignore all other events.
             break;
         }
-    }
-
-    wxLongLong now = wxGetUTCTimeMillis();
-    if (got_event) {
-        last_poll_ = now;
-    } else if (now - last_poll_ > kPollTimeInterval) {
-        for (auto&& joy_state : joystick_states_) {
-            joy_state.second->Poll();
-        }
-        last_poll_ = now;
     }
 }
 
