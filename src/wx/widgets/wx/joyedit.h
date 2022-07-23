@@ -5,20 +5,10 @@
 // The value is the symbolic name of the key pressed
 // Supports manual clearing (bs), multiple keys in widget, automatic tab on key
 
+#include "wx/gamecontrol.h"
 #include "wx/keyedit.h"
 #include "wx/sdljoy.h"
-
-typedef struct wxJoyKeyBinding {
-    int key; // key code; listed first for easy static init
-    int mod; // modifier flags
-    int joy; // joystick # (starting at 1)
-    // if joy is non-0, key = control number, and mod = control type
-} wxJoyKeyBinding;
-
-// Initializer for struct wxJoyKeyBinding
-wxJoyKeyBinding newWxJoyKeyBinding(int key = 0, int mod = 0, int joy = 0);
-
-typedef std::vector<wxJoyKeyBinding> wxJoyKeyBinding_v;
+#include "wx/userinput.h"
 
 // joystick control types
 // mod for joysticks
@@ -52,13 +42,8 @@ public:
     static int DigitalButton(const wxJoyEvent& event);
     // convert mod+key to accel string, separated by -
     static wxString ToString(int mod, int key, int joy, bool isConfig = false);
-    // convert multiple keys, separated by multikey
-    static wxString ToString(wxJoyKeyBinding_v keys, wxChar sep = wxT(','), bool isConfig = false);
     // parses single key string into mod+key
     static bool FromString(const wxString& s, int& mod, int& key, int& joy);
-    // parse multi-key string into array
-    // returns empty array on parse errors
-    static wxJoyKeyBinding_v FromString(const wxString& s, wxChar sep = wxT(','));
     // parse a single key in given wxChar array up to given len
     static bool ParseString(const wxString& s, int len, int& mod, int& key, int& joy);
     // parse multi-key string into array
@@ -77,30 +62,30 @@ protected:
 // A simple copy-only validator
 class wxJoyKeyValidator : public wxValidator {
 public:
-    wxJoyKeyValidator(wxJoyKeyBinding_v* v)
+    wxJoyKeyValidator(const wxGameControl v)
         : wxValidator()
-        , val(v)
+        , val_(v)
     {
     }
     wxJoyKeyValidator(const wxJoyKeyValidator& v)
         : wxValidator()
-        , val(v.val)
+        , val_(v.val_)
     {
     }
-    wxObject* Clone() const
+    wxObject* Clone() const override
     {
-        return new wxJoyKeyValidator(val);
+        return new wxJoyKeyValidator(val_);
     }
-    bool TransferToWindow();
-    bool TransferFromWindow();
-    bool Validate(wxWindow* p)
+    bool TransferToWindow() override;
+    bool TransferFromWindow() override;
+    bool Validate(wxWindow* p) override
     {
         (void)p; // unused params
         return true;
     }
 
 protected:
-    wxJoyKeyBinding_v* val;
+    const wxGameControl val_;
 
     DECLARE_CLASS(wxJoyKeyValidator)
 };

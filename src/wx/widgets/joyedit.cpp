@@ -2,6 +2,7 @@
 
 #include <wx/tokenzr.h>
 
+#include "opts.h"
 #include "strutils.h"
 #include "wx/userinput.h"
 
@@ -12,13 +13,6 @@ IMPLEMENT_DYNAMIC_CLASS(wxJoyKeyTextCtrl, wxKeyTextCtrl)
 BEGIN_EVENT_TABLE(wxJoyKeyTextCtrl, wxKeyTextCtrl)
 EVT_SDLJOY(wxJoyKeyTextCtrl::OnJoy)
 END_EVENT_TABLE()
-
-// Initializer for struct wxJoyKeyBinding
-wxJoyKeyBinding newWxJoyKeyBinding(int key, int mod, int joy)
-{
-    struct wxJoyKeyBinding tmp = {key, mod, joy};
-    return tmp;
-}
 
 int wxJoyKeyTextCtrl::DigitalButton(const wxJoyEvent& event)
 {
@@ -164,25 +158,6 @@ wxString wxJoyKeyTextCtrl::ToString(int mod, int key, int joy, bool isConfig)
     return s;
 }
 
-wxString wxJoyKeyTextCtrl::ToString(wxJoyKeyBinding_v keys, wxChar sep, bool isConfig)
-{
-    wxString ret;
-
-    for (size_t i = 0; i < keys.size(); i++) {
-        if (i > 0)
-            ret += sep;
-
-        wxString key = ToString(keys[i].mod, keys[i].key, keys[i].joy, isConfig);
-
-        if (key.empty())
-            return wxEmptyString;
-
-        ret += key;
-    }
-
-    return ret;
-}
-
 wxString wxJoyKeyTextCtrl::FromAccelToString(wxAcceleratorEntry_v keys, wxChar sep, bool isConfig)
 {
     wxString ret;
@@ -311,22 +286,6 @@ bool wxJoyKeyTextCtrl::FromString(const wxString& s, int& mod, int& key, int& jo
     return ParseString(s, s.size(), mod, key, joy);
 }
 
-wxJoyKeyBinding_v wxJoyKeyTextCtrl::FromString(const wxString& s, wxChar sep)
-{
-    wxJoyKeyBinding_v ret, empty;
-    int mod, key, joy;
-    if (s.size() == 0)
-        return empty;
-
-    for (const auto& token : str_split_with_sep(s, sep)) {
-        if (!ParseString(token, token.size(), mod, key, joy))
-            return empty;
-        wxJoyKeyBinding jb = { key, mod, joy };
-        ret.insert(ret.begin(), jb);
-    }
-    return ret;
-}
-
 wxAcceleratorEntry_v wxJoyKeyTextCtrl::ToAccelFromString(const wxString& s, wxChar sep)
 {
     wxAcceleratorEntry_v ret, empty;
@@ -346,28 +305,22 @@ IMPLEMENT_CLASS(wxJoyKeyValidator, wxValidator)
 
 bool wxJoyKeyValidator::TransferToWindow()
 {
-    if (!val)
-        return false;
-
     wxJoyKeyTextCtrl* jk = wxDynamicCast(GetWindow(), wxJoyKeyTextCtrl);
 
     if (!jk)
         return false;
 
-    jk->SetValue(wxJoyKeyTextCtrl::ToString(*val));
+    jk->SetValue(wxUserInput::SpanToString(gopts.game_control_bindings[val_]));
     return true;
 }
 
 bool wxJoyKeyValidator::TransferFromWindow()
 {
-    if (!val)
-        return false;
-
     wxJoyKeyTextCtrl* jk = wxDynamicCast(GetWindow(), wxJoyKeyTextCtrl);
 
     if (!jk)
         return false;
 
-    *val = wxJoyKeyTextCtrl::FromString(jk->GetValue());
+    gopts.game_control_bindings[val_] = wxUserInput::FromString(jk->GetValue());
     return true;
 }

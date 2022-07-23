@@ -27,6 +27,7 @@
 
 // The built-in vba-over.ini
 #include "builtin-over.h"
+#include "wx/gamecontrol.h"
 #include "wx/userinput.h"
 
 IMPLEMENT_APP(wxvbamApp)
@@ -178,8 +179,6 @@ wxString wxvbamApp::GetConfigurationPath()
                 break;
             }
         }
-        // use default keys for input.
-        set_default_keys();
     }
 
     return data_path;
@@ -429,6 +428,10 @@ bool wxvbamApp::OnInit()
             overrides->SetPath(wxT("/"));
         }
     }
+
+    // Initialize game bindings here, after defaults bindings, vbam.ini bindings
+    // and command line overrides have been applied.
+    wxGameControlState::Instance().OnGameBindingsChanged();
 
     // create the main window
     int x = windowPositionX;
@@ -933,19 +936,12 @@ void MainFrame::SetJoystick()
         return;
 
     std::set<wxJoystick> needed_joysticks;
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < NUM_KEYS; j++) {
-            wxJoyKeyBinding_v b = gopts.joykey_bindings[i][j];
-            for (size_t k = 0; k < b.size(); k++) {
-                int jn = b[k].joy;
-                if (jn) {
-                    needed_joysticks.insert(
-                        wxJoystick::FromLegacyPlayerIndex(jn));
-                }
-            }
+    for (const auto& iter : gopts.game_control_bindings) {
+        for (const auto& input_iter : iter.second) {
+            needed_joysticks.emplace(input_iter.joystick());
         }
     }
-    joy.PollJoysticks(needed_joysticks);
+    joy.PollJoysticks(std::move(needed_joysticks));
 }
 
 void MainFrame::StopJoyPollTimer()

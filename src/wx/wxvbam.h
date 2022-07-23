@@ -805,8 +805,7 @@ void systemStopGamePlayback();
 // true if turbo mode (like pressing turbo button constantly)
 extern bool turbo;
 
-// mask of key press flags; see below
-extern int joypress[4], autofire, autohold;
+extern int autofire, autohold;
 
 // FIXME: these defines should be global to project and used instead of raw numbers
 #define KEYM_A (1 << 0)
