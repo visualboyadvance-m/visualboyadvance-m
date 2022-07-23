@@ -23,6 +23,9 @@
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
 
+#include "opts.h"
+#include "wx/gamecontrol.h"
+#include "wx/userinput.h"
 #include "../gba/CheatSearch.h"
 
 #if defined(__WXGTK__)
@@ -1667,32 +1670,29 @@ public:
         bool clear = ev.GetId() == XRCID("Clear");
 
         // For the individual clear buttons, we assume their name is
-        // "Clear" + joynames[i]
+        // "Clear" + control_name
         // ClearUp for Up; ClearR for R etc
-        for (int i = 0; i < NUM_KEYS; ++i) {
-            wxJoyKeyTextCtrl* tc = XRCCTRL_D(*p, joynames[i], wxJoyKeyTextCtrl);
-            wxString singleClearButton("Clear" + joynames[i]);
+        for (const wxGameKey& game_key : kAllGameKeys) {
+            const wxString control_name = GameKeyToString(game_key);
+            wxJoyKeyTextCtrl* tc = XRCCTRL_D(*p, control_name, wxJoyKeyTextCtrl);
+            wxString singleClearButton("Clear" + control_name);
             if (ev.GetId() == XRCID(singleClearButton.c_str())) {
                 tc->SetValue(wxEmptyString);
                 return;
             }
         }
 
-        for (int i = 0; i < NUM_KEYS; i++) {
-            wxJoyKeyTextCtrl* tc = XRCCTRL_D(*p, joynames[i], wxJoyKeyTextCtrl);
+        for (const wxGameKey& game_key : kAllGameKeys) {
+            wxJoyKeyTextCtrl* tc =
+                XRCCTRL_D(*p, GameKeyToString(game_key), wxJoyKeyTextCtrl);
 
-            if (clear)
+            if (clear) {
                 tc->SetValue(wxEmptyString);
-            else {
-                wxJoyKeyBinding_v a;
-
-                if (defkeys_keyboard[i].key)
-                    a.push_back(defkeys_keyboard[i]);
-
-                for (auto bind : defkeys_joystick[i])
-                    a.push_back(bind);
-
-                tc->SetValue(wxJoyKeyTextCtrl::ToString(a));
+            } else {
+                tc->SetValue(
+                    wxUserInput::SpanToString(
+                        kDefaultBindings.find(
+                            wxGameControl(0, game_key))->second));
             }
         }
     }
@@ -3835,9 +3835,10 @@ bool MainFrame::BindControls()
             cb->SetValidator(wxBoolIntValidator(&gopts.default_stick, i + 1));
             wxWindow *prev = NULL, *prevp = NULL;
 
-            for (int j = 0; j < NUM_KEYS; j++) {
-                wxJoyKeyTextCtrl* tc = XRCCTRL_D(*w, joynames[j], wxJoyKeyTextCtrl);
-                CheckThrowXRCError(tc, joynames[j]);
+            for (const wxGameKey& game_key : kAllGameKeys) {
+                const wxString control_name = GameKeyToString(game_key);
+                wxJoyKeyTextCtrl* tc = XRCCTRL_D(*w, control_name, wxJoyKeyTextCtrl);
+                CheckThrowXRCError(tc, control_name);
                 wxWindow* p = tc->GetParent();
 
                 if (p == prevp)
@@ -3845,7 +3846,7 @@ bool MainFrame::BindControls()
 
                 prev = tc;
                 prevp = p;
-                tc->SetValidator(wxJoyKeyValidator(&gopts.joykey_bindings[i][j]));
+                tc->SetValidator(wxJoyKeyValidator(wxGameControl(i, game_key)));
             }
 
             JoyPadConfigHandler[i].p = w;
@@ -3855,8 +3856,9 @@ bool MainFrame::BindControls()
             w->Connect(XRCID("Clear"), wxEVT_COMMAND_BUTTON_CLICKED,
                 wxCommandEventHandler(JoyPadConfig_t::JoypadConfigButtons),
                 NULL, &JoyPadConfigHandler[i]);
-            for (int j = 0; j < NUM_KEYS; ++j) {
-                w->Connect(XRCID(wxString("Clear" + joynames[j]).c_str()),
+            for (const wxGameKey& game_key : kAllGameKeys) {
+                const wxString control_name = GameKeyToString(game_key);
+                w->Connect(XRCID(wxString("Clear" + control_name).c_str()),
                     wxEVT_COMMAND_BUTTON_CLICKED,
                     wxCommandEventHandler(JoyPadConfig_t::JoypadConfigButtons),
                     NULL, &JoyPadConfigHandler[i]);

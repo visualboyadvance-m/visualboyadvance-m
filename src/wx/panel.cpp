@@ -24,6 +24,7 @@
 #include "drawing.h"
 #include "filters.h"
 #include "wx/joyedit.h"
+#include "wx/gamecontrol.h"
 #include "wx/userinput.h"
 #include "wxvbam.h"
 #include "wxutil.h"
@@ -33,9 +34,6 @@
 #ifdef __WXMSW__
 #include <windows.h>
 #endif
-
-// release all buttons currently pressed
-static void clear_input_press();
 
 int emulating;
 
@@ -957,7 +955,7 @@ GameArea::~GameArea()
 
 void GameArea::OnKillFocus(wxFocusEvent& ev)
 {
-    clear_input_press();
+    wxGameControlState::Instance().Reset();
     ev.Skip();
 }
 
@@ -977,7 +975,7 @@ void GameArea::Pause()
     // when the game is paused like this, we should not allow any
     // input to remain pressed, because they could be released
     // outside of the game zone and we would not know about it.
-    clear_input_press();
+    wxGameControlState::Instance().Reset();
 
     if (loaded != IMAGE_UNKNOWN)
         soundPause();
@@ -1208,99 +1206,12 @@ void GameArea::OnIdle(wxIdleEvent& event)
     }
 }
 
-// Note: keys will get stuck if they are released while window has no focus
-// can't really do anything about it, except scan for pressed keys on
-// activate events.  Maybe later.
-
-static uint32_t bmask[NUM_KEYS] = {
-    KEYM_UP, KEYM_DOWN, KEYM_LEFT, KEYM_RIGHT, KEYM_A, KEYM_B, KEYM_L, KEYM_R,
-    KEYM_SELECT, KEYM_START, KEYM_MOTION_UP, KEYM_MOTION_DOWN, KEYM_MOTION_LEFT,
-    KEYM_MOTION_RIGHT, KEYM_MOTION_IN, KEYM_MOTION_OUT, KEYM_AUTO_A, KEYM_AUTO_B, KEYM_SPEED, KEYM_CAPTURE,
-    KEYM_GS
-};
-
-static std::set<wxUserInput> keys_pressed;
-
-static void clear_input_press()
-{
-    int i;
-    for (i = 0; i < 4; ++i)
-    {
-        joypress[i] = 0;
-    }
-    keys_pressed.clear();
-}
-
-struct game_key {
-    int player;
-    int key_num;
-    int bind_num;
-    wxJoyKeyBinding_v& b;
-};
-
-// Populates |vec| with the game keys currently pressed.
-static void game_keys_pressed(int key, int mod, int joy, std::vector<game_key>* vec)
-{
-    for (int player = 0; player < 4; player++)
-        for (int key_num = 0; key_num < NUM_KEYS; key_num++) {
-            wxJoyKeyBinding_v& b = gopts.joykey_bindings[player][key_num];
-
-            for (size_t bind_num = 0; bind_num < b.size(); bind_num++)
-                if (b[bind_num].key == key && b[bind_num].mod == mod && b[bind_num].joy == joy)
-                    vec->push_back({player, key_num, (int)bind_num, b});
-        }
-}
-
 static bool process_user_input(bool down, const wxUserInput& user_input)
 {
-    int key = user_input.key();
-    int mod = user_input.mod();
-    int joy = user_input.joy();
-
-    std::vector<game_key> game_keys;
-    game_keys_pressed(key, mod, joy, &game_keys);
-    const bool is_game_key = !game_keys.empty();
-
-    // check if key is already pressed
-    auto iter = keys_pressed.find(user_input);
-    if (iter != keys_pressed.end()) {
-        // double press is noop
-        if (down)
-            return is_game_key;
-
-        // if released, forget it
-        iter = keys_pressed.erase(iter);
-    } else {
-        // double release is noop
-        if (!down)
-            return is_game_key;
-
-        // otherwise remember it
-        keys_pressed.emplace(user_input);
-    }
-
-    for (auto&& game_key : game_keys) {
-        if (down) {
-            // press button
-            joypress[game_key.player] |= bmask[game_key.key_num];
-        }
-        else {
-            // only release if no others pressed
-            size_t bind2;
-            auto b = game_key.b;
-
-            for (bind2 = 0; bind2 < game_key.b.size(); bind2++) {
-                if ((size_t)game_key.bind_num == bind2 || (b[bind2].key == key && b[bind2].mod == mod && b[bind2].joy == joy))
-                    continue;
-            }
-            if (bind2 == b.size()) {
-                // release button
-                joypress[game_key.player] &= ~bmask[game_key.key_num];
-            }
-        }
-    }
-
-    return is_game_key;
+    if (down)
+        return wxGameControlState::Instance().OnInputPressed(user_input);
+    else
+        return wxGameControlState::Instance().OnInputReleased(user_input);
 }
 
 static void draw_black_background(wxWindow* win) {
@@ -1356,7 +1267,7 @@ static void process_keyboard_event(const wxKeyEvent& ev, bool down)
             break;
     }
 
-    if (process_user_input(down, wxUserInput::FromLegacyJoyKeyBinding({key, mod, 0}))) {
+    if (process_user_input(down, wxUserInput::FromLegacyKeyModJoy(key, mod, 0))) {
         wxWakeUpIdle();
     };
 }
@@ -1403,17 +1314,17 @@ void GameArea::OnSDLJoy(wxJoyEvent& ev)
     // mutually exclusive key types unpress their opposite
     // TODO: Move creation of these "ghost" events to wxJoyPoller.
     if (mod == WXJB_AXIS_PLUS) {
-        process_user_input(false, wxUserInput::FromLegacyJoyKeyBinding({key, WXJB_AXIS_MINUS, joy}));
+        process_user_input(false, wxUserInput::FromLegacyKeyModJoy(key, WXJB_AXIS_MINUS, joy));
         process_user_input(ev.control_value() != 0, wxUserInput::FromJoyEvent(ev));
     } else if (mod == WXJB_AXIS_MINUS) {
-        process_user_input(false, wxUserInput::FromLegacyJoyKeyBinding({key, WXJB_AXIS_PLUS, joy}));
+        process_user_input(false, wxUserInput::FromLegacyKeyModJoy(key, WXJB_AXIS_PLUS, joy));
         process_user_input(ev.control_value() != 0, wxUserInput::FromJoyEvent(ev));
     } else if (mod >= WXJB_HAT_FIRST && mod <= WXJB_HAT_LAST) {
         int value = ev.control_value();
-        process_user_input(value & SDL_HAT_UP, wxUserInput::FromLegacyJoyKeyBinding({key, WXJB_HAT_N, joy}));
-        process_user_input(value & SDL_HAT_DOWN, wxUserInput::FromLegacyJoyKeyBinding({key, WXJB_HAT_S, joy}));
-        process_user_input(value & SDL_HAT_RIGHT, wxUserInput::FromLegacyJoyKeyBinding({key, WXJB_HAT_E, joy}));
-        process_user_input(value & SDL_HAT_LEFT, wxUserInput::FromLegacyJoyKeyBinding({key, WXJB_HAT_W, joy}));
+        process_user_input(value & SDL_HAT_UP, wxUserInput::FromLegacyKeyModJoy(key, WXJB_HAT_N, joy));
+        process_user_input(value & SDL_HAT_DOWN, wxUserInput::FromLegacyKeyModJoy(key, WXJB_HAT_S, joy));
+        process_user_input(value & SDL_HAT_RIGHT, wxUserInput::FromLegacyKeyModJoy(key, WXJB_HAT_E, joy));
+        process_user_input(value & SDL_HAT_LEFT, wxUserInput::FromLegacyKeyModJoy(key, WXJB_HAT_W, joy));
     } else {
         process_user_input(ev.control_value() != 0, wxUserInput::FromJoyEvent(ev));
     }

@@ -1,4 +1,5 @@
 #include "../common/SoundSDL.h"
+#include "wx/gamecontrol.h"
 #include "wxvbam.h"
 #include "SDL.h"
 #include <wx/ffile.h>
@@ -28,7 +29,7 @@ uint16_t systemGbPalette[24] = {
 int RGB_LOW_BITS_MASK;
 
 // these are local, though.
-int joypress[4], autofire, autohold;
+int autofire, autohold;
 static int sensorx[4], sensory[4], sensorz[4];
 bool pause_next;
 bool turbo;
@@ -251,7 +252,7 @@ uint32_t systemReadJoypad(int joy)
     if (joy < 0 || joy > 3)
         joy = gopts.default_stick - 1;
 
-    uint32_t ret = joypress[joy];
+    uint32_t ret = wxGameControlState::Instance().GetJoypad(joy);
 
     if (turbo)
         ret |= KEYM_SPEED;
@@ -533,13 +534,14 @@ void systemUpdateSolarSensor()
 void systemUpdateMotionSensor()
 {
     for (int i = 0; i < 4; i++) {
+        const uint32_t joy_value = wxGameControlState::Instance().GetJoypad(i);
         if (!sensorx[i])
             sensorx[i] = 2047;
 
         if (!sensory[i])
             sensory[i] = 2047;
 
-        if (joypress[i] & KEYM_MOTION_LEFT) {
+        if (joy_value & KEYM_MOTION_LEFT) {
             sunBars--;
 
             if (sunBars < 1)
@@ -552,7 +554,7 @@ void systemUpdateMotionSensor()
 
             if (sensorx[i] < 2047)
                 sensorx[i] = 2057;
-        } else if (joypress[i] & KEYM_MOTION_RIGHT) {
+        } else if (joy_value & KEYM_MOTION_RIGHT) {
             sunBars++;
 
             if (sunBars > 100)
@@ -577,7 +579,7 @@ void systemUpdateMotionSensor()
                 sensorx[i] = 2047;
         }
 
-        if (joypress[i] & KEYM_MOTION_UP) {
+        if (joy_value & KEYM_MOTION_UP) {
             sensory[i] += 3;
 
             if (sensory[i] > 2197)
@@ -585,7 +587,7 @@ void systemUpdateMotionSensor()
 
             if (sensory[i] < 2047)
                 sensory[i] = 2057;
-        } else if (joypress[i] & KEYM_MOTION_DOWN) {
+        } else if (joy_value & KEYM_MOTION_DOWN) {
             sensory[i] -= 3;
 
             if (sensory[i] < 1897)
@@ -610,7 +612,7 @@ void systemUpdateMotionSensor()
         const int highZ = 1800;
         const int accelZ = 3;
 
-        if (joypress[i] & KEYM_MOTION_IN) {
+        if (joy_value & KEYM_MOTION_IN) {
             sensorz[i] += accelZ;
 
             if (sensorz[i] > highZ)
@@ -618,7 +620,7 @@ void systemUpdateMotionSensor()
 
             if (sensorz[i] < centerZ)
                 sensorz[i] = centerZ + (accelZ * 300);
-        } else if (joypress[i] & KEYM_MOTION_OUT) {
+        } else if (joy_value & KEYM_MOTION_OUT) {
             sensorz[i] -= accelZ;
 
             if (sensorz[i] < lowZ)

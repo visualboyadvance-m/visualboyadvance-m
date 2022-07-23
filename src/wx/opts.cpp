@@ -1,7 +1,11 @@
-#include "wxvbam.h"
 #include <vector>
 #include <algorithm>
+#include <wx/log.h>
 #include <wx/display.h>
+
+#include "wx/gamecontrol.h"
+#include "wx/userinput.h"
+#include "wxvbam.h"
 #include "strutils.h"
 
 /*
@@ -13,7 +17,7 @@
       -p/--profile=hz
 */
 
-#define WJKB newWxJoyKeyBinding
+#define WJKB wxUserInput::FromLegacyKeyModJoy
 
 /* not sure how well other compilers support field-init syntax */
 #define STROPT(c, n, d, v) \
@@ -131,40 +135,138 @@ const wxAcceleratorEntryUnicode default_accels[] = {
 };
 const int num_def_accels = sizeof(default_accels) / sizeof(default_accels[0]);
 
-// Note: this must match GUI widget names or GUI won't work
-// This table's order determines tab order as well
-const wxString joynames[NUM_KEYS] = {
-    wxT("Up"), wxT("Down"), wxT("Left"), wxT("Right"),
-    wxT("A"), wxT("B"), wxT("L"), wxT("R"),
-    wxT("Select"), wxT("Start"),
-    wxT("MotionUp"), wxT("MotionDown"), wxT("MotionLeft"), wxT("MotionRight"),
-    wxT("MotionIn"), wxT("MotionOut"), wxT("AutoA"), wxT("AutoB"),
-    wxT("Speed"), wxT("Capture"), wxT("GS")
-};
+const std::map<wxGameControl, std::set<wxUserInput>> kDefaultBindings = {
+    { wxGameControl(0, wxGameKey::Up), {
+        WJKB(wxT('W')),
+        WJKB(11, WXJB_BUTTON, 1),
+        WJKB(1, WXJB_AXIS_MINUS, 1),
+        WJKB(3, WXJB_AXIS_MINUS, 1),
+    }},
+    { wxGameControl(0, wxGameKey::Down), {
+        WJKB(wxT('S')),
+        WJKB(12, WXJB_BUTTON, 1),
+        WJKB(1, WXJB_AXIS_PLUS, 1),
+        WJKB(3, WXJB_AXIS_PLUS, 1),
+    }},
+    { wxGameControl(0, wxGameKey::Left), {
+        WJKB(wxT('A')),
+        WJKB(13, WXJB_BUTTON, 1),
+        WJKB(0, WXJB_AXIS_MINUS, 1),
+        WJKB(2, WXJB_AXIS_MINUS, 1),
+    }},
+    { wxGameControl(0, wxGameKey::Right), {
+        WJKB(wxT('D')),
+        WJKB(14, WXJB_BUTTON, 1),
+        WJKB(0, WXJB_AXIS_PLUS, 1),
+        WJKB(2, WXJB_AXIS_PLUS, 1),
+    }},
+    { wxGameControl(0, wxGameKey::A), {
+        WJKB(wxT('L')),
+        WJKB(0, WXJB_BUTTON, 1),
+    }},
+    { wxGameControl(0, wxGameKey::B), {
+        WJKB(wxT('K')),
+        WJKB(1, WXJB_BUTTON, 1),
+    }},
+    { wxGameControl(0, wxGameKey::L), {
+        WJKB(wxT('I')),
+        WJKB(2, WXJB_BUTTON, 1),
+        WJKB(9, WXJB_BUTTON, 1),
+        WJKB(4, WXJB_AXIS_PLUS, 1),
+    }},
+    { wxGameControl(0, wxGameKey::R), {
+        WJKB(wxT('O')),
+        WJKB(3, WXJB_BUTTON, 1),
+        WJKB(10, WXJB_BUTTON, 1),
+        WJKB(5, WXJB_AXIS_PLUS, 1),
+    }},
+    { wxGameControl(0, wxGameKey::Select), {
+        WJKB(WXK_BACK),
+        WJKB(4, WXJB_BUTTON, 1),
+    }},
+    { wxGameControl(0, wxGameKey::Start), {
+        WJKB(WXK_RETURN),
+        WJKB(6, WXJB_BUTTON, 1),
+    }},
+    { wxGameControl(0, wxGameKey::MotionUp), {}},
+    { wxGameControl(0, wxGameKey::MotionDown), {}},
+    { wxGameControl(0, wxGameKey::MotionLeft), {}},
+    { wxGameControl(0, wxGameKey::MotionRight), {}},
+    { wxGameControl(0, wxGameKey::MotionIn), {}},
+    { wxGameControl(0, wxGameKey::MotionOut), {}},
+    { wxGameControl(0, wxGameKey::AutoA), {}},
+    { wxGameControl(0, wxGameKey::AutoB), {}},
+    { wxGameControl(0, wxGameKey::Speed), {
+            WJKB(WXK_SPACE),
+    }},
+    { wxGameControl(0, wxGameKey::Capture), {}},
+    { wxGameControl(0, wxGameKey::Gameshark), {}},
 
-wxJoyKeyBinding defkeys_keyboard[NUM_KEYS] = {
-    WJKB(wxT('W')), WJKB(wxT('S')), WJKB(wxT('A')), WJKB(wxT('D')),
-    WJKB(wxT('L')), WJKB(wxT('K')), WJKB(wxT('I')), WJKB(wxT('O')),
-    WJKB(WXK_BACK), WJKB(WXK_RETURN),
-    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
-    WJKB(0), WJKB(0), WJKB(0), WJKB(0),
-    WJKB(WXK_SPACE), WJKB(0), WJKB(0)
-};
+    { wxGameControl(1, wxGameKey::Up), {}},
+    { wxGameControl(1, wxGameKey::Down), {}},
+    { wxGameControl(1, wxGameKey::Left), {}},
+    { wxGameControl(1, wxGameKey::Right), {}},
+    { wxGameControl(1, wxGameKey::A), {}},
+    { wxGameControl(1, wxGameKey::B), {}},
+    { wxGameControl(1, wxGameKey::L), {}},
+    { wxGameControl(1, wxGameKey::R), {}},
+    { wxGameControl(1, wxGameKey::Select), {}},
+    { wxGameControl(1, wxGameKey::Start), {}},
+    { wxGameControl(1, wxGameKey::MotionUp), {}},
+    { wxGameControl(1, wxGameKey::MotionDown), {}},
+    { wxGameControl(1, wxGameKey::MotionLeft), {}},
+    { wxGameControl(1, wxGameKey::MotionRight), {}},
+    { wxGameControl(1, wxGameKey::MotionIn), {}},
+    { wxGameControl(1, wxGameKey::MotionOut), {}},
+    { wxGameControl(1, wxGameKey::AutoA), {}},
+    { wxGameControl(1, wxGameKey::AutoB), {}},
+    { wxGameControl(1, wxGameKey::Speed), {}},
+    { wxGameControl(1, wxGameKey::Capture), {}},
+    { wxGameControl(1, wxGameKey::Gameshark), {}},
 
-std::vector<std::vector<wxJoyKeyBinding>> defkeys_joystick = {
-    { WJKB(11, WXJB_BUTTON, 1), WJKB(1, WXJB_AXIS_MINUS, 1), WJKB(3, WXJB_AXIS_MINUS, 1) },
-    { WJKB(12, WXJB_BUTTON, 1), WJKB(1, WXJB_AXIS_PLUS,  1), WJKB(3, WXJB_AXIS_PLUS,  1) },
-    { WJKB(13, WXJB_BUTTON, 1), WJKB(0, WXJB_AXIS_MINUS, 1), WJKB(2, WXJB_AXIS_MINUS, 1) },
-    { WJKB(14, WXJB_BUTTON, 1), WJKB(0, WXJB_AXIS_PLUS,  1), WJKB(2, WXJB_AXIS_PLUS,  1) },
-    { WJKB(0, WXJB_BUTTON, 1) },
-    { WJKB(1, WXJB_BUTTON, 1) },
-    { WJKB(2, WXJB_BUTTON, 1), WJKB( 9, WXJB_BUTTON, 1), WJKB(4, WXJB_AXIS_PLUS,  1) },
-    { WJKB(3, WXJB_BUTTON, 1), WJKB(10, WXJB_BUTTON, 1), WJKB(5, WXJB_AXIS_PLUS,  1) },
-    { WJKB(4, WXJB_BUTTON, 1) },
-    { WJKB(6, WXJB_BUTTON, 1) },
-    {}, {}, {}, {},
-    {}, {}, {}, {},
-    {}, {}, {}
+    { wxGameControl(2, wxGameKey::Up), {}},
+    { wxGameControl(2, wxGameKey::Down), {}},
+    { wxGameControl(2, wxGameKey::Left), {}},
+    { wxGameControl(2, wxGameKey::Right), {}},
+    { wxGameControl(2, wxGameKey::A), {}},
+    { wxGameControl(2, wxGameKey::B), {}},
+    { wxGameControl(2, wxGameKey::L), {}},
+    { wxGameControl(2, wxGameKey::R), {}},
+    { wxGameControl(2, wxGameKey::Select), {}},
+    { wxGameControl(2, wxGameKey::Start), {}},
+    { wxGameControl(2, wxGameKey::MotionUp), {}},
+    { wxGameControl(2, wxGameKey::MotionDown), {}},
+    { wxGameControl(2, wxGameKey::MotionLeft), {}},
+    { wxGameControl(2, wxGameKey::MotionRight), {}},
+    { wxGameControl(2, wxGameKey::MotionIn), {}},
+    { wxGameControl(2, wxGameKey::MotionOut), {}},
+    { wxGameControl(2, wxGameKey::AutoA), {}},
+    { wxGameControl(2, wxGameKey::AutoB), {}},
+    { wxGameControl(2, wxGameKey::Speed), {}},
+    { wxGameControl(2, wxGameKey::Capture), {}},
+    { wxGameControl(2, wxGameKey::Gameshark), {}},
+
+    { wxGameControl(3, wxGameKey::Up), {}},
+    { wxGameControl(3, wxGameKey::Down), {}},
+    { wxGameControl(3, wxGameKey::Left), {}},
+    { wxGameControl(3, wxGameKey::Right), {}},
+    { wxGameControl(3, wxGameKey::A), {}},
+    { wxGameControl(3, wxGameKey::B), {}},
+    { wxGameControl(3, wxGameKey::L), {}},
+    { wxGameControl(3, wxGameKey::R), {}},
+    { wxGameControl(3, wxGameKey::Select), {}},
+    { wxGameControl(3, wxGameKey::Start), {}},
+    { wxGameControl(3, wxGameKey::MotionUp), {}},
+    { wxGameControl(3, wxGameKey::MotionDown), {}},
+    { wxGameControl(3, wxGameKey::MotionLeft), {}},
+    { wxGameControl(3, wxGameKey::MotionRight), {}},
+    { wxGameControl(3, wxGameKey::MotionIn), {}},
+    { wxGameControl(3, wxGameKey::MotionOut), {}},
+    { wxGameControl(3, wxGameKey::AutoA), {}},
+    { wxGameControl(3, wxGameKey::AutoB), {}},
+    { wxGameControl(3, wxGameKey::Speed), {}},
+    { wxGameControl(3, wxGameKey::Capture), {}},
+    { wxGameControl(3, wxGameKey::Gameshark), {}},
 };
 
 wxAcceleratorEntry_v sys_accels;
@@ -385,19 +487,6 @@ bool opt_lt(const opt_desc& opt1, const opt_desc& opt2)
     return wxStrcmp(opt1.opt, opt2.opt) < 0;
 }
 
-// set default input keys
-void set_default_keys()
-{
-    for (int i = 0; i < NUM_KEYS; i++) {
-        gopts.joykey_bindings[0][i].clear();
-
-        if (defkeys_keyboard[i].key)
-            gopts.joykey_bindings[0][i].push_back(defkeys_keyboard[i]);
-        for (auto bind : defkeys_joystick[i])
-            gopts.joykey_bindings[0][i].push_back(bind);
-    }
-}
-
 // FIXME: simulate MakeInstanceFilename(vbam.ini) using subkeys (Slave%d/*)
 void load_opts()
 {
@@ -473,13 +562,7 @@ void load_opts()
 
                 for (cont = cfg->GetFirstEntry(e, key_idx); cont;
                      cont = cfg->GetNextEntry(e, key_idx)) {
-                    int i;
-
-                    for (i = 0; i < NUM_KEYS; i++)
-                        if (e == joynames[i])
-                            break;
-
-                    if (i == NUM_KEYS) {
+                    if (!StringToGameKey(e)) {
                         s.append(e);
                         //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
                         item_del.push_back(s);
@@ -644,23 +727,20 @@ void load_opts()
         }
     }
 
+    // Initialize game control bindings to populate the configuration map.
+    gopts.game_control_bindings.insert(kDefaultBindings.begin(), kDefaultBindings.end());
+
     // joypad is special
-    set_default_keys();
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < NUM_KEYS; j++) {
-            wxString optname;
-            optname.Printf(wxT("Joypad/%d/%s"), i + 1, joynames[j].c_str());
-            bool gotit = cfg->Read(optname, &s);
-
-            if (gotit) {
-                gopts.joykey_bindings[i][j] = wxJoyKeyTextCtrl::FromString(s);
-
-                if (s.size() && !gopts.joykey_bindings[i][j].size())
-                    wxLogWarning(_("Invalid key binding %s for %s"), s.c_str(), optname.c_str());
-            } else {
-                s = wxJoyKeyTextCtrl::ToString(gopts.joykey_bindings[i][j]);
-                cfg->Write(optname, s);
+    for (auto& iter : gopts.game_control_bindings) {
+        const wxString optname = iter.first.ToString();
+        if (cfg->Read(optname, &s)) {
+            iter.second = wxUserInput::FromString(s);
+            if (!s.empty() && iter.second.empty()) {
+                wxLogWarning(_("Invalid key binding %s for %s"), s.c_str(), optname.c_str());
             }
+        } else {
+            s = wxUserInput::SpanToString(iter.second);
+            cfg->Write(optname, s);
         }
     }
 
@@ -758,20 +838,22 @@ void update_opts()
         }
     }
 
-    // for joypad, use ToString comparisons.  It may trigger changes
-    // even when there are none (e.g. multi-binding ordering changes)
-    // not worth worrying about
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < NUM_KEYS; j++) {
-            wxString s, o;
-            wxString optname;
-            optname.Printf(wxT("Joypad/%d/%s"), i + 1, joynames[j].c_str());
-            s = wxJoyKeyTextCtrl::ToString(gopts.joykey_bindings[i][j], wxT(','), true);
-            cfg->Read(optname, &o);
-
-            if (o != s)
-                cfg->Write(optname, s);
+    // For joypad, compare the wxUserInput sets. Since wxUserInput guarantees a
+    // certain ordering, it is possible that the user control in the panel shows
+    // a different ordering than the one that will be eventually saved, but this
+    // is nothing to worry about.
+    bool game_bindings_changed = false;
+    for (auto &iter : gopts.game_control_bindings) {
+        wxString option_name = iter.first.ToString();
+        std::set<wxUserInput> saved_config =
+            wxUserInput::FromString(cfg->Read(option_name, ""));
+        if (saved_config != iter.second) {
+            game_bindings_changed = true;
+            cfg->Write(option_name, wxUserInput::SpanToString(iter.second));
         }
+    }
+    if (game_bindings_changed) {
+        wxGameControlState::Instance().OnGameBindingsChanged();
     }
 
     // for keyboard, first remove any commands that aren't bound at all
@@ -968,33 +1050,20 @@ bool opt_set(const wxString& name, const wxString& val)
             }
 
             return true;
-        } else if (!wxStrncmp(name, wxT("Joypad"), wxStrlen(wxT("Joypad")))) {
-            if (parts[1] < wxT('1') || parts[1] > wxT('4') || parts.size() < 3)
-                return false;
+        }
 
-            int jno = parts[1][0] - wxT('1');
-            int kno;
-
-            for (kno = 0; kno < NUM_KEYS; kno++)
-                if (!wxStrcmp(joynames[kno], parts[2]))
-                    break;
-
-            if (kno == NUM_KEYS)
-                return false;
-
-            if (val.empty())
-                gopts.joykey_bindings[jno][kno].clear();
-            else {
-                auto b = wxJoyKeyTextCtrl::FromString(val);
-
-                if (!b.size())
-                    wxLogWarning(_("Invalid key binding %s for %s"), val.c_str(), name.c_str());
-                else
-                    gopts.joykey_bindings[jno][kno] = b;
+        const std::optional<wxGameControl> game_control =
+            wxGameControl::FromString(name);
+        if (game_control) {
+            if (val.empty()) {
+                gopts.game_control_bindings[game_control.value()].clear();
+            } else {
+                gopts.game_control_bindings[game_control.value()] =
+                    wxUserInput::FromString(val);
             }
-
             return true;
-        } else
-            return false;
+        }
+
+        return false;
     }
 }

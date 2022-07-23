@@ -1,13 +1,20 @@
 #ifndef WX_OPTS_H
 #define WX_OPTS_H
 
-#include <vector>
+#include <map>
 
-#define NUM_KEYS 21
-extern const wxString joynames[NUM_KEYS];
-extern wxJoyKeyBinding defkeys_keyboard[NUM_KEYS];  // keyboard defaults
+#include <wx/string.h>
+#include <wx/vidmode.h>
 
-extern std::vector<std::vector<wxJoyKeyBinding>> defkeys_joystick;  // joystick defaults
+#include "wx/gamecontrol.h"
+#include "wx/keyedit.h"
+#include "wx/userinput.h"
+
+// Forward declaration.
+class wxFileHistory;
+
+// Default joystick bindings.
+extern const std::map<wxGameControl, std::set<wxUserInput>> kDefaultBindings;
 
 extern struct opts_t {
     opts_t();
@@ -57,7 +64,7 @@ extern struct opts_t {
     int statusbar;
 
     /// Joypad
-    wxJoyKeyBinding_v joykey_bindings[4][NUM_KEYS];
+    std::map<wxGameControl, std::set<wxUserInput>> game_control_bindings;
     int autofire_rate;
     int default_stick;
 
@@ -122,8 +129,6 @@ extern const int num_opts;
 extern const wxAcceleratorEntryUnicode default_accels[];
 extern const int num_def_accels;
 
-// call to setup default keys.
-void set_default_keys();
 // call to load config (once)
 // will write defaults for options not present and delete bad opts
 // will also initialize opts[] array translations

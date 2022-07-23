@@ -1,9 +1,9 @@
 #ifndef _WX_USER_INPUT_H_
 #define _WX_USER_INPUT_H_
 
-#include <optional>
+#include <set>
+#include <wx/event.h>
 
-#include "wx/joyedit.h"
 #include "wx/sdljoy.h"
 
 // Abstraction for a user input, which can come from a keyboard or a joystick.
@@ -12,7 +12,7 @@
 //
 // TODO: Right now, this class is implemented as a thin wrapper around the key,
 // mod and joy user input representation used in many places in the code base.
-// This is to ease a transition away from the wxJoyKeyBinding type, which
+// This is to ease a transition away from the key, mod, joy triplet, which
 // wxUserInput will eventually replace.
 class wxUserInput {
 public:
@@ -33,21 +33,25 @@ public:
     // Constructor from a wxJoyEvent.
     static wxUserInput FromJoyEvent(const wxJoyEvent& event);
 
-    // Constructor from a configuration string. Returns wxUserInput::Invalid()
-    // on parsing failure.
-    static wxUserInput FromString(const wxString& string);
+    // Constructor from a configuration string. Returns empty set on failure.
+    static std::set<wxUserInput> FromString(const wxString& string);
 
-    // TODO: Remove this once all uses of wxJoyKeyBinding have been removed.
-    static wxUserInput FromLegacyJoyKeyBinding(const wxJoyKeyBinding& binding);
+    // TODO: Remove this once all uses have been removed.
+    static wxUserInput FromLegacyKeyModJoy(int key = 0, int mod = 0, int joy = 0);
 
-    // Converts to a configuration string. Computed on first call, and cached
-    // for further calls.
-    wxString ToString();
+    // Converts a set of wxUserInput into a configuration string. This
+    // recomputes the configuration string every time and should not be used
+    // for comparison purposes.
+    // TODO: Replace std::set with std::span when the code base uses C++20.
+    static wxString SpanToString(
+        const std::set<wxUserInput>& user_inputs, bool is_config = false);
 
-    // TODO: Remove these accessors once all callers have been removed.
-    int mod() const { return mod_; }
-    int key() const { return key_; }
-    int joy() const { return joy_; }
+    // Converts to a configuration string.
+    wxString ToString(bool is_config = false) const;
+
+    wxJoystick joystick() const { return joystick_; }
+    bool is_valid() const { return device_ != Device::Invalid; }
+    operator bool() const { return is_valid(); }
 
     bool operator==(const wxUserInput& other) const;
     bool operator!=(const wxUserInput& other) const;
@@ -59,12 +63,11 @@ public:
 private:
     wxUserInput(Device device, int mod, uint8_t key, unsigned joy);
 
-    Device device_;
-    int mod_;
-    uint8_t key_;
-    unsigned joy_;
-
-    wxString config_string_;
+    const Device device_;
+    const wxJoystick joystick_;
+    const int mod_;
+    const uint8_t key_;
+    const unsigned joy_;
 };
 
 
