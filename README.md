@@ -19,6 +19,11 @@
 
 [![Join the chat at https://gitter.im/visualboyadvance-m/Lobby](https://badges.gitter.im/visualboyadvance-m/Lobby.svg)](https://gitter.im/visualboyadvance-m/Lobby)
 
+Our bridged Discord server is [https://discord.gg/Man6Q4Bu](here).
+
+We are also on *`#vba-m`* on [Libera IRC](https://libera.chat/) which has a [Web
+Chat](https://web.libera.chat/).
+
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/visualboyadvance-m)
 
 # Visual Boy Advance - M
