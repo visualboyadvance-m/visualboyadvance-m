@@ -2076,6 +2076,9 @@ void BasicDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
 #include <OpenGL/OpenGL.h>
 #endif
 #ifdef __WXGTK__ // should actually check for X11, but GTK implies X11
+#ifndef Status
+#define Status int
+#endif
 #include <GL/glx.h>
 #endif
 #ifdef __WXMSW__
