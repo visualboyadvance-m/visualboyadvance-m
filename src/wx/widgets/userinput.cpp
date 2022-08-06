@@ -22,7 +22,7 @@ wxUserInput wxUserInput::FromKeyEvent(const wxKeyEvent& event) {
 // static
 wxUserInput wxUserInput::FromJoyEvent(const wxJoyEvent& event) {
     return wxUserInput(Device::Joystick,
-                       wxJoyKeyTextCtrl::DigitalButton(event),
+                       event.control(),
                        event.control_index(),
                        event.joystick().player_index());
 }

@@ -8,34 +8,94 @@
 
 namespace {
 
-const std::string SDLEventTypeToDebugString(int32_t event_type) {
-    switch (event_type) {
-    case SDL_CONTROLLERBUTTONDOWN:
-    case SDL_CONTROLLERBUTTONUP:
-        return "SDL_CONTROLLERBUTTON";
-    case SDL_CONTROLLERAXISMOTION:
-        return "SDL_CONTROLLERAXISMOTION";
-    case SDL_JOYBUTTONDOWN:
-    case SDL_JOYBUTTONUP:
-        return "SDL_JOYBUTTON";
-    case SDL_JOYAXISMOTION:
-        return "SDL_JOYAXISMOTION";
-    case SDL_JOYHATMOTION:
-        return "SDL_JOYHATMOTION";
+enum class wxAxisStatus {
+    Neutral = 0,
+    Plus,
+    Minus
+};
+
+enum class wxHatStatus {
+    Neutral = 0,
+    North,
+    South,
+    West,
+    East,
+    NorthWest,
+    NorthEast,
+    SouthWest,
+    SouthEast
+};
+
+wxAxisStatus AxisValueToStatus(const int16_t& x) {
+    if (x > 0x1fff)
+        return wxAxisStatus::Plus;
+    if (x < -0x1fff)
+        return wxAxisStatus::Minus;
+    return wxAxisStatus::Neutral;
+}
+
+wxHatStatus HatValueToStatus(const int16_t& x) {
+    switch (x) {
+    case 1:
+        return wxHatStatus::North;
+    case 2:
+        return wxHatStatus::East;
+    case 3:
+        return wxHatStatus::NorthEast;
+    case 4:
+        return wxHatStatus::South;
+    case 6:
+        return wxHatStatus::SouthEast;
+    case 8:
+        return wxHatStatus::West;
+    case 9:
+        return wxHatStatus::NorthWest;
+    case 12:
+        return wxHatStatus::SouthWest;
     default:
-        assert(false);
-        return "UNKNOWN SDL EVENT";
+        return wxHatStatus::Neutral;
     }
 }
 
-// Converts an axis value to a direction since we do not need analog controls.
-static int16_t AxisValueToDirection(int16_t x) {
-    if (x > 0x1fff)
-        return 1;
-    else if (x < -0x1fff)
-        return -1;
+wxJoyControl AxisStatusToJoyControl(const wxAxisStatus& status) {
+    switch (status) {
+    case wxAxisStatus::Plus:
+        return wxJoyControl::AxisPlus;
+    case wxAxisStatus::Minus:
+        return wxJoyControl::AxisMinus;
+    case wxAxisStatus::Neutral:
+    default:
+        // This should never happen.
+        assert(false);
+        return wxJoyControl::AxisPlus;
+    }
+}
 
-    return 0;
+std::set<wxJoyControl> HatStatusToJoyControls(const wxHatStatus& status) {
+    switch (status) {
+    case wxHatStatus::Neutral:
+        return {};
+    case wxHatStatus::North:
+        return {wxJoyControl::HatNorth};
+    case wxHatStatus::South:
+        return {wxJoyControl::HatSouth};
+    case wxHatStatus::West:
+        return {wxJoyControl::HatWest};
+    case wxHatStatus::East:
+        return {wxJoyControl::HatEast};
+    case wxHatStatus::NorthWest:
+        return {wxJoyControl::HatNorth, wxJoyControl::HatWest};
+    case wxHatStatus::NorthEast:
+        return {wxJoyControl::HatNorth, wxJoyControl::HatEast};
+    case wxHatStatus::SouthWest:
+        return {wxJoyControl::HatSouth, wxJoyControl::HatWest};
+    case wxHatStatus::SouthEast:
+        return {wxJoyControl::HatSouth, wxJoyControl::HatEast};
+    default:
+        // This should never happen.
+        assert(false);
+        return {};
+    }
 }
 
 } // namespace
@@ -85,12 +145,12 @@ wxJoyEvent::wxJoyEvent(
     wxJoystick joystick,
     wxJoyControl control,
     uint8_t control_index,
-    int16_t control_value) :
+    bool pressed) :
         wxCommandEvent(wxEVT_JOY),
         joystick_(joystick),
         control_(control),
         control_index_(control_index),
-        control_value_(control_value) {}
+        pressed_(pressed) {}
 
 // Represents the current state of a joystick. This class takes care of
 // initializing and destroying SDL resources on construction and destruction so
@@ -109,10 +169,13 @@ public:
     // Returns true if this object was properly initialized.
     bool IsValid() const;
 
-    // Processes an SDL event.
-    void ProcessSDLEvent(int32_t event_type,
-                         uint8_t control_index,
-                         int16_t control_value);
+    // Returns true if `sdl_event` should be processed by this object.
+    bool ShouldProcessEvent(uint32_t sdl_event) const;
+
+    // Processes the corresponding events.
+    void ProcessAxisEvent(uint8_t index, wxAxisStatus status);
+    void ProcessButtonEvent(uint8_t index, bool pressed);
+    void ProcessHatEvent(uint8_t index, wxHatStatus status);
 
     // Activates or deactivates rumble.
     void SetRumble(bool activate_rumble);
@@ -137,13 +200,13 @@ private:
     SDL_Joystick* sdl_joystick_ = nullptr;
 
     // Current state of Joystick axis.
-    std::unordered_map<uint8_t, int16_t> axis_{};
+    std::unordered_map<uint8_t, wxAxisStatus> axis_{};
 
     // Current state of Joystick buttons.
-    std::unordered_map<uint8_t, uint8_t> buttons_{};
+    std::unordered_map<uint8_t, bool> buttons_{};
 
     // Current state of Joystick HAT. Unused for GameControllers.
-    std::unordered_map<uint8_t, uint8_t> hats_{};
+    std::unordered_map<uint8_t, wxHatStatus> hats_{};
 
     // Set to true to activate joystick rumble.
     bool rumbling_ = false;
@@ -189,78 +252,132 @@ bool wxSDLJoyState::IsValid() const {
     return sdl_joystick_;
 }
 
-void wxSDLJoyState::ProcessSDLEvent(int32_t event_type,
-                                    uint8_t control_index,
-                                    int16_t control_value) {
-    int16_t previous_value = 0;
-    wxJoyControl control;
-    bool value_changed = false;
-
-    switch (event_type) {
-    case SDL_JOYBUTTONDOWN:
-    case SDL_JOYBUTTONUP:
-        // Do not process joystick events for game controllers.
-        if (game_controller_) {
-            return;
-        }
-    // Fallthrough.
+bool wxSDLJoyState::ShouldProcessEvent(uint32_t sdl_event) const {
+    switch(sdl_event) {
     case SDL_CONTROLLERBUTTONDOWN:
     case SDL_CONTROLLERBUTTONUP:
-        control = wxJoyControl::Button;
-        previous_value = buttons_[control_index];
-        if (previous_value != control_value) {
-            buttons_[control_index] = control_value;
-            value_changed = true;
-        }
-        break;
-
-    case SDL_JOYHATMOTION:
-        // Do not process joystick events for game controllers.
-        if (game_controller_) {
-            return;
-        }
-        control = wxJoyControl::Hat;
-        previous_value = hats_[control_index];
-        if (previous_value != control_value) {
-            hats_[control_index] = control_value;
-            value_changed = true;
-        }
-        break;
-
-    case SDL_JOYAXISMOTION:
-        // Do not process joystick events for game controllers.
-        if (game_controller_) {
-            return;
-        }
-    // Fallthrough.
     case SDL_CONTROLLERAXISMOTION:
-        control = wxJoyControl::Axis;
-        previous_value = axis_[control_index];
-        if (previous_value != control_value) {
-            axis_[control_index] = control_value;
-            value_changed = true;
-        }
-        break;
+    case SDL_CONTROLLERDEVICEADDED:
+    case SDL_CONTROLLERDEVICEREMOVED:
+        // Always process game controller events.
+        return true;
+
+    case SDL_JOYBUTTONDOWN:
+    case SDL_JOYBUTTONUP:
+    case SDL_JOYAXISMOTION:
+    case SDL_JOYHATMOTION:
+        // Only process joystick events if this is not a game controller.
+        return !game_controller_;
 
     default:
-        // This should never happen.
-        assert(false);
+        // Ignore everything else.
+        return false;
+    }
+}
+
+void wxSDLJoyState::ProcessAxisEvent(uint8_t index, wxAxisStatus status) {
+    auto handler = wxGetApp().frame->GetJoyEventHandler();
+    const wxAxisStatus previous_status = axis_[index];
+
+    // Nothing to do if no-op.
+    if (status == previous_status) {
         return;
     }
 
-    if (value_changed) {
-        wxLogDebug("GOT %s: %s ctrl_idx:%d val:%d prev_val:%d",
-                   SDLEventTypeToDebugString(event_type),
-                   wx_joystick_.ToString(), control_index, control_value,
-                   previous_value);
+    // Update the value.
+    axis_[index] = status;
 
-        auto handler = wxGetApp().frame->GetJoyEventHandler();
-        if (!handler)
-            return;
+    // Nothing more to do if we can't send events.
+    if (!handler) {
+        return;
+    }
 
-        wxQueueEvent(handler,
-                     new wxJoyEvent(
-                         wx_joystick_, control, control_index, control_value));
+    wxLogDebug("Got Axis motion: %s ctrl_idx:%d val:%d prev_val:%d",
+                wx_joystick_.ToString(), index, status, previous_status);
+
+    if (previous_status != wxAxisStatus::Neutral) {
+        // Send the "unpressed" event.
+        wxQueueEvent(handler, new wxJoyEvent(
+            wx_joystick_, AxisStatusToJoyControl(previous_status), index, false));
+    }
+
+    // We already sent the "unpressed" event so nothing more to do.
+    if (status == wxAxisStatus::Neutral) {
+        return;
+    }
+
+    // Send the "pressed" event.
+    wxQueueEvent(handler, new wxJoyEvent(
+        wx_joystick_, AxisStatusToJoyControl(status), index, true));
+
+}
+
+void wxSDLJoyState::ProcessButtonEvent(uint8_t index, bool status) {
+    auto handler = wxGetApp().frame->GetJoyEventHandler();
+    const bool previous_status = buttons_[index];
+
+    // Nothing to do if no-op.
+    if (status == previous_status) {
+        return;
+    }
+
+    // Update the value.
+    buttons_[index] = status;
+
+    // Nothing more to do if we can't send events.
+    if (!handler) {
+        return;
+    }
+
+    wxLogDebug("Got Button event: %s ctrl_idx:%d val:%d prev_val:%d",
+                wx_joystick_.ToString(), index, status, previous_status);
+
+    // Send the event.
+    wxQueueEvent(handler, new wxJoyEvent(
+        wx_joystick_, wxJoyControl::Button, index, status));
+}
+
+void wxSDLJoyState::ProcessHatEvent(uint8_t index, wxHatStatus status) {
+    auto handler = wxGetApp().frame->GetJoyEventHandler();
+    const wxHatStatus previous_status = hats_[index];
+
+    // Nothing to do if no-op.
+    if (status == previous_status) {
+        return;
+    }
+
+    // Update the value.
+    hats_[index] = status;
+
+    // Nothing more to do if we can't send events.
+    if (!handler) {
+        return;
+    }
+
+    wxLogDebug("Got Hat event: %s ctrl_idx:%d val:%d prev_val:%d",
+                wx_joystick_.ToString(), index, status, previous_status);
+
+    const std::set<wxJoyControl> old_controls = HatStatusToJoyControls(previous_status);
+    const std::set<wxJoyControl> new_controls = HatStatusToJoyControls(status);
+
+    // Send the "unpressed" events.
+    for (const wxJoyControl& control : old_controls) {
+        if (new_controls.find(control) != new_controls.end()) {
+            // No need to unpress the old direction.
+            continue;
+        }
+        wxQueueEvent(handler, new wxJoyEvent(
+            wx_joystick_, control, index, false));
+    }
+
+    // Send the "pressed" events.
+    for (const wxJoyControl& control : new_controls) {
+        if (old_controls.find(control) != old_controls.end()) {
+            // No need to press the new direction twice.
+            continue;
+        }
+        wxQueueEvent(handler, new wxJoyEvent(
+            wx_joystick_, control, index, true));
     }
 }
 
@@ -310,9 +427,9 @@ void wxJoyPoller::Poll() {
         case SDL_CONTROLLERBUTTONUP:
         {
             wxSDLJoyState* joy_state = FindJoyState(e.cbutton.which);
-            if (joy_state) {
-                joy_state->ProcessSDLEvent(
-                    e.type, e.cbutton.button, e.cbutton.state);
+            if (joy_state && joy_state->ShouldProcessEvent(e.type)) {
+                joy_state->ProcessButtonEvent(
+                    e.cbutton.button, e.cbutton.state);
             }
             break;
         }
@@ -320,9 +437,9 @@ void wxJoyPoller::Poll() {
         case SDL_CONTROLLERAXISMOTION:
         {
             wxSDLJoyState* joy_state = FindJoyState(e.caxis.which);
-            if (joy_state) {
-                joy_state->ProcessSDLEvent(
-                    e.type, e.caxis.axis, AxisValueToDirection(e.caxis.value));
+            if (joy_state && joy_state->ShouldProcessEvent(e.type)) {
+                joy_state->ProcessAxisEvent(
+                    e.caxis.axis, AxisValueToStatus(e.caxis.value));
             }
             break;
         }
@@ -338,9 +455,9 @@ void wxJoyPoller::Poll() {
         case SDL_JOYBUTTONUP:
         {
             wxSDLJoyState* joy_state = FindJoyState(e.jbutton.which);
-            if (joy_state) {
-                joy_state->ProcessSDLEvent(
-                    e.type, e.jbutton.button, e.jbutton.state);
+            if (joy_state && joy_state->ShouldProcessEvent(e.type)) {
+                joy_state->ProcessButtonEvent(
+                    e.jbutton.button, e.jbutton.state);
             }
             break;
         }
@@ -348,9 +465,9 @@ void wxJoyPoller::Poll() {
         case SDL_JOYAXISMOTION:
         {
             wxSDLJoyState* joy_state = FindJoyState(e.jaxis.which);
-            if (joy_state) {
-                joy_state->ProcessSDLEvent(
-                    e.type, e.jaxis.axis, AxisValueToDirection(e.jaxis.value));
+            if (joy_state && joy_state->ShouldProcessEvent(e.type)) {
+                joy_state->ProcessAxisEvent(
+                    e.jaxis.axis, AxisValueToStatus(e.jaxis.value));
             }
             break;
         }
@@ -358,9 +475,9 @@ void wxJoyPoller::Poll() {
         case SDL_JOYHATMOTION:
         {
             wxSDLJoyState* joy_state = FindJoyState(e.jhat.which);
-            if (joy_state) {
-                joy_state->ProcessSDLEvent(
-                    e.type, e.jhat.hat, e.jhat.value);
+            if (joy_state && joy_state->ShouldProcessEvent(e.type)) {
+                joy_state->ProcessHatEvent(
+                    e.jhat.hat, HatValueToStatus(e.jhat.value));
             }
             break;
         }

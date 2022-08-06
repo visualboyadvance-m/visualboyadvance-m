@@ -4,6 +4,7 @@
 
 #include "opts.h"
 #include "strutils.h"
+#include "wx/sdljoy.h"
 #include "wx/userinput.h"
 
 // FIXME: suppport analog/digital flag on per-axis basis
@@ -14,69 +15,22 @@ BEGIN_EVENT_TABLE(wxJoyKeyTextCtrl, wxKeyTextCtrl)
 EVT_SDLJOY(wxJoyKeyTextCtrl::OnJoy)
 END_EVENT_TABLE()
 
-int wxJoyKeyTextCtrl::DigitalButton(const wxJoyEvent& event)
-{
-    int16_t sdlval = event.control_value();
-    wxJoyControl sdltype = event.control();
-
-    switch (sdltype) {
-    case wxJoyControl::Axis:
-        // for val = 0 return arbitrary direction; val means "off"
-        return sdlval > 0 ? WXJB_AXIS_PLUS : WXJB_AXIS_MINUS;
-
-    case wxJoyControl::Hat:
-
-        /* URDL = 1248 */
-        switch (sdlval) {
-        case 1:
-            return WXJB_HAT_N;
-
-        case 2:
-            return WXJB_HAT_E;
-
-        case 3:
-            return WXJB_HAT_NE;
-
-        case 4:
-            return WXJB_HAT_S;
-
-        case 6:
-            return WXJB_HAT_SE;
-
-        case 8:
-            return WXJB_HAT_W;
-
-        case 9:
-            return WXJB_HAT_NW;
-
-        case 12:
-            return WXJB_HAT_SW;
-
-        default:
-            return WXJB_HAT_N; // arbitrary direction; val = 0 means "off"
-        }
-
-    case wxJoyControl::Button:
-        return WXJB_BUTTON;
-
-    default:
-        // unknown ctrl type
-        return -1;
-    }
-}
-
 void wxJoyKeyTextCtrl::OnJoy(wxJoyEvent& event)
 {
     static wxLongLong last_event = 0;
 
     // Filter consecutive axis motions within 300ms, as this adds two bindings
     // +1/-1 instead of the one intended.
-    if (event.control() == wxJoyControl::Axis && wxGetUTCTimeMillis() - last_event < 300)
+    if ((event.control() == wxJoyControl::AxisPlus ||
+         event.control() == wxJoyControl::AxisMinus) &&
+        wxGetUTCTimeMillis() - last_event < 300) {
         return;
+    }
 
     last_event = wxGetUTCTimeMillis();
 
-    if (!event.control_value() || DigitalButton(event) < 0)
+    // Control was unpressed, ignore.
+    if (!event.pressed())
         return;
 
     wxString nv = wxUserInput::FromJoyEvent(event).ToString();
@@ -109,48 +63,32 @@ wxString wxJoyKeyTextCtrl::ToString(int mod, int key, int joy, bool isConfig)
     wxString mk;
 
     switch (mod) {
-    case WXJB_AXIS_PLUS:
+    case wxJoyControl::AxisPlus:
         mk.Printf(("Axis%d+"), key);
         break;
 
-    case WXJB_AXIS_MINUS:
+    case wxJoyControl::AxisMinus:
         mk.Printf(("Axis%d-"), key);
         break;
 
-    case WXJB_BUTTON:
+    case wxJoyControl::Button:
         mk.Printf(("Button%d"), key);
         break;
 
-    case WXJB_HAT_N:
+    case wxJoyControl::HatNorth:
         mk.Printf(("Hat%dN"), key);
         break;
 
-    case WXJB_HAT_S:
+    case wxJoyControl::HatSouth:
         mk.Printf(("Hat%dS"), key);
         break;
 
-    case WXJB_HAT_W:
+    case wxJoyControl::HatWest:
         mk.Printf(("Hat%dW"), key);
         break;
 
-    case WXJB_HAT_E:
+    case wxJoyControl::HatEast:
         mk.Printf(("Hat%dE"), key);
-        break;
-
-    case WXJB_HAT_NW:
-        mk.Printf(("Hat%dNW"), key);
-        break;
-
-    case WXJB_HAT_NE:
-        mk.Printf(("Hat%dNE"), key);
-        break;
-
-    case WXJB_HAT_SW:
-        mk.Printf(("Hat%dSW"), key);
-        break;
-
-    case WXJB_HAT_SE:
-        mk.Printf(("Hat%dSE"), key);
         break;
     }
 
@@ -214,12 +152,14 @@ static void CompileRegex()
     axre.Compile(("Axis([0-9]+)([+-])"), wxRE_EXTENDED | wxRE_ICASE);
     // \1 is button#
     butre.Compile(("Button([0-9]+)"), wxRE_EXTENDED | wxRE_ICASE);
-    // \1 is hat#, \3 is N, \4 is S, \5 is E, \6 is W, \7 is NE,
-    // \8 is SE, \9 is SW, \10 is NW
-    hatre.Compile(("Hat([0-9]+)((N|North|U|Up)|(S|South|D|Down)|"
-                    "(E|East|R|Right)|(W|West|L|Left)|"
-                    "(NE|NorthEast|UR|UpRight)|(SE|SouthEast|DR|DownRight)|"
-                    "(SW|SouthWest|DL|DownLeft)|(NW|NorthWest|UL|UpLeft))"),
+    // \1 is hat#, \3 is N, \4 is S, \5 is E, \6 is W
+    // This used to support diagonals as discrete input. For compatibility
+    // reasons, these have been moved a 1/8 turn counter-clockwise.
+    hatre.Compile(("Hat([0-9]+)"
+                   "((N|North|U|Up|NE|NorthEast|UR|UpRight)|"
+                   "(S|South|D|Down|SW|SouthWest|DL|DownLeft)|"
+                   "(E|East|R|Right|SE|SouthEast|DR|DownRight)|"
+                   "(W|West|L|Left|NW|NorthWest|UL|UpLeft))"),
                   wxRE_EXTENDED | wxRE_ICASE);
 }
 
@@ -247,24 +187,20 @@ static bool ParseJoy(const wxString& s, int len, int& mod, int& key, int& joy)
         axre.GetMatch(&b, &l, 1);
         key = simple_atoi(p.Mid(b), l);
         axre.GetMatch(&b, &l, 2);
-        mod = p[b] == wxT('+') ? WXJB_AXIS_PLUS : WXJB_AXIS_MINUS;
+        mod = p[b] == wxT('+') ? wxJoyControl::AxisPlus : wxJoyControl::AxisMinus;
     } else if (is_ctrl(butre)) {
         butre.GetMatch(&b, &l, 1);
         key = simple_atoi(p.Mid(b), l);
-        mod = WXJB_BUTTON;
+        mod = wxJoyControl::Button;
     } else if (is_ctrl(hatre)) {
         hatre.GetMatch(&b, &l, 1);
         key = simple_atoi(p.Mid(b), l);
-#define check_dir(n, d) if (hatre.GetMatch(&b, &l, n) && l > 0) mod = WXJB_HAT_##d
+#define check_dir(n, d) if (hatre.GetMatch(&b, &l, n) && l > 0) mod = wxJoyControl::Hat##d
 
-        check_dir(3, N);
-        else check_dir(4, S);
-        else check_dir(5, E);
-        else check_dir(6, W);
-        else check_dir(7, NE);
-        else check_dir(8, SE);
-        else check_dir(9, SW);
-        else check_dir(10, NW);
+        check_dir(3, North);
+        else check_dir(4, South);
+        else check_dir(5, East);
+        else check_dir(6, West);
     } else {
         joy = 0;
         return false;
