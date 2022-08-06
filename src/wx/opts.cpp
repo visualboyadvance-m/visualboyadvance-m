@@ -1052,7 +1052,7 @@ bool opt_set(const wxString& name, const wxString& val)
             return true;
         }
 
-        const std::optional<wxGameControl> game_control =
+        const nonstd::optional<wxGameControl> game_control =
             wxGameControl::FromString(name);
         if (game_control) {
             if (val.empty()) {

@@ -95,7 +95,7 @@ wxString GameKeyToString(const wxGameKey& game_key) {
     return kGameKeyStrings[GameKeyToInt(game_key)];
 }
 
-std::optional<wxGameKey> StringToGameKey(const wxString& input) {
+nonstd::optional<wxGameKey> StringToGameKey(const wxString& input) {
     static const std::map<wxString, wxGameKey> kStringToGameKey = {
         { wxT("Up"),          wxGameKey::Up },
         { wxT("Down"),        wxGameKey::Down },
@@ -122,35 +122,35 @@ std::optional<wxGameKey> StringToGameKey(const wxString& input) {
 
     const auto iter = kStringToGameKey.find(input);
     if (iter == kStringToGameKey.end()) {
-        return std::nullopt;
+        return nonstd::nullopt;
     }
     return iter->second;
 }
 
 // static
-std::optional<wxGameControl> wxGameControl::FromString(const wxString &name) {
+nonstd::optional<wxGameControl> wxGameControl::FromString(const wxString &name) {
     static const wxString kJoypad(wxT("Joypad"));
     if (!wxStrncmp(name, kJoypad, kJoypad.size())) {
         wxLogDebug("Doesn't start with joypad");
-        return std::nullopt;
+        return nonstd::nullopt;
     }
 
     auto parts = str_split(name, wxT("/"));
     if (parts.size() != 3) {
         wxLogDebug("Wrong split size: %d", parts.size());
-        return std::nullopt;
+        return nonstd::nullopt;
     }
 
     const int joypad = parts[1][0] - wxT('1');
     if (!JoypadInRange(joypad)) {
         wxLogDebug("Wrong joypad index: %d", joypad);
-        return std::nullopt;
+        return nonstd::nullopt;
     }
 
-    std::optional<wxGameKey> game_key = StringToGameKey(parts[2]);
+    nonstd::optional<wxGameKey> game_key = StringToGameKey(parts[2]);
     if (!game_key) {
         wxLogDebug("Failed to parse game_key: %s", parts[2]);
-        return std::nullopt;
+        return nonstd::nullopt;
     }
 
     return wxGameControl(joypad, game_key.value());

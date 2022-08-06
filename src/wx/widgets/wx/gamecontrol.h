@@ -3,7 +3,7 @@
 
 #include <array>
 #include <map>
-#include <optional>
+#include "nonstd/optional.hpp"
 #include <set>
 #include <wx/string.h>
 
@@ -72,14 +72,14 @@ wxString GameKeyToString(const wxGameKey& game_key);
 
 // Conversion utility method. Returns std::nullopt on failure.
 // This is O(log(kNbGameKeys)).
-std::optional<wxGameKey> StringToGameKey(const wxString& input);
+nonstd::optional<wxGameKey> StringToGameKey(const wxString& input);
 
 // Abstraction for an in-game control, wich is made of a player index (from 0
 // to 3), and a wxGameKey.
 class wxGameControl {
 public:
     // Converts a string to a wxGameControl. Returns std::nullopt on failure.
-    static std::optional<wxGameControl> FromString(const wxString& name);
+    static nonstd::optional<wxGameControl> FromString(const wxString& name);
 
     wxGameControl(int joypad, wxGameKey game_key);
     ~wxGameControl();

@@ -456,6 +456,9 @@ add_definitions(-DPKGDATADIR="${CMAKE_INSTALL_FULL_DATADIR}/vbam" -DPACKAGE=)
 
 add_definitions(-D__STDC_FORMAT_MACROS)
 
+# For C++, default to nonstd::optional for now due to mac build issues
+add_definitions(-Doptional_CONFIG_SELECT_OPTIONAL=optional_OPTIONAL_NONSTD)
+
 if(ENABLE_LINK)
     # IPC linking code needs sem_timedwait which can be either in librt or pthreads
     if(NOT WIN32)
@@ -1100,6 +1103,7 @@ include_directories(
     ${ZLIB_INCLUDE_DIR}
     fex
     ${SDL2_INCLUDE_DIR}
+    third_party/include
     third_party/include/stb
 )
 
