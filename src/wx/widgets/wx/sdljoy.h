@@ -16,10 +16,15 @@ class wxSDLJoyState;
 class wxJoyPoller;
 
 // The different types of supported controls.
-enum class wxJoyControl {
-    Axis = 0, // Control value is signed 16
-    Hat,      // Control value is bitmask NESW/URDL
-    Button    // Control value is 0 or 1
+enum wxJoyControl {
+    AxisPlus = 0,
+    AxisMinus,
+    Button,
+    HatNorth,
+    HatSouth,
+    HatWest,
+    HatEast,
+    Last = HatEast
 };
 
 // Abstraction for a single joystick. In the current implementation, this
@@ -66,19 +71,19 @@ public:
         wxJoystick joystick,
         wxJoyControl control,
         uint8_t control_index,
-        int16_t control_value);
+        bool pressed);
     virtual ~wxJoyEvent() = default;
 
     wxJoystick joystick() const { return joystick_; }
     wxJoyControl control() const { return control_; }
     uint8_t control_index() const { return control_index_; }
-    int16_t control_value() const { return control_value_; }
+    bool pressed() const { return pressed_; }
 
 private:
     wxJoystick joystick_;
     wxJoyControl control_;
     uint8_t control_index_;
-    int16_t control_value_;
+    bool pressed_;
 };
 
 // This is my own SDL-based joystick handler, since wxJoystick is brain-dead.

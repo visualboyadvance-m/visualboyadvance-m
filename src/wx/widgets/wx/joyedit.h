@@ -10,22 +10,6 @@
 #include "wx/sdljoy.h"
 #include "wx/userinput.h"
 
-// joystick control types
-// mod for joysticks
-enum { WXJB_AXIS_PLUS,
-    WXJB_AXIS_MINUS,
-    WXJB_BUTTON,
-    WXJB_HAT_FIRST,
-    WXJB_HAT_N = WXJB_HAT_FIRST,
-    WXJB_HAT_S,
-    WXJB_HAT_W,
-    WXJB_HAT_E,
-    WXJB_HAT_NW,
-    WXJB_HAT_NE,
-    WXJB_HAT_SW,
-    WXJB_HAT_SE,
-    WXJB_HAT_LAST = WXJB_HAT_SE };
-
 class wxJoyKeyTextCtrl : public wxKeyTextCtrl {
 public:
     // default constructor; required for use with xrc
@@ -36,10 +20,6 @@ public:
     }
     virtual ~wxJoyKeyTextCtrl(){};
 
-    // key is event.GetControlIndex(), and joy is event.GetJoy() + 1
-    // mod is derived from GetControlValue() and GetControlType():
-    // convert wxJoyEvent's type+val into mod (WXJB_*)
-    static int DigitalButton(const wxJoyEvent& event);
     // convert mod+key to accel string, separated by -
     static wxString ToString(int mod, int key, int joy, bool isConfig = false);
     // parses single key string into mod+key

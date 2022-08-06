@@ -1307,27 +1307,7 @@ void GameArea::OnSize(wxSizeEvent& ev)
 
 void GameArea::OnSDLJoy(wxJoyEvent& ev)
 {
-    int key = ev.control_index();
-    int mod = wxJoyKeyTextCtrl::DigitalButton(ev);
-    int joy = ev.joystick().player_index();
-
-    // mutually exclusive key types unpress their opposite
-    // TODO: Move creation of these "ghost" events to wxJoyPoller.
-    if (mod == WXJB_AXIS_PLUS) {
-        process_user_input(false, wxUserInput::FromLegacyKeyModJoy(key, WXJB_AXIS_MINUS, joy));
-        process_user_input(ev.control_value() != 0, wxUserInput::FromJoyEvent(ev));
-    } else if (mod == WXJB_AXIS_MINUS) {
-        process_user_input(false, wxUserInput::FromLegacyKeyModJoy(key, WXJB_AXIS_PLUS, joy));
-        process_user_input(ev.control_value() != 0, wxUserInput::FromJoyEvent(ev));
-    } else if (mod >= WXJB_HAT_FIRST && mod <= WXJB_HAT_LAST) {
-        int value = ev.control_value();
-        process_user_input(value & SDL_HAT_UP, wxUserInput::FromLegacyKeyModJoy(key, WXJB_HAT_N, joy));
-        process_user_input(value & SDL_HAT_DOWN, wxUserInput::FromLegacyKeyModJoy(key, WXJB_HAT_S, joy));
-        process_user_input(value & SDL_HAT_RIGHT, wxUserInput::FromLegacyKeyModJoy(key, WXJB_HAT_E, joy));
-        process_user_input(value & SDL_HAT_LEFT, wxUserInput::FromLegacyKeyModJoy(key, WXJB_HAT_W, joy));
-    } else {
-        process_user_input(ev.control_value() != 0, wxUserInput::FromJoyEvent(ev));
-    }
+    process_user_input(ev.pressed(), wxUserInput::FromJoyEvent(ev));
 
     // tell Linux to turn off the screensaver/screen-blank if joystick button was pressed
     // this shouldn't be necessary of course

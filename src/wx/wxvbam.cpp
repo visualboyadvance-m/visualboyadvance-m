@@ -884,7 +884,7 @@ int MainFrame::FilterEvent(wxEvent& event)
     else if (event.GetEventType() == wxEVT_JOY && !menus_opened && !dialog_opened)
     {
         wxJoyEvent& je = (wxJoyEvent&)event;
-        if (je.control_value() == 0) return -1; // joystick button UP
+        if (!je.pressed()) return -1; // joystick button UP
         wxString label = wxUserInput::FromJoyEvent(je).ToString();
         wxAcceleratorEntry_v accels = wxGetApp().GetAccels();
         for (size_t i = 0; i < accels.size(); ++i)
