@@ -25,36 +25,32 @@ const supportedCodecs videoSupported[] = {
 std::vector<char *> recording::getSupVidNames()
 {
     std::vector<char *> result;
-    size_t size = sizeof(videoSupported) / sizeof(videoSupported[0]);
-    for (size_t i = 0; i < size; ++i)
-        result.push_back((char *)videoSupported[i].longName);
+    for (auto&& codec : videoSupported)
+        result.push_back((char *)codec.longName);
     return result;
 }
 
 std::vector<char *> recording::getSupVidExts()
 {
     std::vector<char *> result;
-    size_t size = sizeof(videoSupported) / sizeof(videoSupported[0]);
-    for (size_t i = 0; i < size; ++i)
-        result.push_back((char *)videoSupported[i].exts);
+    for (auto&& codec : videoSupported)
+        result.push_back((char *)codec.exts);
     return result;
 }
 
 std::vector<char *> recording::getSupAudNames()
 {
     std::vector<char *> result;
-    size_t size = sizeof(audioSupported) / sizeof(audioSupported[0]);
-    for (size_t i = 0; i < size; ++i)
-        result.push_back((char *)audioSupported[i].longName);
+    for (auto&& codec : audioSupported)
+        result.push_back((char *)codec.longName);
     return result;
 }
 
 std::vector<char *> recording::getSupAudExts()
 {
     std::vector<char *> result;
-    size_t size = sizeof(audioSupported) / sizeof(audioSupported[0]);
-    for (size_t i = 0; i < size; ++i)
-        result.push_back((char *)audioSupported[i].exts);
+    for (auto&& codec : audioSupported)
+        result.push_back((char *)codec.exts);
     return result;
 }
 

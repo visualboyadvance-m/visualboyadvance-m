@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-23 17:25-0700\n"
+"POT-Creation-Date: 2022-08-06 20:51+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -358,7 +358,7 @@ msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr ""
 
 #: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
-#: cmdevents.cpp:1157 cmdevents.cpp:1235 cmdevents.cpp:1305 cmdevents.cpp:1332
+#: cmdevents.cpp:1157 cmdevents.cpp:1235 cmdevents.cpp:1305 cmdevents.cpp:1374
 #: viewsupt.cpp:1180
 msgid "Select output file"
 msgstr ""
@@ -729,105 +729,101 @@ msgstr ""
 msgid "Error saving snapshot file %s"
 msgstr ""
 
-#: cmdevents.cpp:1182 sys.cpp:450
+#: cmdevents.cpp:1182 sys.cpp:524
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr ""
 
-#: cmdevents.cpp:1203 cmdevents.cpp:1273
+#: cmdevents.cpp:1203 cmdevents.cpp:1273 cmdevents.cpp:1344 cmdevents.cpp:1408
 msgid " files ("
 msgstr ""
 
-#: cmdevents.cpp:1333 cmdevents.cpp:1354
-msgid "VBA Movie files|*.vmv"
-msgstr ""
-
-#: cmdevents.cpp:1353
+#: cmdevents.cpp:1439
 msgid "Select file"
 msgstr ""
 
-#: cmdevents.cpp:1668 cmdevents.cpp:1761
+#: cmdevents.cpp:1756 cmdevents.cpp:1849
 msgid "Select state file"
 msgstr ""
 
-#: cmdevents.cpp:1669 cmdevents.cpp:1762
+#: cmdevents.cpp:1757 cmdevents.cpp:1850
 msgid "VisualBoyAdvance saved game files|*.sgm"
 msgstr ""
 
-#: cmdevents.cpp:1792 cmdevents.cpp:1802 cmdevents.cpp:1813
+#: cmdevents.cpp:1880 cmdevents.cpp:1890 cmdevents.cpp:1901
 #, c-format
 msgid "Current state slot #%d"
 msgstr ""
 
-#: cmdevents.cpp:1883
+#: cmdevents.cpp:1971
 msgid "Cannot use Colorizer Hack when GB BIOS File is enabled."
 msgstr ""
 
-#: cmdevents.cpp:2098
+#: cmdevents.cpp:2186
 msgid "Sound enabled"
 msgstr ""
 
-#: cmdevents.cpp:2098
+#: cmdevents.cpp:2186
 msgid "Sound disabled"
 msgstr ""
 
-#: cmdevents.cpp:2111 cmdevents.cpp:2125
+#: cmdevents.cpp:2199 cmdevents.cpp:2213
 #, c-format
 msgid "Volume: %d%%"
 msgstr ""
 
-#: cmdevents.cpp:2200
+#: cmdevents.cpp:2288
 msgid "Set to 0 for pseudo tty"
 msgstr ""
 
-#: cmdevents.cpp:2202
+#: cmdevents.cpp:2290
 msgid "Port to wait for connection:"
 msgstr ""
 
-#: cmdevents.cpp:2203
+#: cmdevents.cpp:2291
 msgid "GDB Connection"
 msgstr ""
 
-#: cmdevents.cpp:2256
+#: cmdevents.cpp:2344
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr ""
 
-#: cmdevents.cpp:2263
+#: cmdevents.cpp:2351
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr ""
 
-#: cmdevents.cpp:2266
+#: cmdevents.cpp:2354
 msgid "Waiting for GDB..."
 msgstr ""
 
-#: cmdevents.cpp:2681
+#: cmdevents.cpp:2769
 #, c-format
 msgid "Using pixel filter #%d"
 msgstr ""
 
-#: cmdevents.cpp:2696
+#: cmdevents.cpp:2784
 #, c-format
 msgid "Using interframe blending #%d"
 msgstr ""
 
-#: cmdevents.cpp:2735 panel.cpp:192 panel.cpp:306
+#: cmdevents.cpp:2823 panel.cpp:192 panel.cpp:306
 msgid "Could not initialize the sound driver!"
 msgstr ""
 
-#: cmdevents.cpp:2839
+#: cmdevents.cpp:2927
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr ""
 
-#: cmdevents.cpp:2840
+#: cmdevents.cpp:2928
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr ""
 
-#: cmdevents.cpp:2841
+#: cmdevents.cpp:2929
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -843,114 +839,114 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr ""
 
-#: cmdevents.cpp:3101
+#: cmdevents.cpp:3189
 msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
 msgstr ""
 
-#: cmdevents.cpp:3161
+#: cmdevents.cpp:3249
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr ""
 
-#: cmdevents.cpp:3167
+#: cmdevents.cpp:3255
 msgid "Network is not supported in local mode."
 msgstr ""
 
-#: opts.cpp:648 opts.cpp:950
+#: opts.cpp:649 opts.cpp:951
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr ""
 
-#: opts.cpp:665 opts.cpp:962
+#: opts.cpp:666 opts.cpp:963
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr ""
 
-#: opts.cpp:672 opts.cpp:681 opts.cpp:970 opts.cpp:978
+#: opts.cpp:673 opts.cpp:682 opts.cpp:971 opts.cpp:979
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr ""
 
-#: opts.cpp:738 opts.cpp:759 opts.cpp:1046
+#: opts.cpp:739 opts.cpp:760 opts.cpp:1047
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr ""
 
-#: opts.cpp:933
+#: opts.cpp:934
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr ""
 
-#: sys.cpp:125 sys.cpp:181
+#: sys.cpp:161 sys.cpp:221
 msgid "No game in progress to record"
 msgstr ""
 
-#: sys.cpp:138
+#: sys.cpp:178
 #, c-format
 msgid "Cannot open output file %s"
 msgstr ""
 
-#: sys.cpp:145 sys.cpp:165 sys.cpp:311
+#: sys.cpp:185 sys.cpp:205 sys.cpp:355
 msgid "Error writing game recording"
 msgstr ""
 
-#: sys.cpp:186
+#: sys.cpp:226
 msgid "Cannot play game recording while recording"
 msgstr ""
 
-#: sys.cpp:199
+#: sys.cpp:243
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr ""
 
-#: sys.cpp:206 sys.cpp:216
+#: sys.cpp:250 sys.cpp:260
 msgid "Error reading game recording"
 msgstr ""
 
-#: sys.cpp:322
+#: sys.cpp:371 sys.cpp:391
 msgid "Playback ended"
 msgstr ""
 
-#: sys.cpp:341
+#: sys.cpp:415
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr ""
 
-#: sys.cpp:349
+#: sys.cpp:423
 #, c-format
 msgid "%d%%"
 msgstr ""
 
-#: sys.cpp:769 xrc/GBPrinter.xrc:65
+#: sys.cpp:843 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr ""
 
-#: sys.cpp:803
+#: sys.cpp:877
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr ""
 
-#: sys.cpp:812
+#: sys.cpp:886
 msgid "Save printer image to"
 msgstr ""
 
-#: sys.cpp:826 sys.cpp:1009
+#: sys.cpp:900 sys.cpp:1083
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr ""
 
-#: sys.cpp:831 sys.cpp:902
+#: sys.cpp:905 sys.cpp:976
 msgid "&Close"
 msgstr ""
 
-#: sys.cpp:897
+#: sys.cpp:971
 msgid "Printed"
 msgstr ""
 
-#: sys.cpp:1199
+#: sys.cpp:1273
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr ""
 
-#: sys.cpp:1298
+#: sys.cpp:1372
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr ""
@@ -1046,70 +1042,70 @@ msgstr ""
 msgid "Error writing rewind state"
 msgstr ""
 
-#: panel.cpp:2198
+#: panel.cpp:2201
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2207
+#: panel.cpp:2210
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:2216
+#: panel.cpp:2219
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:2222
+#: panel.cpp:2225
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr ""
 
-#: panel.cpp:2225
+#: panel.cpp:2228
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:2234
+#: panel.cpp:2237
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2240
+#: panel.cpp:2243
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:2336
+#: panel.cpp:2339
 msgid "memory allocation error"
 msgstr ""
 
-#: panel.cpp:2339
+#: panel.cpp:2342
 msgid "error initializing codec"
 msgstr ""
 
-#: panel.cpp:2342
+#: panel.cpp:2345
 msgid "error writing to output file"
 msgstr ""
 
-#: panel.cpp:2345
+#: panel.cpp:2348
 msgid "can't guess output format from file name"
 msgstr ""
 
-#: panel.cpp:2350
+#: panel.cpp:2353
 msgid "programming error; aborting!"
 msgstr ""
 
-#: panel.cpp:2362 panel.cpp:2391
+#: panel.cpp:2365 panel.cpp:2394
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr ""
 
-#: panel.cpp:2419
+#: panel.cpp:2422
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr ""
 
-#: panel.cpp:2425
+#: panel.cpp:2428
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr ""
 
-#: panel.cpp:2435
+#: panel.cpp:2438
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr ""
@@ -1170,12 +1166,12 @@ msgstr ""
 msgid "CONTROL"
 msgstr ""
 
-#: widgets/sdljoy.cpp:177
+#: widgets/sdljoy.cpp:170
 #, c-format
 msgid "Connected %s: %s"
 msgstr ""
 
-#: widgets/sdljoy.cpp:192
+#: widgets/sdljoy.cpp:185
 #, c-format
 msgid "Disconnected %s"
 msgstr ""

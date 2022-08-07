@@ -107,17 +107,87 @@ void systemDrawScreen()
 //  <name>.vmv = keystroke log; all values little-endian ints:
 //     <version>.32 = 1
 //     for every joypad change (init to 0) and once at end of movie {
-//        <timestamp>.32 = frames since start of movie
+//        <timestamp>.32 = frames since start of movie in version 1 and frames since the previous change in version 2
 //        <joypad>.32 = default joypad reading at that time
 //     }
 //  <name>.vm0 = saved state
 
+struct supportedMovie {
+    MVFormatID formatId;
+    char const* longName;
+    char const* exts;
+};
+
+const supportedMovie movieSupportedToRecord[] = {
+    { MV_FORMAT_ID_VMV2, "VBA Movie v2, Time Diff Format", "vmv" },
+    { MV_FORMAT_ID_VMV1, "VBA Movie v1, Old Version for Compatibility", "vmv" },
+};
+
+std::vector<MVFormatID> getSupMovFormatsToRecord()
+{
+    std::vector<MVFormatID> result;
+    for (auto&& fmt: movieSupportedToRecord)
+        result.push_back(fmt.formatId);
+    return result;
+}
+
+std::vector<char*> getSupMovNamesToRecord()
+{
+    std::vector<char*> result;
+    for (auto&& fmt: movieSupportedToRecord)
+        result.push_back((char*)fmt.longName);
+    return result;
+}
+
+std::vector<char*> getSupMovExtsToRecord()
+{
+    std::vector<char*> result;
+    for (auto&& fmt: movieSupportedToRecord)
+        result.push_back((char*)fmt.exts);
+    return result;
+}
+
+const supportedMovie movieSupportedToPlayback[] = {
+    { MV_FORMAT_ID_VMV, "VBA Movie", "vmv" },
+};
+
+std::vector<MVFormatID> getSupMovFormatsToPlayback()
+{
+    std::vector<MVFormatID> result;
+    for (auto&& fmt: movieSupportedToPlayback)
+        result.push_back(fmt.formatId);
+    return result;
+}
+
+std::vector<char*> getSupMovNamesToPlayback()
+{
+    std::vector<char*> result;
+    for (auto&& fmt: movieSupportedToPlayback)
+        result.push_back((char*)fmt.longName);
+    return result;
+}
+
+std::vector<char*> getSupMovExtsToPlayback()
+{
+    std::vector<char*> result;
+    for (auto&& fmt: movieSupportedToPlayback)
+        result.push_back((char*)fmt.exts);
+    return result;
+}
+
+const MVFormatID VMVFormatVersions[] = {
+    MV_FORMAT_ID_VMV,
+    MV_FORMAT_ID_VMV1,
+    MV_FORMAT_ID_VMV2,
+};
+
+enum MVFormatID recording_format;
 wxFFile game_file;
 bool game_recording, game_playback;
 uint32_t game_frame;
 uint32_t game_joypad;
 
-void systemStartGameRecording(const wxString& fname)
+void systemStartGameRecording(const wxString& fname, MVFormatID format)
 {
     GameArea* panel = wxGetApp().frame->GetPanel();
 
@@ -129,10 +199,15 @@ void systemStartGameRecording(const wxString& fname)
     systemStopGamePlayback();
     wxString fn = fname;
 
+    recording_format = format;
+
     if (fn.size() < 4 || !wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".vmv"), false))
         fn.append(wxT(".vmv"));
 
     uint32_t version = 1;
+
+    if (recording_format == MV_FORMAT_ID_VMV2)
+        version = 2;
 
     if (!game_file.Open(fn, wxT("wb")) || game_file.Write(&version, sizeof(version)) != sizeof(version)) {
         wxLogError(_("Cannot open output file %s"), fname.c_str());
@@ -173,7 +248,7 @@ void systemStopGameRecording()
 
 uint32_t game_next_frame, game_next_joypad;
 
-void systemStartGamePlayback(const wxString& fname)
+void systemStartGamePlayback(const wxString& fname, MVFormatID format)
 {
     GameArea* panel = wxGetApp().frame->GetPanel();
 
@@ -190,15 +265,19 @@ void systemStartGamePlayback(const wxString& fname)
     systemStopGamePlayback();
     wxString fn = fname;
 
+    recording_format = format;
+
     if (fn.size() < 4 || !wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".vmv"), false))
         fn.append(wxT(".vmv"));
 
     uint32_t version;
 
-    if (!game_file.Open(fn, wxT("rb")) || game_file.Read(&version, sizeof(version)) != sizeof(version) || wxUINT32_SWAP_ON_BE(version) != 1) {
+    if (!game_file.Open(fn, wxT("rb")) || game_file.Read(&version, sizeof(version)) != sizeof(version) || wxUINT32_SWAP_ON_BE(version) < 1 || wxUINT32_SWAP_ON_BE(version) > 2) {
         wxLogError(_("Cannot open recording file %s"), fname.c_str());
         return;
     }
+
+    recording_format = VMVFormatVersions[version];
 
     uint32_t gf, jp;
 
@@ -310,22 +389,52 @@ uint32_t systemReadJoypad(int joy)
                 game_recording = false;
                 wxLogError(_("Error writing game recording"));
             }
+
+            if (recording_format == MV_FORMAT_ID_VMV2)
+                game_frame = 0;
         }
     } else if (game_playback) {
-        while (game_frame >= game_next_frame) {
-            game_joypad = game_next_joypad;
-            uint32_t gf, jp;
+        switch (recording_format) {
+        case MV_FORMAT_ID_VMV2:
+            if (game_frame >= game_next_frame) {
+                game_joypad = game_next_joypad;
+                uint32_t gf, jp;
 
-            if (game_file.Read(&gf, sizeof(gf)) != sizeof(gf) || game_file.Read(&jp, sizeof(jp)) != sizeof(jp)) {
-                game_file.Close();
-                game_playback = false;
-                wxString msg(_("Playback ended"));
-                systemScreenMessage(msg);
-                break;
+                if (game_file.Read(&gf, sizeof(gf)) != sizeof(gf) || game_file.Read(&jp, sizeof(jp)) != sizeof(jp)) {
+                    game_file.Close();
+                    game_playback = false;
+                    wxString msg(_("Playback ended"));
+                    systemScreenMessage(msg);
+                    break;
+                }
+
+                game_next_frame = wxUINT32_SWAP_ON_BE(gf);
+                game_next_joypad = wxUINT32_SWAP_ON_BE(jp);
+
+                game_frame = 0;
             }
+            break;
 
-            game_next_frame = wxUINT32_SWAP_ON_BE(gf);
-            game_next_joypad = wxUINT32_SWAP_ON_BE(jp);
+        case MV_FORMAT_ID_VMV1:
+            while (game_frame >= game_next_frame) {
+                game_joypad = game_next_joypad;
+                uint32_t gf, jp;
+
+                if (game_file.Read(&gf, sizeof(gf)) != sizeof(gf) || game_file.Read(&jp, sizeof(jp)) != sizeof(jp)) {
+                    game_file.Close();
+                    game_playback = false;
+                    wxString msg(_("Playback ended"));
+                    systemScreenMessage(msg);
+                    break;
+                }
+
+                game_next_frame = wxUINT32_SWAP_ON_BE(gf);
+                game_next_joypad = wxUINT32_SWAP_ON_BE(jp);
+            }
+            break;
+
+        default:
+            break;
         }
 
         ret = game_joypad;
