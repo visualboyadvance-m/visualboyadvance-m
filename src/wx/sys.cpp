@@ -134,27 +134,24 @@ const supportedMovie movieSupportedToRecord[] = {
 std::vector<MVFormatID> getSupMovFormatsToRecord()
 {
     std::vector<MVFormatID> result;
-    size_t size = sizeof(movieSupportedToRecord) / sizeof(movieSupportedToRecord[0]);
-    for (size_t i = 0; i < size; ++i)
-        result.push_back(movieSupportedToRecord[i].formatId);
+    for (auto&& fmt: movieSupportedToRecord)
+        result.push_back(fmt.formatId);
     return result;
 }
 
 std::vector<char*> getSupMovNamesToRecord()
 {
     std::vector<char*> result;
-    size_t size = sizeof(movieSupportedToRecord) / sizeof(movieSupportedToRecord[0]);
-    for (size_t i = 0; i < size; ++i)
-        result.push_back((char*)movieSupportedToRecord[i].longName);
+    for (auto&& fmt: movieSupportedToRecord)
+        result.push_back((char*)fmt.longName);
     return result;
 }
 
 std::vector<char*> getSupMovExtsToRecord()
 {
     std::vector<char*> result;
-    size_t size = sizeof(movieSupportedToRecord) / sizeof(movieSupportedToRecord[0]);
-    for (size_t i = 0; i < size; ++i)
-        result.push_back((char*)movieSupportedToRecord[i].exts);
+    for (auto&& fmt: movieSupportedToRecord)
+        result.push_back((char*)fmt.exts);
     return result;
 }
 
@@ -165,27 +162,24 @@ const supportedMovie movieSupportedToPlayback[] = {
 std::vector<MVFormatID> getSupMovFormatsToPlayback()
 {
     std::vector<MVFormatID> result;
-    size_t size = sizeof(movieSupportedToPlayback) / sizeof(movieSupportedToPlayback[0]);
-    for (size_t i = 0; i < size; ++i)
-        result.push_back(movieSupportedToPlayback[i].formatId);
+    for (auto&& fmt: movieSupportedToPlayback)
+        result.push_back(fmt.formatId);
     return result;
 }
 
 std::vector<char*> getSupMovNamesToPlayback()
 {
     std::vector<char*> result;
-    size_t size = sizeof(movieSupportedToPlayback) / sizeof(movieSupportedToPlayback[0]);
-    for (size_t i = 0; i < size; ++i)
-        result.push_back((char*)movieSupportedToPlayback[i].longName);
+    for (auto&& fmt: movieSupportedToPlayback)
+        result.push_back((char*)fmt.longName);
     return result;
 }
 
 std::vector<char*> getSupMovExtsToPlayback()
 {
     std::vector<char*> result;
-    size_t size = sizeof(movieSupportedToPlayback) / sizeof(movieSupportedToPlayback[0]);
-    for (size_t i = 0; i < size; ++i)
-        result.push_back((char*)movieSupportedToPlayback[i].exts);
+    for (auto&& fmt: movieSupportedToPlayback)
+        result.push_back((char*)fmt.exts);
     return result;
 }
 
