@@ -1335,8 +1335,8 @@ EVT_HANDLER_MASK(RecordMovieStartRecording, "Start game recording...", CMDEN_NGR
         mov_extno = -1;
         int extno = 0;
 
-        std::vector<char*> fmts = getSupMovNames();
-        std::vector<char*> exts = getSupMovExts();
+        std::vector<char*> fmts = getSupMovNamesToRecord();
+        std::vector<char*> exts = getSupMovExtsToRecord();
 
         for (size_t i = 0; i < fmts.size(); ++i)
         {
@@ -1381,7 +1381,7 @@ EVT_HANDLER_MASK(RecordMovieStartRecording, "Start game recording...", CMDEN_NGR
     if (ret != wxID_OK)
         return;
 
-    systemStartGameRecording(dlg.GetPath());
+    systemStartGameRecording(dlg.GetPath(), getSupMovFormatsToRecord()[mov_extno]);
 }
 
 EVT_HANDLER_MASK(RecordMovieStopRecording, "Stop game recording", CMDEN_GREC)
@@ -1399,8 +1399,8 @@ EVT_HANDLER_MASK(PlayMovieStartPlaying, "Start playing movie...", CMDEN_NGREC | 
         mov_extno = -1;
         int extno = 0;
 
-        std::vector<char*> fmts = getSupMovNames();
-        std::vector<char*> exts = getSupMovExts();
+        std::vector<char*> fmts = getSupMovNamesToPlayback();
+        std::vector<char*> exts = getSupMovExtsToPlayback();
 
         for (size_t i = 0; i < fmts.size(); ++i)
         {
@@ -1446,7 +1446,7 @@ EVT_HANDLER_MASK(PlayMovieStartPlaying, "Start playing movie...", CMDEN_NGREC | 
     if (ret != wxID_OK)
         return;
 
-    systemStartGamePlayback(dlg.GetPath());
+    systemStartGamePlayback(dlg.GetPath(), getSupMovFormatsToPlayback()[mov_extno]);
 }
 
 EVT_HANDLER_MASK(PlayMovieStopPlaying, "Stop playing movie", CMDEN_GPLAY)

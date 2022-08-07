@@ -126,28 +126,74 @@ struct supportedMovie {
     char const* exts;
 };
 
-const supportedMovie movieSupported[] = {
-    { MV_FORMAT_ID_VMV, "VBA Movie", "vmv" },
-    { MV_FORMAT_ID_VMD, "VBA Movie (Diff Format)", "vmd"},
+const supportedMovie movieSupportedToRecord[] = {
+    { MV_FORMAT_ID_VMV2, "VBA Movie v2, Time Diff Format", "vmv" },
+    { MV_FORMAT_ID_VMV1, "VBA Movie v1, Old Version for Compatibility", "vmv" },
 };
 
-std::vector<char*> getSupMovNames()
+std::vector<MVFormatID> getSupMovFormatsToRecord()
 {
-    std::vector<char*> result;
-    size_t size = sizeof(movieSupported) / sizeof(movieSupported[0]);
+    std::vector<MVFormatID> result;
+    size_t size = sizeof(movieSupportedToRecord) / sizeof(movieSupportedToRecord[0]);
     for (size_t i = 0; i < size; ++i)
-        result.push_back((char*)movieSupported[i].longName);
+        result.push_back(movieSupportedToRecord[i].formatId);
     return result;
 }
 
-std::vector<char*> getSupMovExts()
+std::vector<char*> getSupMovNamesToRecord()
 {
     std::vector<char*> result;
-    size_t size = sizeof(movieSupported) / sizeof(movieSupported[0]);
+    size_t size = sizeof(movieSupportedToRecord) / sizeof(movieSupportedToRecord[0]);
     for (size_t i = 0; i < size; ++i)
-        result.push_back((char*)movieSupported[i].exts);
+        result.push_back((char*)movieSupportedToRecord[i].longName);
     return result;
 }
+
+std::vector<char*> getSupMovExtsToRecord()
+{
+    std::vector<char*> result;
+    size_t size = sizeof(movieSupportedToRecord) / sizeof(movieSupportedToRecord[0]);
+    for (size_t i = 0; i < size; ++i)
+        result.push_back((char*)movieSupportedToRecord[i].exts);
+    return result;
+}
+
+const supportedMovie movieSupportedToPlayback[] = {
+    { MV_FORMAT_ID_VMV, "VBA Movie", "vmv" },
+};
+
+std::vector<MVFormatID> getSupMovFormatsToPlayback()
+{
+    std::vector<MVFormatID> result;
+    size_t size = sizeof(movieSupportedToPlayback) / sizeof(movieSupportedToPlayback[0]);
+    for (size_t i = 0; i < size; ++i)
+        result.push_back(movieSupportedToPlayback[i].formatId);
+    return result;
+}
+
+std::vector<char*> getSupMovNamesToPlayback()
+{
+    std::vector<char*> result;
+    size_t size = sizeof(movieSupportedToPlayback) / sizeof(movieSupportedToPlayback[0]);
+    for (size_t i = 0; i < size; ++i)
+        result.push_back((char*)movieSupportedToPlayback[i].longName);
+    return result;
+}
+
+std::vector<char*> getSupMovExtsToPlayback()
+{
+    std::vector<char*> result;
+    size_t size = sizeof(movieSupportedToPlayback) / sizeof(movieSupportedToPlayback[0]);
+    for (size_t i = 0; i < size; ++i)
+        result.push_back((char*)movieSupportedToPlayback[i].exts);
+    return result;
+}
+
+const MVFormatID VMVFormatVersions[] = {
+    MV_FORMAT_ID_VMV,
+    MV_FORMAT_ID_VMV1,
+    MV_FORMAT_ID_VMV2,
+};
 
 enum MVFormatID recording_format;
 wxFFile game_file;
@@ -155,7 +201,7 @@ bool game_recording, game_playback;
 uint32_t game_frame;
 uint32_t game_joypad;
 
-void systemStartGameRecording(const wxString& fname)
+void systemStartGameRecording(const wxString& fname, MVFormatID format)
 {
     GameArea* panel = wxGetApp().frame->GetPanel();
 
@@ -167,14 +213,15 @@ void systemStartGameRecording(const wxString& fname)
     systemStopGamePlayback();
     wxString fn = fname;
 
-    recording_format = MV_FORMAT_ID_VMV;
+    recording_format = format;
 
-    if (fn.size() >= 4 && wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".vmd"), true))
-        recording_format = MV_FORMAT_ID_VMD;
-    else if (fn.size() < 4 || !wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".vmv"), false))
+    if (fn.size() < 4 || !wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".vmv"), false))
         fn.append(wxT(".vmv"));
 
     uint32_t version = 1;
+
+    if (recording_format == MV_FORMAT_ID_VMV2)
+        version = 2;
 
     if (!game_file.Open(fn, wxT("wb")) || game_file.Write(&version, sizeof(version)) != sizeof(version)) {
         wxLogError(_("Cannot open output file %s"), fname.c_str());
@@ -182,9 +229,6 @@ void systemStartGameRecording(const wxString& fname)
     }
 
     fn[fn.size() - 1] = wxT('0');
-
-    if (recording_format == MV_FORMAT_ID_VMD)
-        fn[fn.size() - 1] = wxT('1');
 
     if (!panel->emusys->emuWriteState(UTF8(fn))) {
         wxLogError(_("Error writing game recording"));
@@ -218,7 +262,7 @@ void systemStopGameRecording()
 
 uint32_t game_next_frame, game_next_joypad;
 
-void systemStartGamePlayback(const wxString& fname)
+void systemStartGamePlayback(const wxString& fname, MVFormatID format)
 {
     GameArea* panel = wxGetApp().frame->GetPanel();
 
@@ -235,19 +279,19 @@ void systemStartGamePlayback(const wxString& fname)
     systemStopGamePlayback();
     wxString fn = fname;
 
-    recording_format = MV_FORMAT_ID_VMV;
+    recording_format = format;
 
-    if (fn.size() >= 4 && wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".vmd"), true))
-        recording_format = MV_FORMAT_ID_VMD;
-    else if (fn.size() < 4 || !wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".vmv"), false))
+    if (fn.size() < 4 || !wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".vmv"), false))
         fn.append(wxT(".vmv"));
 
     uint32_t version;
 
-    if (!game_file.Open(fn, wxT("rb")) || game_file.Read(&version, sizeof(version)) != sizeof(version) || wxUINT32_SWAP_ON_BE(version) != 1) {
+    if (!game_file.Open(fn, wxT("rb")) || game_file.Read(&version, sizeof(version)) != sizeof(version) || wxUINT32_SWAP_ON_BE(version) < 1 || wxUINT32_SWAP_ON_BE(version) > 2) {
         wxLogError(_("Cannot open recording file %s"), fname.c_str());
         return;
     }
+
+    recording_format = VMVFormatVersions[version];
 
     uint32_t gf, jp;
 
@@ -260,9 +304,6 @@ void systemStartGamePlayback(const wxString& fname)
     game_next_frame = wxUINT32_SWAP_ON_BE(gf);
     game_next_joypad = wxUINT32_SWAP_ON_BE(jp);
     fn[fn.size() - 1] = wxT('0');
-
-    if (recording_format == MV_FORMAT_ID_VMD)
-        fn[fn.size() - 1] = wxT('1');
 
     if (!panel->emusys->emuReadState(UTF8(fn))) {
         wxLogError(_("Error reading game recording"));
@@ -363,12 +404,12 @@ uint32_t systemReadJoypad(int joy)
                 wxLogError(_("Error writing game recording"));
             }
 
-            if (recording_format == MV_FORMAT_ID_VMD)
+            if (recording_format == MV_FORMAT_ID_VMV2)
                 game_frame = 0;
         }
     } else if (game_playback) {
         switch (recording_format) {
-        case MV_FORMAT_ID_VMD:
+        case MV_FORMAT_ID_VMV2:
             if (game_frame >= game_next_frame) {
                 game_joypad = game_next_joypad;
                 uint32_t gf, jp;
@@ -387,7 +428,7 @@ uint32_t systemReadJoypad(int joy)
             }
             break;
 
-        case MV_FORMAT_ID_VMV:
+        case MV_FORMAT_ID_VMV1:
             while (game_frame >= game_next_frame) {
                 game_joypad = game_next_joypad;
                 uint32_t gf, jp;

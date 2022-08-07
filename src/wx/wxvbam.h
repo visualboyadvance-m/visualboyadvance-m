@@ -800,17 +800,22 @@ enum MVFormatID {
 
     /* movie formats */
     MV_FORMAT_ID_VMV,
-    MV_FORMAT_ID_VMD,
+    MV_FORMAT_ID_VMV1,
+    MV_FORMAT_ID_VMV2,
 };
-std::vector<char*> getSupMovNames();
-std::vector<char*> getSupMovExts();
+std::vector<MVFormatID> getSupMovFormatsToRecord();
+std::vector<char*> getSupMovNamesToRecord();
+std::vector<char*> getSupMovExtsToRecord();
+std::vector<MVFormatID> getSupMovFormatsToPlayback();
+std::vector<char*> getSupMovNamesToPlayback();
+std::vector<char*> getSupMovExtsToPlayback();
 
 // perhaps these functions should not be called systemXXX
 // perhaps they should move to panel.cpp/GameArea
 // but they must integrate with systemReadJoypad
-void systemStartGameRecording(const wxString& fname);
+void systemStartGameRecording(const wxString& fname, MVFormatID format);
 void systemStopGameRecording();
-void systemStartGamePlayback(const wxString& fname);
+void systemStartGamePlayback(const wxString& fname, MVFormatID format);
 void systemStopGamePlayback();
 
 // true if turbo mode (like pressing turbo button constantly)
