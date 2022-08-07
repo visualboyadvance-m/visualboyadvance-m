@@ -855,17 +855,6 @@ if(WIN32)
     list(APPEND VBAM_LIBS dxguid dsound wsock32 ws2_32 imm32 version)
 endif()
 
-# On MSYS2 CLANG64, use MinGW64 windres, when available,  instead of
-# llvm-rc, which sometimes does not work.
-if(MSYS AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-    cygpath(gcc_binutils_windres /mingw64/bin/windres)
-
-    if(EXISTS "${gcc_binutils_windres}")
-        set(CMAKE_RC_COMPILER "${gcc_binutils_windres}")
-        set(CMAKE_RC_COMPILER "${gcc_binutils_windres}" CACHE STRING "Windows REsource File Compiler" FORCE)
-    endif()
-endif()
-
 link_directories(${CMAKE_BINARY_DIR})
 
 set(VBAM_ICON visualboyadvance-m.icns)
