@@ -107,18 +107,10 @@ void systemDrawScreen()
 //  <name>.vmv = keystroke log; all values little-endian ints:
 //     <version>.32 = 1
 //     for every joypad change (init to 0) and once at end of movie {
-//        <timestamp>.32 = frames since start of movie
+//        <timestamp>.32 = frames since start of movie in version 1 and frames since the previous change in version 2
 //        <joypad>.32 = default joypad reading at that time
 //     }
 //  <name>.vm0 = saved state
-// 
-//  <name>.vmd = keystroke log; all values little-endian ints:
-//     <version>.32 = 1
-//     for every joypad change (init to 0) and once at end of movie {
-//        <timestamp>.32 = frames since the previous change
-//        <joypad>.32 = default joypad reading at that time
-//     }
-//  <name>.vm1 = saved state
 
 struct supportedMovie {
     MVFormatID formatId;
