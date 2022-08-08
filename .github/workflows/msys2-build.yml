@@ -16,7 +16,7 @@ jobs:
         with: 
           submodules: recursive
       - name: Setup msys2
-        uses: msys2/setup-msys2@v2
+        uses: rkitover/setup-msys2@v2
         with:
           msystem: CLANG64
           update: true
