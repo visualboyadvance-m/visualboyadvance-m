@@ -3,12 +3,14 @@
 #include <cstring>
 #include <vector>
 
-#if defined(__WXGTK__) && defined(HAVE_XSS)
+#ifdef __WXGTK__
     #include <X11/Xlib.h>
     #define Status int
-    #include <X11/extensions/scrnsaver.h>
     #include <gdk/gdkx.h>
     #include <gtk/gtk.h>
+#ifdef HAVE_XSS
+    #include <X11/extensions/scrnsaver.h>
+#endif
 #endif
 
 #include <wx/dcbuffer.h>
@@ -2170,7 +2172,7 @@ void GLDrawingPanel::DrawingPanelInit()
     static PFNGLXSWAPINTERVALSGIPROC glXSwapIntervalSGI = NULL;
     static PFNGLXSWAPINTERVALMESAPROC glXSwapIntervalMESA = NULL;
 
-    auto display = glXGetCurrentDisplay();
+    auto display = GDK_WINDOW_XDISPLAY(gtk_widget_get_window(wxGetApp().frame->GetHandle()));
 
     char* glxQuery = (char*)glXQueryExtensionsString(display, DefaultScreen(display));
 
