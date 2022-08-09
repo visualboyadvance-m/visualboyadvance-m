@@ -5,8 +5,6 @@ endif()
 
 include(doctest)
 
-include_directories("${CMAKE_SOURCE_DIR}/third_party/include/doctest")
-
 function(add_doctest_test test_src)
     string(REGEX REPLACE ".cpp$" "" test_name "${test_src}")
 
