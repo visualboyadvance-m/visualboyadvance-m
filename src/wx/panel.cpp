@@ -2170,7 +2170,9 @@ void GLDrawingPanel::DrawingPanelInit()
     static PFNGLXSWAPINTERVALSGIPROC glXSwapIntervalSGI = NULL;
     static PFNGLXSWAPINTERVALMESAPROC glXSwapIntervalMESA = NULL;
 
-    char* glxQuery = (char*)glXQueryExtensionsString(glXGetCurrentDisplay(), 0);
+    auto display = glXGetCurrentDisplay();
+
+    char* glxQuery = (char*)glXQueryExtensionsString(display, DefaultScreen(display));
 
     if (strstr(glxQuery, "GLX_EXT_swap_control") != NULL)
     {
