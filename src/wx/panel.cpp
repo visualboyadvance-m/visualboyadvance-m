@@ -1274,6 +1274,13 @@ static void process_keyboard_event(const wxKeyEvent& ev, bool down)
     };
 }
 
+#ifdef __WXGTK__
+static Display* GetX11Display()
+{
+    return GDK_WINDOW_XDISPLAY(gtk_widget_get_window(wxGetApp().frame->GetHandle()));
+}
+#endif
+
 void GameArea::OnKeyDown(wxKeyEvent& ev)
 {
     process_keyboard_event(ev, true);
@@ -1315,7 +1322,7 @@ void GameArea::OnSDLJoy(wxJoyEvent& ev)
     // this shouldn't be necessary of course
 #if defined(__WXGTK__) && defined(HAVE_XSS)
     if (!wxGetApp().UsingWayland()) {
-        Display* display = GDK_WINDOW_XDISPLAY(gtk_widget_get_window(wxGetApp().frame->GetHandle()));
+        auto display = GetX11Display();
         XResetScreenSaver(display);
         XFlush(display);
     }
@@ -2172,7 +2179,7 @@ void GLDrawingPanel::DrawingPanelInit()
     static PFNGLXSWAPINTERVALSGIPROC glXSwapIntervalSGI = NULL;
     static PFNGLXSWAPINTERVALMESAPROC glXSwapIntervalMESA = NULL;
 
-    auto display = GDK_WINDOW_XDISPLAY(gtk_widget_get_window(wxGetApp().frame->GetHandle()));
+    auto display = GetX11Display();
 
     char* glxQuery = (char*)glXQueryExtensionsString(display, DefaultScreen(display));
 
