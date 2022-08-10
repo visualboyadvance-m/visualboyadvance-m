@@ -13,4 +13,5 @@ endforeach()
 execute_process(
     COMMAND ${ZIP_PROGRAM} -9r ../translations.zip .
     WORKING_DIRECTORY translations
+    OUTPUT_QUIET
 )

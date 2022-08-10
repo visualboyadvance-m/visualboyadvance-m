@@ -1011,16 +1011,21 @@ endif()
 
 option(TRANSLATIONS_ONLY "Build only the translations.zip" OFF)
 
-# Make the translations.zip for windows builds.
+# Make the translations.zip
 if(ENABLE_NLS)
-    file(GLOB catalogs ${CMAKE_BINARY_DIR}/po/wxvbam/*.gmo)
+    add_custom_command(
+        OUTPUT ${CMAKE_BINARY_DIR}/translations.zip
+        COMMAND ${CMAKE_COMMAND} -D "ZIP_PROGRAM=${ZIP_PROGRAM}" -P ${CMAKE_CURRENT_SOURCE_DIR}/make-translations-zip.cmake
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        DEPENDS translations make-translations-zip.cmake
+    )
 
     add_custom_target(
-            translations-zip ALL
-            COMMAND ${CMAKE_COMMAND} -D "ZIP_PROGRAM=${ZIP_PROGRAM}" -P ${CMAKE_CURRENT_SOURCE_DIR}/make-translations-zip.cmake
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            DEPENDS translations make-translations-zip.cmake ${catalogs}
+        translations-zip
+        SOURCES ${CMAKE_BINARY_DIR}/translations.zip
     )
+
+    add_dependencies(visualboyadvance-m translations-zip)
 endif()
 
 # Update the gettext pot source.
@@ -1046,10 +1051,8 @@ if(ENABLE_NLS)
 
     add_dependencies(gettext-pot xrc-strings)
 
-    add_dependencies(translations-zip gettext-pot)
-
     add_custom_command(
-        TARGET translations-zip
+        TARGET visualboyadvance-m
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -D SRC_DIR=${CMAKE_SOURCE_DIR}/po/wxvbam -D BIN_DIR=${CMAKE_BINARY_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/check-pot-updated.cmake
     )
@@ -1133,12 +1136,12 @@ if(NOT TRANSLATIONS_ONLY)
                 COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/translations.zip.asc
     #            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
                 COMMAND ${GPG_PROGRAM} --detach-sign -a ${CMAKE_BINARY_DIR}/translations.zip
-                DEPENDS translations-zip
+                DEPENDS ${CMAKE_BINARY_DIR}/translations.zip
             )
 
             add_custom_target(translations-zip-sig DEPENDS ${CMAKE_BINARY_DIR}/translations.zip.asc)
 
-            add_dependencies(visualboyadvance-m translations-zip-sig)
+            add_dependencies(translations-zip translations-zip-sig)
 
             add_custom_command(
                 TARGET visualboyadvance-m

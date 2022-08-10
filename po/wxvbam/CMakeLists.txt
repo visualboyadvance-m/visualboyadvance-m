@@ -5,4 +5,4 @@ gettext_create_translations(
         ${po_files}
 )
 
-add_dependencies(translations-zip translations)
+add_dependencies(visualboyadvance-m translations)
