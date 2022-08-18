@@ -1047,12 +1047,12 @@ if(ENABLE_NLS)
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
-    add_custom_target(gettext-pot DEPENDS ${CMAKE_BINARY_DIR}/wxvbam.pot)
+    add_custom_target(gettext-pot ALL DEPENDS ${CMAKE_BINARY_DIR}/wxvbam.pot)
 
     add_dependencies(gettext-pot xrc-strings)
 
     add_custom_command(
-        TARGET visualboyadvance-m
+        TARGET gettext-pot
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -D SRC_DIR=${CMAKE_SOURCE_DIR}/po/wxvbam -D BIN_DIR=${CMAKE_BINARY_DIR} -P ${CMAKE_CURRENT_SOURCE_DIR}/check-pot-updated.cmake
     )
