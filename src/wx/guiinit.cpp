@@ -3701,6 +3701,10 @@ bool MainFrame::BindControls()
             rb->Hide();
 #endif
             ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "Filter", wxGenericValidator(&gopts.filter));
+
+            // Save the Filters choice control to extract the names from the XRC.
+            pixel_filters = ch;
+
             // these two are filled and/or hidden at dialog load time
             wxControl* pll;
             wxChoice* pl;

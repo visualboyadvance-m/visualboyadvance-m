@@ -2766,7 +2766,7 @@ EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
     }
 
     wxString msg;
-    msg.Printf(_("Using pixel filter #%d"), gopts.filter);
+    msg.Printf(_("Using pixel filter %s"), pixel_filters->GetString(gopts.filter));
     systemScreenMessage(msg);
 }
 
