@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-06 20:51+0800\n"
+"POT-Creation-Date: 2022-08-18 14:29+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Greg@Cyberdyne, 2018\n"
 "Language-Team: Hungarian (Hungary) (http://www.transifex.com/bgk/vba-m/language/hu_HU/)\n"
@@ -162,7 +162,7 @@ msgstr "Válassz csalás fájlt"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA csaláslista (*.clt)|*.clt|CHT csaláslista (*.cht)|*.cht"
 
-#: guiinit.cpp:262 panel.cpp:447
+#: guiinit.cpp:262 panel.cpp:449
 msgid "Loaded cheats"
 msgstr "Betöltött csalások"
 
@@ -340,15 +340,15 @@ msgstr "Régi Érték"
 msgid "New Value"
 msgstr "Új Érték"
 
-#: guiinit.cpp:3898
+#: guiinit.cpp:3902
 msgid "Menu commands"
 msgstr "Menü parancsok"
 
-#: guiinit.cpp:3921
+#: guiinit.cpp:3925
 msgid "Other commands"
 msgstr "Egyéb parancsok"
 
-#: guiinit.cpp:4032
+#: guiinit.cpp:4036
 msgid "JoyBus host invalid; disabling"
 msgstr "A JoyBus gazda érvénytelen; letiltás"
 
@@ -615,7 +615,7 @@ msgstr "Egy battery fájl importálása töröl minden játékállás mentést (
 msgid "Confirm import"
 msgstr "Importálás megerősítése"
 
-#: cmdevents.cpp:906 panel.cpp:390
+#: cmdevents.cpp:906 panel.cpp:392
 #, c-format
 msgid "Loaded battery %s"
 msgstr "%s battery betöltve"
@@ -698,7 +698,7 @@ msgstr "A %s pillanatkép fájl betöltése sikertelen"
 msgid "Wrote battery %s"
 msgstr "%s battery megírva"
 
-#: cmdevents.cpp:1099 panel.cpp:699
+#: cmdevents.cpp:1099 panel.cpp:701
 #, c-format
 msgid "Error writing battery %s"
 msgstr "A %s battery írása sikertelen"
@@ -725,7 +725,7 @@ msgstr "A %s pillanatkép fájl mentve"
 msgid "Error saving snapshot file %s"
 msgstr "A %s pillanatkép fájl mentése sikertelen"
 
-#: cmdevents.cpp:1182 sys.cpp:524
+#: cmdevents.cpp:1182 sys.cpp:557
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "A %s pillanatkép kiírva"
@@ -796,15 +796,15 @@ msgstr "Várakozás a GDB-re"
 
 #: cmdevents.cpp:2769
 #, c-format
-msgid "Using pixel filter #%d"
-msgstr "Alkalmazott pixelszűrő:  #%d"
+msgid "Using pixel filter %s"
+msgstr ""
 
 #: cmdevents.cpp:2784
 #, c-format
 msgid "Using interframe blending #%d"
 msgstr "Képkockaátmenet elmosás: #%d"
 
-#: cmdevents.cpp:2823 panel.cpp:192 panel.cpp:306
+#: cmdevents.cpp:2823 panel.cpp:194 panel.cpp:308
 msgid "Could not initialize the sound driver!"
 msgstr "A hang meghajtóprogramja nem indítható!"
 
@@ -872,236 +872,236 @@ msgstr "A %s - %s érvénytelen billentyű hozzárendelés"
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Az érvénytelen jelölőopció %s - %s elutasítva"
 
-#: sys.cpp:161 sys.cpp:221
+#: sys.cpp:195 sys.cpp:256
 msgid "No game in progress to record"
 msgstr "Nincs rögzíthető elindított játék"
 
-#: sys.cpp:178
+#: sys.cpp:213
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "A %s kimeneti fájl nem nyitható meg"
 
-#: sys.cpp:185 sys.cpp:205 sys.cpp:355
+#: sys.cpp:220 sys.cpp:240 sys.cpp:390
 msgid "Error writing game recording"
 msgstr "Hiba a játék rögzítésének írásakor"
 
-#: sys.cpp:226
+#: sys.cpp:261
 msgid "Cannot play game recording while recording"
 msgstr "Játékfelvétel lejátszása nem lehetséges rögzítéskor"
 
-#: sys.cpp:243
+#: sys.cpp:276
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "A %s felvételfájl megnyitása nem lehetséges"
 
-#: sys.cpp:250 sys.cpp:260
+#: sys.cpp:285 sys.cpp:295
 msgid "Error reading game recording"
 msgstr "Hiba a játékfelvétel beolvasásakor"
 
-#: sys.cpp:371 sys.cpp:391
+#: sys.cpp:405 sys.cpp:424
 msgid "Playback ended"
 msgstr "A lejátszás véget ért"
 
-#: sys.cpp:415
+#: sys.cpp:448
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr "%d%%(%d, %d fps)"
 
-#: sys.cpp:423
+#: sys.cpp:456
 #, c-format
 msgid "%d%%"
 msgstr "%d%%"
 
-#: sys.cpp:843 xrc/GBPrinter.xrc:65
+#: sys.cpp:876 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "El&dobás"
 
-#: sys.cpp:877
+#: sys.cpp:910
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "Képfájlok (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:886
+#: sys.cpp:919
 msgid "Save printer image to"
 msgstr "Nyomtatási kép mentésének helye"
 
-#: sys.cpp:900 sys.cpp:1083
+#: sys.cpp:933 sys.cpp:1116
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "Nyomtatási kép kiírva ide: %s"
 
-#: sys.cpp:905 sys.cpp:976
+#: sys.cpp:938 sys.cpp:1009
 msgid "&Close"
 msgstr "Bezár"
 
-#: sys.cpp:971
+#: sys.cpp:1004
 msgid "Printed"
 msgstr "Kinyomtatva"
 
-#: sys.cpp:1273
+#: sys.cpp:1306
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "Hiba az ál-TTY megnyitásakor: %s"
 
-#: sys.cpp:1372
+#: sys.cpp:1405
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "Hiba a szerver socket beállításakor (%d)"
 
-#: panel.cpp:106
+#: panel.cpp:108
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s nem létező ROM fájl"
 
-#: panel.cpp:107 panel.cpp:168 panel.cpp:244
+#: panel.cpp:109 panel.cpp:170 panel.cpp:246
 msgid "Problem loading file"
 msgstr "Probléma a fájl betöltésénél"
 
-#: panel.cpp:167
+#: panel.cpp:169
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "A %s Game Boy ROM nem tölthető be"
 
-#: panel.cpp:204
+#: panel.cpp:206
 msgid ""
 "Cannot use GB BIOS file when Colorizer Hack is enabled, disabling GB BIOS "
 "file."
 msgstr "Bekapcsolt Kiszínező Hack mellett a GB BIOS fájl nem működik, letiltásra kerül."
 
-#: panel.cpp:220 panel.cpp:320
+#: panel.cpp:222 panel.cpp:322
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "A %s BIOS nem tölthető be"
 
-#: panel.cpp:243
+#: panel.cpp:245
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "A %s Game Boy Advance ROM nem tölthető be"
 
-#: panel.cpp:479
+#: panel.cpp:481
 msgid " player "
 msgstr " játékos "
 
-#: panel.cpp:647
+#: panel.cpp:649
 #, c-format
 msgid "Loaded state %s"
 msgstr "A %s játékállás betöltve"
 
-#: panel.cpp:647
+#: panel.cpp:649
 #, c-format
 msgid "Error loading state %s"
 msgstr "Hiba a %s játékállás betöltésekor"
 
-#: panel.cpp:671
+#: panel.cpp:673
 #, c-format
 msgid "Saved state %s"
 msgstr "A %s játékállás mentve"
 
-#: panel.cpp:671
+#: panel.cpp:673
 #, c-format
 msgid "Error saving state %s"
 msgstr "Hiba a %s játékállás mentésekor"
 
-#: panel.cpp:875
+#: panel.cpp:877
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "A teljesképernyős mód %dx%d-%d@%d nem támogatott; másik keresése"
 
-#: panel.cpp:913
+#: panel.cpp:915
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "A teljesképernyős mód %dx%d-%d@%d nem támogatott"
 
-#: panel.cpp:918
+#: panel.cpp:920
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Érvényes mód: %dx%d-%d@%d"
 
-#: panel.cpp:926
+#: panel.cpp:928
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "%dx%d-%d@%d mód választva"
 
-#: panel.cpp:930
+#: panel.cpp:932
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Nem sikerült %dx%d-%d@%d módra váltani"
 
-#: panel.cpp:1018
+#: panel.cpp:1020
 msgid "Not a valid GBA cartridge"
 msgstr "Érvénytelen GBA bővítőkártya"
 
-#: panel.cpp:1182
+#: panel.cpp:1184
 msgid "No memory for rewinding"
 msgstr "Visszajátszáshoz kevés a memória"
 
-#: panel.cpp:1192
+#: panel.cpp:1194
 msgid "Error writing rewind state"
 msgstr "Hiba a visszajátszás-állás írásakor"
 
-#: panel.cpp:2201
+#: panel.cpp:2192
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "A glXSwapIntervalEXT beállítása sikertelen"
 
-#: panel.cpp:2210
+#: panel.cpp:2201
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "A glXSwapIntervalSGI beállítása sikertelen"
 
-#: panel.cpp:2219
+#: panel.cpp:2210
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "A glXSwapIntervalMESA beállítása sikertelen"
 
-#: panel.cpp:2225
+#: panel.cpp:2216
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "A wglGetExtensionsStringEXT nem támogatott"
 
-#: panel.cpp:2228
+#: panel.cpp:2219
 msgid "No support for WGL_EXT_swap_control"
 msgstr "A WGL_EXT_swap_control nem támogatott"
 
-#: panel.cpp:2237
+#: panel.cpp:2228
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "A wglSwapIntervalEXT beállítása sikertelen"
 
-#: panel.cpp:2243
+#: panel.cpp:2234
 msgid "No VSYNC available on this platform"
 msgstr "Nincs VSYNC ezen a platformon"
 
-#: panel.cpp:2339
+#: panel.cpp:2330
 msgid "memory allocation error"
 msgstr "memóriakioszási hiba"
 
-#: panel.cpp:2342
+#: panel.cpp:2333
 msgid "error initializing codec"
 msgstr "hiba a kodek inicializálásnál"
 
-#: panel.cpp:2345
+#: panel.cpp:2336
 msgid "error writing to output file"
 msgstr "hiba a kimeneti fájl írásakor"
 
-#: panel.cpp:2348
+#: panel.cpp:2339
 msgid "can't guess output format from file name"
 msgstr "a fájlnévből nem állapítható meg a kimenet formátuma"
 
-#: panel.cpp:2353
+#: panel.cpp:2344
 msgid "programming error; aborting!"
 msgstr "programhiba; megszakítás!"
 
-#: panel.cpp:2365 panel.cpp:2394
+#: panel.cpp:2356 panel.cpp:2385
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Nem lehet megkezdeni a rögzítést ide: %s (%s)"
 
-#: panel.cpp:2422
+#: panel.cpp:2413
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Hiba a hang/videó rögzítésekor (%s); megszakítás"
 
-#: panel.cpp:2428
+#: panel.cpp:2419
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Hiba a hangrögzítéskor (%s); megszakítás"
 
-#: panel.cpp:2438
+#: panel.cpp:2429
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Hiba a videórögzítéskor (%s); megszakítás"
@@ -1162,12 +1162,12 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:170
+#: widgets/sdljoy.cpp:188
 #, c-format
 msgid "Connected %s: %s"
 msgstr "%s kapcsolódása: %s"
 
-#: widgets/sdljoy.cpp:185
+#: widgets/sdljoy.cpp:203
 #, c-format
 msgid "Disconnected %s"
 msgstr "%s leválasztva"

@@ -19,7 +19,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-06 20:51+0800\n"
+"POT-Creation-Date: 2022-08-18 14:29+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Ching Wen Cheng <chingwen.cheng@gmail.com>, 2020-2021\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/bgk/vba-m/language/zh_TW/)\n"
@@ -171,7 +171,7 @@ msgstr "選擇金手指代碼表"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA 金手指代碼表 (*.clt)|*.clt|CHT 金手指代碼表 (*.cht)|*.cht"
 
-#: guiinit.cpp:262 panel.cpp:447
+#: guiinit.cpp:262 panel.cpp:449
 msgid "Loaded cheats"
 msgstr "已讀取金手指"
 
@@ -349,15 +349,15 @@ msgstr "舊數值"
 msgid "New Value"
 msgstr "新數值"
 
-#: guiinit.cpp:3898
+#: guiinit.cpp:3902
 msgid "Menu commands"
 msgstr "選單指令"
 
-#: guiinit.cpp:3921
+#: guiinit.cpp:3925
 msgid "Other commands"
 msgstr "其他指令"
 
-#: guiinit.cpp:4032
+#: guiinit.cpp:4036
 msgid "JoyBus host invalid; disabling"
 msgstr "遊戲總線主機無效;禁用"
 
@@ -624,7 +624,7 @@ msgstr "匯入電池記憶檔將會抹除現有的存檔（下次存檔後就永
 msgid "Confirm import"
 msgstr "匯入確認"
 
-#: cmdevents.cpp:906 panel.cpp:390
+#: cmdevents.cpp:906 panel.cpp:392
 #, c-format
 msgid "Loaded battery %s"
 msgstr "已讀取電池記憶檔 %s"
@@ -707,7 +707,7 @@ msgstr "讀取快照檔%s時發生錯誤"
 msgid "Wrote battery %s"
 msgstr "寫入電池記憶檔 %s"
 
-#: cmdevents.cpp:1099 panel.cpp:699
+#: cmdevents.cpp:1099 panel.cpp:701
 #, c-format
 msgid "Error writing battery %s"
 msgstr "寫入電池記憶檔%s時發生錯誤"
@@ -734,7 +734,7 @@ msgstr "已儲存快照檔 %s"
 msgid "Error saving snapshot file %s"
 msgstr "儲存快照檔%s時發生錯誤"
 
-#: cmdevents.cpp:1182 sys.cpp:524
+#: cmdevents.cpp:1182 sys.cpp:557
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "寫入快照檔 %s"
@@ -805,15 +805,15 @@ msgstr "正在等候 GDB ……"
 
 #: cmdevents.cpp:2769
 #, c-format
-msgid "Using pixel filter #%d"
-msgstr "使用像素濾波器 #%d"
+msgid "Using pixel filter %s"
+msgstr ""
 
 #: cmdevents.cpp:2784
 #, c-format
 msgid "Using interframe blending #%d"
 msgstr "使用幀間混合 #%d"
 
-#: cmdevents.cpp:2823 panel.cpp:192 panel.cpp:306
+#: cmdevents.cpp:2823 panel.cpp:194 panel.cpp:308
 msgid "Could not initialize the sound driver!"
 msgstr "無法初始化聲音驅動程式!"
 
@@ -881,236 +881,236 @@ msgstr "%s 鍵不能綁訂為 %s"
 msgid "Invalid flag option %s - %s ignored"
 msgstr "無效設置 %s - %s 以忽略"
 
-#: sys.cpp:161 sys.cpp:221
+#: sys.cpp:195 sys.cpp:256
 msgid "No game in progress to record"
 msgstr "沒有遊戲在進行錄製"
 
-#: sys.cpp:178
+#: sys.cpp:213
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "無法開啟輸出檔案 %s"
 
-#: sys.cpp:185 sys.cpp:205 sys.cpp:355
+#: sys.cpp:220 sys.cpp:240 sys.cpp:390
 msgid "Error writing game recording"
 msgstr "寫入遊戲錄製錯誤"
 
-#: sys.cpp:226
+#: sys.cpp:261
 msgid "Cannot play game recording while recording"
 msgstr "當在錄製的時候無法播放遊戲錄製"
 
-#: sys.cpp:243
+#: sys.cpp:276
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "無法開啟錄製檔案 %s"
 
-#: sys.cpp:250 sys.cpp:260
+#: sys.cpp:285 sys.cpp:295
 msgid "Error reading game recording"
 msgstr "讀取遊戲錄製檔錯誤"
 
-#: sys.cpp:371 sys.cpp:391
+#: sys.cpp:405 sys.cpp:424
 msgid "Playback ended"
 msgstr "播放結束"
 
-#: sys.cpp:415
+#: sys.cpp:448
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr "%d%%(%d, %d fps)"
 
-#: sys.cpp:423
+#: sys.cpp:456
 #, c-format
 msgid "%d%%"
 msgstr "%d%%"
 
-#: sys.cpp:843 xrc/GBPrinter.xrc:65
+#: sys.cpp:876 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "丟棄(&D)"
 
-#: sys.cpp:877
+#: sys.cpp:910
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "圖片檔 (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:886
+#: sys.cpp:919
 msgid "Save printer image to"
 msgstr "儲存列印影像到"
 
-#: sys.cpp:900 sys.cpp:1083
+#: sys.cpp:933 sys.cpp:1116
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "回寫列印輸出到 %s"
 
-#: sys.cpp:905 sys.cpp:976
+#: sys.cpp:938 sys.cpp:1009
 msgid "&Close"
 msgstr "關閉(&C)"
 
-#: sys.cpp:971
+#: sys.cpp:1004
 msgid "Printed"
 msgstr "已列印"
 
-#: sys.cpp:1273
+#: sys.cpp:1306
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "開啟錯誤 pseudo tty: %s"
 
-#: sys.cpp:1372
+#: sys.cpp:1405
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "設定伺服器 socket (%d) 錯誤"
 
-#: panel.cpp:106
+#: panel.cpp:108
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s 不是有效的 ROM 檔案"
 
-#: panel.cpp:107 panel.cpp:168 panel.cpp:244
+#: panel.cpp:109 panel.cpp:170 panel.cpp:246
 msgid "Problem loading file"
 msgstr "讀取檔案時發生問題"
 
-#: panel.cpp:167
+#: panel.cpp:169
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "無法讀取 Game Boy ROM %s"
 
-#: panel.cpp:204
+#: panel.cpp:206
 msgid ""
 "Cannot use GB BIOS file when Colorizer Hack is enabled, disabling GB BIOS "
 "file."
 msgstr ""
 
-#: panel.cpp:220 panel.cpp:320
+#: panel.cpp:222 panel.cpp:322
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "無法讀取 BIOS %s"
 
-#: panel.cpp:243
+#: panel.cpp:245
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "無法讀取 Game Boy Advance ROM %s"
 
-#: panel.cpp:479
+#: panel.cpp:481
 msgid " player "
 msgstr " 播放器 "
 
-#: panel.cpp:647
+#: panel.cpp:649
 #, c-format
 msgid "Loaded state %s"
 msgstr "已讀取即時紀錄檔 %s"
 
-#: panel.cpp:647
+#: panel.cpp:649
 #, c-format
 msgid "Error loading state %s"
 msgstr "讀取即時紀錄檔時發生錯誤 %s"
 
-#: panel.cpp:671
+#: panel.cpp:673
 #, c-format
 msgid "Saved state %s"
 msgstr "已完成即時紀錄 %s"
 
-#: panel.cpp:671
+#: panel.cpp:673
 #, c-format
 msgid "Error saving state %s"
 msgstr "即時記錄時發生錯誤 %s"
 
-#: panel.cpp:875
+#: panel.cpp:877
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "不支援全螢幕模式 %dx%d-%d@%d， 尋找其他模式"
 
-#: panel.cpp:913
+#: panel.cpp:915
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "不支援全螢幕模式 %dx%d-%d@%d"
 
-#: panel.cpp:918
+#: panel.cpp:920
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "有效模式：%dx%d-%d@%d"
 
-#: panel.cpp:926
+#: panel.cpp:928
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "選擇模式：%dx%d-%d@%d"
 
-#: panel.cpp:930
+#: panel.cpp:932
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "無法切換到 %dx%d-%d@%d 模式"
 
-#: panel.cpp:1018
+#: panel.cpp:1020
 msgid "Not a valid GBA cartridge"
 msgstr "不是有效的 GBA 卡匣"
 
-#: panel.cpp:1182
+#: panel.cpp:1184
 msgid "No memory for rewinding"
 msgstr "沒有記憶體可用來倒帶"
 
-#: panel.cpp:1192
+#: panel.cpp:1194
 msgid "Error writing rewind state"
 msgstr "回寫狀態錯誤"
 
-#: panel.cpp:2201
+#: panel.cpp:2192
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "設置 glXSwapIntervalEXT 失敗"
 
-#: panel.cpp:2210
+#: panel.cpp:2201
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "設置 glXSwapIntervalSGI 失敗"
 
-#: panel.cpp:2219
+#: panel.cpp:2210
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "設置 glXSwapIntervalMESA 失敗"
 
-#: panel.cpp:2225
+#: panel.cpp:2216
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "不支援 wglGetExtensionsStringEXT"
 
-#: panel.cpp:2228
+#: panel.cpp:2219
 msgid "No support for WGL_EXT_swap_control"
 msgstr "不支援 WGL_EXT_swap_control"
 
-#: panel.cpp:2237
+#: panel.cpp:2228
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "設置 wglSwapIntervalEXT 失敗"
 
-#: panel.cpp:2243
+#: panel.cpp:2234
 msgid "No VSYNC available on this platform"
 msgstr "在此平台無法使用垂直同步"
 
-#: panel.cpp:2339
+#: panel.cpp:2330
 msgid "memory allocation error"
 msgstr "記憶體配置錯誤"
 
-#: panel.cpp:2342
+#: panel.cpp:2333
 msgid "error initializing codec"
 msgstr "解碼器初始化錯誤"
 
-#: panel.cpp:2345
+#: panel.cpp:2336
 msgid "error writing to output file"
 msgstr "輸出檔寫入錯誤"
 
-#: panel.cpp:2348
+#: panel.cpp:2339
 msgid "can't guess output format from file name"
 msgstr "從檔名猜測輸出格式失敗"
 
-#: panel.cpp:2353
+#: panel.cpp:2344
 msgid "programming error; aborting!"
 msgstr "程式錯誤，正在停止!"
 
-#: panel.cpp:2365 panel.cpp:2394
+#: panel.cpp:2356 panel.cpp:2385
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "不能開始錄製到 %s (%s)"
 
-#: panel.cpp:2422
+#: panel.cpp:2413
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "錄製 (%s) 聲音/影像錯誤; 停止中"
 
-#: panel.cpp:2428
+#: panel.cpp:2419
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "錄製 (%s) 聲音; 停止中"
 
-#: panel.cpp:2438
+#: panel.cpp:2429
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "錄製 (%s) 影像錯誤; 停止中"
@@ -1171,12 +1171,12 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:170
+#: widgets/sdljoy.cpp:188
 #, c-format
 msgid "Connected %s: %s"
 msgstr ""
 
-#: widgets/sdljoy.cpp:185
+#: widgets/sdljoy.cpp:203
 #, c-format
 msgid "Disconnected %s"
 msgstr ""

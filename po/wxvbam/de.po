@@ -22,7 +22,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-06 20:51+0800\n"
+"POT-Creation-Date: 2022-08-18 14:29+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Peter Tpoint <peter.traxl@gmail.com>, 2021\n"
 "Language-Team: German (http://www.transifex.com/bgk/vba-m/language/de/)\n"
@@ -174,7 +174,7 @@ msgstr "Cheat-Datei auswählen"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA Cheat-Liste (*.clt)|*.clt|CHT Cheat-Liste (*.cht)|*.cht"
 
-#: guiinit.cpp:262 panel.cpp:447
+#: guiinit.cpp:262 panel.cpp:449
 msgid "Loaded cheats"
 msgstr "Cheats geladen"
 
@@ -352,15 +352,15 @@ msgstr "Ursprünglicher Wert"
 msgid "New Value"
 msgstr "Neuer Wert"
 
-#: guiinit.cpp:3898
+#: guiinit.cpp:3902
 msgid "Menu commands"
 msgstr "Menükommandos"
 
-#: guiinit.cpp:3921
+#: guiinit.cpp:3925
 msgid "Other commands"
 msgstr "Andere Kommandos"
 
-#: guiinit.cpp:4032
+#: guiinit.cpp:4036
 msgid "JoyBus host invalid; disabling"
 msgstr "JoyBus-Host ungültig; wird deaktiviert"
 
@@ -627,7 +627,7 @@ msgstr "Das Importieren einer Batterie-Datei löscht alle Speicherstände (nach 
 msgid "Confirm import"
 msgstr "Import bestätigen"
 
-#: cmdevents.cpp:906 panel.cpp:390
+#: cmdevents.cpp:906 panel.cpp:392
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Batterie geladen %s"
@@ -710,7 +710,7 @@ msgstr "Fehler beim Laden der Snapshot-Datei %s"
 msgid "Wrote battery %s"
 msgstr "Batterie %s geschrieben"
 
-#: cmdevents.cpp:1099 panel.cpp:699
+#: cmdevents.cpp:1099 panel.cpp:701
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Fehler beim Schreiben der Batterie %s"
@@ -737,7 +737,7 @@ msgstr "Snapshot-Datei %s gespeichert"
 msgid "Error saving snapshot file %s"
 msgstr "Fehler beim Speichern der Snapshot-Datei %s"
 
-#: cmdevents.cpp:1182 sys.cpp:524
+#: cmdevents.cpp:1182 sys.cpp:557
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "Snapshot %s geschrieben"
@@ -808,15 +808,15 @@ msgstr "Warte auf GDB..."
 
 #: cmdevents.cpp:2769
 #, c-format
-msgid "Using pixel filter #%d"
-msgstr "Nutze Pixel-Filter #%d"
+msgid "Using pixel filter %s"
+msgstr ""
 
 #: cmdevents.cpp:2784
 #, c-format
 msgid "Using interframe blending #%d"
 msgstr "Nutze Zwischenbild-Überblendung #%d"
 
-#: cmdevents.cpp:2823 panel.cpp:192 panel.cpp:306
+#: cmdevents.cpp:2823 panel.cpp:194 panel.cpp:308
 msgid "Could not initialize the sound driver!"
 msgstr "Der Audiotreiber konnte nicht initialisiert werden!"
 
@@ -884,236 +884,236 @@ msgstr "Ungültige Tastenkombination %s für %s"
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Ungültiges Flag %s - %s wird ignoriert"
 
-#: sys.cpp:161 sys.cpp:221
+#: sys.cpp:195 sys.cpp:256
 msgid "No game in progress to record"
 msgstr "Es läuft kein Spiel, das aufgenommen werden kann"
 
-#: sys.cpp:178
+#: sys.cpp:213
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "Kann Ausgabedatei %s nicht öffnen"
 
-#: sys.cpp:185 sys.cpp:205 sys.cpp:355
+#: sys.cpp:220 sys.cpp:240 sys.cpp:390
 msgid "Error writing game recording"
 msgstr "Fehler beim Schreiben von Spiel-Aufzeichnung"
 
-#: sys.cpp:226
+#: sys.cpp:261
 msgid "Cannot play game recording while recording"
 msgstr "Abspielen von Spiel-Aufnahme während Aufnahme nicht möglich"
 
-#: sys.cpp:243
+#: sys.cpp:276
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "Kann Aufzeichnungsdatei %s nicht öffnen"
 
-#: sys.cpp:250 sys.cpp:260
+#: sys.cpp:285 sys.cpp:295
 msgid "Error reading game recording"
 msgstr "Fehler beim Lesen von Spiel-Aufnahme"
 
-#: sys.cpp:371 sys.cpp:391
+#: sys.cpp:405 sys.cpp:424
 msgid "Playback ended"
 msgstr "Aufzeichnung wurde abgespielt"
 
-#: sys.cpp:415
+#: sys.cpp:448
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr "%d%%(%d, %d fps)"
 
-#: sys.cpp:423
+#: sys.cpp:456
 #, c-format
 msgid "%d%%"
 msgstr "%d%%"
 
-#: sys.cpp:843 xrc/GBPrinter.xrc:65
+#: sys.cpp:876 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "Verwerfen"
 
-#: sys.cpp:877
+#: sys.cpp:910
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "Bilddateien (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:886
+#: sys.cpp:919
 msgid "Save printer image to"
 msgstr "Druckerbild speichern in"
 
-#: sys.cpp:900 sys.cpp:1083
+#: sys.cpp:933 sys.cpp:1116
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "Druckerbild gespeichert in %s"
 
-#: sys.cpp:905 sys.cpp:976
+#: sys.cpp:938 sys.cpp:1009
 msgid "&Close"
 msgstr "S&chließen"
 
-#: sys.cpp:971
+#: sys.cpp:1004
 msgid "Printed"
 msgstr "Ausdruck fertig"
 
-#: sys.cpp:1273
+#: sys.cpp:1306
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "Fehler beim Öffnen von Pseudo-TTY: %s"
 
-#: sys.cpp:1372
+#: sys.cpp:1405
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "Fehler beim Einrichten von Server-Socket (%d)"
 
-#: panel.cpp:106
+#: panel.cpp:108
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s ist keine gültige ROM-Datei"
 
-#: panel.cpp:107 panel.cpp:168 panel.cpp:244
+#: panel.cpp:109 panel.cpp:170 panel.cpp:246
 msgid "Problem loading file"
 msgstr "Problem beim Laden der Datei"
 
-#: panel.cpp:167
+#: panel.cpp:169
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Konnte Game Boy-ROM %s nicht laden"
 
-#: panel.cpp:204
+#: panel.cpp:206
 msgid ""
 "Cannot use GB BIOS file when Colorizer Hack is enabled, disabling GB BIOS "
 "file."
 msgstr ""
 
-#: panel.cpp:220 panel.cpp:320
+#: panel.cpp:222 panel.cpp:322
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Konnte BIOS %s nicht laden"
 
-#: panel.cpp:243
+#: panel.cpp:245
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Konnte Game Boy Advance ROM %s nicht laden"
 
-#: panel.cpp:479
+#: panel.cpp:481
 msgid " player "
 msgstr " Spieler "
 
-#: panel.cpp:647
+#: panel.cpp:649
 #, c-format
 msgid "Loaded state %s"
 msgstr "Savestate %s geladen"
 
-#: panel.cpp:647
+#: panel.cpp:649
 #, c-format
 msgid "Error loading state %s"
 msgstr "Fehler beim Laden von Savestate %s"
 
-#: panel.cpp:671
+#: panel.cpp:673
 #, c-format
 msgid "Saved state %s"
 msgstr "Savestate %s gespeichert"
 
-#: panel.cpp:671
+#: panel.cpp:673
 #, c-format
 msgid "Error saving state %s"
 msgstr "Fehler beim Speichern von Savestate %s"
 
-#: panel.cpp:875
+#: panel.cpp:877
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "Vollbildmodus %dx%d-%d@%d wird nicht unterstützt; probiere einen anderen aus"
 
-#: panel.cpp:913
+#: panel.cpp:915
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "Vollbildmodus %dx%d-%d@%d wird nicht unterstützt"
 
-#: panel.cpp:918
+#: panel.cpp:920
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Gültiger Modus: %dx%d-%d@%d"
 
-#: panel.cpp:926
+#: panel.cpp:928
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "Modus %dx%d-%d@%d ausgewählt"
 
-#: panel.cpp:930
+#: panel.cpp:932
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "Konnte Anzeigemodus nicht auf %dx%d-%d@%d umstellen"
 
-#: panel.cpp:1018
+#: panel.cpp:1020
 msgid "Not a valid GBA cartridge"
 msgstr "Keine gültige GBA-Steckkarte"
 
-#: panel.cpp:1182
+#: panel.cpp:1184
 msgid "No memory for rewinding"
 msgstr "Kein freier Speicher für Zurückspuhl-Datei"
 
-#: panel.cpp:1192
+#: panel.cpp:1194
 msgid "Error writing rewind state"
 msgstr "Fehler beim Speichern von Zurückspuhl-Datei"
 
-#: panel.cpp:2201
+#: panel.cpp:2192
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Das belegen von glXSwapIntervalEXT ist fehlgeschlagen"
 
-#: panel.cpp:2210
+#: panel.cpp:2201
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Das belegen von glXSwapIntervalSGI ist fehlgeschlagen"
 
-#: panel.cpp:2219
+#: panel.cpp:2210
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Das belegen von glXSwapIntervalMESA ist fehlgeschlagen"
 
-#: panel.cpp:2225
+#: panel.cpp:2216
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr " \nKeine Unterstützung für wglGetExtensionsStringEXT"
 
-#: panel.cpp:2228
+#: panel.cpp:2219
 msgid "No support for WGL_EXT_swap_control"
 msgstr "Keine Unterstützung von WGL_EXT_swap_control"
 
-#: panel.cpp:2237
+#: panel.cpp:2228
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Das belegen von wglSwapIntervalEXT ist fehlgeschlagen"
 
-#: panel.cpp:2243
+#: panel.cpp:2234
 msgid "No VSYNC available on this platform"
 msgstr "VSYNC ist auf dieser Plattform nicht verfügbar"
 
-#: panel.cpp:2339
+#: panel.cpp:2330
 msgid "memory allocation error"
 msgstr "Fehler bei Speicherzuweisung"
 
-#: panel.cpp:2342
+#: panel.cpp:2333
 msgid "error initializing codec"
 msgstr "Fehler bei Initialisierung von Codec"
 
-#: panel.cpp:2345
+#: panel.cpp:2336
 msgid "error writing to output file"
 msgstr "Fehler beim Schreiben in Ausgabedatei"
 
-#: panel.cpp:2348
+#: panel.cpp:2339
 msgid "can't guess output format from file name"
 msgstr "Konnte Ausgabeformat nicht von Dateiendung ableiten"
 
-#: panel.cpp:2353
+#: panel.cpp:2344
 msgid "programming error; aborting!"
 msgstr "Programmierfehler! Abbruch!"
 
-#: panel.cpp:2365 panel.cpp:2394
+#: panel.cpp:2356 panel.cpp:2385
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Konnte nicht mit Aufnahme nach %s beginnen (%s)"
 
-#: panel.cpp:2422
+#: panel.cpp:2413
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Fehler bei Audio/Video-Aufnahme (%s). Abbruch"
 
-#: panel.cpp:2428
+#: panel.cpp:2419
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Fehler bei Audio-Aufnahme (%s). Abbruch"
 
-#: panel.cpp:2438
+#: panel.cpp:2429
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Fehler bei Video-Aufnahme (%s). Abbruch"
@@ -1174,12 +1174,12 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "STEUERUNG"
 
-#: widgets/sdljoy.cpp:170
+#: widgets/sdljoy.cpp:188
 #, c-format
 msgid "Connected %s: %s"
 msgstr ""
 
-#: widgets/sdljoy.cpp:185
+#: widgets/sdljoy.cpp:203
 #, c-format
 msgid "Disconnected %s"
 msgstr ""
