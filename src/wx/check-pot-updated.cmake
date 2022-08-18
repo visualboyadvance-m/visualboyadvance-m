@@ -27,7 +27,7 @@ if(NOT src_ver STREQUAL new_ver)
 
 The gettext source in ]=] ${SRC_DIR}/wxvbam.pot [=[ has been updated.
 
-Please commit the result and push to transifex.
+Please commit the result, it will be pushed to Transifex automatically.
 
 ************************************** 
 ]=])
