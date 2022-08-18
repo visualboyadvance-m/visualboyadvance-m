@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-24 21:24+0000\n"
+"POT-Creation-Date: 2022-08-06 20:51+0800\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Stathis Galazios <infin1ty@hol.gr>, 2016-2017\n"
 "Language-Team: Greek (http://www.transifex.com/bgk/vba-m/language/el/)\n"
@@ -22,75 +22,75 @@ msgstr ""
 msgid "visualboyadvance-m"
 msgstr "visualboyadvance-m"
 
-#: wxvbam.cpp:442
+#: wxvbam.cpp:446
 msgid "Could not create main window"
 msgstr "Αδυναμία δημιουργίας κεντρικού παραθύρου"
 
-#: wxvbam.cpp:513
+#: wxvbam.cpp:517
 msgid "Save built-in XRC file and exit"
 msgstr "Αποθήκευση ενσωματωμένου αρχείου XRC και έξοδος"
 
-#: wxvbam.cpp:516
+#: wxvbam.cpp:520
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Αποθήκευση του ενσωματωμένου vba-over.ini και έξοδος"
 
-#: wxvbam.cpp:519
+#: wxvbam.cpp:523
 msgid "Print configuration path and exit"
 msgstr "Εκτύπωση διαδρομής ρυθμίσεων και έξοδος"
 
-#: wxvbam.cpp:522
+#: wxvbam.cpp:526
 msgid "Start in full-screen mode"
 msgstr "Έναρξη σε λειτουργία πλήρους οθόνης"
 
-#: wxvbam.cpp:525
+#: wxvbam.cpp:529
 msgid "Set a configuration file"
 msgstr ""
 
-#: wxvbam.cpp:529
+#: wxvbam.cpp:533
 msgid "Delete shared link state first, if it exists"
 msgstr "Διαγραφή κατάστασης κοινής σύνδεσης πρώτα, εάν υπάρχει"
 
-#: wxvbam.cpp:536
+#: wxvbam.cpp:540
 msgid "List all settable options and exit"
 msgstr "Εμφάνιση όλων των επιλογών προς ρύθμιση και έξοδος"
 
-#: wxvbam.cpp:539
+#: wxvbam.cpp:543
 msgid "ROM file"
 msgstr "Αρχείο ROM"
 
-#: wxvbam.cpp:541
+#: wxvbam.cpp:545
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:572
+#: wxvbam.cpp:576
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr "Σφάλμα ρύθμισης/δημιουργίας: αδυναμία εύρεσης ενσωματωμένου xrc"
 
-#: wxvbam.cpp:580
+#: wxvbam.cpp:584
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Έγινε εγγραφή της ενσωματωμένης διαμόρφωσης στο %s.\nΓια παράκαμψη. αφαιρέστε όλους τους ριζικούς κόμβους εκτός από τους αλλαγμένους. Ο πρώτος ριζικός κόμβος που θα βρεθεί με σωστό όνομα σε αρχεία .xrc ή .xrs στην ακόλουθη διαδρομή αναζήτησης θα παρακάμψει τον ενσωματωμένο:"
 
-#: wxvbam.cpp:595
+#: wxvbam.cpp:599
 msgid "Configuration is read from, in order:"
 msgstr "Οι ρυθμίσεις διαβάζονται από, κατά σειρά:"
 
-#: wxvbam.cpp:609
+#: wxvbam.cpp:613
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
 msgstr "Εγγραφή ενσωματωμένου αρχείου παρακάμψεων σε %s\nΓια παράκαμψη, διαγράψτε τα πάντα εκτός από το τμήμα με αλλαγές. Το πρώτο τμήμα που θα βρεθεί χρησιμοποιείται από τη διαδρομή αναζήτησης:"
 
-#: wxvbam.cpp:615
+#: wxvbam.cpp:619
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tενσωματωμένο"
 
-#: wxvbam.cpp:626
+#: wxvbam.cpp:630
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -98,155 +98,155 @@ msgid ""
 "\n"
 msgstr "Οι επιλογές που ορίζονται από τη γραμμή εντολών αποθηκεύονται εάν γίνουν αλλαγές διαμόρφωσης στη διεπαφή χρήστη.\n\nΓια επιλογές σημαιών, τα «αληθές» και «ψευδές» ορίζονται με 1 και 0 αντίστοιχα.\n\n"
 
-#: wxvbam.cpp:647
+#: wxvbam.cpp:651
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Οι διαθέσιμες εντολές για την επιλογή Πληκτρολόγιο/* είναι:\n\n"
 
-#: wxvbam.cpp:659
+#: wxvbam.cpp:663
 msgid "Configuration file not found."
 msgstr ""
 
-#: wxvbam.cpp:692
+#: wxvbam.cpp:696
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Λάθος επιλογή διαμόρφωσης ή πολλά δοθέντα αρχεία ROM:\n"
 
-#: guiinit.cpp:80
+#: guiinit.cpp:83
 msgid "Start!"
 msgstr "Έναρξη!"
 
-#: guiinit.cpp:99 xrc/NetLink.xrc:99
+#: guiinit.cpp:102 xrc/NetLink.xrc:99
 msgid "Connect"
 msgstr "Σύνδεση"
 
-#: guiinit.cpp:116
+#: guiinit.cpp:119
 msgid "You must enter a valid host name"
 msgstr "Πρέπει να εισάγετε ένα έγκυρο όνομα υπολογιστή"
 
-#: guiinit.cpp:117
+#: guiinit.cpp:120
 msgid "Host name invalid"
 msgstr "Μη έγκυρο όνομα υπολογιστή"
 
-#: guiinit.cpp:135
+#: guiinit.cpp:138
 msgid "Waiting for clients..."
 msgstr "Αναμονή για συνδέσεις..."
 
-#: guiinit.cpp:136
+#: guiinit.cpp:139
 #, c-format
 msgid "Server IP address is: %s\n"
 msgstr "Η διεύθυνση IP του διακομιστή είναι: %s\n"
 
-#: guiinit.cpp:138
+#: guiinit.cpp:141
 msgid "Waiting for connection..."
 msgstr "Αναμονή για σύνδεση..."
 
-#: guiinit.cpp:139
+#: guiinit.cpp:142
 #, c-format
 msgid "Connecting to %s\n"
 msgstr "Σύνδεση σε %s\n"
 
-#: guiinit.cpp:172
+#: guiinit.cpp:175
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr "Προέκυψε σφάλμα.\nΠαρακαλούμε δοκιμάστε ξανά."
 
-#: guiinit.cpp:239 guiinit.cpp:292
+#: guiinit.cpp:242 guiinit.cpp:295
 msgid "Select cheat file"
 msgstr "Επιλογή αρχείου κωδικών"
 
-#: guiinit.cpp:240
+#: guiinit.cpp:243
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Λίστες κωδικών VBA (*.clt)|*.clt|Λίστες κωδικών CHT (*.cht)|*.cht"
 
-#: guiinit.cpp:259 panel.cpp:447
+#: guiinit.cpp:262 panel.cpp:447
 msgid "Loaded cheats"
 msgstr "Φορτώθηκαν κωδικοί"
 
-#: guiinit.cpp:293
+#: guiinit.cpp:296
 msgid "VBA cheat lists (*.clt)|*.clt"
 msgstr "Λίστες κωδικών VBA (*.clt)|*.clt"
 
-#: guiinit.cpp:311
+#: guiinit.cpp:314
 msgid "Saved cheats"
 msgstr "Αποθηκεύτηκαν κωδικοί"
 
-#: guiinit.cpp:342 guiinit.cpp:361
+#: guiinit.cpp:345 guiinit.cpp:364
 msgid "Restore old values?"
 msgstr "Επαναφορά προηγούμενων τιμών;"
 
-#: guiinit.cpp:343 guiinit.cpp:362
+#: guiinit.cpp:346 guiinit.cpp:365
 msgid "Removing cheats"
 msgstr "Αφαίρεση κωδικών"
 
-#: guiinit.cpp:753 xrc/JoyPanel.xrc:364
+#: guiinit.cpp:756 xrc/JoyPanel.xrc:364
 msgid "GameShark"
 msgstr "GameShark"
 
-#: guiinit.cpp:754 cmdevents.cpp:675
+#: guiinit.cpp:757 cmdevents.cpp:675
 msgid "GameGenie"
 msgstr "GameGenie"
 
-#: guiinit.cpp:756
+#: guiinit.cpp:759
 msgid "Generic Code"
 msgstr "Γενικός κωδικός"
 
-#: guiinit.cpp:757
+#: guiinit.cpp:760
 msgid "GameShark Advance"
 msgstr "GameShark Advance"
 
-#: guiinit.cpp:758
+#: guiinit.cpp:761
 msgid "CodeBreaker Advance"
 msgstr "CodeBreaker Advance"
 
-#: guiinit.cpp:759
+#: guiinit.cpp:762
 msgid "Flashcart CHT"
 msgstr "Flashcart CHT"
 
-#: guiinit.cpp:827 guiinit.cpp:1082
+#: guiinit.cpp:830 guiinit.cpp:1085
 msgid "Number cannot be empty"
 msgstr "Ο αριθμός δεν μπορεί να είναι κενός"
 
-#: guiinit.cpp:865
+#: guiinit.cpp:868
 #, c-format
 msgid "Search produced %d results.  Please refine better"
 msgstr "Η αναζήτηση επέστρεψε %d αποτελέσματα. Παρακαλούμε προσδιορίστε καλύτερα"
 
-#: guiinit.cpp:877
+#: guiinit.cpp:880
 msgid "Search produced no results"
 msgstr "Η αναζήτηση δεν επέστρεψε αποτελέσματα"
 
-#: guiinit.cpp:1040
+#: guiinit.cpp:1043
 msgid "8-bit "
 msgstr "8-bit "
 
-#: guiinit.cpp:1044
+#: guiinit.cpp:1047
 msgid "16-bit "
 msgstr "16-bit "
 
-#: guiinit.cpp:1048
+#: guiinit.cpp:1051
 msgid "32-bit "
 msgstr "32-bit "
 
-#: guiinit.cpp:1054
+#: guiinit.cpp:1057
 msgid "signed decimal"
 msgstr "προσημασμένος δεκαδικός"
 
-#: guiinit.cpp:1058
+#: guiinit.cpp:1061
 msgid "unsigned decimal"
 msgstr "μη προσημασμένος δεκαδικός"
 
-#: guiinit.cpp:1062
+#: guiinit.cpp:1065
 msgid "unsigned hexadecimal"
 msgstr "μη προσημασμένος δεκαεξαδικός"
 
-#: guiinit.cpp:1540
+#: guiinit.cpp:1543
 #, c-format
 msgid "%d frames = %.2f ms"
 msgstr "%d καρέ = %.2f ms"
 
-#: guiinit.cpp:1552
+#: guiinit.cpp:1555
 msgid "Default device"
 msgstr "Προεπιλεγμένη συσκευή"
 
@@ -291,62 +291,62 @@ msgstr "Αυτό θα διαγράψει όλους τους επιταχυντ�
 msgid "Confirm"
 msgstr "Επιβεβαίωση"
 
-#: guiinit.cpp:2739
+#: guiinit.cpp:2740
 msgid "Main icon not found"
 msgstr "Το κύριο εικονίδιο δεν βρέθηκε"
 
-#: guiinit.cpp:2749
+#: guiinit.cpp:2750
 msgid "Browse"
 msgstr ""
 
-#: guiinit.cpp:2763
+#: guiinit.cpp:2764
 msgid "Main display panel not found"
 msgstr "Το πάνελ κύριας προβολής δεν βρέθηκε"
 
-#: guiinit.cpp:2928
+#: guiinit.cpp:2929
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Διπλότυπος επιταχυντής μενού: %s για %s και %s, θα κρατηθεί ο πρώτος"
 
-#: guiinit.cpp:2942
+#: guiinit.cpp:2943
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Ο επιταχυντής μενού %s για %s παρακάμπτει την προεπιλογή για %s, διατηρείται το μενού"
 
-#: guiinit.cpp:3081
+#: guiinit.cpp:3082
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Μη έγκυρο αντικείμενο μενού %s, θα αφαιρεθεί"
 
-#: guiinit.cpp:3289
+#: guiinit.cpp:3290
 msgid "Code"
 msgstr "Κωδικός"
 
-#: guiinit.cpp:3298
+#: guiinit.cpp:3299
 msgid "Description"
 msgstr "Περιγραφή"
 
-#: guiinit.cpp:3372 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3373 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Διεύθυνση"
 
-#: guiinit.cpp:3373
+#: guiinit.cpp:3374
 msgid "Old Value"
 msgstr "Προηγούμενη τιμή"
 
-#: guiinit.cpp:3374
+#: guiinit.cpp:3375
 msgid "New Value"
 msgstr "Νέα τιμή"
 
-#: guiinit.cpp:3895
+#: guiinit.cpp:3898
 msgid "Menu commands"
 msgstr "Εντολές μενού"
 
-#: guiinit.cpp:3918
+#: guiinit.cpp:3921
 msgid "Other commands"
 msgstr "Άλλες εντολές"
 
-#: guiinit.cpp:4029
+#: guiinit.cpp:4032
 msgid "JoyBus host invalid; disabling"
 msgstr "Μη έγκυρος JoyBus host, απενεργοποίηση"
 
@@ -355,7 +355,7 @@ msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr "Αρχεία κειμένου (*.txt;*.log)|*.txt;*.log|"
 
 #: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
-#: cmdevents.cpp:1157 cmdevents.cpp:1235 cmdevents.cpp:1305 cmdevents.cpp:1332
+#: cmdevents.cpp:1157 cmdevents.cpp:1235 cmdevents.cpp:1305 cmdevents.cpp:1374
 #: viewsupt.cpp:1180
 msgid "Select output file"
 msgstr "Επιλογή αρχείου εξόδου"
@@ -723,105 +723,101 @@ msgstr "Αποθηκεύτηκε το αρχείο στιγμιότυπου %s"
 msgid "Error saving snapshot file %s"
 msgstr "Σφάλμα αποθήκευσης αρχείου στιγμιότυπου %s"
 
-#: cmdevents.cpp:1182 sys.cpp:449
+#: cmdevents.cpp:1182 sys.cpp:524
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "Εγγραφή στιγμιότυπου %s"
 
-#: cmdevents.cpp:1203 cmdevents.cpp:1273
+#: cmdevents.cpp:1203 cmdevents.cpp:1273 cmdevents.cpp:1344 cmdevents.cpp:1408
 msgid " files ("
 msgstr "αρχεία ("
 
-#: cmdevents.cpp:1333 cmdevents.cpp:1354
-msgid "VBA Movie files|*.vmv"
-msgstr "Αρχεία VBA Movie|*.vmv"
-
-#: cmdevents.cpp:1353
+#: cmdevents.cpp:1439
 msgid "Select file"
 msgstr "Επιλογή αρχείου"
 
-#: cmdevents.cpp:1668 cmdevents.cpp:1761
+#: cmdevents.cpp:1756 cmdevents.cpp:1849
 msgid "Select state file"
 msgstr "Επιλογή αρχείου κατάστασης"
 
-#: cmdevents.cpp:1669 cmdevents.cpp:1762
+#: cmdevents.cpp:1757 cmdevents.cpp:1850
 msgid "VisualBoyAdvance saved game files|*.sgm"
 msgstr "Αρχεία αποθηκευμένων παιχνιδιών VisualBoyAdvance|*.sgm"
 
-#: cmdevents.cpp:1792 cmdevents.cpp:1802 cmdevents.cpp:1813
+#: cmdevents.cpp:1880 cmdevents.cpp:1890 cmdevents.cpp:1901
 #, c-format
 msgid "Current state slot #%d"
 msgstr ""
 
-#: cmdevents.cpp:1883
+#: cmdevents.cpp:1971
 msgid "Cannot use Colorizer Hack when GB BIOS File is enabled."
 msgstr ""
 
-#: cmdevents.cpp:2098
+#: cmdevents.cpp:2186
 msgid "Sound enabled"
 msgstr "Ο ήχος ενεργοποιήθηκε"
 
-#: cmdevents.cpp:2098
+#: cmdevents.cpp:2186
 msgid "Sound disabled"
 msgstr "Ο ήχος απενεργοποιήθηκε"
 
-#: cmdevents.cpp:2111 cmdevents.cpp:2125
+#: cmdevents.cpp:2199 cmdevents.cpp:2213
 #, c-format
 msgid "Volume: %d%%"
 msgstr "Ένταση: %d%%"
 
-#: cmdevents.cpp:2200
+#: cmdevents.cpp:2288
 msgid "Set to 0 for pseudo tty"
 msgstr "Ορίστε το σε 0 για ψευδο-tty"
 
-#: cmdevents.cpp:2202
+#: cmdevents.cpp:2290
 msgid "Port to wait for connection:"
 msgstr "Θύρα για αναμονή σύνδεσης:"
 
-#: cmdevents.cpp:2203
+#: cmdevents.cpp:2291
 msgid "GDB Connection"
 msgstr "Σύνδεση GDB"
 
-#: cmdevents.cpp:2256
+#: cmdevents.cpp:2344
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "Αναμονή για σύνδεση σε %s"
 
-#: cmdevents.cpp:2263
+#: cmdevents.cpp:2351
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "Αναμονή για σύνδεση στη θύρα %d"
 
-#: cmdevents.cpp:2266
+#: cmdevents.cpp:2354
 msgid "Waiting for GDB..."
 msgstr "Αναμονή για GDB..."
 
-#: cmdevents.cpp:2681
+#: cmdevents.cpp:2769
 #, c-format
 msgid "Using pixel filter #%d"
 msgstr ""
 
-#: cmdevents.cpp:2696
+#: cmdevents.cpp:2784
 #, c-format
 msgid "Using interframe blending #%d"
 msgstr ""
 
-#: cmdevents.cpp:2735 panel.cpp:192 panel.cpp:306
+#: cmdevents.cpp:2823 panel.cpp:192 panel.cpp:306
 msgid "Could not initialize the sound driver!"
 msgstr ""
 
-#: cmdevents.cpp:2839
+#: cmdevents.cpp:2927
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Εξομοιωτής Nintendo GameBoy (+Color+Advance)."
 
-#: cmdevents.cpp:2840
+#: cmdevents.cpp:2928
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr ""
 
-#: cmdevents.cpp:2841
+#: cmdevents.cpp:2929
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -837,114 +833,114 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3101
+#: cmdevents.cpp:3189
 msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
 msgstr ""
 
-#: cmdevents.cpp:3161
+#: cmdevents.cpp:3249
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "Η σύνδεση LAN είναι ήδη ενεργή. Απενεργοποιήστε τη λειτουργία σύνδεσης για να αποσυνδεθείτε."
 
-#: cmdevents.cpp:3167
+#: cmdevents.cpp:3255
 msgid "Network is not supported in local mode."
 msgstr "Το δίκτυο δεν υποστηρίζεται σε τοπική λειτουργία."
 
-#: opts.cpp:566 opts.cpp:869
+#: opts.cpp:649 opts.cpp:951
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s%s%s"
 msgstr "Μη έγκυρη τιμή %s για την επιλογή %s, οι έγκυρες τιμές είναι %s%s%s"
 
-#: opts.cpp:583 opts.cpp:881
+#: opts.cpp:666 opts.cpp:963
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Μη έγκυρη τιμή %d για την επιλογή %s, οι έγκυρες τιμές είναι %d - %d"
 
-#: opts.cpp:590 opts.cpp:599 opts.cpp:889 opts.cpp:897
+#: opts.cpp:673 opts.cpp:682 opts.cpp:971 opts.cpp:979
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Μη έγκυρη τιμή %f για την επιλογή %s. Οι έγκυρες τιμές είναι %f - %f"
 
-#: opts.cpp:659 opts.cpp:680 opts.cpp:965 opts.cpp:991
+#: opts.cpp:739 opts.cpp:760 opts.cpp:1047
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Μη έγκυρη αντιστοίχιση πλήκτρου %s για %s"
 
-#: opts.cpp:852
+#: opts.cpp:934
 #, c-format
 msgid "Invalid flag option %s - %s ignored"
 msgstr "Μη έγκυρη επιλογή σημαίας %s - %s αγνοήθηκε"
 
-#: sys.cpp:124 sys.cpp:180
+#: sys.cpp:161 sys.cpp:221
 msgid "No game in progress to record"
 msgstr "Δεν υπάρχουν παιχνίδια σε εξέλιξη για εγγραφή"
 
-#: sys.cpp:137
+#: sys.cpp:178
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "Αδυναμία ανοίγματος αρχείου εξόδου %s"
 
-#: sys.cpp:144 sys.cpp:164 sys.cpp:310
+#: sys.cpp:185 sys.cpp:205 sys.cpp:355
 msgid "Error writing game recording"
 msgstr "Σφάλμα εγγραφής καταγραφής παιχνιδιού"
 
-#: sys.cpp:185
+#: sys.cpp:226
 msgid "Cannot play game recording while recording"
 msgstr "Δεν είναι δυνατή η αναπαραγωγή εγγραφής κατά την εγγραφή"
 
-#: sys.cpp:198
+#: sys.cpp:243
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "Αδυναμία ανοίγματος αρχείου εγγραφής %s"
 
-#: sys.cpp:205 sys.cpp:215
+#: sys.cpp:250 sys.cpp:260
 msgid "Error reading game recording"
 msgstr "Σφάλμα ανάγνωσης καταγραφής παιχνιδιού"
 
-#: sys.cpp:321
+#: sys.cpp:371 sys.cpp:391
 msgid "Playback ended"
 msgstr "Η αναπαραγωγή έληξε"
 
-#: sys.cpp:340
+#: sys.cpp:415
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr "%d%%(%d, %d fps)"
 
-#: sys.cpp:348
+#: sys.cpp:423
 #, c-format
 msgid "%d%%"
 msgstr "%d%%"
 
-#: sys.cpp:767 xrc/GBPrinter.xrc:65
+#: sys.cpp:843 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "Απόρριψη"
 
-#: sys.cpp:801
+#: sys.cpp:877
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "Αρχεία εικόνας (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:810
+#: sys.cpp:886
 msgid "Save printer image to"
 msgstr "Αποθήκευση εικόνας εκτυπωτή σε"
 
-#: sys.cpp:824 sys.cpp:1007
+#: sys.cpp:900 sys.cpp:1083
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "Εγγράφηκε η έξοδος εκτυπωτή σε %s"
 
-#: sys.cpp:829 sys.cpp:900
+#: sys.cpp:905 sys.cpp:976
 msgid "&Close"
 msgstr "Κλείσιμο"
 
-#: sys.cpp:895
+#: sys.cpp:971
 msgid "Printed"
 msgstr "Εκτπώθηκε"
 
-#: sys.cpp:1197
+#: sys.cpp:1273
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "Σφάλμα ανοίγματος ψευδο-tty: %s"
 
-#: sys.cpp:1296
+#: sys.cpp:1372
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "Σφάλμα ρύθμισης θύρας διακομιστή (%d)"
@@ -1040,70 +1036,70 @@ msgstr "Ελλιπής μνήμη για επανάληψη"
 msgid "Error writing rewind state"
 msgstr "Σφάλμα εγγραφής κατάστασης επανάληψης"
 
-#: panel.cpp:2290
+#: panel.cpp:2201
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2299
+#: panel.cpp:2210
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:2308
+#: panel.cpp:2219
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:2314
+#: panel.cpp:2225
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr ""
 
-#: panel.cpp:2317
+#: panel.cpp:2228
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:2326
+#: panel.cpp:2237
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:2332
+#: panel.cpp:2243
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:2428
+#: panel.cpp:2339
 msgid "memory allocation error"
 msgstr "σφάλμα κατανομής μνήμης"
 
-#: panel.cpp:2431
+#: panel.cpp:2342
 msgid "error initializing codec"
 msgstr "σφάλμα αρχικοποίησης codec"
 
-#: panel.cpp:2434
+#: panel.cpp:2345
 msgid "error writing to output file"
 msgstr "σφάλμα εγγραφής σε αρχείο εξόδου"
 
-#: panel.cpp:2437
+#: panel.cpp:2348
 msgid "can't guess output format from file name"
 msgstr "αδυναμία υπόθεσης μορφής εξόδου από το όνομα αρχείου"
 
-#: panel.cpp:2442
+#: panel.cpp:2353
 msgid "programming error; aborting!"
 msgstr "προγραμματιστικό σφάλμα, τερματισμός!"
 
-#: panel.cpp:2454 panel.cpp:2483
+#: panel.cpp:2365 panel.cpp:2394
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Αδυναμία έναρξης εγγραφής σε %s (%s)"
 
-#: panel.cpp:2511
+#: panel.cpp:2422
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Σφάλμα στην εγγραφή ήχου/βίντεο (%s), τερματισμός"
 
-#: panel.cpp:2517
+#: panel.cpp:2428
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Σφάλμα στην εγγραφή ήχου (%s), τερματισμός"
 
-#: panel.cpp:2527
+#: panel.cpp:2438
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Σφάλμα στην εγγραφή βίντεο (%s), τερματισμός"
@@ -1164,14 +1160,14 @@ msgstr "RAW_CONTROL"
 msgid "CONTROL"
 msgstr "CONTROL"
 
-#: widgets/sdljoy.cpp:137
+#: widgets/sdljoy.cpp:170
 #, c-format
-msgid "Connected joystick %d: %s"
+msgid "Connected %s: %s"
 msgstr ""
 
-#: widgets/sdljoy.cpp:152
+#: widgets/sdljoy.cpp:185
 #, c-format
-msgid "Disconnected joystick %d"
+msgid "Disconnected %s"
 msgstr ""
 
 #: xaudio2.cpp:34
