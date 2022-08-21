@@ -795,7 +795,7 @@ msgstr "Очікування GDB..."
 #: cmdevents.cpp:2769
 #, c-format
 msgid "Using pixel filter %s"
-msgstr ""
+msgstr "Використання піксельного фільтра %s"
 
 #: cmdevents.cpp:2784
 #, c-format

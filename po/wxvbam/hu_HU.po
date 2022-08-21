@@ -797,7 +797,7 @@ msgstr "Várakozás a GDB-re"
 #: cmdevents.cpp:2769
 #, c-format
 msgid "Using pixel filter %s"
-msgstr ""
+msgstr "Pixelszűrő: %s"
 
 #: cmdevents.cpp:2784
 #, c-format
