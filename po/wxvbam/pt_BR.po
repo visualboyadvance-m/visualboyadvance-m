@@ -800,7 +800,7 @@ msgstr "Definir como 0 pro pseudo tty"
 
 #: cmdevents.cpp:2290
 msgid "Port to wait for connection:"
-msgstr "Esperar pela conexão na porta:"
+msgstr "Esperar a conexão na porta:"
 
 #: cmdevents.cpp:2291
 msgid "GDB Connection"
@@ -859,7 +859,7 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program.  If not, see http://www.gnu.org/licenses ."
-msgstr "Este programa é um software livre: você pode redistribuí-lo e/ou modificá-lo\nsob os termos da Licença Pública Geral do GNU conforme publicado pela\nFree Software Foundation, seja a versão 2 da Licença ou\n(sua opção) qualquer versão posterior.\n\nEste programa é distribuído na esperança de que ele será útil\nmas SEM QUALQUER GARANTIA; sem mesmo a garantia implícita de\nCOMERCIALIZAÇÃO OU ADEQUAÇÃO PARA UM PROPÓSITO PARTICULAR. Veja a\nLicença Pública Geral do GNU pra mais detalhes.\n\nVocê deveria ter recebido uma cópia da Licença Pública Geral do GNU\njunto com este programa. Se não, veja http://www.gnu.org/licenses."
+msgstr "Este programa é um software livre: você pode redistribuí-lo e/ou modificá-lo\nsob os termos da Licença Pública Geral do GNU conforme publicado pela\nFree Software Foundation, seja a versão 2 da Licença ou\n(sua opção) qualquer versão posterior.\n\nEste programa é distribuído na esperança de que ele será útil mas SEM QUALQUER\nGARANTIA; mesmo sem a garantia implícita de COMERCIALIZAÇÃO OU\nADEQUAÇÃO PRA UM PROPÓSITO PARTICULAR. Veja a\nLicença Pública Geral do GNU pra mais detalhes.\n\nVocê deveria ter recebido uma cópia da Licença Pública Geral do GNU\njunto com este programa. Se não, veja http://www.gnu.org/licenses."
 
 #: cmdevents.cpp:3189
 msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
@@ -1772,7 +1772,7 @@ msgstr "Mistura dos interframes:"
 
 #: xrc/DisplayConfig.xrc:136
 msgid "Smart interframe blending"
-msgstr "Mistura dos interrframes inteligentes"
+msgstr "Mistura dos interframes inteligentes"
 
 #: xrc/DisplayConfig.xrc:137
 msgid "Interframe motion blur"
@@ -1808,7 +1808,7 @@ msgstr "Detalhado"
 
 #: xrc/DisplayConfig.xrc:237
 msgid "On-Screen Display"
-msgstr "Exibição na Tela"
+msgstr "Exibição na tela"
 
 #: xrc/DisplayConfig.xrc:247
 msgid "Default magnification :"
@@ -1860,7 +1860,7 @@ msgstr "Lançamento da Tela:"
 
 #: xrc/GBAROMInfo.xrc:47
 msgid "Release Number:"
-msgstr "Número de Lançamento:"
+msgstr "Número de lançamento:"
 
 #: xrc/GBAROMInfo.xrc:59
 msgid "CRC32:"
@@ -2351,7 +2351,7 @@ msgstr "Sistema"
 
 #: xrc/GameBoyConfig.xrc:84
 msgid "GB Boot &ROM file :"
-msgstr "Arquivo da ROM da &Inicialização do GB:"
+msgstr "Arquivo da ROM de &Inicialização do GB:"
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
@@ -2911,7 +2911,7 @@ msgstr "&Pausar"
 
 #: xrc/MainMenu.xrc:224
 msgid "&Next frame"
-msgstr "&Próximo Frame"
+msgstr "&Próximo frame"
 
 #: xrc/MainMenu.xrc:227
 msgid "Re&wind"
@@ -3264,7 +3264,7 @@ msgstr "&Registro..."
 
 #: xrc/MainMenu.xrc:626
 msgid "&IO Viewer..."
-msgstr "&Visualizador de ES..."
+msgstr "&Visualizador de Entrada/Saída..."
 
 #: xrc/MainMenu.xrc:629
 msgid "&Map Viewer..."
@@ -3284,7 +3284,7 @@ msgstr "&Visualizador da Paleta..."
 
 #: xrc/MainMenu.xrc:641
 msgid "&Tile Viewer..."
-msgstr "&Visualizador de Ladrilhos..."
+msgstr "&Visualizador dos Ladrilhos..."
 
 #: xrc/MainMenu.xrc:646
 msgid "Show all video layers"
@@ -3372,7 +3372,7 @@ msgstr "Traduções"
 
 #: xrc/MainMenu.xrc:742
 msgid "Check for updates"
-msgstr "Procurar atualizações"
+msgstr "Procurar Atualizações"
 
 #: xrc/MainMenu.xrc:745
 msgid "&Factory Reset..."
@@ -3616,7 +3616,7 @@ msgstr "Filtragem do som"
 
 #: xrc/TileViewer.xrc:4
 msgid "Tile Viewer"
-msgstr "Visualizador de Ladrilhos"
+msgstr "Visualizador dos Ladrilhos"
 
 #: xrc/TileViewer.xrc:15
 msgid "1&6"
