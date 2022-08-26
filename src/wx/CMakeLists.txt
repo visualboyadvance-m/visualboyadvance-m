@@ -129,14 +129,25 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR X86_64))
     include_directories(${installed_prefix}/lib/msw${libtype})
     include_directories(${common_prefix}/include)
     set(wxWidgets_LIB_DIR ${installed_prefix}/lib)
-    set(wxWidgets_LIBRARIES
-        ${wxWidgets_LIB_DIR}/wxbase31${libtype}_net.lib
-        ${wxWidgets_LIB_DIR}/wxbase31${libtype}_xml.lib
-        ${wxWidgets_LIB_DIR}/wxmsw31${libtype}_core.lib
-        ${wxWidgets_LIB_DIR}/wxmsw31${libtype}_gl.lib
-        ${wxWidgets_LIB_DIR}/wxmsw31${libtype}_xrc.lib
-        ${wxWidgets_LIB_DIR}/wxmsw31${libtype}_html.lib
-        ${wxWidgets_LIB_DIR}/wxbase31${libtype}.lib
+
+    foreach(wx_lib
+        ${wxWidgets_LIB_DIR}/wxbase*${libtype}_net.lib
+        ${wxWidgets_LIB_DIR}/wxbase*${libtype}_xml.lib
+        ${wxWidgets_LIB_DIR}/wxmsw*${libtype}_core.lib
+        ${wxWidgets_LIB_DIR}/wxmsw*${libtype}_gl.lib
+        ${wxWidgets_LIB_DIR}/wxmsw*${libtype}_xrc.lib
+        ${wxWidgets_LIB_DIR}/wxmsw*${libtype}_html.lib
+        ${wxWidgets_LIB_DIR}/wxbase*${libtype}.lib
+    )
+        file(GLOB wx_lib_file "${wx_lib}")
+
+        if(wx_lib_file)
+            list(APPEND wxWidgets_LIBRARIES "${wx_lib_file}")
+        endif()
+    endforeach()
+
+    list(
+        APPEND wxWidgets_LIBRARIES
         winmm comctl32 oleacc rpcrt4 shlwapi version wsock32 opengl32
     )
 
