@@ -19,7 +19,7 @@
 
 [![Join the chat at https://gitter.im/visualboyadvance-m/Lobby](https://badges.gitter.im/visualboyadvance-m/Lobby.svg)](https://gitter.im/visualboyadvance-m/Lobby)
 
-Our bridged Discord server is [https://discord.gg/Man6Q4Bu](https://discord.gg/Man6Q4Bu).
+Our bridged Discord server is [Here](https://discord.gg/Man6Q4Bu).
 
 We are also on *`#vba-m`* on [Libera IRC](https://libera.chat/) which has a [Web
 Chat](https://web.libera.chat/).
