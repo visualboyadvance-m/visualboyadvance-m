@@ -882,8 +882,13 @@ archlinux_installdeps() {
 
     if [ -z "$target" -o "$target" = m32 ]; then
         if [ -z "$target" -o -z "$amd64" ]; then
-            # native build
-            check $pacman --noconfirm --needed -S "$gcc_pkg" $libs
+            # Native build.
+            #
+            # On newer versions wxgtk2 may have to be manually removed.
+            if ! $pacman --noconfirm --needed -S "$gcc_pkg" $libs; then
+                $pacman --noconfirm -R wxgtk2
+            fi
+            $pacman --noconfirm --needed -S "$gcc_pkg" $libs
         else
             # try to build 32 bit binaries
 
