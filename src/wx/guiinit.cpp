@@ -2868,6 +2868,18 @@ bool MainFrame::BindControls()
                 continue;
             }
 
+#else
+
+            // Always disable Wireless link for now, this has never worked.
+            if (cmdtab[i].cmd_id == XRCID("LinkType2Wireless")) {
+                if (mi)
+                    mi->GetMenu()->Remove(mi);
+
+                cmdtab[i].cmd_id = XRCID("NOOP");
+                cmdtab[i].mi = NULL;
+                continue;
+            }
+
 #endif
 #ifdef NO_DEBUGGER
 
