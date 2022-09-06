@@ -836,7 +836,7 @@ msgstr "Não pôde inicializar o driver de som!"
 
 #: cmdevents.cpp:2927
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
-msgstr "Emulador do Nintendo GameBoy (+Color+Advance)."
+msgstr "Emulador do Nintendo GameBoy (+Color +Advance)."
 
 #: cmdevents.cpp:2928
 msgid ""
@@ -859,7 +859,7 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program.  If not, see http://www.gnu.org/licenses ."
-msgstr "Este programa é um software livre: você pode redistribuí-lo e/ou modificá-lo\nsob os termos da Licença Pública Geral do GNU conforme publicado pela\nFree Software Foundation, seja a versão 2 da Licença ou\n(sua opção) qualquer versão posterior.\n\nEste programa é distribuído na esperança de que ele será útil mas SEM QUALQUER\nGARANTIA; mesmo sem a garantia implícita de COMERCIALIZAÇÃO OU\nADEQUAÇÃO PRA UM PROPÓSITO PARTICULAR. Veja a\nLicença Pública Geral do GNU pra mais detalhes.\n\nVocê deveria ter recebido uma cópia da Licença Pública Geral do GNU\njunto com este programa. Se não, veja http://www.gnu.org/licenses."
+msgstr "Este programa é um software livre: você pode redistribuí-lo e/ou modificá-lo\nsob os termos da Licença Pública Geral do GNU conforme publicado pela\nFree Software Foundation, seja a versão 2 da Licença ou\n(sua opção) qualquer versão posterior.\n\nEste programa é distribuído na esperança de que ele será útil mas SEM QUALQUER\nGARANTIA; mesmo sem a garantia implícita de COMERCIALIZAÇÃO OU\nADEQUAÇÃO PRA UM PROPÓSITO PARTICULAR. Veja a\nLicença Pública Geral do GNU pra mais detalhes.\n\nVocê deve ter recebido uma cópia da Licença Pública Geral do GNU junto\ncom este programa. Se não recebeu veja http://www.gnu.org/licenses."
 
 #: cmdevents.cpp:3189
 msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
@@ -948,7 +948,7 @@ msgstr "Arquivos de imagem (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
 #: sys.cpp:919
 msgid "Save printer image to"
-msgstr "Salvar a imagem da impressão em"
+msgstr "Salvar a imagem da impressora em"
 
 #: sys.cpp:933 sys.cpp:1116
 #, c-format
@@ -1856,7 +1856,7 @@ msgstr "Título interno:"
 
 #: xrc/GBAROMInfo.xrc:35
 msgid "Scene Release:"
-msgstr "Lançamento da Tela:"
+msgstr "Lançamento da Cena:"
 
 #: xrc/GBAROMInfo.xrc:47
 msgid "Release Number:"
@@ -2391,7 +2391,7 @@ msgstr "Geral"
 
 #: xrc/GeneralConfig.xrc:26
 msgid "Screenshot Format:"
-msgstr "Formato da Screenshot:"
+msgstr "Formato do Screenshot:"
 
 #: xrc/GeneralConfig.xrc:33
 msgid "&PNG"
@@ -3060,7 +3060,7 @@ msgstr "&Manter a janela no topo"
 
 #: xrc/MainMenu.xrc:376
 msgid "&Status bar"
-msgstr "&Barra de Status"
+msgstr "&Barra de status"
 
 #: xrc/MainMenu.xrc:380
 msgid "&Disable on-screen display"
@@ -3108,11 +3108,11 @@ msgstr "&Entrada"
 
 #: xrc/MainMenu.xrc:430
 msgid "Allow &keyboard background input"
-msgstr "Permitir a &entrada de fundo do teclado"
+msgstr "Permitir a &entrada em 2o plano do teclado"
 
 #: xrc/MainMenu.xrc:434
 msgid "Allow &joystick background input"
-msgstr "Permitir a &entrada de fundo do joystick"
+msgstr "Permitir a &entrada em 2o plano do joystick"
 
 #: xrc/MainMenu.xrc:439
 msgid "&Autofire"
@@ -3164,11 +3164,11 @@ msgstr "&Filtro LCD"
 
 #: xrc/MainMenu.xrc:531
 msgid "&GB color option"
-msgstr "&Opção de Cores do GB"
+msgstr "&Opção de cores do GB"
 
 #: xrc/MainMenu.xrc:539
 msgid "&GB Colorizer Hack (requires restart)"
-msgstr "&Hack Colorizador do GB (requer reiniciar)"
+msgstr "&Hack colorizador do GB (requer reiniciar)"
 
 #: xrc/MainMenu.xrc:543
 msgid "&GB printer"
@@ -3208,7 +3208,7 @@ msgstr "&Atalhos das Teclas..."
 
 #: xrc/MainMenu.xrc:577
 msgid "&UI Settings ..."
-msgstr "&Configurações da IU..."
+msgstr "&Configurações da Interface do Usuário..."
 
 #: xrc/MainMenu.xrc:581
 msgid "&Tools"
@@ -3668,4 +3668,4 @@ msgstr "Configurações da Interface do Usuário"
 
 #: xrc/UIConfig.xrc:9
 msgid "Hide Menu Bar"
-msgstr "Esconder a Barra de Menu"
+msgstr "Esconder a Barra do Menu"

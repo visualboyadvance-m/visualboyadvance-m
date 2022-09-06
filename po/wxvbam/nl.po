@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Ghostbird <gijsbertth@gmail.com>, 2012
+# LevensLes The, 2022
 # Luke TheGame <verhoefluke@gmail.com>, 2021
 # M the Hane <meesdh@hotmail.com>, 2018-2019
 # Spencer, 2021
@@ -13,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-18 14:29+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Luke TheGame <verhoefluke@gmail.com>, 2021\n"
+"Last-Translator: LevensLes The, 2022\n"
 "Language-Team: Dutch (http://www.transifex.com/bgk/vba-m/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -754,7 +755,7 @@ msgstr ""
 
 #: cmdevents.cpp:1971
 msgid "Cannot use Colorizer Hack when GB BIOS File is enabled."
-msgstr ""
+msgstr "Kan de Colorizer Hack niet gebruiken als GB BIOS aan staat."
 
 #: cmdevents.cpp:2186
 msgid "Sound enabled"
@@ -798,12 +799,12 @@ msgstr "Wachten op GDB..."
 #: cmdevents.cpp:2769
 #, c-format
 msgid "Using pixel filter %s"
-msgstr ""
+msgstr "gebruikt pixel filter %s"
 
 #: cmdevents.cpp:2784
 #, c-format
 msgid "Using interframe blending #%d"
-msgstr ""
+msgstr "Interframe overvloeiing gebruiken #%d"
 
 #: cmdevents.cpp:2823 panel.cpp:194 panel.cpp:308
 msgid "Could not initialize the sound driver!"
@@ -838,7 +839,7 @@ msgstr "This program is free software: you can redistribute it and/or modify\nit
 
 #: cmdevents.cpp:3189
 msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
-msgstr ""
+msgstr "Kan GB BIOS niet gebruiken als Colorizer Hack aanstaat."
 
 #: cmdevents.cpp:3249
 msgid "LAN link is already active.  Disable link mode to disconnect."
@@ -966,7 +967,7 @@ msgstr "Kan Game Boy ROM niet laden %s"
 msgid ""
 "Cannot use GB BIOS file when Colorizer Hack is enabled, disabling GB BIOS "
 "file."
-msgstr ""
+msgstr "Kan GB BIOS niet gebruiken als Colorizer Hack aanstaat, GB BIOS bestand uitzetten."
 
 #: panel.cpp:222 panel.cpp:322
 #, c-format
@@ -1045,19 +1046,19 @@ msgstr "glXSwapIntervalEXT kan niet worden ingesteld."
 
 #: panel.cpp:2201
 msgid "Failed to set glXSwapIntervalSGI"
-msgstr ""
+msgstr "glXSwapIntervalEXT kan niet worden ingesteld."
 
 #: panel.cpp:2210
 msgid "Failed to set glXSwapIntervalMESA"
-msgstr ""
+msgstr "glXSwapIntervalMESA kan niet worden ingesteld."
 
 #: panel.cpp:2216
 msgid "No support for wglGetExtensionsStringEXT"
-msgstr ""
+msgstr "Geen ondersteuning voor wglGetExtensionsStringEXT"
 
 #: panel.cpp:2219
 msgid "No support for WGL_EXT_swap_control"
-msgstr ""
+msgstr "Geen ondersteuning voor WGL_EXT_swap_control"
 
 #: panel.cpp:2228
 msgid "Failed to set wglSwapIntervalEXT"
