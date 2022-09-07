@@ -194,8 +194,8 @@ enum { CMDEN_GB = (1 << 0), // GB ROM loaded
 struct checkable_mi_t {
     int cmd;
     wxMenuItem* mi;
-    bool* boolopt;
-    int *intopt, mask, val;
+    int mask, val;
+    bool initialized = false;
 };
 
 // wxArray is only for small types
@@ -218,12 +218,12 @@ public:
     ~MainFrame();
 
     bool BindControls();
-    void MenuOptionIntMask(const char* menuName, int& field, int mask);
-    void MenuOptionIntRadioValue(const char* menuName, int& field, int mask);
-    void MenuOptionBool(const char* menuName, bool& field);
-    void GetMenuOptionInt(const char* menuName, int& field, int mask);
-    void GetMenuOptionBool(const char* menuName, bool& field);
-    void SetMenuOption(const char* menuName, int value);
+    void MenuOptionIntMask(const wxString& menuName, int field, int mask);
+    void MenuOptionIntRadioValue(const wxString& menuName, int field, int mask);
+    void MenuOptionBool(const wxString& menuName, bool field);
+    void GetMenuOptionInt(const wxString& menuName, int field, int mask);
+    void GetMenuOptionBool(const wxString& menuName, bool field);
+    void SetMenuOption(const wxString& menuName, int value);
 
     void SetJoystick();
 
@@ -434,6 +434,7 @@ enum showspeed {
     SS_DETAILED
 };
 
+// This enum must be kept in sync with the one in vbam-options-static.cpp.
 enum filtfunc {
     // this order must match order of option enum and selector widget
     FF_NONE,
@@ -469,14 +470,14 @@ enum filtfunc {
                         ? 3                                                \
                         : x == FF_PLUGIN ? 0 : x == FF_NONE ? 1 : 2)
 
+// This enum must be kept in sync with the one in vbam-options-static.cpp.
 enum ifbfunc {
-    // this order must match order of option enum and selector widget
     IFB_NONE,
     IFB_SMART,
     IFB_MOTION_BLUR
 };
 
-// make sure and keep this in sync with opts.cpp!
+// This enum must be kept in sync with the one in vbam-options-static.cpp.
 enum renderer {
     RND_SIMPLE,
     RND_OPENGL,
@@ -484,7 +485,7 @@ enum renderer {
     RND_QUARTZ2D,
 };
 
-// likewise
+// This enum must be kept in sync with the one in vbam-options-static.cpp.
 enum audioapi { AUD_SDL,
     AUD_OPENAL,
     AUD_DIRECTSOUND,

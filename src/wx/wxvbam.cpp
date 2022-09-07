@@ -4,6 +4,7 @@
 //   create & display main frame
 
 #include "wxvbam.h"
+
 #include <stdio.h>
 #include <wx/cmdline.h>
 #include <wx/file.h>
@@ -19,14 +20,15 @@
 #include <wx/url.h>
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
-#include "wayland.h"
-#include "strutils.h"
 
 // The built-in xrc file
 #include "builtin-xrc.h"
 
 // The built-in vba-over.ini
 #include "builtin-over.h"
+#include "strutils.h"
+#include "vbam-options.h"
+#include "wayland.h"
 #include "wx/gamecontrol.h"
 #include "wx/userinput.h"
 
@@ -627,29 +629,19 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
     }
 
     if (cl.Found(wxT("o"))) {
+        // This was most likely done on a command line, so use
+        // stderr instead of gui for messages
+        wxLog::SetActiveTarget(new wxLogStderr);
+
         wxPrintf(_("Options set from the command line are saved if any"
                    " configuration changes are made in the user interface.\n\n"
                    "For flag options, true and false are specified as 1 and 0, respectively.\n\n"));
 
-        for (int i = 0; i < num_opts; i++) {
-            wxPrintf(wxT("%s (%s"), opts[i].opt.c_str(),
-                opts[i].boolopt ? wxT("flag") : opts[i].stropt ? wxT("string") : !opts[i].enumvals.empty() ? opts[i].enumvals.c_str() : (opts[i].intopt ? wxT("int") : opts[i].doubleopt ? wxT("decimal") : wxT("string")));
-
-            if (!opts[i].enumvals.empty()) {
-                const wxString evx = wxGetTranslation(opts[i].enumvals);
-
-                if (wxStrcmp(evx, opts[i].enumvals))
-                    wxPrintf(wxT(" = %s"), evx.c_str());
-            }
-
-            wxPrintf(wxT(")\n\t%s\n\n"), opts[i].desc.c_str());
-
-            if (!opts[i].enumvals.empty())
-                opts[i].enumvals = wxGetTranslation(opts[i].enumvals);
+        for (const VbamOption& opt : VbamOption::AllOptions()) {
+            wxPrintf("%s\n", opt.ToHelperString());
         }
 
         wxPrintf(_("The commands available for the Keyboard/* option are:\n\n"));
-
         for (int i = 0; i < ncmds; i++)
             wxPrintf(wxT("%s (%s)\n"), cmdtab[i].cmd.c_str(), cmdtab[i].name.c_str());
 

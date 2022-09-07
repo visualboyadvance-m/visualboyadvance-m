@@ -98,34 +98,6 @@ extern struct opts_t {
     // wxWidgets-generated options (opaque)
 } gopts;
 
-extern struct opt_desc {
-    wxString opt;
-    const char* cmd;
-    wxString desc;
-    wxString* stropt;
-    int* intopt;
-    wxString enumvals;
-    double min, max;
-    bool* boolopt;
-    double* doubleopt;
-    uint32_t* uintopt;
-    // current configured value
-    wxString curstr;
-    int curint;
-    double curdouble;
-    uint32_t curuint;
-#define curbool curint
-} opts[];
-
-// Initializer for struct opt_desc
-opt_desc new_opt_desc(wxString opt = wxT(""), const char* cmd = NULL, wxString desc = wxT(""),
-                      wxString* stropt = NULL, int* intopt = NULL, wxString enumvals = wxT(""),
-                      double min = 0, double max = 0, bool* boolopt = NULL,
-                      double* doubleopt = NULL, uint32_t* uintopt = NULL, wxString curstr = wxT(""),
-                      int curint = 0, double curdouble = 0, uint32_t curuint = 0);
-
-extern const int num_opts;
-
 extern const wxAcceleratorEntryUnicode default_accels[];
 extern const int num_def_accels;
 
@@ -137,6 +109,6 @@ void load_opts();
 // will detect changes and write config if necessary
 void update_opts();
 // returns true if option name correct; prints error if val invalid
-bool opt_set(const wxString& name, const wxString& val);
+void opt_set(const wxString& name, const wxString& val);
 
 #endif /* WX_OPTS_H */

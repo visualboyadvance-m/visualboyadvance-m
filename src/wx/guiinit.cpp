@@ -24,6 +24,7 @@
 #include <wx/wfstream.h>
 
 #include "opts.h"
+#include "vbam-options.h"
 #include "wx/gamecontrol.h"
 #include "wx/userinput.h"
 #include "../gba/CheatSearch.h"
@@ -2651,30 +2652,30 @@ void MainFrame::set_global_accels()
     SetRecentAccels();
 }
 
-void MainFrame::MenuOptionBool(const char* menuName, bool& field)
+void MainFrame::MenuOptionBool(const wxString& menuName, bool field)
 {
-    int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
+    int id = wxXmlResource::GetXRCID(menuName);
 
     for (size_t i = 0; i < checkable_mi.size(); i++) {
         if (checkable_mi[i].cmd != id)
             continue;
 
-        checkable_mi[i].boolopt = &field;
+        checkable_mi[i].initialized = true;
         checkable_mi[i].mi->Check(field);
         break;
     }
 }
 
-void MainFrame::MenuOptionIntMask(const char* menuName, int& field, int mask)
+void MainFrame::MenuOptionIntMask(const wxString& menuName, int field, int mask)
 {
-    int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
+    int id = wxXmlResource::GetXRCID(menuName);
     int value = mask;
 
     for (size_t i = 0; i < checkable_mi.size(); i++) {
         if (checkable_mi[i].cmd != id)
             continue;
 
-        checkable_mi[i].intopt = &field;
+        checkable_mi[i].initialized = true;
         checkable_mi[i].mask = mask;
         checkable_mi[i].val = value;
         checkable_mi[i].mi->Check((field & mask) == value);
@@ -2682,15 +2683,15 @@ void MainFrame::MenuOptionIntMask(const char* menuName, int& field, int mask)
     }
 }
 
-void MainFrame::MenuOptionIntRadioValue(const char* menuName, int& field, int value)
+void MainFrame::MenuOptionIntRadioValue(const wxString& menuName, int field, int value)
 {
-    int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
+    int id = wxXmlResource::GetXRCID(menuName);
 
     for (size_t i = 0; i < checkable_mi.size(); i++) {
         if (checkable_mi[i].cmd != id)
             continue;
 
-        checkable_mi[i].intopt = &field;
+        checkable_mi[i].initialized = true;
         checkable_mi[i].val = field;
         checkable_mi[i].mi->Check(field == value);
         break;
@@ -2973,17 +2974,14 @@ bool MainFrame::BindControls()
 
                 // store checkable items
                 if (mi->IsCheckable()) {
-                    checkable_mi_t cmi = { cmdtab[i].cmd_id, mi, NULL, NULL, 0, 0 };
+                    checkable_mi_t cmi = { cmdtab[i].cmd_id, mi, 0, 0 };
                     checkable_mi.push_back(cmi);
 
-                    for (int j = 0; j < num_opts; j++) {
-                        wxString menuName = wxString(opts[j].cmd, wxConvUTF8);
-
-                        if (menuName == cmdtab[i].cmd) {
-                            if (opts[j].intopt)
-                                MenuOptionIntMask(opts[j].cmd, *opts[j].intopt, (1 << 0));
-                            else if (opts[j].boolopt)
-                                MenuOptionBool(opts[j].cmd, *opts[j].boolopt);
+                    for (const VbamOption& option : VbamOption::AllOptions()) {
+                        if (option.is_int()) {
+                            MenuOptionIntMask(option.command(), option.GetInt(), (1 << 0));
+                        } else if (option.is_bool()) {
+                            MenuOptionBool(option.command(), option.GetBool());
                         }
                     }
                 }
@@ -3090,7 +3088,7 @@ bool MainFrame::BindControls()
     }
 
     for (size_t i = 0; i < checkable_mi.size(); i++)
-        if (!checkable_mi[i].boolopt && !checkable_mi[i].intopt) {
+        if (!checkable_mi[i].initialized) {
             wxLogError(_("Invalid menu item %s; removing"),
                 checkable_mi[i].mi->GetItemLabelText().c_str());
             checkable_mi[i].mi->GetMenu()->Remove(checkable_mi[i].mi);
