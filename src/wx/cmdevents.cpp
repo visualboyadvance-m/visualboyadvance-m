@@ -31,10 +31,10 @@ bool cmditem_lt(const struct cmditem& cmd1, const struct cmditem& cmd2)
     return wxStrcmp(cmd1.cmd, cmd2.cmd) < 0;
 }
 
-void MainFrame::GetMenuOptionBool(const char* menuName, bool& field)
+void MainFrame::GetMenuOptionBool(const wxString& menuName, bool field)
 {
     field = !field;
-    int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
+    int id = wxXmlResource::GetXRCID(menuName);
 
     for (size_t i = 0; i < checkable_mi.size(); i++) {
         if (checkable_mi[i].cmd != id)
@@ -45,11 +45,11 @@ void MainFrame::GetMenuOptionBool(const char* menuName, bool& field)
     }
 }
 
-void MainFrame::GetMenuOptionInt(const char* menuName, int& field, int mask)
+void MainFrame::GetMenuOptionInt(const wxString& menuName, int field, int mask)
 {
     int value = mask;
     bool is_checked = ((field) & (mask)) != (value);
-    int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
+    int id = wxXmlResource::GetXRCID(menuName);
 
     for (size_t i = 0; i < checkable_mi.size(); i++) {
         if (checkable_mi[i].cmd != id)
@@ -62,9 +62,9 @@ void MainFrame::GetMenuOptionInt(const char* menuName, int& field, int mask)
     field = ((field) & ~(mask)) | (is_checked ? (value) : 0);
 }
 
-void MainFrame::SetMenuOption(const char* menuName, int value)
+void MainFrame::SetMenuOption(const wxString& menuName, int value)
 {
-    int id = wxXmlResource::GetXRCID(wxString(menuName, wxConvUTF8));
+    int id = wxXmlResource::GetXRCID(menuName);
 
     for (size_t i = 0; i < checkable_mi.size(); i++) {
         if (checkable_mi[i].cmd != id)

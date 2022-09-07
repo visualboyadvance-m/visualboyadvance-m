@@ -733,6 +733,8 @@ set(
     opts.cpp
     sys.cpp
     panel.cpp
+    vbam-options.cpp
+    vbam-options-static.cpp
     viewsupt.cpp
     wayland.cpp
     strutils.cpp
@@ -767,6 +769,8 @@ set(
     filters.h
     ioregs.h
     opts.h
+    vbam-options.h
+    vbam-options-internal.h
     viewsupt.h
     wxhead.h
     wayland.h
