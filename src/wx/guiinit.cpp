@@ -2978,10 +2978,14 @@ bool MainFrame::BindControls()
                     checkable_mi.push_back(cmi);
 
                     for (const VbamOption& option : VbamOption::AllOptions()) {
-                        if (option.is_int()) {
-                            MenuOptionIntMask(option.command(), option.GetInt(), (1 << 0));
-                        } else if (option.is_bool()) {
-                            MenuOptionBool(option.command(), option.GetBool());
+                        if (cmdtab[i].cmd == option.command()) {
+                            if (option.is_int()) {
+                                MenuOptionIntMask(
+                                    option.command(), option.GetInt(), (1 << 0));
+                            } else if (option.is_bool()) {
+                                MenuOptionBool(
+                                    option.command(), option.GetBool());
+                            }
                         }
                     }
                 }
@@ -3692,8 +3696,11 @@ bool MainFrame::BindControls()
             getsc("MaxScale", maxScale);
             /// Basic
             getrbi("OutputSimple", gopts.render_method, RND_SIMPLE);
+
+#if defined(__WXMAC__)
             getrbi("OutputQuartz2D", gopts.render_method, RND_QUARTZ2D);
-#if !defined(__WXMAC__)
+#else
+            rb = SafeXRCCTRL<wxRadioButton>(d, "OutputQuartz2D");
             rb->Hide();
 #endif
             getrbi("OutputOpenGL", gopts.render_method, RND_OPENGL);
@@ -3706,10 +3713,11 @@ bool MainFrame::BindControls()
                 rb->Hide();
             }
 #endif
-            getrbi("OutputDirect3D", gopts.render_method, RND_DIRECT3D);
-#if !defined(__WXMSW__) || defined(NO_D3D) || 1 // not implemented
+
+            // Direct3D is not implemented so hide the option on every platform.
+            rb = SafeXRCCTRL<wxRadioButton>(d, "OutputDirect3D");
             rb->Hide();
-#endif
+
             ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "Filter", wxGenericValidator(&gopts.filter));
 
             // Save the Filters choice control to extract the names from the XRC.

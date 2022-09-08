@@ -318,7 +318,7 @@ void VbamOption::SetGbPalette(const wxString& value) const {
     uint16_t* dest = std::get<uint16_t*>(value_);
 
     for (size_t i = 0; i < 8; i++) {
-        wxString number = value.substr(i * 4, 4);
+        wxString number = value.substr(i * 5, 4);
         long temp = 0;
         if (number.ToLong(&temp, 16)) {
             dest[i] = temp;

@@ -18,7 +18,7 @@ struct VbamOptionData {
     const VbamOption::Type type;
 };
 
-// Static data to initialize global values.;
+// Static data to initialize global values.
 extern const std::array<VbamOptionData, kNbOptions + 1> kAllOptionsData;
 
 // Conversion utilities.
