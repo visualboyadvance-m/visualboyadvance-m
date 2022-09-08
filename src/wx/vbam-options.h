@@ -60,8 +60,6 @@ enum class VbamOptionID {
     /// Joypad
     kJoypad,
     kJoypadAutofireThrottle,
-
-    /// Keyboard
     kJoypadDefault,
 
     /// Keyboard

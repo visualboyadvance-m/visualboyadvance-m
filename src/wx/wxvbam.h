@@ -221,8 +221,8 @@ public:
     void MenuOptionIntMask(const wxString& menuName, int field, int mask);
     void MenuOptionIntRadioValue(const wxString& menuName, int field, int mask);
     void MenuOptionBool(const wxString& menuName, bool field);
-    void GetMenuOptionInt(const wxString& menuName, int field, int mask);
-    void GetMenuOptionBool(const wxString& menuName, bool field);
+    void GetMenuOptionInt(const wxString& menuName, int* field, int mask);
+    void GetMenuOptionBool(const wxString& menuName, bool* field);
     void SetMenuOption(const wxString& menuName, int value);
 
     void SetJoystick();
@@ -435,6 +435,7 @@ enum showspeed {
 };
 
 // This enum must be kept in sync with the one in vbam-options-static.cpp.
+// TODO: These 2 enums should be unified and a validator created for this enum.
 enum filtfunc {
     // this order must match order of option enum and selector widget
     FF_NONE,
@@ -471,6 +472,7 @@ enum filtfunc {
                         : x == FF_PLUGIN ? 0 : x == FF_NONE ? 1 : 2)
 
 // This enum must be kept in sync with the one in vbam-options-static.cpp.
+// TODO: These 2 enums should be unified and a validator created for this enum.
 enum ifbfunc {
     IFB_NONE,
     IFB_SMART,
@@ -478,19 +480,26 @@ enum ifbfunc {
 };
 
 // This enum must be kept in sync with the one in vbam-options-static.cpp.
+// TODO: These 2 enums should be unified and a validator created for this enum.
 enum renderer {
     RND_SIMPLE,
     RND_OPENGL,
+#if defined(__WXMSW__)
     RND_DIRECT3D,
+#elif defined(__WXMAC__)
     RND_QUARTZ2D,
+#endif
 };
 
 // This enum must be kept in sync with the one in vbam-options-static.cpp.
-enum audioapi { AUD_SDL,
+// TODO: These 2 enums should be unified and a validator created for this enum.
+enum audioapi {
+    AUD_SDL,
     AUD_OPENAL,
     AUD_DIRECTSOUND,
     AUD_XAUDIO2,
-    AUD_FAUDIO };
+    AUD_FAUDIO
+};
 
 // an unfortunate legacy default; should have a non-digit preceding %d
 // the only reason to keep it is that user can set slotdir to old dir

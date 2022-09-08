@@ -1,7 +1,8 @@
 #include "vbam-options.h"
 
 // Helper implementation file to define and compile all of these huge constants
-// separately. These should not be updated very often, so this improves 
+// separately. These should not be updated very often, so having these in a
+// separate file improves incremental build time.
 
 #include <algorithm>
 #include <wx/log.h>
@@ -9,7 +10,6 @@
 #include "../common/ConfigManager.h"
 #include "../gb/gbGlobals.h"
 #include "opts.h"
-#include "wx/stringimpl.h"
 
 #define VBAM_OPTIONS_INTERNAL_INCLUDE
 #include "vbam-options-internal.h"
@@ -18,6 +18,7 @@
 namespace {
 
 // This enum must be kept in sync with the one in wxvbam.h
+// TODO: These 2 enums should be unified and a validator created for this enum.
 enum class FilterFunction {
     kNone,
     k2xsai,
@@ -78,6 +79,7 @@ static const std::array<wxString, kNbFilterFunctions> kFilterStrings = {
 };
 
 // This enum must be kept in sync with the one in wxvbam.h
+// TODO: These 2 enums should be unified and a validator created for this enum.
 enum class Interframe {
     kNone = 0,
     kSmart,
@@ -98,6 +100,7 @@ static const std::array<wxString, kNbInterframes> kInterframeStrings = {
 };
 
 // This enum must be kept in sync with the one in wxvbam.h
+// TODO: These 2 enums should be unified and a validator created for this enum.
 enum class RenderMethod {
     kSimple = 0,
     kOpenGL,
@@ -126,6 +129,8 @@ static const std::array<wxString, kNbRenderMethods> kRenderMethodStrings = {
 };
 
 // This enum must be kept in sync with the one in wxvbam.h
+// TODO: These 2 enums should be unified and a validator created for this enum.
+// TODO: DirectSound and XAudio2 should only be used on Windows.
 enum class AudioApi {
     kSdl = 0,
     kOpenAL,
@@ -469,140 +474,23 @@ const std::array<VbamOptionData, kNbOptions + 1> kAllOptionsData = {
     VbamOptionData { "Sound/Quality", "", _("Sound sample rate (kHz)"), VbamOption::Type::kSoundQuality },
     VbamOptionData { "Sound/Volume", "", _("Sound volume (%)"), VbamOption::Type::kInt },
 
-    // Last
+    // Last. This should never be used, it actually maps to VbamOptionID::kLast.
+    // This is to prevent a memory access violation error in case something
+    // attempts to instantiate a VbamOptionID::kLast. It will trigger a check
+    // in the VbamOption constructor, but that is after the constructor has
+    // accessed this entry.
     VbamOptionData { "", "", "", VbamOption::Type::kNone },
 };
 
 nonstd::optional<VbamOptionID> StringToOptionId(const wxString& input) {
-    // Note: This map does not include "Joystick" and "Keyboard". This is on
-    // purpose, as these are handled separately.
-    static const std::map<wxString, VbamOptionID> kStringToOptionId = {
-        { "Display/Bilinear", VbamOptionID::kDisplayBilinear },
-        { "Display/Filter", VbamOptionID::kDisplayFilter },
-        { "Display/FilterPlugin", VbamOptionID::kDisplayFilterPlugin },
-        { "Display/IFB", VbamOptionID::kDisplayIFB },
-        { "Display/KeepOnTop", VbamOptionID::kDisplayKeepOnTop },
-        { "Display/MaxThreads", VbamOptionID::kDisplayMaxThreads },
-        { "Display/RenderMethod", VbamOptionID::kDisplayRenderMethod },
-        { "Display/Scale", VbamOptionID::kDisplayScale },
-        { "Display/Stretch", VbamOptionID::kDisplayStretch },
-
-        /// GB
-        { "GB/BiosFile", VbamOptionID::kGBBiosFile },
-        { "GB/ColorOption", VbamOptionID::kGBColorOption },
-        { "GB/ColorizerHack", VbamOptionID::kGBColorizerHack },
-        { "GB/LCDFilter", VbamOptionID::kGBLCDFilter },
-        { "GB/GBCBiosFile", VbamOptionID::kGBGBCBiosFile },
-        { "GB/Palette0", VbamOptionID::kGBPalette0 },
-        { "GB/Palette1", VbamOptionID::kGBPalette1 },
-        { "GB/Palette2", VbamOptionID::kGBPalette2 },
-        { "GB/PrintAutoPage", VbamOptionID::kGBPrintAutoPage },
-        { "GB/PrintScreenCap", VbamOptionID::kGBPrintScreenCap },
-        { "GB/ROMDir", VbamOptionID::kGBROMDir },
-        { "GB/GBCROMDir", VbamOptionID::kGBGBCROMDir },
-
-        /// GBA
-        { "GBA/BiosFile", VbamOptionID::kGBABiosFile },
-        { "GBA/LCDFilter", VbamOptionID::kGBALCDFilter },
-#ifndef NO_LINK
-        { "GBA/LinkAuto", VbamOptionID::kGBALinkAuto },
-        { "GBA/LinkFast", VbamOptionID::kGBALinkFast },
-        { "GBA/LinkHost", VbamOptionID::kGBALinkHost },
-        { "GBA/ServerIP", VbamOptionID::kGBAServerIP },
-        { "GBA/LinkPort", VbamOptionID::kGBALinkPort },
-        { "GBA/LinkProto", VbamOptionID::kGBALinkProto },
-        { "GBA/LinkTimeout", VbamOptionID::kGBALinkTimeout },
-        { "GBA/LinkType", VbamOptionID::kGBALinkType },
-#endif
-        { "GBA/ROMDir", VbamOptionID::kGBAROMDir },
-
-        /// General
-        { "General/AutoLoadLastState", VbamOptionID::kGeneralAutoLoadLastState },
-        { "General/BatteryDir", VbamOptionID::kGeneralBatteryDir },
-        { "General/FreezeRecent", VbamOptionID::kGeneralFreezeRecent },
-        { "General/RecordingDir", VbamOptionID::kGeneralRecordingDir },
-        { "General/RewindInterval", VbamOptionID::kGeneralRewindInterval },
-        { "General/ScreenshotDir", VbamOptionID::kGeneralScreenshotDir },
-        { "General/StateDir", VbamOptionID::kGeneralStateDir },
-        { "General/StatusBar", VbamOptionID::kGeneralStatusBar },
-
-        /// Joypad
-        { "Joypad/AutofireThrottle", VbamOptionID::kJoypadAutofireThrottle },
-        { "Joypad/Default", VbamOptionID::kJoypadDefault },
-
-        // Core
-        { "preferences/agbPrint", VbamOptionID::kpreferencesagbPrint },
-        { "preferences/autoFrameSkip", VbamOptionID::kpreferencesautoFrameSkip },
-        { "preferences/autoPatch", VbamOptionID::kpreferencesautoPatch },
-        { "preferences/autoSaveLoadCheatList", VbamOptionID::kpreferencesautoSaveLoadCheatList },
-        { "preferences/borderAutomatic", VbamOptionID::kpreferencesborderAutomatic },
-        { "preferences/borderOn", VbamOptionID::kpreferencesborderOn },
-        { "preferences/captureFormat", VbamOptionID::kpreferencescaptureFormat },
-        { "preferences/cheatsEnabled", VbamOptionID::kpreferencescheatsEnabled },
-#ifdef MMX
-        { "preferences/enableMMX", VbamOptionID::kpreferencesenableMMX },
-#endif
-        { "preferences/disableStatus", VbamOptionID::kpreferencesdisableStatus },
-        { "preferences/emulatorType", VbamOptionID::kpreferencesemulatorType },
-        { "preferences/flashSize", VbamOptionID::kpreferencesflashSize },
-        { "preferences/frameSkip", VbamOptionID::kpreferencesframeSkip },
-        { "preferences/fsColorDepth", VbamOptionID::kpreferencesfsColorDepth },
-        { "preferences/fsFrequency", VbamOptionID::kpreferencesfsFrequency },
-        { "preferences/fsHeight", VbamOptionID::kpreferencesfsHeight },
-        { "preferences/fsWidth", VbamOptionID::kpreferencesfsWidth },
-        { "preferences/gbPaletteOption", VbamOptionID::kpreferencesgbPaletteOption },
-        { "preferences/gbPrinter", VbamOptionID::kpreferencesgbPrinter },
-        { "preferences/gdbBreakOnLoad", VbamOptionID::kpreferencesgdbBreakOnLoad },
-        { "preferences/gdbPort", VbamOptionID::kpreferencesgdbPort },
-#ifndef NO_LINK
-        { "preferences/LinkNumPlayers", VbamOptionID::kpreferencesLinkNumPlayers },
-#endif
-        { "preferences/maxScale", VbamOptionID::kpreferencesmaxScale },
-        { "preferences/pauseWhenInactive", VbamOptionID::kpreferencespauseWhenInactive },
-        { "preferences/rtcEnabled", VbamOptionID::kpreferencesrtcEnabled },
-        { "preferences/saveType", VbamOptionID::kpreferencessaveType },
-        { "preferences/showSpeed", VbamOptionID::kpreferencesshowSpeed },
-        { "preferences/showSpeedTransparent", VbamOptionID::kpreferencesshowSpeedTransparent },
-        { "preferences/skipBios", VbamOptionID::kpreferencesskipBios },
-        { "preferences/skipSaveGameCheats", VbamOptionID::kpreferencesskipSaveGameCheats },
-        { "preferences/skipSaveGameBattery", VbamOptionID::kpreferencesskipSaveGameBattery },
-        { "preferences/throttle", VbamOptionID::kpreferencesthrottle },
-        { "preferences/speedupThrottle", VbamOptionID::kpreferencesspeedupThrottle },
-        { "preferences/speedupFrameSkip", VbamOptionID::kpreferencesspeedupFrameSkip },
-        { "preferences/speedupThrottleFrameSkip", VbamOptionID::kpreferencesspeedupThrottleFrameSkip },
-        { "preferences/useBiosGB", VbamOptionID::kpreferencesuseBiosGB },
-        { "preferences/useBiosGBA", VbamOptionID::kpreferencesuseBiosGBA },
-        { "preferences/useBiosGBC", VbamOptionID::kpreferencesuseBiosGBC },
-        { "preferences/vsync", VbamOptionID::kpreferencesvsync },
-
-        /// Geometry
-        { "geometry/fullScreen", VbamOptionID::kgeometryfullScreen },
-        { "geometry/isMaximized", VbamOptionID::kgeometryisMaximized },
-        { "geometry/windowHeight", VbamOptionID::kgeometrywindowHeight },
-        { "geometry/windowWidth", VbamOptionID::kgeometrywindowWidth },
-        { "geometry/windowX", VbamOptionID::kgeometrywindowX },
-        { "geometry/windowY", VbamOptionID::kgeometrywindowY },
-
-        /// UI
-        { "ui/allowKeyboardBackgroundInput", VbamOptionID::kuiallowKeyboardBackgroundInput },
-        { "ui/allowJoystickBackgroundInput", VbamOptionID::kuiallowJoystickBackgroundInput },
-        { "ui/hideMenuBar", VbamOptionID::kuihideMenuBar },
-
-        /// Sound
-        { "Sound/AudioAPI", VbamOptionID::kSoundAudioAPI },
-        { "Sound/AudioDevice", VbamOptionID::kSoundAudioDevice },
-        { "Sound/Buffers", VbamOptionID::kSoundBuffers },
-        { "Sound/Enable", VbamOptionID::kSoundEnable },
-        { "Sound/GBAFiltering", VbamOptionID::kSoundGBAFiltering },
-        { "Sound/GBAInterpolation", VbamOptionID::kSoundGBAInterpolation },
-        { "Sound/GBDeclicking", VbamOptionID::kSoundGBDeclicking },
-        { "Sound/GBEcho", VbamOptionID::kSoundGBEcho },
-        { "Sound/GBEnableEffects", VbamOptionID::kSoundGBEnableEffects },
-        { "Sound/GBStereo", VbamOptionID::kSoundGBStereo },
-        { "Sound/GBSurround", VbamOptionID::kSoundGBSurround },
-        { "Sound/Quality", VbamOptionID::kSoundQuality },
-        { "Sound/Volume", VbamOptionID::kSoundVolume },
-    };
+    static std::map<wxString, VbamOptionID> kStringToOptionId;
+    if (kStringToOptionId.empty()) {
+        for (size_t i = 0; i < kNbOptions; i++) {
+            kStringToOptionId.emplace(
+                kAllOptionsData[i].config_name, static_cast<VbamOptionID>(i));
+        }
+        assert(kStringToOptionId.size() == kNbOptions);
+    }
 
     const auto iter = kStringToOptionId.find(input);
     if (iter == kStringToOptionId.end()) {
@@ -637,32 +525,14 @@ wxString SoundQualityToString(int value) {
 }
 
 int StringToFilter(const wxString& config_name, const wxString& input) {
-    static const std::map<wxString, FilterFunction> kStringToFilter = {
-        { kFilterStrings[0], FilterFunction::kNone },
-        { kFilterStrings[1], FilterFunction::k2xsai },
-        { kFilterStrings[2], FilterFunction::kSuper2xsai }, 
-        { kFilterStrings[3], FilterFunction::kSupereagle }, 
-        { kFilterStrings[4], FilterFunction::kPixelate }, 
-        { kFilterStrings[5], FilterFunction::kAdvmame }, 
-        { kFilterStrings[6], FilterFunction::kBilinear }, 
-        { kFilterStrings[7], FilterFunction::kBilinearplus }, 
-        { kFilterStrings[8], FilterFunction::kScanlines }, 
-        { kFilterStrings[9], FilterFunction::kTvmode }, 
-        { kFilterStrings[10], FilterFunction::kHQ2x }, 
-        { kFilterStrings[11], FilterFunction::kLQ2x }, 
-        { kFilterStrings[12], FilterFunction::kSimple2x }, 
-        { kFilterStrings[13], FilterFunction::kSimple3x }, 
-        { kFilterStrings[14], FilterFunction::kHQ3x }, 
-        { kFilterStrings[15], FilterFunction::kSimple4x }, 
-        { kFilterStrings[16], FilterFunction::kHQ4x }, 
-        { kFilterStrings[17], FilterFunction::kXbrz2x }, 
-        { kFilterStrings[18], FilterFunction::kXbrz3x }, 
-        { kFilterStrings[19], FilterFunction::kXbrz4x }, 
-        { kFilterStrings[20], FilterFunction::kXbrz5x }, 
-        { kFilterStrings[21], FilterFunction::kXbrz6x }, 
-        { kFilterStrings[22], FilterFunction::kPlugin }, 
-    };
-    assert(kFilterStrings.size() == kNbFilterFunctions);
+    static std::map<wxString, FilterFunction> kStringToFilter;
+    if (kStringToFilter.empty()) {
+        for (size_t i = 0; i < kNbFilterFunctions; i++) {
+            kStringToFilter.emplace(
+                kFilterStrings[i], static_cast<FilterFunction>(i));
+        }
+        assert(kStringToFilter.size() == kNbFilterFunctions);
+    }
 
     const auto iter = kStringToFilter.find(input);
     if (iter == kStringToFilter.end()) {
@@ -676,12 +546,14 @@ int StringToFilter(const wxString& config_name, const wxString& input) {
 }
 
 int StringToInterframe(const wxString& config_name, const wxString& input) {
-    static const std::map<wxString, Interframe> kStringToInterframe = {
-        { kInterframeStrings[0], Interframe::kNone },
-        { kInterframeStrings[1], Interframe::kSmart },
-        { kInterframeStrings[2], Interframe::kMotionBlur },
-    };
-    assert(kStringToInterframe.size() == kNbInterframes);
+    static std::map<wxString, Interframe> kStringToInterframe;
+    if (kStringToInterframe.empty()) {
+        for (size_t i = 0; i < kNbInterframes; i++) {
+            kStringToInterframe.emplace(
+                kInterframeStrings[i], static_cast<Interframe>(i));
+        }
+        assert(kStringToInterframe.size() == kNbInterframes);
+    }
 
     const auto iter = kStringToInterframe.find(input);
     if (iter == kStringToInterframe.end()) {
@@ -695,16 +567,13 @@ int StringToInterframe(const wxString& config_name, const wxString& input) {
 }
 
 int StringToRenderMethod(const wxString& config_name, const wxString& input) {
-    static const std::map<wxString, RenderMethod> kStringToRenderMethod = {
-        { kRenderMethodStrings[0], RenderMethod::kSimple },
-        { kRenderMethodStrings[1], RenderMethod::kOpenGL },
-#ifdef __WXMSW__
-        { kRenderMethodStrings[2], RenderMethod::kDirect3d },
-#elif defined(__WXMAC__)
-        { kRenderMethodStrings[2], RenderMethod::kQuartz2d },
-#endif
-    };
-    assert(kStringToRenderMethod.size() == kNbRenderMethods);
+    static std::map<wxString, RenderMethod> kStringToRenderMethod;
+    if (kStringToRenderMethod.empty()) {
+        for (size_t i = 0; i < kNbRenderMethods; i++) {
+            kStringToRenderMethod.emplace(kRenderMethodStrings[i], static_cast<RenderMethod>(i));
+        }
+        assert(kStringToRenderMethod.size() == kNbRenderMethods);
+    }
 
     const auto iter = kStringToRenderMethod.find(input);
     if (iter == kStringToRenderMethod.end()) {
@@ -718,14 +587,13 @@ int StringToRenderMethod(const wxString& config_name, const wxString& input) {
 }
 
 int StringToAudioApi(const wxString& config_name, const wxString& input) {
-    static const std::map<wxString, AudioApi> kStringToAudioApi = {
-        { kAudioApiStrings[0], AudioApi::kSdl },
-        { kAudioApiStrings[1], AudioApi::kOpenAL },
-        { kAudioApiStrings[2], AudioApi::kDirectSound }, 
-        { kAudioApiStrings[3], AudioApi::kXAudio2 }, 
-        { kAudioApiStrings[4], AudioApi::kFaudio }, 
-    };
-    assert(kStringToAudioApi.size() == kNbAudioApis);
+    static std::map<wxString, AudioApi> kStringToAudioApi;
+    if (kStringToAudioApi.empty()) {
+        for (size_t i = 0; i < kNbAudioApis; i++) {
+            kStringToAudioApi.emplace(kAudioApiStrings[i], static_cast<AudioApi>(i));
+        }
+        assert(kStringToAudioApi.size() == kNbAudioApis);
+    }
 
     const auto iter = kStringToAudioApi.find(input);
     if (iter == kStringToAudioApi.end()) {
@@ -739,13 +607,13 @@ int StringToAudioApi(const wxString& config_name, const wxString& input) {
 }
 
 int StringToSoundQuality(const wxString& config_name, const wxString& input) {
-    static const std::map<wxString, SoundQuality> kStringToSoundQuality = {
-        { kSoundQualityStrings[0], SoundQuality::k48kHz },
-        { kSoundQualityStrings[1], SoundQuality::k44kHz },
-        { kSoundQualityStrings[2], SoundQuality::k22kHz },
-        { kSoundQualityStrings[3], SoundQuality::k11kHz },
-    };
-    assert(kStringToSoundQuality.size() == kNbSoundQualities);
+    static std::map<wxString, SoundQuality> kStringToSoundQuality;
+    if (kStringToSoundQuality.empty()) {
+        for (size_t i = 0; i < kNbSoundQualities; i++) {
+            kStringToSoundQuality.emplace(kSoundQualityStrings[i], static_cast<SoundQuality>(i));
+        }
+        assert(kStringToSoundQuality.size() == kNbSoundQualities);
+    }
 
     const auto iter = kStringToSoundQuality.find(input);
     if (iter == kStringToSoundQuality.end()) {

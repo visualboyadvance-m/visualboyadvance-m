@@ -31,24 +31,26 @@ bool cmditem_lt(const struct cmditem& cmd1, const struct cmditem& cmd2)
     return wxStrcmp(cmd1.cmd, cmd2.cmd) < 0;
 }
 
-void MainFrame::GetMenuOptionBool(const wxString& menuName, bool field)
+void MainFrame::GetMenuOptionBool(const wxString& menuName, bool* field)
 {
-    field = !field;
+    assert(field);
+    *field = !*field;
     int id = wxXmlResource::GetXRCID(menuName);
 
     for (size_t i = 0; i < checkable_mi.size(); i++) {
         if (checkable_mi[i].cmd != id)
             continue;
 
-        field = checkable_mi[i].mi->IsChecked();
+        *field = checkable_mi[i].mi->IsChecked();
         break;
     }
 }
 
-void MainFrame::GetMenuOptionInt(const wxString& menuName, int field, int mask)
+void MainFrame::GetMenuOptionInt(const wxString& menuName, int* field, int mask)
 {
+    assert(field);
     int value = mask;
-    bool is_checked = ((field) & (mask)) != (value);
+    bool is_checked = ((*field) & (mask)) != (value);
     int id = wxXmlResource::GetXRCID(menuName);
 
     for (size_t i = 0; i < checkable_mi.size(); i++) {
@@ -59,7 +61,7 @@ void MainFrame::GetMenuOptionInt(const wxString& menuName, int field, int mask)
         break;
     }
 
-    field = ((field) & ~(mask)) | (is_checked ? (value) : 0);
+    *field = ((*field) & ~(mask)) | (is_checked ? (value) : 0);
 }
 
 void MainFrame::SetMenuOption(const wxString& menuName, int value)
@@ -192,8 +194,8 @@ EVT_HANDLER(RecentReset, "Reset recent ROM list")
 
 EVT_HANDLER(RecentFreeze, "Freeze recent ROM list (toggle)")
 {
-    bool menuPress;
-    GetMenuOptionBool("RecentFreeze", menuPress);
+    bool menuPress = false;
+    GetMenuOptionBool("RecentFreeze", &menuPress);
     toggleBooleanVar(&menuPress, &gopts.recent_freeze);
     SetMenuOption("RecentFreeze", gopts.recent_freeze ? 1 : 0);
     update_opts();
@@ -1471,8 +1473,8 @@ EVT_HANDLER(wxID_EXIT, "Exit")
 // Emulation menu
 EVT_HANDLER(Pause, "Pause (toggle)")
 {
-    bool menuPress;
-    GetMenuOptionBool("Pause", menuPress);
+    bool menuPress = false;
+    GetMenuOptionBool("Pause", &menuPress);
     toggleBooleanVar(&menuPress, &paused);
     SetMenuOption("Pause", paused ? 1 : 0);
 
@@ -1491,8 +1493,8 @@ EVT_HANDLER(Pause, "Pause (toggle)")
 // new
 EVT_HANDLER_MASK(EmulatorSpeedupToggle, "Turbo mode (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    bool menuPress;
-    GetMenuOptionBool("EmulatorSpeedupToggle", menuPress);
+    bool menuPress = false;
+    GetMenuOptionBool("EmulatorSpeedupToggle", &menuPress);
     toggleBooleanVar(&menuPress, &turbo);
     SetMenuOption("EmulatorSpeedupToggle", turbo ? 1 : 0);
 }
@@ -1510,156 +1512,156 @@ EVT_HANDLER(ToggleFullscreen, "Full screen (toggle)")
 
 EVT_HANDLER(JoypadAutofireA, "Autofire A (toggle)")
 {
-    bool menuPress;
-    GetMenuOptionBool("JoypadAutofireA", menuPress);
+    bool menuPress = false;
+    GetMenuOptionBool("JoypadAutofireA", &menuPress);
     toggleBitVar(&menuPress, &autofire, KEYM_A);
     SetMenuOption("JoypadAutofireA", menuPress ? 1 : 0);
-    GetMenuOptionInt("JoypadAutofireA", autofire, KEYM_A);
+    GetMenuOptionInt("JoypadAutofireA", &autofire, KEYM_A);
 }
 
 EVT_HANDLER(JoypadAutofireB, "Autofire B (toggle)")
 {
-    bool menuPress;
-    GetMenuOptionBool("JoypadAutofireB", menuPress);
+    bool menuPress = false;
+    GetMenuOptionBool("JoypadAutofireB", &menuPress);
     toggleBitVar(&menuPress, &autofire, KEYM_B);
     SetMenuOption("JoypadAutofireB", menuPress ? 1 : 0);
-    GetMenuOptionInt("JoypadAutofireB", autofire, KEYM_B);
+    GetMenuOptionInt("JoypadAutofireB", &autofire, KEYM_B);
 }
 
 EVT_HANDLER(JoypadAutofireL, "Autofire L (toggle)")
 {
-    bool menuPress;
-    GetMenuOptionBool("JoypadAutofireL", menuPress);
+    bool menuPress = false;
+    GetMenuOptionBool("JoypadAutofireL", &menuPress);
     toggleBitVar(&menuPress, &autofire, KEYM_L);
     SetMenuOption("JoypadAutofireL", menuPress ? 1 : 0);
-    GetMenuOptionInt("JoypadAutofireL", autofire, KEYM_L);
+    GetMenuOptionInt("JoypadAutofireL", &autofire, KEYM_L);
 }
 
 EVT_HANDLER(JoypadAutofireR, "Autofire R (toggle)")
 {
-    bool menuPress;
-    GetMenuOptionBool("JoypadAutofireR", menuPress);
+    bool menuPress = false;
+    GetMenuOptionBool("JoypadAutofireR", &menuPress);
     toggleBitVar(&menuPress, &autofire, KEYM_R);
     SetMenuOption("JoypadAutofireR", menuPress ? 1 : 0);
-    GetMenuOptionInt("JoypadAutofireR", autofire, KEYM_R);
+    GetMenuOptionInt("JoypadAutofireR", &autofire, KEYM_R);
 }
 
 EVT_HANDLER(JoypadAutoholdUp, "Autohold Up (toggle)")
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "JoypadAutoholdUp";
     int keym = KEYM_UP;
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &autohold, keym);
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, autohold, keym);
+    GetMenuOptionInt(keyName, &autohold, keym);
 }
 
 EVT_HANDLER(JoypadAutoholdDown, "Autohold Down (toggle)")
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "JoypadAutoholdDown";
     int keym = KEYM_DOWN;
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &autohold, keym);
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, autohold, keym);
+    GetMenuOptionInt(keyName, &autohold, keym);
 }
 
 EVT_HANDLER(JoypadAutoholdLeft, "Autohold Left (toggle)")
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "JoypadAutoholdLeft";
     int keym = KEYM_LEFT;
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &autohold, keym);
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, autohold, keym);
+    GetMenuOptionInt(keyName, &autohold, keym);
 }
 
 EVT_HANDLER(JoypadAutoholdRight, "Autohold Right (toggle)")
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "JoypadAutoholdRight";
     int keym = KEYM_RIGHT;
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &autohold, keym);
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, autohold, keym);
+    GetMenuOptionInt(keyName, &autohold, keym);
 }
 
 EVT_HANDLER(JoypadAutoholdA, "Autohold A (toggle)")
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "JoypadAutoholdA";
     int keym = KEYM_A;
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &autohold, keym);
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, autohold, keym);
+    GetMenuOptionInt(keyName, &autohold, keym);
 }
 
 EVT_HANDLER(JoypadAutoholdB, "Autohold B (toggle)")
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "JoypadAutoholdB";
     int keym = KEYM_B;
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &autohold, keym);
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, autohold, keym);
+    GetMenuOptionInt(keyName, &autohold, keym);
 }
 
 EVT_HANDLER(JoypadAutoholdL, "Autohold L (toggle)")
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "JoypadAutoholdL";
     int keym = KEYM_L;
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &autohold, keym);
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, autohold, keym);
+    GetMenuOptionInt(keyName, &autohold, keym);
 }
 
 EVT_HANDLER(JoypadAutoholdR, "Autohold R (toggle)")
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "JoypadAutoholdR";
     int keym = KEYM_R;
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &autohold, keym);
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, autohold, keym);
+    GetMenuOptionInt(keyName, &autohold, keym);
 }
 
 EVT_HANDLER(JoypadAutoholdSelect, "Autohold Select (toggle)")
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "JoypadAutoholdSelect";
     int keym = KEYM_SELECT;
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &autohold, keym);
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, autohold, keym);
+    GetMenuOptionInt(keyName, &autohold, keym);
 }
 
 EVT_HANDLER(JoypadAutoholdStart, "Autohold Start (toggle)")
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "JoypadAutoholdStart";
     int keym = KEYM_START;
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &autohold, keym);
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, autohold, keym);
+    GetMenuOptionInt(keyName, &autohold, keym);
 }
 
 #include "background-input.h"
 
 EVT_HANDLER(AllowKeyboardBackgroundInput, "Allow keyboard background input (toggle)")
 {
-    bool menuPress;
-    GetMenuOptionBool("AllowKeyboardBackgroundInput", menuPress);
+    bool menuPress = false;
+    GetMenuOptionBool("AllowKeyboardBackgroundInput", &menuPress);
     toggleBooleanVar(&menuPress, &allowKeyboardBackgroundInput);
     SetMenuOption("AllowKeyboardBackgroundInput", allowKeyboardBackgroundInput ? 1 : 0);
 
@@ -1676,8 +1678,8 @@ EVT_HANDLER(AllowKeyboardBackgroundInput, "Allow keyboard background input (togg
 
 EVT_HANDLER(AllowJoystickBackgroundInput, "Allow joystick background input (toggle)")
 {
-    bool menuPress;
-    GetMenuOptionBool("AllowJoystickBackgroundInput", menuPress);
+    bool menuPress = false;
+    GetMenuOptionBool("AllowJoystickBackgroundInput", &menuPress);
     toggleBooleanVar(&menuPress, &allowJoystickBackgroundInput);
     SetMenuOption("AllowJoystickBackgroundInput", allowJoystickBackgroundInput ? 1 : 0);
 
@@ -1691,8 +1693,8 @@ EVT_HANDLER_MASK(LoadGameRecent, "Load most recent save", CMDEN_SAVST)
 
 EVT_HANDLER(LoadGameAutoLoad, "Auto load most recent save (toggle)")
 {
-    bool menuPress;
-    GetMenuOptionBool("LoadGameAutoLoad", menuPress);
+    bool menuPress = false;
+    GetMenuOptionBool("LoadGameAutoLoad", &menuPress);
     toggleBooleanVar(&menuPress, &gopts.autoload_state);
     SetMenuOption("LoadGameAutoLoad", gopts.autoload_state ? 1 : 0);
     update_opts();
@@ -1769,22 +1771,22 @@ EVT_HANDLER_MASK(Load, "Load state...", CMDEN_GB | CMDEN_GBA)
 // new
 EVT_HANDLER(KeepSaves, "Do not load battery saves (toggle)")
 {
-    bool menuPress;
-    GetMenuOptionBool("KeepSaves", menuPress);
+    bool menuPress = false;
+    GetMenuOptionBool("KeepSaves", &menuPress);
     toggleBitVar(&menuPress, &skipSaveGameBattery, 1);
     SetMenuOption("KeepSaves", menuPress ? 1 : 0);
-    GetMenuOptionInt("KeepSaves", skipSaveGameBattery, 1);
+    GetMenuOptionInt("KeepSaves", &skipSaveGameBattery, 1);
     update_opts();
 }
 
 // new
 EVT_HANDLER(KeepCheats, "Do not change cheat list (toggle)")
 {
-    bool menuPress;
-    GetMenuOptionBool("KeepCheats", menuPress);
+    bool menuPress = false;
+    GetMenuOptionBool("KeepCheats", &menuPress);
     toggleBitVar(&menuPress, &skipSaveGameCheats, 1);
     SetMenuOption("KeepCheats", menuPress ? 1 : 0);
-    GetMenuOptionInt("KeepCheats", skipSaveGameCheats, 1);
+    GetMenuOptionInt("KeepCheats", &skipSaveGameCheats, 1);
     update_opts();
 }
 
@@ -1945,8 +1947,8 @@ EVT_HANDLER_MASK(CheatsSearch, "Create cheat...", CMDEN_GB | CMDEN_GBA)
 // new
 EVT_HANDLER(CheatsAutoSaveLoad, "Auto save/load cheats (toggle)")
 {
-    bool menuPress;
-    GetMenuOptionBool("CheatsAutoSaveLoad", menuPress);
+    bool menuPress = false;
+    GetMenuOptionBool("CheatsAutoSaveLoad", &menuPress);
     toggleBooleanVar(&menuPress, &gopts.autoload_cheats);
     SetMenuOption("CheatsAutoSaveLoad", gopts.autoload_cheats ? 1 : 0);
     update_opts();
@@ -1956,18 +1958,18 @@ EVT_HANDLER(CheatsAutoSaveLoad, "Auto save/load cheats (toggle)")
 // changed for convenience to match internal variable functionality
 EVT_HANDLER(CheatsEnable, "Enable cheats (toggle)")
 {
-    bool menuPress;
-    GetMenuOptionBool("CheatsEnable", menuPress);
+    bool menuPress = false;
+    GetMenuOptionBool("CheatsEnable", &menuPress);
     toggleBitVar(&menuPress, &cheatsEnabled, 1);
     SetMenuOption("CheatsEnable", menuPress ? 1 : 0);
-    GetMenuOptionInt("CheatsEnable", cheatsEnabled, 1);
+    GetMenuOptionInt("CheatsEnable", &cheatsEnabled, 1);
     update_opts();
 }
 
 EVT_HANDLER(ColorizerHack, "Enable Colorizer Hack (toggle)")
 {
     int val = 0;
-    GetMenuOptionInt("ColorizerHack", val, 1);
+    GetMenuOptionInt("ColorizerHack", &val, 1);
 
     if (val == 1 && useBiosFileGB == 1) {
         wxLogError(_("Cannot use Colorizer Hack when GB BIOS File is enabled."));
@@ -1983,96 +1985,96 @@ EVT_HANDLER(ColorizerHack, "Enable Colorizer Hack (toggle)")
 // Debug menu
 EVT_HANDLER_MASK(VideoLayersBG0, "Video layer BG0 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "VideoLayersBG0";
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &layerSettings, (1 << 8));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, layerSettings, (1 << 8));
+    GetMenuOptionInt(keyName, &layerSettings, (1 << 8));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersBG1, "Video layer BG1 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "VideoLayersBG1";
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &layerSettings, (1 << 9));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, layerSettings, (1 << 9));
+    GetMenuOptionInt(keyName, &layerSettings, (1 << 9));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersBG2, "Video layer BG2 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "VideoLayersBG2";
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &layerSettings, (1 << 10));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, layerSettings, (1 << 10));
+    GetMenuOptionInt(keyName, &layerSettings, (1 << 10));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersBG3, "Video layer BG3 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "VideoLayersBG3";
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &layerSettings, (1 << 11));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, layerSettings, (1 << 11));
+    GetMenuOptionInt(keyName, &layerSettings, (1 << 11));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersOBJ, "Video layer OBJ (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "VideoLayersOBJ";
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &layerSettings, (1 << 12));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, layerSettings, (1 << 12));
+    GetMenuOptionInt(keyName, &layerSettings, (1 << 12));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersWIN0, "Video layer WIN0 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "VideoLayersWIN0";
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &layerSettings, (1 << 13));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, layerSettings, (1 << 13));
+    GetMenuOptionInt(keyName, &layerSettings, (1 << 13));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersWIN1, "Video layer WIN1 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "VideoLayersWIN1";
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &layerSettings, (1 << 14));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, layerSettings, (1 << 14));
+    GetMenuOptionInt(keyName, &layerSettings, (1 << 14));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
 EVT_HANDLER_MASK(VideoLayersOBJWIN, "Video layer OBJWIN (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "VideoLayersOBJWIN";
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &layerSettings, (1 << 15));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, layerSettings, (1 << 15));
+    GetMenuOptionInt(keyName, &layerSettings, (1 << 15));
     layerEnable = DISPCNT & layerSettings;
     CPUUpdateRenderBuffers(false);
 }
@@ -2103,72 +2105,72 @@ EVT_HANDLER_MASK(VideoLayersReset, "Show all video layers", CMDEN_GB | CMDEN_GBA
 
 EVT_HANDLER_MASK(SoundChannel1, "Sound Channel 1 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "SoundChannel1";
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &gopts.sound_en, (1 << 0));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, gopts.sound_en, (1 << 0));
+    GetMenuOptionInt(keyName, &gopts.sound_en, (1 << 0));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
 
 EVT_HANDLER_MASK(SoundChannel2, "Sound Channel 2 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "SoundChannel2";
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &gopts.sound_en, (1 << 1));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, gopts.sound_en, (1 << 1));
+    GetMenuOptionInt(keyName, &gopts.sound_en, (1 << 1));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
 
 EVT_HANDLER_MASK(SoundChannel3, "Sound Channel 3 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "SoundChannel3";
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &gopts.sound_en, (1 << 2));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, gopts.sound_en, (1 << 2));
+    GetMenuOptionInt(keyName, &gopts.sound_en, (1 << 2));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
 
 EVT_HANDLER_MASK(SoundChannel4, "Sound Channel 4 (toggle)", CMDEN_GB | CMDEN_GBA)
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "SoundChannel4";
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &gopts.sound_en, (1 << 3));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, gopts.sound_en, (1 << 3));
+    GetMenuOptionInt(keyName, &gopts.sound_en, (1 << 3));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
 
 EVT_HANDLER_MASK(DirectSoundA, "Direct Sound A (toggle)", CMDEN_GBA)
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "DirectSoundA";
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &gopts.sound_en, (1 << 8));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, gopts.sound_en, (1 << 8));
+    GetMenuOptionInt(keyName, &gopts.sound_en, (1 << 8));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
 
 EVT_HANDLER_MASK(DirectSoundB, "Direct Sound B (toggle)", CMDEN_GBA)
 {
-    bool menuPress;
+    bool menuPress = false;
     char keyName[] = "DirectSoundB";
-    GetMenuOptionBool(keyName, menuPress);
+    GetMenuOptionBool(keyName, &menuPress);
     toggleBitVar(&menuPress, &gopts.sound_en, (1 << 9));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, gopts.sound_en, (1 << 9));
+    GetMenuOptionInt(keyName, &gopts.sound_en, (1 << 9));
     soundSetEnable(gopts.sound_en);
     update_opts();
 }
@@ -2315,7 +2317,7 @@ EVT_HANDLER(DebugGDBPort, "Configure port...")
 EVT_HANDLER(DebugGDBBreakOnLoad, "Break on load")
 {
 #ifndef NO_DEBUGGER
-    GetMenuOptionInt("DebugGDBBreakOnLoad", gdbBreakOnLoad, 1);
+    GetMenuOptionInt("DebugGDBBreakOnLoad", &gdbBreakOnLoad, 1);
     update_opts();
 #endif
 }
@@ -2976,7 +2978,7 @@ EVT_HANDLER(wxID_ABOUT, "About...")
 
 EVT_HANDLER(Bilinear, "Use bilinear filter with 3d renderer")
 {
-    GetMenuOptionBool("Bilinear", gopts.bilinear);
+    GetMenuOptionBool("Bilinear", &gopts.bilinear);
     // Force new panel with new bilinear option
     if (panel->panel) {
         panel->panel->Destroy();
@@ -2987,7 +2989,7 @@ EVT_HANDLER(Bilinear, "Use bilinear filter with 3d renderer")
 
 EVT_HANDLER(RetainAspect, "Retain aspect ratio when resizing")
 {
-    GetMenuOptionBool("RetainAspect", gopts.retain_aspect);
+    GetMenuOptionBool("RetainAspect", &gopts.retain_aspect);
 
     // Force new panel with new aspect ratio options.
     if (panel->panel) {
@@ -3000,7 +3002,7 @@ EVT_HANDLER(RetainAspect, "Retain aspect ratio when resizing")
 
 EVT_HANDLER(Printer, "Enable printer emulation")
 {
-    GetMenuOptionInt("Printer", winGbPrinterEnabled, 1);
+    GetMenuOptionInt("Printer", &winGbPrinterEnabled, 1);
 #if (defined __WIN32__ || defined _WIN32)
 #ifndef NO_LINK
     gbSerialFunction = gbStartLink;
@@ -3016,25 +3018,25 @@ EVT_HANDLER(Printer, "Enable printer emulation")
 
 EVT_HANDLER(PrintGather, "Automatically gather a full page before printing")
 {
-    GetMenuOptionBool("PrintGather", gopts.print_auto_page);
+    GetMenuOptionBool("PrintGather", &gopts.print_auto_page);
     update_opts();
 }
 
 EVT_HANDLER(PrintSnap, "Automatically save printouts as screen captures with -print suffix")
 {
-    GetMenuOptionBool("PrintSnap", gopts.print_screen_cap);
+    GetMenuOptionBool("PrintSnap", &gopts.print_screen_cap);
     update_opts();
 }
 
 EVT_HANDLER(GBASoundInterpolation, "GBA sound interpolation")
 {
-    GetMenuOptionBool("GBASoundInterpolation", soundInterpolation);
+    GetMenuOptionBool("GBASoundInterpolation", &soundInterpolation);
     update_opts();
 }
 
 EVT_HANDLER(GBDeclicking, "GB sound declicking")
 {
-    GetMenuOptionBool("GBDeclicking", gopts.gb_declick);
+    GetMenuOptionBool("GBDeclicking", &gopts.gb_declick);
     // note that setting declick may reset gb sound engine
     gbSoundSetDeclicking(gopts.gb_declick);
     update_opts();
@@ -3042,28 +3044,28 @@ EVT_HANDLER(GBDeclicking, "GB sound declicking")
 
 EVT_HANDLER(GBEnhanceSound, "Enable GB sound effects")
 {
-    GetMenuOptionBool("GBEnhanceSound", gopts.gb_effects_config_enabled);
+    GetMenuOptionBool("GBEnhanceSound", &gopts.gb_effects_config_enabled);
     gb_effects_config.enabled = gopts.gb_effects_config_enabled;
     update_opts();
 }
 
 EVT_HANDLER(GBSurround, "GB surround sound effect (%)")
 {
-    GetMenuOptionBool("GBSurround", gopts.gb_effects_config_surround);
+    GetMenuOptionBool("GBSurround",&gopts.gb_effects_config_surround);
     gb_effects_config.surround = gopts.gb_effects_config_surround;
     update_opts();
 }
 
 EVT_HANDLER(AGBPrinter, "Enable AGB printer")
 {
-    GetMenuOptionInt("AGBPrinter", agbPrint, 1);
+    GetMenuOptionInt("AGBPrinter", &agbPrint, 1);
     update_opts();
 }
 
 EVT_HANDLER_MASK(GBALcdFilter, "Enable LCD filter", CMDEN_GBA)
 {
-    bool menuPress;
-    GetMenuOptionBool("GBALcdFilter", menuPress);
+    bool menuPress = false;
+    GetMenuOptionBool("GBALcdFilter", &menuPress);
     toggleBooleanVar(&menuPress, &gbaLcdFilter);
     SetMenuOption("GBALcdFilter", gbaLcdFilter ? 1 : 0);
     utilUpdateSystemColorMaps(gbaLcdFilter);
@@ -3072,8 +3074,8 @@ EVT_HANDLER_MASK(GBALcdFilter, "Enable LCD filter", CMDEN_GBA)
 
 EVT_HANDLER_MASK(GBLcdFilter, "Enable LCD filter", CMDEN_GB)
 {
-    bool menuPress;
-    GetMenuOptionBool("GBLcdFilter", menuPress);
+    bool menuPress = false;
+    GetMenuOptionBool("GBLcdFilter", &menuPress);
     toggleBooleanVar(&menuPress, &gbLcdFilter);
     SetMenuOption("GBLcdFilter", gbLcdFilter ? 1 : 0);
     utilUpdateSystemColorMaps(gbLcdFilter);
@@ -3082,9 +3084,9 @@ EVT_HANDLER_MASK(GBLcdFilter, "Enable LCD filter", CMDEN_GB)
 
 EVT_HANDLER(GBColorOption, "Enable GB color option")
 {
-    bool menuPress;
+    bool menuPress = false;
     bool intVar = gbColorOption ? true : false;
-    GetMenuOptionBool("GBColorOption", menuPress);
+    GetMenuOptionBool("GBColorOption", &menuPress);
     toggleBooleanVar(&menuPress, &intVar);
     SetMenuOption("GBColorOption", intVar ? 1 : 0);
     gbColorOption = intVar ? 1 : 0;
@@ -3093,21 +3095,21 @@ EVT_HANDLER(GBColorOption, "Enable GB color option")
 
 EVT_HANDLER(ApplyPatches, "Apply IPS/UPS/IPF patches if found")
 {
-    GetMenuOptionInt("ApplyPatches", autoPatch, 1);
+    GetMenuOptionInt("ApplyPatches", &autoPatch, 1);
     update_opts();
 }
 
 EVT_HANDLER(MMX, "Enable MMX")
 {
 #ifdef MMX
-    GetMenuOptionInt("MMX", enableMMX, 1);
+    GetMenuOptionInt("MMX", &enableMMX, 1);
     update_opts();
 #endif
 }
 
 EVT_HANDLER(KeepOnTop, "Keep window on top")
 {
-    GetMenuOptionBool("KeepOnTop", gopts.keep_on_top);
+    GetMenuOptionBool("KeepOnTop", &gopts.keep_on_top);
     MainFrame* mf = wxGetApp().frame;
 
     if (gopts.keep_on_top)
@@ -3120,7 +3122,7 @@ EVT_HANDLER(KeepOnTop, "Keep window on top")
 
 EVT_HANDLER(StatusBar, "Enable status bar")
 {
-    GetMenuOptionInt("StatusBar", gopts.statusbar, 1);
+    GetMenuOptionInt("StatusBar", &gopts.statusbar, 1);
     update_opts();
     MainFrame* mf = wxGetApp().frame;
 
@@ -3136,56 +3138,56 @@ EVT_HANDLER(StatusBar, "Enable status bar")
 
 EVT_HANDLER(NoStatusMsg, "Disable on-screen status messages")
 {
-    GetMenuOptionInt("NoStatusMsg", disableStatusMessages, 1);
+    GetMenuOptionInt("NoStatusMsg", &disableStatusMessages, 1);
     update_opts();
 }
 
 EVT_HANDLER(FrameSkipAuto, "Auto Skip frames.")
 {
-    GetMenuOptionInt("FrameSkipAuto", autoFrameSkip, 1);
+    GetMenuOptionInt("FrameSkipAuto", &autoFrameSkip, 1);
     update_opts();
 }
 
 EVT_HANDLER(Fullscreen, "Enter fullscreen mode at startup")
 {
-    GetMenuOptionInt("Fullscreen", fullScreen, 1);
+    GetMenuOptionInt("Fullscreen", &fullScreen, 1);
     update_opts();
 }
 
 EVT_HANDLER(PauseWhenInactive, "Pause game when main window loses focus")
 {
-    GetMenuOptionInt("PauseWhenInactive", pauseWhenInactive, 1);
+    GetMenuOptionInt("PauseWhenInactive", &pauseWhenInactive, 1);
     update_opts();
 }
 
 EVT_HANDLER(RTC, "Enable RTC (vba-over.ini override is rtcEnabled")
 {
-    GetMenuOptionInt("RTC", rtcEnabled, 1);
+    GetMenuOptionInt("RTC", &rtcEnabled, 1);
     update_opts();
 }
 
 EVT_HANDLER(Transparent, "Draw on-screen messages transparently")
 {
-    GetMenuOptionInt("Transparent", showSpeedTransparent, 1);
+    GetMenuOptionInt("Transparent", &showSpeedTransparent, 1);
     update_opts();
 }
 
 EVT_HANDLER(SkipIntro, "Skip BIOS initialization")
 {
-    GetMenuOptionInt("SkipIntro", skipBios, 1);
+    GetMenuOptionInt("SkipIntro", &skipBios, 1);
     update_opts();
 }
 
 EVT_HANDLER(BootRomEn, "Use the specified BIOS file for GBA")
 {
-    GetMenuOptionInt("BootRomEn", useBiosFileGBA, 1);
+    GetMenuOptionInt("BootRomEn", &useBiosFileGBA, 1);
     update_opts();
 }
 
 EVT_HANDLER(BootRomGB, "Use the specified BIOS file for GB")
 {
     int val = 0;
-    GetMenuOptionInt("BootRomGB", val, 1);
+    GetMenuOptionInt("BootRomGB", &val, 1);
 
     if (val == 1 && colorizerHack == 1) {
         wxLogError(_("Cannot use GB BIOS when Colorizer Hack is enabled."));
@@ -3200,13 +3202,13 @@ EVT_HANDLER(BootRomGB, "Use the specified BIOS file for GB")
 
 EVT_HANDLER(BootRomGBC, "Use the specified BIOS file for GBC")
 {
-    GetMenuOptionInt("BootRomGBC", useBiosFileGBC, 1);
+    GetMenuOptionInt("BootRomGBC", &useBiosFileGBC, 1);
     update_opts();
 }
 
 EVT_HANDLER(VSync, "Wait for vertical sync")
 {
-    GetMenuOptionInt("VSync", vsync, 1);
+    GetMenuOptionInt("VSync", &vsync, 1);
     update_opts();
 }
 
@@ -3291,19 +3293,19 @@ EVT_HANDLER(LinkType4Gameboy, "Link Gameboy")
 
 EVT_HANDLER(LinkAuto, "Enable link at boot")
 {
-    GetMenuOptionBool("LinkAuto", gopts.link_auto);
+    GetMenuOptionBool("LinkAuto", &gopts.link_auto);
     update_opts();
 }
 
 EVT_HANDLER(SpeedOn, "Enable faster network protocol by default")
 {
-    GetMenuOptionInt("SpeedOn", linkHacks, 1);
+    GetMenuOptionInt("SpeedOn", &linkHacks, 1);
     update_opts();
 }
 
 EVT_HANDLER(LinkProto, "Local host IPC")
 {
-    GetMenuOptionInt("LinkProto", gopts.link_proto, 1);
+    GetMenuOptionInt("LinkProto", &gopts.link_proto, 1);
     update_opts();
     enable_menus();
     EnableNetworkMenu();
