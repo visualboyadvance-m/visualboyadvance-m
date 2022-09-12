@@ -795,7 +795,7 @@ msgstr "Oczekiwanie na GDB..."
 #: cmdevents.cpp:2769
 #, c-format
 msgid "Using pixel filter %s"
-msgstr ""
+msgstr "Używany filtr pikseli %s"
 
 #: cmdevents.cpp:2784
 #, c-format
@@ -1163,12 +1163,12 @@ msgstr "CONTROL"
 #: widgets/sdljoy.cpp:188
 #, c-format
 msgid "Connected %s: %s"
-msgstr ""
+msgstr "Podłączono %s: %s"
 
 #: widgets/sdljoy.cpp:203
 #, c-format
 msgid "Disconnected %s"
-msgstr ""
+msgstr "Odłączono %s"
 
 #: xaudio2.cpp:34
 msgid "XAudio2: Enumerating devices failed!"
