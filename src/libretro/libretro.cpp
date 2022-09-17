@@ -59,7 +59,6 @@ static bool option_sndInterpolation = true;
 static bool option_useBios = false;
 static bool option_colorizerHack = false;
 static bool option_forceRTCenable = false;
-static bool option_showAdvancedOptions = false;
 static double option_sndFiltering = 0.5;
 static unsigned option_gbPalette = 0;
 static bool option_lcdfilter = false;
@@ -510,7 +509,8 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
 void retro_set_environment(retro_environment_t cb)
 {
    environ_cb = cb;
-   libretro_set_core_options(environ_cb);
+   bool categoriesSupported;
+   libretro_set_core_options(environ_cb, &categoriesSupported);
 }
 
 void retro_get_system_info(struct retro_system_info *info)
@@ -1204,39 +1204,6 @@ static void update_variables(bool startup)
     }
     else
         ifb_filter_func = NULL;
-
-    var.key = "vbam_show_advanced_options";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        bool newval = (!strcmp(var.value, "enabled")) ? true : false;
-        if ((option_showAdvancedOptions != newval) || startup) {
-            option_showAdvancedOptions = newval;
-            struct retro_core_option_display option_display;
-            unsigned i;
-            char options[][13] = {
-                "vbam_sound_1",
-                "vbam_sound_2",
-                "vbam_sound_3",
-                "vbam_sound_4",
-                "vbam_sound_5",
-                "vbam_sound_6",
-                "vbam_layer_1",
-                "vbam_layer_2",
-                "vbam_layer_3",
-                "vbam_layer_4",
-                "vbam_layer_5",
-                "vbam_layer_6",
-                "vbam_layer_7",
-                "vbam_layer_8"
-            };
-            option_display.visible = option_showAdvancedOptions;
-            for (i = 0; i < (sizeof(options) / sizeof(options[0])); i++) {
-                option_display.key = options[i];
-                environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
-            }
-        }
-    }
 
     // Hide some core options depending on rom image type
     if (startup) {
