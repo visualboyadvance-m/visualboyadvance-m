@@ -129,6 +129,7 @@ const wxAcceleratorEntryUnicode default_accels[] = {
     wxAcceleratorEntryUnicode(wxMOD_CMD, WXK_F10, wxID_FILE10),
     wxAcceleratorEntryUnicode(wxMOD_CMD, wxT('0'), XRCID("VideoLayersReset")),
     wxAcceleratorEntryUnicode(wxMOD_CMD, wxT('G'), XRCID("ChangeFilter")),
+    wxAcceleratorEntryUnicode(wxMOD_CMD, wxT('I'), XRCID("ChangeIFB")),
     wxAcceleratorEntryUnicode(wxMOD_NONE, WXK_NUMPAD_ADD, XRCID("IncreaseVolume")),
     wxAcceleratorEntryUnicode(wxMOD_NONE, WXK_NUMPAD_SUBTRACT, XRCID("DecreaseVolume")),
     wxAcceleratorEntryUnicode(wxMOD_NONE, WXK_NUMPAD_ENTER, XRCID("ToggleSound"))
