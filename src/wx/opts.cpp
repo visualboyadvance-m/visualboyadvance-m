@@ -129,6 +129,7 @@ const wxAcceleratorEntryUnicode default_accels[] = {
     wxAcceleratorEntryUnicode(wxMOD_CMD, WXK_F10, wxID_FILE10),
     wxAcceleratorEntryUnicode(wxMOD_CMD, wxT('0'), XRCID("VideoLayersReset")),
     wxAcceleratorEntryUnicode(wxMOD_CMD, wxT('G'), XRCID("ChangeFilter")),
+    wxAcceleratorEntryUnicode(wxMOD_CMD, wxT('I'), XRCID("ChangeIFB")),
     wxAcceleratorEntryUnicode(wxMOD_NONE, WXK_NUMPAD_ADD, XRCID("IncreaseVolume")),
     wxAcceleratorEntryUnicode(wxMOD_NONE, WXK_NUMPAD_SUBTRACT, XRCID("DecreaseVolume")),
     wxAcceleratorEntryUnicode(wxMOD_NONE, WXK_NUMPAD_ENTER, XRCID("ToggleSound"))
@@ -631,12 +632,12 @@ void load_opts()
             cfg->Read(opt.opt, opt.stropt, *opt.stropt);
             opt.curstr = *opt.stropt;
         } else if (!opt.enumvals.empty()) {
-            auto enum_opts = str_split(opt.enumvals.MakeLower(), wxT("|"));
+            auto enum_opts = strutils::split(opt.enumvals.MakeLower(), wxT("|"));
             opt.curint     = *opt.intopt;
             bool gotit     = cfg->Read(opt.opt, &s); s.MakeLower();
 
             if (gotit && !s.empty()) {
-                const auto found_pos = vec_find(enum_opts, s);
+                const auto found_pos = enum_opts.Index(s);
                 const bool matched   = ((int)found_pos != wxNOT_FOUND);
 
                 if (!matched) {
@@ -795,7 +796,7 @@ void update_opts()
         } else if (!opt.enumvals.empty()) {
             if (*opt.intopt != opt.curint) {
                 opt.curint = *opt.intopt;
-                auto enum_opts = str_split(opt.enumvals.MakeLower(), wxT("|"));
+                auto enum_opts = strutils::split(opt.enumvals.MakeLower(), wxT("|"));
 
                 cfg->Write(opt.opt, enum_opts[opt.curint]);
             }
@@ -938,9 +939,9 @@ bool opt_set(const wxString& name, const wxString& val)
         } else if (!opt->enumvals.empty()) {
             wxString s     = val; s.MakeLower();
             wxString ev    = opt->enumvals; ev.MakeLower();
-            auto enum_opts = str_split(ev, wxT("|"));
+            auto enum_opts = strutils::split(ev, wxT("|"));
 
-            const std::size_t found_pos = vec_find(enum_opts, s);
+            const std::size_t found_pos = enum_opts.Index(s);
             const bool matched          = ((int)found_pos != wxNOT_FOUND);
 
             if (!matched) {
@@ -1016,7 +1017,7 @@ bool opt_set(const wxString& name, const wxString& val)
         if (name.Find(wxT('/')) == wxNOT_FOUND)
             return false;
 
-        auto parts = str_split(name, wxT("/"));
+        auto parts = strutils::split(name, wxT("/"));
 
         if (parts[0] != wxT("Keyboard")) {
             cmditem* cmd = std::lower_bound(&cmdtab[0], &cmdtab[ncmds], cmditem{parts[1],wxString(),0,0,NULL}, cmditem_lt);

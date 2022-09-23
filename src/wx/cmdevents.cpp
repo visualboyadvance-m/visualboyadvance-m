@@ -1,4 +1,5 @@
 #include "wxvbam.h"
+
 #include <algorithm>
 #include <wx/aboutdlg.h>
 #include <wx/ffile.h>
@@ -10,6 +11,7 @@
 #include <wx/wfstream.h>
 #include <wx/msgdlg.h>
 
+#include "strutils.h"
 #include "../common/version_cpp.h"
 #include "../gb/gbPrinter.h"
 #include "../gba/agbprint.h"
@@ -2766,7 +2768,7 @@ EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
     }
 
     wxString msg;
-    msg.Printf(_("Using pixel filter %s"), pixel_filters->GetString(gopts.filter));
+    msg.Printf(_("Using pixel filter: %s"), pixel_filters_->GetString(gopts.filter));
     systemScreenMessage(msg);
 }
 
@@ -2781,7 +2783,7 @@ EVT_HANDLER_MASK(ChangeIFB, "Change Interframe Blending", CMDEN_NREC_ANY)
     }
 
     wxString msg;
-    msg.Printf(_("Using interframe blending #%d"), gopts.ifb);
+    msg.Printf(_("Using interframe blending: %s"), interframe_blenders_->GetString(gopts.ifb));
     systemScreenMessage(msg);
 }
 

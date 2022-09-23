@@ -135,7 +135,7 @@ nonstd::optional<wxGameControl> wxGameControl::FromString(const wxString &name) 
         return nonstd::nullopt;
     }
 
-    auto parts = str_split(name, wxT("/"));
+    auto parts = strutils::split(name, wxT("/"));
     if (parts.size() != 3) {
         wxLogDebug("Wrong split size: %d", parts.size());
         return nonstd::nullopt;

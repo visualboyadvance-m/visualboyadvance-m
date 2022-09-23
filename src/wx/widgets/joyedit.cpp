@@ -229,7 +229,7 @@ wxAcceleratorEntry_v wxJoyKeyTextCtrl::ToAccelFromString(const wxString& s, wxCh
     if (s.size() == 0)
         return empty;
 
-    for (const auto& token : str_split_with_sep(s, sep)) {
+    for (const auto& token : strutils::split_with_sep(s, sep)) {
         if (!ParseString(token, token.size(), mod, key, joy))
             return empty;
         ret.insert(ret.begin(), wxAcceleratorEntryUnicode(token, joy, mod, key));

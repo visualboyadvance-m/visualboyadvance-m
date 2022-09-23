@@ -382,7 +382,8 @@ private:
     // Load a named wxDialog from the XRC file
     wxDialog* LoadXRCropertySheetDialog(const char* name);
 
-    wxChoice* pixel_filters = nullptr;
+    wxChoice* pixel_filters_       = nullptr;
+    wxChoice* interframe_blenders_ = nullptr;
 
 #include "cmdhandlers.h"
 };

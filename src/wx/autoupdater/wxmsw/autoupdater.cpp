@@ -7,7 +7,7 @@
 void initAutoupdater()
 {
     // even if we are a nightly, only check latest stable version
-    wxString version = str_split(vbam_version, '-')[0];
+    wxString version = strutils::split(vbam_version, '-')[0];
 #ifndef NO_HTTPS
     win_sparkle_set_appcast_url("https://data.vba-m.com/appcast.xml");
 #else
