@@ -43,7 +43,7 @@ std::set<wxUserInput> wxUserInput::FromString(const wxString& string) {
         return user_inputs;
     }
 
-    for (const auto& token : str_split_with_sep(string, wxT(","))) {
+    for (const auto& token : strutils::split_with_sep(string, wxT(","))) {
         int mod, key, joy;
         if (!wxJoyKeyTextCtrl::ParseString(token, token.size(), mod, key, joy)) {
             user_inputs.clear();

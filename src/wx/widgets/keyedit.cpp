@@ -204,7 +204,7 @@ static bool checkForPairKeyMod(const wxString& s, int& mod, int& key)
 {
     long ulkey, ulmod;
     // key:mod as pair
-    auto pair = str_split(s, ":");
+    auto pair = strutils::split(s, ":");
     if (pair.size() == 2 && pair[0].ToLong(&ulkey) && pair[1].ToLong(&ulmod))
     {
         key = (int)ulkey;
@@ -309,7 +309,7 @@ wxAcceleratorEntry_v wxKeyTextCtrl::FromString(const wxString& s, wxChar sep)
     wxAcceleratorEntry_v ret, empty;
     int mod, key;
 
-    for (const auto& token : str_split_with_sep(s, sep)) {
+    for (const auto& token : strutils::split_with_sep(s, sep)) {
         if (!ParseString(token, token.size(), mod, key))
             return empty;
         ret.insert(ret.begin(), wxAcceleratorEntryUnicode(mod, key));
