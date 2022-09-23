@@ -4,7 +4,6 @@
 # 
 # Translators:
 # Ds886 <daniel.ashkenazi@gmail.com>, 2020
-# Ds886 <daniel.ashkenazi@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
