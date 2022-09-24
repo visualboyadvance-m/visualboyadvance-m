@@ -26,11 +26,11 @@
 
 // The built-in vba-over.ini
 #include "builtin-over.h"
+#include "config/user-input.h"
 #include "strutils.h"
 #include "vbam-options.h"
 #include "wayland.h"
 #include "wx/gamecontrol.h"
-#include "wx/userinput.h"
 
 IMPLEMENT_APP(wxvbamApp)
 IMPLEMENT_DYNAMIC_CLASS(MainFrame, wxFrame)
@@ -877,7 +877,7 @@ int MainFrame::FilterEvent(wxEvent& event)
     {
         wxJoyEvent& je = (wxJoyEvent&)event;
         if (!je.pressed()) return -1; // joystick button UP
-        wxString label = wxUserInput::FromJoyEvent(je).ToString();
+        wxString label = config::UserInput(je).ToString();
         wxAcceleratorEntry_v accels = wxGetApp().GetAccels();
         for (size_t i = 0; i < accels.size(); ++i)
         {

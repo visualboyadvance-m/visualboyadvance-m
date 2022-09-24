@@ -8,13 +8,13 @@
 
 #include "wx/gamecontrol.h"
 #include "wx/keyedit.h"
-#include "wx/userinput.h"
+#include "config/user-input.h"
 
 // Forward declaration.
 class wxFileHistory;
 
 // Default joystick bindings.
-extern const std::map<wxGameControl, std::set<wxUserInput>> kDefaultBindings;
+extern const std::map<wxGameControl, std::set<config::UserInput>> kDefaultBindings;
 
 extern struct opts_t {
     opts_t();
@@ -64,7 +64,7 @@ extern struct opts_t {
     int statusbar;
 
     /// Joypad
-    std::map<wxGameControl, std::set<wxUserInput>> game_control_bindings;
+    std::map<wxGameControl, std::set<config::UserInput>> game_control_bindings;
     int autofire_rate;
     int default_stick;
 

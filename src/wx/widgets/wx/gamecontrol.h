@@ -7,7 +7,7 @@
 #include <set>
 #include <wx/string.h>
 
-#include "wx/userinput.h"
+#include "config/user-input.h"
 
 // Forward declaration.
 class wxGameControlState;
@@ -114,8 +114,8 @@ public:
 
     // Processes `user_input` and updates the internal tracking state.
     // Returns true if `user_input` corresponds to a game input.
-    bool OnInputPressed(const wxUserInput& user_input);
-    bool OnInputReleased(const wxUserInput& user_input);
+    bool OnInputPressed(const config::UserInput& user_input);
+    bool OnInputReleased(const config::UserInput& user_input);
 
     // Clears all input.
     void Reset();
@@ -130,9 +130,9 @@ private:
     wxGameControlState();
     ~wxGameControlState();
 
-    std::map<wxUserInput, std::set<wxGameControl>> input_bindings_;
-    std::map<wxGameControl, std::set<wxUserInput>> active_controls_;
-    std::set<wxUserInput> keys_pressed_;
+    std::map<config::UserInput, std::set<wxGameControl>> input_bindings_;
+    std::map<wxGameControl, std::set<config::UserInput>> active_controls_;
+    std::set<config::UserInput> keys_pressed_;
     std::array<uint32_t, kNbJoypads> joypads_;
 };
 

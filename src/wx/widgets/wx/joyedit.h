@@ -8,7 +8,6 @@
 #include "wx/gamecontrol.h"
 #include "wx/keyedit.h"
 #include "wx/sdljoy.h"
-#include "wx/userinput.h"
 
 class wxJoyKeyTextCtrl : public wxKeyTextCtrl {
 public:

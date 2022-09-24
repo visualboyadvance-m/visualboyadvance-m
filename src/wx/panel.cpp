@@ -23,11 +23,11 @@
 #include "../gba/RTC.h"
 #include "../gba/agbprint.h"
 #include "../sdl/text.h"
+#include "config/user-input.h"
 #include "drawing.h"
 #include "filters.h"
 #include "wx/joyedit.h"
 #include "wx/gamecontrol.h"
-#include "wx/userinput.h"
 #include "wxvbam.h"
 #include "wxutil.h"
 #include "wayland.h"
@@ -1208,7 +1208,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
     }
 }
 
-static bool process_user_input(bool down, const wxUserInput& user_input)
+static bool process_user_input(bool down, const config::UserInput& user_input)
 {
     if (down)
         return wxGameControlState::Instance().OnInputPressed(user_input);
@@ -1269,7 +1269,7 @@ static void process_keyboard_event(const wxKeyEvent& ev, bool down)
             break;
     }
 
-    if (process_user_input(down, wxUserInput::FromLegacyKeyModJoy(key, mod, 0))) {
+    if (process_user_input(down, config::UserInput(key, mod, 0))) {
         wxWakeUpIdle();
     };
 }
@@ -1316,7 +1316,7 @@ void GameArea::OnSize(wxSizeEvent& ev)
 
 void GameArea::OnSDLJoy(wxJoyEvent& ev)
 {
-    process_user_input(ev.pressed(), wxUserInput::FromJoyEvent(ev));
+    process_user_input(ev.pressed(), config::UserInput(ev));
 
     // tell Linux to turn off the screensaver/screen-blank if joystick button was pressed
     // this shouldn't be necessary of course

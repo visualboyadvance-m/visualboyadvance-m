@@ -2,10 +2,10 @@
 
 #include <wx/tokenzr.h>
 
+#include "config/user-input.h"
 #include "opts.h"
 #include "strutils.h"
 #include "wx/sdljoy.h"
-#include "wx/userinput.h"
 
 // FIXME: suppport analog/digital flag on per-axis basis
 
@@ -33,7 +33,7 @@ void wxJoyKeyTextCtrl::OnJoy(wxJoyEvent& event)
     if (!event.pressed())
         return;
 
-    wxString nv = wxUserInput::FromJoyEvent(event).ToString();
+    wxString nv = config::UserInput(event).ToString();
 
     if (nv.empty())
         return;
@@ -246,7 +246,7 @@ bool wxJoyKeyValidator::TransferToWindow()
     if (!jk)
         return false;
 
-    jk->SetValue(wxUserInput::SpanToString(gopts.game_control_bindings[val_]));
+    jk->SetValue(config::UserInput::SpanToString(gopts.game_control_bindings[val_]));
     return true;
 }
 
@@ -257,6 +257,6 @@ bool wxJoyKeyValidator::TransferFromWindow()
     if (!jk)
         return false;
 
-    gopts.game_control_bindings[val_] = wxUserInput::FromString(jk->GetValue());
+    gopts.game_control_bindings[val_] = config::UserInput::FromString(jk->GetValue());
     return true;
 }
