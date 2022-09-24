@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-18 14:29+0000\n"
+"POT-Creation-Date: 2022-09-21 17:52+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Dex Galaxy, 2022\n"
 "Language-Team: Spanish (http://www.transifex.com/bgk/vba-m/language/es/)\n"
@@ -201,7 +201,7 @@ msgstr "Eliminando trucos"
 msgid "GameShark"
 msgstr "GameShark"
 
-#: guiinit.cpp:757 cmdevents.cpp:675
+#: guiinit.cpp:757 cmdevents.cpp:678
 msgid "GameGenie"
 msgstr "GameGenie"
 
@@ -276,7 +276,7 @@ msgstr "Modo escritorio"
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: guiinit.cpp:1846 cmdevents.cpp:745 xrc/DisplayConfig.xrc:85
+#: guiinit.cpp:1846 cmdevents.cpp:748 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
@@ -320,50 +320,50 @@ msgstr "Navegar"
 msgid "Main display panel not found"
 msgstr "Panel de visualización principal no encontrado"
 
-#: guiinit.cpp:2929
+#: guiinit.cpp:2941
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Duplicar el acelerador del menú: %s por %s y %s; manteniendo el primero"
 
-#: guiinit.cpp:2943
+#: guiinit.cpp:2955
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Acelerador del menú %s por %s sobrescribe por defecto a %s ; manteniendo el menú"
 
-#: guiinit.cpp:3082
+#: guiinit.cpp:3094
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Elemento de menú %s no válido; eliminando"
 
-#: guiinit.cpp:3290
+#: guiinit.cpp:3302
 msgid "Code"
 msgstr "Código"
 
-#: guiinit.cpp:3299
+#: guiinit.cpp:3311
 msgid "Description"
 msgstr "Descripción"
 
-#: guiinit.cpp:3373 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3385 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Dirección"
 
-#: guiinit.cpp:3374
+#: guiinit.cpp:3386
 msgid "Old Value"
 msgstr "Valor anterior"
 
-#: guiinit.cpp:3375
+#: guiinit.cpp:3387
 msgid "New Value"
 msgstr "Nuevo valor"
 
-#: guiinit.cpp:3902
+#: guiinit.cpp:3918
 msgid "Menu commands"
 msgstr "Menú de comandos"
 
-#: guiinit.cpp:3925
+#: guiinit.cpp:3941
 msgid "Other commands"
 msgstr "Otros comandos"
 
-#: guiinit.cpp:4036
+#: guiinit.cpp:4052
 msgid "JoyBus host invalid; disabling"
 msgstr "host de JoyBus inválido; deshabilitando"
 
@@ -372,7 +372,7 @@ msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr "Archivos de texto (*.txt; *.log) | *.txt; *.log|"
 
 #: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
-#: cmdevents.cpp:1157 cmdevents.cpp:1235 cmdevents.cpp:1305 cmdevents.cpp:1374
+#: cmdevents.cpp:1160 cmdevents.cpp:1238 cmdevents.cpp:1308 cmdevents.cpp:1377
 #: viewsupt.cpp:1180
 msgid "Select output file"
 msgstr "Seleccionar archivo de salida"
@@ -459,12 +459,12 @@ msgid ""
 "Table (*.act)|*.act"
 msgstr "Paleta de Windows (*.pal) | *.pal|PaintShop Palette (*.pal) | *.pal|Adobe Color Table (*.act) | *.act"
 
-#: gfxviewers.cpp:1601 gfxviewers.cpp:1743 cmdevents.cpp:1158
+#: gfxviewers.cpp:1601 gfxviewers.cpp:1743 cmdevents.cpp:1161
 #: viewsupt.cpp:1181
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "Imágenes PNG | *.png| Imágenes BMP | *.bmp"
 
-#: cmdevents.cpp:104
+#: cmdevents.cpp:107
 msgid ""
 "GameBoy Advance Files "
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy"
@@ -472,369 +472,369 @@ msgid ""
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "Archivos GameBoy Advance (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:116
+#: cmdevents.cpp:119
 msgid "Open ROM file"
 msgstr "Abrir archivo ROM"
 
-#: cmdevents.cpp:133
+#: cmdevents.cpp:136
 msgid ""
 "GameBoy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "Archivos GameBoy    (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:140
+#: cmdevents.cpp:143
 msgid "Open GB ROM file"
 msgstr "Abrir archivo GB ROM"
 
-#: cmdevents.cpp:157
+#: cmdevents.cpp:160
 msgid ""
 "GameBoy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "Archivos GameBoy Color (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:164
+#: cmdevents.cpp:167
 msgid "Open GBC ROM file"
 msgstr "Abrir archivo GBC ROM"
 
-#: cmdevents.cpp:583 cmdevents.cpp:699 cmdevents.cpp:738 cmdevents.cpp:811
+#: cmdevents.cpp:586 cmdevents.cpp:702 cmdevents.cpp:741 cmdevents.cpp:814
 msgid "Unknown"
 msgstr "Desconocido"
 
-#: cmdevents.cpp:591
+#: cmdevents.cpp:594
 msgid "ROM"
 msgstr "ROM"
 
-#: cmdevents.cpp:595
+#: cmdevents.cpp:598
 msgid "ROM+MBC1"
 msgstr "ROM+MBC1"
 
-#: cmdevents.cpp:599
+#: cmdevents.cpp:602
 msgid "ROM+MBC1+RAM"
 msgstr "ROM+MBC1+RAM"
 
-#: cmdevents.cpp:603
+#: cmdevents.cpp:606
 msgid "ROM+MBC1+RAM+BATT"
 msgstr "ROM+MBC1+RAM+BATT"
 
-#: cmdevents.cpp:607
+#: cmdevents.cpp:610
 msgid "ROM+MBC2"
 msgstr "ROM+MBC2"
 
-#: cmdevents.cpp:611
+#: cmdevents.cpp:614
 msgid "ROM+MBC2+BATT"
 msgstr "ROM+MBC2+BATT"
 
-#: cmdevents.cpp:615
+#: cmdevents.cpp:618
 msgid "ROM+MMM01"
 msgstr "ROM+MMM01"
 
-#: cmdevents.cpp:619
+#: cmdevents.cpp:622
 msgid "ROM+MMM01+RAM"
 msgstr "ROM+MMM01+RAM"
 
-#: cmdevents.cpp:623
+#: cmdevents.cpp:626
 msgid "ROM+MMM01+RAM+BATT"
 msgstr "ROM+MMM01+RAM+BATT"
 
-#: cmdevents.cpp:627
+#: cmdevents.cpp:630
 msgid "ROM+MBC3+TIMER+BATT"
 msgstr "ROM+MBC3+TIMER+BATT"
 
-#: cmdevents.cpp:631
+#: cmdevents.cpp:634
 msgid "ROM+MBC3+TIMER+RAM+BATT"
 msgstr "ROM+MBC3+TIMER+RAM+BATT"
 
-#: cmdevents.cpp:635
+#: cmdevents.cpp:638
 msgid "ROM+MBC3"
 msgstr "ROM+MBC3"
 
-#: cmdevents.cpp:639
+#: cmdevents.cpp:642
 msgid "ROM+MBC3+RAM"
 msgstr "ROM+MBC3+RAM"
 
-#: cmdevents.cpp:643
+#: cmdevents.cpp:646
 msgid "ROM+MBC3+RAM+BATT"
 msgstr "ROM+MBC3+RAM+BATT"
 
-#: cmdevents.cpp:647
+#: cmdevents.cpp:650
 msgid "ROM+MBC5"
 msgstr "ROM+MBC5"
 
-#: cmdevents.cpp:651
+#: cmdevents.cpp:654
 msgid "ROM+MBC5+RAM"
 msgstr "ROM+MBC5+RAM"
 
-#: cmdevents.cpp:655
+#: cmdevents.cpp:658
 msgid "ROM+MBC5+RAM+BATT"
 msgstr "ROM+MBC5+RAM+BATT"
 
-#: cmdevents.cpp:659
+#: cmdevents.cpp:662
 msgid "ROM+MBC5+RUMBLE"
 msgstr "ROM+MBC5+RUMBLE"
 
-#: cmdevents.cpp:663
+#: cmdevents.cpp:666
 msgid "ROM+MBC5+RUMBLE+RAM"
 msgstr "ROM+MBC5+RUMBLE+RAM"
 
-#: cmdevents.cpp:667
+#: cmdevents.cpp:670
 msgid "ROM+MBC5+RUMBLE+RAM+BATT"
 msgstr "ROM+MBC5+RUMBLE+RAM+BATT"
 
-#: cmdevents.cpp:671
+#: cmdevents.cpp:674
 msgid "ROM+MBC7+BATT"
 msgstr "ROM+MBC7+BATT"
 
-#: cmdevents.cpp:679
+#: cmdevents.cpp:682
 msgid "GameShark V3.0"
 msgstr "GameShark V3.0"
 
-#: cmdevents.cpp:683
+#: cmdevents.cpp:686
 msgid "ROM+POCKET CAMERA"
 msgstr "ROM+POCKET CAMERA"
 
-#: cmdevents.cpp:687
+#: cmdevents.cpp:690
 msgid "ROM+BANDAI TAMA5"
 msgstr "ROM+BANDAI TAMA5"
 
-#: cmdevents.cpp:691
+#: cmdevents.cpp:694
 msgid "ROM+HuC-3"
 msgstr "ROM+HuC-3"
 
-#: cmdevents.cpp:695
+#: cmdevents.cpp:698
 msgid "ROM+HuC-1"
 msgstr "ROM+HuC-1"
 
-#: cmdevents.cpp:847 cmdevents.cpp:869
+#: cmdevents.cpp:850 cmdevents.cpp:872
 msgid "Select Dot Code file"
 msgstr "Seleccione el archivo de código de puntos"
 
-#: cmdevents.cpp:849 cmdevents.cpp:871
+#: cmdevents.cpp:852 cmdevents.cpp:874
 msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 msgstr "Código de punto del e-Reader (*.bin; *.raw) | *.bin; *.raw"
 
-#: cmdevents.cpp:890 cmdevents.cpp:1085
+#: cmdevents.cpp:893 cmdevents.cpp:1088
 msgid "Select battery file"
 msgstr "Selecciona un archivo de bateria"
 
-#: cmdevents.cpp:891 cmdevents.cpp:1086
+#: cmdevents.cpp:894 cmdevents.cpp:1089
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "Archivo de batería (*.sav) | *.sav | Guardado Flash (*.dat) | *.dat"
 
-#: cmdevents.cpp:899
+#: cmdevents.cpp:902
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
 msgstr "La importación de un archivo de batería borrara todos las partidas guardadas (permanentemente después de esta línea de texto). ¿Deseas continuar?"
 
-#: cmdevents.cpp:900 cmdevents.cpp:928 cmdevents.cpp:1048
+#: cmdevents.cpp:903 cmdevents.cpp:931 cmdevents.cpp:1051
 msgid "Confirm import"
 msgstr "Confirmar importacion"
 
-#: cmdevents.cpp:906 panel.cpp:392
+#: cmdevents.cpp:909 panel.cpp:392
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Catería cargada %s"
 
-#: cmdevents.cpp:908
+#: cmdevents.cpp:911
 #, c-format
 msgid "Error loading battery %s"
 msgstr "Error al cargar la batería %s"
 
-#: cmdevents.cpp:917
+#: cmdevents.cpp:920
 msgid "Select code file"
 msgstr "Seleccionar archivo de código"
 
-#: cmdevents.cpp:918
+#: cmdevents.cpp:921
 msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
 msgstr "Archivo de código de Gameshark (*.spc; *.xpc) | *.spc; *.xpc"
 
-#: cmdevents.cpp:918
+#: cmdevents.cpp:921
 msgid "Gameshark Code File (*.gcf)|*.gcf"
 msgstr "Archivo de código de Gameshark (*.gcf) | *.gcf"
 
-#: cmdevents.cpp:927
+#: cmdevents.cpp:930
 msgid ""
 "Importing a code file will replace any loaded cheats.  Do you want to "
 "continue?"
 msgstr "Importar un archivo de código reemplazará cualquier truco cargado. ¿Desea continuar?"
 
-#: cmdevents.cpp:944
+#: cmdevents.cpp:947
 #, c-format
 msgid "Cannot open file %s"
 msgstr "No se puede abrir el archivo %s"
 
-#: cmdevents.cpp:954
+#: cmdevents.cpp:957
 #, c-format
 msgid "Unsupported code file %s"
 msgstr "Archivo de código no compatible %s"
 
-#: cmdevents.cpp:1024
+#: cmdevents.cpp:1027
 #, c-format
 msgid "Loaded code file %s"
 msgstr "Archivo de código cargado %s"
 
-#: cmdevents.cpp:1026
+#: cmdevents.cpp:1029
 #, c-format
 msgid "Error loading code file %s"
 msgstr "Error al cargar el archivo de código%s"
 
-#: cmdevents.cpp:1037 cmdevents.cpp:1113
+#: cmdevents.cpp:1040 cmdevents.cpp:1116
 msgid "Select snapshot file"
 msgstr "Selecciona el archivo de captura"
 
-#: cmdevents.cpp:1038
+#: cmdevents.cpp:1041
 msgid ""
 "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots "
 "(*.gsv)|*.gsv"
 msgstr "Capturas GS & PAC (* .sps;* .xps) | *.sps;*.xps | Capturas GameShark SP (* .gsv) | * .gsv"
 
-#: cmdevents.cpp:1038
+#: cmdevents.cpp:1041
 msgid "Gameboy Snapshot (*.gbs)|*.gbs"
 msgstr "Captura Gameboy (* .gbs) | * .gbs"
 
-#: cmdevents.cpp:1047
+#: cmdevents.cpp:1050
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
 msgstr "Importando un archivo de captura, esto borrará cualquier juego guardado (permanentemente después de la siguiente escritura). ¿Deseas continuar?"
 
-#: cmdevents.cpp:1072
+#: cmdevents.cpp:1075
 #, c-format
 msgid "Loaded snapshot file %s"
 msgstr "Archivo de captura cargado %s"
 
-#: cmdevents.cpp:1074
+#: cmdevents.cpp:1077
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr "Error al cargar el archivo de captura %s"
 
-#: cmdevents.cpp:1097
+#: cmdevents.cpp:1100
 #, c-format
 msgid "Wrote battery %s"
 msgstr "Batería escrita %s"
 
-#: cmdevents.cpp:1099 panel.cpp:701
+#: cmdevents.cpp:1102 panel.cpp:701
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Error al escribir batería %s "
 
-#: cmdevents.cpp:1107
+#: cmdevents.cpp:1110
 msgid "EEPROM saves cannot be exported"
 msgstr "Guardados EEPROM no pueden ser exportados"
 
-#: cmdevents.cpp:1114
+#: cmdevents.cpp:1117
 msgid "Gameshark Snapshot (*.sps)|*.sps"
 msgstr "Captura Gameshark (*.sps) | *.sps"
 
-#: cmdevents.cpp:1128
+#: cmdevents.cpp:1131
 msgid "Exported from VisualBoyAdvance-M"
 msgstr "Exportado de VisualBoyAdvance-M"
 
-#: cmdevents.cpp:1140
+#: cmdevents.cpp:1143
 #, c-format
 msgid "Saved snapshot file %s"
 msgstr "Archivo de captura guardado %s"
 
-#: cmdevents.cpp:1142
+#: cmdevents.cpp:1145
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr "Error al guardar el archivo de captura %s"
 
-#: cmdevents.cpp:1182 sys.cpp:557
+#: cmdevents.cpp:1185 sys.cpp:557
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "Captura escrita %s"
 
-#: cmdevents.cpp:1203 cmdevents.cpp:1273 cmdevents.cpp:1344 cmdevents.cpp:1408
+#: cmdevents.cpp:1206 cmdevents.cpp:1276 cmdevents.cpp:1347 cmdevents.cpp:1411
 msgid " files ("
 msgstr " archivos ("
 
-#: cmdevents.cpp:1439
+#: cmdevents.cpp:1442
 msgid "Select file"
 msgstr "Seleccionar archivo"
 
-#: cmdevents.cpp:1756 cmdevents.cpp:1849
+#: cmdevents.cpp:1759 cmdevents.cpp:1852
 msgid "Select state file"
 msgstr "Seleccionar archivo de estado"
 
-#: cmdevents.cpp:1757 cmdevents.cpp:1850
+#: cmdevents.cpp:1760 cmdevents.cpp:1853
 msgid "VisualBoyAdvance saved game files|*.sgm"
 msgstr "Archivos de juego guardados de VBA | *.sgm"
 
-#: cmdevents.cpp:1880 cmdevents.cpp:1890 cmdevents.cpp:1901
+#: cmdevents.cpp:1883 cmdevents.cpp:1893 cmdevents.cpp:1904
 #, c-format
 msgid "Current state slot #%d"
 msgstr "Número de ranura actual: #%d"
 
-#: cmdevents.cpp:1971
+#: cmdevents.cpp:1974
 msgid "Cannot use Colorizer Hack when GB BIOS File is enabled."
 msgstr "No se puede usar el \"Colorizer Hack\" cuando GB BIOS esta activo."
 
-#: cmdevents.cpp:2186
+#: cmdevents.cpp:2189
 msgid "Sound enabled"
 msgstr "Sonido activado"
 
-#: cmdevents.cpp:2186
+#: cmdevents.cpp:2189
 msgid "Sound disabled"
 msgstr "Sonido desactivado"
 
-#: cmdevents.cpp:2199 cmdevents.cpp:2213
+#: cmdevents.cpp:2202 cmdevents.cpp:2216
 #, c-format
 msgid "Volume: %d%%"
 msgstr "Volumen: %d%%"
 
-#: cmdevents.cpp:2288
+#: cmdevents.cpp:2291
 msgid "Set to 0 for pseudo tty"
 msgstr "Establecer a 0 por pseudo tty"
 
-#: cmdevents.cpp:2290
+#: cmdevents.cpp:2293
 msgid "Port to wait for connection:"
 msgstr "Puerto a la espera de conexión:"
 
-#: cmdevents.cpp:2291
+#: cmdevents.cpp:2294
 msgid "GDB Connection"
 msgstr "Conexión GDB"
 
-#: cmdevents.cpp:2344
+#: cmdevents.cpp:2347
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "Esperando la conexion en %s"
 
-#: cmdevents.cpp:2351
+#: cmdevents.cpp:2354
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "Esperando la conexión en el puerto %d"
 
-#: cmdevents.cpp:2354
+#: cmdevents.cpp:2357
 msgid "Waiting for GDB..."
 msgstr "Esperando por GDB..."
 
-#: cmdevents.cpp:2769
+#: cmdevents.cpp:2772
 #, c-format
-msgid "Using pixel filter %s"
+msgid "Using pixel filter: %s"
 msgstr ""
 
-#: cmdevents.cpp:2784
+#: cmdevents.cpp:2787
 #, c-format
-msgid "Using interframe blending #%d"
-msgstr "Usando mezclado de fotogramas intermedios #%d"
+msgid "Using interframe blending: %s"
+msgstr ""
 
-#: cmdevents.cpp:2823 panel.cpp:194 panel.cpp:308
+#: cmdevents.cpp:2826 panel.cpp:194 panel.cpp:308
 msgid "Could not initialize the sound driver!"
 msgstr "¡No se pudo inicializar el controlador de sonido!"
 
-#: cmdevents.cpp:2927
+#: cmdevents.cpp:2930
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Emulador de Nintendo GameBoy (+Color+Advance)."
 
-#: cmdevents.cpp:2928
+#: cmdevents.cpp:2931
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Olvidado\nCopyright (C) 2004-2006 VBA Equipo de desarollo\nCopyright (C) 2007-2020 VBA-M Equipo de desarollo"
 
-#: cmdevents.cpp:2929
+#: cmdevents.cpp:2932
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -850,15 +850,15 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Este programa de software es gratis tu puedes redistribuirlo y/o modificar\nbajo los términos de licencia publica GNU publicada por\nla \"Free Software Foundation,\" ya sea la versión 2 de la licencia, o\n(a su elección) cualquier versión posterior\n\nEste programa es distribuido con la esperanza de que sea de utilidad, pero SIN NINGUNA GARANTIA; ni siquiera la garantía implícita de COMERCIABILIDAD O APTITUD PARA UN PROPOSITO PARTICULAR. Ver la\nlicencia publica general GNU para ver mas detalles. \n\nDebería haber recibido una copia de la Licencia Pública General GNU\njunto con este programa. De lo contrario, consulte http://www.gnu.org/licenses."
 
-#: cmdevents.cpp:3189
+#: cmdevents.cpp:3192
 msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
 msgstr "No puedes usar GB BIOS cuando el \"Colorizer hack\" esta activado"
 
-#: cmdevents.cpp:3249
+#: cmdevents.cpp:3252
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "El enlace LAN ya está activo. Deshabilite el modo de enlace para desconectarse."
 
-#: cmdevents.cpp:3255
+#: cmdevents.cpp:3258
 msgid "Network is not supported in local mode."
 msgstr "La red no es compatible en modo local."
 
@@ -1760,12 +1760,12 @@ msgid "Interframe blending :"
 msgstr "Mezclado de fotogramas intermedios :"
 
 #: xrc/DisplayConfig.xrc:136
-msgid "Smart interframe blending"
-msgstr "Mezclado inteligente de fotogramas intermedios"
+msgid "Smart"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:137
-msgid "Interframe motion blur"
-msgstr "Desenfoque entre fotogramas intermedios"
+msgid "Motion Blur"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:151 xrc/SoundConfig.xrc:91
 msgid "Basic"
