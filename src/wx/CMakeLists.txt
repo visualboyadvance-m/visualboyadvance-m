@@ -739,10 +739,10 @@ set(
     wayland.cpp
     strutils.cpp
     wxutil.cpp
+    config/user-input.cpp
     widgets/gamecontrol.cpp
     widgets/keyedit.cpp
     widgets/joyedit.cpp
-    widgets/userinput.cpp
     widgets/sdljoy.cpp
     widgets/wxmisc.cpp
     # probably ought to be in common
@@ -775,11 +775,11 @@ set(
     wxhead.h
     wayland.h
     wxutil.h
+    config/user-input.h
     widgets/wx/gamecontrol.h
     widgets/wx/keyedit.h
     widgets/wx/joyedit.h
     widgets/wx/sdljoy.h
-    widgets/wx/userinput.h
     widgets/wx/webupdatedef.h
     widgets/wx/wxmisc.h
     # probably ought to be in common

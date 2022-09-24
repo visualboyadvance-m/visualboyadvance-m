@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <algorithm>
+
 #include <wx/log.h>
 #include <wx/display.h>
 
@@ -18,7 +19,7 @@
       -p/--profile=hz
 */
 
-#define WJKB wxUserInput::FromLegacyKeyModJoy
+#define WJKB config::UserInput
 
 opts_t gopts;
 
@@ -114,7 +115,7 @@ const wxAcceleratorEntryUnicode default_accels[] = {
 };
 const int num_def_accels = sizeof(default_accels) / sizeof(default_accels[0]);
 
-const std::map<wxGameControl, std::set<wxUserInput>> kDefaultBindings = {
+const std::map<wxGameControl, std::set<config::UserInput>> kDefaultBindings = {
     { wxGameControl(0, wxGameKey::Up), {
         WJKB(wxT('W')),
         WJKB(11, wxJoyControl::Button, 1),
@@ -488,12 +489,12 @@ void load_opts()
     for (auto& iter : gopts.game_control_bindings) {
         const wxString optname = iter.first.ToString();
         if (cfg->Read(optname, &s)) {
-            iter.second = wxUserInput::FromString(s);
+            iter.second = config::UserInput::FromString(s);
             if (!s.empty() && iter.second.empty()) {
                 wxLogWarning(_("Invalid key binding %s for %s"), s.c_str(), optname.c_str());
             }
         } else {
-            s = wxUserInput::SpanToString(iter.second);
+            s = config::UserInput::SpanToString(iter.second);
             cfg->Write(optname, s);
         }
     }
@@ -571,18 +572,18 @@ void update_opts()
         }
     }
 
-    // For joypad, compare the wxUserInput sets. Since wxUserInput guarantees a
+    // For joypad, compare the UserInput sets. Since UserInput guarantees a
     // certain ordering, it is possible that the user control in the panel shows
     // a different ordering than the one that will be eventually saved, but this
     // is nothing to worry about.
     bool game_bindings_changed = false;
     for (auto &iter : gopts.game_control_bindings) {
         wxString option_name = iter.first.ToString();
-        std::set<wxUserInput> saved_config =
-            wxUserInput::FromString(cfg->Read(option_name, ""));
+        std::set<config::UserInput> saved_config =
+            config::UserInput::FromString(cfg->Read(option_name, ""));
         if (saved_config != iter.second) {
             game_bindings_changed = true;
-            cfg->Write(option_name, wxUserInput::SpanToString(iter.second));
+            cfg->Write(option_name, config::UserInput::SpanToString(iter.second));
         }
     }
     if (game_bindings_changed) {
@@ -760,7 +761,7 @@ void opt_set(const wxString& name, const wxString& val) {
             gopts.game_control_bindings[game_control.value()].clear();
         } else {
             gopts.game_control_bindings[game_control.value()] =
-                wxUserInput::FromString(val);
+                config::UserInput::FromString(val);
         }
         return;
     }

@@ -198,7 +198,7 @@ wxGameControlState& wxGameControlState::Instance() {
 wxGameControlState::wxGameControlState() : joypads_({0, 0, 0, 0}) {}
 wxGameControlState::~wxGameControlState() = default;
 
-bool wxGameControlState::OnInputPressed(const wxUserInput& user_input) {
+bool wxGameControlState::OnInputPressed(const config::UserInput& user_input) {
     assert(user_input);
 
     const auto& game_keys = input_bindings_.find(user_input);
@@ -226,7 +226,7 @@ bool wxGameControlState::OnInputPressed(const wxUserInput& user_input) {
     return true;
 }
 
-bool wxGameControlState::OnInputReleased(const wxUserInput& user_input) {
+bool wxGameControlState::OnInputReleased(const config::UserInput& user_input) {
     assert(user_input);
 
     const auto& game_keys = input_bindings_.find(user_input);

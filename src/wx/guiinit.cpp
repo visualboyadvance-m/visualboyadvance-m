@@ -23,10 +23,10 @@
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
 
+#include "config/user-input.h"
 #include "opts.h"
 #include "vbam-options.h"
 #include "wx/gamecontrol.h"
-#include "wx/userinput.h"
 #include "../gba/CheatSearch.h"
 
 #if defined(__WXGTK__)
@@ -1691,7 +1691,7 @@ public:
                 tc->SetValue(wxEmptyString);
             } else {
                 tc->SetValue(
-                    wxUserInput::SpanToString(
+                    config::UserInput::SpanToString(
                         kDefaultBindings.find(
                             wxGameControl(0, game_key))->second));
             }
