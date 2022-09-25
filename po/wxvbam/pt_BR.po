@@ -823,12 +823,12 @@ msgstr "Esperando pelo GDB..."
 #: cmdevents.cpp:2772
 #, c-format
 msgid "Using pixel filter: %s"
-msgstr ""
+msgstr "Usando o filtro dos pixels: %s"
 
 #: cmdevents.cpp:2787
 #, c-format
 msgid "Using interframe blending: %s"
-msgstr ""
+msgstr "Usando a mistura dos interframes: %s"
 
 #: cmdevents.cpp:2826 panel.cpp:194 panel.cpp:308
 msgid "Could not initialize the sound driver!"
@@ -1772,11 +1772,11 @@ msgstr "Mistura dos interframes:"
 
 #: xrc/DisplayConfig.xrc:136
 msgid "Smart"
-msgstr ""
+msgstr "Inteligente"
 
 #: xrc/DisplayConfig.xrc:137
 msgid "Motion Blur"
-msgstr ""
+msgstr "Borrão do Movimento"
 
 #: xrc/DisplayConfig.xrc:151 xrc/SoundConfig.xrc:91
 msgid "Basic"
