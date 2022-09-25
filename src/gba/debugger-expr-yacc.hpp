@@ -1,14 +1,14 @@
-/* A Bison parser, made by GNU Bison 2.3.  */
+/* A Bison parser, made by GNU Bison 3.8.2.  */
 
-/* Skeleton interface for Bison's Yacc-like parsers in C
+/* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
+   Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,9 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -33,73 +31,75 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Tokens.  */
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
+
+#ifndef YY_DEXP_DEBUGGER_EXPR_YACC_HPP_INCLUDED
+# define YY_DEXP_DEBUGGER_EXPR_YACC_HPP_INCLUDED
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int dexp_debug;
+#endif
+
+/* Token kinds.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     TOK_PLUS = 258,
-     TOK_MINUS = 259,
-     TOK_DIVIDE = 260,
-     TOK_MULTIPLY = 261,
-     TOK_LSHIFT = 262,
-     TOK_RSHIFT = 263,
-     TOK_LPAREN = 264,
-     TOK_RPAREN = 265,
-     TOK_OR = 266,
-     TOK_AND = 267,
-     TOK_XOR = 268,
-     TOK_NEGATE = 269,
-     TOK_BBRACKET = 270,
-     TOK_HBRACKET = 271,
-     TOK_WBRACKET = 272,
-     TOK_LBRACKET = 273,
-     TOK_RBRACKET = 274,
-     TOK_REGISTER = 275,
-     TOK_NUMBER = 276,
-     TOK_ID = 277
-   };
+  enum yytokentype
+  {
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    TOK_PLUS = 258,                /* TOK_PLUS  */
+    TOK_MINUS = 259,               /* TOK_MINUS  */
+    TOK_DIVIDE = 260,              /* TOK_DIVIDE  */
+    TOK_MULTIPLY = 261,            /* TOK_MULTIPLY  */
+    TOK_LSHIFT = 262,              /* TOK_LSHIFT  */
+    TOK_RSHIFT = 263,              /* TOK_RSHIFT  */
+    TOK_LPAREN = 264,              /* TOK_LPAREN  */
+    TOK_RPAREN = 265,              /* TOK_RPAREN  */
+    TOK_OR = 266,                  /* TOK_OR  */
+    TOK_AND = 267,                 /* TOK_AND  */
+    TOK_XOR = 268,                 /* TOK_XOR  */
+    TOK_NEGATE = 269,              /* TOK_NEGATE  */
+    TOK_BBRACKET = 270,            /* TOK_BBRACKET  */
+    TOK_HBRACKET = 271,            /* TOK_HBRACKET  */
+    TOK_WBRACKET = 272,            /* TOK_WBRACKET  */
+    TOK_LBRACKET = 273,            /* TOK_LBRACKET  */
+    TOK_RBRACKET = 274,            /* TOK_RBRACKET  */
+    TOK_REGISTER = 275,            /* TOK_REGISTER  */
+    TOK_NUMBER = 276,              /* TOK_NUMBER  */
+    TOK_ID = 277                   /* TOK_ID  */
+  };
+  typedef enum yytokentype yytoken_kind_t;
 #endif
-/* Tokens.  */
-#define TOK_PLUS 258
-#define TOK_MINUS 259
-#define TOK_DIVIDE 260
-#define TOK_MULTIPLY 261
-#define TOK_LSHIFT 262
-#define TOK_RSHIFT 263
-#define TOK_LPAREN 264
-#define TOK_RPAREN 265
-#define TOK_OR 266
-#define TOK_AND 267
-#define TOK_XOR 268
-#define TOK_NEGATE 269
-#define TOK_BBRACKET 270
-#define TOK_HBRACKET 271
-#define TOK_WBRACKET 272
-#define TOK_LBRACKET 273
-#define TOK_RBRACKET 274
-#define TOK_REGISTER 275
-#define TOK_NUMBER 276
-#define TOK_ID 277
 
-
-
-
+/* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE
-#line 44 "src/sdl/debugger-expr.y"
+union YYSTYPE
 {
+#line 44 "debugger-expr.y"
+
   unsigned int number;
   char *string;
-}
-/* Line 1489 of yacc.c.  */
-#line 98 "src/sdl/debugger-expr-yacc.hpp"
-	YYSTYPE;
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
-# define YYSTYPE_IS_DECLARED 1
+
+#line 91 "debugger-expr-yacc.hpp"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
+# define YYSTYPE_IS_DECLARED 1
 #endif
 
-extern YYSTYPE yylval;
 
+extern YYSTYPE dexp_lval;
+
+
+int dexp_parse (void);
+
+
+#endif /* !YY_DEXP_DEBUGGER_EXPR_YACC_HPP_INCLUDED  */

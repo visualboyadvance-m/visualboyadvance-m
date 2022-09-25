@@ -3,14 +3,14 @@
   
 #include "../System.h"
 #include "GBA.h"
-#include "../Port.h"
+#include "../common/Port.h"
 
 #include <string>
 #include <map>
 #include <iostream>
 
 unsigned int dexp_result = 0;
-extern int dexp_error(char *);
+extern int dexp_error(const char *);
 extern int dexp_lex();
 extern char *dexp_text;
 
@@ -67,7 +67,7 @@ exp: TOK_NUMBER           { $$ = $1; }
 }
 | exp TOK_PLUS exp  { $$ = $1 + $3; }
 | exp TOK_MINUS exp { $$ = $1 - $3;}
-| TOK_MINUS exp { $$ = -$2;}
+| TOK_MINUS exp { $$ = 0 - $2;}
 | TOK_NEGATE exp { $$ = ~$2;}
 | exp TOK_DIVIDE exp { $$ = $1 / $3;}
 | exp TOK_MULTIPLY exp { $$ = $1 * $3;}
@@ -105,7 +105,7 @@ bool dexp_eval(char *expr, uint32_t *result)
   }    
 }
 
-int dexp_error(char *s)
+int dexp_error(const char *)
 {
   return 0;
 }

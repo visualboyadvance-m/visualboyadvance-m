@@ -909,7 +909,11 @@ set(
     src/gba/bios.cpp
     src/gba/Cheats.cpp
     src/gba/CheatSearch.cpp
+    # Built with flex -o debugger-expr-lex.cpp -P dexp_ debugger-expr.l
     src/gba/debugger-expr-lex.cpp
+    # Built with bison -L c -o debugger-expr-yacc.cpp -H -p dexp_ debugger-expr.y
+    # The yyerrorlab label handler was manually commented out to silence a
+    # compiler warning.
     src/gba/debugger-expr-yacc.cpp
     src/gba/EEprom.cpp
     src/gba/ereader.cpp
