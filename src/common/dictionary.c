@@ -87,7 +87,7 @@ static char *xstrdup(const char *s)
 /*--------------------------------------------------------------------------*/
 unsigned dictionary_hash(const char *key)
 {
-        int len;
+        size_t len;
         unsigned hash;
         int i;
 
@@ -122,7 +122,8 @@ dictionary *dictionary_new(int size)
         if (size < DICTMINSZ)
                 size = DICTMINSZ;
 
-        if (!(d = (dictionary *)calloc(1, sizeof(dictionary)))) {
+        d = (dictionary *)calloc(1, sizeof(dictionary));
+        if (!d) {
                 return NULL;
         }
         d->size = size;

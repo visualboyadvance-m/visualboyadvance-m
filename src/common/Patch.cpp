@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "zconf.h"
 #ifndef __LIBRETRO__
 #include <zlib.h>
 #endif
@@ -112,7 +113,7 @@ static int64_t readVarPtr(FILE* f)
     return offset;
 }
 
-static int64_t readSignVarPtr(FILE* f)
+static uint32_t readSignVarPtr(FILE* f)
 {
     int64_t offset = readVarPtr(f);
     bool sign =  offset & 1;
@@ -121,7 +122,7 @@ static int64_t readSignVarPtr(FILE* f)
     if (sign) {
         offset = -offset;
     }
-    return offset;
+    return (uint32_t)(offset);
 }
 
 #ifndef MIN
@@ -135,7 +136,7 @@ static uLong computePatchCRC(FILE* f, unsigned int size)
 
     uLong crc = crc32(0L, Z_NULL, 0);
     do {
-        readed = fread(buf, 1, MIN(size, sizeof(buf)), f);
+        readed = (long)(fread(buf, 1, MIN(size, sizeof(buf)), f));
         crc = crc32(crc, buf, readed);
         size -= readed;
     } while (readed > 0);
@@ -192,7 +193,7 @@ static bool patchApplyIPS(const char* patchname, uint8_t** r, int* s)
             } else {
                 // fill the region with the given byte
                 while (len--) {
-                    rom[offset++] = b;
+                    rom[offset++] = (uint8_t)(b&0xff);
                 }
             }
         }
@@ -234,7 +235,7 @@ static bool patchApplyUPS(const char* patchname, uint8_t** rom, int* size)
     }
 
     fseeko64(f, 0, SEEK_SET);
-    uint32_t crc = computePatchCRC(f, patchSize - 4);
+    uint32_t crc = computePatchCRC(f, (unsigned)(patchSize - 4));
 
     if (crc != patchCRC) {
         fclose(f);
@@ -268,7 +269,7 @@ static bool patchApplyUPS(const char* patchname, uint8_t** rom, int* size)
     if (dataSize > *size) {
         *rom = (uint8_t*)realloc(*rom, dataSize);
         memset(*rom + *size, 0, dataSize - *size);
-        *size = dataSize;
+        *size = (int)(dataSize);
     }
 
     int64_t relative = 0;
@@ -324,7 +325,7 @@ static bool patchApplyBPS(const char* patchname, uint8_t** rom, int* size)
     }
 
     fseeko64(f, 0, SEEK_SET);
-    uint32_t crc = computePatchCRC(f, patchSize - 4);
+    uint32_t crc = computePatchCRC(f, (unsigned)(patchSize - 4));
 
     if (crc != patchCRC) {
         fclose(f);
@@ -335,10 +336,10 @@ static bool patchApplyBPS(const char* patchname, uint8_t** rom, int* size)
     crc = crc32(crc, *rom, *size);
 
     fseeko64(f, 4, SEEK_SET);
-    int64_t dataSize;
-    int64_t srcSize = readVarPtr(f);
-    int64_t dstSize = readVarPtr(f);
-    int64_t mtdSize = readVarPtr(f);
+    int dataSize;
+    const int64_t srcSize = readVarPtr(f);
+    const int64_t dstSize = readVarPtr(f);
+    const int64_t mtdSize = readVarPtr(f);
     fseeko64(f, mtdSize, SEEK_CUR);
 
     if (crc == srcCRC) {
@@ -346,13 +347,13 @@ static bool patchApplyBPS(const char* patchname, uint8_t** rom, int* size)
             fclose(f);
             return false;
         }
-        dataSize = dstSize;
+        dataSize = (int)(dstSize);
     } else if (crc == dstCRC) {
         if (dstSize != *size) {
             fclose(f);
             return false;
         }
-        dataSize = srcSize;
+        dataSize = (int)(srcSize);
     } else {
         fclose(f);
         return false;
@@ -377,7 +378,7 @@ static bool patchApplyBPS(const char* patchname, uint8_t** rom, int* size)
             break;
         case 1: // patchRead
             while(length--) {
-                new_rom[outputOffset++] = fgetc(f);
+                new_rom[outputOffset++] = (uint8_t)(fgetc(f) & 0xff);
             }
             break;
         case 2: // sourceCopy
@@ -440,7 +441,7 @@ static int ppfFileIdLen(FILE* f, int version)
     if (fgetc(f) != '.' || fgetc(f) != 'D' || fgetc(f) != 'I' || fgetc(f) != 'Z')
         return 0;
 
-    return (version == 2) ? readInt4(f) : readInt2(f);
+    return (version == 2) ? int(readInt4(f)) : readInt2(f);
 }
 
 static bool patchApplyPPF1(FILE* f, uint8_t** rom, int* size)
@@ -456,9 +457,10 @@ static bool patchApplyPPF1(FILE* f, uint8_t** rom, int* size)
     uint8_t* mem = *rom;
 
     while (count > 0) {
-        int offset = readInt4(f);
-        if (offset == -1)
+        int64_t offset_read = readInt4(f);
+        if (offset_read == -1)
             break;
+        int offset = (int)(offset_read);
         int len = fgetc(f);
         if (len == EOF)
             break;
@@ -482,7 +484,11 @@ static bool patchApplyPPF2(FILE* f, uint8_t** rom, int* size)
 
     fseek(f, 56, SEEK_SET);
 
-    int datalen = readInt4(f);
+    int64_t datalen_read = readInt4(f);
+    if (datalen_read == -1)
+        return false;
+
+    int datalen = (int)(datalen_read);
     if (datalen != *size)
         return false;
 
@@ -500,9 +506,10 @@ static bool patchApplyPPF2(FILE* f, uint8_t** rom, int* size)
     fseek(f, 56 + 4 + 1024, SEEK_SET);
 
     while (count > 0) {
-        int offset = readInt4(f);
-        if (offset == -1)
+        int64_t offset_read = readInt4(f);
+        if (offset_read == -1)
             break;
+        int offset = (int)(offset_read);
         int len = fgetc(f);
         if (len == EOF)
             break;

@@ -704,16 +704,16 @@ const char* FindConfigFile(const char *name)
 
 	if (!strchr(arg0, '/') &&
 		!strchr(arg0, '\\')) {
-		char *path = getenv("PATH");
+		char *env_path = getenv("PATH");
 
-		if (path != NULL) {
-			strncpy(buffer, path, 4096);
+		if (env_path != NULL) {
+			strncpy(buffer, env_path, 4096);
 			buffer[4095] = 0;
 			char *tok = strtok(buffer, PATH_SEP);
 
 			while (tok) {
-				sprintf(path, "%s%c%s", tok, FILE_SEP, EXE_NAME);
-				if (FileExists(path)) {
+				sprintf(env_path, "%s%c%s", tok, FILE_SEP, EXE_NAME);
+				if (FileExists(env_path)) {
 					static char path2[2048];
 					sprintf(path2, "%s%c%s", tok, FILE_SEP, name);
 					if (FileExists(path2)) {
@@ -1157,7 +1157,7 @@ int ReadOpts(int argc, char ** argv)
 		case OPT_SOUND_FILTERING:
 			// --sound-filtering
 			if (optarg) {
-				soundFiltering = atoi(optarg);
+				soundFiltering = (float)(atoi(optarg));
 			}
 			break;
 
