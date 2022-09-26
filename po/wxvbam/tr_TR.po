@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-21 17:52+0000\n"
+"POT-Creation-Date: 2022-09-06 21:07-0700\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/bgk/vba-m/language/tr_TR/)\n"
@@ -17,79 +17,79 @@ msgstr ""
 "Language: tr_TR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: wxvbam.cpp:225
+#: wxvbam.cpp:227
 msgid "visualboyadvance-m"
 msgstr ""
 
-#: wxvbam.cpp:446
+#: wxvbam.cpp:448
 msgid "Could not create main window"
 msgstr ""
 
-#: wxvbam.cpp:517
+#: wxvbam.cpp:519
 msgid "Save built-in XRC file and exit"
 msgstr ""
 
-#: wxvbam.cpp:520
+#: wxvbam.cpp:522
 msgid "Save built-in vba-over.ini and exit"
 msgstr ""
 
-#: wxvbam.cpp:523
+#: wxvbam.cpp:525
 msgid "Print configuration path and exit"
 msgstr ""
 
-#: wxvbam.cpp:526
+#: wxvbam.cpp:528
 msgid "Start in full-screen mode"
 msgstr ""
 
-#: wxvbam.cpp:529
+#: wxvbam.cpp:531
 msgid "Set a configuration file"
 msgstr ""
 
-#: wxvbam.cpp:533
+#: wxvbam.cpp:535
 msgid "Delete shared link state first, if it exists"
 msgstr ""
 
-#: wxvbam.cpp:540
+#: wxvbam.cpp:542
 msgid "List all settable options and exit"
 msgstr ""
 
-#: wxvbam.cpp:543
+#: wxvbam.cpp:545
 msgid "ROM file"
 msgstr ""
 
-#: wxvbam.cpp:545
+#: wxvbam.cpp:547
 msgid "<config>=<value>"
 msgstr ""
 
-#: wxvbam.cpp:576
+#: wxvbam.cpp:578
 msgid "Configuration/build error: can't find built-in xrc"
 msgstr ""
 
-#: wxvbam.cpp:584
+#: wxvbam.cpp:586
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr ""
 
-#: wxvbam.cpp:599
+#: wxvbam.cpp:601
 msgid "Configuration is read from, in order:"
 msgstr ""
 
-#: wxvbam.cpp:613
+#: wxvbam.cpp:615
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
 msgstr ""
 
-#: wxvbam.cpp:619
+#: wxvbam.cpp:621
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr ""
 
-#: wxvbam.cpp:630
+#: wxvbam.cpp:636
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -97,255 +97,255 @@ msgid ""
 "\n"
 msgstr ""
 
-#: wxvbam.cpp:651
+#: wxvbam.cpp:644
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr ""
 
-#: wxvbam.cpp:663
+#: wxvbam.cpp:655
 msgid "Configuration file not found."
 msgstr ""
 
-#: wxvbam.cpp:696
+#: wxvbam.cpp:688
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr ""
 
-#: guiinit.cpp:83
+#: guiinit.cpp:84
 msgid "Start!"
 msgstr ""
 
-#: guiinit.cpp:102 xrc/NetLink.xrc:99
+#: guiinit.cpp:103 xrc/NetLink.xrc:99
 msgid "Connect"
 msgstr ""
 
-#: guiinit.cpp:119
+#: guiinit.cpp:120
 msgid "You must enter a valid host name"
 msgstr ""
 
-#: guiinit.cpp:120
+#: guiinit.cpp:121
 msgid "Host name invalid"
 msgstr ""
 
-#: guiinit.cpp:138
+#: guiinit.cpp:139
 msgid "Waiting for clients..."
 msgstr ""
 
-#: guiinit.cpp:139
+#: guiinit.cpp:140
 #, c-format
 msgid "Server IP address is: %s\n"
 msgstr ""
 
-#: guiinit.cpp:141
+#: guiinit.cpp:142
 msgid "Waiting for connection..."
 msgstr ""
 
-#: guiinit.cpp:142
+#: guiinit.cpp:143
 #, c-format
 msgid "Connecting to %s\n"
 msgstr ""
 
-#: guiinit.cpp:175
+#: guiinit.cpp:176
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr ""
 
-#: guiinit.cpp:242 guiinit.cpp:295
+#: guiinit.cpp:243 guiinit.cpp:296
 msgid "Select cheat file"
 msgstr ""
 
-#: guiinit.cpp:243
+#: guiinit.cpp:244
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr ""
 
-#: guiinit.cpp:262 panel.cpp:449
+#: guiinit.cpp:263 panel.cpp:449
 msgid "Loaded cheats"
 msgstr ""
 
-#: guiinit.cpp:296
+#: guiinit.cpp:297
 msgid "VBA cheat lists (*.clt)|*.clt"
 msgstr ""
 
-#: guiinit.cpp:314
+#: guiinit.cpp:315
 msgid "Saved cheats"
 msgstr ""
 
-#: guiinit.cpp:345 guiinit.cpp:364
+#: guiinit.cpp:346 guiinit.cpp:365
 msgid "Restore old values?"
 msgstr ""
 
-#: guiinit.cpp:346 guiinit.cpp:365
+#: guiinit.cpp:347 guiinit.cpp:366
 msgid "Removing cheats"
 msgstr ""
 
-#: guiinit.cpp:756 xrc/JoyPanel.xrc:364
+#: guiinit.cpp:757 xrc/JoyPanel.xrc:364
 msgid "GameShark"
 msgstr ""
 
-#: guiinit.cpp:757 cmdevents.cpp:678
+#: guiinit.cpp:758 cmdevents.cpp:675
 msgid "GameGenie"
 msgstr ""
 
-#: guiinit.cpp:759
+#: guiinit.cpp:760
 msgid "Generic Code"
 msgstr ""
 
-#: guiinit.cpp:760
+#: guiinit.cpp:761
 msgid "GameShark Advance"
 msgstr ""
 
-#: guiinit.cpp:761
+#: guiinit.cpp:762
 msgid "CodeBreaker Advance"
 msgstr ""
 
-#: guiinit.cpp:762
+#: guiinit.cpp:763
 msgid "Flashcart CHT"
 msgstr ""
 
-#: guiinit.cpp:830 guiinit.cpp:1085
+#: guiinit.cpp:831 guiinit.cpp:1086
 msgid "Number cannot be empty"
 msgstr ""
 
-#: guiinit.cpp:868
+#: guiinit.cpp:869
 #, c-format
 msgid "Search produced %d results.  Please refine better"
 msgstr ""
 
-#: guiinit.cpp:880
+#: guiinit.cpp:881
 msgid "Search produced no results"
 msgstr ""
 
-#: guiinit.cpp:1043
+#: guiinit.cpp:1044
 msgid "8-bit "
 msgstr ""
 
-#: guiinit.cpp:1047
+#: guiinit.cpp:1048
 msgid "16-bit "
 msgstr ""
 
-#: guiinit.cpp:1051
+#: guiinit.cpp:1052
 msgid "32-bit "
 msgstr ""
 
-#: guiinit.cpp:1057
+#: guiinit.cpp:1058
 msgid "signed decimal"
 msgstr ""
 
-#: guiinit.cpp:1061
+#: guiinit.cpp:1062
 msgid "unsigned decimal"
 msgstr ""
 
-#: guiinit.cpp:1065
+#: guiinit.cpp:1066
 msgid "unsigned hexadecimal"
 msgstr ""
 
-#: guiinit.cpp:1543
+#: guiinit.cpp:1544
 #, c-format
 msgid "%d frames = %.2f ms"
 msgstr ""
 
-#: guiinit.cpp:1555
+#: guiinit.cpp:1556
 msgid "Default device"
 msgstr ""
 
-#: guiinit.cpp:1726
+#: guiinit.cpp:1727
 msgid "Desktop mode"
 msgstr ""
 
-#: guiinit.cpp:1733
+#: guiinit.cpp:1734
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr ""
 
-#: guiinit.cpp:1846 cmdevents.cpp:748 xrc/DisplayConfig.xrc:85
+#: guiinit.cpp:1847 cmdevents.cpp:745 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
 msgid "None"
 msgstr ""
 
-#: guiinit.cpp:1887
+#: guiinit.cpp:1888
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr ""
 
-#: guiinit.cpp:1907 xrc/DisplayConfig.xrc:107
+#: guiinit.cpp:1908 xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr ""
 
-#: guiinit.cpp:1935
+#: guiinit.cpp:1936
 msgid "Please select a plugin or a different filter"
 msgstr ""
 
-#: guiinit.cpp:1936
+#: guiinit.cpp:1937
 msgid "Plugin selection error"
 msgstr ""
 
-#: guiinit.cpp:2149
+#: guiinit.cpp:2150
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr ""
 
-#: guiinit.cpp:2149
+#: guiinit.cpp:2150
 msgid "Confirm"
 msgstr ""
 
-#: guiinit.cpp:2740
+#: guiinit.cpp:2741
 msgid "Main icon not found"
 msgstr ""
 
-#: guiinit.cpp:2750
+#: guiinit.cpp:2751
 msgid "Browse"
 msgstr ""
 
-#: guiinit.cpp:2764
+#: guiinit.cpp:2765
 msgid "Main display panel not found"
 msgstr ""
 
-#: guiinit.cpp:2941
+#: guiinit.cpp:2942
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr ""
 
-#: guiinit.cpp:2955
+#: guiinit.cpp:2956
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr ""
 
-#: guiinit.cpp:3094
+#: guiinit.cpp:3097
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr ""
 
-#: guiinit.cpp:3302
+#: guiinit.cpp:3305
 msgid "Code"
 msgstr ""
 
-#: guiinit.cpp:3311
+#: guiinit.cpp:3314
 msgid "Description"
 msgstr ""
 
-#: guiinit.cpp:3385 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3388 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr ""
 
-#: guiinit.cpp:3386
+#: guiinit.cpp:3389
 msgid "Old Value"
 msgstr ""
 
-#: guiinit.cpp:3387
+#: guiinit.cpp:3390
 msgid "New Value"
 msgstr ""
 
-#: guiinit.cpp:3918
+#: guiinit.cpp:3917
 msgid "Menu commands"
 msgstr ""
 
-#: guiinit.cpp:3941
+#: guiinit.cpp:3940
 msgid "Other commands"
 msgstr ""
 
-#: guiinit.cpp:4052
+#: guiinit.cpp:4051
 msgid "JoyBus host invalid; disabling"
 msgstr ""
 
@@ -844,29 +844,19 @@ msgstr ""
 msgid "Network is not supported in local mode."
 msgstr ""
 
-#: opts.cpp:649 opts.cpp:951
-#, c-format
-msgid "Invalid value %s for option %s; valid values are %s%s%s"
-msgstr ""
-
-#: opts.cpp:666 opts.cpp:963
-#, c-format
-msgid "Invalid value %d for option %s; valid values are %d - %d"
-msgstr ""
-
-#: opts.cpp:673 opts.cpp:682 opts.cpp:971 opts.cpp:979
-#, c-format
-msgid "Invalid value %f for option %s; valid values are %f - %f"
-msgstr ""
-
-#: opts.cpp:739 opts.cpp:760 opts.cpp:1047
+#: opts.cpp:492 opts.cpp:513 opts.cpp:745
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr ""
 
-#: opts.cpp:934
+#: opts.cpp:668 opts.cpp:677 opts.cpp:686 opts.cpp:695 vbam-options.cpp:313
 #, c-format
-msgid "Invalid flag option %s - %s ignored"
+msgid "Invalid value %s for option %s"
+msgstr ""
+
+#: opts.cpp:767
+#, c-format
+msgid "Unknown option %s with value %s"
 msgstr ""
 
 #: sys.cpp:195 sys.cpp:256
@@ -1101,6 +1091,457 @@ msgstr ""
 #: panel.cpp:2429
 #, c-format
 msgid "Error in video recording (%s); aborting"
+msgstr ""
+
+#: vbam-options.cpp:218
+#, c-format
+msgid "Invalid value %f for option %s; valid values are %f - %f"
+msgstr ""
+
+#: vbam-options.cpp:232 vbam-options.cpp:246
+#, c-format
+msgid "Invalid value %d for option %s; valid values are %d - %d"
+msgstr ""
+
+#: vbam-options.cpp:297
+#, c-format
+msgid "Invalid value %d for option %s; valid values are %s"
+msgstr ""
+
+#: vbam-options-static.cpp:342
+msgid "Use bilinear filter with 3d renderer"
+msgstr ""
+
+#: vbam-options-static.cpp:343
+msgid "Full-screen filter to apply"
+msgstr ""
+
+#: vbam-options-static.cpp:344
+msgid "Filter plugin library"
+msgstr ""
+
+#: vbam-options-static.cpp:345
+msgid "Interframe blending function"
+msgstr ""
+
+#: vbam-options-static.cpp:346
+msgid "Keep window on top"
+msgstr ""
+
+#: vbam-options-static.cpp:347
+msgid "Maximum number of threads to run filters in"
+msgstr ""
+
+#: vbam-options-static.cpp:348
+msgid "Render method; if unsupported, simple method will be used"
+msgstr ""
+
+#: vbam-options-static.cpp:349
+msgid "Default scale factor"
+msgstr ""
+
+#: vbam-options-static.cpp:350
+msgid "Retain aspect ratio when resizing"
+msgstr ""
+
+#: vbam-options-static.cpp:353
+msgid "BIOS file to use for GB, if enabled"
+msgstr ""
+
+#: vbam-options-static.cpp:354
+msgid "GB color enhancement, if enabled"
+msgstr ""
+
+#: vbam-options-static.cpp:355
+msgid "Enable DX Colorization Hacks"
+msgstr ""
+
+#: vbam-options-static.cpp:356 vbam-options-static.cpp:368
+msgid "Apply LCD filter, if enabled"
+msgstr ""
+
+#: vbam-options-static.cpp:357
+msgid "BIOS file to use for GBC, if enabled"
+msgstr ""
+
+#: vbam-options-static.cpp:358
+msgid ""
+"The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
+msgstr ""
+
+#: vbam-options-static.cpp:359
+msgid ""
+"The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
+msgstr ""
+
+#: vbam-options-static.cpp:360
+msgid ""
+"The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
+msgstr ""
+
+#: vbam-options-static.cpp:361
+msgid "Automatically gather a full page before printing"
+msgstr ""
+
+#: vbam-options-static.cpp:362
+msgid "Automatically save printouts as screen captures with -print suffix"
+msgstr ""
+
+#: vbam-options-static.cpp:363 vbam-options-static.cpp:379
+msgid "Directory to look for ROM files"
+msgstr ""
+
+#: vbam-options-static.cpp:364
+msgid "Directory to look for GBC ROM files"
+msgstr ""
+
+#: vbam-options-static.cpp:367
+msgid "BIOS file to use, if enabled"
+msgstr ""
+
+#: vbam-options-static.cpp:370
+msgid "Enable link at boot"
+msgstr ""
+
+#: vbam-options-static.cpp:371
+msgid "Enable faster network protocol by default"
+msgstr ""
+
+#: vbam-options-static.cpp:372
+msgid "Default network link client host"
+msgstr ""
+
+#: vbam-options-static.cpp:373
+msgid "Default network link server IP to bind"
+msgstr ""
+
+#: vbam-options-static.cpp:374
+msgid "Default network link port (server and client)"
+msgstr ""
+
+#: vbam-options-static.cpp:375
+msgid "Default network protocol"
+msgstr ""
+
+#: vbam-options-static.cpp:376
+msgid "Link timeout (ms)"
+msgstr ""
+
+#: vbam-options-static.cpp:377
+msgid "Link cable type"
+msgstr ""
+
+#: vbam-options-static.cpp:382
+msgid "Automatically load last saved state"
+msgstr ""
+
+#: vbam-options-static.cpp:383
+msgid ""
+"Directory to store game save files (relative paths are relative to ROM; "
+"blank is config dir)"
+msgstr ""
+
+#: vbam-options-static.cpp:384
+msgid "Freeze recent load list"
+msgstr ""
+
+#: vbam-options-static.cpp:385
+msgid ""
+"Directory to store A/V and game recordings (relative paths are relative to "
+"ROM)"
+msgstr ""
+
+#: vbam-options-static.cpp:386
+msgid "Number of seconds between rewind snapshots (0 to disable)"
+msgstr ""
+
+#: vbam-options-static.cpp:387
+msgid "Directory to store screenshots (relative paths are relative to ROM)"
+msgstr ""
+
+#: vbam-options-static.cpp:388
+msgid ""
+"Directory to store saved state files (relative paths are relative to "
+"BatteryDir)"
+msgstr ""
+
+#: vbam-options-static.cpp:389
+msgid "Enable status bar"
+msgstr ""
+
+#: vbam-options-static.cpp:392
+msgid ""
+"The parameter Joypad/<n>/<button> contains a comma-separated list of key "
+"names which map to joypad #<n> button <button>.  Button is one of Up, Down, "
+"Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
+"MotionRight, AutoA, AutoB, Speed, Capture, GS"
+msgstr ""
+
+#: vbam-options-static.cpp:393
+msgid "The autofire toggle period, in frames (1/60 s)"
+msgstr ""
+
+#: vbam-options-static.cpp:394
+msgid "The number of the stick to use in single-player mode"
+msgstr ""
+
+#: vbam-options-static.cpp:397
+msgid ""
+"The parameter Keyboard/<cmd> contains a comma-separated list of key names "
+"(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
+"executed."
+msgstr ""
+
+#: vbam-options-static.cpp:400
+msgid "Enable AGB debug print"
+msgstr ""
+
+#: vbam-options-static.cpp:401
+msgid "Auto skip frames."
+msgstr ""
+
+#: vbam-options-static.cpp:402
+msgid "Apply IPS/UPS/IPF patches if found"
+msgstr ""
+
+#: vbam-options-static.cpp:403
+msgid "Automatically save and load cheat list"
+msgstr ""
+
+#: vbam-options-static.cpp:404
+msgid "Automatically enable border for Super GameBoy games"
+msgstr ""
+
+#: vbam-options-static.cpp:405
+msgid "Always enable border"
+msgstr ""
+
+#: vbam-options-static.cpp:406
+msgid "Screen capture file format"
+msgstr ""
+
+#: vbam-options-static.cpp:407
+msgid "Enable cheats"
+msgstr ""
+
+#: vbam-options-static.cpp:409 xrc/MainMenu.xrc:355
+msgid "Enable MMX"
+msgstr ""
+
+#: vbam-options-static.cpp:411
+msgid "Disable on-screen status messages"
+msgstr ""
+
+#: vbam-options-static.cpp:412
+msgid "Type of system to emulate"
+msgstr ""
+
+#: vbam-options-static.cpp:413
+msgid "Flash size 0 = 64KB 1 = 128KB"
+msgstr ""
+
+#: vbam-options-static.cpp:414
+msgid ""
+"Skip frames.  Values are 0-9 or -1 to skip automatically based on time."
+msgstr ""
+
+#: vbam-options-static.cpp:415
+msgid "Fullscreen mode color depth (0 = any)"
+msgstr ""
+
+#: vbam-options-static.cpp:416
+msgid "Fullscreen mode frequency (0 = any)"
+msgstr ""
+
+#: vbam-options-static.cpp:417
+msgid "Fullscreen mode height (0 = desktop)"
+msgstr ""
+
+#: vbam-options-static.cpp:418
+msgid "Fullscreen mode width (0 = desktop)"
+msgstr ""
+
+#: vbam-options-static.cpp:419
+msgid "The palette to use"
+msgstr ""
+
+#: vbam-options-static.cpp:420
+msgid "Enable printer emulation"
+msgstr ""
+
+#: vbam-options-static.cpp:421
+msgid "Break into GDB after loading the game."
+msgstr ""
+
+#: vbam-options-static.cpp:422
+msgid "Port to connect GDB to."
+msgstr ""
+
+#: vbam-options-static.cpp:424
+msgid "Number of players in network"
+msgstr ""
+
+#: vbam-options-static.cpp:426
+msgid "Maximum scale factor (0 = no limit)"
+msgstr ""
+
+#: vbam-options-static.cpp:427
+msgid "Pause game when main window loses focus"
+msgstr ""
+
+#: vbam-options-static.cpp:428
+msgid "Enable RTC (vba-over.ini override is rtcEnabled"
+msgstr ""
+
+#: vbam-options-static.cpp:429
+msgid "Native save (\"battery\") hardware type"
+msgstr ""
+
+#: vbam-options-static.cpp:430
+msgid "Show speed indicator"
+msgstr ""
+
+#: vbam-options-static.cpp:431
+msgid "Draw on-screen messages transparently"
+msgstr ""
+
+#: vbam-options-static.cpp:432
+msgid "Skip BIOS initialization"
+msgstr ""
+
+#: vbam-options-static.cpp:433
+msgid "Do not overwrite cheat list when loading state"
+msgstr ""
+
+#: vbam-options-static.cpp:434
+msgid "Do not overwrite native (battery) save when loading state"
+msgstr ""
+
+#: vbam-options-static.cpp:435
+msgid "Throttle game speed, even when accelerated (0-450%, 0 = no throttle)"
+msgstr ""
+
+#: vbam-options-static.cpp:436
+msgid "Set throttle for speedup key (0-3000%, 0 = no throttle)"
+msgstr ""
+
+#: vbam-options-static.cpp:437
+msgid "Number of frames to skip with speedup (instead of speedup throttle)"
+msgstr ""
+
+#: vbam-options-static.cpp:438
+msgid "Use frame skip for speedup throttle"
+msgstr ""
+
+#: vbam-options-static.cpp:439
+msgid "Use the specified BIOS file for GB"
+msgstr ""
+
+#: vbam-options-static.cpp:440
+msgid "Use the specified BIOS file"
+msgstr ""
+
+#: vbam-options-static.cpp:441
+msgid "Use the specified BIOS file for GBC"
+msgstr ""
+
+#: vbam-options-static.cpp:442
+msgid "Wait for vertical sync"
+msgstr ""
+
+#: vbam-options-static.cpp:445
+msgid "Enter fullscreen mode at startup"
+msgstr ""
+
+#: vbam-options-static.cpp:446
+msgid "Window maximized"
+msgstr ""
+
+#: vbam-options-static.cpp:447
+msgid "Window height at startup"
+msgstr ""
+
+#: vbam-options-static.cpp:448
+msgid "Window width at startup"
+msgstr ""
+
+#: vbam-options-static.cpp:449
+msgid "Window axis X position at startup"
+msgstr ""
+
+#: vbam-options-static.cpp:450
+msgid "Window axis Y position at startup"
+msgstr ""
+
+#: vbam-options-static.cpp:453
+msgid "Capture key events while on background"
+msgstr ""
+
+#: vbam-options-static.cpp:454
+msgid "Capture joy events while on background"
+msgstr ""
+
+#: vbam-options-static.cpp:455
+msgid "Hide menu bar when mouse is inactive"
+msgstr ""
+
+#: vbam-options-static.cpp:458
+msgid "Sound API; if unsupported, default API will be used"
+msgstr ""
+
+#: vbam-options-static.cpp:459
+msgid "Device ID of chosen audio device for chosen driver"
+msgstr ""
+
+#: vbam-options-static.cpp:460
+msgid "Number of sound buffers"
+msgstr ""
+
+#: vbam-options-static.cpp:461
+msgid "Bit mask of sound channels to enable"
+msgstr ""
+
+#: vbam-options-static.cpp:462
+msgid "GBA sound filtering (%)"
+msgstr ""
+
+#: vbam-options-static.cpp:463
+msgid "GBA sound interpolation"
+msgstr ""
+
+#: vbam-options-static.cpp:464
+msgid "GB sound declicking"
+msgstr ""
+
+#: vbam-options-static.cpp:465
+msgid "GB echo effect (%)"
+msgstr ""
+
+#: vbam-options-static.cpp:466
+msgid "Enable GB sound effects"
+msgstr ""
+
+#: vbam-options-static.cpp:467
+msgid "GB stereo effect (%)"
+msgstr ""
+
+#: vbam-options-static.cpp:468
+msgid "GB surround sound effect (%)"
+msgstr ""
+
+#: vbam-options-static.cpp:469
+msgid "Sound sample rate (kHz)"
+msgstr ""
+
+#: vbam-options-static.cpp:470
+msgid "Sound volume (%)"
+msgstr ""
+
+#: vbam-options-static.cpp:669 vbam-options-static.cpp:688
+#: vbam-options-static.cpp:711 vbam-options-static.cpp:732
+#: vbam-options-static.cpp:752
+#, c-format
+msgid "Invalid value %s for option %s; valid values are %s"
 msgstr ""
 
 #: viewsupt.cpp:776
@@ -3015,10 +3456,6 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:351
 msgid "&Retain aspect ratio"
-msgstr ""
-
-#: xrc/MainMenu.xrc:355
-msgid "Enable MMX"
 msgstr ""
 
 #: xrc/MainMenu.xrc:360
