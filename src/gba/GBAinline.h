@@ -1,6 +1,8 @@
 #ifndef GBAINLINE_H
 #define GBAINLINE_H
 
+#include <type_traits>
+
 #include "../System.h"
 #include "../common/Port.h"
 #include "GBALink.h"
@@ -9,6 +11,7 @@
 #include "Sound.h"
 #include "agbprint.h"
 #include "remote.h"
+#include "stdint.h"
 
 extern const uint32_t objTilesAddress[3];
 
@@ -43,6 +46,28 @@ extern int cpuTotalTicks;
 
 #define CPUReadMemoryQuick(addr) \
     READ32LE(((uint32_t*)&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask]))
+
+static inline uint16_t DowncastU16(uint32_t value) {
+    return static_cast<uint16_t>(value);
+}
+
+static inline int16_t Downcast16(int32_t value) {
+    return static_cast<int16_t>(value);
+}
+
+template<typename T>
+static inline uint8_t DowncastU8(T value) {
+    static_assert(std::is_integral<T>::value, "Integral type required.");
+    static_assert(sizeof(T) ==2 || sizeof(T) == 4, "16 or 32 bits int required");
+    return static_cast<uint8_t>(value);
+}
+
+template<typename T>
+static inline int8_t Downcast8(T value) {
+    static_assert(std::is_integral<T>::value, "Integral type required.");
+    static_assert(sizeof(T) ==2 || sizeof(T) == 4, "16 or 32 bits int required");
+    return static_cast<int8_t>(value);
+}
 
 extern uint32_t myROM[];
 
@@ -390,7 +415,7 @@ static inline uint8_t CPUReadByte(uint32_t address)
         return rom[address & 0x1FFFFFF];
     case 13:
         if (cpuEEPROMEnabled)
-            return eepromRead(address);
+            return DowncastU8(eepromRead(address));
         goto unreadable;
     case 14:
     case 15:
@@ -399,13 +424,13 @@ static inline uint8_t CPUReadByte(uint32_t address)
 
         switch (address & 0x00008f00) {
         case 0x8200:
-            return systemGetSensorX() & 255;
+            return DowncastU8(systemGetSensorX());
         case 0x8300:
-            return (systemGetSensorX() >> 8) | 0x80;
+            return DowncastU8((systemGetSensorX() >> 8) | 0x80);
         case 0x8400:
-            return systemGetSensorY() & 255;
+            return DowncastU8(systemGetSensorY());
         case 0x8500:
-            return systemGetSensorY() >> 8;
+            return DowncastU8(systemGetSensorY() >> 8);
         }
     // default
     default:
@@ -508,7 +533,7 @@ static inline void CPUWriteMemory(uint32_t address, uint32_t value)
         break;
     case 0x0D:
         if (cpuEEPROMEnabled) {
-            eepromWrite(address, value);
+            eepromWrite(address, DowncastU8(value));
             break;
         }
         goto unwritable;
