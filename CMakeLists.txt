@@ -816,7 +816,7 @@ elseif(MSVC)
     if(CMAKE_BUILD_TYPE STREQUAL Debug)
         set(runtime "${runtime}d")
 
-        add_compiler_flags(${runtime} /W4 /Ob0 /Od /RTC1 /DDEBUG)
+        add_compiler_flags(${runtime} /ZI /W4 /Ob0 /Od /RTC1 /DDEBUG)
     else()
         add_compiler_flags(/w /DNDEBUG)
 
