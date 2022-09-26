@@ -120,7 +120,7 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR X86_64))
         add_definitions(-DWXUSINGDLL)
     endif()
 
-    add_definitions(-D_UNICODE -DUNICODE -DwxUSE_GUI=1 -D__WXMSW__)
+    add_definitions(-D_UNICODE -DUNICODE -DwxUSE_GUI=1 -D__WXMSW__ -DwxUSE_RC_MANIFEST -DwxUSE_DPI_AWARE_MANIFEST=2)
 
     set(common_prefix    ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix})
     set(dbg_prefix       ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix}/debug)
@@ -1009,6 +1009,9 @@ if(NOT TRANSLATIONS_ONLY)
     elseif(MSVC)
         # the debug lib libcmtd is linked in debug mode, so don't link the normal version
         set_target_properties(visualboyadvance-m PROPERTIES LINK_FLAGS_DEBUG "/nodefaultlib:libcmt /subsystem:console")
+
+        # Disable the auto-generated manifest from CMake.
+        target_link_options(visualboyadvance-m PRIVATE "/MANIFEST:NO")
     endif()
 
     # Make the app a console app in debug mode to get log messages.
