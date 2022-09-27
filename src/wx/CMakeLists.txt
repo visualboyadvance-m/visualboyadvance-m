@@ -1008,7 +1008,7 @@ if(NOT TRANSLATIONS_ONLY)
         endif()
     elseif(MSVC)
         # the debug lib libcmtd is linked in debug mode, so don't link the normal version
-        set_target_properties(visualboyadvance-m PROPERTIES LINK_FLAGS_DEBUG "/nodefaultlib:libcmt /subsystem:console")
+        target_link_options(visualboyadvance-m PRIVATE "$<$<CONFIG:DEBUG>:/nodefaultlib:libcmt;/subsystem:console>")
 
         # Disable the auto-generated manifest from CMake.
         target_link_options(visualboyadvance-m PRIVATE "/MANIFEST:NO")

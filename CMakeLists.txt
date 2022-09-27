@@ -29,6 +29,19 @@ if(COMMAND cmake_policy)
     if(POLICY CMP0060)
         cmake_policy(SET CMP0060 NEW) # Full lib paths.
     endif()
+
+    if(POLICY CMP0091)
+        cmake_policy(SET CMP0091 NEW) # Do not set MSVC runtime library flags.
+    endif()
+
+    if(POLICY CMP0092)
+        cmake_policy(SET CMP0092 NEW) # Do not set /w for MSVC.
+    endif()
+
+    if(POLICY CMP0117)
+        cmake_policy(SET CMP0117 NEW) # Do not set /GR for MSVC.
+    endif()
+
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
@@ -557,8 +570,6 @@ ProcessorCount(num_cpus)
 
 option(UPSTREAM_RELEASE "do some optimizations and release automation tasks" OFF)
 
-include(SetCompilerLinkerFlags)
-
 if(CMAKE_C_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     include(LLVMToolchain)
 endif()
@@ -801,43 +812,59 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     set(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${MY_C_LINKER_FLAGS_STR}")
     set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${MY_C_LINKER_FLAGS_STR}")
 elseif(MSVC)
-    # first remove all warnings flags, otherwise there is a warning about overriding them
-    string(REGEX REPLACE "/[Ww][^ ]+" "" CMAKE_C_FLAGS   ${CMAKE_C_FLAGS})
-    string(REGEX REPLACE "/[Ww][^ ]+" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+    # Reset global CMake flags because it can't handle adding options properly.
+    # We'll set what we want ourselves.
+    set(CMAKE_C_FLAGS "")
+    set(CMAKE_C_FLAGS_DEBUG "")
+    set(CMAKE_C_FLAGS_RELEASE "")
+    set(CMAKE_C_FLAGS_MINSIZEREL "")
+    set(CMAKE_C_FLAGS_RELWITHDEBINFO "")
+    set(CMAKE_CXX_FLAGS "")
+    set(CMAKE_CXX_FLAGS_DEBUG "")
+    set(CMAKE_CXX_FLAGS_RELEASE "")
+    set(CMAKE_CXX_FLAGS_MINSIZEREL "")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "")
 
-    add_compiler_flags(/std:c++17 -D__STDC_LIMIT_MACROS /fp:fast /Oi)
-
-    if(VBAM_STATIC)
-        set(runtime "/MT")
-    else()
-        set(runtime "/MD")
+    # Set the right MSVC Runtime library.
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    if(NOT VBAM_STATIC)
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "${CMAKE_MSVC_RUNTIME_LIBRARY}Dll")
     endif()
 
-    if(CMAKE_BUILD_TYPE STREQUAL Debug)
-        set(runtime "${runtime}d")
+    # We use C++17
+    set(CMAKE_CXX_STANDARD 17)
 
-        add_compiler_flags(${runtime} /ZI /W4 /Ob0 /Od /RTC1 /DDEBUG)
-    else()
-        add_compiler_flags(/w /DNDEBUG)
+    # Windows defs.
+    add_compile_definitions(WIN32 _WINDOWS)
 
-        if(CMAKE_BUILD_TYPE STREQUAL Release)
-            if(X86_32)
-                add_compiler_flags(${runtime} /O2 /Ob3)
-            else()
-                add_compiler_flags(${runtime} /O2 /Ob3)
-            endif()
-        elseif(CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo)
-            add_compiler_flags(${runtime} /Zi /Ob1)
-        elseif(CMAKE_BUILD_TYPE STREQUAL MinSizeRel)
-            add_compiler_flags(${runtime} /O1 /Ob1)
-        else()
-            message(FATAL_ERROR "Unknown CMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}'")
-        endif()
+    # Add stdint.h support.
+    add_compile_definitions(__STDC_LIMIT_MACROS)
 
-        if(ENABLE_LTO)
-            add_compiler_flags(/GL)
-            add_linker_flags(/LTCG)
-        endif()
+    # Fast floating point operations, all the warnings, RTTI, exceptions.
+    add_compile_options(/fp:fast /W4 /GR /EHsc)
+
+    # Debug flags
+    add_compile_options("$<$<CONFIG:DEBUG>:/ZI;/Od;/Ob0;/RTC1>")
+    add_compile_definitions("$<$<CONFIG:DEBUG>:DEBUG>")
+
+    # Release flags
+    add_compile_options("$<$<CONFIG:RELEASE>:/O1;/Ob2;/Oy-;/Oi>")
+    add_compile_definitions("$<$<CONFIG:RELEASE>:NDEBUG>")
+    add_link_options("$<$<CONFIG:RELEASE>:/OPT:REF;/OPT:ICF>")
+
+    # RelWithDebInfo flags
+    add_compile_options("$<$<CONFIG:RELWITHDEBINFO>:/Zi;/O1;/Ob2;/Oy-;/Oi>")
+    add_compile_definitions("$<$<CONFIG:RELWITHDEBINFO>:NDEBUG>")
+    add_link_options("$<$<CONFIG:RELWITHDEBINFO>:/OPT:REF;/OPT:ICF>")
+
+    # MinSizeRel flags
+    add_compile_options("$<$<CONFIG:MINSIZEREL>:/O1;/Ob1;/Oy-;/Oi>")
+    add_compile_definitions("$<$<CONFIG:MINSIZEREL>:NDEBUG>")
+    add_link_options("$<$<CONFIG:MINSIZEREL>:/OPT:REF;/OPT:ICF>")
+
+    if(ENABLE_LTO)
+        add_compile_options(/GL)
+        add_link_options(/LTCG)
     endif()
 endif()
 
