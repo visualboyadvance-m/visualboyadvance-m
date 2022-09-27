@@ -391,13 +391,9 @@ private:
 // helper class to add HiDPI awareness (mostly for Mac OS X)
 class HiDPIAware {
 public:
-    HiDPIAware() { hidpi_scale_factor = 0; }
-    virtual double HiDPIScaleFactor();
+    HiDPIAware() =  default;
     virtual void RequestHighResolutionOpenGLSurface();
-    virtual void GetRealPixelClientSize(int* x, int* y);
     virtual wxWindow* GetWindow() = 0;
-private:
-    double hidpi_scale_factor;
 };
 
 // a class for polling joystick keys
