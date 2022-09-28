@@ -803,12 +803,12 @@ msgstr "等待 GDB..."
 #: cmdevents.cpp:2772
 #, c-format
 msgid "Using pixel filter: %s"
-msgstr ""
+msgstr "正在使用像素滤镜: %s"
 
 #: cmdevents.cpp:2787
 #, c-format
 msgid "Using interframe blending: %s"
-msgstr ""
+msgstr "正在使用帧间混合: %s"
 
 #: cmdevents.cpp:2826 panel.cpp:194 panel.cpp:308
 msgid "Could not initialize the sound driver!"
@@ -861,12 +861,12 @@ msgstr "%s 键不能绑定为 %s"
 #: opts.cpp:668 opts.cpp:677 opts.cpp:686 opts.cpp:695 vbam-options.cpp:313
 #, c-format
 msgid "Invalid value %s for option %s"
-msgstr ""
+msgstr "数值 %s 对于选项 %s 无效"
 
 #: opts.cpp:767
 #, c-format
 msgid "Unknown option %s with value %s"
-msgstr ""
+msgstr "未知选项 %s 带有数值 %s"
 
 #: sys.cpp:195 sys.cpp:256
 msgid "No game in progress to record"
@@ -1115,86 +1115,86 @@ msgstr "无效的数值 %d 于选项 %s，合法数值类型为 %d - %d"
 #: vbam-options.cpp:297
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %s"
-msgstr ""
+msgstr "数值 %d 对于选项 %s 无效，有效数值为 %s"
 
 #: vbam-options-static.cpp:342
 msgid "Use bilinear filter with 3d renderer"
-msgstr ""
+msgstr "在 3D 渲染器中使用双线过滤 "
 
 #: vbam-options-static.cpp:343
 msgid "Full-screen filter to apply"
-msgstr ""
+msgstr "要应用的全屏滤镜"
 
 #: vbam-options-static.cpp:344
 msgid "Filter plugin library"
-msgstr ""
+msgstr "滤镜插件库"
 
 #: vbam-options-static.cpp:345
 msgid "Interframe blending function"
-msgstr ""
+msgstr "帧间混合功能"
 
 #: vbam-options-static.cpp:346
 msgid "Keep window on top"
-msgstr ""
+msgstr "保持窗口在最前"
 
 #: vbam-options-static.cpp:347
 msgid "Maximum number of threads to run filters in"
-msgstr ""
+msgstr "运行滤镜的最大线程数"
 
 #: vbam-options-static.cpp:348
 msgid "Render method; if unsupported, simple method will be used"
-msgstr ""
+msgstr "渲染方式；如果不支持，则使用简单方式"
 
 #: vbam-options-static.cpp:349
 msgid "Default scale factor"
-msgstr ""
+msgstr "默认缩放系数"
 
 #: vbam-options-static.cpp:350
 msgid "Retain aspect ratio when resizing"
-msgstr ""
+msgstr "调整大小时保持宽高比"
 
 #: vbam-options-static.cpp:353
 msgid "BIOS file to use for GB, if enabled"
-msgstr ""
+msgstr "用于 GB 的 BIOS 文件（如果启用）"
 
 #: vbam-options-static.cpp:354
 msgid "GB color enhancement, if enabled"
-msgstr ""
+msgstr "GB 色彩增强（如果启用）"
 
 #: vbam-options-static.cpp:355
 msgid "Enable DX Colorization Hacks"
-msgstr ""
+msgstr "启用 DX 上色修改"
 
 #: vbam-options-static.cpp:356 vbam-options-static.cpp:368
 msgid "Apply LCD filter, if enabled"
-msgstr ""
+msgstr "应用 LCD 滤镜（如果启用）"
 
 #: vbam-options-static.cpp:357
 msgid "BIOS file to use for GBC, if enabled"
-msgstr ""
+msgstr "用于 GBC 的 BIOS 文件（如果启用）"
 
 #: vbam-options-static.cpp:358
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "默认调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
 
 #: vbam-options-static.cpp:359
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "第一用户调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
 
 #: vbam-options-static.cpp:360
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "第二用户调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
 
 #: vbam-options-static.cpp:361
 msgid "Automatically gather a full page before printing"
-msgstr ""
+msgstr "打印前自动聚集整个页面"
 
 #: vbam-options-static.cpp:362
 msgid "Automatically save printouts as screen captures with -print suffix"
-msgstr ""
+msgstr "使用 -print 后缀自动将打印输出保存为屏幕截图"
 
 #: vbam-options-static.cpp:363 vbam-options-static.cpp:379
 msgid "Directory to look for ROM files"

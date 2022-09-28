@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# wong marvin, 2022
 # 毅 任, 2022
 msgid ""
 msgstr ""
@@ -10,7 +11,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-06 21:07-0700\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: 毅 任, 2022\n"
+"Last-Translator: wong marvin, 2022\n"
 "Language-Team: Chinese (http://www.transifex.com/bgk/vba-m/language/zh/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -795,12 +796,12 @@ msgstr "Waiting for GDB..."
 #: cmdevents.cpp:2772
 #, c-format
 msgid "Using pixel filter: %s"
-msgstr ""
+msgstr "Using pixel filter: %s"
 
 #: cmdevents.cpp:2787
 #, c-format
 msgid "Using interframe blending: %s"
-msgstr ""
+msgstr "Using interframe blending: %s"
 
 #: cmdevents.cpp:2826 panel.cpp:194 panel.cpp:308
 msgid "Could not initialize the sound driver!"
@@ -853,12 +854,12 @@ msgstr "Invalid key binding %s for %s"
 #: opts.cpp:668 opts.cpp:677 opts.cpp:686 opts.cpp:695 vbam-options.cpp:313
 #, c-format
 msgid "Invalid value %s for option %s"
-msgstr ""
+msgstr "Invalid value %s for option %s"
 
 #: opts.cpp:767
 #, c-format
 msgid "Unknown option %s with value %s"
-msgstr ""
+msgstr "Unknown option %s with value %s"
 
 #: sys.cpp:195 sys.cpp:256
 msgid "No game in progress to record"
@@ -1107,168 +1108,168 @@ msgstr "Invalid value %d for option %s; valid values are %d - %d"
 #: vbam-options.cpp:297
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %s"
-msgstr ""
+msgstr "Invalid value %d for option %s; valid values are %s"
 
 #: vbam-options-static.cpp:342
 msgid "Use bilinear filter with 3d renderer"
-msgstr ""
+msgstr "Use bilinear filter with 3d renderer"
 
 #: vbam-options-static.cpp:343
 msgid "Full-screen filter to apply"
-msgstr ""
+msgstr "Full-screen filter to apply"
 
 #: vbam-options-static.cpp:344
 msgid "Filter plugin library"
-msgstr ""
+msgstr "Filter plugin library"
 
 #: vbam-options-static.cpp:345
 msgid "Interframe blending function"
-msgstr ""
+msgstr "Interframe blending function"
 
 #: vbam-options-static.cpp:346
 msgid "Keep window on top"
-msgstr ""
+msgstr "Keep window on top"
 
 #: vbam-options-static.cpp:347
 msgid "Maximum number of threads to run filters in"
-msgstr ""
+msgstr "Maximum number of threads to run filters in"
 
 #: vbam-options-static.cpp:348
 msgid "Render method; if unsupported, simple method will be used"
-msgstr ""
+msgstr "Render method; if unsupported, simple method will be used"
 
 #: vbam-options-static.cpp:349
 msgid "Default scale factor"
-msgstr ""
+msgstr "Default scale factor"
 
 #: vbam-options-static.cpp:350
 msgid "Retain aspect ratio when resizing"
-msgstr ""
+msgstr "Retain aspect ratio when resizing"
 
 #: vbam-options-static.cpp:353
 msgid "BIOS file to use for GB, if enabled"
-msgstr ""
+msgstr "BIOS file to use for GB, if enabled"
 
 #: vbam-options-static.cpp:354
 msgid "GB color enhancement, if enabled"
-msgstr ""
+msgstr "GB color enhancement, if enabled"
 
 #: vbam-options-static.cpp:355
 msgid "Enable DX Colorization Hacks"
-msgstr ""
+msgstr "Enable DX Colorization Hacks"
 
 #: vbam-options-static.cpp:356 vbam-options-static.cpp:368
 msgid "Apply LCD filter, if enabled"
-msgstr ""
+msgstr "Apply LCD filter, if enabled"
 
 #: vbam-options-static.cpp:357
 msgid "BIOS file to use for GBC, if enabled"
-msgstr ""
+msgstr "BIOS file to use for GBC, if enabled"
 
 #: vbam-options-static.cpp:358
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 
 #: vbam-options-static.cpp:359
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 
 #: vbam-options-static.cpp:360
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 
 #: vbam-options-static.cpp:361
 msgid "Automatically gather a full page before printing"
-msgstr ""
+msgstr "Automatically gather a full page before printing"
 
 #: vbam-options-static.cpp:362
 msgid "Automatically save printouts as screen captures with -print suffix"
-msgstr ""
+msgstr "Automatically save printouts as screen captures with -print suffix"
 
 #: vbam-options-static.cpp:363 vbam-options-static.cpp:379
 msgid "Directory to look for ROM files"
-msgstr ""
+msgstr "Directory to look for ROM files"
 
 #: vbam-options-static.cpp:364
 msgid "Directory to look for GBC ROM files"
-msgstr ""
+msgstr "Directory to look for GBC ROM files"
 
 #: vbam-options-static.cpp:367
 msgid "BIOS file to use, if enabled"
-msgstr ""
+msgstr "BIOS file to use, if enabled"
 
 #: vbam-options-static.cpp:370
 msgid "Enable link at boot"
-msgstr ""
+msgstr "Enable link at boot"
 
 #: vbam-options-static.cpp:371
 msgid "Enable faster network protocol by default"
-msgstr ""
+msgstr "Enable faster network protocol by default"
 
 #: vbam-options-static.cpp:372
 msgid "Default network link client host"
-msgstr ""
+msgstr "Default network link client host"
 
 #: vbam-options-static.cpp:373
 msgid "Default network link server IP to bind"
-msgstr ""
+msgstr "Default network link server IP to bind"
 
 #: vbam-options-static.cpp:374
 msgid "Default network link port (server and client)"
-msgstr ""
+msgstr "Default network link port (server and client)"
 
 #: vbam-options-static.cpp:375
 msgid "Default network protocol"
-msgstr ""
+msgstr "Default network protocol"
 
 #: vbam-options-static.cpp:376
 msgid "Link timeout (ms)"
-msgstr ""
+msgstr "Link timeout (ms)"
 
 #: vbam-options-static.cpp:377
 msgid "Link cable type"
-msgstr ""
+msgstr "Link cable type"
 
 #: vbam-options-static.cpp:382
 msgid "Automatically load last saved state"
-msgstr ""
+msgstr "Automatically load last saved state"
 
 #: vbam-options-static.cpp:383
 msgid ""
 "Directory to store game save files (relative paths are relative to ROM; "
 "blank is config dir)"
-msgstr ""
+msgstr "Directory to store game save files (relative paths are relative to ROM; blank is config dir)"
 
 #: vbam-options-static.cpp:384
 msgid "Freeze recent load list"
-msgstr ""
+msgstr "Freeze recent load list"
 
 #: vbam-options-static.cpp:385
 msgid ""
 "Directory to store A/V and game recordings (relative paths are relative to "
 "ROM)"
-msgstr ""
+msgstr "Directory to store A/V and game recordings (relative paths are relative to ROM)"
 
 #: vbam-options-static.cpp:386
 msgid "Number of seconds between rewind snapshots (0 to disable)"
-msgstr ""
+msgstr "Number of seconds between rewind snapshots (0 to disable)"
 
 #: vbam-options-static.cpp:387
 msgid "Directory to store screenshots (relative paths are relative to ROM)"
-msgstr ""
+msgstr "Directory to store screenshots (relative paths are relative to ROM)"
 
 #: vbam-options-static.cpp:388
 msgid ""
 "Directory to store saved state files (relative paths are relative to "
 "BatteryDir)"
-msgstr ""
+msgstr "Directory to store saved state files (relative paths are relative to BatteryDir)"
 
 #: vbam-options-static.cpp:389
 msgid "Enable status bar"
-msgstr ""
+msgstr "Enable status bar"
 
 #: vbam-options-static.cpp:392
 msgid ""
@@ -1276,54 +1277,54 @@ msgid ""
 "names which map to joypad #<n> button <button>.  Button is one of Up, Down, "
 "Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
-msgstr ""
+msgstr "The parameter Joypad/<n>/<button> contains a comma-separated list of key names which map to joypad #<n> button <button>.  Button is one of Up, Down, Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, AutoB, Speed, Capture, GS"
 
 #: vbam-options-static.cpp:393
 msgid "The autofire toggle period, in frames (1/60 s)"
-msgstr ""
+msgstr "The autofire toggle period, in frames (1/60 s)"
 
 #: vbam-options-static.cpp:394
 msgid "The number of the stick to use in single-player mode"
-msgstr ""
+msgstr "The number of the stick to use in single-player mode"
 
 #: vbam-options-static.cpp:397
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
-msgstr ""
+msgstr "The parameter Keyboard/<cmd> contains a comma-separated list of key names (e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is executed."
 
 #: vbam-options-static.cpp:400
 msgid "Enable AGB debug print"
-msgstr ""
+msgstr "Enable AGB debug print"
 
 #: vbam-options-static.cpp:401
 msgid "Auto skip frames."
-msgstr ""
+msgstr "Auto skip frames."
 
 #: vbam-options-static.cpp:402
 msgid "Apply IPS/UPS/IPF patches if found"
-msgstr ""
+msgstr "Apply IPS/UPS/IPF patches if found"
 
 #: vbam-options-static.cpp:403
 msgid "Automatically save and load cheat list"
-msgstr ""
+msgstr "Automatically save and load cheat list"
 
 #: vbam-options-static.cpp:404
 msgid "Automatically enable border for Super GameBoy games"
-msgstr ""
+msgstr "Automatically enable border for Super GameBoy games"
 
 #: vbam-options-static.cpp:405
 msgid "Always enable border"
-msgstr ""
+msgstr "Always enable border"
 
 #: vbam-options-static.cpp:406
 msgid "Screen capture file format"
-msgstr ""
+msgstr "Screen capture file format"
 
 #: vbam-options-static.cpp:407
 msgid "Enable cheats"
-msgstr ""
+msgstr "Enable cheats"
 
 #: vbam-options-static.cpp:409 xrc/MainMenu.xrc:355
 msgid "Enable MMX"
@@ -1331,219 +1332,219 @@ msgstr "Enable MMX"
 
 #: vbam-options-static.cpp:411
 msgid "Disable on-screen status messages"
-msgstr ""
+msgstr "Disable on-screen status messages"
 
 #: vbam-options-static.cpp:412
 msgid "Type of system to emulate"
-msgstr ""
+msgstr "Type of system to emulate"
 
 #: vbam-options-static.cpp:413
 msgid "Flash size 0 = 64KB 1 = 128KB"
-msgstr ""
+msgstr "Flash size 0 = 64KB 1 = 128KB"
 
 #: vbam-options-static.cpp:414
 msgid ""
 "Skip frames.  Values are 0-9 or -1 to skip automatically based on time."
-msgstr ""
+msgstr "Skip frames.  Values are 0-9 or -1 to skip automatically based on time."
 
 #: vbam-options-static.cpp:415
 msgid "Fullscreen mode color depth (0 = any)"
-msgstr ""
+msgstr "Fullscreen mode color depth (0 = any)"
 
 #: vbam-options-static.cpp:416
 msgid "Fullscreen mode frequency (0 = any)"
-msgstr ""
+msgstr "Fullscreen mode frequency (0 = any)"
 
 #: vbam-options-static.cpp:417
 msgid "Fullscreen mode height (0 = desktop)"
-msgstr ""
+msgstr "Fullscreen mode height (0 = desktop)"
 
 #: vbam-options-static.cpp:418
 msgid "Fullscreen mode width (0 = desktop)"
-msgstr ""
+msgstr "Fullscreen mode width (0 = desktop)"
 
 #: vbam-options-static.cpp:419
 msgid "The palette to use"
-msgstr ""
+msgstr "The palette to use"
 
 #: vbam-options-static.cpp:420
 msgid "Enable printer emulation"
-msgstr ""
+msgstr "Enable printer emulation"
 
 #: vbam-options-static.cpp:421
 msgid "Break into GDB after loading the game."
-msgstr ""
+msgstr "Break into GDB after loading the game."
 
 #: vbam-options-static.cpp:422
 msgid "Port to connect GDB to."
-msgstr ""
+msgstr "Port to connect GDB to."
 
 #: vbam-options-static.cpp:424
 msgid "Number of players in network"
-msgstr ""
+msgstr "Number of players in network"
 
 #: vbam-options-static.cpp:426
 msgid "Maximum scale factor (0 = no limit)"
-msgstr ""
+msgstr "Maximum scale factor (0 = no limit)"
 
 #: vbam-options-static.cpp:427
 msgid "Pause game when main window loses focus"
-msgstr ""
+msgstr "Pause game when main window loses focus"
 
 #: vbam-options-static.cpp:428
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
-msgstr ""
+msgstr "Enable RTC (vba-over.ini override is rtcEnabled"
 
 #: vbam-options-static.cpp:429
 msgid "Native save (\"battery\") hardware type"
-msgstr ""
+msgstr "Native save (\"battery\") hardware type"
 
 #: vbam-options-static.cpp:430
 msgid "Show speed indicator"
-msgstr ""
+msgstr "Show speed indicator"
 
 #: vbam-options-static.cpp:431
 msgid "Draw on-screen messages transparently"
-msgstr ""
+msgstr "Draw on-screen messages transparently"
 
 #: vbam-options-static.cpp:432
 msgid "Skip BIOS initialization"
-msgstr ""
+msgstr "Skip BIOS initialization"
 
 #: vbam-options-static.cpp:433
 msgid "Do not overwrite cheat list when loading state"
-msgstr ""
+msgstr "Do not overwrite cheat list when loading state"
 
 #: vbam-options-static.cpp:434
 msgid "Do not overwrite native (battery) save when loading state"
-msgstr ""
+msgstr "Do not overwrite native (battery) save when loading state"
 
 #: vbam-options-static.cpp:435
 msgid "Throttle game speed, even when accelerated (0-450%, 0 = no throttle)"
-msgstr ""
+msgstr "Throttle game speed, even when accelerated (0-450%, 0 = no throttle)"
 
 #: vbam-options-static.cpp:436
 msgid "Set throttle for speedup key (0-3000%, 0 = no throttle)"
-msgstr ""
+msgstr "Set throttle for speedup key (0-3000%, 0 = no throttle)"
 
 #: vbam-options-static.cpp:437
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
-msgstr ""
+msgstr "Number of frames to skip with speedup (instead of speedup throttle)"
 
 #: vbam-options-static.cpp:438
 msgid "Use frame skip for speedup throttle"
-msgstr ""
+msgstr "Use frame skip for speedup throttle"
 
 #: vbam-options-static.cpp:439
 msgid "Use the specified BIOS file for GB"
-msgstr ""
+msgstr "Use the specified BIOS file for GB"
 
 #: vbam-options-static.cpp:440
 msgid "Use the specified BIOS file"
-msgstr ""
+msgstr "Use the specified BIOS file"
 
 #: vbam-options-static.cpp:441
 msgid "Use the specified BIOS file for GBC"
-msgstr ""
+msgstr "Use the specified BIOS file for GBC"
 
 #: vbam-options-static.cpp:442
 msgid "Wait for vertical sync"
-msgstr ""
+msgstr "Wait for vertical sync"
 
 #: vbam-options-static.cpp:445
 msgid "Enter fullscreen mode at startup"
-msgstr ""
+msgstr "Enter fullscreen mode at startup"
 
 #: vbam-options-static.cpp:446
 msgid "Window maximized"
-msgstr ""
+msgstr "Window maximized"
 
 #: vbam-options-static.cpp:447
 msgid "Window height at startup"
-msgstr ""
+msgstr "Window height at startup"
 
 #: vbam-options-static.cpp:448
 msgid "Window width at startup"
-msgstr ""
+msgstr "Window width at startup"
 
 #: vbam-options-static.cpp:449
 msgid "Window axis X position at startup"
-msgstr ""
+msgstr "Window axis X position at startup"
 
 #: vbam-options-static.cpp:450
 msgid "Window axis Y position at startup"
-msgstr ""
+msgstr "Window axis Y position at startup"
 
 #: vbam-options-static.cpp:453
 msgid "Capture key events while on background"
-msgstr ""
+msgstr "Capture key events while on background"
 
 #: vbam-options-static.cpp:454
 msgid "Capture joy events while on background"
-msgstr ""
+msgstr "Capture joy events while on background"
 
 #: vbam-options-static.cpp:455
 msgid "Hide menu bar when mouse is inactive"
-msgstr ""
+msgstr "Hide menu bar when mouse is inactive"
 
 #: vbam-options-static.cpp:458
 msgid "Sound API; if unsupported, default API will be used"
-msgstr ""
+msgstr "Sound API; if unsupported, default API will be used"
 
 #: vbam-options-static.cpp:459
 msgid "Device ID of chosen audio device for chosen driver"
-msgstr ""
+msgstr "Device ID of chosen audio device for chosen driver"
 
 #: vbam-options-static.cpp:460
 msgid "Number of sound buffers"
-msgstr ""
+msgstr "Number of sound buffers"
 
 #: vbam-options-static.cpp:461
 msgid "Bit mask of sound channels to enable"
-msgstr ""
+msgstr "Bit mask of sound channels to enable"
 
 #: vbam-options-static.cpp:462
 msgid "GBA sound filtering (%)"
-msgstr ""
+msgstr "GBA sound filtering (%)"
 
 #: vbam-options-static.cpp:463
 msgid "GBA sound interpolation"
-msgstr ""
+msgstr "GBA sound interpolation"
 
 #: vbam-options-static.cpp:464
 msgid "GB sound declicking"
-msgstr ""
+msgstr "GB sound declicking"
 
 #: vbam-options-static.cpp:465
 msgid "GB echo effect (%)"
-msgstr ""
+msgstr "GB echo effect (%)"
 
 #: vbam-options-static.cpp:466
 msgid "Enable GB sound effects"
-msgstr ""
+msgstr "Enable GB sound effects"
 
 #: vbam-options-static.cpp:467
 msgid "GB stereo effect (%)"
-msgstr ""
+msgstr "GB stereo effect (%)"
 
 #: vbam-options-static.cpp:468
 msgid "GB surround sound effect (%)"
-msgstr ""
+msgstr "GB surround sound effect (%)"
 
 #: vbam-options-static.cpp:469
 msgid "Sound sample rate (kHz)"
-msgstr ""
+msgstr "Sound sample rate (kHz)"
 
 #: vbam-options-static.cpp:470
 msgid "Sound volume (%)"
-msgstr ""
+msgstr "Sound volume (%)"
 
 #: vbam-options-static.cpp:669 vbam-options-static.cpp:688
 #: vbam-options-static.cpp:711 vbam-options-static.cpp:732
 #: vbam-options-static.cpp:752
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
-msgstr ""
+msgstr "Invalid value %s for option %s; valid values are %s"
 
 #: viewsupt.cpp:776
 msgid "R:"
@@ -1604,12 +1605,12 @@ msgstr "CONTROL"
 #: widgets/sdljoy.cpp:188
 #, c-format
 msgid "Connected %s: %s"
-msgstr ""
+msgstr "Connected %s: %s"
 
 #: widgets/sdljoy.cpp:203
 #, c-format
 msgid "Disconnected %s"
-msgstr ""
+msgstr "Disconnected %s"
 
 #: xaudio2.cpp:34
 msgid "XAudio2: Enumerating devices failed!"
@@ -2185,11 +2186,11 @@ msgstr "Interframe blending :"
 
 #: xrc/DisplayConfig.xrc:136
 msgid "Smart"
-msgstr ""
+msgstr "Smart"
 
 #: xrc/DisplayConfig.xrc:137
 msgid "Motion Blur"
-msgstr ""
+msgstr "Motion Blur"
 
 #: xrc/DisplayConfig.xrc:151 xrc/SoundConfig.xrc:91
 msgid "Basic"
