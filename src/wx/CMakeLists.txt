@@ -913,11 +913,11 @@ if(NOT TRANSLATIONS_ONLY)
     endif()
 
     if(APPLE AND ENABLE_ONLINEUPDATES)
-
         include(FetchContent)
         FetchContent_Declare(Sparkle
             URL "https://github.com/sparkle-project/Sparkle/releases/download/1.23.0/Sparkle-1.23.0.tar.bz2"
             URL_HASH SHA512=fa7e9736d4319bf839cd5e11177d1ddac78c38048be7e59b5c94ea76c9ffc02919dd17890295d21b7f0e35afe0ec9aba9ba36912caed6e5017420345f9f66682
+            DOWNLOAD_EXTRACT_TIMESTAMP TRUE
         )
         FetchContent_MakeAvailable(Sparkle)
 
