@@ -1,8 +1,9 @@
 #ifndef VBAM_OPTIONS_H
 #define VBAM_OPTIONS_H
 
+#include "nonstd/variant.hpp"
+
 #include <array>
-#include <variant>
 
 #include <wx/string.h>
 
@@ -253,8 +254,8 @@ private:
     const wxString ux_helper_;
 
     const Type type_;
-    const std::variant<
-            std::monostate,
+    const nonstd::variant<
+            nonstd::monostate,
             bool*,
             double*,
             int32_t*,
@@ -263,8 +264,8 @@ private:
             uint16_t*>
         value_;
 
-    const std::variant<std::monostate, double, int32_t, uint32_t> min_;
-    const std::variant<std::monostate, double, int32_t, uint32_t> max_;
+    const nonstd::variant<nonstd::monostate, double, int32_t, uint32_t> min_;
+    const nonstd::variant<nonstd::monostate, double, int32_t, uint32_t> max_;
 };
 
 #endif /* VBAM_OPTIONS_H */

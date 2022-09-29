@@ -1,6 +1,7 @@
 #include "vbam-options.h"
 
-#include <variant>
+#include "nonstd/variant.hpp"
+
 #include <wx/log.h>
 #include <wx/translation.h>
 
@@ -143,41 +144,41 @@ VbamOption::VbamOption(VbamOptionID id, uint16_t* option) :
 
 bool VbamOption::GetBool() const {
     assert(is_bool());
-    return *(std::get<bool*>(value_));
+    return *(nonstd::get<bool*>(value_));
 }
 
 double VbamOption::GetDouble() const {
     assert(is_double());
-    return *(std::get<double*>(value_));
+    return *(nonstd::get<double*>(value_));
 }
 
 int32_t VbamOption::GetInt() const {
     assert(is_int());
-    return *(std::get<int32_t*>(value_));
+    return *(nonstd::get<int32_t*>(value_));
 }
 
 uint32_t VbamOption::GetUnsigned() const {
     assert(is_unsigned());
-    return *(std::get<uint32_t*>(value_));
+    return *(nonstd::get<uint32_t*>(value_));
 }
 
 const wxString VbamOption::GetString() const {
     assert(is_string());
-    return *(std::get<wxString*>(value_));
+    return *(nonstd::get<wxString*>(value_));
 }
 
 wxString VbamOption::GetEnumString() const {
     switch (type_) {
     case VbamOption::Type::kFilter:
-        return internal::FilterToString(*(std::get<int32_t*>(value_)));
+        return internal::FilterToString(*(nonstd::get<int32_t*>(value_)));
     case VbamOption::Type::kInterframe:
-        return internal::InterframeToString(*(std::get<int32_t*>(value_)));
+        return internal::InterframeToString(*(nonstd::get<int32_t*>(value_)));
     case VbamOption::Type::kRenderMethod:
-        return internal::RenderMethodToString(*(std::get<int32_t*>(value_)));
+        return internal::RenderMethodToString(*(nonstd::get<int32_t*>(value_)));
     case VbamOption::Type::kAudioApi:
-        return internal::AudioApiToString(*(std::get<int32_t*>(value_)));
+        return internal::AudioApiToString(*(nonstd::get<int32_t*>(value_)));
     case VbamOption::Type::kSoundQuality:
-        return internal::SoundQualityToString(*(std::get<int32_t*>(value_)));
+        return internal::SoundQualityToString(*(nonstd::get<int32_t*>(value_)));
 
     // We don't use default here to explicitly trigger a compiler warning when
     // adding a new value.
@@ -199,7 +200,7 @@ wxString VbamOption::GetGbPaletteString() const {
     assert(is_gb_palette());
 
     wxString palette_string;
-    uint16_t const* value = std::get<uint16_t*>(value_);
+    uint16_t const* value = nonstd::get<uint16_t*>(value_);
     palette_string.Printf("%04X,%04X,%04X,%04X,%04X,%04X,%04X,%04X",
         value[0], value[1], value[2], value[3],
         value[4], value[5], value[6], value[7]);
@@ -208,54 +209,54 @@ wxString VbamOption::GetGbPaletteString() const {
 
 void VbamOption::SetBool(bool value) const {
     assert(is_bool());
-    *std::get<bool*>(value_) = value;
+    *nonstd::get<bool*>(value_) = value;
 }
 
 void VbamOption::SetDouble(double value) const {
     assert(is_double());
-    if (value < std::get<double>(min_) || value > std::get<double>(max_)) {
+    if (value < nonstd::get<double>(min_) || value > nonstd::get<double>(max_)) {
         wxLogWarning(
             _("Invalid value %f for option %s; valid values are %f - %f"),
             value,
             config_name_,
-            std::get<double>(min_),
-            std::get<double>(max_));
+            nonstd::get<double>(min_),
+            nonstd::get<double>(max_));
         return;
     }
-    *std::get<double*>(value_) = value;
+    *nonstd::get<double*>(value_) = value;
 }
 
 void VbamOption::SetInt(int32_t value) const {
     assert(is_int());
-    if (value < std::get<int32_t>(min_) || value > std::get<int32_t>(max_)) {
+    if (value < nonstd::get<int32_t>(min_) || value > nonstd::get<int32_t>(max_)) {
         wxLogWarning(
             _("Invalid value %d for option %s; valid values are %d - %d"),
             value,
             config_name_,
-            std::get<int32_t>(min_),
-            std::get<int32_t>(max_));
+            nonstd::get<int32_t>(min_),
+            nonstd::get<int32_t>(max_));
         return;
     }
-    *std::get<int32_t*>(value_) = value;
+    *nonstd::get<int32_t*>(value_) = value;
 }
 
 void VbamOption::SetUnsigned(uint32_t value) const {
     assert(is_unsigned());
-    if (value < std::get<uint32_t>(min_) || value > std::get<uint32_t>(max_)) {
+    if (value < nonstd::get<uint32_t>(min_) || value > nonstd::get<uint32_t>(max_)) {
         wxLogWarning(
             _("Invalid value %d for option %s; valid values are %d - %d"),
             value,
             config_name_,
-            std::get<uint32_t>(min_),
-            std::get<uint32_t>(max_));
+            nonstd::get<uint32_t>(min_),
+            nonstd::get<uint32_t>(max_));
         return;
     }
-    *std::get<uint32_t*>(value_) = value;
+    *nonstd::get<uint32_t*>(value_) = value;
 }
 
 void VbamOption::SetString(const wxString& value) const {
     assert(is_string());
-    *std::get<wxString*>(value_) = value;
+    *nonstd::get<wxString*>(value_) = value;
 }
 
 void VbamOption::SetEnumString(const wxString& value) const {
@@ -292,7 +293,7 @@ void VbamOption::SetEnumString(const wxString& value) const {
 
 void VbamOption::SetEnumInt(int value) const {
     assert(is_filter() || is_interframe() || is_render_method() || is_audio_api() || is_sound_quality());
-    if (value < std::get<int32_t>(min_) || value > std::get<int32_t>(max_)) {
+    if (value < nonstd::get<int32_t>(min_) || value > nonstd::get<int32_t>(max_)) {
         wxLogWarning(
             _("Invalid value %d for option %s; valid values are %s"),
             value,
@@ -300,7 +301,7 @@ void VbamOption::SetEnumInt(int value) const {
             internal::AllEnumValuesForType(type_));
         return;
     }
-    *std::get<int32_t*>(value_) = value;
+    *nonstd::get<int32_t*>(value_) = value;
 }
 
 void VbamOption::SetGbPalette(const wxString& value) const {
@@ -315,7 +316,7 @@ void VbamOption::SetGbPalette(const wxString& value) const {
              config_name_);
         return;
     }
-    uint16_t* dest = std::get<uint16_t*>(value_);
+    uint16_t* dest = nonstd::get<uint16_t*>(value_);
 
     for (size_t i = 0; i < 8; i++) {
         wxString number = value.substr(i * 5, 4);

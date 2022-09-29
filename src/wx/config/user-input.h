@@ -33,7 +33,7 @@ public:
                                  bool is_config = false);
 
     // Invalid UserInput, mainly used for comparison.
-    constexpr UserInput() : UserInput(Device::Invalid, 0, 0, 0) {}
+    UserInput() : UserInput(Device::Invalid, 0, 0, 0) {}
 
     // Constructor from a wxKeyEvent.
     UserInput(const wxKeyEvent& event);
@@ -42,7 +42,7 @@ public:
     UserInput(const wxJoyEvent& event);
 
     // TODO: Remove this once all uses have been removed.
-    constexpr UserInput(int key = 0, int mod = 0, int joy = 0)
+    UserInput(int key = 0, int mod = 0, int joy = 0)
         : UserInput(joy == 0 ? Device::Keyboard : Device::Joystick,
                     mod,
                     key,
@@ -88,7 +88,7 @@ public:
     }
 
 private:
-    constexpr UserInput(Device device, int mod, int key, unsigned joy)
+    UserInput(Device device, int mod, int key, unsigned joy)
         : device_(device),
           joystick_(joy == 0 ? wxJoystick::Invalid()
                              : wxJoystick::FromLegacyPlayerIndex(joy)),

@@ -456,8 +456,10 @@ add_definitions(-DPKGDATADIR="${CMAKE_INSTALL_FULL_DATADIR}/vbam" -DPACKAGE=)
 
 add_definitions(-D__STDC_FORMAT_MACROS)
 
-# For C++, default to nonstd::optional for now due to mac build issues
+# For C++, default to nonstd::optional and nonstd::variant for now due to mac
+# build issues.
 add_definitions(-Doptional_CONFIG_SELECT_OPTIONAL=optional_OPTIONAL_NONSTD)
+add_definitions(-Dvariant_CONFIG_SELECT_VARIANT=variant_VARIANT_NONSTD)
 
 if(ENABLE_LINK)
     # IPC linking code needs sem_timedwait which can be either in librt or pthreads
