@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Ds886 <daniel.ashkenazi@gmail.com>, 2022
 # Ds886 <daniel.ashkenazi@gmail.com>, 2020
 msgid ""
 msgstr ""
@@ -10,7 +11,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-06 21:07-0700\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Ds886 <daniel.ashkenazi@gmail.com>, 2020\n"
+"Last-Translator: Ds886 <daniel.ashkenazi@gmail.com>, 2022\n"
 "Language-Team: Hebrew (Israel) (http://www.transifex.com/bgk/vba-m/language/he_IL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -44,7 +45,7 @@ msgstr "התחל במצב מסך מלא"
 
 #: wxvbam.cpp:531
 msgid "Set a configuration file"
-msgstr ""
+msgstr "קבע קובץ הגדרות"
 
 #: wxvbam.cpp:535
 msgid "Delete shared link state first, if it exists"
@@ -106,7 +107,7 @@ msgstr "אלה הפקודות הזמינות עבור המקלדת\\* האפשר
 
 #: wxvbam.cpp:655
 msgid "Configuration file not found."
-msgstr ""
+msgstr "קובץ ההגדרות לא נמצא."
 
 #: wxvbam.cpp:688
 msgid "Bad configuration option or multiple ROM files given:\n"
@@ -751,7 +752,7 @@ msgstr "מצב זכרון מסומן #%d"
 
 #: cmdevents.cpp:1974
 msgid "Cannot use Colorizer Hack when GB BIOS File is enabled."
-msgstr ""
+msgstr "לא ניתן להשתמש בהאק צביעה כאשר ה-‎‏BIOS של  הגיימבוי מופעל."
 
 #: cmdevents.cpp:2189
 msgid "Sound enabled"
@@ -795,12 +796,12 @@ msgstr "‏מחכה ל-‎GDB..."
 #: cmdevents.cpp:2772
 #, c-format
 msgid "Using pixel filter: %s"
-msgstr ""
+msgstr "משתמש במסנן פיקסלים: %s"
 
 #: cmdevents.cpp:2787
 #, c-format
 msgid "Using interframe blending: %s"
-msgstr ""
+msgstr "משתמש במשלב פריים ביניים: %s"
 
 #: cmdevents.cpp:2826 panel.cpp:194 panel.cpp:308
 msgid "Could not initialize the sound driver!"
@@ -835,7 +836,7 @@ msgstr "This program is free software: you can redistribute it and/or modify\nit
 
 #: cmdevents.cpp:3192
 msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
-msgstr ""
+msgstr "לא ניתן להשתמש ב-‎‏BIOS של הגיימבוי כאשר ההאק צביעה מופעל."
 
 #: cmdevents.cpp:3252
 msgid "LAN link is already active.  Disable link mode to disconnect."
@@ -853,12 +854,12 @@ msgstr "בחירת מקישים לא תקינה %s עבור %s"
 #: opts.cpp:668 opts.cpp:677 opts.cpp:686 opts.cpp:695 vbam-options.cpp:313
 #, c-format
 msgid "Invalid value %s for option %s"
-msgstr ""
+msgstr "הערך %s לא תקין  עבור ההגדרה %s"
 
 #: opts.cpp:767
 #, c-format
 msgid "Unknown option %s with value %s"
-msgstr ""
+msgstr "ההגדרה %s לא ידועה עם הערך %s"
 
 #: sys.cpp:195 sys.cpp:256
 msgid "No game in progress to record"
@@ -953,7 +954,7 @@ msgstr "לא יכל לטעון את הרום ל-Game Boy %s"
 msgid ""
 "Cannot use GB BIOS file when Colorizer Hack is enabled, disabling GB BIOS "
 "file."
-msgstr ""
+msgstr "לא ניתן להשתמש ב-‎‏BIOS של הגיימבוי כאשר ההאק צביעה מופעל, מבטל את הביוס של הגיימבוי"
 
 #: panel.cpp:222 panel.cpp:322
 #, c-format
@@ -1040,7 +1041,7 @@ msgstr "קרתה שגיאה בעת קביעת glXSwapIntervalMESA"
 
 #: panel.cpp:2216
 msgid "No support for wglGetExtensionsStringEXT"
-msgstr ""
+msgstr "אין תמיכה ב-‎wglGetExtensionsStringEXT"
 
 #: panel.cpp:2219
 msgid "No support for WGL_EXT_swap_control"
@@ -1107,11 +1108,11 @@ msgstr "ערך לא תקין %d עבור אפשרות %s; הערכים תקינ�
 #: vbam-options.cpp:297
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %s"
-msgstr ""
+msgstr "הערך %d לא תקין  עבור ההגדרה %s , ההגדרות התקינות הן: %s"
 
 #: vbam-options-static.cpp:342
 msgid "Use bilinear filter with 3d renderer"
-msgstr ""
+msgstr "תפעיל מסנן דו-לינארי עם המרנדר תלת מימד"
 
 #: vbam-options-static.cpp:343
 msgid "Full-screen filter to apply"
