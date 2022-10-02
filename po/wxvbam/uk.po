@@ -795,12 +795,12 @@ msgstr "Очікування GDB..."
 #: cmdevents.cpp:2772
 #, c-format
 msgid "Using pixel filter: %s"
-msgstr ""
+msgstr "Використання піксельного фільтра: %s"
 
 #: cmdevents.cpp:2787
 #, c-format
 msgid "Using interframe blending: %s"
-msgstr ""
+msgstr "Використання міжкадрового змішування: %s"
 
 #: cmdevents.cpp:2826 panel.cpp:194 panel.cpp:308
 msgid "Could not initialize the sound driver!"
@@ -853,12 +853,12 @@ msgstr "Недійсна призначена кнопка %s для %s."
 #: opts.cpp:668 opts.cpp:677 opts.cpp:686 opts.cpp:695 vbam-options.cpp:313
 #, c-format
 msgid "Invalid value %s for option %s"
-msgstr ""
+msgstr "Недійсне значення %s для опції %s."
 
 #: opts.cpp:767
 #, c-format
 msgid "Unknown option %s with value %s"
-msgstr ""
+msgstr "Невідома опція %s зі значенням %s."
 
 #: sys.cpp:195 sys.cpp:256
 msgid "No game in progress to record"
@@ -1107,168 +1107,168 @@ msgstr "Недійсне значення %d для опції %s; дійсні 
 #: vbam-options.cpp:297
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %s"
-msgstr ""
+msgstr "Недійсне значення %d для опції %s; дійсні значення: %s."
 
 #: vbam-options-static.cpp:342
 msgid "Use bilinear filter with 3d renderer"
-msgstr ""
+msgstr "Використовувати білінійний фільтр із 3D-опрацьовувачем"
 
 #: vbam-options-static.cpp:343
 msgid "Full-screen filter to apply"
-msgstr ""
+msgstr "Повноекранний фільтр для встановлення"
 
 #: vbam-options-static.cpp:344
 msgid "Filter plugin library"
-msgstr ""
+msgstr "Бібліотека плаґінів фільтрів"
 
 #: vbam-options-static.cpp:345
 msgid "Interframe blending function"
-msgstr ""
+msgstr "Функція міжкадрового змішування"
 
 #: vbam-options-static.cpp:346
 msgid "Keep window on top"
-msgstr ""
+msgstr "Зберігати вікно над усіма вікнами"
 
 #: vbam-options-static.cpp:347
 msgid "Maximum number of threads to run filters in"
-msgstr ""
+msgstr "Максимальна кількість потоків для запуску фільтрів"
 
 #: vbam-options-static.cpp:348
 msgid "Render method; if unsupported, simple method will be used"
-msgstr ""
+msgstr "Спосіб опрацювання; при непідтримуванні буде використано простий спосіб"
 
 #: vbam-options-static.cpp:349
 msgid "Default scale factor"
-msgstr ""
+msgstr "Типовий коефіцієнт масштабу"
 
 #: vbam-options-static.cpp:350
 msgid "Retain aspect ratio when resizing"
-msgstr ""
+msgstr "Зберігати співвідношення сторін при зміні розміру"
 
 #: vbam-options-static.cpp:353
 msgid "BIOS file to use for GB, if enabled"
-msgstr ""
+msgstr "BIOS для використання Game Boy"
 
 #: vbam-options-static.cpp:354
 msgid "GB color enhancement, if enabled"
-msgstr ""
+msgstr "Посилення кольору Game Boy"
 
 #: vbam-options-static.cpp:355
 msgid "Enable DX Colorization Hacks"
-msgstr ""
+msgstr "Увімкнути DX-хаки кольоризації"
 
 #: vbam-options-static.cpp:356 vbam-options-static.cpp:368
 msgid "Apply LCD filter, if enabled"
-msgstr ""
+msgstr "Встановити LCD-фільтр"
 
 #: vbam-options-static.cpp:357
 msgid "BIOS file to use for GBC, if enabled"
-msgstr ""
+msgstr "BIOS для використання Game Boy Color"
 
 #: vbam-options-static.cpp:358
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "Типова палітра, 8 розділених комами 4-значних шістнадцяткових цілих чисел (rgb555)."
 
 #: vbam-options-static.cpp:359
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "1-а палітра користувача, 8 розділених комами 4-значних шістнадцяткових цілих чисел (rgb555)."
 
 #: vbam-options-static.cpp:360
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "2-а палітра користувача, 8 розділених комами 4-значних шістнадцяткових цілих чисел (rgb555)."
 
 #: vbam-options-static.cpp:361
 msgid "Automatically gather a full page before printing"
-msgstr ""
+msgstr "Автоматично збирати повну сторінку перед друком"
 
 #: vbam-options-static.cpp:362
 msgid "Automatically save printouts as screen captures with -print suffix"
-msgstr ""
+msgstr "Автоматично зберігати роздруківки захопленнями екрана з суфіксом -print"
 
 #: vbam-options-static.cpp:363 vbam-options-static.cpp:379
 msgid "Directory to look for ROM files"
-msgstr ""
+msgstr "Каталог пошуку ROM"
 
 #: vbam-options-static.cpp:364
 msgid "Directory to look for GBC ROM files"
-msgstr ""
+msgstr "Каталог пошуку Game Boy Color ROM"
 
 #: vbam-options-static.cpp:367
 msgid "BIOS file to use, if enabled"
-msgstr ""
+msgstr "BIOS для використання"
 
 #: vbam-options-static.cpp:370
 msgid "Enable link at boot"
-msgstr ""
+msgstr "Увімкнути з'єднання при завантаженні"
 
 #: vbam-options-static.cpp:371
 msgid "Enable faster network protocol by default"
-msgstr ""
+msgstr "Увімкнути швидший мережевий протокол типово"
 
 #: vbam-options-static.cpp:372
 msgid "Default network link client host"
-msgstr ""
+msgstr "Типовий хост клієнта мережевого з'єднання"
 
 #: vbam-options-static.cpp:373
 msgid "Default network link server IP to bind"
-msgstr ""
+msgstr "Типова IP-адреса сервера мережевого з'єднання для призначення"
 
 #: vbam-options-static.cpp:374
 msgid "Default network link port (server and client)"
-msgstr ""
+msgstr "Типовий порт мережевого з'єднання (сервер і клієнт)"
 
 #: vbam-options-static.cpp:375
 msgid "Default network protocol"
-msgstr ""
+msgstr "Типовий мережевий протокол"
 
 #: vbam-options-static.cpp:376
 msgid "Link timeout (ms)"
-msgstr ""
+msgstr "Час очікування з'єднання (мсек)"
 
 #: vbam-options-static.cpp:377
 msgid "Link cable type"
-msgstr ""
+msgstr "Тип кабелю з'єднання"
 
 #: vbam-options-static.cpp:382
 msgid "Automatically load last saved state"
-msgstr ""
+msgstr "Автоматично завантажувати останній збережений стан"
 
 #: vbam-options-static.cpp:383
 msgid ""
 "Directory to store game save files (relative paths are relative to ROM; "
 "blank is config dir)"
-msgstr ""
+msgstr "Каталог зберігання збережень гри (відносні шляхи відносяться до ROM; порожнє - каталог конфігурації)"
 
 #: vbam-options-static.cpp:384
 msgid "Freeze recent load list"
-msgstr ""
+msgstr "Зупинити перелік останніх завантажень"
 
 #: vbam-options-static.cpp:385
 msgid ""
 "Directory to store A/V and game recordings (relative paths are relative to "
 "ROM)"
-msgstr ""
+msgstr "Каталог зберігання аудіо / відео та записів ігор (відносні шляхи відносяться до ROM)"
 
 #: vbam-options-static.cpp:386
 msgid "Number of seconds between rewind snapshots (0 to disable)"
-msgstr ""
+msgstr "Кількість секунд між перемотуванням знімків назад (0: вимкнути)"
 
 #: vbam-options-static.cpp:387
 msgid "Directory to store screenshots (relative paths are relative to ROM)"
-msgstr ""
+msgstr "Каталог зберігання екранних кадрів (відносні шляхи відносяться до ROM)"
 
 #: vbam-options-static.cpp:388
 msgid ""
 "Directory to store saved state files (relative paths are relative to "
 "BatteryDir)"
-msgstr ""
+msgstr "Каталог зберігання станів збереження (відносні шляхи відносяться до каталогу батареї)"
 
 #: vbam-options-static.cpp:389
 msgid "Enable status bar"
-msgstr ""
+msgstr "Увімкнути панель стану"
 
 #: vbam-options-static.cpp:392
 msgid ""
@@ -1276,54 +1276,54 @@ msgid ""
 "names which map to joypad #<n> button <button>.  Button is one of Up, Down, "
 "Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
-msgstr ""
+msgstr "Параметр Joypad/<n>/<button> містить розділений комами перелік імен кнопок, призначених для джойстика #<n> кнопка <button>. Кнопки: ↑, ↓, ←, →, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, AutoB, Speed, Capture, GS."
 
 #: vbam-options-static.cpp:393
 msgid "The autofire toggle period, in frames (1/60 s)"
-msgstr ""
+msgstr "Період перемикання турбо в кадрах (1 / 60 сек)"
 
 #: vbam-options-static.cpp:394
 msgid "The number of the stick to use in single-player mode"
-msgstr ""
+msgstr "Номер важеля для використання в одиничному режимі"
 
 #: vbam-options-static.cpp:397
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
-msgstr ""
+msgstr "Параметр Keyboard/<cmd> містить розділений комами перелік імен кнопок (наприклад, Alt + Shift + F1). При натисканні вказаної клавіші виконується команда <cmd>."
 
 #: vbam-options-static.cpp:400
 msgid "Enable AGB debug print"
-msgstr ""
+msgstr "Увімкнути налагоджувальний AGB-друк"
 
 #: vbam-options-static.cpp:401
 msgid "Auto skip frames."
-msgstr ""
+msgstr "Автопропуск кадрів"
 
 #: vbam-options-static.cpp:402
 msgid "Apply IPS/UPS/IPF patches if found"
-msgstr ""
+msgstr "Встановити IPS / UPS / IPF-латки"
 
 #: vbam-options-static.cpp:403
 msgid "Automatically save and load cheat list"
-msgstr ""
+msgstr "Автоматично зберігати та завантажувати перелік чітів"
 
 #: vbam-options-static.cpp:404
 msgid "Automatically enable border for Super GameBoy games"
-msgstr ""
+msgstr "Автоматично вмикати межу для ігор Super Game Boy"
 
 #: vbam-options-static.cpp:405
 msgid "Always enable border"
-msgstr ""
+msgstr "Завжди вмикати межу"
 
 #: vbam-options-static.cpp:406
 msgid "Screen capture file format"
-msgstr ""
+msgstr "Формат файлу захоплення екрана"
 
 #: vbam-options-static.cpp:407
 msgid "Enable cheats"
-msgstr ""
+msgstr "Увімкнути чіти"
 
 #: vbam-options-static.cpp:409 xrc/MainMenu.xrc:355
 msgid "Enable MMX"
@@ -1331,219 +1331,219 @@ msgstr "Увімкнути MMX"
 
 #: vbam-options-static.cpp:411
 msgid "Disable on-screen status messages"
-msgstr ""
+msgstr "Вимкнути екранні повідомлення стану"
 
 #: vbam-options-static.cpp:412
 msgid "Type of system to emulate"
-msgstr ""
+msgstr "Тип системи для емуляції"
 
 #: vbam-options-static.cpp:413
 msgid "Flash size 0 = 64KB 1 = 128KB"
-msgstr ""
+msgstr "Флеш-розмір (0: 64 Кбайт; 1: 128 Кбайт)"
 
 #: vbam-options-static.cpp:414
 msgid ""
 "Skip frames.  Values are 0-9 or -1 to skip automatically based on time."
-msgstr ""
+msgstr "Пропуск кадрів. Значення 0-9 або -1 для автоматичного пропуску залежно від часу."
 
 #: vbam-options-static.cpp:415
 msgid "Fullscreen mode color depth (0 = any)"
-msgstr ""
+msgstr "Глибина кольору повного екрана (0: будь-яка)"
 
 #: vbam-options-static.cpp:416
 msgid "Fullscreen mode frequency (0 = any)"
-msgstr ""
+msgstr "Частота повного екрана (0: будь-яка)"
 
 #: vbam-options-static.cpp:417
 msgid "Fullscreen mode height (0 = desktop)"
-msgstr ""
+msgstr "Висота повного екрана (0: робочий стіл)"
 
 #: vbam-options-static.cpp:418
 msgid "Fullscreen mode width (0 = desktop)"
-msgstr ""
+msgstr "Ширина повного екрана (0: робочий стіл)"
 
 #: vbam-options-static.cpp:419
 msgid "The palette to use"
-msgstr ""
+msgstr "Палітра для використання"
 
 #: vbam-options-static.cpp:420
 msgid "Enable printer emulation"
-msgstr ""
+msgstr "Увімкнути емуляцію принтера"
 
 #: vbam-options-static.cpp:421
 msgid "Break into GDB after loading the game."
-msgstr ""
+msgstr "Переривання в GDB після завантаження гри."
 
 #: vbam-options-static.cpp:422
 msgid "Port to connect GDB to."
-msgstr ""
+msgstr "Порт з'єднання GDB"
 
 #: vbam-options-static.cpp:424
 msgid "Number of players in network"
-msgstr ""
+msgstr "Кількість гравців у мережі"
 
 #: vbam-options-static.cpp:426
 msgid "Maximum scale factor (0 = no limit)"
-msgstr ""
+msgstr "Максимальний коефіцієнт масштабу (0: без обмежень)"
 
 #: vbam-options-static.cpp:427
 msgid "Pause game when main window loses focus"
-msgstr ""
+msgstr "Призупинити гру при втраті виділення головного вікна"
 
 #: vbam-options-static.cpp:428
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
-msgstr ""
+msgstr "Увімкнути RTC (vba-over.ini замінено rtcEnabled)"
 
 #: vbam-options-static.cpp:429
 msgid "Native save (\"battery\") hardware type"
-msgstr ""
+msgstr "Тип апаратного забезпечення (\"батарея\") рідного збереження"
 
 #: vbam-options-static.cpp:430
 msgid "Show speed indicator"
-msgstr ""
+msgstr "Показати вказівник швидкості"
 
 #: vbam-options-static.cpp:431
 msgid "Draw on-screen messages transparently"
-msgstr ""
+msgstr "Показати прозорі екранні повідомлення"
 
 #: vbam-options-static.cpp:432
 msgid "Skip BIOS initialization"
-msgstr ""
+msgstr "Пропустити визначення BIOS"
 
 #: vbam-options-static.cpp:433
 msgid "Do not overwrite cheat list when loading state"
-msgstr ""
+msgstr "Не перезаписувати перелік чітів при завантаженні стану"
 
 #: vbam-options-static.cpp:434
 msgid "Do not overwrite native (battery) save when loading state"
-msgstr ""
+msgstr "Не перезаписувати рідні збереження (батарея) при завантаженні стану"
 
 #: vbam-options-static.cpp:435
 msgid "Throttle game speed, even when accelerated (0-450%, 0 = no throttle)"
-msgstr ""
+msgstr "Прискорення швидкості гри (0-450 %, 0: без прискорення)"
 
 #: vbam-options-static.cpp:436
 msgid "Set throttle for speedup key (0-3000%, 0 = no throttle)"
-msgstr ""
+msgstr "Встановити прискорення для кнопки (0-3000 %, 0: без прискорення)"
 
 #: vbam-options-static.cpp:437
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
-msgstr ""
+msgstr "Кількість кадрів для пропуску з прискоренням (замість прискорення)"
 
 #: vbam-options-static.cpp:438
 msgid "Use frame skip for speedup throttle"
-msgstr ""
+msgstr "Використовувати пропуск кадрів для прискорення"
 
 #: vbam-options-static.cpp:439
 msgid "Use the specified BIOS file for GB"
-msgstr ""
+msgstr "Використовувати вказаний BIOS для Game Boy"
 
 #: vbam-options-static.cpp:440
 msgid "Use the specified BIOS file"
-msgstr ""
+msgstr "Використовувати вказаний BIOS"
 
 #: vbam-options-static.cpp:441
 msgid "Use the specified BIOS file for GBC"
-msgstr ""
+msgstr "Використовувати вказаний BIOS для Game Boy Color"
 
 #: vbam-options-static.cpp:442
 msgid "Wait for vertical sync"
-msgstr ""
+msgstr "Дочекатися вертикальної синхронізації"
 
 #: vbam-options-static.cpp:445
 msgid "Enter fullscreen mode at startup"
-msgstr ""
+msgstr "Перейти до повного екрана при запуску"
 
 #: vbam-options-static.cpp:446
 msgid "Window maximized"
-msgstr ""
+msgstr "Вікно розгорнуто"
 
 #: vbam-options-static.cpp:447
 msgid "Window height at startup"
-msgstr ""
+msgstr "Висота вікна при запуску"
 
 #: vbam-options-static.cpp:448
 msgid "Window width at startup"
-msgstr ""
+msgstr "Ширина вікна при запуску"
 
 #: vbam-options-static.cpp:449
 msgid "Window axis X position at startup"
-msgstr ""
+msgstr "Положення осі X вікна при запуску"
 
 #: vbam-options-static.cpp:450
 msgid "Window axis Y position at startup"
-msgstr ""
+msgstr "Положення осі Y вікна при запуску"
 
 #: vbam-options-static.cpp:453
 msgid "Capture key events while on background"
-msgstr ""
+msgstr "Захоплювати ключові події на фоні"
 
 #: vbam-options-static.cpp:454
 msgid "Capture joy events while on background"
-msgstr ""
+msgstr "Захоплювати радісні події на фоні"
 
 #: vbam-options-static.cpp:455
 msgid "Hide menu bar when mouse is inactive"
-msgstr ""
+msgstr "Приховати панель меню при неактивній миші"
 
 #: vbam-options-static.cpp:458
 msgid "Sound API; if unsupported, default API will be used"
-msgstr ""
+msgstr "Звуковий API; при не підтримці буде використано типовий API"
 
 #: vbam-options-static.cpp:459
 msgid "Device ID of chosen audio device for chosen driver"
-msgstr ""
+msgstr "ID вибраного аудіопристрою для вибраного драйвера"
 
 #: vbam-options-static.cpp:460
 msgid "Number of sound buffers"
-msgstr ""
+msgstr "Кількість звукових буферів"
 
 #: vbam-options-static.cpp:461
 msgid "Bit mask of sound channels to enable"
-msgstr ""
+msgstr "Бітова маска звукових каналів для увімкнення"
 
 #: vbam-options-static.cpp:462
 msgid "GBA sound filtering (%)"
-msgstr ""
+msgstr "Фільтрація звуку Game Boy Advance (%)"
 
 #: vbam-options-static.cpp:463
 msgid "GBA sound interpolation"
-msgstr ""
+msgstr "Інтерполяція звуку Game Boy Advance"
 
 #: vbam-options-static.cpp:464
 msgid "GB sound declicking"
-msgstr ""
+msgstr "Без клацання звуку Game Boy"
 
 #: vbam-options-static.cpp:465
 msgid "GB echo effect (%)"
-msgstr ""
+msgstr "Луна Game Boy (%)"
 
 #: vbam-options-static.cpp:466
 msgid "Enable GB sound effects"
-msgstr ""
+msgstr "Увімкнути звукові ефекти Game Boy"
 
 #: vbam-options-static.cpp:467
 msgid "GB stereo effect (%)"
-msgstr ""
+msgstr "Стерео Game Boy (%)"
 
 #: vbam-options-static.cpp:468
 msgid "GB surround sound effect (%)"
-msgstr ""
+msgstr "Об'ємний звук Game Boy (%)"
 
 #: vbam-options-static.cpp:469
 msgid "Sound sample rate (kHz)"
-msgstr ""
+msgstr "Частота дискретизації аудіо (кГц)"
 
 #: vbam-options-static.cpp:470
 msgid "Sound volume (%)"
-msgstr ""
+msgstr "Гучність звуку  (%)"
 
 #: vbam-options-static.cpp:669 vbam-options-static.cpp:688
 #: vbam-options-static.cpp:711 vbam-options-static.cpp:732
 #: vbam-options-static.cpp:752
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
-msgstr ""
+msgstr "Недійсне значення %s для опції %s; дійсні значення: %s."
 
 #: viewsupt.cpp:776
 msgid "R:"
@@ -2185,11 +2185,11 @@ msgstr "Міжкадрове накладання:"
 
 #: xrc/DisplayConfig.xrc:136
 msgid "Smart"
-msgstr ""
+msgstr "Розумне"
 
 #: xrc/DisplayConfig.xrc:137
 msgid "Motion Blur"
-msgstr ""
+msgstr "Міжкадрове розмиття"
 
 #: xrc/DisplayConfig.xrc:151 xrc/SoundConfig.xrc:91
 msgid "Basic"

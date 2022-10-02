@@ -801,7 +801,7 @@ msgstr "משתמש במסנן פיקסלים: %s"
 #: cmdevents.cpp:2787
 #, c-format
 msgid "Using interframe blending: %s"
-msgstr "משתמש במשלב פריים ביניים: %s"
+msgstr "משתמש בממזג intrerframe: %s"
 
 #: cmdevents.cpp:2826 panel.cpp:194 panel.cpp:308
 msgid "Could not initialize the sound driver!"
@@ -1116,60 +1116,60 @@ msgstr "תפעיל מסנן דו-לינארי עם המרנדר תלת מימד"
 
 #: vbam-options-static.cpp:343
 msgid "Full-screen filter to apply"
-msgstr ""
+msgstr "המסנן מסך מלא אשר ליהיות מוכל"
 
 #: vbam-options-static.cpp:344
 msgid "Filter plugin library"
-msgstr ""
+msgstr "ספריית תוספי סינון"
 
 #: vbam-options-static.cpp:345
 msgid "Interframe blending function"
-msgstr ""
+msgstr "שימוש בממזג intrerframe "
 
 #: vbam-options-static.cpp:346
 msgid "Keep window on top"
-msgstr ""
+msgstr "נעל את החלון מעל הכל"
 
 #: vbam-options-static.cpp:347
 msgid "Maximum number of threads to run filters in"
-msgstr ""
+msgstr "כמות ה-threads  להרצת מסנננים ב"
 
 #: vbam-options-static.cpp:348
 msgid "Render method; if unsupported, simple method will be used"
-msgstr ""
+msgstr "מנוע הרינדור לא נתמך, המנוע הפשוט יהיה בשימוש"
 
 #: vbam-options-static.cpp:349
 msgid "Default scale factor"
-msgstr ""
+msgstr "ברירת המחדל עבור קנה מידה של הגודל"
 
 #: vbam-options-static.cpp:350
 msgid "Retain aspect ratio when resizing"
-msgstr ""
+msgstr "שמור על הקנה מידה כאשר מתשנה גודל החלון"
 
 #: vbam-options-static.cpp:353
 msgid "BIOS file to use for GB, if enabled"
-msgstr ""
+msgstr "קובץ ה-BIOS לשימוש  עבור GB במידה ומאופשר."
 
 #: vbam-options-static.cpp:354
 msgid "GB color enhancement, if enabled"
-msgstr ""
+msgstr "שיפור צבעים ל-GB במידה ומאופשר"
 
 #: vbam-options-static.cpp:355
 msgid "Enable DX Colorization Hacks"
-msgstr ""
+msgstr "הפעל האקים של צביעה של DX"
 
 #: vbam-options-static.cpp:356 vbam-options-static.cpp:368
 msgid "Apply LCD filter, if enabled"
-msgstr ""
+msgstr "החל מסנן ‎‏LCD במידה ומאופשר"
 
 #: vbam-options-static.cpp:357
 msgid "BIOS file to use for GBC, if enabled"
-msgstr ""
+msgstr "קובץ ה-‎BIOS‏ לשימוש עבור ‎GBC‏ במידה ומאופשר."
 
 #: vbam-options-static.cpp:358
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "ברירת המחדל עבור פלטת הצבעים, הכנס כ-4 ספרות שלמות הקסדצימליות מופרדות בפסיק(rgb555‎‏)."
 
 #: vbam-options-static.cpp:359
 msgid ""
@@ -1183,27 +1183,27 @@ msgstr ""
 
 #: vbam-options-static.cpp:361
 msgid "Automatically gather a full page before printing"
-msgstr ""
+msgstr "תאגור באופן אוטומטי דף שלם לפני הדפסה"
 
 #: vbam-options-static.cpp:362
 msgid "Automatically save printouts as screen captures with -print suffix"
-msgstr ""
+msgstr "שמור באופן אוטמטי הדפסות כלכידת מסך עם הסיומת \"‎-print‏\""
 
 #: vbam-options-static.cpp:363 vbam-options-static.cpp:379
 msgid "Directory to look for ROM files"
-msgstr ""
+msgstr "תיקייה לחפש בה קבצי ‎ROM"
 
 #: vbam-options-static.cpp:364
 msgid "Directory to look for GBC ROM files"
-msgstr ""
+msgstr "תיקייה לחפש בה קבצי ‎ROM‏ עבור ה-‪GBC‏"
 
 #: vbam-options-static.cpp:367
 msgid "BIOS file to use, if enabled"
-msgstr ""
+msgstr "קבצי ‫BIOS לשימוש, אם מאופשר"
 
 #: vbam-options-static.cpp:370
 msgid "Enable link at boot"
-msgstr ""
+msgstr "הפעל קישור בזמן הפעלה ראשונית"
 
 #: vbam-options-static.cpp:371
 msgid "Enable faster network protocol by default"
@@ -2182,7 +2182,7 @@ msgstr "תוסף"
 
 #: xrc/DisplayConfig.xrc:127
 msgid "Interframe blending :"
-msgstr "מיזוג בין הפריימים:"
+msgstr "מיזוג intrerframe:"
 
 #: xrc/DisplayConfig.xrc:136
 msgid "Smart"
@@ -3454,7 +3454,7 @@ msgstr "שנה פילטר לפיקסלים"
 
 #: xrc/MainMenu.xrc:348
 msgid "Change interframe blending"
-msgstr "שנה צורת מיזוכ בין-פריימים:"
+msgstr "שנה צורת מיזוג intrerframe"
 
 #: xrc/MainMenu.xrc:351
 msgid "&Retain aspect ratio"
