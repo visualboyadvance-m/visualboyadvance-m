@@ -1553,7 +1553,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
             }
             inBios = false;
         }
-    }
+    } break;
 
     // HDMA1
     case 0x51: {
@@ -1747,7 +1747,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
             gbMemory[0xff70] = register_SVBK = value;
             return;
         }
-    }
+    } break;
 
     case 0x75: {
         gbMemory[0xff75] = 0x8f | value;

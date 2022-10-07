@@ -1086,10 +1086,11 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
                 break;
             case GSA_32_BIT_WRITE_IOREGS:
                 if (cheatsList[i].address <= 0x3FF) {
-                    if (((cheatsList[i].address & 0x3FC) != 0x6) && ((cheatsList[i].address & 0x3FC) != 0x130))
-                        ioMem[cheatsList[i].address & 0x3FC] = (cheatsList[i].value & 0xFFFF);
-                    if ((((cheatsList[i].address & 0x3FC) + 2) != 0x6) && ((cheatsList[i].address & 0x3FC) + 2) != 0x130)
-                        ioMem[(cheatsList[i].address & 0x3FC) + 2] = ((cheatsList[i].value >> 16) & 0xFFFF);
+                    uint32_t cheat_addr = cheatsList[i].address & 0x3FC;
+                    if ((cheat_addr != 6) && (cheat_addr != 0x130))
+                        ioMem[cheat_addr] = (cheatsList[i].value & 0xFFFF);
+                    if (((cheat_addr + 2) != 0x6) && (cheat_addr + 2) != 0x130)
+                        ioMem[cheat_addr + 2] = ((cheatsList[i].value >> 16) & 0xFFFF);
                 }
                 break;
             case GSA_8_BIT_IF_TRUE3:
@@ -1352,6 +1353,7 @@ void cheatsDelete(int number, bool restore)
                 } else {
                     CPUWriteMemory(cheatsList[x].address, cheatsList[x].oldValue);
                 }
+                [[fallthrough]];
             case GSA_16_BIT_ROM_PATCH:
                 if (cheatsList[x].status & 1) {
                     cheatsList[x].status &= ~1;

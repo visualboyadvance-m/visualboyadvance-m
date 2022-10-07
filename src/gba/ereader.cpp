@@ -456,7 +456,7 @@ void BIOS_EReader_ScanCard(int swi_num)
             THUMB_PREFETCH
     } else if ((swi_num == 0xE3) || (swi_num == 0xE5)) //Dotcode data
     {
-        if ((reg[0].I >= 0) && (reg[0].I <= 0x10)) {
+        if (((int)reg[0].I >= 0) && (reg[0].I <= 0x10)) {
             if (decodestate == 0) {
                 for (i = 0x17; i >= 0; i--) {
                     if ((0x17 - i) < 8)
