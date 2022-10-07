@@ -578,7 +578,7 @@ void CPUUpdateRenderBuffers(bool force)
 #ifdef __LIBRETRO__
 #include <stddef.h>
 
-unsigned int CPUWriteState(uint8_t* data, unsigned size)
+unsigned int CPUWriteState(uint8_t* data)
 {
     uint8_t* orig = data;
 
@@ -608,12 +608,7 @@ unsigned int CPUWriteState(uint8_t* data, unsigned size)
     return (ptrdiff_t)data - (ptrdiff_t)orig;
 }
 
-bool CPUWriteMemState(char* memory, int available, long& reserved)
-{
-    return false;
-}
-
-bool CPUReadState(const uint8_t* data, unsigned size)
+bool CPUReadState(const uint8_t* data)
 {
     // Don't really care about version.
     int version = utilReadIntMem(data);
@@ -650,9 +645,9 @@ bool CPUReadState(const uint8_t* data, unsigned size)
     utilReadMem(pix, data, SIZE_PIX);
     utilReadMem(ioMem, data, SIZE_IOMEM);
 
-    eepromReadGame(data, version);
-    flashReadGame(data, version);
-    soundReadGame(data, version);
+    eepromReadGame(data);
+    flashReadGame(data);
+    soundReadGame(data);
     rtcReadGame(data);
 
     //// Copypasta stuff ...
@@ -4260,14 +4255,15 @@ struct EmulatedSystem GBASystem = {
     CPUReadState,
     // emuWriteState
     CPUWriteState,
-// emuReadMemState
 #ifdef __LIBRETRO__
-    NULL,
+    NULL, // emuReadMemState
+    NULL, // emuWriteMemState
 #else
+    // emuReadMemState
     CPUReadMemState,
-#endif
     // emuWriteMemState
     CPUWriteMemState,
+#endif    
 #ifdef __LIBRETRO__
     NULL, // emuWritePNG
     NULL, // emuWriteBMP

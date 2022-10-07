@@ -896,7 +896,7 @@ void gbSgbSaveGame(uint8_t*& data)
     utilWriteMem(data, gbSgbATFList, 45 * 20 * 18);
 }
 
-void gbSgbReadGame(const uint8_t*& data, int version)
+void gbSgbReadGame(const uint8_t*& data)
 {
 	utilReadDataMem(data, gbSgbSaveStructV3);
 

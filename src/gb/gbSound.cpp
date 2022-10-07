@@ -449,7 +449,7 @@ void gbSoundSaveGame(gzFile out)
 }
 
 #ifdef __LIBRETRO__
-void gbSoundReadGame(const uint8_t*& in, int version)
+void gbSoundReadGame(const uint8_t*& in)
 #else
 void gbSoundReadGame(int version, gzFile in)
 #endif

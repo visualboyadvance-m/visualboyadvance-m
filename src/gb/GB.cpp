@@ -5492,7 +5492,7 @@ bool gbLoadRomData(const char* data, unsigned size)
 #ifdef __LIBRETRO__
 #include <stddef.h>
 
-unsigned int gbWriteSaveState(uint8_t* data, unsigned)
+unsigned int gbWriteSaveState(uint8_t* data)
 {
 	uint8_t* orig = data;
 
@@ -5560,7 +5560,7 @@ unsigned int gbWriteSaveState(uint8_t* data, unsigned)
 	return (ptrdiff_t)data - (ptrdiff_t)orig;
 }
 
-bool gbReadSaveState(const uint8_t* data, unsigned)
+bool gbReadSaveState(const uint8_t* data)
 {
     int version = utilReadIntMem(data);
 
@@ -5625,7 +5625,7 @@ bool gbReadSaveState(const uint8_t* data, unsigned)
     utilReadMem(&IFF, data, 2);
 
     if (gbSgbMode) {
-        gbSgbReadGame(data, version);
+        gbSgbReadGame(data);
     } else {
         gbSgbMask = 0; // loading a game at the wrong time causes no display
     }
@@ -5767,7 +5767,7 @@ bool gbReadSaveState(const uint8_t* data, unsigned)
         gbMemoryMap[0x0d] = &gbWram[value * 0x1000];
     }
 
-    gbSoundReadGame(data, version);
+    gbSoundReadGame(data);
 
     if (gbCgbMode && gbSgbMode) {
         gbSgbMode = 0;

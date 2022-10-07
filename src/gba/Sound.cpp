@@ -799,7 +799,7 @@ static void soundReadGameOld(gzFile in, int version)
 #include <stdio.h>
 
 #ifdef __LIBRETRO__
-void soundReadGame(const uint8_t*& in, int version)
+void soundReadGame(const uint8_t*& in)
 #else
 void soundReadGame(gzFile in, int version)
 #endif
