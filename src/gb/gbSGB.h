@@ -10,7 +10,7 @@ void gbSgbDoBitTransfer(uint8_t);
 void gbSgbRenderBorder();
 #ifdef __LIBRETRO__
 void gbSgbSaveGame(uint8_t*&);
-void gbSgbReadGame(const uint8_t*&, int);
+void gbSgbReadGame(const uint8_t*&);
 #else
 void gbSgbSaveGame(gzFile);
 void gbSgbReadGame(gzFile, int version);

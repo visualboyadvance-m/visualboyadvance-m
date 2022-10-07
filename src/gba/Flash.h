@@ -7,7 +7,7 @@
 
 #ifdef __LIBRETRO__
 extern void flashSaveGame(uint8_t*& data);
-extern void flashReadGame(const uint8_t*& data, int);
+extern void flashReadGame(const uint8_t*& data);
 #else
 extern void flashSaveGame(gzFile _gzFile);
 extern void flashReadGame(gzFile _gzFile, int version);

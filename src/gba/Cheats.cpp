@@ -2825,9 +2825,9 @@ static uint8_t cheatsGetType(uint32_t address)
 }
 #endif
 
+#ifdef BKPT_SUPPORT
 void cheatsWriteMemory(uint32_t address, uint32_t value)
 {
-#ifdef BKPT_SUPPORT
     if (cheatsNumber == 0) {
         int type = cheatsGetType(address);
         uint32_t oldValue = debuggerReadMemory(address);
@@ -2837,12 +2837,10 @@ void cheatsWriteMemory(uint32_t address, uint32_t value)
         }
         debuggerWriteMemory(address, value);
     }
-#endif
 }
 
 void cheatsWriteHalfWord(uint32_t address, uint16_t value)
 {
-#ifdef BKPT_SUPPORT
     if (cheatsNumber == 0) {
         int type = cheatsGetType(address);
         uint16_t oldValue = debuggerReadHalfWord(address);
@@ -2852,12 +2850,10 @@ void cheatsWriteHalfWord(uint32_t address, uint16_t value)
         }
         debuggerWriteHalfWord(address, value);
     }
-#endif
 }
 
 void cheatsWriteByte(uint32_t address, uint8_t value)
 {
-#ifdef BKPT_SUPPORT
     if (cheatsNumber == 0) {
         int type = cheatsGetType(address);
         uint8_t oldValue = debuggerReadByte(address);
@@ -2867,5 +2863,5 @@ void cheatsWriteByte(uint32_t address, uint8_t value)
         }
         debuggerWriteByte(address, value);
     }
-#endif
 }
+#endif

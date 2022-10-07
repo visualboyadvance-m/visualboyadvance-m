@@ -48,6 +48,7 @@ static retro_input_poll_t poll_cb;
 static retro_input_state_t input_cb;
 static retro_environment_t environ_cb;
 static retro_set_rumble_state_t rumble_cb;
+static retro_audio_sample_t audio_cb;
 retro_audio_sample_batch_t audio_batch_cb;
 
 static char retro_system_directory[2048];
@@ -375,6 +376,7 @@ void retro_set_video_refresh(retro_video_refresh_t cb)
 
 void retro_set_audio_sample(retro_audio_sample_t cb)
 {
+    audio_cb = cb;
 }
 
 void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb)
@@ -1436,14 +1438,14 @@ size_t retro_serialize_size(void)
 bool retro_serialize(void* data, size_t size)
 {
     if (size == serialize_size)
-        return core->emuWriteState((uint8_t*)data, size);
+        return core->emuWriteState((uint8_t*)data);
     return false;
 }
 
 bool retro_unserialize(const void* data, size_t size)
 {
     if (size == serialize_size)
-        return core->emuReadState((uint8_t*)data, size);
+        return core->emuReadState((uint8_t*)data);
     return false;
 }
 
@@ -1676,7 +1678,7 @@ bool retro_load_game(const struct retro_game_info *game)
    update_input_descriptors();    // Initialize input descriptors and info
    update_variables(false);
    uint8_t* state_buf = (uint8_t*)malloc(2000000);
-   serialize_size = core->emuWriteState(state_buf, 2000000);
+   serialize_size = core->emuWriteState(state_buf);
    free(state_buf);
 
    emulating = 1;

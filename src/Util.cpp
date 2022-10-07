@@ -312,6 +312,7 @@ void utilPutWord(uint8_t *p, uint16_t value)
         *p = (value >> 8) & 255;
 }
 
+#ifndef __LIBRETRO__
 bool utilWriteBMPFile(const char *fileName, int w, int h, uint8_t *pix)
 {
         uint8_t writeBuffer[512 * 3];
@@ -430,6 +431,7 @@ bool utilWriteBMPFile(const char *fileName, int w, int h, uint8_t *pix)
 
         return true;
 }
+#endif /* !__LIBRETRO__ */
 
 extern bool cpuIsMultiBoot;
 
