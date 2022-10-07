@@ -4247,6 +4247,16 @@ struct EmulatedSystem GBASystem = {
     CPUReset,
     // emuCleanUp
     CPUCleanUp,
+#ifdef __LIBRETRO__
+    NULL,           // emuReadBattery
+    NULL,           // emuReadState
+    CPUReadState,   // emuReadState
+    CPUWriteState,  // emuWriteState
+    NULL,           // emuReadMemState
+    NULL,           // emuWriteMemState
+    NULL,           // emuWritePNG
+    NULL,           // emuWriteBMP
+#else
     // emuReadBattery
     CPUReadBatteryFile,
     // emuWriteBattery
@@ -4255,19 +4265,10 @@ struct EmulatedSystem GBASystem = {
     CPUReadState,
     // emuWriteState
     CPUWriteState,
-#ifdef __LIBRETRO__
-    NULL, // emuReadMemState
-    NULL, // emuWriteMemState
-#else
     // emuReadMemState
     CPUReadMemState,
     // emuWriteMemState
     CPUWriteMemState,
-#endif    
-#ifdef __LIBRETRO__
-    NULL, // emuWritePNG
-    NULL, // emuWriteBMP
-#else
     // emuWritePNG
     CPUWritePNGFile,
     // emuWriteBMP

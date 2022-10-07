@@ -5800,27 +5800,7 @@ bool gbReadSaveState(const uint8_t* data)
 
     return true;
 }
-
-bool gbWriteMemSaveState(char*, int, long&)
-{
-	return false;
-}
-
-bool gbReadMemSaveState(char*, int)
-{
-    return false;
-}
-
-bool gbReadBatteryFile(const char*)
-{
-    return false;
-}
-
-bool gbWriteBatteryFile(const char*)
-{
-    return false;
-}
-#endif
+#endif /* __LIBRETRO__ */
 
 struct EmulatedSystem GBSystem = {
     // emuMain
@@ -5829,6 +5809,16 @@ struct EmulatedSystem GBSystem = {
     gbReset,
     // emuCleanUp
     gbCleanUp,
+#ifdef __LIBRETRO__
+    NULL,               // emuReadBattery
+    NULL,               // emuWriteBattery
+    gbReadSaveState,    // emuReadState
+    gbWriteSaveState,   // emuWriteState
+    NULL,               // emuReadMemState
+    NULL,               // emuWriteMemState
+    NULL,               // emuWritePNG
+    NULL,               // emuWriteBMP
+#else    
     // emuReadBattery
     gbReadBatteryFile,
     // emuWriteBattery
@@ -5841,15 +5831,11 @@ struct EmulatedSystem GBSystem = {
     gbReadMemSaveState,
     // emuWriteMemState
     gbWriteMemSaveState,
-#ifdef __LIBRETRO__
-    NULL, // emuWritePNG
-    NULL, // emuWriteBMP
-#else
     // emuWritePNG
     gbWritePNGFile,
     // emuWriteBMP
     gbWriteBMPFile,
-#endif
+#endif /* ! __LIBRETRO__ */
     // emuUpdateCPSR
     NULL,
     // emuHasDebugger

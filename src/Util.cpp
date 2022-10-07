@@ -175,7 +175,6 @@ void utilReadScreenPixels(uint8_t *dest, int w, int h)
         }
 }
 
-#ifndef __LIBRETRO__
 bool utilWritePNGFile(const char *fileName, int w, int h, uint8_t *pix)
 {
 #ifndef NO_PNG
@@ -298,7 +297,6 @@ bool utilWritePNGFile(const char *fileName, int w, int h, uint8_t *pix)
         return false;
 #endif
 }
-#endif /* !__LIBRETRO__ */
 
 void utilPutDword(uint8_t *p, uint32_t value)
 {
