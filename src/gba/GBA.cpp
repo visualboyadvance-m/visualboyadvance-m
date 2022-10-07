@@ -1259,6 +1259,7 @@ bool CPUReadBatteryFile(const char* fileName)
     return true;
 }
 
+#ifndef __LIBRETRO__
 bool CPUWritePNGFile(const char* fileName)
 {
     return utilWritePNGFile(fileName, 240, 160, pix);
@@ -1268,6 +1269,7 @@ bool CPUWriteBMPFile(const char* fileName)
 {
     return utilWriteBMPFile(fileName, 240, 160, pix);
 }
+#endif /* !__LIBRETRO__ */
 
 bool CPUIsZipFile(const char* file)
 {
@@ -4266,10 +4268,15 @@ struct EmulatedSystem GBASystem = {
 #endif
     // emuWriteMemState
     CPUWriteMemState,
+#ifdef __LIBRETRO__
+    NULL, // emuWritePNG
+    NULL, // emuWriteBMP
+#else
     // emuWritePNG
     CPUWritePNGFile,
     // emuWriteBMP
     CPUWriteBMPFile,
+#endif
     // emuUpdateCPSR
     CPUUpdateCPSR,
     // emuHasDebugger

@@ -26,8 +26,10 @@ std::string get_xdg_user_config_home();
 std::string get_xdg_user_data_home();
 
 void utilReadScreenPixels(uint8_t *dest, int w, int h);
+#ifndef __LIBRETRO__
 bool utilWritePNGFile(const char *, int, int, uint8_t *);
 bool utilWriteBMPFile(const char *, int, int, uint8_t *);
+#endif
 void utilApplyIPS(const char *ips, uint8_t **rom, int *size);
 bool utilIsGBAImage(const char *);
 bool utilIsGBImage(const char *);

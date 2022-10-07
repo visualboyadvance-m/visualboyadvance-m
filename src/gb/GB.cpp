@@ -4064,7 +4064,6 @@ bool gbReadSaveState(const char* name)
 
     return res;
 }
-#endif // !__LIBRETRO__
 
 bool gbWritePNGFile(const char* fileName)
 {
@@ -4079,6 +4078,7 @@ bool gbWriteBMPFile(const char* fileName)
         return utilWriteBMPFile(fileName, 256, 224, pix);
     return utilWriteBMPFile(fileName, 160, 144, pix);
 }
+#endif // !__LIBRETRO__
 
 void gbCleanUp()
 {
@@ -5841,10 +5841,15 @@ struct EmulatedSystem GBSystem = {
     gbReadMemSaveState,
     // emuWriteMemState
     gbWriteMemSaveState,
+#ifdef __LIBRETRO__
+    NULL, // emuWritePNG
+    NULL, // emuWriteBMP
+#else
     // emuWritePNG
     gbWritePNGFile,
     // emuWriteBMP
     gbWriteBMPFile,
+#endif
     // emuUpdateCPSR
     NULL,
     // emuHasDebugger

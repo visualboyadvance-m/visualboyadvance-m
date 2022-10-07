@@ -48,6 +48,7 @@ static retro_input_poll_t poll_cb;
 static retro_input_state_t input_cb;
 static retro_environment_t environ_cb;
 static retro_set_rumble_state_t rumble_cb;
+static retro_audio_sample_t audio_cb;
 retro_audio_sample_batch_t audio_batch_cb;
 
 static char retro_system_directory[2048];
@@ -375,6 +376,7 @@ void retro_set_video_refresh(retro_video_refresh_t cb)
 
 void retro_set_audio_sample(retro_audio_sample_t cb)
 {
+    audio_cb = cb;
 }
 
 void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb)
