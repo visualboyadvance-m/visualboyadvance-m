@@ -2248,7 +2248,7 @@ void CPUSoftwareInterrupt(int comment)
     case 0x2A:
         BIOS_SndDriverJmpTableCopy();
         // let it go, because we don't really emulate this function
-        [[fallthrough]];
+	/* fallthrough */
     default:
 #ifdef GBA_LOGGING
         if (systemVerbose & VERBOSE_SWI) {

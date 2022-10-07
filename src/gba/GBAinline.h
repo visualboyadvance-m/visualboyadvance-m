@@ -131,7 +131,7 @@ static inline uint32_t CPUReadMemory(uint32_t address)
             value = flashRead(address) * 0x01010101;
             break;
         }
-        [[fallthrough]];
+	/* fallthrough */
     default:
     unreadable:
 #ifdef GBA_LOGGING
@@ -281,7 +281,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
             value = flashRead(address) * 0x0101;
             break;
         }
-        [[fallthrough]];
+	/* fallthrough */
     default:
     unreadable:
         if (cpuDmaRunning|| ((reg[15].I - cpuDmaPC) == (armState ? 4 : 2))) {
@@ -407,7 +407,7 @@ static inline uint8_t CPUReadByte(uint32_t address)
         case 0x8500:
             return systemGetSensorY() >> 8;
         }
-        [[fallthrough]];
+	/* fallthrough */
     default:
     unreadable:
 #ifdef GBA_LOGGING
@@ -627,7 +627,7 @@ static inline void CPUWriteHalfWord(uint32_t address, uint16_t value)
             (*cpuSaveGameFunc)(address, (uint8_t)value);
             break;
         }
-        // fallthrough
+        /* fallthrough */
     default:
     unwritable:
 #ifdef GBA_LOGGING

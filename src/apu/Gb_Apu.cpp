@@ -218,7 +218,7 @@ void Gb_Apu::run_until_( blip_time_t end_time )
 		case 6:
 			// 128 Hz
 			square1.clock_sweep();
-			[[fallthrough]];
+			/* fallthrough */
 		case 0:
 		case 4:
 			// 256 Hz
