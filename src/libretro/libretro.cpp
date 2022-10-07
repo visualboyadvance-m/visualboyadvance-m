@@ -970,7 +970,7 @@ static bool option_swapAnalogSticks;
 
 static void update_variables(bool startup)
 {
-    struct retro_variable var = {0};
+    struct retro_variable var = { NULL, NULL };
     char key[256] = {0};
     int disabled_layers = 0;
     int sound_enabled = 0x30F;
