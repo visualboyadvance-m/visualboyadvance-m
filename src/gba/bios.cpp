@@ -1194,14 +1194,14 @@ static void BIOS_SndDriver_b4c(uint32_t r0, uint32_t r1, uint32_t r2) // 0xb4c
 
 static int32_t BIOS_SndDriver_3e4(uint32_t const r0a, uint32_t const r1a) // 0x3e4
 {
-    int32_t r0 = r1a;
-    int32_t r1 = r0a;
+    int32_t r0 = (int32_t)r1a;
+    int32_t r1 = (int32_t)r0a;
     uint32_t v5 = r0 & 0x80000000;
     int32_t r12;
     int32_t r2;
     bool gtr;
 
-    if ((r1 & 0x80000000 & 0x80000000) != 0)
+    if ((r1 & 0x80000000) != 0)
         r1 = -r1;
     r12 = r0; //v5 ^ (r0 >> 32);
     if (r0 < 0)
@@ -1209,24 +1209,25 @@ static int32_t BIOS_SndDriver_3e4(uint32_t const r0a, uint32_t const r1a) // 0x3
     r2 = r1;
 
     do {
-        gtr = (r2 >= r0 >> 1);
-        if (r2 <= r0 >> 1)
+        int32_t r0_rsh = ((uint32_t)r0 >> 1);
+        gtr = (r2 >= r0_rsh);
+        if (r2 <= r0_rsh)
             r2 *= 2;
     } while (!gtr);
 
     while (1) {
-        v5 += (r0 >= (uint32_t)r2) + v5;
-        if (r0 >= (uint32_t)r2)
+        v5 += (r0 >= r2) + v5;
+        if (r0 >= r2)
             r0 -= r2;
         if (r2 == r1)
             break;
-        r2 = (uint32_t)r2 >> 1;
+        r2 = ((uint32_t)r2 >> 1);
     }
 
-    if (!(r12 << 1))
+    if ((r12 << 1) == 0)
         return -v5;
-    else
-        return v5;
+
+    return v5;
 }
 
 static void BIOS_SndDriverSub1(uint32_t p1) // 0x170a
@@ -1488,8 +1489,8 @@ void BIOS_SndDriverMain() // 0x1dc4 -> 0x08004024 phantasy star
 
     //0x1ea2
     uint32_t r4 = puser1; // apparenty ch ptr?
-    int r9 = CPUReadMemory(r4 + 0x14);
-    int r12 = CPUReadMemory(r4 + 0x18);
+    uint32_t r9 = CPUReadMemory(r4 + 0x14);
+    uint32_t r12 = CPUReadMemory(r4 + 0x18);
     uint32_t i = CPUReadByte(r4 + 0x6);
 
     for (r4 += 0x10; i > 0; i--) {
