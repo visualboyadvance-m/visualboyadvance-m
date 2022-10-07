@@ -1352,6 +1352,7 @@ void cheatsDelete(int number, bool restore)
                 } else {
                     CPUWriteMemory(cheatsList[x].address, cheatsList[x].oldValue);
                 }
+                [[fallthrough]];
             case GSA_16_BIT_ROM_PATCH:
                 if (cheatsList[x].status & 1) {
                     cheatsList[x].status &= ~1;
