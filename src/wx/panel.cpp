@@ -54,6 +54,7 @@ GameArea::GameArea()
     , basic_width(GBAWidth)
     , basic_height(GBAHeight)
     , fullscreen(false)
+    , dpi_scale_factor_(widgets::DPIScaleFactorForWindow(this))
     , paused(false)
     , pointer_blanked(false)
     , mouse_active_time(0)
@@ -745,12 +746,11 @@ void GameArea::DelBorder()
 void GameArea::AdjustMinSize()
 {
     wxWindow* frame           = wxGetApp().frame;
-    double hidpi_scale_factor = HiDPIScaleFactor();
 
     // note: could safely set min size to 1x or less regardless of video_scale
     // but setting it to scaled size makes resizing to default easier
-    wxSize sz((std::ceil(basic_width  * gopts.video_scale) / hidpi_scale_factor),
-              (std::ceil(basic_height * gopts.video_scale) / hidpi_scale_factor));
+    wxSize sz((std::ceil(basic_width  * gopts.video_scale) * dpi_scale_factor_),
+              (std::ceil(basic_height * gopts.video_scale) * dpi_scale_factor_));
     SetMinSize(sz);
 #if wxCHECK_VERSION(2, 8, 8)
     sz = frame->ClientToWindowSize(sz);
@@ -763,10 +763,9 @@ void GameArea::AdjustMinSize()
 void GameArea::LowerMinSize()
 {
     wxWindow* frame           = wxGetApp().frame;
-    double hidpi_scale_factor = HiDPIScaleFactor();
 
-    wxSize sz(std::ceil(basic_width  / hidpi_scale_factor),
-              std::ceil(basic_height / hidpi_scale_factor));
+    wxSize sz(std::ceil(basic_width  * dpi_scale_factor_),
+              std::ceil(basic_height * dpi_scale_factor_));
 
     SetMinSize(sz);
     // do not take decorations into account
@@ -780,9 +779,8 @@ void GameArea::AdjustSize(bool force)
     if (fullscreen)
         return;
 
-    double hidpi_scale_factor = HiDPIScaleFactor();
-    const wxSize newsz((std::ceil(basic_width  * gopts.video_scale) / hidpi_scale_factor),
-                       (std::ceil(basic_height * gopts.video_scale) / hidpi_scale_factor));
+    const wxSize newsz((std::ceil(basic_width  * gopts.video_scale) * dpi_scale_factor_),
+                       (std::ceil(basic_height * gopts.video_scale) * dpi_scale_factor_));
 
     if (!force) {
         wxSize sz = GetClientSize();
@@ -960,6 +958,16 @@ void GameArea::OnKillFocus(wxFocusEvent& ev)
     wxGameControlState::Instance().Reset();
     ev.Skip();
 }
+
+#if WX_HAS_NATIVE_HI_DPI_SUPPORT
+void GameArea::OnDpiChanged(wxDPIChangedEvent&) {
+    if (dpi_scale_factor_ == GetDPIScaleFactor()) {
+        return;
+    }
+    dpi_scale_factor_ = GetDPIScaleFactor();
+    AdjustSize(true);
+}
+#endif  // WX_HAS_NATIVE_HI_DPI_SUPPORT
 
 void GameArea::Pause()
 {
@@ -1332,6 +1340,9 @@ void GameArea::OnSDLJoy(wxJoyEvent& ev)
 BEGIN_EVENT_TABLE(GameArea, wxPanel)
 EVT_IDLE(GameArea::OnIdle)
 EVT_SDLJOY(GameArea::OnSDLJoy)
+#if WX_HAS_NATIVE_HI_DPI_SUPPORT
+EVT_DPI_CHANGED(GameArea::OnDpiChanged)
+#endif // WX_HAS_NATIVE_HI_DPI_SUPPORT
 // FIXME: wxGTK does not generate motion events in MainFrame (not sure
 // what to do about it)
 EVT_MOUSE_EVENTS(GameArea::MouseEvent)
@@ -2086,7 +2097,7 @@ GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
     , wxglc(parent, wxID_ANY, glopts, wxPoint(0, 0), parent->GetClientSize(),
           wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
 {
-    RequestHighResolutionOpenGLSurface();
+    widgets::RequestHighResolutionOpenGlSurfaceForWindow(this);
 #ifndef wxGL_IMPLICIT_CONTEXT
     ctx = new wxGLContext(this);
     SetCurrent(*ctx);
@@ -2251,7 +2262,7 @@ void GLDrawingPanel::AdjustViewport()
 #endif
 
     int x, y;
-    GetRealPixelClientSize(&x, &y);
+    widgets::GetRealPixelClientSize(this, &x, &y);
     glViewport(0, 0, x, y);
 
 #ifdef DEBUG
@@ -2514,24 +2525,3 @@ void GameArea::ShowMenuBar()
     menu_bar_hidden = false;
 #endif
 }
-
-// stub HiDPI methods, see macsupport.mm for the Mac support
-#ifndef __WXMAC__
-double HiDPIAware::HiDPIScaleFactor()
-{
-    if (hidpi_scale_factor == 0) {
-        hidpi_scale_factor = 1.0;
-    }
-
-    return hidpi_scale_factor;
-}
-
-void HiDPIAware::RequestHighResolutionOpenGLSurface()
-{
-}
-
-void HiDPIAware::GetRealPixelClientSize(int* x, int* y)
-{
-    GetWindow()->GetClientSize(x, y);
-}
-#endif // HiDPI stubs

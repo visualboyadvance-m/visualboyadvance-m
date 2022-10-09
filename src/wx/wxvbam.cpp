@@ -5,6 +5,10 @@
 
 #include "wxvbam.h"
 
+#ifdef __WXMSW__
+#include <windows.h>
+#endif
+
 #include <stdio.h>
 #include <wx/cmdline.h>
 #include <wx/file.h>
@@ -34,15 +38,6 @@
 
 IMPLEMENT_APP(wxvbamApp)
 IMPLEMENT_DYNAMIC_CLASS(MainFrame, wxFrame)
-
-#ifdef WIN32_CONSOLE_APP
-#include <windows.h>
-
-int main(int argc, char** argv)
-{
-    return WinMain(::GetModuleHandle(NULL), 0, 0, 0);
-}
-#endif
 
 #ifndef NO_ONLINEUPDATES
 #include "autoupdater/autoupdater.h"
@@ -199,28 +194,36 @@ wxString wxvbamApp::GetAbsolutePath(wxString path)
     return path;
 }
 
-#ifdef __WXMSW__
-#include <wx/msw/private.h>
-#include <windows.h>
-#endif
-
 bool wxvbamApp::OnInit()
 {
     // set up logging
 #ifndef NDEBUG
     wxLog::SetLogLevel(wxLOG_Trace);
-#endif
+#endif  // !NDEBUG
+
 #ifdef __WXMSW__
     // in windows console mode debug builds, redirect e.g. --help to stderr
 #ifndef NDEBUG
     wxMessageOutput::Set(new wxMessageOutputStderr());
-#endif
-    // turn off output buffering to support windows consoles
-    setvbuf(stdout, NULL, _IONBF, 0);
-    setvbuf(stderr, NULL, _IONBF, 0);
-    // redirect stderr to stdout
-    dup2(1, 2);
-#endif
+#endif  // !NDEBUG
+
+    bool console_attached = AttachConsole(ATTACH_PARENT_PROCESS) != FALSE;
+#ifndef NDEBUG
+    // In debug builds, create a console if none is attached.
+    if (!console_attached) {
+        console_attached = AllocConsole() != FALSE;
+    }
+#endif  // !NDEBUG
+
+    // Redirect stdout/stderr to the console if one is attached.
+    // This code was taken from Dolphin.
+    // https://github.com/dolphin-emu/dolphin/blob/6cf99195c645f54d54c72322ad0312a0e56bc985/Source/Core/DolphinQt/Main.cpp#L112
+    HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (console_attached && stdout_handle) {
+        freopen("CONOUT$", "w", stdout);
+        freopen("CONOUT$", "w", stderr);
+    }
+#endif  // __WXMSW__
     using_wayland = IsItWayland();
 
     // use consistent names for config
