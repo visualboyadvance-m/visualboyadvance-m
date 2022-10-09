@@ -11,6 +11,7 @@
 #include <wx/propdlg.h>
 #include <wx/datetime.h>
 
+#include "widgets/dpi-support.h"
 #include "wx/joyedit.h"
 #include "wx/keyedit.h"
 #include "wx/sdljoy.h"
@@ -388,18 +389,6 @@ private:
 #include "cmdhandlers.h"
 };
 
-// helper class to add HiDPI awareness (mostly for Mac OS X)
-class HiDPIAware {
-public:
-    HiDPIAware() { hidpi_scale_factor = 0; }
-    virtual double HiDPIScaleFactor();
-    virtual void RequestHighResolutionOpenGLSurface();
-    virtual void GetRealPixelClientSize(int* x, int* y);
-    virtual wxWindow* GetWindow() = 0;
-private:
-    double hidpi_scale_factor;
-};
-
 // a class for polling joystick keys
 class JoystickPoller : public wxTimer {
     public:
@@ -519,7 +508,7 @@ class DrawingPanelBase;
 #include <windows.h>
 #endif
 
-class GameArea : public wxPanel, public HiDPIAware {
+class GameArea : public wxPanel {
 public:
     GameArea();
     virtual ~GameArea();
@@ -641,8 +630,6 @@ public:
     void StartGamePlayback(const wxString& fname);
     void StopGamePlayback();
 
-    virtual wxWindow* GetWindow() { return this; }
-
 protected:
     MainFrame* main_frame;
 
@@ -655,6 +642,7 @@ protected:
 
     int basic_width, basic_height;
     bool fullscreen;
+    double dpi_scale_factor_ = 0;
 
     bool paused;
     void OnIdle(wxIdleEvent&);
@@ -665,6 +653,9 @@ protected:
     void EraseBackground(wxEraseEvent& ev);
     void OnSize(wxSizeEvent& ev);
     void OnKillFocus(wxFocusEvent& ev);
+#if WX_HAS_NATIVE_HI_DPI_SUPPORT
+    void OnDpiChanged(wxDPIChangedEvent& ev);
+#endif  // WX_HAS_NATIVE_HI_DPI_SUPPORT
 
 #ifndef NO_FFMPEG
     recording::MediaRecorder snd_rec, vid_rec;
@@ -716,7 +707,7 @@ extern bool cmditem_lt(const struct cmditem& cmd1, const struct cmditem& cmd2);
 
 class FilterThread;
 
-class DrawingPanelBase : public HiDPIAware {
+class DrawingPanelBase {
 public:
     DrawingPanelBase(int _width, int _height);
     ~DrawingPanelBase();

@@ -2,6 +2,7 @@
 
 AAAAA_MAINICON ICON "icons/visualboyadvance-m.ico"
 
+#define wxUSE_NO_MANIFEST 1
 #include "wx/msw/wx.rc"
 
 #include "version.h"
@@ -22,6 +23,8 @@ AAAAA_MAINICON ICON "icons/visualboyadvance-m.ico"
 WINSPARKLE_DLL_RC RCDATA WINSPARKLE_DLL_PATH
 
 #endif /* NO_ONLINEUPDATES */
+
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "visualboyadvance-m.manifest"
 
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION VER_FILEVERSION

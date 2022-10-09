@@ -89,6 +89,11 @@ if(NOT WIN32 AND NOT APPLE)
     endif()
 endif()
 
+# Win32 definitions common to all toolchains.
+if (WIN32)
+    add_definitions(-D_UNICODE -DUNICODE -DwxUSE_GUI=1 -D__WXMSW__ -DWINVER=0x0A00 -DNTDDI_VERSION=0x0A000007)
+endif()
+
 # on VS with vcpkg we can't use FindwxWidgets, we have to set everything up
 # manually because the package is broken
 if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR X86_64))
@@ -119,8 +124,6 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR X86_64))
     else()
         add_definitions(-DWXUSINGDLL)
     endif()
-
-    add_definitions(-D_UNICODE -DUNICODE -DwxUSE_GUI=1 -D__WXMSW__ -DwxUSE_RC_MANIFEST -DwxUSE_DPI_AWARE_MANIFEST=2)
 
     set(common_prefix    ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix})
     set(dbg_prefix       ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix}/debug)
@@ -755,9 +758,17 @@ set(
 set(ALL_SRC_WX ${SRC_WX})
 
 list(APPEND ALL_SRC_WX ${CMAKE_CURRENT_SOURCE_DIR}/macsupport.mm)
+list(APPEND ALL_SRC_WX ${CMAKE_CURRENT_SOURCE_DIR}/widgets/dpi-support-mac.mm)
+list(APPEND ALL_SRC_WX ${CMAKE_CURRENT_SOURCE_DIR}/widgets/dpi-support-win.cpp)
+list(APPEND ALL_SRC_WX ${CMAKE_CURRENT_SOURCE_DIR}/widgets/dpi-support.cpp)
 
 if(APPLE)
-    list(APPEND SRC_WX ${CMAKE_CURRENT_SOURCE_DIR}/macsupport.mm)
+    list(APPEND SRC_WX macsupport.mm)
+    list(APPEND SRC_WX widgets/dpi-support-mac.mm)
+elseif(WIN32)
+    list(APPEND SRC_WX widgets/dpi-support-win.cpp)
+else()
+    list(APPEND SRC_WX widgets/dpi-support.cpp)
 endif()
 
 set(
@@ -776,6 +787,7 @@ set(
     wayland.h
     wxutil.h
     config/user-input.h
+    widgets/dpi-support.h
     widgets/wx/gamecontrol.h
     widgets/wx/keyedit.h
     widgets/wx/joyedit.h
@@ -976,18 +988,23 @@ if(NOT TRANSLATIONS_ONLY)
         endif()
     endif()
 
+    if(WIN32)
+        # This is necessary for DPI support and is not included by default in
+        # the msys2 build.
+        target_link_libraries(visualboyadvance-m shcore)
+
+        if(MSVC)
+            # the debug lib libcmtd is linked in debug mode, so don't link the normal version
+            set_target_properties(visualboyadvance-m PROPERTIES LINK_FLAGS_DEBUG "/nodefaultlib:libcmt")
+
+            # Disable the auto-generated manifest from CMake.
+            target_link_options(visualboyadvance-m PRIVATE "/MANIFEST:NO")
+        endif()
+    endif()
+
     # link libgcc/libstdc++ statically on mingw
     # and adjust link command when making a static binary
     if(CMAKE_COMPILER_IS_GNUCXX)
-        if(WIN32)
-            # Build a console app in debug mode on Windows
-            if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
-                set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,--subsystem,console")
-            else()
-                set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -Wl,--subsystem,windows")
-            endif()
-        endif()
-
         if(VBAM_STATIC)
             # some dists don't have a static libpthread
             set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread ")
@@ -1006,19 +1023,7 @@ if(NOT TRANSLATIONS_ONLY)
                 )
             endif()
         endif()
-    elseif(MSVC)
-        # the debug lib libcmtd is linked in debug mode, so don't link the normal version
-        set_target_properties(visualboyadvance-m PROPERTIES LINK_FLAGS_DEBUG "/nodefaultlib:libcmt /subsystem:console")
-
-        # Disable the auto-generated manifest from CMake.
-        target_link_options(visualboyadvance-m PRIVATE "/MANIFEST:NO")
     endif()
-
-    # Make the app a console app in debug mode to get log messages.
-    if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL Debug)
-        target_compile_definitions(visualboyadvance-m PRIVATE -DWIN32_CONSOLE_APP)
-    endif()
-
 
     if(NOT WIN32 AND NOT APPLE)
         install(FILES     ${CMAKE_CURRENT_SOURCE_DIR}/visualboyadvance-m.desktop     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
