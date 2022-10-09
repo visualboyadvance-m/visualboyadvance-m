@@ -110,8 +110,14 @@ if(SDL2_STATIC)
 endif()
 
 unset(lib_suffix)
-if(MSVC AND CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
-    set(lib_suffix d)
+if(MSVC)
+    if(VCPKG_TARGET_TRIPLET MATCHES "-static$")
+	set(lib_suffix "${lib_suffix}-static")
+    endif()
+
+    if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
+	set(lib_suffix "${lib_suffix}d")
+    endif()
 endif()
 
 FIND_LIBRARY(SDL2_LIBRARY_TEMP
