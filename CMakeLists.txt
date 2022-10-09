@@ -250,6 +250,12 @@ if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
+if(MSVC AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+    # TODO: We should update the XAudio headers to build with clang-cl. See
+    # https://github.com/visualboyadvance-m/visualboyadvance-m/issues/1021
+    add_definitions(-DNO_XAUDIO2)
+endif()
+
 option(ENABLE_GBA_LOGGING "Enable extended GBA logging" ON)
 if(ENABLE_GBA_LOGGING)
     add_definitions(-DGBA_LOGGING )
@@ -561,11 +567,12 @@ option(UPSTREAM_RELEASE "do some optimizations and release automation tasks" OFF
 
 include(SetCompilerLinkerFlags)
 
-if(CMAKE_C_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+if(CMAKE_C_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_ID STREQUAL Clang AND NOT MSVC)
+    # TODO: This should also be done for clang-cl.
     include(LLVMToolchain)
 endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang AND NOT MSVC)
     unset(LTO_FLAGS)
     if(ENABLE_LTO)
         if(CMAKE_COMPILER_IS_GNUCXX)

@@ -290,7 +290,7 @@ function(vcpkg_set_toolchain)
         set(CMAKE_GENERATOR_PLATFORM x64 CACHE STRING "visual studio build architecture" FORCE)
     endif()
 
-    if(WIN32 AND NOT CMAKE_GENERATOR MATCHES "Visual Studio")
+    if(WIN32 AND NOT CMAKE_GENERATOR MATCHES "Visual Studio" AND NOT DEFINED CMAKE_CXX_COMPILER)
         if(VCPKG_TARGET_TRIPLET MATCHES "^x[68][46]-windows-")
             # set toolchain to VS for e.g. Ninja or jom
             set(CMAKE_C_COMPILER   cl CACHE STRING "Microsoft C/C++ Compiler" FORCE)

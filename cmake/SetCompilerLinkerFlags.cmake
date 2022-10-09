@@ -27,7 +27,7 @@ endfunction()
 function(add_linker_flags)
     # Set linker flags if not already set.
     foreach(flag ${ARGV})
-        foreach(var EXE SHARED MODULE STATIC)
+        foreach(var EXE SHARED)
             set(var "CMAKE_${var}_LINKER_FLAGS")
 
             # Remove any duplicates first.
