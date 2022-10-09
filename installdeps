@@ -1115,7 +1115,7 @@ windows_installdeps() {
             ;;
     esac
 
-    pkgs="$pkgs SDL2 sfml wxWidgets zlib binutils cmake crt-git extra-cmake-modules headers-git make pkgconf tools-git windows-default-manifest libmangle-git ninja gdb ccache"
+    pkgs="$pkgs SDL2 sfml wxWidgets3.2 zlib binutils cmake crt-git extra-cmake-modules headers-git make pkgconf tools-git windows-default-manifest libmangle-git ninja gdb ccache"
 
     [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs openal"
     [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs ffmpeg"
