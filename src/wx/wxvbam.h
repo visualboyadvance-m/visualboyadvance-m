@@ -642,7 +642,6 @@ protected:
 
     int basic_width, basic_height;
     bool fullscreen;
-    double dpi_scale_factor_ = 0;
 
     bool paused;
     void OnIdle(wxIdleEvent&);
@@ -653,9 +652,6 @@ protected:
     void EraseBackground(wxEraseEvent& ev);
     void OnSize(wxSizeEvent& ev);
     void OnKillFocus(wxFocusEvent& ev);
-#if WX_HAS_NATIVE_HI_DPI_SUPPORT
-    void OnDpiChanged(wxDPIChangedEvent& ev);
-#endif  // WX_HAS_NATIVE_HI_DPI_SUPPORT
 
 #ifndef NO_FFMPEG
     recording::MediaRecorder snd_rec, vid_rec;

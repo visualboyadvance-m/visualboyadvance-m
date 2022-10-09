@@ -36,7 +36,65 @@
 #include "wayland.h"
 #include "wx/gamecontrol.h"
 
-IMPLEMENT_APP(wxvbamApp)
+#ifdef __WXMSW__
+
+int WinMain(HINSTANCE hInstance,
+            HINSTANCE hPrevInstance,
+            LPSTR lpCmdLine,
+            int nCmdShow) {
+    bool console_attached = AttachConsole(ATTACH_PARENT_PROCESS) != FALSE;
+#ifdef DEBUG
+    // In debug builds, create a console if none is attached.
+    if (!console_attached) {
+        console_attached = AllocConsole() != FALSE;
+    }
+#endif  // DEBUG
+
+    // Redirect stdout/stderr to the console if one is attached.
+    // This code was taken from Dolphin.
+    // https://github.com/dolphin-emu/dolphin/blob/6cf99195c645f54d54c72322ad0312a0e56bc985/Source/Core/DolphinQt/Main.cpp#L112
+    HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (console_attached && stdout_handle) {
+        freopen("CONOUT$", "w", stdout);
+        freopen("CONOUT$", "w", stderr);
+    }
+
+    // Set up logging.
+#ifdef DEBUG
+    wxLog::SetLogLevel(wxLOG_Trace);
+#else   // DEBUG
+    wxLog::SetLogLevel(wxLOG_Info);
+#endif  // DEBUG
+
+    // Redirect e.g. --help to stderr.
+    wxMessageOutput::Set(new wxMessageOutputStderr());
+
+    // This will be freed on wxEntry exit.
+    wxApp::SetInstance(new wxvbamApp());
+    return wxEntry(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
+}
+
+#else  // __WXMSW__
+
+int main(int argc, char* argv) {
+    // Set up logging.
+#ifdef DEBUG
+    wxLog::SetLogLevel(wxLOG_Trace);
+#else   // DEBUG
+    wxLog::SetLogLevel(wxLOG_Info);
+#endif  // DEBUG
+
+    // This will be freed on wxEntry exit.
+    wxApp::SetInstance(new wxvbamApp());
+    return wxEntry(argc, argv);
+}
+
+#endif  // __WXMSW__
+
+wxvbamApp& wxGetApp() {
+    return *static_cast<wxvbamApp*>(wxApp::GetInstance());
+}
+
 IMPLEMENT_DYNAMIC_CLASS(MainFrame, wxFrame)
 
 #ifndef NO_ONLINEUPDATES
@@ -194,36 +252,7 @@ wxString wxvbamApp::GetAbsolutePath(wxString path)
     return path;
 }
 
-bool wxvbamApp::OnInit()
-{
-    // set up logging
-#ifndef NDEBUG
-    wxLog::SetLogLevel(wxLOG_Trace);
-#endif  // !NDEBUG
-
-#ifdef __WXMSW__
-    // in windows console mode debug builds, redirect e.g. --help to stderr
-#ifndef NDEBUG
-    wxMessageOutput::Set(new wxMessageOutputStderr());
-#endif  // !NDEBUG
-
-    bool console_attached = AttachConsole(ATTACH_PARENT_PROCESS) != FALSE;
-#ifndef NDEBUG
-    // In debug builds, create a console if none is attached.
-    if (!console_attached) {
-        console_attached = AllocConsole() != FALSE;
-    }
-#endif  // !NDEBUG
-
-    // Redirect stdout/stderr to the console if one is attached.
-    // This code was taken from Dolphin.
-    // https://github.com/dolphin-emu/dolphin/blob/6cf99195c645f54d54c72322ad0312a0e56bc985/Source/Core/DolphinQt/Main.cpp#L112
-    HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (console_attached && stdout_handle) {
-        freopen("CONOUT$", "w", stdout);
-        freopen("CONOUT$", "w", stderr);
-    }
-#endif  // __WXMSW__
+bool wxvbamApp::OnInit() {
     using_wayland = IsItWayland();
 
     // use consistent names for config
