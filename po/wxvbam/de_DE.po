@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Overtry <marcoruhl@hotmail.de>, 2019
+# Marco Ruhl, 2022
 # Overtry <marcoruhl@hotmail.de>, 2019
 msgid ""
 msgstr ""
@@ -11,7 +12,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-06 21:07-0700\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Overtry <marcoruhl@hotmail.de>, 2019\n"
+"Last-Translator: Marco Ruhl, 2022\n"
 "Language-Team: German (Germany) (http://www.transifex.com/bgk/vba-m/language/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3878,39 +3879,39 @@ msgstr ""
 
 #: xrc/NetLink.xrc:11
 msgid "Server"
-msgstr ""
+msgstr "Server"
 
 #: xrc/NetLink.xrc:19
 msgid "Client"
-msgstr ""
+msgstr "Client"
 
 #: xrc/NetLink.xrc:32
 msgid "Players:"
-msgstr ""
+msgstr "Spieler:"
 
 #: xrc/NetLink.xrc:41
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: xrc/NetLink.xrc:49
 msgid "3"
-msgstr ""
+msgstr "3"
 
 #: xrc/NetLink.xrc:56
 msgid "4"
-msgstr ""
+msgstr "4"
 
 #: xrc/NetLink.xrc:67
 msgid "Server:"
-msgstr ""
+msgstr "Server:"
 
 #: xrc/NetLink.xrc:81
 msgid "Port:"
-msgstr ""
+msgstr "Port:"
 
 #: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
-msgstr ""
+msgstr "OAM-Betrachter"
 
 #: xrc/OAMViewer.xrc:85
 msgid "Rot.:"
@@ -3918,111 +3919,111 @@ msgstr "Rot.:"
 
 #: xrc/PaletteViewer.xrc:4
 msgid "Palette Viewer"
-msgstr ""
+msgstr "Paletten-Betrachter"
 
 #: xrc/PaletteViewer.xrc:88
 msgid "C&hange backdrop color..."
-msgstr ""
+msgstr "Hintergrundfarbe ändern..."
 
 #: xrc/SoundConfig.xrc:4
 msgid "Sound Settings"
-msgstr ""
+msgstr "Toneinstellungen"
 
 #: xrc/SoundConfig.xrc:16
 msgid "Volume :"
-msgstr ""
+msgstr "Lautstärke:"
 
 #: xrc/SoundConfig.xrc:34
 msgid "Mute"
-msgstr ""
+msgstr "Stumm schalten"
 
 #: xrc/SoundConfig.xrc:54 xrc/SoundConfig.xrc:320
 msgid "Maximum"
-msgstr ""
+msgstr "Maximum"
 
 #: xrc/SoundConfig.xrc:71
 msgid "Sample rate :"
-msgstr ""
+msgstr "Abtastrate:"
 
 #: xrc/SoundConfig.xrc:77
 msgid "48 KHz"
-msgstr ""
+msgstr "48 KHz"
 
 #: xrc/SoundConfig.xrc:78
 msgid "44.1 KHz"
-msgstr ""
+msgstr "44,1 KHz"
 
 #: xrc/SoundConfig.xrc:79
 msgid "22 KHz"
-msgstr ""
+msgstr "22 KHz"
 
 #: xrc/SoundConfig.xrc:80
 msgid "11 KHz"
-msgstr ""
+msgstr "11 KHz"
 
 #: xrc/SoundConfig.xrc:103
 msgid "SDL"
-msgstr ""
+msgstr "SDL"
 
 #: xrc/SoundConfig.xrc:111
 msgid "OpenAL"
-msgstr ""
+msgstr "OpenAL"
 
 #: xrc/SoundConfig.xrc:118
 msgid "DirectSound"
-msgstr ""
+msgstr "DirectSound"
 
 #: xrc/SoundConfig.xrc:125
 msgid "XAudio2"
-msgstr ""
+msgstr "XAudio2"
 
 #: xrc/SoundConfig.xrc:132
 msgid "FAudio"
-msgstr ""
+msgstr "FAudio"
 
 #: xrc/SoundConfig.xrc:146
 msgid "Device"
-msgstr ""
+msgstr "Gerät"
 
 #: xrc/SoundConfig.xrc:154
 msgid "Enable stereo upmixing"
-msgstr ""
+msgstr "Stereo aufmischen Aktivieren"
 
 #: xrc/SoundConfig.xrc:161
 msgid "Enable hardware acceleration"
-msgstr ""
+msgstr "Hardwarebeschleunigung aktivieren"
 
 #: xrc/SoundConfig.xrc:190
 msgid "Number of sound buffers:"
-msgstr ""
+msgstr "Anzahl der Sound-Puffer:"
 
 #: xrc/SoundConfig.xrc:198
 msgid "Advanced"
-msgstr ""
+msgstr "Erweitert"
 
 #: xrc/SoundConfig.xrc:230
 msgid "Lots"
-msgstr ""
+msgstr "Viele"
 
 #: xrc/SoundConfig.xrc:239
 msgid "Echo"
-msgstr ""
+msgstr "Echo"
 
 #: xrc/SoundConfig.xrc:247
 msgid "Stereo"
-msgstr ""
+msgstr "Stereo"
 
 #: xrc/SoundConfig.xrc:258
 msgid "Center"
-msgstr ""
+msgstr "Mitte"
 
 #: xrc/SoundConfig.xrc:269
 msgid "Left/Right"
-msgstr ""
+msgstr "Links/Rechts"
 
 #: xrc/SoundConfig.xrc:298
 msgid "Sound filtering"
-msgstr ""
+msgstr "Tonfilterung"
 
 #: xrc/TileViewer.xrc:4
 msgid "Tile Viewer"
@@ -4062,7 +4063,7 @@ msgstr "0x60&10000"
 
 #: xrc/SpeedupConfig.xrc:4
 msgid "SpeedUp / Turbo Settings"
-msgstr ""
+msgstr "Beschleunigung / Turbo Einstellungen"
 
 #: xrc/SpeedupConfig.xrc:9
 msgid "Speedup Throttle"
@@ -4070,7 +4071,7 @@ msgstr ""
 
 #: xrc/SpeedupConfig.xrc:50
 msgid "Frame skip"
-msgstr ""
+msgstr "Frame überspringen"
 
 #: xrc/UIConfig.xrc:4
 msgid "User Interface Settings"
