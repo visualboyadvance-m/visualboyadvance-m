@@ -22,75 +22,75 @@ msgstr ""
 
 #: wxvbam.cpp:227
 msgid "visualboyadvance-m"
-msgstr ""
+msgstr "visualboyadvance-m"
 
 #: wxvbam.cpp:448
 msgid "Could not create main window"
-msgstr ""
+msgstr "Hauptfenster konnte nicht erstellt werden"
 
 #: wxvbam.cpp:519
 msgid "Save built-in XRC file and exit"
-msgstr ""
+msgstr "Eingebaute XRC-Datei speichern und beenden"
 
 #: wxvbam.cpp:522
 msgid "Save built-in vba-over.ini and exit"
-msgstr ""
+msgstr "Eingebaute vba-over.ini speichern und beenden"
 
 #: wxvbam.cpp:525
 msgid "Print configuration path and exit"
-msgstr ""
+msgstr "Konfigurationspfad drucken und beenden"
 
 #: wxvbam.cpp:528
 msgid "Start in full-screen mode"
-msgstr ""
+msgstr "Im Vollbildmodus starten"
 
 #: wxvbam.cpp:531
 msgid "Set a configuration file"
-msgstr ""
+msgstr "Eine Konfigurationsdatei festlegen"
 
 #: wxvbam.cpp:535
 msgid "Delete shared link state first, if it exists"
-msgstr ""
+msgstr "Gemeinsamen Link-Status zuerst löschen, falls er existiert"
 
 #: wxvbam.cpp:542
 msgid "List all settable options and exit"
-msgstr ""
+msgstr "Alle einstellbaren Optionen auflisten und beenden"
 
 #: wxvbam.cpp:545
 msgid "ROM file"
-msgstr ""
+msgstr "ROM Datei"
 
 #: wxvbam.cpp:547
 msgid "<config>=<value>"
-msgstr ""
+msgstr "<config>=<value>"
 
 #: wxvbam.cpp:578
 msgid "Configuration/build error: can't find built-in xrc"
-msgstr ""
+msgstr "Konfigurations-/Build-Fehler: kann die eingebaute xrc nicht finden"
 
 #: wxvbam.cpp:586
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr ""
+msgstr "Schrieb die eingebaute Konfiguration nach %s.\nZum überschreiben, entfernen Sie alle bis auf die geänderten Hauptknoten. Der erste gefundene Hauptknoten, mit dem richtigen Namen in einer .xrc oder .xrs Datei im Suchpfad, überschreibt die eingebaute Konfiguration:"
 
 #: wxvbam.cpp:601
 msgid "Configuration is read from, in order:"
-msgstr ""
+msgstr "Die Konfiguration wird der Reihe nach ausgelesen:"
 
 #: wxvbam.cpp:615
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section.  First found section is used from search path:"
-msgstr ""
+msgstr "Integrierte Überschreibungsdatei geschrieben nach %s\nZum Überschreiben alle Abschnitte außer dem geänderten löschen. Der erste gefundene Abschnitt wird aus dem Suchpfad verwendet:"
 
 #: wxvbam.cpp:621
 msgid ""
 "\n"
 "\tbuilt-in"
-msgstr ""
+msgstr "\n\teingebaute"
 
 #: wxvbam.cpp:636
 msgid ""
@@ -98,69 +98,69 @@ msgid ""
 "\n"
 "For flag options, true and false are specified as 1 and 0, respectively.\n"
 "\n"
-msgstr ""
+msgstr "Optionen, die über die Befehlszeile gesetzt werden, werden gespeichert, wenn Konfigurationsänderungen in der Benutzeroberfläche vorgenommen werden.\n\nFür Flag-Optionen werden true und false als 1 bzw. 0 angegeben.\n\n"
 
 #: wxvbam.cpp:644
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
-msgstr ""
+msgstr "Die für die Option Tastatur/* verfügbaren Befehle sind:\n\n"
 
 #: wxvbam.cpp:655
 msgid "Configuration file not found."
-msgstr ""
+msgstr "Konfigurationsdatei nicht gefunden."
 
 #: wxvbam.cpp:688
 msgid "Bad configuration option or multiple ROM files given:\n"
-msgstr ""
+msgstr "Falsche Konfigurationsoption oder mehrere ROM-Dateien angegeben:\n"
 
 #: guiinit.cpp:84
 msgid "Start!"
-msgstr ""
+msgstr "Start!"
 
 #: guiinit.cpp:103 xrc/NetLink.xrc:99
 msgid "Connect"
-msgstr ""
+msgstr "Verbinden"
 
 #: guiinit.cpp:120
 msgid "You must enter a valid host name"
-msgstr ""
+msgstr "Sie müssen einen gültigen Hostnamen eingeben"
 
 #: guiinit.cpp:121
 msgid "Host name invalid"
-msgstr ""
+msgstr "Hostname ungültig"
 
 #: guiinit.cpp:139
 msgid "Waiting for clients..."
-msgstr ""
+msgstr "Warten auf Klienten..."
 
 #: guiinit.cpp:140
 #, c-format
 msgid "Server IP address is: %s\n"
-msgstr ""
+msgstr "Server-IP-Adresse ist: %s\n"
 
 #: guiinit.cpp:142
 msgid "Waiting for connection..."
-msgstr ""
+msgstr "Warte auf Verbindung..."
 
 #: guiinit.cpp:143
 #, c-format
 msgid "Connecting to %s\n"
-msgstr ""
+msgstr "Verbinde mit %s\n"
 
 #: guiinit.cpp:176
 msgid ""
 "Error occurred.\n"
 "Please try again."
-msgstr ""
+msgstr "Es ist ein Fehler aufgetreten.\nVersuch es noch einmal."
 
 #: guiinit.cpp:243 guiinit.cpp:296
 msgid "Select cheat file"
-msgstr ""
+msgstr "Cheat-Datei auswählen"
 
 #: guiinit.cpp:244
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
-msgstr ""
+msgstr "VBA Cheat-Liste (*.clt)|*.clt|CHT Cheat-Liste (*.cht)|*.cht"
 
 #: guiinit.cpp:263 panel.cpp:449
 msgid "Loaded cheats"
@@ -3751,23 +3751,23 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:708
 msgid "Channel &4"
-msgstr ""
+msgstr "Kanal &4"
 
 #: xrc/MainMenu.xrc:713
 msgid "Direct Sound &A"
-msgstr ""
+msgstr "Direct Sound &A"
 
 #: xrc/MainMenu.xrc:718
 msgid "Direct Sound &B"
-msgstr ""
+msgstr "Direct Sound &B"
 
 #: xrc/MainMenu.xrc:722
 msgid "&Sound Channels"
-msgstr ""
+msgstr "Tonkanäle"
 
 #: xrc/MainMenu.xrc:726
 msgid "&Help"
-msgstr ""
+msgstr "Hilfe"
 
 #: xrc/MainMenu.xrc:728
 msgid "Report &Bugs"
@@ -3775,23 +3775,23 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:731
 msgid "VBA-M Support &Forum"
-msgstr ""
+msgstr "VBA-M Support &Forum"
 
 #: xrc/MainMenu.xrc:734
 msgid "Translations"
-msgstr ""
+msgstr "Übersetzungen"
 
 #: xrc/MainMenu.xrc:742
 msgid "Check for updates"
-msgstr ""
+msgstr "Auf Updates prüfen"
 
 #: xrc/MainMenu.xrc:745
 msgid "&Factory Reset..."
-msgstr ""
+msgstr "Werkseinstellungen..."
 
 #: xrc/MainMenu.xrc:749
 msgid "&About..."
-msgstr ""
+msgstr "Über..."
 
 #: xrc/MapViewer.xrc:4
 msgid "Map Viewer"
@@ -3811,19 +3811,19 @@ msgstr ""
 
 #: xrc/MapViewer.xrc:35
 msgid "BG0"
-msgstr ""
+msgstr "BG0"
 
 #: xrc/MapViewer.xrc:41
 msgid "BG1"
-msgstr ""
+msgstr "BG1"
 
 #: xrc/MapViewer.xrc:46
 msgid "BG2"
-msgstr ""
+msgstr "BG2"
 
 #: xrc/MapViewer.xrc:51
 msgid "BG3"
-msgstr ""
+msgstr "BG3"
 
 #: xrc/MapViewer.xrc:84
 msgid "Map Base:"
@@ -3835,11 +3835,11 @@ msgstr ""
 
 #: xrc/MapViewer.xrc:100 xrc/MemSelRegion.xrc:22 xrc/OAMViewer.xrc:77
 msgid "Size:"
-msgstr ""
+msgstr "Größe:"
 
 #: xrc/MapViewer.xrc:108 xrc/OAMViewer.xrc:45
 msgid "Colors:"
-msgstr ""
+msgstr "Farben:"
 
 #: xrc/MapViewer.xrc:124
 msgid "Mosaic:"
@@ -3847,35 +3847,35 @@ msgstr "Mosaik:"
 
 #: xrc/MapViewer.xrc:132
 msgid "Overflow:"
-msgstr ""
+msgstr "Überlauf:"
 
 #: xrc/MemViewer.xrc:4
 msgid "Memory Viewer"
-msgstr ""
+msgstr "Speicher Betrachter"
 
 #: xrc/MemViewer.xrc:17
 msgid "&8-bit"
-msgstr ""
+msgstr "8-bit"
 
 #: xrc/MemViewer.xrc:25
 msgid "&16-bit"
-msgstr ""
+msgstr "16-bit"
 
 #: xrc/MemViewer.xrc:32
 msgid "&32-bit"
-msgstr ""
+msgstr "32-bit"
 
 #: xrc/MemViewer.xrc:83
 msgid "Current address:"
-msgstr ""
+msgstr "Aktuelle Adresse:"
 
 #: xrc/MemViewer.xrc:108
 msgid "&Load..."
-msgstr ""
+msgstr "Lade..."
 
 #: xrc/NetLink.xrc:4
 msgid "Start Network Link"
-msgstr ""
+msgstr "Netzwerkverbindung starten"
 
 #: xrc/NetLink.xrc:11
 msgid "Server"
