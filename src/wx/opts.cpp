@@ -6,7 +6,7 @@
 #include <wx/log.h>
 #include <wx/display.h>
 
-#include "vbam-options.h"
+#include "config/option.h"
 #include "wxvbam.h"
 #include "strutils.h"
 
@@ -115,138 +115,138 @@ const wxAcceleratorEntryUnicode default_accels[] = {
 };
 const int num_def_accels = sizeof(default_accels) / sizeof(default_accels[0]);
 
-const std::map<wxGameControl, std::set<config::UserInput>> kDefaultBindings = {
-    { wxGameControl(0, wxGameKey::Up), {
+const std::map<config::GameControl, std::set<config::UserInput>> kDefaultBindings = {
+    { config::GameControl(0, config::GameKey::Up), {
         WJKB(wxT('W')),
         WJKB(11, wxJoyControl::Button, 1),
         WJKB(1, wxJoyControl::AxisMinus, 1),
         WJKB(3, wxJoyControl::AxisMinus, 1),
     }},
-    { wxGameControl(0, wxGameKey::Down), {
+    { config::GameControl(0, config::GameKey::Down), {
         WJKB(wxT('S')),
         WJKB(12, wxJoyControl::Button, 1),
         WJKB(1, wxJoyControl::AxisPlus, 1),
         WJKB(3, wxJoyControl::AxisPlus, 1),
     }},
-    { wxGameControl(0, wxGameKey::Left), {
+    { config::GameControl(0, config::GameKey::Left), {
         WJKB(wxT('A')),
         WJKB(13, wxJoyControl::Button, 1),
         WJKB(0, wxJoyControl::AxisMinus, 1),
         WJKB(2, wxJoyControl::AxisMinus, 1),
     }},
-    { wxGameControl(0, wxGameKey::Right), {
+    { config::GameControl(0, config::GameKey::Right), {
         WJKB(wxT('D')),
         WJKB(14, wxJoyControl::Button, 1),
         WJKB(0, wxJoyControl::AxisPlus, 1),
         WJKB(2, wxJoyControl::AxisPlus, 1),
     }},
-    { wxGameControl(0, wxGameKey::A), {
+    { config::GameControl(0, config::GameKey::A), {
         WJKB(wxT('L')),
         WJKB(0, wxJoyControl::Button, 1),
     }},
-    { wxGameControl(0, wxGameKey::B), {
+    { config::GameControl(0, config::GameKey::B), {
         WJKB(wxT('K')),
         WJKB(1, wxJoyControl::Button, 1),
     }},
-    { wxGameControl(0, wxGameKey::L), {
+    { config::GameControl(0, config::GameKey::L), {
         WJKB(wxT('I')),
         WJKB(2, wxJoyControl::Button, 1),
         WJKB(9, wxJoyControl::Button, 1),
         WJKB(4, wxJoyControl::AxisPlus, 1),
     }},
-    { wxGameControl(0, wxGameKey::R), {
+    { config::GameControl(0, config::GameKey::R), {
         WJKB(wxT('O')),
         WJKB(3, wxJoyControl::Button, 1),
         WJKB(10, wxJoyControl::Button, 1),
         WJKB(5, wxJoyControl::AxisPlus, 1),
     }},
-    { wxGameControl(0, wxGameKey::Select), {
+    { config::GameControl(0, config::GameKey::Select), {
         WJKB(WXK_BACK),
         WJKB(4, wxJoyControl::Button, 1),
     }},
-    { wxGameControl(0, wxGameKey::Start), {
+    { config::GameControl(0, config::GameKey::Start), {
         WJKB(WXK_RETURN),
         WJKB(6, wxJoyControl::Button, 1),
     }},
-    { wxGameControl(0, wxGameKey::MotionUp), {}},
-    { wxGameControl(0, wxGameKey::MotionDown), {}},
-    { wxGameControl(0, wxGameKey::MotionLeft), {}},
-    { wxGameControl(0, wxGameKey::MotionRight), {}},
-    { wxGameControl(0, wxGameKey::MotionIn), {}},
-    { wxGameControl(0, wxGameKey::MotionOut), {}},
-    { wxGameControl(0, wxGameKey::AutoA), {}},
-    { wxGameControl(0, wxGameKey::AutoB), {}},
-    { wxGameControl(0, wxGameKey::Speed), {
+    { config::GameControl(0, config::GameKey::MotionUp), {}},
+    { config::GameControl(0, config::GameKey::MotionDown), {}},
+    { config::GameControl(0, config::GameKey::MotionLeft), {}},
+    { config::GameControl(0, config::GameKey::MotionRight), {}},
+    { config::GameControl(0, config::GameKey::MotionIn), {}},
+    { config::GameControl(0, config::GameKey::MotionOut), {}},
+    { config::GameControl(0, config::GameKey::AutoA), {}},
+    { config::GameControl(0, config::GameKey::AutoB), {}},
+    { config::GameControl(0, config::GameKey::Speed), {
             WJKB(WXK_SPACE),
     }},
-    { wxGameControl(0, wxGameKey::Capture), {}},
-    { wxGameControl(0, wxGameKey::Gameshark), {}},
+    { config::GameControl(0, config::GameKey::Capture), {}},
+    { config::GameControl(0, config::GameKey::Gameshark), {}},
 
-    { wxGameControl(1, wxGameKey::Up), {}},
-    { wxGameControl(1, wxGameKey::Down), {}},
-    { wxGameControl(1, wxGameKey::Left), {}},
-    { wxGameControl(1, wxGameKey::Right), {}},
-    { wxGameControl(1, wxGameKey::A), {}},
-    { wxGameControl(1, wxGameKey::B), {}},
-    { wxGameControl(1, wxGameKey::L), {}},
-    { wxGameControl(1, wxGameKey::R), {}},
-    { wxGameControl(1, wxGameKey::Select), {}},
-    { wxGameControl(1, wxGameKey::Start), {}},
-    { wxGameControl(1, wxGameKey::MotionUp), {}},
-    { wxGameControl(1, wxGameKey::MotionDown), {}},
-    { wxGameControl(1, wxGameKey::MotionLeft), {}},
-    { wxGameControl(1, wxGameKey::MotionRight), {}},
-    { wxGameControl(1, wxGameKey::MotionIn), {}},
-    { wxGameControl(1, wxGameKey::MotionOut), {}},
-    { wxGameControl(1, wxGameKey::AutoA), {}},
-    { wxGameControl(1, wxGameKey::AutoB), {}},
-    { wxGameControl(1, wxGameKey::Speed), {}},
-    { wxGameControl(1, wxGameKey::Capture), {}},
-    { wxGameControl(1, wxGameKey::Gameshark), {}},
+    { config::GameControl(1, config::GameKey::Up), {}},
+    { config::GameControl(1, config::GameKey::Down), {}},
+    { config::GameControl(1, config::GameKey::Left), {}},
+    { config::GameControl(1, config::GameKey::Right), {}},
+    { config::GameControl(1, config::GameKey::A), {}},
+    { config::GameControl(1, config::GameKey::B), {}},
+    { config::GameControl(1, config::GameKey::L), {}},
+    { config::GameControl(1, config::GameKey::R), {}},
+    { config::GameControl(1, config::GameKey::Select), {}},
+    { config::GameControl(1, config::GameKey::Start), {}},
+    { config::GameControl(1, config::GameKey::MotionUp), {}},
+    { config::GameControl(1, config::GameKey::MotionDown), {}},
+    { config::GameControl(1, config::GameKey::MotionLeft), {}},
+    { config::GameControl(1, config::GameKey::MotionRight), {}},
+    { config::GameControl(1, config::GameKey::MotionIn), {}},
+    { config::GameControl(1, config::GameKey::MotionOut), {}},
+    { config::GameControl(1, config::GameKey::AutoA), {}},
+    { config::GameControl(1, config::GameKey::AutoB), {}},
+    { config::GameControl(1, config::GameKey::Speed), {}},
+    { config::GameControl(1, config::GameKey::Capture), {}},
+    { config::GameControl(1, config::GameKey::Gameshark), {}},
 
-    { wxGameControl(2, wxGameKey::Up), {}},
-    { wxGameControl(2, wxGameKey::Down), {}},
-    { wxGameControl(2, wxGameKey::Left), {}},
-    { wxGameControl(2, wxGameKey::Right), {}},
-    { wxGameControl(2, wxGameKey::A), {}},
-    { wxGameControl(2, wxGameKey::B), {}},
-    { wxGameControl(2, wxGameKey::L), {}},
-    { wxGameControl(2, wxGameKey::R), {}},
-    { wxGameControl(2, wxGameKey::Select), {}},
-    { wxGameControl(2, wxGameKey::Start), {}},
-    { wxGameControl(2, wxGameKey::MotionUp), {}},
-    { wxGameControl(2, wxGameKey::MotionDown), {}},
-    { wxGameControl(2, wxGameKey::MotionLeft), {}},
-    { wxGameControl(2, wxGameKey::MotionRight), {}},
-    { wxGameControl(2, wxGameKey::MotionIn), {}},
-    { wxGameControl(2, wxGameKey::MotionOut), {}},
-    { wxGameControl(2, wxGameKey::AutoA), {}},
-    { wxGameControl(2, wxGameKey::AutoB), {}},
-    { wxGameControl(2, wxGameKey::Speed), {}},
-    { wxGameControl(2, wxGameKey::Capture), {}},
-    { wxGameControl(2, wxGameKey::Gameshark), {}},
+    { config::GameControl(2, config::GameKey::Up), {}},
+    { config::GameControl(2, config::GameKey::Down), {}},
+    { config::GameControl(2, config::GameKey::Left), {}},
+    { config::GameControl(2, config::GameKey::Right), {}},
+    { config::GameControl(2, config::GameKey::A), {}},
+    { config::GameControl(2, config::GameKey::B), {}},
+    { config::GameControl(2, config::GameKey::L), {}},
+    { config::GameControl(2, config::GameKey::R), {}},
+    { config::GameControl(2, config::GameKey::Select), {}},
+    { config::GameControl(2, config::GameKey::Start), {}},
+    { config::GameControl(2, config::GameKey::MotionUp), {}},
+    { config::GameControl(2, config::GameKey::MotionDown), {}},
+    { config::GameControl(2, config::GameKey::MotionLeft), {}},
+    { config::GameControl(2, config::GameKey::MotionRight), {}},
+    { config::GameControl(2, config::GameKey::MotionIn), {}},
+    { config::GameControl(2, config::GameKey::MotionOut), {}},
+    { config::GameControl(2, config::GameKey::AutoA), {}},
+    { config::GameControl(2, config::GameKey::AutoB), {}},
+    { config::GameControl(2, config::GameKey::Speed), {}},
+    { config::GameControl(2, config::GameKey::Capture), {}},
+    { config::GameControl(2, config::GameKey::Gameshark), {}},
 
-    { wxGameControl(3, wxGameKey::Up), {}},
-    { wxGameControl(3, wxGameKey::Down), {}},
-    { wxGameControl(3, wxGameKey::Left), {}},
-    { wxGameControl(3, wxGameKey::Right), {}},
-    { wxGameControl(3, wxGameKey::A), {}},
-    { wxGameControl(3, wxGameKey::B), {}},
-    { wxGameControl(3, wxGameKey::L), {}},
-    { wxGameControl(3, wxGameKey::R), {}},
-    { wxGameControl(3, wxGameKey::Select), {}},
-    { wxGameControl(3, wxGameKey::Start), {}},
-    { wxGameControl(3, wxGameKey::MotionUp), {}},
-    { wxGameControl(3, wxGameKey::MotionDown), {}},
-    { wxGameControl(3, wxGameKey::MotionLeft), {}},
-    { wxGameControl(3, wxGameKey::MotionRight), {}},
-    { wxGameControl(3, wxGameKey::MotionIn), {}},
-    { wxGameControl(3, wxGameKey::MotionOut), {}},
-    { wxGameControl(3, wxGameKey::AutoA), {}},
-    { wxGameControl(3, wxGameKey::AutoB), {}},
-    { wxGameControl(3, wxGameKey::Speed), {}},
-    { wxGameControl(3, wxGameKey::Capture), {}},
-    { wxGameControl(3, wxGameKey::Gameshark), {}},
+    { config::GameControl(3, config::GameKey::Up), {}},
+    { config::GameControl(3, config::GameKey::Down), {}},
+    { config::GameControl(3, config::GameKey::Left), {}},
+    { config::GameControl(3, config::GameKey::Right), {}},
+    { config::GameControl(3, config::GameKey::A), {}},
+    { config::GameControl(3, config::GameKey::B), {}},
+    { config::GameControl(3, config::GameKey::L), {}},
+    { config::GameControl(3, config::GameKey::R), {}},
+    { config::GameControl(3, config::GameKey::Select), {}},
+    { config::GameControl(3, config::GameKey::Start), {}},
+    { config::GameControl(3, config::GameKey::MotionUp), {}},
+    { config::GameControl(3, config::GameKey::MotionDown), {}},
+    { config::GameControl(3, config::GameKey::MotionLeft), {}},
+    { config::GameControl(3, config::GameKey::MotionRight), {}},
+    { config::GameControl(3, config::GameKey::MotionIn), {}},
+    { config::GameControl(3, config::GameKey::MotionOut), {}},
+    { config::GameControl(3, config::GameKey::AutoA), {}},
+    { config::GameControl(3, config::GameKey::AutoB), {}},
+    { config::GameControl(3, config::GameKey::Speed), {}},
+    { config::GameControl(3, config::GameKey::Capture), {}},
+    { config::GameControl(3, config::GameKey::Gameshark), {}},
 };
 
 wxAcceleratorEntry_v sys_accels;
@@ -367,7 +367,7 @@ void load_opts()
 
                 for (cont = cfg->GetFirstEntry(e, key_idx); cont;
                      cont = cfg->GetNextEntry(e, key_idx)) {
-                    if (!StringToGameKey(e)) {
+                    if (!config::StringToGameKey(e)) {
                         s.append(e);
                         //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
                         item_del.push_back(s);
@@ -403,7 +403,7 @@ void load_opts()
             } else {
                 s.append(wxT('/'));
                 s.append(e);
-                if (!VbamOption::FindOptionByName(s) && s != wxT("General/LastUpdated") && s != wxT("General/LastUpdatedFileName")) {
+                if (!config::Option::FindByName(s) && s != wxT("General/LastUpdated") && s != wxT("General/LastUpdatedFileName")) {
                     //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
                     item_del.push_back(s);
                 }
@@ -425,46 +425,46 @@ void load_opts()
     cfg->SetRecordDefaults();
 
     // First access here will also initialize translations.
-    for (const VbamOption& opt : VbamOption::AllOptions()) {
+    for (const config::Option& opt : config::Option::AllOptions()) {
         switch (opt.type()) {
-        case VbamOption::Type::kNone:
+        case config::Option::Type::kNone:
             // Keyboard or Joystick. Handled separately for now.
             break;
-        case VbamOption::Type::kBool: {
+        case config::Option::Type::kBool: {
             bool temp;
             cfg->Read(opt.config_name(), &temp, opt.GetBool());
             opt.SetBool(temp);
             break;
         }
-        case VbamOption::Type::kDouble: {
+        case config::Option::Type::kDouble: {
             double temp;
             cfg->Read(opt.config_name(), &temp, opt.GetDouble());
             opt.SetDouble(temp);
             break;
         }
-        case VbamOption::Type::kInt: {
+        case config::Option::Type::kInt: {
             int32_t temp;
             cfg->Read(opt.config_name(), &temp, opt.GetInt());
             opt.SetInt(temp);
             break;
         }
-        case VbamOption::Type::kUnsigned: {
+        case config::Option::Type::kUnsigned: {
             int temp;
             cfg->Read(opt.config_name(), &temp, opt.GetUnsigned());
             opt.SetUnsigned(temp);
             break;
         }
-        case VbamOption::Type::kString: {
+        case config::Option::Type::kString: {
             wxString temp;
             cfg->Read(opt.config_name(),  &temp, opt.GetString());
             opt.SetString(temp);
             break;
         }
-        case VbamOption::Type::kFilter:
-        case VbamOption::Type::kInterframe:
-        case VbamOption::Type::kRenderMethod:
-        case VbamOption::Type::kAudioApi:
-        case VbamOption::Type::kSoundQuality: {
+        case config::Option::Type::kFilter:
+        case config::Option::Type::kInterframe:
+        case config::Option::Type::kRenderMethod:
+        case config::Option::Type::kAudioApi:
+        case config::Option::Type::kSoundQuality: {
             wxString temp;
             if (cfg->Read(opt.config_name(), &temp) && !temp.empty()) {
                 opt.SetEnumString(temp.MakeLower());
@@ -473,7 +473,7 @@ void load_opts()
             cfg->Write(opt.config_name(), opt.GetEnumString());
             break;
         }
-        case VbamOption::Type::kGbPalette: {
+        case config::Option::Type::kGbPalette: {
             wxString temp;
             cfg->Read(opt.config_name(), &temp, opt.GetGbPaletteString());
             opt.SetGbPalette(temp);
@@ -539,34 +539,34 @@ void update_opts()
 {
     wxFileConfig* cfg = wxGetApp().cfg;
 
-    for (const VbamOption& opt : VbamOption::AllOptions()) {
+    for (const config::Option& opt : config::Option::AllOptions()) {
         switch (opt.type()) {
-        case VbamOption::Type::kNone:
+        case config::Option::Type::kNone:
             // Keyboard and Joypad are handled separately.
             break;
-        case VbamOption::Type::kBool:
+        case config::Option::Type::kBool:
             cfg->Write(opt.config_name(), opt.GetBool());
             break;
-        case VbamOption::Type::kDouble:
+        case config::Option::Type::kDouble:
             cfg->Write(opt.config_name(), opt.GetDouble());
             break;
-        case VbamOption::Type::kInt:
+        case config::Option::Type::kInt:
             cfg->Write(opt.config_name(), opt.GetInt());
             break;
-        case VbamOption::Type::kUnsigned:
+        case config::Option::Type::kUnsigned:
             cfg->Write(opt.config_name(), opt.GetUnsigned());
             break;
-        case VbamOption::Type::kString:
+        case config::Option::Type::kString:
             cfg->Write(opt.config_name(), opt.GetString());
             break;
-        case VbamOption::Type::kFilter:
-        case VbamOption::Type::kInterframe:
-        case VbamOption::Type::kRenderMethod:
-        case VbamOption::Type::kAudioApi:
-        case VbamOption::Type::kSoundQuality:
+        case config::Option::Type::kFilter:
+        case config::Option::Type::kInterframe:
+        case config::Option::Type::kRenderMethod:
+        case config::Option::Type::kAudioApi:
+        case config::Option::Type::kSoundQuality:
             cfg->Write(opt.config_name(), opt.GetEnumString());
             break;
-        case VbamOption::Type::kGbPalette:
+        case config::Option::Type::kGbPalette:
             cfg->Write(opt.config_name(), opt.GetGbPaletteString());
             break;
         }
@@ -587,7 +587,7 @@ void update_opts()
         }
     }
     if (game_bindings_changed) {
-        wxGameControlState::Instance().OnGameBindingsChanged();
+        config::GameControlState::Instance().OnGameBindingsChanged();
     }
 
     // for keyboard, first remove any commands that aren't bound at all
@@ -656,16 +656,16 @@ void update_opts()
 }
 
 void opt_set(const wxString& name, const wxString& val) {
-    VbamOption const* opt = VbamOption::FindOptionByName(name);
+    config::Option const* opt = config::Option::FindByName(name);
 
     // opt->is_none() means it is Keyboard or Joypad.
     if (opt && !opt->is_none()) {
         switch (opt->type()) {
-        case VbamOption::Type::kNone:
+        case config::Option::Type::kNone:
             // This should never happen.
             assert(false);
             return;
-        case VbamOption::Type::kBool:
+        case config::Option::Type::kBool:
             if (val != '0' && val != '1') {
                 wxLogWarning(_("Invalid value %s for option %s"),
                     name.c_str(), val.c_str());
@@ -673,7 +673,7 @@ void opt_set(const wxString& name, const wxString& val) {
             }
             opt->SetBool(val == '1');
             return;
-        case VbamOption::Type::kDouble: {
+        case config::Option::Type::kDouble: {
             double value;
             if (!val.ToDouble(&value)) {
                 wxLogWarning(_("Invalid value %s for option %s"), val, name.c_str());
@@ -682,7 +682,7 @@ void opt_set(const wxString& name, const wxString& val) {
             opt->SetDouble(value);
             return;
         }
-        case VbamOption::Type::kInt: {
+        case config::Option::Type::kInt: {
             long value;
             if (!val.ToLong(&value)) {
                 wxLogWarning(_("Invalid value %s for option %s"), val, name.c_str());
@@ -691,7 +691,7 @@ void opt_set(const wxString& name, const wxString& val) {
             opt->SetInt(static_cast<int32_t>(value));
             return;
         }
-        case VbamOption::Type::kUnsigned: {
+        case config::Option::Type::kUnsigned: {
             unsigned long value;
             if (!val.ToULong(&value)) {
                 wxLogWarning(_("Invalid value %s for option %s"), val, name.c_str());
@@ -700,17 +700,17 @@ void opt_set(const wxString& name, const wxString& val) {
             opt->SetUnsigned(static_cast<uint32_t>(value));
             return;
         }
-        case VbamOption::Type::kString:
+        case config::Option::Type::kString:
             opt->SetString(val);
             return;
-        case VbamOption::Type::kFilter:
-        case VbamOption::Type::kInterframe:
-        case VbamOption::Type::kRenderMethod:
-        case VbamOption::Type::kAudioApi:
-        case VbamOption::Type::kSoundQuality:
+        case config::Option::Type::kFilter:
+        case config::Option::Type::kInterframe:
+        case config::Option::Type::kRenderMethod:
+        case config::Option::Type::kAudioApi:
+        case config::Option::Type::kSoundQuality:
             opt->SetEnumString(val);
             return;
-        case VbamOption::Type::kGbPalette:
+        case config::Option::Type::kGbPalette:
             opt->SetGbPalette(val);
             return;
         }
@@ -754,8 +754,8 @@ void opt_set(const wxString& name, const wxString& val) {
         return;
     }
 
-    const nonstd::optional<wxGameControl> game_control =
-        wxGameControl::FromString(name);
+    const nonstd::optional<config::GameControl> game_control =
+        config::GameControl::FromString(name);
     if (game_control) {
         if (val.empty()) {
             gopts.game_control_bindings[game_control.value()].clear();

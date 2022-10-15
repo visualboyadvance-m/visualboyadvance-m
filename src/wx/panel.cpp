@@ -17,21 +17,21 @@
 #include <wx/menu.h>
 #include <SDL_joystick.h>
 
-#include "../common/version_cpp.h"
 #include "../common/Patch.h"
+#include "../common/version_cpp.h"
 #include "../gb/gbPrinter.h"
 #include "../gba/RTC.h"
 #include "../gba/agbprint.h"
 #include "../sdl/text.h"
+#include "background-input.h"
+#include "config/game-control.h"
 #include "config/user-input.h"
 #include "drawing.h"
 #include "filters.h"
-#include "wx/joyedit.h"
-#include "wx/gamecontrol.h"
-#include "wxvbam.h"
-#include "wxutil.h"
 #include "wayland.h"
-#include "background-input.h"
+#include "wx/joyedit.h"
+#include "wxutil.h"
+#include "wxvbam.h"
 
 #ifdef __WXMSW__
 #include <windows.h>
@@ -958,7 +958,7 @@ GameArea::~GameArea()
 
 void GameArea::OnKillFocus(wxFocusEvent& ev)
 {
-    wxGameControlState::Instance().Reset();
+    config::GameControlState::Instance().Reset();
     ev.Skip();
 }
 
@@ -978,7 +978,7 @@ void GameArea::Pause()
     // when the game is paused like this, we should not allow any
     // input to remain pressed, because they could be released
     // outside of the game zone and we would not know about it.
-    wxGameControlState::Instance().Reset();
+    config::GameControlState::Instance().Reset();
 
     if (loaded != IMAGE_UNKNOWN)
         soundPause();
@@ -1212,9 +1212,9 @@ void GameArea::OnIdle(wxIdleEvent& event)
 static bool process_user_input(bool down, const config::UserInput& user_input)
 {
     if (down)
-        return wxGameControlState::Instance().OnInputPressed(user_input);
+        return config::GameControlState::Instance().OnInputPressed(user_input);
     else
-        return wxGameControlState::Instance().OnInputReleased(user_input);
+        return config::GameControlState::Instance().OnInputReleased(user_input);
 }
 
 static void draw_black_background(wxWindow* win) {

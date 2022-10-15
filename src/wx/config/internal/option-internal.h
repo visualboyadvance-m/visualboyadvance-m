@@ -1,28 +1,29 @@
-#ifndef VBAM_OPTIONS_INTERNAL_INCLUDE
-#error "Do not include "vbam-options-internal.h" outside of the implementation."
+#ifndef VBAM_OPTION_INTERNAL_INCLUDE
+#error "Do not include "config/internal/option-internal.h" outside of the implementation."
 #endif
 
+#include <wx/string.h>
 #include <array>
 #include <string>
-#include <wx/string.h>
 
+#include "config/option.h"
 #include "nonstd/optional.hpp"
-#include "vbam-options.h"
 
+namespace config {
 namespace internal {
 
-struct VbamOptionData {
+struct OptionData {
     const wxString config_name;
     const wxString command;
     const wxString ux_helper;
-    const VbamOption::Type type;
+    const Option::Type type;
 };
 
 // Static data to initialize global values.
-extern const std::array<VbamOptionData, kNbOptions + 1> kAllOptionsData;
+extern const std::array<OptionData, kNbOptions + 1> kAllOptionsData;
 
 // Conversion utilities.
-nonstd::optional<VbamOptionID> StringToOptionId(const wxString& input);
+nonstd::optional<OptionID> StringToOptionId(const wxString& input);
 wxString FilterToString(int value);
 wxString InterframeToString(int value);
 wxString RenderMethodToString(int value);
@@ -34,9 +35,10 @@ int StringToRenderMethod(const wxString& config_name, const wxString& input);
 int StringToAudioApi(const wxString& config_name, const wxString& input);
 int StringToSoundQuality(const wxString& config_name, const wxString& input);
 
-wxString AllEnumValuesForType(VbamOption::Type type);
+wxString AllEnumValuesForType(Option::Type type);
 
 // Max value for enum types.
-int MaxForType(VbamOption::Type type);
+int MaxForType(Option::Type type);
 
 }  // namespace internal
+}  // namespace config

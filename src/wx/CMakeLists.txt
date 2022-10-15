@@ -736,14 +736,14 @@ set(
     opts.cpp
     sys.cpp
     panel.cpp
-    vbam-options.cpp
-    vbam-options-static.cpp
     viewsupt.cpp
     wayland.cpp
     strutils.cpp
     wxutil.cpp
+    config/game-control.cpp
+    config/internal/option-internal.cpp
+    config/option.cpp
     config/user-input.cpp
-    widgets/gamecontrol.cpp
     widgets/keyedit.cpp
     widgets/joyedit.cpp
     widgets/sdljoy.cpp
@@ -777,15 +777,15 @@ set(
     filters.h
     ioregs.h
     opts.h
-    vbam-options.h
-    vbam-options-internal.h
     viewsupt.h
     wxhead.h
     wayland.h
     wxutil.h
+    config/game-control.h
+    config/internal/option-internal.h
+    config/option.h
     config/user-input.h
     widgets/dpi-support.h
-    widgets/wx/gamecontrol.h
     widgets/wx/keyedit.h
     widgets/wx/joyedit.h
     widgets/wx/sdljoy.h

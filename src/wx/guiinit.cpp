@@ -23,11 +23,11 @@
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
 
+#include "../gba/CheatSearch.h"
+#include "config/game-control.h"
+#include "config/option.h"
 #include "config/user-input.h"
 #include "opts.h"
-#include "vbam-options.h"
-#include "wx/gamecontrol.h"
-#include "../gba/CheatSearch.h"
 
 #if defined(__WXGTK__)
 #include "wayland.h"
@@ -1673,8 +1673,8 @@ public:
         // For the individual clear buttons, we assume their name is
         // "Clear" + control_name
         // ClearUp for Up; ClearR for R etc
-        for (const wxGameKey& game_key : kAllGameKeys) {
-            const wxString control_name = GameKeyToString(game_key);
+        for (const config::GameKey& game_key : config::kAllGameKeys) {
+            const wxString control_name = config::GameKeyToString(game_key);
             wxJoyKeyTextCtrl* tc = XRCCTRL_D(*p, control_name, wxJoyKeyTextCtrl);
             wxString singleClearButton("Clear" + control_name);
             if (ev.GetId() == XRCID(singleClearButton.c_str())) {
@@ -1683,17 +1683,16 @@ public:
             }
         }
 
-        for (const wxGameKey& game_key : kAllGameKeys) {
-            wxJoyKeyTextCtrl* tc =
-                XRCCTRL_D(*p, GameKeyToString(game_key), wxJoyKeyTextCtrl);
+        for (const config::GameKey& game_key : config::kAllGameKeys) {
+            wxJoyKeyTextCtrl* tc = XRCCTRL_D(
+                *p, config::GameKeyToString(game_key), wxJoyKeyTextCtrl);
 
             if (clear) {
                 tc->SetValue(wxEmptyString);
             } else {
-                tc->SetValue(
-                    config::UserInput::SpanToString(
-                        kDefaultBindings.find(
-                            wxGameControl(0, game_key))->second));
+                tc->SetValue(config::UserInput::SpanToString(
+                    kDefaultBindings.find(config::GameControl(0, game_key))
+                        ->second));
             }
         }
     }
@@ -2977,7 +2976,8 @@ bool MainFrame::BindControls()
                     checkable_mi_t cmi = { cmdtab[i].cmd_id, mi, 0, 0 };
                     checkable_mi.push_back(cmi);
 
-                    for (const VbamOption& option : VbamOption::AllOptions()) {
+                    for (const config::Option& option :
+                         config::Option::AllOptions()) {
                         if (cmdtab[i].cmd == option.command()) {
                             if (option.is_int()) {
                                 MenuOptionIntMask(
@@ -3861,8 +3861,8 @@ bool MainFrame::BindControls()
             cb->SetValidator(wxBoolIntValidator(&gopts.default_stick, i + 1));
             wxWindow *prev = NULL, *prevp = NULL;
 
-            for (const wxGameKey& game_key : kAllGameKeys) {
-                const wxString control_name = GameKeyToString(game_key);
+            for (const config::GameKey& game_key : config::kAllGameKeys) {
+                const wxString control_name = config::GameKeyToString(game_key);
                 wxJoyKeyTextCtrl* tc = XRCCTRL_D(*w, control_name, wxJoyKeyTextCtrl);
                 CheckThrowXRCError(tc, control_name);
                 wxWindow* p = tc->GetParent();
@@ -3872,7 +3872,8 @@ bool MainFrame::BindControls()
 
                 prev = tc;
                 prevp = p;
-                tc->SetValidator(wxJoyKeyValidator(wxGameControl(i, game_key)));
+                tc->SetValidator(
+                    wxJoyKeyValidator(config::GameControl(i, game_key)));
             }
 
             JoyPadConfigHandler[i].p = w;
@@ -3882,8 +3883,8 @@ bool MainFrame::BindControls()
             w->Connect(XRCID("Clear"), wxEVT_COMMAND_BUTTON_CLICKED,
                 wxCommandEventHandler(JoyPadConfig_t::JoypadConfigButtons),
                 NULL, &JoyPadConfigHandler[i]);
-            for (const wxGameKey& game_key : kAllGameKeys) {
-                const wxString control_name = GameKeyToString(game_key);
+            for (const config::GameKey& game_key : config::kAllGameKeys) {
+                const wxString control_name = config::GameKeyToString(game_key);
                 w->Connect(XRCID(wxString("Clear" + control_name).c_str()),
                     wxEVT_COMMAND_BUTTON_CLICKED,
                     wxCommandEventHandler(JoyPadConfig_t::JoypadConfigButtons),

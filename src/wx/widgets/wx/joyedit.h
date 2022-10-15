@@ -5,7 +5,7 @@
 // The value is the symbolic name of the key pressed
 // Supports manual clearing (bs), multiple keys in widget, automatic tab on key
 
-#include "wx/gamecontrol.h"
+#include "config/game-control.h"
 #include "wx/keyedit.h"
 #include "wx/sdljoy.h"
 
@@ -41,7 +41,7 @@ protected:
 // A simple copy-only validator
 class wxJoyKeyValidator : public wxValidator {
 public:
-    wxJoyKeyValidator(const wxGameControl v)
+    wxJoyKeyValidator(const config::GameControl v)
         : wxValidator()
         , val_(v)
     {
@@ -64,7 +64,7 @@ public:
     }
 
 protected:
-    const wxGameControl val_;
+    const config::GameControl val_;
 
     DECLARE_CLASS(wxJoyKeyValidator)
 };
