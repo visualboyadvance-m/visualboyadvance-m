@@ -32,9 +32,9 @@
 #include "builtin-over.h"
 #include "config/user-input.h"
 #include "strutils.h"
-#include "vbam-options.h"
+#include "config/game-control.h"
+#include "config/option.h"
 #include "wayland.h"
-#include "wx/gamecontrol.h"
 
 #ifdef __WXMSW__
 
@@ -465,7 +465,7 @@ bool wxvbamApp::OnInit() {
 
     // Initialize game bindings here, after defaults bindings, vbam.ini bindings
     // and command line overrides have been applied.
-    wxGameControlState::Instance().OnGameBindingsChanged();
+    config::GameControlState::Instance().OnGameBindingsChanged();
 
     // create the main window
     int x = windowPositionX;
@@ -669,7 +669,7 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
                    " configuration changes are made in the user interface.\n\n"
                    "For flag options, true and false are specified as 1 and 0, respectively.\n\n"));
 
-        for (const VbamOption& opt : VbamOption::AllOptions()) {
+        for (const config::Option& opt : config::Option::AllOptions()) {
             wxPrintf("%s\n", opt.ToHelperString());
         }
 

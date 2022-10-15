@@ -1,5 +1,5 @@
-#ifndef VBAM_OPTIONS_H
-#define VBAM_OPTIONS_H
+#ifndef VBAM_WX_CONFIG_OPTIONS_H_
+#define VBAM_WX_CONFIG_OPTIONS_H_
 
 #include "nonstd/variant.hpp"
 
@@ -7,7 +7,9 @@
 
 #include <wx/string.h>
 
-enum class VbamOptionID {
+namespace config {
+
+enum class OptionID {
     // Display
     kDisplayBilinear = 0,
     kDisplayFilter,
@@ -144,23 +146,23 @@ enum class VbamOptionID {
     Last,
 };
 
-constexpr size_t kNbOptions = static_cast<size_t>(VbamOptionID::Last);
+constexpr size_t kNbOptions = static_cast<size_t>(OptionID::Last);
 
-// Represents a single option saved in the INI file. VbamOption does not own the
+// Represents a single option saved in the INI file. Option does not own the
 // individual option, but keeps a pointer to where the data is actually saved.
 //
 // Ideally, options in the UI code should only be accessed and set via this
 // class, which should also take care of updating the INI file when
-// VbamOption::Set*() is called. This should also handle keyboard and joystick
+// Option::Set*() is called. This should also handle keyboard and joystick
 // configuration so option parsing can be done in a uniform manner. If we ever
 // get to that point, we would be able to remove most update_opts() calls and
 // have individual UI elements access the option via
-// VbamOption::FindOptionByID().
+// Option::FindByID().
 //
 // The implementation for this class is largely inspired by base::Value in
 // Chromium.
 // https://source.chromium.org/chromium/chromium/src/+/main:base/values.h
-class VbamOption {
+class Option {
 public:
     enum class Type {
         kNone = 0,
@@ -177,15 +179,15 @@ public:
         kGbPalette,
     };
 
-    static std::array<VbamOption, kNbOptions>& AllOptions();
+    static std::array<Option, kNbOptions>& AllOptions();
 
     // O(log(kNbOptions))
-    static VbamOption const* FindOptionByName(const wxString& config_name);
+    static Option const* FindByName(const wxString& config_name);
 
     // O(1)
-    static VbamOption& FindOptionByID(VbamOptionID id);
+    static Option& FindByID(OptionID id);
 
-    ~VbamOption();
+    ~Option();
 
     // Accessors.
     const wxString& config_name() const { return config_name_; }
@@ -235,37 +237,38 @@ public:
 
 private:
     // Disable copy and assignment. Every individual option is unique.
-    VbamOption(const VbamOption&) = delete;
-    VbamOption& operator=(const VbamOption&) = delete;
+    Option(const Option&) = delete;
+    Option& operator=(const Option&) = delete;
 
-    VbamOption(VbamOptionID id);
-    VbamOption(VbamOptionID id, bool* option);
-    VbamOption(VbamOptionID id, double* option, double min, double max);
-    VbamOption(VbamOptionID id, int32_t* option, int32_t min, int32_t max);
-    VbamOption(VbamOptionID id, uint32_t* option, uint32_t min, uint32_t max);
-    VbamOption(VbamOptionID id, wxString* option);
-    VbamOption(VbamOptionID id, int* option);
-    VbamOption(VbamOptionID id, uint16_t* option);
+    Option(OptionID id);
+    Option(OptionID id, bool* option);
+    Option(OptionID id, double* option, double min, double max);
+    Option(OptionID id, int32_t* option, int32_t min, int32_t max);
+    Option(OptionID id, uint32_t* option, uint32_t min, uint32_t max);
+    Option(OptionID id, wxString* option);
+    Option(OptionID id, int* option);
+    Option(OptionID id, uint16_t* option);
 
-    const VbamOptionID id_;
+    const OptionID id_;
 
     const wxString config_name_;
     const wxString command_;
     const wxString ux_helper_;
 
     const Type type_;
-    const nonstd::variant<
-            nonstd::monostate,
-            bool*,
-            double*,
-            int32_t*,
-            uint32_t*,
-            wxString*,
-            uint16_t*>
+    const nonstd::variant<nonstd::monostate,
+                          bool*,
+                          double*,
+                          int32_t*,
+                          uint32_t*,
+                          wxString*,
+                          uint16_t*>
         value_;
 
     const nonstd::variant<nonstd::monostate, double, int32_t, uint32_t> min_;
     const nonstd::variant<nonstd::monostate, double, int32_t, uint32_t> max_;
 };
 
-#endif /* VBAM_OPTIONS_H */
+}  // namespace config
+
+#endif  // VBAM_WX_CONFIG_OPTIONS_H_
