@@ -76,7 +76,7 @@ int WinMain(HINSTANCE hInstance,
 
 #else  // __WXMSW__
 
-int main(int argc, char* argv) {
+int main(int argc, char** argv) {
     // Set up logging.
 #ifdef DEBUG
     wxLog::SetLogLevel(wxLOG_Trace);
