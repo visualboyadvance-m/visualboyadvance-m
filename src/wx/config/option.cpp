@@ -12,22 +12,46 @@
 namespace config {
 
 // static
-Option const* Option::FindByName(const wxString& config_name) {
+Option* Option::ByName(const wxString& config_name) {
     nonstd::optional<OptionID> option_id =
         internal::StringToOptionId(config_name);
     if (!option_id) {
         return nullptr;
     }
-    return &FindByID(option_id.value());
+    return ByID(option_id.value());
 }
 
 // static
-Option& Option::FindByID(OptionID id) {
+Option* Option::ByID(OptionID id) {
     assert(id != OptionID::Last);
-    return AllOptions()[static_cast<size_t>(id)];
+    return &All()[static_cast<size_t>(id)];
+}
+
+// static
+Filter Option::GetFilterValue() {
+    return Option::ByID(OptionID::kDisplayFilter)->GetFilter();
+}
+
+// static
+Interframe Option::GetInterframeValue() {
+    return Option::ByID(OptionID::kDisplayIFB)->GetInterframe();
+}
+
+// static
+RenderMethod Option::GetRenderMethodValue() {
+    return Option::ByID(OptionID::kDisplayRenderMethod)->GetRenderMethod();
 }
 
 Option::~Option() = default;
+
+Option::Observer::Observer(OptionID option_id)
+    : option_(Option::ByID(option_id)) {
+    assert(option_);
+    option_->AddObserver(this);
+}
+Option::Observer::~Observer() {
+    option_->RemoveObserver(this);
+}
 
 Option::Option(OptionID id)
     : id_(id),
@@ -128,6 +152,51 @@ Option::Option(OptionID id, wxString* option)
     assert(is_string());
 }
 
+Option::Option(OptionID id, Filter* option)
+    : id_(id),
+      config_name_(
+          internal::kAllOptionsData[static_cast<size_t>(id)].config_name),
+      command_(internal::kAllOptionsData[static_cast<size_t>(id)].command),
+      ux_helper_(wxGetTranslation(
+          internal::kAllOptionsData[static_cast<size_t>(id)].ux_helper)),
+      type_(internal::kAllOptionsData[static_cast<size_t>(id)].type),
+      value_(option),
+      min_(0),
+      max_(internal::MaxForType(type_)) {
+    assert(id != OptionID::Last);
+    assert(is_filter());
+}
+
+Option::Option(OptionID id, Interframe* option)
+    : id_(id),
+      config_name_(
+          internal::kAllOptionsData[static_cast<size_t>(id)].config_name),
+      command_(internal::kAllOptionsData[static_cast<size_t>(id)].command),
+      ux_helper_(wxGetTranslation(
+          internal::kAllOptionsData[static_cast<size_t>(id)].ux_helper)),
+      type_(internal::kAllOptionsData[static_cast<size_t>(id)].type),
+      value_(option),
+      min_(0),
+      max_(internal::MaxForType(type_)) {
+    assert(id != OptionID::Last);
+    assert(is_interframe());
+}
+
+Option::Option(OptionID id, RenderMethod* option)
+    : id_(id),
+      config_name_(
+          internal::kAllOptionsData[static_cast<size_t>(id)].config_name),
+      command_(internal::kAllOptionsData[static_cast<size_t>(id)].command),
+      ux_helper_(wxGetTranslation(
+          internal::kAllOptionsData[static_cast<size_t>(id)].ux_helper)),
+      type_(internal::kAllOptionsData[static_cast<size_t>(id)].type),
+      value_(option),
+      min_(0),
+      max_(internal::MaxForType(type_)) {
+    assert(id != OptionID::Last);
+    assert(is_render_method());
+}
+
 Option::Option(OptionID id, int* option)
     : id_(id),
       config_name_(
@@ -140,8 +209,7 @@ Option::Option(OptionID id, int* option)
       min_(0),
       max_(internal::MaxForType(type_)) {
     assert(id != OptionID::Last);
-    assert(is_filter() || is_interframe() || is_render_method() ||
-           is_audio_api() || is_sound_quality());
+    assert(is_audio_api() || is_sound_quality());
 
     // Validate the initial value.
     SetEnumInt(*option);
@@ -182,21 +250,34 @@ uint32_t Option::GetUnsigned() const {
     return *(nonstd::get<uint32_t*>(value_));
 }
 
-const wxString Option::GetString() const {
+const wxString& Option::GetString() const {
     assert(is_string());
     return *(nonstd::get<wxString*>(value_));
+}
+
+Filter Option::GetFilter() const {
+    assert(is_filter());
+    return *(nonstd::get<Filter*>(value_));
+}
+
+Interframe Option::GetInterframe() const {
+    assert(is_interframe());
+    return *(nonstd::get<Interframe*>(value_));
+}
+
+RenderMethod Option::GetRenderMethod() const {
+    assert(is_render_method());
+    return *(nonstd::get<RenderMethod*>(value_));
 }
 
 wxString Option::GetEnumString() const {
     switch (type_) {
         case Option::Type::kFilter:
-            return internal::FilterToString(*(nonstd::get<int32_t*>(value_)));
+            return internal::FilterToString(GetFilter());
         case Option::Type::kInterframe:
-            return internal::InterframeToString(
-                *(nonstd::get<int32_t*>(value_)));
+            return internal::InterframeToString(GetInterframe());
         case Option::Type::kRenderMethod:
-            return internal::RenderMethodToString(
-                *(nonstd::get<int32_t*>(value_)));
+            return internal::RenderMethodToString(GetRenderMethod());
         case Option::Type::kAudioApi:
             return internal::AudioApiToString(*(nonstd::get<int32_t*>(value_)));
         case Option::Type::kSoundQuality:
@@ -230,72 +311,128 @@ wxString Option::GetGbPaletteString() const {
     return palette_string;
 }
 
-void Option::SetBool(bool value) const {
+bool Option::SetBool(bool value) {
     assert(is_bool());
+    bool old_value = GetBool();
     *nonstd::get<bool*>(value_) = value;
+    if (old_value != value) {
+        CallObservers();
+    }
+    return true;
 }
 
-void Option::SetDouble(double value) const {
+bool Option::SetDouble(double value) {
     assert(is_double());
+    double old_value = GetDouble();
     if (value < nonstd::get<double>(min_) ||
         value > nonstd::get<double>(max_)) {
         wxLogWarning(
             _("Invalid value %f for option %s; valid values are %f - %f"),
             value, config_name_, nonstd::get<double>(min_),
             nonstd::get<double>(max_));
-        return;
+        return false;
     }
     *nonstd::get<double*>(value_) = value;
+    if (old_value != value) {
+        CallObservers();
+    }
+    return true;
 }
 
-void Option::SetInt(int32_t value) const {
+bool Option::SetInt(int32_t value) {
     assert(is_int());
+    int old_value = GetInt();
     if (value < nonstd::get<int32_t>(min_) ||
         value > nonstd::get<int32_t>(max_)) {
         wxLogWarning(
             _("Invalid value %d for option %s; valid values are %d - %d"),
             value, config_name_, nonstd::get<int32_t>(min_),
             nonstd::get<int32_t>(max_));
-        return;
+        return false;
     }
     *nonstd::get<int32_t*>(value_) = value;
+    if (old_value != value) {
+        CallObservers();
+    }
+    return true;
 }
 
-void Option::SetUnsigned(uint32_t value) const {
+bool Option::SetUnsigned(uint32_t value) {
     assert(is_unsigned());
+    uint32_t old_value = value;
     if (value < nonstd::get<uint32_t>(min_) ||
         value > nonstd::get<uint32_t>(max_)) {
         wxLogWarning(
             _("Invalid value %d for option %s; valid values are %d - %d"),
             value, config_name_, nonstd::get<uint32_t>(min_),
             nonstd::get<uint32_t>(max_));
-        return;
+        return false;
     }
     *nonstd::get<uint32_t*>(value_) = value;
+    if (old_value != value) {
+        CallObservers();
+    }
+    return true;
 }
 
-void Option::SetString(const wxString& value) const {
+bool Option::SetString(const wxString& value) {
     assert(is_string());
+    const wxString old_value = GetString();
     *nonstd::get<wxString*>(value_) = value;
+    if (old_value != value) {
+        CallObservers();
+    }
+    return true;
 }
 
-void Option::SetEnumString(const wxString& value) const {
+bool Option::SetFilter(const Filter& value) {
+    assert(is_filter());
+    assert(value != Filter::kLast);
+    const Filter old_value = GetFilter();
+    *nonstd::get<Filter*>(value_) = value;
+    if (old_value != value) {
+        CallObservers();
+    }
+    return true;
+}
+
+bool Option::SetInterframe(const Interframe& value) {
+    assert(is_interframe());
+    assert(value != Interframe::kLast);
+    const Interframe old_value = GetInterframe();
+    *nonstd::get<Interframe*>(value_) = value;
+    if (old_value != value) {
+        CallObservers();
+    }
+    return true;
+}
+
+bool Option::SetRenderMethod(const RenderMethod& value) {
+    assert(is_render_method());
+    assert(value != RenderMethod::kLast);
+    const RenderMethod old_value = GetRenderMethod();
+    *nonstd::get<RenderMethod*>(value_) = value;
+    if (old_value != value) {
+        CallObservers();
+    }
+    return true;
+}
+
+bool Option::SetEnumString(const wxString& value) {
     switch (type_) {
         case Option::Type::kFilter:
-            SetEnumInt(internal::StringToFilter(config_name_, value));
-            return;
+            return SetFilter(internal::StringToFilter(config_name_, value));
         case Option::Type::kInterframe:
-            SetEnumInt(internal::StringToInterframe(config_name_, value));
-            return;
+            return SetInterframe(
+                internal::StringToInterframe(config_name_, value));
         case Option::Type::kRenderMethod:
-            SetEnumInt(internal::StringToRenderMethod(config_name_, value));
-            return;
+            return SetRenderMethod(
+                internal::StringToRenderMethod(config_name_, value));
         case Option::Type::kAudioApi:
-            SetEnumInt(internal::StringToAudioApi(config_name_, value));
-            return;
+            return SetEnumInt(internal::StringToAudioApi(config_name_, value));
         case Option::Type::kSoundQuality:
-            SetEnumInt(internal::StringToSoundQuality(config_name_, value));
-            return;
+            return SetEnumInt(
+                internal::StringToSoundQuality(config_name_, value));
 
         // We don't use default here to explicitly trigger a compiler warning
         // when adding a new value.
@@ -307,24 +444,30 @@ void Option::SetEnumString(const wxString& value) const {
         case Option::Type::kString:
         case Option::Type::kGbPalette:
             assert(false);
-            return;
+            return false;
     }
+    assert(false);
+    return false;
 }
 
-void Option::SetEnumInt(int value) const {
-    assert(is_filter() || is_interframe() || is_render_method() ||
-           is_audio_api() || is_sound_quality());
+bool Option::SetEnumInt(int value) {
+    assert(is_audio_api() || is_sound_quality());
+    int32_t old_value = *nonstd::get<int32_t*>(value_);
     if (value < nonstd::get<int32_t>(min_) ||
         value > nonstd::get<int32_t>(max_)) {
         wxLogWarning(_("Invalid value %d for option %s; valid values are %s"),
                      value, config_name_,
                      internal::AllEnumValuesForType(type_));
-        return;
+        return false;
     }
     *nonstd::get<int32_t*>(value_) = value;
+    if (old_value != value) {
+        CallObservers();
+    }
+    return true;
 }
 
-void Option::SetGbPalette(const wxString& value) const {
+bool Option::SetGbPalette(const wxString& value) {
     assert(is_gb_palette());
 
     // 8 values of 4 chars and 7 commas.
@@ -332,17 +475,44 @@ void Option::SetGbPalette(const wxString& value) const {
 
     if (value.size() != kPaletteStringSize) {
         wxLogWarning(_("Invalid value %s for option %s"), value, config_name_);
-        return;
+        return false;
     }
-    uint16_t* dest = nonstd::get<uint16_t*>(value_);
 
+    uint16_t* dest = nonstd::get<uint16_t*>(value_);
+    std::array<uint16_t, 8> old_value;
+    std::copy(dest, dest + 8, old_value.data());
+
+    std::array<uint16_t, 8> new_value;
     for (size_t i = 0; i < 8; i++) {
         wxString number = value.substr(i * 5, 4);
         long temp = 0;
         if (number.ToLong(&temp, 16)) {
-            dest[i] = temp;
+            new_value[i] = temp;
         }
     }
+    std::copy(new_value.begin(), new_value.end(), dest);
+
+    if (old_value != new_value) {
+        CallObservers();
+    }
+    return true;
+}
+
+void Option::NextFilter(bool skip_filter_plugin) {
+    assert(is_filter());
+    const int old_value = static_cast<int>(GetFilter());
+    Filter new_filter = static_cast<Filter>((old_value + 1) % kNbFilters);
+    if (skip_filter_plugin && new_filter == Filter::kPlugin) {
+        new_filter = Filter::kNone;
+    }
+    SetFilter(new_filter);
+}
+
+void Option::NextInterframe() {
+    assert(is_interframe());
+    const int old_value = static_cast<int>(GetInterframe());
+    const int new_value = (old_value + 1) % kNbInterframes;
+    SetInterframe(static_cast<Interframe>(new_value));
 }
 
 wxString Option::ToHelperString() const {
@@ -384,6 +554,40 @@ wxString Option::ToHelperString() const {
     helper_string.Append("\n");
 
     return helper_string;
+}
+
+void Option::AddObserver(Observer* observer) {
+    assert(observer);
+    [[maybe_unused]] const auto pair = observers_.emplace(observer);
+    assert(pair.second);
+}
+
+void Option::RemoveObserver(Observer* observer) {
+    assert(observer);
+    [[maybe_unused]] const size_t removed = observers_.erase(observer);
+    assert(removed == 1u);
+}
+
+void Option::CallObservers() {
+    assert(!calling_observers_);
+    calling_observers_ = true;
+    for (const auto observer : observers_) {
+        observer->OnValueChanged();
+    }
+    calling_observers_ = false;
+}
+
+BasicOptionObserver::BasicOptionObserver(
+    config::OptionID option_id,
+    std::function<void(config::Option*)> callback)
+    : Option::Observer(option_id), callback_(std::move(callback)) {
+    assert(callback_);
+}
+
+BasicOptionObserver::~BasicOptionObserver() = default;
+
+void BasicOptionObserver::OnValueChanged() {
+    callback_(option());
 }
 
 }  // namespace config

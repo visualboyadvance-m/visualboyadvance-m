@@ -20,42 +20,10 @@ namespace config {
 namespace {
 
 // clang-format off
-// This enum must be kept in sync with the one in wxvbam.h
-// TODO: These 2 enums should be unified and a validator created for this enum.
-enum class FilterFunction {
-    kNone,
-    k2xsai,
-    kSuper2xsai,
-    kSupereagle,
-    kPixelate,
-    kAdvmame,
-    kBilinear,
-    kBilinearplus,
-    kScanlines,
-    kTvmode,
-    kHQ2x,
-    kLQ2x,
-    kSimple2x,
-    kSimple3x,
-    kHQ3x,
-    kSimple4x,
-    kHQ4x,
-    kXbrz2x,
-    kXbrz3x,
-    kXbrz4x,
-    kXbrz5x,
-    kXbrz6x,
-    kPlugin, // This must always be last.
-
-    // Do not add anything under here.
-    kLast,
-};
-constexpr size_t kNbFilterFunctions = static_cast<size_t>(FilterFunction::kLast);
-
-// These MUST follow the same order as the definitions of the enum above.
+// These MUST follow the same order as the definitions of the enum.
 // Adding an option without adding to this array will result in a compiler
-// error since kNbFilterFunctions is automatically updated.
-static const std::array<wxString, kNbFilterFunctions> kFilterStrings = {
+// error since kNbFilters is automatically updated.
+static const std::array<wxString, kNbFilters> kFilterStrings = {
     "none",
     "2xsai",
     "super2xsai",
@@ -81,19 +49,7 @@ static const std::array<wxString, kNbFilterFunctions> kFilterStrings = {
     "plugin",
 };
 
-// This enum must be kept in sync with the one in wxvbam.h
-// TODO: These 2 enums should be unified and a validator created for this enum.
-enum class Interframe {
-    kNone = 0,
-    kSmart,
-    kMotionBlur,
-
-    // Do not add anything under here.
-    kLast,
-};
-constexpr size_t kNbInterframes = static_cast<size_t>(Interframe::kLast);
-
-// These MUST follow the same order as the definitions of the enum above.
+// These MUST follow the same order as the definitions of the enum.
 // Adding an option without adding to this array will result in a compiler
 // error since kNbInterframes is automatically updated.
 static const std::array<wxString, kNbInterframes> kInterframeStrings = {
@@ -102,29 +58,13 @@ static const std::array<wxString, kNbInterframes> kInterframeStrings = {
     "motionblur",
 };
 
-// This enum must be kept in sync with the one in wxvbam.h
-// TODO: These 2 enums should be unified and a validator created for this enum.
-enum class RenderMethod {
-    kSimple = 0,
-    kOpenGL,
-#ifdef __WXMSW__
-    kDirect3d,
-#elif defined(__WXMAC__)
-    kQuartz2d,
-#endif
-
-    // Do not add anything under here.
-    kLast,
-};
-constexpr size_t kNbRenderMethods = static_cast<size_t>(RenderMethod::kLast);
-
-// These MUST follow the same order as the definitions of the enum above.
+// These MUST follow the same order as the definitions of the enum.
 // Adding an option without adding to this array will result in a compiler
 // error since kNbRenderMethods is automatically updated.
 static const std::array<wxString, kNbRenderMethods> kRenderMethodStrings = {
     "simple",
     "opengl",
-#ifdef __WXMSW__
+#if defined(__WXMSW__) && !defined(NO_D3D)
     "direct3d",
 #elif defined(__WXMAC__)
     "quartz2d",
@@ -201,7 +141,20 @@ wxString AllEnumValuesForArray(const std::array<wxString, SIZE>& input) {
 }  // namespace
 
 // static
-std::array<Option, kNbOptions>& Option::AllOptions() {
+std::array<Option, kNbOptions>& Option::All() {
+    struct OwnedOptions {
+        double video_scale = 3;
+        wxString filter_plugin = wxEmptyString;
+        Filter filter = Filter::kNone;
+        Interframe interframe = Interframe::kNone;
+#if defined(NO_OGL)
+        RenderMethod render_method = RenderMethod::kSimple;
+#else
+        RenderMethod render_method = RenderMethod::kOpenGL;
+#endif
+    };
+    static OwnedOptions g_owned_opts;
+
     // These MUST follow the same order as the definitions in OptionID.
     // Adding an option without adding to this array will result in a compiler
     // error since kNbOptions is automatically updated.
@@ -210,13 +163,13 @@ std::array<Option, kNbOptions>& Option::AllOptions() {
     static std::array<Option, kNbOptions> g_all_opts = {
         /// Display
         Option(OptionID::kDisplayBilinear, &gopts.bilinear),
-        Option(OptionID::kDisplayFilter, &gopts.filter),
-        Option(OptionID::kDisplayFilterPlugin, &gopts.filter_plugin),
-        Option(OptionID::kDisplayIFB, &gopts.ifb),
+        Option(OptionID::kDisplayFilter, &g_owned_opts.filter),
+        Option(OptionID::kDisplayFilterPlugin, &g_owned_opts.filter_plugin),
+        Option(OptionID::kDisplayIFB, &g_owned_opts.interframe),
         Option(OptionID::kDisplayKeepOnTop, &gopts.keep_on_top),
         Option(OptionID::kDisplayMaxThreads, &gopts.max_threads, 1, 256),
-        Option(OptionID::kDisplayRenderMethod, &gopts.render_method),
-        Option(OptionID::kDisplayScale, &gopts.video_scale, 1, 6),
+        Option(OptionID::kDisplayRenderMethod, &g_owned_opts.render_method),
+        Option(OptionID::kDisplayScale, &g_owned_opts.video_scale, 1, 6),
         Option(OptionID::kDisplayStretch, &gopts.retain_aspect),
 
         /// GB
@@ -671,19 +624,22 @@ nonstd::optional<OptionID> StringToOptionId(const wxString& input) {
     return iter->second;
 }
 
-wxString FilterToString(int value) {
-    assert(value >= 0 && static_cast<size_t>(value) < kNbFilterFunctions);
-    return kFilterStrings[value];
+wxString FilterToString(const Filter& value) {
+    const size_t size_value = static_cast<size_t>(value);
+    assert(size_value >= 0 && size_value < kNbFilters);
+    return kFilterStrings[size_value];
 }
 
-wxString InterframeToString(int value) {
-    assert(value >= 0 && static_cast<size_t>(value) < kNbInterframes);
-    return kInterframeStrings[value];
+wxString InterframeToString(const Interframe& value) {
+    const size_t size_value = static_cast<size_t>(value);
+    assert(size_value >= 0 && size_value < kNbInterframes);
+    return kInterframeStrings[size_value];
 }
 
-wxString RenderMethodToString(int value) {
-    assert(value >= 0 && static_cast<size_t>(value) < kNbRenderMethods);
-    return kRenderMethodStrings[value];
+wxString RenderMethodToString(const RenderMethod& value) {
+    const size_t size_value = static_cast<size_t>(value);
+    assert(size_value >= 0 && size_value < kNbRenderMethods);
+    return kRenderMethodStrings[size_value];
 }
 
 wxString AudioApiToString(int value) {
@@ -696,14 +652,14 @@ wxString SoundQualityToString(int value) {
     return kSoundQualityStrings[value];
 }
 
-int StringToFilter(const wxString& config_name, const wxString& input) {
-    static std::map<wxString, FilterFunction> kStringToFilter;
+Filter StringToFilter(const wxString& config_name, const wxString& input) {
+    static std::map<wxString, Filter> kStringToFilter;
     if (kStringToFilter.empty()) {
-        for (size_t i = 0; i < kNbFilterFunctions; i++) {
+        for (size_t i = 0; i < kNbFilters; i++) {
             kStringToFilter.emplace(kFilterStrings[i],
-                                    static_cast<FilterFunction>(i));
+                                    static_cast<Filter>(i));
         }
-        assert(kStringToFilter.size() == kNbFilterFunctions);
+        assert(kStringToFilter.size() == kNbFilters);
     }
 
     const auto iter = kStringToFilter.find(input);
@@ -711,12 +667,12 @@ int StringToFilter(const wxString& config_name, const wxString& input) {
         wxLogWarning(_("Invalid value %s for option %s; valid values are %s"),
                      input, config_name,
                      AllEnumValuesForType(Option::Type::kFilter));
-        return 0;
+        return Filter::kNone;
     }
-    return static_cast<int>(iter->second);
+    return iter->second;
 }
 
-int StringToInterframe(const wxString& config_name, const wxString& input) {
+Interframe StringToInterframe(const wxString& config_name, const wxString& input) {
     static std::map<wxString, Interframe> kStringToInterframe;
     if (kStringToInterframe.empty()) {
         for (size_t i = 0; i < kNbInterframes; i++) {
@@ -731,12 +687,13 @@ int StringToInterframe(const wxString& config_name, const wxString& input) {
         wxLogWarning(_("Invalid value %s for option %s; valid values are %s"),
                      input, config_name,
                      AllEnumValuesForType(Option::Type::kInterframe));
-        return 0;
+        return Interframe::kNone;
     }
-    return static_cast<int>(iter->second);
+    return iter->second;
 }
 
-int StringToRenderMethod(const wxString& config_name, const wxString& input) {
+RenderMethod StringToRenderMethod(const wxString& config_name,
+                                  const wxString& input) {
     static std::map<wxString, RenderMethod> kStringToRenderMethod;
     if (kStringToRenderMethod.empty()) {
         for (size_t i = 0; i < kNbRenderMethods; i++) {
@@ -751,9 +708,9 @@ int StringToRenderMethod(const wxString& config_name, const wxString& input) {
         wxLogWarning(_("Invalid value %s for option %s; valid values are %s"),
                      input, config_name,
                      AllEnumValuesForType(Option::Type::kRenderMethod));
-        return 0;
+        return RenderMethod::kSimple;
     }
-    return static_cast<int>(iter->second);
+    return iter->second;
 }
 
 int StringToAudioApi(const wxString& config_name, const wxString& input) {
@@ -843,7 +800,7 @@ wxString AllEnumValuesForType(Option::Type type) {
 int MaxForType(Option::Type type) {
     switch (type) {
         case Option::Type::kFilter:
-            return kNbFilterFunctions;
+            return kNbFilters;
         case Option::Type::kInterframe:
             return kNbInterframes;
         case Option::Type::kRenderMethod:

@@ -11,6 +11,7 @@
 #include <wx/propdlg.h>
 #include <wx/datetime.h>
 
+#include "config/option.h"
 #include "widgets/dpi-support.h"
 #include "wx/joyedit.h"
 #include "wx/keyedit.h"
@@ -383,9 +384,6 @@ private:
     // Load a named wxDialog from the XRC file
     wxDialog* LoadXRCropertySheetDialog(const char* name);
 
-    wxChoice* pixel_filters_       = nullptr;
-    wxChoice* interframe_blenders_ = nullptr;
-
 #include "cmdhandlers.h"
 };
 
@@ -421,63 +419,6 @@ enum showspeed {
     SS_NONE,
     SS_PERCENT,
     SS_DETAILED
-};
-
-// This enum must be kept in sync with the one in vbam-options-static.cpp.
-// TODO: These 2 enums should be unified and a validator created for this enum.
-enum filtfunc {
-    // this order must match order of option enum and selector widget
-    FF_NONE,
-    FF_2XSAI,
-    FF_SUPER2XSAI,
-    FF_SUPEREAGLE,
-    FF_PIXELATE,
-    FF_ADVMAME,
-    FF_BILINEAR,
-    FF_BILINEARPLUS,
-    FF_SCANLINES,
-    FF_TV,
-    FF_HQ2X,
-    FF_LQ2X,
-    FF_SIMPLE2X,
-    FF_SIMPLE3X,
-    FF_HQ3X,
-    FF_SIMPLE4X,
-    FF_HQ4X,
-    FF_XBRZ2X,
-    FF_XBRZ3X,
-    FF_XBRZ4X,
-    FF_XBRZ5X,
-    FF_XBRZ6X,
-    FF_PLUGIN // plugin must always be last
-};
-#define builtin_ff_scale(x)                                                \
-    ((x == FF_XBRZ6X) ? 6 : (x == FF_XBRZ5X)                               \
-                ? 5                                                        \
-                : (x == FF_XBRZ4X || x == FF_HQ4X || x == FF_SIMPLE4X)     \
-                    ? 4                                                    \
-                    : (x == FF_XBRZ3X || x == FF_HQ3X || x == FF_SIMPLE3X) \
-                        ? 3                                                \
-                        : x == FF_PLUGIN ? 0 : x == FF_NONE ? 1 : 2)
-
-// This enum must be kept in sync with the one in vbam-options-static.cpp.
-// TODO: These 2 enums should be unified and a validator created for this enum.
-enum ifbfunc {
-    IFB_NONE,
-    IFB_SMART,
-    IFB_MOTION_BLUR
-};
-
-// This enum must be kept in sync with the one in vbam-options-static.cpp.
-// TODO: These 2 enums should be unified and a validator created for this enum.
-enum renderer {
-    RND_SIMPLE,
-    RND_OPENGL,
-#if defined(__WXMSW__)
-    RND_DIRECT3D,
-#elif defined(__WXMAC__)
-    RND_QUARTZ2D,
-#endif
 };
 
 // This enum must be kept in sync with the one in vbam-options-static.cpp.
@@ -674,6 +615,17 @@ protected:
 
     DECLARE_DYNAMIC_CLASS(GameArea)
     DECLARE_EVENT_TABLE()
+
+private:
+    // Callback for Render and Interframe changed events.
+    void OnRenderingChanged(config::Option*);
+
+    // Callback for VideoScale changed events.
+    void OnScaleChanged(config::Option*);
+
+    config::BasicOptionObserver filter_observer_;
+    config::BasicOptionObserver interframe_observer_;
+    config::BasicOptionObserver scale_observer_;
 };
 
 // wxString version of OSD message
@@ -726,8 +678,8 @@ protected:
     FilterThread* threads;
     int nthreads;
     wxSemaphore filt_done;
-    wxDynamicLibrary filt_plugin;
-    const RENDER_PLUGIN_INFO* rpi; // also flag indicating plugin loaded
+    wxDynamicLibrary filter_plugin_;
+    RENDER_PLUGIN_INFO* rpi_; // also flag indicating plugin loaded
     // largest buffer required is 32-bit * (max width + 1) * (max height + 2)
     uint8_t delta[257 * 4 * 226];
 };

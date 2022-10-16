@@ -751,8 +751,11 @@ set(
     config/internal/option-internal.cpp
     config/option.cpp
     config/user-input.cpp
+    dialogs/display-config.cpp
     widgets/keyedit.cpp
     widgets/joyedit.cpp
+    widgets/option-validator.cpp
+    widgets/render-plugin.cpp
     widgets/sdljoy.cpp
     widgets/wxmisc.cpp
     # probably ought to be in common
@@ -792,7 +795,10 @@ set(
     config/internal/option-internal.h
     config/option.h
     config/user-input.h
+    dialogs/display-config.h
     widgets/dpi-support.h
+    widgets/option-validator.h
+    widgets/render-plugin.h
     widgets/wx/keyedit.h
     widgets/wx/joyedit.h
     widgets/wx/sdljoy.h

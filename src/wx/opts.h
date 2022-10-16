@@ -24,13 +24,8 @@ extern struct opts_t {
 
     /// Display
     bool bilinear;
-    int filter;
-    wxString filter_plugin;
-    int ifb;
     wxVideoMode fs_mode;
     int max_threads;
-    int render_method;
-    double video_scale;
     bool retain_aspect;
     bool keep_on_top;
 

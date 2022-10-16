@@ -24,14 +24,14 @@ extern const std::array<OptionData, kNbOptions + 1> kAllOptionsData;
 
 // Conversion utilities.
 nonstd::optional<OptionID> StringToOptionId(const wxString& input);
-wxString FilterToString(int value);
-wxString InterframeToString(int value);
-wxString RenderMethodToString(int value);
+wxString FilterToString(const Filter& value);
+wxString InterframeToString(const Interframe& value);
+wxString RenderMethodToString(const RenderMethod& value);
 wxString AudioApiToString(int value);
 wxString SoundQualityToString(int value);
-int StringToFilter(const wxString& config_name, const wxString& input);
-int StringToInterframe(const wxString& config_name, const wxString& input);
-int StringToRenderMethod(const wxString& config_name, const wxString& input);
+Filter StringToFilter(const wxString& config_name, const wxString& input);
+Interframe StringToInterframe(const wxString& config_name, const wxString& input);
+RenderMethod StringToRenderMethod(const wxString& config_name, const wxString& input);
 int StringToAudioApi(const wxString& config_name, const wxString& input);
 int StringToSoundQuality(const wxString& config_name, const wxString& input);
 

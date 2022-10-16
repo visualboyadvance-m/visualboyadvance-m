@@ -60,19 +60,6 @@ public:
 protected:
     int val, mask, *vptr;
 };
-
-class wxPositiveDoubleValidator : public wxGenericValidator {
-public:
-    wxPositiveDoubleValidator(double* _val);
-    bool TransferToWindow();
-    bool TransferFromWindow();
-    bool Validate(wxWindow* parent);
-    wxObject* Clone() const;
-protected:
-    double* double_val;
-    wxString str_val;
-};
-
 class wxUIntValidator : public wxValidator {
 public:
     wxUIntValidator(uint32_t* _val);

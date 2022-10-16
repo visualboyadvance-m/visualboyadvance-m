@@ -27,6 +27,7 @@
 #include "config/game-control.h"
 #include "config/option.h"
 #include "config/user-input.h"
+#include "dialogs/display-config.h"
 #include "opts.h"
 
 #if defined(__WXGTK__)
@@ -1777,180 +1778,6 @@ private:
     wxArrayVideoModes vm;
 };
 
-// enable plugin-related iff filter choice is plugin
-class PluginEnabler : public wxValidator {
-public:
-    PluginEnabler()
-        : wxValidator()
-    {
-    }
-    PluginEnabler(const PluginEnabler& e)
-        : wxValidator()
-    {
-        (void)e; // unused params
-    }
-    wxObject* Clone() const { return new PluginEnabler(*this); }
-    bool TransferFromWindow() { return true; }
-    bool Validate(wxWindow* p) {
-        (void)p; // unused params
-        return true;
-    }
-    bool TransferToWindow()
-    {
-        GetWindow()->Enable(gopts.filter == FF_PLUGIN);
-        return true;
-    }
-};
-
-// The same, but as an event handler
-static class PluginEnable_t : public wxEvtHandler {
-public:
-    wxWindow *lab, *ch;
-    void ToggleChoice(wxCommandEvent& ev)
-    {
-        bool en = ev.GetSelection() == FF_PLUGIN;
-        lab->Enable(en);
-        ch->Enable(en);
-    }
-} PluginEnableHandler;
-
-// fill in plugin list
-class PluginListFiller : public PluginEnabler {
-public:
-    PluginListFiller(wxDialog* parent, wxControl* lab, wxChoice* ch)
-        : PluginEnabler()
-        , dlg(parent)
-        , txt(lab)
-        , filtch(ch)
-        , plugins()
-    {
-    }
-    PluginListFiller(const PluginListFiller& e)
-        : PluginEnabler()
-        , dlg(e.dlg)
-        , txt(e.txt)
-        , filtch(e.filtch)
-        , plugins(e.plugins)
-    {
-    }
-    wxObject* Clone() const { return new PluginListFiller(*this); }
-    bool Validate(wxWindow* p) {
-        (void)p; // unused params
-        return true;
-    }
-    bool TransferToWindow()
-    {
-        PluginEnabler::TransferToWindow();
-        wxChoice* ch = wxStaticCast(GetWindow(), wxChoice);
-        ch->Clear();
-        ch->Append(_("None"));
-        plugins.clear();
-        const wxString plpath = wxGetApp().GetPluginsDir();
-        wxDir::GetAllFiles(plpath, &plugins, wxT("*.rpi"), wxDIR_FILES | wxDIR_DIRS);
-
-        for (size_t i = 0; i < plugins.size(); i++) {
-            wxDynamicLibrary dl(plugins[i], wxDL_VERBATIM | wxDL_NOW);
-            RENDPLUG_GetInfo GetInfo;
-            const RENDER_PLUGIN_INFO* rpi = NULL;
-
-            if (dl.IsLoaded() && (GetInfo = (RENDPLUG_GetInfo)dl.GetSymbol(wxT("RenderPluginGetInfo"))) &&
-                // note that in actual kega fusion plugins, rpi->Output is
-                // unused (as is rpi->Handle)
-                dl.GetSymbol(wxT("RenderPluginOutput")) && (rpi = GetInfo()) &&
-                // FIXME: maybe this should be >= RPI_VERISON
-                (rpi->Flags & 0xff) == RPI_VERSION &&
-                // RPI_565_SUPP is not supported
-                // although it would be possible
-                // and it would make Cairo more efficient
-                (rpi->Flags & (RPI_555_SUPP | RPI_888_SUPP))) {
-                wxFileName fn(plugins[i]);
-                wxString s = fn.GetName();
-                s += wxT(": ");
-                s += wxString(rpi->Name, wxConvUTF8, sizeof(rpi->Name));
-                fn.MakeRelativeTo(plpath);
-                plugins[i] = fn.GetFullPath();
-                ch->Append(s);
-
-                if (plugins[i] == gopts.filter_plugin)
-                    ch->SetSelection(i + 1);
-            }
-            else {
-                plugins.RemoveAt(i--);
-            }
-        }
-
-        if (ch->GetCount() == 1) {
-            // this is probably the only place the user can find out where
-            // to put the plugins...  it depends on where program was
-            // installed, and of course OS
-            wxString msg;
-            msg.Printf(_("No usable rpi plugins found in %s"), plpath.c_str());
-            systemScreenMessage(msg);
-            ch->Hide();
-            txt->Hide();
-            int cursel = filtch->GetSelection();
-
-            if (cursel == FF_PLUGIN)
-                cursel = 0;
-
-            if (filtch->GetCount() == FF_PLUGIN + 1) {
-                filtch->Delete(FF_PLUGIN);
-                // apparently wxgtk loses selection after this, even
-                // if selection was not FF_PLUGIN
-                filtch->SetSelection(cursel);
-            }
-        } else {
-            ch->Show();
-            txt->Show();
-
-            if (filtch->GetCount() < FF_PLUGIN + 1)
-                filtch->Append(_("Plugin"));
-        }
-
-        // FIXME: this isn't enough.  It only resizes 2nd time around
-        dlg->Fit();
-        return true;
-    }
-    bool TransferFromWindow()
-    {
-        wxChoice* ch = wxStaticCast(GetWindow(), wxChoice);
-
-        if (ch->GetCount() == 1) {
-            gopts.filter_plugin = wxEmptyString;
-
-            // this happens if "Plugin" was selected and the entry was
-            // subsequently removed
-            if (ch->GetSelection() < 0)
-                ch->SetSelection(0);
-
-            if (gopts.filter < 0)
-                gopts.filter = 0;
-        } else {
-            int n = ch->GetSelection();
-
-            if (n > 0)
-                gopts.filter_plugin = plugins[n - 1];
-            else {
-                if (filtch->GetSelection() == FF_PLUGIN) {
-                    wxMessageBox(_("Please select a plugin or a different filter"),
-                        _("Plugin selection error"), wxOK | wxICON_ERROR);
-                    return false;
-                }
-
-                gopts.filter_plugin = wxEmptyString;
-            }
-        }
-
-        return true;
-    }
-
-private:
-    wxDialog* dlg;
-    wxControl* txt;
-    wxChoice* filtch;
-    wxArrayString plugins;
-};
-
 // this is the cmd table index for the accel tree ctrl
 // one of the "benefits" of using TreeItemData is that we have to
 // malloc them all, because treectrl destructor will free them all
@@ -2976,8 +2803,7 @@ bool MainFrame::BindControls()
                     checkable_mi_t cmi = { cmdtab[i].cmd_id, mi, 0, 0 };
                     checkable_mi.push_back(cmi);
 
-                    for (const config::Option& option :
-                         config::Option::AllOptions()) {
+                    for (const config::Option& option : config::Option::All()) {
                         if (cmdtab[i].cmd == option.command()) {
                             if (option.is_int()) {
                                 MenuOptionIntMask(
@@ -3232,11 +3058,6 @@ bool MainFrame::BindControls()
     do {                                                      \
         tc = SafeXRCCTRL<wxTextCtrl>(d, n);                   \
         tc->SetValidator(wxTextValidator(wxFILTER_NONE, &o)); \
-    } while (0)
-#define getdtc(n, o)                                          \
-    do {                                                      \
-        tc = SafeXRCCTRL<wxTextCtrl>(d, n);                   \
-        tc->SetValidator(wxPositiveDoubleValidator(&o));      \
     } while (0)
 #define getutc(n, o)                                          \
     do {                                                      \
@@ -3675,73 +3496,9 @@ bool MainFrame::BindControls()
             SafeXRCCTRL<wxChoice>(d, "OvMirroring");
             d->Fit();
         }
-        d = LoadXRCropertySheetDialog("DisplayConfig");
-        {
-            /// Speed
-            // AutoSkip/FrameSkip are 2 controls for 1 value.  Needs post-process
-            // to ensure checkbox not ignored
-            getsc("FrameSkip", frameSkip);
-            getlab("FrameSkipLab");
-            int fs = frameSkip;
 
-            if (fs >= 0)
-                systemFrameSkip = fs;
+        dialogs::DisplayConfig::NewInstance(this);
 
-            /// On-Screen Display
-            ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "SpeedIndicator", wxGenericValidator(&showSpeed));
-            /// Zoom
-            getdtc("DefaultScale", gopts.video_scale);
-            // this was a choice, but I'd rather not have to make an off-by-one
-            // validator just for this, and spinctrl is good enough.
-            getsc("MaxScale", maxScale);
-            /// Basic
-            getrbi("OutputSimple", gopts.render_method, RND_SIMPLE);
-
-#if defined(__WXMAC__)
-            getrbi("OutputQuartz2D", gopts.render_method, RND_QUARTZ2D);
-#else
-            rb = SafeXRCCTRL<wxRadioButton>(d, "OutputQuartz2D");
-            rb->Hide();
-#endif
-            getrbi("OutputOpenGL", gopts.render_method, RND_OPENGL);
-#ifdef NO_OGL
-            rb->Hide();
-#endif
-#if defined(__WXGTK__) && !wxCHECK_VERSION(3, 2, 0)
-            // wxGLCanvas segfaults on Wayland before wx 3.2
-            if (wxGetApp().UsingWayland()) {
-                rb->Hide();
-            }
-#endif
-
-            // Direct3D is not implemented so hide the option on every platform.
-            rb = SafeXRCCTRL<wxRadioButton>(d, "OutputDirect3D");
-            rb->Hide();
-
-            ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "Filter", wxGenericValidator(&gopts.filter));
-
-            // Save the Filters choice control to extract the names from the XRC.
-            pixel_filters_ = ch;
-
-            // these two are filled and/or hidden at dialog load time
-            wxControl* pll;
-            wxChoice* pl;
-            pll = SafeXRCCTRL<wxControl>(d, "PluginLab");
-            pl = SafeXRCCTRL<wxChoice>(d, "Plugin");
-            pll->SetValidator(PluginEnabler());
-            pl->SetValidator(PluginListFiller(d, pll, ch));
-            PluginEnableHandler.lab = pll;
-            PluginEnableHandler.ch = pl;
-            ch->Connect(wxEVT_COMMAND_CHOICE_SELECTED,
-                wxCommandEventHandler(PluginEnable_t::ToggleChoice),
-                NULL, &PluginEnableHandler);
-            ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "IFB", wxGenericValidator(&gopts.ifb));
-            d->Fit();
-
-            // Save the interframe blender choice control to extract the names from the XRC.
-            interframe_blenders_ = ch;
-
-        }
         d = LoadXRCropertySheetDialog("SoundConfig");
         wxSlider* sl;
 #define getsl(n, o)                               \
