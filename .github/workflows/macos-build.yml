@@ -1,0 +1,23 @@
+name: macOS Latest Build
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+        with: 
+          submodules: recursive
+
+      - name: Install Dependencies
+        run: >-
+          bash installdeps
+
+      - name: Configure
+        run: >-
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+
+      - name: Build
+        run: ninja -C build
