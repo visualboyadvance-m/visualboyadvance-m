@@ -1,7 +1,8 @@
 #include "opts.h"
 
-#include <vector>
 #include <algorithm>
+#include <memory>
+#include <unordered_set>
 
 #include <wx/log.h>
 #include <wx/display.h>
@@ -18,6 +19,58 @@
      SDL:
       -p/--profile=hz
 */
+
+namespace {
+
+void SaveOption(config::Option* option) {
+    wxFileConfig* cfg = wxGetApp().cfg;
+
+    switch (option->type()) {
+        case config::Option::Type::kNone:
+            // Keyboard and Joypad are handled separately.
+            break;
+        case config::Option::Type::kBool:
+            cfg->Write(option->config_name(), option->GetBool());
+            break;
+        case config::Option::Type::kDouble:
+            cfg->Write(option->config_name(), option->GetDouble());
+            break;
+        case config::Option::Type::kInt:
+            cfg->Write(option->config_name(), option->GetInt());
+            break;
+        case config::Option::Type::kUnsigned:
+            cfg->Write(option->config_name(), option->GetUnsigned());
+            break;
+        case config::Option::Type::kString:
+            cfg->Write(option->config_name(), option->GetString());
+            break;
+        case config::Option::Type::kFilter:
+        case config::Option::Type::kInterframe:
+        case config::Option::Type::kRenderMethod:
+        case config::Option::Type::kAudioApi:
+        case config::Option::Type::kSoundQuality:
+            cfg->Write(option->config_name(), option->GetEnumString());
+            break;
+        case config::Option::Type::kGbPalette:
+            cfg->Write(option->config_name(), option->GetGbPaletteString());
+            break;
+    }
+    cfg->Flush();
+}
+
+// Intitialize global observers to overwrite the configuration option when the
+// option has been modified.
+void InitializeOptionObservers() {
+    static std::unordered_set<std::unique_ptr<config::BasicOptionObserver>>
+        g_observers;
+    g_observers.reserve(config::kNbOptions);
+    for (config::Option& option : config::Option::All()) {
+        g_observers.emplace(std::make_unique<config::BasicOptionObserver>(
+            option.id(), &SaveOption));
+    }
+}
+
+}  // namespace
 
 #define WJKB config::UserInput
 
@@ -257,11 +310,7 @@ opts_t::opts_t()
 {
     frameSkip = -1;
     audio_api = AUD_SDL;
-#ifndef NO_OGL
-    render_method = RND_OPENGL;
-#endif
 
-    video_scale = 3;
     retain_aspect = true;
     max_threads = wxThread::GetCPUCount();
 
@@ -301,12 +350,10 @@ opts_t::opts_t()
 }
 
 // FIXME: simulate MakeInstanceFilename(vbam.ini) using subkeys (Slave%d/*)
-void load_opts()
-{
+void load_opts() {
     // just for sanity...
-    bool did_init = false;
-    if (did_init)
-        return;
+    static bool did_init = false;
+    assert(!did_init);
     did_init = true;
 
     // enumvals should not be translated, since they would cause config file
@@ -403,7 +450,8 @@ void load_opts()
             } else {
                 s.append(wxT('/'));
                 s.append(e);
-                if (!config::Option::FindByName(s) && s != wxT("General/LastUpdated") && s != wxT("General/LastUpdatedFileName")) {
+                if (!config::Option::ByName(s) && s != "General/LastUpdated" &&
+                    s != "General/LastUpdatedFileName") {
                     //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
                     item_del.push_back(s);
                 }
@@ -425,7 +473,7 @@ void load_opts()
     cfg->SetRecordDefaults();
 
     // First access here will also initialize translations.
-    for (const config::Option& opt : config::Option::AllOptions()) {
+    for (config::Option& opt : config::Option::All()) {
         switch (opt.type()) {
         case config::Option::Type::kNone:
             // Keyboard or Joystick. Handled separately for now.
@@ -532,6 +580,8 @@ void load_opts()
     gopts.recent->Load(*cfg);
     cfg->SetPath(wxT("/"));
     cfg->Flush();
+
+    InitializeOptionObservers();
 }
 
 // Note: run load_opts() first to guarantee all config opts exist
@@ -539,37 +589,8 @@ void update_opts()
 {
     wxFileConfig* cfg = wxGetApp().cfg;
 
-    for (const config::Option& opt : config::Option::AllOptions()) {
-        switch (opt.type()) {
-        case config::Option::Type::kNone:
-            // Keyboard and Joypad are handled separately.
-            break;
-        case config::Option::Type::kBool:
-            cfg->Write(opt.config_name(), opt.GetBool());
-            break;
-        case config::Option::Type::kDouble:
-            cfg->Write(opt.config_name(), opt.GetDouble());
-            break;
-        case config::Option::Type::kInt:
-            cfg->Write(opt.config_name(), opt.GetInt());
-            break;
-        case config::Option::Type::kUnsigned:
-            cfg->Write(opt.config_name(), opt.GetUnsigned());
-            break;
-        case config::Option::Type::kString:
-            cfg->Write(opt.config_name(), opt.GetString());
-            break;
-        case config::Option::Type::kFilter:
-        case config::Option::Type::kInterframe:
-        case config::Option::Type::kRenderMethod:
-        case config::Option::Type::kAudioApi:
-        case config::Option::Type::kSoundQuality:
-            cfg->Write(opt.config_name(), opt.GetEnumString());
-            break;
-        case config::Option::Type::kGbPalette:
-            cfg->Write(opt.config_name(), opt.GetGbPaletteString());
-            break;
-        }
+    for (config::Option& opt : config::Option::All()) {
+        SaveOption(&opt);
     }
 
     // For joypad, compare the UserInput sets. Since UserInput guarantees a
@@ -656,7 +677,7 @@ void update_opts()
 }
 
 void opt_set(const wxString& name, const wxString& val) {
-    config::Option const* opt = config::Option::FindByName(name);
+    config::Option* opt = config::Option::ByName(name);
 
     // opt->is_none() means it is Keyboard or Joypad.
     if (opt && !opt->is_none()) {

@@ -1,5 +1,5 @@
-#include <cstdlib>
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
 #include <vector>
 
@@ -29,10 +29,12 @@
 #include "../sdl/text.h"
 #include "background-input.h"
 #include "config/game-control.h"
+#include "config/option.h"
 #include "config/user-input.h"
 #include "drawing.h"
 #include "filters.h"
 #include "wayland.h"
+#include "widgets/render-plugin.h"
 #include "wx/joyedit.h"
 #include "wxutil.h"
 #include "wxvbam.h"
@@ -41,27 +43,82 @@
 #include <windows.h>
 #endif
 
+namespace {
+
+double GetFilterScale() {
+    switch (config::Option::GetFilterValue()) {
+        case config::Filter::kNone:
+            return 1.0;
+        case config::Filter::k2xsai:
+        case config::Filter::kSuper2xsai:
+        case config::Filter::kSupereagle:
+        case config::Filter::kPixelate:
+        case config::Filter::kAdvmame:
+        case config::Filter::kBilinear:
+        case config::Filter::kBilinearplus:
+        case config::Filter::kScanlines:
+        case config::Filter::kTvmode:
+        case config::Filter::kSimple2x:
+        case config::Filter::kLQ2x:
+        case config::Filter::kHQ2x:
+        case config::Filter::kXbrz2x:
+            return 2.0;
+        case config::Filter::kXbrz3x:
+        case config::Filter::kSimple3x:
+        case config::Filter::kHQ3x:
+            return 3.0;
+        case config::Filter::kSimple4x:
+        case config::Filter::kHQ4x:
+        case config::Filter::kXbrz4x:
+            return 4.0;
+        case config::Filter::kXbrz5x:
+            return 5.0;
+        case config::Filter::kXbrz6x:
+            return 6.0;
+        case config::Filter::kPlugin:
+        case config::Filter::kLast:
+            assert(false);
+            return 1.0;
+    }
+    assert(false);
+    return 1.0;
+}
+
+#define out_16 (systemColorDepth == 16)
+
+}  // namespace
+
 int emulating;
 
 IMPLEMENT_DYNAMIC_CLASS(GameArea, wxPanel)
 
 GameArea::GameArea()
-    : wxPanel()
-    , panel(NULL)
-    , emusys(NULL)
-    , was_paused(false)
-    , rewind_time(0)
-    , do_rewind(false)
-    , rewind_mem(0)
-    , num_rewind_states(0)
-    , loaded(IMAGE_UNKNOWN)
-    , basic_width(GBAWidth)
-    , basic_height(GBAHeight)
-    , fullscreen(false)
-    , paused(false)
-    , pointer_blanked(false)
-    , mouse_active_time(0)
-{
+    : wxPanel(),
+      panel(NULL),
+      emusys(NULL),
+      was_paused(false),
+      rewind_time(0),
+      do_rewind(false),
+      rewind_mem(0),
+      num_rewind_states(0),
+      loaded(IMAGE_UNKNOWN),
+      basic_width(GBAWidth),
+      basic_height(GBAHeight),
+      fullscreen(false),
+      paused(false),
+      pointer_blanked(false),
+      mouse_active_time(0),
+      filter_observer_(config::OptionID::kDisplayFilter,
+                       std::bind(&GameArea::OnRenderingChanged,
+                                 this,
+                                 std::placeholders::_1)),
+      interframe_observer_(config::OptionID::kDisplayIFB,
+                           std::bind(&GameArea::OnRenderingChanged,
+                                     this,
+                                     std::placeholders::_1)),
+      scale_observer_(
+          config::OptionID::kDisplayScale,
+          std::bind(&GameArea::OnScaleChanged, this, std::placeholders::_1)) {
     SetSizer(new wxBoxSizer(wxVERTICAL));
     // all renderers prefer 32-bit
     // well, "simple" prefers 24-bit, but that's not available for filters
@@ -750,11 +807,13 @@ void GameArea::AdjustMinSize()
 {
     wxWindow* frame           = wxGetApp().frame;
     double dpi_scale_factor = widgets::DPIScaleFactorForWindow(this);
+    double display_scale =
+        config::Option::ByID(config::OptionID::kDisplayScale)->GetDouble();
 
     // note: could safely set min size to 1x or less regardless of video_scale
     // but setting it to scaled size makes resizing to default easier
-    wxSize sz((std::ceil(basic_width * gopts.video_scale) * dpi_scale_factor),
-              (std::ceil(basic_height * gopts.video_scale) * dpi_scale_factor));
+    wxSize sz((std::ceil(basic_width * display_scale) * dpi_scale_factor),
+              (std::ceil(basic_height * display_scale) * dpi_scale_factor));
     SetMinSize(sz);
 #if wxCHECK_VERSION(2, 8, 8)
     sz = frame->ClientToWindowSize(sz);
@@ -785,9 +844,12 @@ void GameArea::AdjustSize(bool force)
         return;
 
     double dpi_scale_factor = widgets::DPIScaleFactorForWindow(this);
+    double display_scale =
+        config::Option::ByID(config::OptionID::kDisplayScale)->GetDouble();
+
     const wxSize newsz(
-        (std::ceil(basic_width * gopts.video_scale) * dpi_scale_factor),
-        (std::ceil(basic_height * gopts.video_scale) * dpi_scale_factor));
+        (std::ceil(basic_width * display_scale) * dpi_scale_factor),
+        (std::ceil(basic_height * display_scale) * dpi_scale_factor));
 
     if (!force) {
         wxSize sz = GetClientSize();
@@ -1045,25 +1107,29 @@ void GameArea::OnIdle(wxIdleEvent& event)
         return;
 
     if (!panel) {
-        switch (gopts.render_method) {
-        case RND_SIMPLE:
-            panel = new BasicDrawingPanel(this, basic_width, basic_height);
-            break;
+        switch (config::Option::GetRenderMethodValue()) {
+            case config::RenderMethod::kSimple:
+                panel = new BasicDrawingPanel(this, basic_width, basic_height);
+                break;
 #ifdef __WXMAC__
-        case RND_QUARTZ2D:
-            panel = new Quartz2DDrawingPanel(this, basic_width, basic_height);
-            break;
+            case config::RenderMethod::kQuartz2d:
+                panel =
+                    new Quartz2DDrawingPanel(this, basic_width, basic_height);
+                break;
 #endif
 #ifndef NO_OGL
-        case RND_OPENGL:
-            panel = new GLDrawingPanel(this, basic_width, basic_height);
-            break;
+            case config::RenderMethod::kOpenGL:
+                panel = new GLDrawingPanel(this, basic_width, basic_height);
+                break;
 #endif
 #if defined(__WXMSW__) && !defined(NO_D3D)
-        case RND_DIRECT3D:
-            panel = new DXDrawingPanel(this, basic_width, basic_height);
-            break;
+            case config::RenderMethod::kDirect3d:
+                panel = new DXDrawingPanel(this, basic_width, basic_height);
+                break;
 #endif
+            case config::RenderMethod::kLast:
+                assert(false);
+                return;
         }
 
         wxWindow* w = panel->GetWindow();
@@ -1343,67 +1409,50 @@ EVT_MOUSE_EVENTS(GameArea::MouseEvent)
 END_EVENT_TABLE()
 
 DrawingPanelBase::DrawingPanelBase(int _width, int _height)
-    : width(_width)
-    , height(_height)
-    , scale(1)
-    , did_init(false)
-    , todraw(0)
-    , pixbuf1(0)
-    , pixbuf2(0)
-    , nthreads(0)
-    , rpi(0)
-{
+    : width(_width),
+      height(_height),
+      scale(1),
+      did_init(false),
+      todraw(0),
+      pixbuf1(0),
+      pixbuf2(0),
+      nthreads(0),
+      rpi_(nullptr) {
     memset(delta, 0xff, sizeof(delta));
 
-    if (gopts.filter == FF_PLUGIN) {
-        do // do { } while(0) so break; exits entire block
-        {
-            // could've also just used goto & a label, I guess
-            gopts.filter = FF_NONE; // preemptive in case of errors
-            systemColorDepth = 32;
+    if (config::Option::GetFilterValue() == config::Filter::kPlugin) {
+        rpi_ = widgets::MaybeLoadFilterPlugin(
+            config::Option::ByID(config::OptionID::kDisplayFilterPlugin)
+                ->GetString(), &filter_plugin_);
+        if (rpi_) {
+            rpi_->Flags &= ~RPI_565_SUPP;
 
-            if (gopts.filter_plugin.empty())
-                break;
-
-            wxFileName fpn(gopts.filter_plugin);
-            fpn.MakeAbsolute(wxGetApp().GetPluginsDir());
-
-            if (!filt_plugin.Load(fpn.GetFullPath(), wxDL_VERBATIM | wxDL_NOW))
-                break;
-
-            RENDPLUG_GetInfo gi = (RENDPLUG_GetInfo)filt_plugin.GetSymbol(wxT("RenderPluginGetInfo"));
-
-            if (!gi)
-                break;
-
-            // need to be able to write to _rpi to set Output() and Flags
-            RENDER_PLUGIN_INFO* _rpi = gi();
-
-            // FIXME: maybe < RPI_VERSION, assuming future vers. back compat?
-            if (!_rpi || (_rpi->Flags & 0xff) != RPI_VERSION || !(_rpi->Flags & (RPI_555_SUPP | RPI_888_SUPP)))
-                break;
-
-            _rpi->Flags &= ~RPI_565_SUPP;
-
-            if (_rpi->Flags & RPI_888_SUPP) {
-                _rpi->Flags &= ~RPI_555_SUPP;
+            if (rpi_->Flags & RPI_888_SUPP) {
+                rpi_->Flags &= ~RPI_555_SUPP;
                 // FIXME: should this be 32 or 24?  No docs or sample source
                 systemColorDepth = 32;
             } else
                 systemColorDepth = 16;
 
-            if (!_rpi->Output)
-                // note that in actual kega fusion plugins, rpi->Output is
-                // unused (as is rpi->Handle)
-                _rpi->Output = (RENDPLUG_Output)filt_plugin.GetSymbol(wxT("RenderPluginOutput"));
+            if (!rpi_->Output) {
+                // note that in actual kega fusion plugins, rpi_->Output is
+                // unused (as is rpi_->Handle)
+                rpi_->Output =
+                    (RENDPLUG_Output)filter_plugin_.GetSymbol("RenderPluginOutput");
+            }
+            scale *= (rpi_->Flags & RPI_OUT_SCLMSK) >> RPI_OUT_SCLSH;
+        } else {
+            // This is going to delete the object. Do nothing more here.
+            config::Option::ByID(config::OptionID::kDisplayFilterPlugin)
+                ->SetString(wxEmptyString);
+            config::Option::ByID(config::OptionID::kDisplayFilter)
+                ->SetFilter(config::Filter::kNone);
+            return;
+        }
+    }
 
-            scale *= (_rpi->Flags & RPI_OUT_SCLMSK) >> RPI_OUT_SCLSH;
-            rpi = _rpi;
-            gopts.filter = FF_PLUGIN; // now that there is a valid plugin
-        } while (0);
-    } else {
-        scale *= builtin_ff_scale(gopts.filter);
-#define out_16 (systemColorDepth == 16)
+    if (config::Option::GetFilterValue() != config::Filter::kPlugin) {
+        scale *= GetFilterScale();
         systemColorDepth = 32;
     }
 
@@ -1485,215 +1534,258 @@ void DrawingPanelBase::EraseBackground(wxEraseEvent& ev)
 //   interface, I will allow them to be threaded at user's discretion.
 class FilterThread : public wxThread {
 public:
-    FilterThread()
-        : wxThread(wxTHREAD_JOINABLE)
-        , lock()
-        , sig(lock)
-    {
-    }
+    FilterThread() : wxThread(wxTHREAD_JOINABLE), lock_(), sig_(lock_) {}
 
-    wxMutex lock;
-    wxCondition sig;
-    wxSemaphore* done;
+    wxMutex lock_;
+    wxCondition sig_;
+    wxSemaphore* done_;
 
     // Set these params before running
-    int nthreads, threadno;
-    int width, height;
-    double scale;
-    const RENDER_PLUGIN_INFO* rpi;
-    uint8_t *dst, *delta;
+    int nthreads_;
+    int threadno_;
+    int width_;
+    int height_;
+    double scale_;
+    const RENDER_PLUGIN_INFO* rpi_;
+    uint8_t* dst_;
+    uint8_t* delta_;
 
     // set this param every round
     // if NULL, end thread
-    uint8_t* src;
+    uint8_t* src_;
 
-    ExitCode Entry()
-    {
+    ExitCode Entry() override {
         // This is the band this thread will process
         // threadno == -1 means just do a dummy round on the border line
-        int procy = height * threadno / nthreads;
-        height = height * (threadno + 1) / nthreads - procy;
-        int inbpp = systemColorDepth >> 3;
-        int inrb = systemColorDepth == 16 ? 2 : systemColorDepth == 24 ? 0 : 1;
-        int instride = (width + inrb) * inbpp;
-        int outbpp = out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
-        int outrb = systemColorDepth == 24 ? 0 : 4;
-        int outstride = std::ceil(width * outbpp * scale) + outrb;
-        delta += instride * procy;
+        const int procy = height_ * threadno_ / nthreads_;
+        height_ = height_ * (threadno_ + 1) / nthreads_ - procy;
+        const int inbpp = systemColorDepth >> 3;
+        const int inrb = systemColorDepth == 16   ? 2
+                         : systemColorDepth == 24 ? 0
+                                                  : 1;
+        const int instride = (width_ + inrb) * inbpp;
+        const int outbpp = out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
+        const int outrb = systemColorDepth == 24 ? 0 : 4;
+        const int outstride = std::ceil(width_ * outbpp * scale_) + outrb;
+        delta_ += instride * procy;
 
         // FIXME: fugly hack
-        if(gopts.render_method == RND_OPENGL)
-            dst += (int)std::ceil(outstride * (procy + 1) * scale);
-        else
-            dst += (int)std::ceil(outstride * (procy + (1 / scale)) * scale);
+        if (config::Option::GetRenderMethodValue() ==
+            config::RenderMethod::kOpenGL) {
+            dst_ += (int)std::ceil(outstride * (procy + 1) * scale_);
+        } else {
+            dst_ += (int)std::ceil(outstride * (procy + (1 / scale_)) * scale_);
+        }
 
-        while (nthreads == 1 || sig.Wait() == wxCOND_NO_ERROR) {
-            if (!src /* && nthreads > 1 */) {
-                lock.Unlock();
+        while (nthreads_ == 1 || sig_.Wait() == wxCOND_NO_ERROR) {
+            if (!src_ /* && nthreads > 1 */) {
+                lock_.Unlock();
                 return 0;
             }
 
-            src += instride;
+            src_ += instride;
 
             // interframe blending filter
             // definitely not thread safe by default
             // added procy param to provide offset into accum buffers
-            if (gopts.ifb != IFB_NONE) {
-                switch (gopts.ifb) {
-                case IFB_SMART:
-                    if (systemColorDepth == 16)
-                        SmartIB(src, instride, width, procy, height);
-                    else
-                        SmartIB32(src, instride, width, procy, height);
+            ApplyInterframe(instride, procy);
 
-                    break;
-
-                case IFB_MOTION_BLUR:
-
-                    // FIXME: if(renderer == d3d/gl && filter == NONE) break;
-                    if (systemColorDepth == 16)
-                        MotionBlurIB(src, instride, width, procy, height);
-                    else
-                        MotionBlurIB32(src, instride, width, procy, height);
-
-                    break;
-                }
-            }
-
-            if (gopts.filter == FF_NONE) {
-                if (nthreads == 1)
+            if (config::Option::GetFilterValue() == config::Filter::kNone) {
+                if (nthreads_ == 1)
                     return 0;
 
-                done->Post();
+                done_->Post();
                 continue;
             }
 
-            //src += instride * procy;
+            // src += instride * procy;
 
-            // naturally, any of these with accumulation buffers like those of
-            // the IFB filters will screw up royally as well
-            switch (gopts.filter) {
-            case FF_2XSAI:
-                _2xSaI32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_SUPER2XSAI:
-                Super2xSaI32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_SUPEREAGLE:
-                SuperEagle32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_PIXELATE:
-                Pixelate32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_ADVMAME:
-                AdMame2x32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_BILINEAR:
-                Bilinear32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_BILINEARPLUS:
-                BilinearPlus32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_SCANLINES:
-                Scanlines32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_TV:
-                ScanlinesTV32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_LQ2X:
-                lq2x32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_SIMPLE2X:
-                Simple2x32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_SIMPLE3X:
-                Simple3x32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_SIMPLE4X:
-                Simple4x32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_HQ2X:
-                hq2x32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_HQ3X:
-                hq3x32_32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_HQ4X:
-                hq4x32_32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_XBRZ2X:
-                xbrz2x32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_XBRZ3X:
-                xbrz3x32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_XBRZ4X:
-                xbrz4x32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_XBRZ5X:
-                xbrz5x32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_XBRZ6X:
-                xbrz6x32(src, instride, delta, dst, outstride, width, height);
-                break;
-
-            case FF_PLUGIN:
-                // MFC interface did not do plugins in parallel
-                // Probably because it's almost certain they carry state or do
-                // other non-thread-safe things
-                // But the user can always turn mt off of it's not working..
-                RENDER_PLUGIN_OUTP outdesc;
-                outdesc.Size = sizeof(outdesc);
-                outdesc.Flags = rpi->Flags;
-                outdesc.SrcPtr = src;
-                outdesc.SrcPitch = instride;
-                outdesc.SrcW = width;
-                // FIXME: win32 code adds to H, saying that frame isn't fully
-                // rendered otherwise
-                // I need to verify that statement before I go adding stuff that
-                // may make it crash.
-                outdesc.SrcH = height; // + scale / 2
-                outdesc.DstPtr = dst;
-                outdesc.DstPitch = outstride;
-                outdesc.DstW = std::ceil(width * scale);
-                // on the other hand, there is at least 1 line below, so I'll add
-                // that to dest in case safety checks in plugin use < instead of <=
-                outdesc.DstH = std::ceil(height * scale); // + scale * (scale / 2)
-                rpi->Output(&outdesc);
-                break;
-
-            default:
-                break;
+            // naturally, any of these with accumulation buffers like those
+            // of the IFB filters will screw up royally as well
+            ApplyFilter(instride, outstride);
+            if (nthreads_ == 1) {
+                return 0;
             }
 
-            if (nthreads == 1)
-                return 0;
-
-            done->Post();
+            done_->Post();
             continue;
         }
 
         return 0;
+    }
+
+private:
+    // interframe blending filter
+    // definitely not thread safe by default
+    // added procy param to provide offset into accum buffers
+    void ApplyInterframe(int instride, int procy) {
+        switch (config::Option::ByID(config::OptionID::kDisplayIFB)
+                    ->GetInterframe()) {
+            case config::Interframe::kNone:
+                break;
+
+            case config::Interframe::kSmart:
+                if (systemColorDepth == 16)
+                    SmartIB(src_, instride, width_, procy, height_);
+                else
+                    SmartIB32(src_, instride, width_, procy, height_);
+                break;
+
+            case config::Interframe::kMotionBlur:
+                // FIXME: if(renderer == d3d/gl && filter == NONE) break;
+                if (systemColorDepth == 16)
+                    MotionBlurIB(src_, instride, width_, procy, height_);
+                else
+                    MotionBlurIB32(src_, instride, width_, procy, height_);
+                break;
+
+            case config::Interframe::kLast:
+                assert(false);
+                break;
+        }
+    }
+
+    // naturally, any of these with accumulation buffers like those
+    // of the IFB filters will screw up royally as well
+    void ApplyFilter(int instride, int outstride) {
+        switch (config::Option::GetFilterValue()) {
+            case config::Filter::k2xsai:
+                _2xSaI32(src_, instride, delta_, dst_, outstride, width_,
+                         height_);
+                break;
+
+            case config::Filter::kSuper2xsai:
+                Super2xSaI32(src_, instride, delta_, dst_, outstride, width_,
+                             height_);
+                break;
+
+            case config::Filter::kSupereagle:
+                SuperEagle32(src_, instride, delta_, dst_, outstride, width_,
+                             height_);
+                break;
+
+            case config::Filter::kPixelate:
+                Pixelate32(src_, instride, delta_, dst_, outstride, width_,
+                           height_);
+                break;
+
+            case config::Filter::kAdvmame:
+                AdMame2x32(src_, instride, delta_, dst_, outstride, width_,
+                           height_);
+                break;
+
+            case config::Filter::kBilinear:
+                Bilinear32(src_, instride, delta_, dst_, outstride, width_,
+                           height_);
+                break;
+
+            case config::Filter::kBilinearplus:
+                BilinearPlus32(src_, instride, delta_, dst_, outstride, width_,
+                               height_);
+                break;
+
+            case config::Filter::kScanlines:
+                Scanlines32(src_, instride, delta_, dst_, outstride, width_,
+                            height_);
+                break;
+
+            case config::Filter::kTvmode:
+                ScanlinesTV32(src_, instride, delta_, dst_, outstride, width_,
+                              height_);
+                break;
+
+            case config::Filter::kLQ2x:
+                lq2x32(src_, instride, delta_, dst_, outstride, width_,
+                       height_);
+                break;
+
+            case config::Filter::kSimple2x:
+                Simple2x32(src_, instride, delta_, dst_, outstride, width_,
+                           height_);
+                break;
+
+            case config::Filter::kSimple3x:
+                Simple3x32(src_, instride, delta_, dst_, outstride, width_,
+                           height_);
+                break;
+
+            case config::Filter::kSimple4x:
+                Simple4x32(src_, instride, delta_, dst_, outstride, width_,
+                           height_);
+                break;
+
+            case config::Filter::kHQ2x:
+                hq2x32(src_, instride, delta_, dst_, outstride, width_,
+                       height_);
+                break;
+
+            case config::Filter::kHQ3x:
+                hq3x32_32(src_, instride, delta_, dst_, outstride, width_,
+                          height_);
+                break;
+
+            case config::Filter::kHQ4x:
+                hq4x32_32(src_, instride, delta_, dst_, outstride, width_,
+                          height_);
+                break;
+
+            case config::Filter::kXbrz2x:
+                xbrz2x32(src_, instride, delta_, dst_, outstride, width_,
+                         height_);
+                break;
+
+            case config::Filter::kXbrz3x:
+                xbrz3x32(src_, instride, delta_, dst_, outstride, width_,
+                         height_);
+                break;
+
+            case config::Filter::kXbrz4x:
+                xbrz4x32(src_, instride, delta_, dst_, outstride, width_,
+                         height_);
+                break;
+
+            case config::Filter::kXbrz5x:
+                xbrz5x32(src_, instride, delta_, dst_, outstride, width_,
+                         height_);
+                break;
+
+            case config::Filter::kXbrz6x:
+                xbrz6x32(src_, instride, delta_, dst_, outstride, width_,
+                         height_);
+                break;
+
+            case config::Filter::kPlugin:
+                // MFC interface did not do plugins in parallel
+                // Probably because it's almost certain they carry state
+                // or do other non-thread-safe things But the user can
+                // always turn mt off of it's not working..
+                RENDER_PLUGIN_OUTP outdesc;
+                outdesc.Size = sizeof(outdesc);
+                outdesc.Flags = rpi_->Flags;
+                outdesc.SrcPtr = src_;
+                outdesc.SrcPitch = instride;
+                outdesc.SrcW = width_;
+                // FIXME: win32 code adds to H, saying that frame isn't
+                // fully rendered otherwise I need to verify that
+                // statement before I go adding stuff that may make it
+                // crash.
+                outdesc.SrcH = height_;  // + scale / 2
+                outdesc.DstPtr = dst_;
+                outdesc.DstPitch = outstride;
+                outdesc.DstW = std::ceil(width_ * scale_);
+                // on the other hand, there is at least 1 line below, so
+                // I'll add that to dest in case safety checks in plugin
+                // use < instead of <=
+                outdesc.DstH =
+                    std::ceil(height_ * scale_);  // + scale * (scale / 2)
+                rpi_->Output(&outdesc);
+                break;
+
+            case config::Filter::kNone:
+            case config::Filter::kLast:
+                assert(false);
+                break;
+        }
     }
 };
 
@@ -1718,7 +1810,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
         pixbuf2 = (uint8_t*)calloc(allocstride, std::ceil((alloch + 2) * scale));
     }
 
-    if (gopts.filter == FF_NONE) {
+    if (config::Option::GetFilterValue() == config::Filter::kNone) {
         todraw = *data;
         // *data is assigned below, after old buf has been processed
         pixbuf1 = pixbuf2;
@@ -1730,15 +1822,17 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     gopts.max_threads = 1;
 
     // First, apply filters, if applicable, in parallel, if enabled
-    if (gopts.filter != FF_NONE || gopts.ifb != FF_NONE /* FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur) */) {
+    // FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur)
+    if (config::Option::GetFilterValue() != config::Filter::kNone ||
+        config::Option::GetInterframeValue() != config::Interframe::kNone) {
         if (nthreads != gopts.max_threads) {
             if (nthreads) {
                 if (nthreads > 1)
                     for (int i = 0; i < nthreads; i++) {
-                        threads[i].lock.Lock();
-                        threads[i].src = NULL;
-                        threads[i].sig.Signal();
-                        threads[i].lock.Unlock();
+                        threads[i].lock_.Lock();
+                        threads[i].src_ = NULL;
+                        threads[i].sig_.Signal();
+                        threads[i].lock_.Unlock();
                         threads[i].Wait();
                     }
 
@@ -1749,51 +1843,51 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
             threads = new FilterThread[nthreads];
             // first time around, no threading in order to avoid
             // static initializer conflicts
-            threads[0].threadno = 0;
-            threads[0].nthreads = 1;
-            threads[0].width = width;
-            threads[0].height = height;
-            threads[0].scale = scale;
-            threads[0].src = *data;
-            threads[0].dst = todraw;
-            threads[0].delta = delta;
-            threads[0].rpi = rpi;
+            threads[0].threadno_ = 0;
+            threads[0].nthreads_ = 1;
+            threads[0].width_ = width;
+            threads[0].height_ = height;
+            threads[0].scale_ = scale;
+            threads[0].src_ = *data;
+            threads[0].dst_ = todraw;
+            threads[0].delta_ = delta;
+            threads[0].rpi_ = rpi_;
             threads[0].Entry();
 
             // go ahead and start the threads up, though
             if (nthreads > 1) {
                 for (int i = 0; i < nthreads; i++) {
-                    threads[i].threadno = i;
-                    threads[i].nthreads = nthreads;
-                    threads[i].width = width;
-                    threads[i].height = height;
-                    threads[i].scale = scale;
-                    threads[i].dst = todraw;
-                    threads[i].delta = delta;
-                    threads[i].rpi = rpi;
-                    threads[i].done = &filt_done;
-                    threads[i].lock.Lock();
+                    threads[i].threadno_ = i;
+                    threads[i].nthreads_ = nthreads;
+                    threads[i].width_ = width;
+                    threads[i].height_ = height;
+                    threads[i].scale_ = scale;
+                    threads[i].dst_ = todraw;
+                    threads[i].delta_ = delta;
+                    threads[i].rpi_ = rpi_;
+                    threads[i].done_ = &filt_done;
+                    threads[i].lock_.Lock();
                     threads[i].Create();
                     threads[i].Run();
                 }
             }
         } else if (nthreads == 1) {
-            threads[0].threadno = 0;
-            threads[0].nthreads = 1;
-            threads[0].width = width;
-            threads[0].height = height;
-            threads[0].scale = scale;
-            threads[0].src = *data;
-            threads[0].dst = todraw;
-            threads[0].delta = delta;
-            threads[0].rpi = rpi;
+            threads[0].threadno_ = 0;
+            threads[0].nthreads_ = 1;
+            threads[0].width_ = width;
+            threads[0].height_ = height;
+            threads[0].scale_ = scale;
+            threads[0].src_ = *data;
+            threads[0].dst_ = todraw;
+            threads[0].delta_ = delta;
+            threads[0].rpi_ = rpi_;
             threads[0].Entry();
         } else {
             for (int i = 0; i < nthreads; i++) {
-                threads[i].lock.Lock();
-                threads[i].src = *data;
-                threads[i].sig.Signal();
-                threads[i].lock.Unlock();
+                threads[i].lock_.Lock();
+                threads[i].src_ = *data;
+                threads[i].sig_.Signal();
+                threads[i].lock_.Unlock();
             }
 
             for (int i = 0; i < nthreads; i++)
@@ -1802,8 +1896,9 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     }
 
     // swap buffers now that src has been processed
-    if (gopts.filter == FF_NONE)
+    if (config::Option::GetFilterValue() == config::Filter::kNone) {
         *data = pixbuf1;
+    }
 
     // draw OSD text old-style (directly into output buffer), if needed
     // new style flickers too much, so we'll stick to this for now
@@ -1969,10 +2064,10 @@ DrawingPanelBase::~DrawingPanelBase()
     if (nthreads) {
         if (nthreads > 1)
             for (int i = 0; i < nthreads; i++) {
-                threads[i].lock.Lock();
-                threads[i].src = NULL;
-                threads[i].sig.Signal();
-                threads[i].lock.Unlock();
+                threads[i].lock_.Lock();
+                threads[i].src_ = NULL;
+                threads[i].sig_.Signal();
+                threads[i].lock_.Unlock();
                 threads[i].Wait();
             }
 
@@ -1987,10 +2082,14 @@ BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
 {
     // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
     // 16 or 32, though
-    if (gopts.filter == FF_NONE && gopts.ifb == IFB_NONE)
+    if (config::Option::GetFilterValue() == config::Filter::kNone &&
+        config::Option::GetInterframeValue() == config::Interframe::kNone) {
         // changing from 32 to 24 does not require regenerating color tables
         systemColorDepth = 32;
-    if (!did_init) DrawingPanelInit();
+    }
+    if (!did_init) {
+        DrawingPanelInit();
+    }
 }
 
 void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
@@ -2015,7 +2114,7 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
 
             src += 2; // skip rhs border
         }
-    } else if (gopts.filter != FF_NONE) {
+    } else if (config::Option::GetFilterValue() != config::Filter::kNone) {
         // scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
         uint32_t* src = (uint32_t*)todraw + (int)std::ceil(width * scale) + 1; // skip top border
@@ -2030,7 +2129,7 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
 
             ++src; // skip rhs border
         }
-    } else { // 32 bit
+    } else {  // 32 bit
         // not scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
         uint32_t* src = (uint32_t*)todraw + (int)std::ceil((width + 1) * scale); // skip top border
@@ -2537,4 +2636,15 @@ void GameArea::ShowMenuBar()
     SendSizeEvent();
     menu_bar_hidden = false;
 #endif
+}
+
+void GameArea::OnRenderingChanged(config::Option*) {
+    if (panel) {
+        panel->Destroy();
+        panel = nullptr;
+    }
+}
+
+void GameArea::OnScaleChanged(config::Option*) {
+    AdjustSize(true);
 }

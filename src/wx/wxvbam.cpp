@@ -360,8 +360,9 @@ bool wxvbamApp::OnInit() {
 
     // wxGLCanvas segfaults under wayland before wx 3.2
 #if defined(__WXGTK__) && !wxCHECK_VERSION(3, 2, 0)
-    if (UsingWayland() && gopts.render_method == RND_OPENGL) {
-        gopts.render_method = RND_SIMPLE;
+    if (UsingWayland()) {
+        config::Option::ByID(config::OptionID::kDisplayRenderMethod)
+            ->SetRenderMethod(config::RenderMethod::kSimple);
     }
 #endif
 
@@ -671,7 +672,7 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
                    " configuration changes are made in the user interface.\n\n"
                    "For flag options, true and false are specified as 1 and 0, respectively.\n\n"));
 
-        for (const config::Option& opt : config::Option::AllOptions()) {
+        for (const config::Option& opt : config::Option::All()) {
             wxPrintf("%s\n", opt.ToHelperString());
         }
 

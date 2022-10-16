@@ -11,10 +11,10 @@
 #include <wx/wfstream.h>
 #include <wx/msgdlg.h>
 
-#include "strutils.h"
 #include "../common/version_cpp.h"
 #include "../gb/gbPrinter.h"
 #include "../gba/agbprint.h"
+#include "config/option.h"
 
 #if (wxMAJOR_VERSION < 3)
 #define GetXRCDialog(n) \
@@ -2529,40 +2529,35 @@ EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
     update_opts();
 }
 
+// FIXME: These should be changed so AdjustSize() is called somewhere else.
 EVT_HANDLER(SetSize1x, "1x")
 {
-    gopts.video_scale = 1;
-    panel->AdjustSize(true);
+    config::Option::ByID(config::OptionID::kDisplayScale)->SetDouble(1);
 }
 
 EVT_HANDLER(SetSize2x, "2x")
 {
-    gopts.video_scale = 2;
-    panel->AdjustSize(true);
+    config::Option::ByID(config::OptionID::kDisplayScale)->SetDouble(2);
 }
 
 EVT_HANDLER(SetSize3x, "3x")
 {
-    gopts.video_scale = 3;
-    panel->AdjustSize(true);
+    config::Option::ByID(config::OptionID::kDisplayScale)->SetDouble(3);
 }
 
 EVT_HANDLER(SetSize4x, "4x")
 {
-    gopts.video_scale = 4;
-    panel->AdjustSize(true);
+    config::Option::ByID(config::OptionID::kDisplayScale)->SetDouble(4);
 }
 
 EVT_HANDLER(SetSize5x, "5x")
 {
-    gopts.video_scale = 5;
-    panel->AdjustSize(true);
+    config::Option::ByID(config::OptionID::kDisplayScale)->SetDouble(5);
 }
 
 EVT_HANDLER(SetSize6x, "6x")
 {
-    gopts.video_scale = 6;
-    panel->AdjustSize(true);
+    config::Option::ByID(config::OptionID::kDisplayScale)->SetDouble(6);
 }
 
 EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
@@ -2756,37 +2751,17 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
 
 EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
 {
-    int filt = gopts.filter;
-
-    if ((filt == FF_PLUGIN || ++gopts.filter == FF_PLUGIN) && gopts.filter_plugin.empty()) {
-        gopts.filter = 0;
-    }
-
-    update_opts();
-
-    if (panel->panel) {
-        panel->panel->Destroy();
-        panel->panel = nullptr;
-    }
-
-    wxString msg;
-    msg.Printf(_("Using pixel filter: %s"), pixel_filters_->GetString(gopts.filter));
-    systemScreenMessage(msg);
+    const wxString& filter_plugin =
+        config::Option::ByID(config::OptionID::kDisplayFilterPlugin)
+            ->GetString();
+    // Skip the filter plugin if it is not set.
+    config::Option::ByID(config::OptionID::kDisplayFilter)
+        ->NextFilter(filter_plugin == wxEmptyString);
 }
 
 EVT_HANDLER_MASK(ChangeIFB, "Change Interframe Blending", CMDEN_NREC_ANY)
 {
-    gopts.ifb = (gopts.ifb + 1) % 3;
-    update_opts();
-
-    if (panel->panel) {
-        panel->panel->Destroy();
-        panel->panel = nullptr;
-    }
-
-    wxString msg;
-    msg.Printf(_("Using interframe blending: %s"), interframe_blenders_->GetString(gopts.ifb));
-    systemScreenMessage(msg);
+    config::Option::ByID(config::OptionID::kDisplayIFB)->NextInterframe();
 }
 
 EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)

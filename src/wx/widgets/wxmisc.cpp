@@ -384,61 +384,6 @@ static const wxString  val_unsdigits_s[] = {
 const wxArrayString val_unsdigits(sizeof(val_unsdigits_s) / sizeof(val_unsdigits_s[0]),
     val_unsdigits_s);
 
-
-wxPositiveDoubleValidator::wxPositiveDoubleValidator(double* _val)
-    : wxGenericValidator(&str_val)
-    , double_val(_val)
-{
-    if (double_val) {
-        str_val = wxString::Format(wxT("%.1f"), *double_val);
-        TransferToWindow();
-    }
-}
-
-bool wxPositiveDoubleValidator::TransferToWindow()
-{
-    if (double_val) {
-        str_val = wxString::Format(wxT("%.1f"), *double_val);
-        return wxGenericValidator::TransferToWindow();
-    }
-    return true;
-}
-
-bool wxPositiveDoubleValidator::TransferFromWindow()
-{
-    if (wxGenericValidator::TransferFromWindow()) {
-        if (double_val) {
-            return str_val.ToDouble(double_val);
-        }
-    }
-    return false;
-}
-
-bool wxPositiveDoubleValidator::Validate(wxWindow* parent)
-{
-    if (wxGenericValidator::Validate(parent)) {
-        wxTextCtrl* ctrl = wxDynamicCast(GetWindow(), wxTextCtrl);
-
-        if (ctrl) {
-            wxString cur_txt = ctrl->GetValue();
-            double val;
-            if (cur_txt.ToDouble(&val)) {
-                return val >= 0;
-            }
-            return false;
-        }
-
-        return true;
-    }
-    return false;
-}
-
-wxObject* wxPositiveDoubleValidator::Clone() const
-{
-    return new wxPositiveDoubleValidator(double_val);
-}
-
-
 wxUIntValidator::wxUIntValidator(uint32_t* _val)
     : uint_val(_val)
 {
