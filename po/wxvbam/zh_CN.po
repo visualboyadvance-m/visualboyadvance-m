@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-06 21:07-0700\n"
+"POT-Creation-Date: 2022-10-15 15:34-0700\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020,2022\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/bgk/vba-m/language/zh_CN/)\n"
@@ -192,7 +192,7 @@ msgstr "正在移除金手指"
 msgid "GameShark"
 msgstr "GameShark"
 
-#: guiinit.cpp:758 cmdevents.cpp:675
+#: guiinit.cpp:758 cmdevents.cpp:679
 msgid "GameGenie"
 msgstr "GameGenie"
 
@@ -258,103 +258,103 @@ msgstr "%d 帧 = %.2f 毫秒"
 msgid "Default device"
 msgstr "默认设备"
 
-#: guiinit.cpp:1727
+#: guiinit.cpp:1726
 msgid "Desktop mode"
 msgstr "桌面模式"
 
-#: guiinit.cpp:1734
+#: guiinit.cpp:1733
 #, c-format
 msgid "%d x %d - %dbpp @ %dHz"
 msgstr "%d x %d - %dbpp @ %dHz"
 
-#: guiinit.cpp:1847 cmdevents.cpp:745 xrc/DisplayConfig.xrc:85
+#: guiinit.cpp:1846 cmdevents.cpp:749 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
 msgid "None"
 msgstr "无"
 
-#: guiinit.cpp:1888
+#: guiinit.cpp:1887
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "在 %s 中没有可用 rpi 插件"
 
-#: guiinit.cpp:1908 xrc/DisplayConfig.xrc:107
+#: guiinit.cpp:1907 xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "插件"
 
-#: guiinit.cpp:1936
+#: guiinit.cpp:1935
 msgid "Please select a plugin or a different filter"
 msgstr "请选择一个插件或其他滤镜"
 
-#: guiinit.cpp:1937
+#: guiinit.cpp:1936
 msgid "Plugin selection error"
 msgstr "插件选择错误"
 
-#: guiinit.cpp:2150
+#: guiinit.cpp:2149
 msgid "This will clear all user-defined accelerators.  Are you sure?"
 msgstr "将清除所有自定义加速，是否确定？"
 
-#: guiinit.cpp:2150
+#: guiinit.cpp:2149
 msgid "Confirm"
 msgstr "确定"
 
-#: guiinit.cpp:2741
+#: guiinit.cpp:2740
 msgid "Main icon not found"
 msgstr "未找到主图标"
 
-#: guiinit.cpp:2751
+#: guiinit.cpp:2750
 msgid "Browse"
 msgstr "浏览"
 
-#: guiinit.cpp:2765
+#: guiinit.cpp:2764
 msgid "Main display panel not found"
 msgstr "未找到主显示面板"
 
-#: guiinit.cpp:2942
+#: guiinit.cpp:2941
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "复写菜单加速器：%s 对应 %s 和 %s; 保持优先"
 
-#: guiinit.cpp:2956
+#: guiinit.cpp:2955
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "菜单加速器 %s 为 %s 覆盖 %s 的默认值 ; 保留菜单"
 
-#: guiinit.cpp:3097
+#: guiinit.cpp:3096
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "无效的菜单项目 %s; 正在移除"
 
-#: guiinit.cpp:3305
+#: guiinit.cpp:3304
 msgid "Code"
 msgstr "代码"
 
-#: guiinit.cpp:3314
+#: guiinit.cpp:3313
 msgid "Description"
 msgstr "描述"
 
-#: guiinit.cpp:3388 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3387 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "地址"
 
-#: guiinit.cpp:3389
+#: guiinit.cpp:3388
 msgid "Old Value"
 msgstr "旧数值"
 
-#: guiinit.cpp:3390
+#: guiinit.cpp:3389
 msgid "New Value"
 msgstr "新数值"
 
-#: guiinit.cpp:3917
+#: guiinit.cpp:3925
 msgid "Menu commands"
 msgstr "菜单命令"
 
-#: guiinit.cpp:3940
+#: guiinit.cpp:3948
 msgid "Other commands"
 msgstr "其他命令"
 
-#: guiinit.cpp:4051
+#: guiinit.cpp:4059
 msgid "JoyBus host invalid; disabling"
 msgstr "JoyBus 主机无效; 正在禁用"
 
@@ -363,7 +363,7 @@ msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr "文本文件 (*.txt;*.log)|*.txt;*.log|"
 
 #: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
-#: cmdevents.cpp:1160 cmdevents.cpp:1238 cmdevents.cpp:1308 cmdevents.cpp:1377
+#: cmdevents.cpp:1161 cmdevents.cpp:1239 cmdevents.cpp:1309 cmdevents.cpp:1378
 #: viewsupt.cpp:1180
 msgid "Select output file"
 msgstr "选择输出文件"
@@ -450,12 +450,12 @@ msgid ""
 "Table (*.act)|*.act"
 msgstr "Windows 调色板 (*.pal)|*.pal|PaintShop 调色板 (*.pal)|*.pal|Adobe 色表 (*.act)|*.act"
 
-#: gfxviewers.cpp:1601 gfxviewers.cpp:1743 cmdevents.cpp:1161
+#: gfxviewers.cpp:1601 gfxviewers.cpp:1743 cmdevents.cpp:1162
 #: viewsupt.cpp:1181
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG 图片|*.png|BMP 图片|*.bmp"
 
-#: cmdevents.cpp:107
+#: cmdevents.cpp:108
 msgid ""
 "GameBoy Advance Files "
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy"
@@ -463,369 +463,369 @@ msgid ""
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "GBA 文件\n(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GB文件\n(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:119
+#: cmdevents.cpp:120
 msgid "Open ROM file"
 msgstr "打开 ROM 文件"
 
-#: cmdevents.cpp:136
+#: cmdevents.cpp:137
 msgid ""
 "GameBoy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "GB 文件 (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:143
+#: cmdevents.cpp:144
 msgid "Open GB ROM file"
 msgstr "打开 GB ROM 文件"
 
-#: cmdevents.cpp:160
+#: cmdevents.cpp:161
 msgid ""
 "GameBoy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "GBC 文件\n(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:167
+#: cmdevents.cpp:168
 msgid "Open GBC ROM file"
 msgstr "打开 GBC ROM 文件"
 
-#: cmdevents.cpp:586 cmdevents.cpp:702 cmdevents.cpp:741 cmdevents.cpp:814
+#: cmdevents.cpp:587 cmdevents.cpp:703 cmdevents.cpp:742 cmdevents.cpp:815
 msgid "Unknown"
 msgstr "未知"
 
-#: cmdevents.cpp:594
+#: cmdevents.cpp:595
 msgid "ROM"
 msgstr "ROM"
 
-#: cmdevents.cpp:598
+#: cmdevents.cpp:599
 msgid "ROM+MBC1"
 msgstr "ROM+MBC1"
 
-#: cmdevents.cpp:602
+#: cmdevents.cpp:603
 msgid "ROM+MBC1+RAM"
 msgstr "ROM+MBC1+RAM"
 
-#: cmdevents.cpp:606
+#: cmdevents.cpp:607
 msgid "ROM+MBC1+RAM+BATT"
 msgstr "ROM+MBC1+RAM+BATT"
 
-#: cmdevents.cpp:610
+#: cmdevents.cpp:611
 msgid "ROM+MBC2"
 msgstr "ROM+MBC2"
 
-#: cmdevents.cpp:614
+#: cmdevents.cpp:615
 msgid "ROM+MBC2+BATT"
 msgstr "ROM+MBC2+BATT"
 
-#: cmdevents.cpp:618
+#: cmdevents.cpp:619
 msgid "ROM+MMM01"
 msgstr "ROM+MMM01"
 
-#: cmdevents.cpp:622
+#: cmdevents.cpp:623
 msgid "ROM+MMM01+RAM"
 msgstr "ROM+MMM01+RAM"
 
-#: cmdevents.cpp:626
+#: cmdevents.cpp:627
 msgid "ROM+MMM01+RAM+BATT"
 msgstr "ROM+MMM01+RAM+BATT"
 
-#: cmdevents.cpp:630
+#: cmdevents.cpp:631
 msgid "ROM+MBC3+TIMER+BATT"
 msgstr "ROM+MBC3+TIMER+BATT"
 
-#: cmdevents.cpp:634
+#: cmdevents.cpp:635
 msgid "ROM+MBC3+TIMER+RAM+BATT"
 msgstr "ROM+MBC3+TIMER+RAM+BATT"
 
-#: cmdevents.cpp:638
+#: cmdevents.cpp:639
 msgid "ROM+MBC3"
 msgstr "ROM+MBC3"
 
-#: cmdevents.cpp:642
+#: cmdevents.cpp:643
 msgid "ROM+MBC3+RAM"
 msgstr "ROM+MBC3+RAM"
 
-#: cmdevents.cpp:646
+#: cmdevents.cpp:647
 msgid "ROM+MBC3+RAM+BATT"
 msgstr "ROM+MBC3+RAM+BATT"
 
-#: cmdevents.cpp:650
+#: cmdevents.cpp:651
 msgid "ROM+MBC5"
 msgstr "ROM+MBC5"
 
-#: cmdevents.cpp:654
+#: cmdevents.cpp:655
 msgid "ROM+MBC5+RAM"
 msgstr "ROM+MBC5+RAM"
 
-#: cmdevents.cpp:658
+#: cmdevents.cpp:659
 msgid "ROM+MBC5+RAM+BATT"
 msgstr "ROM+MBC5+RAM+BATT"
 
-#: cmdevents.cpp:662
+#: cmdevents.cpp:663
 msgid "ROM+MBC5+RUMBLE"
 msgstr "ROM+MBC5+RUMBLE"
 
-#: cmdevents.cpp:666
+#: cmdevents.cpp:667
 msgid "ROM+MBC5+RUMBLE+RAM"
 msgstr "ROM+MBC5+RUMBLE+RAM"
 
-#: cmdevents.cpp:670
+#: cmdevents.cpp:671
 msgid "ROM+MBC5+RUMBLE+RAM+BATT"
 msgstr "ROM+MBC5+RUMBLE+RAM+BATT"
 
-#: cmdevents.cpp:674
+#: cmdevents.cpp:675
 msgid "ROM+MBC7+BATT"
 msgstr "ROM+MBC7+BATT"
 
-#: cmdevents.cpp:682
+#: cmdevents.cpp:683
 msgid "GameShark V3.0"
 msgstr "GameShark V3.0"
 
-#: cmdevents.cpp:686
+#: cmdevents.cpp:687
 msgid "ROM+POCKET CAMERA"
 msgstr "ROM+POCKET CAMERA"
 
-#: cmdevents.cpp:690
+#: cmdevents.cpp:691
 msgid "ROM+BANDAI TAMA5"
 msgstr "ROM+BANDAI TAMA5"
 
-#: cmdevents.cpp:694
+#: cmdevents.cpp:695
 msgid "ROM+HuC-3"
 msgstr "ROM+HuC-3"
 
-#: cmdevents.cpp:698
+#: cmdevents.cpp:699
 msgid "ROM+HuC-1"
 msgstr "ROM+HuC-1"
 
-#: cmdevents.cpp:850 cmdevents.cpp:872
+#: cmdevents.cpp:851 cmdevents.cpp:873
 msgid "Select Dot Code file"
 msgstr "选择点代码文件"
 
-#: cmdevents.cpp:852 cmdevents.cpp:874
+#: cmdevents.cpp:853 cmdevents.cpp:875
 msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 msgstr "电子阅读器点代码 (*.bin;*.raw)|*.bin;*.raw"
 
-#: cmdevents.cpp:893 cmdevents.cpp:1088
+#: cmdevents.cpp:894 cmdevents.cpp:1089
 msgid "Select battery file"
 msgstr "选择电池文件"
 
-#: cmdevents.cpp:894 cmdevents.cpp:1089
+#: cmdevents.cpp:895 cmdevents.cpp:1090
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "电池文件 (*.sav)|*.sav|Flash 存档(*.dat)|*.dat"
 
-#: cmdevents.cpp:902
+#: cmdevents.cpp:903
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
 msgstr "导入电池文件将删除之前保存的游戏进度 (直到下次写入前)。你确定要继续吗？"
 
-#: cmdevents.cpp:903 cmdevents.cpp:931 cmdevents.cpp:1051
+#: cmdevents.cpp:904 cmdevents.cpp:932 cmdevents.cpp:1052
 msgid "Confirm import"
 msgstr "确认导入"
 
-#: cmdevents.cpp:909 panel.cpp:392
+#: cmdevents.cpp:910 panel.cpp:392
 #, c-format
 msgid "Loaded battery %s"
 msgstr "已读取电池档 %s"
 
-#: cmdevents.cpp:911
+#: cmdevents.cpp:912
 #, c-format
 msgid "Error loading battery %s"
 msgstr "读取电池档错误 %s"
 
-#: cmdevents.cpp:920
+#: cmdevents.cpp:921
 msgid "Select code file"
 msgstr "选择代码文件"
 
-#: cmdevents.cpp:921
+#: cmdevents.cpp:922
 msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
 msgstr "Gameshark  代码文件 (*.spc;*.xpc)|*.spc;*.xpc"
 
-#: cmdevents.cpp:921
+#: cmdevents.cpp:922
 msgid "Gameshark Code File (*.gcf)|*.gcf"
 msgstr "Gameshark 代码文件 (*.gcf)|*.gcf"
 
-#: cmdevents.cpp:930
+#: cmdevents.cpp:931
 msgid ""
 "Importing a code file will replace any loaded cheats.  Do you want to "
 "continue?"
 msgstr "导入代码将会重置之前已读取的所有金手指代码。你确定要继续吗？"
 
-#: cmdevents.cpp:947
+#: cmdevents.cpp:948
 #, c-format
 msgid "Cannot open file %s"
 msgstr "无法打开文件 %s"
 
-#: cmdevents.cpp:957
+#: cmdevents.cpp:958
 #, c-format
 msgid "Unsupported code file %s"
 msgstr "不支持的代码文件 %s"
 
-#: cmdevents.cpp:1027
+#: cmdevents.cpp:1028
 #, c-format
 msgid "Loaded code file %s"
 msgstr "已读取的代码文件 %s"
 
-#: cmdevents.cpp:1029
+#: cmdevents.cpp:1030
 #, c-format
 msgid "Error loading code file %s"
 msgstr "读取代码文件错误 %s"
 
-#: cmdevents.cpp:1040 cmdevents.cpp:1116
+#: cmdevents.cpp:1041 cmdevents.cpp:1117
 msgid "Select snapshot file"
 msgstr "选择快照文件"
 
-#: cmdevents.cpp:1041
+#: cmdevents.cpp:1042
 msgid ""
 "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots "
 "(*.gsv)|*.gsv"
 msgstr "GS & PAC 快照 (*.sps;*.xps)|*.sps;*.xps|GameShark SP 快照 (*.gsv)|*.gsv"
 
-#: cmdevents.cpp:1041
+#: cmdevents.cpp:1042
 msgid "Gameboy Snapshot (*.gbs)|*.gbs"
 msgstr "Gameboy 快照 (*.gbs)|*.gbs"
 
-#: cmdevents.cpp:1050
+#: cmdevents.cpp:1051
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write).  Do you want to continue?"
 msgstr "导入快照将删除之前保存的游戏进度 (直到下次保存前)。你确定要继续吗？ "
 
-#: cmdevents.cpp:1075
+#: cmdevents.cpp:1076
 #, c-format
 msgid "Loaded snapshot file %s"
 msgstr "已读取的快照文件 %s"
 
-#: cmdevents.cpp:1077
+#: cmdevents.cpp:1078
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr "快照文件读取错误 %s"
 
-#: cmdevents.cpp:1100
+#: cmdevents.cpp:1101
 #, c-format
 msgid "Wrote battery %s"
 msgstr "已写入电池档 %s"
 
-#: cmdevents.cpp:1102 panel.cpp:701
+#: cmdevents.cpp:1103 panel.cpp:701
 #, c-format
 msgid "Error writing battery %s"
 msgstr "写入电池档错误 %s"
 
-#: cmdevents.cpp:1110
+#: cmdevents.cpp:1111
 msgid "EEPROM saves cannot be exported"
 msgstr "EEPROM 存档无法导出"
 
-#: cmdevents.cpp:1117
+#: cmdevents.cpp:1118
 msgid "Gameshark Snapshot (*.sps)|*.sps"
 msgstr "Gameshark 快照 (*.sps)|*.sps"
 
-#: cmdevents.cpp:1131
+#: cmdevents.cpp:1132
 msgid "Exported from VisualBoyAdvance-M"
 msgstr "从 VBA-M 导出"
 
-#: cmdevents.cpp:1143
+#: cmdevents.cpp:1144
 #, c-format
 msgid "Saved snapshot file %s"
 msgstr "保存快照文件 %s "
 
-#: cmdevents.cpp:1145
+#: cmdevents.cpp:1146
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr "保存快照文件错误 %s"
 
-#: cmdevents.cpp:1185 sys.cpp:557
+#: cmdevents.cpp:1186 sys.cpp:557
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "写入快照 %s"
 
-#: cmdevents.cpp:1206 cmdevents.cpp:1276 cmdevents.cpp:1347 cmdevents.cpp:1411
+#: cmdevents.cpp:1207 cmdevents.cpp:1277 cmdevents.cpp:1348 cmdevents.cpp:1412
 msgid " files ("
 msgstr "文件 ("
 
-#: cmdevents.cpp:1442
+#: cmdevents.cpp:1443
 msgid "Select file"
 msgstr "选择文件"
 
-#: cmdevents.cpp:1759 cmdevents.cpp:1852
+#: cmdevents.cpp:1760 cmdevents.cpp:1853
 msgid "Select state file"
 msgstr "选择状态文件"
 
-#: cmdevents.cpp:1760 cmdevents.cpp:1853
+#: cmdevents.cpp:1761 cmdevents.cpp:1854
 msgid "VisualBoyAdvance saved game files|*.sgm"
 msgstr "VisualBoyAdvance 保存游戏文件|*.sgm"
 
-#: cmdevents.cpp:1883 cmdevents.cpp:1893 cmdevents.cpp:1904
+#: cmdevents.cpp:1884 cmdevents.cpp:1894 cmdevents.cpp:1905
 #, c-format
 msgid "Current state slot #%d"
 msgstr "当前状态插槽 #%d"
 
-#: cmdevents.cpp:1974
+#: cmdevents.cpp:1975
 msgid "Cannot use Colorizer Hack when GB BIOS File is enabled."
 msgstr "启用 GB BIOS 文件时无法使用色彩修改。"
 
-#: cmdevents.cpp:2189
+#: cmdevents.cpp:2190
 msgid "Sound enabled"
 msgstr "声音已启用"
 
-#: cmdevents.cpp:2189
+#: cmdevents.cpp:2190
 msgid "Sound disabled"
 msgstr "声音已禁用"
 
-#: cmdevents.cpp:2202 cmdevents.cpp:2216
+#: cmdevents.cpp:2203 cmdevents.cpp:2217
 #, c-format
 msgid "Volume: %d%%"
 msgstr "音量 %d%%"
 
-#: cmdevents.cpp:2291
+#: cmdevents.cpp:2292
 msgid "Set to 0 for pseudo tty"
 msgstr "把伪 tty 设置成 0"
 
-#: cmdevents.cpp:2293
+#: cmdevents.cpp:2294
 msgid "Port to wait for connection:"
 msgstr "准备连接的端口："
 
-#: cmdevents.cpp:2294
+#: cmdevents.cpp:2295
 msgid "GDB Connection"
 msgstr "GDB 连接"
 
-#: cmdevents.cpp:2347
+#: cmdevents.cpp:2348
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "等待连接到 %s"
 
-#: cmdevents.cpp:2354
+#: cmdevents.cpp:2355
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "等待连接到端口 %d"
 
-#: cmdevents.cpp:2357
+#: cmdevents.cpp:2358
 msgid "Waiting for GDB..."
 msgstr "等待 GDB..."
 
-#: cmdevents.cpp:2772
+#: cmdevents.cpp:2773
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "正在使用像素滤镜: %s"
 
-#: cmdevents.cpp:2787
+#: cmdevents.cpp:2788
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr "正在使用帧间混合: %s"
 
-#: cmdevents.cpp:2826 panel.cpp:194 panel.cpp:308
+#: cmdevents.cpp:2827 panel.cpp:194 panel.cpp:308
 msgid "Could not initialize the sound driver!"
 msgstr "无法初始化声音驱动！"
 
-#: cmdevents.cpp:2930
+#: cmdevents.cpp:2931
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "任天堂 GameBoy (+Color+Advance) 模拟器。"
 
-#: cmdevents.cpp:2931
+#: cmdevents.cpp:2932
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "版权 (C) 1999-2003 Forgotten\n版权 (C) 2004-2006 VBA 开发团队\n版权 (C) 2007-2020 VBA-M 开发团队"
 
-#: cmdevents.cpp:2932
+#: cmdevents.cpp:2933
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -841,29 +841,29 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "本程序是自由软件: 你可以在自由软件基金会公布的 GNU 通用发布\n许可证条款下重新分发和/或修改此软件，依自己意愿许可证 V2 版或\n任意更新版许可证选其一即可。\n\n本程序希望是能有作用的分发出去，但【无任何担保】；甚至没有隐含\n的【可销售性】或【特定用途的适用性】保证。请查阅 GNU 通用发布\n许可证了解更多信息。\n\n你应该已经收到 GNU 通用发布许可证的副本以及本程序。\n如果没有，请查看 http://www.gnu.org/licenses 。"
 
-#: cmdevents.cpp:3192
+#: cmdevents.cpp:3193
 msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
 msgstr "启用色彩修改时无法使用 GB BIOS。"
 
-#: cmdevents.cpp:3252
+#: cmdevents.cpp:3253
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "局域网连接已激活，禁用连接模式即可断开联网。"
 
-#: cmdevents.cpp:3258
+#: cmdevents.cpp:3259
 msgid "Network is not supported in local mode."
 msgstr "本地模式不支持网络"
 
-#: opts.cpp:492 opts.cpp:513 opts.cpp:745
+#: opts.cpp:494 opts.cpp:515 opts.cpp:747
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "%s 键不能绑定为 %s"
 
-#: opts.cpp:668 opts.cpp:677 opts.cpp:686 opts.cpp:695 vbam-options.cpp:313
+#: opts.cpp:670 opts.cpp:679 opts.cpp:688 opts.cpp:697 config/option.cpp:334
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr "数值 %s 对于选项 %s 无效"
 
-#: opts.cpp:767
+#: opts.cpp:769
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr "未知选项 %s 带有数值 %s"
@@ -908,37 +908,37 @@ msgstr "%d%%(%d, %d fps)"
 msgid "%d%%"
 msgstr "%d%%"
 
-#: sys.cpp:876 xrc/GBPrinter.xrc:65
+#: sys.cpp:878 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "丢弃(&D)"
 
-#: sys.cpp:910
+#: sys.cpp:912
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "图像文件 (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:919
+#: sys.cpp:921
 msgid "Save printer image to"
 msgstr "保存打印图像到"
 
-#: sys.cpp:933 sys.cpp:1116
+#: sys.cpp:935 sys.cpp:1118
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "写入打印输出到 %s"
 
-#: sys.cpp:938 sys.cpp:1009
+#: sys.cpp:940 sys.cpp:1011
 msgid "&Close"
 msgstr "关闭(&C)"
 
-#: sys.cpp:1004
+#: sys.cpp:1006
 msgid "Printed"
 msgstr "已打印"
 
-#: sys.cpp:1306
+#: sys.cpp:1308
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "打开伪 tty 错误: %s"
 
-#: sys.cpp:1405
+#: sys.cpp:1407
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "设置服务器插口错误 (%d)"
@@ -1102,457 +1102,6 @@ msgstr "录制音频时错误 (%s); 正在中止"
 msgid "Error in video recording (%s); aborting"
 msgstr "录制视频时错误 (%s); 正在中止"
 
-#: vbam-options.cpp:218
-#, c-format
-msgid "Invalid value %f for option %s; valid values are %f - %f"
-msgstr "数值 %f 对于选项 %s； 有效数值为 %f - %f"
-
-#: vbam-options.cpp:232 vbam-options.cpp:246
-#, c-format
-msgid "Invalid value %d for option %s; valid values are %d - %d"
-msgstr "数值 %d 对于选项 %s 无效；有效数值为 %d - %d"
-
-#: vbam-options.cpp:297
-#, c-format
-msgid "Invalid value %d for option %s; valid values are %s"
-msgstr "数值 %d 对于选项 %s 无效；有效数值为 %s"
-
-#: vbam-options-static.cpp:342
-msgid "Use bilinear filter with 3d renderer"
-msgstr "在 3D 渲染器中使用双线过滤 "
-
-#: vbam-options-static.cpp:343
-msgid "Full-screen filter to apply"
-msgstr "要应用的全屏滤镜"
-
-#: vbam-options-static.cpp:344
-msgid "Filter plugin library"
-msgstr "滤镜插件库"
-
-#: vbam-options-static.cpp:345
-msgid "Interframe blending function"
-msgstr "帧间混合功能"
-
-#: vbam-options-static.cpp:346
-msgid "Keep window on top"
-msgstr "保持窗口在最前"
-
-#: vbam-options-static.cpp:347
-msgid "Maximum number of threads to run filters in"
-msgstr "运行滤镜的最大线程数"
-
-#: vbam-options-static.cpp:348
-msgid "Render method; if unsupported, simple method will be used"
-msgstr "渲染方式；如果不支持，则使用简单方式"
-
-#: vbam-options-static.cpp:349
-msgid "Default scale factor"
-msgstr "默认缩放系数"
-
-#: vbam-options-static.cpp:350
-msgid "Retain aspect ratio when resizing"
-msgstr "调整大小时保持宽高比"
-
-#: vbam-options-static.cpp:353
-msgid "BIOS file to use for GB, if enabled"
-msgstr "用于 GB 的 BIOS 文件（如果启用）"
-
-#: vbam-options-static.cpp:354
-msgid "GB color enhancement, if enabled"
-msgstr "GB 色彩增强（如果启用）"
-
-#: vbam-options-static.cpp:355
-msgid "Enable DX Colorization Hacks"
-msgstr "启用 DX 色彩修改"
-
-#: vbam-options-static.cpp:356 vbam-options-static.cpp:368
-msgid "Apply LCD filter, if enabled"
-msgstr "应用 LCD 滤镜（如果启用）"
-
-#: vbam-options-static.cpp:357
-msgid "BIOS file to use for GBC, if enabled"
-msgstr "用于 GBC 的 BIOS 文件（如果启用）"
-
-#: vbam-options-static.cpp:358
-msgid ""
-"The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr "默认调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
-
-#: vbam-options-static.cpp:359
-msgid ""
-"The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr "第一用户调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
-
-#: vbam-options-static.cpp:360
-msgid ""
-"The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr "第二用户调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
-
-#: vbam-options-static.cpp:361
-msgid "Automatically gather a full page before printing"
-msgstr "打印前自动聚集整个页面"
-
-#: vbam-options-static.cpp:362
-msgid "Automatically save printouts as screen captures with -print suffix"
-msgstr "使用 -print 后缀自动将打印输出保存为屏幕截图"
-
-#: vbam-options-static.cpp:363 vbam-options-static.cpp:379
-msgid "Directory to look for ROM files"
-msgstr "要查找 ROM 文件的目录"
-
-#: vbam-options-static.cpp:364
-msgid "Directory to look for GBC ROM files"
-msgstr "要查找 GBC ROM 文件的目录"
-
-#: vbam-options-static.cpp:367
-msgid "BIOS file to use, if enabled"
-msgstr "要使用的 BIOS 文件（如果启用）"
-
-#: vbam-options-static.cpp:370
-msgid "Enable link at boot"
-msgstr "在启动时启用链接"
-
-#: vbam-options-static.cpp:371
-msgid "Enable faster network protocol by default"
-msgstr "默认启用更快的网络协议"
-
-#: vbam-options-static.cpp:372
-msgid "Default network link client host"
-msgstr "默认网络链接客户端主机"
-
-#: vbam-options-static.cpp:373
-msgid "Default network link server IP to bind"
-msgstr "要绑定的默认网络链接服务器 IP"
-
-#: vbam-options-static.cpp:374
-msgid "Default network link port (server and client)"
-msgstr "默认网络链接端口（服务器和客户端）"
-
-#: vbam-options-static.cpp:375
-msgid "Default network protocol"
-msgstr "默认网络协议"
-
-#: vbam-options-static.cpp:376
-msgid "Link timeout (ms)"
-msgstr "链接超时（毫秒）"
-
-#: vbam-options-static.cpp:377
-msgid "Link cable type"
-msgstr "链接线缆类型"
-
-#: vbam-options-static.cpp:382
-msgid "Automatically load last saved state"
-msgstr "自动加载上次保存的状态"
-
-#: vbam-options-static.cpp:383
-msgid ""
-"Directory to store game save files (relative paths are relative to ROM; "
-"blank is config dir)"
-msgstr "存放游戏存档文件的目录（相对路径是相对于 ROM；空白是配置目录）"
-
-#: vbam-options-static.cpp:384
-msgid "Freeze recent load list"
-msgstr "冻结最近的加载列表"
-
-#: vbam-options-static.cpp:385
-msgid ""
-"Directory to store A/V and game recordings (relative paths are relative to "
-"ROM)"
-msgstr "存储 A/V 和游戏录像的目录（相对路径是相对于 ROM）"
-
-#: vbam-options-static.cpp:386
-msgid "Number of seconds between rewind snapshots (0 to disable)"
-msgstr "倒带快照之间的秒数（0 表示禁用）"
-
-#: vbam-options-static.cpp:387
-msgid "Directory to store screenshots (relative paths are relative to ROM)"
-msgstr "存放截图的目录（相对路径是相对于 ROM）"
-
-#: vbam-options-static.cpp:388
-msgid ""
-"Directory to store saved state files (relative paths are relative to "
-"BatteryDir)"
-msgstr "存储保存状态文件的目录（相对路径是相对于 BatteryDir）"
-
-#: vbam-options-static.cpp:389
-msgid "Enable status bar"
-msgstr "启用状态栏"
-
-#: vbam-options-static.cpp:392
-msgid ""
-"The parameter Joypad/<n>/<button> contains a comma-separated list of key "
-"names which map to joypad #<n> button <button>.  Button is one of Up, Down, "
-"Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
-"MotionRight, AutoA, AutoB, Speed, Capture, GS"
-msgstr "参数 手柄/<n>/<button> 包含一个逗号分隔的键名列表，这些键名映射到 手柄 #<n> 按键 <button>。 按键是 上、下、左、右、A、B、L、R、Select、Start、体感上、体感下、体感左、体感右、连发A、连发B、加速、截图、GS 中某一个"
-
-#: vbam-options-static.cpp:393
-msgid "The autofire toggle period, in frames (1/60 s)"
-msgstr "连发切换周期，以帧为单位（1/60 秒）"
-
-#: vbam-options-static.cpp:394
-msgid "The number of the stick to use in single-player mode"
-msgstr "在单人模式中使用的摇杆数量"
-
-#: vbam-options-static.cpp:397
-msgid ""
-"The parameter Keyboard/<cmd> contains a comma-separated list of key names "
-"(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
-"executed."
-msgstr "参数 键盘/<cmd> 包含一个以逗号分隔的键名列表（例如 Alt-Shift-F1）。 当按下指定的键时，命令 <cmd> 被执行。"
-
-#: vbam-options-static.cpp:400
-msgid "Enable AGB debug print"
-msgstr "启用 AGB 调试打印"
-
-#: vbam-options-static.cpp:401
-msgid "Auto skip frames."
-msgstr "自动跳帧。"
-
-#: vbam-options-static.cpp:402
-msgid "Apply IPS/UPS/IPF patches if found"
-msgstr "如发现 IPS/UPS/IPF 补丁即应用"
-
-#: vbam-options-static.cpp:403
-msgid "Automatically save and load cheat list"
-msgstr "自动保存和加载金手指列表"
-
-#: vbam-options-static.cpp:404
-msgid "Automatically enable border for Super GameBoy games"
-msgstr "对 Super GameBoy 游戏自动启用边框"
-
-#: vbam-options-static.cpp:405
-msgid "Always enable border"
-msgstr "始终启用边框"
-
-#: vbam-options-static.cpp:406
-msgid "Screen capture file format"
-msgstr "屏幕截图文件格式"
-
-#: vbam-options-static.cpp:407
-msgid "Enable cheats"
-msgstr "启用金手指"
-
-#: vbam-options-static.cpp:409 xrc/MainMenu.xrc:355
-msgid "Enable MMX"
-msgstr "启用 MMX"
-
-#: vbam-options-static.cpp:411
-msgid "Disable on-screen status messages"
-msgstr "禁用屏幕状态消息"
-
-#: vbam-options-static.cpp:412
-msgid "Type of system to emulate"
-msgstr "要模拟的系统类型"
-
-#: vbam-options-static.cpp:413
-msgid "Flash size 0 = 64KB 1 = 128KB"
-msgstr "Flash 大小 0 = 64KB 1 = 128KB"
-
-#: vbam-options-static.cpp:414
-msgid ""
-"Skip frames.  Values are 0-9 or -1 to skip automatically based on time."
-msgstr "跳帧。值为 0-9 或 -1 以根据时间自动跳过。"
-
-#: vbam-options-static.cpp:415
-msgid "Fullscreen mode color depth (0 = any)"
-msgstr "全屏模式颜色深度（0 = 任意）"
-
-#: vbam-options-static.cpp:416
-msgid "Fullscreen mode frequency (0 = any)"
-msgstr "全屏模式频率（0 = 任意）"
-
-#: vbam-options-static.cpp:417
-msgid "Fullscreen mode height (0 = desktop)"
-msgstr "全屏模式高度（0 = 桌面）"
-
-#: vbam-options-static.cpp:418
-msgid "Fullscreen mode width (0 = desktop)"
-msgstr "全屏模式宽度（0 = 桌面）"
-
-#: vbam-options-static.cpp:419
-msgid "The palette to use"
-msgstr "要使用的调色板"
-
-#: vbam-options-static.cpp:420
-msgid "Enable printer emulation"
-msgstr "启用打印机模拟"
-
-#: vbam-options-static.cpp:421
-msgid "Break into GDB after loading the game."
-msgstr "加载游戏后切入 GDB"
-
-#: vbam-options-static.cpp:422
-msgid "Port to connect GDB to."
-msgstr "连接 GDB 的端口。"
-
-#: vbam-options-static.cpp:424
-msgid "Number of players in network"
-msgstr "联机中的玩家数量"
-
-#: vbam-options-static.cpp:426
-msgid "Maximum scale factor (0 = no limit)"
-msgstr "最大缩放系数（0 = 无限制）"
-
-#: vbam-options-static.cpp:427
-msgid "Pause game when main window loses focus"
-msgstr "当主窗口非活动时暂停游戏"
-
-#: vbam-options-static.cpp:428
-msgid "Enable RTC (vba-over.ini override is rtcEnabled"
-msgstr "启用 RTC（vba-over.ini 里覆盖为 rtcEnabled"
-
-#: vbam-options-static.cpp:429
-msgid "Native save (\"battery\") hardware type"
-msgstr "原生存档（“电池档”）硬件类型"
-
-#: vbam-options-static.cpp:430
-msgid "Show speed indicator"
-msgstr "显示速度指示器"
-
-#: vbam-options-static.cpp:431
-msgid "Draw on-screen messages transparently"
-msgstr "透明显示屏幕消息"
-
-#: vbam-options-static.cpp:432
-msgid "Skip BIOS initialization"
-msgstr "跳过 BIOS 初始化"
-
-#: vbam-options-static.cpp:433
-msgid "Do not overwrite cheat list when loading state"
-msgstr "加载状态时不覆盖金手指列表"
-
-#: vbam-options-static.cpp:434
-msgid "Do not overwrite native (battery) save when loading state"
-msgstr "加载状态时不覆盖原生 (电池) 存档"
-
-#: vbam-options-static.cpp:435
-msgid "Throttle game speed, even when accelerated (0-450%, 0 = no throttle)"
-msgstr "阀门加快游戏速度，即使已经在加速时（0-450%，0 = 无阀门）"
-
-#: vbam-options-static.cpp:436
-msgid "Set throttle for speedup key (0-3000%, 0 = no throttle)"
-msgstr "设置加速键的阀门值（0-3000%，0 = 无阀门）"
-
-#: vbam-options-static.cpp:437
-msgid "Number of frames to skip with speedup (instead of speedup throttle)"
-msgstr "加速时跳过的帧数（而不是阀门加速）"
-
-#: vbam-options-static.cpp:438
-msgid "Use frame skip for speedup throttle"
-msgstr "使用跳帧来阀门加速"
-
-#: vbam-options-static.cpp:439
-msgid "Use the specified BIOS file for GB"
-msgstr "对 GB 使用指定的 BIOS 文件"
-
-#: vbam-options-static.cpp:440
-msgid "Use the specified BIOS file"
-msgstr "使用指定的 BIOS 文件"
-
-#: vbam-options-static.cpp:441
-msgid "Use the specified BIOS file for GBC"
-msgstr "对 GBC 使用指定的 BIOS 文件"
-
-#: vbam-options-static.cpp:442
-msgid "Wait for vertical sync"
-msgstr "等待垂直同步"
-
-#: vbam-options-static.cpp:445
-msgid "Enter fullscreen mode at startup"
-msgstr "启动时进入全屏模式"
-
-#: vbam-options-static.cpp:446
-msgid "Window maximized"
-msgstr "窗口最大化"
-
-#: vbam-options-static.cpp:447
-msgid "Window height at startup"
-msgstr "启动时的窗口高度"
-
-#: vbam-options-static.cpp:448
-msgid "Window width at startup"
-msgstr "启动时的窗口宽度"
-
-#: vbam-options-static.cpp:449
-msgid "Window axis X position at startup"
-msgstr "启动时的窗口 X 坐标位置"
-
-#: vbam-options-static.cpp:450
-msgid "Window axis Y position at startup"
-msgstr "启动时的窗口 Y 坐标位置"
-
-#: vbam-options-static.cpp:453
-msgid "Capture key events while on background"
-msgstr "在后台截取按键事件"
-
-#: vbam-options-static.cpp:454
-msgid "Capture joy events while on background"
-msgstr "在后台截取摇杆事件"
-
-#: vbam-options-static.cpp:455
-msgid "Hide menu bar when mouse is inactive"
-msgstr "鼠标非活动时隐藏菜单栏"
-
-#: vbam-options-static.cpp:458
-msgid "Sound API; if unsupported, default API will be used"
-msgstr "声音 API；如果不支持，将使用默认 API"
-
-#: vbam-options-static.cpp:459
-msgid "Device ID of chosen audio device for chosen driver"
-msgstr "所选驱动程序下的所选音频设备 ID"
-
-#: vbam-options-static.cpp:460
-msgid "Number of sound buffers"
-msgstr "声音缓冲区数"
-
-#: vbam-options-static.cpp:461
-msgid "Bit mask of sound channels to enable"
-msgstr "要启用的声道位掩码"
-
-#: vbam-options-static.cpp:462
-msgid "GBA sound filtering (%)"
-msgstr "GBA 声音过滤 (%)"
-
-#: vbam-options-static.cpp:463
-msgid "GBA sound interpolation"
-msgstr "GBA 声音插值"
-
-#: vbam-options-static.cpp:464
-msgid "GB sound declicking"
-msgstr "GB 声音降噪"
-
-#: vbam-options-static.cpp:465
-msgid "GB echo effect (%)"
-msgstr "GB 回声音效 (%)"
-
-#: vbam-options-static.cpp:466
-msgid "Enable GB sound effects"
-msgstr "启用 GB 音效"
-
-#: vbam-options-static.cpp:467
-msgid "GB stereo effect (%)"
-msgstr "GB 立体声音效 (%)"
-
-#: vbam-options-static.cpp:468
-msgid "GB surround sound effect (%)"
-msgstr "GB 环绕音效 (%)"
-
-#: vbam-options-static.cpp:469
-msgid "Sound sample rate (kHz)"
-msgstr "声音采样率 (kHz)"
-
-#: vbam-options-static.cpp:470
-msgid "Sound volume (%)"
-msgstr "音量 (%)"
-
-#: vbam-options-static.cpp:669 vbam-options-static.cpp:688
-#: vbam-options-static.cpp:711 vbam-options-static.cpp:732
-#: vbam-options-static.cpp:752
-#, c-format
-msgid "Invalid value %s for option %s; valid values are %s"
-msgstr "数值 %s 对于选项 %s 无效，有效数值为 %s"
-
 #: viewsupt.cpp:776
 msgid "R:"
 msgstr "R:"
@@ -1564,6 +1113,461 @@ msgstr "G:"
 #: viewsupt.cpp:794
 msgid "B:"
 msgstr "B:"
+
+#: config/internal/option-internal.cpp:367
+msgid "Use bilinear filter with 3d renderer"
+msgstr "在 3D 渲染器中使用双线过滤 "
+
+#: config/internal/option-internal.cpp:368
+msgid "Full-screen filter to apply"
+msgstr "要应用的全屏滤镜"
+
+#: config/internal/option-internal.cpp:370
+msgid "Filter plugin library"
+msgstr "滤镜插件库"
+
+#: config/internal/option-internal.cpp:372
+msgid "Interframe blending function"
+msgstr "帧间混合功能"
+
+#: config/internal/option-internal.cpp:374
+msgid "Keep window on top"
+msgstr "保持窗口在最前"
+
+#: config/internal/option-internal.cpp:377
+msgid "Maximum number of threads to run filters in"
+msgstr "运行滤镜的最大线程数"
+
+#: config/internal/option-internal.cpp:380
+msgid "Render method; if unsupported, simple method will be used"
+msgstr "渲染方式；如果不支持，则使用简单方式"
+
+#: config/internal/option-internal.cpp:382
+msgid "Default scale factor"
+msgstr "默认缩放系数"
+
+#: config/internal/option-internal.cpp:385
+msgid "Retain aspect ratio when resizing"
+msgstr "调整大小时保持宽高比"
+
+#: config/internal/option-internal.cpp:388
+msgid "BIOS file to use for GB, if enabled"
+msgstr "用于 GB 的 BIOS 文件（如果启用）"
+
+#: config/internal/option-internal.cpp:391
+msgid "GB color enhancement, if enabled"
+msgstr "GB 色彩增强（如果启用）"
+
+#: config/internal/option-internal.cpp:393
+msgid "Enable DX Colorization Hacks"
+msgstr "启用 DX 色彩修改"
+
+#: config/internal/option-internal.cpp:394
+#: config/internal/option-internal.cpp:426
+msgid "Apply LCD filter, if enabled"
+msgstr "应用 LCD 滤镜（如果启用）"
+
+#: config/internal/option-internal.cpp:396
+msgid "BIOS file to use for GBC, if enabled"
+msgstr "用于 GBC 的 BIOS 文件（如果启用）"
+
+#: config/internal/option-internal.cpp:399
+msgid ""
+"The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
+msgstr "默认调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
+
+#: config/internal/option-internal.cpp:403
+msgid ""
+"The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
+msgstr "第一用户调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
+
+#: config/internal/option-internal.cpp:407
+msgid ""
+"The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
+msgstr "第二用户调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
+
+#: config/internal/option-internal.cpp:411
+msgid "Automatically gather a full page before printing"
+msgstr "打印前自动聚集整个页面"
+
+#: config/internal/option-internal.cpp:415
+msgid "Automatically save printouts as screen captures with -print suffix"
+msgstr "使用 -print 后缀自动将打印输出保存为屏幕截图"
+
+#: config/internal/option-internal.cpp:417
+#: config/internal/option-internal.cpp:447
+msgid "Directory to look for ROM files"
+msgstr "要查找 ROM 文件的目录"
+
+#: config/internal/option-internal.cpp:419
+msgid "Directory to look for GBC ROM files"
+msgstr "要查找 GBC ROM 文件的目录"
+
+#: config/internal/option-internal.cpp:423
+msgid "BIOS file to use, if enabled"
+msgstr "要使用的 BIOS 文件（如果启用）"
+
+#: config/internal/option-internal.cpp:428
+msgid "Enable link at boot"
+msgstr "在启动时启用链接"
+
+#: config/internal/option-internal.cpp:431
+msgid "Enable faster network protocol by default"
+msgstr "默认启用更快的网络协议"
+
+#: config/internal/option-internal.cpp:433
+msgid "Default network link client host"
+msgstr "默认网络链接客户端主机"
+
+#: config/internal/option-internal.cpp:435
+msgid "Default network link server IP to bind"
+msgstr "要绑定的默认网络链接服务器 IP"
+
+#: config/internal/option-internal.cpp:438
+msgid "Default network link port (server and client)"
+msgstr "默认网络链接端口（服务器和客户端）"
+
+#: config/internal/option-internal.cpp:440
+msgid "Default network protocol"
+msgstr "默认网络协议"
+
+#: config/internal/option-internal.cpp:442
+msgid "Link timeout (ms)"
+msgstr "链接超时（毫秒）"
+
+#: config/internal/option-internal.cpp:444
+msgid "Link cable type"
+msgstr "链接线缆类型"
+
+#: config/internal/option-internal.cpp:452
+msgid "Automatically load last saved state"
+msgstr "自动加载上次保存的状态"
+
+#: config/internal/option-internal.cpp:454
+msgid ""
+"Directory to store game save files (relative paths are relative to ROM; "
+"blank is config dir)"
+msgstr "存放游戏存档文件的目录（相对路径是相对于 ROM；空白是配置目录）"
+
+#: config/internal/option-internal.cpp:457
+msgid "Freeze recent load list"
+msgstr "冻结最近的加载列表"
+
+#: config/internal/option-internal.cpp:460
+msgid ""
+"Directory to store A/V and game recordings (relative paths are relative to "
+"ROM)"
+msgstr "存储 A/V 和游戏录像的目录（相对路径是相对于 ROM）"
+
+#: config/internal/option-internal.cpp:464
+msgid "Number of seconds between rewind snapshots (0 to disable)"
+msgstr "倒带快照之间的秒数（0 表示禁用）"
+
+#: config/internal/option-internal.cpp:467
+msgid "Directory to store screenshots (relative paths are relative to ROM)"
+msgstr "存放截图的目录（相对路径是相对于 ROM）"
+
+#: config/internal/option-internal.cpp:471
+msgid ""
+"Directory to store saved state files (relative paths are relative to "
+"BatteryDir)"
+msgstr "存储保存状态文件的目录（相对路径是相对于 BatteryDir）"
+
+#: config/internal/option-internal.cpp:474
+msgid "Enable status bar"
+msgstr "启用状态栏"
+
+#: config/internal/option-internal.cpp:479
+msgid ""
+"The parameter Joypad/<n>/<button> contains a comma-separated list of key "
+"names which map to joypad #<n> button <button>.  Button is one of Up, Down, "
+"Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
+"MotionRight, AutoA, AutoB, Speed, Capture, GS"
+msgstr "参数 手柄/<n>/<button> 包含一个逗号分隔的键名列表，这些键名映射到 手柄 #<n> 按键 <button>。 按键是 上、下、左、右、A、B、L、R、Select、Start、体感上、体感下、体感左、体感右、连发A、连发B、加速、截图、GS 中某一个"
+
+#: config/internal/option-internal.cpp:486
+msgid "The autofire toggle period, in frames (1/60 s)"
+msgstr "连发切换周期，以帧为单位（1/60 秒）"
+
+#: config/internal/option-internal.cpp:489
+msgid "The number of the stick to use in single-player mode"
+msgstr "在单人模式中使用的摇杆数量"
+
+#: config/internal/option-internal.cpp:494
+msgid ""
+"The parameter Keyboard/<cmd> contains a comma-separated list of key names "
+"(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
+"executed."
+msgstr "参数 键盘/<cmd> 包含一个以逗号分隔的键名列表（例如 Alt-Shift-F1）。 当按下指定的键时，命令 <cmd> 被执行。"
+
+#: config/internal/option-internal.cpp:501
+msgid "Enable AGB debug print"
+msgstr "启用 AGB 调试打印"
+
+#: config/internal/option-internal.cpp:503
+msgid "Auto skip frames."
+msgstr "自动跳帧。"
+
+#: config/internal/option-internal.cpp:505
+msgid "Apply IPS/UPS/IPF patches if found"
+msgstr "如发现 IPS/UPS/IPF 补丁即应用"
+
+#: config/internal/option-internal.cpp:507
+msgid "Automatically save and load cheat list"
+msgstr "自动保存和加载金手指列表"
+
+#: config/internal/option-internal.cpp:510
+msgid "Automatically enable border for Super GameBoy games"
+msgstr "对 Super GameBoy 游戏自动启用边框"
+
+#: config/internal/option-internal.cpp:512
+msgid "Always enable border"
+msgstr "始终启用边框"
+
+#: config/internal/option-internal.cpp:514
+msgid "Screen capture file format"
+msgstr "屏幕截图文件格式"
+
+#: config/internal/option-internal.cpp:516
+msgid "Enable cheats"
+msgstr "启用金手指"
+
+#: config/internal/option-internal.cpp:519 xrc/MainMenu.xrc:355
+msgid "Enable MMX"
+msgstr "启用 MMX"
+
+#: config/internal/option-internal.cpp:523
+msgid "Disable on-screen status messages"
+msgstr "禁用屏幕状态消息"
+
+#: config/internal/option-internal.cpp:524
+msgid "Type of system to emulate"
+msgstr "要模拟的系统类型"
+
+#: config/internal/option-internal.cpp:526
+msgid "Flash size 0 = 64KB 1 = 128KB"
+msgstr "Flash 大小 0 = 64KB 1 = 128KB"
+
+#: config/internal/option-internal.cpp:529
+msgid ""
+"Skip frames.  Values are 0-9 or -1 to skip automatically based on time."
+msgstr "跳帧。值为 0-9 或 -1 以根据时间自动跳过。"
+
+#: config/internal/option-internal.cpp:533
+msgid "Fullscreen mode color depth (0 = any)"
+msgstr "全屏模式颜色深度（0 = 任意）"
+
+#: config/internal/option-internal.cpp:535
+msgid "Fullscreen mode frequency (0 = any)"
+msgstr "全屏模式频率（0 = 任意）"
+
+#: config/internal/option-internal.cpp:537
+msgid "Fullscreen mode height (0 = desktop)"
+msgstr "全屏模式高度（0 = 桌面）"
+
+#: config/internal/option-internal.cpp:539
+msgid "Fullscreen mode width (0 = desktop)"
+msgstr "全屏模式宽度（0 = 桌面）"
+
+#: config/internal/option-internal.cpp:540
+msgid "The palette to use"
+msgstr "要使用的调色板"
+
+#: config/internal/option-internal.cpp:543
+msgid "Enable printer emulation"
+msgstr "启用打印机模拟"
+
+#: config/internal/option-internal.cpp:545
+msgid "Break into GDB after loading the game."
+msgstr "加载游戏后切入 GDB"
+
+#: config/internal/option-internal.cpp:547
+msgid "Port to connect GDB to."
+msgstr "连接 GDB 的端口。"
+
+#: config/internal/option-internal.cpp:550
+msgid "Number of players in network"
+msgstr "联机中的玩家数量"
+
+#: config/internal/option-internal.cpp:553
+msgid "Maximum scale factor (0 = no limit)"
+msgstr "最大缩放系数（0 = 无限制）"
+
+#: config/internal/option-internal.cpp:555
+msgid "Pause game when main window loses focus"
+msgstr "当主窗口非活动时暂停游戏"
+
+#: config/internal/option-internal.cpp:558
+msgid "Enable RTC (vba-over.ini override is rtcEnabled"
+msgstr "启用 RTC（vba-over.ini 里覆盖为 rtcEnabled"
+
+#: config/internal/option-internal.cpp:561
+msgid "Native save (\"battery\") hardware type"
+msgstr "原生存档（“电池档”）硬件类型"
+
+#: config/internal/option-internal.cpp:563
+msgid "Show speed indicator"
+msgstr "显示速度指示器"
+
+#: config/internal/option-internal.cpp:566
+msgid "Draw on-screen messages transparently"
+msgstr "透明显示屏幕消息"
+
+#: config/internal/option-internal.cpp:568
+msgid "Skip BIOS initialization"
+msgstr "跳过 BIOS 初始化"
+
+#: config/internal/option-internal.cpp:570
+msgid "Do not overwrite cheat list when loading state"
+msgstr "加载状态时不覆盖金手指列表"
+
+#: config/internal/option-internal.cpp:573
+msgid "Do not overwrite native (battery) save when loading state"
+msgstr "加载状态时不覆盖原生 (电池) 存档"
+
+#: config/internal/option-internal.cpp:576
+msgid "Throttle game speed, even when accelerated (0-450%, 0 = no throttle)"
+msgstr "阀门加快游戏速度，即使已经在加速时（0-450%，0 = 无阀门）"
+
+#: config/internal/option-internal.cpp:580
+msgid "Set throttle for speedup key (0-3000%, 0 = no throttle)"
+msgstr "设置加速键的阀门值（0-3000%，0 = 无阀门）"
+
+#: config/internal/option-internal.cpp:583
+msgid "Number of frames to skip with speedup (instead of speedup throttle)"
+msgstr "加速时跳过的帧数（而不是阀门加速）"
+
+#: config/internal/option-internal.cpp:587
+msgid "Use frame skip for speedup throttle"
+msgstr "使用跳帧来阀门加速"
+
+#: config/internal/option-internal.cpp:589
+msgid "Use the specified BIOS file for GB"
+msgstr "对 GB 使用指定的 BIOS 文件"
+
+#: config/internal/option-internal.cpp:591
+msgid "Use the specified BIOS file"
+msgstr "使用指定的 BIOS 文件"
+
+#: config/internal/option-internal.cpp:593
+msgid "Use the specified BIOS file for GBC"
+msgstr "对 GBC 使用指定的 BIOS 文件"
+
+#: config/internal/option-internal.cpp:594
+msgid "Wait for vertical sync"
+msgstr "等待垂直同步"
+
+#: config/internal/option-internal.cpp:599
+msgid "Enter fullscreen mode at startup"
+msgstr "启动时进入全屏模式"
+
+#: config/internal/option-internal.cpp:600
+msgid "Window maximized"
+msgstr "窗口最大化"
+
+#: config/internal/option-internal.cpp:602
+msgid "Window height at startup"
+msgstr "启动时的窗口高度"
+
+#: config/internal/option-internal.cpp:604
+msgid "Window width at startup"
+msgstr "启动时的窗口宽度"
+
+#: config/internal/option-internal.cpp:606
+msgid "Window axis X position at startup"
+msgstr "启动时的窗口 X 坐标位置"
+
+#: config/internal/option-internal.cpp:608
+msgid "Window axis Y position at startup"
+msgstr "启动时的窗口 Y 坐标位置"
+
+#: config/internal/option-internal.cpp:614
+msgid "Capture key events while on background"
+msgstr "在后台截取按键事件"
+
+#: config/internal/option-internal.cpp:617
+msgid "Capture joy events while on background"
+msgstr "在后台截取摇杆事件"
+
+#: config/internal/option-internal.cpp:618
+msgid "Hide menu bar when mouse is inactive"
+msgstr "鼠标非活动时隐藏菜单栏"
+
+#: config/internal/option-internal.cpp:623
+msgid "Sound API; if unsupported, default API will be used"
+msgstr "声音 API；如果不支持，将使用默认 API"
+
+#: config/internal/option-internal.cpp:626
+msgid "Device ID of chosen audio device for chosen driver"
+msgstr "所选驱动程序下的所选音频设备 ID"
+
+#: config/internal/option-internal.cpp:628
+msgid "Number of sound buffers"
+msgstr "声音缓冲区数"
+
+#: config/internal/option-internal.cpp:630
+msgid "Bit mask of sound channels to enable"
+msgstr "要启用的声道位掩码"
+
+#: config/internal/option-internal.cpp:632
+msgid "GBA sound filtering (%)"
+msgstr "GBA 声音过滤 (%)"
+
+#: config/internal/option-internal.cpp:635
+msgid "GBA sound interpolation"
+msgstr "GBA 声音插值"
+
+#: config/internal/option-internal.cpp:636
+msgid "GB sound declicking"
+msgstr "GB 声音降噪"
+
+#: config/internal/option-internal.cpp:638
+msgid "GB echo effect (%)"
+msgstr "GB 回声音效 (%)"
+
+#: config/internal/option-internal.cpp:640
+msgid "Enable GB sound effects"
+msgstr "启用 GB 音效"
+
+#: config/internal/option-internal.cpp:641
+msgid "GB stereo effect (%)"
+msgstr "GB 立体声音效 (%)"
+
+#: config/internal/option-internal.cpp:644
+msgid "GB surround sound effect (%)"
+msgstr "GB 环绕音效 (%)"
+
+#: config/internal/option-internal.cpp:645
+msgid "Sound sample rate (kHz)"
+msgstr "声音采样率 (kHz)"
+
+#: config/internal/option-internal.cpp:647
+msgid "Sound volume (%)"
+msgstr "音量 (%)"
+
+#: config/internal/option-internal.cpp:711
+#: config/internal/option-internal.cpp:731
+#: config/internal/option-internal.cpp:751
+#: config/internal/option-internal.cpp:771
+#: config/internal/option-internal.cpp:791
+#, c-format
+msgid "Invalid value %s for option %s; valid values are %s"
+msgstr "数值 %s 对于选项 %s 无效，有效数值为 %s"
+
+#: config/option.cpp:243
+#, c-format
+msgid "Invalid value %f for option %s; valid values are %f - %f"
+msgstr "数值 %f 对于选项 %s； 有效数值为 %f - %f"
+
+#: config/option.cpp:256 config/option.cpp:269
+#, c-format
+msgid "Invalid value %d for option %s; valid values are %d - %d"
+msgstr "数值 %d 对于选项 %s 无效；有效数值为 %d - %d"
+
+#: config/option.cpp:319
+#, c-format
+msgid "Invalid value %d for option %s; valid values are %s"
+msgstr "数值 %d 对于选项 %s 无效；有效数值为 %s"
 
 #: widgets/keyedit.cpp:122 widgets/keyedit.cpp:280
 msgid "SHIFT"
