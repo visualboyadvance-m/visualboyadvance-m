@@ -1,0 +1,26 @@
+name: Ubuntu Latest Build
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+        with: 
+          submodules: recursive
+
+      - name: Install Dependencies
+        run: >-
+          bash installdeps
+
+      - name: Configure
+        run: >-
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+
+      - name: Build
+        run: ninja -C build
+
+      - name: Install
+        run: sudo ninja -C build install
