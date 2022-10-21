@@ -3707,8 +3707,8 @@ bool MainFrame::BindControls()
 #ifdef NO_OGL
             rb->Hide();
 #endif
-#ifdef __WXGTK__
-            // wxGLCanvas segfaults on Wayland
+#if defined(__WXGTK__) && !wxCHECK_VERSION(3, 2, 0)
+            // wxGLCanvas segfaults on Wayland before wx 3.2
             if (wxGetApp().UsingWayland()) {
                 rb->Hide();
             }

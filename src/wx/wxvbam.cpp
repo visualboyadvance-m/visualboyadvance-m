@@ -358,10 +358,12 @@ bool wxvbamApp::OnInit() {
 
     load_opts();
 
-    // wxGLCanvas segfaults under wayland
+    // wxGLCanvas segfaults under wayland before wx 3.2
+#if defined(__WXGTK__) && !wxCHECK_VERSION(3, 2, 0)
     if (UsingWayland() && gopts.render_method == RND_OPENGL) {
         gopts.render_method = RND_SIMPLE;
     }
+#endif
 
     // process command-line options
     for (size_t i = 0; i < pending_optset.size(); i++) {
