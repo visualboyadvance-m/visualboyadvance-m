@@ -3210,6 +3210,11 @@ EVT_HANDLER(VSync, "Wait for vertical sync")
 {
     GetMenuOptionInt("VSync", &vsync, 1);
     update_opts();
+
+    if (panel->panel) {
+        panel->panel->Destroy();
+        panel->panel = nullptr;
+    }
 }
 
 void MainFrame::EnableNetworkMenu()
