@@ -8,6 +8,10 @@
     #define Status int
     #include <gdk/gdkx.h>
     #include <gtk/gtk.h>
+    // For Wayland EGL.
+    #ifdef HAVE_EGL
+        #include <EGL/egl.h>
+    #endif
 #ifdef HAVE_XSS
     #include <X11/extensions/scrnsaver.h>
 #endif
@@ -2176,8 +2180,22 @@ void GLDrawingPanel::DrawingPanelInit()
     glClearColor(0.0, 0.0, 0.0, 1.0);
 // non-portable vsync code
 #if defined(__WXGTK__)
-    // TODO: Use Wayland EGL equivalent to enable/disable vsync.
-    if (!IsItWayland()) {
+    if (IsItWayland()) {
+#ifdef HAVE_EGL
+        if (vsync)
+            systemScreenMessage(_("Enabling EGL VSync."));
+        else
+            systemScreenMessage(_("Disabling EGL VSync."));
+
+        eglSwapInterval(0, vsync);
+#endif
+    }
+    else {
+        if (vsync)
+            systemScreenMessage(_("Enabling GLX VSync."));
+        else
+            systemScreenMessage(_("Disabling GLX VSync."));
+
         static PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT = NULL;
         static PFNGLXSWAPINTERVALSGIPROC glXSwapIntervalSGI = NULL;
         static PFNGLXSWAPINTERVALMESAPROC glXSwapIntervalMESA = NULL;

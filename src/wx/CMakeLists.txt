@@ -87,6 +87,13 @@ if(NOT WIN32 AND NOT APPLE)
         list(APPEND VBAM_LIBS ${X11_Xscreensaver_LIB})
         add_definitions(-DHAVE_XSS)
     endif()
+
+    find_library(EGL_LIBRARY EGL)
+
+    if(EGL_LIBRARY)
+        list(APPEND VBAM_LIBS ${EGL_LIBRARY})
+        add_definitions(-DHAVE_EGL)
+    endif()
 endif()
 
 # Win32 definitions common to all toolchains.
