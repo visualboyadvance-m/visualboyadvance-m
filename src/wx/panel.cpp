@@ -1381,6 +1381,7 @@ void GameArea::OnSize(wxSizeEvent& ev)
     // panel may resize
     if (panel)
         panel->OnSize(ev);
+    Layout();
 
     ev.Skip();
 }
