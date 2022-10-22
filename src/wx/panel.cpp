@@ -2283,18 +2283,18 @@ void GLDrawingPanel::DrawingPanelInit()
     if (IsItWayland()) {
 #ifdef HAVE_EGL
         if (vsync)
-            systemScreenMessage(_("Enabling EGL VSync."));
+            wxLogDebug(_("Enabling EGL VSync."));
         else
-            systemScreenMessage(_("Disabling EGL VSync."));
+            wxLogDebug(_("Disabling EGL VSync."));
 
         eglSwapInterval(0, vsync);
 #endif
     }
     else {
         if (vsync)
-            systemScreenMessage(_("Enabling GLX VSync."));
+            wxLogDebug(_("Enabling GLX VSync."));
         else
-            systemScreenMessage(_("Disabling GLX VSync."));
+            wxLogDebug(_("Disabling GLX VSync."));
 
         static PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT = NULL;
         static PFNGLXSWAPINTERVALSGIPROC glXSwapIntervalSGI = NULL;
