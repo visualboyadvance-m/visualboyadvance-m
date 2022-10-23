@@ -471,13 +471,17 @@ bool wxvbamApp::OnInit() {
     config::GameControlState::Instance().OnGameBindingsChanged();
 
     // create the main window
-    int x = windowPositionX;
-    int y = windowPositionY;
-    int width = windowWidth;
-    int height = windowHeight;
-    int isFullscreen = fullScreen;
-    int isMaximized = windowMaximized;
-    frame = wxDynamicCast(xr->LoadFrame(NULL, wxT("MainFrame")), MainFrame);
+    int x = config::Option::ByID(config::OptionID::kgeometrywindowX)->GetInt();
+    int y = config::Option::ByID(config::OptionID::kgeometrywindowY)->GetInt();
+    int width = config::Option::ByID(config::OptionID::kgeometrywindowWidth)
+                    ->GetUnsigned();
+    int height = config::Option::ByID(config::OptionID::kgeometrywindowHeight)
+                     ->GetUnsigned();
+    bool isFullscreen =
+        config::Option::ByID(config::OptionID::kgeometryfullScreen)->GetInt();
+    bool isMaximized =
+        config::Option::ByID(config::OptionID::kgeometryisMaximized)->GetInt();
+    frame = wxDynamicCast(xr->LoadFrame(nullptr, "MainFrame"), MainFrame);
 
     if (!frame) {
         wxLogError(_("Could not create main window"));
@@ -835,59 +839,46 @@ void MainFrame::OnMenu(wxContextMenuEvent& event)
     }
 }
 
-void MainFrame::OnMove(wxMoveEvent& event)
-{
-    (void)event; // unused params
-    wxPoint pos = GetScreenPosition();
-    int x = pos.x, y = pos.y;
-    if (!IsFullScreen() && !IsMaximized())
-    {
-        if (x >= 0 && y >= 0)
-        {
-            bkpPosX = windowPositionX;
-            bkpPosY = windowPositionY;
-            windowPositionX = x;
-            windowPositionY = y;
+void MainFrame::OnMove(wxMoveEvent&) {
+    wxPoint window_pos = GetScreenPosition();
+
+    if (!IsFullScreen() && !IsMaximized()) {
+        if (window_pos.x >= 0 && window_pos.y >= 0) {
+            config::Option::ByID(config::OptionID::kgeometrywindowX)
+                ->SetInt(window_pos.x);
+            config::Option::ByID(config::OptionID::kgeometrywindowY)
+                ->SetInt(window_pos.y);
         }
     }
-    else
-    {
-        windowPositionX = bkpPosX;
-        windowPositionY = bkpPosY;
-    }
-    update_opts();
 }
 
 void MainFrame::OnSize(wxSizeEvent& event)
 {
     wxFrame::OnSize(event);
-    wxRect pos = GetRect();
-    wxPoint windowPos = GetScreenPosition();
-    int height = pos.GetHeight(), width = pos.GetWidth();
-    int x = windowPos.x, y = windowPos.y;
-    bool isFullscreen = IsFullScreen();
-    bool isMaximized = IsMaximized();
-    if (!isFullscreen && !isMaximized)
-    {
-        if (height > 0 && width > 0)
-        {
-            windowHeight = height;
-            windowWidth = width;
+    wxRect window_rect = GetRect();
+    wxPoint window_pos = GetScreenPosition();
+    config::Option* window_x =
+        config::Option::ByID(config::OptionID::kgeometrywindowX);
+    config::Option* window_y =
+        config::Option::ByID(config::OptionID::kgeometrywindowY);
+
+    if (!IsFullScreen() && !IsMaximized()) {
+        if (window_rect.GetHeight() > 0 && window_rect.GetWidth() > 0) {
+            config::Option::ByID(config::OptionID::kgeometrywindowHeight)
+                ->SetUnsigned(window_rect.GetHeight());
+            config::Option::ByID(config::OptionID::kgeometrywindowWidth)
+                ->SetUnsigned(window_rect.GetWidth());
         }
-        if (x >= 0 && y >= 0)
-        {
-            windowPositionX = x;
-            windowPositionY = y;
+        if (window_pos.x >= 0 && window_pos.y >= 0) {
+            window_x->SetInt(window_pos.x);
+            window_y->SetInt(window_pos.y);
         }
     }
-    else
-    {
-        windowPositionX = bkpPosX;
-        windowPositionY = bkpPosY;
-    }
-    windowMaximized = isMaximized;
-    fullScreen = isFullscreen;
-    update_opts();
+
+    config::Option::ByID(config::OptionID::kgeometryisMaximized)
+        ->SetInt(IsMaximized());
+    config::Option::ByID(config::OptionID::kgeometryfullScreen)
+        ->SetInt(IsFullScreen());
 }
 
 int MainFrame::FilterEvent(wxEvent& event)

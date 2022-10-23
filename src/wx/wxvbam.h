@@ -19,11 +19,6 @@
 #include "wx/wxmisc.h"
 #include "wxhead.h"
 
-/* yeah, they aren't needed globally, but I'm too lazy to limit where needed */
-#include "../common/ConfigManager.h"
-
-#include "../System.h"
-#include "../Util.h"
 #include "../gb/gb.h"
 #include "../gb/gbCheats.h"
 #include "../gb/gbGlobals.h"
@@ -223,6 +218,8 @@ public:
     void MenuOptionIntMask(const wxString& menuName, int field, int mask);
     void MenuOptionIntRadioValue(const wxString& menuName, int field, int mask);
     void MenuOptionBool(const wxString& menuName, bool field);
+    void GetMenuOptionConfig(const wxString& menu_name,
+                             const config::OptionID& option_id);
     void GetMenuOptionInt(const wxString& menuName, int* field, int mask);
     void GetMenuOptionBool(const wxString& menuName, bool* field);
     void SetMenuOption(const wxString& menuName, int value);

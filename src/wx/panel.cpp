@@ -391,8 +391,9 @@ void GameArea::LoadGame(const wxString& name)
         emusys = &GBASystem;
     }
 
-    if (fullScreen)
+    if (config::Option::ByID(config::OptionID::kgeometryfullScreen)->GetInt()) {
         GameArea::ShowFullScreen(true);
+    }
 
     loaded = t;
     SetFrameTitle();
