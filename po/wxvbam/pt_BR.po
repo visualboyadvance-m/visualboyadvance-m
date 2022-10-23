@@ -1029,19 +1029,19 @@ msgstr "Erro ao gravar o estado do retrocesso"
 
 #: panel.cpp:2285
 msgid "Enabling EGL VSync."
-msgstr ""
+msgstr "Ativando o EGL VSync."
 
 #: panel.cpp:2287
 msgid "Disabling EGL VSync."
-msgstr ""
+msgstr "Desativando o EGL VSync."
 
 #: panel.cpp:2294
 msgid "Enabling GLX VSync."
-msgstr ""
+msgstr "Ativando o GLX VSync."
 
 #: panel.cpp:2296
 msgid "Disabling GLX VSync."
-msgstr ""
+msgstr "Desativando o GLX VSync."
 
 #: panel.cpp:2314
 msgid "Failed to set glXSwapIntervalEXT"
