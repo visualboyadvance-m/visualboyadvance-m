@@ -505,7 +505,7 @@ wxThread::ExitCode BackgroundInput::Setup()
     wxLogError(wxT("Yet to be implemented!"));
     return ANY_ERROR;
 #else // defined(__WXGTK__)
-    if (IsItWayland()) {
+    if (IsWayland()) {
         wxLogError(wxT("Wayland does not allow to globally query keypresses for security reasons. \
         Check a better explanation here: https://github.com/albertlauncher/albert/issues/309"));
         return ANY_ERROR;
