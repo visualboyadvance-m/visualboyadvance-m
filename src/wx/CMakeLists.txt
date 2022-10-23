@@ -94,6 +94,12 @@ if(NOT WIN32 AND NOT APPLE)
         list(APPEND VBAM_LIBS ${EGL_LIBRARY})
         add_definitions(-DHAVE_EGL)
     endif()
+
+    find_library(WAYLAND_LIBRARY wayland-client)
+
+    if(WAYLAND_LIBRARY)
+        list(APPEND VBAM_LIBS ${WAYLAND_LIBRARY})
+    endif()
 endif()
 
 # Win32 definitions common to all toolchains.

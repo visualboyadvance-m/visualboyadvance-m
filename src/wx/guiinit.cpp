@@ -2672,7 +2672,7 @@ bool MainFrame::BindControls()
 
             if (cmdtab[i].cmd_id == XRCID("AllowKeyboardBackgroundInput")
 #if defined(__WXGTK__)
-                && IsItWayland()
+                && IsWayland()
 #endif
                ) {
                 if (mi)

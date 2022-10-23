@@ -1302,7 +1302,7 @@ static void process_keyboard_event(const wxKeyEvent& ev, bool down)
     int kc = ev.GetKeyCode();
 
     // Under Wayland or if the key is unicode, we can't use wxGetKeyState().
-    if (!IsItWayland() && kc != WXK_NONE) {
+    if (!IsWayland() && kc != WXK_NONE) {
         // Check if the key state corresponds to the event.
         if (down != wxGetKeyState(static_cast<wxKeyCode>(kc))) {
             return;
@@ -2281,7 +2281,7 @@ void GLDrawingPanel::DrawingPanelInit()
     glClearColor(0.0, 0.0, 0.0, 1.0);
 // non-portable vsync code
 #if defined(__WXGTK__)
-    if (IsItWayland()) {
+    if (IsWayland()) {
 #ifdef HAVE_EGL
         if (vsync)
             wxLogDebug(_("Enabling EGL VSync."));
@@ -2301,9 +2301,8 @@ void GLDrawingPanel::DrawingPanelInit()
         static PFNGLXSWAPINTERVALSGIPROC glXSwapIntervalSGI = NULL;
         static PFNGLXSWAPINTERVALMESAPROC glXSwapIntervalMESA = NULL;
 
-        // These wayland checks don't work.
-        auto display        = IsItWayland() ? 0 : GetX11Display();
-        auto default_screen = IsItWayland() ? 0 : DefaultScreen(display);
+        auto display        = GetX11Display();
+        auto default_screen = DefaultScreen(display);
 
         char* glxQuery = (char*)glXQueryExtensionsString(display, default_screen);
 
@@ -2363,6 +2362,9 @@ void GLDrawingPanel::DrawingPanelInit()
 void GLDrawingPanel::OnSize(wxSizeEvent& ev)
 {
     AdjustViewport();
+
+    // Temporary hack to backport 800d6ed69b from wxWidgets until 3.2.2 is released.
+    MoveWaylandSubsurface(this);
 
     ev.Skip();
 }

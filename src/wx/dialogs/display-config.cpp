@@ -292,7 +292,7 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
     GetValidatedChild(this, "OutputOpenGL")->Hide();
 #elif defined(__WXGTK__) && !wxCHECK_VERSION(3, 2, 0)
     // wxGLCanvas segfaults on Wayland before wx 3.2.
-    if (IsItWayland()) {
+    if (IsWayland()) {
         GetValidatedChild(this, "OutputOpenGL")->Hide();
     } else {
         GetValidatedChild(this, "OutputOpenGL")
