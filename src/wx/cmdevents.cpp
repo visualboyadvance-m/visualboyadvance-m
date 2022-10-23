@@ -46,6 +46,32 @@ void MainFrame::GetMenuOptionBool(const wxString& menuName, bool* field)
     }
 }
 
+void MainFrame::GetMenuOptionConfig(const wxString& menu_name,
+                                    const config::OptionID& option_id) {
+    config::Option* option = config::Option::ByID(option_id);
+    assert(option);
+
+    int id = wxXmlResource::GetXRCID(menu_name);
+    for (size_t i = 0; i < checkable_mi.size(); i++) {
+        if (checkable_mi[i].cmd != id)
+            continue;
+
+        const bool is_checked = checkable_mi[i].mi->IsChecked();
+        switch (option->type()) {
+            case config::Option::Type::kBool:
+                option->SetBool(is_checked);
+                break;
+            case config::Option::Type::kInt:
+                option->SetInt(is_checked);
+                break;
+            default:
+                assert(false);
+                return;
+        }
+        break;
+    }
+}
+
 void MainFrame::GetMenuOptionInt(const wxString& menuName, int* field, int mask)
 {
     assert(field);
@@ -2714,36 +2740,22 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
 
 EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
 {
-    bool fs = fullScreen;
-    wxVideoMode dm = gopts.fs_mode;
-
     if (gopts.max_threads != 1) {
         gopts.max_threads = wxThread::GetCPUCount();
     }
 
-    //Just in case GetCPUCount() returns 0
-    if (!gopts.max_threads)
+    // Just in case GetCPUCount() returns 0 or -1
+    if (gopts.max_threads < 0) {
         gopts.max_threads = 1;
-
-    wxDialog* dlg = GetXRCDialog("DisplayConfig");
-
-    if (ShowModal(dlg) != wxID_OK)
-        return;
-
-    if (frameSkip >= 0)
-        systemFrameSkip = frameSkip;
-
-    if (fs != fullScreen) {
-        panel->ShowFullScreen(fullScreen);
-    } else if (panel->IsFullScreen() && dm != gopts.fs_mode) {
-        // maybe not the best way to do this..
-        panel->ShowFullScreen(false);
-        panel->ShowFullScreen(true);
     }
 
-    if (panel->panel) {
-        panel->panel->Destroy();
-        panel->panel = nullptr;
+    wxDialog* dlg = GetXRCDialog("DisplayConfig");
+    if (ShowModal(dlg) != wxID_OK) {
+        return;
+    }
+
+    if (frameSkip >= 0) {
+        systemFrameSkip = frameSkip;
     }
 
     update_opts();
@@ -3125,8 +3137,7 @@ EVT_HANDLER(FrameSkipAuto, "Auto Skip frames.")
 
 EVT_HANDLER(Fullscreen, "Enter fullscreen mode at startup")
 {
-    GetMenuOptionInt("Fullscreen", &fullScreen, 1);
-    update_opts();
+    GetMenuOptionConfig("Fullscreen", config::OptionID::kgeometryfullScreen);
 }
 
 EVT_HANDLER(PauseWhenInactive, "Pause game when main window loses focus")

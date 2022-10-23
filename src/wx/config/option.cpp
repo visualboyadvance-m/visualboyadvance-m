@@ -359,7 +359,7 @@ bool Option::SetInt(int32_t value) {
 
 bool Option::SetUnsigned(uint32_t value) {
     assert(is_unsigned());
-    uint32_t old_value = value;
+    uint32_t old_value = GetUnsigned();
     if (value < nonstd::get<uint32_t>(min_) ||
         value > nonstd::get<uint32_t>(max_)) {
         wxLogWarning(

@@ -13,8 +13,6 @@
 #include <wx/textctrl.h>
 #include <wx/xrc/xmlres.h>
 
-#include "../../System.h"
-#include "../../common/ConfigManager.h"
 #include "config/option.h"
 #include "rpi.h"
 #include "wayland.h"
