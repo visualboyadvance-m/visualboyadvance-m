@@ -27,21 +27,6 @@ Option* Option::ByID(OptionID id) {
     return &All()[static_cast<size_t>(id)];
 }
 
-// static
-Filter Option::GetFilterValue() {
-    return Option::ByID(OptionID::kDisplayFilter)->GetFilter();
-}
-
-// static
-Interframe Option::GetInterframeValue() {
-    return Option::ByID(OptionID::kDisplayIFB)->GetInterframe();
-}
-
-// static
-RenderMethod Option::GetRenderMethodValue() {
-    return Option::ByID(OptionID::kDisplayRenderMethod)->GetRenderMethod();
-}
-
 Option::~Option() = default;
 
 Option::Observer::Observer(OptionID option_id)
@@ -498,14 +483,11 @@ bool Option::SetGbPalette(const wxString& value) {
     return true;
 }
 
-void Option::NextFilter(bool skip_filter_plugin) {
+void Option::NextFilter() {
     assert(is_filter());
     const int old_value = static_cast<int>(GetFilter());
-    Filter new_filter = static_cast<Filter>((old_value + 1) % kNbFilters);
-    if (skip_filter_plugin && new_filter == Filter::kPlugin) {
-        new_filter = Filter::kNone;
-    }
-    SetFilter(new_filter);
+    const int new_value = (old_value + 1) % kNbFilters;
+    SetFilter(static_cast<Filter>(new_value));
 }
 
 void Option::NextInterframe() {
@@ -575,19 +557,6 @@ void Option::CallObservers() {
         observer->OnValueChanged();
     }
     calling_observers_ = false;
-}
-
-BasicOptionObserver::BasicOptionObserver(
-    config::OptionID option_id,
-    std::function<void(config::Option*)> callback)
-    : Option::Observer(option_id), callback_(std::move(callback)) {
-    assert(callback_);
-}
-
-BasicOptionObserver::~BasicOptionObserver() = default;
-
-void BasicOptionObserver::OnValueChanged() {
-    callback_(option());
 }
 
 }  // namespace config

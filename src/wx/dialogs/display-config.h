@@ -4,12 +4,16 @@
 #include <wx/dialog.h>
 #include <wx/event.h>
 
-#include "config/option.h"
+#include "config/option-observer.h"
 
 // Forward declarations.
 class wxChoice;
 class wxControl;
 class wxWindow;
+
+namespace config {
+class Option;
+}
 
 namespace dialogs {
 
@@ -28,13 +32,13 @@ private:
     // Populates the plugin options.
     void OnDialogShown(wxShowEvent&);
 
-    // 
+    // Stops handling the plugin options.
     void OnDialogClosed(wxCloseEvent&);
 
-    // Callback called when the render method changes.
+    // Displays the new filter name on the screen.
     void OnFilterChanged(config::Option* option);
 
-    // Callback called when the interframe method changes.
+    // Displays the new interframe name on the screen.
     void OnInterframeChanged(config::Option* option);
 
     // Hides/Shows the plugin-related filter options.
@@ -45,8 +49,8 @@ private:
     wxChoice* plugin_selector_;
     wxChoice* filter_selector_;
     wxChoice* interframe_selector_;
-    config::BasicOptionObserver filter_observer_;
-    config::BasicOptionObserver interframe_observer_;
+    config::OptionsObserver filter_observer_;
+    config::OptionsObserver interframe_observer_;
 };
 
 }  // namespace dialogs

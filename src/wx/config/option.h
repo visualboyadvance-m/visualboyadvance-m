@@ -9,147 +9,11 @@
 
 #include <wx/string.h>
 
+#include "config/option-id.h"
+
 namespace config {
 
-enum class OptionID {
-    // Display
-    kDisplayBilinear = 0,
-    kDisplayFilter,
-    kDisplayFilterPlugin,
-    kDisplayIFB,
-    kDisplayKeepOnTop,
-    kDisplayMaxThreads,
-    kDisplayRenderMethod,
-    kDisplayScale,
-    kDisplayStretch,
-
-    /// GB
-    kGBBiosFile,
-    kGBColorOption,
-    kGBColorizerHack,
-    kGBLCDFilter,
-    kGBGBCBiosFile,
-    kGBPalette0,
-    kGBPalette1,
-    kGBPalette2,
-    kGBPrintAutoPage,
-    kGBPrintScreenCap,
-    kGBROMDir,
-    kGBGBCROMDir,
-
-    /// GBA
-    kGBABiosFile,
-    kGBALCDFilter,
-#ifndef NO_LINK
-    kGBALinkAuto,
-    kGBALinkFast,
-    kGBALinkHost,
-    kGBAServerIP,
-    kGBALinkPort,
-    kGBALinkProto,
-    kGBALinkTimeout,
-    kGBALinkType,
-#endif
-    kGBAROMDir,
-
-    /// General
-    kGeneralAutoLoadLastState,
-    kGeneralBatteryDir,
-    kGeneralFreezeRecent,
-    kGeneralRecordingDir,
-    kGeneralRewindInterval,
-    kGeneralScreenshotDir,
-    kGeneralStateDir,
-    kGeneralStatusBar,
-
-    /// Joypad
-    kJoypad,
-    kJoypadAutofireThrottle,
-    kJoypadDefault,
-
-    /// Keyboard
-    kKeyboard,
-
-    // Core
-    kpreferencesagbPrint,
-    kpreferencesautoFrameSkip,
-    kpreferencesautoPatch,
-    kpreferencesautoSaveLoadCheatList,
-    kpreferencesborderAutomatic,
-    kpreferencesborderOn,
-    kpreferencescaptureFormat,
-    kpreferencescheatsEnabled,
-
-#ifdef MMX
-    kpreferencesenableMMX,
-#endif
-    kpreferencesdisableStatus,
-    kpreferencesemulatorType,
-    kpreferencesflashSize,
-    kpreferencesframeSkip,
-    kpreferencesfsColorDepth,
-    kpreferencesfsFrequency,
-    kpreferencesfsHeight,
-    kpreferencesfsWidth,
-    kpreferencesgbPaletteOption,
-    kpreferencesgbPrinter,
-    kpreferencesgdbBreakOnLoad,
-    kpreferencesgdbPort,
-#ifndef NO_LINK
-    kpreferencesLinkNumPlayers,
-#endif
-    kpreferencesmaxScale,
-    kpreferencespauseWhenInactive,
-    kpreferencesrtcEnabled,
-    kpreferencessaveType,
-    kpreferencesshowSpeed,
-    kpreferencesshowSpeedTransparent,
-    kpreferencesskipBios,
-    kpreferencesskipSaveGameCheats,
-    kpreferencesskipSaveGameBattery,
-    kpreferencesthrottle,
-    kpreferencesspeedupThrottle,
-    kpreferencesspeedupFrameSkip,
-    kpreferencesspeedupThrottleFrameSkip,
-    kpreferencesuseBiosGB,
-    kpreferencesuseBiosGBA,
-    kpreferencesuseBiosGBC,
-    kpreferencesvsync,
-
-    /// Geometry
-    kgeometryfullScreen,
-    kgeometryisMaximized,
-    kgeometrywindowHeight,
-    kgeometrywindowWidth,
-    kgeometrywindowX,
-    kgeometrywindowY,
-
-    /// UI
-    kuiallowKeyboardBackgroundInput,
-    kuiallowJoystickBackgroundInput,
-    kuihideMenuBar,
-
-    /// Sound
-    kSoundAudioAPI,
-    kSoundAudioDevice,
-    kSoundBuffers,
-    kSoundEnable,
-    kSoundGBAFiltering,
-    kSoundGBAInterpolation,
-    kSoundGBDeclicking,
-    kSoundGBEcho,
-    kSoundGBEnableEffects,
-    kSoundGBStereo,
-    kSoundGBSurround,
-    kSoundQuality,
-    kSoundVolume,
-
-    // Do not add anything under here.
-    Last,
-};
-static constexpr size_t kNbOptions = static_cast<size_t>(OptionID::Last);
-
-// Values for kDisplayFilter.
+// Values for kDispFilter.
 enum class Filter {
     kNone,
     k2xsai,
@@ -180,7 +44,7 @@ enum class Filter {
 };
 static constexpr size_t kNbFilters = static_cast<size_t>(Filter::kLast);
 
-// Values for kDisplayIFB.
+// Values for kDispIFB.
 enum class Interframe {
     kNone = 0,
     kSmart,
@@ -191,7 +55,7 @@ enum class Interframe {
 };
 static constexpr size_t kNbInterframes = static_cast<size_t>(Interframe::kLast);
 
-// Values for kDisplayRenderMethod.
+// Values for kDispRenderMethod.
 enum class RenderMethod {
     kSimple = 0,
     kOpenGL,
@@ -268,11 +132,6 @@ public:
     // O(1)
     static Option* ByID(OptionID id);
 
-    // Convenience direct accessors for some enum options.
-    static Filter GetFilterValue();
-    static Interframe GetInterframeValue();
-    static RenderMethod GetRenderMethodValue();
-
     ~Option();
 
     // Accessors.
@@ -326,7 +185,7 @@ public:
     bool SetGbPalette(const wxString& value);
 
     // Special convenience modifiers.
-    void NextFilter(bool skip_filter_plugin);
+    void NextFilter();
     void NextInterframe();
 
     // Command-line helper string.
@@ -386,19 +245,41 @@ private:
     const nonstd::variant<nonstd::monostate, double, int32_t, uint32_t> max_;
 };
 
-// A simple Option::Observer that calls a callback when the value has changed.
-class BasicOptionObserver : public Option::Observer {
-public:
-    BasicOptionObserver(config::OptionID option_id,
-                        std::function<void(config::Option*)> callback);
-    ~BasicOptionObserver() override;
-
-private:
-    // Option::Observer implementation.
-    void OnValueChanged() override;
-
-    std::function<void(config::Option*)> callback_;
-};
+// Convenience direct accessors. These are used to make direct access to
+// individual options less verbose.
+inline Option* OptDispFilter() {
+    return Option::ByID(OptionID::kDispFilter);
+}
+inline Option* OptDispIFB() {
+    return Option::ByID(OptionID::kDispIFB);
+}
+inline Option* OptDispFilterPlugin() {
+    return Option::ByID(OptionID::kDispFilterPlugin);
+}
+inline Option* OptDispRenderMethod() {
+    return Option::ByID(OptionID::kDispRenderMethod);
+}
+inline Option* OptDispScale() {
+    return Option::ByID(OptionID::kDispScale);
+}
+inline Option* OptGeomFullScreen() {
+    return Option::ByID(OptionID::kGeomFullScreen);
+}
+inline Option* OptGeomIsMaximized() {
+    return Option::ByID(OptionID::kGeomIsMaximized);
+}
+inline Option* OptGeomWindowHeight() {
+    return Option::ByID(OptionID::kGeomWindowHeight);
+}
+inline Option* OptGeomWindowWidth() {
+    return Option::ByID(OptionID::kGeomWindowWidth);
+}
+inline Option* OptGeomWindowX() {
+    return Option::ByID(OptionID::kGeomWindowX);
+}
+inline Option* OptGeomWindowY() {
+    return Option::ByID(OptionID::kGeomWindowY);
+}
 
 }  // namespace config
 

@@ -7,9 +7,10 @@
 #include <wx/log.h>
 #include <wx/display.h>
 
+#include "config/option-observer.h"
 #include "config/option.h"
-#include "wxvbam.h"
 #include "strutils.h"
+#include "wxvbam.h"
 
 /*
        disableSfx(F) -> cpuDisableSfx
@@ -61,11 +62,11 @@ void SaveOption(config::Option* option) {
 // Intitialize global observers to overwrite the configuration option when the
 // option has been modified.
 void InitializeOptionObservers() {
-    static std::unordered_set<std::unique_ptr<config::BasicOptionObserver>>
+    static std::unordered_set<std::unique_ptr<config::OptionsObserver>>
         g_observers;
     g_observers.reserve(config::kNbOptions);
     for (config::Option& option : config::Option::All()) {
-        g_observers.emplace(std::make_unique<config::BasicOptionObserver>(
+        g_observers.emplace(std::make_unique<config::OptionsObserver>(
             option.id(), &SaveOption));
     }
 }
