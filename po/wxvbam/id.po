@@ -5,6 +5,7 @@
 # Translators:
 # aquatorrent, 2015
 # Chizuru <saiber.one1@gmail.com>, 2015
+# Dimas Radityo, 2022
 # Jeremy Belpois <jeremy.belpois.einstein@gmail.com>, 2019
 # Jeremy Belpois <jeremy.belpois.einstein@gmail.com>, 2019-2020
 msgid ""
@@ -13,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-21 17:50-0700\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Jeremy Belpois <jeremy.belpois.einstein@gmail.com>, 2019-2020\n"
+"Last-Translator: Dimas Radityo, 2022\n"
 "Language-Team: Indonesian (http://www.transifex.com/bgk/vba-m/language/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -109,7 +110,7 @@ msgstr "Perintah yang tersedia untuk pilihan Keyboard/* adalah:\n\n"
 
 #: wxvbam.cpp:689
 msgid "Configuration file not found."
-msgstr ""
+msgstr "File konfigurasi tidak ditemukan"
 
 #: wxvbam.cpp:722
 msgid "Bad configuration option or multiple ROM files given:\n"
