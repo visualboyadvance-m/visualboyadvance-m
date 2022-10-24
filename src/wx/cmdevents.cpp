@@ -2555,35 +2555,34 @@ EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
     update_opts();
 }
 
-// FIXME: These should be changed so AdjustSize() is called somewhere else.
 EVT_HANDLER(SetSize1x, "1x")
 {
-    config::Option::ByID(config::OptionID::kDisplayScale)->SetDouble(1);
+    config::OptDispScale()->SetDouble(1);
 }
 
 EVT_HANDLER(SetSize2x, "2x")
 {
-    config::Option::ByID(config::OptionID::kDisplayScale)->SetDouble(2);
+    config::OptDispScale()->SetDouble(2);
 }
 
 EVT_HANDLER(SetSize3x, "3x")
 {
-    config::Option::ByID(config::OptionID::kDisplayScale)->SetDouble(3);
+    config::OptDispScale()->SetDouble(3);
 }
 
 EVT_HANDLER(SetSize4x, "4x")
 {
-    config::Option::ByID(config::OptionID::kDisplayScale)->SetDouble(4);
+    config::OptDispScale()->SetDouble(4);
 }
 
 EVT_HANDLER(SetSize5x, "5x")
 {
-    config::Option::ByID(config::OptionID::kDisplayScale)->SetDouble(5);
+    config::OptDispScale()->SetDouble(5);
 }
 
 EVT_HANDLER(SetSize6x, "6x")
 {
-    config::Option::ByID(config::OptionID::kDisplayScale)->SetDouble(6);
+    config::OptDispScale()->SetDouble(6);
 }
 
 EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
@@ -2763,17 +2762,12 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
 
 EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
 {
-    const wxString& filter_plugin =
-        config::Option::ByID(config::OptionID::kDisplayFilterPlugin)
-            ->GetString();
-    // Skip the filter plugin if it is not set.
-    config::Option::ByID(config::OptionID::kDisplayFilter)
-        ->NextFilter(filter_plugin == wxEmptyString);
+    config::OptDispFilter()->NextFilter();
 }
 
 EVT_HANDLER_MASK(ChangeIFB, "Change Interframe Blending", CMDEN_NREC_ANY)
 {
-    config::Option::ByID(config::OptionID::kDisplayIFB)->NextInterframe();
+    config::OptDispIFB()->NextInterframe();
 }
 
 EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)
@@ -2966,24 +2960,16 @@ EVT_HANDLER(wxID_ABOUT, "About...")
 EVT_HANDLER(Bilinear, "Use bilinear filter with 3d renderer")
 {
     GetMenuOptionBool("Bilinear", &gopts.bilinear);
-    // Force new panel with new bilinear option
-    if (panel->panel) {
-        panel->panel->Destroy();
-        panel->panel = nullptr;
-    }
+    // Force new panel with new bilinear option.
+    panel->ResetPanel();
     update_opts();
 }
 
 EVT_HANDLER(RetainAspect, "Retain aspect ratio when resizing")
 {
     GetMenuOptionBool("RetainAspect", &gopts.retain_aspect);
-
     // Force new panel with new aspect ratio options.
-    if (panel->panel) {
-        panel->panel->Destroy();
-        panel->panel = nullptr;
-    }
-
+    panel->ResetPanel();
     update_opts();
 }
 
@@ -3137,7 +3123,7 @@ EVT_HANDLER(FrameSkipAuto, "Auto Skip frames.")
 
 EVT_HANDLER(Fullscreen, "Enter fullscreen mode at startup")
 {
-    GetMenuOptionConfig("Fullscreen", config::OptionID::kgeometryfullScreen);
+    GetMenuOptionConfig("Fullscreen", config::OptionID::kGeomFullScreen);
 }
 
 EVT_HANDLER(PauseWhenInactive, "Pause game when main window loses focus")
@@ -3196,11 +3182,7 @@ EVT_HANDLER(VSync, "Wait for vertical sync")
 {
     GetMenuOptionInt("VSync", &vsync, 1);
     update_opts();
-
-    if (panel->panel) {
-        panel->panel->Destroy();
-        panel->panel = nullptr;
-    }
+    panel->ResetPanel();
 }
 
 void MainFrame::EnableNetworkMenu()

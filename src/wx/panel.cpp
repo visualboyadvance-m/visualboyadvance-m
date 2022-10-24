@@ -46,7 +46,7 @@
 namespace {
 
 double GetFilterScale() {
-    switch (config::Option::GetFilterValue()) {
+    switch (config::OptDispFilter()->GetFilter()) {
         case config::Filter::kNone:
             return 1.0;
         case config::Filter::k2xsai:
@@ -108,17 +108,12 @@ GameArea::GameArea()
       paused(false),
       pointer_blanked(false),
       mouse_active_time(0),
-      filter_observer_(config::OptionID::kDisplayFilter,
-                       std::bind(&GameArea::OnRenderingChanged,
-                                 this,
-                                 std::placeholders::_1)),
-      interframe_observer_(config::OptionID::kDisplayIFB,
-                           std::bind(&GameArea::OnRenderingChanged,
-                                     this,
-                                     std::placeholders::_1)),
-      scale_observer_(
-          config::OptionID::kDisplayScale,
-          std::bind(&GameArea::OnScaleChanged, this, std::placeholders::_1)) {
+      render_observer_(
+          {config::OptionID::kDispRenderMethod, config::OptionID::kDispFilter,
+           config::OptionID::kDispIFB},
+          std::bind(&GameArea::ResetPanel, this)),
+      scale_observer_(config::OptionID::kDispScale,
+                      std::bind(&GameArea::AdjustSize, this, true)) {
     SetSizer(new wxBoxSizer(wxVERTICAL));
     // all renderers prefer 32-bit
     // well, "simple" prefers 24-bit, but that's not available for filters
@@ -391,7 +386,7 @@ void GameArea::LoadGame(const wxString& name)
         emusys = &GBASystem;
     }
 
-    if (config::Option::ByID(config::OptionID::kgeometryfullScreen)->GetInt()) {
+    if (config::OptGeomFullScreen()->GetInt()) {
         GameArea::ShowFullScreen(true);
     }
 
@@ -639,10 +634,7 @@ void GameArea::UnloadGame(bool destruct)
 
     // in destructor, panel should be auto-deleted by wx since all panels
     // are derived from a window attached as child to GameArea
-    if (panel) {
-        panel->Destroy();
-        panel = nullptr;
-    }
+    ResetPanel();
 
     // close any game-related viewer windows
     // in destructor, viewer windows are in process of being deleted anyway
@@ -778,11 +770,7 @@ void GameArea::AddBorder()
     AdjustSize(false);
     wxGetApp().frame->Fit();
     GetSizer()->Detach(panel->GetWindow());
-
-    if (panel) {
-        panel->Destroy();
-        panel = nullptr;
-    }
+    ResetPanel();
 }
 
 void GameArea::DelBorder()
@@ -797,19 +785,14 @@ void GameArea::DelBorder()
     AdjustSize(false);
     wxGetApp().frame->Fit();
     GetSizer()->Detach(panel->GetWindow());
-
-    if (panel) {
-        panel->Destroy();
-        panel = nullptr;
-    }
+    ResetPanel();
 }
 
 void GameArea::AdjustMinSize()
 {
     wxWindow* frame           = wxGetApp().frame;
     double dpi_scale_factor = widgets::DPIScaleFactorForWindow(this);
-    double display_scale =
-        config::Option::ByID(config::OptionID::kDisplayScale)->GetDouble();
+    double display_scale = config::OptDispScale()->GetDouble();
 
     // note: could safely set min size to 1x or less regardless of video_scale
     // but setting it to scaled size makes resizing to default easier
@@ -845,8 +828,7 @@ void GameArea::AdjustSize(bool force)
         return;
 
     double dpi_scale_factor = widgets::DPIScaleFactorForWindow(this);
-    double display_scale =
-        config::Option::ByID(config::OptionID::kDisplayScale)->GetDouble();
+    double display_scale = config::OptDispScale()->GetDouble();
 
     const wxSize newsz(
         (std::ceil(basic_width * display_scale) * dpi_scale_factor),
@@ -862,6 +844,13 @@ void GameArea::AdjustSize(bool force)
     SetSize(newsz);
     GetParent()->SetClientSize(newsz);
     wxGetApp().frame->Fit();
+}
+
+void GameArea::ResetPanel() {
+    if (panel) {
+        panel->Destroy();
+        panel = nullptr;
+    }
 }
 
 void GameArea::ShowFullScreen(bool full)
@@ -883,10 +872,7 @@ void GameArea::ShowFullScreen(bool full)
 
     // just in case screen mode is going to change, go ahead and preemptively
     // delete panel to be recreated immediately after resize
-    if (panel) {
-        panel->Destroy();
-        panel = nullptr;
-    }
+    ResetPanel();
 
     // Windows does not restore old window size/pos
     // at least under Wine
@@ -1108,7 +1094,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
         return;
 
     if (!panel) {
-        switch (config::Option::GetRenderMethodValue()) {
+        switch (config::OptDispRenderMethod()->GetRenderMethod()) {
             case config::RenderMethod::kSimple:
                 panel = new BasicDrawingPanel(this, basic_width, basic_height);
                 break;
@@ -1422,10 +1408,9 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
       rpi_(nullptr) {
     memset(delta, 0xff, sizeof(delta));
 
-    if (config::Option::GetFilterValue() == config::Filter::kPlugin) {
+    if (config::OptDispFilter()->GetFilter() == config::Filter::kPlugin) {
         rpi_ = widgets::MaybeLoadFilterPlugin(
-            config::Option::ByID(config::OptionID::kDisplayFilterPlugin)
-                ->GetString(), &filter_plugin_);
+            config::OptDispFilterPlugin()->GetString(), &filter_plugin_);
         if (rpi_) {
             rpi_->Flags &= ~RPI_565_SUPP;
 
@@ -1445,15 +1430,13 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
             scale *= (rpi_->Flags & RPI_OUT_SCLMSK) >> RPI_OUT_SCLSH;
         } else {
             // This is going to delete the object. Do nothing more here.
-            config::Option::ByID(config::OptionID::kDisplayFilterPlugin)
-                ->SetString(wxEmptyString);
-            config::Option::ByID(config::OptionID::kDisplayFilter)
-                ->SetFilter(config::Filter::kNone);
+            config::OptDispFilterPlugin()->SetString(wxEmptyString);
+            config::OptDispFilter()->SetFilter(config::Filter::kNone);
             return;
         }
     }
 
-    if (config::Option::GetFilterValue() != config::Filter::kPlugin) {
+    if (config::OptDispFilter()->GetFilter() != config::Filter::kPlugin) {
         scale *= GetFilterScale();
         systemColorDepth = 32;
     }
@@ -1572,7 +1555,7 @@ public:
         delta_ += instride * procy;
 
         // FIXME: fugly hack
-        if (config::Option::GetRenderMethodValue() ==
+        if (config::OptDispRenderMethod()->GetRenderMethod() ==
             config::RenderMethod::kOpenGL) {
             dst_ += (int)std::ceil(outstride * (procy + 1) * scale_);
         } else {
@@ -1592,7 +1575,7 @@ public:
             // added procy param to provide offset into accum buffers
             ApplyInterframe(instride, procy);
 
-            if (config::Option::GetFilterValue() == config::Filter::kNone) {
+            if (config::OptDispFilter()->GetFilter() == config::Filter::kNone) {
                 if (nthreads_ == 1)
                     return 0;
 
@@ -1621,8 +1604,7 @@ private:
     // definitely not thread safe by default
     // added procy param to provide offset into accum buffers
     void ApplyInterframe(int instride, int procy) {
-        switch (config::Option::ByID(config::OptionID::kDisplayIFB)
-                    ->GetInterframe()) {
+        switch (config::OptDispIFB()->GetInterframe()) {
             case config::Interframe::kNone:
                 break;
 
@@ -1650,7 +1632,7 @@ private:
     // naturally, any of these with accumulation buffers like those
     // of the IFB filters will screw up royally as well
     void ApplyFilter(int instride, int outstride) {
-        switch (config::Option::GetFilterValue()) {
+        switch (config::OptDispFilter()->GetFilter()) {
             case config::Filter::k2xsai:
                 _2xSaI32(src_, instride, delta_, dst_, outstride, width_,
                          height_);
@@ -1812,7 +1794,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
         pixbuf2 = (uint8_t*)calloc(allocstride, std::ceil((alloch + 2) * scale));
     }
 
-    if (config::Option::GetFilterValue() == config::Filter::kNone) {
+    if (config::OptDispFilter()->GetFilter() == config::Filter::kNone) {
         todraw = *data;
         // *data is assigned below, after old buf has been processed
         pixbuf1 = pixbuf2;
@@ -1825,8 +1807,8 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
     // First, apply filters, if applicable, in parallel, if enabled
     // FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur)
-    if (config::Option::GetFilterValue() != config::Filter::kNone ||
-        config::Option::GetInterframeValue() != config::Interframe::kNone) {
+    if (config::OptDispFilter()->GetFilter() != config::Filter::kNone ||
+        config::OptDispIFB()->GetInterframe() != config::Interframe::kNone) {
         if (nthreads != gopts.max_threads) {
             if (nthreads) {
                 if (nthreads > 1)
@@ -1898,7 +1880,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     }
 
     // swap buffers now that src has been processed
-    if (config::Option::GetFilterValue() == config::Filter::kNone) {
+    if (config::OptDispFilter()->GetFilter() == config::Filter::kNone) {
         *data = pixbuf1;
     }
 
@@ -2084,8 +2066,8 @@ BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
 {
     // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
     // 16 or 32, though
-    if (config::Option::GetFilterValue() == config::Filter::kNone &&
-        config::Option::GetInterframeValue() == config::Interframe::kNone) {
+    if (config::OptDispFilter()->GetFilter() == config::Filter::kNone &&
+        config::OptDispIFB()->GetInterframe() == config::Interframe::kNone) {
         // changing from 32 to 24 does not require regenerating color tables
         systemColorDepth = 32;
     }
@@ -2116,7 +2098,7 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
 
             src += 2; // skip rhs border
         }
-    } else if (config::Option::GetFilterValue() != config::Filter::kNone) {
+    } else if (config::OptDispFilter()->GetFilter() != config::Filter::kNone) {
         // scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
         uint32_t* src = (uint32_t*)todraw + (int)std::ceil(width * scale) + 1; // skip top border
@@ -2641,15 +2623,4 @@ void GameArea::ShowMenuBar()
     SendSizeEvent();
     menu_bar_hidden = false;
 #endif
-}
-
-void GameArea::OnRenderingChanged(config::Option*) {
-    if (panel) {
-        panel->Destroy();
-        panel = nullptr;
-    }
-}
-
-void GameArea::OnScaleChanged(config::Option*) {
-    AdjustSize(true);
 }

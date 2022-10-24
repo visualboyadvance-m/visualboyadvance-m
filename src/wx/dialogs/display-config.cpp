@@ -28,8 +28,7 @@ namespace {
 // Validator for a wxTextCtrl with a double value.
 class ScaleValidator : public widgets::OptionValidator {
 public:
-    ScaleValidator()
-        : widgets::OptionValidator(config::OptionID::kDisplayScale) {}
+    ScaleValidator() : widgets::OptionValidator(config::OptionID::kDispScale) {}
     ~ScaleValidator() override = default;
 
 private:
@@ -68,7 +67,7 @@ private:
 // Validator for a wxChoice with a Filter value.
 class FilterValidator : public widgets::OptionValidator {
 public:
-    FilterValidator() : OptionValidator(config::OptionID::kDisplayFilter) {
+    FilterValidator() : OptionValidator(config::OptionID::kDispFilter) {
         Bind(wxEVT_CHOICE, &FilterValidator::OnChoice, this);
     }
     ~FilterValidator() override = default;
@@ -106,7 +105,7 @@ private:
 // Validator for a wxChoice with an Interframe value.
 class InterframeValidator : public widgets::OptionValidator {
 public:
-    InterframeValidator() : OptionValidator(config::OptionID::kDisplayIFB) {
+    InterframeValidator() : OptionValidator(config::OptionID::kDispIFB) {
         Bind(wxEVT_CHOICE, &InterframeValidator::OnChoice, this);
     }
     ~InterframeValidator() override = default;
@@ -146,7 +145,7 @@ private:
 class RenderValidator : public widgets::OptionValidator {
 public:
     explicit RenderValidator(config::RenderMethod render_method)
-        : OptionValidator(config::OptionID::kDisplayRenderMethod),
+        : OptionValidator(config::OptionID::kDispRenderMethod),
           render_method_(render_method) {
         assert(render_method != config::RenderMethod::kLast);
         Bind(wxEVT_RADIOBUTTON, &RenderValidator::OnRadioButton, this);
@@ -184,7 +183,7 @@ private:
 class PluginSelectorValidator : public widgets::OptionValidator {
 public:
     PluginSelectorValidator()
-        : widgets::OptionValidator(config::OptionID::kDisplayFilterPlugin) {}
+        : widgets::OptionValidator(config::OptionID::kDispFilterPlugin) {}
     ~PluginSelectorValidator() override = default;
 
 private:
@@ -246,11 +245,11 @@ DisplayConfig* DisplayConfig::NewInstance(wxWindow* parent) {
 
 DisplayConfig::DisplayConfig(wxWindow* parent)
     : wxDialog(),
-      filter_observer_(config::OptionID::kDisplayFilter,
+      filter_observer_(config::OptionID::kDispFilter,
                        std::bind(&DisplayConfig::OnFilterChanged,
                                  this,
                                  std::placeholders::_1)),
-      interframe_observer_(config::OptionID::kDisplayIFB,
+      interframe_observer_(config::OptionID::kDispIFB,
                            std::bind(&DisplayConfig::OnInterframeChanged,
                                      this,
                                      std::placeholders::_1)) {
@@ -338,9 +337,8 @@ void DisplayConfig::OnDialogShown(wxShowEvent&) {
     plugin_selector_->Clear();
     plugin_selector_->Append(_("None"), new wxStringClientData());
 
-    const wxString selected_plugin =
-        config::Option::ByID(config::OptionID::kDisplayFilterPlugin)
-            ->GetString();
+    const wxString& selected_plugin =
+        config::OptDispFilterPlugin()->GetString();
     bool is_plugin_selected = false;
 
     for (const wxString& plugin : plugins) {
@@ -375,8 +373,7 @@ void DisplayConfig::OnDialogShown(wxShowEvent&) {
     }
 
     if (!is_plugin_selected) {
-        config::Option::ByID(config::OptionID::kDisplayFilterPlugin)
-            ->SetString(wxEmptyString);
+        config::OptDispFilterPlugin()->SetString(wxEmptyString);
     }
 
     plugin_selector_->SetValidator(PluginSelectorValidator());
@@ -393,13 +390,22 @@ void DisplayConfig::OnDialogClosed(wxCloseEvent&) {
 
 void DisplayConfig::OnFilterChanged(config::Option* option) {
     const config::Filter option_filter = option->GetFilter();
-    const bool show_plugin = option_filter == config::Filter::kPlugin;
-    plugin_label_->Enable(show_plugin);
-    plugin_selector_->Enable(show_plugin);
+    const bool is_plugin = (option_filter == config::Filter::kPlugin);
+    plugin_label_->Enable(is_plugin);
+    plugin_selector_->Enable(is_plugin);
 
-    systemScreenMessage(wxString::Format(
-        _("Using pixel filter: %s"),
-        filter_selector_->GetString(static_cast<size_t>(option_filter))));
+    // Plugin needs to be handled separately, in case it was removed. The panel
+    // will eventually reset if it can't actually use the plugin.
+    wxString filter_name;
+    if (is_plugin) {
+        filter_name = _("Plugin");
+    } else {
+        filter_name =
+            filter_selector_->GetString(static_cast<size_t>(option_filter));
+    }
+
+    systemScreenMessage(
+        wxString::Format(_("Using pixel filter: %s"), filter_name));
 }
 
 void DisplayConfig::OnInterframeChanged(config::Option* option) {
@@ -418,16 +424,14 @@ void DisplayConfig::HidePluginOptions() {
     if (filter_selector_->GetCount() == config::kNbFilters) {
         // Make sure we have not selected the plugin option. The validator
         // will take care of updating the selector value.
-        if (config::Option::GetFilterValue() == config::Filter::kPlugin) {
-            config::Option::ByID(config::OptionID::kDisplayFilter)
-                ->SetFilter(config::Filter::kNone);
+        if (config::OptDispFilter()->GetFilter() == config::Filter::kPlugin) {
+            config::OptDispFilter()->SetFilter(config::Filter::kNone);
         }
         filter_selector_->Delete(config::kNbFilters - 1);
     }
 
     // Also erase the Plugin value to avoid issues down the line.
-    config::Option::ByID(config::OptionID::kDisplayFilterPlugin)
-        ->SetString(wxEmptyString);
+    config::OptDispFilterPlugin()->SetString(wxEmptyString);
 }
 
 void DisplayConfig::ShowPluginOptions() {

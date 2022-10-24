@@ -361,8 +361,8 @@ bool wxvbamApp::OnInit() {
     // wxGLCanvas segfaults under wayland before wx 3.2
 #if defined(__WXGTK__) && !wxCHECK_VERSION(3, 2, 0)
     if (UsingWayland()) {
-        config::Option::ByID(config::OptionID::kDisplayRenderMethod)
-            ->SetRenderMethod(config::RenderMethod::kSimple);
+        config::OptDispRenderMethod()->SetRenderMethod(
+            config::RenderMethod::kSimple);
     }
 #endif
 
@@ -471,16 +471,12 @@ bool wxvbamApp::OnInit() {
     config::GameControlState::Instance().OnGameBindingsChanged();
 
     // create the main window
-    int x = config::Option::ByID(config::OptionID::kgeometrywindowX)->GetInt();
-    int y = config::Option::ByID(config::OptionID::kgeometrywindowY)->GetInt();
-    int width = config::Option::ByID(config::OptionID::kgeometrywindowWidth)
-                    ->GetUnsigned();
-    int height = config::Option::ByID(config::OptionID::kgeometrywindowHeight)
-                     ->GetUnsigned();
-    bool isFullscreen =
-        config::Option::ByID(config::OptionID::kgeometryfullScreen)->GetInt();
-    bool isMaximized =
-        config::Option::ByID(config::OptionID::kgeometryisMaximized)->GetInt();
+    int x = config::OptGeomWindowX()->GetInt();
+    int y = config::OptGeomWindowY()->GetInt();
+    int width = config::OptGeomWindowWidth()->GetUnsigned();
+    int height = config::OptGeomWindowHeight()->GetUnsigned();
+    bool isFullscreen = config::OptGeomFullScreen()->GetInt();
+    bool isMaximized = config::OptGeomIsMaximized()->GetInt();
     frame = wxDynamicCast(xr->LoadFrame(nullptr, "MainFrame"), MainFrame);
 
     if (!frame) {
@@ -844,10 +840,8 @@ void MainFrame::OnMove(wxMoveEvent&) {
 
     if (!IsFullScreen() && !IsMaximized()) {
         if (window_pos.x >= 0 && window_pos.y >= 0) {
-            config::Option::ByID(config::OptionID::kgeometrywindowX)
-                ->SetInt(window_pos.x);
-            config::Option::ByID(config::OptionID::kgeometrywindowY)
-                ->SetInt(window_pos.y);
+            config::OptGeomWindowX()->SetInt(window_pos.x);
+            config::OptGeomWindowY()->SetInt(window_pos.y);
         }
     }
 }
@@ -857,17 +851,13 @@ void MainFrame::OnSize(wxSizeEvent& event)
     wxFrame::OnSize(event);
     wxRect window_rect = GetRect();
     wxPoint window_pos = GetScreenPosition();
-    config::Option* window_x =
-        config::Option::ByID(config::OptionID::kgeometrywindowX);
-    config::Option* window_y =
-        config::Option::ByID(config::OptionID::kgeometrywindowY);
+    config::Option* window_x = config::OptGeomWindowX();
+    config::Option* window_y = config::OptGeomWindowY();
 
     if (!IsFullScreen() && !IsMaximized()) {
         if (window_rect.GetHeight() > 0 && window_rect.GetWidth() > 0) {
-            config::Option::ByID(config::OptionID::kgeometrywindowHeight)
-                ->SetUnsigned(window_rect.GetHeight());
-            config::Option::ByID(config::OptionID::kgeometrywindowWidth)
-                ->SetUnsigned(window_rect.GetWidth());
+            config::OptGeomWindowHeight()->SetUnsigned(window_rect.GetHeight());
+            config::OptGeomWindowWidth()->SetUnsigned(window_rect.GetWidth());
         }
         if (window_pos.x >= 0 && window_pos.y >= 0) {
             window_x->SetInt(window_pos.x);
@@ -875,10 +865,8 @@ void MainFrame::OnSize(wxSizeEvent& event)
         }
     }
 
-    config::Option::ByID(config::OptionID::kgeometryisMaximized)
-        ->SetInt(IsMaximized());
-    config::Option::ByID(config::OptionID::kgeometryfullScreen)
-        ->SetInt(IsFullScreen());
+    config::OptGeomIsMaximized()->SetInt(IsMaximized());
+    config::OptGeomFullScreen()->SetInt(IsFullScreen());
 }
 
 int MainFrame::FilterEvent(wxEvent& event)

@@ -11,7 +11,7 @@
 #include <wx/propdlg.h>
 #include <wx/datetime.h>
 
-#include "config/option.h"
+#include "config/option-observer.h"
 #include "widgets/dpi-support.h"
 #include "wx/joyedit.h"
 #include "wx/keyedit.h"
@@ -542,7 +542,9 @@ public:
 // FIXME: size this properly
 #define NUM_REWINDS 8
 #define REWIND_SIZE 1024 * 512 * NUM_REWINDS
-    // FIXME: make this a config option
+
+    // Resets the panel, it will be re-created on the next frame.
+    void ResetPanel();
 
     void ShowFullScreen(bool full);
     bool IsFullScreen()
@@ -614,15 +616,8 @@ protected:
     DECLARE_EVENT_TABLE()
 
 private:
-    // Callback for Render and Interframe changed events.
-    void OnRenderingChanged(config::Option*);
-
-    // Callback for VideoScale changed events.
-    void OnScaleChanged(config::Option*);
-
-    config::BasicOptionObserver filter_observer_;
-    config::BasicOptionObserver interframe_observer_;
-    config::BasicOptionObserver scale_observer_;
+    config::OptionsObserver render_observer_;
+    config::OptionsObserver scale_observer_;
 };
 
 // wxString version of OSD message

@@ -755,6 +755,7 @@ set(
     wxutil.cpp
     config/game-control.cpp
     config/internal/option-internal.cpp
+    config/option-observer.cpp
     config/option.cpp
     config/user-input.cpp
     dialogs/display-config.cpp
@@ -799,6 +800,8 @@ set(
     wxutil.h
     config/game-control.h
     config/internal/option-internal.h
+    config/option-id.h
+    config/option-observer.h
     config/option.h
     config/user-input.h
     dialogs/display-config.h
