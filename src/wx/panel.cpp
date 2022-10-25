@@ -2364,7 +2364,8 @@ void GLDrawingPanel::OnSize(wxSizeEvent& ev)
     AdjustViewport();
 
     // Temporary hack to backport 800d6ed69b from wxWidgets until 3.2.2 is released.
-    MoveWaylandSubsurface(this);
+    if (IsWayland())
+        MoveWaylandSubsurface(this);
 
     ev.Skip();
 }

@@ -17,6 +17,8 @@ bool IsWayland() { return GDK_IS_WAYLAND_DISPLAY(gdk_display_get_default()); }
 
 void MoveWaylandSubsurface(wxGLCanvas* win)
 {
+    if (!IsWayland()) return;
+
     int x, y;
     gdk_window_get_origin(win->GTKGetDrawingWindow(), &x, &y);
     wl_subsurface_set_position(win->m_wlSubsurface, x, y);
