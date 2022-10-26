@@ -1012,19 +1012,19 @@ msgstr "回写状态错误"
 
 #: panel.cpp:2285
 msgid "Enabling EGL VSync."
-msgstr ""
+msgstr "正在启用 EGL 垂直同步。"
 
 #: panel.cpp:2287
 msgid "Disabling EGL VSync."
-msgstr ""
+msgstr "正在禁用 EGL 垂直同步。"
 
 #: panel.cpp:2294
 msgid "Enabling GLX VSync."
-msgstr ""
+msgstr "正在启用 GLX 垂直同步。"
 
 #: panel.cpp:2296
 msgid "Disabling GLX VSync."
-msgstr ""
+msgstr "正在禁用 GLX 垂直同步。"
 
 #: panel.cpp:2314
 msgid "Failed to set glXSwapIntervalEXT"
@@ -1140,7 +1140,7 @@ msgstr "默认缩放系数"
 
 #: config/internal/option-internal.cpp:338
 msgid "Retain aspect ratio when resizing"
-msgstr "调整大小时保持宽高比"
+msgstr "调整大小时保持长宽比"
 
 #: config/internal/option-internal.cpp:341
 msgid "BIOS file to use for GB, if enabled"
@@ -3480,7 +3480,7 @@ msgstr "更改帧间混合"
 
 #: xrc/MainMenu.xrc:351
 msgid "&Retain aspect ratio"
-msgstr "保持宽高比(&R)"
+msgstr "保持长宽比(&R)"
 
 #: xrc/MainMenu.xrc:360
 msgid "&Bilinear filter"
