@@ -15,6 +15,8 @@
 
 #include <wx/xrc/xmlres.h>
 
+#include "config/option-id.h"
+#include "config/option-proxy.h"
 #include "config/option.h"
 #include "rpi.h"
 #include "wayland.h"
@@ -352,8 +354,7 @@ void DisplayConfig::PopulatePluginOptions() {
     plugin_selector_->Clear();
     plugin_selector_->Append(_("None"), new wxStringClientData());
 
-    const wxString& selected_plugin =
-        config::OptDispFilterPlugin()->GetString();
+    const wxString& selected_plugin = config::Proxy<config::OptionID::kDispFilterPlugin>().Get();
     bool is_plugin_selected = false;
 
     for (const wxString& plugin : plugins) {
@@ -388,7 +389,7 @@ void DisplayConfig::PopulatePluginOptions() {
     }
 
     if (!is_plugin_selected) {
-        config::OptDispFilterPlugin()->SetString(wxEmptyString);
+        config::Proxy<config::OptionID::kDispFilterPlugin>().Set(wxEmptyString);
     }
 
     plugin_selector_->SetValidator(PluginSelectorValidator());
@@ -443,14 +444,14 @@ void DisplayConfig::HidePluginOptions() {
     if (filter_selector_->GetCount() == config::kNbFilters) {
         // Make sure we have not selected the plugin option. The validator
         // will take care of updating the selector value.
-        if (config::OptDispFilter()->GetFilter() == config::Filter::kPlugin) {
-            config::OptDispFilter()->SetFilter(config::Filter::kNone);
+        if (config::Proxy<config::OptionID::kDispFilter>().Get() == config::Filter::kPlugin) {
+            config::Proxy<config::OptionID::kDispFilter>().Set(config::Filter::kNone);
         }
         filter_selector_->Delete(config::kNbFilters - 1);
     }
 
     // Also erase the Plugin value to avoid issues down the line.
-    config::OptDispFilterPlugin()->SetString(wxEmptyString);
+    config::Proxy<config::OptionID::kDispFilterPlugin>().Set(wxEmptyString);
 }
 
 void DisplayConfig::ShowPluginOptions() {

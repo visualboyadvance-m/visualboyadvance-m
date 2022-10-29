@@ -261,42 +261,6 @@ private:
     const nonstd::variant<nonstd::monostate, double, int32_t, uint32_t> max_;
 };
 
-// Convenience direct accessors. These are used to make direct access to
-// individual options less verbose.
-inline Option* OptDispFilter() {
-    return Option::ByID(OptionID::kDispFilter);
-}
-inline Option* OptDispIFB() {
-    return Option::ByID(OptionID::kDispIFB);
-}
-inline Option* OptDispFilterPlugin() {
-    return Option::ByID(OptionID::kDispFilterPlugin);
-}
-inline Option* OptDispRenderMethod() {
-    return Option::ByID(OptionID::kDispRenderMethod);
-}
-inline Option* OptDispScale() {
-    return Option::ByID(OptionID::kDispScale);
-}
-inline Option* OptGeomFullScreen() {
-    return Option::ByID(OptionID::kGeomFullScreen);
-}
-inline Option* OptGeomIsMaximized() {
-    return Option::ByID(OptionID::kGeomIsMaximized);
-}
-inline Option* OptGeomWindowHeight() {
-    return Option::ByID(OptionID::kGeomWindowHeight);
-}
-inline Option* OptGeomWindowWidth() {
-    return Option::ByID(OptionID::kGeomWindowWidth);
-}
-inline Option* OptGeomWindowX() {
-    return Option::ByID(OptionID::kGeomWindowX);
-}
-inline Option* OptGeomWindowY() {
-    return Option::ByID(OptionID::kGeomWindowY);
-}
-
 }  // namespace config
 
 #endif  // VBAM_WX_CONFIG_OPTIONS_H_

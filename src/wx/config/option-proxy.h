@@ -1,0 +1,279 @@
+#ifndef VBAM_WX_CONFIG_OPTION_PROXY_H_
+#define VBAM_WX_CONFIG_OPTION_PROXY_H_
+
+#include <array>
+#include <type_traits>
+
+#include "config/option-id.h"
+#include "config/option.h"
+
+namespace config {
+
+static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
+    /// Display
+    /*kDispBilinear*/ Option::Type::kBool,
+    /*kDispFilter*/ Option::Type::kFilter,
+    /*kDispFilterPlugin*/ Option::Type::kString,
+    /*kDispIFB*/ Option::Type::kInterframe,
+    /*kDispKeepOnTop*/ Option::Type::kBool,
+    /*kDispMaxThreads*/ Option::Type::kInt,
+    /*kDispRenderMethod*/ Option::Type::kRenderMethod,
+    /*kDispScale*/ Option::Type::kDouble,
+    /*kDispStretch*/ Option::Type::kBool,
+
+    /// GB
+    /*kGBBiosFile*/ Option::Type::kString,
+    /*kGBColorOption*/ Option::Type::kInt,
+    /*kGBColorizerHack*/ Option::Type::kInt,
+    /*kGBLCDFilter*/ Option::Type::kBool,
+    /*kGBGBCBiosFile*/ Option::Type::kString,
+    /*kGBPalette0*/ Option::Type::kGbPalette,
+    /*kGBPalette1*/ Option::Type::kGbPalette,
+    /*kGBPalette2*/ Option::Type::kGbPalette,
+    /*kGBPrintAutoPage*/ Option::Type::kBool,
+    /*kGBPrintScreenCap*/ Option::Type::kBool,
+    /*kGBROMDir*/ Option::Type::kString,
+    /*kGBGBCROMDir*/ Option::Type::kString,
+
+    /// GBA
+    /*kGBABiosFile*/ Option::Type::kString,
+    /*kGBALCDFilter*/ Option::Type::kBool,
+#ifndef NO_LINK
+    /*kGBALinkAuto*/ Option::Type::kBool,
+    /*kGBALinkFast*/ Option::Type::kBool,
+    /*kGBALinkHost*/ Option::Type::kString,
+    /*kGBAServerIP*/ Option::Type::kString,
+    /*kGBALinkPort*/ Option::Type::kUnsigned,
+    /*kGBALinkProto*/ Option::Type::kBool,
+    /*kGBALinkTimeout*/ Option::Type::kInt,
+    /*kGBALinkType*/ Option::Type::kInt,
+#endif
+    /*kGBAROMDir*/ Option::Type::kString,
+
+    /// General
+    /*kGenAutoLoadLastState*/ Option::Type::kBool,
+    /*kGenBatteryDir*/ Option::Type::kString,
+    /*kGenFreezeRecent*/ Option::Type::kBool,
+    /*kGenRecordingDir*/ Option::Type::kString,
+    /*kGenRewindInterval*/ Option::Type::kInt,
+    /*kGenScreenshotDir*/ Option::Type::kString,
+    /*kGenStateDir*/ Option::Type::kString,
+    /*kGenStatusBar*/ Option::Type::kBool,
+
+    /// Joypad
+    /*kJoy*/ Option::Type::kNone,
+    /*kJoyAutofireThrottle*/ Option::Type::kInt,
+    /*kJoyDefault*/ Option::Type::kInt,
+
+    /// Keyboard
+    /*kKeyboard*/ Option::Type::kNone,
+
+    /// Core
+    /*kPrefAgbPrint*/ Option::Type::kInt,
+    /*kPrefAutoFrameSkip*/ Option::Type::kInt,
+    /*kPrefAutoPatch*/ Option::Type::kInt,
+    /*kPrefAutoSaveLoadCheatList*/ Option::Type::kBool,
+    /*kPrefBorderAutomatic*/ Option::Type::kInt,
+    /*kPrefBorderOn*/ Option::Type::kInt,
+    /*kPrefCaptureFormat*/ Option::Type::kInt,
+    /*kPrefCheatsEnabled*/ Option::Type::kInt,
+    /*kPrefDisableStatus*/ Option::Type::kInt,
+    /*kPrefEmulatorType*/ Option::Type::kInt,
+    /*kPrefFlashSize*/ Option::Type::kInt,
+    /*kPrefFrameSkip*/ Option::Type::kInt,
+    /*kPrefGBPaletteOption*/ Option::Type::kInt,
+    /*kPrefGBPrinter*/ Option::Type::kInt,
+    /*kPrefGDBBreakOnLoad*/ Option::Type::kBool,
+    /*kPrefGDBPort*/ Option::Type::kInt,
+#ifndef NO_LINK
+    /*kPrefLinkNumPlayers*/ Option::Type::kInt,
+#endif
+    /*kPrefMaxScale*/ Option::Type::kInt,
+    /*kPrefPauseWhenInactive*/ Option::Type::kInt,
+    /*kPrefRTCEnabled*/ Option::Type::kInt,
+    /*kPrefSaveType*/ Option::Type::kInt,
+    /*kPrefShowSpeed*/ Option::Type::kInt,
+    /*kPrefShowSpeedTransparent*/ Option::Type::kInt,
+    /*kPrefSkipBios*/ Option::Type::kInt,
+    /*kPrefSkipSaveGameCheats*/ Option::Type::kInt,
+    /*kPrefSkipSaveGameBattery*/ Option::Type::kInt,
+    /*kPrefThrottle*/ Option::Type::kUnsigned,
+    /*kPrefSpeedupThrottle*/ Option::Type::kUnsigned,
+    /*kPrefSpeedupFrameSkip*/ Option::Type::kUnsigned,
+    /*kPrefSpeedupThrottleFrameSkip*/ Option::Type::kBool,
+    /*kPrefUseBiosGB*/ Option::Type::kBool,
+    /*kPrefUseBiosGBA*/ Option::Type::kBool,
+    /*kPrefUseBiosGBC*/ Option::Type::kBool,
+    /*kPrefVsync*/ Option::Type::kBool,
+
+    /// Geometry
+    /*kGeomFullScreen*/ Option::Type::kInt,
+    /*kGeomIsMaximized*/ Option::Type::kBool,
+    /*kGeomWindowHeight*/ Option::Type::kUnsigned,
+    /*kGeomWindowWidth*/ Option::Type::kUnsigned,
+    /*kGeomWindowX*/ Option::Type::kInt,
+    /*kGeomWindowY*/ Option::Type::kInt,
+
+    /// UI
+    /*kUIAllowKeyboardBackgroundInput*/ Option::Type::kBool,
+    /*kUIAllowJoystickBackgroundInput*/ Option::Type::kBool,
+    /*kUIHideMenuBar*/ Option::Type::kBool,
+
+    /// Sound
+    /*kSoundAudioAPI*/ Option::Type::kAudioApi,
+    /*kSoundAudioDevice*/ Option::Type::kString,
+    /*kSoundBuffers*/ Option::Type::kInt,
+    /*kSoundEnable*/ Option::Type::kInt,
+    /*kSoundGBAFiltering*/ Option::Type::kInt,
+    /*kSoundGBAInterpolation*/ Option::Type::kBool,
+    /*kSoundGBDeclicking*/ Option::Type::kBool,
+    /*kSoundGBEcho*/ Option::Type::kInt,
+    /*kSoundGBEnableEffects*/ Option::Type::kBool,
+    /*kSoundGBStereo*/ Option::Type::kInt,
+    /*kSoundGBSurround*/ Option::Type::kBool,
+    /*kSoundQuality*/ Option::Type::kSoundQuality,
+    /*kSoundVolume*/ Option::Type::kInt,
+};
+
+// Less verbose accessor for a specific OptionID with compile-time type checks.
+//
+// Sample usage:
+// if (Proxy<OptionID::kDispBilinear>::Get()) {
+//     // Do something if bilinear filter is on.
+// }
+//
+// Proxy<OptionID::kDispBilinear>::Set(false);
+template <OptionID ID, typename = void>
+class Proxy {};
+
+template <OptionID ID>
+class Proxy<
+    ID,
+    typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] == Option::Type::kBool>::type> {
+public:
+    Proxy() : option_(Option::ByID(ID)) {}
+    ~Proxy() = default;
+
+    bool Get() { return option_->GetBool(); }
+    bool Set(bool value) { return option_->SetBool(value); }
+
+private:
+    Option* option_;
+};
+
+template <OptionID ID>
+class Proxy<ID,
+            typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
+                                    Option::Type::kDouble>::type> {
+public:
+    Proxy() : option_(Option::ByID(ID)) {}
+    ~Proxy() = default;
+
+    double Get() { return option_->GetDouble(); }
+    bool Set(double value) { return option_->SetDouble(value); }
+    double Min() const { return option_->GetDoubleMin(); }
+    double Max() const { return option_->GetDoubleMax(); }
+
+private:
+    Option* option_;
+};
+
+template <OptionID ID>
+class Proxy<
+    ID,
+    typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] == Option::Type::kInt>::type> {
+public:
+    Proxy() : option_(Option::ByID(ID)) {}
+    ~Proxy() = default;
+
+    int32_t Get() { return option_->GetInt(); }
+    bool Set(int32_t value) { return option_->SetInt(value); }
+    int32_t Min() const { return option_->GetIntMin(); }
+    int32_t Max() const { return option_->GetIntMax(); }
+
+private:
+    Option* option_;
+};
+
+template <OptionID ID>
+class Proxy<ID,
+            typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
+                                    Option::Type::kUnsigned>::type> {
+public:
+    Proxy() : option_(Option::ByID(ID)) {}
+    ~Proxy() = default;
+
+    uint32_t Get() { return option_->GetUnsigned(); }
+    bool Set(uint32_t value) { return option_->SetUnsigned(value); }
+    uint32_t Min() const { return option_->GetUnsignedMin(); }
+    uint32_t Max() const { return option_->GetUnsignedMax(); }
+
+private:
+    Option* option_;
+};
+
+template <OptionID ID>
+class Proxy<ID,
+            typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
+                                    Option::Type::kString>::type> {
+public:
+    Proxy() : option_(Option::ByID(ID)) {}
+    ~Proxy() = default;
+
+    const wxString& Get() { return option_->GetString(); }
+    bool Set(const wxString& value) { return option_->SetString(value); }
+
+private:
+    Option* option_;
+};
+
+template <OptionID ID>
+class Proxy<ID,
+            typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
+                                    Option::Type::kFilter>::type> {
+public:
+    Proxy() : option_(Option::ByID(ID)) {}
+    ~Proxy() = default;
+
+    Filter Get() { return option_->GetFilter(); }
+    bool Set(Filter value) { return option_->SetFilter(value); }
+    void Next() { option_->NextFilter(); }
+
+private:
+    Option* option_;
+};
+
+template <OptionID ID>
+class Proxy<ID,
+            typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
+                                    Option::Type::kInterframe>::type> {
+public:
+    Proxy() : option_(Option::ByID(ID)) {}
+    ~Proxy() = default;
+
+    Interframe Get() { return option_->GetInterframe(); }
+    bool Set(Interframe value) { return option_->SetInterframe(value); }
+    void Next() { option_->NextInterframe(); }
+
+private:
+    Option* option_;
+};
+
+template <OptionID ID>
+class Proxy<ID,
+            typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
+                                    Option::Type::kRenderMethod>::type> {
+public:
+    Proxy() : option_(Option::ByID(ID)) {}
+    ~Proxy() = default;
+
+    RenderMethod Get() { return option_->GetRenderMethod(); }
+    bool Set(RenderMethod value) { return option_->SetRenderMethod(value); }
+
+private:
+    Option* option_;
+};
+
+}  // namespace config
+
+#endif  // VBAM_WX_CONFIG_OPTION_PROXY_H_

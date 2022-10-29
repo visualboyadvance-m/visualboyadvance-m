@@ -29,6 +29,7 @@
 #include "../sdl/text.h"
 #include "background-input.h"
 #include "config/game-control.h"
+#include "config/option-proxy.h"
 #include "config/option.h"
 #include "config/user-input.h"
 #include "drawing.h"
@@ -46,7 +47,7 @@
 namespace {
 
 double GetFilterScale() {
-    switch (config::OptDispFilter()->GetFilter()) {
+    switch (config::Proxy<config::OptionID::kDispFilter>().Get()) {
         case config::Filter::kNone:
             return 1.0;
         case config::Filter::k2xsai:
@@ -387,7 +388,7 @@ void GameArea::LoadGame(const wxString& name)
         emusys = &GBASystem;
     }
 
-    if (config::OptGeomFullScreen()->GetInt()) {
+    if (config::Proxy<config::OptionID::kGeomFullScreen>().Get()) {
         GameArea::ShowFullScreen(true);
     }
 
@@ -793,7 +794,7 @@ void GameArea::AdjustMinSize()
 {
     wxWindow* frame           = wxGetApp().frame;
     double dpi_scale_factor = widgets::DPIScaleFactorForWindow(this);
-    double display_scale = config::OptDispScale()->GetDouble();
+    double display_scale = config::Proxy<config::OptionID::kDispScale>().Get();
 
     // note: could safely set min size to 1x or less regardless of video_scale
     // but setting it to scaled size makes resizing to default easier
@@ -829,7 +830,7 @@ void GameArea::AdjustSize(bool force)
         return;
 
     double dpi_scale_factor = widgets::DPIScaleFactorForWindow(this);
-    double display_scale = config::OptDispScale()->GetDouble();
+    double display_scale = config::Proxy<config::OptionID::kDispScale>().Get();
 
     const wxSize newsz(
         (std::ceil(basic_width * display_scale) * dpi_scale_factor),
@@ -1095,7 +1096,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
         return;
 
     if (!panel) {
-        switch (config::OptDispRenderMethod()->GetRenderMethod()) {
+        switch (config::Proxy<config::OptionID::kDispRenderMethod>().Get()) {
             case config::RenderMethod::kSimple:
                 panel = new BasicDrawingPanel(this, basic_width, basic_height);
                 break;
@@ -1411,9 +1412,9 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
       rpi_(nullptr) {
     memset(delta, 0xff, sizeof(delta));
 
-    if (config::OptDispFilter()->GetFilter() == config::Filter::kPlugin) {
+    if (config::Proxy<config::OptionID::kDispFilter>().Get() == config::Filter::kPlugin) {
         rpi_ = widgets::MaybeLoadFilterPlugin(
-            config::OptDispFilterPlugin()->GetString(), &filter_plugin_);
+            config::Proxy<config::OptionID::kDispFilterPlugin>().Get(), &filter_plugin_);
         if (rpi_) {
             rpi_->Flags &= ~RPI_565_SUPP;
 
@@ -1433,13 +1434,13 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
             scale *= (rpi_->Flags & RPI_OUT_SCLMSK) >> RPI_OUT_SCLSH;
         } else {
             // This is going to delete the object. Do nothing more here.
-            config::OptDispFilterPlugin()->SetString(wxEmptyString);
-            config::OptDispFilter()->SetFilter(config::Filter::kNone);
+            config::Proxy<config::OptionID::kDispFilterPlugin>().Set(wxEmptyString);
+            config::Proxy<config::OptionID::kDispFilter>().Set(config::Filter::kNone);
             return;
         }
     }
 
-    if (config::OptDispFilter()->GetFilter() != config::Filter::kPlugin) {
+    if (config::Proxy<config::OptionID::kDispFilter>().Get() != config::Filter::kPlugin) {
         scale *= GetFilterScale();
         systemColorDepth = 32;
     }
@@ -1558,7 +1559,7 @@ public:
         delta_ += instride * procy;
 
         // FIXME: fugly hack
-        if (config::OptDispRenderMethod()->GetRenderMethod() ==
+        if (config::Proxy<config::OptionID::kDispRenderMethod>().Get() ==
             config::RenderMethod::kOpenGL) {
             dst_ += (int)std::ceil(outstride * (procy + 1) * scale_);
         } else {
@@ -1578,7 +1579,7 @@ public:
             // added procy param to provide offset into accum buffers
             ApplyInterframe(instride, procy);
 
-            if (config::OptDispFilter()->GetFilter() == config::Filter::kNone) {
+            if (config::Proxy<config::OptionID::kDispFilter>().Get() == config::Filter::kNone) {
                 if (nthreads_ == 1)
                     return 0;
 
@@ -1607,7 +1608,7 @@ private:
     // definitely not thread safe by default
     // added procy param to provide offset into accum buffers
     void ApplyInterframe(int instride, int procy) {
-        switch (config::OptDispIFB()->GetInterframe()) {
+        switch (config::Proxy<config::OptionID::kDispIFB>().Get()) {
             case config::Interframe::kNone:
                 break;
 
@@ -1635,7 +1636,7 @@ private:
     // naturally, any of these with accumulation buffers like those
     // of the IFB filters will screw up royally as well
     void ApplyFilter(int instride, int outstride) {
-        switch (config::OptDispFilter()->GetFilter()) {
+        switch (config::Proxy<config::OptionID::kDispFilter>().Get()) {
             case config::Filter::k2xsai:
                 _2xSaI32(src_, instride, delta_, dst_, outstride, width_,
                          height_);
@@ -1797,7 +1798,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
         pixbuf2 = (uint8_t*)calloc(allocstride, std::ceil((alloch + 2) * scale));
     }
 
-    if (config::OptDispFilter()->GetFilter() == config::Filter::kNone) {
+    if (config::Proxy<config::OptionID::kDispFilter>().Get() == config::Filter::kNone) {
         todraw = *data;
         // *data is assigned below, after old buf has been processed
         pixbuf1 = pixbuf2;
@@ -1810,8 +1811,8 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
     // First, apply filters, if applicable, in parallel, if enabled
     // FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur)
-    if (config::OptDispFilter()->GetFilter() != config::Filter::kNone ||
-        config::OptDispIFB()->GetInterframe() != config::Interframe::kNone) {
+    if (config::Proxy<config::OptionID::kDispFilter>().Get() != config::Filter::kNone ||
+        config::Proxy<config::OptionID::kDispIFB>().Get() != config::Interframe::kNone) {
         if (nthreads != gopts.max_threads) {
             if (nthreads) {
                 if (nthreads > 1)
@@ -1883,7 +1884,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     }
 
     // swap buffers now that src has been processed
-    if (config::OptDispFilter()->GetFilter() == config::Filter::kNone) {
+    if (config::Proxy<config::OptionID::kDispFilter>().Get() == config::Filter::kNone) {
         *data = pixbuf1;
     }
 
@@ -2069,8 +2070,8 @@ BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
 {
     // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
     // 16 or 32, though
-    if (config::OptDispFilter()->GetFilter() == config::Filter::kNone &&
-        config::OptDispIFB()->GetInterframe() == config::Interframe::kNone) {
+    if (config::Proxy<config::OptionID::kDispFilter>().Get() == config::Filter::kNone &&
+        config::Proxy<config::OptionID::kDispIFB>().Get() == config::Interframe::kNone) {
         // changing from 32 to 24 does not require regenerating color tables
         systemColorDepth = 32;
     }
@@ -2101,7 +2102,7 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
 
             src += 2; // skip rhs border
         }
-    } else if (config::OptDispFilter()->GetFilter() != config::Filter::kNone) {
+    } else if (config::Proxy<config::OptionID::kDispFilter>().Get() != config::Filter::kNone) {
         // scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
         uint32_t* src = (uint32_t*)todraw + (int)std::ceil(width * scale) + 1; // skip top border

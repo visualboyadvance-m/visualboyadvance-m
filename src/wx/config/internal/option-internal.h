@@ -16,7 +16,6 @@ struct OptionData {
     const wxString config_name;
     const wxString command;
     const wxString ux_helper;
-    const Option::Type type;
 };
 
 // Static data to initialize global values.
