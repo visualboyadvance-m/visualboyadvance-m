@@ -9,6 +9,8 @@
 #include "config/internal/option-internal.h"
 #undef VBAM_OPTION_INTERNAL_INCLUDE
 
+#include "config/option-proxy.h"
+
 namespace config {
 
 // static
@@ -45,7 +47,7 @@ Option::Option(OptionID id)
       command_(internal::kAllOptionsData[static_cast<size_t>(id)].command),
       ux_helper_(wxGetTranslation(
           internal::kAllOptionsData[static_cast<size_t>(id)].ux_helper)),
-      type_(internal::kAllOptionsData[static_cast<size_t>(id)].type),
+      type_(kOptionsTypes[static_cast<size_t>(id)]),
       value_(),
       min_(),
       max_() {
@@ -60,7 +62,7 @@ Option::Option(OptionID id, bool* option)
       command_(internal::kAllOptionsData[static_cast<size_t>(id)].command),
       ux_helper_(wxGetTranslation(
           internal::kAllOptionsData[static_cast<size_t>(id)].ux_helper)),
-      type_(internal::kAllOptionsData[static_cast<size_t>(id)].type),
+      type_(kOptionsTypes[static_cast<size_t>(id)]),
       value_(option),
       min_(),
       max_() {
@@ -75,7 +77,7 @@ Option::Option(OptionID id, double* option, double min, double max)
       command_(internal::kAllOptionsData[static_cast<size_t>(id)].command),
       ux_helper_(wxGetTranslation(
           internal::kAllOptionsData[static_cast<size_t>(id)].ux_helper)),
-      type_(internal::kAllOptionsData[static_cast<size_t>(id)].type),
+      type_(kOptionsTypes[static_cast<size_t>(id)]),
       value_(option),
       min_(min),
       max_(max) {
@@ -93,7 +95,7 @@ Option::Option(OptionID id, int32_t* option, int32_t min, int32_t max)
       command_(internal::kAllOptionsData[static_cast<size_t>(id)].command),
       ux_helper_(wxGetTranslation(
           internal::kAllOptionsData[static_cast<size_t>(id)].ux_helper)),
-      type_(internal::kAllOptionsData[static_cast<size_t>(id)].type),
+      type_(kOptionsTypes[static_cast<size_t>(id)]),
       value_(option),
       min_(min),
       max_(max) {
@@ -111,7 +113,7 @@ Option::Option(OptionID id, uint32_t* option, uint32_t min, uint32_t max)
       command_(internal::kAllOptionsData[static_cast<size_t>(id)].command),
       ux_helper_(wxGetTranslation(
           internal::kAllOptionsData[static_cast<size_t>(id)].ux_helper)),
-      type_(internal::kAllOptionsData[static_cast<size_t>(id)].type),
+      type_(kOptionsTypes[static_cast<size_t>(id)]),
       value_(option),
       min_(min),
       max_(max) {
@@ -129,7 +131,7 @@ Option::Option(OptionID id, wxString* option)
       command_(internal::kAllOptionsData[static_cast<size_t>(id)].command),
       ux_helper_(wxGetTranslation(
           internal::kAllOptionsData[static_cast<size_t>(id)].ux_helper)),
-      type_(internal::kAllOptionsData[static_cast<size_t>(id)].type),
+      type_(kOptionsTypes[static_cast<size_t>(id)]),
       value_(option),
       min_(),
       max_() {
@@ -144,7 +146,7 @@ Option::Option(OptionID id, Filter* option)
       command_(internal::kAllOptionsData[static_cast<size_t>(id)].command),
       ux_helper_(wxGetTranslation(
           internal::kAllOptionsData[static_cast<size_t>(id)].ux_helper)),
-      type_(internal::kAllOptionsData[static_cast<size_t>(id)].type),
+      type_(kOptionsTypes[static_cast<size_t>(id)]),
       value_(option),
       min_(0),
       max_(internal::MaxForType(type_)) {
@@ -159,7 +161,7 @@ Option::Option(OptionID id, Interframe* option)
       command_(internal::kAllOptionsData[static_cast<size_t>(id)].command),
       ux_helper_(wxGetTranslation(
           internal::kAllOptionsData[static_cast<size_t>(id)].ux_helper)),
-      type_(internal::kAllOptionsData[static_cast<size_t>(id)].type),
+      type_(kOptionsTypes[static_cast<size_t>(id)]),
       value_(option),
       min_(0),
       max_(internal::MaxForType(type_)) {
@@ -174,7 +176,7 @@ Option::Option(OptionID id, RenderMethod* option)
       command_(internal::kAllOptionsData[static_cast<size_t>(id)].command),
       ux_helper_(wxGetTranslation(
           internal::kAllOptionsData[static_cast<size_t>(id)].ux_helper)),
-      type_(internal::kAllOptionsData[static_cast<size_t>(id)].type),
+      type_(kOptionsTypes[static_cast<size_t>(id)]),
       value_(option),
       min_(0),
       max_(internal::MaxForType(type_)) {
@@ -189,7 +191,7 @@ Option::Option(OptionID id, int* option)
       command_(internal::kAllOptionsData[static_cast<size_t>(id)].command),
       ux_helper_(wxGetTranslation(
           internal::kAllOptionsData[static_cast<size_t>(id)].ux_helper)),
-      type_(internal::kAllOptionsData[static_cast<size_t>(id)].type),
+      type_(kOptionsTypes[static_cast<size_t>(id)]),
       value_(option),
       min_(0),
       max_(internal::MaxForType(type_)) {
@@ -207,7 +209,7 @@ Option::Option(OptionID id, uint16_t* option)
       command_(internal::kAllOptionsData[static_cast<size_t>(id)].command),
       ux_helper_(wxGetTranslation(
           internal::kAllOptionsData[static_cast<size_t>(id)].ux_helper)),
-      type_(internal::kAllOptionsData[static_cast<size_t>(id)].type),
+      type_(kOptionsTypes[static_cast<size_t>(id)]),
       value_(option),
       min_(),
       max_() {

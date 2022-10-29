@@ -167,6 +167,7 @@ std::array<Option, kNbOptions>& Option::All() {
     // error since kNbOptions is automatically updated.
     // This will be initialized on the first call, in load_opts(), ensuring the
     // translation initialization has already happened.
+    // clang-format off
     static std::array<Option, kNbOptions> g_all_opts = {
         /// Display
         Option(OptionID::kDispBilinear, &gopts.bilinear),
@@ -213,22 +214,20 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kGenBatteryDir, &gopts.battery_dir),
         Option(OptionID::kGenFreezeRecent, &gopts.recent_freeze),
         Option(OptionID::kGenRecordingDir, &gopts.recording_dir),
-        Option(OptionID::kGenRewindInterval, &gopts.rewind_interval, 0,
-               600),
+        Option(OptionID::kGenRewindInterval, &gopts.rewind_interval, 0, 600),
         Option(OptionID::kGenScreenshotDir, &gopts.scrshot_dir),
         Option(OptionID::kGenStateDir, &gopts.state_dir),
         Option(OptionID::kGenStatusBar, &gopts.statusbar),
 
         /// Joypad
         Option(OptionID::kJoy),
-        Option(OptionID::kJoyAutofireThrottle, &gopts.autofire_rate, 1,
-               1000),
+        Option(OptionID::kJoyAutofireThrottle, &gopts.autofire_rate, 1, 1000),
         Option(OptionID::kJoyDefault, &gopts.default_stick, 1, 4),
 
         /// Keyboard
         Option(OptionID::kKeyboard),
 
-        // Core
+        /// Core
         Option(OptionID::kPrefAgbPrint, &agbPrint, 0, 1),
         Option(OptionID::kPrefAutoFrameSkip, &autoFrameSkip, 0, 1),
         Option(OptionID::kPrefAutoPatch, &autoPatch, 0, 1),
@@ -237,8 +236,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kPrefBorderOn, &gbBorderOn, 0, 1),
         Option(OptionID::kPrefCaptureFormat, &captureFormat, 0, 1),
         Option(OptionID::kPrefCheatsEnabled, &coreOptions.cheatsEnabled, 0, 1),
-        Option(OptionID::kPrefDisableStatus, &disableStatusMessages, 0,
-               1),
+        Option(OptionID::kPrefDisableStatus, &disableStatusMessages, 0, 1),
         Option(OptionID::kPrefEmulatorType, &gbEmulatorType, 0, 5),
         Option(OptionID::kPrefFlashSize, &optFlashSize, 0, 1),
         Option(OptionID::kPrefFrameSkip, &frameSkip, -1, 9),
@@ -258,17 +256,12 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kPrefShowSpeedTransparent,
                &showSpeedTransparent, 0, 1),
         Option(OptionID::kPrefSkipBios, &coreOptions.skipBios, 0, 1),
-        Option(OptionID::kPrefSkipSaveGameCheats, &coreOptions.skipSaveGameCheats, 0,
-               1),
-        Option(OptionID::kPrefSkipSaveGameBattery, &coreOptions.skipSaveGameBattery,
-               0, 1),
+        Option(OptionID::kPrefSkipSaveGameCheats, &coreOptions.skipSaveGameCheats, 0, 1),
+        Option(OptionID::kPrefSkipSaveGameBattery, &coreOptions.skipSaveGameBattery, 0, 1),
         Option(OptionID::kPrefThrottle, &throttle, 0, 450),
-        Option(OptionID::kPrefSpeedupThrottle, &speedup_throttle, 0,
-               3000),
-        Option(OptionID::kPrefSpeedupFrameSkip, &speedup_frame_skip, 0,
-               300),
-        Option(OptionID::kPrefSpeedupThrottleFrameSkip,
-               &coreOptions.speedup_throttle_frame_skip),
+        Option(OptionID::kPrefSpeedupThrottle, &speedup_throttle, 0, 3000),
+        Option(OptionID::kPrefSpeedupFrameSkip, &speedup_frame_skip, 0, 300),
+        Option(OptionID::kPrefSpeedupThrottleFrameSkip, &coreOptions.speedup_throttle_frame_skip),
         Option(OptionID::kPrefUseBiosGB, &gopts.use_bios_file_gb),
         Option(OptionID::kPrefUseBiosGBA, &gopts.use_bios_file_gba),
         Option(OptionID::kPrefUseBiosGBC, &gopts.use_bios_file_gbc),
@@ -283,10 +276,8 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kGeomWindowY, &g_owned_opts.window_pos_y, -1, 99999),
 
         /// UI
-        Option(OptionID::kUIAllowKeyboardBackgroundInput,
-               &allowKeyboardBackgroundInput),
-        Option(OptionID::kUIAllowJoystickBackgroundInput,
-               &allowJoystickBackgroundInput),
+        Option(OptionID::kUIAllowKeyboardBackgroundInput, &allowKeyboardBackgroundInput),
+        Option(OptionID::kUIAllowJoystickBackgroundInput, &allowJoystickBackgroundInput),
         Option(OptionID::kUIHideMenuBar, &gopts.hide_menu_bar),
 
         /// Sound
@@ -298,13 +289,13 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kSoundGBAInterpolation, &gopts.soundInterpolation),
         Option(OptionID::kSoundGBDeclicking, &gopts.gb_declick),
         Option(OptionID::kSoundGBEcho, &gopts.gb_echo, 0, 100),
-        Option(OptionID::kSoundGBEnableEffects,
-               &gopts.gb_effects_config_enabled),
+        Option(OptionID::kSoundGBEnableEffects, &gopts.gb_effects_config_enabled),
         Option(OptionID::kSoundGBStereo, &gopts.gb_stereo, 0, 100),
         Option(OptionID::kSoundGBSurround, &gopts.gb_effects_config_surround),
         Option(OptionID::kSoundQuality, &gopts.sound_qual),
         Option(OptionID::kSoundVolume, &gopts.sound_vol, 0, 200),
     };
+    // clang-format on
     return g_all_opts;
 }
 
@@ -316,282 +307,233 @@ namespace internal {
 const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     /// Display
     OptionData{"Display/Bilinear", "Bilinear",
-               _("Use bilinear filter with 3d renderer"), Option::Type::kBool},
-    OptionData{"Display/Filter", "", _("Full-screen filter to apply"),
-               Option::Type::kFilter},
-    OptionData{"Display/FilterPlugin", "", _("Filter plugin library"),
-               Option::Type::kString},
-    OptionData{"Display/IFB", "", _("Interframe blending function"),
-               Option::Type::kInterframe},
-    OptionData{"Display/KeepOnTop", "KeepOnTop", _("Keep window on top"),
-               Option::Type::kBool},
+               _("Use bilinear filter with 3d renderer")},
+    OptionData{"Display/Filter", "", _("Full-screen filter to apply")},
+    OptionData{"Display/FilterPlugin", "", _("Filter plugin library")},
+    OptionData{"Display/IFB", "", _("Interframe blending function")},
+    OptionData{"Display/KeepOnTop", "KeepOnTop", _("Keep window on top")},
     OptionData{"Display/MaxThreads", "Multithread",
-               _("Maximum number of threads to run filters in"),
-               Option::Type::kInt},
+               _("Maximum number of threads to run filters in")},
     OptionData{"Display/RenderMethod", "",
-               _("Render method; if unsupported, simple method will be used"),
-               Option::Type::kRenderMethod},
-    OptionData{"Display/Scale", "", _("Default scale factor"),
-               Option::Type::kDouble},
+               _("Render method; if unsupported, simple method will be used")},
+    OptionData{"Display/Scale", "", _("Default scale factor")},
     OptionData{"Display/Stretch", "RetainAspect",
-               _("Retain aspect ratio when resizing"), Option::Type::kBool},
+               _("Retain aspect ratio when resizing")},
 
     /// GB
-    OptionData{"GB/BiosFile", "", _("BIOS file to use for Game Boy, if enabled"),
-               Option::Type::kString},
+    OptionData{"GB/BiosFile", "",
+               _("BIOS file to use for Game Boy, if enabled")},
     OptionData{"GB/ColorOption", "GBColorOption",
-               _("Game Boy color enhancement, if enabled"), Option::Type::kInt},
+               _("Game Boy color enhancement, if enabled")},
     OptionData{"GB/ColorizerHack", "ColorizerHack",
-               _("Enable DX Colorization Hacks"), Option::Type::kInt},
-    OptionData{"GB/LCDFilter", "GBLcdFilter", _("Apply LCD filter, if enabled"),
-               Option::Type::kBool},
-    OptionData{"GB/GBCBiosFile", "", _("BIOS file to use for Game Boy Color, if enabled"),
-               Option::Type::kString},
+               _("Enable DX Colorization Hacks")},
+    OptionData{"GB/LCDFilter", "GBLcdFilter",
+               _("Apply LCD filter, if enabled")},
+    OptionData{"GB/GBCBiosFile", "",
+               _("BIOS file to use for Game Boy Color, if enabled")},
     OptionData{"GB/Palette0", "",
                _("The default palette, as 8 comma-separated 4-digit hex "
-                 "integers (rgb555)."),
-               Option::Type::kGbPalette},
+                 "integers (rgb555).")},
     OptionData{"GB/Palette1", "",
                _("The first user palette, as 8 comma-separated 4-digit hex "
-                 "integers (rgb555)."),
-               Option::Type::kGbPalette},
+                 "integers (rgb555).")},
     OptionData{"GB/Palette2", "",
                _("The second user palette, as 8 comma-separated 4-digit hex "
-                 "integers (rgb555)."),
-               Option::Type::kGbPalette},
+                 "integers (rgb555).")},
     OptionData{"GB/PrintAutoPage", "PrintGather",
-               _("Automatically gather a full page before printing"),
-               Option::Type::kBool},
-    OptionData{
-        "GB/PrintScreenCap", "PrintSnap",
-        _("Automatically save printouts as screen captures with -print suffix"),
-        Option::Type::kBool},
-    OptionData{"GB/ROMDir", "", _("Directory to look for ROM files"),
-               Option::Type::kString},
-    OptionData{"GB/GBCROMDir", "", _("Directory to look for Game Boy Color ROM files"),
-               Option::Type::kString},
+               _("Automatically gather a full page before printing")},
+    OptionData{"GB/PrintScreenCap", "PrintSnap",
+               _("Automatically save printouts as screen captures with -print "
+                 "suffix")},
+    OptionData{"GB/ROMDir", "", _("Directory to look for ROM files")},
+    OptionData{"GB/GBCROMDir", "",
+               _("Directory to look for Game Boy Color ROM files")},
 
     /// GBA
-    OptionData{"GBA/BiosFile", "", _("BIOS file to use, if enabled"),
-               Option::Type::kString},
-    OptionData{"GBA/LCDFilter", "GBALcdFilter",
-               _("Apply LCD filter, if enabled"), Option::Type::kBool},
+    OptionData{"GBA/BiosFile", "", _("BIOS file to use, if enabled")},
+    OptionData{
+        "GBA/LCDFilter",
+        "GBALcdFilter",
+        _("Apply LCD filter, if enabled"),
+    },
 #ifndef NO_LINK
-    OptionData{"GBA/LinkAuto", "LinkAuto", _("Enable link at boot"),
-               Option::Type::kBool},
-    OptionData{"GBA/LinkFast", "SpeedOn",
-               _("Enable faster network protocol by default"),
-               Option::Type::kBool},
-    OptionData{"GBA/LinkHost", "", _("Default network link client host"),
-               Option::Type::kString},
-    OptionData{"GBA/ServerIP", "", _("Default network link server IP to bind"),
-               Option::Type::kString},
+    OptionData{
+        "GBA/LinkAuto",
+        "LinkAuto",
+        _("Enable link at boot"),
+    },
+    OptionData{
+        "GBA/LinkFast",
+        "SpeedOn",
+        _("Enable faster network protocol by default"),
+    },
+    OptionData{"GBA/LinkHost", "", _("Default network link client host")},
+    OptionData{"GBA/ServerIP", "", _("Default network link server IP to bind")},
     OptionData{"GBA/LinkPort", "",
-               _("Default network link port (server and client)"),
-               Option::Type::kUnsigned},
-    OptionData{"GBA/LinkProto", "LinkProto", _("Default network protocol"),
-               Option::Type::kBool},
-    OptionData{"GBA/LinkTimeout", "LinkTimeout", _("Link timeout (ms)"),
-               Option::Type::kInt},
-    OptionData{"GBA/LinkType", "LinkType", _("Link cable type"),
-               Option::Type::kInt},
+               _("Default network link port (server and client)")},
+    OptionData{"GBA/LinkProto", "LinkProto", _("Default network protocol")},
+    OptionData{"GBA/LinkTimeout", "LinkTimeout", _("Link timeout (ms)")},
+    OptionData{"GBA/LinkType", "LinkType", _("Link cable type")},
 #endif
-    OptionData{"GBA/ROMDir", "", _("Directory to look for ROM files"),
-               Option::Type::kString},
+    OptionData{"GBA/ROMDir", "", _("Directory to look for ROM files")},
 
     /// General
     OptionData{"General/AutoLoadLastState", "",
-               _("Automatically load last saved state"), Option::Type::kBool},
+               _("Automatically load last saved state")},
     OptionData{"General/BatteryDir", "",
                _("Directory to store game save files (relative paths are "
-                 "relative to ROM; blank is config dir)"),
-               Option::Type::kString},
-    OptionData{"General/FreezeRecent", "", _("Freeze recent load list"),
-               Option::Type::kBool},
+                 "relative to ROM; blank is config dir)")},
+    OptionData{"General/FreezeRecent", "", _("Freeze recent load list")},
     OptionData{"General/RecordingDir", "",
                _("Directory to store A / V and game recordings (relative paths "
-                 "are relative to ROM)"),
-               Option::Type::kString},
+                 "are relative to ROM)")},
     OptionData{"General/RewindInterval", "",
-               _("Number of seconds between rewind snapshots (0 to disable)"),
-               Option::Type::kInt},
+               _("Number of seconds between rewind snapshots (0 to disable)")},
     OptionData{"General/ScreenshotDir", "",
                _("Directory to store screenshots (relative paths are relative "
-                 "to ROM)"),
-               Option::Type::kString},
+                 "to ROM)")},
     OptionData{"General/StateDir", "",
                _("Directory to store saved state files (relative paths are "
-                 "relative to BatteryDir)"),
-               Option::Type::kString},
-    OptionData{"General/StatusBar", "StatusBar", _("Enable status bar"),
-               Option::Type::kBool},
+                 "relative to BatteryDir)")},
+    OptionData{"General/StatusBar", "StatusBar", _("Enable status bar")},
 
     /// Joypad
     OptionData{"Joypad/*/*", "",
                _("The parameter Joypad/<n>/<button> contains a comma-separated "
                  "list of key names which map to joypad #<n> button <button>. "
                  "Button is one of Up, Down, Left, Right, A, B, L, R, Select, "
-                 "Start, Motion Up, Motion Down, Motion Left, Motion Right, Autofire A, "
-                 "Autofire B, Speed, Capture, GS"),
-               Option::Type::kNone},
+                 "Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, "
+                 "AutoB, Speed, Capture, GS")},
     OptionData{"Joypad/AutofireThrottle", "",
-               _("The autofire toggle period, in frames (1 / 60 s)"),
-               Option::Type::kInt},
+               _("The autofire toggle period, in frames (1/60 s)")},
     OptionData{"Joypad/Default", "",
-               _("The number of the stick to use in single-player mode"),
-               Option::Type::kInt},
+               _("The number of the stick to use in single-player mode")},
 
     /// Keyboard
     OptionData{"Keyboard/*", "",
                _("The parameter Keyboard/<cmd> contains a comma-separated list "
-                 "of key names (e.g. Alt + Shift + F1).  When the named key is "
-                 "pressed, the command <cmd> is executed."),
-               Option::Type::kNone},
+                 "of key names (e.g. Alt-Shift-F1).  When the named key is "
+                 "pressed, the command <cmd> is executed.")},
 
-    // Core
+    /// Core
     OptionData{"preferences/agbPrint", "AGBPrinter",
-               _("Enable AGB debug print"), Option::Type::kInt},
+               _("Enable AGB debug print")},
     OptionData{"preferences/autoFrameSkip", "FrameSkipAuto",
-               _("Auto skip frames"), Option::Type::kInt},
+               _("Auto skip frames")},
     OptionData{"preferences/autoPatch", "ApplyPatches",
-               _("Apply IPS / UPS / IPF patches if found"), Option::Type::kInt},
+               _("Apply IPS / UPS / IPF patches if found")},
     OptionData{"preferences/autoSaveLoadCheatList", "",
-               _("Automatically save and load cheat list"),
-               Option::Type::kBool},
-    OptionData{"preferences/borderAutomatic", "",
-               _("Automatically enable border for Super Game Boy games"),
-               Option::Type::kInt},
-    OptionData{"preferences/borderOn", "", _("Always enable border"),
-               Option::Type::kInt},
-    OptionData{"preferences/captureFormat", "", _("Screen capture file format"),
-               Option::Type::kInt},
-    OptionData{"preferences/cheatsEnabled", "", _("Enable cheats"),
-               Option::Type::kInt},
+               _("Automatically save and load cheat list")},
+    OptionData{
+        "preferences/borderAutomatic",
+        "",
+        _("Automatically enable border for Super Game Boy games"),
+    },
+    OptionData{"preferences/borderOn", "", _("Always enable border")},
+    OptionData{"preferences/captureFormat", "",
+               _("Screen capture file format")},
+    OptionData{"preferences/cheatsEnabled", "", _("Enable cheats")},
     OptionData{"preferences/disableStatus", "NoStatusMsg",
-               _("Disable on-screen status messages"), Option::Type::kInt},
-    OptionData{"preferences/emulatorType", "", _("Type of system to emulate"),
-               Option::Type::kInt},
-    OptionData{"preferences/flashSize", "", _("Flash size 0 = 64 KB 1 = 128 KB"),
-               Option::Type::kInt},
+               _("Disable on-screen status messages")},
+    OptionData{"preferences/emulatorType", "", _("Type of system to emulate")},
+    OptionData{"preferences/flashSize", "",
+               _("Flash size 0 = 64 KB 1 = 128 KB")},
     OptionData{"preferences/frameSkip", "FrameSkip",
                _("Skip frames. Values are 0-9 or -1 to skip automatically "
-                 "based on time."),
-               Option::Type::kInt},
-    OptionData{"preferences/gbPaletteOption", "", _("The palette to use"),
-               Option::Type::kInt},
+                 "based on time.")},
+    OptionData{"preferences/gbPaletteOption", "", _("The palette to use")},
     OptionData{"preferences/gbPrinter", "Printer",
-               _("Enable printer emulation"), Option::Type::kInt},
+               _("Enable printer emulation")},
     OptionData{"preferences/gdbBreakOnLoad", "DebugGDBBreakOnLoad",
-               _("Break into GDB after loading the game."), Option::Type::kBool},
+               _("Break into GDB after loading the game.")},
     OptionData{"preferences/gdbPort", "DebugGDBPort",
-               _("Port to connect GDB to."), Option::Type::kInt},
+               _("Port to connect GDB to.")},
 #ifndef NO_LINK
     OptionData{"preferences/LinkNumPlayers", "",
-               _("Number of players in network"), Option::Type::kInt},
+               _("Number of players in network")},
 #endif
     OptionData{"preferences/maxScale", "",
-               _("Maximum scale factor (0 = no limit)"), Option::Type::kInt},
+               _("Maximum scale factor (0 = no limit)")},
     OptionData{"preferences/pauseWhenInactive", "PauseWhenInactive",
-               _("Pause game when main window loses focus"),
-               Option::Type::kInt},
+               _("Pause game when main window loses focus")},
     OptionData{"preferences/rtcEnabled", "RTC",
-               _("Enable RTC (vba-over.ini override is rtcEnabled"),
-               Option::Type::kInt},
+               _("Enable RTC (vba-over.ini override is rtcEnabled")},
     OptionData{"preferences/saveType", "",
-               _("Native save (\"battery\") hardware type"),
-               Option::Type::kInt},
-    OptionData{"preferences/showSpeed", "", _("Show speed indicator"),
-               Option::Type::kInt},
+               _("Native save (\"battery\") hardware type")},
+    OptionData{"preferences/showSpeed", "", _("Show speed indicator")},
     OptionData{"preferences/showSpeedTransparent", "Transparent",
-               _("Draw on-screen messages transparently"), Option::Type::kInt},
+               _("Draw on-screen messages transparently")},
     OptionData{"preferences/skipBios", "SkipIntro",
-               _("Skip BIOS initialization"), Option::Type::kInt},
+               _("Skip BIOS initialization")},
     OptionData{"preferences/skipSaveGameCheats", "",
-               _("Do not overwrite cheat list when loading state"),
-               Option::Type::kInt},
+               _("Do not overwrite cheat list when loading state")},
     OptionData{"preferences/skipSaveGameBattery", "",
-               _("Do not overwrite native (battery) save when loading state"),
-               Option::Type::kInt},
+               _("Do not overwrite native (battery) save when loading state")},
     OptionData{"preferences/throttle", "",
                _("Throttle game speed, even when accelerated (0-450 %, 0 = no "
-                 "throttle)"),
-               Option::Type::kUnsigned},
+                 "throttle)")},
     OptionData{"preferences/speedupThrottle", "",
-               _("Set throttle for speedup key (0-3000 %, 0 = no throttle)"),
-               Option::Type::kUnsigned},
+               _("Set throttle for speedup key (0-3000 %, 0 = no throttle)")},
     OptionData{"preferences/speedupFrameSkip", "",
                _("Number of frames to skip with speedup (instead of speedup "
-                 "throttle)"),
-               Option::Type::kUnsigned},
+                 "throttle)")},
     OptionData{"preferences/speedupThrottleFrameSkip", "",
-               _("Use frame skip for speedup throttle"), Option::Type::kBool},
+               _("Use frame skip for speedup throttle")},
     OptionData{"preferences/useBiosGB", "BootRomGB",
-               _("Use the specified BIOS file for Game Boy"), Option::Type::kBool},
+               _("Use the specified BIOS file for Game Boy")},
     OptionData{"preferences/useBiosGBA", "BootRomEn",
-               _("Use the specified BIOS file"), Option::Type::kBool},
+               _("Use the specified BIOS file")},
     OptionData{"preferences/useBiosGBC", "BootRomGBC",
-               _("Use the specified BIOS file for Game Boy Color"), Option::Type::kBool},
-    OptionData{"preferences/vsync", "VSync", _("Wait for vertical sync"),
-               Option::Type::kBool},
+               _("Use the specified BIOS file for Game Boy Color")},
+    OptionData{"preferences/vsync", "VSync", _("Wait for vertical sync")},
 
     /// Geometry
     OptionData{"geometry/fullScreen", "Fullscreen",
-               _("Enter fullscreen mode at startup"), Option::Type::kInt},
-    OptionData{"geometry/isMaximized", "Maximized", _("Window maximized"),
-               Option::Type::kBool},
-    OptionData{"geometry/windowHeight", "Height", _("Window height at startup"),
-               Option::Type::kUnsigned},
-    OptionData{"geometry/windowWidth", "Width", _("Window width at startup"),
-               Option::Type::kUnsigned},
-    OptionData{"geometry/windowX", "X", _("Window axis X position at startup"),
-               Option::Type::kInt},
-    OptionData{"geometry/windowY", "Y", _("Window axis Y position at startup"),
-               Option::Type::kInt},
+               _("Enter fullscreen mode at startup")},
+    OptionData{"geometry/isMaximized", "Maximized", _("Window maximized")},
+    OptionData{"geometry/windowHeight", "Height",
+               _("Window height at startup")},
+    OptionData{"geometry/windowWidth", "Width", _("Window width at startup")},
+    OptionData{"geometry/windowX", "X", _("Window axis X position at startup")},
+    OptionData{"geometry/windowY", "Y", _("Window axis Y position at startup")},
 
     /// UI
-    OptionData{
-        "ui/allowKeyboardBackgroundInput", "AllowKeyboardBackgroundInput",
-        _("Capture key events while on background"), Option::Type::kBool},
-    OptionData{
-        "ui/allowJoystickBackgroundInput", "AllowJoystickBackgroundInput",
-        _("Capture joy events while on background"), Option::Type::kBool},
-    OptionData{"ui/hideMenuBar", "", _("Hide menu bar when mouse is inactive"),
-               Option::Type::kBool},
+    OptionData{"ui/allowKeyboardBackgroundInput",
+               "AllowKeyboardBackgroundInput",
+               _("Capture key events while on background")},
+    OptionData{"ui/allowJoystickBackgroundInput",
+               "AllowJoystickBackgroundInput",
+               _("Capture joy events while on background")},
+    OptionData{"ui/hideMenuBar", "", _("Hide menu bar when mouse is inactive")},
 
     /// Sound
     OptionData{"Sound/AudioAPI", "",
-               _("Sound API; if unsupported, default API will be used"),
-               Option::Type::kAudioApi},
+               _("Sound API; if unsupported, default API will be used")},
     OptionData{"Sound/AudioDevice", "",
-               _("Device ID of chosen audio device for chosen driver"),
-               Option::Type::kString},
-    OptionData{"Sound/Buffers", "", _("Number of sound buffers"),
-               Option::Type::kInt},
-    OptionData{"Sound/Enable", "", _("Bit mask of sound channels to enable"),
-               Option::Type::kInt},
-    OptionData{"Sound/GBAFiltering", "", _("Game Boy Advance sound filtering (%)"),
-               Option::Type::kInt},
+               _("Device ID of chosen audio device for chosen driver")},
+    OptionData{"Sound/Buffers", "", _("Number of sound buffers")},
+    OptionData{"Sound/Enable", "", _("Bit mask of sound channels to enable")},
+    OptionData{"Sound/GBAFiltering", "",
+               _("Game Boy Advance sound filtering (%)")},
     OptionData{"Sound/GBAInterpolation", "GBASoundInterpolation",
-               _("Game Boy Advance sound interpolation"), Option::Type::kBool},
-    OptionData{"Sound/GBDeclicking", "GBDeclicking", _("Game Boy sound declicking"),
-               Option::Type::kBool},
-    OptionData{"Sound/GBEcho", "", _("Game Boy echo effect (%)"), Option::Type::kInt},
+               _("Game Boy Advance sound interpolation")},
+    OptionData{"Sound/GBDeclicking", "GBDeclicking",
+               _("Game Boy sound declicking")},
+    OptionData{"Sound/GBEcho", "", _("Game Boy echo effect (%)")},
     OptionData{"Sound/GBEnableEffects", "GBEnhanceSound",
-               _("Enable Game Boy sound effects"), Option::Type::kBool},
-    OptionData{"Sound/GBStereo", "", _("Game Boy stereo effect (%)"),
-               Option::Type::kInt},
+               _("Enable Game Boy sound effects")},
+    OptionData{"Sound/GBStereo", "", _("Game Boy stereo effect (%)")},
     OptionData{"Sound/GBSurround", "GBSurround",
-               _("Game Boy surround sound effect (%)"), Option::Type::kBool},
-    OptionData{"Sound/Quality", "", _("Sound sample rate (kHz)"),
-               Option::Type::kSoundQuality},
-    OptionData{"Sound/Volume", "", _("Sound volume (%)"), Option::Type::kInt},
+               _("Game Boy surround sound effect (%)")},
+    OptionData{"Sound/Quality", "", _("Sound sample rate (kHz)")},
+    OptionData{"Sound/Volume", "", _("Sound volume (%)")},
 
     // Last. This should never be used, it actually maps to OptionID::kLast.
     // This is to prevent a memory access violation error in case something
     // attempts to instantiate a OptionID::kLast. It will trigger a check
     // in the Option constructor, but that is after the constructor has
     // accessed this entry.
-    OptionData{"", "", "", Option::Type::kNone},
+    OptionData{"", "", ""},
 };
 
 nonstd::optional<OptionID> StringToOptionId(const wxString& input) {
@@ -613,19 +555,19 @@ nonstd::optional<OptionID> StringToOptionId(const wxString& input) {
 
 wxString FilterToString(const Filter& value) {
     const size_t size_value = static_cast<size_t>(value);
-    assert(size_value >= 0 && size_value < kNbFilters);
+    assert(size_value < kNbFilters);
     return kFilterStrings[size_value];
 }
 
 wxString InterframeToString(const Interframe& value) {
     const size_t size_value = static_cast<size_t>(value);
-    assert(size_value >= 0 && size_value < kNbInterframes);
+    assert(size_value < kNbInterframes);
     return kInterframeStrings[size_value];
 }
 
 wxString RenderMethodToString(const RenderMethod& value) {
     const size_t size_value = static_cast<size_t>(value);
-    assert(size_value >= 0 && size_value < kNbRenderMethods);
+    assert(size_value < kNbRenderMethods);
     return kRenderMethodStrings[size_value];
 }
 
@@ -643,8 +585,7 @@ Filter StringToFilter(const wxString& config_name, const wxString& input) {
     static std::map<wxString, Filter> kStringToFilter;
     if (kStringToFilter.empty()) {
         for (size_t i = 0; i < kNbFilters; i++) {
-            kStringToFilter.emplace(kFilterStrings[i],
-                                    static_cast<Filter>(i));
+            kStringToFilter.emplace(kFilterStrings[i], static_cast<Filter>(i));
         }
         assert(kStringToFilter.size() == kNbFilters);
     }

@@ -14,6 +14,7 @@
 #include "../common/version_cpp.h"
 #include "../gb/gbPrinter.h"
 #include "../gba/agbprint.h"
+#include "config/option-proxy.h"
 #include "config/option.h"
 
 #if (wxMAJOR_VERSION < 3)
@@ -2558,32 +2559,32 @@ EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
 
 EVT_HANDLER(SetSize1x, "1x")
 {
-    config::OptDispScale()->SetDouble(1);
+    config::Proxy<config::OptionID::kDispScale>().Set(1);
 }
 
 EVT_HANDLER(SetSize2x, "2x")
 {
-    config::OptDispScale()->SetDouble(2);
+    config::Proxy<config::OptionID::kDispScale>().Set(2);
 }
 
 EVT_HANDLER(SetSize3x, "3x")
 {
-    config::OptDispScale()->SetDouble(3);
+    config::Proxy<config::OptionID::kDispScale>().Set(3);
 }
 
 EVT_HANDLER(SetSize4x, "4x")
 {
-    config::OptDispScale()->SetDouble(4);
+    config::Proxy<config::OptionID::kDispScale>().Set(4);
 }
 
 EVT_HANDLER(SetSize5x, "5x")
 {
-    config::OptDispScale()->SetDouble(5);
+    config::Proxy<config::OptionID::kDispScale>().Set(5);
 }
 
 EVT_HANDLER(SetSize6x, "6x")
 {
-    config::OptDispScale()->SetDouble(6);
+    config::Proxy<config::OptionID::kDispScale>().Set(6);
 }
 
 EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
@@ -2763,12 +2764,12 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
 
 EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
 {
-    config::OptDispFilter()->NextFilter();
+    config::Proxy<config::OptionID::kDispFilter>().Next();
 }
 
 EVT_HANDLER_MASK(ChangeIFB, "Change Interframe Blending", CMDEN_NREC_ANY)
 {
-    config::OptDispIFB()->NextInterframe();
+    config::Proxy<config::OptionID::kDispIFB>().Next();
 }
 
 EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)

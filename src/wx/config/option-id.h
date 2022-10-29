@@ -62,7 +62,7 @@ enum class OptionID {
     /// Keyboard
     kKeyboard,
 
-    // Core
+    /// Core
     kPrefAgbPrint,
     kPrefAutoFrameSkip,
     kPrefAutoPatch,
@@ -71,7 +71,6 @@ enum class OptionID {
     kPrefBorderOn,
     kPrefCaptureFormat,
     kPrefCheatsEnabled,
-
     kPrefDisableStatus,
     kPrefEmulatorType,
     kPrefFlashSize,
