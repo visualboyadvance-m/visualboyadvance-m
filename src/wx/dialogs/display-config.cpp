@@ -253,6 +253,11 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
                            std::bind(&DisplayConfig::OnInterframeChanged,
                                      this,
                                      std::placeholders::_1)) {
+#if !wxCHECK_VERSION(3, 1, 0)
+    // This needs to be set before loading any element on the window. This also
+    // has no effect since wx 3.1.0, where it became the default.
+    this->SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);
+#endif
     wxXmlResource::Get()->LoadDialog(this, parent, "DisplayConfig");
 
     // Speed
