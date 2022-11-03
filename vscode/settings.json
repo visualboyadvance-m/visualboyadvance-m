@@ -1,0 +1,9 @@
+{
+    "cmake.generator": "Ninja",
+    "cmake.configureSettings": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+    },
+    "cmake.buildDirectory": "${workspaceRoot}/build-vscode",
+    // To use separate directories for different configurations:
+    // "cmake.buildDirectory": "${workspaceRoot}/build/${buildKitTriple}-${buildKitVersion}/${variant:buildType}-${variant:linkage}",
+}
