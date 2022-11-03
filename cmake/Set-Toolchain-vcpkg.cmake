@@ -3,7 +3,49 @@ if(POLICY CMP0012)
 endif()
 
 if(NOT DEFINED VCPKG_TARGET_TRIPLET)
-    return()
+    # Check if we are in an MSVC environment.
+    if($ENV{CXX} MATCHES "cl.exe$")
+        # Infer the architecture from the LIB folders.
+        foreach(LIB $ENV{LIB})
+            if(${LIB} MATCHES "x64$")
+                set(VBAM_VCPKG_PLATFORM "x64-windows")
+                break()
+            endif()
+            if(${LIB} MATCHES "x86$")
+                set(VBAM_VCPKG_PLATFORM "x86-windows")
+                break()
+            endif()
+            if(${LIB} MATCHES "ARM64$")
+                set(VBAM_VCPKG_PLATFORM "arm64-windows")
+                break()
+            endif()
+        endforeach()
+
+        # If all else fails, try to use a sensible default.
+        if(NOT DEFINED VBAM_VCPKG_PLATFORM)
+            set(VBAM_VCPKG_PLATFORM "x64-windows")
+        endif()
+
+    elseif (NOT DEFINED CMAKE_CXX_COMPILER)
+        # No way to infer the compiler.
+        return()
+
+    elseif(${CMAKE_CXX_COMPILER} MATCHES "clang-cl.exe$" OR ${CMAKE_CXX_COMPILER} MATCHES "clang-cl$")
+        # For stand-alone clang-cl, assume x64.
+        set(VBAM_VCPKG_PLATFORM "x64-windows")
+    endif()
+
+    if (NOT DEFINED VBAM_VCPKG_PLATFORM)
+        # Probably not an MSVC environment.
+        return()
+    endif()
+
+    if(DEFINED BUILD_SHARED_LIBS AND NOT ${BUILD_SHARED_LIBS})
+        set(VBAM_VCPKG_PLATFORM ${VBAM_VCPKG_PLATFORM}-static)
+    endif()
+
+    set(VCPKG_TARGET_TRIPLET ${VBAM_VCPKG_PLATFORM} CACHE STRING "Vcpkg target triplet (ex. x86-windows)" FORCE)
+    message(STATUS "Inferred VCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}")
 endif()
 
 function(vcpkg_seconds)
