@@ -946,8 +946,8 @@ if(NOT TRANSLATIONS_ONLY)
     if(APPLE AND ENABLE_ONLINEUPDATES)
         include(FetchContent)
         FetchContent_Declare(Sparkle
-            URL "https://github.com/sparkle-project/Sparkle/releases/download/1.23.0/Sparkle-1.23.0.tar.bz2"
-            URL_HASH SHA512=fa7e9736d4319bf839cd5e11177d1ddac78c38048be7e59b5c94ea76c9ffc02919dd17890295d21b7f0e35afe0ec9aba9ba36912caed6e5017420345f9f66682
+            URL "https://github.com/sparkle-project/Sparkle/releases/download/2.3.0-beta.2/Sparkle-2.3.0-beta.2.tar.xz"
+            URL_HASH SHA256=6875388aae23c1705c3956c62a9c967f4b788bc4f1dad93ab5645bc6096ef13b
             DOWNLOAD_EXTRACT_TIMESTAMP TRUE
         )
         FetchContent_MakeAvailable(Sparkle)
@@ -963,23 +963,25 @@ if(NOT TRANSLATIONS_ONLY)
         )
 
         set(APPCAST_URL "https://data.vba-m.com/appcast.xml")
-        set(CCS1 mkdir -p ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks)
+        set(CCS1 rm -rf ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks/Sparkle.framework)
+        set(CCS2 mkdir -p ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks)
         # The following commands *should* be run to make sure Sparkle is not going
-        # to bug randomly (version=1.23)
-        set(CCS2 cp -a ${SPARKLE_FRAMEWORK} ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks/Sparkle.framework)
-        set(CCS3 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleVersion            -string "${VERSION}")
-        set(CCS4 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleShortVersionString -string "${VERSION}")
-        set(CCS5 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUEnableAutomaticChecks -bool YES)
-        #set(CCS6 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUPublicEDKey -string "${PUBLIC_KEY}")
-        set(CCS7 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUFeedURL -string "${APPCAST_URL}")
+        # to bug randomly.
+        set(CCS3 cp -a ${SPARKLE_FRAMEWORK} ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks/Sparkle.framework)
+        set(CCS4 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleVersion            -string "${VERSION}")
+        set(CCS5 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleShortVersionString -string "${VERSION}")
+        set(CCS6 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUEnableAutomaticChecks -bool YES)
+        #set(CCS7 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUPublicEDKey -string "${PUBLIC_KEY}")
+        set(CCS8 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUFeedURL -string "${APPCAST_URL}")
         add_custom_command(TARGET visualboyadvance-m POST_BUILD
           COMMAND ${CCS1}
           COMMAND ${CCS2}
           COMMAND ${CCS3}
           COMMAND ${CCS4}
           COMMAND ${CCS5}
-          #COMMAND ${CCS6}
-          COMMAND ${CCS7}
+          COMMAND ${CCS6}
+          #COMMAND ${CCS7}
+          COMMAND ${CCS8}
         )
 
         TARGET_LINK_LIBRARIES(visualboyadvance-m ${SPARKLE_FRAMEWORK})
@@ -1218,7 +1220,7 @@ if(NOT TRANSLATIONS_ONLY)
         if(CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
             add_custom_command(
                 TARGET visualboyadvance-m POST_BUILD
-                COMMAND ${CMAKE_SOURCE_DIR}/tools/osx/third_party_libs_tool ./visualboyadvance-m.app
+                COMMAND ${CMAKE_SOURCE_DIR}/tools/macOS/third_party_libs_tool ./visualboyadvance-m.app
                 WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
             )
 

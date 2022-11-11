@@ -43,14 +43,40 @@ if [ "$target_bits" -eq 32 ] && [ -d /Applications/Xcode9.app ]; then
     sudo xcode-select -s /Applications/Xcode9.app/Contents/Developer
 fi
 
-# Unlink brew wxwidgets if installed because it interferes with ours.
-brew unlink wxwidgets >/dev/null 2>&1
+export BUILD_ROOT="${BUILD_ROOT:-$HOME/vbam-build-mac-${target_bits}bit}$BUILD_ROOT_SUFFIX"
 
-export BUILD_ROOT="$HOME/vbam-build-mac-${target_bits}bit"
+ver_file=$(mktemp)
+sw_vers -productVersion | sed 's/\./ /g' > "$ver_file"
+read -r macos_major macos_minor macos_patch < "$ver_file"
+rm -f "$ver_file"
+
+# Find the highest version clang and llvm in Nix or Homebrew.
+best_llvm=$(
+    (
+        for nix_clang in $(find /nix/store -maxdepth 1 -type d -name '*-clang-[0-9]*[0-9]'); do
+            llvm_ver=$(echo "$nix_clang" | sed -E 's/.*-([0-9][0-9.]*[0-9])$/\1/')
+            nix_llvm=$(find /nix/store -maxdepth 1 -type d -name '*-llvm-'"$llvm_ver")
+
+            if [ -x "$nix_clang/bin/clang++" ]; then
+                echo "$nix_clang:$nix_llvm    $($nix_clang/bin/clang++ --version | head -1 | awk '{ print $NF }')"
+            fi
+        done
+
+        for brew_llvm in $(find /usr/local/opt -maxdepth 1 -type l -name 'llvm*'); do
+            if [ -x "$brew_llvm/bin/clang++" ]; then
+                echo "$brew_llvm    $($brew_llvm/bin/clang++ --version | head -1 | awk '{ print $NF }')"
+            fi
+        done
+    ) | sort -k2,2 -V -r | head -1 | awk '{ print $1 }'
+)
 
 BUILD_ENV=$(cat <<EOF
 export MACOSX_DEPLOYMENT_TARGET=10.7
 export COMMAND_MODE=unix2003
+export PATH=/usr/bin:/bin:/usr/sbin:/sbin
+
+[ -n "$best_llvm" ] && export PATH="$best_llvm/bin:\$PATH"
+
 export CC=clang
 export CXX=clang++
 export CPPFLAGS="-DICONV_CONST="
@@ -65,6 +91,7 @@ EOF
 )
 
 export BUILD_ENV
+
 export TAR=tar
 
 if [ "$target_cpu" = i386 ]; then
@@ -73,9 +100,19 @@ fi
 
 . "$(dirname "$0")/../builder/core.sh"
 
+# Remove -lm, macOS does not use it and it can cause build failures.
+BUILD_ENV=$(printf '%s' "$BUILD_ENV" | sed 's/ -lm / /g')
+export BUILD_ENV
+
 for dist in flex libsecret c2man graphviz zip; do
     table_line_remove DISTS "$dist"
 done
+
+# LLVM libunwind.
+
+table_insert_after DISTS cmake '
+    libunwind       https://github.com/llvm-mirror/libunwind/archive/3e6ec2ae9afaa3683269b690612f84d907943ea2.tar.gz  lib/libunwind.a
+'
 
 # issues with perl modules linked to our libs and brew perl
 table_line_remove DISTS shared-mime-info
@@ -92,13 +129,29 @@ else
     table_line_replace DIST_CONFIGURE_OVERRIDES openssl './Configure darwin64-x86_64-cc no-shared --prefix=/usr --openssldir=/etc/ssl'
 fi
 
-table_line_append DIST_EXTRA_CFLAGS libogg    "-include \"$(xcode-select -p)\"/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/stdint.h"
+table_line_append DIST_PATCHES glib " \
+    https://gist.githubusercontent.com/rkitover/05fb70a11cc8ddcea11230b4dc5fd48b/raw/b44288a2357acd4da62ee5f07ee106d36c91b887/macOS-glib-link-static-libintl-gettext.patch \
+"
 
-table_line_append DIST_EXTRA_CFLAGS libvorbis "-include \"$(xcode-select -p)\"/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/stdint.h"
+stdint_h=
 
-table_line_append DIST_EXTRA_CFLAGS libtheora "-include \"$(xcode-select -p)\"/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/stdint.h"
+if [ -f "$(xcode-select -p)/SDKs/MacOSX.sdk/usr/include/stdint.h" ]; then
+    stdint_h="\"$(xcode-select -p)\"/SDKs/MacOSX.sdk/usr/include/stdint.h"
+elif [ -f "$(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/stdint.h" ]; then
+    stdint_h="\"$(xcode-select -p)\"/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/stdint.h"
+else
+    die "Can't find macOS SDK 'stdint.h'"
+fi
 
-table_line_append DIST_EXTRA_CFLAGS ffmpeg "-include \"$(xcode-select -p)\"/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/stdint.h"
+table_line_append DIST_EXTRA_CFLAGS libogg    "-include $stdint_h"
+
+table_line_append DIST_EXTRA_CFLAGS libvorbis "-include $stdint_h"
+
+table_line_append DIST_EXTRA_CFLAGS libtheora "-include $stdint_h"
+
+table_line_append DIST_EXTRA_CFLAGS ffmpeg    "-include $stdint_h"
+
+table_line_append DIST_MAKE_ARGS unzip "LD=clang"
 
 # -Wl,-no_compact_unwind must be passed in LDFLAGS to openssl
 table_line_append DIST_MAKE_ARGS openssl "LDFLAGS=\"\$LDFLAGS\""
@@ -151,6 +204,3 @@ if [ -n "$PREV_XCODE" ]; then
     printf "\nRe-setting '$PREV_XCODE' as the default Xcode...\n\n"
     sudo xcode-select -s "$PREV_XCODE"
 fi
-
-# Link brew wxwidgets back if installed.
-brew link wxwidgets >/dev/null 2>&1

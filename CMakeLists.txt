@@ -363,8 +363,10 @@ if(MSYS AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" CACHE INTERNAL "prefix search path for find_XXXX" FORCE)
 endif()
 
-# Add support for Homebrew, MacPorts and Fink on OS X
-if(APPLE)
+# Add support for Homebrew, MacPorts and Fink on macOS
+option(DISABLE_MACOS_PACKAGE_MANAGERS "Set to TRUE to disable support for macOS Homebrew, MacPorts and Fink." FALSE)
+
+if(APPLE AND NOT DISABLE_MACOS_PACKAGE_MANAGERS)
     include(MacPackageManagers)
 endif()
 
@@ -609,10 +611,10 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang AND NOT MSVC
 
     # common optimization flags
     if(NOT (APPLE AND CMAKE_CXX_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.3))
-        set(MY_C_OPT_FLAGS ${MY_C_OPT_FLAGS} -O2 -fomit-frame-pointer ${LTO_FLAGS})
+        set(MY_C_OPT_FLAGS ${MY_C_OPT_FLAGS} -Ofast -fomit-frame-pointer ${LTO_FLAGS})
     else()
         # LTO and -fomit-frame-pointer generate broken binaries on Lion with XCode 4.2 tools
-        set(MY_C_OPT_FLAGS ${MY_C_OPT_FLAGS} -O2)
+        set(MY_C_OPT_FLAGS ${MY_C_OPT_FLAGS} -Ofast)
     endif()
 
     # Common flags.
@@ -620,14 +622,21 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang AND NOT MSVC
 
     include(CheckCXXCompilerFlag)
 
-    # Optimize for Core2 and tune for Rocketlake on macOS and Zen3 for the rest
-    # on X86_64.
+    # Require and optimize for Core2 level support, tune for generic.
     if(X86_64)
         set(MY_C_FLAGS ${MY_C_FLAGS} -march=core2 -mtune=generic)
-    # Optimize for pentium-mmx and tune for Core2 on X86_32.
+    # Optimize for pentium-mmx and tune for generic for older XP builds.
     elseif(X86_32)
-        set(MY_C_FLAGS ${MY_C_FLAGS} -march=pentium-mmx -mtune=core2)
+        set(MY_C_FLAGS ${MY_C_FLAGS} -march=pentium-mmx -mtune=generic)
     endif()
+
+    # Check for -fopenmp=libomp on clang.
+    #    if(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+    #        check_cxx_compiler_flag("-fopenmp=libomp" FOPENMP_LIBOMP_FLAG)
+    #        if(FOPENMP_LIBOMP_FLAG)
+    #            set(MY_C_FLAGS ${MY_C_FLAGS} -fopenmp=libomp)
+    #        endif()
+    #    endif()
 
     # common debug flags
     if(CMAKE_COMPILER_IS_GNUCXX)
