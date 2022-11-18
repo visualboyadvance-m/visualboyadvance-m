@@ -99,7 +99,7 @@ void gbCheatsReadGameSkip(gzFile gzFile, int version)
         }
     }
 }
-#endif
+#endif /* __LIBRETRO__ */
 
 void gbCheatsSaveCheatList(const char* file)
 {

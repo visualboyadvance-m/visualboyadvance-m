@@ -24,9 +24,9 @@ struct EmulatedSystem {
         bool (*emuWriteBattery)(const char *);
 #ifdef __LIBRETRO__
         // load state
-        bool (*emuReadState)(const uint8_t *, unsigned);
+        bool (*emuReadState)(const uint8_t *);
         // load state
-        unsigned (*emuWriteState)(uint8_t *, unsigned);
+        unsigned (*emuWriteState)(uint8_t *);
 #else
         // load state
         bool (*emuReadState)(const char *);

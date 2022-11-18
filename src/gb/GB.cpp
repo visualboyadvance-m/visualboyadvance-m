@@ -1582,7 +1582,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
             }
             inBios = false;
         }
-    }
+    } break;
 
     // HDMA1
     case 0x51: {
@@ -1776,7 +1776,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
             gbMemory[0xff70] = register_SVBK = value;
             return;
         }
-    }
+    } break;
 
     case 0x75: {
         gbMemory[0xff75] = 0x8f | value;
@@ -4093,7 +4093,6 @@ bool gbReadSaveState(const char* name)
 
     return res;
 }
-#endif // !__LIBRETRO__
 
 bool gbWritePNGFile(const char* fileName)
 {
@@ -4108,6 +4107,7 @@ bool gbWriteBMPFile(const char* fileName)
         return utilWriteBMPFile(fileName, 256, 224, pix);
     return utilWriteBMPFile(fileName, 160, 144, pix);
 }
+#endif // !__LIBRETRO__
 
 void gbCleanUp()
 {
@@ -5521,7 +5521,7 @@ bool gbLoadRomData(const char* data, unsigned size)
 #ifdef __LIBRETRO__
 #include <stddef.h>
 
-unsigned int gbWriteSaveState(uint8_t* data, unsigned)
+unsigned int gbWriteSaveState(uint8_t* data)
 {
 	uint8_t* orig = data;
 
@@ -5589,7 +5589,7 @@ unsigned int gbWriteSaveState(uint8_t* data, unsigned)
 	return (ptrdiff_t)data - (ptrdiff_t)orig;
 }
 
-bool gbReadSaveState(const uint8_t* data, unsigned)
+bool gbReadSaveState(const uint8_t* data)
 {
     int version = utilReadIntMem(data);
 
@@ -5654,7 +5654,7 @@ bool gbReadSaveState(const uint8_t* data, unsigned)
     utilReadMem(&IFF, data, 2);
 
     if (gbSgbMode) {
-        gbSgbReadGame(data, version);
+        gbSgbReadGame(data);
     } else {
         gbSgbMask = 0; // loading a game at the wrong time causes no display
     }
@@ -5796,7 +5796,7 @@ bool gbReadSaveState(const uint8_t* data, unsigned)
         gbMemoryMap[0x0d] = &gbWram[value * 0x1000];
     }
 
-    gbSoundReadGame(data, version);
+    gbSoundReadGame(data);
 
     if (gbCgbMode && gbSgbMode) {
         gbSgbMode = 0;
@@ -5829,27 +5829,7 @@ bool gbReadSaveState(const uint8_t* data, unsigned)
 
     return true;
 }
-
-bool gbWriteMemSaveState(char*, int, long&)
-{
-	return false;
-}
-
-bool gbReadMemSaveState(char*, int)
-{
-    return false;
-}
-
-bool gbReadBatteryFile(const char*)
-{
-    return false;
-}
-
-bool gbWriteBatteryFile(const char*)
-{
-    return false;
-}
-#endif
+#endif /* __LIBRETRO__ */
 
 struct EmulatedSystem GBSystem = {
     // emuMain
@@ -5858,6 +5838,16 @@ struct EmulatedSystem GBSystem = {
     gbReset,
     // emuCleanUp
     gbCleanUp,
+#ifdef __LIBRETRO__
+    NULL,               // emuReadBattery
+    NULL,               // emuWriteBattery
+    gbReadSaveState,    // emuReadState
+    gbWriteSaveState,   // emuWriteState
+    NULL,               // emuReadMemState
+    NULL,               // emuWriteMemState
+    NULL,               // emuWritePNG
+    NULL,               // emuWriteBMP
+#else    
     // emuReadBattery
     gbReadBatteryFile,
     // emuWriteBattery
@@ -5874,6 +5864,7 @@ struct EmulatedSystem GBSystem = {
     gbWritePNGFile,
     // emuWriteBMP
     gbWriteBMPFile,
+#endif /* ! __LIBRETRO__ */
     // emuUpdateCPSR
     NULL,
     // emuHasDebugger

@@ -595,7 +595,7 @@ void CPUUpdateRenderBuffers(bool force)
 #ifdef __LIBRETRO__
 #include <stddef.h>
 
-unsigned int CPUWriteState(uint8_t* data, unsigned size)
+unsigned int CPUWriteState(uint8_t* data)
 {
     uint8_t* orig = data;
 
@@ -625,12 +625,7 @@ unsigned int CPUWriteState(uint8_t* data, unsigned size)
     return (ptrdiff_t)data - (ptrdiff_t)orig;
 }
 
-bool CPUWriteMemState(char* memory, int available, long& reserved)
-{
-    return false;
-}
-
-bool CPUReadState(const uint8_t* data, unsigned size)
+bool CPUReadState(const uint8_t* data)
 {
     // Don't really care about version.
     int version = utilReadIntMem(data);
@@ -667,9 +662,9 @@ bool CPUReadState(const uint8_t* data, unsigned size)
     utilReadMem(pix, data, SIZE_PIX);
     utilReadMem(ioMem, data, SIZE_IOMEM);
 
-    eepromReadGame(data, version);
-    flashReadGame(data, version);
-    soundReadGame(data, version);
+    eepromReadGame(data);
+    flashReadGame(data);
+    soundReadGame(data);
     rtcReadGame(data);
 
     //// Copypasta stuff ...
@@ -1276,6 +1271,7 @@ bool CPUReadBatteryFile(const char* fileName)
     return true;
 }
 
+#ifndef __LIBRETRO__
 bool CPUWritePNGFile(const char* fileName)
 {
     return utilWritePNGFile(fileName, 240, 160, pix);
@@ -1285,6 +1281,7 @@ bool CPUWriteBMPFile(const char* fileName)
 {
     return utilWriteBMPFile(fileName, 240, 160, pix);
 }
+#endif /* !__LIBRETRO__ */
 
 bool CPUIsZipFile(const char* file)
 {
@@ -2290,7 +2287,8 @@ void CPUSoftwareInterrupt(int comment)
         break;
     case 0x2A:
         BIOS_SndDriverJmpTableCopy();
-    // let it go, because we don't really emulate this function
+        // let it go, because we don't really emulate this function
+	/* fallthrough */
     default:
 #ifdef GBA_LOGGING
         if (systemVerbose & VERBOSE_SWI) {
@@ -4284,6 +4282,16 @@ struct EmulatedSystem GBASystem = {
     CPUReset,
     // emuCleanUp
     CPUCleanUp,
+#ifdef __LIBRETRO__
+    NULL,           // emuReadBattery
+    NULL,           // emuReadState
+    CPUReadState,   // emuReadState
+    CPUWriteState,  // emuWriteState
+    NULL,           // emuReadMemState
+    NULL,           // emuWriteMemState
+    NULL,           // emuWritePNG
+    NULL,           // emuWriteBMP
+#else
     // emuReadBattery
     CPUReadBatteryFile,
     // emuWriteBattery
@@ -4292,18 +4300,15 @@ struct EmulatedSystem GBASystem = {
     CPUReadState,
     // emuWriteState
     CPUWriteState,
-// emuReadMemState
-#ifdef __LIBRETRO__
-    NULL,
-#else
+    // emuReadMemState
     CPUReadMemState,
-#endif
     // emuWriteMemState
     CPUWriteMemState,
     // emuWritePNG
     CPUWritePNGFile,
     // emuWriteBMP
     CPUWriteBMPFile,
+#endif
     // emuUpdateCPSR
     CPUUpdateCPSR,
     // emuHasDebugger

@@ -70,7 +70,7 @@ extern int soundTicks; // Number of 16.8 MHz clocks until gbSoundTick() will be 
 // Saves/loads emulator state
 #ifdef __LIBRETRO__
 void gbSoundSaveGame(uint8_t*&);
-void gbSoundReadGame(const uint8_t*&, int);
+void gbSoundReadGame(const uint8_t*&);
 #else
 void gbSoundSaveGame(gzFile out);
 void gbSoundReadGame(int version, gzFile in);

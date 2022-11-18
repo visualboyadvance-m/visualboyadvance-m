@@ -228,7 +228,7 @@ void flashSaveGame(uint8_t*& data)
     utilWriteDataMem(data, flashSaveData3);
 }
 
-void flashReadGame(const uint8_t*& data, int)
+void flashReadGame(const uint8_t*& data)
 {
     utilReadDataMem(data, flashSaveData3);
 }

@@ -393,7 +393,7 @@ static void gbSoundReadGameOld(int version, gzFile gzFile)
 
     memcpy(&s.regs[0x20], &gbMemory[0xFF30], 0x10); // wave
 }
-#endif
+#endif // ! __LIBRETRO__
 
 // New state format
 static variable_desc gb_state[] = {
@@ -429,11 +429,8 @@ static variable_desc gb_state[] = {
     { NULL, 0 }
 };
 
-#ifdef __LIBRETRO__
-void gbSoundSaveGame(uint8_t*& out)
-#else
+#ifndef __LIBRETRO__
 void gbSoundSaveGame(gzFile out)
-#endif
 {
     gb_apu->save_state(&state.apu);
 
@@ -441,31 +438,43 @@ void gbSoundSaveGame(gzFile out)
     memset(dummy_state, 0, sizeof dummy_state);
 
     state.version = 1;
-#ifdef __LIBRETRO__
-    utilWriteDataMem(out, gb_state);
-#else
     utilWriteData(out, gb_state);
-#endif
 }
 
-#ifdef __LIBRETRO__
-void gbSoundReadGame(const uint8_t*& in, int version)
-#else
 void gbSoundReadGame(int version, gzFile in)
-#endif
 {
     // Prepare APU and default state
     reset_apu();
     gb_apu->save_state(&state.apu);
 
-#ifdef __LIBRETRO__
-    utilReadDataMem(in, gb_state);
-#else
     if (version > 11)
         utilReadData(in, gb_state);
     else
         gbSoundReadGameOld(version, in);
-#endif
 
     gb_apu->load_state(state.apu);
 }
+#endif // ! __LIBRETRO__
+
+#ifdef __LIBRETRO__
+void gbSoundSaveGame(uint8_t*& out)
+{
+    gb_apu->save_state(&state.apu);
+
+    // Be sure areas for expansion get written as zero
+    memset(dummy_state, 0, sizeof dummy_state);
+
+    state.version = 1;
+    utilWriteDataMem(out, gb_state);
+}
+
+void gbSoundReadGame(const uint8_t*& in)
+{
+    // Prepare APU and default state
+    reset_apu();
+    gb_apu->save_state(&state.apu);
+
+    utilReadDataMem(in, gb_state);
+    gb_apu->load_state(state.apu);
+}
+#endif // __LIBRETRO__

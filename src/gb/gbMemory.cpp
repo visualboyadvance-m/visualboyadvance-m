@@ -1016,7 +1016,8 @@ mapperHuC3RTC gbRTCHuC3 = {
     0, // DateTime
     0, // WritingTime
     0, // ModeFlag
-    0 // ClockShift
+    0, // ClockShift
+    { 0 }
 };
 
 void memoryUpdateHuC3Latch() {

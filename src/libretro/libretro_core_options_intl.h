@@ -73,31 +73,43 @@ extern "C" {
 
 /* RETRO_LANGUAGE_TURKISH */
 
-struct retro_core_option_definition option_defs_tr[] = {
-    {
-        "vbam_solarsensor",
-        "Solar Sensör Seviyesi",
-        "Boktai oyunlarında simüle güneş seviyesini ayarlar. L2 / R2 düğmeleri ayrıca seviyeleri hızlıca değiştirmek için de kullanılabilir.",
-        {
-            { "0",  NULL },
-            { "1",  NULL },
-            { "2",  NULL },
-            { "3",  NULL },
-            { "4",  NULL },
-            { "5",  NULL },
-            { "6",  NULL },
-            { "7",  NULL },
-            { "8",  NULL },
-            { "9",  NULL },
-            { "10", NULL },
-            { NULL, NULL },
-        },
-        "0"
-    },
+struct retro_core_option_v2_category option_cats_tr[] = {
+   {
+      "system",
+      NULL,
+      NULL,
+   },
+   {
+      "video",
+      NULL,
+      NULL,
+   },
+   {
+      "audio",
+      NULL,
+      NULL,
+   },
+   {
+      "input",
+      NULL,
+      NULL,
+   },
+   {
+      "advanced",
+      NULL,
+      NULL,
+   },
+   { NULL, NULL, NULL },
+};
+
+struct retro_core_option_v2_definition option_defs_tr[] = {
     {
         "vbam_usebios",
         "Resmi BIOS'u kullanın (Varsa)",
+        NULL,
         "Mümkün olduğunda resmi BIOS kullanın. Değişikliklerin uygulanabilmesi için çekirdeğin yeniden başlatılması gerekiyor.",
+        NULL,
+        "system",
         {
             { "disabled",  NULL },
             { "enabled",   NULL },
@@ -108,7 +120,92 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_forceRTCenable",
         "RTC'yi Etkinleştir",
+        NULL,
         "RAM'den bağımsız olarak dahili gerçek zamanlı saati etkinleştirmeye zorlar. Saatin etkinleştirilmesini gerektiren rom yamalar için kullanılabilir (Pokemon gibi).",
+        NULL,
+        "system",
+        {
+            { "disabled",  NULL },
+            { "enabled",   NULL },
+            { NULL, NULL },
+        },
+        "disabled"
+    },
+    {
+        "vbam_gbHardware",
+        "(GB) Öykünülmüş Donanım (Yeniden Başlatılması Gerekiyor)",
+        NULL,
+        "Game Boy donanım tipini taklit edecek şekilde ayarlar. Uygulamak için çekirdeği yeniden başlatın.",
+        NULL,
+        "system",
+        {
+            { "gbc",  "Game Boy Color" },
+            { "auto", "Automatic" },
+            { "sgb",  "Super Game Boy" },
+            { "gb",   "Game Boy" },
+            { "gba",  "Game Boy Advance" },
+            { "sgb2", "Super Game Boy 2" },
+            { NULL, NULL },
+        },
+        "gbc"
+    },
+    {
+        "vbam_allowcolorizerhack",
+        "(GB) Colorizer Hack'i Etkinleştir (Yeniden Başlatılması Gerekiyor)",
+        NULL,
+        "Colorizer'ın saldırıya uğramış GB oyunlarının (örn. DX yamalı oyunlar) normalde GBC / GBA donanım türünde çalışmasına izin verir. Bu ayrıca bios dosyasının kullanımını da devre dışı bırakır. Renklendirilmemiş oyunlarda kullanılması tavsiye edilmez.",
+        NULL,
+        "system",
+        {
+            { "disabled",  NULL },
+            { "enabled",   NULL },
+            { NULL, NULL },
+        },
+        "disabled"
+    },
+    {
+        "vbam_palettes",
+        "(GB) Renk Paleti",
+        NULL,
+        "Game Boy paletlerini kullanmak için ayarlayın.",
+        NULL,
+        "video",
+        {
+            { "black and white", NULL },
+            { "blue sea",     NULL },
+            { "dark knight",  NULL },
+            { "green forest", NULL },
+            { "hot desert",   NULL },
+            { "pink dreams",  NULL },
+            { "wierd colors", NULL },
+            { "original gameboy", NULL },
+            { "gba sp",       NULL },
+            { NULL, NULL },
+        },
+        "standard"
+    },
+    {
+        "vbam_showborders",
+        "(GB) Sınırları Göster",
+        NULL,
+        "Etkinleştirildiğinde, yüklü içerik SGB uyumluysa, bu durum oyundaki sınırı gösterir.",
+        NULL,
+        "video",
+        {
+            { "disabled",  NULL },
+            { "enabled",   NULL },
+            { "auto",      NULL },
+            { NULL, NULL },
+        },
+        "disabled"
+    },
+    {
+        "vbam_gbcoloroption",
+        "(GB) Renk Düzeltme",
+        NULL,
+        "Bazı oyunlarda renkleri düzelten renk düzeltmesini uygular.",
+        NULL,
+        "video",
         {
             { "disabled",  NULL },
             { "enabled",   NULL },
@@ -119,7 +216,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_soundinterpolation",
         "Ses Enterpolasyonu",
+        NULL,
         "Ses filtresini etkinleştirin veya devre dışı bırakın.",
+        NULL,
+        "audio",
         {
             { "disabled",  NULL },
             { "enabled",   NULL },
@@ -130,7 +230,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_soundfiltering",
         "Ses Filtreleme",
+        NULL,
         "Kullanılacak filtreleme miktarını ayarlar. Yüksek değer, yüksek frekansları azaltır.",
+        NULL,
+        "audio",
         {
             { "0",  NULL },
             { "1",  NULL },
@@ -148,76 +251,12 @@ struct retro_core_option_definition option_defs_tr[] = {
         "5"
     },
     {
-        "vbam_palettes",
-        "(GB) Renk Paleti",
-        "Game Boy paletlerini kullanmak için ayarlayın.",
-        {
-            { "black and white", NULL },
-            { "blue sea",     NULL },
-            { "dark knight",  NULL },
-            { "green forest", NULL },
-            { "hot desert",   NULL },
-            { "pink dreams",  NULL },
-            { "wierd colors", NULL },
-            { "original gameboy", NULL },
-            { "gba sp",       NULL },
-            { NULL, NULL },
-        },
-        "standard"
-    },
-    {
-        "vbam_gbHardware",
-        "(GB) Öykünülmüş Donanım (Yeniden Başlatılması Gerekiyor)",
-        "Game Boy donanım tipini taklit edecek şekilde ayarlar. Uygulamak için çekirdeği yeniden başlatın.",
-        {
-            { "gbc",  "Game Boy Color" },
-            { "auto", "Automatic" },
-            { "sgb",  "Super Game Boy" },
-            { "gb",   "Game Boy" },
-            { "gba",  "Game Boy Advance" },
-            { "sgb2", "Super Game Boy 2" },
-            { NULL, NULL },
-        },
-        "gbc"
-    },
-    {
-        "vbam_allowcolorizerhack",
-        "(GB) Colorizer Hack'i Etkinleştir (Yeniden Başlatılması Gerekiyor)",
-        "Colorizer'ın saldırıya uğramış GB oyunlarının (örn. DX yamalı oyunlar) normalde GBC / GBA donanım türünde çalışmasına izin verir. Bu ayrıca bios dosyasının kullanımını da devre dışı bırakır. Renklendirilmemiş oyunlarda kullanılması tavsiye edilmez.",
-        {
-            { "disabled",  NULL },
-            { "enabled",   NULL },
-            { NULL, NULL },
-        },
-        "disabled"
-    },
-    {
-        "vbam_showborders",
-        "(GB) Sınırları Göster",
-        "Etkinleştirildiğinde, yüklü içerik SGB uyumluysa, bu durum oyundaki sınırı gösterir.",
-        {
-            { "disabled",  NULL },
-            { "enabled",   NULL },
-            { "auto",      NULL },
-            { NULL, NULL },
-        },
-        "disabled"
-    },
-    {
-        "vbam_gbcoloroption",
-        "(GB) Renk Düzeltme",
-        "Bazı oyunlarda renkleri düzelten renk düzeltmesini uygular.",
-        {
-            { "disabled",  NULL },
-            { "enabled",   NULL },
-            { NULL, NULL },
-        },
-        "disabled"
-    },
-    {
         "vbam_turboenable",
         "Turbo Düğmelerini Etkinleştir",
+        NULL,
         "Gamepad turbo düğmelerini etkinleştirin veya devre dışı bırakın.",
+        NULL,
+        "input",
         {
             { "disabled", NULL },
             { "enabled",  NULL },
@@ -228,7 +267,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_turbodelay",
         "Turbo Gecikme (kare cinsinden)",
+        NULL,
         "Karelerde turbo tetikleyicilerin oranını tekrarlayın. Daha yüksek değer daha fazla tetikler.",
+        NULL,
+        "input",
         {
             { "1",  NULL },
             { "2",  NULL },
@@ -250,9 +292,35 @@ struct retro_core_option_definition option_defs_tr[] = {
         "3"
     },
     {
+        "vbam_solarsensor",
+        "Solar Sensör Seviyesi",
+        NULL,
+        "Boktai oyunlarında simüle güneş seviyesini ayarlar. L2 / R2 düğmeleri ayrıca seviyeleri hızlıca değiştirmek için de kullanılabilir.",
+        NULL,
+        "input",
+        {
+            { "0",  NULL },
+            { "1",  NULL },
+            { "2",  NULL },
+            { "3",  NULL },
+            { "4",  NULL },
+            { "5",  NULL },
+            { "6",  NULL },
+            { "7",  NULL },
+            { "8",  NULL },
+            { "9",  NULL },
+            { "10", NULL },
+            { NULL, NULL },
+        },
+        "0"
+    },
+    {
         "vbam_astick_deadzone",
         "Sensörlerin Ölü Bölgesi (%)",
+        NULL,
         "Analog çubukların ölü bölgesini (yüzde olarak) ayarlayın.",
+        NULL,
+        "input",
         {
             { "0",  NULL },
             { "5",  NULL },
@@ -268,7 +336,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_gyro_sensitivity",
         "Sensör Hassasiyeti (Jiroskop) (%)",
+        NULL,
         "Varsayılan konumlandırma, sol analogdur. Gyro özellikli oyunlar için hassasiyet seviyesini ayarlamak için kullanılır.",
+        NULL,
+        "input",
         {
             { "10",  NULL },
             { "15",  NULL },
@@ -300,7 +371,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_tilt_sensitivity",
         "Sensör Hassasiyeti (Eğim) (%)",
+        NULL,
         "Varsayılan konumlandırma sağ analogdur. Gyro özellikli oyunlar için hassasiyet seviyesini ayarlamak için kullanılır.",
+        NULL,
+        "input",
         {
             { "10",  NULL },
             { "15",  NULL },
@@ -332,18 +406,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_swap_astick",
         "Sol / Sağ Analog Değiştirme",
+        NULL,
         "Döndürme ve eğme için sola ve sağa analog çubuk işlevini değiştirir.",
-        {
-            { "disabled", NULL },
-            { "enabled",  NULL },
-            { NULL, NULL },
-        },
-        "disabled"
-    },
-    {
-        "vbam_show_advanced_options",
-        "Gelişmiş Ayarları Göster",
-        "Ses kanallarını ve grafik katmanlarını etkinleştirebilen veya devre dışı bırakabilen gelişmiş seçenekleri gösterin.",
+        NULL,
+        "input",
         {
             { "disabled", NULL },
             { "enabled",  NULL },
@@ -354,7 +420,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_sound_1",
         "Ses Kanalı 1",
+        NULL,
         "Tonlu ve tarama ses kanalını etkinleştirir veya devre dışı bırakır.",
+        NULL,
+        "advanced",
         {
             { "disabled", NULL },
             { "enabled",  NULL },
@@ -365,7 +434,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_sound_2",
         "Ses Kanalı 2",
+        NULL,
         "Tonlu ses kanalını etkinleştirir veya devre dışı bırakır.",
+        NULL,
+        "advanced",
         {
             { "disabled", NULL },
             { "enabled",  NULL },
@@ -376,7 +448,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_sound_3",
         "Ses Kanalı 3",
+        NULL,
         "Dalga çıkışı ses kanalını etkinleştirir veya devre dışı bırakır.",
+        NULL,
+        "advanced",
         {
             { "disabled", NULL },
             { "enabled",  NULL },
@@ -387,7 +462,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_sound_4",
         "Ses Kanalı 4",
+        NULL,
         "Gürültü ses kanalını etkinleştirir veya devre dışı bırakır.",
+        NULL,
+        "advanced",
         {
             { "disabled", NULL },
             { "enabled",  NULL },
@@ -398,7 +476,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_sound_5",
         "DMA Ses Kanalı A",
+        NULL,
         "DMA ses kanalı A'yı etkinleştirir veya devre dışı bırakır.",
+        NULL,
+        "advanced",
         {
             { "disabled", NULL },
             { "enabled",  NULL },
@@ -409,7 +490,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_sound_6",
         "DMA Ses Kanalı B",
+        NULL,
         "DMA ses kanalı B'yi etkinleştirir veya devre dışı bırakır.",
+        NULL,
+        "advanced",
         {
             { "disabled", NULL },
             { "enabled",  NULL },
@@ -420,7 +504,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_layer_1",
         "Arka Plan Katmanını Göster 1",
+        NULL,
         "1. arka plan katmanını gösterir veya gizler.",
+        NULL,
+        "advanced",
         {
             { "disabled", NULL },
             { "enabled",  NULL },
@@ -431,7 +518,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_layer_2",
         "Arka Plan Katmanını Göster 2",
+        NULL,
         "2. arka plan katmanını gösterir veya gizler.",
+        NULL,
+        "advanced",
         {
             { "disabled", NULL },
             { "enabled",  NULL },
@@ -442,7 +532,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_layer_3",
         "Arka Plan Katmanını Göster 3",
+        NULL,
         "3. arka plan katmanını gösterir veya gizler.",
+        NULL,
+        "advanced",
         {
             { "disabled", NULL },
             { "enabled",  NULL },
@@ -453,7 +546,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_layer_4",
         "Arka Plan Katmanını Göster 4",
+        NULL,
         "4. arka plan katmanını gösterir veya gizler.",
+        NULL,
+        "advanced",
         {
             { "disabled", NULL },
             { "enabled",  NULL },
@@ -464,7 +560,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_layer_5",
         "Sprite Katmanını Göster",
+        NULL,
         "Sprite katmanını gösterir veya gizler.",
+        NULL,
+        "advanced",
         {
             { "disabled", NULL },
             { "enabled",  NULL },
@@ -475,7 +574,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_layer_6",
         "Pencere Katmanını Göster 1",
+        NULL,
         "Pencere katmanı 1'i gösterir veya gizler.",
+        NULL,
+        "advanced",
         {
             { "disabled", NULL },
             { "enabled",  NULL },
@@ -486,7 +588,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_layer_7",
         "Pencere Katmanını Göster 2",
+        NULL,
         "Pencere katmanı 2'yi gösterir veya gizler.",
+        NULL,
+        "advanced",
         {
             { "disabled", NULL },
             { "enabled",  NULL },
@@ -497,7 +602,10 @@ struct retro_core_option_definition option_defs_tr[] = {
     {
         "vbam_layer_8",
         "Sprite Pencere Katmanını Göster",
+        NULL,
         "Sprite pencere katmanını gösterir veya gizler.",
+        NULL,
+        "advanced",
         {
             { "disabled", NULL },
             { "enabled",  NULL },
@@ -506,7 +614,12 @@ struct retro_core_option_definition option_defs_tr[] = {
         "enabled"
     },
 
-    { NULL, NULL, NULL, {{0}}, NULL }
+    { NULL, NULL, NULL, NULL, NULL, NULL, { { NULL, NULL } }, NULL },
+};
+
+struct retro_core_options_v2 options_tr = {
+   option_cats_tr,
+   option_defs_tr
 };
 
 #ifdef __cplusplus

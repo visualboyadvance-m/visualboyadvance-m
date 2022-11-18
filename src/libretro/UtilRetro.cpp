@@ -43,11 +43,6 @@ bool cpuIsMultiBoot      = false;
 const char* loadDotCodeFile;
 const char* saveDotCodeFile;
 
-bool utilWritePNGFile(const char* fileName, int w, int h, uint8_t* pix)
-{
-    return false;
-}
-
 void utilPutDword(uint8_t* p, uint32_t value)
 {
     *p++ = value & 255;
@@ -60,11 +55,6 @@ void utilPutWord(uint8_t* p, uint16_t value)
 {
     *p++ = value & 255;
     *p = (value >> 8) & 255;
-}
-
-bool utilWriteBMPFile(const char* fileName, int w, int h, uint8_t* pix)
-{
-    return false;
 }
 
 extern bool cpuIsMultiBoot;
