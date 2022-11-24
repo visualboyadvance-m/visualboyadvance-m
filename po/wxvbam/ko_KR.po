@@ -7,7 +7,7 @@
 # JunYoung Ahn <ajy9812@gmail.com>, 2021
 # mp hdte <mphdte@gmail.com>, 2020
 # park seungbin <parksengbin48@gmail.com>, 2019
-# 네온YouTube <xodms1722@gmail.com>, 2022
+# 노란 아홀로틀 <xodms1722@gmail.com>, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
