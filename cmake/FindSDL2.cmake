@@ -109,22 +109,34 @@ if(SDL2_STATIC)
     endif()
 endif()
 
-unset(lib_suffix)
+unset(lib_suffixes)
 if(MSVC)
     if(VCPKG_TARGET_TRIPLET MATCHES "-static$")
-	set(lib_suffix "${lib_suffix}-static")
+	list(APPEND lib_suffixes -static)
     endif()
 
     if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
-	set(lib_suffix "${lib_suffix}d")
+	list(APPEND lib_suffixes d)
     endif()
 endif()
 
+# Calculate combination of possible name+suffixes.
+unset(names)
+set(lib_name SDL2)
+set(current ${lib_name})
+foreach(suffix ${lib_suffixes})
+    list(APPEND names "${current}${suffix}" "${lib_name}${suffix}")
+    set(current "${current}${suffix}")
+endforeach()
+
+# Fallback to name by itself.
+list(APPEND names ${lib_name})
+
 FIND_LIBRARY(SDL2_LIBRARY_TEMP
-	NAMES SDL2${lib_suffix}
-	HINTS $ENV{SDL2DIR}
-	PATH_SUFFIXES lib64 lib lib/x64 lib/x86
-	PATHS ${SDL2_SEARCH_PATHS}
+    NAMES ${names}
+    HINTS $ENV{SDL2DIR}
+    PATH_SUFFIXES lib64 lib lib/x64 lib/x86
+    PATHS ${SDL2_SEARCH_PATHS}
 )
 
 if(NOT (SDL2_BUILDING_LIBRARY OR ${SDL2_INCLUDE_DIR} MATCHES ".framework"))
