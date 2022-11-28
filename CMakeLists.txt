@@ -33,6 +33,10 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
+if(WIN32)
+    include(RemoveStrawberryPerlFromPATH)
+endif()
+
 if(UPDATE_APPCAST)
     include(UpdateAppcast)
 endif()
