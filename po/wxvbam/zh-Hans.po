@@ -19,7 +19,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-23 17:33-0700\n"
+"POT-Creation-Date: 2022-12-02 22:20+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: 天绝星 <c.cejhb@gmail.com>, 2016-2017,2019-2020,2022\n"
 "Language-Team: Chinese Simplified (http://www.transifex.com/bgk/vba-m/language/zh-Hans/)\n"
@@ -574,7 +574,7 @@ msgstr "ROM+HuC-3"
 msgid "ROM+HuC-1"
 msgstr "ROM+HuC-1"
 
-#: cmdevents.cpp:775 dialogs/display-config.cpp:338 xrc/DisplayConfig.xrc:85
+#: cmdevents.cpp:775 dialogs/display-config.cpp:343 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
@@ -829,6 +829,34 @@ msgstr "局域网连接已激活，禁用连接模式即可断开联网。"
 msgid "Network is not supported in local mode."
 msgstr "本地模式不支持网络"
 
+#: extra-translations.cpp:12
+msgid "&Apply"
+msgstr ""
+
+#: extra-translations.cpp:13
+msgid "Artists"
+msgstr ""
+
+#: extra-translations.cpp:14
+msgid "Cancel"
+msgstr ""
+
+#: extra-translations.cpp:15
+msgid "Close"
+msgstr ""
+
+#: extra-translations.cpp:16
+msgid "Developers"
+msgstr ""
+
+#: extra-translations.cpp:17
+msgid "License"
+msgstr ""
+
+#: extra-translations.cpp:18
+msgid "OK"
+msgstr ""
+
 #: opts.cpp:543 opts.cpp:564 opts.cpp:769
 #, c-format
 msgid "Invalid key binding %s for %s"
@@ -1054,42 +1082,42 @@ msgstr "设置 wglSwapIntervalEXT 失败"
 msgid "No VSYNC available on this platform"
 msgstr "垂直同步在该平台上不可用 "
 
-#: panel.cpp:2439
+#: panel.cpp:2440
 msgid "memory allocation error"
 msgstr "内存分配错误"
 
-#: panel.cpp:2442
+#: panel.cpp:2443
 msgid "error initializing codec"
 msgstr "初始化代码错误"
 
-#: panel.cpp:2445
+#: panel.cpp:2446
 msgid "error writing to output file"
 msgstr "写入输出文件错误"
 
-#: panel.cpp:2448
+#: panel.cpp:2449
 msgid "can't guess output format from file name"
 msgstr "无法从文件名猜测输出格式"
 
-#: panel.cpp:2453
+#: panel.cpp:2454
 msgid "programming error; aborting!"
 msgstr "程序错误；正在中止！"
 
-#: panel.cpp:2465 panel.cpp:2494
+#: panel.cpp:2466 panel.cpp:2495
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "不能开始录制到 %s (%s)"
 
-#: panel.cpp:2522
+#: panel.cpp:2523
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "录制音频/视频时错误 (%s); 正在中止"
 
-#: panel.cpp:2528
+#: panel.cpp:2529
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "录制音频时错误 (%s); 正在中止"
 
-#: panel.cpp:2538
+#: panel.cpp:2539
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "录制视频时错误 (%s); 正在中止"
@@ -1561,22 +1589,22 @@ msgstr "数值 %d 对于选项 %s 无效；有效数值为 %d - %d"
 msgid "Invalid value %d for option %s; valid values are %s"
 msgstr "数值 %d 对于选项 %s 无效；有效数值为 %s"
 
-#: dialogs/display-config.cpp:369
+#: dialogs/display-config.cpp:374
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "在 %s 中没有可用 rpi 插件"
 
-#: dialogs/display-config.cpp:401 dialogs/display-config.cpp:443
+#: dialogs/display-config.cpp:406 dialogs/display-config.cpp:448
 #: xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "插件"
 
-#: dialogs/display-config.cpp:408
+#: dialogs/display-config.cpp:413
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "正在使用像素滤镜: %s"
 
-#: dialogs/display-config.cpp:415
+#: dialogs/display-config.cpp:420
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr "正在使用帧间混合: %s"
@@ -2855,9 +2883,8 @@ msgid "&Throttle"
 msgstr "阀门(&T)"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
-#, c-format
-msgid "% of normal:"
-msgstr "% 正常:"
+msgid "percent of normal:"
+msgstr ""
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
