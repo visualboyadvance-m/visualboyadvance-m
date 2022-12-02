@@ -746,6 +746,7 @@ set(
     viewers.cpp
     gfxviewers.cpp
     cmdevents.cpp
+    extra-translations.cpp
     opts.cpp
     sys.cpp
     panel.cpp
