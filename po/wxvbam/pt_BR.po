@@ -848,31 +848,31 @@ msgstr "A rede não é suportada no modo local."
 
 #: extra-translations.cpp:12
 msgid "&Apply"
-msgstr ""
+msgstr "&Aplicar"
 
 #: extra-translations.cpp:13
 msgid "Artists"
-msgstr ""
+msgstr "Artistas"
 
 #: extra-translations.cpp:14
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: extra-translations.cpp:15
 msgid "Close"
-msgstr ""
+msgstr "Fechar"
 
 #: extra-translations.cpp:16
 msgid "Developers"
-msgstr ""
+msgstr "Desenvolvedores"
 
 #: extra-translations.cpp:17
 msgid "License"
-msgstr ""
+msgstr "Licença"
 
 #: extra-translations.cpp:18
 msgid "OK"
-msgstr ""
+msgstr "Ok"
 
 #: opts.cpp:543 opts.cpp:564 opts.cpp:769
 #, c-format
@@ -1057,19 +1057,19 @@ msgstr "Erro ao gravar o estado do retrocesso"
 
 #: panel.cpp:2269
 msgid "Enabling EGL VSync."
-msgstr "Ativando o EGL VSync."
+msgstr "Ativando o VSync do EGL."
 
 #: panel.cpp:2271
 msgid "Disabling EGL VSync."
-msgstr "Desativando o EGL VSync."
+msgstr "Desativando o VSync do EGL."
 
 #: panel.cpp:2278
 msgid "Enabling GLX VSync."
-msgstr "Ativando o GLX VSync."
+msgstr "Ativando o VSync do GLX."
 
 #: panel.cpp:2280
 msgid "Disabling GLX VSync."
-msgstr "Desativando o GLX VSync."
+msgstr "Desativando o VSync do GLX."
 
 #: panel.cpp:2297
 msgid "Failed to set glXSwapIntervalEXT"
@@ -2901,7 +2901,7 @@ msgstr "&Acelerar"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "percent of normal:"
-msgstr ""
+msgstr "porcentagem do normal:"
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
