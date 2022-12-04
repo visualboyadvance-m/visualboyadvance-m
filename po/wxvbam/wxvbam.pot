@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-02 22:20+0000\n"
+"POT-Creation-Date: 2022-12-04 15:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2877,7 +2877,8 @@ msgid "&Throttle"
 msgstr ""
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
-msgid "percent of normal:"
+#, c-format
+msgid "%% of normal:"
 msgstr ""
 
 #: xrc/GeneralConfig.xrc:106

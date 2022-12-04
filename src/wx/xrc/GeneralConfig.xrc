@@ -93,7 +93,7 @@
               <orient>wxHORIZONTAL</orient>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>percent of normal:</label>
+                  <label>%% of normal:</label>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>
