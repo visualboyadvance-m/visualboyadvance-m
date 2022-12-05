@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-02 22:20+0000\n"
+"POT-Creation-Date: 2022-12-04 15:52+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Stanley Kid, 2022\n"
 "Language-Team: Ukrainian (http://www.transifex.com/bgk/vba-m/language/uk/)\n"
@@ -804,7 +804,7 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program.  If not, see http://www.gnu.org/licenses ."
-msgstr "Програма - вільне програмне забезпечення: можна розповсюджувати\nїї та / або змінювати за умовами Загальної Публічної Ліцензії GNU,\nопублікованої Фондом Вільного Програмного Забезпечення, чи\nверсії 2 Ліцензії, чи (на твій вибір) будь-якої пізнішої версії.\nПрограму розповсюджено з надією на користь, але БЕЗ ГАРАНТІЙ;\nнавіть без неявної гарантії ПРИДАТНОСТІ ДО ПРОДАЖУ\nЧИ ОСОБЛИВОЇ МЕТИ. Докладно в Загальній Публічній Ліцензії GNU.\n\nТи отримаєш копію Загальної Публічної Ліцензії GNU\nразом із програмою, чи за посиланням.\nhttp://gnu.org/licenses"
+msgstr "Програма - вільне програмне забезпечення: можна розповсюджувати\nїї та / або змінювати за умовами Загальної Публічної Ліцензії GNU,\nопублікованої Фондом Безкоштовного Програмного Забезпечення, чи\nверсії 2 Ліцензії, чи (на твій вибір) будь-якої пізнішої версії.\nПрограму розповсюджено з надією на користь, але БЕЗ ГАРАНТІЙ;\nнавіть без неявної гарантії ПРИДАТНОСТІ ДО ПРОДАЖУ\nЧИ ОСОБЛИВОЇ МЕТИ. Докладно в Загальній Публічній Ліцензії GNU.\n\nТи отримаєш копію Загальної Публічної Ліцензії GNU\nразом із програмою, чи за посиланням.\nhttp://gnu.org/licenses"
 
 #: cmdevents.cpp:3165
 msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
@@ -820,27 +820,27 @@ msgstr "Мережа непідтримувана в локальному реж
 
 #: extra-translations.cpp:12
 msgid "&Apply"
-msgstr ""
+msgstr "&Встановити"
 
 #: extra-translations.cpp:13
 msgid "Artists"
-msgstr ""
+msgstr "Художники"
 
 #: extra-translations.cpp:14
 msgid "Cancel"
-msgstr ""
+msgstr "Скасувати"
 
 #: extra-translations.cpp:15
 msgid "Close"
-msgstr ""
+msgstr "Закрити"
 
 #: extra-translations.cpp:16
 msgid "Developers"
-msgstr ""
+msgstr "Виробники"
 
 #: extra-translations.cpp:17
 msgid "License"
-msgstr ""
+msgstr "Ліцензія"
 
 #: extra-translations.cpp:18
 msgid "OK"
@@ -1029,19 +1029,19 @@ msgstr "Помилка запису стану звороту."
 
 #: panel.cpp:2269
 msgid "Enabling EGL VSync."
-msgstr ""
+msgstr "Увімкнення вертикальної синхронізації EGL."
 
 #: panel.cpp:2271
 msgid "Disabling EGL VSync."
-msgstr ""
+msgstr "Вимкнення вертикальної синхронізації EGL."
 
 #: panel.cpp:2278
 msgid "Enabling GLX VSync."
-msgstr ""
+msgstr "Увімкнення вертикальної синхронізації GLX."
 
 #: panel.cpp:2280
 msgid "Disabling GLX VSync."
-msgstr ""
+msgstr "Вимкнення вертикальної синхронізації GLX."
 
 #: panel.cpp:2297
 msgid "Failed to set glXSwapIntervalEXT"
@@ -1712,7 +1712,7 @@ msgstr "Не вдалося створити вторинний звуковий
 #: dsound.cpp:163
 #, c-format
 msgid "dsbSecondary->SetCurrentPosition failed %08x"
-msgstr "не виконано dsbSecondary → SetCurrentPosition %08x."
+msgstr "Не виконано dsbSecondary → SetCurrentPosition %08x."
 
 #: dsound.cpp:186
 #, c-format
@@ -1722,7 +1722,7 @@ msgstr "Неможливо відтворити %08x."
 #: dsound.cpp:321
 #, c-format
 msgid "dsbSecondary->Lock() failed: %08x"
-msgstr "не виконано dsbSecondary → Lock(): %08x."
+msgstr "Не виконано dsbSecondary → Lock(): %08x."
 
 #: viewsupt.h:61
 #, c-format
@@ -2872,8 +2872,9 @@ msgid "&Throttle"
 msgstr "&Прискорити"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
-msgid "percent of normal:"
-msgstr ""
+#, c-format
+msgid "%% of normal:"
+msgstr "%% норми:"
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"

@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-02 22:20+0000\n"
+"POT-Creation-Date: 2022-12-04 15:52+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Allan Nordhøy <epost@anotheragency.no>, 2016-2017\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/bgk/vba-m/language/nb/)\n"
@@ -2875,7 +2875,8 @@ msgid "&Throttle"
 msgstr "&Struping"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
-msgid "percent of normal:"
+#, c-format
+msgid "%% of normal:"
 msgstr ""
 
 #: xrc/GeneralConfig.xrc:106
