@@ -828,31 +828,31 @@ msgstr "本地模式不支持网络"
 
 #: extra-translations.cpp:12
 msgid "&Apply"
-msgstr ""
+msgstr "应用(&A)"
 
 #: extra-translations.cpp:13
 msgid "Artists"
-msgstr ""
+msgstr "艺术家"
 
 #: extra-translations.cpp:14
 msgid "Cancel"
-msgstr ""
+msgstr "取消"
 
 #: extra-translations.cpp:15
 msgid "Close"
-msgstr ""
+msgstr "关闭"
 
 #: extra-translations.cpp:16
 msgid "Developers"
-msgstr ""
+msgstr "开发商"
 
 #: extra-translations.cpp:17
 msgid "License"
-msgstr ""
+msgstr "授权"
 
 #: extra-translations.cpp:18
 msgid "OK"
-msgstr ""
+msgstr "确定"
 
 #: opts.cpp:543 opts.cpp:564 opts.cpp:769
 #, c-format
@@ -2882,7 +2882,7 @@ msgstr "阀门(&T)"
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 #, c-format
 msgid "%% of normal:"
-msgstr ""
+msgstr "%% 正常:"
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
