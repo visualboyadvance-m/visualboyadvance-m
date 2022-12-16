@@ -60,7 +60,7 @@ static int(ZEXPORT *utilGzReadFunc)(gzFile, voidp, unsigned int) = NULL;
 static int(ZEXPORT *utilGzCloseFunc)(gzFile) = NULL;
 static z_off_t(ZEXPORT *utilGzSeekFunc)(gzFile, z_off_t, int) = NULL;
 
-#define MAX_CART_SIZE 0x2000000 // 32MB
+#define MAX_CART_SIZE 0x8000000 // 128MB
 
 bool FileExists(const char *filename)
 {
