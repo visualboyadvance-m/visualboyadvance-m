@@ -6,6 +6,7 @@
 # Alain Richell Rodriguez Blazquez, 2021
 # Álvaro Pérez Urbano <alvaro_beta@hotmail.com>, 2021
 # Damián Cabello Jiménez <jdamiancabello@gmail.com>, 2018
+# Dani Quiroz, 2022
 # Dex Galaxy, 2022
 # MELERIX, 2015
 # Ein Striker <ein.striker@gmail.com>, 2017
@@ -27,7 +28,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-04 15:52+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Dex Galaxy, 2022\n"
+"Last-Translator: Dani Quiroz, 2022\n"
 "Language-Team: Spanish (http://www.transifex.com/bgk/vba-m/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -77,7 +78,7 @@ msgstr "Archivo ROM"
 
 #: wxvbam.cpp:582
 msgid "<config>=<value>"
-msgstr "1 = 2"
+msgstr "<config>=<value>"
 
 #: wxvbam.cpp:613
 msgid "Configuration/build error: can't find built-in xrc"
@@ -841,23 +842,23 @@ msgstr ""
 
 #: extra-translations.cpp:13
 msgid "Artists"
-msgstr ""
+msgstr "Artistas"
 
 #: extra-translations.cpp:14
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: extra-translations.cpp:15
 msgid "Close"
-msgstr ""
+msgstr "Cerrar"
 
 #: extra-translations.cpp:16
 msgid "Developers"
-msgstr ""
+msgstr "Desarrolladores"
 
 #: extra-translations.cpp:17
 msgid "License"
-msgstr ""
+msgstr "Licencia"
 
 #: extra-translations.cpp:18
 msgid "OK"
@@ -1301,7 +1302,7 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:427
 msgid "Enable status bar"
-msgstr ""
+msgstr "Habilitar barra de estado"
 
 #: config/internal/option-internal.cpp:432
 msgid ""
@@ -1340,7 +1341,7 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:460
 msgid "Automatically save and load cheat list"
-msgstr ""
+msgstr "Guardar y cargar trucos automáticamente"
 
 #: config/internal/option-internal.cpp:463
 msgid "Automatically enable border for Super GameBoy games"
@@ -1356,7 +1357,7 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:469
 msgid "Enable cheats"
-msgstr ""
+msgstr "Habilitar trucos"
 
 #: config/internal/option-internal.cpp:472 xrc/MainMenu.xrc:355
 msgid "Enable MMX"
@@ -1413,7 +1414,7 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:503
 msgid "Number of players in network"
-msgstr ""
+msgstr "Número de jugadores en la red"
 
 #: config/internal/option-internal.cpp:506
 msgid "Maximum scale factor (0 = no limit)"
@@ -1433,7 +1434,7 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:516
 msgid "Show speed indicator"
-msgstr ""
+msgstr "Mostrar indicador de velocidad"
 
 #: config/internal/option-internal.cpp:519
 msgid "Draw on-screen messages transparently"
@@ -1517,7 +1518,7 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:571
 msgid "Hide menu bar when mouse is inactive"
-msgstr ""
+msgstr "Ocultar barra de menú cuando el ratón esté inactivo"
 
 #: config/internal/option-internal.cpp:576
 msgid "Sound API; if unsupported, default API will be used"
@@ -1569,7 +1570,7 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:600
 msgid "Sound volume (%)"
-msgstr ""
+msgstr "Volumen (%)"
 
 #: config/internal/option-internal.cpp:667
 #: config/internal/option-internal.cpp:687
@@ -1662,12 +1663,12 @@ msgstr "CONTROL"
 #: widgets/sdljoy.cpp:188
 #, c-format
 msgid "Connected %s: %s"
-msgstr ""
+msgstr "Conectado %s: %s"
 
 #: widgets/sdljoy.cpp:203
 #, c-format
 msgid "Disconnected %s"
-msgstr ""
+msgstr "Desconectado %s"
 
 #: xaudio2.cpp:34
 msgid "XAudio2: Enumerating devices failed!"
