@@ -4,6 +4,7 @@
 # 
 # Translators:
 # chxndler perez cueva <chxndlerpc@gmail.com>, 2018
+# Dani Quiroz, 2022
 # David Martínez <david8dgm@gmail.com>, 2020
 # Dex Galaxy, 2022
 # FERNANDO AYALA PEREZ, 2021
@@ -15,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-04 15:52+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Dex Galaxy, 2022\n"
+"Last-Translator: Dani Quiroz, 2022\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/bgk/vba-m/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -829,23 +830,23 @@ msgstr ""
 
 #: extra-translations.cpp:13
 msgid "Artists"
-msgstr ""
+msgstr "Artistas"
 
 #: extra-translations.cpp:14
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: extra-translations.cpp:15
 msgid "Close"
-msgstr ""
+msgstr "Cerrar"
 
 #: extra-translations.cpp:16
 msgid "Developers"
-msgstr ""
+msgstr "Desarrolladores"
 
 #: extra-translations.cpp:17
 msgid "License"
-msgstr ""
+msgstr "Licencia"
 
 #: extra-translations.cpp:18
 msgid "OK"
@@ -1489,11 +1490,11 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:559
 msgid "Window axis X position at startup"
-msgstr ""
+msgstr "Posición del eje X de la ventana al inicio"
 
 #: config/internal/option-internal.cpp:561
 msgid "Window axis Y position at startup"
-msgstr ""
+msgstr "Posición del eje Y de la ventana al inicio"
 
 #: config/internal/option-internal.cpp:567
 msgid "Capture key events while on background"
@@ -1505,7 +1506,7 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:571
 msgid "Hide menu bar when mouse is inactive"
-msgstr ""
+msgstr "Ocultar barra de menú cuando el ratón esté inactivo"
 
 #: config/internal/option-internal.cpp:576
 msgid "Sound API; if unsupported, default API will be used"
@@ -1517,7 +1518,7 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:581
 msgid "Number of sound buffers"
-msgstr ""
+msgstr "Número de \"buffers\" de sonido:"
 
 #: config/internal/option-internal.cpp:583
 msgid "Bit mask of sound channels to enable"
@@ -1525,11 +1526,11 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:585
 msgid "GBA sound filtering (%)"
-msgstr ""
+msgstr "Filtro de sonido GBA (%)"
 
 #: config/internal/option-internal.cpp:588
 msgid "GBA sound interpolation"
-msgstr ""
+msgstr "Interpolación de sonido GBA"
 
 #: config/internal/option-internal.cpp:589
 msgid "GB sound declicking"
@@ -1537,15 +1538,15 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:591
 msgid "GB echo effect (%)"
-msgstr ""
+msgstr "Efecto eco GB (%)"
 
 #: config/internal/option-internal.cpp:593
 msgid "Enable GB sound effects"
-msgstr ""
+msgstr "Habilitar efectos de sonido GB"
 
 #: config/internal/option-internal.cpp:594
 msgid "GB stereo effect (%)"
-msgstr ""
+msgstr "Efecto estéreo GB (%)"
 
 #: config/internal/option-internal.cpp:597
 msgid "GB surround sound effect (%)"
@@ -1557,7 +1558,7 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:600
 msgid "Sound volume (%)"
-msgstr ""
+msgstr "Volumen (%)"
 
 #: config/internal/option-internal.cpp:667
 #: config/internal/option-internal.cpp:687
@@ -1601,7 +1602,7 @@ msgstr ""
 #: dialogs/display-config.cpp:420
 #, c-format
 msgid "Using interframe blending: %s"
-msgstr ""
+msgstr "Usar mezcla de fotogramas intermedios: %s"
 
 #: widgets/keyedit.cpp:122 widgets/keyedit.cpp:280
 msgid "SHIFT"
@@ -1650,12 +1651,12 @@ msgstr "CONTROL"
 #: widgets/sdljoy.cpp:188
 #, c-format
 msgid "Connected %s: %s"
-msgstr ""
+msgstr "Conectado %s: %s"
 
 #: widgets/sdljoy.cpp:203
 #, c-format
 msgid "Disconnected %s"
-msgstr ""
+msgstr "Desconectado %s"
 
 #: xaudio2.cpp:34
 msgid "XAudio2: Enumerating devices failed!"
@@ -2231,11 +2232,11 @@ msgstr "Interframe blending :"
 
 #: xrc/DisplayConfig.xrc:136
 msgid "Smart"
-msgstr ""
+msgstr "Inteligente"
 
 #: xrc/DisplayConfig.xrc:137
 msgid "Motion Blur"
-msgstr ""
+msgstr "Desenfoque de movimiento"
 
 #: xrc/DisplayConfig.xrc:151 xrc/SoundConfig.xrc:91
 msgid "Basic"
