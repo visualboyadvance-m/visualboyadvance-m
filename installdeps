@@ -494,7 +494,7 @@ fedora_installdeps() {
             # this is sometimes necessary for rawhide
             set -- --exclude='glibc32*'
         fi
-        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel SDL2-devel SFML-devel openal-soft-devel wxGTK3-devel gtk3-devel; do
+        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel SDL2-devel SFML-devel openal-soft-devel wxGTK-devel gtk3-devel; do
             case $pkg in
                 *ffmpeg*)
                     [ -z "$ENABLE_FFMPEG" ] && continue
@@ -504,15 +504,23 @@ fedora_installdeps() {
                     ;;
             esac
 
+            pkg_arch=
             if [ -n "$amd64" ]; then
+                pkg_arch=.x86_64
+
                 if [ "$target" = m32 ]; then
-                    set -- "$@" "${pkg}.i686"
-                else
-                    set -- "$@" "${pkg}.x86_64"
+                    pkg_arch=.i686
                 fi
-            else
-                set -- "$@" "$pkg"
             fi
+
+            # Check which is newer, wxGTK or wxGTK3.
+            if [ "$pkg" = wxGTK-devel ]; then
+                pkg=$(dnf -q --releasever=$(rpm -E %fedora) --showduplicates list wxGTK-devel wxGTK3-devel 2>/dev/null | awk '{ print $1 "\t" $2 }' | grep -Ev '^(Installed|Available)' | sort -rVu -k 2,2 | head -1 | awk '{ print $1 }' | sed -E 's/\.[^.]+//')
+
+                [ -z "$pkg" ] && pkg=wxGTK3-devel
+            fi
+
+            set -- "$@" "${pkg}${pkg_arch}"
         done
 
         # fedora has a bug where all necessary -devel packages are not pulled in for 32 bit direct -devel deps
