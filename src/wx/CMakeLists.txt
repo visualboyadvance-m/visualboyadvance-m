@@ -109,7 +109,7 @@ endif()
 
 # on VS with vcpkg we can't use FindwxWidgets, we have to set everything up
 # manually because the package is broken
-if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg AND (X86_32 OR X86_64))
+if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
     # set up wxwidgets stuff
     set(libtype u)
     unset(arch_suffix)
