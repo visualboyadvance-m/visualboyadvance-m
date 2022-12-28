@@ -318,7 +318,6 @@ else()
         set(WX_TEST_CONSOLE_APP "
 #include <cstdlib>
 #include <iostream>
-#include <wx/wxprec.h>
 #include <wx/wx.h>
 
 #ifdef _WIN32
@@ -459,7 +458,7 @@ int main(int argc, char** argv)
 
     if(NOT DEFINED WX_HAS_OPENGL)
         check_cxx_source_compiles("
-#include <wx/wxprec.h>
+#include <wx/wx.h>
 #include <wx/config.h>
 #include <wx/glcanvas.h>
 

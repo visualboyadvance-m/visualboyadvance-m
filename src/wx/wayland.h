@@ -3,7 +3,8 @@
 
 #include <wx/config.h>
 
-class wxGLCanvas; // Forward declare.
+class wxGLCanvas;	// Forward declare.
+class wxGLCanvasEGL;
 
 #if defined(__WXGTK__)
 #include <gdk/gdk.h>
@@ -21,11 +22,11 @@ constexpr bool IsWayland() { return false; }
 #endif // wayland
 
 // Temporary hack to backport 800d6ed69b from wxWidgets until 3.2.2 is released.
-#if defined(__WXGTK__) && defined(HAVE_EGL) && wxCHECK_VERSION(3, 2, 0) && !wxCHECK_VERSION(3, 2, 2)
+#if defined(__WXGTK__) && defined(HAVE_EGL) && wxCHECK_VERSION(3, 2, 0) && !wxCHECK_VERSION(3, 2, 2) && wxUSE_GLCANVAS_EGL
 
 #define WAYLAND_MOVE_SUBSURFACE_BACKPORT
 
-void MoveWaylandSubsurface(wxGLCanvas* win);
+void MoveWaylandSubsurface(wxGLCanvasEGL* win);
 
 #else
 
