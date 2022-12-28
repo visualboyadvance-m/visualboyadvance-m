@@ -21,8 +21,14 @@ constexpr bool IsWayland() { return false; }
 
 #endif // wayland
 
+#if defined(__WXGTK__) && defined(HAVE_EGL) && wxCHECK_VERSION(3, 2, 0) && wxUSE_GLCANVAS_EGL
+
+#define HAVE_WAYLAND_EGL
+
+#endif
+
 // Temporary hack to backport 800d6ed69b from wxWidgets until 3.2.2 is released.
-#if defined(__WXGTK__) && defined(HAVE_EGL) && wxCHECK_VERSION(3, 2, 0) && !wxCHECK_VERSION(3, 2, 2) && wxUSE_GLCANVAS_EGL
+#if defined(HAVE_WAYLAND_EGL) && !wxCHECK_VERSION(3, 2, 2)
 
 #define WAYLAND_MOVE_SUBSURFACE_BACKPORT
 

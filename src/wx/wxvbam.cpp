@@ -359,7 +359,7 @@ bool wxvbamApp::OnInit() {
     load_opts();
 
     // wxGLCanvas segfaults under wayland before wx 3.2
-#if defined(__WXGTK__) && !wxCHECK_VERSION(3, 2, 0)
+#if defined(HAVE_WAYLAND_SUPPORT) && !defined(HAVE_WAYLAND_EGL)
     if (UsingWayland()) {
         config::OptDispRenderMethod()->SetRenderMethod(
             config::RenderMethod::kSimple);
