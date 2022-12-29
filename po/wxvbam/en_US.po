@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-04 15:52+0000\n"
+"POT-Creation-Date: 2022-12-02 22:20+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: XxGamer JavixX, 2022\n"
 "Language-Team: English (United States) (http://www.transifex.com/bgk/vba-m/language/en_US/)\n"
@@ -2874,8 +2874,7 @@ msgid "&Throttle"
 msgstr "&Throttle"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
-#, c-format
-msgid "%% of normal:"
+msgid "percent of normal:"
 msgstr ""
 
 #: xrc/GeneralConfig.xrc:106

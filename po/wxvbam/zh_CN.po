@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-04 15:52+0000\n"
+"POT-Creation-Date: 2022-12-02 22:20+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020,2022\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/bgk/vba-m/language/zh_CN/)\n"
@@ -2880,9 +2880,8 @@ msgid "&Throttle"
 msgstr "阀门(&T)"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
-#, c-format
-msgid "%% of normal:"
-msgstr "%% 正常:"
+msgid "percent of normal:"
+msgstr ""
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
