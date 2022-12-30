@@ -7,39 +7,39 @@
 #include "Globals.h"
 #include "bios.h"
 
-uint16_t sineTable[256] = {
-    (uint16_t)0x0000, (uint16_t)0x0192, (uint16_t)0x0323, (uint16_t)0x04B5, (uint16_t)0x0645, (uint16_t)0x07D5, (uint16_t)0x0964, (uint16_t)0x0AF1,
-    (uint16_t)0x0C7C, (uint16_t)0x0E05, (uint16_t)0x0F8C, (uint16_t)0x1111, (uint16_t)0x1294, (uint16_t)0x1413, (uint16_t)0x158F, (uint16_t)0x1708,
-    (uint16_t)0x187D, (uint16_t)0x19EF, (uint16_t)0x1B5D, (uint16_t)0x1CC6, (uint16_t)0x1E2B, (uint16_t)0x1F8B, (uint16_t)0x20E7, (uint16_t)0x223D,
-    (uint16_t)0x238E, (uint16_t)0x24DA, (uint16_t)0x261F, (uint16_t)0x275F, (uint16_t)0x2899, (uint16_t)0x29CD, (uint16_t)0x2AFA, (uint16_t)0x2C21,
-    (uint16_t)0x2D41, (uint16_t)0x2E5A, (uint16_t)0x2F6B, (uint16_t)0x3076, (uint16_t)0x3179, (uint16_t)0x3274, (uint16_t)0x3367, (uint16_t)0x3453,
-    (uint16_t)0x3536, (uint16_t)0x3612, (uint16_t)0x36E5, (uint16_t)0x37AF, (uint16_t)0x3871, (uint16_t)0x392A, (uint16_t)0x39DA, (uint16_t)0x3A82,
-    (uint16_t)0x3B20, (uint16_t)0x3BB6, (uint16_t)0x3C42, (uint16_t)0x3CC5, (uint16_t)0x3D3E, (uint16_t)0x3DAE, (uint16_t)0x3E14, (uint16_t)0x3E71,
-    (uint16_t)0x3EC5, (uint16_t)0x3F0E, (uint16_t)0x3F4E, (uint16_t)0x3F84, (uint16_t)0x3FB1, (uint16_t)0x3FD3, (uint16_t)0x3FEC, (uint16_t)0x3FFB,
-    (uint16_t)0x4000, (uint16_t)0x3FFB, (uint16_t)0x3FEC, (uint16_t)0x3FD3, (uint16_t)0x3FB1, (uint16_t)0x3F84, (uint16_t)0x3F4E, (uint16_t)0x3F0E,
-    (uint16_t)0x3EC5, (uint16_t)0x3E71, (uint16_t)0x3E14, (uint16_t)0x3DAE, (uint16_t)0x3D3E, (uint16_t)0x3CC5, (uint16_t)0x3C42, (uint16_t)0x3BB6,
-    (uint16_t)0x3B20, (uint16_t)0x3A82, (uint16_t)0x39DA, (uint16_t)0x392A, (uint16_t)0x3871, (uint16_t)0x37AF, (uint16_t)0x36E5, (uint16_t)0x3612,
-    (uint16_t)0x3536, (uint16_t)0x3453, (uint16_t)0x3367, (uint16_t)0x3274, (uint16_t)0x3179, (uint16_t)0x3076, (uint16_t)0x2F6B, (uint16_t)0x2E5A,
-    (uint16_t)0x2D41, (uint16_t)0x2C21, (uint16_t)0x2AFA, (uint16_t)0x29CD, (uint16_t)0x2899, (uint16_t)0x275F, (uint16_t)0x261F, (uint16_t)0x24DA,
-    (uint16_t)0x238E, (uint16_t)0x223D, (uint16_t)0x20E7, (uint16_t)0x1F8B, (uint16_t)0x1E2B, (uint16_t)0x1CC6, (uint16_t)0x1B5D, (uint16_t)0x19EF,
-    (uint16_t)0x187D, (uint16_t)0x1708, (uint16_t)0x158F, (uint16_t)0x1413, (uint16_t)0x1294, (uint16_t)0x1111, (uint16_t)0x0F8C, (uint16_t)0x0E05,
-    (uint16_t)0x0C7C, (uint16_t)0x0AF1, (uint16_t)0x0964, (uint16_t)0x07D5, (uint16_t)0x0645, (uint16_t)0x04B5, (uint16_t)0x0323, (uint16_t)0x0192,
-    (uint16_t)0x0000, (uint16_t)0xFE6E, (uint16_t)0xFCDD, (uint16_t)0xFB4B, (uint16_t)0xF9BB, (uint16_t)0xF82B, (uint16_t)0xF69C, (uint16_t)0xF50F,
-    (uint16_t)0xF384, (uint16_t)0xF1FB, (uint16_t)0xF074, (uint16_t)0xEEEF, (uint16_t)0xED6C, (uint16_t)0xEBED, (uint16_t)0xEA71, (uint16_t)0xE8F8,
-    (uint16_t)0xE783, (uint16_t)0xE611, (uint16_t)0xE4A3, (uint16_t)0xE33A, (uint16_t)0xE1D5, (uint16_t)0xE075, (uint16_t)0xDF19, (uint16_t)0xDDC3,
-    (uint16_t)0xDC72, (uint16_t)0xDB26, (uint16_t)0xD9E1, (uint16_t)0xD8A1, (uint16_t)0xD767, (uint16_t)0xD633, (uint16_t)0xD506, (uint16_t)0xD3DF,
-    (uint16_t)0xD2BF, (uint16_t)0xD1A6, (uint16_t)0xD095, (uint16_t)0xCF8A, (uint16_t)0xCE87, (uint16_t)0xCD8C, (uint16_t)0xCC99, (uint16_t)0xCBAD,
-    (uint16_t)0xCACA, (uint16_t)0xC9EE, (uint16_t)0xC91B, (uint16_t)0xC851, (uint16_t)0xC78F, (uint16_t)0xC6D6, (uint16_t)0xC626, (uint16_t)0xC57E,
-    (uint16_t)0xC4E0, (uint16_t)0xC44A, (uint16_t)0xC3BE, (uint16_t)0xC33B, (uint16_t)0xC2C2, (uint16_t)0xC252, (uint16_t)0xC1EC, (uint16_t)0xC18F,
-    (uint16_t)0xC13B, (uint16_t)0xC0F2, (uint16_t)0xC0B2, (uint16_t)0xC07C, (uint16_t)0xC04F, (uint16_t)0xC02D, (uint16_t)0xC014, (uint16_t)0xC005,
-    (uint16_t)0xC000, (uint16_t)0xC005, (uint16_t)0xC014, (uint16_t)0xC02D, (uint16_t)0xC04F, (uint16_t)0xC07C, (uint16_t)0xC0B2, (uint16_t)0xC0F2,
-    (uint16_t)0xC13B, (uint16_t)0xC18F, (uint16_t)0xC1EC, (uint16_t)0xC252, (uint16_t)0xC2C2, (uint16_t)0xC33B, (uint16_t)0xC3BE, (uint16_t)0xC44A,
-    (uint16_t)0xC4E0, (uint16_t)0xC57E, (uint16_t)0xC626, (uint16_t)0xC6D6, (uint16_t)0xC78F, (uint16_t)0xC851, (uint16_t)0xC91B, (uint16_t)0xC9EE,
-    (uint16_t)0xCACA, (uint16_t)0xCBAD, (uint16_t)0xCC99, (uint16_t)0xCD8C, (uint16_t)0xCE87, (uint16_t)0xCF8A, (uint16_t)0xD095, (uint16_t)0xD1A6,
-    (uint16_t)0xD2BF, (uint16_t)0xD3DF, (uint16_t)0xD506, (uint16_t)0xD633, (uint16_t)0xD767, (uint16_t)0xD8A1, (uint16_t)0xD9E1, (uint16_t)0xDB26,
-    (uint16_t)0xDC72, (uint16_t)0xDDC3, (uint16_t)0xDF19, (uint16_t)0xE075, (uint16_t)0xE1D5, (uint16_t)0xE33A, (uint16_t)0xE4A3, (uint16_t)0xE611,
-    (uint16_t)0xE783, (uint16_t)0xE8F8, (uint16_t)0xEA71, (uint16_t)0xEBED, (uint16_t)0xED6C, (uint16_t)0xEEEF, (uint16_t)0xF074, (uint16_t)0xF1FB,
-    (uint16_t)0xF384, (uint16_t)0xF50F, (uint16_t)0xF69C, (uint16_t)0xF82B, (uint16_t)0xF9BB, (uint16_t)0xFB4B, (uint16_t)0xFCDD, (uint16_t)0xFE6E
+int16_t sineTable[256] = {
+    (int16_t)0x0000, (int16_t)0x0192, (int16_t)0x0323, (int16_t)0x04B5, (int16_t)0x0645, (int16_t)0x07D5, (int16_t)0x0964, (int16_t)0x0AF1,
+    (int16_t)0x0C7C, (int16_t)0x0E05, (int16_t)0x0F8C, (int16_t)0x1111, (int16_t)0x1294, (int16_t)0x1413, (int16_t)0x158F, (int16_t)0x1708,
+    (int16_t)0x187D, (int16_t)0x19EF, (int16_t)0x1B5D, (int16_t)0x1CC6, (int16_t)0x1E2B, (int16_t)0x1F8B, (int16_t)0x20E7, (int16_t)0x223D,
+    (int16_t)0x238E, (int16_t)0x24DA, (int16_t)0x261F, (int16_t)0x275F, (int16_t)0x2899, (int16_t)0x29CD, (int16_t)0x2AFA, (int16_t)0x2C21,
+    (int16_t)0x2D41, (int16_t)0x2E5A, (int16_t)0x2F6B, (int16_t)0x3076, (int16_t)0x3179, (int16_t)0x3274, (int16_t)0x3367, (int16_t)0x3453,
+    (int16_t)0x3536, (int16_t)0x3612, (int16_t)0x36E5, (int16_t)0x37AF, (int16_t)0x3871, (int16_t)0x392A, (int16_t)0x39DA, (int16_t)0x3A82,
+    (int16_t)0x3B20, (int16_t)0x3BB6, (int16_t)0x3C42, (int16_t)0x3CC5, (int16_t)0x3D3E, (int16_t)0x3DAE, (int16_t)0x3E14, (int16_t)0x3E71,
+    (int16_t)0x3EC5, (int16_t)0x3F0E, (int16_t)0x3F4E, (int16_t)0x3F84, (int16_t)0x3FB1, (int16_t)0x3FD3, (int16_t)0x3FEC, (int16_t)0x3FFB,
+    (int16_t)0x4000, (int16_t)0x3FFB, (int16_t)0x3FEC, (int16_t)0x3FD3, (int16_t)0x3FB1, (int16_t)0x3F84, (int16_t)0x3F4E, (int16_t)0x3F0E,
+    (int16_t)0x3EC5, (int16_t)0x3E71, (int16_t)0x3E14, (int16_t)0x3DAE, (int16_t)0x3D3E, (int16_t)0x3CC5, (int16_t)0x3C42, (int16_t)0x3BB6,
+    (int16_t)0x3B20, (int16_t)0x3A82, (int16_t)0x39DA, (int16_t)0x392A, (int16_t)0x3871, (int16_t)0x37AF, (int16_t)0x36E5, (int16_t)0x3612,
+    (int16_t)0x3536, (int16_t)0x3453, (int16_t)0x3367, (int16_t)0x3274, (int16_t)0x3179, (int16_t)0x3076, (int16_t)0x2F6B, (int16_t)0x2E5A,
+    (int16_t)0x2D41, (int16_t)0x2C21, (int16_t)0x2AFA, (int16_t)0x29CD, (int16_t)0x2899, (int16_t)0x275F, (int16_t)0x261F, (int16_t)0x24DA,
+    (int16_t)0x238E, (int16_t)0x223D, (int16_t)0x20E7, (int16_t)0x1F8B, (int16_t)0x1E2B, (int16_t)0x1CC6, (int16_t)0x1B5D, (int16_t)0x19EF,
+    (int16_t)0x187D, (int16_t)0x1708, (int16_t)0x158F, (int16_t)0x1413, (int16_t)0x1294, (int16_t)0x1111, (int16_t)0x0F8C, (int16_t)0x0E05,
+    (int16_t)0x0C7C, (int16_t)0x0AF1, (int16_t)0x0964, (int16_t)0x07D5, (int16_t)0x0645, (int16_t)0x04B5, (int16_t)0x0323, (int16_t)0x0192,
+    (int16_t)0x0000, (int16_t)0xFE6E, (int16_t)0xFCDD, (int16_t)0xFB4B, (int16_t)0xF9BB, (int16_t)0xF82B, (int16_t)0xF69C, (int16_t)0xF50F,
+    (int16_t)0xF384, (int16_t)0xF1FB, (int16_t)0xF074, (int16_t)0xEEEF, (int16_t)0xED6C, (int16_t)0xEBED, (int16_t)0xEA71, (int16_t)0xE8F8,
+    (int16_t)0xE783, (int16_t)0xE611, (int16_t)0xE4A3, (int16_t)0xE33A, (int16_t)0xE1D5, (int16_t)0xE075, (int16_t)0xDF19, (int16_t)0xDDC3,
+    (int16_t)0xDC72, (int16_t)0xDB26, (int16_t)0xD9E1, (int16_t)0xD8A1, (int16_t)0xD767, (int16_t)0xD633, (int16_t)0xD506, (int16_t)0xD3DF,
+    (int16_t)0xD2BF, (int16_t)0xD1A6, (int16_t)0xD095, (int16_t)0xCF8A, (int16_t)0xCE87, (int16_t)0xCD8C, (int16_t)0xCC99, (int16_t)0xCBAD,
+    (int16_t)0xCACA, (int16_t)0xC9EE, (int16_t)0xC91B, (int16_t)0xC851, (int16_t)0xC78F, (int16_t)0xC6D6, (int16_t)0xC626, (int16_t)0xC57E,
+    (int16_t)0xC4E0, (int16_t)0xC44A, (int16_t)0xC3BE, (int16_t)0xC33B, (int16_t)0xC2C2, (int16_t)0xC252, (int16_t)0xC1EC, (int16_t)0xC18F,
+    (int16_t)0xC13B, (int16_t)0xC0F2, (int16_t)0xC0B2, (int16_t)0xC07C, (int16_t)0xC04F, (int16_t)0xC02D, (int16_t)0xC014, (int16_t)0xC005,
+    (int16_t)0xC000, (int16_t)0xC005, (int16_t)0xC014, (int16_t)0xC02D, (int16_t)0xC04F, (int16_t)0xC07C, (int16_t)0xC0B2, (int16_t)0xC0F2,
+    (int16_t)0xC13B, (int16_t)0xC18F, (int16_t)0xC1EC, (int16_t)0xC252, (int16_t)0xC2C2, (int16_t)0xC33B, (int16_t)0xC3BE, (int16_t)0xC44A,
+    (int16_t)0xC4E0, (int16_t)0xC57E, (int16_t)0xC626, (int16_t)0xC6D6, (int16_t)0xC78F, (int16_t)0xC851, (int16_t)0xC91B, (int16_t)0xC9EE,
+    (int16_t)0xCACA, (int16_t)0xCBAD, (int16_t)0xCC99, (int16_t)0xCD8C, (int16_t)0xCE87, (int16_t)0xCF8A, (int16_t)0xD095, (int16_t)0xD1A6,
+    (int16_t)0xD2BF, (int16_t)0xD3DF, (int16_t)0xD506, (int16_t)0xD633, (int16_t)0xD767, (int16_t)0xD8A1, (int16_t)0xD9E1, (int16_t)0xDB26,
+    (int16_t)0xDC72, (int16_t)0xDDC3, (int16_t)0xDF19, (int16_t)0xE075, (int16_t)0xE1D5, (int16_t)0xE33A, (int16_t)0xE4A3, (int16_t)0xE611,
+    (int16_t)0xE783, (int16_t)0xE8F8, (int16_t)0xEA71, (int16_t)0xEBED, (int16_t)0xED6C, (int16_t)0xEEEF, (int16_t)0xF074, (int16_t)0xF1FB,
+    (int16_t)0xF384, (int16_t)0xF50F, (int16_t)0xF69C, (int16_t)0xF82B, (int16_t)0xF9BB, (int16_t)0xFB4B, (int16_t)0xFCDD, (int16_t)0xFE6E
 };
 
 // 2020-08-12 - negativeExponent
@@ -213,23 +213,23 @@ void BIOS_BgAffineSet()
         src += 4;
         int32_t cy = CPUReadMemory(src);
         src += 4;
-        int16_t dispx = CPUReadHalfWordSigned(src);
+        int16_t dispx = CPUReadHalfWord(src);
         src += 2;
-        int16_t dispy = CPUReadHalfWordSigned(src);
+        int16_t dispy = CPUReadHalfWord(src);
         src += 2;
-        int16_t rx = CPUReadHalfWordSigned(src);
+        int16_t rx = CPUReadHalfWord(src);
         src += 2;
-        int16_t ry = CPUReadHalfWordSigned(src);
+        int16_t ry = CPUReadHalfWord(src);
         src += 2;
-        uint16_t theta = DowncastU16(CPUReadHalfWord(src) >> 8);
+        uint16_t theta = CPUReadHalfWord(src) >> 8;
         src += 4; // keep structure alignment
         int32_t a = sineTable[(theta + 0x40) & 255];
         int32_t b = sineTable[theta];
 
-        int16_t dx = Downcast16((rx * a) >> 14);
-        int16_t dmx = Downcast16((rx * b) >> 14);
-        int16_t dy = Downcast16((ry * b) >> 14);
-        int16_t dmy = Downcast16((ry * a) >> 14);
+        int16_t dx = (rx * a) >> 14;
+        int16_t dmx = (rx * b) >> 14;
+        int16_t dy = (ry * b) >> 14;
+        int16_t dmy = (ry * a) >> 14;
 
         CPUWriteHalfWord(dest, dx);
         dest += 2;
@@ -293,7 +293,7 @@ void BIOS_CpuSet()
     } else {
         // 16-bit fill?
         if ((cnt >> 24) & 1) {
-            uint16_t value = (source > 0x0EFFFFFF ? 0x1CAD : DowncastU16(CPUReadHalfWord(source)));
+            uint16_t value = (source > 0x0EFFFFFF ? 0x1CAD : CPUReadHalfWord(source));
             while (count) {
                 CPUWriteHalfWord(dest, value);
                 dest += 2;
@@ -302,7 +302,7 @@ void BIOS_CpuSet()
         } else {
             // copy
             while (count) {
-                CPUWriteHalfWord(dest, (source > 0x0EFFFFFF ? 0x1CAD : DowncastU16(CPUReadHalfWord(source))));
+                CPUWriteHalfWord(dest, (source > 0x0EFFFFFF ? 0x1CAD : CPUReadHalfWord(source)));
                 source += 2;
                 dest += 2;
                 count--;
@@ -452,14 +452,14 @@ void BIOS_Diff16bitUnFilter()
 
     int len = header >> 8;
 
-    uint16_t data = DowncastU16(CPUReadHalfWord(source));
+    uint16_t data = CPUReadHalfWord(source);
     source += 2;
     CPUWriteHalfWord(dest, data);
     dest += 2;
     len -= 2;
 
     while (len >= 2) {
-        uint16_t diff = DowncastU16(CPUReadHalfWord(source));
+        uint16_t diff = CPUReadHalfWord(source);
         source += 2;
         data += diff;
         CPUWriteHalfWord(dest, data);
@@ -702,7 +702,7 @@ void BIOS_LZ77UnCompVram()
                         byteCount++;
 
                         if (byteCount == 2) {
-                            CPUWriteHalfWord(dest, DowncastU16(writeValue));
+                            CPUWriteHalfWord(dest, writeValue);
                             dest += 2;
                             byteCount = 0;
                             byteShift = 0;
@@ -717,7 +717,7 @@ void BIOS_LZ77UnCompVram()
                     byteShift += 8;
                     byteCount++;
                     if (byteCount == 2) {
-                        CPUWriteHalfWord(dest, DowncastU16(writeValue));
+                        CPUWriteHalfWord(dest, writeValue);
                         dest += 2;
                         byteCount = 0;
                         byteShift = 0;
@@ -735,7 +735,7 @@ void BIOS_LZ77UnCompVram()
                 byteShift += 8;
                 byteCount++;
                 if (byteCount == 2) {
-                    CPUWriteHalfWord(dest, DowncastU16(writeValue));
+                    CPUWriteHalfWord(dest, writeValue);
                     dest += 2;
                     byteShift = 0;
                     byteCount = 0;
@@ -824,20 +824,20 @@ void BIOS_ObjAffineSet()
     int offset = reg[3].I;
 
     for (int i = 0; i < num; i++) {
-        int16_t rx = CPUReadHalfWordSigned(src);
+        int16_t rx = CPUReadHalfWord(src);
         src += 2;
-        int16_t ry = CPUReadHalfWordSigned(src);
+        int16_t ry = CPUReadHalfWord(src);
         src += 2;
-        uint16_t theta = DowncastU16(CPUReadHalfWord(src) >> 8);
+        uint16_t theta = CPUReadHalfWord(src) >> 8;
         src += 4; // keep structure alignment
 
         int32_t a = (int32_t)sineTable[(theta + 0x40) & 255];
         int32_t b = (int32_t)sineTable[theta];
 
-        int16_t dx = Downcast16((((int32_t)rx * a) >> 14));
-        int16_t dmx = Downcast16(((int32_t)rx * b) >> 14);
-        int16_t dy = Downcast16(((int32_t)ry * b) >> 14);
-        int16_t dmy = Downcast16(((int32_t)ry * a) >> 14);
+        int16_t dx = ((int32_t)rx * a) >> 14;
+        int16_t dmx = ((int32_t)rx * b) >> 14;
+        int16_t dy = ((int32_t)ry * b) >> 14;
+        int16_t dmy = ((int32_t)ry * a) >> 14;
 
         CPUWriteHalfWord(dest, dx);
         dest += offset;
@@ -976,7 +976,7 @@ void BIOS_RLUnCompVram()
                 byteCount++;
 
                 if (byteCount == 2) {
-                    CPUWriteHalfWord(dest, DowncastU16(writeValue));
+                    CPUWriteHalfWord(dest, writeValue);
                     dest += 2;
                     byteCount = 0;
                     byteShift = 0;
@@ -993,7 +993,7 @@ void BIOS_RLUnCompVram()
                 byteShift += 8;
                 byteCount++;
                 if (byteCount == 2) {
-                    CPUWriteHalfWord(dest, DowncastU16(writeValue));
+                    CPUWriteHalfWord(dest, writeValue);
                     dest += 2;
                     byteCount = 0;
                     byteShift = 0;
@@ -1232,7 +1232,7 @@ static int32_t BIOS_SndDriver_3e4(uint32_t const r0a, uint32_t const r1a) // 0x3
 
 static void BIOS_SndDriverSub1(uint32_t p1) // 0x170a
 {
-    uint8_t local1 = DowncastU8((p1 & 0x000F0000) >> 16); // param is r0
+    uint8_t local1 = (p1 & 0x000F0000) >> 16; // param is r0
     uint32_t const puser1 = CPUReadMemory(0x3007FF0); // 7FC0 + 0x30
 
     // Store something
@@ -1254,7 +1254,7 @@ static void BIOS_SndDriverSub1(uint32_t p1) // 0x170a
 
     // 0x172c
     r0 = BIOS_SndDriver_3e4(r0, r1);
-    CPUWriteByte(puser1 + 0xB, DowncastU8(r0));
+    CPUWriteByte(puser1 + 0xB, r0);
 
     uint32_t x = 0x91d1b * r4;
     r1 = x + 0x1388;
@@ -1274,12 +1274,12 @@ static void BIOS_SndDriverSub1(uint32_t p1) // 0x170a
     CPUWriteHalfWord(r4basesnd + 2, 0);
     r0 = BIOS_SndDriver_3e4(r0, r1);
     r0 = (1 << 16) - r0;
-    CPUWriteHalfWord(r4basesnd + 0, DowncastU16(r0));
+    CPUWriteHalfWord(r4basesnd + 0, r0);
 
     // sub 0x18c8 is unrolled here
     r1 = 0x5b << 9;
-    CPUWriteHalfWord(base1 + 6, DowncastU16(r1));
-    CPUWriteHalfWord(base1 + 12, DowncastU16(r1));
+    CPUWriteHalfWord(base1 + 6, r1);
+    CPUWriteHalfWord(base1 + 12, r1);
 
     // 0x176a, @todo busy loop here
     r0 = 0x4000000;
@@ -1315,7 +1315,7 @@ void BIOS_SndDriverInit() // 0x166a
     CPUWriteHalfWord(base2 + 4, 0x8F);
     CPUWriteHalfWord(base2 + 2, 0xA90E);
 
-    uint16_t val9 = DowncastU16(CPUReadHalfWord(base2 + 9));
+    uint16_t val9 = CPUReadHalfWord(base2 + 9);
     CPUWriteHalfWord(base2 + 9, val9 & ADBITS_MASK); // DA?
 
     CPUWriteMemory(base3 + 0, (user1 + 0x350)); //0x350, 640int
@@ -1382,7 +1382,7 @@ void BIOS_SndDriverMode() //0x179c
             dab >>= 0xE;
             uint8_t adv = CPUReadByte(puser1 + 9) & ADBITS_MASK; // @todo verify offset
             dab |= adv;
-            CPUWriteByte(puser1 + 9, DowncastU8(dab));
+            CPUWriteByte(puser1 + 9, dab);
         }
         // Playback frequency at bits 16...19
         uint32_t pbf = (input & 0x000F0000);
@@ -1558,7 +1558,7 @@ void BIOS_SndDriverMain() // 0x1dc4 -> 0x08004024 phantasy star
         }
         {
             //lbl_0x1f54:
-            CPUWriteByte(r4 + 0x9, DowncastU8(r5));
+            CPUWriteByte(r4 + 0x9, r5);
 
             uint32_t user0 = CPUReadByte(puser1 + 0x7); // @sp+10
             user0++;
@@ -1568,12 +1568,12 @@ void BIOS_SndDriverMain() // 0x1dc4 -> 0x08004024 phantasy star
             user0 = CPUReadByte(r4 + 0x2);
             user0 *= r5;
             user0 >>= 8;
-            CPUWriteByte(r4 + 0xA, DowncastU8(user0));
+            CPUWriteByte(r4 + 0xA, user0);
 
             user0 = CPUReadByte(r4 + 0x3);
             user0 *= r5;
             user0 >>= 8;
-            CPUWriteByte(r4 + 0xB, DowncastU8(user0));
+            CPUWriteByte(r4 + 0xB, user0);
 
             user0 = r6 & 0x10;
             if (user0 != 0) // @todo 0x1f76
@@ -1623,7 +1623,7 @@ void BIOS_SndDriverMain() // 0x1dc4 -> 0x08004024 phantasy star
                     if (r2) {
                         r3 = CPUReadMemory(reg[13].I + 0xC); // @todo stack pull 0x205c
                     } else {
-                        CPUWriteByte(r4, DowncastU8(r2));
+                        CPUWriteByte(r4, r2);
                         goto lbl_20e4;
                     }
                 }
@@ -1631,23 +1631,23 @@ void BIOS_SndDriverMain() // 0x1dc4 -> 0x08004024 phantasy star
             } while (r7 >= r9);
         lbl_207c:
             while (1) {
-                int32_t r0b = CPUReadByte(DowncastU8(r3));
+                int32_t r0a = CPUReadByte(r3);
                 int32_t r1a = CPUReadByte(r3 + 0x1);
 
-                r1a -= r0b;
+                r1a -= r0a;
                 int32_t r6a = r1a * (int32_t)r7;
                 r1a = r6a * r12; // 208c
-                r6a = (r0b + ((int8_t)(r1a >> 23)));
+                r6a = (r0a + ((int8_t)(r1a >> 23)));
 
                 r1a = r6a * (int32_t)r11;
 
-                r0b = CPUReadByte(r5 + 0x630);
-                r0b = (r0b + ((int8_t)(r1a >> 8)));
-                CPUWriteByte(r5 + 0x630, DowncastU8(r0b));
+                r0a = CPUReadByte(r5 + 0x630);
+                r0a = (r0a + ((int8_t)(r1a >> 8)));
+                CPUWriteByte(r5 + 0x630, r0a);
                 r1a = r6a * (int32_t)r10;
-                r0b = CPUReadByte(r5);
-                r0b = (r0b + ((int8_t)(r1a >> 8)));
-                CPUWriteByte(r5++, DowncastU8(r0b)); //ptr inc +1 not +4
+                r0a = CPUReadByte(r5);
+                r0a = (r0a + ((int8_t)(r1a >> 8)));
+                CPUWriteByte(r5++, r0a); //ptr inc +1 not +4
 
                 r7 += r14;
                 --r8;
@@ -1682,13 +1682,13 @@ void BIOS_SndDriverVSync()
         CPUWriteByte(puser1 + 4, v1i);
         if (v1 <= 1) {
             uint8_t v2 = CPUReadByte(puser1 + 0xB); //11
-            uint32_t base3 = 0x040000D2;
+            uint32_t base2 = 0x040000D2;
             CPUWriteByte(puser1 + 4, v2);
 
             CPUWriteHalfWord(base1 + 0x6, 0);
-            CPUWriteHalfWord(base3, 0);
+            CPUWriteHalfWord(base2, 0);
             CPUWriteHalfWord(base1 + 0x6, 0xB600);
-            CPUWriteHalfWord(base3, 0xB600); //-18944
+            CPUWriteHalfWord(base2, 0xB600); //-18944
         }
     }
 }
