@@ -1,23 +1,34 @@
 function(host_compile src dst_cmd)
     if(CMAKE_CROSSCOMPILING)
         unset(link_flags)
+        set(dst "${dst_cmd}")
 
         if(CMAKE_HOST_WIN32)
-            set(dst "${dst_cmd}.exe")
-
             if(CMAKE_COMPILER_IS_GNUCXX)
                 set(link_flags -Wl,--subsystem,console)
             endif()
-        else()
-            set(dst ${dst_cmd})
         endif()
 
-        # assume cc foo.c -o foo # will work on most hosts
-        add_custom_command(
-            OUTPUT ${dst}
-            COMMAND cc ${src} -o ${dst} ${link_flags}
-            DEPENDS ${src}
-        )
+        if(MSVC)
+            set(msvc_compile_script ${CMAKE_SOURCE_DIR}/cmake/MSVC_x86_Host_Compile.cmake)
+
+            add_custom_command(
+                OUTPUT ${dst}
+                DEPENDS ${src} ${msvc_compile_script}
+                COMMAND ${CMAKE_COMMAND} -D "src=${src}" -D "dst=${dst}" -P ${msvc_compile_script}
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            )
+        else()
+            set(dst ${dst_cmd})
+
+            # Assume: cc foo.c -o foo # will work on most hosts
+            add_custom_command(
+                OUTPUT ${dst}
+                DEPENDS ${src}
+                COMMAND cc ${src} -o ${dst} ${link_flags}
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            )
+        endif()
     else()
         get_filename_component(dst ${dst_cmd} NAME)
 
