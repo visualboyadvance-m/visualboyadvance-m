@@ -1371,7 +1371,7 @@ EVT_HANDLER_MASK(RecordMovieStartRecording, "Start game recording...", CMDEN_NGR
         for (auto&& fmt : fmts)
         {
             mov_exts.append(wxString(fmt, wxConvLibc));
-            mov_exts.append(_(" files ("));
+            mov_exts.append(_(" files |"));
             wxString ext(exts[extno], wxConvLibc);
             ext.Replace(wxT(","), wxT(";*."));
             ext.insert(0, wxT("*."));
@@ -1380,7 +1380,7 @@ EVT_HANDLER_MASK(RecordMovieStartRecording, "Start game recording...", CMDEN_NGR
                 mov_extno = extno;
 
             mov_exts.append(ext);
-            mov_exts.append(wxT(")|"));
+            mov_exts.append(wxT(";|"));
             mov_exts.append(ext);
             mov_exts.append(wxT('|'));
             extno++;
@@ -1435,7 +1435,7 @@ EVT_HANDLER_MASK(PlayMovieStartPlaying, "Start playing movie...", CMDEN_NGREC | 
         for (size_t i = 0; i < fmts.size(); ++i)
         {
             mov_exts.append(wxString(fmts[i], wxConvLibc));
-            mov_exts.append(_(" files ("));
+            mov_exts.append(_(" files |"));
             wxString ext(exts[i], wxConvLibc);
             ext.Replace(wxT(","), wxT(";*."));
             ext.insert(0, wxT("*."));
@@ -1444,7 +1444,7 @@ EVT_HANDLER_MASK(PlayMovieStartPlaying, "Start playing movie...", CMDEN_NGREC | 
                 mov_extno = extno;
 
             mov_exts.append(ext);
-            mov_exts.append(wxT(")|"));
+            mov_exts.append(wxT(";|"));
             mov_exts.append(ext);
             mov_exts.append(wxT('|'));
             extno++;
