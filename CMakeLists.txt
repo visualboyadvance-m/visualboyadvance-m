@@ -812,9 +812,9 @@ elseif(MSVC)
     if(CMAKE_BUILD_TYPE STREQUAL Debug)
         set(runtime "${runtime}d")
 
-        add_compiler_flags(${runtime} /ZI /W4 /Ob0 /Od /RTC1 /DDEBUG)
+        add_compiler_flags(${runtime} /ZI /W4 /Ob0 /Od /RTC1 /DDEBUG /EHsc)
     else()
-        add_compiler_flags(/w /DNDEBUG)
+        add_compiler_flags(/w /DNDEBUG /EHsc)
 
         if(CMAKE_BUILD_TYPE STREQUAL Release)
             if(X86_32)
