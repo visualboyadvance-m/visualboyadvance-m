@@ -213,23 +213,23 @@ void BIOS_BgAffineSet()
         src += 4;
         int32_t cy = CPUReadMemory(src);
         src += 4;
-        int16_t dispx = CPUReadHalfWord(src);
+        int16_t dispx = CPUReadHalfWordSigned(src);
         src += 2;
-        int16_t dispy = CPUReadHalfWord(src);
+        int16_t dispy = CPUReadHalfWordSigned(src);
         src += 2;
-        int16_t rx = CPUReadHalfWord(src);
+        int16_t rx = CPUReadHalfWordSigned(src);
         src += 2;
-        int16_t ry = CPUReadHalfWord(src);
+        int16_t ry = CPUReadHalfWordSigned(src);
         src += 2;
-        uint16_t theta = CPUReadHalfWord(src) >> 8;
+        uint16_t theta = DowncastU16(CPUReadHalfWord(src) >> 8);
         src += 4; // keep structure alignment
         int32_t a = sineTable[(theta + 0x40) & 255];
         int32_t b = sineTable[theta];
 
-        int16_t dx = (rx * a) >> 14;
-        int16_t dmx = (rx * b) >> 14;
-        int16_t dy = (ry * b) >> 14;
-        int16_t dmy = (ry * a) >> 14;
+        int16_t dx = Downcast16((rx * a) >> 14);
+        int16_t dmx = Downcast16((rx * b) >> 14);
+        int16_t dy = Downcast16((ry * b) >> 14);
+        int16_t dmy = Downcast16((ry * a) >> 14);
 
         CPUWriteHalfWord(dest, dx);
         dest += 2;
@@ -293,7 +293,7 @@ void BIOS_CpuSet()
     } else {
         // 16-bit fill?
         if ((cnt >> 24) & 1) {
-            uint16_t value = (source > 0x0EFFFFFF ? 0x1CAD : CPUReadHalfWord(source));
+            uint16_t value = (source > 0x0EFFFFFF ? 0x1CAD : DowncastU16(CPUReadHalfWord(source)));
             while (count) {
                 CPUWriteHalfWord(dest, value);
                 dest += 2;
@@ -302,7 +302,7 @@ void BIOS_CpuSet()
         } else {
             // copy
             while (count) {
-                CPUWriteHalfWord(dest, (source > 0x0EFFFFFF ? 0x1CAD : CPUReadHalfWord(source)));
+                CPUWriteHalfWord(dest, (source > 0x0EFFFFFF ? 0x1CAD : DowncastU16(CPUReadHalfWord(source))));
                 source += 2;
                 dest += 2;
                 count--;
@@ -452,14 +452,14 @@ void BIOS_Diff16bitUnFilter()
 
     int len = header >> 8;
 
-    uint16_t data = CPUReadHalfWord(source);
+    uint16_t data = DowncastU16(CPUReadHalfWord(source));
     source += 2;
     CPUWriteHalfWord(dest, data);
     dest += 2;
     len -= 2;
 
     while (len >= 2) {
-        uint16_t diff = CPUReadHalfWord(source);
+        uint16_t diff = DowncastU16(CPUReadHalfWord(source));
         source += 2;
         data += diff;
         CPUWriteHalfWord(dest, data);
@@ -702,7 +702,7 @@ void BIOS_LZ77UnCompVram()
                         byteCount++;
 
                         if (byteCount == 2) {
-                            CPUWriteHalfWord(dest, writeValue);
+                            CPUWriteHalfWord(dest, DowncastU16(writeValue));
                             dest += 2;
                             byteCount = 0;
                             byteShift = 0;
@@ -717,7 +717,7 @@ void BIOS_LZ77UnCompVram()
                     byteShift += 8;
                     byteCount++;
                     if (byteCount == 2) {
-                        CPUWriteHalfWord(dest, writeValue);
+                        CPUWriteHalfWord(dest, DowncastU16(writeValue));
                         dest += 2;
                         byteCount = 0;
                         byteShift = 0;
@@ -735,7 +735,7 @@ void BIOS_LZ77UnCompVram()
                 byteShift += 8;
                 byteCount++;
                 if (byteCount == 2) {
-                    CPUWriteHalfWord(dest, writeValue);
+                    CPUWriteHalfWord(dest, DowncastU16(writeValue));
                     dest += 2;
                     byteShift = 0;
                     byteCount = 0;
@@ -824,20 +824,20 @@ void BIOS_ObjAffineSet()
     int offset = reg[3].I;
 
     for (int i = 0; i < num; i++) {
-        int16_t rx = CPUReadHalfWord(src);
+        int16_t rx = CPUReadHalfWordSigned(src);
         src += 2;
-        int16_t ry = CPUReadHalfWord(src);
+        int16_t ry = CPUReadHalfWordSigned(src);
         src += 2;
-        uint16_t theta = CPUReadHalfWord(src) >> 8;
+        uint16_t theta = DowncastU16(CPUReadHalfWord(src) >> 8);
         src += 4; // keep structure alignment
 
         int32_t a = (int32_t)sineTable[(theta + 0x40) & 255];
         int32_t b = (int32_t)sineTable[theta];
 
-        int16_t dx = ((int32_t)rx * a) >> 14;
-        int16_t dmx = ((int32_t)rx * b) >> 14;
-        int16_t dy = ((int32_t)ry * b) >> 14;
-        int16_t dmy = ((int32_t)ry * a) >> 14;
+        int16_t dx = Downcast16((((int32_t)rx * a) >> 14));
+        int16_t dmx = Downcast16(((int32_t)rx * b) >> 14);
+        int16_t dy = Downcast16(((int32_t)ry * b) >> 14);
+        int16_t dmy = Downcast16(((int32_t)ry * a) >> 14);
 
         CPUWriteHalfWord(dest, dx);
         dest += offset;
@@ -976,7 +976,7 @@ void BIOS_RLUnCompVram()
                 byteCount++;
 
                 if (byteCount == 2) {
-                    CPUWriteHalfWord(dest, writeValue);
+                    CPUWriteHalfWord(dest, DowncastU16(writeValue));
                     dest += 2;
                     byteCount = 0;
                     byteShift = 0;
@@ -993,7 +993,7 @@ void BIOS_RLUnCompVram()
                 byteShift += 8;
                 byteCount++;
                 if (byteCount == 2) {
-                    CPUWriteHalfWord(dest, writeValue);
+                    CPUWriteHalfWord(dest, DowncastU16(writeValue));
                     dest += 2;
                     byteCount = 0;
                     byteShift = 0;
@@ -1232,7 +1232,7 @@ static int32_t BIOS_SndDriver_3e4(uint32_t const r0a, uint32_t const r1a) // 0x3
 
 static void BIOS_SndDriverSub1(uint32_t p1) // 0x170a
 {
-    uint8_t local1 = (p1 & 0x000F0000) >> 16; // param is r0
+    uint8_t local1 = DowncastU8((p1 & 0x000F0000) >> 16); // param is r0
     uint32_t const puser1 = CPUReadMemory(0x3007FF0); // 7FC0 + 0x30
 
     // Store something
@@ -1254,7 +1254,7 @@ static void BIOS_SndDriverSub1(uint32_t p1) // 0x170a
 
     // 0x172c
     r0 = BIOS_SndDriver_3e4(r0, r1);
-    CPUWriteByte(puser1 + 0xB, r0);
+    CPUWriteByte(puser1 + 0xB, DowncastU8(r0));
 
     uint32_t x = 0x91d1b * r4;
     r1 = x + 0x1388;
@@ -1274,12 +1274,12 @@ static void BIOS_SndDriverSub1(uint32_t p1) // 0x170a
     CPUWriteHalfWord(r4basesnd + 2, 0);
     r0 = BIOS_SndDriver_3e4(r0, r1);
     r0 = (1 << 16) - r0;
-    CPUWriteHalfWord(r4basesnd + 0, r0);
+    CPUWriteHalfWord(r4basesnd + 0, DowncastU16(r0));
 
     // sub 0x18c8 is unrolled here
     r1 = 0x5b << 9;
-    CPUWriteHalfWord(base1 + 6, r1);
-    CPUWriteHalfWord(base1 + 12, r1);
+    CPUWriteHalfWord(base1 + 6, DowncastU16(r1));
+    CPUWriteHalfWord(base1 + 12, DowncastU16(r1));
 
     // 0x176a, @todo busy loop here
     r0 = 0x4000000;
@@ -1315,7 +1315,7 @@ void BIOS_SndDriverInit() // 0x166a
     CPUWriteHalfWord(base2 + 4, 0x8F);
     CPUWriteHalfWord(base2 + 2, 0xA90E);
 
-    uint16_t val9 = CPUReadHalfWord(base2 + 9);
+    uint16_t val9 = DowncastU16(CPUReadHalfWord(base2 + 9));
     CPUWriteHalfWord(base2 + 9, val9 & ADBITS_MASK); // DA?
 
     CPUWriteMemory(base3 + 0, (user1 + 0x350)); //0x350, 640int
@@ -1382,7 +1382,7 @@ void BIOS_SndDriverMode() //0x179c
             dab >>= 0xE;
             uint8_t adv = CPUReadByte(puser1 + 9) & ADBITS_MASK; // @todo verify offset
             dab |= adv;
-            CPUWriteByte(puser1 + 9, dab);
+            CPUWriteByte(puser1 + 9, DowncastU8(dab));
         }
         // Playback frequency at bits 16...19
         uint32_t pbf = (input & 0x000F0000);
@@ -1558,7 +1558,7 @@ void BIOS_SndDriverMain() // 0x1dc4 -> 0x08004024 phantasy star
         }
         {
             //lbl_0x1f54:
-            CPUWriteByte(r4 + 0x9, r5);
+            CPUWriteByte(r4 + 0x9, DowncastU8(r5));
 
             uint32_t user0 = CPUReadByte(puser1 + 0x7); // @sp+10
             user0++;
@@ -1568,12 +1568,12 @@ void BIOS_SndDriverMain() // 0x1dc4 -> 0x08004024 phantasy star
             user0 = CPUReadByte(r4 + 0x2);
             user0 *= r5;
             user0 >>= 8;
-            CPUWriteByte(r4 + 0xA, user0);
+            CPUWriteByte(r4 + 0xA, DowncastU8(user0));
 
             user0 = CPUReadByte(r4 + 0x3);
             user0 *= r5;
             user0 >>= 8;
-            CPUWriteByte(r4 + 0xB, user0);
+            CPUWriteByte(r4 + 0xB, DowncastU8(user0));
 
             user0 = r6 & 0x10;
             if (user0 != 0) // @todo 0x1f76
@@ -1623,7 +1623,7 @@ void BIOS_SndDriverMain() // 0x1dc4 -> 0x08004024 phantasy star
                     if (r2) {
                         r3 = CPUReadMemory(reg[13].I + 0xC); // @todo stack pull 0x205c
                     } else {
-                        CPUWriteByte(r4, r2);
+                        CPUWriteByte(r4, DowncastU8(r2));
                         goto lbl_20e4;
                     }
                 }
@@ -1631,23 +1631,23 @@ void BIOS_SndDriverMain() // 0x1dc4 -> 0x08004024 phantasy star
             } while (r7 >= r9);
         lbl_207c:
             while (1) {
-                int32_t r0a = CPUReadByte(r3);
+                int32_t r0b = CPUReadByte(DowncastU8(r3));
                 int32_t r1a = CPUReadByte(r3 + 0x1);
 
-                r1a -= r0a;
+                r1a -= r0b;
                 int32_t r6a = r1a * (int32_t)r7;
                 r1a = r6a * r12; // 208c
-                r6a = (r0a + ((int8_t)(r1a >> 23)));
+                r6a = (r0b + ((int8_t)(r1a >> 23)));
 
                 r1a = r6a * (int32_t)r11;
 
-                r0a = CPUReadByte(r5 + 0x630);
-                r0a = (r0a + ((int8_t)(r1a >> 8)));
-                CPUWriteByte(r5 + 0x630, r0a);
+                r0b = CPUReadByte(r5 + 0x630);
+                r0b = (r0b + ((int8_t)(r1a >> 8)));
+                CPUWriteByte(r5 + 0x630, DowncastU8(r0b));
                 r1a = r6a * (int32_t)r10;
-                r0a = CPUReadByte(r5);
-                r0a = (r0a + ((int8_t)(r1a >> 8)));
-                CPUWriteByte(r5++, r0a); //ptr inc +1 not +4
+                r0b = CPUReadByte(r5);
+                r0b = (r0b + ((int8_t)(r1a >> 8)));
+                CPUWriteByte(r5++, DowncastU8(r0b)); //ptr inc +1 not +4
 
                 r7 += r14;
                 --r8;
@@ -1682,13 +1682,13 @@ void BIOS_SndDriverVSync()
         CPUWriteByte(puser1 + 4, v1i);
         if (v1 <= 1) {
             uint8_t v2 = CPUReadByte(puser1 + 0xB); //11
-            uint32_t base2 = 0x040000D2;
+            uint32_t base3 = 0x040000D2;
             CPUWriteByte(puser1 + 4, v2);
 
             CPUWriteHalfWord(base1 + 0x6, 0);
-            CPUWriteHalfWord(base2, 0);
+            CPUWriteHalfWord(base3, 0);
             CPUWriteHalfWord(base1 + 0x6, 0xB600);
-            CPUWriteHalfWord(base2, 0xB600); //-18944
+            CPUWriteHalfWord(base3, 0xB600); //-18944
         }
     }
 }
