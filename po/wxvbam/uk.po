@@ -781,7 +781,7 @@ msgstr "Неможливо визначити аудіодрайвер!"
 
 #: cmdevents.cpp:2912
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
-msgstr "Емулятор Nintendo Game Boy / Color / Advance)."
+msgstr "Емулятор Nintendo Game Boy / Color / Advance."
 
 #: cmdevents.cpp:2913
 msgid ""
@@ -804,7 +804,7 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program.  If not, see http://www.gnu.org/licenses ."
-msgstr "Програма - вільне програмне забезпечення: можна розповсюджувати\nїї та / або змінювати за умовами Загальної Публічної Ліцензії GNU,\nопублікованої Фондом Безкоштовного Програмного Забезпечення, чи\nверсії 2 Ліцензії, чи (на твій вибір) будь-якої пізнішої версії.\nПрограму розповсюджено з надією на користь, але БЕЗ ГАРАНТІЙ;\nнавіть без неявної гарантії ПРИДАТНОСТІ ДО ПРОДАЖУ\nЧИ ОСОБЛИВОЇ МЕТИ. Докладно в Загальній Публічній Ліцензії GNU.\n\nТи отримаєш копію Загальної Публічної Ліцензії GNU\nразом із програмою, чи за посиланням.\nhttp://gnu.org/licenses"
+msgstr "Програма - безкоштовне програмне забезпечення: можна розповсюджувати\nїї та / або змінювати за умовами Загальної Публічної Ліцензії GNU,\nопублікованої Фондом Безкоштовного Програмного Забезпечення, чи\nверсії 2 Ліцензії, чи (на твій вибір) будь-якої пізнішої версії.\nПрограму розповсюджено з надією на користь, але БЕЗ ГАРАНТІЙ;\nнавіть без неявної гарантії ПРИДАТНОСТІ ДО ПРОДАЖУ\nЧИ ОСОБЛИВОЇ МЕТИ. Докладно в Загальній Публічній Ліцензії GNU.\n\nТи отримаєш копію Загальної Публічної Ліцензії GNU\nразом із програмою, чи за посиланням.\nhttp://gnu.org/licenses"
 
 #: cmdevents.cpp:3165
 msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
@@ -993,31 +993,31 @@ msgstr "Помилка збереження стану %s."
 #: panel.cpp:931
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
-msgstr "Непідтримуваний повний екран %d*%d-%d@%d; пошук іншого."
+msgstr "Непідтримуваний повний екран %d * %d - %d @ %d; пошук іншого."
 
 #: panel.cpp:969
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
-msgstr "Непідтримуваний повний екран %dx%d-%d@%d."
+msgstr "Непідтримуваний повний екран %d * %d - %d @ %d."
 
 #: panel.cpp:974
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
-msgstr "Дійсний режим: %dx%d-%d@%d."
+msgstr "Дійсний режим: %d * %d - %d @ %d."
 
 #: panel.cpp:982
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
-msgstr "Вибрано режим %dx%d-%d@%d."
+msgstr "Вибрано режим %d * %d - %d @ %d."
 
 #: panel.cpp:986
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
-msgstr "Не вдалося змінити режим на %dx%d-%d@%d."
+msgstr "Не вдалося змінити режим на %d * %d - %d @ %d."
 
 #: panel.cpp:1074
 msgid "Not a valid GBA cartridge"
-msgstr "Недійсний GBA-картридж."
+msgstr "Недійсний Game Boy Advance-картридж."
 
 #: panel.cpp:1242
 msgid "No memory for rewinding"
@@ -1292,7 +1292,7 @@ msgid ""
 "names which map to joypad #<n> button <button>.  Button is one of Up, Down, "
 "Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
-msgstr "Параметр Joypad/<n>/<button> містить розділений комами перелік імен кнопок, призначених для джойстика #<n> кнопка <button>. Кнопки: ↑, ↓, ←, →, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, AutoB, Speed, Capture, GS."
+msgstr "Параметр Joypad/<n>/<button> містить розділений комами перелік імен кнопок, призначених для джойстика #<n> кнопка <button>. Кнопки: ↑, ↓, ←, →, A, B, L, R, Select, Start, Motion Up, Motion Down, Motion Left, Motion Right, Autofire A, Autofire B, Speed, Capture, GS."
 
 #: config/internal/option-internal.cpp:439
 msgid "The autofire toggle period, in frames (1/60 s)"
@@ -1552,7 +1552,7 @@ msgstr "Частота дискретизації аудіо (кГц)"
 
 #: config/internal/option-internal.cpp:600
 msgid "Sound volume (%)"
-msgstr "Гучність звуку  (%)"
+msgstr "Гучність звуку (%)"
 
 #: config/internal/option-internal.cpp:667
 #: config/internal/option-internal.cpp:687
@@ -1654,35 +1654,35 @@ msgstr "Роз'єднано %s."
 
 #: xaudio2.cpp:34
 msgid "XAudio2: Enumerating devices failed!"
-msgstr "X-Audio-2: Не вдалося визначити пристрої!"
+msgstr "XAudio2: Не вдалося визначити пристрої!"
 
 #: xaudio2.cpp:68 xaudio2.cpp:352
 msgid "The XAudio2 interface failed to initialize!"
-msgstr "X-Audio-2: Не вдалося визначити інтерфейс!"
+msgstr "XAudio2: Не вдалося визначити інтерфейс!"
 
 #: xaudio2.cpp:383
 msgid "XAudio2: Creating mastering voice failed!"
-msgstr "X-Audio-2: Не вдалося створити основний голос!"
+msgstr "XAudio2: Не вдалося створити основний голос!"
 
 #: xaudio2.cpp:392
 msgid "XAudio2: Creating source voice failed!"
-msgstr "X-Audio-2: Не вдалося створити голос-джерело!"
+msgstr "XAudio2: Не вдалося створити голос-джерело!"
 
 #: faudio.cpp:31
 msgid "FAudio: Enumerating devices failed!"
-msgstr "F-Audio: Не вдалося визначити пристрої!"
+msgstr "FAudio: Не вдалося визначити пристрої!"
 
 #: faudio.cpp:66 faudio.cpp:351
 msgid "The FAudio interface failed to initialize!"
-msgstr "F-Audio: не вдалося визначити інтерфейс!"
+msgstr "FAudio: не вдалося визначити інтерфейс!"
 
 #: faudio.cpp:383
 msgid "FAudio: Creating mastering voice failed!"
-msgstr "F-Audio: Не вдалося створити основний голос!"
+msgstr "FAudio: Не вдалося створити основний голос!"
 
 #: faudio.cpp:394
 msgid "FAudio: Creating source voice failed!"
-msgstr "F-Audio: Не вдалося створити голос-джерело!"
+msgstr "FAudio: Не вдалося створити голос-джерело!"
 
 #: dsound.cpp:89 dsound.cpp:103
 #, c-format
@@ -2386,7 +2386,7 @@ msgstr "Справжні кольори Game Boy"
 
 #: xrc/GBColorPrefPanel.xrc:18
 msgid "Real 'GB on GBASP' Colors"
-msgstr "Справжні кольори Game Boy на Game Boy Advance SP"
+msgstr "Справжні кольори Game Boy на Game Boy Advance Special"
 
 #: xrc/GBColorPrefPanel.xrc:46 xrc/GBPaletteViewer.xrc:17 xrc/MapViewer.xrc:54
 #: xrc/PaletteViewer.xrc:19
@@ -2873,7 +2873,7 @@ msgstr "&Прискорити"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "percent of normal:"
-msgstr ""
+msgstr "% норми:"
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
@@ -4013,11 +4013,11 @@ msgstr "Direct Sound"
 
 #: xrc/SoundConfig.xrc:125
 msgid "XAudio2"
-msgstr "X-Audio-2"
+msgstr "XAudio2"
 
 #: xrc/SoundConfig.xrc:132
 msgid "FAudio"
-msgstr "F-Audio"
+msgstr "FAudio"
 
 #: xrc/SoundConfig.xrc:146
 msgid "Device"
