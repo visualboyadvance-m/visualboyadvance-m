@@ -1,0 +1,16 @@
+{
+  "name": "visualboyadvance-m",
+  "dependencies": [
+        "zlib",
+        "gettext",
+        { "name": "gettext", "host": true, "features": ["tools"] },
+        "getopt",
+        "sfml",
+        { "name": "ffmpeg", "features": [ "avcodec", "avformat","swscale", "swresample"] },
+        { "name": "pkgconf", "host": true },
+        "sdl2",
+        { "name": "wxwidgets", "features": [ "sound", "fonts"] }
+  ],
+  "builtin-baseline": "f9bea5d58186dc14e7e33132e43b52222147f51e"
+
+}

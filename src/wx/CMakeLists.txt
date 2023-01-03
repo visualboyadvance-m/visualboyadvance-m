@@ -1,23 +1,3 @@
-# Do not use this file directly.  Always use the top level CMakeLists.txt file
-
-if(COMMAND cmake_policy)
-    cmake_policy(SET CMP0003 NEW) # link to full path of libs
-    cmake_policy(SET CMP0005 NEW) # escapes in add_definitions
-
-
-    if(POLICY CMP0074)
-        cmake_policy(SET CMP0074 NEW) # use Package_ROOT if set
-    endif()
-
-    if(POLICY CMP0077)
-        cmake_policy(SET CMP0077 NEW) # use vars for options
-    endif()
-
-    if(POLICY CMP0043)
-        cmake_policy(SET CMP0043 NEW) # for wxWidgets, use generator expressions
-    endif()
-endif()
-
 include(VbamFunctions)
 
 set(VBAM_LIBS ${VBAMCORE_LIBS})
@@ -109,7 +89,7 @@ endif()
 
 # on VS with vcpkg we can't use FindwxWidgets, we have to set everything up
 # manually because the package is broken
-if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
+if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     # set up wxwidgets stuff
     set(libtype u)
     unset(arch_suffix)
@@ -205,7 +185,7 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
     endif()
 
     # SDL2.dll does not get copied to build dir
-    if(NOT VCPKG_TARGET_TRIPLET MATCHES -static)
+    if(NOT VCPKG_TARGET_TRIPLET MATCHES "-static")
         unset(deb_suffix)
         if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
             set(deb_suffix d)
@@ -927,7 +907,9 @@ if(NOT TRANSLATIONS_ONLY)
         ${VBAM_ICON_PATH}
         ${CM_STUFF}
     )
-
+    target_compile_features(visualboyadvance-m PRIVATE cxx_std_17)
+    target_compile_definitions(visualboyadvance-m PRIVATE __STDC_LIMIT_MACROS __STDC_CONSTANT_MACROS)
+    target_link_libraries(visualboyadvance-m "${GETOPT_LIB}")
     if(WIN32 AND (X86_64 OR X86_32) AND ENABLE_ONLINEUPDATES)
         if(NOT DEFINED WINSPARKLE_BIN_RELEASE_DIR)
             set(WINSPARKLE_BIN_RELEASE_DIR ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0)

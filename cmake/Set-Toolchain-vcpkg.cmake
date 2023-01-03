@@ -1,7 +1,3 @@
-if(POLICY CMP0012)
-    cmake_policy(SET CMP0012 NEW) # Saner if() behavior.
-endif()
-
 if(NOT DEFINED VCPKG_TARGET_TRIPLET)
     # Check if we are in an MSVC environment.
     if($ENV{CXX} MATCHES "cl.exe$")
@@ -72,78 +68,8 @@ endfunction()
 
 function(vcpkg_check_git_status git_status)
     if(NOT git_status EQUAL 0)
-        message(FATAL_ERROR "Error updating vcpkg from git, please make sure git for windows is installed correctly, it can be installed from Visual Studio components")
+        message(WARNING "Error updating vcpkg from git, please make sure git for windows is installed correctly, it can be installed from Visual Studio components. git_status:${git_status}")
     endif()
-endfunction()
-
-function(vcpkg_get_first_upgrade vcpkg_exe)
-    # First get the list of upgraded ports.
-    execute_process(
-        COMMAND ${vcpkg_exe} upgrade
-        OUTPUT_VARIABLE upgradable
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        ERROR_QUIET
-        WORKING_DIRECTORY ${VCPKG_ROOT}
-    )
-
-    string(REGEX REPLACE "\r?\n" ";" upgrade_lines "${upgradable}")
-
-    unset(first_upgrade)
-
-    foreach(line ${upgrade_lines})
-        if(line MATCHES "^  [* ] [^ ]*:")
-            string(REGEX REPLACE "^  [* ] ([^[]+).*" "\\1" pkg     ${line})
-            string(REGEX REPLACE "^[^:]+:(.+)$"      "\\1" triplet ${line})
-
-            if(triplet STREQUAL "${VCPKG_TARGET_TRIPLET}")
-                # Prefer upgrading zlib before anything else.
-                if(NOT first_upgrade OR pkg MATCHES zlib)
-                    set(first_upgrade ${pkg})
-                endif()
-            endif()
-        endif()
-    endforeach()
-
-    if(DEFINED first_upgrade)
-        set(first_upgrade ${first_upgrade} PARENT_SCOPE)
-    endif()
-endfunction()
-
-function(vcpkg_deps_fixup vcpkg_exe)
-    # Get installed list.
-    execute_process(
-        COMMAND ${vcpkg_exe} list
-        OUTPUT_VARIABLE pkg_list
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        ERROR_QUIET
-        WORKING_DIRECTORY ${VCPKG_ROOT}
-    )
-
-    # If libvorbis is NOT installed but libogg is, remove libvorbis recursively.
-    if(pkg_list MATCHES libogg AND (NOT pkg_list MATCHES libvorbis))
-        execute_process(
-            COMMAND ${vcpkg_exe} remove --recurse libogg:${VCPKG_TARGET_TRIPLET}
-            WORKING_DIRECTORY ${VCPKG_ROOT}
-        )
-    endif()
-endfunction()
-
-function(vcpkg_remove_optional_deps vcpkg_exe)
-    list(LENGTH VCPKG_DEPS_OPTIONAL optionals_list_len)
-    math(EXPR optionals_list_last "${optionals_list_len} - 1")
-
-    unset(deps)
-
-    foreach(i RANGE 0 ${optionals_list_last} 2)
-        list(GET VCPKG_DEPS_OPTIONAL ${i} dep)
-
-        list(APPEND deps ${dep}:${VCPKG_TARGET_TRIPLET})
-    endforeach()
-
-    execute_process(
-        COMMAND ${vcpkg_exe} remove --recurse ${deps}
-        WORKING_DIRECTORY ${VCPKG_ROOT}
-    )
 endfunction()
 
 function(vcpkg_set_toolchain)
@@ -170,8 +96,9 @@ function(vcpkg_set_toolchain)
     if(NOT EXISTS ${VCPKG_ROOT})
         get_filename_component(root_parent ${VCPKG_ROOT}/.. ABSOLUTE)
 
+        find_package(Git REQUIRED)
         execute_process(
-            COMMAND git clone https://github.com/microsoft/vcpkg.git
+            COMMAND ${GIT_EXECUTABLE} clone https://github.com/microsoft/vcpkg.git
             RESULT_VARIABLE git_status
             WORKING_DIRECTORY ${root_parent}
         )
@@ -181,11 +108,11 @@ function(vcpkg_set_toolchain)
         # this is the case when we cache vcpkg/installed with the appveyor build cache
         if(NOT EXISTS ${VCPKG_ROOT}/.git)
             set(git_commands
-                "git init"
-                "git remote add origin https://github.com/microsoft/vcpkg.git"
-                "git fetch --all --prune"
-                "git reset --hard origin/master"
-                "git branch --set-upstream-to=origin/master master"
+                "${GIT_EXECUTABLE} init"
+                "${GIT_EXECUTABLE} remote add origin https://github.com/microsoft/vcpkg.git"
+                "${GIT_EXECUTABLE} fetch --all --prune"
+                "${GIT_EXECUTABLE} reset --hard origin/master"
+                "${GIT_EXECUTABLE} branch --set-upstream-to=origin/master master"
             )
             foreach(git_command ${git_commands})
                 separate_arguments(git_command)
@@ -200,14 +127,14 @@ function(vcpkg_set_toolchain)
             endforeach()
         else()
             execute_process(
-                COMMAND git fetch origin
+                COMMAND ${GIT_EXECUTABLE} fetch origin
                 RESULT_VARIABLE git_status
                 WORKING_DIRECTORY ${VCPKG_ROOT}
             )
             vcpkg_check_git_status(${git_status})
 
             execute_process(
-                COMMAND git status
+                COMMAND ${GIT_EXECUTABLE} status
                 RESULT_VARIABLE git_status
                 OUTPUT_VARIABLE git_status_text
                 WORKING_DIRECTORY ${VCPKG_ROOT}
@@ -222,7 +149,7 @@ function(vcpkg_set_toolchain)
 
             if(NOT git_up_to_date)
                 execute_process(
-                    COMMAND git pull --rebase
+                    COMMAND ${GIT_EXECUTABLE} pull --rebase
                     RESULT_VARIABLE git_status
                     WORKING_DIRECTORY ${VCPKG_ROOT}
                 )
@@ -253,52 +180,13 @@ function(vcpkg_set_toolchain)
         list(APPEND VCPKG_DEPS_QUALIFIED ${pkg}:${VCPKG_TARGET_TRIPLET})
     endforeach()
 
-    if(WIN32)
-        set(vcpkg_exe vcpkg)
-    else()
-        set(vcpkg_exe ./vcpkg)
-    endif()
+    find_program(vcpkg_exe NAMES vcpkg)
 
     # update portfiles
     execute_process(
         COMMAND ${vcpkg_exe} update
         WORKING_DIRECTORY ${VCPKG_ROOT}
     )
-
-    # Get number of seconds since midnight (might be wrong if am/pm is in effect on Windows.)
-    vcpkg_seconds()
-    set(began ${seconds})
-
-    # Limit total installation time to 20 minutes to not overrun CI time limit.
-    math(EXPR time_limit "${began} + (20 * 60)")
-
-    vcpkg_deps_fixup("${vcpkg_exe}")
-
-    # Install core deps.
-    execute_process(
-        COMMAND ${vcpkg_exe} install ${VCPKG_DEPS_QUALIFIED}
-        WORKING_DIRECTORY ${VCPKG_ROOT}
-    )
-
-    # If ports have been updated, and there is time, rebuild cache one at a time to not overrun the CI time limit.
-    vcpkg_seconds()
-
-    if(seconds LESS time_limit)
-        vcpkg_get_first_upgrade(${vcpkg_exe})
-
-        if(DEFINED first_upgrade)
-            # If we have to upgrade zlib, remove optional deps first so that
-            # the build doesn't overrun the CI time limit.
-            if(first_upgrade STREQUAL "zlib")
-                vcpkg_remove_optional_deps(${vcpkg_exe})
-            endif()
-
-            execute_process(
-                COMMAND ${vcpkg_exe} upgrade --no-dry-run "${first_upgrade}:${VCPKG_TARGET_TRIPLET}"
-                WORKING_DIRECTORY ${VCPKG_ROOT}
-            )
-        endif()
-    endif()
 
     # Install optional deps, within time limit.
     list(LENGTH VCPKG_DEPS_OPTIONAL optionals_list_len)
@@ -344,9 +232,13 @@ function(vcpkg_set_toolchain)
         endif()
     endif()
 
-    set(CMAKE_TOOLCHAIN_FILE ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake CACHE FILEPATH "vcpkg toolchain" FORCE)
+    set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "vcpkg toolchain" FORCE)
 endfunction()
 
 vcpkg_set_toolchain()
 
-include(${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
+if(NOT DEFINED VCPKG_HOST_TRIPLET)
+    set(VCPKG_HOST_TRIPLET "${VCPKG_TARGET_TRIPLET}")
+endif()
+
+include("${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")

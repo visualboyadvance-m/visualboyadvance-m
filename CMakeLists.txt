@@ -1,37 +1,18 @@
-if(COMMAND cmake_policy)
-    cmake_policy(SET CMP0003 NEW) # link to full path of libs
-    cmake_policy(SET CMP0005 NEW) # escapes in add_definitions
-
-    if(POLICY CMP0074)
-        cmake_policy(SET CMP0074 NEW) # use Package_ROOT if set
-    endif()
-
-    if(POLICY CMP0077)
-        cmake_policy(SET CMP0077 NEW) # use vars for options
-    endif()
-
-    if(POLICY CMP0043)
-        cmake_policy(SET CMP0043 NEW) # for wxWidgets, use generator expressions
-    endif()
-
-    if(POLICY CMP0048)
-        cmake_policy(SET CMP0048 NEW) # set CMAKE_PROJECT_VERSION*
-    endif()
-
-    if(POLICY CMP0011)
-        cmake_policy(SET CMP0011 NEW) # Policy PUSH/POP for scripts.
-    endif()
-
-    if(POLICY CMP0012)
-        cmake_policy(SET CMP0012 NEW) # Saner if() behavior.
-    endif()
-
-    if(POLICY CMP0060)
-        cmake_policy(SET CMP0060 NEW) # Full lib paths.
-    endif()
+cmake_minimum_required(VERSION 3.7...3.25)
+if(POLICY CMP0074)
+    cmake_policy(SET CMP0074 NEW) # use Package_ROOT if set
+endif()
+if(POLICY CMP0077)
+    cmake_policy(SET CMP0077 NEW) # use vars for options
 endif()
 
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake")
+
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build Type" FORCE)
+elseif(NOT CMAKE_BUILD_TYPE MATCHES "^(Release|Debug|RelWithDebInfo|MinSizeRel)$")
+    message(FATAL_ERROR "Invalid CMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}', must be one of: 'Release', 'Debug', 'RelWithDebInfo' or 'MinSizeRel'")
+endif()
 
 if(WIN32)
     include(RemoveStrawberryPerlFromPATH)
@@ -55,8 +36,7 @@ set(VCPKG_DEPS_OPTIONAL
 include(Set-Toolchain-vcpkg)
 
 set(VBAM_STATIC_DEFAULT OFF)
-
-if(VCPKG_TARGET_TRIPLET MATCHES -static OR CMAKE_TOOLCHAIN_FILE MATCHES "mxe|-static")
+if(VCPKG_TARGET_TRIPLET MATCHES "-static-?" OR CMAKE_TOOLCHAIN_FILE MATCHES "mxe|-static-?")
     set(VBAM_STATIC_DEFAULT ON)
 endif()
 
@@ -76,16 +56,8 @@ endif()
 
 project(VBA-M C CXX)
 
-cmake_minimum_required(VERSION 2.8.12)
-
 if(NOT CMAKE_PREFIX_PATH AND (NOT ("$ENV{CMAKE_PREFIX_PATH}" STREQUAL "")))
     set(CMAKE_PREFIX_PATH "$ENV{CMAKE_PREFIX_PATH}")
-endif()
-
-if(CMAKE_BUILD_TYPE STREQUAL "")
-    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build Type" FORCE)
-elseif(NOT CMAKE_BUILD_TYPE MATCHES "^(Release|Debug|RelWithDebInfo|MinSizeRel)$")
-    message(FATAL_ERROR "Invalid CMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}', must be one of: 'Release', 'Debug', 'RelWithDebInfo' or 'MinSizeRel'")
 endif()
 
 include(CTest)
@@ -101,7 +73,7 @@ add_custom_target(generate)
 #Output all binaries at top level
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
-option(ENABLE_SDL "Build the SDL port" OFF)
+option(ENABLE_SDL "Build the SDL port" ON)
 option(ENABLE_WX "Build the wxWidgets port" ON)
 option(ENABLE_DEBUGGER "Enable the debugger" ON)
 option(ENABLE_ASAN "Enable -fsanitize=<option>, address by default, requires debug build" OFF)
@@ -231,14 +203,15 @@ endif()
 
 option(ENABLE_LTO "Compile with Link Time Optimization (gcc and clang only)" ${LTO_DEFAULT})
 
+find_package(Git)
 if(WIN32 OR CMAKE_TOOLCHAIN_FILE MATCHES "[Mm][Ii][Nn][Gg][Ww]")
     # Win32 deps submodule
     set(git_checkout FALSE)
-
+    find_package(Git REQUIRED)
     if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
         set(git_checkout TRUE)
         execute_process(
-            COMMAND git submodule update --init --remote --recursive
+            COMMAND ${GIT_EXECUTABLE} submodule update --init --remote --recursive
             RESULT_VARIABLE git_status
             WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
         )
@@ -282,7 +255,6 @@ if(MINGW)
     include_directories("${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
 endif()
 
-find_package(Git)
 if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
     include(GitTagVersion)
     git_version(VERSION REVISION VERSION_RELEASE)
@@ -320,7 +292,7 @@ if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
                 COMMAND ${GIT_EXECUTABLE} tag -d ${tag}
                 OUTPUT_QUIET
                 ERROR_QUIET
-                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
             )
         endforeach()
 
@@ -328,7 +300,7 @@ if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
             COMMAND ${GIT_EXECUTABLE} fetch --tags origin
             OUTPUT_QUIET
             ERROR_QUIET
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
         )
     endif()
 endif()
@@ -340,7 +312,7 @@ if(NOT VERSION)
 endif()
 
 # generate version.h
-include_directories(${CMAKE_BINARY_DIR})
+include_directories("${CMAKE_BINARY_DIR}")
 string(REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+).*" "\\1,\\2,\\3,0" WIN_VERSION "${VERSION}")
 configure_file("${CMAKE_SOURCE_DIR}/src/version.h.in" "${CMAKE_BINARY_DIR}/version.h" @ONLY)
 
@@ -388,8 +360,8 @@ if(ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS)
         endif()
 
         execute_process(
-            COMMAND nuget.exe install nasm2 -OutputDirectory ${CMAKE_BINARY_DIR}/nuget
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            COMMAND nuget.exe install nasm2 -OutputDirectory "${CMAKE_BINARY_DIR}/nuget"
+            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
         )
 
         file(GLOB pkg ${CMAKE_BINARY_DIR}/nuget/nasm2*)
@@ -474,6 +446,7 @@ add_definitions(-D__STDC_FORMAT_MACROS)
 # build issues.
 add_definitions(-Doptional_CONFIG_SELECT_OPTIONAL=optional_OPTIONAL_NONSTD)
 add_definitions(-Dvariant_CONFIG_SELECT_VARIANT=variant_VARIANT_NONSTD)
+
 
 if(ENABLE_LINK)
     # IPC linking code needs sem_timedwait which can be either in librt or pthreads
@@ -805,8 +778,10 @@ elseif(MSVC)
 
     if(VBAM_STATIC)
         set(runtime "/MT")
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:DEBUG>:Debug>" CACHE INTERNAL "")
     else()
         set(runtime "/MD")
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:DEBUG>:Debug>DLL" CACHE INTERNAL "")
     endif()
 
     if(CMAKE_BUILD_TYPE STREQUAL Debug)
@@ -857,6 +832,11 @@ if(NOT TRANSLATIONS_ONLY)
     add_subdirectory(fex)
 endif()
 
+if(WIN32)
+    find_library(GETOPT_LIB NAMES getopt)
+    set(VBAMCORE_LIBS ${VBAMCORE_LIBS} ${GETOPT_LIB})
+endif()
+
 set(
     SRC_MAIN
     src/Util.cpp
@@ -867,10 +847,6 @@ set(
     src/common/memgzio.c
     src/common/SoundSDL.cpp
 )
-
-if(MSVC)
-        set(SRC_MAIN ${SRC_MAIN} "dependencies/msvc/getopt.c")
-endif()
 
 set(
     HDR_MAIN
@@ -885,10 +861,6 @@ set(
     src/common/SoundDriver.h
     src/common/SoundSDL.h
 )
-
-if(MSVC)
-        set(HDR_MAIN ${HDR_MAIN} "dependencies/msvc/getopt.h")
-endif()
 
 if(ENABLE_FFMPEG)
     set(SRC_MAIN ${SRC_MAIN} src/common/ffmpeg.cpp)
@@ -1156,8 +1128,9 @@ if(NOT TRANSLATIONS_ONLY)
         ${HDR_STB_IMAGE}
     )
     add_dependencies(vbamcore generate)
-    set_property(TARGET vbamcore PROPERTY CXX_STANDARD 11)
+    set_property(TARGET vbamcore PROPERTY CXX_STANDARD 17)
     set_property(TARGET vbamcore PROPERTY CXX_STANDARD_REQUIRED ON)
+    target_link_libraries(vbamcore PUBLIC "${GETOPT_LIB}")
 endif()
 
 if((NOT TRANSLATIONS_ONLY) AND ENABLE_SDL)
@@ -1167,7 +1140,7 @@ if((NOT TRANSLATIONS_ONLY) AND ENABLE_SDL)
         ${SRC_SDL}
         ${HDR_SDL}
     )
-    set_property(TARGET vbam PROPERTY CXX_STANDARD 11)
+    set_property(TARGET vbam PROPERTY CXX_STANDARD 17)
     set_property(TARGET vbam PROPERTY CXX_STANDARD_REQUIRED ON)
 
     if(WIN32)

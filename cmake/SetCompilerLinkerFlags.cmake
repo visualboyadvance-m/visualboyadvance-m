@@ -1,16 +1,9 @@
 include(VbamFunctions)
 
 function(add_compiler_flags)
-    foreach(var RELEASE DEBUG RELWITHDEBINFO MINSIZEREL)
-        set("CMAKE_CXX_FLAGS_${var}" "" CACHE STRING "MUST BE UNSET" FORCE)
-        set("CMAKE_CXX_FLAGS_${var}" "" PARENT_SCOPE)
-        set("CMAKE_C_FLAGS_${var}"   "" CACHE STRING "MUST BE UNSET" FORCE)
-        set("CMAKE_C_FLAGS_${var}"   "" PARENT_SCOPE)
-    endforeach()
-
     # Set C and CXX flags if not already set.
     foreach(flag ${ARGV})
-        foreach(var CMAKE_CXX_FLAGS CMAKE_C_FLAGS)
+        foreach(var CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE} CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE})
             # Remove any duplicates first.
             remove_dupes("${${var}}" "${var}")
 
