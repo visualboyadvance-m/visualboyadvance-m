@@ -10,6 +10,8 @@ option(ENABLE_ASAN "Enable -fsanitize=<option>, address by default, requires deb
 
 option(ENABLE_SSP "Enable gcc stack protector support" OFF)
 option(VBAM_STATIC "Try to link all libraries statically" ${VBAM_STATIC_DEFAULT})
+option(VBAM_STATIC_CRT "Link C runtime statically" OFF)
+
 
 option(ENABLE_ASM "Enable x86 ASM related options" OFF)
 
@@ -48,6 +50,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug OR (WIN32 AND CMAKE_COMPILER_IS_GNUCXX))
 endif()
 
 option(ENABLE_LTO "Compile with Link Time Optimization (gcc and clang only)" ${LTO_DEFAULT})
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ${ENABLE_LTO})
 
 option(ENABLE_GBA_LOGGING "Enable extended GBA logging" ON)
 

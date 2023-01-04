@@ -139,14 +139,12 @@ set(
 # wxrc does not support xrs files in -c output (> 10x compression)
 # we do it using the bin2c.c utility
 
-if(CMAKE_CROSSCOMPILING)
-    set(BIN2C ${CMAKE_BINARY_DIR}/bin2c)
-else()
+find_program(BIN2C NAMES bin2c PATHS "${CMAKE_BINARY_DIR}")
+if(NOT BIN2C)
+    include(HostCompile)
+    host_compile(${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c ${BIN2C})
     set(BIN2C bin2c)
 endif()
-
-include(HostCompile)
-host_compile(${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c ${BIN2C})
 
 if(CMAKE_HOST_WIN32 AND CMAKE_CROSSCOMPILING)
     find_program(WXRC NAMES wxrc)
@@ -428,9 +426,9 @@ if(NOT TRANSLATIONS_ONLY)
         ${CM_STUFF}
     )
     target_compile_features(visualboyadvance-m PRIVATE cxx_std_17)
-    target_compile_definitions(visualboyadvance-m PRIVATE __STDC_LIMIT_MACROS __STDC_CONSTANT_MACROS)
+
     target_link_libraries(visualboyadvance-m "${GETOPT_LIB}")
-    target_link_libraries(visualboyadvance-m wx::core wx::base)
+
     if(ENABLE_XAUDIO2)
         target_link_libraries(visualboyadvance-m Microsoft::XAudio2Redist)
     endif()
@@ -486,7 +484,7 @@ if(NOT TRANSLATIONS_ONLY)
 
     target_link_libraries(
         visualboyadvance-m
-        wx::core wx::base
+        wx::core wx::base wx::net wx::wxgl wx::wxxml wx::wxxrc wx::wxhtml
         ${VBAM_LIBS}
         sfml-network
     )

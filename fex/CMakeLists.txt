@@ -38,6 +38,7 @@ ADD_LIBRARY(
     ${SRC_FEX}
 )
 
+target_include_directories(fex PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(fex PUBLIC ZLIB::ZLIB)
 
 add_dependencies(fex generate)
