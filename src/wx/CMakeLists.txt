@@ -2,24 +2,14 @@ include(VbamFunctions)
 
 set(VBAM_LIBS ${VBAMCORE_LIBS})
 
-find_package(OpenAL)
-
-if(OPENAL_FOUND)
-	set(ENABLE_OPENAL_DEFAULT ON)
-else()
-	set(ENABLE_OPENAL_DEFAULT OFF)
-endif()
-
-option(ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" ${ENABLE_OPENAL_DEFAULT})
-
 if(ENABLE_OPENAL)
-	find_package(OpenAL REQUIRED)
+    find_package(OpenAL REQUIRED)
 
-	include_directories(${OPENAL_INCLUDE_DIR})
+    include_directories(${OPENAL_INCLUDE_DIR})
 
-	if(OPENAL_STATIC OR (WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)))
-		add_definitions(-DAL_LIBTYPE_STATIC)
-	endif()
+    if(OPENAL_STATIC OR (WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)))
+        add_definitions(-DAL_LIBTYPE_STATIC)
+    endif()
 
         list(APPEND VBAM_LIBS ${OPENAL_LIBRARY})
 else()
@@ -445,20 +435,6 @@ if(NOT TRANSLATIONS_ONLY)
         target_link_libraries(visualboyadvance-m Microsoft::XAudio2Redist)
     endif()
     if(WIN32 AND (X86_64 OR X86_32) AND ENABLE_ONLINEUPDATES)
-        # if(NOT DEFINED WINSPARKLE_BIN_RELEASE_DIR)
-        #     set(WINSPARKLE_BIN_RELEASE_DIR ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0)
-        # endif()
-
-        # target_include_directories(
-        #     visualboyadvance-m
-        #     PRIVATE ${WINSPARKLE_BIN_RELEASE_DIR}/include
-        # )
-
-        # if(X86_64)
-        #     set(WINSPARKLE_DLL ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0/x64/Release/WinSparkle.dll)
-        # else()
-        #     set(WINSPARKLE_DLL ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0/Release/WinSparkle.dll)
-        # endif()
         find_file(WINSPARKLE_DLL NAMES WinSparkle.dll PATH_SUFFIXES bin)
         set(WINSPARKLE_DLL WinSparkle.dll)
         configure_file(autoupdater/wxmsw/winsparkle-path.h.in ${CMAKE_BINARY_DIR}/winsparkle-path.h)
@@ -510,15 +486,9 @@ if(NOT TRANSLATIONS_ONLY)
 
     target_link_libraries(
         visualboyadvance-m
-        ${wxWidgets_LIBRARIES}
+        wx::core wx::base
         ${VBAM_LIBS}
         sfml-network
-    )
-
-    target_link_libraries(
-        visualboyadvance-m
-        ${wxWidgets_LIBRARIES}
-        ${VBAM_LIBS}
     )
 
     if(ENABLE_FFMPEG)
@@ -572,11 +542,9 @@ if(ENABLE_NLS)
     )
 
     add_dependencies(visualboyadvance-m translations-zip)
-endif()
 
 # Update the gettext pot source.
 # Do this automatically instead of manually to make sure we don't forget to update.
-if(ENABLE_NLS)
     add_custom_command(
         OUTPUT ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
         COMMAND ${CMAKE_COMMAND} -E env "PATH=$ENV{PATH}" ${WXRC} -g ${XRC_SOURCES} -o ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
@@ -615,8 +583,6 @@ if(NOT TRANSLATIONS_ONLY)
             ERROR_QUIET
         )
     endif()
-
-    option(ZIP_SUFFIX [=[suffix for release zip files, e.g.  "-somebranch".zip]=] OFF)
 
     if(NOT ZIP_SUFFIX)
         set(ZIP_SUFFIX "")

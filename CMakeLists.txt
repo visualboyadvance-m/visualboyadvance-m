@@ -299,8 +299,8 @@ add_definitions(-D__STDC_FORMAT_MACROS)
 
 # For C++, default to nonstd::optional and nonstd::variant for now due to mac
 # build issues.
-add_definitions(-Doptional_CONFIG_SELECT_OPTIONAL=optional_OPTIONAL_NONSTD)
-add_definitions(-Dvariant_CONFIG_SELECT_VARIANT=variant_VARIANT_NONSTD)
+# add_definitions(-Doptional_CONFIG_SELECT_OPTIONAL=optional_OPTIONAL_NONSTD)
+# add_definitions(-Dvariant_CONFIG_SELECT_VARIANT=variant_VARIANT_NONSTD)
 
 
 if(ENABLE_LINK)
@@ -645,7 +645,6 @@ endif()
 
 find_path(STB_INCLUDE_DIRS "stb_c_lexer.h")
 
-
 include_directories(
     fex
 )
@@ -691,7 +690,7 @@ if((NOT TRANSLATIONS_ONLY) AND ENABLE_SDL)
         WIN32
         ${SRC_SDL}
         ${HDR_SDL}
-    )
+    ) # Does this even still run ?
     target_compile_features(vbamcore PUBLIC cxx_std_17)
 
     if(WIN32)

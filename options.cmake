@@ -72,3 +72,7 @@ if(WIN32)
 endif()
 
 option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" OFF)
+
+option(ZIP_SUFFIX [=[suffix for release zip files, e.g.  "-somebranch".zip]=] OFF)
+
+option(ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" ON)

@@ -32,15 +32,12 @@ SET(SRC_FEX
     fex/Zlib_Inflater.cpp
 )
 
-INCLUDE_DIRECTORIES(
-    .
-    ${ZLIB_INCLUDE_DIRS}
-)
-
 ADD_LIBRARY(
     fex
     STATIC
     ${SRC_FEX}
 )
+
+target_link_libraries(fex PUBLIC ZLIB::ZLIB)
 
 add_dependencies(fex generate)
