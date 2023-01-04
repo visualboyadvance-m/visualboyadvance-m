@@ -27,36 +27,16 @@ if(TAG_RELEASE)
 endif()
 
 ## Setup VCPKG
-if(ENABLE_LINK)
-    list(APPEND VCPKG_MANIFEST_FEATURES sfml)
-endif()
-if(ENABLE_FFMPEG)
-    list(APPEND VCPKG_MANIFEST_FEATURES ffmpeg)
-endif()
-if(ENABLE_NLS)
-    list(APPEND VCPKG_MANIFEST_FEATURES nls)
-endif()
-if(ENABLE_ONLINEUPDATES)
-    list(APPEND VCPKG_MANIFEST_FEATURES update)
-endif()
-set(VCPKG_INSTALL_OPTIONS --allow-unsupported)
-set(VCPKG_TARGET_TRIPLET x64-windows-static-md)
-#set(VCPKG_INSTALL_OPTIONS --no-print-usage)
 include(Set-Toolchain-vcpkg)
-set(VBAM_STATIC_DEFAULT OFF)
-if(VCPKG_TARGET_TRIPLET MATCHES "-static-?" OR CMAKE_TOOLCHAIN_FILE MATCHES "mxe|-static-?")
-    set(VBAM_STATIC_DEFAULT ON)
-endif()
+
+
 ####
 
 include(enable-ccache.cmake)
 include(VbamFunctions)
 
 project(VBA-M C CXX)
-
-string(APPEND CMAKE_C_FLAGS_RELEASE " /Zi")
-string(APPEND CMAKE_CXX_FLAGS_RELEASE " /Zi")
-string(APPEND CMAKE_EXE_LINKER_FLAGS_RELEASE " /DEBUG")
+include(GNUInstallDirs)
 
 include(CTest)
 if(BUILD_TESTING)
@@ -134,19 +114,6 @@ endif()
 
 if(NOT HTTPS)
     add_definitions(-DNO_HTTPS)
-endif()
-
-
-
-if(MSVC)
-    include_directories("${CMAKE_SOURCE_DIR}/dependencies/msvc")
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-endif()
-
-if(MSVC AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-    # TODO: We should update the XAudio headers to build with clang-cl. See
-    # https://github.com/visualboyadvance-m/visualboyadvance-m/issues/1021
-    add_definitions(-DNO_XAUDIO2)
 endif()
 
 if(ENABLE_GBA_LOGGING)
@@ -287,19 +254,9 @@ else()
     set(WITHLIRC 0)
 endif()
 
-include(GNUInstallDirs)
-
 # C defines
 add_definitions(-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DSDL -DUSE_OPENGL -DSYSCONF_INSTALL_DIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}" -DWITH_LIRC=${WITHLIRC})
 add_definitions(-DPKGDATADIR="${CMAKE_INSTALL_FULL_DATADIR}/vbam" -DPACKAGE=)
-
-add_definitions(-D__STDC_FORMAT_MACROS)
-
-# For C++, default to nonstd::optional and nonstd::variant for now due to mac
-# build issues.
-# add_definitions(-Doptional_CONFIG_SELECT_OPTIONAL=optional_OPTIONAL_NONSTD)
-# add_definitions(-Dvariant_CONFIG_SELECT_VARIANT=variant_VARIANT_NONSTD)
-
 
 if(ENABLE_LINK)
     # IPC linking code needs sem_timedwait which can be either in librt or pthreads
@@ -369,7 +326,7 @@ if(ENABLE_NLS)
     endif()
 endif()
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/Flags.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/Flags.cmake") # Should be set as a toolchain isntead or close to project()
 
 if(APPLE)
     add_definitions(-DMACHO)
@@ -386,7 +343,7 @@ if(NOT TRANSLATIONS_ONLY)
 endif()
 
 if(WIN32)
-    find_library(GETOPT_LIB NAMES getopt)
+    find_library(GETOPT_LIB NAMES getopt) # getopt should get a proper target
     set(VBAMCORE_LIBS ${VBAMCORE_LIBS} ${GETOPT_LIB})
 endif()
 
@@ -615,7 +572,6 @@ else()
     add_definitions(-DNO_ASM)
 endif()
 
-
 set(
     SRC_DEBUGGER
     src/gba/armdis.cpp
@@ -640,8 +596,6 @@ if(ENABLE_DEBUGGER)
         src/gba/remote.h
     )
 endif()
-
-find_path(STB_INCLUDE_DIRS "stb_c_lexer.h")
 
 include_directories(
     fex
@@ -671,6 +625,7 @@ if(NOT TRANSLATIONS_ONLY)
         ${SRC_DEBUGGER}
         ${HDR_DEBUGGER}
     )
+    find_path(STB_INCLUDE_DIRS "stb_c_lexer.h")
     target_include_directories(vbamcore PUBLIC ${STB_INCLUDE_DIRS})
     if(MSVC)
         target_include_directories(vbamcore PUBLIC msvc)

@@ -12,8 +12,6 @@
         { "name": "wxwidgets", "features": [ "sound", "fonts"] },
         "stb",
         "doctest",
-        "optional-lite",
-        "variant-lite",
         { "name": "winsparkle", "platform": "windows" },
         "xaudio2redist"
   ],

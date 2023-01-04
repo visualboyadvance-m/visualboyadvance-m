@@ -1,3 +1,6 @@
+set(VCPKG_TARGET_TRIPLET "x64-windows-static-md")
+set(VBAM_STATIC_DEFAULT ON)
+
 if(NOT DEFINED VCPKG_TARGET_TRIPLET)
     # Check if we are in an MSVC environment.
     if($ENV{CXX} MATCHES "cl.exe$")
@@ -37,34 +40,12 @@ if(NOT DEFINED VCPKG_TARGET_TRIPLET)
     endif()
 
     if(DEFINED BUILD_SHARED_LIBS AND NOT ${BUILD_SHARED_LIBS})
-        set(VBAM_VCPKG_PLATFORM ${VBAM_VCPKG_PLATFORM}-static)
+        set(VBAM_VCPKG_PLATFORM ${VBAM_VCPKG_PLATFORM}-static-md)
     endif()
 
     set(VCPKG_TARGET_TRIPLET ${VBAM_VCPKG_PLATFORM} CACHE STRING "Vcpkg target triplet (ex. x86-windows)" FORCE)
     message(STATUS "Inferred VCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}")
 endif()
-
-function(vcpkg_seconds)
-    if(CMAKE_HOST_SYSTEM MATCHES Windows OR ((NOT DEFINED CMAKE_HOST_SYSTEM) AND WIN32))
-        execute_process(
-            COMMAND cmd /c echo %TIME:~0,8%
-            OUTPUT_VARIABLE time
-        )
-    else()
-        execute_process(
-            COMMAND date +'%H:%M:%S'
-            OUTPUT_VARIABLE time
-        )
-    endif()
-
-    string(SUBSTRING "${time}" 0 2 hours)
-    string(SUBSTRING "${time}" 3 2 minutes)
-    string(SUBSTRING "${time}" 6 2 secs)
-
-    math(EXPR seconds "(${hours} * 60 * 60) + (${minutes} * 60) + ${secs}")
-
-    set(seconds ${seconds} PARENT_SCOPE)
-endfunction()
 
 function(vcpkg_check_git_status git_status)
     if(NOT git_status EQUAL 0)
@@ -196,6 +177,23 @@ function(vcpkg_set_toolchain)
 
     set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "vcpkg toolchain" FORCE)
 endfunction()
+
+##TODO:Actually add these features in the manifest (options.cmake should be loaded before this here)
+if(ENABLE_LINK)
+    list(APPEND VCPKG_MANIFEST_FEATURES sfml)
+endif()
+if(ENABLE_FFMPEG)
+    list(APPEND VCPKG_MANIFEST_FEATURES ffmpeg)
+endif()
+if(ENABLE_NLS)
+    list(APPEND VCPKG_MANIFEST_FEATURES nls)
+endif()
+if(ENABLE_ONLINEUPDATES)
+    list(APPEND VCPKG_MANIFEST_FEATURES update)
+endif()
+
+#set(VCPKG_INSTALL_OPTIONS --allow-unsupported)
+#set(VCPKG_INSTALL_OPTIONS --no-print-usage)
 
 vcpkg_set_toolchain()
 
