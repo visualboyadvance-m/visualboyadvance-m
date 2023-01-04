@@ -176,45 +176,7 @@ function(vcpkg_set_toolchain)
         endif()
     endif()
 
-    foreach(pkg ${VCPKG_DEPS})
-        list(APPEND VCPKG_DEPS_QUALIFIED ${pkg}:${VCPKG_TARGET_TRIPLET})
-    endforeach()
-
     find_program(vcpkg_exe NAMES vcpkg)
-
-    # update portfiles
-    execute_process(
-        COMMAND ${vcpkg_exe} update
-        WORKING_DIRECTORY ${VCPKG_ROOT}
-    )
-
-    # Install optional deps, within time limit.
-    list(LENGTH VCPKG_DEPS_OPTIONAL optionals_list_len)
-    math(EXPR optionals_list_last "${optionals_list_len} - 1")
-
-    foreach(i RANGE 0 ${optionals_list_last} 2)
-        list(GET VCPKG_DEPS_OPTIONAL ${i} dep)
-
-        math(EXPR var_idx "${i} + 1")
-
-        list(GET VCPKG_DEPS_OPTIONAL ${var_idx} var)
-        set(val "${${var}}")
-
-        vcpkg_seconds()
-
-        if("${val}" OR (seconds LESS time_limit AND ("${val}" OR "${val}" STREQUAL "")))
-            set(dep_qualified "${dep}:${VCPKG_TARGET_TRIPLET}")
-
-            execute_process(
-                COMMAND ${vcpkg_exe} install ${dep_qualified}
-                WORKING_DIRECTORY ${VCPKG_ROOT}
-            )
-
-            set(${var} ON)
-        else()
-            set(${var} OFF)
-        endif()
-    endforeach()
 
     if(WIN32 AND VCPKG_TARGET_TRIPLET MATCHES x64 AND CMAKE_GENERATOR MATCHES "Visual Studio")
         set(CMAKE_GENERATOR_PLATFORM x64 CACHE STRING "visual studio build architecture" FORCE)
@@ -237,7 +199,7 @@ endfunction()
 
 vcpkg_set_toolchain()
 
-if(NOT DEFINED VCPKG_HOST_TRIPLET)
+if(NOT DEFINED VCPKG_HOST_TRIPLET AND NOT CMAKE_CROSSCOMPILING)
     set(VCPKG_HOST_TRIPLET "${VCPKG_TARGET_TRIPLET}")
 endif()
 

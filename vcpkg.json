@@ -9,8 +9,14 @@
         { "name": "ffmpeg", "features": [ "avcodec", "avformat","swscale", "swresample"] },
         { "name": "pkgconf", "host": true },
         "sdl2",
-        { "name": "wxwidgets", "features": [ "sound", "fonts"] }
+        { "name": "wxwidgets", "features": [ "sound", "fonts"] },
+        "stb",
+        "doctest",
+        "optional-lite",
+        "variant-lite",
+        { "name": "winsparkle", "platform": "windows" },
+        "xaudio2redist"
   ],
-  "builtin-baseline": "f9bea5d58186dc14e7e33132e43b52222147f51e"
+  "builtin-baseline": "0f719b3fdfc36f8dd45229370a0df180fdbf68f6"
 
 }

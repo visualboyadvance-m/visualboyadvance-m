@@ -21,6 +21,10 @@
 #include "widgets/wx/wxmisc.h"
 #include "wxvbam.h"
 
+#ifdef option
+#undef option // option macro from getopt.h
+#endif
+
 namespace dialogs {
 
 namespace {

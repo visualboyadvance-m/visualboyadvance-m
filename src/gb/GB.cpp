@@ -3749,7 +3749,7 @@ static bool gbReadSaveState(gzFile gzFile)
         ub = utilReadInt(gzFile) ? true : false;
         ib = utilReadInt(gzFile) ? true : false;
 
-        if ((ub != useBios) && (ib)) {
+        if ((ub != (bool)useBios) && (ib)) {
             if (useBios)
                 systemMessage(MSG_SAVE_GAME_NOT_USING_BIOS,
                     N_("Save game is not using the BIOS files"));

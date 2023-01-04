@@ -2540,7 +2540,7 @@ EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
 
     // this value might have been overwritten by FrameSkip
     if (panel->game_type() == IMAGE_GB) {
-        if (borderon != gbBorderOn) {
+        if (borderon != (bool)gbBorderOn) {
             if (gbBorderOn) {
                 panel->AddBorder();
                 gbSgbRenderBorder();

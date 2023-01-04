@@ -1579,7 +1579,7 @@ public:
 #ifndef NO_XAUDIO2
 
         case AUD_XAUDIO2:
-            if (!GetXA2Devices(names, dev_ids))
+            if (!CouldGetXA2Devices(names, dev_ids))
                 return false;
 
             break;

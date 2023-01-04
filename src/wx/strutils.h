@@ -1,8 +1,12 @@
 #ifndef STRUTILS_H
 #define STRUTILS_H
 
+#ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
+#endif
+#ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
+#endif
 
 #include <wx/string.h>
 #include <wx/arrstr.h>

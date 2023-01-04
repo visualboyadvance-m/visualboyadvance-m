@@ -9,7 +9,9 @@
 
 // XAudio2
 #if _MSC_VER
-#include <xaudio2.legacy.h>
+#include <xaudio2.h>
+
+
 #else
 #include <XAudio2.h>
 #endif 
@@ -23,38 +25,102 @@
 #include "../System.h" // for systemMessage()
 #include "../gba/Globals.h"
 
-int GetXA2Devices(IXAudio2* xa, wxArrayString* names, wxArrayString* ids,
-    const wxString* match)
-{
-    HRESULT hr;
-    UINT32 dev_count = 0;
-    hr = xa->GetDeviceCount(&dev_count);
+#if _MSC_VER
+//#include <devpkey.h>
+#include <wrl.h>
+#include <propvarutil.h>
+#include <mmdeviceapi.h>
+#include <Functiondiscoverykeys_devpkey.h>
+#include <endpointvolume.h>
+#pragma comment(lib,"Propsys.lib")
+#endif
 
-    if (hr != S_OK) {
-        wxLogError(_("XAudio2: Enumerating devices failed!"));
-        return true;
-    } else {
-        XAUDIO2_DEVICE_DETAILS dd;
+#define SAFE_RELEASE(punk)  \
+              if ((punk) != NULL)  \
+                { (punk)->Release(); (punk) = NULL; }
 
-        for (UINT32 i = 0; i < dev_count; i++) {
-            hr = xa->GetDeviceDetails(i, &dd);
+using prop_string_t = std::unique_ptr<WCHAR, decltype(&CoTaskMemFree)>;
 
-            if (hr != S_OK) {
-                continue;
-            } else {
-                if (ids) {
-                    ids->push_back(dd.DeviceID);
-                    names->push_back(dd.DisplayName);
-                } else if (*match == dd.DeviceID)
-                    return i;
-            }
-        }
+#define prop_string_null prop_string_t(nullptr, CoTaskMemFree)
+prop_string_t GetDeviceId(Microsoft::WRL::ComPtr<IMMDevice> const& device) {
+  LPWSTR buffer = nullptr;
+  if SUCCEEDED(device->GetId(&buffer)) {
+    return prop_string_t(buffer, CoTaskMemFree);
+  }
+  return prop_string_null;
+}
+prop_string_t GetPropString(Microsoft::WRL::ComPtr<IPropertyStore> const& prop,
+                            PROPERTYKEY const& key) {
+  PROPVARIANT var;
+  ::PropVariantInit(&var);
+  if SUCCEEDED(prop->GetValue(key, &var)) {
+    LPWSTR str;
+    if SUCCEEDED(::PropVariantToStringAlloc(var, &str)) {
+      ::PropVariantClear(&var);
+      return prop_string_t(str, CoTaskMemFree);
     }
-
-    return -1;
+  }
+  ::PropVariantClear(&var);
+  return prop_string_null;
 }
 
-bool GetXA2Devices(wxArrayString& names, wxArrayString& ids)
+prop_string_t GetXA2Devices(IXAudio2* xa, wxArrayString* names, wxArrayString* ids,
+    const wxString* match)
+{
+    prop_string_t DeviceId = prop_string_null;
+
+    Microsoft::WRL::ComPtr<IMMDeviceEnumerator> deviceEnumerator;
+
+    if FAILED(::CoCreateInstance(__uuidof(MMDeviceEnumerator),
+                                      nullptr,
+                                      CLSCTX_INPROC_SERVER,
+                                      IID_PPV_ARGS(deviceEnumerator.ReleaseAndGetAddressOf())))
+    {
+        wxLogError(_("XAudio2: Enumerating devices failed! (Create Instance)"));
+        return prop_string_null;
+    }
+
+    Microsoft::WRL::ComPtr<IMMDeviceCollection> deviceCollection;
+    if (FAILED(deviceEnumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE,
+                                      deviceCollection.ReleaseAndGetAddressOf()))) {
+        wxLogError(_("XAudio2: Enumerating devices failed! (Device Enumerator)"));
+        return prop_string_null;
+    }
+
+    UINT32 dev_count = 0;
+    if (FAILED(deviceCollection->GetCount(&dev_count))) {
+        wxLogError(_("XAudio2: Enumerating devices failed! (GetCount)"));
+        return prop_string_null;
+    }
+
+    for (UINT32 i = 0; i < dev_count; i++) {
+        Microsoft::WRL::ComPtr<IMMDevice> dd;
+        if (FAILED(deviceCollection->Item(i, dd.ReleaseAndGetAddressOf()))) {
+            continue;
+        }
+        DeviceId = GetDeviceId(dd);
+
+        Microsoft::WRL::ComPtr<IPropertyStore> prop;
+        if (FAILED(dd->OpenPropertyStore(STGM_READ, prop.ReleaseAndGetAddressOf()))) {
+            continue;
+        }
+        auto FriendlyName = GetPropString(prop,PKEY_Device_FriendlyName);
+        if (FriendlyName == nullptr) {
+            continue;
+        }
+
+        if (ids && DeviceId != nullptr) {
+            ids->push_back(DeviceId.get());
+            names->push_back(FriendlyName.get());
+        }
+        else if (*match == DeviceId.get()) {
+            break;
+        }
+    } 
+    return DeviceId;
+}
+
+bool CouldGetXA2Devices(wxArrayString& names, wxArrayString& ids)
 {
     HRESULT hr;
     IXAudio2* xa = NULL;
@@ -74,13 +140,12 @@ bool GetXA2Devices(wxArrayString& names, wxArrayString& ids)
     return true;
 }
 
-static int XA2GetDev(IXAudio2* xa)
+static LPCWSTR XA2GetDev(IXAudio2* xa)
 {
     if (gopts.audio_dev.empty())
-        return 0;
+        return NULL;
     else {
-        int ret = GetXA2Devices(xa, NULL, NULL, &gopts.audio_dev);
-        return ret < 0 ? 0 : ret;
+        return GetXA2Devices(xa, NULL, NULL, &gopts.audio_dev).get();
     }
 }
 
@@ -375,7 +440,7 @@ bool XAudio2_Output::init(long sampleRate)
         &mVoice,
         XAUDIO2_DEFAULT_CHANNELS,
         XAUDIO2_DEFAULT_SAMPLERATE,
-        0,
+        NULL,
         XA2GetDev(xaud),
         NULL);
 
@@ -396,19 +461,40 @@ bool XAudio2_Output::init(long sampleRate)
 
     if (gopts.upmix) {
         // set up stereo upmixing
-        XAUDIO2_DEVICE_DETAILS dd;
-        ZeroMemory(&dd, sizeof(dd));
-        hr = xaud->GetDeviceDetails(0, &dd);
+        Microsoft::WRL::ComPtr<IMMDeviceEnumerator> deviceEnumerator;
+        Microsoft::WRL::ComPtr<IMMDevice> dd;
+        hr = ::CoCreateInstance(__uuidof(MMDeviceEnumerator),
+                                      nullptr,
+                                      CLSCTX_INPROC_SERVER,
+                                      IID_PPV_ARGS(deviceEnumerator.ReleaseAndGetAddressOf()));
+        if (hr != S_OK) {
+            wxLogError(_("XAudio2: Creating source voice failed! (Getting device enumerator)"));
+            return true;
+        }
+        hr = deviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, dd.ReleaseAndGetAddressOf());
+        if (hr != S_OK) {
+            wxLogError(_("XAudio2: Creating source voice failed! (Getting default audio endpoint)"));
+            return true;
+        }
+
+        Microsoft::WRL::ComPtr<IAudioEndpointVolume> channelVolume = NULL;
+        hr = dd->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_ALL, NULL, reinterpret_cast<void**>(channelVolume.ReleaseAndGetAddressOf()));
+        if (hr != S_OK) {
+            std::cout << "failed retrieving volume channels " << hr << std::endl;
+            return true;
+        }
+        UINT32 nChannels;
+        hr = channelVolume->GetChannelCount(&nChannels);
         assert(hr == S_OK);
         float* matrix = NULL;
-        matrix = (float*)malloc(sizeof(float) * 2 * dd.OutputFormat.Format.nChannels);
+        matrix = (float*)malloc(sizeof(float) * 2 * nChannels);
 
         if (matrix == NULL)
             return false;
 
         bool matrixAvailable = true;
 
-        switch (dd.OutputFormat.Format.nChannels) {
+        switch (nChannels) {
         case 4: // 4.0
             //Speaker \ Left Source           Right Source
             /*Front L*/ matrix[0] = 1.0000f;
@@ -495,7 +581,7 @@ bool XAudio2_Output::init(long sampleRate)
         }
 
         if (matrixAvailable) {
-            hr = sVoice->SetOutputMatrix(NULL, 2, dd.OutputFormat.Format.nChannels, matrix);
+            hr = sVoice->SetOutputMatrix(NULL, 2, nChannels, matrix);
             assert(hr == S_OK);
         }
 

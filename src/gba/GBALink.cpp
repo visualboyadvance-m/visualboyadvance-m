@@ -2850,9 +2850,10 @@ static void UpdateCableIPC(int ticks)
     if (!transfer_direction)
         return;
 
+    // IMPORTANT NOTE: transfer_direction is a bool so a lot of arithmetic here doesn'T make sense!
     if (transfer_direction <= linkmem->trgbas && linktime >= trtimedata[transfer_direction - 1][tspeed]) {
         // transfer #n -> wait for value n - 1
-        if (transfer_direction > 1 && linkid != transfer_direction - 1) {
+        if (transfer_direction > 1 && linkid != transfer_direction - 1) { // NOTE: transfer_direction is bool so transfer_direction > 1 is always false. 
             if (WaitForSingleObject(linksync[transfer_direction - 1], linktimeout) == WAIT_TIMEOUT) {
                 // assume slave has dropped off if timed out
                 if (!linkid) {

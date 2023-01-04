@@ -8,9 +8,11 @@ include(doctest)
 function(add_doctest_test test_src)
     string(REGEX REPLACE ".cpp$" "" test_name "${test_src}")
 
+    find_package(doctest CONFIG REQUIRED)
     add_executable("${test_name}" "${ARGV}")
 
     target_link_libraries("${test_name}" ${wxWidgets_LIBRARIES})
+    target_link_libraries("${test_name}" doctest::doctest)
 
     target_include_directories("${test_name}" PRIVATE ${wxWidgets_INCLUDE_DIRS})
 

@@ -1,15 +1,15 @@
-cmake_minimum_required(VERSION 3.7...3.25)
+cmake_minimum_required(VERSION 3.11...3.25) # GLVND was added in 3.10
 if(POLICY CMP0074)
-    cmake_policy(SET CMP0074 NEW) # use Package_ROOT if set
+    cmake_policy(SET CMP0074 NEW) # use Package_ROOT if set 3.12
 endif()
 if(POLICY CMP0077)
-    cmake_policy(SET CMP0077 NEW) # use vars for options
+    cmake_policy(SET CMP0077 NEW) # use vars for options 3.13
 endif()
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake")
 
 if(NOT DEFINED CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build Type" FORCE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build Type")
 elseif(NOT CMAKE_BUILD_TYPE MATCHES "^(Release|Debug|RelWithDebInfo|MinSizeRel)$")
     message(FATAL_ERROR "Invalid CMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}', must be one of: 'Release', 'Debug', 'RelWithDebInfo' or 'MinSizeRel'")
 endif()
@@ -26,64 +26,48 @@ if(TAG_RELEASE)
     include(MakeReleaseCommitAndTag)
 endif()
 
-set(VCPKG_DEPS          zlib SDL2 gettext wxWidgets)
-
-set(VCPKG_DEPS_OPTIONAL
-    SFML   ENABLE_LINK
-    ffmpeg ENABLE_FFMPEG
-)
-
+## Setup VCPKG
+if(ENABLE_LINK)
+    list(APPEND VCPKG_MANIFEST_FEATURES sfml)
+endif()
+if(ENABLE_FFMPEG)
+    list(APPEND VCPKG_MANIFEST_FEATURES ffmpeg)
+endif()
+if(ENABLE_NLS)
+    list(APPEND VCPKG_MANIFEST_FEATURES nls)
+endif()
+if(ENABLE_ONLINEUPDATES)
+    list(APPEND VCPKG_MANIFEST_FEATURES update)
+endif()
+set(VCPKG_INSTALL_OPTIONS --allow-unsupported)
+set(VCPKG_TARGET_TRIPLET x64-windows-static-md)
+#set(VCPKG_INSTALL_OPTIONS --no-print-usage)
 include(Set-Toolchain-vcpkg)
-
 set(VBAM_STATIC_DEFAULT OFF)
 if(VCPKG_TARGET_TRIPLET MATCHES "-static-?" OR CMAKE_TOOLCHAIN_FILE MATCHES "mxe|-static-?")
     set(VBAM_STATIC_DEFAULT ON)
 endif()
+####
 
-# Use ccache if available and not already enabled on the command line.
-# This has to be done before the project() call.
-
-if(NOT CMAKE_CXX_COMPILER_LAUNCHER)
-    find_program(CCACHE_EXECUTABLE ccache)
-    if(CCACHE_EXECUTABLE)
-        message(STATUS "Enabling ccache")
-
-        set(CMAKE_C_COMPILER_LAUNCHER        ${CCACHE_EXECUTABLE} CACHE STRING "C compiler launcher"     FORCE)
-        set(CMAKE_CXX_COMPILER_LAUNCHER      ${CCACHE_EXECUTABLE} CACHE STRING "C++ compiler launcher"   FORCE)
-        set(CMAKE_ASM_NASM_COMPILER_LAUNCHER ${CCACHE_EXECUTABLE} CACHE STRING "nasm assembler launcher" FORCE)
-    endif()
-endif()
+include(enable-ccache.cmake)
+include(VbamFunctions)
 
 project(VBA-M C CXX)
 
-if(NOT CMAKE_PREFIX_PATH AND (NOT ("$ENV{CMAKE_PREFIX_PATH}" STREQUAL "")))
-    set(CMAKE_PREFIX_PATH "$ENV{CMAKE_PREFIX_PATH}")
-endif()
+string(APPEND CMAKE_C_FLAGS_RELEASE " /Zi")
+string(APPEND CMAKE_CXX_FLAGS_RELEASE " /Zi")
+string(APPEND CMAKE_EXE_LINKER_FLAGS_RELEASE " /DEBUG")
 
 include(CTest)
-
 if(BUILD_TESTING)
     enable_testing()
 endif()
 
-set(ALL_TARGETS fex visualboyadvance-m vbamcore vbam)
-
 add_custom_target(generate)
 
 #Output all binaries at top level
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 
-option(ENABLE_SDL "Build the SDL port" ON)
-option(ENABLE_WX "Build the wxWidgets port" ON)
-option(ENABLE_DEBUGGER "Enable the debugger" ON)
-option(ENABLE_ASAN "Enable -fsanitize=<option>, address by default, requires debug build" OFF)
-
-# Default to static builds on MinGW and all MSYS2 envs.
-if(MINGW OR (NOT "$ENV{MSYSTEM_PREFIX}" STREQUAL ""))
-    set(VBAM_STATIC_DEFAULT ON)
-endif()
-
-option(VBAM_STATIC "Try to link all libraries statically" ${VBAM_STATIC_DEFAULT})
 
 if(VBAM_STATIC)
     set(SDL2_STATIC ON)
@@ -93,44 +77,22 @@ if(VBAM_STATIC)
     set(OPENAL_STATIC ON)
     set_property(GLOBAL PROPERTY LINK_SEARCH_START_STATIC ON)
     set_property(GLOBAL PROPERTY LINK_SEARCH_END_STATIC   ON)
-
-    if(MSVC)
-        set(CMAKE_FIND_LIBRARY_SUFFIXES .lib)
-    else()
-        list(INSERT CMAKE_FIND_LIBRARY_SUFFIXES 0 .a)
-    endif()
 endif()
 
-set(SSP_DEFAULT OFF)
-
-option(ENABLE_SSP "Enable gcc stack protector support" ${SSP_DEFAULT})
-
-set(ASM_DEFAULT OFF)
-
-include(Architecture)
-
-option(ENABLE_ASM "Enable x86 ASM related options" ${ASM_DEFAULT})
-
-# The ARM ASM core seems to be very buggy, see #98 and #54. Default to it being
-# OFF for the time being, until it is either fixed or replaced.
-option(ENABLE_ASM_CORE "Enable x86 ASM CPU cores" OFF)
-
-if(ENABLE_ASM_CORE)
-    message(WARNING "!!!!!! The x86 ASM cores are considered buggy and dangerous, use at your own risk. !!!!!!")
-endif()
-
-set(ASM_SCALERS_DEFAULT ${ENABLE_ASM})
-set(MMX_DEFAULT ${ENABLE_ASM})
-
-option(ENABLE_ASM_SCALERS "Enable x86 ASM graphic filters" ${ASM_SCALERS_DEFAULT})
-
-if(ENABLE_ASM_SCALERS)
-    option(ENABLE_MMX "Enable MMX" ${MMX_DEFAULT})
-endif()
-
+find_package(Git)
 find_package(PkgConfig)
 
-set(ENABLE_LINK_DEFAULT OFF)
+# Look for some dependencies using CMake scripts
+find_package(ZLIB REQUIRED)
+
+set(OpenGL_GL_PREFERENCE GLVND)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+    set(OpenGL_GL_PREFERENCE LEGACY)
+endif()
+
+find_package(OpenGL REQUIRED)
+find_package(SDL2   CONFIG REQUIRED)
 
 # msys2 does not have static sfml libs atm
 # while on mxe we use static libs
@@ -138,21 +100,12 @@ if(WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe) AND NO
     set(SFML_STATIC_LIBRARIES TRUE)
 endif()
 
-find_package(SFML 2.4 COMPONENTS network system)
-
-if(SFML_FOUND)
-    set(ENABLE_LINK_DEFAULT ON)
+if(ENABLE_LINK)
+    find_package(SFML 2.4 COMPONENTS network system CONFIG REQUIRED)
 endif()
-
-option(ENABLE_LINK "Enable GBA linking functionality" ${ENABLE_LINK_DEFAULT})
-
-option(ENABLE_LIRC "Enable LIRC support" OFF)
-
-set(FFMPEG_DEFAULT OFF)
 
 set(FFMPEG_COMPONENTS         AVCODEC            AVFORMAT            SWSCALE          AVUTIL            SWRESAMPLE)
 set(FFMPEG_COMPONENT_VERSIONS AVCODEC>=58.18.100 AVFORMAT>=58.12.100 SWSCALE>=5.1.100 AVUTIL>=56.14.100 SWRESAMPLE>=3.1.100)
-
 macro(check_ffmpeg_component_versions)
     # check versions, but only if pkgconfig is available
     if(FFMPEG_FOUND AND PKG_CONFIG_FOUND AND NOT CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
@@ -168,61 +121,22 @@ macro(check_ffmpeg_component_versions)
     endif()
 endmacro()
 
-if(NOT DEFINED ENABLE_FFMPEG OR ENABLE_FFMPEG)
-    set(FFMPEG_DEFAULT ON)
-
-    find_package(FFmpeg COMPONENTS ${FFMPEG_COMPONENTS})
+if(ENABLE_FFMPEG)
+    find_package(FFmpeg COMPONENTS ${FFMPEG_COMPONENTS} REQUIRED)
     check_ffmpeg_component_versions()
-
-    if(NOT FFMPEG_FOUND)
-        set(FFMPEG_DEFAULT OFF)
-    endif()
 endif()
 
-option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
-
-set(ONLINEUPDATES_DEFAULT OFF)
-
-if((WIN32 AND (X64 OR X86)) OR APPLE) # winsparkle/sparkle
-    set(ONLINEUPDATES_DEFAULT ON)
+include(options.cmake)
+include(Architecture)
+if(ENABLE_ASM_CORE)
+    message(WARNING "!!!!!! The x86 ASM cores are considered buggy and dangerous, use at your own risk. !!!!!!")
 endif()
 
-option(ENABLE_ONLINEUPDATES "Enable online update checks" ${ONLINEUPDATES_DEFAULT})
-option(HTTPS "Use https URL for winsparkle" ON)
 if(NOT HTTPS)
     add_definitions(-DNO_HTTPS)
 endif()
 
-set(LTO_DEFAULT ON)
 
-# gcc lto produces buggy binaries for 64 bit mingw
-# and we generally don't want it when debugging because it makes linking slow
-if(CMAKE_BUILD_TYPE STREQUAL Debug OR (WIN32 AND CMAKE_COMPILER_IS_GNUCXX))
-    set(LTO_DEFAULT OFF)
-endif()
-
-option(ENABLE_LTO "Compile with Link Time Optimization (gcc and clang only)" ${LTO_DEFAULT})
-
-find_package(Git)
-if(WIN32 OR CMAKE_TOOLCHAIN_FILE MATCHES "[Mm][Ii][Nn][Gg][Ww]")
-    # Win32 deps submodule
-    set(git_checkout FALSE)
-    find_package(Git REQUIRED)
-    if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
-        set(git_checkout TRUE)
-        execute_process(
-            COMMAND ${GIT_EXECUTABLE} submodule update --init --remote --recursive
-            RESULT_VARIABLE git_status
-            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-        )
-    endif()
-
-    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
-        if(NOT (git_checkout AND git_status EQUAL 0))
-            message(FATAL_ERROR "Please pull in git submodules, e.g.\nrun: git submodule update --init --remote --recursive")
-        endif()
-    endif()
-endif()
 
 if(MSVC)
     include_directories("${CMAKE_SOURCE_DIR}/dependencies/msvc")
@@ -235,7 +149,6 @@ if(MSVC AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     add_definitions(-DNO_XAUDIO2)
 endif()
 
-option(ENABLE_GBA_LOGGING "Enable extended GBA logging" ON)
 if(ENABLE_GBA_LOGGING)
     add_definitions(-DGBA_LOGGING )
 endif()
@@ -246,13 +159,6 @@ endif()
 # The SDL port can't be built without debugging support
 if(NOT ENABLE_DEBUGGER AND ENABLE_SDL)
     message(SEND_ERROR "The SDL port can't be built without debugging support")
-endif()
-
-# this has to run after the toolchain is initialized so it can't be in
-# Win32deps.cmake
-if(MINGW)
-    include_directories("${CMAKE_SOURCE_DIR}/dependencies/mingw-include")
-    include_directories("${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
 endif()
 
 if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
@@ -316,37 +222,7 @@ include_directories("${CMAKE_BINARY_DIR}")
 string(REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+).*" "\\1,\\2,\\3,0" WIN_VERSION "${VERSION}")
 configure_file("${CMAKE_SOURCE_DIR}/src/version.h.in" "${CMAKE_BINARY_DIR}/version.h" @ONLY)
 
-if(CMAKE_BUILD_TYPE STREQUAL Debug)
-    add_definitions(-DDEBUG)
-else()
-    add_definitions(-DNDEBUG)
-endif()
-
-# hack for ninja in msys2
-if(WIN32 AND CMAKE_GENERATOR STREQUAL Ninja AND NOT "$ENV{MSYSTEM_PREFIX}" STREQUAL "")
-    set(MSYS ON)
-endif()
-
-include(VbamFunctions)
-
-if(MSYS AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-    if($ENV{MSYSTEM} STREQUAL CLANG64)
-        cygpath(prefix "$ENV{MSYSTEM_PREFIX}/x86_64-w64-mingw32")
-        list(APPEND CMAKE_PREFIX_PATH "${prefix}")
-    elseif($ENV{MSYSTEM} STREQUAL CLANG32)
-        cygpath(prefix "$ENV{MSYSTEM_PREFIX}/i686-w64-mingw32")
-        list(APPEND CMAKE_PREFIX_PATH "${prefix}")
-    endif()
-
-    set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" CACHE INTERNAL "prefix search path for find_XXXX" FORCE)
-endif()
-
-# Add support for Homebrew, MacPorts and Fink on macOS
-option(DISABLE_MACOS_PACKAGE_MANAGERS "Set to TRUE to disable support for macOS Homebrew, MacPorts and Fink." FALSE)
-
-if(APPLE AND NOT DISABLE_MACOS_PACKAGE_MANAGERS)
-    include(MacPackageManagers)
-endif()
+add_definitions(-D$<$<NOT:$<CONFIG:DEBUG>>:N>DEBUG)
 
 # We do not support amd64 asm yet
 if(X86_64 AND (ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS OR ENABLE_MMX))
@@ -374,38 +250,17 @@ if(ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS)
     set(ASM_ENABLED ON)
 endif()
 
-# Look for some dependencies using CMake scripts
-find_package(ZLIB REQUIRED)
-
-set(OpenGL_GL_PREFERENCE GLVND)
-
-if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
-    set(OpenGL_GL_PREFERENCE LEGACY)
-endif()
-
-find_package(OpenGL REQUIRED)
-find_package(SDL2   REQUIRED)
-
-if(WIN32)
-    set(SDL2_LIBRARY ${SDL2_LIBRARY} setupapi winmm)
-endif()
-
 # set the standard libraries all ports use
-set(
-    VBAMCORE_LIBS
+set(VBAMCORE_LIBS
     vbamcore
     fex
-    ${SDL2_LIBRARY}
-    ${SFML_LIBRARIES}
-    ${OPENGL_LIBRARIES}
-    ${ZLIB_LIBRARY}
-)
+    $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+    sfml-system
+    sfml-network
+    OpenGL::GL
+    ZLIB::ZLIB)
 
 if(ENABLE_FFMPEG)
-    if(NOT FFMPEG_LIBRARIES)
-        message(FATAL_ERROR "ENABLE_FFMPEG was specified, but required versions of ffmpeg libraries cannot be found!")
-    endif()
-
     if(APPLE)
         set(FFMPEG_LDFLAGS ${FFMPEG_LDFLAGS} -framework CoreText -framework ApplicationServices)
     elseif(WIN32)
@@ -495,328 +350,28 @@ if(NOT ENABLE_ASM_CORE)
     add_definitions(-DC_CORE)
 endif()
 
-set(NLS_DEFAULT ON)
-
-option(ENABLE_NLS "Enable translations" ${NLS_DEFAULT})
-
 # Enable internationalization
 if(ENABLE_NLS)
     set(LOCALEDIR ${CMAKE_INSTALL_PREFIX}/share/locale)
     add_definitions(-DENABLE_NLS)
     add_definitions(-DLOCALEDIR="${LOCALEDIR}")
     # for now, only GBALink.cpp uses gettext() directly
-    if(APPLE)
-        # use Homebrew gettext if available
-        if(EXISTS "/usr/local/opt/gettext")
-            set(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH};/usr/local/opt/gettext/include")
-            set(CMAKE_LIBRARY_PATH "${CMAKE_LIBRARY_PATH};/usr/local/opt/gettext/lib")
-            set(CMAKE_PROGRAM_PATH "${CMAKE_PROGRAM_PATH};/usr/local/opt/gettext/bin")
-        endif()
-    endif()
     if(ENABLE_LINK OR ENABLE_WX)
-        find_path(LIBINTL_INC libintl.h)
-        find_library(LIBINTL_LIB    NAMES libintl    intl)
-        find_library(LIBICONV_LIB   NAMES libiconv   iconv)
-        find_library(LIBCHARSET_LIB NAMES libcharset charset)
-        if(LIBINTL_LIB)
-            list(APPEND CMAKE_REQUIRED_LIBRARIES ${LIBINTL_LIB})
-            list(APPEND VBAMCORE_LIBS            ${LIBINTL_LIB})
+        find_package(Intl REQUIRED)
+        find_package(Iconv REQUIRED)
+        if(NOT Intl_IS_BUILT_IN)
+            list(APPEND CMAKE_REQUIRED_LIBRARIES ${Intl_LIBRARIES})
+            list(APPEND VBAMCORE_LIBS            ${Intl_LIBRARIES})
         endif()
-        if(LIBICONV_LIB)
-            list(APPEND CMAKE_REQUIRED_LIBRARIES ${LIBICONV_LIB})
-            list(APPEND VBAMCORE_LIBS            ${LIBICONV_LIB})
+        if(Iconv_FOUND)
+            list(APPEND CMAKE_REQUIRED_LIBRARIES ${Iconv_LIBRARIES})
+            list(APPEND VBAMCORE_LIBS            ${Iconv_LIBRARIES})
         endif()
-        if(LIBCHARSET_LIB)
-            list(APPEND CMAKE_REQUIRED_LIBRARIES ${LIBCHARSET_LIB})
-            list(APPEND VBAMCORE_LIBS            ${LIBCHARSET_LIB})
-        endif()
-        include(CheckFunctionExists)
-        check_function_exists(gettext GETTEXT_FN)
-        if(NOT (LIBINTL_INC OR GETTEXT_FN))
-            message(FATAL_ERROR "NLS requires libintl/gettext")
-        endif()
-        include_directories(${LIBINTL_INC})
+        include_directories(${Intl_INCLUDE_DIRS})
     endif()
 endif()
 
-include(ProcessorCount)
-ProcessorCount(num_cpus)
-
-# Compiler stuff
-
-option(UPSTREAM_RELEASE "do some optimizations and release automation tasks" OFF)
-
-include(SetCompilerLinkerFlags)
-
-if(CMAKE_C_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_ID STREQUAL Clang AND NOT MSVC)
-    # TODO: This should also be done for clang-cl.
-    include(LLVMToolchain)
-endif()
-
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang AND NOT MSVC)
-    unset(LTO_FLAGS)
-    if(ENABLE_LTO)
-        if(CMAKE_COMPILER_IS_GNUCXX)
-            if(num_cpus GREATER 1)
-                set(LTO_FLAGS -flto=${num_cpus} -ffat-lto-objects)
-            else()
-                set(LTO_FLAGS -flto -ffat-lto-objects)
-            endif()
-        else()
-            set(LTO_FLAGS -flto)
-        endif()
-
-        # check that LTO is not broken before enabling it
-        set(ORIG_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
-        set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${LTO_FLAGS}")
-
-        include(CheckCXXSourceCompiles)
-        check_cxx_source_compiles("int main(int argc, char** argv) { return 0; }" LTO_WORKS)
-
-        set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
-
-        if(NOT LTO_WORKS)
-            message(WARNING "LTO does not seem to be working on your system, if using clang make sure LLVMGold is installed")
-            unset(LTO_FLAGS)
-            set(ENABLE_LTO OFF)
-        endif()
-    endif()
-
-    unset(MY_C_OPT_FLAGS)
-
-    if(X86_32 OR X86_64)
-        set(MY_C_OPT_FLAGS -mfpmath=sse -msse2)
-    endif()
-
-    # common optimization flags
-    if(NOT (APPLE AND CMAKE_CXX_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.3))
-        set(MY_C_OPT_FLAGS ${MY_C_OPT_FLAGS} -Ofast -fomit-frame-pointer ${LTO_FLAGS})
-    else()
-        # LTO and -fomit-frame-pointer generate broken binaries on Lion with XCode 4.2 tools
-        set(MY_C_OPT_FLAGS ${MY_C_OPT_FLAGS} -Ofast)
-    endif()
-
-    # Common flags.
-    set(MY_C_FLAGS -pipe -Wno-unused-command-line-argument -Wformat -Wformat-security -feliminate-unused-debug-types)
-
-    include(CheckCXXCompilerFlag)
-
-    # Require and optimize for Core2 level support, tune for generic.
-    if(X86_64)
-        set(MY_C_FLAGS ${MY_C_FLAGS} -march=core2 -mtune=generic)
-    # Optimize for pentium-mmx and tune for generic for older XP builds.
-    elseif(X86_32)
-        set(MY_C_FLAGS ${MY_C_FLAGS} -march=pentium-mmx -mtune=generic)
-    endif()
-
-    # Check for -fopenmp=libomp on clang.
-    #    if(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-    #        check_cxx_compiler_flag("-fopenmp=libomp" FOPENMP_LIBOMP_FLAG)
-    #        if(FOPENMP_LIBOMP_FLAG)
-    #            set(MY_C_FLAGS ${MY_C_FLAGS} -fopenmp=libomp)
-    #        endif()
-    #    endif()
-
-    # common debug flags
-    if(CMAKE_COMPILER_IS_GNUCXX)
-        set(MY_C_DBG_FLAGS -ggdb3 -Og -fno-omit-frame-pointer)
-    else()
-        set(MY_C_DBG_FLAGS -g -fno-omit-frame-pointer)
-    endif()
-
-    if(ENABLE_ASAN)
-        string(TOLOWER ${CMAKE_BUILD_TYPE} build)
-        if(NOT build STREQUAL "debug")
-            message(FATAL_ERROR "asan requires debug build, set -DCMAKE_BUILD_TYPE=Debug")
-        endif()
-
-        string(TOLOWER ${ENABLE_ASAN} SANITIZER)
-        if(SANITIZER STREQUAL "on" OR SANITIZER STREQUAL "true")
-            set(SANITIZER address)
-        endif()
-        list(PREPEND CMAKE_REQUIRED_LIBRARIES -fsanitize=${SANITIZER})
-        check_cxx_compiler_flag("-fsanitize=${SANITIZER}" ASAN_SUPPORT_FLAG)
-        if(${ASAN_SUPPORT_FLAG})
-            list(PREPEND MY_C_DBG_FLAGS -fsanitize=${SANITIZER})
-        else()
-            message(FATAL_ERROR "asan not available to compiler.")
-        endif()
-    endif()
-
-    if(ENABLE_SSP AND CMAKE_BUILD_TYPE STREQUAL Debug)
-        if(WIN32)
-            set(SSP_STATIC ON)
-        endif()
-
-        find_package(SSP)
-
-        if(SSP_LIBRARY)
-            list(APPEND MY_C_FLAGS        -D_FORTIFY_SOURCE=2)
-            list(APPEND MY_C_LINKER_FLAGS ${SSP_LIBRARY})
-        endif()
-    endif()
-
-    if(NOT (WIN32 OR X86_32)) # inline asm is not allowed with -fPIC
-        set(MY_C_FLAGS ${MY_C_FLAGS} -fPIC)
-    endif()
-
-    # check if ssp flags are supported for this version of gcc
-    if(CMAKE_COMPILER_IS_GNUCXX)
-        if(ENABLE_SSP)
-            check_cxx_compiler_flag(-fstack-protector-strong  F_STACK_PROTECTOR_STRONG_FLAG)
-
-            if(F_STACK_PROTECTOR_STRONG_FLAG)
-                set(MY_C_FLAGS ${MY_C_FLAGS} -fstack-protector-strong)
-
-                check_cxx_compiler_flag("--param ssp-buffer-size=4" SSP_BUFFER_SIZE_FLAG)
-
-                if(SSP_BUFFER_SIZE_FLAG)
-                    # we do not add it to MY_C_FLAGS because this breaks things like CMAKE_REQUIRED_LIBRARIES
-                    # which misinterpret compiler flags without leading dashes
-                    add_compile_options(--param ssp-buffer-size=4)
-                endif()
-            endif()
-        endif()
-
-        set(MY_C_FLAGS ${MY_C_FLAGS} -fopenmp)
-    endif()
-
-    if(CMAKE_CXX_COMPILER_ID STREQUAL GNU)
-        unset(COMPILER_COLOR_DIAGNOSTICS)
-        check_cxx_compiler_flag(-fdiagnostics-color=always COMPILER_COLOR_DIAGNOSTICS)
-        if(COMPILER_COLOR_DIAGNOSTICS)
-            add_compile_options(-fdiagnostics-color=always)
-        else()
-            unset(COMPILER_COLOR_DIAGNOSTICS)
-            check_cxx_compiler_flag(-fdiagnostics-color COMPILER_COLOR_DIAGNOSTICS)
-            if(COMPILER_COLOR_DIAGNOSTICS)
-                add_compile_options(-fdiagnostics-color)
-            endif()
-        endif()
-    elseif(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-        unset(COMPILER_COLOR_DIAGNOSTICS)
-        check_cxx_compiler_flag(-fcolor-diagnostics COMPILER_COLOR_DIAGNOSTICS)
-        if(COMPILER_COLOR_DIAGNOSTICS)
-            add_compile_options(-fcolor-diagnostics)
-        endif()
-    endif()
-
-    if(MINGW)
-        set(MY_C_FLAGS ${MY_C_FLAGS} -static-libgcc -static-libstdc++)
-    endif()
-
-    if(CMAKE_BUILD_TYPE STREQUAL Debug)
-        set(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_DBG_FLAGS} -Wall -Wextra)
-    else()
-        set(MY_C_FLAGS   ${MY_C_FLAGS}   ${MY_C_OPT_FLAGS} -Wno-error)
-    endif()
-
-    # for some reason this is necessary
-    if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
-        set(MY_C_FLAGS -I/usr/local/include ${MY_C_FLAGS})
-    endif()
-
-    foreach(C_COMPILE_FLAG ${MY_C_FLAGS})
-        add_compile_options(${C_COMPILE_FLAG})
-    endforeach()
-
-    include(CheckCXXCompilerFlag)
-
-    check_cxx_compiler_flag(-std=gnu++17 GNUPP17_FLAG)
-
-    if(NOT GNUPP17_FLAG)
-        message(FATAL_ERROR "Your compiler does not support -std=gnu++17.")
-    endif()
-
-    set(MY_CXX_FLAGS -std=gnu++17 -fexceptions)
-
-    foreach(ARG ${MY_CXX_FLAGS})
-        set(MY_CXX_FLAGS_STR "${MY_CXX_FLAGS_STR} ${ARG}")
-    endforeach()
-
-    # These must be set for C++ only, and we can't use generator expressions in
-    # ADD_COMPILE_OPTIONS because that's a cmake 3.3 feature and we need 2.8.12
-    # compat for Ubuntu 14.
-    string(REGEX REPLACE "<FLAGS>" "<FLAGS> ${MY_CXX_FLAGS_STR} " CMAKE_CXX_COMPILE_OBJECT ${CMAKE_CXX_COMPILE_OBJECT})
-
-    foreach(ARG ${MY_C_FLAGS})
-        set(MY_C_FLAGS_STR "${MY_C_FLAGS_STR} ${ARG}")
-    endforeach()
-
-    # need all flags for linking, because of -flto etc.
-    set(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${MY_C_FLAGS_STR}")
-    set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${MY_C_FLAGS_STR}")
-
-    # for the gcc -fstack-protector* flags we need libssp
-    # we also have to use the gcc- binutils for LTO to work
-    if(CMAKE_COMPILER_IS_GNUCXX)
-        if(ENABLE_LTO)
-            include(UseGCCBinUtilsWrappers)
-        endif()
-
-        set(MY_C_LINKER_FLAGS ${MY_C_LINKER_FLAGS} -Wl,-allow-multiple-definition)
-
-        if(CMAKE_PREFIX_PATH)
-            list(GET CMAKE_PREFIX_PATH 0 prefix_path_first)
-            set(MY_C_LINKER_FLAGS ${MY_C_LINKER_FLAGS} "-Wl,-rpath-link=${prefix_path_first}/lib")
-        endif()
-    endif()
-
-    # set linker flags
-    foreach(ARG ${MY_C_LINKER_FLAGS})
-        set(MY_C_LINKER_FLAGS_STR "${MY_C_LINKER_FLAGS_STR} ${ARG}")
-    endforeach()
-
-    set(CMAKE_C_LINK_EXECUTABLE   "${CMAKE_C_LINK_EXECUTABLE}   ${MY_C_LINKER_FLAGS_STR}")
-    set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} ${MY_C_LINKER_FLAGS_STR}")
-elseif(MSVC)
-    # first remove all warnings flags, otherwise there is a warning about overriding them
-    string(REGEX REPLACE "/[Ww][^ ]+" "" CMAKE_C_FLAGS   ${CMAKE_C_FLAGS})
-    string(REGEX REPLACE "/[Ww][^ ]+" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-
-    add_compiler_flags(/std:c++17 -D__STDC_LIMIT_MACROS /fp:fast /Oi)
-
-    if(VBAM_STATIC)
-        set(runtime "/MT")
-        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:DEBUG>:Debug>" CACHE INTERNAL "")
-    else()
-        set(runtime "/MD")
-        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:DEBUG>:Debug>DLL" CACHE INTERNAL "")
-    endif()
-
-    if(CMAKE_BUILD_TYPE STREQUAL Debug)
-        set(runtime "${runtime}d")
-
-        add_compiler_flags(${runtime} /ZI /W4 /Ob0 /Od /RTC1 /DDEBUG /EHsc)
-    else()
-        add_compiler_flags(/w /DNDEBUG /EHsc)
-
-        if(CMAKE_BUILD_TYPE STREQUAL Release)
-            if(X86_32)
-                add_compiler_flags(${runtime} /O2 /Ob3)
-            else()
-                add_compiler_flags(${runtime} /O2 /Ob3)
-            endif()
-        elseif(CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo)
-            add_compiler_flags(${runtime} /Zi /Ob1)
-        elseif(CMAKE_BUILD_TYPE STREQUAL MinSizeRel)
-            add_compiler_flags(${runtime} /O1 /Ob1)
-        else()
-            message(FATAL_ERROR "Unknown CMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}'")
-        endif()
-
-        if(ENABLE_LTO)
-            add_compiler_flags(/GL)
-            add_linker_flags(/LTCG)
-        endif()
-    endif()
-endif()
-
-# Assembler flags
-
-if(ASM_ENABLED)
-    string(REGEX REPLACE "<FLAGS>" "-I${CMAKE_SOURCE_DIR}/src/filters/hq/asm/ -O1 -w-orphan-labels" CMAKE_ASM_NASM_COMPILE_OBJECT ${CMAKE_ASM_NASM_COMPILE_OBJECT})
-endif()
+include("${CMAKE_CURRENT_SOURCE_DIR}/Flags.cmake")
 
 if(APPLE)
     add_definitions(-DMACHO)
@@ -1088,18 +643,11 @@ if(ENABLE_DEBUGGER)
     )
 endif()
 
-set(
-    HDR_STB_IMAGE
-    third_party/include/stb/stb_image.h
-    third_party/include/stb/stb_image_write.h
-)
+find_path(STB_INCLUDE_DIRS "stb_c_lexer.h")
+
 
 include_directories(
-    ${ZLIB_INCLUDE_DIR}
     fex
-    ${SDL2_INCLUDE_DIR}
-    third_party/include
-    third_party/include/stb
 )
 
 if(ENABLE_FFMPEG)
@@ -1125,12 +673,16 @@ if(NOT TRANSLATIONS_ONLY)
         ${HDR_FILTERS}
         ${SRC_DEBUGGER}
         ${HDR_DEBUGGER}
-        ${HDR_STB_IMAGE}
     )
+    target_include_directories(vbamcore PUBLIC ${STB_INCLUDE_DIRS})
+    if(MSVC)
+        target_include_directories(vbamcore PUBLIC msvc)
+    endif()
     add_dependencies(vbamcore generate)
-    set_property(TARGET vbamcore PROPERTY CXX_STANDARD 17)
-    set_property(TARGET vbamcore PROPERTY CXX_STANDARD_REQUIRED ON)
+    target_compile_features(vbamcore PUBLIC cxx_std_17)
     target_link_libraries(vbamcore PUBLIC "${GETOPT_LIB}")
+    target_link_libraries(vbamcore PUBLIC "$<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>")
+    target_link_libraries(vbamcore PUBLIC "sfml-network")
 endif()
 
 if((NOT TRANSLATIONS_ONLY) AND ENABLE_SDL)
@@ -1140,16 +692,10 @@ if((NOT TRANSLATIONS_ONLY) AND ENABLE_SDL)
         ${SRC_SDL}
         ${HDR_SDL}
     )
-    set_property(TARGET vbam PROPERTY CXX_STANDARD 17)
-    set_property(TARGET vbam PROPERTY CXX_STANDARD_REQUIRED ON)
+    target_compile_features(vbamcore PUBLIC cxx_std_17)
 
     if(WIN32)
         set(WIN32_LIBRARIES wsock32 ws2_32 winmm version imm32)
-    endif()
-
-    if(MSVC)
-        # the debug lib libcmtd is linked in debug mode, so don't link the normal version
-        set_target_properties(vbam PROPERTIES LINK_FLAGS_DEBUG "/nodefaultlib:libcmt")
     endif()
 
     if(ENABLE_LIRC)
@@ -1164,7 +710,7 @@ if((NOT TRANSLATIONS_ONLY) AND ENABLE_SDL)
     )
 
     if(WIN32)
-        target_link_libraries(vbam ${SDL2MAIN_LIBRARY})
+        target_link_libraries(vbam SDL2::SDL2main)
     endif()
 
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vbam${CMAKE_EXECUTABLE_SUFFIX} DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
@@ -1194,15 +740,15 @@ if(ENABLE_WX)
         add_subdirectory(po)
     endif()
 endif()
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/vba-over.ini DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/vbam)
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/vba-over.ini" DESTINATION "${CMAKE_INSTALL_FULL_DATADIR}/vbam")
 
 # manual pages
 if(UNIX)
     if(ENABLE_SDL)
-        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/debian/vbam.6 DESTINATION ${CMAKE_INSTALL_FULL_MANDIR}/man6)
+        install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/debian/vbam.6" DESTINATION "${CMAKE_INSTALL_FULL_MANDIR}/man6")
     endif()
     if(ENABLE_WX)
-        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/debian/visualboyadvance-m.6 DESTINATION ${CMAKE_INSTALL_FULL_MANDIR}/man6)
+        install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/debian/visualboyadvance-m.6" DESTINATION "${CMAKE_INSTALL_FULL_MANDIR}/man6")
     endif()
 endif()
 

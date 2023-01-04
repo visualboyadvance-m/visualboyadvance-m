@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-02 22:20+0000\n"
+"POT-Creation-Date: 2023-01-04 12:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -569,7 +569,7 @@ msgstr ""
 msgid "ROM+HuC-1"
 msgstr ""
 
-#: cmdevents.cpp:775 dialogs/display-config.cpp:343 xrc/DisplayConfig.xrc:85
+#: cmdevents.cpp:775 dialogs/display-config.cpp:347 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
@@ -1583,22 +1583,22 @@ msgstr ""
 msgid "Invalid value %d for option %s; valid values are %s"
 msgstr ""
 
-#: dialogs/display-config.cpp:374
+#: dialogs/display-config.cpp:378
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr ""
 
-#: dialogs/display-config.cpp:406 dialogs/display-config.cpp:448
+#: dialogs/display-config.cpp:410 dialogs/display-config.cpp:452
 #: xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr ""
 
-#: dialogs/display-config.cpp:413
+#: dialogs/display-config.cpp:417
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr ""
 
-#: dialogs/display-config.cpp:420
+#: dialogs/display-config.cpp:424
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr ""
@@ -1657,20 +1657,36 @@ msgstr ""
 msgid "Disconnected %s"
 msgstr ""
 
-#: xaudio2.cpp:34
-msgid "XAudio2: Enumerating devices failed!"
+#: xaudio2.cpp:79
+msgid "XAudio2: Enumerating devices failed! (Create Instance)"
 msgstr ""
 
-#: xaudio2.cpp:68 xaudio2.cpp:352
+#: xaudio2.cpp:86
+msgid "XAudio2: Enumerating devices failed! (Device Enumerator)"
+msgstr ""
+
+#: xaudio2.cpp:92
+msgid "XAudio2: Enumerating devices failed! (GetCount)"
+msgstr ""
+
+#: xaudio2.cpp:134 xaudio2.cpp:417
 msgid "The XAudio2 interface failed to initialize!"
 msgstr ""
 
-#: xaudio2.cpp:383
+#: xaudio2.cpp:448
 msgid "XAudio2: Creating mastering voice failed!"
 msgstr ""
 
-#: xaudio2.cpp:392
+#: xaudio2.cpp:457
 msgid "XAudio2: Creating source voice failed!"
+msgstr ""
+
+#: xaudio2.cpp:471
+msgid "XAudio2: Creating source voice failed! (Getting device enumerator)"
+msgstr ""
+
+#: xaudio2.cpp:476
+msgid "XAudio2: Creating source voice failed! (Getting default audio endpoint)"
 msgstr ""
 
 #: faudio.cpp:31

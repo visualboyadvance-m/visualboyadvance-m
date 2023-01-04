@@ -712,7 +712,7 @@ extern bool GetDSDevices(wxArrayString& names, wxArrayString& ids);
 
 #ifndef NO_XAUDIO2
 extern SoundDriver* newXAudio2_Output();
-extern bool GetXA2Devices(wxArrayString& names, wxArrayString& ids);
+extern bool CouldGetXA2Devices(wxArrayString& names, wxArrayString& ids);
 #endif
 
 #ifndef NO_FAUDIO

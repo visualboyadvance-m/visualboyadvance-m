@@ -1,5 +1,6 @@
 file(GLOB po_files "${CMAKE_CURRENT_SOURCE_DIR}/*.po")
 
+find_package(Gettext REQUIRED)
 gettext_create_translations(
 	wxvbam.pot
         ${po_files}
