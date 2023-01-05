@@ -6,15 +6,16 @@
         { "name": "gettext", "host": true, "features": ["tools"] },
         "getopt",
         "sfml",
-        { "name": "ffmpeg", "features": [ "avcodec", "avformat","swscale", "swresample"] },
+        { "name": "ffmpeg", "features": [ "avcodec", "avformat","swscale", "swresample","zlib", "opengl", "iconv"] },
         { "name": "pkgconf", "host": true },
-        "sdl2",
+        { "name": "sdl2" },
         { "name": "wxwidgets", "features": [ "sound", "fonts"] },
         "stb",
         "doctest",
         { "name": "winsparkle", "platform": "windows" },
-        "xaudio2redist"
+        "xaudio2redist",
+        "optional-lite",
+        "variant-lite"
   ],
-  "builtin-baseline": "0f719b3fdfc36f8dd45229370a0df180fdbf68f6"
-
+  "$builtin-baseline": "0f719b3fdfc36f8dd45229370a0df180fdbf68f6"
 }

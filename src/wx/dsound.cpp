@@ -10,6 +10,8 @@
 
 // DirectSound8
 #define DIRECTSOUND_VERSION 0x0800
+#include <mmeapi.h>
+#include <uuids.h>
 #include <dsound.h>
 
 extern bool soundBufferLow;

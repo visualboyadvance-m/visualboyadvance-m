@@ -139,11 +139,11 @@ set(
 # wxrc does not support xrs files in -c output (> 10x compression)
 # we do it using the bin2c.c utility
 
-find_program(BIN2C NAMES bin2c PATHS "${CMAKE_BINARY_DIR}")
+#find_program(BIN2C NAMES bin2c PATHS "${CMAKE_BINARY_DIR}") # conflicts with bin2c in the CUDA toolkit
 if(NOT BIN2C)
     include(HostCompile)
-    host_compile(${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c ${BIN2C})
     set(BIN2C bin2c)
+    host_compile("${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c" "${BIN2C}")
 endif()
 
 if(CMAKE_HOST_WIN32 AND CMAKE_CROSSCOMPILING)
