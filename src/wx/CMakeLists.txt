@@ -555,12 +555,14 @@ if(ENABLE_NLS)
         # Add nuget package source.
         execute_process(
             COMMAND nuget sources add -Name "NuGet official package source" -Source "https://api.nuget.org/v3/index.json"
+            OUTPUT_QUIET
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
         # Install the Gettext.Tools package.
         execute_process(
             COMMAND nuget.exe install Gettext.Tools -OutputDirectory ${CMAKE_BINARY_DIR}/nuget
+            OUTPUT_QUIET
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
@@ -778,8 +780,6 @@ set(
 
 set(ALL_SRC_WX ${SRC_WX})
 
-list(APPEND ALL_SRC_WX ${CMAKE_CURRENT_SOURCE_DIR}/macsupport.mm)
-list(APPEND ALL_SRC_WX ${CMAKE_CURRENT_SOURCE_DIR}/widgets/dpi-support-mac.mm)
 list(APPEND ALL_SRC_WX ${CMAKE_CURRENT_SOURCE_DIR}/widgets/dpi-support.cpp)
 
 if(APPLE)
@@ -845,7 +845,6 @@ endif()
 # make files included for gettext pot generation
 list(APPEND ALL_HDR_WX autoupdater/autoupdater.h)
 list(APPEND ALL_SRC_WX autoupdater/macos/autoupdater.cpp)
-list(APPEND ALL_SRC_WX autoupdater/macos/sparkle-wrapper.mm)
 list(APPEND ALL_HDR_WX autoupdater/macos/sparkle-wrapper.h)
 
 if(APPLE AND ENABLE_ONLINEUPDATES)
