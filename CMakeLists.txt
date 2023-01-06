@@ -814,7 +814,9 @@ elseif(MSVC)
 
         add_compiler_flags(${runtime} /ZI /W4 /Ob0 /Od /RTC1 /DDEBUG /EHsc)
     else()
-        add_compiler_flags(/w /DNDEBUG /EHsc)
+        # Enable severe warnings for release builds, but suppress macro
+        # redefinition warnings.
+        add_compiler_flags(/W1 /wd4005 /DNDEBUG /EHsc)
 
         if(CMAKE_BUILD_TYPE STREQUAL Release)
             if(X86_32)
