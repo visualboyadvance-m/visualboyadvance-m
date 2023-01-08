@@ -1386,6 +1386,8 @@ EVT_HANDLER_MASK(RecordMovieStartRecording, "Start game recording...", CMDEN_NGR
             extno++;
         }
 
+        mov_exts.append(wxALL_FILES);
+
         if (mov_extno < 0)
             mov_extno = extno;
     }
@@ -1449,6 +1451,8 @@ EVT_HANDLER_MASK(PlayMovieStartPlaying, "Start playing movie...", CMDEN_NGREC | 
             mov_exts.append(wxT('|'));
             extno++;
         }
+
+        mov_exts.append(wxALL_FILES);
 
         if (mov_extno < 0)
             mov_extno = extno;
