@@ -23,8 +23,9 @@ extern bool cpuSramEnabled;
 extern bool cpuFlashEnabled;
 extern bool cpuEEPROMEnabled;
 extern bool cpuEEPROMSensorEnabled;
-extern bool cpuDmaHack;
+extern bool cpuDmaRunning;
 extern uint32_t cpuDmaLast;
+extern uint32_t cpuDmaPC;
 extern bool timer0On;
 extern int timer0Ticks;
 extern int timer0ClockReload;
@@ -165,7 +166,7 @@ static inline uint32_t CPUReadMemory(uint32_t address)
                 armMode ? armNextPC - 4 : armNextPC - 2);
         }
 #endif
-        if (cpuDmaHack) {
+        if (cpuDmaRunning || ((reg[15].I - cpuDmaPC) == (armState ? 4 : 2))) {
             value = cpuDmaLast;
         } else {
             if (armState) {
@@ -308,7 +309,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
 	/* fallthrough */
     default:
     unreadable:
-        if (cpuDmaHack) {
+        if (cpuDmaRunning|| ((reg[15].I - cpuDmaPC) == (armState ? 4 : 2))) {
             value = cpuDmaLast & 0xFFFF;
         } else {
             int param = reg[15].I;
@@ -441,7 +442,7 @@ static inline uint8_t CPUReadByte(uint32_t address)
                 armMode ? armNextPC - 4 : armNextPC - 2);
         }
 #endif
-        if (cpuDmaHack) {
+        if (cpuDmaRunning || ((reg[15].I - cpuDmaPC) == (armState ? 4 : 2))) {
             return cpuDmaLast & 0xFF;
         } else {
             if (armState) {
