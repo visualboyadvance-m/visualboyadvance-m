@@ -821,31 +821,31 @@ msgstr "Helyi módban hálózat nem támogatott."
 
 #: extra-translations.cpp:12
 msgid "&Apply"
-msgstr ""
+msgstr "&Alkalmaz"
 
 #: extra-translations.cpp:13
 msgid "Artists"
-msgstr ""
+msgstr "Művészek"
 
 #: extra-translations.cpp:14
 msgid "Cancel"
-msgstr ""
+msgstr "Mégse"
 
 #: extra-translations.cpp:15
 msgid "Close"
-msgstr ""
+msgstr "Bezár"
 
 #: extra-translations.cpp:16
 msgid "Developers"
-msgstr ""
+msgstr "Fejlesztők"
 
 #: extra-translations.cpp:17
 msgid "License"
-msgstr ""
+msgstr "Licenc"
 
 #: extra-translations.cpp:18
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: opts.cpp:543 opts.cpp:564 opts.cpp:769
 #, c-format
@@ -2874,7 +2874,7 @@ msgstr "Gyorsí&tás"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "percent of normal:"
-msgstr ""
+msgstr "százaléka a normálnak:"
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"

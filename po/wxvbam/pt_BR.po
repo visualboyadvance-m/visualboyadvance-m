@@ -116,7 +116,7 @@ msgstr "Gravou o arquivo de substituição embutido em %s\nPra substituir apague
 msgid ""
 "\n"
 "\tbuilt-in"
-msgstr "\n\tembutido"
+msgstr "\n\tEmbutido"
 
 #: wxvbam.cpp:671
 msgid ""
@@ -138,7 +138,7 @@ msgstr "Arquivo de configuração não encontrado."
 
 #: wxvbam.cpp:723
 msgid "Bad configuration option or multiple ROM files given:\n"
-msgstr "Opção ruim da configuração ou múltiplos arquivos de ROMs dados:\n"
+msgstr "Opção ruim da configuração ou múltiplos arquivos de ROMs fornecidos:\n"
 
 #: guiinit.cpp:85
 msgid "Start!"
@@ -310,12 +310,12 @@ msgstr "O painel de exibição principal não foi encontrado"
 #: guiinit.cpp:2768
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
-msgstr "Acelerador do menu duplicado: %s pra %s e %s; mantendo o primeiro"
+msgstr "Acelerador do menu duplicado: %s pro %s e %s; mantendo o primeiro"
 
 #: guiinit.cpp:2782
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
-msgstr "Acelerador do menu %s pra %s substitui o padrão pra %s ; mantendo o menu"
+msgstr "Acelerador do menu %s pro %s substitui o padrão pra %s ; mantendo o menu"
 
 #: guiinit.cpp:2922
 #, c-format
@@ -758,7 +758,7 @@ msgstr "Arquivos dos jogos salvos do Visual Boy Advance|*.sgm"
 #: cmdevents.cpp:1910 cmdevents.cpp:1920 cmdevents.cpp:1931
 #, c-format
 msgid "Current state slot #%d"
-msgstr "Slot do estado atual #%d"
+msgstr "Slot do state atual #%d"
 
 #: cmdevents.cpp:2001
 msgid "Cannot use Colorizer Hack when GB BIOS File is enabled."
@@ -816,7 +816,7 @@ msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 Time de desenvolvimento do VBA\nCopyright (C) 2007-2022 Time de desenvolvimento do VBA-M"
+msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 Time de desenvolvimento do VBA\nCopyright (C) 2007-2023 Time de desenvolvimento do VBA-M"
 
 #: cmdevents.cpp:2914
 msgid ""
@@ -877,7 +877,7 @@ msgstr "Ok"
 #: opts.cpp:543 opts.cpp:564 opts.cpp:769
 #, c-format
 msgid "Invalid key binding %s for %s"
-msgstr "Chave obrigatória inválida %s pra %s"
+msgstr "Chave de vinculação inválida %s pra %s"
 
 #: opts.cpp:692 opts.cpp:701 opts.cpp:710 opts.cpp:719 config/option.cpp:462
 #, c-format
@@ -896,7 +896,7 @@ msgstr "Nenhum jogo em progresso pra gravar"
 #: sys.cpp:213
 #, c-format
 msgid "Cannot open output file %s"
-msgstr "Não pôde abrir o arquivo de saída%s"
+msgstr "Não pôde abrir o arquivo de saída %s"
 
 #: sys.cpp:220 sys.cpp:240 sys.cpp:390
 msgid "Error writing game recording"
@@ -996,7 +996,7 @@ msgstr "Incapaz de carregar a ROM do Game Boy Advance %s"
 
 #: panel.cpp:538
 msgid " player "
-msgstr " jogador "
+msgstr " Jogador "
 
 #: panel.cpp:703
 #, c-format
@@ -1105,15 +1105,15 @@ msgstr "Erro de alocação da memória"
 
 #: panel.cpp:2443
 msgid "error initializing codec"
-msgstr "erro ao inicializar o codec"
+msgstr "Erro ao inicializar o codec"
 
 #: panel.cpp:2446
 msgid "error writing to output file"
-msgstr "erro ao gravar no arquivo de saída"
+msgstr "Erro ao gravar no arquivo de saída"
 
 #: panel.cpp:2449
 msgid "can't guess output format from file name"
-msgstr "não pôde adivinhar o formato de saída a partir do nome do arquivo"
+msgstr "Não pôde adivinhar o formato de saída a partir do nome do arquivo"
 
 #: panel.cpp:2454
 msgid "programming error; aborting!"
@@ -1278,7 +1278,7 @@ msgstr "Tipo de cabo do link"
 
 #: config/internal/option-internal.cpp:405
 msgid "Automatically load last saved state"
-msgstr "Carregar automaticamente o último estado salvo"
+msgstr "Carregar automaticamente o último state salvo"
 
 #: config/internal/option-internal.cpp:407
 msgid ""
@@ -1298,7 +1298,7 @@ msgstr "Diretório pra armazenar gravações de jogos e A/V (os caminhos relativ
 
 #: config/internal/option-internal.cpp:417
 msgid "Number of seconds between rewind snapshots (0 to disable)"
-msgstr "Número de segundos entre snapshots de rebobinamento (0 pra desativar)"
+msgstr "Número de segundos entre os snapshots de retrocesso (0 pra desativar)"
 
 #: config/internal/option-internal.cpp:420
 msgid "Directory to store screenshots (relative paths are relative to ROM)"
@@ -1320,11 +1320,11 @@ msgid ""
 "names which map to joypad #<n> button <button>.  Button is one of Up, Down, "
 "Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
-msgstr "O parâmetro Joypad/<n>/<button> contém uma lista separada por vírgula dos nomes-chave os quais mapeiam pro joypad #<n> botão <button>.  O botão é um de Pra Cima, Pra Baixo, Esquerda, Direita, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, AutoB, Velocidade, Captura, GS"
+msgstr "O parâmetro do Joypad/<n>/<button> contém uma lista separada por vírgula dos nomes-chave os quais mapeiam pro joypad #<n> botão <button>. O botão é um de Pra Cima, Pra Baixo, Esquerda, Direita, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, AutoB, Velocidade, Captura, GS"
 
 #: config/internal/option-internal.cpp:439
 msgid "The autofire toggle period, in frames (1/60 s)"
-msgstr "O período de alternância do auto-disparo, em quadros (1/60 s)"
+msgstr "O período de alternância do auto-disparo em frames (1/60 s)"
 
 #: config/internal/option-internal.cpp:442
 msgid "The number of the stick to use in single-player mode"
@@ -1335,7 +1335,7 @@ msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
-msgstr "O parâmetro Teclado/<cmd> contém uma lista separada por vírgula dos nomes-chave (ex: Alt-Shift-F1).  Quando a tecla nomeada é pressionada o comando <cmd> é executado."
+msgstr "O parâmetro do Teclado/<cmd> contém uma lista separada por vírgula dos nomes-chave (ex: Alt-Shift-F1). Quando a tecla nomeada é pressionada o comando <cmd> é executado."
 
 #: config/internal/option-internal.cpp:454
 msgid "Enable AGB debug print"
@@ -1388,7 +1388,7 @@ msgstr "Tamanho do flash 0 = 64 KBs 1 = 128 KBs"
 #: config/internal/option-internal.cpp:482
 msgid ""
 "Skip frames.  Values are 0-9 or -1 to skip automatically based on time."
-msgstr "Pular quadros.  Os valores são 0-9 ou -1 pra pular automaticamente baseado no tempo."
+msgstr "Pular frames. Os valores são 0-9 ou -1 pra pular automaticamente baseado no tempo."
 
 #: config/internal/option-internal.cpp:486
 msgid "Fullscreen mode color depth (0 = any)"
@@ -1464,7 +1464,7 @@ msgstr "Não sobrescrever o save nativo (bateria) quando carregar o state"
 
 #: config/internal/option-internal.cpp:529
 msgid "Throttle game speed, even when accelerated (0-450%, 0 = no throttle)"
-msgstr "Sufocar a velocidade do jogo mesmo quando acelerado (0-450%, 0 = sem sufocador)"
+msgstr "Aumentar a velocidade do jogo mesmo quando acelerado (0-450%, 0 = sem acelerador)"
 
 #: config/internal/option-internal.cpp:533
 msgid "Set throttle for speedup key (0-3000%, 0 = no throttle)"
@@ -1472,11 +1472,11 @@ msgstr "Definir o acelerador pra tecla de aceleração (0-3000%, 0 = sem acelera
 
 #: config/internal/option-internal.cpp:536
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
-msgstr "Número de quadros a pular com aceleração (ao invés de sufocamento da aceleração)"
+msgstr "Número de frames a pular com aceleração (ao invés do aumento da aceleração)"
 
 #: config/internal/option-internal.cpp:540
 msgid "Use frame skip for speedup throttle"
-msgstr "Use o pulo de quadros pra sufocar a aceleração"
+msgstr "Use o frame skip pra aumentar a aceleração"
 
 #: config/internal/option-internal.cpp:542
 msgid "Use the specified BIOS file for GB"
@@ -1504,7 +1504,7 @@ msgstr "Janela maximizada"
 
 #: config/internal/option-internal.cpp:555
 msgid "Window height at startup"
-msgstr "A altura da janela na inicialização"
+msgstr "Altura da janela na inicialização"
 
 #: config/internal/option-internal.cpp:557
 msgid "Window width at startup"
@@ -1524,7 +1524,7 @@ msgstr "Capturar os eventos-chave enquanto em segundo plano"
 
 #: config/internal/option-internal.cpp:570
 msgid "Capture joy events while on background"
-msgstr "Capture eventos de alegria enquanto em segundo plano"
+msgstr "Capturar eventos de alegria enquanto em segundo plano"
 
 #: config/internal/option-internal.cpp:571
 msgid "Hide menu bar when mouse is inactive"
@@ -1532,7 +1532,7 @@ msgstr "Esconder a barra do menu quando o mouse está inativo"
 
 #: config/internal/option-internal.cpp:576
 msgid "Sound API; if unsupported, default API will be used"
-msgstr "API de som; se não for suportada, a API padrão será usada"
+msgstr "API de som; se não for suportada a API padrão será usada"
 
 #: config/internal/option-internal.cpp:579
 msgid "Device ID of chosen audio device for chosen driver"
@@ -1544,7 +1544,7 @@ msgstr "Número de buffers do som"
 
 #: config/internal/option-internal.cpp:583
 msgid "Bit mask of sound channels to enable"
-msgstr "A máscara do bit dos canais de som a ativar"
+msgstr "A máscara dos bits dos canais de som a ativar"
 
 #: config/internal/option-internal.cpp:585
 msgid "GBA sound filtering (%)"
@@ -1720,27 +1720,27 @@ msgstr "Não pôde criar o DirectSound %08x"
 #: dsound.cpp:108
 #, c-format
 msgid "Cannot SetCooperativeLevel %08x"
-msgstr "Não pôde SetCooperativeLevel %08x"
+msgstr "Não pôde fazer o SetCooperativeLevel %08x"
 
 #: dsound.cpp:122
 #, c-format
 msgid "Cannot CreateSoundBuffer %08x"
-msgstr "Não pôde CreateSoundBuffer %08x"
+msgstr "Não pôde fazer o CreateSoundBuffer %08x"
 
 #: dsound.cpp:141
 #, c-format
 msgid "CreateSoundBuffer(primary) failed %08x"
-msgstr "Falhou em CreateSoundBuffer(primário) %08x"
+msgstr "CreateSoundBuffer(primário) falhou %08x"
 
 #: dsound.cpp:158
 #, c-format
 msgid "CreateSoundBuffer(secondary) failed %08x"
-msgstr "Falhou em CreateSoundBuffer(secundário) %08x"
+msgstr "CreateSoundBuffer(secundário) falhou %08x"
 
 #: dsound.cpp:163
 #, c-format
 msgid "dsbSecondary->SetCurrentPosition failed %08x"
-msgstr "Falhou com o dsbSecondary->SetCurrentPosition %08x"
+msgstr "O dsbSecondary->SetCurrentPosition falhou %08x"
 
 #: dsound.cpp:186
 #, c-format
@@ -1750,7 +1750,7 @@ msgstr "Não pôde jogar no primário %08x"
 #: dsound.cpp:321
 #, c-format
 msgid "dsbSecondary->Lock() failed: %08x"
-msgstr "Falhou com o dsbSecondary->Lock(): %08x"
+msgstr "O dsbSecondary->Lock() falhou: %08x"
 
 #: viewsupt.h:61
 #, c-format
@@ -1871,7 +1871,7 @@ msgstr "Tamanho dos dados"
 
 #: xrc/CheatCreate.xrc:144
 msgid "Ol&d value"
-msgstr "Va&lor Antigo"
+msgstr "Va&lor antigo"
 
 #: xrc/CheatCreate.xrc:152
 msgid "Specific &value"
@@ -2342,7 +2342,7 @@ msgstr "Lançamento da Cena:"
 
 #: xrc/GBAROMInfo.xrc:47
 msgid "Release Number:"
-msgstr "Número de lançamento:"
+msgstr "Número de Lançamento:"
 
 #: xrc/GBAROMInfo.xrc:59
 msgid "CRC32:"
@@ -2873,7 +2873,7 @@ msgstr "Geral"
 
 #: xrc/GeneralConfig.xrc:26
 msgid "Screenshot Format:"
-msgstr "Formato do Screenshot:"
+msgstr "Formato da Screenshot:"
 
 #: xrc/GeneralConfig.xrc:33
 msgid "&PNG"
@@ -2901,7 +2901,7 @@ msgstr "&Acelerar"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "percent of normal:"
-msgstr ""
+msgstr "porcentagem do normal:"
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
@@ -2917,7 +2917,7 @@ msgstr "Visualizador de E/S"
 
 #: xrc/IOViewer.xrc:10
 msgid "a"
-msgstr "um"
+msgstr "a"
 
 #: xrc/IOViewer.xrc:11
 msgid "b"
@@ -3400,7 +3400,7 @@ msgstr "Re&troceder"
 
 #: xrc/MainMenu.xrc:231
 msgid "Toggle &full screen"
-msgstr "Alternar &tela cheia"
+msgstr "Alternar pra &tela cheia"
 
 #: xrc/MainMenu.xrc:238
 msgid "&Turbo mode"
@@ -3721,7 +3721,7 @@ msgstr "&Configurar porta..."
 
 #: xrc/MainMenu.xrc:610
 msgid "&Break on load"
-msgstr "&Pausar ao carregar"
+msgstr "&Interromper ao carregar"
 
 #: xrc/MainMenu.xrc:615
 msgid "&Disconnect"
@@ -3753,7 +3753,7 @@ msgstr "V&isualizador de Memória..."
 
 #: xrc/MainMenu.xrc:635
 msgid "&OAM Viewer..."
-msgstr "&Visualizador OAM..."
+msgstr "&Visualizador do OAM..."
 
 #: xrc/MainMenu.xrc:638
 msgid "&Palette Viewer..."
@@ -3913,7 +3913,7 @@ msgstr "Mosaico:"
 
 #: xrc/MapViewer.xrc:132
 msgid "Overflow:"
-msgstr "Transbordo:"
+msgstr "Transbordamento:"
 
 #: xrc/MemViewer.xrc:4
 msgid "Memory Viewer"
@@ -3977,7 +3977,7 @@ msgstr "Porta:"
 
 #: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
-msgstr "Visualizador OAM"
+msgstr "Visualizador do OAM"
 
 #: xrc/OAMViewer.xrc:85
 msgid "Rot.:"
