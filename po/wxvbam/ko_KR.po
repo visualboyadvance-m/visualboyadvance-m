@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Hoseok Seo <ddinghoya@gmail.com>, 2022
+# Hoseok Seo <ddinghoya@gmail.com>, 2022-2023
 # JunYoung Ahn <ajy9812@gmail.com>, 2021
 # mp hdte <mphdte@gmail.com>, 2020
 # park seungbin <parksengbin48@gmail.com>, 2019
@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-02 22:20+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Hoseok Seo <ddinghoya@gmail.com>, 2022\n"
+"Last-Translator: Hoseok Seo <ddinghoya@gmail.com>, 2022-2023\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/bgk/vba-m/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -832,23 +832,23 @@ msgstr ""
 
 #: extra-translations.cpp:14
 msgid "Cancel"
-msgstr ""
+msgstr "취소"
 
 #: extra-translations.cpp:15
 msgid "Close"
-msgstr ""
+msgstr "닫기"
 
 #: extra-translations.cpp:16
 msgid "Developers"
-msgstr ""
+msgstr "개발자"
 
 #: extra-translations.cpp:17
 msgid "License"
-msgstr ""
+msgstr "라이센스"
 
 #: extra-translations.cpp:18
 msgid "OK"
-msgstr ""
+msgstr "확인"
 
 #: opts.cpp:543 opts.cpp:564 opts.cpp:769
 #, c-format
@@ -1033,19 +1033,19 @@ msgstr "오류 - 되감기 상태 작성을 할 수 없습니다."
 
 #: panel.cpp:2269
 msgid "Enabling EGL VSync."
-msgstr ""
+msgstr "EGL 수직동기화 활성화"
 
 #: panel.cpp:2271
 msgid "Disabling EGL VSync."
-msgstr ""
+msgstr "EGL 수직동기화 비활성화"
 
 #: panel.cpp:2278
 msgid "Enabling GLX VSync."
-msgstr ""
+msgstr "GLX 수직동기화 활성화"
 
 #: panel.cpp:2280
 msgid "Disabling GLX VSync."
-msgstr ""
+msgstr "GLX 수직동기화 비활성화"
 
 #: panel.cpp:2297
 msgid "Failed to set glXSwapIntervalEXT"
@@ -1137,23 +1137,23 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:323
 msgid "Filter plugin library"
-msgstr ""
+msgstr "필터 플러그인 라이브러리"
 
 #: config/internal/option-internal.cpp:325
 msgid "Interframe blending function"
-msgstr ""
+msgstr "인터프레임 블렌딩 기능"
 
 #: config/internal/option-internal.cpp:327
 msgid "Keep window on top"
-msgstr ""
+msgstr "창을 맨 위에 유지"
 
 #: config/internal/option-internal.cpp:330
 msgid "Maximum number of threads to run filters in"
-msgstr ""
+msgstr "필터를 실행할 최대 스레드 수"
 
 #: config/internal/option-internal.cpp:333
 msgid "Render method; if unsupported, simple method will be used"
-msgstr ""
+msgstr "렌더링 방법; 지원되지 않는 경우 간단한 방법 사용"
 
 #: config/internal/option-internal.cpp:335
 msgid "Default scale factor"
@@ -1210,39 +1210,39 @@ msgstr ""
 #: config/internal/option-internal.cpp:370
 #: config/internal/option-internal.cpp:400
 msgid "Directory to look for ROM files"
-msgstr ""
+msgstr "ROM 파일을 찾을 디렉토리"
 
 #: config/internal/option-internal.cpp:372
 msgid "Directory to look for GBC ROM files"
-msgstr ""
+msgstr "GBC ROM 파일을 찾을 디렉토리"
 
 #: config/internal/option-internal.cpp:376
 msgid "BIOS file to use, if enabled"
-msgstr ""
+msgstr "활성화된 경우, 사용할 BIOS 파일"
 
 #: config/internal/option-internal.cpp:381
 msgid "Enable link at boot"
-msgstr ""
+msgstr "부팅 시 링크 활성화"
 
 #: config/internal/option-internal.cpp:384
 msgid "Enable faster network protocol by default"
-msgstr ""
+msgstr "기본적으로 더 빠른 네트워크 프로토콜 활성화"
 
 #: config/internal/option-internal.cpp:386
 msgid "Default network link client host"
-msgstr ""
+msgstr "기본 네트워크 링크 클라이언트 호스트"
 
 #: config/internal/option-internal.cpp:388
 msgid "Default network link server IP to bind"
-msgstr ""
+msgstr "바인딩할 기본 네트워크 링크 서버 IP"
 
 #: config/internal/option-internal.cpp:391
 msgid "Default network link port (server and client)"
-msgstr ""
+msgstr "기본 네트워크 링크 포트 (서버 및 클라이언트)"
 
 #: config/internal/option-internal.cpp:393
 msgid "Default network protocol"
-msgstr ""
+msgstr "기본 네트워크 프로토콜"
 
 #: config/internal/option-internal.cpp:395
 msgid "Link timeout (ms)"
@@ -1250,11 +1250,11 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:397
 msgid "Link cable type"
-msgstr ""
+msgstr "링크 케이블 유형"
 
 #: config/internal/option-internal.cpp:405
 msgid "Automatically load last saved state"
-msgstr ""
+msgstr "마지막으로 저장된 상태를 자동으로 불러오기"
 
 #: config/internal/option-internal.cpp:407
 msgid ""
@@ -1388,7 +1388,7 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:496
 msgid "Enable printer emulation"
-msgstr ""
+msgstr "프린터 에뮬레이션 활성화"
 
 #: config/internal/option-internal.cpp:498
 msgid "Break into GDB after loading the game."
@@ -1396,19 +1396,19 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:500
 msgid "Port to connect GDB to."
-msgstr ""
+msgstr "GDB를 연결할 포트."
 
 #: config/internal/option-internal.cpp:503
 msgid "Number of players in network"
-msgstr ""
+msgstr "네트워크의 플레이어 수"
 
 #: config/internal/option-internal.cpp:506
 msgid "Maximum scale factor (0 = no limit)"
-msgstr ""
+msgstr "최대 스케일 팩터 (0 = 제한 없음)"
 
 #: config/internal/option-internal.cpp:508
 msgid "Pause game when main window loses focus"
-msgstr ""
+msgstr "기본 창에서 포커스를 잃으면 게임 일시 중지"
 
 #: config/internal/option-internal.cpp:511
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
@@ -1420,143 +1420,143 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:516
 msgid "Show speed indicator"
-msgstr ""
+msgstr "속도 표시기 표시"
 
 #: config/internal/option-internal.cpp:519
 msgid "Draw on-screen messages transparently"
-msgstr ""
+msgstr "화면 메시지를 투명하게 그리기"
 
 #: config/internal/option-internal.cpp:521
 msgid "Skip BIOS initialization"
-msgstr ""
+msgstr "BIOS 초기화 건너뛰기"
 
 #: config/internal/option-internal.cpp:523
 msgid "Do not overwrite cheat list when loading state"
-msgstr ""
+msgstr "상태를 불러올 때 치트 목록을 덮어쓰지 않음"
 
 #: config/internal/option-internal.cpp:526
 msgid "Do not overwrite native (battery) save when loading state"
-msgstr ""
+msgstr "상태를 불러올 때 기본 (배터리) 저장을 덮어쓰지 않음"
 
 #: config/internal/option-internal.cpp:529
 msgid "Throttle game speed, even when accelerated (0-450%, 0 = no throttle)"
-msgstr ""
+msgstr "가속된 경우에도 스로틀 게임 속도 (0-450%, 0 = 스로틀 없음)"
 
 #: config/internal/option-internal.cpp:533
 msgid "Set throttle for speedup key (0-3000%, 0 = no throttle)"
-msgstr ""
+msgstr "가속 키에 대한 스로틀 설정 (0-3000%, 0 = 스로틀 없음)"
 
 #: config/internal/option-internal.cpp:536
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
-msgstr ""
+msgstr "속도 향상으로 건너뛸 프레임 수 (속도 향상 스로틀 대신)"
 
 #: config/internal/option-internal.cpp:540
 msgid "Use frame skip for speedup throttle"
-msgstr ""
+msgstr "스로틀 속도 향상을 위해 프레임 건너뛰기 사용"
 
 #: config/internal/option-internal.cpp:542
 msgid "Use the specified BIOS file for GB"
-msgstr ""
+msgstr "GB에 대해 지정된 BIOS 파일 사용"
 
 #: config/internal/option-internal.cpp:544
 msgid "Use the specified BIOS file"
-msgstr ""
+msgstr "지정된 BIOS 파일 사용"
 
 #: config/internal/option-internal.cpp:546
 msgid "Use the specified BIOS file for GBC"
-msgstr ""
+msgstr "GBC용으로 지정된 BIOS 파일 사용"
 
 #: config/internal/option-internal.cpp:547
 msgid "Wait for vertical sync"
-msgstr ""
+msgstr "수직 동기화 대기"
 
 #: config/internal/option-internal.cpp:552
 msgid "Enter fullscreen mode at startup"
-msgstr ""
+msgstr "시작 시 전체 화면 모드 시작"
 
 #: config/internal/option-internal.cpp:553
 msgid "Window maximized"
-msgstr ""
+msgstr "창 최대화"
 
 #: config/internal/option-internal.cpp:555
 msgid "Window height at startup"
-msgstr ""
+msgstr "시작 시 창 높이"
 
 #: config/internal/option-internal.cpp:557
 msgid "Window width at startup"
-msgstr ""
+msgstr "시작 시 창 너비"
 
 #: config/internal/option-internal.cpp:559
 msgid "Window axis X position at startup"
-msgstr ""
+msgstr "시작 시 창 축 X 위치"
 
 #: config/internal/option-internal.cpp:561
 msgid "Window axis Y position at startup"
-msgstr ""
+msgstr "시작 시 창 축 Y 위치"
 
 #: config/internal/option-internal.cpp:567
 msgid "Capture key events while on background"
-msgstr ""
+msgstr "백그라운드에서 주요 이벤트 캡처"
 
 #: config/internal/option-internal.cpp:570
 msgid "Capture joy events while on background"
-msgstr ""
+msgstr "백그라운드에서 조이 이벤트 캡처"
 
 #: config/internal/option-internal.cpp:571
 msgid "Hide menu bar when mouse is inactive"
-msgstr ""
+msgstr "마우스가 비활성 상태일 때 메뉴 표시줄 숨기기"
 
 #: config/internal/option-internal.cpp:576
 msgid "Sound API; if unsupported, default API will be used"
-msgstr ""
+msgstr "사운드 API; 지원되지 않는 경우 기본 API 사용"
 
 #: config/internal/option-internal.cpp:579
 msgid "Device ID of chosen audio device for chosen driver"
-msgstr ""
+msgstr "선택한 드라이버에 대해 선택한 오디오 장치의 장치 ID"
 
 #: config/internal/option-internal.cpp:581
 msgid "Number of sound buffers"
-msgstr ""
+msgstr "사운드 버퍼 수"
 
 #: config/internal/option-internal.cpp:583
 msgid "Bit mask of sound channels to enable"
-msgstr ""
+msgstr "활성화할 사운드 채널의 비트 마스크"
 
 #: config/internal/option-internal.cpp:585
 msgid "GBA sound filtering (%)"
-msgstr ""
+msgstr "GBA 사운드 필터링 (%)"
 
 #: config/internal/option-internal.cpp:588
 msgid "GBA sound interpolation"
-msgstr ""
+msgstr "GBA 사운드 보간"
 
 #: config/internal/option-internal.cpp:589
 msgid "GB sound declicking"
-msgstr ""
+msgstr "GB 사운드 디클릭킹"
 
 #: config/internal/option-internal.cpp:591
 msgid "GB echo effect (%)"
-msgstr ""
+msgstr "GB 에코 효과 (%)"
 
 #: config/internal/option-internal.cpp:593
 msgid "Enable GB sound effects"
-msgstr ""
+msgstr "GB 사운드 효과 활성화"
 
 #: config/internal/option-internal.cpp:594
 msgid "GB stereo effect (%)"
-msgstr ""
+msgstr "GB 스테레오 효과 (%)"
 
 #: config/internal/option-internal.cpp:597
 msgid "GB surround sound effect (%)"
-msgstr ""
+msgstr "GB 서라운드 사운드 효과 (%)"
 
 #: config/internal/option-internal.cpp:598
 msgid "Sound sample rate (kHz)"
-msgstr ""
+msgstr "사운드 샘플링 속도 (kHz)"
 
 #: config/internal/option-internal.cpp:600
 msgid "Sound volume (%)"
-msgstr ""
+msgstr "사운드 볼륨 (%)"
 
 #: config/internal/option-internal.cpp:667
 #: config/internal/option-internal.cpp:687
@@ -1565,7 +1565,7 @@ msgstr ""
 #: config/internal/option-internal.cpp:748
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
-msgstr ""
+msgstr "옵션 %s 에 대한 잘못된 값 %s; 유효한 값은 %s"
 
 #: config/option.cpp:315
 #, c-format
