@@ -824,11 +824,11 @@ msgstr "로컬 모드에서는 네트워크가 지원되지 않음."
 
 #: extra-translations.cpp:12
 msgid "&Apply"
-msgstr ""
+msgstr "적용(&A)"
 
 #: extra-translations.cpp:13
 msgid "Artists"
-msgstr ""
+msgstr "아티스트"
 
 #: extra-translations.cpp:14
 msgid "Cancel"
@@ -858,12 +858,12 @@ msgstr " %s 키는 %s에 무효한 키 설정입니다."
 #: opts.cpp:692 opts.cpp:701 opts.cpp:710 opts.cpp:719 config/option.cpp:462
 #, c-format
 msgid "Invalid value %s for option %s"
-msgstr ""
+msgstr "옵션 %s 에 대해 유효하지 않은 값 %s"
 
 #: opts.cpp:791
 #, c-format
 msgid "Unknown option %s with value %s"
-msgstr ""
+msgstr "값이 %s 알 수 없는 옵션 %s"
 
 #: sys.cpp:195 sys.cpp:256
 msgid "No game in progress to record"
@@ -928,7 +928,7 @@ msgstr "닫기(&C)"
 
 #: sys.cpp:1006
 msgid "Printed"
-msgstr "인쇄 완료"
+msgstr "출력됨"
 
 #: sys.cpp:1308
 #, c-format
@@ -1129,11 +1129,11 @@ msgstr "B:"
 
 #: config/internal/option-internal.cpp:320
 msgid "Use bilinear filter with 3d renderer"
-msgstr ""
+msgstr "3d 렌더러와 함께 이중선형 필터 사용"
 
 #: config/internal/option-internal.cpp:321
 msgid "Full-screen filter to apply"
-msgstr ""
+msgstr "적용할 전체화면 필터"
 
 #: config/internal/option-internal.cpp:323
 msgid "Filter plugin library"
@@ -1157,55 +1157,55 @@ msgstr "렌더링 방법; 지원되지 않는 경우 간단한 방법 사용"
 
 #: config/internal/option-internal.cpp:335
 msgid "Default scale factor"
-msgstr ""
+msgstr "기본 스케일 팩터"
 
 #: config/internal/option-internal.cpp:338
 msgid "Retain aspect ratio when resizing"
-msgstr ""
+msgstr "크기 조정 시 화면비 유지"
 
 #: config/internal/option-internal.cpp:341
 msgid "BIOS file to use for GB, if enabled"
-msgstr ""
+msgstr "활성화된 경우, GB에 사용할 BIOS 파일"
 
 #: config/internal/option-internal.cpp:344
 msgid "GB color enhancement, if enabled"
-msgstr ""
+msgstr "활성화된 경우, GB 색상 향상"
 
 #: config/internal/option-internal.cpp:346
 msgid "Enable DX Colorization Hacks"
-msgstr ""
+msgstr "DX 색상화 해킹 활성화"
 
 #: config/internal/option-internal.cpp:347
 #: config/internal/option-internal.cpp:379
 msgid "Apply LCD filter, if enabled"
-msgstr ""
+msgstr "활성화된 경우, LCD 필터 적용"
 
 #: config/internal/option-internal.cpp:349
 msgid "BIOS file to use for GBC, if enabled"
-msgstr ""
+msgstr "활성화된 경우, GBC에 사용할 BIOS 파일"
 
 #: config/internal/option-internal.cpp:352
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "기본 팔레트, 8개의 쉼표로 구분된 4자리 16진수 정수 (rgb555) 입니다."
 
 #: config/internal/option-internal.cpp:356
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "첫 번째 사용자 팔레트, 8개의 쉼표로 구분된 4자리 16진수 정수 (rgb555) 입니다."
 
 #: config/internal/option-internal.cpp:360
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "두 번째 사용자 팔레트, 8개의 쉼표로 구분된 4자리 16진수 정수 (rgb555) 입니다."
 
 #: config/internal/option-internal.cpp:364
 msgid "Automatically gather a full page before printing"
-msgstr ""
+msgstr "출력하기 전에 자동으로 전체 페이지 수집"
 
 #: config/internal/option-internal.cpp:368
 msgid "Automatically save printouts as screen captures with -print suffix"
-msgstr ""
+msgstr "-print 접미사를 사용하여 출력물을 화면 캡처로 자동 저장"
 
 #: config/internal/option-internal.cpp:370
 #: config/internal/option-internal.cpp:400
@@ -1246,7 +1246,7 @@ msgstr "기본 네트워크 프로토콜"
 
 #: config/internal/option-internal.cpp:395
 msgid "Link timeout (ms)"
-msgstr ""
+msgstr "링크 시간 초과 (ms)"
 
 #: config/internal/option-internal.cpp:397
 msgid "Link cable type"
@@ -1260,35 +1260,35 @@ msgstr "마지막으로 저장된 상태를 자동으로 불러오기"
 msgid ""
 "Directory to store game save files (relative paths are relative to ROM; "
 "blank is config dir)"
-msgstr ""
+msgstr "게임 저장 파일을 저장할 디렉터리 (상대 경로는 ROM에 상대적이며 공백은 구성 디렉토리임)"
 
 #: config/internal/option-internal.cpp:410
 msgid "Freeze recent load list"
-msgstr ""
+msgstr "최근 불러오기 목록 고정"
 
 #: config/internal/option-internal.cpp:413
 msgid ""
 "Directory to store A/V and game recordings (relative paths are relative to "
 "ROM)"
-msgstr ""
+msgstr "A/V 및 게임 녹화를 저장하는 디렉토리 (상대 경로는 ROM에 상대적임)"
 
 #: config/internal/option-internal.cpp:417
 msgid "Number of seconds between rewind snapshots (0 to disable)"
-msgstr ""
+msgstr "되감기 스냅샷 사이의 초 수( 비활성화하려면 0)"
 
 #: config/internal/option-internal.cpp:420
 msgid "Directory to store screenshots (relative paths are relative to ROM)"
-msgstr ""
+msgstr "스크린샷을 저장할 디렉토리 (상대 경로는 ROM에 상대적임)"
 
 #: config/internal/option-internal.cpp:424
 msgid ""
 "Directory to store saved state files (relative paths are relative to "
 "BatteryDir)"
-msgstr ""
+msgstr "저장된 상태 파일을 저장할 디렉토리 (상대 경로는 BatteryDir에 상대적임)"
 
 #: config/internal/option-internal.cpp:427
 msgid "Enable status bar"
-msgstr ""
+msgstr "상태 표시줄 활성화"
 
 #: config/internal/option-internal.cpp:432
 msgid ""
@@ -1296,54 +1296,54 @@ msgid ""
 "names which map to joypad #<n> button <button>.  Button is one of Up, Down, "
 "Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
-msgstr ""
+msgstr "The parameter Joypad// contains a comma-separated list of key names which map to joypad # button .  Button is one of Up, Down, Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, AutoB, Speed, Capture, GS\n\n조이패드/<n>/<button> 매개변수는 조이패드 #<n> 버튼 <button>에 매핑되는 키 이름의 쉼표로 구분된 목록을 포함합니다. 버튼은 위, 아래, 왼쪽, 오른쪽, A, B, L, R, 선택, 시작, 모션위, 모션아래, 모션왼쪽, 모션오른쪽, 자동A, 자동B, 속도, 캡처, GS 중 하나입니다"
 
 #: config/internal/option-internal.cpp:439
 msgid "The autofire toggle period, in frames (1/60 s)"
-msgstr ""
+msgstr "프레임 단위의 자동 발사 전환 기간 (1/60초)"
 
 #: config/internal/option-internal.cpp:442
 msgid "The number of the stick to use in single-player mode"
-msgstr ""
+msgstr "싱글 플레이어 모드에서 사용할 스틱의 수"
 
 #: config/internal/option-internal.cpp:447
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
-msgstr ""
+msgstr "매개변수 Keyboard/<cmd> 에는 쉼표로 구분된 키 이름 (예: Alt-Shift-F1) 목록이 포함되어 있습니다. 명명된 키를 누르면 명령 <cmd> 가 실행됩니다."
 
 #: config/internal/option-internal.cpp:454
 msgid "Enable AGB debug print"
-msgstr ""
+msgstr "AGB 디버그 출력 활성화"
 
 #: config/internal/option-internal.cpp:456
 msgid "Auto skip frames."
-msgstr ""
+msgstr "자동 건너뛰기 프레임입니다."
 
 #: config/internal/option-internal.cpp:458
 msgid "Apply IPS/UPS/IPF patches if found"
-msgstr ""
+msgstr "발견된 경우 IPS/UPS/IPF 패치 적용"
 
 #: config/internal/option-internal.cpp:460
 msgid "Automatically save and load cheat list"
-msgstr ""
+msgstr "치트 목록 자동 저장 및 불러오기"
 
 #: config/internal/option-internal.cpp:463
 msgid "Automatically enable border for Super GameBoy games"
-msgstr ""
+msgstr "슈퍼 게임보이 게임의 테두리를 자동으로 활성화"
 
 #: config/internal/option-internal.cpp:465
 msgid "Always enable border"
-msgstr ""
+msgstr "항상 테두리 활성화"
 
 #: config/internal/option-internal.cpp:467
 msgid "Screen capture file format"
-msgstr ""
+msgstr "화면 캡처 파일 형식"
 
 #: config/internal/option-internal.cpp:469
 msgid "Enable cheats"
-msgstr ""
+msgstr "치트 활성화"
 
 #: config/internal/option-internal.cpp:472 xrc/MainMenu.xrc:355
 msgid "Enable MMX"
@@ -1351,40 +1351,40 @@ msgstr "MMX 활성화"
 
 #: config/internal/option-internal.cpp:476
 msgid "Disable on-screen status messages"
-msgstr ""
+msgstr "화면 상태 메시지 비활성화"
 
 #: config/internal/option-internal.cpp:477
 msgid "Type of system to emulate"
-msgstr ""
+msgstr "에뮬레이션할 시스템 유형"
 
 #: config/internal/option-internal.cpp:479
 msgid "Flash size 0 = 64KB 1 = 128KB"
-msgstr ""
+msgstr "플래시 크기 0 = 64KB 1 = 128KB"
 
 #: config/internal/option-internal.cpp:482
 msgid ""
 "Skip frames.  Values are 0-9 or -1 to skip automatically based on time."
-msgstr ""
+msgstr "프레임을 건너뜁니다. 시간에 따라 자동으로 건너뛰려면 값은 0-9 또는 -1 입니다."
 
 #: config/internal/option-internal.cpp:486
 msgid "Fullscreen mode color depth (0 = any)"
-msgstr ""
+msgstr "전체화면 모드 색상 심도 (0 = 임의)"
 
 #: config/internal/option-internal.cpp:488
 msgid "Fullscreen mode frequency (0 = any)"
-msgstr ""
+msgstr "전체화면 모드 빈도 (0 = 임의)"
 
 #: config/internal/option-internal.cpp:490
 msgid "Fullscreen mode height (0 = desktop)"
-msgstr ""
+msgstr "전체화면 모드 높이 (0 = 데스크탑)"
 
 #: config/internal/option-internal.cpp:492
 msgid "Fullscreen mode width (0 = desktop)"
-msgstr ""
+msgstr "전체화면 모드 너비 (0 = 데스크탑)"
 
 #: config/internal/option-internal.cpp:493
 msgid "The palette to use"
-msgstr ""
+msgstr "사용할 팔레트"
 
 #: config/internal/option-internal.cpp:496
 msgid "Enable printer emulation"
@@ -1392,7 +1392,7 @@ msgstr "프린터 에뮬레이션 활성화"
 
 #: config/internal/option-internal.cpp:498
 msgid "Break into GDB after loading the game."
-msgstr ""
+msgstr "게임을 불러온 후 GDB에 개입합니다."
 
 #: config/internal/option-internal.cpp:500
 msgid "Port to connect GDB to."
@@ -1412,11 +1412,11 @@ msgstr "기본 창에서 포커스를 잃으면 게임 일시 중지"
 
 #: config/internal/option-internal.cpp:511
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
-msgstr ""
+msgstr "RTC 활성화 (vba-over.ini 재정의는 rtcEnabled임"
 
 #: config/internal/option-internal.cpp:514
 msgid "Native save (\"battery\") hardware type"
-msgstr ""
+msgstr "기본 저장 (\"배터리\") 하드웨어 유형"
 
 #: config/internal/option-internal.cpp:516
 msgid "Show speed indicator"
@@ -1580,7 +1580,7 @@ msgstr "%d 값은 %s 옵션에 무효합니다; 유효한 값은 %d - %d입니�
 #: config/option.cpp:443
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %s"
-msgstr ""
+msgstr "옵션 %s 에 대해 유효하지 않은 값 %d; 유효한 값은 %s"
 
 #: dialogs/display-config.cpp:374
 #, c-format
@@ -1595,12 +1595,12 @@ msgstr "플러그인"
 #: dialogs/display-config.cpp:413
 #, c-format
 msgid "Using pixel filter: %s"
-msgstr ""
+msgstr "픽셀 필터 사용: %s"
 
 #: dialogs/display-config.cpp:420
 #, c-format
 msgid "Using interframe blending: %s"
-msgstr ""
+msgstr "프레임 간 블렌딩 사용: %s"
 
 #: widgets/keyedit.cpp:122 widgets/keyedit.cpp:280
 msgid "SHIFT"
@@ -2230,11 +2230,11 @@ msgstr "인터프레임 블렌딩 (부드러운 프레임 전환) :"
 
 #: xrc/DisplayConfig.xrc:136
 msgid "Smart"
-msgstr ""
+msgstr "스마트"
 
 #: xrc/DisplayConfig.xrc:137
 msgid "Motion Blur"
-msgstr ""
+msgstr "모션 블러"
 
 #: xrc/DisplayConfig.xrc:151 xrc/SoundConfig.xrc:91
 msgid "Basic"
@@ -2877,7 +2877,7 @@ msgstr "명령 처리빈도 조절(&T)"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "percent of normal:"
-msgstr ""
+msgstr "정상 비율:"
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
