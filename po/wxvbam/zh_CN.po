@@ -6,6 +6,7 @@
 # b t <babypandas886@gmail.com>, 2015
 # pngai <pngai@ymail.com>, 2016
 # Rythm Tse <ksusix@gmail.com>, 2016
+# wr superboy, 2023
 # Xuntao Chi <1139954766@qq.com>, 2019
 # 后海游泳大老爷 <my.yuicn@gmail.com>, 2015
 # 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020,2022
@@ -18,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-02 22:20+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020,2022\n"
+"Last-Translator: wr superboy, 2023\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/bgk/vba-m/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3168,7 +3169,7 @@ msgstr "打开 GBC(&C)..."
 
 #: xrc/MainMenu.xrc:16
 msgid "Open rece&nt"
-msgstr "最近打开的文件(&N)"
+msgstr "打开最近(&N)"
 
 #: xrc/MainMenu.xrc:18
 msgid "&Reset recent list"
@@ -3204,7 +3205,7 @@ msgstr "保存点代码(&S)..."
 
 #: xrc/MainMenu.xrc:47
 msgid "Most &recent"
-msgstr "最常用"
+msgstr "最近(&R)"
 
 #: xrc/MainMenu.xrc:50
 msgid "Load current state slot"
@@ -3212,7 +3213,7 @@ msgstr "载入当前状态插槽"
 
 #: xrc/MainMenu.xrc:53
 msgid "&Auto load most recent"
-msgstr "自动载入最常用文件(&A)"
+msgstr "自动载入最近(&A)"
 
 #: xrc/MainMenu.xrc:61 xrc/MainMenu.xrc:117
 msgid "&2"
@@ -3533,15 +3534,15 @@ msgstr "音频(&A)"
 
 #: xrc/MainMenu.xrc:394
 msgid "&Increase volume"
-msgstr "增大音量"
+msgstr "增大音量(&I)"
 
 #: xrc/MainMenu.xrc:398
 msgid "&Decrease volume"
-msgstr "减小音量"
+msgstr "减小音量(&D)"
 
 #: xrc/MainMenu.xrc:402
 msgid "&Toggle sound"
-msgstr "声音开/关"
+msgstr "声音开/关(&T)"
 
 #: xrc/MainMenu.xrc:407
 msgid "&GBA sound interpolation"
@@ -3601,7 +3602,7 @@ msgstr "Game Boy Advance(&G)"
 
 #: xrc/MainMenu.xrc:504 xrc/MainMenu.xrc:527
 msgid "Configure ..."
-msgstr "设置 ..."
+msgstr "设置..."
 
 #: xrc/MainMenu.xrc:508
 msgid "&Real-time clock"
@@ -3817,7 +3818,7 @@ msgstr "帮助(&H)"
 
 #: xrc/MainMenu.xrc:728
 msgid "Report &Bugs"
-msgstr "反馈"
+msgstr "反馈Bug(&B)"
 
 #: xrc/MainMenu.xrc:731
 msgid "VBA-M Support &Forum"
@@ -3833,7 +3834,7 @@ msgstr "检查更新"
 
 #: xrc/MainMenu.xrc:745
 msgid "&Factory Reset..."
-msgstr "恢复默认设置"
+msgstr "恢复默认设置(&F)"
 
 #: xrc/MainMenu.xrc:749
 msgid "&About..."
