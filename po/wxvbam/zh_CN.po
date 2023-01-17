@@ -13,13 +13,14 @@
 # 智弘 王, 2022
 # 沈舒超 <ssc19940105@gmail.com>, 2015
 # 王晨旭 <wcxu21@126.com>, 2021
+# 陈 依云 <c1998lf@qq.com>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-02 22:20+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: wr superboy, 2023\n"
+"Last-Translator: 陈 依云 <c1998lf@qq.com>, 2023\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/bgk/vba-m/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2882,7 +2883,7 @@ msgstr "阀门(&T)"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "percent of normal:"
-msgstr ""
+msgstr "正常百分比："
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
