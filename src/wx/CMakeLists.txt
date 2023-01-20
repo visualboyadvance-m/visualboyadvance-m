@@ -1048,7 +1048,7 @@ if(NOT TRANSLATIONS_ONLY)
 
     if(NOT WIN32 AND NOT APPLE)
         install(FILES     ${CMAKE_CURRENT_SOURCE_DIR}/visualboyadvance-m.desktop     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
-        install(FILES     ${CMAKE_CURRENT_SOURCE_DIR}/visualboyadvance-m.appdata.xml DESTINATION ${CMAKE_INSTALL_PREFIX}/share/appdata)
+        install(FILES     ${CMAKE_CURRENT_SOURCE_DIR}/visualboyadvance-m.metainfo.xml DESTINATION ${CMAKE_INSTALL_PREFIX}/share/metainfo)
         install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/icons/sizes/                   DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor)
     endif()
 endif()
