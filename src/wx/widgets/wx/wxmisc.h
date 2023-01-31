@@ -2,6 +2,7 @@
 #define WX_MISC_H
 // utility widgets
 
+#include <stdint.h>
 #include <wx/checkbox.h>
 #include <wx/valgen.h>
 

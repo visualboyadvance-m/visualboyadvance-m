@@ -7,6 +7,7 @@
 #include <functional>
 #include <unordered_set>
 
+#include <stdint.h>
 #include <wx/string.h>
 
 #include "config/option-id.h"
