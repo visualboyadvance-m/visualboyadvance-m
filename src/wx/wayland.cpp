@@ -34,7 +34,7 @@ void MoveWaylandSubsurface(wxGLCanvasEGL* win)
     // compiled against 3.2.0 or 3.2.1 but running with 3.2.2 after a distro
     // upgrade.
     auto&& wxver = wxGetLibraryVersionInfo();
-    int&& major = wxver.GetMajor(), minor = wxver.GetMinor(), micro = wxver.GetMicro();
+    int &&major = wxver.GetMajor(), &&minor = wxver.GetMinor(), &&micro = wxver.GetMicro();
 
     if (!(major > 3 || (major == 3 && (minor > 2 || (minor == 2 && micro >= 2))))) {
         int x, y;
