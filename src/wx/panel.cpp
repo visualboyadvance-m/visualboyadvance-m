@@ -1129,7 +1129,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
                 panel = new GLDrawingPanel(this, basic_width, basic_height);
                 break;
 #endif
-#if defined(__WXMSW__) && !defined(NO_D3D)
+#ifdef __WXMSW__
             case config::RenderMethod::kDirect3d:
                 panel = new DXDrawingPanel(this, basic_width, basic_height);
                 break;
@@ -2438,10 +2438,10 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 
 #endif // GL support
 
-#if defined(__WXMSW__) && !defined(NO_D3D)
+#ifdef __WXMSW__
 #define DIRECT3D_VERSION 0x0900
 #include <d3d9.h> // main include file
-//#include <d3dx9core.h> // required for font rendering
+#include <d3dx9core.h> // required for font rendering
 #include <dxerr9.h> // contains debug functions
 
 DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
@@ -2452,13 +2452,21 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
 
 void DXDrawingPanel::DrawArea(wxWindowDC& dc)
 {
-    // FIXME: implement
-    if (!did_init) {
-      DrawingPanelInit();
-    }
+   IDirect3DDevice9 * Device;
+   D3DPRESENT_PARAMETERS present_params;
+   ZeroMemory( &present_params, sizeof(present_params) );
+   present_params.Windowed = true;
+   present_params.SwapEffect = D3DSWAPEFFECT_DISCARD;
+   present_params.BackBufferFormat = D3DFMT_UNKNOWN;
+   present_params.BackBufferWidth = GetSize().x;
+   present_params.BackBufferHeight = GetSize().y;
 
-    if (todraw) {
-    }
+   if ( FAILED( D3d->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, (HWND)GetWindow()->GetHandle()/*get handle from wxWidgets, vitally important*/, D3DCREATE_HARDWARE_VERTEXPROCESSING, &present_params, &Device) ))
+   {
+        wxMessageBox( "Failed to CreateDevice for Direct3D", "Error");
+        throw "aaaaaaaaaaaaaa!!!"; // I agree that this error handling scheme is not very professional
+   }
+
 }
 #endif
 
