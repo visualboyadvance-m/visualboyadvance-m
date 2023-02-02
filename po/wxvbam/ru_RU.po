@@ -3,32 +3,35 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# 74dffd932c00dbbb41918c687b127233_b4301a9 <3295ddb221a13e599d1c8fb3215ca8da_372329>, 2015
+# 85f5ad14c5f803c69d22f4aeb4ef6a7e, 2015
 # Alexey Laptev <sliph69@gmail.com>, 2015
 # Alexey Ter <lexalamer@mail.ru>, 2016
 # Anton Fedenko <gang296@mail.ru>, 2015
 # Artem Abramov <aabramovrussia@yandex.com>, 2015
-# 85f5ad14c5f803c69d22f4aeb4ef6a7e, 2015
+# George Matsune <georg29387878@gmail.com>, 2017
 # Irina Fedulova <istartlin@gmail.com>, 2020
+# Koshak Magnificent <coschack@mail.ru>, 2020
 # Matvey Nazarov, 2022
-# 74dffd932c00dbbb41918c687b127233_b4301a9 <3295ddb221a13e599d1c8fb3215ca8da_372329>, 2015
 # teorex <teorex3@gmail.com>, 2020
 # Алексей Гаврилов <flexxx_seva@mail.ru>, 2018
 # Антон Баталов <nikiforov28.ru@gmail.com>, 2021
 # Михаил Михаил <sined116@gmail.com>, 2016
 # Никита Громушкин <n.gromuskin@gmail.com>, 2021
 # Радмир Амиров <darkmantro79@gmail.com>, 2021
+# Set Ruks <kolpahok7@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-02 22:20+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Matvey Nazarov, 2022\n"
-"Language-Team: Russian (http://www.transifex.com/bgk/vba-m/language/ru/)\n"
+"Last-Translator: Радмир Амиров <darkmantro79@gmail.com>, 2021\n"
+"Language-Team: Russian (Russia) (http://www.transifex.com/bgk/vba-m/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ru\n"
+"Language: ru_RU\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #: wxvbam.cpp:259

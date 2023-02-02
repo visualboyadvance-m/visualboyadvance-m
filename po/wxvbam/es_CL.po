@@ -5,13 +5,14 @@
 # Translators:
 # Alexander Angulo <alex.angulo2001@gmail.com>, 2020
 # Jorge Ratti <valentinaratti123@gmail.com>, 2021
+# MELERIX, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-02 22:20+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Jorge Ratti <valentinaratti123@gmail.com>, 2021\n"
+"Last-Translator: MELERIX, 2023\n"
 "Language-Team: Spanish (Chile) (http://www.transifex.com/bgk/vba-m/language/es_CL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -61,7 +62,7 @@ msgstr "Archivo ROM"
 
 #: wxvbam.cpp:582
 msgid "<config>=<value>"
-msgstr ""
+msgstr "<config>=<value>"
 
 #: wxvbam.cpp:613
 msgid "Configuration/build error: can't find built-in xrc"
@@ -107,7 +108,7 @@ msgstr ""
 
 #: wxvbam.cpp:690
 msgid "Configuration file not found."
-msgstr ""
+msgstr "Archivo de configuración no encontrado"
 
 #: wxvbam.cpp:723
 msgid "Bad configuration option or multiple ROM files given:\n"
@@ -115,7 +116,7 @@ msgstr "Mala opción de configuración o múltiples archivos ROM  ingresados:\n"
 
 #: guiinit.cpp:85
 msgid "Start!"
-msgstr ""
+msgstr "¡Iniciar!"
 
 #: guiinit.cpp:104 xrc/NetLink.xrc:99
 msgid "Connect"
@@ -140,7 +141,7 @@ msgstr "Dirección IP del servidor es: %s\n"
 
 #: guiinit.cpp:143
 msgid "Waiting for connection..."
-msgstr "Esperando por una conección..."
+msgstr "Esperando por conexión..."
 
 #: guiinit.cpp:144
 #, c-format
@@ -151,7 +152,7 @@ msgstr "Conectando a %s\n"
 msgid ""
 "Error occurred.\n"
 "Please try again."
-msgstr "Un error ocurrió\nPor favor inténtalo renuevo ."
+msgstr "Ocurrió un error\nPor favor intenta de nuevo."
 
 #: guiinit.cpp:244 guiinit.cpp:297
 msgid "Select cheat file"
@@ -274,7 +275,7 @@ msgstr "Icono principal no encontrado"
 
 #: guiinit.cpp:2577
 msgid "Browse"
-msgstr ""
+msgstr "Navegar"
 
 #: guiinit.cpp:2591
 msgid "Main display panel not found"
@@ -305,15 +306,15 @@ msgstr "Descripción"
 
 #: guiinit.cpp:3208 xrc/CheatAdd.xrc:31
 msgid "Address"
-msgstr ""
+msgstr "Dirección"
 
 #: guiinit.cpp:3209
 msgid "Old Value"
-msgstr "Valor Antiguo"
+msgstr "Valor antiguo"
 
 #: guiinit.cpp:3210
 msgid "New Value"
-msgstr "Valor Nuevo"
+msgstr "Valor nuevo"
 
 #: guiinit.cpp:3682
 msgid "Menu commands"
@@ -335,7 +336,7 @@ msgstr "Archivos de texto (*.txt;*.log)|*.txt;*log|"
 #: cmdevents.cpp:1187 cmdevents.cpp:1265 cmdevents.cpp:1335 cmdevents.cpp:1404
 #: viewsupt.cpp:1180
 msgid "Select output file"
-msgstr ""
+msgstr "Seleccionar archivo de salida"
 
 #: viewers.cpp:698 viewers.cpp:770
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
@@ -351,67 +352,67 @@ msgstr "0x00000000 - BIOS"
 
 #: viewers.cpp:815
 msgid "0x02000000 - WRAM"
-msgstr ""
+msgstr "0x02000000 - WRAM"
 
 #: viewers.cpp:816
 msgid "0x03000000 - IRAM"
-msgstr ""
+msgstr "0x03000000 - IRAM"
 
 #: viewers.cpp:817
 msgid "0x04000000 - I/O"
-msgstr ""
+msgstr "0x04000000 - I/O"
 
 #: viewers.cpp:818
 msgid "0x05000000 - PALETTE"
-msgstr ""
+msgstr "0x05000000 - PALETA"
 
 #: viewers.cpp:819
 msgid "0x06000000 - VRAM"
-msgstr ""
+msgstr "0x06000000 - VRAM"
 
 #: viewers.cpp:820
 msgid "0x07000000 - OAM"
-msgstr ""
+msgstr "0x07000000 - OAM"
 
 #: viewers.cpp:821
 msgid "0x08000000 - ROM"
-msgstr ""
+msgstr "0x08000000 - ROM"
 
 #: viewers.cpp:924
 msgid "0x0000 - ROM"
-msgstr ""
+msgstr "0x0000 - ROM"
 
 #: viewers.cpp:925
 msgid "0x4000 - ROM"
-msgstr ""
+msgstr "0x4000 - ROM"
 
 #: viewers.cpp:926
 msgid "0x8000 - VRAM"
-msgstr ""
+msgstr "0x8000 - VRAM"
 
 #: viewers.cpp:927
 msgid "0xA000 - SRAM"
-msgstr ""
+msgstr "0xA000 - SRAM"
 
 #: viewers.cpp:928
 msgid "0xC000 - RAM"
-msgstr ""
+msgstr "0xC000 - RAM"
 
 #: viewers.cpp:929
 msgid "0xD000 - WRAM"
-msgstr ""
+msgstr "0xD000 - WRAM"
 
 #: viewers.cpp:930
 msgid "0xFF00 - I/O"
-msgstr ""
+msgstr "0xFF00 - I/O"
 
 #: viewers.cpp:931
 msgid "0xFF80 - RAM"
-msgstr ""
+msgstr "0xFF80 - RAM"
 
 #: gfxviewers.cpp:1141
 msgid "Select output file and type"
-msgstr ""
+msgstr "Seleccionar archivos de salida y tipo"
 
 #: gfxviewers.cpp:1142
 msgid ""
@@ -430,31 +431,31 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy"
 " Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Archivos de GameBoy Advance (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:146
 msgid "Open ROM file"
-msgstr "Abrir archivador ROM"
+msgstr "Abrir archivo ROM"
 
 #: cmdevents.cpp:163
 msgid ""
 "GameBoy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Archivos de GameBoy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:170
 msgid "Open GB ROM file"
-msgstr "Abrir archivo GB ROM"
+msgstr "Abrir archivo ROM de GB"
 
 #: cmdevents.cpp:187
 msgid ""
 "GameBoy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Archivos de GameBoy Color (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:194
 msgid "Open GBC ROM file"
-msgstr "Abrir archivo GBC ROM"
+msgstr "Abrir archivo ROM de GBC"
 
 #: cmdevents.cpp:613 cmdevents.cpp:729 cmdevents.cpp:768 cmdevents.cpp:841
 msgid "Unknown"
@@ -506,63 +507,63 @@ msgstr "ROM+MBC3+TIMER+RAM+BATT"
 
 #: cmdevents.cpp:665
 msgid "ROM+MBC3"
-msgstr ""
+msgstr "ROM+MBC3"
 
 #: cmdevents.cpp:669
 msgid "ROM+MBC3+RAM"
-msgstr ""
+msgstr "ROM+MBC3+RAM"
 
 #: cmdevents.cpp:673
 msgid "ROM+MBC3+RAM+BATT"
-msgstr ""
+msgstr "ROM+MBC3+RAM+BATT"
 
 #: cmdevents.cpp:677
 msgid "ROM+MBC5"
-msgstr ""
+msgstr "ROM+MBC5"
 
 #: cmdevents.cpp:681
 msgid "ROM+MBC5+RAM"
-msgstr ""
+msgstr "ROM+MBC5+RAM"
 
 #: cmdevents.cpp:685
 msgid "ROM+MBC5+RAM+BATT"
-msgstr ""
+msgstr "ROM+MBC5+RAM+BATT"
 
 #: cmdevents.cpp:689
 msgid "ROM+MBC5+RUMBLE"
-msgstr ""
+msgstr "ROM+MBC5+RUMBLE"
 
 #: cmdevents.cpp:693
 msgid "ROM+MBC5+RUMBLE+RAM"
-msgstr ""
+msgstr "ROM+MBC5+RUMBLE+RAM"
 
 #: cmdevents.cpp:697
 msgid "ROM+MBC5+RUMBLE+RAM+BATT"
-msgstr ""
+msgstr "ROM+MBC5+RUMBLE+RAM+BATT"
 
 #: cmdevents.cpp:701
 msgid "ROM+MBC7+BATT"
-msgstr ""
+msgstr "ROM+MBC7+BATT"
 
 #: cmdevents.cpp:709
 msgid "GameShark V3.0"
-msgstr ""
+msgstr "GameShark V3.0"
 
 #: cmdevents.cpp:713
 msgid "ROM+POCKET CAMERA"
-msgstr ""
+msgstr "ROM+POCKET CAMERA"
 
 #: cmdevents.cpp:717
 msgid "ROM+BANDAI TAMA5"
-msgstr ""
+msgstr "ROM+BANDAI TAMA5"
 
 #: cmdevents.cpp:721
 msgid "ROM+HuC-3"
-msgstr ""
+msgstr "ROM+HuC-3"
 
 #: cmdevents.cpp:725
 msgid "ROM+HuC-1"
-msgstr ""
+msgstr "ROM+HuC-1"
 
 #: cmdevents.cpp:775 dialogs/display-config.cpp:343 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
@@ -714,15 +715,15 @@ msgstr ""
 
 #: cmdevents.cpp:1233 cmdevents.cpp:1303 cmdevents.cpp:1374 cmdevents.cpp:1438
 msgid " files ("
-msgstr ""
+msgstr " archivos ("
 
 #: cmdevents.cpp:1469
 msgid "Select file"
-msgstr ""
+msgstr "Seleccionar archivo"
 
 #: cmdevents.cpp:1786 cmdevents.cpp:1879
 msgid "Select state file"
-msgstr ""
+msgstr "Seleccionar archivos de estado"
 
 #: cmdevents.cpp:1787 cmdevents.cpp:1880
 msgid "VisualBoyAdvance saved game files|*.sgm"
@@ -739,11 +740,11 @@ msgstr ""
 
 #: cmdevents.cpp:2216
 msgid "Sound enabled"
-msgstr ""
+msgstr "Sonido habilitado"
 
 #: cmdevents.cpp:2216
 msgid "Sound disabled"
-msgstr ""
+msgstr "Sonido deshabilitado"
 
 #: cmdevents.cpp:2229 cmdevents.cpp:2243
 #, c-format
@@ -760,7 +761,7 @@ msgstr ""
 
 #: cmdevents.cpp:2321
 msgid "GDB Connection"
-msgstr ""
+msgstr "Conexión GDB"
 
 #: cmdevents.cpp:2374
 #, c-format
@@ -789,7 +790,7 @@ msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr ""
+msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2020 VBA-M development team"
 
 #: cmdevents.cpp:2914
 msgid ""
@@ -821,7 +822,7 @@ msgstr ""
 
 #: extra-translations.cpp:12
 msgid "&Apply"
-msgstr ""
+msgstr "&Aplicar"
 
 #: extra-translations.cpp:13
 msgid "Artists"
@@ -829,15 +830,15 @@ msgstr ""
 
 #: extra-translations.cpp:14
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: extra-translations.cpp:15
 msgid "Close"
-msgstr ""
+msgstr "Cerrar"
 
 #: extra-translations.cpp:16
 msgid "Developers"
-msgstr ""
+msgstr "Desarrolladores"
 
 #: extra-translations.cpp:17
 msgid "License"
