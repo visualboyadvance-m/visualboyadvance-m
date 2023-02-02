@@ -483,6 +483,36 @@ bool Option::SetGbPalette(const wxString& value) {
     return true;
 }
 
+double Option::GetDoubleMin() const {
+    assert(is_double());
+    return nonstd::get<double>(min_);
+}
+
+double Option::GetDoubleMax() const {
+    assert(is_double());
+    return nonstd::get<double>(max_);
+}
+
+int32_t Option::GetIntMin() const {
+    assert(is_int());
+    return nonstd::get<int32_t>(min_);
+}
+
+int32_t Option::GetIntMax() const {
+    assert(is_int());
+    return nonstd::get<int32_t>(max_);
+}
+
+uint32_t Option::GetUnsignedMin() const {
+    assert(is_unsigned());
+    return nonstd::get<uint32_t>(min_);
+}
+
+uint32_t Option::GetUnsignedMax() const {
+    assert(is_unsigned());
+    return nonstd::get<uint32_t>(max_);
+}
+
 void Option::NextFilter() {
     assert(is_filter());
     const int old_value = static_cast<int>(GetFilter());

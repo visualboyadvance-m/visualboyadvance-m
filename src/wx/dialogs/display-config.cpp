@@ -11,6 +11,8 @@
 #include <wx/spinctrl.h>
 #include <wx/stdpaths.h>
 #include <wx/textctrl.h>
+#include <wx/valnum.h>
+
 #include <wx/xrc/xmlres.h>
 
 #include "config/option.h"
@@ -25,57 +27,60 @@ namespace dialogs {
 
 namespace {
 
-// Validator for a wxTextCtrl with a double value.
-class ScaleValidator : public widgets::OptionValidator {
+// Custom validator for the kDispScale option. We rely on the existing
+// wxFloatingPointValidator validator for this.
+class ScaleValidator : public wxFloatingPointValidator<double>,
+                       public config::Option::Observer {
 public:
-    ScaleValidator() : widgets::OptionValidator(config::OptionID::kDispScale) {}
+    ScaleValidator()
+        : wxFloatingPointValidator<double>(&value_),
+          config::Option::Observer(config::OptionID::kDispScale),
+          value_(option()->GetDouble()) {
+        // Let wxFloatingPointValidator do the hard work.
+        SetMin(option()->GetDoubleMin());
+        SetMax(option()->GetDoubleMax());
+        SetPrecision(1);
+    }
     ~ScaleValidator() override = default;
 
-private:
-    // OptionValidator implementation.
+    // Returns a copy of the object.
     wxObject* Clone() const override { return new ScaleValidator(); }
 
-    bool IsWindowValueValid() override {
-        double value;
-        if (!wxDynamicCast(GetWindow(), wxTextCtrl)
-                 ->GetValue()
-                 .ToDouble(&value)) {
+private:
+    // wxValidator implementation.
+    bool TransferFromWindow() final {
+        if (!wxFloatingPointValidator<double>::TransferFromWindow()) {
+            wxLogWarning(_("Invalid value for Default magnification."));
             return false;
         }
-
-        return true;
+        return option()->SetDouble(value_);
     }
 
-    bool WriteToWindow() override {
-        wxDynamicCast(GetWindow(), wxTextCtrl)
-            ->SetValue(wxString::Format("%.1f", option()->GetDouble()));
-        return true;
-    }
+    bool TransferToWindow() final {
+        value_ = option()->GetDouble();
+        return wxFloatingPointValidator<double>::TransferToWindow();
+    };
 
-    bool WriteToOption() override {
-        double value;
-        if (!wxDynamicCast(GetWindow(), wxTextCtrl)
-                 ->GetValue()
-                 .ToDouble(&value)) {
-            return false;
-        }
-
-        return option()->SetDouble(value);
+#if WX_HAS_VALIDATOR_SET_WINDOW_OVERRIDE
+    void SetWindow(wxWindow* window) final {
+        wxFloatingPointValidator<double>::SetWindow(window);
     }
+#endif
+
+    // config::Option::Observer implementation.
+    void OnValueChanged() final { TransferToWindow(); }
+
+    // A local value used for configuration.
+    double value_;
 };
 
 // Validator for a wxChoice with a Filter value.
 class FilterValidator : public widgets::OptionValidator {
 public:
-    FilterValidator() : OptionValidator(config::OptionID::kDispFilter) {
-        Bind(wxEVT_CHOICE, &FilterValidator::OnChoice, this);
-    }
+    FilterValidator() : OptionValidator(config::OptionID::kDispFilter) {}
     ~FilterValidator() override = default;
 
 private:
-    // wxChoice event handler.
-    void OnChoice(wxCommandEvent&) { WriteToOption(); }
-
     // OptionValidator implementation.
     wxObject* Clone() const override { return new FilterValidator(); }
 
@@ -105,15 +110,10 @@ private:
 // Validator for a wxChoice with an Interframe value.
 class InterframeValidator : public widgets::OptionValidator {
 public:
-    InterframeValidator() : OptionValidator(config::OptionID::kDispIFB) {
-        Bind(wxEVT_CHOICE, &InterframeValidator::OnChoice, this);
-    }
+    InterframeValidator() : OptionValidator(config::OptionID::kDispIFB) {}
     ~InterframeValidator() override = default;
 
 private:
-    // wxChoice event handler.
-    void OnChoice(wxCommandEvent&) { WriteToOption(); }
-
     // OptionValidator implementation.
     wxObject* Clone() const override { return new InterframeValidator(); }
 
@@ -148,14 +148,10 @@ public:
         : OptionValidator(config::OptionID::kDispRenderMethod),
           render_method_(render_method) {
         assert(render_method != config::RenderMethod::kLast);
-        Bind(wxEVT_RADIOBUTTON, &RenderValidator::OnRadioButton, this);
     }
     ~RenderValidator() override = default;
 
 private:
-    // wxRadioButton event handler.
-    void OnRadioButton(wxCommandEvent&) { WriteToOption(); }
-
     // OptionValidator implementation.
     wxObject* Clone() const override {
         return new RenderValidator(render_method_);
@@ -307,11 +303,18 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
         ->SetValidator(RenderValidator(config::RenderMethod::kOpenGL));
 #endif  // NO_OGL
 
-    // Direct3D is not implemented so hide the option on every platform.
+#if defined(__WXMSW__) && !defined(NO_D3D)
+    // Enable the Direct3D option on Windows.
+    GetValidatedChild(this, "OutputDirect3D")
+        ->SetValidator(RenderValidator(config::RenderMethod::kDirect3d));
+#else
     GetValidatedChild(this, "OutputDirect3D")->Hide();
+#endif
 
     filter_selector_ = GetValidatedChild<wxChoice>(this, "Filter");
     filter_selector_->SetValidator(FilterValidator());
+    filter_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::UpdatePlugin, this,
+                           GetId());
 
     // These are filled and/or hidden at dialog load time.
     plugin_label_ = GetValidatedChild<wxControl>(this, "PluginLab");
@@ -320,14 +323,21 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
     interframe_selector_ = GetValidatedChild<wxChoice>(this, "IFB");
     interframe_selector_->SetValidator(InterframeValidator());
 
-    Bind(wxEVT_SHOW, &DisplayConfig::OnDialogShown, this, GetId());
-    Bind(wxEVT_CLOSE_WINDOW, &DisplayConfig::OnDialogClosed, this, GetId());
+    Bind(wxEVT_SHOW, &DisplayConfig::OnDialogShowEvent, this, GetId());
 
     // Finally, fit everything nicely.
     Fit();
 }
 
-void DisplayConfig::OnDialogShown(wxShowEvent&) {
+void DisplayConfig::OnDialogShowEvent(wxShowEvent& event) {
+    if (event.IsShown()) {
+        PopulatePluginOptions();
+    } else {
+        StopPluginHandler();
+    }
+}
+
+void DisplayConfig::PopulatePluginOptions() {
     // Populate the plugin values, if any.
     wxArrayString plugins;
     const wxString plugin_path = wxGetApp().GetPluginsDir();
@@ -387,17 +397,21 @@ void DisplayConfig::OnDialogShown(wxShowEvent&) {
     Fit();
 }
 
-void DisplayConfig::OnDialogClosed(wxCloseEvent&) {
-    // Reset the validator to stop handling events while this dialog is not
-    // shown.
+void DisplayConfig::StopPluginHandler() {
+    // Reset the validator to stop handling events while this dialog is hidden.
     plugin_selector_->SetValidator(wxValidator());
+}
+
+void DisplayConfig::UpdatePlugin(wxCommandEvent& event) {
+    const bool is_plugin = (static_cast<config::Filter>(event.GetSelection()) ==
+                            config::Filter::kPlugin);
+    plugin_label_->Enable(is_plugin);
+    plugin_selector_->Enable(is_plugin);
 }
 
 void DisplayConfig::OnFilterChanged(config::Option* option) {
     const config::Filter option_filter = option->GetFilter();
     const bool is_plugin = (option_filter == config::Filter::kPlugin);
-    plugin_label_->Enable(is_plugin);
-    plugin_selector_->Enable(is_plugin);
 
     // Plugin needs to be handled separately, in case it was removed. The panel
     // will eventually reset if it can't actually use the plugin.

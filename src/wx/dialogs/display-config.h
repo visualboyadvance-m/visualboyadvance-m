@@ -29,11 +29,17 @@ private:
     // owner, `parent` is destroyed. This prevents accidental deletion.
     DisplayConfig(wxWindow* parent);
 
+    // Handler for the wxEVT_SHOW event.
+    void OnDialogShowEvent(wxShowEvent& event);
+
     // Populates the plugin options.
-    void OnDialogShown(wxShowEvent&);
+    void PopulatePluginOptions();
 
     // Stops handling the plugin options.
-    void OnDialogClosed(wxCloseEvent&);
+    void StopPluginHandler();
+
+    // Update the plugin display.
+    void UpdatePlugin(wxCommandEvent& event);
 
     // Displays the new filter name on the screen.
     void OnFilterChanged(config::Option* option);
