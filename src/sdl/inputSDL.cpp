@@ -48,7 +48,11 @@ static SDL_Joystick** sdlDevices = NULL;
 
 static EPad sdlDefaultJoypad = PAD_MAIN;
 
+static int autoFire = 0;
+static int autoFireToggle = 0;
 static int autoFireCountdown = 0;
+static int sensorX = 0;
+static int sensorY = 0;
 
 static uint32_t joypad[5][SDLBUTTONS_NUM] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },

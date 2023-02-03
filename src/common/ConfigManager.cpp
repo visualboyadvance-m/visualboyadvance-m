@@ -62,7 +62,6 @@ enum named_opts
 	OPT_AGB_PRINT = 1000,
 	OPT_AUTOFIRE,
 	OPT_AUTO_FRAME_SKIP,
-	OPT_AVI_RECORD_DIR,
 	OPT_BATTERY_DIR,
 	OPT_BIOS_FILE_NAME_GB,
 	OPT_BIOS_FILE_NAME_GBA,
@@ -72,47 +71,18 @@ enum named_opts
 	OPT_CPU_SAVE_TYPE,
 	OPT_DOTCODE_FILE_NAME_LOAD,
 	OPT_DOTCODE_FILE_NAME_SAVE,
-	OPT_EMULATOR_TYPE,
-	OPT_FS_ADAPTER,
-	OPT_FS_COLOR_DEPTH,
-	OPT_FS_FREQUENCY,
-	OPT_FS_HEIGHT,
-	OPT_FS_WIDTH,
 	OPT_GB_EMULATOR_TYPE,
 	OPT_GB_FRAME_SKIP,
 	OPT_GB_PALETTE_OPTION,
-	OPT_GDB_PORT,
-	OPT_GL_FILTER,
 	OPT_IFB_TYPE,
-	OPT_JOYPAD_DEFAULT,
-	OPT_LANGUAGE_OPTION,
-	OPT_LINK_AUTO,
-	OPT_LINK_HACKS,
-	OPT_LINK_HOST_ADDR,
-	OPT_LINK_MODE,
-	OPT_LINK_NUM_PLAYERS,
-	OPT_LINK_TIMEOUT,
-	OPT_MAX_SCALE,
-	OPT_MOVIE_RECORD_DIR,
 	OPT_OPT_FLASH_SIZE,
 	OPT_REWIND_TIMER,
-	OPT_ROM_DIR_GB,
-	OPT_ROM_DIR_GBA,
-	OPT_ROM_DIR_GBC,
 	OPT_RTC_ENABLED,
 	OPT_SAVE_DIR,
 	OPT_SCREEN_SHOT_DIR,
 	OPT_SHOW_SPEED,
 	OPT_SHOW_SPEED_TRANSPARENT,
 	OPT_SOUND_FILTERING,
-	OPT_SOUND_RECORD_DIR,
-	OPT_SYNCHRONIZE,
-	OPT_THREAD_PRIORITY,
-	OPT_VIDEO_OPTION,
-	OPT_WINDOW_HEIGHT,
-	OPT_WINDOW_POSITION_X,
-	OPT_WINDOW_POSITION_Y,
-	OPT_WINDOW_WIDTH,
 	OPT_SPEEDUP_THROTTLE,
 	OPT_SPEEDUP_FRAME_SKIP,
 	OPT_NO_SPEEDUP_THROTTLE_FRAME_SKIP
@@ -134,129 +104,45 @@ bool mirroringEnable = true;
 bool parseDebug = true;
 bool speedHack = false;
 bool speedup = false;
-bool gbaLcdFilter = false;
-bool gbLcdFilter = false;
-const char* aviRecordDir;
 const char* batteryDir;
 const char* biosFileNameGB;
 const char* biosFileNameGBA;
 const char* biosFileNameGBC;
 const char* loadDotCodeFile;
 const char* saveDotCodeFile;
-const char* linkHostAddr;
-const char* movieRecordDir;
-char* rewindMemory = NULL;
-const char* romDirGB;
-const char* romDirGBA;
-const char* romDirGBC;
 const char* saveDir;
 const char* screenShotDir;
-const char* soundRecordDir;
-int active = 1;
 int agbPrint;
-int autoFire;
 int autoFireMaxCount = 1;
-int autoFireToggle;
 int autoFrameSkip = 0;
-int autoLoadMostRecent;
 int autoPatch;
-int autoSaveLoadCheatList;
-int aviRecording;
 int captureFormat = 0;
 int cheatsEnabled = true;
 int colorizerHack = 0;
 int cpuDisableSfx = false;
 int cpuSaveType = 0;
-int enableMMX;
 int disableStatusMessages = 0;
-int dsoundDisableHardwareAcceleration;
-int filterHeight;
-int filterMagnification;
-int filterMT; // enable multi-threading for pixel filters
 int filter = kStretch2x;
-int filterWidth;
 int frameSkip = 1;
-int frameskipadjust;
-int fsAdapter;
-int fsColorDepth;
-int fsForceChange;
-int fsFrequency;
-int fsHeight;
-int fsWidth;
 int fullScreen;
-int fullScreenStretch;
-int gdbBreakOnLoad;
-int gdbPort;
-int glFilter;
 int ifbType = kIFBNone;
-int joypadDefault;
-int languageOption;
 int layerEnable = 0xff00;
 int layerSettings = 0xff00;
-int linkAuto;
-int linkHacks = 1;
-int linkMode;
-int linkNumPlayers;
-int linkTimeout = 500;
-int maxScale;
-int mouseCounter = 0;
-int movieFrame;
-int moviePlayFrame;
-int moviePlaying;
-int movieRecording;
 int openGL;
 int optFlashSize;
 int optPrintUsage;
-int paused;
 int pauseWhenInactive = 0;
 int preparedCheats = 0;
-int recentFreeze;
-int renderedFrames;
-int rewindCount;
-int rewindCounter;
-int rewindPos;
-int rewindSaveNeeded = 0;
 int rewindTimer = 0;
-int rewindTopPos;
 int rtcEnabled;
 int saveType = GBA_SAVE_AUTO;
-int screenMessage;
-int sensorX;
-int sensorY;
-int showRenderedFrames;
 int showSpeed;
 int showSpeedTransparent;
-int sizeX;
-int sizeY;
 int skipBios = 0;
 int skipSaveGameBattery = true;
 int skipSaveGameCheats = false;
-int soundRecording;
-int speedupToggle;
-int sunBars;
-int surfaceSizeX;
-int surfaceSizeY;
-int threadPriority;
-int tripleBuffering;
 int useBios = 0;
-int useBiosFileGB;
-int useBiosFileGBA;
-int useBiosFileGBC;
-int videoOption;
-int vsync;
-int wasPaused = 0;
-uint32_t windowHeight;
-int windowMaximized;
-int windowPositionX = 0;
-int windowPositionY = 0;
-uint32_t windowWidth;
-int winGbBorderOn;
 int winGbPrinterEnabled;
-int winPauseNextFrame;
-int* rewindSerials = NULL;
-uint32_t autoFrameSkipLastTime;
-uint32_t movieLastJoypad;
-uint32_t movieNextJoypad;
 uint32_t throttle = 100;
 uint32_t speedup_throttle = 100;
 uint32_t speedup_frame_skip = 9;
@@ -265,9 +151,6 @@ bool allowKeyboardBackgroundInput = false;
 bool allowJoystickBackgroundInput = true;
 
 const char* preparedCheatCodes[MAX_CHEATS];
-
-FilterFunc filterFunction = 0;
-IFBFilterFunc ifbFunction = 0;
 
 // allow up to 100 IPS/UPS/PPF patches given on commandline
 int	patchNum = 0;
@@ -279,19 +162,14 @@ void(*dbgSignal)(int, int) = remoteStubSignal;
 void(*dbgOutput)(const char *, uint32_t) = debuggerOutput;
 #endif
 
-char* homeDir = NULL;
 char* arg0 = NULL;
 
 
 struct option argOptions[] = {
-
 	{ "agb-print", required_argument, 0, OPT_AGB_PRINT },
 	{ "auto-frame-skip", required_argument, 0, OPT_AUTO_FRAME_SKIP },
-	{ "auto-load-most-recent", no_argument, &autoLoadMostRecent, 1 },
 	{ "auto-patch", no_argument, &autoPatch, 1 },
-	{ "auto-save-load-cheat-list", no_argument, &autoSaveLoadCheatList, 1 },
 	{ "autofire", required_argument, 0, OPT_AUTOFIRE },
-	{ "avi-record-dir", required_argument, 0, OPT_AVI_RECORD_DIR },
 	{ "battery-dir", required_argument, 0, OPT_BATTERY_DIR },
 	{ "bios", required_argument, 0, 'b' },
 	{ "bios-file-name-gb", required_argument, 0, OPT_BIOS_FILE_NAME_GB },
@@ -308,26 +186,16 @@ struct option argOptions[] = {
 	{ "cpu-disable-sfx", no_argument, &cpuDisableSfx, 1 },
 	{ "cpu-save-type", required_argument, 0, OPT_CPU_SAVE_TYPE },
 	{ "debug", no_argument, 0, 'd' },
-	{ "enable-mmx", no_argument, &enableMMX, 1 },
 	{ "disable-sfx", no_argument, &cpuDisableSfx, 1 },
 	{ "disable-status-messages", no_argument, &disableStatusMessages, 1 },
 	{ "dotcode-file-name-load", required_argument, 0, OPT_DOTCODE_FILE_NAME_LOAD },
 	{ "dotcode-file-name-save", required_argument, 0, OPT_DOTCODE_FILE_NAME_SAVE },
-	{ "emulator-type", required_argument, 0, OPT_EMULATOR_TYPE },
 	{ "filter", required_argument, 0, 'f' },
-	{ "filter-enable-multi-threading", no_argument, &filterMT, 1 },
-	{ "filter-mt", no_argument, &filterMT, 1 },
 	{ "flash-128k", no_argument, &optFlashSize, 1 },
 	{ "flash-64k", no_argument, &optFlashSize, 0 },
 	{ "flash-size", required_argument, 0, 'S' },
 	{ "frameskip", required_argument, 0, 's' },
-	{ "fs-adapter", required_argument, 0, OPT_FS_ADAPTER },
-	{ "fs-color-depth", required_argument, 0, OPT_FS_COLOR_DEPTH },
-	{ "fs-frequency", required_argument, 0, OPT_FS_FREQUENCY },
-	{ "fs-height", required_argument, 0, OPT_FS_HEIGHT },
-	{ "fs-width", required_argument, 0, OPT_FS_WIDTH },
 	{ "full-screen", no_argument, &fullScreen, 1 },
-	{ "full-screen-stretch", no_argument, &fullScreenStretch, 1 },
 	{ "gb-border-automatic", no_argument, &gbBorderAutomatic, 1 },
 	{ "gb-border-on", no_argument, &gbBorderOn, 1 },
 	{ "gb-color-option", no_argument, &gbColorOption, 1 },
@@ -336,22 +204,9 @@ struct option argOptions[] = {
 	{ "gb-palette-option", required_argument, 0, OPT_GB_PALETTE_OPTION },
 	{ "gb-printer", no_argument, &winGbPrinterEnabled, 1 },
 	{ "gdb", required_argument, 0, 'G' },
-	{ "gdb-break-on-load", no_argument, &gdbBreakOnLoad, 1 },
-	{ "gdb-port", required_argument, 0, OPT_GDB_PORT },
-	{ "gl-filter", required_argument, 0, OPT_GL_FILTER },
 	{ "help", no_argument, &optPrintUsage, 1 },
 	{ "ifb-filter", required_argument, 0, 'I' },
 	{ "ifb-type", required_argument, 0, OPT_IFB_TYPE },
-	{ "joypad-default", required_argument, 0, OPT_JOYPAD_DEFAULT },
-	{ "language-option", required_argument, 0, OPT_LANGUAGE_OPTION },
-	{ "link-auto", required_argument, 0, OPT_LINK_AUTO },
-	{ "link-hacks", required_argument, 0, OPT_LINK_HACKS },
-	{ "link-host-addr", required_argument, 0, OPT_LINK_HOST_ADDR },
-	{ "link-mode", required_argument, 0, OPT_LINK_MODE },
-	{ "link-num-players", required_argument, 0, OPT_LINK_NUM_PLAYERS },
-	{ "link-timeout", required_argument, 0, OPT_LINK_TIMEOUT },
-	{ "max-scale", required_argument, 0, OPT_MAX_SCALE },
-	{ "movie-record-dir", required_argument, 0, OPT_MOVIE_RECORD_DIR },
 	{ "no-agb-print", no_argument, &agbPrint, 0 },
 	{ "no-auto-frameskip", no_argument, &autoFrameSkip, 0 },
 	{ "no-debug", no_argument, 0, 'N' },
@@ -367,11 +222,7 @@ struct option argOptions[] = {
 	{ "patch", required_argument, 0, 'i' },
 	{ "pause-when-inactive", no_argument, &pauseWhenInactive, 1 },
 	{ "profile", optional_argument, 0, 'p' },
-	{ "recent-freeze", no_argument, &recentFreeze, 1 },
 	{ "rewind-timer", required_argument, 0, OPT_REWIND_TIMER },
-	{ "rom-dir-gb", required_argument, 0, OPT_ROM_DIR_GB },
-	{ "rom-dir-gba", required_argument, 0, OPT_ROM_DIR_GBA },
-	{ "rom-dir-gbc", required_argument, 0, OPT_ROM_DIR_GBC },
 	{ "rtc", no_argument, &rtcEnabled, 1 },
 	{ "rtc-enabled", required_argument, 0, OPT_RTC_ENABLED },
 	{ "save-auto", no_argument, &cpuSaveType, 0 },
@@ -391,27 +242,13 @@ struct option argOptions[] = {
 	{ "skip-save-game-battery", no_argument, &skipSaveGameBattery, 1 },
 	{ "skip-save-game-cheats", no_argument, &skipSaveGameCheats, 1 },
 	{ "sound-filtering", required_argument, 0, OPT_SOUND_FILTERING },
-	{ "sound-record-dir", required_argument, 0, OPT_SOUND_RECORD_DIR },
-	{ "stretch", no_argument, &fullScreenStretch, 1 },
-	{ "synchronize", required_argument, 0, OPT_SYNCHRONIZE },
-	{ "thread-priority", required_argument, 0, OPT_THREAD_PRIORITY },
 	{ "throttle", required_argument, 0, 'T' },
 	{ "speedup-throttle", required_argument, 0, OPT_SPEEDUP_THROTTLE },
 	{ "speedup-frame-skip", required_argument, 0, OPT_SPEEDUP_FRAME_SKIP },
 	{ "no-speedup-throttle-frame-skip", no_argument, 0, OPT_NO_SPEEDUP_THROTTLE_FRAME_SKIP },
-	{ "triple-buffering", no_argument, &tripleBuffering, 1 },
 	{ "use-bios", no_argument, &useBios, 1 },
-	{ "use-bios-file-gb", no_argument, &useBiosFileGB, 1 },
-	{ "use-bios-file-gba", no_argument, &useBiosFileGBA, 1 },
-	{ "use-bios-file-gbc", no_argument, &useBiosFileGBC, 1 },
 	{ "verbose", required_argument, 0, 'v' },
-	{ "video-option", required_argument, 0, OPT_VIDEO_OPTION },
-	{ "vsync", no_argument, &vsync, 1 },
 	{ "win-gb-printer-enabled", no_argument, &winGbPrinterEnabled, 1 },
-	{ "window-height", required_argument, 0, OPT_WINDOW_HEIGHT },
-	{ "window-position-x", required_argument, 0, OPT_WINDOW_POSITION_X },
-	{ "window-position-y", required_argument, 0, OPT_WINDOW_POSITION_Y },
-	{ "window-width", required_argument, 0, OPT_WINDOW_WIDTH },
 
 
 	{ NULL, no_argument, NULL, 0 }
@@ -470,11 +307,6 @@ void ValidateConfig()
 		rewindTimer = 0;
 	if (autoFireMaxCount < 1)
 		autoFireMaxCount = 1;
-
-	if (rewindTimer) {
-		rewindMemory = (char *)malloc(REWIND_NUM*REWIND_SIZE);
-		rewindSerials = (int *)calloc(REWIND_NUM, sizeof(int)); // init to zeroes
-	}
 }
 
 void LoadConfig()
@@ -484,10 +316,7 @@ void LoadConfig()
 	allowJoystickBackgroundInput = ReadPref("allowJoystickBackgroundInput", true);
 	autoFireMaxCount = fromDec(ReadPrefString("autoFireMaxCount"));
 	autoFrameSkip = ReadPref("autoFrameSkip", 0);
-	autoLoadMostRecent = ReadPref("autoLoadMostRecent", 0);
 	autoPatch = ReadPref("autoPatch", 1);
-	autoSaveLoadCheatList = ReadPref("autoSaveLoadCheatList", 1);
-	aviRecordDir = ReadPrefString("aviRecordDir");
 	batteryDir = ReadPrefString("batteryDir");
 	biosFileNameGB = ReadPrefString("biosFileGB");
 	biosFileNameGBA = ReadPrefString("biosFileGBA");
@@ -497,18 +326,10 @@ void LoadConfig()
 	colorizerHack = ReadPref("colorizerHack", 0);
 	cpuDisableSfx = ReadPref("disableSfx", 0);
 	cpuSaveType = ReadPrefHex("saveType");
-	enableMMX = ReadPref("enableMMX", 1);
 	disableStatusMessages = ReadPrefHex("disableStatus");
-	filterMT = ReadPref("filterEnableMultiThreading", 0);
 	filter = ReadPref("filter", 0);
 	frameSkip = ReadPref("frameSkip", 0);
-	fsAdapter = ReadPref("fsAdapter", 0);
-	fsColorDepth = ReadPref("fsColorDepth", 32);
-	fsFrequency = ReadPref("fsFrequency", 60);
-	fsHeight = ReadPref("fsHeight", 600);
-	fsWidth = ReadPref("fsWidth", 800);
 	fullScreen = ReadPrefHex("fullScreen");
-	fullScreenStretch = ReadPref("stretch", 0);
 	gbBorderAutomatic = ReadPref("borderAutomatic", 1);
 	gbBorderOn = ReadPrefHex("borderOn");
 	gbColorOption = ReadPref("colorOption", 0);
@@ -520,35 +341,12 @@ void LoadConfig()
 	gb_effects_config.enabled = ReadPref("gbSoundEffectsEnabled", 0);
 	gb_effects_config.stereo = (float)ReadPref("gbSoundEffectsStereo", 15) / 100.0f;
 	gb_effects_config.surround = ReadPref("gbSoundEffectsSurround", 0);
-	gdbBreakOnLoad = ReadPref("gdbBreakOnLoad", 0);
-	gdbPort = ReadPref("gdbPort", 55555);
-	glFilter = ReadPref("glFilter", 1);
 	ifbType = ReadPref("ifbType", 0);
-	joypadDefault = ReadPref("joypadDefault", 0);
-	languageOption = ReadPref("language", 1);
-	linkAuto = ReadPref("LinkAuto", 1);
-	linkHacks = ReadPref("LinkHacks", 0);
-	linkHostAddr = ReadPrefString("LinkHost", "localhost");
-	linkMode = ReadPref("LinkMode", 0); // LINK_DISCONNECTED = 0
-	linkNumPlayers = ReadPref("LinkNumPlayers", 2);
-
-	linkTimeout = ReadPref("LinkTimeout", 500);
-
-	// Previous default was 1, which is very wrong.
-	if (linkTimeout <= 1)
-	    linkTimeout = 500;
-
 	loadDotCodeFile = ReadPrefString("loadDotCodeFile");
-	maxScale = ReadPref("maxScale", 0);
-	movieRecordDir = ReadPrefString("movieRecordDir");
 	openGL = ReadPrefHex("openGL");
 	optFlashSize = ReadPref("flashSize", 0);
 	pauseWhenInactive = ReadPref("pauseWhenInactive", 1);
-	recentFreeze = ReadPref("recentFreeze", 0);
 	rewindTimer = ReadPref("rewindTimer", 0);
-	romDirGB = ReadPrefString("romDirGB");
-	romDirGBA = ReadPrefString("romDirGBA");
-	romDirGBC = ReadPrefString("romDirGBC");
 	rtcEnabled = ReadPref("rtcEnabled", 0);
 	saveDir = ReadPrefString("saveDir");
 	saveDotCodeFile = ReadPrefString("saveDotCodeFile");
@@ -560,25 +358,11 @@ void LoadConfig()
 	skipSaveGameCheats = ReadPref("skipSaveGameCheats", 0);
 	soundFiltering = (float)ReadPref("gbaSoundFiltering", 50) / 100.0f;
 	soundInterpolation = ReadPref("gbaSoundInterpolation", 1);
-	soundRecordDir = ReadPrefString("soundRecordDir");
-	threadPriority = ReadPref("priority", 2);
 	throttle = ReadPref("throttle", 100);
 	speedup_throttle = ReadPref("speedupThrottle", 100);
 	speedup_frame_skip = ReadPref("speedupFrameSkip", 9);
 	speedup_throttle_frame_skip = ReadPref("speedupThrottleFrameSkip", 0);
-	tripleBuffering = ReadPref("tripleBuffering", 0);
 	useBios = ReadPrefHex("useBiosGBA");
-	useBiosFileGB = ReadPref("useBiosGB", 0);
-	useBiosFileGBA = ReadPref("useBiosGBA", 0);
-	useBiosFileGBC = ReadPref("useBiosGBC", 0);
-	videoOption = ReadPref("video", 2); // VIDEO_3X = 2
-	vsync = ReadPref("vsync", false);
-	windowHeight = ReadPref("windowHeight", 0);
-	windowMaximized = ReadPref("windowMaximized", 0);
-	windowPositionX = ReadPref("windowX", -1);
-	windowPositionY = ReadPref("windowY", -1);
-	windowWidth = ReadPref("windowWidth", 0);
-	winGbBorderOn = ReadPref("borderOn", 0);
 	winGbPrinterEnabled = ReadPref("gbPrinter", 0);
 
 	int soundQuality = (ReadPrefHex("soundQuality", 1));
@@ -972,7 +756,6 @@ int ReadOpts(int argc, char ** argv)
 			break;
 		case 'F':
 			fullScreen = 1;
-			mouseCounter = 120;
 			break;
 		case 'f':
 			if (optarg) {
@@ -1084,20 +867,6 @@ int ReadOpts(int argc, char ** argv)
 			}
 			break;
 
-		case OPT_VIDEO_OPTION:
-			// --video-option
-			if (optarg) {
-				videoOption = atoi(optarg);
-			}
-			break;
-
-		case OPT_LANGUAGE_OPTION:
-			// --language-option
-			if (optarg) {
-				languageOption = atoi(optarg);
-			}
-			break;
-
 		case OPT_GB_FRAME_SKIP:
 			// --gb-frame-skip
 			if (optarg) {
@@ -1105,66 +874,10 @@ int ReadOpts(int argc, char ** argv)
 			}
 			break;
 
-		case OPT_FS_ADAPTER:
-			// --fs-adapter
-			if (optarg) {
-				fsAdapter = atoi(optarg);
-			}
-			break;
-
-		case OPT_FS_WIDTH:
-			// --fs-width
-			if (optarg) {
-				fsWidth = atoi(optarg);
-			}
-			break;
-
-		case OPT_FS_HEIGHT:
-			// --fs-height
-			if (optarg) {
-				fsHeight = atoi(optarg);
-			}
-			break;
-
-		case OPT_FS_COLOR_DEPTH:
-			// --fs-color-depth
-			if (optarg) {
-				fsColorDepth = atoi(optarg);
-			}
-			break;
-
-		case OPT_FS_FREQUENCY:
-			// --fs-frequency
-			if (optarg) {
-				fsFrequency = atoi(optarg);
-			}
-			break;
-
-		case OPT_WINDOW_POSITION_X:
-			// --window-position-x
-			if (optarg) {
-				windowPositionX = atoi(optarg);
-			}
-			break;
-
-		case OPT_WINDOW_POSITION_Y:
-			// --window-position-y
-			if (optarg) {
-				windowPositionY = atoi(optarg);
-			}
-			break;
-
 		case OPT_SOUND_FILTERING:
 			// --sound-filtering
 			if (optarg) {
 				soundFiltering = (float)(atoi(optarg));
-			}
-			break;
-
-		case OPT_GL_FILTER:
-			// --gl-filter
-			if (optarg) {
-				glFilter = atoi(optarg);
 			}
 			break;
 
@@ -1189,13 +902,6 @@ int ReadOpts(int argc, char ** argv)
 			}
 			break;
 
-		case OPT_THREAD_PRIORITY:
-			// --thread-priority
-			if (optarg) {
-				threadPriority = atoi(optarg);
-			}
-			break;
-
 		case OPT_GB_PALETTE_OPTION:
 			// --gb-palette-option
 			if (optarg) {
@@ -1207,62 +913,6 @@ int ReadOpts(int argc, char ** argv)
 			// --rewind-timer
 			if (optarg) {
 				rewindTimer = atoi(optarg);
-			}
-			break;
-
-		case OPT_JOYPAD_DEFAULT:
-			// --joypad-default
-			if (optarg) {
-				joypadDefault = atoi(optarg);
-			}
-			break;
-
-		case OPT_MAX_SCALE:
-			// --max-scale
-			if (optarg) {
-				maxScale = atoi(optarg);
-			}
-			break;
-
-		case OPT_LINK_TIMEOUT:
-			// --link-timeout
-			if (optarg) {
-				linkTimeout = atoi(optarg);
-			}
-			break;
-
-		case OPT_LINK_MODE:
-			// --link-mode
-			if (optarg) {
-				linkMode = atoi(optarg);
-			}
-			break;
-
-		case OPT_LINK_AUTO:
-			// --link-auto
-			if (optarg) {
-				linkAuto = atoi(optarg);
-			}
-			break;
-
-		case OPT_LINK_HACKS:
-			// --link-hacks
-			if (optarg) {
-				linkHacks = atoi(optarg);
-			}
-			break;
-
-		case OPT_LINK_NUM_PLAYERS:
-			// --link-num-players
-			if (optarg) {
-				linkNumPlayers = atoi(optarg);
-			}
-			break;
-
-		case OPT_GDB_PORT:
-			// --gdb-port
-			if (optarg) {
-				gdbPort = atoi(optarg);
 			}
 			break;
 
@@ -1281,21 +931,6 @@ int ReadOpts(int argc, char ** argv)
 			biosFileNameGBC = optarg;
 			break;
 
-		case OPT_AVI_RECORD_DIR:
-			// --avi-record-dir
-			aviRecordDir = optarg;
-			break;
-
-		case OPT_MOVIE_RECORD_DIR:
-			// --movie-record-dir
-			movieRecordDir = optarg;
-			break;
-
-		case OPT_SOUND_RECORD_DIR:
-			// --sound-record-dir
-			soundRecordDir = optarg;
-			break;
-
 		case OPT_SCREEN_SHOT_DIR:
 			// --screen-shot-dir
 			screenShotDir = optarg;
@@ -1311,26 +946,6 @@ int ReadOpts(int argc, char ** argv)
 			batteryDir = optarg;
 			break;
 
-		case OPT_ROM_DIR_GBC:
-			// --rom-dir-gbc
-			romDirGBC = optarg;
-			break;
-
-		case OPT_ROM_DIR_GB:
-			// --rom-dir-gb
-			romDirGB = optarg;
-			break;
-
-		case OPT_ROM_DIR_GBA:
-			// --rom-dir-gba
-			romDirGBA = optarg;
-			break;
-
-		case OPT_LINK_HOST_ADDR:
-			// --link-host-addr
-			linkHostAddr = optarg;
-			break;
-
 		case OPT_CPU_SAVE_TYPE:
 			// --cpu-save-type
 			if (optarg) {
@@ -1344,20 +959,6 @@ int ReadOpts(int argc, char ** argv)
 				optFlashSize = atoi(optarg);
                                 if (optFlashSize < 0 || optFlashSize > 1)
                                     optFlashSize = 0;
-			}
-			break;
-
-		case OPT_WINDOW_HEIGHT:
-			// --window-height
-			if (optarg) {
-				windowHeight = atoi(optarg);
-			}
-			break;
-
-		case OPT_WINDOW_WIDTH:
-			// --window-width
-			if (optarg) {
-				windowWidth = atoi(optarg);
 			}
 			break;
 

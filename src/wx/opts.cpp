@@ -309,44 +309,19 @@ wxAcceleratorEntry_v sys_accels;
 // the default value of every non-object to be 0.
 opts_t::opts_t()
 {
-    frameSkip = -1;
-    audio_api = AUD_SDL;
-
-    retain_aspect = true;
-    max_threads = wxThread::GetCPUCount();
-
     // handle erroneous thread count values appropriately
+    max_threads = wxThread::GetCPUCount();
     if (max_threads > 256)
         max_threads = 256;
 
     if (max_threads < 1)
         max_threads = 1;
 
-    // 10 fixes stuttering on mac with openal, as opposed to 5
-    // also should be better for modern hardware in general
-    audio_buffers = 10;
-
-    sound_en = 0x30f;
-    sound_vol = 100;
-    sound_qual = 1;
-    gb_echo = 20;
-    gb_stereo = 15;
-    gb_declick = true;
-    gba_sound_filter = 50;
-    bilinear = true;
-    default_stick = 1;
-
     recent = new wxFileHistory(10);
-    autofire_rate = 1;
-    print_auto_page = true;
+
+    // These are globals being set here.
+    frameSkip = -1;
     autoPatch = true;
-    // quick fix for issues #48 and #445
-    link_host = "127.0.0.1";
-    server_ip = "*";
-    link_port = 5738;
-
-    hide_menu_bar = true;
-
     skipSaveGameBattery = true;
 }
 
@@ -571,9 +546,10 @@ void load_opts() {
         }
     }
 
-    // Make sure linkTimeout is not set to 1, which was the previous default.
-    if (linkTimeout <= 1)
-        linkTimeout = 500;
+    // Make sure link_timeout is not set to 1, which was the previous default.
+    if (gopts.link_timeout <= 1) {
+        gopts.link_timeout = 500;
+    }
 
     // recent is special
     // Recent does not get written with defaults

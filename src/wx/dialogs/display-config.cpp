@@ -279,7 +279,7 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
     // this was a choice, but I'd rather not have to make an off-by-one
     // validator just for this, and spinctrl is good enough.
     GetValidatedChild(this, "MaxScale")
-        ->SetValidator(wxGenericValidator(&maxScale));
+        ->SetValidator(wxGenericValidator(&gopts.max_scale));
 
     // Basic
     GetValidatedChild(this, "OutputSimple")

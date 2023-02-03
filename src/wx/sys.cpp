@@ -31,6 +31,7 @@ int RGB_LOW_BITS_MASK;
 // these are local, though.
 int autofire, autohold;
 static int sensorx[4], sensory[4], sensorz[4];
+int sunBars = 1;
 bool pause_next;
 bool turbo;
 

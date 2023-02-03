@@ -152,6 +152,11 @@ std::array<Option, kNbOptions>& Option::All() {
 #else
         RenderMethod render_method = RenderMethod::kOpenGL;
 #endif
+        bool window_maximized = false;
+        uint32_t window_height = 0;
+        uint32_t window_width = 0;
+        int window_pos_x = -1;
+        int window_pos_y = -1;
     };
     static OwnedOptions g_owned_opts;
 
@@ -176,7 +181,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kGBBiosFile, &gopts.gb_bios),
         Option(OptionID::kGBColorOption, &gbColorOption, 0, 1),
         Option(OptionID::kGBColorizerHack, &colorizerHack, 0, 1),
-        Option(OptionID::kGBLCDFilter, &gbLcdFilter),
+        Option(OptionID::kGBLCDFilter, &gopts.gb_lcd_filter),
         Option(OptionID::kGBGBCBiosFile, &gopts.gbc_bios),
         Option(OptionID::kGBPalette0, systemGbPalette),
         Option(OptionID::kGBPalette1, systemGbPalette + 8),
@@ -188,15 +193,15 @@ std::array<Option, kNbOptions>& Option::All() {
 
         /// GBA
         Option(OptionID::kGBABiosFile, &gopts.gba_bios),
-        Option(OptionID::kGBALCDFilter, &gbaLcdFilter),
+        Option(OptionID::kGBALCDFilter, &gopts.gba_lcd_filter),
 #ifndef NO_LINK
         Option(OptionID::kGBALinkAuto, &gopts.link_auto),
-        Option(OptionID::kGBALinkFast, &linkHacks, 0, 1),
+        Option(OptionID::kGBALinkFast, &gopts.link_hacks),
         Option(OptionID::kGBALinkHost, &gopts.link_host),
         Option(OptionID::kGBAServerIP, &gopts.server_ip),
         Option(OptionID::kGBALinkPort, &gopts.link_port, 0, 65535),
-        Option(OptionID::kGBALinkProto, &gopts.link_proto, 0, 1),
-        Option(OptionID::kGBALinkTimeout, &linkTimeout, 0, 9999999),
+        Option(OptionID::kGBALinkProto, &gopts.link_proto),
+        Option(OptionID::kGBALinkTimeout, &gopts.link_timeout, 0, 9999999),
         Option(OptionID::kGBALinkType, &gopts.gba_link_type, 0, 5),
 #endif
         Option(OptionID::kGBAROMDir, &gopts.gba_rom_dir),
@@ -210,7 +215,7 @@ std::array<Option, kNbOptions>& Option::All() {
                600),
         Option(OptionID::kGenScreenshotDir, &gopts.scrshot_dir),
         Option(OptionID::kGenStateDir, &gopts.state_dir),
-        Option(OptionID::kGenStatusBar, &gopts.statusbar, 0, 1),
+        Option(OptionID::kGenStatusBar, &gopts.statusbar),
 
         /// Joypad
         Option(OptionID::kJoy),
@@ -225,32 +230,23 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kPrefAgbPrint, &agbPrint, 0, 1),
         Option(OptionID::kPrefAutoFrameSkip, &autoFrameSkip, 0, 1),
         Option(OptionID::kPrefAutoPatch, &autoPatch, 0, 1),
-        Option(OptionID::kPrefAutoSaveLoadCheatList,
-               &gopts.autoload_cheats),
         Option(OptionID::kPrefBorderAutomatic, &gbBorderAutomatic, 0, 1),
         Option(OptionID::kPrefBorderOn, &gbBorderOn, 0, 1),
         Option(OptionID::kPrefCaptureFormat, &captureFormat, 0, 1),
         Option(OptionID::kPrefCheatsEnabled, &cheatsEnabled, 0, 1),
-#ifdef MMX
-        Option(OptionID::kPrefEnableMMX, &enableMMX, 0, 1),
-#endif
         Option(OptionID::kPrefDisableStatus, &disableStatusMessages, 0,
                1),
         Option(OptionID::kPrefEmulatorType, &gbEmulatorType, 0, 5),
         Option(OptionID::kPrefFlashSize, &optFlashSize, 0, 1),
         Option(OptionID::kPrefFrameSkip, &frameSkip, -1, 9),
-        Option(OptionID::kPrefFsColorDepth, &fsColorDepth, 0, 999),
-        Option(OptionID::kPrefFsFrequency, &fsFrequency, 0, 999),
-        Option(OptionID::kPrefFsHeight, &fsHeight, 0, 99999),
-        Option(OptionID::kPrefFsWidth, &fsWidth, 0, 99999),
         Option(OptionID::kPrefGBPaletteOption, &gbPaletteOption, 0, 2),
         Option(OptionID::kPrefGBPrinter, &winGbPrinterEnabled, 0, 1),
-        Option(OptionID::kPrefGDBBreakOnLoad, &gdbBreakOnLoad, 0, 1),
-        Option(OptionID::kPrefGDBPort, &gdbPort, 0, 65535),
+        Option(OptionID::kPrefGDBBreakOnLoad, &gopts.gdb_break_on_load),
+        Option(OptionID::kPrefGDBPort, &gopts.gdb_port, 0, 65535),
 #ifndef NO_LINK
-        Option(OptionID::kPrefLinkNumPlayers, &linkNumPlayers, 2, 4),
+        Option(OptionID::kPrefLinkNumPlayers, &gopts.link_num_players, 2, 4),
 #endif
-        Option(OptionID::kPrefMaxScale, &maxScale, 0, 100),
+        Option(OptionID::kPrefMaxScale, &gopts.max_scale, 0, 100),
         Option(OptionID::kPrefPauseWhenInactive, &pauseWhenInactive, 0,
                1),
         Option(OptionID::kPrefRTCEnabled, &rtcEnabled, 0, 1),
@@ -270,18 +266,18 @@ std::array<Option, kNbOptions>& Option::All() {
                300),
         Option(OptionID::kPrefSpeedupThrottleFrameSkip,
                &speedup_throttle_frame_skip),
-        Option(OptionID::kPrefUseBiosGB, &useBiosFileGB, 0, 1),
-        Option(OptionID::kPrefUseBiosGBA, &useBiosFileGBA, 0, 1),
-        Option(OptionID::kPrefUseBiosGBC, &useBiosFileGBC, 0, 1),
-        Option(OptionID::kPrefVsync, &vsync, 0, 1),
+        Option(OptionID::kPrefUseBiosGB, &gopts.use_bios_file_gb),
+        Option(OptionID::kPrefUseBiosGBA, &gopts.use_bios_file_gba),
+        Option(OptionID::kPrefUseBiosGBC, &gopts.use_bios_file_gbc),
+        Option(OptionID::kPrefVsync, &gopts.vsync),
 
         /// Geometry
         Option(OptionID::kGeomFullScreen, &fullScreen, 0, 1),
-        Option(OptionID::kGeomIsMaximized, &windowMaximized, 0, 1),
-        Option(OptionID::kGeomWindowHeight, &windowHeight, 0, 99999),
-        Option(OptionID::kGeomWindowWidth, &windowWidth, 0, 99999),
-        Option(OptionID::kGeomWindowX, &windowPositionX, -1, 99999),
-        Option(OptionID::kGeomWindowY, &windowPositionY, -1, 99999),
+        Option(OptionID::kGeomIsMaximized, &g_owned_opts.window_maximized),
+        Option(OptionID::kGeomWindowHeight, &g_owned_opts.window_height, 0, 99999),
+        Option(OptionID::kGeomWindowWidth, &g_owned_opts.window_width, 0, 99999),
+        Option(OptionID::kGeomWindowX, &g_owned_opts.window_pos_x, -1, 99999),
+        Option(OptionID::kGeomWindowY, &g_owned_opts.window_pos_y, -1, 99999),
 
         /// UI
         Option(OptionID::kUIAllowKeyboardBackgroundInput,
@@ -382,7 +378,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                Option::Type::kBool},
     OptionData{"GBA/LinkFast", "SpeedOn",
                _("Enable faster network protocol by default"),
-               Option::Type::kInt},
+               Option::Type::kBool},
     OptionData{"GBA/LinkHost", "", _("Default network link client host"),
                Option::Type::kString},
     OptionData{"GBA/ServerIP", "", _("Default network link server IP to bind"),
@@ -391,7 +387,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                _("Default network link port (server and client)"),
                Option::Type::kUnsigned},
     OptionData{"GBA/LinkProto", "LinkProto", _("Default network protocol"),
-               Option::Type::kInt},
+               Option::Type::kBool},
     OptionData{"GBA/LinkTimeout", "LinkTimeout", _("Link timeout (ms)"),
                Option::Type::kInt},
     OptionData{"GBA/LinkType", "LinkType", _("Link cable type"),
@@ -425,7 +421,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                  "relative to BatteryDir)"),
                Option::Type::kString},
     OptionData{"General/StatusBar", "StatusBar", _("Enable status bar"),
-               Option::Type::kInt},
+               Option::Type::kBool},
 
     /// Joypad
     OptionData{"Joypad/*/*", "",
@@ -456,9 +452,6 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                _("Auto skip frames."), Option::Type::kInt},
     OptionData{"preferences/autoPatch", "ApplyPatches",
                _("Apply IPS/UPS/IPF patches if found"), Option::Type::kInt},
-    OptionData{"preferences/autoSaveLoadCheatList", "",
-               _("Automatically save and load cheat list"),
-               Option::Type::kBool},
     OptionData{"preferences/borderAutomatic", "",
                _("Automatically enable border for Super GameBoy games"),
                Option::Type::kInt},
@@ -468,10 +461,6 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                Option::Type::kInt},
     OptionData{"preferences/cheatsEnabled", "", _("Enable cheats"),
                Option::Type::kInt},
-#ifdef MMX
-    OptionData{"preferences/enableMMX", "MMX", _("Enable MMX"),
-               Option::Type::kInt},
-#endif
     OptionData{"preferences/disableStatus", "NoStatusMsg",
                _("Disable on-screen status messages"), Option::Type::kInt},
     OptionData{"preferences/emulatorType", "", _("Type of system to emulate"),
@@ -482,20 +471,12 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                _("Skip frames.  Values are 0-9 or -1 to skip automatically "
                  "based on time."),
                Option::Type::kInt},
-    OptionData{"preferences/fsColorDepth", "",
-               _("Fullscreen mode color depth (0 = any)"), Option::Type::kInt},
-    OptionData{"preferences/fsFrequency", "",
-               _("Fullscreen mode frequency (0 = any)"), Option::Type::kInt},
-    OptionData{"preferences/fsHeight", "",
-               _("Fullscreen mode height (0 = desktop)"), Option::Type::kInt},
-    OptionData{"preferences/fsWidth", "",
-               _("Fullscreen mode width (0 = desktop)"), Option::Type::kInt},
     OptionData{"preferences/gbPaletteOption", "", _("The palette to use"),
                Option::Type::kInt},
     OptionData{"preferences/gbPrinter", "Printer",
                _("Enable printer emulation"), Option::Type::kInt},
     OptionData{"preferences/gdbBreakOnLoad", "DebugGDBBreakOnLoad",
-               _("Break into GDB after loading the game."), Option::Type::kInt},
+               _("Break into GDB after loading the game."), Option::Type::kBool},
     OptionData{"preferences/gdbPort", "DebugGDBPort",
                _("Port to connect GDB to."), Option::Type::kInt},
 #ifndef NO_LINK
@@ -539,19 +520,19 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"preferences/speedupThrottleFrameSkip", "",
                _("Use frame skip for speedup throttle"), Option::Type::kBool},
     OptionData{"preferences/useBiosGB", "BootRomGB",
-               _("Use the specified BIOS file for GB"), Option::Type::kInt},
+               _("Use the specified BIOS file for GB"), Option::Type::kBool},
     OptionData{"preferences/useBiosGBA", "BootRomEn",
-               _("Use the specified BIOS file"), Option::Type::kInt},
+               _("Use the specified BIOS file"), Option::Type::kBool},
     OptionData{"preferences/useBiosGBC", "BootRomGBC",
-               _("Use the specified BIOS file for GBC"), Option::Type::kInt},
+               _("Use the specified BIOS file for GBC"), Option::Type::kBool},
     OptionData{"preferences/vsync", "VSync", _("Wait for vertical sync"),
-               Option::Type::kInt},
+               Option::Type::kBool},
 
     /// Geometry
     OptionData{"geometry/fullScreen", "Fullscreen",
                _("Enter fullscreen mode at startup"), Option::Type::kInt},
     OptionData{"geometry/isMaximized", "Maximized", _("Window maximized"),
-               Option::Type::kInt},
+               Option::Type::kBool},
     OptionData{"geometry/windowHeight", "Height", _("Window height at startup"),
                Option::Type::kUnsigned},
     OptionData{"geometry/windowWidth", "Width", _("Window width at startup"),
