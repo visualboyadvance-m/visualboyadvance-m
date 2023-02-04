@@ -5,6 +5,8 @@
 #pragma hdrstop
 #endif
 
+#include <cstdint>
+
 #include <wx/wx.h>
 
 // The following are not pulled in by wx.h
@@ -19,6 +21,13 @@
 #include <wx/xrc/xmlres.h>
 // filehistory.h is separate only in 2.9+
 #include <wx/docview.h>
+
+using std::uint8_t;
+using std::uint16_t;
+using std::uint32_t;
+using std::int8_t;
+using std::int16_t;
+using std::int32_t;
 
 #ifndef NO_OGL
 // glcanvas must be included before SFML for MacOSX

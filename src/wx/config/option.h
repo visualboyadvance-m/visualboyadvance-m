@@ -4,12 +4,20 @@
 #include "nonstd/variant.hpp"
 
 #include <array>
+#include <cstdint>
 #include <functional>
 #include <unordered_set>
 
 #include <wx/string.h>
 
 #include "config/option-id.h"
+
+using std::uint8_t;
+using std::uint16_t;
+using std::uint32_t;
+using std::int8_t;
+using std::int16_t;
+using std::int32_t;
 
 namespace config {
 

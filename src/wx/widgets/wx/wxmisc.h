@@ -2,8 +2,17 @@
 #define WX_MISC_H
 // utility widgets
 
+#include <cstdint>
+
 #include <wx/checkbox.h>
 #include <wx/valgen.h>
+
+using std::uint8_t;
+using std::uint16_t;
+using std::uint32_t;
+using std::int8_t;
+using std::int16_t;
+using std::int32_t;
 
 // simple radio button not under the same parent window
 // note that it must be checkbox, as wx radio buttons have rigid behavior
