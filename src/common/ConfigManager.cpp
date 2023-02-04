@@ -134,7 +134,7 @@ bool mirroringEnable = true;
 bool parseDebug = true;
 bool speedHack = false;
 bool speedup = false;
-bool gbaLcdFilter = true;
+bool gbaLcdFilter = false;
 bool gbLcdFilter = false;
 const char* aviRecordDir;
 const char* batteryDir;
