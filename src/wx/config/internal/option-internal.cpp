@@ -335,15 +335,15 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                _("Retain aspect ratio when resizing"), Option::Type::kBool},
 
     /// GB
-    OptionData{"GB/BiosFile", "", _("BIOS file to use for GB, if enabled"),
+    OptionData{"GB/BiosFile", "", _("BIOS file to use for Game Boy, if enabled"),
                Option::Type::kString},
     OptionData{"GB/ColorOption", "GBColorOption",
-               _("GB color enhancement, if enabled"), Option::Type::kInt},
+               _("Game Boy color enhancement, if enabled"), Option::Type::kInt},
     OptionData{"GB/ColorizerHack", "ColorizerHack",
                _("Enable DX Colorization Hacks"), Option::Type::kInt},
     OptionData{"GB/LCDFilter", "GBLcdFilter", _("Apply LCD filter, if enabled"),
                Option::Type::kBool},
-    OptionData{"GB/GBCBiosFile", "", _("BIOS file to use for GBC, if enabled"),
+    OptionData{"GB/GBCBiosFile", "", _("BIOS file to use for Game Boy Color, if enabled"),
                Option::Type::kString},
     OptionData{"GB/Palette0", "",
                _("The default palette, as 8 comma-separated 4-digit hex "
@@ -366,7 +366,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
         Option::Type::kBool},
     OptionData{"GB/ROMDir", "", _("Directory to look for ROM files"),
                Option::Type::kString},
-    OptionData{"GB/GBCROMDir", "", _("Directory to look for GBC ROM files"),
+    OptionData{"GB/GBCROMDir", "", _("Directory to look for Game Boy Color ROM files"),
                Option::Type::kString},
 
     /// GBA
@@ -407,7 +407,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"General/FreezeRecent", "", _("Freeze recent load list"),
                Option::Type::kBool},
     OptionData{"General/RecordingDir", "",
-               _("Directory to store A/V and game recordings (relative paths "
+               _("Directory to store A / V and game recordings (relative paths "
                  "are relative to ROM)"),
                Option::Type::kString},
     OptionData{"General/RewindInterval", "",
@@ -427,13 +427,13 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     /// Joypad
     OptionData{"Joypad/*/*", "",
                _("The parameter Joypad/<n>/<button> contains a comma-separated "
-                 "list of key names which map to joypad #<n> button <button>.  "
+                 "list of key names which map to joypad #<n> button <button>. "
                  "Button is one of Up, Down, Left, Right, A, B, L, R, Select, "
-                 "Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, "
-                 "AutoB, Speed, Capture, GS"),
+                 "Start, Motion Up, Motion Down, Motion Left, Motion Right, Autofire A, "
+                 "Autofire B, Speed, Capture, GS"),
                Option::Type::kNone},
     OptionData{"Joypad/AutofireThrottle", "",
-               _("The autofire toggle period, in frames (1/60 s)"),
+               _("The autofire toggle period, in frames (1 / 60 s)"),
                Option::Type::kInt},
     OptionData{"Joypad/Default", "",
                _("The number of the stick to use in single-player mode"),
@@ -442,7 +442,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     /// Keyboard
     OptionData{"Keyboard/*", "",
                _("The parameter Keyboard/<cmd> contains a comma-separated list "
-                 "of key names (e.g. Alt-Shift-F1).  When the named key is "
+                 "of key names (e.g. Alt + Shift + F1).  When the named key is "
                  "pressed, the command <cmd> is executed."),
                Option::Type::kNone},
 
@@ -450,14 +450,14 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"preferences/agbPrint", "AGBPrinter",
                _("Enable AGB debug print"), Option::Type::kInt},
     OptionData{"preferences/autoFrameSkip", "FrameSkipAuto",
-               _("Auto skip frames."), Option::Type::kInt},
+               _("Auto skip frames"), Option::Type::kInt},
     OptionData{"preferences/autoPatch", "ApplyPatches",
-               _("Apply IPS/UPS/IPF patches if found"), Option::Type::kInt},
+               _("Apply IPS / UPS / IPF patches if found"), Option::Type::kInt},
     OptionData{"preferences/autoSaveLoadCheatList", "",
                _("Automatically save and load cheat list"),
                Option::Type::kBool},
     OptionData{"preferences/borderAutomatic", "",
-               _("Automatically enable border for Super GameBoy games"),
+               _("Automatically enable border for Super Game Boy games"),
                Option::Type::kInt},
     OptionData{"preferences/borderOn", "", _("Always enable border"),
                Option::Type::kInt},
@@ -469,10 +469,10 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                _("Disable on-screen status messages"), Option::Type::kInt},
     OptionData{"preferences/emulatorType", "", _("Type of system to emulate"),
                Option::Type::kInt},
-    OptionData{"preferences/flashSize", "", _("Flash size 0 = 64KB 1 = 128KB"),
+    OptionData{"preferences/flashSize", "", _("Flash size 0 = 64 KB 1 = 128 KB"),
                Option::Type::kInt},
     OptionData{"preferences/frameSkip", "FrameSkip",
-               _("Skip frames.  Values are 0-9 or -1 to skip automatically "
+               _("Skip frames. Values are 0-9 or -1 to skip automatically "
                  "based on time."),
                Option::Type::kInt},
     OptionData{"preferences/gbPaletteOption", "", _("The palette to use"),
@@ -511,11 +511,11 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                _("Do not overwrite native (battery) save when loading state"),
                Option::Type::kInt},
     OptionData{"preferences/throttle", "",
-               _("Throttle game speed, even when accelerated (0-450%, 0 = no "
+               _("Throttle game speed, even when accelerated (0-450 %, 0 = no "
                  "throttle)"),
                Option::Type::kUnsigned},
     OptionData{"preferences/speedupThrottle", "",
-               _("Set throttle for speedup key (0-3000%, 0 = no throttle)"),
+               _("Set throttle for speedup key (0-3000 %, 0 = no throttle)"),
                Option::Type::kUnsigned},
     OptionData{"preferences/speedupFrameSkip", "",
                _("Number of frames to skip with speedup (instead of speedup "
@@ -524,11 +524,11 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"preferences/speedupThrottleFrameSkip", "",
                _("Use frame skip for speedup throttle"), Option::Type::kBool},
     OptionData{"preferences/useBiosGB", "BootRomGB",
-               _("Use the specified BIOS file for GB"), Option::Type::kBool},
+               _("Use the specified BIOS file for Game Boy"), Option::Type::kBool},
     OptionData{"preferences/useBiosGBA", "BootRomEn",
                _("Use the specified BIOS file"), Option::Type::kBool},
     OptionData{"preferences/useBiosGBC", "BootRomGBC",
-               _("Use the specified BIOS file for GBC"), Option::Type::kBool},
+               _("Use the specified BIOS file for Game Boy Color"), Option::Type::kBool},
     OptionData{"preferences/vsync", "VSync", _("Wait for vertical sync"),
                Option::Type::kBool},
 
@@ -567,19 +567,19 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                Option::Type::kInt},
     OptionData{"Sound/Enable", "", _("Bit mask of sound channels to enable"),
                Option::Type::kInt},
-    OptionData{"Sound/GBAFiltering", "", _("GBA sound filtering (%)"),
+    OptionData{"Sound/GBAFiltering", "", _("Game Boy Advance sound filtering (%)"),
                Option::Type::kInt},
     OptionData{"Sound/GBAInterpolation", "GBASoundInterpolation",
-               _("GBA sound interpolation"), Option::Type::kBool},
-    OptionData{"Sound/GBDeclicking", "GBDeclicking", _("GB sound declicking"),
+               _("Game Boy Advance sound interpolation"), Option::Type::kBool},
+    OptionData{"Sound/GBDeclicking", "GBDeclicking", _("Game Boy sound declicking"),
                Option::Type::kBool},
-    OptionData{"Sound/GBEcho", "", _("GB echo effect (%)"), Option::Type::kInt},
+    OptionData{"Sound/GBEcho", "", _("Game Boy echo effect (%)"), Option::Type::kInt},
     OptionData{"Sound/GBEnableEffects", "GBEnhanceSound",
-               _("Enable GB sound effects"), Option::Type::kBool},
-    OptionData{"Sound/GBStereo", "", _("GB stereo effect (%)"),
+               _("Enable Game Boy sound effects"), Option::Type::kBool},
+    OptionData{"Sound/GBStereo", "", _("Game Boy stereo effect (%)"),
                Option::Type::kInt},
     OptionData{"Sound/GBSurround", "GBSurround",
-               _("GB surround sound effect (%)"), Option::Type::kBool},
+               _("Game Boy surround sound effect (%)"), Option::Type::kBool},
     OptionData{"Sound/Quality", "", _("Sound sample rate (kHz)"),
                Option::Type::kSoundQuality},
     OptionData{"Sound/Volume", "", _("Sound volume (%)"), Option::Type::kInt},

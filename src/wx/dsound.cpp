@@ -100,7 +100,7 @@ bool DirectSound::init(long sampleRate)
     pDirectSound->Initialize(&dev);
 
     if (hr != DS_OK) {
-        wxLogError(_("Cannot create DirectSound %08x"), hr);
+        wxLogError(_("Cannot create Direct Sound %08x"), hr);
         return false;
     }
 

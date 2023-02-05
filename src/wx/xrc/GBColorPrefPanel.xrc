@@ -14,8 +14,8 @@
             <item>Hot Desert</item>
             <item>Pink Dreams</item>
             <item>Weird Colors</item>
-            <item>Real GB Colors</item>
-            <item>Real 'GB on GBASP' Colors</item>
+            <item>Real Game Boy Colors</item>
+            <item>Real 'Game Boy on Game Boy Advance Special' Colors</item>
           </content>
         </object>
         <flag>wxALL|wxEXPAND</flag>

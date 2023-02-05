@@ -610,7 +610,7 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
         wxFSFile* f = fs.OpenFile(wxT("memory:wxvbam.xrs#zip:wxvbam.xrs$wxvbam.xrc"));
 
         if (!f) {
-            wxLogError(_("Configuration/build error: can't find built-in xrc"));
+            wxLogError(_("Configuration / build error: can't find built-in xrc"));
             return false;
         }
 
@@ -619,9 +619,8 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
         delete f;
         wxString lm;
         lm.Printf(_("Wrote built-in configuration to %s.\n"
-                    "To override, remove all but changed root node(s).  "
-                    "First found root node of correct name in any .xrc or "
-                    ".xrs files in following search path overrides built-in:"),
+                    "To override, remove all but changed root node(s). First found root node of correct name in any ."
+                    "xrc or .xrs files in following search path overrides built-in:"),
             s.c_str());
         tack_full_path(lm);
         wxLogMessage(lm);
@@ -648,7 +647,7 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
         os.Write(builtin_over, sizeof(builtin_over));
         wxString lm;
         lm.Printf(_("Wrote built-in override file to %s\n"
-                    "To override, delete all but changed section.  First found section is used from search path:"),
+                    "To override, delete all but changed section. First found section is used from search path:"),
             s.c_str());
         wxString oi = wxFileName::GetPathSeparator();
         oi += wxT("vba-over.ini");

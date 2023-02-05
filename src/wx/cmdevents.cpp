@@ -131,17 +131,16 @@ EVT_HANDLER(wxID_OPEN, "Open ROM...")
     open_dir = wxGetApp().GetAbsolutePath(gopts.gba_rom_dir);
     // FIXME: ignore if non-existent or not a dir
     wxString pats = _(
-        "GameBoy Advance Files (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|"
+        "Game Boy Advance Files (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|"
         "*.agb;*.gba;*.bin;*.elf;*.mb;"
         "*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;"
         "*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;"
-        "*.zip;*.7z;*.rar"
-        "|GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|"
+        "*.zip;*.7z;*.rar|"
+        "Game Boy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|"
         "*.dmg;*.gb;*.gbc;*.cgb;*.sgb;"
         "*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;"
         "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;"
-        "*.zip;*.7z;*.rar"
-        "|");
+        "*.zip;*.7z;*.rar|");
     pats.append(wxALL_FILES);
     wxFileDialog dlg(this, _("Open ROM file"), open_dir, wxT(""),
         pats,
@@ -160,12 +159,11 @@ EVT_HANDLER(OpenGB, "Open GB...")
     open_dir = wxGetApp().GetAbsolutePath(gopts.gb_rom_dir);
     // FIXME: ignore if non-existent or not a dir
     wxString pats = _(
-        "GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|"
+        "Game Boy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|"
         "*.dmg;*.gb;*.gbc;*.cgb;*.sgb;"
         "*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;"
         "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;"
-        "*.zip;*.7z;*.rar"
-        "|");
+        "*.zip;*.7z;*.rar|");
     pats.append(wxALL_FILES);
     wxFileDialog dlg(this, _("Open GB ROM file"), open_dir, wxT(""),
         pats,
@@ -184,12 +182,11 @@ EVT_HANDLER(OpenGBC, "Open GBC...")
     open_dir = wxGetApp().GetAbsolutePath(gopts.gbc_rom_dir);
     // FIXME: ignore if non-existent or not a dir
     wxString pats = _(
-        "GameBoy Color Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|"
+        "Game Boy Color Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|"
         "*.dmg;*.gb;*.gbc;*.cgb;*.sgb;"
         "*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;"
         "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;"
-        "*.zip;*.7z;*.rar"
-        "|");
+        "*.zip;*.7z;*.rar|");
     pats.append(wxALL_FILES);
     wxFileDialog dlg(this, _("Open GBC ROM file"), open_dir, wxT(""),
         pats,
@@ -622,83 +619,83 @@ EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB | CMDEN_GBA)
             break;
 
         case 0x01:
-            type = _("ROM+MBC1");
+            type = _("ROM + MBC1");
             break;
 
         case 0x02:
-            type = _("ROM+MBC1+RAM");
+            type = _("ROM + MBC1 + RAM");
             break;
 
         case 0x03:
-            type = _("ROM+MBC1+RAM+BATT");
+            type = _("ROM + MBC1 + RAM + BATT");
             break;
 
         case 0x05:
-            type = _("ROM+MBC2");
+            type = _("ROM + MBC2");
             break;
 
         case 0x06:
-            type = _("ROM+MBC2+BATT");
+            type = _("ROM + MBC2 + BATT");
             break;
 
         case 0x0b:
-            type = _("ROM+MMM01");
+            type = _("ROM + MMM01");
             break;
 
         case 0x0c:
-            type = _("ROM+MMM01+RAM");
+            type = _("ROM + MMM01 + RAM");
             break;
 
         case 0x0d:
-            type = _("ROM+MMM01+RAM+BATT");
+            type = _("ROM + MMM01 + RAM + BATT");
             break;
 
         case 0x0f:
-            type = _("ROM+MBC3+TIMER+BATT");
+            type = _("ROM + MBC3 + TIMER + BATT");
             break;
 
         case 0x10:
-            type = _("ROM+MBC3+TIMER+RAM+BATT");
+            type = _("ROM + MBC3 + TIMER + RAM + BATT");
             break;
 
         case 0x11:
-            type = _("ROM+MBC3");
+            type = _("ROM + MBC3");
             break;
 
         case 0x12:
-            type = _("ROM+MBC3+RAM");
+            type = _("ROM + MBC3 + RAM");
             break;
 
         case 0x13:
-            type = _("ROM+MBC3+RAM+BATT");
+            type = _("ROM + MBC3 + RAM + BATT");
             break;
 
         case 0x19:
-            type = _("ROM+MBC5");
+            type = _("ROM + MBC5");
             break;
 
         case 0x1a:
-            type = _("ROM+MBC5+RAM");
+            type = _("ROM + MBC5 + RAM");
             break;
 
         case 0x1b:
-            type = _("ROM+MBC5+RAM+BATT");
+            type = _("ROM + MBC5 + RAM + BATT");
             break;
 
         case 0x1c:
-            type = _("ROM+MBC5+RUMBLE");
+            type = _("ROM + MBC5 + RUMBLE");
             break;
 
         case 0x1d:
-            type = _("ROM+MBC5+RUMBLE+RAM");
+            type = _("ROM + MBC5 + RUMBLE + RAM");
             break;
 
         case 0x1e:
-            type = _("ROM+MBC5+RUMBLE+RAM+BATT");
+            type = _("ROM + MBC5 + RUMBLE + RAM + BATT");
             break;
 
         case 0x22:
-            type = _("ROM+MBC7+BATT");
+            type = _("ROM + MBC7 + BATT");
             break;
 
         case 0x55:
@@ -710,19 +707,19 @@ EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB | CMDEN_GBA)
             break;
 
         case 0xfc:
-            type = _("ROM+POCKET CAMERA");
+            type = _("ROM + POCKET CAMERA");
             break;
 
         case 0xfd:
-            type = _("ROM+BANDAI TAMA5");
+            type = _("ROM + BANDAI TAMA5");
             break;
 
         case 0xfe:
-            type = _("ROM+HuC-3");
+            type = _("ROM + HuC-3");
             break;
 
         case 0xff:
-            type = _("ROM+HuC-1");
+            type = _("ROM + HuC-1");
             break;
 
         default:
@@ -926,7 +923,7 @@ EVT_HANDLER_MASK(ImportBatteryFile, "Import battery file...", CMDEN_GB | CMDEN_G
         return;
 
     wxString fn = dlg.GetPath();
-    ret = wxMessageBox(_("Importing a battery file will erase any saved games (permanently after the next write).  Do you want to continue?"),
+    ret = wxMessageBox(_("Importing a battery file will erase any saved games (permanently after the next write). Do you want to continue?"),
         _("Confirm import"), wxYES_NO | wxICON_EXCLAMATION);
 
     if (ret == wxYES) {
@@ -941,11 +938,11 @@ EVT_HANDLER_MASK(ImportBatteryFile, "Import battery file...", CMDEN_GB | CMDEN_G
     }
 }
 
-EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import GameShark code file...", CMDEN_GB | CMDEN_GBA)
+EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import Game Shark code file...", CMDEN_GB | CMDEN_GBA)
 {
     static wxString path;
     wxFileDialog dlg(this, _("Select code file"), path, wxEmptyString,
-        panel->game_type() == IMAGE_GBA ? _("Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc") : _("Gameshark Code File (*.gcf)|*.gcf"),
+        panel->game_type() == IMAGE_GBA ? _("Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc") : _("Game Shark Code File (*.gcf)|*.gcf"),
         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     int ret = ShowModal(&dlg);
     path = dlg.GetDirectory();
@@ -954,7 +951,7 @@ EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import GameShark code file...", CMDEN
         return;
 
     wxString fn = dlg.GetPath();
-    ret = wxMessageBox(_("Importing a code file will replace any loaded cheats.  Do you want to continue?"),
+    ret = wxMessageBox(_("Importing a code file will replace any loaded cheats. Do you want to continue?"),
         _("Confirm import"), wxYES_NO | wxICON_EXCLAMATION);
 
     if (ret == wxYES) {
@@ -1062,10 +1059,10 @@ EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import GameShark code file...", CMDEN
 static wxString gss_path;
 
 EVT_HANDLER_MASK(ImportGamesharkActionReplaySnapshot,
-    "Import GameShark Action Replay snapshot...", CMDEN_GB | CMDEN_GBA)
+    "Import Game Shark Action Replay snapshot...", CMDEN_GB | CMDEN_GBA)
 {
     wxFileDialog dlg(this, _("Select snapshot file"), gss_path, wxEmptyString,
-        panel->game_type() == IMAGE_GBA ? _("GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots (*.gsv)|*.gsv") : _("Gameboy Snapshot (*.gbs)|*.gbs"),
+        panel->game_type() == IMAGE_GBA ? _("GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots (*.gsv)|*.gsv") : _("Game Boy Snapshot (*.gbs)|*.gbs"),
         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     int ret = ShowModal(&dlg);
     gss_path = dlg.GetDirectory();
@@ -1074,7 +1071,7 @@ EVT_HANDLER_MASK(ImportGamesharkActionReplaySnapshot,
         return;
 
     wxString fn = dlg.GetPath();
-    ret = wxMessageBox(_("Importing a snapshot file will erase any saved games (permanently after the next write).  Do you want to continue?"),
+    ret = wxMessageBox(_("Importing a snapshot file will erase any saved games (permanently after the next write). Do you want to continue?"),
         _("Confirm import"), wxYES_NO | wxICON_EXCLAMATION);
 
     if (ret == wxYES) {
@@ -1141,7 +1138,7 @@ EVT_HANDLER_MASK(ExportGamesharkSnapshot, "Export GameShark snapshot...", CMDEN_
     wxString def_name = panel->game_name();
     def_name.append(wxT(".sps"));
     wxFileDialog dlg(this, _("Select snapshot file"), gss_path, def_name,
-        _("Gameshark Snapshot (*.sps)|*.sps"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+        _("Game Shark Snapshot (*.sps)|*.sps"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     int ret = ShowModal(&dlg);
     gss_path = dlg.GetDirectory();
 
@@ -1155,7 +1152,7 @@ EVT_HANDLER_MASK(ExportGamesharkSnapshot, "Export GameShark snapshot...", CMDEN_
                *n = XRCCTRL(*infodlg, "Notes", wxTextCtrl);
     tit->SetValue(wxString((const char*)&rom[0xa0], wxConvLibc, 12));
     dsc->SetValue(wxDateTime::Now().Format(wxT("%c")));
-    n->SetValue(_("Exported from VisualBoyAdvance-M"));
+    n->SetValue(_("Exported from Visual Boy Advance-M"));
 
     if (ShowModal(infodlg) != wxID_OK)
         return;
@@ -1788,7 +1785,7 @@ EVT_HANDLER_MASK(Load, "Load state...", CMDEN_GB | CMDEN_GBA)
         st_dir = panel->state_dir();
 
     wxFileDialog dlg(this, _("Select state file"), st_dir, wxEmptyString,
-        _("VisualBoyAdvance saved game files|*.sgm"), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+        _("Visual Boy Advance saved game files|*.sgm"), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     int ret = ShowModal(&dlg);
     st_dir = dlg.GetDirectory();
 
@@ -1881,7 +1878,7 @@ EVT_HANDLER_MASK(Save, "Save state as...", CMDEN_GB | CMDEN_GBA)
         st_dir = panel->state_dir();
 
     wxFileDialog dlg(this, _("Select state file"), st_dir, wxEmptyString,
-        _("VisualBoyAdvance saved game files|*.sgm"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+        _("Visual Boy Advance saved game files|*.sgm"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     int ret = ShowModal(&dlg);
     st_dir = dlg.GetDirectory();
 
@@ -2002,7 +1999,7 @@ EVT_HANDLER(ColorizerHack, "Enable Colorizer Hack (toggle)")
     GetMenuOptionBool("ColorizerHack", &val);
 
     if (val && gopts.use_bios_file_gb) {
-        wxLogError(_("Cannot use Colorizer Hack when GB BIOS File is enabled."));
+        wxLogError(_("Cannot use Colorizer Hack when Game Boy BIOS File is enabled."));
         val = 0;
         SetMenuOption("ColorizerHack", 0);
     }
@@ -2230,7 +2227,7 @@ EVT_HANDLER(IncreaseVolume, "Increase volume")
     update_opts();
     soundSetVolume((float)gopts.sound_vol / 100.0);
     wxString msg;
-    msg.Printf(_("Volume: %d%%"), gopts.sound_vol);
+    msg.Printf(_("Volume: %d %%"), gopts.sound_vol);
     systemScreenMessage(msg);
 }
 
@@ -2244,7 +2241,7 @@ EVT_HANDLER(DecreaseVolume, "Decrease volume")
     update_opts();
     soundSetVolume((float)gopts.sound_vol / 100.0);
     wxString msg;
-    msg.Printf(_("Volume: %d%%"), gopts.sound_vol);
+    msg.Printf(_("Volume: %d %%"), gopts.sound_vol);
     systemScreenMessage(msg);
 }
 
@@ -2913,18 +2910,22 @@ EVT_HANDLER(wxID_ABOUT, "About...")
     // but at least win32 standard about is nothing special
     ai.SetWebSite(wxT("http://www.vba-m.com/"));
     ai.SetIcon(GetIcons().GetIcon(wxSize(32, 32), wxIconBundle::FALLBACK_NEAREST_LARGER));
-    ai.SetDescription(_("Nintendo GameBoy (+Color+Advance) emulator."));
+    ai.SetDescription(_("Nintendo Game Boy / Color / Advance) emulator."));
     ai.SetCopyright(_("Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2020 VBA-M development team"));
-    ai.SetLicense(_("This program is free software: you can redistribute it and/or modify\n"
-                    "it under the terms of the GNU General Public License as published by\n"
-                    "the Free Software Foundation, either version 2 of the License, or\n"
-                    "(at your option) any later version.\n\n"
-                    "This program is distributed in the hope that it will be useful,\n"
-                    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-                    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-                    "GNU General Public License for more details.\n\n"
-                    "You should have received a copy of the GNU General Public License\n"
-                    "along with this program.  If not, see http://www.gnu.org/licenses ."));
+    ai.SetLicense(_(
+"This program is free software: you can redistribute it and / or modify\n"
+"it under the terms of the GNU General Public License as published by\n"
+"the Free Software Foundation, either version 2 of the License, or\n"
+"(at your option) any later version.\n"
+"\n"
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n"
+"GNU General Public License for more details.\n"
+"\n"
+"You should have received a copy of the GNU General Public License\n"
+"along with this program. If not, see http://www.gnu.org/licenses ."
+    ));
     // from gtk
     ai.AddDeveloper(wxT("Forgotten"));
     ai.AddDeveloper(wxT("kxu"));
@@ -3153,7 +3154,7 @@ EVT_HANDLER(BootRomGB, "Use the specified BIOS file for GB")
     GetMenuOptionInt("BootRomGB", &val, 1);
 
     if (val == 1 && colorizerHack == 1) {
-        wxLogError(_("Cannot use GB BIOS when Colorizer Hack is enabled."));
+        wxLogError(_("Cannot use Game Boy BIOS when Colorizer Hack is enabled."));
         val = 0;
         SetMenuOption("BootRomGB", 0);
     }
@@ -3214,7 +3215,7 @@ EVT_HANDLER_MASK(LanLink, "Start Network link", CMDEN_LINK_ANY)
     if (mode != LINK_DISCONNECTED) {
         // while we could deactivate the command when connected, it is more
         // user-friendly to display a message indidcating why
-        wxLogError(_("LAN link is already active.  Disable link mode to disconnect."));
+        wxLogError(_("LAN link is already active. Disable link mode to disconnect."));
         return;
     }
 

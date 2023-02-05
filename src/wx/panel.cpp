@@ -259,7 +259,7 @@ void GameArea::LoadGame(const wxString& name)
 
         // Disable bios loading when using colorizer hack.
         if (gopts.use_bios_file_gb && colorizerHack) {
-            wxLogError(_("Cannot use GB BIOS file when Colorizer Hack is enabled, disabling GB BIOS file."));
+            wxLogError(_("Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game Boy BIOS file."));
             gopts.use_bios_file_gb = false;
             update_opts();
         }
@@ -929,7 +929,7 @@ void GameArea::ShowFullScreen(bool full)
             wxDisplay d(dno);
 
             if (!d.ChangeMode(gopts.fs_mode)) {
-                wxLogInfo(_("Fullscreen mode %dx%d-%d@%d not supported; looking for another"),
+                wxLogInfo(_("Fullscreen mode %d x %d - %d @ %d not supported; looking for another"),
                     gopts.fs_mode.w, gopts.fs_mode.h, gopts.fs_mode.bpp, gopts.fs_mode.refresh);
                 // specifying a mode may not work with bpp/rate of 0
                 // in particular, unix does Matches() in wrong direction
@@ -967,12 +967,12 @@ void GameArea::ShowFullScreen(bool full)
                     i = best_mode;
 
                 if (i == vm.size()) {
-                    wxLogWarning(_("Fullscreen mode %dx%d-%d@%d not supported"),
+                    wxLogWarning(_("Fullscreen mode %d x %d - %d @ %d not supported"),
                         gopts.fs_mode.w, gopts.fs_mode.h, gopts.fs_mode.bpp, gopts.fs_mode.refresh);
                     gopts.fs_mode = wxVideoMode();
 
                     for (i = 0; i < vm.size(); i++)
-                        wxLogInfo(_("Valid mode: %dx%d-%d@%d"), vm[i].w,
+                        wxLogInfo(_("Valid mode: %d x %d - %d @ %d"), vm[i].w,
                             vm[i].h, vm[i].bpp,
                             vm[i].refresh);
                 } else {
@@ -980,11 +980,11 @@ void GameArea::ShowFullScreen(bool full)
                     gopts.fs_mode.refresh = vm[i].refresh;
                 }
 
-                wxLogInfo(_("Chose mode %dx%d-%d@%d"),
+                wxLogInfo(_("Chose mode %d x %d - %d @ %d"),
                     gopts.fs_mode.w, gopts.fs_mode.h, gopts.fs_mode.bpp, gopts.fs_mode.refresh);
 
                 if (!d.ChangeMode(gopts.fs_mode)) {
-                    wxLogWarning(_("Failed to change mode to %dx%d-%d@%d"),
+                    wxLogWarning(_("Failed to change mode to %d x %d - %d @ %d"),
                         gopts.fs_mode.w, gopts.fs_mode.h, gopts.fs_mode.bpp, gopts.fs_mode.refresh);
                     gopts.fs_mode.w = 0;
                 }
@@ -1072,7 +1072,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
             mf->GDBBreak();
 
         if (debugger && loaded != IMAGE_GBA) {
-            wxLogError(_("Not a valid GBA cartridge"));
+            wxLogError(_("Not a valid Game Boy Advance cartridge"));
             UnloadGame();
         }
 #endif
@@ -2524,7 +2524,7 @@ void GameArea::AddFrame(const uint16_t* data, int length)
     recording::MediaRet ret;
 
     if ((ret = vid_rec.AddFrame(data, length)) != recording::MRET_OK) {
-        wxLogError(_("Error in audio/video recording (%s); aborting"),
+        wxLogError(_("Error in audio / video recording (%s); aborting"),
             media_err(ret));
         vid_rec.Stop();
     }

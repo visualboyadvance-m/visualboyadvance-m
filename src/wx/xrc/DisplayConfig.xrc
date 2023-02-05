@@ -87,7 +87,7 @@
                     <item>Super 2xSaI</item>
                     <item>Super Eagle</item>
                     <item>Pixelate</item>
-                    <item>Advance MAME Scale2x</item>
+                    <item>Advance MAME Scale 2x</item>
                     <item>Bilinear</item>
                     <item>Bilinear Plus</item>
                     <item>Scanlines</item>
@@ -112,7 +112,7 @@
               </object>
 			  <object class="sizeritem">
                 <object class="wxStaticText" name="PluginLab">
-                  <label>Plugin :</label>
+                  <label>Plugin:</label>
                 </object>
 				<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
 				<border>5</border>
@@ -124,7 +124,7 @@
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>Interframe blending :</label>
+                  <label>Interframe blending:</label>
                 </object>
                 <flag>wxRIGHT|wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>
@@ -174,7 +174,7 @@
                   <orient>wxHORIZONTAL</orient>
                   <object class="sizeritem">
                     <object class="wxStaticText" name="FrameSkipLab">
-                      <label>_Number of frames to skip :</label>
+                      <label>_Number of frames to skip:</label>
                     </object>
                     <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                     <border>5</border>
@@ -212,7 +212,7 @@
                     <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                     <border>5</border>
                     <object class="wxStaticText">
-                      <label>Speed indicator :</label>
+                      <label>Speed indicator:</label>
                     </object>
                   </object>
                   <object class="sizeritem">
@@ -244,7 +244,7 @@
             <object class="wxBoxSizer">
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>Default magnification :</label>
+                  <label>Default magnification:</label>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>
@@ -263,7 +263,7 @@
             <object class="wxBoxSizer">
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>Maximum magnification factor :</label>
+                  <label>Maximum magnification factor:</label>
                   <tooltip>0 = no maximum</tooltip>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>

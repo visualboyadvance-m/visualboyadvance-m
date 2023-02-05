@@ -54,7 +54,7 @@
               <orient>wxHORIZONTAL</orient>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>_Rewind interval :</label>
+                  <label>_Rewind interval:</label>
                   <tooltip>If not empty or 0, enable rewind (seconds)</tooltip>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>

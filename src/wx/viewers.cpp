@@ -814,7 +814,7 @@ public:
         bs->Append(_("0x00000000 - BIOS"));
         bs->Append(_("0x02000000 - WRAM"));
         bs->Append(_("0x03000000 - IRAM"));
-        bs->Append(_("0x04000000 - I/O"));
+        bs->Append(_("0x04000000 - I / O"));
         bs->Append(_("0x05000000 - PALETTE"));
         bs->Append(_("0x06000000 - VRAM"));
         bs->Append(_("0x07000000 - OAM"));
@@ -927,7 +927,7 @@ public:
         bs->Append(_("0xA000 - SRAM"));
         bs->Append(_("0xC000 - RAM"));
         bs->Append(_("0xD000 - WRAM"));
-        bs->Append(_("0xFF00 - I/O"));
+        bs->Append(_("0xFF00 - I / O"));
         bs->Append(_("0xFF80 - RAM"));
         bs->SetSelection(1);
         Fit();

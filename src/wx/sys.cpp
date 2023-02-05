@@ -446,7 +446,7 @@ void systemShowSpeed(int speed)
 {
     MainFrame* f = wxGetApp().frame;
     wxString s;
-    s.Printf(_("%d%%(%d, %d fps)"), speed, systemFrameSkip, frames * speed / 100);
+    s.Printf(_("%d %% (%d, %d fps)"), speed, systemFrameSkip, frames * speed / 100);
 
     switch (showSpeed) {
     case SS_NONE:
@@ -454,7 +454,7 @@ void systemShowSpeed(int speed)
         break;
 
     case SS_PERCENT:
-        f->GetPanel()->osdstat.Printf(_("%d%%"), speed);
+        f->GetPanel()->osdstat.Printf(_("%d %%"), speed);
         break;
 
     case SS_DETAILED:

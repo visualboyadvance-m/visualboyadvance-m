@@ -755,12 +755,12 @@ public:
         ch->Clear();
 
         if (clh.isgb) {
-            ch->Append(_("GameShark"));
-            ch->Append(_("GameGenie"));
+            ch->Append(_("Game Shark"));
+            ch->Append(_("Game Genie"));
         } else {
             ch->Append(_("Generic Code"));
-            ch->Append(_("GameShark Advance"));
-            ch->Append(_("CodeBreaker Advance"));
+            ch->Append(_("Game Shark Advance"));
+            ch->Append(_("Code Breaker Advance"));
             ch->Append(_("Flashcart CHT"));
         }
 
@@ -1731,7 +1731,7 @@ public:
         wxString s;
 
         for (size_t i = 0; i < vm.size(); i++) {
-            s.Printf(_("%d x %d - %dbpp @ %dHz"), vm[i].w, vm[i].h, vm[i].bpp, vm[i].refresh);
+            s.Printf(_("%d x %d - %d bpp @ %d Hz"), vm[i].w, vm[i].h, vm[i].bpp, vm[i].refresh);
             c->Append(s);
 
             if (!modeno && gopts.fs_mode.w == vm[i].w && gopts.fs_mode.h == vm[i].h) {
@@ -1973,7 +1973,7 @@ public:
     void ResetAll(wxCommandEvent& ev)
     {
         (void)ev; // unused params
-        if (user_accels.empty() || wxMessageBox(_("This will clear all user-defined accelerators.  Are you sure?"), _("Confirm"), wxYES_NO) != wxYES)
+        if (user_accels.empty() || wxMessageBox(_("This will clear all user-defined accelerators. Are you sure?"), _("Confirm"), wxYES_NO) != wxYES)
             return;
 
         user_accels.clear();
@@ -2768,7 +2768,7 @@ bool MainFrame::BindControls()
                                         if (cmdtab[cmd].cmd_id == e->GetCommand())
                                             break;
 
-                                    wxLogInfo(_("Menu accelerator %s for %s overrides default for %s ; keeping menu"),
+                                    wxLogInfo(_("Menu accelerator %s for %s overrides default for %s; keeping menu"),
                                         wxKeyTextCtrl::ToString(a->GetFlags(), a->GetKeyCode()).c_str(),
                                         mi->GetItemLabelText().c_str(),
                                         cmdtab[cmd].cmd.c_str());

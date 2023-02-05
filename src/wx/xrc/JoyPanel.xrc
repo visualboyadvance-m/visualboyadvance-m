@@ -5,7 +5,7 @@
       <orient>wxVERTICAL</orient>
       <object class="sizeritem">
         <object class="wxNotebook">
-          <tooltip>Click a field and press a key or move joystick to add.  Press backspace to delete last added key.  Resize window or click inside and move pointer to see entire contents if too small.</tooltip>
+          <tooltip>Click a field and press a key or move joystick to add. Press backspace to delete last added key. Resize window or click inside and move pointer to see entire contents if too small.</tooltip>
           <object class="notebookpage">
             <object class="wxPanel">
               <object class="wxFlexGridSizer">
@@ -339,7 +339,7 @@
                 </object>
                 <object class="sizeritem">
                   <object class="wxStaticText">
-                    <label>Motion Left/Dark</label>
+                    <label>Motion Left / Dark</label>
                   </object>
                   <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
                   <border>5</border>
@@ -383,7 +383,7 @@
                 </object>
                 <object class="sizeritem">
                   <object class="wxStaticText">
-                    <label>Motion Right/Light</label>
+                    <label>Motion Right / Light</label>
                   </object>
                   <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
                   <border>5</border>

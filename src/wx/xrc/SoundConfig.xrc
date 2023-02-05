@@ -13,7 +13,7 @@
             <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>
             <object class="wxStaticText">
-              <label>Volume :</label>
+              <label>Volume:</label>
             </object>
           </object>
           <object class="sizeritem">
@@ -68,7 +68,7 @@
             <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>
             <object class="wxStaticText">
-              <label>Sample rate :</label>
+              <label>Sample rate:</label>
             </object>
           </object>
           <object class="sizeritem">
@@ -115,7 +115,7 @@
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="DirectSound">
-                      <label>DirectSound</label>
+                      <label>Direct Sound</label>
                     </object>
                     <flag>wxALL</flag>
                     <border>5</border>
@@ -266,7 +266,7 @@
                         </object>
                         <object class="sizeritem">
                           <object class="wxStaticText">
-                            <label>Left/Right</label>
+                            <label>Left / Right</label>
                           </object>
                           <flag>wxALL</flag>
                           <border>5</border>
