@@ -305,8 +305,7 @@ const std::map<config::GameControl, std::set<config::UserInput>> kDefaultBinding
 
 wxAcceleratorEntry_v sys_accels;
 
-// This constructor only works with globally allocated gopts.  It relies on
-// the default value of every non-object to be 0.
+// This constructor only works with globally allocated gopts.
 opts_t::opts_t()
 {
     // handle erroneous thread count values appropriately
@@ -322,7 +321,6 @@ opts_t::opts_t()
     // These are globals being set here.
     frameSkip = -1;
     autoPatch = true;
-    skipSaveGameBattery = true;
 }
 
 // FIXME: simulate MakeInstanceFilename(vbam.ini) using subkeys (Slave%d/*)

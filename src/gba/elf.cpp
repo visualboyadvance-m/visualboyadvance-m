@@ -215,8 +215,6 @@ struct ELFFrameState {
     int returnAddress;
 };
 
-extern bool cpuIsMultiBoot;
-
 Symbol* elfSymbols = NULL;
 char* elfSymbolsStrTab = NULL;
 int elfSymbolsCount = 0;
@@ -2547,7 +2545,7 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
     int i;
 
     if (READ32LE(&eh->e_entry) == 0x2000000)
-        cpuIsMultiBoot = true;
+        coreOptions.cpuIsMultiBoot = true;
 
     // read program headers... should probably move this code down
     uint8_t* p = data + READ32LE(&eh->e_phoff);
@@ -2572,7 +2570,7 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
 
         uint8_t* source  = data + offset;
 
-        if (cpuIsMultiBoot) {
+        if (coreOptions.cpuIsMultiBoot) {
             unsigned effective_address = address - 0x2000000;
 
             if (effective_address + section_size < SIZE_WRAM) {
@@ -2623,7 +2621,7 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
         //   sh[i]->flags, sh[i]->addr, sh[i]->offset, sh[i]->size,
         //   sh[i]->link, sh[i]->info);
         if (READ32LE(&sh[i]->flags) & 2) { // load section
-            if (cpuIsMultiBoot) {
+            if (coreOptions.cpuIsMultiBoot) {
                 if (READ32LE(&sh[i]->addr) >= 0x2000000 && READ32LE(&sh[i]->addr) <= 0x203ffff) {
                     memcpy(&workRAM[READ32LE(&sh[i]->addr) & 0x3ffff], data + READ32LE(&sh[i]->offset),
                         READ32LE(&sh[i]->size));
@@ -2714,8 +2712,6 @@ end:
     return true;
 }
 
-extern bool parseDebug;
-
 bool elfRead(const char* name, int& siz, FILE* f)
 {
     fseek(f, 0, SEEK_END);
@@ -2740,7 +2736,7 @@ bool elfRead(const char* name, int& siz, FILE* f)
         return false;
     }
 
-    if (!elfReadProgram(header, elfFileData, size, siz, parseDebug)) {
+    if (!elfReadProgram(header, elfFileData, size, siz, coreOptions.parseDebug)) {
         free(elfFileData);
         elfFileData = NULL;
         return false;

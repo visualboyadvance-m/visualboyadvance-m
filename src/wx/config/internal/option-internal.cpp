@@ -15,6 +15,8 @@
 #include "config/internal/option-internal.h"
 #undef VBAM_OPTION_INTERNAL_INCLUDE
 
+struct CoreOptions coreOptions;
+
 namespace config {
 
 namespace {
@@ -234,14 +236,14 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kPrefBorderAutomatic, &gbBorderAutomatic, 0, 1),
         Option(OptionID::kPrefBorderOn, &gbBorderOn, 0, 1),
         Option(OptionID::kPrefCaptureFormat, &captureFormat, 0, 1),
-        Option(OptionID::kPrefCheatsEnabled, &cheatsEnabled, 0, 1),
+        Option(OptionID::kPrefCheatsEnabled, &coreOptions.cheatsEnabled, 0, 1),
         Option(OptionID::kPrefDisableStatus, &disableStatusMessages, 0,
                1),
         Option(OptionID::kPrefEmulatorType, &gbEmulatorType, 0, 5),
         Option(OptionID::kPrefFlashSize, &optFlashSize, 0, 1),
         Option(OptionID::kPrefFrameSkip, &frameSkip, -1, 9),
         Option(OptionID::kPrefGBPaletteOption, &gbPaletteOption, 0, 2),
-        Option(OptionID::kPrefGBPrinter, &winGbPrinterEnabled, 0, 1),
+        Option(OptionID::kPrefGBPrinter, &coreOptions.winGbPrinterEnabled, 0, 1),
         Option(OptionID::kPrefGDBBreakOnLoad, &gopts.gdb_break_on_load),
         Option(OptionID::kPrefGDBPort, &gopts.gdb_port, 0, 65535),
 #ifndef NO_LINK
@@ -250,15 +252,15 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kPrefMaxScale, &gopts.max_scale, 0, 100),
         Option(OptionID::kPrefPauseWhenInactive, &pauseWhenInactive, 0,
                1),
-        Option(OptionID::kPrefRTCEnabled, &rtcEnabled, 0, 1),
-        Option(OptionID::kPrefSaveType, &cpuSaveType, 0, 5),
+        Option(OptionID::kPrefRTCEnabled, &coreOptions.rtcEnabled, 0, 1),
+        Option(OptionID::kPrefSaveType, &coreOptions.cpuSaveType, 0, 5),
         Option(OptionID::kPrefShowSpeed, &showSpeed, 0, 2),
         Option(OptionID::kPrefShowSpeedTransparent,
                &showSpeedTransparent, 0, 1),
-        Option(OptionID::kPrefSkipBios, &skipBios, 0, 1),
-        Option(OptionID::kPrefSkipSaveGameCheats, &skipSaveGameCheats, 0,
+        Option(OptionID::kPrefSkipBios, &coreOptions.skipBios, 0, 1),
+        Option(OptionID::kPrefSkipSaveGameCheats, &coreOptions.skipSaveGameCheats, 0,
                1),
-        Option(OptionID::kPrefSkipSaveGameBattery, &skipSaveGameBattery,
+        Option(OptionID::kPrefSkipSaveGameBattery, &coreOptions.skipSaveGameBattery,
                0, 1),
         Option(OptionID::kPrefThrottle, &throttle, 0, 450),
         Option(OptionID::kPrefSpeedupThrottle, &speedup_throttle, 0,
@@ -266,7 +268,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kPrefSpeedupFrameSkip, &speedup_frame_skip, 0,
                300),
         Option(OptionID::kPrefSpeedupThrottleFrameSkip,
-               &speedup_throttle_frame_skip),
+               &coreOptions.speedup_throttle_frame_skip),
         Option(OptionID::kPrefUseBiosGB, &gopts.use_bios_file_gb),
         Option(OptionID::kPrefUseBiosGBA, &gopts.use_bios_file_gba),
         Option(OptionID::kPrefUseBiosGBC, &gopts.use_bios_file_gbc),

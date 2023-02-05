@@ -796,7 +796,7 @@ static inline void CPUWriteByte(uint32_t address, uint8_t b)
         goto unwritable;
     case 14:
     case 15:
-        if ((saveType != 5) && ((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled)) {
+        if ((coreOptions.saveType != 5) && ((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled)) {
             // if(!cpuEEPROMEnabled && (cpuSramEnabled | cpuFlashEnabled)) {
 
             (*cpuSaveGameFunc)(address, b);

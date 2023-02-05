@@ -14,15 +14,15 @@ void mode1RenderLine()
         return;
     }
 
-    if (layerEnable & 0x0100) {
+    if (coreOptions.layerEnable & 0x0100) {
         gfxDrawTextScreen(BG0CNT, BG0HOFS, BG0VOFS, line0);
     }
 
-    if (layerEnable & 0x0200) {
+    if (coreOptions.layerEnable & 0x0200) {
         gfxDrawTextScreen(BG1CNT, BG1HOFS, BG1VOFS, line1);
     }
 
-    if (layerEnable & 0x0400) {
+    if (coreOptions.layerEnable & 0x0400) {
         int changed = gfxBG2Changed;
         if (gfxLastVCOUNT > VCOUNT)
             changed = 3;
@@ -120,15 +120,15 @@ void mode1RenderLineNoWindow()
         return;
     }
 
-    if (layerEnable & 0x0100) {
+    if (coreOptions.layerEnable & 0x0100) {
         gfxDrawTextScreen(BG0CNT, BG0HOFS, BG0VOFS, line0);
     }
 
-    if (layerEnable & 0x0200) {
+    if (coreOptions.layerEnable & 0x0200) {
         gfxDrawTextScreen(BG1CNT, BG1HOFS, BG1VOFS, line1);
     }
 
-    if (layerEnable & 0x0400) {
+    if (coreOptions.layerEnable & 0x0400) {
         int changed = gfxBG2Changed;
         if (gfxLastVCOUNT > VCOUNT)
             changed = 3;
@@ -280,7 +280,7 @@ void mode1RenderLineAll()
     bool inWindow0 = false;
     bool inWindow1 = false;
 
-    if (layerEnable & 0x2000) {
+    if (coreOptions.layerEnable & 0x2000) {
         uint8_t v0 = WIN0V >> 8;
         uint8_t v1 = WIN0V & 255;
         inWindow0 = ((v0 == v1) && (v0 >= 0xe8));
@@ -289,7 +289,7 @@ void mode1RenderLineAll()
         else
             inWindow0 |= (VCOUNT >= v0 || VCOUNT < v1);
     }
-    if (layerEnable & 0x4000) {
+    if (coreOptions.layerEnable & 0x4000) {
         uint8_t v0 = WIN1V >> 8;
         uint8_t v1 = WIN1V & 255;
         inWindow1 = ((v0 == v1) && (v0 >= 0xe8));
@@ -299,15 +299,15 @@ void mode1RenderLineAll()
             inWindow1 |= (VCOUNT >= v0 || VCOUNT < v1);
     }
 
-    if (layerEnable & 0x0100) {
+    if (coreOptions.layerEnable & 0x0100) {
         gfxDrawTextScreen(BG0CNT, BG0HOFS, BG0VOFS, line0);
     }
 
-    if (layerEnable & 0x0200) {
+    if (coreOptions.layerEnable & 0x0200) {
         gfxDrawTextScreen(BG1CNT, BG1HOFS, BG1VOFS, line1);
     }
 
-    if (layerEnable & 0x0400) {
+    if (coreOptions.layerEnable & 0x0400) {
         int changed = gfxBG2Changed;
         if (gfxLastVCOUNT > VCOUNT)
             changed = 3;

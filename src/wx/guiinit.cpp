@@ -1513,9 +1513,9 @@ public:
         (void)ev; // unused params
         uint32_t sz = wxGetApp().frame->GetPanel()->game_size();
         utilGBAFindSave(sz);
-        type->SetSelection(saveType);
+        type->SetSelection(coreOptions.saveType);
 
-        if (saveType == GBA_SAVE_FLASH) {
+        if (coreOptions.saveType == GBA_SAVE_FLASH) {
             size->SetSelection(flashSize == 0x20000 ? 1 : 0);
             size->Enable();
         } else {
@@ -2206,7 +2206,7 @@ public:
         if (val == 0) {
             speedup_throttle            = 0;
             speedup_frame_skip          = 0;
-            speedup_throttle_frame_skip = false;
+            coreOptions.speedup_throttle_frame_skip = false;
 
             frame_skip_cb->SetValue(false);
             frame_skip_cb->Disable();
@@ -2223,7 +2223,7 @@ public:
         }
         else { // val > 450
             speedup_throttle            = 100;
-            speedup_throttle_frame_skip = false;
+            coreOptions.speedup_throttle_frame_skip = false;
 
             unsigned rounded = std::round((double)val / 100) * 100;
 
@@ -2252,7 +2252,7 @@ public:
 
         bool checked = frame_skip_cb->GetValue();
 
-        speedup_throttle_frame_skip = prev_frame_skip_cb = checked;
+        coreOptions.speedup_throttle_frame_skip = prev_frame_skip_cb = checked;
     }
 
     void Init(wxShowEvent& ev)
@@ -2264,7 +2264,7 @@ public:
         }
         else {
             speedup_throttle_spin->SetValue(speedup_throttle);
-            frame_skip_cb->SetValue(speedup_throttle_frame_skip);
+            frame_skip_cb->SetValue(coreOptions.speedup_throttle_frame_skip);
 
             if (speedup_throttle != 0)
                 frame_skip_cb->Enable();
@@ -2275,7 +2275,7 @@ public:
         ev.Skip();
     }
 private:
-    bool prev_frame_skip_cb = speedup_throttle_frame_skip;
+    bool prev_frame_skip_cb = coreOptions.speedup_throttle_frame_skip;
 } speedup_throttle_ctrl;
 
 /////////////////////////////
@@ -2869,19 +2869,19 @@ bool MainFrame::BindControls()
         MenuOptionIntMask("SoundChannel4", gopts.sound_en, (1 << 3));
         MenuOptionIntMask("DirectSoundA", gopts.sound_en, (1 << 8));
         MenuOptionIntMask("DirectSoundB", gopts.sound_en, (1 << 9));
-        MenuOptionIntMask("VideoLayersBG0", layerSettings, (1 << 8));
-        MenuOptionIntMask("VideoLayersBG1", layerSettings, (1 << 9));
-        MenuOptionIntMask("VideoLayersBG2", layerSettings, (1 << 10));
-        MenuOptionIntMask("VideoLayersBG3", layerSettings, (1 << 11));
-        MenuOptionIntMask("VideoLayersOBJ", layerSettings, (1 << 12));
-        MenuOptionIntMask("VideoLayersWIN0", layerSettings, (1 << 13));
-        MenuOptionIntMask("VideoLayersWIN1", layerSettings, (1 << 14));
-        MenuOptionIntMask("VideoLayersOBJWIN", layerSettings, (1 << 15));
+        MenuOptionIntMask("VideoLayersBG0", coreOptions.layerSettings, (1 << 8));
+        MenuOptionIntMask("VideoLayersBG1", coreOptions.layerSettings, (1 << 9));
+        MenuOptionIntMask("VideoLayersBG2", coreOptions.layerSettings, (1 << 10));
+        MenuOptionIntMask("VideoLayersBG3", coreOptions.layerSettings, (1 << 11));
+        MenuOptionIntMask("VideoLayersOBJ", coreOptions.layerSettings, (1 << 12));
+        MenuOptionIntMask("VideoLayersWIN0", coreOptions.layerSettings, (1 << 13));
+        MenuOptionIntMask("VideoLayersWIN1", coreOptions.layerSettings, (1 << 14));
+        MenuOptionIntMask("VideoLayersOBJWIN", coreOptions.layerSettings, (1 << 15));
         MenuOptionBool("CheatsAutoSaveLoad", gopts.autoload_cheats);
-        MenuOptionIntMask("CheatsEnable", cheatsEnabled, 1);
+        MenuOptionIntMask("CheatsEnable", coreOptions.cheatsEnabled, 1);
         SetMenuOption("ColorizerHack", colorizerHack ? 1 : 0);
-        MenuOptionIntMask("KeepSaves", skipSaveGameBattery, 1);
-        MenuOptionIntMask("KeepCheats", skipSaveGameCheats, 1);
+        MenuOptionIntMask("KeepSaves", coreOptions.skipSaveGameBattery, 1);
+        MenuOptionIntMask("KeepCheats", coreOptions.skipSaveGameCheats, 1);
         MenuOptionBool("LoadGameAutoLoad", gopts.autoload_state);
         MenuOptionIntMask("JoypadAutofireA", autofire, KEYM_A);
         MenuOptionIntMask("JoypadAutofireB", autofire, KEYM_B);
@@ -3452,7 +3452,7 @@ bool MainFrame::BindControls()
         d = LoadXRCropertySheetDialog("GameBoyAdvanceConfig");
         {
             /// System and peripherals
-            ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "SaveType", wxGenericValidator(&cpuSaveType));
+            ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "SaveType", wxGenericValidator(&coreOptions.cpuSaveType));
             BatConfigHandler.type = ch;
             ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "FlashSize", wxGenericValidator(&optFlashSize));
             BatConfigHandler.size = ch;

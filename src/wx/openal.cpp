@@ -292,7 +292,7 @@ void OpenAL::write(uint16_t* finalWave, int length)
             }
         }
 
-        if (!speedup && throttle && !gba_joybus_active) {
+        if (!coreOptions.speedup && throttle && !gba_joybus_active) {
             // wait until at least one buffer has finished
             while (nBuffersProcessed == 0) {
                 winlog(" waiting...\n");

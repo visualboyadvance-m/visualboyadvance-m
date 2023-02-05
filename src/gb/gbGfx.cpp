@@ -1,6 +1,7 @@
 #include <memory.h>
 
 #include "../Util.h"
+#include "../common/ConfigManager.h"
 #include "gbGlobals.h"
 #include "gbSGB.h"
 
@@ -42,7 +43,6 @@ uint8_t gbInvertTab[256] = {
 uint16_t gbLineMix[160];
 uint16_t gbWindowColor[160];
 extern int inUseRegister_WY;
-extern int layerSettings;
 
 void gbRenderLine()
 {
@@ -104,7 +104,7 @@ void gbRenderLine()
     int tile_pattern_address = tile_pattern + tile * 16 + by * 2;
 
     if (register_LCDC & 0x80) {
-        if ((register_LCDC & 0x01 || gbCgbMode) && (layerSettings & 0x0100)) {
+        if ((register_LCDC & 0x01 || gbCgbMode) && (coreOptions.layerSettings & 0x0100)) {
             while (x < 160) {
 
                 uint8_t tile_a = 0;
@@ -215,7 +215,7 @@ void gbRenderLine()
         // LCDC.0 also enables/disables the window in !gbCgbMode ?!?!
         // (tested on real hardware)
         // This fixes Last Bible II & Zankurou Musouken
-        if ((register_LCDC & 0x01 || gbCgbMode) && (register_LCDC & 0x20) && (layerSettings & 0x2000) && (gbWindowLine != -2)) {
+        if ((register_LCDC & 0x01 || gbCgbMode) && (register_LCDC & 0x20) && (coreOptions.layerSettings & 0x2000) && (gbWindowLine != -2)) {
             int i = 0;
             // Fix (accurate emulation) for most of the window display problems
             // (ie. Zen - Intergalactic Ninja, Urusei Yatsura...).
@@ -536,7 +536,7 @@ void gbDrawSprites(bool draw)
     if (!(register_LCDC & 0x80))
         return;
 
-    if ((register_LCDC & 2) && (layerSettings & 0x1000)) {
+    if ((register_LCDC & 2) && (coreOptions.layerSettings & 0x1000)) {
         int yc = register_LY;
 
         int address = 0xfe00;

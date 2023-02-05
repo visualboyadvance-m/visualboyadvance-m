@@ -1800,9 +1800,9 @@ EVT_HANDLER(KeepSaves, "Do not load battery saves (toggle)")
 {
     bool menuPress = false;
     GetMenuOptionBool("KeepSaves", &menuPress);
-    toggleBitVar(&menuPress, &skipSaveGameBattery, 1);
+    toggleBitVar(&menuPress, &coreOptions.skipSaveGameBattery, 1);
     SetMenuOption("KeepSaves", menuPress ? 1 : 0);
-    GetMenuOptionInt("KeepSaves", &skipSaveGameBattery, 1);
+    GetMenuOptionInt("KeepSaves", &coreOptions.skipSaveGameBattery, 1);
     update_opts();
 }
 
@@ -1811,9 +1811,9 @@ EVT_HANDLER(KeepCheats, "Do not change cheat list (toggle)")
 {
     bool menuPress = false;
     GetMenuOptionBool("KeepCheats", &menuPress);
-    toggleBitVar(&menuPress, &skipSaveGameCheats, 1);
+    toggleBitVar(&menuPress, &coreOptions.skipSaveGameCheats, 1);
     SetMenuOption("KeepCheats", menuPress ? 1 : 0);
-    GetMenuOptionInt("KeepCheats", &skipSaveGameCheats, 1);
+    GetMenuOptionInt("KeepCheats", &coreOptions.skipSaveGameCheats, 1);
     update_opts();
 }
 
@@ -1987,9 +1987,9 @@ EVT_HANDLER(CheatsEnable, "Enable cheats (toggle)")
 {
     bool menuPress = false;
     GetMenuOptionBool("CheatsEnable", &menuPress);
-    toggleBitVar(&menuPress, &cheatsEnabled, 1);
+    toggleBitVar(&menuPress, &coreOptions.cheatsEnabled, 1);
     SetMenuOption("CheatsEnable", menuPress ? 1 : 0);
-    GetMenuOptionInt("CheatsEnable", &cheatsEnabled, 1);
+    GetMenuOptionInt("CheatsEnable", &coreOptions.cheatsEnabled, 1);
     update_opts();
 }
 
@@ -2015,10 +2015,10 @@ EVT_HANDLER_MASK(VideoLayersBG0, "Video layer BG0 (toggle)", CMDEN_GB | CMDEN_GB
     bool menuPress = false;
     char keyName[] = "VideoLayersBG0";
     GetMenuOptionBool(keyName, &menuPress);
-    toggleBitVar(&menuPress, &layerSettings, (1 << 8));
+    toggleBitVar(&menuPress, &coreOptions.layerSettings, (1 << 8));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, &layerSettings, (1 << 8));
-    layerEnable = DISPCNT & layerSettings;
+    GetMenuOptionInt(keyName, &coreOptions.layerSettings, (1 << 8));
+    coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
@@ -2027,10 +2027,10 @@ EVT_HANDLER_MASK(VideoLayersBG1, "Video layer BG1 (toggle)", CMDEN_GB | CMDEN_GB
     bool menuPress = false;
     char keyName[] = "VideoLayersBG1";
     GetMenuOptionBool(keyName, &menuPress);
-    toggleBitVar(&menuPress, &layerSettings, (1 << 9));
+    toggleBitVar(&menuPress, &coreOptions.layerSettings, (1 << 9));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, &layerSettings, (1 << 9));
-    layerEnable = DISPCNT & layerSettings;
+    GetMenuOptionInt(keyName, &coreOptions.layerSettings, (1 << 9));
+    coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
@@ -2039,10 +2039,10 @@ EVT_HANDLER_MASK(VideoLayersBG2, "Video layer BG2 (toggle)", CMDEN_GB | CMDEN_GB
     bool menuPress = false;
     char keyName[] = "VideoLayersBG2";
     GetMenuOptionBool(keyName, &menuPress);
-    toggleBitVar(&menuPress, &layerSettings, (1 << 10));
+    toggleBitVar(&menuPress, &coreOptions.layerSettings, (1 << 10));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, &layerSettings, (1 << 10));
-    layerEnable = DISPCNT & layerSettings;
+    GetMenuOptionInt(keyName, &coreOptions.layerSettings, (1 << 10));
+    coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
@@ -2051,10 +2051,10 @@ EVT_HANDLER_MASK(VideoLayersBG3, "Video layer BG3 (toggle)", CMDEN_GB | CMDEN_GB
     bool menuPress = false;
     char keyName[] = "VideoLayersBG3";
     GetMenuOptionBool(keyName, &menuPress);
-    toggleBitVar(&menuPress, &layerSettings, (1 << 11));
+    toggleBitVar(&menuPress, &coreOptions.layerSettings, (1 << 11));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, &layerSettings, (1 << 11));
-    layerEnable = DISPCNT & layerSettings;
+    GetMenuOptionInt(keyName, &coreOptions.layerSettings, (1 << 11));
+    coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
@@ -2063,10 +2063,10 @@ EVT_HANDLER_MASK(VideoLayersOBJ, "Video layer OBJ (toggle)", CMDEN_GB | CMDEN_GB
     bool menuPress = false;
     char keyName[] = "VideoLayersOBJ";
     GetMenuOptionBool(keyName, &menuPress);
-    toggleBitVar(&menuPress, &layerSettings, (1 << 12));
+    toggleBitVar(&menuPress, &coreOptions.layerSettings, (1 << 12));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, &layerSettings, (1 << 12));
-    layerEnable = DISPCNT & layerSettings;
+    GetMenuOptionInt(keyName, &coreOptions.layerSettings, (1 << 12));
+    coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
@@ -2075,10 +2075,10 @@ EVT_HANDLER_MASK(VideoLayersWIN0, "Video layer WIN0 (toggle)", CMDEN_GB | CMDEN_
     bool menuPress = false;
     char keyName[] = "VideoLayersWIN0";
     GetMenuOptionBool(keyName, &menuPress);
-    toggleBitVar(&menuPress, &layerSettings, (1 << 13));
+    toggleBitVar(&menuPress, &coreOptions.layerSettings, (1 << 13));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, &layerSettings, (1 << 13));
-    layerEnable = DISPCNT & layerSettings;
+    GetMenuOptionInt(keyName, &coreOptions.layerSettings, (1 << 13));
+    coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
@@ -2087,10 +2087,10 @@ EVT_HANDLER_MASK(VideoLayersWIN1, "Video layer WIN1 (toggle)", CMDEN_GB | CMDEN_
     bool menuPress = false;
     char keyName[] = "VideoLayersWIN1";
     GetMenuOptionBool(keyName, &menuPress);
-    toggleBitVar(&menuPress, &layerSettings, (1 << 14));
+    toggleBitVar(&menuPress, &coreOptions.layerSettings, (1 << 14));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, &layerSettings, (1 << 14));
-    layerEnable = DISPCNT & layerSettings;
+    GetMenuOptionInt(keyName, &coreOptions.layerSettings, (1 << 14));
+    coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
@@ -2099,10 +2099,10 @@ EVT_HANDLER_MASK(VideoLayersOBJWIN, "Video layer OBJWIN (toggle)", CMDEN_GB | CM
     bool menuPress = false;
     char keyName[] = "VideoLayersOBJWIN";
     GetMenuOptionBool(keyName, &menuPress);
-    toggleBitVar(&menuPress, &layerSettings, (1 << 15));
+    toggleBitVar(&menuPress, &coreOptions.layerSettings, (1 << 15));
     SetMenuOption(keyName, menuPress ? 1 : 0);
-    GetMenuOptionInt(keyName, &layerSettings, (1 << 15));
-    layerEnable = DISPCNT & layerSettings;
+    GetMenuOptionInt(keyName, &coreOptions.layerSettings, (1 << 15));
+    coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
     CPUUpdateRenderBuffers(false);
 }
 
@@ -2117,8 +2117,8 @@ EVT_HANDLER_MASK(VideoLayersReset, "Show all video layers", CMDEN_GB | CMDEN_GBA
                 break;                                \
             }                                         \
     } while (0)
-    layerSettings = 0x7f00;
-    layerEnable = DISPCNT & layerSettings;
+    coreOptions.layerSettings = 0x7f00;
+    coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
     set_vl("VideoLayersBG0");
     set_vl("VideoLayersBG1");
     set_vl("VideoLayersBG2");
@@ -2488,7 +2488,7 @@ EVT_HANDLER(SpeedupConfigure, "Speedup / Turbo options...")
 
     unsigned save_speedup_throttle            = speedup_throttle;
     unsigned save_speedup_frame_skip          = speedup_frame_skip;
-    bool     save_speedup_throttle_frame_skip = speedup_throttle_frame_skip;
+    bool     save_speedup_throttle_frame_skip = coreOptions.speedup_throttle_frame_skip;
 
     if (ShowModal(dlg) == wxID_OK)
         update_opts();
@@ -2496,7 +2496,7 @@ EVT_HANDLER(SpeedupConfigure, "Speedup / Turbo options...")
         // Restore values if cancel pressed.
         speedup_throttle            = save_speedup_throttle;
         speedup_frame_skip          = save_speedup_frame_skip;
-        speedup_throttle_frame_skip = save_speedup_throttle_frame_skip;
+        coreOptions.speedup_throttle_frame_skip = save_speedup_throttle_frame_skip;
     }
 }
 
@@ -2980,7 +2980,7 @@ EVT_HANDLER(RetainAspect, "Retain aspect ratio when resizing")
 
 EVT_HANDLER(Printer, "Enable printer emulation")
 {
-    GetMenuOptionInt("Printer", &winGbPrinterEnabled, 1);
+    GetMenuOptionInt("Printer", &coreOptions.winGbPrinterEnabled, 1);
 #if (defined __WIN32__ || defined _WIN32)
 #ifndef NO_LINK
     gbSerialFunction = gbStartLink;
@@ -2988,7 +2988,7 @@ EVT_HANDLER(Printer, "Enable printer emulation")
     gbSerialFunction = NULL;
 #endif
 #endif
-    if (winGbPrinterEnabled)
+    if (coreOptions.winGbPrinterEnabled)
         gbSerialFunction = gbPrinterSend;
 
     update_opts();
@@ -3126,7 +3126,7 @@ EVT_HANDLER(PauseWhenInactive, "Pause game when main window loses focus")
 
 EVT_HANDLER(RTC, "Enable RTC (vba-over.ini override is rtcEnabled")
 {
-    GetMenuOptionInt("RTC", &rtcEnabled, 1);
+    GetMenuOptionInt("RTC", &coreOptions.rtcEnabled, 1);
     update_opts();
 }
 
@@ -3138,7 +3138,7 @@ EVT_HANDLER(Transparent, "Draw on-screen messages transparently")
 
 EVT_HANDLER(SkipIntro, "Skip BIOS initialization")
 {
-    GetMenuOptionInt("SkipIntro", &skipBios, 1);
+    GetMenuOptionInt("SkipIntro", &coreOptions.skipBios, 1);
     update_opts();
 }
 

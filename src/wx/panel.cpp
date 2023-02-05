@@ -275,7 +275,7 @@ void GameArea::LoadGame(const wxString& name)
 
         gbCPUInit(fn, use_bios);
 
-        if (use_bios && !useBios) {
+        if (use_bios && !coreOptions.useBios) {
             wxLogError(_("Could not load BIOS %s"), (gbCgbMode ? gopts.gbc_bios : gopts.gb_bios).mb_str());
             // could clear use flag & file name now, but better to force
             // user to do it
@@ -322,7 +322,7 @@ void GameArea::LoadGame(const wxString& name)
 
         if (cfg->HasGroup(id)) {
             cfg->SetPath(id);
-            bool enable_rtc = cfg->Read(wxT("rtcEnabled"), rtcEnabled);
+            bool enable_rtc = cfg->Read(wxT("rtcEnabled"), coreOptions.rtcEnabled);
 
             rtcEnable(enable_rtc);
 
@@ -332,7 +332,7 @@ void GameArea::LoadGame(const wxString& name)
                 fsz = 0x10000 << optFlashSize;
 
             flashSetSize(fsz);
-            ovSaveType = cfg->Read(wxT("saveType"), cpuSaveType);
+            ovSaveType = cfg->Read(wxT("coreOptions.saveType"), coreOptions.cpuSaveType);
 
             if (ovSaveType < 0 || ovSaveType > 5)
                 ovSaveType = 0;
@@ -340,26 +340,26 @@ void GameArea::LoadGame(const wxString& name)
             if (ovSaveType == 0)
                 utilGBAFindSave(rom_size);
             else
-                saveType = ovSaveType;
+                coreOptions.saveType = ovSaveType;
 
-            mirroringEnable = cfg->Read(wxT("mirroringEnabled"), (long)1);
+            coreOptions.mirroringEnable = cfg->Read(wxT("mirroringEnabled"), (long)1);
             cfg->SetPath(wxT("/"));
         } else {
-            rtcEnable(rtcEnabled);
+            rtcEnable(coreOptions.rtcEnabled);
             flashSetSize(0x10000 << optFlashSize);
 
-            if (cpuSaveType < 0 || cpuSaveType > 5)
-                cpuSaveType = 0;
+            if (coreOptions.cpuSaveType < 0 || coreOptions.cpuSaveType > 5)
+                coreOptions.cpuSaveType = 0;
 
-            if (cpuSaveType == 0)
+            if (coreOptions.cpuSaveType == 0)
                 utilGBAFindSave(rom_size);
             else
-                saveType = cpuSaveType;
+                coreOptions.saveType = coreOptions.cpuSaveType;
 
-            mirroringEnable = false;
+            coreOptions.mirroringEnable = false;
         }
 
-        doMirroring(mirroringEnable);
+        doMirroring(coreOptions.mirroringEnable);
         // start sound; this must happen before CPU stuff
         if (!soundInit()) {
             wxLogError(_("Could not initialize the sound driver!"));
@@ -375,7 +375,7 @@ void GameArea::LoadGame(const wxString& name)
 
         CPUInit(UTF8(gopts.gba_bios), gopts.use_bios_file_gba);
 
-        if (gopts.use_bios_file_gba && !useBios) {
+        if (gopts.use_bios_file_gba && !coreOptions.useBios) {
             wxLogError(_("Could not load BIOS %s"), gopts.gba_bios.mb_str());
             // could clear use flag & file name now, but better to force
             // user to do it
@@ -414,7 +414,7 @@ void GameArea::LoadGame(const wxString& name)
 #endif
 
     // probably only need to do this for GB carts
-    if (winGbPrinterEnabled)
+    if (coreOptions.winGbPrinterEnabled)
         gbSerialFunction = gbPrinterSend;
 
     // probably only need to do this for GBA carts
@@ -430,7 +430,7 @@ void GameArea::LoadGame(const wxString& name)
     mf->update_state_ts(true);
     bool did_autoload = gopts.autoload_state ? LoadState() : false;
 
-    if (!did_autoload || skipSaveGameBattery) {
+    if (!did_autoload || coreOptions.skipSaveGameBattery) {
         wxString bname = loaded_game.GetFullName();
 #ifndef NO_LINK
         // MakeInstanceFilename doesn't do wxString, so just add slave ID here
@@ -450,24 +450,24 @@ void GameArea::LoadGame(const wxString& name)
             msg.Printf(_("Loaded battery %s"), bat.GetFullPath().wc_str());
             systemScreenMessage(msg);
 
-            if (cpuSaveType == 0 && ovSaveType == 0 && t == IMAGE_GBA) {
+            if (coreOptions.cpuSaveType == 0 && ovSaveType == 0 && t == IMAGE_GBA) {
                 switch (bat.GetSize().GetValue()) {
                 case 0x200:
                 case 0x2000:
-                    saveType = GBA_SAVE_EEPROM;
+                    coreOptions.saveType = GBA_SAVE_EEPROM;
                     break;
 
                 case 0x8000:
-                    saveType = GBA_SAVE_SRAM;
+                    coreOptions.saveType = GBA_SAVE_SRAM;
                     break;
 
                 case 0x10000:
-                    if (saveType == GBA_SAVE_EEPROM || saveType == GBA_SAVE_SRAM)
+                    if (coreOptions.saveType == GBA_SAVE_EEPROM || coreOptions.saveType == GBA_SAVE_SRAM)
                         break;
                     break;
 
                 case 0x20000:
-                    saveType = GBA_SAVE_FLASH;
+                    coreOptions.saveType = GBA_SAVE_FLASH;
                     flashSetSize(bat.GetSize().GetValue());
                     break;
 
@@ -475,7 +475,7 @@ void GameArea::LoadGame(const wxString& name)
                     break;
                 }
 
-                SetSaveType(saveType);
+                SetSaveType(coreOptions.saveType);
             }
         }
 
@@ -488,9 +488,9 @@ void GameArea::LoadGame(const wxString& name)
     // do a reset or load from state file when # rewinds == 0
     do_rewind = gopts.rewind_interval > 0;
     // FIXME: backup battery file (useful if game name conflict)
-    cheats_dirty = (did_autoload && !skipSaveGameCheats) || (loaded == IMAGE_GB ? gbCheatNumber > 0 : cheatsNumber > 0);
+    cheats_dirty = (did_autoload && !coreOptions.skipSaveGameCheats) || (loaded == IMAGE_GB ? gbCheatNumber > 0 : cheatsNumber > 0);
 
-    if (gopts.autoload_cheats && (!did_autoload || skipSaveGameCheats)) {
+    if (gopts.autoload_cheats && (!did_autoload || coreOptions.skipSaveGameCheats)) {
         wxFileName cfn = loaded_game;
         // SetExt may strip something off by accident, so append to text instead
         cfn.SetFullName(cfn.GetFullName() + wxT(".clt"));

@@ -40,7 +40,7 @@ void SoundSDL::soundCallback(void* data, uint8_t* stream, int len) {
 }
 
 bool SoundSDL::should_wait() {
-    return emulating && !speedup && current_rate && !gba_joybus_active;
+    return emulating && !coreOptions.speedup && current_rate && !gba_joybus_active;
 }
 
 std::size_t SoundSDL::buffer_size() {

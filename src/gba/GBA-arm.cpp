@@ -2830,7 +2830,7 @@ static void tester(void) {
 int armExecute()
 {
     do {
-        if (cheatsEnabled) {
+        if (coreOptions.cheatsEnabled) {
             cpuMasterCodeCheck();
         }
 
