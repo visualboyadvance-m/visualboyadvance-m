@@ -387,7 +387,7 @@ void GameArea::LoadGame(const wxString& name)
         emusys = &GBASystem;
     }
 
-    if (config::OptGeomFullScreen()->GetBool()) {
+    if (config::OptGeomFullScreen()->GetInt()) {
         GameArea::ShowFullScreen(true);
     }
 
