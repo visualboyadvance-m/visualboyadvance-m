@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-02 22:20+0000\n"
+"POT-Creation-Date: 2023-02-05 17:29+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Sinan H., 2016,2018,2022\n"
 "Language-Team: Turkish (http://www.transifex.com/bgk/vba-m/language/tr/)\n"
@@ -168,7 +168,7 @@ msgstr "Hile dosyası seçin"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA hile listesi uzantıları (*.clt)|*.clt|CHT hile listeleri (*.cht)|*.cht"
 
-#: guiinit.cpp:264 panel.cpp:506
+#: guiinit.cpp:264 panel.cpp:507
 msgid "Loaded cheats"
 msgstr "Hileleri yükle"
 
@@ -287,50 +287,50 @@ msgstr "Gözat"
 msgid "Main display panel not found"
 msgstr "Ana ekran paneli bulunamadı"
 
-#: guiinit.cpp:2768
+#: guiinit.cpp:2757
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Menu hızlandırıcısını kopyala:%siçin%sve%s; İlk seçenek tutulur"
 
-#: guiinit.cpp:2782
+#: guiinit.cpp:2771
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "Menü hızlandırıcı %siçin%svarsayılanı %siçin geçersiz kılar; Menü tutulur"
 
-#: guiinit.cpp:2922
+#: guiinit.cpp:2910
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Geçersiz menü ögesi %s; siliniyor"
 
-#: guiinit.cpp:3125
+#: guiinit.cpp:3113
 msgid "Code"
 msgstr "Kod"
 
-#: guiinit.cpp:3134
+#: guiinit.cpp:3122
 msgid "Description"
 msgstr "Açıklama"
 
-#: guiinit.cpp:3208 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3196 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Adres"
 
-#: guiinit.cpp:3209
+#: guiinit.cpp:3197
 msgid "Old Value"
 msgstr "Eski Değer"
 
-#: guiinit.cpp:3210
+#: guiinit.cpp:3198
 msgid "New Value"
 msgstr "Yeni Değer"
 
-#: guiinit.cpp:3682
+#: guiinit.cpp:3670
 msgid "Menu commands"
 msgstr "Menü komutları"
 
-#: guiinit.cpp:3705
+#: guiinit.cpp:3693
 msgid "Other commands"
 msgstr "Diğer komutlar"
 
-#: guiinit.cpp:3816
+#: guiinit.cpp:3804
 msgid "JoyBus host invalid; disabling"
 msgstr "JoyBus sunucusu geçersiz; kapatılıyor"
 
@@ -339,7 +339,7 @@ msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr "Metin uzantıları  (*.txt;*.log)|*.txt;*.log|"
 
 #: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
-#: cmdevents.cpp:1187 cmdevents.cpp:1265 cmdevents.cpp:1335 cmdevents.cpp:1404
+#: cmdevents.cpp:1187 cmdevents.cpp:1265 cmdevents.cpp:1335 cmdevents.cpp:1406
 #: viewsupt.cpp:1180
 msgid "Select output file"
 msgstr "Çıktı dosyası seçiniz"
@@ -571,7 +571,7 @@ msgstr "ROM+HuC-3"
 msgid "ROM+HuC-1"
 msgstr "ROM+HuC-1"
 
-#: cmdevents.cpp:775 dialogs/display-config.cpp:343 xrc/DisplayConfig.xrc:85
+#: cmdevents.cpp:775 dialogs/display-config.cpp:353 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
@@ -604,7 +604,7 @@ msgstr "Kartuş dosyasını içe aktarmak oyun kayıtlarınızı silecektir (ger
 msgid "Confirm import"
 msgstr "İçe aktarmayı onayla"
 
-#: cmdevents.cpp:936 panel.cpp:449
+#: cmdevents.cpp:936 panel.cpp:450
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Kartuş dosyası yüklendi : %s"
@@ -687,7 +687,7 @@ msgstr "Kayıt yüklenirken hata oluştu : %s"
 msgid "Wrote battery %s"
 msgstr "Kartuş yazıldı : %s"
 
-#: cmdevents.cpp:1129 panel.cpp:755
+#: cmdevents.cpp:1129 panel.cpp:756
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Kartuş yazımında hata : %s"
@@ -714,91 +714,91 @@ msgstr "Dosya kaydedildi : %s"
 msgid "Error saving snapshot file %s"
 msgstr "Kaydedilirken bir hata oluştu : %s"
 
-#: cmdevents.cpp:1212 sys.cpp:557
+#: cmdevents.cpp:1212 sys.cpp:558
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "Kayıt yapıldı : %s"
 
-#: cmdevents.cpp:1233 cmdevents.cpp:1303 cmdevents.cpp:1374 cmdevents.cpp:1438
+#: cmdevents.cpp:1233 cmdevents.cpp:1303 cmdevents.cpp:1374 cmdevents.cpp:1440
 msgid " files ("
 msgstr "dosyalar ("
 
-#: cmdevents.cpp:1469
+#: cmdevents.cpp:1473
 msgid "Select file"
 msgstr "Dosya seçin"
 
-#: cmdevents.cpp:1786 cmdevents.cpp:1879
+#: cmdevents.cpp:1790 cmdevents.cpp:1883
 msgid "Select state file"
 msgstr "Durum dosyası seçin"
 
-#: cmdevents.cpp:1787 cmdevents.cpp:1880
+#: cmdevents.cpp:1791 cmdevents.cpp:1884
 msgid "VisualBoyAdvance saved game files|*.sgm"
 msgstr "VisualBoyAdvance kayıt uzantısı\\*.sgm"
 
-#: cmdevents.cpp:1910 cmdevents.cpp:1920 cmdevents.cpp:1931
+#: cmdevents.cpp:1914 cmdevents.cpp:1924 cmdevents.cpp:1935
 #, c-format
 msgid "Current state slot #%d"
 msgstr "Geçerli durum kaydı #%d"
 
-#: cmdevents.cpp:2001
+#: cmdevents.cpp:2005
 msgid "Cannot use Colorizer Hack when GB BIOS File is enabled."
 msgstr "GB BIOS Dosyası seçiliyken Renklendirici Hilesi kullanılamaz."
 
-#: cmdevents.cpp:2216
+#: cmdevents.cpp:2220
 msgid "Sound enabled"
 msgstr "Ses etkin"
 
-#: cmdevents.cpp:2216
+#: cmdevents.cpp:2220
 msgid "Sound disabled"
 msgstr "Ses kapatıldı"
 
-#: cmdevents.cpp:2229 cmdevents.cpp:2243
+#: cmdevents.cpp:2233 cmdevents.cpp:2247
 #, c-format
 msgid "Volume: %d%%"
 msgstr "Ses Düzeyi: %d%%"
 
-#: cmdevents.cpp:2318
+#: cmdevents.cpp:2322
 msgid "Set to 0 for pseudo tty"
 msgstr "Pseudo tty 0'a ayarlansın"
 
-#: cmdevents.cpp:2320
+#: cmdevents.cpp:2324
 msgid "Port to wait for connection:"
 msgstr "Bağlantı noktası:"
 
-#: cmdevents.cpp:2321
+#: cmdevents.cpp:2325
 msgid "GDB Connection"
 msgstr "GDB Bağlantısı"
 
-#: cmdevents.cpp:2374
+#: cmdevents.cpp:2378
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "Bağlantı bekleniyor %s"
 
-#: cmdevents.cpp:2381
+#: cmdevents.cpp:2385
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "Bağlantı için beklenilen nokta : %d"
 
-#: cmdevents.cpp:2384
+#: cmdevents.cpp:2388
 msgid "Waiting for GDB..."
 msgstr "GDB bekleniyor..."
 
-#: cmdevents.cpp:2808 panel.cpp:250 panel.cpp:364
+#: cmdevents.cpp:2812 panel.cpp:250 panel.cpp:365
 msgid "Could not initialize the sound driver!"
 msgstr "Ses sürücüsü başlatılamadı!"
 
-#: cmdevents.cpp:2912
+#: cmdevents.cpp:2916
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "Nintendo GameBoy (+Color+Advance) öykünücüsü."
 
-#: cmdevents.cpp:2913
+#: cmdevents.cpp:2917
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "Telif Hakkı (C) 1999-2003 Forgotten\nTelif Hakkı (C) 2004-2006 VBA Geliştirici Takımı\nTelif Hakkı (C) 2007-2020 VBA-M Geliştirici Takımı"
 
-#: cmdevents.cpp:2914
+#: cmdevents.cpp:2918
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -814,15 +814,15 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "Bu ücretsiz bir programdır:Free Software Foundation'ın yayımladığı GNU General Public lisansına uygun olarak paylaşılabilir, üzerinde değişiklikler yapılabilir (lisansın 2. sürümü ya da sonrasında çıkan sürümü, sizin tercihinizdir.)\n\nBu program işe yaraması amacı ile yazılmıştır, ancak HİÇBİR GARANTİ içermez; ima edilen TİCARETE UYGUNLUK garantisi ya da BELLİ BİR AMACA UYGUNLUK garantisi bile içermez. Daha fazla bilgi için GNU General Public Lisansını inceleyiniz.\n\nBu programın içinde GNU General Public lisansının bir kopyasının da bulunması gerekir. Eğer bu kopya programdan çıkmadıysa, http://www.gnu.org/licenses sitesinden Lisansa ulaşabilirsiniz."
 
-#: cmdevents.cpp:3165
+#: cmdevents.cpp:3156
 msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
 msgstr "Renklendirme Hilesi açıkken GB BIOS kullanılamaz."
 
-#: cmdevents.cpp:3226
+#: cmdevents.cpp:3217
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LAN bağlantı kipi zaten açık. Bağlantıyı kesmek için bağlantı kipini kapatınız."
 
-#: cmdevents.cpp:3232
+#: cmdevents.cpp:3223
 msgid "Network is not supported in local mode."
 msgstr "Yerel kipte ağ desteği yoktur."
 
@@ -854,92 +854,92 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-#: opts.cpp:543 opts.cpp:564 opts.cpp:769
+#: opts.cpp:518 opts.cpp:539 opts.cpp:745
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "%siçin%sgeçersiz tuş bağlantısı"
 
-#: opts.cpp:692 opts.cpp:701 opts.cpp:710 opts.cpp:719 config/option.cpp:462
+#: opts.cpp:668 opts.cpp:677 opts.cpp:686 opts.cpp:695 config/option.cpp:462
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr ""
 
-#: opts.cpp:791
+#: opts.cpp:767
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr ""
 
-#: sys.cpp:195 sys.cpp:256
+#: sys.cpp:196 sys.cpp:257
 msgid "No game in progress to record"
 msgstr "Görüntü/ses kaydı alınabilecek bir oyun çalışmamaktadır"
 
-#: sys.cpp:213
+#: sys.cpp:214
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "%s çıktı dosyası açılamıyor "
 
-#: sys.cpp:220 sys.cpp:240 sys.cpp:390
+#: sys.cpp:221 sys.cpp:241 sys.cpp:391
 msgid "Error writing game recording"
 msgstr "Alınmış olan Görüntü/ses kaydı yazılamıyor "
 
-#: sys.cpp:261
+#: sys.cpp:262
 msgid "Cannot play game recording while recording"
 msgstr "Yeni bir görüntü/ses kaydı alınırken, daha önce alınmış bir kayıt oynatılamaz"
 
-#: sys.cpp:276
+#: sys.cpp:277
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "%s kaydı dosyası açılamıyor"
 
-#: sys.cpp:285 sys.cpp:295
+#: sys.cpp:286 sys.cpp:296
 msgid "Error reading game recording"
 msgstr "Oyun görüntü/ses kaydı okunamıyor"
 
-#: sys.cpp:405 sys.cpp:424
+#: sys.cpp:406 sys.cpp:425
 msgid "Playback ended"
 msgstr "Oynatma sona erdi"
 
-#: sys.cpp:448
+#: sys.cpp:449
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr "%d%%(%d,%dfps)"
 
-#: sys.cpp:456
+#: sys.cpp:457
 #, c-format
 msgid "%d%%"
 msgstr "%d%%"
 
-#: sys.cpp:878 xrc/GBPrinter.xrc:65
+#: sys.cpp:879 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "&Sil"
 
-#: sys.cpp:912
+#: sys.cpp:913
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "Resim uzantıları (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:921
+#: sys.cpp:922
 msgid "Save printer image to"
 msgstr "Yazıcı resmini şuraya kaydet"
 
-#: sys.cpp:935 sys.cpp:1118
+#: sys.cpp:936 sys.cpp:1119
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "Yazıcı çıktısı şuraya kayıt edildi;%s"
 
-#: sys.cpp:940 sys.cpp:1011
+#: sys.cpp:941 sys.cpp:1012
 msgid "&Close"
 msgstr "&Kapat"
 
-#: sys.cpp:1006
+#: sys.cpp:1007
 msgid "Printed"
 msgstr "Çıktı alındı"
 
-#: sys.cpp:1308
+#: sys.cpp:1309
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "sahte tty:%saçılırken hata oluştu"
 
-#: sys.cpp:1407
+#: sys.cpp:1408
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "Sunucu soketi hazırlanırken hata oluştu (%d)"
@@ -949,7 +949,7 @@ msgstr "Sunucu soketi hazırlanırken hata oluştu (%d)"
 msgid "%s is not a valid ROM file"
 msgstr "%sbir ROM dosyası değil."
 
-#: panel.cpp:165 panel.cpp:226 panel.cpp:302
+#: panel.cpp:165 panel.cpp:226 panel.cpp:303
 msgid "Problem loading file"
 msgstr "Dosya yüklenirken hata"
 
@@ -964,157 +964,157 @@ msgid ""
 "file."
 msgstr "GB BIOS Dosyası seçiliyken Renklendirici Hilesi kullanılamaz. GB BIOS dosyası kullanımı iptal ediliyor."
 
-#: panel.cpp:278 panel.cpp:378
+#: panel.cpp:279 panel.cpp:379
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "BIOS yüklenemedi %s"
 
-#: panel.cpp:301
+#: panel.cpp:302
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Game Boy Advance ROM'u %syüklenemiyor"
 
-#: panel.cpp:538
+#: panel.cpp:539
 msgid " player "
 msgstr "oyuncu"
 
-#: panel.cpp:703
+#: panel.cpp:704
 #, c-format
 msgid "Loaded state %s"
 msgstr "%s Durum kaydı yüklendi"
 
-#: panel.cpp:703
+#: panel.cpp:704
 #, c-format
 msgid "Error loading state %s"
 msgstr "%s durum kaydı yüklenirken hata oluştu"
 
-#: panel.cpp:727
+#: panel.cpp:728
 #, c-format
 msgid "Saved state %s"
 msgstr "%s Durum kaydı alındı"
 
-#: panel.cpp:727
+#: panel.cpp:728
 #, c-format
 msgid "Error saving state %s"
 msgstr "%sdurum kaydı alınamadı"
 
-#: panel.cpp:931
+#: panel.cpp:932
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "%dx%d-%d@%dçözünürlüğünde tam ekran kipi desteklenmiyor; başka çözünürlük aranıyor"
 
-#: panel.cpp:969
+#: panel.cpp:970
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "%dx%d-%d@%d çözünürlüğünde Tam ekran kipi desteklenmiyor"
 
-#: panel.cpp:974
+#: panel.cpp:975
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "Geçerli çözünürlük: %dx%d-%d@%d"
 
-#: panel.cpp:982
+#: panel.cpp:983
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "%dx%d-%d@%d çözünürlüğünü seç"
 
-#: panel.cpp:986
+#: panel.cpp:987
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "çözünürlük %dx%d-%d@%d'e geçirilemedi"
 
-#: panel.cpp:1074
+#: panel.cpp:1075
 msgid "Not a valid GBA cartridge"
 msgstr "Geçerli bir GBA kartuşu değil"
 
-#: panel.cpp:1242
+#: panel.cpp:1245
 msgid "No memory for rewinding"
 msgstr "Geri sarma özelliği için yaterli hafıza yok"
 
-#: panel.cpp:1252
+#: panel.cpp:1255
 msgid "Error writing rewind state"
 msgstr "Geri sarma durumu yazılırken hata oluştu"
 
-#: panel.cpp:2269
+#: panel.cpp:2272
 msgid "Enabling EGL VSync."
 msgstr ""
 
-#: panel.cpp:2271
+#: panel.cpp:2274
 msgid "Disabling EGL VSync."
 msgstr ""
 
-#: panel.cpp:2278
+#: panel.cpp:2281
 msgid "Enabling GLX VSync."
 msgstr ""
 
-#: panel.cpp:2280
+#: panel.cpp:2283
 msgid "Disabling GLX VSync."
 msgstr ""
 
-#: panel.cpp:2297
+#: panel.cpp:2301
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "glXSwapIntervalEXT Ayarlanamadı"
 
-#: panel.cpp:2306
+#: panel.cpp:2310
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "glXSwapIntervalSGI Ayarlanamadı"
 
-#: panel.cpp:2315
+#: panel.cpp:2319
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "glXSwapIntervalMESA Ayarlanamadı"
 
-#: panel.cpp:2322
+#: panel.cpp:2326
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "wglGetExtensionsStringEXT desteği yok"
 
-#: panel.cpp:2325
+#: panel.cpp:2329
 msgid "No support for WGL_EXT_swap_control"
 msgstr "WGL_EXT_swap_control desteği yok"
 
-#: panel.cpp:2334
+#: panel.cpp:2338
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "wglSwapIntervalEXT Ayarlanamadı"
 
-#: panel.cpp:2340
+#: panel.cpp:2344
 msgid "No VSYNC available on this platform"
 msgstr "Bu platform için Dikey Eşitleme mevcut değil"
 
-#: panel.cpp:2440
+#: panel.cpp:2444
 msgid "memory allocation error"
 msgstr "Hafıza atama hatası"
 
-#: panel.cpp:2443
+#: panel.cpp:2447
 msgid "error initializing codec"
 msgstr "Çözücü başlatılırken hata"
 
-#: panel.cpp:2446
+#: panel.cpp:2450
 msgid "error writing to output file"
 msgstr "Çıktı dosyası yazılırken hata"
 
-#: panel.cpp:2449
+#: panel.cpp:2453
 msgid "can't guess output format from file name"
 msgstr "çıktı biçimi, dosya adından anlaşılamıyor"
 
-#: panel.cpp:2454
+#: panel.cpp:2458
 msgid "programming error; aborting!"
 msgstr "Programlama hatası; İşlem durduruluyor!"
 
-#: panel.cpp:2466 panel.cpp:2495
+#: panel.cpp:2470 panel.cpp:2499
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "%s(%s) buraya görüntü kaydı başlatılamıyor"
 
-#: panel.cpp:2523
+#: panel.cpp:2527
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "Ses ve görüntü kaydında hata (%s); İşlem durduruluyor"
 
-#: panel.cpp:2529
+#: panel.cpp:2533
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Ses kaydı hatası (%s); İptal ediliyor"
 
-#: panel.cpp:2539
+#: panel.cpp:2543
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Video kaydı hatası (%s); İptal ediliyor"
@@ -1131,170 +1131,170 @@ msgstr "Y:"
 msgid "B:"
 msgstr "M:"
 
-#: config/internal/option-internal.cpp:320
+#: config/internal/option-internal.cpp:317
 msgid "Use bilinear filter with 3d renderer"
 msgstr ""
 
-#: config/internal/option-internal.cpp:321
+#: config/internal/option-internal.cpp:318
 msgid "Full-screen filter to apply"
 msgstr ""
 
-#: config/internal/option-internal.cpp:323
+#: config/internal/option-internal.cpp:320
 msgid "Filter plugin library"
 msgstr ""
 
-#: config/internal/option-internal.cpp:325
+#: config/internal/option-internal.cpp:322
 msgid "Interframe blending function"
 msgstr ""
 
-#: config/internal/option-internal.cpp:327
+#: config/internal/option-internal.cpp:324
 msgid "Keep window on top"
 msgstr ""
 
-#: config/internal/option-internal.cpp:330
+#: config/internal/option-internal.cpp:327
 msgid "Maximum number of threads to run filters in"
 msgstr ""
 
-#: config/internal/option-internal.cpp:333
+#: config/internal/option-internal.cpp:330
 msgid "Render method; if unsupported, simple method will be used"
 msgstr ""
 
-#: config/internal/option-internal.cpp:335
+#: config/internal/option-internal.cpp:332
 msgid "Default scale factor"
 msgstr ""
 
-#: config/internal/option-internal.cpp:338
+#: config/internal/option-internal.cpp:335
 msgid "Retain aspect ratio when resizing"
 msgstr ""
 
-#: config/internal/option-internal.cpp:341
+#: config/internal/option-internal.cpp:338
 msgid "BIOS file to use for GB, if enabled"
 msgstr ""
 
-#: config/internal/option-internal.cpp:344
+#: config/internal/option-internal.cpp:341
 msgid "GB color enhancement, if enabled"
 msgstr ""
 
-#: config/internal/option-internal.cpp:346
+#: config/internal/option-internal.cpp:343
 msgid "Enable DX Colorization Hacks"
 msgstr ""
 
-#: config/internal/option-internal.cpp:347
-#: config/internal/option-internal.cpp:379
+#: config/internal/option-internal.cpp:344
+#: config/internal/option-internal.cpp:376
 msgid "Apply LCD filter, if enabled"
 msgstr ""
 
-#: config/internal/option-internal.cpp:349
+#: config/internal/option-internal.cpp:346
 msgid "BIOS file to use for GBC, if enabled"
 msgstr ""
 
-#: config/internal/option-internal.cpp:352
+#: config/internal/option-internal.cpp:349
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr ""
 
-#: config/internal/option-internal.cpp:356
+#: config/internal/option-internal.cpp:353
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr ""
 
-#: config/internal/option-internal.cpp:360
+#: config/internal/option-internal.cpp:357
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr ""
 
-#: config/internal/option-internal.cpp:364
+#: config/internal/option-internal.cpp:361
 msgid "Automatically gather a full page before printing"
 msgstr ""
 
-#: config/internal/option-internal.cpp:368
+#: config/internal/option-internal.cpp:365
 msgid "Automatically save printouts as screen captures with -print suffix"
 msgstr ""
 
-#: config/internal/option-internal.cpp:370
-#: config/internal/option-internal.cpp:400
+#: config/internal/option-internal.cpp:367
+#: config/internal/option-internal.cpp:397
 msgid "Directory to look for ROM files"
 msgstr ""
 
-#: config/internal/option-internal.cpp:372
+#: config/internal/option-internal.cpp:369
 msgid "Directory to look for GBC ROM files"
 msgstr ""
 
-#: config/internal/option-internal.cpp:376
+#: config/internal/option-internal.cpp:373
 msgid "BIOS file to use, if enabled"
 msgstr ""
 
-#: config/internal/option-internal.cpp:381
+#: config/internal/option-internal.cpp:378
 msgid "Enable link at boot"
 msgstr ""
 
-#: config/internal/option-internal.cpp:384
+#: config/internal/option-internal.cpp:381
 msgid "Enable faster network protocol by default"
 msgstr ""
 
-#: config/internal/option-internal.cpp:386
+#: config/internal/option-internal.cpp:383
 msgid "Default network link client host"
 msgstr ""
 
-#: config/internal/option-internal.cpp:388
+#: config/internal/option-internal.cpp:385
 msgid "Default network link server IP to bind"
 msgstr ""
 
-#: config/internal/option-internal.cpp:391
+#: config/internal/option-internal.cpp:388
 msgid "Default network link port (server and client)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:393
+#: config/internal/option-internal.cpp:390
 msgid "Default network protocol"
 msgstr ""
 
-#: config/internal/option-internal.cpp:395
+#: config/internal/option-internal.cpp:392
 msgid "Link timeout (ms)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:397
+#: config/internal/option-internal.cpp:394
 msgid "Link cable type"
 msgstr ""
 
-#: config/internal/option-internal.cpp:405
+#: config/internal/option-internal.cpp:402
 msgid "Automatically load last saved state"
 msgstr ""
 
-#: config/internal/option-internal.cpp:407
+#: config/internal/option-internal.cpp:404
 msgid ""
 "Directory to store game save files (relative paths are relative to ROM; "
 "blank is config dir)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:410
+#: config/internal/option-internal.cpp:407
 msgid "Freeze recent load list"
 msgstr ""
 
-#: config/internal/option-internal.cpp:413
+#: config/internal/option-internal.cpp:410
 msgid ""
 "Directory to store A/V and game recordings (relative paths are relative to "
 "ROM)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:417
+#: config/internal/option-internal.cpp:414
 msgid "Number of seconds between rewind snapshots (0 to disable)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:420
+#: config/internal/option-internal.cpp:417
 msgid "Directory to store screenshots (relative paths are relative to ROM)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:424
+#: config/internal/option-internal.cpp:421
 msgid ""
 "Directory to store saved state files (relative paths are relative to "
 "BatteryDir)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:427
+#: config/internal/option-internal.cpp:424
 msgid "Enable status bar"
 msgstr ""
 
-#: config/internal/option-internal.cpp:432
+#: config/internal/option-internal.cpp:429
 msgid ""
 "The parameter Joypad/<n>/<button> contains a comma-separated list of key "
 "names which map to joypad #<n> button <button>.  Button is one of Up, Down, "
@@ -1302,271 +1302,251 @@ msgid ""
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
 msgstr ""
 
-#: config/internal/option-internal.cpp:439
+#: config/internal/option-internal.cpp:436
 msgid "The autofire toggle period, in frames (1/60 s)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:442
+#: config/internal/option-internal.cpp:439
 msgid "The number of the stick to use in single-player mode"
 msgstr ""
 
-#: config/internal/option-internal.cpp:447
+#: config/internal/option-internal.cpp:444
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
 msgstr ""
 
-#: config/internal/option-internal.cpp:454
+#: config/internal/option-internal.cpp:451
 msgid "Enable AGB debug print"
 msgstr ""
 
-#: config/internal/option-internal.cpp:456
+#: config/internal/option-internal.cpp:453
 msgid "Auto skip frames."
 msgstr ""
 
-#: config/internal/option-internal.cpp:458
+#: config/internal/option-internal.cpp:455
 msgid "Apply IPS/UPS/IPF patches if found"
 msgstr ""
 
-#: config/internal/option-internal.cpp:460
+#: config/internal/option-internal.cpp:457
 msgid "Automatically save and load cheat list"
 msgstr ""
 
-#: config/internal/option-internal.cpp:463
+#: config/internal/option-internal.cpp:460
 msgid "Automatically enable border for Super GameBoy games"
 msgstr ""
 
-#: config/internal/option-internal.cpp:465
+#: config/internal/option-internal.cpp:462
 msgid "Always enable border"
 msgstr ""
 
-#: config/internal/option-internal.cpp:467
+#: config/internal/option-internal.cpp:464
 msgid "Screen capture file format"
 msgstr ""
 
-#: config/internal/option-internal.cpp:469
+#: config/internal/option-internal.cpp:466
 msgid "Enable cheats"
 msgstr ""
 
-#: config/internal/option-internal.cpp:472 xrc/MainMenu.xrc:355
-msgid "Enable MMX"
-msgstr "MMX etkinleştir"
-
-#: config/internal/option-internal.cpp:476
+#: config/internal/option-internal.cpp:469
 msgid "Disable on-screen status messages"
 msgstr ""
 
-#: config/internal/option-internal.cpp:477
+#: config/internal/option-internal.cpp:470
 msgid "Type of system to emulate"
 msgstr ""
 
-#: config/internal/option-internal.cpp:479
+#: config/internal/option-internal.cpp:472
 msgid "Flash size 0 = 64KB 1 = 128KB"
 msgstr ""
 
-#: config/internal/option-internal.cpp:482
+#: config/internal/option-internal.cpp:475
 msgid ""
 "Skip frames.  Values are 0-9 or -1 to skip automatically based on time."
 msgstr ""
 
-#: config/internal/option-internal.cpp:486
-msgid "Fullscreen mode color depth (0 = any)"
-msgstr ""
-
-#: config/internal/option-internal.cpp:488
-msgid "Fullscreen mode frequency (0 = any)"
-msgstr ""
-
-#: config/internal/option-internal.cpp:490
-msgid "Fullscreen mode height (0 = desktop)"
-msgstr ""
-
-#: config/internal/option-internal.cpp:492
-msgid "Fullscreen mode width (0 = desktop)"
-msgstr ""
-
-#: config/internal/option-internal.cpp:493
+#: config/internal/option-internal.cpp:478
 msgid "The palette to use"
 msgstr ""
 
-#: config/internal/option-internal.cpp:496
+#: config/internal/option-internal.cpp:481
 msgid "Enable printer emulation"
 msgstr ""
 
-#: config/internal/option-internal.cpp:498
+#: config/internal/option-internal.cpp:483
 msgid "Break into GDB after loading the game."
 msgstr ""
 
-#: config/internal/option-internal.cpp:500
+#: config/internal/option-internal.cpp:485
 msgid "Port to connect GDB to."
 msgstr ""
 
-#: config/internal/option-internal.cpp:503
+#: config/internal/option-internal.cpp:488
 msgid "Number of players in network"
 msgstr ""
 
-#: config/internal/option-internal.cpp:506
+#: config/internal/option-internal.cpp:491
 msgid "Maximum scale factor (0 = no limit)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:508
+#: config/internal/option-internal.cpp:493
 msgid "Pause game when main window loses focus"
 msgstr ""
 
-#: config/internal/option-internal.cpp:511
+#: config/internal/option-internal.cpp:496
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
 msgstr ""
 
-#: config/internal/option-internal.cpp:514
+#: config/internal/option-internal.cpp:499
 msgid "Native save (\"battery\") hardware type"
 msgstr ""
 
-#: config/internal/option-internal.cpp:516
+#: config/internal/option-internal.cpp:501
 msgid "Show speed indicator"
 msgstr ""
 
-#: config/internal/option-internal.cpp:519
+#: config/internal/option-internal.cpp:504
 msgid "Draw on-screen messages transparently"
 msgstr ""
 
-#: config/internal/option-internal.cpp:521
+#: config/internal/option-internal.cpp:506
 msgid "Skip BIOS initialization"
 msgstr ""
 
-#: config/internal/option-internal.cpp:523
+#: config/internal/option-internal.cpp:508
 msgid "Do not overwrite cheat list when loading state"
 msgstr ""
 
-#: config/internal/option-internal.cpp:526
+#: config/internal/option-internal.cpp:511
 msgid "Do not overwrite native (battery) save when loading state"
 msgstr ""
 
-#: config/internal/option-internal.cpp:529
+#: config/internal/option-internal.cpp:514
 msgid "Throttle game speed, even when accelerated (0-450%, 0 = no throttle)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:533
+#: config/internal/option-internal.cpp:518
 msgid "Set throttle for speedup key (0-3000%, 0 = no throttle)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:536
+#: config/internal/option-internal.cpp:521
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:540
+#: config/internal/option-internal.cpp:525
 msgid "Use frame skip for speedup throttle"
 msgstr ""
 
-#: config/internal/option-internal.cpp:542
+#: config/internal/option-internal.cpp:527
 msgid "Use the specified BIOS file for GB"
 msgstr ""
 
-#: config/internal/option-internal.cpp:544
+#: config/internal/option-internal.cpp:529
 msgid "Use the specified BIOS file"
 msgstr ""
 
-#: config/internal/option-internal.cpp:546
+#: config/internal/option-internal.cpp:531
 msgid "Use the specified BIOS file for GBC"
 msgstr ""
 
-#: config/internal/option-internal.cpp:547
+#: config/internal/option-internal.cpp:532
 msgid "Wait for vertical sync"
 msgstr ""
 
-#: config/internal/option-internal.cpp:552
+#: config/internal/option-internal.cpp:537
 msgid "Enter fullscreen mode at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:553
+#: config/internal/option-internal.cpp:538
 msgid "Window maximized"
 msgstr ""
 
-#: config/internal/option-internal.cpp:555
+#: config/internal/option-internal.cpp:540
 msgid "Window height at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:557
+#: config/internal/option-internal.cpp:542
 msgid "Window width at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:559
+#: config/internal/option-internal.cpp:544
 msgid "Window axis X position at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:561
+#: config/internal/option-internal.cpp:546
 msgid "Window axis Y position at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:567
+#: config/internal/option-internal.cpp:552
 msgid "Capture key events while on background"
 msgstr ""
 
-#: config/internal/option-internal.cpp:570
+#: config/internal/option-internal.cpp:555
 msgid "Capture joy events while on background"
 msgstr ""
 
-#: config/internal/option-internal.cpp:571
+#: config/internal/option-internal.cpp:556
 msgid "Hide menu bar when mouse is inactive"
 msgstr ""
 
-#: config/internal/option-internal.cpp:576
+#: config/internal/option-internal.cpp:561
 msgid "Sound API; if unsupported, default API will be used"
 msgstr ""
 
-#: config/internal/option-internal.cpp:579
+#: config/internal/option-internal.cpp:564
 msgid "Device ID of chosen audio device for chosen driver"
 msgstr ""
 
-#: config/internal/option-internal.cpp:581
+#: config/internal/option-internal.cpp:566
 msgid "Number of sound buffers"
 msgstr ""
 
-#: config/internal/option-internal.cpp:583
+#: config/internal/option-internal.cpp:568
 msgid "Bit mask of sound channels to enable"
 msgstr ""
 
-#: config/internal/option-internal.cpp:585
+#: config/internal/option-internal.cpp:570
 msgid "GBA sound filtering (%)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:588
+#: config/internal/option-internal.cpp:573
 msgid "GBA sound interpolation"
 msgstr ""
 
-#: config/internal/option-internal.cpp:589
+#: config/internal/option-internal.cpp:574
 msgid "GB sound declicking"
 msgstr ""
 
-#: config/internal/option-internal.cpp:591
+#: config/internal/option-internal.cpp:576
 msgid "GB echo effect (%)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:593
+#: config/internal/option-internal.cpp:578
 msgid "Enable GB sound effects"
 msgstr ""
 
-#: config/internal/option-internal.cpp:594
+#: config/internal/option-internal.cpp:579
 msgid "GB stereo effect (%)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:597
+#: config/internal/option-internal.cpp:582
 msgid "GB surround sound effect (%)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:598
+#: config/internal/option-internal.cpp:583
 msgid "Sound sample rate (kHz)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:600
+#: config/internal/option-internal.cpp:585
 msgid "Sound volume (%)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:667
-#: config/internal/option-internal.cpp:687
-#: config/internal/option-internal.cpp:708
-#: config/internal/option-internal.cpp:728
-#: config/internal/option-internal.cpp:748
+#: config/internal/option-internal.cpp:652
+#: config/internal/option-internal.cpp:672
+#: config/internal/option-internal.cpp:693
+#: config/internal/option-internal.cpp:713
+#: config/internal/option-internal.cpp:733
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
 msgstr ""
@@ -1586,22 +1566,26 @@ msgstr "seçenek %siçin geçersiz değer %d; Geçerli değerler %d-%d"
 msgid "Invalid value %d for option %s; valid values are %s"
 msgstr ""
 
-#: dialogs/display-config.cpp:374
+#: dialogs/display-config.cpp:53
+msgid "Invalid value for Default magnification."
+msgstr ""
+
+#: dialogs/display-config.cpp:384
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "%s'da kullanılabilir bir rpi eklentisi bulunamadı"
 
-#: dialogs/display-config.cpp:406 dialogs/display-config.cpp:448
+#: dialogs/display-config.cpp:420 dialogs/display-config.cpp:462
 #: xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "Eklenti"
 
-#: dialogs/display-config.cpp:413
+#: dialogs/display-config.cpp:427
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr ""
 
-#: dialogs/display-config.cpp:420
+#: dialogs/display-config.cpp:434
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr ""
@@ -2974,7 +2958,7 @@ msgid ""
 "see entire contents if too small."
 msgstr "Ekranda bulunan gameboy tuş alanlarından birine tıklayın, ardından o tuş ile eşleştirmek istediğiniz kol tuşunuza ya da klavye tuşunuza basın. Son eklenen eşleştirmeyi silmek için klavyeden Geri \"Sil\" tuşuna basın. Eğer tuş ayarlama ekranı küçükse pencereyi büyütün ya da ekranı aşağı yukarı çekerek tüm tuş bilgilerine ulaşın. "
 
-#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:460
+#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:456
 msgid "Up"
 msgstr "Yukarı"
 
@@ -2982,7 +2966,7 @@ msgstr "Yukarı"
 msgid "A"
 msgstr "A"
 
-#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:464
+#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:460
 msgid "Down"
 msgstr "Aşağı"
 
@@ -2990,7 +2974,7 @@ msgstr "Aşağı"
 msgid "B"
 msgstr "B"
 
-#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:468
+#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:464
 msgid "Left"
 msgstr "Sol"
 
@@ -2998,7 +2982,7 @@ msgstr "Sol"
 msgid "L"
 msgstr "L"
 
-#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:472
+#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:468
 msgid "Right"
 msgstr "Sağ"
 
@@ -3006,11 +2990,11 @@ msgstr "Sağ"
 msgid "R"
 msgstr "R"
 
-#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:492
+#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:488
 msgid "Select"
 msgstr "Seç"
 
-#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:496
+#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:492
 msgid "Start"
 msgstr "Başlat"
 
@@ -3438,7 +3422,7 @@ msgstr "&Kablosuz"
 msgid "&GameCube"
 msgstr "&GameCube"
 
-#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:525
+#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:521
 msgid "&Game Boy"
 msgstr "&Game Boy"
 
@@ -3454,8 +3438,8 @@ msgstr "Açılışta &bağlan"
 msgid "&Speed hack"
 msgstr "&Hız hilesi"
 
-#: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:391
-#: xrc/MainMenu.xrc:427
+#: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:387
+#: xrc/MainMenu.xrc:423
 msgid "&Configure ..."
 msgstr "&Ayarla..."
 
@@ -3507,335 +3491,335 @@ msgstr "Kareler arası karıştırmayı değiştir"
 msgid "&Retain aspect ratio"
 msgstr "&Görüntü oranını koru"
 
-#: xrc/MainMenu.xrc:360
+#: xrc/MainMenu.xrc:356
 msgid "&Bilinear filter"
 msgstr "&Çift doğrusal filtre"
 
-#: xrc/MainMenu.xrc:371
+#: xrc/MainMenu.xrc:367
 msgid "&Keep window on top"
 msgstr "&VBA penceresini hep en üstte tut"
 
-#: xrc/MainMenu.xrc:376
+#: xrc/MainMenu.xrc:372
 msgid "&Status bar"
 msgstr "&Durum çubuğu"
 
-#: xrc/MainMenu.xrc:380
+#: xrc/MainMenu.xrc:376
 msgid "&Disable on-screen display"
 msgstr "&OSD'yi devre dışı bırak"
 
-#: xrc/MainMenu.xrc:384
+#: xrc/MainMenu.xrc:380
 msgid "&Transparent on-screen display"
 msgstr "&OSD şeffaf olsun"
 
-#: xrc/MainMenu.xrc:389
+#: xrc/MainMenu.xrc:385
 msgid "&Audio"
 msgstr "&Ses"
 
-#: xrc/MainMenu.xrc:394
+#: xrc/MainMenu.xrc:390
 msgid "&Increase volume"
 msgstr "Sesi arttır"
 
-#: xrc/MainMenu.xrc:398
+#: xrc/MainMenu.xrc:394
 msgid "&Decrease volume"
 msgstr "Sesi azalt"
 
-#: xrc/MainMenu.xrc:402
+#: xrc/MainMenu.xrc:398
 msgid "&Toggle sound"
 msgstr "Sesi aç/kapa"
 
-#: xrc/MainMenu.xrc:407
+#: xrc/MainMenu.xrc:403
 msgid "&GBA sound interpolation"
 msgstr "&GBA ses tekrarlaştırması"
 
-#: xrc/MainMenu.xrc:412
+#: xrc/MainMenu.xrc:408
 msgid "&GB sound enhancement"
 msgstr "&GB ses iyileştirme"
 
-#: xrc/MainMenu.xrc:416
+#: xrc/MainMenu.xrc:412
 msgid "&GB surround sound effect"
 msgstr "&GB çevresel ses efekti"
 
-#: xrc/MainMenu.xrc:420
+#: xrc/MainMenu.xrc:416
 msgid "&GB sound declicking"
 msgstr "&GB ses kesilmesi"
 
-#: xrc/MainMenu.xrc:425
+#: xrc/MainMenu.xrc:421
 msgid "&Input"
 msgstr "&Girdi"
 
-#: xrc/MainMenu.xrc:430
+#: xrc/MainMenu.xrc:426
 msgid "Allow &keyboard background input"
 msgstr "Arkaplanda &klavye girişlerine izin ver"
 
-#: xrc/MainMenu.xrc:434
+#: xrc/MainMenu.xrc:430
 msgid "Allow &joystick background input"
 msgstr "Arkaplanda &oyun çubuğu girişlerine izin ver"
 
-#: xrc/MainMenu.xrc:439
+#: xrc/MainMenu.xrc:435
 msgid "&Autofire"
 msgstr "&Otomatik tıklama"
 
-#: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
+#: xrc/MainMenu.xrc:437 xrc/MainMenu.xrc:472
 msgid "&A"
 msgstr "&A"
 
-#: xrc/MainMenu.xrc:445 xrc/MainMenu.xrc:480
+#: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
 msgid "&B"
 msgstr "&B"
 
-#: xrc/MainMenu.xrc:449 xrc/MainMenu.xrc:484
+#: xrc/MainMenu.xrc:445 xrc/MainMenu.xrc:480
 msgid "&L"
 msgstr "&L"
 
-#: xrc/MainMenu.xrc:453 xrc/MainMenu.xrc:488
+#: xrc/MainMenu.xrc:449 xrc/MainMenu.xrc:484
 msgid "&R"
 msgstr "&R"
 
-#: xrc/MainMenu.xrc:458
+#: xrc/MainMenu.xrc:454
 msgid "&Autohold"
 msgstr "&Otomatik basılı tutma"
 
-#: xrc/MainMenu.xrc:502
+#: xrc/MainMenu.xrc:498
 msgid "&Game Boy Advance"
 msgstr "&Game Boy Advance"
 
-#: xrc/MainMenu.xrc:504 xrc/MainMenu.xrc:527
+#: xrc/MainMenu.xrc:500 xrc/MainMenu.xrc:523
 msgid "Configure ..."
 msgstr "Ayarla..."
 
-#: xrc/MainMenu.xrc:508
+#: xrc/MainMenu.xrc:504
 msgid "&Real-time clock"
 msgstr "&Gerçek zamanlı saat"
 
-#: xrc/MainMenu.xrc:512
+#: xrc/MainMenu.xrc:508
 msgid "&Use BIOS file"
 msgstr "&BIOS kullan"
 
-#: xrc/MainMenu.xrc:516
+#: xrc/MainMenu.xrc:512
 msgid "&Debug print"
 msgstr "&Hata ayıklama çıktısı al"
 
-#: xrc/MainMenu.xrc:520 xrc/MainMenu.xrc:535
+#: xrc/MainMenu.xrc:516 xrc/MainMenu.xrc:531
 msgid "&LCD Filter"
 msgstr "&LCD Filtre"
 
-#: xrc/MainMenu.xrc:531
+#: xrc/MainMenu.xrc:527
 msgid "&GB color option"
 msgstr "&GB renk ayarı"
 
-#: xrc/MainMenu.xrc:539
+#: xrc/MainMenu.xrc:535
 msgid "&GB Colorizer Hack (requires restart)"
 msgstr "&GB Renklendirici hilesi (yeniden başlatma gerektirir)"
 
-#: xrc/MainMenu.xrc:543
+#: xrc/MainMenu.xrc:539
 msgid "&GB printer"
 msgstr "&GB yazıcı"
 
-#: xrc/MainMenu.xrc:547
+#: xrc/MainMenu.xrc:543
 msgid "&Gather a full page before printing"
 msgstr "&Çıktı almadan önce bir sayfanın dolmasını bekle"
 
-#: xrc/MainMenu.xrc:551
+#: xrc/MainMenu.xrc:547
 msgid "&Save printouts as screen captures"
 msgstr "&Kağıda basmak yerine ekran resmi olarak kaydet"
 
-#: xrc/MainMenu.xrc:556
+#: xrc/MainMenu.xrc:552
 msgid "&Use GB BIOS file (requires restart)"
 msgstr "GB &BIOS dosyası kullan (yeniden başlatma gerektirir)"
 
-#: xrc/MainMenu.xrc:560
+#: xrc/MainMenu.xrc:556
 msgid "&Use GBC BIOS file"
 msgstr "&GBC BIOS'u kullan"
 
-#: xrc/MainMenu.xrc:565
+#: xrc/MainMenu.xrc:561
 msgid "&General ..."
 msgstr "&Genel..."
 
-#: xrc/MainMenu.xrc:568
+#: xrc/MainMenu.xrc:564
 msgid "&Speedup / Turbo ..."
 msgstr "&Hızlandırma"
 
-#: xrc/MainMenu.xrc:571
+#: xrc/MainMenu.xrc:567
 msgid "D&irectories ..."
 msgstr "K&lasörler..."
 
-#: xrc/MainMenu.xrc:574
+#: xrc/MainMenu.xrc:570
 msgid "&Key Shortcuts ..."
 msgstr "&Tuş kısayolları"
 
-#: xrc/MainMenu.xrc:577
+#: xrc/MainMenu.xrc:573
 msgid "&UI Settings ..."
 msgstr "&Arayüz Ayarları"
 
-#: xrc/MainMenu.xrc:581
+#: xrc/MainMenu.xrc:577
 msgid "&Tools"
 msgstr "&Araçlar"
 
-#: xrc/MainMenu.xrc:583
+#: xrc/MainMenu.xrc:579
 msgid "&Cheats"
 msgstr "&Hileler"
 
-#: xrc/MainMenu.xrc:585
+#: xrc/MainMenu.xrc:581
 msgid "List &cheats ..."
 msgstr "&Hileleri listele..."
 
-#: xrc/MainMenu.xrc:588
+#: xrc/MainMenu.xrc:584
 msgid "Find c&heat ..."
 msgstr "H&ile bul..."
 
-#: xrc/MainMenu.xrc:592
+#: xrc/MainMenu.xrc:588
 msgid "A&utomatically save/load cheats"
 msgstr "Hileleri o&tomatik olarak yükle ve kaydet"
 
-#: xrc/MainMenu.xrc:596
+#: xrc/MainMenu.xrc:592
 msgid "&Enable cheats"
 msgstr "&Hileleri aktif et"
 
-#: xrc/MainMenu.xrc:603
+#: xrc/MainMenu.xrc:599
 msgid "&Break into GDB"
 msgstr "&GDB'ye gir"
 
-#: xrc/MainMenu.xrc:607
+#: xrc/MainMenu.xrc:603
 msgid "&Configure port..."
 msgstr "Bağlantı noktası &ayarla..."
 
-#: xrc/MainMenu.xrc:610
+#: xrc/MainMenu.xrc:606
 msgid "&Break on load"
 msgstr "&Yüklendiğinde durdur"
 
-#: xrc/MainMenu.xrc:615
+#: xrc/MainMenu.xrc:611
 msgid "&Disconnect"
 msgstr "&Bağlantıyı kes"
 
-#: xrc/MainMenu.xrc:617
+#: xrc/MainMenu.xrc:613
 msgid "&GDB"
 msgstr "&GDB"
 
-#: xrc/MainMenu.xrc:620
+#: xrc/MainMenu.xrc:616
 msgid "&Disassemble..."
 msgstr "&Parçala/kaynak kodu al..."
 
-#: xrc/MainMenu.xrc:623
+#: xrc/MainMenu.xrc:619
 msgid "&Logging..."
 msgstr "&Günlük..."
 
-#: xrc/MainMenu.xrc:626
+#: xrc/MainMenu.xrc:622
 msgid "&IO Viewer..."
 msgstr "&G/Ç izleyici..."
 
-#: xrc/MainMenu.xrc:629
+#: xrc/MainMenu.xrc:625
 msgid "&Map Viewer..."
 msgstr "&Harita izleyici..."
 
-#: xrc/MainMenu.xrc:632
+#: xrc/MainMenu.xrc:628
 msgid "M&emory Viewer..."
 msgstr "H&afıza izleyici..."
 
-#: xrc/MainMenu.xrc:635
+#: xrc/MainMenu.xrc:631
 msgid "&OAM Viewer..."
 msgstr "&OAM izleyici..."
 
-#: xrc/MainMenu.xrc:638
+#: xrc/MainMenu.xrc:634
 msgid "&Palette Viewer..."
 msgstr "&Palet izleyici..."
 
-#: xrc/MainMenu.xrc:641
+#: xrc/MainMenu.xrc:637
 msgid "&Tile Viewer..."
 msgstr "&Desen izleyici..."
 
-#: xrc/MainMenu.xrc:646
+#: xrc/MainMenu.xrc:642
 msgid "Show all video layers"
 msgstr "Tüm video katmanlarını göster"
 
-#: xrc/MainMenu.xrc:650
+#: xrc/MainMenu.xrc:646
 msgid "BG &0"
 msgstr "Arka Plan &0"
 
-#: xrc/MainMenu.xrc:655
+#: xrc/MainMenu.xrc:651
 msgid "BG &1"
 msgstr "Arka Plan &1"
 
-#: xrc/MainMenu.xrc:660
+#: xrc/MainMenu.xrc:656
 msgid "BG &2"
 msgstr "Arka Plan &2"
 
-#: xrc/MainMenu.xrc:665
+#: xrc/MainMenu.xrc:661
 msgid "BG &3"
 msgstr "Arka Plan &3"
 
-#: xrc/MainMenu.xrc:670
+#: xrc/MainMenu.xrc:666
 msgid "&OBJ"
 msgstr "&Nesne"
 
-#: xrc/MainMenu.xrc:675
+#: xrc/MainMenu.xrc:671
 msgid "&WIN 0"
 msgstr "Pencere &0"
 
-#: xrc/MainMenu.xrc:680
+#: xrc/MainMenu.xrc:676
 msgid "W&IN 1"
 msgstr "P&encere 1"
 
-#: xrc/MainMenu.xrc:685
+#: xrc/MainMenu.xrc:681
 msgid "O&BJ WIN"
 msgstr "Pencere Ne&sne"
 
-#: xrc/MainMenu.xrc:689
+#: xrc/MainMenu.xrc:685
 msgid "&View Layers"
 msgstr "&Katmanları gör"
 
-#: xrc/MainMenu.xrc:693
+#: xrc/MainMenu.xrc:689
 msgid "Channel &1"
 msgstr "Kanal &1"
 
-#: xrc/MainMenu.xrc:698
+#: xrc/MainMenu.xrc:694
 msgid "Channel &2"
 msgstr "Kanal &2"
 
-#: xrc/MainMenu.xrc:703
+#: xrc/MainMenu.xrc:699
 msgid "Channel &3"
 msgstr "Kanal &3"
 
-#: xrc/MainMenu.xrc:708
+#: xrc/MainMenu.xrc:704
 msgid "Channel &4"
 msgstr "Kanal &4"
 
-#: xrc/MainMenu.xrc:713
+#: xrc/MainMenu.xrc:709
 msgid "Direct Sound &A"
 msgstr "Direct Sound &A"
 
-#: xrc/MainMenu.xrc:718
+#: xrc/MainMenu.xrc:714
 msgid "Direct Sound &B"
 msgstr "Direct Sound &B"
 
-#: xrc/MainMenu.xrc:722
+#: xrc/MainMenu.xrc:718
 msgid "&Sound Channels"
 msgstr "&Ses kanalları"
 
-#: xrc/MainMenu.xrc:726
+#: xrc/MainMenu.xrc:722
 msgid "&Help"
 msgstr "Yardım"
 
-#: xrc/MainMenu.xrc:728
+#: xrc/MainMenu.xrc:724
 msgid "Report &Bugs"
 msgstr "Hata Bildirme"
 
-#: xrc/MainMenu.xrc:731
+#: xrc/MainMenu.xrc:727
 msgid "VBA-M Support &Forum"
 msgstr "VBA-M Destek Hattı"
 
-#: xrc/MainMenu.xrc:734
+#: xrc/MainMenu.xrc:730
 msgid "Translations"
 msgstr "Çeviriler"
 
-#: xrc/MainMenu.xrc:742
+#: xrc/MainMenu.xrc:738
 msgid "Check for updates"
 msgstr "Güncelleştirmeler"
 
-#: xrc/MainMenu.xrc:745
+#: xrc/MainMenu.xrc:741
 msgid "&Factory Reset..."
 msgstr "&Fabrika Ayarlarına Döndür..."
 
-#: xrc/MainMenu.xrc:749
+#: xrc/MainMenu.xrc:745
 msgid "&About..."
 msgstr "H&akkında..."
 

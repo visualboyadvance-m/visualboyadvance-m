@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-02 22:20+0000\n"
+"POT-Creation-Date: 2023-02-05 17:29+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Hoseok Seo <ddinghoya@gmail.com>, 2022-2023\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/bgk/vba-m/language/ko_KR/)\n"
@@ -164,7 +164,7 @@ msgstr "치트파일 선택"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA 치트 리스트 (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 
-#: guiinit.cpp:264 panel.cpp:506
+#: guiinit.cpp:264 panel.cpp:507
 msgid "Loaded cheats"
 msgstr "치트 불러오기"
 
@@ -283,50 +283,50 @@ msgstr "Browse"
 msgid "Main display panel not found"
 msgstr "메인 디스플레이 패널을 찾을 수 없음"
 
-#: guiinit.cpp:2768
+#: guiinit.cpp:2757
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "메뉴 가속기 복제: %s는 %s와 %s용; 첫 번째 유지"
 
-#: guiinit.cpp:2782
+#: guiinit.cpp:2771
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr "%s 메뉴 가속기 (%s에 대해) 는 %s에 대한 초기값을 덮어씌움 ; 메뉴 유지"
 
-#: guiinit.cpp:2922
+#: guiinit.cpp:2910
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "무효한 %s메뉴 항목 ; 제거합니다."
 
-#: guiinit.cpp:3125
+#: guiinit.cpp:3113
 msgid "Code"
 msgstr "코드"
 
-#: guiinit.cpp:3134
+#: guiinit.cpp:3122
 msgid "Description"
 msgstr "서술"
 
-#: guiinit.cpp:3208 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3196 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "주소"
 
-#: guiinit.cpp:3209
+#: guiinit.cpp:3197
 msgid "Old Value"
 msgstr "오래된 값"
 
-#: guiinit.cpp:3210
+#: guiinit.cpp:3198
 msgid "New Value"
 msgstr "새로운 값"
 
-#: guiinit.cpp:3682
+#: guiinit.cpp:3670
 msgid "Menu commands"
 msgstr "메뉴 명령"
 
-#: guiinit.cpp:3705
+#: guiinit.cpp:3693
 msgid "Other commands"
 msgstr "그 외 명령"
 
-#: guiinit.cpp:3816
+#: guiinit.cpp:3804
 msgid "JoyBus host invalid; disabling"
 msgstr "조이버스 호스트 무효; 비활성화합니다."
 
@@ -335,7 +335,7 @@ msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr "텍스트 파일 (*.txt;*.log)|*.txt;*.log|"
 
 #: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
-#: cmdevents.cpp:1187 cmdevents.cpp:1265 cmdevents.cpp:1335 cmdevents.cpp:1404
+#: cmdevents.cpp:1187 cmdevents.cpp:1265 cmdevents.cpp:1335 cmdevents.cpp:1406
 #: viewsupt.cpp:1180
 msgid "Select output file"
 msgstr "출력파일 선택"
@@ -567,7 +567,7 @@ msgstr "ROM+HuC-3"
 msgid "ROM+HuC-1"
 msgstr "ROM+HuC-1"
 
-#: cmdevents.cpp:775 dialogs/display-config.cpp:343 xrc/DisplayConfig.xrc:85
+#: cmdevents.cpp:775 dialogs/display-config.cpp:353 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
@@ -600,7 +600,7 @@ msgstr "배터리 파일을 가져오면 저장된 게임이 모두 지워집니
 msgid "Confirm import"
 msgstr "가져오기 확인"
 
-#: cmdevents.cpp:936 panel.cpp:449
+#: cmdevents.cpp:936 panel.cpp:450
 #, c-format
 msgid "Loaded battery %s"
 msgstr "%s를 로드한 배터리"
@@ -683,7 +683,7 @@ msgstr "로드중 %s 스넵샷 파일 에러"
 msgid "Wrote battery %s"
 msgstr "%s 배터리가 기록됨"
 
-#: cmdevents.cpp:1129 panel.cpp:755
+#: cmdevents.cpp:1129 panel.cpp:756
 #, c-format
 msgid "Error writing battery %s"
 msgstr "%s 배터리 기록 오류"
@@ -710,91 +710,91 @@ msgstr "%s스넵샷 저장완료 "
 msgid "Error saving snapshot file %s"
 msgstr "스넵샷%s저장 중 에러"
 
-#: cmdevents.cpp:1212 sys.cpp:557
+#: cmdevents.cpp:1212 sys.cpp:558
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "%s 스냅샷이 기록됨"
 
-#: cmdevents.cpp:1233 cmdevents.cpp:1303 cmdevents.cpp:1374 cmdevents.cpp:1438
+#: cmdevents.cpp:1233 cmdevents.cpp:1303 cmdevents.cpp:1374 cmdevents.cpp:1440
 msgid " files ("
 msgstr "파일("
 
-#: cmdevents.cpp:1469
+#: cmdevents.cpp:1473
 msgid "Select file"
 msgstr "파일 선택"
 
-#: cmdevents.cpp:1786 cmdevents.cpp:1879
+#: cmdevents.cpp:1790 cmdevents.cpp:1883
 msgid "Select state file"
 msgstr "스테이트 파일을 선택"
 
-#: cmdevents.cpp:1787 cmdevents.cpp:1880
+#: cmdevents.cpp:1791 cmdevents.cpp:1884
 msgid "VisualBoyAdvance saved game files|*.sgm"
 msgstr "VisualBoyAdvance saved game files|*.sgm"
 
-#: cmdevents.cpp:1910 cmdevents.cpp:1920 cmdevents.cpp:1931
+#: cmdevents.cpp:1914 cmdevents.cpp:1924 cmdevents.cpp:1935
 #, c-format
 msgid "Current state slot #%d"
 msgstr "현재 상태 슬롯 # %d"
 
-#: cmdevents.cpp:2001
+#: cmdevents.cpp:2005
 msgid "Cannot use Colorizer Hack when GB BIOS File is enabled."
 msgstr "게임보이 바이오스 파일이 활성화일 경우 색상 해킹을 사용할 수 없습니다."
 
-#: cmdevents.cpp:2216
+#: cmdevents.cpp:2220
 msgid "Sound enabled"
 msgstr "소리 켜기"
 
-#: cmdevents.cpp:2216
+#: cmdevents.cpp:2220
 msgid "Sound disabled"
 msgstr "소리 끄기"
 
-#: cmdevents.cpp:2229 cmdevents.cpp:2243
+#: cmdevents.cpp:2233 cmdevents.cpp:2247
 #, c-format
 msgid "Volume: %d%%"
 msgstr "음량: %d %%"
 
-#: cmdevents.cpp:2318
+#: cmdevents.cpp:2322
 msgid "Set to 0 for pseudo tty"
 msgstr "가상 Teletypewriter를 0으로 설정"
 
-#: cmdevents.cpp:2320
+#: cmdevents.cpp:2324
 msgid "Port to wait for connection:"
 msgstr "연결 대기용 포트:"
 
-#: cmdevents.cpp:2321
+#: cmdevents.cpp:2325
 msgid "GDB Connection"
 msgstr "GDB 연결"
 
-#: cmdevents.cpp:2374
+#: cmdevents.cpp:2378
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "%s로 연결 대기 중"
 
-#: cmdevents.cpp:2381
+#: cmdevents.cpp:2385
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "포트%d에 연결중이니 기다려주세요"
 
-#: cmdevents.cpp:2384
+#: cmdevents.cpp:2388
 msgid "Waiting for GDB..."
 msgstr "GDB 대기 중..."
 
-#: cmdevents.cpp:2808 panel.cpp:250 panel.cpp:364
+#: cmdevents.cpp:2812 panel.cpp:250 panel.cpp:365
 msgid "Could not initialize the sound driver!"
 msgstr "사운드 드라이버를 초기화할 수 없습니다!"
 
-#: cmdevents.cpp:2912
+#: cmdevents.cpp:2916
 msgid "Nintendo GameBoy (+Color+Advance) emulator."
 msgstr "닌텐도 게임보이(+컬러+어드벤스) 에뮬레이터입니다."
 
-#: cmdevents.cpp:2913
+#: cmdevents.cpp:2917
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA 개발팀\nCopyright (C) 2007-2020 VBA-M 개발팀"
 
-#: cmdevents.cpp:2914
+#: cmdevents.cpp:2918
 msgid ""
 "This program is free software: you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -810,15 +810,15 @@ msgid ""
 "along with this program.  If not, see http://www.gnu.org/licenses ."
 msgstr "이 프로그램은 자유 소프트웨어입니다. 당신은 Free Software Foundation이 공표한 GNU 일반 공중 라이선스 버전 2 또는 (당신의 선택에 따라) 그 이후 버전을 임의로 선택해서 그 규정에 따라 프로그램을 수정하거나 재배포할 수 있습니다.\n\n이 프로그램은 유용하게 사용될 수 있을 것이라는 희망에서 배포되고 있지만 어떠한 형태의 보증도 제공하지 않습니다. 상품성 또는 특정 목적 적합성에 대한 묵시적 보증 역시 제공하지 않습니다. 보다 자세한 내용은 GNU 일반 공중 라이선스를 참고하시기 바랍니다.\n\n GNU General Public License는 이 프로그램과 함께 제공됩니다. 그렇지 않은 경우 http://www.gnu.org/licenses 를 참조하십시오."
 
-#: cmdevents.cpp:3165
+#: cmdevents.cpp:3156
 msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
 msgstr "게임보이 색상 해킹이 활성화일 경우 게임보이 바이오스를 사용할 수 없습니다."
 
-#: cmdevents.cpp:3226
+#: cmdevents.cpp:3217
 msgid "LAN link is already active.  Disable link mode to disconnect."
 msgstr "LAN 연결이 이미 활성화 상태입니다. 연결해체를 위해 연결 모드를 비활성화 하십시오."
 
-#: cmdevents.cpp:3232
+#: cmdevents.cpp:3223
 msgid "Network is not supported in local mode."
 msgstr "로컬 모드에서는 네트워크가 지원되지 않음."
 
@@ -850,92 +850,92 @@ msgstr "라이센스"
 msgid "OK"
 msgstr "확인"
 
-#: opts.cpp:543 opts.cpp:564 opts.cpp:769
+#: opts.cpp:518 opts.cpp:539 opts.cpp:745
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr " %s 키는 %s에 무효한 키 설정입니다."
 
-#: opts.cpp:692 opts.cpp:701 opts.cpp:710 opts.cpp:719 config/option.cpp:462
+#: opts.cpp:668 opts.cpp:677 opts.cpp:686 opts.cpp:695 config/option.cpp:462
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr "옵션 %s 에 대해 유효하지 않은 값 %s"
 
-#: opts.cpp:791
+#: opts.cpp:767
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr "값이 %s 알 수 없는 옵션 %s"
 
-#: sys.cpp:195 sys.cpp:256
+#: sys.cpp:196 sys.cpp:257
 msgid "No game in progress to record"
 msgstr "진행 중인 게임이 없어 기록할 수 없습니다."
 
-#: sys.cpp:213
+#: sys.cpp:214
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "출력파일 %s을 열 수 없습니다."
 
-#: sys.cpp:220 sys.cpp:240 sys.cpp:390
+#: sys.cpp:221 sys.cpp:241 sys.cpp:391
 msgid "Error writing game recording"
 msgstr "게임 녹화를 기록할 수 없습니다."
 
-#: sys.cpp:261
+#: sys.cpp:262
 msgid "Cannot play game recording while recording"
 msgstr "녹화중에는 게임 녹화를 재생할 수 없습니다."
 
-#: sys.cpp:276
+#: sys.cpp:277
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "녹화 파일 %s 을 열 수 없습니다."
 
-#: sys.cpp:285 sys.cpp:295
+#: sys.cpp:286 sys.cpp:296
 msgid "Error reading game recording"
 msgstr "게임 녹화를 읽을 수 없습니다."
 
-#: sys.cpp:405 sys.cpp:424
+#: sys.cpp:406 sys.cpp:425
 msgid "Playback ended"
 msgstr "재생 종료."
 
-#: sys.cpp:448
+#: sys.cpp:449
 #, c-format
 msgid "%d%%(%d, %d fps)"
 msgstr "%d%%(%d, %d fps)"
 
-#: sys.cpp:456
+#: sys.cpp:457
 #, c-format
 msgid "%d%%"
 msgstr "%d%%"
 
-#: sys.cpp:878 xrc/GBPrinter.xrc:65
+#: sys.cpp:879 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "버리기(&D)"
 
-#: sys.cpp:912
+#: sys.cpp:913
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "이미지 파일 (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:921
+#: sys.cpp:922
 msgid "Save printer image to"
 msgstr "프린터 이미지 저장 : "
 
-#: sys.cpp:935 sys.cpp:1118
+#: sys.cpp:936 sys.cpp:1119
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "프린터 출력을 %s에 작성했습니다."
 
-#: sys.cpp:940 sys.cpp:1011
+#: sys.cpp:941 sys.cpp:1012
 msgid "&Close"
 msgstr "닫기(&C)"
 
-#: sys.cpp:1006
+#: sys.cpp:1007
 msgid "Printed"
 msgstr "출력됨"
 
-#: sys.cpp:1308
+#: sys.cpp:1309
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "가상 tty %s를 열 수 없습니다."
 
-#: sys.cpp:1407
+#: sys.cpp:1408
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "서버 소켓을 설정할 수 없습니다. (%d)"
@@ -945,7 +945,7 @@ msgstr "서버 소켓을 설정할 수 없습니다. (%d)"
 msgid "%s is not a valid ROM file"
 msgstr "%s 파일은 유효한 ROM파일이 아닙니다."
 
-#: panel.cpp:165 panel.cpp:226 panel.cpp:302
+#: panel.cpp:165 panel.cpp:226 panel.cpp:303
 msgid "Problem loading file"
 msgstr "파일을 불러올 수 없습니다."
 
@@ -960,157 +960,157 @@ msgid ""
 "file."
 msgstr "게임보이 색상 해킹이 활성화일 경우 게임보이 바이오스를 사용할 수 없습니다.\n게임보이 바이오스를 비활성화합니다."
 
-#: panel.cpp:278 panel.cpp:378
+#: panel.cpp:279 panel.cpp:379
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "%s BIOS를 불러올 수 없습니다."
 
-#: panel.cpp:301
+#: panel.cpp:302
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "%s 게임보이 어드밴스 ROM을 불러올 수 없습니다."
 
-#: panel.cpp:538
+#: panel.cpp:539
 msgid " player "
 msgstr "플레이어"
 
-#: panel.cpp:703
+#: panel.cpp:704
 #, c-format
 msgid "Loaded state %s"
 msgstr "상태 %s 불러옴"
 
-#: panel.cpp:703
+#: panel.cpp:704
 #, c-format
 msgid "Error loading state %s"
 msgstr "상태 %s 불러오기 오류"
 
-#: panel.cpp:727
+#: panel.cpp:728
 #, c-format
 msgid "Saved state %s"
 msgstr "상태 %s 저장함"
 
-#: panel.cpp:727
+#: panel.cpp:728
 #, c-format
 msgid "Error saving state %s"
 msgstr "상태 %s 저장 오류"
 
-#: panel.cpp:931
+#: panel.cpp:932
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
 msgstr "전체화면 모드 %dx%d-%d@%d 는 지원되지 않습니다; 다른 해상도로 설정"
 
-#: panel.cpp:969
+#: panel.cpp:970
 #, c-format
 msgid "Fullscreen mode %dx%d-%d@%d not supported"
 msgstr "전체화면 모드 %dx%d-%d@%d 는 지원되지 않습니다."
 
-#: panel.cpp:974
+#: panel.cpp:975
 #, c-format
 msgid "Valid mode: %dx%d-%d@%d"
 msgstr "유효한 모드: %dx%d-%d@%d"
 
-#: panel.cpp:982
+#: panel.cpp:983
 #, c-format
 msgid "Chose mode %dx%d-%d@%d"
 msgstr "모드 %dx%d-%d@%d 선택"
 
-#: panel.cpp:986
+#: panel.cpp:987
 #, c-format
 msgid "Failed to change mode to %dx%d-%d@%d"
 msgstr "%dx%d-%d@%d 모드로 변경을 실패했습니다."
 
-#: panel.cpp:1074
+#: panel.cpp:1075
 msgid "Not a valid GBA cartridge"
 msgstr "유효한 GBA 카트리지가 아닙니다."
 
-#: panel.cpp:1242
+#: panel.cpp:1245
 msgid "No memory for rewinding"
 msgstr "되감기할 메모리가 없습니다."
 
-#: panel.cpp:1252
+#: panel.cpp:1255
 msgid "Error writing rewind state"
 msgstr "오류 - 되감기 상태 작성을 할 수 없습니다."
 
-#: panel.cpp:2269
+#: panel.cpp:2272
 msgid "Enabling EGL VSync."
 msgstr "EGL 수직동기화 활성화"
 
-#: panel.cpp:2271
+#: panel.cpp:2274
 msgid "Disabling EGL VSync."
 msgstr "EGL 수직동기화 비활성화"
 
-#: panel.cpp:2278
+#: panel.cpp:2281
 msgid "Enabling GLX VSync."
 msgstr "GLX 수직동기화 활성화"
 
-#: panel.cpp:2280
+#: panel.cpp:2283
 msgid "Disabling GLX VSync."
 msgstr "GLX 수직동기화 비활성화"
 
-#: panel.cpp:2297
+#: panel.cpp:2301
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "glXSwapIntervalEXT 설정 실패"
 
-#: panel.cpp:2306
+#: panel.cpp:2310
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "glXSwapIntervalSGI 설정 실패"
 
-#: panel.cpp:2315
+#: panel.cpp:2319
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "glXSwapIntervalMESA 설정 실패"
 
-#: panel.cpp:2322
+#: panel.cpp:2326
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "wglGetExtensionsStringEXT은 지원하지 않습니다."
 
-#: panel.cpp:2325
+#: panel.cpp:2329
 msgid "No support for WGL_EXT_swap_control"
 msgstr "WGL_EXT_swap_control은 지원하지 않습니다."
 
-#: panel.cpp:2334
+#: panel.cpp:2338
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "wglSwapIntervalEXT 설정 실패"
 
-#: panel.cpp:2340
+#: panel.cpp:2344
 msgid "No VSYNC available on this platform"
 msgstr "이 플랫폼에서는 VSYNC를 사용할 수 없습니다."
 
-#: panel.cpp:2440
+#: panel.cpp:2444
 msgid "memory allocation error"
 msgstr "메모리 할당 오류"
 
-#: panel.cpp:2443
+#: panel.cpp:2447
 msgid "error initializing codec"
 msgstr "코덱 초기화 오류"
 
-#: panel.cpp:2446
+#: panel.cpp:2450
 msgid "error writing to output file"
 msgstr "출력 파일 작성 오류"
 
-#: panel.cpp:2449
+#: panel.cpp:2453
 msgid "can't guess output format from file name"
 msgstr "파일명으로부터 출력 포맷을 알 수 없습니다."
 
-#: panel.cpp:2454
+#: panel.cpp:2458
 msgid "programming error; aborting!"
 msgstr "프로그래밍 오류; 종료합니다!"
 
-#: panel.cpp:2466 panel.cpp:2495
+#: panel.cpp:2470 panel.cpp:2499
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "%s (%s)부터 녹화를 시작할 수 없습니다."
 
-#: panel.cpp:2523
+#: panel.cpp:2527
 #, c-format
 msgid "Error in audio/video recording (%s); aborting"
 msgstr "(%s) 에서 오디오/비디오 녹화 오류; 종료합니다."
 
-#: panel.cpp:2529
+#: panel.cpp:2533
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "(%s) 에서 오디오 녹음 오류; 종료합니다."
 
-#: panel.cpp:2539
+#: panel.cpp:2543
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "(%s) 에서 비디오 녹화 오류; 종료합니다."
@@ -1127,170 +1127,170 @@ msgstr "G:"
 msgid "B:"
 msgstr "B:"
 
-#: config/internal/option-internal.cpp:320
+#: config/internal/option-internal.cpp:317
 msgid "Use bilinear filter with 3d renderer"
 msgstr "3d 렌더러와 함께 이중선형 필터 사용"
 
-#: config/internal/option-internal.cpp:321
+#: config/internal/option-internal.cpp:318
 msgid "Full-screen filter to apply"
 msgstr "적용할 전체화면 필터"
 
-#: config/internal/option-internal.cpp:323
+#: config/internal/option-internal.cpp:320
 msgid "Filter plugin library"
 msgstr "필터 플러그인 라이브러리"
 
-#: config/internal/option-internal.cpp:325
+#: config/internal/option-internal.cpp:322
 msgid "Interframe blending function"
 msgstr "인터프레임 블렌딩 기능"
 
-#: config/internal/option-internal.cpp:327
+#: config/internal/option-internal.cpp:324
 msgid "Keep window on top"
 msgstr "창을 맨 위에 유지"
 
-#: config/internal/option-internal.cpp:330
+#: config/internal/option-internal.cpp:327
 msgid "Maximum number of threads to run filters in"
 msgstr "필터를 실행할 최대 스레드 수"
 
-#: config/internal/option-internal.cpp:333
+#: config/internal/option-internal.cpp:330
 msgid "Render method; if unsupported, simple method will be used"
 msgstr "렌더링 방법; 지원되지 않는 경우 간단한 방법 사용"
 
-#: config/internal/option-internal.cpp:335
+#: config/internal/option-internal.cpp:332
 msgid "Default scale factor"
 msgstr "기본 스케일 팩터"
 
-#: config/internal/option-internal.cpp:338
+#: config/internal/option-internal.cpp:335
 msgid "Retain aspect ratio when resizing"
 msgstr "크기 조정 시 화면비 유지"
 
-#: config/internal/option-internal.cpp:341
+#: config/internal/option-internal.cpp:338
 msgid "BIOS file to use for GB, if enabled"
 msgstr "활성화된 경우, GB에 사용할 BIOS 파일"
 
-#: config/internal/option-internal.cpp:344
+#: config/internal/option-internal.cpp:341
 msgid "GB color enhancement, if enabled"
 msgstr "활성화된 경우, GB 색상 향상"
 
-#: config/internal/option-internal.cpp:346
+#: config/internal/option-internal.cpp:343
 msgid "Enable DX Colorization Hacks"
 msgstr "DX 색상화 해킹 활성화"
 
-#: config/internal/option-internal.cpp:347
-#: config/internal/option-internal.cpp:379
+#: config/internal/option-internal.cpp:344
+#: config/internal/option-internal.cpp:376
 msgid "Apply LCD filter, if enabled"
 msgstr "활성화된 경우, LCD 필터 적용"
 
-#: config/internal/option-internal.cpp:349
+#: config/internal/option-internal.cpp:346
 msgid "BIOS file to use for GBC, if enabled"
 msgstr "활성화된 경우, GBC에 사용할 BIOS 파일"
 
-#: config/internal/option-internal.cpp:352
+#: config/internal/option-internal.cpp:349
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "기본 팔레트, 8개의 쉼표로 구분된 4자리 16진수 정수 (rgb555) 입니다."
 
-#: config/internal/option-internal.cpp:356
+#: config/internal/option-internal.cpp:353
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "첫 번째 사용자 팔레트, 8개의 쉼표로 구분된 4자리 16진수 정수 (rgb555) 입니다."
 
-#: config/internal/option-internal.cpp:360
+#: config/internal/option-internal.cpp:357
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "두 번째 사용자 팔레트, 8개의 쉼표로 구분된 4자리 16진수 정수 (rgb555) 입니다."
 
-#: config/internal/option-internal.cpp:364
+#: config/internal/option-internal.cpp:361
 msgid "Automatically gather a full page before printing"
 msgstr "출력하기 전에 자동으로 전체 페이지 수집"
 
-#: config/internal/option-internal.cpp:368
+#: config/internal/option-internal.cpp:365
 msgid "Automatically save printouts as screen captures with -print suffix"
 msgstr "-print 접미사를 사용하여 출력물을 화면 캡처로 자동 저장"
 
-#: config/internal/option-internal.cpp:370
-#: config/internal/option-internal.cpp:400
+#: config/internal/option-internal.cpp:367
+#: config/internal/option-internal.cpp:397
 msgid "Directory to look for ROM files"
 msgstr "ROM 파일을 찾을 디렉토리"
 
-#: config/internal/option-internal.cpp:372
+#: config/internal/option-internal.cpp:369
 msgid "Directory to look for GBC ROM files"
 msgstr "GBC ROM 파일을 찾을 디렉토리"
 
-#: config/internal/option-internal.cpp:376
+#: config/internal/option-internal.cpp:373
 msgid "BIOS file to use, if enabled"
 msgstr "활성화된 경우, 사용할 BIOS 파일"
 
-#: config/internal/option-internal.cpp:381
+#: config/internal/option-internal.cpp:378
 msgid "Enable link at boot"
 msgstr "부팅 시 링크 활성화"
 
-#: config/internal/option-internal.cpp:384
+#: config/internal/option-internal.cpp:381
 msgid "Enable faster network protocol by default"
 msgstr "기본적으로 더 빠른 네트워크 프로토콜 활성화"
 
-#: config/internal/option-internal.cpp:386
+#: config/internal/option-internal.cpp:383
 msgid "Default network link client host"
 msgstr "기본 네트워크 링크 클라이언트 호스트"
 
-#: config/internal/option-internal.cpp:388
+#: config/internal/option-internal.cpp:385
 msgid "Default network link server IP to bind"
 msgstr "바인딩할 기본 네트워크 링크 서버 IP"
 
-#: config/internal/option-internal.cpp:391
+#: config/internal/option-internal.cpp:388
 msgid "Default network link port (server and client)"
 msgstr "기본 네트워크 링크 포트 (서버 및 클라이언트)"
 
-#: config/internal/option-internal.cpp:393
+#: config/internal/option-internal.cpp:390
 msgid "Default network protocol"
 msgstr "기본 네트워크 프로토콜"
 
-#: config/internal/option-internal.cpp:395
+#: config/internal/option-internal.cpp:392
 msgid "Link timeout (ms)"
 msgstr "링크 시간 초과 (ms)"
 
-#: config/internal/option-internal.cpp:397
+#: config/internal/option-internal.cpp:394
 msgid "Link cable type"
 msgstr "링크 케이블 유형"
 
-#: config/internal/option-internal.cpp:405
+#: config/internal/option-internal.cpp:402
 msgid "Automatically load last saved state"
 msgstr "마지막으로 저장된 상태를 자동으로 불러오기"
 
-#: config/internal/option-internal.cpp:407
+#: config/internal/option-internal.cpp:404
 msgid ""
 "Directory to store game save files (relative paths are relative to ROM; "
 "blank is config dir)"
 msgstr "게임 저장 파일을 저장할 디렉터리 (상대 경로는 ROM에 상대적이며 공백은 구성 디렉토리임)"
 
-#: config/internal/option-internal.cpp:410
+#: config/internal/option-internal.cpp:407
 msgid "Freeze recent load list"
 msgstr "최근 불러오기 목록 고정"
 
-#: config/internal/option-internal.cpp:413
+#: config/internal/option-internal.cpp:410
 msgid ""
 "Directory to store A/V and game recordings (relative paths are relative to "
 "ROM)"
 msgstr "A/V 및 게임 녹화를 저장하는 디렉토리 (상대 경로는 ROM에 상대적임)"
 
-#: config/internal/option-internal.cpp:417
+#: config/internal/option-internal.cpp:414
 msgid "Number of seconds between rewind snapshots (0 to disable)"
 msgstr "되감기 스냅샷 사이의 초 수( 비활성화하려면 0)"
 
-#: config/internal/option-internal.cpp:420
+#: config/internal/option-internal.cpp:417
 msgid "Directory to store screenshots (relative paths are relative to ROM)"
 msgstr "스크린샷을 저장할 디렉토리 (상대 경로는 ROM에 상대적임)"
 
-#: config/internal/option-internal.cpp:424
+#: config/internal/option-internal.cpp:421
 msgid ""
 "Directory to store saved state files (relative paths are relative to "
 "BatteryDir)"
 msgstr "저장된 상태 파일을 저장할 디렉토리 (상대 경로는 BatteryDir에 상대적임)"
 
-#: config/internal/option-internal.cpp:427
+#: config/internal/option-internal.cpp:424
 msgid "Enable status bar"
 msgstr "상태 표시줄 활성화"
 
-#: config/internal/option-internal.cpp:432
+#: config/internal/option-internal.cpp:429
 msgid ""
 "The parameter Joypad/<n>/<button> contains a comma-separated list of key "
 "names which map to joypad #<n> button <button>.  Button is one of Up, Down, "
@@ -1298,271 +1298,251 @@ msgid ""
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
 msgstr "The parameter Joypad// contains a comma-separated list of key names which map to joypad # button .  Button is one of Up, Down, Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, AutoB, Speed, Capture, GS\n\n조이패드/<n>/<button> 매개변수는 조이패드 #<n> 버튼 <button>에 매핑되는 키 이름의 쉼표로 구분된 목록을 포함합니다. 버튼은 위, 아래, 왼쪽, 오른쪽, A, B, L, R, 선택, 시작, 모션위, 모션아래, 모션왼쪽, 모션오른쪽, 자동A, 자동B, 속도, 캡처, GS 중 하나입니다"
 
-#: config/internal/option-internal.cpp:439
+#: config/internal/option-internal.cpp:436
 msgid "The autofire toggle period, in frames (1/60 s)"
 msgstr "프레임 단위의 자동 발사 전환 기간 (1/60초)"
 
-#: config/internal/option-internal.cpp:442
+#: config/internal/option-internal.cpp:439
 msgid "The number of the stick to use in single-player mode"
 msgstr "싱글 플레이어 모드에서 사용할 스틱의 수"
 
-#: config/internal/option-internal.cpp:447
+#: config/internal/option-internal.cpp:444
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
 msgstr "매개변수 Keyboard/<cmd> 에는 쉼표로 구분된 키 이름 (예: Alt-Shift-F1) 목록이 포함되어 있습니다. 명명된 키를 누르면 명령 <cmd> 가 실행됩니다."
 
-#: config/internal/option-internal.cpp:454
+#: config/internal/option-internal.cpp:451
 msgid "Enable AGB debug print"
 msgstr "AGB 디버그 출력 활성화"
 
-#: config/internal/option-internal.cpp:456
+#: config/internal/option-internal.cpp:453
 msgid "Auto skip frames."
 msgstr "자동 건너뛰기 프레임입니다."
 
-#: config/internal/option-internal.cpp:458
+#: config/internal/option-internal.cpp:455
 msgid "Apply IPS/UPS/IPF patches if found"
 msgstr "발견된 경우 IPS/UPS/IPF 패치 적용"
 
-#: config/internal/option-internal.cpp:460
+#: config/internal/option-internal.cpp:457
 msgid "Automatically save and load cheat list"
 msgstr "치트 목록 자동 저장 및 불러오기"
 
-#: config/internal/option-internal.cpp:463
+#: config/internal/option-internal.cpp:460
 msgid "Automatically enable border for Super GameBoy games"
 msgstr "슈퍼 게임보이 게임의 테두리를 자동으로 활성화"
 
-#: config/internal/option-internal.cpp:465
+#: config/internal/option-internal.cpp:462
 msgid "Always enable border"
 msgstr "항상 테두리 활성화"
 
-#: config/internal/option-internal.cpp:467
+#: config/internal/option-internal.cpp:464
 msgid "Screen capture file format"
 msgstr "화면 캡처 파일 형식"
 
-#: config/internal/option-internal.cpp:469
+#: config/internal/option-internal.cpp:466
 msgid "Enable cheats"
 msgstr "치트 활성화"
 
-#: config/internal/option-internal.cpp:472 xrc/MainMenu.xrc:355
-msgid "Enable MMX"
-msgstr "MMX 활성화"
-
-#: config/internal/option-internal.cpp:476
+#: config/internal/option-internal.cpp:469
 msgid "Disable on-screen status messages"
 msgstr "화면 상태 메시지 비활성화"
 
-#: config/internal/option-internal.cpp:477
+#: config/internal/option-internal.cpp:470
 msgid "Type of system to emulate"
 msgstr "에뮬레이션할 시스템 유형"
 
-#: config/internal/option-internal.cpp:479
+#: config/internal/option-internal.cpp:472
 msgid "Flash size 0 = 64KB 1 = 128KB"
 msgstr "플래시 크기 0 = 64KB 1 = 128KB"
 
-#: config/internal/option-internal.cpp:482
+#: config/internal/option-internal.cpp:475
 msgid ""
 "Skip frames.  Values are 0-9 or -1 to skip automatically based on time."
 msgstr "프레임을 건너뜁니다. 시간에 따라 자동으로 건너뛰려면 값은 0-9 또는 -1 입니다."
 
-#: config/internal/option-internal.cpp:486
-msgid "Fullscreen mode color depth (0 = any)"
-msgstr "전체화면 모드 색상 심도 (0 = 임의)"
-
-#: config/internal/option-internal.cpp:488
-msgid "Fullscreen mode frequency (0 = any)"
-msgstr "전체화면 모드 빈도 (0 = 임의)"
-
-#: config/internal/option-internal.cpp:490
-msgid "Fullscreen mode height (0 = desktop)"
-msgstr "전체화면 모드 높이 (0 = 데스크탑)"
-
-#: config/internal/option-internal.cpp:492
-msgid "Fullscreen mode width (0 = desktop)"
-msgstr "전체화면 모드 너비 (0 = 데스크탑)"
-
-#: config/internal/option-internal.cpp:493
+#: config/internal/option-internal.cpp:478
 msgid "The palette to use"
 msgstr "사용할 팔레트"
 
-#: config/internal/option-internal.cpp:496
+#: config/internal/option-internal.cpp:481
 msgid "Enable printer emulation"
 msgstr "프린터 에뮬레이션 활성화"
 
-#: config/internal/option-internal.cpp:498
+#: config/internal/option-internal.cpp:483
 msgid "Break into GDB after loading the game."
 msgstr "게임을 불러온 후 GDB에 개입합니다."
 
-#: config/internal/option-internal.cpp:500
+#: config/internal/option-internal.cpp:485
 msgid "Port to connect GDB to."
 msgstr "GDB를 연결할 포트."
 
-#: config/internal/option-internal.cpp:503
+#: config/internal/option-internal.cpp:488
 msgid "Number of players in network"
 msgstr "네트워크의 플레이어 수"
 
-#: config/internal/option-internal.cpp:506
+#: config/internal/option-internal.cpp:491
 msgid "Maximum scale factor (0 = no limit)"
 msgstr "최대 스케일 팩터 (0 = 제한 없음)"
 
-#: config/internal/option-internal.cpp:508
+#: config/internal/option-internal.cpp:493
 msgid "Pause game when main window loses focus"
 msgstr "기본 창에서 포커스를 잃으면 게임 일시 중지"
 
-#: config/internal/option-internal.cpp:511
+#: config/internal/option-internal.cpp:496
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
 msgstr "RTC 활성화 (vba-over.ini 재정의는 rtcEnabled임"
 
-#: config/internal/option-internal.cpp:514
+#: config/internal/option-internal.cpp:499
 msgid "Native save (\"battery\") hardware type"
 msgstr "기본 저장 (\"배터리\") 하드웨어 유형"
 
-#: config/internal/option-internal.cpp:516
+#: config/internal/option-internal.cpp:501
 msgid "Show speed indicator"
 msgstr "속도 표시기 표시"
 
-#: config/internal/option-internal.cpp:519
+#: config/internal/option-internal.cpp:504
 msgid "Draw on-screen messages transparently"
 msgstr "화면 메시지를 투명하게 그리기"
 
-#: config/internal/option-internal.cpp:521
+#: config/internal/option-internal.cpp:506
 msgid "Skip BIOS initialization"
 msgstr "BIOS 초기화 건너뛰기"
 
-#: config/internal/option-internal.cpp:523
+#: config/internal/option-internal.cpp:508
 msgid "Do not overwrite cheat list when loading state"
 msgstr "상태를 불러올 때 치트 목록을 덮어쓰지 않음"
 
-#: config/internal/option-internal.cpp:526
+#: config/internal/option-internal.cpp:511
 msgid "Do not overwrite native (battery) save when loading state"
 msgstr "상태를 불러올 때 기본 (배터리) 저장을 덮어쓰지 않음"
 
-#: config/internal/option-internal.cpp:529
+#: config/internal/option-internal.cpp:514
 msgid "Throttle game speed, even when accelerated (0-450%, 0 = no throttle)"
 msgstr "가속된 경우에도 스로틀 게임 속도 (0-450%, 0 = 스로틀 없음)"
 
-#: config/internal/option-internal.cpp:533
+#: config/internal/option-internal.cpp:518
 msgid "Set throttle for speedup key (0-3000%, 0 = no throttle)"
 msgstr "가속 키에 대한 스로틀 설정 (0-3000%, 0 = 스로틀 없음)"
 
-#: config/internal/option-internal.cpp:536
+#: config/internal/option-internal.cpp:521
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
 msgstr "속도 향상으로 건너뛸 프레임 수 (속도 향상 스로틀 대신)"
 
-#: config/internal/option-internal.cpp:540
+#: config/internal/option-internal.cpp:525
 msgid "Use frame skip for speedup throttle"
 msgstr "스로틀 속도 향상을 위해 프레임 건너뛰기 사용"
 
-#: config/internal/option-internal.cpp:542
+#: config/internal/option-internal.cpp:527
 msgid "Use the specified BIOS file for GB"
 msgstr "GB에 대해 지정된 BIOS 파일 사용"
 
-#: config/internal/option-internal.cpp:544
+#: config/internal/option-internal.cpp:529
 msgid "Use the specified BIOS file"
 msgstr "지정된 BIOS 파일 사용"
 
-#: config/internal/option-internal.cpp:546
+#: config/internal/option-internal.cpp:531
 msgid "Use the specified BIOS file for GBC"
 msgstr "GBC용으로 지정된 BIOS 파일 사용"
 
-#: config/internal/option-internal.cpp:547
+#: config/internal/option-internal.cpp:532
 msgid "Wait for vertical sync"
 msgstr "수직 동기화 대기"
 
-#: config/internal/option-internal.cpp:552
+#: config/internal/option-internal.cpp:537
 msgid "Enter fullscreen mode at startup"
 msgstr "시작 시 전체 화면 모드 시작"
 
-#: config/internal/option-internal.cpp:553
+#: config/internal/option-internal.cpp:538
 msgid "Window maximized"
 msgstr "창 최대화"
 
-#: config/internal/option-internal.cpp:555
+#: config/internal/option-internal.cpp:540
 msgid "Window height at startup"
 msgstr "시작 시 창 높이"
 
-#: config/internal/option-internal.cpp:557
+#: config/internal/option-internal.cpp:542
 msgid "Window width at startup"
 msgstr "시작 시 창 너비"
 
-#: config/internal/option-internal.cpp:559
+#: config/internal/option-internal.cpp:544
 msgid "Window axis X position at startup"
 msgstr "시작 시 창 축 X 위치"
 
-#: config/internal/option-internal.cpp:561
+#: config/internal/option-internal.cpp:546
 msgid "Window axis Y position at startup"
 msgstr "시작 시 창 축 Y 위치"
 
-#: config/internal/option-internal.cpp:567
+#: config/internal/option-internal.cpp:552
 msgid "Capture key events while on background"
 msgstr "백그라운드에서 주요 이벤트 캡처"
 
-#: config/internal/option-internal.cpp:570
+#: config/internal/option-internal.cpp:555
 msgid "Capture joy events while on background"
 msgstr "백그라운드에서 조이 이벤트 캡처"
 
-#: config/internal/option-internal.cpp:571
+#: config/internal/option-internal.cpp:556
 msgid "Hide menu bar when mouse is inactive"
 msgstr "마우스가 비활성 상태일 때 메뉴 표시줄 숨기기"
 
-#: config/internal/option-internal.cpp:576
+#: config/internal/option-internal.cpp:561
 msgid "Sound API; if unsupported, default API will be used"
 msgstr "사운드 API; 지원되지 않는 경우 기본 API 사용"
 
-#: config/internal/option-internal.cpp:579
+#: config/internal/option-internal.cpp:564
 msgid "Device ID of chosen audio device for chosen driver"
 msgstr "선택한 드라이버에 대해 선택한 오디오 장치의 장치 ID"
 
-#: config/internal/option-internal.cpp:581
+#: config/internal/option-internal.cpp:566
 msgid "Number of sound buffers"
 msgstr "사운드 버퍼 수"
 
-#: config/internal/option-internal.cpp:583
+#: config/internal/option-internal.cpp:568
 msgid "Bit mask of sound channels to enable"
 msgstr "활성화할 사운드 채널의 비트 마스크"
 
-#: config/internal/option-internal.cpp:585
+#: config/internal/option-internal.cpp:570
 msgid "GBA sound filtering (%)"
 msgstr "GBA 사운드 필터링 (%)"
 
-#: config/internal/option-internal.cpp:588
+#: config/internal/option-internal.cpp:573
 msgid "GBA sound interpolation"
 msgstr "GBA 사운드 보간"
 
-#: config/internal/option-internal.cpp:589
+#: config/internal/option-internal.cpp:574
 msgid "GB sound declicking"
 msgstr "GB 사운드 디클릭킹"
 
-#: config/internal/option-internal.cpp:591
+#: config/internal/option-internal.cpp:576
 msgid "GB echo effect (%)"
 msgstr "GB 에코 효과 (%)"
 
-#: config/internal/option-internal.cpp:593
+#: config/internal/option-internal.cpp:578
 msgid "Enable GB sound effects"
 msgstr "GB 사운드 효과 활성화"
 
-#: config/internal/option-internal.cpp:594
+#: config/internal/option-internal.cpp:579
 msgid "GB stereo effect (%)"
 msgstr "GB 스테레오 효과 (%)"
 
-#: config/internal/option-internal.cpp:597
+#: config/internal/option-internal.cpp:582
 msgid "GB surround sound effect (%)"
 msgstr "GB 서라운드 사운드 효과 (%)"
 
-#: config/internal/option-internal.cpp:598
+#: config/internal/option-internal.cpp:583
 msgid "Sound sample rate (kHz)"
 msgstr "사운드 샘플링 속도 (kHz)"
 
-#: config/internal/option-internal.cpp:600
+#: config/internal/option-internal.cpp:585
 msgid "Sound volume (%)"
 msgstr "사운드 볼륨 (%)"
 
-#: config/internal/option-internal.cpp:667
-#: config/internal/option-internal.cpp:687
-#: config/internal/option-internal.cpp:708
-#: config/internal/option-internal.cpp:728
-#: config/internal/option-internal.cpp:748
+#: config/internal/option-internal.cpp:652
+#: config/internal/option-internal.cpp:672
+#: config/internal/option-internal.cpp:693
+#: config/internal/option-internal.cpp:713
+#: config/internal/option-internal.cpp:733
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
 msgstr "옵션 %s 에 대한 잘못된 값 %s; 유효한 값은 %s"
@@ -1582,22 +1562,26 @@ msgstr "%d 값은 %s 옵션에 무효합니다; 유효한 값은 %d - %d입니�
 msgid "Invalid value %d for option %s; valid values are %s"
 msgstr "옵션 %s 에 대해 유효하지 않은 값 %d; 유효한 값은 %s"
 
-#: dialogs/display-config.cpp:374
+#: dialogs/display-config.cpp:53
+msgid "Invalid value for Default magnification."
+msgstr ""
+
+#: dialogs/display-config.cpp:384
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "%s에서 사용가능한 rpi 플러그인을 찾을 수 없음"
 
-#: dialogs/display-config.cpp:406 dialogs/display-config.cpp:448
+#: dialogs/display-config.cpp:420 dialogs/display-config.cpp:462
 #: xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "플러그인"
 
-#: dialogs/display-config.cpp:413
+#: dialogs/display-config.cpp:427
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "픽셀 필터 사용: %s"
 
-#: dialogs/display-config.cpp:420
+#: dialogs/display-config.cpp:434
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr "프레임 간 블렌딩 사용: %s"
@@ -2970,7 +2954,7 @@ msgid ""
 "see entire contents if too small."
 msgstr "입력 칸를 클릭하고, 키를 누르거나 스틱을 조작하여 원하는 입력을 추가하세요. 입력된 키를 지우려면 백스페이스를 누르세요. 창이 작아서 잘 안보인다면, 창 크기를 키우거나 창 안쪽을 클릭하고 포인터를 움직이세요."
 
-#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:460
+#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:456
 msgid "Up"
 msgstr "상"
 
@@ -2978,7 +2962,7 @@ msgstr "상"
 msgid "A"
 msgstr "A"
 
-#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:464
+#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:460
 msgid "Down"
 msgstr "하"
 
@@ -2986,7 +2970,7 @@ msgstr "하"
 msgid "B"
 msgstr "B"
 
-#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:468
+#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:464
 msgid "Left"
 msgstr "좌"
 
@@ -2994,7 +2978,7 @@ msgstr "좌"
 msgid "L"
 msgstr "L"
 
-#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:472
+#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:468
 msgid "Right"
 msgstr "우"
 
@@ -3002,11 +2986,11 @@ msgstr "우"
 msgid "R"
 msgstr "R"
 
-#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:492
+#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:488
 msgid "Select"
 msgstr "Select"
 
-#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:496
+#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:492
 msgid "Start"
 msgstr "Start"
 
@@ -3434,7 +3418,7 @@ msgstr "무선(&W)"
 msgid "&GameCube"
 msgstr "게임큐브(&G)"
 
-#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:525
+#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:521
 msgid "&Game Boy"
 msgstr "게임보이(&G)"
 
@@ -3450,8 +3434,8 @@ msgstr "시작할 때 연결(&L)"
 msgid "&Speed hack"
 msgstr "스피드 핵(&S)"
 
-#: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:391
-#: xrc/MainMenu.xrc:427
+#: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:387
+#: xrc/MainMenu.xrc:423
 msgid "&Configure ..."
 msgstr "설정 창(&C)..."
 
@@ -3503,335 +3487,335 @@ msgstr "인터프레임 블렌딩(부드러운 프레임 전환) 타입 변경"
 msgid "&Retain aspect ratio"
 msgstr "화면비율 유지(&R)"
 
-#: xrc/MainMenu.xrc:360
+#: xrc/MainMenu.xrc:356
 msgid "&Bilinear filter"
 msgstr "격자 필터(&B)"
 
-#: xrc/MainMenu.xrc:371
+#: xrc/MainMenu.xrc:367
 msgid "&Keep window on top"
 msgstr "창 맨 위로 고정(&K)"
 
-#: xrc/MainMenu.xrc:376
+#: xrc/MainMenu.xrc:372
 msgid "&Status bar"
 msgstr "상태 표시줄(&S)"
 
-#: xrc/MainMenu.xrc:380
+#: xrc/MainMenu.xrc:376
 msgid "&Disable on-screen display"
 msgstr "화면 상 표시 비활성화(&D)"
 
-#: xrc/MainMenu.xrc:384
+#: xrc/MainMenu.xrc:380
 msgid "&Transparent on-screen display"
 msgstr "화면 상 표시를 투명하게(&T)"
 
-#: xrc/MainMenu.xrc:389
+#: xrc/MainMenu.xrc:385
 msgid "&Audio"
 msgstr "소리(&A)"
 
-#: xrc/MainMenu.xrc:394
+#: xrc/MainMenu.xrc:390
 msgid "&Increase volume"
 msgstr "음량 높이기(&I)"
 
-#: xrc/MainMenu.xrc:398
+#: xrc/MainMenu.xrc:394
 msgid "&Decrease volume"
 msgstr "음량 낮추기(&D)"
 
-#: xrc/MainMenu.xrc:402
+#: xrc/MainMenu.xrc:398
 msgid "&Toggle sound"
 msgstr "음향 전환(&T)"
 
-#: xrc/MainMenu.xrc:407
+#: xrc/MainMenu.xrc:403
 msgid "&GBA sound interpolation"
 msgstr "&GBA 음향 보정"
 
-#: xrc/MainMenu.xrc:412
+#: xrc/MainMenu.xrc:408
 msgid "&GB sound enhancement"
 msgstr "&GB 소리 향상"
 
-#: xrc/MainMenu.xrc:416
+#: xrc/MainMenu.xrc:412
 msgid "&GB surround sound effect"
 msgstr "&GB 입체 음향 효과"
 
-#: xrc/MainMenu.xrc:420
+#: xrc/MainMenu.xrc:416
 msgid "&GB sound declicking"
 msgstr "&GB 소리 잡음제거"
 
-#: xrc/MainMenu.xrc:425
+#: xrc/MainMenu.xrc:421
 msgid "&Input"
 msgstr "입력(&I)"
 
-#: xrc/MainMenu.xrc:430
+#: xrc/MainMenu.xrc:426
 msgid "Allow &keyboard background input"
 msgstr "키보드 백그라운드 입력 허용(&K)"
 
-#: xrc/MainMenu.xrc:434
+#: xrc/MainMenu.xrc:430
 msgid "Allow &joystick background input"
 msgstr "조이스틱 백그라운드 입력 허용(&J)"
 
-#: xrc/MainMenu.xrc:439
+#: xrc/MainMenu.xrc:435
 msgid "&Autofire"
 msgstr "버튼 연사(&A)"
 
-#: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
+#: xrc/MainMenu.xrc:437 xrc/MainMenu.xrc:472
 msgid "&A"
 msgstr "&A"
 
-#: xrc/MainMenu.xrc:445 xrc/MainMenu.xrc:480
+#: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
 msgid "&B"
 msgstr "&B"
 
-#: xrc/MainMenu.xrc:449 xrc/MainMenu.xrc:484
+#: xrc/MainMenu.xrc:445 xrc/MainMenu.xrc:480
 msgid "&L"
 msgstr "&L"
 
-#: xrc/MainMenu.xrc:453 xrc/MainMenu.xrc:488
+#: xrc/MainMenu.xrc:449 xrc/MainMenu.xrc:484
 msgid "&R"
 msgstr "&R"
 
-#: xrc/MainMenu.xrc:458
+#: xrc/MainMenu.xrc:454
 msgid "&Autohold"
 msgstr "자동 입력(&A)"
 
-#: xrc/MainMenu.xrc:502
+#: xrc/MainMenu.xrc:498
 msgid "&Game Boy Advance"
 msgstr "게임보이 어드밴스(&G)"
 
-#: xrc/MainMenu.xrc:504 xrc/MainMenu.xrc:527
+#: xrc/MainMenu.xrc:500 xrc/MainMenu.xrc:523
 msgid "Configure ..."
 msgstr "설정 창..."
 
-#: xrc/MainMenu.xrc:508
+#: xrc/MainMenu.xrc:504
 msgid "&Real-time clock"
 msgstr "실시간 시계(&R)"
 
-#: xrc/MainMenu.xrc:512
+#: xrc/MainMenu.xrc:508
 msgid "&Use BIOS file"
 msgstr "BIOS 파일을 사용(&U)"
 
-#: xrc/MainMenu.xrc:516
+#: xrc/MainMenu.xrc:512
 msgid "&Debug print"
 msgstr "디버그 출력(&D)"
 
-#: xrc/MainMenu.xrc:520 xrc/MainMenu.xrc:535
+#: xrc/MainMenu.xrc:516 xrc/MainMenu.xrc:531
 msgid "&LCD Filter"
 msgstr "&LCD 필터"
 
-#: xrc/MainMenu.xrc:531
+#: xrc/MainMenu.xrc:527
 msgid "&GB color option"
 msgstr "게임보이 색상 옵션(&G)"
 
-#: xrc/MainMenu.xrc:539
+#: xrc/MainMenu.xrc:535
 msgid "&GB Colorizer Hack (requires restart)"
 msgstr "게임보이 색상 해킹 (재시작 필요) (&G)"
 
-#: xrc/MainMenu.xrc:543
+#: xrc/MainMenu.xrc:539
 msgid "&GB printer"
 msgstr "게임보이 프린터(&G)"
 
-#: xrc/MainMenu.xrc:547
+#: xrc/MainMenu.xrc:543
 msgid "&Gather a full page before printing"
 msgstr "출력 전 모든 페이지를 모으기(&G)"
 
-#: xrc/MainMenu.xrc:551
+#: xrc/MainMenu.xrc:547
 msgid "&Save printouts as screen captures"
 msgstr "출력물 스크린 캡쳐로 저장하기(&S)"
 
-#: xrc/MainMenu.xrc:556
+#: xrc/MainMenu.xrc:552
 msgid "&Use GB BIOS file (requires restart)"
 msgstr "게임보이 BIOS 파일을 사용 (재시작 필요) (&U)"
 
-#: xrc/MainMenu.xrc:560
+#: xrc/MainMenu.xrc:556
 msgid "&Use GBC BIOS file"
 msgstr "게임보이 컬러 BIOS 파일 사용(&U)"
 
-#: xrc/MainMenu.xrc:565
+#: xrc/MainMenu.xrc:561
 msgid "&General ..."
 msgstr "일반(&G)..."
 
-#: xrc/MainMenu.xrc:568
+#: xrc/MainMenu.xrc:564
 msgid "&Speedup / Turbo ..."
 msgstr "스피드 업 / 터보(&S)..."
 
-#: xrc/MainMenu.xrc:571
+#: xrc/MainMenu.xrc:567
 msgid "D&irectories ..."
 msgstr "디렉토리(&I)..."
 
-#: xrc/MainMenu.xrc:574
+#: xrc/MainMenu.xrc:570
 msgid "&Key Shortcuts ..."
 msgstr "단축키(&K)..."
 
-#: xrc/MainMenu.xrc:577
+#: xrc/MainMenu.xrc:573
 msgid "&UI Settings ..."
 msgstr "인터페이스 설정(&U)..."
 
-#: xrc/MainMenu.xrc:581
+#: xrc/MainMenu.xrc:577
 msgid "&Tools"
 msgstr "도구(&T)"
 
-#: xrc/MainMenu.xrc:583
+#: xrc/MainMenu.xrc:579
 msgid "&Cheats"
 msgstr "치트(&C)"
 
-#: xrc/MainMenu.xrc:585
+#: xrc/MainMenu.xrc:581
 msgid "List &cheats ..."
 msgstr "치트 목록(&C)..."
 
-#: xrc/MainMenu.xrc:588
+#: xrc/MainMenu.xrc:584
 msgid "Find c&heat ..."
 msgstr "치트 찾기(&H)..."
 
-#: xrc/MainMenu.xrc:592
+#: xrc/MainMenu.xrc:588
 msgid "A&utomatically save/load cheats"
 msgstr "치트 자동 저장/불러오기(&U)"
 
-#: xrc/MainMenu.xrc:596
+#: xrc/MainMenu.xrc:592
 msgid "&Enable cheats"
 msgstr "치트 활성화(&E)"
 
-#: xrc/MainMenu.xrc:603
+#: xrc/MainMenu.xrc:599
 msgid "&Break into GDB"
 msgstr "GNU 디버깅 시스템 침입(&B)"
 
-#: xrc/MainMenu.xrc:607
+#: xrc/MainMenu.xrc:603
 msgid "&Configure port..."
 msgstr "포트 구성(&C)..."
 
-#: xrc/MainMenu.xrc:610
+#: xrc/MainMenu.xrc:606
 msgid "&Break on load"
 msgstr "불러오기 시 침입(&B)"
 
-#: xrc/MainMenu.xrc:615
+#: xrc/MainMenu.xrc:611
 msgid "&Disconnect"
 msgstr "연결 끊기(&D)"
 
-#: xrc/MainMenu.xrc:617
+#: xrc/MainMenu.xrc:613
 msgid "&GDB"
 msgstr "&GNU 디버거"
 
-#: xrc/MainMenu.xrc:620
+#: xrc/MainMenu.xrc:616
 msgid "&Disassemble..."
 msgstr "파일 분석(&D)..."
 
-#: xrc/MainMenu.xrc:623
+#: xrc/MainMenu.xrc:619
 msgid "&Logging..."
 msgstr "기록(&L)..."
 
-#: xrc/MainMenu.xrc:626
+#: xrc/MainMenu.xrc:622
 msgid "&IO Viewer..."
 msgstr "입출력 뷰어(&I)..."
 
-#: xrc/MainMenu.xrc:629
+#: xrc/MainMenu.xrc:625
 msgid "&Map Viewer..."
 msgstr "맵 뷰어(&M)..."
 
-#: xrc/MainMenu.xrc:632
+#: xrc/MainMenu.xrc:628
 msgid "M&emory Viewer..."
 msgstr "메모리 뷰어(&E)..."
 
-#: xrc/MainMenu.xrc:635
+#: xrc/MainMenu.xrc:631
 msgid "&OAM Viewer..."
 msgstr "OAM(운용관리 시스템) 뷰어(&O)..."
 
-#: xrc/MainMenu.xrc:638
+#: xrc/MainMenu.xrc:634
 msgid "&Palette Viewer..."
 msgstr "팔레트 뷰어(&P)..."
 
-#: xrc/MainMenu.xrc:641
+#: xrc/MainMenu.xrc:637
 msgid "&Tile Viewer..."
 msgstr "타일 뷰어(&T)..."
 
-#: xrc/MainMenu.xrc:646
+#: xrc/MainMenu.xrc:642
 msgid "Show all video layers"
 msgstr "모든 비디오 레이어 표시"
 
-#: xrc/MainMenu.xrc:650
+#: xrc/MainMenu.xrc:646
 msgid "BG &0"
 msgstr "BG &0"
 
-#: xrc/MainMenu.xrc:655
+#: xrc/MainMenu.xrc:651
 msgid "BG &1"
 msgstr "BG &1"
 
-#: xrc/MainMenu.xrc:660
+#: xrc/MainMenu.xrc:656
 msgid "BG &2"
 msgstr "BG &2"
 
-#: xrc/MainMenu.xrc:665
+#: xrc/MainMenu.xrc:661
 msgid "BG &3"
 msgstr "BG &3"
 
-#: xrc/MainMenu.xrc:670
+#: xrc/MainMenu.xrc:666
 msgid "&OBJ"
 msgstr "개체(&O)"
 
-#: xrc/MainMenu.xrc:675
+#: xrc/MainMenu.xrc:671
 msgid "&WIN 0"
 msgstr "창 0(&W)"
 
-#: xrc/MainMenu.xrc:680
+#: xrc/MainMenu.xrc:676
 msgid "W&IN 1"
 msgstr "창 1(&I)"
 
-#: xrc/MainMenu.xrc:685
+#: xrc/MainMenu.xrc:681
 msgid "O&BJ WIN"
 msgstr "개체 창(&B)"
 
-#: xrc/MainMenu.xrc:689
+#: xrc/MainMenu.xrc:685
 msgid "&View Layers"
 msgstr "레이어 보기(&V)"
 
-#: xrc/MainMenu.xrc:693
+#: xrc/MainMenu.xrc:689
 msgid "Channel &1"
 msgstr "채널 &1"
 
-#: xrc/MainMenu.xrc:698
+#: xrc/MainMenu.xrc:694
 msgid "Channel &2"
 msgstr "채널 &2"
 
-#: xrc/MainMenu.xrc:703
+#: xrc/MainMenu.xrc:699
 msgid "Channel &3"
 msgstr "채널 &3"
 
-#: xrc/MainMenu.xrc:708
+#: xrc/MainMenu.xrc:704
 msgid "Channel &4"
 msgstr "채널 &4"
 
-#: xrc/MainMenu.xrc:713
+#: xrc/MainMenu.xrc:709
 msgid "Direct Sound &A"
 msgstr "다이렉트 사운드 &A"
 
-#: xrc/MainMenu.xrc:718
+#: xrc/MainMenu.xrc:714
 msgid "Direct Sound &B"
 msgstr "다이렉트 사운드 &B"
 
-#: xrc/MainMenu.xrc:722
+#: xrc/MainMenu.xrc:718
 msgid "&Sound Channels"
 msgstr "음향 채널(&S)"
 
-#: xrc/MainMenu.xrc:726
+#: xrc/MainMenu.xrc:722
 msgid "&Help"
 msgstr "도움말(&H)"
 
-#: xrc/MainMenu.xrc:728
+#: xrc/MainMenu.xrc:724
 msgid "Report &Bugs"
 msgstr "버그 제보(&B)"
 
-#: xrc/MainMenu.xrc:731
+#: xrc/MainMenu.xrc:727
 msgid "VBA-M Support &Forum"
 msgstr "VBA-M 지원 포럼(&F)"
 
-#: xrc/MainMenu.xrc:734
+#: xrc/MainMenu.xrc:730
 msgid "Translations"
 msgstr "번역 참여"
 
-#: xrc/MainMenu.xrc:742
+#: xrc/MainMenu.xrc:738
 msgid "Check for updates"
 msgstr "업데이트 확인"
 
-#: xrc/MainMenu.xrc:745
+#: xrc/MainMenu.xrc:741
 msgid "&Factory Reset..."
 msgstr "공장 초기화(&F)..."
 
-#: xrc/MainMenu.xrc:749
+#: xrc/MainMenu.xrc:745
 msgid "&About..."
 msgstr "정보(&A)..."
 
