@@ -66,6 +66,7 @@ enum class OptionID {
     kPrefAgbPrint,
     kPrefAutoFrameSkip,
     kPrefAutoPatch,
+    kPrefAutoSaveLoadCheatList,
     kPrefBorderAutomatic,
     kPrefBorderOn,
     kPrefCaptureFormat,

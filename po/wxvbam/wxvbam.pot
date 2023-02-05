@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-04 16:52-0800\n"
+"POT-Creation-Date: 2023-02-04 18:56-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -282,50 +282,50 @@ msgstr ""
 msgid "Main display panel not found"
 msgstr ""
 
-#: guiinit.cpp:2768
+#: guiinit.cpp:2757
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr ""
 
-#: guiinit.cpp:2782
+#: guiinit.cpp:2771
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
 msgstr ""
 
-#: guiinit.cpp:2921
+#: guiinit.cpp:2910
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr ""
 
-#: guiinit.cpp:3124
+#: guiinit.cpp:3113
 msgid "Code"
 msgstr ""
 
-#: guiinit.cpp:3133
+#: guiinit.cpp:3122
 msgid "Description"
 msgstr ""
 
-#: guiinit.cpp:3207 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3196 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr ""
 
-#: guiinit.cpp:3208
+#: guiinit.cpp:3197
 msgid "Old Value"
 msgstr ""
 
-#: guiinit.cpp:3209
+#: guiinit.cpp:3198
 msgid "New Value"
 msgstr ""
 
-#: guiinit.cpp:3681
+#: guiinit.cpp:3670
 msgid "Menu commands"
 msgstr ""
 
-#: guiinit.cpp:3704
+#: guiinit.cpp:3693
 msgid "Other commands"
 msgstr ""
 
-#: guiinit.cpp:3815
+#: guiinit.cpp:3804
 msgid "JoyBus host invalid; disabling"
 msgstr ""
 
@@ -1129,170 +1129,170 @@ msgstr ""
 msgid "B:"
 msgstr ""
 
-#: config/internal/option-internal.cpp:316
+#: config/internal/option-internal.cpp:317
 msgid "Use bilinear filter with 3d renderer"
 msgstr ""
 
-#: config/internal/option-internal.cpp:317
+#: config/internal/option-internal.cpp:318
 msgid "Full-screen filter to apply"
 msgstr ""
 
-#: config/internal/option-internal.cpp:319
+#: config/internal/option-internal.cpp:320
 msgid "Filter plugin library"
 msgstr ""
 
-#: config/internal/option-internal.cpp:321
+#: config/internal/option-internal.cpp:322
 msgid "Interframe blending function"
 msgstr ""
 
-#: config/internal/option-internal.cpp:323
+#: config/internal/option-internal.cpp:324
 msgid "Keep window on top"
 msgstr ""
 
-#: config/internal/option-internal.cpp:326
+#: config/internal/option-internal.cpp:327
 msgid "Maximum number of threads to run filters in"
 msgstr ""
 
-#: config/internal/option-internal.cpp:329
+#: config/internal/option-internal.cpp:330
 msgid "Render method; if unsupported, simple method will be used"
 msgstr ""
 
-#: config/internal/option-internal.cpp:331
+#: config/internal/option-internal.cpp:332
 msgid "Default scale factor"
 msgstr ""
 
-#: config/internal/option-internal.cpp:334
+#: config/internal/option-internal.cpp:335
 msgid "Retain aspect ratio when resizing"
 msgstr ""
 
-#: config/internal/option-internal.cpp:337
+#: config/internal/option-internal.cpp:338
 msgid "BIOS file to use for GB, if enabled"
 msgstr ""
 
-#: config/internal/option-internal.cpp:340
+#: config/internal/option-internal.cpp:341
 msgid "GB color enhancement, if enabled"
 msgstr ""
 
-#: config/internal/option-internal.cpp:342
+#: config/internal/option-internal.cpp:343
 msgid "Enable DX Colorization Hacks"
 msgstr ""
 
-#: config/internal/option-internal.cpp:343
-#: config/internal/option-internal.cpp:375
+#: config/internal/option-internal.cpp:344
+#: config/internal/option-internal.cpp:376
 msgid "Apply LCD filter, if enabled"
 msgstr ""
 
-#: config/internal/option-internal.cpp:345
+#: config/internal/option-internal.cpp:346
 msgid "BIOS file to use for GBC, if enabled"
 msgstr ""
 
-#: config/internal/option-internal.cpp:348
+#: config/internal/option-internal.cpp:349
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr ""
 
-#: config/internal/option-internal.cpp:352
+#: config/internal/option-internal.cpp:353
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr ""
 
-#: config/internal/option-internal.cpp:356
+#: config/internal/option-internal.cpp:357
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr ""
 
-#: config/internal/option-internal.cpp:360
+#: config/internal/option-internal.cpp:361
 msgid "Automatically gather a full page before printing"
 msgstr ""
 
-#: config/internal/option-internal.cpp:364
+#: config/internal/option-internal.cpp:365
 msgid "Automatically save printouts as screen captures with -print suffix"
 msgstr ""
 
-#: config/internal/option-internal.cpp:366
-#: config/internal/option-internal.cpp:396
+#: config/internal/option-internal.cpp:367
+#: config/internal/option-internal.cpp:397
 msgid "Directory to look for ROM files"
 msgstr ""
 
-#: config/internal/option-internal.cpp:368
+#: config/internal/option-internal.cpp:369
 msgid "Directory to look for GBC ROM files"
 msgstr ""
 
-#: config/internal/option-internal.cpp:372
+#: config/internal/option-internal.cpp:373
 msgid "BIOS file to use, if enabled"
 msgstr ""
 
-#: config/internal/option-internal.cpp:377
+#: config/internal/option-internal.cpp:378
 msgid "Enable link at boot"
 msgstr ""
 
-#: config/internal/option-internal.cpp:380
+#: config/internal/option-internal.cpp:381
 msgid "Enable faster network protocol by default"
 msgstr ""
 
-#: config/internal/option-internal.cpp:382
+#: config/internal/option-internal.cpp:383
 msgid "Default network link client host"
 msgstr ""
 
-#: config/internal/option-internal.cpp:384
+#: config/internal/option-internal.cpp:385
 msgid "Default network link server IP to bind"
 msgstr ""
 
-#: config/internal/option-internal.cpp:387
+#: config/internal/option-internal.cpp:388
 msgid "Default network link port (server and client)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:389
+#: config/internal/option-internal.cpp:390
 msgid "Default network protocol"
 msgstr ""
 
-#: config/internal/option-internal.cpp:391
+#: config/internal/option-internal.cpp:392
 msgid "Link timeout (ms)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:393
+#: config/internal/option-internal.cpp:394
 msgid "Link cable type"
 msgstr ""
 
-#: config/internal/option-internal.cpp:401
+#: config/internal/option-internal.cpp:402
 msgid "Automatically load last saved state"
 msgstr ""
 
-#: config/internal/option-internal.cpp:403
+#: config/internal/option-internal.cpp:404
 msgid ""
 "Directory to store game save files (relative paths are relative to ROM; "
 "blank is config dir)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:406
+#: config/internal/option-internal.cpp:407
 msgid "Freeze recent load list"
 msgstr ""
 
-#: config/internal/option-internal.cpp:409
+#: config/internal/option-internal.cpp:410
 msgid ""
 "Directory to store A/V and game recordings (relative paths are relative to "
 "ROM)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:413
+#: config/internal/option-internal.cpp:414
 msgid "Number of seconds between rewind snapshots (0 to disable)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:416
+#: config/internal/option-internal.cpp:417
 msgid "Directory to store screenshots (relative paths are relative to ROM)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:420
+#: config/internal/option-internal.cpp:421
 msgid ""
 "Directory to store saved state files (relative paths are relative to "
 "BatteryDir)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:423
+#: config/internal/option-internal.cpp:424
 msgid "Enable status bar"
 msgstr ""
 
-#: config/internal/option-internal.cpp:428
+#: config/internal/option-internal.cpp:429
 msgid ""
 "The parameter Joypad/<n>/<button> contains a comma-separated list of key "
 "names which map to joypad #<n> button <button>.  Button is one of Up, Down, "
@@ -1300,246 +1300,250 @@ msgid ""
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
 msgstr ""
 
-#: config/internal/option-internal.cpp:435
+#: config/internal/option-internal.cpp:436
 msgid "The autofire toggle period, in frames (1/60 s)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:438
+#: config/internal/option-internal.cpp:439
 msgid "The number of the stick to use in single-player mode"
 msgstr ""
 
-#: config/internal/option-internal.cpp:443
+#: config/internal/option-internal.cpp:444
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names (e."
 "g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
 msgstr ""
 
-#: config/internal/option-internal.cpp:450
+#: config/internal/option-internal.cpp:451
 msgid "Enable AGB debug print"
 msgstr ""
 
-#: config/internal/option-internal.cpp:452
+#: config/internal/option-internal.cpp:453
 msgid "Auto skip frames."
 msgstr ""
 
-#: config/internal/option-internal.cpp:454
+#: config/internal/option-internal.cpp:455
 msgid "Apply IPS/UPS/IPF patches if found"
 msgstr ""
 
-#: config/internal/option-internal.cpp:456
-msgid "Automatically enable border for Super GameBoy games"
-msgstr ""
-
-#: config/internal/option-internal.cpp:458
-msgid "Always enable border"
+#: config/internal/option-internal.cpp:457
+msgid "Automatically save and load cheat list"
 msgstr ""
 
 #: config/internal/option-internal.cpp:460
-msgid "Screen capture file format"
+msgid "Automatically enable border for Super GameBoy games"
 msgstr ""
 
 #: config/internal/option-internal.cpp:462
-msgid "Enable cheats"
+msgid "Always enable border"
 msgstr ""
 
-#: config/internal/option-internal.cpp:465
-msgid "Disable on-screen status messages"
+#: config/internal/option-internal.cpp:464
+msgid "Screen capture file format"
 msgstr ""
 
 #: config/internal/option-internal.cpp:466
+msgid "Enable cheats"
+msgstr ""
+
+#: config/internal/option-internal.cpp:469
+msgid "Disable on-screen status messages"
+msgstr ""
+
+#: config/internal/option-internal.cpp:470
 msgid "Type of system to emulate"
 msgstr ""
 
-#: config/internal/option-internal.cpp:468
+#: config/internal/option-internal.cpp:472
 msgid "Flash size 0 = 64KB 1 = 128KB"
 msgstr ""
 
-#: config/internal/option-internal.cpp:471
+#: config/internal/option-internal.cpp:475
 msgid "Skip frames.  Values are 0-9 or -1 to skip automatically based on time."
 msgstr ""
 
-#: config/internal/option-internal.cpp:474
+#: config/internal/option-internal.cpp:478
 msgid "The palette to use"
 msgstr ""
 
-#: config/internal/option-internal.cpp:477
+#: config/internal/option-internal.cpp:481
 msgid "Enable printer emulation"
 msgstr ""
 
-#: config/internal/option-internal.cpp:479
+#: config/internal/option-internal.cpp:483
 msgid "Break into GDB after loading the game."
 msgstr ""
 
-#: config/internal/option-internal.cpp:481
+#: config/internal/option-internal.cpp:485
 msgid "Port to connect GDB to."
 msgstr ""
 
-#: config/internal/option-internal.cpp:484
+#: config/internal/option-internal.cpp:488
 msgid "Number of players in network"
 msgstr ""
 
-#: config/internal/option-internal.cpp:487
+#: config/internal/option-internal.cpp:491
 msgid "Maximum scale factor (0 = no limit)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:489
+#: config/internal/option-internal.cpp:493
 msgid "Pause game when main window loses focus"
 msgstr ""
 
-#: config/internal/option-internal.cpp:492
+#: config/internal/option-internal.cpp:496
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
 msgstr ""
 
-#: config/internal/option-internal.cpp:495
+#: config/internal/option-internal.cpp:499
 msgid "Native save (\"battery\") hardware type"
 msgstr ""
 
-#: config/internal/option-internal.cpp:497
+#: config/internal/option-internal.cpp:501
 msgid "Show speed indicator"
 msgstr ""
 
-#: config/internal/option-internal.cpp:500
+#: config/internal/option-internal.cpp:504
 msgid "Draw on-screen messages transparently"
 msgstr ""
 
-#: config/internal/option-internal.cpp:502
+#: config/internal/option-internal.cpp:506
 msgid "Skip BIOS initialization"
 msgstr ""
 
-#: config/internal/option-internal.cpp:504
+#: config/internal/option-internal.cpp:508
 msgid "Do not overwrite cheat list when loading state"
 msgstr ""
 
-#: config/internal/option-internal.cpp:507
+#: config/internal/option-internal.cpp:511
 msgid "Do not overwrite native (battery) save when loading state"
 msgstr ""
 
-#: config/internal/option-internal.cpp:510
+#: config/internal/option-internal.cpp:514
 msgid "Throttle game speed, even when accelerated (0-450%, 0 = no throttle)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:514
+#: config/internal/option-internal.cpp:518
 msgid "Set throttle for speedup key (0-3000%, 0 = no throttle)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:517
+#: config/internal/option-internal.cpp:521
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:521
+#: config/internal/option-internal.cpp:525
 msgid "Use frame skip for speedup throttle"
 msgstr ""
 
-#: config/internal/option-internal.cpp:523
+#: config/internal/option-internal.cpp:527
 msgid "Use the specified BIOS file for GB"
 msgstr ""
 
-#: config/internal/option-internal.cpp:525
+#: config/internal/option-internal.cpp:529
 msgid "Use the specified BIOS file"
 msgstr ""
 
-#: config/internal/option-internal.cpp:527
+#: config/internal/option-internal.cpp:531
 msgid "Use the specified BIOS file for GBC"
 msgstr ""
 
-#: config/internal/option-internal.cpp:528
+#: config/internal/option-internal.cpp:532
 msgid "Wait for vertical sync"
 msgstr ""
 
-#: config/internal/option-internal.cpp:533
+#: config/internal/option-internal.cpp:537
 msgid "Enter fullscreen mode at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:534
+#: config/internal/option-internal.cpp:538
 msgid "Window maximized"
 msgstr ""
 
-#: config/internal/option-internal.cpp:536
+#: config/internal/option-internal.cpp:540
 msgid "Window height at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:538
+#: config/internal/option-internal.cpp:542
 msgid "Window width at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:540
+#: config/internal/option-internal.cpp:544
 msgid "Window axis X position at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:542
+#: config/internal/option-internal.cpp:546
 msgid "Window axis Y position at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:548
+#: config/internal/option-internal.cpp:552
 msgid "Capture key events while on background"
 msgstr ""
 
-#: config/internal/option-internal.cpp:551
+#: config/internal/option-internal.cpp:555
 msgid "Capture joy events while on background"
 msgstr ""
 
-#: config/internal/option-internal.cpp:552
+#: config/internal/option-internal.cpp:556
 msgid "Hide menu bar when mouse is inactive"
 msgstr ""
 
-#: config/internal/option-internal.cpp:557
+#: config/internal/option-internal.cpp:561
 msgid "Sound API; if unsupported, default API will be used"
 msgstr ""
 
-#: config/internal/option-internal.cpp:560
+#: config/internal/option-internal.cpp:564
 msgid "Device ID of chosen audio device for chosen driver"
 msgstr ""
 
-#: config/internal/option-internal.cpp:562
+#: config/internal/option-internal.cpp:566
 msgid "Number of sound buffers"
 msgstr ""
 
-#: config/internal/option-internal.cpp:564
+#: config/internal/option-internal.cpp:568
 msgid "Bit mask of sound channels to enable"
 msgstr ""
 
-#: config/internal/option-internal.cpp:566
+#: config/internal/option-internal.cpp:570
 msgid "GBA sound filtering (%)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:569
+#: config/internal/option-internal.cpp:573
 msgid "GBA sound interpolation"
 msgstr ""
 
-#: config/internal/option-internal.cpp:570
+#: config/internal/option-internal.cpp:574
 msgid "GB sound declicking"
 msgstr ""
 
-#: config/internal/option-internal.cpp:572
+#: config/internal/option-internal.cpp:576
 msgid "GB echo effect (%)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:574
+#: config/internal/option-internal.cpp:578
 msgid "Enable GB sound effects"
 msgstr ""
 
-#: config/internal/option-internal.cpp:575
+#: config/internal/option-internal.cpp:579
 msgid "GB stereo effect (%)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:578
+#: config/internal/option-internal.cpp:582
 msgid "GB surround sound effect (%)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:579
+#: config/internal/option-internal.cpp:583
 msgid "Sound sample rate (kHz)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:581
+#: config/internal/option-internal.cpp:585
 msgid "Sound volume (%)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:648
-#: config/internal/option-internal.cpp:668
-#: config/internal/option-internal.cpp:689
-#: config/internal/option-internal.cpp:709
-#: config/internal/option-internal.cpp:729
+#: config/internal/option-internal.cpp:652
+#: config/internal/option-internal.cpp:672
+#: config/internal/option-internal.cpp:693
+#: config/internal/option-internal.cpp:713
+#: config/internal/option-internal.cpp:733
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
 msgstr ""
@@ -2947,7 +2951,7 @@ msgid ""
 "see entire contents if too small."
 msgstr ""
 
-#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:460
+#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:456
 msgid "Up"
 msgstr ""
 
@@ -2955,7 +2959,7 @@ msgstr ""
 msgid "A"
 msgstr ""
 
-#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:464
+#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:460
 msgid "Down"
 msgstr ""
 
@@ -2963,7 +2967,7 @@ msgstr ""
 msgid "B"
 msgstr ""
 
-#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:468
+#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:464
 msgid "Left"
 msgstr ""
 
@@ -2971,7 +2975,7 @@ msgstr ""
 msgid "L"
 msgstr ""
 
-#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:472
+#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:468
 msgid "Right"
 msgstr ""
 
@@ -2979,11 +2983,11 @@ msgstr ""
 msgid "R"
 msgstr ""
 
-#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:492
+#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:488
 msgid "Select"
 msgstr ""
 
-#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:496
+#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:492
 msgid "Start"
 msgstr ""
 
@@ -3411,7 +3415,7 @@ msgstr ""
 msgid "&GameCube"
 msgstr ""
 
-#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:525
+#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:521
 msgid "&Game Boy"
 msgstr ""
 
@@ -3427,8 +3431,8 @@ msgstr ""
 msgid "&Speed hack"
 msgstr ""
 
-#: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:391
-#: xrc/MainMenu.xrc:427
+#: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:387
+#: xrc/MainMenu.xrc:423
 msgid "&Configure ..."
 msgstr ""
 
@@ -3480,339 +3484,335 @@ msgstr ""
 msgid "&Retain aspect ratio"
 msgstr ""
 
-#: xrc/MainMenu.xrc:355
-msgid "Enable MMX"
-msgstr ""
-
-#: xrc/MainMenu.xrc:360
+#: xrc/MainMenu.xrc:356
 msgid "&Bilinear filter"
 msgstr ""
 
-#: xrc/MainMenu.xrc:371
+#: xrc/MainMenu.xrc:367
 msgid "&Keep window on top"
 msgstr ""
 
-#: xrc/MainMenu.xrc:376
+#: xrc/MainMenu.xrc:372
 msgid "&Status bar"
 msgstr ""
 
-#: xrc/MainMenu.xrc:380
+#: xrc/MainMenu.xrc:376
 msgid "&Disable on-screen display"
 msgstr ""
 
-#: xrc/MainMenu.xrc:384
+#: xrc/MainMenu.xrc:380
 msgid "&Transparent on-screen display"
 msgstr ""
 
-#: xrc/MainMenu.xrc:389
+#: xrc/MainMenu.xrc:385
 msgid "&Audio"
 msgstr ""
 
-#: xrc/MainMenu.xrc:394
+#: xrc/MainMenu.xrc:390
 msgid "&Increase volume"
 msgstr ""
 
-#: xrc/MainMenu.xrc:398
+#: xrc/MainMenu.xrc:394
 msgid "&Decrease volume"
 msgstr ""
 
-#: xrc/MainMenu.xrc:402
+#: xrc/MainMenu.xrc:398
 msgid "&Toggle sound"
 msgstr ""
 
-#: xrc/MainMenu.xrc:407
+#: xrc/MainMenu.xrc:403
 msgid "&GBA sound interpolation"
 msgstr ""
 
-#: xrc/MainMenu.xrc:412
+#: xrc/MainMenu.xrc:408
 msgid "&GB sound enhancement"
 msgstr ""
 
-#: xrc/MainMenu.xrc:416
+#: xrc/MainMenu.xrc:412
 msgid "&GB surround sound effect"
 msgstr ""
 
-#: xrc/MainMenu.xrc:420
+#: xrc/MainMenu.xrc:416
 msgid "&GB sound declicking"
 msgstr ""
 
-#: xrc/MainMenu.xrc:425
+#: xrc/MainMenu.xrc:421
 msgid "&Input"
 msgstr ""
 
-#: xrc/MainMenu.xrc:430
+#: xrc/MainMenu.xrc:426
 msgid "Allow &keyboard background input"
 msgstr ""
 
-#: xrc/MainMenu.xrc:434
+#: xrc/MainMenu.xrc:430
 msgid "Allow &joystick background input"
 msgstr ""
 
-#: xrc/MainMenu.xrc:439
+#: xrc/MainMenu.xrc:435
 msgid "&Autofire"
 msgstr ""
 
-#: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
+#: xrc/MainMenu.xrc:437 xrc/MainMenu.xrc:472
 msgid "&A"
 msgstr ""
 
-#: xrc/MainMenu.xrc:445 xrc/MainMenu.xrc:480
+#: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
 msgid "&B"
 msgstr ""
 
-#: xrc/MainMenu.xrc:449 xrc/MainMenu.xrc:484
+#: xrc/MainMenu.xrc:445 xrc/MainMenu.xrc:480
 msgid "&L"
 msgstr ""
 
-#: xrc/MainMenu.xrc:453 xrc/MainMenu.xrc:488
+#: xrc/MainMenu.xrc:449 xrc/MainMenu.xrc:484
 msgid "&R"
 msgstr ""
 
-#: xrc/MainMenu.xrc:458
+#: xrc/MainMenu.xrc:454
 msgid "&Autohold"
 msgstr ""
 
-#: xrc/MainMenu.xrc:502
+#: xrc/MainMenu.xrc:498
 msgid "&Game Boy Advance"
 msgstr ""
 
-#: xrc/MainMenu.xrc:504 xrc/MainMenu.xrc:527
+#: xrc/MainMenu.xrc:500 xrc/MainMenu.xrc:523
 msgid "Configure ..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:508
+#: xrc/MainMenu.xrc:504
 msgid "&Real-time clock"
 msgstr ""
 
-#: xrc/MainMenu.xrc:512
+#: xrc/MainMenu.xrc:508
 msgid "&Use BIOS file"
 msgstr ""
 
-#: xrc/MainMenu.xrc:516
+#: xrc/MainMenu.xrc:512
 msgid "&Debug print"
 msgstr ""
 
-#: xrc/MainMenu.xrc:520 xrc/MainMenu.xrc:535
+#: xrc/MainMenu.xrc:516 xrc/MainMenu.xrc:531
 msgid "&LCD Filter"
 msgstr ""
 
-#: xrc/MainMenu.xrc:531
+#: xrc/MainMenu.xrc:527
 msgid "&GB color option"
 msgstr ""
 
-#: xrc/MainMenu.xrc:539
+#: xrc/MainMenu.xrc:535
 msgid "&GB Colorizer Hack (requires restart)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:543
+#: xrc/MainMenu.xrc:539
 msgid "&GB printer"
 msgstr ""
 
-#: xrc/MainMenu.xrc:547
+#: xrc/MainMenu.xrc:543
 msgid "&Gather a full page before printing"
 msgstr ""
 
-#: xrc/MainMenu.xrc:551
+#: xrc/MainMenu.xrc:547
 msgid "&Save printouts as screen captures"
 msgstr ""
 
-#: xrc/MainMenu.xrc:556
+#: xrc/MainMenu.xrc:552
 msgid "&Use GB BIOS file (requires restart)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:560
+#: xrc/MainMenu.xrc:556
 msgid "&Use GBC BIOS file"
 msgstr ""
 
-#: xrc/MainMenu.xrc:565
+#: xrc/MainMenu.xrc:561
 msgid "&General ..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:568
+#: xrc/MainMenu.xrc:564
 msgid "&Speedup / Turbo ..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:571
+#: xrc/MainMenu.xrc:567
 msgid "D&irectories ..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:574
+#: xrc/MainMenu.xrc:570
 msgid "&Key Shortcuts ..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:577
+#: xrc/MainMenu.xrc:573
 msgid "&UI Settings ..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:581
+#: xrc/MainMenu.xrc:577
 msgid "&Tools"
 msgstr ""
 
-#: xrc/MainMenu.xrc:583
+#: xrc/MainMenu.xrc:579
 msgid "&Cheats"
 msgstr ""
 
-#: xrc/MainMenu.xrc:585
+#: xrc/MainMenu.xrc:581
 msgid "List &cheats ..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:588
+#: xrc/MainMenu.xrc:584
 msgid "Find c&heat ..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:592
+#: xrc/MainMenu.xrc:588
 msgid "A&utomatically save/load cheats"
 msgstr ""
 
-#: xrc/MainMenu.xrc:596
+#: xrc/MainMenu.xrc:592
 msgid "&Enable cheats"
 msgstr ""
 
-#: xrc/MainMenu.xrc:603
+#: xrc/MainMenu.xrc:599
 msgid "&Break into GDB"
 msgstr ""
 
-#: xrc/MainMenu.xrc:607
+#: xrc/MainMenu.xrc:603
 msgid "&Configure port..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:610
+#: xrc/MainMenu.xrc:606
 msgid "&Break on load"
 msgstr ""
 
-#: xrc/MainMenu.xrc:615
+#: xrc/MainMenu.xrc:611
 msgid "&Disconnect"
 msgstr ""
 
-#: xrc/MainMenu.xrc:617
+#: xrc/MainMenu.xrc:613
 msgid "&GDB"
 msgstr ""
 
-#: xrc/MainMenu.xrc:620
+#: xrc/MainMenu.xrc:616
 msgid "&Disassemble..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:623
+#: xrc/MainMenu.xrc:619
 msgid "&Logging..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:626
+#: xrc/MainMenu.xrc:622
 msgid "&IO Viewer..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:629
+#: xrc/MainMenu.xrc:625
 msgid "&Map Viewer..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:632
+#: xrc/MainMenu.xrc:628
 msgid "M&emory Viewer..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:635
+#: xrc/MainMenu.xrc:631
 msgid "&OAM Viewer..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:638
+#: xrc/MainMenu.xrc:634
 msgid "&Palette Viewer..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:641
+#: xrc/MainMenu.xrc:637
 msgid "&Tile Viewer..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:646
+#: xrc/MainMenu.xrc:642
 msgid "Show all video layers"
 msgstr ""
 
-#: xrc/MainMenu.xrc:650
+#: xrc/MainMenu.xrc:646
 msgid "BG &0"
 msgstr ""
 
-#: xrc/MainMenu.xrc:655
+#: xrc/MainMenu.xrc:651
 msgid "BG &1"
 msgstr ""
 
-#: xrc/MainMenu.xrc:660
+#: xrc/MainMenu.xrc:656
 msgid "BG &2"
 msgstr ""
 
-#: xrc/MainMenu.xrc:665
+#: xrc/MainMenu.xrc:661
 msgid "BG &3"
 msgstr ""
 
-#: xrc/MainMenu.xrc:670
+#: xrc/MainMenu.xrc:666
 msgid "&OBJ"
 msgstr ""
 
-#: xrc/MainMenu.xrc:675
+#: xrc/MainMenu.xrc:671
 msgid "&WIN 0"
 msgstr ""
 
-#: xrc/MainMenu.xrc:680
+#: xrc/MainMenu.xrc:676
 msgid "W&IN 1"
 msgstr ""
 
-#: xrc/MainMenu.xrc:685
+#: xrc/MainMenu.xrc:681
 msgid "O&BJ WIN"
 msgstr ""
 
-#: xrc/MainMenu.xrc:689
+#: xrc/MainMenu.xrc:685
 msgid "&View Layers"
 msgstr ""
 
-#: xrc/MainMenu.xrc:693
+#: xrc/MainMenu.xrc:689
 msgid "Channel &1"
 msgstr ""
 
-#: xrc/MainMenu.xrc:698
+#: xrc/MainMenu.xrc:694
 msgid "Channel &2"
 msgstr ""
 
-#: xrc/MainMenu.xrc:703
+#: xrc/MainMenu.xrc:699
 msgid "Channel &3"
 msgstr ""
 
-#: xrc/MainMenu.xrc:708
+#: xrc/MainMenu.xrc:704
 msgid "Channel &4"
 msgstr ""
 
-#: xrc/MainMenu.xrc:713
+#: xrc/MainMenu.xrc:709
 msgid "Direct Sound &A"
 msgstr ""
 
-#: xrc/MainMenu.xrc:718
+#: xrc/MainMenu.xrc:714
 msgid "Direct Sound &B"
 msgstr ""
 
-#: xrc/MainMenu.xrc:722
+#: xrc/MainMenu.xrc:718
 msgid "&Sound Channels"
 msgstr ""
 
-#: xrc/MainMenu.xrc:726
+#: xrc/MainMenu.xrc:722
 msgid "&Help"
 msgstr ""
 
-#: xrc/MainMenu.xrc:728
+#: xrc/MainMenu.xrc:724
 msgid "Report &Bugs"
 msgstr ""
 
-#: xrc/MainMenu.xrc:731
+#: xrc/MainMenu.xrc:727
 msgid "VBA-M Support &Forum"
 msgstr ""
 
-#: xrc/MainMenu.xrc:734
+#: xrc/MainMenu.xrc:730
 msgid "Translations"
 msgstr ""
 
-#: xrc/MainMenu.xrc:742
+#: xrc/MainMenu.xrc:738
 msgid "Check for updates"
 msgstr ""
 
-#: xrc/MainMenu.xrc:745
+#: xrc/MainMenu.xrc:741
 msgid "&Factory Reset..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:749
+#: xrc/MainMenu.xrc:745
 msgid "&About..."
 msgstr ""
 

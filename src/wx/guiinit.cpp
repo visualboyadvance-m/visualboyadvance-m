@@ -2722,17 +2722,6 @@ bool MainFrame::BindControls()
                 continue;
 	    }
 #endif
-#ifndef MMX
-
-	    if (cmdtab[i].cmd_id == XRCID("MMX"))
-	    {
-		if (mi)
-		    mi->GetMenu()->Remove(mi);
-                cmdtab[i].cmd_id = XRCID("NOOP");
-                cmdtab[i].mi = NULL;
-                continue;
-	    }
-#endif
 #if defined(NO_ONLINEUPDATES)
 	    if (cmdtab[i].cmd_id == XRCID("UpdateEmu"))
 	    {
