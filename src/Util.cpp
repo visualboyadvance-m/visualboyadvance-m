@@ -428,11 +428,9 @@ bool utilWriteBMPFile(const char *fileName, int w, int h, uint8_t *pix)
 }
 #endif /* !__LIBRETRO__ */
 
-extern bool cpuIsMultiBoot;
-
 bool utilIsGBAImage(const char *file)
 {
-        cpuIsMultiBoot = false;
+        coreOptions.cpuIsMultiBoot = false;
         if (strlen(file) > 4) {
                 const char *p = strrchr(file, '.');
 
@@ -441,7 +439,7 @@ bool utilIsGBAImage(const char *file)
                             (_stricmp(p, ".bin") == 0) || (_stricmp(p, ".elf") == 0))
                                 return true;
                         if (_stricmp(p, ".mb") == 0) {
-                                cpuIsMultiBoot = true;
+                                coreOptions.cpuIsMultiBoot = true;
                                 return true;
                         }
                 }
@@ -870,7 +868,7 @@ void utilGBAFindSave(const int size)
         }
         rtcEnable(rtcFound);
         rtcEnableRumble(!rtcFound);
-        saveType = detectedSaveType;
+        coreOptions.saveType = detectedSaveType;
         flashSetSize(flashSize);
 }
 

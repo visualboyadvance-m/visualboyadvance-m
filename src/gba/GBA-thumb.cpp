@@ -2000,7 +2000,7 @@ static insnfunc_t thumbInsnTable[1024] = {
 int thumbExecute()
 {
     do {
-        if (cheatsEnabled) {
+        if (coreOptions.cheatsEnabled) {
             cpuMasterCodeCheck();
         }
 

@@ -99,11 +99,6 @@ char path[2048];
 
 dictionary* preferences;
 
-bool cpuIsMultiBoot = false;
-bool mirroringEnable = true;
-bool parseDebug = true;
-bool speedHack = false;
-bool speedup = false;
 const char* batteryDir;
 const char* biosFileNameGB;
 const char* biosFileNameGBA;
@@ -117,36 +112,23 @@ int autoFireMaxCount = 1;
 int autoFrameSkip = 0;
 int autoPatch;
 int captureFormat = 0;
-int cheatsEnabled = true;
 int colorizerHack = 0;
-int cpuDisableSfx = false;
-int cpuSaveType = 0;
 int disableStatusMessages = 0;
 int filter = kStretch2x;
 int frameSkip = 1;
 int fullScreen;
 int ifbType = kIFBNone;
-int layerEnable = 0xff00;
-int layerSettings = 0xff00;
 int openGL;
 int optFlashSize;
 int optPrintUsage;
 int pauseWhenInactive = 0;
 int preparedCheats = 0;
 int rewindTimer = 0;
-int rtcEnabled;
-int saveType = GBA_SAVE_AUTO;
 int showSpeed;
 int showSpeedTransparent;
-int skipBios = 0;
-int skipSaveGameBattery = true;
-int skipSaveGameCheats = false;
-int useBios = 0;
-int winGbPrinterEnabled;
 uint32_t throttle = 100;
 uint32_t speedup_throttle = 100;
 uint32_t speedup_frame_skip = 9;
-bool speedup_throttle_frame_skip = false;
 bool allowKeyboardBackgroundInput = false;
 bool allowJoystickBackgroundInput = true;
 
@@ -179,14 +161,14 @@ struct option argOptions[] = {
 	{ "border-on", no_argument, &gbBorderOn, 1 },
 	{ "capture-format", required_argument, 0, OPT_CAPTURE_FORMAT },
 	{ "cheat", required_argument, 0, OPT_CHEAT },
-	{ "cheats-enabled", no_argument, &cheatsEnabled, 1 },
+	{ "cheats-enabled", no_argument, &coreOptions.cheatsEnabled, 1 },
 	{ "color-option", no_argument, &gbColorOption, 1 },
 	{ "colorizer-hack", no_argument, &colorizerHack, 1 },
 	{ "config", required_argument, 0, 'c' },
-	{ "cpu-disable-sfx", no_argument, &cpuDisableSfx, 1 },
+	{ "cpu-disable-sfx", no_argument, &coreOptions.cpuDisableSfx, 1 },
 	{ "cpu-save-type", required_argument, 0, OPT_CPU_SAVE_TYPE },
 	{ "debug", no_argument, 0, 'd' },
-	{ "disable-sfx", no_argument, &cpuDisableSfx, 1 },
+	{ "disable-sfx", no_argument, &coreOptions.cpuDisableSfx, 1 },
 	{ "disable-status-messages", no_argument, &disableStatusMessages, 1 },
 	{ "dotcode-file-name-load", required_argument, 0, OPT_DOTCODE_FILE_NAME_LOAD },
 	{ "dotcode-file-name-save", required_argument, 0, OPT_DOTCODE_FILE_NAME_SAVE },
@@ -202,7 +184,7 @@ struct option argOptions[] = {
 	{ "gb-emulator-type", required_argument, 0, OPT_GB_EMULATOR_TYPE },
 	{ "gb-frame-skip", required_argument, 0, OPT_GB_FRAME_SKIP },
 	{ "gb-palette-option", required_argument, 0, OPT_GB_PALETTE_OPTION },
-	{ "gb-printer", no_argument, &winGbPrinterEnabled, 1 },
+	{ "gb-printer", no_argument, &coreOptions.winGbPrinterEnabled, 1 },
 	{ "gdb", required_argument, 0, 'G' },
 	{ "help", no_argument, &optPrintUsage, 1 },
 	{ "ifb-filter", required_argument, 0, 'I' },
@@ -213,7 +195,7 @@ struct option argOptions[] = {
 	{ "no-opengl", no_argument, &openGL, 0 },
 	{ "no-patch", no_argument, &autoPatch, 0 },
 	{ "no-pause-when-inactive", no_argument, &pauseWhenInactive, 0 },
-	{ "no-rtc", no_argument, &rtcEnabled, 0 },
+	{ "no-rtc", no_argument, &coreOptions.rtcEnabled, 0 },
 	{ "no-show-speed", no_argument, &showSpeed, 0 },
 	{ "opengl", required_argument, 0, 'O' },
 	{ "opengl-bilinear", no_argument, &openGL, 2 },
@@ -223,32 +205,32 @@ struct option argOptions[] = {
 	{ "pause-when-inactive", no_argument, &pauseWhenInactive, 1 },
 	{ "profile", optional_argument, 0, 'p' },
 	{ "rewind-timer", required_argument, 0, OPT_REWIND_TIMER },
-	{ "rtc", no_argument, &rtcEnabled, 1 },
+	{ "rtc", no_argument, &coreOptions.rtcEnabled, 1 },
 	{ "rtc-enabled", required_argument, 0, OPT_RTC_ENABLED },
-	{ "save-auto", no_argument, &cpuSaveType, 0 },
+	{ "save-auto", no_argument, &coreOptions.cpuSaveType, 0 },
 	{ "save-dir", required_argument, 0, OPT_SAVE_DIR },
-	{ "save-eeprom", no_argument, &cpuSaveType, 1 },
-	{ "save-flash", no_argument, &cpuSaveType, 3 },
-	{ "save-none", no_argument, &cpuSaveType, 5 },
-	{ "save-sensor", no_argument, &cpuSaveType, 4 },
-	{ "save-sram", no_argument, &cpuSaveType, 2 },
+	{ "save-eeprom", no_argument, &coreOptions.cpuSaveType, 1 },
+	{ "save-flash", no_argument, &coreOptions.cpuSaveType, 3 },
+	{ "save-none", no_argument, &coreOptions.cpuSaveType, 5 },
+	{ "save-sensor", no_argument, &coreOptions.cpuSaveType, 4 },
+	{ "save-sram", no_argument, &coreOptions.cpuSaveType, 2 },
 	{ "save-type", required_argument, 0, 't' },
 	{ "screen-shot-dir", required_argument, 0, OPT_SCREEN_SHOT_DIR },
 	{ "show-speed", required_argument, 0, OPT_SHOW_SPEED },
 	{ "show-speed-detailed", no_argument, &showSpeed, 2 },
 	{ "show-speed-normal", no_argument, &showSpeed, 1 },
 	{ "show-speed-transparent", required_argument, 0, OPT_SHOW_SPEED_TRANSPARENT },
-	{ "skip-bios", no_argument, &skipBios, 1 },
-	{ "skip-save-game-battery", no_argument, &skipSaveGameBattery, 1 },
-	{ "skip-save-game-cheats", no_argument, &skipSaveGameCheats, 1 },
+	{ "skip-bios", no_argument, &coreOptions.skipBios, 1 },
+	{ "skip-save-game-battery", no_argument, &coreOptions.skipSaveGameBattery, 1 },
+	{ "skip-save-game-cheats", no_argument, &coreOptions.skipSaveGameCheats, 1 },
 	{ "sound-filtering", required_argument, 0, OPT_SOUND_FILTERING },
 	{ "throttle", required_argument, 0, 'T' },
 	{ "speedup-throttle", required_argument, 0, OPT_SPEEDUP_THROTTLE },
 	{ "speedup-frame-skip", required_argument, 0, OPT_SPEEDUP_FRAME_SKIP },
 	{ "no-speedup-throttle-frame-skip", no_argument, 0, OPT_NO_SPEEDUP_THROTTLE_FRAME_SKIP },
-	{ "use-bios", no_argument, &useBios, 1 },
+	{ "use-bios", no_argument, &coreOptions.useBios, 1 },
 	{ "verbose", required_argument, 0, 'v' },
-	{ "win-gb-printer-enabled", no_argument, &winGbPrinterEnabled, 1 },
+	{ "win-gb-printer-enabled", no_argument, &coreOptions.winGbPrinterEnabled, 1 },
 
 
 	{ NULL, no_argument, NULL, 0 }
@@ -295,8 +277,8 @@ void ValidateConfig()
 	if (filter < kStretch1x || filter >= kInvalidFilter)
 		filter = kStretch2x;
 
-	if (cpuSaveType < 0 || cpuSaveType > 5)
-		cpuSaveType = 0;
+	if (coreOptions.cpuSaveType < 0 || coreOptions.cpuSaveType > 5)
+		coreOptions.cpuSaveType = 0;
 	if (optFlashSize != 0 && optFlashSize != 1)
 		optFlashSize = 0;
 	if (ifbType < kIFBNone || ifbType >= kInvalidIFBFilter)
@@ -322,10 +304,10 @@ void LoadConfig()
 	biosFileNameGBA = ReadPrefString("biosFileGBA");
 	biosFileNameGBC = ReadPrefString("biosFileGBC");
 	captureFormat = ReadPref("captureFormat", 0);
-	cheatsEnabled = ReadPref("cheatsEnabled", 0);
+	coreOptions.cheatsEnabled = ReadPref("cheatsEnabled", 0);
 	colorizerHack = ReadPref("colorizerHack", 0);
-	cpuDisableSfx = ReadPref("disableSfx", 0);
-	cpuSaveType = ReadPrefHex("saveType");
+	coreOptions.cpuDisableSfx = ReadPref("disableSfx", 0);
+	coreOptions.cpuSaveType = ReadPrefHex("saveType");
 	disableStatusMessages = ReadPrefHex("disableStatus");
 	filter = ReadPref("filter", 0);
 	frameSkip = ReadPref("frameSkip", 0);
@@ -347,23 +329,23 @@ void LoadConfig()
 	optFlashSize = ReadPref("flashSize", 0);
 	pauseWhenInactive = ReadPref("pauseWhenInactive", 1);
 	rewindTimer = ReadPref("rewindTimer", 0);
-	rtcEnabled = ReadPref("rtcEnabled", 0);
+	coreOptions.rtcEnabled = ReadPref("rtcEnabled", 0);
 	saveDir = ReadPrefString("saveDir");
 	saveDotCodeFile = ReadPrefString("saveDotCodeFile");
 	screenShotDir = ReadPrefString("screenShotDir");
 	showSpeed = ReadPref("showSpeed", 0);
 	showSpeedTransparent = ReadPref("showSpeedTransparent", 1);
-	skipBios = ReadPref("skipBios", 0);
-	skipSaveGameBattery = ReadPref("skipSaveGameBattery", 1);
-	skipSaveGameCheats = ReadPref("skipSaveGameCheats", 0);
+	coreOptions.skipBios = ReadPref("skipBios", 0);
+	coreOptions.skipSaveGameBattery = ReadPref("skipSaveGameBattery", 1);
+	coreOptions.skipSaveGameCheats = ReadPref("skipSaveGameCheats", 0);
 	soundFiltering = (float)ReadPref("gbaSoundFiltering", 50) / 100.0f;
 	soundInterpolation = ReadPref("gbaSoundInterpolation", 1);
 	throttle = ReadPref("throttle", 100);
 	speedup_throttle = ReadPref("speedupThrottle", 100);
 	speedup_frame_skip = ReadPref("speedupFrameSkip", 9);
-	speedup_throttle_frame_skip = ReadPref("speedupThrottleFrameSkip", 0);
-	useBios = ReadPrefHex("useBiosGBA");
-	winGbPrinterEnabled = ReadPref("gbPrinter", 0);
+	coreOptions.speedup_throttle_frame_skip = ReadPref("speedupThrottleFrameSkip", 0);
+	coreOptions.useBios = ReadPrefHex("useBiosGBA");
+	coreOptions.winGbPrinterEnabled = ReadPref("gbPrinter", 0);
 
 	int soundQuality = (ReadPrefHex("soundQuality", 1));
 	switch (soundQuality) {
@@ -400,7 +382,7 @@ void LoadConfig()
 	else
 		flashSetSize(0x20000);
 
-	rtcEnable(rtcEnabled ? true : false);
+	rtcEnable(coreOptions.rtcEnabled ? true : false);
 	agbPrintEnable(agbPrint ? true : false);
 
 	for (int i = 0; i < 24;) {
@@ -677,7 +659,7 @@ int ReadOpts(int argc, char ** argv)
 				autoFireMaxCount = 1;
 			break;
 		case 'b':
-			useBios = true;
+			coreOptions.useBios = true;
 			if (optarg == NULL) {
 				log("Missing BIOS file name\n");
 				break;
@@ -752,7 +734,7 @@ int ReadOpts(int argc, char ** argv)
 			break;
 #endif
 		case 'N':
-			parseDebug = false;
+			coreOptions.parseDebug = false;
 			break;
 		case 'F':
 			fullScreen = 1;
@@ -809,7 +791,7 @@ int ReadOpts(int argc, char ** argv)
 				int a = atoi(optarg);
 				if (a < 0 || a > 5)
 					a = 0;
-				cpuSaveType = a;
+				coreOptions.cpuSaveType = a;
 			}
 			break;
 		case 'v':
@@ -863,7 +845,7 @@ int ReadOpts(int argc, char ** argv)
 		case OPT_RTC_ENABLED:
 			// --rtc-enabled
 			if (optarg) {
-				rtcEnabled = atoi(optarg);
+				coreOptions.rtcEnabled = atoi(optarg);
 			}
 			break;
 
@@ -949,7 +931,7 @@ int ReadOpts(int argc, char ** argv)
 		case OPT_CPU_SAVE_TYPE:
 			// --cpu-save-type
 			if (optarg) {
-				cpuSaveType = atoi(optarg);
+				coreOptions.cpuSaveType = atoi(optarg);
 			}
 			break;
 
@@ -957,8 +939,8 @@ int ReadOpts(int argc, char ** argv)
 			// --opt-flash-size
 			if (optarg) {
 				optFlashSize = atoi(optarg);
-                                if (optFlashSize < 0 || optFlashSize > 1)
-                                    optFlashSize = 0;
+				if (optFlashSize < 0 || optFlashSize > 1)
+					optFlashSize = 0;
 			}
 			break;
 
@@ -971,17 +953,17 @@ int ReadOpts(int argc, char ** argv)
 			// --dotcode-file-name-save
 			saveDotCodeFile = optarg;
 			break;
-                case OPT_SPEEDUP_THROTTLE:
-                        if (optarg)
-                            speedup_throttle = atoi(optarg);
-                        break;
-                case OPT_SPEEDUP_FRAME_SKIP:
-                        if (optarg)
-                            speedup_frame_skip = atoi(optarg);
-                        break;
-                case OPT_NO_SPEEDUP_THROTTLE_FRAME_SKIP:
-			speedup_throttle_frame_skip = false;
-                        break;
+		case OPT_SPEEDUP_THROTTLE:
+			if (optarg)
+				speedup_throttle = atoi(optarg);
+			break;
+		case OPT_SPEEDUP_FRAME_SKIP:
+			if (optarg)
+				speedup_frame_skip = atoi(optarg);
+			break;
+		case OPT_NO_SPEEDUP_THROTTLE_FRAME_SKIP:
+			coreOptions.speedup_throttle_frame_skip = false;
+			break;
 		}
 	}
 	return op;

@@ -109,6 +109,8 @@ extern void remoteOutput(const char*, uint32_t);
 extern void remoteSetProtocol(int);
 extern void remoteSetPort(int);
 
+struct CoreOptions coreOptions;
+
 struct EmulatedSystem emulator = {
     NULL,
     NULL,
@@ -616,9 +618,9 @@ static void sdlApplyPerImagePreferences()
             } else if (!strcmp(token, "saveType")) {
                 int save = atoi(value);
                 if (save >= 0 && save <= 5)
-                    cpuSaveType = save;
+                    coreOptions.cpuSaveType = save;
             } else if (!strcmp(token, "mirroringEnabled")) {
-                mirroringEnable = (atoi(value) == 0 ? false : true);
+                coreOptions.mirroringEnable = (atoi(value) == 0 ? false : true);
             }
         }
     }
@@ -1110,8 +1112,8 @@ void sdlPollEvents()
                 break;
             case SDLK_e:
                 if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
-                    cheatsEnabled = !cheatsEnabled;
-                    systemConsoleMessage(cheatsEnabled ? "Cheats on" : "Cheats off");
+                    coreOptions.cheatsEnabled = !coreOptions.cheatsEnabled;
+                    systemConsoleMessage(coreOptions.cheatsEnabled ? "Cheats on" : "Cheats off");
                 }
                 break;
 
@@ -1291,8 +1293,8 @@ void sdlPollEvents()
                     }
                 } else if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
                     int mask = 0x0100 << (event.key.keysym.sym - SDLK_1);
-                    layerSettings ^= mask;
-                    layerEnable = DISPCNT & layerSettings;
+                    coreOptions.layerSettings ^= mask;
+                    coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
                     CPUUpdateRenderBuffers(false);
                 }
                 break;
@@ -1302,8 +1304,8 @@ void sdlPollEvents()
             case SDLK_8:
                 if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
                     int mask = 0x0100 << (event.key.keysym.sym - SDLK_1);
-                    layerSettings ^= mask;
-                    layerEnable = DISPCNT & layerSettings;
+                    coreOptions.layerSettings ^= mask;
+                    coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
                 }
                 break;
             case SDLK_n:
@@ -1561,7 +1563,7 @@ int main(int argc, char** argv)
     frameSkip = 2;
     gbBorderOn = 0;
 
-    parseDebug = true;
+    coreOptions.parseDebug = true;
 
     gb_effects_config.stereo = 0.0;
     gb_effects_config.echo = 0.0;
@@ -1718,7 +1720,7 @@ int main(int argc, char** argv)
 
                 // used for the handling of the gb Boot Rom
                 if (gbHardware & 7)
-                    gbCPUInit(biosFileNameGB, useBios);
+                    gbCPUInit(biosFileNameGB, coreOptions.useBios);
 
                 cartridgeType = IMAGE_GB;
                 emulator = GBSystem;
@@ -1738,19 +1740,19 @@ int main(int argc, char** argv)
             int size = CPULoadRom(szFile);
             failed = (size == 0);
             if (!failed) {
-                if (cpuSaveType == 0)
+                if (coreOptions.cpuSaveType == 0)
                     utilGBAFindSave(size);
                 else
-                    saveType = cpuSaveType;
+                    coreOptions.saveType = coreOptions.cpuSaveType;
 
                 sdlApplyPerImagePreferences();
 
-                doMirroring(mirroringEnable);
+                doMirroring(coreOptions.mirroringEnable);
 
                 cartridgeType = 0;
                 emulator = GBASystem;
 
-                CPUInit(biosFileNameGBA, useBios);
+                CPUInit(biosFileNameGBA, coreOptions.useBios);
                 int patchnum;
                 for (patchnum = 0; patchnum < patchNum; patchnum++) {
                     fprintf(stdout, "Trying patch %s%s\n", patchNames[patchnum],
@@ -1780,7 +1782,7 @@ int main(int argc, char** argv)
 
         emulator = GBASystem;
 
-        CPUInit(biosFileNameGBA, useBios);
+        CPUInit(biosFileNameGBA, coreOptions.useBios);
         CPUReset();
     }
 

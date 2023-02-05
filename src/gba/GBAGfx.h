@@ -625,7 +625,7 @@ static inline void gfxDrawSprites(uint32_t* lineOBJ)
     int lineOBJpix = (DISPCNT & 0x20) ? 954 : 1226;
     int m = 0;
     gfxClearArray(lineOBJ);
-    if (layerEnable & 0x1000) {
+    if (coreOptions.layerEnable & 0x1000) {
         uint16_t* sprites = (uint16_t*)oam;
         uint16_t* spritePalette = &((uint16_t*)paletteRAM)[256];
         int mosaicY = ((MOSAIC & 0xF000) >> 12) + 1;
@@ -674,7 +674,7 @@ static inline void gfxDrawSprites(uint32_t* lineOBJ)
             int sx = (a1 & 0x1FF);
 
             // computes ticks used by OBJ-WIN if OBJWIN is enabled
-            if (((a0 & 0x0c00) == 0x0800) && (layerEnable & 0x8000)) {
+            if (((a0 & 0x0c00) == 0x0800) && (coreOptions.layerEnable & 0x8000)) {
                 if ((a0 & 0x0300) == 0x0300) {
                     sizeX <<= 1;
                     sizeY <<= 1;
@@ -1142,7 +1142,7 @@ static inline void gfxDrawSprites(uint32_t* lineOBJ)
 static inline void gfxDrawOBJWin(uint32_t* lineOBJWin)
 {
     gfxClearArray(lineOBJWin);
-    if ((layerEnable & 0x9000) == 0x9000) {
+    if ((coreOptions.layerEnable & 0x9000) == 0x9000) {
         uint16_t* sprites = (uint16_t*)oam;
         // uint16_t *spritePalette = &((uint16_t *)paletteRAM)[256];
         for (int x = 0; x < 128; x++) {

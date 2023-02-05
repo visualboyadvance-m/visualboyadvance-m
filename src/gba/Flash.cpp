@@ -85,16 +85,16 @@ uint8_t flashRead(uint32_t address)
 
 void flashSaveDecide(uint32_t address, uint8_t byte)
 {
-    if (saveType == GBA_SAVE_EEPROM)
+    if (coreOptions.saveType == GBA_SAVE_EEPROM)
         return;
 
     if (cpuSramEnabled && cpuFlashEnabled) {
         if (address == 0x0e005555) {
-            saveType = GBA_SAVE_FLASH;
+            coreOptions.saveType = GBA_SAVE_FLASH;
             cpuSramEnabled = false;
             cpuSaveGameFunc = flashWrite;
         } else {
-            saveType = GBA_SAVE_SRAM;
+            coreOptions.saveType = GBA_SAVE_SRAM;
             cpuFlashEnabled = false;
             cpuSaveGameFunc = sramWrite;
         }
@@ -108,7 +108,7 @@ void flashSaveDecide(uint32_t address, uint8_t byte)
 
 void flashDelayedWrite(uint32_t address, uint8_t byte)
 {
-    saveType = GBA_SAVE_FLASH;
+    coreOptions.saveType = GBA_SAVE_FLASH;
     cpuSaveGameFunc = flashWrite;
     flashWrite(address, byte);
 }

@@ -87,6 +87,8 @@ int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 int emulating = 0;
 
+struct CoreOptions coreOptions;
+
 #ifdef BKPT_SUPPORT
 void (*dbgOutput)(const char* s, uint32_t addr);
 void (*dbgSignal)(int sig, int number);
@@ -278,9 +280,9 @@ void* retro_get_memory_data(unsigned id)
     case IMAGE_GBA:
         switch (id) {
         case RETRO_MEMORY_SAVE_RAM:
-            if ((saveType == GBA_SAVE_EEPROM) | (saveType == GBA_SAVE_EEPROM_SENSOR))
+            if ((coreOptions.saveType == GBA_SAVE_EEPROM) | (coreOptions.saveType == GBA_SAVE_EEPROM_SENSOR))
                 data =  eepromData;
-            else if ((saveType == GBA_SAVE_SRAM) | (saveType == GBA_SAVE_FLASH))
+            else if ((coreOptions.saveType == GBA_SAVE_SRAM) | (coreOptions.saveType == GBA_SAVE_FLASH))
                 data = flashSaveMemory;
             break;
         case RETRO_MEMORY_SYSTEM_RAM:
@@ -324,11 +326,11 @@ size_t retro_get_memory_size(unsigned id)
     case IMAGE_GBA:
         switch (id) {
         case RETRO_MEMORY_SAVE_RAM:
-            if ((saveType == GBA_SAVE_EEPROM) | (saveType == GBA_SAVE_EEPROM_SENSOR))
+            if ((coreOptions.saveType == GBA_SAVE_EEPROM) | (coreOptions.saveType == GBA_SAVE_EEPROM_SENSOR))
                 size = eepromSize;
-            else if (saveType == GBA_SAVE_FLASH)
+            else if (coreOptions.saveType == GBA_SAVE_FLASH)
                 size = flashSize;
-            else if (saveType == GBA_SAVE_SRAM)
+            else if (coreOptions.saveType == GBA_SAVE_SRAM)
                 size = SIZE_SRAM;
             break;
         case RETRO_MEMORY_SYSTEM_RAM:
@@ -551,18 +553,25 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
 
 void retro_init(void)
 {
-   struct retro_log_callback log;
-   struct retro_rumble_interface rumble;
+    // The libretro core uses a few different defaults.
+    coreOptions.mirroringEnable = false;
+    coreOptions.parseDebug = true;
+    coreOptions.cheatsEnabled = 0;
+    coreOptions.skipSaveGameBattery = 0;
+    coreOptions.winGbPrinterEnabled = 0;
 
-   environ_cb(RETRO_ENVIRONMENT_GET_CAN_DUPE, &can_dupe);
-   if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
-      log_cb = log.log;
-   else
-      log_cb = NULL;
+    struct retro_log_callback log;
+    struct retro_rumble_interface rumble;
 
-   const char* dir = NULL;
-   if (environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &dir) && dir)
-       snprintf(retro_system_directory, sizeof(retro_system_directory), "%s", dir);
+    environ_cb(RETRO_ENVIRONMENT_GET_CAN_DUPE, &can_dupe);
+    if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
+       log_cb = log.log;
+    else
+       log_cb = NULL;
+
+    const char* dir = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &dir) && dir)
+        snprintf(retro_system_directory, sizeof(retro_system_directory), "%s", dir);
 
 #ifdef FRONTEND_SUPPORTS_RGB565
     systemColorDepth = 16;
@@ -723,7 +732,7 @@ typedef struct {
     int saveType;  // 0auto 1eeprom 2sram 3flash 4sensor+eeprom 5none
     int rtcEnabled;
     int mirroringEnabled;
-    int useBios;
+    int useBios; // unused?
 } ini_t;
 
 static const ini_t gbaover[512] = {
@@ -749,11 +758,11 @@ static void load_image_preferences(void)
     unsigned i = 0, found_no = 0;
     unsigned long romCrc32 = crc32(0, rom, romSize);
 
-    cpuSaveType = GBA_SAVE_AUTO;
+    coreOptions.cpuSaveType = GBA_SAVE_AUTO;
     flashSize = SIZE_FLASH512;
     eepromSize = SIZE_EEPROM_512;
-    rtcEnabled = false;
-    mirroringEnable = false;
+    coreOptions.rtcEnabled = false;
+    coreOptions.mirroringEnable = false;
 
     log("File CRC32      : 0x%08X\n", romCrc32);
 
@@ -785,50 +794,50 @@ static void load_image_preferences(void)
     if (found) {
         log("Name            : %s\n", gbaover[found_no].romtitle);
 
-        rtcEnabled = gbaover[found_no].rtcEnabled;
-        cpuSaveType = gbaover[found_no].saveType;
+        coreOptions.rtcEnabled = gbaover[found_no].rtcEnabled;
+        coreOptions.cpuSaveType = gbaover[found_no].saveType;
 
         unsigned size = gbaover[found_no].saveSize;
-        if (cpuSaveType == GBA_SAVE_SRAM)
+        if (coreOptions.cpuSaveType == GBA_SAVE_SRAM)
             flashSize = SIZE_SRAM;
-        else if (cpuSaveType == GBA_SAVE_FLASH)
+        else if (coreOptions.cpuSaveType == GBA_SAVE_FLASH)
             flashSize = (size == SIZE_FLASH1M) ? SIZE_FLASH1M : SIZE_FLASH512;
-        else if ((cpuSaveType == GBA_SAVE_EEPROM) || (cpuSaveType == GBA_SAVE_EEPROM_SENSOR))
+        else if ((coreOptions.cpuSaveType == GBA_SAVE_EEPROM) || (coreOptions.cpuSaveType == GBA_SAVE_EEPROM_SENSOR))
             eepromSize = (size == SIZE_EEPROM_8K) ? SIZE_EEPROM_8K : SIZE_EEPROM_512;
     }
 
     // gameID that starts with 'F' are classic/famicom games
-    mirroringEnable = (buffer[0] == 'F') ? true : false;
+    coreOptions.mirroringEnable = (buffer[0] == 'F') ? true : false;
 
-    if (!cpuSaveType)
+    if (!coreOptions.cpuSaveType)
         utilGBAFindSave(romSize);
 
-    saveType = cpuSaveType;
+    coreOptions.saveType = coreOptions.cpuSaveType;
 
     if (flashSize == SIZE_FLASH512 || flashSize == SIZE_FLASH1M)
         flashSetSize(flashSize);
 
     if (option_forceRTCenable)
-        rtcEnabled = true;
+        coreOptions.rtcEnabled = true;
 
-    rtcEnable(rtcEnabled);
+    rtcEnable(coreOptions.rtcEnabled);
 
     // game code starting with 'R' or 'V' has rumble support
     if ((buffer[0] == 'R') || (buffer[0] == 'V'))
         hasRumble = true;
 
-    rtcEnableRumble(!rtcEnabled && hasRumble);
+    rtcEnableRumble(!coreOptions.rtcEnabled && hasRumble);
 
-    doMirroring(mirroringEnable);
+    doMirroring(coreOptions.mirroringEnable);
 
     log("romSize         : %dKB\n", (romSize + 1023) / 1024);
-    log("has RTC         : %s.\n", rtcEnabled ? "Yes" : "No");
-    log("cpuSaveType     : %s.\n", savetype[cpuSaveType]);
-    if (cpuSaveType == 3)
+    log("has RTC         : %s.\n", coreOptions.rtcEnabled ? "Yes" : "No");
+    log("cpuSaveType     : %s.\n", savetype[coreOptions.cpuSaveType]);
+    if (coreOptions.cpuSaveType == 3)
         log("flashSize       : %d.\n", flashSize);
-    else if (cpuSaveType == 1)
+    else if (coreOptions.cpuSaveType == 1)
         log("eepromSize      : %d.\n", eepromSize);
-    log("mirroringEnable : %s.\n", mirroringEnable ? "Yes" : "No");
+    log("mirroringEnable : %s.\n", coreOptions.mirroringEnable ? "Yes" : "No");
 }
 
 #ifdef _WIN32
@@ -987,8 +996,8 @@ static void update_variables(bool startup)
             disabled_layers |= 0x100 << i;
     }
 
-    layerSettings = 0xFF00 ^ disabled_layers;
-    layerEnable = DISPCNT & layerSettings;
+    coreOptions.layerSettings = 0xFF00 ^ disabled_layers;
+    coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
     CPUUpdateRenderBuffers(false);
 
     strcpy(key, "vbam_sound_x");
@@ -1451,7 +1460,7 @@ bool retro_unserialize(const void* data, size_t size)
 
 void retro_cheat_reset(void)
 {
-    cheatsEnabled = 1;
+    coreOptions.cheatsEnabled = 1;
     if (type == IMAGE_GBA)
         cheatsDeleteAll(false);
     else if (type == IMAGE_GB)

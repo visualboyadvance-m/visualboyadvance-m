@@ -26,13 +26,8 @@ extern bool armIrqEnable;
 extern uint32_t armNextPC;
 extern int armMode;
 extern uint32_t stop;
-extern int saveType;
-extern int frameSkip;
 extern bool gba_joybus_enabled;
 extern bool gba_joybus_active;
-extern int layerSettings;
-extern int layerEnable;
-extern int cpuSaveType;
 extern int customBackdropColor;
 
 extern uint8_t* bios;

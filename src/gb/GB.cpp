@@ -1067,7 +1067,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
         EmuReseted = false;
         gbMemory[0xff02] = value;
         if (gbSerialOn && (GetLinkMode() == LINK_GAMEBOY_IPC || GetLinkMode() == LINK_GAMEBOY_SOCKET
-        || GetLinkMode() == LINK_DISCONNECTED || winGbPrinterEnabled)) {
+        || GetLinkMode() == LINK_DISCONNECTED || coreOptions.winGbPrinterEnabled)) {
 
             gbSerialTicks = GBSERIAL_CLOCK_TICKS;
 
@@ -2205,7 +2205,7 @@ void gbCPUInit(const char* biosFileName, bool useBiosFile)
     if (!(gbHardware & 7))
         return;
 
-    useBios = false;
+    coreOptions.useBios = false;
     if (useBiosFile) {
         int expectedSize = (gbHardware & 2) ? 0x900 : 0x100;
         int size = expectedSize;
@@ -2214,7 +2214,7 @@ void gbCPUInit(const char* biosFileName, bool useBiosFile)
                 bios,
                 size)) {
             if (size == expectedSize)
-                useBios = true;
+                coreOptions.useBios = true;
             else
                 systemMessage(MSG_INVALID_BIOS_FILE_SIZE, N_("Invalid BOOTROM file size"));
         }
@@ -2565,7 +2565,7 @@ void gbReset()
     }
 
     // used for the handling of the gb Boot Rom
-    if ((gbHardware & 7) && (bios != NULL) && useBios && !skipBios) {
+    if ((gbHardware & 7) && (bios != NULL) && coreOptions.useBios && !coreOptions.skipBios) {
         if (gbHardware & 5) {
             memcpy((uint8_t*)(gbMemory), (uint8_t*)(gbRom), 0x1000);
             memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), 0x100);
@@ -3632,7 +3632,7 @@ static bool gbWriteSaveState(gzFile gzFile)
 
     utilGzWrite(gzFile, &gbRom[0x134], 15);
 
-    utilWriteInt(gzFile, useBios);
+    utilWriteInt(gzFile, coreOptions.useBios);
     utilWriteInt(gzFile, inBios);
 
     utilWriteData(gzFile, gbSaveGameStruct);
@@ -3749,8 +3749,8 @@ static bool gbReadSaveState(gzFile gzFile)
         ub = utilReadInt(gzFile) ? true : false;
         ib = utilReadInt(gzFile) ? true : false;
 
-        if ((ub != useBios) && (ib)) {
-            if (useBios)
+        if ((ub != coreOptions.useBios) && (ib)) {
+            if (coreOptions.useBios)
                 systemMessage(MSG_SAVE_GAME_NOT_USING_BIOS,
                     N_("Save game is not using the BIOS files"));
             else
@@ -3806,7 +3806,7 @@ static bool gbReadSaveState(gzFile gzFile)
     if (version >= 11) {
         utilGzRead(gzFile, &gbDataTAMA5, sizeof(gbDataTAMA5));
         if (gbTAMA5ram != NULL) {
-            if (skipSaveGameBattery) {
+            if (coreOptions.skipSaveGameBattery) {
                 utilGzSeek(gzFile, gbTAMA5ramSize, SEEK_CUR);
             } else {
                 utilGzRead(gzFile, gbTAMA5ram, gbTAMA5ramSize);
@@ -3839,14 +3839,14 @@ static bool gbReadSaveState(gzFile gzFile)
 
     if (gbRamSize && gbRam) {
         if (version < 11)
-            if (skipSaveGameBattery) {
+            if (coreOptions.skipSaveGameBattery) {
                 utilGzSeek(gzFile, gbRamSize, SEEK_CUR); //skip
             } else {
                 utilGzRead(gzFile, gbRam, gbRamSize); //read
             }
         else {
             int ramSize = utilReadInt(gzFile);
-            if (skipSaveGameBattery) {
+            if (coreOptions.skipSaveGameBattery) {
                 utilGzSeek(gzFile, (gbRamSize > ramSize) ? ramSize : gbRamSize, SEEK_CUR); //skip
             } else {
                 utilGzRead(gzFile, gbRam, (gbRamSize > ramSize) ? ramSize : gbRamSize); //read
@@ -3978,7 +3978,7 @@ static bool gbReadSaveState(gzFile gzFile)
     systemDrawScreen();
 
     if (version > GBSAVE_GAME_VERSION_1) {
-        if (skipSaveGameCheats) {
+        if (coreOptions.skipSaveGameCheats) {
             gbCheatsReadGameSkip(gzFile, version);
         } else {
             gbCheatsReadGame(gzFile, version);
@@ -4967,7 +4967,7 @@ void gbEmulate(int ticksToStop)
                                 speedup_throttle_set = true;
                             }
 
-                            if (speedup_throttle_frame_skip)
+                            if (coreOptions.speedup_throttle_frame_skip)
                                 framesToSkip += std::ceil(double(speedup_throttle) / 100.0) - 1;
                         }
                     }
@@ -5036,10 +5036,10 @@ void gbEmulate(int ticksToStop)
 
                             newmask = (gbJoymask[0] >> 10);
 
-                            speedup = false;
+                            coreOptions.speedup = false;
 
                             if (newmask & 1 && !speedup_throttle_set)
-                                speedup = true;
+                                coreOptions.speedup = true;
 
                             gbCapture = (newmask & 2) ? true : false;
 
@@ -5201,7 +5201,7 @@ void gbEmulate(int ticksToStop)
                         gbDrawLine();
                     } else if ((register_LY == 144) && (!systemFrameSkip)) {
                         int framesToSkip = systemFrameSkip;
-                        //if (speedup)
+                        //if (coreOptions.speedup)
                         //    framesToSkip = 9; // try 6 FPS during speedup
                         if ((gbFrameSkipCount >= framesToSkip) || (gbWhiteScreen == 1)) {
                             gbWhiteScreen = 2;
@@ -5529,7 +5529,7 @@ unsigned int gbWriteSaveState(uint8_t* data)
 
     utilWriteMem(data, &gbRom[0x134], 15);
 
-    utilWriteIntMem(data, useBios);
+    utilWriteIntMem(data, coreOptions.useBios);
     utilWriteIntMem(data, inBios);
 
     utilWriteDataMem(data, gbSaveGameStruct);
@@ -5616,8 +5616,8 @@ bool gbReadSaveState(const uint8_t* data)
     ub = utilReadIntMem(data) ? true : false;
     ib = utilReadIntMem(data) ? true : false;
 
-    if ((ub != useBios) && (ib)) {
-        if (useBios)
+    if ((ub != coreOptions.useBios) && (ib)) {
+        if (coreOptions.useBios)
             systemMessage(MSG_SAVE_GAME_NOT_USING_BIOS,
                 N_("Save game is not using the BIOS files"));
         else

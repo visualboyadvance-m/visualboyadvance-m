@@ -85,7 +85,7 @@ uint8_t freezeOAM[SIZE_OAM];
 bool debugger_last;
 #endif
 
-int lcdTicks = (useBios && !skipBios) ? 1008 : 208;
+int lcdTicks = (coreOptions.useBios && !coreOptions.skipBios) ? 1008 : 208;
 uint8_t timerOnOffDelay = 0;
 uint16_t timer0Value = 0;
 bool timer0On = false;
@@ -454,7 +454,7 @@ variable_desc saveGameStruct[] = {
     { &armIrqEnable, sizeof(bool) },
     { &armNextPC, sizeof(uint32_t) },
     { &armMode, sizeof(int) },
-    { &saveType, sizeof(int) },
+    { &coreOptions.saveType, sizeof(int) },
     { NULL, 0 }
 };
 
@@ -579,16 +579,16 @@ extern uint32_t line3[240];
 
 void CPUUpdateRenderBuffers(bool force)
 {
-    if (!(layerEnable & 0x0100) || force) {
+    if (!(coreOptions.layerEnable & 0x0100) || force) {
         CLEAR_ARRAY(line0);
     }
-    if (!(layerEnable & 0x0200) || force) {
+    if (!(coreOptions.layerEnable & 0x0200) || force) {
         CLEAR_ARRAY(line1);
     }
-    if (!(layerEnable & 0x0400) || force) {
+    if (!(coreOptions.layerEnable & 0x0400) || force) {
         CLEAR_ARRAY(line2);
     }
-    if (!(layerEnable & 0x0800) || force) {
+    if (!(coreOptions.layerEnable & 0x0800) || force) {
         CLEAR_ARRAY(line3);
     }
 }
@@ -602,7 +602,7 @@ unsigned int CPUWriteState(uint8_t* data)
 
     utilWriteIntMem(data, SAVE_GAME_VERSION);
     utilWriteMem(data, &rom[0xa0], 16);
-    utilWriteIntMem(data, useBios);
+    utilWriteIntMem(data, coreOptions.useBios);
     utilWriteMem(data, &reg[0], sizeof(reg));
 
     utilWriteDataMem(data, saveGameStruct);
@@ -670,7 +670,7 @@ bool CPUReadState(const uint8_t* data)
 
     //// Copypasta stuff ...
     // set pointers!
-    layerEnable = layerSettings & DISPCNT;
+    coreOptions.layerEnable = coreOptions.layerSettings & DISPCNT;
 
     CPUUpdateRender();
 
@@ -684,7 +684,7 @@ bool CPUReadState(const uint8_t* data)
     CPUUpdateWindow0();
     CPUUpdateWindow1();
 
-    SetSaveType(saveType);
+    SetSaveType(coreOptions.saveType);
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
     if (armState) {
@@ -706,7 +706,7 @@ static bool CPUWriteState(gzFile gzFile)
 
     utilGzWrite(gzFile, &rom[0xa0], 16);
 
-    utilWriteInt(gzFile, useBios);
+    utilWriteInt(gzFile, coreOptions.useBios);
 
     utilGzWrite(gzFile, &reg[0], sizeof(reg));
 
@@ -799,8 +799,8 @@ static bool CPUReadState(gzFile gzFile)
 
     bool ub = utilReadInt(gzFile) ? true : false;
 
-    if (ub != useBios) {
-        if (useBios)
+    if (ub != coreOptions.useBios) {
+        if (coreOptions.useBios)
             systemMessage(MSG_SAVE_GAME_NOT_USING_BIOS,
                 N_("Save game is not using the BIOS files"));
         else
@@ -842,7 +842,7 @@ static bool CPUReadState(gzFile gzFile)
         utilGzRead(gzFile, pix, SIZE_PIX);
     utilGzRead(gzFile, ioMem, SIZE_IOMEM);
 
-    if (skipSaveGameBattery) {
+    if (coreOptions.skipSaveGameBattery) {
         // skip eeprom data
         eepromReadGameSkip(gzFile, version);
         // skip flash data
@@ -854,7 +854,7 @@ static bool CPUReadState(gzFile gzFile)
     soundReadGame(gzFile, version);
 
     if (version > SAVE_GAME_VERSION_1) {
-        if (skipSaveGameCheats) {
+        if (coreOptions.skipSaveGameCheats) {
             // skip cheats list data
             cheatsReadGameSkip(gzFile, version);
         } else {
@@ -897,14 +897,14 @@ static bool CPUReadState(gzFile gzFile)
     }
 
     // set pointers!
-    layerEnable = layerSettings & DISPCNT;
+    coreOptions.layerEnable = coreOptions.layerSettings & DISPCNT;
 
     CPUUpdateRender();
     CPUUpdateRenderBuffers(true);
     CPUUpdateWindow0();
     CPUUpdateWindow1();
 
-    SetSaveType(saveType);
+    SetSaveType(coreOptions.saveType);
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
     if (armState) {
@@ -971,7 +971,7 @@ bool CPUExportEepromFile(const char* fileName)
 
 bool CPUWriteBatteryFile(const char* fileName)
 {
-    if ((saveType) && (saveType != GBA_SAVE_NONE)) {
+    if ((coreOptions.saveType) && (coreOptions.saveType != GBA_SAVE_NONE)) {
         FILE* file = utilOpenFile(fileName, "wb");
 
         if (!file) {
@@ -982,12 +982,12 @@ bool CPUWriteBatteryFile(const char* fileName)
 
         // only save if Flash/Sram in use or EEprom in use
         if (!eepromInUse) {
-            if (saveType == GBA_SAVE_FLASH) { // save flash type
+            if (coreOptions.saveType == GBA_SAVE_FLASH) { // save flash type
                 if (fwrite(flashSaveMemory, 1, flashSize, file) != (size_t)flashSize) {
                     fclose(file);
                     return false;
                 }
-            } else if (saveType == GBA_SAVE_SRAM) { // save sram type
+            } else if (coreOptions.saveType == GBA_SAVE_SRAM) { // save sram type
                 if (fwrite(flashSaveMemory, 1, 0x8000, file) != 0x8000) {
                     fclose(file);
                     return false;
@@ -1154,7 +1154,7 @@ bool CPUWriteGSASnapshot(const char* fileName,
     fwrite(buffer, 1, 4, file); // notes length
     fwrite(notes, 1, strlen(notes), file);
     int saveSize = 0x10000;
-    if (saveType == GBA_SAVE_FLASH)
+    if (coreOptions.saveType == GBA_SAVE_FLASH)
         saveSize = flashSize;
     int totalSize = saveSize + 0x1c;
 
@@ -1300,7 +1300,7 @@ bool CPUIsZipFile(const char* file)
 
 bool CPUIsGBAImage(const char* file)
 {
-    cpuIsMultiBoot = false;
+    coreOptions.cpuIsMultiBoot = false;
     if (strlen(file) > 4) {
         const char* p = strrchr(file, '.');
 
@@ -1314,7 +1314,7 @@ bool CPUIsGBAImage(const char* file)
             if (_stricmp(p, ".elf") == 0)
                 return true;
             if (_stricmp(p, ".mb") == 0) {
-                cpuIsMultiBoot = true;
+                coreOptions.cpuIsMultiBoot = true;
                 return true;
             }
         }
@@ -1486,7 +1486,7 @@ int CPULoadRom(const char* szFile)
         return 0;
     }
 
-    uint8_t* whereToLoad = cpuIsMultiBoot ? workRAM : rom;
+    uint8_t* whereToLoad = coreOptions.cpuIsMultiBoot ? workRAM : rom;
 
 #ifndef NO_DEBUGGER
     if (CPUIsELF(szFile)) {
@@ -1612,7 +1612,7 @@ int CPULoadRomData(const char* data, int size)
         return 0;
     }
 
-    uint8_t* whereToLoad = cpuIsMultiBoot ? workRAM : rom;
+    uint8_t* whereToLoad = coreOptions.cpuIsMultiBoot ? workRAM : rom;
 
     romSize = size % 2 == 0 ? size : size + 1;
     memcpy(whereToLoad, data, size);
@@ -1747,49 +1747,49 @@ void CPUUpdateRender()
 {
     switch (DISPCNT & 7) {
     case 0:
-        if ((!fxOn && !windowOn && !(layerEnable & 0x8000)) || cpuDisableSfx)
+        if ((!fxOn && !windowOn && !(coreOptions.layerEnable & 0x8000)) || coreOptions.cpuDisableSfx)
             renderLine = mode0RenderLine;
-        else if (fxOn && !windowOn && !(layerEnable & 0x8000))
+        else if (fxOn && !windowOn && !(coreOptions.layerEnable & 0x8000))
             renderLine = mode0RenderLineNoWindow;
         else
             renderLine = mode0RenderLineAll;
         break;
     case 1:
-        if ((!fxOn && !windowOn && !(layerEnable & 0x8000)) || cpuDisableSfx)
+        if ((!fxOn && !windowOn && !(coreOptions.layerEnable & 0x8000)) || coreOptions.cpuDisableSfx)
             renderLine = mode1RenderLine;
-        else if (fxOn && !windowOn && !(layerEnable & 0x8000))
+        else if (fxOn && !windowOn && !(coreOptions.layerEnable & 0x8000))
             renderLine = mode1RenderLineNoWindow;
         else
             renderLine = mode1RenderLineAll;
         break;
     case 2:
-        if ((!fxOn && !windowOn && !(layerEnable & 0x8000)) || cpuDisableSfx)
+        if ((!fxOn && !windowOn && !(coreOptions.layerEnable & 0x8000)) || coreOptions.cpuDisableSfx)
             renderLine = mode2RenderLine;
-        else if (fxOn && !windowOn && !(layerEnable & 0x8000))
+        else if (fxOn && !windowOn && !(coreOptions.layerEnable & 0x8000))
             renderLine = mode2RenderLineNoWindow;
         else
             renderLine = mode2RenderLineAll;
         break;
     case 3:
-        if ((!fxOn && !windowOn && !(layerEnable & 0x8000)) || cpuDisableSfx)
+        if ((!fxOn && !windowOn && !(coreOptions.layerEnable & 0x8000)) || coreOptions.cpuDisableSfx)
             renderLine = mode3RenderLine;
-        else if (fxOn && !windowOn && !(layerEnable & 0x8000))
+        else if (fxOn && !windowOn && !(coreOptions.layerEnable & 0x8000))
             renderLine = mode3RenderLineNoWindow;
         else
             renderLine = mode3RenderLineAll;
         break;
     case 4:
-        if ((!fxOn && !windowOn && !(layerEnable & 0x8000)) || cpuDisableSfx)
+        if ((!fxOn && !windowOn && !(coreOptions.layerEnable & 0x8000)) || coreOptions.cpuDisableSfx)
             renderLine = mode4RenderLine;
-        else if (fxOn && !windowOn && !(layerEnable & 0x8000))
+        else if (fxOn && !windowOn && !(coreOptions.layerEnable & 0x8000))
             renderLine = mode4RenderLineNoWindow;
         else
             renderLine = mode4RenderLineAll;
         break;
     case 5:
-        if ((!fxOn && !windowOn && !(layerEnable & 0x8000)) || cpuDisableSfx)
+        if ((!fxOn && !windowOn && !(coreOptions.layerEnable & 0x8000)) || coreOptions.cpuDisableSfx)
             renderLine = mode5RenderLine;
-        else if (fxOn && !windowOn && !(layerEnable & 0x8000))
+        else if (fxOn && !windowOn && !(coreOptions.layerEnable & 0x8000))
             renderLine = mode5RenderLineNoWindow;
         else
             renderLine = mode5RenderLineAll;
@@ -2042,7 +2042,7 @@ void CPUSoftwareInterrupt(int comment)
         return;
     }
 #endif
-    if (useBios) {
+    if (coreOptions.useBios) {
 #ifdef GBA_LOGGING
         if (systemVerbose & VERBOSE_SWI) {
             log("SWI: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,
@@ -2329,7 +2329,7 @@ void CPUCompareVCOUNT()
     if (layerEnableDelay > 0) {
         layerEnableDelay--;
         if (layerEnableDelay == 1)
-            layerEnable = layerSettings & DISPCNT;
+            coreOptions.layerEnable = coreOptions.layerSettings & DISPCNT;
     }
 }
 
@@ -2679,13 +2679,13 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
 
         if (changeBGon) {
             layerEnableDelay = 4;
-            layerEnable = layerSettings & value & (~changeBGon);
+            coreOptions.layerEnable = coreOptions.layerSettings & value & (~changeBGon);
         } else {
-            layerEnable = layerSettings & value;
+            coreOptions.layerEnable = coreOptions.layerSettings & value;
             // CPUUpdateTicks();
         }
 
-        windowOn = (layerEnable & 0x6000) ? true : false;
+        windowOn = (coreOptions.layerEnable & 0x6000) ? true : false;
         if (change && !((value & 0x80))) {
             if (!(DISPSTAT & 1)) {
                 //lcdTicks = 1008;
@@ -3173,7 +3173,7 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
     case 0x204: {
         memoryWait[0x0e] = memoryWaitSeq[0x0e] = gamepakRamWaitState[value & 3];
 
-        if (!speedHack) {
+        if (!coreOptions.speedHack) {
             memoryWait[0x08] = memoryWait[0x09] = gamepakWaitState[(value >> 2) & 3];
             memoryWaitSeq[0x08] = memoryWaitSeq[0x09] = gamepakWaitState0[(value >> 4) & 1];
 
@@ -3298,7 +3298,7 @@ void CPUInit(const char* biosFileName, bool useBiosFile)
     }
 #endif
     eepromInUse = 0;
-    useBios = false;
+    coreOptions.useBios = false;
 
     if (useBiosFile && strlen(biosFileName) > 0) {
         int size = 0x4000;
@@ -3307,13 +3307,13 @@ void CPUInit(const char* biosFileName, bool useBiosFile)
                 bios,
                 size)) {
             if (size == 0x4000)
-                useBios = true;
+                coreOptions.useBios = true;
             else
                 systemMessage(MSG_INVALID_BIOS_FILE_SIZE, N_("Invalid BIOS file size"));
         }
     }
 
-    if (!useBios) {
+    if (!coreOptions.useBios) {
         memcpy(bios, myROM, sizeof(myROM));
     }
 
@@ -3455,7 +3455,7 @@ void CPUReset()
 
     DISPCNT = 0x0080;
     DISPSTAT = 0x0000;
-    VCOUNT = (useBios && !skipBios) ? 0 : 0x007E;
+    VCOUNT = (coreOptions.useBios && !coreOptions.skipBios) ? 0 : 0x007E;
     BG0CNT = 0x0000;
     BG1CNT = 0x0000;
     BG2CNT = 0x0000;
@@ -3533,7 +3533,7 @@ void CPUReset()
 
     armMode = 0x1F;
 
-    if (cpuIsMultiBoot) {
+    if (coreOptions.cpuIsMultiBoot) {
         reg[13].I = 0x03007F00;
         reg[15].I = 0x02000000;
         reg[16].I = 0x00000000;
@@ -3541,7 +3541,7 @@ void CPUReset()
         reg[R13_SVC].I = 0x03007FE0;
         armIrqEnable = true;
     } else {
-        if (useBios && !skipBios) {
+        if (coreOptions.useBios && !coreOptions.skipBios) {
             reg[15].I = 0x00000000;
             armMode = 0x13;
             armIrqEnable = false;
@@ -3582,7 +3582,7 @@ void CPUReset()
     biosProtected[2] = 0x29;
     biosProtected[3] = 0xe1;
 
-    lcdTicks = (useBios && !skipBios) ? 1008 : 208;
+    lcdTicks = (coreOptions.useBios && !coreOptions.skipBios) ? 1008 : 208;
     timer0On = false;
     timer0Ticks = 0;
     timer0Reload = 0;
@@ -3611,7 +3611,7 @@ void CPUReset()
     fxOn = false;
     windowOn = false;
     frameCount = 0;
-    layerEnable = DISPCNT & layerSettings;
+    coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
 
     CPUUpdateRenderBuffers(true);
 
@@ -3641,19 +3641,19 @@ void CPUReset()
     CPUUpdateWindow1();
 
     // make sure registers are correctly initialized if not using BIOS
-    if (!useBios) {
-        if (cpuIsMultiBoot)
+    if (!coreOptions.useBios) {
+        if (coreOptions.cpuIsMultiBoot)
             BIOS_RegisterRamReset(0xfe);
         else
             BIOS_RegisterRamReset(0xff);
     } else {
-        if (cpuIsMultiBoot)
+        if (coreOptions.cpuIsMultiBoot)
             BIOS_RegisterRamReset(0xfe);
     }
 
     flashReset();
     eepromReset();
-    SetSaveType(saveType);
+    SetSaveType(coreOptions.saveType);
 
     ARM_PREFETCH;
 
@@ -3834,7 +3834,7 @@ void CPULoop(int ticks)
                                 speedup_throttle_set = true;
                             }
 
-                            if (speedup_throttle_frame_skip)
+                            if (coreOptions.speedup_throttle_frame_skip)
                                 framesToSkip += std::ceil(double(speedup_throttle) / 100.0) - 1;
                         }
                     }
@@ -3874,13 +3874,13 @@ void CPULoop(int ticks)
 
                             uint32_t ext = (joy >> 10);
                             // If no (m) code is enabled, apply the cheats at each LCDline
-                            if ((cheatsEnabled) && (mastercode == 0))
+                            if ((coreOptions.cheatsEnabled) && (mastercode == 0))
                                 remainingTicks += cheatsCheckKeys(P1 ^ 0x3FF, ext);
 
-                            speedup = false;
+                            coreOptions.speedup = false;
 
                             if (ext & 1 && !speedup_throttle_set)
-                                speedup = true;
+                                coreOptions.speedup = true;
 
                             capture = (ext & 2) ? true : false;
 

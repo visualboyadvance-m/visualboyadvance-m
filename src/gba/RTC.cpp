@@ -217,7 +217,7 @@ bool rtcWrite(uint32_t address, uint16_t value)
                             break;
 
                         case 0x65: {
-                            if (rtcEnabled)
+                            if (coreOptions.rtcEnabled)
                                 SetGBATime();
 
                             rtcClockData.dataLen = 7;
@@ -232,7 +232,7 @@ bool rtcWrite(uint32_t address, uint16_t value)
                         } break;
 
                         case 0x67: {
-                            if (rtcEnabled)
+                            if (coreOptions.rtcEnabled)
                                 SetGBATime();
 
                             rtcClockData.dataLen = 3;

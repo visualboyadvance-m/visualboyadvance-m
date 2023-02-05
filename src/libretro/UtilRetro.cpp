@@ -22,24 +22,6 @@
 #define _stricmp strcasecmp
 #endif // ! _MSC_VER
 
-// Because Configmanager was introduced, this has to be done.
-int  rtcEnabled          = 0;
-int  cpuDisableSfx       = 0;
-int  skipBios            = 0;
-int  saveType            = 0;
-int  cpuSaveType         = 0;
-int  skipSaveGameBattery = 0;
-int  skipSaveGameCheats  = 0;
-int  useBios             = 0;
-int  cheatsEnabled       = 0;
-int  layerSettings       = 0xff00;
-int  layerEnable         = 0xff00;
-bool speedup             = false;
-bool parseDebug          = false;
-bool speedHack           = false;
-bool mirroringEnable     = false;
-bool cpuIsMultiBoot      = false;
-
 const char* loadDotCodeFile;
 const char* saveDotCodeFile;
 
@@ -57,11 +39,9 @@ void utilPutWord(uint8_t* p, uint16_t value)
     *p = (value >> 8) & 255;
 }
 
-extern bool cpuIsMultiBoot;
-
 bool utilIsGBAImage(const char* file)
 {
-    cpuIsMultiBoot = false;
+    coreOptions.cpuIsMultiBoot = false;
     if (strlen(file) > 4) {
         const char* p = strrchr(file, '.');
 
@@ -69,7 +49,7 @@ bool utilIsGBAImage(const char* file)
             if ((_stricmp(p, ".agb") == 0) || (_stricmp(p, ".gba") == 0) || (_stricmp(p, ".bin") == 0) || (_stricmp(p, ".elf") == 0))
                 return true;
             if (_stricmp(p, ".mb") == 0) {
-                cpuIsMultiBoot = true;
+                coreOptions.cpuIsMultiBoot = true;
                 return true;
             }
         }
@@ -205,8 +185,8 @@ void utilGBAFindSave(const int size)
     if (detectedSaveType == 4)
         detectedSaveType = 3;
 
-    cpuSaveType = detectedSaveType;
-    rtcEnabled = rtcFound_;
+    coreOptions.cpuSaveType = detectedSaveType;
+    coreOptions.rtcEnabled = rtcFound_;
     flashSize = flashSize_;
 }
 
