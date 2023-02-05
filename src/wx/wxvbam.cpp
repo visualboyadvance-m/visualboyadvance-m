@@ -476,7 +476,7 @@ bool wxvbamApp::OnInit() {
     int width = config::OptGeomWindowWidth()->GetUnsigned();
     int height = config::OptGeomWindowHeight()->GetUnsigned();
     bool isFullscreen = config::OptGeomFullScreen()->GetInt();
-    bool isMaximized = config::OptGeomIsMaximized()->GetInt();
+    bool isMaximized = config::OptGeomIsMaximized()->GetBool();
     frame = wxDynamicCast(xr->LoadFrame(nullptr, "MainFrame"), MainFrame);
 
     if (!frame) {
@@ -865,7 +865,7 @@ void MainFrame::OnSize(wxSizeEvent& event)
         }
     }
 
-    config::OptGeomIsMaximized()->SetInt(IsMaximized());
+    config::OptGeomIsMaximized()->SetBool(IsMaximized());
     config::OptGeomFullScreen()->SetInt(IsFullScreen());
 }
 

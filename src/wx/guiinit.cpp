@@ -124,15 +124,15 @@ public:
             }
         }
 
-        linkNumPlayers = n_players;
+        gopts.link_num_players = n_players;
         update_opts(); // save fast flag and client host
         // Close any previous link
         CloseLink();
         wxString connmsg;
         wxString title;
-        SetLinkTimeout(linkTimeout);
-        EnableSpeedHacks(linkHacks);
-        EnableLinkServer(server, linkNumPlayers - 1);
+        SetLinkTimeout(gopts.link_timeout);
+        EnableSpeedHacks(gopts.link_hacks);
+        EnableLinkServer(server, gopts.link_num_players - 1);
 
         if (server) {
             char host[length];
@@ -2722,17 +2722,6 @@ bool MainFrame::BindControls()
                 continue;
 	    }
 #endif
-#ifndef MMX
-
-	    if (cmdtab[i].cmd_id == XRCID("MMX"))
-	    {
-		if (mi)
-		    mi->GetMenu()->Remove(mi);
-                cmdtab[i].cmd_id = XRCID("NOOP");
-                cmdtab[i].mi = NULL;
-                continue;
-	    }
-#endif
 #if defined(NO_ONLINEUPDATES)
 	    if (cmdtab[i].cmd_id == XRCID("UpdateEmu"))
 	    {
@@ -2908,7 +2897,6 @@ bool MainFrame::BindControls()
         MenuOptionIntMask("JoypadAutoholdR", autohold, KEYM_R);
         MenuOptionIntMask("JoypadAutoholdSelect", autohold, KEYM_SELECT);
         MenuOptionIntMask("JoypadAutoholdStart", autohold, KEYM_START);
-        MenuOptionIntMask("MMX", enableMMX, 1);
         MenuOptionBool("EmulatorSpeedupToggle", turbo);
         MenuOptionIntRadioValue("LinkType0Nothing", gopts.gba_link_type, 0);
         MenuOptionIntRadioValue("LinkType1Cable", gopts.gba_link_type, 1);
@@ -3067,7 +3055,7 @@ bool MainFrame::BindControls()
 #ifndef NO_LINK
         {
             net_link_handler.dlg = d;
-            net_link_handler.n_players = linkNumPlayers;
+            net_link_handler.n_players = gopts.link_num_players;
             getrbbe("Server", net_link_handler.server);
             getrbbd("Client", net_link_handler.server);
             getlab("PlayersLab");
@@ -3656,7 +3644,7 @@ bool MainFrame::BindControls()
         {
             getlab("LinkTimeoutLab");
             addbe(lab);
-            getsc("LinkTimeout", linkTimeout);
+            getsc("LinkTimeout", gopts.link_timeout);
             addbe(sc);
             d->Fit();
         }
@@ -3803,9 +3791,9 @@ bool MainFrame::BindControls()
         mf->SetWindowStyle(mf->GetWindowStyle() & ~wxSTAY_ON_TOP);
 
 #ifndef NO_LINK
-    LinkMode linkMode = GetConfiguredLinkMode();
+    LinkMode link_mode = GetConfiguredLinkMode();
 
-    if (linkMode == LINK_GAMECUBE_DOLPHIN) {
+    if (link_mode == LINK_GAMECUBE_DOLPHIN) {
         bool isv = !gopts.link_host.empty();
 
         if (isv) {
@@ -3815,11 +3803,11 @@ bool MainFrame::BindControls()
         if (!isv) {
             wxLogError(_("JoyBus host invalid; disabling"));
         } else {
-            linkMode = LINK_DISCONNECTED;
+            link_mode = LINK_DISCONNECTED;
         }
     }
 
-    ConnectionState linkState = InitLink(linkMode);
+    ConnectionState linkState = InitLink(link_mode);
 
     if (linkState != LINK_OK) {
         CloseLink();
@@ -3827,8 +3815,8 @@ bool MainFrame::BindControls()
 
     if (GetLinkMode() != LINK_DISCONNECTED) {
         cmd_enable |= CMDEN_LINK_ANY;
-        SetLinkTimeout(linkTimeout);
-        EnableSpeedHacks(linkHacks);
+        SetLinkTimeout(gopts.link_timeout);
+        EnableSpeedHacks(gopts.link_hacks);
     }
 
     EnableNetworkMenu();

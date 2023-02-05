@@ -139,13 +139,31 @@ int systemGreenShift = 0;
 int systemColorDepth = 0;
 int systemVerbose = 0;
 int systemFrameSkip = 0;
+int frameskipadjust = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
+int renderedFrames = 0;
+int showRenderedFrames = 0;
+int mouseCounter = 0;
+uint32_t autoFrameSkipLastTime = 0;
+
+char* rewindMemory = NULL;
+int rewindCount;
+int rewindCounter;
+int rewindPos;
+int rewindSaveNeeded = 0;
+int rewindTopPos;
+int* rewindSerials = NULL;
 
 int srcPitch = 0;
 int destWidth = 0;
 int destHeight = 0;
 int desktopWidth = 0;
 int desktopHeight = 0;
+int sizeX = 240;
+int sizeY = 160;
+
+FilterFunc filterFunction = 0;
+IFBFilterFunc ifbFunction = 0;
 
 uint8_t* delta = NULL;
 static const int delta_size = 322 * 242 * 4;
@@ -207,6 +225,8 @@ enum VIDEO_SIZE {
 
 uint32_t throttleLastTime = 0;
 
+bool paused = false;
+bool wasPaused = false;
 bool pauseNextFrame = false;
 int sdlMirroringEnable = 1;
 
@@ -219,6 +239,7 @@ char* home;
 char homeConfigDir[1024];
 char homeDataDir[1024];
 
+bool screenMessage = false;
 char screenMessageBuffer[21];
 uint32_t screenMessageTime = 0;
 
@@ -1023,7 +1044,7 @@ void sdlPollEvents()
                 if (pauseWhenInactive)
                     if (paused) {
                         if (emulating) {
-                            paused = 0;
+                            paused = false;
                             soundResume();
                         }
                     }
@@ -1032,7 +1053,7 @@ void sdlPollEvents()
                 if (pauseWhenInactive) {
                     wasPaused = true;
                     if (emulating) {
-                        paused = 1;
+                        paused = true;
                         soundPause();
                     }
 
@@ -1548,6 +1569,14 @@ int main(int argc, char** argv)
     gb_effects_config.enabled = false;
 
     LoadConfig(); // Parse command line arguments (overrides ini)
+
+    // Additional configuration.
+	if (rewindTimer) {
+		rewindMemory = (char *)malloc(REWIND_NUM*REWIND_SIZE);
+		rewindSerials = (int *)calloc(REWIND_NUM, sizeof(int)); // init to zeroes
+	}
+
+
     ReadOpts(argc, argv);
 
     inputSetKeymap(PAD_1, KEY_LEFT, ReadPrefHex("Joy0_Left"));
@@ -1858,7 +1887,7 @@ int main(int argc, char** argv)
     }
 
     while (emulating) {
-        if (!paused && active) {
+        if (!paused) {
             if (debugger && emulator.emuHasDebugger)
                 remoteStubMain();
             else {

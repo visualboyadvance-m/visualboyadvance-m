@@ -351,10 +351,6 @@
           <label>_Retain aspect ratio</label>
           <checkable>1</checkable>
         </object>
-        <object class="wxMenuItem" name="MMX">
-          <label>Enable MMX</label>
-          <checkable>1</checkable>
-        </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="Bilinear">
           <label>_Bilinear filter</label>

@@ -234,7 +234,7 @@ EVT_HANDLER(wxID_FILE1, "Load recent ROM 1")
     panel->LoadGame(gopts.recent->GetHistoryFile(0));
 
 #ifndef NO_DEBUGGER
-    if (gdbBreakOnLoad)
+    if (gopts.gdb_break_on_load)
         GDBBreak();
 #endif
 }
@@ -244,7 +244,7 @@ EVT_HANDLER(wxID_FILE2, "Load recent ROM 2")
     panel->LoadGame(gopts.recent->GetHistoryFile(1));
 
 #ifndef NO_DEBUGGER
-    if (gdbBreakOnLoad)
+    if (gopts.gdb_break_on_load)
         GDBBreak();
 #endif
 }
@@ -254,7 +254,7 @@ EVT_HANDLER(wxID_FILE3, "Load recent ROM 3")
     panel->LoadGame(gopts.recent->GetHistoryFile(2));
 
 #ifndef NO_DEBUGGER
-    if (gdbBreakOnLoad)
+    if (gopts.gdb_break_on_load)
         GDBBreak();
 #endif
 }
@@ -264,7 +264,7 @@ EVT_HANDLER(wxID_FILE4, "Load recent ROM 4")
     panel->LoadGame(gopts.recent->GetHistoryFile(3));
 
 #ifndef NO_DEBUGGER
-    if (gdbBreakOnLoad)
+    if (gopts.gdb_break_on_load)
         GDBBreak();
 #endif
 }
@@ -274,7 +274,7 @@ EVT_HANDLER(wxID_FILE5, "Load recent ROM 5")
     panel->LoadGame(gopts.recent->GetHistoryFile(4));
 
 #ifndef NO_DEBUGGER
-    if (gdbBreakOnLoad)
+    if (gopts.gdb_break_on_load)
         GDBBreak();
 #endif
 }
@@ -284,7 +284,7 @@ EVT_HANDLER(wxID_FILE6, "Load recent ROM 6")
     panel->LoadGame(gopts.recent->GetHistoryFile(5));
 
 #ifndef NO_DEBUGGER
-    if (gdbBreakOnLoad)
+    if (gopts.gdb_break_on_load)
         GDBBreak();
 #endif
 }
@@ -294,7 +294,7 @@ EVT_HANDLER(wxID_FILE7, "Load recent ROM 7")
     panel->LoadGame(gopts.recent->GetHistoryFile(6));
 
 #ifndef NO_DEBUGGER
-    if (gdbBreakOnLoad)
+    if (gopts.gdb_break_on_load)
         GDBBreak();
 #endif
 }
@@ -304,7 +304,7 @@ EVT_HANDLER(wxID_FILE8, "Load recent ROM 8")
     panel->LoadGame(gopts.recent->GetHistoryFile(7));
 
 #ifndef NO_DEBUGGER
-    if (gdbBreakOnLoad)
+    if (gopts.gdb_break_on_load)
         GDBBreak();
 #endif
 }
@@ -314,7 +314,7 @@ EVT_HANDLER(wxID_FILE9, "Load recent ROM 9")
     panel->LoadGame(gopts.recent->GetHistoryFile(8));
 
 #ifndef NO_DEBUGGER
-    if (gdbBreakOnLoad)
+    if (gopts.gdb_break_on_load)
         GDBBreak();
 #endif
 }
@@ -324,7 +324,7 @@ EVT_HANDLER(wxID_FILE10, "Load recent ROM 10")
     panel->LoadGame(gopts.recent->GetHistoryFile(9));
 
 #ifndef NO_DEBUGGER
-    if (gdbBreakOnLoad)
+    if (gopts.gdb_break_on_load)
         GDBBreak();
 #endif
 }
@@ -1998,10 +1998,10 @@ EVT_HANDLER(CheatsEnable, "Enable cheats (toggle)")
 
 EVT_HANDLER(ColorizerHack, "Enable Colorizer Hack (toggle)")
 {
-    int val = 0;
-    GetMenuOptionInt("ColorizerHack", &val, 1);
+    bool val = false;
+    GetMenuOptionBool("ColorizerHack", &val);
 
-    if (val == 1 && useBiosFileGB == 1) {
+    if (val && gopts.use_bios_file_gb) {
         wxLogError(_("Cannot use Colorizer Hack when GB BIOS File is enabled."));
         val = 0;
         SetMenuOption("ColorizerHack", 0);
@@ -2322,7 +2322,7 @@ int GetGDBPort(MainFrame* mf)
         _("Set to 0 for pseudo tty"),
 #endif
         _("Port to wait for connection:"),
-        _("GDB Connection"), gdbPort,
+        _("GDB Connection"), gopts.gdb_port,
 #ifdef __WXMSW__
         1025,
 #else
@@ -2338,7 +2338,7 @@ EVT_HANDLER(DebugGDBPort, "Configure port...")
     int port_selected = GetGDBPort(this);
 
     if (port_selected != -1) {
-        gdbPort = port_selected;
+        gopts.gdb_port = port_selected;
         update_opts();
     }
 #endif
@@ -2347,7 +2347,7 @@ EVT_HANDLER(DebugGDBPort, "Configure port...")
 EVT_HANDLER(DebugGDBBreakOnLoad, "Break on load")
 {
 #ifndef NO_DEBUGGER
-    GetMenuOptionInt("DebugGDBBreakOnLoad", &gdbBreakOnLoad, 1);
+    GetMenuOptionBool("DebugGDBBreakOnLoad", &gopts.gdb_break_on_load);
     update_opts();
 #endif
 }
@@ -2357,21 +2357,21 @@ void MainFrame::GDBBreak()
 {
     ModalPause mp;
 
-    if (gdbPort == 0) {
+    if (gopts.gdb_port == 0) {
         int port_selected = GetGDBPort(this);
 
         if (port_selected != -1) {
-            gdbPort = port_selected;
+            gopts.gdb_port = port_selected;
             update_opts();
         }
     }
 
-    if (gdbPort > 0) {
+    if (gopts.gdb_port > 0) {
         if (!remotePort) {
             wxString msg;
 #ifndef __WXMSW__
 
-            if (!gdbPort) {
+            if (!gopts.gdb_port) {
                 if (!debugOpenPty())
                     return;
 
@@ -2379,10 +2379,10 @@ void MainFrame::GDBBreak()
             } else
 #endif
             {
-                if (!debugStartListen(gdbPort))
+                if (!debugStartListen(gopts.gdb_port))
                     return;
 
-                msg.Printf(_("Waiting for connection on port %d"), gdbPort);
+                msg.Printf(_("Waiting for connection on port %d"), gopts.gdb_port);
             }
 
             wxProgressDialog dlg(_("Waiting for GDB..."), msg, 100, this,
@@ -2392,7 +2392,7 @@ void MainFrame::GDBBreak()
             while (dlg.Pulse()) {
 #ifndef __WXMSW__
 
-                if (!gdbPort)
+                if (!gopts.gdb_port)
                     connected = debugWaitPty();
                 else
 #endif
@@ -2406,7 +2406,7 @@ void MainFrame::GDBBreak()
             }
 
             if (connected) {
-                remotePort = gdbPort;
+                remotePort = gopts.gdb_port;
                 emulating = 1;
                 dbgMain = remoteStubMain;
                 dbgSignal = remoteStubSignal;
@@ -3043,9 +3043,9 @@ EVT_HANDLER_MASK(GBALcdFilter, "Enable LCD filter", CMDEN_GBA)
 {
     bool menuPress = false;
     GetMenuOptionBool("GBALcdFilter", &menuPress);
-    toggleBooleanVar(&menuPress, &gbaLcdFilter);
-    SetMenuOption("GBALcdFilter", gbaLcdFilter ? 1 : 0);
-    utilUpdateSystemColorMaps(gbaLcdFilter);
+    toggleBooleanVar(&menuPress, &gopts.gba_lcd_filter);
+    SetMenuOption("GBALcdFilter", gopts.gba_lcd_filter ? 1 : 0);
+    utilUpdateSystemColorMaps(gopts.gba_lcd_filter);
     update_opts();
 }
 
@@ -3053,9 +3053,9 @@ EVT_HANDLER_MASK(GBLcdFilter, "Enable LCD filter", CMDEN_GB)
 {
     bool menuPress = false;
     GetMenuOptionBool("GBLcdFilter", &menuPress);
-    toggleBooleanVar(&menuPress, &gbLcdFilter);
-    SetMenuOption("GBLcdFilter", gbLcdFilter ? 1 : 0);
-    utilUpdateSystemColorMaps(gbLcdFilter);
+    toggleBooleanVar(&menuPress, &gopts.gb_lcd_filter);
+    SetMenuOption("GBLcdFilter", gopts.gb_lcd_filter ? 1 : 0);
+    utilUpdateSystemColorMaps(gopts.gb_lcd_filter);
     update_opts();
 }
 
@@ -3076,14 +3076,6 @@ EVT_HANDLER(ApplyPatches, "Apply IPS/UPS/IPF patches if found")
     update_opts();
 }
 
-EVT_HANDLER(MMX, "Enable MMX")
-{
-#ifdef MMX
-    GetMenuOptionInt("MMX", &enableMMX, 1);
-    update_opts();
-#endif
-}
-
 EVT_HANDLER(KeepOnTop, "Keep window on top")
 {
     GetMenuOptionBool("KeepOnTop", &gopts.keep_on_top);
@@ -3099,7 +3091,7 @@ EVT_HANDLER(KeepOnTop, "Keep window on top")
 
 EVT_HANDLER(StatusBar, "Enable status bar")
 {
-    GetMenuOptionInt("StatusBar", &gopts.statusbar, 1);
+    GetMenuOptionBool("StatusBar", &gopts.statusbar);
     update_opts();
     MainFrame* mf = wxGetApp().frame;
 
@@ -3123,11 +3115,6 @@ EVT_HANDLER(FrameSkipAuto, "Auto Skip frames.")
 {
     GetMenuOptionInt("FrameSkipAuto", &autoFrameSkip, 1);
     update_opts();
-}
-
-EVT_HANDLER(Fullscreen, "Enter fullscreen mode at startup")
-{
-    GetMenuOptionConfig("Fullscreen", config::OptionID::kGeomFullScreen);
 }
 
 EVT_HANDLER(PauseWhenInactive, "Pause game when main window loses focus")
@@ -3156,7 +3143,7 @@ EVT_HANDLER(SkipIntro, "Skip BIOS initialization")
 
 EVT_HANDLER(BootRomEn, "Use the specified BIOS file for GBA")
 {
-    GetMenuOptionInt("BootRomEn", &useBiosFileGBA, 1);
+    GetMenuOptionBool("BootRomEn", &gopts.use_bios_file_gba);
     update_opts();
 }
 
@@ -3171,20 +3158,20 @@ EVT_HANDLER(BootRomGB, "Use the specified BIOS file for GB")
         SetMenuOption("BootRomGB", 0);
     }
 
-    useBiosFileGB = val;
+    gopts.use_bios_file_gb = val;
 
     update_opts();
 }
 
 EVT_HANDLER(BootRomGBC, "Use the specified BIOS file for GBC")
 {
-    GetMenuOptionInt("BootRomGBC", &useBiosFileGBC, 1);
+    GetMenuOptionBool("BootRomGBC", &gopts.use_bios_file_gbc);
     update_opts();
 }
 
 EVT_HANDLER(VSync, "Wait for vertical sync")
 {
-    GetMenuOptionInt("VSync", &vsync, 1);
+    GetMenuOptionBool("VSync", &gopts.vsync);
     update_opts();
     panel->ResetPanel();
 }
@@ -3276,13 +3263,13 @@ EVT_HANDLER(LinkAuto, "Enable link at boot")
 
 EVT_HANDLER(SpeedOn, "Enable faster network protocol by default")
 {
-    GetMenuOptionInt("SpeedOn", &linkHacks, 1);
+    GetMenuOptionBool("SpeedOn", &gopts.link_hacks);
     update_opts();
 }
 
 EVT_HANDLER(LinkProto, "Local host IPC")
 {
-    GetMenuOptionInt("LinkProto", &gopts.link_proto, 1);
+    GetMenuOptionBool("LinkProto", &gopts.link_proto);
     update_opts();
     enable_menus();
     EnableNetworkMenu();
@@ -3296,7 +3283,7 @@ EVT_HANDLER(LinkConfigure, "Link options...")
     if (ShowModal(dlg) != wxID_OK)
         return;
 
-    SetLinkTimeout(linkTimeout);
+    SetLinkTimeout(gopts.link_timeout);
     update_opts();
     EnableNetworkMenu();
 #endif

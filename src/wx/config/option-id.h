@@ -72,17 +72,10 @@ enum class OptionID {
     kPrefCaptureFormat,
     kPrefCheatsEnabled,
 
-#ifdef MMX
-    kPrefEnableMMX,
-#endif
     kPrefDisableStatus,
     kPrefEmulatorType,
     kPrefFlashSize,
     kPrefFrameSkip,
-    kPrefFsColorDepth,
-    kPrefFsFrequency,
-    kPrefFsHeight,
-    kPrefFsWidth,
     kPrefGBPaletteOption,
     kPrefGBPrinter,
     kPrefGDBBreakOnLoad,

@@ -258,16 +258,17 @@ void GameArea::LoadGame(const wxString& name)
 
 
         // Disable bios loading when using colorizer hack.
-        if (useBiosFileGB && colorizerHack) {
+        if (gopts.use_bios_file_gb && colorizerHack) {
             wxLogError(_("Cannot use GB BIOS file when Colorizer Hack is enabled, disabling GB BIOS file."));
-            useBiosFileGB = 0;
+            gopts.use_bios_file_gb = false;
             update_opts();
         }
 
         // Set up the core for the colorizer hack.
         setColorizerHack(colorizerHack);
 
-        bool use_bios = gbCgbMode ? useBiosFileGBC : useBiosFileGB;
+        bool use_bios =
+            gbCgbMode ? gopts.use_bios_file_gbc : gopts.use_bios_file_gb;
 
         wxCharBuffer fnb(UTF8((gbCgbMode ? gopts.gbc_bios : gopts.gb_bios)));
         const char* fn = fnb.data();
@@ -372,9 +373,9 @@ void GameArea::LoadGame(const wxString& name)
 
         rtcEnableRumble(true);
 
-        CPUInit(UTF8(gopts.gba_bios), useBiosFileGBA);
+        CPUInit(UTF8(gopts.gba_bios), gopts.use_bios_file_gba);
 
-        if (useBiosFileGBA && !useBios) {
+        if (gopts.use_bios_file_gba && !useBios) {
             wxLogError(_("Could not load BIOS %s"), gopts.gba_bios.mb_str());
             // could clear use flag & file name now, but better to force
             // user to do it
@@ -512,8 +513,8 @@ void GameArea::LoadGame(const wxString& name)
 #ifndef NO_LINK
 
     if (gopts.link_auto) {
-        linkMode = mf->GetConfiguredLinkMode();
-        BootLink(linkMode, UTF8(gopts.link_host), linkTimeout, linkHacks, linkNumPlayers);
+        BootLink(mf->GetConfiguredLinkMode(), UTF8(gopts.link_host),
+                 gopts.link_timeout, gopts.link_hacks, gopts.link_num_players);
     }
 
 #endif
@@ -1067,7 +1068,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
         LoadGame(pl);
 
 #ifndef NO_DEBUGGER
-        if (gdbBreakOnLoad)
+        if (gopts.gdb_break_on_load)
             mf->GDBBreak();
 
         if (debugger && loaded != IMAGE_GBA) {
@@ -1148,9 +1149,9 @@ void GameArea::OnIdle(wxIdleEvent& event)
         if (allowKeyboardBackgroundInput)
             enableKeyboardBackgroundInput(w);
 
-        if (maxScale)
-            w->SetMaxSize(wxSize(basic_width * maxScale,
-                basic_height * maxScale));
+        if (gopts.max_scale)
+            w->SetMaxSize(wxSize(basic_width * gopts.max_scale,
+                                 basic_height * gopts.max_scale));
 
         // if user changed Display/Scale config, this needs to run
         AdjustMinSize();
@@ -1190,8 +1191,10 @@ void GameArea::OnIdle(wxIdleEvent& event)
         w->SetFocus();
 
         // generate system color maps (after output module init)
-        if (loaded == IMAGE_GBA) utilUpdateSystemColorMaps(gbaLcdFilter);
-        else if (loaded == IMAGE_GB) utilUpdateSystemColorMaps(gbLcdFilter);
+        if (loaded == IMAGE_GBA)
+            utilUpdateSystemColorMaps(gopts.gba_lcd_filter);
+        else if (loaded == IMAGE_GB)
+            utilUpdateSystemColorMaps(gopts.gb_lcd_filter);
         else utilUpdateSystemColorMaps(false);
     }
 
@@ -2265,16 +2268,16 @@ void GLDrawingPanel::DrawingPanelInit()
 #if defined(__WXGTK__)
     if (IsWayland()) {
 #ifdef HAVE_EGL
-        if (vsync)
+        if (gopts.vsync)
             wxLogDebug(_("Enabling EGL VSync."));
         else
             wxLogDebug(_("Disabling EGL VSync."));
 
-        eglSwapInterval(0, vsync);
+        eglSwapInterval(0, gopts.vsync);
 #endif
     }
     else {
-        if (vsync)
+        if (gopts.vsync)
             wxLogDebug(_("Enabling GLX VSync."));
         else
             wxLogDebug(_("Disabling GLX VSync."));
@@ -2292,7 +2295,8 @@ void GLDrawingPanel::DrawingPanelInit()
         {
             glXSwapIntervalEXT = reinterpret_cast<PFNGLXSWAPINTERVALEXTPROC>(glXGetProcAddress((const GLubyte*)"glXSwapIntervalEXT"));
             if (glXSwapIntervalEXT)
-                glXSwapIntervalEXT(glXGetCurrentDisplay(), glXGetCurrentDrawable(), vsync);
+                glXSwapIntervalEXT(glXGetCurrentDisplay(),
+                                   glXGetCurrentDrawable(), gopts.vsync);
             else
                 systemScreenMessage(_("Failed to set glXSwapIntervalEXT"));
         }
@@ -2301,7 +2305,7 @@ void GLDrawingPanel::DrawingPanelInit()
             glXSwapIntervalSGI = reinterpret_cast<PFNGLXSWAPINTERVALSGIPROC>(glXGetProcAddress((const GLubyte*)("glXSwapIntervalSGI")));
 
             if (glXSwapIntervalSGI)
-                glXSwapIntervalSGI(vsync);
+                glXSwapIntervalSGI(gopts.vsync);
             else
                 systemScreenMessage(_("Failed to set glXSwapIntervalSGI"));
         }
@@ -2310,7 +2314,7 @@ void GLDrawingPanel::DrawingPanelInit()
             glXSwapIntervalMESA = reinterpret_cast<PFNGLXSWAPINTERVALMESAPROC>(glXGetProcAddress((const GLubyte*)("glXSwapIntervalMESA")));
 
             if (glXSwapIntervalMESA)
-                glXSwapIntervalMESA(vsync);
+                glXSwapIntervalMESA(gopts.vsync);
             else
                 systemScreenMessage(_("Failed to set glXSwapIntervalMESA"));
         }
@@ -2329,11 +2333,11 @@ void GLDrawingPanel::DrawingPanelInit()
     static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = NULL;
     wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
     if (wglSwapIntervalEXT)
-        wglSwapIntervalEXT(vsync);
+        wglSwapIntervalEXT(gopts.vsync);
     else
         systemScreenMessage(_("Failed to set wglSwapIntervalEXT"));
 #elif defined(__WXMAC__)
-    int swap_interval = vsync ? 1 : 0;
+    int swap_interval = gopts.vsync ? 1 : 0;
     CGLContextObj cgl_context = CGLGetCurrentContext();
     CGLSetParameter(cgl_context, kCGLCPSwapInterval, &swap_interval);
 #else
