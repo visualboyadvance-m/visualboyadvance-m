@@ -192,6 +192,14 @@ public:
     bool SetEnumString(const wxString& value);
     bool SetGbPalette(const wxString& value);
 
+    // Min/Max accessors.
+    double GetDoubleMin() const;
+    double GetDoubleMax() const;
+    int32_t GetIntMin() const;
+    int32_t GetIntMax() const;
+    uint32_t GetUnsignedMin() const;
+    uint32_t GetUnsignedMax() const;
+
     // Special convenience modifiers.
     void NextFilter();
     void NextInterframe();
