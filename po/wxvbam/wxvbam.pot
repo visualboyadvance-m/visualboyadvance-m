@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-04 18:56-0800\n"
+"POT-Creation-Date: 2023-02-05 17:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -569,7 +569,7 @@ msgstr ""
 msgid "ROM+HuC-1"
 msgstr ""
 
-#: cmdevents.cpp:775 dialogs/display-config.cpp:343 xrc/DisplayConfig.xrc:85
+#: cmdevents.cpp:775 dialogs/display-config.cpp:353 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
@@ -1563,22 +1563,26 @@ msgstr ""
 msgid "Invalid value %d for option %s; valid values are %s"
 msgstr ""
 
-#: dialogs/display-config.cpp:374
+#: dialogs/display-config.cpp:53
+msgid "Invalid value for Default magnification."
+msgstr ""
+
+#: dialogs/display-config.cpp:384
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr ""
 
-#: dialogs/display-config.cpp:406 dialogs/display-config.cpp:448
+#: dialogs/display-config.cpp:420 dialogs/display-config.cpp:462
 #: xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr ""
 
-#: dialogs/display-config.cpp:413
+#: dialogs/display-config.cpp:427
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr ""
 
-#: dialogs/display-config.cpp:420
+#: dialogs/display-config.cpp:434
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr ""
