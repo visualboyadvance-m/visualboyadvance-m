@@ -53,8 +53,6 @@ extern struct opts_t {
     bool autoload_state = false;
     bool autoload_cheats = false;
     wxString battery_dir;
-    long last_update;
-    wxString last_updated_filename;
     bool recent_freeze = false;
     wxString recording_dir;
     int rewind_interval = 0;
@@ -116,7 +114,7 @@ extern const int num_def_accels;
 // call to load config (once)
 // will write defaults for options not present and delete bad opts
 // will also initialize opts[] array translations
-void load_opts();
+void load_opts(bool first_time_launch);
 // call whenever opt vars change
 // will detect changes and write config if necessary
 void update_opts();

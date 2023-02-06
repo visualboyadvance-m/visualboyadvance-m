@@ -53,6 +53,7 @@ enum class OptionID {
     kGenScreenshotDir,
     kGenStateDir,
     kGenStatusBar,
+    kGenIniVersion,
 
     /// Joypad
     kJoy,

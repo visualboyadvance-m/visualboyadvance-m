@@ -38,6 +38,11 @@
 #include "strutils.h"
 #include "wayland.h"
 
+namespace {
+static const wxString kOldConfigFileName("vbam.conf");
+static const wxString knewConfigFileName("vbam.ini");
+}  // namespace
+
 #ifdef __WXMSW__
 
 int __stdcall WinMain(HINSTANCE hInstance,
@@ -197,16 +202,14 @@ const wxString wxvbamApp::GetPluginsDir()
     return wxStandardPaths::Get().GetPluginsDir();
 }
 
-wxString wxvbamApp::GetConfigurationPath()
-{
-    wxString config(wxT("vbam.ini"));
+wxString wxvbamApp::GetConfigurationPath() {
     // first check if config files exists in reverse order
     // (from system paths to more local paths.)
     if (data_path.empty()) {
         get_config_path(config_path);
 
         for (int i = config_path.size() - 1; i >= 0; i--) {
-            wxFileName fn(config_path[i], config);
+            wxFileName fn(config_path[i], knewConfigFileName);
 
             if (fn.FileExists() && fn.IsFileWritable()) {
                 data_path = config_path[i];
@@ -312,53 +315,52 @@ bool wxvbamApp::OnInit() {
 
     wxSetWorkingDirectory(cwd);
 
-    if (!cfg) {
-        // set up config file
-        // this needs to be in a subdir to support other config as well
-        // but subdir flag behaves differently 2.8 vs. 2.9.  Oh well.
-        // NOTE: this does not support XDG (freedesktop.org) paths
-        wxString confname(wxT("vbam.ini"));
-        wxFileName vbamconf(GetConfigurationPath(), confname);
-        // /MIGRATION
-        // migrate from 'vbam.{cfg,conf}' to 'vbam.ini' to manage a single config
-        // file for all platforms.
-        wxString oldConf(GetConfigurationPath() + wxT(FILE_SEP) + wxT("vbam.conf"));
-        wxString newConf(GetConfigurationPath() + wxT(FILE_SEP) + wxT("vbam.ini"));
+    if (!config_file_.IsOk()) {
+        // Set up the default configuration file.
+        // This needs to be in a subdir to support other config as well.
+        // NOTE: this does not support XDG (freedesktop.org) paths.
+        // We rely on wx to build the paths in a cross-platform manner. However,
+        // the wxFileName APIs are weird and don't quite work as intended so we
+        // use the wxString APIs for files instead.
+        const wxString old_conf_file(
+            wxFileName(GetConfigurationPath(), kOldConfigFileName)
+                .GetFullPath());
+        const wxString new_conf_file(
+            wxFileName(GetConfigurationPath(), knewConfigFileName)
+                .GetFullPath());
 
-        if (!wxFileExists(newConf) && wxFileExists(oldConf))
-            wxRenameFile(oldConf, newConf, false);
+        if (wxDirExists(new_conf_file)) {
+            wxLogError(_("Invalid configuration file provided: %s"),
+                       new_conf_file);
+            return false;
+        }
+
+        // /MIGRATION
+        // Migrate from 'vbam.conf' to 'vbam.ini' to manage a single config
+        // file for all platforms.
+        if (!wxFileExists(new_conf_file) && wxFileExists(old_conf_file)) {
+            wxRenameFile(old_conf_file, new_conf_file, false);
+        }
         // /END_MIGRATION
 
-        cfg = new wxFileConfig(wxT("vbam"), wxEmptyString,
-            vbamconf.GetFullPath(),
-            wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
-        // set global config for e.g. Windows font mapping
-        wxFileConfig::Set(cfg);
-        // yet another bug/deficiency in wxConfig: dirs are not created if needed
-        // since a default config is always written, dirs are always needed
-        // Can't figure out statically if using wxFileConfig w/o duplicating wx's
-        // logic, so do it at run-time
-        // wxFileConfig *f = wxDynamicCast(cfg, wxFileConfig);
-        // wxConfigBase does not derive from wxObject!!! so no wxDynamicCast
-        wxFileConfig* fc = dynamic_cast<wxFileConfig*>(cfg);
-
-        if (fc) {
-            wxFileName s(wxFileConfig::GetLocalFileName(GetAppName()));
-            // at least up to 2.8.12, GetLocalFileName returns the dir if
-            // SUBDIR is specified instead of actual file name
-            // and SUBDIR only affects UNIX
-#if defined(__UNIX__) && !wxCHECK_VERSION(2, 9, 0)
-            s.AppendDir(s.GetFullName());
-#endif
-            // only the path part gets created
-            // note that 0777 is default (assumes umask will do og-w)
-            s.Mkdir(0777, wxPATH_MKDIR_FULL);
-            s = wxFileName::DirName(GetConfigurationPath());
-            s.Mkdir(0777, wxPATH_MKDIR_FULL);
-        }
+        config_file_ = new_conf_file;
     }
 
-    load_opts();
+    if (!config_file_.IsOk() || wxDirExists(config_file_.GetFullPath())) {
+        wxLogError(_("Invalid configuration file provided: %s"),
+                   config_file_.GetFullPath());
+        return false;
+    }
+
+    // wx takes ownership of the wxFileConfig here. It will be deleted on app
+    // destruction.
+    wxConfigBase::DontCreateOnDemand();
+    wxConfigBase::Set(new wxFileConfig("vbam", wxEmptyString,
+                                       config_file_.GetFullPath(),
+                                       wxEmptyString, wxCONFIG_USE_LOCAL_FILE));
+
+    // Load the default options.
+    load_opts(!config_file_.Exists());
 
     // wxGLCanvas segfaults under wayland before wx 3.2
 #if defined(HAVE_WAYLAND_SUPPORT) && !defined(HAVE_WAYLAND_EGL)
@@ -703,9 +705,7 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
             wxLogError(_("Configuration file not found."));
             return false;
         }
-        cfg = new wxFileConfig(wxT("vbam"), wxEmptyString,
-            vbamconf.GetFullPath(),
-            wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
+        config_file_ = s;
     }
 
 #if !defined(NO_LINK) && !defined(__WXMSW__)

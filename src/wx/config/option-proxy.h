@@ -59,6 +59,7 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /*kGenScreenshotDir*/ Option::Type::kString,
     /*kGenStateDir*/ Option::Type::kString,
     /*kGenStatusBar*/ Option::Type::kBool,
+    /*kGenIniVersion*/ Option::Type::kUnsigned,
 
     /// Joypad
     /*kJoy*/ Option::Type::kNone,

@@ -208,10 +208,10 @@ EVT_HANDLER(RecentReset, "Reset recent ROM list")
         while (gopts.recent->GetCount())
             gopts.recent->RemoveFileFromHistory(0);
 
-        wxFileConfig* cfg = wxGetApp().cfg;
-        cfg->SetPath(wxT("/Recent"));
+        wxConfigBase* cfg = wxConfigBase::Get();
+        cfg->SetPath("/Recent");
         gopts.recent->Save(*cfg);
-        cfg->SetPath(wxT("/"));
+        cfg->SetPath("/");
         cfg->Flush();
     }
 }
@@ -2857,14 +2857,12 @@ EVT_HANDLER(UpdateEmu, "Check for updates...")
 
 EVT_HANDLER(FactoryReset, "Factory Reset...")
 {
-    wxMessageDialog dlg(NULL, wxString(wxT(
-"YOUR CONFIGURATION WILL BE DELETED!\n\n")) + wxString(wxT(
-"Are you sure?")),
-                        wxT("FACTORY RESET"), wxYES_NO | wxNO_DEFAULT | wxCENTRE);
+    wxMessageDialog dlg(
+        nullptr, _("YOUR CONFIGURATION WILL BE DELETED!\n\nAre you sure?"),
+        _("FACTORY RESET"), wxYES_NO | wxNO_DEFAULT | wxCENTRE);
 
     if (dlg.ShowModal() == wxID_YES) {
-        wxGetApp().cfg->DeleteAll();
-
+        wxConfigBase::Get()->DeleteAll();
         wxExecute(wxStandardPaths::Get().GetExecutablePath(), wxEXEC_ASYNC);
         Close(true);
     }

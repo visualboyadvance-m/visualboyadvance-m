@@ -1,11 +1,12 @@
 #include "opts.h"
 
 #include <algorithm>
+#include <limits>
 #include <memory>
 #include <unordered_set>
 
+#include <wx/defs.h>
 #include <wx/log.h>
-#include <wx/display.h>
 
 #include "config/option-observer.h"
 #include "config/option-proxy.h"
@@ -25,7 +26,7 @@
 namespace {
 
 void SaveOption(config::Option* option) {
-    wxFileConfig* cfg = wxGetApp().cfg;
+    wxConfigBase* cfg = wxConfigBase::Get();
 
     switch (option->type()) {
         case config::Option::Type::kNone:
@@ -70,6 +71,33 @@ void InitializeOptionObservers() {
         g_observers.emplace(std::make_unique<config::OptionsObserver>(
             option.id(), &SaveOption));
     }
+}
+
+// Helper function to work around wxWidgets limitations when converting string
+// to unsigned int.
+uint32_t LoadUnsignedOption(wxConfigBase* cfg,
+                            const wxString& option_name,
+                            uint32_t default_value) {
+    wxString temp;
+    if (!cfg->Read(option_name, &temp)) {
+        return default_value;
+    }
+    if (!temp.IsNumber()) {
+        return default_value;
+    }
+
+    // Go through ulonglong to get enough space to work with. Also, older
+    // versions do not have a conversion function for unsigned int.
+    wxULongLong_t out;
+    if (!temp.ToULongLong(&out)) {
+        return default_value;
+    }
+
+    if (out > std::numeric_limits<uint32_t>::max()) {
+        return default_value;
+    }
+
+    return out;
 }
 
 }  // namespace
@@ -317,7 +345,7 @@ opts_t::opts_t()
 }
 
 // FIXME: simulate MakeInstanceFilename(vbam.ini) using subkeys (Slave%d/*)
-void load_opts() {
+void load_opts(bool first_time_launch) {
     // just for sanity...
     static bool did_init = false;
     assert(!did_init);
@@ -326,8 +354,9 @@ void load_opts() {
     // enumvals should not be translated, since they would cause config file
     // change after lang change
     // instead, translate when presented to user
-    wxFileConfig* cfg = wxGetApp().cfg;
-    cfg->SetPath(wxT("/"));
+    wxConfigBase* cfg = wxConfigBase::Get();
+    cfg->SetPath("/");
+
     // enure there are no unknown options present
     // note that items cannot be deleted until after loop or loop will fail
     wxArrayString item_del, grp_del;
@@ -341,9 +370,22 @@ void load_opts() {
         item_del.push_back(s);
     }
 
-    // Date of last online update check;
-    gopts.last_update = cfg->Read(wxT("General/LastUpdated"), (long)0);
-    cfg->Read(wxT("General/LastUpdatedFileName"), &gopts.last_updated_filename);
+    // Read the IniVersion now since the Option initialization code will reset
+    // it to kIniLatestVersion if it is unset.
+    uint32_t ini_version = 0;
+    if (first_time_launch) {
+        // Just go with the default values for the first time launch.
+        ini_version = config::kIniLatestVersion;
+    } else {
+        // We want to default to 0 if the option is not set.
+        ini_version = LoadUnsignedOption(cfg, "General/IniVersion", 0);
+        if (ini_version > config::kIniLatestVersion) {
+            wxLogWarning(
+                _("The INI file was written for a more recent version of "
+                  "VBA-M. Some INI option values may have been reset."));
+            ini_version = config::kIniLatestVersion;
+        }
+    }
 
     for (cont = cfg->GetFirstGroup(s, grp_idx); cont;
          cont = cfg->GetNextGroup(s, grp_idx)) {
@@ -464,8 +506,8 @@ void load_opts() {
             break;
         }
         case config::Option::Type::kUnsigned: {
-            int temp;
-            cfg->Read(opt.config_name(), &temp, opt.GetUnsigned());
+            uint32_t temp =
+                LoadUnsignedOption(cfg, opt.config_name(), opt.GetUnsigned());
             opt.SetUnsigned(temp);
             break;
         }
@@ -537,17 +579,14 @@ void load_opts() {
         }
     }
 
-    // Make sure link_timeout is not set to 1, which was the previous default.
-    if (gopts.link_timeout <= 1) {
-        gopts.link_timeout = 500;
-    }
-
     // recent is special
     // Recent does not get written with defaults
     cfg->SetPath(wxT("/Recent"));
     gopts.recent->Load(*cfg);
     cfg->SetPath(wxT("/"));
     cfg->Flush();
+
+    InitializeOptionObservers();
 
     // We default the MaxThreads option to 0, so set it to the CPU count here.
     config::OptionProxy<config::OptionID::kDispMaxThreads> max_threads;
@@ -563,13 +602,32 @@ void load_opts() {
         }
     }
 
-    InitializeOptionObservers();
+    // Apply Option updates.
+    while (ini_version < config::kIniLatestVersion) {
+        // Update the ini version as we go in case we fail halfway through.
+        OPTION(kGenIniVersion) = ini_version;
+        switch (ini_version) {
+            case 0: { // up to 2.1.5 included.
+#ifndef NO_LINK
+                // Previous default was 1.
+                if (OPTION(kGBALinkTimeout) == 1) {
+                    OPTION(kGBALinkTimeout) = 500;
+                }
+#endif
+                // Previous default was true.
+                OPTION(kGBALCDFilter) = false;
+            }
+        }
+        ini_version++;
+    }
+
+    // Finally, overwrite the value to the current version.
+    OPTION(kGenIniVersion) = config::kIniLatestVersion;
 }
 
 // Note: run load_opts() first to guarantee all config opts exist
-void update_opts()
-{
-    wxFileConfig* cfg = wxGetApp().cfg;
+void update_opts() {
+    wxConfigBase* cfg = wxConfigBase::Get();
 
     for (config::Option& opt : config::Option::All()) {
         SaveOption(&opt);

@@ -104,8 +104,6 @@ public:
         return accels;
     }
 
-    // the main configuration
-    wxFileConfig* cfg = nullptr;
     // vba-over.ini
     wxFileConfig* overrides = nullptr;
 
@@ -144,6 +142,9 @@ protected:
 private:
     wxPathList config_path;
     char* home = nullptr;
+
+    // Main configuration file.
+    wxFileName config_file_;
 };
 
 DECLARE_APP(wxvbamApp);
