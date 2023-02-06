@@ -362,8 +362,7 @@ bool wxvbamApp::OnInit() {
     // wxGLCanvas segfaults under wayland before wx 3.2
 #if defined(HAVE_WAYLAND_SUPPORT) && !defined(HAVE_WAYLAND_EGL)
     if (UsingWayland()) {
-        config::Proxy<config::OptionID::kDispRenderMethod>().Set(
-            config::RenderMethod::kSimple);
+        OPTION(kDispRenderMethod) = config::RenderMethod::kSimple;
     }
 #endif
 
@@ -472,14 +471,12 @@ bool wxvbamApp::OnInit() {
     config::GameControlState::Instance().OnGameBindingsChanged();
 
     // create the main window
-    int x = config::Proxy<config::OptionID::kGeomWindowX>().Get();
-    int y = config::Proxy<config::OptionID::kGeomWindowY>().Get();
-    int width = config::Proxy<config::OptionID::kGeomWindowHeight>().Get();
-    int height = config::Proxy<config::OptionID::kGeomWindowHeight>().Get();
-    bool isFullscreen =
-        config::Proxy<config::OptionID::kGeomFullScreen>().Get();
-    bool isMaximized =
-        config::Proxy<config::OptionID::kGeomIsMaximized>().Get();
+    int x = OPTION(kGeomWindowX);
+    int y = OPTION(kGeomWindowY);
+    int width = OPTION(kGeomWindowHeight);
+    int height = OPTION(kGeomWindowHeight);
+    bool isFullscreen = OPTION(kGeomFullScreen);
+    bool isMaximized = OPTION(kGeomIsMaximized);
     frame = wxDynamicCast(xr->LoadFrame(nullptr, "MainFrame"), MainFrame);
 
     if (!frame) {
@@ -842,8 +839,8 @@ void MainFrame::OnMove(wxMoveEvent&) {
 
     if (!IsFullScreen() && !IsMaximized()) {
         if (window_pos.x >= 0 && window_pos.y >= 0) {
-            config::Proxy<config::OptionID::kGeomWindowX>().Set(window_pos.x);
-            config::Proxy<config::OptionID::kGeomWindowY>().Set(window_pos.y);
+            OPTION(kGeomWindowX) = window_pos.x;
+            OPTION(kGeomWindowY) = window_pos.y;
         }
     }
 }
@@ -851,26 +848,22 @@ void MainFrame::OnMove(wxMoveEvent&) {
 void MainFrame::OnSize(wxSizeEvent& event)
 {
     wxFrame::OnSize(event);
-    wxRect window_rect = GetRect();
-    wxPoint window_pos = GetScreenPosition();
-    config::Proxy<config::OptionID::kGeomWindowX> window_x;
-    config::Proxy<config::OptionID::kGeomWindowY> window_y;
+    const wxRect window_rect = GetRect();
+    const wxPoint window_pos = GetScreenPosition();
 
     if (!IsFullScreen() && !IsMaximized()) {
         if (window_rect.GetHeight() > 0 && window_rect.GetWidth() > 0) {
-            config::Proxy<config::OptionID::kGeomWindowHeight>().Set(
-                window_rect.GetHeight());
-            config::Proxy<config::OptionID::kGeomWindowWidth>().Set(
-                window_rect.GetWidth());
+            OPTION(kGeomWindowHeight) = window_rect.GetHeight();
+            OPTION(kGeomWindowWidth) = window_rect.GetWidth();
         }
         if (window_pos.x >= 0 && window_pos.y >= 0) {
-            window_x.Set(window_pos.x);
-            window_y.Set(window_pos.y);
+            OPTION(kGeomWindowX) = window_pos.x;
+            OPTION(kGeomWindowY) = window_pos.y;
         }
     }
 
-    config::Proxy<config::OptionID::kGeomIsMaximized>().Set(IsMaximized());
-    config::Proxy<config::OptionID::kGeomFullScreen>().Set(IsFullScreen());
+    OPTION(kGeomIsMaximized) = IsMaximized();
+    OPTION(kGeomFullScreen) = IsFullScreen();
 }
 
 int MainFrame::FilterEvent(wxEvent& event)

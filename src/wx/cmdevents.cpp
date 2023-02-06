@@ -2559,32 +2559,32 @@ EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
 
 EVT_HANDLER(SetSize1x, "1x")
 {
-    config::Proxy<config::OptionID::kDispScale>().Set(1);
+    OPTION(kDispScale) = 1;
 }
 
 EVT_HANDLER(SetSize2x, "2x")
 {
-    config::Proxy<config::OptionID::kDispScale>().Set(2);
+    OPTION(kDispScale) = 2;
 }
 
 EVT_HANDLER(SetSize3x, "3x")
 {
-    config::Proxy<config::OptionID::kDispScale>().Set(3);
+    OPTION(kDispScale) = 3;
 }
 
 EVT_HANDLER(SetSize4x, "4x")
 {
-    config::Proxy<config::OptionID::kDispScale>().Set(4);
+    OPTION(kDispScale) = 4;
 }
 
 EVT_HANDLER(SetSize5x, "5x")
 {
-    config::Proxy<config::OptionID::kDispScale>().Set(5);
+    OPTION(kDispScale) = 5;
 }
 
 EVT_HANDLER(SetSize6x, "6x")
 {
-    config::Proxy<config::OptionID::kDispScale>().Set(6);
+    OPTION(kDispScale) = 6;
 }
 
 EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
@@ -2764,12 +2764,12 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
 
 EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
 {
-    config::Proxy<config::OptionID::kDispFilter>().Next();
+    OPTION(kDispFilter).Next();
 }
 
 EVT_HANDLER_MASK(ChangeIFB, "Change Interframe Blending", CMDEN_NREC_ANY)
 {
-    config::Proxy<config::OptionID::kDispIFB>().Next();
+    OPTION(kDispIFB).Next();
 }
 
 EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)

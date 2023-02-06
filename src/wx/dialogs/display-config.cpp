@@ -354,7 +354,7 @@ void DisplayConfig::PopulatePluginOptions() {
     plugin_selector_->Clear();
     plugin_selector_->Append(_("None"), new wxStringClientData());
 
-    const wxString& selected_plugin = config::Proxy<config::OptionID::kDispFilterPlugin>().Get();
+    const wxString& selected_plugin = OPTION(kDispFilterPlugin);
     bool is_plugin_selected = false;
 
     for (const wxString& plugin : plugins) {
@@ -389,7 +389,7 @@ void DisplayConfig::PopulatePluginOptions() {
     }
 
     if (!is_plugin_selected) {
-        config::Proxy<config::OptionID::kDispFilterPlugin>().Set(wxEmptyString);
+        OPTION(kDispFilterPlugin) = wxEmptyString;
     }
 
     plugin_selector_->SetValidator(PluginSelectorValidator());
@@ -444,14 +444,14 @@ void DisplayConfig::HidePluginOptions() {
     if (filter_selector_->GetCount() == config::kNbFilters) {
         // Make sure we have not selected the plugin option. The validator
         // will take care of updating the selector value.
-        if (config::Proxy<config::OptionID::kDispFilter>().Get() == config::Filter::kPlugin) {
-            config::Proxy<config::OptionID::kDispFilter>().Set(config::Filter::kNone);
+        if (OPTION(kDispFilter) == config::Filter::kPlugin) {
+            OPTION(kDispFilter) = config::Filter::kNone;
         }
         filter_selector_->Delete(config::kNbFilters - 1);
     }
 
     // Also erase the Plugin value to avoid issues down the line.
-    config::Proxy<config::OptionID::kDispFilterPlugin>().Set(wxEmptyString);
+    OPTION(kDispFilterPlugin) = wxEmptyString;
 }
 
 void DisplayConfig::ShowPluginOptions() {
