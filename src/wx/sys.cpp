@@ -1,5 +1,6 @@
 #include "../common/SoundSDL.h"
 #include "config/game-control.h"
+#include "config/option-proxy.h"
 #include "wxvbam.h"
 #include "SDL.h"
 #include <wx/ffile.h>
@@ -777,7 +778,7 @@ public:
     {
         dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
 
-        if (gopts.keep_on_top)
+        if (OPTION(kDispKeepOnTop))
             dlg->SetWindowStyle(dlg->GetWindowStyle() | wxSTAY_ON_TOP);
         else
             dlg->SetWindowStyle(dlg->GetWindowStyle() & ~wxSTAY_ON_TOP);

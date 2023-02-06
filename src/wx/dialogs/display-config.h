@@ -5,6 +5,7 @@
 #include <wx/event.h>
 
 #include "config/option-observer.h"
+#include "widgets/keep-on-top-styler.h"
 
 // Forward declarations.
 class wxChoice;
@@ -55,8 +56,9 @@ private:
     wxChoice* plugin_selector_;
     wxChoice* filter_selector_;
     wxChoice* interframe_selector_;
-    config::OptionsObserver filter_observer_;
-    config::OptionsObserver interframe_observer_;
+    const config::OptionsObserver filter_observer_;
+    const config::OptionsObserver interframe_observer_;
+    const widgets::KeepOnTopStyler keep_on_top_styler_;
 };
 
 }  // namespace dialogs

@@ -23,11 +23,7 @@ extern struct opts_t {
     // I instead organized this by opts.cpp table order
 
     /// Display
-    bool bilinear = true;
     wxVideoMode fs_mode;
-    int max_threads = 0;
-    bool retain_aspect = true;
-    bool keep_on_top = false;
 
     /// GB
     wxString gb_bios;

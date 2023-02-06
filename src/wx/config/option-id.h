@@ -4,7 +4,7 @@
 namespace config {
 
 enum class OptionID {
-    // Display
+    /// Display
     kDispBilinear = 0,
     kDispFilter,
     kDispFilterPlugin,

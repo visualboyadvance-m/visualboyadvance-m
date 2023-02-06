@@ -4,11 +4,13 @@
 
 #include "../common/cstdint.h"
 
-#include "../gba/armdis.h"
-#include "viewsupt.h"
-#include "wxvbam.h"
 #include <wx/ffile.h>
 #include <wx/vlbox.h>
+#include "../gba/armdis.h"
+#include "config/option-proxy.h"
+#include "keep-on-top-styler.h"
+#include "viewsupt.h"
+#include "wxvbam.h"
 
 // avoid exporting classes
 namespace Viewers {
@@ -515,8 +517,7 @@ void MainFrame::IOViewer()
             baddialog();                                                \
         cb->SetValidator(wxBoolIntValidator(&systemVerbose, val, val)); \
     } while (0)
-LogDialog::LogDialog()
-{
+LogDialog::LogDialog() : keep_on_top_styler_(this) {
     const wxString dname = wxT("Logging");
 
     if (!wxXmlResource::Get()->LoadDialog(this, wxGetApp().frame, dname))
@@ -727,7 +728,7 @@ public:
         selreg_len->SetValue(s);
         selregion->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
 
-        if (gopts.keep_on_top)
+        if (OPTION(kDispKeepOnTop))
             selregion->SetWindowStyle(selregion->GetWindowStyle() | wxSTAY_ON_TOP);
         else
             selregion->SetWindowStyle(selregion->GetWindowStyle() & ~wxSTAY_ON_TOP);
@@ -752,7 +753,7 @@ public:
         selreg_len->SetValue(wxEmptyString);
         selregion->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
 
-        if (gopts.keep_on_top)
+        if (OPTION(kDispKeepOnTop))
             selregion->SetWindowStyle(selregion->GetWindowStyle() | wxSTAY_ON_TOP);
         else
             selregion->SetWindowStyle(selregion->GetWindowStyle() & ~wxSTAY_ON_TOP);

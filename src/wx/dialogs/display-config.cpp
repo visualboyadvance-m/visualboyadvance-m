@@ -18,6 +18,7 @@
 #include "config/option-id.h"
 #include "config/option-proxy.h"
 #include "config/option.h"
+#include "keep-on-top-styler.h"
 #include "rpi.h"
 #include "wayland.h"
 #include "widgets/option-validator.h"
@@ -250,7 +251,8 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
       interframe_observer_(config::OptionID::kDispIFB,
                            std::bind(&DisplayConfig::OnInterframeChanged,
                                      this,
-                                     std::placeholders::_1)) {
+                                     std::placeholders::_1)),
+      keep_on_top_styler_(this) {
 #if !wxCHECK_VERSION(3, 1, 0)
     // This needs to be set before loading any element on the window. This also
     // has no effect since wx 3.1.0, where it became the default.
@@ -337,6 +339,9 @@ void DisplayConfig::OnDialogShowEvent(wxShowEvent& event) {
     } else {
         StopPluginHandler();
     }
+
+    // Let the event propagate.
+    event.Skip();
 }
 
 void DisplayConfig::PopulatePluginOptions() {
@@ -408,6 +413,9 @@ void DisplayConfig::UpdatePlugin(wxCommandEvent& event) {
                             config::Filter::kPlugin);
     plugin_label_->Enable(is_plugin);
     plugin_selector_->Enable(is_plugin);
+
+    // Let the event propagate.
+    event.Skip();
 }
 
 void DisplayConfig::OnFilterChanged(config::Option* option) {

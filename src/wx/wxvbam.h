@@ -13,6 +13,7 @@
 
 #include "config/option-observer.h"
 #include "widgets/dpi-support.h"
+#include "widgets/keep-on-top-styler.h"
 #include "wx/joyedit.h"
 #include "wx/keyedit.h"
 #include "wx/sdljoy.h"
@@ -212,7 +213,7 @@ extern bool pause_next;
 class MainFrame : public wxFrame {
 public:
     MainFrame();
-    ~MainFrame();
+    ~MainFrame() override;
 
     bool BindControls();
     void MenuOptionIntMask(const wxString& menuName, int field, int mask);
@@ -361,14 +362,15 @@ private:
     // joystick reader
     wxJoyPoller joy;
     JoystickPoller* jpoll = nullptr;
+    // quicker & more accurate than FindFocus() != NULL
+    bool focused;
+    const widgets::KeepOnTopStyler keep_on_top_styler_;
 
     // helper function for adding menu to accel editor
     void add_menu_accels(wxTreeCtrl* tc, wxTreeItemId& parent, wxMenu* menu);
 
     // for detecting window focus
     void OnActivate(wxActivateEvent&);
-    // quicker & more accurate than FindFocus() != NULL
-    bool focused;
     // may work, may not...  if so, load dropped file
     void OnDropFile(wxDropFilesEvent&);
     // pop up menu in fullscreen mode
@@ -689,6 +691,7 @@ public:
 
 private:
     wxTextCtrl* log;
+    widgets::KeepOnTopStyler keep_on_top_styler_;
     void Save(wxCommandEvent& ev);
     void Clear(wxCommandEvent& ev);
 

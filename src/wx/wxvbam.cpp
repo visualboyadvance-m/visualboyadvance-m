@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <wx/cmdline.h>
+#include <wx/display.h>
 #include <wx/file.h>
 #include <wx/filesys.h>
 #include <wx/fs_arc.h>
@@ -39,10 +40,10 @@
 
 #ifdef __WXMSW__
 
-int WinMain(HINSTANCE hInstance,
-            HINSTANCE hPrevInstance,
-            LPSTR lpCmdLine,
-            int nCmdShow) {
+int __stdcall WinMain(HINSTANCE hInstance,
+                      HINSTANCE hPrevInstance,
+                      LPSTR lpCmdLine,
+                      int nCmdShow) {
     bool console_attached = AttachConsole(ATTACH_PARENT_PROCESS) != FALSE;
 #ifdef DEBUG
     // In debug builds, create a console if none is attached.
@@ -470,32 +471,45 @@ bool wxvbamApp::OnInit() {
     // and command line overrides have been applied.
     config::GameControlState::Instance().OnGameBindingsChanged();
 
-    // create the main window
-    int x = OPTION(kGeomWindowX);
-    int y = OPTION(kGeomWindowY);
-    int width = OPTION(kGeomWindowHeight);
-    int height = OPTION(kGeomWindowHeight);
-    bool isFullscreen = OPTION(kGeomFullScreen);
-    bool isMaximized = OPTION(kGeomIsMaximized);
-    frame = wxDynamicCast(xr->LoadFrame(nullptr, "MainFrame"), MainFrame);
+    // We need to gather this information before crating the MainFrame as the
+    // OnSize / OnMove event handlers can fire during construction.
+    const wxRect client_rect(
+        OPTION(kGeomWindowX).Get(),
+        OPTION(kGeomWindowY).Get(),
+        OPTION(kGeomWindowWidth).Get(),
+        OPTION(kGeomWindowHeight).Get());
+    const bool is_fullscreen = OPTION(kGeomFullScreen);
+    const bool is_maximized = OPTION(kGeomIsMaximized);
 
+    // Create the main window.
+    frame = wxDynamicCast(xr->LoadFrame(nullptr, "MainFrame"), MainFrame);
     if (!frame) {
         wxLogError(_("Could not create main window"));
         return false;
     }
 
     // Create() cannot be overridden easily
-    if (!frame->BindControls())
+    if (!frame->BindControls()) {
         return false;
+    }
 
-    if (x >= 0 && y >= 0 && width > 0 && height > 0)
-        frame->SetSize(x, y, width, height);
+    // Measure the full display area.
+    wxRect display_rect;
+    for (unsigned int i = 0; i < wxDisplay::GetCount(); i++) {
+        display_rect.Union(wxDisplay(i).GetClientArea());
+    }
 
-    if (isMaximized)
+    // Ensure we are not drawing out of bounds.
+    if (display_rect.Intersects(client_rect)) {
+        frame->SetSize(client_rect);
+    }
+
+    if (is_maximized) {
         frame->Maximize();
+    }
+    if (is_fullscreen && wxGetApp().pending_load != wxEmptyString)
+        frame->ShowFullScreen(is_fullscreen);
 
-    if (isFullscreen && wxGetApp().pending_load != wxEmptyString)
-        frame->ShowFullScreen(isFullscreen);
     frame->Show(true);
 
 #ifndef NO_ONLINEUPDATES
@@ -760,12 +774,12 @@ wxvbamApp::~wxvbamApp() {
 }
 
 MainFrame::MainFrame()
-    : wxFrame()
-    , paused(false)
-    , menus_opened(0)
-    , dialog_opened(0)
-    , focused(false)
-{
+    : wxFrame(),
+      paused(false),
+      menus_opened(0),
+      dialog_opened(0),
+      focused(false),
+      keep_on_top_styler_(this) {
     jpoll = new JoystickPoller();
     this->Connect(wxID_ANY, wxEVT_SHOW, wxShowEventHandler(JoystickPoller::ShowDialog), jpoll, jpoll);
 }
@@ -835,13 +849,10 @@ void MainFrame::OnMenu(wxContextMenuEvent& event)
 }
 
 void MainFrame::OnMove(wxMoveEvent&) {
-    wxPoint window_pos = GetScreenPosition();
-
     if (!IsFullScreen() && !IsMaximized()) {
-        if (window_pos.x >= 0 && window_pos.y >= 0) {
-            OPTION(kGeomWindowX) = window_pos.x;
-            OPTION(kGeomWindowY) = window_pos.y;
-        }
+        const wxPoint window_pos = GetScreenPosition();
+        OPTION(kGeomWindowX) = window_pos.x;
+        OPTION(kGeomWindowY) = window_pos.y;
     }
 }
 
@@ -856,10 +867,8 @@ void MainFrame::OnSize(wxSizeEvent& event)
             OPTION(kGeomWindowHeight) = window_rect.GetHeight();
             OPTION(kGeomWindowWidth) = window_rect.GetWidth();
         }
-        if (window_pos.x >= 0 && window_pos.y >= 0) {
-            OPTION(kGeomWindowX) = window_pos.x;
-            OPTION(kGeomWindowY) = window_pos.y;
-        }
+        OPTION(kGeomWindowX) = window_pos.x;
+        OPTION(kGeomWindowY) = window_pos.y;
     }
 
     OPTION(kGeomIsMaximized) = IsMaximized();
@@ -1161,7 +1170,7 @@ int MainFrame::ShowModal(wxDialog* dlg)
 {
     dlg->SetWindowStyle(dlg->GetWindowStyle() | wxCAPTION | wxRESIZE_BORDER);
 
-    if (gopts.keep_on_top)
+    if (OPTION(kDispKeepOnTop))
         dlg->SetWindowStyle(dlg->GetWindowStyle() | wxSTAY_ON_TOP);
     else
         dlg->SetWindowStyle(dlg->GetWindowStyle() & ~wxSTAY_ON_TOP);

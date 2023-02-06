@@ -110,8 +110,9 @@ GameArea::GameArea()
       pointer_blanked(false),
       mouse_active_time(0),
       render_observer_(
-          {config::OptionID::kDispRenderMethod, config::OptionID::kDispFilter,
-           config::OptionID::kDispIFB},
+          {config::OptionID::kDispBilinear, config::OptionID::kDispFilter,
+           config::OptionID::kDispRenderMethod, config::OptionID::kDispIFB,
+           config::OptionID::kDispStretch},
           std::bind(&GameArea::ResetPanel, this)),
       scale_observer_(config::OptionID::kDispScale,
                       std::bind(&GameArea::AdjustSize, this, true)) {
@@ -1158,32 +1159,28 @@ void GameArea::OnIdle(wxIdleEvent& event)
         AdjustMinSize();
         AdjustSize(false);
 
-        unsigned frame_priority = gopts.retain_aspect ? 0 : 1;
+        const bool retain_aspect = OPTION(kDispStretch);
+        const unsigned frame_priority = retain_aspect ? 0 : 1;
 
         GetSizer()->Clear();
 
         // add spacers on top and bottom to center panel vertically
         // but not on 2.8 which does not handle this correctly
-        if (gopts.retain_aspect)
-#if wxCHECK_VERSION(2, 9, 0)
+        if (retain_aspect) {
             GetSizer()->Add(0, 0, wxEXPAND);
-#else
-            frame_priority = 1;
-#endif
+        }
 
         // this triggers an assertion dialog in <= 3.1.2 in debug mode
-        GetSizer()->Add(w, frame_priority, gopts.retain_aspect ? (wxSHAPED | wxALIGN_CENTER | wxEXPAND) : wxEXPAND);
+        GetSizer()->Add(
+            w, frame_priority,
+            retain_aspect ? (wxSHAPED | wxALIGN_CENTER | wxEXPAND) : wxEXPAND);
 
-#if wxCHECK_VERSION(2, 9, 0)
-        if (gopts.retain_aspect)
+        if (retain_aspect) {
             GetSizer()->Add(0, 0, wxEXPAND);
-#endif
+        }
 
         Layout();
-
-#if wxCHECK_VERSION(2, 9, 0)
         SendSizeEvent();
-#endif
 
         if (pointer_blanked)
             w->SetCursor(wxCursor(wxCURSOR_BLANK));
@@ -1196,7 +1193,8 @@ void GameArea::OnIdle(wxIdleEvent& event)
             utilUpdateSystemColorMaps(gopts.gba_lcd_filter);
         else if (loaded == IMAGE_GB)
             utilUpdateSystemColorMaps(gopts.gb_lcd_filter);
-        else utilUpdateSystemColorMaps(false);
+        else
+            utilUpdateSystemColorMaps(false);
     }
 
     mf->PollJoysticks();
@@ -1806,13 +1804,13 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
         todraw = pixbuf2;
 
     // FIXME: filters race condition?
-    gopts.max_threads = 1;
+    const int max_threads = 1;
 
     // First, apply filters, if applicable, in parallel, if enabled
     // FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur)
     if (OPTION(kDispFilter) != config::Filter::kNone ||
         OPTION(kDispIFB) != config::Interframe::kNone) {
-        if (nthreads != gopts.max_threads) {
+        if (nthreads != max_threads) {
             if (nthreads) {
                 if (nthreads > 1)
                     for (int i = 0; i < nthreads; i++) {
@@ -1826,7 +1824,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                 delete[] threads;
             }
 
-            nthreads = gopts.max_threads;
+            nthreads = max_threads;
             threads = new FilterThread[nthreads];
             // first time around, no threading in order to avoid
             // static initializer conflicts
@@ -2217,6 +2215,8 @@ void GLDrawingPanel::DrawingPanelInit()
 
     AdjustViewport();
 
+    const bool bilinear = OPTION(kDispBilinear);
+
     // taken from GTK front end almost verbatim
     glDisable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
@@ -2241,9 +2241,9 @@ void GLDrawingPanel::DrawingPanelInit()
     glGenTextures(1, &texid);
     glBindTexture(GL_TEXTURE_2D, texid);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-        gopts.bilinear ? GL_LINEAR : GL_NEAREST);
+                    bilinear ? GL_LINEAR : GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-        gopts.bilinear ? GL_LINEAR : GL_NEAREST);
+                    bilinear ? GL_LINEAR : GL_NEAREST);
 
 #define int_fmt out_16 ? GL_RGB5 : GL_RGB
 #define tex_fmt out_16 ? GL_BGRA : GL_RGBA, \

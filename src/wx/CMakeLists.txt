@@ -765,6 +765,7 @@ set(
     config/option.cpp
     config/user-input.cpp
     dialogs/display-config.cpp
+    widgets/keep-on-top-styler.cpp
     widgets/keyedit.cpp
     widgets/joyedit.cpp
     widgets/option-validator.cpp
@@ -811,6 +812,7 @@ set(
     config/user-input.h
     dialogs/display-config.h
     widgets/dpi-support.h
+    widgets/keep-on-top-styler.h
     widgets/option-validator.h
     widgets/render-plugin.h
     widgets/wx/keyedit.h
