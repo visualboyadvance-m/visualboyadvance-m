@@ -170,14 +170,14 @@ void GameArea::LoadGame(const wxString& name)
     }
 
     {
-        wxFileConfig* cfg = wxGetApp().cfg;
+        wxConfigBase* cfg = wxConfigBase::Get();
 
         if (!gopts.recent_freeze) {
             gopts.recent->AddFileToHistory(name);
             wxGetApp().frame->SetRecentAccels();
-            cfg->SetPath(wxT("/Recent"));
+            cfg->SetPath("/Recent");
             gopts.recent->Save(*cfg);
-            cfg->SetPath(wxT("/"));
+            cfg->SetPath("/");
             cfg->Flush();
         }
     }

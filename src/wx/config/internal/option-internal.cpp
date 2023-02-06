@@ -161,6 +161,9 @@ std::array<Option, kNbOptions>& Option::All() {
         double video_scale = 3;
         bool retain_aspect = true;
 
+        /// General
+        uint32_t ini_version = kIniLatestVersion;
+
         /// Geometry
         bool window_maximized = false;
         uint32_t window_height = 0;
@@ -226,6 +229,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kGenScreenshotDir, &gopts.scrshot_dir),
         Option(OptionID::kGenStateDir, &gopts.state_dir),
         Option(OptionID::kGenStatusBar, &gopts.statusbar),
+        Option(OptionID::kGenIniVersion, &g_owned_opts.ini_version, 0, std::numeric_limits<uint32_t>::max()),
 
         /// Joypad
         Option(OptionID::kJoy),
@@ -402,6 +406,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                _("Directory to store saved state files (relative paths are "
                  "relative to BatteryDir)")},
     OptionData{"General/StatusBar", "StatusBar", _("Enable status bar")},
+    OptionData{"General/IniVersion", "", _("INI file version (DO NOT MODIFY)")},
 
     /// Joypad
     OptionData{"Joypad/*/*", "",
