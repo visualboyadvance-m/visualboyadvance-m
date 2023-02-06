@@ -3119,6 +3119,11 @@ EVT_HANDLER(FrameSkipAuto, "Auto Skip frames.")
     update_opts();
 }
 
+EVT_HANDLER(Fullscreen, "Enter fullscreen mode at startup")
+{
+    GetMenuOptionConfig("Fullscreen", config::OptionID::kGeomFullScreen);
+}
+
 EVT_HANDLER(PauseWhenInactive, "Pause game when main window loses focus")
 {
     GetMenuOptionInt("PauseWhenInactive", &pauseWhenInactive, 1);
