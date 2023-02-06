@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-05 17:29+0000\n"
+"POT-Creation-Date: 2023-02-05 19:53+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: agBAZE <drakitoo94@gmail.com>, 2021\n"
 "Language-Team: Spanish (United States) (http://www.transifex.com/bgk/vba-m/language/es_US/)\n"
@@ -64,34 +64,34 @@ msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
 #: wxvbam.cpp:613
-msgid "Configuration/build error: can't find built-in xrc"
-msgstr "Configuration/build error: can't find built-in xrc"
+msgid "Configuration / build error: can't find built-in xrc"
+msgstr ""
 
 #: wxvbam.cpp:621
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
-"To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr "Wrote built-in configuration to %s.\nTo override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
+"To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
+msgstr ""
 
-#: wxvbam.cpp:636
+#: wxvbam.cpp:635
 msgid "Configuration is read from, in order:"
 msgstr "Configuration is read from, in order:"
 
-#: wxvbam.cpp:650
+#: wxvbam.cpp:649
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
-"To override, delete all but changed section.  First found section is used from search path:"
-msgstr "Wrote built-in override file to %s\nTo override, delete all but changed section.  First found section is used from search path:"
+"To override, delete all but changed section. First found section is used from search path:"
+msgstr ""
 
-#: wxvbam.cpp:656
+#: wxvbam.cpp:655
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tbuilt-in"
 
-#: wxvbam.cpp:671
+#: wxvbam.cpp:670
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -99,17 +99,17 @@ msgid ""
 "\n"
 msgstr "Options set from the command line are saved if any configuration changes are made in the user interface.\n\nFor flag options, true and false are specified as 1 and 0, respectively.\n\n"
 
-#: wxvbam.cpp:679
+#: wxvbam.cpp:678
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "The commands available for the Keyboard/* option are:\n\n"
 
-#: wxvbam.cpp:690
+#: wxvbam.cpp:689
 msgid "Configuration file not found."
 msgstr "Configuration file not found."
 
-#: wxvbam.cpp:723
+#: wxvbam.cpp:722
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Bad configuration option or multiple ROM files given:\n"
 
@@ -181,25 +181,25 @@ msgstr " FiltersTextStatusTagUsersDateLabelMore1visualboyadvance-m2Could not cr
 msgid "Removing cheats"
 msgstr "Removing cheats"
 
-#: guiinit.cpp:758 xrc/JoyPanel.xrc:364
-msgid "GameShark"
-msgstr "GameShark"
+#: guiinit.cpp:758
+msgid "Game Shark"
+msgstr ""
 
-#: guiinit.cpp:759 cmdevents.cpp:705
-msgid "GameGenie"
-msgstr "GameGenie"
+#: guiinit.cpp:759
+msgid "Game Genie"
+msgstr ""
 
 #: guiinit.cpp:761
 msgid "Generic Code"
 msgstr "Generic Code"
 
 #: guiinit.cpp:762
-msgid "GameShark Advance"
-msgstr "GameShark Advance"
+msgid "Game Shark Advance"
+msgstr ""
 
 #: guiinit.cpp:763
-msgid "CodeBreaker Advance"
-msgstr "CodeBreaker Advance"
+msgid "Code Breaker Advance"
+msgstr ""
 
 #: guiinit.cpp:764
 msgid "Flashcart CHT"
@@ -257,12 +257,12 @@ msgstr "Desktop mode"
 
 #: guiinit.cpp:1734
 #, c-format
-msgid "%d x %d - %dbpp @ %dHz"
-msgstr "%d x %d - %dbpp @ %dHz"
+msgid "%d x %d - %d bpp @ %d Hz"
+msgstr ""
 
 #: guiinit.cpp:1976
-msgid "This will clear all user-defined accelerators.  Are you sure?"
-msgstr "This will clear all user-defined accelerators.  Are you sure?"
+msgid "This will clear all user-defined accelerators. Are you sure?"
+msgstr ""
 
 #: guiinit.cpp:1976
 msgid "Confirm"
@@ -287,8 +287,8 @@ msgstr "Duplicate menu accelerator: %s for %s and %s; keeping first"
 
 #: guiinit.cpp:2771
 #, c-format
-msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
-msgstr "Menu accelerator %s for %s overrides default for %s ; keeping menu"
+msgid "Menu accelerator %s for %s overrides default for %s; keeping menu"
+msgstr ""
 
 #: guiinit.cpp:2910
 #, c-format
@@ -332,7 +332,7 @@ msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr "Text files (*.txt;*.log)|*.txt;*.log|"
 
 #: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
-#: cmdevents.cpp:1187 cmdevents.cpp:1265 cmdevents.cpp:1335 cmdevents.cpp:1406
+#: cmdevents.cpp:1184 cmdevents.cpp:1262 cmdevents.cpp:1332 cmdevents.cpp:1403
 #: viewsupt.cpp:1180
 msgid "Select output file"
 msgstr "Select output file"
@@ -358,8 +358,8 @@ msgid "0x03000000 - IRAM"
 msgstr "0x03000000 - IRAM"
 
 #: viewers.cpp:817
-msgid "0x04000000 - I/O"
-msgstr "0x04000000 - I/O"
+msgid "0x04000000 - I / O"
+msgstr ""
 
 #: viewers.cpp:818
 msgid "0x05000000 - PALETTE"
@@ -402,8 +402,8 @@ msgid "0xD000 - WRAM"
 msgstr "0xD000 - WRAM"
 
 #: viewers.cpp:930
-msgid "0xFF00 - I/O"
-msgstr "0xFF00 - I/O"
+msgid "0xFF00 - I / O"
+msgstr ""
 
 #: viewers.cpp:931
 msgid "0xFF80 - RAM"
@@ -419,403 +419,407 @@ msgid ""
 "Table (*.act)|*.act"
 msgstr "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color Table (*.act)|*.act"
 
-#: gfxviewers.cpp:1601 gfxviewers.cpp:1743 cmdevents.cpp:1188
+#: gfxviewers.cpp:1601 gfxviewers.cpp:1743 cmdevents.cpp:1185
 #: viewsupt.cpp:1181
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG images|*.png|BMP images|*.bmp"
 
 #: cmdevents.cpp:134
 msgid ""
-"GameBoy Advance Files "
-"(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy"
-" Files "
+"Game Boy Advance Files "
+"(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
+" Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "GameBoy Advance Files (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr ""
 
-#: cmdevents.cpp:146
+#: cmdevents.cpp:145
 msgid "Open ROM file"
 msgstr "Open ROM file"
 
-#: cmdevents.cpp:163
+#: cmdevents.cpp:162
 msgid ""
-"GameBoy Files "
+"Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr ""
 
-#: cmdevents.cpp:170
+#: cmdevents.cpp:168
 msgid "Open GB ROM file"
 msgstr "Open GB ROM file"
 
-#: cmdevents.cpp:187
+#: cmdevents.cpp:185
 msgid ""
-"GameBoy Color Files "
+"Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "GameBoy Color Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr ""
 
-#: cmdevents.cpp:194
+#: cmdevents.cpp:191
 msgid "Open GBC ROM file"
 msgstr "Open GBC ROM file"
 
-#: cmdevents.cpp:613 cmdevents.cpp:729 cmdevents.cpp:768 cmdevents.cpp:841
+#: cmdevents.cpp:610 cmdevents.cpp:726 cmdevents.cpp:765 cmdevents.cpp:838
 msgid "Unknown"
 msgstr "Unknown"
 
-#: cmdevents.cpp:621
+#: cmdevents.cpp:618
 msgid "ROM"
 msgstr "ROM"
 
-#: cmdevents.cpp:625
-msgid "ROM+MBC1"
-msgstr "ROM+MBC1"
+#: cmdevents.cpp:622
+msgid "ROM + MBC1"
+msgstr ""
 
-#: cmdevents.cpp:629
-msgid "ROM+MBC1+RAM"
-msgstr "ROM+MBC1+RAM"
+#: cmdevents.cpp:626
+msgid "ROM + MBC1 + RAM"
+msgstr ""
 
-#: cmdevents.cpp:633
-msgid "ROM+MBC1+RAM+BATT"
-msgstr "ROM+MBC1+RAM+BATT"
+#: cmdevents.cpp:630
+msgid "ROM + MBC1 + RAM + BATT"
+msgstr ""
 
-#: cmdevents.cpp:637
-msgid "ROM+MBC2"
-msgstr "ROM+MBC2"
+#: cmdevents.cpp:634
+msgid "ROM + MBC2"
+msgstr ""
 
-#: cmdevents.cpp:641
-msgid "ROM+MBC2+BATT"
-msgstr "ROM+MBC2+BATT"
+#: cmdevents.cpp:638
+msgid "ROM + MBC2 + BATT"
+msgstr ""
 
-#: cmdevents.cpp:645
-msgid "ROM+MMM01"
-msgstr "ROM+MMM01"
+#: cmdevents.cpp:642
+msgid "ROM + MMM01"
+msgstr ""
 
-#: cmdevents.cpp:649
-msgid "ROM+MMM01+RAM"
-msgstr "ROM+MMM01+RAM"
+#: cmdevents.cpp:646
+msgid "ROM + MMM01 + RAM"
+msgstr ""
 
-#: cmdevents.cpp:653
-msgid "ROM+MMM01+RAM+BATT"
-msgstr "ROM+MMM01+RAM+BATT"
+#: cmdevents.cpp:650
+msgid "ROM + MMM01 + RAM + BATT"
+msgstr ""
 
-#: cmdevents.cpp:657
-msgid "ROM+MBC3+TIMER+BATT"
-msgstr "ROM+MBC3+TIMER+BATT"
+#: cmdevents.cpp:654
+msgid "ROM + MBC3 + TIMER + BATT"
+msgstr ""
 
-#: cmdevents.cpp:661
-msgid "ROM+MBC3+TIMER+RAM+BATT"
-msgstr "ROM+MBC3+TIMER+RAM+BATT"
+#: cmdevents.cpp:658
+msgid "ROM + MBC3 + TIMER + RAM + BATT"
+msgstr ""
 
-#: cmdevents.cpp:665
-msgid "ROM+MBC3"
-msgstr "ROM+MBC3"
+#: cmdevents.cpp:662
+msgid "ROM + MBC3"
+msgstr ""
 
-#: cmdevents.cpp:669
-msgid "ROM+MBC3+RAM"
-msgstr "ROM+MBC3+RAM"
+#: cmdevents.cpp:666
+msgid "ROM + MBC3 + RAM"
+msgstr ""
 
-#: cmdevents.cpp:673
-msgid "ROM+MBC3+RAM+BATT"
-msgstr "ROM+MBC3+RAM+BATT"
+#: cmdevents.cpp:670
+msgid "ROM + MBC3 + RAM + BATT"
+msgstr ""
 
-#: cmdevents.cpp:677
-msgid "ROM+MBC5"
-msgstr "ROM+MBC5"
+#: cmdevents.cpp:674
+msgid "ROM + MBC5"
+msgstr ""
 
-#: cmdevents.cpp:681
-msgid "ROM+MBC5+RAM"
-msgstr "ROM+MBC5+RAM"
+#: cmdevents.cpp:678
+msgid "ROM + MBC5 + RAM"
+msgstr ""
 
-#: cmdevents.cpp:685
-msgid "ROM+MBC5+RAM+BATT"
-msgstr "ROM+MBC5+RAM+BATT"
+#: cmdevents.cpp:682
+msgid "ROM + MBC5 + RAM + BATT"
+msgstr ""
 
-#: cmdevents.cpp:689
-msgid "ROM+MBC5+RUMBLE"
-msgstr "ROM+MBC5+RUMBLE"
+#: cmdevents.cpp:686
+msgid "ROM + MBC5 + RUMBLE"
+msgstr ""
 
-#: cmdevents.cpp:693
-msgid "ROM+MBC5+RUMBLE+RAM"
-msgstr "ROM+MBC5+RUMBLE+RAM"
+#: cmdevents.cpp:690
+msgid "ROM + MBC5 + RUMBLE + RAM"
+msgstr ""
 
-#: cmdevents.cpp:697
-msgid "ROM+MBC5+RUMBLE+RAM+BATT"
-msgstr "ROM+MBC5+RUMBLE+RAM+BATT"
+#: cmdevents.cpp:694
+msgid "ROM + MBC5 + RUMBLE + RAM + BATT"
+msgstr ""
 
-#: cmdevents.cpp:701
-msgid "ROM+MBC7+BATT"
-msgstr "ROM+MBC7+BATT"
+#: cmdevents.cpp:698
+msgid "ROM + MBC7 + BATT"
+msgstr ""
 
-#: cmdevents.cpp:709
+#: cmdevents.cpp:702
+msgid "GameGenie"
+msgstr "GameGenie"
+
+#: cmdevents.cpp:706
 msgid "GameShark V3.0"
 msgstr "GameShark V3.0"
 
-#: cmdevents.cpp:713
-msgid "ROM+POCKET CAMERA"
-msgstr "ROM+POCKET CAMERA"
+#: cmdevents.cpp:710
+msgid "ROM + POCKET CAMERA"
+msgstr ""
 
-#: cmdevents.cpp:717
-msgid "ROM+BANDAI TAMA5"
-msgstr "ROM+BANDAI TAMA5"
+#: cmdevents.cpp:714
+msgid "ROM + BANDAI TAMA5"
+msgstr ""
 
-#: cmdevents.cpp:721
-msgid "ROM+HuC-3"
-msgstr "ROM+HuC-3"
+#: cmdevents.cpp:718
+msgid "ROM + HuC-3"
+msgstr ""
 
-#: cmdevents.cpp:725
-msgid "ROM+HuC-1"
-msgstr "ROM+HuC-1"
+#: cmdevents.cpp:722
+msgid "ROM + HuC-1"
+msgstr ""
 
-#: cmdevents.cpp:775 dialogs/display-config.cpp:353 xrc/DisplayConfig.xrc:85
+#: cmdevents.cpp:772 dialogs/display-config.cpp:353 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
 msgid "None"
 msgstr "None"
 
-#: cmdevents.cpp:877 cmdevents.cpp:899
+#: cmdevents.cpp:874 cmdevents.cpp:896
 msgid "Select Dot Code file"
 msgstr "Select Dot Code file"
 
-#: cmdevents.cpp:879 cmdevents.cpp:901
+#: cmdevents.cpp:876 cmdevents.cpp:898
 msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 msgstr "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 
-#: cmdevents.cpp:920 cmdevents.cpp:1115
+#: cmdevents.cpp:917 cmdevents.cpp:1112
 msgid "Select battery file"
 msgstr "Select battery file"
 
-#: cmdevents.cpp:921 cmdevents.cpp:1116
+#: cmdevents.cpp:918 cmdevents.cpp:1113
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 
-#: cmdevents.cpp:929
+#: cmdevents.cpp:926
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
-"next write).  Do you want to continue?"
-msgstr "Importing a battery file will erase any saved games (permanently after the next write).  Do you want to continue?"
+"next write). Do you want to continue?"
+msgstr ""
 
-#: cmdevents.cpp:930 cmdevents.cpp:958 cmdevents.cpp:1078
+#: cmdevents.cpp:927 cmdevents.cpp:955 cmdevents.cpp:1075
 msgid "Confirm import"
 msgstr "Confirm import"
 
-#: cmdevents.cpp:936 panel.cpp:450
+#: cmdevents.cpp:933 panel.cpp:450
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Loaded battery %s"
 
-#: cmdevents.cpp:938
+#: cmdevents.cpp:935
 #, c-format
 msgid "Error loading battery %s"
 msgstr "Error loading battery %s"
 
-#: cmdevents.cpp:947
+#: cmdevents.cpp:944
 msgid "Select code file"
 msgstr "Select code file"
 
-#: cmdevents.cpp:948
-msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
-msgstr "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
+#: cmdevents.cpp:945
+msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
+msgstr ""
 
-#: cmdevents.cpp:948
-msgid "Gameshark Code File (*.gcf)|*.gcf"
-msgstr "Gameshark Code File (*.gcf)|*.gcf"
+#: cmdevents.cpp:945
+msgid "Game Shark Code File (*.gcf)|*.gcf"
+msgstr ""
 
-#: cmdevents.cpp:957
+#: cmdevents.cpp:954
 msgid ""
-"Importing a code file will replace any loaded cheats.  Do you want to "
+"Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
-msgstr "Importing a code file will replace any loaded cheats.  Do you want to continue?"
+msgstr ""
 
-#: cmdevents.cpp:974
+#: cmdevents.cpp:971
 #, c-format
 msgid "Cannot open file %s"
 msgstr "Cannot open file %s"
 
-#: cmdevents.cpp:984
+#: cmdevents.cpp:981
 #, c-format
 msgid "Unsupported code file %s"
 msgstr "Unsupported code file %s"
 
-#: cmdevents.cpp:1054
+#: cmdevents.cpp:1051
 #, c-format
 msgid "Loaded code file %s"
 msgstr "Loaded code file %s"
 
-#: cmdevents.cpp:1056
+#: cmdevents.cpp:1053
 #, c-format
 msgid "Error loading code file %s"
 msgstr "Error loading code file %s"
 
-#: cmdevents.cpp:1067 cmdevents.cpp:1143
+#: cmdevents.cpp:1064 cmdevents.cpp:1140
 msgid "Select snapshot file"
 msgstr "Select snapshot file"
 
-#: cmdevents.cpp:1068
+#: cmdevents.cpp:1065
 msgid ""
-"GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots "
+"GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots "
 "(*.gsv)|*.gsv"
-msgstr "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots (*.gsv)|*.gsv"
+msgstr ""
 
-#: cmdevents.cpp:1068
-msgid "Gameboy Snapshot (*.gbs)|*.gbs"
-msgstr "Gameboy Snapshot (*.gbs)|*.gbs"
+#: cmdevents.cpp:1065
+msgid "Game Boy Snapshot (*.gbs)|*.gbs"
+msgstr ""
 
-#: cmdevents.cpp:1077
+#: cmdevents.cpp:1074
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
-"next write).  Do you want to continue?"
-msgstr "Importing a snapshot file will erase any saved games (permanently after the next write).  Do you want to continue?"
+"next write). Do you want to continue?"
+msgstr ""
 
-#: cmdevents.cpp:1102
+#: cmdevents.cpp:1099
 #, c-format
 msgid "Loaded snapshot file %s"
 msgstr "Loaded snapshot file %s"
 
-#: cmdevents.cpp:1104
+#: cmdevents.cpp:1101
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr "Error loading snapshot file %s"
 
-#: cmdevents.cpp:1127
+#: cmdevents.cpp:1124
 #, c-format
 msgid "Wrote battery %s"
 msgstr "Wrote battery %s"
 
-#: cmdevents.cpp:1129 panel.cpp:756
+#: cmdevents.cpp:1126 panel.cpp:756
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Error writing battery %s"
 
-#: cmdevents.cpp:1137
+#: cmdevents.cpp:1134
 msgid "EEPROM saves cannot be exported"
 msgstr "EEPROM saves cannot be exported"
 
-#: cmdevents.cpp:1144
-msgid "Gameshark Snapshot (*.sps)|*.sps"
-msgstr "Gameshark Snapshot (*.sps)|*.sps"
+#: cmdevents.cpp:1141
+msgid "Game Shark Snapshot (*.sps)|*.sps"
+msgstr ""
 
-#: cmdevents.cpp:1158
-msgid "Exported from VisualBoyAdvance-M"
-msgstr "Exported from VisualBoyAdvance-M"
+#: cmdevents.cpp:1155
+msgid "Exported from Visual Boy Advance-M"
+msgstr ""
 
-#: cmdevents.cpp:1170
+#: cmdevents.cpp:1167
 #, c-format
 msgid "Saved snapshot file %s"
 msgstr "Saved snapshot file %s"
 
-#: cmdevents.cpp:1172
+#: cmdevents.cpp:1169
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr "Error saving snapshot file %s"
 
-#: cmdevents.cpp:1212 sys.cpp:558
+#: cmdevents.cpp:1209 sys.cpp:558
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "Wrote snapshot %s"
 
-#: cmdevents.cpp:1233 cmdevents.cpp:1303 cmdevents.cpp:1374 cmdevents.cpp:1440
+#: cmdevents.cpp:1230 cmdevents.cpp:1300 cmdevents.cpp:1371 cmdevents.cpp:1437
 msgid " files ("
 msgstr " files ("
 
-#: cmdevents.cpp:1473
+#: cmdevents.cpp:1470
 msgid "Select file"
 msgstr "Select file"
 
-#: cmdevents.cpp:1790 cmdevents.cpp:1883
+#: cmdevents.cpp:1787 cmdevents.cpp:1880
 msgid "Select state file"
 msgstr "Select state file"
 
-#: cmdevents.cpp:1791 cmdevents.cpp:1884
-msgid "VisualBoyAdvance saved game files|*.sgm"
-msgstr "VisualBoyAdvance saved game files|*.sgm"
+#: cmdevents.cpp:1788 cmdevents.cpp:1881
+msgid "Visual Boy Advance saved game files|*.sgm"
+msgstr ""
 
-#: cmdevents.cpp:1914 cmdevents.cpp:1924 cmdevents.cpp:1935
+#: cmdevents.cpp:1911 cmdevents.cpp:1921 cmdevents.cpp:1932
 #, c-format
 msgid "Current state slot #%d"
 msgstr "Current state slot #%d"
 
-#: cmdevents.cpp:2005
-msgid "Cannot use Colorizer Hack when GB BIOS File is enabled."
+#: cmdevents.cpp:2002
+msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
 msgstr ""
 
-#: cmdevents.cpp:2220
+#: cmdevents.cpp:2217
 msgid "Sound enabled"
 msgstr "Sound enabled"
 
-#: cmdevents.cpp:2220
+#: cmdevents.cpp:2217
 msgid "Sound disabled"
 msgstr "Sound disabled"
 
-#: cmdevents.cpp:2233 cmdevents.cpp:2247
+#: cmdevents.cpp:2230 cmdevents.cpp:2244
 #, c-format
-msgid "Volume: %d%%"
-msgstr "Volume: %d%%"
+msgid "Volume: %d %%"
+msgstr ""
 
-#: cmdevents.cpp:2322
+#: cmdevents.cpp:2319
 msgid "Set to 0 for pseudo tty"
 msgstr "Set to 0 for pseudo tty"
 
-#: cmdevents.cpp:2324
+#: cmdevents.cpp:2321
 msgid "Port to wait for connection:"
 msgstr "Port to wait for connection:"
 
-#: cmdevents.cpp:2325
+#: cmdevents.cpp:2322
 msgid "GDB Connection"
 msgstr "GDB Connection"
 
-#: cmdevents.cpp:2378
+#: cmdevents.cpp:2375
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "Waiting for connection at %s"
 
-#: cmdevents.cpp:2385
+#: cmdevents.cpp:2382
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "Waiting for connection on port %d"
 
-#: cmdevents.cpp:2388
+#: cmdevents.cpp:2385
 msgid "Waiting for GDB..."
 msgstr "Waiting for GDB..."
 
-#: cmdevents.cpp:2812 panel.cpp:250 panel.cpp:365
+#: cmdevents.cpp:2809 panel.cpp:250 panel.cpp:365
 msgid "Could not initialize the sound driver!"
 msgstr "Could not initialize the sound driver!"
 
-#: cmdevents.cpp:2916
-msgid "Nintendo GameBoy (+Color+Advance) emulator."
-msgstr "Nintendo GameBoy (+Color+Advance) emulator."
+#: cmdevents.cpp:2913
+msgid "Nintendo Game Boy / Color / Advance) emulator."
+msgstr ""
 
-#: cmdevents.cpp:2917
+#: cmdevents.cpp:2914
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2020 VBA-M development team"
 
-#: cmdevents.cpp:2918
+#: cmdevents.cpp:2916
 msgid ""
-"This program is free software: you can redistribute it and/or modify\n"
+"This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
 "the Free Software Foundation, either version 2 of the License, or\n"
 "(at your option) any later version.\n"
 "\n"
 "This program is distributed in the hope that it will be useful,\n"
 "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n"
 "GNU General Public License for more details.\n"
 "\n"
 "You should have received a copy of the GNU General Public License\n"
-"along with this program.  If not, see http://www.gnu.org/licenses ."
-msgstr "This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see http://www.gnu.org/licenses ."
-
-#: cmdevents.cpp:3156
-msgid "Cannot use GB BIOS when Colorizer Hack is enabled."
+"along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr ""
 
-#: cmdevents.cpp:3217
-msgid "LAN link is already active.  Disable link mode to disconnect."
-msgstr "LAN link is already active.  Disable link mode to disconnect."
+#: cmdevents.cpp:3157
+msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
+msgstr ""
 
-#: cmdevents.cpp:3223
+#: cmdevents.cpp:3218
+msgid "LAN link is already active. Disable link mode to disconnect."
+msgstr ""
+
+#: cmdevents.cpp:3224
 msgid "Network is not supported in local mode."
 msgstr "Network is not supported in local mode."
 
@@ -894,13 +898,13 @@ msgstr "Playback ended"
 
 #: sys.cpp:449
 #, c-format
-msgid "%d%%(%d, %d fps)"
-msgstr "%d%%(%d, %d fps)"
+msgid "%d %% (%d, %d fps)"
+msgstr ""
 
 #: sys.cpp:457
 #, c-format
-msgid "%d%%"
-msgstr "%d%%"
+msgid "%d %%"
+msgstr ""
 
 #: sys.cpp:879 xrc/GBPrinter.xrc:65
 msgid "&Discard"
@@ -953,8 +957,8 @@ msgstr "Unable to load Game Boy ROM %s"
 
 #: panel.cpp:262
 msgid ""
-"Cannot use GB BIOS file when Colorizer Hack is enabled, disabling GB BIOS "
-"file."
+"Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
+" Boy BIOS file."
 msgstr ""
 
 #: panel.cpp:279 panel.cpp:379
@@ -993,32 +997,32 @@ msgstr "Error saving state %s"
 
 #: panel.cpp:932
 #, c-format
-msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
-msgstr "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
+msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
+msgstr ""
 
 #: panel.cpp:970
 #, c-format
-msgid "Fullscreen mode %dx%d-%d@%d not supported"
-msgstr "Fullscreen mode %dx%d-%d@%d not supported"
+msgid "Fullscreen mode %d x %d - %d @ %d not supported"
+msgstr ""
 
 #: panel.cpp:975
 #, c-format
-msgid "Valid mode: %dx%d-%d@%d"
-msgstr "Valid mode: %dx%d-%d@%d"
+msgid "Valid mode: %d x %d - %d @ %d"
+msgstr ""
 
 #: panel.cpp:983
 #, c-format
-msgid "Chose mode %dx%d-%d@%d"
-msgstr "Chose mode %dx%d-%d@%d"
+msgid "Chose mode %d x %d - %d @ %d"
+msgstr ""
 
 #: panel.cpp:987
 #, c-format
-msgid "Failed to change mode to %dx%d-%d@%d"
-msgstr "Failed to change mode to %dx%d-%d@%d"
+msgid "Failed to change mode to %d x %d - %d @ %d"
+msgstr ""
 
 #: panel.cpp:1075
-msgid "Not a valid GBA cartridge"
-msgstr "Not a valid GBA cartridge"
+msgid "Not a valid Game Boy Advance cartridge"
+msgstr ""
 
 #: panel.cpp:1245
 msgid "No memory for rewinding"
@@ -1099,8 +1103,8 @@ msgstr "Unable to begin recording to %s (%s)"
 
 #: panel.cpp:2527
 #, c-format
-msgid "Error in audio/video recording (%s); aborting"
-msgstr "Error in audio/video recording (%s); aborting"
+msgid "Error in audio / video recording (%s); aborting"
+msgstr ""
 
 #: panel.cpp:2533
 #, c-format
@@ -1161,11 +1165,11 @@ msgid "Retain aspect ratio when resizing"
 msgstr ""
 
 #: config/internal/option-internal.cpp:338
-msgid "BIOS file to use for GB, if enabled"
+msgid "BIOS file to use for Game Boy, if enabled"
 msgstr ""
 
 #: config/internal/option-internal.cpp:341
-msgid "GB color enhancement, if enabled"
+msgid "Game Boy color enhancement, if enabled"
 msgstr ""
 
 #: config/internal/option-internal.cpp:343
@@ -1178,7 +1182,7 @@ msgid "Apply LCD filter, if enabled"
 msgstr ""
 
 #: config/internal/option-internal.cpp:346
-msgid "BIOS file to use for GBC, if enabled"
+msgid "BIOS file to use for Game Boy Color, if enabled"
 msgstr ""
 
 #: config/internal/option-internal.cpp:349
@@ -1210,7 +1214,7 @@ msgid "Directory to look for ROM files"
 msgstr ""
 
 #: config/internal/option-internal.cpp:369
-msgid "Directory to look for GBC ROM files"
+msgid "Directory to look for Game Boy Color ROM files"
 msgstr ""
 
 #: config/internal/option-internal.cpp:373
@@ -1265,8 +1269,8 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:410
 msgid ""
-"Directory to store A/V and game recordings (relative paths are relative to "
-"ROM)"
+"Directory to store A / V and game recordings (relative paths are relative to"
+" ROM)"
 msgstr ""
 
 #: config/internal/option-internal.cpp:414
@@ -1290,13 +1294,13 @@ msgstr ""
 #: config/internal/option-internal.cpp:429
 msgid ""
 "The parameter Joypad/<n>/<button> contains a comma-separated list of key "
-"names which map to joypad #<n> button <button>.  Button is one of Up, Down, "
-"Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
-"MotionRight, AutoA, AutoB, Speed, Capture, GS"
+"names which map to joypad #<n> button <button>. Button is one of Up, Down, "
+"Left, Right, A, B, L, R, Select, Start, Motion Up, Motion Down, Motion Left,"
+" Motion Right, Autofire A, Autofire B, Speed, Capture, GS"
 msgstr ""
 
 #: config/internal/option-internal.cpp:436
-msgid "The autofire toggle period, in frames (1/60 s)"
+msgid "The autofire toggle period, in frames (1 / 60 s)"
 msgstr ""
 
 #: config/internal/option-internal.cpp:439
@@ -1306,8 +1310,8 @@ msgstr ""
 #: config/internal/option-internal.cpp:444
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
-"(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
-"executed."
+"(e.g. Alt + Shift + F1).  When the named key is pressed, the command <cmd> "
+"is executed."
 msgstr ""
 
 #: config/internal/option-internal.cpp:451
@@ -1315,11 +1319,11 @@ msgid "Enable AGB debug print"
 msgstr ""
 
 #: config/internal/option-internal.cpp:453
-msgid "Auto skip frames."
+msgid "Auto skip frames"
 msgstr ""
 
 #: config/internal/option-internal.cpp:455
-msgid "Apply IPS/UPS/IPF patches if found"
+msgid "Apply IPS / UPS / IPF patches if found"
 msgstr ""
 
 #: config/internal/option-internal.cpp:457
@@ -1327,7 +1331,7 @@ msgid "Automatically save and load cheat list"
 msgstr ""
 
 #: config/internal/option-internal.cpp:460
-msgid "Automatically enable border for Super GameBoy games"
+msgid "Automatically enable border for Super Game Boy games"
 msgstr ""
 
 #: config/internal/option-internal.cpp:462
@@ -1351,12 +1355,11 @@ msgid "Type of system to emulate"
 msgstr ""
 
 #: config/internal/option-internal.cpp:472
-msgid "Flash size 0 = 64KB 1 = 128KB"
+msgid "Flash size 0 = 64 KB 1 = 128 KB"
 msgstr ""
 
 #: config/internal/option-internal.cpp:475
-msgid ""
-"Skip frames.  Values are 0-9 or -1 to skip automatically based on time."
+msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
 msgstr ""
 
 #: config/internal/option-internal.cpp:478
@@ -1416,11 +1419,11 @@ msgid "Do not overwrite native (battery) save when loading state"
 msgstr ""
 
 #: config/internal/option-internal.cpp:514
-msgid "Throttle game speed, even when accelerated (0-450%, 0 = no throttle)"
+msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
 msgstr ""
 
 #: config/internal/option-internal.cpp:518
-msgid "Set throttle for speedup key (0-3000%, 0 = no throttle)"
+msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
 msgstr ""
 
 #: config/internal/option-internal.cpp:521
@@ -1432,7 +1435,7 @@ msgid "Use frame skip for speedup throttle"
 msgstr ""
 
 #: config/internal/option-internal.cpp:527
-msgid "Use the specified BIOS file for GB"
+msgid "Use the specified BIOS file for Game Boy"
 msgstr ""
 
 #: config/internal/option-internal.cpp:529
@@ -1440,7 +1443,7 @@ msgid "Use the specified BIOS file"
 msgstr ""
 
 #: config/internal/option-internal.cpp:531
-msgid "Use the specified BIOS file for GBC"
+msgid "Use the specified BIOS file for Game Boy Color"
 msgstr ""
 
 #: config/internal/option-internal.cpp:532
@@ -1500,31 +1503,31 @@ msgid "Bit mask of sound channels to enable"
 msgstr ""
 
 #: config/internal/option-internal.cpp:570
-msgid "GBA sound filtering (%)"
+msgid "Game Boy Advance sound filtering (%)"
 msgstr ""
 
 #: config/internal/option-internal.cpp:573
-msgid "GBA sound interpolation"
+msgid "Game Boy Advance sound interpolation"
 msgstr ""
 
 #: config/internal/option-internal.cpp:574
-msgid "GB sound declicking"
+msgid "Game Boy sound declicking"
 msgstr ""
 
 #: config/internal/option-internal.cpp:576
-msgid "GB echo effect (%)"
+msgid "Game Boy echo effect (%)"
 msgstr ""
 
 #: config/internal/option-internal.cpp:578
-msgid "Enable GB sound effects"
+msgid "Enable Game Boy sound effects"
 msgstr ""
 
 #: config/internal/option-internal.cpp:579
-msgid "GB stereo effect (%)"
+msgid "Game Boy stereo effect (%)"
 msgstr ""
 
 #: config/internal/option-internal.cpp:582
-msgid "GB surround sound effect (%)"
+msgid "Game Boy surround sound effect (%)"
 msgstr ""
 
 #: config/internal/option-internal.cpp:583
@@ -1669,10 +1672,15 @@ msgstr "FAudio: Creating mastering voice failed!"
 msgid "FAudio: Creating source voice failed!"
 msgstr "FAudio: Creating source voice failed!"
 
-#: dsound.cpp:89 dsound.cpp:103
+#: dsound.cpp:89
 #, c-format
 msgid "Cannot create DirectSound %08x"
 msgstr "Cannot create DirectSound %08x"
+
+#: dsound.cpp:103
+#, c-format
+msgid "Cannot create Direct Sound %08x"
+msgstr ""
 
 #: dsound.cpp:108
 #, c-format
@@ -1807,8 +1815,8 @@ msgid "&Hexadecimal"
 msgstr "&Hexadecimal"
 
 #: xrc/CheatCreate.xrc:97
-msgid "Signed/Unsigned"
-msgstr "Signed/Unsigned"
+msgid "Signed / Unsigned"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:107
 msgid "&8 bits"
@@ -2134,8 +2142,8 @@ msgid "Pixelate"
 msgstr "Pixelate"
 
 #: xrc/DisplayConfig.xrc:90
-msgid "Advance MAME Scale2x"
-msgstr "Advance MAME Scale2x"
+msgid "Advance MAME Scale 2x"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:91
 msgid "Bilinear"
@@ -2202,12 +2210,12 @@ msgid "xBRZ 6x"
 msgstr "xBRZ 6x"
 
 #: xrc/DisplayConfig.xrc:115
-msgid "Plugin :"
-msgstr "Plugin :"
+msgid "Plugin:"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:127
-msgid "Interframe blending :"
-msgstr "Interframe blending :"
+msgid "Interframe blending:"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:136
 msgid "Smart"
@@ -2226,16 +2234,16 @@ msgid "Frame Skip"
 msgstr "Frame Skip"
 
 #: xrc/DisplayConfig.xrc:177
-msgid "&Number of frames to skip :"
-msgstr "&Number of frames to skip :"
+msgid "&Number of frames to skip:"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:199
 msgid "Speed"
 msgstr "Speed"
 
 #: xrc/DisplayConfig.xrc:215
-msgid "Speed indicator :"
-msgstr "Speed indicator :"
+msgid "Speed indicator:"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:222
 msgid "Percentage"
@@ -2250,12 +2258,12 @@ msgid "On-Screen Display"
 msgstr "On-Screen Display"
 
 #: xrc/DisplayConfig.xrc:247
-msgid "Default magnification :"
-msgstr "Default magnification :"
+msgid "Default magnification:"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:266
-msgid "Maximum magnification factor :"
-msgstr "Maximum magnification factor :"
+msgid "Maximum magnification factor:"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:267
 msgid "0 = no maximum"
@@ -2366,12 +2374,12 @@ msgid "Weird Colors"
 msgstr "Weird Colors"
 
 #: xrc/GBColorPrefPanel.xrc:17
-msgid "Real GB Colors"
-msgstr "Real GB Colors"
+msgid "Real Game Boy Colors"
+msgstr ""
 
 #: xrc/GBColorPrefPanel.xrc:18
-msgid "Real 'GB on GBASP' Colors"
-msgstr "Real 'GB on GBASP' Colors"
+msgid "Real 'Game Boy on Game Boy Advance Special' Colors"
+msgstr ""
 
 #: xrc/GBColorPrefPanel.xrc:46 xrc/GBPaletteViewer.xrc:17 xrc/MapViewer.xrc:54
 #: xrc/PaletteViewer.xrc:19
@@ -2629,8 +2637,8 @@ msgid "Game Boy Advance settings"
 msgstr "Game Boy Advance settings"
 
 #: xrc/GameBoyAdvanceConfig.xrc:21
-msgid "Save type :"
-msgstr "Save type :"
+msgid "Save type:"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
 #: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
@@ -2649,21 +2657,21 @@ msgstr "SRAM"
 msgid "Flash"
 msgstr "Flash"
 
-#: xrc/GameBoyAdvanceConfig.xrc:31
+#: xrc/GameBoyAdvanceConfig.xrc:31 xrc/GameBoyAdvanceConfig.xrc:203
 msgid "EEPROM + Sensor"
 msgstr "EEPROM + Sensor"
 
 #: xrc/GameBoyAdvanceConfig.xrc:43
-msgid "Flash size :"
-msgstr "Flash size :"
+msgid "Flash size:"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
-msgid "64K"
-msgstr "64K"
+msgid "64 K"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:50 xrc/GameBoyAdvanceConfig.xrc:222
-msgid "128K"
-msgstr "128K"
+msgid "128 K"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:64
 msgid "Detect Now"
@@ -2678,12 +2686,12 @@ msgid "Save type"
 msgstr "Save type"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
-msgid "BIOS file :"
-msgstr "BIOS file :"
+msgid "BIOS file:"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
-msgid "Current BIOS file :"
-msgstr "Current BIOS file :"
+msgid "Current BIOS file:"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:122 xrc/GameBoyConfig.xrc:138
 #: xrc/GameBoyConfig.xrc:159
@@ -2724,10 +2732,6 @@ msgstr "Enabled"
 msgid "Save Type:"
 msgstr "Save Type:"
 
-#: xrc/GameBoyAdvanceConfig.xrc:203
-msgid "EEPROM+Sensor"
-msgstr "EEPROM+Sensor"
-
 #: xrc/GameBoyAdvanceConfig.xrc:212
 msgid "Flash Size:"
 msgstr "Flash Size:"
@@ -2745,12 +2749,12 @@ msgid "Game Overrides"
 msgstr "Game Overrides"
 
 #: xrc/GameBoyConfig.xrc:4
-msgid "GameBoy settings"
-msgstr "GameBoy settings"
+msgid "Game Boy settings"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:20
-msgid "Emulated &system :"
-msgstr "Emulated &system :"
+msgid "Emulated &system:"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:30
 msgid "Game Boy Color"
@@ -2773,8 +2777,8 @@ msgid "Super Game Boy 2"
 msgstr "Super Game Boy 2"
 
 #: xrc/GameBoyConfig.xrc:48
-msgid "Display &borders :"
-msgstr "Display &borders :"
+msgid "Display &borders:"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:57
 msgid "Never"
@@ -2789,24 +2793,24 @@ msgid "System"
 msgstr "System"
 
 #: xrc/GameBoyConfig.xrc:84
-msgid "GB Boot &ROM file :"
-msgstr "GB Boot &ROM file :"
+msgid "Game Boy Boot &ROM file:"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
 msgstr "Select a File"
 
 #: xrc/GameBoyConfig.xrc:106
-msgid "GBC Boot ROM &file :"
-msgstr "GBC Boot ROM &file :"
+msgid "Game Boy Color Boot ROM &file:"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:131
-msgid "Current GB BIOS file :"
-msgstr "Current GB BIOS file :"
+msgid "Current Game Boy BIOS file:"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:152
-msgid "Current GBC BIOS file :"
-msgstr "Current GBC BIOS file :"
+msgid "Current Game Boy Color BIOS file:"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:186
 msgid "User 1"
@@ -2841,8 +2845,8 @@ msgid "&BMP"
 msgstr "&BMP"
 
 #: xrc/GeneralConfig.xrc:57
-msgid "&Rewind interval :"
-msgstr "&Rewind interval :"
+msgid "&Rewind interval:"
+msgstr ""
 
 #: xrc/GeneralConfig.xrc:58
 msgid "If not empty or 0, enable rewind (seconds)"
@@ -2946,10 +2950,10 @@ msgstr "0 "
 
 #: xrc/JoyPanel.xrc:8
 msgid ""
-"Click a field and press a key or move joystick to add.  Press backspace to "
-"delete last added key.  Resize window or click inside and move pointer to "
-"see entire contents if too small."
-msgstr "Click a field and press a key or move joystick to add.  Press backspace to delete last added key.  Resize window or click inside and move pointer to see entire contents if too small."
+"Click a field and press a key or move joystick to add. Press backspace to "
+"delete last added key. Resize window or click inside and move pointer to see"
+" entire contents if too small."
+msgstr ""
 
 #: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:456
 msgid "Up"
@@ -3008,12 +3012,16 @@ msgid "Autofire B"
 msgstr "Autofire B"
 
 #: xrc/JoyPanel.xrc:342
-msgid "Motion Left/Dark"
-msgstr "Motion Left/Dark"
+msgid "Motion Left / Dark"
+msgstr ""
+
+#: xrc/JoyPanel.xrc:364
+msgid "GameShark"
+msgstr "GameShark"
 
 #: xrc/JoyPanel.xrc:386
-msgid "Motion Right/Light"
-msgstr "Motion Right/Light"
+msgid "Motion Right / Light"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:408
 msgid "Speed Up"
@@ -3136,12 +3144,12 @@ msgid "Open..."
 msgstr "Open..."
 
 #: xrc/MainMenu.xrc:10
-msgid "Open &GB..."
-msgstr "Open &GB..."
+msgid "Open &Game Boy..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:13
-msgid "Open GB&C..."
-msgstr "Open GB&C..."
+msgid "Open Game Boy &Color..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:16
 msgid "Open rece&nt"
@@ -3228,8 +3236,8 @@ msgid "1&0"
 msgstr "1&0"
 
 #: xrc/MainMenu.xrc:89
-msgid "From &File ..."
-msgstr "From &File ..."
+msgid "From &File..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
@@ -3256,8 +3264,8 @@ msgid "Increase state slot number and save"
 msgstr "Increase state slot number and save"
 
 #: xrc/MainMenu.xrc:145
-msgid "To &File ..."
-msgstr "To &File ..."
+msgid "To &File..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:147
 msgid "&Save state"
@@ -3276,16 +3284,20 @@ msgid "&Battery file..."
 msgstr "&Battery file..."
 
 #: xrc/MainMenu.xrc:161
-msgid "Gameshark &code file..."
-msgstr "Gameshark &code file..."
+msgid "Game Shark &code file..."
+msgstr ""
 
-#: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
+#: xrc/MainMenu.xrc:164
 msgid "&Gameshark snapshot..."
 msgstr "&Gameshark snapshot..."
 
 #: xrc/MainMenu.xrc:166
 msgid "&Import"
 msgstr "&Import"
+
+#: xrc/MainMenu.xrc:173
+msgid "&Game Shark snapshot..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:175
 msgid "&Export"
@@ -3376,8 +3388,8 @@ msgid "&Skip BIOS"
 msgstr "&Skip BIOS"
 
 #: xrc/MainMenu.xrc:255
-msgid "&Auto IPS/UPS/IPF patch"
-msgstr "&Auto IPS/UPS/IPF patch"
+msgid "&Auto IPS / UPS / IPF patch"
+msgstr ""
 
 #: xrc/MainMenu.xrc:259
 msgid "&Pause when inactive"
@@ -3396,8 +3408,8 @@ msgid "&Link"
 msgstr "&Link"
 
 #: xrc/MainMenu.xrc:272
-msgid "Start &Network Link ..."
-msgstr "Start &Network Link ..."
+msgid "Start &Network Link..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:277
 msgid "&Nothing"
@@ -3412,8 +3424,8 @@ msgid "&Wireless"
 msgstr "&Wireless"
 
 #: xrc/MainMenu.xrc:289
-msgid "&GameCube"
-msgstr "&GameCube"
+msgid "&Game Cube"
+msgstr ""
 
 #: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:521
 msgid "&Game Boy"
@@ -3433,8 +3445,8 @@ msgstr "&Speed hack"
 
 #: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:387
 #: xrc/MainMenu.xrc:423
-msgid "&Configure ..."
-msgstr "&Configure ..."
+msgid "&Configure..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:314
 msgid "&Video"
@@ -3521,20 +3533,20 @@ msgid "&Toggle sound"
 msgstr "&Toggle sound"
 
 #: xrc/MainMenu.xrc:403
-msgid "&GBA sound interpolation"
-msgstr "&GBA sound interpolation"
+msgid "&Game Boy Advance sound interpolation"
+msgstr ""
 
 #: xrc/MainMenu.xrc:408
-msgid "&GB sound enhancement"
-msgstr "&GB sound enhancement"
+msgid "&Game Boy sound enhancement"
+msgstr ""
 
 #: xrc/MainMenu.xrc:412
-msgid "&GB surround sound effect"
-msgstr "&GB surround sound effect"
+msgid "&Game Boy surround sound effect"
+msgstr ""
 
 #: xrc/MainMenu.xrc:416
-msgid "&GB sound declicking"
-msgstr "&GB sound declicking"
+msgid "&Game Boy sound declicking"
+msgstr ""
 
 #: xrc/MainMenu.xrc:421
 msgid "&Input"
@@ -3577,8 +3589,8 @@ msgid "&Game Boy Advance"
 msgstr "&Game Boy Advance"
 
 #: xrc/MainMenu.xrc:500 xrc/MainMenu.xrc:523
-msgid "Configure ..."
-msgstr "Configure ..."
+msgid "Configure..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:504
 msgid "&Real-time clock"
@@ -3597,16 +3609,16 @@ msgid "&LCD Filter"
 msgstr "&LCD Filter"
 
 #: xrc/MainMenu.xrc:527
-msgid "&GB color option"
-msgstr "&GB color option"
+msgid "&Game Boy color option"
+msgstr ""
 
 #: xrc/MainMenu.xrc:535
-msgid "&GB Colorizer Hack (requires restart)"
+msgid "&Game Boy Colorizer Hack (requires restart)"
 msgstr ""
 
 #: xrc/MainMenu.xrc:539
-msgid "&GB printer"
-msgstr "&GB printer"
+msgid "&Game Boy printer"
+msgstr ""
 
 #: xrc/MainMenu.xrc:543
 msgid "&Gather a full page before printing"
@@ -3617,32 +3629,32 @@ msgid "&Save printouts as screen captures"
 msgstr "&Save printouts as screen captures"
 
 #: xrc/MainMenu.xrc:552
-msgid "&Use GB BIOS file (requires restart)"
+msgid "&Use Game Boy BIOS file (requires restart)"
 msgstr ""
 
 #: xrc/MainMenu.xrc:556
-msgid "&Use GBC BIOS file"
-msgstr "&Use GBC BIOS file"
+msgid "&Use Game Boy Color BIOS file"
+msgstr ""
 
 #: xrc/MainMenu.xrc:561
-msgid "&General ..."
-msgstr "&General ..."
+msgid "&General..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:564
-msgid "&Speedup / Turbo ..."
-msgstr "&Speedup / Turbo ..."
+msgid "&Speedup / Turbo..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:567
-msgid "D&irectories ..."
-msgstr "D&irectories ..."
+msgid "D&irectories..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:570
-msgid "&Key Shortcuts ..."
-msgstr "&Key Shortcuts ..."
+msgid "&Key Shortcuts..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:573
-msgid "&UI Settings ..."
-msgstr "&UI Settings ..."
+msgid "&UI Settings..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:577
 msgid "&Tools"
@@ -3653,16 +3665,16 @@ msgid "&Cheats"
 msgstr "&Cheats"
 
 #: xrc/MainMenu.xrc:581
-msgid "List &cheats ..."
-msgstr "List &cheats ..."
+msgid "List &cheats..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:584
-msgid "Find c&heat ..."
-msgstr "Find c&heat ..."
+msgid "Find c&heat..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:588
-msgid "A&utomatically save/load cheats"
-msgstr "A&utomatically save/load cheats"
+msgid "A&utomatically save / load cheats"
+msgstr ""
 
 #: xrc/MainMenu.xrc:592
 msgid "&Enable cheats"
@@ -3797,8 +3809,8 @@ msgid "Report &Bugs"
 msgstr "Report &Bugs"
 
 #: xrc/MainMenu.xrc:727
-msgid "VBA-M Support &Forum"
-msgstr "VBA-M Support &Forum"
+msgid "Visual Boy Advance-M Support &Forum"
+msgstr ""
 
 #: xrc/MainMenu.xrc:730
 msgid "Translations"
@@ -3833,20 +3845,20 @@ msgid "Frame"
 msgstr "Frame"
 
 #: xrc/MapViewer.xrc:35
-msgid "BG0"
-msgstr "BG0"
+msgid "BG 0"
+msgstr ""
 
 #: xrc/MapViewer.xrc:41
-msgid "BG1"
-msgstr "BG1"
+msgid "BG 1"
+msgstr ""
 
 #: xrc/MapViewer.xrc:46
-msgid "BG2"
-msgstr "BG2"
+msgid "BG 2"
+msgstr ""
 
 #: xrc/MapViewer.xrc:51
-msgid "BG3"
-msgstr "BG3"
+msgid "BG 3"
+msgstr ""
 
 #: xrc/MapViewer.xrc:84
 msgid "Map Base:"
@@ -3953,8 +3965,8 @@ msgid "Sound Settings"
 msgstr "Sound Settings"
 
 #: xrc/SoundConfig.xrc:16
-msgid "Volume :"
-msgstr "Volume :"
+msgid "Volume:"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:34
 msgid "Mute"
@@ -3965,8 +3977,8 @@ msgid "Maximum"
 msgstr "Maximum"
 
 #: xrc/SoundConfig.xrc:71
-msgid "Sample rate :"
-msgstr "Sample rate :"
+msgid "Sample rate:"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:77
 msgid "48 KHz"
@@ -3993,8 +4005,8 @@ msgid "OpenAL"
 msgstr "OpenAL"
 
 #: xrc/SoundConfig.xrc:118
-msgid "DirectSound"
-msgstr "DirectSound"
+msgid "Direct Sound"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:125
 msgid "XAudio2"
@@ -4041,8 +4053,8 @@ msgid "Center"
 msgstr "Center"
 
 #: xrc/SoundConfig.xrc:269
-msgid "Left/Right"
-msgstr "Left/Right"
+msgid "Left / Right"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:298
 msgid "Sound filtering"
