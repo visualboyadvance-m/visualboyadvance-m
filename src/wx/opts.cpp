@@ -8,6 +8,7 @@
 #include <wx/display.h>
 
 #include "config/option-observer.h"
+#include "config/option-proxy.h"
 #include "config/option.h"
 #include "strutils.h"
 #include "wxvbam.h"
@@ -308,14 +309,6 @@ wxAcceleratorEntry_v sys_accels;
 // This constructor only works with globally allocated gopts.
 opts_t::opts_t()
 {
-    // handle erroneous thread count values appropriately
-    max_threads = wxThread::GetCPUCount();
-    if (max_threads > 256)
-        max_threads = 256;
-
-    if (max_threads < 1)
-        max_threads = 1;
-
     recent = new wxFileHistory(10);
 
     // These are globals being set here.
@@ -555,6 +548,20 @@ void load_opts() {
     gopts.recent->Load(*cfg);
     cfg->SetPath(wxT("/"));
     cfg->Flush();
+
+    // We default the MaxThreads option to 0, so set it to the CPU count here.
+    config::OptionProxy<config::OptionID::kDispMaxThreads> max_threads;
+    if (max_threads == 0) {
+        // Handle erroneous thread count values appropriately.
+        const int cpu_count = wxThread::GetCPUCount();
+        if (cpu_count > 256) {
+            max_threads = 256;
+        } else if (cpu_count < 1) {
+            max_threads = 1;
+        } else {
+            max_threads = cpu_count;
+        }
+    }
 
     InitializeOptionObservers();
 }

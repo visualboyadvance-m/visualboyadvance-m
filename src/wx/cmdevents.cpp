@@ -2267,12 +2267,6 @@ EVT_HANDLER(Logging, "Logging...")
 {
     wxDialog* dlg = wxGetApp().frame->logdlg;
     dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
-
-    if (gopts.keep_on_top)
-        dlg->SetWindowStyle(dlg->GetWindowStyle() | wxSTAY_ON_TOP);
-    else
-        dlg->SetWindowStyle(dlg->GetWindowStyle() & ~wxSTAY_ON_TOP);
-
     dlg->Show();
     dlg->Raise();
 }
@@ -2741,15 +2735,6 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
 
 EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
 {
-    if (gopts.max_threads != 1) {
-        gopts.max_threads = wxThread::GetCPUCount();
-    }
-
-    // Just in case GetCPUCount() returns 0 or -1
-    if (gopts.max_threads < 0) {
-        gopts.max_threads = 1;
-    }
-
     wxDialog* dlg = GetXRCDialog("DisplayConfig");
     if (ShowModal(dlg) != wxID_OK) {
         return;
@@ -2965,18 +2950,12 @@ EVT_HANDLER(wxID_ABOUT, "About...")
 
 EVT_HANDLER(Bilinear, "Use bilinear filter with 3d renderer")
 {
-    GetMenuOptionBool("Bilinear", &gopts.bilinear);
-    // Force new panel with new bilinear option.
-    panel->ResetPanel();
-    update_opts();
+    GetMenuOptionConfig("Bilinear", config::OptionID::kDispBilinear);
 }
 
 EVT_HANDLER(RetainAspect, "Retain aspect ratio when resizing")
 {
-    GetMenuOptionBool("RetainAspect", &gopts.retain_aspect);
-    // Force new panel with new aspect ratio options.
-    panel->ResetPanel();
-    update_opts();
+    GetMenuOptionConfig("RetainAspect", config::OptionID::kDispStretch);
 }
 
 EVT_HANDLER(Printer, "Enable printer emulation")
@@ -3080,15 +3059,7 @@ EVT_HANDLER(ApplyPatches, "Apply IPS/UPS/IPF patches if found")
 
 EVT_HANDLER(KeepOnTop, "Keep window on top")
 {
-    GetMenuOptionBool("KeepOnTop", &gopts.keep_on_top);
-    MainFrame* mf = wxGetApp().frame;
-
-    if (gopts.keep_on_top)
-        mf->SetWindowStyle(mf->GetWindowStyle() | wxSTAY_ON_TOP);
-    else
-        mf->SetWindowStyle(mf->GetWindowStyle() & ~wxSTAY_ON_TOP);
-
-    update_opts();
+    GetMenuOptionConfig("KeepOnTop", config::OptionID::kDispKeepOnTop);
 }
 
 EVT_HANDLER(StatusBar, "Enable status bar")

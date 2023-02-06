@@ -6,6 +6,7 @@
 
 #include <wx/log.h>
 #include <algorithm>
+#include <limits>
 
 #include "../common/ConfigManager.h"
 #include "../gb/gbGlobals.h"
@@ -145,20 +146,27 @@ wxString AllEnumValuesForArray(const std::array<wxString, SIZE>& input) {
 // static
 std::array<Option, kNbOptions>& Option::All() {
     struct OwnedOptions {
-        double video_scale = 3;
-        wxString filter_plugin = wxEmptyString;
+        /// Display
+        bool bilinear = true;
         Filter filter = Filter::kNone;
+        wxString filter_plugin = wxEmptyString;
         Interframe interframe = Interframe::kNone;
+        bool keep_on_top = false;
+        int32_t max_threads = 0;
 #if defined(NO_OGL)
         RenderMethod render_method = RenderMethod::kSimple;
 #else
         RenderMethod render_method = RenderMethod::kOpenGL;
 #endif
+        double video_scale = 3;
+        bool retain_aspect = true;
+
+        /// Geometry
         bool window_maximized = false;
         uint32_t window_height = 0;
         uint32_t window_width = 0;
-        int window_pos_x = -1;
-        int window_pos_y = -1;
+        int32_t window_pos_x = -1;
+        int32_t window_pos_y = -1;
     };
     static OwnedOptions g_owned_opts;
 
@@ -170,15 +178,15 @@ std::array<Option, kNbOptions>& Option::All() {
     // clang-format off
     static std::array<Option, kNbOptions> g_all_opts = {
         /// Display
-        Option(OptionID::kDispBilinear, &gopts.bilinear),
+        Option(OptionID::kDispBilinear, &g_owned_opts.bilinear),
         Option(OptionID::kDispFilter, &g_owned_opts.filter),
         Option(OptionID::kDispFilterPlugin, &g_owned_opts.filter_plugin),
         Option(OptionID::kDispIFB, &g_owned_opts.interframe),
-        Option(OptionID::kDispKeepOnTop, &gopts.keep_on_top),
-        Option(OptionID::kDispMaxThreads, &gopts.max_threads, 1, 256),
+        Option(OptionID::kDispKeepOnTop, &g_owned_opts.keep_on_top),
+        Option(OptionID::kDispMaxThreads, &g_owned_opts.max_threads, 0, 256),
         Option(OptionID::kDispRenderMethod, &g_owned_opts.render_method),
         Option(OptionID::kDispScale, &g_owned_opts.video_scale, 1, 6),
-        Option(OptionID::kDispStretch, &gopts.retain_aspect),
+        Option(OptionID::kDispStretch, &g_owned_opts.retain_aspect),
 
         /// GB
         Option(OptionID::kGBBiosFile, &gopts.gb_bios),
@@ -270,8 +278,8 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kGeomIsMaximized, &g_owned_opts.window_maximized),
         Option(OptionID::kGeomWindowHeight, &g_owned_opts.window_height, 0, 99999),
         Option(OptionID::kGeomWindowWidth, &g_owned_opts.window_width, 0, 99999),
-        Option(OptionID::kGeomWindowX, &g_owned_opts.window_pos_x, -1, 99999),
-        Option(OptionID::kGeomWindowY, &g_owned_opts.window_pos_y, -1, 99999),
+        Option(OptionID::kGeomWindowX, &g_owned_opts.window_pos_x, std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max()),
+        Option(OptionID::kGeomWindowY, &g_owned_opts.window_pos_y, std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max()),
 
         /// UI
         Option(OptionID::kUIAllowKeyboardBackgroundInput, &allowKeyboardBackgroundInput),

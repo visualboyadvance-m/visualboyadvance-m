@@ -26,6 +26,7 @@
 #include "../gba/CheatSearch.h"
 #include "config/game-control.h"
 #include "config/option.h"
+#include "config/option-proxy.h"
 #include "config/user-input.h"
 #include "dialogs/display-config.h"
 #include "opts.h"
@@ -322,7 +323,7 @@ public:
             wxDialog* subdlg = GetXRCDialog("CheatEdit");
             dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
 
-            if (gopts.keep_on_top)
+            if (OPTION(kDispKeepOnTop))
                 subdlg->SetWindowStyle(subdlg->GetWindowStyle() | wxSTAY_ON_TOP);
             else
                 subdlg->SetWindowStyle(subdlg->GetWindowStyle() & ~wxSTAY_ON_TOP);
@@ -545,7 +546,7 @@ public:
         wxDialog* subdlg = GetXRCDialog("CheatEdit");
         dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
 
-        if (gopts.keep_on_top)
+        if (OPTION(kDispKeepOnTop))
             subdlg->SetWindowStyle(subdlg->GetWindowStyle() | wxSTAY_ON_TOP);
         else
             subdlg->SetWindowStyle(subdlg->GetWindowStyle() & ~wxSTAY_ON_TOP);
@@ -1075,7 +1076,7 @@ public:
         wxDialog* subdlg = GetXRCDialog("CheatAdd");
         dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
 
-        if (gopts.keep_on_top)
+        if (OPTION(kDispKeepOnTop))
             subdlg->SetWindowStyle(subdlg->GetWindowStyle() | wxSTAY_ON_TOP);
         else
             subdlg->SetWindowStyle(subdlg->GetWindowStyle() & ~wxSTAY_ON_TOP);
@@ -3785,7 +3786,7 @@ bool MainFrame::BindControls()
     else
         mf->GetStatusBar()->Hide();
 
-    if (gopts.keep_on_top)
+    if (OPTION(kDispKeepOnTop))
         mf->SetWindowStyle(mf->GetWindowStyle() | wxSTAY_ON_TOP);
     else
         mf->SetWindowStyle(mf->GetWindowStyle() & ~wxSTAY_ON_TOP);
