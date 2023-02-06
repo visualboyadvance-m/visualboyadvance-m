@@ -138,137 +138,173 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
 // Less verbose accessor for a specific OptionID with compile-time type checks.
 //
 // Sample usage:
-// if (Proxy<OptionID::kDispBilinear>::Get()) {
+//
+// if (OPTION(kDispBilinear)) {
 //     // Do something if bilinear filter is on.
 // }
 //
-// Proxy<OptionID::kDispBilinear>::Set(false);
+// // Set this Option to false.
+// OPTION(kDispBilinear) = false;
+#define OPTION(option_id) ::config::OptionProxy<::config::OptionID::option_id>()
+
 template <OptionID ID, typename = void>
-class Proxy {};
+class OptionProxy {};
 
 template <OptionID ID>
-class Proxy<
+class OptionProxy<
     ID,
-    typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] == Option::Type::kBool>::type> {
+    typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
+                            Option::Type::kBool>::type> {
 public:
-    Proxy() : option_(Option::ByID(ID)) {}
-    ~Proxy() = default;
+    OptionProxy() : option_(Option::ByID(ID)) {}
+    ~OptionProxy() = default;
 
-    bool Get() { return option_->GetBool(); }
+    bool Get() const { return option_->GetBool(); }
     bool Set(bool value) { return option_->SetBool(value); }
+
+    bool operator=(bool value) { return Set(value); }
+    operator bool() const { return Get(); }
 
 private:
     Option* option_;
 };
 
 template <OptionID ID>
-class Proxy<ID,
-            typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
-                                    Option::Type::kDouble>::type> {
+class OptionProxy<
+    ID,
+    typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
+                            Option::Type::kDouble>::type> {
 public:
-    Proxy() : option_(Option::ByID(ID)) {}
-    ~Proxy() = default;
+    OptionProxy() : option_(Option::ByID(ID)) {}
+    ~OptionProxy() = default;
 
-    double Get() { return option_->GetDouble(); }
+    double Get() const { return option_->GetDouble(); }
     bool Set(double value) { return option_->SetDouble(value); }
     double Min() const { return option_->GetDoubleMin(); }
     double Max() const { return option_->GetDoubleMax(); }
 
+    bool operator=(double value) { return Set(value); }
+    operator double() const { return Get(); }
+
 private:
     Option* option_;
 };
 
 template <OptionID ID>
-class Proxy<
+class OptionProxy<
     ID,
-    typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] == Option::Type::kInt>::type> {
+    typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
+                            Option::Type::kInt>::type> {
 public:
-    Proxy() : option_(Option::ByID(ID)) {}
-    ~Proxy() = default;
+    OptionProxy() : option_(Option::ByID(ID)) {}
+    ~OptionProxy() = default;
 
-    int32_t Get() { return option_->GetInt(); }
+    int32_t Get() const { return option_->GetInt(); }
     bool Set(int32_t value) { return option_->SetInt(value); }
     int32_t Min() const { return option_->GetIntMin(); }
     int32_t Max() const { return option_->GetIntMax(); }
 
+    bool operator=(int32_t value) { return Set(value); }
+    operator int32_t() const { return Get(); }
+
 private:
     Option* option_;
 };
 
 template <OptionID ID>
-class Proxy<ID,
-            typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
-                                    Option::Type::kUnsigned>::type> {
+class OptionProxy<
+    ID,
+    typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
+                            Option::Type::kUnsigned>::type> {
 public:
-    Proxy() : option_(Option::ByID(ID)) {}
-    ~Proxy() = default;
+    OptionProxy() : option_(Option::ByID(ID)) {}
+    ~OptionProxy() = default;
 
-    uint32_t Get() { return option_->GetUnsigned(); }
+    uint32_t Get() const { return option_->GetUnsigned(); }
     bool Set(uint32_t value) { return option_->SetUnsigned(value); }
     uint32_t Min() const { return option_->GetUnsignedMin(); }
     uint32_t Max() const { return option_->GetUnsignedMax(); }
 
+    bool operator=(int32_t value) { return Set(value); }
+    operator int32_t() const { return Get(); }
+
 private:
     Option* option_;
 };
 
 template <OptionID ID>
-class Proxy<ID,
-            typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
-                                    Option::Type::kString>::type> {
+class OptionProxy<
+    ID,
+    typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
+                            Option::Type::kString>::type> {
 public:
-    Proxy() : option_(Option::ByID(ID)) {}
-    ~Proxy() = default;
+    OptionProxy() : option_(Option::ByID(ID)) {}
+    ~OptionProxy() = default;
 
-    const wxString& Get() { return option_->GetString(); }
+    const wxString& Get() const { return option_->GetString(); }
     bool Set(const wxString& value) { return option_->SetString(value); }
 
+    bool operator=(wxString value) { return Set(value); }
+    operator wxString() const { return Get(); }
+
 private:
     Option* option_;
 };
 
 template <OptionID ID>
-class Proxy<ID,
-            typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
-                                    Option::Type::kFilter>::type> {
+class OptionProxy<
+    ID,
+    typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
+                            Option::Type::kFilter>::type> {
 public:
-    Proxy() : option_(Option::ByID(ID)) {}
-    ~Proxy() = default;
+    OptionProxy() : option_(Option::ByID(ID)) {}
+    ~OptionProxy() = default;
 
-    Filter Get() { return option_->GetFilter(); }
+    Filter Get() const { return option_->GetFilter(); }
     bool Set(Filter value) { return option_->SetFilter(value); }
     void Next() { option_->NextFilter(); }
 
+    bool operator=(Filter value) { return Set(value); }
+    operator Filter() const { return Get(); }
+
 private:
     Option* option_;
 };
 
 template <OptionID ID>
-class Proxy<ID,
-            typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
-                                    Option::Type::kInterframe>::type> {
+class OptionProxy<
+    ID,
+    typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
+                            Option::Type::kInterframe>::type> {
 public:
-    Proxy() : option_(Option::ByID(ID)) {}
-    ~Proxy() = default;
+    OptionProxy() : option_(Option::ByID(ID)) {}
+    ~OptionProxy() = default;
 
-    Interframe Get() { return option_->GetInterframe(); }
+    Interframe Get() const { return option_->GetInterframe(); }
     bool Set(Interframe value) { return option_->SetInterframe(value); }
     void Next() { option_->NextInterframe(); }
 
+    bool operator=(Interframe value) { return Set(value); }
+    operator Interframe() const { return Get(); }
+
 private:
     Option* option_;
 };
 
 template <OptionID ID>
-class Proxy<ID,
-            typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
-                                    Option::Type::kRenderMethod>::type> {
+class OptionProxy<
+    ID,
+    typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
+                            Option::Type::kRenderMethod>::type> {
 public:
-    Proxy() : option_(Option::ByID(ID)) {}
-    ~Proxy() = default;
+    OptionProxy() : option_(Option::ByID(ID)) {}
+    ~OptionProxy() = default;
 
-    RenderMethod Get() { return option_->GetRenderMethod(); }
+    RenderMethod Get() const { return option_->GetRenderMethod(); }
     bool Set(RenderMethod value) { return option_->SetRenderMethod(value); }
+
+    bool operator=(RenderMethod value) { return Set(value); }
+    operator RenderMethod() const { return Get(); }
 
 private:
     Option* option_;
