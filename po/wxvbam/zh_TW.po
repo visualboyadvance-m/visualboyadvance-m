@@ -14,6 +14,7 @@
 # wai luk <tlserver6y@gmail.com>, 2018
 # Yao Cheng Lai <gse_guardian@yahoo.com.tw>, 2019
 # 丹海 <roy800500@gmail.com>, 2016
+# 陈 依云 <c1998lf@qq.com>, 2023
 # 丹海 <roy800500@gmail.com>, 2016
 msgid ""
 msgstr ""
@@ -21,7 +22,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-05 14:20-0800\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Ching Wen Cheng <chingwen.cheng@gmail.com>, 2020-2021\n"
+"Last-Translator: 陈 依云 <c1998lf@qq.com>, 2023\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/bgk/vba-m/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -75,14 +76,14 @@ msgstr "<config>=<value>"
 
 #: wxvbam.cpp:616
 msgid "Configuration / build error: can't find built-in xrc"
-msgstr ""
+msgstr "設定/建立錯誤: 無法找到內建的 xrc"
 
 #: wxvbam.cpp:624
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr ""
+msgstr "將內建設定寫入到 %s。\n如果要覆蓋，請刪除所有未更動的根節點。 首先在以下搜索覆蓋內建路徑裡找到的任何 .xrc 或 .xrs 檔案中找出正確名稱的根節點 :"
 
 #: wxvbam.cpp:638
 msgid "Configuration is read from, in order:"
@@ -93,7 +94,7 @@ msgstr "設定按順序從中讀取:"
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
-msgstr ""
+msgstr "將內建覆蓋檔案寫入到 %s。\n如果要覆蓋，請刪除所有未更動的部分。 首先在搜索路徑裡找到正在使用的部分:"
 
 #: wxvbam.cpp:658
 msgid ""
@@ -193,11 +194,11 @@ msgstr "移除金手指"
 
 #: guiinit.cpp:758
 msgid "Game Shark"
-msgstr ""
+msgstr "Game Shark"
 
 #: guiinit.cpp:759
 msgid "Game Genie"
-msgstr ""
+msgstr "Game Genie"
 
 #: guiinit.cpp:761
 msgid "Generic Code"
@@ -205,11 +206,11 @@ msgstr "通用代碼"
 
 #: guiinit.cpp:762
 msgid "Game Shark Advance"
-msgstr ""
+msgstr "Game Shark Advance"
 
 #: guiinit.cpp:763
 msgid "Code Breaker Advance"
-msgstr ""
+msgstr "Code Breaker Advance"
 
 #: guiinit.cpp:764
 msgid "Flashcart CHT"
@@ -268,11 +269,11 @@ msgstr "桌面模式"
 #: guiinit.cpp:1734
 #, c-format
 msgid "%d x %d - %d bpp @ %d Hz"
-msgstr ""
+msgstr "%d x %d - %d bpp @ %d Hz"
 
 #: guiinit.cpp:1976
 msgid "This will clear all user-defined accelerators. Are you sure?"
-msgstr ""
+msgstr "這將清除所有使用者的加速器設定。你確定嗎?"
 
 #: guiinit.cpp:1976
 msgid "Confirm"
@@ -298,7 +299,7 @@ msgstr "複製選單加速器:%s於%s和%s；保持第一"
 #: guiinit.cpp:2771
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s; keeping menu"
-msgstr ""
+msgstr "選單加速器%s%s的預設覆蓋%s的；保存選單"
 
 #: guiinit.cpp:2910
 #, c-format
@@ -369,7 +370,7 @@ msgstr "0x03000000 - IRAM"
 
 #: viewers.cpp:817
 msgid "0x04000000 - I / O"
-msgstr ""
+msgstr "0x04000000 - I / O"
 
 #: viewers.cpp:818
 msgid "0x05000000 - PALETTE"
@@ -413,7 +414,7 @@ msgstr "0xD000 - WRAM"
 
 #: viewers.cpp:930
 msgid "0xFF00 - I / O"
-msgstr ""
+msgstr "0xFF00 - I / O"
 
 #: viewers.cpp:931
 msgid "0xFF80 - RAM"
@@ -440,7 +441,7 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
 " Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "GameBoy Advance 檔案 (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy 檔案 (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:146
 msgid "Open ROM file"
@@ -450,7 +451,7 @@ msgstr "開啟 ROM 檔案"
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "GameBoy 檔案 (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:169
 msgid "Open GB ROM file"
@@ -460,7 +461,7 @@ msgstr "開啟 GB ROM 檔案"
 msgid ""
 "Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "GameBoy Color 檔案 (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:192
 msgid "Open GBC ROM file"
@@ -476,83 +477,83 @@ msgstr "ROM"
 
 #: cmdevents.cpp:623
 msgid "ROM + MBC1"
-msgstr ""
+msgstr "ROM + MBC1"
 
 #: cmdevents.cpp:627
 msgid "ROM + MBC1 + RAM"
-msgstr ""
+msgstr "ROM + MBC1 + RAM"
 
 #: cmdevents.cpp:631
 msgid "ROM + MBC1 + RAM + BATT"
-msgstr ""
+msgstr "ROM + MBC1 + RAM + BATT"
 
 #: cmdevents.cpp:635
 msgid "ROM + MBC2"
-msgstr ""
+msgstr "ROM + MBC2"
 
 #: cmdevents.cpp:639
 msgid "ROM + MBC2 + BATT"
-msgstr ""
+msgstr "ROM + MBC2 + BATT"
 
 #: cmdevents.cpp:643
 msgid "ROM + MMM01"
-msgstr ""
+msgstr "ROM + MMM01"
 
 #: cmdevents.cpp:647
 msgid "ROM + MMM01 + RAM"
-msgstr ""
+msgstr "ROM + MMM01 + RAM"
 
 #: cmdevents.cpp:651
 msgid "ROM + MMM01 + RAM + BATT"
-msgstr ""
+msgstr "ROM + MMM01 + RAM + BATT"
 
 #: cmdevents.cpp:655
 msgid "ROM + MBC3 + TIMER + BATT"
-msgstr ""
+msgstr "ROM + MBC3 + TIMER + BATT"
 
 #: cmdevents.cpp:659
 msgid "ROM + MBC3 + TIMER + RAM + BATT"
-msgstr ""
+msgstr "ROM + MBC3 + TIMER + RAM + BATT"
 
 #: cmdevents.cpp:663
 msgid "ROM + MBC3"
-msgstr ""
+msgstr "ROM + MBC3"
 
 #: cmdevents.cpp:667
 msgid "ROM + MBC3 + RAM"
-msgstr ""
+msgstr "ROM + MBC3 + RAM"
 
 #: cmdevents.cpp:671
 msgid "ROM + MBC3 + RAM + BATT"
-msgstr ""
+msgstr "ROM + MBC3 + RAM + BATT"
 
 #: cmdevents.cpp:675
 msgid "ROM + MBC5"
-msgstr ""
+msgstr "ROM + MBC5"
 
 #: cmdevents.cpp:679
 msgid "ROM + MBC5 + RAM"
-msgstr ""
+msgstr "ROM + MBC5 + RAM"
 
 #: cmdevents.cpp:683
 msgid "ROM + MBC5 + RAM + BATT"
-msgstr ""
+msgstr "ROM + MBC5 + RAM + BATT"
 
 #: cmdevents.cpp:687
 msgid "ROM + MBC5 + RUMBLE"
-msgstr ""
+msgstr "ROM + MBC5 + RUMBLE"
 
 #: cmdevents.cpp:691
 msgid "ROM + MBC5 + RUMBLE + RAM"
-msgstr ""
+msgstr "ROM + MBC5 + RUMBLE + RAM"
 
 #: cmdevents.cpp:695
 msgid "ROM + MBC5 + RUMBLE + RAM + BATT"
-msgstr ""
+msgstr "ROM + MBC5 + RUMBLE + RAM + BATT"
 
 #: cmdevents.cpp:699
 msgid "ROM + MBC7 + BATT"
-msgstr ""
+msgstr "ROM + MBC7 + BATT"
 
 #: cmdevents.cpp:703
 msgid "GameGenie"
@@ -564,19 +565,19 @@ msgstr "GameShark V3.0"
 
 #: cmdevents.cpp:711
 msgid "ROM + POCKET CAMERA"
-msgstr ""
+msgstr "ROM + POCKET CAMERA"
 
 #: cmdevents.cpp:715
 msgid "ROM + BANDAI TAMA5"
-msgstr ""
+msgstr "ROM + BANDAI TAMA5"
 
 #: cmdevents.cpp:719
 msgid "ROM + HuC-3"
-msgstr ""
+msgstr "ROM + HuC-3"
 
 #: cmdevents.cpp:723
 msgid "ROM + HuC-1"
-msgstr ""
+msgstr "ROM + HuC-1"
 
 #: cmdevents.cpp:773 dialogs/display-config.cpp:355 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
@@ -605,7 +606,7 @@ msgstr "電池記憶檔 (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "匯入電池記憶檔將會抹除現有的存檔（下次存檔後就永遠無法復原）。你要繼續嗎？"
 
 #: cmdevents.cpp:928 cmdevents.cpp:956 cmdevents.cpp:1076
 msgid "Confirm import"
@@ -627,17 +628,17 @@ msgstr "選擇代碼檔"
 
 #: cmdevents.cpp:946
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
-msgstr ""
+msgstr "Gameshark 代碼檔 (*.spc;*.xpc)|*.spc;*.xpc"
 
 #: cmdevents.cpp:946
 msgid "Game Shark Code File (*.gcf)|*.gcf"
-msgstr ""
+msgstr "Gameshark 代碼檔 (*.gcf)|*.gcf"
 
 #: cmdevents.cpp:955
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
-msgstr ""
+msgstr "匯入的代碼檔將會取代已經載入的代碼。  你要繼續嗎？"
 
 #: cmdevents.cpp:972
 #, c-format
@@ -667,17 +668,17 @@ msgstr "選擇快照檔"
 msgid ""
 "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots "
 "(*.gsv)|*.gsv"
-msgstr ""
+msgstr "GS & PAC 快照檔 (*.sps;*.xps)|*.sps;*.xps|GameShark SP 快照檔 (*.gsv)|*.gsv"
 
 #: cmdevents.cpp:1066
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
-msgstr ""
+msgstr "Gameboy 快照檔 (*.gbs)|*.gbs"
 
 #: cmdevents.cpp:1075
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "匯入快照檔將會抹除現有存檔（下次存檔後就永遠無法復原）。你要繼續嗎？"
 
 #: cmdevents.cpp:1100
 #, c-format
@@ -705,11 +706,11 @@ msgstr "EEPROM 記錄不能匯出"
 
 #: cmdevents.cpp:1142
 msgid "Game Shark Snapshot (*.sps)|*.sps"
-msgstr ""
+msgstr "Gameshark 快照檔 (*.sps)|*.sps"
 
 #: cmdevents.cpp:1156
 msgid "Exported from Visual Boy Advance-M"
-msgstr ""
+msgstr "從 Visual Boy Advance-M 匯出"
 
 #: cmdevents.cpp:1168
 #, c-format
@@ -740,7 +741,7 @@ msgstr "選擇即時紀錄檔"
 
 #: cmdevents.cpp:1789 cmdevents.cpp:1882
 msgid "Visual Boy Advance saved game files|*.sgm"
-msgstr ""
+msgstr "Visual Boy Advance 保存遊戲檔|*.sgm"
 
 #: cmdevents.cpp:1912 cmdevents.cpp:1922 cmdevents.cpp:1933
 #, c-format
@@ -749,7 +750,7 @@ msgstr "現在的儲存槽 #%d"
 
 #: cmdevents.cpp:2003
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
-msgstr ""
+msgstr "啟用 GB BIOS 檔案時無法使用色彩修改。"
 
 #: cmdevents.cpp:2218
 msgid "Sound enabled"
@@ -762,7 +763,7 @@ msgstr "音效已關閉"
 #: cmdevents.cpp:2231 cmdevents.cpp:2245
 #, c-format
 msgid "Volume: %d %%"
-msgstr ""
+msgstr "音量: %d %%"
 
 #: cmdevents.cpp:2320
 msgid "Set to 0 for pseudo tty"
@@ -796,7 +797,7 @@ msgstr "無法初始化聲音驅動程式!"
 
 #: cmdevents.cpp:2914
 msgid "Nintendo Game Boy / Color / Advance) emulator."
-msgstr ""
+msgstr "任天堂 Game Boy/Color/Advance 模擬器。"
 
 #: cmdevents.cpp:2915
 msgid ""
@@ -819,15 +820,15 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program. If not, see http://www.gnu.org/licenses ."
-msgstr ""
+msgstr "本程式是自由軟體：你可以在自由軟體基金會公佈的 GNU 通用發佈許可證條款下\n重新分發和/或修改此軟件，依自己意願許可證 V2 版或\n任意更新版許可證選其一即可。\n\n本程式希望是能有作用的分發出去，\n但【無任何擔保】； 甚至沒有隱含的\n【可銷售性】或【特定用途的適用性】保證。\n 請查閱 GNU 通用發佈許可證瞭解更多資訊。 \n\n你應該已經收到 GNU 通用發佈許可證的副本以及本程式。 \n如果沒有，請查看 http://www.gnu.org/licenses 。"
 
 #: cmdevents.cpp:3158
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
-msgstr ""
+msgstr "啟用色彩修改時無法使用 GB BIOS 檔案。"
 
 #: cmdevents.cpp:3219
 msgid "LAN link is already active. Disable link mode to disconnect."
-msgstr ""
+msgstr "區網連接已開啟。禁用連接模式以斷開連接。"
 
 #: cmdevents.cpp:3225
 msgid "Network is not supported in local mode."
@@ -835,31 +836,31 @@ msgstr "網路不支持本地模式。"
 
 #: extra-translations.cpp:12
 msgid "&Apply"
-msgstr ""
+msgstr "應用(&A)"
 
 #: extra-translations.cpp:13
 msgid "Artists"
-msgstr ""
+msgstr "美術"
 
 #: extra-translations.cpp:14
 msgid "Cancel"
-msgstr ""
+msgstr "取消"
 
 #: extra-translations.cpp:15
 msgid "Close"
-msgstr ""
+msgstr "關閉"
 
 #: extra-translations.cpp:16
 msgid "Developers"
-msgstr ""
+msgstr "開發者"
 
 #: extra-translations.cpp:17
 msgid "License"
-msgstr ""
+msgstr "授權"
 
 #: extra-translations.cpp:18
 msgid "OK"
-msgstr ""
+msgstr "確定"
 
 #: opts.cpp:518 opts.cpp:539 opts.cpp:745
 #, c-format
@@ -869,12 +870,12 @@ msgstr "%s 鍵不能綁訂為 %s"
 #: opts.cpp:668 opts.cpp:677 opts.cpp:686 opts.cpp:695 config/option.cpp:464
 #, c-format
 msgid "Invalid value %s for option %s"
-msgstr ""
+msgstr "數值 %s 對於選項 %s 無效"
 
 #: opts.cpp:767
 #, c-format
 msgid "Unknown option %s with value %s"
-msgstr ""
+msgstr "未知選項 %s 帶有數值 %s"
 
 #: sys.cpp:196 sys.cpp:257
 msgid "No game in progress to record"
@@ -909,12 +910,12 @@ msgstr "播放結束"
 #: sys.cpp:449
 #, c-format
 msgid "%d %% (%d, %d fps)"
-msgstr ""
+msgstr "%d %% (%d, %d fps)"
 
 #: sys.cpp:457
 #, c-format
 msgid "%d %%"
-msgstr ""
+msgstr "%d %%"
 
 #: sys.cpp:879 xrc/GBPrinter.xrc:65
 msgid "&Discard"
@@ -969,7 +970,7 @@ msgstr "無法讀取 Game Boy ROM %s"
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
-msgstr ""
+msgstr "啟用色彩修改時無法使用 GB BIOS 檔案，正在禁用 GB BIOS 檔案。"
 
 #: panel.cpp:280 panel.cpp:380
 #, c-format
@@ -1008,31 +1009,31 @@ msgstr "即時記錄時發生錯誤 %s"
 #: panel.cpp:933
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
-msgstr ""
+msgstr "不支援全螢幕模式 %d x %d - %d @ %d，尋找其他模式"
 
 #: panel.cpp:971
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
-msgstr ""
+msgstr "不支援全螢幕模式 %d x %d - %d @ %d"
 
 #: panel.cpp:976
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
-msgstr ""
+msgstr "有效模式: %d x %d - %d @ %d"
 
 #: panel.cpp:984
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
-msgstr ""
+msgstr "選擇模式: %d x %d - %d @ %d"
 
 #: panel.cpp:988
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
-msgstr ""
+msgstr "無法切換到 %d x %d - %d @ %d 模式"
 
 #: panel.cpp:1076
 msgid "Not a valid Game Boy Advance cartridge"
-msgstr ""
+msgstr "不是有效的 GBA 卡匣"
 
 #: panel.cpp:1246
 msgid "No memory for rewinding"
@@ -1044,19 +1045,19 @@ msgstr "回寫狀態錯誤"
 
 #: panel.cpp:2273
 msgid "Enabling EGL VSync."
-msgstr ""
+msgstr "正在啟用 EGL 垂直同步。"
 
 #: panel.cpp:2275
 msgid "Disabling EGL VSync."
-msgstr ""
+msgstr "正在禁用 EGL 垂直同步。"
 
 #: panel.cpp:2282
 msgid "Enabling GLX VSync."
-msgstr ""
+msgstr "正在啟用 GLX 垂直同步。"
 
 #: panel.cpp:2284
 msgid "Disabling GLX VSync."
-msgstr ""
+msgstr "正在禁用 GLX 垂直同步。"
 
 #: panel.cpp:2302
 msgid "Failed to set glXSwapIntervalEXT"
@@ -1114,7 +1115,7 @@ msgstr "不能開始錄製到 %s (%s)"
 #: panel.cpp:2528
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
-msgstr ""
+msgstr "錄製 (%s) 聲音/影像錯誤; 停止中"
 
 #: panel.cpp:2534
 #, c-format
@@ -1140,166 +1141,166 @@ msgstr "B:"
 
 #: config/internal/option-internal.cpp:306
 msgid "Use bilinear filter with 3d renderer"
-msgstr ""
+msgstr "在 3D 渲染器中使用雙線過濾"
 
 #: config/internal/option-internal.cpp:307
 msgid "Full-screen filter to apply"
-msgstr ""
+msgstr "全屏濾鏡"
 
 #: config/internal/option-internal.cpp:308
 msgid "Filter plugin library"
-msgstr ""
+msgstr "濾鏡外掛程式庫"
 
 #: config/internal/option-internal.cpp:309
 msgid "Interframe blending function"
-msgstr ""
+msgstr "幀間混合"
 
 #: config/internal/option-internal.cpp:310
 msgid "Keep window on top"
-msgstr ""
+msgstr "保持視窗在最上層"
 
 #: config/internal/option-internal.cpp:312
 msgid "Maximum number of threads to run filters in"
-msgstr ""
+msgstr "運行濾鏡的最大線程數"
 
 #: config/internal/option-internal.cpp:314
 msgid "Render method; if unsupported, simple method will be used"
-msgstr ""
+msgstr "渲染管道；如果不支持，則使用簡單管道"
 
 #: config/internal/option-internal.cpp:315
 msgid "Default scale factor"
-msgstr ""
+msgstr "預設比例系数"
 
 #: config/internal/option-internal.cpp:317
 msgid "Retain aspect ratio when resizing"
-msgstr ""
+msgstr "調整大小時保持長寬比"
 
 #: config/internal/option-internal.cpp:321
 msgid "BIOS file to use for Game Boy, if enabled"
-msgstr ""
+msgstr "用於 GB 的 BIOS 檔案（如果啟用）"
 
 #: config/internal/option-internal.cpp:323
 msgid "Game Boy color enhancement, if enabled"
-msgstr ""
+msgstr "GB 色彩增强（如果啟用）"
 
 #: config/internal/option-internal.cpp:325
 msgid "Enable DX Colorization Hacks"
-msgstr ""
+msgstr "啟用 DX 色彩修改"
 
 #: config/internal/option-internal.cpp:327
 #: config/internal/option-internal.cpp:353
 msgid "Apply LCD filter, if enabled"
-msgstr ""
+msgstr "應用 LCD 濾鏡（如果啟用）"
 
 #: config/internal/option-internal.cpp:329
 msgid "BIOS file to use for Game Boy Color, if enabled"
-msgstr ""
+msgstr "用於 GBC 的 BIOS 檔案（如果啟用）"
 
 #: config/internal/option-internal.cpp:331
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "默認調色板，8 個逗號分隔的 4 比特十六進位整數（rgb555）。"
 
 #: config/internal/option-internal.cpp:334
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "第一用戶調色板，8 個逗號分隔的 4 比特十六進位整數（rgb555）。"
 
 #: config/internal/option-internal.cpp:337
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "第二用戶調色板，8 個逗號分隔的 4 比特十六進位整數（rgb555）。"
 
 #: config/internal/option-internal.cpp:340
 msgid "Automatically gather a full page before printing"
-msgstr ""
+msgstr "列印前自動聚集整個頁面"
 
 #: config/internal/option-internal.cpp:342
 msgid "Automatically save printouts as screen captures with -print suffix"
-msgstr ""
+msgstr "使用 -print 尾碼自動將列印輸出保存為螢幕截圖"
 
 #: config/internal/option-internal.cpp:344
 #: config/internal/option-internal.cpp:374
 msgid "Directory to look for ROM files"
-msgstr ""
+msgstr "要查找 ROM 檔案的目錄"
 
 #: config/internal/option-internal.cpp:346
 msgid "Directory to look for Game Boy Color ROM files"
-msgstr ""
+msgstr "要查找 GBC ROM 檔案的目錄"
 
 #: config/internal/option-internal.cpp:349
 msgid "BIOS file to use, if enabled"
-msgstr ""
+msgstr "要使用的 BIOS 檔案（如果啟用）"
 
 #: config/internal/option-internal.cpp:359
 msgid "Enable link at boot"
-msgstr ""
+msgstr "在啟動時啟用連結"
 
 #: config/internal/option-internal.cpp:364
 msgid "Enable faster network protocol by default"
-msgstr ""
+msgstr "默認啟用更快的網路通訊協定"
 
 #: config/internal/option-internal.cpp:366
 msgid "Default network link client host"
-msgstr ""
+msgstr "默認網絡連結用戶端主機"
 
 #: config/internal/option-internal.cpp:367
 msgid "Default network link server IP to bind"
-msgstr ""
+msgstr "要綁定的默認網絡連結伺服器 IP 地址"
 
 #: config/internal/option-internal.cpp:369
 msgid "Default network link port (server and client)"
-msgstr ""
+msgstr "默認網絡連結埠（服務器和用戶端）"
 
 #: config/internal/option-internal.cpp:370
 msgid "Default network protocol"
-msgstr ""
+msgstr "默認網路通訊協定"
 
 #: config/internal/option-internal.cpp:371
 msgid "Link timeout (ms)"
-msgstr ""
+msgstr "連結超時（毫秒）"
 
 #: config/internal/option-internal.cpp:372
 msgid "Link cable type"
-msgstr ""
+msgstr "連結線纜類型"
 
 #: config/internal/option-internal.cpp:378
 msgid "Automatically load last saved state"
-msgstr ""
+msgstr "自動加載上次保存的狀態"
 
 #: config/internal/option-internal.cpp:380
 msgid ""
 "Directory to store game save files (relative paths are relative to ROM; "
 "blank is config dir)"
-msgstr ""
+msgstr "存放遊戲存檔檔案的目錄（相對路徑是相對於 ROM；留空則為配寘目錄）"
 
 #: config/internal/option-internal.cpp:382
 msgid "Freeze recent load list"
-msgstr ""
+msgstr "凍結最近的加載清單"
 
 #: config/internal/option-internal.cpp:384
 msgid ""
 "Directory to store A / V and game recordings (relative paths are relative to"
 " ROM)"
-msgstr ""
+msgstr "存儲 A/V 和遊戲錄影的目錄（相對路徑是相對於 ROM）"
 
 #: config/internal/option-internal.cpp:387
 msgid "Number of seconds between rewind snapshots (0 to disable)"
-msgstr ""
+msgstr "倒帶快照之間的秒數（0 表示禁用）"
 
 #: config/internal/option-internal.cpp:389
 msgid "Directory to store screenshots (relative paths are relative to ROM)"
-msgstr ""
+msgstr "存放截圖的目錄（相對路徑是相對於 ROM）"
 
 #: config/internal/option-internal.cpp:392
 msgid ""
 "Directory to store saved state files (relative paths are relative to "
 "BatteryDir)"
-msgstr ""
+msgstr "存儲保存狀態檔案的目錄（相對路徑是相對於 BatteryDir）"
 
 #: config/internal/option-internal.cpp:394
 msgid "Enable status bar"
-msgstr ""
+msgstr "啟用狀態列"
 
 #: config/internal/option-internal.cpp:398
 msgid ""
@@ -1307,246 +1308,246 @@ msgid ""
 "names which map to joypad #<n> button <button>. Button is one of Up, Down, "
 "Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
-msgstr ""
+msgstr "參數 手柄 /<n>/<button> 包含一個逗號分隔的鍵名清單，這些鍵名映射到手柄 #<n> 按鍵 <button> 。按鍵是上、下、左、右、A、B、L、R、Select、Start、體感上、體感下、體感左、體感右、連發A、連發B、加速、截圖、GS中某一個"
 
 #: config/internal/option-internal.cpp:404
 msgid "The autofire toggle period, in frames (1/60 s)"
-msgstr ""
+msgstr "連發切換週期，以幀為組織（1/60 秒）"
 
 #: config/internal/option-internal.cpp:406
 msgid "The number of the stick to use in single-player mode"
-msgstr ""
+msgstr "在單人模式中使用的搖杆數量"
 
 #: config/internal/option-internal.cpp:410
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
-msgstr ""
+msgstr "參數 鍵盤 /<cmd> 包含一個以逗號分隔的鍵名清單（例如 Alt-Shift-F1）。當按下指定的鍵時，命令 <cmd> 被執行。"
 
 #: config/internal/option-internal.cpp:416
 msgid "Enable AGB debug print"
-msgstr ""
+msgstr "啟用 AGB 調試列印"
 
 #: config/internal/option-internal.cpp:418
 msgid "Auto skip frames"
-msgstr ""
+msgstr "自動省略畫格"
 
 #: config/internal/option-internal.cpp:420
 msgid "Apply IPS / UPS / IPF patches if found"
-msgstr ""
+msgstr "如發現 IPS/UPS/IPF 補丁即應用"
 
 #: config/internal/option-internal.cpp:422
 msgid "Automatically save and load cheat list"
-msgstr ""
+msgstr "自動儲存和讀取金手指代碼"
 
 #: config/internal/option-internal.cpp:426
 msgid "Automatically enable border for Super Game Boy games"
-msgstr ""
+msgstr "對 Super GameBoy 遊戲自動啟用邊框"
 
 #: config/internal/option-internal.cpp:428
 msgid "Always enable border"
-msgstr ""
+msgstr "始終啟用邊框"
 
 #: config/internal/option-internal.cpp:430
 msgid "Screen capture file format"
-msgstr ""
+msgstr "螢幕截圖檔案格式"
 
 #: config/internal/option-internal.cpp:431
 msgid "Enable cheats"
-msgstr ""
+msgstr "啟動金手指"
 
 #: config/internal/option-internal.cpp:433
 msgid "Disable on-screen status messages"
-msgstr ""
+msgstr "關閉荧幕狀態訊息"
 
 #: config/internal/option-internal.cpp:434
 msgid "Type of system to emulate"
-msgstr ""
+msgstr "類比的系統類型"
 
 #: config/internal/option-internal.cpp:436
 msgid "Flash size 0 = 64 KB 1 = 128 KB"
-msgstr ""
+msgstr "Flash 大小 0 = 64 KB 1 = 128 KB"
 
 #: config/internal/option-internal.cpp:438
 msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
-msgstr ""
+msgstr "跳幀。 值為 0-9 或 -1 以根據時間自動跳過。"
 
 #: config/internal/option-internal.cpp:440
 msgid "The palette to use"
-msgstr ""
+msgstr "要使用的調色板"
 
 #: config/internal/option-internal.cpp:442
 msgid "Enable printer emulation"
-msgstr ""
+msgstr "啟用打印機類比"
 
 #: config/internal/option-internal.cpp:444
 msgid "Break into GDB after loading the game."
-msgstr ""
+msgstr "加載遊戲後切入 GDB"
 
 #: config/internal/option-internal.cpp:446
 msgid "Port to connect GDB to."
-msgstr ""
+msgstr "連接 GDB 的埠。"
 
 #: config/internal/option-internal.cpp:449
 msgid "Number of players in network"
-msgstr ""
+msgstr "聯機中的玩家數量"
 
 #: config/internal/option-internal.cpp:452
 msgid "Maximum scale factor (0 = no limit)"
-msgstr ""
+msgstr "最大縮放係數（0 = 無限制）"
 
 #: config/internal/option-internal.cpp:454
 msgid "Pause game when main window loses focus"
-msgstr ""
+msgstr "當主視窗非活動時暫停遊戲"
 
 #: config/internal/option-internal.cpp:456
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
-msgstr ""
+msgstr "啟用 RTC（vba-over.ini 裏覆蓋為 rtcEnabled"
 
 #: config/internal/option-internal.cpp:458
 msgid "Native save (\"battery\") hardware type"
-msgstr ""
+msgstr "原生存檔（“電池檔”）硬體類型"
 
 #: config/internal/option-internal.cpp:459
 msgid "Show speed indicator"
-msgstr ""
+msgstr "顯示速度指標"
 
 #: config/internal/option-internal.cpp:461
 msgid "Draw on-screen messages transparently"
-msgstr ""
+msgstr "透明顯示荧幕消息"
 
 #: config/internal/option-internal.cpp:463
 msgid "Skip BIOS initialization"
-msgstr ""
+msgstr "跳過 BIOS 初始化"
 
 #: config/internal/option-internal.cpp:465
 msgid "Do not overwrite cheat list when loading state"
-msgstr ""
+msgstr "加載狀態時不覆蓋金手指清單"
 
 #: config/internal/option-internal.cpp:467
 msgid "Do not overwrite native (battery) save when loading state"
-msgstr ""
+msgstr "加載狀態時不覆蓋原生（電池）存檔"
 
 #: config/internal/option-internal.cpp:469
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
-msgstr ""
+msgstr "閥門加快遊戲速度，即使已經在加速時（0-450%，0 = 無閥門）"
 
 #: config/internal/option-internal.cpp:472
 msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
-msgstr ""
+msgstr "設定加速鍵的閥門值（0-3000%，0 = 無閥門）"
 
 #: config/internal/option-internal.cpp:474
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
-msgstr ""
+msgstr "加速時跳過的幀數（而不是閥門加速）"
 
 #: config/internal/option-internal.cpp:477
 msgid "Use frame skip for speedup throttle"
-msgstr ""
+msgstr "使用跳幀來閥門加速"
 
 #: config/internal/option-internal.cpp:479
 msgid "Use the specified BIOS file for Game Boy"
-msgstr ""
+msgstr "對 GB 使用指定的 BIOS 檔案"
 
 #: config/internal/option-internal.cpp:481
 msgid "Use the specified BIOS file"
-msgstr ""
+msgstr "使用指定的 BIOS 檔案"
 
 #: config/internal/option-internal.cpp:483
 msgid "Use the specified BIOS file for Game Boy Color"
-msgstr ""
+msgstr "對 GBC 使用指定的 BIOS 檔案"
 
 #: config/internal/option-internal.cpp:484
 msgid "Wait for vertical sync"
-msgstr ""
+msgstr "等待垂直同步"
 
 #: config/internal/option-internal.cpp:488
 msgid "Enter fullscreen mode at startup"
-msgstr ""
+msgstr "啟動時進入全屏模式"
 
 #: config/internal/option-internal.cpp:489
 msgid "Window maximized"
-msgstr ""
+msgstr "視窗最大化"
 
 #: config/internal/option-internal.cpp:491
 msgid "Window height at startup"
-msgstr ""
+msgstr "啟動時的視窗高度"
 
 #: config/internal/option-internal.cpp:492
 msgid "Window width at startup"
-msgstr ""
+msgstr "啟動時的視窗寬度"
 
 #: config/internal/option-internal.cpp:493
 msgid "Window axis X position at startup"
-msgstr ""
+msgstr "啟動時的視窗 X 座標位置"
 
 #: config/internal/option-internal.cpp:494
 msgid "Window axis Y position at startup"
-msgstr ""
+msgstr "啟動時的視窗 Y 座標位置"
 
 #: config/internal/option-internal.cpp:499
 msgid "Capture key events while on background"
-msgstr ""
+msgstr "在後臺截取按鍵事件"
 
 #: config/internal/option-internal.cpp:502
 msgid "Capture joy events while on background"
-msgstr ""
+msgstr "在後臺截取搖杆事件"
 
 #: config/internal/option-internal.cpp:503
 msgid "Hide menu bar when mouse is inactive"
-msgstr ""
+msgstr "滑鼠非活動時隱藏功能表列"
 
 #: config/internal/option-internal.cpp:507
 msgid "Sound API; if unsupported, default API will be used"
-msgstr ""
+msgstr "聲音 API；如果不支持，將使用默認 API"
 
 #: config/internal/option-internal.cpp:509
 msgid "Device ID of chosen audio device for chosen driver"
-msgstr ""
+msgstr "所選驅動程序下的所選音訊設備 ID"
 
 #: config/internal/option-internal.cpp:510
 msgid "Number of sound buffers"
-msgstr ""
+msgstr "聲音緩衝區數"
 
 #: config/internal/option-internal.cpp:511
 msgid "Bit mask of sound channels to enable"
-msgstr ""
+msgstr "要啟用的聲道比特遮罩"
 
 #: config/internal/option-internal.cpp:513
 msgid "Game Boy Advance sound filtering (%)"
-msgstr ""
+msgstr "GBA 聲音過濾（%）"
 
 #: config/internal/option-internal.cpp:515
 msgid "Game Boy Advance sound interpolation"
-msgstr ""
+msgstr "GBA 聲音插值"
 
 #: config/internal/option-internal.cpp:517
 msgid "Game Boy sound declicking"
-msgstr ""
+msgstr "GB 聲音降噪"
 
 #: config/internal/option-internal.cpp:518
 msgid "Game Boy echo effect (%)"
-msgstr ""
+msgstr "GB 回聲音效（%）"
 
 #: config/internal/option-internal.cpp:520
 msgid "Enable Game Boy sound effects"
-msgstr ""
+msgstr "啟用 GB 音效"
 
 #: config/internal/option-internal.cpp:521
 msgid "Game Boy stereo effect (%)"
-msgstr ""
+msgstr "GB 身歷聲音效（%）"
 
 #: config/internal/option-internal.cpp:523
 msgid "Game Boy surround sound effect (%)"
-msgstr ""
+msgstr "GB 環繞音效（%）"
 
 #: config/internal/option-internal.cpp:524
 msgid "Sound sample rate (kHz)"
-msgstr ""
+msgstr "聲音取樣速率（kHz）"
 
 #: config/internal/option-internal.cpp:525
 msgid "Sound volume (%)"
-msgstr ""
+msgstr "音量（%）"
 
 #: config/internal/option-internal.cpp:591
 #: config/internal/option-internal.cpp:611
@@ -1555,7 +1556,7 @@ msgstr ""
 #: config/internal/option-internal.cpp:672
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
-msgstr ""
+msgstr "無效值 %s 的 %s 選項; 有效值為 %s"
 
 #: config/option.cpp:317
 #, c-format
@@ -1570,11 +1571,11 @@ msgstr "無效值 %d 的選項 %s; 有效值為 %d - %d"
 #: config/option.cpp:445
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %s"
-msgstr ""
+msgstr "無效值 %d 的 %s 選項; 有效值為 %s"
 
 #: dialogs/display-config.cpp:55
 msgid "Invalid value for Default magnification."
-msgstr ""
+msgstr "無效的默認放大倍數值。"
 
 #: dialogs/display-config.cpp:385
 #, c-format
@@ -1589,12 +1590,12 @@ msgstr "插件"
 #: dialogs/display-config.cpp:428
 #, c-format
 msgid "Using pixel filter: %s"
-msgstr ""
+msgstr "使用像素濾波器: %s"
 
 #: dialogs/display-config.cpp:435
 #, c-format
 msgid "Using interframe blending: %s"
-msgstr ""
+msgstr "使用幀間混合: %s"
 
 #: widgets/keyedit.cpp:122 widgets/keyedit.cpp:280
 msgid "SHIFT"
@@ -1643,12 +1644,12 @@ msgstr "CONTROL"
 #: widgets/sdljoy.cpp:188
 #, c-format
 msgid "Connected %s: %s"
-msgstr ""
+msgstr "已連接 %s: %s"
 
 #: widgets/sdljoy.cpp:203
 #, c-format
 msgid "Disconnected %s"
-msgstr ""
+msgstr "已斷開連接 %s"
 
 #: xaudio2.cpp:34
 msgid "XAudio2: Enumerating devices failed!"
@@ -1690,7 +1691,7 @@ msgstr "無法創建DirectSound %08x"
 #: dsound.cpp:103
 #, c-format
 msgid "Cannot create Direct Sound %08x"
-msgstr ""
+msgstr "無法創建 Direct Sound %08x"
 
 #: dsound.cpp:108
 #, c-format
@@ -1826,7 +1827,7 @@ msgstr "十六進位(&H)"
 
 #: xrc/CheatCreate.xrc:97
 msgid "Signed / Unsigned"
-msgstr ""
+msgstr "有號/無號"
 
 #: xrc/CheatCreate.xrc:107
 msgid "&8 bits"
@@ -2153,7 +2154,7 @@ msgstr "像素化"
 
 #: xrc/DisplayConfig.xrc:90
 msgid "Advance MAME Scale 2x"
-msgstr ""
+msgstr "進階 MAME 縮放 2x"
 
 #: xrc/DisplayConfig.xrc:91
 msgid "Bilinear"
@@ -2221,19 +2222,19 @@ msgstr "xBRZ 6x"
 
 #: xrc/DisplayConfig.xrc:115
 msgid "Plugin:"
-msgstr ""
+msgstr "插件:"
 
 #: xrc/DisplayConfig.xrc:127
 msgid "Interframe blending:"
-msgstr ""
+msgstr "幀間混合："
 
 #: xrc/DisplayConfig.xrc:136
 msgid "Smart"
-msgstr ""
+msgstr "智慧"
 
 #: xrc/DisplayConfig.xrc:137
 msgid "Motion Blur"
-msgstr ""
+msgstr "動態模糊"
 
 #: xrc/DisplayConfig.xrc:151 xrc/SoundConfig.xrc:91
 msgid "Basic"
@@ -2245,7 +2246,7 @@ msgstr "省略畫格"
 
 #: xrc/DisplayConfig.xrc:177
 msgid "&Number of frames to skip:"
-msgstr ""
+msgstr "省略的畫格數(&N)："
 
 #: xrc/DisplayConfig.xrc:199
 msgid "Speed"
@@ -2253,7 +2254,7 @@ msgstr "速度"
 
 #: xrc/DisplayConfig.xrc:215
 msgid "Speed indicator:"
-msgstr ""
+msgstr "速度指標："
 
 #: xrc/DisplayConfig.xrc:222
 msgid "Percentage"
@@ -2269,11 +2270,11 @@ msgstr "OSD"
 
 #: xrc/DisplayConfig.xrc:247
 msgid "Default magnification:"
-msgstr ""
+msgstr "預設比例:"
 
 #: xrc/DisplayConfig.xrc:266
 msgid "Maximum magnification factor:"
-msgstr ""
+msgstr "最高放大倍率:"
 
 #: xrc/DisplayConfig.xrc:267
 msgid "0 = no maximum"
@@ -2385,11 +2386,11 @@ msgstr "怪異顏色"
 
 #: xrc/GBColorPrefPanel.xrc:17
 msgid "Real Game Boy Colors"
-msgstr ""
+msgstr "真實 GB 顏色"
 
 #: xrc/GBColorPrefPanel.xrc:18
 msgid "Real 'Game Boy on Game Boy Advance Special' Colors"
-msgstr ""
+msgstr "實機 'GB on GBASP' 顏色"
 
 #: xrc/GBColorPrefPanel.xrc:46 xrc/GBPaletteViewer.xrc:17 xrc/MapViewer.xrc:54
 #: xrc/PaletteViewer.xrc:19
@@ -2648,7 +2649,7 @@ msgstr "Game Boy Advance 設定"
 
 #: xrc/GameBoyAdvanceConfig.xrc:21
 msgid "Save type:"
-msgstr ""
+msgstr "存檔類型："
 
 #: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
 #: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
@@ -2673,15 +2674,15 @@ msgstr "EEPROM + Sensor"
 
 #: xrc/GameBoyAdvanceConfig.xrc:43
 msgid "Flash size:"
-msgstr ""
+msgstr "Flash 大小:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
 msgid "64 K"
-msgstr ""
+msgstr "64 K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:50 xrc/GameBoyAdvanceConfig.xrc:222
 msgid "128 K"
-msgstr ""
+msgstr "128 K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:64
 msgid "Detect Now"
@@ -2697,11 +2698,11 @@ msgstr "存檔類型"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file:"
-msgstr ""
+msgstr "BIOS 檔案:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file:"
-msgstr ""
+msgstr "現在的 BIOS 檔案:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:122 xrc/GameBoyConfig.xrc:138
 #: xrc/GameBoyConfig.xrc:159
@@ -2760,11 +2761,11 @@ msgstr "遊戲覆蓋"
 
 #: xrc/GameBoyConfig.xrc:4
 msgid "Game Boy settings"
-msgstr ""
+msgstr "GameBoy 設定"
 
 #: xrc/GameBoyConfig.xrc:20
 msgid "Emulated &system:"
-msgstr ""
+msgstr "模擬的系統(&S)："
 
 #: xrc/GameBoyConfig.xrc:30
 msgid "Game Boy Color"
@@ -2788,7 +2789,7 @@ msgstr "Super Game Boy 2"
 
 #: xrc/GameBoyConfig.xrc:48
 msgid "Display &borders:"
-msgstr ""
+msgstr "顯示邊框(&B)："
 
 #: xrc/GameBoyConfig.xrc:57
 msgid "Never"
@@ -2804,7 +2805,7 @@ msgstr "系統"
 
 #: xrc/GameBoyConfig.xrc:84
 msgid "Game Boy Boot &ROM file:"
-msgstr ""
+msgstr "GB 啟動程式(Boot ROM)檔案(&R):"
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
@@ -2812,15 +2813,15 @@ msgstr "選擇一個檔案"
 
 #: xrc/GameBoyConfig.xrc:106
 msgid "Game Boy Color Boot ROM &file:"
-msgstr ""
+msgstr "GBC 啟動程式(Boot ROM)檔案(&F):"
 
 #: xrc/GameBoyConfig.xrc:131
 msgid "Current Game Boy BIOS file:"
-msgstr ""
+msgstr "現在的 GB BIOS 檔案:"
 
 #: xrc/GameBoyConfig.xrc:152
 msgid "Current Game Boy Color BIOS file:"
-msgstr ""
+msgstr "現在的 GBC BIOS 檔案:"
 
 #: xrc/GameBoyConfig.xrc:186
 msgid "User 1"
@@ -2856,7 +2857,7 @@ msgstr "&BMP"
 
 #: xrc/GeneralConfig.xrc:57
 msgid "&Rewind interval:"
-msgstr ""
+msgstr "倒退間隔(&R):"
 
 #: xrc/GeneralConfig.xrc:58
 msgid "If not empty or 0, enable rewind (seconds)"
@@ -2872,7 +2873,7 @@ msgstr "節流閥(&T)"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "percent of normal:"
-msgstr ""
+msgstr "正常百分比："
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
@@ -2963,7 +2964,7 @@ msgid ""
 "Click a field and press a key or move joystick to add. Press backspace to "
 "delete last added key. Resize window or click inside and move pointer to see"
 " entire contents if too small."
-msgstr ""
+msgstr "點擊一個字段並且按一個按鍵或是移動搖桿來進行添加的動作。按倒退鍵來刪除最後一個添加的按鍵。假如太小的話，請縮放視窗或是點擊內部並且移動游標來看整個內容。"
 
 #: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:456
 msgid "Up"
@@ -3023,7 +3024,7 @@ msgstr "連發 B"
 
 #: xrc/JoyPanel.xrc:342
 msgid "Motion Left / Dark"
-msgstr ""
+msgstr "動作 左/暗"
 
 #: xrc/JoyPanel.xrc:364
 msgid "GameShark"
@@ -3031,7 +3032,7 @@ msgstr "GameShark"
 
 #: xrc/JoyPanel.xrc:386
 msgid "Motion Right / Light"
-msgstr ""
+msgstr "動作 右/亮"
 
 #: xrc/JoyPanel.xrc:408
 msgid "Speed Up"
@@ -3155,11 +3156,11 @@ msgstr "開啟..."
 
 #: xrc/MainMenu.xrc:10
 msgid "Open &Game Boy..."
-msgstr ""
+msgstr "開啟 GB(&G)..."
 
 #: xrc/MainMenu.xrc:13
 msgid "Open Game Boy &Color..."
-msgstr ""
+msgstr "開啟 GBC(&C)..."
 
 #: xrc/MainMenu.xrc:16
 msgid "Open rece&nt"
@@ -3247,7 +3248,7 @@ msgstr "1&0"
 
 #: xrc/MainMenu.xrc:89
 msgid "From &File..."
-msgstr ""
+msgstr "來自檔案(&F)..."
 
 #: xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
@@ -3275,7 +3276,7 @@ msgstr "增加即時紀錄槽數量並且存檔"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File..."
-msgstr ""
+msgstr "到檔案(&F)..."
 
 #: xrc/MainMenu.xrc:147
 msgid "&Save state"
@@ -3295,7 +3296,7 @@ msgstr "電池記憶檔(&B)"
 
 #: xrc/MainMenu.xrc:161
 msgid "Game Shark &code file..."
-msgstr ""
+msgstr "Gameshark 代碼檔(&C)..."
 
 #: xrc/MainMenu.xrc:164
 msgid "&Gameshark snapshot..."
@@ -3307,7 +3308,7 @@ msgstr "匯入(&I)"
 
 #: xrc/MainMenu.xrc:173
 msgid "&Game Shark snapshot..."
-msgstr ""
+msgstr "Gameshark 快照(&G)..."
 
 #: xrc/MainMenu.xrc:175
 msgid "&Export"
@@ -3399,7 +3400,7 @@ msgstr "跳過 BIOS"
 
 #: xrc/MainMenu.xrc:255
 msgid "&Auto IPS / UPS / IPF patch"
-msgstr ""
+msgstr "自動套用 IPS/UPS/IPF 補丁(&A)"
 
 #: xrc/MainMenu.xrc:259
 msgid "&Pause when inactive"
@@ -3419,7 +3420,7 @@ msgstr "連線(L)"
 
 #: xrc/MainMenu.xrc:272
 msgid "Start &Network Link..."
-msgstr ""
+msgstr "開始網路連線(&N)..."
 
 #: xrc/MainMenu.xrc:277
 msgid "&Nothing"
@@ -3435,7 +3436,7 @@ msgstr "無線(&W)"
 
 #: xrc/MainMenu.xrc:289
 msgid "&Game Cube"
-msgstr ""
+msgstr "Game Cube(&G)"
 
 #: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:521
 msgid "&Game Boy"
@@ -3456,7 +3457,7 @@ msgstr "速度破解(&S)"
 #: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:387
 #: xrc/MainMenu.xrc:423
 msgid "&Configure..."
-msgstr ""
+msgstr "設定(&C)..."
 
 #: xrc/MainMenu.xrc:314
 msgid "&Video"
@@ -3544,19 +3545,19 @@ msgstr "聲音開/關(&T)"
 
 #: xrc/MainMenu.xrc:403
 msgid "&Game Boy Advance sound interpolation"
-msgstr ""
+msgstr "GBA 聲音插值(&G)"
 
 #: xrc/MainMenu.xrc:408
 msgid "&Game Boy sound enhancement"
-msgstr ""
+msgstr "GB 聲音加強(&G)"
 
 #: xrc/MainMenu.xrc:412
 msgid "&Game Boy surround sound effect"
-msgstr ""
+msgstr "GB 環繞音效(&G)"
 
 #: xrc/MainMenu.xrc:416
 msgid "&Game Boy sound declicking"
-msgstr ""
+msgstr "GB 聲音降噪(&G)"
 
 #: xrc/MainMenu.xrc:421
 msgid "&Input"
@@ -3600,7 +3601,7 @@ msgstr "&Game Boy Advance"
 
 #: xrc/MainMenu.xrc:500 xrc/MainMenu.xrc:523
 msgid "Configure..."
-msgstr ""
+msgstr "設定..."
 
 #: xrc/MainMenu.xrc:504
 msgid "&Real-time clock"
@@ -3620,15 +3621,15 @@ msgstr "&LCD 濾鏡"
 
 #: xrc/MainMenu.xrc:527
 msgid "&Game Boy color option"
-msgstr ""
+msgstr "GB 顏色選項(&G)"
 
 #: xrc/MainMenu.xrc:535
 msgid "&Game Boy Colorizer Hack (requires restart)"
-msgstr ""
+msgstr "GB 色彩修改（需要重啓）(&G)"
 
 #: xrc/MainMenu.xrc:539
 msgid "&Game Boy printer"
-msgstr ""
+msgstr "GB 印表機(&G)"
 
 #: xrc/MainMenu.xrc:543
 msgid "&Gather a full page before printing"
@@ -3640,31 +3641,31 @@ msgstr "將列印輸出另存為螢幕截圖(&S)"
 
 #: xrc/MainMenu.xrc:552
 msgid "&Use Game Boy BIOS file (requires restart)"
-msgstr ""
+msgstr "使用 GB BIOS 檔案（需要重啓）(&U)"
 
 #: xrc/MainMenu.xrc:556
 msgid "&Use Game Boy Color BIOS file"
-msgstr ""
+msgstr "使用 GBC BIOS 檔案(&U)"
 
 #: xrc/MainMenu.xrc:561
 msgid "&General..."
-msgstr ""
+msgstr "一般設定(&G)..."
 
 #: xrc/MainMenu.xrc:564
 msgid "&Speedup / Turbo..."
-msgstr ""
+msgstr "加速/超頻(&S)..."
 
 #: xrc/MainMenu.xrc:567
 msgid "D&irectories..."
-msgstr ""
+msgstr "資料夾(&I)..."
 
 #: xrc/MainMenu.xrc:570
 msgid "&Key Shortcuts..."
-msgstr ""
+msgstr "快捷鍵(&K)..."
 
 #: xrc/MainMenu.xrc:573
 msgid "&UI Settings..."
-msgstr ""
+msgstr "介面設定(&U)…"
 
 #: xrc/MainMenu.xrc:577
 msgid "&Tools"
@@ -3676,15 +3677,15 @@ msgstr "金手指(&C)"
 
 #: xrc/MainMenu.xrc:581
 msgid "List &cheats..."
-msgstr ""
+msgstr "列出金手指代碼(&C)..."
 
 #: xrc/MainMenu.xrc:584
 msgid "Find c&heat..."
-msgstr ""
+msgstr "收尋金手指(&H)..."
 
 #: xrc/MainMenu.xrc:588
 msgid "A&utomatically save / load cheats"
-msgstr ""
+msgstr "自動儲存/讀取金手指代碼(&U)"
 
 #: xrc/MainMenu.xrc:592
 msgid "&Enable cheats"
@@ -3820,7 +3821,7 @@ msgstr "回報程式瑕疵(&B)"
 
 #: xrc/MainMenu.xrc:727
 msgid "Visual Boy Advance-M Support &Forum"
-msgstr ""
+msgstr "VBA-M 支持與論壇(&F)"
 
 #: xrc/MainMenu.xrc:730
 msgid "Translations"
@@ -3856,19 +3857,19 @@ msgstr "幀"
 
 #: xrc/MapViewer.xrc:35
 msgid "BG 0"
-msgstr ""
+msgstr "BG 0"
 
 #: xrc/MapViewer.xrc:41
 msgid "BG 1"
-msgstr ""
+msgstr "BG 1"
 
 #: xrc/MapViewer.xrc:46
 msgid "BG 2"
-msgstr ""
+msgstr "BG 2"
 
 #: xrc/MapViewer.xrc:51
 msgid "BG 3"
-msgstr ""
+msgstr "BG 3"
 
 #: xrc/MapViewer.xrc:84
 msgid "Map Base:"
@@ -3976,7 +3977,7 @@ msgstr "音效設定"
 
 #: xrc/SoundConfig.xrc:16
 msgid "Volume:"
-msgstr ""
+msgstr "音量："
 
 #: xrc/SoundConfig.xrc:34
 msgid "Mute"
@@ -3988,7 +3989,7 @@ msgstr "最大"
 
 #: xrc/SoundConfig.xrc:71
 msgid "Sample rate:"
-msgstr ""
+msgstr "取樣率："
 
 #: xrc/SoundConfig.xrc:77
 msgid "48 KHz"
@@ -4016,7 +4017,7 @@ msgstr "OpenAL"
 
 #: xrc/SoundConfig.xrc:118
 msgid "Direct Sound"
-msgstr ""
+msgstr "Direct Sound"
 
 #: xrc/SoundConfig.xrc:125
 msgid "XAudio2"
@@ -4064,7 +4065,7 @@ msgstr "中央"
 
 #: xrc/SoundConfig.xrc:269
 msgid "Left / Right"
-msgstr ""
+msgstr "左/右"
 
 #: xrc/SoundConfig.xrc:298
 msgid "Sound filtering"

@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Stanley Kid, 2022
+# Stanley Kid, 2022-2023
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-05 14:20-0800\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Stanley Kid, 2022\n"
+"Last-Translator: Stanley Kid, 2022-2023\n"
 "Language-Team: Ukrainian (http://www.transifex.com/bgk/vba-m/language/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -64,14 +64,14 @@ msgstr "<параметр> = <значення>"
 
 #: wxvbam.cpp:616
 msgid "Configuration / build error: can't find built-in xrc"
-msgstr ""
+msgstr "Помилка конфігурації / випуску: неможливо знайти вбудований xrc."
 
 #: wxvbam.cpp:624
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr ""
+msgstr "Записано вбудовану конфігурацію до %s.\nДля перевизначення вилучи всі вузли, крім змінених кореневих. Перший знайдений кореневий вузол із правильним іменем у будь-якому файлі .xrc чи .xrs у наведених шляхах пошуку перевизначає вбудований:"
 
 #: wxvbam.cpp:638
 msgid "Configuration is read from, in order:"
@@ -82,7 +82,7 @@ msgstr "Конфігурацію прочитано з файлів за пор�
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
-msgstr ""
+msgstr "Записано вбудоване перевизначення файлу до %s.\nДля перевизначення видали всі розділи, крім змінених. Перший знайдений розділ буде використано зі шляху пошуку:"
 
 #: wxvbam.cpp:658
 msgid ""
@@ -182,11 +182,11 @@ msgstr "Вилучення чітів."
 
 #: guiinit.cpp:758
 msgid "Game Shark"
-msgstr ""
+msgstr "Game Shark"
 
 #: guiinit.cpp:759
 msgid "Game Genie"
-msgstr ""
+msgstr "Game Genie"
 
 #: guiinit.cpp:761
 msgid "Generic Code"
@@ -194,11 +194,11 @@ msgstr "Загальний код"
 
 #: guiinit.cpp:762
 msgid "Game Shark Advance"
-msgstr ""
+msgstr "Game Shark Advance"
 
 #: guiinit.cpp:763
 msgid "Code Breaker Advance"
-msgstr ""
+msgstr "Code Breaker Advance"
 
 #: guiinit.cpp:764
 msgid "Flashcart CHT"
@@ -257,11 +257,11 @@ msgstr "Робочий стіл"
 #: guiinit.cpp:1734
 #, c-format
 msgid "%d x %d - %d bpp @ %d Hz"
-msgstr ""
+msgstr "%d * %d - %d біт / піксель @ %d Гц"
 
 #: guiinit.cpp:1976
 msgid "This will clear all user-defined accelerators. Are you sure?"
-msgstr ""
+msgstr "Очистити всі користувацькі гарячі кнопки?"
 
 #: guiinit.cpp:1976
 msgid "Confirm"
@@ -287,7 +287,7 @@ msgstr "Дубльовано гарячу кнопку: %s для %s і %s; за
 #: guiinit.cpp:2771
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s; keeping menu"
-msgstr ""
+msgstr "Гарячою кнопкою %s для %s перевизначено типово %s; залишено кінцеву."
 
 #: guiinit.cpp:2910
 #, c-format
@@ -429,7 +429,7 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
 " Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Game Boy Advance|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game Boy|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:146
 msgid "Open ROM file"
@@ -439,7 +439,7 @@ msgstr "Відкриття ROM"
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Game Boy|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:169
 msgid "Open GB ROM file"
@@ -449,7 +449,7 @@ msgstr "Відкриття Game Boy ROM"
 msgid ""
 "Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Game Boy Color|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:192
 msgid "Open GBC ROM file"
@@ -594,7 +594,7 @@ msgstr "Батарея|*.sav|Флеш-збереження|*.dat"
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "Видалити всі збережені ігри імпортом батареї остаточно після наступного запису?"
 
 #: cmdevents.cpp:928 cmdevents.cpp:956 cmdevents.cpp:1076
 msgid "Confirm import"
@@ -616,17 +616,17 @@ msgstr "Вибір кодів"
 
 #: cmdevents.cpp:946
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
-msgstr ""
+msgstr "Game Shark-коди|*.spc;*.xpc"
 
 #: cmdevents.cpp:946
 msgid "Game Shark Code File (*.gcf)|*.gcf"
-msgstr ""
+msgstr "Game Shark-коди|*.gcf"
 
 #: cmdevents.cpp:955
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
-msgstr ""
+msgstr "Замінити всі завантажені чіти імпортом кодів?"
 
 #: cmdevents.cpp:972
 #, c-format
@@ -656,17 +656,17 @@ msgstr "Вибір знімка"
 msgid ""
 "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots "
 "(*.gsv)|*.gsv"
-msgstr ""
+msgstr "Game Shark & PAC-знімки|*.sps;*.xps|Game Shark SP-знімки|*.gsv"
 
 #: cmdevents.cpp:1066
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
-msgstr ""
+msgstr "Game Boy-знімки|*.gbs"
 
 #: cmdevents.cpp:1075
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "Видалити всі збережені ігри імпортом знімка остаточно після наступного запису?"
 
 #: cmdevents.cpp:1100
 #, c-format
@@ -694,11 +694,11 @@ msgstr "EEPROM-збереження неможливо експортувати.
 
 #: cmdevents.cpp:1142
 msgid "Game Shark Snapshot (*.sps)|*.sps"
-msgstr ""
+msgstr "Game Shark-знімки|*.sps"
 
 #: cmdevents.cpp:1156
 msgid "Exported from Visual Boy Advance-M"
-msgstr ""
+msgstr "Експортовано з Visual Boy Advance-M."
 
 #: cmdevents.cpp:1168
 #, c-format
@@ -729,7 +729,7 @@ msgstr "Вибір стану"
 
 #: cmdevents.cpp:1789 cmdevents.cpp:1882
 msgid "Visual Boy Advance saved game files|*.sgm"
-msgstr ""
+msgstr "Visual Boy Advance-збереження|*.sgm"
 
 #: cmdevents.cpp:1912 cmdevents.cpp:1922 cmdevents.cpp:1933
 #, c-format
@@ -738,7 +738,7 @@ msgstr "Поточний слот стану %d"
 
 #: cmdevents.cpp:2003
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
-msgstr ""
+msgstr "Неможливо використати колірний хак при увімкненому Game Boy BIOS."
 
 #: cmdevents.cpp:2218
 msgid "Sound enabled"
@@ -751,7 +751,7 @@ msgstr "Звук вимкнено."
 #: cmdevents.cpp:2231 cmdevents.cpp:2245
 #, c-format
 msgid "Volume: %d %%"
-msgstr ""
+msgstr "Гучність: %d %%"
 
 #: cmdevents.cpp:2320
 msgid "Set to 0 for pseudo tty"
@@ -785,7 +785,7 @@ msgstr "Неможливо визначити аудіодрайвер!"
 
 #: cmdevents.cpp:2914
 msgid "Nintendo Game Boy / Color / Advance) emulator."
-msgstr ""
+msgstr "Емулятор Nintendo Game Boy / Color / Advance."
 
 #: cmdevents.cpp:2915
 msgid ""
@@ -808,15 +808,15 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program. If not, see http://www.gnu.org/licenses ."
-msgstr ""
+msgstr "Програма - безкоштовне програмне забезпечення: можна розповсюджувати\nїї та / або змінювати за умовами Загальної Публічної Ліцензії GNU,\nопублікованої Фондом Безкоштовного Програмного Забезпечення, чи\nверсії 2 Ліцензії, чи (на твій вибір) будь-якої пізнішої версії.\nПрограму розповсюджено з надією на користь, але БЕЗ ГАРАНТІЙ;\nнавіть без неявної гарантії ПРИДАТНОСТІ ДО ПРОДАЖУ\nЧИ ОСОБЛИВОЇ МЕТИ. Докладно в Загальній Публічній Ліцензії GNU.\n\nТи отримаєш копію Загальної Публічної Ліцензії GNU\nразом із програмою, чи за посиланням.\nhttp://gnu.org/licenses"
 
 #: cmdevents.cpp:3158
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
-msgstr ""
+msgstr "Неможливо використати Game Boy BIOS при увімкненому колірному хаку."
 
 #: cmdevents.cpp:3219
 msgid "LAN link is already active. Disable link mode to disconnect."
-msgstr ""
+msgstr "LAN-з'єднання активне. Вимкни режим з'єднання для роз'єднання."
 
 #: cmdevents.cpp:3225
 msgid "Network is not supported in local mode."
@@ -898,7 +898,7 @@ msgstr "Відтворення завершено."
 #: sys.cpp:449
 #, c-format
 msgid "%d %% (%d, %d fps)"
-msgstr ""
+msgstr "%d %% (%d, %d Гц)"
 
 #: sys.cpp:457
 #, c-format
@@ -958,7 +958,7 @@ msgstr "Неможливо завантажити Game Boy ROM %s."
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
-msgstr ""
+msgstr "Неможливо використати Game Boy BIOS при увімкненому колірному хаку, Game Boy BIOS вимкнено."
 
 #: panel.cpp:280 panel.cpp:380
 #, c-format
@@ -997,31 +997,31 @@ msgstr "Помилка збереження стану %s."
 #: panel.cpp:933
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
-msgstr ""
+msgstr "Непідтримуваний повний екран %d * %d - %d @ %d; пошук іншого."
 
 #: panel.cpp:971
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
-msgstr ""
+msgstr "Непідтримуваний повний екран %d * %d - %d @ %d."
 
 #: panel.cpp:976
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
-msgstr ""
+msgstr "Дійсний режим: %d * %d - %d @ %d."
 
 #: panel.cpp:984
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
-msgstr ""
+msgstr "Вибрано режим %d * %d - %d @ %d."
 
 #: panel.cpp:988
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
-msgstr ""
+msgstr "Не вдалося змінити режим на %d * %d - %d @ %d."
 
 #: panel.cpp:1076
 msgid "Not a valid Game Boy Advance cartridge"
-msgstr ""
+msgstr "Недійсний Game Boy Advance-картридж."
 
 #: panel.cpp:1246
 msgid "No memory for rewinding"
@@ -1103,7 +1103,7 @@ msgstr "Неможливо почати запис до %s (%s)."
 #: panel.cpp:2528
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
-msgstr ""
+msgstr "Помилка аудіо- / відеозапису (%s); перервано."
 
 #: panel.cpp:2534
 #, c-format
@@ -1153,7 +1153,7 @@ msgstr "Максимальна кількість потоків для запу
 
 #: config/internal/option-internal.cpp:314
 msgid "Render method; if unsupported, simple method will be used"
-msgstr "Спосіб опрацювання; при непідтримуванні буде використано простий спосіб"
+msgstr "Спосіб опрацювання; при непідтримці буде використано простий спосіб"
 
 #: config/internal/option-internal.cpp:315
 msgid "Default scale factor"
@@ -1165,11 +1165,11 @@ msgstr "Зберігати співвідношення сторін при зм
 
 #: config/internal/option-internal.cpp:321
 msgid "BIOS file to use for Game Boy, if enabled"
-msgstr ""
+msgstr "BIOS для використання Game Boy"
 
 #: config/internal/option-internal.cpp:323
 msgid "Game Boy color enhancement, if enabled"
-msgstr ""
+msgstr "Посилення кольору Game Boy"
 
 #: config/internal/option-internal.cpp:325
 msgid "Enable DX Colorization Hacks"
@@ -1182,7 +1182,7 @@ msgstr "Встановити LCD-фільтр"
 
 #: config/internal/option-internal.cpp:329
 msgid "BIOS file to use for Game Boy Color, if enabled"
-msgstr ""
+msgstr "BIOS для використання Game Boy Color"
 
 #: config/internal/option-internal.cpp:331
 msgid ""
@@ -1214,7 +1214,7 @@ msgstr "Каталог пошуку ROM"
 
 #: config/internal/option-internal.cpp:346
 msgid "Directory to look for Game Boy Color ROM files"
-msgstr ""
+msgstr "Каталог пошуку Game Boy Color ROM"
 
 #: config/internal/option-internal.cpp:349
 msgid "BIOS file to use, if enabled"
@@ -1260,7 +1260,7 @@ msgstr "Автоматично завантажувати останній зб�
 msgid ""
 "Directory to store game save files (relative paths are relative to ROM; "
 "blank is config dir)"
-msgstr "Каталог зберігання збережень гри (відносні шляхи відносяться до ROM; порожнє - каталог конфігурації)"
+msgstr "Каталог зберігання збережень гри (відносні шляхи до ROM; порожнє - каталог конфігурації)"
 
 #: config/internal/option-internal.cpp:382
 msgid "Freeze recent load list"
@@ -1270,7 +1270,7 @@ msgstr "Зупинити перелік останніх завантажень"
 msgid ""
 "Directory to store A / V and game recordings (relative paths are relative to"
 " ROM)"
-msgstr ""
+msgstr "Каталог зберігання аудіо / відео та записів ігор (відносні шляхи до ROM)"
 
 #: config/internal/option-internal.cpp:387
 msgid "Number of seconds between rewind snapshots (0 to disable)"
@@ -1278,13 +1278,13 @@ msgstr "Кількість секунд між перемотуванням зн
 
 #: config/internal/option-internal.cpp:389
 msgid "Directory to store screenshots (relative paths are relative to ROM)"
-msgstr "Каталог зберігання екранних кадрів (відносні шляхи відносяться до ROM)"
+msgstr "Каталог зберігання екранних кадрів (відносні шляхи до ROM)"
 
 #: config/internal/option-internal.cpp:392
 msgid ""
 "Directory to store saved state files (relative paths are relative to "
 "BatteryDir)"
-msgstr "Каталог зберігання станів збереження (відносні шляхи відносяться до каталогу батареї)"
+msgstr "Каталог зберігання станів збереження (відносні шляхи до каталогу батареї)"
 
 #: config/internal/option-internal.cpp:394
 msgid "Enable status bar"
@@ -1296,11 +1296,11 @@ msgid ""
 "names which map to joypad #<n> button <button>. Button is one of Up, Down, "
 "Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
-msgstr ""
+msgstr "Параметр Joypad/<n>/<button> містить розділений комами перелік імен кнопок, призначених для джойстика #<n> кнопка <button>. Кнопки: ↑, ↓, ←, →, A, B, L, R, Select, Start, Motion Up, Motion Down, Motion Left, Motion Right, Autofire A, Autofire B, Speed, Capture, Game Shark."
 
 #: config/internal/option-internal.cpp:404
 msgid "The autofire toggle period, in frames (1/60 s)"
-msgstr ""
+msgstr "Період перемикання турбо в кадрах (1 / 60 сек)"
 
 #: config/internal/option-internal.cpp:406
 msgid "The number of the stick to use in single-player mode"
@@ -1311,7 +1311,7 @@ msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
-msgstr ""
+msgstr "Параметр Keyboard/<cmd> містить розділений комами перелік імен кнопок (наприклад, Alt + Shift + F1). При натисканні вказаної клавіші виконується команда <cmd>."
 
 #: config/internal/option-internal.cpp:416
 msgid "Enable AGB debug print"
@@ -1319,11 +1319,11 @@ msgstr "Увімкнути налагоджувальний AGB-друк"
 
 #: config/internal/option-internal.cpp:418
 msgid "Auto skip frames"
-msgstr ""
+msgstr "Автопропуск кадрів"
 
 #: config/internal/option-internal.cpp:420
 msgid "Apply IPS / UPS / IPF patches if found"
-msgstr ""
+msgstr "Встановити знайдені IPS / UPS / IPF-латки"
 
 #: config/internal/option-internal.cpp:422
 msgid "Automatically save and load cheat list"
@@ -1331,7 +1331,7 @@ msgstr "Автоматично зберігати та завантажуват�
 
 #: config/internal/option-internal.cpp:426
 msgid "Automatically enable border for Super Game Boy games"
-msgstr ""
+msgstr "Автоматично вмикати межу для ігор Super Game Boy"
 
 #: config/internal/option-internal.cpp:428
 msgid "Always enable border"
@@ -1355,11 +1355,11 @@ msgstr "Тип системи для емуляції"
 
 #: config/internal/option-internal.cpp:436
 msgid "Flash size 0 = 64 KB 1 = 128 KB"
-msgstr ""
+msgstr "Флеш-розмір (0: 64 Кбайт; 1: 128 Кбайт)"
 
 #: config/internal/option-internal.cpp:438
 msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
-msgstr ""
+msgstr "Пропуск кадрів. Значення 0-9 або -1 для автоматичного пропуску залежно від часу."
 
 #: config/internal/option-internal.cpp:440
 msgid "The palette to use"
@@ -1419,11 +1419,11 @@ msgstr "Не перезаписувати рідні збереження (ба�
 
 #: config/internal/option-internal.cpp:469
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
-msgstr ""
+msgstr "Прискорення швидкості гри (0-450 %, 0: без прискорення)"
 
 #: config/internal/option-internal.cpp:472
 msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
-msgstr ""
+msgstr "Встановити прискорення для кнопки (0-3000 %, 0: без прискорення)"
 
 #: config/internal/option-internal.cpp:474
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
@@ -1435,7 +1435,7 @@ msgstr "Використовувати пропуск кадрів для при
 
 #: config/internal/option-internal.cpp:479
 msgid "Use the specified BIOS file for Game Boy"
-msgstr ""
+msgstr "Використовувати вказаний BIOS для Game Boy"
 
 #: config/internal/option-internal.cpp:481
 msgid "Use the specified BIOS file"
@@ -1443,11 +1443,11 @@ msgstr "Використовувати вказаний BIOS"
 
 #: config/internal/option-internal.cpp:483
 msgid "Use the specified BIOS file for Game Boy Color"
-msgstr ""
+msgstr "Використовувати вказаний BIOS для Game Boy Color"
 
 #: config/internal/option-internal.cpp:484
 msgid "Wait for vertical sync"
-msgstr "Дочекатися вертикальної синхронізації"
+msgstr "Чекати вертикальну синхронізацію"
 
 #: config/internal/option-internal.cpp:488
 msgid "Enter fullscreen mode at startup"
@@ -1487,7 +1487,7 @@ msgstr "Приховати панель меню при неактивній м�
 
 #: config/internal/option-internal.cpp:507
 msgid "Sound API; if unsupported, default API will be used"
-msgstr "Звуковий API; при не підтримці буде використано типовий API"
+msgstr "Звуковий API; при непідтримці буде використано типовий API"
 
 #: config/internal/option-internal.cpp:509
 msgid "Device ID of chosen audio device for chosen driver"
@@ -1503,31 +1503,31 @@ msgstr "Бітова маска звукових каналів для увім�
 
 #: config/internal/option-internal.cpp:513
 msgid "Game Boy Advance sound filtering (%)"
-msgstr ""
+msgstr "Фільтрація звуку Game Boy Advance (%)"
 
 #: config/internal/option-internal.cpp:515
 msgid "Game Boy Advance sound interpolation"
-msgstr ""
+msgstr "Інтерполяція звуку Game Boy Advance"
 
 #: config/internal/option-internal.cpp:517
 msgid "Game Boy sound declicking"
-msgstr ""
+msgstr "Без клацання звуку Game Boy"
 
 #: config/internal/option-internal.cpp:518
 msgid "Game Boy echo effect (%)"
-msgstr ""
+msgstr "Луна Game Boy (%)"
 
 #: config/internal/option-internal.cpp:520
 msgid "Enable Game Boy sound effects"
-msgstr ""
+msgstr "Увімкнути звукові ефекти Game Boy"
 
 #: config/internal/option-internal.cpp:521
 msgid "Game Boy stereo effect (%)"
-msgstr ""
+msgstr "Стерео Game Boy (%)"
 
 #: config/internal/option-internal.cpp:523
 msgid "Game Boy surround sound effect (%)"
-msgstr ""
+msgstr "Об'ємний звук Game Boy (%)"
 
 #: config/internal/option-internal.cpp:524
 msgid "Sound sample rate (kHz)"
@@ -1563,7 +1563,7 @@ msgstr "Недійсне значення %d для опції %s; дійсні 
 
 #: dialogs/display-config.cpp:55
 msgid "Invalid value for Default magnification."
-msgstr ""
+msgstr "Недійсне значення типового збільшення."
 
 #: dialogs/display-config.cpp:385
 #, c-format
@@ -1679,7 +1679,7 @@ msgstr "Неможливо створити Direct Sound %08x."
 #: dsound.cpp:103
 #, c-format
 msgid "Cannot create Direct Sound %08x"
-msgstr ""
+msgstr "Неможливо створити Direct Sound %08x."
 
 #: dsound.cpp:108
 #, c-format
@@ -1815,7 +1815,7 @@ msgstr "&Шістнадцятковий"
 
 #: xrc/CheatCreate.xrc:97
 msgid "Signed / Unsigned"
-msgstr ""
+msgstr "Підписано / Без підпису"
 
 #: xrc/CheatCreate.xrc:107
 msgid "&8 bits"
@@ -2210,11 +2210,11 @@ msgstr ""
 
 #: xrc/DisplayConfig.xrc:115
 msgid "Plugin:"
-msgstr ""
+msgstr "Плаґін:"
 
 #: xrc/DisplayConfig.xrc:127
 msgid "Interframe blending:"
-msgstr ""
+msgstr "Міжкадрове накладання:"
 
 #: xrc/DisplayConfig.xrc:136
 msgid "Smart"
@@ -2234,7 +2234,7 @@ msgstr "Пропуск кадрів"
 
 #: xrc/DisplayConfig.xrc:177
 msgid "&Number of frames to skip:"
-msgstr ""
+msgstr "&Кількість кадрів для пропуску:"
 
 #: xrc/DisplayConfig.xrc:199
 msgid "Speed"
@@ -2242,7 +2242,7 @@ msgstr "Швидкість"
 
 #: xrc/DisplayConfig.xrc:215
 msgid "Speed indicator:"
-msgstr ""
+msgstr "Указівник швидкості:"
 
 #: xrc/DisplayConfig.xrc:222
 msgid "Percentage"
@@ -2258,11 +2258,11 @@ msgstr "Екранне відображення"
 
 #: xrc/DisplayConfig.xrc:247
 msgid "Default magnification:"
-msgstr ""
+msgstr "Типове збільшення:"
 
 #: xrc/DisplayConfig.xrc:266
 msgid "Maximum magnification factor:"
-msgstr ""
+msgstr "Максимальний коефіцієнт збільшення:"
 
 #: xrc/DisplayConfig.xrc:267
 msgid "0 = no maximum"
@@ -2374,11 +2374,11 @@ msgstr "Дивні кольори"
 
 #: xrc/GBColorPrefPanel.xrc:17
 msgid "Real Game Boy Colors"
-msgstr ""
+msgstr "Справжні кольори Game Boy"
 
 #: xrc/GBColorPrefPanel.xrc:18
 msgid "Real 'Game Boy on Game Boy Advance Special' Colors"
-msgstr ""
+msgstr "Справжні кольори Game Boy на Game Boy Advance Special"
 
 #: xrc/GBColorPrefPanel.xrc:46 xrc/GBPaletteViewer.xrc:17 xrc/MapViewer.xrc:54
 #: xrc/PaletteViewer.xrc:19
@@ -2637,7 +2637,7 @@ msgstr "Налаштування Game Boy Advance"
 
 #: xrc/GameBoyAdvanceConfig.xrc:21
 msgid "Save type:"
-msgstr ""
+msgstr "Тип збереження:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
 #: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
@@ -2662,15 +2662,15 @@ msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:43
 msgid "Flash size:"
-msgstr ""
+msgstr "Флеш-розмір:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
 msgid "64 K"
-msgstr ""
+msgstr "64 Кбайт"
 
 #: xrc/GameBoyAdvanceConfig.xrc:50 xrc/GameBoyAdvanceConfig.xrc:222
 msgid "128 K"
-msgstr ""
+msgstr "128 Кбайт"
 
 #: xrc/GameBoyAdvanceConfig.xrc:64
 msgid "Detect Now"
@@ -2686,11 +2686,11 @@ msgstr "Тип збереження"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file:"
-msgstr ""
+msgstr "BIOS:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file:"
-msgstr ""
+msgstr "Поточний BIOS:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:122 xrc/GameBoyConfig.xrc:138
 #: xrc/GameBoyConfig.xrc:159
@@ -2749,11 +2749,11 @@ msgstr "Перевизначення гри"
 
 #: xrc/GameBoyConfig.xrc:4
 msgid "Game Boy settings"
-msgstr ""
+msgstr "Налаштування Game Boy"
 
 #: xrc/GameBoyConfig.xrc:20
 msgid "Emulated &system:"
-msgstr ""
+msgstr "Емульована &система:"
 
 #: xrc/GameBoyConfig.xrc:30
 msgid "Game Boy Color"
@@ -2777,7 +2777,7 @@ msgstr ""
 
 #: xrc/GameBoyConfig.xrc:48
 msgid "Display &borders:"
-msgstr ""
+msgstr "&Межі відображення:"
 
 #: xrc/GameBoyConfig.xrc:57
 msgid "Never"
@@ -2793,7 +2793,7 @@ msgstr "Система"
 
 #: xrc/GameBoyConfig.xrc:84
 msgid "Game Boy Boot &ROM file:"
-msgstr ""
+msgstr "Game &Boy ROM завантаження:"
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
@@ -2801,15 +2801,15 @@ msgstr "Вибір файлу"
 
 #: xrc/GameBoyConfig.xrc:106
 msgid "Game Boy Color Boot ROM &file:"
-msgstr ""
+msgstr "Game Boy &Color ROM завантаження:"
 
 #: xrc/GameBoyConfig.xrc:131
 msgid "Current Game Boy BIOS file:"
-msgstr ""
+msgstr "Поточний Game Boy BIOS:"
 
 #: xrc/GameBoyConfig.xrc:152
 msgid "Current Game Boy Color BIOS file:"
-msgstr ""
+msgstr "Поточний Game Boy Color BIOS:"
 
 #: xrc/GameBoyConfig.xrc:186
 msgid "User 1"
@@ -2845,7 +2845,7 @@ msgstr ""
 
 #: xrc/GeneralConfig.xrc:57
 msgid "&Rewind interval:"
-msgstr ""
+msgstr "&Інтервал звороту:"
 
 #: xrc/GeneralConfig.xrc:58
 msgid "If not empty or 0, enable rewind (seconds)"
@@ -2952,7 +2952,7 @@ msgid ""
 "Click a field and press a key or move joystick to add. Press backspace to "
 "delete last added key. Resize window or click inside and move pointer to see"
 " entire contents if too small."
-msgstr ""
+msgstr "Натисни поле та кнопку чи перемісти джойстик для додання. Натисни Backspace для видалення останньої доданої кнопки. Зміни розмір вікна чи натисни всередині та перемісти вказівник для показу замалого вмісту."
 
 #: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:456
 msgid "Up"
@@ -3012,7 +3012,7 @@ msgstr "B-Turbo"
 
 #: xrc/JoyPanel.xrc:342
 msgid "Motion Left / Dark"
-msgstr ""
+msgstr "Рух ← / Темрява"
 
 #: xrc/JoyPanel.xrc:364
 msgid "GameShark"
@@ -3020,7 +3020,7 @@ msgstr "Game Shark"
 
 #: xrc/JoyPanel.xrc:386
 msgid "Motion Right / Light"
-msgstr ""
+msgstr "Рух → / Світло"
 
 #: xrc/JoyPanel.xrc:408
 msgid "Speed Up"
@@ -3144,11 +3144,11 @@ msgstr "Відкрити..."
 
 #: xrc/MainMenu.xrc:10
 msgid "Open &Game Boy..."
-msgstr ""
+msgstr "Відкрити &Game Boy..."
 
 #: xrc/MainMenu.xrc:13
 msgid "Open Game Boy &Color..."
-msgstr ""
+msgstr "Відкрити Game Boy &Color..."
 
 #: xrc/MainMenu.xrc:16
 msgid "Open rece&nt"
@@ -3236,7 +3236,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:89
 msgid "From &File..."
-msgstr ""
+msgstr "Із &файлу..."
 
 #: xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
@@ -3264,7 +3264,7 @@ msgstr "Збільшити номер і зберегти слот стану"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File..."
-msgstr ""
+msgstr "До &файлу..."
 
 #: xrc/MainMenu.xrc:147
 msgid "&Save state"
@@ -3284,7 +3284,7 @@ msgstr "&Батарея..."
 
 #: xrc/MainMenu.xrc:161
 msgid "Game Shark &code file..."
-msgstr ""
+msgstr "Game Shark-&коди..."
 
 #: xrc/MainMenu.xrc:164
 msgid "&Gameshark snapshot..."
@@ -3296,7 +3296,7 @@ msgstr "&Імпортувати"
 
 #: xrc/MainMenu.xrc:173
 msgid "&Game Shark snapshot..."
-msgstr ""
+msgstr "&Game Shark-знімок..."
 
 #: xrc/MainMenu.xrc:175
 msgid "&Export"
@@ -3388,7 +3388,7 @@ msgstr "&Пропустити BIOS"
 
 #: xrc/MainMenu.xrc:255
 msgid "&Auto IPS / UPS / IPF patch"
-msgstr ""
+msgstr "&Автолатання IPS / UPS / IPF"
 
 #: xrc/MainMenu.xrc:259
 msgid "&Pause when inactive"
@@ -3408,7 +3408,7 @@ msgstr "&З'єднання"
 
 #: xrc/MainMenu.xrc:272
 msgid "Start &Network Link..."
-msgstr ""
+msgstr "Розпочати &мережеве з'єднання..."
 
 #: xrc/MainMenu.xrc:277
 msgid "&Nothing"
@@ -3445,7 +3445,7 @@ msgstr "&Швидкісний хак"
 #: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:387
 #: xrc/MainMenu.xrc:423
 msgid "&Configure..."
-msgstr ""
+msgstr "&Налаштувати..."
 
 #: xrc/MainMenu.xrc:314
 msgid "&Video"
@@ -3533,19 +3533,19 @@ msgstr "&Перемкнути звук"
 
 #: xrc/MainMenu.xrc:403
 msgid "&Game Boy Advance sound interpolation"
-msgstr ""
+msgstr "&Інтерполяція звуку Game Boy Advance"
 
 #: xrc/MainMenu.xrc:408
 msgid "&Game Boy sound enhancement"
-msgstr ""
+msgstr "Посилення &звуку Game Boy"
 
 #: xrc/MainMenu.xrc:412
 msgid "&Game Boy surround sound effect"
-msgstr ""
+msgstr "&Об'ємний звук Game Boy"
 
 #: xrc/MainMenu.xrc:416
 msgid "&Game Boy sound declicking"
-msgstr ""
+msgstr "&Без клацання звуку Game Boy"
 
 #: xrc/MainMenu.xrc:421
 msgid "&Input"
@@ -3589,7 +3589,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:500 xrc/MainMenu.xrc:523
 msgid "Configure..."
-msgstr ""
+msgstr "Налаштувати..."
 
 #: xrc/MainMenu.xrc:504
 msgid "&Real-time clock"
@@ -3609,15 +3609,15 @@ msgstr "&LCD-фільтр"
 
 #: xrc/MainMenu.xrc:527
 msgid "&Game Boy color option"
-msgstr ""
+msgstr "Колірна &опція Game Boy"
 
 #: xrc/MainMenu.xrc:535
 msgid "&Game Boy Colorizer Hack (requires restart)"
-msgstr ""
+msgstr "Колірний &хак Game Boy (необхідний перезапуск)"
 
 #: xrc/MainMenu.xrc:539
 msgid "&Game Boy printer"
-msgstr ""
+msgstr "&Принтер Game Boy"
 
 #: xrc/MainMenu.xrc:543
 msgid "&Gather a full page before printing"
@@ -3629,31 +3629,31 @@ msgstr "&Зберегти роздруківки як захоплення ек�
 
 #: xrc/MainMenu.xrc:552
 msgid "&Use Game Boy BIOS file (requires restart)"
-msgstr ""
+msgstr "&Використовувати Game Boy BIOS (необхідний перезапуск)"
 
 #: xrc/MainMenu.xrc:556
 msgid "&Use Game Boy Color BIOS file"
-msgstr ""
+msgstr "&Використовувати Game Boy Color BIOS"
 
 #: xrc/MainMenu.xrc:561
 msgid "&General..."
-msgstr ""
+msgstr "&Загальні..."
 
 #: xrc/MainMenu.xrc:564
 msgid "&Speedup / Turbo..."
-msgstr ""
+msgstr "&Прискорення / Турбо..."
 
 #: xrc/MainMenu.xrc:567
 msgid "D&irectories..."
-msgstr ""
+msgstr "&Каталоги..."
 
 #: xrc/MainMenu.xrc:570
 msgid "&Key Shortcuts..."
-msgstr ""
+msgstr "&Гарячі кнопки..."
 
 #: xrc/MainMenu.xrc:573
 msgid "&UI Settings..."
-msgstr ""
+msgstr "&UI-налаштування..."
 
 #: xrc/MainMenu.xrc:577
 msgid "&Tools"
@@ -3665,15 +3665,15 @@ msgstr "&Чіти"
 
 #: xrc/MainMenu.xrc:581
 msgid "List &cheats..."
-msgstr ""
+msgstr "Перелік &чітів..."
 
 #: xrc/MainMenu.xrc:584
 msgid "Find c&heat..."
-msgstr ""
+msgstr "Знайти &чіт..."
 
 #: xrc/MainMenu.xrc:588
 msgid "A&utomatically save / load cheats"
-msgstr ""
+msgstr "&Автоматично зберігати / завантажувати чіти"
 
 #: xrc/MainMenu.xrc:592
 msgid "&Enable cheats"
@@ -3809,7 +3809,7 @@ msgstr "Повідомити &помилки"
 
 #: xrc/MainMenu.xrc:727
 msgid "Visual Boy Advance-M Support &Forum"
-msgstr ""
+msgstr "&Форум підтримки Visual Boy Advance-M"
 
 #: xrc/MainMenu.xrc:730
 msgid "Translations"
@@ -3965,7 +3965,7 @@ msgstr "Налаштування звуку"
 
 #: xrc/SoundConfig.xrc:16
 msgid "Volume:"
-msgstr ""
+msgstr "Гучність:"
 
 #: xrc/SoundConfig.xrc:34
 msgid "Mute"
@@ -3977,7 +3977,7 @@ msgstr "Максимум"
 
 #: xrc/SoundConfig.xrc:71
 msgid "Sample rate:"
-msgstr ""
+msgstr "Частота дискретизації:"
 
 #: xrc/SoundConfig.xrc:77
 msgid "48 KHz"
@@ -4005,7 +4005,7 @@ msgstr "Open AL"
 
 #: xrc/SoundConfig.xrc:118
 msgid "Direct Sound"
-msgstr ""
+msgstr "Direct Sound"
 
 #: xrc/SoundConfig.xrc:125
 msgid "XAudio2"
@@ -4053,7 +4053,7 @@ msgstr "Центр"
 
 #: xrc/SoundConfig.xrc:269
 msgid "Left / Right"
-msgstr ""
+msgstr "Лівий / правий канали"
 
 #: xrc/SoundConfig.xrc:298
 msgid "Sound filtering"
