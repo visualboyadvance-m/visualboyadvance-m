@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-05 14:20-0800\n"
+"POT-Creation-Date: 2023-02-06 14:51-0800\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Stanley Kid, 2022-2023\n"
 "Language-Team: Ukrainian (http://www.transifex.com/bgk/vba-m/language/uk/)\n"
@@ -18,79 +18,84 @@ msgstr ""
 "Language: uk\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
-#: wxvbam.cpp:260
+#: wxvbam.cpp:265
 msgid "visualboyadvance-m"
 msgstr ""
 
-#: wxvbam.cpp:486
+#: wxvbam.cpp:329 wxvbam.cpp:346
+#, c-format
+msgid "Invalid configuration file provided: %s"
+msgstr "Надано недійсний файл конфігурації: %s."
+
+#: wxvbam.cpp:484
 msgid "Could not create main window"
 msgstr "Неможливо створити головне вікно."
 
-#: wxvbam.cpp:557
+#: wxvbam.cpp:565
 msgid "Save built-in XRC file and exit"
 msgstr "Зберегти вбудований XRC та вийти"
 
-#: wxvbam.cpp:560
+#: wxvbam.cpp:568
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Зберегти вбудований vba-over.ini та вийти"
 
-#: wxvbam.cpp:563
+#: wxvbam.cpp:571
 msgid "Print configuration path and exit"
 msgstr "Роздрукувати шлях конфігурації та вийти"
 
-#: wxvbam.cpp:566
+#: wxvbam.cpp:574
 msgid "Start in full-screen mode"
 msgstr "Запускати в повному екрані"
 
-#: wxvbam.cpp:569
+#: wxvbam.cpp:577
 msgid "Set a configuration file"
 msgstr "Встановити файл конфігурації"
 
-#: wxvbam.cpp:573
+#: wxvbam.cpp:581
 msgid "Delete shared link state first, if it exists"
 msgstr "Видалити спочатку стан загального з'єднання за наявності"
 
-#: wxvbam.cpp:580
+#: wxvbam.cpp:588
 msgid "List all settable options and exit"
 msgstr "Показати всі налаштовувані опції та вийти"
 
-#: wxvbam.cpp:583
+#: wxvbam.cpp:591
 msgid "ROM file"
 msgstr "ROM-файл"
 
-#: wxvbam.cpp:585
+#: wxvbam.cpp:593
 msgid "<config>=<value>"
-msgstr "<параметр> = <значення>"
+msgstr ""
 
-#: wxvbam.cpp:616
+#: wxvbam.cpp:624
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "Помилка конфігурації / випуску: неможливо знайти вбудований xrc."
 
-#: wxvbam.cpp:624
+#: wxvbam.cpp:632
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Записано вбудовану конфігурацію до %s.\nДля перевизначення вилучи всі вузли, крім змінених кореневих. Перший знайдений кореневий вузол із правильним іменем у будь-якому файлі .xrc чи .xrs у наведених шляхах пошуку перевизначає вбудований:"
 
-#: wxvbam.cpp:638
+#: wxvbam.cpp:646
 msgid "Configuration is read from, in order:"
 msgstr "Конфігурацію прочитано з файлів за порядком:"
 
-#: wxvbam.cpp:652
+#: wxvbam.cpp:660
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "Записано вбудоване перевизначення файлу до %s.\nДля перевизначення видали всі розділи, крім змінених. Перший знайдений розділ буде використано зі шляху пошуку:"
 
-#: wxvbam.cpp:658
+#: wxvbam.cpp:666
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tвбудовано"
 
-#: wxvbam.cpp:673
+#: wxvbam.cpp:681
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -98,313 +103,313 @@ msgid ""
 "\n"
 msgstr "Опції, встановлені з командного рядка, буде збережено при зміні конфігурації інтерфейсу користувача.\n\nДля позначення значення \"істина\" та \"хиба\" вказуються як 1 і 0 відповідно.\n\n"
 
-#: wxvbam.cpp:681
+#: wxvbam.cpp:689
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Доступні команди для опцій клавіатури:\n"
 
-#: wxvbam.cpp:692
+#: wxvbam.cpp:700
 msgid "Configuration file not found."
 msgstr "Файл конфігурації не знайдено."
 
-#: wxvbam.cpp:725
+#: wxvbam.cpp:731
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Неправильна опція конфігурації чи вибрано декілька ROM'ів:\n"
 
-#: guiinit.cpp:85
+#: guiinit.cpp:86
 msgid "Start!"
 msgstr "Запустити!"
 
-#: guiinit.cpp:104 xrc/NetLink.xrc:99
+#: guiinit.cpp:105 xrc/NetLink.xrc:99
 msgid "Connect"
 msgstr "З'єднати"
 
-#: guiinit.cpp:121
+#: guiinit.cpp:122
 msgid "You must enter a valid host name"
 msgstr "Необхідно вказати дійсне ім'я хоста."
 
-#: guiinit.cpp:122
+#: guiinit.cpp:123
 msgid "Host name invalid"
 msgstr "Недійсне ім'я хоста."
 
-#: guiinit.cpp:140
+#: guiinit.cpp:141
 msgid "Waiting for clients..."
 msgstr "Очікування клієнтів..."
 
-#: guiinit.cpp:141
+#: guiinit.cpp:142
 #, c-format
 msgid "Server IP address is: %s\n"
 msgstr "IP-адреса сервера: %s\n"
 
-#: guiinit.cpp:143
+#: guiinit.cpp:144
 msgid "Waiting for connection..."
 msgstr "Очікування з'єднання..."
 
-#: guiinit.cpp:144
+#: guiinit.cpp:145
 #, c-format
 msgid "Connecting to %s\n"
 msgstr "З'єднання з %s\n"
 
-#: guiinit.cpp:177
+#: guiinit.cpp:178
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr "Помилка.\nСпробуй знову."
 
-#: guiinit.cpp:244 guiinit.cpp:297
+#: guiinit.cpp:245 guiinit.cpp:298
 msgid "Select cheat file"
 msgstr "Вибір чітів"
 
-#: guiinit.cpp:245
+#: guiinit.cpp:246
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Visual Boy Advance-чіти|*.clt|CHT-чіти|*.cht"
 
-#: guiinit.cpp:264 panel.cpp:508
+#: guiinit.cpp:265 panel.cpp:509
 msgid "Loaded cheats"
 msgstr "Завантажено чіти."
 
-#: guiinit.cpp:298
+#: guiinit.cpp:299
 msgid "VBA cheat lists (*.clt)|*.clt"
 msgstr "Visual Boy Advance-чіти|*.clt"
 
-#: guiinit.cpp:316
+#: guiinit.cpp:317
 msgid "Saved cheats"
 msgstr "Збережено чіти."
 
-#: guiinit.cpp:347 guiinit.cpp:366
+#: guiinit.cpp:348 guiinit.cpp:367
 msgid "Restore old values?"
 msgstr "Відновити старі значення?"
 
-#: guiinit.cpp:348 guiinit.cpp:367
+#: guiinit.cpp:349 guiinit.cpp:368
 msgid "Removing cheats"
 msgstr "Вилучення чітів."
 
-#: guiinit.cpp:758
-msgid "Game Shark"
-msgstr "Game Shark"
-
 #: guiinit.cpp:759
-msgid "Game Genie"
-msgstr "Game Genie"
+msgid "Game Shark"
+msgstr ""
 
-#: guiinit.cpp:761
+#: guiinit.cpp:760
+msgid "Game Genie"
+msgstr ""
+
+#: guiinit.cpp:762
 msgid "Generic Code"
 msgstr "Загальний код"
 
-#: guiinit.cpp:762
-msgid "Game Shark Advance"
-msgstr "Game Shark Advance"
-
 #: guiinit.cpp:763
-msgid "Code Breaker Advance"
-msgstr "Code Breaker Advance"
+msgid "Game Shark Advance"
+msgstr ""
 
 #: guiinit.cpp:764
+msgid "Code Breaker Advance"
+msgstr ""
+
+#: guiinit.cpp:765
 msgid "Flashcart CHT"
 msgstr ""
 
-#: guiinit.cpp:832 guiinit.cpp:1087
+#: guiinit.cpp:833 guiinit.cpp:1088
 msgid "Number cannot be empty"
 msgstr "Число не може бути порожнім."
 
-#: guiinit.cpp:870
+#: guiinit.cpp:871
 #, c-format
 msgid "Search produced %d results.  Please refine better"
 msgstr "Знайдено %d результатів. Уточни запит."
 
-#: guiinit.cpp:882
+#: guiinit.cpp:883
 msgid "Search produced no results"
 msgstr "Не знайдено результатів."
 
-#: guiinit.cpp:1045
+#: guiinit.cpp:1046
 msgid "8-bit "
 msgstr "8 біт "
 
-#: guiinit.cpp:1049
+#: guiinit.cpp:1050
 msgid "16-bit "
 msgstr "16 біт "
 
-#: guiinit.cpp:1053
+#: guiinit.cpp:1054
 msgid "32-bit "
 msgstr "32 біт "
 
-#: guiinit.cpp:1059
+#: guiinit.cpp:1060
 msgid "signed decimal"
 msgstr "знакове десяткове"
 
-#: guiinit.cpp:1063
+#: guiinit.cpp:1064
 msgid "unsigned decimal"
 msgstr "беззнакове десяткове"
 
-#: guiinit.cpp:1067
+#: guiinit.cpp:1068
 msgid "unsigned hexadecimal"
 msgstr "беззнакове шістнадцяткове"
 
-#: guiinit.cpp:1545
+#: guiinit.cpp:1546
 #, c-format
 msgid "%d frames = %.2f ms"
 msgstr "%d кадрів = %.2f мсек"
 
-#: guiinit.cpp:1557
+#: guiinit.cpp:1558
 msgid "Default device"
 msgstr "Типовий пристрій"
 
-#: guiinit.cpp:1727
+#: guiinit.cpp:1728
 msgid "Desktop mode"
 msgstr "Робочий стіл"
 
-#: guiinit.cpp:1734
+#: guiinit.cpp:1735
 #, c-format
 msgid "%d x %d - %d bpp @ %d Hz"
 msgstr "%d * %d - %d біт / піксель @ %d Гц"
 
-#: guiinit.cpp:1976
+#: guiinit.cpp:1977
 msgid "This will clear all user-defined accelerators. Are you sure?"
 msgstr "Очистити всі користувацькі гарячі кнопки?"
 
-#: guiinit.cpp:1976
+#: guiinit.cpp:1977
 msgid "Confirm"
 msgstr "Підтвердити"
 
-#: guiinit.cpp:2567
+#: guiinit.cpp:2568
 msgid "Main icon not found"
 msgstr "Головну піктограму не знайдено."
 
-#: guiinit.cpp:2577
+#: guiinit.cpp:2578
 msgid "Browse"
 msgstr "Огляд"
 
-#: guiinit.cpp:2591
+#: guiinit.cpp:2592
 msgid "Main display panel not found"
 msgstr "Головну панель дисплея не знайдено."
 
-#: guiinit.cpp:2757
+#: guiinit.cpp:2758
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Дубльовано гарячу кнопку: %s для %s і %s; залишено початкову."
 
-#: guiinit.cpp:2771
+#: guiinit.cpp:2772
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s; keeping menu"
 msgstr "Гарячою кнопкою %s для %s перевизначено типово %s; залишено кінцеву."
 
-#: guiinit.cpp:2910
+#: guiinit.cpp:2911
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Вилучено недійсний пункт меню %s."
 
-#: guiinit.cpp:3113
+#: guiinit.cpp:3114
 msgid "Code"
 msgstr "Код"
 
-#: guiinit.cpp:3122
+#: guiinit.cpp:3123
 msgid "Description"
 msgstr "Опис"
 
-#: guiinit.cpp:3196 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3197 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Адреса"
 
-#: guiinit.cpp:3197
+#: guiinit.cpp:3198
 msgid "Old Value"
 msgstr "Старе значення"
 
-#: guiinit.cpp:3198
+#: guiinit.cpp:3199
 msgid "New Value"
 msgstr "Нове значення"
 
-#: guiinit.cpp:3670
+#: guiinit.cpp:3671
 msgid "Menu commands"
 msgstr "Команди меню"
 
-#: guiinit.cpp:3693
+#: guiinit.cpp:3694
 msgid "Other commands"
 msgstr "Інші команди"
 
-#: guiinit.cpp:3804
+#: guiinit.cpp:3805
 msgid "JoyBus host invalid; disabling"
 msgstr "Вимкнено недійсний хост Joy Bus."
 
-#: viewers.cpp:560
+#: viewers.cpp:561
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr "Тексти|*.txt;*.log|"
 
-#: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
+#: viewers.cpp:563 viewers.cpp:773 gfxviewers.cpp:1600 gfxviewers.cpp:1742
 #: cmdevents.cpp:1185 cmdevents.cpp:1263 cmdevents.cpp:1333 cmdevents.cpp:1404
 #: viewsupt.cpp:1180
 msgid "Select output file"
 msgstr "Вибір кінцевого файлу"
 
-#: viewers.cpp:698 viewers.cpp:770
+#: viewers.cpp:699 viewers.cpp:771
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
 msgstr "Дампи пам'яті|*.dmp;*.bin|"
 
-#: viewers.cpp:700
+#: viewers.cpp:701
 msgid "Select memory dump file"
 msgstr "Вибір дампа пам'яті"
 
-#: viewers.cpp:814
+#: viewers.cpp:815
 msgid "0x00000000 - BIOS"
 msgstr ""
 
-#: viewers.cpp:815
+#: viewers.cpp:816
 msgid "0x02000000 - WRAM"
 msgstr ""
 
-#: viewers.cpp:816
+#: viewers.cpp:817
 msgid "0x03000000 - IRAM"
 msgstr ""
 
-#: viewers.cpp:817
+#: viewers.cpp:818
 msgid "0x04000000 - I / O"
 msgstr ""
 
-#: viewers.cpp:818
+#: viewers.cpp:819
 msgid "0x05000000 - PALETTE"
 msgstr ""
 
-#: viewers.cpp:819
+#: viewers.cpp:820
 msgid "0x06000000 - VRAM"
 msgstr ""
 
-#: viewers.cpp:820
+#: viewers.cpp:821
 msgid "0x07000000 - OAM"
 msgstr ""
 
-#: viewers.cpp:821
+#: viewers.cpp:822
 msgid "0x08000000 - ROM"
 msgstr ""
 
-#: viewers.cpp:924
+#: viewers.cpp:925
 msgid "0x0000 - ROM"
 msgstr ""
 
-#: viewers.cpp:925
+#: viewers.cpp:926
 msgid "0x4000 - ROM"
 msgstr ""
 
-#: viewers.cpp:926
+#: viewers.cpp:927
 msgid "0x8000 - VRAM"
 msgstr ""
 
-#: viewers.cpp:927
+#: viewers.cpp:928
 msgid "0xA000 - SRAM"
 msgstr ""
 
-#: viewers.cpp:928
+#: viewers.cpp:929
 msgid "0xC000 - RAM"
 msgstr ""
 
-#: viewers.cpp:929
+#: viewers.cpp:930
 msgid "0xD000 - WRAM"
 msgstr ""
 
-#: viewers.cpp:930
+#: viewers.cpp:931
 msgid "0xFF00 - I / O"
 msgstr ""
 
-#: viewers.cpp:931
+#: viewers.cpp:932
 msgid "0xFF80 - RAM"
 msgstr ""
 
@@ -567,7 +572,7 @@ msgstr ""
 msgid "ROM + HuC-1"
 msgstr ""
 
-#: cmdevents.cpp:773 dialogs/display-config.cpp:355 xrc/DisplayConfig.xrc:85
+#: cmdevents.cpp:773 dialogs/display-config.cpp:360 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
@@ -600,7 +605,7 @@ msgstr "Видалити всі збережені ігри імпортом б�
 msgid "Confirm import"
 msgstr "Підтвердити імпорт"
 
-#: cmdevents.cpp:934 panel.cpp:451
+#: cmdevents.cpp:934 panel.cpp:452
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Завантажено батарею %s."
@@ -683,7 +688,7 @@ msgstr "Помилка завантаження знімка %s."
 msgid "Wrote battery %s"
 msgstr "Записано батарею %s."
 
-#: cmdevents.cpp:1127 panel.cpp:757
+#: cmdevents.cpp:1127 panel.cpp:758
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Помилка запису батареї %s."
@@ -710,7 +715,7 @@ msgstr "Збережено знімок %s."
 msgid "Error saving snapshot file %s"
 msgstr "Помилка збереження знімка %s."
 
-#: cmdevents.cpp:1210 sys.cpp:558
+#: cmdevents.cpp:1210 sys.cpp:559
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "Записано знімок %s."
@@ -753,48 +758,59 @@ msgstr "Звук вимкнено."
 msgid "Volume: %d %%"
 msgstr "Гучність: %d %%"
 
-#: cmdevents.cpp:2320
+#: cmdevents.cpp:2314
 msgid "Set to 0 for pseudo tty"
 msgstr "Встановити 0 для псевдо-tty"
 
-#: cmdevents.cpp:2322
+#: cmdevents.cpp:2316
 msgid "Port to wait for connection:"
 msgstr "Порт очікування з'єднання:"
 
-#: cmdevents.cpp:2323
+#: cmdevents.cpp:2317
 msgid "GDB Connection"
 msgstr "GDB-з'єднання"
 
-#: cmdevents.cpp:2376
+#: cmdevents.cpp:2370
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "Очікування з'єднання з %s."
 
-#: cmdevents.cpp:2383
+#: cmdevents.cpp:2377
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "Очікування з'єднання на порті %d."
 
-#: cmdevents.cpp:2386
+#: cmdevents.cpp:2380
 msgid "Waiting for GDB..."
 msgstr "Очікування GDB..."
 
-#: cmdevents.cpp:2810 panel.cpp:251 panel.cpp:366
+#: cmdevents.cpp:2795 panel.cpp:252 panel.cpp:367
 msgid "Could not initialize the sound driver!"
 msgstr "Неможливо визначити аудіодрайвер!"
 
-#: cmdevents.cpp:2914
+#: cmdevents.cpp:2861
+msgid ""
+"YOUR CONFIGURATION WILL BE DELETED!\n"
+"\n"
+"Are you sure?"
+msgstr "Видалити конфігурацію?"
+
+#: cmdevents.cpp:2862
+msgid "FACTORY RESET"
+msgstr "Відновити заводські налаштування"
+
+#: cmdevents.cpp:2897
 msgid "Nintendo Game Boy / Color / Advance) emulator."
 msgstr "Емулятор Nintendo Game Boy / Color / Advance."
 
-#: cmdevents.cpp:2915
+#: cmdevents.cpp:2898
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr "Forgotten, 1999-2003\nКоманда виробників Visual Boy Advance, 2004-2006\nКоманда виробників Visual Boy Advance-M, 2007-2022"
+msgstr "Forgotten, 1999-2003\nКоманда виробників Visual Boy Advance, 2004-2006\nКоманда виробників Visual Boy Advance-M, 2007-2023"
 
-#: cmdevents.cpp:2917
+#: cmdevents.cpp:2900
 msgid ""
 "This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -810,15 +826,15 @@ msgid ""
 "along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr "Програма - безкоштовне програмне забезпечення: можна розповсюджувати\nїї та / або змінювати за умовами Загальної Публічної Ліцензії GNU,\nопублікованої Фондом Безкоштовного Програмного Забезпечення, чи\nверсії 2 Ліцензії, чи (на твій вибір) будь-якої пізнішої версії.\nПрограму розповсюджено з надією на користь, але БЕЗ ГАРАНТІЙ;\nнавіть без неявної гарантії ПРИДАТНОСТІ ДО ПРОДАЖУ\nЧИ ОСОБЛИВОЇ МЕТИ. Докладно в Загальній Публічній Ліцензії GNU.\n\nТи отримаєш копію Загальної Публічної Ліцензії GNU\nразом із програмою, чи за посиланням.\nhttp://gnu.org/licenses"
 
-#: cmdevents.cpp:3158
+#: cmdevents.cpp:3132
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 msgstr "Неможливо використати Game Boy BIOS при увімкненому колірному хаку."
 
-#: cmdevents.cpp:3219
+#: cmdevents.cpp:3193
 msgid "LAN link is already active. Disable link mode to disconnect."
 msgstr "LAN-з'єднання активне. Вимкни режим з'єднання для роз'єднання."
 
-#: cmdevents.cpp:3225
+#: cmdevents.cpp:3199
 msgid "Network is not supported in local mode."
 msgstr "Мережа непідтримувана в локальному режимі."
 
@@ -850,267 +866,273 @@ msgstr "Ліцензія"
 msgid "OK"
 msgstr ""
 
-#: opts.cpp:518 opts.cpp:539 opts.cpp:745
+#: opts.cpp:354
+msgid ""
+"The INI file was written for a more recent version of VBA-M. Some INI option"
+" values may have been reset."
+msgstr "INI записано для новішої версії Visual Boy Advance-M. Можливе відновлення деяких значень INI-опцій."
+
+#: opts.cpp:521 opts.cpp:542 opts.cpp:778
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Недійсна призначена кнопка %s для %s."
 
-#: opts.cpp:668 opts.cpp:677 opts.cpp:686 opts.cpp:695 config/option.cpp:464
+#: opts.cpp:701 opts.cpp:710 opts.cpp:719 opts.cpp:728 config/option.cpp:464
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr "Недійсне значення %s для опції %s."
 
-#: opts.cpp:767
+#: opts.cpp:800
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr "Невідома опція %s зі значенням %s."
 
-#: sys.cpp:196 sys.cpp:257
+#: sys.cpp:197 sys.cpp:258
 msgid "No game in progress to record"
 msgstr "Відсутні ігри для запису."
 
-#: sys.cpp:214
+#: sys.cpp:215
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "Неможливо відкрити кінцевий %s."
 
-#: sys.cpp:221 sys.cpp:241 sys.cpp:391
+#: sys.cpp:222 sys.cpp:242 sys.cpp:392
 msgid "Error writing game recording"
 msgstr "Помилка запису гри."
 
-#: sys.cpp:262
+#: sys.cpp:263
 msgid "Cannot play game recording while recording"
 msgstr "Неможливо відтворити запис гри при записі."
 
-#: sys.cpp:277
+#: sys.cpp:278
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "Неможливо відкрити запис %s."
 
-#: sys.cpp:286 sys.cpp:296
+#: sys.cpp:287 sys.cpp:297
 msgid "Error reading game recording"
 msgstr "Помилка читання запису гри."
 
-#: sys.cpp:406 sys.cpp:425
+#: sys.cpp:407 sys.cpp:426
 msgid "Playback ended"
 msgstr "Відтворення завершено."
 
-#: sys.cpp:449
+#: sys.cpp:450
 #, c-format
 msgid "%d %% (%d, %d fps)"
 msgstr "%d %% (%d, %d Гц)"
 
-#: sys.cpp:457
+#: sys.cpp:458
 #, c-format
 msgid "%d %%"
 msgstr ""
 
-#: sys.cpp:879 xrc/GBPrinter.xrc:65
+#: sys.cpp:880 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "&Скасувати"
 
-#: sys.cpp:913
+#: sys.cpp:914
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "Зображення|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:922
+#: sys.cpp:923
 msgid "Save printer image to"
 msgstr "Зберегти зображення принтера до"
 
-#: sys.cpp:936 sys.cpp:1119
+#: sys.cpp:937 sys.cpp:1120
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "Записано кінцеві дані принтера до %s."
 
-#: sys.cpp:941 sys.cpp:1012
+#: sys.cpp:942 sys.cpp:1013
 msgid "&Close"
 msgstr "&Закрити"
 
-#: sys.cpp:1007
+#: sys.cpp:1008
 msgid "Printed"
 msgstr "Роздруковано."
 
-#: sys.cpp:1309
+#: sys.cpp:1310
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "Помилка відкриття псевдо-tty: %s."
 
-#: sys.cpp:1408
+#: sys.cpp:1409
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "Помилка налаштування серверного сокета (%d)."
 
-#: panel.cpp:165
+#: panel.cpp:166
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s - недійсний ROM."
 
-#: panel.cpp:166 panel.cpp:227 panel.cpp:304
+#: panel.cpp:167 panel.cpp:228 panel.cpp:305
 msgid "Problem loading file"
 msgstr "Проблема завантаження файлу."
 
-#: panel.cpp:226
+#: panel.cpp:227
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Неможливо завантажити Game Boy ROM %s."
 
-#: panel.cpp:263
+#: panel.cpp:264
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
 msgstr "Неможливо використати Game Boy BIOS при увімкненому колірному хаку, Game Boy BIOS вимкнено."
 
-#: panel.cpp:280 panel.cpp:380
+#: panel.cpp:281 panel.cpp:381
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Неможливо завантажити BIOS %s."
 
-#: panel.cpp:303
+#: panel.cpp:304
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Неможливо завантажити Game Boy Advance ROM %s."
 
-#: panel.cpp:540
+#: panel.cpp:541
 msgid " player "
 msgstr " гравець "
 
-#: panel.cpp:705
+#: panel.cpp:706
 #, c-format
 msgid "Loaded state %s"
 msgstr "Завантажено стан %s."
 
-#: panel.cpp:705
+#: panel.cpp:706
 #, c-format
 msgid "Error loading state %s"
 msgstr "Помилка завантаження стану %s."
 
-#: panel.cpp:729
+#: panel.cpp:730
 #, c-format
 msgid "Saved state %s"
 msgstr "Збережено стан %s."
 
-#: panel.cpp:729
+#: panel.cpp:730
 #, c-format
 msgid "Error saving state %s"
 msgstr "Помилка збереження стану %s."
 
-#: panel.cpp:933
+#: panel.cpp:934
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 msgstr "Непідтримуваний повний екран %d * %d - %d @ %d; пошук іншого."
 
-#: panel.cpp:971
+#: panel.cpp:972
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
 msgstr "Непідтримуваний повний екран %d * %d - %d @ %d."
 
-#: panel.cpp:976
+#: panel.cpp:977
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
 msgstr "Дійсний режим: %d * %d - %d @ %d."
 
-#: panel.cpp:984
+#: panel.cpp:985
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
 msgstr "Вибрано режим %d * %d - %d @ %d."
 
-#: panel.cpp:988
+#: panel.cpp:989
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr "Не вдалося змінити режим на %d * %d - %d @ %d."
 
-#: panel.cpp:1076
+#: panel.cpp:1077
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr "Недійсний Game Boy Advance-картридж."
 
-#: panel.cpp:1246
+#: panel.cpp:1244
 msgid "No memory for rewinding"
 msgstr "Відсутня пам'ять для звороту."
 
-#: panel.cpp:1256
+#: panel.cpp:1254
 msgid "Error writing rewind state"
 msgstr "Помилка запису стану звороту."
 
-#: panel.cpp:2273
+#: panel.cpp:2272
 msgid "Enabling EGL VSync."
 msgstr "Увімкнення вертикальної синхронізації EGL."
 
-#: panel.cpp:2275
+#: panel.cpp:2274
 msgid "Disabling EGL VSync."
 msgstr "Вимкнення вертикальної синхронізації EGL."
 
-#: panel.cpp:2282
+#: panel.cpp:2281
 msgid "Enabling GLX VSync."
 msgstr "Увімкнення вертикальної синхронізації GLX."
 
-#: panel.cpp:2284
+#: panel.cpp:2283
 msgid "Disabling GLX VSync."
 msgstr "Вимкнення вертикальної синхронізації GLX."
 
-#: panel.cpp:2302
+#: panel.cpp:2301
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Не вдалося встановити glXSwapIntervalEXT."
 
-#: panel.cpp:2311
+#: panel.cpp:2310
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Не вдалося встановити glXSwapIntervalSGI."
 
-#: panel.cpp:2320
+#: panel.cpp:2319
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Не вдалося встановити glXSwapIntervalMESA."
 
-#: panel.cpp:2327
+#: panel.cpp:2326
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "Відсутня підтримка wglGetExtensionsStringEXT."
 
-#: panel.cpp:2330
+#: panel.cpp:2329
 msgid "No support for WGL_EXT_swap_control"
 msgstr "Відсутня підтримка WGL_EXT_swap_control."
 
-#: panel.cpp:2339
+#: panel.cpp:2338
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Не вдалося встановити wglSwapIntervalEXT."
 
-#: panel.cpp:2345
+#: panel.cpp:2344
 msgid "No VSYNC available on this platform"
 msgstr "Вертикальна синхронізація недоступна для платформи."
 
-#: panel.cpp:2445
+#: panel.cpp:2444
 msgid "memory allocation error"
 msgstr "помилка розподілу пам'яті"
 
-#: panel.cpp:2448
+#: panel.cpp:2447
 msgid "error initializing codec"
 msgstr "помилка визначення кодека"
 
-#: panel.cpp:2451
+#: panel.cpp:2450
 msgid "error writing to output file"
 msgstr "помилка запису до кінцевого файлу"
 
-#: panel.cpp:2454
+#: panel.cpp:2453
 msgid "can't guess output format from file name"
 msgstr "неможливо визначити кінцевий формат імені файлу"
 
-#: panel.cpp:2459
+#: panel.cpp:2458
 msgid "programming error; aborting!"
 msgstr "програмна помилка; перервано!"
 
-#: panel.cpp:2471 panel.cpp:2500
+#: panel.cpp:2470 panel.cpp:2499
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Неможливо почати запис до %s (%s)."
 
-#: panel.cpp:2528
+#: panel.cpp:2527
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "Помилка аудіо- / відеозапису (%s); перервано."
 
-#: panel.cpp:2534
+#: panel.cpp:2533
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Помилка аудіозапису (%s); перервано."
 
-#: panel.cpp:2544
+#: panel.cpp:2543
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Помилка відеозапису (%s); перервано."
@@ -1127,170 +1149,174 @@ msgstr ""
 msgid "B:"
 msgstr ""
 
-#: config/internal/option-internal.cpp:306
+#: config/internal/option-internal.cpp:320
 msgid "Use bilinear filter with 3d renderer"
 msgstr "Використовувати білінійний фільтр із 3D-опрацьовувачем"
 
-#: config/internal/option-internal.cpp:307
+#: config/internal/option-internal.cpp:321
 msgid "Full-screen filter to apply"
 msgstr "Повноекранний фільтр для встановлення"
 
-#: config/internal/option-internal.cpp:308
+#: config/internal/option-internal.cpp:322
 msgid "Filter plugin library"
 msgstr "Бібліотека плаґінів фільтрів"
 
-#: config/internal/option-internal.cpp:309
+#: config/internal/option-internal.cpp:323
 msgid "Interframe blending function"
 msgstr "Функція міжкадрового змішування"
 
-#: config/internal/option-internal.cpp:310
+#: config/internal/option-internal.cpp:324
 msgid "Keep window on top"
 msgstr "Зберігати вікно над усіма вікнами"
 
-#: config/internal/option-internal.cpp:312
+#: config/internal/option-internal.cpp:326
 msgid "Maximum number of threads to run filters in"
 msgstr "Максимальна кількість потоків для запуску фільтрів"
 
-#: config/internal/option-internal.cpp:314
+#: config/internal/option-internal.cpp:328
 msgid "Render method; if unsupported, simple method will be used"
 msgstr "Спосіб опрацювання; при непідтримці буде використано простий спосіб"
 
-#: config/internal/option-internal.cpp:315
+#: config/internal/option-internal.cpp:329
 msgid "Default scale factor"
 msgstr "Типовий коефіцієнт масштабу"
 
-#: config/internal/option-internal.cpp:317
+#: config/internal/option-internal.cpp:331
 msgid "Retain aspect ratio when resizing"
 msgstr "Зберігати співвідношення сторін при зміні розміру"
 
-#: config/internal/option-internal.cpp:321
+#: config/internal/option-internal.cpp:335
 msgid "BIOS file to use for Game Boy, if enabled"
 msgstr "BIOS для використання Game Boy"
 
-#: config/internal/option-internal.cpp:323
+#: config/internal/option-internal.cpp:337
 msgid "Game Boy color enhancement, if enabled"
 msgstr "Посилення кольору Game Boy"
 
-#: config/internal/option-internal.cpp:325
+#: config/internal/option-internal.cpp:339
 msgid "Enable DX Colorization Hacks"
 msgstr "Увімкнути DX-хаки кольоризації"
 
-#: config/internal/option-internal.cpp:327
-#: config/internal/option-internal.cpp:353
+#: config/internal/option-internal.cpp:341
+#: config/internal/option-internal.cpp:367
 msgid "Apply LCD filter, if enabled"
 msgstr "Встановити LCD-фільтр"
 
-#: config/internal/option-internal.cpp:329
+#: config/internal/option-internal.cpp:343
 msgid "BIOS file to use for Game Boy Color, if enabled"
 msgstr "BIOS для використання Game Boy Color"
 
-#: config/internal/option-internal.cpp:331
+#: config/internal/option-internal.cpp:345
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "Типова палітра, 8 розділених комами 4-значних шістнадцяткових цілих чисел (rgb555)."
 
-#: config/internal/option-internal.cpp:334
+#: config/internal/option-internal.cpp:348
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "1-а палітра користувача, 8 розділених комами 4-значних шістнадцяткових цілих чисел (rgb555)."
 
-#: config/internal/option-internal.cpp:337
+#: config/internal/option-internal.cpp:351
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "2-а палітра користувача, 8 розділених комами 4-значних шістнадцяткових цілих чисел (rgb555)."
 
-#: config/internal/option-internal.cpp:340
+#: config/internal/option-internal.cpp:354
 msgid "Automatically gather a full page before printing"
 msgstr "Автоматично збирати повну сторінку перед друком"
 
-#: config/internal/option-internal.cpp:342
+#: config/internal/option-internal.cpp:356
 msgid "Automatically save printouts as screen captures with -print suffix"
 msgstr "Автоматично зберігати роздруківки захопленнями екрана з суфіксом -print"
 
-#: config/internal/option-internal.cpp:344
-#: config/internal/option-internal.cpp:374
+#: config/internal/option-internal.cpp:358
+#: config/internal/option-internal.cpp:388
 msgid "Directory to look for ROM files"
 msgstr "Каталог пошуку ROM"
 
-#: config/internal/option-internal.cpp:346
+#: config/internal/option-internal.cpp:360
 msgid "Directory to look for Game Boy Color ROM files"
 msgstr "Каталог пошуку Game Boy Color ROM"
 
-#: config/internal/option-internal.cpp:349
+#: config/internal/option-internal.cpp:363
 msgid "BIOS file to use, if enabled"
 msgstr "BIOS для використання"
 
-#: config/internal/option-internal.cpp:359
+#: config/internal/option-internal.cpp:373
 msgid "Enable link at boot"
 msgstr "Увімкнути з'єднання при завантаженні"
 
-#: config/internal/option-internal.cpp:364
+#: config/internal/option-internal.cpp:378
 msgid "Enable faster network protocol by default"
 msgstr "Увімкнути швидший мережевий протокол типово"
 
-#: config/internal/option-internal.cpp:366
+#: config/internal/option-internal.cpp:380
 msgid "Default network link client host"
 msgstr "Типовий хост клієнта мережевого з'єднання"
 
-#: config/internal/option-internal.cpp:367
+#: config/internal/option-internal.cpp:381
 msgid "Default network link server IP to bind"
 msgstr "Типова IP-адреса сервера мережевого з'єднання для призначення"
 
-#: config/internal/option-internal.cpp:369
+#: config/internal/option-internal.cpp:383
 msgid "Default network link port (server and client)"
 msgstr "Типовий порт мережевого з'єднання (сервер і клієнт)"
 
-#: config/internal/option-internal.cpp:370
+#: config/internal/option-internal.cpp:384
 msgid "Default network protocol"
 msgstr "Типовий мережевий протокол"
 
-#: config/internal/option-internal.cpp:371
+#: config/internal/option-internal.cpp:385
 msgid "Link timeout (ms)"
 msgstr "Час очікування з'єднання (мсек)"
 
-#: config/internal/option-internal.cpp:372
+#: config/internal/option-internal.cpp:386
 msgid "Link cable type"
 msgstr "Тип кабелю з'єднання"
 
-#: config/internal/option-internal.cpp:378
+#: config/internal/option-internal.cpp:392
 msgid "Automatically load last saved state"
 msgstr "Автоматично завантажувати останній збережений стан"
 
-#: config/internal/option-internal.cpp:380
+#: config/internal/option-internal.cpp:394
 msgid ""
 "Directory to store game save files (relative paths are relative to ROM; "
 "blank is config dir)"
 msgstr "Каталог зберігання збережень гри (відносні шляхи до ROM; порожнє - каталог конфігурації)"
 
-#: config/internal/option-internal.cpp:382
+#: config/internal/option-internal.cpp:396
 msgid "Freeze recent load list"
 msgstr "Зупинити перелік останніх завантажень"
 
-#: config/internal/option-internal.cpp:384
+#: config/internal/option-internal.cpp:398
 msgid ""
 "Directory to store A / V and game recordings (relative paths are relative to"
 " ROM)"
 msgstr "Каталог зберігання аудіо / відео та записів ігор (відносні шляхи до ROM)"
 
-#: config/internal/option-internal.cpp:387
+#: config/internal/option-internal.cpp:401
 msgid "Number of seconds between rewind snapshots (0 to disable)"
 msgstr "Кількість секунд між перемотуванням знімків назад (0: вимкнути)"
 
-#: config/internal/option-internal.cpp:389
+#: config/internal/option-internal.cpp:403
 msgid "Directory to store screenshots (relative paths are relative to ROM)"
 msgstr "Каталог зберігання екранних кадрів (відносні шляхи до ROM)"
 
-#: config/internal/option-internal.cpp:392
+#: config/internal/option-internal.cpp:406
 msgid ""
 "Directory to store saved state files (relative paths are relative to "
 "BatteryDir)"
 msgstr "Каталог зберігання станів збереження (відносні шляхи до каталогу батареї)"
 
-#: config/internal/option-internal.cpp:394
+#: config/internal/option-internal.cpp:408
 msgid "Enable status bar"
 msgstr "Увімкнути панель стану"
 
-#: config/internal/option-internal.cpp:398
+#: config/internal/option-internal.cpp:409
+msgid "INI file version (DO NOT MODIFY)"
+msgstr "Версія INI (не змінювати)"
+
+#: config/internal/option-internal.cpp:413
 msgid ""
 "The parameter Joypad/<n>/<button> contains a comma-separated list of key "
 "names which map to joypad #<n> button <button>. Button is one of Up, Down, "
@@ -1298,250 +1324,250 @@ msgid ""
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
 msgstr "Параметр Joypad/<n>/<button> містить розділений комами перелік імен кнопок, призначених для джойстика #<n> кнопка <button>. Кнопки: ↑, ↓, ←, →, A, B, L, R, Select, Start, Motion Up, Motion Down, Motion Left, Motion Right, Autofire A, Autofire B, Speed, Capture, Game Shark."
 
-#: config/internal/option-internal.cpp:404
+#: config/internal/option-internal.cpp:419
 msgid "The autofire toggle period, in frames (1/60 s)"
 msgstr "Період перемикання турбо в кадрах (1 / 60 сек)"
 
-#: config/internal/option-internal.cpp:406
+#: config/internal/option-internal.cpp:421
 msgid "The number of the stick to use in single-player mode"
 msgstr "Номер важеля для використання в одиничному режимі"
 
-#: config/internal/option-internal.cpp:410
+#: config/internal/option-internal.cpp:425
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
 msgstr "Параметр Keyboard/<cmd> містить розділений комами перелік імен кнопок (наприклад, Alt + Shift + F1). При натисканні вказаної клавіші виконується команда <cmd>."
 
-#: config/internal/option-internal.cpp:416
+#: config/internal/option-internal.cpp:431
 msgid "Enable AGB debug print"
 msgstr "Увімкнути налагоджувальний AGB-друк"
 
-#: config/internal/option-internal.cpp:418
+#: config/internal/option-internal.cpp:433
 msgid "Auto skip frames"
 msgstr "Автопропуск кадрів"
 
-#: config/internal/option-internal.cpp:420
+#: config/internal/option-internal.cpp:435
 msgid "Apply IPS / UPS / IPF patches if found"
 msgstr "Встановити знайдені IPS / UPS / IPF-латки"
 
-#: config/internal/option-internal.cpp:422
+#: config/internal/option-internal.cpp:437
 msgid "Automatically save and load cheat list"
 msgstr "Автоматично зберігати та завантажувати перелік чітів"
 
-#: config/internal/option-internal.cpp:426
+#: config/internal/option-internal.cpp:441
 msgid "Automatically enable border for Super Game Boy games"
 msgstr "Автоматично вмикати межу для ігор Super Game Boy"
 
-#: config/internal/option-internal.cpp:428
+#: config/internal/option-internal.cpp:443
 msgid "Always enable border"
 msgstr "Завжди вмикати межу"
 
-#: config/internal/option-internal.cpp:430
+#: config/internal/option-internal.cpp:445
 msgid "Screen capture file format"
 msgstr "Формат файлу захоплення екрана"
 
-#: config/internal/option-internal.cpp:431
+#: config/internal/option-internal.cpp:446
 msgid "Enable cheats"
 msgstr "Увімкнути чіти"
 
-#: config/internal/option-internal.cpp:433
+#: config/internal/option-internal.cpp:448
 msgid "Disable on-screen status messages"
 msgstr "Вимкнути екранні повідомлення стану"
 
-#: config/internal/option-internal.cpp:434
+#: config/internal/option-internal.cpp:449
 msgid "Type of system to emulate"
 msgstr "Тип системи для емуляції"
 
-#: config/internal/option-internal.cpp:436
+#: config/internal/option-internal.cpp:451
 msgid "Flash size 0 = 64 KB 1 = 128 KB"
 msgstr "Флеш-розмір (0: 64 Кбайт; 1: 128 Кбайт)"
 
-#: config/internal/option-internal.cpp:438
+#: config/internal/option-internal.cpp:453
 msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
 msgstr "Пропуск кадрів. Значення 0-9 або -1 для автоматичного пропуску залежно від часу."
 
-#: config/internal/option-internal.cpp:440
+#: config/internal/option-internal.cpp:455
 msgid "The palette to use"
 msgstr "Палітра для використання"
 
-#: config/internal/option-internal.cpp:442
+#: config/internal/option-internal.cpp:457
 msgid "Enable printer emulation"
 msgstr "Увімкнути емуляцію принтера"
 
-#: config/internal/option-internal.cpp:444
+#: config/internal/option-internal.cpp:459
 msgid "Break into GDB after loading the game."
 msgstr "Переривання в GDB після завантаження гри."
 
-#: config/internal/option-internal.cpp:446
+#: config/internal/option-internal.cpp:461
 msgid "Port to connect GDB to."
 msgstr "Порт з'єднання GDB"
 
-#: config/internal/option-internal.cpp:449
+#: config/internal/option-internal.cpp:464
 msgid "Number of players in network"
 msgstr "Кількість гравців у мережі"
 
-#: config/internal/option-internal.cpp:452
+#: config/internal/option-internal.cpp:467
 msgid "Maximum scale factor (0 = no limit)"
 msgstr "Максимальний коефіцієнт масштабу (0: без обмежень)"
 
-#: config/internal/option-internal.cpp:454
+#: config/internal/option-internal.cpp:469
 msgid "Pause game when main window loses focus"
 msgstr "Призупинити гру при втраті виділення головного вікна"
 
-#: config/internal/option-internal.cpp:456
+#: config/internal/option-internal.cpp:471
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
 msgstr "Увімкнути RTC (vba-over.ini замінено rtcEnabled)"
 
-#: config/internal/option-internal.cpp:458
+#: config/internal/option-internal.cpp:473
 msgid "Native save (\"battery\") hardware type"
 msgstr "Тип апаратного забезпечення (\"батарея\") рідного збереження"
 
-#: config/internal/option-internal.cpp:459
+#: config/internal/option-internal.cpp:474
 msgid "Show speed indicator"
 msgstr "Показати вказівник швидкості"
 
-#: config/internal/option-internal.cpp:461
+#: config/internal/option-internal.cpp:476
 msgid "Draw on-screen messages transparently"
 msgstr "Показати прозорі екранні повідомлення"
 
-#: config/internal/option-internal.cpp:463
+#: config/internal/option-internal.cpp:478
 msgid "Skip BIOS initialization"
 msgstr "Пропустити визначення BIOS"
 
-#: config/internal/option-internal.cpp:465
+#: config/internal/option-internal.cpp:480
 msgid "Do not overwrite cheat list when loading state"
 msgstr "Не перезаписувати перелік чітів при завантаженні стану"
 
-#: config/internal/option-internal.cpp:467
+#: config/internal/option-internal.cpp:482
 msgid "Do not overwrite native (battery) save when loading state"
 msgstr "Не перезаписувати рідні збереження (батарея) при завантаженні стану"
 
-#: config/internal/option-internal.cpp:469
+#: config/internal/option-internal.cpp:484
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
 msgstr "Прискорення швидкості гри (0-450 %, 0: без прискорення)"
 
-#: config/internal/option-internal.cpp:472
+#: config/internal/option-internal.cpp:487
 msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
 msgstr "Встановити прискорення для кнопки (0-3000 %, 0: без прискорення)"
 
-#: config/internal/option-internal.cpp:474
+#: config/internal/option-internal.cpp:489
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
 msgstr "Кількість кадрів для пропуску з прискоренням (замість прискорення)"
 
-#: config/internal/option-internal.cpp:477
+#: config/internal/option-internal.cpp:492
 msgid "Use frame skip for speedup throttle"
 msgstr "Використовувати пропуск кадрів для прискорення"
 
-#: config/internal/option-internal.cpp:479
+#: config/internal/option-internal.cpp:494
 msgid "Use the specified BIOS file for Game Boy"
 msgstr "Використовувати вказаний BIOS для Game Boy"
 
-#: config/internal/option-internal.cpp:481
+#: config/internal/option-internal.cpp:496
 msgid "Use the specified BIOS file"
 msgstr "Використовувати вказаний BIOS"
 
-#: config/internal/option-internal.cpp:483
+#: config/internal/option-internal.cpp:498
 msgid "Use the specified BIOS file for Game Boy Color"
 msgstr "Використовувати вказаний BIOS для Game Boy Color"
 
-#: config/internal/option-internal.cpp:484
+#: config/internal/option-internal.cpp:499
 msgid "Wait for vertical sync"
 msgstr "Чекати вертикальну синхронізацію"
 
-#: config/internal/option-internal.cpp:488
+#: config/internal/option-internal.cpp:503
 msgid "Enter fullscreen mode at startup"
 msgstr "Перейти до повного екрана при запуску"
 
-#: config/internal/option-internal.cpp:489
+#: config/internal/option-internal.cpp:504
 msgid "Window maximized"
 msgstr "Вікно розгорнуто"
 
-#: config/internal/option-internal.cpp:491
+#: config/internal/option-internal.cpp:506
 msgid "Window height at startup"
 msgstr "Висота вікна при запуску"
 
-#: config/internal/option-internal.cpp:492
+#: config/internal/option-internal.cpp:507
 msgid "Window width at startup"
 msgstr "Ширина вікна при запуску"
 
-#: config/internal/option-internal.cpp:493
+#: config/internal/option-internal.cpp:508
 msgid "Window axis X position at startup"
 msgstr "Положення осі X вікна при запуску"
 
-#: config/internal/option-internal.cpp:494
+#: config/internal/option-internal.cpp:509
 msgid "Window axis Y position at startup"
 msgstr "Положення осі Y вікна при запуску"
 
-#: config/internal/option-internal.cpp:499
+#: config/internal/option-internal.cpp:514
 msgid "Capture key events while on background"
 msgstr "Захоплювати ключові події на фоні"
 
-#: config/internal/option-internal.cpp:502
+#: config/internal/option-internal.cpp:517
 msgid "Capture joy events while on background"
 msgstr "Захоплювати радісні події на фоні"
 
-#: config/internal/option-internal.cpp:503
+#: config/internal/option-internal.cpp:518
 msgid "Hide menu bar when mouse is inactive"
 msgstr "Приховати панель меню при неактивній миші"
 
-#: config/internal/option-internal.cpp:507
+#: config/internal/option-internal.cpp:522
 msgid "Sound API; if unsupported, default API will be used"
 msgstr "Звуковий API; при непідтримці буде використано типовий API"
 
-#: config/internal/option-internal.cpp:509
+#: config/internal/option-internal.cpp:524
 msgid "Device ID of chosen audio device for chosen driver"
 msgstr "ID вибраного аудіопристрою для вибраного драйвера"
 
-#: config/internal/option-internal.cpp:510
+#: config/internal/option-internal.cpp:525
 msgid "Number of sound buffers"
 msgstr "Кількість звукових буферів"
 
-#: config/internal/option-internal.cpp:511
+#: config/internal/option-internal.cpp:526
 msgid "Bit mask of sound channels to enable"
 msgstr "Бітова маска звукових каналів для увімкнення"
 
-#: config/internal/option-internal.cpp:513
+#: config/internal/option-internal.cpp:528
 msgid "Game Boy Advance sound filtering (%)"
 msgstr "Фільтрація звуку Game Boy Advance (%)"
 
-#: config/internal/option-internal.cpp:515
+#: config/internal/option-internal.cpp:530
 msgid "Game Boy Advance sound interpolation"
 msgstr "Інтерполяція звуку Game Boy Advance"
 
-#: config/internal/option-internal.cpp:517
+#: config/internal/option-internal.cpp:532
 msgid "Game Boy sound declicking"
 msgstr "Без клацання звуку Game Boy"
 
-#: config/internal/option-internal.cpp:518
+#: config/internal/option-internal.cpp:533
 msgid "Game Boy echo effect (%)"
 msgstr "Луна Game Boy (%)"
 
-#: config/internal/option-internal.cpp:520
+#: config/internal/option-internal.cpp:535
 msgid "Enable Game Boy sound effects"
 msgstr "Увімкнути звукові ефекти Game Boy"
 
-#: config/internal/option-internal.cpp:521
+#: config/internal/option-internal.cpp:536
 msgid "Game Boy stereo effect (%)"
 msgstr "Стерео Game Boy (%)"
 
-#: config/internal/option-internal.cpp:523
+#: config/internal/option-internal.cpp:538
 msgid "Game Boy surround sound effect (%)"
 msgstr "Об'ємний звук Game Boy (%)"
 
-#: config/internal/option-internal.cpp:524
+#: config/internal/option-internal.cpp:539
 msgid "Sound sample rate (kHz)"
 msgstr "Частота дискретизації аудіо (кГц)"
 
-#: config/internal/option-internal.cpp:525
+#: config/internal/option-internal.cpp:540
 msgid "Sound volume (%)"
 msgstr "Гучність звуку (%)"
 
-#: config/internal/option-internal.cpp:591
-#: config/internal/option-internal.cpp:611
-#: config/internal/option-internal.cpp:632
-#: config/internal/option-internal.cpp:652
-#: config/internal/option-internal.cpp:672
+#: config/internal/option-internal.cpp:606
+#: config/internal/option-internal.cpp:626
+#: config/internal/option-internal.cpp:647
+#: config/internal/option-internal.cpp:667
+#: config/internal/option-internal.cpp:687
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
 msgstr "Недійсне значення %s для опції %s; дійсні значення: %s."
@@ -1561,26 +1587,26 @@ msgstr "Недійсне значення %d для опції %s; дійсні 
 msgid "Invalid value %d for option %s; valid values are %s"
 msgstr "Недійсне значення %d для опції %s; дійсні значення: %s."
 
-#: dialogs/display-config.cpp:55
+#: dialogs/display-config.cpp:56
 msgid "Invalid value for Default magnification."
 msgstr "Недійсне значення типового збільшення."
 
-#: dialogs/display-config.cpp:385
+#: dialogs/display-config.cpp:390
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Не знайдено придатних rpi-плаґінів у %s."
 
-#: dialogs/display-config.cpp:421 dialogs/display-config.cpp:463
+#: dialogs/display-config.cpp:429 dialogs/display-config.cpp:471
 #: xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "Плаґін"
 
-#: dialogs/display-config.cpp:428
+#: dialogs/display-config.cpp:436
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "Використання піксельного фільтра: %s"
 
-#: dialogs/display-config.cpp:435
+#: dialogs/display-config.cpp:443
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr "Використання міжкадрового змішування: %s"

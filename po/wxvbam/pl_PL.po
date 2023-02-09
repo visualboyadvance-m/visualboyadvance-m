@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-05 14:20-0800\n"
+"POT-Creation-Date: 2023-02-06 14:51-0800\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Damian Drakon <dragon1590@gmail.com>, 2019-2020,2022-2023\n"
 "Language-Team: Polish (Poland) (http://www.transifex.com/bgk/vba-m/language/pl_PL/)\n"
@@ -18,79 +18,84 @@ msgstr ""
 "Language: pl_PL\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
-#: wxvbam.cpp:260
+#: wxvbam.cpp:265
 msgid "visualboyadvance-m"
 msgstr "visualboyadvance-m"
 
-#: wxvbam.cpp:486
+#: wxvbam.cpp:329 wxvbam.cpp:346
+#, c-format
+msgid "Invalid configuration file provided: %s"
+msgstr ""
+
+#: wxvbam.cpp:484
 msgid "Could not create main window"
 msgstr "Nie można utworzyć okna głównego"
 
-#: wxvbam.cpp:557
+#: wxvbam.cpp:565
 msgid "Save built-in XRC file and exit"
 msgstr "Zapisz wbudowany plik XRC i wyjdź"
 
-#: wxvbam.cpp:560
+#: wxvbam.cpp:568
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Zapisz wbudowaną wersję vba-over.ini i wyjdź"
 
-#: wxvbam.cpp:563
+#: wxvbam.cpp:571
 msgid "Print configuration path and exit"
 msgstr "Wydrukuj ścieżkę konfiguracji i wyjdź"
 
-#: wxvbam.cpp:566
+#: wxvbam.cpp:574
 msgid "Start in full-screen mode"
 msgstr "Uruchom w trybie pełnoekranowym"
 
-#: wxvbam.cpp:569
+#: wxvbam.cpp:577
 msgid "Set a configuration file"
 msgstr "Ustaw plik konfiguracyjny"
 
-#: wxvbam.cpp:573
+#: wxvbam.cpp:581
 msgid "Delete shared link state first, if it exists"
 msgstr "Najpierw usuń stan dzielonego łącza, jeśli istnieje"
 
-#: wxvbam.cpp:580
+#: wxvbam.cpp:588
 msgid "List all settable options and exit"
 msgstr "Wyświetl wszystkie możliwe do ustawienia opcje i wyjdź"
 
-#: wxvbam.cpp:583
+#: wxvbam.cpp:591
 msgid "ROM file"
 msgstr "Plik pamięci ROM"
 
-#: wxvbam.cpp:585
+#: wxvbam.cpp:593
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:616
-msgid "Configuration / build error: can't find built-in xrc"
-msgstr ""
-
 #: wxvbam.cpp:624
+msgid "Configuration / build error: can't find built-in xrc"
+msgstr "Błąd konfiguracji / kompilacji: nie można odnaleźć wbudowanego pliku xrc"
+
+#: wxvbam.cpp:632
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr ""
+msgstr "Zapisano wbudowany plik konfiguracyjny do %s.\nAby zastąpić jakieś ustawienia, pozostaw jedynie zmieniony/ne węzeł/zły główny/ne (pozostałe usuń). Pierwszy węzeł główny, którego poprawna nazwa znajduje się w pliku .xrc lub .xrs w następującym folderze, zastępuje wbudowany:"
 
-#: wxvbam.cpp:638
+#: wxvbam.cpp:646
 msgid "Configuration is read from, in order:"
 msgstr "Konfiguracja jest odczytywana, w kolejności, z:"
 
-#: wxvbam.cpp:652
+#: wxvbam.cpp:660
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
-msgstr ""
+msgstr "Zapisano wbudowany plik zastępowania do %s\nAby zastąpić jakieś ustawienia, pozostaw jedynie zmienioną sekcję, zaś pozostałe usuń. Wykorzystywana jest pierwsza sekcja, znaleziona w pliku/plikach w następującym folderze:"
 
-#: wxvbam.cpp:658
+#: wxvbam.cpp:666
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\twbudowany"
 
-#: wxvbam.cpp:673
+#: wxvbam.cpp:681
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -98,313 +103,313 @@ msgid ""
 "\n"
 msgstr "Opcje ustawione za pomocą wiersza poleceń są zapisywane podczas zmiany ustawień w interfejsie użytkownika.\n\nOpcje flag prawda i fałsz są określone odpowiednio jako 1 i 0.\n\n"
 
-#: wxvbam.cpp:681
+#: wxvbam.cpp:689
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Polecenia dostępne dla opcji Klawiatura/* to:\n\n"
 
-#: wxvbam.cpp:692
+#: wxvbam.cpp:700
 msgid "Configuration file not found."
 msgstr "Nie znaleziono pliku konfiguracyjnego."
 
-#: wxvbam.cpp:725
+#: wxvbam.cpp:731
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Nieprawidłowe ustawienia lub podanych zostało wiele plików pamięci ROM:\n"
 
-#: guiinit.cpp:85
+#: guiinit.cpp:86
 msgid "Start!"
 msgstr "Start!"
 
-#: guiinit.cpp:104 xrc/NetLink.xrc:99
+#: guiinit.cpp:105 xrc/NetLink.xrc:99
 msgid "Connect"
 msgstr "Połącz"
 
-#: guiinit.cpp:121
+#: guiinit.cpp:122
 msgid "You must enter a valid host name"
 msgstr "Musisz podać prawidłową nazwę hosta"
 
-#: guiinit.cpp:122
+#: guiinit.cpp:123
 msgid "Host name invalid"
 msgstr "Niepoprawna nazwa hosta"
 
-#: guiinit.cpp:140
+#: guiinit.cpp:141
 msgid "Waiting for clients..."
 msgstr "Oczekiwanie na klientów..."
 
-#: guiinit.cpp:141
+#: guiinit.cpp:142
 #, c-format
 msgid "Server IP address is: %s\n"
 msgstr "Adres IP serwera to: %s\n"
 
-#: guiinit.cpp:143
+#: guiinit.cpp:144
 msgid "Waiting for connection..."
 msgstr "Oczekiwanie na połączenie..."
 
-#: guiinit.cpp:144
+#: guiinit.cpp:145
 #, c-format
 msgid "Connecting to %s\n"
 msgstr "Łączenie z %s\n"
 
-#: guiinit.cpp:177
+#: guiinit.cpp:178
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr "Wystąpił błąd.\nProszę spróbować ponownie."
 
-#: guiinit.cpp:244 guiinit.cpp:297
+#: guiinit.cpp:245 guiinit.cpp:298
 msgid "Select cheat file"
 msgstr "Wybierz plik z kodami"
 
-#: guiinit.cpp:245
+#: guiinit.cpp:246
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Listy kodów VBA (*.clt)|*.clt|Listy kodów CHT (*.cht)|*.cht"
 
-#: guiinit.cpp:264 panel.cpp:508
+#: guiinit.cpp:265 panel.cpp:509
 msgid "Loaded cheats"
 msgstr "Wczytane kody"
 
-#: guiinit.cpp:298
+#: guiinit.cpp:299
 msgid "VBA cheat lists (*.clt)|*.clt"
 msgstr "Listy kodów VBA (*.clt)|*.clt"
 
-#: guiinit.cpp:316
+#: guiinit.cpp:317
 msgid "Saved cheats"
 msgstr "Zapisane kody"
 
-#: guiinit.cpp:347 guiinit.cpp:366
+#: guiinit.cpp:348 guiinit.cpp:367
 msgid "Restore old values?"
 msgstr "Przywrócić stare wartości?"
 
-#: guiinit.cpp:348 guiinit.cpp:367
+#: guiinit.cpp:349 guiinit.cpp:368
 msgid "Removing cheats"
 msgstr "Usuwanie kodów"
 
-#: guiinit.cpp:758
-msgid "Game Shark"
-msgstr ""
-
 #: guiinit.cpp:759
-msgid "Game Genie"
-msgstr ""
+msgid "Game Shark"
+msgstr "Game Shark"
 
-#: guiinit.cpp:761
+#: guiinit.cpp:760
+msgid "Game Genie"
+msgstr "Game Genie"
+
+#: guiinit.cpp:762
 msgid "Generic Code"
 msgstr "Kod Ogólny"
 
-#: guiinit.cpp:762
-msgid "Game Shark Advance"
-msgstr ""
-
 #: guiinit.cpp:763
-msgid "Code Breaker Advance"
-msgstr ""
+msgid "Game Shark Advance"
+msgstr "Game Shark Advance"
 
 #: guiinit.cpp:764
+msgid "Code Breaker Advance"
+msgstr "Code Breaker Advance"
+
+#: guiinit.cpp:765
 msgid "Flashcart CHT"
 msgstr "Flashcart CHT"
 
-#: guiinit.cpp:832 guiinit.cpp:1087
+#: guiinit.cpp:833 guiinit.cpp:1088
 msgid "Number cannot be empty"
 msgstr "Liczba nie może być pusta"
 
-#: guiinit.cpp:870
+#: guiinit.cpp:871
 #, c-format
 msgid "Search produced %d results.  Please refine better"
 msgstr "Wyszukiwanie wygenerowało %d wyników. Proszę zawęzić wyszukiwanie"
 
-#: guiinit.cpp:882
+#: guiinit.cpp:883
 msgid "Search produced no results"
 msgstr "Wyszukiwanie nie przyniosło rezultatów"
 
-#: guiinit.cpp:1045
+#: guiinit.cpp:1046
 msgid "8-bit "
 msgstr "8-bitowy "
 
-#: guiinit.cpp:1049
+#: guiinit.cpp:1050
 msgid "16-bit "
 msgstr "16-bitowy "
 
-#: guiinit.cpp:1053
+#: guiinit.cpp:1054
 msgid "32-bit "
 msgstr "32-bitowy "
 
-#: guiinit.cpp:1059
+#: guiinit.cpp:1060
 msgid "signed decimal"
 msgstr "podpisany dziesiętny"
 
-#: guiinit.cpp:1063
+#: guiinit.cpp:1064
 msgid "unsigned decimal"
 msgstr "niepodpisany dziesiętny"
 
-#: guiinit.cpp:1067
+#: guiinit.cpp:1068
 msgid "unsigned hexadecimal"
 msgstr "niepodpisany szesnastkowy"
 
-#: guiinit.cpp:1545
+#: guiinit.cpp:1546
 #, c-format
 msgid "%d frames = %.2f ms"
 msgstr "%d klatki/klatek = %.2f ms"
 
-#: guiinit.cpp:1557
+#: guiinit.cpp:1558
 msgid "Default device"
 msgstr "Urządzenie domyślne"
 
-#: guiinit.cpp:1727
+#: guiinit.cpp:1728
 msgid "Desktop mode"
 msgstr "Tryb pulpitu"
 
-#: guiinit.cpp:1734
+#: guiinit.cpp:1735
 #, c-format
 msgid "%d x %d - %d bpp @ %d Hz"
-msgstr ""
+msgstr "%d x %d - %d bpp @ %d Hz"
 
-#: guiinit.cpp:1976
+#: guiinit.cpp:1977
 msgid "This will clear all user-defined accelerators. Are you sure?"
-msgstr ""
+msgstr "To działanie spowoduje usunięcie wszystkich akceleratorów zdefiniowanych przez użytkownika. Czy chcesz kontynuować?"
 
-#: guiinit.cpp:1976
+#: guiinit.cpp:1977
 msgid "Confirm"
 msgstr "Potwierdź "
 
-#: guiinit.cpp:2567
+#: guiinit.cpp:2568
 msgid "Main icon not found"
 msgstr "Nie znaleziono głównej ikony"
 
-#: guiinit.cpp:2577
+#: guiinit.cpp:2578
 msgid "Browse"
 msgstr "Przeglądaj"
 
-#: guiinit.cpp:2591
+#: guiinit.cpp:2592
 msgid "Main display panel not found"
 msgstr "Nie znaleziono głównego panelu wyświetlacza"
 
-#: guiinit.cpp:2757
+#: guiinit.cpp:2758
 #, c-format
 msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
 msgstr "Zduplikowanie skrótu klawiszowego: %s dla %s i %s; pierwszy zostaje zachowany"
 
-#: guiinit.cpp:2771
+#: guiinit.cpp:2772
 #, c-format
 msgid "Menu accelerator %s for %s overrides default for %s; keeping menu"
-msgstr ""
+msgstr "Skrót klawiszowy %s dla %s zastępuje domyślny dla %s ; menu zostaje zachowane"
 
-#: guiinit.cpp:2910
+#: guiinit.cpp:2911
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Nieprawidłowy element menu %s; usuwanie"
 
-#: guiinit.cpp:3113
+#: guiinit.cpp:3114
 msgid "Code"
 msgstr "Kod"
 
-#: guiinit.cpp:3122
+#: guiinit.cpp:3123
 msgid "Description"
 msgstr "Opis"
 
-#: guiinit.cpp:3196 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:3197 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Adres"
 
-#: guiinit.cpp:3197
+#: guiinit.cpp:3198
 msgid "Old Value"
 msgstr "Stara Wartość"
 
-#: guiinit.cpp:3198
+#: guiinit.cpp:3199
 msgid "New Value"
 msgstr "Nowa Wartość"
 
-#: guiinit.cpp:3670
+#: guiinit.cpp:3671
 msgid "Menu commands"
 msgstr "Polecenia menu"
 
-#: guiinit.cpp:3693
+#: guiinit.cpp:3694
 msgid "Other commands"
 msgstr "Inne polecenia"
 
-#: guiinit.cpp:3804
+#: guiinit.cpp:3805
 msgid "JoyBus host invalid; disabling"
 msgstr "Nieprawidłowy host JoyBus; wyłączanie"
 
-#: viewers.cpp:560
+#: viewers.cpp:561
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr "Pliki tekstowe (*.txt;*.log)|*.txt;*.log|"
 
-#: viewers.cpp:562 viewers.cpp:772 gfxviewers.cpp:1600 gfxviewers.cpp:1742
+#: viewers.cpp:563 viewers.cpp:773 gfxviewers.cpp:1600 gfxviewers.cpp:1742
 #: cmdevents.cpp:1185 cmdevents.cpp:1263 cmdevents.cpp:1333 cmdevents.cpp:1404
 #: viewsupt.cpp:1180
 msgid "Select output file"
 msgstr "Zapisz jako..."
 
-#: viewers.cpp:698 viewers.cpp:770
+#: viewers.cpp:699 viewers.cpp:771
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
 msgstr "Zrzuty pamięci (*.dmp;*.bin)|*.dmp;*.bin|"
 
-#: viewers.cpp:700
+#: viewers.cpp:701
 msgid "Select memory dump file"
 msgstr "Wybierz plik zrzutu pamięci"
 
-#: viewers.cpp:814
+#: viewers.cpp:815
 msgid "0x00000000 - BIOS"
 msgstr "0x00000000 - BIOS"
 
-#: viewers.cpp:815
+#: viewers.cpp:816
 msgid "0x02000000 - WRAM"
 msgstr "0x02000000 - WRAM"
 
-#: viewers.cpp:816
+#: viewers.cpp:817
 msgid "0x03000000 - IRAM"
 msgstr "0x03000000 - IRAM"
 
-#: viewers.cpp:817
-msgid "0x04000000 - I / O"
-msgstr ""
-
 #: viewers.cpp:818
+msgid "0x04000000 - I / O"
+msgstr "0x04000000 - I / O"
+
+#: viewers.cpp:819
 msgid "0x05000000 - PALETTE"
 msgstr "0x05000000 - PALETTE"
 
-#: viewers.cpp:819
+#: viewers.cpp:820
 msgid "0x06000000 - VRAM"
 msgstr "0x06000000 - VRAM"
 
-#: viewers.cpp:820
+#: viewers.cpp:821
 msgid "0x07000000 - OAM"
 msgstr "0x07000000 - OAM"
 
-#: viewers.cpp:821
+#: viewers.cpp:822
 msgid "0x08000000 - ROM"
 msgstr "0x08000000 - ROM"
 
-#: viewers.cpp:924
+#: viewers.cpp:925
 msgid "0x0000 - ROM"
 msgstr "0x0000 - ROM"
 
-#: viewers.cpp:925
+#: viewers.cpp:926
 msgid "0x4000 - ROM"
 msgstr "0x4000 - ROM"
 
-#: viewers.cpp:926
+#: viewers.cpp:927
 msgid "0x8000 - VRAM"
 msgstr "0x8000 - VRAM"
 
-#: viewers.cpp:927
+#: viewers.cpp:928
 msgid "0xA000 - SRAM"
 msgstr "0xA000 - SRAM"
 
-#: viewers.cpp:928
+#: viewers.cpp:929
 msgid "0xC000 - RAM"
 msgstr "0xC000 - RAM"
 
-#: viewers.cpp:929
+#: viewers.cpp:930
 msgid "0xD000 - WRAM"
 msgstr "0xD000 - WRAM"
 
-#: viewers.cpp:930
-msgid "0xFF00 - I / O"
-msgstr ""
-
 #: viewers.cpp:931
+msgid "0xFF00 - I / O"
+msgstr "0xFF00 - I / O"
+
+#: viewers.cpp:932
 msgid "0xFF80 - RAM"
 msgstr "0xFF80 - RAM"
 
@@ -429,7 +434,7 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
 " Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Pliki konsoli GameBoy Advance (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Pliki konsoli GameBoy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:146
 msgid "Open ROM file"
@@ -439,7 +444,7 @@ msgstr "Otwórz plik pamięci ROM"
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Pliki konsoli GameBoy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:169
 msgid "Open GB ROM file"
@@ -449,7 +454,7 @@ msgstr "Otwórz plik pamięci ROM konsoli GB"
 msgid ""
 "Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Pliki konsoli GameBoy Color (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:192
 msgid "Open GBC ROM file"
@@ -465,83 +470,83 @@ msgstr "ROM"
 
 #: cmdevents.cpp:623
 msgid "ROM + MBC1"
-msgstr ""
+msgstr "ROM + MBC1"
 
 #: cmdevents.cpp:627
 msgid "ROM + MBC1 + RAM"
-msgstr ""
+msgstr "ROM + MBC1 + RAM"
 
 #: cmdevents.cpp:631
 msgid "ROM + MBC1 + RAM + BATT"
-msgstr ""
+msgstr "ROM + MBC1 + RAM + BATT"
 
 #: cmdevents.cpp:635
 msgid "ROM + MBC2"
-msgstr ""
+msgstr "ROM + MBC2"
 
 #: cmdevents.cpp:639
 msgid "ROM + MBC2 + BATT"
-msgstr ""
+msgstr "ROM + MBC2 + BATT"
 
 #: cmdevents.cpp:643
 msgid "ROM + MMM01"
-msgstr ""
+msgstr "ROM + MMM01"
 
 #: cmdevents.cpp:647
 msgid "ROM + MMM01 + RAM"
-msgstr ""
+msgstr "ROM + MMM01 + RAM"
 
 #: cmdevents.cpp:651
 msgid "ROM + MMM01 + RAM + BATT"
-msgstr ""
+msgstr "ROM + MMM01 + RAM + BATT"
 
 #: cmdevents.cpp:655
 msgid "ROM + MBC3 + TIMER + BATT"
-msgstr ""
+msgstr "ROM + MBC3 + TIMER + BATT"
 
 #: cmdevents.cpp:659
 msgid "ROM + MBC3 + TIMER + RAM + BATT"
-msgstr ""
+msgstr "ROM + MBC3 + TIMER + RAM + BATT"
 
 #: cmdevents.cpp:663
 msgid "ROM + MBC3"
-msgstr ""
+msgstr "ROM + MBC3"
 
 #: cmdevents.cpp:667
 msgid "ROM + MBC3 + RAM"
-msgstr ""
+msgstr "ROM + MBC3 + RAM"
 
 #: cmdevents.cpp:671
 msgid "ROM + MBC3 + RAM + BATT"
-msgstr ""
+msgstr "ROM + MBC3 + RAM + BATT"
 
 #: cmdevents.cpp:675
 msgid "ROM + MBC5"
-msgstr ""
+msgstr "ROM + MBC5"
 
 #: cmdevents.cpp:679
 msgid "ROM + MBC5 + RAM"
-msgstr ""
+msgstr "ROM + MBC5 + RAM"
 
 #: cmdevents.cpp:683
 msgid "ROM + MBC5 + RAM + BATT"
-msgstr ""
+msgstr "ROM + MBC5 + RAM + BATT"
 
 #: cmdevents.cpp:687
 msgid "ROM + MBC5 + RUMBLE"
-msgstr ""
+msgstr "ROM + MBC5 + RUMBLE"
 
 #: cmdevents.cpp:691
 msgid "ROM + MBC5 + RUMBLE + RAM"
-msgstr ""
+msgstr "ROM + MBC5 + RUMBLE + RAM"
 
 #: cmdevents.cpp:695
 msgid "ROM + MBC5 + RUMBLE + RAM + BATT"
-msgstr ""
+msgstr "ROM + MBC5 + RUMBLE + RAM + BATT"
 
 #: cmdevents.cpp:699
 msgid "ROM + MBC7 + BATT"
-msgstr ""
+msgstr "ROM + MBC7 + BATT"
 
 #: cmdevents.cpp:703
 msgid "GameGenie"
@@ -553,21 +558,21 @@ msgstr "GameShark V3.0"
 
 #: cmdevents.cpp:711
 msgid "ROM + POCKET CAMERA"
-msgstr ""
+msgstr "ROM + POCKET CAMERA"
 
 #: cmdevents.cpp:715
 msgid "ROM + BANDAI TAMA5"
-msgstr ""
+msgstr "ROM + BANDAI TAMA5"
 
 #: cmdevents.cpp:719
 msgid "ROM + HuC-3"
-msgstr ""
+msgstr "ROM + HuC-3"
 
 #: cmdevents.cpp:723
 msgid "ROM + HuC-1"
-msgstr ""
+msgstr "ROM + HuC-1"
 
-#: cmdevents.cpp:773 dialogs/display-config.cpp:355 xrc/DisplayConfig.xrc:85
+#: cmdevents.cpp:773 dialogs/display-config.cpp:360 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
@@ -594,13 +599,13 @@ msgstr "Plik baterii (*.sav)|*.sav|Zapis Flash (*.dat)|*.dat"
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "Zaimportowanie pliku baterii usunie wszystkie zapisy gry (na stałe po ponownym zapisie). Czy chcesz kontynuować?"
 
 #: cmdevents.cpp:928 cmdevents.cpp:956 cmdevents.cpp:1076
 msgid "Confirm import"
 msgstr "Potwierdź importowanie"
 
-#: cmdevents.cpp:934 panel.cpp:451
+#: cmdevents.cpp:934 panel.cpp:452
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Wczytana bateria %s"
@@ -616,17 +621,17 @@ msgstr "Wybierz plik z kodami"
 
 #: cmdevents.cpp:946
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
-msgstr ""
+msgstr "Plik kodów Game Shark (*.spc;*.xpc)|*.spc;*.xpc"
 
 #: cmdevents.cpp:946
 msgid "Game Shark Code File (*.gcf)|*.gcf"
-msgstr ""
+msgstr "Plik kodów Game Shark (*.gcf)|*.gcf"
 
 #: cmdevents.cpp:955
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
-msgstr ""
+msgstr "Zaimportowanie pliku z kodami zastąpi wszystkie wczytane kody. Czy chcesz kontynuować?"
 
 #: cmdevents.cpp:972
 #, c-format
@@ -650,40 +655,40 @@ msgstr "Niepowodzenie przy wczytywaniu pliku z kodami %s"
 
 #: cmdevents.cpp:1065 cmdevents.cpp:1141
 msgid "Select snapshot file"
-msgstr "Wybierz plik zrzutu"
+msgstr "Wybierz plik migawki"
 
 #: cmdevents.cpp:1066
 msgid ""
 "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots "
 "(*.gsv)|*.gsv"
-msgstr ""
+msgstr "Migawki GS i PAC (*.sps;*.xps)|*.sps;*.xps|Migawki Game Shark SP (*.gsv)|*.gsv"
 
 #: cmdevents.cpp:1066
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
-msgstr ""
+msgstr "Migawka konsoli Game Boy (*.gbs)|*.gbs"
 
 #: cmdevents.cpp:1075
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "Zaimportowanie pliku migawki usunie wszystkie zapisy gry (na stałe po ponownym zapisie). Czy chcesz kontynuować?"
 
 #: cmdevents.cpp:1100
 #, c-format
 msgid "Loaded snapshot file %s"
-msgstr "Wczytany plik zrzutu %s"
+msgstr "Wczytany plik migawki %s"
 
 #: cmdevents.cpp:1102
 #, c-format
 msgid "Error loading snapshot file %s"
-msgstr "Niepowodzenie przy wczytywaniu pliku zrzutu %s"
+msgstr "Niepowodzenie przy wczytywaniu pliku migawki %s"
 
 #: cmdevents.cpp:1125
 #, c-format
 msgid "Wrote battery %s"
 msgstr "Zapisana bateria %s"
 
-#: cmdevents.cpp:1127 panel.cpp:757
+#: cmdevents.cpp:1127 panel.cpp:758
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Niepowodzenie przy zapisywaniu baterii %s"
@@ -694,26 +699,26 @@ msgstr "Zapisy EEPROM nie mogą być wyeksportowane"
 
 #: cmdevents.cpp:1142
 msgid "Game Shark Snapshot (*.sps)|*.sps"
-msgstr ""
+msgstr "Migawka Game Shark (*.sps)|*.sps"
 
 #: cmdevents.cpp:1156
 msgid "Exported from Visual Boy Advance-M"
-msgstr ""
+msgstr "Wyeksportowane z Visual Boy Advance-M"
 
 #: cmdevents.cpp:1168
 #, c-format
 msgid "Saved snapshot file %s"
-msgstr "Zapisany plik zrzutu %s"
+msgstr "Zapisany plik migawki %s"
 
 #: cmdevents.cpp:1170
 #, c-format
 msgid "Error saving snapshot file %s"
-msgstr "Niepowodzenie przy zapisywaniu pliku zrzutu %s"
+msgstr "Niepowodzenie przy zapisywaniu pliku migawki %s"
 
-#: cmdevents.cpp:1210 sys.cpp:558
+#: cmdevents.cpp:1210 sys.cpp:559
 #, c-format
 msgid "Wrote snapshot %s"
-msgstr "Zapisany zrzut %s"
+msgstr "Zapisana migawka %s"
 
 #: cmdevents.cpp:1231 cmdevents.cpp:1301 cmdevents.cpp:1372 cmdevents.cpp:1438
 msgid " files ("
@@ -729,7 +734,7 @@ msgstr "Wybierz plik zapisu stanu gry"
 
 #: cmdevents.cpp:1789 cmdevents.cpp:1882
 msgid "Visual Boy Advance saved game files|*.sgm"
-msgstr ""
+msgstr "Pliki zapisu gry emulatora Visual Boy Advance|*.sgm"
 
 #: cmdevents.cpp:1912 cmdevents.cpp:1922 cmdevents.cpp:1933
 #, c-format
@@ -738,7 +743,7 @@ msgstr "Bieżące gniazdo zapisu stanu gry #%d"
 
 #: cmdevents.cpp:2003
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
-msgstr ""
+msgstr "Nie można użyć Hacku Koloryzatora, gdy plik BIOSu konsoli Game Boy jest włączony."
 
 #: cmdevents.cpp:2218
 msgid "Sound enabled"
@@ -751,50 +756,61 @@ msgstr "Dźwięk wyłączony"
 #: cmdevents.cpp:2231 cmdevents.cpp:2245
 #, c-format
 msgid "Volume: %d %%"
-msgstr ""
+msgstr "Głośność: %d %%"
 
-#: cmdevents.cpp:2320
+#: cmdevents.cpp:2314
 msgid "Set to 0 for pseudo tty"
 msgstr "Ustaw na 0 dla pseudo tty"
 
-#: cmdevents.cpp:2322
+#: cmdevents.cpp:2316
 msgid "Port to wait for connection:"
 msgstr "Port oczekiwania na połączenie:"
 
-#: cmdevents.cpp:2323
+#: cmdevents.cpp:2317
 msgid "GDB Connection"
 msgstr "Połączenie GDB"
 
-#: cmdevents.cpp:2376
+#: cmdevents.cpp:2370
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "Oczekiwanie na połączenie z %s"
 
-#: cmdevents.cpp:2383
+#: cmdevents.cpp:2377
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "Oczekiwanie na połączenie z portem %d"
 
-#: cmdevents.cpp:2386
+#: cmdevents.cpp:2380
 msgid "Waiting for GDB..."
 msgstr "Oczekiwanie na GDB..."
 
-#: cmdevents.cpp:2810 panel.cpp:251 panel.cpp:366
+#: cmdevents.cpp:2795 panel.cpp:252 panel.cpp:367
 msgid "Could not initialize the sound driver!"
 msgstr "Nie można zainicjować sterownika dźwięku!"
 
-#: cmdevents.cpp:2914
-msgid "Nintendo Game Boy / Color / Advance) emulator."
+#: cmdevents.cpp:2861
+msgid ""
+"YOUR CONFIGURATION WILL BE DELETED!\n"
+"\n"
+"Are you sure?"
 msgstr ""
 
-#: cmdevents.cpp:2915
+#: cmdevents.cpp:2862
+msgid "FACTORY RESET"
+msgstr ""
+
+#: cmdevents.cpp:2897
+msgid "Nintendo Game Boy / Color / Advance) emulator."
+msgstr "Emulator konsoli Nintendo Game Boy / Color / Advance."
+
+#: cmdevents.cpp:2898
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "Prawo autorskie (C) 1999-2003 Forgotten\nPrawo autorskie (C) 2004-2006 VBA development team\nPrawo autorskie (C) 2007-2020 VBA-M development team"
 
-#: cmdevents.cpp:2917
+#: cmdevents.cpp:2900
 msgid ""
 "This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -808,17 +824,17 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program. If not, see http://www.gnu.org/licenses ."
-msgstr ""
+msgstr "Niniejszy program jest wolnym oprogramowaniem; możesz go\nrozprowadzać dalej lub modyfikować na warunkach Powszechnej\nLicencji Publicznej GNU, wydanej przez Fundację Wolnego\nOprogramowania - według wersji 2 tej Licencji lub (według twojego\nwyboru) którejś z późniejszych wersji.\n\nNiniejszy program rozpowszechniany jest z nadzieją, iż będzie on\nużyteczny - jednak BEZ JAKIEJKOLWIEK GWARANCJI, nawet domyślnej\ngwarancji PRZYDATNOŚCI HANDLOWEJ albo PRZYDATNOŚCI DO\nOkreślonych ZASTOSOWAŃ. W celu uzyskania bliższych informacji\nsięgnij do Powszechnej Licencji Publicznej GNU.\n\nZ pewnością wraz z niniejszym programem otrzymałeś też egzemplarz\nPowszechnej Licencji Publicznej GNU (GNU General Public License);\njeśli nie - zobacz http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:3158
+#: cmdevents.cpp:3132
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
-msgstr ""
+msgstr "Nie można użyć BIOSu konsoli Game Boy, gdy Hack Koloryzatora jest włączony."
 
-#: cmdevents.cpp:3219
+#: cmdevents.cpp:3193
 msgid "LAN link is already active. Disable link mode to disconnect."
-msgstr ""
+msgstr "Połączenie LAN jest już aktywne. Wyłącz tryb połączenia aby się rozłączyć."
 
-#: cmdevents.cpp:3225
+#: cmdevents.cpp:3199
 msgid "Network is not supported in local mode."
 msgstr "W trybie lokalnym sieć nie jest wspierana."
 
@@ -850,267 +866,273 @@ msgstr "Licencja"
 msgid "OK"
 msgstr "OK"
 
-#: opts.cpp:518 opts.cpp:539 opts.cpp:745
+#: opts.cpp:354
+msgid ""
+"The INI file was written for a more recent version of VBA-M. Some INI option"
+" values may have been reset."
+msgstr ""
+
+#: opts.cpp:521 opts.cpp:542 opts.cpp:778
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Nieprawidłowe przypisanie klawisza/szy %s dla %s"
 
-#: opts.cpp:668 opts.cpp:677 opts.cpp:686 opts.cpp:695 config/option.cpp:464
+#: opts.cpp:701 opts.cpp:710 opts.cpp:719 opts.cpp:728 config/option.cpp:464
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr "Nieprawidłowa wartość %s dla opcji %s"
 
-#: opts.cpp:767
+#: opts.cpp:800
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr "Nieznana opcja %s z wartością %s"
 
-#: sys.cpp:196 sys.cpp:257
+#: sys.cpp:197 sys.cpp:258
 msgid "No game in progress to record"
 msgstr "Brak gry w trakcie do rozpoczęcia nagrywania"
 
-#: sys.cpp:214
+#: sys.cpp:215
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "Nie można otworzyć pliku %s"
 
-#: sys.cpp:221 sys.cpp:241 sys.cpp:391
+#: sys.cpp:222 sys.cpp:242 sys.cpp:392
 msgid "Error writing game recording"
 msgstr "Niepowodzenie przy zapisywaniu nagrania gry"
 
-#: sys.cpp:262
+#: sys.cpp:263
 msgid "Cannot play game recording while recording"
 msgstr "Nie można odtwarzać nagrania gry podczas nagrywania"
 
-#: sys.cpp:277
+#: sys.cpp:278
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "Nie można otworzyć pliku nagrania %s"
 
-#: sys.cpp:286 sys.cpp:296
+#: sys.cpp:287 sys.cpp:297
 msgid "Error reading game recording"
 msgstr "Niepowodzenie przy wczytywaniu nagrania gry"
 
-#: sys.cpp:406 sys.cpp:425
+#: sys.cpp:407 sys.cpp:426
 msgid "Playback ended"
 msgstr "Odtwarzanie zakończone"
 
-#: sys.cpp:449
+#: sys.cpp:450
 #, c-format
 msgid "%d %% (%d, %d fps)"
-msgstr ""
+msgstr "%d %% (%d, %d fps)"
 
-#: sys.cpp:457
+#: sys.cpp:458
 #, c-format
 msgid "%d %%"
-msgstr ""
+msgstr "%d %%"
 
-#: sys.cpp:879 xrc/GBPrinter.xrc:65
+#: sys.cpp:880 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "Odrzuć"
 
-#: sys.cpp:913
+#: sys.cpp:914
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "Pliki graficzne (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:922
+#: sys.cpp:923
 msgid "Save printer image to"
 msgstr "Zapisz wydruk w"
 
-#: sys.cpp:936 sys.cpp:1119
+#: sys.cpp:937 sys.cpp:1120
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "Zapisano wydruk w %s"
 
-#: sys.cpp:941 sys.cpp:1012
+#: sys.cpp:942 sys.cpp:1013
 msgid "&Close"
 msgstr "Zamknij"
 
-#: sys.cpp:1007
+#: sys.cpp:1008
 msgid "Printed"
 msgstr "Wydrukowano"
 
-#: sys.cpp:1309
+#: sys.cpp:1310
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "Niepowodzenie przy otwieraniu pseudo tty: %s"
 
-#: sys.cpp:1408
+#: sys.cpp:1409
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "Niepowodzenie przy konfigurowaniu gniazda serwera (%d)"
 
-#: panel.cpp:165
+#: panel.cpp:166
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s nie jest prawidłowym plikiem pamięci ROM"
 
-#: panel.cpp:166 panel.cpp:227 panel.cpp:304
+#: panel.cpp:167 panel.cpp:228 panel.cpp:305
 msgid "Problem loading file"
 msgstr "Problem z wczytywaniem pliku"
 
-#: panel.cpp:226
+#: panel.cpp:227
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Nie można załadować pliku pamięci ROM konsoli Game Boy %s"
 
-#: panel.cpp:263
+#: panel.cpp:264
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
-msgstr ""
+msgstr "Nie można użyć pliku BIOS konsoli Game Boy, gdy Hack Koloryzatora jest włączony, wyłączanie Pliku BIOSu konsoli Game Boy."
 
-#: panel.cpp:280 panel.cpp:380
+#: panel.cpp:281 panel.cpp:381
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Nie można załadować pliku BIOS %s"
 
-#: panel.cpp:303
+#: panel.cpp:304
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Nie można załadować pliku pamięci ROM konsoli Game Boy Advance %s"
 
-#: panel.cpp:540
+#: panel.cpp:541
 msgid " player "
 msgstr "gracz"
 
-#: panel.cpp:705
+#: panel.cpp:706
 #, c-format
 msgid "Loaded state %s"
 msgstr "Wczytano zapisany stan gry %s"
 
-#: panel.cpp:705
+#: panel.cpp:706
 #, c-format
 msgid "Error loading state %s"
 msgstr "Niepowodzenie przy wczytywaniu zapisanego stanu gry %s"
 
-#: panel.cpp:729
+#: panel.cpp:730
 #, c-format
 msgid "Saved state %s"
 msgstr "Zapisany stan gry %s"
 
-#: panel.cpp:729
+#: panel.cpp:730
 #, c-format
 msgid "Error saving state %s"
 msgstr "Niepowodzenie przy zapisywaniu stanu gry %s"
 
-#: panel.cpp:933
+#: panel.cpp:934
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
-msgstr ""
+msgstr "Tryb pełnoekranowy %d x %d - %d @ %d nie jest wspierany; szukanie innego"
 
-#: panel.cpp:971
+#: panel.cpp:972
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
-msgstr ""
+msgstr "Tryb pełnoekranowy %d x %d - %d @ %d nie jest wspierany"
 
-#: panel.cpp:976
+#: panel.cpp:977
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
-msgstr ""
+msgstr "Wspierany tryb: %d x %d - %d @ %d"
 
-#: panel.cpp:984
+#: panel.cpp:985
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
-msgstr ""
+msgstr "Wybrano tryb %d x %d - %d @ %d"
 
-#: panel.cpp:988
+#: panel.cpp:989
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
-msgstr ""
+msgstr "Nie można zmienić trybu na %d x %d - %d @ %d"
 
-#: panel.cpp:1076
+#: panel.cpp:1077
 msgid "Not a valid Game Boy Advance cartridge"
-msgstr ""
+msgstr "Nieprawidłowy kartridż konsoli Game Boy Advance"
 
-#: panel.cpp:1246
+#: panel.cpp:1244
 msgid "No memory for rewinding"
 msgstr "Brak pamięci na przewijanie wstecz"
 
-#: panel.cpp:1256
+#: panel.cpp:1254
 msgid "Error writing rewind state"
 msgstr "Niepowodzenie przy zapisywaniu stanu przewijania wstecz"
 
-#: panel.cpp:2273
+#: panel.cpp:2272
 msgid "Enabling EGL VSync."
 msgstr "Włączenie EGL VSync."
 
-#: panel.cpp:2275
+#: panel.cpp:2274
 msgid "Disabling EGL VSync."
 msgstr "Wyłączenie EGL VSync."
 
-#: panel.cpp:2282
+#: panel.cpp:2281
 msgid "Enabling GLX VSync."
 msgstr "Włączenie GLX VSync."
 
-#: panel.cpp:2284
+#: panel.cpp:2283
 msgid "Disabling GLX VSync."
 msgstr "Wyłączenie GLX VSync."
 
-#: panel.cpp:2302
+#: panel.cpp:2301
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Nie udało się ustawić glXSwapIntervalEXT"
 
-#: panel.cpp:2311
+#: panel.cpp:2310
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Nie udało się ustawić glXSwapIntervalSGI"
 
-#: panel.cpp:2320
+#: panel.cpp:2319
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Nie udało się ustawić glXSwapIntervalMESA"
 
-#: panel.cpp:2327
+#: panel.cpp:2326
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "Brak wsparcia dla wglGetExtensionsStringEXT"
 
-#: panel.cpp:2330
+#: panel.cpp:2329
 msgid "No support for WGL_EXT_swap_control"
 msgstr "Brak wsparcia dla WGL_EXT_swap_control"
 
-#: panel.cpp:2339
+#: panel.cpp:2338
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Nie udało się ustawić wglSwapIntervalEXT"
 
-#: panel.cpp:2345
+#: panel.cpp:2344
 msgid "No VSYNC available on this platform"
 msgstr "VSYNC jest niedostępne na tej platformie"
 
-#: panel.cpp:2445
+#: panel.cpp:2444
 msgid "memory allocation error"
 msgstr "błąd alokacji pamięci"
 
-#: panel.cpp:2448
+#: panel.cpp:2447
 msgid "error initializing codec"
 msgstr "niepowodzenie przy inicjowaniu kodeka"
 
-#: panel.cpp:2451
+#: panel.cpp:2450
 msgid "error writing to output file"
 msgstr "niepowodzenie przy zapisywaniu pliku"
 
-#: panel.cpp:2454
+#: panel.cpp:2453
 msgid "can't guess output format from file name"
 msgstr "nie można rozpoznać formatu wyjściowego z nazwy pliku"
 
-#: panel.cpp:2459
+#: panel.cpp:2458
 msgid "programming error; aborting!"
 msgstr "błąd programowania; przerywanie!"
 
-#: panel.cpp:2471 panel.cpp:2500
+#: panel.cpp:2470 panel.cpp:2499
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Nie można rozpocząć nagrywania do %s (%s)"
 
-#: panel.cpp:2528
+#: panel.cpp:2527
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
-msgstr ""
+msgstr "Błąd podczas nagrywania dźwięku / obrazu (%s); przerywanie"
 
-#: panel.cpp:2534
+#: panel.cpp:2533
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Błąd podczas nagrywania dźwięku (%s); przerywanie"
 
-#: panel.cpp:2544
+#: panel.cpp:2543
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Błąd podczas nagrywania wideo (%s); przerywanie"
@@ -1127,421 +1149,425 @@ msgstr "G:"
 msgid "B:"
 msgstr "B:"
 
-#: config/internal/option-internal.cpp:306
+#: config/internal/option-internal.cpp:320
 msgid "Use bilinear filter with 3d renderer"
 msgstr "Użyj filtra bilinearnego z rendererem 3d"
 
-#: config/internal/option-internal.cpp:307
+#: config/internal/option-internal.cpp:321
 msgid "Full-screen filter to apply"
 msgstr "Filtr pełnoekranowy do zastosowania"
 
-#: config/internal/option-internal.cpp:308
+#: config/internal/option-internal.cpp:322
 msgid "Filter plugin library"
 msgstr "Biblioteka wtyczek filtrów"
 
-#: config/internal/option-internal.cpp:309
+#: config/internal/option-internal.cpp:323
 msgid "Interframe blending function"
 msgstr "Funkcja mieszania międzyklatkowego"
 
-#: config/internal/option-internal.cpp:310
+#: config/internal/option-internal.cpp:324
 msgid "Keep window on top"
 msgstr "Zachowaj okno na wierzchu"
 
-#: config/internal/option-internal.cpp:312
+#: config/internal/option-internal.cpp:326
 msgid "Maximum number of threads to run filters in"
 msgstr "Maksymalna liczba wątków do uruchomienia filtrów w"
 
-#: config/internal/option-internal.cpp:314
+#: config/internal/option-internal.cpp:328
 msgid "Render method; if unsupported, simple method will be used"
 msgstr "Metoda renderowania; jeśli nie jest obsługiwana, zostanie użyta metoda prosta"
 
-#: config/internal/option-internal.cpp:315
+#: config/internal/option-internal.cpp:329
 msgid "Default scale factor"
 msgstr "Domyślny współczynnik skali"
 
-#: config/internal/option-internal.cpp:317
+#: config/internal/option-internal.cpp:331
 msgid "Retain aspect ratio when resizing"
 msgstr "Zachowaj współczynnik proporcji podczas zmiany rozmiaru"
 
-#: config/internal/option-internal.cpp:321
+#: config/internal/option-internal.cpp:335
 msgid "BIOS file to use for Game Boy, if enabled"
-msgstr ""
+msgstr "Plik BIOS-u używany dla konsoli Game Boy, jeśli jest włączony"
 
-#: config/internal/option-internal.cpp:323
+#: config/internal/option-internal.cpp:337
 msgid "Game Boy color enhancement, if enabled"
-msgstr ""
+msgstr "Wzmocnienie kolorów konsoli Game Boy, jeśli jest włączone"
 
-#: config/internal/option-internal.cpp:325
+#: config/internal/option-internal.cpp:339
 msgid "Enable DX Colorization Hacks"
 msgstr "Włącz hacki do koloryzacji DX-a"
 
-#: config/internal/option-internal.cpp:327
-#: config/internal/option-internal.cpp:353
+#: config/internal/option-internal.cpp:341
+#: config/internal/option-internal.cpp:367
 msgid "Apply LCD filter, if enabled"
 msgstr "Zastosuj filtr LCD, jeśli jest włączony"
 
-#: config/internal/option-internal.cpp:329
+#: config/internal/option-internal.cpp:343
 msgid "BIOS file to use for Game Boy Color, if enabled"
-msgstr ""
+msgstr "Plik BIOS-u używany dla konsoli Game Boy Color, jeśli jest włączony"
 
-#: config/internal/option-internal.cpp:331
+#: config/internal/option-internal.cpp:345
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "Domyślna paleta, jako 8 oddzielonych przecinkami 4-cyfrowych liczb całkowitych w formacie hex (rgb555)."
 
-#: config/internal/option-internal.cpp:334
+#: config/internal/option-internal.cpp:348
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "Pierwsza paleta użytkownika, jako 8 oddzielonych przecinkami 4-cyfrowych liczb całkowitych w formacie hex (rgb555)."
 
-#: config/internal/option-internal.cpp:337
+#: config/internal/option-internal.cpp:351
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "Druga paleta użytkownika, jako 8 oddzielonych przecinkami 4-cyfrowych liczb całkowitych w formacie hex (rgb555)."
 
-#: config/internal/option-internal.cpp:340
+#: config/internal/option-internal.cpp:354
 msgid "Automatically gather a full page before printing"
 msgstr "Automatycznie zbieraj pełną stronę przed drukowaniem"
 
-#: config/internal/option-internal.cpp:342
+#: config/internal/option-internal.cpp:356
 msgid "Automatically save printouts as screen captures with -print suffix"
 msgstr "Automatycznie zapisuj wydruki jako zrzuty ekranu z przyrostkiem -print"
 
-#: config/internal/option-internal.cpp:344
-#: config/internal/option-internal.cpp:374
+#: config/internal/option-internal.cpp:358
+#: config/internal/option-internal.cpp:388
 msgid "Directory to look for ROM files"
 msgstr "Katalog, w którym należy szukać plików ROM"
 
-#: config/internal/option-internal.cpp:346
+#: config/internal/option-internal.cpp:360
 msgid "Directory to look for Game Boy Color ROM files"
-msgstr ""
+msgstr "Katalog do szukania plików ROM konsoli Game Boy Color"
 
-#: config/internal/option-internal.cpp:349
+#: config/internal/option-internal.cpp:363
 msgid "BIOS file to use, if enabled"
 msgstr "Plik BIOS-u do użycia, jeśli jest włączony"
 
-#: config/internal/option-internal.cpp:359
+#: config/internal/option-internal.cpp:373
 msgid "Enable link at boot"
 msgstr "Włącz połączenie przy rozruchu"
 
-#: config/internal/option-internal.cpp:364
+#: config/internal/option-internal.cpp:378
 msgid "Enable faster network protocol by default"
 msgstr "Włącz domyślnie szybszy protokół sieciowy"
 
-#: config/internal/option-internal.cpp:366
+#: config/internal/option-internal.cpp:380
 msgid "Default network link client host"
 msgstr "Domyślny host klienta łącza sieciowego"
 
-#: config/internal/option-internal.cpp:367
+#: config/internal/option-internal.cpp:381
 msgid "Default network link server IP to bind"
 msgstr "Domyślne IP serwera łącza sieciowego do powiązania"
 
-#: config/internal/option-internal.cpp:369
+#: config/internal/option-internal.cpp:383
 msgid "Default network link port (server and client)"
 msgstr "Domyślny port łącza sieciowego (serwer i klient)"
 
-#: config/internal/option-internal.cpp:370
+#: config/internal/option-internal.cpp:384
 msgid "Default network protocol"
 msgstr "Domyślny protokół sieciowy"
 
-#: config/internal/option-internal.cpp:371
+#: config/internal/option-internal.cpp:385
 msgid "Link timeout (ms)"
 msgstr "Limit czasu oczekiwania na połączenie (ms)"
 
-#: config/internal/option-internal.cpp:372
+#: config/internal/option-internal.cpp:386
 msgid "Link cable type"
 msgstr "Rodzaj kabla łączącego"
 
-#: config/internal/option-internal.cpp:378
+#: config/internal/option-internal.cpp:392
 msgid "Automatically load last saved state"
 msgstr "Automatycznie wczytaj ostatnio zapisany stan"
 
-#: config/internal/option-internal.cpp:380
+#: config/internal/option-internal.cpp:394
 msgid ""
 "Directory to store game save files (relative paths are relative to ROM; "
 "blank is config dir)"
 msgstr "Katalog do przechowywania plików zapisu gry (ścieżki względne są względne do pamięci ROM; pusty jest katalogiem konfiguracyjnym)"
 
-#: config/internal/option-internal.cpp:382
+#: config/internal/option-internal.cpp:396
 msgid "Freeze recent load list"
 msgstr "Zamroź listę ostatnich załadowań"
 
-#: config/internal/option-internal.cpp:384
+#: config/internal/option-internal.cpp:398
 msgid ""
 "Directory to store A / V and game recordings (relative paths are relative to"
 " ROM)"
-msgstr ""
+msgstr "Katalog do przechowywania nagrań A / V i gier (ścieżki względne są względne do pamięci ROM)"
 
-#: config/internal/option-internal.cpp:387
+#: config/internal/option-internal.cpp:401
 msgid "Number of seconds between rewind snapshots (0 to disable)"
-msgstr ""
+msgstr "Liczba sekund pomiędzy kolejnymi migawkami do przewijania (0, aby wyłączyć)"
 
-#: config/internal/option-internal.cpp:389
+#: config/internal/option-internal.cpp:403
 msgid "Directory to store screenshots (relative paths are relative to ROM)"
-msgstr ""
+msgstr "Katalog do przechowywania zrzutów ekranu (ścieżki względne są względne do pamięci ROM)"
 
-#: config/internal/option-internal.cpp:392
+#: config/internal/option-internal.cpp:406
 msgid ""
 "Directory to store saved state files (relative paths are relative to "
 "BatteryDir)"
-msgstr ""
+msgstr "Katalog do przechowywania plików zapisanego stanu (ścieżki względne są względne do katalogu baterii)"
 
-#: config/internal/option-internal.cpp:394
+#: config/internal/option-internal.cpp:408
 msgid "Enable status bar"
+msgstr "Włącz pasek stanu"
+
+#: config/internal/option-internal.cpp:409
+msgid "INI file version (DO NOT MODIFY)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:398
+#: config/internal/option-internal.cpp:413
 msgid ""
 "The parameter Joypad/<n>/<button> contains a comma-separated list of key "
 "names which map to joypad #<n> button <button>. Button is one of Up, Down, "
 "Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
-msgstr ""
+msgstr "Parametr Joypad/<n>/<button> zawiera oddzieloną przecinkami listę nazw klawiszy, które odpowiadają przyciskowi <button> na joypadzie #3. Przycisk jest jednym z następujących: góra, dół, lewo, prawo, A, B, L, R, Wybierz, Start, Ruch w górę, Ruch w dół, Ruch w lewo, Ruch w prawo, Autostrzał A, Autostrzał B, Prędkość, Capture, GS"
 
-#: config/internal/option-internal.cpp:404
+#: config/internal/option-internal.cpp:419
 msgid "The autofire toggle period, in frames (1/60 s)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:406
+#: config/internal/option-internal.cpp:421
 msgid "The number of the stick to use in single-player mode"
 msgstr ""
 
-#: config/internal/option-internal.cpp:410
+#: config/internal/option-internal.cpp:425
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
 msgstr ""
 
-#: config/internal/option-internal.cpp:416
+#: config/internal/option-internal.cpp:431
 msgid "Enable AGB debug print"
 msgstr "Włącz wydruk debugowania konsoli AGB"
 
-#: config/internal/option-internal.cpp:418
+#: config/internal/option-internal.cpp:433
 msgid "Auto skip frames"
 msgstr ""
 
-#: config/internal/option-internal.cpp:420
+#: config/internal/option-internal.cpp:435
 msgid "Apply IPS / UPS / IPF patches if found"
 msgstr ""
 
-#: config/internal/option-internal.cpp:422
+#: config/internal/option-internal.cpp:437
 msgid "Automatically save and load cheat list"
 msgstr ""
 
-#: config/internal/option-internal.cpp:426
+#: config/internal/option-internal.cpp:441
 msgid "Automatically enable border for Super Game Boy games"
 msgstr ""
 
-#: config/internal/option-internal.cpp:428
+#: config/internal/option-internal.cpp:443
 msgid "Always enable border"
 msgstr ""
 
-#: config/internal/option-internal.cpp:430
+#: config/internal/option-internal.cpp:445
 msgid "Screen capture file format"
 msgstr ""
 
-#: config/internal/option-internal.cpp:431
+#: config/internal/option-internal.cpp:446
 msgid "Enable cheats"
 msgstr ""
 
-#: config/internal/option-internal.cpp:433
+#: config/internal/option-internal.cpp:448
 msgid "Disable on-screen status messages"
 msgstr ""
 
-#: config/internal/option-internal.cpp:434
+#: config/internal/option-internal.cpp:449
 msgid "Type of system to emulate"
 msgstr ""
 
-#: config/internal/option-internal.cpp:436
+#: config/internal/option-internal.cpp:451
 msgid "Flash size 0 = 64 KB 1 = 128 KB"
 msgstr ""
 
-#: config/internal/option-internal.cpp:438
+#: config/internal/option-internal.cpp:453
 msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
 msgstr ""
 
-#: config/internal/option-internal.cpp:440
+#: config/internal/option-internal.cpp:455
 msgid "The palette to use"
 msgstr ""
 
-#: config/internal/option-internal.cpp:442
+#: config/internal/option-internal.cpp:457
 msgid "Enable printer emulation"
 msgstr ""
 
-#: config/internal/option-internal.cpp:444
+#: config/internal/option-internal.cpp:459
 msgid "Break into GDB after loading the game."
 msgstr ""
 
-#: config/internal/option-internal.cpp:446
+#: config/internal/option-internal.cpp:461
 msgid "Port to connect GDB to."
 msgstr ""
 
-#: config/internal/option-internal.cpp:449
+#: config/internal/option-internal.cpp:464
 msgid "Number of players in network"
 msgstr ""
 
-#: config/internal/option-internal.cpp:452
+#: config/internal/option-internal.cpp:467
 msgid "Maximum scale factor (0 = no limit)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:454
+#: config/internal/option-internal.cpp:469
 msgid "Pause game when main window loses focus"
 msgstr ""
 
-#: config/internal/option-internal.cpp:456
+#: config/internal/option-internal.cpp:471
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
 msgstr ""
 
-#: config/internal/option-internal.cpp:458
+#: config/internal/option-internal.cpp:473
 msgid "Native save (\"battery\") hardware type"
 msgstr ""
 
-#: config/internal/option-internal.cpp:459
+#: config/internal/option-internal.cpp:474
 msgid "Show speed indicator"
 msgstr ""
 
-#: config/internal/option-internal.cpp:461
+#: config/internal/option-internal.cpp:476
 msgid "Draw on-screen messages transparently"
 msgstr ""
 
-#: config/internal/option-internal.cpp:463
+#: config/internal/option-internal.cpp:478
 msgid "Skip BIOS initialization"
 msgstr ""
 
-#: config/internal/option-internal.cpp:465
+#: config/internal/option-internal.cpp:480
 msgid "Do not overwrite cheat list when loading state"
-msgstr ""
+msgstr "Nie nadpisuj listy kodów podczas ładowania zapisanego stanu gry"
 
-#: config/internal/option-internal.cpp:467
+#: config/internal/option-internal.cpp:482
 msgid "Do not overwrite native (battery) save when loading state"
-msgstr ""
+msgstr "Nie nadpisuj natywnego (bateryjnego) zapisu podczas ładowania zapisanego stanu gry"
 
-#: config/internal/option-internal.cpp:469
+#: config/internal/option-internal.cpp:484
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:472
+#: config/internal/option-internal.cpp:487
 msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:474
+#: config/internal/option-internal.cpp:489
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:477
+#: config/internal/option-internal.cpp:492
 msgid "Use frame skip for speedup throttle"
 msgstr ""
 
-#: config/internal/option-internal.cpp:479
+#: config/internal/option-internal.cpp:494
 msgid "Use the specified BIOS file for Game Boy"
 msgstr ""
 
-#: config/internal/option-internal.cpp:481
+#: config/internal/option-internal.cpp:496
 msgid "Use the specified BIOS file"
 msgstr ""
 
-#: config/internal/option-internal.cpp:483
+#: config/internal/option-internal.cpp:498
 msgid "Use the specified BIOS file for Game Boy Color"
 msgstr ""
 
-#: config/internal/option-internal.cpp:484
+#: config/internal/option-internal.cpp:499
 msgid "Wait for vertical sync"
 msgstr ""
 
-#: config/internal/option-internal.cpp:488
+#: config/internal/option-internal.cpp:503
 msgid "Enter fullscreen mode at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:489
+#: config/internal/option-internal.cpp:504
 msgid "Window maximized"
 msgstr ""
 
-#: config/internal/option-internal.cpp:491
+#: config/internal/option-internal.cpp:506
 msgid "Window height at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:492
+#: config/internal/option-internal.cpp:507
 msgid "Window width at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:493
+#: config/internal/option-internal.cpp:508
 msgid "Window axis X position at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:494
+#: config/internal/option-internal.cpp:509
 msgid "Window axis Y position at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:499
+#: config/internal/option-internal.cpp:514
 msgid "Capture key events while on background"
 msgstr ""
 
-#: config/internal/option-internal.cpp:502
+#: config/internal/option-internal.cpp:517
 msgid "Capture joy events while on background"
 msgstr ""
 
-#: config/internal/option-internal.cpp:503
+#: config/internal/option-internal.cpp:518
 msgid "Hide menu bar when mouse is inactive"
 msgstr ""
 
-#: config/internal/option-internal.cpp:507
+#: config/internal/option-internal.cpp:522
 msgid "Sound API; if unsupported, default API will be used"
 msgstr ""
 
-#: config/internal/option-internal.cpp:509
+#: config/internal/option-internal.cpp:524
 msgid "Device ID of chosen audio device for chosen driver"
 msgstr ""
 
-#: config/internal/option-internal.cpp:510
+#: config/internal/option-internal.cpp:525
 msgid "Number of sound buffers"
 msgstr ""
 
-#: config/internal/option-internal.cpp:511
+#: config/internal/option-internal.cpp:526
 msgid "Bit mask of sound channels to enable"
 msgstr ""
 
-#: config/internal/option-internal.cpp:513
+#: config/internal/option-internal.cpp:528
 msgid "Game Boy Advance sound filtering (%)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:515
+#: config/internal/option-internal.cpp:530
 msgid "Game Boy Advance sound interpolation"
 msgstr ""
 
-#: config/internal/option-internal.cpp:517
+#: config/internal/option-internal.cpp:532
 msgid "Game Boy sound declicking"
 msgstr ""
 
-#: config/internal/option-internal.cpp:518
+#: config/internal/option-internal.cpp:533
 msgid "Game Boy echo effect (%)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:520
+#: config/internal/option-internal.cpp:535
 msgid "Enable Game Boy sound effects"
 msgstr ""
 
-#: config/internal/option-internal.cpp:521
+#: config/internal/option-internal.cpp:536
 msgid "Game Boy stereo effect (%)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:523
+#: config/internal/option-internal.cpp:538
 msgid "Game Boy surround sound effect (%)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:524
+#: config/internal/option-internal.cpp:539
 msgid "Sound sample rate (kHz)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:525
+#: config/internal/option-internal.cpp:540
 msgid "Sound volume (%)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:591
-#: config/internal/option-internal.cpp:611
-#: config/internal/option-internal.cpp:632
-#: config/internal/option-internal.cpp:652
-#: config/internal/option-internal.cpp:672
+#: config/internal/option-internal.cpp:606
+#: config/internal/option-internal.cpp:626
+#: config/internal/option-internal.cpp:647
+#: config/internal/option-internal.cpp:667
+#: config/internal/option-internal.cpp:687
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
 msgstr ""
@@ -1561,26 +1587,26 @@ msgstr "Nieprawidłowa wartość %d dla opcji %s; prawidłowe wartości to %d - 
 msgid "Invalid value %d for option %s; valid values are %s"
 msgstr ""
 
-#: dialogs/display-config.cpp:55
+#: dialogs/display-config.cpp:56
 msgid "Invalid value for Default magnification."
 msgstr ""
 
-#: dialogs/display-config.cpp:385
+#: dialogs/display-config.cpp:390
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Nie znaleziono użytecznych wtyczek rpi w %s"
 
-#: dialogs/display-config.cpp:421 dialogs/display-config.cpp:463
+#: dialogs/display-config.cpp:429 dialogs/display-config.cpp:471
 #: xrc/DisplayConfig.xrc:107
 msgid "Plugin"
 msgstr "Wtyczka"
 
-#: dialogs/display-config.cpp:428
+#: dialogs/display-config.cpp:436
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr ""
 
-#: dialogs/display-config.cpp:435
+#: dialogs/display-config.cpp:443
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr ""
@@ -2222,7 +2248,7 @@ msgstr ""
 
 #: xrc/DisplayConfig.xrc:137
 msgid "Motion Blur"
-msgstr ""
+msgstr "Rozmycie ruchu"
 
 #: xrc/DisplayConfig.xrc:151 xrc/SoundConfig.xrc:91
 msgid "Basic"
@@ -2849,7 +2875,7 @@ msgstr ""
 
 #: xrc/GeneralConfig.xrc:58
 msgid "If not empty or 0, enable rewind (seconds)"
-msgstr "By przewijanie wstecz było możliwe, ustaw je na 1 lub więcej sekund"
+msgstr "Jeśli to pole nie jest puste lub nie wprowadzono 0, włącz przewijanie wstecz (sekundy)"
 
 #: xrc/GeneralConfig.xrc:67
 msgid "seconds (0-600); 0 = disable"
@@ -3012,7 +3038,7 @@ msgstr "Autostrzał B"
 
 #: xrc/JoyPanel.xrc:342
 msgid "Motion Left / Dark"
-msgstr ""
+msgstr "Ruch w lewo / Ciemno"
 
 #: xrc/JoyPanel.xrc:364
 msgid "GameShark"
@@ -3020,7 +3046,7 @@ msgstr "GameShark"
 
 #: xrc/JoyPanel.xrc:386
 msgid "Motion Right / Light"
-msgstr ""
+msgstr "Ruch w prawo / Jasno"
 
 #: xrc/JoyPanel.xrc:408
 msgid "Speed Up"
@@ -3144,11 +3170,11 @@ msgstr "Otwórz..."
 
 #: xrc/MainMenu.xrc:10
 msgid "Open &Game Boy..."
-msgstr ""
+msgstr "Otwórz (Game Boy)..."
 
 #: xrc/MainMenu.xrc:13
 msgid "Open Game Boy &Color..."
-msgstr ""
+msgstr "Otwórz (Game Boy Color)..."
 
 #: xrc/MainMenu.xrc:16
 msgid "Open rece&nt"
@@ -3236,7 +3262,7 @@ msgstr "10"
 
 #: xrc/MainMenu.xrc:89
 msgid "From &File..."
-msgstr ""
+msgstr "Z pliku..."
 
 #: xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
@@ -3264,7 +3290,7 @@ msgstr "Zwiększ numer gniazda zapisu stanu gry i zapisz"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File..."
-msgstr ""
+msgstr "Do pliku..."
 
 #: xrc/MainMenu.xrc:147
 msgid "&Save state"
@@ -3288,7 +3314,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:164
 msgid "&Gameshark snapshot..."
-msgstr "Zrzut Gameshark..."
+msgstr "Migawka Gameshark..."
 
 #: xrc/MainMenu.xrc:166
 msgid "&Import"
@@ -3296,7 +3322,7 @@ msgstr "Importuj"
 
 #: xrc/MainMenu.xrc:173
 msgid "&Game Shark snapshot..."
-msgstr ""
+msgstr "Migawka Game Shark..."
 
 #: xrc/MainMenu.xrc:175
 msgid "&Export"
