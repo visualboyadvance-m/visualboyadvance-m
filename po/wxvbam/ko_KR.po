@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-06 14:51-0800\n"
+"POT-Creation-Date: 2023-02-10 05:48+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Hoseok Seo <ddinghoya@gmail.com>, 2022-2023\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/bgk/vba-m/language/ko_KR/)\n"
@@ -22,84 +22,84 @@ msgstr ""
 "Language: ko_KR\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: wxvbam.cpp:265
+#: wxvbam.cpp:264
 msgid "visualboyadvance-m"
 msgstr "visualboyadvance-m"
 
-#: wxvbam.cpp:329 wxvbam.cpp:346
+#: wxvbam.cpp:333 wxvbam.cpp:350
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr ""
 
-#: wxvbam.cpp:484
+#: wxvbam.cpp:489
 msgid "Could not create main window"
 msgstr "메인 윈도우를 생성할 수 없습니다."
 
-#: wxvbam.cpp:565
+#: wxvbam.cpp:570
 msgid "Save built-in XRC file and exit"
 msgstr "built-in XRC 파일을 저장하고 종료합니다."
 
-#: wxvbam.cpp:568
+#: wxvbam.cpp:573
 msgid "Save built-in vba-over.ini and exit"
 msgstr "built-in vba-over.ini 를 저장하고 종료합니다."
 
-#: wxvbam.cpp:571
+#: wxvbam.cpp:576
 msgid "Print configuration path and exit"
 msgstr "설정 경로를 출력하고 종료합니다."
 
-#: wxvbam.cpp:574
+#: wxvbam.cpp:579
 msgid "Start in full-screen mode"
 msgstr "전체화면으로 시작합니다."
 
-#: wxvbam.cpp:577
+#: wxvbam.cpp:582
 msgid "Set a configuration file"
 msgstr "구성 설정 파일을 설정합니다."
 
-#: wxvbam.cpp:581
+#: wxvbam.cpp:586
 msgid "Delete shared link state first, if it exists"
 msgstr "shared link state 파일이 존재한다면 삭제합니다."
 
-#: wxvbam.cpp:588
+#: wxvbam.cpp:593
 msgid "List all settable options and exit"
 msgstr "설정 가능한 옵션을 나열하고 종료합니다."
 
-#: wxvbam.cpp:591
+#: wxvbam.cpp:596
 msgid "ROM file"
 msgstr "ROM 파일"
 
-#: wxvbam.cpp:593
+#: wxvbam.cpp:598
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:624
+#: wxvbam.cpp:629
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr ""
 
-#: wxvbam.cpp:632
+#: wxvbam.cpp:637
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr ""
 
-#: wxvbam.cpp:646
+#: wxvbam.cpp:651
 msgid "Configuration is read from, in order:"
 msgstr "설정은 다음으로부터 순서대로 불러옵니다 :"
 
-#: wxvbam.cpp:660
+#: wxvbam.cpp:665
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr ""
 
-#: wxvbam.cpp:666
+#: wxvbam.cpp:671
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\t빌트인"
 
-#: wxvbam.cpp:681
+#: wxvbam.cpp:686
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -107,17 +107,17 @@ msgid ""
 "\n"
 msgstr "사용자 인터페이스에서 설정이 변경되면, 명령 줄에서 선택된 옵션이 저장됩니다. \n\n플래그 옵션에서, true와 false는 각각 1과 0으로 지정됩니다.\n\n"
 
-#: wxvbam.cpp:689
+#: wxvbam.cpp:694
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "키보드 / * 옵션으로 사용 가능한 수준 :\n\n"
 
-#: wxvbam.cpp:700
+#: wxvbam.cpp:705
 msgid "Configuration file not found."
 msgstr "설정 파일을 찾을 수 없습니다."
 
-#: wxvbam.cpp:731
+#: wxvbam.cpp:736
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "설정 옵션이 잘못되었거나, 여러 개의 ROM 파일이 주어졌습니다:\n"
 
@@ -189,11 +189,11 @@ msgstr "이전 값을 복원하시겠습니까?"
 msgid "Removing cheats"
 msgstr "치트 지우기"
 
-#: guiinit.cpp:759
+#: guiinit.cpp:759 xrc/JoyPanel.xrc:364
 msgid "Game Shark"
 msgstr ""
 
-#: guiinit.cpp:760
+#: guiinit.cpp:760 cmdevents.cpp:703
 msgid "Game Genie"
 msgstr ""
 
@@ -216,11 +216,6 @@ msgstr "플래시카트 CHT"
 #: guiinit.cpp:833 guiinit.cpp:1088
 msgid "Number cannot be empty"
 msgstr "번호는 비워 둘 수 없습니다"
-
-#: guiinit.cpp:871
-#, c-format
-msgid "Search produced %d results.  Please refine better"
-msgstr "%d개의 검색 결과가 있습니다. 좀 더 세분화하십시오."
 
 #: guiinit.cpp:883
 msgid "Search produced no results"
@@ -552,13 +547,9 @@ msgstr ""
 msgid "ROM + MBC7 + BATT"
 msgstr ""
 
-#: cmdevents.cpp:703
-msgid "GameGenie"
-msgstr "게임지니"
-
 #: cmdevents.cpp:707
-msgid "GameShark V3.0"
-msgstr "GameShark V3.0"
+msgid "Game Shark 3.0"
+msgstr ""
 
 #: cmdevents.cpp:711
 msgid "ROM + POCKET CAMERA"
@@ -663,8 +654,8 @@ msgstr "스냅샷 파일 선택"
 
 #: cmdevents.cpp:1066
 msgid ""
-"GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots "
-"(*.gsv)|*.gsv"
+"Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
+" (*.gsv)|*.gsv"
 msgstr ""
 
 #: cmdevents.cpp:1066
@@ -804,7 +795,7 @@ msgid "FACTORY RESET"
 msgstr ""
 
 #: cmdevents.cpp:2897
-msgid "Nintendo Game Boy / Color / Advance) emulator."
+msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr ""
 
 #: cmdevents.cpp:2898
@@ -870,23 +861,23 @@ msgstr "라이센스"
 msgid "OK"
 msgstr "확인"
 
-#: opts.cpp:354
+#: opts.cpp:384
 msgid ""
 "The INI file was written for a more recent version of VBA-M. Some INI option"
 " values may have been reset."
 msgstr ""
 
-#: opts.cpp:521 opts.cpp:542 opts.cpp:778
+#: opts.cpp:551 opts.cpp:572 opts.cpp:808
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr " %s 키는 %s에 무효한 키 설정입니다."
 
-#: opts.cpp:701 opts.cpp:710 opts.cpp:719 opts.cpp:728 config/option.cpp:464
+#: opts.cpp:731 opts.cpp:740 opts.cpp:749 opts.cpp:758 config/option.cpp:464
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr "옵션 %s 에 대해 유효하지 않은 값 %s"
 
-#: opts.cpp:800
+#: opts.cpp:830
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr "값이 %s 알 수 없는 옵션 %s"
@@ -1404,8 +1395,8 @@ msgid "Break into GDB after loading the game."
 msgstr "게임을 불러온 후 GDB에 개입합니다."
 
 #: config/internal/option-internal.cpp:461
-msgid "Port to connect GDB to."
-msgstr "GDB를 연결할 포트."
+msgid "Port to connect GDB to"
+msgstr ""
 
 #: config/internal/option-internal.cpp:464
 msgid "Number of players in network"
@@ -1701,12 +1692,7 @@ msgstr "FAudio: 마스터링 음성 작성에 실패했습니다!"
 msgid "FAudio: Creating source voice failed!"
 msgstr "FAudio: 소스 음성 작성에 실패했습니다!"
 
-#: dsound.cpp:89
-#, c-format
-msgid "Cannot create DirectSound %08x"
-msgstr "%08x 다이렉트사운드를 생성할 수 없습니다."
-
-#: dsound.cpp:103
+#: dsound.cpp:89 dsound.cpp:103
 #, c-format
 msgid "Cannot create Direct Sound %08x"
 msgstr ""
@@ -2151,8 +2137,8 @@ msgid "Filters"
 msgstr "필터"
 
 #: xrc/DisplayConfig.xrc:79
-msgid "Display filter :"
-msgstr "화면 필터 :"
+msgid "Display filter:"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:86
 msgid "2xSaI"
@@ -3044,10 +3030,6 @@ msgstr "B 버튼 연사"
 msgid "Motion Left / Dark"
 msgstr ""
 
-#: xrc/JoyPanel.xrc:364
-msgid "GameShark"
-msgstr "게임샤크"
-
 #: xrc/JoyPanel.xrc:386
 msgid "Motion Right / Light"
 msgstr ""
@@ -3316,17 +3298,13 @@ msgstr "배터리 파일(&B)..."
 msgid "Game Shark &code file..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:164
-msgid "&Gameshark snapshot..."
-msgstr "게임샤크 스냅샷(&G)..."
+#: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
+msgid "&Game Shark snapshot..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:166
 msgid "&Import"
 msgstr "가져오기(&I)"
-
-#: xrc/MainMenu.xrc:173
-msgid "&Game Shark snapshot..."
-msgstr ""
 
 #: xrc/MainMenu.xrc:175
 msgid "&Export"

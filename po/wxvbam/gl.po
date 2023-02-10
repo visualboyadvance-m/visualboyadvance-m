@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-06 14:51-0800\n"
+"POT-Creation-Date: 2023-02-10 05:48+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: David Rebolo Magariños <drgaga345@gmail.com>, 2021\n"
 "Language-Team: Galician (http://www.transifex.com/bgk/vba-m/language/gl/)\n"
@@ -21,84 +21,84 @@ msgstr ""
 "Language: gl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: wxvbam.cpp:265
+#: wxvbam.cpp:264
 msgid "visualboyadvance-m"
 msgstr "visualboyadvance-m"
 
-#: wxvbam.cpp:329 wxvbam.cpp:346
+#: wxvbam.cpp:333 wxvbam.cpp:350
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr ""
 
-#: wxvbam.cpp:484
+#: wxvbam.cpp:489
 msgid "Could not create main window"
 msgstr "Non se pode crear a xanela principal"
 
-#: wxvbam.cpp:565
+#: wxvbam.cpp:570
 msgid "Save built-in XRC file and exit"
 msgstr "Gardar o ficheiro XRC integrado e saír"
 
-#: wxvbam.cpp:568
+#: wxvbam.cpp:573
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Gardar vba-over.ini integrado e saír"
 
-#: wxvbam.cpp:571
+#: wxvbam.cpp:576
 msgid "Print configuration path and exit"
 msgstr "Imprimir camiño de configuración e saír"
 
-#: wxvbam.cpp:574
+#: wxvbam.cpp:579
 msgid "Start in full-screen mode"
 msgstr "Iniciar en modo pantalla completa"
 
-#: wxvbam.cpp:577
+#: wxvbam.cpp:582
 msgid "Set a configuration file"
 msgstr "Estabelecer un ficheiro de configuración"
 
-#: wxvbam.cpp:581
+#: wxvbam.cpp:586
 msgid "Delete shared link state first, if it exists"
 msgstr "Borrar estado da ligazón compartida, se existe"
 
-#: wxvbam.cpp:588
+#: wxvbam.cpp:593
 msgid "List all settable options and exit"
 msgstr "Enumera todas as opcións configurábeis e saír"
 
-#: wxvbam.cpp:591
+#: wxvbam.cpp:596
 msgid "ROM file"
 msgstr "Ficheiro ROM"
 
-#: wxvbam.cpp:593
+#: wxvbam.cpp:598
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:624
+#: wxvbam.cpp:629
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr ""
 
-#: wxvbam.cpp:632
+#: wxvbam.cpp:637
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr ""
 
-#: wxvbam.cpp:646
+#: wxvbam.cpp:651
 msgid "Configuration is read from, in order:"
 msgstr "A configuración lese dende, en orde:"
 
-#: wxvbam.cpp:660
+#: wxvbam.cpp:665
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr ""
 
-#: wxvbam.cpp:666
+#: wxvbam.cpp:671
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tintegrado"
 
-#: wxvbam.cpp:681
+#: wxvbam.cpp:686
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -106,17 +106,17 @@ msgid ""
 "\n"
 msgstr "As opcións estabelecidas dende a liña de comandos gárdanse se se fan cambios na interface de usuario.\n\nPara as opcións do indicador, certo e falso especifícanse como 1 e 0, respectivamente.\n\n"
 
-#: wxvbam.cpp:689
+#: wxvbam.cpp:694
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Os comandos dispoñíbeis para a opción teclado/* son:\n\n"
 
-#: wxvbam.cpp:700
+#: wxvbam.cpp:705
 msgid "Configuration file not found."
 msgstr "Non se atopa o ficheiro de configuración."
 
-#: wxvbam.cpp:731
+#: wxvbam.cpp:736
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Mala opción de configuración ou proporcionáronse múltiples ficheiros ROM:\n"
 
@@ -188,11 +188,11 @@ msgstr "Restaurar valores antigos?"
 msgid "Removing cheats"
 msgstr "Eliminando trucos"
 
-#: guiinit.cpp:759
+#: guiinit.cpp:759 xrc/JoyPanel.xrc:364
 msgid "Game Shark"
 msgstr ""
 
-#: guiinit.cpp:760
+#: guiinit.cpp:760 cmdevents.cpp:703
 msgid "Game Genie"
 msgstr ""
 
@@ -215,11 +215,6 @@ msgstr "Flashcart CHT"
 #: guiinit.cpp:833 guiinit.cpp:1088
 msgid "Number cannot be empty"
 msgstr "O número non pode estar baleiro"
-
-#: guiinit.cpp:871
-#, c-format
-msgid "Search produced %d results.  Please refine better"
-msgstr "A busca obtivo %d resultados.  Concreta mellor"
 
 #: guiinit.cpp:883
 msgid "Search produced no results"
@@ -551,13 +546,9 @@ msgstr ""
 msgid "ROM + MBC7 + BATT"
 msgstr ""
 
-#: cmdevents.cpp:703
-msgid "GameGenie"
-msgstr "GameGenie"
-
 #: cmdevents.cpp:707
-msgid "GameShark V3.0"
-msgstr "GameShark V3.0"
+msgid "Game Shark 3.0"
+msgstr ""
 
 #: cmdevents.cpp:711
 msgid "ROM + POCKET CAMERA"
@@ -662,8 +653,8 @@ msgstr "Seleccionar ficheiro de instantánea"
 
 #: cmdevents.cpp:1066
 msgid ""
-"GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots "
-"(*.gsv)|*.gsv"
+"Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
+" (*.gsv)|*.gsv"
 msgstr ""
 
 #: cmdevents.cpp:1066
@@ -803,7 +794,7 @@ msgid "FACTORY RESET"
 msgstr ""
 
 #: cmdevents.cpp:2897
-msgid "Nintendo Game Boy / Color / Advance) emulator."
+msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr ""
 
 #: cmdevents.cpp:2898
@@ -869,23 +860,23 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-#: opts.cpp:354
+#: opts.cpp:384
 msgid ""
 "The INI file was written for a more recent version of VBA-M. Some INI option"
 " values may have been reset."
 msgstr ""
 
-#: opts.cpp:521 opts.cpp:542 opts.cpp:778
+#: opts.cpp:551 opts.cpp:572 opts.cpp:808
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Teclas de vinculación non válidas %s para %s"
 
-#: opts.cpp:701 opts.cpp:710 opts.cpp:719 opts.cpp:728 config/option.cpp:464
+#: opts.cpp:731 opts.cpp:740 opts.cpp:749 opts.cpp:758 config/option.cpp:464
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr ""
 
-#: opts.cpp:800
+#: opts.cpp:830
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr ""
@@ -1403,7 +1394,7 @@ msgid "Break into GDB after loading the game."
 msgstr ""
 
 #: config/internal/option-internal.cpp:461
-msgid "Port to connect GDB to."
+msgid "Port to connect GDB to"
 msgstr ""
 
 #: config/internal/option-internal.cpp:464
@@ -1700,12 +1691,7 @@ msgstr "FAudio: erro ao crear a voz da masterización!"
 msgid "FAudio: Creating source voice failed!"
 msgstr "FAudio: erro ao crear a voz de orixe!"
 
-#: dsound.cpp:89
-#, c-format
-msgid "Cannot create DirectSound %08x"
-msgstr "Non se puido crear DirectSound %08x"
-
-#: dsound.cpp:103
+#: dsound.cpp:89 dsound.cpp:103
 #, c-format
 msgid "Cannot create Direct Sound %08x"
 msgstr ""
@@ -2150,8 +2136,8 @@ msgid "Filters"
 msgstr "Filtros"
 
 #: xrc/DisplayConfig.xrc:79
-msgid "Display filter :"
-msgstr "Filtro de visualización :"
+msgid "Display filter:"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:86
 msgid "2xSaI"
@@ -3043,10 +3029,6 @@ msgstr "Pulsado automático B"
 msgid "Motion Left / Dark"
 msgstr ""
 
-#: xrc/JoyPanel.xrc:364
-msgid "GameShark"
-msgstr "GameShark"
-
 #: xrc/JoyPanel.xrc:386
 msgid "Motion Right / Light"
 msgstr ""
@@ -3315,17 +3297,13 @@ msgstr "Ficheiro de &batería..."
 msgid "Game Shark &code file..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:164
-msgid "&Gameshark snapshot..."
-msgstr "Instantánea &Gameshark..."
+#: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
+msgid "&Game Shark snapshot..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:166
 msgid "&Import"
 msgstr "&Importar"
-
-#: xrc/MainMenu.xrc:173
-msgid "&Game Shark snapshot..."
-msgstr ""
 
 #: xrc/MainMenu.xrc:175
 msgid "&Export"
