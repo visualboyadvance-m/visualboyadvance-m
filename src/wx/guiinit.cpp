@@ -864,7 +864,7 @@ public:
 // since listctrl is virtual, it should be able to handle
 // at least 256k results, which is about the most you
 // will ever get
-#if 0
+/*
 
                                         if (list->addrs.size() > 1000)
                                         {
@@ -874,7 +874,7 @@ public:
                                                 return;
                                         }
 
-#endif
+*/
                 }
             }
         }

@@ -700,11 +700,11 @@ EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB | CMDEN_GBA)
             break;
 
         case 0x55:
-            type = _("GameGenie");
+            type = _("Game Genie");
             break;
 
         case 0x56:
-            type = _("GameShark V3.0");
+            type = _("Game Shark 3.0");
             break;
 
         case 0xfc:
@@ -1063,7 +1063,7 @@ EVT_HANDLER_MASK(ImportGamesharkActionReplaySnapshot,
     "Import Game Shark Action Replay snapshot...", CMDEN_GB | CMDEN_GBA)
 {
     wxFileDialog dlg(this, _("Select snapshot file"), gss_path, wxEmptyString,
-        panel->game_type() == IMAGE_GBA ? _("GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots (*.gsv)|*.gsv") : _("Game Boy Snapshot (*.gbs)|*.gbs"),
+        panel->game_type() == IMAGE_GBA ? _("Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots (*.gsv)|*.gsv") : _("Game Boy Snapshot (*.gbs)|*.gbs"),
         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     int ret = ShowModal(&dlg);
     gss_path = dlg.GetDirectory();
@@ -2894,7 +2894,7 @@ EVT_HANDLER(wxID_ABOUT, "About...")
     // but at least win32 standard about is nothing special
     ai.SetWebSite(wxT("http://www.vba-m.com/"));
     ai.SetIcon(GetIcons().GetIcon(wxSize(32, 32), wxIconBundle::FALLBACK_NEAREST_LARGER));
-    ai.SetDescription(_("Nintendo Game Boy / Color / Advance) emulator."));
+    ai.SetDescription(_("Nintendo Game Boy / Color / Advance emulator."));
     ai.SetCopyright(_("Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2020 VBA-M development team"));
     ai.SetLicense(_(
 "This program is free software: you can redistribute it and / or modify\n"

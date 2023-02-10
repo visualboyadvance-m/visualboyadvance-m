@@ -458,7 +458,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"preferences/gdbBreakOnLoad", "DebugGDBBreakOnLoad",
                _("Break into GDB after loading the game.")},
     OptionData{"preferences/gdbPort", "DebugGDBPort",
-               _("Port to connect GDB to.")},
+               _("Port to connect GDB to")},
 #ifndef NO_LINK
     OptionData{"preferences/LinkNumPlayers", "",
                _("Number of players in network")},

@@ -76,7 +76,7 @@
                 <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>
                 <object class="wxStaticText">
-                  <label>Display filter :</label>
+                  <label>Display filter:</label>
                 </object>
               </object>
               <object class="sizeritem">

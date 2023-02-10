@@ -86,7 +86,7 @@ bool DirectSound::init(long sampleRate)
     hr = CoCreateInstance(CLSID_DirectSound8, NULL, CLSCTX_INPROC_SERVER, IID_IDirectSound8, (LPVOID*)&pDirectSound);
 
     if (hr != S_OK) {
-        wxLogError(_("Cannot create DirectSound %08x"), hr);
+        wxLogError(_("Cannot create Direct Sound %08x"), hr);
         return false;
     }
 

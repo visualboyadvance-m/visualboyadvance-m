@@ -161,7 +161,7 @@
           <label>Game Shark _code file...</label>
         </object>
         <object class="wxMenuItem" name="ImportGamesharkActionReplaySnapshot">
-          <label>_Gameshark snapshot...</label>
+          <label>_Game Shark snapshot...</label>
         </object>
         <label>_Import</label>
       </object>
