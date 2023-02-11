@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-10 05:48+0000\n"
+"POT-Creation-Date: 2023-02-06 14:51-0800\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Stanley Kid, 2022-2023\n"
 "Language-Team: Ukrainian (http://www.transifex.com/bgk/vba-m/language/uk/)\n"
@@ -18,84 +18,84 @@ msgstr ""
 "Language: uk\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
-#: wxvbam.cpp:264
+#: wxvbam.cpp:265
 msgid "visualboyadvance-m"
 msgstr ""
 
-#: wxvbam.cpp:333 wxvbam.cpp:350
+#: wxvbam.cpp:329 wxvbam.cpp:346
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "Надано недійсний файл конфігурації: %s."
 
-#: wxvbam.cpp:489
+#: wxvbam.cpp:484
 msgid "Could not create main window"
 msgstr "Неможливо створити головне вікно."
 
-#: wxvbam.cpp:570
+#: wxvbam.cpp:565
 msgid "Save built-in XRC file and exit"
 msgstr "Зберегти вбудований XRC та вийти"
 
-#: wxvbam.cpp:573
+#: wxvbam.cpp:568
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Зберегти вбудований vba-over.ini та вийти"
 
-#: wxvbam.cpp:576
+#: wxvbam.cpp:571
 msgid "Print configuration path and exit"
 msgstr "Роздрукувати шлях конфігурації та вийти"
 
-#: wxvbam.cpp:579
+#: wxvbam.cpp:574
 msgid "Start in full-screen mode"
 msgstr "Запускати в повному екрані"
 
-#: wxvbam.cpp:582
+#: wxvbam.cpp:577
 msgid "Set a configuration file"
 msgstr "Встановити файл конфігурації"
 
-#: wxvbam.cpp:586
+#: wxvbam.cpp:581
 msgid "Delete shared link state first, if it exists"
 msgstr "Видалити спочатку стан загального з'єднання за наявності"
 
-#: wxvbam.cpp:593
+#: wxvbam.cpp:588
 msgid "List all settable options and exit"
 msgstr "Показати всі налаштовувані опції та вийти"
 
-#: wxvbam.cpp:596
+#: wxvbam.cpp:591
 msgid "ROM file"
 msgstr "ROM-файл"
 
-#: wxvbam.cpp:598
+#: wxvbam.cpp:593
 msgid "<config>=<value>"
 msgstr ""
 
-#: wxvbam.cpp:629
+#: wxvbam.cpp:624
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "Помилка конфігурації / випуску: неможливо знайти вбудований xrc."
 
-#: wxvbam.cpp:637
+#: wxvbam.cpp:632
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Записано вбудовану конфігурацію до %s.\nДля перевизначення вилучи всі вузли, крім змінених кореневих. Перший знайдений кореневий вузол із правильним іменем у будь-якому файлі .xrc чи .xrs у наведених шляхах пошуку перевизначає вбудований:"
 
-#: wxvbam.cpp:651
+#: wxvbam.cpp:646
 msgid "Configuration is read from, in order:"
 msgstr "Конфігурацію прочитано з файлів за порядком:"
 
-#: wxvbam.cpp:665
+#: wxvbam.cpp:660
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "Записано вбудоване перевизначення файлу до %s.\nДля перевизначення видали всі розділи, крім змінених. Перший знайдений розділ буде використано зі шляху пошуку:"
 
-#: wxvbam.cpp:671
+#: wxvbam.cpp:666
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tвбудовано"
 
-#: wxvbam.cpp:686
+#: wxvbam.cpp:681
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -103,17 +103,17 @@ msgid ""
 "\n"
 msgstr "Опції, встановлені з командного рядка, буде збережено при зміні конфігурації інтерфейсу користувача.\n\nДля позначення значення \"істина\" та \"хиба\" вказуються як 1 і 0 відповідно.\n\n"
 
-#: wxvbam.cpp:694
+#: wxvbam.cpp:689
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Доступні команди для опцій клавіатури:\n"
 
-#: wxvbam.cpp:705
+#: wxvbam.cpp:700
 msgid "Configuration file not found."
 msgstr "Файл конфігурації не знайдено."
 
-#: wxvbam.cpp:736
+#: wxvbam.cpp:731
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Неправильна опція конфігурації чи вибрано декілька ROM'ів:\n"
 
@@ -185,11 +185,11 @@ msgstr "Відновити старі значення?"
 msgid "Removing cheats"
 msgstr "Вилучення чітів."
 
-#: guiinit.cpp:759 xrc/JoyPanel.xrc:364
+#: guiinit.cpp:759
 msgid "Game Shark"
 msgstr ""
 
-#: guiinit.cpp:760 cmdevents.cpp:703
+#: guiinit.cpp:760
 msgid "Game Genie"
 msgstr ""
 
@@ -212,6 +212,11 @@ msgstr ""
 #: guiinit.cpp:833 guiinit.cpp:1088
 msgid "Number cannot be empty"
 msgstr "Число не може бути порожнім."
+
+#: guiinit.cpp:871
+#, c-format
+msgid "Search produced %d results.  Please refine better"
+msgstr ""
 
 #: guiinit.cpp:883
 msgid "Search produced no results"
@@ -543,8 +548,12 @@ msgstr ""
 msgid "ROM + MBC7 + BATT"
 msgstr ""
 
+#: cmdevents.cpp:703
+msgid "GameGenie"
+msgstr ""
+
 #: cmdevents.cpp:707
-msgid "Game Shark 3.0"
+msgid "GameShark V3.0"
 msgstr ""
 
 #: cmdevents.cpp:711
@@ -650,8 +659,8 @@ msgstr "Вибір знімка"
 
 #: cmdevents.cpp:1066
 msgid ""
-"Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
-" (*.gsv)|*.gsv"
+"GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots "
+"(*.gsv)|*.gsv"
 msgstr ""
 
 #: cmdevents.cpp:1066
@@ -791,7 +800,7 @@ msgid "FACTORY RESET"
 msgstr "Відновити заводські налаштування"
 
 #: cmdevents.cpp:2897
-msgid "Nintendo Game Boy / Color / Advance emulator."
+msgid "Nintendo Game Boy / Color / Advance) emulator."
 msgstr ""
 
 #: cmdevents.cpp:2898
@@ -857,23 +866,23 @@ msgstr "Ліцензія"
 msgid "OK"
 msgstr ""
 
-#: opts.cpp:384
+#: opts.cpp:354
 msgid ""
 "The INI file was written for a more recent version of VBA-M. Some INI option"
 " values may have been reset."
 msgstr "INI записано для новішої версії Visual Boy Advance-M. Можливе відновлення деяких значень INI-опцій."
 
-#: opts.cpp:551 opts.cpp:572 opts.cpp:808
+#: opts.cpp:521 opts.cpp:542 opts.cpp:778
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Недійсна призначена кнопка %s для %s."
 
-#: opts.cpp:731 opts.cpp:740 opts.cpp:749 opts.cpp:758 config/option.cpp:464
+#: opts.cpp:701 opts.cpp:710 opts.cpp:719 opts.cpp:728 config/option.cpp:464
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr "Недійсне значення %s для опції %s."
 
-#: opts.cpp:830
+#: opts.cpp:800
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr "Невідома опція %s зі значенням %s."
@@ -1391,7 +1400,7 @@ msgid "Break into GDB after loading the game."
 msgstr "Переривання в GDB після завантаження гри."
 
 #: config/internal/option-internal.cpp:461
-msgid "Port to connect GDB to"
+msgid "Port to connect GDB to."
 msgstr ""
 
 #: config/internal/option-internal.cpp:464
@@ -1688,7 +1697,12 @@ msgstr "FAudio: Не вдалося створити основний голос
 msgid "FAudio: Creating source voice failed!"
 msgstr "FAudio: Не вдалося створити голос-джерело!"
 
-#: dsound.cpp:89 dsound.cpp:103
+#: dsound.cpp:89
+#, c-format
+msgid "Cannot create DirectSound %08x"
+msgstr ""
+
+#: dsound.cpp:103
 #, c-format
 msgid "Cannot create Direct Sound %08x"
 msgstr "Неможливо створити Direct Sound %08x."
@@ -2133,7 +2147,7 @@ msgid "Filters"
 msgstr "Фільтри"
 
 #: xrc/DisplayConfig.xrc:79
-msgid "Display filter:"
+msgid "Display filter :"
 msgstr ""
 
 #: xrc/DisplayConfig.xrc:86
@@ -3026,6 +3040,10 @@ msgstr "B-Turbo"
 msgid "Motion Left / Dark"
 msgstr "Рух ← / Темрява"
 
+#: xrc/JoyPanel.xrc:364
+msgid "GameShark"
+msgstr ""
+
 #: xrc/JoyPanel.xrc:386
 msgid "Motion Right / Light"
 msgstr "Рух → / Світло"
@@ -3294,13 +3312,17 @@ msgstr "&Батарея..."
 msgid "Game Shark &code file..."
 msgstr "Game Shark-&коди..."
 
-#: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
-msgid "&Game Shark snapshot..."
-msgstr "&Game Shark-знімок..."
+#: xrc/MainMenu.xrc:164
+msgid "&Gameshark snapshot..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:166
 msgid "&Import"
 msgstr "&Імпортувати"
+
+#: xrc/MainMenu.xrc:173
+msgid "&Game Shark snapshot..."
+msgstr "&Game Shark-знімок..."
 
 #: xrc/MainMenu.xrc:175
 msgid "&Export"
