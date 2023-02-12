@@ -10,7 +10,6 @@
 #include "../NLS.h"
 #include "../System.h"
 #include "../Util.h"
-#include "../common/ConfigManager.h"
 #include "Cheats.h"
 #include "EEprom.h"
 #include "Flash.h"

@@ -8,7 +8,6 @@
 #include "System.h"
 #include "Util.h"
 #include "common/Port.h"
-#include "common/ConfigManager.h"
 #include "gba/Flash.h"
 #include "gba/GBA.h"
 #include "gba/Globals.h"

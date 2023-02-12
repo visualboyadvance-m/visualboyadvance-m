@@ -2,7 +2,6 @@
 #define GBCHEATS_H
 
 #include "../System.h"
-#include "../common/ConfigManager.h"
 
 struct gbXxCheat {
     char cheatDesc[100];

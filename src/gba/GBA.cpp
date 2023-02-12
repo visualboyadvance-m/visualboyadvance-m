@@ -11,7 +11,6 @@
 #include "../NLS.h"
 #include "../System.h"
 #include "../Util.h"
-#include "../common/ConfigManager.h"
 #include "../common/Port.h"
 #include "Cheats.h"
 #include "EEprom.h"
@@ -35,6 +34,10 @@
 
 #ifdef __GNUC__
 #define _stricmp strcasecmp
+#endif
+
+#ifdef _MSC_VER
+#define strdup _strdup
 #endif
 
 extern int emulating;

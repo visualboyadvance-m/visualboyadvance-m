@@ -46,7 +46,6 @@
 #include "SDL.h"
 
 #include "../Util.h"
-#include "../common/ConfigManager.h"
 #include "../common/Patch.h"
 #include "../gb/gb.h"
 #include "../gb/gbCheats.h"
@@ -60,6 +59,8 @@
 #include "../gba/agbprint.h"
 
 #include "../common/SoundSDL.h"
+
+#include "ConfigManager.h"
 #include "filters.h"
 #include "inputSDL.h"
 #include "text.h"

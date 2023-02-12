@@ -16,7 +16,7 @@
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "inputSDL.h"
-#include "../common/ConfigManager.h"
+#include "ConfigManager.h"
 
 #define SDLBUTTONS_NUM 14
 

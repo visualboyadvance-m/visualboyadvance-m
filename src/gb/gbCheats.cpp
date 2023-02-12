@@ -7,7 +7,6 @@
 #include "../System.h"
 #include "../Util.h"
 
-#include "../common/ConfigManager.h"
 #include "gb.h"
 #include "gbCheats.h"
 #include "gbGlobals.h"

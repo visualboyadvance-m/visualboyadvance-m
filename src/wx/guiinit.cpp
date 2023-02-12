@@ -25,8 +25,8 @@
 
 #include "../gba/CheatSearch.h"
 #include "config/game-control.h"
-#include "config/option.h"
 #include "config/option-proxy.h"
+#include "config/option.h"
 #include "config/user-input.h"
 #include "dialogs/display-config.h"
 #include "opts.h"
@@ -2881,7 +2881,7 @@ bool MainFrame::BindControls()
         MenuOptionIntMask("VideoLayersOBJWIN", coreOptions.layerSettings, (1 << 15));
         MenuOptionBool("CheatsAutoSaveLoad", gopts.autoload_cheats);
         MenuOptionIntMask("CheatsEnable", coreOptions.cheatsEnabled, 1);
-        SetMenuOption("ColorizerHack", OPTION(kGBColorizerHack) ? 1 : 0);
+        SetMenuOption("ColorizerHack", OPTION(kGBColorizerHack));
         MenuOptionIntMask("KeepSaves", coreOptions.skipSaveGameBattery, 1);
         MenuOptionIntMask("KeepCheats", coreOptions.skipSaveGameCheats, 1);
         MenuOptionBool("LoadGameAutoLoad", gopts.autoload_state);

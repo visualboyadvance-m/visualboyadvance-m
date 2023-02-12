@@ -16,7 +16,6 @@
 #include "../apu/Gb_Apu.h"
 #include "../apu/Gb_Oscs.h"
 #include "../common/Port.h"
-#include "../common/ConfigManager.h"
 #include "../gba/Cheats.h"
 #include "../gba/EEprom.h"
 #include "../gba/Flash.h"
@@ -65,6 +64,7 @@ static unsigned option_gbPalette = 0;
 static bool option_lcdfilter = false;
 
 // filters
+typedef void (*IFBFilterFunc)(uint8_t*, uint32_t, int, int);
 static IFBFilterFunc ifb_filter_func = NULL;
 
 static unsigned retropad_device[4] = {0};

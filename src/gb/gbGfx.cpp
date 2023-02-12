@@ -1,7 +1,6 @@
 #include <memory.h>
 
 #include "../Util.h"
-#include "../common/ConfigManager.h"
 #include "gbGlobals.h"
 #include "gbSGB.h"
 
