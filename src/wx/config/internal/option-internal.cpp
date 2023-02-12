@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <limits>
 
-#include "../common/ConfigManager.h"
+#include "../System.h"
 #include "../gb/gbGlobals.h"
 #include "opts.h"
 

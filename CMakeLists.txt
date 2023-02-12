@@ -862,7 +862,6 @@ endif()
 set(
     SRC_MAIN
     src/Util.cpp
-    src/common/ConfigManager.cpp
     src/common/dictionary.c
     src/common/iniparser.c
     src/common/Patch.cpp
@@ -879,7 +878,6 @@ set(
     src/System.h
     src/Util.h
     src/common/array.h
-    src/common/ConfigManager.h
     src/common/dictionary.h
     src/common/iniparser.h
     src/common/memgzio.h
@@ -1015,6 +1013,7 @@ set(
 
 set(
     SRC_SDL
+    src/sdl/ConfigManager.cpp
     src/sdl/SDL.cpp
     src/sdl/filters.cpp
     src/sdl/text.cpp
@@ -1027,6 +1026,7 @@ set(
 
 set(
     HDR_SDL
+    src/sdl/ConfigManager.h
     src/sdl/filters.h
     src/sdl/text.h
     src/sdl/inputSDL.h

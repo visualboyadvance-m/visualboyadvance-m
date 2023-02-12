@@ -49,6 +49,32 @@ struct EmulatedSystem {
         int emuCount;
 };
 
+extern struct CoreOptions {
+    bool cpuIsMultiBoot = false;
+    bool mirroringEnable = true;
+    bool parseDebug = true;
+    bool speedHack = false;
+    bool speedup = false;
+    bool speedup_throttle_frame_skip = false;
+    int cheatsEnabled = 1;
+    int cpuDisableSfx = 0;
+    int cpuSaveType = 0;
+    int layerSettings = 0xff00;
+    int layerEnable = 0xff00;
+    int rtcEnabled = 0;
+    int saveType = 0;
+    int skipBios = 0;
+    int skipSaveGameBattery = 1;
+    int skipSaveGameCheats = 0;
+    int useBios = 0;
+    int winGbPrinterEnabled = 1;
+    uint32_t speedup_throttle = 100;
+    uint32_t speedup_frame_skip = 9;
+    uint32_t throttle = 100;
+    const char *loadDotCodeFile = nullptr;
+    const char *saveDotCodeFile = nullptr;
+} coreOptions;
+
 extern void log(const char *, ...);
 extern bool systemPauseOnFrame();
 extern void systemGbPrint(uint8_t *, int, int, int, int, int);
@@ -96,6 +122,7 @@ extern int systemVerbose;
 extern int systemFrameSkip;
 extern int systemSaveUpdateCounter;
 extern int systemSpeed;
+#define MAX_CHEATS 16384
 #define SYSTEM_SAVE_UPDATED 30
 #define SYSTEM_SAVE_NOT_UPDATED 0
 #endif // SYSTEM_H

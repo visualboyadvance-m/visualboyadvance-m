@@ -1,7 +1,9 @@
 #ifndef CHEATS_H
 #define CHEATS_H
 
-#include "../common/ConfigManager.h"
+#include <cstdint>
+
+#include "../System.h"
 
 struct CheatsData {
     int code;

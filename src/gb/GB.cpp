@@ -9,7 +9,6 @@
 #include "../NLS.h"
 #include "../System.h"
 #include "../Util.h"
-#include "../common/ConfigManager.h"
 #include "../gba/GBALink.h"
 #include "../gba/Sound.h"
 #include "gb.h"

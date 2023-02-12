@@ -26,6 +26,8 @@
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
 
+#include "../gba/remote.h"
+
 // The built-in xrc file
 #include "builtin-xrc.h"
 
@@ -41,7 +43,14 @@
 namespace {
 static const wxString kOldConfigFileName("vbam.conf");
 static const wxString knewConfigFileName("vbam.ini");
+static const char kDotDir[] = "visualboyadvance-m";
 }  // namespace
+
+#ifndef NO_DEBUGGER
+void(*dbgMain)() = remoteStubMain;
+void(*dbgSignal)(int, int) = remoteStubSignal;
+void(*dbgOutput)(const char *, uint32_t) = debuggerOutput;
+#endif
 
 #ifdef __WXMSW__
 
@@ -743,21 +752,17 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
         }
     }
 
-    home = strdup(wxString(wxApp::argv[0]).char_str());
-    SetHome(home);
-    LoadConfig(); // Parse command line arguments (overrides ini)
-    ReadOpts(argc, (char**)argv);
     return true;
 }
 
 wxString wxvbamApp::GetConfigDir()
 {
-    return GetAbsolutePath(wxString((get_xdg_user_config_home() + DOT_DIR).c_str(), wxConvLibc));
+    return GetAbsolutePath(wxString((get_xdg_user_config_home() + kDotDir).c_str(), wxConvLibc));
 }
 
 wxString wxvbamApp::GetDataDir()
 {
-    return GetAbsolutePath(wxString((get_xdg_user_data_home() + DOT_DIR).c_str(), wxConvLibc));
+    return GetAbsolutePath(wxString((get_xdg_user_data_home() + kDotDir).c_str(), wxConvLibc));
 }
 
 wxvbamApp::~wxvbamApp() {
@@ -929,7 +934,7 @@ wxString MainFrame::GetGamePath(wxString path)
 
     if (!wxIsWritable(game_path))
     {
-        game_path = wxGetApp().GetAbsolutePath(wxString((get_xdg_user_data_home() + DOT_DIR).c_str(), wxConvLibc));
+        game_path = wxGetApp().GetAbsolutePath(wxString((get_xdg_user_data_home() + kDotDir).c_str(), wxConvLibc));
         wxFileName::Mkdir(game_path, 0777, wxPATH_MKDIR_FULL);
     }
 
