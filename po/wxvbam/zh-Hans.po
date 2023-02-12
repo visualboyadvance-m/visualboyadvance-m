@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-06 14:51-0800\n"
+"POT-Creation-Date: 2023-02-10 05:48+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: 陈 依云 <c1998lf@qq.com>, 2023\n"
 "Language-Team: Chinese Simplified (http://www.transifex.com/bgk/vba-m/language/zh-Hans/)\n"
@@ -30,84 +30,84 @@ msgstr ""
 "Language: zh-Hans\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: wxvbam.cpp:265
+#: wxvbam.cpp:264
 msgid "visualboyadvance-m"
 msgstr "visualboyadvance-m"
 
-#: wxvbam.cpp:329 wxvbam.cpp:346
+#: wxvbam.cpp:333 wxvbam.cpp:350
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "提供的配置文件无效: %s"
 
-#: wxvbam.cpp:484
+#: wxvbam.cpp:489
 msgid "Could not create main window"
 msgstr "无法创建主窗口"
 
-#: wxvbam.cpp:565
+#: wxvbam.cpp:570
 msgid "Save built-in XRC file and exit"
 msgstr "保存内置 XRC 文件并退出"
 
-#: wxvbam.cpp:568
+#: wxvbam.cpp:573
 msgid "Save built-in vba-over.ini and exit"
 msgstr "保存内置 vba-over.ini 文件并退出"
 
-#: wxvbam.cpp:571
+#: wxvbam.cpp:576
 msgid "Print configuration path and exit"
 msgstr "打印配置路径并退出"
 
-#: wxvbam.cpp:574
+#: wxvbam.cpp:579
 msgid "Start in full-screen mode"
 msgstr "以全屏模式启动"
 
-#: wxvbam.cpp:577
+#: wxvbam.cpp:582
 msgid "Set a configuration file"
 msgstr "设置配置文件"
 
-#: wxvbam.cpp:581
+#: wxvbam.cpp:586
 msgid "Delete shared link state first, if it exists"
 msgstr "请先删除共享链接状态，如果存在的话"
 
-#: wxvbam.cpp:588
+#: wxvbam.cpp:593
 msgid "List all settable options and exit"
 msgstr "列出所有可设置的选项并退出"
 
-#: wxvbam.cpp:591
+#: wxvbam.cpp:596
 msgid "ROM file"
 msgstr "ROM 文件"
 
-#: wxvbam.cpp:593
+#: wxvbam.cpp:598
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:624
+#: wxvbam.cpp:629
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "配置/建构错误：无法找到内置 xrc 文件"
 
-#: wxvbam.cpp:632
+#: wxvbam.cpp:637
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "将内置配置写入到 %s。\n如要覆盖，请删除所有未更改的根节点。首先在以下搜索覆盖内置路径里找到任意 .xrc 或 .xrs 文件中正确名称的根节点："
 
-#: wxvbam.cpp:646
+#: wxvbam.cpp:651
 msgid "Configuration is read from, in order:"
 msgstr "配置按顺序从中读取："
 
-#: wxvbam.cpp:660
+#: wxvbam.cpp:665
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "将内置覆盖文件写入到 %s\n 如要覆盖，请删除所有未更改的部分。首个找到的部分从以下搜索路径使用："
 
-#: wxvbam.cpp:666
+#: wxvbam.cpp:671
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\t内置"
 
-#: wxvbam.cpp:681
+#: wxvbam.cpp:686
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -115,17 +115,17 @@ msgid ""
 "\n"
 msgstr "如果在用户界面中进行了任何配置更改，则保存从命令行设置的选项。\n\n对于标志选项，true 和 false 分别指定为 1 和 0。\n\n"
 
-#: wxvbam.cpp:689
+#: wxvbam.cpp:694
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "可用于键盘 /* 选项的命令是:\n\n"
 
-#: wxvbam.cpp:700
+#: wxvbam.cpp:705
 msgid "Configuration file not found."
 msgstr "未找到配置文件。"
 
-#: wxvbam.cpp:731
+#: wxvbam.cpp:736
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "错误的配置选项或多个 ROM 文件被指定:\n"
 
@@ -197,11 +197,11 @@ msgstr "恢复原先数值？"
 msgid "Removing cheats"
 msgstr "正在移除金手指"
 
-#: guiinit.cpp:759
+#: guiinit.cpp:759 xrc/JoyPanel.xrc:364
 msgid "Game Shark"
 msgstr "Game Shark"
 
-#: guiinit.cpp:760
+#: guiinit.cpp:760 cmdevents.cpp:703
 msgid "Game Genie"
 msgstr "Game Genie"
 
@@ -224,11 +224,6 @@ msgstr "烧录卡 CHT"
 #: guiinit.cpp:833 guiinit.cpp:1088
 msgid "Number cannot be empty"
 msgstr "编号不能为空"
-
-#: guiinit.cpp:871
-#, c-format
-msgid "Search produced %d results.  Please refine better"
-msgstr ""
 
 #: guiinit.cpp:883
 msgid "Search produced no results"
@@ -560,13 +555,9 @@ msgstr "ROM + MBC5 + RUMBLE + RAM + BATT"
 msgid "ROM + MBC7 + BATT"
 msgstr "ROM + MBC7 + BATT"
 
-#: cmdevents.cpp:703
-msgid "GameGenie"
-msgstr ""
-
 #: cmdevents.cpp:707
-msgid "GameShark V3.0"
-msgstr ""
+msgid "Game Shark 3.0"
+msgstr "Game Shark 3.0"
 
 #: cmdevents.cpp:711
 msgid "ROM + POCKET CAMERA"
@@ -671,9 +662,9 @@ msgstr "选择快照文件"
 
 #: cmdevents.cpp:1066
 msgid ""
-"GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots "
-"(*.gsv)|*.gsv"
-msgstr ""
+"Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
+" (*.gsv)|*.gsv"
+msgstr "GameShark & PAC 快照 (*.sps;*.xps)|*.sps;*.xps|GameShark SP 快照 (*.gsv)|*.gsv"
 
 #: cmdevents.cpp:1066
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
@@ -812,8 +803,8 @@ msgid "FACTORY RESET"
 msgstr "恢复默认"
 
 #: cmdevents.cpp:2897
-msgid "Nintendo Game Boy / Color / Advance) emulator."
-msgstr ""
+msgid "Nintendo Game Boy / Color / Advance emulator."
+msgstr "任天堂 GameBoy/Color/Advance 模拟器。"
 
 #: cmdevents.cpp:2898
 msgid ""
@@ -878,23 +869,23 @@ msgstr "授权"
 msgid "OK"
 msgstr "确定"
 
-#: opts.cpp:354
+#: opts.cpp:384
 msgid ""
 "The INI file was written for a more recent version of VBA-M. Some INI option"
 " values may have been reset."
 msgstr "此 INI 文件是为新版本 VBA-M 编写的。某些 INI 选项值可能已被重置。"
 
-#: opts.cpp:521 opts.cpp:542 opts.cpp:778
+#: opts.cpp:551 opts.cpp:572 opts.cpp:808
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "%s 键不能绑定为 %s"
 
-#: opts.cpp:701 opts.cpp:710 opts.cpp:719 opts.cpp:728 config/option.cpp:464
+#: opts.cpp:731 opts.cpp:740 opts.cpp:749 opts.cpp:758 config/option.cpp:464
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr "数值 %s 对于选项 %s 无效"
 
-#: opts.cpp:800
+#: opts.cpp:830
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr "未知选项 %s 带有数值 %s"
@@ -1412,8 +1403,8 @@ msgid "Break into GDB after loading the game."
 msgstr "加载游戏后切入 GDB"
 
 #: config/internal/option-internal.cpp:461
-msgid "Port to connect GDB to."
-msgstr ""
+msgid "Port to connect GDB to"
+msgstr "连接 GDB 的端口"
 
 #: config/internal/option-internal.cpp:464
 msgid "Number of players in network"
@@ -1709,12 +1700,7 @@ msgstr "FAudio:  创建主语音失败！"
 msgid "FAudio: Creating source voice failed!"
 msgstr "FAudio: 创建源语音失败！"
 
-#: dsound.cpp:89
-#, c-format
-msgid "Cannot create DirectSound %08x"
-msgstr ""
-
-#: dsound.cpp:103
+#: dsound.cpp:89 dsound.cpp:103
 #, c-format
 msgid "Cannot create Direct Sound %08x"
 msgstr "无法创建 DirectSound %08x"
@@ -2159,8 +2145,8 @@ msgid "Filters"
 msgstr "滤镜"
 
 #: xrc/DisplayConfig.xrc:79
-msgid "Display filter :"
-msgstr ""
+msgid "Display filter:"
+msgstr "显示滤镜："
 
 #: xrc/DisplayConfig.xrc:86
 msgid "2xSaI"
@@ -3052,10 +3038,6 @@ msgstr "连发 B"
 msgid "Motion Left / Dark"
 msgstr "体感 左/暗"
 
-#: xrc/JoyPanel.xrc:364
-msgid "GameShark"
-msgstr ""
-
 #: xrc/JoyPanel.xrc:386
 msgid "Motion Right / Light"
 msgstr "体感 右/亮"
@@ -3324,17 +3306,13 @@ msgstr "电池文件(&B)..."
 msgid "Game Shark &code file..."
 msgstr "Gameshark 代码文件(&C)..."
 
-#: xrc/MainMenu.xrc:164
-msgid "&Gameshark snapshot..."
-msgstr ""
+#: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
+msgid "&Game Shark snapshot..."
+msgstr "Gameshark 快照(&G)..."
 
 #: xrc/MainMenu.xrc:166
 msgid "&Import"
 msgstr "导入(&I)"
-
-#: xrc/MainMenu.xrc:173
-msgid "&Game Shark snapshot..."
-msgstr "Gameshark 快照(&G)..."
 
 #: xrc/MainMenu.xrc:175
 msgid "&Export"

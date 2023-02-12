@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-06 14:51-0800\n"
+"POT-Creation-Date: 2023-02-10 05:48+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: 田中康陽, 2022\n"
 "Language-Team: Japanese (http://www.transifex.com/bgk/vba-m/language/ja/)\n"
@@ -26,84 +26,84 @@ msgstr ""
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: wxvbam.cpp:265
+#: wxvbam.cpp:264
 msgid "visualboyadvance-m"
 msgstr "visualboyadvance-m"
 
-#: wxvbam.cpp:329 wxvbam.cpp:346
+#: wxvbam.cpp:333 wxvbam.cpp:350
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr ""
 
-#: wxvbam.cpp:484
+#: wxvbam.cpp:489
 msgid "Could not create main window"
 msgstr "メインウィンドウを作成できませんでした"
 
-#: wxvbam.cpp:565
+#: wxvbam.cpp:570
 msgid "Save built-in XRC file and exit"
 msgstr "XRCファイルを保存して終了"
 
-#: wxvbam.cpp:568
+#: wxvbam.cpp:573
 msgid "Save built-in vba-over.ini and exit"
 msgstr "vba-over.ini を保存して終了"
 
-#: wxvbam.cpp:571
+#: wxvbam.cpp:576
 msgid "Print configuration path and exit"
 msgstr "設定ファイルのパスを出力して終了"
 
-#: wxvbam.cpp:574
+#: wxvbam.cpp:579
 msgid "Start in full-screen mode"
 msgstr "全画面表示で開始"
 
-#: wxvbam.cpp:577
+#: wxvbam.cpp:582
 msgid "Set a configuration file"
 msgstr "設定ファイルをセット"
 
-#: wxvbam.cpp:581
+#: wxvbam.cpp:586
 msgid "Delete shared link state first, if it exists"
 msgstr "共有リンク状態が存在する場合は、最初に削除します"
 
-#: wxvbam.cpp:588
+#: wxvbam.cpp:593
 msgid "List all settable options and exit"
 msgstr "設定可能なオプションをすべてリストして終了します"
 
-#: wxvbam.cpp:591
+#: wxvbam.cpp:596
 msgid "ROM file"
 msgstr "ROMファイル"
 
-#: wxvbam.cpp:593
+#: wxvbam.cpp:598
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:624
+#: wxvbam.cpp:629
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr ""
 
-#: wxvbam.cpp:632
+#: wxvbam.cpp:637
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr ""
 
-#: wxvbam.cpp:646
+#: wxvbam.cpp:651
 msgid "Configuration is read from, in order:"
 msgstr "構成は、次の順序で読み取られます。"
 
-#: wxvbam.cpp:660
+#: wxvbam.cpp:665
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr ""
 
-#: wxvbam.cpp:666
+#: wxvbam.cpp:671
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\t組み込み"
 
-#: wxvbam.cpp:681
+#: wxvbam.cpp:686
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -111,17 +111,17 @@ msgid ""
 "\n"
 msgstr "ユーザーインターフェイスで構成を変更するとコマンドラインからの設定されたオプションが保存されます。.\n\nフラグオプションの場合、trueとfalseにそれぞれ1と0を指定できます。\n\n"
 
-#: wxvbam.cpp:689
+#: wxvbam.cpp:694
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Keyboard / *オプションで使用できるコマンドは次のとおりです。\n\n"
 
-#: wxvbam.cpp:700
+#: wxvbam.cpp:705
 msgid "Configuration file not found."
 msgstr "設定ファイルが見つかりません。"
 
-#: wxvbam.cpp:731
+#: wxvbam.cpp:736
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "設定オプションが不正か、複数のロムファイルが読み込まれました。\n"
 
@@ -193,11 +193,11 @@ msgstr "以前の値に戻しますか?"
 msgid "Removing cheats"
 msgstr "チートコードを消す"
 
-#: guiinit.cpp:759
+#: guiinit.cpp:759 xrc/JoyPanel.xrc:364
 msgid "Game Shark"
 msgstr ""
 
-#: guiinit.cpp:760
+#: guiinit.cpp:760 cmdevents.cpp:703
 msgid "Game Genie"
 msgstr ""
 
@@ -220,11 +220,6 @@ msgstr "Flashcart CHT"
 #: guiinit.cpp:833 guiinit.cpp:1088
 msgid "Number cannot be empty"
 msgstr "値を空白にすることはできません"
-
-#: guiinit.cpp:871
-#, c-format
-msgid "Search produced %d results.  Please refine better"
-msgstr ""
 
 #: guiinit.cpp:883
 msgid "Search produced no results"
@@ -556,12 +551,8 @@ msgstr ""
 msgid "ROM + MBC7 + BATT"
 msgstr ""
 
-#: cmdevents.cpp:703
-msgid "GameGenie"
-msgstr ""
-
 #: cmdevents.cpp:707
-msgid "GameShark V3.0"
+msgid "Game Shark 3.0"
 msgstr ""
 
 #: cmdevents.cpp:711
@@ -667,8 +658,8 @@ msgstr "スナップショットファイルを選択"
 
 #: cmdevents.cpp:1066
 msgid ""
-"GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots "
-"(*.gsv)|*.gsv"
+"Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
+" (*.gsv)|*.gsv"
 msgstr ""
 
 #: cmdevents.cpp:1066
@@ -808,7 +799,7 @@ msgid "FACTORY RESET"
 msgstr ""
 
 #: cmdevents.cpp:2897
-msgid "Nintendo Game Boy / Color / Advance) emulator."
+msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr ""
 
 #: cmdevents.cpp:2898
@@ -874,23 +865,23 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-#: opts.cpp:354
+#: opts.cpp:384
 msgid ""
 "The INI file was written for a more recent version of VBA-M. Some INI option"
 " values may have been reset."
 msgstr ""
 
-#: opts.cpp:521 opts.cpp:542 opts.cpp:778
+#: opts.cpp:551 opts.cpp:572 opts.cpp:808
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "%s キーを %s へ割り当てることはできません"
 
-#: opts.cpp:701 opts.cpp:710 opts.cpp:719 opts.cpp:728 config/option.cpp:464
+#: opts.cpp:731 opts.cpp:740 opts.cpp:749 opts.cpp:758 config/option.cpp:464
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr ""
 
-#: opts.cpp:800
+#: opts.cpp:830
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr ""
@@ -1408,7 +1399,7 @@ msgid "Break into GDB after loading the game."
 msgstr ""
 
 #: config/internal/option-internal.cpp:461
-msgid "Port to connect GDB to."
+msgid "Port to connect GDB to"
 msgstr ""
 
 #: config/internal/option-internal.cpp:464
@@ -1705,12 +1696,7 @@ msgstr "FAudio2: マスタリングボイスの作成に失敗しました!"
 msgid "FAudio: Creating source voice failed!"
 msgstr "FAudio2: 音源の作成に失敗しました!"
 
-#: dsound.cpp:89
-#, c-format
-msgid "Cannot create DirectSound %08x"
-msgstr ""
-
-#: dsound.cpp:103
+#: dsound.cpp:89 dsound.cpp:103
 #, c-format
 msgid "Cannot create Direct Sound %08x"
 msgstr ""
@@ -2155,7 +2141,7 @@ msgid "Filters"
 msgstr "フィルタ"
 
 #: xrc/DisplayConfig.xrc:79
-msgid "Display filter :"
+msgid "Display filter:"
 msgstr ""
 
 #: xrc/DisplayConfig.xrc:86
@@ -3048,10 +3034,6 @@ msgstr "B（連射）"
 msgid "Motion Left / Dark"
 msgstr ""
 
-#: xrc/JoyPanel.xrc:364
-msgid "GameShark"
-msgstr ""
-
 #: xrc/JoyPanel.xrc:386
 msgid "Motion Right / Light"
 msgstr ""
@@ -3320,17 +3302,13 @@ msgstr "セーブデータファイル… (&B)"
 msgid "Game Shark &code file..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:164
-msgid "&Gameshark snapshot..."
+#: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
+msgid "&Game Shark snapshot..."
 msgstr ""
 
 #: xrc/MainMenu.xrc:166
 msgid "&Import"
 msgstr "インポート(&I)"
-
-#: xrc/MainMenu.xrc:173
-msgid "&Game Shark snapshot..."
-msgstr ""
 
 #: xrc/MainMenu.xrc:175
 msgid "&Export"
