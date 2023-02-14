@@ -53,7 +53,7 @@ msgstr "Visual Boy Advance-M"
 #: wxvbam.cpp:333 wxvbam.cpp:350
 #, c-format
 msgid "Invalid configuration file provided: %s"
-msgstr "Arquivo de configuração inválida fornecido: %s"
+msgstr "Arquivo de configuração inválido fornecido: %s"
 
 #: wxvbam.cpp:489
 msgid "Could not create main window"
@@ -573,7 +573,7 @@ msgstr "ROM + MBC7 + BATT"
 
 #: cmdevents.cpp:707
 msgid "Game Shark 3.0"
-msgstr ""
+msgstr "Game Shark 3.0"
 
 #: cmdevents.cpp:711
 msgid "ROM + POCKET CAMERA"
@@ -680,7 +680,7 @@ msgstr "Selecionar o arquivo do snapshot"
 msgid ""
 "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
 " (*.gsv)|*.gsv"
-msgstr ""
+msgstr "Snapshots do Game Shark & PAC (*.sps;*.xps)|*.sps;*.xps|Snapshots do Game Shark SP (*.gsv)|*.gsv"
 
 #: cmdevents.cpp:1066
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
@@ -820,7 +820,7 @@ msgstr "RESET DE FÁBRICA"
 
 #: cmdevents.cpp:2897
 msgid "Nintendo Game Boy / Color / Advance emulator."
-msgstr ""
+msgstr "Emulador do Nintendo Game Boy / Color / Advance."
 
 #: cmdevents.cpp:2898
 msgid ""
@@ -1420,7 +1420,7 @@ msgstr "Entrar no GDB após carregar o jogo."
 
 #: config/internal/option-internal.cpp:461
 msgid "Port to connect GDB to"
-msgstr ""
+msgstr "Porta pra conectar o GDB a"
 
 #: config/internal/option-internal.cpp:464
 msgid "Number of players in network"
@@ -2162,7 +2162,7 @@ msgstr "Filtros"
 
 #: xrc/DisplayConfig.xrc:79
 msgid "Display filter:"
-msgstr ""
+msgstr "Exibir filtro:"
 
 #: xrc/DisplayConfig.xrc:86
 msgid "2xSaI"
