@@ -4958,17 +4958,17 @@ void gbEmulate(int ticksToStop)
                     static uint32_t last_throttle;
 
                     if (turbo_button_pressed) {
-                        if (speedup_frame_skip)
-                            framesToSkip = speedup_frame_skip;
+                        if (coreOptions.speedup_frame_skip)
+                            framesToSkip = coreOptions.speedup_frame_skip;
                         else {
-                            if (!speedup_throttle_set && throttle != speedup_throttle) {
-                                last_throttle = throttle;
-                                soundSetThrottle(speedup_throttle);
+                            if (!speedup_throttle_set && coreOptions.throttle != coreOptions.speedup_throttle) {
+                                last_throttle = coreOptions.throttle;
+                                soundSetThrottle(coreOptions.speedup_throttle);
                                 speedup_throttle_set = true;
                             }
 
                             if (coreOptions.speedup_throttle_frame_skip)
-                                framesToSkip += std::ceil(double(speedup_throttle) / 100.0) - 1;
+                                framesToSkip += std::ceil(double(coreOptions.speedup_throttle) / 100.0) - 1;
                         }
                     }
                     else if (speedup_throttle_set) {

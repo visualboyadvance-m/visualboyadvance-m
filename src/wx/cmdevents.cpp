@@ -2457,7 +2457,7 @@ EVT_HANDLER(GeneralConfigure, "General options...")
         update_opts();
 
     if (panel->game_type() != IMAGE_UNKNOWN)
-        soundSetThrottle(throttle);
+        soundSetThrottle(coreOptions.throttle);
 
     if (rew != gopts.rewind_interval) {
         if (!gopts.rewind_interval) {
@@ -2481,16 +2481,16 @@ EVT_HANDLER(SpeedupConfigure, "Speedup / Turbo options...")
 {
     wxDialog* dlg = GetXRCDialog("SpeedupConfig");
 
-    unsigned save_speedup_throttle            = speedup_throttle;
-    unsigned save_speedup_frame_skip          = speedup_frame_skip;
+    unsigned save_speedup_throttle            = coreOptions.speedup_throttle;
+    unsigned save_speedup_frame_skip          = coreOptions.speedup_frame_skip;
     bool     save_speedup_throttle_frame_skip = coreOptions.speedup_throttle_frame_skip;
 
     if (ShowModal(dlg) == wxID_OK)
         update_opts();
     else {
         // Restore values if cancel pressed.
-        speedup_throttle            = save_speedup_throttle;
-        speedup_frame_skip          = save_speedup_frame_skip;
+        coreOptions.speedup_throttle            = save_speedup_throttle;
+        coreOptions.speedup_frame_skip          = save_speedup_frame_skip;
         coreOptions.speedup_throttle_frame_skip = save_speedup_throttle_frame_skip;
     }
 }

@@ -103,8 +103,6 @@ const char* batteryDir;
 const char* biosFileNameGB;
 const char* biosFileNameGBA;
 const char* biosFileNameGBC;
-const char* loadDotCodeFile;
-const char* saveDotCodeFile;
 const char* saveDir;
 const char* screenShotDir;
 int agbPrint;
@@ -126,9 +124,6 @@ int preparedCheats = 0;
 int rewindTimer = 0;
 int showSpeed;
 int showSpeedTransparent;
-uint32_t throttle = 100;
-uint32_t speedup_throttle = 100;
-uint32_t speedup_frame_skip = 9;
 bool allowKeyboardBackgroundInput = false;
 bool allowJoystickBackgroundInput = true;
 
@@ -324,14 +319,14 @@ void LoadConfig()
 	gb_effects_config.stereo = (float)ReadPref("gbSoundEffectsStereo", 15) / 100.0f;
 	gb_effects_config.surround = ReadPref("gbSoundEffectsSurround", 0);
 	ifbType = ReadPref("ifbType", 0);
-	loadDotCodeFile = ReadPrefString("loadDotCodeFile");
+	coreOptions.loadDotCodeFile = ReadPrefString("loadDotCodeFile");
 	openGL = ReadPrefHex("openGL");
 	optFlashSize = ReadPref("flashSize", 0);
 	pauseWhenInactive = ReadPref("pauseWhenInactive", 1);
 	rewindTimer = ReadPref("rewindTimer", 0);
 	coreOptions.rtcEnabled = ReadPref("rtcEnabled", 0);
 	saveDir = ReadPrefString("saveDir");
-	saveDotCodeFile = ReadPrefString("saveDotCodeFile");
+	coreOptions.saveDotCodeFile = ReadPrefString("saveDotCodeFile");
 	screenShotDir = ReadPrefString("screenShotDir");
 	showSpeed = ReadPref("showSpeed", 0);
 	showSpeedTransparent = ReadPref("showSpeedTransparent", 1);
@@ -340,9 +335,9 @@ void LoadConfig()
 	coreOptions.skipSaveGameCheats = ReadPref("skipSaveGameCheats", 0);
 	soundFiltering = (float)ReadPref("gbaSoundFiltering", 50) / 100.0f;
 	soundInterpolation = ReadPref("gbaSoundInterpolation", 1);
-	throttle = ReadPref("throttle", 100);
-	speedup_throttle = ReadPref("speedupThrottle", 100);
-	speedup_frame_skip = ReadPref("speedupFrameSkip", 9);
+	coreOptions.throttle = ReadPref("throttle", 100);
+	coreOptions.speedup_throttle = ReadPref("speedupThrottle", 100);
+	coreOptions.speedup_frame_skip = ReadPref("speedupFrameSkip", 9);
 	coreOptions.speedup_throttle_frame_skip = ReadPref("speedupThrottleFrameSkip", 0);
 	coreOptions.useBios = ReadPrefHex("useBiosGBA");
 	coreOptions.winGbPrinterEnabled = ReadPref("gbPrinter", 0);
@@ -747,10 +742,10 @@ int ReadOpts(int argc, char ** argv)
 				filter = kStretch2x;
 			}
 			break;
-                case 'T':
-                        if (optarg)
-                            throttle = atoi(optarg);
-                        break;
+		case 'T':
+			if (optarg)
+				coreOptions.throttle = atoi(optarg);
+			break;
 		case 'I':
 			if (optarg) {
 				ifbType = (IFBFilter)atoi(optarg);
@@ -946,20 +941,20 @@ int ReadOpts(int argc, char ** argv)
 
 		case OPT_DOTCODE_FILE_NAME_LOAD:
 			// --dotcode-file-name-load
-			loadDotCodeFile = optarg;
+			coreOptions.loadDotCodeFile = optarg;
 			break;
 
 		case OPT_DOTCODE_FILE_NAME_SAVE:
 			// --dotcode-file-name-save
-			saveDotCodeFile = optarg;
+			coreOptions.saveDotCodeFile = optarg;
 			break;
 		case OPT_SPEEDUP_THROTTLE:
 			if (optarg)
-				speedup_throttle = atoi(optarg);
+				coreOptions.speedup_throttle = atoi(optarg);
 			break;
 		case OPT_SPEEDUP_FRAME_SKIP:
 			if (optarg)
-				speedup_frame_skip = atoi(optarg);
+				coreOptions.speedup_frame_skip = atoi(optarg);
 			break;
 		case OPT_NO_SPEEDUP_THROTTLE_FRAME_SKIP:
 			coreOptions.speedup_throttle_frame_skip = false;

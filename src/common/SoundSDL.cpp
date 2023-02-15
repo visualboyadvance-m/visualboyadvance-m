@@ -31,7 +31,7 @@ const double SoundSDL::buftime = 0.100;
 SoundSDL::SoundSDL():
     samples_buf(0),
     sound_device(0),
-    current_rate(static_cast<unsigned short>(throttle)),
+    current_rate(static_cast<unsigned short>(coreOptions.throttle)),
     initialized(false)
 {}
 

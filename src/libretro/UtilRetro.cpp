@@ -22,9 +22,6 @@
 #define _stricmp strcasecmp
 #endif // ! _MSC_VER
 
-const char* loadDotCodeFile;
-const char* saveDotCodeFile;
-
 void utilPutDword(uint8_t* p, uint32_t value)
 {
     *p++ = value & 255;
