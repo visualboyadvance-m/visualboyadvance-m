@@ -2091,7 +2091,7 @@ void systemFrame()
 {
 }
 
-void system10Frames(int rate)
+void system10Frames()
 {
     uint32_t time = systemGetClock();
     if (!wasPaused && autoFrameSkip) {
@@ -2099,7 +2099,7 @@ void system10Frames(int rate)
         int speed = 100;
 
         if (diff)
-            speed = (1000000 / rate) / diff;
+            speed = (1000000 / 60) / diff;
 
         if (speed >= 98) {
             frameskipadjust++;

@@ -1,12 +1,15 @@
-#include "../common/SoundSDL.h"
-#include "config/game-control.h"
-#include "config/option-proxy.h"
-#include "wxvbam.h"
-#include "SDL.h"
+#include <algorithm>
+
 #include <wx/ffile.h>
 #include <wx/generic/prntdlgg.h>
 #include <wx/print.h>
 #include <wx/printdlg.h>
+#include <SDL.h>
+
+#include "../common/SoundSDL.h"
+#include "config/game-control.h"
+#include "config/option-proxy.h"
+#include "wxvbam.h"
 
 // These should probably be in vbamcore
 int systemVerbose;
@@ -469,43 +472,55 @@ void systemShowSpeed(int speed)
 
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-void system10Frames(int rate)
-{
+void system10Frames() {
     GameArea* panel = wxGetApp().frame->GetPanel();
     int fs = frameSkip;
 
     if (fs < 0) {
-        // I don't know why this algorithm isn't in common somewhere
-        // as is, I copied it from SDL
+        // We keep a rolling mean of the last second and use this value to
+        // adjust the systemFrameSkip value dynamically.
+
+        // Target time in ms for 10 frames at 60 FPS.
+        constexpr int kTarget = 10 * 1000 / 60;
+
         static uint32_t prevclock = 0;
         static int speedadj = 0;
-        uint32_t t = systemGetClock();
+        static int last_second[6] = {kTarget, kTarget, kTarget,
+                                    kTarget, kTarget, kTarget};
+        static size_t last_index = 0;
 
-        if (!panel->was_paused && prevclock && (t - prevclock) != (uint32_t)(10000 / rate)) {
-            int speed = t == prevclock ? 100 * 10000 / rate - (t - prevclock) : 100;
+        const uint32_t timestamp = systemGetClock();
+
+        if (!panel->was_paused && prevclock) {
+            last_second[last_index] = systemGetClock() - prevclock;
+            last_index = (last_index + 1) % 6;
+
+            int average = 0;
+            for (size_t i = 0; i < 6; i++) {
+                average += last_second[i];
+            }
+            average /= 6;
+
+            const int speed = (kTarget * 100) / average;
 
             // why 98??
             if (speed >= 98)
                 speedadj++;
             else if (speed < 80)
-                speedadj -= (90 - speed) / 5;
+                speedadj -= (90 - speed) / 10;
             else
                 speedadj--;
 
             if (speedadj >= 3) {
                 speedadj = 0;
-
-                if (systemFrameSkip > 0)
-                    systemFrameSkip--;
+                systemFrameSkip = std::max(systemFrameSkip - 1, 0);
             } else if (speedadj <= -2) {
                 speedadj += 2;
-
-                if (systemFrameSkip < 9)
-                    systemFrameSkip++;
+                systemFrameSkip = std::min(systemFrameSkip + 1, 9);
             }
         }
 
-        prevclock = t;
+        prevclock = timestamp;
         panel->was_paused = false;
     }
 
