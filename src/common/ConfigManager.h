@@ -54,7 +54,6 @@ extern int autoFireMaxCount;
 extern int autoFrameSkip;
 extern int autoPatch;
 extern int captureFormat;
-extern int colorizerHack;
 extern int disableStatusMessages;
 extern int filter;
 extern int frameSkip;
@@ -67,8 +66,6 @@ extern int pauseWhenInactive;
 extern int rewindTimer;
 extern int showSpeed;
 extern int showSpeedTransparent;
-extern bool allowKeyboardBackgroundInput;
-extern bool allowJoystickBackgroundInput;
 
 extern int preparedCheats;
 extern const char *preparedCheatCodes[MAX_CHEATS];

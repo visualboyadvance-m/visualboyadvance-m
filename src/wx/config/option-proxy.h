@@ -24,7 +24,7 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /// GB
     /*kGBBiosFile*/ Option::Type::kString,
     /*kGBColorOption*/ Option::Type::kInt,
-    /*kGBColorizerHack*/ Option::Type::kInt,
+    /*kGBColorizerHack*/ Option::Type::kBool,
     /*kGBLCDFilter*/ Option::Type::kBool,
     /*kGBGBCBiosFile*/ Option::Type::kString,
     /*kGBPalette0*/ Option::Type::kGbPalette,
@@ -108,7 +108,7 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /*kPrefVsync*/ Option::Type::kBool,
 
     /// Geometry
-    /*kGeomFullScreen*/ Option::Type::kInt,
+    /*kGeomFullScreen*/ Option::Type::kBool,
     /*kGeomIsMaximized*/ Option::Type::kBool,
     /*kGeomWindowHeight*/ Option::Type::kUnsigned,
     /*kGeomWindowWidth*/ Option::Type::kUnsigned,

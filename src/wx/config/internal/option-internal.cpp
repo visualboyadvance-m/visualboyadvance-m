@@ -161,15 +161,23 @@ std::array<Option, kNbOptions>& Option::All() {
         double video_scale = 3;
         bool retain_aspect = true;
 
+        /// GB
+        bool colorizer_hack = false;
+
         /// General
         uint32_t ini_version = kIniLatestVersion;
 
         /// Geometry
+        bool fullscreen = false;
         bool window_maximized = false;
         uint32_t window_height = 0;
         uint32_t window_width = 0;
         int32_t window_pos_x = -1;
         int32_t window_pos_y = -1;
+
+        /// UI
+        bool allow_keyboard_background_input = false;
+        bool allow_joystick_background_input = true;
     };
     static OwnedOptions g_owned_opts;
 
@@ -194,7 +202,7 @@ std::array<Option, kNbOptions>& Option::All() {
         /// GB
         Option(OptionID::kGBBiosFile, &gopts.gb_bios),
         Option(OptionID::kGBColorOption, &gbColorOption, 0, 1),
-        Option(OptionID::kGBColorizerHack, &colorizerHack, 0, 1),
+        Option(OptionID::kGBColorizerHack, &g_owned_opts.colorizer_hack),
         Option(OptionID::kGBLCDFilter, &gopts.gb_lcd_filter),
         Option(OptionID::kGBGBCBiosFile, &gopts.gbc_bios),
         Option(OptionID::kGBPalette0, systemGbPalette),
@@ -278,7 +286,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kPrefVsync, &gopts.vsync),
 
         /// Geometry
-        Option(OptionID::kGeomFullScreen, &fullScreen, 0, 1),
+        Option(OptionID::kGeomFullScreen, &g_owned_opts.fullscreen),
         Option(OptionID::kGeomIsMaximized, &g_owned_opts.window_maximized),
         Option(OptionID::kGeomWindowHeight, &g_owned_opts.window_height, 0, 99999),
         Option(OptionID::kGeomWindowWidth, &g_owned_opts.window_width, 0, 99999),
@@ -286,8 +294,8 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kGeomWindowY, &g_owned_opts.window_pos_y, std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max()),
 
         /// UI
-        Option(OptionID::kUIAllowKeyboardBackgroundInput, &allowKeyboardBackgroundInput),
-        Option(OptionID::kUIAllowJoystickBackgroundInput, &allowJoystickBackgroundInput),
+        Option(OptionID::kUIAllowKeyboardBackgroundInput, &g_owned_opts.allow_keyboard_background_input),
+        Option(OptionID::kUIAllowJoystickBackgroundInput, &g_owned_opts.allow_joystick_background_input),
         Option(OptionID::kUIHideMenuBar, &gopts.hide_menu_bar),
 
         /// Sound

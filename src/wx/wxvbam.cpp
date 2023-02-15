@@ -984,7 +984,7 @@ wxEvtHandler* MainFrame::GetJoyEventHandler()
     if (!panel)
         return nullptr;
 
-    if (allowJoystickBackgroundInput)
+    if (OPTION(kUIAllowJoystickBackgroundInput))
         return panel->GetEventHandler();
 
     return nullptr;
