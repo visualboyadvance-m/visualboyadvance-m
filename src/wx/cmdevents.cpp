@@ -1688,30 +1688,21 @@ EVT_HANDLER(JoypadAutoholdStart, "Autohold Start (toggle)")
 
 EVT_HANDLER(AllowKeyboardBackgroundInput, "Allow keyboard background input (toggle)")
 {
-    bool menuPress = false;
-    GetMenuOptionBool("AllowKeyboardBackgroundInput", &menuPress);
-    toggleBooleanVar(&menuPress, &allowKeyboardBackgroundInput);
-    SetMenuOption("AllowKeyboardBackgroundInput", allowKeyboardBackgroundInput ? 1 : 0);
+    GetMenuOptionConfig("AllowKeyboardBackgroundInput",
+                        config::OptionID::kUIAllowKeyboardBackgroundInput);
 
     disableKeyboardBackgroundInput();
-
-    if (allowKeyboardBackgroundInput) {
+    if (OPTION(kUIAllowKeyboardBackgroundInput)) {
         if (panel && panel->panel) {
             enableKeyboardBackgroundInput(panel->panel->GetWindow());
         }
     }
-
-    update_opts();
 }
 
 EVT_HANDLER(AllowJoystickBackgroundInput, "Allow joystick background input (toggle)")
 {
-    bool menuPress = false;
-    GetMenuOptionBool("AllowJoystickBackgroundInput", &menuPress);
-    toggleBooleanVar(&menuPress, &allowJoystickBackgroundInput);
-    SetMenuOption("AllowJoystickBackgroundInput", allowJoystickBackgroundInput ? 1 : 0);
-
-    update_opts();
+    GetMenuOptionConfig("AllowKeyboardBackgroundInput",
+                        config::OptionID::kUIAllowJoystickBackgroundInput);
 }
 
 EVT_HANDLER_MASK(LoadGameRecent, "Load most recent save", CMDEN_SAVST)
@@ -1996,18 +1987,13 @@ EVT_HANDLER(CheatsEnable, "Enable cheats (toggle)")
 
 EVT_HANDLER(ColorizerHack, "Enable Colorizer Hack (toggle)")
 {
-    bool val = false;
-    GetMenuOptionBool("ColorizerHack", &val);
-
-    if (val && gopts.use_bios_file_gb) {
-        wxLogError(_("Cannot use Colorizer Hack when Game Boy BIOS File is enabled."));
-        val = 0;
+    GetMenuOptionConfig("ColorizerHack", config::OptionID::kGBColorizerHack);
+    if (OPTION(kGBColorizerHack) && gopts.use_bios_file_gb) {
+        wxLogError(
+            _("Cannot use Colorizer Hack when Game Boy BIOS File is enabled."));
         SetMenuOption("ColorizerHack", 0);
+        OPTION(kGBColorizerHack) = false;
     }
-
-    colorizerHack = val;
-
-    update_opts();
 }
 
 // Debug menu
@@ -3128,7 +3114,7 @@ EVT_HANDLER(BootRomGB, "Use the specified BIOS file for GB")
     int val = 0;
     GetMenuOptionInt("BootRomGB", &val, 1);
 
-    if (val == 1 && colorizerHack == 1) {
+    if (val == 1 && OPTION(kGBColorizerHack)) {
         wxLogError(_("Cannot use Game Boy BIOS when Colorizer Hack is enabled."));
         val = 0;
         SetMenuOption("BootRomGB", 0);

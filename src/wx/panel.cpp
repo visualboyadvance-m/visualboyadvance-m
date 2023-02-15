@@ -260,14 +260,14 @@ void GameArea::LoadGame(const wxString& name)
 
 
         // Disable bios loading when using colorizer hack.
-        if (gopts.use_bios_file_gb && colorizerHack) {
+        if (gopts.use_bios_file_gb && OPTION(kGBColorizerHack)) {
             wxLogError(_("Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game Boy BIOS file."));
             gopts.use_bios_file_gb = false;
             update_opts();
         }
 
         // Set up the core for the colorizer hack.
-        setColorizerHack(colorizerHack);
+        setColorizerHack(OPTION(kGBColorizerHack));
 
         bool use_bios =
             gbCgbMode ? gopts.use_bios_file_gbc : gopts.use_bios_file_gb;
@@ -1148,7 +1148,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
         w->SetSize(wxSize(basic_width, basic_height));
 
         // Allow input while on background
-        if (allowKeyboardBackgroundInput)
+        if (OPTION(kUIAllowKeyboardBackgroundInput))
             enableKeyboardBackgroundInput(w);
 
         if (gopts.max_scale)

@@ -110,7 +110,6 @@ int autoFireMaxCount = 1;
 int autoFrameSkip = 0;
 int autoPatch;
 int captureFormat = 0;
-int colorizerHack = 0;
 int disableStatusMessages = 0;
 int filter = kStretch2x;
 int frameSkip = 1;
@@ -124,8 +123,6 @@ int preparedCheats = 0;
 int rewindTimer = 0;
 int showSpeed;
 int showSpeedTransparent;
-bool allowKeyboardBackgroundInput = false;
-bool allowJoystickBackgroundInput = true;
 
 const char* preparedCheatCodes[MAX_CHEATS];
 
@@ -158,7 +155,6 @@ struct option argOptions[] = {
 	{ "cheat", required_argument, 0, OPT_CHEAT },
 	{ "cheats-enabled", no_argument, &coreOptions.cheatsEnabled, 1 },
 	{ "color-option", no_argument, &gbColorOption, 1 },
-	{ "colorizer-hack", no_argument, &colorizerHack, 1 },
 	{ "config", required_argument, 0, 'c' },
 	{ "cpu-disable-sfx", no_argument, &coreOptions.cpuDisableSfx, 1 },
 	{ "cpu-save-type", required_argument, 0, OPT_CPU_SAVE_TYPE },
@@ -289,8 +285,6 @@ void ValidateConfig()
 void LoadConfig()
 {
 	agbPrint = ReadPrefHex("agbPrint");
-	allowKeyboardBackgroundInput = ReadPref("allowKeyboardBackgroundInput", false);
-	allowJoystickBackgroundInput = ReadPref("allowJoystickBackgroundInput", true);
 	autoFireMaxCount = fromDec(ReadPrefString("autoFireMaxCount"));
 	autoFrameSkip = ReadPref("autoFrameSkip", 0);
 	autoPatch = ReadPref("autoPatch", 1);
@@ -300,7 +294,6 @@ void LoadConfig()
 	biosFileNameGBC = ReadPrefString("biosFileGBC");
 	captureFormat = ReadPref("captureFormat", 0);
 	coreOptions.cheatsEnabled = ReadPref("cheatsEnabled", 0);
-	colorizerHack = ReadPref("colorizerHack", 0);
 	coreOptions.cpuDisableSfx = ReadPref("disableSfx", 0);
 	coreOptions.cpuSaveType = ReadPrefHex("saveType");
 	disableStatusMessages = ReadPrefHex("disableStatus");
