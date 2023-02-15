@@ -255,7 +255,7 @@ void GameArea::LoadGame(const wxString& name)
         gbSoundSetSampleRate(!gopts.sound_qual ? 48000 : 44100 / (1 << (gopts.sound_qual - 1)));
         soundSetVolume((float)gopts.sound_vol / 100.0);
         // this **MUST** be called **AFTER** setting sample rate because the core calls soundInit()
-        soundSetThrottle(throttle);
+        soundSetThrottle(coreOptions.throttle);
         gbGetHardwareType();
 
 
@@ -370,7 +370,7 @@ void GameArea::LoadGame(const wxString& name)
         soundSetSampleRate(!gopts.sound_qual ? 48000 : 44100 / (1 << (gopts.sound_qual - 1)));
         soundSetVolume((float)gopts.sound_vol / 100.0);
         // this **MUST** be called **AFTER** setting sample rate because the core calls soundInit()
-        soundSetThrottle(throttle);
+        soundSetThrottle(coreOptions.throttle);
         soundFiltering = (float)gopts.gba_sound_filter / 100.0f;
 
         rtcEnableRumble(true);

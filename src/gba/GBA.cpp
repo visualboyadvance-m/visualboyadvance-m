@@ -1707,40 +1707,40 @@ void doMirroring(bool b)
 
 const char* GetLoadDotCodeFile()
 {
-    return loadDotCodeFile;
+    return coreOptions.loadDotCodeFile;
 }
 
 const char* GetSaveDotCodeFile()
 {
-    return saveDotCodeFile;
+    return coreOptions.saveDotCodeFile;
 }
 
 void ResetLoadDotCodeFile()
 {
-    if (loadDotCodeFile) {
-        free((char*)loadDotCodeFile);
+    if (coreOptions.loadDotCodeFile) {
+        free((char*)coreOptions.loadDotCodeFile);
     }
 
-    loadDotCodeFile = strdup("");
+    coreOptions.loadDotCodeFile = strdup("");
 }
 
 void SetLoadDotCodeFile(const char* szFile)
 {
-    loadDotCodeFile = strdup(szFile);
+    coreOptions.loadDotCodeFile = strdup(szFile);
 }
 
 void ResetSaveDotCodeFile()
 {
-    if (saveDotCodeFile) {
-        free((char*)saveDotCodeFile);
+    if (coreOptions.saveDotCodeFile) {
+        free((char*)coreOptions.saveDotCodeFile);
     }
 
-    saveDotCodeFile = strdup("");
+    coreOptions.saveDotCodeFile = strdup("");
 }
 
 void SetSaveDotCodeFile(const char* szFile)
 {
-    saveDotCodeFile = strdup(szFile);
+    coreOptions.saveDotCodeFile = strdup(szFile);
 }
 
 void CPUUpdateRender()
@@ -3825,17 +3825,17 @@ void CPULoop(int ticks)
                     static uint32_t last_throttle;
 
                     if (turbo_button_pressed) {
-                        if (speedup_frame_skip)
-                            framesToSkip = speedup_frame_skip;
+                        if (coreOptions.speedup_frame_skip)
+                            framesToSkip = coreOptions.speedup_frame_skip;
                         else {
-                            if (!speedup_throttle_set && throttle != speedup_throttle) {
-                                last_throttle = throttle;
-                                soundSetThrottle(speedup_throttle);
+                            if (!speedup_throttle_set && coreOptions.throttle != coreOptions.speedup_throttle) {
+                                last_throttle = coreOptions.throttle;
+                                soundSetThrottle(coreOptions.speedup_throttle);
                                 speedup_throttle_set = true;
                             }
 
                             if (coreOptions.speedup_throttle_frame_skip)
-                                framesToSkip += std::ceil(double(speedup_throttle) / 100.0) - 1;
+                                framesToSkip += std::ceil(double(coreOptions.speedup_throttle) / 100.0) - 1;
                         }
                     }
                     else if (speedup_throttle_set) {

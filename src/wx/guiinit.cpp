@@ -2189,7 +2189,7 @@ public:
     void Init(wxShowEvent& ev)
     {
         ev.Skip();
-        DoSetThrottleSel(throttle);
+        DoSetThrottleSel(coreOptions.throttle);
     }
 } throttle_ctrl;
 
@@ -2205,8 +2205,8 @@ public:
         evt.Skip(false);
 
         if (val == 0) {
-            speedup_throttle            = 0;
-            speedup_frame_skip          = 0;
+            coreOptions.speedup_throttle            = 0;
+            coreOptions.speedup_frame_skip          = 0;
             coreOptions.speedup_throttle_frame_skip = false;
 
             frame_skip_cb->SetValue(false);
@@ -2216,32 +2216,32 @@ public:
                 return; // Do not update value if user cleared text box.
         }
         else if (val <= 450) {
-            speedup_throttle   = val;
-            speedup_frame_skip = 0;
+            coreOptions.speedup_throttle   = val;
+            coreOptions.speedup_frame_skip = 0;
 
             frame_skip_cb->SetValue(prev_frame_skip_cb);
             frame_skip_cb->Enable();
         }
         else { // val > 450
-            speedup_throttle            = 100;
+            coreOptions.speedup_throttle            = 100;
             coreOptions.speedup_throttle_frame_skip = false;
 
             unsigned rounded = std::round((double)val / 100) * 100;
 
-            speedup_frame_skip = rounded / 100 - 1;
+            coreOptions.speedup_frame_skip = rounded / 100 - 1;
 
             // Round up or down to the nearest 100%.
             // For example, when the up/down buttons are pressed on the spin
             // control.
             if ((int)(val - rounded) > 0)
-                speedup_frame_skip++;
+                coreOptions.speedup_frame_skip++;
             else if ((int)(val - rounded) < 0)
-                speedup_frame_skip--;
+                coreOptions.speedup_frame_skip--;
 
             frame_skip_cb->SetValue(true);
             frame_skip_cb->Disable();
 
-            val = (speedup_frame_skip + 1) * 100;
+            val = (coreOptions.speedup_frame_skip + 1) * 100;
         }
 
         speedup_throttle_spin->SetValue(val);
@@ -2258,16 +2258,16 @@ public:
 
     void Init(wxShowEvent& ev)
     {
-        if (speedup_frame_skip != 0) {
-            speedup_throttle_spin->SetValue((speedup_frame_skip + 1) * 100);
+        if (coreOptions.speedup_frame_skip != 0) {
+            speedup_throttle_spin->SetValue((coreOptions.speedup_frame_skip + 1) * 100);
             frame_skip_cb->SetValue(true);
             frame_skip_cb->Disable();
         }
         else {
-            speedup_throttle_spin->SetValue(speedup_throttle);
+            speedup_throttle_spin->SetValue(coreOptions.speedup_throttle);
             frame_skip_cb->SetValue(coreOptions.speedup_throttle_frame_skip);
 
-            if (speedup_throttle != 0)
+            if (coreOptions.speedup_throttle != 0)
                 frame_skip_cb->Enable();
             else
                 frame_skip_cb->Disable();
@@ -3303,7 +3303,7 @@ bool MainFrame::BindControls()
             getrbi("PNG", captureFormat, 0);
             getrbi("BMP", captureFormat, 1);
             getsc("RewindInterval", gopts.rewind_interval);
-            getsc_uint("Throttle", throttle);
+            getsc_uint("Throttle", coreOptions.throttle);
             throttle_ctrl.thr = sc;
             throttle_ctrl.thrsel = SafeXRCCTRL<wxChoice>(d, "ThrottleSel");
             throttle_ctrl.thr->Connect(wxEVT_COMMAND_SPINCTRL_UPDATED,

@@ -39,13 +39,16 @@ extern struct CoreOptions {
     int skipSaveGameCheats = 0;
     int useBios = 0;
     int winGbPrinterEnabled = 1;
+    uint32_t speedup_throttle = 100;
+    uint32_t speedup_frame_skip = 9;
+    uint32_t throttle = 100;
+    const char *loadDotCodeFile = nullptr;
+    const char *saveDotCodeFile = nullptr;
 } coreOptions;
 
 extern const char *biosFileNameGB;
 extern const char *biosFileNameGBA;
 extern const char *biosFileNameGBC;
-extern const char *loadDotCodeFile;
-extern const char *saveDotCodeFile;
 extern int agbPrint;
 extern int autoFireMaxCount;
 extern int autoFrameSkip;
@@ -64,9 +67,6 @@ extern int pauseWhenInactive;
 extern int rewindTimer;
 extern int showSpeed;
 extern int showSpeedTransparent;
-extern uint32_t throttle;
-extern uint32_t speedup_throttle;
-extern uint32_t speedup_frame_skip;
 extern bool allowKeyboardBackgroundInput;
 extern bool allowJoystickBackgroundInput;
 
