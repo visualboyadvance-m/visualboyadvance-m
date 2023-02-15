@@ -76,7 +76,7 @@ extern void systemPossibleCartridgeRumble(bool);
 extern void updateRumbleFrame();
 extern bool systemCanChangeSoundQuality();
 extern void systemShowSpeed(int);
-extern void system10Frames(int);
+extern void system10Frames();
 extern void systemFrame();
 extern void systemGbBorderOn();
 extern void Sm60FPS_Init();

@@ -5016,7 +5016,7 @@ void gbEmulate(int ticksToStop)
                             gbSoundTick(soundTicks);
 
                             if ((gbFrameCount % 10) == 0)
-                                system10Frames(60);
+                                system10Frames();
 
                             if (gbFrameCount >= 60) {
                                 uint32_t currentTime = systemGetClock();
@@ -5224,7 +5224,7 @@ void gbEmulate(int ticksToStop)
                         gbSoundTick(soundTicks);
 
                         if ((gbFrameCount % 10) == 0)
-                            system10Frames(60);
+                            system10Frames();
 
                         if (gbFrameCount >= 60) {
                             uint32_t currentTime = systemGetClock();

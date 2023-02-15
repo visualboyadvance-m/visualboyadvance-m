@@ -1896,7 +1896,7 @@ void systemShowSpeed(int)
 {
 }
 
-void system10Frames(int)
+void system10Frames()
 {
 }
 

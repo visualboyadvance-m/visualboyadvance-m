@@ -3859,7 +3859,7 @@ void CPULoop(int ticks)
                             systemFrame();
 
                             if ((count % 10) == 0) {
-                                system10Frames(60);
+                                system10Frames();
                             }
                             if (count == 60) {
                                 uint32_t time = systemGetClock();
