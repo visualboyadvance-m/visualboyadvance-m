@@ -85,6 +85,61 @@ private:
     void OnValueChanged() final;
 };
 
+// "Generic" validator for a wxChecBox or wxRadioButton widget with a kUnsigned
+// Option. This will make sure the kUnsigned Option and the wxRadioButton or
+// wxCheckBox are kept in sync. The widget will be checked if the kUnsigned
+// Option matches the provided `value` parameter in the constructor.
+class OptionSelectedValidator : public OptionValidator {
+public:
+    OptionSelectedValidator(config::OptionID option_id, uint32_t value);
+    ~OptionSelectedValidator() override = default;
+
+    // Returns a copy of the object.
+    wxObject* Clone() const override;
+
+private:
+    // OptionValidator implementation.
+    bool IsWindowValueValid() override;
+    bool WriteToWindow() override;
+    bool WriteToOption() override;
+
+    const uint32_t value_;
+};
+
+// Validator for a wxSpinCtrl  widget with a kInt Option. This will keep the
+// kInt Option and the wxSpinCtrl selection in sync.
+class OptionSpinCtrlValidator : public OptionValidator {
+public:
+    explicit OptionSpinCtrlValidator(config::OptionID option_id);
+    ~OptionSpinCtrlValidator() override = default;
+
+    // Returns a copy of the object.
+    wxObject* Clone() const override;
+
+private:
+    // OptionValidator implementation.
+    bool IsWindowValueValid() override;
+    bool WriteToWindow() override;
+    bool WriteToOption() override;
+};
+
+// Validator for a wxChoice  widget with a kUnsigned Option. This will keep the
+// kUnsigned Option and the wxChoice selection in sync.
+class OptionChoiceValidator : public OptionValidator {
+public:
+    explicit OptionChoiceValidator(config::OptionID option_id);
+    ~OptionChoiceValidator() override = default;
+
+    // Returns a copy of the object.
+    wxObject* Clone() const override;
+
+private:
+    // OptionValidator implementation.
+    bool IsWindowValueValid() override;
+    bool WriteToWindow() override;
+    bool WriteToOption() override;
+};
+
 }  // namespace widgets
 
 #endif  // VBAM_WX_WIDGETS_OPTION_VALIDATOR_H_

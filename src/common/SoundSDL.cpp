@@ -19,7 +19,6 @@
 #include <iostream>
 #include <SDL_events.h>
 #include "SoundSDL.h"
-#include "ConfigManager.h"
 #include "../gba/Globals.h"
 #include "../gba/Sound.h"
 

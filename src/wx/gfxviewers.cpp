@@ -2,10 +2,12 @@
 // these are all the viewer dialogs with graphical panel areas
 // they can be instantiated multiple times
 
-#include "viewsupt.h"
-#include "wxvbam.h"
 #include <wx/colordlg.h>
 #include <wx/ffile.h>
+
+#include "config/option-proxy.h"
+#include "viewsupt.h"
+#include "wxvbam.h"
 
 // FIXME: many of these read e.g. palette data directly without regard to
 // byte order.  Need to determine where things are stored in emulated machine
@@ -1592,14 +1594,15 @@ public:
         wxString def_name = panel->game_name() + wxT('-') + dname;
         def_name.resize(def_name.size() - 6); // strlen("Viewer")
 
-        if (captureFormat)
-            def_name += wxT(".bmp");
+        const int capture_format = OPTION(kPrefCaptureFormat);
+        if (capture_format == 0)
+            def_name.append(".png");
         else
-            def_name += wxT(".png");
+            def_name.append(".bmp");
 
         wxFileDialog dlg(GetGrandParent(), _("Select output file"), bmp_save_dir, def_name,
             _("PNG images|*.png|BMP images|*.bmp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-        dlg.SetFilterIndex(captureFormat);
+        dlg.SetFilterIndex(capture_format);
         int ret = dlg.ShowModal();
         bmp_save_dir = dlg.GetDirectory();
 
@@ -1734,14 +1737,15 @@ public:
         wxString def_name = panel->game_name() + wxT('-') + dname;
         def_name.resize(def_name.size() - 6); // strlen("Viewer")
 
-        if (captureFormat)
-            def_name += wxT(".bmp");
+        const int capture_format = OPTION(kPrefCaptureFormat);
+        if (capture_format == 0)
+            def_name.append(".png");
         else
-            def_name += wxT(".png");
+            def_name.append(".bmp");
 
         wxFileDialog dlg(GetGrandParent(), _("Select output file"), bmp_save_dir, def_name,
             _("PNG images|*.png|BMP images|*.bmp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-        dlg.SetFilterIndex(captureFormat);
+        dlg.SetFilterIndex(capture_format);
         int ret = dlg.ShowModal();
         bmp_save_dir = dlg.GetDirectory();
 

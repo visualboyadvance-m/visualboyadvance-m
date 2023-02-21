@@ -198,7 +198,7 @@ void GameArea::LoadGame(const wxString& name)
     // out to a temporary file and load it (and can't just use
     // AssignTempFileName because it needs correct extension)
     // too much trouble for now, though
-    bool loadpatch = autoPatch;
+    bool loadpatch = OPTION(kPrefAutoPatch);
     wxFileName pfn = loaded_game;
     int ovSaveType = 0;
 
@@ -331,7 +331,7 @@ void GameArea::LoadGame(const wxString& name)
             int fsz = cfg->Read(wxT("flashSize"), (long)0);
 
             if (fsz != 0x10000 && fsz != 0x20000)
-                fsz = 0x10000 << optFlashSize;
+                fsz = 0x10000 << OPTION(kPrefFlashSize);
 
             flashSetSize(fsz);
             ovSaveType = cfg->Read(wxT("coreOptions.saveType"), coreOptions.cpuSaveType);
@@ -348,7 +348,7 @@ void GameArea::LoadGame(const wxString& name)
             cfg->SetPath(wxT("/"));
         } else {
             rtcEnable(coreOptions.rtcEnabled);
-            flashSetSize(0x10000 << optFlashSize);
+            flashSetSize(0x10000 << OPTION(kPrefFlashSize));
 
             if (coreOptions.cpuSaveType < 0 || coreOptions.cpuSaveType > 5)
                 coreOptions.cpuSaveType = 0;
@@ -420,12 +420,13 @@ void GameArea::LoadGame(const wxString& name)
         gbSerialFunction = gbPrinterSend;
 
     // probably only need to do this for GBA carts
-    agbPrintEnable(agbPrint);
-    // set frame skip based on ROM type
-    systemFrameSkip = frameSkip;
+    agbPrintEnable(OPTION(kPrefAgbPrint));
 
-    if (systemFrameSkip < 0)
-        systemFrameSkip = 0;
+    // set frame skip based on ROM type
+    const int frame_skip = OPTION(kPrefFrameSkip);
+    if (frame_skip != -1) {
+        systemFrameSkip = frame_skip;
+    }
 
     // load battery and/or saved state
     recompute_dirs();
@@ -1892,9 +1893,9 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
         if (panel->osdstat.size())
             drawText(todraw + outstride * (systemColorDepth != 24), outstride,
-                10, 20, UTF8(panel->osdstat), showSpeedTransparent);
+                10, 20, UTF8(panel->osdstat), OPTION(kPrefShowSpeedTransparent));
 
-        if (!disableStatusMessages && !panel->osdtext.empty()) {
+        if (!OPTION(kPrefDisableStatus) && !panel->osdtext.empty()) {
             if (systemGetClock() - panel->osdtime < OSD_TIME) {
                 wxString message = panel->osdtext;
                 int linelen = std::ceil(width * scale - 20) / 8;
@@ -1908,7 +1909,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                     ptr[linelen] = 0;
                     drawText(todraw + outstride * (systemColorDepth != 24),
                         outstride, 10, cury, ptr,
-                        showSpeedTransparent);
+                        OPTION(kPrefShowSpeedTransparent));
                     cury += 10;
                     nlines--;
                     ptr += linelen;
@@ -1917,7 +1918,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
                 drawText(todraw + outstride * (systemColorDepth != 24),
                     outstride, 10, cury, ptr,
-                    showSpeedTransparent);
+                    OPTION(kPrefShowSpeedTransparent));
 
                 free(buf);
                 buf = NULL;
@@ -1957,7 +1958,7 @@ void DrawingPanelBase::DrawOSD(wxWindowDC& dc)
     // directly into the output like DrawText, this is only enabled for
     // non-3d renderers.
     GameArea* panel = wxGetApp().frame->GetPanel();
-    dc.SetTextForeground(wxColour(255, 0, 0, showSpeedTransparent ? 128 : 255));
+    dc.SetTextForeground(wxColour(255, 0, 0, OPTION(kPrefShowSpeedTransparent) ? 128 : 255));
     dc.SetTextBackground(wxColour(0, 0, 0, 0));
     dc.SetUserScale(1.0, 1.0);
 
@@ -1971,7 +1972,7 @@ void DrawingPanelBase::DrawOSD(wxWindowDC& dc)
         }
     }
 
-    if (!disableStatusMessages && !panel->osdtext.empty()) {
+    if (!OPTION(kPrefDisableStatus) && !panel->osdtext.empty()) {
         wxSize asz = dc.GetSize();
         wxString msg = panel->osdtext;
         int lw, lh;

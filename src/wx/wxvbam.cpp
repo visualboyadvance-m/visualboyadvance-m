@@ -817,7 +817,7 @@ void MainFrame::OnActivate(wxActivateEvent& event)
     if (panel && focused)
         panel->SetFocus();
 
-    if (pauseWhenInactive) {
+    if (OPTION(kPrefPauseWhenInactive)) {
         if (panel && focused && !paused) {
             panel->Resume();
         }

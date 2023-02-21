@@ -224,7 +224,7 @@ public:
                              const config::OptionID& option_id);
     void GetMenuOptionInt(const wxString& menuName, int* field, int mask);
     void GetMenuOptionBool(const wxString& menuName, bool* field);
-    void SetMenuOption(const wxString& menuName, int value);
+    void SetMenuOption(const wxString& menuName, bool value);
 
     void SetJoystick();
 
