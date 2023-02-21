@@ -30,6 +30,7 @@
 #include "config/user-input.h"
 #include "dialogs/display-config.h"
 #include "opts.h"
+#include "widgets/option-validator.h"
 
 #if defined(__WXGTK__)
 #include "wayland.h"
@@ -2981,6 +2982,12 @@ bool MainFrame::BindControls()
         d = LoadXRCDialog("NetLink");
 #endif
         wxRadioButton* rb;
+#define getrbo(name, option_id, value)                            \
+    do {                                                           \
+        rb = SafeXRCCTRL<wxRadioButton>(d, name);                  \
+        rb->SetValidator(                                          \
+            ::widgets::OptionSelectedValidator(option_id, value)); \
+    } while (0)
 #define getrbi(n, o, v)                              \
     do {                                             \
         rb = SafeXRCCTRL<wxRadioButton>(d, n);       \
@@ -3300,8 +3307,8 @@ bool MainFrame::BindControls()
         sc->SetValidator(wxUIntValidator(&o));    \
     } while (0)
         {
-            getrbi("PNG", captureFormat, 0);
-            getrbi("BMP", captureFormat, 1);
+            getrbo("PNG", config::OptionID::kPrefCaptureFormat, 0);
+            getrbo("BMP", config::OptionID::kPrefCaptureFormat, 1);
             getsc("RewindInterval", gopts.rewind_interval);
             getsc_uint("Throttle", coreOptions.throttle);
             throttle_ctrl.thr = sc;
@@ -3455,7 +3462,10 @@ bool MainFrame::BindControls()
             /// System and peripherals
             ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "SaveType", wxGenericValidator(&coreOptions.cpuSaveType));
             BatConfigHandler.type = ch;
-            ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "FlashSize", wxGenericValidator(&optFlashSize));
+            ch = GetValidatedChild<wxChoice, widgets::OptionChoiceValidator>(
+                d, "FlashSize",
+                widgets::OptionChoiceValidator(
+                    config::OptionID::kPrefFlashSize));
             BatConfigHandler.size = ch;
             d->Connect(XRCID("SaveType"), wxEVT_COMMAND_CHOICE_SELECTED,
                 wxCommandEventHandler(BatConfig_t::ChangeType),

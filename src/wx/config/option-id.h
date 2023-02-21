@@ -1,6 +1,8 @@
 #ifndef VBAM_WX_CONFIG_OPTION_ID_H_
 #define VBAM_WX_CONFIG_OPTION_ID_H_
 
+#include <cstddef>
+
 namespace config {
 
 enum class OptionID {

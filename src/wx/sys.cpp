@@ -452,7 +452,7 @@ void systemShowSpeed(int speed)
     wxString s;
     s.Printf(_("%d %% (%d, %d fps)"), speed, systemFrameSkip, frames * speed / 100);
 
-    switch (showSpeed) {
+    switch (OPTION(kPrefShowSpeed)) {
     case SS_NONE:
         f->GetPanel()->osdstat.clear();
         break;
@@ -474,9 +474,8 @@ int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
 void system10Frames() {
     GameArea* panel = wxGetApp().frame->GetPanel();
-    int fs = frameSkip;
 
-    if (fs < 0) {
+    if (OPTION(kPrefFrameSkip) == -1) {
         // We keep a rolling mean of the last second and use this value to
         // adjust the systemFrameSkip value dynamically.
 
@@ -550,24 +549,25 @@ void systemScreenCapture(int num)
     GameArea* panel = wxGetApp().frame->GetPanel();
     wxFileName fn = wxFileName(wxGetApp().frame->GetGamePath(gopts.scrshot_dir), wxEmptyString);
 
+    const int capture_format = OPTION(kPrefCaptureFormat);
     do {
         wxString bfn;
         bfn.Printf(wxT("%s%02d"), panel->game_name().c_str(),
             num++);
 
-        if (captureFormat == 0)
-            bfn.append(wxT(".png"));
-        else // if(gopts.cap_format == 1)
-            bfn.append(wxT(".bmp"));
+        if (capture_format == 0)
+            bfn.append(".png");
+        else
+            bfn.append(".bmp");
 
         fn.SetFullName(bfn);
     } while (fn.FileExists());
 
     fn.Mkdir(0777, wxPATH_MKDIR_FULL);
 
-    if (captureFormat == 0)
+    if (capture_format == 0)
         panel->emusys->emuWritePNG(UTF8(fn.GetFullPath()));
-    else // if(gopts.cap_format == 1)
+    else
         panel->emusys->emuWriteBMP(UTF8(fn.GetFullPath()));
 
     wxString msg;
@@ -930,10 +930,10 @@ void PrintDialog::DoSave(wxCommandEvent&)
     pats.append(wxALL_FILES);
     wxString dn = wxGetApp().frame->GetPanel()->game_name();
 
-    if (captureFormat == 0)
-        dn.append(wxT(".png"));
-    else // if(gopts.cap_format == 1)
-        dn.append(wxT(".bmp"));
+    if (OPTION(kPrefCaptureFormat) == 0)
+        dn.append(".png");
+    else
+        dn.append(".bmp");
 
     wxFileDialog fdlg(dlg, _("Save printer image to"), prsav_path, dn,
         pats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
@@ -1106,16 +1106,17 @@ void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int con
     if (gopts.print_screen_cap) {
         wxFileName fn = wxFileName(wxGetApp().frame->GetGamePath(gopts.scrshot_dir), wxEmptyString);
         int num = 1;
+        const int capture_format = OPTION(kPrefCaptureFormat);
 
         do {
             wxString bfn;
             bfn.Printf(wxT("%s-print%02d"), panel->game_name().c_str(),
                 num++);
 
-            if (captureFormat == 0)
-                bfn.append(wxT(".png"));
-            else // if(gopts.cap_format == 1)
-                bfn.append(wxT(".bmp"));
+            if (capture_format == 0)
+                bfn.append(".png");
+            else
+                bfn.append(".bmp");
 
             fn.SetFullName(bfn);
         } while (fn.FileExists());
@@ -1128,7 +1129,7 @@ void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int con
         systemGreenShift = 5;
         systemBlueShift = 0;
         wxString of = fn.GetFullPath();
-        bool ret = captureFormat == 0 ? utilWritePNGFile(UTF8(of), 160, lines, (uint8_t*)to_print) : utilWriteBMPFile(UTF8(of), 160, lines, (uint8_t*)to_print);
+        bool ret = capture_format == 0 ? utilWritePNGFile(UTF8(of), 160, lines, (uint8_t*)to_print) : utilWriteBMPFile(UTF8(of), 160, lines, (uint8_t*)to_print);
 
         if (ret) {
             wxString msg;

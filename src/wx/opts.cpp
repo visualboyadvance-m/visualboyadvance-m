@@ -338,10 +338,6 @@ wxAcceleratorEntry_v sys_accels;
 opts_t::opts_t()
 {
     recent = new wxFileHistory(10);
-
-    // These are globals being set here.
-    frameSkip = -1;
-    autoPatch = true;
 }
 
 // FIXME: simulate MakeInstanceFilename(vbam.ini) using subkeys (Slave%d/*)

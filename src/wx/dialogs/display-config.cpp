@@ -8,8 +8,6 @@
 #include <wx/log.h>
 #include <wx/object.h>
 #include <wx/radiobut.h>
-#include <wx/spinctrl.h>
-#include <wx/stdpaths.h>
 #include <wx/textctrl.h>
 #include <wx/valnum.h>
 
@@ -261,17 +259,14 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
     wxXmlResource::Get()->LoadDialog(this, parent, "DisplayConfig");
 
     // Speed
-    // AutoSkip/FrameSkip are 2 controls for 1 value.  Needs post-process
-    // to ensure checkbox not ignored
     GetValidatedChild(this, "FrameSkip")
-        ->SetValidator(wxGenericValidator(&frameSkip));
-    if (frameSkip >= 0) {
-        systemFrameSkip = frameSkip;
-    }
+        ->SetValidator(
+            widgets::OptionSpinCtrlValidator(config::OptionID::kPrefFrameSkip));
 
     // On-Screen Display
     GetValidatedChild(this, "SpeedIndicator")
-        ->SetValidator(wxGenericValidator(&showSpeed));
+        ->SetValidator(
+            widgets::OptionChoiceValidator(config::OptionID::kPrefShowSpeed));
 
     // Zoom
     GetValidatedChild(this, "DefaultScale")->SetValidator(ScaleValidator());

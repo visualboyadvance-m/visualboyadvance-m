@@ -164,6 +164,18 @@ std::array<Option, kNbOptions>& Option::All() {
         /// GB
         bool colorizer_hack = false;
 
+        /// Core
+        bool agb_print = false;
+        bool auto_frame_skip = false;
+        bool auto_patch = true;
+        uint32_t capture_format = 0;
+        bool disable_status_messages = false;
+        uint32_t flash_size = 0;
+        int32_t frame_skip = 0;
+        bool pause_when_inactive = false;
+        uint32_t show_speed = 0;
+        bool show_speed_transparent = false;
+
         /// General
         uint32_t ini_version = kIniLatestVersion;
 
@@ -248,18 +260,18 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kKeyboard),
 
         /// Core
-        Option(OptionID::kPrefAgbPrint, &agbPrint, 0, 1),
-        Option(OptionID::kPrefAutoFrameSkip, &autoFrameSkip, 0, 1),
-        Option(OptionID::kPrefAutoPatch, &autoPatch, 0, 1),
+        Option(OptionID::kPrefAgbPrint, &g_owned_opts.agb_print),
+        Option(OptionID::kPrefAutoFrameSkip, &g_owned_opts.auto_frame_skip),
+        Option(OptionID::kPrefAutoPatch, &g_owned_opts.auto_patch),
         Option(OptionID::kPrefAutoSaveLoadCheatList, &gopts.autoload_cheats),
         Option(OptionID::kPrefBorderAutomatic, &gbBorderAutomatic, 0, 1),
         Option(OptionID::kPrefBorderOn, &gbBorderOn, 0, 1),
-        Option(OptionID::kPrefCaptureFormat, &captureFormat, 0, 1),
+        Option(OptionID::kPrefCaptureFormat, &g_owned_opts.capture_format, 0, 1),
         Option(OptionID::kPrefCheatsEnabled, &coreOptions.cheatsEnabled, 0, 1),
-        Option(OptionID::kPrefDisableStatus, &disableStatusMessages, 0, 1),
+        Option(OptionID::kPrefDisableStatus, &g_owned_opts.disable_status_messages),
         Option(OptionID::kPrefEmulatorType, &gbEmulatorType, 0, 5),
-        Option(OptionID::kPrefFlashSize, &optFlashSize, 0, 1),
-        Option(OptionID::kPrefFrameSkip, &frameSkip, -1, 9),
+        Option(OptionID::kPrefFlashSize, &g_owned_opts.flash_size, 0, 1),
+        Option(OptionID::kPrefFrameSkip, &g_owned_opts.frame_skip, -1, 9),
         Option(OptionID::kPrefGBPaletteOption, &gbPaletteOption, 0, 2),
         Option(OptionID::kPrefGBPrinter, &coreOptions.winGbPrinterEnabled, 0, 1),
         Option(OptionID::kPrefGDBBreakOnLoad, &gopts.gdb_break_on_load),
@@ -268,11 +280,11 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kPrefLinkNumPlayers, &gopts.link_num_players, 2, 4),
 #endif
         Option(OptionID::kPrefMaxScale, &gopts.max_scale, 0, 100),
-        Option(OptionID::kPrefPauseWhenInactive, &pauseWhenInactive, 0, 1),
+        Option(OptionID::kPrefPauseWhenInactive, &g_owned_opts.pause_when_inactive),
         Option(OptionID::kPrefRTCEnabled, &coreOptions.rtcEnabled, 0, 1),
         Option(OptionID::kPrefSaveType, &coreOptions.cpuSaveType, 0, 5),
-        Option(OptionID::kPrefShowSpeed, &showSpeed, 0, 2),
-        Option(OptionID::kPrefShowSpeedTransparent, &showSpeedTransparent, 0, 1),
+        Option(OptionID::kPrefShowSpeed, &g_owned_opts.show_speed, 0, 2),
+        Option(OptionID::kPrefShowSpeedTransparent, &g_owned_opts.show_speed_transparent),
         Option(OptionID::kPrefSkipBios, &coreOptions.skipBios, 0, 1),
         Option(OptionID::kPrefSkipSaveGameCheats, &coreOptions.skipSaveGameCheats, 0, 1),
         Option(OptionID::kPrefSkipSaveGameBattery, &coreOptions.skipSaveGameBattery, 0, 1),

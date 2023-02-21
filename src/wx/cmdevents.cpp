@@ -91,7 +91,7 @@ void MainFrame::GetMenuOptionInt(const wxString& menuName, int* field, int mask)
     *field = ((*field) & ~(mask)) | (is_checked ? (value) : 0);
 }
 
-void MainFrame::SetMenuOption(const wxString& menuName, int value)
+void MainFrame::SetMenuOption(const wxString& menuName, bool value)
 {
     int id = wxXmlResource::GetXRCID(menuName);
 
@@ -1177,14 +1177,15 @@ EVT_HANDLER_MASK(ScreenCapture, "Screen capture...", CMDEN_GB | CMDEN_GBA)
     wxString scap_path = GetGamePath(gopts.scrshot_dir);
     wxString def_name = panel->game_name();
 
-    if (captureFormat == 0)
-        def_name.append(wxT(".png"));
+    const int capture_format = OPTION(kPrefCaptureFormat);
+    if (capture_format == 0)
+        def_name.append(".png");
     else
-        def_name.append(wxT(".bmp"));
+        def_name.append(".bmp");
 
     wxFileDialog dlg(this, _("Select output file"), scap_path, def_name,
         _("PNG images|*.png|BMP images|*.bmp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-    dlg.SetFilterIndex(captureFormat);
+    dlg.SetFilterIndex(capture_format);
     int ret = ShowModal(&dlg);
     scap_path = dlg.GetDirectory();
 
@@ -1512,10 +1513,10 @@ EVT_HANDLER(Pause, "Pause (toggle)")
         panel->Resume();
 
     // undo next-frame's zeroing of frameskip
-    int fs = frameSkip;
-
-    if (fs >= 0)
-        systemFrameSkip = fs;
+    const int frame_skip = OPTION(kPrefFrameSkip);
+    if (frame_skip != -1) {
+        systemFrameSkip = frame_skip;
+    }
 }
 
 // new
@@ -2614,7 +2615,7 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
         return;
 
     if (panel->game_type() == IMAGE_GBA) {
-        agbPrintEnable(agbPrint);
+        agbPrintEnable(OPTION(kPrefAgbPrint));
         wxString s = wxString((const char*)&rom[0xac], wxConvLibc, 4);
         wxFileConfig* cfg = wxGetApp().overrides;
         bool chg;
@@ -2726,8 +2727,9 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
         return;
     }
 
-    if (frameSkip >= 0) {
-        systemFrameSkip = frameSkip;
+    const int frame_skip = OPTION(kPrefFrameSkip);
+    if (frame_skip != -1) {
+        systemFrameSkip = frame_skip;
     }
 
     update_opts();
@@ -3000,8 +3002,7 @@ EVT_HANDLER(GBSurround, "GB surround sound effect (%)")
 
 EVT_HANDLER(AGBPrinter, "Enable AGB printer")
 {
-    GetMenuOptionInt("AGBPrinter", &agbPrint, 1);
-    update_opts();
+    GetMenuOptionConfig("AGBPrinter", config::OptionID::kPrefAgbPrint);
 }
 
 EVT_HANDLER_MASK(GBALcdFilter, "Enable LCD filter", CMDEN_GBA)
@@ -3037,8 +3038,7 @@ EVT_HANDLER(GBColorOption, "Enable GB color option")
 
 EVT_HANDLER(ApplyPatches, "Apply IPS/UPS/IPF patches if found")
 {
-    GetMenuOptionInt("ApplyPatches", &autoPatch, 1);
-    update_opts();
+    GetMenuOptionConfig("ApplyPatches", config::OptionID::kPrefAutoPatch);
 }
 
 EVT_HANDLER(KeepOnTop, "Keep window on top")
@@ -3064,14 +3064,12 @@ EVT_HANDLER(StatusBar, "Enable status bar")
 
 EVT_HANDLER(NoStatusMsg, "Disable on-screen status messages")
 {
-    GetMenuOptionInt("NoStatusMsg", &disableStatusMessages, 1);
-    update_opts();
+    GetMenuOptionConfig("NoStatusMsg", config::OptionID::kPrefDisableStatus);
 }
 
 EVT_HANDLER(FrameSkipAuto, "Auto Skip frames.")
 {
-    GetMenuOptionInt("FrameSkipAuto", &autoFrameSkip, 1);
-    update_opts();
+    GetMenuOptionConfig("FrameSkipAuto", config::OptionID::kPrefAutoFrameSkip);
 }
 
 EVT_HANDLER(Fullscreen, "Enter fullscreen mode at startup")
@@ -3081,8 +3079,7 @@ EVT_HANDLER(Fullscreen, "Enter fullscreen mode at startup")
 
 EVT_HANDLER(PauseWhenInactive, "Pause game when main window loses focus")
 {
-    GetMenuOptionInt("PauseWhenInactive", &pauseWhenInactive, 1);
-    update_opts();
+    GetMenuOptionConfig("PauseWhenInactive", config::OptionID::kPrefPauseWhenInactive);
 }
 
 EVT_HANDLER(RTC, "Enable RTC (vba-over.ini override is rtcEnabled")
@@ -3093,8 +3090,7 @@ EVT_HANDLER(RTC, "Enable RTC (vba-over.ini override is rtcEnabled")
 
 EVT_HANDLER(Transparent, "Draw on-screen messages transparently")
 {
-    GetMenuOptionInt("Transparent", &showSpeedTransparent, 1);
-    update_opts();
+    GetMenuOptionConfig("Transparent", config::OptionID::kPrefShowSpeedTransparent);
 }
 
 EVT_HANDLER(SkipIntro, "Skip BIOS initialization")
