@@ -2993,6 +2993,52 @@ void gbWriteSaveTAMA5(const char* name, bool extendedSave)
     fclose(gzFile);
 }
 
+void gbWriteSaveHUC3(const char* name, bool extendedSave)
+{
+    if (gbRam || extendedSave) {
+        FILE* gzFile = fopen(name, "wb");
+        if (gbRam) {
+
+            if (gzFile == NULL) {
+                systemMessage(MSG_ERROR_CREATING_FILE, N_("Error creating file %s"), name);
+                return;
+            }
+
+            fwrite(gbRam,
+                1,
+                (gbRamSizeMask + 1),
+                gzFile);
+        }
+
+        if (extendedSave)
+            fwrite(&gbRTCHuC3.mapperLastTime,
+                1,
+                HUC3_RTC_DATA_SIZE,
+                gzFile);
+
+        fclose(gzFile);
+    }
+}
+
+void gbWriteSaveHUC1(const char* name)
+{
+    if (gbRam) {
+        FILE* gzFile = utilOpenFile(name, "wb");
+
+        if (gzFile == NULL) {
+            systemMessage(MSG_ERROR_CREATING_FILE, N_("Error creating file %s"), name);
+            return;
+        }
+
+        fwrite(gbRam,
+            1,
+            (gbRamSizeMask + 1),
+            gzFile);
+
+        fclose(gzFile);
+    }
+}
+
 void gbWriteSaveMMM01(const char* name)
 {
     if (gbRam) {
@@ -3297,6 +3343,105 @@ bool gbReadSaveTAMA5(const char* name)
     return res;
 }
 
+bool gbReadSaveHUC3(const char* name)
+{
+    gzFile gzFile = utilAutoGzOpen(name, "rb");
+
+    if (gzFile == NULL) {
+        return false;
+    }
+
+    int read = 0;
+
+    if (gbRam)
+        read = gzread(gzFile,
+            gbRam,
+            (gbRamSizeMask + 1));
+    else
+        read = (gbRamSizeMask + 1);
+
+    bool res = true;
+
+    if (read != (gbRamSizeMask + 1)) {
+        systemMessage(MSG_FAILED_TO_READ_SGM,
+            N_("Battery file's size incompatible with the rom settings %s (%d).\nWarning : save of the battery file is now disabled !"), name, read);
+        gbBatteryError = true;
+        res = false;
+    }
+    else if ((gbRomType == 0xf) || (gbRomType == 0xfe)) { // read RTC data
+        read = gzread(gzFile,
+            &gbRTCHuC3.mapperLastTime,
+            HUC3_RTC_DATA_SIZE);
+
+        if (!read || (read != HUC3_RTC_DATA_SIZE && read != HUC3_RTC_DATA_SIZE - 4)) { // detect old 32 bit saves
+            systemMessage(MSG_FAILED_TO_READ_RTC, N_("Failed to read RTC from save game %s (continuing)"),
+                name);
+            res = false;
+        }
+        else {
+            // Also checks if the battery file it bigger than gbRamSizeMask+1+RTC !
+            uint8_t data[1];
+            data[0] = 0;
+
+            read = gzread(gzFile,
+                data,
+                1);
+            if (read > 0) {
+                systemMessage(MSG_FAILED_TO_READ_SGM,
+                    N_("Battery file's size incompatible with the rom settings %s (%d).\nWarning : save of the battery file is now disabled !"), name, read);
+                gbBatteryError = true;
+                res = false;
+            }
+        }
+    }
+
+    gzclose(gzFile);
+    return res;
+}
+
+bool gbReadSaveHUC1(const char* name)
+{
+    if (gbRam) {
+        gzFile gzFile = utilAutoGzOpen(name, "rb");
+
+        if (gzFile == NULL) {
+            return false;
+        }
+
+        int read = gzread(gzFile,
+            gbRam,
+            (gbRamSizeMask + 1));
+
+        if (read != (gbRamSizeMask + 1)) {
+            systemMessage(MSG_FAILED_TO_READ_SGM,
+                N_("Battery file's size incompatible with the rom settings %s (%d).\nWarning : save of the battery file is now disabled !"), name, read);
+            gzclose(gzFile);
+            gbBatteryError = true;
+            return false;
+        }
+
+        // Also checks if the battery file it bigger than gbRamSizeMask+1 !
+        uint8_t data[1];
+        data[0] = 0;
+
+        read = gzread(gzFile,
+            data,
+            1);
+        if (read > 0) {
+            systemMessage(MSG_FAILED_TO_READ_SGM,
+                N_("Battery file's size incompatible with the rom settings %s (%d).\nWarning : save of the battery file is now disabled !"), name, read);
+            gzclose(gzFile);
+            gbBatteryError = true;
+            return false;
+        }
+
+        gzclose(gzFile);
+        return true;
+    }
+    else
+        return false;
+}
+
 bool gbReadSaveMMM01(const char* name)
 {
     if (gbRam) {
@@ -3389,8 +3534,11 @@ bool gbWriteBatteryFile(const char* file, bool extendedSave)
         case 0xfd:
             gbWriteSaveTAMA5(file, extendedSave);
             break;
+        case 0xfe:
+            gbWriteSaveHUC3(file, extendedSave);
+            break;
         case 0xff:
-            gbWriteSaveMBC1(file);
+            gbWriteSaveHUC1(file);
             break;
         }
     }
@@ -3482,8 +3630,18 @@ bool gbReadBatteryFile(const char* file)
             }
             res = true;
             break;
+        case 0xfe:
+            if (!gbReadSaveHUC3(file)) {
+                time(&gbRTCHuC3.mapperLastTime);
+                struct tm* lt;
+                lt = localtime(&gbRTCHuC3.mapperLastTime);
+                res = false;
+                break;
+            }
+            res = true;
+            break;
         case 0xff:
-            res = gbReadSaveMBC1(file);
+            res = gbReadSaveHUC1(file);
             break;
         }
     }
