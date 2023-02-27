@@ -103,6 +103,9 @@ void flashSaveDecide(uint32_t address, uint8_t byte)
             cpuSramEnabled ? "SRAM" : "FLASH", address, byte);
     }
 
+    if (coreOptions.saveType == GBA_SAVE_NONE)
+        return;
+
     (*cpuSaveGameFunc)(address, byte);
 }
 
