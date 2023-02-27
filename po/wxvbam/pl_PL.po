@@ -25,7 +25,7 @@ msgstr "visualboyadvance-m"
 #: wxvbam.cpp:333 wxvbam.cpp:350
 #, c-format
 msgid "Invalid configuration file provided: %s"
-msgstr ""
+msgstr "Podano nieprawidłowy plik konfiguracyjny: %s"
 
 #: wxvbam.cpp:489
 msgid "Could not create main window"
@@ -545,7 +545,7 @@ msgstr "ROM + MBC7 + BATT"
 
 #: cmdevents.cpp:707
 msgid "Game Shark 3.0"
-msgstr ""
+msgstr "Game Shark 3.0"
 
 #: cmdevents.cpp:711
 msgid "ROM + POCKET CAMERA"
@@ -652,7 +652,7 @@ msgstr "Wybierz plik migawki"
 msgid ""
 "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
 " (*.gsv)|*.gsv"
-msgstr ""
+msgstr "Migawki Game Shark i PAC (*.sps;*.xps)|*.sps;*.xps|Migawki Game Shark SP (*.gsv)|*.gsv"
 
 #: cmdevents.cpp:1066
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
@@ -784,15 +784,15 @@ msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
-msgstr ""
+msgstr "TWOJA KONFIGURACJA ZOSTANIE USUNIĘTA!\n\nJesteś pewien(wna)?"
 
 #: cmdevents.cpp:2862
 msgid "FACTORY RESET"
-msgstr ""
+msgstr "PRZYWRÓCENIE USTAWIEŃ FABRYCZNYCH"
 
 #: cmdevents.cpp:2897
 msgid "Nintendo Game Boy / Color / Advance emulator."
-msgstr ""
+msgstr "Emulator konsoli Nintendo Game Boy / Color / Advance."
 
 #: cmdevents.cpp:2898
 msgid ""
@@ -861,7 +861,7 @@ msgstr "OK"
 msgid ""
 "The INI file was written for a more recent version of VBA-M. Some INI option"
 " values may have been reset."
-msgstr ""
+msgstr "Plik INI został napisany dla nowszej wersji VBA-M. Niektóre wartości opcji INI mogły zostać zresetowane."
 
 #: opts.cpp:551 opts.cpp:572 opts.cpp:808
 #, c-format
@@ -1305,7 +1305,7 @@ msgstr "Włącz pasek stanu"
 
 #: config/internal/option-internal.cpp:409
 msgid "INI file version (DO NOT MODIFY)"
-msgstr ""
+msgstr "Wersja pliku INI (NIE MODYFIKUJ)"
 
 #: config/internal/option-internal.cpp:413
 msgid ""
