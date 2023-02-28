@@ -28,6 +28,10 @@ Chat](https://web.libera.chat/).
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/visualboyadvance-m)
 
+***Want to know where you can install visualboyadvance-m in your linux distribution?***
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/visualboyadvance-m.svg)](https://repology.org/project/visualboyadvance-m/versions)
+
 # Visual Boy Advance - M
 
 Game Boy and Game Boy Advance Emulator
