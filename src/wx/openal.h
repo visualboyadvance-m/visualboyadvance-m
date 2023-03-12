@@ -1,7 +1,7 @@
 // on win32 and mac, pointer typedefs only happen with AL_NO_PROTOTYPES
 // on mac, ALC_NO_PROTOTYPES as well
 
-#define AL_NO_PROTOTYPES 1
+//#define AL_NO_PROTOTYPES 1
 
 // on mac, alc pointer typedefs ony happen for ALC if ALC_NO_PROTOTYPES
 // unfortunately, there is a bug in the system headers (use of ALCvoid when
