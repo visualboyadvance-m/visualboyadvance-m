@@ -69,6 +69,9 @@ enum named_opts
 	OPT_CPU_SAVE_TYPE,
 	OPT_DOTCODE_FILE_NAME_LOAD,
 	OPT_DOTCODE_FILE_NAME_SAVE,
+	OPT_GB_BORDER_AUTOMATIC,
+	OPT_GB_BORDER_ON,
+	OPT_GB_COLOR_OPTION,
 	OPT_GB_EMULATOR_TYPE,
 	OPT_GB_FRAME_SKIP,
 	OPT_GB_PALETTE_OPTION,
@@ -147,12 +150,12 @@ struct option argOptions[] = {
 	{ "bios-file-name-gb", required_argument, 0, OPT_BIOS_FILE_NAME_GB },
 	{ "bios-file-name-gba", required_argument, 0, OPT_BIOS_FILE_NAME_GBA },
 	{ "bios-file-name-gbc", required_argument, 0, OPT_BIOS_FILE_NAME_GBC },
-	{ "border-automatic", no_argument, &gbBorderAutomatic, 1 },
-	{ "border-on", no_argument, &gbBorderOn, 1 },
+	{ "border-automatic", no_argument, 0, OPT_GB_BORDER_AUTOMATIC },
+	{ "border-on", no_argument, 0, OPT_GB_BORDER_ON },
 	{ "capture-format", required_argument, 0, OPT_CAPTURE_FORMAT },
 	{ "cheat", required_argument, 0, OPT_CHEAT },
 	{ "cheats-enabled", no_argument, &coreOptions.cheatsEnabled, 1 },
-	{ "color-option", no_argument, &gbColorOption, 1 },
+	{ "color-option", no_argument, 0, OPT_GB_COLOR_OPTION },
 	{ "config", required_argument, 0, 'c' },
 	{ "cpu-disable-sfx", no_argument, &coreOptions.cpuDisableSfx, 1 },
 	{ "cpu-save-type", required_argument, 0, OPT_CPU_SAVE_TYPE },
@@ -167,9 +170,9 @@ struct option argOptions[] = {
 	{ "flash-size", required_argument, 0, 'S' },
 	{ "frameskip", required_argument, 0, 's' },
 	{ "full-screen", no_argument, &fullScreen, 1 },
-	{ "gb-border-automatic", no_argument, &gbBorderAutomatic, 1 },
-	{ "gb-border-on", no_argument, &gbBorderOn, 1 },
-	{ "gb-color-option", no_argument, &gbColorOption, 1 },
+	{ "gb-border-automatic", no_argument, 0, OPT_GB_BORDER_AUTOMATIC },
+	{ "gb-border-on", no_argument, 0, OPT_GB_BORDER_ON },
+	{ "gb-color-option", no_argument, 0, OPT_GB_COLOR_OPTION },
 	{ "gb-emulator-type", required_argument, 0, OPT_GB_EMULATOR_TYPE },
 	{ "gb-frame-skip", required_argument, 0, OPT_GB_FRAME_SKIP },
 	{ "gb-palette-option", required_argument, 0, OPT_GB_PALETTE_OPTION },
@@ -257,8 +260,10 @@ void OpenPreferences(const char *name)
 
 void ValidateConfig()
 {
-	if (gbEmulatorType < 0 || gbEmulatorType > 5)
+	if (gbEmulatorType > 5)
 		gbEmulatorType = 1;
+	if (gbPaletteOption > 2)
+		gbPaletteOption = 0;
 	if (frameSkip < 0 || frameSkip > 9)
 		frameSkip = 2;
 	if (gbFrameSkip < 0 || gbFrameSkip > 9)
@@ -861,6 +866,24 @@ int ReadOpts(int argc, char ** argv)
 			if (optarg) {
 				ifbType = atoi(optarg);
 			}
+			break;
+
+		case OPT_GB_BORDER_AUTOMATIC:
+			// --border-automatic
+			// --gb-border-automatic
+			gbBorderAutomatic = true;
+			break;
+
+		case OPT_GB_BORDER_ON:
+			// --border-on
+			// --gb-border-on
+			gbBorderOn = true;
+			break;
+
+		case OPT_GB_COLOR_OPTION:
+			// --color-option
+			// --gb-color-option
+			gbColorOption = true;
 			break;
 
 		case OPT_GB_EMULATOR_TYPE:

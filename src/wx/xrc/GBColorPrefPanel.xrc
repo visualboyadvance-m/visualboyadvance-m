@@ -4,9 +4,9 @@
     <object class="wxBoxSizer">
       <orient>wxVERTICAL</orient>
       <object class="sizeritem">
-        <object class="wxChoice" name="ColorSet">
+        <object class="wxChoice" name="DefaultPalette">
           <content>
-            <item/>
+            <item>Custom</item>
             <item>Standard</item>
             <item>Blue Sea</item>
             <item>Dark Night</item>
@@ -80,7 +80,7 @@
       <object class="sizeritem">
         <object class="wxBoxSizer">
           <object class="sizeritem">
-            <object class="wxCheckBox" name="UsePalette" subclass="wxFarRadio">
+            <object class="GroupCheckBox" name="UsePalette">
               <label>Use this palette</label>
             </object>
             <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>

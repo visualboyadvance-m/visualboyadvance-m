@@ -39,6 +39,7 @@
 #include "config/user-input.h"
 #include "strutils.h"
 #include "wayland.h"
+#include "widgets/group-check-box.h"
 
 namespace {
 static const wxString kOldConfigFileName("vbam.conf");
@@ -294,6 +295,7 @@ bool wxvbamApp::OnInit() {
     // note: if linking statically, next 2 pull in lot of unused code
     // maybe in future if not wxSHARED, load only builtin-needed handlers
     xr->InitAllHandlers();
+    xr->AddHandler(new widgets::GroupCheckBoxXmlHandler());
     wxInitAllImageHandlers();
     get_config_path(config_path);
     // first, load override xrcs

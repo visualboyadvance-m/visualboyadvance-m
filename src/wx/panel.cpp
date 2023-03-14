@@ -115,7 +115,15 @@ GameArea::GameArea()
            config::OptionID::kDispStretch},
           std::bind(&GameArea::ResetPanel, this)),
       scale_observer_(config::OptionID::kDispScale,
-                      std::bind(&GameArea::AdjustSize, this, true)) {
+                      std::bind(&GameArea::AdjustSize, this, true)),
+      gb_border_observer_(
+          config::OptionID::kPrefBorderOn,
+          std::bind(&GameArea::OnGBBorderChanged, this, std::placeholders::_1)),
+      gb_palette_observer_(
+          {config::OptionID::kGBPalette0, config::OptionID::kGBPalette1,
+           config::OptionID::kGBPalette2,
+           config::OptionID::kPrefGBPaletteOption},
+          std::bind(&gbResetPalette)) {
     SetSizer(new wxBoxSizer(wxVERTICAL));
     // all renderers prefer 32-bit
     // well, "simple" prefers 24-bit, but that's not available for filters
@@ -269,23 +277,21 @@ void GameArea::LoadGame(const wxString& name)
         // Set up the core for the colorizer hack.
         setColorizerHack(OPTION(kGBColorizerHack));
 
-        bool use_bios =
+        const bool use_bios =
             gbCgbMode ? gopts.use_bios_file_gbc : gopts.use_bios_file_gb;
 
-        wxCharBuffer fnb(UTF8((gbCgbMode ? gopts.gbc_bios : gopts.gb_bios)));
-        const char* fn = fnb.data();
-
-        gbCPUInit(fn, use_bios);
+        const wxString bios_file = gbCgbMode ? OPTION(kGBGBCBiosFile).Get() : OPTION(kGBBiosFile).Get();
+        gbCPUInit(bios_file.To8BitData().data(), use_bios);
 
         if (use_bios && !coreOptions.useBios) {
-            wxLogError(_("Could not load BIOS %s"), (gbCgbMode ? gopts.gbc_bios : gopts.gb_bios).mb_str());
+            wxLogError(_("Could not load BIOS %s"), bios_file);
             // could clear use flag & file name now, but better to force
             // user to do it
         }
 
         gbReset();
 
-        if (gbBorderOn) {
+        if (OPTION(kPrefBorderOn)) {
             basic_width = gbBorderLineSkip = SGBWidth;
             basic_height = SGBHeight;
             gbBorderColumnSkip = (SGBWidth - GBWidth) / 2;
@@ -2628,4 +2634,15 @@ void GameArea::ShowMenuBar()
     SendSizeEvent();
     menu_bar_hidden = false;
 #endif
+}
+
+void GameArea::OnGBBorderChanged(config::Option* option) {
+    if (game_type() == IMAGE_GB && gbSgbMode) {
+        if (option->GetBool()) {
+            AddBorder();
+            gbSgbRenderBorder();
+        } else {
+            DelBorder();
+        }
+    }
 }

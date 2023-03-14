@@ -180,6 +180,7 @@ public:
     Interframe GetInterframe() const;
     RenderMethod GetRenderMethod() const;
     wxString GetEnumString() const;
+    std::array<uint16_t, 8> GetGbPalette() const;
     wxString GetGbPaletteString() const;
 
     // Sets the value. Will assert on type mismatch.
@@ -194,7 +195,8 @@ public:
     bool SetInterframe(const Interframe& value);
     bool SetRenderMethod(const RenderMethod& value);
     bool SetEnumString(const wxString& value);
-    bool SetGbPalette(const wxString& value);
+    bool SetGbPalette(const std::array<uint16_t, 8>& value);
+    bool SetGbPaletteString(const wxString& value);
 
     // Min/Max accessors.
     double GetDoubleMin() const;

@@ -319,7 +319,7 @@ void gbSgbPicture()
     gbSgbCGBSupport |= 4;
 
     if (gbBorderAutomatic && !gbBorderOn && gbSgbCGBSupport > 4) {
-        gbBorderOn = 1;
+        gbBorderOn = true;
         systemGbBorderOn();
     }
 
@@ -663,7 +663,7 @@ void gbSgbChrTransfer()
     memcpy(&gbSgbBorderChar[address], gbSgbScreenBuffer, 128 * 32);
 
     if (gbBorderAutomatic && !gbBorderOn && gbSgbCGBSupport > 4) {
-        gbBorderOn = 1;
+        gbBorderOn = true;
         systemGbBorderOn();
     }
 

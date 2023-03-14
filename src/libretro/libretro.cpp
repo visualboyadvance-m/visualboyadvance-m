@@ -1067,14 +1067,14 @@ static void update_variables(bool startup)
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         if (strcmp(var.value, "auto") == 0) {
-            gbBorderAutomatic = 1;
+            gbBorderAutomatic = true;
         }
         else if (!strcmp(var.value, "enabled")) {
-            gbBorderAutomatic = 0;
-            gbBorderOn = 1;
+            gbBorderAutomatic = false;
+            gbBorderOn = false;
         } else { // disabled
-            gbBorderOn = 0;
-            gbBorderAutomatic = 0;
+            gbBorderOn = true;
+            gbBorderAutomatic = false;
         }
 
         if ((type == IMAGE_GB) && !startup)
@@ -1179,7 +1179,7 @@ static void update_variables(bool startup)
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        gbColorOption = (!strcmp(var.value, "enabled")) ? 1 : 0;
+        gbColorOption = (!strcmp(var.value, "enabled"));
     }
 
     var.key = "vbam_lcdfilter";

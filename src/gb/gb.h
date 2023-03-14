@@ -1,6 +1,8 @@
 #ifndef GB_H
 #define GB_H
 
+#include <cstdint>
+
 #define gbWidth   160
 #define gbHeight  144
 #define sgbWidth  256
@@ -33,6 +35,12 @@ void gbWriteMemory(uint16_t, uint8_t);
 void gbDrawLine();
 bool gbIsGameboyRom(const char*);
 void gbGetHardwareType();
+
+// Resets gbPalette to systemGbPalette and gbPaletteOption value. This is called
+// in gbReset and only needs to be called when systemGbPalette or
+// gbPaletteOption is updated while a GB game is running.
+void gbResetPalette();
+
 void gbReset();
 void gbCleanUp();
 void gbCPUInit(const char*, bool);

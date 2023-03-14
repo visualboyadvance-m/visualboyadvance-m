@@ -605,6 +605,7 @@ public:
     void HidePointer();
     void HideMenuBar();
     void ShowMenuBar();
+    void OnGBBorderChanged(config::Option* option);
 
 protected:
     void MouseEvent(wxMouseEvent&);
@@ -621,6 +622,8 @@ protected:
 private:
     config::OptionsObserver render_observer_;
     config::OptionsObserver scale_observer_;
+    config::OptionsObserver gb_border_observer_;
+    config::OptionsObserver gb_palette_observer_;
 };
 
 // wxString version of OSD message

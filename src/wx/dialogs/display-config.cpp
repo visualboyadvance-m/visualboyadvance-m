@@ -16,7 +16,7 @@
 #include "config/option-id.h"
 #include "config/option-proxy.h"
 #include "config/option.h"
-#include "keep-on-top-styler.h"
+#include "dialogs/validated-child.h"
 #include "rpi.h"
 #include "wayland.h"
 #include "widgets/option-validator.h"
@@ -217,20 +217,6 @@ private:
         return option()->SetString(selected_window_plugin);
     }
 };
-
-// Helper functions to assert on the returned value.
-wxWindow* GetValidatedChild(const wxWindow* parent, const wxString& name) {
-    wxWindow* window = parent->FindWindow(name);
-    assert(window);
-    return window;
-}
-
-template <class T>
-T* GetValidatedChild(const wxWindow* parent, const wxString& name) {
-    T* child = wxDynamicCast(GetValidatedChild(parent, name), T);
-    assert(child);
-    return child;
-}
 
 }  // namespace
 

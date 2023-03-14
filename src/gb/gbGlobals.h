@@ -23,11 +23,8 @@ extern uint8_t* gbMemoryMap[16];
 
 extern int gbFrameSkip;
 extern uint16_t gbColorFilter[32768];
-extern int gbColorOption;
-extern int gbPaletteOption;
-extern int gbEmulatorType;
-extern int gbBorderOn;
-extern int gbBorderAutomatic;
+extern uint32_t gbEmulatorType;
+extern uint32_t gbPaletteOption;
 extern int gbCgbMode;
 extern int gbSgbMode;
 extern int gbWindowLine;
@@ -36,8 +33,10 @@ extern uint8_t gbBgp[4];
 extern uint8_t gbObp0[4];
 extern uint8_t gbObp1[4];
 extern uint16_t gbPalette[128];
+extern bool gbBorderAutomatic;
+extern bool gbBorderOn;
+extern bool gbColorOption;
 extern bool gbScreenOn;
-extern bool gbDrawWindow;
 extern uint8_t gbSCYLine[300];
 // gbSCXLine is used for the emulation (bug) of the SX change
 // found in the Artic Zone game.
