@@ -29,6 +29,7 @@
 #include "config/option.h"
 #include "config/user-input.h"
 #include "dialogs/display-config.h"
+#include "dialogs/game-boy-config.h"
 #include "opts.h"
 #include "widgets/option-validator.h"
 
@@ -1399,83 +1400,6 @@ wxString CheatListCtrl::OnGetItemText(long item, long column) const
     return s;
 }
 
-// these are the choices for canned colors; their order must match the
-// names in the choice control
-static const uint16_t defaultPalettes[][8] = {
-    {
-        // Standard
-        0x7FFF, 0x56B5, 0x318C, 0x0000, 0x7FFF, 0x56B5, 0x318C, 0x0000,
-    },
-    {
-        // Blue Sea
-        0x6200, 0x7E10, 0x7C10, 0x5000, 0x6200, 0x7E10, 0x7C10, 0x5000,
-    },
-    {
-        // Dark Night
-        0x4008, 0x4000, 0x2000, 0x2008, 0x4008, 0x4000, 0x2000, 0x2008,
-    },
-    {
-        // Green Forest
-        0x43F0, 0x03E0, 0x4200, 0x2200, 0x43F0, 0x03E0, 0x4200, 0x2200,
-    },
-    {
-        // Hot Desert
-        0x43FF, 0x03FF, 0x221F, 0x021F, 0x43FF, 0x03FF, 0x221F, 0x021F,
-    },
-    {
-        // Pink Dreams
-        0x621F, 0x7E1F, 0x7C1F, 0x2010, 0x621F, 0x7E1F, 0x7C1F, 0x2010,
-    },
-    {
-        // Weird Colors
-        0x621F, 0x401F, 0x001F, 0x2010, 0x621F, 0x401F, 0x001F, 0x2010,
-    },
-    {
-        // Real GB Colors
-        0x1B8E, 0x02C0, 0x0DA0, 0x1140, 0x1B8E, 0x02C0, 0x0DA0, 0x1140,
-    },
-    {
-        // Real 'GB on GBASP' Colors
-        0x7BDE, /*0x23F0*/ 0x5778, /*0x5DC0*/ 0x5640, 0x0000, 0x7BDE, /*0x3678*/ 0x529C, /*0x0980*/ 0x2990, 0x0000,
-    }
-};
-
-// manage the GB color prefs' canned color selecter
-static class GBColorConfig_t : public wxEvtHandler {
-public:
-    wxWindow* p;
-    wxChoice* c;
-    wxColourPickerCtrl* cp[8];
-    int pno;
-    void ColorSel(wxCommandEvent& ev)
-    {
-        if (ev.GetSelection() > 0) {
-            const uint16_t* color = defaultPalettes[ev.GetSelection() - 1];
-
-            for (int i = 0; i < 8; i++, color++)
-                cp[i]->SetColour(wxColor(((*color << 3) & 0xf8),
-                    ((*color >> 2) & 0xf8),
-                    ((*color >> 7) & 0xf8)));
-        }
-    }
-    void ColorReset(wxCommandEvent& ev)
-    {
-        (void)ev; // unused params
-        const uint16_t* color = &systemGbPalette[pno * 8];
-
-        for (int i = 0; i < 8; i++, color++)
-            cp[i]->SetColour(wxColor(((*color << 3) & 0xf8),
-                ((*color >> 2) & 0xf8),
-                ((*color >> 7) & 0xf8)));
-    }
-
-    void ColorButton(wxCommandEvent& ev)
-    {
-        (void)ev; // unused params
-        c->SetSelection(0);
-    }
-} GBColorConfigHandler[3];
-
 // disable controls if a GBA game is not loaded
 class GBACtrlEnabler : public wxValidator {
 public:
@@ -1700,85 +1624,6 @@ public:
         }
     }
 } JoyPadConfigHandler[4];
-
-// manage fullscreen mode widget
-// technically, it's more than a validator: it modifies the widget as well
-class ScreenModeList : public wxValidator {
-public:
-    ScreenModeList()
-        : wxValidator()
-    {
-    }
-    ScreenModeList(const ScreenModeList& e)
-        : wxValidator()
-    {
-        (void)e; // unused params
-    }
-    wxObject* Clone() const { return new ScreenModeList(*this); }
-    bool Validate(wxWindow* p) {
-        (void)p; // unused params
-        return true;
-    }
-    bool TransferToWindow()
-    {
-        wxChoice* c = wxStaticCast(GetWindow(), wxChoice);
-        wxDisplay d(wxDisplay::GetFromWindow(c->GetParent()));
-        c->Clear();
-        int modeno = 0, bestmode = 0;
-        int bm_bpp = 0;
-        c->Append(_("Desktop mode"));
-        // probably ought to just disable this whole control on UNIX/X11 since
-        // wxDisplay is so broken.
-        vm = d.GetModes();
-        wxString s;
-
-        for (size_t i = 0; i < vm.size(); i++) {
-            s.Printf(_("%d x %d - %d bpp @ %d Hz"), vm[i].w, vm[i].h, vm[i].bpp, vm[i].refresh);
-            c->Append(s);
-
-            if (!modeno && gopts.fs_mode.w == vm[i].w && gopts.fs_mode.h == vm[i].h) {
-                if (gopts.fs_mode.bpp == vm[i].bpp && gopts.fs_mode.refresh == vm[i].refresh)
-                    modeno = i + 1;
-                else if (vm[i].bpp == gopts.fs_mode.bpp && bm_bpp != gopts.fs_mode.bpp) {
-                    bestmode = i + 1;
-                    bm_bpp = vm[i].bpp;
-                } else if (bm_bpp != gopts.fs_mode.bpp && bm_bpp != 32 && vm[i].bpp == 32) {
-                    bm_bpp = vm[i].bpp;
-                    bestmode = i + 1;
-                } else if (bm_bpp != gopts.fs_mode.bpp && bm_bpp < 24 && vm[i].bpp == 24) {
-                    bm_bpp = vm[i].bpp;
-                    bestmode = i + 1;
-                } else if (bm_bpp != gopts.fs_mode.bpp && bm_bpp < 24 && bm_bpp != 16 && vm[i].bpp == 16) {
-                    bm_bpp = vm[i].bpp;
-                    bestmode = i + 1;
-                } else if (!bm_bpp) {
-                    bm_bpp = vm[i].bpp;
-                    bestmode = i + 1;
-                }
-            }
-        }
-
-        if (!modeno && bestmode)
-            modeno = bestmode;
-
-        c->SetSelection(modeno);
-        return true;
-    }
-    bool TransferFromWindow()
-    {
-        int bestmode = wxStaticCast(GetWindow(), wxChoice)->GetSelection();
-
-        if (!bestmode)
-            gopts.fs_mode.h = gopts.fs_mode.w = gopts.fs_mode.bpp = gopts.fs_mode.refresh = 0;
-        else
-            gopts.fs_mode = vm[bestmode - 1];
-
-        return true;
-    }
-
-private:
-    wxArrayVideoModes vm;
-};
 
 // this is the cmd table index for the accel tree ctrl
 // one of the "benefits" of using TreeItemData is that we have to
@@ -2993,16 +2838,6 @@ bool MainFrame::BindControls()
         rb = SafeXRCCTRL<wxRadioButton>(d, n);       \
         rb->SetValidator(wxBoolIntValidator(&o, v)); \
     } while (0)
-#define getrbb(n, o)                              \
-    do {                                          \
-        rb = SafeXRCCTRL<wxRadioButton>(d, n);    \
-        rb->SetValidator(wxGenericValidator(&o)); \
-    } while (0)
-#define getrbbr(n, o)                             \
-    do {                                          \
-        rb = SafeXRCCTRL<wxRadioButton>(d, n);    \
-        rb->SetValidator(wxBoolRevValidator(&o)); \
-    } while (0)
         wxBoolEnValidator* benval;
         wxBoolEnHandler* ben;
 #define getbe(n, o, cv, t, wt)                                        \
@@ -3290,11 +3125,6 @@ bool MainFrame::BindControls()
         cb = SafeXRCCTRL<wxCheckBox>(d, n);       \
         cb->SetValidator(wxGenericValidator(&o)); \
     } while (0)
-#define getcbi(n, o)                                 \
-    do {                                             \
-        cb = SafeXRCCTRL<wxCheckBox>(d, n);          \
-        cb->SetValidator(wxBoolIntValidator(&o, 1)); \
-    } while (0)
         wxSpinCtrl* sc;
 #define getsc(n, o)                               \
     do {                                          \
@@ -3357,106 +3187,14 @@ bool MainFrame::BindControls()
         }
 
         d = LoadXRCDialog("UIConfig");
-        {
-            getcbb("HideMenuBar", gopts.hide_menu_bar);
-        }
-#define getcbbe(n, o) getbe(n, o, cb, wxCheckBox, CB)
-        wxBoolIntEnValidator* bienval;
-        (void)bienval; // not used yet
-#define getbie(n, o, v, cv, t, wt)                                        \
-    do {                                                                  \
-        cv = SafeXRCCTRL<t>(d, n);                                        \
-        cv->SetValidator(wxBoolIntEnValidator(&o, v, v));                 \
-        bienval = wxStaticCast(cv->GetValidator(), wxBoolIntEnValidator); \
-        static wxBoolEnHandler _ben;                                      \
-        ben = &_ben;                                                      \
-        wx##wt##BoolEnHandlerConnect(cv, wxID_ANY, _ben);                 \
-    } while (0)
-#define addbie(n)                       \
-    do {                                \
-        ben->controls.push_back(n);     \
-        bienval->controls.push_back(n); \
-    } while (0)
-#define addbier(n, r)                   \
-    do {                                \
-        ben->controls.push_back(n);     \
-        ben->reverse.push_back(r);      \
-        bienval->controls.push_back(n); \
-        bienval->reverse.push_back(r);  \
-    } while (0)
-#define getcbie(n, o, v) getbie(n, o, v, cb, wxCheckBox, CB)
+        { getcbb("HideMenuBar", gopts.hide_menu_bar); }
         wxFilePickerCtrl* fp;
 #define getfp(n, o, l)                                     \
     do {                                                   \
         fp = SafeXRCCTRL<wxFilePickerCtrl>(d, n);          \
         fp->SetValidator(wxFileDirPickerValidator(&o, l)); \
     } while (0)
-        d = LoadXRCropertySheetDialog("GameBoyConfig");
-        {
-            /// System and Peripherals
-            ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "System", wxGenericValidator(&gbEmulatorType));
-            // "Display borders" corresponds to 2 variables, so it is handled
-            // in command handler.  Plus making changes might require resizing
-            // game area.  Validation only here.
-            SafeXRCCTRL<wxChoice>(d, "Borders");
-            /// GB Boot ROM
-            wxStaticText *label = SafeXRCCTRL<wxStaticText>(d, "BiosFile");
-            if (!gopts.gb_bios.empty()) label->SetLabel(gopts.gb_bios);
-            getfp("BootRom", gopts.gb_bios, label);
-            getlab("BootRomLab");
-            /// GBC
-            wxStaticText *clabel = SafeXRCCTRL<wxStaticText>(d, "CBiosFile");
-            if (!gopts.gbc_bios.empty()) clabel->SetLabel(gopts.gbc_bios);
-            getfp("CBootRom", gopts.gbc_bios, clabel);
-            getlab("CBootRomLab");
-            /// Custom Colors
-            //getcbi("Color", gbColorOption);
-            wxFarRadio* r = NULL;
-
-            for (int i = 0; i < 3; i++) {
-                wxString pn;
-                // NOTE: wx2.9.1 behaves differently for referenced nodes
-                // than 2.8!  Unless there is an actual child node, the ID field
-                // will not be overwritten.  This means that there should be a
-                // dummy child node (e.g. position=(0,0)).  If you get
-                // "Unable to load dialog GameBoyConfig from resources", this is
-                // probably the reason.
-                pn.Printf(wxT("cp%d"), i + 1);
-                wxWindow* w = SafeXRCCTRL<wxWindow>(d, pn);
-                GBColorConfigHandler[i].p = w;
-                GBColorConfigHandler[i].pno = i;
-                wxFarRadio* cb = SafeXRCCTRL<wxFarRadio>(w, "UsePalette");
-
-                if (r)
-                    cb->SetGroup(r);
-                else
-                    r = cb;
-
-                cb->SetValidator(wxBoolIntValidator(&gbPaletteOption, i));
-                ch = SafeXRCCTRL<wxChoice>(w, "ColorSet");
-                GBColorConfigHandler[i].c = ch;
-
-                for (int j = 0; j < 8; j++) {
-                    wxString s;
-                    s.Printf(wxT("Color%d"), j);
-                    wxColourPickerCtrl* cp = SafeXRCCTRL<wxColourPickerCtrl>(w, s);
-                    GBColorConfigHandler[i].cp[j] = cp;
-                    cp->SetValidator(wxColorValidator(&systemGbPalette[i * 8 + j]));
-                }
-
-                w->Connect(wxEVT_COMMAND_CHOICE_SELECTED,
-                    wxCommandEventHandler(GBColorConfig_t::ColorSel),
-                    NULL, &GBColorConfigHandler[i]);
-                w->Connect(XRCID("Reset"), wxEVT_COMMAND_BUTTON_CLICKED,
-                    wxCommandEventHandler(GBColorConfig_t::ColorReset),
-                    NULL, &GBColorConfigHandler[i]);
-                w->Connect(wxID_ANY, wxEVT_COMMAND_COLOURPICKER_CHANGED,
-                    wxCommandEventHandler(GBColorConfig_t::ColorButton),
-                    NULL, &GBColorConfigHandler[i]);
-            }
-
-            d->Fit();
-        }
+        dialogs::GameBoyConfig::NewInstance(this);
         d = LoadXRCropertySheetDialog("GameBoyAdvanceConfig");
         {
             /// System and peripherals
@@ -3594,7 +3332,6 @@ bool MainFrame::BindControls()
             d->Fit();
         }
         wxDialog* joyDialog = LoadXRCropertySheetDialog("JoypadConfig");
-        wxFarRadio* r = 0;
 
         for (int i = 0; i < 4; i++) {
             wxString pn;
@@ -3606,15 +3343,9 @@ bool MainFrame::BindControls()
             // probably the reason.
             pn.Printf(wxT("joy%d"), i + 1);
             wxWindow* w = SafeXRCCTRL<wxWindow>(joyDialog, pn);
-            wxFarRadio* cb;
-            cb = SafeXRCCTRL<wxFarRadio>(w, "DefaultConfig");
 
-            if (r)
-                cb->SetGroup(r);
-            else
-                r = cb;
-
-            cb->SetValidator(wxBoolIntValidator(&gopts.default_stick, i + 1));
+            w->FindWindow("DefaultConfig")
+                ->SetValidator(wxBoolIntValidator(&gopts.default_stick, i + 1));
             wxWindow *prev = NULL, *prevp = NULL;
 
             for (const config::GameKey& game_key : config::kAllGameKeys) {

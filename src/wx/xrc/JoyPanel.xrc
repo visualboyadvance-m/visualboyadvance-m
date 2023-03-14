@@ -511,7 +511,7 @@
         <flag>wxEXPAND|wxALL</flag>
       </object>
       <object class="sizeritem">
-        <object class="wxCheckBox" name="DefaultConfig" subclass="wxFarRadio">
+        <object class="GroupCheckBox" name="DefaultConfig">
           <label>Use as default</label>
         </object>
       </object>

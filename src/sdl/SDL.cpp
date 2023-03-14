@@ -1562,7 +1562,7 @@ int main(int argc, char** argv)
     SetHomeDataDir();
 
     frameSkip = 2;
-    gbBorderOn = 0;
+    gbBorderOn = false;
 
     coreOptions.parseDebug = true;
 

@@ -162,7 +162,9 @@ std::array<Option, kNbOptions>& Option::All() {
         bool retain_aspect = true;
 
         /// GB
+        wxString gb_bios = wxEmptyString;
         bool colorizer_hack = false;
+        wxString gbc_bios = wxEmptyString;
 
         /// Core
         bool agb_print = false;
@@ -212,11 +214,11 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kDispStretch, &g_owned_opts.retain_aspect),
 
         /// GB
-        Option(OptionID::kGBBiosFile, &gopts.gb_bios),
-        Option(OptionID::kGBColorOption, &gbColorOption, 0, 1),
+        Option(OptionID::kGBBiosFile, &g_owned_opts.gb_bios),
+        Option(OptionID::kGBColorOption, &gbColorOption),
         Option(OptionID::kGBColorizerHack, &g_owned_opts.colorizer_hack),
         Option(OptionID::kGBLCDFilter, &gopts.gb_lcd_filter),
-        Option(OptionID::kGBGBCBiosFile, &gopts.gbc_bios),
+        Option(OptionID::kGBGBCBiosFile, &g_owned_opts.gbc_bios),
         Option(OptionID::kGBPalette0, systemGbPalette),
         Option(OptionID::kGBPalette1, systemGbPalette + 8),
         Option(OptionID::kGBPalette2, systemGbPalette + 16),
@@ -264,8 +266,8 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kPrefAutoFrameSkip, &g_owned_opts.auto_frame_skip),
         Option(OptionID::kPrefAutoPatch, &g_owned_opts.auto_patch),
         Option(OptionID::kPrefAutoSaveLoadCheatList, &gopts.autoload_cheats),
-        Option(OptionID::kPrefBorderAutomatic, &gbBorderAutomatic, 0, 1),
-        Option(OptionID::kPrefBorderOn, &gbBorderOn, 0, 1),
+        Option(OptionID::kPrefBorderAutomatic, &gbBorderAutomatic),
+        Option(OptionID::kPrefBorderOn, &gbBorderOn),
         Option(OptionID::kPrefCaptureFormat, &g_owned_opts.capture_format, 0, 1),
         Option(OptionID::kPrefCheatsEnabled, &coreOptions.cheatsEnabled, 0, 1),
         Option(OptionID::kPrefDisableStatus, &g_owned_opts.disable_status_messages),

@@ -765,6 +765,8 @@ set(
     config/option.cpp
     config/user-input.cpp
     dialogs/display-config.cpp
+    dialogs/game-boy-config.cpp
+    widgets/group-check-box.cpp
     widgets/keep-on-top-styler.cpp
     widgets/keyedit.cpp
     widgets/joyedit.cpp
@@ -811,7 +813,10 @@ set(
     config/option.h
     config/user-input.h
     dialogs/display-config.h
+    dialogs/game-boy-config.h
+    dialogs/validated-child.h
     widgets/dpi-support.h
+    widgets/group-check-box.h
     widgets/keep-on-top-styler.h
     widgets/option-validator.h
     widgets/render-plugin.h

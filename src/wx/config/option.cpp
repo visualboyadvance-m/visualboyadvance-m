@@ -1,5 +1,6 @@
 #include "config/option.h"
 
+#include <cstring>
 #include "nonstd/variant.hpp"
 
 #include <wx/log.h>
@@ -287,6 +288,15 @@ wxString Option::GetEnumString() const {
     return wxEmptyString;
 }
 
+std::array<uint16_t, 8> Option::GetGbPalette() const {
+    assert(is_gb_palette());
+
+    const uint16_t* raw_palette = (nonstd::get<uint16_t*>(value_));
+    std::array<uint16_t, 8> palette;
+    std::memcpy(palette.data(), raw_palette, sizeof(palette));
+    return palette;
+}
+
 wxString Option::GetGbPaletteString() const {
     assert(is_gb_palette());
 
@@ -454,7 +464,25 @@ bool Option::SetEnumInt(int value) {
     return true;
 }
 
-bool Option::SetGbPalette(const wxString& value) {
+bool Option::SetGbPalette(const std::array<uint16_t, 8>& value) {
+    assert(is_gb_palette());
+
+    uint16_t* dest = nonstd::get<uint16_t*>(value_);
+
+    // Keep a copy of the current value.
+    std::array<uint16_t, 8> old_value;
+    std::copy(dest, dest + 8, old_value.data());
+
+    // Set the new value.
+    std::copy(value.begin(), value.end(), dest);
+
+    if (old_value != value) {
+        CallObservers();
+    }
+    return true;
+}
+
+bool Option::SetGbPaletteString(const wxString& value) {
     assert(is_gb_palette());
 
     // 8 values of 4 chars and 7 commas.
@@ -465,10 +493,6 @@ bool Option::SetGbPalette(const wxString& value) {
         return false;
     }
 
-    uint16_t* dest = nonstd::get<uint16_t*>(value_);
-    std::array<uint16_t, 8> old_value;
-    std::copy(dest, dest + 8, old_value.data());
-
     std::array<uint16_t, 8> new_value;
     for (size_t i = 0; i < 8; i++) {
         wxString number = value.substr(i * 5, 4);
@@ -477,12 +501,8 @@ bool Option::SetGbPalette(const wxString& value) {
             new_value[i] = temp;
         }
     }
-    std::copy(new_value.begin(), new_value.end(), dest);
 
-    if (old_value != new_value) {
-        CallObservers();
-    }
-    return true;
+    return SetGbPalette(new_value);
 }
 
 double Option::GetDoubleMin() const {

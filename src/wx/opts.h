@@ -26,10 +26,7 @@ extern struct opts_t {
     wxVideoMode fs_mode;
 
     /// GB
-    wxString gb_bios;
-    bool gb_colorizer_hack = false;
     bool gb_lcd_filter = false;
-    wxString gbc_bios;
     bool print_auto_page = true;
     bool print_screen_cap = false;
     wxString gb_rom_dir;

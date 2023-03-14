@@ -1,17 +1,17 @@
-//#include "../win32/stdafx.h" // would fix LNK2005 linker errors for MSVC
+#include "gb.h"
+
+#include <array>
+#include <cassert>
 #include <cmath>
-#include <assert.h>
-#include <memory.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #include "../NLS.h"
 #include "../System.h"
 #include "../Util.h"
 #include "../gba/GBALink.h"
 #include "../gba/Sound.h"
-#include "gb.h"
 #include "gbCheats.h"
 #include "gbGlobals.h"
 #include "gbMemory.h"
@@ -21,6 +21,45 @@
 #ifdef __GNUC__
 #define _stricmp strcasecmp
 #endif
+
+namespace {
+
+// These are the default palettes when launching a GB game for GBC, GBA and
+// GBA SP, respectively.
+static constexpr std::array<uint16_t, 0x40> kGbGbcPalette = {
+    0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff,
+    0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff,
+    0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff,
+    0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff,
+    0x0600, 0xfdf3, 0x041c, 0xf5db, 0x4419, 0x57ea, 0x2808, 0x9b75,
+    0x129b, 0xfce0, 0x22da, 0x4ac5, 0x2d71, 0xf0c2, 0x5137, 0x2d41,
+    0x6b2d, 0x2215, 0xbe0a, 0xc053, 0xfe5f, 0xe000, 0xbe10, 0x914d,
+    0x7f91, 0x02b5, 0x77ac, 0x14e5, 0xcf89, 0xa03d, 0xfd50, 0x91ff,
+};
+
+static constexpr std::array<uint16_t, 0x40> kGbGbaPalette = {
+    0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff,
+    0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff,
+    0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff,
+    0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff,
+    0xbe00, 0xfdfd, 0xbd69, 0x7baf, 0xf5ff, 0x3f8f, 0xcee5, 0x5bf7,
+    0xb35b, 0xef97, 0xef9f, 0x97f7, 0x82bf, 0x9f3d, 0xddde, 0xbad5,
+    0x3cba, 0xdfd7, 0xedea, 0xfeda, 0xf7f9, 0xfdee, 0x6d2f, 0xf0e6,
+    0xf7f0, 0xf296, 0x3bf1, 0xe211, 0x69ba, 0x3d0d, 0xdfd3, 0xa6ba,
+};
+
+static constexpr std::array<uint16_t, 0x40> kGbGbaSpPalette = {
+    0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff,
+    0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff,
+    0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff,
+    0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff,
+    0x9c00, 0x6340, 0x10c6, 0xdb97, 0x7622, 0x3e57, 0x2e12, 0x95c3,
+    0x1095, 0x488c, 0x8241, 0xde8c, 0xfabc, 0x0e81, 0x7675, 0xfdec,
+    0xddfd, 0x5995, 0x066a, 0xed1e, 0x1e84, 0x1d14, 0x11c3, 0x2749,
+    0xa727, 0x6266, 0xe27b, 0xe3fc, 0x1f76, 0xf158, 0x468e, 0xa540,
+};
+
+}  // namespace
 
 extern uint8_t* pix;
 bool gbUpdateSizes();
@@ -2184,6 +2223,8 @@ bool CPUIsGBBios(const char* file)
         const char* p = strrchr(file, '.');
 
         if (p != NULL) {
+            if (_stricmp(p, ".gbc") == 0)
+                return true;
             if (_stricmp(p, ".gb") == 0)
                 return true;
             if (_stricmp(p, ".bin") == 0)
@@ -2313,6 +2354,14 @@ static void gbSelectColorizationPalette()
 
     // Third palette is always used for BGP.
     memcpy(gbPalette, gbColorizationPaletteData[palette][2], sizeof(gbColorizationPaletteData[palette][0]));
+}
+
+void gbResetPalette() {
+    if (!gbCgbMode && !gbSgbMode) {
+        // In SGB Mode, palette initialization is done in gbSgbReset().
+        memcpy(gbPalette, &systemGbPalette[gbPaletteOption * 8],
+            8 * sizeof(systemGbPalette[0]));
+    }
 }
 
 void gbReset()
@@ -2606,10 +2655,9 @@ void gbReset()
     gbTimerOnChange = false;
     gbTimerOn = 0;
 
-    if (gbCgbMode) {
-        for (i = 0; i < 0x20; i++)
-            gbPalette[i] = 0x7fff;
+    gbResetPalette();
 
+    if (gbCgbMode) {
         // This is just to show that the starting values of the OBJ palettes are different
         // between the 3 consoles, and that they 'kinda' stay the same at each reset
         // (they can slightly change, somehow (randomly?)).
@@ -2618,122 +2666,21 @@ void gbReset()
         // is running (GB,GBC and GBA(SP) have different startup values).
         // Unfortunatly, I don't have any SGB system, so I can't get their starting values.
 
-        if (gbGBCColorType == 0) // GBC Hardware
-        {
-            gbPalette[0x20] = 0x0600;
-            gbPalette[0x21] = 0xfdf3;
-            gbPalette[0x22] = 0x041c;
-            gbPalette[0x23] = 0xf5db;
-            gbPalette[0x24] = 0x4419;
-            gbPalette[0x25] = 0x57ea;
-            gbPalette[0x26] = 0x2808;
-            gbPalette[0x27] = 0x9b75;
-            gbPalette[0x28] = 0x129b;
-            gbPalette[0x29] = 0xfce0;
-            gbPalette[0x2a] = 0x22da;
-            gbPalette[0x2b] = 0x4ac5;
-            gbPalette[0x2c] = 0x2d71;
-            gbPalette[0x2d] = 0xf0c2;
-            gbPalette[0x2e] = 0x5137;
-            gbPalette[0x2f] = 0x2d41;
-            gbPalette[0x30] = 0x6b2d;
-            gbPalette[0x31] = 0x2215;
-            gbPalette[0x32] = 0xbe0a;
-            gbPalette[0x33] = 0xc053;
-            gbPalette[0x34] = 0xfe5f;
-            gbPalette[0x35] = 0xe000;
-            gbPalette[0x36] = 0xbe10;
-            gbPalette[0x37] = 0x914d;
-            gbPalette[0x38] = 0x7f91;
-            gbPalette[0x39] = 0x02b5;
-            gbPalette[0x3a] = 0x77ac;
-            gbPalette[0x3b] = 0x14e5;
-            gbPalette[0x3c] = 0xcf89;
-            gbPalette[0x3d] = 0xa03d;
-            gbPalette[0x3e] = 0xfd50;
-            gbPalette[0x3f] = 0x91ff;
-        } else if (gbGBCColorType == 1) // GBA Hardware
-        {
-            gbPalette[0x20] = 0xbe00;
-            gbPalette[0x21] = 0xfdfd;
-            gbPalette[0x22] = 0xbd69;
-            gbPalette[0x23] = 0x7baf;
-            gbPalette[0x24] = 0xf5ff;
-            gbPalette[0x25] = 0x3f8f;
-            gbPalette[0x26] = 0xcee5;
-            gbPalette[0x27] = 0x5bf7;
-            gbPalette[0x28] = 0xb35b;
-            gbPalette[0x29] = 0xef97;
-            gbPalette[0x2a] = 0xef9f;
-            gbPalette[0x2b] = 0x97f7;
-            gbPalette[0x2c] = 0x82bf;
-            gbPalette[0x2d] = 0x9f3d;
-            gbPalette[0x2e] = 0xddde;
-            gbPalette[0x2f] = 0xbad5;
-            gbPalette[0x30] = 0x3cba;
-            gbPalette[0x31] = 0xdfd7;
-            gbPalette[0x32] = 0xedea;
-            gbPalette[0x33] = 0xfeda;
-            gbPalette[0x34] = 0xf7f9;
-            gbPalette[0x35] = 0xfdee;
-            gbPalette[0x36] = 0x6d2f;
-            gbPalette[0x37] = 0xf0e6;
-            gbPalette[0x38] = 0xf7f0;
-            gbPalette[0x39] = 0xf296;
-            gbPalette[0x3a] = 0x3bf1;
-            gbPalette[0x3b] = 0xe211;
-            gbPalette[0x3c] = 0x69ba;
-            gbPalette[0x3d] = 0x3d0d;
-            gbPalette[0x3e] = 0xdfd3;
-            gbPalette[0x3f] = 0xa6ba;
-        } else if (gbGBCColorType == 2) // GBASP Hardware
-        {
-            gbPalette[0x20] = 0x9c00;
-            gbPalette[0x21] = 0x6340;
-            gbPalette[0x22] = 0x10c6;
-            gbPalette[0x23] = 0xdb97;
-            gbPalette[0x24] = 0x7622;
-            gbPalette[0x25] = 0x3e57;
-            gbPalette[0x26] = 0x2e12;
-            gbPalette[0x27] = 0x95c3;
-            gbPalette[0x28] = 0x1095;
-            gbPalette[0x29] = 0x488c;
-            gbPalette[0x2a] = 0x8241;
-            gbPalette[0x2b] = 0xde8c;
-            gbPalette[0x2c] = 0xfabc;
-            gbPalette[0x2d] = 0x0e81;
-            gbPalette[0x2e] = 0x7675;
-            gbPalette[0x2f] = 0xfdec;
-            gbPalette[0x30] = 0xddfd;
-            gbPalette[0x31] = 0x5995;
-            gbPalette[0x32] = 0x066a;
-            gbPalette[0x33] = 0xed1e;
-            gbPalette[0x34] = 0x1e84;
-            gbPalette[0x35] = 0x1d14;
-            gbPalette[0x36] = 0x11c3;
-            gbPalette[0x37] = 0x2749;
-            gbPalette[0x38] = 0xa727;
-            gbPalette[0x39] = 0x6266;
-            gbPalette[0x3a] = 0xe27b;
-            gbPalette[0x3b] = 0xe3fc;
-            gbPalette[0x3c] = 0x1f76;
-            gbPalette[0x3d] = 0xf158;
-            gbPalette[0x3e] = 0x468e;
-            gbPalette[0x3f] = 0xa540;
+        if (gbGBCColorType == 0) {
+            // GBC Hardware
+            std::copy(kGbGbcPalette.begin(), kGbGbcPalette.end(), gbPalette);
+        } else if (gbGBCColorType == 1) {
+            // GBA Hardware
+            std::copy(kGbGbaPalette.begin(), kGbGbaPalette.end(), gbPalette);
+        } else if (gbGBCColorType == 2) {
+            // GBASP Hardware
+            std::copy(kGbGbaSpPalette.begin(), kGbGbaSpPalette.end(), gbPalette);
         }
 
         // The CGB BIOS palette selection has to be done by VBA if BIOS is skipped.
         if (!(gbRom[0x143] & 0x80) && !inBios) {
             gbSelectColorizationPalette();
         }
-
-    } else {
-        if (gbSgbMode) {
-            for (i = 0; i < 8; i++)
-                gbPalette[i] = systemGbPalette[gbPaletteOption * 8 + i];
-        }
-        for (i = 0; i < 8; i++)
-            gbPalette[i] = systemGbPalette[gbPaletteOption * 8 + i];
     }
 
     GBTIMER_MODE_0_CLOCK_TICKS = 256;
@@ -3985,12 +3932,9 @@ static bool gbReadSaveState(gzFile gzFile)
     if (version < 11)
         utilGzRead(gzFile, gbPalette, 128 * sizeof(uint16_t));
 
-    if (version < GBSAVE_GAME_VERSION_10) {
-        if (!gbCgbMode && !gbSgbMode) {
-            for (int i = 0; i < 8; i++)
-                gbPalette[i] = systemGbPalette[gbPaletteOption * 8 + i];
-        }
-    }
+    // This is necessary for GB games (not GBC or SGB) to have them load with
+    // the user-defined palette and not the saved palette.
+    gbResetPalette();
 
     utilGzRead(gzFile, &gbMemory[0x8000], 0x8000);
 

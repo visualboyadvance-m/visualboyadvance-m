@@ -3,38 +3,10 @@
 // utility widgets
 
 #include <cstdint>
+#include <vector>
 
-#include <wx/checkbox.h>
+#include <wx/stattext.h>
 #include <wx/valgen.h>
-
-using std::uint8_t;
-using std::uint16_t;
-using std::uint32_t;
-using std::int8_t;
-using std::int16_t;
-using std::int32_t;
-
-// simple radio button not under the same parent window
-// note that it must be checkbox, as wx radio buttons have rigid behavior
-class wxFarRadio : public wxCheckBox {
-public:
-    wxFarRadio();
-    virtual ~wxFarRadio();
-    void SetValue(bool val);
-    // join this group with widget(s) in grp
-    void SetGroup(class wxFarRadio* grp);
-    // turn into a singleton
-    void BreakGroup();
-    // iterate over members in group (ring)
-    wxFarRadio* GetNext();
-
-protected:
-    void UpdatedValue();
-    void UpdateEvt(wxCommandEvent& ev);
-    wxFarRadio* Next;
-    DECLARE_DYNAMIC_CLASS(wxFarRadio)
-    DECLARE_EVENT_TABLE()
-};
 
 // boolean copy-only validator that uses a constant int
 // may be attached to radio button or checkbox
@@ -110,8 +82,6 @@ protected:
     bool* vptr;
 };
 
-#include <wx/stattext.h>
-
 // wxFilePickerCtrl/wxDirPickerCtrl copy-only vvalidator
 class wxFileDirPickerValidator : public wxValidator {
 public:
@@ -144,55 +114,9 @@ protected:
     wxStaticText* vlabel;
 };
 
-// color copy-only validator that supports either 32-bit or 16-bit color
-// value (but not endianness..)
-// FIXME: only supported formats are RGB888 and BGR555
-
-#include <stdint.h>
-
-class wxColorValidator : public wxValidator {
-public:
-    wxColorValidator(uint32_t* vptr)
-        : wxValidator()
-        , ptr32(vptr)
-        , ptr16(0)
-    {
-    }
-    wxColorValidator(uint16_t* vptr)
-        : wxValidator()
-        , ptr32(0)
-        , ptr16(vptr)
-    {
-    }
-    wxColorValidator(const wxColorValidator& v)
-        : wxValidator()
-        , ptr32(v.ptr32)
-        , ptr16(v.ptr16)
-    {
-    }
-    wxObject* Clone() const
-    {
-        return new wxColorValidator(*this);
-    }
-    bool TransferToWindow();
-    bool TransferFromWindow();
-    bool Validate(wxWindow* p)
-    {
-        (void)p; // unused params
-        return true;
-    }
-
-protected:
-    uint32_t* ptr32;
-    uint16_t* ptr16;
-};
-
 // Copy-only validators for checkboxes and radio buttons that enables a set
 // of dependent widgets
 // Requires an event handler during run-time
-
-#include <vector>
-#include <wx/valgen.h>
 
 // there's probably a standard wxWindowList or some such, but it's
 // undocumented and I prefer arrays

@@ -529,7 +529,7 @@ void load_opts(bool first_time_launch) {
         case config::Option::Type::kGbPalette: {
             wxString temp;
             cfg->Read(opt.config_name(), &temp, opt.GetGbPaletteString());
-            opt.SetGbPalette(temp);
+            opt.SetGbPaletteString(temp);
             break;
         }
         }
@@ -768,7 +768,7 @@ void opt_set(const wxString& name, const wxString& val) {
             opt->SetEnumString(val);
             return;
         case config::Option::Type::kGbPalette:
-            opt->SetGbPalette(val);
+            opt->SetGbPaletteString(val);
             return;
         }
     }

@@ -2492,50 +2492,7 @@ EVT_HANDLER(UIConfigure, "UI Settings...")
 
 EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
 {
-    wxDialog* dlg = GetXRCDialog("GameBoyConfig");
-    wxChoice* c = XRCCTRL(*dlg, "Borders", wxChoice);
-    bool borderon = gbBorderOn;
-
-    if (!gbBorderOn && !gbBorderAutomatic)
-        c->SetSelection(0);
-    else if (gbBorderOn)
-        c->SetSelection(1);
-    else
-        c->SetSelection(2);
-
-    if (ShowModal(dlg) != wxID_OK)
-        return;
-
-    switch (c->GetSelection()) {
-    case 0:
-        gbBorderOn = gbBorderAutomatic = false;
-        break;
-
-    case 1:
-        gbBorderOn = true;
-        break;
-
-    case 2:
-        gbBorderOn = false;
-        gbBorderAutomatic = true;
-        break;
-    }
-
-    // this value might have been overwritten by FrameSkip
-    if (panel->game_type() == IMAGE_GB) {
-        if (borderon != gbBorderOn) {
-            if (gbBorderOn) {
-                panel->AddBorder();
-                gbSgbRenderBorder();
-            } else
-                panel->DelBorder();
-        }
-
-        // don't want to have to reset to change colors
-        memcpy(gbPalette, &systemGbPalette[gbPaletteOption * 8], 8 * sizeof(systemGbPalette[0]));
-    }
-
-    update_opts();
+    ShowModal(GetXRCDialog("GameBoyConfig"));
 }
 
 EVT_HANDLER(SetSize1x, "1x")
@@ -3027,13 +2984,7 @@ EVT_HANDLER_MASK(GBLcdFilter, "Enable LCD filter", CMDEN_GB)
 
 EVT_HANDLER(GBColorOption, "Enable GB color option")
 {
-    bool menuPress = false;
-    bool intVar = gbColorOption ? true : false;
-    GetMenuOptionBool("GBColorOption", &menuPress);
-    toggleBooleanVar(&menuPress, &intVar);
-    SetMenuOption("GBColorOption", intVar ? 1 : 0);
-    gbColorOption = intVar ? 1 : 0;
-    update_opts();
+    GetMenuOptionConfig("GBColorOption", config::OptionID::kGBColorOption);
 }
 
 EVT_HANDLER(ApplyPatches, "Apply IPS/UPS/IPF patches if found")

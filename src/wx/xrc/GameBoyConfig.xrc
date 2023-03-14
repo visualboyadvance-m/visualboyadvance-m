@@ -87,7 +87,7 @@
                 <border>5</border>
               </object>
               <object class="sizeritem">
-                <object class="wxFilePickerCtrl" name="BootRom">
+                <object class="wxFilePickerCtrl" name="GBBiosPicker">
                   <message>Select a File</message>
                   <wildcard>BIOS files (*.bin;*.rom)|*.bin;*.rom|All files|*</wildcard>
                   <size>472,30</size>
@@ -109,7 +109,7 @@
                 <border>5</border>
               </object>
               <object class="sizeritem">
-                <object class="wxFilePickerCtrl" name="CBootRom">
+                <object class="wxFilePickerCtrl" name="GBCBiosPicker">
                   <message>Select a File</message>
                   <wildcard>BIOS files (*.bin;*.rom)|*.bin;*.rom|All files|*</wildcard>
                   <size>472,30</size>
@@ -134,7 +134,7 @@
                 <border>5</border>
               </object>
               <object class="sizeritem">
-                <object class="wxStaticText" name="BiosFile">
+                <object class="wxStaticText" name="GBBiosLabel">
                   <label>(None)</label>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
@@ -155,7 +155,7 @@
                 <border>5</border>
               </object>
               <object class="sizeritem">
-                <object class="wxStaticText" name="CBiosFile">
+                <object class="wxStaticText" name="GBCBiosLabel">
               <label>(None)</label>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
@@ -174,19 +174,19 @@
           <object class="sizeritem">
             <object class="wxNotebook">
               <object class="notebookpage">
-                <object_ref name="cp1" ref="GBColorPrefPanel">
+                <object_ref name="cp0" ref="GBColorPrefPanel">
                   <pos>0,0</pos>
                 </object_ref>
                 <label>Default</label>
               </object>
               <object class="notebookpage">
-                <object_ref name="cp2" ref="GBColorPrefPanel">
+                <object_ref name="cp1" ref="GBColorPrefPanel">
                   <pos>0,0</pos>
                 </object_ref>
                 <label>User 1</label>
               </object>
               <object class="notebookpage">
-                <object_ref name="cp3" ref="GBColorPrefPanel">
+                <object_ref name="cp2" ref="GBColorPrefPanel">
                   <pos>0,0</pos>
                 </object_ref>
                 <label>User 2</label>
