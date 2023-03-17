@@ -606,10 +606,12 @@ public:
     void HideMenuBar();
     void ShowMenuBar();
     void OnGBBorderChanged(config::Option* option);
+    void SuspendScreenSaver();
+    void UnsuspendScreenSaver();
 
 protected:
     void MouseEvent(wxMouseEvent&);
-    bool pointer_blanked, menu_bar_hidden = false;
+    bool pointer_blanked, menu_bar_hidden, xscreensaver_suspended = false;
     uint32_t mouse_active_time;
     wxPoint mouse_last_pos;
 #ifdef __WXMSW__

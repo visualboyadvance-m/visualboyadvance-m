@@ -100,6 +100,7 @@ extern struct opts_t {
 
     /// UI Config
     bool hide_menu_bar = true;
+    bool suspend_screensaver = false;
 
     /// wxWindows
     // wxWidgets-generated options (opaque)

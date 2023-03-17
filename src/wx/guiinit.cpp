@@ -3188,6 +3188,16 @@ bool MainFrame::BindControls()
 
         d = LoadXRCDialog("UIConfig");
         { getcbb("HideMenuBar", gopts.hide_menu_bar); }
+        {
+            getcbb("SuspendScreenSaver", gopts.suspend_screensaver);
+// TODO: change preprocessor directive to fit other platforms
+#if !defined(HAVE_XSS)
+                cb->Hide();
+#else
+                if (wxGetApp().UsingWayland())
+                    cb->Hide();
+#endif // !HAVE_XSS
+        }
         wxFilePickerCtrl* fp;
 #define getfp(n, o, l)                                     \
     do {                                                   \

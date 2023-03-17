@@ -413,6 +413,8 @@ void GameArea::LoadGame(const wxString& name)
 #endif
 #endif
 
+    SuspendScreenSaver();
+
     // probably only need to do this for GB carts
     if (coreOptions.winGbPrinterEnabled)
         gbSerialFunction = gbPrinterSend;
@@ -624,6 +626,7 @@ void GameArea::UnloadGame(bool destruct)
         cheatsDeleteAll(false);
     }
 
+    UnsuspendScreenSaver();
     emulating = false;
     loaded = IMAGE_UNKNOWN;
     emusys = NULL;
@@ -1029,6 +1032,7 @@ void GameArea::Pause()
 #endif
 
     paused = was_paused = true;
+    UnsuspendScreenSaver();
 
     // when the game is paused like this, we should not allow any
     // input to remain pressed, because they could be released
@@ -1047,6 +1051,7 @@ void GameArea::Resume()
         return;
 
     paused = false;
+    SuspendScreenSaver();
     SetExtraStyle(GetExtraStyle() | wxWS_EX_PROCESS_IDLE);
 
     if (loaded != IMAGE_UNKNOWN)
@@ -1210,6 +1215,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
             if (!emulating) {
                 emulating = true;
+                SuspendScreenSaver();
                 UnloadGame();
             }
 
@@ -1338,7 +1344,7 @@ static Display* GetX11Display()
 {
     return GDK_WINDOW_XDISPLAY(gtk_widget_get_window(wxGetApp().frame->GetHandle()));
 }
-#endif
+#endif // __WXGTK__
 
 void GameArea::OnKeyDown(wxKeyEvent& ev)
 {
@@ -1380,7 +1386,7 @@ void GameArea::OnSDLJoy(wxJoyEvent& ev)
 
     // tell Linux to turn off the screensaver/screen-blank if joystick button was pressed
     // this shouldn't be necessary of course
-#if defined(__WXGTK__) && defined(HAVE_XSS)
+#if defined(__WXGTK__) && defined(HAVE_X11) && !defined(HAVE_XSS)
     if (!wxGetApp().UsingWayland()) {
         auto display = GetX11Display();
         XResetScreenSaver(display);
@@ -2637,4 +2643,28 @@ void GameArea::OnGBBorderChanged(config::Option* option) {
             DelBorder();
         }
     }
+}
+
+void GameArea::SuspendScreenSaver() {
+#ifdef HAVE_XSS
+    if (xscreensaver_suspended || !gopts.suspend_screensaver)
+        return;
+    // suspend screensaver
+    if (emulating && !wxGetApp().UsingWayland()) {
+        auto display = GetX11Display();
+        XScreenSaverSuspend(display, true);
+        xscreensaver_suspended = true;
+    }
+#endif // HAVE_XSS
+}
+
+void GameArea::UnsuspendScreenSaver() {
+#ifdef HAVE_XSS
+    // unsuspend screensaver
+    if (xscreensaver_suspended) {
+        auto display = GetX11Display();
+        XScreenSaverSuspend(display, false);
+        xscreensaver_suspended = false;
+    }
+#endif // HAVE_XSS
 }

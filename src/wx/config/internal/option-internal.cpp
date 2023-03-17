@@ -311,6 +311,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kUIAllowKeyboardBackgroundInput, &g_owned_opts.allow_keyboard_background_input),
         Option(OptionID::kUIAllowJoystickBackgroundInput, &g_owned_opts.allow_joystick_background_input),
         Option(OptionID::kUIHideMenuBar, &gopts.hide_menu_bar),
+        Option(OptionID::kUISuspendScreenSaver, &gopts.suspend_screensaver),
 
         /// Sound
         Option(OptionID::kSoundAudioAPI, &gopts.audio_api),
@@ -538,6 +539,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                "AllowJoystickBackgroundInput",
                _("Capture joy events while on background")},
     OptionData{"ui/hideMenuBar", "", _("Hide menu bar when mouse is inactive")},
+    OptionData{"ui/suspendScreenSaver", "", _("Suspend screensaver when game is running")},
 
     /// Sound
     OptionData{"Sound/AudioAPI", "",
