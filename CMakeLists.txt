@@ -103,6 +103,9 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
 option(ENABLE_SDL "Build the SDL port" OFF)
 option(ENABLE_WX "Build the wxWidgets port" ON)
+if(ENABLE_WX)
+    option(ENABLE_XSS "Check XSS support in the wxWidgets port" OFF)
+endif()
 option(ENABLE_DEBUGGER "Enable the debugger" ON)
 option(ENABLE_ASAN "Enable -fsanitize=<option>, address by default, requires debug build" OFF)
 

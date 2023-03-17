@@ -93,6 +93,39 @@ int emulating;
 
 IMPLEMENT_DYNAMIC_CLASS(GameArea, wxPanel)
 
+#ifdef __WXGTK__
+static Display* GetX11Display()
+{
+    return GDK_WINDOW_XDISPLAY(gtk_widget_get_window(wxGetApp().frame->GetHandle()));
+}
+
+#ifdef HAVE_XSS
+int xscreensaver_suspended = 0; // 1 if screensaver is suspended by XSS
+
+static void suspend_screensaver()
+{
+    if (xscreensaver_suspended)
+        return;
+    // suspend screensaver
+    if (emulating && !wxGetApp().UsingWayland()) {
+        auto display = GetX11Display();
+        XScreenSaverSuspend(display, true);
+        xscreensaver_suspended = 1;
+    }
+}
+
+static void unsuspend_screensaver()
+{
+    // unsuspend screensaver
+    if (xscreensaver_suspended) {
+        auto display = GetX11Display();
+        XScreenSaverSuspend(display, false);
+        xscreensaver_suspended = 0;
+    }
+}
+#endif // HAVE_XSS
+#endif // __WXGTK__
+
 GameArea::GameArea()
     : wxPanel(),
       panel(NULL),
@@ -421,6 +454,10 @@ void GameArea::LoadGame(const wxString& name)
 #endif
 #endif
 
+#if defined(__WXGTK__) && defined(HAVE_XSS)
+    suspend_screensaver();
+#endif
+
     // probably only need to do this for GB carts
     if (coreOptions.winGbPrinterEnabled)
         gbSerialFunction = gbPrinterSend;
@@ -632,6 +669,9 @@ void GameArea::UnloadGame(bool destruct)
         cheatsDeleteAll(false);
     }
 
+#if defined(__WXGTK__) && defined(HAVE_XSS)
+    unsuspend_screensaver();
+#endif
     emulating = false;
     loaded = IMAGE_UNKNOWN;
     emusys = NULL;
@@ -1037,6 +1077,9 @@ void GameArea::Pause()
 #endif
 
     paused = was_paused = true;
+#if defined(__WXGTK__) && defined(HAVE_XSS)
+    unsuspend_screensaver();
+#endif
 
     // when the game is paused like this, we should not allow any
     // input to remain pressed, because they could be released
@@ -1055,6 +1098,9 @@ void GameArea::Resume()
         return;
 
     paused = false;
+#if defined(__WXGTK__) && defined(HAVE_XSS)
+    suspend_screensaver();
+#endif
     SetExtraStyle(GetExtraStyle() | wxWS_EX_PROCESS_IDLE);
 
     if (loaded != IMAGE_UNKNOWN)
@@ -1218,6 +1264,9 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
             if (!emulating) {
                 emulating = true;
+#if defined(__WXGTK__) && defined(HAVE_XSS)
+                suspend_screensaver();
+#endif
                 UnloadGame();
             }
 
@@ -1341,13 +1390,6 @@ static void process_keyboard_event(const wxKeyEvent& ev, bool down)
     };
 }
 
-#ifdef __WXGTK__
-static Display* GetX11Display()
-{
-    return GDK_WINDOW_XDISPLAY(gtk_widget_get_window(wxGetApp().frame->GetHandle()));
-}
-#endif
-
 void GameArea::OnKeyDown(wxKeyEvent& ev)
 {
     process_keyboard_event(ev, true);
@@ -1388,7 +1430,7 @@ void GameArea::OnSDLJoy(wxJoyEvent& ev)
 
     // tell Linux to turn off the screensaver/screen-blank if joystick button was pressed
     // this shouldn't be necessary of course
-#if defined(__WXGTK__) && defined(HAVE_XSS)
+#if defined(__WXGTK__) && defined(HAVE_X11) && !defined(HAVE_XSS)
     if (!wxGetApp().UsingWayland()) {
         auto display = GetX11Display();
         XResetScreenSaver(display);
