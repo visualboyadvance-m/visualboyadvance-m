@@ -38,7 +38,7 @@ SoundDriver* soundDriver = 0;
 
 extern bool stopState; // TODO: silence sound when true
 
-int const SOUND_CLOCK_TICKS_ = 167772; // 1/100 second
+int const SOUND_CLOCK_TICKS_ = 280896; // ~1074 samples per frame
 
 static uint16_t soundFinalWave[1600];
 long soundSampleRate = 44100;
