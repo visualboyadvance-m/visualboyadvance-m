@@ -45,61 +45,37 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label>Unit code:</label>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxStaticText" name="UnitCode"/>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxStaticText">
               <label>Cartridge type:</label>
             </object>
             <flag>wxALL</flag>
             <border>5</border>
           </object>
           <object class="sizeritem">
-            <object class="wxStaticText" name="DeviceType"/>
+            <object class="wxStaticText" name="CartridgeType"/>
             <flag>wxALL</flag>
             <border>5</border>
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label>ROM version:</label>
+              <label>SGB code:</label>
             </object>
             <flag>wxALL</flag>
             <border>5</border>
           </object>
           <object class="sizeritem">
-            <object class="wxStaticText" name="Version"/>
+            <object class="wxStaticText" name="SGBCode"/>
             <flag>wxALL</flag>
             <border>5</border>
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label>CRC:</label>
+              <label>CGB code:</label>
             </object>
             <flag>wxALL</flag>
             <border>5</border>
           </object>
           <object class="sizeritem">
-            <object class="wxStaticText" name="CRC"/>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxStaticText">
-              <label>Color:</label>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxStaticText" name="Color"/>
+            <object class="wxStaticText" name="CGBCode"/>
             <flag>wxALL</flag>
             <border>5</border>
           </object>
@@ -153,13 +129,37 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label>Checksum:</label>
+              <label>ROM version:</label>
             </object>
             <flag>wxALL</flag>
             <border>5</border>
           </object>
           <object class="sizeritem">
-            <object class="wxStaticText" name="Checksum"/>
+            <object class="wxStaticText" name="Version"/>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Header checksum:</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText" name="HeaderChecksum"/>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Cartridge checksum:</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText" name="CartridgeChecksum"/>
             <flag>wxALL</flag>
             <border>5</border>
           </object>
