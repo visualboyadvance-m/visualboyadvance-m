@@ -42,6 +42,7 @@
 #include "dialogs/directories-config.h"
 #include "dialogs/display-config.h"
 #include "dialogs/game-boy-config.h"
+#include "dialogs/gb-rom-info.h"
 #include "opts.h"
 #include "widgets/option-validator.h"
 #include "widgets/user-input-ctrl.h"
@@ -2267,22 +2268,7 @@ bool MainFrame::BindControls()
         getlab("Version");
         getlab("CRC");
         d->Fit();
-        d = LoadXRCDialog("GBROMInfo");
-        // just verify fields present
-        getlab("Title");
-        getlab("MakerCode");
-        getlab("MakerName");
-        getlab("UnitCode");
-        getlab("DeviceType");
-        getlab("Version");
-        getlab("CRC");
-        getlab("Color");
-        getlab("ROMSize");
-        getlab("RAMSize");
-        getlab("DestCode");
-        getlab("LicCode");
-        getlab("Checksum");
-        d->Fit();
+        dialogs::GbRomInfo::NewInstance(this);
         d = LoadXRCDialog("CodeSelect");
         // just verify list present
         SafeXRCCTRL<wxControlWithItems>(d, "CodeList");

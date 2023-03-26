@@ -771,6 +771,8 @@ set(
     dialogs/directories-config.cpp
     dialogs/display-config.cpp
     dialogs/game-boy-config.cpp
+    dialogs/game-maker.cpp
+    dialogs/gb-rom-info.cpp
     widgets/group-check-box.cpp
     widgets/keep-on-top-styler.cpp
     widgets/option-validator.cpp
@@ -822,6 +824,8 @@ set(
     dialogs/directories-config.h
     dialogs/display-config.h
     dialogs/game-boy-config.h
+    dialogs/game-maker.h
+    dialogs/gb-rom-info.h
     dialogs/validated-child.h
     widgets/dpi-support.h
     widgets/group-check-box.h
