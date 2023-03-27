@@ -2647,7 +2647,7 @@ void GameArea::OnGBBorderChanged(config::Option* option) {
 
 void GameArea::SuspendScreenSaver() {
 #ifdef HAVE_XSS
-    if (xscreensaver_suspended)
+    if (xscreensaver_suspended || !gopts.suspend_screensaver)
         return;
     // suspend screensaver
     if (emulating && !wxGetApp().UsingWayland()) {

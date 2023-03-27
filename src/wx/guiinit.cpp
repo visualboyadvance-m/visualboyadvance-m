@@ -3188,6 +3188,7 @@ bool MainFrame::BindControls()
 
         d = LoadXRCDialog("UIConfig");
         { getcbb("HideMenuBar", gopts.hide_menu_bar); }
+        { getcbb("SuspendScreenSaver", gopts.suspend_screensaver); }
         wxFilePickerCtrl* fp;
 #define getfp(n, o, l)                                     \
     do {                                                   \

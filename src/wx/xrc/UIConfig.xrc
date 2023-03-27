@@ -12,6 +12,13 @@
         <border>5</border>
       </object>
       <object class="sizeritem">
+        <object class="wxCheckBox" name="SuspendScreenSaver">
+          <label>Suspend ScreenSaver</label>
+        </object>
+        <flag>wxALL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
         <flag>wxALL|wxEXPAND</flag>
         <border>5</border>
         <object class="wxStdDialogButtonSizer">
