@@ -3,6 +3,8 @@
 
 #include <cstdint>
 
+#include "gbCartData.h"
+
 #define gbWidth   160
 #define gbHeight  144
 #define sgbWidth  256
@@ -28,8 +30,18 @@ extern gbRegister AF, BC, DE, HL, SP, PC;
 extern uint16_t IFF;
 int gbDis(char*, uint16_t);
 
-bool gbLoadRom(const char*);
-bool gbUpdateSizes();
+// Attempts to load the ROM file at `filename`. Returns true on success.
+bool gbLoadRom(const char* filename);
+// Attempts to load the ROM at `romData`, with a size of `romSize`. This will
+// make a copy of `romData`. Returns true on success.
+bool gbLoadRomData(const char* romData, size_t romSize);
+
+#ifndef __LIBRETRO__
+// Attempts to apply `patchName` to the currently loaded ROM. Returns true on
+// success.
+bool gbApplyPatch(const char* patchName);
+#endif  // __LIBRETRO__
+
 void gbEmulate(int);
 void gbWriteMemory(uint16_t, uint8_t);
 void gbDrawLine();
@@ -61,8 +73,6 @@ bool gbWritePNGFile(const char*);
 bool gbWriteBMPFile(const char*);
 bool gbReadGSASnapshot(const char*);
 
-bool gbLoadRomData(const char* data, unsigned size);
-
 // Allows invalid vram/palette access needed for Colorizer hacked games in GBC/GBA hardware
 void setColorizerHack(bool value);
 bool allowColorizerHack(void);
@@ -72,6 +82,7 @@ extern int gbRomType; // gets type from header 0x147
 extern int gbBattery; // enabled when gbRamSize != 0
 extern int gbRTCPresent;  // gbROM has RTC support
 
+extern gbCartData g_gbCartData;
 extern struct EmulatedSystem GBSystem;
 
 #endif // GB_H
