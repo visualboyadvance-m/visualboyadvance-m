@@ -238,16 +238,8 @@ void GameArea::LoadGame(const wxString& name)
             return;
         }
 
-        rom_size = gbRomSize;
-
         if (loadpatch) {
-            int size = rom_size;
-            applyPatch(UTF8(pfn.GetFullPath()), &gbRom, &size);
-
-            if (size != (int)rom_size)
-                gbUpdateSizes();
-
-            rom_size = size;
+            gbApplyPatch(UTF8(pfn.GetFullPath()));
         }
 
         // start sound; this must happen before CPU stuff
