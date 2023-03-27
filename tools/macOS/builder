@@ -71,7 +71,7 @@ best_llvm=$(
 )
 
 BUILD_ENV=$(cat <<EOF
-export MACOSX_DEPLOYMENT_TARGET=10.7
+export MACOSX_DEPLOYMENT_TARGET=10.10
 export COMMAND_MODE=unix2003
 export PATH=/usr/bin:/bin:/usr/sbin:/sbin
 
@@ -113,6 +113,8 @@ done
 table_insert_after DISTS cmake '
     libunwind       https://github.com/llvm-mirror/libunwind/archive/3e6ec2ae9afaa3683269b690612f84d907943ea2.tar.gz  lib/libunwind.a
 '
+
+table_line_replace DIST_ARGS libunwind '-DLIBUNWIND_ENABLE_STATIC=ON -DLIBUNWIND_ENABLE_SHARED=OFF'
 
 # issues with perl modules linked to our libs and brew perl
 table_line_remove DISTS shared-mime-info
@@ -184,9 +186,11 @@ table_line_append  DIST_PRE_BUILD       libmodplug " \
 table_line_append DIST_PRE_BUILD libzmq "sed -i.bak 's/-lstdc++/-lc++/g' src/libzmq.pc.in"
 table_line_append DIST_PRE_BUILD ffmpeg "sed -i.bak 's/-lstdc++/-lc++/g' configure"
 
-table_line_replace DISTS wxwidgets "https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.5.1/wxWidgets-3.0.5.1.tar.bz2 lib/libwx_baseu-3.0*.a"
+# For a 10.7 target:
+#table_line_replace DISTS wxwidgets "https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.5.1/wxWidgets-3.0.5.1.tar.bz2 lib/libwx_baseu-3.0*.a"
 
-table_line_append DIST_CONFIGURE_OVERRIDES wxwidgets  "--with-macosx-version-min=\$MACOSX_DEPLOYMENT_TARGET LDFLAGS=\"\$LDFLAGS -stdlib=libc++\" --disable-stl"
+# For 10.7 add --disable-stl
+table_line_append DIST_ARGS wxwidgets  "--with-macosx-version-min=\$MACOSX_DEPLOYMENT_TARGET LDFLAGS=\"\$LDFLAGS -stdlib=libc++\""
 
 table_line_append DIST_ARGS libmodplug "CC=clang++ CXX=clang++"
 
@@ -196,7 +200,7 @@ table_line_append DIST_PRE_BUILD libvpx " \
 
 table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg "--disable-videotoolbox --extra-ldflags='-framework CoreText'"
 
-table_line_append DIST_PATCHES ffmpeg "-p0 https://gist.githubusercontent.com/rkitover/db75d083b74617b186eec11965c1da74/raw/20da2f8c6d8c02ce284096c5e805ae671351cc6e/ffmpeg-macos10-7.patch"
+#table_line_append DIST_PATCHES ffmpeg "-p0 https://gist.githubusercontent.com/rkitover/db75d083b74617b186eec11965c1da74/raw/20da2f8c6d8c02ce284096c5e805ae671351cc6e/ffmpeg-macos10-7.patch"
 
 builder "$@"
 

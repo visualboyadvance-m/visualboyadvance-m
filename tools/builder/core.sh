@@ -189,7 +189,7 @@ DISTS=$DISTS'
     harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/5.1.0/harfbuzz-5.1.0.tar.xz          lib/libharfbuzz.a
     sfml            https://github.com/SFML/SFML/releases/download/2.5.1/SFML-2.5.1-sources.zip                 lib/libsfml-system-s.a
     shared-mime-info https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.2/shared-mime-info-2.2.tar.bz2  bin/update-mime-database
-    wxwidgets       https://github.com/wxWidgets/wxWidgets/archive/31720e1ee102b195265203f9e9886929bff0528d.tar.gz lib/libwx_baseu-3.*.a
+    wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.2.1/wxWidgets-3.2.2.1.tar.bz2 lib/libwx_baseu-3.*.a
     graphite2       https://github.com/silnrsi/graphite/archive/425da3d08926b9cf321fc0014dfa979c24d2cf64.tar.gz lib/libgraphite2.a
     xvidcore        https://downloads.xvid.com/downloads/xvidcore-1.3.7.tar.bz2                                 lib/libxvidcore.a
     fribidi         https://github.com/fribidi/fribidi/releases/download/v1.0.12/fribidi-1.0.12.tar.xz          lib/libfribidi.a
@@ -241,7 +241,7 @@ if [ -z "$target_os" ] && [ "$os" = linux ] && [ "$bits" = 64 ]; then
     export CMAKE_INSTALL_ARGS="$CMAKE_INSTALL_ARGS -DCMAKE_INSTALL_RPATH=/usr/lib64 -DCMAKE_INSTALL_LIBDIR=/usr/lib64"
 fi
 
-export CONFIGURE_ARGS="$CONFIGURE_ARGS --disable-shared --enable-static $CONFIGURE_INSTALL_ARGS"
+export CONFIGURE_ARGS="$CONFIGURE_ARGS --disable-shared $CONFIGURE_INSTALL_ARGS"
 export CMAKE_ARGS="$CMAKE_BASE_ARGS $CMAKE_ARGS $CMAKE_INSTALL_ARGS"
 export MESON_ARGS="$MESON_BASE_ARGS --buildtype release --default-library static $MESON_INSTALL_ARGS"
 
@@ -268,6 +268,7 @@ DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     docbook2x       autoreconf
     libvorbis       autoreconf
     libgpg-error    autoreconf
+    wxwidgets       autoreconf
 "
 
 DIST_RELOCATION_TYPES="$DIST_RELOCATION_TYPES
@@ -311,6 +312,7 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
     docbook2x       sed -i.bak 's/^\\( *SUBDIRS *= *.*\\)doc\\(.*\\)\$/\1\2/'           Makefile.am; \
                     sed -i.bak 's/^\\( *SUBDIRS *= *.*\\)documentation\\(.*\\)\$/\1\2/' xslt/Makefile.am;
     hiredis         sed -i.bak 's/ SHARED / STATIC /' CMakeLists.txt;
+    wxwidgets       sed -i.bak 's/^WX_LDFLAGS=.*/WX_LDFLAGS=\$USER_LDFLAGS/' configure.in;
 "
 
 DIST_POST_BUILD="$DIST_POST_BUILD
@@ -336,7 +338,6 @@ DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
     openssl     ./config no-shared --prefix=/usr --openssldir=/etc/ssl
     cmake       ./configure --prefix=/usr --no-qt-gui --parallel=\$NUM_CPUS
     XML-SAX     echo no | PERL_MM_USE_DEFAULT=0 \"\$perl\" Makefile.PL
-    wxwidgets   ./configure \$CONFIGURE_REQUIRED_ARGS --disable-shared --prefix=/usr --enable-stl --disable-precomp-headers --enable-cxx11 --enable-permissive --with-opengl --with-libpng
     libvpx      ./configure --disable-shared --enable-static --prefix=/usr --disable-unit-tests --disable-tools --disable-docs --disable-examples
     ffmpeg      ./configure --disable-shared --enable-static --prefix=/usr --pkg-config-flags=--static --enable-nonfree --extra-version=tessus --enable-fontconfig --enable-gpl --enable-version3 --enable-libass --enable-libbluray --enable-libfreetype --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopus --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzmq --enable-openssl --enable-lzma --extra-cflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-cxxflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-objcflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-libs=-liconv --cc=\"\$CC\" --cxx=\"\$CXX\"
 "
@@ -346,6 +347,7 @@ DIST_BUILD_OVERRIDES="$DIST_BUILD_OVERRIDES
                    sed -i.bak \"s|/[^ ][^ ]*/libfl[.][^ ]*|-L\$BUILD_ROOT/root/lib -lfl|\" Makefile; \
                    make -j\$NUM_CPUS; \
                    make install bin=\"\$BUILD_ROOT/root/bin\" mansrc=\"\$BUILD_ROOT/root/share/man/man1\" privlib=\"\$BUILD_ROOT/root/lib/c2man\"
+    zstd           make -j\$NUM_CPUS -C lib install-static DESTDIR=\"\$BUILD_ROOT/root\" LIBDIR=/lib
     setuptools     python bootstrap.py; python easy_install.py .
     pip            easy_install .
     ninja          python configure.py --bootstrap && cp -af ./ninja \"\$BUILD_ROOT/root/bin\"
@@ -367,7 +369,9 @@ DIST_BUILD_OVERRIDES="$DIST_BUILD_OVERRIDES
 
 DIST_ARGS="$DIST_ARGS
     pkgconf     --disable-tests
-    libicu      --disable-extras --disable-tools --disable-tests --disable-samples --with-library-bits=64
+    curl        --with-openssl --without-nghttp2 --without-libidn2 --without-librtmp --without-brotli
+    libffi      --enable-static
+    libicu      --enable-static --disable-extras --disable-tools --disable-tests --disable-samples --with-library-bits=64
     gettext     --with-included-gettext --with-included-glib --with-included-libcroco --with-included-libunistring --with-included-libxml --disable-curses CPPFLAGS=\"\$CPPFLAGS -DLIBXML_STATIC\"
     pkgconfig   --with-internal-glib --with-libiconv=gnu
     curl        --with-ssl --without-brotli
@@ -398,8 +402,9 @@ DIST_ARGS="$DIST_ARGS
     libbluray   --disable-bdjava-jar --disable-examples
     libopencore-amrnb   --disable-compile-c
     vidstab     -DUSE_OMP=NO
-    libx264     --enable-pic
+    libx264     --enable-static --enable-pic
     libx265     -DHIGH_BIT_DEPTH=ON -DENABLE_ASSEMBLY=OFF -DENABLE_CLI=OFF
+    wxwidgets   --enable-stl --disable-precomp-headers --enable-cxx11 --enable-permissive --with-opengl --with-libpng
 "
 
 export DIST_BARE_MAKE_ARGS='CC="$CC" CXX="$CXX" LD="$CXX"'
@@ -445,7 +450,7 @@ DIST_EXTRA_LIBS="$DIST_EXTRA_LIBS
     shared-mime-info    \$LD_START_GROUP -lxml2 -lgio-2.0 -lgmodule-2.0 -lgobject-2.0 -lglib-2.0 -lpcre -llzma -lz -lm -lffi -lpthread -liconv -lresolv -ldl \$LD_END_GROUP
     python3             -liconv -lintl
     harfbuzz            -lz
-    wxwidgets           -ljpeg -ltiff
+    wxwidgets           -ljpeg -ltiff -liconv
 "
 
 OIFS=$IFS
