@@ -93,39 +93,6 @@ int emulating;
 
 IMPLEMENT_DYNAMIC_CLASS(GameArea, wxPanel)
 
-#ifdef __WXGTK__
-static Display* GetX11Display()
-{
-    return GDK_WINDOW_XDISPLAY(gtk_widget_get_window(wxGetApp().frame->GetHandle()));
-}
-
-#ifdef HAVE_XSS
-int xscreensaver_suspended = 0; // 1 if screensaver is suspended by XSS
-
-static void suspend_screensaver()
-{
-    if (xscreensaver_suspended)
-        return;
-    // suspend screensaver
-    if (emulating && !wxGetApp().UsingWayland()) {
-        auto display = GetX11Display();
-        XScreenSaverSuspend(display, true);
-        xscreensaver_suspended = 1;
-    }
-}
-
-static void unsuspend_screensaver()
-{
-    // unsuspend screensaver
-    if (xscreensaver_suspended) {
-        auto display = GetX11Display();
-        XScreenSaverSuspend(display, false);
-        xscreensaver_suspended = 0;
-    }
-}
-#endif // HAVE_XSS
-#endif // __WXGTK__
-
 GameArea::GameArea()
     : wxPanel(),
       panel(NULL),
@@ -446,9 +413,7 @@ void GameArea::LoadGame(const wxString& name)
 #endif
 #endif
 
-#if defined(__WXGTK__) && defined(HAVE_XSS)
-    suspend_screensaver();
-#endif
+    SuspendScreenSaver();
 
     // probably only need to do this for GB carts
     if (coreOptions.winGbPrinterEnabled)
@@ -661,9 +626,7 @@ void GameArea::UnloadGame(bool destruct)
         cheatsDeleteAll(false);
     }
 
-#if defined(__WXGTK__) && defined(HAVE_XSS)
-    unsuspend_screensaver();
-#endif
+    UnsuspendScreenSaver();
     emulating = false;
     loaded = IMAGE_UNKNOWN;
     emusys = NULL;
@@ -1069,9 +1032,7 @@ void GameArea::Pause()
 #endif
 
     paused = was_paused = true;
-#if defined(__WXGTK__) && defined(HAVE_XSS)
-    unsuspend_screensaver();
-#endif
+    UnsuspendScreenSaver();
 
     // when the game is paused like this, we should not allow any
     // input to remain pressed, because they could be released
@@ -1090,9 +1051,7 @@ void GameArea::Resume()
         return;
 
     paused = false;
-#if defined(__WXGTK__) && defined(HAVE_XSS)
-    suspend_screensaver();
-#endif
+    SuspendScreenSaver();
     SetExtraStyle(GetExtraStyle() | wxWS_EX_PROCESS_IDLE);
 
     if (loaded != IMAGE_UNKNOWN)
@@ -1256,9 +1215,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
             if (!emulating) {
                 emulating = true;
-#if defined(__WXGTK__) && defined(HAVE_XSS)
-                suspend_screensaver();
-#endif
+                SuspendScreenSaver();
                 UnloadGame();
             }
 
@@ -1381,6 +1338,13 @@ static void process_keyboard_event(const wxKeyEvent& ev, bool down)
         wxWakeUpIdle();
     };
 }
+
+#ifdef __WXGTK__
+static Display* GetX11Display()
+{
+    return GDK_WINDOW_XDISPLAY(gtk_widget_get_window(wxGetApp().frame->GetHandle()));
+}
+#endif // __WXGTK__
 
 void GameArea::OnKeyDown(wxKeyEvent& ev)
 {
@@ -2679,4 +2643,28 @@ void GameArea::OnGBBorderChanged(config::Option* option) {
             DelBorder();
         }
     }
+}
+
+void GameArea::SuspendScreenSaver() {
+#ifdef HAVE_XSS
+    if (xscreensaver_suspended)
+        return;
+    // suspend screensaver
+    if (emulating && !wxGetApp().UsingWayland()) {
+        auto display = GetX11Display();
+        XScreenSaverSuspend(display, true);
+        xscreensaver_suspended = true;
+    }
+#endif // HAVE_XSS
+}
+
+void GameArea::UnsuspendScreenSaver() {
+#ifdef HAVE_XSS
+    // unsuspend screensaver
+    if (xscreensaver_suspended) {
+        auto display = GetX11Display();
+        XScreenSaverSuspend(display, false);
+        xscreensaver_suspended = false;
+    }
+#endif // HAVE_XSS
 }
