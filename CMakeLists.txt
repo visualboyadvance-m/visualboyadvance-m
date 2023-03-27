@@ -885,6 +885,7 @@ set(
     src/common/iniparser.h
     src/common/memgzio.h
     src/common/Port.h
+    src/common/sizes.h
     src/common/SoundDriver.h
     src/common/SoundSDL.h
 )
@@ -969,6 +970,7 @@ set(
 set(
     SRC_GB
     src/gb/GB.cpp
+    src/gb/gbCartData.cpp
     src/gb/gbCheats.cpp
     src/gb/gbDis.cpp
     src/gb/gbGfx.cpp
@@ -982,6 +984,7 @@ set(
 set(
     HDR_GB
     src/gb/gb.h
+    src/gb/gbCartData.h
     src/gb/gbCheats.h
     src/gb/gbCodes.h
     src/gb/gbCodesCB.h

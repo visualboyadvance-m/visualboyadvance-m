@@ -7,7 +7,6 @@ int gbRomSizeMask = 0;
 int gbRomSize = 0;
 int gbRamSizeMask = 0;
 int gbRamSize = 0;
-int gbTAMA5ramSize = 0;
 
 uint8_t* gbMemory = NULL;
 uint8_t* gbVram = NULL;

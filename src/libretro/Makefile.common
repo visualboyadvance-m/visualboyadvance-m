@@ -53,6 +53,7 @@ SOURCES_CXX += \
 	$(CORE_DIR)/gba/Sram.cpp
 
 SOURCES_CXX += \
+	$(CORE_DIR)/gb/gbCartData.cpp \
 	$(CORE_DIR)/gb/gbCheats.cpp \
 	$(CORE_DIR)/gb/GB.cpp \
 	$(CORE_DIR)/gb/gbGfx.cpp \

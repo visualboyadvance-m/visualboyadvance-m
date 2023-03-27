@@ -1725,15 +1725,9 @@ int main(int argc, char** argv)
 
                 cartridgeType = IMAGE_GB;
                 emulator = GBSystem;
-                int size = gbRomSize, patchnum;
-                for (patchnum = 0; patchnum < patchNum; patchnum++) {
+                for (int patchnum = 0; patchnum < patchNum; patchnum++) {
                     fprintf(stdout, "Trying patch %s%s\n", patchNames[patchnum],
-                        applyPatch(patchNames[patchnum], &gbRom, &size) ? " [success]" : "");
-                }
-                if (size != gbRomSize) {
-                    extern bool gbUpdateSizes();
-                    gbUpdateSizes();
-                    gbReset();
+                        gbApplyPatch(patchNames[patchnum]) ? " [success]" : "");
                 }
                 gbReset();
             }

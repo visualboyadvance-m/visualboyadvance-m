@@ -669,6 +669,20 @@ ConnectionState InitLink(LinkMode mode)
 void StartLink(uint16_t siocnt)
 {
     if (!linkDriver || !linkDriver->start) {
+        // We still need to update the SIOCNT register for consistency. Some
+        // games (e.g. Digimon Racing EUR) will be stuck in an infinite loop
+        // waiting git the SIOCNT register to be updated otherwise.
+        // This mimicks the NO_LINK behavior.
+        if (siocnt & 0x80) {
+            siocnt &= 0xff7f;
+            if (siocnt & 1 && (siocnt & 0x4000)) {
+                UPDATE_REG(COMM_SIOCNT, 0xFF);
+                IF |= 0x80;
+                UPDATE_REG(0x202, IF);
+                siocnt &= 0x7f7f;
+            }
+        }
+        UPDATE_REG(COMM_SIOCNT, siocnt);
         return;
     }
 

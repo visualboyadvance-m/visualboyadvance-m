@@ -7,7 +7,6 @@ extern int gbRomSizeMask;
 extern int gbRomSize;
 extern int gbRamSize;
 extern int gbRamSizeMask;
-extern int gbTAMA5ramSize;
 
 extern uint8_t* bios;
 
