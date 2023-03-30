@@ -104,7 +104,7 @@ bool DirectSound::init(long sampleRate)
         return false;
     }
 
-    if (FAILED(hr = pDirectSound->SetCooperativeLevel((HWND)wxGetApp().frame->GetHandle(), DSSCL_EXCLUSIVE))) {
+    if (FAILED(hr = pDirectSound->SetCooperativeLevel((HWND)wxGetApp().frame->GetHandle(), DSSCL_PRIORITY))) {
         wxLogError(_("Cannot SetCooperativeLevel %08x"), hr);
         return false;
     }

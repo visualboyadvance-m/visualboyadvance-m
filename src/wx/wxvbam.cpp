@@ -1143,32 +1143,18 @@ void MainFrame::MenuPopped(wxMenuEvent& evt)
     evt.Skip();
 }
 
-// Pause game if menu pops up.
-//
-// This is a feature most people don't like, and it causes problems with
-// keyboard game keys on mac, so we will disable it for now.
-//
-// On Windows, there will still be a pause because of how the windows event
-// model works, in addition the audio will loop with SDL, so we still pause on
-// Windows.
-//
-// TODO: This needs to be fixed properly.
-//
+// On Windows, opening the menubar will stop the app, but DirectSound will
+// loop, so we pause audio here.
 void MainFrame::SetMenusOpened(bool state)
 {
-    if ((menus_opened = state)) {
+    menus_opened = state;
+
 #ifdef __WXMSW__
-        paused       = true;
-        panel->Pause();
+    if (menus_opened)
+        soundPause();
+    else if (!paused)
+        soundResume();
 #endif
-    }
-    else {
-#ifdef __WXMSW__
-        paused       = false;
-        pause_next   = false;
-        panel->Resume();
-#endif
-    }
 }
 
 // ShowModal that also disables emulator loop
