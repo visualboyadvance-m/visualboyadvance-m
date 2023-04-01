@@ -8,13 +8,13 @@ int gbRomSize = 0;
 int gbRamSizeMask = 0;
 int gbRamSize = 0;
 
-uint8_t* gbMemory = NULL;
-uint8_t* gbVram = NULL;
-uint8_t* gbRom = NULL;
-uint8_t* gbRam = NULL;
-uint8_t* gbWram = NULL;
-uint16_t* gbLineBuffer = NULL;
-uint8_t* gbTAMA5ram = NULL;
+uint8_t* gbMemory = nullptr;
+uint8_t* gbVram = nullptr;
+uint8_t* gbRom = nullptr;
+uint8_t* gbRam = nullptr;
+uint8_t* gbWram = nullptr;
+uint16_t* gbLineBuffer = nullptr;
+uint8_t* gbTAMA5ram = nullptr;
 
 uint16_t gbPalette[128];
 uint8_t gbBgp[4] = { 0, 1, 2, 3 };

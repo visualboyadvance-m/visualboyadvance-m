@@ -227,9 +227,13 @@ bool gbInitializeRom(size_t romSize) {
             }
 
             gbRamFill = 0x00;
-            if (gbTAMA5ram == nullptr)
-                gbTAMA5ram = (uint8_t*)malloc(kTama5RamSize);
-            memset(gbTAMA5ram, 0x0, kTama5RamSize);
+            if (gbTAMA5ram == nullptr) {
+                gbTAMA5ram = (uint8_t*)calloc(1, kTama5RamSize);
+                if (gbTAMA5ram == nullptr) {
+                    assert(false);
+                    return false;
+                }
+            }
 
             g_mapperRAM = mapperTAMA5RAM;
             g_mapperReadRAM = mapperTAMA5ReadRAM;
@@ -253,6 +257,10 @@ bool gbInitializeRom(size_t romSize) {
     const size_t ramSize = g_gbCartData.ram_size();
     if (ramSize > 0) {
         gbRam = (uint8_t*)malloc(ramSize);
+        if (gbRam == nullptr) {
+            assert(false);
+            return false;
+        }
         memset(gbRam, gbRamFill, ramSize);
     }
 
@@ -261,14 +269,22 @@ bool gbInitializeRom(size_t romSize) {
     setColorizerHack(false);
 
     gbMemory = (uint8_t*)malloc(65536);
+    if (gbMemory == nullptr) {
+        assert(false);
+        return false;
+    }
 
-#ifdef __LIBRETRO__
-    pix = (uint8_t*)calloc(1, 4 * 256 * 224);
-#else
-    pix = (uint8_t*)calloc(1, 4 * 257 * 226);
-#endif
+    pix = (uint8_t*)calloc(1, kGBPixSize);
+    if (pix == nullptr) {
+        assert(false);
+        return false;
+    }
 
-    gbLineBuffer = (uint16_t*)malloc(160 * sizeof(uint16_t));
+    gbLineBuffer = (uint16_t*)malloc(kGBLineBufferSize);
+    if (gbLineBuffer == nullptr) {
+        assert(false);
+        return false;
+    }
 
     return true;
 }
@@ -281,7 +297,7 @@ bool inBios = false;
 bool memorydebug = false;
 char gbBuffer[2048];
 
-extern uint16_t gbLineMix[160];
+extern uint16_t gbLineMix[kGBWidth];
 
 // registers
 gbRegister PC;
@@ -1436,7 +1452,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
 
                 //  systemDrawScreen();
 
-                gbRegisterLYLCDCOffOn = (register_LY + 144) % 154;
+                gbRegisterLYLCDCOffOn = (register_LY + kGBHeight) % 154;
 
                 gbLcdTicks = GBLCD_MODE_2_CLOCK_TICKS - (gbSpeed ? 2 : 1);
                 gbLcdTicksDelayed = GBLCD_MODE_2_CLOCK_TICKS - (gbSpeed ? 1 : 0);
@@ -1683,7 +1699,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
     // WY
     case 0x4a:
         gbMemory[0xff4a] = register_WY = value;
-        if ((register_LY <= register_WY) && ((gbWindowLine < 0) || (gbWindowLine >= 144))) {
+        if ((register_LY <= register_WY) && ((gbWindowLine < 0) || (gbWindowLine >= (int)kGBHeight))) {
             gbWindowLine = -1;
             oldRegister_WY = register_WY;
         }
@@ -2356,7 +2372,7 @@ void gbCPUInit(const char* biosFileName, bool useBiosFile)
 
     coreOptions.useBios = false;
     if (useBiosFile) {
-        int expectedSize = (gbHardware & 2) ? 0x900 : 0x100;
+        int expectedSize = (gbHardware & 2) ? kCGBBiosSize : kGBBiosSize;
         int size = expectedSize;
         if (utilLoad(biosFileName,
                 CPUIsGBBios,
@@ -2494,21 +2510,30 @@ void gbReset()
     oldRegister_WY = 146;
     gbInterruptLaunched = 0;
 
-    if (gbCgbMode == 1) {
-        if (gbVram == NULL)
-            gbVram = (uint8_t*)malloc(0x4000);
-        if (gbWram == NULL)
-            gbWram = (uint8_t*)malloc(0x8000);
-        memset(gbVram, 0, 0x4000);
-        memset(gbPalette, 0, 2 * 128);
-    } else {
-        if (gbVram != NULL) {
-            free(gbVram);
-            gbVram = NULL;
+    if (gbCgbMode) {
+        if (gbVram == nullptr) {
+            gbVram = (uint8_t*)calloc(1, kGBVRamSize);
+            if (gbVram == nullptr) {
+                assert(false);
+                return;
+            }
         }
-        if (gbWram != NULL) {
+        if (gbWram == nullptr) {
+            gbWram = (uint8_t*)malloc(kGBWRamSize);
+            if (gbWram == nullptr) {
+                assert(false);
+                return;
+            }
+        }
+        memset(gbPalette, 0, sizeof(gbPalette));
+    } else {
+        if (gbVram != nullptr) {
+            free(gbVram);
+            gbVram = nullptr;
+        }
+        if (gbWram != nullptr) {
             free(gbWram);
-            gbWram = NULL;
+            gbWram = nullptr;
         }
     }
 
@@ -2526,7 +2551,7 @@ void gbReset()
     // In all cases, most of the 2nd bank is filled with 00s.
     // The starting data are important for some 'buggy' games, like Buster Brothers or
     // Karamuchou ha Oosawagi!.
-    if (gbMemory != NULL) {
+    if (gbMemory != nullptr) {
         memset(gbMemory, 0xff, 65536);
         for (int temp = 0xC000; temp < 0xE000; temp++)
             if ((temp & 0x8) ^ ((temp & 0x800) >> 8)) {
@@ -2552,14 +2577,17 @@ void gbReset()
     }
 
     // clean LineBuffer
-    if (gbLineBuffer != NULL)
-        memset(gbLineBuffer, 0, sizeof(*gbLineBuffer));
+    if (gbLineBuffer != nullptr) {
+        memset(gbLineBuffer, 0, kGBLineBufferSize);
+    }
     // clean Pix
-    if (pix != NULL)
-        memset(pix, 0, sizeof(*pix));
+    if (pix != nullptr) {
+        memset(pix, 0, kGBPixSize);
+    }
     // clean Vram
-    if (gbVram != NULL)
-        memset(gbVram, 0, 0x4000);
+    if (gbVram != nullptr) {
+        memset(gbVram, 0, kGBVRamSize);
+    }
     // clean Wram 2
     // This kinda emulates the startup state of Wram on GBC (not very accurate,
     // but way closer to the reality than filling it with 00es or FFes).
@@ -2567,7 +2595,7 @@ void gbReset()
     // In all cases, most of the 2nd bank is filled with 00s.
     // The starting data are important for some 'buggy' games, like Buster Brothers or
     // Karamuchou ha Oosawagi!
-    if (gbWram != NULL) {
+    if (gbWram != nullptr) {
         for (int i = 0; i < 8; i++)
             if (i != 2)
                 memcpy((uint16_t*)(gbWram + i * 0x1000), (uint16_t*)(gbMemory + 0xC000), 0x1000);
@@ -2732,9 +2760,9 @@ void gbReset()
     if ((gbHardware & 7) && (bios != NULL) && coreOptions.useBios && !coreOptions.skipBios) {
         if (gbHardware & 5) {
             memcpy((uint8_t*)(gbMemory), (uint8_t*)(gbRom), 0x1000);
-            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), 0x100);
+            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), kGBBiosSize);
         } else {
-            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), 0x900);
+            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), kCGBBiosSize);
             memcpy((uint8_t*)(gbMemory + 0x100), (uint8_t*)(gbRom + 0x100), 0x100);
         }
         gbWhiteScreen = 0;
@@ -3541,26 +3569,7 @@ bool gbReadSaveMMM01(const char* name)
     } else
         return false;
 }
-#endif // !__LIBRETRO__
 
-void gbInit()
-{
-    gbGenFilter();
-    gbSgbInit();
-    setColorizerHack(false);
-
-    gbMemory = (uint8_t*)malloc(65536);
-
-#ifdef __LIBRETRO__
-    pix = (uint8_t*)calloc(1, 4 * 256 * 224);
-#else
-    pix = (uint8_t*)calloc(1, 4 * 257 * 226);
-#endif
-
-    gbLineBuffer = (uint16_t*)malloc(160 * sizeof(uint16_t));
-}
-
-#ifndef __LIBRETRO__
 bool gbWriteBatteryFile(const char* file, bool extendedSave)
 {
     if (gbBattery) {
@@ -3870,7 +3879,7 @@ static bool gbWriteSaveState(gzFile gzFile)
         utilGzWrite(gzFile, gbTAMA5ram, kTama5RamSize);
     utilGzWrite(gzFile, &gbDataMMM01, sizeof(gbDataMMM01));
 
-    utilGzWrite(gzFile, gbPalette, 128 * sizeof(uint16_t));
+    utilGzWrite(gzFile, gbPalette, sizeof(gbPalette));
 
     utilGzWrite(gzFile, &gbMemory[0x8000], 0x8000);
 
@@ -3880,8 +3889,8 @@ static bool gbWriteSaveState(gzFile gzFile)
     }
 
     if (gbCgbMode) {
-        utilGzWrite(gzFile, gbVram, 0x4000);
-        utilGzWrite(gzFile, gbWram, 0x8000);
+        utilGzWrite(gzFile, gbVram, kGBVRamSize);
+        utilGzWrite(gzFile, gbWram, kGBWRamSize);
     }
 
     gbSoundSaveGame(gzFile);
@@ -3983,22 +3992,31 @@ static bool gbReadSaveState(gzFile gzFile)
     utilReadData(gzFile, gbSaveGameStruct);
 
     // Correct crash when loading color gameboy save in regular gameboy type.
-    if (!gbCgbMode) {
-        if (gbVram != NULL) {
-            free(gbVram);
-            gbVram = NULL;
+    if (gbCgbMode) {
+        if (gbVram == nullptr) {
+            gbVram = (uint8_t*)calloc(1, kGBVRamSize);
+            if (gbVram == nullptr) {
+                assert(false);
+                return false;
+            }
         }
-        if (gbWram != NULL) {
-            free(gbWram);
-            gbWram = NULL;
+        if (gbWram == nullptr) {
+            gbWram = (uint8_t*)malloc(kGBWRamSize);
+            if (gbWram == nullptr) {
+                assert(false);
+                return false;
+            }
         }
+        memset(gbPalette, 0, sizeof(gbPalette));
     } else {
-        if (gbVram == NULL)
-            gbVram = (uint8_t*)malloc(0x4000);
-        if (gbWram == NULL)
-            gbWram = (uint8_t*)malloc(0x8000);
-        memset(gbVram, 0, 0x4000);
-        memset(gbPalette, 0, 2 * 128);
+        if (gbVram != nullptr) {
+            free(gbVram);
+            gbVram = nullptr;
+        }
+        if (gbWram != nullptr) {
+            free(gbWram);
+            gbWram = nullptr;
+        }
     }
 
     if (version >= GBSAVE_GAME_VERSION_7) {
@@ -4034,7 +4052,7 @@ static bool gbReadSaveState(gzFile gzFile)
     if (version < GBSAVE_GAME_VERSION_5) {
         utilGzRead(gzFile, pix, 256 * 224 * sizeof(uint16_t));
     }
-    memset(pix, 0, 257 * 226 * sizeof(uint32_t));
+    memset(pix, 0, kGBPixSize);
 
     if (version < GBSAVE_GAME_VERSION_6) {
         utilGzRead(gzFile, gbPalette, 64 * sizeof(uint16_t));
@@ -4080,9 +4098,9 @@ static bool gbReadSaveState(gzFile gzFile)
         gbMemoryMap[0x00] = &gbMemory[0x0000];
         if (gbHardware & 5) {
             memcpy((uint8_t*)(gbMemory), (uint8_t*)(gbRom), 0x1000);
-            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), 0x100);
+            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), kGBBiosSize);
         } else if (gbHardware & 2) {
-            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), 0x900);
+            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), kCGBBiosSize);
             memcpy((uint8_t*)(gbMemory + 0x100), (uint8_t*)(gbRom + 0x100), 0x100);
         }
 
@@ -4166,8 +4184,8 @@ static bool gbReadSaveState(gzFile gzFile)
     }
 
     if (gbCgbMode) {
-        utilGzRead(gzFile, gbVram, 0x4000);
-        utilGzRead(gzFile, gbWram, 0x8000);
+        utilGzRead(gzFile, gbVram, kGBVRamSize);
+        utilGzRead(gzFile, gbWram, kGBWRamSize);
 
         int value = register_SVBK;
         if (value == 0)
@@ -4310,65 +4328,65 @@ bool gbReadSaveState(const char* name)
 bool gbWritePNGFile(const char* fileName)
 {
     if (gbBorderOn)
-        return utilWritePNGFile(fileName, 256, 224, pix);
-    return utilWritePNGFile(fileName, 160, 144, pix);
+        return utilWritePNGFile(fileName, kSGBWidth, kSGBHeight, pix);
+    return utilWritePNGFile(fileName, kGBWidth, kGBHeight, pix);
 }
 
 bool gbWriteBMPFile(const char* fileName)
 {
     if (gbBorderOn)
-        return utilWriteBMPFile(fileName, 256, 224, pix);
-    return utilWriteBMPFile(fileName, 160, 144, pix);
+        return utilWriteBMPFile(fileName, kSGBWidth, kSGBHeight, pix);
+    return utilWriteBMPFile(fileName, kGBWidth, kGBHeight, pix);
 }
 #endif // !__LIBRETRO__
 
 void gbCleanUp()
 {
-    if (gbRam != NULL) {
+    if (gbRam != nullptr) {
         free(gbRam);
-        gbRam = NULL;
+        gbRam = nullptr;
     }
 
-    if (gbRom != NULL) {
+    if (gbRom != nullptr) {
         free(gbRom);
-        gbRom = NULL;
+        gbRom = nullptr;
     }
 
-    if (bios != NULL) {
+    if (bios != nullptr) {
         free(bios);
-        bios = NULL;
+        bios = nullptr;
     }
 
-    if (gbMemory != NULL) {
+    if (gbMemory != nullptr) {
         free(gbMemory);
-        gbMemory = NULL;
+        gbMemory = nullptr;
     }
 
-    if (gbLineBuffer != NULL) {
+    if (gbLineBuffer != nullptr) {
         free(gbLineBuffer);
-        gbLineBuffer = NULL;
+        gbLineBuffer = nullptr;
     }
 
-    if (pix != NULL) {
+    if (pix != nullptr) {
         free(pix);
-        pix = NULL;
+        pix = nullptr;
     }
 
     gbSgbShutdown();
 
-    if (gbVram != NULL) {
+    if (gbVram != nullptr) {
         free(gbVram);
-        gbVram = NULL;
+        gbVram = nullptr;
     }
 
-    if (gbWram != NULL) {
+    if (gbWram != nullptr) {
         free(gbWram);
-        gbWram = NULL;
+        gbWram = nullptr;
     }
 
-    if (gbTAMA5ram != NULL) {
+    if (gbTAMA5ram != nullptr) {
         free(gbTAMA5ram);
-        gbTAMA5ram = NULL;
+        gbTAMA5ram = nullptr;
     }
 
     g_gbCartData = gbCartData();
@@ -4398,7 +4416,11 @@ bool gbLoadRom(const char* filename) {
         free(bios);
         bios = nullptr;
     }
-    bios = (uint8_t*)calloc(1, 0x900);
+    bios = (uint8_t*)calloc(1, kGBBiosBufferSize);
+    if (bios == nullptr) {
+        assert(false);
+        return false;
+    }
 
     return gbInitializeRom(romSize);
 }
@@ -4445,7 +4467,7 @@ void gbDrawLine()
         uint16_t* dest = (uint16_t*)pix + (gbBorderLineSkip + 2) * (register_LY + gbBorderRowSkip + 1)
             + gbBorderColumnSkip;
 #endif
-        for (int x = 0; x < 160;) {
+        for (size_t x = 0; x < kGBWidth;) {
             *dest++ = systemColorMap16[gbLineMix[x++]];
             *dest++ = systemColorMap16[gbLineMix[x++]];
             *dest++ = systemColorMap16[gbLineMix[x++]];
@@ -4475,7 +4497,7 @@ void gbDrawLine()
 
     case 24: {
         uint8_t* dest = (uint8_t*)pix + 3 * (gbBorderLineSkip * (register_LY + gbBorderRowSkip) + gbBorderColumnSkip);
-        for (int x = 0; x < 160;) {
+        for (size_t x = 0; x < kGBWidth;) {
             *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
             dest += 3;
             *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
@@ -4522,7 +4544,7 @@ void gbDrawLine()
         uint32_t* dest = (uint32_t*)pix + (gbBorderLineSkip + 1) * (register_LY + gbBorderRowSkip + 1)
             + gbBorderColumnSkip;
 #endif
-        for (int x = 0; x < 160;) {
+        for (size_t x = 0; x < kGBWidth;) {
             *dest++ = systemColorMap32[gbLineMix[x++]];
             *dest++ = systemColorMap32[gbLineMix[x++]];
             *dest++ = systemColorMap32[gbLineMix[x++]];
@@ -4770,7 +4792,7 @@ void gbEmulate(int ticksToStop)
                     case 0: {
                         // H-Blank
                         // check if we reached the V-Blank period
-                        if (register_LY == 144) {
+                        if (register_LY == kGBHeight) {
                             // Yes, V-Blank
                             // set the LY increment counter
                             if (gbHardware & 0x5) {
@@ -4845,7 +4867,7 @@ void gbEmulate(int ticksToStop)
                                 int tempinUseRegister_WY = inUseRegister_WY;
                                 int tempgbWindowLine = gbWindowLine;
 
-                                if ((tempgbWindowLine == -1) || (tempgbWindowLine > 144)) {
+                                if ((tempgbWindowLine == -1) || (tempgbWindowLine > (int)kGBHeight)) {
                                     tempinUseRegister_WY = oldRegister_WY;
                                     if (register_LY > oldRegister_WY)
                                         tempgbWindowLine = 146;
@@ -4952,7 +4974,7 @@ void gbEmulate(int ticksToStop)
                         if (gbWindowLine < 0)
                             oldRegister_WY = register_WY;
                         // check if we reached the V-Blank period
-                        if (register_LY == 144) {
+                        if (register_LY == kGBHeight) {
                             // Yes, V-Blank
                             // set the LY increment counter
 
@@ -5054,7 +5076,7 @@ void gbEmulate(int ticksToStop)
 
                         // OAM and VRAM in use
                         // next mode is H-Blank
-                        if ((register_LY < 144) && (register_LCDC & 0x80) && gbScreenOn) {
+                        if ((register_LY < kGBHeight) && (register_LCDC & 0x80) && gbScreenOn) {
                             if (!gbSgbMask) {
                                 if (gbFrameSkipCount >= framesToSkip) {
                                     if (!gbBlackScreen) {
@@ -5064,7 +5086,7 @@ void gbEmulate(int ticksToStop)
                                         uint16_t color = gbColorOption ? gbColorFilter[0] : 0;
                                         if (!gbCgbMode)
                                             color = gbColorOption ? gbColorFilter[gbPalette[3] & 0x7FFF] : gbPalette[3] & 0x7FFF;
-                                        for (int i = 0; i < 160; i++) {
+                                        for (size_t i = 0; i < kGBWidth; i++) {
                                             gbLineMix[i] = color;
                                             gbLineBuffer[i] = 0;
                                         }
@@ -5129,7 +5151,7 @@ void gbEmulate(int ticksToStop)
                         uint16_t color = gbColorOption ? gbColorFilter[0x7FFF] : 0x7FFF;
                         if (!gbCgbMode)
                             color = gbColorOption ? gbColorFilter[gbPalette[0] & 0x7FFF] : gbPalette[0] & 0x7FFF;
-                        for (int i = 0; i < 160; i++) {
+                        for (size_t i = 0; i < kGBWidth; i++) {
                             gbLineMix[i] = color;
                             gbLineBuffer[i] = 0;
                         }
@@ -5145,17 +5167,17 @@ void gbEmulate(int ticksToStop)
                 while (gbLcdLYIncrementTicks <= 0) {
                     register_LY = ((register_LY + 1) % 154);
                     gbLcdLYIncrementTicks += GBLY_INCREMENT_CLOCK_TICKS;
-                    if (register_LY < 144) {
+                    if (register_LY < kGBHeight) {
 
                         uint16_t color = gbColorOption ? gbColorFilter[0x7FFF] : 0x7FFF;
                         if (!gbCgbMode)
                             color = gbColorOption ? gbColorFilter[gbPalette[0] & 0x7FFF] : gbPalette[0] & 0x7FFF;
-                        for (int i = 0; i < 160; i++) {
+                        for (size_t i = 0; i < kGBWidth; i++) {
                             gbLineMix[i] = color;
                             gbLineBuffer[i] = 0;
                         }
                         gbDrawLine();
-                    } else if ((register_LY == 144) && (!systemFrameSkip)) {
+                    } else if ((register_LY == kGBHeight) && (!systemFrameSkip)) {
                         int framesToSkip = systemFrameSkip;
                         //if (coreOptions.speedup)
                         //    framesToSkip = 9; // try 6 FPS during speedup
@@ -5457,7 +5479,8 @@ bool gbLoadRomData(const char* data, size_t size) {
 
     gbRom = (uint8_t*)calloc(1, size);
     if (gbRom == nullptr) {
-        return 0;
+        assert(false);
+        return false;
     }
 
     memcpy(gbRom, data, size);
@@ -5469,7 +5492,11 @@ bool gbLoadRomData(const char* data, size_t size) {
         bios = nullptr;
     }
 
-    bios = (uint8_t*)calloc(1, 0x900);
+    bios = (uint8_t*)calloc(1, kGBBiosBufferSize);
+    if (bios == nullptr) {
+        assert(false);
+        return false;
+    }
     return gbInitializeRom(size);
 }
 
@@ -5524,7 +5551,7 @@ unsigned int gbWriteSaveState(uint8_t* data)
         utilWriteMem(data, gbTAMA5ram, kTama5RamSize);
     utilWriteMem(data, &gbDataMMM01, sizeof(gbDataMMM01));
 
-    utilWriteMem(data, gbPalette, 128 * sizeof(uint16_t));
+    utilWriteMem(data, gbPalette, sizeof(gbPalette));
 
     utilWriteMem(data, &gbMemory[0x8000], 0x8000);
 
@@ -5534,8 +5561,8 @@ unsigned int gbWriteSaveState(uint8_t* data)
     }
 
     if (gbCgbMode) {
-        utilWriteMem(data, gbVram, 0x4000);
-        utilWriteMem(data, gbWram, 0x8000);
+        utilWriteMem(data, gbVram, kGBVRamSize);
+        utilWriteMem(data, gbWram, kGBWRamSize);
     }
 
     gbSoundSaveGame(data);
@@ -5604,22 +5631,31 @@ bool gbReadSaveState(const uint8_t* data)
     utilReadDataMem(data, gbSaveGameStruct);
 
     // Correct crash when loading color gameboy save in regular gameboy type.
-    if (!gbCgbMode) {
-        if (gbVram != NULL) {
-            free(gbVram);
-            gbVram = NULL;
+    if (gbCgbMode) {
+        if (gbVram == nullptr) {
+            gbVram = (uint8_t*)calloc(1, kGBVRamSize);
+            if (gbVram == nullptr) {
+                assert(false);
+                return;
+            }
         }
-        if (gbWram != NULL) {
-            free(gbWram);
-            gbWram = NULL;
+        if (gbWram == nullptr) {
+            gbWram = (uint8_t*)malloc(kGBWRamSize);
+            if (gbWram == nullptr) {
+                assert(false);
+                return;
+            }
         }
+        memset(gbPalette, 0, sizeof(gbPalette));
     } else {
-        if (gbVram == NULL)
-            gbVram = (uint8_t*)malloc(0x4000);
-        if (gbWram == NULL)
-            gbWram = (uint8_t*)malloc(0x8000);
-        memset(gbVram, 0, 0x4000);
-        memset(gbPalette, 0, 2 * 128);
+        if (gbVram != nullptr) {
+            free(gbVram);
+            gbVram = nullptr;
+        }
+        if (gbWram != nullptr) {
+            free(gbWram);
+            gbWram = nullptr;
+        }
     }
 
     utilReadMem(&IFF, data, 2);
@@ -5644,7 +5680,7 @@ bool gbReadSaveState(const uint8_t* data)
     }
     utilReadMem(&gbDataMMM01, data, sizeof(gbDataMMM01));
 
-    utilReadMem(gbPalette, data, 128 * sizeof(uint16_t));
+    utilReadMem(gbPalette, data, sizeof(gbPalette));
 
     utilReadMem(&gbMemory[0x8000], data, 0x8000);
 
@@ -5666,9 +5702,9 @@ bool gbReadSaveState(const uint8_t* data)
         gbMemoryMap[0x00] = &gbMemory[0x0000];
         if (gbHardware & 5) {
             memcpy((uint8_t*)(gbMemory), (uint8_t*)(gbRom), 0x1000);
-            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), 0x100);
+            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), kGBBiosSize);
         } else if (gbHardware & 2) {
-            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), 0x900);
+            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), kCGBBiosSize);
             memcpy((uint8_t*)(gbMemory + 0x100), (uint8_t*)(gbRom + 0x100), 0x100);
         }
 
@@ -5754,8 +5790,8 @@ bool gbReadSaveState(const uint8_t* data)
     }
 
     if (gbCgbMode) {
-        utilReadMem(gbVram, data, 0x4000);
-        utilReadMem(gbWram, data, 0x8000);
+        utilReadMem(gbVram, data, kGBVramSize);
+        utilReadMem(gbWram, data, kGBWRamSize);
 
         int value = register_SVBK;
         if (value == 0)
