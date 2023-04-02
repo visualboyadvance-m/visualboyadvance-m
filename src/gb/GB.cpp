@@ -5636,14 +5636,14 @@ bool gbReadSaveState(const uint8_t* data)
             gbVram = (uint8_t*)calloc(1, kGBVRamSize);
             if (gbVram == nullptr) {
                 assert(false);
-                return;
+                return false;
             }
         }
         if (gbWram == nullptr) {
             gbWram = (uint8_t*)malloc(kGBWRamSize);
             if (gbWram == nullptr) {
                 assert(false);
-                return;
+                return false;
             }
         }
         memset(gbPalette, 0, sizeof(gbPalette));
@@ -5790,7 +5790,7 @@ bool gbReadSaveState(const uint8_t* data)
     }
 
     if (gbCgbMode) {
-        utilReadMem(gbVram, data, kGBVramSize);
+        utilReadMem(gbVram, data, kGBVRamSize);
         utilReadMem(gbWram, data, kGBWRamSize);
 
         int value = register_SVBK;
