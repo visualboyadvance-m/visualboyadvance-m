@@ -44,7 +44,6 @@ bool gbApplyPatch(const char* patchName);
 
 void gbEmulate(int);
 void gbWriteMemory(uint16_t, uint8_t);
-void gbDrawLine();
 bool gbIsGameboyRom(const char*);
 void gbGetHardwareType();
 
@@ -56,21 +55,7 @@ void gbResetPalette();
 void gbReset();
 void gbCleanUp();
 void gbCPUInit(const char*, bool);
-#ifdef __LIBRETRO__
-unsigned int gbWriteSaveState(uint8_t*, unsigned);
-bool gbReadSaveState(const uint8_t*, unsigned);
-#else
-bool gbWriteSaveState(const char*);
-bool gbReadSaveState(const char*);
-#endif
-bool gbWriteBatteryFile(const char*);
-bool gbWriteBatteryFile(const char*, bool);
-bool gbReadBatteryFile(const char*);
-bool gbWriteMemSaveState(char*, int, long&);
-bool gbReadMemSaveState(char*, int);
 void gbSgbRenderBorder();
-bool gbWritePNGFile(const char*);
-bool gbWriteBMPFile(const char*);
 bool gbReadGSASnapshot(const char*);
 
 // Allows invalid vram/palette access needed for Colorizer hacked games in GBC/GBA hardware
