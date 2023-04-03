@@ -114,6 +114,7 @@ bool gbInitializeRom(size_t romSize) {
         switch (g_gbCartData.validity()) {
             case gbCartData::Validity::kValid:
             case gbCartData::Validity::kUninitialized:
+                // Unreachable.
                 assert(false);
                 break;
             case gbCartData::Validity::kSizeTooSmall:
@@ -157,7 +158,6 @@ bool gbInitializeRom(size_t romSize) {
     if (romSize < romHeaderSize) {
         uint8_t* gbRomNew = (uint8_t*)realloc(gbRom, romHeaderSize);
         if (!gbRomNew) {
-            assert(false);
             return false;
         };
         gbRom = gbRomNew;
@@ -230,7 +230,6 @@ bool gbInitializeRom(size_t romSize) {
             if (gbTAMA5ram == nullptr) {
                 gbTAMA5ram = (uint8_t*)calloc(1, kTama5RamSize);
                 if (gbTAMA5ram == nullptr) {
-                    assert(false);
                     return false;
                 }
             }
@@ -258,7 +257,6 @@ bool gbInitializeRom(size_t romSize) {
     if (ramSize > 0) {
         gbRam = (uint8_t*)malloc(ramSize);
         if (gbRam == nullptr) {
-            assert(false);
             return false;
         }
         memset(gbRam, gbRamFill, ramSize);
@@ -270,19 +268,16 @@ bool gbInitializeRom(size_t romSize) {
 
     gbMemory = (uint8_t*)malloc(65536);
     if (gbMemory == nullptr) {
-        assert(false);
         return false;
     }
 
     pix = (uint8_t*)calloc(1, kGBPixSize);
     if (pix == nullptr) {
-        assert(false);
         return false;
     }
 
     gbLineBuffer = (uint16_t*)malloc(kGBLineBufferSize);
     if (gbLineBuffer == nullptr) {
-        assert(false);
         return false;
     }
 
@@ -2514,14 +2509,12 @@ void gbReset()
         if (gbVram == nullptr) {
             gbVram = (uint8_t*)calloc(1, kGBVRamSize);
             if (gbVram == nullptr) {
-                assert(false);
                 return;
             }
         }
         if (gbWram == nullptr) {
             gbWram = (uint8_t*)malloc(kGBWRamSize);
             if (gbWram == nullptr) {
-                assert(false);
                 return;
             }
         }
@@ -3996,14 +3989,12 @@ static bool gbReadSaveState(gzFile gzFile)
         if (gbVram == nullptr) {
             gbVram = (uint8_t*)calloc(1, kGBVRamSize);
             if (gbVram == nullptr) {
-                assert(false);
                 return false;
             }
         }
         if (gbWram == nullptr) {
             gbWram = (uint8_t*)malloc(kGBWRamSize);
             if (gbWram == nullptr) {
-                assert(false);
                 return false;
             }
         }
@@ -4293,8 +4284,10 @@ static bool gbReadSaveState(gzFile gzFile)
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    if (version >= 12 && utilReadInt(gzFile) != 0x12345678)
-        assert(false); // fails if something read too much/little from file
+    if (version >= 12 && utilReadInt(gzFile) != 0x12345678) {
+        // fails if something read too much/little from file
+        return false;
+    }
 
     return true;
 }
@@ -4418,7 +4411,6 @@ bool gbLoadRom(const char* filename) {
     }
     bios = (uint8_t*)calloc(1, kGBBiosBufferSize);
     if (bios == nullptr) {
-        assert(false);
         return false;
     }
 
@@ -5479,7 +5471,6 @@ bool gbLoadRomData(const char* data, size_t size) {
 
     gbRom = (uint8_t*)calloc(1, size);
     if (gbRom == nullptr) {
-        assert(false);
         return false;
     }
 
@@ -5494,7 +5485,6 @@ bool gbLoadRomData(const char* data, size_t size) {
 
     bios = (uint8_t*)calloc(1, kGBBiosBufferSize);
     if (bios == nullptr) {
-        assert(false);
         return false;
     }
     return gbInitializeRom(size);
@@ -5635,14 +5625,12 @@ bool gbReadSaveState(const uint8_t* data)
         if (gbVram == nullptr) {
             gbVram = (uint8_t*)calloc(1, kGBVRamSize);
             if (gbVram == nullptr) {
-                assert(false);
                 return false;
             }
         }
         if (gbWram == nullptr) {
             gbWram = (uint8_t*)malloc(kGBWRamSize);
             if (gbWram == nullptr) {
-                assert(false);
                 return false;
             }
         }
@@ -5831,8 +5819,10 @@ bool gbReadSaveState(const uint8_t* data)
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    if (version >= 12 && utilReadIntMem(data) != 0x12345678)
-        assert(false); // fails if something read too much/little from file
+    if (version >= 12 && utilReadIntMem(data) != 0x12345678) {
+        // fails if something read too much/little from file
+        return false;
+    }
 
     return true;
 }
