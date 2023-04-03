@@ -391,6 +391,10 @@ gbCartData::gbCartData(const uint8_t* romData, size_t romDataSize) {
                 ram_size_ = k128KiB;
                 break;
             case 0x05:
+                // Technically, this refers to a 1 Mbit (128 KiB) RAM chip, but
+                // this is only used in Pocket Monsters Crystal JP, which has a
+                // mapper chip referred as "MBC30". This mapper can only address
+                // half of the RAM chip. So, we set the size to 64 KiB.
                 ram_size_ = k64KiB;
                 break;
             default:
