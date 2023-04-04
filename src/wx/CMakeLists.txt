@@ -765,6 +765,7 @@ set(
     config/option-observer.cpp
     config/option.cpp
     config/user-input.cpp
+    dialogs/directories-config.cpp
     dialogs/display-config.cpp
     dialogs/game-boy-config.cpp
     widgets/group-check-box.cpp
@@ -813,6 +814,7 @@ set(
     config/option-proxy.h
     config/option.h
     config/user-input.h
+    dialogs/directories-config.h
     dialogs/display-config.h
     dialogs/game-boy-config.h
     dialogs/validated-child.h

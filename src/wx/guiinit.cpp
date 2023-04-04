@@ -28,6 +28,7 @@
 #include "config/option-proxy.h"
 #include "config/option.h"
 #include "config/user-input.h"
+#include "dialogs/directories-config.h"
 #include "dialogs/display-config.h"
 #include "dialogs/game-boy-config.h"
 #include "opts.h"
@@ -2418,12 +2419,6 @@ void MainFrame::BindAppIcon() {
     SetIcon(icon);
 }
 
-static void setCustomLabelForFilePicker(wxDirPickerCtrl* dp)
-{
-    wxButton *pButt = static_cast<wxButton*>(dp->GetPickerCtrl());
-    if (pButt) pButt->SetLabel(_("Browse"));
-}
-
 // If there is a menubar, store all special menuitems
 #define XRCITEM_I(id) menubar->FindItem(id, NULL)
 #define XRCITEM_D(s) XRCITEM_I(XRCID_D(s))
@@ -3317,30 +3312,7 @@ bool MainFrame::BindControls()
             getsl("GBASoundFiltering", gopts.gba_sound_filter);
             d->Fit();
         }
-        wxDirPickerCtrl* dp;
-#define getdp(n, o)                                     \
-    do {                                                \
-        dp = SafeXRCCTRL<wxDirPickerCtrl>(d, n);        \
-        dp->SetValidator(wxFileDirPickerValidator(&o)); \
-    } while (0)
-        d = LoadXRCDialog("DirectoriesConfig");
-        {
-            getdp("GBARoms", gopts.gba_rom_dir);
-            setCustomLabelForFilePicker(dp);
-            getdp("GBRoms", gopts.gb_rom_dir);
-            setCustomLabelForFilePicker(dp);
-            getdp("GBCRoms", gopts.gbc_rom_dir);
-            setCustomLabelForFilePicker(dp);
-            getdp("BatSaves", gopts.battery_dir);
-            setCustomLabelForFilePicker(dp);
-            getdp("StateSaves", gopts.state_dir);
-            setCustomLabelForFilePicker(dp);
-            getdp("Screenshots", gopts.scrshot_dir);
-            setCustomLabelForFilePicker(dp);
-            getdp("Recordings", gopts.recording_dir);
-            setCustomLabelForFilePicker(dp);
-            d->Fit();
-        }
+        dialogs::DirectoriesConfig::NewInstance(this);
         wxDialog* joyDialog = LoadXRCropertySheetDialog("JoypadConfig");
 
         for (int i = 0; i < 4; i++) {

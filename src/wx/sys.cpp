@@ -547,7 +547,7 @@ void systemFrame()
 void systemScreenCapture(int num)
 {
     GameArea* panel = wxGetApp().frame->GetPanel();
-    wxFileName fn = wxFileName(wxGetApp().frame->GetGamePath(gopts.scrshot_dir), wxEmptyString);
+    wxFileName fn = wxFileName(wxGetApp().frame->GetGamePath(OPTION(kGenScreenshotDir)), wxEmptyString);
 
     const int capture_format = OPTION(kPrefCaptureFormat);
     do {
@@ -1104,7 +1104,7 @@ void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int con
     }
 
     if (gopts.print_screen_cap) {
-        wxFileName fn = wxFileName(wxGetApp().frame->GetGamePath(gopts.scrshot_dir), wxEmptyString);
+        wxFileName fn = wxFileName(wxGetApp().frame->GetGamePath(OPTION(kGenScreenshotDir)), wxEmptyString);
         int num = 1;
         const int capture_format = OPTION(kPrefCaptureFormat);
 

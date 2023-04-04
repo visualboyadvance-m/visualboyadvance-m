@@ -18,7 +18,6 @@
 #include "dialogs/validated-child.h"
 #include "widgets/group-check-box.h"
 #include "widgets/option-validator.h"
-#include "wx/object.h"
 
 namespace dialogs {
 

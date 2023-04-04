@@ -1588,7 +1588,7 @@ public:
     {
         (void)ev; // unused params
         GameArea* panel = wxGetApp().frame->GetPanel();
-        wxString bmp_save_dir = wxGetApp().frame->GetGamePath(gopts.scrshot_dir);
+        wxString bmp_save_dir = wxGetApp().frame->GetGamePath(OPTION(kGenScreenshotDir));
         // no attempt is made here to translate the dialog type name
         // it's just a suggested name, anyway
         wxString def_name = panel->game_name() + wxT('-') + dname;
@@ -1731,7 +1731,7 @@ public:
     {
         (void)ev; // unused params
         GameArea* panel = wxGetApp().frame->GetPanel();
-        wxString bmp_save_dir = wxGetApp().frame->GetGamePath(gopts.scrshot_dir);
+        wxString bmp_save_dir = wxGetApp().frame->GetGamePath(OPTION(kGenScreenshotDir));
         // no attempt is made here to translate the dialog type name
         // it's just a suggested name, anyway
         wxString def_name = panel->game_name() + wxT('-') + dname;

@@ -29,8 +29,6 @@ extern struct opts_t {
     bool gb_lcd_filter = false;
     bool print_auto_page = true;
     bool print_screen_cap = false;
-    wxString gb_rom_dir;
-    wxString gbc_rom_dir;
 
     /// GBA
     wxString gba_bios;
@@ -44,17 +42,12 @@ extern struct opts_t {
     bool link_proto = false;
     int link_timeout = 500;
     int gba_link_type;
-    wxString gba_rom_dir;
 
     /// General
     bool autoload_state = false;
     bool autoload_cheats = false;
-    wxString battery_dir;
     bool recent_freeze = false;
-    wxString recording_dir;
     int rewind_interval = 0;
-    wxString scrshot_dir;
-    wxString state_dir;
     bool statusbar = false;
 
     /// Joypad
