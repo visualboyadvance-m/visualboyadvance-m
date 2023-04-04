@@ -4,9 +4,10 @@
 // separately. These should not be updated very often, so having these in a
 // separate file improves incremental build time.
 
-#include <wx/log.h>
 #include <algorithm>
 #include <limits>
+
+#include <wx/log.h>
 
 #include "../System.h"
 #include "../gb/gbGlobals.h"
@@ -165,6 +166,11 @@ std::array<Option, kNbOptions>& Option::All() {
         wxString gb_bios = wxEmptyString;
         bool colorizer_hack = false;
         wxString gbc_bios = wxEmptyString;
+        wxString gb_rom_dir = wxEmptyString;
+        wxString gbc_rom_dir = wxEmptyString;
+
+        /// GBA
+        wxString gba_rom_dir;
 
         /// Core
         bool agb_print = false;
@@ -179,6 +185,10 @@ std::array<Option, kNbOptions>& Option::All() {
         bool show_speed_transparent = false;
 
         /// General
+        wxString battery_dir = wxEmptyString;
+        wxString recording_dir = wxEmptyString;
+        wxString screenshot_dir = wxEmptyString;
+        wxString state_dir = wxEmptyString;
         uint32_t ini_version = kIniLatestVersion;
 
         /// Geometry
@@ -224,8 +234,8 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kGBPalette2, systemGbPalette + 16),
         Option(OptionID::kGBPrintAutoPage, &gopts.print_auto_page),
         Option(OptionID::kGBPrintScreenCap, &gopts.print_screen_cap),
-        Option(OptionID::kGBROMDir, &gopts.gb_rom_dir),
-        Option(OptionID::kGBGBCROMDir, &gopts.gbc_rom_dir),
+        Option(OptionID::kGBROMDir, &g_owned_opts.gb_rom_dir),
+        Option(OptionID::kGBGBCROMDir, &g_owned_opts.gbc_rom_dir),
 
         /// GBA
         Option(OptionID::kGBABiosFile, &gopts.gba_bios),
@@ -240,16 +250,16 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kGBALinkTimeout, &gopts.link_timeout, 0, 9999999),
         Option(OptionID::kGBALinkType, &gopts.gba_link_type, 0, 5),
 #endif
-        Option(OptionID::kGBAROMDir, &gopts.gba_rom_dir),
+        Option(OptionID::kGBAROMDir, &g_owned_opts.gba_rom_dir),
 
         /// General
         Option(OptionID::kGenAutoLoadLastState, &gopts.autoload_state),
-        Option(OptionID::kGenBatteryDir, &gopts.battery_dir),
+        Option(OptionID::kGenBatteryDir, &g_owned_opts.battery_dir),
         Option(OptionID::kGenFreezeRecent, &gopts.recent_freeze),
-        Option(OptionID::kGenRecordingDir, &gopts.recording_dir),
+        Option(OptionID::kGenRecordingDir, &g_owned_opts.recording_dir),
         Option(OptionID::kGenRewindInterval, &gopts.rewind_interval, 0, 600),
-        Option(OptionID::kGenScreenshotDir, &gopts.scrshot_dir),
-        Option(OptionID::kGenStateDir, &gopts.state_dir),
+        Option(OptionID::kGenScreenshotDir, &g_owned_opts.screenshot_dir),
+        Option(OptionID::kGenStateDir, &g_owned_opts.state_dir),
         Option(OptionID::kGenStatusBar, &gopts.statusbar),
         Option(OptionID::kGenIniVersion, &g_owned_opts.ini_version, 0, std::numeric_limits<uint32_t>::max()),
 

@@ -124,12 +124,11 @@ static void toggleBitVar(bool *menuValue, int *globalVar, int mask)
 
 //// File menu
 
-static int open_ft = 0;
-static wxString open_dir;
-
 EVT_HANDLER(wxID_OPEN, "Open ROM...")
 {
-    open_dir = wxGetApp().GetAbsolutePath(gopts.gba_rom_dir);
+    static int open_ft = 0;
+    const wxString& gba_rom_dir = OPTION(kGBAROMDir);
+
     // FIXME: ignore if non-existent or not a dir
     wxString pats = _(
         "Game Boy Advance Files (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|"
@@ -143,7 +142,7 @@ EVT_HANDLER(wxID_OPEN, "Open ROM...")
         "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;"
         "*.zip;*.7z;*.rar|");
     pats.append(wxALL_FILES);
-    wxFileDialog dlg(this, _("Open ROM file"), open_dir, wxT(""),
+    wxFileDialog dlg(this, _("Open ROM file"), gba_rom_dir, "",
         pats,
         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     dlg.SetFilterIndex(open_ft);
@@ -152,12 +151,16 @@ EVT_HANDLER(wxID_OPEN, "Open ROM...")
         wxGetApp().pending_load = dlg.GetPath();
 
     open_ft = dlg.GetFilterIndex();
-    open_dir = dlg.GetDirectory();
+    if (gba_rom_dir.empty()) {
+        OPTION(kGBAROMDir) = dlg.GetDirectory();
+    }
 }
 
 EVT_HANDLER(OpenGB, "Open GB...")
 {
-    open_dir = wxGetApp().GetAbsolutePath(gopts.gb_rom_dir);
+    static int open_ft = 0;
+    const wxString& gb_rom_dir = OPTION(kGBROMDir);
+
     // FIXME: ignore if non-existent or not a dir
     wxString pats = _(
         "Game Boy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|"
@@ -166,7 +169,7 @@ EVT_HANDLER(OpenGB, "Open GB...")
         "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;"
         "*.zip;*.7z;*.rar|");
     pats.append(wxALL_FILES);
-    wxFileDialog dlg(this, _("Open GB ROM file"), open_dir, wxT(""),
+    wxFileDialog dlg(this, _("Open GB ROM file"), gb_rom_dir, "",
         pats,
         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     dlg.SetFilterIndex(open_ft);
@@ -175,12 +178,16 @@ EVT_HANDLER(OpenGB, "Open GB...")
         wxGetApp().pending_load = dlg.GetPath();
 
     open_ft = dlg.GetFilterIndex();
-    open_dir = dlg.GetDirectory();
+    if (gb_rom_dir.empty()) {
+        OPTION(kGBROMDir) = dlg.GetDirectory();
+    }
 }
 
 EVT_HANDLER(OpenGBC, "Open GBC...")
 {
-    open_dir = wxGetApp().GetAbsolutePath(gopts.gbc_rom_dir);
+    static int open_ft = 0;
+    const wxString& gbc_rom_dir = OPTION(kGBGBCROMDir);
+
     // FIXME: ignore if non-existent or not a dir
     wxString pats = _(
         "Game Boy Color Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|"
@@ -189,7 +196,7 @@ EVT_HANDLER(OpenGBC, "Open GBC...")
         "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;"
         "*.zip;*.7z;*.rar|");
     pats.append(wxALL_FILES);
-    wxFileDialog dlg(this, _("Open GBC ROM file"), open_dir, wxT(""),
+    wxFileDialog dlg(this, _("Open GBC ROM file"), gbc_rom_dir, "",
         pats,
         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     dlg.SetFilterIndex(open_ft);
@@ -198,7 +205,9 @@ EVT_HANDLER(OpenGBC, "Open GBC...")
         wxGetApp().pending_load = dlg.GetPath();
 
     open_ft = dlg.GetFilterIndex();
-    open_dir = dlg.GetDirectory();
+    if (gbc_rom_dir.empty()) {
+        OPTION(kGBGBCROMDir) = dlg.GetDirectory();
+    }
 }
 
 EVT_HANDLER(RecentReset, "Reset recent ROM list")
@@ -1174,7 +1183,7 @@ EVT_HANDLER_MASK(ExportGamesharkSnapshot, "Export GameShark snapshot...", CMDEN_
 
 EVT_HANDLER_MASK(ScreenCapture, "Screen capture...", CMDEN_GB | CMDEN_GBA)
 {
-    wxString scap_path = GetGamePath(gopts.scrshot_dir);
+    wxString scap_path = GetGamePath(OPTION(kGenScreenshotDir));
     wxString def_name = panel->game_name();
 
     const int capture_format = OPTION(kPrefCaptureFormat);
@@ -1250,7 +1259,7 @@ EVT_HANDLER_MASK(RecordSoundStartRecording, "Start sound recording...", CMDEN_NS
             sound_extno = extno;
     }
 
-    sound_path = GetGamePath(gopts.recording_dir);
+    sound_path = GetGamePath(OPTION(kGenRecordingDir));
     wxString def_name = panel->game_name();
     wxString extoff = sound_exts;
 
@@ -1320,7 +1329,7 @@ EVT_HANDLER_MASK(RecordAVIStartRecording, "Start video recording...", CMDEN_NVRE
             vid_extno = extno;
     }
 
-    vid_path = GetGamePath(gopts.recording_dir);
+    vid_path = GetGamePath(OPTION(kGenRecordingDir));
     wxString def_name = panel->game_name();
     wxString extoff = vid_exts;
 
@@ -1391,7 +1400,7 @@ EVT_HANDLER_MASK(RecordMovieStartRecording, "Start game recording...", CMDEN_NGR
             mov_extno = extno;
     }
 
-    mov_path = GetGamePath(gopts.recording_dir);
+    mov_path = GetGamePath(OPTION(kGenRecordingDir));
     wxString def_name = panel->game_name();
     wxString extoff = mov_exts;
 
@@ -1457,7 +1466,7 @@ EVT_HANDLER_MASK(PlayMovieStartPlaying, "Start playing movie...", CMDEN_NGREC | 
             mov_extno = extno;
     }
 
-    mov_path = GetGamePath(gopts.recording_dir);
+    mov_path = GetGamePath(OPTION(kGenRecordingDir));
     systemStopGamePlayback();
     wxString def_name = panel->game_name();
     wxString extoff = mov_exts;
@@ -2747,10 +2756,7 @@ EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)
 
 EVT_HANDLER(EmulatorDirectories, "Directories...")
 {
-    wxDialog* dlg = GetXRCDialog("DirectoriesConfig");
-
-    if (ShowModal(dlg) == wxID_OK)
-        update_opts();
+    ShowModal(GetXRCDialog("DirectoriesConfig"));
 }
 
 EVT_HANDLER(JoypadConfigure, "Joypad options...")

@@ -247,7 +247,7 @@ public:
     bool Set(const wxString& value) { return option_->SetString(value); }
 
     bool operator=(wxString value) { return Set(value); }
-    operator wxString() const { return Get(); }
+    operator const wxString&() const { return Get(); }
 
 private:
     Option* option_;

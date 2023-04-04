@@ -134,9 +134,9 @@ GameArea::GameArea()
 
 void GameArea::LoadGame(const wxString& name)
 {
-    rom_scene_rls = wxT("-");
-    rom_scene_rls_name = wxT("-");
-    rom_name = wxT("");
+    rom_scene_rls = "-";
+    rom_scene_rls_name = "-";
+    rom_name = "";
     // fex just crashes if file does not exist and it's compressed,
     // so check first
     wxFileName fnfn(name);
@@ -147,18 +147,21 @@ void GameArea::LoadGame(const wxString& name)
         wxString rp = fnfn.GetPath();
 
         // can't really decide which dir to use, so try GBA first, then GB
-        if (!wxGetApp().GetAbsolutePath(gopts.gba_rom_dir).empty()) {
-            fnfn.SetPath(wxGetApp().GetAbsolutePath(gopts.gba_rom_dir) + wxT('/') + rp);
+        const wxString& gba_rom_dir = OPTION(kGBAROMDir);
+        if (!wxGetApp().GetAbsolutePath(gba_rom_dir).empty()) {
+            fnfn.SetPath(wxGetApp().GetAbsolutePath(gba_rom_dir) + '/' + rp);
             badfile = !fnfn.IsFileReadable();
         }
 
-        if (badfile && !wxGetApp().GetAbsolutePath(gopts.gb_rom_dir).empty()) {
-            fnfn.SetPath(wxGetApp().GetAbsolutePath(gopts.gb_rom_dir) + wxT('/') + rp);
+        const wxString& gb_rom_dir = OPTION(kGBROMDir);
+        if (badfile && !wxGetApp().GetAbsolutePath(gb_rom_dir).empty()) {
+            fnfn.SetPath(wxGetApp().GetAbsolutePath(gb_rom_dir) + '/' + rp);
             badfile = !fnfn.IsFileReadable();
         }
 
-        if (badfile && !wxGetApp().GetAbsolutePath(gopts.gbc_rom_dir).empty()) {
-            fnfn.SetPath(wxGetApp().GetAbsolutePath(gopts.gbc_rom_dir) + wxT('/') + rp);
+        const wxString& gbc_rom_dir = OPTION(kGBGBCROMDir);
+        if (badfile && !wxGetApp().GetAbsolutePath(gbc_rom_dir).empty()) {
+            fnfn.SetPath(wxGetApp().GetAbsolutePath(gbc_rom_dir) + '/' + rp);
             badfile = !fnfn.IsFileReadable();
         }
     }
@@ -549,24 +552,24 @@ void GameArea::SetFrameTitle()
 
 void GameArea::recompute_dirs()
 {
-    batdir = gopts.battery_dir;
+    batdir = OPTION(kGenBatteryDir);
 
-    if (!batdir.size()) {
+    if (batdir.empty()) {
         batdir = loaded_game.GetPathWithSep();
     } else {
-        batdir = wxGetApp().GetAbsolutePath(gopts.battery_dir);
+        batdir = wxGetApp().GetAbsolutePath(batdir);
     }
 
     if (!wxIsWritable(batdir)) {
         batdir = wxGetApp().GetDataDir();
     }
 
-    statedir = gopts.state_dir;
+    statedir = OPTION(kGenStateDir);
 
-    if (!statedir.size()) {
+    if (statedir.empty()) {
         statedir = loaded_game.GetPathWithSep();
     } else {
-        statedir = wxGetApp().GetAbsolutePath(gopts.state_dir);
+        statedir = wxGetApp().GetAbsolutePath(statedir);
     }
 
     if (!wxIsWritable(statedir)) {
