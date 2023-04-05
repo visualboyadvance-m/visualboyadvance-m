@@ -357,7 +357,7 @@ gbCartData::gbCartData(const uint8_t* romData, size_t romDataSize) {
         case 0x22:
             // MBC7 header does not specify a RAM size so set it here.
             mapper_type_ = MapperType::kMbc7;
-            ram_size_ = k512B;
+            ram_size_ = k256B;
             skip_ram = true;
             has_battery_ = true;
             has_rumble_ = true;
@@ -496,6 +496,12 @@ gbCartData::gbCartData(const uint8_t* romData, size_t romDataSize) {
     // The global checksum value is computed here. This does not fail the header
     // verification as it does not on actual hardware either.
     actual_global_checksum_ = get_rom_checksum(romData, romDataSize);
+
+    if (has_battery_ && !has_rtc_ && ram_size_ == 0) {
+        // Some homebrew ROMs have the battery flag set but no RAM or RTC. This
+        // is probably a mistake, so we ignore the battery flag.
+        has_battery_ = false;
+    }
 
     validity_ = Validity::kValid;
 }
