@@ -77,14 +77,21 @@ std::string old_licensee_to_string(uint8_t licensee) {
     return std::string(result.begin(), result.end());
 }
 
-// Constructs a "real" string from a raw buffer. The buffer could have a null
-// value. If it does, the string will be truncated at that point.
-std::string from_buffer(const char* buffer, size_t size) {
-    // The string is null terminated, so we can use std::find to find the end.
-    return std::string(buffer, std::find(buffer, buffer + size, '\0'));
+template <typename T, std::size_t N>
+constexpr std::size_t array_size(const T (&)[N]) {
+    return N;
 }
 
-bool is_valid_manufacturer_code(const std::string manufacturer_code) {
+// Constructs a "real" string from a raw buffer. The buffer could have a null
+// value. If it does, the string will be truncated at that point.
+template <typename T>
+std::string from_buffer(const T& buffer) {
+    // The string is null terminated, so we can use std::find to find the end.
+    return std::string(buffer,
+                       std::find(buffer, buffer + array_size(buffer), '\0'));
+}
+
+bool is_valid_manufacturer_code(const std::string& manufacturer_code) {
     return manufacturer_code.size() == 4 &&
            std::all_of(manufacturer_code.begin(), manufacturer_code.end(),
                        [](char c) { return std::isalnum(c); });
@@ -196,7 +203,7 @@ gbCartData::gbCartData(const uint8_t* romData, size_t romDataSize) {
 
     // SGB support flag.
     sgb_flag_ = header->sgb_flag;
-    sgb_support_ = header->sgb_flag == kSgbSetFlag;
+    sgb_support_ = (sgb_flag_ == kSgbSetFlag);
 
     // CGB support flag. This needs to be parsed now to work around some
     // incorrect homebrew ROMs.
@@ -215,30 +222,19 @@ gbCartData::gbCartData(const uint8_t* romData, size_t romDataSize) {
     if (old_licensee_code_ == kNewManufacturerCode) {
         // New licensee code format.
         header_type_ = RomHeaderType::kNewLicenseeCode;
-
-        maker_code_ = from_buffer(
-            reinterpret_cast<const char*>(header->cgb.new_licensee_code),
-            sizeof(header->cgb.new_licensee_code));
+        maker_code_ = from_buffer(header->cgb.new_licensee_code);
 
         if (cgb_support_ == CGBSupport::kNone) {
-            title_ =
-                from_buffer(reinterpret_cast<const char*>(header->sgb.title),
-                            sizeof(header->sgb.title));
+            title_ = from_buffer(header->sgb.title);
         } else {
-            manufacturer_code_ = from_buffer(
-                reinterpret_cast<const char*>(header->cgb.manufacturer_code),
-                sizeof(header->cgb.manufacturer_code));
+            manufacturer_code_ = from_buffer(header->cgb.manufacturer_code);
             if (is_valid_manufacturer_code(manufacturer_code_)) {
-                title_ = from_buffer(
-                    reinterpret_cast<const char*>(header->cgb.title),
-                    sizeof(header->cgb.title));
+                title_ = from_buffer(header->cgb.title);
             } else {
                 // Some ROMS and homebrew do not actually set this field.
                 // Interpret the title as a homebrew title instead.
                 manufacturer_code_.clear();
-                title_ =
-                    from_buffer(reinterpret_cast<const char*>(header->hb.title),
-                                sizeof(header->hb.title));
+                title_ = from_buffer(header->hb.title);
             }
         }
     } else {
@@ -248,14 +244,10 @@ gbCartData::gbCartData(const uint8_t* romData, size_t romDataSize) {
         if (cgb_support_ == CGBSupport::kNone) {
             // Rese the CGB flag here. This is part of the title.
             cgb_flag_ = 0;
-            title_ =
-                from_buffer(reinterpret_cast<const char*>(header->dmg.title),
-                            sizeof(header->dmg.title));
+            title_ = from_buffer(header->dmg.title);
         } else {
             // This is (incorrectly) used by some homebrew.
-            title_ =
-                from_buffer(reinterpret_cast<const char*>(header->hb.title),
-                            sizeof(header->hb.title));
+            title_ = from_buffer(header->hb.title);
         }
 
         maker_code_ = old_licensee_to_string(header->old_licensee_code);
