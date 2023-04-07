@@ -1077,7 +1077,7 @@ void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int con
     // or at the very least dump when the game state changes
     uint16_t* to_print = prdata;
 
-    if ((gopts.print_auto_page && !(feed & 15)) || accum_prdata_len) {
+    if ((OPTION(kGBPrintAutoPage) && !(feed & 15)) || accum_prdata_len) {
         if (!accum_prdata_len)
             accum_prdata_len = 162; // top border
 
@@ -1095,7 +1095,7 @@ void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int con
         memcpy(accum_prdata + accum_prdata_len - lines * 162, prdata + 162,
             lines * 162 * 2);
 
-        if (gopts.print_auto_page && !(feed & 15))
+        if (OPTION(kGBPrintAutoPage) && !(feed & 15))
             return;
 
         to_print = accum_prdata;
@@ -1103,7 +1103,7 @@ void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int con
         accum_prdata_len = 0;
     }
 
-    if (gopts.print_screen_cap) {
+    if (OPTION(kGBPrintScreenCap)) {
         wxFileName fn = wxFileName(wxGetApp().frame->GetGamePath(OPTION(kGenScreenshotDir)), wxEmptyString);
         int num = 1;
         const int capture_format = OPTION(kPrefCaptureFormat);

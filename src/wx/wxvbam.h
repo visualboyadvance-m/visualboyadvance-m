@@ -366,10 +366,14 @@ private:
     // quicker & more accurate than FindFocus() != NULL
     bool focused;
     const widgets::KeepOnTopStyler keep_on_top_styler_;
+    const config::OptionsObserver status_bar_observer_;
+    const config::OptionsObserver gba_link_observer_;
 
     // helper function for adding menu to accel editor
     void add_menu_accels(wxTreeCtrl* tc, wxTreeItemId& parent, wxMenu* menu);
 
+    // For enabling / disabling the status bar.
+    void OnStatusBarChanged(config::Option* option);
     // for detecting window focus
     void OnActivate(wxActivateEvent&);
     // may work, may not...  if so, load dropped file
@@ -606,6 +610,7 @@ public:
     void HideMenuBar();
     void ShowMenuBar();
     void OnGBBorderChanged(config::Option* option);
+    void UpdateLcdFilter();
     void SuspendScreenSaver();
     void UnsuspendScreenSaver();
 
@@ -622,10 +627,12 @@ protected:
     DECLARE_EVENT_TABLE()
 
 private:
-    config::OptionsObserver render_observer_;
-    config::OptionsObserver scale_observer_;
-    config::OptionsObserver gb_border_observer_;
-    config::OptionsObserver gb_palette_observer_;
+    const config::OptionsObserver render_observer_;
+    const config::OptionsObserver scale_observer_;
+    const config::OptionsObserver gb_border_observer_;
+    const config::OptionsObserver gb_palette_observer_;
+    const config::OptionsObserver gb_declick_observer_;
+    const config::OptionsObserver lcd_filters_observer_;
 };
 
 // wxString version of OSD message

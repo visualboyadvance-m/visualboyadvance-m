@@ -10,6 +10,7 @@
 #include <wx/log.h>
 
 #include "../System.h"
+#include "../gba/Sound.h"
 #include "../gb/gbGlobals.h"
 #include "opts.h"
 
@@ -165,30 +166,46 @@ std::array<Option, kNbOptions>& Option::All() {
         /// GB
         wxString gb_bios = wxEmptyString;
         bool colorizer_hack = false;
+        bool gb_lcd_filter = false;
         wxString gbc_bios = wxEmptyString;
+        bool print_auto_page = true;
+        bool print_screen_cap = false;
         wxString gb_rom_dir = wxEmptyString;
         wxString gbc_rom_dir = wxEmptyString;
 
         /// GBA
+        bool gba_lcd_filter = false;
+        bool link_auto = false;
+        bool link_hacks = true;
+        bool link_proto = false;
         wxString gba_rom_dir;
 
         /// Core
         bool agb_print = false;
         bool auto_frame_skip = false;
         bool auto_patch = true;
+        bool autoload_cheats = false;
         uint32_t capture_format = 0;
         bool disable_status_messages = false;
         uint32_t flash_size = 0;
         int32_t frame_skip = 0;
+        bool gdb_break_on_load  = false;
         bool pause_when_inactive = false;
         uint32_t show_speed = 0;
         bool show_speed_transparent = false;
+        bool use_bios_file_gb = false;
+        bool use_bios_file_gba = false;
+        bool use_bios_file_gbc = false;
+        bool vsync = false;
 
         /// General
+        bool autoload_state = false;
         wxString battery_dir = wxEmptyString;
+        bool recent_freeze = false;
         wxString recording_dir = wxEmptyString;
         wxString screenshot_dir = wxEmptyString;
         wxString state_dir = wxEmptyString;
+        bool statusbar = false;
         uint32_t ini_version = kIniLatestVersion;
 
         /// Geometry
@@ -202,6 +219,11 @@ std::array<Option, kNbOptions>& Option::All() {
         /// UI
         bool allow_keyboard_background_input = false;
         bool allow_joystick_background_input = true;
+
+        /// Sound
+        bool gb_declicking = true;
+        bool gb_effects_config_enabled = false;
+        bool gb_effects_config_surround = false;
     };
     static OwnedOptions g_owned_opts;
 
@@ -227,40 +249,40 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kGBBiosFile, &g_owned_opts.gb_bios),
         Option(OptionID::kGBColorOption, &gbColorOption),
         Option(OptionID::kGBColorizerHack, &g_owned_opts.colorizer_hack),
-        Option(OptionID::kGBLCDFilter, &gopts.gb_lcd_filter),
+        Option(OptionID::kGBLCDFilter, &g_owned_opts.gb_lcd_filter),
         Option(OptionID::kGBGBCBiosFile, &g_owned_opts.gbc_bios),
         Option(OptionID::kGBPalette0, systemGbPalette),
         Option(OptionID::kGBPalette1, systemGbPalette + 8),
         Option(OptionID::kGBPalette2, systemGbPalette + 16),
-        Option(OptionID::kGBPrintAutoPage, &gopts.print_auto_page),
-        Option(OptionID::kGBPrintScreenCap, &gopts.print_screen_cap),
+        Option(OptionID::kGBPrintAutoPage, &g_owned_opts.print_auto_page),
+        Option(OptionID::kGBPrintScreenCap, &g_owned_opts.print_screen_cap),
         Option(OptionID::kGBROMDir, &g_owned_opts.gb_rom_dir),
         Option(OptionID::kGBGBCROMDir, &g_owned_opts.gbc_rom_dir),
 
         /// GBA
         Option(OptionID::kGBABiosFile, &gopts.gba_bios),
-        Option(OptionID::kGBALCDFilter, &gopts.gba_lcd_filter),
+        Option(OptionID::kGBALCDFilter, &g_owned_opts.gba_lcd_filter),
 #ifndef NO_LINK
-        Option(OptionID::kGBALinkAuto, &gopts.link_auto),
-        Option(OptionID::kGBALinkFast, &gopts.link_hacks),
+        Option(OptionID::kGBALinkAuto, &g_owned_opts.link_auto),
+        Option(OptionID::kGBALinkFast, &g_owned_opts.link_hacks),
         Option(OptionID::kGBALinkHost, &gopts.link_host),
         Option(OptionID::kGBAServerIP, &gopts.server_ip),
         Option(OptionID::kGBALinkPort, &gopts.link_port, 0, 65535),
-        Option(OptionID::kGBALinkProto, &gopts.link_proto),
+        Option(OptionID::kGBALinkProto, &g_owned_opts.link_proto),
         Option(OptionID::kGBALinkTimeout, &gopts.link_timeout, 0, 9999999),
         Option(OptionID::kGBALinkType, &gopts.gba_link_type, 0, 5),
 #endif
         Option(OptionID::kGBAROMDir, &g_owned_opts.gba_rom_dir),
 
         /// General
-        Option(OptionID::kGenAutoLoadLastState, &gopts.autoload_state),
+        Option(OptionID::kGenAutoLoadLastState, &g_owned_opts.autoload_state),
         Option(OptionID::kGenBatteryDir, &g_owned_opts.battery_dir),
-        Option(OptionID::kGenFreezeRecent, &gopts.recent_freeze),
+        Option(OptionID::kGenFreezeRecent, &g_owned_opts.recent_freeze),
         Option(OptionID::kGenRecordingDir, &g_owned_opts.recording_dir),
         Option(OptionID::kGenRewindInterval, &gopts.rewind_interval, 0, 600),
         Option(OptionID::kGenScreenshotDir, &g_owned_opts.screenshot_dir),
         Option(OptionID::kGenStateDir, &g_owned_opts.state_dir),
-        Option(OptionID::kGenStatusBar, &gopts.statusbar),
+        Option(OptionID::kGenStatusBar, &g_owned_opts.statusbar),
         Option(OptionID::kGenIniVersion, &g_owned_opts.ini_version, 0, std::numeric_limits<uint32_t>::max()),
 
         /// Joypad
@@ -275,7 +297,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kPrefAgbPrint, &g_owned_opts.agb_print),
         Option(OptionID::kPrefAutoFrameSkip, &g_owned_opts.auto_frame_skip),
         Option(OptionID::kPrefAutoPatch, &g_owned_opts.auto_patch),
-        Option(OptionID::kPrefAutoSaveLoadCheatList, &gopts.autoload_cheats),
+        Option(OptionID::kPrefAutoSaveLoadCheatList, &g_owned_opts.autoload_cheats),
         Option(OptionID::kPrefBorderAutomatic, &gbBorderAutomatic),
         Option(OptionID::kPrefBorderOn, &gbBorderOn),
         Option(OptionID::kPrefCaptureFormat, &g_owned_opts.capture_format, 0, 1),
@@ -286,7 +308,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kPrefFrameSkip, &g_owned_opts.frame_skip, -1, 9),
         Option(OptionID::kPrefGBPaletteOption, &gbPaletteOption, 0, 2),
         Option(OptionID::kPrefGBPrinter, &coreOptions.winGbPrinterEnabled, 0, 1),
-        Option(OptionID::kPrefGDBBreakOnLoad, &gopts.gdb_break_on_load),
+        Option(OptionID::kPrefGDBBreakOnLoad, &g_owned_opts.gdb_break_on_load),
         Option(OptionID::kPrefGDBPort, &gopts.gdb_port, 0, 65535),
 #ifndef NO_LINK
         Option(OptionID::kPrefLinkNumPlayers, &gopts.link_num_players, 2, 4),
@@ -297,17 +319,17 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kPrefSaveType, &coreOptions.cpuSaveType, 0, 5),
         Option(OptionID::kPrefShowSpeed, &g_owned_opts.show_speed, 0, 2),
         Option(OptionID::kPrefShowSpeedTransparent, &g_owned_opts.show_speed_transparent),
-        Option(OptionID::kPrefSkipBios, &coreOptions.skipBios, 0, 1),
+        Option(OptionID::kPrefSkipBios, &coreOptions.skipBios),
         Option(OptionID::kPrefSkipSaveGameCheats, &coreOptions.skipSaveGameCheats, 0, 1),
         Option(OptionID::kPrefSkipSaveGameBattery, &coreOptions.skipSaveGameBattery, 0, 1),
         Option(OptionID::kPrefThrottle, &coreOptions.throttle, 0, 450),
         Option(OptionID::kPrefSpeedupThrottle, &coreOptions.speedup_throttle, 0, 3000),
         Option(OptionID::kPrefSpeedupFrameSkip, &coreOptions.speedup_frame_skip, 0, 300),
         Option(OptionID::kPrefSpeedupThrottleFrameSkip, &coreOptions.speedup_throttle_frame_skip),
-        Option(OptionID::kPrefUseBiosGB, &gopts.use_bios_file_gb),
-        Option(OptionID::kPrefUseBiosGBA, &gopts.use_bios_file_gba),
-        Option(OptionID::kPrefUseBiosGBC, &gopts.use_bios_file_gbc),
-        Option(OptionID::kPrefVsync, &gopts.vsync),
+        Option(OptionID::kPrefUseBiosGB, &g_owned_opts.use_bios_file_gb),
+        Option(OptionID::kPrefUseBiosGBA, &g_owned_opts.use_bios_file_gba),
+        Option(OptionID::kPrefUseBiosGBC, &g_owned_opts.use_bios_file_gbc),
+        Option(OptionID::kPrefVsync, &g_owned_opts.vsync),
 
         /// Geometry
         Option(OptionID::kGeomFullScreen, &g_owned_opts.fullscreen),
@@ -329,12 +351,12 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kSoundBuffers, &gopts.audio_buffers, 2, 10),
         Option(OptionID::kSoundEnable, &gopts.sound_en, 0, 0x30f),
         Option(OptionID::kSoundGBAFiltering, &gopts.gba_sound_filter, 0, 100),
-        Option(OptionID::kSoundGBAInterpolation, &gopts.soundInterpolation),
-        Option(OptionID::kSoundGBDeclicking, &gopts.gb_declick),
+        Option(OptionID::kSoundGBAInterpolation, &g_gbaSoundInterpolation),
+        Option(OptionID::kSoundGBDeclicking, &g_owned_opts.gb_declicking),
         Option(OptionID::kSoundGBEcho, &gopts.gb_echo, 0, 100),
-        Option(OptionID::kSoundGBEnableEffects, &gopts.gb_effects_config_enabled),
+        Option(OptionID::kSoundGBEnableEffects, &g_owned_opts.gb_effects_config_enabled),
         Option(OptionID::kSoundGBStereo, &gopts.gb_stereo, 0, 100),
-        Option(OptionID::kSoundGBSurround, &gopts.gb_effects_config_surround),
+        Option(OptionID::kSoundGBSurround, &g_owned_opts.gb_effects_config_surround),
         Option(OptionID::kSoundQuality, &gopts.sound_qual),
         Option(OptionID::kSoundVolume, &gopts.sound_vol, 0, 200),
     };

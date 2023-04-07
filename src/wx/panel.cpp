@@ -112,7 +112,7 @@ GameArea::GameArea()
       render_observer_(
           {config::OptionID::kDispBilinear, config::OptionID::kDispFilter,
            config::OptionID::kDispRenderMethod, config::OptionID::kDispIFB,
-           config::OptionID::kDispStretch},
+           config::OptionID::kDispStretch, config::OptionID::kPrefVsync},
           std::bind(&GameArea::ResetPanel, this)),
       scale_observer_(config::OptionID::kDispScale,
                       std::bind(&GameArea::AdjustSize, this, true)),
@@ -123,7 +123,14 @@ GameArea::GameArea()
           {config::OptionID::kGBPalette0, config::OptionID::kGBPalette1,
            config::OptionID::kGBPalette2,
            config::OptionID::kPrefGBPaletteOption},
-          std::bind(&gbResetPalette)) {
+          std::bind(&gbResetPalette)),
+      gb_declick_observer_(config::OptionID::kSoundGBDeclicking,
+                           [&](config::Option* option) {
+                               gbSoundSetDeclicking(option->GetBool());
+                           }),
+      lcd_filters_observer_(
+          {config::OptionID::kGBLCDFilter, config::OptionID::kGBALCDFilter},
+          std::bind(&GameArea::UpdateLcdFilter, this)) {
     SetSizer(new wxBoxSizer(wxVERTICAL));
     // all renderers prefer 32-bit
     // well, "simple" prefers 24-bit, but that's not available for filters
@@ -183,7 +190,7 @@ void GameArea::LoadGame(const wxString& name)
     {
         wxConfigBase* cfg = wxConfigBase::Get();
 
-        if (!gopts.recent_freeze) {
+        if (!OPTION(kGenFreezeRecent)) {
             gopts.recent->AddFileToHistory(name);
             wxGetApp().frame->SetRecentAccels();
             cfg->SetPath("/Recent");
@@ -246,11 +253,10 @@ void GameArea::LoadGame(const wxString& name)
         }
 
         // start sound; this must happen before CPU stuff
-        gb_effects_config.enabled = gopts.gb_effects_config_enabled;
-        gb_effects_config.surround = gopts.gb_effects_config_surround;
+        gb_effects_config.enabled = OPTION(kSoundGBEnableEffects);
+        gb_effects_config.surround = OPTION(kSoundGBSurround);
         gb_effects_config.echo = (float)gopts.gb_echo / 100.0;
         gb_effects_config.stereo = (float)gopts.gb_stereo / 100.0;
-        gbSoundSetDeclicking(gopts.gb_declick);
         if (!soundInit()) {
             wxLogError(_("Could not initialize the sound driver!"));
         }
@@ -263,17 +269,16 @@ void GameArea::LoadGame(const wxString& name)
 
 
         // Disable bios loading when using colorizer hack.
-        if (gopts.use_bios_file_gb && OPTION(kGBColorizerHack)) {
+        if (OPTION(kPrefUseBiosGB) && OPTION(kGBColorizerHack)) {
             wxLogError(_("Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game Boy BIOS file."));
-            gopts.use_bios_file_gb = false;
-            update_opts();
+            OPTION(kPrefUseBiosGB) = false;
         }
 
         // Set up the core for the colorizer hack.
         setColorizerHack(OPTION(kGBColorizerHack));
 
-        const bool use_bios =
-            gbCgbMode ? gopts.use_bios_file_gbc : gopts.use_bios_file_gb;
+        const bool use_bios = gbCgbMode ? OPTION(kPrefUseBiosGBC).Get()
+                                        : OPTION(kPrefUseBiosGB).Get();
 
         const wxString bios_file = gbCgbMode ? OPTION(kGBGBCBiosFile).Get() : OPTION(kGBBiosFile).Get();
         gbCPUInit(bios_file.To8BitData().data(), use_bios);
@@ -376,9 +381,9 @@ void GameArea::LoadGame(const wxString& name)
 
         rtcEnableRumble(true);
 
-        CPUInit(UTF8(gopts.gba_bios), gopts.use_bios_file_gba);
+        CPUInit(UTF8(gopts.gba_bios), OPTION(kPrefUseBiosGBA));
 
-        if (gopts.use_bios_file_gba && !coreOptions.useBios) {
+        if (OPTION(kPrefUseBiosGBA) && !coreOptions.useBios) {
             wxLogError(_("Could not load BIOS %s"), gopts.gba_bios.mb_str());
             // could clear use flag & file name now, but better to force
             // user to do it
@@ -434,7 +439,7 @@ void GameArea::LoadGame(const wxString& name)
     // load battery and/or saved state
     recompute_dirs();
     mf->update_state_ts(true);
-    bool did_autoload = gopts.autoload_state ? LoadState() : false;
+    bool did_autoload = OPTION(kGenAutoLoadLastState) ? LoadState() : false;
 
     if (!did_autoload || coreOptions.skipSaveGameBattery) {
         wxString bname = loaded_game.GetFullName();
@@ -496,7 +501,7 @@ void GameArea::LoadGame(const wxString& name)
     // FIXME: backup battery file (useful if game name conflict)
     cheats_dirty = (did_autoload && !coreOptions.skipSaveGameCheats) || (loaded == IMAGE_GB ? gbCheatNumber > 0 : cheatsNumber > 0);
 
-    if (gopts.autoload_cheats && (!did_autoload || coreOptions.skipSaveGameCheats)) {
+    if (OPTION(kPrefAutoSaveLoadCheatList) && (!did_autoload || coreOptions.skipSaveGameCheats)) {
         wxFileName cfn = loaded_game;
         // SetExt may strip something off by accident, so append to text instead
         cfn.SetFullName(cfn.GetFullName() + wxT(".clt"));
@@ -517,12 +522,17 @@ void GameArea::LoadGame(const wxString& name)
     }
 
 #ifndef NO_LINK
-
-    if (gopts.link_auto) {
+    if (OPTION(kGBALinkAuto)) {
         BootLink(mf->GetConfiguredLinkMode(), UTF8(gopts.link_host),
-                 gopts.link_timeout, gopts.link_hacks, gopts.link_num_players);
+                 gopts.link_timeout, OPTION(kGBALinkFast),
+                 gopts.link_num_players);
     }
+#endif
 
+#ifndef NO_DEBUGGER
+    if (OPTION(kPrefGDBBreakOnLoad)) {
+        mf->GDBBreak();
+    }
 #endif
 }
 
@@ -583,7 +593,7 @@ void GameArea::UnloadGame(bool destruct)
         return;
 
     // last opportunity to autosave cheats
-    if (gopts.autoload_cheats && cheats_dirty) {
+    if (OPTION(kPrefAutoSaveLoadCheatList) && cheats_dirty) {
         wxFileName cfn = loaded_game;
         // SetExt may strip something off by accident, so append to text instead
         cfn.SetFullName(cfn.GetFullName() + wxT(".clt"));
@@ -1077,8 +1087,9 @@ void GameArea::OnIdle(wxIdleEvent& event)
         LoadGame(pl);
 
 #ifndef NO_DEBUGGER
-        if (gopts.gdb_break_on_load)
+        if (OPTION(kPrefGDBBreakOnLoad)) {
             mf->GDBBreak();
+        }
 
         if (debugger && loaded != IMAGE_GBA) {
             wxLogError(_("Not a valid Game Boy Advance cartridge"));
@@ -1196,12 +1207,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
         w->SetFocus();
 
         // generate system color maps (after output module init)
-        if (loaded == IMAGE_GBA)
-            utilUpdateSystemColorMaps(gopts.gba_lcd_filter);
-        else if (loaded == IMAGE_GB)
-            utilUpdateSystemColorMaps(gopts.gb_lcd_filter);
-        else
-            utilUpdateSystemColorMaps(false);
+        UpdateLcdFilter();
     }
 
     mf->PollJoysticks();
@@ -1895,7 +1901,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
     // draw OSD text old-style (directly into output buffer), if needed
     // new style flickers too much, so we'll stick to this for now
-    if (wxGetApp().frame->IsFullScreen() || !gopts.statusbar) {
+    if (wxGetApp().frame->IsFullScreen() || !OPTION(kGenStatusBar)) {
         GameArea* panel = wxGetApp().frame->GetPanel();
 
         if (panel->osdstat.size())
@@ -2276,16 +2282,16 @@ void GLDrawingPanel::DrawingPanelInit()
 #if defined(__WXGTK__)
     if (IsWayland()) {
 #ifdef HAVE_EGL
-        if (gopts.vsync)
+        if (OPTION(kPrefVsync))
             wxLogDebug(_("Enabling EGL VSync."));
         else
             wxLogDebug(_("Disabling EGL VSync."));
 
-        eglSwapInterval(0, gopts.vsync);
+        eglSwapInterval(0, OPTION(kPrefVsync));
 #endif
     }
     else {
-        if (gopts.vsync)
+        if (OPTION(kPrefVsync))
             wxLogDebug(_("Enabling GLX VSync."));
         else
             wxLogDebug(_("Disabling GLX VSync."));
@@ -2304,7 +2310,7 @@ void GLDrawingPanel::DrawingPanelInit()
             glXSwapIntervalEXT = reinterpret_cast<PFNGLXSWAPINTERVALEXTPROC>(glXGetProcAddress((const GLubyte*)"glXSwapIntervalEXT"));
             if (glXSwapIntervalEXT)
                 glXSwapIntervalEXT(glXGetCurrentDisplay(),
-                                   glXGetCurrentDrawable(), gopts.vsync);
+                                   glXGetCurrentDrawable(), OPTION(kPrefVsync));
             else
                 systemScreenMessage(_("Failed to set glXSwapIntervalEXT"));
         }
@@ -2313,7 +2319,7 @@ void GLDrawingPanel::DrawingPanelInit()
             glXSwapIntervalSGI = reinterpret_cast<PFNGLXSWAPINTERVALSGIPROC>(glXGetProcAddress((const GLubyte*)("glXSwapIntervalSGI")));
 
             if (glXSwapIntervalSGI)
-                glXSwapIntervalSGI(gopts.vsync);
+                glXSwapIntervalSGI(OPTION(kPrefVsync));
             else
                 systemScreenMessage(_("Failed to set glXSwapIntervalSGI"));
         }
@@ -2322,7 +2328,7 @@ void GLDrawingPanel::DrawingPanelInit()
             glXSwapIntervalMESA = reinterpret_cast<PFNGLXSWAPINTERVALMESAPROC>(glXGetProcAddress((const GLubyte*)("glXSwapIntervalMESA")));
 
             if (glXSwapIntervalMESA)
-                glXSwapIntervalMESA(gopts.vsync);
+                glXSwapIntervalMESA(OPTION(kPrefVsync));
             else
                 systemScreenMessage(_("Failed to set glXSwapIntervalMESA"));
         }
@@ -2341,11 +2347,11 @@ void GLDrawingPanel::DrawingPanelInit()
     static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = NULL;
     wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
     if (wglSwapIntervalEXT)
-        wglSwapIntervalEXT(gopts.vsync);
+        wglSwapIntervalEXT(OPTION(kPrefVsync));
     else
         systemScreenMessage(_("Failed to set wglSwapIntervalEXT"));
 #elif defined(__WXMAC__)
-    int swap_interval = gopts.vsync ? 1 : 0;
+    int swap_interval = OPTION(kPrefVsync) ? 1 : 0;
     CGLContextObj cgl_context = CGLGetCurrentContext();
     CGLSetParameter(cgl_context, kCGLCPSwapInterval, &swap_interval);
 #else
@@ -2646,6 +2652,15 @@ void GameArea::OnGBBorderChanged(config::Option* option) {
             DelBorder();
         }
     }
+}
+
+void GameArea::UpdateLcdFilter() {
+    if (loaded == IMAGE_GBA)
+        utilUpdateSystemColorMaps(OPTION(kGBALCDFilter));
+    else if (loaded == IMAGE_GB)
+        utilUpdateSystemColorMaps(OPTION(kGBLCDFilter));
+    else
+        utilUpdateSystemColorMaps(false);
 }
 
 void GameArea::SuspendScreenSaver() {

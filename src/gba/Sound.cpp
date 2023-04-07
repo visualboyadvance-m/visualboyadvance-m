@@ -42,7 +42,7 @@ int const SOUND_CLOCK_TICKS_ = 280896; // ~1074 samples per frame
 
 static uint16_t soundFinalWave[1600];
 long soundSampleRate = 44100;
-bool soundInterpolation = true;
+bool g_gbaSoundInterpolation = true;
 bool soundPaused = true;
 float soundFiltering = 0.5f;
 int SOUND_CLOCK_TICKS = SOUND_CLOCK_TICKS_;
@@ -156,7 +156,7 @@ void Gba_Pcm::update(int dac)
             last_amp = dac;
 
             int filter = 0;
-            if (soundInterpolation) {
+            if (g_gbaSoundInterpolation) {
                 // base filtering on how long since last sample was output
                 int period = time - last_time;
 

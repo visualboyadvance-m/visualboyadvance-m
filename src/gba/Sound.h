@@ -42,7 +42,7 @@ long soundGetSampleRate();
 void soundSetSampleRate(long sampleRate);
 
 // Sound settings
-extern bool soundInterpolation; // 1 if PCM should have low-pass filtering
+extern bool g_gbaSoundInterpolation; // 1 if PCM should have low-pass filtering
 extern float soundFiltering; // 0.0 = none, 1.0 = max
 
 //// GBA sound emulation
