@@ -83,6 +83,7 @@ enum named_opts
 	OPT_SCREEN_SHOT_DIR,
 	OPT_SHOW_SPEED,
 	OPT_SHOW_SPEED_TRANSPARENT,
+	OPT_SKIP_BIOS,
 	OPT_SOUND_FILTERING,
 	OPT_SPEEDUP_THROTTLE,
 	OPT_SPEEDUP_FRAME_SKIP,
@@ -212,7 +213,7 @@ struct option argOptions[] = {
 	{ "show-speed-detailed", no_argument, &showSpeed, 2 },
 	{ "show-speed-normal", no_argument, &showSpeed, 1 },
 	{ "show-speed-transparent", required_argument, 0, OPT_SHOW_SPEED_TRANSPARENT },
-	{ "skip-bios", no_argument, &coreOptions.skipBios, 1 },
+	{ "skip-bios", no_argument, 0, OPT_SKIP_BIOS},
 	{ "skip-save-game-battery", no_argument, &coreOptions.skipSaveGameBattery, 1 },
 	{ "skip-save-game-cheats", no_argument, &coreOptions.skipSaveGameCheats, 1 },
 	{ "sound-filtering", required_argument, 0, OPT_SOUND_FILTERING },
@@ -330,7 +331,7 @@ void LoadConfig()
 	coreOptions.skipSaveGameBattery = ReadPref("skipSaveGameBattery", 1);
 	coreOptions.skipSaveGameCheats = ReadPref("skipSaveGameCheats", 0);
 	soundFiltering = (float)ReadPref("gbaSoundFiltering", 50) / 100.0f;
-	soundInterpolation = ReadPref("gbaSoundInterpolation", 1);
+	g_gbaSoundInterpolation = ReadPref("gbaSoundInterpolation", 1);
 	coreOptions.throttle = ReadPref("throttle", 100);
 	coreOptions.speedup_throttle = ReadPref("speedupThrottle", 100);
 	coreOptions.speedup_frame_skip = ReadPref("speedupFrameSkip", 9);
@@ -817,6 +818,11 @@ int ReadOpts(int argc, char ** argv)
 			if (optarg) {
 				showSpeedTransparent = atoi(optarg);
 			}
+			break;
+
+		case OPT_SKIP_BIOS:
+			// --skip-bios
+			coreOptions.skipBios = true;
 			break;
 
 		case OPT_AUTO_FRAME_SKIP:

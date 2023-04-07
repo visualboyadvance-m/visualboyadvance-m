@@ -786,16 +786,32 @@ MainFrame::MainFrame()
       menus_opened(0),
       dialog_opened(0),
       focused(false),
-      keep_on_top_styler_(this) {
+      keep_on_top_styler_(this),
+      status_bar_observer_(config::OptionID::kGenStatusBar,
+                           std::bind(&MainFrame::OnStatusBarChanged,
+                                     this,
+                                     std::placeholders::_1)),
+      gba_link_observer_(config::OptionID::kGBALinkHost,
+                         std::bind(&MainFrame::EnableNetworkMenu, this)) {
     jpoll = new JoystickPoller();
     this->Connect(wxID_ANY, wxEVT_SHOW, wxShowEventHandler(JoystickPoller::ShowDialog), jpoll, jpoll);
 }
 
-MainFrame::~MainFrame()
-{
+MainFrame::~MainFrame() {
 #ifndef NO_LINK
     CloseLink();
 #endif
+}
+
+void MainFrame::OnStatusBarChanged(config::Option* option) {
+    if (option->GetBool())
+        GetStatusBar()->Show();
+    else
+        GetStatusBar()->Hide();
+
+    SendSizeEvent();
+    panel->AdjustSize(false);
+    SendSizeEvent();
 }
 
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
@@ -1204,15 +1220,15 @@ LinkMode MainFrame::GetConfiguredLinkMode()
         break;
 
     case 1:
-        if (gopts.link_proto)
-            return LINK_CABLE_IPC;
+        if (OPTION(kGBALinkProto))
+                return LINK_CABLE_IPC;
         else
             return LINK_CABLE_SOCKET;
 
         break;
 
     case 2:
-        if (gopts.link_proto)
+        if (OPTION(kGBALinkProto))
             return LINK_RFU_IPC;
         else
             return LINK_RFU_SOCKET;
@@ -1224,7 +1240,7 @@ LinkMode MainFrame::GetConfiguredLinkMode()
         break;
 
     case 4:
-        if (gopts.link_proto)
+        if (OPTION(kGBALinkProto))
             return LINK_GAMEBOY_IPC;
         else
             return LINK_GAMEBOY_SOCKET;

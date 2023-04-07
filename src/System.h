@@ -52,6 +52,7 @@ struct EmulatedSystem {
 extern struct CoreOptions {
     bool cpuIsMultiBoot = false;
     bool mirroringEnable = true;
+    bool skipBios = false;
     bool parseDebug = true;
     bool speedHack = false;
     bool speedup = false;
@@ -63,7 +64,6 @@ extern struct CoreOptions {
     int layerEnable = 0xff00;
     int rtcEnabled = 0;
     int saveType = 0;
-    int skipBios = 0;
     int skipSaveGameBattery = 1;
     int skipSaveGameCheats = 0;
     int useBios = 0;

@@ -1036,8 +1036,8 @@ static void update_variables(bool startup)
     }
 
     if (sound_changed) {
-        soundInterpolation = option_sndInterpolation;
-        soundFiltering     = option_sndFiltering;
+        g_gbaSoundInterpolation = option_sndInterpolation;
+        soundFiltering          = option_sndFiltering;
     }
 
     var.key = "vbam_usebios";

@@ -25,30 +25,17 @@ extern struct opts_t {
     /// Display
     wxVideoMode fs_mode;
 
-    /// GB
-    bool gb_lcd_filter = false;
-    bool print_auto_page = true;
-    bool print_screen_cap = false;
-
     /// GBA
     wxString gba_bios;
-    bool gba_lcd_filter = false;
-    bool link_auto = false;
-    bool link_hacks = true;
     // quick fix for issues #48 and #445
     wxString link_host = "127.0.0.1";
     wxString server_ip = "*";
     uint32_t link_port = 5738;
-    bool link_proto = false;
     int link_timeout = 500;
     int gba_link_type;
 
     /// General
-    bool autoload_state = false;
-    bool autoload_cheats = false;
-    bool recent_freeze = false;
     int rewind_interval = 0;
-    bool statusbar = false;
 
     /// Joypad
     std::map<config::GameControl, std::set<config::UserInput>>
@@ -60,14 +47,9 @@ extern struct opts_t {
     wxAcceleratorEntry_v accels;
 
     /// Core
-    bool gdb_break_on_load  = false;
     int gdb_port = 55555;
     int link_num_players = 2;
     int max_scale = 0;
-    bool use_bios_file_gb = false;
-    bool use_bios_file_gba = false;
-    bool use_bios_file_gbc = false;
-    bool vsync = false;
 
     /// Sound
     int audio_api = 0;
@@ -77,13 +59,9 @@ extern struct opts_t {
     wxString audio_dev;
     int sound_en = 0x30f; // soundSetEnable()
     int gba_sound_filter = 50;
-    bool soundInterpolation;
-    bool gb_declick = true;
     int gb_echo = 20;
-    bool gb_effects_config_enabled;
     bool dsound_hw_accel;
     int gb_stereo = 15;
-    bool gb_effects_config_surround;
     int sound_qual = 1; // soundSetSampleRate() / gbSoundSetSampleRate()
     int sound_vol = 100; // soundSetVolume()
     bool upmix = false; // xa2 only

@@ -135,7 +135,7 @@ public:
         wxString connmsg;
         wxString title;
         SetLinkTimeout(gopts.link_timeout);
-        EnableSpeedHacks(gopts.link_hacks);
+        EnableSpeedHacks(OPTION(kGBALinkFast));
         EnableLinkServer(server, gopts.link_num_players - 1);
 
         if (server) {
@@ -2703,7 +2703,7 @@ bool MainFrame::BindControls()
     // set pointers for checkable menu items
     // and set initial checked status
     if (checkable_mi.size()) {
-        MenuOptionBool("RecentFreeze", gopts.recent_freeze);
+        MenuOptionBool("RecentFreeze", OPTION(kGenFreezeRecent));
         MenuOptionBool("Pause", paused);
         MenuOptionIntMask("SoundChannel1", gopts.sound_en, (1 << 0));
         MenuOptionIntMask("SoundChannel2", gopts.sound_en, (1 << 1));
@@ -2719,12 +2719,12 @@ bool MainFrame::BindControls()
         MenuOptionIntMask("VideoLayersWIN0", coreOptions.layerSettings, (1 << 13));
         MenuOptionIntMask("VideoLayersWIN1", coreOptions.layerSettings, (1 << 14));
         MenuOptionIntMask("VideoLayersOBJWIN", coreOptions.layerSettings, (1 << 15));
-        MenuOptionBool("CheatsAutoSaveLoad", gopts.autoload_cheats);
+        MenuOptionBool("CheatsAutoSaveLoad", OPTION(kPrefAutoSaveLoadCheatList));
         MenuOptionIntMask("CheatsEnable", coreOptions.cheatsEnabled, 1);
         SetMenuOption("ColorizerHack", OPTION(kGBColorizerHack));
         MenuOptionIntMask("KeepSaves", coreOptions.skipSaveGameBattery, 1);
         MenuOptionIntMask("KeepCheats", coreOptions.skipSaveGameCheats, 1);
-        MenuOptionBool("LoadGameAutoLoad", gopts.autoload_state);
+        MenuOptionBool("LoadGameAutoLoad", OPTION(kGenAutoLoadLastState));
         MenuOptionIntMask("JoypadAutofireA", autofire, KEYM_A);
         MenuOptionIntMask("JoypadAutofireB", autofire, KEYM_B);
         MenuOptionIntMask("JoypadAutofireL", autofire, KEYM_L);
@@ -3499,20 +3499,9 @@ bool MainFrame::BindControls()
 #endif
 
     // delayed fullscreen
-    if (wxGetApp().pending_fullscreen)
+    if (wxGetApp().pending_fullscreen) {
         panel->ShowFullScreen(true);
-
-    MainFrame* mf = wxGetApp().frame;
-
-    if (gopts.statusbar)
-        mf->GetStatusBar()->Show();
-    else
-        mf->GetStatusBar()->Hide();
-
-    if (OPTION(kDispKeepOnTop))
-        mf->SetWindowStyle(mf->GetWindowStyle() | wxSTAY_ON_TOP);
-    else
-        mf->SetWindowStyle(mf->GetWindowStyle() & ~wxSTAY_ON_TOP);
+    }
 
 #ifndef NO_LINK
     LinkMode link_mode = GetConfiguredLinkMode();
@@ -3540,7 +3529,7 @@ bool MainFrame::BindControls()
     if (GetLinkMode() != LINK_DISCONNECTED) {
         cmd_enable |= CMDEN_LINK_ANY;
         SetLinkTimeout(gopts.link_timeout);
-        EnableSpeedHacks(gopts.link_hacks);
+        EnableSpeedHacks(OPTION(kGBALinkFast));
     }
 
     EnableNetworkMenu();

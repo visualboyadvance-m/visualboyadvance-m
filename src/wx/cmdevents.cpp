@@ -25,8 +25,6 @@
     wxStaticCast(wxGetApp().frame->FindWindowByName(n), wxDialog)
 #endif
 
-void GDBBreak(MainFrame* mf);
-
 bool cmditem_lt(const struct cmditem& cmd1, const struct cmditem& cmd2)
 {
     return wxStrcmp(cmd1.cmd, cmd2.cmd) < 0;
@@ -227,11 +225,7 @@ EVT_HANDLER(RecentReset, "Reset recent ROM list")
 
 EVT_HANDLER(RecentFreeze, "Freeze recent ROM list (toggle)")
 {
-    bool menuPress = false;
-    GetMenuOptionBool("RecentFreeze", &menuPress);
-    toggleBooleanVar(&menuPress, &gopts.recent_freeze);
-    SetMenuOption("RecentFreeze", gopts.recent_freeze ? 1 : 0);
-    update_opts();
+    GetMenuOptionConfig("RecentFreeze", config::OptionID::kGenFreezeRecent);
 }
 
 // following 10 should really be a single ranged handler
@@ -239,101 +233,51 @@ EVT_HANDLER(RecentFreeze, "Freeze recent ROM list (toggle)")
 EVT_HANDLER(wxID_FILE1, "Load recent ROM 1")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(0));
-
-#ifndef NO_DEBUGGER
-    if (gopts.gdb_break_on_load)
-        GDBBreak();
-#endif
 }
 
 EVT_HANDLER(wxID_FILE2, "Load recent ROM 2")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(1));
-
-#ifndef NO_DEBUGGER
-    if (gopts.gdb_break_on_load)
-        GDBBreak();
-#endif
 }
 
 EVT_HANDLER(wxID_FILE3, "Load recent ROM 3")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(2));
-
-#ifndef NO_DEBUGGER
-    if (gopts.gdb_break_on_load)
-        GDBBreak();
-#endif
 }
 
 EVT_HANDLER(wxID_FILE4, "Load recent ROM 4")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(3));
-
-#ifndef NO_DEBUGGER
-    if (gopts.gdb_break_on_load)
-        GDBBreak();
-#endif
 }
 
 EVT_HANDLER(wxID_FILE5, "Load recent ROM 5")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(4));
-
-#ifndef NO_DEBUGGER
-    if (gopts.gdb_break_on_load)
-        GDBBreak();
-#endif
 }
 
 EVT_HANDLER(wxID_FILE6, "Load recent ROM 6")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(5));
-
-#ifndef NO_DEBUGGER
-    if (gopts.gdb_break_on_load)
-        GDBBreak();
-#endif
 }
 
 EVT_HANDLER(wxID_FILE7, "Load recent ROM 7")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(6));
-
-#ifndef NO_DEBUGGER
-    if (gopts.gdb_break_on_load)
-        GDBBreak();
-#endif
 }
 
 EVT_HANDLER(wxID_FILE8, "Load recent ROM 8")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(7));
-
-#ifndef NO_DEBUGGER
-    if (gopts.gdb_break_on_load)
-        GDBBreak();
-#endif
 }
 
 EVT_HANDLER(wxID_FILE9, "Load recent ROM 9")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(8));
-
-#ifndef NO_DEBUGGER
-    if (gopts.gdb_break_on_load)
-        GDBBreak();
-#endif
 }
 
 EVT_HANDLER(wxID_FILE10, "Load recent ROM 10")
 {
     panel->LoadGame(gopts.recent->GetHistoryFile(9));
-
-#ifndef NO_DEBUGGER
-    if (gopts.gdb_break_on_load)
-        GDBBreak();
-#endif
 }
 
 static const struct rom_maker {
@@ -1722,11 +1666,7 @@ EVT_HANDLER_MASK(LoadGameRecent, "Load most recent save", CMDEN_SAVST)
 
 EVT_HANDLER(LoadGameAutoLoad, "Auto load most recent save (toggle)")
 {
-    bool menuPress = false;
-    GetMenuOptionBool("LoadGameAutoLoad", &menuPress);
-    toggleBooleanVar(&menuPress, &gopts.autoload_state);
-    SetMenuOption("LoadGameAutoLoad", gopts.autoload_state ? 1 : 0);
-    update_opts();
+    GetMenuOptionConfig("LoadGameAutoLoad", config::OptionID::kGenAutoLoadLastState);
 }
 
 EVT_HANDLER_MASK(LoadGame01, "Load saved state 1", CMDEN_SAVST)
@@ -1976,11 +1916,7 @@ EVT_HANDLER_MASK(CheatsSearch, "Create cheat...", CMDEN_GB | CMDEN_GBA)
 // new
 EVT_HANDLER(CheatsAutoSaveLoad, "Auto save/load cheats (toggle)")
 {
-    bool menuPress = false;
-    GetMenuOptionBool("CheatsAutoSaveLoad", &menuPress);
-    toggleBooleanVar(&menuPress, &gopts.autoload_cheats);
-    SetMenuOption("CheatsAutoSaveLoad", gopts.autoload_cheats ? 1 : 0);
-    update_opts();
+    GetMenuOptionConfig("CheatsAutoSaveLoad", config::OptionID::kPrefAutoSaveLoadCheatList);
 }
 
 // was CheatsDisable
@@ -1998,7 +1934,7 @@ EVT_HANDLER(CheatsEnable, "Enable cheats (toggle)")
 EVT_HANDLER(ColorizerHack, "Enable Colorizer Hack (toggle)")
 {
     GetMenuOptionConfig("ColorizerHack", config::OptionID::kGBColorizerHack);
-    if (OPTION(kGBColorizerHack) && gopts.use_bios_file_gb) {
+    if (OPTION(kGBColorizerHack) && OPTION(kPrefUseBiosGB)) {
         wxLogError(
             _("Cannot use Colorizer Hack when Game Boy BIOS File is enabled."));
         SetMenuOption("ColorizerHack", 0);
@@ -2335,8 +2271,7 @@ EVT_HANDLER(DebugGDBPort, "Configure port...")
 EVT_HANDLER(DebugGDBBreakOnLoad, "Break on load")
 {
 #ifndef NO_DEBUGGER
-    GetMenuOptionBool("DebugGDBBreakOnLoad", &gopts.gdb_break_on_load);
-    update_opts();
+    GetMenuOptionConfig("DebugGDBBreakOnLoad", config::OptionID::kPrefGDBBreakOnLoad);
 #endif
 }
 
@@ -2925,42 +2860,32 @@ EVT_HANDLER(Printer, "Enable printer emulation")
 
 EVT_HANDLER(PrintGather, "Automatically gather a full page before printing")
 {
-    GetMenuOptionBool("PrintGather", &gopts.print_auto_page);
-    update_opts();
+    GetMenuOptionConfig("PrintGather", config::OptionID::kGBPrintAutoPage);
 }
 
 EVT_HANDLER(PrintSnap, "Automatically save printouts as screen captures with -print suffix")
 {
-    GetMenuOptionBool("PrintSnap", &gopts.print_screen_cap);
-    update_opts();
+    GetMenuOptionConfig("PrintSnap", config::OptionID::kGBPrintScreenCap);
 }
 
 EVT_HANDLER(GBASoundInterpolation, "GBA sound interpolation")
 {
-    GetMenuOptionBool("GBASoundInterpolation", &soundInterpolation);
-    update_opts();
+    GetMenuOptionConfig("GBASoundInterpolation", config::OptionID::kSoundGBAInterpolation);
 }
 
 EVT_HANDLER(GBDeclicking, "GB sound declicking")
 {
-    GetMenuOptionBool("GBDeclicking", &gopts.gb_declick);
-    // note that setting declick may reset gb sound engine
-    gbSoundSetDeclicking(gopts.gb_declick);
-    update_opts();
+    GetMenuOptionConfig("GBDeclicking", config::OptionID::kSoundGBDeclicking);
 }
 
 EVT_HANDLER(GBEnhanceSound, "Enable GB sound effects")
 {
-    GetMenuOptionBool("GBEnhanceSound", &gopts.gb_effects_config_enabled);
-    gb_effects_config.enabled = gopts.gb_effects_config_enabled;
-    update_opts();
+    GetMenuOptionConfig("GBEnhanceSound", config::OptionID::kSoundGBEnableEffects);
 }
 
 EVT_HANDLER(GBSurround, "GB surround sound effect (%)")
 {
-    GetMenuOptionBool("GBSurround",&gopts.gb_effects_config_surround);
-    gb_effects_config.surround = gopts.gb_effects_config_surround;
-    update_opts();
+    GetMenuOptionConfig("GBSurround",config::OptionID::kSoundGBSurround);
 }
 
 EVT_HANDLER(AGBPrinter, "Enable AGB printer")
@@ -2970,22 +2895,12 @@ EVT_HANDLER(AGBPrinter, "Enable AGB printer")
 
 EVT_HANDLER_MASK(GBALcdFilter, "Enable LCD filter", CMDEN_GBA)
 {
-    bool menuPress = false;
-    GetMenuOptionBool("GBALcdFilter", &menuPress);
-    toggleBooleanVar(&menuPress, &gopts.gba_lcd_filter);
-    SetMenuOption("GBALcdFilter", gopts.gba_lcd_filter ? 1 : 0);
-    utilUpdateSystemColorMaps(gopts.gba_lcd_filter);
-    update_opts();
+    GetMenuOptionConfig("GBALcdFilter", config::OptionID::kGBALCDFilter);
 }
 
 EVT_HANDLER_MASK(GBLcdFilter, "Enable LCD filter", CMDEN_GB)
 {
-    bool menuPress = false;
-    GetMenuOptionBool("GBLcdFilter", &menuPress);
-    toggleBooleanVar(&menuPress, &gopts.gb_lcd_filter);
-    SetMenuOption("GBLcdFilter", gopts.gb_lcd_filter ? 1 : 0);
-    utilUpdateSystemColorMaps(gopts.gb_lcd_filter);
-    update_opts();
+    GetMenuOptionConfig("GBLcdFilter", config::OptionID::kGBLCDFilter);
 }
 
 EVT_HANDLER(GBColorOption, "Enable GB color option")
@@ -3005,18 +2920,7 @@ EVT_HANDLER(KeepOnTop, "Keep window on top")
 
 EVT_HANDLER(StatusBar, "Enable status bar")
 {
-    GetMenuOptionBool("StatusBar", &gopts.statusbar);
-    update_opts();
-    MainFrame* mf = wxGetApp().frame;
-
-    if (gopts.statusbar)
-        mf->GetStatusBar()->Show();
-    else
-        mf->GetStatusBar()->Hide();
-
-    mf->SendSizeEvent();
-    panel->AdjustSize(false);
-    mf->SendSizeEvent();
+    GetMenuOptionConfig("StatusBar", config::OptionID::kGenStatusBar);
 }
 
 EVT_HANDLER(NoStatusMsg, "Disable on-screen status messages")
@@ -3052,43 +2956,32 @@ EVT_HANDLER(Transparent, "Draw on-screen messages transparently")
 
 EVT_HANDLER(SkipIntro, "Skip BIOS initialization")
 {
-    GetMenuOptionInt("SkipIntro", &coreOptions.skipBios, 1);
-    update_opts();
+    GetMenuOptionConfig("SkipIntro", config::OptionID::kPrefSkipBios);
 }
 
 EVT_HANDLER(BootRomEn, "Use the specified BIOS file for GBA")
 {
-    GetMenuOptionBool("BootRomEn", &gopts.use_bios_file_gba);
-    update_opts();
+    GetMenuOptionConfig("BootRomEn", config::OptionID::kPrefUseBiosGBA);
 }
 
 EVT_HANDLER(BootRomGB, "Use the specified BIOS file for GB")
 {
-    int val = 0;
-    GetMenuOptionInt("BootRomGB", &val, 1);
-
-    if (val == 1 && OPTION(kGBColorizerHack)) {
+    GetMenuOptionConfig("BootRomGB", config::OptionID::kPrefUseBiosGB);
+    if (OPTION(kPrefUseBiosGB) && OPTION(kGBColorizerHack)) {
         wxLogError(_("Cannot use Game Boy BIOS when Colorizer Hack is enabled."));
-        val = 0;
         SetMenuOption("BootRomGB", 0);
+        OPTION(kPrefUseBiosGB) = false;
     }
-
-    gopts.use_bios_file_gb = val;
-
-    update_opts();
 }
 
 EVT_HANDLER(BootRomGBC, "Use the specified BIOS file for GBC")
 {
-    GetMenuOptionBool("BootRomGBC", &gopts.use_bios_file_gbc);
-    update_opts();
+    GetMenuOptionConfig("BootRomGBC", config::OptionID::kPrefUseBiosGBC);
 }
 
 EVT_HANDLER(VSync, "Wait for vertical sync")
 {
-    GetMenuOptionBool("VSync", &gopts.vsync);
-    update_opts();
-    panel->ResetPanel();
+    GetMenuOptionConfig("VSync", config::OptionID::kPrefVsync);
 }
 
 void MainFrame::EnableNetworkMenu()
@@ -3098,7 +2991,7 @@ void MainFrame::EnableNetworkMenu()
     if (gopts.gba_link_type != 0)
         cmd_enable |= CMDEN_LINK_ANY;
 
-    if (gopts.link_proto)
+    if (OPTION(kGBALinkProto))
         cmd_enable &= ~CMDEN_LINK_ANY;
 
     enable_menus();
@@ -3133,7 +3026,7 @@ EVT_HANDLER_MASK(LanLink, "Start Network link", CMDEN_LINK_ANY)
         return;
     }
 
-    if (gopts.link_proto) {
+    if (OPTION(kGBALinkProto)) {
         // see above comment
         wxLogError(_("Network is not supported in local mode."));
         return;
@@ -3172,22 +3065,17 @@ EVT_HANDLER(LinkType4Gameboy, "Link Gameboy")
 
 EVT_HANDLER(LinkAuto, "Enable link at boot")
 {
-    GetMenuOptionBool("LinkAuto", &gopts.link_auto);
-    update_opts();
+    GetMenuOptionConfig("LinkAuto", config::OptionID::kGBALinkAuto);
 }
 
 EVT_HANDLER(SpeedOn, "Enable faster network protocol by default")
 {
-    GetMenuOptionBool("SpeedOn", &gopts.link_hacks);
-    update_opts();
+    GetMenuOptionConfig("SpeedOn", config::OptionID::kGBALinkFast);
 }
 
 EVT_HANDLER(LinkProto, "Local host IPC")
 {
-    GetMenuOptionBool("LinkProto", &gopts.link_proto);
-    update_opts();
-    enable_menus();
-    EnableNetworkMenu();
+    GetMenuOptionConfig("LinkProto", config::OptionID::kGBALinkHost);
 }
 
 EVT_HANDLER(LinkConfigure, "Link options...")
