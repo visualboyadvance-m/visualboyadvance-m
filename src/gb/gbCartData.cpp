@@ -356,8 +356,10 @@ gbCartData::gbCartData(const uint8_t* romData, size_t romDataSize) {
             break;
         case 0x22:
             // MBC7 header does not specify a RAM size so set it here.
+            // TODO: Figure out how to get the RAM size for MBC7. It is either
+            // 256 or 512 Bytes.
             mapper_type_ = MapperType::kMbc7;
-            ram_size_ = k256B;
+            ram_size_ = k512B;
             skip_ram = true;
             has_battery_ = true;
             has_rumble_ = true;
