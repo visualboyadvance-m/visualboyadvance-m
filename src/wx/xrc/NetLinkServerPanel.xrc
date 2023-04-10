@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+  <object class="wxPanel" name="NetLinkServerPanel">
+    <object class="wxFlexGridSizer">
+      <rows>4</rows>
+      <cols>2</cols>
+      <object class="sizeritem">
+        <flag>wxALIGN_CENTER_VERTICAL|wxALIGN_LEFT|wxALL</flag>
+          <border>5</border>
+          <object class="wxStaticText" name="PlayersLab">
+          <label>Players:</label>
+          </object>
+      </object>
+      <object class="sizeritem">
+          <flag>wxALIGN_LEFT|wxALL|wxEXPAND</flag>
+          <border>5</border>
+          <object class="wxBoxSizer">
+            <orient>wxHORIZONTAL</orient>
+            <object class="sizeritem">
+              <flag>wxALL|wxALIGN_CENTER</flag>
+              <border>5</border>
+              <object class="wxRadioButton" name="Link2P">
+                <style>wxRB_GROUP</style>
+                <label>2</label>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL|wxALIGN_CENTER</flag>
+              <border>5</border>
+              <object class="wxRadioButton" name="Link3P">
+                <label>3</label>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL|wxALIGN_CENTER</flag>
+              <border>5</border>
+              <object class="wxRadioButton" name="Link4P">
+                <label>4</label>
+              </object>
+            </object>
+          </object>
+        </object>
+        <object class="sizeritem">
+          <flag>wxALIGN_CENTER_VERTICAL|wxALIGN_LEFT|wxALL</flag>
+          <border>5</border>
+          <object class="wxStaticText" name="ServerIPLab">
+            <label>Server:</label>
+          </object>
+        </object>
+        <object class="sizeritem">
+          <flag>wxALIGN_LEFT|wxALL|wxEXPAND</flag>
+          <border>5</border>
+          <object class="wxTextCtrl" name="ServerIP" />
+        </object>
+        <object class="sizeritem">
+            <flag>wxALIGN_CENTER_VERTICAL|wxALIGN_LEFT|wxALL</flag>
+            <border>5</border>
+            <object class="wxStaticText" name="ServerPortLab">
+              <label>Port:</label>
+            </object>
+        </object>
+        <object class="sizeritem">
+          <flag>wxALIGN_LEFT|wxALL|wxEXPAND</flag>
+          <border>5</border>
+          <object class="wxSpinCtrl" name="ServerPort">
+            <min>0</min>
+            <max>65535</max>
+          </object>
+        </object>
+        <object class="sizeritem">
+          <flag>wxALIGN_CENTER_VERTICAL|wxALIGN_LEFT|wxALL</flag>
+          <border>5</border>
+          <object class="wxStaticText" name="LinkTimeoutLab">
+            <label>Timeout:</label>
+          </object>
+        </object>
+        <object class="sizeritem">
+          <flag>wxALIGN_LEFT|wxALL|wxEXPAND</flag>
+          <border>5</border>
+          <object class="wxSpinCtrl" name="LinkTimeout">
+            <style>wxSP_ARROW_KEYS</style>
+            <min>0</min>
+            <max>9999999</max>
+          </object>
+        </object>
+      </object>
+  </object>
+</resource>

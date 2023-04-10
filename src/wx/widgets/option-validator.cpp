@@ -4,6 +4,7 @@
 #include <wx/choice.h>
 #include <wx/radiobut.h>
 #include <wx/spinctrl.h>
+#include <wx/textctrl.h>
 
 namespace widgets {
 
@@ -140,6 +141,65 @@ bool OptionChoiceValidator::WriteToOption() {
     const wxChoice* choice = wxDynamicCast(GetWindow(), wxChoice);
     assert(choice);
     return option()->SetUnsigned(choice->GetSelection());
+}
+
+OptionIntValidator::OptionIntValidator(config::OptionID option_id,
+                                       int32_t value)
+    : OptionValidator(option_id), value_(value) {
+    assert(option()->is_int());
+    assert(option()->GetIntMin() <= value_);
+    assert(option()->GetIntMax() >= value_);
+}
+
+wxObject* OptionIntValidator::Clone() const {
+    return new OptionIntValidator(option()->id(), value_);
+}
+
+bool OptionIntValidator::IsWindowValueValid() {
+    return true;
+}
+
+bool OptionIntValidator::WriteToWindow() {
+    wxRadioButton* radio_button = wxDynamicCast(GetWindow(), wxRadioButton);
+    assert(radio_button);
+    radio_button->SetValue(option()->GetInt() == value_);
+    return true;
+}
+
+bool OptionIntValidator::WriteToOption() {
+    const wxRadioButton* radio_button =
+        wxDynamicCast(GetWindow(), wxRadioButton);
+    assert(radio_button);
+    if (radio_button->GetValue()) {
+        option()->SetInt(value_);
+    }
+    return true;
+}
+
+OptionStringValidator::OptionStringValidator(config::OptionID option_id)
+    : OptionValidator(option_id) {
+    assert(option()->is_string());
+}
+
+wxObject* OptionStringValidator::Clone() const {
+    return new OptionStringValidator(option()->id());
+}
+
+bool OptionStringValidator::IsWindowValueValid() {
+    return true;
+}
+
+bool OptionStringValidator::WriteToWindow() {
+    wxTextCtrl* text_control = wxDynamicCast(GetWindow(), wxTextCtrl);
+    assert(text_control);
+    text_control->SetValue(option()->GetString());
+    return true;
+}
+
+bool OptionStringValidator::WriteToOption() {
+    const wxTextCtrl* text_control = wxDynamicCast(GetWindow(), wxTextCtrl);
+    assert(text_control);
+    return option()->SetString(text_control->GetValue());
 }
 
 }  // namespace widgets

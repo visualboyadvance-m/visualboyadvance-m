@@ -280,9 +280,6 @@ public:
         return focused;
     }
 
-    // Returns the link mode to set according to the options
-    LinkMode GetConfiguredLinkMode();
-
     void IdentifyRom();
 
     // Start GDB listener

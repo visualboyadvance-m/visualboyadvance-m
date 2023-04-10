@@ -623,7 +623,6 @@ set(
     xrc/IOViewer.xrc
     xrc/JoyPanel.xrc
     xrc/JoypadConfig.xrc
-    xrc/LinkConfig.xrc
     xrc/Logging.xrc
     xrc/MainFrame.xrc
     xrc/MainIcon.xrc
@@ -631,6 +630,8 @@ set(
     xrc/MapViewer.xrc
     xrc/MemSelRegion.xrc
     xrc/MemViewer.xrc
+    xrc/NetLinkClientPanel.xrc
+    xrc/NetLinkServerPanel.xrc
     xrc/NetLink.xrc
     xrc/OAMViewer.xrc
     xrc/PaletteViewer.xrc
@@ -768,6 +769,7 @@ set(
     dialogs/directories-config.cpp
     dialogs/display-config.cpp
     dialogs/game-boy-config.cpp
+    dialogs/net-link.cpp
     widgets/group-check-box.cpp
     widgets/keep-on-top-styler.cpp
     widgets/keyedit.cpp
@@ -817,6 +819,7 @@ set(
     dialogs/directories-config.h
     dialogs/display-config.h
     dialogs/game-boy-config.h
+    dialogs/net-link.h
     dialogs/validated-child.h
     widgets/dpi-support.h
     widgets/group-check-box.h

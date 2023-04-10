@@ -27,11 +27,6 @@ extern struct opts_t {
 
     /// GBA
     wxString gba_bios;
-    // quick fix for issues #48 and #445
-    wxString link_host = "127.0.0.1";
-    wxString server_ip = "*";
-    uint32_t link_port = 5738;
-    int link_timeout = 500;
     int gba_link_type;
 
     /// General
@@ -48,7 +43,6 @@ extern struct opts_t {
 
     /// Core
     int gdb_port = 55555;
-    int link_num_players = 2;
     int max_scale = 0;
 
     /// Sound

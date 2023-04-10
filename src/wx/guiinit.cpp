@@ -34,6 +34,10 @@
 #include "opts.h"
 #include "widgets/option-validator.h"
 
+#ifndef NO_LINK
+#include "dialogs/net-link.h"
+#endif
+
 #if defined(__WXGTK__)
 #include "wayland.h"
 #endif
@@ -69,126 +73,6 @@ const
 #endif
 
 // Event handlers must be methods of wxEvtHandler-derived objects
-
-// manage the network link dialog
-#ifndef NO_LINK
-static class NetLink_t : public wxEvtHandler {
-public:
-    wxDialog* dlg;
-    int n_players;
-    bool server;
-    NetLink_t()
-        : n_players(2)
-        , server(false)
-    {
-    }
-    wxButton* okb;
-    void ServerOKButton(wxCommandEvent& ev)
-    {
-        (void)ev; // unused params
-        okb->SetLabel(_("Start!"));
-    }
-    void BindServerIP(wxCommandEvent& ev)
-    {
-        (void)ev; // unused param
-        auto *tc = XRCCTRL(*dlg, "ServerIP", wxTextCtrl);
-        tc->SetValidator(wxTextValidator(wxFILTER_NONE, &gopts.server_ip));
-        tc->SetValue(gopts.server_ip);
-    }
-    void BindLinkHost(wxCommandEvent& ev)
-    {
-        (void)ev; // unused param
-        auto *tc = XRCCTRL(*dlg, "ServerIP", wxTextCtrl);
-        tc->SetValidator(wxTextValidator(wxFILTER_NONE, &gopts.link_host));
-        tc->SetValue(gopts.link_host);
-    }
-    void ClientOKButton(wxCommandEvent& ev)
-    {
-        (void)ev; // unused params
-        okb->SetLabel(_("Connect"));
-    }
-    // attached to OK, so skip when OK
-    void NetConnect(wxCommandEvent& ev)
-    {
-        static const int length = 256;
-
-        if (!dlg->Validate() || !dlg->TransferDataFromWindow())
-            return;
-
-        IP_LINK_PORT         = gopts.link_port;
-        IP_LINK_BIND_ADDRESS = gopts.server_ip;
-
-        if (!server) {
-            bool valid = SetLinkServerHost(gopts.link_host.utf8_str());
-
-            if (!valid) {
-                wxMessageBox(_("You must enter a valid host name"),
-                    _("Host name invalid"), wxICON_ERROR | wxOK);
-                return;
-            }
-        }
-
-        gopts.link_num_players = n_players;
-        update_opts(); // save fast flag and client host
-        // Close any previous link
-        CloseLink();
-        wxString connmsg;
-        wxString title;
-        SetLinkTimeout(gopts.link_timeout);
-        EnableSpeedHacks(OPTION(kGBALinkFast));
-        EnableLinkServer(server, gopts.link_num_players - 1);
-
-        if (server) {
-            char host[length];
-            GetLinkServerHost(host, length);
-            title.Printf(_("Waiting for clients..."));
-            connmsg.Printf(_("Server IP address is: %s\n"), wxString(host, wxConvLibc).c_str());
-        } else {
-            title.Printf(_("Waiting for connection..."));
-            connmsg.Printf(_("Connecting to %s\n"), gopts.link_host.c_str());
-        }
-
-        // Init link
-        MainFrame* mf = wxGetApp().frame;
-        ConnectionState state = InitLink(mf->GetConfiguredLinkMode());
-
-        // Display a progress dialog while the connection is establishing
-        if (state == LINK_NEEDS_UPDATE) {
-            wxProgressDialog pdlg(title, connmsg,
-                100, dlg, wxPD_APP_MODAL | wxPD_CAN_ABORT | wxPD_ELAPSED_TIME);
-
-            while (state == LINK_NEEDS_UPDATE) {
-                // Ask the core for updates
-                char message[length];
-                state = ConnectLinkUpdate(message, length);
-                connmsg = wxString(message, wxConvLibc);
-
-                // Does the user want to abort?
-                if (!pdlg.Pulse(connmsg)) {
-                    state = LINK_ABORT;
-                }
-            }
-        }
-
-        // The user canceled the connection attempt
-        if (state == LINK_ABORT) {
-            CloseLink();
-        }
-
-        // Something failed during init
-        if (state == LINK_ERROR) {
-            CloseLink();
-            wxLogError(_("Error occurred.\nPlease try again."));
-        }
-
-        if (GetLinkMode() != LINK_DISCONNECTED) {
-            connmsg.Replace(wxT("\n"), wxT(" "));
-            systemScreenMessage(connmsg);
-            ev.Skip(); // all OK
-        }
-    }
-} net_link_handler;
-#endif
 
 // manage the cheat list dialog
 static class CheatList_t : public wxEvtHandler {
@@ -2528,7 +2412,7 @@ bool MainFrame::BindControls()
 #endif
 #ifdef NO_LINK
 
-            if (cmdtab[i].cmd_id == XRCID("LanLink") || cmdtab[i].cmd_id == XRCID("LinkType0Nothing") || cmdtab[i].cmd_id == XRCID("LinkType1Cable") || cmdtab[i].cmd_id == XRCID("LinkType2Wireless") || cmdtab[i].cmd_id == XRCID("LinkType3GameCube") || cmdtab[i].cmd_id == XRCID("LinkType4Gameboy") || cmdtab[i].cmd_id == XRCID("LinkAuto") || cmdtab[i].cmd_id == XRCID("SpeedOn") || cmdtab[i].cmd_id == XRCID("LinkProto") || cmdtab[i].cmd_id == XRCID("LinkConfigure")) {
+            if (cmdtab[i].cmd_id == XRCID("LanLink") || cmdtab[i].cmd_id == XRCID("LinkType0Nothing") || cmdtab[i].cmd_id == XRCID("LinkType1Cable") || cmdtab[i].cmd_id == XRCID("LinkType2Wireless") || cmdtab[i].cmd_id == XRCID("LinkType3GameCube") || cmdtab[i].cmd_id == XRCID("LinkType4Gameboy") || cmdtab[i].cmd_id == XRCID("LinkAuto") || cmdtab[i].cmd_id == XRCID("SpeedOn") || cmdtab[i].cmd_id == XRCID("LinkProto")) {
                 if (mi)
                     mi->GetMenu()->Remove(mi);
 
@@ -2819,7 +2703,7 @@ bool MainFrame::BindControls()
         d->Fit();
 //// Emulation menu
 #ifndef NO_LINK
-        d = LoadXRCDialog("NetLink");
+        dialogs::NetLink::NewInstance(this);
 #endif
         wxRadioButton* rb;
 #define getrbo(name, option_id, value)                            \
@@ -2833,109 +2717,12 @@ bool MainFrame::BindControls()
         rb = SafeXRCCTRL<wxRadioButton>(d, n);       \
         rb->SetValidator(wxBoolIntValidator(&o, v)); \
     } while (0)
-        wxBoolEnValidator* benval;
-        wxBoolEnHandler* ben;
-#define getbe(n, o, cv, t, wt)                                        \
-    do {                                                              \
-        cv = SafeXRCCTRL<t>(d, n);                                    \
-        cv->SetValidator(wxBoolEnValidator(&o));                      \
-        benval = wxStaticCast(cv->GetValidator(), wxBoolEnValidator); \
-        static wxBoolEnHandler _ben;                                  \
-        ben = &_ben;                                                  \
-        wx##wt##BoolEnHandlerConnect(cv, wxID_ANY, _ben);             \
-    } while (0)
-        // brenval & friends are here just to allow yes/no radioboxes in place
-        // of checkboxes.  A lot of work for little benefit.
-        wxBoolRevEnValidator* brenval;
-#define getbre(n, o, cv, t, wt)                                           \
-    do {                                                                  \
-        cv = SafeXRCCTRL<t>(d, n);                                        \
-        cv->SetValidator(wxBoolRevEnValidator(&o));                       \
-        brenval = wxStaticCast(cv->GetValidator(), wxBoolRevEnValidator); \
-        wx##wt##BoolEnHandlerConnect(rb, wxID_ANY, *ben);                 \
-    } while (0)
-#define addbe(n)                       \
-    do {                               \
-        ben->controls.push_back(n);    \
-        benval->controls.push_back(n); \
-    } while (0)
-#define addrbe(n)                       \
-    do {                                \
-        addbe(n);                       \
-        brenval->controls.push_back(n); \
-    } while (0)
-#define addber(n, r)                   \
-    do {                               \
-        ben->controls.push_back(n);    \
-        ben->reverse.push_back(r);     \
-        benval->controls.push_back(n); \
-        benval->reverse.push_back(r);  \
-    } while (0)
-#define addrber(n, r)                   \
-    do {                                \
-        addber(n, r);                   \
-        brenval->controls.push_back(n); \
-        brenval->reverse.push_back(r);  \
-    } while (0)
-#define getrbbe(n, o) getbe(n, o, rb, wxRadioButton, RBE)
-#define getrbbd(n, o) getbre(n, o, rb, wxRadioButton, RBD)
         wxTextCtrl* tc;
 #define gettc(n, o)                                           \
     do {                                                      \
         tc = SafeXRCCTRL<wxTextCtrl>(d, n);                   \
         tc->SetValidator(wxTextValidator(wxFILTER_NONE, &o)); \
     } while (0)
-#define getutc(n, o)                                          \
-    do {                                                      \
-        tc = SafeXRCCTRL<wxTextCtrl>(d, n);                   \
-        tc->SetValidator(wxUIntValidator(&o));                \
-    } while (0)
-#ifndef NO_LINK
-        {
-            net_link_handler.dlg = d;
-            net_link_handler.n_players = gopts.link_num_players;
-            getrbbe("Server", net_link_handler.server);
-            getrbbd("Client", net_link_handler.server);
-            getlab("PlayersLab");
-            addrber(lab, false);
-            getrbi("Link2P", net_link_handler.n_players, 2);
-            addrber(rb, false);
-            getrbi("Link3P", net_link_handler.n_players, 3);
-            addrber(rb, false);
-            getrbi("Link4P", net_link_handler.n_players, 4);
-            addrber(rb, false);
-            getlab("ServerIPLab");
-            gettc("ServerIP", gopts.link_host);
-            getutc("ServerPort", gopts.link_port);
-            wxWindow* okb = d->FindWindow(wxID_OK);
-
-            if (okb) // may be gone if style guidlines removed it
-            {
-                net_link_handler.okb = wxStaticCast(okb, wxButton);
-                d->Connect(XRCID("Server"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
-                    wxCommandEventHandler(NetLink_t::ServerOKButton),
-                    NULL, &net_link_handler);
-                d->Connect(XRCID("Client"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
-                    wxCommandEventHandler(NetLink_t::ClientOKButton),
-                    NULL, &net_link_handler);
-            }
-
-            // Bind server IP when the server radio button is selected.
-            d->Connect(XRCID("Server"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
-                wxCommandEventHandler(NetLink_t::BindServerIP),
-                NULL, &net_link_handler);
-            // Bind client link_host when client radio button is selected.
-            d->Connect(XRCID("Client"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
-                wxCommandEventHandler(NetLink_t::BindLinkHost),
-                NULL, &net_link_handler);
-
-            // this should intercept wxID_OK before the dialog handler gets it
-            d->Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED,
-                wxCommandEventHandler(NetLink_t::NetConnect),
-                NULL, &net_link_handler);
-            d->Fit();
-        }
-#endif
         d = LoadXRCDialog("CheatList");
         {
             cheat_list_handler.dlg = d;
@@ -3363,16 +3150,6 @@ bool MainFrame::BindControls()
             joyDialog->Fit();
         }
 
-#ifndef NO_LINK
-        d = LoadXRCDialog("LinkConfig");
-        {
-            getlab("LinkTimeoutLab");
-            addbe(lab);
-            getsc("LinkTimeout", gopts.link_timeout);
-            addbe(sc);
-            d->Fit();
-        }
-#endif
         d = LoadXRCDialog("AccelConfig");
         {
             wxTreeCtrl* tc;
@@ -3504,36 +3281,31 @@ bool MainFrame::BindControls()
     }
 
 #ifndef NO_LINK
-    LinkMode link_mode = GetConfiguredLinkMode();
-
+    LinkMode link_mode = dialogs::GetConfiguredLinkMode();
     if (link_mode == LINK_GAMECUBE_DOLPHIN) {
-        bool isv = !gopts.link_host.empty();
-
-        if (isv) {
-            isv = SetLinkServerHost(gopts.link_host.utf8_str());
-        }
-
-        if (!isv) {
+        const wxString& link_host = OPTION(kGBALinkHost).Get();
+        if (link_host.empty()) {
             wxLogError(_("JoyBus host invalid; disabling"));
         } else {
+            if (SetLinkServerHost(link_host.utf8_str())) {
             link_mode = LINK_DISCONNECTED;
+            }
         }
     }
 
-    ConnectionState linkState = InitLink(link_mode);
-
-    if (linkState != LINK_OK) {
+    if (InitLink(link_mode) != LINK_OK) {
         CloseLink();
     }
 
     if (GetLinkMode() != LINK_DISCONNECTED) {
         cmd_enable |= CMDEN_LINK_ANY;
-        SetLinkTimeout(gopts.link_timeout);
+        SetLinkTimeout(OPTION(kGBALinkTimeout));
         EnableSpeedHacks(OPTION(kGBALinkFast));
     }
 
     EnableNetworkMenu();
 #endif
+
     enable_menus();
     panel->SetFrameTitle();
     // All OK; activate idle loop

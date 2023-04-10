@@ -306,9 +306,6 @@
           <label>_Speed hack</label>
           <checkable>1</checkable>
         </object>
-        <object class="wxMenuItem" name="LinkConfigure">
-          <label>_Configure...</label>
-        </object>
       </object>
       <object class="wxMenu">
         <label>_Video</label>

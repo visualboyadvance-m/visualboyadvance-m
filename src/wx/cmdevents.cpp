@@ -3032,8 +3032,7 @@ EVT_HANDLER_MASK(LanLink, "Start Network link", CMDEN_LINK_ANY)
         return;
     }
 
-    wxDialog* dlg = GetXRCDialog("NetLink");
-    ShowModal(dlg);
+    ShowModal(GetXRCDialog("NetLink"));
     panel->SetFrameTitle();
 #endif
 }
@@ -3075,21 +3074,8 @@ EVT_HANDLER(SpeedOn, "Enable faster network protocol by default")
 
 EVT_HANDLER(LinkProto, "Local host IPC")
 {
-    GetMenuOptionConfig("LinkProto", config::OptionID::kGBALinkHost);
-}
-
-EVT_HANDLER(LinkConfigure, "Link options...")
-{
-#ifndef NO_LINK
-    wxDialog* dlg = GetXRCDialog("LinkConfig");
-
-    if (ShowModal(dlg) != wxID_OK)
-        return;
-
-    SetLinkTimeout(gopts.link_timeout);
-    update_opts();
+    GetMenuOptionConfig("LinkProto", config::OptionID::kGBALinkProto);
     EnableNetworkMenu();
-#endif
 }
 
 // Dummy for disabling system key bindings

@@ -140,6 +140,42 @@ private:
     bool WriteToOption() override;
 };
 
+// Validator for a wxRadioButton widget with a selected kInt Option. This will
+// keep the kInt Option and the wxRadioButton selection in sync.
+class OptionIntValidator : public OptionValidator {
+public:
+    explicit OptionIntValidator(config::OptionID option_id, int32_t value);
+    ~OptionIntValidator() override = default;
+
+    // Returns a copy of the object.
+    wxObject* Clone() const override;
+
+private:
+    // OptionValidator implementation.
+    bool IsWindowValueValid() override;
+    bool WriteToWindow() override;
+    bool WriteToOption() override;
+
+    const int32_t value_;
+};
+
+// Validator for a wxTextCtrl widget with a selected kString Option. This will
+// keep the kString Option and the wxTextCtrl in sync.
+class OptionStringValidator : public OptionValidator {
+public:
+    explicit OptionStringValidator(config::OptionID option_id);
+    ~OptionStringValidator() override = default;
+
+    // Returns a copy of the object.
+    wxObject* Clone() const override;
+
+private:
+    // OptionValidator implementation.
+    bool IsWindowValueValid() override;
+    bool WriteToWindow() override;
+    bool WriteToOption() override;
+};
+
 }  // namespace widgets
 
 #endif  // VBAM_WX_WIDGETS_OPTION_VALIDATOR_H_
