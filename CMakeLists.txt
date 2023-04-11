@@ -45,10 +45,10 @@ if(TAG_RELEASE)
     include(MakeReleaseCommitAndTag)
 endif()
 
-set(VCPKG_DEPS pkgconf zlib SDL2 gettext wxWidgets)
+set(VCPKG_DEPS pkgconf zlib sdl2 gettext wxwidgets)
 
 set(VCPKG_DEPS_OPTIONAL
-    SFML   ENABLE_LINK
+    sfml   ENABLE_LINK
     ffmpeg ENABLE_FFMPEG
 )
 
