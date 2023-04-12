@@ -349,4 +349,14 @@ endfunction()
 
 vcpkg_set_toolchain()
 
+# Make vcpkg use debug libs for RelWithDebInfo
+set(orig_build_type ${CMAKE_BUILD_TYPE})
+
+if(CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo)
+    set(CMAKE_BUILD_TYPE Debug)
+endif()
+
 include(${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
+
+set(CMAKE_BUILD_TYPE ${orig_build_type})
+unset(orig_build_type)

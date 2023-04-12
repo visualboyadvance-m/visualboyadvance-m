@@ -1174,7 +1174,7 @@ if(NOT TRANSLATIONS_ONLY)
 
         unset(pdb_file)
 
-        if(MSVC AND CMAKE_BUILD_TYPE STREQUAL Debug)
+        if(MSVC AND CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
             set(pdb_file visualboyadvance-m.pdb)
         endif()
 

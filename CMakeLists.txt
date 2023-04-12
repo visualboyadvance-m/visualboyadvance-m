@@ -88,6 +88,11 @@ elseif(NOT CMAKE_BUILD_TYPE MATCHES "^(Release|Debug|RelWithDebInfo|MinSizeRel)$
     message(FATAL_ERROR "Invalid CMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}', must be one of: 'Release', 'Debug', 'RelWithDebInfo' or 'MinSizeRel'")
 endif()
 
+# Link debug libs for RelWithDebInfo
+if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    set(CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO "Debug")
+endif()
+
 include(CTest)
 
 if(BUILD_TESTING)
@@ -167,6 +172,14 @@ if(WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe) AND NO
 endif()
 
 find_package(SFML 2.4 COMPONENTS network system)
+
+if(CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo)
+    if(SFML_STATIC_LIBRARIES AND SFML_NETWORK_LIBRARY_STATIC_DEBUG AND SFML_SYSTEM_LIBRARY_STATIC_DEBUG)
+        set(SFML_LIBRARIES ${SFML_NETWORK_LIBRARY_STATIC_DEBUG} ${SFML_SYSTEM_LIBRARY_STATIC_DEBUG})
+    elseif(SFML_NETWORK_LIBRARY_DYNAMIC_DEBUG AND SFML_SYSTEM_LIBRARY_DYNAMIC_DEBUG)
+        set(SFML_LIBRARIES ${SFML_NETWORK_LIBRARY_DYNAMIC_DEBUG} ${SFML_SYSTEM_LIBRARY_DYNAMIC_DEBUG})
+    endif()
+endif()
 
 if(SFML_FOUND)
     set(ENABLE_LINK_DEFAULT ON)
@@ -652,9 +665,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang AND NOT MSVC
     endif()
 
     if(ENABLE_ASAN)
-        string(TOLOWER ${CMAKE_BUILD_TYPE} build)
-        if(NOT build STREQUAL "debug")
-            message(FATAL_ERROR "asan requires debug build, set -DCMAKE_BUILD_TYPE=Debug")
+        if(NOT CMAKE_BUILD_TYPE STREQUAL Debug)
+            message(FATAL_ERROR "asan requires a debug build, set -DCMAKE_BUILD_TYPE=Debug")
         endif()
 
         string(TOLOWER ${ENABLE_ASAN} SANITIZER)
@@ -809,9 +821,11 @@ elseif(MSVC)
         set(runtime "/MD")
     endif()
 
-    if(CMAKE_BUILD_TYPE STREQUAL Debug)
+    if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
         set(runtime "${runtime}d")
+    endif()
 
+    if(CMAKE_BUILD_TYPE STREQUAL Debug)
         add_compiler_flags(${runtime} /ZI /W4 /Ob0 /Od /RTC1 /DDEBUG /EHsc)
     else()
         # Enable severe warnings for release builds, but suppress macro
@@ -819,11 +833,7 @@ elseif(MSVC)
         add_compiler_flags(/W1 /wd4005 /DNDEBUG /EHsc)
 
         if(CMAKE_BUILD_TYPE STREQUAL Release)
-            if(X86_32)
-                add_compiler_flags(${runtime} /O2 /Ob3)
-            else()
-                add_compiler_flags(${runtime} /O2 /Ob3)
-            endif()
+            add_compiler_flags(${runtime} /O2 /Ob3)
         elseif(CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo)
             add_compiler_flags(${runtime} /Zi /Ob1)
         elseif(CMAKE_BUILD_TYPE STREQUAL MinSizeRel)
