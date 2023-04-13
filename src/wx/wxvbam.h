@@ -382,6 +382,8 @@ private:
     void OnMenu(wxContextMenuEvent&);
     // window geometry
     void OnMove(wxMoveEvent& event);
+    void OnMoveStart(wxMoveEvent& event);
+    void OnMoveEnd(wxMoveEvent& event);
     void OnSize(wxSizeEvent& event);
     // Load a named wxDialog from the XRC file
     wxDialog* LoadXRCDialog(const char* name);

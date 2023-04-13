@@ -824,6 +824,8 @@ EVT_DROP_FILES(MainFrame::OnDropFile)
 
 // for window geometry
 EVT_MOVE(MainFrame::OnMove)
+EVT_MOVE_START(MainFrame::OnMoveStart)
+EVT_MOVE_END(MainFrame::OnMoveEnd)
 EVT_SIZE(MainFrame::OnSize)
 
 // For tracking menubar state.
@@ -877,6 +879,20 @@ void MainFrame::OnMove(wxMoveEvent&) {
         OPTION(kGeomWindowX) = window_pos.x;
         OPTION(kGeomWindowY) = window_pos.y;
     }
+}
+
+// On Windows pause sound when moving and resizing the window to prevent dsound
+// from looping.
+void MainFrame::OnMoveStart(wxMoveEvent&) {
+#ifdef __WXMSW__
+    soundPause();
+#endif
+}
+
+void MainFrame::OnMoveEnd(wxMoveEvent&) {
+#ifdef __WXMSW__
+    soundResume();
+#endif
 }
 
 void MainFrame::OnSize(wxSizeEvent& event)
