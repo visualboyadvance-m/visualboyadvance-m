@@ -58,10 +58,6 @@ struct VBamIoVec {
 };
 std::vector<VBamIoVec> g_vbamIoVecs;
 
-// TODO: This is set to 256 bytes for compatibility with older versions. We
-// should figure out how to actually get the MBC7 RAM size.
-static constexpr size_t kMbc7RamSizeForSaving = k256B;
-
 void ResetMBC3RTC() {
     time(&gbDataMBC3.mapperLastTime);
     struct tm* lt;
@@ -472,17 +468,12 @@ bool gbInitializeRom(size_t romSize) {
                                         HUC3_RTC_DATA_SIZE, -4,
                                         &ResetHuc3RTC});
                 break;
-            case gbCartData::MapperType::kMbc7:
-                // For MBC7, we don't save the RAM data from the same location.
-                // TODO: Unify handling and find how to get the MBC7 RAM size.
-                g_vbamIoVecs.clear();
-                g_vbamIoVecs.push_back({&gbMemory[0xa000], kMbc7RamSizeForSaving});
-                break;
             case gbCartData::MapperType::kNone:
             case gbCartData::MapperType::kMbc1:
             case gbCartData::MapperType::kMbc2:
             case gbCartData::MapperType::kMbc5:
             case gbCartData::MapperType::kMbc6:
+            case gbCartData::MapperType::kMbc7:
             case gbCartData::MapperType::kHuC1:
             case gbCartData::MapperType::kMmm01:
             case gbCartData::MapperType::kPocketCamera:
@@ -3181,13 +3172,12 @@ bool gbReadGSASnapshot(const char* fileName)
             case gbCartData::MapperType::kMbc1:
             case gbCartData::MapperType::kMbc3:
             case gbCartData::MapperType::kMbc5:
+            case gbCartData::MapperType::kMbc7:
             case gbCartData::MapperType::kHuC1:
                 FREAD_UNCHECKED(gbRam, 1, g_gbCartData.ram_size(), file);
                 break;
             case gbCartData::MapperType::kMbc2:
-            case gbCartData::MapperType::kMbc7:
-                // TODO: Figure out how to get the RAM size for MBC7.
-                FREAD_UNCHECKED(&gbMemory[0xa000], 1, kMbc7RamSizeForSaving, file);
+                FREAD_UNCHECKED(&gbMemory[0xa000], 1, k256B, file);
                 break;
             default:
                 systemMessage(MSG_UNSUPPORTED_SNAPSHOT_FILE,

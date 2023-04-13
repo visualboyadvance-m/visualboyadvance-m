@@ -356,10 +356,18 @@ gbCartData::gbCartData(const uint8_t* romData, size_t romDataSize) {
             break;
         case 0x22:
             // MBC7 header does not specify a RAM size so set it here.
-            // TODO: Figure out how to get the RAM size for MBC7. It is either
-            // 256 or 512 Bytes.
             mapper_type_ = MapperType::kMbc7;
-            ram_size_ = k512B;
+            if (header->rom_size == 0x05) {
+                // Kirby Tilt 'n' Tumble / Korokoro Kirby.
+                ram_size_ = k256B;
+            } else if (header->rom_size == 0x06) {
+                // Command Master.
+                ram_size_ = k512B;
+            } else {
+                // Not a licensed MBC7 cart. Default to the larger size and hope
+                // for the best.
+                ram_size_ = k512B;
+            }
             skip_ram = true;
             has_battery_ = true;
             has_rumble_ = true;
