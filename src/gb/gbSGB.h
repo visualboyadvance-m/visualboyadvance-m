@@ -17,7 +17,6 @@ void gbSgbReadGame(gzFile, int version);
 #endif
 
 extern uint8_t gbSgbATF[20 * 18];
-extern int gbSgbMode;
 extern int gbSgbMask;
 extern int gbSgbMultiplayer;
 extern uint8_t gbSgbNextController;

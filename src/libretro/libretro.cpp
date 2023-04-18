@@ -16,6 +16,7 @@
 #include "../apu/Gb_Apu.h"
 #include "../apu/Gb_Oscs.h"
 #include "../common/Port.h"
+#include "../common/sizes.h"
 #include "../gba/Cheats.h"
 #include "../gba/EEprom.h"
 #include "../gba/Flash.h"
@@ -165,28 +166,56 @@ static void set_gbPalette(void)
 
 static void* gb_rtcdata_prt(void)
 {
-    switch (gbRomType) {
-    case 0x0f:
-    case 0x10: // MBC3 + extended
+    switch (g_gbCartData.mapper_type()) {
+    case gbCartData::MapperType::kMbc3:
         return &gbDataMBC3.mapperSeconds;
-    case 0xfd: // TAMA5 + extended
+    case gbCartData::MapperType::kTama5:
         return &gbDataTAMA5.mapperSeconds;
-    case 0xfe: // HuC3 + Clock
+    case gbCartData::MapperType::kHuC3:
         return &gbRTCHuC3.mapperLastTime;
+    case gbCartData::MapperType::kNone:
+    case gbCartData::MapperType::kMbc1:
+    case gbCartData::MapperType::kMbc2:
+    case gbCartData::MapperType::kMbc5:
+    case gbCartData::MapperType::kMbc6:
+    case gbCartData::MapperType::kMbc7:
+    case gbCartData::MapperType::kPocketCamera:
+    case gbCartData::MapperType::kMmm01:
+    case gbCartData::MapperType::kHuC1:
+    case gbCartData::MapperType::kGameGenie:
+    case gbCartData::MapperType::kGameShark:
+    case gbCartData::MapperType::kUnknown:
+        // Unreachable.
+        assert(false);
+        return nullptr;
     }
-    return NULL;
+    return nullptr;
 }
 
 static size_t gb_rtcdata_size(void)
 {
-    switch (gbRomType) {
-    case 0x0f:
-    case 0x10: // MBC3 + extended
+    switch (g_gbCartData.mapper_type()) {
+    case gbCartData::MapperType::kMbc3:
         return MBC3_RTC_DATA_SIZE;
-    case 0xfd: // TAMA5 + extended
+    case gbCartData::MapperType::kTama5:
         return TAMA5_RTC_DATA_SIZE;
-    case 0xfe: // HuC3 + Clock
+    case gbCartData::MapperType::kHuC3:
         return sizeof(gbRTCHuC3.mapperLastTime);
+    case gbCartData::MapperType::kNone:
+    case gbCartData::MapperType::kMbc1:
+    case gbCartData::MapperType::kMbc2:
+    case gbCartData::MapperType::kMbc5:
+    case gbCartData::MapperType::kMbc6:
+    case gbCartData::MapperType::kMbc7:
+    case gbCartData::MapperType::kPocketCamera:
+    case gbCartData::MapperType::kMmm01:
+    case gbCartData::MapperType::kHuC1:
+    case gbCartData::MapperType::kGameGenie:
+    case gbCartData::MapperType::kGameShark:
+    case gbCartData::MapperType::kUnknown:
+        // Unreachable.
+        assert(false);
+        break;
     }
     return 0;
 }
@@ -198,9 +227,8 @@ static void gbInitRTC(void)
     time(&rawtime);
     lt = localtime(&rawtime);
 
-    switch (gbRomType) {
-    case 0x0f:
-    case 0x10:
+    switch (g_gbCartData.mapper_type()) {
+    case gbCartData::MapperType::kMbc3:
         gbDataMBC3.mapperSeconds = lt->tm_sec;
         gbDataMBC3.mapperMinutes = lt->tm_min;
         gbDataMBC3.mapperHours = lt->tm_hour;
@@ -208,7 +236,7 @@ static void gbInitRTC(void)
         gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0xfe) | (lt->tm_yday > 255 ? 1 : 0);
         gbDataMBC3.mapperLastTime = rawtime;
         break;
-    case 0xfd: {
+    case gbCartData::MapperType::kTama5: {
         uint8_t gbDaysinMonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
         int days = lt->tm_yday + 365 * 3;
         gbDataTAMA5.mapperSeconds = lt->tm_sec;
@@ -237,8 +265,23 @@ static void gbInitRTC(void)
             gbDataTAMA5.mapperControl = (gbDataTAMA5.mapperControl & 0xfe) | (lt->tm_yday > 255 ? 1 : 0);
         }
         break;
-    case 0xfe:
+    case gbCartData::MapperType::kHuC3:
         gbRTCHuC3.mapperLastTime = rawtime;
+        break;
+    case gbCartData::MapperType::kNone:
+    case gbCartData::MapperType::kMbc1:
+    case gbCartData::MapperType::kMbc2:
+    case gbCartData::MapperType::kMbc5:
+    case gbCartData::MapperType::kMbc6:
+    case gbCartData::MapperType::kMbc7:
+    case gbCartData::MapperType::kPocketCamera:
+    case gbCartData::MapperType::kMmm01:
+    case gbCartData::MapperType::kHuC1:
+    case gbCartData::MapperType::kGameGenie:
+    case gbCartData::MapperType::kGameShark:
+    case gbCartData::MapperType::kUnknown:
+        // Unreachable.
+        assert(false);
         break;
     }
 }
@@ -297,7 +340,7 @@ void* retro_get_memory_data(unsigned id)
     case IMAGE_GB:
         switch (id) {
         case RETRO_MEMORY_SAVE_RAM:
-            if (gbBattery)
+            if (g_gbCartData.has_battery())
                 data = gbRam;
             break;
         case RETRO_MEMORY_SYSTEM_RAM:
@@ -307,7 +350,7 @@ void* retro_get_memory_data(unsigned id)
             data = (gbCgbMode ? gbVram : (gbMemory + 0x8000));
             break;
         case RETRO_MEMORY_RTC:
-            if (gbRTCPresent)
+            if (g_gbCartData.has_rtc())
                 data = gb_rtcdata_prt();
             break;
         }
@@ -345,8 +388,8 @@ size_t retro_get_memory_size(unsigned id)
     case IMAGE_GB:
         switch (id) {
         case RETRO_MEMORY_SAVE_RAM:
-            if (gbBattery)
-                size = gbRamSize;
+            if (g_gbCartData.has_battery())
+                size = g_gbCartData.ram_size();
             break;
         case RETRO_MEMORY_SYSTEM_RAM:
             size = gbCgbMode ? 0x8000 : 0x2000;
@@ -355,7 +398,7 @@ size_t retro_get_memory_size(unsigned id)
             size = gbCgbMode ? 0x4000 : 0x2000;
             break;
         case RETRO_MEMORY_RTC:
-            if (gbRTCPresent)
+            if (g_gbCartData.has_rtc())
                 size = gb_rtcdata_size();
             break;
         }
@@ -610,7 +653,7 @@ static const char *gbGetCartridgeType(void)
 {
     const char *type = "Unknown";
 
-    switch (gbRom[0x147]) {
+    switch (g_gbCartData.mapper_flag()) {
     case 0x00:
         type = "ROM";
         break;
@@ -701,24 +744,33 @@ static const char *gbGetSaveRamSize(void)
 {
     const char *type = "Unknown";
 
-    switch (gbRom[0x149]) {
+    switch (g_gbCartData.ram_size()) {
     case 0:
         type = "None";
         break;
-    case 1:
+    case k256B:
+        type = "256B";
+        break;
+    case k512B:
+        type = "512B";
+        break;
+    case k2KiB:
         type = "2K";
         break;
-    case 2:
+    case k8KiB:
         type = "8K";
         break;
-    case 3:
+    case k32KiB:
         type = "32K";
         break;
-    case 4:
+    case k64KiB:
+        type = "64K";
+        break;
+    case k128KiB:
         type = "128K";
         break;
-    case 5:
-        type = "64K";
+    default:
+        type = "Unknown";
         break;
     }
 
@@ -904,33 +956,19 @@ static void gb_init(void)
     gbReset(); // also resets sound;
     set_gbPalette();
 
-    log("Rom size       : %02x (%dK)\n", gbRom[0x148], (romSize + 1023) / 1024);
-    log("Cartridge type : %02x (%s)\n", gbRom[0x147], gbGetCartridgeType());
-    log("Ram size       : %02x (%s)\n", gbRom[0x149], gbGetSaveRamSize());
+    log("Rom size       : %02x (%dK)\n", g_gbCartData.rom_flag(), (romSize + 1023) / 1024);
+    log("Cartridge type : %02x (%s)\n", g_gbCartData.mapper_flag(), gbGetCartridgeType());
+    log("Ram size       : %02x (%s)\n", g_gbCartData.ram_flag(), gbGetSaveRamSize());
+    log("CRC            : %02x (%02x)\n", g_gbCartData.header_checksum(), g_gbCartData.actual_header_checksum());
+    log("Checksum       : %04x (%04x)\n", g_gbCartData.global_checksum(), g_gbCartData.actual_global_checksum());
 
-    int i = 0;
-    uint8_t crc = 25;
-
-    for (i = 0x134; i < 0x14d; i++)
-        crc += gbRom[i];
-    crc = 256 - crc;
-    log("CRC            : %02x (%02x)\n", crc, gbRom[0x14d]);
-
-    uint16_t crc16 = 0;
-
-    for (i = 0; i < gbRomSize; i++)
-        crc16 += gbRom[i];
-
-    crc16 -= gbRom[0x14e] + gbRom[0x14f];
-    log("Checksum       : %04x (%04x)\n", crc16, gbRom[0x14e] * 256 + gbRom[0x14f]);
-
-    if (gbBattery)
+    if (g_gbCartData.has_battery())
         log("Game supports battery save ram.\n");
-    if (gbRom[0x143] == 0xc0)
+    if (g_gbCartData.RequiresCGB())
         log("Game works on CGB only\n");
-    else if (gbRom[0x143] == 0x80)
+    else if (g_gbCartData.SupportsCGB())
         log("Game supports GBC functions, GB compatible.\n");
-    if (gbRom[0x146] == 0x03)
+    if (g_gbCartData.sgb_support())
         log("Game supports SGB functions\n");
 }
 
@@ -1399,21 +1437,35 @@ void retro_run(void)
         firstrun = false;
         /* Check if GB game has RTC data. Has to be check here since this is where the data will be
          * available when using libretro api. */
-        if ((type == IMAGE_GB) && gbRTCPresent) {
-            switch (gbRomType) {
-            case 0x0f:
-            case 0x10:
+        if ((type == IMAGE_GB) && g_gbCartData.has_rtc()) {
+            switch (g_gbCartData.mapper_type()) {
+            case gbCartData::MapperType::kMbc3:
                 /* Check if any RTC has been loaded, zero value means nothing has been loaded. */
                 if (!gbDataMBC3.mapperLastTime)
                     initRTC = true;
                 break;
-            case 0xfd:
+            case gbCartData::MapperType::kTama5:
                 if (!gbDataTAMA5.mapperLastTime)
                     initRTC = true;
                 break;
-            case 0xfe:
+            case gbCartData::MapperType::kHuC3:
                 if (!gbRTCHuC3.mapperLastTime)
                     initRTC = true;
+                break;
+            case gbCartData::MapperType::kNone:
+            case gbCartData::MapperType::kMbc1:
+            case gbCartData::MapperType::kMbc2:
+            case gbCartData::MapperType::kMbc5:
+            case gbCartData::MapperType::kMbc6:
+            case gbCartData::MapperType::kMbc7:
+            case gbCartData::MapperType::kPocketCamera:
+            case gbCartData::MapperType::kMmm01:
+            case gbCartData::MapperType::kHuC1:
+            case gbCartData::MapperType::kGameGenie:
+            case gbCartData::MapperType::kGameShark:
+            case gbCartData::MapperType::kUnknown:
+                // Unreachable.
+                assert(false);
                 break;
             }
             /* Initialize RTC using local time if needed */

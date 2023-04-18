@@ -751,21 +751,9 @@ EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB | CMDEN_GBA)
         setblab("DestCode", gbRom[0x14a]);
         setblab("LicCode", gbRom[0x14b]);
         setblab("Version", gbRom[0x14c]);
-        uint8_t crc = 25;
-
-        for (int i = 0x134; i < 0x14d; i++)
-            crc += gbRom[i];
-
-        crc = 256 - crc;
-        s.Printf(wxT("%02x (%02x)"), crc, gbRom[0x14d]);
+        s.Printf(wxT("%02x (%02x)"), g_gbCartData.actual_header_checksum(), g_gbCartData.header_checksum());
         setlab("CRC");
-        uint16_t crc16 = 0;
-
-        for (int i = 0; i < gbRomSize; i++)
-            crc16 += gbRom[i];
-
-        crc16 -= gbRom[0x14e] + gbRom[0x14f];
-        s.Printf(wxT("%04x (%04x)"), crc16, gbRom[0x14e] * 256 + gbRom[0x14f]);
+        s.Printf(wxT("%04x (%04x)"), g_gbCartData.actual_global_checksum(), g_gbCartData.global_checksum());
         setlab("Checksum");
         dlg->Fit();
         ShowModal(dlg);
