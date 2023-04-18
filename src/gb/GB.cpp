@@ -338,15 +338,8 @@ bool gbInitializeRom(size_t romSize) {
         std::fill(gbRom + romSize, gbRom + romHeaderSize, (uint8_t)0);
     }
 
-    // Set up globals for compatibility.
-    gbRomType = g_gbCartData.mapper_flag();
+    // Override for compatibility.
     gbRom[0x147] = g_gbCartData.mapper_flag();
-    gbRomSize = g_gbCartData.rom_size();
-    gbRomSizeMask = g_gbCartData.rom_mask();
-    gbRamSize = g_gbCartData.ram_size();
-    gbRamSizeMask = g_gbCartData.ram_mask();
-    gbBattery = g_gbCartData.has_battery();
-    gbRTCPresent = g_gbCartData.has_rtc();
 
     // The initial RAM byte value.
     uint8_t gbRamFill = 0xff;
@@ -571,7 +564,6 @@ int clockTicks = 0;
 bool gbSystemMessage = false;
 int gbGBCColorType = 0;
 int gbHardware = 0;
-int gbRomType = 0;
 int gbRemainingClockTicks = 0;
 int gbOldClockTicks = 0;
 int gbIntBreak = 0;
@@ -649,8 +641,6 @@ int gbFrameSkipCount = 0;
 uint32_t gbLastTime = 0;
 int gbSynchronizeTicks = GBSYNCHRONIZE_CLOCK_TICKS;
 // emulator features
-int gbBattery = 0;
-int gbRTCPresent = 0;
 int gbCaptureNumber = 0;
 bool gbCapture = false;
 bool gbCapturePrevious = false;
@@ -2182,7 +2172,7 @@ uint8_t gbReadMemory(uint16_t address)
         // for the 2kb ram limit (fixes crash in shawu's story
         // but now its sram test fails, as the it expects 8kb and not 2kb...
         // So use the 'genericflashcard' option to fix it).
-        if (address <= (0xa000 + gbRamSizeMask)) {
+        if (address <= (0xa000 + g_gbCartData.ram_mask())) {
             if (g_mapperReadRAM) {
                 return g_mapperReadRAM(address);
             }
@@ -2975,7 +2965,8 @@ void gbReset()
         inBios = true;
     } else if (gbHardware & 0xa) {
         // Set compatibility mode if it is a DMG ROM.
-        gbMemory[0xff6c] = 0xfe | (uint8_t) !(gbRom[0x143] & 0x80);
+        const uint8_t gbcFlag = g_gbCartData.SupportsCGB() ? 0x80 : 0x00;
+        gbMemory[0xff6c] = 0xfe | gbcFlag;
     }
 
     gbLine99Ticks = 1;
@@ -3604,7 +3595,7 @@ static bool gbReadSaveState(gzFile gzFile)
     gbSoundReadGame(version, gzFile);
 
     if (gbCgbMode && gbSgbMode) {
-        gbSgbMode = 0;
+        gbSgbMode = false;
     }
 
     if (gbBorderOn && !gbSgbMask) {
@@ -5218,7 +5209,7 @@ bool gbReadSaveState(const uint8_t* data)
     gbSoundReadGame(data);
 
     if (gbCgbMode && gbSgbMode) {
-        gbSgbMode = 0;
+        gbSgbMode = false;
     }
 
     if (gbBorderOn && !gbSgbMask) {

@@ -20,7 +20,6 @@ uint8_t* gbSgbBorder = NULL;
 
 int gbSgbCGBSupport = 0;
 int gbSgbMask = 0;
-int gbSgbMode = 0;
 int gbSgbPacketState = GBSGB_NONE;
 int gbSgbBit = 0;
 int gbSgbPacketTimeout = 0;
@@ -328,7 +327,7 @@ void gbSgbPicture()
 
     if (gbSgbMode && gbCgbMode && gbSgbCGBSupport > 4) {
         gbSgbCGBSupport = 0;
-        gbSgbMode = 0;
+        gbSgbMode = false;
         gbSgbMask = 0;
         gbSgbRenderBorder();
         gbReset();
@@ -672,7 +671,7 @@ void gbSgbChrTransfer()
 
     if (gbSgbMode && gbCgbMode && gbSgbCGBSupport == 7) {
         gbSgbCGBSupport = 0;
-        gbSgbMode = 0;
+        gbSgbMode = false;
         gbSgbMask = 0;
         gbSgbRenderBorder();
         gbReset();

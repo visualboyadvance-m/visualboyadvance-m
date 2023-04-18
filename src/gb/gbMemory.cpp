@@ -1,10 +1,10 @@
 #include "gbMemory.h"
 #include "../System.h"
 #include "../common/Port.h"
+#include "../common/sizes.h"
 #include "gb.h"
 #include "gbGlobals.h"
 uint8_t gbDaysinMonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-const uint8_t gbDisabledRam[8] = { 0x80, 0xff, 0xf0, 0x00, 0x30, 0xbf, 0xbf, 0xbf };
 extern int gbGBCColorType;
 extern gbRegister PC;
 
@@ -48,7 +48,7 @@ void mapperMBC1ROM(uint16_t address, uint8_t value)
             tmpAddress |= (gbDataMBC1.mapperROMHighAddress & 3) << 19;
         }
 
-        tmpAddress &= gbRomSizeMask;
+        tmpAddress &= g_gbCartData.rom_mask();
         gbDataMBC1.mapperROMBank = value;
         gbMemoryMap[0x04] = &gbRom[tmpAddress];
         gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
@@ -57,11 +57,11 @@ void mapperMBC1ROM(uint16_t address, uint8_t value)
         break;
     case 0x4000: // RAM bank select
         if (gbDataMBC1.mapperMemoryModel == 1) {
-            if (!gbRamSize) {
+            if (!g_gbCartData.HasRam()) {
                 if (gbDataMBC1.mapperRomBank0Remapping == 3) {
                     gbDataMBC1.mapperROMHighAddress = value & 0x03;
                     tmpAddress = (gbDataMBC1.mapperROMHighAddress) << 18;
-                    tmpAddress &= gbRomSizeMask;
+                    tmpAddress &= g_gbCartData.rom_mask();
                     gbMemoryMap[0x00] = &gbRom[tmpAddress];
                     gbMemoryMap[0x01] = &gbRom[tmpAddress + 0x1000];
                     gbMemoryMap[0x02] = &gbRom[tmpAddress + 0x2000];
@@ -78,8 +78,8 @@ void mapperMBC1ROM(uint16_t address, uint8_t value)
             if (value == gbDataMBC1.mapperRAMBank)
                 break;
             tmpAddress = value << 13;
-            tmpAddress &= gbRamSizeMask;
-            if (gbRamSize) {
+            tmpAddress &= g_gbCartData.ram_mask();
+            if (g_gbCartData.HasRam()) {
                 gbMemoryMap[0x0a] = &gbRam[tmpAddress];
                 gbMemoryMap[0x0b] = &gbRam[tmpAddress + 0x1000];
             }
@@ -93,12 +93,12 @@ void mapperMBC1ROM(uint16_t address, uint8_t value)
             gbDataMBC1.mapperROMHighAddress = value & 0x03;
             tmpAddress = gbDataMBC1.mapperROMBank << 14;
             tmpAddress |= (gbDataMBC1.mapperROMHighAddress) << 19;
-            tmpAddress &= gbRomSizeMask;
+            tmpAddress &= g_gbCartData.rom_mask();
             gbMemoryMap[0x04] = &gbRom[tmpAddress];
             gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
             gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
             gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
-            if (gbRamSize) {
+            if (g_gbCartData.HasRam()) {
                 gbMemoryMap[0x0a] = &gbRam[0];
                 gbMemoryMap[0x0b] = &gbRam[0x1000];
             }
@@ -114,8 +114,8 @@ void mapperMBC1ROM(uint16_t address, uint8_t value)
 
             value = gbDataMBC1.mapperRAMBank & 0x03;
             tmpAddress = value << 13;
-            tmpAddress &= gbRamSizeMask;
-            if (gbRamSize) {
+            tmpAddress &= g_gbCartData.ram_mask();
+            if (g_gbCartData.HasRam()) {
                 gbMemoryMap[0x0a] = &gbRam[gbDataMBC1.mapperRAMAddress];
                 gbMemoryMap[0x0b] = &gbRam[gbDataMBC1.mapperRAMAddress + 0x1000];
                 gbDataMBC1.mapperRomBank0Remapping = 0;
@@ -127,7 +127,7 @@ void mapperMBC1ROM(uint16_t address, uint8_t value)
 
             tmpAddress = gbDataMBC1.mapperROMBank << 14;
 
-            tmpAddress &= gbRomSizeMask;
+            tmpAddress &= g_gbCartData.rom_mask();
             gbMemoryMap[0x04] = &gbRom[tmpAddress];
             gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
             gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
@@ -138,12 +138,12 @@ void mapperMBC1ROM(uint16_t address, uint8_t value)
 
             tmpAddress = gbDataMBC1.mapperROMBank << 14;
             tmpAddress |= (gbDataMBC1.mapperROMHighAddress) << 19;
-            tmpAddress &= gbRomSizeMask;
+            tmpAddress &= g_gbCartData.rom_mask();
             gbMemoryMap[0x04] = &gbRom[tmpAddress];
             gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
             gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
             gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
-            if (gbRamSize) {
+            if (g_gbCartData.HasRam()) {
                 gbMemoryMap[0x0a] = &gbRam[0];
                 gbMemoryMap[0x0b] = &gbRam[0x1000];
             }
@@ -156,7 +156,7 @@ void mapperMBC1ROM(uint16_t address, uint8_t value)
 void mapperMBC1RAM(uint16_t address, uint8_t value)
 {
     if (gbDataMBC1.mapperRAMEnable) {
-        if (gbRamSize) {
+        if (g_gbCartData.HasRam()) {
             gbMemoryMap[address >> 12][address & 0x0fff] = value;
             systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
         }
@@ -170,23 +170,7 @@ uint8_t mapperMBC1ReadRAM(uint16_t address)
     if (gbDataMBC1.mapperRAMEnable)
         return gbMemoryMap[address >> 12][address & 0x0fff];
 
-    if (!genericflashcardEnable)
-        return 0xff;
-    else if ((address & 0x1000) >= 0x1000) {
-        // The value returned when reading RAM while it's disabled
-        // is constant, exept for the GBASP hardware.
-        // (actually, is the address that read is out of the ROM, the returned value if 0xff...)
-        if (PC.W >= 0xff80)
-            return 0xff;
-        else if ((gbHardware & 0x08) && (gbGBCColorType == 2)) {
-            if (address & 1)
-                return 0xfb;
-            else
-                return 0x7a;
-        } else
-            return 0x0a;
-    } else
-        return gbDisabledRam[address & 7];
+    return 0xff;
 }
 
 void memoryUpdateMapMBC1()
@@ -196,7 +180,7 @@ void memoryUpdateMapMBC1()
     // check current model
     if (gbDataMBC1.mapperRomBank0Remapping == 3) {
         tmpAddress = (gbDataMBC1.mapperROMHighAddress & 3) << 18;
-        tmpAddress &= gbRomSizeMask;
+        tmpAddress &= g_gbCartData.rom_mask();
         gbMemoryMap[0x00] = &gbRom[tmpAddress];
         gbMemoryMap[0x01] = &gbRom[tmpAddress + 0x1000];
         gbMemoryMap[0x02] = &gbRom[tmpAddress + 0x2000];
@@ -213,14 +197,14 @@ void memoryUpdateMapMBC1()
             tmpAddress |= (gbDataMBC1.mapperROMHighAddress & 3) << 19;
         }
 
-        tmpAddress &= gbRomSizeMask;
+        tmpAddress &= g_gbCartData.rom_mask();
         gbMemoryMap[0x04] = &gbRom[tmpAddress];
         gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
         gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
         gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
     }
 
-    if (gbRamSize) {
+    if (g_gbCartData.HasRam()) {
         if (gbDataMBC1.mapperMemoryModel == 1) {
             gbMemoryMap[0x0a] = &gbRam[gbDataMBC1.mapperRAMAddress];
             gbMemoryMap[0x0b] = &gbRam[gbDataMBC1.mapperRAMAddress + 0x1000];
@@ -256,7 +240,7 @@ void mapperMBC2ROM(uint16_t address, uint8_t value)
 
                 int tmpAddress = value << 14;
 
-                tmpAddress &= gbRomSizeMask;
+                tmpAddress &= g_gbCartData.rom_mask();
 
                 gbMemoryMap[0x04] = &gbRom[tmpAddress];
                 gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
@@ -272,7 +256,7 @@ void mapperMBC2ROM(uint16_t address, uint8_t value)
 void mapperMBC2RAM(uint16_t address, uint8_t value)
 {
     if (gbDataMBC2.mapperRAMEnable) {
-        if (gbRamSize && address < 0xa200) {
+        if (g_gbCartData.ram_size() && address < 0xa200) {
             gbMemoryMap[address >> 12][address & 0x0fff] = value;
             systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
         }
@@ -283,7 +267,7 @@ void memoryUpdateMapMBC2()
 {
     int tmpAddress = gbDataMBC2.mapperROMBank << 14;
 
-    tmpAddress &= gbRomSizeMask;
+    tmpAddress &= g_gbCartData.rom_mask();
 
     gbMemoryMap[0x04] = &gbRom[tmpAddress];
     gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
@@ -362,7 +346,7 @@ void mapperMBC3ROM(uint16_t address, uint8_t value)
         gbDataMBC3.mapperRAMEnable = ((value & 0x0a) == 0x0a ? 1 : 0);
         break;
     case 0x2000: { // ROM bank select
-        if (gbRomSize != 0x00400000)
+        if (g_gbCartData.rom_size() != k4MiB)
             value = value & 0x7f; // Assume 2MiB, unless MBC30.
 
         if (value == 0)
@@ -372,7 +356,7 @@ void mapperMBC3ROM(uint16_t address, uint8_t value)
 
         tmpAddress = value << 14;
 
-        tmpAddress &= gbRomSizeMask;
+        tmpAddress &= g_gbCartData.rom_mask();
 
         gbDataMBC3.mapperROMBank = value;
 
@@ -388,13 +372,13 @@ void mapperMBC3ROM(uint16_t address, uint8_t value)
             if (value == gbDataMBC3.mapperRAMBank)
                 break;
             tmpAddress = value << 13;
-            tmpAddress &= gbRamSizeMask;
+            tmpAddress &= g_gbCartData.ram_mask();
             gbMemoryMap[0x0a] = &gbRam[tmpAddress];
             gbMemoryMap[0x0b] = &gbRam[tmpAddress + 0x1000];
             gbDataMBC3.mapperRAMBank = value;
             gbDataMBC3.mapperRAMAddress = tmpAddress;
         } else {
-            if (gbRTCPresent && gbDataMBC3.mapperRAMEnable) {
+            if (g_gbCartData.has_rtc() && gbDataMBC3.mapperRAMEnable) {
                 gbDataMBC3.mapperRAMBank = -1;
 
                 gbDataMBC3.mapperClockRegister = value;
@@ -402,7 +386,7 @@ void mapperMBC3ROM(uint16_t address, uint8_t value)
         }
         break;
     case 0x6000: // clock latch
-        if (gbRTCPresent) {
+        if (g_gbCartData.has_rtc()) {
             if (gbDataMBC3.mapperClockLatch == 0 && value == 1) {
                 memoryUpdateMBC3Clock();
                 gbDataMBC3.mapperLSeconds = gbDataMBC3.mapperSeconds;
@@ -423,11 +407,11 @@ void mapperMBC3RAM(uint16_t address, uint8_t value)
 {
     if (gbDataMBC3.mapperRAMEnable) {
         if (gbDataMBC3.mapperRAMBank >= 0) {
-            if (gbRamSize) {
+            if (g_gbCartData.ram_size()) {
                 gbMemoryMap[address >> 12][address & 0x0fff] = value;
                 systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
             }
-        } else if (gbRTCPresent) {
+        } else if (g_gbCartData.has_rtc()) {
             time(&gbDataMBC3.mapperLastTime);
             switch (gbDataMBC3.mapperClockRegister) {
             case 0x08:
@@ -459,7 +443,7 @@ uint8_t mapperMBC3ReadRAM(uint16_t address)
     if (gbDataMBC3.mapperRAMEnable) {
         if (gbDataMBC3.mapperRAMBank >= 0) {
             return gbMemoryMap[address >> 12][address & 0x0fff];
-        } else if (gbRTCPresent) {
+        } else if (g_gbCartData.has_rtc()) {
             switch (gbDataMBC3.mapperClockRegister) {
             case 0x08:
                 return gbDataMBC3.mapperLSeconds;
@@ -479,39 +463,23 @@ uint8_t mapperMBC3ReadRAM(uint16_t address)
         }
     }
 
-    if (!genericflashcardEnable)
-        return 0xff;
-    else if ((address & 0x1000) >= 0x1000) {
-        // The value returned when reading RAM while it's disabled
-        // is constant, exept for the GBASP hardware.
-        // (actually, is the address that read is out of the ROM, the returned value if 0xff...)
-        if (PC.W >= 0xff80)
-            return 0xff;
-        else if ((gbHardware & 0x08) && (gbGBCColorType == 2)) {
-            if (address & 1)
-                return 0xfb;
-            else
-                return 0x7a;
-        } else
-            return 0x0a;
-    } else
-        return gbDisabledRam[address & 7];
+    return 0xff;
 }
 
 void memoryUpdateMapMBC3()
 {
     int tmpAddress = gbDataMBC3.mapperROMBank << 14;
 
-    tmpAddress &= gbRomSizeMask;
+    tmpAddress &= g_gbCartData.rom_mask();
 
     gbMemoryMap[0x04] = &gbRom[tmpAddress];
     gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
     gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
     gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
 
-    if (gbDataMBC3.mapperRAMBank >= 0 && gbRamSize) {
+    if (gbDataMBC3.mapperRAMBank >= 0 && g_gbCartData.HasRam()) {
         tmpAddress = gbDataMBC3.mapperRAMBank << 13;
-        tmpAddress &= gbRamSizeMask;
+        tmpAddress &= g_gbCartData.ram_mask();
         gbMemoryMap[0x0a] = &gbRam[tmpAddress];
         gbMemoryMap[0x0b] = &gbRam[tmpAddress + 0x1000];
     }
@@ -544,7 +512,7 @@ void mapperMBC5ROM(uint16_t address, uint8_t value)
 
             tmpAddress = (value << 14) | (gbDataMBC5.mapperROMHighAddress << 22);
 
-            tmpAddress &= gbRomSizeMask;
+            tmpAddress &= g_gbCartData.rom_mask();
             gbDataMBC5.mapperROMBank = value;
             gbMemoryMap[0x04] = &gbRom[tmpAddress];
             gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
@@ -558,7 +526,7 @@ void mapperMBC5ROM(uint16_t address, uint8_t value)
 
             tmpAddress = (gbDataMBC5.mapperROMBank << 14) | (value << 22);
 
-            tmpAddress &= gbRomSizeMask;
+            tmpAddress &= g_gbCartData.rom_mask();
             gbDataMBC5.mapperROMHighAddress = value;
             gbMemoryMap[0x04] = &gbRom[tmpAddress];
             gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
@@ -575,8 +543,8 @@ void mapperMBC5ROM(uint16_t address, uint8_t value)
         if (value == gbDataMBC5.mapperRAMBank)
             break;
         tmpAddress = value << 13;
-        tmpAddress &= gbRamSizeMask;
-        if (gbRamSize) {
+        tmpAddress &= g_gbCartData.ram_mask();
+        if (g_gbCartData.HasRam()) {
             gbMemoryMap[0x0a] = &gbRam[tmpAddress];
             gbMemoryMap[0x0b] = &gbRam[tmpAddress + 0x1000];
 
@@ -591,7 +559,7 @@ void mapperMBC5ROM(uint16_t address, uint8_t value)
 void mapperMBC5RAM(uint16_t address, uint8_t value)
 {
     if (gbDataMBC5.mapperRAMEnable) {
-        if (gbRamSize) {
+        if (g_gbCartData.HasRam()) {
             gbMemoryMap[address >> 12][address & 0x0fff] = value;
             systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
         }
@@ -605,38 +573,22 @@ uint8_t mapperMBC5ReadRAM(uint16_t address)
     if (gbDataMBC5.mapperRAMEnable)
         return gbMemoryMap[address >> 12][address & 0x0fff];
 
-    if (!genericflashcardEnable)
-        return 0xff;
-    else if ((address & 0x1000) >= 0x1000) {
-        // The value returned when reading RAM while it's disabled
-        // is constant, exept for the GBASP hardware.
-        // (actually, is the address that read is out of the ROM, the returned value if 0xff...)
-        if (PC.W >= 0xff80)
-            return 0xff;
-        else if ((gbHardware & 0x08) && (gbGBCColorType == 2)) {
-            if (address & 1)
-                return 0xfb;
-            else
-                return 0x7a;
-        } else
-            return 0x0a;
-    } else
-        return gbDisabledRam[address & 7];
+    return 0xff;
 }
 
 void memoryUpdateMapMBC5()
 {
     int tmpAddress = (gbDataMBC5.mapperROMBank << 14) | (gbDataMBC5.mapperROMHighAddress << 22);
 
-    tmpAddress &= gbRomSizeMask;
+    tmpAddress &= g_gbCartData.rom_mask();
     gbMemoryMap[0x04] = &gbRom[tmpAddress];
     gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
     gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
     gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
 
-    if (gbRamSize) {
+    if (g_gbCartData.HasRam()) {
         tmpAddress = gbDataMBC5.mapperRAMBank << 13;
-        tmpAddress &= gbRamSizeMask;
+        tmpAddress &= g_gbCartData.ram_mask();
         gbMemoryMap[0x0a] = &gbRam[tmpAddress];
         gbMemoryMap[0x0b] = &gbRam[tmpAddress + 0x1000];
     }
@@ -677,7 +629,7 @@ void mapperMBC7ROM(uint16_t address, uint8_t value)
 
         tmpAddress = (value << 14);
 
-        tmpAddress &= gbRomSizeMask;
+        tmpAddress &= g_gbCartData.rom_mask();
         gbDataMBC7.mapperROMBank = value;
         gbMemoryMap[0x04] = &gbRom[tmpAddress];
         gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
@@ -687,7 +639,7 @@ void mapperMBC7ROM(uint16_t address, uint8_t value)
     case 0x4000: // RAM bank select/enable
         if (value < 8) {
             tmpAddress = (value & 3) << 13;
-            tmpAddress &= gbRamSizeMask;
+            tmpAddress &= g_gbCartData.ram_mask();
             gbMemoryMap[0x0a] = &gbMemory[0xa000];
             gbMemoryMap[0x0b] = &gbMemory[0xb000];
 
@@ -726,23 +678,7 @@ uint8_t mapperMBC7ReadRAM(uint16_t address)
         return gbDataMBC7.value;
     }
 
-    if (!genericflashcardEnable)
-        return 0xff;
-    else if ((address & 0x1000) >= 0x1000) {
-        // The value returned when reading RAM while it's disabled
-        // is constant, exept for the GBASP hardware.
-        // (actually, is the address that read is out of the ROM, the returned value if 0xff...)
-        if (PC.W >= 0xff80)
-            return 0xff;
-        else if ((gbHardware & 0x08) && (gbGBCColorType == 2)) {
-            if (address & 1)
-                return 0xfb;
-            else
-                return 0x7a;
-        } else
-            return 0x0a;
-    } else
-        return gbDisabledRam[address & 7];
+    return 0xff;
 }
 
 // MBC7 RAM write
@@ -892,7 +828,7 @@ void memoryUpdateMapMBC7()
 {
     int tmpAddress = (gbDataMBC7.mapperROMBank << 14);
 
-    tmpAddress &= gbRomSizeMask;
+    tmpAddress &= g_gbCartData.rom_mask();
     gbMemoryMap[0x04] = &gbRom[tmpAddress];
     gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
     gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
@@ -926,7 +862,7 @@ void mapperHuC1ROM(uint16_t address, uint8_t value)
 
         tmpAddress = value << 14;
 
-        tmpAddress &= gbRomSizeMask;
+        tmpAddress &= g_gbCartData.rom_mask();
         gbDataHuC1.mapperROMBank = value;
         gbMemoryMap[0x04] = &gbRom[tmpAddress];
         gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
@@ -940,7 +876,7 @@ void mapperHuC1ROM(uint16_t address, uint8_t value)
             if (value == gbDataHuC1.mapperRAMBank)
                 break;
             tmpAddress = value << 13;
-            tmpAddress &= gbRamSizeMask;
+            tmpAddress &= g_gbCartData.ram_mask();
             gbMemoryMap[0x0a] = &gbRam[tmpAddress];
             gbMemoryMap[0x0b] = &gbRam[tmpAddress + 0x1000];
             gbDataHuC1.mapperRAMBank = value;
@@ -950,7 +886,7 @@ void mapperHuC1ROM(uint16_t address, uint8_t value)
             gbDataHuC1.mapperROMHighAddress = value & 0x03;
             tmpAddress = gbDataHuC1.mapperROMBank << 14;
             tmpAddress |= (gbDataHuC1.mapperROMHighAddress) << 19;
-            tmpAddress &= gbRomSizeMask;
+            tmpAddress &= g_gbCartData.rom_mask();
             gbMemoryMap[0x04] = &gbRom[tmpAddress];
             gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
             gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
@@ -967,7 +903,7 @@ void mapperHuC1ROM(uint16_t address, uint8_t value)
 void mapperHuC1RAM(uint16_t address, uint8_t value)
 {
     if (gbDataHuC1.mapperRAMEnable) {
-        if (gbRamSize) {
+        if (g_gbCartData.HasRam()) {
             gbMemoryMap[address >> 12][address & 0x0fff] = value;
             systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
         }
@@ -978,16 +914,16 @@ void memoryUpdateMapHuC1()
 {
     int tmpAddress = gbDataHuC1.mapperROMBank << 14;
 
-    tmpAddress &= gbRomSizeMask;
+    tmpAddress &= g_gbCartData.rom_mask();
 
     gbMemoryMap[0x04] = &gbRom[tmpAddress];
     gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
     gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
     gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
 
-    if (gbRamSize) {
+    if (g_gbCartData.HasRam()) {
         tmpAddress = gbDataHuC1.mapperRAMBank << 13;
-        tmpAddress &= gbRamSizeMask;
+        tmpAddress &= g_gbCartData.ram_mask();
         gbMemoryMap[0x0a] = &gbRam[tmpAddress];
         gbMemoryMap[0x0b] = &gbRam[tmpAddress + 0x1000];
     }
@@ -1012,7 +948,7 @@ mapperHuC3 gbDataHuC3 = {
 };
 
 mapperHuC3RTC gbRTCHuC3 = {
-    0, // lastTime
+    {0}, // lastTime
     0, // DateTime
     0, // WritingTime
     0, // ModeFlag
@@ -1058,7 +994,7 @@ void mapperHuC3ROM(uint16_t address, uint8_t value)
 
         tmpAddress = value << 14;
 
-        tmpAddress &= gbRomSizeMask;
+        tmpAddress &= g_gbCartData.rom_mask();
         gbDataHuC3.mapperROMBank = value;
         gbMemoryMap[0x04] = &gbRom[tmpAddress];
         gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
@@ -1070,7 +1006,7 @@ void mapperHuC3ROM(uint16_t address, uint8_t value)
         if (value == gbDataHuC3.mapperRAMBank)
             break;
         tmpAddress = value << 13;
-        tmpAddress &= gbRamSizeMask;
+        tmpAddress &= g_gbCartData.ram_mask();
         gbMemoryMap[0x0a] = &gbRam[tmpAddress];
         gbMemoryMap[0x0b] = &gbRam[tmpAddress + 0x1000];
         gbDataHuC3.mapperRAMBank = value;
@@ -1099,7 +1035,7 @@ void mapperHuC3RAM(uint16_t address, uint8_t value)
 
     if (gbDataHuC3.mapperRAMFlag < 0x0b || gbDataHuC3.mapperRAMFlag > 0x0e) {
         if (gbDataHuC3.mapperRAMEnable) {
-            if (gbRamSize) {
+            if (g_gbCartData.ram_size()) {
                 gbMemoryMap[address >> 12][address & 0x0fff] = value;
                 systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
             }
@@ -1196,15 +1132,15 @@ void memoryUpdateMapHuC3()
 {
     int tmpAddress = gbDataHuC3.mapperROMBank << 14;
 
-    tmpAddress &= gbRomSizeMask;
+    tmpAddress &= g_gbCartData.rom_mask();
     gbMemoryMap[0x04] = &gbRom[tmpAddress];
     gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
     gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
     gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
 
-    if (gbRamSize) {
+    if (g_gbCartData.ram_size()) {
         tmpAddress = gbDataHuC3.mapperRAMBank << 13;
-        tmpAddress &= gbRamSizeMask;
+        tmpAddress &= g_gbCartData.ram_mask();
         gbMemoryMap[0x0a] = &gbRam[tmpAddress];
         gbMemoryMap[0x0b] = &gbRam[tmpAddress + 0x1000];
     }
@@ -1333,7 +1269,7 @@ void mapperTAMA5RAM(uint16_t address, uint8_t value)
 
                 int tmpAddress = (gbDataTAMA5.mapperROMBank << 14);
 
-                tmpAddress &= gbRomSizeMask;
+                tmpAddress &= g_gbCartData.rom_mask();
                 gbMemoryMap[0x04] = &gbRom[tmpAddress];
                 gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
                 gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
@@ -1492,7 +1428,7 @@ void mapperTAMA5RAM(uint16_t address, uint8_t value)
     } else {
         if (gbDataTAMA5.mapperRAMEnable) {
             if (gbDataTAMA5.mapperRAMBank != -1) {
-                if (gbRamSize) {
+                if (g_gbCartData.HasRam()) {
                     gbMemoryMap[address >> 12][address & 0x0fff] = value;
                     systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
                 }
@@ -1511,15 +1447,15 @@ void memoryUpdateMapTAMA5()
 {
     int tmpAddress = (gbDataTAMA5.mapperROMBank << 14);
 
-    tmpAddress &= gbRomSizeMask;
+    tmpAddress &= g_gbCartData.rom_mask();
     gbMemoryMap[0x04] = &gbRom[tmpAddress];
     gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
     gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
     gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
 
-    if (gbRamSize) {
+    if (g_gbCartData.HasRam()) {
         tmpAddress = 0 << 13;
-        tmpAddress &= gbRamSizeMask;
+        tmpAddress &= g_gbCartData.ram_mask();
         gbMemoryMap[0x0a] = &gbRam[tmpAddress];
         gbMemoryMap[0x0b] = &gbRam[tmpAddress + 0x1000];
     }
@@ -1561,7 +1497,7 @@ void mapperMMM01ROM(uint16_t address, uint8_t value)
         } else
             tmpAddress |= gbDataMMM01.mapperRomBank0Remapping << 18;
 
-        tmpAddress &= gbRomSizeMask;
+        tmpAddress &= g_gbCartData.rom_mask();
         gbDataMMM01.mapperROMBank = value;
         gbMemoryMap[0x04] = &gbRom[tmpAddress];
         gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
@@ -1575,7 +1511,7 @@ void mapperMMM01ROM(uint16_t address, uint8_t value)
             if (value == gbDataMBC1.mapperRAMBank)
                 break;
             tmpAddress = value << 13;
-            tmpAddress &= gbRamSizeMask;
+            tmpAddress &= g_gbCartData.ram_mask();
             gbMemoryMap[0x0a] = &gbRam[tmpAddress];
             gbMemoryMap[0x0b] = &gbRam[tmpAddress + 0x1000];
             gbDataMMM01.mapperRAMBank = value;
@@ -1585,7 +1521,7 @@ void mapperMMM01ROM(uint16_t address, uint8_t value)
             gbDataMMM01.mapperROMHighAddress = value & 0x03;
             tmpAddress = gbDataMMM01.mapperROMBank << 14;
             tmpAddress |= (gbDataMMM01.mapperROMHighAddress) << 19;
-            tmpAddress &= gbRomSizeMask;
+            tmpAddress &= g_gbCartData.rom_mask();
             gbMemoryMap[0x04] = &gbRom[tmpAddress];
             gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
             gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
@@ -1593,7 +1529,7 @@ void mapperMMM01ROM(uint16_t address, uint8_t value)
 
             gbDataMMM01.mapperRomBank0Remapping = ((value << 1) | (value & 0x40 ? 1 : 0)) & 0xff;
             tmpAddress = gbDataMMM01.mapperRomBank0Remapping << 18;
-            tmpAddress &= gbRomSizeMask;
+            tmpAddress &= g_gbCartData.rom_mask();
             gbMemoryMap[0x00] = &gbRom[tmpAddress];
             gbMemoryMap[0x01] = &gbRom[tmpAddress + 0x1000];
             gbMemoryMap[0x02] = &gbRom[tmpAddress + 0x2000];
@@ -1610,7 +1546,7 @@ void mapperMMM01ROM(uint16_t address, uint8_t value)
 void mapperMMM01RAM(uint16_t address, uint8_t value)
 {
     if (gbDataMMM01.mapperRAMEnable) {
-        if (gbRamSize) {
+        if (g_gbCartData.HasRam()) {
             gbMemoryMap[address >> 12][address & 0x0fff] = value;
             systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
         }
@@ -1627,20 +1563,20 @@ void memoryUpdateMapMMM01()
         tmpAddress |= (gbDataMMM01.mapperROMHighAddress) << 19;
     }
 
-    tmpAddress &= gbRomSizeMask;
+    tmpAddress &= g_gbCartData.rom_mask();
     gbMemoryMap[0x04] = &gbRom[tmpAddress];
     gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
     gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
     gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
 
     tmpAddress = gbDataMMM01.mapperRomBank0Remapping << 18;
-    tmpAddress &= gbRomSizeMask;
+    tmpAddress &= g_gbCartData.rom_mask();
     gbMemoryMap[0x00] = &gbRom[tmpAddress];
     gbMemoryMap[0x01] = &gbRom[tmpAddress + 0x1000];
     gbMemoryMap[0x02] = &gbRom[tmpAddress + 0x2000];
     gbMemoryMap[0x03] = &gbRom[tmpAddress + 0x3000];
 
-    if (gbRamSize) {
+    if (g_gbCartData.HasRam()) {
         gbMemoryMap[0x0a] = &gbRam[gbDataMMM01.mapperRAMAddress];
         gbMemoryMap[0x0b] = &gbRam[gbDataMMM01.mapperRAMAddress + 0x1000];
     }
@@ -1685,7 +1621,7 @@ void mapperGS3ROM(uint16_t address, uint8_t value)
                 break;
             tmpAddress = value << 13;
 
-            tmpAddress &= gbRomSizeMask;
+            tmpAddress &= g_gbCartData.rom_mask();
             gbDataGS3.mapperROMBank = value;
             gbMemoryMap[0x04] = &gbRom[tmpAddress];
             gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
@@ -1699,7 +1635,7 @@ void memoryUpdateMapGS3()
 {
     int tmpAddress = gbDataGS3.mapperROMBank << 13;
 
-    tmpAddress &= gbRomSizeMask;
+    tmpAddress &= g_gbCartData.rom_mask();
     // GS can only change a half ROM bank
     gbMemoryMap[0x04] = &gbRom[tmpAddress];
     gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];

@@ -946,9 +946,9 @@ public:
                 else
                     block->data = &gbMemory[0xa000];
 
-                block->saved = (uint8_t*)malloc(gbRamSize);
-                block->size = gbRamSize;
-                block->bits = (uint8_t*)malloc(gbRamSize >> 3);
+                block->saved = (uint8_t*)malloc(g_gbCartData.ram_size());
+                block->size = g_gbCartData.ram_size();
+                block->bits = (uint8_t*)malloc(g_gbCartData.ram_size() >> 3);
 
                 if (gbCgbMode) {
                     block++;

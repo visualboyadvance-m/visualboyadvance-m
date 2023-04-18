@@ -3,11 +3,6 @@
 
 #include "../common/Types.h"
 
-extern int gbRomSizeMask;
-extern int gbRomSize;
-extern int gbRamSize;
-extern int gbRamSizeMask;
-
 extern uint8_t* bios;
 
 extern uint8_t* gbRom;
@@ -24,8 +19,8 @@ extern int gbFrameSkip;
 extern uint16_t gbColorFilter[32768];
 extern uint32_t gbEmulatorType;
 extern uint32_t gbPaletteOption;
-extern int gbCgbMode;
-extern int gbSgbMode;
+extern bool gbCgbMode;
+extern bool gbSgbMode;
 extern int gbWindowLine;
 extern int gbSpeed;
 extern uint8_t gbBgp[4];
@@ -58,7 +53,6 @@ extern uint8_t register_VBK;
 extern uint8_t oldRegister_WY;
 
 extern int emulating;
-extern bool genericflashcardEnable;
 
 extern int gbBorderLineSkip;
 extern int gbBorderRowSkip;
