@@ -2302,7 +2302,7 @@ void MainFrame::set_global_accels()
             len++;
 
     if (len) {
-        wxAcceleratorEntryUnicode tab[1000];
+        wxAcceleratorEntry tab[1000];
 
         for (size_t i = 0, j = 0; i < accels.size(); i++)
             if (!accels[i].GetMenuItem())
