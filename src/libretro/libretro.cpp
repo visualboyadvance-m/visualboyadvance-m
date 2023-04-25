@@ -933,7 +933,7 @@ static void gb_init(void)
 
     if (option_useBios) {
         snprintf(biosfile, sizeof(biosfile), "%s%c%s",
-            retro_system_directory, SLASH, biosname[gbCgbMode]);
+            retro_system_directory, SLASH, biosname[gbCgbMode ? 1 : 0]);
         log("Loading bios: %s\n", biosfile);
     }
 

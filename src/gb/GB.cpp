@@ -568,7 +568,6 @@ int gbRemainingClockTicks = 0;
 int gbOldClockTicks = 0;
 int gbIntBreak = 0;
 int gbInterruptLaunched = 0;
-uint8_t gbCheatingDevice = 0; // 1 = GS, 2 = GG
 // breakpoint
 bool breakpoint = false;
 // interrupt

@@ -256,7 +256,7 @@ void mapperMBC2ROM(uint16_t address, uint8_t value)
 void mapperMBC2RAM(uint16_t address, uint8_t value)
 {
     if (gbDataMBC2.mapperRAMEnable) {
-        if (g_gbCartData.ram_size() && address < 0xa200) {
+        if (g_gbCartData.HasRam() && address < 0xa200) {
             gbMemoryMap[address >> 12][address & 0x0fff] = value;
             systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
         }
@@ -407,7 +407,7 @@ void mapperMBC3RAM(uint16_t address, uint8_t value)
 {
     if (gbDataMBC3.mapperRAMEnable) {
         if (gbDataMBC3.mapperRAMBank >= 0) {
-            if (g_gbCartData.ram_size()) {
+            if (g_gbCartData.HasRam()) {
                 gbMemoryMap[address >> 12][address & 0x0fff] = value;
                 systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
             }
@@ -1035,7 +1035,7 @@ void mapperHuC3RAM(uint16_t address, uint8_t value)
 
     if (gbDataHuC3.mapperRAMFlag < 0x0b || gbDataHuC3.mapperRAMFlag > 0x0e) {
         if (gbDataHuC3.mapperRAMEnable) {
-            if (g_gbCartData.ram_size()) {
+            if (g_gbCartData.HasRam()) {
                 gbMemoryMap[address >> 12][address & 0x0fff] = value;
                 systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
             }
@@ -1138,7 +1138,7 @@ void memoryUpdateMapHuC3()
     gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
     gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
 
-    if (g_gbCartData.ram_size()) {
+    if (g_gbCartData.HasRam()) {
         tmpAddress = gbDataHuC3.mapperRAMBank << 13;
         tmpAddress &= g_gbCartData.ram_mask();
         gbMemoryMap[0x0a] = &gbRam[tmpAddress];
