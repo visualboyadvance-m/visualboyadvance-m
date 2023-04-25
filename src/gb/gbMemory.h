@@ -190,9 +190,6 @@ void mapperMMM01ROM(uint16_t, uint8_t);
 void mapperMMM01RAM(uint16_t, uint8_t);
 void mapperGGROM(uint16_t, uint8_t);
 void mapperGS3ROM(uint16_t, uint8_t);
-// extern void (*mapper)(uint16_t,uint8_t);
-// extern void (*mapperRAM)(uint16_t,uint8_t);
-// extern uint8_t (*mapperReadRAM)(uint16_t);
 
 extern void memoryUpdateMapMBC1();
 extern void memoryUpdateMapMBC2();
