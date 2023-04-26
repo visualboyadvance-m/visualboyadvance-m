@@ -1228,49 +1228,6 @@ void MainFrame::StopModal()
         panel->Resume();
 }
 
-LinkMode MainFrame::GetConfiguredLinkMode()
-{
-    switch (gopts.gba_link_type) {
-    case 0:
-        return LINK_DISCONNECTED;
-        break;
-
-    case 1:
-        if (OPTION(kGBALinkProto))
-                return LINK_CABLE_IPC;
-        else
-            return LINK_CABLE_SOCKET;
-
-        break;
-
-    case 2:
-        if (OPTION(kGBALinkProto))
-            return LINK_RFU_IPC;
-        else
-            return LINK_RFU_SOCKET;
-
-        break;
-
-    case 3:
-        return LINK_GAMECUBE_DOLPHIN;
-        break;
-
-    case 4:
-        if (OPTION(kGBALinkProto))
-            return LINK_GAMEBOY_IPC;
-        else
-            return LINK_GAMEBOY_SOCKET;
-
-        break;
-
-    default:
-        return LINK_DISCONNECTED;
-        break;
-    }
-
-    return LINK_DISCONNECTED;
-}
-
 void MainFrame::IdentifyRom()
 {
     if (!panel->rom_name.empty())

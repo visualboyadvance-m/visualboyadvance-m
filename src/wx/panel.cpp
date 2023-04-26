@@ -32,6 +32,7 @@
 #include "config/option-proxy.h"
 #include "config/option.h"
 #include "config/user-input.h"
+#include "dialogs/net-link.h"
 #include "drawing.h"
 #include "filters.h"
 #include "wayland.h"
@@ -523,9 +524,9 @@ void GameArea::LoadGame(const wxString& name)
 
 #ifndef NO_LINK
     if (OPTION(kGBALinkAuto)) {
-        BootLink(mf->GetConfiguredLinkMode(), UTF8(gopts.link_host),
-                 gopts.link_timeout, OPTION(kGBALinkFast),
-                 gopts.link_num_players);
+        BootLink(dialogs::GetConfiguredLinkMode(), UTF8(OPTION(kGBALinkHost)),
+                 OPTION(kGBALinkTimeout), OPTION(kGBALinkFast),
+                 OPTION(kPrefLinkNumPlayers));
     }
 #endif
 

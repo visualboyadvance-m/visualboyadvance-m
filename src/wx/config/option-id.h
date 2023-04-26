@@ -40,6 +40,7 @@ enum class OptionID {
     kGBALinkHost,
     kGBAServerIP,
     kGBALinkPort,
+    kGBAServerPort,
     kGBALinkProto,
     kGBALinkTimeout,
     kGBALinkType,

@@ -1,12 +1,15 @@
 // utility widgets
+#include "wx/wxmisc.h"
 
 #include <cctype>
 #include <string>
 #include <algorithm>
 
-#include "wx/wxmisc.h"
-#include <wx/wx.h>
+#include <wx/checkbox.h>
+#include <wx/filepicker.h>
+#include <wx/radiobut.h>
 #include <wx/spinctrl.h>
+#include <wx/textctrl.h>
 
 bool wxBoolIntValidator::TransferToWindow()
 {
@@ -57,51 +60,6 @@ bool wxBoolIntValidator::TransferFromWindow()
     return true;
 }
 
-bool wxBoolRevValidator::TransferToWindow()
-{
-    if (!vptr)
-        return false;
-
-    wxCheckBox* cb = wxDynamicCast(GetWindow(), wxCheckBox);
-
-    if (cb) {
-        cb->SetValue(!*vptr);
-        return true;
-    }
-
-    wxRadioButton* rb = wxDynamicCast(GetWindow(), wxRadioButton);
-
-    if (rb) {
-        rb->SetValue(!*vptr);
-        return true;
-    }
-
-    return false;
-}
-
-bool wxBoolRevValidator::TransferFromWindow()
-{
-    if (!vptr)
-        return false;
-
-    wxCheckBox* cb = wxDynamicCast(GetWindow(), wxCheckBox);
-
-    if (cb)
-        *vptr = !cb->GetValue();
-    else {
-        wxRadioButton* rb = wxDynamicCast(GetWindow(), wxRadioButton);
-
-        if (rb)
-            *vptr = !rb->GetValue();
-        else
-            return false;
-    }
-
-    return true;
-}
-
-#include <wx/filepicker.h>
-
 bool wxFileDirPickerValidator::TransferToWindow()
 {
     if (!vptr)
@@ -146,70 +104,6 @@ bool wxFileDirPickerValidator::TransferFromWindow()
     }
 
     return false;
-}
-
-static void enable(wxWindow_v controls, std::vector<int> reverse, bool en)
-{
-    for (size_t i = 0; i < controls.size(); i++)
-        controls[i]->Enable(reverse.size() <= i || !reverse[i] ? en : !en);
-}
-
-#define boolen(r)                                                          \
-    do {                                                                   \
-        int en;                                                            \
-        wxCheckBox* cb = wxDynamicCast(GetWindow(), wxCheckBox);           \
-        if (cb)                                                            \
-            en = cb->GetValue();                                           \
-        else {                                                             \
-            wxRadioButton* rb = wxDynamicCast(GetWindow(), wxRadioButton); \
-            if (!rb)                                                       \
-                return false;                                              \
-            en = rb->GetValue();                                           \
-        }                                                                  \
-        enable(controls, reverse, r ? !en : en);                           \
-        return true;                                                       \
-    } while (0)
-
-bool wxBoolEnValidator::TransferToWindow()
-{
-    if (!wxGenericValidator::TransferToWindow())
-        return false;
-
-    boolen(false);
-}
-
-bool wxBoolIntEnValidator::TransferToWindow()
-{
-    if (!wxBoolIntValidator::TransferToWindow())
-        return false;
-
-    boolen(false);
-}
-
-bool wxBoolRevEnValidator::TransferToWindow()
-{
-    if (!wxBoolRevValidator::TransferToWindow())
-        return false;
-
-    boolen(true);
-}
-
-void wxBoolEnHandler::ToggleCheck(wxCommandEvent& ev)
-{
-    enable(controls, reverse, ev.IsChecked());
-    ev.Skip();
-}
-
-void wxBoolEnHandler::Enable(wxCommandEvent& ev)
-{
-    enable(controls, reverse, true);
-    ev.Skip();
-}
-
-void wxBoolEnHandler::Disable(wxCommandEvent& ev)
-{
-    enable(controls, reverse, false);
-    ev.Skip();
 }
 
 static const wxString  val_hexdigits_s[] = {

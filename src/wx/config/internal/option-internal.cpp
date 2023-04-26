@@ -177,7 +177,12 @@ std::array<Option, kNbOptions>& Option::All() {
         bool gba_lcd_filter = false;
         bool link_auto = false;
         bool link_hacks = true;
+        wxString link_host = "127.0.0.1";  // quick fix for issues #48 and #445
+        wxString server_ip = "*";
+        int32_t link_port = 5738;
+        int32_t server_port = 5738;
         bool link_proto = false;
+        int32_t link_timeout = 500;
         wxString gba_rom_dir;
 
         /// Core
@@ -190,6 +195,9 @@ std::array<Option, kNbOptions>& Option::All() {
         uint32_t flash_size = 0;
         int32_t frame_skip = 0;
         bool gdb_break_on_load  = false;
+#ifndef NO_LINK
+        int32_t link_num_players = 2;
+#endif
         bool pause_when_inactive = false;
         uint32_t show_speed = 0;
         bool show_speed_transparent = false;
@@ -265,11 +273,12 @@ std::array<Option, kNbOptions>& Option::All() {
 #ifndef NO_LINK
         Option(OptionID::kGBALinkAuto, &g_owned_opts.link_auto),
         Option(OptionID::kGBALinkFast, &g_owned_opts.link_hacks),
-        Option(OptionID::kGBALinkHost, &gopts.link_host),
-        Option(OptionID::kGBAServerIP, &gopts.server_ip),
-        Option(OptionID::kGBALinkPort, &gopts.link_port, 0, 65535),
+        Option(OptionID::kGBALinkHost, &g_owned_opts.link_host),
+        Option(OptionID::kGBAServerIP, &g_owned_opts.server_ip),
+        Option(OptionID::kGBALinkPort, &g_owned_opts.link_port, 0, 65535),
+        Option(OptionID::kGBAServerPort, &g_owned_opts.server_port, 0, 65535),
         Option(OptionID::kGBALinkProto, &g_owned_opts.link_proto),
-        Option(OptionID::kGBALinkTimeout, &gopts.link_timeout, 0, 9999999),
+        Option(OptionID::kGBALinkTimeout, &g_owned_opts.link_timeout, 0, 9999999),
         Option(OptionID::kGBALinkType, &gopts.gba_link_type, 0, 5),
 #endif
         Option(OptionID::kGBAROMDir, &g_owned_opts.gba_rom_dir),
@@ -311,7 +320,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kPrefGDBBreakOnLoad, &g_owned_opts.gdb_break_on_load),
         Option(OptionID::kPrefGDBPort, &gopts.gdb_port, 0, 65535),
 #ifndef NO_LINK
-        Option(OptionID::kPrefLinkNumPlayers, &gopts.link_num_players, 2, 4),
+        Option(OptionID::kPrefLinkNumPlayers, &g_owned_opts.link_num_players, 2, 4),
 #endif
         Option(OptionID::kPrefMaxScale, &gopts.max_scale, 0, 100),
         Option(OptionID::kPrefPauseWhenInactive, &g_owned_opts.pause_when_inactive),
@@ -434,8 +443,8 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     },
     OptionData{"GBA/LinkHost", "", _("Default network link client host")},
     OptionData{"GBA/ServerIP", "", _("Default network link server IP to bind")},
-    OptionData{"GBA/LinkPort", "",
-               _("Default network link port (server and client)")},
+    OptionData{"GBA/LinkPort", "", _("Default network link port (client)")},
+    OptionData{"GBA/ServerPort", "", _("Default network link port (server)")},
     OptionData{"GBA/LinkProto", "LinkProto", _("Default network protocol")},
     OptionData{"GBA/LinkTimeout", "LinkTimeout", _("Link timeout (ms)")},
     OptionData{"GBA/LinkType", "LinkType", _("Link cable type")},
@@ -571,7 +580,8 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                "AllowJoystickBackgroundInput",
                _("Capture joy events while on background")},
     OptionData{"ui/hideMenuBar", "", _("Hide menu bar when mouse is inactive")},
-    OptionData{"ui/suspendScreenSaver", "", _("Suspend screensaver when game is running")},
+    OptionData{"ui/suspendScreenSaver", "",
+               _("Suspend screensaver when game is running")},
 
     /// Sound
     OptionData{"Sound/AudioAPI", "",
