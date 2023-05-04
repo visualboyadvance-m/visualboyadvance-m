@@ -23,14 +23,13 @@ public:
     enum class Device { Invalid = 0, Keyboard, Joystick, Last = Joystick };
 
     // Constructor from a configuration string. Returns empty set on failure.
-    static std::set<UserInput> FromString(const wxString& string);
+    static std::set<UserInput> FromConfigString(const wxString& string);
 
     // Converts a set of UserInput into a configuration string. This
     // recomputes the configuration string every time and should not be used
     // for comparison purposes.
     // TODO: Replace std::set with std::span when the code base uses C++20.
-    static wxString SpanToString(const std::set<UserInput>& user_inputs,
-                                 bool is_config = false);
+    static wxString SpanToConfigString(const std::set<UserInput>& user_inputs);
 
     // Invalid UserInput, mainly used for comparison.
     UserInput() : UserInput(Device::Invalid, 0, 0, 0) {}
@@ -42,18 +41,27 @@ public:
     UserInput(const wxJoyEvent& event);
 
     // TODO: Remove this once all uses have been removed.
-    UserInput(int key = 0, int mod = 0, int joy = 0)
+    UserInput(int key, int mod = 0, int joy = 0)
         : UserInput(joy == 0 ? Device::Keyboard : Device::Joystick,
                     mod,
                     key,
                     joy) {}
 
-    // Converts to a configuration string.
-    wxString ToString(bool is_config = false) const;
+    Device device() const { return device_; }
+
+    // Converts to a configuration string for saving.
+    wxString ToConfigString() const;
+
+    // Converts to a localized string for display.
+    wxString ToLocalizedString() const;
 
     wxJoystick joystick() const { return joystick_; }
     constexpr bool is_valid() const { return device_ != Device::Invalid; }
     constexpr operator bool() const { return is_valid(); }
+
+    int key() const { return key_; }
+    int mod() const { return mod_; }
+    unsigned joy() const { return joy_; }
 
     constexpr bool operator==(const UserInput& other) const {
         return device_ == other.device_ && mod_ == other.mod_ &&

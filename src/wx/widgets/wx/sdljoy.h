@@ -86,6 +86,13 @@ private:
     bool pressed_;
 };
 
+wxDECLARE_EVENT(wxEVT_JOY, wxJoyEvent);
+
+typedef void (wxEvtHandler::*wxJoyEventFunction)(wxJoyEvent&);
+#define wxJoyEventHandler(func) wxEVENT_HANDLER_CAST(wxJoyEventFunction, func)
+#define EVT_SDLJOY(func) \
+    wx__DECLARE_EVT0(wxEVT_JOY, wxJoyEventHandler(func))
+
 // This is my own SDL-based joystick handler, since wxJoystick is brain-dead.
 // It's geared towards keyboard emulation.
 //
@@ -144,17 +151,5 @@ private:
     // Timestamp when the latest poll was done.
     wxLongLong last_poll_ = wxGetUTCTimeMillis();
 };
-
-// Note: this means sdljoy can't be part of a library w/o extra work
-DECLARE_LOCAL_EVENT_TYPE(wxEVT_JOY, -1)
-typedef void (wxEvtHandler::*wxJoyEventFunction)(wxJoyEvent&);
-#define EVT_SDLJOY(fn)                                                   \
-    DECLARE_EVENT_TABLE_ENTRY(wxEVT_JOY,                              \
-        wxID_ANY,                                                        \
-        wxID_ANY,                                                        \
-        (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction) \
-            wxStaticCastEvent(wxJoyEventFunction, &fn),               \
-        (wxObject*)NULL)                                                 \
-    ,
 
 #endif /* _WX_SDLJOY_H */

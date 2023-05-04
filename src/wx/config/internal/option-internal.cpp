@@ -8,6 +8,7 @@
 #include <limits>
 
 #include <wx/log.h>
+#include <wx/translation.h>
 
 #include "../System.h"
 #include "../gba/Sound.h"

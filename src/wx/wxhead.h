@@ -22,6 +22,7 @@
 // filehistory.h is separate only in 2.9+
 #include <wx/docview.h>
 
+// This is necessary to build with gcc on Fedora.
 using std::uint8_t;
 using std::uint16_t;
 using std::uint32_t;
@@ -42,15 +43,6 @@ using std::int32_t;
 #endif
 #endif
 
-// compatibility with MacOSX 10.5
-#if !wxCHECK_VERSION(2, 8, 8)
-#define AddFileWithMimeType(a, b, c, m) AddFile(a, b, c)
-#define GetItemLabel GetText
-#define SetItemLabel SetText
-#define GetMenuLabel GetLabelTop
-#define GetItemLabelText GetLabel
-#endif
-
 // compatibility with wx-2.9
 // The only reason I use wxTRANSLATE at all is to get wxT as a side effect.
 #if wxCHECK_VERSION(2, 9, 0)
@@ -65,7 +57,7 @@ using std::int32_t;
 // GetAccel is inefficent anyway (often I don't want to convert to wxAccEnt)
 // This is a working replacement for SetAccel, at least.
 
-#include "wx/keyedit.h"
+#include "wxutil.h"
 
 static inline void DoSetAccel(wxMenuItem* mi, wxAcceleratorEntryUnicode* acc)
 {
@@ -81,11 +73,12 @@ static inline void DoSetAccel(wxMenuItem* mi, wxAcceleratorEntryUnicode* acc)
 
     wxString accs;
 
-    if (acc)
+    if (acc) {
         // actually, use keyedit's ToString(), as it is more reliable
         // and doesn't generate wx assertions
         // accs = acc->ToString();
-        accs = wxKeyTextCtrl::ToString(acc->GetFlags(), acc->GetKeyCode());
+        accs = config::UserInput(acc->GetKeyCode(), acc->GetFlags()).ToLocalizedString();
+    }
 
     if (tab != wxString::npos && accs == lab.substr(tab + 1))
         return;
