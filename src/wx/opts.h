@@ -8,7 +8,7 @@
 
 #include "config/game-control.h"
 #include "config/user-input.h"
-#include "wx/keyedit.h"
+#include "wxutil.h"
 
 // Forward declaration.
 class wxFileHistory;

@@ -736,7 +736,7 @@ add_custom_command(
     OUTPUT cmdtab.cpp cmdhandlers.h cmd-evtable.h
     COMMAND ${CMAKE_COMMAND} -D OUTDIR=${CMAKE_CURRENT_BINARY_DIR} -P copy-events.cmake
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS cmdevents.cpp
+    DEPENDS cmdevents.cpp copy-events.cmake
 )
 
 
@@ -770,11 +770,10 @@ set(
     dialogs/game-boy-config.cpp
     widgets/group-check-box.cpp
     widgets/keep-on-top-styler.cpp
-    widgets/keyedit.cpp
-    widgets/joyedit.cpp
     widgets/option-validator.cpp
     widgets/render-plugin.cpp
     widgets/sdljoy.cpp
+    widgets/user-input-ctrl.cpp
     widgets/wxmisc.cpp
     # probably ought to be in common
     ../sdl/text.cpp
@@ -823,8 +822,7 @@ set(
     widgets/keep-on-top-styler.h
     widgets/option-validator.h
     widgets/render-plugin.h
-    widgets/wx/keyedit.h
-    widgets/wx/joyedit.h
+    widgets/user-input-ctrl.h
     widgets/wx/sdljoy.h
     widgets/wx/webupdatedef.h
     widgets/wx/wxmisc.h

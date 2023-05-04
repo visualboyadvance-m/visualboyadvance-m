@@ -12,15 +12,25 @@
 #include <stdexcept>
 #include <typeinfo>
 
+#include <wx/checkbox.h>
 #include <wx/checkedlistctrl.h>
+#include <wx/choice.h>
 #include <wx/clrpicker.h>
+#include <wx/dialog.h>
 #include <wx/dir.h>
+#include <wx/filehistory.h>
 #include <wx/filepicker.h>
+#include <wx/menu.h>
+#include <wx/msgdlg.h>
 #include <wx/progdlg.h>
+#include <wx/radiobut.h>
+#include <wx/scrolwin.h>
+#include <wx/slider.h>
 #include <wx/spinctrl.h>
 #include <wx/stockitem.h>
 #include <wx/tokenzr.h>
 #include <wx/txtstrm.h>
+#include <wx/valtext.h>
 #include <wx/wfstream.h>
 
 #include "../gba/CheatSearch.h"
@@ -33,6 +43,8 @@
 #include "dialogs/game-boy-config.h"
 #include "opts.h"
 #include "widgets/option-validator.h"
+#include "widgets/user-input-ctrl.h"
+#include "wxhead.h"
 
 #if defined(__WXGTK__)
 #include "wayland.h"
@@ -1603,24 +1615,22 @@ public:
         // ClearUp for Up; ClearR for R etc
         for (const config::GameKey& game_key : config::kAllGameKeys) {
             const wxString control_name = config::GameKeyToString(game_key);
-            wxJoyKeyTextCtrl* tc = XRCCTRL_D(*p, control_name, wxJoyKeyTextCtrl);
+            widgets::UserInputCtrl* tc = XRCCTRL_D(*p, control_name, widgets::UserInputCtrl);
             wxString singleClearButton("Clear" + control_name);
             if (ev.GetId() == XRCID(singleClearButton.c_str())) {
-                tc->SetValue(wxEmptyString);
+                tc->Clear();
                 return;
             }
         }
 
         for (const config::GameKey& game_key : config::kAllGameKeys) {
-            wxJoyKeyTextCtrl* tc = XRCCTRL_D(
-                *p, config::GameKeyToString(game_key), wxJoyKeyTextCtrl);
+            widgets::UserInputCtrl* tc =
+                XRCCTRL_D(*p, config::GameKeyToString(game_key), widgets::UserInputCtrl);
 
             if (clear) {
-                tc->SetValue(wxEmptyString);
+                tc->Clear();
             } else {
-                tc->SetValue(config::UserInput::SpanToString(
-                    kDefaultBindings.find(config::GameControl(0, game_key))
-                        ->second));
+                tc->SetInputs(kDefaultBindings.find(config::GameControl(0, game_key))->second);
             }
         }
     }
@@ -1673,6 +1683,19 @@ static bool cmdid_lt(const wxAcceleratorEntryUnicode& a, const wxAcceleratorEntr
     return a.GetCommand() < b.GetCommand();
 }
 
+class UserInputClientData : public wxClientData {
+public:
+    explicit UserInputClientData(const config::UserInput& user_input) : user_input_(user_input) {}
+    explicit UserInputClientData(config::UserInput&& user_input)
+        : user_input_(std::move(user_input)) {}
+    ~UserInputClientData() override = default;
+
+    const config::UserInput& user_input() const { return user_input_; }
+
+private:
+    const config::UserInput user_input_;
+};
+
 // manage the accel editor dialog
 static class AccelConfig_t : public wxEvtHandler {
 public:
@@ -1680,30 +1703,25 @@ public:
     wxControlWithItems* lb;
     wxAcceleratorEntry_v user_accels, accels;
     wxWindow *asb, *remb;
-    wxJoyKeyTextCtrl* key;
+    widgets::UserInputCtrl* key;
     wxControl* curas;
 
     // since this is not the actual dialog, derived from wxDialog, which is
     // the normal way of doing things, do init on the show event instead of
     // constructor
-    void Init(wxShowEvent& ev)
-    {
-#if wxCHECK_VERSION(2, 9, 0)
-#define GetShow IsShown
-#endif
+    void Init(wxShowEvent& ev) {
         ev.Skip();
 
-        if (!ev.GetShow())
+        if (!ev.IsShown())
             return;
 
         lb->Clear();
         tc->Unselect();
         tc->ExpandAll();
         user_accels = gopts.accels;
-        key->SetValue(wxT(""));
         asb->Enable(false);
         remb->Enable(false);
-        curas->SetLabel(wxT(""));
+        curas->SetLabel("");
         accels = wxGetApp().frame->get_accels(user_accels);
     }
 
@@ -1738,18 +1756,13 @@ public:
 
         lb->Clear();
         remb->Enable(false);
-        asb->Enable(!key->GetValue().empty());
+        asb->Enable(!key->inputs().empty());
         int cmd = id->val;
 
         for (size_t i = 0; i < accels.size(); ++i) {
             if (accels[i].GetCommand() == cmdtab[cmd].cmd_id) {
-                if (accels[i].GetJoystick() == 0) {
-                    wxString key = wxJoyKeyTextCtrl::ToCandidateString(accels[i].GetFlags(), accels[i].GetKeyCode());
-                    lb->Append(key);
-                }
-                else {
-                    lb->Append(accels[i].GetUkey());
-                }
+                config::UserInput input(accels[i].GetKeyCode(), accels[i].GetFlags(), accels[i].GetJoystick());
+                lb->Append(input.ToLocalizedString(), new UserInputClientData(std::move(input)));
             }
         }
     }
@@ -1771,26 +1784,23 @@ public:
             return;
 
         wxString selstr = lb->GetString(lsel);
-        int selmod, selkey, seljoy;
-
-        if (!wxJoyKeyTextCtrl::FromString(selstr, selmod, selkey, seljoy))
-            // this should never happen
-            return;
+        const config::UserInput& input =
+            static_cast<const UserInputClientData*>(lb->GetClientObject(lsel))->user_input();
+        int selmod = input.mod();
+        int selkey = input.key();
+        int seljoy = input.joy();
 
         remb->Enable(false);
 
         // if this key is currently in the shortcut field, clear out curas
         if (selstr == key->GetValue())
-            curas->SetLabel(wxT(""));
+            curas->SetLabel("");
 
         lb->Delete(lsel);
 
         // first drop from user accels, if applicable
-        for (wxAcceleratorEntry_v::iterator i = user_accels.begin();
-             i < user_accels.end(); ++i)
-            if ((i->GetFlags() == selmod && i->GetKeyCode() == selkey)
-                || (seljoy != 0 && i->GetUkey() == selstr))
-            {
+        for (wxAcceleratorEntry_v::iterator i = user_accels.begin(); i < user_accels.end(); ++i)
+            if (i->GetFlags() == selmod && i->GetKeyCode() == selkey && i->GetJoystick() == seljoy) {
                 user_accels.erase(i);
                 break;
             }
@@ -1799,19 +1809,16 @@ public:
         wxAcceleratorEntry_v& sys_accels = wxGetApp().frame->sys_accels;
 
         for (size_t i = 0; i < sys_accels.size(); i++)
-            if ((sys_accels[i].GetFlags() == selmod && sys_accels[i].GetKeyCode() == selkey)
-                || (seljoy != 0 && sys_accels[i].GetUkey() == selstr)) // joystick system bindings?
-            {
-                wxAcceleratorEntryUnicode ne(selstr, seljoy, selmod, selkey, XRCID("NOOP"));
+            if (sys_accels[i].GetFlags() == selmod && sys_accels[i].GetKeyCode() == selkey &&
+                sys_accels[i].GetJoystick() == seljoy) {
+                wxAcceleratorEntryUnicode ne(seljoy, selmod, selkey, XRCID("NOOP"));
                 user_accels.push_back(ne);
             }
 
         // finally, remove from accels instead of recomputing
-        for (wxAcceleratorEntry_v::iterator i = accels.begin();
-             i < accels.end(); ++i)
-            if ((i->GetFlags() == selmod && i->GetKeyCode() == selkey)
-                || (seljoy != 0 && i->GetUkey() == selstr))
-            {
+        for (wxAcceleratorEntry_v::iterator i = accels.begin(); i < accels.end(); ++i)
+            if (i->GetFlags() == selmod && i->GetKeyCode() == selkey &&
+                i->GetJoystick() == seljoy) {
                 accels.erase(i);
                 break;
             }
@@ -1821,7 +1828,9 @@ public:
     void ResetAll(wxCommandEvent& ev)
     {
         (void)ev; // unused params
-        if (user_accels.empty() || wxMessageBox(_("This will clear all user-defined accelerators. Are you sure?"), _("Confirm"), wxYES_NO) != wxYES)
+        if (user_accels.empty() ||
+            wxMessageBox(_("This will clear all user-defined accelerators. Are you sure?"),
+                         _("Confirm"), wxYES_NO) != wxYES)
             return;
 
         user_accels.clear();
@@ -1829,8 +1838,8 @@ public:
         tc->Unselect();
         lb->Clear();
         // rather than recomputing curas, just clear it
-        key->SetValue(wxT(""));
-        curas->SetLabel(wxT(""));
+        key->Clear();
+        curas->SetLabel("");
     }
 
     // remove old key binding, add new key binding, and update GUI
@@ -1838,35 +1847,37 @@ public:
     {
         (void)ev; // unused params
         wxTreeItemId csel = tc->GetSelection();
-        wxString accel = key->GetValue();
+        const std::set<config::UserInput>& inputs = key->inputs();
 
-        if (!csel.IsOk() || accel.empty())
+        if (!csel.IsOk() || inputs.empty())
             return;
 
-        int acmod, ackey, acjoy;
+        assert(inputs.size() == 1);
 
-        if (!wxJoyKeyTextCtrl::FromString(accel, acmod, ackey, acjoy))
-            // this should never happen
-            return;
+        const config::UserInput& input = *inputs.begin();
+        const int acmod = input.mod();
+        const int ackey = input.key();
+        const int acjoy = input.joy();
 
-        for (unsigned int i = 0; i < lb->GetCount(); i++)
-            if (lb->GetString(i) == accel)
-                return; // ignore attempts to add twice
+        for (unsigned int i = 0; i < lb->GetCount(); i++) {
+            if (static_cast<UserInputClientData*>(lb->GetClientObject(i))->user_input() == input) {
+                // Ignore attempts to add twice.
+                return;
+            }
+        }
 
-        lb->Append(accel);
+        lb->Append(input.ToLocalizedString(), new UserInputClientData(input));
 
         // first drop from user accels, if applicable
-        for (wxAcceleratorEntry_v::iterator i = user_accels.begin();
-             i < user_accels.end(); ++i)
-            if ((i->GetFlags() == acmod && i->GetKeyCode() == ackey && i->GetJoystick() != acjoy)
-                || (acjoy != 0 && i->GetUkey() == accel)) {
+        for (wxAcceleratorEntry_v::iterator i = user_accels.begin(); i < user_accels.end(); ++i)
+            if (i->GetFlags() == acmod && i->GetKeyCode() == ackey && i->GetJoystick() == acjoy) {
                 user_accels.erase(i);
                 break;
             }
 
         // then assign to this command
         const TreeInt* id = static_cast<const TreeInt*>(tc->GetItemData(csel));
-        wxAcceleratorEntryUnicode ne(accel, acjoy, acmod, ackey, cmdtab[id->val].cmd_id);
+        wxAcceleratorEntryUnicode ne(input, cmdtab[id->val].cmd_id);
         user_accels.push_back(ne);
 
         // now assigned to this cmd...
@@ -1881,31 +1892,28 @@ public:
     void CheckKey(wxCommandEvent& ev)
     {
         (void)ev; // unused params
-        wxString nkey = key->GetValue();
+        const auto& inputs = key->inputs();
 
-        if (nkey.empty()) {
-            curas->SetLabel(wxT(""));
+        if (inputs.empty()) {
+            curas->SetLabel("");
             asb->Enable(false);
             return;
         }
 
-        int acmod, ackey, acjoy;
+        assert(inputs.size() == 1);
+        const config::UserInput input = *inputs.begin();
 
-        if (!wxJoyKeyTextCtrl::FromString(nkey, acmod, ackey, acjoy)) {
-            // this should never happen
-            key->SetValue(wxT(""));
-            asb->Enable(false);
-            return;
-        }
+        const int ackey = input.key();
+        const int acmod = input.mod();
+        const int acjoy = input.joy();
 
         asb->Enable(tc->GetSelection().IsOk());
         int cmd = -1;
 
         for (size_t i = 0; i < accels.size(); i++)
-            if ((accels[i].GetFlags() == acmod && accels[i].GetKeyCode() == ackey)
-                || (acjoy != 0 && accels[i].GetUkey() == nkey)) {
+            if (accels[i].GetFlags() == acmod && accels[i].GetKeyCode() == ackey &&
+                accels[i].GetJoystick() == acjoy) {
                 int cmdid = accels[i].GetCommand();
-
                 for (cmd = 0; cmd < ncmds; cmd++)
                     if (cmdid == cmdtab[cmd].cmd_id)
                         break;
@@ -1914,7 +1922,7 @@ public:
             }
 
         if (cmd < 0 || cmdtab[cmd].cmd_id == XRCID("NOOP")) {
-            curas->SetLabel(wxT(""));
+            curas->SetLabel("");
             return;
         }
 
@@ -2233,8 +2241,8 @@ wxAcceleratorEntry_v MainFrame::get_accels(wxAcceleratorEntry_v user_accels)
         const wxAcceleratorEntryUnicode& ae = user_accels[i];
 
         for (wxAcceleratorEntry_v::iterator e = accels.begin(); e < accels.end(); ++e)
-            if ((ae.GetFlags() == e->GetFlags() && ae.GetKeyCode() == e->GetKeyCode())
-                || (ae.GetJoystick() == e->GetJoystick() && ae.GetUkey() == e->GetUkey())) {
+            if (ae.GetFlags() == e->GetFlags() && ae.GetKeyCode() == e->GetKeyCode() &&
+                ae.GetJoystick() == e->GetJoystick()) {
                 accels.erase(e);
                 break;
             }
@@ -2258,8 +2266,7 @@ void MainFrame::set_global_accels()
     // first, zero out menu item on all accels
     std::set<wxJoystick> needed_joysticks;
     for (size_t i = 0; i < accels.size(); ++i) {
-        accels[i].Set(accels[i].GetUkey(), accels[i].GetJoystick(), accels[i].GetFlags(), accels[i].GetKeyCode(), accels[i].GetCommand());
-        if (accels[i].GetJoystick()) {
+        if (accels[i].GetJoystick() != 0) {
             needed_joysticks.insert(
                 wxJoystick::FromLegacyPlayerIndex(accels[i].GetJoystick()));
         }
@@ -2287,7 +2294,9 @@ void MainFrame::set_global_accels()
 
         if (last_accel >= 0) {
             DoSetAccel(mi, &accels[last_accel]);
-            accels[last_accel].Set(accels[last_accel].GetUkey(), accels[last_accel].GetJoystick(), accels[last_accel].GetFlags(), accels[last_accel].GetKeyCode(), accels[last_accel].GetCommand(), mi);
+            accels[last_accel].Set(accels[last_accel].GetJoystick(), accels[last_accel].GetFlags(),
+                                   accels[last_accel].GetKeyCode(), accels[last_accel].GetCommand(),
+                                   mi);
         } else {
             // clear out user-cleared menu items
             DoSetAccel(mi, NULL);
@@ -2596,10 +2605,12 @@ bool MainFrame::BindControls()
                          e < sys_accels.end(); ++e)
                         if (a->GetFlags() == e->GetFlags() && a->GetKeyCode() == e->GetKeyCode()) {
                             if (e->GetMenuItem()) {
-                                wxLogInfo(_("Duplicate menu accelerator: %s for %s and %s; keeping first"),
-                                    wxKeyTextCtrl::ToString(a->GetFlags(), a->GetKeyCode()).c_str(),
-                                    e->GetMenuItem()->GetItemLabelText().c_str(),
-                                    mi->GetItemLabelText().c_str());
+                                wxLogInfo(_("Duplicate menu accelerator: %s for %s and %s; keeping "
+                                            "first"),
+                                          config::UserInput(a->GetKeyCode(), a->GetFlags())
+                                              .ToLocalizedString(),
+                                          e->GetMenuItem()->GetItemLabelText().c_str(),
+                                          mi->GetItemLabelText().c_str());
                                 delete a;
                                 a = 0;
                             } else {
@@ -2610,10 +2621,12 @@ bool MainFrame::BindControls()
                                         if (cmdtab[cmd].cmd_id == e->GetCommand())
                                             break;
 
-                                    wxLogInfo(_("Menu accelerator %s for %s overrides default for %s; keeping menu"),
-                                        wxKeyTextCtrl::ToString(a->GetFlags(), a->GetKeyCode()).c_str(),
-                                        mi->GetItemLabelText().c_str(),
-                                        cmdtab[cmd].cmd.c_str());
+                                    wxLogInfo(_("Menu accelerator %s for %s overrides default for "
+                                                "%s; keeping menu"),
+                                              config::UserInput(a->GetKeyCode(), a->GetFlags())
+                                                  .ToLocalizedString(),
+                                              mi->GetItemLabelText().c_str(),
+                                              cmdtab[cmd].cmd.c_str());
                                 }
 
                                 sys_accels.erase(e);
@@ -3332,7 +3345,7 @@ bool MainFrame::BindControls()
 
             for (const config::GameKey& game_key : config::kAllGameKeys) {
                 const wxString control_name = config::GameKeyToString(game_key);
-                wxJoyKeyTextCtrl* tc = XRCCTRL_D(*w, control_name, wxJoyKeyTextCtrl);
+                widgets::UserInputCtrl* tc = XRCCTRL_D(*w, control_name, widgets::UserInputCtrl);
                 CheckThrowXRCError(tc, control_name);
                 wxWindow* p = tc->GetParent();
 
@@ -3341,8 +3354,7 @@ bool MainFrame::BindControls()
 
                 prev = tc;
                 prevp = p;
-                tc->SetValidator(
-                    wxJoyKeyValidator(config::GameControl(i, game_key)));
+                tc->SetValidator(widgets::UserInputCtrlValidator(config::GameControl(i, game_key)));
             }
 
             JoyPadConfigHandler[i].p = w;
@@ -3383,11 +3395,9 @@ bool MainFrame::BindControls()
             accel_config_handler.lb = lb;
             accel_config_handler.asb = SafeXRCCTRL<wxButton>(d, "Assign");
             accel_config_handler.remb = SafeXRCCTRL<wxButton>(d, "Remove");
-            accel_config_handler.key = SafeXRCCTRL<wxJoyKeyTextCtrl>(d, "Shortcut");
+            accel_config_handler.key = SafeXRCCTRL<widgets::UserInputCtrl>(d, "Shortcut");
             accel_config_handler.curas = SafeXRCCTRL<wxControl>(d, "AlreadyThere");
             accel_config_handler.key->MoveBeforeInTabOrder(accel_config_handler.asb);
-            accel_config_handler.key->SetMultikey(0);
-            accel_config_handler.key->SetClearable(false);
             wxTreeItemId rid = tc->AddRoot(wxT("root"));
 
             if (menubar) {

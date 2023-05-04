@@ -14,8 +14,6 @@
 #include "config/option-observer.h"
 #include "widgets/dpi-support.h"
 #include "widgets/keep-on-top-styler.h"
-#include "wx/joyedit.h"
-#include "wx/keyedit.h"
 #include "wx/sdljoy.h"
 #include "wx/wxmisc.h"
 #include "wxhead.h"

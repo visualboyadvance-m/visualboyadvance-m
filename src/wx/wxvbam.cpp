@@ -16,14 +16,18 @@
 #include <wx/filesys.h>
 #include <wx/fs_arc.h>
 #include <wx/fs_mem.h>
+#include <wx/menu.h>
 #include <wx/mstream.h>
 #include <wx/progdlg.h>
 #include <wx/protocol/http.h>
 #include <wx/regex.h>
 #include <wx/sstream.h>
+#include <wx/stdpaths.h>
+#include <wx/string.h>
 #include <wx/txtstrm.h>
 #include <wx/url.h>
 #include <wx/wfstream.h>
+#include <wx/wxcrtvararg.h>
 #include <wx/zipstrm.h>
 
 #include "../gba/remote.h"
@@ -40,6 +44,8 @@
 #include "strutils.h"
 #include "wayland.h"
 #include "widgets/group-check-box.h"
+#include "widgets/user-input-ctrl.h"
+#include "wxhead.h"
 
 namespace {
 static const wxString kOldConfigFileName("vbam.conf");
@@ -296,6 +302,7 @@ bool wxvbamApp::OnInit() {
     // maybe in future if not wxSHARED, load only builtin-needed handlers
     xr->InitAllHandlers();
     xr->AddHandler(new widgets::GroupCheckBoxXmlHandler());
+    xr->AddHandler(new widgets::UserInputCtrlXmlHandler());
     wxInitAllImageHandlers();
     get_config_path(config_path);
     // first, load override xrcs
@@ -935,18 +942,19 @@ int MainFrame::FilterEvent(wxEvent& event)
     else if (event.GetEventType() == wxEVT_JOY && !menus_opened && !dialog_opened)
     {
         wxJoyEvent& je = (wxJoyEvent&)event;
-        if (!je.pressed()) return -1; // joystick button UP
-        wxString label = config::UserInput(je).ToString();
+        if (!je.pressed()) {
+            // joystick button UP
+            return -1;
+        }
         wxAcceleratorEntry_v accels = wxGetApp().GetAccels();
-        for (size_t i = 0; i < accels.size(); ++i)
-        {
-            if (label == accels[i].GetUkey())
-            {
+        for (size_t i = 0; i < accels.size(); ++i) {
+        if (accels[i].GetJoystick() == je.joystick().player_index() &&
+            accels[i].GetKeyCode() == je.control_index() && accels[i].GetFlags() == je.control()) {
                 wxCommandEvent evh(wxEVT_COMMAND_MENU_SELECTED, accels[i].GetCommand());
                 evh.SetEventObject(this);
                 GetEventHandler()->ProcessEvent(evh);
                 return wxEventFilter::Event_Processed;
-            }
+        }
         }
     }
     return wxEventFilter::Event_Skip;

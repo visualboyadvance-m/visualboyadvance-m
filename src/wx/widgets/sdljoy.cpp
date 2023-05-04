@@ -58,8 +58,6 @@ wxJoyControl HatStatusToJoyControl(const uint8_t status) {
 // For testing a GameController as a Joystick:
 //#define SDL_IsGameController(x) false
 
-DEFINE_EVENT_TYPE(wxEVT_JOY)
-
 // static
 wxJoystick wxJoystick::Invalid() {
     return wxJoystick(kInvalidSdlIndex);
@@ -106,6 +104,8 @@ wxJoyEvent::wxJoyEvent(
         control_(control),
         control_index_(control_index),
         pressed_(pressed) {}
+
+wxDEFINE_EVENT(wxEVT_JOY, wxJoyEvent);
 
 // Represents the current state of a joystick. This class takes care of
 // initializing and destroying SDL resources on construction and destruction so

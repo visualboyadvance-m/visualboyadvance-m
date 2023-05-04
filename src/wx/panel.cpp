@@ -36,7 +36,6 @@
 #include "filters.h"
 #include "wayland.h"
 #include "widgets/render-plugin.h"
-#include "wx/joyedit.h"
 #include "wxutil.h"
 #include "wxvbam.h"
 
