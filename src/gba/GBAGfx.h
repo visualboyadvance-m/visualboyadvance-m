@@ -81,7 +81,7 @@ static inline void gfxClearArray(uint32_t* array)
 static inline void gfxDrawTextScreen(uint16_t control, uint16_t hofs, uint16_t vofs, uint32_t* line)
 {
     uint16_t* palette = (uint16_t*)paletteRAM;
-    uint8_t* charBase = &vram[((control >> 2) & 0x03) * 0x4000];
+    const size_t charBankBaseOffset = ((control >> 2) & 0x03) * 0x4000;
     uint16_t* screenBase = (uint16_t*)&vram[((control >> 8) & 0x1f) * 0x800];
     uint32_t prio = ((control & 3) << 25) + 0x1000000;
     int sizeX = 256;
@@ -143,7 +143,18 @@ static inline void gfxDrawTextScreen(uint16_t control, uint16_t hofs, uint16_t v
             if (data & 0x0800)
                 tileY = 7 - tileY;
 
-            uint8_t color = charBase[tile * 64 + tileY * 8 + tileX];
+            const size_t charBankOffset = tile * 64 + tileY * 8 + tileX;
+            const size_t charBankTotalOffset = charBankOffset + charBankBaseOffset;
+            uint8_t color;
+            if (charBankTotalOffset >= 0x10000) {
+                // Adapted from https://github.com/mgba-emu/mgba/commit/4ce9b83362ad66b1421afea7372adfc753bce97c
+                // Real hardware PPU uses the most recently read from background
+                // VRAM. This can't be easily emulated in vba-m, so we simply
+                // use 0 here.
+                color = 0;
+            } else {
+                color = vram[charBankTotalOffset];
+            }
 
             line[x] = color ? (READ16LE(&palette[color]) | prio) : 0x80000000;
 
@@ -177,12 +188,22 @@ static inline void gfxDrawTextScreen(uint16_t control, uint16_t hofs, uint16_t v
             if (data & 0x0800)
                 tileY = 7 - tileY;
 
-            uint8_t color = charBase[(tile << 5) + (tileY << 2) + (tileX >> 1)];
-
-            if (tileX & 1) {
-                color = (color >> 4);
+            const size_t charBankOffset = (tile << 5) + (tileY << 2) + (tileX >> 1);
+            const size_t charBankTotalOffset = charBankOffset + charBankBaseOffset;
+            uint8_t color;
+            if (charBankTotalOffset >= 0x10000) {
+                // Adapted from https://github.com/mgba-emu/mgba/commit/4ce9b83362ad66b1421afea7372adfc753bce97c
+                // Real hardware PPU uses the most recently read from background
+                // VRAM. This can't be easily emulated in vba-m, so we simply
+                // use 0 here.
+                color = 0;
             } else {
-                color &= 0x0F;
+                color = vram[charBankTotalOffset];
+                if (tileX & 1) {
+                    color = (color >> 4);
+                } else {
+                    color &= 0x0F;
+                }
             }
 
             int pal = (data >> 8) & 0xF0;
