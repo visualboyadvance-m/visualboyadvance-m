@@ -62,6 +62,8 @@ IF(EXISTS /usr/local/bin/brew AND $ENV{PATH} MATCHES "(^|:)/usr/local/bin/?(:|$)
     LINK_DIRECTORIES("/usr/local/lib")
 
     SET(CMAKE_PROGRAM_PATH /usr/local/bin ${CMAKE_PROGRAM_PATH})
+
+    set(ZLIB_ROOT /usr/local/opt/zlib)
 ELSEIF(EXISTS /opt/local/bin/port AND $ENV{PATH} MATCHES "(^|:)/opt/local/bin/?(:|$)")
     MESSAGE("-- Configuring for MacPorts")
 

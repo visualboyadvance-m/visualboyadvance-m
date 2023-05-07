@@ -15,7 +15,6 @@
 #   - AVUTIL
 #   - POSTPROC
 #   - SWSCALE
-#   - SWRESAMPLE
 # the following variables will be defined
 #  <component>_FOUND        - System has <component>
 #  <component>_INCLUDE_DIRS - Include directory necessary for using the <component> headers
@@ -70,20 +69,19 @@ macro(find_component _component _pkgconfig _library _header)
 
   find_path(${_component}_INCLUDE_DIRS ${_header}
     HINTS
-      ${PC_LIB${_component}_INCLUDEDIR}
-      ${PC_LIB${_component}_INCLUDE_DIRS}
+      ${PC_${_component}_INCLUDEDIR}
+      ${PC_${_component}_INCLUDE_DIRS}
     PATH_SUFFIXES
       ffmpeg
   )
 
   find_library(${_component}_LIBRARIES NAMES ${_library}
       HINTS
-      ${PC_LIB${_component}_LIBDIR}
-      ${PC_LIB${_component}_LIBRARY_DIRS}
+      ${PC_${_component}_LIBDIR}
+      ${PC_${_component}_LIBRARY_DIRS}
   )
 
   set(${_component}_DEFINITIONS  ${PC_${_component}_CFLAGS_OTHER} CACHE STRING "The ${_component} CFLAGS.")
-  set(${_component}_LDFLAGS      ${PC_${_component}_LDFLAGS}      CACHE STRING "The ${_component} LDFLAGS.")
   set(${_component}_VERSION      ${PC_${_component}_VERSION}      CACHE STRING "The ${_component} version number.")
 
   set_component_found(${_component})
@@ -114,9 +112,8 @@ if (NOT FFMPEG_LIBRARIES)
   foreach (_component ${FFmpeg_FIND_COMPONENTS})
     if (${_component}_FOUND)
       # message(STATUS "Required component ${_component} present.")
-      list(APPEND FFMPEG_LIBRARIES    ${${_component}_LIBRARIES})
-      list(APPEND FFMPEG_DEFINITIONS  ${${_component}_DEFINITIONS})
-      list(APPEND FFMPEG_LDFLAGS      ${${_component}_LDFLAGS})
+      set(FFMPEG_LIBRARIES   ${FFMPEG_LIBRARIES}   ${${_component}_LIBRARIES})
+      set(FFMPEG_DEFINITIONS ${FFMPEG_DEFINITIONS} ${${_component}_DEFINITIONS})
       list(APPEND FFMPEG_INCLUDE_DIRS ${${_component}_INCLUDE_DIRS})
     else ()
       # message(STATUS "Required component ${_component} missing.")
@@ -130,12 +127,10 @@ if (NOT FFMPEG_LIBRARIES)
 
   # cache the vars.
   set(FFMPEG_INCLUDE_DIRS ${FFMPEG_INCLUDE_DIRS} CACHE STRING "The FFmpeg include directories." FORCE)
-  set(FFMPEG_LIBRARIES    ${FFMPEG_LIBRARIES}    CACHE STRING "The FFmpeg libraries."           FORCE)
-  set(FFMPEG_DEFINITIONS  ${FFMPEG_DEFINITIONS}  CACHE STRING "The FFmpeg CFLAGS."              FORCE)
-  set(FFMPEG_LDFLAGS      ${FFMPEG_LDFLAGS}      CACHE STRING "The FFmpeg LDFLAGS."             FORCE)
+  set(FFMPEG_LIBRARIES    ${FFMPEG_LIBRARIES}    CACHE STRING "The FFmpeg libraries." FORCE)
+  set(FFMPEG_DEFINITIONS  ${FFMPEG_DEFINITIONS}  CACHE STRING "The FFmpeg cflags." FORCE)
 
   mark_as_advanced(FFMPEG_INCLUDE_DIRS
-                   FFMPEG_LDFLAGS
                    FFMPEG_LIBRARIES
                    FFMPEG_DEFINITIONS)
 
@@ -146,18 +141,9 @@ foreach (_component AVCODEC AVDEVICE AVFORMAT AVUTIL POSTPROCESS SWSCALE)
   set_component_found(${_component})
 endforeach ()
 
-# message(STATUS "FFmpeg_FIND_COMPONENTS: ${FFmpeg_FIND_COMPONENTS}")
-# message(STATUS "FFMPEG_LIBRARIES: ${FFMPEG_LIBRARIES}")
-# message(STATUS "FFMPEG_LDFLAGS: ${FFMPEG_LDFLAGS}")
-# message(STATUS "FFMPEG_INCLUDE_DIRS: ${FFMPEG_INCLUDE_DIRS}")
-
 # Compile the list of required vars
 set(_FFmpeg_REQUIRED_VARS FFMPEG_LIBRARIES FFMPEG_INCLUDE_DIRS)
 foreach (_component ${FFmpeg_FIND_COMPONENTS})
-  # message(STATUS "${_component}_LIBRARIES: ${${_component}_LIBRARIES}")
-  # message(STATUS "${_component}_LDFLAGS: ${${_component}_LDFLAGS}")
-  # message(STATUS "${_component}_INCLUDE_DIRS: ${${_component}_INCLUDE_DIRS}")
-
   list(APPEND _FFmpeg_REQUIRED_VARS ${_component}_LIBRARIES ${_component}_INCLUDE_DIRS)
 endforeach ()
 
