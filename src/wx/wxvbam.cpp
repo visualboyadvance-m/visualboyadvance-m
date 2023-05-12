@@ -48,9 +48,38 @@
 #include "wxhead.h"
 
 namespace {
+
+// Resets the accelerator text for `menu_item` to the first keyboard input.
+void ResetMenuItemAccelerator(wxMenuItem* menu_item) {
+    const wxString old_label = menu_item->GetItemLabel();
+    const size_t tab_index = old_label.find('\t');
+    wxString new_label;
+    new_label = old_label;
+    if (tab_index != wxString::npos) {
+        new_label.resize(tab_index);
+    }
+    std::set<config::UserInput> user_inputs =
+        gopts.shortcuts.InputsForCommand(menu_item->GetId());
+    for (const config::UserInput& user_input : user_inputs) {
+        if (user_input.device() != config::UserInput::Device::Keyboard) {
+            // Cannot use joystick keybinding as text without wx assertion error.
+            continue;
+        }
+
+        new_label.append('\t');
+        new_label.append(user_input.ToLocalizedString());
+        break;
+    }
+
+    if (old_label != new_label) {
+        menu_item->SetItemLabel(new_label);
+    }
+}
+
 static const wxString kOldConfigFileName("vbam.conf");
 static const wxString knewConfigFileName("vbam.ini");
 static const char kDotDir[] = "visualboyadvance-m";
+
 }  // namespace
 
 #ifndef NO_DEBUGGER
@@ -921,43 +950,31 @@ void MainFrame::OnSize(wxSizeEvent& event)
     OPTION(kGeomFullScreen) = IsFullScreen();
 }
 
-int MainFrame::FilterEvent(wxEvent& event)
-{
-    if (event.GetEventType() == wxEVT_KEY_DOWN && !menus_opened && !dialog_opened)
-    {
-        wxKeyEvent& ke = (wxKeyEvent&)event;
-        int keyCode = getKeyboardKeyCode(ke);
-        int keyMod = ke.GetModifiers();
-        wxAcceleratorEntry_v accels = wxGetApp().GetAccels();
-        for (size_t i = 0; i < accels.size(); ++i)
-            if (keyCode == accels[i].GetKeyCode() && keyMod == accels[i].GetFlags()
-                && accels[i].GetCommand() != XRCID("NOOP"))
-            {
-                wxCommandEvent evh(wxEVT_COMMAND_MENU_SELECTED, accels[i].GetCommand());
-                evh.SetEventObject(this);
-                GetEventHandler()->ProcessEvent(evh);
-                return wxEventFilter::Event_Processed;
+int MainFrame::FilterEvent(wxEvent& event) {
+    if (menus_opened || dialog_opened) {
+        return wxEventFilter::Event_Skip;
+    }
+
+    int command = 0;
+    if (event.GetEventType() == wxEVT_KEY_DOWN) {
+        const wxKeyEvent& key_event = static_cast<wxKeyEvent&>(event);
+        command = gopts.shortcuts.CommandForInput(config::UserInput(key_event));
+    } else if (event.GetEventType() == wxEVT_JOY) {
+        const wxJoyEvent& joy_event = static_cast<wxJoyEvent&>(event);
+        if (joy_event.pressed()) {
+            // We ignore "button up" events here.
+            command = gopts.shortcuts.CommandForInput(config::UserInput(joy_event));
         }
     }
-    else if (event.GetEventType() == wxEVT_JOY && !menus_opened && !dialog_opened)
-    {
-        wxJoyEvent& je = (wxJoyEvent&)event;
-        if (!je.pressed()) {
-            // joystick button UP
-            return -1;
-        }
-        wxAcceleratorEntry_v accels = wxGetApp().GetAccels();
-        for (size_t i = 0; i < accels.size(); ++i) {
-        if (accels[i].GetJoystick() == je.joystick().player_index() &&
-            accels[i].GetKeyCode() == je.control_index() && accels[i].GetFlags() == je.control()) {
-                wxCommandEvent evh(wxEVT_COMMAND_MENU_SELECTED, accels[i].GetCommand());
-                evh.SetEventObject(this);
-                GetEventHandler()->ProcessEvent(evh);
-                return wxEventFilter::Event_Processed;
-        }
-        }
+
+    if (command == 0) {
+        return wxEventFilter::Event_Skip;
     }
-    return wxEventFilter::Event_Skip;
+
+    wxCommandEvent command_event(wxEVT_COMMAND_MENU_SELECTED, command);
+    command_event.SetEventObject(this);
+    this->GetEventHandler()->ProcessEvent(command_event);
+    return wxEventFilter::Event_Processed;
 }
 
 wxString MainFrame::GetGamePath(wxString path)
@@ -989,12 +1006,10 @@ void MainFrame::SetJoystick()
      * destroying and creating the GameArea `panel`. */
     joy.StopPolling();
 
-    set_global_accels();
-
     if (!emulating)
         return;
 
-    std::set<wxJoystick> needed_joysticks;
+    std::set<wxJoystick> needed_joysticks = gopts.shortcuts.Joysticks();
     for (const auto& iter : gopts.game_control_bindings) {
         for (const auto& input_iter : iter.second) {
             needed_joysticks.emplace(input_iter.joystick());
@@ -1047,19 +1062,6 @@ void MainFrame::enable_menus()
         for (int i = 0; i < 10; i++)
             if (loadst_mi[i])
                 loadst_mi[i]->Enable(state_ts[i].IsValid());
-}
-
-void MainFrame::SetRecentAccels()
-{
-    for (int i = 0; i < 10; i++) {
-        wxMenuItem* mi = recent->FindItem(i + wxID_FILE1);
-
-        if (!mi)
-            break;
-
-        // if command is 0, there is no accel
-        DoSetAccel(mi, recent_accel[i].GetCommand() ? &recent_accel[i] : NULL);
-    }
 }
 
 void MainFrame::update_state_ts(bool force)
@@ -1169,6 +1171,26 @@ int MainFrame::newest_state_slot()
     }
 
     return ns + 1;
+}
+
+void MainFrame::ResetRecentAccelerators() {
+    for (int i = wxID_FILE1; i <= wxID_FILE10; i++) {
+        wxMenuItem* menu_item = recent->FindItem(i);
+        if (!menu_item) {
+            break;
+        }
+        ResetMenuItemAccelerator(menu_item);
+    }
+}
+
+void MainFrame::ResetMenuAccelerators() {
+    for (int i = 0; i < ncmds; i++) {
+        if (!cmdtab[i].mi) {
+            continue;
+        }
+        ResetMenuItemAccelerator(cmdtab[i].mi);
+    }
+    ResetRecentAccelerators();
 }
 
 void MainFrame::MenuPopped(wxMenuEvent& evt)

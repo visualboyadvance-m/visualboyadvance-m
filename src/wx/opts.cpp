@@ -110,98 +110,6 @@ uint32_t LoadUnsignedOption(wxConfigBase* cfg,
 
 opts_t gopts;
 
-// having the standard menu accels here means they will work even without menus
-const wxAcceleratorEntryUnicode default_accels[] = {
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, 'C', XRCID("CheatsList")),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, 'N', XRCID("NextFrame")),
-    // some ports add ctrl-q anyway, so may as well make it official
-    // maybe make alt-f4 universal as well...
-    // FIXME: ctrl-Q does not work on wxMSW
-    // FIXME: esc does not work on wxMSW
-
-    // this was annoying people A LOT #334
-    //wxAcceleratorEntryUnicode(0, wxMOD_NONE, WXK_ESCAPE, wxID_EXIT),
-
-    // this was annoying people #298
-    //wxAcceleratorEntryUnicode(0, wxMOD_CMD, 'X', wxID_EXIT),
-
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, 'Q', wxID_EXIT),
-    // FIXME: ctrl-W does not work on wxMSW
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, 'W', wxID_CLOSE),
-    // load most recent is more commonly used than load other
-    //wxAcceleratorEntry(wxMOD_CMD, 'L', XRCID("Load")),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, 'L', XRCID("LoadGameRecent")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, WXK_F1, XRCID("LoadGame01")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, WXK_F2, XRCID("LoadGame02")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, WXK_F3, XRCID("LoadGame03")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, WXK_F4, XRCID("LoadGame04")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, WXK_F5, XRCID("LoadGame05")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, WXK_F6, XRCID("LoadGame06")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, WXK_F7, XRCID("LoadGame07")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, WXK_F8, XRCID("LoadGame08")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, WXK_F9, XRCID("LoadGame09")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, WXK_F10, XRCID("LoadGame10")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, WXK_PAUSE, XRCID("Pause")),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, 'P', XRCID("Pause")),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, 'R', XRCID("Reset")),
-    // add shortcuts for original size multiplier #415
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, '1', XRCID("SetSize1x")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, '2', XRCID("SetSize2x")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, '3', XRCID("SetSize3x")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, '4', XRCID("SetSize4x")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, '5', XRCID("SetSize5x")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, '6', XRCID("SetSize6x")),
-    // save oldest is more commonly used than save other
-    //wxAcceleratorEntry(wxMOD_CMD, 'S', XRCID("Save")),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, 'S', XRCID("SaveGameOldest")),
-    wxAcceleratorEntryUnicode(0, wxMOD_SHIFT, WXK_F1, XRCID("SaveGame01")),
-    wxAcceleratorEntryUnicode(0, wxMOD_SHIFT, WXK_F2, XRCID("SaveGame02")),
-    wxAcceleratorEntryUnicode(0, wxMOD_SHIFT, WXK_F3, XRCID("SaveGame03")),
-    wxAcceleratorEntryUnicode(0, wxMOD_SHIFT, WXK_F4, XRCID("SaveGame04")),
-    wxAcceleratorEntryUnicode(0, wxMOD_SHIFT, WXK_F5, XRCID("SaveGame05")),
-    wxAcceleratorEntryUnicode(0, wxMOD_SHIFT, WXK_F6, XRCID("SaveGame06")),
-    wxAcceleratorEntryUnicode(0, wxMOD_SHIFT, WXK_F7, XRCID("SaveGame07")),
-    wxAcceleratorEntryUnicode(0, wxMOD_SHIFT, WXK_F8, XRCID("SaveGame08")),
-    wxAcceleratorEntryUnicode(0, wxMOD_SHIFT, WXK_F9, XRCID("SaveGame09")),
-    wxAcceleratorEntryUnicode(0, wxMOD_SHIFT, WXK_F10, XRCID("SaveGame10")),
-    // I prefer the SDL ESC key binding
-    //wxAcceleratorEntry(wxMOD_NONE, WXK_ESCAPE, XRCID("ToggleFullscreen"),
-    // alt-enter is more standard anyway
-    wxAcceleratorEntryUnicode(0, wxMOD_ALT, WXK_RETURN, XRCID("ToggleFullscreen")),
-    wxAcceleratorEntryUnicode(0, wxMOD_ALT, '1', XRCID("JoypadAutofireA")),
-    wxAcceleratorEntryUnicode(0, wxMOD_ALT, '2', XRCID("JoypadAutofireB")),
-    wxAcceleratorEntryUnicode(0, wxMOD_ALT, '3', XRCID("JoypadAutofireL")),
-    wxAcceleratorEntryUnicode(0, wxMOD_ALT, '4', XRCID("JoypadAutofireR")),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, '1', XRCID("VideoLayersBG0")),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, '2', XRCID("VideoLayersBG1")),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, '3', XRCID("VideoLayersBG2")),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, '4', XRCID("VideoLayersBG3")),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, '5', XRCID("VideoLayersOBJ")),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, '6', XRCID("VideoLayersWIN0")),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, '7', XRCID("VideoLayersWIN1")),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, '8', XRCID("VideoLayersOBJWIN")),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, 'B', XRCID("Rewind")),
-    // following are not in standard menus
-    // FILExx are filled in when recent menu is filled
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, WXK_F1, wxID_FILE1),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, WXK_F2, wxID_FILE2),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, WXK_F3, wxID_FILE3),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, WXK_F4, wxID_FILE4),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, WXK_F5, wxID_FILE5),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, WXK_F6, wxID_FILE6),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, WXK_F7, wxID_FILE7),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, WXK_F8, wxID_FILE8),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, WXK_F9, wxID_FILE9),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, WXK_F10, wxID_FILE10),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, '0', XRCID("VideoLayersReset")),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, 'G', XRCID("ChangeFilter")),
-    wxAcceleratorEntryUnicode(0, wxMOD_CMD, 'I', XRCID("ChangeIFB")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, WXK_NUMPAD_ADD, XRCID("IncreaseVolume")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, WXK_NUMPAD_SUBTRACT, XRCID("DecreaseVolume")),
-    wxAcceleratorEntryUnicode(0, wxMOD_NONE, WXK_NUMPAD_ENTER, XRCID("ToggleSound"))
-};
-const int num_def_accels = sizeof(default_accels) / sizeof(default_accels[0]);
-
 const std::map<config::GameControl, std::set<config::UserInput>> kDefaultBindings = {
     { config::GameControl(0, config::GameKey::Up), {
         WJKB('W'),
@@ -335,8 +243,6 @@ const std::map<config::GameControl, std::set<config::UserInput>> kDefaultBinding
     { config::GameControl(3, config::GameKey::Capture), {}},
     { config::GameControl(3, config::GameKey::Gameshark), {}},
 };
-
-wxAcceleratorEntry_v sys_accels;
 
 // This constructor only works with globally allocated gopts.
 opts_t::opts_t()
@@ -570,11 +476,9 @@ void load_opts(bool first_time_launch) {
             if (inputs.empty()) {
                 wxLogWarning(_("Invalid key binding %s for %s"), s.c_str(), kbopt.c_str());
             } else {
-                wxAcceleratorEntry_v val;
                 for (const auto& input : inputs) {
-                    val.push_back(wxAcceleratorEntryUnicode(input, cmdtab[i].cmd_id));
+                    gopts.shortcuts.AssignInputToCommand(input, cmdtab[i].cmd_id);
                 }
-                gopts.accels.insert(gopts.accels.end(), val.begin(), val.end());
             }
         }
     }
@@ -651,72 +555,31 @@ void update_opts() {
         config::GameControlState::Instance().OnGameBindingsChanged();
     }
 
-    // for keyboard, first remove any commands that aren't bound at all
-    if (cfg->HasGroup(wxT("/Keyboard"))) {
-        cfg->SetPath(wxT("/Keyboard"));
-        wxString s;
-        long entry_idx;
-        wxArrayString item_del;
+    cfg->SetPath("/");
+    cfg->Flush();
+}
 
-        for (bool cont = cfg->GetFirstEntry(s, entry_idx); cont;
-             cont = cfg->GetNextEntry(s, entry_idx)) {
-            const cmditem dummy = new_cmditem(s);
-            cmditem* cmd = std::lower_bound(&cmdtab[0], &cmdtab[ncmds], dummy, cmditem_lt);
-            size_t i;
+void update_shortcut_opts() {
+    wxConfigBase* cfg = wxConfigBase::Get();
 
-            for (i = 0; i < gopts.accels.size(); i++)
-                if (gopts.accels[i].GetCommand() == cmd->cmd_id)
-                    break;
-
-            if (i == gopts.accels.size())
-                item_del.push_back(s);
-        }
-
-        for (size_t i = 0; i < item_del.size(); i++)
-            cfg->DeleteEntry(item_del[i]);
-    }
-
-    // then, add/update the commands that are bound
-    // even if only ordering changed, a write will be triggered.
-    // nothing to worry about...
-    if (gopts.accels.size())
-        cfg->SetPath(wxT("/Keyboard"));
-
-    int cmd_id = -1;
-    for (wxAcceleratorEntry_v::iterator i = gopts.accels.begin();
-         i < gopts.accels.end(); ++i) {
-        if (cmd_id == i->GetCommand()) continue;
-        cmd_id = i->GetCommand();
-        int cmd;
-
+    // For shortcuts, it's easier to delete everything and start over.
+    cfg->DeleteGroup("/Keyboard");
+    cfg->SetPath("/Keyboard");
+    for (const auto& iter : gopts.shortcuts.GetConfiguration()) {
+        int cmd = 0;
         for (cmd = 0; cmd < ncmds; cmd++)
-            if (cmdtab[cmd].cmd_id == cmd_id)
+            if (cmdtab[cmd].cmd_id == iter.first)
                 break;
-
-        // NOOP overwrittes commands removed by the user
-        wxString command = cmdtab[cmd].cmd;
-        if (cmdtab[cmd].cmd_id == XRCID("NOOP"))
-            command = wxT("NOOP");
-
-        wxAcceleratorEntry_v::iterator j;
-
-        for (j = i + 1; j < gopts.accels.end(); ++j)
-            if (j->GetCommand() != cmd_id)
-                break;
-
-        wxAcceleratorEntry_v nv(i, j);
-        std::set<config::UserInput> user_inputs;
-        for (const auto& accel : nv) {
-            user_inputs.insert(config::UserInput(accel.GetKeyCode(), accel.GetFlags(), accel.GetJoystick()));
+        if (cmd == ncmds) {
+            // Command not found. This should never happen.
+            assert(false);
+            continue;
         }
-        wxString nvs = config::UserInput::SpanToConfigString(user_inputs);
 
-        if (nvs != cfg->Read(command))
-            cfg->Write(command, nvs);
+        cfg->Write(cmdtab[cmd].cmd, iter.second);
     }
 
-    cfg->SetPath(wxT("/"));
-    // recent items are updated separately
+    cfg->SetPath("/");
     cfg->Flush();
 }
 
@@ -793,28 +656,14 @@ void opt_set(const wxString& name, const wxString& val) {
             return;
         }
 
-        for (auto i = gopts.accels.begin(); i < gopts.accels.end(); ++i)
-            if (i->GetCommand() == cmd->cmd_id) {
-                auto j = i;
-                for (; j < gopts.accels.end(); ++j)
-                    if (j->GetCommand() != cmd->cmd_id)
-                        break;
-                gopts.accels.erase(i, j);
-                break;
-            }
-
         if (!val.empty()) {
-            auto inputs = config::UserInput::FromConfigString(val);
-            wxAcceleratorEntry_v aval;
-            for (const auto& input : inputs) {
-                aval.push_back(wxAcceleratorEntryUnicode(input, cmd->cmd_id));
-            }
-            if (!aval.size()) {
+            const auto inputs = config::UserInput::FromConfigString(val);
+            if (inputs.empty()) {
                 wxLogWarning(_("Invalid key binding %s for %s"), val.c_str(), name.c_str());
-                return;
             }
-
-            gopts.accels.insert(gopts.accels.end(), aval.begin(), aval.end());
+            for (const auto& input : inputs) {
+                gopts.shortcuts.AssignInputToCommand(input, cmd->cmd_id);
+            }
         }
 
         return;

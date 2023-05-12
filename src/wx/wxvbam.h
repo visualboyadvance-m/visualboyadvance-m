@@ -95,12 +95,6 @@ public:
 #endif
     // without this, global accels don't always work
     int FilterEvent(wxEvent&);
-    wxAcceleratorEntry_v accels;
-
-    wxAcceleratorEntry_v GetAccels()
-    {
-        return accels;
-    }
 
     // vba-over.ini
     wxFileConfig* overrides = nullptr;
@@ -262,15 +256,11 @@ public:
     int oldest_state_slot(); // or empty slot if available
     int newest_state_slot(); // or 0 if none
 
-    // system-defined accelerators
-    wxAcceleratorEntry_v sys_accels;
-    // adjust recent menu with accelerators
-    void SetRecentAccels();
-    // merge sys accels with user-defined accels (user overrides sys)
-    wxAcceleratorEntry_v get_accels(wxAcceleratorEntry_v user_accels);
-    // update menu and global accelerator table with sys+user accel defs
-    // probably not the quickest way to add/remove individual accels
-    void set_global_accels();
+    // Resets the Recent menu accelerators. Needs to be called every time the
+    // Recent menu is updated.
+    void ResetRecentAccelerators();
+    // Resets all menu accelerators.
+    void ResetMenuAccelerators();
 
     // 2.8 has no HasFocus(), and FindFocus() doesn't work right
     bool HasFocus() const
@@ -357,7 +347,6 @@ private:
     checkable_mi_array_t checkable_mi;
     // recent menu item accels
     wxMenu* recent;
-    wxAcceleratorEntryUnicode recent_accel[10];
     // joystick reader
     wxJoyPoller joy;
     JoystickPoller* jpoll = nullptr;

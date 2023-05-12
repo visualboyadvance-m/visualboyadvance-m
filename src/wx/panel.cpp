@@ -191,7 +191,7 @@ void GameArea::LoadGame(const wxString& name)
 
         if (!OPTION(kGenFreezeRecent)) {
             gopts.recent->AddFileToHistory(name);
-            wxGetApp().frame->SetRecentAccels();
+            wxGetApp().frame->ResetRecentAccelerators();
             cfg->SetPath("/Recent");
             gopts.recent->Save(*cfg);
             cfg->SetPath("/");

@@ -2710,8 +2710,10 @@ EVT_HANDLER(Customize, "Customize UI...")
 
     if (!joy_timer) frame->StartJoyPollTimer();
 
-    if (ShowModal(dlg) == wxID_OK)
-        update_opts();
+    if (ShowModal(dlg) == wxID_OK) {
+        update_shortcut_opts();
+        ResetMenuAccelerators();
+    }
 
     if (!joy_timer) frame->StopJoyPollTimer();
 

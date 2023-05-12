@@ -67,6 +67,14 @@ void UserInputCtrl::SetInputs(const std::set<config::UserInput>& inputs) {
     UpdateText();
 }
 
+config::UserInput UserInputCtrl::SingleInput() const {
+    assert(!is_multikey_);
+    if (inputs_.empty()) {
+        return config::UserInput();
+    }
+    return *inputs_.begin();
+}
+
 void UserInputCtrl::Clear() {
     inputs_.clear();
     UpdateText();

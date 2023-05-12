@@ -59,41 +59,6 @@ using std::int32_t;
 
 #include "wxutil.h"
 
-static inline void DoSetAccel(wxMenuItem* mi, wxAcceleratorEntryUnicode* acc)
-{
-    // cannot use SDL keybinding as text without wx assertion error
-    if (acc && acc->GetJoystick() != 0) return;
-
-    wxString lab = mi->GetItemLabel();
-    size_t tab = lab.find(wxT('\t'));
-
-    // following short circuit returns are to avoid UI update on no change
-    if (tab == wxString::npos && !acc)
-        return;
-
-    wxString accs;
-
-    if (acc) {
-        // actually, use keyedit's ToString(), as it is more reliable
-        // and doesn't generate wx assertions
-        // accs = acc->ToString();
-        accs = config::UserInput(acc->GetKeyCode(), acc->GetFlags()).ToLocalizedString();
-    }
-
-    if (tab != wxString::npos && accs == lab.substr(tab + 1))
-        return;
-
-    if (tab != wxString::npos)
-        lab.resize(tab);
-
-    if (acc) {
-        lab.append(wxT('\t'));
-        lab.append(accs);
-    }
-
-    mi->SetItemLabel(lab);
-}
-
 // wxrc helpers (for dynamic strings instead of constant)
 #define XRCID_D(str) wxXmlResource::GetXRCID(str)
 //#define XRCCTRL_D(win, id, type) (wxStaticCast((win).FindWindow(XRCID_D(id)), type))
@@ -117,8 +82,5 @@ static inline const wxCharBuffer UTF8(wxString str)
 {
     return str.mb_str(wxConvUTF8);
 }
-
-// by default, only 9 recent items
-#define wxID_FILE10 (wxID_FILE9 + 1)
 
 #endif /* WX_WXHEAD_H */
