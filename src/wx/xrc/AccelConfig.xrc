@@ -3,7 +3,7 @@
   <object class="wxDialog" name="AccelConfig">
     <title>Key Shortcuts</title>
     <object class="wxBoxSizer">
-      <orient>wxVERTICAL</orient>
+      <flag>wxEXPAND</flag>
       <object class="sizeritem">
         <object class="wxFlexGridSizer">
           <object class="sizeritem">

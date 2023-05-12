@@ -47,6 +47,11 @@ public:
     // Sets this control inputs.
     void SetInputs(const std::set<config::UserInput>& inputs);
 
+    // Helper method to return the single input for no multikey UserInputCtrls.
+    // Asserts if `is_multikey_` is true.
+    // Returns an invalid UserInput if no input is currently set.
+    config::UserInput SingleInput() const;
+
     // Returns the inputs set in this control.
     const std::set<config::UserInput>& inputs() const { return inputs_; }
 

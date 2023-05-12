@@ -7,6 +7,7 @@
 #include <wx/vidmode.h>
 
 #include "config/game-control.h"
+#include "config/shortcuts.h"
 #include "config/user-input.h"
 #include "wxutil.h"
 
@@ -44,7 +45,7 @@ extern struct opts_t {
     int default_stick = 1;
 
     /// Keyboard
-    wxAcceleratorEntry_v accels;
+    config::Shortcuts shortcuts;
 
     /// Core
     int gdb_port = 55555;
@@ -77,9 +78,6 @@ extern struct opts_t {
     // wxWidgets-generated options (opaque)
 } gopts;
 
-extern const wxAcceleratorEntryUnicode default_accels[];
-extern const int num_def_accels;
-
 // call to load config (once)
 // will write defaults for options not present and delete bad opts
 // will also initialize opts[] array translations
@@ -87,6 +85,8 @@ void load_opts(bool first_time_launch);
 // call whenever opt vars change
 // will detect changes and write config if necessary
 void update_opts();
+// Updates the shortcut options.
+void update_shortcut_opts();
 // returns true if option name correct; prints error if val invalid
 void opt_set(const wxString& name, const wxString& val);
 

@@ -762,9 +762,12 @@ set(
     wxutil.cpp
     config/game-control.cpp
     config/internal/option-internal.cpp
+    config/internal/shortcuts-internal.cpp
     config/option-observer.cpp
     config/option.cpp
+    config/shortcuts.cpp
     config/user-input.cpp
+    dialogs/accel-config.cpp
     dialogs/directories-config.cpp
     dialogs/display-config.cpp
     dialogs/game-boy-config.cpp
@@ -808,11 +811,14 @@ set(
     wxutil.h
     config/game-control.h
     config/internal/option-internal.h
+    config/internal/shortcuts-internal.h
     config/option-id.h
     config/option-observer.h
     config/option-proxy.h
     config/option.h
+    config/shortcuts.h
     config/user-input.h
+    dialogs/accel-config.h
     dialogs/directories-config.h
     dialogs/display-config.h
     dialogs/game-boy-config.h
