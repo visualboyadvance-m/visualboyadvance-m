@@ -688,34 +688,18 @@ void BIOS_LZ77UnCompVram()
     while (len > 0) {
         uint8_t d = CPUReadByte(source++);
 
-        if (d) {
-            for (int i = 0; i < 8; i++) {
-                if (d & 0x80) {
-                    uint16_t data = CPUReadByte(source++) << 8;
-                    data |= CPUReadByte(source++);
-                    int length = (data >> 12) + 3;
-                    int offset = (data & 0x0FFF);
-                    uint32_t windowOffset = dest + byteCount - offset - 1;
-                    for (int i2 = 0; i2 < length; i2++) {
-                        writeValue |= (CPUReadByte(windowOffset++) << byteShift);
-                        byteShift += 8;
-                        byteCount++;
-
-                        if (byteCount == 2) {
-                            CPUWriteHalfWord(dest, DowncastU16(writeValue));
-                            dest += 2;
-                            byteCount = 0;
-                            byteShift = 0;
-                            writeValue = 0;
-                        }
-                        len--;
-                        if (len == 0)
-                            return;
-                    }
-                } else {
-                    writeValue |= (CPUReadByte(source++) << byteShift);
+        for (int i = 0; i < 8; i++) {
+            if (d & 0x80) {
+                uint16_t data = CPUReadByte(source++) << 8;
+                data |= CPUReadByte(source++);
+                int length = (data >> 12) + 3;
+                int offset = (data & 0x0FFF);
+                uint32_t windowOffset = dest + byteCount - offset - 1;
+                for (int i2 = 0; i2 < length; i2++) {
+                    writeValue |= (CPUReadByte(windowOffset++) << byteShift);
                     byteShift += 8;
                     byteCount++;
+
                     if (byteCount == 2) {
                         CPUWriteHalfWord(dest, DowncastU16(writeValue));
                         dest += 2;
@@ -724,29 +708,34 @@ void BIOS_LZ77UnCompVram()
                         writeValue = 0;
                     }
                     len--;
-                    if (len == 0)
-                        return;
                 }
-                d <<= 1;
-            }
-        } else {
-            for (int i = 0; i < 8; i++) {
+            } else {
                 writeValue |= (CPUReadByte(source++) << byteShift);
                 byteShift += 8;
                 byteCount++;
                 if (byteCount == 2) {
                     CPUWriteHalfWord(dest, DowncastU16(writeValue));
                     dest += 2;
-                    byteShift = 0;
                     byteCount = 0;
+                    byteShift = 0;
                     writeValue = 0;
                 }
                 len--;
-                if (len == 0)
-                    return;
+            }
+
+            d <<= 1;
+
+            if (len <= 0) {
+                // This can happen if the parameter was incorrectly set. Real
+                // hardware does a buffer overflow so we do it here too.
+                break;
             }
         }
     }
+
+    reg[0].I = source;
+    reg[1].I = dest;
+    reg[3].I = 0;
 }
 
 void BIOS_LZ77UnCompWram()
@@ -772,37 +761,35 @@ void BIOS_LZ77UnCompWram()
     while (len > 0) {
         uint8_t d = CPUReadByte(source++);
 
-        if (d) {
-            for (int i = 0; i < 8; i++) {
-                if (d & 0x80) {
-                    uint16_t data = CPUReadByte(source++) << 8;
-                    data |= CPUReadByte(source++);
-                    int length = (data >> 12) + 3;
-                    int offset = (data & 0x0FFF);
-                    uint32_t windowOffset = dest - offset - 1;
-                    for (int i2 = 0; i2 < length; i2++) {
-                        CPUWriteByte(dest++, CPUReadByte(windowOffset++));
-                        len--;
-                        if (len == 0)
-                            return;
-                    }
-                } else {
-                    CPUWriteByte(dest++, CPUReadByte(source++));
+        for (int i = 0; i < 8; i++) {
+            if (d & 0x80) {
+                uint16_t data = CPUReadByte(source++) << 8;
+                data |= CPUReadByte(source++);
+                int length = (data >> 12) + 3;
+                int offset = (data & 0x0FFF);
+                uint32_t windowOffset = dest - offset - 1;
+                for (int i2 = 0; i2 < length; i2++) {
+                    CPUWriteByte(dest++, CPUReadByte(windowOffset++));
                     len--;
-                    if (len == 0)
-                        return;
                 }
-                d <<= 1;
-            }
-        } else {
-            for (int i = 0; i < 8; i++) {
+            } else {
                 CPUWriteByte(dest++, CPUReadByte(source++));
                 len--;
-                if (len == 0)
-                    return;
+            }
+
+            d <<= 1;
+
+            if (len <= 0) {
+                // This can happen if the parameter was incorrectly set. Real
+                // hardware does a buffer overflow so we do it here too.
+                break;
             }
         }
     }
+
+    reg[0].I = source;
+    reg[1].I = dest;
+    reg[3].I = 0;
 }
 
 void BIOS_ObjAffineSet()
@@ -1695,6 +1682,13 @@ void BIOS_SndDriverVSync()
 
 void BIOS_SndDriverVSyncOff() // 0x1878
 {
+#ifdef GBA_LOGGING
+    if (systemVerbose & VERBOSE_SWI) {
+        log("SndDriverVSyncOff: (VCOUNT = %2d)\n",
+            VCOUNT);
+    }
+#endif
+
     uint32_t const puser1 = CPUReadMemory(0x3007FF0); // 7FC0 + 0x30
     uint32_t user1 = CPUReadMemory(puser1);
 
@@ -1716,6 +1710,20 @@ void BIOS_SndDriverVSyncOff() // 0x1878
         CPUWriteMemory(puser1, (--user1)); // this ret is common among funcs
     }
     //0x18b0
+}
+
+void BIOS_SndDriverVSyncOn()
+{
+#ifdef GBA_LOGGING
+    if (systemVerbose & VERBOSE_SWI) {
+        log("SndDriverVSyncOn: (VCOUNT = %2d)\n",
+            VCOUNT);
+    }
+#endif
+
+    const uint16_t r1 = 0x8600; // 91 << 9
+    CPUWriteHalfWord(base1 + 0x6, r1);
+    CPUWriteHalfWord(base1 + 0x12, r1);
 }
 
 // This functions is verified but lacks proper register settings before calling user func
