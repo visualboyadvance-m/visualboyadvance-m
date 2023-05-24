@@ -2083,8 +2083,8 @@ void CPUSoftwareInterrupt(int comment)
     case 0x02:
 #ifdef GBA_LOGGING
         if (systemVerbose & VERBOSE_SWI) {
-            /*log("Halt: (VCOUNT = %2d)\n",
-          VCOUNT);*/
+            log("Halt: (VCOUNT = %2d)\n",
+                VCOUNT);
         }
 #endif
         holdState = true;
@@ -2094,8 +2094,8 @@ void CPUSoftwareInterrupt(int comment)
     case 0x03:
 #ifdef GBA_LOGGING
         if (systemVerbose & VERBOSE_SWI) {
-            /*log("Stop: (VCOUNT = %2d)\n",
-          VCOUNT);*/
+            log("Stop: (VCOUNT = %2d)\n",
+                VCOUNT);
         }
 #endif
         holdState = true;
@@ -2271,11 +2271,14 @@ void CPUSoftwareInterrupt(int comment)
     case 0x1E:
         BIOS_SndChannelClear();
         break;
+    case 0x1F:
+        BIOS_MidiKey2Freq();
+        break;
     case 0x28:
         BIOS_SndDriverVSyncOff();
         break;
-    case 0x1F:
-        BIOS_MidiKey2Freq();
+    case 0x29:
+        BIOS_SndDriverVSyncOn();
         break;
     case 0xE0:
     case 0xE1:
