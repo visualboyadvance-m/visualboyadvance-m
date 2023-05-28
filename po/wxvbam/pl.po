@@ -1301,111 +1301,111 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:550
 msgid "Use the specified BIOS file for Game Boy"
-msgstr ""
+msgstr "Użyj określonego pliku BIOS dla konsoli Game Boy"
 
 #: config/internal/option-internal.cpp:552
 msgid "Use the specified BIOS file"
-msgstr ""
+msgstr "Użyj określonego pliku BIOS"
 
 #: config/internal/option-internal.cpp:554
 msgid "Use the specified BIOS file for Game Boy Color"
-msgstr ""
+msgstr "Użyj określonego pliku BIOS dla konsoli Game Boy Color"
 
 #: config/internal/option-internal.cpp:555
 msgid "Wait for vertical sync"
-msgstr ""
+msgstr "Zaczekaj na synchronizację pionową"
 
 #: config/internal/option-internal.cpp:559
 msgid "Enter fullscreen mode at startup"
-msgstr ""
+msgstr "Wejdź w tryb pełnoekranowy przy uruchomieniu"
 
 #: config/internal/option-internal.cpp:560
 msgid "Window maximized"
-msgstr ""
+msgstr "Okno zmaksymalizowane"
 
 #: config/internal/option-internal.cpp:562
 msgid "Window height at startup"
-msgstr ""
+msgstr "Wysokość okna przy uruchomieniu"
 
 #: config/internal/option-internal.cpp:563
 msgid "Window width at startup"
-msgstr ""
+msgstr "Szerokość okna przy uruchomieniu"
 
 #: config/internal/option-internal.cpp:564
 msgid "Window axis X position at startup"
-msgstr ""
+msgstr "Położenie osi X okna przy uruchomieniu"
 
 #: config/internal/option-internal.cpp:565
 msgid "Window axis Y position at startup"
-msgstr ""
+msgstr "Położenie osi Y okna przy uruchomieniu"
 
 #: config/internal/option-internal.cpp:570
 msgid "Capture key events while on background"
-msgstr ""
+msgstr "Przechwyć kluczowe zdarzenia w tle"
 
 #: config/internal/option-internal.cpp:573
 msgid "Capture joy events while on background"
-msgstr ""
+msgstr "Przechwyć radosne zdarzenia w tle"
 
 #: config/internal/option-internal.cpp:574
 msgid "Hide menu bar when mouse is inactive"
-msgstr ""
+msgstr "Ukryj pasek menu, gdy mysz jest nieaktywna"
 
 #: config/internal/option-internal.cpp:575
 msgid "Suspend screensaver when game is running"
-msgstr ""
+msgstr "Zawieś wygaszacz ekranu, gdy gra jest uruchomiona"
 
 #: config/internal/option-internal.cpp:579
 msgid "Sound API; if unsupported, default API will be used"
-msgstr ""
+msgstr "Interfejs API dźwięku; jeśli nie jest obsługiwany, użyty zostanie domyślny interfejs API"
 
 #: config/internal/option-internal.cpp:581
 msgid "Device ID of chosen audio device for chosen driver"
-msgstr ""
+msgstr "Identyfikator urządzenia wybranego urządzenia audio dla wybranego sterownika"
 
 #: config/internal/option-internal.cpp:582
 msgid "Number of sound buffers"
-msgstr ""
+msgstr "Liczba buforów dźwięku"
 
 #: config/internal/option-internal.cpp:583
 msgid "Bit mask of sound channels to enable"
-msgstr ""
+msgstr "Maska bitowa kanałów dźwięku do włączenia"
 
 #: config/internal/option-internal.cpp:585
 msgid "Game Boy Advance sound filtering (%)"
-msgstr ""
+msgstr "Filtrowanie dźwięku konsoli Game Boy Advance (%)"
 
 #: config/internal/option-internal.cpp:587
 msgid "Game Boy Advance sound interpolation"
-msgstr ""
+msgstr "Interpolacja dźwięku konsoli Game Boy Advance"
 
 #: config/internal/option-internal.cpp:589
 msgid "Game Boy sound declicking"
-msgstr ""
+msgstr "Tłumienie kliknięć dźwięku konsoli Game Boy"
 
 #: config/internal/option-internal.cpp:590
 msgid "Game Boy echo effect (%)"
-msgstr ""
+msgstr "Efekt echa konsoli Game Boy (%)"
 
 #: config/internal/option-internal.cpp:592
 msgid "Enable Game Boy sound effects"
-msgstr ""
+msgstr "Włącz efekty dźwiękowe konsoli Game Boy"
 
 #: config/internal/option-internal.cpp:593
 msgid "Game Boy stereo effect (%)"
-msgstr ""
+msgstr "Efekt stereo konsoli Game Boy (%)"
 
 #: config/internal/option-internal.cpp:595
 msgid "Game Boy surround sound effect (%)"
-msgstr ""
+msgstr "Efekt dźwięku przestrzennego konsoli Game Boy (%)"
 
 #: config/internal/option-internal.cpp:596
 msgid "Sound sample rate (kHz)"
-msgstr ""
+msgstr "Częstotliwość próbkowania dźwięku (kHz)"
 
 #: config/internal/option-internal.cpp:597
 msgid "Sound volume (%)"
-msgstr ""
+msgstr "Głośność dźwięku (%)"
 
 #: config/internal/option-internal.cpp:663
 #: config/internal/option-internal.cpp:683
@@ -1414,7 +1414,7 @@ msgstr ""
 #: config/internal/option-internal.cpp:744
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
-msgstr ""
+msgstr "Nieprawidłowa wartość %s dla opcji %s; prawidłowe wartości to %s"
 
 #: config/option.cpp:327
 #, c-format
@@ -1429,159 +1429,159 @@ msgstr "Nieprawidłowa wartość %d dla opcji %s; prawidłowe wartości to %d - 
 #: config/option.cpp:455
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %s"
-msgstr ""
+msgstr "Nieprawidłowa wartość %d dla opcji %s; prawidłowe wartości to %s"
 
 #: config/user-input.cpp:23
 msgid "Backspace"
-msgstr ""
+msgstr "Backspace"
 
 #: config/user-input.cpp:24
 msgid "Delete"
-msgstr ""
+msgstr "Delete"
 
 #: config/user-input.cpp:25
 msgid "Page Up"
-msgstr ""
+msgstr "Page Up"
 
 #: config/user-input.cpp:26
 msgid "Page Down"
-msgstr ""
+msgstr "Page Down"
 
 #: config/user-input.cpp:27
 msgid "Num Lock"
-msgstr ""
+msgstr "Num Lock"
 
 #: config/user-input.cpp:28
 msgid "Scroll Lock"
-msgstr ""
+msgstr "Scroll Lock"
 
 #: config/user-input.cpp:31
 msgid "Num Space"
-msgstr ""
+msgstr "Num Space"
 
 #: config/user-input.cpp:32
 msgid "Num Tab"
-msgstr ""
+msgstr "Num Tab"
 
 #: config/user-input.cpp:33
 msgid "Num Enter"
-msgstr ""
+msgstr "Num Enter"
 
 #: config/user-input.cpp:34
 msgid "Num Home"
-msgstr ""
+msgstr "Num Home"
 
 #: config/user-input.cpp:35
 msgid "Num left"
-msgstr ""
+msgstr "Num left"
 
 #: config/user-input.cpp:36
 msgid "Num Up"
-msgstr ""
+msgstr "Num Up"
 
 #: config/user-input.cpp:37
 msgid "Num Right"
-msgstr ""
+msgstr "Num Right"
 
 #: config/user-input.cpp:38
 msgid "Num Down"
-msgstr ""
+msgstr "Num Down"
 
 #: config/user-input.cpp:39
 msgid "Num PageUp"
-msgstr ""
+msgstr "Num PageUp"
 
 #: config/user-input.cpp:40
 msgid "Num PageDown"
-msgstr ""
+msgstr "Num PageDown"
 
 #: config/user-input.cpp:41
 msgid "Num End"
-msgstr ""
+msgstr "Num End"
 
 #: config/user-input.cpp:42
 msgid "Num Begin"
-msgstr ""
+msgstr "Num Begin"
 
 #: config/user-input.cpp:43
 msgid "Num Insert"
-msgstr ""
+msgstr "Num Insert"
 
 #: config/user-input.cpp:44
 msgid "Num Delete"
-msgstr ""
+msgstr "Num Delete"
 
 #: config/user-input.cpp:45
 msgid "Num ="
-msgstr ""
+msgstr "Num ="
 
 #: config/user-input.cpp:46
 msgid "Num *"
-msgstr ""
+msgstr "Num *"
 
 #: config/user-input.cpp:47
 msgid "Num +"
-msgstr ""
+msgstr "Num +"
 
 #: config/user-input.cpp:48
 msgid "Num ,"
-msgstr ""
+msgstr "Num ,"
 
 #: config/user-input.cpp:49
 msgid "Num -"
-msgstr ""
+msgstr "Num -"
 
 #: config/user-input.cpp:50
 msgid "Num ."
-msgstr ""
+msgstr "Num ."
 
 #: config/user-input.cpp:51
 msgid "Num /"
-msgstr ""
+msgstr "Num /"
 
 #: config/user-input.cpp:55
 msgid "Volume Mute"
-msgstr ""
+msgstr "Wyciszenie głośności"
 
 #: config/user-input.cpp:56
 msgid "Volume Down"
-msgstr ""
+msgstr "Zmniejszenie głośności"
 
 #: config/user-input.cpp:57
 msgid "Volume Up"
-msgstr ""
+msgstr "Zwiększenie głośności"
 
 #: config/user-input.cpp:58
 msgid "Next Track"
-msgstr ""
+msgstr "Następny utwór"
 
 #: config/user-input.cpp:59
 msgid "Previous Track"
-msgstr ""
+msgstr "Poprzedni utwór"
 
 #: config/user-input.cpp:60
 msgid "Stop"
-msgstr ""
+msgstr "Zatrzymaj"
 
 #: config/user-input.cpp:61
 msgid "Play/Pause"
-msgstr ""
+msgstr "Odtwarzanie/Pauza"
 
 #: config/user-input.cpp:94
 msgid "Alt+"
-msgstr ""
+msgstr "Alt+"
 
 #: config/user-input.cpp:97
 msgid "Ctrl+"
-msgstr ""
+msgstr "Ctrl+"
 
 #: config/user-input.cpp:101
 msgid "Rawctrl+"
-msgstr ""
+msgstr "Rawctrl+"
 
 #: config/user-input.cpp:105
 msgid "Shift+"
-msgstr ""
+msgstr "Shift+"
 
 #: config/user-input.cpp:108
 msgid "Meta+"
@@ -1589,19 +1589,19 @@ msgstr "Meta+"
 
 #: config/user-input.cpp:135
 msgid "Alt"
-msgstr ""
+msgstr "Alt"
 
 #: config/user-input.cpp:136
 msgid "Shift"
-msgstr ""
+msgstr "Shift"
 
 #: config/user-input.cpp:138 config/user-input.cpp:141
 msgid "Ctrl"
-msgstr ""
+msgstr "Ctrl"
 
 #: config/user-input.cpp:139
 msgid "Cmd"
-msgstr ""
+msgstr "Cmd"
 
 #: dialogs/accel-config.cpp:156
 msgid "Menu commands"
@@ -1618,7 +1618,7 @@ msgstr "Potwierdź "
 #: dialogs/accel-config.cpp:302
 #, c-format
 msgid "This will unassign \"%s\" from \"%s\". Are you sure?"
-msgstr ""
+msgstr "Spowoduje to usunięcie przypisania \"%s\" z \"%s\". Czy na pewno?"
 
 #: dialogs/directories-config.cpp:50
 msgid "Browse"
@@ -1626,7 +1626,7 @@ msgstr "Przeglądaj"
 
 #: dialogs/display-config.cpp:54
 msgid "Invalid value for Default magnification."
-msgstr ""
+msgstr "Nieprawidłowa wartość dla domyślnego powiększenia."
 
 #: dialogs/display-config.cpp:341 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
@@ -1648,12 +1648,12 @@ msgstr "Wtyczka"
 #: dialogs/display-config.cpp:417
 #, c-format
 msgid "Using pixel filter: %s"
-msgstr ""
+msgstr "Używany filtr pikseli: %s"
 
 #: dialogs/display-config.cpp:424
 #, c-format
 msgid "Using interframe blending: %s"
-msgstr ""
+msgstr "Używane mieszanie międzyklatkowe: %s"
 
 #: dialogs/game-boy-config.cpp:142 xrc/GameBoyAdvanceConfig.xrc:122
 #: xrc/GameBoyConfig.xrc:138 xrc/GameBoyConfig.xrc:159
@@ -1666,186 +1666,186 @@ msgstr "Nieznany"
 
 #: dialogs/game-maker.cpp:235
 msgid "Invalid"
-msgstr ""
+msgstr "Nieprawidłowy"
 
 #: dialogs/gb-rom-info.cpp:21
 msgid "No mapper"
-msgstr ""
+msgstr "Brak mappera"
 
 #: dialogs/gb-rom-info.cpp:24
 msgid "MBC1"
-msgstr ""
+msgstr "MBC1"
 
 #: dialogs/gb-rom-info.cpp:27
 msgid "MBC2"
-msgstr ""
+msgstr "MBC2"
 
 #: dialogs/gb-rom-info.cpp:30
 msgid "MBC3"
-msgstr ""
+msgstr "MBC3"
 
 #: dialogs/gb-rom-info.cpp:33
 msgid "MBC5"
-msgstr ""
+msgstr "MBC5"
 
 #: dialogs/gb-rom-info.cpp:36
 msgid "MBC6"
-msgstr ""
+msgstr "MBC6"
 
 #: dialogs/gb-rom-info.cpp:39
 msgid "MBC7"
-msgstr ""
+msgstr "MBC7"
 
 #: dialogs/gb-rom-info.cpp:42
 msgid "Pocket Camera"
-msgstr ""
+msgstr "Kamera kieszonkowa"
 
 #: dialogs/gb-rom-info.cpp:45
 msgid "MMM01"
-msgstr ""
+msgstr "MMM01"
 
 #: dialogs/gb-rom-info.cpp:48
 msgid "HuC-1"
-msgstr ""
+msgstr "HuC-1"
 
 #: dialogs/gb-rom-info.cpp:51
 msgid "HuC-3"
-msgstr ""
+msgstr "HuC-3"
 
 #: dialogs/gb-rom-info.cpp:54
 msgid "Bandai TAMA5"
-msgstr ""
+msgstr "Bandai TAMA5"
 
 #: dialogs/gb-rom-info.cpp:67
 msgid " + RAM"
-msgstr ""
+msgstr " + RAM"
 
 #: dialogs/gb-rom-info.cpp:68
 msgid " + RTC"
-msgstr ""
+msgstr " + RTC"
 
 #: dialogs/gb-rom-info.cpp:69
 msgid " + Battery"
-msgstr ""
+msgstr " + Bateria"
 
 #: dialogs/gb-rom-info.cpp:70
 msgid " + Rumble"
-msgstr ""
+msgstr " + Dudnienie"
 
 #: dialogs/gb-rom-info.cpp:71
 msgid " + Motion Sensor"
-msgstr ""
+msgstr " + Czujnik Ruchu"
 
 #: dialogs/gb-rom-info.cpp:73
 #, c-format
 msgid "%02X (%s%s%s%s%s%s)"
-msgstr ""
+msgstr "%02X (%s%s%s%s%s%s)"
 
 #: dialogs/gb-rom-info.cpp:80 dialogs/gb-rom-info.cpp:92
 #, c-format
 msgid "%02X (Supported)"
-msgstr ""
+msgstr "%02X (Obsługiwany)"
 
 #: dialogs/gb-rom-info.cpp:82 dialogs/gb-rom-info.cpp:90
 #, c-format
 msgid "%02X (Not supported)"
-msgstr ""
+msgstr "%02X (Nieobsługiwany)"
 
 #: dialogs/gb-rom-info.cpp:94
 #, c-format
 msgid "%02X (Required)"
-msgstr ""
+msgstr "%02X (Wymagany)"
 
 #: dialogs/gb-rom-info.cpp:106 dialogs/gb-rom-info.cpp:140
 #, c-format
 msgid "%02X (32 KiB)"
-msgstr ""
+msgstr "%02X (32 KiB)"
 
 #: dialogs/gb-rom-info.cpp:108 dialogs/gb-rom-info.cpp:144
 #, c-format
 msgid "%02X (64 KiB)"
-msgstr ""
+msgstr "%02X (64 KiB)"
 
 #: dialogs/gb-rom-info.cpp:110 dialogs/gb-rom-info.cpp:142
 #, c-format
 msgid "%02X (128 KiB)"
-msgstr ""
+msgstr "%02X (128 KiB)"
 
 #: dialogs/gb-rom-info.cpp:112
 #, c-format
 msgid "%02X (256 KiB)"
-msgstr ""
+msgstr "%02X (256 KiB)"
 
 #: dialogs/gb-rom-info.cpp:114
 #, c-format
 msgid "%02X (512 KiB)"
-msgstr ""
+msgstr "%02X (512 KiB)"
 
 #: dialogs/gb-rom-info.cpp:116
 #, c-format
 msgid "%02X (1 MiB)"
-msgstr ""
+msgstr "%02X (1 MiB)"
 
 #: dialogs/gb-rom-info.cpp:118
 #, c-format
 msgid "%02X (2 MiB)"
-msgstr ""
+msgstr "%02X (2 MiB)"
 
 #: dialogs/gb-rom-info.cpp:120
 #, c-format
 msgid "%02X (4 MiB)"
-msgstr ""
+msgstr "%02X (4 MiB)"
 
 #: dialogs/gb-rom-info.cpp:122 dialogs/gb-rom-info.cpp:146
 #: dialogs/gb-rom-info.cpp:158
 #, c-format
 msgid "%02X (Unknown)"
-msgstr ""
+msgstr "%02X(Nieznany)"
 
 #: dialogs/gb-rom-info.cpp:130
 #, c-format
 msgid "%02X (None)"
-msgstr ""
+msgstr "%02X (Brak)"
 
 #: dialogs/gb-rom-info.cpp:132
 #, c-format
 msgid "%02X (256 B)"
-msgstr ""
+msgstr "%02X (256 B)"
 
 #: dialogs/gb-rom-info.cpp:134
 #, c-format
 msgid "%02X (512 B)"
-msgstr ""
+msgstr "%02X (512 B)"
 
 #: dialogs/gb-rom-info.cpp:136
 #, c-format
 msgid "%02X (2 KiB)"
-msgstr ""
+msgstr "%02X (2 KiB)"
 
 #: dialogs/gb-rom-info.cpp:138
 #, c-format
 msgid "%02X (8 KiB)"
-msgstr ""
+msgstr "%02X (8 KiB)"
 
 #: dialogs/gb-rom-info.cpp:154
 #, c-format
 msgid "%02X (Japan)"
-msgstr ""
+msgstr "%02X (Japonia)"
 
 #: dialogs/gb-rom-info.cpp:156
 #, c-format
 msgid "%02X (World)"
-msgstr ""
+msgstr "%02X (Świat)"
 
 #: dialogs/gb-rom-info.cpp:208
 #, c-format
 msgid "%02X (Actual: %02X)"
-msgstr ""
+msgstr "%02X (Aktualny: %02X)"
 
 #: dialogs/gb-rom-info.cpp:211
 #, c-format
 msgid "%04X (Actual: %04X)"
-msgstr ""
+msgstr "%04X (Aktualny: %04X)"
 
 #: widgets/sdljoy.cpp:188
 #, c-format
@@ -1892,7 +1892,7 @@ msgstr "FAudio: Tworzenie głosu źródłowego nie powiodło się!"
 #: dsound.cpp:89 dsound.cpp:103
 #, c-format
 msgid "Cannot create Direct Sound %08x"
-msgstr ""
+msgstr "Nie można utworzyć dźwięku bezpośredniego %08x"
 
 #: dsound.cpp:108
 #, c-format
@@ -2028,7 +2028,7 @@ msgstr "Szesnastkowy"
 
 #: xrc/CheatCreate.xrc:97
 msgid "Signed / Unsigned"
-msgstr ""
+msgstr "Podpisany / Niepodpisany"
 
 #: xrc/CheatCreate.xrc:107
 msgid "&8 bits"
@@ -2335,7 +2335,7 @@ msgstr "Filtry"
 
 #: xrc/DisplayConfig.xrc:79
 msgid "Display filter:"
-msgstr ""
+msgstr "Filtr wyświetlania:"
 
 #: xrc/DisplayConfig.xrc:86
 msgid "2xSaI"
@@ -2355,7 +2355,7 @@ msgstr "Pikselizacja"
 
 #: xrc/DisplayConfig.xrc:90
 msgid "Advance MAME Scale 2x"
-msgstr ""
+msgstr "Advance MAME Scale 2x"
 
 #: xrc/DisplayConfig.xrc:91
 msgid "Bilinear"
@@ -2423,15 +2423,15 @@ msgstr "xBRZ 6x"
 
 #: xrc/DisplayConfig.xrc:115
 msgid "Plugin:"
-msgstr ""
+msgstr "Wtyczka:"
 
 #: xrc/DisplayConfig.xrc:127
 msgid "Interframe blending:"
-msgstr ""
+msgstr "Mieszanie międzyklatkowe:"
 
 #: xrc/DisplayConfig.xrc:136
 msgid "Smart"
-msgstr ""
+msgstr "Mądry"
 
 #: xrc/DisplayConfig.xrc:137
 msgid "Motion Blur"
@@ -2447,7 +2447,7 @@ msgstr "Pomijanie klatek"
 
 #: xrc/DisplayConfig.xrc:177
 msgid "&Number of frames to skip:"
-msgstr ""
+msgstr "Liczba klatek do pominięcia:"
 
 #: xrc/DisplayConfig.xrc:199
 msgid "Speed"
@@ -2455,7 +2455,7 @@ msgstr "Prędkość"
 
 #: xrc/DisplayConfig.xrc:215
 msgid "Speed indicator:"
-msgstr ""
+msgstr "Wskaźnik prędkości:"
 
 #: xrc/DisplayConfig.xrc:222
 msgid "Percentage"
@@ -2471,11 +2471,11 @@ msgstr "Wyświetlanie na ekranie"
 
 #: xrc/DisplayConfig.xrc:247
 msgid "Default magnification:"
-msgstr ""
+msgstr "Domyślne powiększenie:"
 
 #: xrc/DisplayConfig.xrc:266
 msgid "Maximum magnification factor:"
-msgstr ""
+msgstr "Maksymalny współczynnik powiększenia:"
 
 #: xrc/DisplayConfig.xrc:267
 msgid "0 = no maximum"
@@ -2559,7 +2559,7 @@ msgstr "Informacje o pamięci ROM"
 
 #: xrc/GBColorPrefPanel.xrc:9
 msgid "Custom"
-msgstr ""
+msgstr "Niestandardowy"
 
 #: xrc/GBColorPrefPanel.xrc:10 xrc/JoyPanel.xrc:247
 msgid "Standard"
@@ -2591,11 +2591,11 @@ msgstr "Dziwne kolory"
 
 #: xrc/GBColorPrefPanel.xrc:17
 msgid "Real Game Boy Colors"
-msgstr ""
+msgstr "Prawdziwe kolory konsoli Game Boy"
 
 #: xrc/GBColorPrefPanel.xrc:18
 msgid "Real 'Game Boy on Game Boy Advance Special' Colors"
-msgstr ""
+msgstr "Prawdziwe kolory \"konsoli Game Boy na konsoli Game Boy Advance Special\""
 
 #: xrc/GBColorPrefPanel.xrc:46 xrc/GBPaletteViewer.xrc:17 xrc/MapViewer.xrc:54
 #: xrc/PaletteViewer.xrc:19
@@ -2802,11 +2802,11 @@ msgstr "Typ kartridża:"
 
 #: xrc/GBROMInfo.xrc:60
 msgid "SGB code:"
-msgstr ""
+msgstr "Kod SGB:"
 
 #: xrc/GBROMInfo.xrc:72
 msgid "CGB code:"
-msgstr ""
+msgstr "Kod CGB:"
 
 #: xrc/GBROMInfo.xrc:84
 msgid "ROM size:"
@@ -2826,11 +2826,11 @@ msgstr "Kod licencji:"
 
 #: xrc/GBROMInfo.xrc:144
 msgid "Header checksum:"
-msgstr ""
+msgstr "Suma kontrolna nagłówka:"
 
 #: xrc/GBROMInfo.xrc:156
 msgid "Cartridge checksum:"
-msgstr ""
+msgstr "Suma kontrolna kartridża:"
 
 #: xrc/GBTileViewer.xrc:14
 msgid "&0"
@@ -2858,7 +2858,7 @@ msgstr "Ustawienia konsoli Game Boy Advance"
 
 #: xrc/GameBoyAdvanceConfig.xrc:21
 msgid "Save type:"
-msgstr ""
+msgstr "Typ zapisu:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
 #: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
@@ -2883,15 +2883,15 @@ msgstr "EEPROM + Czujnik"
 
 #: xrc/GameBoyAdvanceConfig.xrc:43
 msgid "Flash size:"
-msgstr ""
+msgstr "Rozmiar pamięci flash:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
 msgid "64 K"
-msgstr ""
+msgstr "64 K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:50 xrc/GameBoyAdvanceConfig.xrc:222
 msgid "128 K"
-msgstr ""
+msgstr "128 K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:64
 msgid "Detect Now"
@@ -2907,11 +2907,11 @@ msgstr "Typ zapisu"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file:"
-msgstr ""
+msgstr "Plik BIOSu:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file:"
-msgstr ""
+msgstr "Aktualny plik BIOSu:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:136 xrc/GameBoyConfig.xrc:168
 msgid "Boot ROM"
@@ -2965,11 +2965,11 @@ msgstr "Przedefiniowanie ustawień gry"
 
 #: xrc/GameBoyConfig.xrc:4
 msgid "Game Boy settings"
-msgstr ""
+msgstr "Ustawienia konsoli Game Boy"
 
 #: xrc/GameBoyConfig.xrc:20
 msgid "Emulated &system:"
-msgstr ""
+msgstr "Emulowana konsola:"
 
 #: xrc/GameBoyConfig.xrc:30
 msgid "Game Boy Color"
@@ -2993,7 +2993,7 @@ msgstr "Super Game Boy 2"
 
 #: xrc/GameBoyConfig.xrc:48
 msgid "Display &borders:"
-msgstr ""
+msgstr "Wyświetl obramowanie:"
 
 #: xrc/GameBoyConfig.xrc:57
 msgid "Never"
@@ -3009,7 +3009,7 @@ msgstr "Konsola"
 
 #: xrc/GameBoyConfig.xrc:84
 msgid "Game Boy Boot &ROM file:"
-msgstr ""
+msgstr "Plik rozruchowej pamięci ROM konsoli Game Boy:"
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
@@ -3017,15 +3017,15 @@ msgstr "Wybierz plik"
 
 #: xrc/GameBoyConfig.xrc:106
 msgid "Game Boy Color Boot ROM &file:"
-msgstr ""
+msgstr "Plik rozruchowej pamięci ROM konsoli Game Boy Color:"
 
 #: xrc/GameBoyConfig.xrc:131
 msgid "Current Game Boy BIOS file:"
-msgstr ""
+msgstr "Aktualny plik BIOSu konsoli Game Boy:"
 
 #: xrc/GameBoyConfig.xrc:152
 msgid "Current Game Boy Color BIOS file:"
-msgstr ""
+msgstr "Aktualny plik BIOSu konsoli Game Boy Color:"
 
 #: xrc/GameBoyConfig.xrc:186
 msgid "User 1"
@@ -3061,7 +3061,7 @@ msgstr "BMP"
 
 #: xrc/GeneralConfig.xrc:57
 msgid "&Rewind interval:"
-msgstr ""
+msgstr "Przewiń wstecz o:"
 
 #: xrc/GeneralConfig.xrc:58
 msgid "If not empty or 0, enable rewind (seconds)"
@@ -3077,7 +3077,7 @@ msgstr "Kontrola prędkości"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "percent of normal:"
-msgstr ""
+msgstr "procent normalnej prędkości:"
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
@@ -3168,7 +3168,7 @@ msgid ""
 "Click a field and press a key or move joystick to add. Press backspace to "
 "delete last added key. Resize window or click inside and move pointer to see"
 " entire contents if too small."
-msgstr ""
+msgstr "Kliknij pole i naciśnij klawisz lub przesuń joystick, aby dodać. Naciśnij backspace, aby usunąć ostatnio dodany klawisz. Zmień rozmiar okna lub kliknij wewnątrz i przesuń wskaźnik, aby zobaczyć całą zawartość, jeśli jest zbyt mała."
 
 #: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:456
 msgid "Up"
@@ -3496,7 +3496,7 @@ msgstr "Plik baterii..."
 
 #: xrc/MainMenu.xrc:161
 msgid "Game Shark &code file..."
-msgstr ""
+msgstr "Plik kodów Game Shark..."
 
 #: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
 msgid "&Game Shark snapshot..."
@@ -3596,7 +3596,7 @@ msgstr "Pomiń BIOS"
 
 #: xrc/MainMenu.xrc:255
 msgid "&Auto IPS / UPS / IPF patch"
-msgstr ""
+msgstr "Autozastosowanie poprawek IPS / UPS / IPF"
 
 #: xrc/MainMenu.xrc:259
 msgid "&Pause when inactive"
@@ -3616,7 +3616,7 @@ msgstr "Połączenie"
 
 #: xrc/MainMenu.xrc:272
 msgid "Start &Network Link..."
-msgstr ""
+msgstr "Rozpocznij połączenie sieciowe..."
 
 #: xrc/MainMenu.xrc:277
 msgid "&Nothing"
@@ -3632,7 +3632,7 @@ msgstr "Bezprzewodowy"
 
 #: xrc/MainMenu.xrc:289
 msgid "&Game Cube"
-msgstr ""
+msgstr "Game Cube"
 
 #: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:521
 msgid "&Game Boy"
@@ -3653,7 +3653,7 @@ msgstr "Złamanie prędkości"
 #: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:387
 #: xrc/MainMenu.xrc:423
 msgid "&Configure..."
-msgstr ""
+msgstr "Konfiguruj..."
 
 #: xrc/MainMenu.xrc:314
 msgid "&Video"
@@ -3741,19 +3741,19 @@ msgstr "Wł./Wył. dźwięk"
 
 #: xrc/MainMenu.xrc:403
 msgid "&Game Boy Advance sound interpolation"
-msgstr ""
+msgstr "Interpolacja dźwięku konsoli Game Boy Advance"
 
 #: xrc/MainMenu.xrc:408
 msgid "&Game Boy sound enhancement"
-msgstr ""
+msgstr "Ulepszenie dźwięku konsoli Game Boy"
 
 #: xrc/MainMenu.xrc:412
 msgid "&Game Boy surround sound effect"
-msgstr ""
+msgstr "Efekt dźwięku przestrzennego konsoli Game Boy"
 
 #: xrc/MainMenu.xrc:416
 msgid "&Game Boy sound declicking"
-msgstr ""
+msgstr "Tłumienie kliknięć dźwięku konsoli Game Boy"
 
 #: xrc/MainMenu.xrc:421
 msgid "&Input"
@@ -3797,7 +3797,7 @@ msgstr "Game Boy Advance"
 
 #: xrc/MainMenu.xrc:500 xrc/MainMenu.xrc:523
 msgid "Configure..."
-msgstr ""
+msgstr "Konfiguruj..."
 
 #: xrc/MainMenu.xrc:504
 msgid "&Real-time clock"
@@ -3817,15 +3817,15 @@ msgstr "Filtr LCD"
 
 #: xrc/MainMenu.xrc:527
 msgid "&Game Boy color option"
-msgstr ""
+msgstr "Opcja koloru konsoli Game Boy"
 
 #: xrc/MainMenu.xrc:535
 msgid "&Game Boy Colorizer Hack (requires restart)"
-msgstr ""
+msgstr "Hack Koloryzatora konsoli Game Boy (wymaga ponownego uruchomienia)"
 
 #: xrc/MainMenu.xrc:539
 msgid "&Game Boy printer"
-msgstr ""
+msgstr "Drukarka konsoli Game Boy"
 
 #: xrc/MainMenu.xrc:543
 msgid "&Gather a full page before printing"
@@ -3837,31 +3837,31 @@ msgstr "Zapisz wydruki jako zrzuty ekranu"
 
 #: xrc/MainMenu.xrc:552
 msgid "&Use Game Boy BIOS file (requires restart)"
-msgstr ""
+msgstr "Użyj pliku BIOS konsoli Game Boy (wymaga ponownego uruchomienia)"
 
 #: xrc/MainMenu.xrc:556
 msgid "&Use Game Boy Color BIOS file"
-msgstr ""
+msgstr "Użyj pliku BIOS konsoli Game Boy Color"
 
 #: xrc/MainMenu.xrc:561
 msgid "&General..."
-msgstr ""
+msgstr "Ogólne..."
 
 #: xrc/MainMenu.xrc:564
 msgid "&Speedup / Turbo..."
-msgstr ""
+msgstr "Przyśpieszenie / Turbo..."
 
 #: xrc/MainMenu.xrc:567
 msgid "D&irectories..."
-msgstr ""
+msgstr "Katalogi..."
 
 #: xrc/MainMenu.xrc:570
 msgid "&Key Shortcuts..."
-msgstr ""
+msgstr "Skróty klawiszowe..."
 
 #: xrc/MainMenu.xrc:573
 msgid "&UI Settings..."
-msgstr ""
+msgstr "Ustawienia interfejsu użytkownika..."
 
 #: xrc/MainMenu.xrc:577
 msgid "&Tools"
@@ -3873,15 +3873,15 @@ msgstr "Kody"
 
 #: xrc/MainMenu.xrc:581
 msgid "List &cheats..."
-msgstr ""
+msgstr "Lista kodów..."
 
 #: xrc/MainMenu.xrc:584
 msgid "Find c&heat..."
-msgstr ""
+msgstr "Znajdź kod..."
 
 #: xrc/MainMenu.xrc:588
 msgid "A&utomatically save / load cheats"
-msgstr ""
+msgstr "Automatycznie zapisz / wczytaj kody"
 
 #: xrc/MainMenu.xrc:592
 msgid "&Enable cheats"
@@ -4017,7 +4017,7 @@ msgstr "Zgłoś błędy"
 
 #: xrc/MainMenu.xrc:727
 msgid "Visual Boy Advance-M Support &Forum"
-msgstr ""
+msgstr "Forum wsparcia dla Visual Boy Advance-M"
 
 #: xrc/MainMenu.xrc:730
 msgid "Translations"
@@ -4053,19 +4053,19 @@ msgstr "Klatka"
 
 #: xrc/MapViewer.xrc:35
 msgid "BG 0"
-msgstr ""
+msgstr "Tło 0"
 
 #: xrc/MapViewer.xrc:41
 msgid "BG 1"
-msgstr ""
+msgstr "Tło 1"
 
 #: xrc/MapViewer.xrc:46
 msgid "BG 2"
-msgstr ""
+msgstr "Tło 2"
 
 #: xrc/MapViewer.xrc:51
 msgid "BG 3"
-msgstr ""
+msgstr "Tło 3"
 
 #: xrc/MapViewer.xrc:84
 msgid "Map Base:"
@@ -4173,7 +4173,7 @@ msgstr "Ustawienia dźwięku"
 
 #: xrc/SoundConfig.xrc:16
 msgid "Volume:"
-msgstr ""
+msgstr "Głośność:"
 
 #: xrc/SoundConfig.xrc:34
 msgid "Mute"
@@ -4185,7 +4185,7 @@ msgstr "Maksymalna"
 
 #: xrc/SoundConfig.xrc:71
 msgid "Sample rate:"
-msgstr ""
+msgstr "Częstotliwość próbkowania:"
 
 #: xrc/SoundConfig.xrc:77
 msgid "48 KHz"
@@ -4213,7 +4213,7 @@ msgstr "OpenAL"
 
 #: xrc/SoundConfig.xrc:118
 msgid "Direct Sound"
-msgstr ""
+msgstr "Direct Sound"
 
 #: xrc/SoundConfig.xrc:125
 msgid "XAudio2"
@@ -4261,7 +4261,7 @@ msgstr "Środek"
 
 #: xrc/SoundConfig.xrc:269
 msgid "Left / Right"
-msgstr ""
+msgstr "Lewo / Prawo"
 
 #: xrc/SoundConfig.xrc:298
 msgid "Sound filtering"
@@ -4325,4 +4325,4 @@ msgstr "Ukryj pasek menu"
 
 #: xrc/UIConfig.xrc:16
 msgid "Suspend ScreenSaver"
-msgstr ""
+msgstr "Zawieszenie wygaszacza ekranu"
