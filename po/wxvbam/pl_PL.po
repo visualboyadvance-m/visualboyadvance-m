@@ -1257,7 +1257,7 @@ msgstr "Włącz RTC (nadpisanie vba-over.ini to rtcEnabled)"
 
 #: config/internal/option-internal.cpp:529
 msgid "Native save (\"battery\") hardware type"
-msgstr ""
+msgstr "Typ sprzętu natywnego zapisu (\"bateryjnego\")"
 
 #: config/internal/option-internal.cpp:530
 msgid "Show speed indicator"
