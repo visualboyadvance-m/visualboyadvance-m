@@ -132,7 +132,7 @@ else
 fi
 
 table_line_append DIST_PATCHES glib " \
-    https://gist.githubusercontent.com/rkitover/05fb70a11cc8ddcea11230b4dc5fd48b/raw/b44288a2357acd4da62ee5f07ee106d36c91b887/macOS-glib-link-static-libintl-gettext.patch \
+    https://gist.githubusercontent.com/rkitover/9f3cceac7eaa9625ce605f052c56f3ba/raw/2ceb1de9a9592e39a657141684beae4e4b33abcd/glib-static-gettext.patch \
 "
 
 stdint_h=

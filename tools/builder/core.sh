@@ -177,7 +177,7 @@ DISTS=$DISTS'
     ninja           https://github.com/ninja-build/ninja/archive/v1.11.1.tar.gz                                 bin/ninja
     meson           https://github.com/mesonbuild/meson/releases/download/0.63.2/meson-0.63.2.tar.gz            bin/meson
 
-    glib            https://gitlab.gnome.org/GNOME/glib/-/archive/51251940640b217ed2f1bf83ce7560cecef66bb7/glib-51251940640b217ed2f1bf83ce7560cecef66bb7.tar.bz2  lib/libglib-2.0.a
+    glib            https://gitlab.gnome.org/GNOME/glib/-/archive/6fc6d9ea3e497e2b77789a61bc9cf80bfb3d367d/glib-6fc6d9ea3e497e2b77789a61bc9cf80bfb3d367d.tar.bz2  lib/libglib-2.0.a
 
     libgpg-error    https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.45.tar.bz2                         lib/libgpg-error.a
     libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.1.tar.bz2                             lib/libgcrypt.a
@@ -289,9 +289,9 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
     zip             rm -f unix/Contents; ln -sf \$(find unix -mindepth 1 -maxdepth 1) .;
     gettext         sed -i.bak 's/-Wl,--disable-auto-import//' m4/woe32-dll.m4;
     glib            cd subprojects/gvdb; \
-                    curl -sLO 'https://gitlab.gnome.org/GNOME/gvdb/-/archive/0854af0fdb6d527a8d1999835ac2c5059976c210/gvdb-0854af0fdb6d527a8d1999835ac2c5059976c210.tar.bz2'; \
-                    tar --strip-components=1 -jxf gvdb-0854af0fdb6d527a8d1999835ac2c5059976c210.tar.bz2; \
-                    rm gvdb-0854af0fdb6d527a8d1999835ac2c5059976c210.tar.bz2; \
+                    curl -sLO 'https://gitlab.gnome.org/GNOME/gvdb/-/archive/89dbdb9ab45721189e195c7e70ed620143d840f7/gvdb-89dbdb9ab45721189e195c7e70ed620143d840f7.tar.bz2'; \
+                    tar --strip-components=1 -jxf gvdb-89dbdb9ab45721189e195c7e70ed620143d840f7.tar.bz2; \
+                    rm gvdb-89dbdb9ab45721189e195c7e70ed620143d840f7.tar.bz2; \
                     cd ../..;
     expat           sed -i.bak '/doc\\/Makefile/d' configure.ac; \
                     sed -i.bak '/SUBDIRS/{; s/ doc//; }' Makefile.am;
