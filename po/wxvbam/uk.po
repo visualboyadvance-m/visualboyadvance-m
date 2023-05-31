@@ -4,13 +4,14 @@
 # 
 # Translators:
 # Stanley Kid, 2022-2023
+# Svyatoslav <zarazafamila@gmail.com>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-23 14:26-0700\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Stanley Kid, 2022-2023\n"
+"Last-Translator: Svyatoslav <zarazafamila@gmail.com>, 2023\n"
 "Language-Team: Ukrainian (http://app.transifex.com/bgk/vba-m/language/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,7 +21,7 @@ msgstr ""
 
 #: wxvbam.cpp:309
 msgid "visualboyadvance-m"
-msgstr ""
+msgstr "visualboyadvance-m"
 
 #: wxvbam.cpp:380 wxvbam.cpp:397
 #, c-format
@@ -65,7 +66,7 @@ msgstr "ROM-файл"
 
 #: wxvbam.cpp:645
 msgid "<config>=<value>"
-msgstr ""
+msgstr "<config>=<value>"
 
 #: wxvbam.cpp:676
 msgid "Configuration / build error: can't find built-in xrc"
@@ -187,11 +188,11 @@ msgstr "Вилучення чітів."
 
 #: guiinit.cpp:776 dialogs/gb-rom-info.cpp:60 xrc/JoyPanel.xrc:364
 msgid "Game Shark"
-msgstr ""
+msgstr "Коди Game Shark"
 
 #: guiinit.cpp:777 dialogs/gb-rom-info.cpp:57
 msgid "Game Genie"
-msgstr ""
+msgstr "Коди Game Genie"
 
 #: guiinit.cpp:779
 msgid "Generic Code"
@@ -199,15 +200,15 @@ msgstr "Загальний код"
 
 #: guiinit.cpp:780
 msgid "Game Shark Advance"
-msgstr ""
+msgstr "Game Shark Advance"
 
 #: guiinit.cpp:781
 msgid "Code Breaker Advance"
-msgstr ""
+msgstr "Code Breaker Advance"
 
 #: guiinit.cpp:782
 msgid "Flashcart CHT"
-msgstr ""
+msgstr "Flashcart CHT"
 
 #: guiinit.cpp:850 guiinit.cpp:1105
 msgid "Number cannot be empty"
@@ -307,67 +308,67 @@ msgstr "Вибір дампа пам'яті"
 
 #: viewers.cpp:815
 msgid "0x00000000 - BIOS"
-msgstr ""
+msgstr "0x00000000 - BIOS"
 
 #: viewers.cpp:816
 msgid "0x02000000 - WRAM"
-msgstr ""
+msgstr "0x02000000 - WRAM"
 
 #: viewers.cpp:817
 msgid "0x03000000 - IRAM"
-msgstr ""
+msgstr "0x03000000 - IRAM"
 
 #: viewers.cpp:818
 msgid "0x04000000 - I / O"
-msgstr ""
+msgstr "0x04000000 - I / O"
 
 #: viewers.cpp:819
 msgid "0x05000000 - PALETTE"
-msgstr ""
+msgstr "0x05000000 - PALETTE"
 
 #: viewers.cpp:820
 msgid "0x06000000 - VRAM"
-msgstr ""
+msgstr "0x06000000 - VRAM"
 
 #: viewers.cpp:821
 msgid "0x07000000 - OAM"
-msgstr ""
+msgstr "0x07000000 - OAM"
 
 #: viewers.cpp:822
 msgid "0x08000000 - ROM"
-msgstr ""
+msgstr "0x08000000 - ROM"
 
 #: viewers.cpp:925
 msgid "0x0000 - ROM"
-msgstr ""
+msgstr "0x0000 - ROM"
 
 #: viewers.cpp:926
 msgid "0x4000 - ROM"
-msgstr ""
+msgstr "0x4000 - ROM"
 
 #: viewers.cpp:927
 msgid "0x8000 - VRAM"
-msgstr ""
+msgstr "0x8000 - VRAM"
 
 #: viewers.cpp:928
 msgid "0xA000 - SRAM"
-msgstr ""
+msgstr "0xA000 - SRAM"
 
 #: viewers.cpp:929
 msgid "0xC000 - RAM"
-msgstr ""
+msgstr "0xC000 - RAM"
 
 #: viewers.cpp:930
 msgid "0xD000 - WRAM"
-msgstr ""
+msgstr "0xD000 - WRAM"
 
 #: viewers.cpp:931
 msgid "0xFF00 - I / O"
-msgstr ""
+msgstr "0xFF00 - I / O"
 
 #: viewers.cpp:932
 msgid "0xFF80 - RAM"
-msgstr ""
+msgstr "0xFF80 - RAM"
 
 #: gfxviewers.cpp:1143
 msgid "Select output file and type"
@@ -700,7 +701,7 @@ msgstr "Ліцензія"
 
 #: extra-translations.cpp:18
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: opts.cpp:290
 msgid ""
@@ -761,7 +762,7 @@ msgstr "%d %% (%d, %d Гц)"
 #: sys.cpp:461
 #, c-format
 msgid "%d %%"
-msgstr ""
+msgstr "%d %%"
 
 #: sys.cpp:895 xrc/GBPrinter.xrc:65
 msgid "&Discard"
@@ -975,15 +976,15 @@ msgstr "Помилка відеозапису (%s); перервано."
 
 #: viewsupt.cpp:778
 msgid "R:"
-msgstr ""
+msgstr "R:"
 
 #: viewsupt.cpp:787
 msgid "G:"
-msgstr ""
+msgstr "G:"
 
 #: viewsupt.cpp:796
 msgid "B:"
-msgstr ""
+msgstr "B:"
 
 #: config/internal/option-internal.cpp:376
 msgid "Use bilinear filter with 3d renderer"
@@ -1429,111 +1430,111 @@ msgstr "Недійсне значення %d для опції %s; дійсні 
 
 #: config/user-input.cpp:23
 msgid "Backspace"
-msgstr ""
+msgstr "Backspace"
 
 #: config/user-input.cpp:24
 msgid "Delete"
-msgstr ""
+msgstr "Delete"
 
 #: config/user-input.cpp:25
 msgid "Page Up"
-msgstr ""
+msgstr "Page Up"
 
 #: config/user-input.cpp:26
 msgid "Page Down"
-msgstr ""
+msgstr "Page Down"
 
 #: config/user-input.cpp:27
 msgid "Num Lock"
-msgstr ""
+msgstr "Num Lock"
 
 #: config/user-input.cpp:28
 msgid "Scroll Lock"
-msgstr ""
+msgstr "Scroll Lock"
 
 #: config/user-input.cpp:31
 msgid "Num Space"
-msgstr ""
+msgstr "Num Space"
 
 #: config/user-input.cpp:32
 msgid "Num Tab"
-msgstr ""
+msgstr "Num Tab"
 
 #: config/user-input.cpp:33
 msgid "Num Enter"
-msgstr ""
+msgstr "Num Enter"
 
 #: config/user-input.cpp:34
 msgid "Num Home"
-msgstr ""
+msgstr "Num Home"
 
 #: config/user-input.cpp:35
 msgid "Num left"
-msgstr ""
+msgstr "Num left"
 
 #: config/user-input.cpp:36
 msgid "Num Up"
-msgstr ""
+msgstr "Num Up"
 
 #: config/user-input.cpp:37
 msgid "Num Right"
-msgstr ""
+msgstr "Num Right"
 
 #: config/user-input.cpp:38
 msgid "Num Down"
-msgstr ""
+msgstr "Num Down"
 
 #: config/user-input.cpp:39
 msgid "Num PageUp"
-msgstr ""
+msgstr "Num PageUp"
 
 #: config/user-input.cpp:40
 msgid "Num PageDown"
-msgstr ""
+msgstr "Num PageDown"
 
 #: config/user-input.cpp:41
 msgid "Num End"
-msgstr ""
+msgstr "Num End"
 
 #: config/user-input.cpp:42
 msgid "Num Begin"
-msgstr ""
+msgstr "Num Begin"
 
 #: config/user-input.cpp:43
 msgid "Num Insert"
-msgstr ""
+msgstr "Num Insert"
 
 #: config/user-input.cpp:44
 msgid "Num Delete"
-msgstr ""
+msgstr "Num Delete"
 
 #: config/user-input.cpp:45
 msgid "Num ="
-msgstr ""
+msgstr "Num ="
 
 #: config/user-input.cpp:46
 msgid "Num *"
-msgstr ""
+msgstr "Num *"
 
 #: config/user-input.cpp:47
 msgid "Num +"
-msgstr ""
+msgstr "Num +"
 
 #: config/user-input.cpp:48
 msgid "Num ,"
-msgstr ""
+msgstr "Num ,"
 
 #: config/user-input.cpp:49
 msgid "Num -"
-msgstr ""
+msgstr "Num -"
 
 #: config/user-input.cpp:50
 msgid "Num ."
-msgstr ""
+msgstr "Num ."
 
 #: config/user-input.cpp:51
 msgid "Num /"
-msgstr ""
+msgstr "Num /"
 
 #: config/user-input.cpp:55
 msgid "Volume Mute"
@@ -1565,39 +1566,39 @@ msgstr "Відтворити / Призупинити"
 
 #: config/user-input.cpp:94
 msgid "Alt+"
-msgstr ""
+msgstr "Alt+"
 
 #: config/user-input.cpp:97
 msgid "Ctrl+"
-msgstr ""
+msgstr "Ctrl+"
 
 #: config/user-input.cpp:101
 msgid "Rawctrl+"
-msgstr ""
+msgstr "Rawctrl+"
 
 #: config/user-input.cpp:105
 msgid "Shift+"
-msgstr ""
+msgstr "Shift+"
 
 #: config/user-input.cpp:108
 msgid "Meta+"
-msgstr ""
+msgstr "Meta+"
 
 #: config/user-input.cpp:135
 msgid "Alt"
-msgstr ""
+msgstr "Alt"
 
 #: config/user-input.cpp:136
 msgid "Shift"
-msgstr ""
+msgstr "Shift"
 
 #: config/user-input.cpp:138 config/user-input.cpp:141
 msgid "Ctrl"
-msgstr ""
+msgstr "Ctrl"
 
 #: config/user-input.cpp:139
 msgid "Cmd"
-msgstr ""
+msgstr "Cmd"
 
 #: dialogs/accel-config.cpp:156
 msgid "Menu commands"
@@ -1670,72 +1671,72 @@ msgstr "Без мапера"
 
 #: dialogs/gb-rom-info.cpp:24
 msgid "MBC1"
-msgstr ""
+msgstr "MBC1"
 
 #: dialogs/gb-rom-info.cpp:27
 msgid "MBC2"
-msgstr ""
+msgstr "MBC2"
 
 #: dialogs/gb-rom-info.cpp:30
 msgid "MBC3"
-msgstr ""
+msgstr "MBC3"
 
 #: dialogs/gb-rom-info.cpp:33
 msgid "MBC5"
-msgstr ""
+msgstr "MBC5"
 
 #: dialogs/gb-rom-info.cpp:36
 msgid "MBC6"
-msgstr ""
+msgstr "MBC6"
 
 #: dialogs/gb-rom-info.cpp:39
 msgid "MBC7"
-msgstr ""
+msgstr "MBC7"
 
 #: dialogs/gb-rom-info.cpp:42
 msgid "Pocket Camera"
-msgstr ""
+msgstr "Pocket Camera"
 
 #: dialogs/gb-rom-info.cpp:45
 msgid "MMM01"
-msgstr ""
+msgstr "MMM01"
 
 #: dialogs/gb-rom-info.cpp:48
 msgid "HuC-1"
-msgstr ""
+msgstr "HuC-1"
 
 #: dialogs/gb-rom-info.cpp:51
 msgid "HuC-3"
-msgstr ""
+msgstr "HuC-3"
 
 #: dialogs/gb-rom-info.cpp:54
 msgid "Bandai TAMA5"
-msgstr ""
+msgstr "Bandai TAMA5"
 
 #: dialogs/gb-rom-info.cpp:67
 msgid " + RAM"
-msgstr ""
+msgstr " + RAM"
 
 #: dialogs/gb-rom-info.cpp:68
 msgid " + RTC"
-msgstr ""
+msgstr " + RTC"
 
 #: dialogs/gb-rom-info.cpp:69
 msgid " + Battery"
-msgstr ""
+msgstr " + Battery"
 
 #: dialogs/gb-rom-info.cpp:70
 msgid " + Rumble"
-msgstr ""
+msgstr " + Rumble"
 
 #: dialogs/gb-rom-info.cpp:71
 msgid " + Motion Sensor"
-msgstr ""
+msgstr " + Motion Sensor"
 
 #: dialogs/gb-rom-info.cpp:73
 #, c-format
 msgid "%02X (%s%s%s%s%s%s)"
-msgstr ""
+msgstr "%02X (%s%s%s%s%s%s)"
 
 #: dialogs/gb-rom-info.cpp:80 dialogs/gb-rom-info.cpp:92
 #, c-format
@@ -2159,11 +2160,11 @@ msgstr "&Автоматично"
 
 #: xrc/Disassemble.xrc:23
 msgid "A&RM"
-msgstr ""
+msgstr "A&RM"
 
 #: xrc/Disassemble.xrc:30
 msgid "&THUMB"
-msgstr ""
+msgstr "&THUMB"
 
 #: xrc/Disassemble.xrc:45 xrc/GBDisassemble.xrc:18 xrc/MemViewer.xrc:47
 msgid "&Go"
@@ -2171,7 +2172,7 @@ msgstr "&Перейти"
 
 #: xrc/Disassemble.xrc:73
 msgid "R0:"
-msgstr ""
+msgstr "R0:"
 
 #: xrc/Disassemble.xrc:83 xrc/Disassemble.xrc:100 xrc/Disassemble.xrc:117
 #: xrc/Disassemble.xrc:134 xrc/Disassemble.xrc:151 xrc/Disassemble.xrc:168
@@ -2180,99 +2181,99 @@ msgstr ""
 #: xrc/Disassemble.xrc:287 xrc/Disassemble.xrc:304 xrc/Disassemble.xrc:321
 #: xrc/Disassemble.xrc:338 xrc/Disassemble.xrc:355
 msgid "00000000"
-msgstr ""
+msgstr "00000000"
 
 #: xrc/Disassemble.xrc:90
 msgid "R1:"
-msgstr ""
+msgstr "R1:"
 
 #: xrc/Disassemble.xrc:107
 msgid "R2:"
-msgstr ""
+msgstr "R2:"
 
 #: xrc/Disassemble.xrc:124
 msgid "R3:"
-msgstr ""
+msgstr "R3:"
 
 #: xrc/Disassemble.xrc:141
 msgid "R4:"
-msgstr ""
+msgstr "R4:"
 
 #: xrc/Disassemble.xrc:158
 msgid "R5:"
-msgstr ""
+msgstr "R5:"
 
 #: xrc/Disassemble.xrc:175
 msgid "R6:"
-msgstr ""
+msgstr "R6:"
 
 #: xrc/Disassemble.xrc:192
 msgid "R7:"
-msgstr ""
+msgstr "R7:"
 
 #: xrc/Disassemble.xrc:209
 msgid "R8:"
-msgstr ""
+msgstr "R8:"
 
 #: xrc/Disassemble.xrc:226
 msgid "R9:"
-msgstr ""
+msgstr "R9:"
 
 #: xrc/Disassemble.xrc:243
 msgid "R10:"
-msgstr ""
+msgstr "R10:"
 
 #: xrc/Disassemble.xrc:260
 msgid "R11:"
-msgstr ""
+msgstr "R11:"
 
 #: xrc/Disassemble.xrc:277
 msgid "R12:"
-msgstr ""
+msgstr "R12:"
 
 #: xrc/Disassemble.xrc:294 xrc/GBDisassemble.xrc:111
 msgid "SP:"
-msgstr ""
+msgstr "SP:"
 
 #: xrc/Disassemble.xrc:311
 msgid "LR:"
-msgstr ""
+msgstr "LR:"
 
 #: xrc/Disassemble.xrc:328 xrc/GBDisassemble.xrc:128
 msgid "PC:"
-msgstr ""
+msgstr "PC:"
 
 #: xrc/Disassemble.xrc:345
 msgid "CPSR:"
-msgstr ""
+msgstr "CPSR:"
 
 #: xrc/Disassemble.xrc:362 xrc/GBDisassemble.xrc:185
 msgid "N"
-msgstr ""
+msgstr "N"
 
 #: xrc/Disassemble.xrc:369
 msgid "I"
-msgstr ""
+msgstr "I"
 
 #: xrc/Disassemble.xrc:376 xrc/GBDisassemble.xrc:179
 msgid "Z"
-msgstr ""
+msgstr "Z"
 
 #: xrc/Disassemble.xrc:383
 msgid "F"
-msgstr ""
+msgstr "F"
 
 #: xrc/Disassemble.xrc:390 xrc/GBDisassemble.xrc:197
 msgid "C"
-msgstr ""
+msgstr "C"
 
 #: xrc/Disassemble.xrc:397
 msgid "T"
-msgstr ""
+msgstr "T"
 
 #: xrc/Disassemble.xrc:404
 msgid "V"
-msgstr ""
+msgstr "V"
 
 #: xrc/Disassemble.xrc:414 xrc/MapViewer.xrc:76 xrc/OAMViewer.xrc:37
 msgid "Mode:"
@@ -2280,7 +2281,7 @@ msgstr "Режим:"
 
 #: xrc/Disassemble.xrc:424 xrc/GBDisassemble.xrc:172
 msgid "00"
-msgstr ""
+msgstr "00"
 
 #: xrc/Disassemble.xrc:443 xrc/GBDisassemble.xrc:212 xrc/GBOAMViewer.xrc:93
 #: xrc/GBPaletteViewer.xrc:105 xrc/GBTileViewer.xrc:75 xrc/IOViewer.xrc:318
@@ -2311,7 +2312,7 @@ msgstr "Кінцевий модуль"
 
 #: xrc/DisplayConfig.xrc:33
 msgid "Simple"
-msgstr ""
+msgstr "Simple"
 
 #: xrc/DisplayConfig.xrc:40
 msgid "Quartz2D"
@@ -2343,79 +2344,79 @@ msgstr "Super 2x Sa I"
 
 #: xrc/DisplayConfig.xrc:88
 msgid "Super Eagle"
-msgstr ""
+msgstr "Super Eagle"
 
 #: xrc/DisplayConfig.xrc:89
 msgid "Pixelate"
-msgstr ""
+msgstr "Pixelate"
 
 #: xrc/DisplayConfig.xrc:90
 msgid "Advance MAME Scale 2x"
-msgstr ""
+msgstr "Advance MAME Scale 2x"
 
 #: xrc/DisplayConfig.xrc:91
 msgid "Bilinear"
-msgstr ""
+msgstr "Bilinear"
 
 #: xrc/DisplayConfig.xrc:92
 msgid "Bilinear Plus"
-msgstr ""
+msgstr "Bilinear Plus"
 
 #: xrc/DisplayConfig.xrc:93
 msgid "Scanlines"
-msgstr ""
+msgstr "Scanlines"
 
 #: xrc/DisplayConfig.xrc:94
 msgid "TV Mode"
-msgstr ""
+msgstr "TV Mode"
 
 #: xrc/DisplayConfig.xrc:95
 msgid "HQ 2x"
-msgstr ""
+msgstr "HQ 2x"
 
 #: xrc/DisplayConfig.xrc:96
 msgid "LQ 2x"
-msgstr ""
+msgstr "LQ 2x"
 
 #: xrc/DisplayConfig.xrc:97
 msgid "Simple 2x"
-msgstr ""
+msgstr "Simple 2x"
 
 #: xrc/DisplayConfig.xrc:98
 msgid "Simple 3x"
-msgstr ""
+msgstr "Simple 3x"
 
 #: xrc/DisplayConfig.xrc:99
 msgid "HQ 3x"
-msgstr ""
+msgstr "HQ 3x"
 
 #: xrc/DisplayConfig.xrc:100
 msgid "Simple 4x"
-msgstr ""
+msgstr "Simple 4x"
 
 #: xrc/DisplayConfig.xrc:101
 msgid "HQ 4x"
-msgstr ""
+msgstr "HQ 4x"
 
 #: xrc/DisplayConfig.xrc:102
 msgid "xBRZ 2x"
-msgstr ""
+msgstr "xBRZ 2x"
 
 #: xrc/DisplayConfig.xrc:103
 msgid "xBRZ 3x"
-msgstr ""
+msgstr "xBRZ 3x"
 
 #: xrc/DisplayConfig.xrc:104
 msgid "xBRZ 4x"
-msgstr ""
+msgstr "xBRZ 4x"
 
 #: xrc/DisplayConfig.xrc:105
 msgid "xBRZ 5x"
-msgstr ""
+msgstr "xBRZ 5x"
 
 #: xrc/DisplayConfig.xrc:106
 msgid "xBRZ 6x"
-msgstr ""
+msgstr "xBRZ 6x"
 
 #: xrc/DisplayConfig.xrc:115
 msgid "Plugin:"
@@ -2519,7 +2520,7 @@ msgstr "Номер випуску:"
 
 #: xrc/GBAROMInfo.xrc:59
 msgid "CRC32:"
-msgstr ""
+msgstr "CRC32:"
 
 #: xrc/GBAROMInfo.xrc:71
 msgid "Game code:"
@@ -2547,7 +2548,7 @@ msgstr "Версія ROM:"
 
 #: xrc/GBAROMInfo.xrc:143
 msgid "CRC:"
-msgstr ""
+msgstr "CRC:"
 
 #: xrc/GBAROMInfo.xrc:150
 msgid "ROM Information"
@@ -2612,45 +2613,45 @@ msgstr "Відновити"
 
 #: xrc/GBDisassemble.xrc:43
 msgid "AF:"
-msgstr ""
+msgstr "AF:"
 
 #: xrc/GBDisassemble.xrc:53 xrc/GBDisassemble.xrc:70 xrc/GBDisassemble.xrc:87
 #: xrc/GBDisassemble.xrc:104 xrc/GBDisassemble.xrc:121
 #: xrc/GBDisassemble.xrc:138 xrc/GBDisassemble.xrc:155
 msgid "0000"
-msgstr ""
+msgstr "0000"
 
 #: xrc/GBDisassemble.xrc:60
 msgid "BC:"
-msgstr ""
+msgstr "BC:"
 
 #: xrc/GBDisassemble.xrc:77
 msgid "DE:"
-msgstr ""
+msgstr "DE:"
 
 #: xrc/GBDisassemble.xrc:94
 msgid "HL:"
-msgstr ""
+msgstr "HL:"
 
 #: xrc/GBDisassemble.xrc:145
 msgid "IFF:"
-msgstr ""
+msgstr "IFF:"
 
 #: xrc/GBDisassemble.xrc:162
 msgid "LY:"
-msgstr ""
+msgstr "LY:"
 
 #: xrc/GBDisassemble.xrc:191
 msgid "H"
-msgstr ""
+msgstr "H"
 
 #: xrc/GBMapViewer.xrc:14
 msgid "0x8000"
-msgstr ""
+msgstr "0x8000"
 
 #: xrc/GBMapViewer.xrc:20
 msgid "0x8800"
-msgstr ""
+msgstr "0x8800"
 
 #: xrc/GBMapViewer.xrc:23 xrc/GBTileViewer.xrc:42 xrc/TileViewer.xrc:58
 msgid "Char Base"
@@ -2658,11 +2659,11 @@ msgstr "База символів"
 
 #: xrc/GBMapViewer.xrc:33
 msgid "0x9800"
-msgstr ""
+msgstr "0x9800"
 
 #: xrc/GBMapViewer.xrc:39
 msgid "0x9C00"
-msgstr ""
+msgstr "0x9C00"
 
 #: xrc/GBMapViewer.xrc:42
 msgid "Map Base"
@@ -2725,7 +2726,7 @@ msgstr "Пріоритет:"
 
 #: xrc/GBOAMViewer.xrc:53
 msgid "OAP:"
-msgstr ""
+msgstr "OAP:"
 
 #: xrc/GBOAMViewer.xrc:61 xrc/OAMViewer.xrc:53
 msgid "Pal:"
@@ -2774,19 +2775,19 @@ msgstr "Розмір &друку"
 
 #: xrc/GBPrinter.xrc:29
 msgid "1x"
-msgstr ""
+msgstr "1x"
 
 #: xrc/GBPrinter.xrc:30
 msgid "2x"
-msgstr ""
+msgstr "2x"
 
 #: xrc/GBPrinter.xrc:31
 msgid "3x"
-msgstr ""
+msgstr "3x"
 
 #: xrc/GBPrinter.xrc:32
 msgid "4x"
-msgstr ""
+msgstr "4x"
 
 #: xrc/GBPrinter.xrc:58
 msgid "C&ontinue"
@@ -2830,11 +2831,11 @@ msgstr "Контрольна сума картриджа:"
 
 #: xrc/GBTileViewer.xrc:14
 msgid "&0"
-msgstr ""
+msgstr "&0"
 
 #: xrc/GBTileViewer.xrc:20 xrc/MainMenu.xrc:58 xrc/MainMenu.xrc:114
 msgid "&1"
-msgstr ""
+msgstr "&1"
 
 #: xrc/GBTileViewer.xrc:23
 msgid "VRAM Bank"
@@ -2842,11 +2843,11 @@ msgstr "VRAM-банк"
 
 #: xrc/GBTileViewer.xrc:33
 msgid "0x&8000"
-msgstr ""
+msgstr "0x&8000"
 
 #: xrc/GBTileViewer.xrc:39
 msgid "0x&8800"
-msgstr ""
+msgstr "0x&8800"
 
 #: xrc/GameBoyAdvanceConfig.xrc:4
 msgid "Game Boy Advance settings"
@@ -2863,11 +2864,11 @@ msgstr "Автоматично"
 
 #: xrc/GameBoyAdvanceConfig.xrc:28 xrc/GameBoyAdvanceConfig.xrc:200
 msgid "EEPROM"
-msgstr ""
+msgstr "EEPROM"
 
 #: xrc/GameBoyAdvanceConfig.xrc:29 xrc/GameBoyAdvanceConfig.xrc:201
 msgid "SRAM"
-msgstr ""
+msgstr "SRAM"
 
 #: xrc/GameBoyAdvanceConfig.xrc:30 xrc/GameBoyAdvanceConfig.xrc:202
 msgid "Flash"
@@ -2875,7 +2876,7 @@ msgstr "Флеш-пам'ять"
 
 #: xrc/GameBoyAdvanceConfig.xrc:31 xrc/GameBoyAdvanceConfig.xrc:203
 msgid "EEPROM + Sensor"
-msgstr ""
+msgstr "EEPROM + Sensor"
 
 #: xrc/GameBoyAdvanceConfig.xrc:43
 msgid "Flash size:"
@@ -2969,7 +2970,7 @@ msgstr "Емульована &система:"
 
 #: xrc/GameBoyConfig.xrc:30
 msgid "Game Boy Color"
-msgstr ""
+msgstr "Game Boy Color"
 
 #: xrc/GameBoyConfig.xrc:31
 msgid "Super Game Boy"
@@ -2977,15 +2978,15 @@ msgstr "Super Game Boy 1"
 
 #: xrc/GameBoyConfig.xrc:32 xrc/SoundConfig.xrc:290
 msgid "Game Boy"
-msgstr ""
+msgstr "Game Boy"
 
 #: xrc/GameBoyConfig.xrc:33 xrc/SoundConfig.xrc:335
 msgid "Game Boy Advance"
-msgstr ""
+msgstr "Game Boy Advance"
 
 #: xrc/GameBoyConfig.xrc:34
 msgid "Super Game Boy 2"
-msgstr ""
+msgstr "Super Game Boy 2"
 
 #: xrc/GameBoyConfig.xrc:48
 msgid "Display &borders:"
@@ -3049,11 +3050,11 @@ msgstr "Формат екранного кадру:"
 
 #: xrc/GeneralConfig.xrc:33
 msgid "&PNG"
-msgstr ""
+msgstr "&PNG"
 
 #: xrc/GeneralConfig.xrc:42
 msgid "&BMP"
-msgstr ""
+msgstr "&BMP"
 
 #: xrc/GeneralConfig.xrc:57
 msgid "&Rewind interval:"
@@ -3089,75 +3090,75 @@ msgstr "Переглядач введення-виведення"
 
 #: xrc/IOViewer.xrc:10
 msgid "a"
-msgstr ""
+msgstr "a"
 
 #: xrc/IOViewer.xrc:11
 msgid "b"
-msgstr ""
+msgstr "b"
 
 #: xrc/IOViewer.xrc:47
 msgid "15 "
-msgstr ""
+msgstr "15 "
 
 #: xrc/IOViewer.xrc:64
 msgid "14 "
-msgstr ""
+msgstr "14 "
 
 #: xrc/IOViewer.xrc:81
 msgid "13 "
-msgstr ""
+msgstr "13 "
 
 #: xrc/IOViewer.xrc:98
 msgid "12 "
-msgstr ""
+msgstr "12 "
 
 #: xrc/IOViewer.xrc:115
 msgid "11 "
-msgstr ""
+msgstr "11 "
 
 #: xrc/IOViewer.xrc:132
 msgid "10 "
-msgstr ""
+msgstr "10 "
 
 #: xrc/IOViewer.xrc:149
 msgid "9 "
-msgstr ""
+msgstr "9 "
 
 #: xrc/IOViewer.xrc:166
 msgid "8 "
-msgstr ""
+msgstr "8 "
 
 #: xrc/IOViewer.xrc:183
 msgid "7 "
-msgstr ""
+msgstr "7 "
 
 #: xrc/IOViewer.xrc:200
 msgid "6 "
-msgstr ""
+msgstr "6 "
 
 #: xrc/IOViewer.xrc:217
 msgid "5 "
-msgstr ""
+msgstr "5 "
 
 #: xrc/IOViewer.xrc:234
 msgid "4 "
-msgstr ""
+msgstr "4 "
 
 #: xrc/IOViewer.xrc:251
 msgid "3 "
-msgstr ""
+msgstr "3 "
 
 #: xrc/IOViewer.xrc:268
 msgid "2 "
-msgstr ""
+msgstr "2 "
 
 #: xrc/IOViewer.xrc:285
 msgid "1 "
-msgstr ""
+msgstr "1 "
 
 #: xrc/IOViewer.xrc:302
 msgid "0 "
-msgstr ""
+msgstr "0 "
 
 #: xrc/JoyPanel.xrc:8
 msgid ""
@@ -3172,7 +3173,7 @@ msgstr "↑"
 
 #: xrc/JoyPanel.xrc:37
 msgid "A"
-msgstr ""
+msgstr "A"
 
 #: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:460
 msgid "Down"
@@ -3180,7 +3181,7 @@ msgstr "↓"
 
 #: xrc/JoyPanel.xrc:83
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:464
 msgid "Left"
@@ -3188,7 +3189,7 @@ msgstr "←"
 
 #: xrc/JoyPanel.xrc:129
 msgid "L"
-msgstr ""
+msgstr "L"
 
 #: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:468
 msgid "Right"
@@ -3196,15 +3197,15 @@ msgstr "→"
 
 #: xrc/JoyPanel.xrc:175
 msgid "R"
-msgstr ""
+msgstr "R"
 
 #: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:488
 msgid "Select"
-msgstr ""
+msgstr "Select"
 
 #: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:492
 msgid "Start"
-msgstr ""
+msgstr "Start"
 
 #: xrc/JoyPanel.xrc:254
 msgid "Motion Up"
@@ -3296,7 +3297,7 @@ msgstr "Журнал"
 
 #: xrc/Logging.xrc:13
 msgid "SW&I"
-msgstr ""
+msgstr "SW&I"
 
 #: xrc/Logging.xrc:20
 msgid "Unaligned &memory"
@@ -3312,19 +3313,19 @@ msgstr "Незаконне &читання"
 
 #: xrc/Logging.xrc:41
 msgid "DMA &0"
-msgstr ""
+msgstr "DMA &0"
 
 #: xrc/Logging.xrc:48
 msgid "DMA &1"
-msgstr ""
+msgstr "DMA &1"
 
 #: xrc/Logging.xrc:55
 msgid "DMA &2"
-msgstr ""
+msgstr "DMA &2"
 
 #: xrc/Logging.xrc:62
 msgid "DMA &3"
-msgstr ""
+msgstr "DMA &3"
 
 #: xrc/Logging.xrc:69
 msgid "&Undefined instruction"
@@ -3332,7 +3333,7 @@ msgstr "&Невизначена відомість"
 
 #: xrc/Logging.xrc:76
 msgid "&AGBPrint"
-msgstr ""
+msgstr "&AGBPrint"
 
 #: xrc/Logging.xrc:83
 msgid "Soun&d output"
@@ -3376,7 +3377,7 @@ msgstr "ROM-&відомості..."
 
 #: xrc/MainMenu.xrc:30
 msgid "&e-Reader"
-msgstr ""
+msgstr "&e-Reader"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
@@ -3408,39 +3409,39 @@ msgstr "&Автозавантаження найостаннішого"
 
 #: xrc/MainMenu.xrc:61 xrc/MainMenu.xrc:117
 msgid "&2"
-msgstr ""
+msgstr "&2"
 
 #: xrc/MainMenu.xrc:64 xrc/MainMenu.xrc:120
 msgid "&3"
-msgstr ""
+msgstr "&3"
 
 #: xrc/MainMenu.xrc:67 xrc/MainMenu.xrc:123
 msgid "&4"
-msgstr ""
+msgstr "&4"
 
 #: xrc/MainMenu.xrc:70 xrc/MainMenu.xrc:126
 msgid "&5"
-msgstr ""
+msgstr "&5"
 
 #: xrc/MainMenu.xrc:73 xrc/MainMenu.xrc:129
 msgid "&6"
-msgstr ""
+msgstr "&6"
 
 #: xrc/MainMenu.xrc:76 xrc/MainMenu.xrc:132
 msgid "&7"
-msgstr ""
+msgstr "&7"
 
 #: xrc/MainMenu.xrc:79 xrc/MainMenu.xrc:135
 msgid "&8"
-msgstr ""
+msgstr "&8"
 
 #: xrc/MainMenu.xrc:82 xrc/MainMenu.xrc:138
 msgid "&9"
-msgstr ""
+msgstr "&9"
 
 #: xrc/MainMenu.xrc:85 xrc/MainMenu.xrc:141
 msgid "1&0"
-msgstr ""
+msgstr "1&0"
 
 #: xrc/MainMenu.xrc:89
 msgid "From &File..."
@@ -3628,11 +3629,11 @@ msgstr "&Бездротовий"
 
 #: xrc/MainMenu.xrc:289
 msgid "&Game Cube"
-msgstr ""
+msgstr "&Game Cube"
 
 #: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:521
 msgid "&Game Boy"
-msgstr ""
+msgstr "&Game Boy"
 
 #: xrc/MainMenu.xrc:298
 msgid "&Local mode"
@@ -3665,27 +3666,27 @@ msgstr "Змінити розмір &масштабовано"
 
 #: xrc/MainMenu.xrc:326
 msgid "&1x"
-msgstr ""
+msgstr "&1x"
 
 #: xrc/MainMenu.xrc:329
 msgid "&2x"
-msgstr ""
+msgstr "&2x"
 
 #: xrc/MainMenu.xrc:332
 msgid "&3x"
-msgstr ""
+msgstr "&3x"
 
 #: xrc/MainMenu.xrc:335
 msgid "&4x"
-msgstr ""
+msgstr "&4x"
 
 #: xrc/MainMenu.xrc:338
 msgid "&5x"
-msgstr ""
+msgstr "&5x"
 
 #: xrc/MainMenu.xrc:341
 msgid "&6x"
-msgstr ""
+msgstr "&6x"
 
 #: xrc/MainMenu.xrc:345
 msgid "Change pixel filter"
@@ -3769,19 +3770,19 @@ msgstr "&Турбо"
 
 #: xrc/MainMenu.xrc:437 xrc/MainMenu.xrc:472
 msgid "&A"
-msgstr ""
+msgstr "&A"
 
 #: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
 msgid "&B"
-msgstr ""
+msgstr "&B"
 
 #: xrc/MainMenu.xrc:445 xrc/MainMenu.xrc:480
 msgid "&L"
-msgstr ""
+msgstr "&L"
 
 #: xrc/MainMenu.xrc:449 xrc/MainMenu.xrc:484
 msgid "&R"
-msgstr ""
+msgstr "&R"
 
 #: xrc/MainMenu.xrc:454
 msgid "&Autohold"
@@ -3789,7 +3790,7 @@ msgstr "&Автоутримання"
 
 #: xrc/MainMenu.xrc:498
 msgid "&Game Boy Advance"
-msgstr ""
+msgstr "&Game Boy Advance"
 
 #: xrc/MainMenu.xrc:500 xrc/MainMenu.xrc:523
 msgid "Configure..."
@@ -3901,7 +3902,7 @@ msgstr "&Роз'єднати"
 
 #: xrc/MainMenu.xrc:613
 msgid "&GDB"
-msgstr ""
+msgstr "&GDB"
 
 #: xrc/MainMenu.xrc:616
 msgid "&Disassemble..."
@@ -3941,35 +3942,35 @@ msgstr "Показати всі відеошари"
 
 #: xrc/MainMenu.xrc:646
 msgid "BG &0"
-msgstr ""
+msgstr "BG &0"
 
 #: xrc/MainMenu.xrc:651
 msgid "BG &1"
-msgstr ""
+msgstr "BG &1"
 
 #: xrc/MainMenu.xrc:656
 msgid "BG &2"
-msgstr ""
+msgstr "BG &2"
 
 #: xrc/MainMenu.xrc:661
 msgid "BG &3"
-msgstr ""
+msgstr "BG &3"
 
 #: xrc/MainMenu.xrc:666
 msgid "&OBJ"
-msgstr ""
+msgstr "&OBJ"
 
 #: xrc/MainMenu.xrc:671
 msgid "&WIN 0"
-msgstr ""
+msgstr "&WIN 0"
 
 #: xrc/MainMenu.xrc:676
 msgid "W&IN 1"
-msgstr ""
+msgstr "W&IN 1"
 
 #: xrc/MainMenu.xrc:681
 msgid "O&BJ WIN"
-msgstr ""
+msgstr "O&BJ WIN"
 
 #: xrc/MainMenu.xrc:685
 msgid "&View Layers"
@@ -3993,11 +3994,11 @@ msgstr "Канал &4"
 
 #: xrc/MainMenu.xrc:709
 msgid "Direct Sound &A"
-msgstr ""
+msgstr "Direct Sound &A"
 
 #: xrc/MainMenu.xrc:714
 msgid "Direct Sound &B"
-msgstr ""
+msgstr "Direct Sound &B"
 
 #: xrc/MainMenu.xrc:718
 msgid "&Sound Channels"
@@ -4049,19 +4050,19 @@ msgstr "Кадр"
 
 #: xrc/MapViewer.xrc:35
 msgid "BG 0"
-msgstr ""
+msgstr "BG 0"
 
 #: xrc/MapViewer.xrc:41
 msgid "BG 1"
-msgstr ""
+msgstr "BG 1"
 
 #: xrc/MapViewer.xrc:46
 msgid "BG 2"
-msgstr ""
+msgstr "BG 2"
 
 #: xrc/MapViewer.xrc:51
 msgid "BG 3"
-msgstr ""
+msgstr "BG 3"
 
 #: xrc/MapViewer.xrc:84
 msgid "Map Base:"
@@ -4129,15 +4130,15 @@ msgstr "Гравці:"
 
 #: xrc/NetLink.xrc:41
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: xrc/NetLink.xrc:49
 msgid "3"
-msgstr ""
+msgstr "3"
 
 #: xrc/NetLink.xrc:56
 msgid "4"
-msgstr ""
+msgstr "4"
 
 #: xrc/NetLink.xrc:67
 msgid "Server:"
@@ -4201,7 +4202,7 @@ msgstr "11025 Гц"
 
 #: xrc/SoundConfig.xrc:103
 msgid "SDL"
-msgstr ""
+msgstr "SDL"
 
 #: xrc/SoundConfig.xrc:111
 msgid "OpenAL"
@@ -4209,15 +4210,15 @@ msgstr "Open AL"
 
 #: xrc/SoundConfig.xrc:118
 msgid "Direct Sound"
-msgstr ""
+msgstr "Direct Sound"
 
 #: xrc/SoundConfig.xrc:125
 msgid "XAudio2"
-msgstr ""
+msgstr "XAudio2"
 
 #: xrc/SoundConfig.xrc:132
 msgid "FAudio"
-msgstr ""
+msgstr "FAudio"
 
 #: xrc/SoundConfig.xrc:146
 msgid "Device"
@@ -4269,11 +4270,11 @@ msgstr "Переглядач плитки"
 
 #: xrc/TileViewer.xrc:15
 msgid "1&6"
-msgstr ""
+msgstr "1&6"
 
 #: xrc/TileViewer.xrc:21
 msgid "&256"
-msgstr ""
+msgstr "&256"
 
 #: xrc/TileViewer.xrc:24
 msgid "Colors"
@@ -4281,23 +4282,23 @@ msgstr "Кольори"
 
 #: xrc/TileViewer.xrc:34
 msgid "0x600&0000"
-msgstr ""
+msgstr "0x600&0000"
 
 #: xrc/TileViewer.xrc:40
 msgid "0x600&4000"
-msgstr ""
+msgstr "0x600&4000"
 
 #: xrc/TileViewer.xrc:45
 msgid "0x600&8000"
-msgstr ""
+msgstr "0x600&8000"
 
 #: xrc/TileViewer.xrc:50
 msgid "0x600&C000"
-msgstr ""
+msgstr "0x600&C000"
 
 #: xrc/TileViewer.xrc:55
 msgid "0x60&10000"
-msgstr ""
+msgstr "0x60&10000"
 
 #: xrc/SpeedupConfig.xrc:4
 msgid "SpeedUp / Turbo Settings"
