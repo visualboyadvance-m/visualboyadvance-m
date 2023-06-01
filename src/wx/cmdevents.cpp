@@ -2608,7 +2608,7 @@ EVT_HANDLER(SpeedOn, "Enable faster network protocol by default")
 
 EVT_HANDLER(LinkProto, "Local host IPC")
 {
-    GetMenuOptionConfig("LinkProto", config::OptionID::kGBALinkHost);
+    GetMenuOptionConfig("LinkProto", config::OptionID::kGBALinkProto);
 }
 
 EVT_HANDLER(LinkConfigure, "Link options...")

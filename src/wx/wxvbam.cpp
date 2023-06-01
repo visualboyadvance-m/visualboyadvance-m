@@ -406,6 +406,11 @@ bool wxvbamApp::OnInit() {
                                        config_file_.GetFullPath(),
                                        wxEmptyString, wxCONFIG_USE_LOCAL_FILE));
 
+    // wx does not create the directories by itself so do it here, if needed.
+    if (!wxDirExists(config_file_.GetPath())) {
+       config_file_.Mkdir(wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
+    }
+
     // Load the default options.
     load_opts(!config_file_.Exists());
 
