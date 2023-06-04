@@ -29,7 +29,7 @@ msgstr "visualboyadvance-m"
 #: wxvbam.cpp:380 wxvbam.cpp:397
 #, c-format
 msgid "Invalid configuration file provided: %s"
-msgstr ""
+msgstr "제공된 구성 파일이 잘못되었습니다: %s"
 
 #: wxvbam.cpp:536
 msgid "Could not create main window"
@@ -73,14 +73,14 @@ msgstr "<config>=<value>"
 
 #: wxvbam.cpp:676
 msgid "Configuration / build error: can't find built-in xrc"
-msgstr ""
+msgstr "구성 / 빌드 오류: 기본 제공 xrc를 찾을 수 없음"
 
 #: wxvbam.cpp:684
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr ""
+msgstr "기본 구성을 %s로 작성했습니다.\n재정의하려면 변경된 루트 노드를 제외한 모든 노드를 제거하세요. 다음 검색 경로에서 .xrc 또는 .xrs 파일에서 올바른 이름의 루트 노드를 처음 발견하면 기본값이 재정의됩니다:"
 
 #: wxvbam.cpp:698
 msgid "Configuration is read from, in order:"
@@ -91,7 +91,7 @@ msgstr "설정은 다음으로부터 순서대로 불러옵니다 :"
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
-msgstr ""
+msgstr "기본 제공 오버라이드 파일을 %s로 작성했습니다.\n재정의하려면 변경된 섹션을 제외한 모든 섹션을 삭제합니다. 검색 경로에서 처음 찾은 섹션이 사용됩니다:"
 
 #: wxvbam.cpp:718
 msgid ""
@@ -191,11 +191,11 @@ msgstr "치트 지우기"
 
 #: guiinit.cpp:776 dialogs/gb-rom-info.cpp:60 xrc/JoyPanel.xrc:364
 msgid "Game Shark"
-msgstr ""
+msgstr "게임 샤크"
 
 #: guiinit.cpp:777 dialogs/gb-rom-info.cpp:57
 msgid "Game Genie"
-msgstr ""
+msgstr "게임 지니"
 
 #: guiinit.cpp:779
 msgid "Generic Code"
@@ -203,11 +203,11 @@ msgstr "제네릭 코드"
 
 #: guiinit.cpp:780
 msgid "Game Shark Advance"
-msgstr ""
+msgstr "게임 샤크 어드밴스"
 
 #: guiinit.cpp:781
 msgid "Code Breaker Advance"
-msgstr ""
+msgstr "코드 브레이커 어드밴스"
 
 #: guiinit.cpp:782
 msgid "Flashcart CHT"
@@ -323,7 +323,7 @@ msgstr "0x03000000 - IRAM"
 
 #: viewers.cpp:818
 msgid "0x04000000 - I / O"
-msgstr ""
+msgstr "0x04000000 - I / O"
 
 #: viewers.cpp:819
 msgid "0x05000000 - PALETTE"
@@ -367,7 +367,7 @@ msgstr "0xD000 - WRAM"
 
 #: viewers.cpp:931
 msgid "0xFF00 - I / O"
-msgstr ""
+msgstr "0xFF00 - I / O"
 
 #: viewers.cpp:932
 msgid "0xFF80 - RAM"
@@ -393,7 +393,7 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
 " Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "게이보이 어드밴스 파일 (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|게임보이 파일 (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:140
 msgid "Open ROM file"
@@ -403,7 +403,7 @@ msgstr "롬 파일 열기"
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "게임보이 파일 (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:167
 msgid "Open GB ROM file"
@@ -413,7 +413,7 @@ msgstr "게임보이 롬 파일 열기"
 msgid ""
 "Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "게임보이 컬러 파일 (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:194
 msgid "Open GBC ROM file"
@@ -439,7 +439,7 @@ msgstr "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "배터리 파일을 가져오면 저장된 게임이 모두 지워집니다 (다음 쓰기 이후에는 영구적으로 지워집니다). 계속하겠습니까?"
 
 #: cmdevents.cpp:412 cmdevents.cpp:440 cmdevents.cpp:560
 msgid "Confirm import"
@@ -461,17 +461,17 @@ msgstr "코드파일 선택"
 
 #: cmdevents.cpp:430
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
-msgstr ""
+msgstr "게임 샤크 코드 파일 (*.spc;*.xpc)|*.spc;*.xpc"
 
 #: cmdevents.cpp:430
 msgid "Game Shark Code File (*.gcf)|*.gcf"
-msgstr ""
+msgstr "게임 샤크 코드 파일 (*.gcf)|*.gcf"
 
 #: cmdevents.cpp:439
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
-msgstr ""
+msgstr "코드 파일을 가져오면 로드된 치트가 모두 대체됩니다. 계속하겠습니까?"
 
 #: cmdevents.cpp:456
 #, c-format
@@ -501,17 +501,17 @@ msgstr "스냅샷 파일 선택"
 msgid ""
 "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
 " (*.gsv)|*.gsv"
-msgstr ""
+msgstr "게임 샤크 & PAC 스크린샷 (*.sps;*.xps)|*.sps;*.xps|게임 샤크 SP 스냅샷 (*.gsv)|*.gsv"
 
 #: cmdevents.cpp:550
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
-msgstr ""
+msgstr "게임보이 스냅샵 (*.gbs)|*.gbs"
 
 #: cmdevents.cpp:559
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "스냅샷 파일을 가져오면 저장된 게임이 모두 지워집니다 (다음 쓰기 이후에는 영구적으로 지워집니다). 계속하겠습니까?"
 
 #: cmdevents.cpp:584
 #, c-format
@@ -539,11 +539,11 @@ msgstr "EEPROM 저장 방식은 내보낼 수 없음"
 
 #: cmdevents.cpp:626
 msgid "Game Shark Snapshot (*.sps)|*.sps"
-msgstr ""
+msgstr "게임 샤크 스냅샷 (*.sps)|*.sps"
 
 #: cmdevents.cpp:640
 msgid "Exported from Visual Boy Advance-M"
-msgstr ""
+msgstr "Visual Boy Advance-M에서 내보내기"
 
 #: cmdevents.cpp:652
 #, c-format
@@ -574,7 +574,7 @@ msgstr "스테이트 파일을 선택"
 
 #: cmdevents.cpp:1261 cmdevents.cpp:1354
 msgid "Visual Boy Advance saved game files|*.sgm"
-msgstr ""
+msgstr "비주얼 보이 어드밴스 저장된 게임 파일|*.sgm"
 
 #: cmdevents.cpp:1384 cmdevents.cpp:1394 cmdevents.cpp:1405
 #, c-format
@@ -583,7 +583,7 @@ msgstr "현재 상태 슬롯 # %d"
 
 #: cmdevents.cpp:1470
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
-msgstr ""
+msgstr "게임보이 바이오스 파일이 활성화된 경우 컬러라이저 해킹을 사용할 수 없습니다."
 
 #: cmdevents.cpp:1681
 msgid "Sound enabled"
@@ -596,7 +596,7 @@ msgstr "소리 끄기"
 #: cmdevents.cpp:1694 cmdevents.cpp:1708
 #, c-format
 msgid "Volume: %d %%"
-msgstr ""
+msgstr "볼륨: %d %%"
 
 #: cmdevents.cpp:1777
 msgid "Set to 0 for pseudo tty"
@@ -633,15 +633,15 @@ msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
-msgstr ""
+msgstr "설정이 삭제됩니다!\n\n확실한가요?"
 
 #: cmdevents.cpp:2281
 msgid "FACTORY RESET"
-msgstr ""
+msgstr "공장 초기화"
 
 #: cmdevents.cpp:2316
 msgid "Nintendo Game Boy / Color / Advance emulator."
-msgstr ""
+msgstr "닌텐도 게임보이 / 컬러 / 어드밴스 에뮬레이터입니다."
 
 #: cmdevents.cpp:2317
 msgid ""
@@ -664,15 +664,15 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program. If not, see http://www.gnu.org/licenses ."
-msgstr ""
+msgstr "이 프로그램은 자유 소프트웨어이므로 재배포 및/또는 수정할 수 있습니다.\n자유 소프트웨어 재단에서 게시한 GNU 일반 공중 사용 허가서 조건에 따라\n자유 소프트웨어 재단, 라이선스 버전 2 또는 (귀하의 선택에 따라)\n이후 버전에 따라 재배포할 수 있습니다.\n\n이 프로그램은 유용하게 사용되기를 바라는 마음으로 배포되며, 어떠한 보증도 없이\n상품성 또는 특정 목적에의 적합성에 대한 묵시적 보증도 없이 배포됩니다.\n자세한 내용은 GNU 일반 공중 사용 허가서를 참조하세요.\n\n이 프로그램과 함께 GNU 일반 공중 사용 허가서 사본을 이 프로그램과 함께 받았어야 합니다.\n그렇지 않은 경우 http://www.gnu.org/licenses 을 참조하세요."
 
 #: cmdevents.cpp:2504
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
-msgstr ""
+msgstr "컬러라이저 해킹이 활성화된 경우 게임보이 바이오스를 사용할 수 없습니다."
 
 #: cmdevents.cpp:2558
 msgid "LAN link is already active. Disable link mode to disconnect."
-msgstr ""
+msgstr "랜 링크가 이미 활성화되어 있습니다. 연결을 끊으려면 링크 모드를 비활성화합니다."
 
 #: cmdevents.cpp:2564
 msgid "Network is not supported in local mode."
@@ -710,7 +710,7 @@ msgstr "확인"
 msgid ""
 "The INI file was written for a more recent version of VBA-M. Some INI option"
 " values may have been reset."
-msgstr ""
+msgstr "INI 파일은 최신 버전의 VBA-M용으로 작성되었습니다. 일부 INI 옵션 값이 재설정되었을 수 있습니다."
 
 #: opts.cpp:457 opts.cpp:477 opts.cpp:662
 #, c-format
@@ -760,12 +760,12 @@ msgstr "재생 종료."
 #: sys.cpp:453
 #, c-format
 msgid "%d %% (%d, %d fps)"
-msgstr ""
+msgstr "%d %% (%d, %d fps)"
 
 #: sys.cpp:461
 #, c-format
 msgid "%d %%"
-msgstr ""
+msgstr "%d %%"
 
 #: sys.cpp:895 xrc/GBPrinter.xrc:65
 msgid "&Discard"
@@ -820,7 +820,7 @@ msgstr "%s 게임보이 ROM을 불러올 수 없습니다."
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
-msgstr ""
+msgstr "컬러라이저 해킹이 활성화된 경우 게임보이 바이오스 파일을 사용할 수 없으므로 게임보이 바이오스 파일을 비활성화합니다."
 
 #: panel.cpp:286 panel.cpp:386
 #, c-format
@@ -859,31 +859,31 @@ msgstr "상태 %s 저장 오류"
 #: panel.cpp:948
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
-msgstr ""
+msgstr "전체 화면 모드 %d x %d - %d @ %d 지원되지 않음; 다른 것을 찾고 있음"
 
 #: panel.cpp:986
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
-msgstr ""
+msgstr "전체 화면 모드 %d x %d - %d @ %d 지원되지 않음"
 
 #: panel.cpp:991
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
-msgstr ""
+msgstr "유효한 모드: %d x %d - %d @ %d"
 
 #: panel.cpp:999
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
-msgstr ""
+msgstr "선택 모드 %d x %d - %d @ %d"
 
 #: panel.cpp:1003
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
-msgstr ""
+msgstr "모드를 %d x %d - %d @ %d로 변경하지 못했음"
 
 #: panel.cpp:1094
 msgid "Not a valid Game Boy Advance cartridge"
-msgstr ""
+msgstr "유효한 게임보이 어드밴스 카트리지가 아님"
 
 #: panel.cpp:1257
 msgid "No memory for rewinding"
@@ -965,7 +965,7 @@ msgstr "%s (%s)부터 녹화를 시작할 수 없습니다."
 #: panel.cpp:2540
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
-msgstr ""
+msgstr "오디오 / 비디오 녹음 중 오류 (%s); 중단 중"
 
 #: panel.cpp:2546
 #, c-format
@@ -1027,11 +1027,11 @@ msgstr "크기 조정 시 화면비 유지"
 
 #: config/internal/option-internal.cpp:391
 msgid "BIOS file to use for Game Boy, if enabled"
-msgstr ""
+msgstr "활성화된 경우, 게임보이에서 사용할 바이오스 파일"
 
 #: config/internal/option-internal.cpp:393
 msgid "Game Boy color enhancement, if enabled"
-msgstr ""
+msgstr "활성화된 경우, 게임보이 색상 향상"
 
 #: config/internal/option-internal.cpp:395
 msgid "Enable DX Colorization Hacks"
@@ -1044,7 +1044,7 @@ msgstr "활성화된 경우, LCD 필터 적용"
 
 #: config/internal/option-internal.cpp:399
 msgid "BIOS file to use for Game Boy Color, if enabled"
-msgstr ""
+msgstr "활성화된 경우, 게임보이 컬러에 사용할 바이오스 파일"
 
 #: config/internal/option-internal.cpp:401
 msgid ""
@@ -1076,7 +1076,7 @@ msgstr "ROM 파일을 찾을 디렉토리"
 
 #: config/internal/option-internal.cpp:416
 msgid "Directory to look for Game Boy Color ROM files"
-msgstr ""
+msgstr "게임보이 컬러 롬 파일을 찾을 디렉토리"
 
 #: config/internal/option-internal.cpp:419
 msgid "BIOS file to use, if enabled"
@@ -1132,7 +1132,7 @@ msgstr "최근 불러오기 목록 고정"
 msgid ""
 "Directory to store A / V and game recordings (relative paths are relative to"
 " ROM)"
-msgstr ""
+msgstr "A / V 및 게임 녹화를 저장할 디렉토리 (상대 경로는 롬을 기준으로 함)"
 
 #: config/internal/option-internal.cpp:457
 msgid "Number of seconds between rewind snapshots (0 to disable)"
@@ -1154,7 +1154,7 @@ msgstr "상태 표시줄 활성화"
 
 #: config/internal/option-internal.cpp:465
 msgid "INI file version (DO NOT MODIFY)"
-msgstr ""
+msgstr "INI 파일 버전 (수정 금지)"
 
 #: config/internal/option-internal.cpp:469
 msgid ""
@@ -1162,11 +1162,11 @@ msgid ""
 "names which map to joypad #<n> button <button>. Button is one of Up, Down, "
 "Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
-msgstr ""
+msgstr "조이패드/<n>/<button> 매개변수에는 조이패드 #<n> 버튼 <button>에 매핑되는 쉼표로 구분된 키 이름 목록이 포함되어 있습니다. 버튼은 위쪽, 아래쪽, 왼쪽, 오른쪽, A, B, L, R, 선택, 시작, 모션위쪽, 모션아래쪽, 모션왼쪽, 모션오른쪽, 자동A, 자동B, 속도, 캡쳐, GS 중 하나입니다."
 
 #: config/internal/option-internal.cpp:475
 msgid "The autofire toggle period, in frames (1/60 s)"
-msgstr ""
+msgstr "연사 토글 주기, 프레임 단위 (1/60 초)"
 
 #: config/internal/option-internal.cpp:477
 msgid "The number of the stick to use in single-player mode"
@@ -1177,7 +1177,7 @@ msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
-msgstr ""
+msgstr "매개변수 키보드/<cmd>에는 쉼표로 구분된 키 이름 목록이 포함되어 있습니다 (예: Alt-Shift-F1). 이름이 지정된 키를 누르면 명령 <cmd>가 실행됩니다."
 
 #: config/internal/option-internal.cpp:487
 msgid "Enable AGB debug print"
@@ -1185,11 +1185,11 @@ msgstr "AGB 디버그 출력 활성화"
 
 #: config/internal/option-internal.cpp:489
 msgid "Auto skip frames"
-msgstr ""
+msgstr "프레임 자동 건너뛰기"
 
 #: config/internal/option-internal.cpp:491
 msgid "Apply IPS / UPS / IPF patches if found"
-msgstr ""
+msgstr "발견 시 IPS / UPS / IPF 패치 적용"
 
 #: config/internal/option-internal.cpp:493
 msgid "Automatically save and load cheat list"
@@ -1197,7 +1197,7 @@ msgstr "치트 목록 자동 저장 및 불러오기"
 
 #: config/internal/option-internal.cpp:497
 msgid "Automatically enable border for Super Game Boy games"
-msgstr ""
+msgstr "슈퍼 게임보이 게임에서 테두리 자동 활성화"
 
 #: config/internal/option-internal.cpp:499
 msgid "Always enable border"
@@ -1221,11 +1221,11 @@ msgstr "에뮬레이션할 시스템 유형"
 
 #: config/internal/option-internal.cpp:507
 msgid "Flash size 0 = 64 KB 1 = 128 KB"
-msgstr ""
+msgstr "플래시 크기 0 = 64 KB 1 = 128 KB"
 
 #: config/internal/option-internal.cpp:509
 msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
-msgstr ""
+msgstr "프레임 건너뛰기입니다. 값은 0-9 또는 -1이며 시간에 따라 자동으로 건너뜁니다."
 
 #: config/internal/option-internal.cpp:511
 msgid "The palette to use"
@@ -1241,7 +1241,7 @@ msgstr "게임을 불러온 후 GDB에 개입합니다."
 
 #: config/internal/option-internal.cpp:517
 msgid "Port to connect GDB to"
-msgstr ""
+msgstr "GDB를 연결할 포트"
 
 #: config/internal/option-internal.cpp:520
 msgid "Number of players in network"
@@ -1285,11 +1285,11 @@ msgstr "상태를 불러올 때 기본 (배터리) 저장을 덮어쓰지 않음
 
 #: config/internal/option-internal.cpp:540
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
-msgstr ""
+msgstr "가속 시에도 게임 속도 조절 (0-450%, 0 = 스로틀 없음)"
 
 #: config/internal/option-internal.cpp:543
 msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
-msgstr ""
+msgstr "속도 향상 키의 스로틀 설정 (0-3000%, 0 = 스로틀 없음)"
 
 #: config/internal/option-internal.cpp:545
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
@@ -1301,7 +1301,7 @@ msgstr "스로틀 속도 향상을 위해 프레임 건너뛰기 사용"
 
 #: config/internal/option-internal.cpp:550
 msgid "Use the specified BIOS file for Game Boy"
-msgstr ""
+msgstr "게임보이에 지정된 바이오스 파일 사용"
 
 #: config/internal/option-internal.cpp:552
 msgid "Use the specified BIOS file"
@@ -1309,7 +1309,7 @@ msgstr "지정된 BIOS 파일 사용"
 
 #: config/internal/option-internal.cpp:554
 msgid "Use the specified BIOS file for Game Boy Color"
-msgstr ""
+msgstr "게임보이 컬러에 지정된 바이오스 파일 사용"
 
 #: config/internal/option-internal.cpp:555
 msgid "Wait for vertical sync"
@@ -1353,7 +1353,7 @@ msgstr "마우스가 비활성 상태일 때 메뉴 표시줄 숨기기"
 
 #: config/internal/option-internal.cpp:575
 msgid "Suspend screensaver when game is running"
-msgstr ""
+msgstr "게임이 실행 중일 때 화면 보호기 일시 중지"
 
 #: config/internal/option-internal.cpp:579
 msgid "Sound API; if unsupported, default API will be used"
@@ -1373,31 +1373,31 @@ msgstr "활성화할 사운드 채널의 비트 마스크"
 
 #: config/internal/option-internal.cpp:585
 msgid "Game Boy Advance sound filtering (%)"
-msgstr ""
+msgstr "게임보이 어드밴스 사운드 필터링 (%)"
 
 #: config/internal/option-internal.cpp:587
 msgid "Game Boy Advance sound interpolation"
-msgstr ""
+msgstr "게임보이 어드밴스 사운드 보간"
 
 #: config/internal/option-internal.cpp:589
 msgid "Game Boy sound declicking"
-msgstr ""
+msgstr "게임보이 사운드 감소"
 
 #: config/internal/option-internal.cpp:590
 msgid "Game Boy echo effect (%)"
-msgstr ""
+msgstr "게임보이 에코 효과 (%)"
 
 #: config/internal/option-internal.cpp:592
 msgid "Enable Game Boy sound effects"
-msgstr ""
+msgstr "게임보이 사운드 효과 활성화"
 
 #: config/internal/option-internal.cpp:593
 msgid "Game Boy stereo effect (%)"
-msgstr ""
+msgstr "게임보이 스테레오 효과 (%)"
 
 #: config/internal/option-internal.cpp:595
 msgid "Game Boy surround sound effect (%)"
-msgstr ""
+msgstr "게임보이 서라운드 사운드 효과 (%)"
 
 #: config/internal/option-internal.cpp:596
 msgid "Sound sample rate (kHz)"
@@ -1433,155 +1433,155 @@ msgstr "옵션 %s 에 대해 유효하지 않은 값 %d; 유효한 값은 %s"
 
 #: config/user-input.cpp:23
 msgid "Backspace"
-msgstr ""
+msgstr "Backspace"
 
 #: config/user-input.cpp:24
 msgid "Delete"
-msgstr ""
+msgstr "Delete"
 
 #: config/user-input.cpp:25
 msgid "Page Up"
-msgstr ""
+msgstr "Page Up"
 
 #: config/user-input.cpp:26
 msgid "Page Down"
-msgstr ""
+msgstr "Page Down"
 
 #: config/user-input.cpp:27
 msgid "Num Lock"
-msgstr ""
+msgstr "Num Lock"
 
 #: config/user-input.cpp:28
 msgid "Scroll Lock"
-msgstr ""
+msgstr "Scroll Lock"
 
 #: config/user-input.cpp:31
 msgid "Num Space"
-msgstr ""
+msgstr "Num Space"
 
 #: config/user-input.cpp:32
 msgid "Num Tab"
-msgstr ""
+msgstr "Num Tab"
 
 #: config/user-input.cpp:33
 msgid "Num Enter"
-msgstr ""
+msgstr "Num Enter"
 
 #: config/user-input.cpp:34
 msgid "Num Home"
-msgstr ""
+msgstr "Num Home"
 
 #: config/user-input.cpp:35
 msgid "Num left"
-msgstr ""
+msgstr "Num left"
 
 #: config/user-input.cpp:36
 msgid "Num Up"
-msgstr ""
+msgstr "Num Up"
 
 #: config/user-input.cpp:37
 msgid "Num Right"
-msgstr ""
+msgstr "Num Right"
 
 #: config/user-input.cpp:38
 msgid "Num Down"
-msgstr ""
+msgstr "Num Down"
 
 #: config/user-input.cpp:39
 msgid "Num PageUp"
-msgstr ""
+msgstr "Num PageUp"
 
 #: config/user-input.cpp:40
 msgid "Num PageDown"
-msgstr ""
+msgstr "Num PageDown"
 
 #: config/user-input.cpp:41
 msgid "Num End"
-msgstr ""
+msgstr "Num End"
 
 #: config/user-input.cpp:42
 msgid "Num Begin"
-msgstr ""
+msgstr "Num Begin"
 
 #: config/user-input.cpp:43
 msgid "Num Insert"
-msgstr ""
+msgstr "Num Insert"
 
 #: config/user-input.cpp:44
 msgid "Num Delete"
-msgstr ""
+msgstr "Num Delete"
 
 #: config/user-input.cpp:45
 msgid "Num ="
-msgstr ""
+msgstr "Num ="
 
 #: config/user-input.cpp:46
 msgid "Num *"
-msgstr ""
+msgstr "Num *"
 
 #: config/user-input.cpp:47
 msgid "Num +"
-msgstr ""
+msgstr "Num +"
 
 #: config/user-input.cpp:48
 msgid "Num ,"
-msgstr ""
+msgstr "Num ,"
 
 #: config/user-input.cpp:49
 msgid "Num -"
-msgstr ""
+msgstr "Num -"
 
 #: config/user-input.cpp:50
 msgid "Num ."
-msgstr ""
+msgstr "Num ."
 
 #: config/user-input.cpp:51
 msgid "Num /"
-msgstr ""
+msgstr "Num /"
 
 #: config/user-input.cpp:55
 msgid "Volume Mute"
-msgstr ""
+msgstr "볼륨 무음"
 
 #: config/user-input.cpp:56
 msgid "Volume Down"
-msgstr ""
+msgstr "볼륨 낮춤"
 
 #: config/user-input.cpp:57
 msgid "Volume Up"
-msgstr ""
+msgstr "Volume Up"
 
 #: config/user-input.cpp:58
 msgid "Next Track"
-msgstr ""
+msgstr "다음 트랙"
 
 #: config/user-input.cpp:59
 msgid "Previous Track"
-msgstr ""
+msgstr "이전 트랙"
 
 #: config/user-input.cpp:60
 msgid "Stop"
-msgstr ""
+msgstr "정지"
 
 #: config/user-input.cpp:61
 msgid "Play/Pause"
-msgstr ""
+msgstr "재생/잠시 멈춤"
 
 #: config/user-input.cpp:94
 msgid "Alt+"
-msgstr ""
+msgstr "Alt+"
 
 #: config/user-input.cpp:97
 msgid "Ctrl+"
-msgstr ""
+msgstr "Ctrl+"
 
 #: config/user-input.cpp:101
 msgid "Rawctrl+"
-msgstr ""
+msgstr "Rawctrl+"
 
 #: config/user-input.cpp:105
 msgid "Shift+"
-msgstr ""
+msgstr "Shift+"
 
 #: config/user-input.cpp:108
 msgid "Meta+"
@@ -1589,19 +1589,19 @@ msgstr "Meta+"
 
 #: config/user-input.cpp:135
 msgid "Alt"
-msgstr ""
+msgstr "Alt"
 
 #: config/user-input.cpp:136
 msgid "Shift"
-msgstr ""
+msgstr "Shift"
 
 #: config/user-input.cpp:138 config/user-input.cpp:141
 msgid "Ctrl"
-msgstr ""
+msgstr "Ctrl"
 
 #: config/user-input.cpp:139
 msgid "Cmd"
-msgstr ""
+msgstr "Cmd"
 
 #: dialogs/accel-config.cpp:156
 msgid "Menu commands"
@@ -1609,7 +1609,7 @@ msgstr "메뉴 명령"
 
 #: dialogs/accel-config.cpp:268
 msgid "This will clear all user-defined accelerators. Are you sure?"
-msgstr ""
+msgstr "이렇게 하면 모든 사용자 정의 가속기가 지워집니다. 확실한가요?"
 
 #: dialogs/accel-config.cpp:268 dialogs/accel-config.cpp:305
 msgid "Confirm"
@@ -1618,7 +1618,7 @@ msgstr "확인"
 #: dialogs/accel-config.cpp:302
 #, c-format
 msgid "This will unassign \"%s\" from \"%s\". Are you sure?"
-msgstr ""
+msgstr "이렇게 하면 \"%s\"에서 \"%s\"의 할당이 해제됩니다. 확실한가요?"
 
 #: dialogs/directories-config.cpp:50
 msgid "Browse"
@@ -1626,7 +1626,7 @@ msgstr "Browse"
 
 #: dialogs/display-config.cpp:54
 msgid "Invalid value for Default magnification."
-msgstr ""
+msgstr "기본 배율에 대한 잘못된 값입니다."
 
 #: dialogs/display-config.cpp:341 xrc/DisplayConfig.xrc:85
 #: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
@@ -1666,186 +1666,186 @@ msgstr "알 수 없음"
 
 #: dialogs/game-maker.cpp:235
 msgid "Invalid"
-msgstr ""
+msgstr "유효하지 않음"
 
 #: dialogs/gb-rom-info.cpp:21
 msgid "No mapper"
-msgstr ""
+msgstr "매퍼 없음"
 
 #: dialogs/gb-rom-info.cpp:24
 msgid "MBC1"
-msgstr ""
+msgstr "MBC1"
 
 #: dialogs/gb-rom-info.cpp:27
 msgid "MBC2"
-msgstr ""
+msgstr "MBC2"
 
 #: dialogs/gb-rom-info.cpp:30
 msgid "MBC3"
-msgstr ""
+msgstr "MBC3"
 
 #: dialogs/gb-rom-info.cpp:33
 msgid "MBC5"
-msgstr ""
+msgstr "MBC5"
 
 #: dialogs/gb-rom-info.cpp:36
 msgid "MBC6"
-msgstr ""
+msgstr "MBC6"
 
 #: dialogs/gb-rom-info.cpp:39
 msgid "MBC7"
-msgstr ""
+msgstr "MBC7"
 
 #: dialogs/gb-rom-info.cpp:42
 msgid "Pocket Camera"
-msgstr ""
+msgstr "포켓 카메라"
 
 #: dialogs/gb-rom-info.cpp:45
 msgid "MMM01"
-msgstr ""
+msgstr "MMM01"
 
 #: dialogs/gb-rom-info.cpp:48
 msgid "HuC-1"
-msgstr ""
+msgstr "HuC-1"
 
 #: dialogs/gb-rom-info.cpp:51
 msgid "HuC-3"
-msgstr ""
+msgstr "HuC-3"
 
 #: dialogs/gb-rom-info.cpp:54
 msgid "Bandai TAMA5"
-msgstr ""
+msgstr "반다이 TAMA5"
 
 #: dialogs/gb-rom-info.cpp:67
 msgid " + RAM"
-msgstr ""
+msgstr " + 램"
 
 #: dialogs/gb-rom-info.cpp:68
 msgid " + RTC"
-msgstr ""
+msgstr " + RTC"
 
 #: dialogs/gb-rom-info.cpp:69
 msgid " + Battery"
-msgstr ""
+msgstr " + 배터리"
 
 #: dialogs/gb-rom-info.cpp:70
 msgid " + Rumble"
-msgstr ""
+msgstr " + 진동"
 
 #: dialogs/gb-rom-info.cpp:71
 msgid " + Motion Sensor"
-msgstr ""
+msgstr " + 모션 센서"
 
 #: dialogs/gb-rom-info.cpp:73
 #, c-format
 msgid "%02X (%s%s%s%s%s%s)"
-msgstr ""
+msgstr "%02X (%s%s%s%s%s%s)"
 
 #: dialogs/gb-rom-info.cpp:80 dialogs/gb-rom-info.cpp:92
 #, c-format
 msgid "%02X (Supported)"
-msgstr ""
+msgstr "%02X (지원)"
 
 #: dialogs/gb-rom-info.cpp:82 dialogs/gb-rom-info.cpp:90
 #, c-format
 msgid "%02X (Not supported)"
-msgstr ""
+msgstr "%02X (지원 안 함)"
 
 #: dialogs/gb-rom-info.cpp:94
 #, c-format
 msgid "%02X (Required)"
-msgstr ""
+msgstr "%02X (요구됨)"
 
 #: dialogs/gb-rom-info.cpp:106 dialogs/gb-rom-info.cpp:140
 #, c-format
 msgid "%02X (32 KiB)"
-msgstr ""
+msgstr "%02X (32 KiB)"
 
 #: dialogs/gb-rom-info.cpp:108 dialogs/gb-rom-info.cpp:144
 #, c-format
 msgid "%02X (64 KiB)"
-msgstr ""
+msgstr "%02X (64 KiB)"
 
 #: dialogs/gb-rom-info.cpp:110 dialogs/gb-rom-info.cpp:142
 #, c-format
 msgid "%02X (128 KiB)"
-msgstr ""
+msgstr "%02X (128 KiB)"
 
 #: dialogs/gb-rom-info.cpp:112
 #, c-format
 msgid "%02X (256 KiB)"
-msgstr ""
+msgstr "%02X (256 KiB)"
 
 #: dialogs/gb-rom-info.cpp:114
 #, c-format
 msgid "%02X (512 KiB)"
-msgstr ""
+msgstr "%02X (512 KiB)"
 
 #: dialogs/gb-rom-info.cpp:116
 #, c-format
 msgid "%02X (1 MiB)"
-msgstr ""
+msgstr "%02X (1 MiB)"
 
 #: dialogs/gb-rom-info.cpp:118
 #, c-format
 msgid "%02X (2 MiB)"
-msgstr ""
+msgstr "%02X (2 MiB)"
 
 #: dialogs/gb-rom-info.cpp:120
 #, c-format
 msgid "%02X (4 MiB)"
-msgstr ""
+msgstr "%02X (4 MiB)"
 
 #: dialogs/gb-rom-info.cpp:122 dialogs/gb-rom-info.cpp:146
 #: dialogs/gb-rom-info.cpp:158
 #, c-format
 msgid "%02X (Unknown)"
-msgstr ""
+msgstr "%02X (알 수 없음)"
 
 #: dialogs/gb-rom-info.cpp:130
 #, c-format
 msgid "%02X (None)"
-msgstr ""
+msgstr "%02X (없음)"
 
 #: dialogs/gb-rom-info.cpp:132
 #, c-format
 msgid "%02X (256 B)"
-msgstr ""
+msgstr "%02X (256 B)"
 
 #: dialogs/gb-rom-info.cpp:134
 #, c-format
 msgid "%02X (512 B)"
-msgstr ""
+msgstr "%02X (512 B)"
 
 #: dialogs/gb-rom-info.cpp:136
 #, c-format
 msgid "%02X (2 KiB)"
-msgstr ""
+msgstr "%02X (2 KiB)"
 
 #: dialogs/gb-rom-info.cpp:138
 #, c-format
 msgid "%02X (8 KiB)"
-msgstr ""
+msgstr "%02X (8 KiB)"
 
 #: dialogs/gb-rom-info.cpp:154
 #, c-format
 msgid "%02X (Japan)"
-msgstr ""
+msgstr "%02X (일본)"
 
 #: dialogs/gb-rom-info.cpp:156
 #, c-format
 msgid "%02X (World)"
-msgstr ""
+msgstr "%02X (세계)"
 
 #: dialogs/gb-rom-info.cpp:208
 #, c-format
 msgid "%02X (Actual: %02X)"
-msgstr ""
+msgstr "%02X (실제: %02X)"
 
 #: dialogs/gb-rom-info.cpp:211
 #, c-format
 msgid "%04X (Actual: %04X)"
-msgstr ""
+msgstr "%04X (실제: %04X)"
 
 #: widgets/sdljoy.cpp:188
 #, c-format
@@ -1892,7 +1892,7 @@ msgstr "FAudio: 소스 음성 작성에 실패했습니다!"
 #: dsound.cpp:89 dsound.cpp:103
 #, c-format
 msgid "Cannot create Direct Sound %08x"
-msgstr ""
+msgstr "다이렉트 사운드 %08x 생성할 수 없음"
 
 #: dsound.cpp:108
 #, c-format
@@ -2028,7 +2028,7 @@ msgstr "16진수(&H)"
 
 #: xrc/CheatCreate.xrc:97
 msgid "Signed / Unsigned"
-msgstr ""
+msgstr "서명 / 미서명"
 
 #: xrc/CheatCreate.xrc:107
 msgid "&8 bits"
@@ -2335,7 +2335,7 @@ msgstr "필터"
 
 #: xrc/DisplayConfig.xrc:79
 msgid "Display filter:"
-msgstr ""
+msgstr "필터 표시:"
 
 #: xrc/DisplayConfig.xrc:86
 msgid "2xSaI"
@@ -2355,7 +2355,7 @@ msgstr "픽셀화"
 
 #: xrc/DisplayConfig.xrc:90
 msgid "Advance MAME Scale 2x"
-msgstr ""
+msgstr "고급 MAME 스케일 2x"
 
 #: xrc/DisplayConfig.xrc:91
 msgid "Bilinear"
@@ -2423,11 +2423,11 @@ msgstr "xBRZ 6배율"
 
 #: xrc/DisplayConfig.xrc:115
 msgid "Plugin:"
-msgstr ""
+msgstr "플러그인:"
 
 #: xrc/DisplayConfig.xrc:127
 msgid "Interframe blending:"
-msgstr ""
+msgstr "프레임 간 블렌딩:"
 
 #: xrc/DisplayConfig.xrc:136
 msgid "Smart"
@@ -2447,7 +2447,7 @@ msgstr "프레임 생략"
 
 #: xrc/DisplayConfig.xrc:177
 msgid "&Number of frames to skip:"
-msgstr ""
+msgstr "건너뛸 프레임 수(&N):"
 
 #: xrc/DisplayConfig.xrc:199
 msgid "Speed"
@@ -2455,7 +2455,7 @@ msgstr "속도"
 
 #: xrc/DisplayConfig.xrc:215
 msgid "Speed indicator:"
-msgstr ""
+msgstr "속도 표시기:"
 
 #: xrc/DisplayConfig.xrc:222
 msgid "Percentage"
@@ -2471,11 +2471,11 @@ msgstr "화면에 표시"
 
 #: xrc/DisplayConfig.xrc:247
 msgid "Default magnification:"
-msgstr ""
+msgstr "기본 배율:"
 
 #: xrc/DisplayConfig.xrc:266
 msgid "Maximum magnification factor:"
-msgstr ""
+msgstr "최대 배율 계수:"
 
 #: xrc/DisplayConfig.xrc:267
 msgid "0 = no maximum"
@@ -2559,7 +2559,7 @@ msgstr "ROM 정보"
 
 #: xrc/GBColorPrefPanel.xrc:9
 msgid "Custom"
-msgstr ""
+msgstr "커스텀"
 
 #: xrc/GBColorPrefPanel.xrc:10 xrc/JoyPanel.xrc:247
 msgid "Standard"
@@ -2591,11 +2591,11 @@ msgstr "이상한 색 조합"
 
 #: xrc/GBColorPrefPanel.xrc:17
 msgid "Real Game Boy Colors"
-msgstr ""
+msgstr "실제 게임보이 컬러"
 
 #: xrc/GBColorPrefPanel.xrc:18
 msgid "Real 'Game Boy on Game Boy Advance Special' Colors"
-msgstr ""
+msgstr "실제 '게임보이 어드밴스 스페셜에서 게임보이' 색상"
 
 #: xrc/GBColorPrefPanel.xrc:46 xrc/GBPaletteViewer.xrc:17 xrc/MapViewer.xrc:54
 #: xrc/PaletteViewer.xrc:19
@@ -2802,11 +2802,11 @@ msgstr "카트리지 형식:"
 
 #: xrc/GBROMInfo.xrc:60
 msgid "SGB code:"
-msgstr ""
+msgstr "SGB 코드:"
 
 #: xrc/GBROMInfo.xrc:72
 msgid "CGB code:"
-msgstr ""
+msgstr "CGB 코드:"
 
 #: xrc/GBROMInfo.xrc:84
 msgid "ROM size:"
@@ -2826,11 +2826,11 @@ msgstr "라이센스 코드:"
 
 #: xrc/GBROMInfo.xrc:144
 msgid "Header checksum:"
-msgstr ""
+msgstr "헤더 체크섬:"
 
 #: xrc/GBROMInfo.xrc:156
 msgid "Cartridge checksum:"
-msgstr ""
+msgstr "카트리지 체크섬:"
 
 #: xrc/GBTileViewer.xrc:14
 msgid "&0"
@@ -2858,7 +2858,7 @@ msgstr "게임보이 어드밴스 설정"
 
 #: xrc/GameBoyAdvanceConfig.xrc:21
 msgid "Save type:"
-msgstr ""
+msgstr "저장 유형:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
 #: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
@@ -2883,15 +2883,15 @@ msgstr "EEPROM + 센서"
 
 #: xrc/GameBoyAdvanceConfig.xrc:43
 msgid "Flash size:"
-msgstr ""
+msgstr "플래시 크기:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
 msgid "64 K"
-msgstr ""
+msgstr "64 K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:50 xrc/GameBoyAdvanceConfig.xrc:222
 msgid "128 K"
-msgstr ""
+msgstr "128 K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:64
 msgid "Detect Now"
@@ -2907,11 +2907,11 @@ msgstr "저장 형식"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file:"
-msgstr ""
+msgstr "바이오스 파일:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file:"
-msgstr ""
+msgstr "현재 바이오스 파일:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:136 xrc/GameBoyConfig.xrc:168
 msgid "Boot ROM"
@@ -2965,11 +2965,11 @@ msgstr "게임 오버라이드"
 
 #: xrc/GameBoyConfig.xrc:4
 msgid "Game Boy settings"
-msgstr ""
+msgstr "게임보이 설정"
 
 #: xrc/GameBoyConfig.xrc:20
 msgid "Emulated &system:"
-msgstr ""
+msgstr "에뮬레이트된 시스템(&S):"
 
 #: xrc/GameBoyConfig.xrc:30
 msgid "Game Boy Color"
@@ -2993,7 +2993,7 @@ msgstr "슈퍼 게임보이 2"
 
 #: xrc/GameBoyConfig.xrc:48
 msgid "Display &borders:"
-msgstr ""
+msgstr "테두리 표시(&B):"
 
 #: xrc/GameBoyConfig.xrc:57
 msgid "Never"
@@ -3009,7 +3009,7 @@ msgstr "시스템"
 
 #: xrc/GameBoyConfig.xrc:84
 msgid "Game Boy Boot &ROM file:"
-msgstr ""
+msgstr "게임보이 부팅  롬 파일(&R):"
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
@@ -3017,15 +3017,15 @@ msgstr "파일을 선택하세요."
 
 #: xrc/GameBoyConfig.xrc:106
 msgid "Game Boy Color Boot ROM &file:"
-msgstr ""
+msgstr "게임보이 컬러 부팅 롬 파일(&F):"
 
 #: xrc/GameBoyConfig.xrc:131
 msgid "Current Game Boy BIOS file:"
-msgstr ""
+msgstr "현재 게임보이 바이오스 파일:"
 
 #: xrc/GameBoyConfig.xrc:152
 msgid "Current Game Boy Color BIOS file:"
-msgstr ""
+msgstr "현재 게임보이 컬러 바이오스 파일:"
 
 #: xrc/GameBoyConfig.xrc:186
 msgid "User 1"
@@ -3061,7 +3061,7 @@ msgstr "&BMP"
 
 #: xrc/GeneralConfig.xrc:57
 msgid "&Rewind interval:"
-msgstr ""
+msgstr "되감기 간격(&R):"
 
 #: xrc/GeneralConfig.xrc:58
 msgid "If not empty or 0, enable rewind (seconds)"
@@ -3168,7 +3168,7 @@ msgid ""
 "Click a field and press a key or move joystick to add. Press backspace to "
 "delete last added key. Resize window or click inside and move pointer to see"
 " entire contents if too small."
-msgstr ""
+msgstr "필드를 클릭하고 키를 누르거나 조이스틱을 움직여 추가합니다. 마지막으로 추가한 키를 삭제하려면 백스페이스 키를 누릅니다. 창이 너무 작으면 크기를 조정하거나 안쪽을 클릭하고 포인터를 이동하여 전체 내용을 확인합니다."
 
 #: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:456
 msgid "Up"
@@ -3228,11 +3228,11 @@ msgstr "B 버튼 연사"
 
 #: xrc/JoyPanel.xrc:342
 msgid "Motion Left / Dark"
-msgstr ""
+msgstr "모션 왼쪽 / 어두움"
 
 #: xrc/JoyPanel.xrc:386
 msgid "Motion Right / Light"
-msgstr ""
+msgstr "모션 오른쪽 / 밝음"
 
 #: xrc/JoyPanel.xrc:408
 msgid "Speed Up"
@@ -3356,11 +3356,11 @@ msgstr "열기..."
 
 #: xrc/MainMenu.xrc:10
 msgid "Open &Game Boy..."
-msgstr ""
+msgstr "게임보이 열기(&G)..."
 
 #: xrc/MainMenu.xrc:13
 msgid "Open Game Boy &Color..."
-msgstr ""
+msgstr "게임보이 컬러 열기(&C)..."
 
 #: xrc/MainMenu.xrc:16
 msgid "Open rece&nt"
@@ -3448,7 +3448,7 @@ msgstr "1&0"
 
 #: xrc/MainMenu.xrc:89
 msgid "From &File..."
-msgstr ""
+msgstr "파일에서(&F)..."
 
 #: xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
@@ -3476,7 +3476,7 @@ msgstr "저장 슬롯 수 확장 후 저장"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File..."
-msgstr ""
+msgstr "파일로(&F)..."
 
 #: xrc/MainMenu.xrc:147
 msgid "&Save state"
@@ -3496,11 +3496,11 @@ msgstr "배터리 파일(&B)..."
 
 #: xrc/MainMenu.xrc:161
 msgid "Game Shark &code file..."
-msgstr ""
+msgstr "게임 샤크 코드 파일(&C)..."
 
 #: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
 msgid "&Game Shark snapshot..."
-msgstr ""
+msgstr "게임 샤크 스냅샷(&G)..."
 
 #: xrc/MainMenu.xrc:166
 msgid "&Import"
@@ -3596,7 +3596,7 @@ msgstr "BIOS 생략(&S)"
 
 #: xrc/MainMenu.xrc:255
 msgid "&Auto IPS / UPS / IPF patch"
-msgstr ""
+msgstr "자동 IPS / UPS / IPF 패치(&A)"
 
 #: xrc/MainMenu.xrc:259
 msgid "&Pause when inactive"
@@ -3616,7 +3616,7 @@ msgstr "연결(&L)"
 
 #: xrc/MainMenu.xrc:272
 msgid "Start &Network Link..."
-msgstr ""
+msgstr "네트워크 링크 시작(&N)..."
 
 #: xrc/MainMenu.xrc:277
 msgid "&Nothing"
@@ -3632,7 +3632,7 @@ msgstr "무선(&W)"
 
 #: xrc/MainMenu.xrc:289
 msgid "&Game Cube"
-msgstr ""
+msgstr "게임큐브(&G)"
 
 #: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:521
 msgid "&Game Boy"
@@ -3653,7 +3653,7 @@ msgstr "스피드 핵(&S)"
 #: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:387
 #: xrc/MainMenu.xrc:423
 msgid "&Configure..."
-msgstr ""
+msgstr "구성(&C)..."
 
 #: xrc/MainMenu.xrc:314
 msgid "&Video"
@@ -3741,19 +3741,19 @@ msgstr "음향 전환(&T)"
 
 #: xrc/MainMenu.xrc:403
 msgid "&Game Boy Advance sound interpolation"
-msgstr ""
+msgstr "게임보이 어드밴스 사운드 보간(&G)"
 
 #: xrc/MainMenu.xrc:408
 msgid "&Game Boy sound enhancement"
-msgstr ""
+msgstr "게임보이 사운드 향상(&G)"
 
 #: xrc/MainMenu.xrc:412
 msgid "&Game Boy surround sound effect"
-msgstr ""
+msgstr "게임보이 서라운드 사운드 효과(&G)"
 
 #: xrc/MainMenu.xrc:416
 msgid "&Game Boy sound declicking"
-msgstr ""
+msgstr "게임보이 사운드 감소(&G)"
 
 #: xrc/MainMenu.xrc:421
 msgid "&Input"
@@ -3797,7 +3797,7 @@ msgstr "게임보이 어드밴스(&G)"
 
 #: xrc/MainMenu.xrc:500 xrc/MainMenu.xrc:523
 msgid "Configure..."
-msgstr ""
+msgstr "구성..."
 
 #: xrc/MainMenu.xrc:504
 msgid "&Real-time clock"
@@ -3817,15 +3817,15 @@ msgstr "&LCD 필터"
 
 #: xrc/MainMenu.xrc:527
 msgid "&Game Boy color option"
-msgstr ""
+msgstr "게임보이 컬러 옵션(&G)"
 
 #: xrc/MainMenu.xrc:535
 msgid "&Game Boy Colorizer Hack (requires restart)"
-msgstr ""
+msgstr "게임보이 컬러라이저 해킹 (재시작 필요)(&G)"
 
 #: xrc/MainMenu.xrc:539
 msgid "&Game Boy printer"
-msgstr ""
+msgstr "게임보이 프린터(&G)"
 
 #: xrc/MainMenu.xrc:543
 msgid "&Gather a full page before printing"
@@ -3837,31 +3837,31 @@ msgstr "출력물 스크린 캡쳐로 저장하기(&S)"
 
 #: xrc/MainMenu.xrc:552
 msgid "&Use Game Boy BIOS file (requires restart)"
-msgstr ""
+msgstr "게임보이 바이오스 파일 사용 (재시작 필요)(&U)"
 
 #: xrc/MainMenu.xrc:556
 msgid "&Use Game Boy Color BIOS file"
-msgstr ""
+msgstr "게임보이 컬러 바이오스 파일 사용(&U)"
 
 #: xrc/MainMenu.xrc:561
 msgid "&General..."
-msgstr ""
+msgstr "일반사항(&G)..."
 
 #: xrc/MainMenu.xrc:564
 msgid "&Speedup / Turbo..."
-msgstr ""
+msgstr "스피드업 / 터보(&S)..."
 
 #: xrc/MainMenu.xrc:567
 msgid "D&irectories..."
-msgstr ""
+msgstr "디렉토리(&I)..."
 
 #: xrc/MainMenu.xrc:570
 msgid "&Key Shortcuts..."
-msgstr ""
+msgstr "키 단축키(&K)..."
 
 #: xrc/MainMenu.xrc:573
 msgid "&UI Settings..."
-msgstr ""
+msgstr "UI 설정(&U)..."
 
 #: xrc/MainMenu.xrc:577
 msgid "&Tools"
@@ -3873,15 +3873,15 @@ msgstr "치트(&C)"
 
 #: xrc/MainMenu.xrc:581
 msgid "List &cheats..."
-msgstr ""
+msgstr "치트 목록(&C)..."
 
 #: xrc/MainMenu.xrc:584
 msgid "Find c&heat..."
-msgstr ""
+msgstr "치트 찾기(&H)..."
 
 #: xrc/MainMenu.xrc:588
 msgid "A&utomatically save / load cheats"
-msgstr ""
+msgstr "자동으로 치트 저장 / 불러오기(&U)"
 
 #: xrc/MainMenu.xrc:592
 msgid "&Enable cheats"
@@ -4017,7 +4017,7 @@ msgstr "버그 제보(&B)"
 
 #: xrc/MainMenu.xrc:727
 msgid "Visual Boy Advance-M Support &Forum"
-msgstr ""
+msgstr "Visual Boy Advance-M 지원 포럼(&F)"
 
 #: xrc/MainMenu.xrc:730
 msgid "Translations"
@@ -4053,19 +4053,19 @@ msgstr "프레임"
 
 #: xrc/MapViewer.xrc:35
 msgid "BG 0"
-msgstr ""
+msgstr "배경 0"
 
 #: xrc/MapViewer.xrc:41
 msgid "BG 1"
-msgstr ""
+msgstr "배경 1"
 
 #: xrc/MapViewer.xrc:46
 msgid "BG 2"
-msgstr ""
+msgstr "배경 2"
 
 #: xrc/MapViewer.xrc:51
 msgid "BG 3"
-msgstr ""
+msgstr "배경 3"
 
 #: xrc/MapViewer.xrc:84
 msgid "Map Base:"
@@ -4173,7 +4173,7 @@ msgstr "음향 설정"
 
 #: xrc/SoundConfig.xrc:16
 msgid "Volume:"
-msgstr ""
+msgstr "볼륨:"
 
 #: xrc/SoundConfig.xrc:34
 msgid "Mute"
@@ -4185,7 +4185,7 @@ msgstr "최대"
 
 #: xrc/SoundConfig.xrc:71
 msgid "Sample rate:"
-msgstr ""
+msgstr "샘플 레이트:"
 
 #: xrc/SoundConfig.xrc:77
 msgid "48 KHz"
@@ -4213,7 +4213,7 @@ msgstr "OpenAL"
 
 #: xrc/SoundConfig.xrc:118
 msgid "Direct Sound"
-msgstr ""
+msgstr "다이렉트 사운드"
 
 #: xrc/SoundConfig.xrc:125
 msgid "XAudio2"
@@ -4261,7 +4261,7 @@ msgstr "중앙"
 
 #: xrc/SoundConfig.xrc:269
 msgid "Left / Right"
-msgstr ""
+msgstr "왼쪽 / 오른쪽"
 
 #: xrc/SoundConfig.xrc:298
 msgid "Sound filtering"
@@ -4325,4 +4325,4 @@ msgstr "메뉴 바 숨기기"
 
 #: xrc/UIConfig.xrc:16
 msgid "Suspend ScreenSaver"
-msgstr ""
+msgstr "화면 보호기 일시 중지"
