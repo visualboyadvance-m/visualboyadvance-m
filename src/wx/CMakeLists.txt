@@ -1245,13 +1245,13 @@ if(NOT TRANSLATIONS_ONLY)
                 COMMAND ${CMAKE_SOURCE_DIR}/tools/macOS/third_party_libs_tool ./visualboyadvance-m.app
                 WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
             )
-
-            add_custom_command(
-                TARGET visualboyadvance-m POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/mac-translations.cmake
-                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            )
         endif()
+
+        add_custom_command(
+            TARGET visualboyadvance-m POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/mac-translations.cmake
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
     endif()
 
     if(APPLE AND (UPSTREAM_RELEASE OR ENABLE_ONLINEUPDATES))
