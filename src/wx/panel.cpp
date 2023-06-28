@@ -2183,6 +2183,15 @@ static int glopts[] = {
     WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0
 };
 
+bool GLDrawingPanel::SetCurrent()
+{
+#ifndef wxGL_IMPLICIT_CONTEXT
+    return wxGLCanvas::SetCurrent(*ctx);
+#else
+    return wxGLContext::SetCurrent(*this);
+#endif
+}
+
 GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
     : DrawingPanelBase(_width, _height)
     , wxglc(parent, wxID_ANY, glopts, wxPoint(0, 0), parent->GetClientSize(),
@@ -2191,8 +2200,8 @@ GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
     widgets::RequestHighResolutionOpenGlSurfaceForWindow(this);
 #ifndef wxGL_IMPLICIT_CONTEXT
     ctx = new wxGLContext(this);
-    SetCurrent(*ctx);
 #endif
+    SetCurrent();
     if (!did_init) DrawingPanelInit();
 }
 
@@ -2202,11 +2211,7 @@ GLDrawingPanel::~GLDrawingPanel()
     // it's also unsafe if panel no longer displayed
     if (did_init)
     {
-#ifndef wxGL_IMPLICIT_CONTEXT
-        SetCurrent(*ctx);
-#else
         SetCurrent();
-#endif
         glDeleteLists(vlist, 1);
         glDeleteTextures(1, &texid);
     }
@@ -2218,11 +2223,7 @@ GLDrawingPanel::~GLDrawingPanel()
 
 void GLDrawingPanel::DrawingPanelInit()
 {
-#ifndef wxGL_IMPLICIT_CONTEXT
-    SetCurrent(*ctx);
-#else
     SetCurrent();
-#endif
 
     DrawingPanelBase::DrawingPanelInit();
 
@@ -2360,6 +2361,7 @@ void GLDrawingPanel::DrawingPanelInit()
 
 void GLDrawingPanel::OnSize(wxSizeEvent& ev)
 {
+    SetCurrent();
     AdjustViewport();
 
     // Temporary hack to backport 800d6ed69b from wxWidgets until 3.2.2 is released.
@@ -2371,11 +2373,7 @@ void GLDrawingPanel::OnSize(wxSizeEvent& ev)
 
 void GLDrawingPanel::AdjustViewport()
 {
-#ifndef wxGL_IMPLICIT_CONTEXT
-    SetCurrent(*ctx);
-#else
     SetCurrent();
-#endif
 
     int x, y;
     widgets::GetRealPixelClientSize(this, &x, &y);
@@ -2392,11 +2390,7 @@ void GLDrawingPanel::AdjustViewport()
 void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 {
     (void)dc; // unused params
-#ifndef wxGL_IMPLICIT_CONTEXT
-    SetCurrent(*ctx);
-#else
     SetCurrent();
-#endif
 
     if (!did_init)
         DrawingPanelInit();

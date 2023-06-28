@@ -41,6 +41,7 @@ protected:
 #ifndef wxGL_IMPLICIT_CONTEXT
     wxGLContext* ctx;
 #endif
+    bool SetCurrent();
     void DrawingPanelInit();
     GLuint texid, vlist;
     int texsize;
