@@ -38,10 +38,11 @@ protected:
     void DrawArea(wxWindowDC& dc);
     void OnSize(wxSizeEvent& ev);
     void AdjustViewport();
+    void RefreshGL();
 #ifndef wxGL_IMPLICIT_CONTEXT
-    wxGLContext* ctx;
+    wxGLContext* ctx = nullptr;
 #endif
-    bool SetCurrent();
+    bool SetContext();
     void DrawingPanelInit();
     GLuint texid, vlist;
     int texsize;
