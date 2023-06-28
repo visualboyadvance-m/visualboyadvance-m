@@ -2387,10 +2387,24 @@ void GLDrawingPanel::AdjustViewport()
 #endif
 }
 
+void GLDrawingPanel::RefreshGL()
+{
+#ifndef wxGL_IMPLICIT_CONTEXT
+    SetCurrent(*ctx);
+#else
+    SetCurrent();
+#endif
+
+    // Rebind any textures or other OpenGL resources here
+    glBindTexture(GL_TEXTURE_2D, texid);
+}
+
 void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 {
     (void)dc; // unused params
     SetCurrent();
+
+    RefreshGL();
 
     if (!did_init)
         DrawingPanelInit();

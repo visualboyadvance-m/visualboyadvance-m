@@ -38,6 +38,7 @@ protected:
     void DrawArea(wxWindowDC& dc);
     void OnSize(wxSizeEvent& ev);
     void AdjustViewport();
+    void RefreshGL();
 #ifndef wxGL_IMPLICIT_CONTEXT
     wxGLContext* ctx;
 #endif
