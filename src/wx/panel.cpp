@@ -2183,7 +2183,7 @@ static int glopts[] = {
     WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0
 };
 
-bool GLDrawingPanel::SetCurrent()
+bool GLDrawingPanel::SetContext()
 {
 #ifndef wxGL_IMPLICIT_CONTEXT
     return wxGLCanvas::SetCurrent(*ctx);
@@ -2201,7 +2201,7 @@ GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
 #ifndef wxGL_IMPLICIT_CONTEXT
     ctx = new wxGLContext(this);
 #endif
-    SetCurrent();
+    SetContext();
     if (!did_init) DrawingPanelInit();
 }
 
@@ -2211,7 +2211,7 @@ GLDrawingPanel::~GLDrawingPanel()
     // it's also unsafe if panel no longer displayed
     if (did_init)
     {
-        SetCurrent();
+        SetContext();
         glDeleteLists(vlist, 1);
         glDeleteTextures(1, &texid);
     }
@@ -2223,7 +2223,7 @@ GLDrawingPanel::~GLDrawingPanel()
 
 void GLDrawingPanel::DrawingPanelInit()
 {
-    SetCurrent();
+    SetContext();
 
     DrawingPanelBase::DrawingPanelInit();
 
@@ -2361,7 +2361,6 @@ void GLDrawingPanel::DrawingPanelInit()
 
 void GLDrawingPanel::OnSize(wxSizeEvent& ev)
 {
-    SetCurrent();
     AdjustViewport();
 
     // Temporary hack to backport 800d6ed69b from wxWidgets until 3.2.2 is released.
@@ -2373,7 +2372,7 @@ void GLDrawingPanel::OnSize(wxSizeEvent& ev)
 
 void GLDrawingPanel::AdjustViewport()
 {
-    SetCurrent();
+    SetContext();
 
     int x, y;
     widgets::GetRealPixelClientSize(this, &x, &y);
@@ -2387,10 +2386,20 @@ void GLDrawingPanel::AdjustViewport()
 #endif
 }
 
+void GLDrawingPanel::RefreshGL()
+{
+    SetContext();
+
+    // Rebind any textures or other OpenGL resources here
+
+    glBindTexture(GL_TEXTURE_2D, texid);
+}
+
 void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 {
     (void)dc; // unused params
-    SetCurrent();
+    SetContext();
+    RefreshGL();
 
     if (!did_init)
         DrawingPanelInit();
