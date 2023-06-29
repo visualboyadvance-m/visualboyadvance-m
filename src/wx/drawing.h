@@ -39,13 +39,10 @@ protected:
     void OnSize(wxSizeEvent& ev);
     void AdjustViewport();
     void RefreshGL();
-
-    // Add a new method to reset the OpenGL context
-    void ResetContext();
-
 #ifndef wxGL_IMPLICIT_CONTEXT
     wxGLContext* ctx;
 #endif
+    bool SetContext();
     void DrawingPanelInit();
     GLuint texid, vlist;
     int texsize;

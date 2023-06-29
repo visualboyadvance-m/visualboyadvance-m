@@ -2183,6 +2183,28 @@ static int glopts[] = {
     WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0
 };
 
+bool GLDrawingPanel::SetContext()
+{
+#ifndef wxGL_IMPLICIT_CONTEXT
+    // Check if the current context is valid
+    if (!ctx || !ctx->IsOK())
+    {
+        // Delete the old context
+        if (ctx) {
+            delete ctx;
+            ctx = nullptr;
+        }
+
+        // Create a new context
+        ctx = new wxGLContext(this);
+}
+
+    return wxGLCanvas::SetCurrent(*ctx);
+#else
+    return wxGLContext::SetCurrent(*this);
+#endif
+}
+
 GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
     : DrawingPanelBase(_width, _height)
     , wxglc(parent, wxID_ANY, glopts, wxPoint(0, 0), parent->GetClientSize(),
@@ -2191,8 +2213,8 @@ GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
     widgets::RequestHighResolutionOpenGlSurfaceForWindow(this);
 #ifndef wxGL_IMPLICIT_CONTEXT
     ctx = new wxGLContext(this);
-    SetCurrent(*ctx);
 #endif
+    SetContext();
     if (!did_init) DrawingPanelInit();
 }
 
@@ -2202,7 +2224,6 @@ GLDrawingPanel::~GLDrawingPanel()
     // it's also unsafe if panel no longer displayed
     if (did_init)
     {
-#ifndef wxGL_IMPLICIT_CONTEXT
         SetCurrent(*ctx);
 #else
         SetCurrent();
@@ -2216,7 +2237,6 @@ GLDrawingPanel::~GLDrawingPanel()
 #endif
 }
 
-// Add a new method to reset the OpenGL context
 void GLDrawingPanel::ResetContext()
 {
 #ifndef wxGL_IMPLICIT_CONTEXT
@@ -2228,26 +2248,9 @@ void GLDrawingPanel::ResetContext()
     if (ctx) {
         delete ctx;
         ctx = nullptr;
-    }
-
-    // Create a new context
-    ctx = new wxGLContext(this);
-    SetCurrent(*ctx);
-#else
-    SetCurrent();
-#endif
-
-    // Reinitialize the drawing panel
-    DrawingPanelInit();
-}
-
 void GLDrawingPanel::DrawingPanelInit()
 {
-#ifndef wxGL_IMPLICIT_CONTEXT
-    SetCurrent(*ctx);
-#else
-    SetCurrent();
-#endif
+    SetContext();
 
     DrawingPanelBase::DrawingPanelInit();
 
@@ -2396,11 +2399,7 @@ void GLDrawingPanel::OnSize(wxSizeEvent& ev)
 
 void GLDrawingPanel::AdjustViewport()
 {
-#ifndef wxGL_IMPLICIT_CONTEXT
-    SetCurrent(*ctx);
-#else
-    SetCurrent();
-#endif
+    SetContext();
 
     int x, y;
     widgets::GetRealPixelClientSize(this, &x, &y);
@@ -2416,20 +2415,17 @@ void GLDrawingPanel::AdjustViewport()
 
 void GLDrawingPanel::RefreshGL()
 {
-#ifndef wxGL_IMPLICIT_CONTEXT
-    SetCurrent(*ctx);
-#else
-    SetCurrent();
-#endif
+    SetContext();
 
     // Rebind any textures or other OpenGL resources here
+
     glBindTexture(GL_TEXTURE_2D, texid);
 }
 
 void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 {
     (void)dc; // unused params
-    ResetContext();
+    SetContext();
     RefreshGL();
 
     if (!did_init)
