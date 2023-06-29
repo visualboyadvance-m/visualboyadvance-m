@@ -431,6 +431,11 @@ if(WIN32)
     set(SDL2_LIBRARY ${SDL2_LIBRARY} setupapi winmm)
 endif()
 
+if(ENABLE_Direct3D)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+find_package(DirectX REQUIRED)
+endif()
+
 # set the standard libraries all ports use
 set(
     VBAMCORE_LIBS
