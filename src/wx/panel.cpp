@@ -2442,23 +2442,200 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 #define DIRECT3D_VERSION 0x0900
 #include <d3d9.h> // main include file
 //#include <d3dx9core.h> // required for font rendering
-#include <dxerr9.h> // contains debug functions
 
 DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
     : DrawingPanel(parent, _width, _height)
 {
-    // FIXME: implement
+    // Create the Direct3D9 object
+    IDirect3D9* d3d = Direct3DCreate9(D3D_SDK_VERSION);
+    if (d3d == nullptr)
+    {
+        // Handle error here
+    }
+
+    // Set up the presentation parameters
+    D3DPRESENT_PARAMETERS d3dpp;
+    ZeroMemory(&d3dpp, sizeof(d3dpp));
+    d3dpp.Windowed = TRUE;
+    d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+    d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
+    d3dpp.BackBufferCount = 2;
+    d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+
+    // Create the Direct3D9 device
+    IDirect3DDevice9* d3ddev = nullptr;
+    HRESULT hr = d3d->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, (HWND)wxGetApp().frame->GetHandle(),
+        D3DCREATE_HARDWARE_VERTEXPROCESSING, &d3dpp, &d3ddev);
+    if (FAILED(hr))
+    {
+        // Handle error here
+    }
+
+    // Store the Direct3D9 device and object in member variables
+    this->d3ddev = d3ddev;
+    this->d3d = d3d;
+
+    // Call the DrawingPanelInit method to initialize the rendering state and resources
+    DrawingPanelInit();
+}
+
+void DXDrawingPanel::DrawingPanelInit()
+{
+    // Set up the rendering state
+    bool bilinear = true; // Set the desired texture filtering mode here
+
+    if (d3ddev != nullptr)
+    {
+        // The IDirect3DDevice9 object has been created and initialized correctly
+        // You can use it here
+        d3ddev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+        d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        d3ddev->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        d3ddev->SetSamplerState(0, D3DSAMP_MINFILTER, bilinear ? D3DTEXF_LINEAR : D3DTEXF_POINT);
+        d3ddev->SetSamplerState(0, D3DSAMP_MAGFILTER, bilinear ? D3DTEXF_LINEAR : D3DTEXF_POINT);
+    }
+    else
+    {
+        // The IDirect3DDevice9 object has not been created or initialized correctly
+        // Handle the error here
+    }
+
+    // Define a matrix type
+    struct Matrix4x4
+    {
+        float m[4][4];
+    };
+
+    // Set up the projection matrix
+    Matrix4x4 matProj;
+    ZeroMemory(&matProj, sizeof(matProj));
+    matProj.m[0][0] = 2.0f;
+    matProj.m[1][1] = -2.0f;
+    matProj.m[2][2] = 1.0f;
+    matProj.m[3][0] = -1.0f;
+    matProj.m[3][1] = 1.0f;
+    matProj.m[3][3] = 1.0f;
+    d3ddev->SetTransform(D3DTS_PROJECTION, (D3DMATRIX*)&matProj);
+
+    Vertex vertices[] = {
+        { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+        { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f },
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f },
+        { 1.0f, 0.0f, 0.0f, 1.0f, 0.0f }
+    };
+
+    d3ddev->CreateVertexBuffer(4 * sizeof(Vertex), D3DUSAGE_WRITEONLY,
+        D3DFVF_XYZ | D3DFVF_TEX1,
+        D3DPOOL_MANAGED,
+        &vbuffer,
+        NULL);
+    void* pVertices;
+    vbuffer->Lock(0,
+        sizeof(vertices),
+        (void**)&pVertices,
+        0);
+    memcpy(pVertices, vertices, sizeof(vertices));
+    vbuffer->Unlock();
+
+    // Create the texture
+    int texWidth = std::ceil(width * scale);
+    int texHeight = std::ceil(height * scale);
+    D3DFORMAT texFormat = out_16 ? D3DFMT_A1R5G5B5 : D3DFMT_A8R8G8B8;
+    HRESULT hr = d3ddev->CreateTexture(texWidth,
+        texHeight,
+        1,
+        0,
+        texFormat,
+        D3DPOOL_MANAGED,
+        &texture,
+        NULL);
+    if (FAILED(hr))
+    {
+        // Handle error here
+    }
+}
+
+DXDrawingPanel::~DXDrawingPanel()
+{
+    // Release any resources here
+    if (vbuffer) vbuffer->Release();
+    if (texture) texture->Release();
+    if (d3ddev) d3ddev->Release();
+    if (d3d) d3d->Release();
 }
 
 void DXDrawingPanel::DrawArea(wxWindowDC& dc)
 {
-    // FIXME: implement
     if (!did_init) {
-      DrawingPanelInit();
+        DrawingPanelInit();
     }
 
     if (todraw) {
+        // Update the texture data
+        D3DLOCKED_RECT rect;
+        texture->LockRect(0, &rect, NULL, 0);
+
+        // Calculate the number of pixels in a row of the image data
+        int rowlen = std::ceil(width * scale) + (out_16 ? 2 : 1);
+
+        // Copy the image data from the todraw variable to the locked rectangle of the texture
+        uint8_t* src = todraw + (int)std::ceil(rowlen * (out_16 ? 2 : 4) * scale);
+        uint8_t* dst = (uint8_t*)rect.pBits;
+        for (int y = 0; y < std::ceil(height * scale); y++) {
+            memcpy(dst, src, rowlen * (out_16 ? 2 : 4));
+            src += rowlen * (out_16 ? 2 : 4);
+            dst += rect.Pitch;
+        }
+
+        texture->UnlockRect(0);
+
+        // Clear the back buffer
+        d3ddev->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+
+        // Begin the scene
+        d3ddev->BeginScene();
+
+        // Set the texture and vertex buffer
+        d3ddev->SetTexture(0, texture);
+        d3ddev->SetStreamSource(0, vbuffer, 0, sizeof(Vertex));
+        d3ddev->SetFVF(D3DFVF_XYZ | D3DFVF_TEX1);
+
+        // Draw the quad
+        d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+
+        // End the scene
+        d3ddev->EndScene();
+
+        // Present the back buffer to the screen
+        d3ddev->Present(NULL, NULL, NULL, NULL);
     }
+}
+
+void DXDrawingPanel::OnSize(wxSizeEvent& ev)
+{
+    // Reset the Direct3D device with updated presentation parameters
+    D3DPRESENT_PARAMETERS d3dpp;
+    ZeroMemory(&d3dpp, sizeof(d3dpp));
+    d3dpp.Windowed = TRUE;
+    d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+    d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
+    d3dpp.BackBufferCount = 2;
+    d3ddev->Reset(&d3dpp);
+
+    // Update the projection matrix
+    float width = (float)ev.GetSize().GetWidth();
+    float height = (float)ev.GetSize().GetHeight();
+    D3DMATRIX matProj = {
+        2.0f / width, 0.0f, 0.0f, 0.0f,
+        0.0f, -2.0f / height, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        -1.0f, 1.0f, 0.0f, 1.0f
+    };
+    d3ddev->SetTransform(D3DTS_PROJECTION, &matProj);
+
+    // Call the base class handler
+    ev.Skip();
 }
 #endif
 
