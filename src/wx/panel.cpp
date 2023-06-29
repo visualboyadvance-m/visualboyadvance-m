@@ -2220,6 +2220,10 @@ GLDrawingPanel::~GLDrawingPanel()
 void GLDrawingPanel::ResetContext()
 {
 #ifndef wxGL_IMPLICIT_CONTEXT
+    // Check if the current context is valid
+    if (ctx && ctx->IsOK())
+        return;
+
     // Delete the old context
     if (ctx) {
         delete ctx;
@@ -2425,12 +2429,7 @@ void GLDrawingPanel::RefreshGL()
 void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 {
     (void)dc; // unused params
-#ifndef wxGL_IMPLICIT_CONTEXT
-    SetCurrent(*ctx);
-#else
-    SetCurrent();
-#endif
-
+    ResetContext();
     RefreshGL();
 
     if (!did_init)
