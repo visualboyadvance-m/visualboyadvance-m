@@ -2224,10 +2224,7 @@ GLDrawingPanel::~GLDrawingPanel()
     // it's also unsafe if panel no longer displayed
     if (did_init)
     {
-        SetCurrent(*ctx);
-#else
-        SetCurrent();
-#endif
+        SetContext();
         glDeleteLists(vlist, 1);
         glDeleteTextures(1, &texid);
     }
@@ -2237,17 +2234,6 @@ GLDrawingPanel::~GLDrawingPanel()
 #endif
 }
 
-void GLDrawingPanel::ResetContext()
-{
-#ifndef wxGL_IMPLICIT_CONTEXT
-    // Check if the current context is valid
-    if (ctx && ctx->IsOK())
-        return;
-
-    // Delete the old context
-    if (ctx) {
-        delete ctx;
-        ctx = nullptr;
 void GLDrawingPanel::DrawingPanelInit()
 {
     SetContext();
