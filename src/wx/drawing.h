@@ -58,22 +58,22 @@ struct Vertex
     float u, v;
 };
 
-class DXDrawingPanel : public DrawingPanel {
+class DXDrawingPanel : public DrawingPanel
+{
 public:
     DXDrawingPanel(wxWindow* parent, int _width, int _height);
     virtual ~DXDrawingPanel();
 
 protected:
+    void DrawingPanelInit();
     void DrawArea(wxWindowDC&);
     void OnSize(wxSizeEvent& ev);
-    void DrawingPanelInit();
-
 
 private:
-    IDirect3D9* d3d;
-    IDirect3DDevice9* d3ddev;
-    IDirect3DTexture9* texture;
+    IDirect3D9Ex* d3d;
+    IDirect3DDevice9Ex* d3ddev;
     IDirect3DVertexBuffer9* vbuffer;
+    IDirect3DTexture9* texture;
 };
 #endif
 

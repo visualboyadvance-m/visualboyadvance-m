@@ -2446,19 +2446,35 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
     : DrawingPanel(parent, _width, _height)
 {
-    // Create the Direct3D9 object
-    d3d = Direct3DCreate9(D3D_SDK_VERSION);
+    // Create the Direct3D9Ex object
+    IDirect3D9Ex* d3dEx = nullptr;
+    HRESULT hr = Direct3DCreate9Ex(D3D_SDK_VERSION, &d3dEx);
+    if (FAILED(hr))
+    {
+        // Handle error here
+    }
 
     // Set up the presentation parameters
     D3DPRESENT_PARAMETERS d3dpp;
     ZeroMemory(&d3dpp, sizeof(d3dpp));
     d3dpp.Windowed = TRUE;
-    d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+    d3dpp.SwapEffect = D3DSWAPEFFECT_FLIPEX;
     d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
+    d3dpp.BackBufferCount = 2;
+    d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 
-    // Create the Direct3D9 device
-    d3d->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, GetHWND(),
-        D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &d3ddev);
+    // Create the Direct3D9Ex device
+    IDirect3DDevice9Ex* d3ddevEx = nullptr;
+    hr = d3dEx->CreateDeviceEx(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, (HWND)wxGetApp().frame->GetHandle(),
+        D3DCREATE_HARDWARE_VERTEXPROCESSING, &d3dpp, NULL, &d3ddevEx);
+    if (FAILED(hr))
+    {
+        // Handle error here
+    }
+
+    // Store the Direct3D9Ex device and object in member variables
+    d3ddev = d3ddevEx;
+    d3d = d3dEx;
 
     // Call the DrawingPanelInit method to initialize the rendering state and resources
     DrawingPanelInit();
@@ -2468,12 +2484,23 @@ void DXDrawingPanel::DrawingPanelInit()
 {
     // Set up the rendering state
     bool bilinear = true; // Set the desired texture filtering mode here
-    d3ddev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-    d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-    d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-    d3ddev->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-    d3ddev->SetSamplerState(0, D3DSAMP_MINFILTER, bilinear ? D3DTEXF_LINEAR : D3DTEXF_POINT);
-    d3ddev->SetSamplerState(0, D3DSAMP_MAGFILTER, bilinear ? D3DTEXF_LINEAR : D3DTEXF_POINT);
+
+    if (d3ddev != nullptr)
+    {
+        // The IDirect3DDevice9Ex object has been created and initialized correctly
+        // You can use it here
+        d3ddev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+        d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        d3ddev->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        d3ddev->SetSamplerState(0, D3DSAMP_MINFILTER, bilinear ? D3DTEXF_LINEAR : D3DTEXF_POINT);
+        d3ddev->SetSamplerState(0, D3DSAMP_MAGFILTER, bilinear ? D3DTEXF_LINEAR : D3DTEXF_POINT);
+    }
+    else
+    {
+        // The IDirect3DDevice9Ex object has not been created or initialized correctly
+        // Handle the error here
+    }
 
     // Define a matrix type
     struct Matrix4x4
@@ -2492,7 +2519,6 @@ void DXDrawingPanel::DrawingPanelInit()
     matProj.m[3][3] = 1.0f;
     d3ddev->SetTransform(D3DTS_PROJECTION, (D3DMATRIX*)&matProj);
 
-    // Create the vertex buffer
     Vertex vertices[] = {
         { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f },
         { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f },
@@ -2502,9 +2528,10 @@ void DXDrawingPanel::DrawingPanelInit()
 
     d3ddev->CreateVertexBuffer(4 * sizeof(Vertex), D3DUSAGE_WRITEONLY,
         D3DFVF_XYZ | D3DFVF_TEX1,
-        D3DPOOL_MANAGED,
+        D3DPOOL_DEFAULT,
         &vbuffer,
         NULL);
+
     void* pVertices;
     vbuffer->Lock(0,
         sizeof(vertices),
@@ -2520,9 +2547,9 @@ void DXDrawingPanel::DrawingPanelInit()
     HRESULT hr = d3ddev->CreateTexture(texWidth,
         texHeight,
         1,
-        0,
+        D3DUSAGE_DYNAMIC,
         texFormat,
-        D3DPOOL_MANAGED,
+        D3DPOOL_DEFAULT,
         &texture,
         NULL);
     if (FAILED(hr))
@@ -2542,6 +2569,31 @@ DXDrawingPanel::~DXDrawingPanel()
 
 void DXDrawingPanel::DrawArea(wxWindowDC& dc)
 {
+    // Check if the device is lost
+    HRESULT hr = d3ddev->TestCooperativeLevel();
+    if (hr == D3DERR_DEVICELOST)
+    {
+        // Release any resources created in the D3DPOOL_DEFAULT memory pool
+        if (vbuffer) vbuffer->Release();
+        if (texture) texture->Release();
+
+        // Reset the device
+        D3DPRESENT_PARAMETERS d3dpp;
+        ZeroMemory(&d3dpp, sizeof(d3dpp));
+        d3dpp.Windowed = TRUE;
+        d3dpp.SwapEffect = D3DSWAPEFFECT_FLIPEX;
+        d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
+        d3dpp.BackBufferCount = 2;
+        hr = d3ddev->ResetEx(&d3dpp, NULL);
+        if (FAILED(hr))
+        {
+            // Handle error here
+        }
+
+        // Recreate any resources that were released
+        DrawingPanelInit();
+    }
+
     if (!did_init) {
         DrawingPanelInit();
     }
@@ -2593,11 +2645,10 @@ void DXDrawingPanel::OnSize(wxSizeEvent& ev)
     D3DPRESENT_PARAMETERS d3dpp;
     ZeroMemory(&d3dpp, sizeof(d3dpp));
     d3dpp.Windowed = TRUE;
-    d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+    d3dpp.SwapEffect = D3DSWAPEFFECT_FLIPEX;
     d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
-    d3dpp.BackBufferWidth = ev.GetSize().GetWidth();
-    d3dpp.BackBufferHeight = ev.GetSize().GetHeight();
-    d3ddev->Reset(&d3dpp);
+    d3dpp.BackBufferCount = 2;
+    d3ddev->ResetEx(&d3dpp, NULL);
 
     // Update the projection matrix
     float width = (float)ev.GetSize().GetWidth();
