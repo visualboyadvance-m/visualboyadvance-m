@@ -2444,7 +2444,7 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 //#include <d3dx9core.h> // required for font rendering
 
 DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
-    : DrawingPanel(parent, _width, _height)
+    : DrawingPanelBase(_width, _height)
 {
     // Create the Direct3D9Ex object
     IDirect3D9Ex* d3dEx = nullptr;
@@ -2482,6 +2482,8 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
 
 void DXDrawingPanel::DrawingPanelInit()
 {
+    DrawingPanelBase::DrawingPanelInit();
+
     // Set up the rendering state
     bool bilinear = true; // Set the desired texture filtering mode here
 
@@ -2607,12 +2609,51 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
         int rowlen = std::ceil(width * scale) + (out_16 ? 2 : 1);
 
         // Copy the image data from the todraw variable to the locked rectangle of the texture
-        uint8_t* src = todraw + (int)std::ceil(rowlen * (out_16 ? 2 : 4) * scale);
-        uint8_t* dst = (uint8_t*)rect.pBits;
-        for (int y = 0; y < std::ceil(height * scale); y++) {
-            memcpy(dst, src, rowlen * (out_16 ? 2 : 4));
-            src += rowlen * (out_16 ? 2 : 4);
-            dst += rect.Pitch;
+        if (systemColorDepth == 24) {
+            // never scaled, no borders, no transformations needed
+            memcpy(rect.pBits, todraw, rowlen * height * 3);
+        }
+        else if (out_16) {
+            // scaled by filters, top/right borders, transform to 32-bit
+            uint16_t* src = (uint16_t*)todraw + (int)std::ceil((width + 2) * scale); // skip top border
+            uint32_t* dst = (uint32_t*)rect.pBits;
+            for (int y = 0; y < std::ceil(height * scale); y++) {
+                for (int x = 0; x < std::ceil(width * scale); x++, src++) {
+                    uint8_t r = ((*src >> systemRedShift) & 0x1f) << 3;
+                    uint8_t g = ((*src >> systemGreenShift) & 0x1f) << 3;
+                    uint8_t b = ((*src >> systemBlueShift) & 0x1f) << 3;
+                    *dst++ = (r << 16) | (g << 8) | b;
+                }
+                src += 2; // skip rhs border
+            }
+        }
+        else if (OPTION(kDispFilter) != config::Filter::kNone) {
+            // scaled by filters, top/right borders, transform to 32-bit
+            uint32_t* src = (uint32_t*)todraw + (int)std::ceil(width * scale) + 1; // skip top border
+            uint32_t* dst = (uint32_t*)rect.pBits;
+            for (int y = 0; y < std::ceil(height * scale); y++) {
+                for (int x = 0; x < std::ceil(width * scale); x++, src++) {
+                    uint8_t r = *src >> (systemRedShift - 3);
+                    uint8_t g = *src >> (systemGreenShift - 3);
+                    uint8_t b = *src >> (systemBlueShift - 3);
+                    *dst++ = (r << 16) | (g << 8) | b;
+                }
+                ++src; // skip rhs border
+            }
+        }
+        else { // 32 bit
+            // not scaled by filters, top/right borders, transform to 32-bit
+            uint32_t* src = (uint32_t*)todraw + (int)std::ceil((width + 1) * scale); // skip top border
+            uint32_t* dst = (uint32_t*)rect.pBits;
+            for (int y = 0; y < std::ceil(height * scale); y++) {
+                for (int x = 0; x < std::ceil(width * scale); x++, src++) {
+                    uint8_t r = *src >> (systemRedShift - 3);
+                    uint8_t g = *src >> (systemGreenShift - 3);
+                    uint8_t b = *src >> (systemBlueShift - 3);
+                    *dst++ = (r << 16) | (g << 8) | b;
+                }
+                ++src; // skip rhs border
+            }
         }
 
         texture->UnlockRect(0);
@@ -2653,9 +2694,11 @@ void DXDrawingPanel::OnSize(wxSizeEvent& ev)
     // Update the projection matrix
     float width = (float)ev.GetSize().GetWidth();
     float height = (float)ev.GetSize().GetHeight();
+    float sx = width / (this->width * scale);
+    float sy = height / (this->height * scale);
     D3DMATRIX matProj = {
-        2.0f / width, 0.0f, 0.0f, 0.0f,
-        0.0f, -2.0f / height, 0.0f, 0.0f,
+        2.0f / width * sx, 0.0f, 0.0f, 0.0f,
+        0.0f, -2.0f / height * sy, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f,
         -1.0f, 1.0f, 0.0f, 1.0f
     };

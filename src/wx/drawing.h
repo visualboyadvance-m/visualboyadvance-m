@@ -58,7 +58,7 @@ struct Vertex
     float u, v;
 };
 
-class DXDrawingPanel : public DrawingPanel
+class DXDrawingPanel : public DrawingPanelBase
 {
 public:
     DXDrawingPanel(wxWindow* parent, int _width, int _height);
