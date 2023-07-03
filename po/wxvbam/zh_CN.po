@@ -9,7 +9,7 @@
 # wr superboy, 2023
 # Xuntao Chi <1139954766@qq.com>, 2019
 # 后海游泳大老爷 <my.yuicn@gmail.com>, 2015
-# 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020,2022
+# 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020,2022-2023
 # 智弘 王, 2022
 # 沈舒超 <ssc19940105@gmail.com>, 2015
 # 王晨旭 <wcxu21@126.com>, 2021
@@ -20,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-23 14:26-0700\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: 陈 依云 <c1998lf@qq.com>, 2023\n"
+"Last-Translator: 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020,2022-2023\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/bgk/vba-m/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1736,7 +1736,7 @@ msgstr " + 电池"
 
 #: dialogs/gb-rom-info.cpp:70
 msgid " + Rumble"
-msgstr " + 隆隆声"
+msgstr " + 震动"
 
 #: dialogs/gb-rom-info.cpp:71
 msgid " + Motion Sensor"
