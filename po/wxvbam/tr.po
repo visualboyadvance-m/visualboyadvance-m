@@ -11,14 +11,14 @@
 # Justice League <denizden788@gmail.com>, 2020
 # Bone Cruncher (SilentChaos) <mrzabuzaxtr@gmail.com>, 2018
 # Sinan H., 2016,2018,2022
-# Tmp341, 2016,2021
+# Tmp341, 2016,2021,2023
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-23 14:26-0700\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Sinan H., 2016,2018,2022\n"
+"Last-Translator: Tmp341, 2016,2021,2023\n"
 "Language-Team: Turkish (http://app.transifex.com/bgk/vba-m/language/tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,7 +33,7 @@ msgstr "visualboyadvance-m"
 #: wxvbam.cpp:380 wxvbam.cpp:397
 #, c-format
 msgid "Invalid configuration file provided: %s"
-msgstr ""
+msgstr "Geçersiz yapılandırma dosyası sağlandı: %s"
 
 #: wxvbam.cpp:536
 msgid "Could not create main window"
@@ -77,14 +77,14 @@ msgstr "<config>=<value>"
 
 #: wxvbam.cpp:676
 msgid "Configuration / build error: can't find built-in xrc"
-msgstr ""
+msgstr "Yapılandırma / derleme hatası: dahili xrc bulunamıyor"
 
 #: wxvbam.cpp:684
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr ""
+msgstr "Dahili yapılandırmanın yazıldığı yer %s.\nGeçersiz kılmak için, değiştirilmiş kök düğüm(ler) hariç tümünü kaldırın. Mevcut .xrc ya da .xrs dosyaları içinde bulunan ilk doğru isimdeki kök düğüm, takip eden arama yolunda dahilinin üzerine yazar:"
 
 #: wxvbam.cpp:698
 msgid "Configuration is read from, in order:"
@@ -95,7 +95,7 @@ msgstr "Ayar şu sıra ile, şuradan okunur:"
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
-msgstr ""
+msgstr "Dahili geçersiz kılma dosyasının yazıldığı yer %s\nGeçersiz kılmak için, değiştirilmiş bölüm hariç tamamını silin. İlk bulunan bölüm, mevcut arama yolundan sağlandı:"
 
 #: wxvbam.cpp:718
 msgid ""
@@ -195,11 +195,11 @@ msgstr "Hileleri kaldır"
 
 #: guiinit.cpp:776 dialogs/gb-rom-info.cpp:60 xrc/JoyPanel.xrc:364
 msgid "Game Shark"
-msgstr ""
+msgstr "Game Shark"
 
 #: guiinit.cpp:777 dialogs/gb-rom-info.cpp:57
 msgid "Game Genie"
-msgstr ""
+msgstr "Game Genie"
 
 #: guiinit.cpp:779
 msgid "Generic Code"
@@ -207,11 +207,11 @@ msgstr "Genel Kod"
 
 #: guiinit.cpp:780
 msgid "Game Shark Advance"
-msgstr ""
+msgstr "Game Shark Advance"
 
 #: guiinit.cpp:781
 msgid "Code Breaker Advance"
-msgstr ""
+msgstr "Code Breaker Advance"
 
 #: guiinit.cpp:782
 msgid "Flashcart CHT"
@@ -327,7 +327,7 @@ msgstr "0x03000000 - IRAM"
 
 #: viewers.cpp:818
 msgid "0x04000000 - I / O"
-msgstr ""
+msgstr "0x04000000 - I / O"
 
 #: viewers.cpp:819
 msgid "0x05000000 - PALETTE"
@@ -371,7 +371,7 @@ msgstr "0xD000 - WRAM"
 
 #: viewers.cpp:931
 msgid "0xFF00 - I / O"
-msgstr ""
+msgstr "0xFF00 - I / O"
 
 #: viewers.cpp:932
 msgid "0xFF80 - RAM"
@@ -397,7 +397,7 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
 " Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Game Boy Advance Dosyaları (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game Boy Dosyaları (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:140
 msgid "Open ROM file"
@@ -407,7 +407,7 @@ msgstr "ROM dosyası açın"
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Game Boy Dosyaları (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:167
 msgid "Open GB ROM file"
@@ -417,7 +417,7 @@ msgstr "GB ROM dosyası açın"
 msgid ""
 "Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Game Boy Color Dosyaları (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:194
 msgid "Open GBC ROM file"
@@ -443,7 +443,7 @@ msgstr "Kartuş dosyası (*.sav) *.sav/Bellek kaydı(*.dat)*.dat"
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "Bir batarya dosyasını içe aktarmak, kayıt dosyalarını (sonraki yazmadan sonra kalıcı olarak) siler. Devam etmek istiyor musunuz?"
 
 #: cmdevents.cpp:412 cmdevents.cpp:440 cmdevents.cpp:560
 msgid "Confirm import"
@@ -465,17 +465,17 @@ msgstr "Kod dosyası seçin"
 
 #: cmdevents.cpp:430
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
-msgstr ""
+msgstr "Game Shark Kodu Dosyaları (*.spc;*.xpc)|*.spc;*.xpc"
 
 #: cmdevents.cpp:430
 msgid "Game Shark Code File (*.gcf)|*.gcf"
-msgstr ""
+msgstr "Game Shark Kodu Dosyası (*.gcf)|*.gcf"
 
 #: cmdevents.cpp:439
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
-msgstr ""
+msgstr "Kod dosyasını içeri aktarmak, yüklenmiş hileleri değiştirir. Devam etmek istiyor musunuz?"
 
 #: cmdevents.cpp:456
 #, c-format
@@ -505,17 +505,17 @@ msgstr "Hile kayıt dosyası seçiniz"
 msgid ""
 "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
 " (*.gsv)|*.gsv"
-msgstr ""
+msgstr "Game Shark & PAC Kayıtları (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Kayıtları (*.gsv)|*.gsv"
 
 #: cmdevents.cpp:550
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
-msgstr ""
+msgstr "Game Boy Kayıtları (*.gbs)|*.gbs"
 
 #: cmdevents.cpp:559
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "Kayıt dosyasını içeri aktarmak, oyun kayıtlarını (sonraki yazmadan sonra kalıcı olarak) siler. Devam etmek istiyor musunuz?"
 
 #: cmdevents.cpp:584
 #, c-format
@@ -543,11 +543,11 @@ msgstr "EEPROM kayıtları dışa aktarılamaz"
 
 #: cmdevents.cpp:626
 msgid "Game Shark Snapshot (*.sps)|*.sps"
-msgstr ""
+msgstr "Game Shark Kayıtları (*.sps)|*.sps"
 
 #: cmdevents.cpp:640
 msgid "Exported from Visual Boy Advance-M"
-msgstr ""
+msgstr "Visual Boy Advance-M uygulamasından dışa aktarıldı"
 
 #: cmdevents.cpp:652
 #, c-format
@@ -578,7 +578,7 @@ msgstr "Durum dosyası seçin"
 
 #: cmdevents.cpp:1261 cmdevents.cpp:1354
 msgid "Visual Boy Advance saved game files|*.sgm"
-msgstr ""
+msgstr "Visual Boy Advance oyun kayıt dosyaları|*.sgm"
 
 #: cmdevents.cpp:1384 cmdevents.cpp:1394 cmdevents.cpp:1405
 #, c-format
@@ -587,7 +587,7 @@ msgstr "Geçerli durum kaydı #%d"
 
 #: cmdevents.cpp:1470
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
-msgstr ""
+msgstr "Renklendirme Hilesi, Game Boy BIOS dosyası aktifken kullanılamaz."
 
 #: cmdevents.cpp:1681
 msgid "Sound enabled"
@@ -600,7 +600,7 @@ msgstr "Ses kapatıldı"
 #: cmdevents.cpp:1694 cmdevents.cpp:1708
 #, c-format
 msgid "Volume: %d %%"
-msgstr ""
+msgstr "Ses Düzeyi: %d %%"
 
 #: cmdevents.cpp:1777
 msgid "Set to 0 for pseudo tty"
@@ -637,15 +637,15 @@ msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
-msgstr ""
+msgstr "YAPILANDIRMANIZ SİLİNECEK!\n\nEmin misiniz?"
 
 #: cmdevents.cpp:2281
 msgid "FACTORY RESET"
-msgstr ""
+msgstr "FABRİKA AYARLARINA SIFIRLAMA"
 
 #: cmdevents.cpp:2316
 msgid "Nintendo Game Boy / Color / Advance emulator."
-msgstr ""
+msgstr "Nintendo Game Boy / Color / Advance emulatörü."
 
 #: cmdevents.cpp:2317
 msgid ""
@@ -684,31 +684,31 @@ msgstr "Yerel kipte ağ desteği yoktur."
 
 #: extra-translations.cpp:12
 msgid "&Apply"
-msgstr ""
+msgstr "Uygul&a"
 
 #: extra-translations.cpp:13
 msgid "Artists"
-msgstr ""
+msgstr "Çizerler"
 
 #: extra-translations.cpp:14
 msgid "Cancel"
-msgstr ""
+msgstr "İptal"
 
 #: extra-translations.cpp:15
 msgid "Close"
-msgstr ""
+msgstr "Kapat"
 
 #: extra-translations.cpp:16
 msgid "Developers"
-msgstr ""
+msgstr "Geliştiriciler"
 
 #: extra-translations.cpp:17
 msgid "License"
-msgstr ""
+msgstr "Lisans"
 
 #: extra-translations.cpp:18
 msgid "OK"
-msgstr ""
+msgstr "Tamam"
 
 #: opts.cpp:290
 msgid ""
