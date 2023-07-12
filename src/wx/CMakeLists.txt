@@ -990,8 +990,6 @@ if(NOT TRANSLATIONS_ONLY)
         # The following commands *should* be run to make sure Sparkle is not going
         # to bug randomly.
         set(CCS3 cp -a ${SPARKLE_FRAMEWORK} ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks/Sparkle.framework)
-        set(CCS4 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleVersion            -string "${VERSION}")
-        set(CCS5 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleShortVersionString -string "${VERSION}")
         set(CCS6 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUEnableAutomaticChecks -bool YES)
         #set(CCS7 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUPublicEDKey -string "${PUBLIC_KEY}")
         set(CCS8 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUFeedURL -string "${APPCAST_URL}")
@@ -999,8 +997,6 @@ if(NOT TRANSLATIONS_ONLY)
           COMMAND ${CCS1}
           COMMAND ${CCS2}
           COMMAND ${CCS3}
-          COMMAND ${CCS4}
-          COMMAND ${CCS5}
           COMMAND ${CCS6}
           #COMMAND ${CCS7}
           COMMAND ${CCS8}
@@ -1251,6 +1247,19 @@ if(NOT TRANSLATIONS_ONLY)
             TARGET visualboyadvance-m POST_BUILD
             COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/mac-translations.cmake
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+        set(ver ${VERSION})
+
+        if(NOT VERSION_RELEASE)
+            set(ver "${ver}-${REVISION}")
+        endif()
+
+        add_custom_command(
+            TARGET visualboyadvance-m POST_BUILD
+            COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleVersion            -string "${ver}"
+            COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleShortVersionString -string "${ver}"
+            COMMAND plutil -convert xml1 ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist
         )
     endif()
 
