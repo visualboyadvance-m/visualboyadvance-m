@@ -1263,7 +1263,7 @@ if(NOT TRANSLATIONS_ONLY)
         )
     endif()
 
-    if(APPLE AND (UPSTREAM_RELEASE OR ENABLE_ONLINEUPDATES))
+    if(APPLE AND UPSTREAM_RELEASE)
         if(CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
             find_program(STRIP_PROGRAM strip)
 
@@ -1280,7 +1280,7 @@ if(NOT TRANSLATIONS_ONLY)
         add_custom_command(
             TARGET visualboyadvance-m
             POST_BUILD
-            VERBATIM COMMAND sh -c [=[codesign --sign "Developer ID Application" --force --deep ./visualboyadvance-m.app || :]=]
+            VERBATIM COMMAND sh -c [=[codesign --sign "Developer ID Application" --options runtime --timestamp --force --deep ./visualboyadvance-m.app || :]=]
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
@@ -1292,37 +1292,59 @@ if(NOT TRANSLATIONS_ONLY)
                 add_custom_command(
                     TARGET visualboyadvance-m
                     POST_BUILD
-                    VERBATIM COMMAND sh -c "codesign --sign 'Developer ID Application' --force ${framework} || :"
+                    VERBATIM COMMAND sh -c "codesign --sign 'Developer ID Application' --options runtime --timestamp --force --deep ${framework} || :"
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                 )
             endforeach()
         endif()
 
-        if(UPSTREAM_RELEASE)
-           if(CMAKE_BUILD_TYPE STREQUAL Debug)
-              set(appzip visualboyadvance-m-Mac-${ARCH_NAME}-debug${ZIP_SUFFIX}.zip)
-           else()
-              set(appzip visualboyadvance-m-Mac-${ARCH_NAME}${ZIP_SUFFIX}.zip)
-           endif()
+        # Zip, notarize, staple to the .app and zip again
 
+        if(CMAKE_BUILD_TYPE STREQUAL Debug)
+            set(appzip visualboyadvance-m-Mac-${ARCH_NAME}-debug${ZIP_SUFFIX}.zip)
+        else()
+            set(appzip visualboyadvance-m-Mac-${ARCH_NAME}${ZIP_SUFFIX}.zip)
+        endif()
+
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E remove ${appzip}
+            COMMAND ${ZIP_PROGRAM} -9yr ${appzip} ./visualboyadvance-m.app
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND xcrun notarytool submit ${appzip} --keychain-profile AC_PASSWORD --wait
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND xcrun stapler staple ./visualboyadvance-m.app
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E remove ${appzip}
+            COMMAND ${ZIP_PROGRAM} -9yr ${appzip} ./visualboyadvance-m.app
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+        if(GPG_KEYS)
             add_custom_command(
                 TARGET visualboyadvance-m
                 POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E remove ${appzip}
-                COMMAND ${ZIP_PROGRAM} -9yr ${appzip} ./visualboyadvance-m.app
+                COMMAND ${CMAKE_COMMAND} -E remove ${appzip}.asc
+#                COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
+                COMMAND ${GPG_PROGRAM} --detach-sign -a ${appzip}
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             )
-
-            if(GPG_KEYS)
-                add_custom_command(
-                    TARGET visualboyadvance-m
-                    POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E remove ${appzip}.asc
-    #                COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
-                    COMMAND ${GPG_PROGRAM} --detach-sign -a ${appzip}
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                )
-            endif()
         endif()
     endif()
 
