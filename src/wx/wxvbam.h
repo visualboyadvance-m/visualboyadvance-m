@@ -12,10 +12,10 @@
 #include <wx/datetime.h>
 
 #include "core/base/system.h"
-#include "wx/config/game-control.h"
+#include "wx/config/bindings.h"
+#include "wx/config/emulated-gamepad.h"
 #include "wx/config/option-observer.h"
 #include "wx/config/option.h"
-#include "wx/config/shortcuts.h"
 #include "wx/dialogs/base-dialog.h"
 #include "wx/widgets/dpi-support.h"
 #include "wx/widgets/keep-on-top-styler.h"
@@ -59,18 +59,32 @@ inline std::string ToString(const wxChar* aString)
 
 class MainFrame;
 
-class wxvbamApp : public wxApp {
+class wxvbamApp final : public wxApp {
 public:
     wxvbamApp();
-    virtual bool OnInit();
-    virtual int OnRun();
-    virtual bool OnCmdLineHelp(wxCmdLineParser&);
-    virtual bool OnCmdLineError(wxCmdLineParser&);
-    virtual bool UsingWayland() { return using_wayland; }
-    virtual void OnInitCmdLine(wxCmdLineParser&);
-    virtual bool OnCmdLineParsed(wxCmdLineParser&);
-    virtual wxString GetConfigDir();
-    virtual wxString GetDataDir();
+
+    // wxApp implementation.
+    bool OnInit() final;
+    int OnRun() final;
+    bool OnCmdLineHelp(wxCmdLineParser&) final;
+    bool OnCmdLineError(wxCmdLineParser&) final;
+    void OnInitCmdLine(wxCmdLineParser&) final;
+    bool OnCmdLineParsed(wxCmdLineParser&) final;
+    // without this, global accels don't always work
+    int FilterEvent(wxEvent&) final;
+    // Handle most exceptions
+    bool OnExceptionInMainLoop() override {
+        try {
+            throw;
+        } catch (const std::exception& e) {
+            std::cerr << "AN ERROR HAS OCCURRED: " << e.what() << std::endl;
+            return false;
+        }
+    }
+
+    wxString GetConfigDir();
+    wxString GetDataDir();
+    bool UsingWayland() { return using_wayland; }
     wxString GetConfigurationPath();
     const wxString GetPluginsDir();
     wxString GetAbsolutePath(wxString path);
@@ -87,8 +101,6 @@ public:
         pending_load = f;
     };
 #endif
-    // without this, global accels don't always work
-    int FilterEvent(wxEvent&);
 
     widgets::SdlPoller* sdl_poller() { return &sdl_poller_; }
 
@@ -109,23 +121,11 @@ public:
     // there's no way to retrieve "current" locale, so this is public
     wxLocale locale;
 
-    // Handle most exceptions
-    virtual bool OnExceptionInMainLoop()
-    {
-        try {
-            throw;
-        } catch (const std::exception& e) {
-            std::cerr << "AN ERROR HAS OCCURRED: " << e.what() << std::endl;
-            return false;
-        }
-    }
-
     // Accessors for configuration data.
-    config::Shortcuts* shortcuts() { return &shortcuts_; }
-    config::GameControlState* game_control_state() { return &game_control_state_; }
-    config::GameControlBindings* game_control_bindings() { return &game_control_bindings_; }
+    config::Bindings* bindings() { return &bindings_; }
+    config::EmulatedGamepad* emulated_gamepad() { return &emulated_gamepad_; }
 
-    virtual ~wxvbamApp();
+    ~wxvbamApp() override;
 
 protected:
     bool using_wayland;
@@ -136,9 +136,8 @@ private:
     // Returns the currently active event handler to use for user input events.
     wxEvtHandler* GetJoyEventHandler();
 
-    config::Shortcuts shortcuts_;
-    config::GameControlState game_control_state_;
-    config::GameControlBindings game_control_bindings_;
+    config::Bindings bindings_;
+    config::EmulatedGamepad emulated_gamepad_;
 
     wxPathList config_path;
     char* home = nullptr;
@@ -273,10 +272,7 @@ public:
     void ResetMenuAccelerators();
 
     // 2.8 has no HasFocus(), and FindFocus() doesn't work right
-    bool HasFocus() const override
-    {
-        return focused;
-    }
+    bool HasFocus() const override { return focused; }
 
 #ifndef NO_LINK
     // Returns the link mode to set according to the options

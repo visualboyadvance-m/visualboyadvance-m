@@ -6,10 +6,8 @@
 #include <wx/longlong.h>
 #include <wx/string.h>
 #include <wx/textctrl.h>
-#include <wx/validate.h>
 #include <wx/xrc/xmlres.h>
 
-#include "wx/config/game-control.h"
 #include "wx/config/user-input.h"
 #include "wx/widgets/user-input-event.h"
 
@@ -79,24 +77,6 @@ private:
     bool is_navigating_away_ = false;
 
     std::unordered_set<config::UserInput> inputs_;
-};
-
-// A validator for the UserInputCtrl. This validator is used to transfer the
-// GameControl data to and from the UserInputCtrl.
-class UserInputCtrlValidator : public wxValidator {
-public:
-    explicit UserInputCtrlValidator(const config::GameControl game_control);
-    ~UserInputCtrlValidator() override = default;
-
-    wxObject* Clone() const override;
-
-protected:
-    // wxValidator implementation.
-    bool TransferToWindow() override;
-    bool TransferFromWindow() override;
-    bool Validate(wxWindow*) override { return true; }
-
-    const config::GameControl game_control_;
 };
 
 // Handler to load the resource from an XRC file as a "UserInputCtrl" object.

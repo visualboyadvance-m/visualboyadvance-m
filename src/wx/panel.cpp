@@ -41,7 +41,7 @@
 #include "core/gba/gbaRtc.h"
 #include "core/gba/gbaSound.h"
 #include "wx/background-input.h"
-#include "wx/config/game-control.h"
+#include "wx/config/emulated-gamepad.h"
 #include "wx/config/option-id.h"
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
@@ -1058,7 +1058,7 @@ GameArea::~GameArea()
 
 void GameArea::OnKillFocus(wxFocusEvent& ev)
 {
-    wxGetApp().game_control_state()->Reset();
+    wxGetApp().emulated_gamepad()->Reset();
     ev.Skip();
 }
 
@@ -1079,7 +1079,7 @@ void GameArea::Pause()
     // when the game is paused like this, we should not allow any
     // input to remain pressed, because they could be released
     // outside of the game zone and we would not know about it.
-    wxGetApp().game_control_state()->Reset();
+    wxGetApp().emulated_gamepad()->Reset();
 
     if (loaded != IMAGE_UNKNOWN)
         soundPause();
@@ -1330,13 +1330,13 @@ static Display* GetX11Display() {
 #endif  // __WXGTK__
 
 void GameArea::OnUserInputDown(widgets::UserInputEvent& event) {
-    if (wxGetApp().game_control_state()->OnInputPressed(event.input())) {
+    if (wxGetApp().emulated_gamepad()->OnInputPressed(event.input())) {
         wxWakeUpIdle();
     }
 }
 
 void GameArea::OnUserInputUp(widgets::UserInputEvent& event) {
-    if (wxGetApp().game_control_state()->OnInputReleased(event.input())) {
+    if (wxGetApp().emulated_gamepad()->OnInputReleased(event.input())) {
         wxWakeUpIdle();
     }
 
@@ -1454,7 +1454,7 @@ DrawingPanel::DrawingPanel(wxWindow* parent, int _width, int _height)
     , wxPanel(parent, wxID_ANY, wxPoint(0, 0), parent->GetClientSize(),
           wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
 {
-    this->SetClientData(new widgets::UserInputEventSender(this));
+    this->SetClientObject(new widgets::UserInputEventSender(this));
 }
 
 void DrawingPanelBase::DrawingPanelInit()
@@ -2186,7 +2186,7 @@ GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
     , wxglc(parent, wxID_ANY, glopts, wxPoint(0, 0), parent->GetClientSize(),
           wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
 {
-    this->SetClientData(new widgets::UserInputEventSender(this));
+    this->SetClientObject(new widgets::UserInputEventSender(this));
     widgets::RequestHighResolutionOpenGlSurfaceForWindow(this);
     SetContext();
 }

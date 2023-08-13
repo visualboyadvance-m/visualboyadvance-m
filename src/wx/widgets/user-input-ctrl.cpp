@@ -4,7 +4,6 @@
 
 #include "wx/config/user-input.h"
 #include "wx/widgets/user-input-event.h"
-#include "wx/wxvbam.h"
 
 namespace widgets {
 
@@ -108,29 +107,6 @@ void UserInputCtrl::UpdateText() {
         SetValue(value.substr(0, value.size() - 1));
     }
 }
-
-UserInputCtrlValidator::UserInputCtrlValidator(const config::GameControl game_control) : wxValidator(), game_control_(game_control) {}
-
-wxObject* UserInputCtrlValidator::Clone() const {
-    return new UserInputCtrlValidator(game_control_);
-}
-
-bool UserInputCtrlValidator::TransferToWindow() {
-    UserInputCtrl* control = wxDynamicCast(GetWindow(), UserInputCtrl);
-    assert(control);
-
-    control->SetInputs((*wxGetApp().game_control_bindings())[game_control_]);
-    return true;
-}
-
-bool UserInputCtrlValidator::TransferFromWindow() {
-    UserInputCtrl* control = wxDynamicCast(GetWindow(), UserInputCtrl);
-    assert(control);
-
-    wxGetApp().game_control_bindings()->insert({game_control_, control->inputs()});
-    return true;
-}
-
 
 UserInputCtrlXmlHandler::UserInputCtrlXmlHandler() : wxXmlResourceHandler() {
     AddWindowStyles();

@@ -2174,7 +2174,7 @@ EVT_HANDLER(EmulatorDirectories, "Directories...")
 EVT_HANDLER(JoypadConfigure, "Joypad options...")
 {
     if (ShowModal(GetXRCDialog("JoypadConfig")) == wxID_OK) {
-        update_joypad_opts();
+        update_shortcut_opts();
     }
 }
 

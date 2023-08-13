@@ -1,4 +1,5 @@
 #include "wx/wxvbam.h"
+#include "wx/config/command.h"
 
 #ifdef __WXMSW__
 #include <windows.h>
@@ -33,7 +34,7 @@
 #include "core/gba/gbaSound.h"
 #include "wx/builtin-over.h"
 #include "wx/builtin-xrc.h"
-#include "wx/config/game-control.h"
+#include "wx/config/emulated-gamepad.h"
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
 #include "wx/config/user-input.h"
@@ -59,7 +60,8 @@ void ResetMenuItemAccelerator(wxMenuItem* menu_item) {
         new_label.resize(tab_index);
     }
     std::unordered_set<config::UserInput> user_inputs =
-        wxGetApp().shortcuts()->InputsForCommand(menu_item->GetId());
+        wxGetApp().bindings()->InputsForCommand(
+            config::ShortcutCommand(menu_item->GetId()));
     for (const config::UserInput& user_input : user_inputs) {
         if (user_input.device() != config::UserInput::Device::Keyboard) {
             // Cannot use joystick keybinding as text without wx assertion error.
@@ -256,7 +258,7 @@ wxvbamApp::wxvbamApp()
       pending_fullscreen(false),
       frame(nullptr),
       using_wayland(false),
-      game_control_state_(std::bind(&wxvbamApp::game_control_bindings, this)),
+      emulated_gamepad_(std::bind(&wxvbamApp::bindings, this)),
       sdl_poller_(std::bind(&wxvbamApp::GetJoyEventHandler, this)) {}
 
 const wxString wxvbamApp::GetPluginsDir()
@@ -539,10 +541,6 @@ bool wxvbamApp::OnInit() {
             overrides->SetPath(wxT("/"));
         }
     }
-
-    // Initialize game bindings here, after defaults bindings, vbam.ini bindings
-    // and command line overrides have been applied.
-    game_control_state()->OnGameBindingsChanged();
 
     // We need to gather this information before crating the MainFrame as the
     // OnSize / OnMove event handlers can fire during construction.
@@ -1009,13 +1007,18 @@ int MainFrame::FilterEvent(wxEvent& event) {
     }
 
     const widgets::UserInputEvent& user_input_event = static_cast<widgets::UserInputEvent&>(event);
-    const int command = wxGetApp().shortcuts()->CommandForInput(user_input_event.input());
-    if (command == 0) {
+    nonstd::optional<config::Command> command =
+        wxGetApp().bindings()->CommandForInput(user_input_event.input());
+    if (command == nonstd::nullopt) {
         // No associated command found.
         return wxEventFilter::Event_Skip;
     }
 
-    wxCommandEvent command_event(wxEVT_COMMAND_MENU_SELECTED, command);
+    if (!command->is_shortcut()) {
+        return wxEventFilter::Event_Skip;
+    }
+
+    wxCommandEvent command_event(wxEVT_COMMAND_MENU_SELECTED, command->shortcut().id());
     command_event.SetEventObject(this);
     this->GetEventHandler()->ProcessEvent(command_event);
     return wxEventFilter::Event_Processed;
@@ -1286,8 +1289,6 @@ LinkMode MainFrame::GetConfiguredLinkMode()
         return LINK_DISCONNECTED;
         break;
     }
-
-    return LINK_DISCONNECTED;
 }
 
 #endif  // NO_LINK

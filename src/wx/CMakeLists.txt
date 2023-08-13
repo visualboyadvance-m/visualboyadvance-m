@@ -13,20 +13,22 @@ set(VBAM_WX_COMMON
     background-input.cpp
     background-input.h
     cmdevents.cpp
-    config/game-control.cpp
-    config/game-control.h
+    config/bindings.cpp
+    config/bindings.h
+    config/command.cpp
+    config/command.h
+    config/emulated-gamepad.cpp
+    config/emulated-gamepad.h
+    config/internal/bindings-internal.cpp
+    config/internal/bindings-internal.h
     config/internal/option-internal.cpp
     config/internal/option-internal.h
-    config/internal/shortcuts-internal.cpp
-    config/internal/shortcuts-internal.h
     config/option-id.h
     config/option-observer.cpp
     config/option-observer.h
     config/option-proxy.h
     config/option.cpp
     config/option.h
-    config/shortcuts.cpp
-    config/shortcuts.h
     config/user-input.cpp
     config/user-input.h
     dialogs/accel-config.cpp
@@ -67,6 +69,7 @@ set(VBAM_WX_COMMON
     # from external source with minor modifications
     widgets/checkedlistctrl.cpp
     widgets/checkedlistctrl.h
+    widgets/client-data.h
     widgets/dpi-support.h
     widgets/group-check-box.cpp
     widgets/group-check-box.h

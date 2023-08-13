@@ -2468,7 +2468,7 @@ bool MainFrame::BindControls()
         dialogs::DisplayConfig::NewInstance(this);
         dialogs::SoundConfig::NewInstance(this);
         dialogs::DirectoriesConfig::NewInstance(this);
-        dialogs::JoypadConfig::NewInstance(this);
+        dialogs::JoypadConfig::NewInstance(this, std::bind(&wxvbamApp::bindings, &wxGetApp()));
 
 #ifndef NO_LINK
         d = LoadXRCDialog("LinkConfig");
@@ -2481,7 +2481,7 @@ bool MainFrame::BindControls()
         }
 #endif
         dialogs::AccelConfig::NewInstance(this, menubar, recent,
-                                          std::bind(&wxvbamApp::shortcuts, &wxGetApp()));
+                                          std::bind(&wxvbamApp::bindings, &wxGetApp()));
     } catch (std::exception& e) {
         wxLogError(wxString::FromUTF8(e.what()));
         return false;

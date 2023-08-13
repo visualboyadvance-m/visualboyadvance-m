@@ -6,9 +6,11 @@
 #include <wx/menu.h>
 #include <wx/msgdlg.h>
 
-#include "wx/config/shortcuts.h"
+#include "wx/config/bindings.h"
+#include "wx/config/command.h"
 #include "wx/config/user-input.h"
 #include "wx/dialogs/base-dialog.h"
+#include "wx/widgets/client-data.h"
 #include "wx/widgets/user-input-ctrl.h"
 #include "wx/wxvbam.h"
 
@@ -16,38 +18,28 @@ namespace dialogs {
 
 namespace {
 
-// Client data holding a config::UserInput.
-class UserInputClientData : public wxClientData {
-public:
-    explicit UserInputClientData(const config::UserInput& user_input) : user_input_(user_input) {}
-    explicit UserInputClientData(config::UserInput&& user_input)
-        : user_input_(std::move(user_input)) {}
-    ~UserInputClientData() override = default;
-
-    const config::UserInput& user_input() const { return user_input_; }
-
-private:
-    const config::UserInput user_input_;
-};
+using UserInputClientData = widgets::ClientData<config::UserInput>;
 
 // Holds a Command reference and the corresponding string used for current
 // assignment reference for fast access at configuration time. Owned by
 // the corresponding wxTreeItem.
 class CommandTreeItemData : public wxTreeItemData {
 public:
-    CommandTreeItemData(int command, wxString assigned_string, wxString message_string)
+    CommandTreeItemData(config::ShortcutCommand command,
+                        wxString assigned_string,
+                        wxString message_string)
         : wxTreeItemData(),
           command_(command),
           assigned_string_(std::move(assigned_string)),
           message_string_(std::move(message_string)) {}
     ~CommandTreeItemData() override = default;
 
-    int command() const { return command_; }
+    config::ShortcutCommand command() const { return command_; }
     const wxString& assigned_string() const { return assigned_string_; };
     const wxString& message_string() const { return message_string_; };
 
 private:
-    const int command_;
+    const config::ShortcutCommand command_;
     const wxString assigned_string_;
     const wxString message_string_;
 };
@@ -61,7 +53,7 @@ wxString AppendMenuItem(const wxString& prefix, int level, const wxMenuItem* men
                         menu_item->GetItemLabelText() + (menu_item->IsSubMenu() ? "\n" : ""));
 }
 
-void AppendItemToTree(std::unordered_map<int, wxTreeItemId>* command_to_item_id,
+void AppendItemToTree(std::unordered_map<config::ShortcutCommand, wxTreeItemId>* command_to_item_id,
                       wxTreeCtrl* tree,
                       const wxTreeItemId& parent,
                       int command,
@@ -75,25 +67,26 @@ void AppendItemToTree(std::unordered_map<int, wxTreeItemId>* command_to_item_id,
     }
     assert(i < ncmds);
 
-    const wxTreeItemId tree_item_id =
-        tree->AppendItem(parent,
-                         /*text=*/cmdtab[i].name,
-                         /*image=*/-1,
-                         /*selImage=*/-1,
-                         /*data=*/
-                         new CommandTreeItemData(
-                             command, AppendString(prefix, level, cmdtab[i].name), cmdtab[i].name));
+    const wxTreeItemId tree_item_id = tree->AppendItem(
+        parent,
+        /*text=*/cmdtab[i].name,
+        /*image=*/-1,
+        /*selImage=*/-1,
+        /*data=*/
+        new CommandTreeItemData(config::ShortcutCommand(command),
+                                AppendString(prefix, level, cmdtab[i].name), cmdtab[i].name));
     command_to_item_id->emplace(command, tree_item_id);
 }
 
 // Built the initial tree control from the menu.
-void PopulateTreeWithMenu(std::unordered_map<int, wxTreeItemId>* command_to_item_id,
-                          wxTreeCtrl* tree,
-                          const wxTreeItemId& parent,
-                          wxMenu* menu,
-                          const wxMenu* recents,
-                          const wxString& prefix,
-                          int level = 1) {
+void PopulateTreeWithMenu(
+    std::unordered_map<config::ShortcutCommand, wxTreeItemId>* command_to_item_id,
+    wxTreeCtrl* tree,
+    const wxTreeItemId& parent,
+    wxMenu* menu,
+    const wxMenu* recents,
+    const wxString& prefix,
+    int level = 1) {
     for (auto menu_item : menu->GetMenuItems()) {
         if (menu_item->IsSeparator()) {
             tree->AppendItem(parent, "-----");
@@ -125,18 +118,18 @@ void PopulateTreeWithMenu(std::unordered_map<int, wxTreeItemId>* command_to_item
 AccelConfig* AccelConfig::NewInstance(wxWindow* parent,
                                       wxMenuBar* menu,
                                       wxMenu* recents,
-                                      const config::ShortcutsProvider shortcuts_provider) {
+                                      const config::BindingsProvider bindings_provider) {
     assert(parent);
     assert(menu);
     assert(recents);
-    return new AccelConfig(parent, menu, recents, shortcuts_provider);
+    return new AccelConfig(parent, menu, recents, bindings_provider);
 }
 
 AccelConfig::AccelConfig(wxWindow* parent,
                          wxMenuBar* menu,
                          wxMenu* recents,
-                         const config::ShortcutsProvider shortcuts_provider)
-    : BaseDialog(parent, "AccelConfig"), shortcuts_provider_(shortcuts_provider) {
+                         const config::BindingsProvider bindings_provider)
+    : BaseDialog(parent, "AccelConfig"), bindings_provider_(bindings_provider) {
     assert(menu);
 
     // Loads the various dialog elements.
@@ -219,11 +212,11 @@ void AccelConfig::OnDialogShown(wxShowEvent& ev) {
     remove_button_->Enable(false);
     currently_assigned_label_->SetLabel("");
 
-    config_shortcuts_ = shortcuts_provider_()->Clone();
+    config_shortcuts_ = bindings_provider_()->Clone();
 }
 
 void AccelConfig::OnValidate(wxCommandEvent& ev) {
-    *shortcuts_provider_() = std::move(config_shortcuts_);
+    *bindings_provider_() = std::move(config_shortcuts_);
     ev.Skip();
 }
 
@@ -243,7 +236,7 @@ void AccelConfig::OnCommandSelected(wxTreeEvent& ev) {
         return;
     }
 
-    selected_command_ = command_tree_data->command();
+    selected_command_ = command_tree_data->command().id();
     PopulateCurrentKeys();
 }
 
@@ -257,8 +250,7 @@ void AccelConfig::OnRemoveBinding(wxCommandEvent&) {
         return;
     }
 
-    config_shortcuts_.UnassignInput(
-        static_cast<UserInputClientData*>(current_keys_->GetClientObject(selection))->user_input());
+    config_shortcuts_.UnassignInput(UserInputClientData::From(current_keys_));
     PopulateCurrentKeys();
 }
 
@@ -269,7 +261,7 @@ void AccelConfig::OnResetAll(wxCommandEvent&) {
         return;
     }
 
-    config_shortcuts_ = config::Shortcuts();
+    config_shortcuts_ = config::Bindings();
     tree_->Unselect();
     key_input_->Clear();
     PopulateCurrentKeys();
@@ -288,19 +280,29 @@ void AccelConfig::OnAssignBinding(wxCommandEvent&) {
         return;
     }
 
-    const int old_command = config_shortcuts_.CommandForInput(user_input);
-    if (old_command != 0) {
-        const auto iter = command_to_item_id_.find(old_command);
-        assert(iter != command_to_item_id_.end());
-        const CommandTreeItemData* old_command_item_data =
-            static_cast<const CommandTreeItemData*>(tree_->GetItemData(iter->second));
-        assert(old_command_item_data);
+    const nonstd::optional<config::Command> old_command =
+        config_shortcuts_.CommandForInput(user_input);
+    if (old_command != nonstd::nullopt) {
+        wxString old_command_name;
 
         // Require user confirmation to override.
+        switch (old_command->tag()) {
+            case config::Command::Tag::kGame:
+                old_command_name = old_command->game().ToUXString();
+                break;
+            case config::Command::Tag::kShortcut:
+                const auto iter = command_to_item_id_.find(old_command->shortcut());
+                assert(iter != command_to_item_id_.end());
+                const CommandTreeItemData* old_command_item_data =
+                    static_cast<const CommandTreeItemData*>(tree_->GetItemData(iter->second));
+                assert(old_command_item_data);
+                old_command_name = old_command_item_data->message_string();
+                break;
+        }
+
         const int confirmation =
             wxMessageBox(wxString::Format(_("This will unassign \"%s\" from \"%s\". Are you sure?"),
-                                          user_input.ToLocalizedString(),
-                                          old_command_item_data->message_string()),
+                                          user_input.ToLocalizedString(), old_command_name),
                          _("Confirm"), wxYES_NO);
         if (confirmation != wxYES) {
             return;
@@ -319,16 +321,24 @@ void AccelConfig::OnKeyInput(wxCommandEvent&) {
         return;
     }
 
-    const int command = config_shortcuts_.CommandForInput(user_input);
-    if (command == 0) {
+    const auto command = config_shortcuts_.CommandForInput(user_input);
+    if (!command) {
         // No existing assignment.
         currently_assigned_label_->SetLabel(wxEmptyString);
     } else {
         // Existing assignment, inform the user.
-        const auto iter = command_to_item_id_.find(command);
-        assert(iter != command_to_item_id_.end());
-        currently_assigned_label_->SetLabel(
-            static_cast<CommandTreeItemData*>(tree_->GetItemData(iter->second))->assigned_string());
+        switch (command->tag()) {
+            case config::Command::Tag::kGame:
+                currently_assigned_label_->SetLabel(command->game().ToUXString());
+                break;
+            case config::Command::Tag::kShortcut:
+                const auto iter = command_to_item_id_.find(command->shortcut());
+                assert(iter != command_to_item_id_.end());
+                currently_assigned_label_->SetLabel(
+                    static_cast<CommandTreeItemData*>(tree_->GetItemData(iter->second))
+                        ->assigned_string());
+                break;
+        }
     }
 
     assign_button_->Enable(true);
@@ -342,9 +352,11 @@ void AccelConfig::PopulateCurrentKeys() {
         return;
     }
 
+    const config::ShortcutCommand command(selected_command_);
+
     // Populate `current_keys`.
     int new_keys_count = 0;
-    for (const auto& user_input : config_shortcuts_.InputsForCommand(selected_command_)) {
+    for (const auto& user_input : config_shortcuts_.InputsForCommand(command)) {
         current_keys_->Append(user_input.ToLocalizedString(), new UserInputClientData(user_input));
         new_keys_count++;
     }
@@ -357,7 +369,6 @@ void AccelConfig::PopulateCurrentKeys() {
         current_keys_->SetSelection(std::min(previous_selection, new_keys_count - 1));
         remove_button_->Enable(true);
     }
-
 }
 
 }  // namespace dialogs
