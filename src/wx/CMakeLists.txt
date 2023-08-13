@@ -773,6 +773,7 @@ set(
     dialogs/game-boy-config.cpp
     dialogs/game-maker.cpp
     dialogs/gb-rom-info.cpp
+    dialogs/joypad-config.cpp
     widgets/group-check-box.cpp
     widgets/keep-on-top-styler.cpp
     widgets/option-validator.cpp
@@ -826,6 +827,7 @@ set(
     dialogs/game-boy-config.h
     dialogs/game-maker.h
     dialogs/gb-rom-info.h
+    dialogs/joypad-config.h
     dialogs/validated-child.h
     widgets/dpi-support.h
     widgets/group-check-box.h

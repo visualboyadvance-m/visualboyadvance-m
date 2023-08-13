@@ -2227,18 +2227,22 @@ EVT_HANDLER(EmulatorDirectories, "Directories...")
 
 EVT_HANDLER(JoypadConfigure, "Joypad options...")
 {
-    wxDialog* dlg = GetXRCDialog("JoypadConfig");
     joy.PollAllJoysticks();
 
     auto frame = wxGetApp().frame;
     bool joy_timer = frame->IsJoyPollTimerRunning();
 
-    if (!joy_timer) frame->StartJoyPollTimer();
+    if (!joy_timer) {
+         frame->StartJoyPollTimer();
+    }
 
-    if (ShowModal(dlg) == wxID_OK)
-        update_opts();
+    if (ShowModal(GetXRCDialog("JoypadConfig")) == wxID_OK) {
+        update_joypad_opts();
+    }
 
-    if (!joy_timer) frame->StopJoyPollTimer();
+    if (!joy_timer) {
+        frame->StopJoyPollTimer();
+    }
 
     SetJoystick();
 }
