@@ -11,7 +11,7 @@
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaSound.h"
 #include "wx/audio/audio.h"
-#include "wx/config/game-control.h"
+#include "wx/config/emulated-gamepad.h"
 #include "wx/config/option-proxy.h"
 #include "wx/wxvbam.h"
 
@@ -340,7 +340,7 @@ uint32_t systemReadJoypad(int joy)
     if (joy < 0 || joy > 3)
         joy = OPTION(kJoyDefault) - 1;
 
-    uint32_t ret = wxGetApp().game_control_state()->GetJoypad(joy);
+    uint32_t ret = wxGetApp().emulated_gamepad()->GetJoypad(joy);
 
     if (turbo)
         ret |= KEYM_SPEED;
@@ -662,7 +662,7 @@ void systemUpdateSolarSensor()
 void systemUpdateMotionSensor()
 {
     for (int i = 0; i < 4; i++) {
-        const uint32_t joy_value = wxGetApp().game_control_state()->GetJoypad(i);
+        const uint32_t joy_value = wxGetApp().emulated_gamepad()->GetJoypad(i);
 
         if (!sensorx[i])
             sensorx[i] = 2047;

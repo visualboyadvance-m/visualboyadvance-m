@@ -207,14 +207,14 @@ private:
 // Specializations for hash functions for all of the above classes.
 template <>
 struct std::hash<config::JoyId> {
-    std::size_t operator()(config::JoyId const& joy_id) const noexcept {
+    std::size_t operator()(const config::JoyId& joy_id) const noexcept {
         return std::hash<int>{}(joy_id.sdl_index_);
     }
 };
 
 template <>
 struct std::hash<config::JoyInput> {
-    std::size_t operator()(config::JoyInput const& joy_input) const noexcept {
+    std::size_t operator()(const config::JoyInput& joy_input) const noexcept {
         const std::size_t hash1 = std::hash<config::JoyId>{}(joy_input.joy());
         const std::size_t hash2 = std::hash<int>{}(static_cast<int>(joy_input.control()));
         const std::size_t hash3 = std::hash<int>{}(joy_input.control_index());
@@ -224,7 +224,7 @@ struct std::hash<config::JoyInput> {
 
 template <>
 struct std::hash<config::KeyboardInput> {
-    std::size_t operator()(config::KeyboardInput const& keyboard_input) const noexcept {
+    std::size_t operator()(const config::KeyboardInput& keyboard_input) const noexcept {
         const std::size_t hash1 = std::hash<int>{}(keyboard_input.key());
         const std::size_t hash2 = std::hash<int>{}(keyboard_input.mod());
         return hash1 ^ hash2;
@@ -233,7 +233,7 @@ struct std::hash<config::KeyboardInput> {
 
 template <>
 struct std::hash<config::UserInput> {
-    std::size_t operator()(config::UserInput const& user_input) const noexcept {
+    std::size_t operator()(const config::UserInput& user_input) const noexcept {
         const std::size_t device_hash = std::hash<int>{}(static_cast<int>(user_input.device()));
         switch (user_input.device()) {
             case config::UserInput::Device::Invalid:

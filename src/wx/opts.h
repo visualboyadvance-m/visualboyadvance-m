@@ -6,13 +6,8 @@
 #include <wx/string.h>
 #include <wx/vidmode.h>
 
-#include "wx/config/game-control.h"
-
 // Forward declaration.
 class wxFileHistory;
-
-// Default joystick bindings.
-extern const config::GameControlBindings kDefaultBindings;
 
 extern struct opts_t {
     opts_t();
@@ -61,8 +56,6 @@ void load_opts(bool first_time_launch);
 // call whenever opt vars change
 // will detect changes and write config if necessary
 void update_opts();
-// Updates the joypad options.
-void update_joypad_opts();
 // Updates the shortcut options.
 void update_shortcut_opts();
 // returns true if option name correct; prints error if val invalid
