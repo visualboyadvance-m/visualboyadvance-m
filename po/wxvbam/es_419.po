@@ -11,6 +11,7 @@
 # FERNANDO AYALA PEREZ, 2021
 # Kevin Bustinza <ufreshx@gmail.com>, 2021
 # MELERIX, 2023
+# Sebastián Castro Saldarriaga, 2023
 # yocsan Cañderón <yecoyocsan@gmail.com>, 2021
 msgid ""
 msgstr ""
@@ -18,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-23 14:26-0700\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Enzo Cortés, 2023\n"
+"Last-Translator: Sebastián Castro Saldarriaga, 2023\n"
 "Language-Team: Spanish (Latin America) (http://app.transifex.com/bgk/vba-m/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -109,7 +110,7 @@ msgid ""
 "\n"
 "For flag options, true and false are specified as 1 and 0, respectively.\n"
 "\n"
-msgstr "Options set from the command line are saved if any configuration changes are made in the user interface.\n\nFor flag options, true and false are specified as 1 and 0, respectively.\n\n"
+msgstr "Las opciones establecidas desde la línea de comandos se guardan si se realizan cambios de configuración en la interfaz de usuario.\n\nPara las opciones de marca, verdadero y falso se especifican como 1 y 0, respectivamente.\n\n"
 
 #: wxvbam.cpp:741
 msgid ""
