@@ -181,7 +181,7 @@ libretro-build-ngc:
   extends:
     - .libretro-ngc-static-retroarch-master
     - .core-defs
-
+    
 # Nintendo Wii
 libretro-build-wii:
   extends:
