@@ -57,6 +57,10 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: '/vita-static.yml'
 
+  # Nintendo GameCube
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/ngc-static.yml'
+
   # Nintendo Wii
   - project: 'libretro-infrastructure/ci-templates'
     file: '/wii-static.yml'
@@ -170,6 +174,12 @@ libretro-build-tvos-arm64:
 libretro-build-vita:
   extends:
     - .libretro-vita-static-retroarch-master
+    - .core-defs
+    
+# Nintendo GameCube
+libretro-build-ngc:
+  extends:
+    - .libretro-ngc-static-retroarch-master
     - .core-defs
     
 # Nintendo Wii
