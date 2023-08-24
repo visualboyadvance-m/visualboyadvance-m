@@ -450,6 +450,11 @@ bool gbInitializeRom(size_t romSize) {
                                             &ResetMBC3RTC});
                 }
                 break;
+         case gbCartData::MapperType::kMbc7:
+                // For MBC7, we don't save the RAM data from the same location.
+                g_vbamIoVecs.clear();
+                g_vbamIoVecs.push_back({ &gbMemory[0xa000], ramSize});
+                break;				
             case gbCartData::MapperType::kTama5:
                 g_vbamIoVecs.push_back({gbTAMA5ram, kTama5RamSize});
                 g_vbamIoVecs.push_back({&gbDataTAMA5.mapperSeconds,
@@ -466,7 +471,6 @@ bool gbInitializeRom(size_t romSize) {
             case gbCartData::MapperType::kMbc2:
             case gbCartData::MapperType::kMbc5:
             case gbCartData::MapperType::kMbc6:
-            case gbCartData::MapperType::kMbc7:
             case gbCartData::MapperType::kHuC1:
             case gbCartData::MapperType::kMmm01:
             case gbCartData::MapperType::kPocketCamera:
@@ -3163,6 +3167,8 @@ bool gbReadGSASnapshot(const char* fileName)
             case gbCartData::MapperType::kMbc3:
             case gbCartData::MapperType::kMbc5:
             case gbCartData::MapperType::kMbc7:
+                FREAD_UNCHECKED(&gbMemory[0xa000], 1, g_gbCartData.ram_size(), file);
+                break;		
             case gbCartData::MapperType::kHuC1:
                 FREAD_UNCHECKED(gbRam, 1, g_gbCartData.ram_size(), file);
                 break;
