@@ -74,7 +74,9 @@ if(NOT CMAKE_CXX_COMPILER_LAUNCHER)
     endif()
 endif()
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.8.2)
+
+set(CMAKE_CXX_STANDARD 17)
 
 project(VBA-M C CXX)
 
@@ -1175,8 +1177,6 @@ if(NOT TRANSLATIONS_ONLY)
         ${HDR_STB_IMAGE}
     )
     add_dependencies(vbamcore generate)
-    set_property(TARGET vbamcore PROPERTY CXX_STANDARD 11)
-    set_property(TARGET vbamcore PROPERTY CXX_STANDARD_REQUIRED ON)
 endif()
 
 if((NOT TRANSLATIONS_ONLY) AND ENABLE_SDL)
@@ -1186,8 +1186,6 @@ if((NOT TRANSLATIONS_ONLY) AND ENABLE_SDL)
         ${SRC_SDL}
         ${HDR_SDL}
     )
-    set_property(TARGET vbam PROPERTY CXX_STANDARD 11)
-    set_property(TARGET vbam PROPERTY CXX_STANDARD_REQUIRED ON)
 
     if(WIN32)
         set(WIN32_LIBRARIES wsock32 ws2_32 winmm version imm32)
