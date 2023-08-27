@@ -3063,6 +3063,9 @@ void gbReset()
     gbDataMBC5.mapperROMBank = 1;
     gbDataMBC5.isRumbleCartridge = g_gbCartData.has_rumble();
 
+    memset(&gbDataMBC7, 0, sizeof(gbDataMBC7));
+    gbDataMBC7.mapperROMBank = 1;
+
     memset(&gbDataHuC1, 0, sizeof(gbDataHuC1));
     gbDataHuC1.mapperROMBank = 1;
 
@@ -3291,6 +3294,7 @@ static bool gbWriteSaveState(gzFile gzFile)
     utilGzWrite(gzFile, &gbDataMBC2, sizeof(gbDataMBC2));
     utilGzWrite(gzFile, &gbDataMBC3, sizeof(gbDataMBC3));
     utilGzWrite(gzFile, &gbDataMBC5, sizeof(gbDataMBC5));
+    utilGzWrite(gzFile, &gbDataMBC7, sizeof(gbDataMBC7));
     utilGzWrite(gzFile, &gbDataHuC1, sizeof(gbDataHuC1));
     utilGzWrite(gzFile, &gbDataHuC3, sizeof(gbDataHuC3));
     utilGzWrite(gzFile, &gbDataTAMA5, sizeof(gbDataTAMA5));
@@ -3453,6 +3457,7 @@ static bool gbReadSaveState(gzFile gzFile)
     utilGzRead(gzFile, &gbDataMBC2, sizeof(gbDataMBC2));
     utilGzRead(gzFile, &gbDataMBC3, sizeof(gbDataMBC3));
     utilGzRead(gzFile, &gbDataMBC5, sizeof(gbDataMBC5));
+    utilGzRead(gzFile, &gbDataMBC7, sizeof(gbDataMBC7));
     utilGzRead(gzFile, &gbDataHuC1, sizeof(gbDataHuC1));
     utilGzRead(gzFile, &gbDataHuC3, sizeof(gbDataHuC3));
     if (version >= 11) {
@@ -4973,6 +4978,7 @@ unsigned int gbWriteSaveState(uint8_t* data)
     utilWriteMem(data, &gbDataMBC2, sizeof(gbDataMBC2));
     utilWriteMem(data, &gbDataMBC3, sizeof(gbDataMBC3));
     utilWriteMem(data, &gbDataMBC5, sizeof(gbDataMBC5));
+    utilWriteMem(data, &gbDataMBC7, sizeof(gbDataMBC7));
     utilWriteMem(data, &gbDataHuC1, sizeof(gbDataHuC1));
     utilWriteMem(data, &gbDataHuC3, sizeof(gbDataHuC3));
     if (g_gbCartData.mapper_type() == gbCartData::MapperType::kHuC3)
@@ -5099,6 +5105,7 @@ bool gbReadSaveState(const uint8_t* data)
     utilReadMem(&gbDataMBC2, data, sizeof(gbDataMBC2));
     utilReadMem(&gbDataMBC3, data, sizeof(gbDataMBC3));
     utilReadMem(&gbDataMBC5, data, sizeof(gbDataMBC5));
+    utilReadMem(&gbDataMBC7, data, sizeof(gbDataMBC7));
     utilReadMem(&gbDataHuC1, data, sizeof(gbDataHuC1));
     utilReadMem(&gbDataHuC3, data, sizeof(gbDataHuC3));
     if (g_gbCartData.mapper_type() == gbCartData::MapperType::kHuC3)
