@@ -1699,12 +1699,29 @@ void BIOS_SndDriverVSyncOff() // 0x1878
         CPUWriteHalfWord(base1 + 0x12, 0);
         CPUWriteByte(puser1 + 4, 0);
 
+        // Actual BIOS executes a copy by calling CpuSet() with the source being
+        // the stack pointer and the destination a location in memory that is
+        // an offset from `puser1`. `puser1` is pointing to an area in the
+        // internal work RAM at this point. In addition, actual BIOS overwrites
+        // the first word in the stack to be 0. With an actual BIOS, this is
+        // fine because the stack contains data used by the BIOS at this point,
+        // and no longer points to the user stack.
+        // With the emulated BIOS, the stack pointer still points to the user
+        // stack so overwriting the stack pointer to 0 results in user stack
+        // corruption and some software (like the Shrek games) fail to boot as
+        // a result.
+        // More broadly, why the BIOS writes 318 words from the stack to another
+        // location in memory is unknown. The `SndDriverVSyncOn()` does not
+        // attempt to restore this data, only re-writing the IO registers. This
+        // is why this code is disabled here.
+#if 0
         uint32_t r1 = puser1 + 0x350;
         uint32_t r2 = 0x05000318;
         uint32_t sp = reg[13].I; //0x03003c94;
 
         CPUWriteMemory(sp, 0);
         BIOS_SndDriver_b4c(sp, r1, r2);
+#endif
 
         user1 = CPUReadMemory(puser1); // 0x18aa
         CPUWriteMemory(puser1, (--user1)); // this ret is common among funcs
