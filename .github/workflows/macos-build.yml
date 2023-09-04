@@ -1,8 +1,13 @@
 name: macOS Latest Build
-on: [push, pull_request]
+#on: [push, pull_request]
+on: workflow_dispatch
 
 jobs:
   build:
+    strategy:
+      matrix:
+        cmake_build: ['-DCMAKE_BUILD_TYPE=Release', '-DCMAKE_BUILD_TYPE=Debug']
+        cmake_options: ['', '-DENABLE_LINK=OFF', '-DENABLE_SDL=ON']
     runs-on: macos-latest
 
     steps:
@@ -17,7 +22,7 @@ jobs:
 
       - name: Configure
         run: >-
-          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+          cmake -B build -G Ninja ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}
 
       - name: Build
         run: ninja -C build
