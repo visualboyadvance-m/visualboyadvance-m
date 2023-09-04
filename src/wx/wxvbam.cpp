@@ -827,13 +827,13 @@ MainFrame::MainFrame()
       menus_opened(0),
       dialog_opened(0),
       focused(false),
+#ifndef NO_LINK
+      gba_link_observer_(config::OptionID::kGBALinkHost,
+                         std::bind(&MainFrame::EnableNetworkMenu, this)),
+#endif
       keep_on_top_styler_(this),
       status_bar_observer_(config::OptionID::kGenStatusBar,
-                           std::bind(&MainFrame::OnStatusBarChanged,
-                                     this,
-                                     std::placeholders::_1)),
-      gba_link_observer_(config::OptionID::kGBALinkHost,
-                         std::bind(&MainFrame::EnableNetworkMenu, this)) {
+                           std::bind(&MainFrame::OnStatusBarChanged, this, std::placeholders::_1)) {
     jpoll = new JoystickPoller();
     this->Connect(wxID_ANY, wxEVT_SHOW, wxShowEventHandler(JoystickPoller::ShowDialog), jpoll, jpoll);
 }
@@ -1263,6 +1263,8 @@ void MainFrame::StopModal()
         panel->Resume();
 }
 
+#ifndef NO_LINK
+
 LinkMode MainFrame::GetConfiguredLinkMode()
 {
     switch (gopts.gba_link_type) {
@@ -1305,6 +1307,8 @@ LinkMode MainFrame::GetConfiguredLinkMode()
 
     return LINK_DISCONNECTED;
 }
+
+#endif  // NO_LINK
 
 void MainFrame::IdentifyRom()
 {

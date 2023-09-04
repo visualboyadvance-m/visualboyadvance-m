@@ -246,7 +246,9 @@ public:
 
     // adjust menus based on current cmd_enable
     void enable_menus();
+#ifndef NO_LINK
     void EnableNetworkMenu();
+#endif
 
     // adjust menus based on available save game states
     void update_state_ts(bool force = false);
@@ -268,8 +270,10 @@ public:
         return focused;
     }
 
+#ifndef NO_LINK
     // Returns the link mode to set according to the options
     LinkMode GetConfiguredLinkMode();
+#endif
 
     void IdentifyRom();
 
@@ -352,9 +356,11 @@ private:
     JoystickPoller* jpoll = nullptr;
     // quicker & more accurate than FindFocus() != NULL
     bool focused;
+#ifndef NO_LINK
+    const config::OptionsObserver gba_link_observer_;
+#endif
     const widgets::KeepOnTopStyler keep_on_top_styler_;
     const config::OptionsObserver status_bar_observer_;
-    const config::OptionsObserver gba_link_observer_;
 
     // helper function for adding menu to accel editor
     void add_menu_accels(wxTreeCtrl* tc, wxTreeItemId& parent, wxMenu* menu);
