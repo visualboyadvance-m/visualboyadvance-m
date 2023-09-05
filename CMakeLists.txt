@@ -45,7 +45,7 @@ if(TAG_RELEASE)
     include(MakeReleaseCommitAndTag)
 endif()
 
-set(VCPKG_DEPS pkgconf zlib sdl2 gettext wxwidgets)
+set(VCPKG_DEPS pkgconf zlib SDL3 gettext wxwidgets)
 
 set(VCPKG_DEPS_OPTIONAL
     sfml   ENABLE_LINK
@@ -121,7 +121,7 @@ endif()
 option(VBAM_STATIC "Try to link all libraries statically" ${VBAM_STATIC_DEFAULT})
 
 if(VBAM_STATIC)
-    set(SDL2_STATIC ON)
+    set(SDL3_STATIC ON)
     set(SFML_STATIC_LIBRARIES ON)
     set(FFMPEG_STATIC ON)
     set(SSP_STATIC ON)
@@ -427,10 +427,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
 endif()
 
 find_package(OpenGL REQUIRED)
-find_package(SDL2   REQUIRED)
+find_package(SDL3   REQUIRED)
 
 if(WIN32)
-    set(SDL2_LIBRARY ${SDL2_LIBRARY} setupapi winmm)
+    set(SDL3_LIBRARY ${SDL3_LIBRARY} setupapi winmm)
 endif()
 
 # set the standard libraries all ports use
@@ -438,7 +438,7 @@ set(
     VBAMCORE_LIBS
     vbamcore
     fex
-    ${SDL2_LIBRARY}
+    ${SDL3_LIBRARY}
     ${SFML_LIBRARIES}
     ${OPENGL_LIBRARIES}
     ${ZLIB_LIBRARY}
@@ -1151,7 +1151,7 @@ set(
 include_directories(
     ${ZLIB_INCLUDE_DIR}
     fex
-    ${SDL2_INCLUDE_DIR}
+    ${SDL3_INCLUDE_DIR}
     third_party/include
     third_party/include/stb
 )
@@ -1213,7 +1213,7 @@ if((NOT TRANSLATIONS_ONLY) AND ENABLE_SDL)
     )
 
     if(WIN32)
-        target_link_libraries(vbam ${SDL2MAIN_LIBRARY})
+        target_link_libraries(vbam ${SDL3MAIN_LIBRARY})
     endif()
 
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vbam${CMAKE_EXECUTABLE_SUFFIX} DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})

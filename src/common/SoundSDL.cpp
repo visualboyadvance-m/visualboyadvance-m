@@ -62,7 +62,7 @@ void SoundSDL::read(uint16_t* stream, int length) {
 
     if (!buffer_size()) {
         if (should_wait())
-            SDL_SemWait(data_available);
+            SDL_WaitSemaphore(data_available);
         else
             return;
     }
@@ -73,7 +73,7 @@ void SoundSDL::read(uint16_t* stream, int length) {
 
     SDL_UnlockMutex(mutex);
 
-    SDL_SemPost(data_read);
+    SDL_PostSemaphore(data_read);
 }
 
 void SoundSDL::write(uint16_t * finalWave, int length) {
@@ -82,7 +82,8 @@ void SoundSDL::write(uint16_t * finalWave, int length) {
 
     SDL_LockMutex(mutex);
 
-    if (SDL_GetAudioDeviceStatus(sound_device) != SDL_AUDIO_PLAYING)
+    // SDL_GetAudioDeviceStatus has been removed in SDL3 and replaced with SDL_IsAudioDevicePaused()
+    if (SDL_IsAudioDevicePaused(sound_device) != SDL_TRUE)
 	SDL_PauseAudioDevice(sound_device, 0);
 
     std::size_t samples = length / 4;
@@ -96,10 +97,10 @@ void SoundSDL::write(uint16_t * finalWave, int length) {
 
 	SDL_UnlockMutex(mutex);
 
-	SDL_SemPost(data_available);
+	SDL_PostSemaphore(data_available);
 
 	if (should_wait())
-	    SDL_SemWait(data_read);
+	    SDL_WaitSemaphore(data_read);
 	else
 	    // Drop the remainder of the audio data
 	    return;
@@ -116,17 +117,17 @@ void SoundSDL::write(uint16_t * finalWave, int length) {
 bool SoundSDL::init(long sampleRate) {
     if (initialized) deinit();
 
-    SDL_AudioSpec audio;
-    SDL_memset(&audio, 0, sizeof(audio));
+    const SDL_AudioSpec audio = { SDL_AUDIO_S16SYS, 2, 2048 };
+    //SDL_memset(&audio, 0, sizeof(audio));
 
     // for "no throttle" use regular rate, audio is just dropped
-    audio.freq     = current_rate ? static_cast<int>(sampleRate * (current_rate / 100.0)) : sampleRate;
+    //audio.freq     = current_rate ? static_cast<int>(sampleRate * (current_rate / 100.0)) : sampleRate;
 
-    audio.format   = AUDIO_S16SYS;
-    audio.channels = 2;
-    audio.samples  = 2048;
-    audio.callback = soundCallback;
-    audio.userdata = this;
+    //audio.format   = SDL_AUDIO_S16SYS, 2, 2048;
+    //audio.channels = 2;
+    //audio.samples  = 2048;
+    //audio.callback = soundCallback;
+    //audio.userdata = this;
 
     if (!SDL_WasInit(SDL_INIT_AUDIO)) SDL_Init(SDL_INIT_AUDIO);
 
@@ -161,8 +162,8 @@ void SoundSDL::deinit() {
     SDL_LockMutex(mutex);
     int is_emulating = emulating;
     emulating = 0;
-    SDL_SemPost(data_available);
-    SDL_SemPost(data_read);
+    SDL_PostSemaphore(data_available);
+    SDL_PostSemaphore(data_read);
     SDL_UnlockMutex(mutex);
 
     SDL_Delay(100);
