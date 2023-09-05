@@ -84,7 +84,8 @@ void SoundSDL::write(uint16_t * finalWave, int length) {
 
     // SDL_GetAudioDeviceStatus has been removed in SDL3 and replaced with SDL_IsAudioDevicePaused()
     if (SDL_IsAudioDevicePaused(sound_device) != SDL_TRUE)
-	SDL_PauseAudioDevice(sound_device, 0);
+    //still need to deal with below 
+	SDL_PauseAudioDevice(sound_device);
 
     std::size_t samples = length / 4;
     std::size_t avail;
@@ -131,7 +132,7 @@ bool SoundSDL::init(long sampleRate) {
 
     if (!SDL_WasInit(SDL_INIT_AUDIO)) SDL_Init(SDL_INIT_AUDIO);
 
-    sound_device = SDL_OpenAudioDevice(NULL, 0, &audio, NULL, 0);
+    SDL_AudioStream *sound_device = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_OUTPUT, &audio, NULL, 0);
 
     if(sound_device == 0) {
         std::cerr << "Failed to open audio: " << SDL_GetError() << std::endl;
@@ -145,9 +146,9 @@ bool SoundSDL::init(long sampleRate) {
     data_read      = SDL_CreateSemaphore(1);
 
     // turn off audio events because we are not processing them
-#if SDL_VERSION_ATLEAST(2, 0, 4)
-    SDL_EventState(SDL_AUDIODEVICEADDED,   SDL_IGNORE);
-    SDL_EventState(SDL_AUDIODEVICEREMOVED, SDL_IGNORE);
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+    SDL_EventEnabled(SDL_EVENT_AUDIO_DEVICE_ADDED);
+    SDL_EventEnabled(SDL_EVENT_AUDIO_DEVICE_REMOVED);
 #endif
 
     return initialized = true;
