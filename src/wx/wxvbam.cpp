@@ -47,6 +47,10 @@
 #include "widgets/user-input-ctrl.h"
 #include "wxhead.h"
 
+#ifdef __WXGTK__
+#include <gdk/gdk.h>
+#endif
+
 namespace {
 
 // Resets the accelerator text for `menu_item` to the first keyboard input.
@@ -135,6 +139,15 @@ int main(int argc, char** argv) {
 #else   // DEBUG
     wxLog::SetLogLevel(wxLOG_Info);
 #endif  // DEBUG
+
+    // Launch under xwayland on Wayland if EGL is not available.
+#if defined(__WXGTK__) && !defined(HAVE_WAYLAND_EGL)
+    wxString xdg_session_type = wxGetenv("XDG_SESSION_TYPE");
+    wxString wayland_display  = wxGetenv("WAYLAND_DISPLAY");
+
+    if (xdg_session_type == "wayland" || wayland_display.Contains("wayland"))
+        gdk_set_allowed_backends("x11,*");
+#endif
 
     // This will be freed on wxEntry exit.
     wxApp::SetInstance(new wxvbamApp());
