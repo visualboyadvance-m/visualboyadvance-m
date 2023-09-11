@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.1.7] - 11.09.2023
+
+=========================
+* aca206a7 - Launch on xwayland under Wayland if no EGL [rkitover]
+* 93a24bee - Disable mirroring for ROMs > 32MB [rkitover]
+* 0f4ec575 - [Build] Fix the NO_LINK build [steelskin]
+* 803ab352 - [GB] Save MBC7 EEPROM data to `gbRam` [steelskin]
+* 24b6ac5a - [GBA] Implement missing Thumb instruction [steelskin]
+* 14a4b6f8 - [dialogs] Move JoypadConfig to its own class. [steelskin]
+
 ## [2.1.6] - 09.07.2023 
 
 =========================
