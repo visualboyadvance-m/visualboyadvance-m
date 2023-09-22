@@ -188,11 +188,11 @@ msgstr "Вилучення чітів."
 
 #: guiinit.cpp:776 dialogs/gb-rom-info.cpp:60 xrc/JoyPanel.xrc:364
 msgid "Game Shark"
-msgstr "Коди Game Shark"
+msgstr "Game Shark"
 
 #: guiinit.cpp:777 dialogs/gb-rom-info.cpp:57
 msgid "Game Genie"
-msgstr "Коди Game Genie"
+msgstr "Game Genie"
 
 #: guiinit.cpp:779
 msgid "Generic Code"
@@ -1174,7 +1174,7 @@ msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
-msgstr "Параметр Keyboard/<cmd> містить розділений комами перелік імен кнопок (наприклад, Alt + Shift + F1). При натисканні вказаної кнопки виконується команда <cmd>."
+msgstr "Параметр Keyboard/<cmd> містить розділений комами перелік імен кнопок (наприклад, Alt + Shift + F1). При натисканні вказаної кнопки буде виконано команду <cmd>."
 
 #: config/internal/option-internal.cpp:487
 msgid "Enable AGB debug print"
@@ -1470,7 +1470,7 @@ msgstr "Num Home"
 
 #: config/user-input.cpp:35
 msgid "Num left"
-msgstr "Num left"
+msgstr "Num Left"
 
 #: config/user-input.cpp:36
 msgid "Num Up"
@@ -1486,11 +1486,11 @@ msgstr "Num Down"
 
 #: config/user-input.cpp:39
 msgid "Num PageUp"
-msgstr "Num PageUp"
+msgstr "Num Page Up"
 
 #: config/user-input.cpp:40
 msgid "Num PageDown"
-msgstr "Num PageDown"
+msgstr "Num Page Down"
 
 #: config/user-input.cpp:41
 msgid "Num End"
@@ -1876,7 +1876,7 @@ msgstr "FAudio: Не вдалося визначити пристрої!"
 
 #: faudio.cpp:66 faudio.cpp:351
 msgid "The FAudio interface failed to initialize!"
-msgstr "FAudio: не вдалося визначити інтерфейс!"
+msgstr "FAudio: Не вдалося визначити інтерфейс!"
 
 #: faudio.cpp:383
 msgid "FAudio: Creating mastering voice failed!"
