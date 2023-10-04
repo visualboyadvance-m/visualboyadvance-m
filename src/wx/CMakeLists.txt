@@ -259,7 +259,7 @@ else()
 
     include_directories(${wxWidgets_INCLUDE_DIRS})
 
-    if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
+    if(CMAKE_BUILD_TYPE STREQUAL Debug)
         # tell wx to enable debug mode if possible, if the cmake module did not do it for us
         execute_process(COMMAND "${wxWidgets_CONFIG_EXECUTABLE} --debug=yes" RESULT_VARIABLE WX_CONFIG_DEBUG OUTPUT_QUIET ERROR_QUIET)
 
@@ -278,6 +278,17 @@ else()
     foreach(CXX_COMPILE_FLAG ${wxWidgets_CXX_FLAGS})
         add_compile_options(${CXX_COMPILE_FLAG})
     endforeach()
+
+    # Remove "-framework System" from libs on macOS, it's not necessary and nix doesn't have it.
+    if(APPLE)
+        unset(tmp_libs)
+        foreach(lib ${wxWidgets_LIBRARIES})
+            if(NOT lib STREQUAL "-framework System")
+                list(APPEND tmp_libs "${lib}")
+            endif()
+        endforeach()
+        set(wxWidgets_LIBRARIES "${tmp_libs}")
+    endif()
 
     # set up variables for some compile/run checks for wxWidgets
     set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${MY_CXX_FLAGS} ${MY_C_FLAGS} ${MY_CXX_LINKER_FLAGS} ${MY_C_LINKER_FLAGS} ${wxWidgets_LIBRARIES})
