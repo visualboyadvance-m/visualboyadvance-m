@@ -2630,6 +2630,7 @@ EVT_HANDLER(LinkProto, "Local host IPC")
 {
 #ifndef NO_LINK
     GetMenuOptionConfig("LinkProto", config::OptionID::kGBALinkProto);
+    EnableNetworkMenu();
 #endif
 }
 
@@ -2643,7 +2644,6 @@ EVT_HANDLER(LinkConfigure, "Link options...")
 
     SetLinkTimeout(gopts.link_timeout);
     update_opts();
-    EnableNetworkMenu();
 #endif
 }
 
