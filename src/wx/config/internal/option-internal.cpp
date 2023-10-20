@@ -348,6 +348,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kUIAllowJoystickBackgroundInput, &g_owned_opts.allow_joystick_background_input),
         Option(OptionID::kUIHideMenuBar, &gopts.hide_menu_bar),
         Option(OptionID::kUISuspendScreenSaver, &gopts.suspend_screensaver),
+        Option(OptionID::kUIForceDarkMode, &gopts.force_dark_mode),
 
         /// Sound
         Option(OptionID::kSoundAudioAPI, &gopts.audio_api),

@@ -374,7 +374,7 @@ bool wxvbamApp::OnInit() {
     }
 
     wxSetWorkingDirectory(cwd);
-
+    
     if (!config_file_.IsOk()) {
         // Set up the default configuration file.
         // This needs to be in a subdir to support other config as well.
@@ -432,6 +432,11 @@ bool wxvbamApp::OnInit() {
     if (UsingWayland()) {
         OPTION(kDispRenderMethod) = config::RenderMethod::kSimple;
     }
+#endif
+
+#if defined(__WXMSW__) && wxCHECK_VERSION(3, 2, 3)
+    if (wxSystemAppearance::IsSystemDark())
+        MSWEnableDarkMode();
 #endif
 
     // process command-line options

@@ -2622,6 +2622,7 @@ bool MainFrame::BindControls()
                     cb->Hide();
 #endif // !HAVE_XSS
         }
+        { getcbb("ForceDarkMode", gopts.force_dark_mode); }
         wxFilePickerCtrl* fp;
 #define getfp(n, o, l)                                     \
     do {                                                   \

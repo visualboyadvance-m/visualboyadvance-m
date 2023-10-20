@@ -120,6 +120,7 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /*kUIAllowJoystickBackgroundInput*/ Option::Type::kBool,
     /*kUIHideMenuBar*/ Option::Type::kBool,
     /*kUISuspendScreenSaver*/ Option::Type::kBool,
+    /*kUIForceDarkMode*/ Option::Type::kBool,
 
     /// Sound
     /*kSoundAudioAPI*/ Option::Type::kAudioApi,
