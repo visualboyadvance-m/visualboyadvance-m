@@ -453,7 +453,7 @@ if(ENABLE_FFMPEG)
         set(FFMPEG_LDFLAGS ${FFMPEG_LDFLAGS} -framework CoreText -framework ApplicationServices)
 
         if(UPSTREAM_RELEASE)
-            set(FFMPEG_LDFLAGS ${FFMPEG_LDFLAGS} -lbz2 -lvo-amrwbenc -lopencore-amrnb -lopencore-amrwb -lmodplug -lbluray -lgsm -lmp3lame -ltiff -lopus -lsnappy -lsoxr -lspeex -ltheora -lvorbis -lvpx -lx264 -lx265 -lxavs -lxvidcore -lzmq -framework DiskArbitration -lfreetype -lfontconfig -llzma -logg -lvorbisenc -lxml2 -lharfbuzz)
+            set(FFMPEG_LDFLAGS ${FFMPEG_LDFLAGS} -lbz2 -ltiff -framework DiskArbitration -lfreetype -lfontconfig -llzma -lxml2 -lharfbuzz)
         endif()
     elseif(WIN32)
         set(WIN32_MEDIA_FOUNDATION_LIBS dxva2 evr mf mfplat mfplay mfreadwrite mfuuid amstrmid)
