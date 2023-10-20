@@ -181,34 +181,10 @@ DISTS=$DISTS'
     libsecret       https://gitlab.gnome.org/GNOME/libsecret/-/archive/0.20.5/libsecret-0.20.5.tar.bz2          lib/libsecret-1.a
     sdl2            https://github.com/libsdl-org/SDL/releases/download/release-2.28.4/SDL2-2.28.4.tar.gz       lib/libSDL2.a
     flac            https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.3.4.tar.xz                             lib/libFLAC.a
-    libogg          http://downloads.xiph.org/releases/ogg/libogg-1.3.5.tar.xz                                  lib/libogg.a
-    libvorbis       http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.7.tar.xz                            lib/libvorbis.a
     harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/5.1.0/harfbuzz-5.1.0.tar.xz          lib/libharfbuzz.a
     sfml            https://github.com/SFML/SFML/archive/refs/tags/2.6.0.tar.gz                                 lib/libsfml-system-s.a
     shared-mime-info https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.2/shared-mime-info-2.2.tar.bz2  bin/update-mime-database
     wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.3/wxWidgets-3.2.3.tar.bz2     lib/libwx_baseu-3.*.a
-    graphite2       https://github.com/silnrsi/graphite/archive/425da3d08926b9cf321fc0014dfa979c24d2cf64.tar.gz lib/libgraphite2.a
-    xvidcore        https://downloads.xvid.com/downloads/xvidcore-1.3.7.tar.bz2                                 lib/libxvidcore.a
-    fribidi         https://github.com/fribidi/fribidi/releases/download/v1.0.12/fribidi-1.0.12.tar.xz          lib/libfribidi.a
-    libgsm          https://www.quut.com/gsm/gsm-1.0.22.tar.gz                                                  lib/libgsm.a
-    libmodplug      https://github.com/Konstanty/libmodplug/archive/d1b97ed0020bc620a059d3675d1854b40bd2608d.tar.gz lib/libmodplug.a
-    libopencore-amrnb https://sourceforge.net/projects/opencore-amr/files/opencore-amr/opencore-amr-0.1.6.tar.gz/download  lib/libopencore-amrnb.a
-    opus            https://archive.mozilla.org/pub/opus/opus-1.3.1.tar.gz                                      lib/libopus.a
-    snappy          https://github.com/google/snappy/archive/af720f9a3b2c831f173b6074961737516f2d3a46.tar.gz    lib/libsnappy.a
-    libsoxr         https://downloads.sourceforge.net/project/soxr/soxr-0.1.3-Source.tar.xz                     lib/libsoxr.a
-    speex           http://downloads.xiph.org/releases/speex/speex-1.2.1.tar.gz                                 lib/libspeex.a
-    libtheora       https://github.com/Distrotech/libtheora/archive/17b02c8c564475bb812e540b551219fc42b1f75f.tar.gz lib/libtheora.a
-    vidstab         https://github.com/georgmartius/vid.stab/archive/90c76aca2cb06c3ff6f7476a7cd6851b39436656.tar.gz  lib/libvidstab.a
-    libvo-amrwbenc  https://github.com/mstorsjo/vo-amrwbenc/archive/3b3fcd0d250948e74cd67e7ea81af431ab3928f9.tar.gz  lib/libvo-amrwbenc.a
-    mp3lame         https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz                 lib/libmp3lame.a
-    libass          https://github.com/libass/libass/releases/download/0.16.0/libass-0.16.0.tar.xz              lib/libass.a
-    libbluray       https://download.videolan.org/pub/videolan/libbluray/1.3.2/libbluray-1.3.2.tar.bz2          lib/libbluray.a
-    libvpx          https://github.com/webmproject/libvpx/archive/refs/tags/v1.12.0.tar.gz                      lib/libvpx.a
-    libx264         https://code.videolan.org/videolan/x264/-/archive/f7074e12d90de71f22aebd5040b8c6d31ca8f926/x264-f7074e12d90de71f22aebd5040b8c6d31ca8f926.tar.bz2  lib/libx264.a
-    libx265         https://github.com/videolan/x265/archive/3.4.tar.gz                                         lib/libx265.a
-    libxavs         https://github.com/Distrotech/xavs/archive/8300fbf4918bca2af1af2aee6a337815e90b51e1.tar.gz  lib/libxavs.a
-    libzmq          https://github.com/zeromq/libzmq/releases/download/v4.3.4/zeromq-4.3.4.tar.gz               lib/libzmq.a
-#    libzvbi         https://downloads.sourceforge.net/project/zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2           lib/libzvbi.a
     ffmpeg          http://ffmpeg.org/releases/ffmpeg-6.0.tar.xz                                                lib/libavformat.a
 '
 
@@ -341,7 +317,7 @@ DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
     cmake       ./configure --prefix=/usr --no-qt-gui --parallel=\$NUM_CPUS
     XML-SAX     echo no | PERL_MM_USE_DEFAULT=0 \"\$perl\" Makefile.PL
     libvpx      ./configure --disable-shared --enable-static --prefix=/usr --disable-unit-tests --disable-tools --disable-docs --disable-examples
-    ffmpeg      ./configure --disable-shared --enable-static --prefix=/usr --pkg-config-flags=--static --enable-nonfree --extra-version=tessus --enable-fontconfig --enable-gpl --enable-version3 --enable-libass --enable-libbluray --enable-libfreetype --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopus --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libvidstab --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-libzmq --enable-openssl --enable-lzma --extra-cflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-cxxflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-objcflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-libs=-liconv --cc=\"\$CC\" --cxx=\"\$CXX\"
+    ffmpeg      ./configure --disable-shared --enable-static --prefix=/usr --pkg-config-flags=--static --disable-nonfree --enable-fontconfig --enable-gpl --enable-version3 --disable-libass --disable-libbluray --enable-libfreetype --disable-libgsm --disable-libmodplug --disable-libmp3lame --disable-libopencore-amrnb --disable-libopencore-amrwb --disable-libopus --disable-libsnappy --disable-libsoxr --disable-libspeex --disable-libtheora --disable-libvidstab --disable-libvo-amrwbenc --disable-libvorbis --disable-libvpx --disable-libx264 --disable-libx265 --disable-libxavs --disable-libxvid --disable-libzmq --disable-openssl --enable-lzma --extra-cflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-cxxflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-objcflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-libs=-liconv --cc=\"\$CC\" --cxx=\"\$CXX\"
 "
 
 DIST_BUILD_OVERRIDES="$DIST_BUILD_OVERRIDES
@@ -388,7 +364,7 @@ DIST_ARGS="$DIST_ARGS
     bakefile    --enable-shared
     XML-Parser  EXPATINCPATH=\"\$BUILD_ROOT/root/include\" EXPATLIBPATH=\"\$BUILD_ROOT/root/lib\"
     doxygen     -DICONV_ACCEPTS_NONCONST_INPUT:BOOL=FALSE -DICONV_ACCEPTS_CONST_INPUT:BOOL=TRUE
-    sfml        -DSFML_USE_SYSTEM_DEPS=TRUE
+    sfml        -DSFML_USE_SYSTEM_DEPS=TRUE -DSFML_BUILD_AUDIO=FALSE
     libcroco    --disable-Bsymbolic
     snappy      -DSNAPPY_BUILD_TESTS=OFF -DSNAPPY_BUILD_BENCHMARKS=OFF
     libjpeg-turbo -DWITH_JPEG8=ON -DWITH_SIMD=OFF
