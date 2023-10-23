@@ -6,24 +6,7 @@ description: |
 adopt-info: vbam
 grade: devel
 confinement: strict
-base: core20
-
-plugs:
-
-  desktop:
-  desktop-legacy:
-  audio-playback:
-  opengl:
-
-  home:
-  removable-media:
-
-  network:
-
-  wayland:
-
-  x11:
-
+base: core22
 parts:
   vbam:
     source: https://github.com/visualboyadvance-m/visualboyadvance-m.git
@@ -74,8 +57,21 @@ parts:
 
 apps:
   visualboyadvance-m:
+    plugs:
+      - desktop
+      - desktop-legacy
+      - audio-playback
+      - opengl
+      - joystick
+      - raw-usb
+      - screen-inhibit-control
+      - home
+      - removable-media
+      - network
+      - wayland
+      - x11
     command: usr/bin/visualboyadvance-m
     desktop: usr/share/applications/visualboyadvance-m.desktop
-    extensions: [gnome-3-38]
+    extensions: [gnome]
     environment:
       LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
