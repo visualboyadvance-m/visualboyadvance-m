@@ -117,34 +117,21 @@ ninja
 
 ## Visual Studio Code Support
 
-On most platforms, Visual Studio Code should work as-is, as long as the
-[CMake Tools extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)
-is installed.
+Make sure the
+[C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
+and [CMake
+Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)
+extensions are installed.
 
-There is a recommended configuration in the `vscode/settings.json` file. To use
-it, copy the file to a `.vscode/` folder.
+Add the following to your `settings.json`:
 
-By default, this will publish builds in the `build-vscode/` directory. In the
-`vscode/settings.json` file, there is an alternate configuration for the
-`"cmake.buildDirectory"` option that will use different build directories for
-different toolchains and build configurations.
-
-### Optional: clangd
-
-The [clangd extension](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd)
-uses clangd to provide powerful code completion, errors and warnings and
-references on click in VS Code.
-
-With the recommended configuration, the build configuration will generate a
-`compile_commands.json` file that can be used with clangd. After configuration,
-you can copy that file to the root directory with a command similar to this one:
-
-```shell
-cp build/build-vscode/compile_commands.json .
+```json
+{
+    "cmake.configureOnOpen": true,
+    "cmake.preferredGenerators": [ "Ninja" ]
+}
 ```
-
-Then, select "clangd: Restart language server" from the command palette to get
-completion in the IDE.
+.
 
 ## Dependencies
 
