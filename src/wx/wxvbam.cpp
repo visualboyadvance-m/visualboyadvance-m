@@ -846,7 +846,7 @@ MainFrame::MainFrame()
 #endif
       keep_on_top_styler_(this),
       status_bar_observer_(config::OptionID::kGenStatusBar,
-                           std::bind(&MainFrame::OnStatusBarChanged, this, std::placeholders::_1)) {
+                           std::bind(&MainFrame::OnStatusBarChanged, this)) {
     jpoll = new JoystickPoller();
     this->Connect(wxID_ANY, wxEVT_SHOW, wxShowEventHandler(JoystickPoller::ShowDialog), jpoll, jpoll);
 }
@@ -857,12 +857,14 @@ MainFrame::~MainFrame() {
 #endif
 }
 
-void MainFrame::OnStatusBarChanged(config::Option* option) {
-    if (option->GetBool())
-        GetStatusBar()->Show();
-    else
-        GetStatusBar()->Hide();
+void MainFrame::SetStatusBar(wxStatusBar* menu_bar) {
+    wxFrame::SetStatusBar(menu_bar);
+    // This will take care of hiding the menu bar at startup, if needed.
+    menu_bar->Show(OPTION(kGenStatusBar));
+}
 
+void MainFrame::OnStatusBarChanged() {
+    GetStatusBar()->Show(OPTION(kGenStatusBar));
     SendSizeEvent();
     panel->AdjustSize(false);
     SendSizeEvent();

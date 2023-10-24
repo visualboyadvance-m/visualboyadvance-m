@@ -362,11 +362,14 @@ private:
     const widgets::KeepOnTopStyler keep_on_top_styler_;
     const config::OptionsObserver status_bar_observer_;
 
+    // wxFrame override.
+    void SetStatusBar(wxStatusBar* menuBar) override;
+
     // helper function for adding menu to accel editor
     void add_menu_accels(wxTreeCtrl* tc, wxTreeItemId& parent, wxMenu* menu);
 
     // For enabling / disabling the status bar.
-    void OnStatusBarChanged(config::Option* option);
+    void OnStatusBarChanged();
     // for detecting window focus
     void OnActivate(wxActivateEvent&);
     // may work, may not...  if so, load dropped file
