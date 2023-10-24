@@ -930,6 +930,9 @@ void MainFrame::OnMenu(wxContextMenuEvent& event)
 }
 
 void MainFrame::OnMove(wxMoveEvent&) {
+    if (!init_complete_) {
+        return;
+    }
     if (!IsFullScreen() && !IsMaximized()) {
         const wxPoint window_pos = GetScreenPosition();
         OPTION(kGeomWindowX) = window_pos.x;
@@ -954,6 +957,9 @@ void MainFrame::OnMoveEnd(wxMoveEvent&) {
 void MainFrame::OnSize(wxSizeEvent& event)
 {
     wxFrame::OnSize(event);
+    if (!init_complete_) {
+        return;
+    }
     const wxRect window_rect = GetRect();
     const wxPoint window_pos = GetScreenPosition();
 

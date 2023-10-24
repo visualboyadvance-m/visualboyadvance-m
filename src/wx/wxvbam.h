@@ -356,6 +356,9 @@ private:
     JoystickPoller* jpoll = nullptr;
     // quicker & more accurate than FindFocus() != NULL
     bool focused;
+    // One-time toggle to indicate that this object is fully initialized. This
+    // used to filter events that are sent during initialization.
+    bool init_complete_ = false;
 #ifndef NO_LINK
     const config::OptionsObserver gba_link_observer_;
 #endif
