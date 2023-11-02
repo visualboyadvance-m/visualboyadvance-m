@@ -135,6 +135,8 @@ endfunction()
 function(vcpkg_is_installed vcpkg_exe pkg_name pkg_version outvar)
     set(${outvar} FALSE PARENT_SCOPE)
 
+    string(REGEX REPLACE "-r([0-9]+)\$" ".\\1" pkg_version ${pkg_version})
+
     if(NOT DEFINED VCPKG_INSTALLED)
         execute_process(
             COMMAND ${vcpkg_exe} list
@@ -150,14 +152,16 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_version outvar)
             endif()
             set(inst_pkg_name    ${CMAKE_MATCH_1})
             set(inst_pkg_version ${CMAKE_MATCH_2})
-            
+
+            string(REGEX REPLACE "#([0-9]+)\$" ".\\1" inst_pkg_version ${inst_pkg_version})
+
             list(APPEND VCPKG_INSTALLED ${inst_pkg_name} ${inst_pkg_version})
             math(EXPR VCPKG_INSTALLED_COUNT "${VCPKG_INSTALLED_COUNT} + 1")
         endforeach()
         set(VCPKG_INSTALLED       ${VCPKG_INSTALLED}       PARENT_SCOPE)
         set(VCPKG_INSTALLED_COUNT ${VCPKG_INSTALLED_COUNT} PARENT_SCOPE)
     endif()
-    
+
     if(NOT VCPKG_INSTALLED_COUNT GREATER 0)
         return()
     endif()
@@ -168,7 +172,7 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_version outvar)
         math(EXPR idx_ver "${idx} + 1")
         list(GET VCPKG_INSTALLED ${idx}     inst_pkg_name)
         list(GET VCPKG_INSTALLED ${idx_ver} inst_pkg_ver)
-        
+
         if(inst_pkg_name STREQUAL pkg_name AND (NOT inst_pkg_ver VERSION_LESS pkg_version))
             set(${outvar} TRUE PARENT_SCOPE)
             return()
@@ -178,7 +182,7 @@ endfunction()
 
 function(get_binary_packages vcpkg_exe)
     set(binary_packages_installed FALSE PARENT_SCOPE)
-    
+
     file(
         DOWNLOAD "https://nightly.vba-m.com/vcpkg/${VCPKG_TARGET_TRIPLET}/" ${CMAKE_BINARY_DIR}/binary_package_list.html
         STATUS pkg_list_status
@@ -190,7 +194,7 @@ function(get_binary_packages vcpkg_exe)
         message(STATUS "Failed to download vcpkg binary package list: ${pkg_list_status} - ${pkg_list_error}")
         return()
     endif()
-    
+
     file(
         STRINGS ${CMAKE_BINARY_DIR}/binary_package_list.html binary_packages_html
         REGEX "<a href=\".*[.]zip"
@@ -205,18 +209,18 @@ function(get_binary_packages vcpkg_exe)
         set(pkg         "${CMAKE_MATCH_1}_${CMAKE_MATCH_2}_${CMAKE_MATCH_3}")
         set(pkg_name    ${CMAKE_MATCH_1})
         set(pkg_version ${CMAKE_MATCH_2})
-        
+
         vcpkg_is_installed(${vcpkg_exe} ${pkg_name} ${pkg_version} pkg_installed)
-        
+
         if(NOT pkg_installed)
             list(APPEND to_install ${pkg})
         endif()
     endforeach()
-    
+
     if(to_install)
         set(bin_pkgs_dir ${CMAKE_BINARY_DIR}/vcpkg-binary-packages)
         file(MAKE_DIRECTORY ${bin_pkgs_dir})
-        
+
         foreach(pkg ${to_install})
             message(STATUS "Downloading https://nightly.vba-m.com/vcpkg/${VCPKG_TARGET_TRIPLET}/${pkg} ...")
 
@@ -231,10 +235,10 @@ function(get_binary_packages vcpkg_exe)
                 message(STATUS "Failed to download vcpkg binary package '${pkg}': ${pkg_download_status} - ${pkg_download_error}")
                 return()
             endif()
-            
+
             message(STATUS "done.")
         endforeach()
-        
+
         set(vcpkg_binpkg_dir ${CMAKE_BINARY_DIR}/vcpkg-binpkg)
         include(FetchContent)
         FetchContent_Declare(
@@ -242,22 +246,22 @@ function(get_binary_packages vcpkg_exe)
             URL "https://github.com/rkitover/vcpkg-binpkg-prototype/archive/refs/heads/master.zip"
             SOURCE_DIR ${vcpkg_binpkg_dir}
         )
-      
+
         FetchContent_GetProperties(vcpkg_binpkg)
         if(NOT vcpkg_binpkg_POPULATED)
             FetchContent_Populate(vcpkg_binpkg)
         endif()
-        
+
         if(WIN32)
             set(powershell powershell)
         else()
             set(powershell pwsh)
         endif()
-        
+
         foreach(pkg ${to_install})
             execute_process(
-                COMMAND ${powershell} 
-                    -executionpolicy bypass -noprofile 
+                COMMAND ${powershell}
+                    -executionpolicy bypass -noprofile
                     -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-instpkg './${pkg}'"
                 WORKING_DIRECTORY ${bin_pkgs_dir}
             )
@@ -405,7 +409,7 @@ function(vcpkg_set_toolchain)
     )
 
     get_binary_packages(${vcpkg_exe})
-    
+
     if(NOT binary_packages_installed)
         # Get number of seconds since midnight (might be wrong if am/pm is in effect on Windows.)
         vcpkg_seconds()
