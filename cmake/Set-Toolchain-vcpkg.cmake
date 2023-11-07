@@ -258,14 +258,14 @@ function(get_binary_packages vcpkg_exe)
             set(powershell pwsh)
         endif()
 
-        foreach(pkg ${to_install})
-            execute_process(
-                COMMAND ${powershell}
-                    -executionpolicy bypass -noprofile
-                    -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-instpkg './${pkg}'"
-                WORKING_DIRECTORY ${bin_pkgs_dir}
-            )
-        endforeach()
+        execute_process(
+            COMMAND ${powershell}
+                -executionpolicy bypass -noprofile
+                -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-instpkg ."
+            WORKING_DIRECTORY ${bin_pkgs_dir}
+        )
+
+        file(REMOVE_RECURSE ${bin_pkgs_dir})
     endif()
 
     set(binary_packages_installed TRUE PARENT_SCOPE)
