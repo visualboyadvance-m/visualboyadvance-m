@@ -136,6 +136,7 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_version outvar)
     set(${outvar} FALSE PARENT_SCOPE)
 
     string(REGEX REPLACE "-r([0-9]+)\$" ".\\1" pkg_version ${pkg_version})
+    string(REPLACE       "-"            "."    pkg_version ${pkg_version})
 
     if(NOT DEFINED VCPKG_INSTALLED)
         execute_process(
@@ -154,6 +155,7 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_version outvar)
             set(inst_pkg_version ${CMAKE_MATCH_2})
 
             string(REGEX REPLACE "#([0-9]+)\$" ".\\1" inst_pkg_version ${inst_pkg_version})
+            string(REPLACE       "-"           "."    inst_pkg_version ${inst_pkg_version})
 
             list(APPEND VCPKG_INSTALLED ${inst_pkg_name} ${inst_pkg_version})
             math(EXPR VCPKG_INSTALLED_COUNT "${VCPKG_INSTALLED_COUNT} + 1")
@@ -203,7 +205,7 @@ function(get_binary_packages vcpkg_exe)
     unset(binary_packages)
     unset(to_install)
     foreach(pkg ${binary_packages_html})
-        if(NOT pkg MATCHES "^.*<a href=\".[^>]+>([^_]+)_([^_]+)_([^<]+[.]zip)<.*\$")
+        if(NOT pkg MATCHES "<a href=\"([^_]+)_([^_]+)_([^.]+[.]zip)\"")
             continue()
         endif()
         set(pkg         "${CMAKE_MATCH_1}_${CMAKE_MATCH_2}_${CMAKE_MATCH_3}")
