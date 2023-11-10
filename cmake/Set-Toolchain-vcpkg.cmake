@@ -132,11 +132,14 @@ function(vcpkg_deps_fixup vcpkg_exe)
     endif()
 endfunction()
 
-function(vcpkg_is_installed vcpkg_exe pkg_name pkg_version outvar)
+function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver outvar)
     set(${outvar} FALSE PARENT_SCOPE)
 
-    string(REGEX REPLACE "-r([0-9]+)\$" ".\\1" pkg_version ${pkg_version})
-    string(REPLACE       "-"            "."    pkg_version ${pkg_version})
+    unset(CMAKE_MATCH_1)
+    string(REGEX REPLACE "-r([0-9]+)\$" "" pkg_ver ${pkg_ver})
+    set(pkg_rev ${CMAKE_MATCH_1})
+
+    string(REPLACE "-" "." pkg_ver ${pkg_ver})
 
     if(NOT DEFINED VCPKG_INSTALLED)
         execute_process(
@@ -151,13 +154,20 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_version outvar)
             if(NOT pkg MATCHES "^([^:[]+)[^:]*:${VCPKG_TARGET_TRIPLET} +([0-9][^ ]*) +.*\$")
                 continue()
             endif()
-            set(inst_pkg_name    ${CMAKE_MATCH_1})
-            set(inst_pkg_version ${CMAKE_MATCH_2})
+            set(inst_pkg_name ${CMAKE_MATCH_1})
+            set(inst_pkg_ver  ${CMAKE_MATCH_2})
 
-            string(REGEX REPLACE "#([0-9]+)\$" ".\\1" inst_pkg_version ${inst_pkg_version})
-            string(REPLACE       "-"           "."    inst_pkg_version ${inst_pkg_version})
+            unset(CMAKE_MATCH_1)
+            string(REGEX REPLACE "#([0-9]+)\$" "" inst_pkg_ver ${inst_pkg_ver})
+            if(CMAKE_MATCH_1)
+                set(inst_pkg_rev ${CMAKE_MATCH_1})
+            else()
+                set(inst_pkg_rev FALSE)
+            endif()
 
-            list(APPEND VCPKG_INSTALLED ${inst_pkg_name} ${inst_pkg_version})
+            string(REPLACE "-" "." inst_pkg_ver ${inst_pkg_ver})
+
+            list(APPEND VCPKG_INSTALLED ${inst_pkg_name} ${inst_pkg_ver} ${inst_pkg_rev})
             math(EXPR VCPKG_INSTALLED_COUNT "${VCPKG_INSTALLED_COUNT} + 1")
         endforeach()
         set(VCPKG_INSTALLED       ${VCPKG_INSTALLED}       PARENT_SCOPE)
@@ -167,15 +177,22 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_version outvar)
     if(NOT VCPKG_INSTALLED_COUNT GREATER 0)
         return()
     endif()
+    
+    math(EXPR idx_max "(${VCPKG_INSTALLED_COUNT} - 1) * 3")
 
-    math(EXPR idx_max "(${VCPKG_INSTALLED_COUNT} - 1) * 2")
-
-    foreach(idx RANGE 0 ${idx_max} 2)
+    foreach(idx RANGE 0 ${idx_max} 3)
         math(EXPR idx_ver "${idx} + 1")
+        math(EXPR idx_rev "${idx} + 2")
         list(GET VCPKG_INSTALLED ${idx}     inst_pkg_name)
         list(GET VCPKG_INSTALLED ${idx_ver} inst_pkg_ver)
+        list(GET VCPKG_INSTALLED ${idx_rev} inst_pkg_rev)
 
-        if(inst_pkg_name STREQUAL pkg_name AND (NOT inst_pkg_ver VERSION_LESS pkg_version))
+        if(inst_pkg_name STREQUAL pkg_name
+            AND pkg_ver VERSION_LESS inst_pkg_ver
+            OR (pkg_ver VERSION_EQUAL inst_pkg_ver
+                AND ((NOT pkg_rev AND NOT inst_pkg_rev)
+                    OR (pkg_rev AND inst_pkg_rev AND (NOT pkg_rev GREATER inst_pkg_rev)))))
+
             set(${outvar} TRUE PARENT_SCOPE)
             return()
         endif()
