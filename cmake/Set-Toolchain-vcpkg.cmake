@@ -60,7 +60,7 @@ function(vcpkg_seconds)
         )
     else()
         execute_process(
-            COMMAND date +'%H:%M:%S'
+            COMMAND date +%H:%M:%S
             OUTPUT_VARIABLE time
         )
     endif()

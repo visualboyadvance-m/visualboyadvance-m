@@ -110,7 +110,7 @@ endif()
 
 # on VS with vcpkg we can't use FindwxWidgets, we have to set everything up
 # manually because the package is broken
-if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
+if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     # set up wxwidgets stuff
     set(libtype u)
     unset(arch_suffix)
@@ -314,9 +314,10 @@ else()
     # need it because everything is built with clang
     set(ABI_CHECK FALSE)
 
-    if((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+    if((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         AND NOT CMAKE_CROSSCOMPILING
-        AND NOT CMAKE_SYSTEM_NAME STREQUAL FreeBSD
+        AND NOT CMAKE_SYSTEM_NAME STREQUAL "FreeBSD"
+        AND NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg"
         AND NOT TRANSLATIONS_ONLY)
 
         set(ABI_CHECK TRUE)
