@@ -6,28 +6,28 @@ if(POLICY CMP0135)
     cmake_policy(SET CMP0135 NEW) # Use timestamps from archives.
 endif()
 
-if(NOT DEFINED VCPKG_TARGET_TRIPLET)
+if(NOT DEFINED VCPKG_TARGET_TRIPLET AND WIN32)
     # Check if we are in an MSVC environment.
     if($ENV{CXX} MATCHES "cl.exe$")
         # Infer the architecture from the LIB folders.
         foreach(LIB $ENV{LIB})
             if(${LIB} MATCHES "x64$")
-                set(VBAM_VCPKG_PLATFORM "x64-windows")
+                set(VBAM_VCPKG_PLATFORM "x64-windows-static")
                 break()
             endif()
             if(${LIB} MATCHES "x86$")
-                set(VBAM_VCPKG_PLATFORM "x86-windows")
+                set(VBAM_VCPKG_PLATFORM "x86-windows-static")
                 break()
             endif()
             if(${LIB} MATCHES "ARM64$")
-                set(VBAM_VCPKG_PLATFORM "arm64-windows")
+                set(VBAM_VCPKG_PLATFORM "arm64-windows-static")
                 break()
             endif()
         endforeach()
 
         # If all else fails, try to use a sensible default.
         if(NOT DEFINED VBAM_VCPKG_PLATFORM)
-            set(VBAM_VCPKG_PLATFORM "x64-windows")
+            set(VBAM_VCPKG_PLATFORM "x64-windows-static")
         endif()
 
     elseif (NOT DEFINED CMAKE_CXX_COMPILER)
@@ -36,7 +36,7 @@ if(NOT DEFINED VCPKG_TARGET_TRIPLET)
 
     elseif(${CMAKE_CXX_COMPILER} MATCHES "clang-cl.exe$" OR ${CMAKE_CXX_COMPILER} MATCHES "clang-cl$")
         # For stand-alone clang-cl, assume x64.
-        set(VBAM_VCPKG_PLATFORM "x64-windows")
+        set(VBAM_VCPKG_PLATFORM "x64-windows-static")
     endif()
 
     if (NOT DEFINED VBAM_VCPKG_PLATFORM)
@@ -44,11 +44,7 @@ if(NOT DEFINED VCPKG_TARGET_TRIPLET)
         return()
     endif()
 
-    if(DEFINED BUILD_SHARED_LIBS AND NOT ${BUILD_SHARED_LIBS})
-        set(VBAM_VCPKG_PLATFORM ${VBAM_VCPKG_PLATFORM}-static)
-    endif()
-
-    set(VCPKG_TARGET_TRIPLET ${VBAM_VCPKG_PLATFORM} CACHE STRING "Vcpkg target triplet (ex. x86-windows)" FORCE)
+    set(VCPKG_TARGET_TRIPLET ${VBAM_VCPKG_PLATFORM} CACHE STRING "Vcpkg target triplet (ex. x64-windows-static)" FORCE)
     message(STATUS "Inferred VCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}")
 endif()
 
