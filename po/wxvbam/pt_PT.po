@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Eduardo Cardoso, 2023
 # gvasco <g.v.faria@icloud.com>, 2016
 msgid ""
 msgstr ""
@@ -10,7 +11,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-23 14:26-0700\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: gvasco <g.v.faria@icloud.com>, 2016\n"
+"Last-Translator: Eduardo Cardoso, 2023\n"
 "Language-Team: Portuguese (Portugal) (http://app.transifex.com/bgk/vba-m/language/pt_PT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,56 +21,56 @@ msgstr ""
 
 #: wxvbam.cpp:309
 msgid "visualboyadvance-m"
-msgstr ""
+msgstr "visualboyadvance-m"
 
 #: wxvbam.cpp:380 wxvbam.cpp:397
 #, c-format
 msgid "Invalid configuration file provided: %s"
-msgstr ""
+msgstr "O ficheiro de configuração fornecido é inválido: %s"
 
 #: wxvbam.cpp:536
 msgid "Could not create main window"
-msgstr ""
+msgstr "Não foi possível criar janela principal"
 
 #: wxvbam.cpp:617
 msgid "Save built-in XRC file and exit"
-msgstr ""
+msgstr "Guardar ficheiro XRC embutido e sair"
 
 #: wxvbam.cpp:620
 msgid "Save built-in vba-over.ini and exit"
-msgstr ""
+msgstr "Guardar vba-over.ini embutido e sair"
 
 #: wxvbam.cpp:623
 msgid "Print configuration path and exit"
-msgstr ""
+msgstr "Imprimir caminho de configuração e sair"
 
 #: wxvbam.cpp:626
 msgid "Start in full-screen mode"
-msgstr ""
+msgstr "Iniciar em modo de ecrã inteiro"
 
 #: wxvbam.cpp:629
 msgid "Set a configuration file"
-msgstr ""
+msgstr "Definir um ficheiro de configuração"
 
 #: wxvbam.cpp:633
 msgid "Delete shared link state first, if it exists"
-msgstr ""
+msgstr "Apagar primeiro o estado da hiperligação partilhada, se existir"
 
 #: wxvbam.cpp:640
 msgid "List all settable options and exit"
-msgstr ""
+msgstr "Listar todas as opções configuráveis e sair"
 
 #: wxvbam.cpp:643
 msgid "ROM file"
-msgstr ""
+msgstr "Ficheiro ROM"
 
 #: wxvbam.cpp:645
 msgid "<config>=<value>"
-msgstr ""
+msgstr "<config>=<value>"
 
 #: wxvbam.cpp:676
 msgid "Configuration / build error: can't find built-in xrc"
-msgstr ""
+msgstr "Erro de configuração/construção: não é possível encontrar ficheiro xrc embutido"
 
 #: wxvbam.cpp:684
 #, c-format
@@ -111,7 +112,7 @@ msgstr ""
 
 #: wxvbam.cpp:752
 msgid "Configuration file not found."
-msgstr ""
+msgstr "Ficheiro de configuração não encontrado."
 
 #: wxvbam.cpp:783
 msgid "Bad configuration option or multiple ROM files given:\n"
@@ -119,37 +120,37 @@ msgstr ""
 
 #: guiinit.cpp:103
 msgid "Start!"
-msgstr ""
+msgstr "Iniciar!"
 
 #: guiinit.cpp:122 xrc/NetLink.xrc:99
 msgid "Connect"
-msgstr ""
+msgstr "Conectar"
 
 #: guiinit.cpp:139
 msgid "You must enter a valid host name"
-msgstr ""
+msgstr "Deve introduzir um nome de anfitrião válido."
 
 #: guiinit.cpp:140
 msgid "Host name invalid"
-msgstr ""
+msgstr "Nome de anfitrião inválido"
 
 #: guiinit.cpp:158
 msgid "Waiting for clients..."
-msgstr ""
+msgstr "A esperar clientes..."
 
 #: guiinit.cpp:159
 #, c-format
 msgid "Server IP address is: %s\n"
-msgstr ""
+msgstr "O endereço de IP do servidor é: %s\n"
 
 #: guiinit.cpp:161
 msgid "Waiting for connection..."
-msgstr ""
+msgstr "À espera de ligação..."
 
 #: guiinit.cpp:162
 #, c-format
 msgid "Connecting to %s\n"
-msgstr ""
+msgstr "A ligar a %s\n"
 
 #: guiinit.cpp:195
 msgid ""
