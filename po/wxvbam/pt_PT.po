@@ -645,7 +645,7 @@ msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr ""
+msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 equipa de desenvolvimento do VBA \nCopyright (C) 2007-2020 equipa de desenvolvimento do VBA-M"
 
 #: cmdevents.cpp:2319
 msgid ""
@@ -661,202 +661,202 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program. If not, see http://www.gnu.org/licenses ."
-msgstr ""
+msgstr "Este programa é software livre: Você pode redistribuí-lo e / ou modificá-lo\nsobre os termos da Licença Pública Geral GNU tal como publicado pela\nFundação para o Software Livre, seja a versão 2 da licença, ou\n(opção sua) outra versão mais recente.\n\nEste programa é distribuído na esperança de ser útil,\nmas SEM QUALQUER GARANTIA; nem mesmo a garantia implícita de COMERCIALIZAÇÃO ou ADEQUAÇÃO PARA UM PROPÓSITO PARTICULAR. Veja a\nLicença Pública Geral GNU para mais detalhes.\n\nDeverá ter recebido uma cópia da  Licença Pública Geral GNU\njunto com este programa. Se não recebeu, veja http://www.gnu.org/licenses ."
 
 #: cmdevents.cpp:2504
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
-msgstr ""
+msgstr "Não é possível usar a BIOS do Game Boy quando o Hack do Colorizador está ativo."
 
 #: cmdevents.cpp:2558
 msgid "LAN link is already active. Disable link mode to disconnect."
-msgstr ""
+msgstr "O link da LAN já está ativo. Desative o modo link para desconectar."
 
 #: cmdevents.cpp:2564
 msgid "Network is not supported in local mode."
-msgstr ""
+msgstr "A rede não é suportada em modo local."
 
 #: extra-translations.cpp:12
 msgid "&Apply"
-msgstr ""
+msgstr "&Aplicar"
 
 #: extra-translations.cpp:13
 msgid "Artists"
-msgstr ""
+msgstr "Artistas"
 
 #: extra-translations.cpp:14
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: extra-translations.cpp:15
 msgid "Close"
-msgstr ""
+msgstr "Fechar"
 
 #: extra-translations.cpp:16
 msgid "Developers"
-msgstr ""
+msgstr "Programadores"
 
 #: extra-translations.cpp:17
 msgid "License"
-msgstr ""
+msgstr "Licensa"
 
 #: extra-translations.cpp:18
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: opts.cpp:290
 msgid ""
 "The INI file was written for a more recent version of VBA-M. Some INI option"
 " values may have been reset."
-msgstr ""
+msgstr "O ficheiro INI foi escrito para uma versão mais recente do VBA-M. Alguns valores da opção INI podem ter sido repostos."
 
 #: opts.cpp:457 opts.cpp:477 opts.cpp:662
 #, c-format
 msgid "Invalid key binding %s for %s"
-msgstr ""
+msgstr "Vinculação de tecla inválida %spara%s"
 
 #: opts.cpp:598 opts.cpp:607 opts.cpp:616 opts.cpp:625 config/option.cpp:492
 #, c-format
 msgid "Invalid value %s for option %s"
-msgstr ""
+msgstr "Valor inválido %s para a opção %s"
 
 #: opts.cpp:684
 #, c-format
 msgid "Unknown option %s with value %s"
-msgstr ""
+msgstr "Opção desconhecida %s com o valor %s"
 
 #: sys.cpp:200 sys.cpp:261
 msgid "No game in progress to record"
-msgstr ""
+msgstr "Nenhum jogo em progresso para gravar"
 
 #: sys.cpp:218
 #, c-format
 msgid "Cannot open output file %s"
-msgstr ""
+msgstr "Não é possível abrir ficheiro de saída %s"
 
 #: sys.cpp:225 sys.cpp:245 sys.cpp:395
 msgid "Error writing game recording"
-msgstr ""
+msgstr "Erro ao escrever a gravação do jogo"
 
 #: sys.cpp:266
 msgid "Cannot play game recording while recording"
-msgstr ""
+msgstr "Não é possível reproduzir a gravação do jogo enquanto estiver a gravar"
 
 #: sys.cpp:281
 #, c-format
 msgid "Cannot open recording file %s"
-msgstr ""
+msgstr "Não é possível abrir o ficheiro de gravação %s"
 
 #: sys.cpp:290 sys.cpp:300
 msgid "Error reading game recording"
-msgstr ""
+msgstr "Erro ao ler a gravação do jogo"
 
 #: sys.cpp:410 sys.cpp:429
 msgid "Playback ended"
-msgstr ""
+msgstr "Reprodução finalizada"
 
 #: sys.cpp:453
 #, c-format
 msgid "%d %% (%d, %d fps)"
-msgstr ""
+msgstr "%d %% (%d, %d fps)"
 
 #: sys.cpp:461
 #, c-format
 msgid "%d %%"
-msgstr ""
+msgstr "%d %%"
 
 #: sys.cpp:895 xrc/GBPrinter.xrc:65
 msgid "&Discard"
-msgstr ""
+msgstr "&Descartar"
 
 #: sys.cpp:929
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
-msgstr ""
+msgstr "Ficheiros de imagem (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
 #: sys.cpp:938
 msgid "Save printer image to"
-msgstr ""
+msgstr "Guardar imagem da impressora para"
 
 #: sys.cpp:952 sys.cpp:1136
 #, c-format
 msgid "Wrote printer output to %s"
-msgstr ""
+msgstr "Escreveu a saída da impressora em %s"
 
 #: sys.cpp:957 sys.cpp:1028
 msgid "&Close"
-msgstr ""
+msgstr "&Fechar"
 
 #: sys.cpp:1023
 msgid "Printed"
-msgstr ""
+msgstr "Impresso"
 
 #: sys.cpp:1326
 #, c-format
 msgid "Error opening pseudo tty: %s"
-msgstr ""
+msgstr "Erro ao abrir pseudo tty: %s"
 
 #: sys.cpp:1425
 #, c-format
 msgid "Error setting up server socket (%d)"
-msgstr ""
+msgstr "Erro ao configurar o socket do servidor (%d)"
 
 #: panel.cpp:183
 #, c-format
 msgid "%s is not a valid ROM file"
-msgstr ""
+msgstr "%s não é um ficheiro de ROM válido"
 
 #: panel.cpp:184 panel.cpp:245 panel.cpp:310
 msgid "Problem loading file"
-msgstr ""
+msgstr "Problema ao carregar ficheiro"
 
 #: panel.cpp:244
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
-msgstr ""
+msgstr "Não foi possível carregar ROM de Game Boy %s"
 
 #: panel.cpp:272
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
-msgstr ""
+msgstr "Não é possível usar ficheiro de BIOS de Game Boy quando o Hack do Colorizador está ativo, a desativar ficheiro de BIOS de Game Boy"
 
 #: panel.cpp:286 panel.cpp:386
 #, c-format
 msgid "Could not load BIOS %s"
-msgstr ""
+msgstr "Não foi possível carregar BIOS %s"
 
 #: panel.cpp:309
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
-msgstr ""
+msgstr "Não é possível carregar ROM de Game Boy Advance %s"
 
 #: panel.cpp:554
 msgid " player "
-msgstr ""
+msgstr "jogador"
 
 #: panel.cpp:720
 #, c-format
 msgid "Loaded state %s"
-msgstr ""
+msgstr "Estado carregado %s"
 
 #: panel.cpp:720
 #, c-format
 msgid "Error loading state %s"
-msgstr ""
+msgstr "Erro ao carregar estado %s"
 
 #: panel.cpp:744
 #, c-format
 msgid "Saved state %s"
-msgstr ""
+msgstr "Estado guardado %s"
 
 #: panel.cpp:744
 #, c-format
 msgid "Error saving state %s"
-msgstr ""
+msgstr "Erro ao guardar estado %s"
 
 #: panel.cpp:948
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
-msgstr ""
+msgstr "Modo de ecrã inteiro %d x %d - %d @ %d não suportado; a procurar por outro"
 
 #: panel.cpp:986
 #, c-format
