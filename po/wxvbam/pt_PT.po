@@ -861,192 +861,192 @@ msgstr "Modo de ecrã inteiro %d x %d - %d @ %d não suportado; a procurar por o
 #: panel.cpp:986
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
-msgstr ""
+msgstr "O modo de ecrã inteiro %d x %d - %d @ %d não é suportado"
 
 #: panel.cpp:991
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
-msgstr ""
+msgstr "Modo válido: %d x %d - %d @ %d"
 
 #: panel.cpp:999
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
-msgstr ""
+msgstr "Escolha o modo %d x %d - %d @ %d"
 
 #: panel.cpp:1003
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
-msgstr ""
+msgstr "Falha ao mudar o modo para %d x %d - %d @ %d"
 
 #: panel.cpp:1094
 msgid "Not a valid Game Boy Advance cartridge"
-msgstr ""
+msgstr "O cartucho de Game Boy Advance não é válido"
 
 #: panel.cpp:1257
 msgid "No memory for rewinding"
-msgstr ""
+msgstr "Sem memória para retroceder"
 
 #: panel.cpp:1267
 msgid "Error writing rewind state"
-msgstr ""
+msgstr "Erro ao escrever o estado de retrocesso"
 
 #: panel.cpp:2285
 msgid "Enabling EGL VSync."
-msgstr ""
+msgstr "A ativar o VSync do EGL."
 
 #: panel.cpp:2287
 msgid "Disabling EGL VSync."
-msgstr ""
+msgstr "A desativar o VSync do EGL."
 
 #: panel.cpp:2294
 msgid "Enabling GLX VSync."
-msgstr ""
+msgstr "A ativar o VSync do GLX."
 
 #: panel.cpp:2296
 msgid "Disabling GLX VSync."
-msgstr ""
+msgstr "A desativar o VSync do GLX."
 
 #: panel.cpp:2314
 msgid "Failed to set glXSwapIntervalEXT"
-msgstr ""
+msgstr "Falha ao definir o glXSwapIntervalEXT"
 
 #: panel.cpp:2323
 msgid "Failed to set glXSwapIntervalSGI"
-msgstr ""
+msgstr "Falha ao definir glXSwapIntervalSGI"
 
 #: panel.cpp:2332
 msgid "Failed to set glXSwapIntervalMESA"
-msgstr ""
+msgstr "Falha ao definir glXSwapIntervalMESA"
 
 #: panel.cpp:2339
 msgid "No support for wglGetExtensionsStringEXT"
-msgstr ""
+msgstr "Sem suporte para o wglGetExtensionsStringEXT"
 
 #: panel.cpp:2342
 msgid "No support for WGL_EXT_swap_control"
-msgstr ""
+msgstr "Sem suporte para o WGL_EXT_swap_control"
 
 #: panel.cpp:2351
 msgid "Failed to set wglSwapIntervalEXT"
-msgstr ""
+msgstr "Falha ao definir o wglSwapIntervalEXT"
 
 #: panel.cpp:2357
 msgid "No VSYNC available on this platform"
-msgstr ""
+msgstr "Não há VSYNC disponível nesta plataforma"
 
 #: panel.cpp:2457
 msgid "memory allocation error"
-msgstr ""
+msgstr "Erro de alocação de memória"
 
 #: panel.cpp:2460
 msgid "error initializing codec"
-msgstr ""
+msgstr "Erro ao inicializar o codec"
 
 #: panel.cpp:2463
 msgid "error writing to output file"
-msgstr ""
+msgstr "Erro ao escrever para o ficheiro de saída"
 
 #: panel.cpp:2466
 msgid "can't guess output format from file name"
-msgstr ""
+msgstr "Não é possível adivinhar o formato de saída a partir do nome de ficheiro"
 
 #: panel.cpp:2471
 msgid "programming error; aborting!"
-msgstr ""
+msgstr "Erro de programação; A abortar!"
 
 #: panel.cpp:2483 panel.cpp:2512
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
-msgstr ""
+msgstr "Não foi possível iniciar gravação para %s (%s)"
 
 #: panel.cpp:2540
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
-msgstr ""
+msgstr "Erro de gravação de audio / vídeo (%s); A abortar"
 
 #: panel.cpp:2546
 #, c-format
 msgid "Error in audio recording (%s); aborting"
-msgstr ""
+msgstr "Erro na gravação de audio (%s); A abortar"
 
 #: panel.cpp:2556
 #, c-format
 msgid "Error in video recording (%s); aborting"
-msgstr ""
+msgstr "Erro na gravação de vídeo (%s); A abortar"
 
 #: viewsupt.cpp:778
 msgid "R:"
-msgstr ""
+msgstr "R:"
 
 #: viewsupt.cpp:787
 msgid "G:"
-msgstr ""
+msgstr "G:"
 
 #: viewsupt.cpp:796
 msgid "B:"
-msgstr ""
+msgstr "B:"
 
 #: config/internal/option-internal.cpp:376
 msgid "Use bilinear filter with 3d renderer"
-msgstr ""
+msgstr "Usar filtro bilinear com o renderizador 3d"
 
 #: config/internal/option-internal.cpp:377
 msgid "Full-screen filter to apply"
-msgstr ""
+msgstr "Filtro de ecrã inteiro a aplicar"
 
 #: config/internal/option-internal.cpp:378
 msgid "Filter plugin library"
-msgstr ""
+msgstr "Biblioteca do plugin de filtro"
 
 #: config/internal/option-internal.cpp:379
 msgid "Interframe blending function"
-msgstr ""
+msgstr "Função de mistura do interframe"
 
 #: config/internal/option-internal.cpp:380
 msgid "Keep window on top"
-msgstr ""
+msgstr "Manter janela no topo"
 
 #: config/internal/option-internal.cpp:382
 msgid "Maximum number of threads to run filters in"
-msgstr ""
+msgstr "Número máximo de threads para correr os filtros"
 
 #: config/internal/option-internal.cpp:384
 msgid "Render method; if unsupported, simple method will be used"
-msgstr ""
+msgstr "Método de renderização; Caso não seja suportado, será usado um método simples"
 
 #: config/internal/option-internal.cpp:385
 msgid "Default scale factor"
-msgstr ""
+msgstr "Fator de escala padrão"
 
 #: config/internal/option-internal.cpp:387
 msgid "Retain aspect ratio when resizing"
-msgstr ""
+msgstr "Reter a proporção de aspeto quando redimensiona"
 
 #: config/internal/option-internal.cpp:391
 msgid "BIOS file to use for Game Boy, if enabled"
-msgstr ""
+msgstr "Ficheiro de BIOS a usar para o Game Boy, se ativado"
 
 #: config/internal/option-internal.cpp:393
 msgid "Game Boy color enhancement, if enabled"
-msgstr ""
+msgstr "Melhoria de cor do Game Boy, se ativado"
 
 #: config/internal/option-internal.cpp:395
 msgid "Enable DX Colorization Hacks"
-msgstr ""
+msgstr "Ativar os Hacks de Colorização do DX"
 
 #: config/internal/option-internal.cpp:397
 #: config/internal/option-internal.cpp:423
 msgid "Apply LCD filter, if enabled"
-msgstr ""
+msgstr "Aplicar o filtro LCD, se ativado"
 
 #: config/internal/option-internal.cpp:399
 msgid "BIOS file to use for Game Boy Color, if enabled"
-msgstr ""
+msgstr "Ficheiro BIOS a usar par o Game Boy Color, se ativado"
 
 #: config/internal/option-internal.cpp:401
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "A paleta padrão, como 8 inteiros hexadecimais de 4 dígitos separados por vírgulas (rgb555)."
 
 #: config/internal/option-internal.cpp:404
 msgid ""
