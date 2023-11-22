@@ -17,7 +17,7 @@
 
 #include <cmath>
 #include <iostream>
-#include <SDL_events.h>
+#include <SDL3/SDL_events.h>
 #include "SoundSDL.h"
 #include "../gba/Globals.h"
 #include "../gba/Sound.h"

@@ -43,7 +43,7 @@
 
 #include "../common/version_cpp.h"
 
-#include "SDL.h"
+#include <SDL3/SDL.h>
 
 #include "../Util.h"
 #include "../common/Patch.h"
@@ -795,7 +795,7 @@ void sdlReadDesktopVideoMode()
 {
     if (window) {
         SDL_DisplayMode dm;
-        SDL_GetDesktopDisplayMode(SDL_GetWindowDisplayIndex(window), &dm);
+        SDL_GetDesktopDisplayMode(SDL_GetDisplayForWindow(window), &dm);
         desktopWidth = dm.w;
         desktopHeight = dm.h;
     }
@@ -815,12 +815,12 @@ static void sdlResizeVideo()
     }
 
     if (surface)
-        SDL_FreeSurface(surface);
+        SDL_DestroySurface(surface);
     if (texture)
         SDL_DestroyTexture(texture);
 
     if (!openGL) {
-        surface = SDL_CreateRGBSurface(0, destWidth, destHeight, 32,
+        surface = SDL_CreateSurface(0, destWidth, destHeight, 32,
             0x00FF0000, 0x0000FF00,
             0x000000FF, 0xFF000000);
         texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
@@ -845,8 +845,10 @@ void sdlInitVideo()
 
     destWidth = filter_enlarge * sizeX;
     destHeight = filter_enlarge * sizeY;
-
-    flags = fullScreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0;
+    
+    //This bit will need to be checked
+    //flags = fullScreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0;
+    flags = fullScreen ? SDL_WINDOW_FULLSCREEN : 0;
     if (openGL) {
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
         flags |= SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;

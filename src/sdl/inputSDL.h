@@ -18,7 +18,7 @@
 #ifndef VBAM_SDL_INPUT_H
 #define VBAM_SDL_INPUT_H
 
-#include "SDL.h"
+#include <SDL3/SDL.h>
 
 enum EKey {
     KEY_LEFT,
