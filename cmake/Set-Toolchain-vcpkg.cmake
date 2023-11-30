@@ -8,7 +8,9 @@ endif()
 
 if(NOT DEFINED VCPKG_TARGET_TRIPLET AND WIN32)
     # Check if we are in an MSVC environment.
-    if($ENV{CXX} MATCHES "cl.exe$")
+    find_program(cl_exe_path NAME cl.exe HINTS ENV PATH)
+
+    if($ENV{CXX} MATCHES "cl.exe$" OR cl_exe_path)
         # Infer the architecture from the LIB folders.
         foreach(LIB $ENV{LIB})
             if(${LIB} MATCHES "x64$")
@@ -30,6 +32,7 @@ if(NOT DEFINED VCPKG_TARGET_TRIPLET AND WIN32)
             set(VBAM_VCPKG_PLATFORM "x64-windows-static")
         endif()
 
+        unset(cl_exe_path)
     elseif (NOT DEFINED CMAKE_CXX_COMPILER)
         # No way to infer the compiler.
         return()
@@ -71,7 +74,8 @@ function(vcpkg_seconds)
 endfunction()
 
 function(vcpkg_check_git_status git_status)
-    if(NOT git_status EQUAL 0)
+    # The VS vcpkg component cannot be written to without elevation.
+    if(NOT git_status EQUAL 0 AND NOT VCPKG_ROOT MATCHES "^C:/Program Files/Microsoft Visual Studio/")
         message(FATAL_ERROR "Error updating vcpkg from git, please make sure git for windows is installed correctly, it can be installed from Visual Studio components")
     endif()
 endfunction()
@@ -128,7 +132,7 @@ function(vcpkg_deps_fixup vcpkg_exe)
     endif()
 endfunction()
 
-function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver outvar)
+function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver pkg_triplet outvar)
     set(${outvar} FALSE PARENT_SCOPE)
 
     unset(CMAKE_MATCH_1)
@@ -147,7 +151,7 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver outvar)
 
         set(VCPKG_INSTALLED_COUNT 0 PARENT_SCOPE)
         foreach(pkg ${vcpkg_list_raw})
-            if(NOT pkg MATCHES "^([^:[]+)[^:]*:${VCPKG_TARGET_TRIPLET} +([0-9][^ ]*) +.*\$")
+            if(NOT pkg MATCHES "^([^:[]+)[^:]*:${pkg_triplet} +([0-9][^ ]*) +.*\$")
                 continue()
             endif()
             set(inst_pkg_name ${CMAKE_MATCH_1})
@@ -197,35 +201,48 @@ endfunction()
 
 function(get_binary_packages vcpkg_exe)
     set(binary_packages_installed FALSE PARENT_SCOPE)
-
-    file(
-        DOWNLOAD "https://nightly.vba-m.com/vcpkg/${VCPKG_TARGET_TRIPLET}/" ${CMAKE_BINARY_DIR}/binary_package_list.html
-        STATUS pkg_list_status
-    )
-    list(GET pkg_list_status 1 pkg_list_error)
-    list(GET pkg_list_status 0 pkg_list_status)
-
-    if(NOT pkg_list_status EQUAL 0)
-        message(STATUS "Failed to download vcpkg binary package list: ${pkg_list_status} - ${pkg_list_error}")
-        return()
+    
+    unset(triplets)
+    if(VCPKG_TARGET_TRIPLET MATCHES "^(.*)-static\$")
+        list(APPEND triplets "${CMAKE_MATCH_1}")
     endif()
+    list(APPEND triplets "${VCPKG_TARGET_TRIPLET}")
 
-    file(
-        STRINGS ${CMAKE_BINARY_DIR}/binary_package_list.html binary_packages_html
-        REGEX "<a href=\".*[.]zip"
-    )
+    foreach(triplet ${triplets})
+        file(
+            DOWNLOAD "https://nightly.vba-m.com/vcpkg/${triplet}/" "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html"
+            STATUS pkg_list_status
+        )
+        list(GET pkg_list_status 1 pkg_list_error)
+        list(GET pkg_list_status 0 pkg_list_status)
+
+        if(NOT pkg_list_status EQUAL 0)
+            message(STATUS "Failed to download vcpkg binary package list: ${pkg_list_status} - ${pkg_list_error}")
+            return()
+        endif()
+    endforeach()
+
+    unset(binary_packages_html)
+    foreach(triplet ${triplets})
+        file(
+            STRINGS "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html" links
+            REGEX "<a href=\".*[.]zip"
+        )
+        string(APPEND binary_packages_html "${links}\n")
+    endforeach()
 
     unset(binary_packages)
     unset(to_install)
     foreach(pkg ${binary_packages_html})
-        if(NOT pkg MATCHES "<a href=\"([^_]+)_([^_]+)_([^.]+[.]zip)\"")
+        if(NOT pkg MATCHES "<a href=\"([^_]+)_([^_]+)_([^.]+)[.]zip\"")
             continue()
         endif()
-        set(pkg         "${CMAKE_MATCH_1}_${CMAKE_MATCH_2}_${CMAKE_MATCH_3}")
+        set(pkg         "${CMAKE_MATCH_1}_${CMAKE_MATCH_2}_${CMAKE_MATCH_3}.zip")
         set(pkg_name    ${CMAKE_MATCH_1})
         set(pkg_version ${CMAKE_MATCH_2})
+        set(pkg_triplet ${CMAKE_MATCH_3})
 
-        vcpkg_is_installed(${vcpkg_exe} ${pkg_name} ${pkg_version} pkg_installed)
+        vcpkg_is_installed(${vcpkg_exe} ${pkg_name} ${pkg_version} ${pkg_triplet} pkg_installed)
 
         if(NOT pkg_installed)
             list(APPEND to_install ${pkg})
@@ -237,10 +254,12 @@ function(get_binary_packages vcpkg_exe)
         file(MAKE_DIRECTORY ${bin_pkgs_dir})
 
         foreach(pkg ${to_install})
-            message(STATUS "Downloading https://nightly.vba-m.com/vcpkg/${VCPKG_TARGET_TRIPLET}/${pkg} ...")
+            string(REGEX REPLACE "^[^_]+_[^_]+_([^.]+)[.]zip\$" "\\1" pkg_triplet ${pkg})
+
+            message(STATUS "Downloading https://nightly.vba-m.com/vcpkg/${pkg_triplet}/${pkg} ...")
 
             file(
-                DOWNLOAD "https://nightly.vba-m.com/vcpkg/${VCPKG_TARGET_TRIPLET}/${pkg}" "${bin_pkgs_dir}/${pkg}"
+                DOWNLOAD "https://nightly.vba-m.com/vcpkg/${pkg_triplet}/${pkg}" "${bin_pkgs_dir}/${pkg}"
                 STATUS pkg_download_status
             )
             list(GET pkg_download_status 1 pkg_download_error)
@@ -274,6 +293,7 @@ function(get_binary_packages vcpkg_exe)
         endif()
 
         execute_process(
+#                -command "import-module ($env:USERPROFILE + '/source/repos/vcpkg-binpkg-prototype/vcpkg-binpkg.psm1'); vcpkg-instpkg ."
             COMMAND ${powershell}
                 -executionpolicy bypass -noprofile
                 -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-instpkg ."
@@ -311,6 +331,15 @@ function(vcpkg_set_toolchain)
                 set(VCPKG_ROOT /vcpkg)
             elseif(EXISTS c:/vcpkg)
                 set(VCPKG_ROOT c:/vcpkg)
+            else()
+                find_program(vcpkg_exe_path NAME vcpkg.exe HINTS ENV PATH)
+
+                if(vcpkg_exe_path)
+                    get_filename_component(VCPKG_ROOT "${vcpkg_exe_path}" DIRECTORY)
+                    get_filename_component(VCPKG_ROOT "${VCPKG_ROOT}"     ABSOLUTE)
+                endif()
+
+                unset(vcpkg_exe_path)
             endif()
         endif()
 
@@ -322,8 +351,8 @@ function(vcpkg_set_toolchain)
     else()
         set(VCPKG_ROOT $ENV{VCPKG_ROOT})
     endif()
-
-    set(VCPKG_ROOT ${VCPKG_ROOT} CACHE FILEPATH "vcpkg installation root path" FORCE)
+    
+    set(VCPKG_ROOT "${VCPKG_ROOT}" CACHE FILEPATH "vcpkg installation root path" FORCE)
 
     if(NOT EXISTS ${VCPKG_ROOT})
         get_filename_component(root_parent ${VCPKG_ROOT}/.. ABSOLUTE)
@@ -388,8 +417,6 @@ function(vcpkg_set_toolchain)
                 vcpkg_check_git_status(${git_status})
             endif()
         endif()
-
-        vcpkg_check_git_status(${git_status})
     endif()
 
     # build latest vcpkg, if needed
