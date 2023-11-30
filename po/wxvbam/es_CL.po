@@ -7,13 +7,14 @@
 # BeTo Perera, 2023
 # Jorge Ratti <valentinaratti123@gmail.com>, 2021
 # MELERIX, 2023
+# Sabri Ale, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-23 14:26-0700\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: BeTo Perera, 2023\n"
+"Last-Translator: Sabri Ale, 2023\n"
 "Language-Team: Spanish (Chile) (http://app.transifex.com/bgk/vba-m/language/es_CL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -130,11 +131,11 @@ msgstr "Conectar"
 
 #: guiinit.cpp:139
 msgid "You must enter a valid host name"
-msgstr ""
+msgstr "Debes introducir un nombre de Host válido "
 
 #: guiinit.cpp:140
 msgid "Host name invalid"
-msgstr ""
+msgstr "Nombre del Host invalido"
 
 #: guiinit.cpp:158
 msgid "Waiting for clients..."
@@ -675,7 +676,7 @@ msgstr ""
 
 #: cmdevents.cpp:2564
 msgid "Network is not supported in local mode."
-msgstr ""
+msgstr "La red no es compatible en modo local."
 
 #: extra-translations.cpp:12
 msgid "&Apply"
@@ -683,7 +684,7 @@ msgstr "&Aplicar"
 
 #: extra-translations.cpp:13
 msgid "Artists"
-msgstr ""
+msgstr "Artistas"
 
 #: extra-translations.cpp:14
 msgid "Cancel"
@@ -699,11 +700,11 @@ msgstr "Desarrolladores"
 
 #: extra-translations.cpp:17
 msgid "License"
-msgstr ""
+msgstr "Licencia"
 
 #: extra-translations.cpp:18
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: opts.cpp:290
 msgid ""
@@ -728,7 +729,7 @@ msgstr ""
 
 #: sys.cpp:200 sys.cpp:261
 msgid "No game in progress to record"
-msgstr ""
+msgstr "Ningún juego en proceso para grabar"
 
 #: sys.cpp:218
 #, c-format
@@ -789,7 +790,7 @@ msgstr ""
 
 #: sys.cpp:1023
 msgid "Printed"
-msgstr ""
+msgstr "Impreso"
 
 #: sys.cpp:1326
 #, c-format
@@ -808,7 +809,7 @@ msgstr ""
 
 #: panel.cpp:184 panel.cpp:245 panel.cpp:310
 msgid "Problem loading file"
-msgstr ""
+msgstr "Problema al cargar el archivo"
 
 #: panel.cpp:244
 #, c-format
@@ -833,7 +834,7 @@ msgstr ""
 
 #: panel.cpp:554
 msgid " player "
-msgstr ""
+msgstr "Jugador"
 
 #: panel.cpp:720
 #, c-format
@@ -978,15 +979,15 @@ msgstr ""
 
 #: viewsupt.cpp:778
 msgid "R:"
-msgstr ""
+msgstr "R:"
 
 #: viewsupt.cpp:787
 msgid "G:"
-msgstr ""
+msgstr "G:"
 
 #: viewsupt.cpp:796
 msgid "B:"
-msgstr ""
+msgstr "B:"
 
 #: config/internal/option-internal.cpp:376
 msgid "Use bilinear filter with 3d renderer"
