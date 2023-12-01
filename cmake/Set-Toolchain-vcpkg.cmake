@@ -326,11 +326,16 @@ endfunction()
 
 function(vcpkg_set_toolchain)
     if(NOT DEFINED ENV{VCPKG_ROOT})
+        get_filename_component(preferred_root ${CMAKE_SOURCE_DIR}/../vcpkg ABSOLUTE)
+
         if(WIN32)
             if(DEFINED ENV{CI} OR EXISTS /vcpkg)
                 set(VCPKG_ROOT /vcpkg)
             elseif(EXISTS c:/vcpkg)
                 set(VCPKG_ROOT c:/vcpkg)
+            # Prefer the preferred root to the VS default which is more difficult to deal with, if it exists.
+            elseif(EXISTS "${preferred_root}")
+                set(VCPKG_ROOT "${preferred_root}")
             else()
                 find_program(vcpkg_exe_path NAME vcpkg.exe HINTS ENV PATH)
 
@@ -344,17 +349,17 @@ function(vcpkg_set_toolchain)
         endif()
 
         if(NOT DEFINED VCPKG_ROOT)
-            get_filename_component(VCPKG_ROOT ${CMAKE_SOURCE_DIR}/../vcpkg ABSOLUTE)
+            set(VCPKG_ROOT "${preferred_root}")
         endif()
 
-        set(ENV{VCPKG_ROOT} ${VCPKG_ROOT})
+        set(ENV{VCPKG_ROOT} "${VCPKG_ROOT}")
     else()
-        set(VCPKG_ROOT $ENV{VCPKG_ROOT})
+        set(VCPKG_ROOT "$ENV{VCPKG_ROOT}")
     endif()
     
     set(VCPKG_ROOT "${VCPKG_ROOT}" CACHE FILEPATH "vcpkg installation root path" FORCE)
 
-    if(NOT EXISTS ${VCPKG_ROOT})
+    if(NOT EXISTS "${VCPKG_ROOT}")
         get_filename_component(root_parent ${VCPKG_ROOT}/.. ABSOLUTE)
 
         execute_process(
