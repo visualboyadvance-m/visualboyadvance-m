@@ -151,11 +151,12 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver pkg_triplet outvar)
 
         set(VCPKG_INSTALLED_COUNT 0 PARENT_SCOPE)
         foreach(pkg ${vcpkg_list_raw})
-            if(NOT pkg MATCHES "^([^:[]+)[^:]*:${pkg_triplet} +([0-9][^ ]*) +.*\$")
+            if(NOT pkg MATCHES "^([^:[]+)[^:]*:([^ ]+) +([0-9][^ ]*) +.*\$")
                 continue()
             endif()
-            set(inst_pkg_name ${CMAKE_MATCH_1})
-            set(inst_pkg_ver  ${CMAKE_MATCH_2})
+            set(inst_pkg_name    ${CMAKE_MATCH_1})
+            set(inst_pkg_ver     ${CMAKE_MATCH_3})
+            set(inst_pkg_triplet ${CMAKE_MATCH_2})
 
             unset(CMAKE_MATCH_1)
             string(REGEX REPLACE "#([0-9]+)\$" "" inst_pkg_ver ${inst_pkg_ver})
@@ -167,7 +168,7 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver pkg_triplet outvar)
 
             string(REPLACE "-" "." inst_pkg_ver ${inst_pkg_ver})
 
-            list(APPEND VCPKG_INSTALLED ${inst_pkg_name} ${inst_pkg_ver} ${inst_pkg_rev})
+            list(APPEND VCPKG_INSTALLED ${inst_pkg_name} ${inst_pkg_ver} ${inst_pkg_rev} ${inst_pkg_triplet})
             math(EXPR VCPKG_INSTALLED_COUNT "${VCPKG_INSTALLED_COUNT} + 1")
         endforeach()
         set(VCPKG_INSTALLED       ${VCPKG_INSTALLED}       PARENT_SCOPE)
@@ -178,14 +179,20 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver pkg_triplet outvar)
         return()
     endif()
     
-    math(EXPR idx_max "(${VCPKG_INSTALLED_COUNT} - 1) * 3")
+    math(EXPR idx_max "(${VCPKG_INSTALLED_COUNT} - 1) * 4")
 
-    foreach(idx RANGE 0 ${idx_max} 3)
-        math(EXPR idx_ver "${idx} + 1")
-        math(EXPR idx_rev "${idx} + 2")
-        list(GET VCPKG_INSTALLED ${idx}     inst_pkg_name)
-        list(GET VCPKG_INSTALLED ${idx_ver} inst_pkg_ver)
-        list(GET VCPKG_INSTALLED ${idx_rev} inst_pkg_rev)
+    foreach(idx RANGE 0 ${idx_max} 4)
+        math(EXPR idx_ver     "${idx} + 1")
+        math(EXPR idx_rev     "${idx} + 2")
+        math(EXPR idx_triplet "${idx} + 3")
+        list(GET VCPKG_INSTALLED ${idx}         inst_pkg_name)
+        list(GET VCPKG_INSTALLED ${idx_ver}     inst_pkg_ver)
+        list(GET VCPKG_INSTALLED ${idx_rev}     inst_pkg_rev)
+        list(GET VCPKG_INSTALLED ${idx_triplet} inst_pkg_triplet)
+        
+        if(NOT inst_pkg_triplet STREQUAL pkg_triplet)
+            continue()
+        endif()
 
         if(inst_pkg_name STREQUAL pkg_name
             AND pkg_ver VERSION_LESS inst_pkg_ver
