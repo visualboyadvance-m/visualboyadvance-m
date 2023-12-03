@@ -132,7 +132,7 @@ function(vcpkg_deps_fixup vcpkg_exe)
     endif()
 endfunction()
 
-function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver pkg_triplet outvar)
+function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver pkg_triplet powershell outvar)
     set(${outvar} FALSE PARENT_SCOPE)
 
     unset(CMAKE_MATCH_1)
@@ -142,10 +142,19 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver pkg_triplet outvar)
     string(REPLACE "-" "." pkg_ver ${pkg_ver})
 
     if(NOT DEFINED VCPKG_INSTALLED)
-        execute_process(
-            COMMAND ${vcpkg_exe} list
-            OUTPUT_VARIABLE vcpkg_list_text
-        )
+        if(VCPKG_ROOT MATCHES "^C:/Program Files/Microsoft Visual Studio/")
+            execute_process(
+                COMMAND ${powershell}
+                    -executionpolicy bypass -noprofile
+                    -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-list"
+                OUTPUT_VARIABLE vcpkg_list_text
+            )
+        else()
+            execute_process(
+                COMMAND ${vcpkg_exe} list
+                OUTPUT_VARIABLE vcpkg_list_text
+            )
+        endif()
 
         string(REGEX REPLACE "\r?\n" ";" vcpkg_list_raw "${vcpkg_list_text}")
 
@@ -238,6 +247,25 @@ function(get_binary_packages vcpkg_exe)
         string(APPEND binary_packages_html "${links}\n")
     endforeach()
 
+    set(vcpkg_binpkg_dir ${CMAKE_BINARY_DIR}/vcpkg-binpkg)
+    include(FetchContent)
+    FetchContent_Declare(
+        vcpkg_binpkg
+        URL "https://github.com/rkitover/vcpkg-binpkg-prototype/archive/refs/heads/master.zip"
+        SOURCE_DIR ${vcpkg_binpkg_dir}
+    )
+
+    FetchContent_GetProperties(vcpkg_binpkg)
+    if(NOT vcpkg_binpkg_POPULATED)
+        FetchContent_Populate(vcpkg_binpkg)
+    endif()
+
+    if(WIN32)
+        set(powershell powershell)
+    else()
+        set(powershell pwsh)
+    endif()
+
     unset(binary_packages)
     unset(to_install)
     foreach(pkg ${binary_packages_html})
@@ -249,7 +277,7 @@ function(get_binary_packages vcpkg_exe)
         set(pkg_version ${CMAKE_MATCH_2})
         set(pkg_triplet ${CMAKE_MATCH_3})
 
-        vcpkg_is_installed(${vcpkg_exe} ${pkg_name} ${pkg_version} ${pkg_triplet} pkg_installed)
+        vcpkg_is_installed(${vcpkg_exe} ${pkg_name} ${pkg_version} ${pkg_triplet} ${powershell} pkg_installed)
 
         if(NOT pkg_installed)
             list(APPEND to_install ${pkg})
@@ -280,27 +308,8 @@ function(get_binary_packages vcpkg_exe)
             message(STATUS "done.")
         endforeach()
 
-        set(vcpkg_binpkg_dir ${CMAKE_BINARY_DIR}/vcpkg-binpkg)
-        include(FetchContent)
-        FetchContent_Declare(
-            vcpkg_binpkg
-            URL "https://github.com/rkitover/vcpkg-binpkg-prototype/archive/refs/heads/master.zip"
-            SOURCE_DIR ${vcpkg_binpkg_dir}
-        )
-
-        FetchContent_GetProperties(vcpkg_binpkg)
-        if(NOT vcpkg_binpkg_POPULATED)
-            FetchContent_Populate(vcpkg_binpkg)
-        endif()
-
-        if(WIN32)
-            set(powershell powershell)
-        else()
-            set(powershell pwsh)
-        endif()
-
-        execute_process(
 #                -command "import-module ($env:USERPROFILE + '/source/repos/vcpkg-binpkg-prototype/vcpkg-binpkg.psm1'); vcpkg-instpkg ."
+        execute_process(
             COMMAND ${powershell}
                 -executionpolicy bypass -noprofile
                 -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-instpkg ."
@@ -341,14 +350,14 @@ function(vcpkg_set_toolchain)
             elseif(EXISTS c:/vcpkg)
                 set(VCPKG_ROOT c:/vcpkg)
             # Prefer the preferred root to the VS default which is more difficult to deal with, if it exists.
-            elseif(EXISTS "${preferred_root}")
-                set(VCPKG_ROOT "${preferred_root}")
+            elseif(EXISTS preferred_root)
+                set(VCPKG_ROOT ${preferred_root})
             else()
                 find_program(vcpkg_exe_path NAME vcpkg.exe HINTS ENV PATH)
 
                 if(vcpkg_exe_path)
-                    get_filename_component(VCPKG_ROOT "${vcpkg_exe_path}" DIRECTORY)
-                    get_filename_component(VCPKG_ROOT "${VCPKG_ROOT}"     ABSOLUTE)
+                    get_filename_component(VCPKG_ROOT ${vcpkg_exe_path} DIRECTORY)
+                    get_filename_component(VCPKG_ROOT ${VCPKG_ROOT}     ABSOLUTE)
                 endif()
 
                 unset(vcpkg_exe_path)
@@ -356,17 +365,17 @@ function(vcpkg_set_toolchain)
         endif()
 
         if(NOT DEFINED VCPKG_ROOT)
-            set(VCPKG_ROOT "${preferred_root}")
+            set(VCPKG_ROOT ${preferred_root})
         endif()
 
-        set(ENV{VCPKG_ROOT} "${VCPKG_ROOT}")
+        set(ENV{VCPKG_ROOT} ${VCPKG_ROOT})
     else()
-        set(VCPKG_ROOT "$ENV{VCPKG_ROOT}")
+        set(VCPKG_ROOT $ENV{VCPKG_ROOT})
     endif()
     
-    set(VCPKG_ROOT "${VCPKG_ROOT}" CACHE FILEPATH "vcpkg installation root path" FORCE)
+    set(VCPKG_ROOT ${VCPKG_ROOT} CACHE FILEPATH "vcpkg installation root path" FORCE)
 
-    if(NOT EXISTS "${VCPKG_ROOT}")
+    if(NOT EXISTS VCPKG_ROOT)
         get_filename_component(root_parent ${VCPKG_ROOT}/.. ABSOLUTE)
 
         execute_process(
