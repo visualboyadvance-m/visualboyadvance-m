@@ -350,7 +350,7 @@ function(vcpkg_set_toolchain)
             elseif(EXISTS c:/vcpkg)
                 set(VCPKG_ROOT c:/vcpkg)
             # Prefer the preferred root to the VS default which is more difficult to deal with, if it exists.
-            elseif(EXISTS preferred_root)
+            elseif(EXISTS ${preferred_root})
                 set(VCPKG_ROOT ${preferred_root})
             else()
                 find_program(vcpkg_exe_path NAME vcpkg.exe HINTS ENV PATH)
@@ -375,7 +375,7 @@ function(vcpkg_set_toolchain)
     
     set(VCPKG_ROOT ${VCPKG_ROOT} CACHE FILEPATH "vcpkg installation root path" FORCE)
 
-    if(NOT EXISTS VCPKG_ROOT)
+    if(NOT EXISTS ${VCPKG_ROOT})
         get_filename_component(root_parent ${VCPKG_ROOT}/.. ABSOLUTE)
 
         execute_process(
