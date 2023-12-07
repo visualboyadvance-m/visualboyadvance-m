@@ -12,6 +12,7 @@
 # Kevin Bustinza <ufreshx@gmail.com>, 2021
 # MELERIX, 2023
 # Sebastián Castro Saldarriaga, 2023
+# Yeferson Galviz, 2023
 # yocsan Cañderón <yecoyocsan@gmail.com>, 2021
 msgid ""
 msgstr ""
@@ -19,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-23 14:26-0700\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Sebastián Castro Saldarriaga, 2023\n"
+"Last-Translator: Yeferson Galviz, 2023\n"
 "Language-Team: Spanish (Latin America) (http://app.transifex.com/bgk/vba-m/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1218,47 +1219,47 @@ msgstr "Habilitar trucos"
 
 #: config/internal/option-internal.cpp:504
 msgid "Disable on-screen status messages"
-msgstr ""
+msgstr "Desactivar mensajes de estado en pantalla"
 
 #: config/internal/option-internal.cpp:505
 msgid "Type of system to emulate"
-msgstr ""
+msgstr "Tipo de sistema a emular"
 
 #: config/internal/option-internal.cpp:507
 msgid "Flash size 0 = 64 KB 1 = 128 KB"
-msgstr ""
+msgstr "Tamaño de Flash 0 = 64 KB 1 = 128 KB"
 
 #: config/internal/option-internal.cpp:509
 msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
-msgstr ""
+msgstr "Saltar fotogramas. Los valores son 0-9 o -1 para saltar automáticamente según el tiempo."
 
 #: config/internal/option-internal.cpp:511
 msgid "The palette to use"
-msgstr ""
+msgstr "La paleta a utilizar"
 
 #: config/internal/option-internal.cpp:513
 msgid "Enable printer emulation"
-msgstr ""
+msgstr "Habilitar la emulación de impresora"
 
 #: config/internal/option-internal.cpp:515
 msgid "Break into GDB after loading the game."
-msgstr ""
+msgstr "Acceder a GDB después de cargar el juego."
 
 #: config/internal/option-internal.cpp:517
 msgid "Port to connect GDB to"
-msgstr ""
+msgstr "Puerto para conectar GDB a"
 
 #: config/internal/option-internal.cpp:520
 msgid "Number of players in network"
-msgstr ""
+msgstr "Número de jugadores en la red"
 
 #: config/internal/option-internal.cpp:523
 msgid "Maximum scale factor (0 = no limit)"
-msgstr ""
+msgstr "Factor de escala máximo (0 = sin límite)"
 
 #: config/internal/option-internal.cpp:525
 msgid "Pause game when main window loses focus"
-msgstr ""
+msgstr "Pausar el juego cuando la ventana principal pierde el enfoque"
 
 #: config/internal/option-internal.cpp:527
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
@@ -1266,7 +1267,7 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:529
 msgid "Native save (\"battery\") hardware type"
-msgstr ""
+msgstr "Tipo de hardware de guardado nativo (\"battery\")"
 
 #: config/internal/option-internal.cpp:530
 msgid "Show speed indicator"
@@ -1274,11 +1275,11 @@ msgstr "Mostrar indicador de velocidad"
 
 #: config/internal/option-internal.cpp:532
 msgid "Draw on-screen messages transparently"
-msgstr ""
+msgstr "Dibujar mensajes en pantalla de forma transparente"
 
 #: config/internal/option-internal.cpp:534
 msgid "Skip BIOS initialization"
-msgstr ""
+msgstr "Omitir la inicialización de la BIOS"
 
 #: config/internal/option-internal.cpp:536
 msgid "Do not overwrite cheat list when loading state"
@@ -1286,7 +1287,7 @@ msgstr "No sobreescribir trucos al cargar"
 
 #: config/internal/option-internal.cpp:538
 msgid "Do not overwrite native (battery) save when loading state"
-msgstr ""
+msgstr "No sobrescribir la función nativa (battery) de guardar al cargar el estado"
 
 #: config/internal/option-internal.cpp:540
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
@@ -1306,11 +1307,11 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:550
 msgid "Use the specified BIOS file for Game Boy"
-msgstr ""
+msgstr "Usar el archivo BIOS especificado para Game Boy"
 
 #: config/internal/option-internal.cpp:552
 msgid "Use the specified BIOS file"
-msgstr ""
+msgstr "Usar el archivo BIOS especificado"
 
 #: config/internal/option-internal.cpp:554
 msgid "Use the specified BIOS file for Game Boy Color"
@@ -1318,11 +1319,11 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:555
 msgid "Wait for vertical sync"
-msgstr ""
+msgstr "Esperar a la sincronización vertical"
 
 #: config/internal/option-internal.cpp:559
 msgid "Enter fullscreen mode at startup"
-msgstr ""
+msgstr "Iniciar en modo de pantalla completa"
 
 #: config/internal/option-internal.cpp:560
 msgid "Window maximized"
