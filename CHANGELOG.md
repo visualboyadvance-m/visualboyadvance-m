@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.1.8] - 2023-12-13
+
+========================
+* beab0881 - Store the PC register at the appropriate offset [steelskin]
+* bf2452aa - Resize GameArea after MainFrame initialization [steelskin]
+* 71ca0fb2 - Properly hide the status bar at startup [steelskin]
+* 7e1afcd3 - Fix reading joystick hat config values [rkitover]
+* 32581966 - Link: Fix menu not refreshing correctly [74248064+nuive]
+
 ## [2.1.7] - 11.09.2023
 
 =========================
