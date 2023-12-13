@@ -6,7 +6,11 @@ if(POLICY CMP0135)
     cmake_policy(SET CMP0135 NEW) # Use timestamps from archives.
 endif()
 
-if(NOT DEFINED VCPKG_TARGET_TRIPLET AND WIN32)
+if(NOT DEFINED VCPKG_TARGET_TRIPLET)
+    if(NOT WIN32)
+        return()
+    endif()
+
     # Check if we are in an MSVC environment.
     find_program(cl_exe_path NAME cl.exe HINTS ENV PATH)
 
