@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Andreu van Walré, 2021
+# f25da06f4945f601ee6fa00f6fa65e0a_79edcaa, 2021
 # Carlos Aguadero <aguaderomartincarlos@gmail.com>, 2021
 # Daniel Carrasco <danielmadrid19@gmail.com>, 2016
 # Jorge Hdez Schez <jorjolo2004@gmail.com>, 2021
