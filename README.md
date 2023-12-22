@@ -43,7 +43,7 @@ Windows and Mac builds are in the [releases tab](https://github.com/visualboyadv
 
 Nightly builds for Windows and macOS are at [https://nightly.vba-m.com/](https://nightly.vba-m.com/).
 
-**PLESE TEST THE NIGHTLY OR MASTER WITH A FACTORY RESET BEFORE REPORTING
+**PLEASE TEST THE NIGHTLY OR MASTER WITH A FACTORY RESET BEFORE REPORTING
 ISSUES**
 
 Your distribution may have packages available as well, search for
@@ -170,7 +170,7 @@ This is supported on Fedora, Arch, Solus and MSYS2.
 
 `./installdeps` takes one optional parameter for cross-compiling target, which
 may be `win32` which is an alias for `mingw-w64-i686` to target 32 bit Windows,
-or `mingw-gw64-x86_64` for 64 bit Windows targets.
+or `mingw-w64-x86_64` for 64 bit Windows targets.
 
 The target is implicit on MSys2 depending on which MINGW shell you started (the
 value of `$MSYSTEM`.)
