@@ -26,6 +26,7 @@ Our bridged Discord server is [Here](https://discord.gg/EpfxEuGMKH).
 We are also on *`#vba-m`* on [Libera IRC](https://libera.chat/) which has a [Web
 Chat](https://web.libera.chat/).
 
+[![Get it from flathub](https://dl.flathub.org/assets/badges/flathub-badge-en.svg)](https://flathub.org/apps/com.vba_m.visualboyadvance-m)
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/visualboyadvance-m)
 
 ***Want to know where you can install visualboyadvance-m in your linux distribution?***
