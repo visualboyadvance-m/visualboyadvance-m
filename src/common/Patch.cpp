@@ -15,8 +15,18 @@
 
 #ifndef __LIBRETRO__
 
+#ifdef __linux__
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#include <features.h>
+#ifndef __USE_GNU
+#define __MUSL__
+#endif
+#endif
+
 #ifdef __GNUC__
-#if defined(__APPLE__) || defined(BSD) || defined(__NetBSD__)
+#if defined(__MUSL__) || defined(__APPLE__) || defined(BSD) || defined(__NetBSD__)
 typedef off_t __off64_t; /* off_t is 64 bits on BSD. */
 #define fseeko64 fseeko
 #define ftello64 ftello
