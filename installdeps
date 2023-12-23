@@ -179,6 +179,9 @@ linux_installdeps() {
             nixos)
                 nixos_installdeps
                 ;;
+            alpine)
+                alpine_installdeps
+                ;;
             *)
                 error "Don't know how to install deps on your version of Linux"
                 ;;
@@ -1104,6 +1107,15 @@ gentoo_installdeps() {
 
     build_instructions
 }
+
+alpine_installdeps() {
+    installing
+
+    check sudo apk add cmake ninja g++ ccache nasm gettext-dev zlib-dev mesa-dev sdl2-dev glu-dev sfml-dev wxwidgets-dev gtk+3.0-dev zip
+
+    build_instructions
+}
+
 
 windows_installdeps() {
     msys2=1
