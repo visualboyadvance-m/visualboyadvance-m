@@ -325,6 +325,7 @@ endif()
 # FAudio.
 if(ENABLE_FAUDIO)
     find_package(FAudio REQUIRED)
+    target_sources(visualboyadvance-m PRIVATE faudio.cpp)
     target_link_libraries(visualboyadvance-m FAudio::FAudio)
     target_compile_definitions(visualboyadvance-m PRIVATE VBAM_ENABLE_FAUDIO)
 endif()
