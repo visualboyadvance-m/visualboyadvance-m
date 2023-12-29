@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-23 14:26-0700\n"
+"POT-Creation-Date: 2023-12-29 14:47+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: 天绝星 <c.cejhb@gmail.com>, 2016-2017,2019-2020,2022-2023\n"
 "Language-Team: Chinese Simplified (http://app.transifex.com/bgk/vba-m/language/zh-Hans/)\n"
@@ -30,84 +30,80 @@ msgstr ""
 "Language: zh-Hans\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: wxvbam.cpp:309
-msgid "visualboyadvance-m"
-msgstr "visualboyadvance-m"
-
-#: wxvbam.cpp:380 wxvbam.cpp:397
+#: wxvbam.cpp:393 wxvbam.cpp:410
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "提供的配置文件无效: %s"
 
-#: wxvbam.cpp:536
+#: wxvbam.cpp:554
 msgid "Could not create main window"
 msgstr "无法创建主窗口"
 
-#: wxvbam.cpp:617
+#: wxvbam.cpp:635
 msgid "Save built-in XRC file and exit"
 msgstr "保存内置 XRC 文件并退出"
 
-#: wxvbam.cpp:620
+#: wxvbam.cpp:638
 msgid "Save built-in vba-over.ini and exit"
 msgstr "保存内置 vba-over.ini 文件并退出"
 
-#: wxvbam.cpp:623
+#: wxvbam.cpp:641
 msgid "Print configuration path and exit"
 msgstr "打印配置路径并退出"
 
-#: wxvbam.cpp:626
+#: wxvbam.cpp:644
 msgid "Start in full-screen mode"
 msgstr "以全屏模式启动"
 
-#: wxvbam.cpp:629
+#: wxvbam.cpp:647
 msgid "Set a configuration file"
 msgstr "设置配置文件"
 
-#: wxvbam.cpp:633
+#: wxvbam.cpp:651
 msgid "Delete shared link state first, if it exists"
 msgstr "请先删除共享链接状态，如果存在的话"
 
-#: wxvbam.cpp:640
+#: wxvbam.cpp:658
 msgid "List all settable options and exit"
 msgstr "列出所有可设置的选项并退出"
 
-#: wxvbam.cpp:643
+#: wxvbam.cpp:661
 msgid "ROM file"
 msgstr "ROM 文件"
 
-#: wxvbam.cpp:645
+#: wxvbam.cpp:663
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:676
+#: wxvbam.cpp:694
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "配置/建构错误：无法找到内置 xrc 文件"
 
-#: wxvbam.cpp:684
+#: wxvbam.cpp:702
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "将内置配置写入到 %s。\n如要覆盖，请删除所有未更改的根节点。首先在以下搜索覆盖内置路径里找到任意 .xrc 或 .xrs 文件中正确名称的根节点："
 
-#: wxvbam.cpp:698
+#: wxvbam.cpp:716
 msgid "Configuration is read from, in order:"
 msgstr "配置按顺序从中读取："
 
-#: wxvbam.cpp:712
+#: wxvbam.cpp:730
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "将内置覆盖文件写入到 %s\n 如要覆盖，请删除所有未更改的部分。首个找到的部分从以下搜索路径使用："
 
-#: wxvbam.cpp:718
+#: wxvbam.cpp:736
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\t内置"
 
-#: wxvbam.cpp:733
+#: wxvbam.cpp:751
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -115,187 +111,167 @@ msgid ""
 "\n"
 msgstr "如果在用户界面中进行了任何配置更改，则保存从命令行设置的选项。\n\n对于标志选项，true 和 false 分别指定为 1 和 0。\n\n"
 
-#: wxvbam.cpp:741
+#: wxvbam.cpp:759
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "可用于键盘 /* 选项的命令是:\n\n"
 
-#: wxvbam.cpp:752
+#: wxvbam.cpp:770
 msgid "Configuration file not found."
 msgstr "未找到配置文件。"
 
-#: wxvbam.cpp:783
+#: wxvbam.cpp:801
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "错误的配置选项或多个 ROM 文件被指定:\n"
 
-#: guiinit.cpp:103
+#: guiinit.cpp:104
 msgid "Start!"
 msgstr "开始！"
 
-#: guiinit.cpp:122 xrc/NetLink.xrc:99
+#: guiinit.cpp:123 xrc/NetLink.xrc:99
 msgid "Connect"
 msgstr "连接"
 
-#: guiinit.cpp:139
+#: guiinit.cpp:140
 msgid "You must enter a valid host name"
 msgstr "必须输入有效的主机名"
 
-#: guiinit.cpp:140
+#: guiinit.cpp:141
 msgid "Host name invalid"
 msgstr "主机名无效"
 
-#: guiinit.cpp:158
+#: guiinit.cpp:159
 msgid "Waiting for clients..."
 msgstr "正在等待客户端..."
 
-#: guiinit.cpp:159
+#: guiinit.cpp:160
 #, c-format
 msgid "Server IP address is: %s\n"
 msgstr "服务器 IP 地址: %s\n"
 
-#: guiinit.cpp:161
+#: guiinit.cpp:162
 msgid "Waiting for connection..."
 msgstr "等待连接"
 
-#: guiinit.cpp:162
+#: guiinit.cpp:163
 #, c-format
 msgid "Connecting to %s\n"
 msgstr "正在连接到 %s\n"
 
-#: guiinit.cpp:195
+#: guiinit.cpp:196
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr "发生错误。\n请重试。"
 
-#: guiinit.cpp:262 guiinit.cpp:315
+#: guiinit.cpp:263 guiinit.cpp:316
 msgid "Select cheat file"
 msgstr "选择金手指文件"
 
-#: guiinit.cpp:263
+#: guiinit.cpp:264
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA 金手指列表 (*.clt)|*.clt|CHT 金手指列表 (*.cht)|*.cht"
 
-#: guiinit.cpp:282 panel.cpp:517
+#: guiinit.cpp:283 panel.cpp:517
 msgid "Loaded cheats"
 msgstr "打开金手指"
 
-#: guiinit.cpp:316
+#: guiinit.cpp:317
 msgid "VBA cheat lists (*.clt)|*.clt"
 msgstr "VBA 金手指列表 (*.clt)|*.clt"
 
-#: guiinit.cpp:334
+#: guiinit.cpp:335
 msgid "Saved cheats"
 msgstr "保存金手指"
 
-#: guiinit.cpp:365 guiinit.cpp:384
+#: guiinit.cpp:366 guiinit.cpp:385
 msgid "Restore old values?"
 msgstr "恢复原先数值？"
 
-#: guiinit.cpp:366 guiinit.cpp:385
+#: guiinit.cpp:367 guiinit.cpp:386
 msgid "Removing cheats"
 msgstr "正在移除金手指"
 
-#: guiinit.cpp:776 dialogs/gb-rom-info.cpp:60 xrc/JoyPanel.xrc:364
-msgid "Game Shark"
-msgstr "Game Shark"
-
-#: guiinit.cpp:777 dialogs/gb-rom-info.cpp:57
-msgid "Game Genie"
-msgstr "Game Genie"
-
-#: guiinit.cpp:779
+#: guiinit.cpp:781
 msgid "Generic Code"
 msgstr "通用代码"
 
-#: guiinit.cpp:780
-msgid "Game Shark Advance"
-msgstr "Game Shark Advance"
-
-#: guiinit.cpp:781
-msgid "Code Breaker Advance"
-msgstr "Code Breaker Advance"
-
-#: guiinit.cpp:782
-msgid "Flashcart CHT"
-msgstr "烧录卡 CHT"
-
-#: guiinit.cpp:850 guiinit.cpp:1105
+#: guiinit.cpp:853 guiinit.cpp:1108
 msgid "Number cannot be empty"
 msgstr "编号不能为空"
 
-#: guiinit.cpp:900
+#: guiinit.cpp:903
 msgid "Search produced no results"
 msgstr "搜索不到结果"
 
-#: guiinit.cpp:1063
+#: guiinit.cpp:1066
 msgid "8-bit "
 msgstr "8 位"
 
-#: guiinit.cpp:1067
+#: guiinit.cpp:1070
 msgid "16-bit "
 msgstr "16 位"
 
-#: guiinit.cpp:1071
+#: guiinit.cpp:1074
 msgid "32-bit "
 msgstr "32 位"
 
-#: guiinit.cpp:1077
+#: guiinit.cpp:1080
 msgid "signed decimal"
 msgstr "十进制-有符号"
 
-#: guiinit.cpp:1081
+#: guiinit.cpp:1084
 msgid "unsigned decimal"
 msgstr "十进制-无符号"
 
-#: guiinit.cpp:1085
+#: guiinit.cpp:1088
 msgid "unsigned hexadecimal"
 msgstr "十六进制-无符号"
 
-#: guiinit.cpp:1486
+#: guiinit.cpp:1489
 #, c-format
 msgid "%d frames = %.2f ms"
 msgstr "%d 帧 = %.2f 毫秒"
 
-#: guiinit.cpp:1498
+#: guiinit.cpp:1501
 msgid "Default device"
 msgstr "默认设备"
 
-#: guiinit.cpp:1951
+#: guiinit.cpp:1920
 msgid "Main icon not found"
 msgstr "未找到主图标"
 
-#: guiinit.cpp:1969
+#: guiinit.cpp:1938
 msgid "Main display panel not found"
 msgstr "未找到主显示面板"
 
-#: guiinit.cpp:2228
+#: guiinit.cpp:2197
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "无效的菜单项目 %s; 正在移除"
 
-#: guiinit.cpp:2413
+#: guiinit.cpp:2382
 msgid "Code"
 msgstr "代码"
 
-#: guiinit.cpp:2422
+#: guiinit.cpp:2391
 msgid "Description"
 msgstr "描述"
 
-#: guiinit.cpp:2496 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:2465 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "地址"
 
-#: guiinit.cpp:2497
+#: guiinit.cpp:2466
 msgid "Old Value"
 msgstr "旧数值"
 
-#: guiinit.cpp:2498
+#: guiinit.cpp:2467
 msgid "New Value"
 msgstr "新数值"
 
-#: guiinit.cpp:2872
+#: guiinit.cpp:2794
 msgid "JoyBus host invalid; disabling"
 msgstr "JoyBus 主机无效; 正在禁用"
 
@@ -316,70 +292,6 @@ msgstr "内存转储 (*.dmp;*.bin)|*.dmp;*.bin|"
 #: viewers.cpp:701
 msgid "Select memory dump file"
 msgstr "选择内存转储文件"
-
-#: viewers.cpp:815
-msgid "0x00000000 - BIOS"
-msgstr "0x00000000 - BIOS"
-
-#: viewers.cpp:816
-msgid "0x02000000 - WRAM"
-msgstr "0x02000000 - WRAM"
-
-#: viewers.cpp:817
-msgid "0x03000000 - IRAM"
-msgstr "0x03000000 - IRAM"
-
-#: viewers.cpp:818
-msgid "0x04000000 - I / O"
-msgstr "0x04000000 - I / O"
-
-#: viewers.cpp:819
-msgid "0x05000000 - PALETTE"
-msgstr "0x05000000 - 调色板"
-
-#: viewers.cpp:820
-msgid "0x06000000 - VRAM"
-msgstr "0x06000000 - VRAM"
-
-#: viewers.cpp:821
-msgid "0x07000000 - OAM"
-msgstr "0x07000000 - OAM"
-
-#: viewers.cpp:822
-msgid "0x08000000 - ROM"
-msgstr "0x08000000 - ROM"
-
-#: viewers.cpp:925
-msgid "0x0000 - ROM"
-msgstr "0x0000 - ROM"
-
-#: viewers.cpp:926
-msgid "0x4000 - ROM"
-msgstr "0x4000 - ROM"
-
-#: viewers.cpp:927
-msgid "0x8000 - VRAM"
-msgstr "0x8000 - VRAM"
-
-#: viewers.cpp:928
-msgid "0xA000 - SRAM"
-msgstr "0xA000 - SRAM"
-
-#: viewers.cpp:929
-msgid "0xC000 - RAM"
-msgstr "0xC000 - RAM"
-
-#: viewers.cpp:930
-msgid "0xD000 - WRAM"
-msgstr "0xD000 - WRAM"
-
-#: viewers.cpp:931
-msgid "0xFF00 - I / O"
-msgstr "0xFF00 - I / O"
-
-#: viewers.cpp:932
-msgid "0xFF80 - RAM"
-msgstr "0xFF80 - RAM"
 
 #: gfxviewers.cpp:1143
 msgid "Select output file and type"
@@ -636,29 +548,29 @@ msgstr "等待 GDB..."
 msgid "Could not initialize the sound driver!"
 msgstr "无法初始化声音驱动！"
 
-#: cmdevents.cpp:2280
+#: cmdevents.cpp:2284
 msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
 msgstr "你的配置将被删除！\n\n是否确定？"
 
-#: cmdevents.cpp:2281
+#: cmdevents.cpp:2285
 msgid "FACTORY RESET"
 msgstr "恢复默认"
 
-#: cmdevents.cpp:2316
+#: cmdevents.cpp:2320
 msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr "任天堂 GameBoy/Color/Advance 模拟器。"
 
-#: cmdevents.cpp:2317
+#: cmdevents.cpp:2321
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "版权 (C) 1999-2003 Forgotten\n版权 (C) 2004-2006 VBA 开发团队\n版权 (C) 2007-2020 VBA-M 开发团队"
 
-#: cmdevents.cpp:2319
+#: cmdevents.cpp:2323
 msgid ""
 "This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -674,15 +586,15 @@ msgid ""
 "along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr "本程序是自由软件: 你可以在自由软件基金会公布的 GNU 通用发布\n许可证条款下重新分发和/或修改此软件，依自己意愿许可证 V2 版或\n任意更新版许可证选其一即可。\n\n本程序希望是能有作用的分发出去，但【无任何担保】；甚至没有隐含\n的【可销售性】或【特定用途的适用性】保证。请查阅 GNU 通用发布\n许可证了解更多信息。\n\n你应该已经收到 GNU 通用发布许可证的副本以及本程序。\n如果没有，请查看 http://www.gnu.org/licenses 。"
 
-#: cmdevents.cpp:2504
+#: cmdevents.cpp:2508
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 msgstr "启用色彩修改时无法使用 GB BIOS。"
 
-#: cmdevents.cpp:2558
+#: cmdevents.cpp:2564
 msgid "LAN link is already active. Disable link mode to disconnect."
 msgstr "局域网连接已激活，禁用连接模式即可断开联网。"
 
-#: cmdevents.cpp:2564
+#: cmdevents.cpp:2570
 msgid "Network is not supported in local mode."
 msgstr "本地模式不支持网络"
 
@@ -720,17 +632,17 @@ msgid ""
 " values may have been reset."
 msgstr "此 INI 文件是为新版本 VBA-M 编写的。某些 INI 选项值可能已被重置。"
 
-#: opts.cpp:457 opts.cpp:477 opts.cpp:662
+#: opts.cpp:457 opts.cpp:477 opts.cpp:665
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "%s 键不能绑定为 %s"
 
-#: opts.cpp:598 opts.cpp:607 opts.cpp:616 opts.cpp:625 config/option.cpp:492
+#: opts.cpp:601 opts.cpp:610 opts.cpp:619 opts.cpp:628 config/option.cpp:492
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr "数值 %s 对于选项 %s 无效"
 
-#: opts.cpp:684
+#: opts.cpp:687
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr "未知选项 %s 带有数值 %s"
@@ -769,11 +681,6 @@ msgstr "回放已结束"
 #, c-format
 msgid "%d %% (%d, %d fps)"
 msgstr "%d %% (%d, %d fps)"
-
-#: sys.cpp:461
-#, c-format
-msgid "%d %%"
-msgstr "%d %%"
 
 #: sys.cpp:895 xrc/GBPrinter.xrc:65
 msgid "&Discard"
@@ -901,270 +808,270 @@ msgstr "没有用于回退的内存"
 msgid "Error writing rewind state"
 msgstr "回写状态错误"
 
-#: panel.cpp:2285
+#: panel.cpp:2299
 msgid "Enabling EGL VSync."
 msgstr "正在启用 EGL 垂直同步。"
 
-#: panel.cpp:2287
+#: panel.cpp:2301
 msgid "Disabling EGL VSync."
 msgstr "正在禁用 EGL 垂直同步。"
 
-#: panel.cpp:2294
+#: panel.cpp:2308
 msgid "Enabling GLX VSync."
 msgstr "正在启用 GLX 垂直同步。"
 
-#: panel.cpp:2296
+#: panel.cpp:2310
 msgid "Disabling GLX VSync."
 msgstr "正在禁用 GLX 垂直同步。"
 
-#: panel.cpp:2314
+#: panel.cpp:2328
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "设置 glXSwapIntervalEXT 失败"
 
-#: panel.cpp:2323
+#: panel.cpp:2337
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "设置 glXSwapIntervalSGI 失败"
 
-#: panel.cpp:2332
+#: panel.cpp:2346
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "设置 glXSwapIntervalMESA 失败"
 
-#: panel.cpp:2339
+#: panel.cpp:2353
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "不支持 wglGetExtensionsStringEXT"
 
-#: panel.cpp:2342
+#: panel.cpp:2356
 msgid "No support for WGL_EXT_swap_control"
 msgstr "不支持 WGL_EXT_swap_control"
 
-#: panel.cpp:2351
+#: panel.cpp:2365
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "设置 wglSwapIntervalEXT 失败"
 
-#: panel.cpp:2357
+#: panel.cpp:2371
 msgid "No VSYNC available on this platform"
 msgstr "垂直同步在该平台上不可用 "
 
-#: panel.cpp:2457
+#: panel.cpp:2473
 msgid "memory allocation error"
 msgstr "内存分配错误"
 
-#: panel.cpp:2460
+#: panel.cpp:2476
 msgid "error initializing codec"
 msgstr "初始化代码错误"
 
-#: panel.cpp:2463
+#: panel.cpp:2479
 msgid "error writing to output file"
 msgstr "写入输出文件错误"
 
-#: panel.cpp:2466
+#: panel.cpp:2482
 msgid "can't guess output format from file name"
 msgstr "无法从文件名猜测输出格式"
 
-#: panel.cpp:2471
+#: panel.cpp:2487
 msgid "programming error; aborting!"
 msgstr "程序错误；正在中止！"
 
-#: panel.cpp:2483 panel.cpp:2512
+#: panel.cpp:2499 panel.cpp:2528
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "不能开始录制到 %s (%s)"
 
-#: panel.cpp:2540
+#: panel.cpp:2556
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "录制音频/视频时错误 (%s); 正在中止"
 
-#: panel.cpp:2546
+#: panel.cpp:2562
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "录制音频时错误 (%s); 正在中止"
 
-#: panel.cpp:2556
+#: panel.cpp:2572
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "录制视频时错误 (%s); 正在中止"
 
 #: viewsupt.cpp:778
-msgid "R:"
-msgstr "R:"
+msgid "Red:"
+msgstr ""
 
 #: viewsupt.cpp:787
-msgid "G:"
-msgstr "G:"
+msgid "Green:"
+msgstr ""
 
 #: viewsupt.cpp:796
-msgid "B:"
-msgstr "B:"
+msgid "Blue:"
+msgstr ""
 
-#: config/internal/option-internal.cpp:376
+#: config/internal/option-internal.cpp:379
 msgid "Use bilinear filter with 3d renderer"
 msgstr "在 3D 渲染器中使用双线过滤 "
 
-#: config/internal/option-internal.cpp:377
+#: config/internal/option-internal.cpp:380
 msgid "Full-screen filter to apply"
 msgstr "要应用的全屏滤镜"
 
-#: config/internal/option-internal.cpp:378
+#: config/internal/option-internal.cpp:381
 msgid "Filter plugin library"
 msgstr "滤镜插件库"
 
-#: config/internal/option-internal.cpp:379
+#: config/internal/option-internal.cpp:382
 msgid "Interframe blending function"
 msgstr "帧间混合功能"
 
-#: config/internal/option-internal.cpp:380
+#: config/internal/option-internal.cpp:383
 msgid "Keep window on top"
 msgstr "保持窗口在最前"
 
-#: config/internal/option-internal.cpp:382
+#: config/internal/option-internal.cpp:385
 msgid "Maximum number of threads to run filters in"
 msgstr "运行滤镜的最大线程数"
 
-#: config/internal/option-internal.cpp:384
+#: config/internal/option-internal.cpp:387
 msgid "Render method; if unsupported, simple method will be used"
 msgstr "渲染方式；如果不支持，则使用简单方式"
 
-#: config/internal/option-internal.cpp:385
+#: config/internal/option-internal.cpp:388
 msgid "Default scale factor"
 msgstr "默认缩放系数"
 
-#: config/internal/option-internal.cpp:387
+#: config/internal/option-internal.cpp:390
 msgid "Retain aspect ratio when resizing"
 msgstr "调整大小时保持长宽比"
 
-#: config/internal/option-internal.cpp:391
+#: config/internal/option-internal.cpp:394
 msgid "BIOS file to use for Game Boy, if enabled"
 msgstr "用于 GB 的 BIOS 文件（如果启用）"
 
-#: config/internal/option-internal.cpp:393
+#: config/internal/option-internal.cpp:396
 msgid "Game Boy color enhancement, if enabled"
 msgstr "GB 色彩增强（如果启用）"
 
-#: config/internal/option-internal.cpp:395
+#: config/internal/option-internal.cpp:398
 msgid "Enable DX Colorization Hacks"
 msgstr "启用 DX 色彩修改"
 
-#: config/internal/option-internal.cpp:397
-#: config/internal/option-internal.cpp:423
+#: config/internal/option-internal.cpp:400
+#: config/internal/option-internal.cpp:426
 msgid "Apply LCD filter, if enabled"
 msgstr "应用 LCD 滤镜（如果启用）"
 
-#: config/internal/option-internal.cpp:399
+#: config/internal/option-internal.cpp:402
 msgid "BIOS file to use for Game Boy Color, if enabled"
 msgstr "用于 GBC 的 BIOS 文件（如果启用）"
 
-#: config/internal/option-internal.cpp:401
+#: config/internal/option-internal.cpp:404
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "默认调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
 
-#: config/internal/option-internal.cpp:404
+#: config/internal/option-internal.cpp:407
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "第一用户调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
 
-#: config/internal/option-internal.cpp:407
+#: config/internal/option-internal.cpp:410
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "第二用户调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
 
-#: config/internal/option-internal.cpp:410
+#: config/internal/option-internal.cpp:413
 msgid "Automatically gather a full page before printing"
 msgstr "打印前自动聚集整个页面"
 
-#: config/internal/option-internal.cpp:412
+#: config/internal/option-internal.cpp:415
 msgid "Automatically save printouts as screen captures with -print suffix"
 msgstr "使用 -print 后缀自动将打印输出保存为屏幕截图"
 
-#: config/internal/option-internal.cpp:414
-#: config/internal/option-internal.cpp:444
+#: config/internal/option-internal.cpp:417
+#: config/internal/option-internal.cpp:447
 msgid "Directory to look for ROM files"
 msgstr "要查找 ROM 文件的目录"
 
-#: config/internal/option-internal.cpp:416
+#: config/internal/option-internal.cpp:419
 msgid "Directory to look for Game Boy Color ROM files"
 msgstr "要查找 GBC ROM 文件的目录"
 
-#: config/internal/option-internal.cpp:419
+#: config/internal/option-internal.cpp:422
 msgid "BIOS file to use, if enabled"
 msgstr "要使用的 BIOS 文件（如果启用）"
 
-#: config/internal/option-internal.cpp:429
+#: config/internal/option-internal.cpp:432
 msgid "Enable link at boot"
 msgstr "在启动时启用链接"
 
-#: config/internal/option-internal.cpp:434
+#: config/internal/option-internal.cpp:437
 msgid "Enable faster network protocol by default"
 msgstr "默认启用更快的网络协议"
 
-#: config/internal/option-internal.cpp:436
+#: config/internal/option-internal.cpp:439
 msgid "Default network link client host"
 msgstr "默认网络链接客户端主机"
 
-#: config/internal/option-internal.cpp:437
+#: config/internal/option-internal.cpp:440
 msgid "Default network link server IP to bind"
 msgstr "要绑定的默认网络链接服务器 IP"
 
-#: config/internal/option-internal.cpp:439
+#: config/internal/option-internal.cpp:442
 msgid "Default network link port (server and client)"
 msgstr "默认网络链接端口（服务器和客户端）"
 
-#: config/internal/option-internal.cpp:440
+#: config/internal/option-internal.cpp:443
 msgid "Default network protocol"
 msgstr "默认网络协议"
 
-#: config/internal/option-internal.cpp:441
+#: config/internal/option-internal.cpp:444
 msgid "Link timeout (ms)"
 msgstr "链接超时（毫秒）"
 
-#: config/internal/option-internal.cpp:442
+#: config/internal/option-internal.cpp:445
 msgid "Link cable type"
 msgstr "链接线缆类型"
 
-#: config/internal/option-internal.cpp:448
+#: config/internal/option-internal.cpp:451
 msgid "Automatically load last saved state"
 msgstr "自动加载上次保存的状态"
 
-#: config/internal/option-internal.cpp:450
+#: config/internal/option-internal.cpp:453
 msgid ""
 "Directory to store game save files (relative paths are relative to ROM; "
 "blank is config dir)"
 msgstr "存放游戏存档文件的目录（相对路径是相对于 ROM；空白是配置目录）"
 
-#: config/internal/option-internal.cpp:452
+#: config/internal/option-internal.cpp:455
 msgid "Freeze recent load list"
 msgstr "冻结最近的加载列表"
 
-#: config/internal/option-internal.cpp:454
+#: config/internal/option-internal.cpp:457
 msgid ""
 "Directory to store A / V and game recordings (relative paths are relative to"
 " ROM)"
 msgstr "存储 A/V 和游戏录像的目录（相对路径是相对于 ROM）"
 
-#: config/internal/option-internal.cpp:457
+#: config/internal/option-internal.cpp:460
 msgid "Number of seconds between rewind snapshots (0 to disable)"
 msgstr "倒带快照之间的秒数（0 表示禁用）"
 
-#: config/internal/option-internal.cpp:459
+#: config/internal/option-internal.cpp:462
 msgid "Directory to store screenshots (relative paths are relative to ROM)"
 msgstr "存放截图的目录（相对路径是相对于 ROM）"
 
-#: config/internal/option-internal.cpp:462
+#: config/internal/option-internal.cpp:465
 msgid ""
 "Directory to store saved state files (relative paths are relative to "
 "BatteryDir)"
 msgstr "存储保存状态文件的目录（相对路径是相对于 BatteryDir）"
 
-#: config/internal/option-internal.cpp:464
+#: config/internal/option-internal.cpp:467
 msgid "Enable status bar"
 msgstr "启用状态栏"
 
-#: config/internal/option-internal.cpp:465
+#: config/internal/option-internal.cpp:468
 msgid "INI file version (DO NOT MODIFY)"
 msgstr "INI 文件版本 (请勿修改)"
 
-#: config/internal/option-internal.cpp:469
+#: config/internal/option-internal.cpp:472
 msgid ""
 "The parameter Joypad/<n>/<button> contains a comma-separated list of key "
 "names which map to joypad #<n> button <button>. Button is one of Up, Down, "
@@ -1172,254 +1079,254 @@ msgid ""
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
 msgstr "参数 手柄/<n>/<button> 包含一个逗号分隔的键名列表，这些键名映射到 手柄 #<n> 按键 <button>。 按键是 上、下、左、右、A、B、L、R、Select、Start、体感上、体感下、体感左、体感右、连发A、连发B、加速、截图、GS 中某一个"
 
-#: config/internal/option-internal.cpp:475
+#: config/internal/option-internal.cpp:478
 msgid "The autofire toggle period, in frames (1/60 s)"
 msgstr "连发切换周期，以帧为单位（1/60 秒）"
 
-#: config/internal/option-internal.cpp:477
+#: config/internal/option-internal.cpp:480
 msgid "The number of the stick to use in single-player mode"
 msgstr "在单人模式中使用的摇杆数量"
 
-#: config/internal/option-internal.cpp:481
+#: config/internal/option-internal.cpp:484
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
 msgstr "参数 键盘/<cmd> 包含一个以逗号分隔的键名列表（例如 Alt-Shift-F1）。 当按下指定的键时，命令 <cmd> 被执行。"
 
-#: config/internal/option-internal.cpp:487
+#: config/internal/option-internal.cpp:490
 msgid "Enable AGB debug print"
 msgstr "启用 AGB 调试打印"
 
-#: config/internal/option-internal.cpp:489
+#: config/internal/option-internal.cpp:492
 msgid "Auto skip frames"
 msgstr "自动跳帧"
 
-#: config/internal/option-internal.cpp:491
+#: config/internal/option-internal.cpp:494
 msgid "Apply IPS / UPS / IPF patches if found"
 msgstr "如发现 IPS/UPS/IPF 补丁即应用"
 
-#: config/internal/option-internal.cpp:493
+#: config/internal/option-internal.cpp:496
 msgid "Automatically save and load cheat list"
 msgstr "自动保存和加载金手指列表"
 
-#: config/internal/option-internal.cpp:497
+#: config/internal/option-internal.cpp:500
 msgid "Automatically enable border for Super Game Boy games"
 msgstr "对 Super GameBoy 游戏自动启用边框"
 
-#: config/internal/option-internal.cpp:499
+#: config/internal/option-internal.cpp:502
 msgid "Always enable border"
 msgstr "始终启用边框"
 
-#: config/internal/option-internal.cpp:501
+#: config/internal/option-internal.cpp:504
 msgid "Screen capture file format"
 msgstr "屏幕截图文件格式"
 
-#: config/internal/option-internal.cpp:502
+#: config/internal/option-internal.cpp:505
 msgid "Enable cheats"
 msgstr "启用金手指"
 
-#: config/internal/option-internal.cpp:504
+#: config/internal/option-internal.cpp:507
 msgid "Disable on-screen status messages"
 msgstr "禁用屏幕状态消息"
 
-#: config/internal/option-internal.cpp:505
+#: config/internal/option-internal.cpp:508
 msgid "Type of system to emulate"
 msgstr "要模拟的系统类型"
 
-#: config/internal/option-internal.cpp:507
+#: config/internal/option-internal.cpp:510
 msgid "Flash size 0 = 64 KB 1 = 128 KB"
 msgstr "Flash 大小 0 = 64 KB 1 = 128 KB"
 
-#: config/internal/option-internal.cpp:509
+#: config/internal/option-internal.cpp:512
 msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
 msgstr "跳帧。值为 0-9 或 -1 以根据时间自动跳过。"
 
-#: config/internal/option-internal.cpp:511
+#: config/internal/option-internal.cpp:514
 msgid "The palette to use"
 msgstr "要使用的调色板"
 
-#: config/internal/option-internal.cpp:513
+#: config/internal/option-internal.cpp:516
 msgid "Enable printer emulation"
 msgstr "启用打印机模拟"
 
-#: config/internal/option-internal.cpp:515
+#: config/internal/option-internal.cpp:518
 msgid "Break into GDB after loading the game."
 msgstr "加载游戏后切入 GDB"
 
-#: config/internal/option-internal.cpp:517
+#: config/internal/option-internal.cpp:520
 msgid "Port to connect GDB to"
 msgstr "连接 GDB 的端口"
 
-#: config/internal/option-internal.cpp:520
+#: config/internal/option-internal.cpp:523
 msgid "Number of players in network"
 msgstr "联机中的玩家数量"
 
-#: config/internal/option-internal.cpp:523
+#: config/internal/option-internal.cpp:526
 msgid "Maximum scale factor (0 = no limit)"
 msgstr "最大缩放系数（0 = 无限制）"
 
-#: config/internal/option-internal.cpp:525
+#: config/internal/option-internal.cpp:528
 msgid "Pause game when main window loses focus"
 msgstr "当主窗口非活动时暂停游戏"
 
-#: config/internal/option-internal.cpp:527
+#: config/internal/option-internal.cpp:530
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
 msgstr "启用 RTC（vba-over.ini 里覆盖为 rtcEnabled"
 
-#: config/internal/option-internal.cpp:529
+#: config/internal/option-internal.cpp:532
 msgid "Native save (\"battery\") hardware type"
 msgstr "原生存档（“电池档”）硬件类型"
 
-#: config/internal/option-internal.cpp:530
+#: config/internal/option-internal.cpp:533
 msgid "Show speed indicator"
 msgstr "显示速度指示器"
 
-#: config/internal/option-internal.cpp:532
+#: config/internal/option-internal.cpp:535
 msgid "Draw on-screen messages transparently"
 msgstr "透明显示屏幕消息"
 
-#: config/internal/option-internal.cpp:534
+#: config/internal/option-internal.cpp:537
 msgid "Skip BIOS initialization"
 msgstr "跳过 BIOS 初始化"
 
-#: config/internal/option-internal.cpp:536
+#: config/internal/option-internal.cpp:539
 msgid "Do not overwrite cheat list when loading state"
 msgstr "加载状态时不覆盖金手指列表"
 
-#: config/internal/option-internal.cpp:538
+#: config/internal/option-internal.cpp:541
 msgid "Do not overwrite native (battery) save when loading state"
 msgstr "加载状态时不覆盖原生 (电池) 存档"
 
-#: config/internal/option-internal.cpp:540
+#: config/internal/option-internal.cpp:543
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
 msgstr "阀门加快游戏速度，即使已经在加速时（0-450 %，0 = 无阀门）"
 
-#: config/internal/option-internal.cpp:543
+#: config/internal/option-internal.cpp:546
 msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
 msgstr "设置加速键的阀门值（0-3000 %，0 = 无阀门）"
 
-#: config/internal/option-internal.cpp:545
+#: config/internal/option-internal.cpp:548
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
 msgstr "加速时跳过的帧数（而不是阀门加速）"
 
-#: config/internal/option-internal.cpp:548
+#: config/internal/option-internal.cpp:551
 msgid "Use frame skip for speedup throttle"
 msgstr "使用跳帧来阀门加速"
 
-#: config/internal/option-internal.cpp:550
+#: config/internal/option-internal.cpp:553
 msgid "Use the specified BIOS file for Game Boy"
 msgstr "对 GB 使用指定的 BIOS 文件"
 
-#: config/internal/option-internal.cpp:552
+#: config/internal/option-internal.cpp:555
 msgid "Use the specified BIOS file"
 msgstr "使用指定的 BIOS 文件"
 
-#: config/internal/option-internal.cpp:554
+#: config/internal/option-internal.cpp:557
 msgid "Use the specified BIOS file for Game Boy Color"
 msgstr "对 GBC 使用指定的 BIOS 文件"
 
-#: config/internal/option-internal.cpp:555
+#: config/internal/option-internal.cpp:558
 msgid "Wait for vertical sync"
 msgstr "等待垂直同步"
 
-#: config/internal/option-internal.cpp:559
+#: config/internal/option-internal.cpp:562
 msgid "Enter fullscreen mode at startup"
 msgstr "启动时进入全屏模式"
 
-#: config/internal/option-internal.cpp:560
+#: config/internal/option-internal.cpp:563
 msgid "Window maximized"
 msgstr "窗口最大化"
 
-#: config/internal/option-internal.cpp:562
+#: config/internal/option-internal.cpp:565
 msgid "Window height at startup"
 msgstr "启动时的窗口高度"
 
-#: config/internal/option-internal.cpp:563
+#: config/internal/option-internal.cpp:566
 msgid "Window width at startup"
 msgstr "启动时的窗口宽度"
 
-#: config/internal/option-internal.cpp:564
+#: config/internal/option-internal.cpp:567
 msgid "Window axis X position at startup"
 msgstr "启动时的窗口 X 坐标位置"
 
-#: config/internal/option-internal.cpp:565
+#: config/internal/option-internal.cpp:568
 msgid "Window axis Y position at startup"
 msgstr "启动时的窗口 Y 坐标位置"
 
-#: config/internal/option-internal.cpp:570
+#: config/internal/option-internal.cpp:573
 msgid "Capture key events while on background"
 msgstr "在后台截取按键事件"
 
-#: config/internal/option-internal.cpp:573
+#: config/internal/option-internal.cpp:576
 msgid "Capture joy events while on background"
 msgstr "在后台截取摇杆事件"
 
-#: config/internal/option-internal.cpp:574
+#: config/internal/option-internal.cpp:577
 msgid "Hide menu bar when mouse is inactive"
 msgstr "鼠标非活动时隐藏菜单栏"
 
-#: config/internal/option-internal.cpp:575
+#: config/internal/option-internal.cpp:578
 msgid "Suspend screensaver when game is running"
 msgstr "游戏运行时暂停屏幕保护程序"
 
-#: config/internal/option-internal.cpp:579
+#: config/internal/option-internal.cpp:582
 msgid "Sound API; if unsupported, default API will be used"
 msgstr "声音 API；如果不支持，将使用默认 API"
 
-#: config/internal/option-internal.cpp:581
+#: config/internal/option-internal.cpp:584
 msgid "Device ID of chosen audio device for chosen driver"
 msgstr "所选驱动程序下的所选音频设备 ID"
 
-#: config/internal/option-internal.cpp:582
+#: config/internal/option-internal.cpp:585
 msgid "Number of sound buffers"
 msgstr "声音缓冲区数"
 
-#: config/internal/option-internal.cpp:583
+#: config/internal/option-internal.cpp:586
 msgid "Bit mask of sound channels to enable"
 msgstr "要启用的声道位掩码"
 
-#: config/internal/option-internal.cpp:585
+#: config/internal/option-internal.cpp:588
 msgid "Game Boy Advance sound filtering (%)"
 msgstr "GBA 声音过滤 (%)"
 
-#: config/internal/option-internal.cpp:587
+#: config/internal/option-internal.cpp:590
 msgid "Game Boy Advance sound interpolation"
 msgstr "GBA 声音插值"
 
-#: config/internal/option-internal.cpp:589
+#: config/internal/option-internal.cpp:592
 msgid "Game Boy sound declicking"
 msgstr "GB 声音降噪"
 
-#: config/internal/option-internal.cpp:590
+#: config/internal/option-internal.cpp:593
 msgid "Game Boy echo effect (%)"
 msgstr "GB 回声音效 (%)"
 
-#: config/internal/option-internal.cpp:592
+#: config/internal/option-internal.cpp:595
 msgid "Enable Game Boy sound effects"
 msgstr "启用 GB 音效"
 
-#: config/internal/option-internal.cpp:593
+#: config/internal/option-internal.cpp:596
 msgid "Game Boy stereo effect (%)"
 msgstr "GB 立体声音效 (%)"
 
-#: config/internal/option-internal.cpp:595
+#: config/internal/option-internal.cpp:598
 msgid "Game Boy surround sound effect (%)"
 msgstr "GB 环绕音效 (%)"
 
-#: config/internal/option-internal.cpp:596
+#: config/internal/option-internal.cpp:599
 msgid "Sound sample rate (kHz)"
 msgstr "声音采样率 (kHz)"
 
-#: config/internal/option-internal.cpp:597
+#: config/internal/option-internal.cpp:600
 msgid "Sound volume (%)"
 msgstr "音量 (%)"
 
-#: config/internal/option-internal.cpp:663
-#: config/internal/option-internal.cpp:683
-#: config/internal/option-internal.cpp:704
-#: config/internal/option-internal.cpp:724
-#: config/internal/option-internal.cpp:744
+#: config/internal/option-internal.cpp:666
+#: config/internal/option-internal.cpp:686
+#: config/internal/option-internal.cpp:707
+#: config/internal/option-internal.cpp:727
+#: config/internal/option-internal.cpp:747
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
 msgstr "数值 %s 对于选项 %s 无效，有效数值为 %s"
@@ -1680,49 +1587,9 @@ msgstr "无效"
 msgid "No mapper"
 msgstr "未映射"
 
-#: dialogs/gb-rom-info.cpp:24
-msgid "MBC1"
-msgstr "MBC1"
-
-#: dialogs/gb-rom-info.cpp:27
-msgid "MBC2"
-msgstr "MBC2"
-
-#: dialogs/gb-rom-info.cpp:30
-msgid "MBC3"
-msgstr "MBC3"
-
-#: dialogs/gb-rom-info.cpp:33
-msgid "MBC5"
-msgstr "MBC5"
-
-#: dialogs/gb-rom-info.cpp:36
-msgid "MBC6"
-msgstr "MBC6"
-
-#: dialogs/gb-rom-info.cpp:39
-msgid "MBC7"
-msgstr "MBC7"
-
 #: dialogs/gb-rom-info.cpp:42
 msgid "Pocket Camera"
 msgstr "口袋摄像机"
-
-#: dialogs/gb-rom-info.cpp:45
-msgid "MMM01"
-msgstr "MMM01"
-
-#: dialogs/gb-rom-info.cpp:48
-msgid "HuC-1"
-msgstr "HuC-1"
-
-#: dialogs/gb-rom-info.cpp:51
-msgid "HuC-3"
-msgstr "HuC-3"
-
-#: dialogs/gb-rom-info.cpp:54
-msgid "Bandai TAMA5"
-msgstr "Bandai TAMA5"
 
 #: dialogs/gb-rom-info.cpp:67
 msgid " + RAM"
@@ -2169,130 +2036,13 @@ msgstr "反编译"
 msgid "&Automatic"
 msgstr "自动(&A)"
 
-#: xrc/Disassemble.xrc:23
-msgid "A&RM"
-msgstr "ARM(&R)"
-
-#: xrc/Disassemble.xrc:30
-msgid "&THUMB"
-msgstr "THUMB(&T)"
-
 #: xrc/Disassemble.xrc:45 xrc/GBDisassemble.xrc:18 xrc/MemViewer.xrc:47
 msgid "&Go"
 msgstr "开始(&G)"
 
-#: xrc/Disassemble.xrc:73
-msgid "R0:"
-msgstr "R0:"
-
-#: xrc/Disassemble.xrc:83 xrc/Disassemble.xrc:100 xrc/Disassemble.xrc:117
-#: xrc/Disassemble.xrc:134 xrc/Disassemble.xrc:151 xrc/Disassemble.xrc:168
-#: xrc/Disassemble.xrc:185 xrc/Disassemble.xrc:202 xrc/Disassemble.xrc:219
-#: xrc/Disassemble.xrc:236 xrc/Disassemble.xrc:253 xrc/Disassemble.xrc:270
-#: xrc/Disassemble.xrc:287 xrc/Disassemble.xrc:304 xrc/Disassemble.xrc:321
-#: xrc/Disassemble.xrc:338 xrc/Disassemble.xrc:355
-msgid "00000000"
-msgstr "00000000"
-
-#: xrc/Disassemble.xrc:90
-msgid "R1:"
-msgstr "R1:"
-
-#: xrc/Disassemble.xrc:107
-msgid "R2:"
-msgstr "R2:"
-
-#: xrc/Disassemble.xrc:124
-msgid "R3:"
-msgstr "R3:"
-
-#: xrc/Disassemble.xrc:141
-msgid "R4:"
-msgstr "R4:"
-
-#: xrc/Disassemble.xrc:158
-msgid "R5:"
-msgstr "R5:"
-
-#: xrc/Disassemble.xrc:175
-msgid "R6:"
-msgstr "R6:"
-
-#: xrc/Disassemble.xrc:192
-msgid "R7:"
-msgstr "R7:"
-
-#: xrc/Disassemble.xrc:209
-msgid "R8:"
-msgstr "R8:"
-
-#: xrc/Disassemble.xrc:226
-msgid "R9:"
-msgstr "R9:"
-
-#: xrc/Disassemble.xrc:243
-msgid "R10:"
-msgstr "R10:"
-
-#: xrc/Disassemble.xrc:260
-msgid "R11:"
-msgstr "R11:"
-
-#: xrc/Disassemble.xrc:277
-msgid "R12:"
-msgstr "R12:"
-
-#: xrc/Disassemble.xrc:294 xrc/GBDisassemble.xrc:111
-msgid "SP:"
-msgstr "SP:"
-
-#: xrc/Disassemble.xrc:311
-msgid "LR:"
-msgstr "LR:"
-
-#: xrc/Disassemble.xrc:328 xrc/GBDisassemble.xrc:128
-msgid "PC:"
-msgstr "PC:"
-
-#: xrc/Disassemble.xrc:345
-msgid "CPSR:"
-msgstr "CPSR:"
-
-#: xrc/Disassemble.xrc:362 xrc/GBDisassemble.xrc:185
-msgid "N"
-msgstr "N"
-
-#: xrc/Disassemble.xrc:369
-msgid "I"
-msgstr "I"
-
-#: xrc/Disassemble.xrc:376 xrc/GBDisassemble.xrc:179
-msgid "Z"
-msgstr "Z"
-
-#: xrc/Disassemble.xrc:383
-msgid "F"
-msgstr "F"
-
-#: xrc/Disassemble.xrc:390 xrc/GBDisassemble.xrc:197
-msgid "C"
-msgstr "C"
-
-#: xrc/Disassemble.xrc:397
-msgid "T"
-msgstr "T"
-
-#: xrc/Disassemble.xrc:404
-msgid "V"
-msgstr "V"
-
 #: xrc/Disassemble.xrc:414 xrc/MapViewer.xrc:76 xrc/OAMViewer.xrc:37
 msgid "Mode:"
 msgstr "模式:"
-
-#: xrc/Disassemble.xrc:424 xrc/GBDisassemble.xrc:172
-msgid "00"
-msgstr "00"
 
 #: xrc/Disassemble.xrc:443 xrc/GBDisassemble.xrc:212 xrc/GBOAMViewer.xrc:93
 #: xrc/GBPaletteViewer.xrc:105 xrc/GBTileViewer.xrc:75 xrc/IOViewer.xrc:318
@@ -2325,18 +2075,6 @@ msgstr "输出模块"
 msgid "Simple"
 msgstr "简单"
 
-#: xrc/DisplayConfig.xrc:40
-msgid "Quartz2D"
-msgstr "Quartz2D"
-
-#: xrc/DisplayConfig.xrc:47
-msgid "OpenGL"
-msgstr "OpenGL"
-
-#: xrc/DisplayConfig.xrc:54
-msgid "Direct3D 9"
-msgstr "Direct3D 9"
-
 #: xrc/DisplayConfig.xrc:65
 msgid "Filters"
 msgstr "滤镜"
@@ -2344,10 +2082,6 @@ msgstr "滤镜"
 #: xrc/DisplayConfig.xrc:79
 msgid "Display filter:"
 msgstr "显示滤镜："
-
-#: xrc/DisplayConfig.xrc:86
-msgid "2xSaI"
-msgstr "2"
 
 #: xrc/DisplayConfig.xrc:87
 msgid "Super 2xSaI"
@@ -2381,14 +2115,6 @@ msgstr "扫描线"
 msgid "TV Mode"
 msgstr "电视模式"
 
-#: xrc/DisplayConfig.xrc:95
-msgid "HQ 2x"
-msgstr "HQ 2x"
-
-#: xrc/DisplayConfig.xrc:96
-msgid "LQ 2x"
-msgstr "LQ 2x"
-
 #: xrc/DisplayConfig.xrc:97
 msgid "Simple 2x"
 msgstr "采样 2x"
@@ -2397,37 +2123,9 @@ msgstr "采样 2x"
 msgid "Simple 3x"
 msgstr "采样 3x"
 
-#: xrc/DisplayConfig.xrc:99
-msgid "HQ 3x"
-msgstr "HQ 3x"
-
 #: xrc/DisplayConfig.xrc:100
 msgid "Simple 4x"
 msgstr "采样 4x"
-
-#: xrc/DisplayConfig.xrc:101
-msgid "HQ 4x"
-msgstr "HQ 4x"
-
-#: xrc/DisplayConfig.xrc:102
-msgid "xBRZ 2x"
-msgstr "xBRZ 2x"
-
-#: xrc/DisplayConfig.xrc:103
-msgid "xBRZ 3x"
-msgstr "xBRZ 3x"
-
-#: xrc/DisplayConfig.xrc:104
-msgid "xBRZ 4x"
-msgstr "xBRZ 4x"
-
-#: xrc/DisplayConfig.xrc:105
-msgid "xBRZ 5x"
-msgstr "xBRZ 5x"
-
-#: xrc/DisplayConfig.xrc:106
-msgid "xBRZ 6x"
-msgstr "xBRZ 6x"
 
 #: xrc/DisplayConfig.xrc:115
 msgid "Plugin:"
@@ -2529,10 +2227,6 @@ msgstr "版本 : "
 msgid "Release Number:"
 msgstr "版本号:"
 
-#: xrc/GBAROMInfo.xrc:59
-msgid "CRC32:"
-msgstr "CRC32 :"
-
 #: xrc/GBAROMInfo.xrc:71
 msgid "Game code:"
 msgstr "游戏代码:"
@@ -2556,10 +2250,6 @@ msgstr "设备类型 :"
 #: xrc/GBAROMInfo.xrc:131 xrc/GBROMInfo.xrc:132
 msgid "ROM version:"
 msgstr "ROM 版本 :"
-
-#: xrc/GBAROMInfo.xrc:143
-msgid "CRC:"
-msgstr "CRC :"
 
 #: xrc/GBAROMInfo.xrc:150
 msgid "ROM Information"
@@ -2622,59 +2312,9 @@ msgstr "使用此调色板"
 msgid "Restore"
 msgstr "恢复默认"
 
-#: xrc/GBDisassemble.xrc:43
-msgid "AF:"
-msgstr "AF:"
-
-#: xrc/GBDisassemble.xrc:53 xrc/GBDisassemble.xrc:70 xrc/GBDisassemble.xrc:87
-#: xrc/GBDisassemble.xrc:104 xrc/GBDisassemble.xrc:121
-#: xrc/GBDisassemble.xrc:138 xrc/GBDisassemble.xrc:155
-msgid "0000"
-msgstr "0000"
-
-#: xrc/GBDisassemble.xrc:60
-msgid "BC:"
-msgstr "BC:"
-
-#: xrc/GBDisassemble.xrc:77
-msgid "DE:"
-msgstr "DE:"
-
-#: xrc/GBDisassemble.xrc:94
-msgid "HL:"
-msgstr "HL:"
-
-#: xrc/GBDisassemble.xrc:145
-msgid "IFF:"
-msgstr "IFF:"
-
-#: xrc/GBDisassemble.xrc:162
-msgid "LY:"
-msgstr "LY:"
-
-#: xrc/GBDisassemble.xrc:191
-msgid "H"
-msgstr "H"
-
-#: xrc/GBMapViewer.xrc:14
-msgid "0x8000"
-msgstr "0x8000"
-
-#: xrc/GBMapViewer.xrc:20
-msgid "0x8800"
-msgstr "0x8800"
-
 #: xrc/GBMapViewer.xrc:23 xrc/GBTileViewer.xrc:42 xrc/TileViewer.xrc:58
 msgid "Char Base"
 msgstr "字符库"
-
-#: xrc/GBMapViewer.xrc:33
-msgid "0x9800"
-msgstr "0x9800"
-
-#: xrc/GBMapViewer.xrc:39
-msgid "0x9C00"
-msgstr "0x9C00"
 
 #: xrc/GBMapViewer.xrc:42
 msgid "Map Base"
@@ -2734,10 +2374,6 @@ msgstr "Pos:"
 #: xrc/GBOAMViewer.xrc:45 xrc/OAMViewer.xrc:69
 msgid "Prio:"
 msgstr "Prio:"
-
-#: xrc/GBOAMViewer.xrc:53
-msgid "OAP:"
-msgstr "OAP:"
 
 #: xrc/GBOAMViewer.xrc:61 xrc/OAMViewer.xrc:53
 msgid "Pal:"
@@ -2840,25 +2476,9 @@ msgstr "头部校验和："
 msgid "Cartridge checksum:"
 msgstr "卡带校验和："
 
-#: xrc/GBTileViewer.xrc:14
-msgid "&0"
-msgstr "&0"
-
-#: xrc/GBTileViewer.xrc:20 xrc/MainMenu.xrc:58 xrc/MainMenu.xrc:114
-msgid "&1"
-msgstr "&1"
-
 #: xrc/GBTileViewer.xrc:23
 msgid "VRAM Bank"
 msgstr "虚拟内存空间"
-
-#: xrc/GBTileViewer.xrc:33
-msgid "0x&8000"
-msgstr "0x&8000"
-
-#: xrc/GBTileViewer.xrc:39
-msgid "0x&8800"
-msgstr "0x&8800"
 
 #: xrc/GameBoyAdvanceConfig.xrc:4
 msgid "Game Boy Advance settings"
@@ -2872,10 +2492,6 @@ msgstr "保存类型:"
 #: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
 msgid "Automatic"
 msgstr "自动"
-
-#: xrc/GameBoyAdvanceConfig.xrc:28 xrc/GameBoyAdvanceConfig.xrc:200
-msgid "EEPROM"
-msgstr "EEPROM"
 
 #: xrc/GameBoyAdvanceConfig.xrc:29 xrc/GameBoyAdvanceConfig.xrc:201
 msgid "SRAM"
@@ -2979,26 +2595,6 @@ msgstr "GameBoy 设置"
 msgid "Emulated &system:"
 msgstr "模拟系统(&S) :"
 
-#: xrc/GameBoyConfig.xrc:30
-msgid "Game Boy Color"
-msgstr "Game Boy 颜色"
-
-#: xrc/GameBoyConfig.xrc:31
-msgid "Super Game Boy"
-msgstr "Super Game Boy"
-
-#: xrc/GameBoyConfig.xrc:32 xrc/SoundConfig.xrc:290
-msgid "Game Boy"
-msgstr "Game Boy"
-
-#: xrc/GameBoyConfig.xrc:33 xrc/SoundConfig.xrc:335
-msgid "Game Boy Advance"
-msgstr "Game Boy Advance"
-
-#: xrc/GameBoyConfig.xrc:34
-msgid "Super Game Boy 2"
-msgstr "Super Game Boy 2"
-
 #: xrc/GameBoyConfig.xrc:48
 msgid "Display &borders:"
 msgstr "显示边框(&B) :"
@@ -3059,14 +2655,6 @@ msgstr "通用"
 msgid "Screenshot Format:"
 msgstr "截图格式:"
 
-#: xrc/GeneralConfig.xrc:33
-msgid "&PNG"
-msgstr "PNG(&P)"
-
-#: xrc/GeneralConfig.xrc:42
-msgid "&BMP"
-msgstr "BMP(&B)"
-
 #: xrc/GeneralConfig.xrc:57
 msgid "&Rewind interval:"
 msgstr "回退间隔(&R) :"
@@ -3098,78 +2686,6 @@ msgstr "无限制"
 #: xrc/IOViewer.xrc:4
 msgid "IO Viewer"
 msgstr "IO 查看器"
-
-#: xrc/IOViewer.xrc:10
-msgid "a"
-msgstr "a"
-
-#: xrc/IOViewer.xrc:11
-msgid "b"
-msgstr "b"
-
-#: xrc/IOViewer.xrc:47
-msgid "15 "
-msgstr "15"
-
-#: xrc/IOViewer.xrc:64
-msgid "14 "
-msgstr "14"
-
-#: xrc/IOViewer.xrc:81
-msgid "13 "
-msgstr "13"
-
-#: xrc/IOViewer.xrc:98
-msgid "12 "
-msgstr "12"
-
-#: xrc/IOViewer.xrc:115
-msgid "11 "
-msgstr "11"
-
-#: xrc/IOViewer.xrc:132
-msgid "10 "
-msgstr "10"
-
-#: xrc/IOViewer.xrc:149
-msgid "9 "
-msgstr "9"
-
-#: xrc/IOViewer.xrc:166
-msgid "8 "
-msgstr "8"
-
-#: xrc/IOViewer.xrc:183
-msgid "7 "
-msgstr "7"
-
-#: xrc/IOViewer.xrc:200
-msgid "6 "
-msgstr "6"
-
-#: xrc/IOViewer.xrc:217
-msgid "5 "
-msgstr "5"
-
-#: xrc/IOViewer.xrc:234
-msgid "4 "
-msgstr "4"
-
-#: xrc/IOViewer.xrc:251
-msgid "3 "
-msgstr "3"
-
-#: xrc/IOViewer.xrc:268
-msgid "2 "
-msgstr "2"
-
-#: xrc/IOViewer.xrc:285
-msgid "1 "
-msgstr "1"
-
-#: xrc/IOViewer.xrc:302
-msgid "0 "
-msgstr "0"
 
 #: xrc/JoyPanel.xrc:8
 msgid ""
@@ -3306,10 +2822,6 @@ msgstr "最大等待连接时间 (毫秒)"
 msgid "Logging"
 msgstr "正在记录"
 
-#: xrc/Logging.xrc:13
-msgid "SW&I"
-msgstr "SWI(&I)"
-
 #: xrc/Logging.xrc:20
 msgid "Unaligned &memory"
 msgstr "未校准的内存(&M)"
@@ -3322,29 +2834,9 @@ msgstr "非法写入(&W)"
 msgid "Illegal &read"
 msgstr "非法读取(&R)"
 
-#: xrc/Logging.xrc:41
-msgid "DMA &0"
-msgstr "DMA &0"
-
-#: xrc/Logging.xrc:48
-msgid "DMA &1"
-msgstr "DMA &1"
-
-#: xrc/Logging.xrc:55
-msgid "DMA &2"
-msgstr "DMA &2"
-
-#: xrc/Logging.xrc:62
-msgid "DMA &3"
-msgstr "DMA &3"
-
 #: xrc/Logging.xrc:69
 msgid "&Undefined instruction"
 msgstr "未定义指令(&U)"
-
-#: xrc/Logging.xrc:76
-msgid "&AGBPrint"
-msgstr "AGP 打印(&A)"
 
 #: xrc/Logging.xrc:83
 msgid "Soun&d output"
@@ -3418,42 +2910,6 @@ msgstr "载入当前状态插槽"
 msgid "&Auto load most recent"
 msgstr "自动载入最常用文件(&A)"
 
-#: xrc/MainMenu.xrc:61 xrc/MainMenu.xrc:117
-msgid "&2"
-msgstr "&2"
-
-#: xrc/MainMenu.xrc:64 xrc/MainMenu.xrc:120
-msgid "&3"
-msgstr "&3"
-
-#: xrc/MainMenu.xrc:67 xrc/MainMenu.xrc:123
-msgid "&4"
-msgstr "&4"
-
-#: xrc/MainMenu.xrc:70 xrc/MainMenu.xrc:126
-msgid "&5"
-msgstr "&5"
-
-#: xrc/MainMenu.xrc:73 xrc/MainMenu.xrc:129
-msgid "&6"
-msgstr "&6"
-
-#: xrc/MainMenu.xrc:76 xrc/MainMenu.xrc:132
-msgid "&7"
-msgstr "&7"
-
-#: xrc/MainMenu.xrc:79 xrc/MainMenu.xrc:135
-msgid "&8"
-msgstr "&8"
-
-#: xrc/MainMenu.xrc:82 xrc/MainMenu.xrc:138
-msgid "&9"
-msgstr "&9"
-
-#: xrc/MainMenu.xrc:85 xrc/MainMenu.xrc:141
-msgid "1&0"
-msgstr "1&0"
-
 #: xrc/MainMenu.xrc:89
 msgid "From &File..."
 msgstr "从文件(&F)..."
@@ -3481,6 +2937,42 @@ msgstr "保存当前状态插槽"
 #: xrc/MainMenu.xrc:110
 msgid "Increase state slot number and save"
 msgstr "增加状态插槽号并保存"
+
+#: xrc/MainMenu.xrc:117
+msgid "&2"
+msgstr "&2"
+
+#: xrc/MainMenu.xrc:120
+msgid "&3"
+msgstr "&3"
+
+#: xrc/MainMenu.xrc:123
+msgid "&4"
+msgstr "&4"
+
+#: xrc/MainMenu.xrc:126
+msgid "&5"
+msgstr "&5"
+
+#: xrc/MainMenu.xrc:129
+msgid "&6"
+msgstr "&6"
+
+#: xrc/MainMenu.xrc:132
+msgid "&7"
+msgstr "&7"
+
+#: xrc/MainMenu.xrc:135
+msgid "&8"
+msgstr "&8"
+
+#: xrc/MainMenu.xrc:138
+msgid "&9"
+msgstr "&9"
+
+#: xrc/MainMenu.xrc:141
+msgid "1&0"
+msgstr "1&0"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File..."
@@ -3638,14 +3130,6 @@ msgstr "有线(&C)"
 msgid "&Wireless"
 msgstr "无线(&W)"
 
-#: xrc/MainMenu.xrc:289
-msgid "&Game Cube"
-msgstr "Game Cube(&G)"
-
-#: xrc/MainMenu.xrc:293 xrc/MainMenu.xrc:521
-msgid "&Game Boy"
-msgstr "Game Boy(&G)"
-
 #: xrc/MainMenu.xrc:298
 msgid "&Local mode"
 msgstr "本地模式(&L)"
@@ -3779,29 +3263,25 @@ msgstr "允许摇杆后台输入(&J)"
 msgid "&Autofire"
 msgstr "连发(&A)"
 
-#: xrc/MainMenu.xrc:437 xrc/MainMenu.xrc:472
-msgid "&A"
-msgstr "&A"
-
-#: xrc/MainMenu.xrc:441 xrc/MainMenu.xrc:476
-msgid "&B"
-msgstr "&B"
-
-#: xrc/MainMenu.xrc:445 xrc/MainMenu.xrc:480
-msgid "&L"
-msgstr "&L"
-
-#: xrc/MainMenu.xrc:449 xrc/MainMenu.xrc:484
-msgid "&R"
-msgstr "&R"
-
 #: xrc/MainMenu.xrc:454
 msgid "&Autohold"
 msgstr "自动保持(&A)"
 
-#: xrc/MainMenu.xrc:498
-msgid "&Game Boy Advance"
-msgstr "Game Boy Advance(&G)"
+#: xrc/MainMenu.xrc:472
+msgid "&A"
+msgstr "&A"
+
+#: xrc/MainMenu.xrc:476
+msgid "&B"
+msgstr "&B"
+
+#: xrc/MainMenu.xrc:480
+msgid "&L"
+msgstr "&L"
+
+#: xrc/MainMenu.xrc:484
+msgid "&R"
+msgstr "&R"
 
 #: xrc/MainMenu.xrc:500 xrc/MainMenu.xrc:523
 msgid "Configure..."
@@ -3911,10 +3391,6 @@ msgstr "加载时切入(&B)"
 msgid "&Disconnect"
 msgstr "断开连接(&D)"
 
-#: xrc/MainMenu.xrc:613
-msgid "&GDB"
-msgstr "GDB(&G)"
-
 #: xrc/MainMenu.xrc:616
 msgid "&Disassemble..."
 msgstr "反编译(&D)..."
@@ -3950,38 +3426,6 @@ msgstr "碎片查看器(&T)..."
 #: xrc/MainMenu.xrc:642
 msgid "Show all video layers"
 msgstr "显示所有视频图层"
-
-#: xrc/MainMenu.xrc:646
-msgid "BG &0"
-msgstr "BG &0"
-
-#: xrc/MainMenu.xrc:651
-msgid "BG &1"
-msgstr "BG &1"
-
-#: xrc/MainMenu.xrc:656
-msgid "BG &2"
-msgstr "BG &2"
-
-#: xrc/MainMenu.xrc:661
-msgid "BG &3"
-msgstr "BG &3"
-
-#: xrc/MainMenu.xrc:666
-msgid "&OBJ"
-msgstr "&OBJ"
-
-#: xrc/MainMenu.xrc:671
-msgid "&WIN 0"
-msgstr "&WIN 0"
-
-#: xrc/MainMenu.xrc:676
-msgid "W&IN 1"
-msgstr "W&IN 1"
-
-#: xrc/MainMenu.xrc:681
-msgid "O&BJ WIN"
-msgstr "O&BJ WIN"
 
 #: xrc/MainMenu.xrc:685
 msgid "&View Layers"
@@ -4059,22 +3503,6 @@ msgstr "帧 1"
 msgid "Frame"
 msgstr "帧"
 
-#: xrc/MapViewer.xrc:35
-msgid "BG 0"
-msgstr "BG 0"
-
-#: xrc/MapViewer.xrc:41
-msgid "BG 1"
-msgstr "BG 1"
-
-#: xrc/MapViewer.xrc:46
-msgid "BG 2"
-msgstr "BG 2"
-
-#: xrc/MapViewer.xrc:51
-msgid "BG 3"
-msgstr "BG 3"
-
 #: xrc/MapViewer.xrc:84
 msgid "Map Base:"
 msgstr "图层库:"
@@ -4139,18 +3567,6 @@ msgstr "客户端"
 msgid "Players:"
 msgstr "玩家:"
 
-#: xrc/NetLink.xrc:41
-msgid "2"
-msgstr "2"
-
-#: xrc/NetLink.xrc:49
-msgid "3"
-msgstr "3"
-
-#: xrc/NetLink.xrc:56
-msgid "4"
-msgstr "4"
-
 #: xrc/NetLink.xrc:67
 msgid "Server:"
 msgstr "服务器:"
@@ -4211,25 +3627,9 @@ msgstr "22 KHz"
 msgid "11 KHz"
 msgstr "11 KHz"
 
-#: xrc/SoundConfig.xrc:103
-msgid "SDL"
-msgstr "SDL"
-
-#: xrc/SoundConfig.xrc:111
-msgid "OpenAL"
-msgstr "OpenAL"
-
 #: xrc/SoundConfig.xrc:118
 msgid "Direct Sound"
 msgstr "Direct Sound"
-
-#: xrc/SoundConfig.xrc:125
-msgid "XAudio2"
-msgstr "XAudio2"
-
-#: xrc/SoundConfig.xrc:132
-msgid "FAudio"
-msgstr "FAudio"
 
 #: xrc/SoundConfig.xrc:146
 msgid "Device"
@@ -4279,37 +3679,9 @@ msgstr "声音过滤"
 msgid "Tile Viewer"
 msgstr "碎片查看器"
 
-#: xrc/TileViewer.xrc:15
-msgid "1&6"
-msgstr "1&6"
-
-#: xrc/TileViewer.xrc:21
-msgid "&256"
-msgstr "&256"
-
 #: xrc/TileViewer.xrc:24
 msgid "Colors"
 msgstr "颜色"
-
-#: xrc/TileViewer.xrc:34
-msgid "0x600&0000"
-msgstr "0x600&0000"
-
-#: xrc/TileViewer.xrc:40
-msgid "0x600&4000"
-msgstr "0x600&4000"
-
-#: xrc/TileViewer.xrc:45
-msgid "0x600&8000"
-msgstr "0x600&8000"
-
-#: xrc/TileViewer.xrc:50
-msgid "0x600&C000"
-msgstr "0x600&C000"
-
-#: xrc/TileViewer.xrc:55
-msgid "0x60&10000"
-msgstr "0x60&10000"
 
 #: xrc/SpeedupConfig.xrc:4
 msgid "SpeedUp / Turbo Settings"
