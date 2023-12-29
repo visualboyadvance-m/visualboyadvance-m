@@ -318,14 +318,14 @@ wxString wxvbamApp::GetAbsolutePath(wxString path)
 bool wxvbamApp::OnInit() {
     using_wayland = IsWayland();
 
-    // use consistent names for config
-    SetAppName(_("visualboyadvance-m"));
+    // use consistent names for config, DO NOT TRANSLATE
+    SetAppName("visualboyadvance-m");
 #if (wxMAJOR_VERSION >= 3)
-    SetAppDisplayName(_T("VisualBoyAdvance-M"));
+    SetAppDisplayName("VisualBoyAdvance-M");
 #endif
     // load system default locale, if available
     locale.Init();
-    locale.AddCatalog(_T("wxvbam"));
+    locale.AddCatalog("wxvbam");
     // make built-in xrc file available
     // this has to be done before parent OnInit() so xrc dump works
     wxFileSystem::AddHandler(new wxMemoryFSHandler);

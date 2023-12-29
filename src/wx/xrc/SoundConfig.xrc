@@ -100,7 +100,7 @@
                 <object class="wxBoxSizer">
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="SDL">
-                      <label>SDL</label>
+                      <label translate="0">SDL</label>
                       <style>wxRB_GROUP</style>
                     </object>
                     <flag>wxALL|wxEXPAND</flag>
@@ -108,7 +108,7 @@
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="OpenAL">
-                      <label>OpenAL</label>
+                      <label translate="0">OpenAL</label>
                     </object>
                     <flag>wxALL|wxEXPAND</flag>
                     <border>5</border>
@@ -122,14 +122,14 @@
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="XAudio2">
-                      <label>XAudio2</label>
+                      <label translate="0">XAudio2</label>
                     </object>
                     <flag>wxALL|wxEXPAND</flag>
                     <border>5</border>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="FAudio">
-                      <label>FAudio</label>
+                      <label translate="0">FAudio</label>
                     </object>
                     <flag>wxALL|wxEXPAND</flag>
                     <border>5</border>
@@ -287,7 +287,7 @@
           </object>
         </object>
       </object>
-      <label>Game Boy</label>
+      <label translate="0">Game Boy</label>
     </object>
     <object class="notebookpage">
       <object class="wxPanel">
@@ -332,7 +332,7 @@
           </object>
         </object>
       </object>
-      <label>Game Boy Advance</label>
+      <label translate="0">Game Boy Advance</label>
     </object>
   </object>
   </object>

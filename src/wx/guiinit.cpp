@@ -774,13 +774,15 @@ public:
         ch->Clear();
 
         if (clh.isgb) {
-            ch->Append(_("Game Shark"));
-            ch->Append(_("Game Genie"));
+            // DO NOT TRANSLATE
+            ch->Append("Game Shark");
+            ch->Append("Game Genie");
         } else {
             ch->Append(_("Generic Code"));
-            ch->Append(_("Game Shark Advance"));
-            ch->Append(_("Code Breaker Advance"));
-            ch->Append(_("Flashcart CHT"));
+            // DO NOT TRANSLATE
+            ch->Append("Game Shark Advance");
+            ch->Append("Code Breaker Advance");
+            ch->Append("Flashcart CHT");
         }
 
         ch->SetSelection(0);

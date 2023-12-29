@@ -458,7 +458,7 @@ void systemShowSpeed(int speed)
         break;
 
     case SS_PERCENT:
-        f->GetPanel()->osdstat.Printf(_("%d %%"), speed);
+        f->GetPanel()->osdstat.Printf("%d %%", speed);
         break;
 
     case SS_DETAILED:

@@ -361,7 +361,7 @@
                 </object>
                 <object class="sizeritem">
                   <object class="wxStaticText">
-                    <label>Game Shark</label>
+                    <label translate="0">Game Shark</label>
                   </object>
                   <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
                   <border>5</border>

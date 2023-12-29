@@ -38,7 +38,7 @@
             <object class="wxGridSizer">
               <object class="sizeritem">
                 <object class="wxRadioButton" name="Link2P">
-                  <label>2</label>
+                  <label translate="0">2</label>
                   <style>wxRB_GROUP</style>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE</flag>
@@ -46,14 +46,14 @@
               </object>
               <object class="sizeritem">
                 <object class="wxRadioButton" name="Link3P">
-                  <label>3</label>
+                  <label translate="0">3</label>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxRadioButton" name="Link4P">
-                  <label>4</label>
+                  <label translate="0">4</label>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE</flag>
                 <border>5</border>
