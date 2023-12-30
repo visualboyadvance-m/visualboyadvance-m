@@ -910,15 +910,15 @@ msgstr "Erro na gravação do vídeo (%s); abortando"
 
 #: viewsupt.cpp:778
 msgid "Red:"
-msgstr ""
+msgstr "Vermelho:"
 
 #: viewsupt.cpp:787
 msgid "Green:"
-msgstr ""
+msgstr "Verde:"
 
 #: viewsupt.cpp:796
 msgid "Blue:"
-msgstr ""
+msgstr "Azul:"
 
 #: config/internal/option-internal.cpp:379
 msgid "Use bilinear filter with 3d renderer"

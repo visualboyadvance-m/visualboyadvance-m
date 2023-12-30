@@ -884,15 +884,15 @@ msgstr "Error in video recording (%s); aborting"
 
 #: viewsupt.cpp:778
 msgid "Red:"
-msgstr ""
+msgstr "Red:"
 
 #: viewsupt.cpp:787
 msgid "Green:"
-msgstr ""
+msgstr "Green:"
 
 #: viewsupt.cpp:796
 msgid "Blue:"
-msgstr ""
+msgstr "Blue:"
 
 #: config/internal/option-internal.cpp:379
 msgid "Use bilinear filter with 3d renderer"

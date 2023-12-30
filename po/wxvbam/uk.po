@@ -883,15 +883,15 @@ msgstr "Помилка відеозапису (%s); перервано."
 
 #: viewsupt.cpp:778
 msgid "Red:"
-msgstr ""
+msgstr "Червоний:"
 
 #: viewsupt.cpp:787
 msgid "Green:"
-msgstr ""
+msgstr "Зелений:"
 
 #: viewsupt.cpp:796
 msgid "Blue:"
-msgstr ""
+msgstr "Синій:"
 
 #: config/internal/option-internal.cpp:379
 msgid "Use bilinear filter with 3d renderer"
@@ -2074,7 +2074,7 @@ msgstr "Фільтр відображення:"
 
 #: xrc/DisplayConfig.xrc:87
 msgid "Super 2xSaI"
-msgstr "Super 2x Sa I"
+msgstr "Super 2xSaI"
 
 #: xrc/DisplayConfig.xrc:88
 msgid "Super Eagle"
@@ -2825,7 +2825,7 @@ msgstr "Незаконне &читання"
 
 #: xrc/Logging.xrc:69
 msgid "&Undefined instruction"
-msgstr "&Невизначена відомість"
+msgstr "&Невизначена вказівка"
 
 #: xrc/Logging.xrc:83
 msgid "Soun&d output"
