@@ -145,7 +145,7 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver pkg_triplet powershell ou
 
     string(REPLACE "-" "." pkg_ver ${pkg_ver})
 
-    if(NOT DEFINED VCPKG_INSTALLED)
+    if(NOT DEFINED VCPKG_INSTALLED_COUNT)
         if(VCPKG_ROOT MATCHES "^C:/Program Files/Microsoft Visual Studio/")
             execute_process(
                 COMMAND ${powershell}
@@ -157,6 +157,7 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver pkg_triplet powershell ou
             execute_process(
                 COMMAND ${vcpkg_exe} list
                 OUTPUT_VARIABLE vcpkg_list_text
+                ERROR_QUIET
             )
         endif()
 
@@ -191,7 +192,7 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver pkg_triplet powershell ou
     if(NOT VCPKG_INSTALLED_COUNT GREATER 0)
         return()
     endif()
-    
+
     math(EXPR idx_max "(${VCPKG_INSTALLED_COUNT} - 1) * 4")
 
     foreach(idx RANGE 0 ${idx_max} 4)
@@ -202,7 +203,7 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver pkg_triplet powershell ou
         list(GET VCPKG_INSTALLED ${idx_ver}     inst_pkg_ver)
         list(GET VCPKG_INSTALLED ${idx_rev}     inst_pkg_rev)
         list(GET VCPKG_INSTALLED ${idx_triplet} inst_pkg_triplet)
-        
+
         if(NOT inst_pkg_triplet STREQUAL pkg_triplet)
             continue()
         endif()
@@ -221,7 +222,7 @@ endfunction()
 
 function(get_binary_packages vcpkg_exe)
     set(binary_packages_installed FALSE PARENT_SCOPE)
-    
+
     unset(triplets)
     if(VCPKG_TARGET_TRIPLET MATCHES "^(.*)-static\$")
         list(APPEND triplets "${CMAKE_MATCH_1}")
@@ -242,13 +243,14 @@ function(get_binary_packages vcpkg_exe)
         endif()
     endforeach()
 
-    unset(binary_packages_html)
+    unset(binary_packages)
     foreach(triplet ${triplets})
-        file(
-            STRINGS "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html" links
-            REGEX "<a href=\".*[.]zip"
-        )
-        string(APPEND binary_packages_html "${links}\n")
+        file(READ "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html" raw_html)
+        string(REGEX MATCHALL "<a href=\"[^\"]+[.]zip\"" links ${raw_html})
+        foreach(link ${links})
+            string(REGEX REPLACE "<a href=\"([^\"]+[.]zip)\"" "\\1" pkg ${link})
+            list(APPEND binary_packages ${pkg})
+        endforeach()
     endforeach()
 
     set(vcpkg_binpkg_dir ${CMAKE_BINARY_DIR}/vcpkg-binpkg)
@@ -270,13 +272,11 @@ function(get_binary_packages vcpkg_exe)
         set(powershell pwsh)
     endif()
 
-    unset(binary_packages)
     unset(to_install)
-    foreach(pkg ${binary_packages_html})
-        if(NOT pkg MATCHES "<a href=\"([^_]+)_([^_]+)_([^.]+)[.]zip\"")
+    foreach(pkg ${binary_packages})
+        if(NOT pkg MATCHES "([^_]+)_([^_]+)_([^.]+)[.]zip")
             continue()
         endif()
-        set(pkg         "${CMAKE_MATCH_1}_${CMAKE_MATCH_2}_${CMAKE_MATCH_3}.zip")
         set(pkg_name    ${CMAKE_MATCH_1})
         set(pkg_version ${CMAKE_MATCH_2})
         set(pkg_triplet ${CMAKE_MATCH_3})
@@ -376,7 +376,7 @@ function(vcpkg_set_toolchain)
     else()
         set(VCPKG_ROOT $ENV{VCPKG_ROOT})
     endif()
-    
+
     set(VCPKG_ROOT ${VCPKG_ROOT} CACHE FILEPATH "vcpkg installation root path" FORCE)
 
     if(NOT EXISTS ${VCPKG_ROOT})
