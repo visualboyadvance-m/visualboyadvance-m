@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-29 14:47+0000\n"
+"POT-Creation-Date: 2024-01-15 14:15-0500\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Stathis Galazios <infin1ty@hol.gr>, 2016-2017\n"
 "Language-Team: Greek (http://app.transifex.com/bgk/vba-m/language/el/)\n"
@@ -117,7 +117,7 @@ msgstr "Λάθος επιλογή διαμόρφωσης ή πολλά δοθέ�
 msgid "Start!"
 msgstr "Έναρξη!"
 
-#: guiinit.cpp:123 xrc/NetLink.xrc:99
+#: guiinit.cpp:123
 msgid "Connect"
 msgstr "Σύνδεση"
 
@@ -1531,10 +1531,10 @@ msgstr ""
 msgid "Invalid value for Default magnification."
 msgstr ""
 
-#: dialogs/display-config.cpp:341 xrc/DisplayConfig.xrc:85
-#: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
+#: dialogs/display-config.cpp:341 xrc/DisplayConfig.xrc:86
+#: xrc/DisplayConfig.xrc:136 xrc/DisplayConfig.xrc:222
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
-#: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
+#: xrc/SoundConfig.xrc:221 xrc/SoundConfig.xrc:311
 msgid "None"
 msgstr "Κανένα"
 
@@ -1544,7 +1544,7 @@ msgid "No usable rpi plugins found in %s"
 msgstr "Δεν βρέθηκαν χρήσιμες επεκτάσεις rpi στο %s"
 
 #: dialogs/display-config.cpp:410 dialogs/display-config.cpp:452
-#: xrc/DisplayConfig.xrc:107
+#: xrc/DisplayConfig.xrc:108
 msgid "Plugin"
 msgstr "Επέκταση"
 
@@ -2055,131 +2055,131 @@ msgstr "Επόμενο"
 msgid "Display settings"
 msgstr "Ρυθμίσεις οθόνης"
 
-#: xrc/DisplayConfig.xrc:15
+#: xrc/DisplayConfig.xrc:16
 msgid "Output module"
 msgstr "Μονάδα εξόδου"
 
-#: xrc/DisplayConfig.xrc:33
+#: xrc/DisplayConfig.xrc:34
 msgid "Simple"
 msgstr "Απλή"
 
-#: xrc/DisplayConfig.xrc:65
+#: xrc/DisplayConfig.xrc:66
 msgid "Filters"
 msgstr "Φίλτρα"
 
-#: xrc/DisplayConfig.xrc:79
+#: xrc/DisplayConfig.xrc:80
 msgid "Display filter:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:87
+#: xrc/DisplayConfig.xrc:88
 msgid "Super 2xSaI"
 msgstr "Super 2xSaI"
 
-#: xrc/DisplayConfig.xrc:88
+#: xrc/DisplayConfig.xrc:89
 msgid "Super Eagle"
 msgstr "Super Eagle"
 
-#: xrc/DisplayConfig.xrc:89
+#: xrc/DisplayConfig.xrc:90
 msgid "Pixelate"
 msgstr "Pixelate"
 
-#: xrc/DisplayConfig.xrc:90
+#: xrc/DisplayConfig.xrc:91
 msgid "Advance MAME Scale 2x"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:91
+#: xrc/DisplayConfig.xrc:92
 msgid "Bilinear"
 msgstr "Bilinear"
 
-#: xrc/DisplayConfig.xrc:92
+#: xrc/DisplayConfig.xrc:93
 msgid "Bilinear Plus"
 msgstr "Bilinear Plus"
 
-#: xrc/DisplayConfig.xrc:93
+#: xrc/DisplayConfig.xrc:94
 msgid "Scanlines"
 msgstr "Scanlines"
 
-#: xrc/DisplayConfig.xrc:94
+#: xrc/DisplayConfig.xrc:95
 msgid "TV Mode"
 msgstr "TV Mode"
 
-#: xrc/DisplayConfig.xrc:97
+#: xrc/DisplayConfig.xrc:98
 msgid "Simple 2x"
 msgstr "Simple 2x"
 
-#: xrc/DisplayConfig.xrc:98
+#: xrc/DisplayConfig.xrc:99
 msgid "Simple 3x"
 msgstr "Simple 3x"
 
-#: xrc/DisplayConfig.xrc:100
+#: xrc/DisplayConfig.xrc:101
 msgid "Simple 4x"
 msgstr "Simple 4x"
 
-#: xrc/DisplayConfig.xrc:115
+#: xrc/DisplayConfig.xrc:116
 msgid "Plugin:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:127
+#: xrc/DisplayConfig.xrc:128
 msgid "Interframe blending:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:136
+#: xrc/DisplayConfig.xrc:137
 msgid "Smart"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:137
+#: xrc/DisplayConfig.xrc:138
 msgid "Motion Blur"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:151 xrc/SoundConfig.xrc:91
+#: xrc/DisplayConfig.xrc:152 xrc/SoundConfig.xrc:93
 msgid "Basic"
 msgstr "Βασική"
 
-#: xrc/DisplayConfig.xrc:159
+#: xrc/DisplayConfig.xrc:160
 msgid "Frame Skip"
 msgstr "Παράλειψη καρέ"
 
-#: xrc/DisplayConfig.xrc:177
+#: xrc/DisplayConfig.xrc:178
 msgid "&Number of frames to skip:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:199
+#: xrc/DisplayConfig.xrc:200
 msgid "Speed"
 msgstr "Ταχύτητα"
 
-#: xrc/DisplayConfig.xrc:215
+#: xrc/DisplayConfig.xrc:216
 msgid "Speed indicator:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:222
+#: xrc/DisplayConfig.xrc:223
 msgid "Percentage"
 msgstr "Ποσοστό"
 
-#: xrc/DisplayConfig.xrc:223
+#: xrc/DisplayConfig.xrc:224
 msgid "Detailed"
 msgstr "Λεπτομερής"
 
-#: xrc/DisplayConfig.xrc:237
+#: xrc/DisplayConfig.xrc:238
 msgid "On-Screen Display"
 msgstr "Ένδειξη οθόνης"
 
-#: xrc/DisplayConfig.xrc:247
+#: xrc/DisplayConfig.xrc:248
 msgid "Default magnification:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:266
+#: xrc/DisplayConfig.xrc:267
 msgid "Maximum magnification factor:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:267
+#: xrc/DisplayConfig.xrc:268
 msgid "0 = no maximum"
 msgstr "0 = χωρίς μέγιστο"
 
-#: xrc/DisplayConfig.xrc:275
+#: xrc/DisplayConfig.xrc:276
 msgid "0 = no limit"
 msgstr "0 = χωρίς όριο"
 
-#: xrc/DisplayConfig.xrc:285
+#: xrc/DisplayConfig.xrc:286
 msgid "Zoom"
 msgstr "Ζουμ"
 
@@ -3543,23 +3543,31 @@ msgstr "Φόρτωση..."
 msgid "Start Network Link"
 msgstr "Έναρξη σύνδεσης δικτύου"
 
-#: xrc/NetLink.xrc:11
+#: xrc/NetLink.xrc:13
+msgid "WARNING: Link will likely not work over the internet or LAN."
+msgstr ""
+
+#: xrc/NetLink.xrc:38
 msgid "Server"
 msgstr "Διακομιστής"
 
-#: xrc/NetLink.xrc:19
+#: xrc/NetLink.xrc:47
 msgid "Client"
 msgstr "Πελάτης"
 
-#: xrc/NetLink.xrc:32
+#: xrc/NetLink.xrc:66
 msgid "Players:"
 msgstr "Παίκτες:"
 
-#: xrc/NetLink.xrc:67
+#: xrc/NetLink.xrc:83
+msgid "2"
+msgstr ""
+
+#: xrc/NetLink.xrc:107
 msgid "Server:"
 msgstr "Διακομιστής:"
 
-#: xrc/NetLink.xrc:81
+#: xrc/NetLink.xrc:124
 msgid "Port:"
 msgstr ""
 
@@ -3583,83 +3591,83 @@ msgstr "Αλλαγή χρώματος σκηνικού..."
 msgid "Sound Settings"
 msgstr "Ρυθμίσεις ήχου"
 
-#: xrc/SoundConfig.xrc:16
+#: xrc/SoundConfig.xrc:18
 msgid "Volume:"
 msgstr ""
 
-#: xrc/SoundConfig.xrc:34
+#: xrc/SoundConfig.xrc:36
 msgid "Mute"
 msgstr "Σίγαση"
 
-#: xrc/SoundConfig.xrc:54 xrc/SoundConfig.xrc:320
+#: xrc/SoundConfig.xrc:56 xrc/SoundConfig.xrc:322
 msgid "Maximum"
 msgstr "Μέγιστη"
 
-#: xrc/SoundConfig.xrc:71
+#: xrc/SoundConfig.xrc:73
 msgid "Sample rate:"
 msgstr ""
 
-#: xrc/SoundConfig.xrc:77
+#: xrc/SoundConfig.xrc:79
 msgid "48 KHz"
 msgstr "48 KHz"
 
-#: xrc/SoundConfig.xrc:78
+#: xrc/SoundConfig.xrc:80
 msgid "44.1 KHz"
 msgstr "44.1 KHz"
 
-#: xrc/SoundConfig.xrc:79
+#: xrc/SoundConfig.xrc:81
 msgid "22 KHz"
 msgstr "22 KHz"
 
-#: xrc/SoundConfig.xrc:80
+#: xrc/SoundConfig.xrc:82
 msgid "11 KHz"
 msgstr "11 KHz"
 
-#: xrc/SoundConfig.xrc:118
+#: xrc/SoundConfig.xrc:120
 msgid "Direct Sound"
 msgstr ""
 
-#: xrc/SoundConfig.xrc:146
+#: xrc/SoundConfig.xrc:148
 msgid "Device"
 msgstr "Συσκευή"
 
-#: xrc/SoundConfig.xrc:154
+#: xrc/SoundConfig.xrc:156
 msgid "Enable stereo upmixing"
 msgstr "Ενεργοποίηση μετατροπής σε στερεοφωνικό"
 
-#: xrc/SoundConfig.xrc:161
+#: xrc/SoundConfig.xrc:163
 msgid "Enable hardware acceleration"
 msgstr "Ενεργοποίηση επιτάχυνσης υλικού"
 
-#: xrc/SoundConfig.xrc:190
+#: xrc/SoundConfig.xrc:192
 msgid "Number of sound buffers:"
 msgstr "Αριθμός προσωρινών μνημών ήχου:"
 
-#: xrc/SoundConfig.xrc:198
+#: xrc/SoundConfig.xrc:200
 msgid "Advanced"
 msgstr "Για προχωρημένους"
 
-#: xrc/SoundConfig.xrc:230
+#: xrc/SoundConfig.xrc:232
 msgid "Lots"
 msgstr "Πολλές"
 
-#: xrc/SoundConfig.xrc:239
+#: xrc/SoundConfig.xrc:241
 msgid "Echo"
 msgstr "Ηχώ"
 
-#: xrc/SoundConfig.xrc:247
+#: xrc/SoundConfig.xrc:249
 msgid "Stereo"
 msgstr "Στερεοφωνικά"
 
-#: xrc/SoundConfig.xrc:258
+#: xrc/SoundConfig.xrc:260
 msgid "Center"
 msgstr "Κέντρο"
 
-#: xrc/SoundConfig.xrc:269
+#: xrc/SoundConfig.xrc:271
 msgid "Left / Right"
 msgstr ""
 
-#: xrc/SoundConfig.xrc:298
+#: xrc/SoundConfig.xrc:300
 msgid "Sound filtering"
 msgstr "Φιλτράρισμα ήχου"
 

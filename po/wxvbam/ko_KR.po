@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-29 14:47+0000\n"
+"POT-Creation-Date: 2024-01-15 14:15-0500\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Hoseok Seo <ddinghoya@gmail.com>, 2022-2023\n"
 "Language-Team: Korean (Korea) (http://app.transifex.com/bgk/vba-m/language/ko_KR/)\n"
@@ -121,7 +121,7 @@ msgstr "설정 옵션이 잘못되었거나, 여러 개의 ROM 파일이 주어�
 msgid "Start!"
 msgstr "시작!"
 
-#: guiinit.cpp:123 xrc/NetLink.xrc:99
+#: guiinit.cpp:123
 msgid "Connect"
 msgstr "연결"
 
@@ -1535,10 +1535,10 @@ msgstr "Browse"
 msgid "Invalid value for Default magnification."
 msgstr "기본 배율에 대한 잘못된 값입니다."
 
-#: dialogs/display-config.cpp:341 xrc/DisplayConfig.xrc:85
-#: xrc/DisplayConfig.xrc:135 xrc/DisplayConfig.xrc:221
+#: dialogs/display-config.cpp:341 xrc/DisplayConfig.xrc:86
+#: xrc/DisplayConfig.xrc:136 xrc/DisplayConfig.xrc:222
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
-#: xrc/SoundConfig.xrc:219 xrc/SoundConfig.xrc:309
+#: xrc/SoundConfig.xrc:221 xrc/SoundConfig.xrc:311
 msgid "None"
 msgstr "없음"
 
@@ -1548,7 +1548,7 @@ msgid "No usable rpi plugins found in %s"
 msgstr "%s에서 사용가능한 rpi 플러그인을 찾을 수 없음"
 
 #: dialogs/display-config.cpp:410 dialogs/display-config.cpp:452
-#: xrc/DisplayConfig.xrc:107
+#: xrc/DisplayConfig.xrc:108
 msgid "Plugin"
 msgstr "플러그인"
 
@@ -2059,131 +2059,131 @@ msgstr "다음(&N)"
 msgid "Display settings"
 msgstr "화면 설정"
 
-#: xrc/DisplayConfig.xrc:15
+#: xrc/DisplayConfig.xrc:16
 msgid "Output module"
 msgstr "출력 모듈"
 
-#: xrc/DisplayConfig.xrc:33
+#: xrc/DisplayConfig.xrc:34
 msgid "Simple"
 msgstr "기본"
 
-#: xrc/DisplayConfig.xrc:65
+#: xrc/DisplayConfig.xrc:66
 msgid "Filters"
 msgstr "필터"
 
-#: xrc/DisplayConfig.xrc:79
+#: xrc/DisplayConfig.xrc:80
 msgid "Display filter:"
 msgstr "필터 표시:"
 
-#: xrc/DisplayConfig.xrc:87
+#: xrc/DisplayConfig.xrc:88
 msgid "Super 2xSaI"
 msgstr "Super 2xSaI"
 
-#: xrc/DisplayConfig.xrc:88
+#: xrc/DisplayConfig.xrc:89
 msgid "Super Eagle"
 msgstr "Super Eagle"
 
-#: xrc/DisplayConfig.xrc:89
+#: xrc/DisplayConfig.xrc:90
 msgid "Pixelate"
 msgstr "픽셀화"
 
-#: xrc/DisplayConfig.xrc:90
+#: xrc/DisplayConfig.xrc:91
 msgid "Advance MAME Scale 2x"
 msgstr "고급 MAME 스케일 2x"
 
-#: xrc/DisplayConfig.xrc:91
+#: xrc/DisplayConfig.xrc:92
 msgid "Bilinear"
 msgstr "격자 필터"
 
-#: xrc/DisplayConfig.xrc:92
+#: xrc/DisplayConfig.xrc:93
 msgid "Bilinear Plus"
 msgstr "격자+ 필터"
 
-#: xrc/DisplayConfig.xrc:93
+#: xrc/DisplayConfig.xrc:94
 msgid "Scanlines"
 msgstr "스캔라인"
 
-#: xrc/DisplayConfig.xrc:94
+#: xrc/DisplayConfig.xrc:95
 msgid "TV Mode"
 msgstr "TV 모드"
 
-#: xrc/DisplayConfig.xrc:97
+#: xrc/DisplayConfig.xrc:98
 msgid "Simple 2x"
 msgstr "단순 2배율"
 
-#: xrc/DisplayConfig.xrc:98
+#: xrc/DisplayConfig.xrc:99
 msgid "Simple 3x"
 msgstr "단순 3배율"
 
-#: xrc/DisplayConfig.xrc:100
+#: xrc/DisplayConfig.xrc:101
 msgid "Simple 4x"
 msgstr "단순 4배율"
 
-#: xrc/DisplayConfig.xrc:115
+#: xrc/DisplayConfig.xrc:116
 msgid "Plugin:"
 msgstr "플러그인:"
 
-#: xrc/DisplayConfig.xrc:127
+#: xrc/DisplayConfig.xrc:128
 msgid "Interframe blending:"
 msgstr "프레임 간 블렌딩:"
 
-#: xrc/DisplayConfig.xrc:136
+#: xrc/DisplayConfig.xrc:137
 msgid "Smart"
 msgstr "스마트"
 
-#: xrc/DisplayConfig.xrc:137
+#: xrc/DisplayConfig.xrc:138
 msgid "Motion Blur"
 msgstr "모션 블러"
 
-#: xrc/DisplayConfig.xrc:151 xrc/SoundConfig.xrc:91
+#: xrc/DisplayConfig.xrc:152 xrc/SoundConfig.xrc:93
 msgid "Basic"
 msgstr "기본"
 
-#: xrc/DisplayConfig.xrc:159
+#: xrc/DisplayConfig.xrc:160
 msgid "Frame Skip"
 msgstr "프레임 생략"
 
-#: xrc/DisplayConfig.xrc:177
+#: xrc/DisplayConfig.xrc:178
 msgid "&Number of frames to skip:"
 msgstr "건너뛸 프레임 수(&N):"
 
-#: xrc/DisplayConfig.xrc:199
+#: xrc/DisplayConfig.xrc:200
 msgid "Speed"
 msgstr "속도"
 
-#: xrc/DisplayConfig.xrc:215
+#: xrc/DisplayConfig.xrc:216
 msgid "Speed indicator:"
 msgstr "속도 표시기:"
 
-#: xrc/DisplayConfig.xrc:222
+#: xrc/DisplayConfig.xrc:223
 msgid "Percentage"
 msgstr "백분율 표기"
 
-#: xrc/DisplayConfig.xrc:223
+#: xrc/DisplayConfig.xrc:224
 msgid "Detailed"
 msgstr "상세 표기"
 
-#: xrc/DisplayConfig.xrc:237
+#: xrc/DisplayConfig.xrc:238
 msgid "On-Screen Display"
 msgstr "화면에 표시"
 
-#: xrc/DisplayConfig.xrc:247
+#: xrc/DisplayConfig.xrc:248
 msgid "Default magnification:"
 msgstr "기본 배율:"
 
-#: xrc/DisplayConfig.xrc:266
+#: xrc/DisplayConfig.xrc:267
 msgid "Maximum magnification factor:"
 msgstr "최대 배율 계수:"
 
-#: xrc/DisplayConfig.xrc:267
+#: xrc/DisplayConfig.xrc:268
 msgid "0 = no maximum"
 msgstr "0 = 최대치 없음"
 
-#: xrc/DisplayConfig.xrc:275
+#: xrc/DisplayConfig.xrc:276
 msgid "0 = no limit"
 msgstr "0 = 제한 없음"
 
-#: xrc/DisplayConfig.xrc:285
+#: xrc/DisplayConfig.xrc:286
 msgid "Zoom"
 msgstr "화면 배율"
 
@@ -3547,23 +3547,31 @@ msgstr "불러오기(&L)..."
 msgid "Start Network Link"
 msgstr "네트워크 연결 시작"
 
-#: xrc/NetLink.xrc:11
+#: xrc/NetLink.xrc:13
+msgid "WARNING: Link will likely not work over the internet or LAN."
+msgstr ""
+
+#: xrc/NetLink.xrc:38
 msgid "Server"
 msgstr "중앙 서버"
 
-#: xrc/NetLink.xrc:19
+#: xrc/NetLink.xrc:47
 msgid "Client"
 msgstr "객체 서버"
 
-#: xrc/NetLink.xrc:32
+#: xrc/NetLink.xrc:66
 msgid "Players:"
 msgstr "사용자 수:"
 
-#: xrc/NetLink.xrc:67
+#: xrc/NetLink.xrc:83
+msgid "2"
+msgstr ""
+
+#: xrc/NetLink.xrc:107
 msgid "Server:"
 msgstr "서버:"
 
-#: xrc/NetLink.xrc:81
+#: xrc/NetLink.xrc:124
 msgid "Port:"
 msgstr "포트:"
 
@@ -3587,83 +3595,83 @@ msgstr "배경색 변경(&H)..."
 msgid "Sound Settings"
 msgstr "음향 설정"
 
-#: xrc/SoundConfig.xrc:16
+#: xrc/SoundConfig.xrc:18
 msgid "Volume:"
 msgstr "볼륨:"
 
-#: xrc/SoundConfig.xrc:34
+#: xrc/SoundConfig.xrc:36
 msgid "Mute"
 msgstr "음소거"
 
-#: xrc/SoundConfig.xrc:54 xrc/SoundConfig.xrc:320
+#: xrc/SoundConfig.xrc:56 xrc/SoundConfig.xrc:322
 msgid "Maximum"
 msgstr "최대"
 
-#: xrc/SoundConfig.xrc:71
+#: xrc/SoundConfig.xrc:73
 msgid "Sample rate:"
 msgstr "샘플 레이트:"
 
-#: xrc/SoundConfig.xrc:77
+#: xrc/SoundConfig.xrc:79
 msgid "48 KHz"
 msgstr "48 KHz"
 
-#: xrc/SoundConfig.xrc:78
+#: xrc/SoundConfig.xrc:80
 msgid "44.1 KHz"
 msgstr "44.1 KHz"
 
-#: xrc/SoundConfig.xrc:79
+#: xrc/SoundConfig.xrc:81
 msgid "22 KHz"
 msgstr "22 KHz"
 
-#: xrc/SoundConfig.xrc:80
+#: xrc/SoundConfig.xrc:82
 msgid "11 KHz"
 msgstr "11 KHz"
 
-#: xrc/SoundConfig.xrc:118
+#: xrc/SoundConfig.xrc:120
 msgid "Direct Sound"
 msgstr "다이렉트 사운드"
 
-#: xrc/SoundConfig.xrc:146
+#: xrc/SoundConfig.xrc:148
 msgid "Device"
 msgstr "장치"
 
-#: xrc/SoundConfig.xrc:154
+#: xrc/SoundConfig.xrc:156
 msgid "Enable stereo upmixing"
 msgstr "스테레오 업믹싱 사용"
 
-#: xrc/SoundConfig.xrc:161
+#: xrc/SoundConfig.xrc:163
 msgid "Enable hardware acceleration"
 msgstr "하드웨어 가속 사용"
 
-#: xrc/SoundConfig.xrc:190
+#: xrc/SoundConfig.xrc:192
 msgid "Number of sound buffers:"
 msgstr "사운드 버퍼 수:"
 
-#: xrc/SoundConfig.xrc:198
+#: xrc/SoundConfig.xrc:200
 msgid "Advanced"
 msgstr "고급"
 
-#: xrc/SoundConfig.xrc:230
+#: xrc/SoundConfig.xrc:232
 msgid "Lots"
 msgstr "많이"
 
-#: xrc/SoundConfig.xrc:239
+#: xrc/SoundConfig.xrc:241
 msgid "Echo"
 msgstr "소리 울림(에코)"
 
-#: xrc/SoundConfig.xrc:247
+#: xrc/SoundConfig.xrc:249
 msgid "Stereo"
 msgstr "스테레오"
 
-#: xrc/SoundConfig.xrc:258
+#: xrc/SoundConfig.xrc:260
 msgid "Center"
 msgstr "중앙"
 
-#: xrc/SoundConfig.xrc:269
+#: xrc/SoundConfig.xrc:271
 msgid "Left / Right"
 msgstr "왼쪽 / 오른쪽"
 
-#: xrc/SoundConfig.xrc:298
+#: xrc/SoundConfig.xrc:300
 msgid "Sound filtering"
 msgstr "음향 필터링"
 
