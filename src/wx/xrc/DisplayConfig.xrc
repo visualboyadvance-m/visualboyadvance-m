@@ -5,6 +5,7 @@
     <object class="wxBoxSizer">
     <orient>wxVERTICAL</orient>
     <object class="sizeritem">
+    <flag>wxALL|wxEXPAND</flag>
     <object class="wxNotebook">
     <object class="notebookpage">
       <object class="wxPanel">
@@ -285,6 +286,7 @@
       <label>Zoom</label>
     </object>
   </object>
+  <option>1</option>
   </object>
       <object class="sizeritem">
         <flag>wxALL|wxEXPAND</flag>

@@ -5,7 +5,9 @@
     <object class="wxBoxSizer">
     <orient>wxVERTICAL</orient>
     <object class="sizeritem">
+    <flag>wxEXPAND|wxALL</flag>
     <object class="wxNotebook">
+    <flag>wxEXPAND|wxALL</flag>
     <object class="notebookpage">
       <object class="wxPanel">
         <object class="wxFlexGridSizer">
@@ -335,6 +337,7 @@
       <label translate="0">Game Boy Advance</label>
     </object>
   </object>
+  <option>1</option>
   </object>
       <object class="sizeritem">
         <flag>wxALL|wxEXPAND</flag>
