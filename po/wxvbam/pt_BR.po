@@ -3573,7 +3573,7 @@ msgstr "Iniciar o Link da Rede"
 
 #: xrc/NetLink.xrc:13
 msgid "WARNING: Link will likely not work over the internet or LAN."
-msgstr ""
+msgstr "AVISO: O link provavelmente não funcionará na Internet ou na LAN."
 
 #: xrc/NetLink.xrc:38
 msgid "Server"
@@ -3589,7 +3589,7 @@ msgstr "Jogadores:"
 
 #: xrc/NetLink.xrc:83
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: xrc/NetLink.xrc:107
 msgid "Server:"

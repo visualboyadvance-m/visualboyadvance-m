@@ -5,14 +5,14 @@
 # Translators:
 # wong marvin, 2022
 # 毅 任, 2022
-# 陈 依云 <c1998lf@qq.com>, 2023
+# 陈 依云 <c1998lf@qq.com>, 2023-2024
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-15 14:15-0500\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: 陈 依云 <c1998lf@qq.com>, 2023\n"
+"Last-Translator: 陈 依云 <c1998lf@qq.com>, 2023-2024\n"
 "Language-Team: Chinese (http://app.transifex.com/bgk/vba-m/language/zh/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3547,7 +3547,7 @@ msgstr "Start Network Link"
 
 #: xrc/NetLink.xrc:13
 msgid "WARNING: Link will likely not work over the internet or LAN."
-msgstr ""
+msgstr "WARNING: Link will likely not work over the internet or LAN."
 
 #: xrc/NetLink.xrc:38
 msgid "Server"
@@ -3563,7 +3563,7 @@ msgstr "Players:"
 
 #: xrc/NetLink.xrc:83
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: xrc/NetLink.xrc:107
 msgid "Server:"
