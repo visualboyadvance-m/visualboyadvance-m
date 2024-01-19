@@ -3546,7 +3546,7 @@ msgstr "Розпочати мережеве з'єднання"
 
 #: xrc/NetLink.xrc:13
 msgid "WARNING: Link will likely not work over the internet or LAN."
-msgstr ""
+msgstr "УВАГА: посилання, ймовірно, не працюватиме через Інтернет або локальну мережу."
 
 #: xrc/NetLink.xrc:38
 msgid "Server"
@@ -3562,7 +3562,7 @@ msgstr "Гравці:"
 
 #: xrc/NetLink.xrc:83
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: xrc/NetLink.xrc:107
 msgid "Server:"
