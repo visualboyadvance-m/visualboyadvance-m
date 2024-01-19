@@ -18,6 +18,7 @@
 #include <cmath>
 #include <iostream>
 #include <SDL_events.h>
+#include <samplerate.h>
 #include "SoundSDL.h"
 #include "../gba/Globals.h"
 #include "../gba/Sound.h"
@@ -83,35 +84,58 @@ void SoundSDL::write(uint16_t * finalWave, int length) {
     SDL_LockMutex(mutex);
 
     if (SDL_GetAudioDeviceStatus(sound_device) != SDL_AUDIO_PLAYING)
-	SDL_PauseAudioDevice(sound_device, 0);
+        SDL_PauseAudioDevice(sound_device, 0);
 
     std::size_t samples = length / 4;
     std::size_t avail;
 
+    // Create a new SRC_STATE object for the resampling
+    int error;
+    SRC_STATE* src_state = src_new(SRC_SINC_FASTEST, 2, &error);
+    if (!src_state) {
+        // Handle the error
+    }
+
+    // Set up the SRC_DATA struct
+    SRC_DATA src_data;
+    src_data.data_in = finalWave;
+    src_data.input_frames = length / 2;
+    src_data.data_out = finalWave;
+    src_data.output_frames = length / 2;
+    src_data.src_ratio = (double)desired_sample_rate / current_sample_rate;
+
+    // Perform the resampling
+    error = src_process(src_state, &src_data);
+    if (error) {
+        // Handle the error
+    }
+
+    // Clean up
+    src_delete(src_state);
+
     while ((avail = samples_buf.avail() / 2) < samples) {
-	samples_buf.write(finalWave, avail * 2);
+        samples_buf.write(finalWave, avail * 2);
 
-	finalWave += avail * 2;
-	samples -= avail;
+        finalWave += avail * 2;
+        samples -= avail;
 
-	SDL_UnlockMutex(mutex);
+        SDL_UnlockMutex(mutex);
 
-	SDL_SemPost(data_available);
+        SDL_SemPost(data_available);
 
-	if (should_wait())
-	    SDL_SemWait(data_read);
-	else
-	    // Drop the remainder of the audio data
-	    return;
+        if (should_wait())
+            SDL_SemWait(data_read);
+        else
+            // Drop the remainder of the audio data
+            return;
 
-	SDL_LockMutex(mutex);
+        SDL_LockMutex(mutex);
     }
 
     samples_buf.write(finalWave, samples * 2);
 
     SDL_UnlockMutex(mutex);
 }
-
 
 bool SoundSDL::init(long sampleRate) {
     if (initialized) deinit();
