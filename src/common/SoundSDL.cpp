@@ -77,7 +77,7 @@ void SoundSDL::read(uint16_t* stream, int length) {
     SDL_SemPost(data_read);
 }
 
-void SoundSDL::write(uint16_t * finalWave, int length) {
+void SoundSDL::write(uint16_t* finalWave, int length) {
     if (!initialized)
         return;
 
@@ -96,13 +96,19 @@ void SoundSDL::write(uint16_t * finalWave, int length) {
         // Handle the error
     }
 
+    // Convert your uint16_t* data to float*
+    float* finalWaveFloat = new float[length];
+    for (int i = 0; i < length; i++) {
+        finalWaveFloat[i] = (float)finalWave[i];
+    }
+
     // Set up the SRC_DATA struct
     SRC_DATA src_data;
-    src_data.data_in = finalWave;
+    src_data.data_in = finalWaveFloat;
     src_data.input_frames = length / 2;
-    src_data.data_out = finalWave;
+    src_data.data_out = finalWaveFloat;
     src_data.output_frames = length / 2;
-    src_data.src_ratio = (double)desired_sample_rate / current_sample_rate;
+    src_data.src_ratio = 1.0;  // since desired_sample_rate matches current_sample_rate
 
     // Perform the resampling
     error = src_process(src_state, &src_data);
@@ -135,6 +141,9 @@ void SoundSDL::write(uint16_t * finalWave, int length) {
     samples_buf.write(finalWave, samples * 2);
 
     SDL_UnlockMutex(mutex);
+
+    // Clean up
+    delete[] finalWaveFloat;
 }
 
 bool SoundSDL::init(long sampleRate) {
