@@ -339,34 +339,34 @@ recording::MediaRet recording::MediaRecorder::Record(const char *fname, int widt
     ret = setup_common(fname);
     if (ret != MRET_OK)
     {
-        Stop();
+        Stop(false);
         return ret;
     }
     // video stream
     ret = setup_video_stream_info(width, height, depth);
     if (ret != MRET_OK)
     {
-        Stop();
+        Stop(false);
         return ret;
     }
     ret = setup_video_stream(width, height);
     if (ret != MRET_OK)
     {
-        Stop();
+        Stop(false);
         return ret;
     }
     // audio stream
     ret = setup_audio_stream();
     if (ret != MRET_OK)
     {
-        Stop();
+        Stop(false);
         return ret;
     }
     // last details
     ret = finish_setup(fname);
     if (ret != MRET_OK)
     {
-        Stop();
+        Stop(false);
         return ret;
     }
     return MRET_OK;
@@ -409,12 +409,12 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint8_t *vid)
     return MRET_OK;
 }
 
-void recording::MediaRecorder::Stop()
+void recording::MediaRecorder::Stop(bool initSuccess)
 {
     if (oc)
     {
         // write the trailer; must be called before av_codec_close()
-        if (!audioOnlyRecording)
+        if (initSuccess) // only call av_write_trailer() if initialization went ok
             av_write_trailer(oc);
     }
     isRecording = false;
@@ -521,21 +521,21 @@ recording::MediaRet recording::MediaRecorder::Record(const char *fname)
     ret = setup_common(fname);
     if (ret != MRET_OK)
     {
-        Stop();
+        Stop(false);
         return ret;
     }
     // audio stream
     ret = setup_audio_stream();
     if (ret != MRET_OK)
     {
-        Stop();
+        Stop(false);
         return ret;
     }
     // last details
     ret = finish_setup(fname);
     if (ret != MRET_OK)
     {
-        Stop();
+        Stop(false);
         return ret;
     }
     return MRET_OK;
