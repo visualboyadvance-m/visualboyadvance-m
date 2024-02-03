@@ -152,7 +152,7 @@ And the following development libraries:
 - [gettext](https://www.gnu.org/software/gettext/) and gettext-tools (optional, with ENABLE_NLS)
 - [SDL2](https://www.libsdl.org/) (required)
 - [SFML](https://www.sfml-dev.org/) (optional, for link)
-- [OpenAL](https://www.openal.org/) or [openal-soft](https://kcat.strangesoft.net/openal.html) (optional, a sound interface)
+- [OpenAL](https://www.openal.org/) or [openal-soft](https://kcat.strangesoft.net/openal.html) (required, a sound interface)
 - [wxWidgets](https://wxwidgets.org/) (required for GUI, 2.8 and non-stl builds are no longer supported)
 
 On Linux and similar, you also need the version of GTK your wxWidgets is linked

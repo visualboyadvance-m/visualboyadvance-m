@@ -31,29 +31,15 @@ endif()
 
 option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" OFF)
 
-find_package(OpenAL)
+find_package(OpenAL REQUIRED)
 
-if(OPENAL_FOUND)
-	set(ENABLE_OPENAL_DEFAULT ON)
-else()
-	set(ENABLE_OPENAL_DEFAULT OFF)
+include_directories(${OPENAL_INCLUDE_DIR})
+
+if(OPENAL_STATIC OR (WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)))
+    add_definitions(-DAL_LIBTYPE_STATIC)
 endif()
 
-option(ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" ${ENABLE_OPENAL_DEFAULT})
-
-if(ENABLE_OPENAL)
-	find_package(OpenAL REQUIRED)
-
-	include_directories(${OPENAL_INCLUDE_DIR})
-
-	if(OPENAL_STATIC OR (WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)))
-		add_definitions(-DAL_LIBTYPE_STATIC)
-	endif()
-
-        list(APPEND VBAM_LIBS ${OPENAL_LIBRARY})
-else()
-    add_definitions(-DNO_OAL)
-endif()
+list(APPEND VBAM_LIBS ${OPENAL_LIBRARY})
 
 if(APPLE)
     add_definitions(-DwxMAC_USE_CORE_GRAPHICS)
@@ -910,10 +896,8 @@ set(
 list(APPEND ALL_SRC_WX openal.cpp)
 list(APPEND ALL_HDR_WX openal.h)
 
-if(ENABLE_OPENAL)
-   list(APPEND SRC_WX openal.cpp)
-   list(APPEND HDR_WX openal.h)
-endif()
+list(APPEND SRC_WX openal.cpp)
+list(APPEND HDR_WX openal.h)
 
 list(APPEND ALL_SRC_WX xaudio2.cpp)
 

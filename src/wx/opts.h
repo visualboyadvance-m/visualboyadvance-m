@@ -9,7 +9,7 @@
 #include "config/game-control.h"
 #include "config/shortcuts.h"
 #include "config/user-input.h"
-#include "wxutil.h"
+#include "wxhead.h"
 
 // Forward declaration.
 class wxFileHistory;
@@ -52,7 +52,11 @@ extern struct opts_t {
     int max_scale = 0;
 
     /// Sound
-    int audio_api = 0;
+#ifdef __WXMSW__
+    int audio_api = AUD_XAUDIO2;
+#else
+    int audio_api = AUD_OPENAL;
+#endif
     // 10 fixes stuttering on mac with openal, as opposed to 5
     // also should be better for modern hardware in general
     int audio_buffers = 10;
