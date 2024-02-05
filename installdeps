@@ -1024,7 +1024,7 @@ solus_installdeps() {
     check sudo eopkg -y install -c system.devel
     check sudo eopkg -y install git ccache ninja
 
-    set -- sdl2-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel
+    set -- sdl2-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel libglu-devel
 
     [ -n "$ENABLE_OPENAL" ] && set -- "$@" openal-soft-devel
 
