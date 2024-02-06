@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application>
  <id type="desktop">visualboyadvance-m.desktop</id>
- <developer id="vba-m.com">
+ <developer id="visualboyadvance-m.org">
    <name>VisualBoyAdvance-M</name>
  </developer>
  <metadata_license>CC-BY-SA-3.0</metadata_license>
@@ -20,15 +20,15 @@
   </p>
  </description>
  <screenshots>
-  <screenshot type="default">https://vba-m.com/screenshots/1.png</screenshot>
-  <screenshot>https://vba-m.com/screenshots/2.png</screenshot>
-  <screenshot>https://vba-m.com/screenshots/3.png</screenshot>
-  <screenshot>https://vba-m.com/screenshots/4.png</screenshot>
+  <screenshot type="default">https://visualboyadvance-m.org/screenshots/1.png</screenshot>
+  <screenshot>https://visualboyadvance-m.org/screenshots/2.png</screenshot>
+  <screenshot>https://visualboyadvance-m.org/screenshots/3.png</screenshot>
+  <screenshot>https://visualboyadvance-m.org/screenshots/4.png</screenshot>
  </screenshots>
  <releases>
-   <release version="2.1.8" date="2023-12-14"/>
+   <release version="2.1.9" date="2024-02-03"/>
  </releases>
- <url type="homepage">http://vba-m.com/</url>
+ <url type="homepage">http://visualboyadvance-m.org/</url>
  <url type="bugtracker">https://github.com/visualboyadvance-m/visualboyadvance-m/issues</url>
- <updatecontact>zachbacon@vba-m.com</updatecontact>
+ <updatecontact>zachbacon@visualboyadvance-m.org</updatecontact>
 </application>

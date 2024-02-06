@@ -37,11 +37,11 @@ Chat](https://web.libera.chat/).
 
 Game Boy and Game Boy Advance Emulator
 
-The forums are [here](https://board.vba-m.com/).
+The forums are [here](https://board.visualboyadvance-m.org/).
 
 Windows and Mac builds are in the [releases tab](https://github.com/visualboyadvance-m/visualboyadvance-m/releases).
 
-Nightly builds for Windows and macOS are at [https://nightly.vba-m.com/](https://nightly.vba-m.com/).
+Nightly builds for Windows and macOS are at [https://nightly.visualboyadvance-m.org/](https://nightly.visualboyadvance-m.org/).
 
 **PLEASE TEST THE NIGHTLY OR MASTER WITH A FACTORY RESET BEFORE REPORTING
 ISSUES**

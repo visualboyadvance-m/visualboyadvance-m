@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [2.1.9] - 2024-03-02
+## [2.1.9] - 2024-02-03
 =======================
 * 84b0a3e3 - Remove SDL sound driver [rkitover]
 * 2ad7dd1a - Fix wav audio recording [40356555+Aikku93]
