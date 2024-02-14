@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop">
- <id>org.visualboyadvance.visualboyadvance_m</id>
+ <id>org.visualboyadvance_m.visualboyadvance-m</id>
  <metadata_license>CC-BY-SA-3.0</metadata_license>
  <project_license>GPL-2.0</project_license>
  <content_rating type="oars-1.1"/>
@@ -17,17 +17,16 @@
   </p>
  </description>
  <screenshots>
-     <screenshot type="default"><image type="source">https://i0.wp.com/visualboyadvance.org/wp-content/uploads/2023/01/visual-boy-advance-installed.webp</image></screenshot>
-     <screenshot><image type="source">https://i0.wp.com/visualboyadvance.org/wp-content/uploads/2023/01/visualboyadvance-ubuntu-software-store.webp</image></screenshot>
-     <screenshot><image type="source">https://i0.wp.com/visualboyadvance.org/wp-content/uploads/2023/01/screen-filters-vba.webp</image></screenshot>
-     <screenshot><image type="source">https://i0.wp.com/visualboyadvance.org/wp-content/uploads/2023/01/enable-cheats-on-visual-boy-advance.png</image></screenshot>
-     <screenshot><image type="source">https://i0.wp.com/visualboyadvance.org/wp-content/uploads/2023/01/visualboyadvance-on-android.webp</image></screenshot>
+     <screenshot type="default"><image type="source">https://visualboyadvance-m.org/screenshots/1.png</image></screenshot>
+     <screenshot><image type="source">https://visualboyadvance-m.org/screenshots/2.png</image></screenshot>
+     <screenshot><image type="source">https://visualboyadvance-m.org/screenshots/3.png</image></screenshot>
+     <screenshot><image type="source">https://visualboyadvance-m.org/screenshots/4.png</image></screenshot>
  </screenshots>
  <launchable type="desktop-id">visualboyadvance-m.desktop</launchable>
  <releases>
-   <release version="2.1.8" date="2023-12-14"/>
+   <release version="2.1.9" date="2024-02-03"/>
  </releases>
- <url type="homepage">https://visualboyadvance.org</url>
+ <url type="homepage">https://visualboyadvance-m.org</url>
  <url type="bugtracker">https://github.com/visualboyadvance-m/visualboyadvance-m/issues</url>
  <update_contact>zachbacon@visualboyadvance-m.org</update_contact>
 </component>
