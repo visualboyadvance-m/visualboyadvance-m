@@ -278,9 +278,9 @@ function(get_binary_packages vcpkg_exe)
     endif()
 
     if(WIN32)
-        set(powershell powershell)
+        find_program(powershell powershell.exe HINTS "/Windows/System32/WindowsPowerShell/v1.0" REQUIRED)
     else()
-        set(powershell pwsh)
+        find_program(powershell pwsh REQUIRED)
     endif()
 
     unset(to_install)

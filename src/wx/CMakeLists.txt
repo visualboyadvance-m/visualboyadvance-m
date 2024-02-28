@@ -94,6 +94,17 @@ if (WIN32)
     add_definitions(-D_UNICODE -DUNICODE -DwxUSE_GUI=1 -D__WXMSW__ -DWINVER=0x0A00 -DNTDDI_VERSION=0x0A000007)
 endif()
 
+if(CMAKE_HOST_WIN32)
+    find_program(POWERSHELL powershell.exe HINTS "/Windows/System32/WindowsPowerShell/v1.0" REQUIRED)
+else()
+    find_program(POWERSHELL pwsh)
+endif()
+
+find_program(ZIP_PROGRAM zip)
+if(ZIP_PROGRAM)
+    set(ZIP_PROGRAM "${ZIP_PROGRAM}" CACHE STRING "zip compressor executable" FORCE)
+endif()
+
 # on VS with vcpkg we can't use FindwxWidgets, we have to set everything up
 # manually because the package is broken
 if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
@@ -180,12 +191,12 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
 
     set(ENV{PATH} "${dbg_prefix}/bin;${common_prefix}/bin;$ENV{PATH}")
 
-    if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/zip.exe)
+    if(NOT ZIP_PROGRAM AND NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/zip.exe)
         # get zip binary for wxrc
         file(DOWNLOAD "https://www.willus.com/archive/zip64/infozip_binaries_win32.zip" ${CMAKE_CURRENT_BINARY_DIR}/infozip_binaries_win32.zip)
         # unzip it
         execute_process(
-            COMMAND powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('${CMAKE_CURRENT_BINARY_DIR}/infozip_binaries_win32.zip', '${CMAKE_CURRENT_BINARY_DIR}'); }"
+            COMMAND "${POWERSHELL}" -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('${CMAKE_CURRENT_BINARY_DIR}/infozip_binaries_win32.zip', '${CMAKE_CURRENT_BINARY_DIR}'); }"
         )
 
         set(ZIP_PROGRAM ${CMAKE_CURRENT_BINARY_DIR}/zip.exe CACHE STRING "zip compressor executable" FORCE)
@@ -592,10 +603,12 @@ include_directories(widgets)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-find_program(ZIP_PROGRAM zip DOC "zip compressor executable")
-
 if(NOT ZIP_PROGRAM)
-    message(FATAL_ERROR "The zip compressor program is required for building.")
+    find_program(ZIP_PROGRAM zip DOC "zip compressor executable")
+
+    if(NOT ZIP_PROGRAM)
+        message(FATAL_ERROR "The zip compressor program is required for building.")
+    endif()
 endif()
 
 set(
