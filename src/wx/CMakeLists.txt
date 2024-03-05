@@ -652,7 +652,6 @@ set(
     xrc/SoundConfig.xrc
     xrc/TileViewer.xrc
     xrc/SpeedupConfig.xrc
-    xrc/UIConfig.xrc
 )
 
 # wxrc does not support xrs files in -c output (> 10x compression)

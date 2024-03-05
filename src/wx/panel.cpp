@@ -1900,14 +1900,14 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
     // draw OSD text old-style (directly into output buffer), if needed
     // new style flickers too much, so we'll stick to this for now
-    if (wxGetApp().frame->IsFullScreen() || !OPTION(kGenStatusBar)) {
+    if (wxGetApp().frame->IsFullScreen() || !OPTION(kPrefDisableStatus)) {
         GameArea* panel = wxGetApp().frame->GetPanel();
 
         if (panel->osdstat.size())
             drawText(todraw + outstride * (systemColorDepth != 24), outstride,
                 10, 20, UTF8(panel->osdstat), OPTION(kPrefShowSpeedTransparent));
 
-        if (!OPTION(kPrefDisableStatus) && !panel->osdtext.empty()) {
+        if (!panel->osdtext.empty()) {
             if (systemGetClock() - panel->osdtime < OSD_TIME) {
                 wxString message = panel->osdtext;
                 int linelen = std::ceil(width * scale - 20) / 8;

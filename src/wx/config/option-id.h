@@ -54,7 +54,6 @@ enum class OptionID {
     kGenRewindInterval,
     kGenScreenshotDir,
     kGenStateDir,
-    kGenStatusBar,
     kGenIniVersion,
 
     /// Joypad
@@ -112,6 +111,7 @@ enum class OptionID {
     kGeomWindowY,
 
     /// UI
+    kUIEnableStatusBar,
     kUIAllowKeyboardBackgroundInput,
     kUIAllowJoystickBackgroundInput,
     kUIHideMenuBar,

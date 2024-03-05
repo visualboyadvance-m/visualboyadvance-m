@@ -368,10 +368,6 @@
           <checkable>1</checkable>
         </object>
         <object class="separator"/>
-        <object class="wxMenuItem" name="StatusBar">
-          <label>_Status bar</label>
-          <checkable>1</checkable>
-        </object>
         <object class="wxMenuItem" name="NoStatusMsg">
           <label>_Disable on-screen display</label>
           <checkable>1</checkable>
@@ -569,8 +565,20 @@
         <object class="wxMenuItem" name="Customize">
           <label>_Key Shortcuts...</label>
         </object>
-        <object class="wxMenuItem" name="UIConfigure">
-          <label>_UI Settings...</label>
+        <object class="wxMenu" name="UIConfigure">
+          <label>UI Settings</label>
+					<object class="wxMenuItem" name="EnableStatusBar">
+							<label>Enable _Status bar</label>
+							<checkable>1</checkable>
+					</object>
+					<object class="wxMenuItem" name="HideMenuBar">
+							<label>Hide _Menu Bar</label>
+							<checkable>1</checkable>
+					</object>
+					<object class="wxMenuItem" name="SuspendScreenSaver">
+							<label>Suspend _Screen Saver</label>
+							<checkable>1</checkable>
+					</object>
         </object>
     </object>
     <object class="wxMenu">

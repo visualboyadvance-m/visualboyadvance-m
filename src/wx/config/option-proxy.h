@@ -58,7 +58,6 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /*kGenRewindInterval*/ Option::Type::kInt,
     /*kGenScreenshotDir*/ Option::Type::kString,
     /*kGenStateDir*/ Option::Type::kString,
-    /*kGenStatusBar*/ Option::Type::kBool,
     /*kGenIniVersion*/ Option::Type::kUnsigned,
 
     /// Joypad
@@ -116,6 +115,7 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /*kGeomWindowY*/ Option::Type::kInt,
 
     /// UI
+    /*kUIEnableStatusBar*/ Option::Type::kBool,
     /*kUIAllowKeyboardBackgroundInput*/ Option::Type::kBool,
     /*kUIAllowJoystickBackgroundInput*/ Option::Type::kBool,
     /*kUIHideMenuBar*/ Option::Type::kBool,
