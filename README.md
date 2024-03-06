@@ -26,7 +26,6 @@ Our bridged Discord server is [Here](https://discord.gg/EpfxEuGMKH).
 We are also on *`#vba-m`* on [Libera IRC](https://libera.chat/) which has a [Web
 Chat](https://web.libera.chat/).
 
-[![Get it from flathub](https://dl.flathub.org/assets/badges/flathub-badge-en.svg)](https://flathub.org/apps/com.vba_m.visualboyadvance-m)
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/visualboyadvance-m)
 
 ***Want to know where you can install visualboyadvance-m in your linux distribution?***
@@ -43,7 +42,7 @@ Windows and Mac builds are in the [releases tab](https://github.com/visualboyadv
 
 Nightly builds for Windows and macOS are at [https://nightly.vba-m.com/](https://nightly.vba-m.com/).
 
-**PLEASE TEST THE NIGHTLY OR MASTER WITH A FACTORY RESET BEFORE REPORTING
+**PLESE TEST THE NIGHTLY OR MASTER WITH A FACTORY RESET BEFORE REPORTING
 ISSUES**
 
 Your distribution may have packages available as well, search for
@@ -118,21 +117,34 @@ ninja
 
 ## Visual Studio Code Support
 
-Make sure the
-[C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
-and [CMake
-Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)
-extensions are installed.
+On most platforms, Visual Studio Code should work as-is, as long as the
+[CMake Tools extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)
+is installed.
 
-Add the following to your `settings.json`:
+There is a recommended configuration in the `vscode/settings.json` file. To use
+it, copy the file to a `.vscode/` folder.
 
-```json
-{
-    "cmake.configureOnOpen": true,
-    "cmake.preferredGenerators": [ "Ninja" ]
-}
+By default, this will publish builds in the `build-vscode/` directory. In the
+`vscode/settings.json` file, there is an alternate configuration for the
+`"cmake.buildDirectory"` option that will use different build directories for
+different toolchains and build configurations.
+
+### Optional: clangd
+
+The [clangd extension](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd)
+uses clangd to provide powerful code completion, errors and warnings and
+references on click in VS Code.
+
+With the recommended configuration, the build configuration will generate a
+`compile_commands.json` file that can be used with clangd. After configuration,
+you can copy that file to the root directory with a command similar to this one:
+
+```shell
+cp build/build-vscode/compile_commands.json .
 ```
-.
+
+Then, select "clangd: Restart language server" from the command palette to get
+completion in the IDE.
 
 ## Dependencies
 
@@ -170,7 +182,7 @@ This is supported on Fedora, Arch, Solus and MSYS2.
 
 `./installdeps` takes one optional parameter for cross-compiling target, which
 may be `win32` which is an alias for `mingw-w64-i686` to target 32 bit Windows,
-or `mingw-w64-x86_64` for 64 bit Windows targets.
+or `mingw-gw64-x86_64` for 64 bit Windows targets.
 
 The target is implicit on MSys2 depending on which MINGW shell you started (the
 value of `$MSYSTEM`.)

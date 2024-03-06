@@ -2,162 +2,109 @@
 <resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
   <object class="wxDialog" name="NetLink">
     <title>Start Network Link</title>
-    <centered>1</centered>
-    <style>wxDEFAULT_DIALOG_STYLE</style>
     <object class="wxBoxSizer">
       <orient>wxVERTICAL</orient>
       <object class="sizeritem">
-        <flag>wxALL</flag>
-        <border>5</border>
-        <object class="wxStaticText" name="m_staticText1">
-          <label>WARNING: Link will likely not work over the internet or LAN.</label>
-          <style/>
-          <fg>#DC143C</fg>
-          <font>
-            <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
-            <style>normal</style>
-            <weight>bold</weight>
-            <underlined>0</underlined>
-          </font>
-          <wrap>200</wrap>
+        <object class="wxGridSizer">
+          <object class="sizeritem">
+            <object class="wxRadioButton" name="Server">
+              <label>Server</label>
+              <style>wxRB_GROUP</style>
+            </object>
+            <flag>wxALL|wxALIGN_CENTRE</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxRadioButton" name="Client">
+              <label>Client</label>
+            </object>
+            <flag>wxALL|wxALIGN_CENTRE</flag>
+            <border>5</border>
+          </object>
         </object>
-      </object>
-      <object class="sizeritem" name="gridSizer131">
         <flag>wxALL|wxEXPAND</flag>
         <border>5</border>
-        <object class="wxGridSizer">
-          <cols>2</cols>
-          <rows>0</rows>
-          <vgap>0</vgap>
-          <hgap>0</hgap>
-          <object class="sizeritem">
-            <flag>wxALL|wxALIGN_CENTER</flag>
-            <border>5</border>
-            <object class="wxRadioButton" name="Server">
-              <style>wxRB_GROUP</style>
-              <label>Server</label>
-              <value>1</value>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <flag>wxALL|wxALIGN_CENTER</flag>
-            <border>5</border>
-            <object class="wxRadioButton" name="Client">
-              <style/>
-              <label>Client</label>
-              <value>1</value>
-            </object>
-          </object>
-        </object>
-      </object>
-      <object class="sizeritem" name="flexGridSizer134">
-        <flag>wxEXPAND</flag>
-        <object class="wxFlexGridSizer">
-          <cols>2</cols>
-          <rows>0</rows>
-          <vgap>0</vgap>
-          <hgap>0</hgap>
-          <growablecols/>
-          <growablerows/>
-          <object class="sizeritem">
-            <flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
-            <border>5</border>
-            <object class="wxStaticText" name="PlayersLab">
-              <label>Players:</label>
-              <style/>
-            </object>
-          </object>
-          <object class="sizeritem" name="gridSizer136">
-            <flag>wxEXPAND</flag>
-            <object class="wxGridSizer">
-              <cols>3</cols>
-              <rows>0</rows>
-              <vgap>0</vgap>
-              <hgap>0</hgap>
-              <object class="sizeritem">
-                <flag>wxALL|wxALIGN_CENTER</flag>
-                <border>5</border>
-                <object class="wxRadioButton" name="Link2P">
-                  <label translate="0">2</label>
-                  <style>wxRB_GROUP</style>
-                  <label>2</label>
-                  <value>1</value>
-                </object>
-              </object>
-              <object class="sizeritem">
-                <flag>wxALL|wxALIGN_CENTER</flag>
-                <border>5</border>
-                <object class="wxRadioButton" name="Link3P">
-                  <label translate="0">3</label>
-                </object>
-              </object>
-              <object class="sizeritem">
-                <flag>wxALL|wxALIGN_CENTER</flag>
-                <border>5</border>
-                <object class="wxRadioButton" name="Link4P">
-                  <label translate="0">4</label>
-                </object>
-              </object>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
-            <border>5</border>
-            <object class="wxStaticText" name="ServerIPLab">
-              <label>Server:</label>
-              <style/>
-              <wrap>200</wrap>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
-            <option>1</option>
-            <object class="wxTextCtrl" name="ServerIP">
-              <style/>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
-            <border>5</border>
-            <object class="wxStaticText" name="ServerPortLab">
-              <label>Port:</label>
-              <style/>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
-            <option>1</option>
-            <object class="wxTextCtrl" name="ServerPort">
-              <style/>
-            </object>
-          </object>
-        </object>
       </object>
       <object class="sizeritem">
-        <flag>wxALL|wxEXPAND</flag>
-        <border>5</border>
-        <object class="wxStdDialogButtonSizer" name="m_stdBtnSizer143">
-          <object class="button">
-            <object class="wxButton" name="wxID_OK">
-              <label/>
-              <style/>
-              <bg/>
-              <fg/>
-              <default>0</default>
+        <object class="wxFlexGridSizer">
+          <object class="sizeritem">
+            <object class="wxStaticText" name="PlayersLab">
+              <label>Players:</label>
             </object>
+            <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
           </object>
-          <object class="button">
-            <object class="wxButton" name="wxID_CANCEL">
-              <label/>
-              <style/>
-              <bg/>
-              <fg/>
-              <default>0</default>
+          <object class="sizeritem">
+            <object class="wxGridSizer">
+              <object class="sizeritem">
+                <object class="wxRadioButton" name="Link2P">
+                  <label>2</label>
+                  <style>wxRB_GROUP</style>
+                </object>
+                <flag>wxALL|wxALIGN_CENTRE</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxRadioButton" name="Link3P">
+                  <label>3</label>
+                </object>
+                <flag>wxALL|wxALIGN_CENTRE</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxRadioButton" name="Link4P">
+                  <label>4</label>
+                </object>
+                <flag>wxALL|wxALIGN_CENTRE</flag>
+                <border>5</border>
+              </object>
+              <cols>3</cols>
             </object>
+            <flag>wxEXPAND</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText" name="ServerIPLab">
+              <label>Server:</label>
+              <wrap>200</wrap>
+            </object>
+            <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxTextCtrl" name="ServerIP"/>
+            <option>1</option>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText" name="ServerPortLab">
+              <label>Port:</label>
+            </object>
+            <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxTextCtrl" name="ServerPort"/>
+            <option>1</option>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
           </object>
         </object>
+        <flag>wxEXPAND</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStdDialogButtonSizer">
+          <object class="button">
+            <object class="wxButton" name="wxID_OK">
+              <label>Connect</label>
+            </object>
+          </object>
+          <object class="button">
+            <object class="wxButton" name="wxID_CANCEL"/>
+          </object>
+        </object>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
       </object>
     </object>
   </object>

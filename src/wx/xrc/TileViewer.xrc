@@ -12,13 +12,13 @@
                 <object class="wxStaticBoxSizer">
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="Color16">
-                      <label translate="0">1_6</label>
+                      <label>1_6</label>
                       <style>wxRB_GROUP</style>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="Color256">
-                      <label translate="0">_256</label>
+                      <label>_256</label>
                     </object>
                   </object>
                   <label>Colors</label>
@@ -31,28 +31,28 @@
                 <object class="wxStaticBoxSizer">
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="CharBase0">
-                      <label translate="0">0x600_0000</label>
+                      <label>0x600_0000</label>
                       <style>wxRB_GROUP</style>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="CharBase1">
-                      <label translate="0">0x600_4000</label>
+                      <label>0x600_4000</label>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="CharBase2">
-                      <label translate="0">0x600_8000</label>
+                      <label>0x600_8000</label>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="CharBase3">
-                      <label translate="0">0x600_C000</label>
+                      <label>0x600_C000</label>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="CharBase4">
-                      <label translate="0">0x60_10000</label>
+                      <label>0x60_10000</label>
                     </object>
                   </object>
                   <label>Char Base</label>

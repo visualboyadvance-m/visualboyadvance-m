@@ -775,7 +775,7 @@ ColorView::ColorView(wxWindow* parent, wxWindowID id)
         wxBORDER_SUNKEN);
     sz->Add(cp);
     wxGridSizer* gs = new wxGridSizer(2);
-    wxStaticText* lab = new wxStaticText(this, wxID_ANY, _("Red:"));
+    wxStaticText* lab = new wxStaticText(this, wxID_ANY, _("R:"));
     gs->Add(lab, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
     rt = new wxStaticText(this, wxID_ANY, wxT("255"), wxDefaultPosition,
 #if !defined(__WXGTK__)
@@ -784,7 +784,7 @@ ColorView::ColorView(wxWindow* parent, wxWindowID id)
         wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL);
 #endif // !defined(__WXGTK__)
     gs->Add(rt, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
-    lab = new wxStaticText(this, wxID_ANY, _("Green:"));
+    lab = new wxStaticText(this, wxID_ANY, _("G:"));
     gs->Add(lab, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
     gt = new wxStaticText(this, wxID_ANY, wxT("255"), wxDefaultPosition,
 #if !defined(__WXGTK__)
@@ -793,7 +793,7 @@ ColorView::ColorView(wxWindow* parent, wxWindowID id)
         wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL);
 #endif // !defined(__WXGTK__)
     gs->Add(gt, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
-    lab = new wxStaticText(this, wxID_ANY, _("Blue:"));
+    lab = new wxStaticText(this, wxID_ANY, _("B:"));
     gs->Add(lab, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
     bt = new wxStaticText(this, wxID_ANY, wxT("255"), wxDefaultPosition,
 #if !defined(__WXGTK__)

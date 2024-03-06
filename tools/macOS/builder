@@ -80,10 +80,10 @@ export PATH=/usr/bin:/bin:/usr/sbin:/sbin
 export CC=clang
 export CXX=clang++
 export CPPFLAGS="-DICONV_CONST="
-export CFLAGS="-m${target_bits} -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
-export CXXFLAGS="-m${target_bits} -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
-export OBJCXXFLAGS="-m${target_bits} -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
-export LDFLAGS="-m${target_bits} -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
+export CFLAGS="-m${target_bits} -framework Carbon -framework Foundation -framework CoreServices -stdlib=libc++ -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+export CXXFLAGS="-m${target_bits} -stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+export OBJCXXFLAGS="-m${target_bits} -stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+export LDFLAGS="-m${target_bits} -framework Carbon -framework Foundation -framework CoreServices -stdlib=libc++ -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
 
 export UUID_CFLAGS="-I\$BUILD_ROOT/root/stow/libuuid/include"
 export UUID_LIBS="-L\$BUILD_ROOT/root/stow/libuuid/lib -luuid"
@@ -130,6 +130,10 @@ if [ "$target_cpu" = i386 ]; then
 else
     table_line_replace DIST_CONFIGURE_OVERRIDES openssl './Configure darwin64-x86_64-cc no-shared --prefix=/usr --openssldir=/etc/ssl'
 fi
+
+table_line_append DIST_PATCHES glib " \
+    https://gist.githubusercontent.com/rkitover/9f3cceac7eaa9625ce605f052c56f3ba/raw/2ceb1de9a9592e39a657141684beae4e4b33abcd/glib-static-gettext.patch \
+"
 
 stdint_h=
 
@@ -186,7 +190,7 @@ table_line_append DIST_PRE_BUILD ffmpeg "sed -i.bak 's/-lstdc++/-lc++/g' configu
 #table_line_replace DISTS wxwidgets "https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.5.1/wxWidgets-3.0.5.1.tar.bz2 lib/libwx_baseu-3.0*.a"
 
 # For 10.7 add --disable-stl
-table_line_append DIST_ARGS wxwidgets  "--with-macosx-version-min=\$MACOSX_DEPLOYMENT_TARGET"
+table_line_append DIST_ARGS wxwidgets  "--with-macosx-version-min=\$MACOSX_DEPLOYMENT_TARGET LDFLAGS=\"\$LDFLAGS -stdlib=libc++\""
 
 table_line_append DIST_ARGS libmodplug "CC=clang++ CXX=clang++"
 

@@ -334,7 +334,7 @@ bool systemReadJoypads()
 uint32_t systemReadJoypad(int joy)
 {
     if (joy < 0 || joy > 3)
-        joy = OPTION(kJoyDefault) - 1;
+        joy = gopts.default_stick - 1;
 
     uint32_t ret = config::GameControlState::Instance().GetJoypad(joy);
 
@@ -458,7 +458,7 @@ void systemShowSpeed(int speed)
         break;
 
     case SS_PERCENT:
-        f->GetPanel()->osdstat.Printf("%d %%", speed);
+        f->GetPanel()->osdstat.Printf(_("%d %%"), speed);
         break;
 
     case SS_DETAILED:
@@ -772,17 +772,17 @@ void systemUpdateMotionSensor()
 
 int systemGetSensorX()
 {
-    return sensorx[OPTION(kJoyDefault) - 1];
+    return sensorx[gopts.default_stick - 1];
 }
 
 int systemGetSensorY()
 {
-    return sensory[OPTION(kJoyDefault) - 1];
+    return sensory[gopts.default_stick - 1];
 }
 
 int systemGetSensorZ()
 {
-    return sensorz[OPTION(kJoyDefault) - 1] / 10;
+    return sensorz[gopts.default_stick - 1] / 10;
 }
 
 class PrintDialog : public wxEvtHandler, public wxPrintout {

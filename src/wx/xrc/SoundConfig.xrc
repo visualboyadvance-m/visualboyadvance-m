@@ -5,9 +5,7 @@
     <object class="wxBoxSizer">
     <orient>wxVERTICAL</orient>
     <object class="sizeritem">
-    <flag>wxEXPAND|wxALL</flag>
     <object class="wxNotebook">
-    <flag>wxEXPAND|wxALL</flag>
     <object class="notebookpage">
       <object class="wxPanel">
         <object class="wxFlexGridSizer">
@@ -102,7 +100,7 @@
                 <object class="wxBoxSizer">
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="SDL">
-                      <label translate="0">SDL</label>
+                      <label>SDL</label>
                       <style>wxRB_GROUP</style>
                     </object>
                     <flag>wxALL|wxEXPAND</flag>
@@ -110,7 +108,7 @@
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="OpenAL">
-                      <label translate="0">OpenAL</label>
+                      <label>OpenAL</label>
                     </object>
                     <flag>wxALL|wxEXPAND</flag>
                     <border>5</border>
@@ -124,14 +122,14 @@
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="XAudio2">
-                      <label translate="0">XAudio2</label>
+                      <label>XAudio2</label>
                     </object>
                     <flag>wxALL|wxEXPAND</flag>
                     <border>5</border>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="FAudio">
-                      <label translate="0">FAudio</label>
+                      <label>FAudio</label>
                     </object>
                     <flag>wxALL|wxEXPAND</flag>
                     <border>5</border>
@@ -289,7 +287,7 @@
           </object>
         </object>
       </object>
-      <label translate="0">Game Boy</label>
+      <label>Game Boy</label>
     </object>
     <object class="notebookpage">
       <object class="wxPanel">
@@ -334,10 +332,9 @@
           </object>
         </object>
       </object>
-      <label translate="0">Game Boy Advance</label>
+      <label>Game Boy Advance</label>
     </object>
   </object>
-  <option>1</option>
   </object>
       <object class="sizeritem">
         <flag>wxALL|wxEXPAND</flag>

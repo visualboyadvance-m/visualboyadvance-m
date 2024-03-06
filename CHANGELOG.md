@@ -4,61 +4,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [2.1.8] - 2023-12-13
-
-========================
-* beab0881 - Store the PC register at the appropriate offset [steelskin]
-* bf2452aa - Resize GameArea after MainFrame initialization [steelskin]
-* 71ca0fb2 - Properly hide the status bar at startup [steelskin]
-* 7e1afcd3 - Fix reading joystick hat config values [rkitover]
-* 32581966 - Link: Fix menu not refreshing correctly [74248064+nuive]
-
-## [2.1.7] - 11.09.2023
-
-=========================
-* aca206a7 - Launch on xwayland under Wayland if no EGL [rkitover]
-* 93a24bee - Disable mirroring for ROMs > 32MB [rkitover]
-* 0f4ec575 - [Build] Fix the NO_LINK build [steelskin]
-* 803ab352 - [GB] Save MBC7 EEPROM data to `gbRam` [steelskin]
-* 24b6ac5a - [GBA] Implement missing Thumb instruction [steelskin]
-* 14a4b6f8 - [dialogs] Move JoypadConfig to its own class. [steelskin]
-
-## [2.1.6] - 09.07.2023 
-
-=========================
-* 7561ca97 - Fix Discord streaming for OpenGL [danialhorton]
-* e26f8073 - [bios] Fix lz77 and add BIOS_SndDriverVsyncOn [steelskin]
-* d1f65000 - Refactor accelerator / global shortcuts handling [steelskin]
-* fda429fc - [GBA] Do not draw BG tiles from outside of BG VRAM [steelskin]
-* 5aa3ea92 - Properly initialize wxAcceleratorTable [steelskin]
-* 0e29be87 - Support multiple RAM sizes for MBC7 [steelskin]
-* 75b79d91 - Change MBC7 reported RAM size to 512 bytes [steelskin]
-* 36e88faf - Fix dsound looping when moving/resizing window [rkitover]
-* 019fcda9 - Sanitize and improve the GB header parsing (#1109) [Steelskin]
-* 7005b928 - Sanitize allocations in the Game Boy emulator (#1105) [Steelskin]
-* 3cef52b7 - Fix pause/next-frame [rkitover]
-* d3f8cc17 - Option to suspend the X11 screensaver when running [2306079+multiSnow]
-* df819598 - builder: update macOS build to 10.10, Wx 3.2.2.1 [rkitover]
-* 1ab46f70 - Update SIOCNT when the link driver is disconnected [steelskin]
-* 1d7e8ae4 - build: fix build with new OpenAL [rkitover]
-* a9284b3d - workaround for Stuart Little 2 crashing when set to none [danialhorton]
-* 166299cd - Implements Read/Writes for HUC3 [danialhorton]
-* 640ce453 - Change SOUND_CLOCK_TICKS to 280896 cycles - ~1074 samples per frame [reallibretroretroarch]
-* f1d3f631 - Fix automatic dynamic frame skipping [steelskin]
-* d756f671 - translations: fix some source strings [stanley.udr.kid]
-* 91873254 - Add INI file versioning [steelskin]
-* 7d9cb2b5 - Default GBA LCD filter to off. [rkitover]
-* be1e5ca1 - Check for wx < 3.2.2 for EGL move fix backport [rkitover]
-* 1fb18b32 - Rename appdata to metainfo [polynomial-c]
-* ca7ae336 - Fix regression in bios, port DMA fix from libretro [danialhorton]
-* b34448c9 - Fix record/play dialogs for native recordings [danialhorton]
-* 6307348c - build: support MSVC arm64 cross build on x86 [rkitover]
-* 87bdc93e - Revert "translations: use %% instead of percent" [rkitover]
-* ab4ae96e - Clarify/set condition: wayland && !wayland_egl [rkitover]
-* 8e4acfc9 - Fix build w/wxUSE_GLCANVAS_EGL=0, on Fedora [rkitover]
-* 3c41b68d - Fix the Windows ARM64 build [steelskin]
-* 22578d02 - Increase MAX_CART_SIZE from 32MiB to 128MiB [rkitover]
-
 ## [2.1.5] - 2022-12-15
 =======================
 * ea2a929f - Backport 800d6ed69b from wx to fix Wayland EGL pos [rkitover]

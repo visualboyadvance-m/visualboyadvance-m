@@ -157,7 +157,6 @@ extern mapperMBC1 gbDataMBC1;
 extern mapperMBC2 gbDataMBC2;
 extern mapperMBC3 gbDataMBC3;
 extern mapperMBC5 gbDataMBC5;
-extern mapperMBC7 gbDataMBC7;
 extern mapperHuC1 gbDataHuC1;
 extern mapperHuC3 gbDataHuC3;
 extern mapperHuC3RTC gbRTCHuC3;

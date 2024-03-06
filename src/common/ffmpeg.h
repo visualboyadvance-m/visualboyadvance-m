@@ -67,7 +67,7 @@ class MediaRecorder
         // start audio only
         MediaRet Record(const char *fname);
         // stop both
-        void Stop(bool initSuccess = true);
+        void Stop();
         bool IsRecording()
         {
                 return isRecording;
