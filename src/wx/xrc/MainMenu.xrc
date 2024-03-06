@@ -55,34 +55,34 @@
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="LoadGame01">
-          <label>_1</label>
+          <label translate="0">_1</label>
         </object>
         <object class="wxMenuItem" name="LoadGame02">
-          <label>_2</label>
+          <label translate="0">_2</label>
         </object>
         <object class="wxMenuItem" name="LoadGame03">
-          <label>_3</label>
+          <label translate="0">_3</label>
         </object>
         <object class="wxMenuItem" name="LoadGame04">
-          <label>_4</label>
+          <label translate="0">_4</label>
         </object>
         <object class="wxMenuItem" name="LoadGame05">
-          <label>_5</label>
+          <label translate="0">_5</label>
         </object>
         <object class="wxMenuItem" name="LoadGame06">
-          <label>_6</label>
+          <label translate="0">_6</label>
         </object>
         <object class="wxMenuItem" name="LoadGame07">
-          <label>_7</label>
+          <label translate="0">_7</label>
         </object>
         <object class="wxMenuItem" name="LoadGame08">
-          <label>_8</label>
+          <label translate="0">_8</label>
         </object>
         <object class="wxMenuItem" name="LoadGame09">
-          <label>_9</label>
+          <label translate="0">_9</label>
         </object>
         <object class="wxMenuItem" name="LoadGame10">
-          <label>1_0</label>
+          <label translate="0">1_0</label>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="Load">
@@ -111,7 +111,7 @@
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="SaveGame01">
-          <label>_1</label>
+          <label translate="0">_1</label>
         </object>
         <object class="wxMenuItem" name="SaveGame02">
           <label>_2</label>
@@ -286,11 +286,11 @@
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="LinkType3GameCube">
-            <label>_Game Cube</label>
+            <label translate="0">_Game Cube</label>
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="LinkType4Gameboy">
-            <label>_Game Boy</label>
+            <label translate="0">_Game Boy</label>
             <checkable>1</checkable>
           </object>
         </object>
@@ -434,19 +434,19 @@
         <object class="wxMenu">
           <label>_Autofire</label>
           <object class="wxMenuItem" name="JoypadAutofireA">
-            <label>_A</label>
+            <label translate="0">_A</label>
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="JoypadAutofireB">
-            <label>_B</label>
+            <label translate="0">_B</label>
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="JoypadAutofireL">
-            <label>_L</label>
+            <label translate="0">_L</label>
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="JoypadAutofireR">
-            <label>_R</label>
+            <label translate="0">_R</label>
             <checkable>1</checkable>
           </object>
         </object>
@@ -495,7 +495,7 @@
         </object>
       </object>
       <object class="wxMenu">
-        <label>_Game Boy Advance</label>
+        <label translate="0">_Game Boy Advance</label>
         <object class="wxMenuItem" name="GameBoyAdvanceConfigure">
           <label>Configure...</label>
         </object>
@@ -518,7 +518,7 @@
         </object>
       </object>
       <object class="wxMenu">
-        <label>_Game Boy</label>
+        <label translate="0">_Game Boy</label>
         <object class="wxMenuItem" name="GameBoyConfigure">
           <label>Configure...</label>
         </object>
@@ -610,7 +610,7 @@
         <object class="wxMenuItem" name="DebugGDBDisconnect">
           <label>_Disconnect</label>
         </object>
-        <label>_GDB</label>
+        <label translate="0">_GDB</label>
       </object>
       <object class="wxMenuItem" name="Disassemble">
         <label>_Disassemble...</label>
@@ -643,42 +643,42 @@
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="VideoLayersBG0">
-          <label>BG _0</label>
+          <label translate="0">BG _0</label>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersBG1">
-          <label>BG _1</label>
+          <label translate="0">BG _1</label>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersBG2">
-          <label>BG _2</label>
+          <label translate="0">BG _2</label>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersBG3">
-          <label>BG _3</label>
+          <label translate="0">BG _3</label>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersOBJ">
-          <label>_OBJ</label>
+          <label translate="0">_OBJ</label>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersWIN0">
-          <label>_WIN 0</label>
+          <label translate="0">_WIN 0</label>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersWIN1">
-          <label>W_IN 1</label>
+          <label translate="0">W_IN 1</label>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersOBJWIN">
-          <label>O_BJ WIN</label>
+          <label translate="0">O_BJ WIN</label>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>

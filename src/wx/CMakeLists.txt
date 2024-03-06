@@ -110,7 +110,7 @@ endif()
 
 # on VS with vcpkg we can't use FindwxWidgets, we have to set everything up
 # manually because the package is broken
-if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
+if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     # set up wxwidgets stuff
     set(libtype u)
     unset(arch_suffix)
@@ -259,7 +259,7 @@ else()
 
     include_directories(${wxWidgets_INCLUDE_DIRS})
 
-    if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
+    if(CMAKE_BUILD_TYPE STREQUAL Debug)
         # tell wx to enable debug mode if possible, if the cmake module did not do it for us
         execute_process(COMMAND "${wxWidgets_CONFIG_EXECUTABLE} --debug=yes" RESULT_VARIABLE WX_CONFIG_DEBUG OUTPUT_QUIET ERROR_QUIET)
 
@@ -278,6 +278,17 @@ else()
     foreach(CXX_COMPILE_FLAG ${wxWidgets_CXX_FLAGS})
         add_compile_options(${CXX_COMPILE_FLAG})
     endforeach()
+
+    # Remove "-framework System" from libs on macOS, it's not necessary and nix doesn't have it.
+    if(APPLE)
+        unset(tmp_libs)
+        foreach(lib ${wxWidgets_LIBRARIES})
+            if(NOT lib STREQUAL "-framework System")
+                list(APPEND tmp_libs "${lib}")
+            endif()
+        endforeach()
+        set(wxWidgets_LIBRARIES "${tmp_libs}")
+    endif()
 
     # set up variables for some compile/run checks for wxWidgets
     set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${MY_CXX_FLAGS} ${MY_C_FLAGS} ${MY_CXX_LINKER_FLAGS} ${MY_C_LINKER_FLAGS} ${wxWidgets_LIBRARIES})
@@ -303,9 +314,10 @@ else()
     # need it because everything is built with clang
     set(ABI_CHECK FALSE)
 
-    if((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+    if((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         AND NOT CMAKE_CROSSCOMPILING
-        AND NOT CMAKE_SYSTEM_NAME STREQUAL FreeBSD
+        AND NOT CMAKE_SYSTEM_NAME STREQUAL "FreeBSD"
+        AND NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg"
         AND NOT TRANSLATIONS_ONLY)
 
         set(ABI_CHECK TRUE)
@@ -773,6 +785,7 @@ set(
     dialogs/game-boy-config.cpp
     dialogs/game-maker.cpp
     dialogs/gb-rom-info.cpp
+    dialogs/joypad-config.cpp
     widgets/group-check-box.cpp
     widgets/keep-on-top-styler.cpp
     widgets/option-validator.cpp
@@ -826,6 +839,7 @@ set(
     dialogs/game-boy-config.h
     dialogs/game-maker.h
     dialogs/gb-rom-info.h
+    dialogs/joypad-config.h
     dialogs/validated-child.h
     widgets/dpi-support.h
     widgets/group-check-box.h
@@ -994,8 +1008,6 @@ if(NOT TRANSLATIONS_ONLY)
         # The following commands *should* be run to make sure Sparkle is not going
         # to bug randomly.
         set(CCS3 cp -a ${SPARKLE_FRAMEWORK} ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks/Sparkle.framework)
-        set(CCS4 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleVersion            -string "${VERSION}")
-        set(CCS5 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleShortVersionString -string "${VERSION}")
         set(CCS6 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUEnableAutomaticChecks -bool YES)
         #set(CCS7 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUPublicEDKey -string "${PUBLIC_KEY}")
         set(CCS8 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUFeedURL -string "${APPCAST_URL}")
@@ -1003,8 +1015,6 @@ if(NOT TRANSLATIONS_ONLY)
           COMMAND ${CCS1}
           COMMAND ${CCS2}
           COMMAND ${CCS3}
-          COMMAND ${CCS4}
-          COMMAND ${CCS5}
           COMMAND ${CCS6}
           #COMMAND ${CCS7}
           COMMAND ${CCS8}
@@ -1146,7 +1156,7 @@ if(NOT TRANSLATIONS_ONLY)
     if(UPSTREAM_RELEASE AND WIN32)
         set(home "$ENV{HOME}")
 
-        if(NOT CMAKE_CROSSCOMPILING AND NOT DEFINED ENV{MSYSTEM_PREFIX})
+        if((MSVC OR NOT CMAKE_CROSSCOMPILING) AND NOT DEFINED ENV{MSYSTEM_PREFIX})
             set(home "$ENV{USERPROFILE}")
         endif()
 
@@ -1256,9 +1266,22 @@ if(NOT TRANSLATIONS_ONLY)
             COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/mac-translations.cmake
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
+
+        set(ver ${VERSION})
+
+        if(NOT VERSION_RELEASE)
+            set(ver "${ver}-${REVISION}")
+        endif()
+
+        add_custom_command(
+            TARGET visualboyadvance-m POST_BUILD
+            COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleVersion            -string "${ver}"
+            COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleShortVersionString -string "${ver}"
+            COMMAND plutil -convert xml1 ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist
+        )
     endif()
 
-    if(APPLE AND (UPSTREAM_RELEASE OR ENABLE_ONLINEUPDATES))
+    if(APPLE AND UPSTREAM_RELEASE)
         if(CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
             find_program(STRIP_PROGRAM strip)
 
@@ -1275,7 +1298,7 @@ if(NOT TRANSLATIONS_ONLY)
         add_custom_command(
             TARGET visualboyadvance-m
             POST_BUILD
-            VERBATIM COMMAND sh -c [=[codesign --sign "Developer ID Application" --force --deep ./visualboyadvance-m.app || :]=]
+            VERBATIM COMMAND sh -c [=[codesign --sign "Developer ID Application" --options runtime --timestamp --force --deep ./visualboyadvance-m.app || :]=]
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
@@ -1287,37 +1310,59 @@ if(NOT TRANSLATIONS_ONLY)
                 add_custom_command(
                     TARGET visualboyadvance-m
                     POST_BUILD
-                    VERBATIM COMMAND sh -c "codesign --sign 'Developer ID Application' --force ${framework} || :"
+                    VERBATIM COMMAND sh -c "codesign --sign 'Developer ID Application' --options runtime --timestamp --force --deep ${framework} || :"
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                 )
             endforeach()
         endif()
 
-        if(UPSTREAM_RELEASE)
-           if(CMAKE_BUILD_TYPE STREQUAL Debug)
-              set(appzip visualboyadvance-m-Mac-${ARCH_NAME}-debug${ZIP_SUFFIX}.zip)
-           else()
-              set(appzip visualboyadvance-m-Mac-${ARCH_NAME}${ZIP_SUFFIX}.zip)
-           endif()
+        # Zip, notarize, staple to the .app and zip again
 
+        if(CMAKE_BUILD_TYPE STREQUAL Debug)
+            set(appzip visualboyadvance-m-Mac-${ARCH_NAME}-debug${ZIP_SUFFIX}.zip)
+        else()
+            set(appzip visualboyadvance-m-Mac-${ARCH_NAME}${ZIP_SUFFIX}.zip)
+        endif()
+
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E remove ${appzip}
+            COMMAND ${ZIP_PROGRAM} -9yr ${appzip} ./visualboyadvance-m.app
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND xcrun notarytool submit ${appzip} --keychain-profile AC_PASSWORD --wait
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND xcrun stapler staple ./visualboyadvance-m.app
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E remove ${appzip}
+            COMMAND ${ZIP_PROGRAM} -9yr ${appzip} ./visualboyadvance-m.app
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+        if(GPG_KEYS)
             add_custom_command(
                 TARGET visualboyadvance-m
                 POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E remove ${appzip}
-                COMMAND ${ZIP_PROGRAM} -9yr ${appzip} ./visualboyadvance-m.app
+                COMMAND ${CMAKE_COMMAND} -E remove ${appzip}.asc
+#                COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
+                COMMAND ${GPG_PROGRAM} --detach-sign -a ${appzip}
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             )
-
-            if(GPG_KEYS)
-                add_custom_command(
-                    TARGET visualboyadvance-m
-                    POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E remove ${appzip}.asc
-    #                COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
-                    COMMAND ${GPG_PROGRAM} --detach-sign -a ${appzip}
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                )
-            endif()
         endif()
     endif()
 

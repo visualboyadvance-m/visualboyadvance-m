@@ -25,7 +25,7 @@
                     <object class="wxChoice" name="SaveType">
                       <content>
                         <item>Automatic</item>
-                        <item>EEPROM</item>
+                        <item translate="0">EEPROM</item>
                         <item>SRAM</item>
                         <item>Flash</item>
                         <item>EEPROM + Sensor</item>
@@ -197,7 +197,7 @@
                   <content>
                     <item>Default</item>
                     <item>Automatic</item>
-                    <item>EEPROM</item>
+                    <item translate="0">EEPROM</item>
                     <item>SRAM</item>
                     <item>Flash</item>
                     <item>EEPROM + Sensor</item>

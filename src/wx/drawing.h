@@ -40,7 +40,7 @@ protected:
     void AdjustViewport();
     void RefreshGL();
 #ifndef wxGL_IMPLICIT_CONTEXT
-    wxGLContext* ctx;
+    wxGLContext* ctx = nullptr;
 #endif
     bool SetContext();
     void DrawingPanelInit();
