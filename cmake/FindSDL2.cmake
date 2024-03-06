@@ -202,25 +202,6 @@ IF(SDL2_LIBRARY_TEMP)
 		SET(SDL2_LIBRARY_TEMP ${MINGW32_LIBRARY} ${SDL2_LIBRARY_TEMP} -lversion -limm32)
 	ENDIF(MINGW)
 
-	# Add libsamplerate with vcpkg
-	if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
-	    if(WIN32)
-		unset(arch_suffix)
-		unset(path_prefix)
-		if(VCPKG_TARGET_TRIPLET MATCHES -static)
-		    set(arch_suffix  -static)
-		endif()
-		if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
-		    set(path_prefix debug)
-		endif()
-		set(installed_prefix ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix}/${path_prefix})
-
-		SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} ${installed_prefix}/lib/samplerate.lib)
-	    else()
-		SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} -lsamplerate)
-	    endif()
-	endif()
-
         # Add some stuff from pkg-config, if available
         IF(NOT PKG_CONFIG_EXECUTABLE)
             FIND_PACKAGE(PkgConfig QUIET)

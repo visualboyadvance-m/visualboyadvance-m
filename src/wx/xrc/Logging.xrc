@@ -10,7 +10,7 @@
             <object class="wxStaticBoxSizer">
               <object class="sizeritem">
                 <object class="wxCheckBox" name="SWI">
-                  <label translate="0">SW_I</label>
+                  <label>SW_I</label>
                 </object>
                 <flag>wxALL</flag>
                 <border>5</border>
@@ -38,28 +38,28 @@
               </object>
               <object class="sizeritem">
                 <object class="wxCheckBox" name="DMA0">
-                  <label translate="0">DMA _0</label>
+                  <label>DMA _0</label>
                 </object>
                 <flag>wxALL</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxCheckBox" name="DMA1">
-                  <label translate="0">DMA _1</label>
+                  <label>DMA _1</label>
                 </object>
                 <flag>wxALL</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxCheckBox" name="DMA2">
-                  <label translate="0">DMA _2</label>
+                  <label>DMA _2</label>
                 </object>
                 <flag>wxALL</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxCheckBox" name="DMA3">
-                  <label translate="0">DMA _3</label>
+                  <label>DMA _3</label>
                 </object>
                 <flag>wxALL</flag>
                 <border>5</border>
@@ -73,7 +73,7 @@
               </object>
               <object class="sizeritem">
                 <object class="wxCheckBox" name="AGBPrint">
-                  <label translate="0">_AGBPrint</label>
+                  <label>_AGBPrint</label>
                 </object>
                 <flag>wxALL</flag>
                 <border>5</border>

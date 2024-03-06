@@ -422,8 +422,7 @@ bool gbInitializeRom(size_t romSize) {
 
     const size_t ramSize = g_gbCartData.ram_size();
     if (g_gbCartData.HasRam()) {
-        // Always allocate 4 KiB to prevent access issues down the line.
-        gbRam = (uint8_t*)malloc(std::max(k4KiB, ramSize));
+        gbRam = (uint8_t*)malloc(ramSize);
         if (gbRam == nullptr) {
             return false;
         }
@@ -3062,9 +3061,6 @@ void gbReset()
 
     memset(&gbDataHuC1, 0, sizeof(gbDataHuC1));
     gbDataHuC1.mapperROMBank = 1;
-
-    memset(&gbDataMBC7, 0, sizeof(gbDataMBC7));
-    gbDataMBC7.mapperROMBank = 1;
 
     memset(&gbDataHuC3, 0, sizeof(gbDataHuC3));
     gbDataHuC3.mapperROMBank = 1;

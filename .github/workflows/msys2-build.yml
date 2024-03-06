@@ -3,10 +3,6 @@ on: [push, pull_request]
 
 jobs:
   build:
-    strategy:
-      matrix:
-        cmake_build: ['-DCMAKE_BUILD_TYPE=Release', '-DCMAKE_BUILD_TYPE=Debug']
-        cmake_options: ['', '-DENABLE_LINK=OFF', '-DENABLE_SDL=ON']
     runs-on: windows-latest
     env:
       MSYSTEM: CLANG64
@@ -24,12 +20,20 @@ jobs:
         with:
           msystem: CLANG64
           update: true
-      - name: Install deps
-        run: >-
-          bash installdeps
+          install: >-
+            mingw-w64-clang-x86_64-toolchain
+            mingw-w64-clang-x86_64-pkgconf
+            mingw-w64-clang-x86_64-ffmpeg
+            mingw-w64-clang-x86_64-FAudio
+            mingw-w64-clang-x86_64-cmake
+            mingw-w64-clang-x86_64-ninja
+            mingw-w64-clang-x86_64-wxWidgets3.2
+            mingw-w64-clang-x86_64-sfml
+            mingw-w64-clang-x86_64-SDL2
+            zip
       - name: Configure
         run: >-
-          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DVBAM_STATIC=ON -DENABLE_SSP=ON -DENABLE_ONLINEUPDATES=OFF
       - name: Build
         run: ninja -C build
 

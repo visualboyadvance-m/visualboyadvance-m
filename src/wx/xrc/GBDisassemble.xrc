@@ -40,7 +40,7 @@
             <object class="wxFlexGridSizer">
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label translate="0">AF:</label>
+                  <label>AF:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -50,14 +50,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label translate="0">0000</label>
+                  <label>0000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label translate="0">BC:</label>
+                  <label>BC:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -67,14 +67,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label translate="0">0000</label>
+                  <label>0000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label translate="0">DE:</label>
+                  <label>DE:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -84,14 +84,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label translate="0">0000</label>
+                  <label>0000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label translate="0">HL:</label>
+                  <label>HL:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -101,14 +101,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label translate="0">0000</label>
+                  <label>0000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label translate="0">SP:</label>
+                  <label>SP:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -118,14 +118,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label translate="0">0000</label>
+                  <label>0000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label translate="0">PC:</label>
+                  <label>PC:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -135,14 +135,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label translate="0">0000</label>
+                  <label>0000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label translate="0">IFF:</label>
+                  <label>IFF:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -152,14 +152,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label translate="0">0000</label>
+                  <label>0000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label translate="0">LY:</label>
+                  <label>LY:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -169,32 +169,32 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label translate="0">00</label>
+                  <label>00</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxCheckBox" name="Z" subclass="DispCheckBox">
-                  <label translate="0">Z</label>
+                  <label>Z</label>
                 </object>
               </object>
               <object class="spacer"/>
               <object class="sizeritem">
                 <object class="wxCheckBox" name="N" subclass="DispCheckBox">
-                  <label translate="0">N</label>
+                  <label>N</label>
                 </object>
               </object>
               <object class="spacer"/>
               <object class="sizeritem">
                 <object class="wxCheckBox" name="H" subclass="DispCheckBox">
-                  <label translate="0">H</label>
+                  <label>H</label>
                 </object>
               </object>
               <object class="spacer"/>
               <object class="sizeritem">
                 <object class="wxCheckBox" name="C" subclass="DispCheckBox">
-                  <label translate="0">C</label>
+                  <label>C</label>
                 </object>
               </object>
               <cols>2</cols>

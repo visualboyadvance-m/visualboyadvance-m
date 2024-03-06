@@ -7,8 +7,8 @@
       <object class="sizeritem">
         <object class="wxChoice" name="Address">
           <content>
-            <item translate="0">a</item>
-            <item translate="0">b</item>
+            <item>a</item>
+            <item>b</item>
           </content>
         </object>
         <flag>wxTOP|wxLEFT|wxRIGHT|wxEXPAND</flag>
@@ -44,7 +44,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label translate="0">15 </label>
+              <label>15 </label>
             </object>
             <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>
@@ -61,7 +61,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label translate="0">14 </label>
+              <label>14 </label>
             </object>
             <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>
@@ -78,7 +78,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label translate="0">13 </label>
+              <label>13 </label>
             </object>
             <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>
@@ -95,7 +95,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label translate="0">12 </label>
+              <label>12 </label>
             </object>
             <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>
@@ -112,7 +112,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label translate="0">11 </label>
+              <label>11 </label>
             </object>
             <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>
@@ -129,7 +129,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label translate="0">10 </label>
+              <label>10 </label>
             </object>
             <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>
@@ -146,7 +146,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label translate="0">9 </label>
+              <label>9 </label>
             </object>
             <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>
@@ -163,7 +163,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label translate="0">8 </label>
+              <label>8 </label>
             </object>
             <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>
@@ -180,7 +180,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label translate="0">7 </label>
+              <label>7 </label>
             </object>
             <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>
@@ -197,7 +197,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label translate="0">6 </label>
+              <label>6 </label>
             </object>
             <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>
@@ -214,7 +214,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label translate="0">5 </label>
+              <label>5 </label>
             </object>
             <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>
@@ -231,7 +231,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label translate="0">4 </label>
+              <label>4 </label>
             </object>
             <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>
@@ -248,7 +248,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label translate="0">3 </label>
+              <label>3 </label>
             </object>
             <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>
@@ -265,7 +265,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label translate="0">2 </label>
+              <label>2 </label>
             </object>
             <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>
@@ -282,7 +282,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label translate="0">1 </label>
+              <label>1 </label>
             </object>
             <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>
@@ -299,7 +299,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText">
-              <label translate="0">0 </label>
+              <label>0 </label>
             </object>
             <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
             <border>5</border>

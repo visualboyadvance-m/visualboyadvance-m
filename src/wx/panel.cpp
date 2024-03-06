@@ -2187,11 +2187,7 @@ bool GLDrawingPanel::SetContext()
 {
 #ifndef wxGL_IMPLICIT_CONTEXT
     // Check if the current context is valid
-    if (!ctx
-#if wxCHECK_VERSION(3, 1, 0)
-            || !ctx->IsOK()
-#endif
-    )
+    if (!ctx || !ctx->IsOK())
     {
         // Delete the old context
         if (ctx) {
@@ -2201,8 +2197,8 @@ bool GLDrawingPanel::SetContext()
 
         // Create a new context
         ctx = new wxGLContext(this);
-        DrawingPanelInit();
-    }
+}
+
     return wxGLCanvas::SetCurrent(*ctx);
 #else
     return wxGLContext::SetCurrent(*this);
@@ -2215,7 +2211,11 @@ GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
           wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
 {
     widgets::RequestHighResolutionOpenGlSurfaceForWindow(this);
+#ifndef wxGL_IMPLICIT_CONTEXT
+    ctx = new wxGLContext(this);
+#endif
     SetContext();
+    if (!did_init) DrawingPanelInit();
 }
 
 GLDrawingPanel::~GLDrawingPanel()
@@ -2442,23 +2442,270 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 #define DIRECT3D_VERSION 0x0900
 #include <d3d9.h> // main include file
 //#include <d3dx9core.h> // required for font rendering
-#include <dxerr9.h> // contains debug functions
 
 DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
-    : DrawingPanel(parent, _width, _height)
+    : DrawingPanelBase(_width, _height)
 {
-    // FIXME: implement
+    // Create the Direct3D9Ex object
+    IDirect3D9Ex* d3dEx = nullptr;
+    HRESULT hr = Direct3DCreate9Ex(D3D_SDK_VERSION, &d3dEx);
+    if (FAILED(hr))
+    {
+        // Handle error here
+    }
+
+    // Set up the presentation parameters
+    D3DPRESENT_PARAMETERS d3dpp;
+    ZeroMemory(&d3dpp, sizeof(d3dpp));
+    d3dpp.Windowed = TRUE;
+    d3dpp.SwapEffect = D3DSWAPEFFECT_FLIPEX;
+    d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
+    d3dpp.BackBufferCount = 2;
+    d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+
+    // Create the Direct3D9Ex device
+    IDirect3DDevice9Ex* d3ddevEx = nullptr;
+    hr = d3dEx->CreateDeviceEx(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, (HWND)wxGetApp().frame->GetHandle(),
+        D3DCREATE_HARDWARE_VERTEXPROCESSING, &d3dpp, NULL, &d3ddevEx);
+    if (FAILED(hr))
+    {
+        // Handle error here
+    }
+
+    // Store the Direct3D9Ex device and object in member variables
+    d3ddev = d3ddevEx;
+    d3d = d3dEx;
+
+    // Call the DrawingPanelInit method to initialize the rendering state and resources
+    DrawingPanelInit();
+}
+
+void DXDrawingPanel::DrawingPanelInit()
+{
+    DrawingPanelBase::DrawingPanelInit();
+
+    // Set up the rendering state
+    bool bilinear = true; // Set the desired texture filtering mode here
+
+    if (d3ddev != nullptr)
+    {
+        // The IDirect3DDevice9Ex object has been created and initialized correctly
+        // You can use it here
+        d3ddev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+        d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        d3ddev->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        d3ddev->SetSamplerState(0, D3DSAMP_MINFILTER, bilinear ? D3DTEXF_LINEAR : D3DTEXF_POINT);
+        d3ddev->SetSamplerState(0, D3DSAMP_MAGFILTER, bilinear ? D3DTEXF_LINEAR : D3DTEXF_POINT);
+    }
+    else
+    {
+        // The IDirect3DDevice9Ex object has not been created or initialized correctly
+        // Handle the error here
+    }
+
+    // Define a matrix type
+    struct Matrix4x4
+    {
+        float m[4][4];
+    };
+
+    // Set up the projection matrix
+    Matrix4x4 matProj;
+    ZeroMemory(&matProj, sizeof(matProj));
+    matProj.m[0][0] = 2.0f;
+    matProj.m[1][1] = -2.0f;
+    matProj.m[2][2] = 1.0f;
+    matProj.m[3][0] = -1.0f;
+    matProj.m[3][1] = 1.0f;
+    matProj.m[3][3] = 1.0f;
+    d3ddev->SetTransform(D3DTS_PROJECTION, (D3DMATRIX*)&matProj);
+
+    Vertex vertices[] = {
+        { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f },
+        { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f },
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f },
+        { 1.0f, 0.0f, 0.0f, 1.0f, 0.0f }
+    };
+
+    d3ddev->CreateVertexBuffer(4 * sizeof(Vertex), D3DUSAGE_WRITEONLY,
+        D3DFVF_XYZ | D3DFVF_TEX1,
+        D3DPOOL_DEFAULT,
+        &vbuffer,
+        NULL);
+
+    void* pVertices;
+    vbuffer->Lock(0,
+        sizeof(vertices),
+        (void**)&pVertices,
+        0);
+    memcpy(pVertices, vertices, sizeof(vertices));
+    vbuffer->Unlock();
+
+    // Create the texture
+    int texWidth = std::ceil(width * scale);
+    int texHeight = std::ceil(height * scale);
+    D3DFORMAT texFormat = out_16 ? D3DFMT_A1R5G5B5 : D3DFMT_A8R8G8B8;
+    HRESULT hr = d3ddev->CreateTexture(texWidth,
+        texHeight,
+        1,
+        D3DUSAGE_DYNAMIC,
+        texFormat,
+        D3DPOOL_DEFAULT,
+        &texture,
+        NULL);
+    if (FAILED(hr))
+    {
+        // Handle error here
+    }
+}
+
+DXDrawingPanel::~DXDrawingPanel()
+{
+    // Release any resources here
+    if (vbuffer) vbuffer->Release();
+    if (texture) texture->Release();
+    if (d3ddev) d3ddev->Release();
+    if (d3d) d3d->Release();
 }
 
 void DXDrawingPanel::DrawArea(wxWindowDC& dc)
 {
-    // FIXME: implement
+    // Check if the device is lost
+    HRESULT hr = d3ddev->TestCooperativeLevel();
+    if (hr == D3DERR_DEVICELOST)
+    {
+        // Release any resources created in the D3DPOOL_DEFAULT memory pool
+        if (vbuffer) vbuffer->Release();
+        if (texture) texture->Release();
+
+        // Reset the device
+        D3DPRESENT_PARAMETERS d3dpp;
+        ZeroMemory(&d3dpp, sizeof(d3dpp));
+        d3dpp.Windowed = TRUE;
+        d3dpp.SwapEffect = D3DSWAPEFFECT_FLIPEX;
+        d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
+        d3dpp.BackBufferCount = 2;
+        hr = d3ddev->ResetEx(&d3dpp, NULL);
+        if (FAILED(hr))
+        {
+            // Handle error here
+        }
+
+        // Recreate any resources that were released
+        DrawingPanelInit();
+    }
+
     if (!did_init) {
-      DrawingPanelInit();
+        DrawingPanelInit();
     }
 
     if (todraw) {
+        // Update the texture data
+        D3DLOCKED_RECT rect;
+        texture->LockRect(0, &rect, NULL, 0);
+
+        // Calculate the number of pixels in a row of the image data
+        int rowlen = std::ceil(width * scale) + (out_16 ? 2 : 1);
+
+        // Copy the image data from the todraw variable to the locked rectangle of the texture
+        if (systemColorDepth == 24) {
+            // never scaled, no borders, no transformations needed
+            memcpy(rect.pBits, todraw, rowlen * height * 3);
+        }
+        else if (out_16) {
+            // scaled by filters, top/right borders, transform to 32-bit
+            uint16_t* src = (uint16_t*)todraw + (int)std::ceil((width + 2) * scale); // skip top border
+            uint32_t* dst = (uint32_t*)rect.pBits;
+            for (int y = 0; y < std::ceil(height * scale); y++) {
+                for (int x = 0; x < std::ceil(width * scale); x++, src++) {
+                    uint8_t r = ((*src >> systemRedShift) & 0x1f) << 3;
+                    uint8_t g = ((*src >> systemGreenShift) & 0x1f) << 3;
+                    uint8_t b = ((*src >> systemBlueShift) & 0x1f) << 3;
+                    *dst++ = (r << 16) | (g << 8) | b;
+                }
+                src += 2; // skip rhs border
+            }
+        }
+        else if (OPTION(kDispFilter) != config::Filter::kNone) {
+            // scaled by filters, top/right borders, transform to 32-bit
+            uint32_t* src = (uint32_t*)todraw + (int)std::ceil(width * scale) + 1; // skip top border
+            uint32_t* dst = (uint32_t*)rect.pBits;
+            for (int y = 0; y < std::ceil(height * scale); y++) {
+                for (int x = 0; x < std::ceil(width * scale); x++, src++) {
+                    uint8_t r = *src >> (systemRedShift - 3);
+                    uint8_t g = *src >> (systemGreenShift - 3);
+                    uint8_t b = *src >> (systemBlueShift - 3);
+                    *dst++ = (r << 16) | (g << 8) | b;
+                }
+                ++src; // skip rhs border
+            }
+        }
+        else { // 32 bit
+            // not scaled by filters, top/right borders, transform to 32-bit
+            uint32_t* src = (uint32_t*)todraw + (int)std::ceil((width + 1) * scale); // skip top border
+            uint32_t* dst = (uint32_t*)rect.pBits;
+            for (int y = 0; y < std::ceil(height * scale); y++) {
+                for (int x = 0; x < std::ceil(width * scale); x++, src++) {
+                    uint8_t r = *src >> (systemRedShift - 3);
+                    uint8_t g = *src >> (systemGreenShift - 3);
+                    uint8_t b = *src >> (systemBlueShift - 3);
+                    *dst++ = (r << 16) | (g << 8) | b;
+                }
+                ++src; // skip rhs border
+            }
+        }
+
+        texture->UnlockRect(0);
+
+        // Clear the back buffer
+        d3ddev->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+
+        // Begin the scene
+        d3ddev->BeginScene();
+
+        // Set the texture and vertex buffer
+        d3ddev->SetTexture(0, texture);
+        d3ddev->SetStreamSource(0, vbuffer, 0, sizeof(Vertex));
+        d3ddev->SetFVF(D3DFVF_XYZ | D3DFVF_TEX1);
+
+        // Draw the quad
+        d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+
+        // End the scene
+        d3ddev->EndScene();
+
+        // Present the back buffer to the screen
+        d3ddev->Present(NULL, NULL, NULL, NULL);
     }
+}
+
+void DXDrawingPanel::OnSize(wxSizeEvent& ev)
+{
+    // Reset the Direct3D device with updated presentation parameters
+    D3DPRESENT_PARAMETERS d3dpp;
+    ZeroMemory(&d3dpp, sizeof(d3dpp));
+    d3dpp.Windowed = TRUE;
+    d3dpp.SwapEffect = D3DSWAPEFFECT_FLIPEX;
+    d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
+    d3dpp.BackBufferCount = 2;
+    d3ddev->ResetEx(&d3dpp, NULL);
+
+    // Update the projection matrix
+    float width = (float)ev.GetSize().GetWidth();
+    float height = (float)ev.GetSize().GetHeight();
+    float sx = width / (this->width * scale);
+    float sy = height / (this->height * scale);
+    D3DMATRIX matProj = {
+        2.0f / width * sx, 0.0f, 0.0f, 0.0f,
+        0.0f, -2.0f / height * sy, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        -1.0f, 1.0f, 0.0f, 1.0f
+    };
+    d3ddev->SetTransform(D3DTS_PROJECTION, &matProj);
+
+    // Call the base class handler
+    ev.Skip();
 }
 #endif
 

@@ -20,8 +20,6 @@ constexpr size_t k1MiB = 2 * k512KiB;
 constexpr size_t k2MiB = 2 * k1MiB;
 constexpr size_t k4MiB = 2 * k2MiB;
 constexpr size_t k8MiB = 2 * k4MiB;
-constexpr size_t k16MiB = 2 * k8MiB;
-constexpr size_t k32MiB = 2 * k16MiB;
 
 // Game Boy BIOS Sizes.
 constexpr size_t kGBBiosSize = k256B;

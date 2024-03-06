@@ -11,13 +11,13 @@
                 <object class="wxStaticBoxSizer">
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="Bank0">
-                      <label translate="0">_0</label>
+                      <label>_0</label>
                       <style>wxRB_GROUP</style>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="Bank1">
-                      <label translate="0">_1</label>
+                      <label>_1</label>
                     </object>
                   </object>
                   <label>VRAM Bank</label>
@@ -30,13 +30,13 @@
                 <object class="wxStaticBoxSizer">
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="CharBase0">
-                      <label translate="0">0x_8000</label>
+                      <label>0x_8000</label>
                       <style>wxRB_GROUP</style>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="CharBase1">
-                      <label translate="0">0x_8800</label>
+                      <label>0x_8800</label>
                     </object>
                   </object>
                   <label>Char Base</label>

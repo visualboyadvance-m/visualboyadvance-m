@@ -531,13 +531,11 @@ void load_opts(bool first_time_launch) {
 
 // Note: run load_opts() first to guarantee all config opts exist
 void update_opts() {
+    wxConfigBase* cfg = wxConfigBase::Get();
+
     for (config::Option& opt : config::Option::All()) {
         SaveOption(&opt);
     }
-}
-
-void update_joypad_opts() {
-    wxConfigBase* cfg = wxConfigBase::Get();
 
     // For joypad, compare the UserInput sets. Since UserInput guarantees a
     // certain ordering, it is possible that the user control in the panel shows
@@ -553,7 +551,6 @@ void update_joypad_opts() {
             cfg->Write(option_name, config::UserInput::SpanToConfigString(iter.second));
         }
     }
-
     if (game_bindings_changed) {
         config::GameControlState::Instance().OnGameBindingsChanged();
     }

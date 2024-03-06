@@ -42,6 +42,7 @@ extern struct opts_t {
     std::map<config::GameControl, std::set<config::UserInput>>
         game_control_bindings;
     int autofire_rate = 1;
+    int default_stick = 1;
 
     /// Keyboard
     config::Shortcuts shortcuts;
@@ -84,8 +85,6 @@ void load_opts(bool first_time_launch);
 // call whenever opt vars change
 // will detect changes and write config if necessary
 void update_opts();
-// Updates the joypad options.
-void update_joypad_opts();
 // Updates the shortcut options.
 void update_shortcut_opts();
 // returns true if option name correct; prints error if val invalid
