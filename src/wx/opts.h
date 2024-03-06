@@ -9,7 +9,7 @@
 #include "config/game-control.h"
 #include "config/shortcuts.h"
 #include "config/user-input.h"
-#include "wxutil.h"
+#include "wxhead.h"
 
 // Forward declaration.
 class wxFileHistory;
@@ -42,7 +42,6 @@ extern struct opts_t {
     std::map<config::GameControl, std::set<config::UserInput>>
         game_control_bindings;
     int autofire_rate = 1;
-    int default_stick = 1;
 
     /// Keyboard
     config::Shortcuts shortcuts;
@@ -53,7 +52,11 @@ extern struct opts_t {
     int max_scale = 0;
 
     /// Sound
-    int audio_api = 0;
+#ifdef __WXMSW__
+    int audio_api = AUD_XAUDIO2;
+#else
+    int audio_api = AUD_OPENAL;
+#endif
     // 10 fixes stuttering on mac with openal, as opposed to 5
     // also should be better for modern hardware in general
     int audio_buffers = 10;
@@ -85,6 +88,8 @@ void load_opts(bool first_time_launch);
 // call whenever opt vars change
 // will detect changes and write config if necessary
 void update_opts();
+// Updates the joypad options.
+void update_joypad_opts();
 // Updates the shortcut options.
 void update_shortcut_opts();
 // returns true if option name correct; prints error if val invalid

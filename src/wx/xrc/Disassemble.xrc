@@ -20,14 +20,14 @@
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="InsARM">
-                      <label>A_RM</label>
+                      <label translate="0">A_RM</label>
                     </object>
                     <flag>wxALL</flag>
                     <border>5</border>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="InsThumb">
-                      <label>_THUMB</label>
+                      <label translate="0">_THUMB</label>
                     </object>
                     <flag>wxALL</flag>
                     <border>5</border>
@@ -70,7 +70,7 @@
             <object class="wxFlexGridSizer">
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>R0:</label>
+                  <label translate="0">R0:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -80,14 +80,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label>00000000</label>
+                  <label translate="0">00000000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>R1:</label>
+                  <label translate="0">R1:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -97,14 +97,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label>00000000</label>
+                  <label translate="0">00000000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>R2:</label>
+                  <label translate="0">R2:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -114,14 +114,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label>00000000</label>
+                  <label translate="0">00000000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>R3:</label>
+                  <label translate="0">R3:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -131,14 +131,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label>00000000</label>
+                  <label translate="0">00000000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>R4:</label>
+                  <label translate="0">R4:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -148,14 +148,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label>00000000</label>
+                  <label translate="0">00000000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>R5:</label>
+                  <label translate="0">R5:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -165,14 +165,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label>00000000</label>
+                  <label translate="0">00000000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>R6:</label>
+                  <label translate="0">R6:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -182,14 +182,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label>00000000</label>
+                  <label translate="0">00000000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>R7:</label>
+                  <label translate="0">R7:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -199,14 +199,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label>00000000</label>
+                  <label translate="0">00000000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>R8:</label>
+                  <label translate="0">R8:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -216,14 +216,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label>00000000</label>
+                  <label translate="0">00000000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>R9:</label>
+                  <label translate="0">R9:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -233,14 +233,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label>00000000</label>
+                  <label translate="0">00000000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>R10:</label>
+                  <label translate="0">R10:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -250,14 +250,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label>00000000</label>
+                  <label translate="0">00000000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>R11:</label>
+                  <label translate="0">R11:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -267,14 +267,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label>00000000</label>
+                  <label translate="0">00000000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>R12:</label>
+                  <label translate="0">R12:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -284,14 +284,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label>00000000</label>
+                  <label translate="0">00000000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>SP:</label>
+                  <label translate="0">SP:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -301,14 +301,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label>00000000</label>
+                  <label translate="0">00000000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>LR:</label>
+                  <label translate="0">LR:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -318,14 +318,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label>00000000</label>
+                  <label translate="0">00000000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>PC:</label>
+                  <label translate="0">PC:</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -335,14 +335,14 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label>00000000</label>
+                  <label translate="0">00000000</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>CPSR:</label>
+                  <label translate="0">CPSR:</label>
                 </object>
                 <flag>wxBOTTOM|wxRIGHT</flag>
                 <border>5</border>
@@ -352,56 +352,56 @@
                   <font>
                     <family>modern</family>
                   </font>
-                  <label>00000000</label>
+                  <label translate="0">00000000</label>
                 </object>
                 <flag>wxBOTTOM|wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxCheckBox" name="N" subclass="DispCheckBox">
-                  <label>N</label>
+                  <label translate="0">N</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxCheckBox" name="I" subclass="DispCheckBox">
-                  <label>I</label>
+                  <label translate="0">I</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxCheckBox" name="Z" subclass="DispCheckBox">
-                  <label>Z</label>
+                  <label translate="0">Z</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxCheckBox" name="F" subclass="DispCheckBox">
-                  <label>F</label>
+                  <label translate="0">F</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxCheckBox" name="C" subclass="DispCheckBox">
-                  <label>C</label>
+                  <label translate="0">C</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxCheckBox" name="T" subclass="DispCheckBox">
-                  <label>T</label>
+                  <label translate="0">T</label>
                 </object>
                 <flag>wxLEFT</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxCheckBox" name="V" subclass="DispCheckBox">
-                  <label>V</label>
+                  <label translate="0">V</label>
                 </object>
                 <flag>wxRIGHT</flag>
                 <border>5</border>
@@ -421,7 +421,7 @@
                       <font>
                         <family>modern</family>
                       </font>
-                      <label>00</label>
+                      <label translate="0">00</label>
                     </object>
                     <flag>wxLEFT</flag>
                     <border>5</border>

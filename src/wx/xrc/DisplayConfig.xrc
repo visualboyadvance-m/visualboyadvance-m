@@ -5,6 +5,7 @@
     <object class="wxBoxSizer">
     <orient>wxVERTICAL</orient>
     <object class="sizeritem">
+    <flag>wxALL|wxEXPAND</flag>
     <object class="wxNotebook">
     <object class="notebookpage">
       <object class="wxPanel">
@@ -37,21 +38,21 @@
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="OutputQuartz2D">
-                      <label>Quartz2D</label>
+                      <label translate="0">Quartz2D</label>
                     </object>
                     <flag>wxALL</flag>
                     <border>5</border>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="OutputOpenGL">
-                      <label>OpenGL</label>
+                      <label translate="0">OpenGL</label>
                     </object>
                     <flag>wxALL</flag>
                     <border>5</border>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="OutputDirect3D">
-                      <label>Direct3D 9</label>
+                      <label translate="0">Direct3D 9</label>
                     </object>
                     <flag>wxALL</flag>
                     <border>5</border>
@@ -83,7 +84,7 @@
                 <object class="wxChoice" name="Filter">
                   <content>
                     <item>None</item>
-                    <item>2xSaI</item>
+                    <item translate="0">2xSaI</item>
                     <item>Super 2xSaI</item>
                     <item>Super Eagle</item>
                     <item>Pixelate</item>
@@ -92,18 +93,18 @@
                     <item>Bilinear Plus</item>
                     <item>Scanlines</item>
                     <item>TV Mode</item>
-                    <item>HQ 2x</item>
-                    <item>LQ 2x</item>
+                    <item translate="0">HQ 2x</item>
+                    <item translate="0">LQ 2x</item>
                     <item>Simple 2x</item>
                     <item>Simple 3x</item>
-                    <item>HQ 3x</item>
+                    <item translate="0">HQ 3x</item>
                     <item>Simple 4x</item>
-                    <item>HQ 4x</item>
-                    <item>xBRZ 2x</item>
-                    <item>xBRZ 3x</item>
-                    <item>xBRZ 4x</item>
-                    <item>xBRZ 5x</item>
-                    <item>xBRZ 6x</item>
+                    <item translate="0">HQ 4x</item>
+                    <item translate="0">xBRZ 2x</item>
+                    <item translate="0">xBRZ 3x</item>
+                    <item translate="0">xBRZ 4x</item>
+                    <item translate="0">xBRZ 5x</item>
+                    <item translate="0">xBRZ 6x</item>
                     <item>Plugin</item>
                   </content>
                 </object>
@@ -285,6 +286,7 @@
       <label>Zoom</label>
     </object>
   </object>
+  <option>1</option>
   </object>
       <object class="sizeritem">
         <flag>wxALL|wxEXPAND</flag>

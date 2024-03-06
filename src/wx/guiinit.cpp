@@ -43,6 +43,7 @@
 #include "dialogs/display-config.h"
 #include "dialogs/game-boy-config.h"
 #include "dialogs/gb-rom-info.h"
+#include "dialogs/joypad-config.h"
 #include "opts.h"
 #include "widgets/option-validator.h"
 #include "widgets/user-input-ctrl.h"
@@ -773,13 +774,15 @@ public:
         ch->Clear();
 
         if (clh.isgb) {
-            ch->Append(_("Game Shark"));
-            ch->Append(_("Game Genie"));
+            // DO NOT TRANSLATE
+            ch->Append("Game Shark");
+            ch->Append("Game Genie");
         } else {
             ch->Append(_("Generic Code"));
-            ch->Append(_("Game Shark Advance"));
-            ch->Append(_("Code Breaker Advance"));
-            ch->Append(_("Flashcart CHT"));
+            // DO NOT TRANSLATE
+            ch->Append("Game Shark Advance");
+            ch->Append("Code Breaker Advance");
+            ch->Append("Flashcart CHT");
         }
 
         ch->SetSelection(0);
@@ -1603,40 +1606,6 @@ public:
         return true;
     }
 };
-
-// manage the joypad prefs' per-panel default/clear buttons
-static class JoyPadConfig_t : public wxEvtHandler {
-public:
-    wxWindow* p;
-    void JoypadConfigButtons(wxCommandEvent& ev)
-    {
-        bool clear = ev.GetId() == XRCID("Clear");
-
-        // For the individual clear buttons, we assume their name is
-        // "Clear" + control_name
-        // ClearUp for Up; ClearR for R etc
-        for (const config::GameKey& game_key : config::kAllGameKeys) {
-            const wxString control_name = config::GameKeyToString(game_key);
-            widgets::UserInputCtrl* tc = XRCCTRL_D(*p, control_name, widgets::UserInputCtrl);
-            wxString singleClearButton("Clear" + control_name);
-            if (ev.GetId() == XRCID(singleClearButton.c_str())) {
-                tc->Clear();
-                return;
-            }
-        }
-
-        for (const config::GameKey& game_key : config::kAllGameKeys) {
-            widgets::UserInputCtrl* tc =
-                XRCCTRL_D(*p, config::GameKeyToString(game_key), widgets::UserInputCtrl);
-
-            if (clear) {
-                tc->Clear();
-            } else {
-                tc->SetInputs(kDefaultBindings.find(config::GameControl(0, game_key))->second);
-            }
-        }
-    }
-} JoyPadConfigHandler[4];
 
 // manage throttle spinctrl/canned setting choice interaction
 static class ThrottleCtrl_t : public wxEvtHandler {
@@ -2727,6 +2696,8 @@ bool MainFrame::BindControls()
             NULL, &sound_config_handler);                 \
     } while (0)
             audapi_rb("SDL", AUD_SDL);
+            rb->Hide(); // currently disabled
+
             audapi_rb("OpenAL", AUD_OPENAL);
 #ifdef NO_OAL
             rb->Hide();
@@ -2775,54 +2746,7 @@ bool MainFrame::BindControls()
             d->Fit();
         }
         dialogs::DirectoriesConfig::NewInstance(this);
-        wxDialog* joyDialog = LoadXRCropertySheetDialog("JoypadConfig");
-
-        for (int i = 0; i < 4; i++) {
-            wxString pn;
-            // NOTE: wx2.9.1 behaves differently for referenced nodes
-            // than 2.8!  Unless there is an actual child node, the ID field
-            // will not be overwritten.  This means that there should be a
-            // dummy child node (e.g. position=(0,0)).  If you get
-            // "Unable to load dialog JoypadConfig from resources", this is
-            // probably the reason.
-            pn.Printf(wxT("joy%d"), i + 1);
-            wxWindow* w = SafeXRCCTRL<wxWindow>(joyDialog, pn);
-
-            w->FindWindow("DefaultConfig")
-                ->SetValidator(wxBoolIntValidator(&gopts.default_stick, i + 1));
-            wxWindow *prev = NULL, *prevp = NULL;
-
-            for (const config::GameKey& game_key : config::kAllGameKeys) {
-                const wxString control_name = config::GameKeyToString(game_key);
-                widgets::UserInputCtrl* tc = XRCCTRL_D(*w, control_name, widgets::UserInputCtrl);
-                CheckThrowXRCError(tc, control_name);
-                wxWindow* p = tc->GetParent();
-
-                if (p == prevp)
-                    tc->MoveAfterInTabOrder(prev);
-
-                prev = tc;
-                prevp = p;
-                tc->SetValidator(widgets::UserInputCtrlValidator(config::GameControl(i, game_key)));
-            }
-
-            JoyPadConfigHandler[i].p = w;
-            w->Connect(XRCID("Defaults"), wxEVT_COMMAND_BUTTON_CLICKED,
-                wxCommandEventHandler(JoyPadConfig_t::JoypadConfigButtons),
-                NULL, &JoyPadConfigHandler[i]);
-            w->Connect(XRCID("Clear"), wxEVT_COMMAND_BUTTON_CLICKED,
-                wxCommandEventHandler(JoyPadConfig_t::JoypadConfigButtons),
-                NULL, &JoyPadConfigHandler[i]);
-            for (const config::GameKey& game_key : config::kAllGameKeys) {
-                const wxString control_name = config::GameKeyToString(game_key);
-                w->Connect(XRCID(wxString("Clear" + control_name).c_str()),
-                    wxEVT_COMMAND_BUTTON_CLICKED,
-                    wxCommandEventHandler(JoyPadConfig_t::JoypadConfigButtons),
-                    NULL, &JoyPadConfigHandler[i]);
-            }
-
-            joyDialog->Fit();
-        }
+        dialogs::JoypadConfig::NewInstance(this);
 
 #ifndef NO_LINK
         d = LoadXRCDialog("LinkConfig");
@@ -2893,5 +2817,12 @@ bool MainFrame::BindControls()
     panel->SetFrameTitle();
     // All OK; activate idle loop
     panel->SetExtraStyle(panel->GetExtraStyle() | wxWS_EX_PROCESS_IDLE);
+
+    // Re-adjust size now to nudge some sense into Widgets.
+    panel->AdjustSize(false);
+
+    // Frame initialization is complete.
+    init_complete_ = true;
+
     return true;
 }

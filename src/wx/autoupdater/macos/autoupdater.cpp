@@ -7,7 +7,7 @@ SparkleWrapper autoupdater;
 
 void initAutoupdater()
 {
-    autoupdater.addAppcastURL("https://data.vba-m.com/appcast.xml");
+    autoupdater.addAppcastURL("https://data.visualboyadvance-m.org/appcast.xml");
 }
 
 

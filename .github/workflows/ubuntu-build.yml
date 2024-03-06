@@ -3,8 +3,12 @@ on: [push, pull_request]
 
 jobs:
   build:
+    strategy:
+      matrix:
+        cmake_compiler: ['-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++', '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++']
+        cmake_build: ['-DCMAKE_BUILD_TYPE=Release', '-DCMAKE_BUILD_TYPE=Debug']
+        cmake_options: ['', '-DENABLE_LINK=OFF', '-DENABLE_SDL=ON']
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
@@ -13,11 +17,11 @@ jobs:
 
       - name: Install Dependencies
         run: >-
-          bash installdeps
+          bash installdeps; if [ "${{ matrix.compiler }}" = clang ]; then sudo apt -y install clang; fi
 
       - name: Configure
         run: >-
-          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+          cmake -B build -G Ninja ${{ matrix.cmake_compiler }} ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}
 
       - name: Build
         run: ninja -C build

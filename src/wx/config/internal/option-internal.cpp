@@ -209,6 +209,9 @@ std::array<Option, kNbOptions>& Option::All() {
         bool statusbar = false;
         uint32_t ini_version = kIniLatestVersion;
 
+        /// Joypad
+        uint32_t default_stick = 1;
+
         /// Geometry
         bool fullscreen = false;
         bool window_maximized = false;
@@ -289,7 +292,7 @@ std::array<Option, kNbOptions>& Option::All() {
         /// Joypad
         Option(OptionID::kJoy),
         Option(OptionID::kJoyAutofireThrottle, &gopts.autofire_rate, 1, 1000),
-        Option(OptionID::kJoyDefault, &gopts.default_stick, 1, 4),
+        Option(OptionID::kJoyDefault, &g_owned_opts.default_stick, 1, 4),
 
         /// Keyboard
         Option(OptionID::kKeyboard),
@@ -709,7 +712,7 @@ RenderMethod StringToRenderMethod(const wxString& config_name,
     return iter->second;
 }
 
-int StringToAudioApi(const wxString& config_name, const wxString& input) {
+int StringToAudioApi(const wxString& config_name, const wxString& input_) {
     static std::map<wxString, AudioApi> kStringToAudioApi;
     if (kStringToAudioApi.empty()) {
         for (size_t i = 0; i < kNbAudioApis; i++) {
@@ -717,6 +720,17 @@ int StringToAudioApi(const wxString& config_name, const wxString& input) {
                                       static_cast<AudioApi>(i));
         }
         assert(kStringToAudioApi.size() == kNbAudioApis);
+    }
+
+    wxString input = input_;
+
+    // sdl has been removed, rewrite to new default
+    if (input == "sdl") {
+#ifdef __WXMSW__
+        input = "xaudio2";
+#else
+        input = "openal";
+#endif
     }
 
     const auto iter = kStringToAudioApi.find(input);

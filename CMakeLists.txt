@@ -45,7 +45,7 @@ if(TAG_RELEASE)
     include(MakeReleaseCommitAndTag)
 endif()
 
-set(VCPKG_DEPS pkgconf zlib sdl2 gettext wxwidgets)
+set(VCPKG_DEPS pkgconf zlib "sdl2[samplerate]" gettext wxwidgets)
 
 set(VCPKG_DEPS_OPTIONAL
     sfml   ENABLE_LINK
@@ -74,9 +74,11 @@ if(NOT CMAKE_CXX_COMPILER_LAUNCHER)
     endif()
 endif()
 
-project(VBA-M C CXX)
+cmake_minimum_required(VERSION 3.8.2)
 
-cmake_minimum_required(VERSION 2.8.12)
+set(CMAKE_CXX_STANDARD 17)
+
+project(VBA-M C CXX)
 
 if(NOT CMAKE_PREFIX_PATH AND (NOT ("$ENV{CMAKE_PREFIX_PATH}" STREQUAL "")))
     set(CMAKE_PREFIX_PATH "$ENV{CMAKE_PREFIX_PATH}")
@@ -456,7 +458,7 @@ if(ENABLE_FFMPEG)
         set(FFMPEG_LDFLAGS ${FFMPEG_LDFLAGS} -framework CoreText -framework ApplicationServices)
 
         if(UPSTREAM_RELEASE)
-            set(FFMPEG_LDFLAGS ${FFMPEG_LDFLAGS} -lbz2 -lvo-amrwbenc -lopencore-amrnb -lopencore-amrwb -lmodplug -lbluray -lgsm -lmp3lame -ltiff -lopus -lsnappy -lsoxr -lspeex -ltheora -lvorbis -lvpx -lx264 -lx265 -lxavs -lxvidcore -lzmq -framework DiskArbitration -lfreetype -lfontconfig -llzma -logg -lvorbisenc -lxml2 -lharfbuzz)
+            set(FFMPEG_LDFLAGS ${FFMPEG_LDFLAGS} -lbz2 -ltiff -framework DiskArbitration -lfreetype -lfontconfig -llzma -lxml2 -lharfbuzz)
         endif()
     elseif(WIN32)
         set(WIN32_MEDIA_FOUNDATION_LIBS dxva2 evr mf mfplat mfplay mfreadwrite mfuuid amstrmid)
@@ -494,8 +496,13 @@ add_definitions(-D__STDC_FORMAT_MACROS)
 
 # For C++, default to nonstd::optional and nonstd::variant for now due to mac
 # build issues.
-add_definitions(-Doptional_CONFIG_SELECT_OPTIONAL=optional_OPTIONAL_NONSTD)
-add_definitions(-Dvariant_CONFIG_SELECT_VARIANT=variant_VARIANT_NONSTD)
+if(APPLE)
+    add_definitions(-Doptional_CONFIG_SELECT_OPTIONAL=optional_OPTIONAL_NONSTD)
+    add_definitions(-Dvariant_CONFIG_SELECT_VARIANT=variant_VARIANT_NONSTD)
+else()
+    add_definitions(-Doptional_CONFIG_SELECT_OPTIONAL=optional_OPTIONAL_STD)
+    add_definitions(-Dvariant_CONFIG_SELECT_VARIANT=variant_VARIANT_STD)
+endif()
 
 if(ENABLE_LINK)
     # IPC linking code needs sem_timedwait which can be either in librt or pthreads
@@ -1180,8 +1187,6 @@ if(NOT TRANSLATIONS_ONLY)
         ${HDR_STB_IMAGE}
     )
     add_dependencies(vbamcore generate)
-    set_property(TARGET vbamcore PROPERTY CXX_STANDARD 11)
-    set_property(TARGET vbamcore PROPERTY CXX_STANDARD_REQUIRED ON)
 endif()
 
 if((NOT TRANSLATIONS_ONLY) AND ENABLE_SDL)
@@ -1191,8 +1196,6 @@ if((NOT TRANSLATIONS_ONLY) AND ENABLE_SDL)
         ${SRC_SDL}
         ${HDR_SDL}
     )
-    set_property(TARGET vbam PROPERTY CXX_STANDARD 11)
-    set_property(TARGET vbam PROPERTY CXX_STANDARD_REQUIRED ON)
 
     if(WIN32)
         set(WIN32_LIBRARIES wsock32 ws2_32 winmm version imm32)
