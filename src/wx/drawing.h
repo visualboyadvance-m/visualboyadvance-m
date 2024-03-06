@@ -50,12 +50,30 @@ protected:
 #endif
 
 #if defined(__WXMSW__) && !defined(NO_D3D)
-class DXDrawingPanel : public DrawingPanel {
+#include <d3d9.h> // main include file
+
+struct Vertex
+{
+    float x, y, z;
+    float u, v;
+};
+
+class DXDrawingPanel : public DrawingPanelBase
+{
 public:
     DXDrawingPanel(wxWindow* parent, int _width, int _height);
+    virtual ~DXDrawingPanel();
 
 protected:
+    void DrawingPanelInit();
     void DrawArea(wxWindowDC&);
+    void OnSize(wxSizeEvent& ev);
+
+private:
+    IDirect3D9Ex* d3d;
+    IDirect3DDevice9Ex* d3ddev;
+    IDirect3DVertexBuffer9* vbuffer;
+    IDirect3DTexture9* texture;
 };
 #endif
 
