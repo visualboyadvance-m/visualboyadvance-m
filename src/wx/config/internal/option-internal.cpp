@@ -286,6 +286,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kGenRewindInterval, &gopts.rewind_interval, 0, 600),
         Option(OptionID::kGenScreenshotDir, &g_owned_opts.screenshot_dir),
         Option(OptionID::kGenStateDir, &g_owned_opts.state_dir),
+        Option(OptionID::kGenStatusBar, &g_owned_opts.statusbar),
         Option(OptionID::kGenIniVersion, &g_owned_opts.ini_version, 0, std::numeric_limits<uint32_t>::max()),
 
         /// Joypad
@@ -343,7 +344,6 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kGeomWindowY, &g_owned_opts.window_pos_y, std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max()),
 
         /// UI
-        Option(OptionID::kUIEnableStatusBar, &g_owned_opts.statusbar),
         Option(OptionID::kUIAllowKeyboardBackgroundInput, &g_owned_opts.allow_keyboard_background_input),
         Option(OptionID::kUIAllowJoystickBackgroundInput, &g_owned_opts.allow_joystick_background_input),
         Option(OptionID::kUIHideMenuBar, &gopts.hide_menu_bar),
@@ -464,6 +464,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"General/StateDir", "",
                _("Directory to store saved state files (relative paths are "
                  "relative to BatteryDir)")},
+    OptionData{"General/StatusBar", "StatusBar", _("Enable status bar")},
     OptionData{"General/IniVersion", "", _("INI file version (DO NOT MODIFY)")},
 
     /// Joypad
@@ -567,7 +568,6 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"geometry/windowY", "Y", _("Window axis Y position at startup")},
 
     /// UI
-    OptionData{"ui/enableStatusBar", "EnableStatusBar", _("Enable status bar")},
     OptionData{"ui/allowKeyboardBackgroundInput",
                "AllowKeyboardBackgroundInput",
                _("Capture key events while on background")},

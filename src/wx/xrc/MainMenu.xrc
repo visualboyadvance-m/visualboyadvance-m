@@ -567,7 +567,7 @@
         </object>
         <object class="wxMenu" name="UIConfigure">
           <label>UI Settings</label>
-					<object class="wxMenuItem" name="EnableStatusBar">
+					<object class="wxMenuItem" name="StatusBar">
 							<label>Enable _Status bar</label>
 							<checkable>1</checkable>
 					</object>

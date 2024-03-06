@@ -2447,6 +2447,11 @@ EVT_HANDLER(KeepOnTop, "Keep window on top")
     GetMenuOptionConfig("KeepOnTop", config::OptionID::kDispKeepOnTop);
 }
 
+EVT_HANDLER(StatusBar, "Enable status bar")
+{
+    GetMenuOptionConfig("StatusBar", config::OptionID::kGenStatusBar);
+}
+
 EVT_HANDLER(NoStatusMsg, "Disable on-screen status messages")
 {
     GetMenuOptionConfig("NoStatusMsg", config::OptionID::kPrefDisableStatus);
@@ -2506,11 +2511,6 @@ EVT_HANDLER(BootRomGBC, "Use the specified BIOS file for GBC")
 EVT_HANDLER(VSync, "Wait for vertical sync")
 {
     GetMenuOptionConfig("VSync", config::OptionID::kPrefVsync);
-}
-
-EVT_HANDLER(EnableStatusBar, "Enable status bar")
-{
-    GetMenuOptionConfig("EnableStatusBar", config::OptionID::kUIEnableStatusBar);
 }
 
 EVT_HANDLER(HideMenuBar, "Hide menu bar when mouse is inactive")

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-05 21:49+0800\n"
+"POT-Creation-Date: 2024-03-06 18:49+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -581,7 +581,7 @@ msgid ""
 "along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr ""
 
-#: cmdevents.cpp:2495
+#: cmdevents.cpp:2500
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 msgstr ""
 
@@ -1059,10 +1059,14 @@ msgid ""
 msgstr ""
 
 #: config/internal/option-internal.cpp:467
+msgid "Enable status bar"
+msgstr ""
+
+#: config/internal/option-internal.cpp:468
 msgid "INI file version (DO NOT MODIFY)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:471
+#: config/internal/option-internal.cpp:472
 msgid ""
 "The parameter Joypad/<n>/<button> contains a comma-separated list of key "
 "names which map to joypad #<n> button <button>. Button is one of Up, Down, "
@@ -1070,183 +1074,179 @@ msgid ""
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
 msgstr ""
 
-#: config/internal/option-internal.cpp:477
+#: config/internal/option-internal.cpp:478
 msgid "The autofire toggle period, in frames (1/60 s)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:479
+#: config/internal/option-internal.cpp:480
 msgid "The number of the stick to use in single-player mode"
 msgstr ""
 
-#: config/internal/option-internal.cpp:483
+#: config/internal/option-internal.cpp:484
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names (e."
 "g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
 msgstr ""
 
-#: config/internal/option-internal.cpp:489
+#: config/internal/option-internal.cpp:490
 msgid "Enable AGB debug print"
 msgstr ""
 
-#: config/internal/option-internal.cpp:491
+#: config/internal/option-internal.cpp:492
 msgid "Auto skip frames"
 msgstr ""
 
-#: config/internal/option-internal.cpp:493
+#: config/internal/option-internal.cpp:494
 msgid "Apply IPS / UPS / IPF patches if found"
 msgstr ""
 
-#: config/internal/option-internal.cpp:495
+#: config/internal/option-internal.cpp:496
 msgid "Automatically save and load cheat list"
 msgstr ""
 
-#: config/internal/option-internal.cpp:499
+#: config/internal/option-internal.cpp:500
 msgid "Automatically enable border for Super Game Boy games"
 msgstr ""
 
-#: config/internal/option-internal.cpp:501
+#: config/internal/option-internal.cpp:502
 msgid "Always enable border"
 msgstr ""
 
-#: config/internal/option-internal.cpp:503
+#: config/internal/option-internal.cpp:504
 msgid "Screen capture file format"
 msgstr ""
 
-#: config/internal/option-internal.cpp:504
+#: config/internal/option-internal.cpp:505
 msgid "Enable cheats"
 msgstr ""
 
-#: config/internal/option-internal.cpp:506
+#: config/internal/option-internal.cpp:507
 msgid "Disable on-screen status messages"
 msgstr ""
 
-#: config/internal/option-internal.cpp:507
+#: config/internal/option-internal.cpp:508
 msgid "Type of system to emulate"
 msgstr ""
 
-#: config/internal/option-internal.cpp:509
+#: config/internal/option-internal.cpp:510
 msgid "Flash size 0 = 64 KB 1 = 128 KB"
 msgstr ""
 
-#: config/internal/option-internal.cpp:511
+#: config/internal/option-internal.cpp:512
 msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
 msgstr ""
 
-#: config/internal/option-internal.cpp:513
+#: config/internal/option-internal.cpp:514
 msgid "The palette to use"
 msgstr ""
 
-#: config/internal/option-internal.cpp:515
+#: config/internal/option-internal.cpp:516
 msgid "Enable printer emulation"
 msgstr ""
 
-#: config/internal/option-internal.cpp:517
+#: config/internal/option-internal.cpp:518
 msgid "Break into GDB after loading the game."
 msgstr ""
 
-#: config/internal/option-internal.cpp:519
+#: config/internal/option-internal.cpp:520
 msgid "Port to connect GDB to"
 msgstr ""
 
-#: config/internal/option-internal.cpp:522
+#: config/internal/option-internal.cpp:523
 msgid "Number of players in network"
 msgstr ""
 
-#: config/internal/option-internal.cpp:525
+#: config/internal/option-internal.cpp:526
 msgid "Maximum scale factor (0 = no limit)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:527
+#: config/internal/option-internal.cpp:528
 msgid "Pause game when main window loses focus"
 msgstr ""
 
-#: config/internal/option-internal.cpp:529
+#: config/internal/option-internal.cpp:530
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
 msgstr ""
 
-#: config/internal/option-internal.cpp:531
+#: config/internal/option-internal.cpp:532
 msgid "Native save (\"battery\") hardware type"
 msgstr ""
 
-#: config/internal/option-internal.cpp:532
+#: config/internal/option-internal.cpp:533
 msgid "Show speed indicator"
 msgstr ""
 
-#: config/internal/option-internal.cpp:534
+#: config/internal/option-internal.cpp:535
 msgid "Draw on-screen messages transparently"
 msgstr ""
 
-#: config/internal/option-internal.cpp:536
+#: config/internal/option-internal.cpp:537
 msgid "Skip BIOS initialization"
 msgstr ""
 
-#: config/internal/option-internal.cpp:538
+#: config/internal/option-internal.cpp:539
 msgid "Do not overwrite cheat list when loading state"
 msgstr ""
 
-#: config/internal/option-internal.cpp:540
+#: config/internal/option-internal.cpp:541
 msgid "Do not overwrite native (battery) save when loading state"
 msgstr ""
 
-#: config/internal/option-internal.cpp:542
+#: config/internal/option-internal.cpp:543
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:545
+#: config/internal/option-internal.cpp:546
 msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:547
+#: config/internal/option-internal.cpp:548
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
 msgstr ""
 
-#: config/internal/option-internal.cpp:550
+#: config/internal/option-internal.cpp:551
 msgid "Use frame skip for speedup throttle"
 msgstr ""
 
-#: config/internal/option-internal.cpp:552
+#: config/internal/option-internal.cpp:553
 msgid "Use the specified BIOS file for Game Boy"
 msgstr ""
 
-#: config/internal/option-internal.cpp:554
+#: config/internal/option-internal.cpp:555
 msgid "Use the specified BIOS file"
 msgstr ""
 
-#: config/internal/option-internal.cpp:556
+#: config/internal/option-internal.cpp:557
 msgid "Use the specified BIOS file for Game Boy Color"
 msgstr ""
 
-#: config/internal/option-internal.cpp:557
+#: config/internal/option-internal.cpp:558
 msgid "Wait for vertical sync"
 msgstr ""
 
-#: config/internal/option-internal.cpp:561
+#: config/internal/option-internal.cpp:562
 msgid "Enter fullscreen mode at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:562
+#: config/internal/option-internal.cpp:563
 msgid "Window maximized"
 msgstr ""
 
-#: config/internal/option-internal.cpp:564
+#: config/internal/option-internal.cpp:565
 msgid "Window height at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:565
+#: config/internal/option-internal.cpp:566
 msgid "Window width at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:566
+#: config/internal/option-internal.cpp:567
 msgid "Window axis X position at startup"
 msgstr ""
 
-#: config/internal/option-internal.cpp:567
+#: config/internal/option-internal.cpp:568
 msgid "Window axis Y position at startup"
-msgstr ""
-
-#: config/internal/option-internal.cpp:570
-msgid "Enable status bar"
 msgstr ""
 
 #: config/internal/option-internal.cpp:573

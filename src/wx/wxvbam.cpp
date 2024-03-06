@@ -845,7 +845,7 @@ MainFrame::MainFrame()
                          std::bind(&MainFrame::EnableNetworkMenu, this)),
 #endif
       keep_on_top_styler_(this),
-      status_bar_observer_(config::OptionID::kUIEnableStatusBar,
+      status_bar_observer_(config::OptionID::kGenStatusBar,
                            std::bind(&MainFrame::OnStatusBarChanged, this)) {
     jpoll = new JoystickPoller();
     this->Connect(wxID_ANY, wxEVT_SHOW, wxShowEventHandler(JoystickPoller::ShowDialog), jpoll, jpoll);
@@ -860,11 +860,11 @@ MainFrame::~MainFrame() {
 void MainFrame::SetStatusBar(wxStatusBar* menu_bar) {
     wxFrame::SetStatusBar(menu_bar);
     // This will take care of hiding the menu bar at startup, if needed.
-    menu_bar->Show(OPTION(kUIEnableStatusBar));
+    menu_bar->Show(OPTION(kGenStatusBar));
 }
 
 void MainFrame::OnStatusBarChanged() {
-    GetStatusBar()->Show(OPTION(kUIEnableStatusBar));
+    GetStatusBar()->Show(OPTION(kGenStatusBar));
     SendSizeEvent();
     panel->AdjustSize(false);
     SendSizeEvent();
