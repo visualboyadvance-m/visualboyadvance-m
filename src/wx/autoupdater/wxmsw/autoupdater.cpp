@@ -9,9 +9,9 @@ void initAutoupdater()
     // even if we are a nightly, only check latest stable version
     wxString version = strutils::split(vbam_version, '-')[0];
 #ifndef NO_HTTPS
-    win_sparkle_set_appcast_url("https://data.vba-m.com/appcast.xml");
+    win_sparkle_set_appcast_url("https://data.visualboyadvance-m.org/appcast.xml");
 #else
-    win_sparkle_set_appcast_url("http://data.vba-m.com/appcast.xml");
+    win_sparkle_set_appcast_url("http://data.visualboyadvance-m.org/appcast.xml");
 #endif // NO_HTTPS
     win_sparkle_set_app_details(L"visualboyadvance-m", L"VisualBoyAdvance-M", version.wc_str());
     win_sparkle_init();
