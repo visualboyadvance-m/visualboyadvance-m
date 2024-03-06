@@ -55,7 +55,7 @@ endif()
 
 if(ENABLE_FAUDIO)
     find_package(FAudio REQUIRED)
-    list(APPEND VBAM_LIBS FAudio)
+    list(APPEND VBAM_LIBS FAudio::FAudio)
 else()
     add_definitions(-DNO_FAUDIO)
 endif()
