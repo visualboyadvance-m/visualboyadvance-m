@@ -2696,8 +2696,6 @@ bool MainFrame::BindControls()
             NULL, &sound_config_handler);                 \
     } while (0)
             audapi_rb("SDL", AUD_SDL);
-            rb->Hide(); // currently disabled
-
             audapi_rb("OpenAL", AUD_OPENAL);
 #ifdef NO_OAL
             rb->Hide();

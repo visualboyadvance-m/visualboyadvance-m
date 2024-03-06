@@ -426,6 +426,16 @@ enum showspeed {
     SS_DETAILED
 };
 
+// This enum must be kept in sync with the one in vbam-options-static.cpp.
+// TODO: These 2 enums should be unified and a validator created for this enum.
+enum audioapi {
+    AUD_SDL,
+    AUD_OPENAL,
+    AUD_DIRECTSOUND,
+    AUD_XAUDIO2,
+    AUD_FAUDIO
+};
+
 // an unfortunate legacy default; should have a non-digit preceding %d
 // the only reason to keep it is that user can set slotdir to old dir
 // otoh, we already make some name changes (double ext strip), and

@@ -31,15 +31,29 @@ endif()
 
 option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" OFF)
 
-find_package(OpenAL REQUIRED)
+find_package(OpenAL)
 
-include_directories(${OPENAL_INCLUDE_DIR})
-
-if(OPENAL_STATIC OR (WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)))
-    add_definitions(-DAL_LIBTYPE_STATIC)
+if(OPENAL_FOUND)
+	set(ENABLE_OPENAL_DEFAULT ON)
+else()
+	set(ENABLE_OPENAL_DEFAULT OFF)
 endif()
 
-list(APPEND VBAM_LIBS ${OPENAL_LIBRARY})
+option(ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" ${ENABLE_OPENAL_DEFAULT})
+
+if(ENABLE_OPENAL)
+	find_package(OpenAL REQUIRED)
+
+	include_directories(${OPENAL_INCLUDE_DIR})
+
+	if(OPENAL_STATIC OR (WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)))
+		add_definitions(-DAL_LIBTYPE_STATIC)
+	endif()
+
+        list(APPEND VBAM_LIBS ${OPENAL_LIBRARY})
+else()
+    add_definitions(-DNO_OAL)
+endif()
 
 if(APPLE)
     add_definitions(-DwxMAC_USE_CORE_GRAPHICS)
@@ -92,17 +106,6 @@ endif()
 # Win32 definitions common to all toolchains.
 if (WIN32)
     add_definitions(-D_UNICODE -DUNICODE -DwxUSE_GUI=1 -D__WXMSW__ -DWINVER=0x0A00 -DNTDDI_VERSION=0x0A000007)
-endif()
-
-if(CMAKE_HOST_WIN32)
-    find_program(POWERSHELL powershell.exe HINTS "/Windows/System32/WindowsPowerShell/v1.0" REQUIRED)
-else()
-    find_program(POWERSHELL pwsh)
-endif()
-
-find_program(ZIP_PROGRAM zip)
-if(ZIP_PROGRAM)
-    set(ZIP_PROGRAM "${ZIP_PROGRAM}" CACHE STRING "zip compressor executable" FORCE)
 endif()
 
 # on VS with vcpkg we can't use FindwxWidgets, we have to set everything up
@@ -191,12 +194,12 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
 
     set(ENV{PATH} "${dbg_prefix}/bin;${common_prefix}/bin;$ENV{PATH}")
 
-    if(NOT ZIP_PROGRAM AND NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/zip.exe)
+    if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/zip.exe)
         # get zip binary for wxrc
         file(DOWNLOAD "https://www.willus.com/archive/zip64/infozip_binaries_win32.zip" ${CMAKE_CURRENT_BINARY_DIR}/infozip_binaries_win32.zip)
         # unzip it
         execute_process(
-            COMMAND "${POWERSHELL}" -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('${CMAKE_CURRENT_BINARY_DIR}/infozip_binaries_win32.zip', '${CMAKE_CURRENT_BINARY_DIR}'); }"
+            COMMAND powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('${CMAKE_CURRENT_BINARY_DIR}/infozip_binaries_win32.zip', '${CMAKE_CURRENT_BINARY_DIR}'); }"
         )
 
         set(ZIP_PROGRAM ${CMAKE_CURRENT_BINARY_DIR}/zip.exe CACHE STRING "zip compressor executable" FORCE)
@@ -234,11 +237,7 @@ else()
     # is set
     if(NOT wxWidgets_CONFIG_EXECUTABLE)
         if(DEFINED ENV{WX_CONFIG})
-            if(NOT CMAKE_HOST_WIN32)
-                separate_arguments(wxWidgets_CONFIG_EXECUTABLE UNIX_COMMAND "$ENV{WX_CONFIG}")
-            else()
-                set(wxWidgets_CONFIG_EXECUTABLE "$ENV{WX_CONFIG}")
-            endif()
+            separate_arguments(wxWidgets_CONFIG_EXECUTABLE UNIX_COMMAND $ENV{WX_CONFIG})
         else()
             find_wx_util(wxWidgets_CONFIG_EXECUTABLE wx-config)
         endif()
@@ -603,12 +602,10 @@ include_directories(widgets)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-if(NOT ZIP_PROGRAM)
-    find_program(ZIP_PROGRAM zip DOC "zip compressor executable")
+find_program(ZIP_PROGRAM zip DOC "zip compressor executable")
 
-    if(NOT ZIP_PROGRAM)
-        message(FATAL_ERROR "The zip compressor program is required for building.")
-    endif()
+if(NOT ZIP_PROGRAM)
+    message(FATAL_ERROR "The zip compressor program is required for building.")
 endif()
 
 set(
@@ -671,14 +668,10 @@ if(CMAKE_HOST_WIN32 AND CMAKE_CROSSCOMPILING)
     set(WXRC ${CMAKE_SOURCE_DIR}/dependencies/wxrc/wxrc.exe)
 endif()
 
-if(WXRC AND NOT CMAKE_HOST_WIN32)
+if(WXRC)
     separate_arguments(WXRC UNIX_COMMAND ${WXRC})
 elseif(DEFINED ENV{WXRC})
-    if(NOT CMAKE_HOST_WIN32)
-        separate_arguments(WXRC UNIX_COMMAND "$ENV{WXRC}")
-    else()
-        set(WXRC "$ENV{WXRC}")
-    endif()
+    separate_arguments(WXRC UNIX_COMMAND $ENV{WXRC})
 elseif(wxWidgets_CONFIG_EXECUTABLE)
     execute_process(
         COMMAND ${wxWidgets_CONFIG_EXECUTABLE} --utility=wxrc
@@ -921,8 +914,10 @@ if(ENABLE_DIRECT3D)
     list(APPEND VBAM_LIBS d3d9)
 endif()
 
-list(APPEND SRC_WX openal.cpp)
-list(APPEND HDR_WX openal.h)
+if(ENABLE_OPENAL)
+   list(APPEND SRC_WX openal.cpp)
+   list(APPEND HDR_WX openal.h)
+endif()
 
 list(APPEND ALL_SRC_WX xaudio2.cpp)
 
@@ -1007,7 +1002,7 @@ if(NOT TRANSLATIONS_ONLY)
             PRIVATE ${SPARKLE_INCLUDE_DIR}
         )
 
-        set(APPCAST_URL "https://data.visualboyadvance-m.org/appcast.xml")
+        set(APPCAST_URL "https://data.vba-m.com/appcast.xml")
         set(CCS1 rm -rf ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks/Sparkle.framework)
         set(CCS2 mkdir -p ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks)
         # The following commands *should* be run to make sure Sparkle is not going

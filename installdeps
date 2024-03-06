@@ -1024,7 +1024,7 @@ solus_installdeps() {
     check sudo eopkg -y install -c system.devel
     check sudo eopkg -y install git ccache ninja
 
-    set -- sdl2-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel libglu-devel
+    set -- sdl2-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel
 
     [ -n "$ENABLE_OPENAL" ] && set -- "$@" openal-soft-devel
 
@@ -1095,24 +1095,15 @@ gentoo_installdeps() {
     wx_slot=$(equery -qC list -p -F '$slot' x11-libs/wxGTK | grep gtk3 | sort -rV | head -1)
 
     ebuilds="\
-      sys-devel/gcc \
-      dev-build/make \
-      dev-build/cmake \
-      dev-util/ccache \
-      sys-devel/binutils \
-      media-libs/libsdl2 \
-      media-libs/libsfml \
-      x11-libs/wxGTK:$wx_slot \
-      sys-libs/zlib \
-      dev-util/pkgconf \
-      dev-lang/nasm \
-      dev-build/ninja"
+      sys-devel/gcc      sys-devel/make     dev-util/cmake          dev-util/ccache sys-devel/binutils \
+      media-libs/libsdl2 media-libs/libsfml x11-libs/wxGTK:$wx_slot sys-libs/zlib   dev-util/pkgconf \
+      dev-lang/nasm      dev-util/ninja"
 
     [ -n "$ENABLE_OPENAL" ] && ebuilds="$ebuilds media-libs/openal"
 
     [ -n "$ENABLE_FFMPEG" ] && ebuilds="$ebuilds media-video/ffmpeg"
 
-    check sudo emerge -vna $ebuilds
+    check sudo emerge -vn $ebuilds
 
     build_instructions
 }
