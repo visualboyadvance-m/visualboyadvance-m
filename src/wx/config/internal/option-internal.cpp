@@ -712,7 +712,7 @@ RenderMethod StringToRenderMethod(const wxString& config_name,
     return iter->second;
 }
 
-int StringToAudioApi(const wxString& config_name, const wxString& input) {
+int StringToAudioApi(const wxString& config_name, const wxString& input_) {
     static std::map<wxString, AudioApi> kStringToAudioApi;
     if (kStringToAudioApi.empty()) {
         for (size_t i = 0; i < kNbAudioApis; i++) {
@@ -720,6 +720,17 @@ int StringToAudioApi(const wxString& config_name, const wxString& input) {
                                       static_cast<AudioApi>(i));
         }
         assert(kStringToAudioApi.size() == kNbAudioApis);
+    }
+
+    wxString input = input_;
+
+    // sdl has been removed, rewrite to new default
+    if (input == "sdl") {
+#ifdef __WXMSW__
+        input = "xaudio2";
+#else
+        input = "openal";
+#endif
     }
 
     const auto iter = kStringToAudioApi.find(input);

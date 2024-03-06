@@ -3,21 +3,21 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Ds886 <daniel.ashkenazi@gmail.com>, 2022
-# Ds886 <daniel.ashkenazi@gmail.com>, 2020
+# Eduardo Cardoso, 2023
+# gvasco <g.v.faria@icloud.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-15 14:15-0500\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Ds886 <daniel.ashkenazi@gmail.com>, 2022\n"
-"Language-Team: Hebrew (Israel) (http://app.transifex.com/bgk/vba-m/language/he_IL/)\n"
+"Last-Translator: Eduardo Cardoso, 2023\n"
+"Language-Team: Portuguese (Portugal) (http://app.transifex.com/bgk/vba-m/language/pt_PT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: he_IL\n"
-"Plural-Forms: nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
+"Language: pt_PT\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #: wxvbam.cpp:393 wxvbam.cpp:410
 #, c-format
@@ -26,43 +26,43 @@ msgstr ""
 
 #: wxvbam.cpp:554
 msgid "Could not create main window"
-msgstr "לא יכל ליצור את החלון המרכזי"
+msgstr ""
 
 #: wxvbam.cpp:635
 msgid "Save built-in XRC file and exit"
-msgstr "‏שמור את הקובץ ‎XRC ‏הבסיסי  וצא"
+msgstr ""
 
 #: wxvbam.cpp:638
 msgid "Save built-in vba-over.ini and exit"
-msgstr "שמור את קובץ vba-over.ini  הבסיסי וצא"
+msgstr ""
 
 #: wxvbam.cpp:641
 msgid "Print configuration path and exit"
-msgstr "הדפס את נתיב ההגדרות וצא"
+msgstr ""
 
 #: wxvbam.cpp:644
 msgid "Start in full-screen mode"
-msgstr "התחל במצב מסך מלא"
+msgstr ""
 
 #: wxvbam.cpp:647
 msgid "Set a configuration file"
-msgstr "קבע קובץ הגדרות"
+msgstr ""
 
 #: wxvbam.cpp:651
 msgid "Delete shared link state first, if it exists"
-msgstr "מחק את מצב הקישור המשותף קודם במידה והוא קיים"
+msgstr ""
 
 #: wxvbam.cpp:658
 msgid "List all settable options and exit"
-msgstr "הצג את כל האפשרויות הניתנות  לשינוי וצא"
+msgstr ""
 
 #: wxvbam.cpp:661
 msgid "ROM file"
-msgstr "קובץ רום"
+msgstr ""
 
 #: wxvbam.cpp:663
 msgid "<config>=<value>"
-msgstr "<config> = <value>"
+msgstr ""
 
 #: wxvbam.cpp:694
 msgid "Configuration / build error: can't find built-in xrc"
@@ -77,7 +77,7 @@ msgstr ""
 
 #: wxvbam.cpp:716
 msgid "Configuration is read from, in order:"
-msgstr "הגדרות נקראו, בסדר:"
+msgstr ""
 
 #: wxvbam.cpp:730
 #, c-format
@@ -90,7 +90,7 @@ msgstr ""
 msgid ""
 "\n"
 "\tbuilt-in"
-msgstr "\nפנימי"
+msgstr ""
 
 #: wxvbam.cpp:751
 msgid ""
@@ -98,203 +98,203 @@ msgid ""
 "\n"
 "For flag options, true and false are specified as 1 and 0, respectively.\n"
 "\n"
-msgstr "הגדרות שנקבעו דרך שורת פקודה נשמרים אם נעשה שינוי כלשהו בהגדרות של הממשק.\n\nעל מנת לבחור מהם, אמת ושקר מצויינים כ-1 ו-0 בהתאם.\n"
+msgstr ""
 
 #: wxvbam.cpp:759
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
-msgstr "אלה הפקודות הזמינות עבור המקלדת\\* האפשרויות הם:\n"
+msgstr ""
 
 #: wxvbam.cpp:770
 msgid "Configuration file not found."
-msgstr "קובץ ההגדרות לא נמצא."
+msgstr ""
 
 #: wxvbam.cpp:801
 msgid "Bad configuration option or multiple ROM files given:\n"
-msgstr "ישנה בעיה  בהגדרות שנבחרו או ניתנו מספר רב של קבצי רום:\n"
+msgstr ""
 
 #: guiinit.cpp:104
 msgid "Start!"
-msgstr "התחל!"
+msgstr ""
 
 #: guiinit.cpp:123
 msgid "Connect"
-msgstr "התחבר"
+msgstr ""
 
 #: guiinit.cpp:140
 msgid "You must enter a valid host name"
-msgstr "אתה חייב להכניס שם מארח תקין"
+msgstr ""
 
 #: guiinit.cpp:141
 msgid "Host name invalid"
-msgstr "שם המארח אינו תקין"
+msgstr ""
 
 #: guiinit.cpp:159
 msgid "Waiting for clients..."
-msgstr "מחכה למשתמשים..."
+msgstr ""
 
 #: guiinit.cpp:160
 #, c-format
 msgid "Server IP address is: %s\n"
-msgstr "‏כתובת ה-‎IP ‏של השרת היא: %s\n"
+msgstr ""
 
 #: guiinit.cpp:162
 msgid "Waiting for connection..."
-msgstr "מחכה לחיבור..."
+msgstr ""
 
 #: guiinit.cpp:163
 #, c-format
 msgid "Connecting to %s\n"
-msgstr "מתחבר אל %s\n"
+msgstr ""
 
 #: guiinit.cpp:196
 msgid ""
 "Error occurred.\n"
 "Please try again."
-msgstr "קרתה שגיאה.\nבבקשה תנסה שוב."
+msgstr ""
 
 #: guiinit.cpp:263 guiinit.cpp:316
 msgid "Select cheat file"
-msgstr "בחר קובץ רמאויות"
+msgstr ""
 
 #: guiinit.cpp:264
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
-msgstr "‏רשימת רמאויות של ‎VBA (*.clt)|*.clt| ‏רשימת רמאויות CHT ‎(*.cht)|*.cht"
+msgstr ""
 
 #: guiinit.cpp:283 panel.cpp:517
 msgid "Loaded cheats"
-msgstr "טען רמאויות"
+msgstr ""
 
 #: guiinit.cpp:317
 msgid "VBA cheat lists (*.clt)|*.clt"
-msgstr "רשימת רמאויות של VBA (*.clt)|*.clt|CHT"
+msgstr ""
 
 #: guiinit.cpp:335
 msgid "Saved cheats"
-msgstr "שמר רמאויות"
+msgstr ""
 
 #: guiinit.cpp:366 guiinit.cpp:385
 msgid "Restore old values?"
-msgstr "לשחזר ערכים ישנים?"
+msgstr ""
 
 #: guiinit.cpp:367 guiinit.cpp:386
 msgid "Removing cheats"
-msgstr "למחוק רמאויות"
+msgstr ""
 
 #: guiinit.cpp:781
 msgid "Generic Code"
-msgstr "קוד ג'נרי"
+msgstr ""
 
 #: guiinit.cpp:853 guiinit.cpp:1108
 msgid "Number cannot be empty"
-msgstr "המספרים אינם יכולים ליהיות ריקים"
+msgstr ""
 
 #: guiinit.cpp:903
 msgid "Search produced no results"
-msgstr "החיפוש לא מצא תוצאות"
+msgstr ""
 
 #: guiinit.cpp:1066
 msgid "8-bit "
-msgstr "8 סיביות"
+msgstr ""
 
 #: guiinit.cpp:1070
 msgid "16-bit "
-msgstr "16 סיביות"
+msgstr ""
 
 #: guiinit.cpp:1074
 msgid "32-bit "
-msgstr "32 סיביות"
+msgstr ""
 
 #: guiinit.cpp:1080
 msgid "signed decimal"
-msgstr "מספר מסומן"
+msgstr ""
 
 #: guiinit.cpp:1084
 msgid "unsigned decimal"
-msgstr "מספר לא מסומן"
+msgstr ""
 
 #: guiinit.cpp:1088
 msgid "unsigned hexadecimal"
-msgstr "מספר הקסדצימלי לא מסומן"
+msgstr ""
 
 #: guiinit.cpp:1489
 #, c-format
 msgid "%d frames = %.2f ms"
-msgstr "%d פריימים = %.2f מילישניות "
+msgstr ""
 
 #: guiinit.cpp:1501
 msgid "Default device"
-msgstr "מכשיר ברירת מחדל"
+msgstr ""
 
 #: guiinit.cpp:1920
 msgid "Main icon not found"
-msgstr "לא נמצאה סמלית ראשית "
+msgstr ""
 
 #: guiinit.cpp:1938
 msgid "Main display panel not found"
-msgstr "הפאנל של המסך ראשי לא נמצא"
+msgstr ""
 
 #: guiinit.cpp:2197
 #, c-format
 msgid "Invalid menu item %s; removing"
-msgstr "הפריט של התפריט %s לא תקין; מוחק"
+msgstr ""
 
 #: guiinit.cpp:2382
 msgid "Code"
-msgstr "קוד"
+msgstr ""
 
 #: guiinit.cpp:2391
 msgid "Description"
-msgstr "תיאור"
+msgstr ""
 
 #: guiinit.cpp:2465 xrc/CheatAdd.xrc:31
 msgid "Address"
-msgstr "כתובת"
+msgstr ""
 
 #: guiinit.cpp:2466
 msgid "Old Value"
-msgstr "ערך ישן"
+msgstr ""
 
 #: guiinit.cpp:2467
 msgid "New Value"
-msgstr "ערך חדש"
+msgstr ""
 
 #: guiinit.cpp:2794
 msgid "JoyBus host invalid; disabling"
-msgstr "מארח JoyBus  איננו תקין; מבטל"
+msgstr ""
 
 #: viewers.cpp:561
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
-msgstr "קבצי טקסט (*.txt;*.log)|*.txt;*.log|"
+msgstr ""
 
 #: viewers.cpp:563 viewers.cpp:773 gfxviewers.cpp:1603 gfxviewers.cpp:1746
 #: cmdevents.cpp:670 cmdevents.cpp:748 cmdevents.cpp:818 cmdevents.cpp:889
 #: viewsupt.cpp:1183
 msgid "Select output file"
-msgstr "בחר קובץ פלט"
+msgstr ""
 
 #: viewers.cpp:699 viewers.cpp:771
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
-msgstr "הטל זכרון (*.dmp;*.bin)|*.dmp;*.bin|"
+msgstr ""
 
 #: viewers.cpp:701
 msgid "Select memory dump file"
-msgstr "בחר הטל זכרון"
+msgstr ""
 
 #: gfxviewers.cpp:1143
 msgid "Select output file and type"
-msgstr "בחר קובץ פולט וסוג"
+msgstr ""
 
 #: gfxviewers.cpp:1144
 msgid ""
 "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
 "Table (*.act)|*.act"
-msgstr "לוח צבעים של החלון(*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|טבלת צבעים של Adobe  (*.act)|*.act"
+msgstr ""
 
 #: gfxviewers.cpp:1604 gfxviewers.cpp:1747 cmdevents.cpp:671 viewsupt.cpp:1184
 msgid "PNG images|*.png|BMP images|*.bmp"
-msgstr "תמונות PNG|*.png|תמונות BMP|*.bmp"
+msgstr ""
 
 #: cmdevents.cpp:129
 msgid ""
@@ -306,7 +306,7 @@ msgstr ""
 
 #: cmdevents.cpp:140
 msgid "Open ROM file"
-msgstr "פתח קובץ רום"
+msgstr ""
 
 #: cmdevents.cpp:161
 msgid ""
@@ -316,7 +316,7 @@ msgstr ""
 
 #: cmdevents.cpp:167
 msgid "Open GB ROM file"
-msgstr "‏פתח קובץ רום ל-‎GB "
+msgstr ""
 
 #: cmdevents.cpp:188
 msgid ""
@@ -326,23 +326,23 @@ msgstr ""
 
 #: cmdevents.cpp:194
 msgid "Open GBC ROM file"
-msgstr "‏פתח קובץ רום ל-‎GBC"
+msgstr ""
 
 #: cmdevents.cpp:359 cmdevents.cpp:381
 msgid "Select Dot Code file"
-msgstr "בחר קובץ קוד נקודות"
+msgstr ""
 
 #: cmdevents.cpp:361 cmdevents.cpp:383
 msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr "קוד נקודות e-Reader (*.bin;*.raw)|*.bin;*.raw"
+msgstr ""
 
 #: cmdevents.cpp:402 cmdevents.cpp:597
 msgid "Select battery file"
-msgstr "בחר קובץ סוללה"
+msgstr ""
 
 #: cmdevents.cpp:403 cmdevents.cpp:598
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
-msgstr "קובץ סוללה (*.sav)|*.sav| קובץ שמירת פלאש (*.dat)|*.dat"
+msgstr ""
 
 #: cmdevents.cpp:411
 msgid ""
@@ -352,21 +352,21 @@ msgstr ""
 
 #: cmdevents.cpp:412 cmdevents.cpp:440 cmdevents.cpp:560
 msgid "Confirm import"
-msgstr "אשר ייבוא"
+msgstr ""
 
 #: cmdevents.cpp:418 panel.cpp:460
 #, c-format
 msgid "Loaded battery %s"
-msgstr "טען סוללה%s"
+msgstr ""
 
 #: cmdevents.cpp:420
 #, c-format
 msgid "Error loading battery %s"
-msgstr "קרתה שגיאה בטעינת סוללה %s"
+msgstr ""
 
 #: cmdevents.cpp:429
 msgid "Select code file"
-msgstr "בחר קובץ רמאות"
+msgstr ""
 
 #: cmdevents.cpp:430
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
@@ -385,26 +385,26 @@ msgstr ""
 #: cmdevents.cpp:456
 #, c-format
 msgid "Cannot open file %s"
-msgstr "לא יכול לפתוח את קובץ %s"
+msgstr ""
 
 #: cmdevents.cpp:466
 #, c-format
 msgid "Unsupported code file %s"
-msgstr "קובץ רמאויות לא נתמך %s"
+msgstr ""
 
 #: cmdevents.cpp:536
 #, c-format
 msgid "Loaded code file %s"
-msgstr "טען קובץ רמאויות %s"
+msgstr ""
 
 #: cmdevents.cpp:538
 #, c-format
 msgid "Error loading code file %s"
-msgstr "קרתה שגיאה בטעינת קובץ רמאויות %s"
+msgstr ""
 
 #: cmdevents.cpp:549 cmdevents.cpp:625
 msgid "Select snapshot file"
-msgstr "בחר קובץ תמונת זכרון"
+msgstr ""
 
 #: cmdevents.cpp:550
 msgid ""
@@ -425,26 +425,26 @@ msgstr ""
 #: cmdevents.cpp:584
 #, c-format
 msgid "Loaded snapshot file %s"
-msgstr "טען קובץ תמונת זכרון %s"
+msgstr ""
 
 #: cmdevents.cpp:586
 #, c-format
 msgid "Error loading snapshot file %s"
-msgstr "קרתה שגיאה בעת טעינת קובץ תמונות זכרון %s"
+msgstr ""
 
 #: cmdevents.cpp:609
 #, c-format
 msgid "Wrote battery %s"
-msgstr "כתב סוללה"
+msgstr ""
 
 #: cmdevents.cpp:611 panel.cpp:772
 #, c-format
 msgid "Error writing battery %s"
-msgstr "קרתה שגיאה בעת כתיבת הסוללה %s"
+msgstr ""
 
 #: cmdevents.cpp:619
 msgid "EEPROM saves cannot be exported"
-msgstr "לא ניתן לייצא שמירות EEPROM "
+msgstr ""
 
 #: cmdevents.cpp:626
 msgid "Game Shark Snapshot (*.sps)|*.sps"
@@ -457,29 +457,29 @@ msgstr ""
 #: cmdevents.cpp:652
 #, c-format
 msgid "Saved snapshot file %s"
-msgstr "שמר קובץ תמונת זכרון %s"
+msgstr ""
 
 #: cmdevents.cpp:654
 #, c-format
 msgid "Error saving snapshot file %s"
-msgstr "קרתה שגיאה בעת שמירת קובץ תמונת זכרון %s"
+msgstr ""
 
 #: cmdevents.cpp:695 sys.cpp:574
 #, c-format
 msgid "Wrote snapshot %s"
-msgstr "כתב תמונת זכרון %s"
+msgstr ""
 
 #: cmdevents.cpp:716 cmdevents.cpp:786 cmdevents.cpp:857 cmdevents.cpp:923
 msgid " files ("
-msgstr "קבצים ("
+msgstr ""
 
 #: cmdevents.cpp:956
 msgid "Select file"
-msgstr "בחר קובץ"
+msgstr ""
 
 #: cmdevents.cpp:1260 cmdevents.cpp:1353
 msgid "Select state file"
-msgstr "שמור קובץ מצב זכרון"
+msgstr ""
 
 #: cmdevents.cpp:1261 cmdevents.cpp:1354
 msgid "Visual Boy Advance saved game files|*.sgm"
@@ -488,7 +488,7 @@ msgstr ""
 #: cmdevents.cpp:1384 cmdevents.cpp:1394 cmdevents.cpp:1405
 #, c-format
 msgid "Current state slot #%d"
-msgstr "מצב זכרון מסומן #%d"
+msgstr ""
 
 #: cmdevents.cpp:1470
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
@@ -496,11 +496,11 @@ msgstr ""
 
 #: cmdevents.cpp:1681
 msgid "Sound enabled"
-msgstr "קול מופעל"
+msgstr ""
 
 #: cmdevents.cpp:1681
 msgid "Sound disabled"
-msgstr "שמע מבוטל"
+msgstr ""
 
 #: cmdevents.cpp:1694 cmdevents.cpp:1708
 #, c-format
@@ -509,33 +509,33 @@ msgstr ""
 
 #: cmdevents.cpp:1777
 msgid "Set to 0 for pseudo tty"
-msgstr "‏קבע ל-0 בשביל מצב דמוי ‎tty"
+msgstr ""
 
 #: cmdevents.cpp:1779
 msgid "Port to wait for connection:"
-msgstr "פורט בשביל להמתין לחיבור:"
+msgstr ""
 
 #: cmdevents.cpp:1780
 msgid "GDB Connection"
-msgstr "‏חיבור ‎GDB"
+msgstr ""
 
 #: cmdevents.cpp:1832
 #, c-format
 msgid "Waiting for connection at %s"
-msgstr "מחכה לחיבור ב-%s"
+msgstr ""
 
 #: cmdevents.cpp:1839
 #, c-format
 msgid "Waiting for connection on port %d"
-msgstr "מחכה לחיבור בפורט %d"
+msgstr ""
 
 #: cmdevents.cpp:1842
 msgid "Waiting for GDB..."
-msgstr "‏מחכה ל-‎GDB..."
+msgstr ""
 
 #: cmdevents.cpp:2215 panel.cpp:260 panel.cpp:372
 msgid "Could not initialize the sound driver!"
-msgstr "לא יכל לאתחל את הדרייבר לשמע!"
+msgstr ""
 
 #: cmdevents.cpp:2284
 msgid ""
@@ -585,7 +585,7 @@ msgstr ""
 
 #: cmdevents.cpp:2570
 msgid "Network is not supported in local mode."
-msgstr "הרשת לא מאופשרת במצב מקומי."
+msgstr ""
 
 #: extra-translations.cpp:12
 msgid "&Apply"
@@ -624,47 +624,47 @@ msgstr ""
 #: opts.cpp:457 opts.cpp:477 opts.cpp:665
 #, c-format
 msgid "Invalid key binding %s for %s"
-msgstr "בחירת מקישים לא תקינה %s עבור %s"
+msgstr ""
 
 #: opts.cpp:601 opts.cpp:610 opts.cpp:619 opts.cpp:628 config/option.cpp:492
 #, c-format
 msgid "Invalid value %s for option %s"
-msgstr "הערך %s לא תקין  עבור ההגדרה %s"
+msgstr ""
 
 #: opts.cpp:687
 #, c-format
 msgid "Unknown option %s with value %s"
-msgstr "ההגדרה %s לא ידועה עם הערך %s"
+msgstr ""
 
 #: sys.cpp:200 sys.cpp:261
 msgid "No game in progress to record"
-msgstr "אין אף משחק ברקע על מנת להקליט."
+msgstr ""
 
 #: sys.cpp:218
 #, c-format
 msgid "Cannot open output file %s"
-msgstr "לא יכול לפתוח קובץ פלט ׂ%s"
+msgstr ""
 
 #: sys.cpp:225 sys.cpp:245 sys.cpp:395
 msgid "Error writing game recording"
-msgstr "קרתה שגיאה בעת הקלטת המשחק"
+msgstr ""
 
 #: sys.cpp:266
 msgid "Cannot play game recording while recording"
-msgstr "לא אפשרי להפעיל הקלטת משחק בעת הקלטה"
+msgstr ""
 
 #: sys.cpp:281
 #, c-format
 msgid "Cannot open recording file %s"
-msgstr "לא יכול לפתוח קובץ הקלטת משחק %s"
+msgstr ""
 
 #: sys.cpp:290 sys.cpp:300
 msgid "Error reading game recording"
-msgstr "קרתה שגיאה בעת קריאת ההקלטת משחק"
+msgstr ""
 
 #: sys.cpp:410 sys.cpp:429
 msgid "Playback ended"
-msgstr "הקלטה נגמרה"
+msgstr ""
 
 #: sys.cpp:453
 #, c-format
@@ -673,52 +673,52 @@ msgstr ""
 
 #: sys.cpp:895 xrc/GBPrinter.xrc:65
 msgid "&Discard"
-msgstr "&בטל"
+msgstr ""
 
 #: sys.cpp:929
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
-msgstr "קבצי תמונה (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
+msgstr ""
 
 #: sys.cpp:938
 msgid "Save printer image to"
-msgstr "שמור את תמונת המדפסת ל"
+msgstr ""
 
 #: sys.cpp:952 sys.cpp:1136
 #, c-format
 msgid "Wrote printer output to %s"
-msgstr "כתב את תמונת המדפסת ל-%s"
+msgstr ""
 
 #: sys.cpp:957 sys.cpp:1028
 msgid "&Close"
-msgstr "&סגור"
+msgstr ""
 
 #: sys.cpp:1023
 msgid "Printed"
-msgstr "הודפס"
+msgstr ""
 
 #: sys.cpp:1326
 #, c-format
 msgid "Error opening pseudo tty: %s"
-msgstr "קרתה שגיאה בעת פתיחת דמוי-tty: %s"
+msgstr ""
 
 #: sys.cpp:1425
 #, c-format
 msgid "Error setting up server socket (%d)"
-msgstr "קרתה שגיאה בעת הגדרת הסוקט לשרת(%d)"
+msgstr ""
 
 #: panel.cpp:183
 #, c-format
 msgid "%s is not a valid ROM file"
-msgstr "%s אינו קובץ רום תקין"
+msgstr ""
 
 #: panel.cpp:184 panel.cpp:245 panel.cpp:310
 msgid "Problem loading file"
-msgstr "קרתה שגיאה בעת טעינת הקובץ"
+msgstr ""
 
 #: panel.cpp:244
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
-msgstr "לא יכל לטעון את הרום ל-Game Boy %s"
+msgstr ""
 
 #: panel.cpp:272
 msgid ""
@@ -729,36 +729,36 @@ msgstr ""
 #: panel.cpp:286 panel.cpp:386
 #, c-format
 msgid "Could not load BIOS %s"
-msgstr "לא יכל לטעון את ה-BIOS %s"
+msgstr ""
 
 #: panel.cpp:309
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
-msgstr "לא יכל לטעון את הרום ל-Game Boy Advance %s"
+msgstr ""
 
 #: panel.cpp:554
 msgid " player "
-msgstr "שחקן"
+msgstr ""
 
 #: panel.cpp:720
 #, c-format
 msgid "Loaded state %s"
-msgstr "מצב זכרון נטען %s"
+msgstr ""
 
 #: panel.cpp:720
 #, c-format
 msgid "Error loading state %s"
-msgstr "קרתה שגיאה בעת טעינת מצב הזכרון %s"
+msgstr ""
 
 #: panel.cpp:744
 #, c-format
 msgid "Saved state %s"
-msgstr "שמר מצב זכרון %s"
+msgstr ""
 
 #: panel.cpp:744
 #, c-format
 msgid "Error saving state %s"
-msgstr "קרתה שגיאה בעת שמירת מצב הזכרון %s"
+msgstr ""
 
 #: panel.cpp:948
 #, c-format
@@ -791,11 +791,11 @@ msgstr ""
 
 #: panel.cpp:1257
 msgid "No memory for rewinding"
-msgstr "אין זכרון עבור החזרה לאחורה"
+msgstr ""
 
 #: panel.cpp:1267
 msgid "Error writing rewind state"
-msgstr "קרתה שגיאה בעת כתיבת מצב זכרון של חזרה אחורה"
+msgstr ""
 
 #: panel.cpp:2299
 msgid "Enabling EGL VSync."
@@ -815,56 +815,56 @@ msgstr ""
 
 #: panel.cpp:2328
 msgid "Failed to set glXSwapIntervalEXT"
-msgstr "קרתה שגיאה בעת קביעת glXSwapIntervalEXT"
+msgstr ""
 
 #: panel.cpp:2337
 msgid "Failed to set glXSwapIntervalSGI"
-msgstr "קרתה שגיאה בעת קביעת glXSwapIntervalSGI"
+msgstr ""
 
 #: panel.cpp:2346
 msgid "Failed to set glXSwapIntervalMESA"
-msgstr "קרתה שגיאה בעת קביעת glXSwapIntervalMESA"
+msgstr ""
 
 #: panel.cpp:2353
 msgid "No support for wglGetExtensionsStringEXT"
-msgstr "אין תמיכה ב-‎wglGetExtensionsStringEXT"
+msgstr ""
 
 #: panel.cpp:2356
 msgid "No support for WGL_EXT_swap_control"
-msgstr "אין תמיכה עבור WGL_EXT_swap_control"
+msgstr ""
 
 #: panel.cpp:2365
 msgid "Failed to set wglSwapIntervalEXT"
-msgstr "קרתה שגיאה בעת קביעת wglSwapIntervalEXT"
+msgstr ""
 
 #: panel.cpp:2371
 msgid "No VSYNC available on this platform"
-msgstr "אף VSYNC איננו זמין על פלטפורמה זו"
+msgstr ""
 
 #: panel.cpp:2473
 msgid "memory allocation error"
-msgstr "קרתה שגיאה בקביעת הזכרון"
+msgstr ""
 
 #: panel.cpp:2476
 msgid "error initializing codec"
-msgstr "קרתה שגיאה באתחול הקודק"
+msgstr ""
 
 #: panel.cpp:2479
 msgid "error writing to output file"
-msgstr "קרתה שגיאה בעת כתיבת קובץ הפלט"
+msgstr ""
 
 #: panel.cpp:2482
 msgid "can't guess output format from file name"
-msgstr "לא ניתן לנחש את פורמט הפלט מתוך שם הקובץ"
+msgstr ""
 
 #: panel.cpp:2487
 msgid "programming error; aborting!"
-msgstr "קרתה שגיאת תכנות, מבטל!"
+msgstr ""
 
 #: panel.cpp:2499 panel.cpp:2528
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
-msgstr "לא יכל להתחיל הקלטה  עבור %s (%s)"
+msgstr ""
 
 #: panel.cpp:2556
 #, c-format
@@ -874,12 +874,12 @@ msgstr ""
 #: panel.cpp:2562
 #, c-format
 msgid "Error in audio recording (%s); aborting"
-msgstr "קרתה שגיאה בעת הקלטת הקול (%s); מבטל"
+msgstr ""
 
 #: panel.cpp:2572
 #, c-format
 msgid "Error in video recording (%s); aborting"
-msgstr "קרתה שגיאה בעת הקלטת הוידאו (%s); מבטל"
+msgstr ""
 
 #: viewsupt.cpp:778
 msgid "Red:"
@@ -895,39 +895,39 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:379
 msgid "Use bilinear filter with 3d renderer"
-msgstr "תפעיל מסנן דו-לינארי עם המרנדר תלת מימד"
+msgstr ""
 
 #: config/internal/option-internal.cpp:380
 msgid "Full-screen filter to apply"
-msgstr "המסנן מסך מלא אשר ליהיות מוכל"
+msgstr ""
 
 #: config/internal/option-internal.cpp:381
 msgid "Filter plugin library"
-msgstr "ספריית תוספי סינון"
+msgstr ""
 
 #: config/internal/option-internal.cpp:382
 msgid "Interframe blending function"
-msgstr "שימוש בממזג intrerframe "
+msgstr ""
 
 #: config/internal/option-internal.cpp:383
 msgid "Keep window on top"
-msgstr "נעל את החלון מעל הכל"
+msgstr ""
 
 #: config/internal/option-internal.cpp:385
 msgid "Maximum number of threads to run filters in"
-msgstr "כמות ה-threads  להרצת מסנננים ב"
+msgstr ""
 
 #: config/internal/option-internal.cpp:387
 msgid "Render method; if unsupported, simple method will be used"
-msgstr "מנוע הרינדור לא נתמך, המנוע הפשוט יהיה בשימוש"
+msgstr ""
 
 #: config/internal/option-internal.cpp:388
 msgid "Default scale factor"
-msgstr "ברירת המחדל עבור קנה מידה של הגודל"
+msgstr ""
 
 #: config/internal/option-internal.cpp:390
 msgid "Retain aspect ratio when resizing"
-msgstr "שמור על הקנה מידה כאשר מתשנה גודל החלון"
+msgstr ""
 
 #: config/internal/option-internal.cpp:394
 msgid "BIOS file to use for Game Boy, if enabled"
@@ -939,12 +939,12 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:398
 msgid "Enable DX Colorization Hacks"
-msgstr "הפעל האקים של צביעה של DX"
+msgstr ""
 
 #: config/internal/option-internal.cpp:400
 #: config/internal/option-internal.cpp:426
 msgid "Apply LCD filter, if enabled"
-msgstr "החל מסנן ‎‏LCD במידה ומאופשר"
+msgstr ""
 
 #: config/internal/option-internal.cpp:402
 msgid "BIOS file to use for Game Boy Color, if enabled"
@@ -953,7 +953,7 @@ msgstr ""
 #: config/internal/option-internal.cpp:404
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr "ברירת המחדל עבור פלטת הצבעים, הכנס כ-4 ספרות שלמות הקסדצימליות מופרדות בפסיק(rgb555‎‏)."
+msgstr ""
 
 #: config/internal/option-internal.cpp:407
 msgid ""
@@ -967,16 +967,16 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:413
 msgid "Automatically gather a full page before printing"
-msgstr "תאגור באופן אוטומטי דף שלם לפני הדפסה"
+msgstr ""
 
 #: config/internal/option-internal.cpp:415
 msgid "Automatically save printouts as screen captures with -print suffix"
-msgstr "שמור באופן אוטמטי הדפסות כלכידת מסך עם הסיומת \"‎-print‏\""
+msgstr ""
 
 #: config/internal/option-internal.cpp:417
 #: config/internal/option-internal.cpp:447
 msgid "Directory to look for ROM files"
-msgstr "תיקייה לחפש בה קבצי ‎ROM"
+msgstr ""
 
 #: config/internal/option-internal.cpp:419
 msgid "Directory to look for Game Boy Color ROM files"
@@ -984,11 +984,11 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:422
 msgid "BIOS file to use, if enabled"
-msgstr "קבצי ‫BIOS לשימוש, אם מאופשר"
+msgstr ""
 
 #: config/internal/option-internal.cpp:432
 msgid "Enable link at boot"
-msgstr "הפעל קישור בזמן הפעלה ראשונית"
+msgstr ""
 
 #: config/internal/option-internal.cpp:437
 msgid "Enable faster network protocol by default"
@@ -1323,17 +1323,17 @@ msgstr ""
 #: config/option.cpp:327
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
-msgstr "ערך לא תקין %f עבור אפשרות %s; הערכים תקינים  הם %f - %f"
+msgstr ""
 
 #: config/option.cpp:345 config/option.cpp:363
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
-msgstr "ערך לא תקין %d עבור אפשרות %s; הערכים תקינים הם %d - %d"
+msgstr ""
 
 #: config/option.cpp:455
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %s"
-msgstr "הערך %d לא תקין  עבור ההגדרה %s , ההגדרות התקינות הן: %s"
+msgstr ""
 
 #: config/user-input.cpp:23
 msgid "Backspace"
@@ -1489,7 +1489,7 @@ msgstr ""
 
 #: config/user-input.cpp:108
 msgid "Meta+"
-msgstr "Meta+"
+msgstr ""
 
 #: config/user-input.cpp:135
 msgid "Alt"
@@ -1509,7 +1509,7 @@ msgstr ""
 
 #: dialogs/accel-config.cpp:156
 msgid "Menu commands"
-msgstr "פקודות של התפריט"
+msgstr ""
 
 #: dialogs/accel-config.cpp:268
 msgid "This will clear all user-defined accelerators. Are you sure?"
@@ -1517,7 +1517,7 @@ msgstr ""
 
 #: dialogs/accel-config.cpp:268 dialogs/accel-config.cpp:305
 msgid "Confirm"
-msgstr "מאשר"
+msgstr ""
 
 #: dialogs/accel-config.cpp:302
 #, c-format
@@ -1526,7 +1526,7 @@ msgstr ""
 
 #: dialogs/directories-config.cpp:50
 msgid "Browse"
-msgstr "עיין"
+msgstr ""
 
 #: dialogs/display-config.cpp:54
 msgid "Invalid value for Default magnification."
@@ -1537,36 +1537,36 @@ msgstr ""
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:221 xrc/SoundConfig.xrc:311
 msgid "None"
-msgstr "ללא"
+msgstr ""
 
 #: dialogs/display-config.cpp:371
 #, c-format
 msgid "No usable rpi plugins found in %s"
-msgstr "לא נמצא תוסף rpi הניתן לשימוש ב-%s"
+msgstr ""
 
 #: dialogs/display-config.cpp:410 dialogs/display-config.cpp:452
 #: xrc/DisplayConfig.xrc:108
 msgid "Plugin"
-msgstr "תוסף"
+msgstr ""
 
 #: dialogs/display-config.cpp:417
 #, c-format
 msgid "Using pixel filter: %s"
-msgstr "משתמש במסנן פיקסלים: %s"
+msgstr ""
 
 #: dialogs/display-config.cpp:424
 #, c-format
 msgid "Using interframe blending: %s"
-msgstr "משתמש בממזג intrerframe: %s"
+msgstr ""
 
 #: dialogs/game-boy-config.cpp:142 xrc/GameBoyAdvanceConfig.xrc:122
 #: xrc/GameBoyConfig.xrc:138 xrc/GameBoyConfig.xrc:159
 msgid "(None)"
-msgstr "(ללא)"
+msgstr ""
 
 #: dialogs/game-maker.cpp:234 dialogs/gb-rom-info.cpp:63
 msgid "Unknown"
-msgstr "לא ידוע"
+msgstr ""
 
 #: dialogs/game-maker.cpp:235
 msgid "Invalid"
@@ -1723,35 +1723,35 @@ msgstr ""
 
 #: xaudio2.cpp:34
 msgid "XAudio2: Enumerating devices failed!"
-msgstr "XAudio2: פקידת מכישרים נכשלה"
+msgstr ""
 
 #: xaudio2.cpp:68 xaudio2.cpp:352
 msgid "The XAudio2 interface failed to initialize!"
-msgstr "ממשק ה-XAudio2 נכשל בעת טעינה!"
+msgstr ""
 
 #: xaudio2.cpp:383
 msgid "XAudio2: Creating mastering voice failed!"
-msgstr "XAudio2:  יצירת קול ראשי נכשלה!"
+msgstr ""
 
 #: xaudio2.cpp:392
 msgid "XAudio2: Creating source voice failed!"
-msgstr "XAudio2: יצירת קול מקור נכשלה!"
+msgstr ""
 
 #: faudio.cpp:31
 msgid "FAudio: Enumerating devices failed!"
-msgstr "FAudio: פקידת מכישרים נכשלה!"
+msgstr ""
 
 #: faudio.cpp:66 faudio.cpp:351
 msgid "The FAudio interface failed to initialize!"
-msgstr "ממשק ה-FAudio נכשל בעת טעינה!"
+msgstr ""
 
 #: faudio.cpp:383
 msgid "FAudio: Creating mastering voice failed!"
-msgstr "FAudio:  יצירת קול ראשי נכשלה!"
+msgstr ""
 
 #: faudio.cpp:394
 msgid "FAudio: Creating source voice failed!"
-msgstr "FAudio: יצירת קול מקור נכשלה!"
+msgstr ""
 
 #: dsound.cpp:89 dsound.cpp:103
 #, c-format
@@ -1761,134 +1761,134 @@ msgstr ""
 #: dsound.cpp:108
 #, c-format
 msgid "Cannot SetCooperativeLevel %08x"
-msgstr "לא יכול ליצור SetCooperativeLevel %08x"
+msgstr ""
 
 #: dsound.cpp:122
 #, c-format
 msgid "Cannot CreateSoundBuffer %08x"
-msgstr "לא יכול ליצור CreateSoundBuffer  %08x"
+msgstr ""
 
 #: dsound.cpp:141
 #, c-format
 msgid "CreateSoundBuffer(primary) failed %08x"
-msgstr "CreateSoundBuffer(primary)  נכשל %08x"
+msgstr ""
 
 #: dsound.cpp:158
 #, c-format
 msgid "CreateSoundBuffer(secondary) failed %08x"
-msgstr "CreateSoundBuffer(secondary) נכשל %08x"
+msgstr ""
 
 #: dsound.cpp:163
 #, c-format
 msgid "dsbSecondary->SetCurrentPosition failed %08x"
-msgstr "dsbSecondary->SetCurrentPosition נכשל %08x"
+msgstr ""
 
 #: dsound.cpp:186
 #, c-format
 msgid "Cannot Play primary %08x"
-msgstr "לא יכול להפעיל  את הראשי %08x"
+msgstr ""
 
 #: dsound.cpp:321
 #, c-format
 msgid "dsbSecondary->Lock() failed: %08x"
-msgstr "dsbSecondary->Lock() נכשל: %08x"
+msgstr ""
 
 #: viewsupt.h:61
 #, c-format
 msgid "Unable to load dialog %s from resources"
-msgstr "לא יכל לטעון את הדיאלוג  %s מהמשאבים"
+msgstr ""
 
 #: xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
-msgstr "קיצורי מקשים"
+msgstr ""
 
 #: xrc/AccelConfig.xrc:13
 msgid "Co&mmands:"
-msgstr "פקודות"
+msgstr ""
 
 #: xrc/AccelConfig.xrc:34
 msgid "Current Keys:"
-msgstr "מקשים נוכחיים"
+msgstr ""
 
 #: xrc/AccelConfig.xrc:53
 msgid "&Assign"
-msgstr "קבע"
+msgstr ""
 
 #: xrc/AccelConfig.xrc:60
 msgid "&Remove"
-msgstr "הסר"
+msgstr ""
 
 #: xrc/AccelConfig.xrc:67
 msgid "Re&set All"
-msgstr "אתחל הכל"
+msgstr ""
 
 #: xrc/AccelConfig.xrc:81
 msgid "Currently assigned to:"
-msgstr "כרגע נקבע ל:"
+msgstr ""
 
 #: xrc/AccelConfig.xrc:96
 msgid "Shortcut Key:"
-msgstr "קיצורי מקשים:"
+msgstr ""
 
 #: xrc/CheatAdd.xrc:4
 msgid "Add Cheat"
-msgstr "הוסף רמאות"
+msgstr ""
 
 #: xrc/CheatAdd.xrc:9 xrc/CheatEdit.xrc:9
 msgid "&Description"
-msgstr "תיאור"
+msgstr ""
 
 #: xrc/CheatAdd.xrc:53
 msgid "&Value"
-msgstr "ערך"
+msgstr ""
 
 #: xrc/CheatAdd.xrc:77
 msgid "Format"
-msgstr "פורמט"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:4
 msgid "Cheat Search"
-msgstr "חפש רמאות"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:23
 msgid "E&qual"
-msgstr "שווה"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:31
 msgid "&Not equal"
-msgstr "שונה"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:38
 msgid "&Less than"
-msgstr "גדול מ-"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:45
 msgid "L&ess or equal"
-msgstr "קטן או שווה ל-"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:52
 msgid "&Greater than"
-msgstr "גדול מ-"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:59
 msgid "G&reater or equal"
-msgstr "גדול או שווה ל-"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:64
 msgid "Compare type"
-msgstr "סוג השוואה"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:77
 msgid "S&igned"
-msgstr "מסומן"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:85
 msgid "&Unsigned"
-msgstr "לא מסומן"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:92
 msgid "&Hexadecimal"
-msgstr "הקסדצימלי"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:97
 msgid "Signed / Unsigned"
@@ -1896,39 +1896,39 @@ msgstr ""
 
 #: xrc/CheatCreate.xrc:107
 msgid "&8 bits"
-msgstr "8 סיביות"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:115
 msgid "&16 bits"
-msgstr "16 סיביות"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:122
 msgid "&32 bits"
-msgstr "32 סיביות"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:127
 msgid "Data size"
-msgstr "גודל הנתונים"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:144
 msgid "Ol&d value"
-msgstr "ערך ישן"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:152
 msgid "Specific &value"
-msgstr "ערך מסוים"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:163
 msgid "Search value"
-msgstr "חפש ערך"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:181
 msgid "&Search"
-msgstr "חפש"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:188
 msgid "U&pdate Old"
-msgstr "עדכן ישן"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:195 xrc/JoyPanel.xrc:29 xrc/JoyPanel.xrc:52
 #: xrc/JoyPanel.xrc:75 xrc/JoyPanel.xrc:98 xrc/JoyPanel.xrc:121
@@ -1939,134 +1939,134 @@ msgstr "עדכן ישן"
 #: xrc/JoyPanel.xrc:422 xrc/JoyPanel.xrc:444 xrc/JoyPanel.xrc:475
 #: xrc/JoyPanel.xrc:497 xrc/Logging.xrc:119
 msgid "&Clear"
-msgstr "נקה"
+msgstr ""
 
 #: xrc/CheatCreate.xrc:202
 msgid "&Add cheat"
-msgstr "הוסף רמאות"
+msgstr ""
 
 #: xrc/CheatEdit.xrc:4
 msgid "Edit Cheat"
-msgstr "ערוך רמאות"
+msgstr ""
 
 #: xrc/CheatEdit.xrc:31 xrc/MainMenu.xrc:275
 msgid "&Type"
-msgstr "סוג"
+msgstr ""
 
 #: xrc/CheatEdit.xrc:53
 msgid "C&odes"
-msgstr "קודים"
+msgstr ""
 
 #: xrc/CheatList.xrc:4
 msgid "Cheat List"
-msgstr "רשימת רמאויות"
+msgstr ""
 
 #: xrc/CheatList.xrc:11
 msgid "Open cheat list"
-msgstr "פתח רשימת רמאויות"
+msgstr ""
 
 #: xrc/CheatList.xrc:15
 msgid "Save cheat list"
-msgstr "שמור רשימת רמאויות"
+msgstr ""
 
 #: xrc/CheatList.xrc:20
 msgid "Add new cheat"
-msgstr "הוסף רמאות חדשה"
+msgstr ""
 
 #: xrc/CheatList.xrc:24
 msgid "Delete selected cheat"
-msgstr "מחק רמאות נבחרת"
+msgstr ""
 
 #: xrc/CheatList.xrc:29
 msgid "Delete all cheats"
-msgstr "מחק את כל הרמאויות"
+msgstr ""
 
 #: xrc/CheatList.xrc:35
 msgid "Toggle all Cheats"
-msgstr "הפעל את כל הרמאויות"
+msgstr ""
 
 #: xrc/DirectoriesConfig.xrc:4
 msgid "Directories"
-msgstr "תיקיות"
+msgstr ""
 
 #: xrc/DirectoriesConfig.xrc:11 xrc/DirectoriesConfig.xrc:18
 msgid "Game Boy Advance ROMs"
-msgstr "רומים של Game Boy Advance"
+msgstr ""
 
 #: xrc/DirectoriesConfig.xrc:27 xrc/DirectoriesConfig.xrc:34
 msgid "Game Boy ROMs"
-msgstr "רומים של Game Boy "
+msgstr ""
 
 #: xrc/DirectoriesConfig.xrc:42 xrc/DirectoriesConfig.xrc:49
 msgid "Game Boy Color ROMs"
-msgstr "רומים של Game Boy Color"
+msgstr ""
 
 #: xrc/DirectoriesConfig.xrc:57 xrc/DirectoriesConfig.xrc:64
 msgid "Native Saves"
-msgstr "שמירות רגילות"
+msgstr ""
 
 #: xrc/DirectoriesConfig.xrc:72 xrc/DirectoriesConfig.xrc:79
 msgid "Emulator Saves"
-msgstr "שמירות של האימוטור"
+msgstr ""
 
 #: xrc/DirectoriesConfig.xrc:87 xrc/DirectoriesConfig.xrc:94
 msgid "Screenshots"
-msgstr "תצלומי מסך"
+msgstr ""
 
 #: xrc/DirectoriesConfig.xrc:102 xrc/DirectoriesConfig.xrc:109
 msgid "Recordings"
-msgstr "הקלטות"
+msgstr ""
 
 #: xrc/Disassemble.xrc:4
 msgid "Disassemble"
-msgstr "פרק"
+msgstr ""
 
 #: xrc/Disassemble.xrc:15
 msgid "&Automatic"
-msgstr "אוטומטי"
+msgstr ""
 
 #: xrc/Disassemble.xrc:45 xrc/GBDisassemble.xrc:18 xrc/MemViewer.xrc:47
 msgid "&Go"
-msgstr "צא"
+msgstr ""
 
 #: xrc/Disassemble.xrc:414 xrc/MapViewer.xrc:76 xrc/OAMViewer.xrc:37
 msgid "Mode:"
-msgstr "מצב:"
+msgstr ""
 
 #: xrc/Disassemble.xrc:443 xrc/GBDisassemble.xrc:212 xrc/GBOAMViewer.xrc:93
 #: xrc/GBPaletteViewer.xrc:105 xrc/GBTileViewer.xrc:75 xrc/IOViewer.xrc:318
 #: xrc/MemViewer.xrc:72 xrc/OAMViewer.xrc:109 xrc/PaletteViewer.xrc:81
 #: xrc/TileViewer.xrc:91
 msgid "Automatic &update"
-msgstr "עדכונים אוטומטיים"
+msgstr ""
 
 #: xrc/Disassemble.xrc:453 xrc/GBDisassemble.xrc:222
 msgid "G&oto PC"
-msgstr "לך ל-PC"
+msgstr ""
 
 #: xrc/Disassemble.xrc:460 xrc/GBDisassemble.xrc:229
 msgid "Re&fresh"
-msgstr "רענן"
+msgstr ""
 
 #: xrc/Disassemble.xrc:467 xrc/GBDisassemble.xrc:236
 msgid "&Next"
-msgstr "הבא"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:4
 msgid "Display settings"
-msgstr "הגדרות תצוגה"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:16
 msgid "Output module"
-msgstr "תצורת פלט"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:34
 msgid "Simple"
-msgstr "פשוטה"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:66
 msgid "Filters"
-msgstr "מסננים"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:80
 msgid "Display filter:"
@@ -2074,15 +2074,15 @@ msgstr ""
 
 #: xrc/DisplayConfig.xrc:88
 msgid "Super 2xSaI"
-msgstr "Super 2xSaI"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:89
 msgid "Super Eagle"
-msgstr "Super Eagle"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:90
 msgid "Pixelate"
-msgstr "Pixelate"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:91
 msgid "Advance MAME Scale 2x"
@@ -2090,31 +2090,31 @@ msgstr ""
 
 #: xrc/DisplayConfig.xrc:92
 msgid "Bilinear"
-msgstr "Bilinear"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:93
 msgid "Bilinear Plus"
-msgstr "Bilinear Plus"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:94
 msgid "Scanlines"
-msgstr "Scanlines"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:95
 msgid "TV Mode"
-msgstr "TV Mode"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:98
 msgid "Simple 2x"
-msgstr "Simple 2x"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:99
 msgid "Simple 3x"
-msgstr "Simple 3x"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:101
 msgid "Simple 4x"
-msgstr "Simple 4x"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:116
 msgid "Plugin:"
@@ -2134,11 +2134,11 @@ msgstr ""
 
 #: xrc/DisplayConfig.xrc:152 xrc/SoundConfig.xrc:93
 msgid "Basic"
-msgstr "בסיסי"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:160
 msgid "Frame Skip"
-msgstr "דילוג פריימים"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:178
 msgid "&Number of frames to skip:"
@@ -2146,7 +2146,7 @@ msgstr ""
 
 #: xrc/DisplayConfig.xrc:200
 msgid "Speed"
-msgstr "מהירות"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:216
 msgid "Speed indicator:"
@@ -2154,15 +2154,15 @@ msgstr ""
 
 #: xrc/DisplayConfig.xrc:223
 msgid "Percentage"
-msgstr "אחוזים"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:224
 msgid "Detailed"
-msgstr "מפורט"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:238
 msgid "On-Screen Display"
-msgstr "תצוגה על המסך"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:248
 msgid "Default magnification:"
@@ -2174,75 +2174,75 @@ msgstr ""
 
 #: xrc/DisplayConfig.xrc:268
 msgid "0 = no maximum"
-msgstr "0 = בלי מקסימום"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:276
 msgid "0 = no limit"
-msgstr "0 = ללא הגבלה"
+msgstr ""
 
 #: xrc/DisplayConfig.xrc:286
 msgid "Zoom"
-msgstr "הגדלה"
+msgstr ""
 
 #: xrc/ExportSPS.xrc:10
 msgid "Title:"
-msgstr "כותרת: "
+msgstr ""
 
 #: xrc/ExportSPS.xrc:22
 msgid "Description:"
-msgstr "תיאור: "
+msgstr ""
 
 #: xrc/ExportSPS.xrc:34
 msgid "Notes:"
-msgstr "הערות: "
+msgstr ""
 
 #: xrc/GBAROMInfo.xrc:4 xrc/GBROMInfo.xrc:4
 msgid "Rom Information"
-msgstr "מידע אודות הרום"
+msgstr ""
 
 #: xrc/GBAROMInfo.xrc:11 xrc/GBROMInfo.xrc:12
 msgid "Game title:"
-msgstr "כותרת המשחק: "
+msgstr ""
 
 #: xrc/GBAROMInfo.xrc:23
 msgid "Internal title:"
-msgstr "כותרת פנימית: "
+msgstr ""
 
 #: xrc/GBAROMInfo.xrc:35
 msgid "Scene Release:"
-msgstr "הוצאת סצנה: "
+msgstr ""
 
 #: xrc/GBAROMInfo.xrc:47
 msgid "Release Number:"
-msgstr "מספר הוצאה: "
+msgstr ""
 
 #: xrc/GBAROMInfo.xrc:71
 msgid "Game code:"
-msgstr "קוד משחק: "
+msgstr ""
 
 #: xrc/GBAROMInfo.xrc:83 xrc/GBROMInfo.xrc:24
 msgid "Maker code:"
-msgstr "קוד יוצר: "
+msgstr ""
 
 #: xrc/GBAROMInfo.xrc:95 xrc/GBROMInfo.xrc:36
 msgid "Maker name:"
-msgstr "שם יוצר: "
+msgstr ""
 
 #: xrc/GBAROMInfo.xrc:107
 msgid "Main unit code:"
-msgstr "קוד יחידה מרכזית: "
+msgstr ""
 
 #: xrc/GBAROMInfo.xrc:119
 msgid "Device type:"
-msgstr "סוג מכשיר: "
+msgstr ""
 
 #: xrc/GBAROMInfo.xrc:131 xrc/GBROMInfo.xrc:132
 msgid "ROM version:"
-msgstr "גרסאת רום: "
+msgstr ""
 
 #: xrc/GBAROMInfo.xrc:150
 msgid "ROM Information"
-msgstr "מידע אודות הרום"
+msgstr ""
 
 #: xrc/GBColorPrefPanel.xrc:9
 msgid "Custom"
@@ -2250,31 +2250,31 @@ msgstr ""
 
 #: xrc/GBColorPrefPanel.xrc:10 xrc/JoyPanel.xrc:247
 msgid "Standard"
-msgstr "רגיל"
+msgstr ""
 
 #: xrc/GBColorPrefPanel.xrc:11
 msgid "Blue Sea"
-msgstr "כחול-ים"
+msgstr ""
 
 #: xrc/GBColorPrefPanel.xrc:12
 msgid "Dark Night"
-msgstr "שחור-לילה"
+msgstr ""
 
 #: xrc/GBColorPrefPanel.xrc:13
 msgid "Green Forest"
-msgstr "ירוק-יער"
+msgstr ""
 
 #: xrc/GBColorPrefPanel.xrc:14
 msgid "Hot Desert"
-msgstr "חם מדבר"
+msgstr ""
 
 #: xrc/GBColorPrefPanel.xrc:15
 msgid "Pink Dreams"
-msgstr "ורוד-חלומות"
+msgstr ""
 
 #: xrc/GBColorPrefPanel.xrc:16
 msgid "Weird Colors"
-msgstr "צבעים מוזרים"
+msgstr ""
 
 #: xrc/GBColorPrefPanel.xrc:17
 msgid "Real Game Boy Colors"
@@ -2287,151 +2287,151 @@ msgstr ""
 #: xrc/GBColorPrefPanel.xrc:46 xrc/GBPaletteViewer.xrc:17 xrc/MapViewer.xrc:54
 #: xrc/PaletteViewer.xrc:19
 msgid "Background"
-msgstr "רקע"
+msgstr ""
 
 #: xrc/GBColorPrefPanel.xrc:74
 msgid "Sprites"
-msgstr "ספרייט"
+msgstr ""
 
 #: xrc/GBColorPrefPanel.xrc:84
 msgid "Use this palette"
-msgstr "תשתמש בלוח צבעים זה"
+msgstr ""
 
 #: xrc/GBColorPrefPanel.xrc:94
 msgid "Restore"
-msgstr "שחזר"
+msgstr ""
 
 #: xrc/GBMapViewer.xrc:23 xrc/GBTileViewer.xrc:42 xrc/TileViewer.xrc:58
 msgid "Char Base"
-msgstr "תו בסיס"
+msgstr ""
 
 #: xrc/GBMapViewer.xrc:42
 msgid "Map Base"
-msgstr "בסיס של המפה"
+msgstr ""
 
 #: xrc/GBMapViewer.xrc:54 xrc/GBOAMViewer.xrc:88 xrc/GBTileViewer.xrc:68
 #: xrc/MapViewer.xrc:62 xrc/OAMViewer.xrc:104 xrc/TileViewer.xrc:84
 msgid "Stretch to &fit"
-msgstr "מתח להתאמה"
+msgstr ""
 
 #: xrc/GBMapViewer.xrc:59 xrc/MapViewer.xrc:67
 msgid "Auto &update"
-msgstr "עדכן אוטומטית"
+msgstr ""
 
 #: xrc/GBMapViewer.xrc:74 xrc/GBTileViewer.xrc:99 xrc/MapViewer.xrc:144
 #: xrc/MemSelRegion.xrc:10 xrc/PaletteViewer.xrc:50 xrc/TileViewer.xrc:115
 msgid "Address:"
-msgstr "כתובת: "
+msgstr ""
 
 #: xrc/GBMapViewer.xrc:82 xrc/GBOAMViewer.xrc:37 xrc/GBTileViewer.xrc:91
 #: xrc/MapViewer.xrc:152 xrc/OAMViewer.xrc:61 xrc/TileViewer.xrc:107
 msgid "Tile:"
-msgstr "אריח:"
+msgstr ""
 
 #: xrc/GBMapViewer.xrc:90 xrc/MapViewer.xrc:160
 msgid "Flip:"
-msgstr "הפוך:"
+msgstr ""
 
 #: xrc/GBMapViewer.xrc:98 xrc/GBTileViewer.xrc:50 xrc/MapViewer.xrc:168
 #: xrc/TileViewer.xrc:66
 msgid "Palette:"
-msgstr "לוח צבעים: "
+msgstr ""
 
 #: xrc/GBMapViewer.xrc:106 xrc/MapViewer.xrc:116
 msgid "Priority:"
-msgstr "עדיפות:"
+msgstr ""
 
 #: xrc/GBMapViewer.xrc:152 xrc/GBOAMViewer.xrc:142 xrc/GBPaletteViewer.xrc:114
 #: xrc/GBTileViewer.xrc:145 xrc/IOViewer.xrc:327 xrc/MapViewer.xrc:214
 #: xrc/MemViewer.xrc:101 xrc/OAMViewer.xrc:155 xrc/PaletteViewer.xrc:100
 #: xrc/TileViewer.xrc:161
 msgid "&Refresh"
-msgstr "רענן"
+msgstr ""
 
 #: xrc/GBMapViewer.xrc:157 xrc/Logging.xrc:112 xrc/MapViewer.xrc:219
 msgid "&Save"
-msgstr "שמור"
+msgstr ""
 
 #: xrc/GBOAMViewer.xrc:13 xrc/OAMViewer.xrc:14
 msgid "Sprite:"
-msgstr "ספרייט:"
+msgstr ""
 
 #: xrc/GBOAMViewer.xrc:29 xrc/OAMViewer.xrc:29
 msgid "Pos:"
-msgstr "מיקום:"
+msgstr ""
 
 #: xrc/GBOAMViewer.xrc:45 xrc/OAMViewer.xrc:69
 msgid "Prio:"
-msgstr "עדיפות:"
+msgstr ""
 
 #: xrc/GBOAMViewer.xrc:61 xrc/OAMViewer.xrc:53
 msgid "Pal:"
-msgstr "Pal:"
+msgstr ""
 
 #: xrc/GBOAMViewer.xrc:69 xrc/OAMViewer.xrc:93
 msgid "Flags:"
-msgstr "דגלים:"
+msgstr ""
 
 #: xrc/GBOAMViewer.xrc:77
 msgid "Bank:"
-msgstr "בנק: "
+msgstr ""
 
 #: xrc/GBOAMViewer.xrc:149 xrc/GBTileViewer.xrc:152 xrc/MemViewer.xrc:115
 #: xrc/OAMViewer.xrc:162 xrc/TileViewer.xrc:168
 msgid "&Save..."
-msgstr "שמור..."
+msgstr ""
 
 #: xrc/GBPaletteViewer.xrc:8 xrc/PaletteViewer.xrc:9
 msgid "Click on a color for more information"
-msgstr "לחץ למידע נוסף"
+msgstr ""
 
 #: xrc/GBPaletteViewer.xrc:27 xrc/PaletteViewer.xrc:105
 msgid "Save &BG..."
-msgstr "שמור רקע"
+msgstr ""
 
 #: xrc/GBPaletteViewer.xrc:38 xrc/PaletteViewer.xrc:33
 msgid "Sprite"
-msgstr "ספרייט"
+msgstr ""
 
 #: xrc/GBPaletteViewer.xrc:48 xrc/PaletteViewer.xrc:111
 msgid "Save &Sprite..."
-msgstr "שמור ספרייט"
+msgstr ""
 
 #: xrc/GBPaletteViewer.xrc:67
 msgid "Index:"
-msgstr "אינדקס:"
+msgstr ""
 
 #: xrc/GBPaletteViewer.xrc:79 xrc/IOViewer.xrc:21 xrc/PaletteViewer.xrc:62
 msgid "Value:"
-msgstr "ערך:"
+msgstr ""
 
 #: xrc/GBPrinter.xrc:21
 msgid "Print Si&ze"
-msgstr "הדפס גודל"
+msgstr ""
 
 #: xrc/GBPrinter.xrc:29
 msgid "1x"
-msgstr "1x"
+msgstr ""
 
 #: xrc/GBPrinter.xrc:30
 msgid "2x"
-msgstr "2x"
+msgstr ""
 
 #: xrc/GBPrinter.xrc:31
 msgid "3x"
-msgstr "3x"
+msgstr ""
 
 #: xrc/GBPrinter.xrc:32
 msgid "4x"
-msgstr "4x"
+msgstr ""
 
 #: xrc/GBPrinter.xrc:58
 msgid "C&ontinue"
-msgstr "המשך"
+msgstr ""
 
 #: xrc/GBROMInfo.xrc:48
 msgid "Cartridge type:"
-msgstr "סוג מחסנית: "
+msgstr ""
 
 #: xrc/GBROMInfo.xrc:60
 msgid "SGB code:"
@@ -2443,19 +2443,19 @@ msgstr ""
 
 #: xrc/GBROMInfo.xrc:84
 msgid "ROM size:"
-msgstr "גודל רום: "
+msgstr ""
 
 #: xrc/GBROMInfo.xrc:96
 msgid "RAM size:"
-msgstr "גודל ראם:"
+msgstr ""
 
 #: xrc/GBROMInfo.xrc:108
 msgid "Dest. code:"
-msgstr "קוד יעד: "
+msgstr ""
 
 #: xrc/GBROMInfo.xrc:120
 msgid "License code:"
-msgstr "קוד רישיון: "
+msgstr ""
 
 #: xrc/GBROMInfo.xrc:144
 msgid "Header checksum:"
@@ -2467,11 +2467,11 @@ msgstr ""
 
 #: xrc/GBTileViewer.xrc:23
 msgid "VRAM Bank"
-msgstr "בנק VRAM"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:4
 msgid "Game Boy Advance settings"
-msgstr "הגדרות גימבוי אדוונס"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:21
 msgid "Save type:"
@@ -2480,19 +2480,19 @@ msgstr ""
 #: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
 #: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
 msgid "Automatic"
-msgstr "אוטומטית"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:29 xrc/GameBoyAdvanceConfig.xrc:201
 msgid "SRAM"
-msgstr "SRAM"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:30 xrc/GameBoyAdvanceConfig.xrc:202
 msgid "Flash"
-msgstr "פלאש"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:31 xrc/GameBoyAdvanceConfig.xrc:203
 msgid "EEPROM + Sensor"
-msgstr "EEPROM + חיישן"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:43
 msgid "Flash size:"
@@ -2508,15 +2508,15 @@ msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:64
 msgid "Detect Now"
-msgstr "זהה כעת"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:69
 msgid "Cartridge"
-msgstr "מחסנית"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:77
 msgid "Save type"
-msgstr "סוג שמירה"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file:"
@@ -2528,53 +2528,53 @@ msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:136 xrc/GameBoyConfig.xrc:168
 msgid "Boot ROM"
-msgstr "רום הפעלה"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:146
 msgid "Game Code"
-msgstr "קוד המשחק"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:160
 msgid "Comment"
-msgstr "הערה"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:172
 msgid "Real Time Clock:"
-msgstr "שעון בזמן אמת:"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:180 xrc/GameBoyAdvanceConfig.xrc:198
 #: xrc/GameBoyAdvanceConfig.xrc:220 xrc/GameBoyAdvanceConfig.xrc:238
 #: xrc/GameBoyConfig.xrc:180
 msgid "Default"
-msgstr "ברירת מחדל"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:181 xrc/GameBoyAdvanceConfig.xrc:239
 msgid "Disabled"
-msgstr "מבוטל"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:182 xrc/GameBoyAdvanceConfig.xrc:240
 msgid "Enabled"
-msgstr "מאופשר"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:190
 msgid "Save Type:"
-msgstr "סוג שמירה: "
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:212
 msgid "Flash Size:"
-msgstr "גודל פלאש: "
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:230
 msgid "Mirroring:"
-msgstr "שיקוף: "
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:254
 msgid "&Defaults"
-msgstr "ברירת מחדל"
+msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:261
 msgid "Game Overrides"
-msgstr "דריסות למשחק"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:4
 msgid "Game Boy settings"
@@ -2590,15 +2590,15 @@ msgstr ""
 
 #: xrc/GameBoyConfig.xrc:57
 msgid "Never"
-msgstr "אף פעם"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:58
 msgid "Always"
-msgstr "תמיד"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:72
 msgid "System"
-msgstr "מערכת"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:84
 msgid "Game Boy Boot &ROM file:"
@@ -2622,27 +2622,27 @@ msgstr ""
 
 #: xrc/GameBoyConfig.xrc:186
 msgid "User 1"
-msgstr "משתמש 1"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:192
 msgid "User 2"
-msgstr "משתמש 2"
+msgstr ""
 
 #: xrc/GameBoyConfig.xrc:198
 msgid "Custom Colors"
-msgstr "צבעים מותאמים אישית"
+msgstr ""
 
 #: xrc/GeneralConfig.xrc:4
 msgid "General settings"
-msgstr "הגדרות כלליות"
+msgstr ""
 
 #: xrc/GeneralConfig.xrc:9
 msgid "General"
-msgstr "הגדרות"
+msgstr ""
 
 #: xrc/GeneralConfig.xrc:26
 msgid "Screenshot Format:"
-msgstr "תצורת צילום מסך:"
+msgstr ""
 
 #: xrc/GeneralConfig.xrc:57
 msgid "&Rewind interval:"
@@ -2650,15 +2650,15 @@ msgstr ""
 
 #: xrc/GeneralConfig.xrc:58
 msgid "If not empty or 0, enable rewind (seconds)"
-msgstr "אפשר חזרה לאחור במידה ואינו ריק או 0 (שניות)"
+msgstr ""
 
 #: xrc/GeneralConfig.xrc:67
 msgid "seconds (0-600); 0 = disable"
-msgstr "שניות (0-600); 0 = מבוטל"
+msgstr ""
 
 #: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
-msgstr "וויסות"
+msgstr ""
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "percent of normal:"
@@ -2666,15 +2666,15 @@ msgstr ""
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
-msgstr "0 = ללא וויסות"
+msgstr ""
 
 #: xrc/GeneralConfig.xrc:114
 msgid "Unlimited"
-msgstr "ללא הגבלה"
+msgstr ""
 
 #: xrc/IOViewer.xrc:4
 msgid "IO Viewer"
-msgstr "מציג קלט-פלט"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:8
 msgid ""
@@ -2685,59 +2685,59 @@ msgstr ""
 
 #: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:456
 msgid "Up"
-msgstr "למעלה"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:37
 msgid "A"
-msgstr "A"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:460
 msgid "Down"
-msgstr "למטה"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:83
 msgid "B"
-msgstr "B"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:464
 msgid "Left"
-msgstr "שמאל"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:129
 msgid "L"
-msgstr "כפתור שמאלי"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:468
 msgid "Right"
-msgstr "ימין"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:175
 msgid "R"
-msgstr "כפתור ימני"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:488
 msgid "Select"
-msgstr "בחר"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:492
 msgid "Start"
-msgstr "התחל"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:254
 msgid "Motion Up"
-msgstr "תנועה למעלה"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:276
 msgid "Autofire A"
-msgstr "ירייה אוטומטית A"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:298
 msgid "Motion Down"
-msgstr "תנועה למטה"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:320
 msgid "Autofire B"
-msgstr "ירייה אוטומטית B"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:342
 msgid "Motion Left / Dark"
@@ -2749,99 +2749,99 @@ msgstr ""
 
 #: xrc/JoyPanel.xrc:408
 msgid "Speed Up"
-msgstr "הגבר מהירות"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:430
 msgid "Spin Left"
-msgstr "סובב שמאלה"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:461
 msgid "Spin Right"
-msgstr "סובב ימינה"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:483
 msgid "Screenshot"
-msgstr "צילום מסך"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:507
 msgid "Special"
-msgstr "מיוחד"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:515
 msgid "Use as default"
-msgstr "השתמש כברירת מחדל"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:522
 msgid "Defaults"
-msgstr "ברירת מחדל"
+msgstr ""
 
 #: xrc/JoyPanel.xrc:529
 msgid "Clear All"
-msgstr "נקה  הכל"
+msgstr ""
 
 #: xrc/JoypadConfig.xrc:4
 msgid "Joypad Configuration"
-msgstr "הגדרות ג'ויפאד"
+msgstr ""
 
 #: xrc/JoypadConfig.xrc:13
 msgid "Player 1"
-msgstr "שחקן 1"
+msgstr ""
 
 #: xrc/JoypadConfig.xrc:19
 msgid "Player 2"
-msgstr "שחקן 2"
+msgstr ""
 
 #: xrc/JoypadConfig.xrc:25
 msgid "Player 3"
-msgstr "שחקן 3"
+msgstr ""
 
 #: xrc/JoypadConfig.xrc:31
 msgid "Player 4"
-msgstr "שחקן 4"
+msgstr ""
 
 #: xrc/LinkConfig.xrc:4
 msgid "Link configuration"
-msgstr "הגדרות חיבור"
+msgstr ""
 
 #: xrc/LinkConfig.xrc:11
 msgid "Link timeout (in milliseconds)"
-msgstr "פסק זמן של הקישור (במילישיניות)"
+msgstr ""
 
 #: xrc/Logging.xrc:4
 msgid "Logging"
-msgstr "שמירת לוג"
+msgstr ""
 
 #: xrc/Logging.xrc:20
 msgid "Unaligned &memory"
-msgstr "זיכרון לא מסודר"
+msgstr ""
 
 #: xrc/Logging.xrc:27
 msgid "Illegal &write"
-msgstr "כתיבה לא חוקית"
+msgstr ""
 
 #: xrc/Logging.xrc:34
 msgid "Illegal &read"
-msgstr "קריאה לא חוקית"
+msgstr ""
 
 #: xrc/Logging.xrc:69
 msgid "&Undefined instruction"
-msgstr "הנחיה לא מוגדרת"
+msgstr ""
 
 #: xrc/Logging.xrc:83
 msgid "Soun&d output"
-msgstr "פלט קול"
+msgstr ""
 
 #: xrc/Logging.xrc:88
 msgid "Verbose"
-msgstr "מלולי"
+msgstr ""
 
 #: xrc/MainMenu.xrc:5
 msgid "&File"
-msgstr "קובץ"
+msgstr ""
 
 #: xrc/MainMenu.xrc:7
 msgid "Open..."
-msgstr "פתח"
+msgstr ""
 
 #: xrc/MainMenu.xrc:10
 msgid "Open &Game Boy..."
@@ -2853,51 +2853,51 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:16
 msgid "Open rece&nt"
-msgstr "פתח פריטים אחרונים"
+msgstr ""
 
 #: xrc/MainMenu.xrc:18
 msgid "&Reset recent list"
-msgstr "אתחל רשימה של פריטים אחרונים"
+msgstr ""
 
 #: xrc/MainMenu.xrc:21
 msgid "&Freeze recent list"
-msgstr "הקפא את רשימת פריטים אחרונים"
+msgstr ""
 
 #: xrc/MainMenu.xrc:26
 msgid "ROM in&formation..."
-msgstr "מידע אודות הרום"
+msgstr ""
 
 #: xrc/MainMenu.xrc:30
 msgid "&e-Reader"
-msgstr "&e-Reader"
+msgstr ""
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
-msgstr "אתחל את טעינת ה-Dot Code"
+msgstr ""
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
-msgstr "טען  Dot Code..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr "אתחל את שמירת ה-Dot Code"
+msgstr ""
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
-msgstr "שמור את ה-Dot Code..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:47
 msgid "Most &recent"
-msgstr "הכי אחרון"
+msgstr ""
 
 #: xrc/MainMenu.xrc:50
 msgid "Load current state slot"
-msgstr "טען את חריץ מצב הזכרון הנוכחי"
+msgstr ""
 
 #: xrc/MainMenu.xrc:53
 msgid "&Auto load most recent"
-msgstr "טען אוטומטית את המעודכן ביותר"
+msgstr ""
 
 #: xrc/MainMenu.xrc:89
 msgid "From &File..."
@@ -2905,63 +2905,63 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
-msgstr "אל תשנה שמירת סוללה"
+msgstr ""
 
 #: xrc/MainMenu.xrc:97
 msgid "Do not change &cheat list"
-msgstr "אל תשנה רשימת רמאויות"
+msgstr ""
 
 #: xrc/MainMenu.xrc:100
 msgid "&Load state"
-msgstr "טען מצב זכרון"
+msgstr ""
 
 #: xrc/MainMenu.xrc:104
 msgid "&Oldest slot"
-msgstr "החריץ הישן ביותר"
+msgstr ""
 
 #: xrc/MainMenu.xrc:107
 msgid "Save current state slot"
-msgstr "שמור בחריץ מצב הזכרון הנוכחי"
+msgstr ""
 
 #: xrc/MainMenu.xrc:110
 msgid "Increase state slot number and save"
-msgstr "הגדל את מספר החריץ מצב זכרון ושמור"
+msgstr ""
 
 #: xrc/MainMenu.xrc:117
 msgid "&2"
-msgstr "&2"
+msgstr ""
 
 #: xrc/MainMenu.xrc:120
 msgid "&3"
-msgstr "&3"
+msgstr ""
 
 #: xrc/MainMenu.xrc:123
 msgid "&4"
-msgstr "&4"
+msgstr ""
 
 #: xrc/MainMenu.xrc:126
 msgid "&5"
-msgstr "&5"
+msgstr ""
 
 #: xrc/MainMenu.xrc:129
 msgid "&6"
-msgstr "&6"
+msgstr ""
 
 #: xrc/MainMenu.xrc:132
 msgid "&7"
-msgstr "&7"
+msgstr ""
 
 #: xrc/MainMenu.xrc:135
 msgid "&8"
-msgstr "&8"
+msgstr ""
 
 #: xrc/MainMenu.xrc:138
 msgid "&9"
-msgstr "&9"
+msgstr ""
 
 #: xrc/MainMenu.xrc:141
 msgid "1&0"
-msgstr "1&0"
+msgstr ""
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File..."
@@ -2969,19 +2969,19 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:147
 msgid "&Save state"
-msgstr "שמירת מצב זכרון"
+msgstr ""
 
 #: xrc/MainMenu.xrc:150
 msgid "Increase state slot number"
-msgstr "הגדל את מספר חריץ שמירת זכרון"
+msgstr ""
 
 #: xrc/MainMenu.xrc:153
 msgid "Decrease state slot number"
-msgstr "הקטון את מספר חריץ שמירת זכרון"
+msgstr ""
 
 #: xrc/MainMenu.xrc:158 xrc/MainMenu.xrc:170
 msgid "&Battery file..."
-msgstr "קובץ סוללה..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:161
 msgid "Game Shark &code file..."
@@ -2993,95 +2993,95 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:166
 msgid "&Import"
-msgstr "יבא"
+msgstr ""
 
 #: xrc/MainMenu.xrc:175
 msgid "&Export"
-msgstr "יצא"
+msgstr ""
 
 #: xrc/MainMenu.xrc:179
 msgid "Screen capt&ure..."
-msgstr "צלם מסך"
+msgstr ""
 
 #: xrc/MainMenu.xrc:183
 msgid "Start &sound recording..."
-msgstr "התחל הקלטת קול..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:186
 msgid "Stop s&ound recording"
-msgstr "הפסק הקלטת קול"
+msgstr ""
 
 #: xrc/MainMenu.xrc:189
 msgid "Start &video recording..."
-msgstr "התחל הקלטת וידאו"
+msgstr ""
 
 #: xrc/MainMenu.xrc:192
 msgid "Stop v&ideo recording"
-msgstr "הפסק הקלטת וידאו"
+msgstr ""
 
 #: xrc/MainMenu.xrc:195
 msgid "Start &game recording..."
-msgstr "התחל הקלטת משחק..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:198
 msgid "Stop g&ame recording"
-msgstr "הפסק הקלטת משחק"
+msgstr ""
 
 #: xrc/MainMenu.xrc:200
 msgid "&Record"
-msgstr "הקלט"
+msgstr ""
 
 #: xrc/MainMenu.xrc:204
 msgid "Start playing &movie..."
-msgstr "התחל לנגן סרט..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:207
 msgid "Stop playing m&ovie"
-msgstr "הפסק ניגון סרט"
+msgstr ""
 
 #: xrc/MainMenu.xrc:209
 msgid "&Play"
-msgstr "נגן"
+msgstr ""
 
 #: xrc/MainMenu.xrc:214
 msgid "&Quit"
-msgstr "צא"
+msgstr ""
 
 #: xrc/MainMenu.xrc:218
 msgid "&Emulation"
-msgstr "הדמיה"
+msgstr ""
 
 #: xrc/MainMenu.xrc:220
 msgid "&Pause"
-msgstr "השהייה"
+msgstr ""
 
 #: xrc/MainMenu.xrc:224
 msgid "&Next frame"
-msgstr "פריים הבא"
+msgstr ""
 
 #: xrc/MainMenu.xrc:227
 msgid "Re&wind"
-msgstr "חזור אחורה"
+msgstr ""
 
 #: xrc/MainMenu.xrc:231
 msgid "Toggle &full screen"
-msgstr "הפעל מסך מלא"
+msgstr ""
 
 #: xrc/MainMenu.xrc:238
 msgid "&Turbo mode"
-msgstr "מצב טורבו"
+msgstr ""
 
 #: xrc/MainMenu.xrc:242
 msgid "&VSync"
-msgstr "&VSync"
+msgstr ""
 
 #: xrc/MainMenu.xrc:246
 msgid "&Auto skip frames"
-msgstr "דלג על פריימים אוטומטית"
+msgstr ""
 
 #: xrc/MainMenu.xrc:251
 msgid "&Skip BIOS"
-msgstr "דלג על BIOS"
+msgstr ""
 
 #: xrc/MainMenu.xrc:255
 msgid "&Auto IPS / UPS / IPF patch"
@@ -3089,19 +3089,19 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:259
 msgid "&Pause when inactive"
-msgstr "השהה כאשר החלון לא פעיל"
+msgstr ""
 
 #: xrc/MainMenu.xrc:264
 msgid "&Reset"
-msgstr "אתחל"
+msgstr ""
 
 #: xrc/MainMenu.xrc:268
 msgid "&Options"
-msgstr "הגדרות"
+msgstr ""
 
 #: xrc/MainMenu.xrc:270
 msgid "&Link"
-msgstr "קישור"
+msgstr ""
 
 #: xrc/MainMenu.xrc:272
 msgid "Start &Network Link..."
@@ -3109,27 +3109,27 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:277
 msgid "&Nothing"
-msgstr "כלום"
+msgstr ""
 
 #: xrc/MainMenu.xrc:281
 msgid "&Cable"
-msgstr "חוטי"
+msgstr ""
 
 #: xrc/MainMenu.xrc:285
 msgid "&Wireless"
-msgstr "אלחוטי"
+msgstr ""
 
 #: xrc/MainMenu.xrc:298
 msgid "&Local mode"
-msgstr "מצב מקומי"
+msgstr ""
 
 #: xrc/MainMenu.xrc:302
 msgid "&Link at boot"
-msgstr "קשר בעת חיבור"
+msgstr ""
 
 #: xrc/MainMenu.xrc:306
 msgid "&Speed hack"
-msgstr "פריצת מהירות"
+msgstr ""
 
 #: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:387
 #: xrc/MainMenu.xrc:423
@@ -3138,87 +3138,87 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:314
 msgid "&Video"
-msgstr "וידאו"
+msgstr ""
 
 #: xrc/MainMenu.xrc:320
 msgid "&Start in full screen"
-msgstr "התחל במסך מלא"
+msgstr ""
 
 #: xrc/MainMenu.xrc:324
 msgid "&Scaled resize"
-msgstr "שנה גודל על פי קנה מידה"
+msgstr ""
 
 #: xrc/MainMenu.xrc:326
 msgid "&1x"
-msgstr "&1x"
+msgstr ""
 
 #: xrc/MainMenu.xrc:329
 msgid "&2x"
-msgstr "&2x"
+msgstr ""
 
 #: xrc/MainMenu.xrc:332
 msgid "&3x"
-msgstr "&3x"
+msgstr ""
 
 #: xrc/MainMenu.xrc:335
 msgid "&4x"
-msgstr "&4x"
+msgstr ""
 
 #: xrc/MainMenu.xrc:338
 msgid "&5x"
-msgstr "&5x"
+msgstr ""
 
 #: xrc/MainMenu.xrc:341
 msgid "&6x"
-msgstr "&6x"
+msgstr ""
 
 #: xrc/MainMenu.xrc:345
 msgid "Change pixel filter"
-msgstr "שנה פילטר לפיקסלים"
+msgstr ""
 
 #: xrc/MainMenu.xrc:348
 msgid "Change interframe blending"
-msgstr "שנה צורת מיזוג intrerframe"
+msgstr ""
 
 #: xrc/MainMenu.xrc:351
 msgid "&Retain aspect ratio"
-msgstr "שמור על קנה מידה"
+msgstr ""
 
 #: xrc/MainMenu.xrc:356
 msgid "&Bilinear filter"
-msgstr "פילטר bilinear"
+msgstr ""
 
 #: xrc/MainMenu.xrc:367
 msgid "&Keep window on top"
-msgstr "שמור את החלון מעל הכל"
+msgstr ""
 
 #: xrc/MainMenu.xrc:372
 msgid "&Status bar"
-msgstr "שורת מצב"
+msgstr ""
 
 #: xrc/MainMenu.xrc:376
 msgid "&Disable on-screen display"
-msgstr "הצג תצוגה פנימית"
+msgstr ""
 
 #: xrc/MainMenu.xrc:380
 msgid "&Transparent on-screen display"
-msgstr "תצוכה פנימית שקופה"
+msgstr ""
 
 #: xrc/MainMenu.xrc:385
 msgid "&Audio"
-msgstr "קול"
+msgstr ""
 
 #: xrc/MainMenu.xrc:390
 msgid "&Increase volume"
-msgstr "הגבר עצמת שמע"
+msgstr ""
 
 #: xrc/MainMenu.xrc:394
 msgid "&Decrease volume"
-msgstr "הנמך עוצמת שמע"
+msgstr ""
 
 #: xrc/MainMenu.xrc:398
 msgid "&Toggle sound"
-msgstr "הפעל\\בטל קול"
+msgstr ""
 
 #: xrc/MainMenu.xrc:403
 msgid "&Game Boy Advance sound interpolation"
@@ -3238,7 +3238,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:421
 msgid "&Input"
-msgstr "קלט"
+msgstr ""
 
 #: xrc/MainMenu.xrc:426
 msgid "Allow &keyboard background input"
@@ -3250,27 +3250,27 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:435
 msgid "&Autofire"
-msgstr "ירייה אוטומטית"
+msgstr ""
 
 #: xrc/MainMenu.xrc:454
 msgid "&Autohold"
-msgstr "החזק אוטומטית"
+msgstr ""
 
 #: xrc/MainMenu.xrc:472
 msgid "&A"
-msgstr "&A"
+msgstr ""
 
 #: xrc/MainMenu.xrc:476
 msgid "&B"
-msgstr "&B"
+msgstr ""
 
 #: xrc/MainMenu.xrc:480
 msgid "&L"
-msgstr "&L"
+msgstr ""
 
 #: xrc/MainMenu.xrc:484
 msgid "&R"
-msgstr "&R"
+msgstr ""
 
 #: xrc/MainMenu.xrc:500 xrc/MainMenu.xrc:523
 msgid "Configure..."
@@ -3278,19 +3278,19 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:504
 msgid "&Real-time clock"
-msgstr "שעון בזמן אמת"
+msgstr ""
 
 #: xrc/MainMenu.xrc:508
 msgid "&Use BIOS file"
-msgstr "השתמש ב-BIOS"
+msgstr ""
 
 #: xrc/MainMenu.xrc:512
 msgid "&Debug print"
-msgstr "הדפס דיבאג"
+msgstr ""
 
 #: xrc/MainMenu.xrc:516 xrc/MainMenu.xrc:531
 msgid "&LCD Filter"
-msgstr "פילטר LCD"
+msgstr ""
 
 #: xrc/MainMenu.xrc:527
 msgid "&Game Boy color option"
@@ -3306,11 +3306,11 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:543
 msgid "&Gather a full page before printing"
-msgstr "לקט דף מלא לפני הדפסה"
+msgstr ""
 
 #: xrc/MainMenu.xrc:547
 msgid "&Save printouts as screen captures"
-msgstr "שמור הדפסות כתצלומי מסך"
+msgstr ""
 
 #: xrc/MainMenu.xrc:552
 msgid "&Use Game Boy BIOS file (requires restart)"
@@ -3342,11 +3342,11 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:577
 msgid "&Tools"
-msgstr "כלים"
+msgstr ""
 
 #: xrc/MainMenu.xrc:579
 msgid "&Cheats"
-msgstr "רמאויות"
+msgstr ""
 
 #: xrc/MainMenu.xrc:581
 msgid "List &cheats..."
@@ -3362,99 +3362,99 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:592
 msgid "&Enable cheats"
-msgstr "אפשר רמאויות"
+msgstr ""
 
 #: xrc/MainMenu.xrc:599
 msgid "&Break into GDB"
-msgstr "עצור  אל GDB"
+msgstr ""
 
 #: xrc/MainMenu.xrc:603
 msgid "&Configure port..."
-msgstr "הגדר פורט..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:606
 msgid "&Break on load"
-msgstr "שבור בעת טעינה"
+msgstr ""
 
 #: xrc/MainMenu.xrc:611
 msgid "&Disconnect"
-msgstr "תתנתק"
+msgstr ""
 
 #: xrc/MainMenu.xrc:616
 msgid "&Disassemble..."
-msgstr "שחזר לשפת-סף"
+msgstr ""
 
 #: xrc/MainMenu.xrc:619
 msgid "&Logging..."
-msgstr "שמירת לוג..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:622
 msgid "&IO Viewer..."
-msgstr "מראה קלט-פלט"
+msgstr ""
 
 #: xrc/MainMenu.xrc:625
 msgid "&Map Viewer..."
-msgstr "מראה מפה..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:628
 msgid "M&emory Viewer..."
-msgstr "מראה זכרון"
+msgstr ""
 
 #: xrc/MainMenu.xrc:631
 msgid "&OAM Viewer..."
-msgstr "מראה OAM"
+msgstr ""
 
 #: xrc/MainMenu.xrc:634
 msgid "&Palette Viewer..."
-msgstr "מראה לוח צבעים..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:637
 msgid "&Tile Viewer..."
-msgstr "מראה אריחים..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:642
 msgid "Show all video layers"
-msgstr "הראה את כל שכבות הוידאו"
+msgstr ""
 
 #: xrc/MainMenu.xrc:685
 msgid "&View Layers"
-msgstr "הראה שכבות"
+msgstr ""
 
 #: xrc/MainMenu.xrc:689
 msgid "Channel &1"
-msgstr "ערוץ &1"
+msgstr ""
 
 #: xrc/MainMenu.xrc:694
 msgid "Channel &2"
-msgstr "ערוץ &2"
+msgstr ""
 
 #: xrc/MainMenu.xrc:699
 msgid "Channel &3"
-msgstr "ערוץ &3"
+msgstr ""
 
 #: xrc/MainMenu.xrc:704
 msgid "Channel &4"
-msgstr "ערוץ &4"
+msgstr ""
 
 #: xrc/MainMenu.xrc:709
 msgid "Direct Sound &A"
-msgstr "קול ישיר &A"
+msgstr ""
 
 #: xrc/MainMenu.xrc:714
 msgid "Direct Sound &B"
-msgstr "קול ישיר &B"
+msgstr ""
 
 #: xrc/MainMenu.xrc:718
 msgid "&Sound Channels"
-msgstr "ערוצי קול"
+msgstr ""
 
 #: xrc/MainMenu.xrc:722
 msgid "&Help"
-msgstr "עזרה"
+msgstr ""
 
 #: xrc/MainMenu.xrc:724
 msgid "Report &Bugs"
-msgstr "דווח על תקלות"
+msgstr ""
 
 #: xrc/MainMenu.xrc:727
 msgid "Visual Boy Advance-M Support &Forum"
@@ -3462,87 +3462,87 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:730
 msgid "Translations"
-msgstr "תרגומים"
+msgstr ""
 
 #: xrc/MainMenu.xrc:738
 msgid "Check for updates"
-msgstr "בדוק עדכונים"
+msgstr ""
 
 #: xrc/MainMenu.xrc:741
 msgid "&Factory Reset..."
-msgstr "שחזר להגדרות ראשוניות..."
+msgstr ""
 
 #: xrc/MainMenu.xrc:745
 msgid "&About..."
-msgstr "אודות..."
+msgstr ""
 
 #: xrc/MapViewer.xrc:4
 msgid "Map Viewer"
-msgstr "מראה מפה"
+msgstr ""
 
 #: xrc/MapViewer.xrc:16
 msgid "Frame 0"
-msgstr "פריים 0"
+msgstr ""
 
 #: xrc/MapViewer.xrc:22
 msgid "Frame 1"
-msgstr "פריים 1"
+msgstr ""
 
 #: xrc/MapViewer.xrc:25
 msgid "Frame"
-msgstr "פריים"
+msgstr ""
 
 #: xrc/MapViewer.xrc:84
 msgid "Map Base:"
-msgstr "בסיס מיפוי:"
+msgstr ""
 
 #: xrc/MapViewer.xrc:92
 msgid "Char Base:"
-msgstr "בסיס תווים:"
+msgstr ""
 
 #: xrc/MapViewer.xrc:100 xrc/MemSelRegion.xrc:22 xrc/OAMViewer.xrc:77
 msgid "Size:"
-msgstr "גודל:"
+msgstr ""
 
 #: xrc/MapViewer.xrc:108 xrc/OAMViewer.xrc:45
 msgid "Colors:"
-msgstr "צבע:"
+msgstr ""
 
 #: xrc/MapViewer.xrc:124
 msgid "Mosaic:"
-msgstr "מוזיאק: "
+msgstr ""
 
 #: xrc/MapViewer.xrc:132
 msgid "Overflow:"
-msgstr "הצפה: "
+msgstr ""
 
 #: xrc/MemViewer.xrc:4
 msgid "Memory Viewer"
-msgstr "מציג זכרון"
+msgstr ""
 
 #: xrc/MemViewer.xrc:17
 msgid "&8-bit"
-msgstr "8 סיביות"
+msgstr ""
 
 #: xrc/MemViewer.xrc:25
 msgid "&16-bit"
-msgstr "16 סיביות"
+msgstr ""
 
 #: xrc/MemViewer.xrc:32
 msgid "&32-bit"
-msgstr "32 סיביות"
+msgstr ""
 
 #: xrc/MemViewer.xrc:83
 msgid "Current address:"
-msgstr "כתובת נוכחית:"
+msgstr ""
 
 #: xrc/MemViewer.xrc:108
 msgid "&Load..."
-msgstr "טען..."
+msgstr ""
 
 #: xrc/NetLink.xrc:4
 msgid "Start Network Link"
-msgstr "התחל קישור רשת"
+msgstr ""
 
 #: xrc/NetLink.xrc:13
 msgid "WARNING: Link will likely not work over the internet or LAN."
@@ -3550,15 +3550,15 @@ msgstr ""
 
 #: xrc/NetLink.xrc:38
 msgid "Server"
-msgstr "שרת"
+msgstr ""
 
 #: xrc/NetLink.xrc:47
 msgid "Client"
-msgstr "לקוח"
+msgstr ""
 
 #: xrc/NetLink.xrc:66
 msgid "Players:"
-msgstr "שחקנים:"
+msgstr ""
 
 #: xrc/NetLink.xrc:83
 msgid "2"
@@ -3566,31 +3566,31 @@ msgstr ""
 
 #: xrc/NetLink.xrc:107
 msgid "Server:"
-msgstr "שרת:"
+msgstr ""
 
 #: xrc/NetLink.xrc:124
 msgid "Port:"
-msgstr "פורט:"
+msgstr ""
 
 #: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
-msgstr "מראה OAM"
+msgstr ""
 
 #: xrc/OAMViewer.xrc:85
 msgid "Rot.:"
-msgstr "סביבוביות:"
+msgstr ""
 
 #: xrc/PaletteViewer.xrc:4
 msgid "Palette Viewer"
-msgstr "מראה לוח צבעים"
+msgstr ""
 
 #: xrc/PaletteViewer.xrc:88
 msgid "C&hange backdrop color..."
-msgstr "שנה את צבע הרקע..."
+msgstr ""
 
 #: xrc/SoundConfig.xrc:4
 msgid "Sound Settings"
-msgstr "הגדרות סאונד"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:18
 msgid "Volume:"
@@ -3598,11 +3598,11 @@ msgstr ""
 
 #: xrc/SoundConfig.xrc:36
 msgid "Mute"
-msgstr "השתק"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:56 xrc/SoundConfig.xrc:322
 msgid "Maximum"
-msgstr "מקסימלי"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:73
 msgid "Sample rate:"
@@ -3610,19 +3610,19 @@ msgstr ""
 
 #: xrc/SoundConfig.xrc:79
 msgid "48 KHz"
-msgstr "48 KHz"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:80
 msgid "44.1 KHz"
-msgstr "44.1 KHz"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:81
 msgid "22 KHz"
-msgstr "22 KHz"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:82
 msgid "11 KHz"
-msgstr "11 KHz"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:120
 msgid "Direct Sound"
@@ -3630,39 +3630,39 @@ msgstr ""
 
 #: xrc/SoundConfig.xrc:148
 msgid "Device"
-msgstr "מכשיר"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:156
 msgid "Enable stereo upmixing"
-msgstr "אפשר העלאת מיקס לסטיראו "
+msgstr ""
 
 #: xrc/SoundConfig.xrc:163
 msgid "Enable hardware acceleration"
-msgstr "אפשר האצת חומרה"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:192
 msgid "Number of sound buffers:"
-msgstr "מספר של תזרימי סאונד:"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:200
 msgid "Advanced"
-msgstr "מתקדם"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:232
 msgid "Lots"
-msgstr "הרבה"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:241
 msgid "Echo"
-msgstr "הד"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:249
 msgid "Stereo"
-msgstr "סטיראו "
+msgstr ""
 
 #: xrc/SoundConfig.xrc:260
 msgid "Center"
-msgstr "מרכז"
+msgstr ""
 
 #: xrc/SoundConfig.xrc:271
 msgid "Left / Right"
@@ -3670,35 +3670,35 @@ msgstr ""
 
 #: xrc/SoundConfig.xrc:300
 msgid "Sound filtering"
-msgstr "סינון קול"
+msgstr ""
 
 #: xrc/TileViewer.xrc:4
 msgid "Tile Viewer"
-msgstr "מראה אריחים"
+msgstr ""
 
 #: xrc/TileViewer.xrc:24
 msgid "Colors"
-msgstr "צבעים"
+msgstr ""
 
 #: xrc/SpeedupConfig.xrc:4
 msgid "SpeedUp / Turbo Settings"
-msgstr "הגברת מהירות \\ טורבו"
+msgstr ""
 
 #: xrc/SpeedupConfig.xrc:9
 msgid "Speedup Throttle"
-msgstr "וויסות הגברת מהירות"
+msgstr ""
 
 #: xrc/SpeedupConfig.xrc:50
 msgid "Frame skip"
-msgstr "דילוג פריימים"
+msgstr ""
 
 #: xrc/UIConfig.xrc:4
 msgid "User Interface Settings"
-msgstr "הגדרות ממשק משתמש"
+msgstr ""
 
 #: xrc/UIConfig.xrc:9
 msgid "Hide Menu Bar"
-msgstr "הסתר תפריטים"
+msgstr ""
 
 #: xrc/UIConfig.xrc:16
 msgid "Suspend ScreenSaver"
