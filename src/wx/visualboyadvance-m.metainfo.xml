@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<component type="desktop">
- <id>org.visualboyadvance_m.visualboyadvance_m</id>
+<application>
+ <id type="desktop">visualboyadvance-m.desktop</id>
+ <developer id="vba-m.com">
+   <name>VisualBoyAdvance-M</name>
+ </developer>
  <metadata_license>CC-BY-SA-3.0</metadata_license>
  <project_license>GPL-2.0</project_license>
  <content_rating type="oars-1.1"/>
@@ -17,16 +20,15 @@
   </p>
  </description>
  <screenshots>
-     <screenshot type="default"><image type="source">https://visualboyadvance-m.org/screenshots/1.png</image></screenshot>
-     <screenshot><image type="source">https://visualboyadvance-m.org/screenshots/2.png</image></screenshot>
-     <screenshot><image type="source">https://visualboyadvance-m.org/screenshots/3.png</image></screenshot>
-     <screenshot><image type="source">https://visualboyadvance-m.org/screenshots/4.png</image></screenshot>
+  <screenshot type="default">https://vba-m.com/screenshots/1.png</screenshot>
+  <screenshot>https://vba-m.com/screenshots/2.png</screenshot>
+  <screenshot>https://vba-m.com/screenshots/3.png</screenshot>
+  <screenshot>https://vba-m.com/screenshots/4.png</screenshot>
  </screenshots>
- <launchable type="desktop-id">visualboyadvance-m.desktop</launchable>
  <releases>
-   <release version="2.1.9" date="2024-02-03"/>
+   <release version="2.1.8" date="2023-12-14"/>
  </releases>
- <url type="homepage">https://visualboyadvance-m.org</url>
+ <url type="homepage">http://vba-m.com/</url>
  <url type="bugtracker">https://github.com/visualboyadvance-m/visualboyadvance-m/issues</url>
- <update_contact>zachbacon@visualboyadvance-m.org</update_contact>
-</component>
+ <updatecontact>zachbacon@vba-m.com</updatecontact>
+</application>

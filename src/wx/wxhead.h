@@ -59,16 +59,6 @@ using std::int32_t;
 
 #include "wxutil.h"
 
-// This enum must be kept in sync with the one in vbam-options-static.cpp.
-// TODO: These 2 enums should be unified and a validator created for this enum.
-enum audioapi {
-    AUD_SDL,
-    AUD_OPENAL,
-    AUD_DIRECTSOUND,
-    AUD_XAUDIO2,
-    AUD_FAUDIO
-};
-
 // wxrc helpers (for dynamic strings instead of constant)
 #define XRCID_D(str) wxXmlResource::GetXRCID(str)
 //#define XRCCTRL_D(win, id, type) (wxStaticCast((win).FindWindow(XRCID_D(id)), type))

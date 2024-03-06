@@ -44,7 +44,7 @@
 	     <key>UTTypeIdentifier</key>
 	     <string>public.gbarom</string>
 	     <key>UTTypeReferenceURL</key>
-	     <string>http://visualboyadvance-m.org/</string>
+	     <string>http://www.vba-m.com/</string>
 	     <key>UTTypeDescription</key>
 	     <string>GameBoy Advance ROM</string>
 	     <key>UTTypeIconFile</key>
@@ -79,7 +79,7 @@
 	     <key>UTTypeIdentifier</key>
 	     <string>public.gbrom</string>
 	     <key>UTTypeReferenceURL</key>
-	     <string>http://visualboyadvance-m.org/</string>
+	     <string>http://www.vba-m.com/</string>
 	     <key>UTTypeDescription</key>
 	     <string>GameBoy ROM</string>
 	     <key>UTTypeIconFile</key>
