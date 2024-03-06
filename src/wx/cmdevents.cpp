@@ -2227,18 +2227,22 @@ EVT_HANDLER(EmulatorDirectories, "Directories...")
 
 EVT_HANDLER(JoypadConfigure, "Joypad options...")
 {
-    wxDialog* dlg = GetXRCDialog("JoypadConfig");
     joy.PollAllJoysticks();
 
     auto frame = wxGetApp().frame;
     bool joy_timer = frame->IsJoyPollTimerRunning();
 
-    if (!joy_timer) frame->StartJoyPollTimer();
+    if (!joy_timer) {
+         frame->StartJoyPollTimer();
+    }
 
-    if (ShowModal(dlg) == wxID_OK)
-        update_opts();
+    if (ShowModal(GetXRCDialog("JoypadConfig")) == wxID_OK) {
+        update_joypad_opts();
+    }
 
-    if (!joy_timer) frame->StopJoyPollTimer();
+    if (!joy_timer) {
+        frame->StopJoyPollTimer();
+    }
 
     SetJoystick();
 }
@@ -2517,6 +2521,8 @@ EVT_HANDLER(VSync, "Wait for vertical sync")
     GetMenuOptionConfig("VSync", config::OptionID::kPrefVsync);
 }
 
+#ifndef NO_LINK
+
 void MainFrame::EnableNetworkMenu()
 {
     cmd_enable &= ~CMDEN_LINK_ANY;
@@ -2541,11 +2547,11 @@ void SetLinkTypeMenu(const char* type, int value)
     mf->SetMenuOption(type, 1);
     gopts.gba_link_type = value;
     update_opts();
-#ifndef NO_LINK
     CloseLink();
-#endif
     mf->EnableNetworkMenu();
 }
+
+#endif  // NO_LINK
 
 EVT_HANDLER_MASK(LanLink, "Start Network link", CMDEN_LINK_ANY)
 {
@@ -2573,42 +2579,59 @@ EVT_HANDLER_MASK(LanLink, "Start Network link", CMDEN_LINK_ANY)
 
 EVT_HANDLER(LinkType0Nothing, "Link nothing")
 {
+#ifndef NO_LINK
     SetLinkTypeMenu("LinkType0Nothing", 0);
+#endif
 }
 
 EVT_HANDLER(LinkType1Cable, "Link cable")
 {
+#ifndef NO_LINK
     SetLinkTypeMenu("LinkType1Cable", 1);
+#endif
 }
 
 EVT_HANDLER(LinkType2Wireless, "Link wireless")
 {
+#ifndef NO_LINK
     SetLinkTypeMenu("LinkType2Wireless", 2);
+#endif
 }
 
 EVT_HANDLER(LinkType3GameCube, "Link GameCube")
 {
+#ifndef NO_LINK
     SetLinkTypeMenu("LinkType3GameCube", 3);
+#endif
 }
 
 EVT_HANDLER(LinkType4Gameboy, "Link Gameboy")
 {
+#ifndef NO_LINK
     SetLinkTypeMenu("LinkType4Gameboy", 4);
+#endif
 }
 
 EVT_HANDLER(LinkAuto, "Enable link at boot")
 {
+#ifndef NO_LINK
     GetMenuOptionConfig("LinkAuto", config::OptionID::kGBALinkAuto);
+#endif
 }
 
 EVT_HANDLER(SpeedOn, "Enable faster network protocol by default")
 {
+#ifndef NO_LINK
     GetMenuOptionConfig("SpeedOn", config::OptionID::kGBALinkFast);
+#endif
 }
 
 EVT_HANDLER(LinkProto, "Local host IPC")
 {
+#ifndef NO_LINK
     GetMenuOptionConfig("LinkProto", config::OptionID::kGBALinkProto);
+    EnableNetworkMenu();
+#endif
 }
 
 EVT_HANDLER(LinkConfigure, "Link options...")
@@ -2621,7 +2644,6 @@ EVT_HANDLER(LinkConfigure, "Link options...")
 
     SetLinkTimeout(gopts.link_timeout);
     update_opts();
-    EnableNetworkMenu();
 #endif
 }
 

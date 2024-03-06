@@ -32,23 +32,23 @@
                 <object class="wxStaticBoxSizer">
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="BG0">
-                      <label>BG 0</label>
+                      <label translate="0">BG 0</label>
                       <style>wxRB_GROUP</style>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="BG1">
-                      <label>BG 1</label>
+                      <label translate="0">BG 1</label>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="BG2">
-                      <label>BG 2</label>
+                      <label translate="0">BG 2</label>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="BG3">
-                      <label>BG 3</label>
+                      <label translate="0">BG 3</label>
                     </object>
                   </object>
                   <label>Background</label>

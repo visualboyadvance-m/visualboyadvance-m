@@ -214,13 +214,13 @@ UserInput StringToUserInput(const wxString& string) {
         if (kHatRegex.Matches(remainder)) {
             kHatRegex.GetMatch(&start, &length, 1);
             const int key = StringToInt(remainder.Mid(start, length));
-            if (kHatRegex.GetMatch(&start, &length, 3)) {
+            if (kHatRegex.GetMatch(remainder, 3).Length()) {
                 return UserInput(key, wxJoyControl::HatNorth, joy);
-            } else if (kHatRegex.GetMatch(&start, &length, 4)) {
+            } else if (kHatRegex.GetMatch(remainder, 4).Length()) {
                 return UserInput(key, wxJoyControl::HatSouth, joy);
-            } else if (kHatRegex.GetMatch(&start, &length, 5)) {
+            } else if (kHatRegex.GetMatch(remainder, 5).Length()) {
                 return UserInput(key, wxJoyControl::HatEast, joy);
-            } else if (kHatRegex.GetMatch(&start, &length, 6)) {
+            } else if (kHatRegex.GetMatch(remainder, 6).Length()) {
                 return UserInput(key, wxJoyControl::HatWest, joy);
             }
         }

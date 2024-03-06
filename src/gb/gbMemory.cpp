@@ -640,8 +640,9 @@ void mapperMBC7ROM(uint16_t address, uint8_t value)
         if (value < 8) {
             tmpAddress = (value & 3) << 13;
             tmpAddress &= g_gbCartData.ram_mask();
-            gbMemoryMap[0x0a] = &gbMemory[0xa000];
-            gbMemoryMap[0x0b] = &gbMemory[0xb000];
+            gbMemoryMap[0x0a] = &gbRam[0];
+            // Only one RAM bank for MBC7 so wrap around.
+            gbMemoryMap[0x0b] = &gbRam[0];
 
             gbDataMBC7.mapperRAMBank = value;
             gbDataMBC7.mapperRAMAddress = tmpAddress;
@@ -694,8 +695,8 @@ void mapperMBC7RAM(uint16_t address, uint8_t value)
         if (!oldCs && gbDataMBC7.cs) {
             if (gbDataMBC7.state == 5) {
                 if (gbDataMBC7.writeEnable) {
-                    gbMemory[0xa000 + gbDataMBC7.address * 2] = gbDataMBC7.buffer >> 8;
-                    gbMemory[0xa000 + gbDataMBC7.address * 2 + 1] = gbDataMBC7.buffer & 0xff;
+                    gbRam[gbDataMBC7.address * 2] = gbDataMBC7.buffer >> 8;
+                    gbRam[gbDataMBC7.address * 2 + 1] = gbDataMBC7.buffer & 0xff;
                     systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
                 }
                 gbDataMBC7.state = 0;
@@ -762,8 +763,8 @@ void mapperMBC7RAM(uint16_t address, uint8_t value)
                             } else if ((gbDataMBC7.address >> 6) == 1) {
                                 if (gbDataMBC7.writeEnable) {
                                     for (int i = 0; i < 256; i++) {
-                                        gbMemory[0xa000 + i * 2] = gbDataMBC7.buffer >> 8;
-                                        gbMemory[0xa000 + i * 2 + 1] = gbDataMBC7.buffer & 0xff;
+                                        gbRam[i * 2] = gbDataMBC7.buffer >> 8;
+                                        gbRam[i * 2 + 1] = gbDataMBC7.buffer & 0xff;
                                         systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
                                     }
                                 }
@@ -771,7 +772,7 @@ void mapperMBC7RAM(uint16_t address, uint8_t value)
                             } else if ((gbDataMBC7.address >> 6) == 2) {
                                 if (gbDataMBC7.writeEnable) {
                                     for (int i = 0; i < 256; i++)
-                                        WRITE16LE((uint16_t*)&gbMemory[0xa000 + i * 2], 0xffff);
+                                        WRITE16LE((uint16_t*)&gbRam[i * 2], 0xffff);
                                     systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
                                 }
                                 gbDataMBC7.state = 5;
@@ -793,7 +794,7 @@ void mapperMBC7RAM(uint16_t address, uint8_t value)
                         if (gbDataMBC7.count == 1) {
                             gbDataMBC7.state = 4;
                             gbDataMBC7.count = 0;
-                            gbDataMBC7.buffer = (gbMemory[0xa000 + gbDataMBC7.address * 2] << 8) | (gbMemory[0xa000 + gbDataMBC7.address * 2 + 1]);
+                            gbDataMBC7.buffer = (gbRam[gbDataMBC7.address * 2] << 8) | (gbRam[gbDataMBC7.address * 2 + 1]);
                         }
                         break;
                     case 3:

@@ -30,7 +30,7 @@
               </object>
               <object class="sizeritem">
                 <object class="wxRadioButton" name="PNG">
-                  <label>_PNG</label>
+                  <label translate="0">_PNG</label>
                   <style>wxRB_GROUP</style>
                 </object>
                 <option>1</option>
@@ -39,7 +39,7 @@
               </object>
               <object class="sizeritem">
                 <object class="wxRadioButton" name="BMP">
-                  <label>_BMP</label>
+                  <label translate="0">_BMP</label>
                 </object>
                 <option>1</option>
                 <flag>wxALL</flag>

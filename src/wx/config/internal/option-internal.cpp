@@ -209,6 +209,9 @@ std::array<Option, kNbOptions>& Option::All() {
         bool statusbar = false;
         uint32_t ini_version = kIniLatestVersion;
 
+        /// Joypad
+        uint32_t default_stick = 1;
+
         /// Geometry
         bool fullscreen = false;
         bool window_maximized = false;
@@ -289,7 +292,7 @@ std::array<Option, kNbOptions>& Option::All() {
         /// Joypad
         Option(OptionID::kJoy),
         Option(OptionID::kJoyAutofireThrottle, &gopts.autofire_rate, 1, 1000),
-        Option(OptionID::kJoyDefault, &gopts.default_stick, 1, 4),
+        Option(OptionID::kJoyDefault, &g_owned_opts.default_stick, 1, 4),
 
         /// Keyboard
         Option(OptionID::kKeyboard),

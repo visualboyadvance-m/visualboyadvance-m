@@ -47,6 +47,10 @@
 #include "widgets/user-input-ctrl.h"
 #include "wxhead.h"
 
+#ifdef __WXGTK__
+#include <gdk/gdk.h>
+#endif
+
 namespace {
 
 // Resets the accelerator text for `menu_item` to the first keyboard input.
@@ -135,6 +139,15 @@ int main(int argc, char** argv) {
 #else   // DEBUG
     wxLog::SetLogLevel(wxLOG_Info);
 #endif  // DEBUG
+
+    // Launch under xwayland on Wayland if EGL is not available.
+#if defined(__WXGTK__) && !defined(HAVE_WAYLAND_EGL)
+    wxString xdg_session_type = wxGetenv("XDG_SESSION_TYPE");
+    wxString wayland_display  = wxGetenv("WAYLAND_DISPLAY");
+
+    if (xdg_session_type == "wayland" || wayland_display.Contains("wayland"))
+        gdk_set_allowed_backends("x11,*");
+#endif
 
     // This will be freed on wxEntry exit.
     wxApp::SetInstance(new wxvbamApp());
@@ -305,14 +318,14 @@ wxString wxvbamApp::GetAbsolutePath(wxString path)
 bool wxvbamApp::OnInit() {
     using_wayland = IsWayland();
 
-    // use consistent names for config
-    SetAppName(_("visualboyadvance-m"));
+    // use consistent names for config, DO NOT TRANSLATE
+    SetAppName("visualboyadvance-m");
 #if (wxMAJOR_VERSION >= 3)
-    SetAppDisplayName(_T("VisualBoyAdvance-M"));
+    SetAppDisplayName("VisualBoyAdvance-M");
 #endif
     // load system default locale, if available
     locale.Init();
-    locale.AddCatalog(_T("wxvbam"));
+    locale.AddCatalog("wxvbam");
     // make built-in xrc file available
     // this has to be done before parent OnInit() so xrc dump works
     wxFileSystem::AddHandler(new wxMemoryFSHandler);
@@ -827,13 +840,13 @@ MainFrame::MainFrame()
       menus_opened(0),
       dialog_opened(0),
       focused(false),
+#ifndef NO_LINK
+      gba_link_observer_(config::OptionID::kGBALinkHost,
+                         std::bind(&MainFrame::EnableNetworkMenu, this)),
+#endif
       keep_on_top_styler_(this),
       status_bar_observer_(config::OptionID::kGenStatusBar,
-                           std::bind(&MainFrame::OnStatusBarChanged,
-                                     this,
-                                     std::placeholders::_1)),
-      gba_link_observer_(config::OptionID::kGBALinkHost,
-                         std::bind(&MainFrame::EnableNetworkMenu, this)) {
+                           std::bind(&MainFrame::OnStatusBarChanged, this)) {
     jpoll = new JoystickPoller();
     this->Connect(wxID_ANY, wxEVT_SHOW, wxShowEventHandler(JoystickPoller::ShowDialog), jpoll, jpoll);
 }
@@ -844,12 +857,14 @@ MainFrame::~MainFrame() {
 #endif
 }
 
-void MainFrame::OnStatusBarChanged(config::Option* option) {
-    if (option->GetBool())
-        GetStatusBar()->Show();
-    else
-        GetStatusBar()->Hide();
+void MainFrame::SetStatusBar(wxStatusBar* menu_bar) {
+    wxFrame::SetStatusBar(menu_bar);
+    // This will take care of hiding the menu bar at startup, if needed.
+    menu_bar->Show(OPTION(kGenStatusBar));
+}
 
+void MainFrame::OnStatusBarChanged() {
+    GetStatusBar()->Show(OPTION(kGenStatusBar));
     SendSizeEvent();
     panel->AdjustSize(false);
     SendSizeEvent();
@@ -915,6 +930,9 @@ void MainFrame::OnMenu(wxContextMenuEvent& event)
 }
 
 void MainFrame::OnMove(wxMoveEvent&) {
+    if (!init_complete_) {
+        return;
+    }
     if (!IsFullScreen() && !IsMaximized()) {
         const wxPoint window_pos = GetScreenPosition();
         OPTION(kGeomWindowX) = window_pos.x;
@@ -939,6 +957,9 @@ void MainFrame::OnMoveEnd(wxMoveEvent&) {
 void MainFrame::OnSize(wxSizeEvent& event)
 {
     wxFrame::OnSize(event);
+    if (!init_complete_) {
+        return;
+    }
     const wxRect window_rect = GetRect();
     const wxPoint window_pos = GetScreenPosition();
 
@@ -1263,6 +1284,8 @@ void MainFrame::StopModal()
         panel->Resume();
 }
 
+#ifndef NO_LINK
+
 LinkMode MainFrame::GetConfiguredLinkMode()
 {
     switch (gopts.gba_link_type) {
@@ -1305,6 +1328,8 @@ LinkMode MainFrame::GetConfiguredLinkMode()
 
     return LINK_DISCONNECTED;
 }
+
+#endif  // NO_LINK
 
 void MainFrame::IdentifyRom()
 {

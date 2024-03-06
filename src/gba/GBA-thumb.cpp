@@ -1213,6 +1213,14 @@ static INSN_REGPARM void thumb44_3(uint32_t opcode)
     }
 }
 
+// CMP Rd, Rs
+static INSN_REGPARM void thumb45_0(uint32_t opcode)
+{
+    int dest = ((opcode >> 3) & 7);
+    uint32_t value = reg[(opcode & 7)].I;
+    CMP_RD_RS;
+}
+
 // CMP Rd, Hs
 static INSN_REGPARM void thumb45_1(uint32_t opcode)
 {
@@ -1898,7 +1906,7 @@ static insnfunc_t thumbInsnTable[1024] = {
     thumb3E, thumb3E, thumb3E, thumb3E, thumb3F, thumb3F, thumb3F, thumb3F,
     thumb40_0, thumb40_1, thumb40_2, thumb40_3, thumb41_0, thumb41_1, thumb41_2, thumb41_3, // 40
     thumb42_0, thumb42_1, thumb42_2, thumb42_3, thumb43_0, thumb43_1, thumb43_2, thumb43_3,
-    thumbUI, thumb44_1, thumb44_2, thumb44_3, thumbUI, thumb45_1, thumb45_2, thumb45_3,
+    thumbUI, thumb44_1, thumb44_2, thumb44_3, thumb45_0, thumb45_1, thumb45_2, thumb45_3,
     thumb46_0, thumb46_1, thumb46_2, thumb46_3, thumb47, thumb47, thumbUI, thumbUI,
     thumb48, thumb48, thumb48, thumb48, thumb48, thumb48, thumb48, thumb48, // 48
     thumb48, thumb48, thumb48, thumb48, thumb48, thumb48, thumb48, thumb48,

@@ -12,6 +12,7 @@
 #include "../System.h"
 #include "../Util.h"
 #include "../common/Port.h"
+#include "../common/sizes.h"
 #include "Cheats.h"
 #include "EEprom.h"
 #include "Flash.h"
@@ -1688,6 +1689,9 @@ int CPULoadRomData(const char* data, int size)
 
 void doMirroring(bool b)
 {
+    if (romSize > k32MiB)
+        return;
+
     int romSizeRounded = romSize;
     romSizeRounded--;
     romSizeRounded |= romSizeRounded >> 1;
