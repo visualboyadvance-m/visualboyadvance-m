@@ -812,14 +812,14 @@ public:
     MemViewer()
         : MemViewerBase(~0)
     {
-        bs->Append(_("0x00000000 - BIOS"));
-        bs->Append(_("0x02000000 - WRAM"));
-        bs->Append(_("0x03000000 - IRAM"));
-        bs->Append(_("0x04000000 - I / O"));
-        bs->Append(_("0x05000000 - PALETTE"));
-        bs->Append(_("0x06000000 - VRAM"));
-        bs->Append(_("0x07000000 - OAM"));
-        bs->Append(_("0x08000000 - ROM"));
+        bs->Append("0x00000000 - BIOS");
+        bs->Append("0x02000000 - WRAM");
+        bs->Append("0x03000000 - IRAM");
+        bs->Append("0x04000000 - I / O");
+        bs->Append("0x05000000 - PALETTE");
+        bs->Append("0x06000000 - VRAM");
+        bs->Append("0x07000000 - OAM");
+        bs->Append("0x08000000 - ROM");
         bs->SetSelection(1);
         Fit();
     }
@@ -922,14 +922,14 @@ public:
     GBMemViewer()
         : MemViewerBase((uint16_t)~0)
     {
-        bs->Append(_("0x0000 - ROM"));
-        bs->Append(_("0x4000 - ROM"));
-        bs->Append(_("0x8000 - VRAM"));
-        bs->Append(_("0xA000 - SRAM"));
-        bs->Append(_("0xC000 - RAM"));
-        bs->Append(_("0xD000 - WRAM"));
-        bs->Append(_("0xFF00 - I / O"));
-        bs->Append(_("0xFF80 - RAM"));
+        bs->Append("0x0000 - ROM");
+        bs->Append("0x4000 - ROM");
+        bs->Append("0x8000 - VRAM");
+        bs->Append("0xA000 - SRAM");
+        bs->Append("0xC000 - RAM");
+        bs->Append("0xD000 - WRAM");
+        bs->Append("0xFF00 - I / O");
+        bs->Append("0xFF80 - RAM");
         bs->SetSelection(1);
         Fit();
     }

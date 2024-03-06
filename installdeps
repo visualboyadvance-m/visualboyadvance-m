@@ -179,6 +179,9 @@ linux_installdeps() {
             nixos)
                 nixos_installdeps
                 ;;
+            alpine)
+                alpine_installdeps
+                ;;
             *)
                 error "Don't know how to install deps on your version of Linux"
                 ;;
@@ -335,16 +338,24 @@ debian_installdeps() {
             libswresample_dev=$(apt-cache search libswresample-dev | awk '{print $1}')
         fi
 
-        # in newer distros
-        wx_lib=$(apt-cache search 'libwxgtk3.0-gtk3(-[^[:space:]]+)?$' | grep -v -- -dev | sed 's/ - .*//')
-        wx_lib_dev=$(apt-cache search 'libwxgtk3.0-gtk3-dev(-[^[:space:]]+)?$' | sed 's/ - .*//')
+        wx_libs=$(apt-cache search 'libwxgtk[0-9]' | sed 's/ - .*//')
 
-        if [ -z "$wx_lib" ] || [ -z "$wx_lib_dev" ]; then
-          wx_lib=libwxgtk3.0
-          wx_lib_dev=libwxgtk3.0-dev
-        fi
+        # Use -gtk3 variant on older distros.
+        case "$wx_libs" in
+            *-gtk3*)
+                new_wx_libs=
+                for pkg in $wx_libs; do
+                    case "$pkg" in
+                        *-gtk3*)
+                            new_wx_libs="$new_wx_libs $pkg"
+                            ;;
+                    esac
+                done
+                wx_libs=$new_wx_libs
+                ;;
+        esac
 
-        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev libsdl2-dev $sdl_lib libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev libsfml-dev $sfml_libs $glew_lib $wx_lib $wx_lib_dev libgtk2.0-dev libgtk-3-dev ccache zip ninja-build"
+        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev libsdl2-dev $sdl_lib libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev libsfml-dev $sfml_libs $glew_lib $wx_libs libgtk2.0-dev libgtk-3-dev ccache zip ninja-build"
 
         [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs libopenal-dev"
         [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs libavcodec-dev libavformat-dev libswscale-dev libavutil-dev $libswresample_dev"
@@ -1013,7 +1024,7 @@ solus_installdeps() {
     check sudo eopkg -y install -c system.devel
     check sudo eopkg -y install git ccache ninja
 
-    set -- sdl2-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel
+    set -- sdl2-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel libglu-devel
 
     [ -n "$ENABLE_OPENAL" ] && set -- "$@" openal-soft-devel
 
@@ -1084,18 +1095,36 @@ gentoo_installdeps() {
     wx_slot=$(equery -qC list -p -F '$slot' x11-libs/wxGTK | grep gtk3 | sort -rV | head -1)
 
     ebuilds="\
-      sys-devel/gcc      sys-devel/make     dev-util/cmake          dev-util/ccache sys-devel/binutils \
-      media-libs/libsdl2 media-libs/libsfml x11-libs/wxGTK:$wx_slot sys-libs/zlib   dev-util/pkgconf \
-      dev-lang/nasm      dev-util/ninja"
+      sys-devel/gcc \
+      dev-build/make \
+      dev-build/cmake \
+      dev-util/ccache \
+      sys-devel/binutils \
+      media-libs/libsdl2 \
+      media-libs/libsfml \
+      x11-libs/wxGTK:$wx_slot \
+      sys-libs/zlib \
+      dev-util/pkgconf \
+      dev-lang/nasm \
+      dev-build/ninja"
 
     [ -n "$ENABLE_OPENAL" ] && ebuilds="$ebuilds media-libs/openal"
 
     [ -n "$ENABLE_FFMPEG" ] && ebuilds="$ebuilds media-video/ffmpeg"
 
-    check sudo emerge -vn $ebuilds
+    check sudo emerge -vna $ebuilds
 
     build_instructions
 }
+
+alpine_installdeps() {
+    installing
+
+    check sudo apk add cmake ninja g++ ccache nasm gettext-dev zlib-dev mesa-dev sdl2-dev glu-dev sfml-dev wxwidgets-dev gtk+3.0-dev zip
+
+    build_instructions
+}
+
 
 windows_installdeps() {
     msys2=1

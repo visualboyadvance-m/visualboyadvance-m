@@ -50,7 +50,7 @@
                   </object>
                   <object class="sizeritem">
                     <object class="wxStaticText">
-                      <label>OAP:</label>
+                      <label translate="0">OAP:</label>
                     </object>
                   </object>
                   <object class="sizeritem">

@@ -73,8 +73,61 @@ https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 the description of your work should be in the **commit message NOT the pull
 request description**.
 
-Make sure your git history is clean and logical, edit when necessary with
-`rebase -i`.
+The title line must be no more than 50 characters and the description must be
+wrapped at 72 characters. Most commit message editor interfaces will help you
+with this. The title line must not end with a period.
+
+Write everything in the imperative mood, e.g. change, fix, **NOT** changes,
+changed, fixed, fixes etc..
+
+A commit message must always have a title and a description, the description
+must be independent of the title line, if necessary repeat the information in
+the title line in the description.
+
+Make sure the git history in your branch is clean and logical, edit when
+necessary with `rebase -i`.
+
+Use one commit per logical change if necessary, most work can be squashed into
+one commit when you are done. It is not necessary to have separate commits
+per-file if they are one logical change. We are less strict about this than
+other projects, fewer is better.
+
+The commit title line should be prefixed with an area, unless it involves the
+wxWidgets GUI app, in which case it should **NOT** have a prefix.
+
+The text after the area prefix should not be capitalized.
+
+Please use one of these area prefixes otherwise:
+
+- doc: documentation, README.md etc.
+- build: cmake, installdeps, preprocessor compatibility defines, etc.
+- gb-core: the GameBoy emulator core
+- gba-core: the GameBoy Advance emulator core
+- libretro: the libretro core glue and build
+- sdl-app: anything for the SDL app
+- translations: anything related to translations
+
+. Add other areas here if needed.
+
+If a commit fixes a regression, use a title line such as:
+
+```console
+Fix regression <PROBLEM> in <SHORT-SHA>
+```
+, you can get the short sha from `git log --oneline -100` or similar.
+
+The commit description for a regression must refer to the breaking change in
+reference format, which you can get from e.g. `git log --format=reference -20`.
+
+You can refer to github issues using `#<ISSUE-NUMBER>` freely in the description
+text.
+
+If a commit fixes an issue, add a line at the end of the description such as:
+
+```console
+Fix #<ISSUE-NUMBER>.
+```
+.
 
 #### Collaboration on a Branch
 

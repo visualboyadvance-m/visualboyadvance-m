@@ -31,29 +31,15 @@ endif()
 
 option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" OFF)
 
-find_package(OpenAL)
+find_package(OpenAL REQUIRED)
 
-if(OPENAL_FOUND)
-	set(ENABLE_OPENAL_DEFAULT ON)
-else()
-	set(ENABLE_OPENAL_DEFAULT OFF)
+include_directories(${OPENAL_INCLUDE_DIR})
+
+if(OPENAL_STATIC OR (WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)))
+    add_definitions(-DAL_LIBTYPE_STATIC)
 endif()
 
-option(ENABLE_OPENAL "Enable OpenAL for the wxWidgets port" ${ENABLE_OPENAL_DEFAULT})
-
-if(ENABLE_OPENAL)
-	find_package(OpenAL REQUIRED)
-
-	include_directories(${OPENAL_INCLUDE_DIR})
-
-	if(OPENAL_STATIC OR (WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)))
-		add_definitions(-DAL_LIBTYPE_STATIC)
-	endif()
-
-        list(APPEND VBAM_LIBS ${OPENAL_LIBRARY})
-else()
-    add_definitions(-DNO_OAL)
-endif()
+list(APPEND VBAM_LIBS ${OPENAL_LIBRARY})
 
 if(APPLE)
     add_definitions(-DwxMAC_USE_CORE_GRAPHICS)
@@ -108,9 +94,20 @@ if (WIN32)
     add_definitions(-D_UNICODE -DUNICODE -DwxUSE_GUI=1 -D__WXMSW__ -DWINVER=0x0A00 -DNTDDI_VERSION=0x0A000007)
 endif()
 
+if(CMAKE_HOST_WIN32)
+    find_program(POWERSHELL powershell.exe HINTS "/Windows/System32/WindowsPowerShell/v1.0" REQUIRED)
+else()
+    find_program(POWERSHELL pwsh)
+endif()
+
+find_program(ZIP_PROGRAM zip)
+if(ZIP_PROGRAM)
+    set(ZIP_PROGRAM "${ZIP_PROGRAM}" CACHE STRING "zip compressor executable" FORCE)
+endif()
+
 # on VS with vcpkg we can't use FindwxWidgets, we have to set everything up
 # manually because the package is broken
-if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
+if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     # set up wxwidgets stuff
     set(libtype u)
     unset(arch_suffix)
@@ -194,12 +191,12 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
 
     set(ENV{PATH} "${dbg_prefix}/bin;${common_prefix}/bin;$ENV{PATH}")
 
-    if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/zip.exe)
+    if(NOT ZIP_PROGRAM AND NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/zip.exe)
         # get zip binary for wxrc
         file(DOWNLOAD "https://www.willus.com/archive/zip64/infozip_binaries_win32.zip" ${CMAKE_CURRENT_BINARY_DIR}/infozip_binaries_win32.zip)
         # unzip it
         execute_process(
-            COMMAND powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('${CMAKE_CURRENT_BINARY_DIR}/infozip_binaries_win32.zip', '${CMAKE_CURRENT_BINARY_DIR}'); }"
+            COMMAND "${POWERSHELL}" -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('${CMAKE_CURRENT_BINARY_DIR}/infozip_binaries_win32.zip', '${CMAKE_CURRENT_BINARY_DIR}'); }"
         )
 
         set(ZIP_PROGRAM ${CMAKE_CURRENT_BINARY_DIR}/zip.exe CACHE STRING "zip compressor executable" FORCE)
@@ -237,7 +234,11 @@ else()
     # is set
     if(NOT wxWidgets_CONFIG_EXECUTABLE)
         if(DEFINED ENV{WX_CONFIG})
-            separate_arguments(wxWidgets_CONFIG_EXECUTABLE UNIX_COMMAND $ENV{WX_CONFIG})
+            if(NOT CMAKE_HOST_WIN32)
+                separate_arguments(wxWidgets_CONFIG_EXECUTABLE UNIX_COMMAND "$ENV{WX_CONFIG}")
+            else()
+                set(wxWidgets_CONFIG_EXECUTABLE "$ENV{WX_CONFIG}")
+            endif()
         else()
             find_wx_util(wxWidgets_CONFIG_EXECUTABLE wx-config)
         endif()
@@ -259,7 +260,7 @@ else()
 
     include_directories(${wxWidgets_INCLUDE_DIRS})
 
-    if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
+    if(CMAKE_BUILD_TYPE STREQUAL Debug)
         # tell wx to enable debug mode if possible, if the cmake module did not do it for us
         execute_process(COMMAND "${wxWidgets_CONFIG_EXECUTABLE} --debug=yes" RESULT_VARIABLE WX_CONFIG_DEBUG OUTPUT_QUIET ERROR_QUIET)
 
@@ -278,6 +279,17 @@ else()
     foreach(CXX_COMPILE_FLAG ${wxWidgets_CXX_FLAGS})
         add_compile_options(${CXX_COMPILE_FLAG})
     endforeach()
+
+    # Remove "-framework System" from libs on macOS, it's not necessary and nix doesn't have it.
+    if(APPLE)
+        unset(tmp_libs)
+        foreach(lib ${wxWidgets_LIBRARIES})
+            if(NOT lib STREQUAL "-framework System")
+                list(APPEND tmp_libs "${lib}")
+            endif()
+        endforeach()
+        set(wxWidgets_LIBRARIES "${tmp_libs}")
+    endif()
 
     # set up variables for some compile/run checks for wxWidgets
     set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${MY_CXX_FLAGS} ${MY_C_FLAGS} ${MY_CXX_LINKER_FLAGS} ${MY_C_LINKER_FLAGS} ${wxWidgets_LIBRARIES})
@@ -303,9 +315,10 @@ else()
     # need it because everything is built with clang
     set(ABI_CHECK FALSE)
 
-    if((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+    if((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         AND NOT CMAKE_CROSSCOMPILING
-        AND NOT CMAKE_SYSTEM_NAME STREQUAL FreeBSD
+        AND NOT CMAKE_SYSTEM_NAME STREQUAL "FreeBSD"
+        AND NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg"
         AND NOT TRANSLATIONS_ONLY)
 
         set(ABI_CHECK TRUE)
@@ -590,10 +603,12 @@ include_directories(widgets)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-find_program(ZIP_PROGRAM zip DOC "zip compressor executable")
-
 if(NOT ZIP_PROGRAM)
-    message(FATAL_ERROR "The zip compressor program is required for building.")
+    find_program(ZIP_PROGRAM zip DOC "zip compressor executable")
+
+    if(NOT ZIP_PROGRAM)
+        message(FATAL_ERROR "The zip compressor program is required for building.")
+    endif()
 endif()
 
 set(
@@ -656,10 +671,14 @@ if(CMAKE_HOST_WIN32 AND CMAKE_CROSSCOMPILING)
     set(WXRC ${CMAKE_SOURCE_DIR}/dependencies/wxrc/wxrc.exe)
 endif()
 
-if(WXRC)
+if(WXRC AND NOT CMAKE_HOST_WIN32)
     separate_arguments(WXRC UNIX_COMMAND ${WXRC})
 elseif(DEFINED ENV{WXRC})
-    separate_arguments(WXRC UNIX_COMMAND $ENV{WXRC})
+    if(NOT CMAKE_HOST_WIN32)
+        separate_arguments(WXRC UNIX_COMMAND "$ENV{WXRC}")
+    else()
+        set(WXRC "$ENV{WXRC}")
+    endif()
 elseif(wxWidgets_CONFIG_EXECUTABLE)
     execute_process(
         COMMAND ${wxWidgets_CONFIG_EXECUTABLE} --utility=wxrc
@@ -773,6 +792,7 @@ set(
     dialogs/game-boy-config.cpp
     dialogs/game-maker.cpp
     dialogs/gb-rom-info.cpp
+    dialogs/joypad-config.cpp
     widgets/group-check-box.cpp
     widgets/keep-on-top-styler.cpp
     widgets/option-validator.cpp
@@ -826,6 +846,7 @@ set(
     dialogs/game-boy-config.h
     dialogs/game-maker.h
     dialogs/gb-rom-info.h
+    dialogs/joypad-config.h
     dialogs/validated-child.h
     widgets/dpi-support.h
     widgets/group-check-box.h
@@ -900,10 +921,8 @@ if(ENABLE_DIRECT3D)
     list(APPEND VBAM_LIBS d3d9)
 endif()
 
-if(ENABLE_OPENAL)
-   list(APPEND SRC_WX openal.cpp)
-   list(APPEND HDR_WX openal.h)
-endif()
+list(APPEND SRC_WX openal.cpp)
+list(APPEND HDR_WX openal.h)
 
 list(APPEND ALL_SRC_WX xaudio2.cpp)
 
@@ -988,14 +1007,12 @@ if(NOT TRANSLATIONS_ONLY)
             PRIVATE ${SPARKLE_INCLUDE_DIR}
         )
 
-        set(APPCAST_URL "https://data.vba-m.com/appcast.xml")
+        set(APPCAST_URL "https://data.visualboyadvance-m.org/appcast.xml")
         set(CCS1 rm -rf ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks/Sparkle.framework)
         set(CCS2 mkdir -p ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks)
         # The following commands *should* be run to make sure Sparkle is not going
         # to bug randomly.
         set(CCS3 cp -a ${SPARKLE_FRAMEWORK} ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks/Sparkle.framework)
-        set(CCS4 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleVersion            -string "${VERSION}")
-        set(CCS5 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleShortVersionString -string "${VERSION}")
         set(CCS6 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUEnableAutomaticChecks -bool YES)
         #set(CCS7 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUPublicEDKey -string "${PUBLIC_KEY}")
         set(CCS8 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUFeedURL -string "${APPCAST_URL}")
@@ -1003,8 +1020,6 @@ if(NOT TRANSLATIONS_ONLY)
           COMMAND ${CCS1}
           COMMAND ${CCS2}
           COMMAND ${CCS3}
-          COMMAND ${CCS4}
-          COMMAND ${CCS5}
           COMMAND ${CCS6}
           #COMMAND ${CCS7}
           COMMAND ${CCS8}
@@ -1146,7 +1161,7 @@ if(NOT TRANSLATIONS_ONLY)
     if(UPSTREAM_RELEASE AND WIN32)
         set(home "$ENV{HOME}")
 
-        if(NOT CMAKE_CROSSCOMPILING AND NOT DEFINED ENV{MSYSTEM_PREFIX})
+        if((MSVC OR NOT CMAKE_CROSSCOMPILING) AND NOT DEFINED ENV{MSYSTEM_PREFIX})
             set(home "$ENV{USERPROFILE}")
         endif()
 
@@ -1256,9 +1271,22 @@ if(NOT TRANSLATIONS_ONLY)
             COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/mac-translations.cmake
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
+
+        set(ver ${VERSION})
+
+        if(NOT VERSION_RELEASE)
+            set(ver "${ver}-${REVISION}")
+        endif()
+
+        add_custom_command(
+            TARGET visualboyadvance-m POST_BUILD
+            COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleVersion            -string "${ver}"
+            COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleShortVersionString -string "${ver}"
+            COMMAND plutil -convert xml1 ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist
+        )
     endif()
 
-    if(APPLE AND (UPSTREAM_RELEASE OR ENABLE_ONLINEUPDATES))
+    if(APPLE AND UPSTREAM_RELEASE)
         if(CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
             find_program(STRIP_PROGRAM strip)
 
@@ -1275,7 +1303,7 @@ if(NOT TRANSLATIONS_ONLY)
         add_custom_command(
             TARGET visualboyadvance-m
             POST_BUILD
-            VERBATIM COMMAND sh -c [=[codesign --sign "Developer ID Application" --force --deep ./visualboyadvance-m.app || :]=]
+            VERBATIM COMMAND sh -c [=[codesign --sign "Developer ID Application" --options runtime --timestamp --force --deep ./visualboyadvance-m.app || :]=]
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
@@ -1287,37 +1315,59 @@ if(NOT TRANSLATIONS_ONLY)
                 add_custom_command(
                     TARGET visualboyadvance-m
                     POST_BUILD
-                    VERBATIM COMMAND sh -c "codesign --sign 'Developer ID Application' --force ${framework} || :"
+                    VERBATIM COMMAND sh -c "codesign --sign 'Developer ID Application' --options runtime --timestamp --force --deep ${framework} || :"
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                 )
             endforeach()
         endif()
 
-        if(UPSTREAM_RELEASE)
-           if(CMAKE_BUILD_TYPE STREQUAL Debug)
-              set(appzip visualboyadvance-m-Mac-${ARCH_NAME}-debug${ZIP_SUFFIX}.zip)
-           else()
-              set(appzip visualboyadvance-m-Mac-${ARCH_NAME}${ZIP_SUFFIX}.zip)
-           endif()
+        # Zip, notarize, staple to the .app and zip again
 
+        if(CMAKE_BUILD_TYPE STREQUAL Debug)
+            set(appzip visualboyadvance-m-Mac-${ARCH_NAME}-debug${ZIP_SUFFIX}.zip)
+        else()
+            set(appzip visualboyadvance-m-Mac-${ARCH_NAME}${ZIP_SUFFIX}.zip)
+        endif()
+
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E remove ${appzip}
+            COMMAND ${ZIP_PROGRAM} -9yr ${appzip} ./visualboyadvance-m.app
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND xcrun notarytool submit ${appzip} --keychain-profile AC_PASSWORD --wait
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND xcrun stapler staple ./visualboyadvance-m.app
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E remove ${appzip}
+            COMMAND ${ZIP_PROGRAM} -9yr ${appzip} ./visualboyadvance-m.app
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+        if(GPG_KEYS)
             add_custom_command(
                 TARGET visualboyadvance-m
                 POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E remove ${appzip}
-                COMMAND ${ZIP_PROGRAM} -9yr ${appzip} ./visualboyadvance-m.app
+                COMMAND ${CMAKE_COMMAND} -E remove ${appzip}.asc
+#                COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
+                COMMAND ${GPG_PROGRAM} --detach-sign -a ${appzip}
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             )
-
-            if(GPG_KEYS)
-                add_custom_command(
-                    TARGET visualboyadvance-m
-                    POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E remove ${appzip}.asc
-    #                COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
-                    COMMAND ${GPG_PROGRAM} --detach-sign -a ${appzip}
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                )
-            endif()
         endif()
     endif()
 

@@ -2187,7 +2187,11 @@ bool GLDrawingPanel::SetContext()
 {
 #ifndef wxGL_IMPLICIT_CONTEXT
     // Check if the current context is valid
-    if (!ctx || !ctx->IsOK())
+    if (!ctx
+#if wxCHECK_VERSION(3, 1, 0)
+            || !ctx->IsOK()
+#endif
+    )
     {
         // Delete the old context
         if (ctx) {
@@ -2197,8 +2201,8 @@ bool GLDrawingPanel::SetContext()
 
         // Create a new context
         ctx = new wxGLContext(this);
-}
-
+        DrawingPanelInit();
+    }
     return wxGLCanvas::SetCurrent(*ctx);
 #else
     return wxGLContext::SetCurrent(*this);
@@ -2211,11 +2215,7 @@ GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
           wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
 {
     widgets::RequestHighResolutionOpenGlSurfaceForWindow(this);
-#ifndef wxGL_IMPLICIT_CONTEXT
-    ctx = new wxGLContext(this);
-#endif
     SetContext();
-    if (!did_init) DrawingPanelInit();
 }
 
 GLDrawingPanel::~GLDrawingPanel()

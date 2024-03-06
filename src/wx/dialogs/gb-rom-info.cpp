@@ -21,43 +21,43 @@ wxString GetCartType() {
             mapper_type = _("No mapper");
             break;
         case gbCartData::MapperType::kMbc1:
-            mapper_type = _("MBC1");
+            mapper_type = "MBC1";
             break;
         case gbCartData::MapperType::kMbc2:
-            mapper_type = _("MBC2");
+            mapper_type = "MBC2";
             break;
         case gbCartData::MapperType::kMbc3:
-            mapper_type = _("MBC3");
+            mapper_type = "MBC3";
             break;
         case gbCartData::MapperType::kMbc5:
-            mapper_type = _("MBC5");
+            mapper_type = "MBC5";
             break;
         case gbCartData::MapperType::kMbc6:
-            mapper_type = _("MBC6");
+            mapper_type = "MBC6";
             break;
         case gbCartData::MapperType::kMbc7:
-            mapper_type = _("MBC7");
+            mapper_type = "MBC7";
             break;
         case gbCartData::MapperType::kPocketCamera:
             mapper_type = _("Pocket Camera");
             break;
         case gbCartData::MapperType::kMmm01:
-            mapper_type = _("MMM01");
+            mapper_type = "MMM01";
             break;
         case gbCartData::MapperType::kHuC1:
-            mapper_type = _("HuC-1");
+            mapper_type = "HuC-1";
             break;
         case gbCartData::MapperType::kHuC3:
-            mapper_type = _("HuC-3");
+            mapper_type = "HuC-3";
             break;
         case gbCartData::MapperType::kTama5:
-            mapper_type = _("Bandai TAMA5");
+            mapper_type = "Bandai TAMA5";
             break;
         case gbCartData::MapperType::kGameGenie:
-            mapper_type = _("Game Genie");
+            mapper_type = "Game Genie";
             break;
         case gbCartData::MapperType::kGameShark:
-            mapper_type = _("Game Shark");
+            mapper_type = "Game Shark";
             break;
         case gbCartData::MapperType::kUnknown:
             mapper_type = _("Unknown");
