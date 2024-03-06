@@ -24,7 +24,7 @@ set(VBAM_LIBS ${VBAMCORE_LIBS})
 
 if(WIN32)
     # not yet implemented
-    option(ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" OFF)
+    option(ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" ON)
 
     option(ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ON)
 endif()
@@ -916,6 +916,10 @@ set(
 
 list(APPEND ALL_SRC_WX openal.cpp)
 list(APPEND ALL_HDR_WX openal.h)
+
+if(ENABLE_DIRECT3D)
+    list(APPEND VBAM_LIBS d3d9)
+endif()
 
 list(APPEND SRC_WX openal.cpp)
 list(APPEND HDR_WX openal.h)
