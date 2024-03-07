@@ -2612,18 +2612,18 @@ bool MainFrame::BindControls()
             d->Fit();
         }
 
-        d = LoadXRCDialog("UIConfig");
-        { getcbb("HideMenuBar", gopts.hide_menu_bar); }
+        wxMenuItem* suspend_scr_saver_mi = XRCITEM("SuspendScreenSaver");
+        if (suspend_scr_saver_mi)
         {
-            getcbb("SuspendScreenSaver", gopts.suspend_screensaver);
-// TODO: change preprocessor directive to fit other platforms
+            // TODO: change preprocessor directive to fit other platforms
 #if !defined(HAVE_XSS)
-                cb->Hide();
+            suspend_scr_saver_mi->GetMenu()->Remove(suspend_scr_saver_mi);
 #else
-                if (wxGetApp().UsingWayland())
-                    cb->Hide();
+            if (wxGetApp().UsingWayland())
+                suspend_scr_saver_mi->GetMenu()->Remove(suspend_scr_saver_mi);
 #endif // !HAVE_XSS
         }
+
         wxFilePickerCtrl* fp;
 #define getfp(n, o, l)                                     \
     do {                                                   \

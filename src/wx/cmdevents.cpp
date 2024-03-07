@@ -1957,14 +1957,6 @@ EVT_HANDLER(SpeedupConfigure, "Speedup / Turbo options...")
     }
 }
 
-EVT_HANDLER(UIConfigure, "UI Settings...")
-{
-    wxDialog* dlg = GetXRCDialog("UIConfig");
-
-    if (ShowModal(dlg) == wxID_OK)
-        update_opts();
-}
-
 EVT_HANDLER(GameBoyConfigure, "Game Boy options...")
 {
     ShowModal(GetXRCDialog("GameBoyConfig"));
@@ -2519,6 +2511,16 @@ EVT_HANDLER(BootRomGBC, "Use the specified BIOS file for GBC")
 EVT_HANDLER(VSync, "Wait for vertical sync")
 {
     GetMenuOptionConfig("VSync", config::OptionID::kPrefVsync);
+}
+
+EVT_HANDLER(HideMenuBar, "Hide menu bar when mouse is inactive")
+{
+    GetMenuOptionConfig("HideMenuBar", config::OptionID::kUIHideMenuBar);
+}
+
+EVT_HANDLER(SuspendScreenSaver, "Suspend screensaver when game is running")
+{
+    GetMenuOptionConfig("SuspendScreenSaver", config::OptionID::kUISuspendScreenSaver);
 }
 
 #ifndef NO_LINK

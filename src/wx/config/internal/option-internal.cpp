@@ -574,8 +574,8 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"ui/allowJoystickBackgroundInput",
                "AllowJoystickBackgroundInput",
                _("Capture joy events while on background")},
-    OptionData{"ui/hideMenuBar", "", _("Hide menu bar when mouse is inactive")},
-    OptionData{"ui/suspendScreenSaver", "", _("Suspend screensaver when game is running")},
+    OptionData{"ui/hideMenuBar", "HideMenuBar", _("Hide menu bar when mouse is inactive")},
+    OptionData{"ui/suspendScreenSaver", "SuspendScreenSaver", _("Suspend screensaver when game is running")},
 
     /// Sound
     OptionData{"Sound/AudioAPI", "",
