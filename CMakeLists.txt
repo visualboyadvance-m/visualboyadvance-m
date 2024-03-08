@@ -451,16 +451,34 @@ endif()
 find_package(OpenGL REQUIRED)
 find_package(SDL2   REQUIRED)
 
-if(WIN32)
-    set(SDL2_LIBRARY ${SDL2_LIBRARY} setupapi winmm)
+# Add libsamplerate to SDL2 with vcpkg
+unset(SDL2_LIBRARY_TEMP)
+if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
+    if(WIN32)
+        unset(arch_suffix)
+        unset(path_prefix)
+        if(VCPKG_TARGET_TRIPLET MATCHES -static)
+            set(arch_suffix  -static)
+        endif()
+        if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
+            set(path_prefix debug)
+        endif()
+        set(installed_prefix ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix}/${path_prefix})
+
+        SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} ${installed_prefix}/lib/samplerate.lib)
+    else()
+        SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} -lsamplerate)
+    endif()
 endif()
+
+set(SDL2_TARGETS SDL2::SDL2 ${SDL2_LIBRARY_TEMP})
 
 # set the standard libraries all ports use
 set(
     VBAMCORE_LIBS
     vbamcore
     fex
-    ${SDL2_LIBRARY}
+    ${SDL2_TARGETS}
     ${SFML_LIBRARIES}
     ${OPENGL_LIBRARIES}
     ${ZLIB_LIBRARY}
