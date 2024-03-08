@@ -6,6 +6,7 @@
 # b t <babypandas886@gmail.com>, 2015
 # pngai <pngai@ymail.com>, 2016
 # Rythm Tse <ksusix@gmail.com>, 2016
+# Weiran Wu <wwrustc@mail.ustc.edu.cn>, 2024
 # wr superboy, 2023
 # Xuntao Chi <1139954766@qq.com>, 2019
 # 后海游泳大老爷 <my.yuicn@gmail.com>, 2015
@@ -18,9 +19,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-15 14:15-0500\n"
+"POT-Creation-Date: 2024-03-06 18:49+0800\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: 陈 依云 <c1998lf@qq.com>, 2023-2024\n"
+"Last-Translator: Weiran Wu <wwrustc@mail.ustc.edu.cn>, 2024\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/bgk/vba-m/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -82,7 +83,7 @@ msgstr "配置/建构错误：无法找到内置 xrc 文件"
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr "将内置配置写入到 %s。\n如要覆盖，请删除所有未更改的根节点。首先在以下搜索覆盖内置路径里找到任意 .xrc 或 .xrs 文件中正确名称的根节点："
+msgstr "已将内置配置写入到 %s。\n如要覆盖，请删除所有未更改的根节点。首先在以下搜索覆盖内置路径里找到任意 .xrc 或 .xrs 文件中正确名称的根节点："
 
 #: wxvbam.cpp:716
 msgid "Configuration is read from, in order:"
@@ -93,7 +94,7 @@ msgstr "配置按顺序从中读取："
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
-msgstr "将内置覆盖文件写入到 %s\n 如要覆盖，请删除所有未更改的部分。首个找到的部分从以下搜索路径使用："
+msgstr "已将内置覆盖文件写入到 %s\n 如要覆盖，请删除所有未更改的部分。首个找到的部分从以下搜索路径使用："
 
 #: wxvbam.cpp:736
 msgid ""
@@ -269,7 +270,7 @@ msgstr "旧数值"
 msgid "New Value"
 msgstr "新数值"
 
-#: guiinit.cpp:2794
+#: guiinit.cpp:2796
 msgid "JoyBus host invalid; disabling"
 msgstr "JoyBus 主机无效; 正在禁用"
 
@@ -371,7 +372,7 @@ msgstr "已读取电池档 %s"
 #: cmdevents.cpp:420
 #, c-format
 msgid "Error loading battery %s"
-msgstr "读取电池档错误 %s"
+msgstr "读取电池档 %s错误"
 
 #: cmdevents.cpp:429
 msgid "Select code file"
@@ -389,7 +390,7 @@ msgstr "Gameshark 代码文件 (*.gcf)|*.gcf"
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
-msgstr "导入代码将会重置之前已读取的所有金手指代码。你确定要继续吗？"
+msgstr "导入代码文件将会重置之前已读取的所有金手指代码。你确定要继续吗？"
 
 #: cmdevents.cpp:456
 #, c-format
@@ -542,33 +543,33 @@ msgstr "等待连接到端口 %d"
 msgid "Waiting for GDB..."
 msgstr "等待 GDB..."
 
-#: cmdevents.cpp:2215 panel.cpp:260 panel.cpp:372
+#: cmdevents.cpp:2207 panel.cpp:260 panel.cpp:372
 msgid "Could not initialize the sound driver!"
 msgstr "无法初始化声音驱动！"
 
-#: cmdevents.cpp:2284
+#: cmdevents.cpp:2276
 msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
 msgstr "你的配置将被删除！\n\n是否确定？"
 
-#: cmdevents.cpp:2285
+#: cmdevents.cpp:2277
 msgid "FACTORY RESET"
 msgstr "恢复默认"
 
-#: cmdevents.cpp:2320
+#: cmdevents.cpp:2312
 msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr "任天堂 GameBoy/Color/Advance 模拟器。"
 
-#: cmdevents.cpp:2321
+#: cmdevents.cpp:2313
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "版权 (C) 1999-2003 Forgotten\n版权 (C) 2004-2006 VBA 开发团队\n版权 (C) 2007-2020 VBA-M 开发团队"
 
-#: cmdevents.cpp:2323
+#: cmdevents.cpp:2315
 msgid ""
 "This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -584,15 +585,15 @@ msgid ""
 "along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr "本程序是自由软件: 你可以在自由软件基金会公布的 GNU 通用发布\n许可证条款下重新分发和/或修改此软件，依自己意愿许可证 V2 版或\n任意更新版许可证选其一即可。\n\n本程序希望是能有作用的分发出去，但【无任何担保】；甚至没有隐含\n的【可销售性】或【特定用途的适用性】保证。请查阅 GNU 通用发布\n许可证了解更多信息。\n\n你应该已经收到 GNU 通用发布许可证的副本以及本程序。\n如果没有，请查看 http://www.gnu.org/licenses 。"
 
-#: cmdevents.cpp:2508
+#: cmdevents.cpp:2500
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 msgstr "启用色彩修改时无法使用 GB BIOS。"
 
-#: cmdevents.cpp:2564
+#: cmdevents.cpp:2566
 msgid "LAN link is already active. Disable link mode to disconnect."
 msgstr "局域网连接已激活，禁用连接模式即可断开联网。"
 
-#: cmdevents.cpp:2570
+#: cmdevents.cpp:2572
 msgid "Network is not supported in local mode."
 msgstr "本地模式不支持网络"
 
@@ -1323,8 +1324,8 @@ msgstr "音量 (%)"
 #: config/internal/option-internal.cpp:666
 #: config/internal/option-internal.cpp:686
 #: config/internal/option-internal.cpp:707
-#: config/internal/option-internal.cpp:727
-#: config/internal/option-internal.cpp:747
+#: config/internal/option-internal.cpp:738
+#: config/internal/option-internal.cpp:758
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
 msgstr "数值 %s 对于选项 %s 无效，有效数值为 %s"
@@ -1925,7 +1926,7 @@ msgstr "旧数值(&D)"
 
 #: xrc/CheatCreate.xrc:152
 msgid "Specific &value"
-msgstr "特定值(V)"
+msgstr "特定值(&V)"
 
 #: xrc/CheatCreate.xrc:163
 msgid "Search value"
@@ -2667,7 +2668,7 @@ msgstr "秒 (0-600); 0 = 禁用"
 
 #: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
-msgstr "阀门(&T)"
+msgstr "节流(&T)"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "percent of normal:"
@@ -2692,7 +2693,7 @@ msgid ""
 " entire contents if too small."
 msgstr "单击字段，然后按键或移动操纵杆以添加。按退格键删除最后添加的键值。如果太小则调整窗口尺寸或单击内部再移动指针以查看整个内容。"
 
-#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:456
+#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:452
 msgid "Up"
 msgstr "上"
 
@@ -2700,7 +2701,7 @@ msgstr "上"
 msgid "A"
 msgstr "A"
 
-#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:460
+#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:456
 msgid "Down"
 msgstr "下"
 
@@ -2708,7 +2709,7 @@ msgstr "下"
 msgid "B"
 msgstr "B"
 
-#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:464
+#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:460
 msgid "Left"
 msgstr "左"
 
@@ -2716,7 +2717,7 @@ msgstr "左"
 msgid "L"
 msgstr "L"
 
-#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:468
+#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:464
 msgid "Right"
 msgstr "右"
 
@@ -2724,11 +2725,11 @@ msgstr "右"
 msgid "R"
 msgstr "R"
 
-#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:488
+#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:484
 msgid "Select"
 msgstr "选择"
 
-#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:492
+#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:488
 msgid "Start"
 msgstr "开始"
 
@@ -2842,7 +2843,7 @@ msgstr "声音输出(&D)"
 
 #: xrc/Logging.xrc:88
 msgid "Verbose"
-msgstr " 冗余"
+msgstr "详细"
 
 #: xrc/MainMenu.xrc:5
 msgid "&File"
@@ -3140,8 +3141,8 @@ msgstr "启动时连接(&L)"
 msgid "&Speed hack"
 msgstr "速度破解(&S)"
 
-#: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:387
-#: xrc/MainMenu.xrc:423
+#: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:383
+#: xrc/MainMenu.xrc:419
 msgid "&Configure..."
 msgstr "配置(&C)..."
 
@@ -3202,286 +3203,294 @@ msgid "&Keep window on top"
 msgstr "保持窗口在最前(&K)"
 
 #: xrc/MainMenu.xrc:372
-msgid "&Status bar"
-msgstr "状态栏(&S)"
-
-#: xrc/MainMenu.xrc:376
 msgid "&Disable on-screen display"
 msgstr "禁用屏幕显示信息(&D)"
 
-#: xrc/MainMenu.xrc:380
+#: xrc/MainMenu.xrc:376
 msgid "&Transparent on-screen display"
 msgstr "透明屏幕显示信息(&T)"
 
-#: xrc/MainMenu.xrc:385
+#: xrc/MainMenu.xrc:381
 msgid "&Audio"
 msgstr "音频(&A)"
 
-#: xrc/MainMenu.xrc:390
+#: xrc/MainMenu.xrc:386
 msgid "&Increase volume"
 msgstr "增大音量(&I)"
 
-#: xrc/MainMenu.xrc:394
+#: xrc/MainMenu.xrc:390
 msgid "&Decrease volume"
 msgstr "减小音量(&D)"
 
-#: xrc/MainMenu.xrc:398
+#: xrc/MainMenu.xrc:394
 msgid "&Toggle sound"
 msgstr "声音开/关(&T)"
 
-#: xrc/MainMenu.xrc:403
+#: xrc/MainMenu.xrc:399
 msgid "&Game Boy Advance sound interpolation"
 msgstr "GBA 声音插值(&G)"
 
-#: xrc/MainMenu.xrc:408
+#: xrc/MainMenu.xrc:404
 msgid "&Game Boy sound enhancement"
 msgstr "GB 声音加强(&G)"
 
-#: xrc/MainMenu.xrc:412
+#: xrc/MainMenu.xrc:408
 msgid "&Game Boy surround sound effect"
 msgstr "GB 环绕音效(&G)"
 
-#: xrc/MainMenu.xrc:416
+#: xrc/MainMenu.xrc:412
 msgid "&Game Boy sound declicking"
 msgstr "GB 声音降噪(&G)"
 
-#: xrc/MainMenu.xrc:421
+#: xrc/MainMenu.xrc:417
 msgid "&Input"
 msgstr "输入(&I)"
 
-#: xrc/MainMenu.xrc:426
+#: xrc/MainMenu.xrc:422
 msgid "Allow &keyboard background input"
 msgstr "允许键盘后台输入(&K)"
 
-#: xrc/MainMenu.xrc:430
+#: xrc/MainMenu.xrc:426
 msgid "Allow &joystick background input"
 msgstr "允许摇杆后台输入(&J)"
 
-#: xrc/MainMenu.xrc:435
+#: xrc/MainMenu.xrc:431
 msgid "&Autofire"
 msgstr "连发(&A)"
 
-#: xrc/MainMenu.xrc:454
+#: xrc/MainMenu.xrc:450
 msgid "&Autohold"
 msgstr "自动保持(&A)"
 
-#: xrc/MainMenu.xrc:472
+#: xrc/MainMenu.xrc:468
 msgid "&A"
 msgstr "&A"
 
-#: xrc/MainMenu.xrc:476
+#: xrc/MainMenu.xrc:472
 msgid "&B"
 msgstr "&B"
 
-#: xrc/MainMenu.xrc:480
+#: xrc/MainMenu.xrc:476
 msgid "&L"
 msgstr "&L"
 
-#: xrc/MainMenu.xrc:484
+#: xrc/MainMenu.xrc:480
 msgid "&R"
 msgstr "&R"
 
-#: xrc/MainMenu.xrc:500 xrc/MainMenu.xrc:523
+#: xrc/MainMenu.xrc:496 xrc/MainMenu.xrc:519
 msgid "Configure..."
 msgstr "设置..."
 
-#: xrc/MainMenu.xrc:504
+#: xrc/MainMenu.xrc:500
 msgid "&Real-time clock"
 msgstr "实时时钟(&R)"
 
-#: xrc/MainMenu.xrc:508
+#: xrc/MainMenu.xrc:504
 msgid "&Use BIOS file"
 msgstr "使用 BIOS 文件(&U)"
 
-#: xrc/MainMenu.xrc:512
+#: xrc/MainMenu.xrc:508
 msgid "&Debug print"
 msgstr "调试打印(&D)"
 
-#: xrc/MainMenu.xrc:516 xrc/MainMenu.xrc:531
+#: xrc/MainMenu.xrc:512 xrc/MainMenu.xrc:527
 msgid "&LCD Filter"
 msgstr "LCD 滤镜(&L)"
 
-#: xrc/MainMenu.xrc:527
+#: xrc/MainMenu.xrc:523
 msgid "&Game Boy color option"
 msgstr "GB 颜色选项(&G)"
 
-#: xrc/MainMenu.xrc:535
+#: xrc/MainMenu.xrc:531
 msgid "&Game Boy Colorizer Hack (requires restart)"
 msgstr "GB 色彩修改（需要重启）(&G)"
 
-#: xrc/MainMenu.xrc:539
+#: xrc/MainMenu.xrc:535
 msgid "&Game Boy printer"
 msgstr "GB 打印机(&G)"
 
-#: xrc/MainMenu.xrc:543
+#: xrc/MainMenu.xrc:539
 msgid "&Gather a full page before printing"
 msgstr "在打印前聚集整个页面(&G)"
 
-#: xrc/MainMenu.xrc:547
+#: xrc/MainMenu.xrc:543
 msgid "&Save printouts as screen captures"
 msgstr "将打印输出保存为截图(&S)"
 
-#: xrc/MainMenu.xrc:552
+#: xrc/MainMenu.xrc:548
 msgid "&Use Game Boy BIOS file (requires restart)"
 msgstr "使用 GB BIOS 文件（需要重启）(&U)"
 
-#: xrc/MainMenu.xrc:556
+#: xrc/MainMenu.xrc:552
 msgid "&Use Game Boy Color BIOS file"
 msgstr "使用 GBC BIOS 文件(&U)"
 
-#: xrc/MainMenu.xrc:561
+#: xrc/MainMenu.xrc:557
 msgid "&General..."
 msgstr "通用(&G)..."
 
-#: xrc/MainMenu.xrc:564
+#: xrc/MainMenu.xrc:560
 msgid "&Speedup / Turbo..."
 msgstr "加速/超频(&S)..."
 
-#: xrc/MainMenu.xrc:567
+#: xrc/MainMenu.xrc:563
 msgid "D&irectories..."
 msgstr "目录(&I)..."
 
-#: xrc/MainMenu.xrc:570
+#: xrc/MainMenu.xrc:566
 msgid "&Key Shortcuts..."
 msgstr "快捷键(&K)..."
 
-#: xrc/MainMenu.xrc:573
-msgid "&UI Settings..."
-msgstr "界面设置(&U)..."
+#: xrc/MainMenu.xrc:569
+msgid "UI Settings"
+msgstr "界面设置"
 
-#: xrc/MainMenu.xrc:577
+#: xrc/MainMenu.xrc:571
+msgid "Enable &Status bar"
+msgstr "启用状态栏(&S)"
+
+#: xrc/MainMenu.xrc:575
+msgid "Hide &Menu Bar"
+msgstr "隐藏菜单栏(&M)"
+
+#: xrc/MainMenu.xrc:579
+msgid "Suspend &Screen Saver"
+msgstr "暂停屏幕保护程序(&S)"
+
+#: xrc/MainMenu.xrc:585
 msgid "&Tools"
 msgstr "工具(&T)"
 
-#: xrc/MainMenu.xrc:579
+#: xrc/MainMenu.xrc:587
 msgid "&Cheats"
 msgstr "金手指(&C)"
 
-#: xrc/MainMenu.xrc:581
+#: xrc/MainMenu.xrc:589
 msgid "List &cheats..."
 msgstr "金手指列表(&C)..."
 
-#: xrc/MainMenu.xrc:584
+#: xrc/MainMenu.xrc:592
 msgid "Find c&heat..."
 msgstr "搜索金手指(&H)..."
 
-#: xrc/MainMenu.xrc:588
+#: xrc/MainMenu.xrc:596
 msgid "A&utomatically save / load cheats"
 msgstr "自动保存/载入金手指(&U)"
 
-#: xrc/MainMenu.xrc:592
+#: xrc/MainMenu.xrc:600
 msgid "&Enable cheats"
 msgstr "启用金手指(&E)"
 
-#: xrc/MainMenu.xrc:599
+#: xrc/MainMenu.xrc:607
 msgid "&Break into GDB"
 msgstr "切入 GDB(&B)"
 
-#: xrc/MainMenu.xrc:603
+#: xrc/MainMenu.xrc:611
 msgid "&Configure port..."
 msgstr "配置端口(&C)..."
 
-#: xrc/MainMenu.xrc:606
+#: xrc/MainMenu.xrc:614
 msgid "&Break on load"
 msgstr "加载时切入(&B)"
 
-#: xrc/MainMenu.xrc:611
+#: xrc/MainMenu.xrc:619
 msgid "&Disconnect"
 msgstr "断开连接(&D)"
 
-#: xrc/MainMenu.xrc:616
+#: xrc/MainMenu.xrc:624
 msgid "&Disassemble..."
 msgstr "反编译(&D)..."
 
-#: xrc/MainMenu.xrc:619
+#: xrc/MainMenu.xrc:627
 msgid "&Logging..."
 msgstr "日志(&L)..."
 
-#: xrc/MainMenu.xrc:622
+#: xrc/MainMenu.xrc:630
 msgid "&IO Viewer..."
 msgstr "IO 查看器(&I)..."
 
-#: xrc/MainMenu.xrc:625
+#: xrc/MainMenu.xrc:633
 msgid "&Map Viewer..."
 msgstr "图层查看器(&M)..."
 
-#: xrc/MainMenu.xrc:628
+#: xrc/MainMenu.xrc:636
 msgid "M&emory Viewer..."
 msgstr "内存查看器(&E)..."
 
-#: xrc/MainMenu.xrc:631
+#: xrc/MainMenu.xrc:639
 msgid "&OAM Viewer..."
 msgstr "OAM 查看器(&O)..."
 
-#: xrc/MainMenu.xrc:634
+#: xrc/MainMenu.xrc:642
 msgid "&Palette Viewer..."
 msgstr "调色板查看器(&P)..."
 
-#: xrc/MainMenu.xrc:637
+#: xrc/MainMenu.xrc:645
 msgid "&Tile Viewer..."
 msgstr "碎片查看器(&T)..."
 
-#: xrc/MainMenu.xrc:642
+#: xrc/MainMenu.xrc:650
 msgid "Show all video layers"
 msgstr "显示所有视频图层"
 
-#: xrc/MainMenu.xrc:685
+#: xrc/MainMenu.xrc:693
 msgid "&View Layers"
 msgstr "查看图层(&V)"
 
-#: xrc/MainMenu.xrc:689
+#: xrc/MainMenu.xrc:697
 msgid "Channel &1"
 msgstr "通道 1(&1)"
 
-#: xrc/MainMenu.xrc:694
+#: xrc/MainMenu.xrc:702
 msgid "Channel &2"
 msgstr "通道 2(&2)"
 
-#: xrc/MainMenu.xrc:699
+#: xrc/MainMenu.xrc:707
 msgid "Channel &3"
 msgstr "通道 3(&3)"
 
-#: xrc/MainMenu.xrc:704
+#: xrc/MainMenu.xrc:712
 msgid "Channel &4"
 msgstr "通道 4(&4)"
 
-#: xrc/MainMenu.xrc:709
+#: xrc/MainMenu.xrc:717
 msgid "Direct Sound &A"
 msgstr "Direct Sound A(&A)"
 
-#: xrc/MainMenu.xrc:714
+#: xrc/MainMenu.xrc:722
 msgid "Direct Sound &B"
 msgstr "Direct Sound B(&B)"
 
-#: xrc/MainMenu.xrc:718
+#: xrc/MainMenu.xrc:726
 msgid "&Sound Channels"
 msgstr "声道(&S)"
 
-#: xrc/MainMenu.xrc:722
+#: xrc/MainMenu.xrc:730
 msgid "&Help"
 msgstr "帮助(&H)"
 
-#: xrc/MainMenu.xrc:724
+#: xrc/MainMenu.xrc:732
 msgid "Report &Bugs"
 msgstr "反馈Bug(&B)"
 
-#: xrc/MainMenu.xrc:727
+#: xrc/MainMenu.xrc:735
 msgid "Visual Boy Advance-M Support &Forum"
 msgstr "VBA-M 支持与论坛(&F)"
 
-#: xrc/MainMenu.xrc:730
+#: xrc/MainMenu.xrc:738
 msgid "Translations"
 msgstr "翻译"
 
-#: xrc/MainMenu.xrc:738
+#: xrc/MainMenu.xrc:746
 msgid "Check for updates"
 msgstr "检查更新"
 
-#: xrc/MainMenu.xrc:741
+#: xrc/MainMenu.xrc:749
 msgid "&Factory Reset..."
 msgstr "恢复默认设置(&F)"
 
-#: xrc/MainMenu.xrc:745
+#: xrc/MainMenu.xrc:753
 msgid "&About..."
 msgstr "关于(&A)..."
 
@@ -3700,15 +3709,3 @@ msgstr "阀门加速"
 #: xrc/SpeedupConfig.xrc:50
 msgid "Frame skip"
 msgstr "跳帧"
-
-#: xrc/UIConfig.xrc:4
-msgid "User Interface Settings"
-msgstr "用户界面设置"
-
-#: xrc/UIConfig.xrc:9
-msgid "Hide Menu Bar"
-msgstr "隐藏菜单栏"
-
-#: xrc/UIConfig.xrc:16
-msgid "Suspend ScreenSaver"
-msgstr "暂停屏幕保护程序"

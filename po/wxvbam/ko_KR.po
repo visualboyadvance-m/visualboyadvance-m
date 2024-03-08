@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-15 14:15-0500\n"
+"POT-Creation-Date: 2024-03-06 18:49+0800\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Hoseok Seo <ddinghoya@gmail.com>, 2022-2023\n"
 "Language-Team: Korean (Korea) (http://app.transifex.com/bgk/vba-m/language/ko_KR/)\n"
@@ -263,7 +263,7 @@ msgstr "오래된 값"
 msgid "New Value"
 msgstr "새로운 값"
 
-#: guiinit.cpp:2794
+#: guiinit.cpp:2796
 msgid "JoyBus host invalid; disabling"
 msgstr "조이버스 호스트 무효; 비활성화합니다."
 
@@ -536,33 +536,33 @@ msgstr "포트%d에 연결중이니 기다려주세요"
 msgid "Waiting for GDB..."
 msgstr "GDB 대기 중..."
 
-#: cmdevents.cpp:2215 panel.cpp:260 panel.cpp:372
+#: cmdevents.cpp:2207 panel.cpp:260 panel.cpp:372
 msgid "Could not initialize the sound driver!"
 msgstr "사운드 드라이버를 초기화할 수 없습니다!"
 
-#: cmdevents.cpp:2284
+#: cmdevents.cpp:2276
 msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
 msgstr "설정이 삭제됩니다!\n\n확실한가요?"
 
-#: cmdevents.cpp:2285
+#: cmdevents.cpp:2277
 msgid "FACTORY RESET"
 msgstr "공장 초기화"
 
-#: cmdevents.cpp:2320
+#: cmdevents.cpp:2312
 msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr "닌텐도 게임보이 / 컬러 / 어드밴스 에뮬레이터입니다."
 
-#: cmdevents.cpp:2321
+#: cmdevents.cpp:2313
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA 개발팀\nCopyright (C) 2007-2020 VBA-M 개발팀"
 
-#: cmdevents.cpp:2323
+#: cmdevents.cpp:2315
 msgid ""
 "This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -578,15 +578,15 @@ msgid ""
 "along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr "이 프로그램은 자유 소프트웨어이므로 재배포 및/또는 수정할 수 있습니다.\n자유 소프트웨어 재단에서 게시한 GNU 일반 공중 사용 허가서 조건에 따라\n자유 소프트웨어 재단, 라이선스 버전 2 또는 (귀하의 선택에 따라)\n이후 버전에 따라 재배포할 수 있습니다.\n\n이 프로그램은 유용하게 사용되기를 바라는 마음으로 배포되며, 어떠한 보증도 없이\n상품성 또는 특정 목적에의 적합성에 대한 묵시적 보증도 없이 배포됩니다.\n자세한 내용은 GNU 일반 공중 사용 허가서를 참조하세요.\n\n이 프로그램과 함께 GNU 일반 공중 사용 허가서 사본을 이 프로그램과 함께 받았어야 합니다.\n그렇지 않은 경우 http://www.gnu.org/licenses 을 참조하세요."
 
-#: cmdevents.cpp:2508
+#: cmdevents.cpp:2500
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 msgstr "컬러라이저 해킹이 활성화된 경우 게임보이 바이오스를 사용할 수 없습니다."
 
-#: cmdevents.cpp:2564
+#: cmdevents.cpp:2566
 msgid "LAN link is already active. Disable link mode to disconnect."
 msgstr "랜 링크가 이미 활성화되어 있습니다. 연결을 끊으려면 링크 모드를 비활성화합니다."
 
-#: cmdevents.cpp:2570
+#: cmdevents.cpp:2572
 msgid "Network is not supported in local mode."
 msgstr "로컬 모드에서는 네트워크가 지원되지 않음."
 
@@ -1317,8 +1317,8 @@ msgstr "사운드 볼륨 (%)"
 #: config/internal/option-internal.cpp:666
 #: config/internal/option-internal.cpp:686
 #: config/internal/option-internal.cpp:707
-#: config/internal/option-internal.cpp:727
-#: config/internal/option-internal.cpp:747
+#: config/internal/option-internal.cpp:738
+#: config/internal/option-internal.cpp:758
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
 msgstr "옵션 %s 에 대한 잘못된 값 %s; 유효한 값은 %s"
@@ -2686,7 +2686,7 @@ msgid ""
 " entire contents if too small."
 msgstr "필드를 클릭하고 키를 누르거나 조이스틱을 움직여 추가합니다. 마지막으로 추가한 키를 삭제하려면 백스페이스 키를 누릅니다. 창이 너무 작으면 크기를 조정하거나 안쪽을 클릭하고 포인터를 이동하여 전체 내용을 확인합니다."
 
-#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:456
+#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:452
 msgid "Up"
 msgstr "상"
 
@@ -2694,7 +2694,7 @@ msgstr "상"
 msgid "A"
 msgstr "A"
 
-#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:460
+#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:456
 msgid "Down"
 msgstr "하"
 
@@ -2702,7 +2702,7 @@ msgstr "하"
 msgid "B"
 msgstr "B"
 
-#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:464
+#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:460
 msgid "Left"
 msgstr "좌"
 
@@ -2710,7 +2710,7 @@ msgstr "좌"
 msgid "L"
 msgstr "L"
 
-#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:468
+#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:464
 msgid "Right"
 msgstr "우"
 
@@ -2718,11 +2718,11 @@ msgstr "우"
 msgid "R"
 msgstr "R"
 
-#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:488
+#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:484
 msgid "Select"
 msgstr "Select"
 
-#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:492
+#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:488
 msgid "Start"
 msgstr "Start"
 
@@ -3134,8 +3134,8 @@ msgstr "시작할 때 연결(&L)"
 msgid "&Speed hack"
 msgstr "스피드 핵(&S)"
 
-#: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:387
-#: xrc/MainMenu.xrc:423
+#: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:383
+#: xrc/MainMenu.xrc:419
 msgid "&Configure..."
 msgstr "구성(&C)..."
 
@@ -3196,286 +3196,294 @@ msgid "&Keep window on top"
 msgstr "창 맨 위로 고정(&K)"
 
 #: xrc/MainMenu.xrc:372
-msgid "&Status bar"
-msgstr "상태 표시줄(&S)"
-
-#: xrc/MainMenu.xrc:376
 msgid "&Disable on-screen display"
 msgstr "화면 상 표시 비활성화(&D)"
 
-#: xrc/MainMenu.xrc:380
+#: xrc/MainMenu.xrc:376
 msgid "&Transparent on-screen display"
 msgstr "화면 상 표시를 투명하게(&T)"
 
-#: xrc/MainMenu.xrc:385
+#: xrc/MainMenu.xrc:381
 msgid "&Audio"
 msgstr "소리(&A)"
 
-#: xrc/MainMenu.xrc:390
+#: xrc/MainMenu.xrc:386
 msgid "&Increase volume"
 msgstr "음량 높이기(&I)"
 
-#: xrc/MainMenu.xrc:394
+#: xrc/MainMenu.xrc:390
 msgid "&Decrease volume"
 msgstr "음량 낮추기(&D)"
 
-#: xrc/MainMenu.xrc:398
+#: xrc/MainMenu.xrc:394
 msgid "&Toggle sound"
 msgstr "음향 전환(&T)"
 
-#: xrc/MainMenu.xrc:403
+#: xrc/MainMenu.xrc:399
 msgid "&Game Boy Advance sound interpolation"
 msgstr "게임보이 어드밴스 사운드 보간(&G)"
 
-#: xrc/MainMenu.xrc:408
+#: xrc/MainMenu.xrc:404
 msgid "&Game Boy sound enhancement"
 msgstr "게임보이 사운드 향상(&G)"
 
-#: xrc/MainMenu.xrc:412
+#: xrc/MainMenu.xrc:408
 msgid "&Game Boy surround sound effect"
 msgstr "게임보이 서라운드 사운드 효과(&G)"
 
-#: xrc/MainMenu.xrc:416
+#: xrc/MainMenu.xrc:412
 msgid "&Game Boy sound declicking"
 msgstr "게임보이 사운드 감소(&G)"
 
-#: xrc/MainMenu.xrc:421
+#: xrc/MainMenu.xrc:417
 msgid "&Input"
 msgstr "입력(&I)"
 
-#: xrc/MainMenu.xrc:426
+#: xrc/MainMenu.xrc:422
 msgid "Allow &keyboard background input"
 msgstr "키보드 백그라운드 입력 허용(&K)"
 
-#: xrc/MainMenu.xrc:430
+#: xrc/MainMenu.xrc:426
 msgid "Allow &joystick background input"
 msgstr "조이스틱 백그라운드 입력 허용(&J)"
 
-#: xrc/MainMenu.xrc:435
+#: xrc/MainMenu.xrc:431
 msgid "&Autofire"
 msgstr "버튼 연사(&A)"
 
-#: xrc/MainMenu.xrc:454
+#: xrc/MainMenu.xrc:450
 msgid "&Autohold"
 msgstr "자동 입력(&A)"
 
-#: xrc/MainMenu.xrc:472
+#: xrc/MainMenu.xrc:468
 msgid "&A"
 msgstr "&A"
 
-#: xrc/MainMenu.xrc:476
+#: xrc/MainMenu.xrc:472
 msgid "&B"
 msgstr "&B"
 
-#: xrc/MainMenu.xrc:480
+#: xrc/MainMenu.xrc:476
 msgid "&L"
 msgstr "&L"
 
-#: xrc/MainMenu.xrc:484
+#: xrc/MainMenu.xrc:480
 msgid "&R"
 msgstr "&R"
 
-#: xrc/MainMenu.xrc:500 xrc/MainMenu.xrc:523
+#: xrc/MainMenu.xrc:496 xrc/MainMenu.xrc:519
 msgid "Configure..."
 msgstr "구성..."
 
-#: xrc/MainMenu.xrc:504
+#: xrc/MainMenu.xrc:500
 msgid "&Real-time clock"
 msgstr "실시간 시계(&R)"
 
-#: xrc/MainMenu.xrc:508
+#: xrc/MainMenu.xrc:504
 msgid "&Use BIOS file"
 msgstr "BIOS 파일을 사용(&U)"
 
-#: xrc/MainMenu.xrc:512
+#: xrc/MainMenu.xrc:508
 msgid "&Debug print"
 msgstr "디버그 출력(&D)"
 
-#: xrc/MainMenu.xrc:516 xrc/MainMenu.xrc:531
+#: xrc/MainMenu.xrc:512 xrc/MainMenu.xrc:527
 msgid "&LCD Filter"
 msgstr "&LCD 필터"
 
-#: xrc/MainMenu.xrc:527
+#: xrc/MainMenu.xrc:523
 msgid "&Game Boy color option"
 msgstr "게임보이 컬러 옵션(&G)"
 
-#: xrc/MainMenu.xrc:535
+#: xrc/MainMenu.xrc:531
 msgid "&Game Boy Colorizer Hack (requires restart)"
 msgstr "게임보이 컬러라이저 해킹 (재시작 필요)(&G)"
 
-#: xrc/MainMenu.xrc:539
+#: xrc/MainMenu.xrc:535
 msgid "&Game Boy printer"
 msgstr "게임보이 프린터(&G)"
 
-#: xrc/MainMenu.xrc:543
+#: xrc/MainMenu.xrc:539
 msgid "&Gather a full page before printing"
 msgstr "출력 전 모든 페이지를 모으기(&G)"
 
-#: xrc/MainMenu.xrc:547
+#: xrc/MainMenu.xrc:543
 msgid "&Save printouts as screen captures"
 msgstr "출력물 스크린 캡쳐로 저장하기(&S)"
 
-#: xrc/MainMenu.xrc:552
+#: xrc/MainMenu.xrc:548
 msgid "&Use Game Boy BIOS file (requires restart)"
 msgstr "게임보이 바이오스 파일 사용 (재시작 필요)(&U)"
 
-#: xrc/MainMenu.xrc:556
+#: xrc/MainMenu.xrc:552
 msgid "&Use Game Boy Color BIOS file"
 msgstr "게임보이 컬러 바이오스 파일 사용(&U)"
 
-#: xrc/MainMenu.xrc:561
+#: xrc/MainMenu.xrc:557
 msgid "&General..."
 msgstr "일반사항(&G)..."
 
-#: xrc/MainMenu.xrc:564
+#: xrc/MainMenu.xrc:560
 msgid "&Speedup / Turbo..."
 msgstr "스피드업 / 터보(&S)..."
 
-#: xrc/MainMenu.xrc:567
+#: xrc/MainMenu.xrc:563
 msgid "D&irectories..."
 msgstr "디렉토리(&I)..."
 
-#: xrc/MainMenu.xrc:570
+#: xrc/MainMenu.xrc:566
 msgid "&Key Shortcuts..."
 msgstr "키 단축키(&K)..."
 
-#: xrc/MainMenu.xrc:573
-msgid "&UI Settings..."
-msgstr "UI 설정(&U)..."
+#: xrc/MainMenu.xrc:569
+msgid "UI Settings"
+msgstr ""
 
-#: xrc/MainMenu.xrc:577
+#: xrc/MainMenu.xrc:571
+msgid "Enable &Status bar"
+msgstr ""
+
+#: xrc/MainMenu.xrc:575
+msgid "Hide &Menu Bar"
+msgstr ""
+
+#: xrc/MainMenu.xrc:579
+msgid "Suspend &Screen Saver"
+msgstr ""
+
+#: xrc/MainMenu.xrc:585
 msgid "&Tools"
 msgstr "도구(&T)"
 
-#: xrc/MainMenu.xrc:579
+#: xrc/MainMenu.xrc:587
 msgid "&Cheats"
 msgstr "치트(&C)"
 
-#: xrc/MainMenu.xrc:581
+#: xrc/MainMenu.xrc:589
 msgid "List &cheats..."
 msgstr "치트 목록(&C)..."
 
-#: xrc/MainMenu.xrc:584
+#: xrc/MainMenu.xrc:592
 msgid "Find c&heat..."
 msgstr "치트 찾기(&H)..."
 
-#: xrc/MainMenu.xrc:588
+#: xrc/MainMenu.xrc:596
 msgid "A&utomatically save / load cheats"
 msgstr "자동으로 치트 저장 / 불러오기(&U)"
 
-#: xrc/MainMenu.xrc:592
+#: xrc/MainMenu.xrc:600
 msgid "&Enable cheats"
 msgstr "치트 활성화(&E)"
 
-#: xrc/MainMenu.xrc:599
+#: xrc/MainMenu.xrc:607
 msgid "&Break into GDB"
 msgstr "GNU 디버깅 시스템 침입(&B)"
 
-#: xrc/MainMenu.xrc:603
+#: xrc/MainMenu.xrc:611
 msgid "&Configure port..."
 msgstr "포트 구성(&C)..."
 
-#: xrc/MainMenu.xrc:606
+#: xrc/MainMenu.xrc:614
 msgid "&Break on load"
 msgstr "불러오기 시 침입(&B)"
 
-#: xrc/MainMenu.xrc:611
+#: xrc/MainMenu.xrc:619
 msgid "&Disconnect"
 msgstr "연결 끊기(&D)"
 
-#: xrc/MainMenu.xrc:616
+#: xrc/MainMenu.xrc:624
 msgid "&Disassemble..."
 msgstr "파일 분석(&D)..."
 
-#: xrc/MainMenu.xrc:619
+#: xrc/MainMenu.xrc:627
 msgid "&Logging..."
 msgstr "기록(&L)..."
 
-#: xrc/MainMenu.xrc:622
+#: xrc/MainMenu.xrc:630
 msgid "&IO Viewer..."
 msgstr "입출력 뷰어(&I)..."
 
-#: xrc/MainMenu.xrc:625
+#: xrc/MainMenu.xrc:633
 msgid "&Map Viewer..."
 msgstr "맵 뷰어(&M)..."
 
-#: xrc/MainMenu.xrc:628
+#: xrc/MainMenu.xrc:636
 msgid "M&emory Viewer..."
 msgstr "메모리 뷰어(&E)..."
 
-#: xrc/MainMenu.xrc:631
+#: xrc/MainMenu.xrc:639
 msgid "&OAM Viewer..."
 msgstr "OAM(운용관리 시스템) 뷰어(&O)..."
 
-#: xrc/MainMenu.xrc:634
+#: xrc/MainMenu.xrc:642
 msgid "&Palette Viewer..."
 msgstr "팔레트 뷰어(&P)..."
 
-#: xrc/MainMenu.xrc:637
+#: xrc/MainMenu.xrc:645
 msgid "&Tile Viewer..."
 msgstr "타일 뷰어(&T)..."
 
-#: xrc/MainMenu.xrc:642
+#: xrc/MainMenu.xrc:650
 msgid "Show all video layers"
 msgstr "모든 비디오 레이어 표시"
 
-#: xrc/MainMenu.xrc:685
+#: xrc/MainMenu.xrc:693
 msgid "&View Layers"
 msgstr "레이어 보기(&V)"
 
-#: xrc/MainMenu.xrc:689
+#: xrc/MainMenu.xrc:697
 msgid "Channel &1"
 msgstr "채널 &1"
 
-#: xrc/MainMenu.xrc:694
+#: xrc/MainMenu.xrc:702
 msgid "Channel &2"
 msgstr "채널 &2"
 
-#: xrc/MainMenu.xrc:699
+#: xrc/MainMenu.xrc:707
 msgid "Channel &3"
 msgstr "채널 &3"
 
-#: xrc/MainMenu.xrc:704
+#: xrc/MainMenu.xrc:712
 msgid "Channel &4"
 msgstr "채널 &4"
 
-#: xrc/MainMenu.xrc:709
+#: xrc/MainMenu.xrc:717
 msgid "Direct Sound &A"
 msgstr "다이렉트 사운드 &A"
 
-#: xrc/MainMenu.xrc:714
+#: xrc/MainMenu.xrc:722
 msgid "Direct Sound &B"
 msgstr "다이렉트 사운드 &B"
 
-#: xrc/MainMenu.xrc:718
+#: xrc/MainMenu.xrc:726
 msgid "&Sound Channels"
 msgstr "음향 채널(&S)"
 
-#: xrc/MainMenu.xrc:722
+#: xrc/MainMenu.xrc:730
 msgid "&Help"
 msgstr "도움말(&H)"
 
-#: xrc/MainMenu.xrc:724
+#: xrc/MainMenu.xrc:732
 msgid "Report &Bugs"
 msgstr "버그 제보(&B)"
 
-#: xrc/MainMenu.xrc:727
+#: xrc/MainMenu.xrc:735
 msgid "Visual Boy Advance-M Support &Forum"
 msgstr "Visual Boy Advance-M 지원 포럼(&F)"
 
-#: xrc/MainMenu.xrc:730
+#: xrc/MainMenu.xrc:738
 msgid "Translations"
 msgstr "번역 참여"
 
-#: xrc/MainMenu.xrc:738
+#: xrc/MainMenu.xrc:746
 msgid "Check for updates"
 msgstr "업데이트 확인"
 
-#: xrc/MainMenu.xrc:741
+#: xrc/MainMenu.xrc:749
 msgid "&Factory Reset..."
 msgstr "공장 초기화(&F)..."
 
-#: xrc/MainMenu.xrc:745
+#: xrc/MainMenu.xrc:753
 msgid "&About..."
 msgstr "정보(&A)..."
 
@@ -3694,15 +3702,3 @@ msgstr "스피드 업 제한"
 #: xrc/SpeedupConfig.xrc:50
 msgid "Frame skip"
 msgstr "프레임 생략"
-
-#: xrc/UIConfig.xrc:4
-msgid "User Interface Settings"
-msgstr "사용자 인터페이스 설정"
-
-#: xrc/UIConfig.xrc:9
-msgid "Hide Menu Bar"
-msgstr "메뉴 바 숨기기"
-
-#: xrc/UIConfig.xrc:16
-msgid "Suspend ScreenSaver"
-msgstr "화면 보호기 일시 중지"

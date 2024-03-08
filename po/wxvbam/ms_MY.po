@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-15 14:15-0500\n"
+"POT-Creation-Date: 2024-03-06 18:49+0800\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: abuyop <abuyop@gmail.com>, 2017\n"
 "Language-Team: Malay (Malaysia) (http://app.transifex.com/bgk/vba-m/language/ms_MY/)\n"
@@ -259,7 +259,7 @@ msgstr "Nilai Lama"
 msgid "New Value"
 msgstr "Nilai Baharu"
 
-#: guiinit.cpp:2794
+#: guiinit.cpp:2796
 msgid "JoyBus host invalid; disabling"
 msgstr "Hos JoyBus tidak sah; dilumpuhkan"
 
@@ -532,33 +532,33 @@ msgstr "Menunggu sambungan pada port %d"
 msgid "Waiting for GDB..."
 msgstr "Menunggu GDB..."
 
-#: cmdevents.cpp:2215 panel.cpp:260 panel.cpp:372
+#: cmdevents.cpp:2207 panel.cpp:260 panel.cpp:372
 msgid "Could not initialize the sound driver!"
 msgstr ""
 
-#: cmdevents.cpp:2284
+#: cmdevents.cpp:2276
 msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
 msgstr ""
 
-#: cmdevents.cpp:2285
+#: cmdevents.cpp:2277
 msgid "FACTORY RESET"
 msgstr ""
 
-#: cmdevents.cpp:2320
+#: cmdevents.cpp:2312
 msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr ""
 
-#: cmdevents.cpp:2321
+#: cmdevents.cpp:2313
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr ""
 
-#: cmdevents.cpp:2323
+#: cmdevents.cpp:2315
 msgid ""
 "This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -574,15 +574,15 @@ msgid ""
 "along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr ""
 
-#: cmdevents.cpp:2508
+#: cmdevents.cpp:2500
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 msgstr ""
 
-#: cmdevents.cpp:2564
+#: cmdevents.cpp:2566
 msgid "LAN link is already active. Disable link mode to disconnect."
 msgstr ""
 
-#: cmdevents.cpp:2570
+#: cmdevents.cpp:2572
 msgid "Network is not supported in local mode."
 msgstr "Rangkaian tidak disokong dalam mod setempat."
 
@@ -1313,8 +1313,8 @@ msgstr ""
 #: config/internal/option-internal.cpp:666
 #: config/internal/option-internal.cpp:686
 #: config/internal/option-internal.cpp:707
-#: config/internal/option-internal.cpp:727
-#: config/internal/option-internal.cpp:747
+#: config/internal/option-internal.cpp:738
+#: config/internal/option-internal.cpp:758
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
 msgstr ""
@@ -2682,7 +2682,7 @@ msgid ""
 " entire contents if too small."
 msgstr ""
 
-#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:456
+#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:452
 msgid "Up"
 msgstr "Naik"
 
@@ -2690,7 +2690,7 @@ msgstr "Naik"
 msgid "A"
 msgstr "A"
 
-#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:460
+#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:456
 msgid "Down"
 msgstr "Turun"
 
@@ -2698,7 +2698,7 @@ msgstr "Turun"
 msgid "B"
 msgstr "B"
 
-#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:464
+#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:460
 msgid "Left"
 msgstr "Kiri"
 
@@ -2706,7 +2706,7 @@ msgstr "Kiri"
 msgid "L"
 msgstr "L"
 
-#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:468
+#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:464
 msgid "Right"
 msgstr "Kanan"
 
@@ -2714,11 +2714,11 @@ msgstr "Kanan"
 msgid "R"
 msgstr "R"
 
-#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:488
+#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:484
 msgid "Select"
 msgstr "Pilih"
 
-#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:492
+#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:488
 msgid "Start"
 msgstr "Mula"
 
@@ -3130,8 +3130,8 @@ msgstr "&Paut ketika but"
 msgid "&Speed hack"
 msgstr "&Godam kelajuan"
 
-#: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:387
-#: xrc/MainMenu.xrc:423
+#: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:383
+#: xrc/MainMenu.xrc:419
 msgid "&Configure..."
 msgstr ""
 
@@ -3192,286 +3192,294 @@ msgid "&Keep window on top"
 msgstr "&Kekalkan tetingkap di atas"
 
 #: xrc/MainMenu.xrc:372
-msgid "&Status bar"
-msgstr "Palang &Status"
-
-#: xrc/MainMenu.xrc:376
 msgid "&Disable on-screen display"
 msgstr "&Lumpuhkan paparan atas-skrin"
 
-#: xrc/MainMenu.xrc:380
+#: xrc/MainMenu.xrc:376
 msgid "&Transparent on-screen display"
 msgstr "Paparan atas-skrin &lutsinar"
 
-#: xrc/MainMenu.xrc:385
+#: xrc/MainMenu.xrc:381
 msgid "&Audio"
 msgstr "&Audio"
 
-#: xrc/MainMenu.xrc:390
+#: xrc/MainMenu.xrc:386
 msgid "&Increase volume"
 msgstr ""
 
-#: xrc/MainMenu.xrc:394
+#: xrc/MainMenu.xrc:390
 msgid "&Decrease volume"
 msgstr ""
 
-#: xrc/MainMenu.xrc:398
+#: xrc/MainMenu.xrc:394
 msgid "&Toggle sound"
 msgstr ""
 
-#: xrc/MainMenu.xrc:403
+#: xrc/MainMenu.xrc:399
 msgid "&Game Boy Advance sound interpolation"
 msgstr ""
 
-#: xrc/MainMenu.xrc:408
+#: xrc/MainMenu.xrc:404
 msgid "&Game Boy sound enhancement"
 msgstr ""
 
-#: xrc/MainMenu.xrc:412
+#: xrc/MainMenu.xrc:408
 msgid "&Game Boy surround sound effect"
 msgstr ""
 
-#: xrc/MainMenu.xrc:416
+#: xrc/MainMenu.xrc:412
 msgid "&Game Boy sound declicking"
 msgstr ""
 
-#: xrc/MainMenu.xrc:421
+#: xrc/MainMenu.xrc:417
 msgid "&Input"
 msgstr "&Input"
 
-#: xrc/MainMenu.xrc:426
+#: xrc/MainMenu.xrc:422
 msgid "Allow &keyboard background input"
 msgstr ""
 
-#: xrc/MainMenu.xrc:430
+#: xrc/MainMenu.xrc:426
 msgid "Allow &joystick background input"
 msgstr ""
 
-#: xrc/MainMenu.xrc:435
+#: xrc/MainMenu.xrc:431
 msgid "&Autofire"
 msgstr "&Autotembak"
 
-#: xrc/MainMenu.xrc:454
+#: xrc/MainMenu.xrc:450
 msgid "&Autohold"
 msgstr ""
 
-#: xrc/MainMenu.xrc:472
+#: xrc/MainMenu.xrc:468
 msgid "&A"
 msgstr "&A"
 
-#: xrc/MainMenu.xrc:476
+#: xrc/MainMenu.xrc:472
 msgid "&B"
 msgstr "&B"
 
-#: xrc/MainMenu.xrc:480
+#: xrc/MainMenu.xrc:476
 msgid "&L"
 msgstr "&L"
 
-#: xrc/MainMenu.xrc:484
+#: xrc/MainMenu.xrc:480
 msgid "&R"
 msgstr "&R"
 
-#: xrc/MainMenu.xrc:500 xrc/MainMenu.xrc:523
+#: xrc/MainMenu.xrc:496 xrc/MainMenu.xrc:519
 msgid "Configure..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:504
+#: xrc/MainMenu.xrc:500
 msgid "&Real-time clock"
 msgstr "Waktu masa-n&yata"
 
-#: xrc/MainMenu.xrc:508
+#: xrc/MainMenu.xrc:504
 msgid "&Use BIOS file"
 msgstr "&Guse fail BIOS"
 
-#: xrc/MainMenu.xrc:512
+#: xrc/MainMenu.xrc:508
 msgid "&Debug print"
 msgstr "&Nyahpepijat cetak"
 
-#: xrc/MainMenu.xrc:516 xrc/MainMenu.xrc:531
+#: xrc/MainMenu.xrc:512 xrc/MainMenu.xrc:527
 msgid "&LCD Filter"
 msgstr ""
 
-#: xrc/MainMenu.xrc:527
+#: xrc/MainMenu.xrc:523
 msgid "&Game Boy color option"
 msgstr ""
 
-#: xrc/MainMenu.xrc:535
+#: xrc/MainMenu.xrc:531
 msgid "&Game Boy Colorizer Hack (requires restart)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:539
+#: xrc/MainMenu.xrc:535
 msgid "&Game Boy printer"
 msgstr ""
 
-#: xrc/MainMenu.xrc:543
+#: xrc/MainMenu.xrc:539
 msgid "&Gather a full page before printing"
 msgstr "&Himpun halaman penuh sebelum mencetak"
 
-#: xrc/MainMenu.xrc:547
+#: xrc/MainMenu.xrc:543
 msgid "&Save printouts as screen captures"
 msgstr "&Simpan cetakan sebagai tangkapan skrin"
 
-#: xrc/MainMenu.xrc:552
+#: xrc/MainMenu.xrc:548
 msgid "&Use Game Boy BIOS file (requires restart)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:556
+#: xrc/MainMenu.xrc:552
 msgid "&Use Game Boy Color BIOS file"
 msgstr ""
 
-#: xrc/MainMenu.xrc:561
+#: xrc/MainMenu.xrc:557
 msgid "&General..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:564
+#: xrc/MainMenu.xrc:560
 msgid "&Speedup / Turbo..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:567
+#: xrc/MainMenu.xrc:563
 msgid "D&irectories..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:570
+#: xrc/MainMenu.xrc:566
 msgid "&Key Shortcuts..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:573
-msgid "&UI Settings..."
+#: xrc/MainMenu.xrc:569
+msgid "UI Settings"
 msgstr ""
 
-#: xrc/MainMenu.xrc:577
+#: xrc/MainMenu.xrc:571
+msgid "Enable &Status bar"
+msgstr ""
+
+#: xrc/MainMenu.xrc:575
+msgid "Hide &Menu Bar"
+msgstr ""
+
+#: xrc/MainMenu.xrc:579
+msgid "Suspend &Screen Saver"
+msgstr ""
+
+#: xrc/MainMenu.xrc:585
 msgid "&Tools"
 msgstr "&Alatan"
 
-#: xrc/MainMenu.xrc:579
+#: xrc/MainMenu.xrc:587
 msgid "&Cheats"
 msgstr "&Menipu"
 
-#: xrc/MainMenu.xrc:581
+#: xrc/MainMenu.xrc:589
 msgid "List &cheats..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:584
+#: xrc/MainMenu.xrc:592
 msgid "Find c&heat..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:588
+#: xrc/MainMenu.xrc:596
 msgid "A&utomatically save / load cheats"
 msgstr ""
 
-#: xrc/MainMenu.xrc:592
+#: xrc/MainMenu.xrc:600
 msgid "&Enable cheats"
 msgstr "B&enarkan menipu"
 
-#: xrc/MainMenu.xrc:599
+#: xrc/MainMenu.xrc:607
 msgid "&Break into GDB"
 msgstr "Pe&cah menjadi GDB"
 
-#: xrc/MainMenu.xrc:603
+#: xrc/MainMenu.xrc:611
 msgid "&Configure port..."
 msgstr "&Konfigur port..."
 
-#: xrc/MainMenu.xrc:606
+#: xrc/MainMenu.xrc:614
 msgid "&Break on load"
 msgstr "P&ech ketika muat"
 
-#: xrc/MainMenu.xrc:611
+#: xrc/MainMenu.xrc:619
 msgid "&Disconnect"
 msgstr "P&utuskan"
 
-#: xrc/MainMenu.xrc:616
+#: xrc/MainMenu.xrc:624
 msgid "&Disassemble..."
 msgstr "&Nyahhimpun"
 
-#: xrc/MainMenu.xrc:619
+#: xrc/MainMenu.xrc:627
 msgid "&Logging..."
 msgstr "Peng&elogan"
 
-#: xrc/MainMenu.xrc:622
+#: xrc/MainMenu.xrc:630
 msgid "&IO Viewer..."
 msgstr "Pelihat &IO"
 
-#: xrc/MainMenu.xrc:625
+#: xrc/MainMenu.xrc:633
 msgid "&Map Viewer..."
 msgstr "Pelihat P&eta..."
 
-#: xrc/MainMenu.xrc:628
+#: xrc/MainMenu.xrc:636
 msgid "M&emory Viewer..."
 msgstr "Pelihat &Ingatan..."
 
-#: xrc/MainMenu.xrc:631
+#: xrc/MainMenu.xrc:639
 msgid "&OAM Viewer..."
 msgstr "Pelihat &OAM..."
 
-#: xrc/MainMenu.xrc:634
+#: xrc/MainMenu.xrc:642
 msgid "&Palette Viewer..."
 msgstr "Pelihat &Palet..."
 
-#: xrc/MainMenu.xrc:637
+#: xrc/MainMenu.xrc:645
 msgid "&Tile Viewer..."
 msgstr "Pelihat &Jubin..."
 
-#: xrc/MainMenu.xrc:642
+#: xrc/MainMenu.xrc:650
 msgid "Show all video layers"
 msgstr ""
 
-#: xrc/MainMenu.xrc:685
+#: xrc/MainMenu.xrc:693
 msgid "&View Layers"
 msgstr "&Lihat Lapisan"
 
-#: xrc/MainMenu.xrc:689
+#: xrc/MainMenu.xrc:697
 msgid "Channel &1"
 msgstr "Saluran &1"
 
-#: xrc/MainMenu.xrc:694
+#: xrc/MainMenu.xrc:702
 msgid "Channel &2"
 msgstr "Saluran &2"
 
-#: xrc/MainMenu.xrc:699
+#: xrc/MainMenu.xrc:707
 msgid "Channel &3"
 msgstr "Saluran &3"
 
-#: xrc/MainMenu.xrc:704
+#: xrc/MainMenu.xrc:712
 msgid "Channel &4"
 msgstr "Saluran &4"
 
-#: xrc/MainMenu.xrc:709
+#: xrc/MainMenu.xrc:717
 msgid "Direct Sound &A"
 msgstr "Direct Sound &A"
 
-#: xrc/MainMenu.xrc:714
+#: xrc/MainMenu.xrc:722
 msgid "Direct Sound &B"
 msgstr "Direct Sound &B"
 
-#: xrc/MainMenu.xrc:718
+#: xrc/MainMenu.xrc:726
 msgid "&Sound Channels"
 msgstr "Saluran &Bunyi"
 
-#: xrc/MainMenu.xrc:722
+#: xrc/MainMenu.xrc:730
 msgid "&Help"
 msgstr "&Bantuan"
 
-#: xrc/MainMenu.xrc:724
+#: xrc/MainMenu.xrc:732
 msgid "Report &Bugs"
 msgstr "Lapor P&epijat"
 
-#: xrc/MainMenu.xrc:727
+#: xrc/MainMenu.xrc:735
 msgid "Visual Boy Advance-M Support &Forum"
 msgstr ""
 
-#: xrc/MainMenu.xrc:730
+#: xrc/MainMenu.xrc:738
 msgid "Translations"
 msgstr "Terjemahan"
 
-#: xrc/MainMenu.xrc:738
+#: xrc/MainMenu.xrc:746
 msgid "Check for updates"
 msgstr ""
 
-#: xrc/MainMenu.xrc:741
+#: xrc/MainMenu.xrc:749
 msgid "&Factory Reset..."
 msgstr ""
 
-#: xrc/MainMenu.xrc:745
+#: xrc/MainMenu.xrc:753
 msgid "&About..."
 msgstr ""
 
@@ -3689,16 +3697,4 @@ msgstr ""
 
 #: xrc/SpeedupConfig.xrc:50
 msgid "Frame skip"
-msgstr ""
-
-#: xrc/UIConfig.xrc:4
-msgid "User Interface Settings"
-msgstr ""
-
-#: xrc/UIConfig.xrc:9
-msgid "Hide Menu Bar"
-msgstr ""
-
-#: xrc/UIConfig.xrc:16
-msgid "Suspend ScreenSaver"
 msgstr ""
