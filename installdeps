@@ -1139,10 +1139,10 @@ windows_installdeps() {
 
     case "$target" in
         *clang*)
-            pkgs="lldb"
+            pkgs="lldb clang"
             ;;
         *)
-            pkgs="$pkgs gcc gcc-libs gcc-libgfortran"
+            pkgs="gcc gcc-libs gcc-libgfortran"
             ;;
     esac
 
