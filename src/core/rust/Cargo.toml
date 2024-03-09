@@ -1,0 +1,16 @@
+[package]
+name = "vbam_rust"
+version = "0.1.0"
+
+[lib]
+name = "vbam_rust"
+crate-type = ["staticlib"]
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+
+[build-dependencies]
+cbindgen = "0.26.0"

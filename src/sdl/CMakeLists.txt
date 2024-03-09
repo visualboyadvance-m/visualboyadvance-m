@@ -34,10 +34,6 @@ if(MSVC)
     )
 endif()
 
-if(ENABLE_LIRC)
-    set(LIRC_CLIENT_LIBRARY lirc_client)
-endif()
-
 target_link_libraries(vbam
     vbam-core
     vbam-components-audio-sdl

@@ -9,18 +9,7 @@
 #include <zlib.h>
 #endif  // defined(__LIBRETRO__)
 
-struct CheatsData {
-    int code;
-    int size;
-    int status;
-    bool enabled;
-    uint32_t rawaddress;
-    uint32_t address;
-    uint32_t value;
-    uint32_t oldValue;
-    char codestring[20];
-    char desc[32];
-};
+#include "core/rust/bindings.hpp"
 
 void cheatsAdd(const char* codeStr, const char* desc, uint32_t rawaddress, uint32_t address, uint32_t value,
     int code, int size);
@@ -47,6 +36,6 @@ void cheatsWriteByte(uint32_t address, uint8_t value);
 int cheatsCheckKeys(uint32_t keys, uint32_t extended);
 
 extern int cheatsNumber;
-extern CheatsData cheatsList[MAX_CHEATS];
+extern core::CheatsData cheatsList[MAX_CHEATS];
 
 #endif // VBAM_CORE_GBA_GBACHEATS_H_

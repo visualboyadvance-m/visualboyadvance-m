@@ -17,3 +17,7 @@ compile_commands.json
 
 # mac finder crap
 *.DS_Store
+
+# Rust build files
+src/core/rust/target/
+src/core/rust/Cargo.lock

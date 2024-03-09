@@ -8,6 +8,6 @@
 #define DOCTEST_THREAD_LOCAL // Avoid MinGW thread_local bug.
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "doctest.h"
+#include <doctest.h>
 
 #endif

@@ -6,8 +6,11 @@
 #include "core/base/file_util.h"
 #include "core/base/message.h"
 #include "core/gba/gba.h"
-#include "core/gba/gbaInline.h"
 #include "core/gba/gbaGlobals.h"
+#include "core/gba/gbaInline.h"
+#include "core/rust/bindings.hpp"
+
+using namespace core;
 
 /**
  * Gameshark code types: (based on AR v1.0)
@@ -672,7 +675,7 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
         case GSA_16_BIT_ROM_PATCH:
             if ((cheatsList[i].status & 1) == 0) {
                 if (CPUReadHalfWord(cheatsList[i].address) != cheatsList[i].value) {
-                    cheatsList[i].oldValue = CPUReadHalfWord(cheatsList[i].address);
+                    cheatsList[i].old_value = CPUReadHalfWord(cheatsList[i].address);
                     cheatsList[i].status |= 1;
                     CHEAT_PATCH_ROM_16BIT(cheatsList[i].address, cheatsList[i].value);
                 }
@@ -1280,6 +1283,33 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
     return ticks;
 }
 
+void cheatsAdd(CheatsData data) {
+    if (cheatsNumber == MAX_CHEATS) {
+        return;
+    }
+
+    int x = cheatsNumber;
+    cheatsList[x] = std::move(data);
+    switch (cheatsList[x].size) {
+        case INT_8_BIT_WRITE:
+            cheatsList[x].old_value = CPUReadByte(cheatsList[x].address);
+            break;
+        case INT_16_BIT_WRITE:
+            cheatsList[x].old_value = CPUReadHalfWord(cheatsList[x].address);
+            break;
+        case INT_32_BIT_WRITE:
+            cheatsList[x].old_value = CPUReadMemory(cheatsList[x].address);
+            break;
+        case CHEATS_16_BIT_WRITE:
+            cheatsList[x].old_value = CPUReadHalfWord(cheatsList[x].address);
+            break;
+        case CHEATS_32_BIT_WRITE:
+            cheatsList[x].old_value = CPUReadMemory(cheatsList[x].address);
+            break;
+    }
+    cheatsNumber++;
+}
+
 void cheatsAdd(const char* codeStr,
     const char* desc,
     uint32_t rawaddress,
@@ -1304,19 +1334,19 @@ void cheatsAdd(const char* codeStr,
         // is taken care when it actually patches the ROM
         switch (cheatsList[x].size) {
         case INT_8_BIT_WRITE:
-            cheatsList[x].oldValue = CPUReadByte(address);
+            cheatsList[x].old_value = CPUReadByte(address);
             break;
         case INT_16_BIT_WRITE:
-            cheatsList[x].oldValue = CPUReadHalfWord(address);
+            cheatsList[x].old_value = CPUReadHalfWord(address);
             break;
         case INT_32_BIT_WRITE:
-            cheatsList[x].oldValue = CPUReadMemory(address);
+            cheatsList[x].old_value = CPUReadMemory(address);
             break;
         case CHEATS_16_BIT_WRITE:
-            cheatsList[x].oldValue = CPUReadHalfWord(address);
+            cheatsList[x].old_value = CPUReadHalfWord(address);
             break;
         case CHEATS_32_BIT_WRITE:
-            cheatsList[x].oldValue = CPUReadMemory(address);
+            cheatsList[x].old_value = CPUReadMemory(address);
             break;
         }
         cheatsNumber++;
@@ -1331,33 +1361,33 @@ void cheatsDelete(int number, bool restore)
         if (restore) {
             switch (cheatsList[x].size) {
             case INT_8_BIT_WRITE:
-                CPUWriteByte(cheatsList[x].address, (uint8_t)cheatsList[x].oldValue);
+                CPUWriteByte(cheatsList[x].address, (uint8_t)cheatsList[x].old_value);
                 break;
             case INT_16_BIT_WRITE:
-                CPUWriteHalfWord(cheatsList[x].address, (uint16_t)cheatsList[x].oldValue);
+                CPUWriteHalfWord(cheatsList[x].address, (uint16_t)cheatsList[x].old_value);
                 break;
             case INT_32_BIT_WRITE:
-                CPUWriteMemory(cheatsList[x].address, cheatsList[x].oldValue);
+                CPUWriteMemory(cheatsList[x].address, cheatsList[x].old_value);
                 break;
             case CHEATS_16_BIT_WRITE:
                 if ((cheatsList[x].address >> 24) >= 0x08) {
-                    CHEAT_PATCH_ROM_16BIT(cheatsList[x].address, cheatsList[x].oldValue);
+                    CHEAT_PATCH_ROM_16BIT(cheatsList[x].address, cheatsList[x].old_value);
                 } else {
-                    CPUWriteHalfWord(cheatsList[x].address, cheatsList[x].oldValue);
+                    CPUWriteHalfWord(cheatsList[x].address, cheatsList[x].old_value);
                 }
                 break;
             case CHEATS_32_BIT_WRITE:
                 if ((cheatsList[x].address >> 24) >= 0x08) {
-                    CHEAT_PATCH_ROM_32BIT(cheatsList[x].address, cheatsList[x].oldValue);
+                    CHEAT_PATCH_ROM_32BIT(cheatsList[x].address, cheatsList[x].old_value);
                 } else {
-                    CPUWriteMemory(cheatsList[x].address, cheatsList[x].oldValue);
+                    CPUWriteMemory(cheatsList[x].address, cheatsList[x].old_value);
                 }
 		/* fallthrough */
             case GSA_16_BIT_ROM_PATCH:
                 if (cheatsList[x].status & 1) {
                     cheatsList[x].status &= ~1;
                     CHEAT_PATCH_ROM_16BIT(cheatsList[x].address,
-                        cheatsList[x].oldValue);
+                        cheatsList[x].old_value);
                 }
                 break;
             case GSA_16_BIT_ROM_PATCH2C:
@@ -1403,7 +1433,7 @@ void cheatsDisable(int i)
             if (cheatsList[i].status & 1) {
                 cheatsList[i].status &= ~1;
                 CHEAT_PATCH_ROM_16BIT(cheatsList[i].address,
-                    cheatsList[i].oldValue);
+                    cheatsList[i].old_value);
             }
             break;
         case GSA_16_BIT_ROM_PATCH2C:
@@ -1424,72 +1454,15 @@ void cheatsDisable(int i)
 
 bool cheatsVerifyCheatCode(const char* code, const char* desc)
 {
-    size_t len = strlen(code);
-    if (len != 11 && len != 13 && len != 17) {
-        systemMessage(MSG_INVALID_CHEAT_CODE, N_("Invalid cheat code '%s': wrong length"), code);
+    auto converted = core::decode_code(core::GbaCheatsType::Generic, code, desc);
+    if (converted.tag ==
+        core::Result_CheatsData__CheatsDecodeError_Tag::Err_CheatsData__CheatsDecodeError) {
+        systemMessage(MSG_INVALID_CHEAT_CODE, N_("Invalid cheat code '%s': %s"), code,
+                      converted.err);
         return false;
     }
 
-    if (code[8] != ':') {
-        systemMessage(MSG_INVALID_CHEAT_CODE, N_("Invalid cheat code '%s': no colon"), code);
-        return false;
-    }
-
-    size_t i;
-    for (i = 0; i < 8; i++) {
-        if (!CHEAT_IS_HEX(code[i])) {
-            // wrong cheat
-            systemMessage(MSG_INVALID_CHEAT_CODE,
-                N_("Invalid cheat code '%s': first part is not hex"), code);
-            return false;
-        }
-    }
-    for (i = 9; i < len; i++) {
-        if (!CHEAT_IS_HEX(code[i])) {
-            // wrong cheat
-            systemMessage(MSG_INVALID_CHEAT_CODE,
-                N_("Invalid cheat code '%s' second part is not hex"), code);
-            return false;
-        }
-    }
-
-    uint32_t address = 0;
-    uint32_t value = 0;
-
-    char buffer[10];
-    strncpy(buffer, code, 8);
-    buffer[8] = 0;
-    sscanf(buffer, "%x", &address);
-
-    switch (address >> 24) {
-    case 0x02:
-    case 0x03:
-    case 0x04:
-    case 0x05:
-    case 0x06:
-    case 0x07:
-    case 0x08:
-    case 0x09:
-    case 0x0A:
-    case 0x0B:
-    case 0x0C:
-    case 0x0D:
-        break;
-    default:
-        systemMessage(MSG_INVALID_CHEAT_CODE_ADDRESS,
-            N_("Invalid cheat code address: %08x"),
-            address);
-        return false;
-    }
-
-    strncpy(buffer, &code[9], 8);
-    sscanf(buffer, "%x", &value);
-    int type = 0;
-    if (len == 13)
-        type = 114;
-    if (len == 17)
-        type = 115;
-    cheatsAdd(code, desc, address, address, value, type, type);
+    cheatsAdd(std::move(converted.ok));
     return true;
 }
 
@@ -2606,7 +2579,7 @@ void cheatsReadGame(gzFile file, int version)
             utilGzRead(file, &cheatsList[i].address, sizeof(uint32_t));
             cheatsList[i].rawaddress = cheatsList[i].address;
             utilGzRead(file, &cheatsList[i].value, sizeof(uint32_t));
-            utilGzRead(file, &cheatsList[i].oldValue, sizeof(uint32_t));
+            utilGzRead(file, &cheatsList[i].old_value, sizeof(uint32_t));
             utilGzRead(file, &cheatsList[i].codestring, 20 * sizeof(char));
             utilGzRead(file, &cheatsList[i].desc, 32 * sizeof(char));
         }
@@ -2743,7 +2716,7 @@ bool cheatsLoadCheatList(const char* file)
             FREAD_UNCHECKED(&cheatsList[i].address, 1, sizeof(uint32_t), f);
             cheatsList[i].rawaddress = cheatsList[i].address;
             FREAD_UNCHECKED(&cheatsList[i].value, 1, sizeof(uint32_t), f);
-            FREAD_UNCHECKED(&cheatsList[i].oldValue, 1, sizeof(uint32_t), f);
+            FREAD_UNCHECKED(&cheatsList[i].old_value, 1, sizeof(uint32_t), f);
             FREAD_UNCHECKED(&cheatsList[i].codestring, 1, 20 * sizeof(char), f);
             if (fread(&cheatsList[i].desc, 1, 32 * sizeof(char), f) != 32 * sizeof(char)) {
                 fclose(f);
@@ -2829,9 +2802,9 @@ void cheatsWriteMemory(uint32_t address, uint32_t value)
 {
     if (cheatsNumber == 0) {
         int type = cheatsGetType(address);
-        uint32_t oldValue = debuggerReadMemory(address);
-        if (type == 1 || (type == 2 && oldValue != value)) {
-            debuggerBreakOnWrite(address, oldValue, value, 2, type);
+        uint32_t old_value = debuggerReadMemory(address);
+        if (type == 1 || (type == 2 && old_value != value)) {
+            debuggerBreakOnWrite(address, old_value, value, 2, type);
             cpuNextEvent = 0;
         }
         debuggerWriteMemory(address, value);
@@ -2842,9 +2815,9 @@ void cheatsWriteHalfWord(uint32_t address, uint16_t value)
 {
     if (cheatsNumber == 0) {
         int type = cheatsGetType(address);
-        uint16_t oldValue = debuggerReadHalfWord(address);
-        if (type == 1 || (type == 2 && oldValue != value)) {
-            debuggerBreakOnWrite(address, oldValue, value, 1, type);
+        uint16_t old_value = debuggerReadHalfWord(address);
+        if (type == 1 || (type == 2 && old_value != value)) {
+            debuggerBreakOnWrite(address, old_value, value, 1, type);
             cpuNextEvent = 0;
         }
         debuggerWriteHalfWord(address, value);
@@ -2855,9 +2828,9 @@ void cheatsWriteByte(uint32_t address, uint8_t value)
 {
     if (cheatsNumber == 0) {
         int type = cheatsGetType(address);
-        uint8_t oldValue = debuggerReadByte(address);
-        if (type == 1 || (type == 2 && oldValue != value)) {
-            debuggerBreakOnWrite(address, oldValue, value, 0, type);
+        uint8_t old_value = debuggerReadByte(address);
+        if (type == 1 || (type == 2 && old_value != value)) {
+            debuggerBreakOnWrite(address, old_value, value, 0, type);
             cpuNextEvent = 0;
         }
         debuggerWriteByte(address, value);

@@ -74,6 +74,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
+# Rust library dependency
+include(FetchContent)
+FetchContent_Declare(
+    Corrosion
+    GIT_REPOSITORY https://github.com/corrosion-rs/corrosion.git
+    GIT_TAG v0.4
+)
+FetchContent_MakeAvailable(Corrosion)
+
 project(VBA-M C CXX)
 
 find_package(PkgConfig)
@@ -263,15 +272,6 @@ add_compile_definitions(PKGDATADIR="${CMAKE_INSTALL_FULL_DATADIR}/vbam")
 add_compile_definitions(__STDC_FORMAT_MACROS)
 
 if(ENABLE_LINK)
-    # IPC linking code needs sem_timedwait which can be either in librt or pthreads
-    if(NOT WIN32)
-        find_library(RT_LIB rt)
-        if(RT_LIB)
-           set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${RT_LIB})
-           set(VBAMCORE_LIBS ${VBAMCORE_LIBS} ${RT_LIB})
-        endif()
-    endif()
-
     include(CheckFunctionExists)
     check_function_exists(sem_timedwait SEM_TIMEDWAIT)
     if(SEM_TIMEDWAIT)

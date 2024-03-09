@@ -51,7 +51,6 @@ parts:
       - libopenal-dev
       - libwxgtk3.0-gtk3-dev
     cmake-parameters:
-      - -DENABLE_OPENAL=ON
       - -DENABLE_SDL=OFF
       - -DCMAKE_INSTALL_PREFIX=/usr
 

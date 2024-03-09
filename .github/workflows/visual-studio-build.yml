@@ -12,6 +12,9 @@ jobs:
         cmake_options: ['', '-DENABLE_LINK=OFF', '-DENABLE_SDL=ON']
     runs-on: windows-latest
     steps:
+      - name: Install Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
       - name: Checkout the code
         uses: actions/checkout@v2
         with:

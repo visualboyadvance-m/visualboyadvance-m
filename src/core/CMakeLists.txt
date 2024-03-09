@@ -2,6 +2,9 @@ add_subdirectory(apu)
 add_subdirectory(base)
 add_subdirectory(fex)
 
+# Set up "vbam_rust" library.
+corrosion_import_crate(MANIFEST_PATH ${CMAKE_CURRENT_LIST_DIR}/rust/Cargo.toml NO_STD)
+
 # The vbam-core target contains both the Game Boy and Game Boy Advance
 # emulators. These should be broken down into 2 separate targets. The issue lies
 # with the Link and Sound emulation, which are tangled together between the two
@@ -94,7 +97,7 @@ target_include_directories(vbam-core
 
 target_link_libraries(vbam-core
     PRIVATE vbam-core-apu vbam-fex
-    PUBLIC vbam-core-base ${ZLIB_LIBRARY}
+    PUBLIC vbam-core-base ${ZLIB_LIBRARY} vbam_rust
 )
 
 if(ENABLE_DEBUGGER)

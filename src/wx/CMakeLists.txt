@@ -427,7 +427,7 @@ host_compile(${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c ${BIN2C})
 
 # Override wxrc when cross-compiling.
 if(CMAKE_HOST_WIN32 AND CMAKE_CROSSCOMPILING)
-    set(WXRC ${CMAKE_SOURCE_DIR}/dependencies/wxrc/wxrc.exe)
+    find_program(WXRC NAMES wxrc)
 endif()
 
 # Configure wxrc.
