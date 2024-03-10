@@ -557,7 +557,7 @@ msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr "Forgotten, 1999-2003\nКоманда виробників Visual Boy Advance, 2004-2006\nКоманда виробників Visual Boy Advance-M, 2007-2023"
+msgstr "Forgotten, 1999-2003\nКоманда виробників Visual Boy Advance, 2004-2006\nКоманда виробників Visual Boy Advance-M, 2007-2024"
 
 #: cmdevents.cpp:2315
 msgid ""
@@ -3334,19 +3334,19 @@ msgstr "&Гарячі кнопки..."
 
 #: xrc/MainMenu.xrc:569
 msgid "UI Settings"
-msgstr ""
+msgstr "UI-налаштування"
 
 #: xrc/MainMenu.xrc:571
 msgid "Enable &Status bar"
-msgstr ""
+msgstr "Увімкнути панель &стану"
 
 #: xrc/MainMenu.xrc:575
 msgid "Hide &Menu Bar"
-msgstr ""
+msgstr "Приховати панель &меню"
 
 #: xrc/MainMenu.xrc:579
 msgid "Suspend &Screen Saver"
-msgstr ""
+msgstr "Призупинити &заставку"
 
 #: xrc/MainMenu.xrc:585
 msgid "&Tools"
