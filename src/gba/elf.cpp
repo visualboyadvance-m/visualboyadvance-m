@@ -834,9 +834,13 @@ uint32_t elfReadLEB128(uint8_t* data, int* bytesRead)
     return result;
 }
 
-uint8_t* elfReadSection(uint8_t* data, ELFSectionHeader* sh)
+uint8_t* elfReadSection(uint8_t* data, unsigned long data_size, ELFSectionHeader* sh)
 {
-    return data + READ32LE(&sh->offset);
+    unsigned offset = READ32LE(&sh->offset);
+    unsigned size = READ32LE(&sh->size);
+    if (offset >= data_size || offset + size > data_size)
+         return NULL;
+    return data + offset;
 }
 
 ELFSectionHeader* elfGetSectionByName(const char* name)
@@ -1025,7 +1029,7 @@ ELFAbbrev** elfReadAbbrevs(uint8_t* data, uint32_t offset)
     return abbrevs;
 }
 
-void elfParseCFA(uint8_t* top)
+void elfParseCFA(uint8_t* top, unsigned long data_size)
 {
     ELFSectionHeader* h = elfGetSectionByName(".debug_frame");
 
@@ -1033,7 +1037,9 @@ void elfParseCFA(uint8_t* top)
         return;
     }
 
-    uint8_t* data = elfReadSection(top, h);
+    uint8_t* data = elfReadSection(top, data_size, h);
+    if (!data)
+        return;
 
     uint8_t* topOffset = data;
 
@@ -1134,7 +1140,7 @@ void elfAddLine(LineInfo* l, uint32_t a, int file, int line, int* max)
     l->number++;
 }
 
-void elfParseLineInfo(CompileUnit* unit, uint8_t* top)
+void elfParseLineInfo(CompileUnit* unit, uint8_t* top, unsigned long data_size)
 {
     ELFSectionHeader* h = elfGetSectionByName(".debug_line");
     if (h == NULL) {
@@ -1146,7 +1152,9 @@ void elfParseLineInfo(CompileUnit* unit, uint8_t* top)
     int max = 1000;
     l->lines = (LineInfoItem*)malloc(1000 * sizeof(LineInfoItem));
 
-    uint8_t* data = elfReadSection(top, h);
+    uint8_t* data = elfReadSection(top, data_size, h);
+    if (!data)
+        return;
     data += unit->lineInfo;
     uint32_t totalLen = elfRead4Bytes(data);
     data += 4;
@@ -2437,7 +2445,7 @@ CompileUnit* elfParseCompUnit(uint8_t* data, uint8_t* abbrevData)
     return unit;
 }
 
-void elfParseAranges(uint8_t* data)
+void elfParseAranges(uint8_t* data, unsigned long data_size)
 {
     ELFSectionHeader* sh = elfGetSectionByName(".debug_aranges");
     if (sh == NULL) {
@@ -2445,7 +2453,9 @@ void elfParseAranges(uint8_t* data)
         return;
     }
 
-    data = elfReadSection(data, sh);
+    data = elfReadSection(data, data_size, sh);
+    if (!data)
+        return;
     uint8_t* end = data + READ32LE(&sh->size);
 
     int max = 4;
@@ -2489,14 +2499,18 @@ void elfParseAranges(uint8_t* data)
     elfDebugInfo->ranges = ranges;
 }
 
-void elfReadSymtab(uint8_t* data)
+void elfReadSymtab(uint8_t* data, unsigned long data_size)
 {
     ELFSectionHeader* sh = elfGetSectionByName(".symtab");
     int table = READ32LE(&sh->link);
 
-    char* strtable = (char*)elfReadSection(data, elfGetSectionByNumber(table));
+    char* strtable = (char*)elfReadSection(data, data_size, elfGetSectionByNumber(table));
+    if (!strtable)
+        return;
 
-    ELFSymbol* symtab = (ELFSymbol*)elfReadSection(data, sh);
+    ELFSymbol* symtab = (ELFSymbol*)elfReadSection(data, data_size, sh);
+    if (!symtab)
+        return;
 
     int count = READ32LE(&sh->size) / sizeof(ELFSymbol);
     elfSymbolsCount = 0;
@@ -2541,17 +2555,23 @@ void elfReadSymtab(uint8_t* data)
 
 bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& size, bool parseDebug)
 {
+    bool retval = false;
     int count = READ16LE(&eh->e_phnum);
     int i;
 
     if (READ32LE(&eh->e_entry) == 0x2000000)
         coreOptions.cpuIsMultiBoot = true;
 
+    if (READ32LE(&eh->e_phoff) >= data_size)
+        return false;
+
     // read program headers... should probably move this code down
     uint8_t* p = data + READ32LE(&eh->e_phoff);
     size = 0;
     for (i = 0; i < count; i++) {
         ELFProgramHeader* ph = (ELFProgramHeader*)p;
+        if ((ph + 1) > ((ELFProgramHeader*)(data + data_size)))
+            return false;
         p += sizeof(ELFProgramHeader);
         if (READ16LE(&eh->e_phentsize) != sizeof(ELFProgramHeader)) {
             p += READ16LE(&eh->e_phentsize) - sizeof(ELFProgramHeader);
@@ -2573,12 +2593,18 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
         if (coreOptions.cpuIsMultiBoot) {
             unsigned effective_address = address - 0x2000000;
 
+            if (effective_address >= SIZE_WRAM)
+                return false;
+
             if (effective_address + section_size < SIZE_WRAM) {
                 memcpy(&workRAM[effective_address], source, section_size);
                 size += section_size;
             }
         } else {
             unsigned effective_address = address - 0x8000000;
+
+            if (effective_address >= SIZE_ROM)
+                return false;
 
             if (effective_address + section_size < SIZE_ROM) {
                 memcpy(&rom[effective_address], source, section_size);
@@ -2595,6 +2621,9 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
     if (READ16LE(&eh->e_shstrndx) == 0)
         goto end;
 
+    if (READ32LE(&eh->e_shoff) >= data_size)
+        goto end;
+
     p = data + READ32LE(&eh->e_shoff);
 
     count = READ16LE(&eh->e_shnum);
@@ -2602,14 +2631,22 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
     sh = (ELFSectionHeader**)
         malloc(sizeof(ELFSectionHeader*) * count);
 
+    if ((((ELFSectionHeader*)p) + count) > ((ELFSectionHeader*)(data + data_size)))
+        goto end;
+
     for (i = 0; i < count; i++) {
         sh[i] = (ELFSectionHeader*)p;
         p += sizeof(ELFSectionHeader);
         if (READ16LE(&eh->e_shentsize) != sizeof(ELFSectionHeader))
             p += READ16LE(&eh->e_shentsize) - sizeof(ELFSectionHeader);
     }
-	
-	stringTable = (char*)elfReadSection(data, sh[READ16LE(&eh->e_shstrndx)]);
+
+    if (READ16LE(&eh->e_shstrndx) >= count)
+        goto end;
+
+    stringTable = (char*)elfReadSection(data, data_size, sh[READ16LE(&eh->e_shstrndx)]);
+    if (!stringTable)
+        goto end;
 
     elfSectionHeaders            = sh;
     elfSectionHeadersStringTable = stringTable;
@@ -2654,22 +2691,24 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
         }
 
         elfDebugInfo = (DebugInfo*)calloc(sizeof(DebugInfo), 1);
-        uint8_t* abbrevdata = elfReadSection(data, h);
+        uint8_t* abbrevdata = elfReadSection(data, data_size, h);
+        if (!abbrevdata)
+            goto end;
 
         h = elfGetSectionByName(".debug_str");
 
         if (h == NULL)
             elfDebugStrings = NULL;
         else
-            elfDebugStrings = (char*)elfReadSection(data, h);
+            elfDebugStrings = (char*)elfReadSection(data, data_size, h);
 
-        uint8_t* debugdata = elfReadSection(data, dbgHeader);
+        uint8_t* debugdata = elfReadSection(data, data_size, dbgHeader);
 
         elfDebugInfo->debugdata = data;
         elfDebugInfo->infodata = debugdata;
 
         uint32_t total = READ32LE(&dbgHeader->size);
-        uint8_t* end = debugdata + total;
+        uint8_t* end = debugdata ? debugdata + total : debugdata;
         uint8_t* ddata = debugdata;
 
         CompileUnit* last = NULL;
@@ -2678,7 +2717,7 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
         while (ddata < end) {
             unit = elfParseCompUnit(ddata, abbrevdata);
             unit->offset = (uint32_t)(ddata - debugdata);
-            elfParseLineInfo(unit, data);
+            elfParseLineInfo(unit, data, data_size);
             if (last == NULL)
                 elfCompileUnits = unit;
             else
@@ -2686,7 +2725,7 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
             last = unit;
             ddata += 4 + unit->length;
         }
-        elfParseAranges(data);
+        elfParseAranges(data, data_size);
         CompileUnit* comp = elfCompileUnits;
         while (comp) {
             ARanges* r = elfDebugInfo->ranges;
@@ -2697,9 +2736,11 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
                 }
             comp = comp->next;
         }
-        elfParseCFA(data);
-        elfReadSymtab(data);
+        elfParseCFA(data, data_size);
+        elfReadSymtab(data, data_size);
     }
+
+    retval = true;
 end:
     if (sh) {
         free(sh);
@@ -2709,7 +2750,7 @@ end:
     elfSectionHeadersStringTable = NULL;
     elfSectionHeadersCount = 0;
 
-    return true;
+    return retval;
 }
 
 bool elfRead(const char* name, int& siz, FILE* f)
