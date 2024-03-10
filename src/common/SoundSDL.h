@@ -18,10 +18,10 @@
 #ifndef __VBA_SOUND_SDL_H__
 #define __VBA_SOUND_SDL_H__
 
+#include <SDL.h>
+
 #include "ringbuffer.h"
 #include "SoundDriver.h"
-
-#include "SDL.h"
 
 class SoundSDL : public SoundDriver {
 public:

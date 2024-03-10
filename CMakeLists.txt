@@ -681,7 +681,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang AND NOT MSVC
     endif()
 
     # Common flags.
-    set(MY_C_FLAGS -pipe -Wno-unused-command-line-argument -Wformat -Wformat-security -feliminate-unused-debug-types)
+    set(MY_C_FLAGS -pipe -Wformat -Wformat-security -feliminate-unused-debug-types)
 
     include(CheckCXXCompilerFlag)
 
@@ -1184,7 +1184,6 @@ set(
 include_directories(
     ${ZLIB_INCLUDE_DIR}
     fex
-    ${SDL2_INCLUDE_DIR}
     third_party/include
     third_party/include/stb
 )
@@ -1215,6 +1214,7 @@ if(NOT TRANSLATIONS_ONLY)
         ${HDR_STB_IMAGE}
     )
     add_dependencies(vbamcore generate)
+    target_include_directories(vbamcore PUBLIC ${SDL2_INCLUDE_DIRS})
 endif()
 
 if((NOT TRANSLATIONS_ONLY) AND ENABLE_SDL)
