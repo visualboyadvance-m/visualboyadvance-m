@@ -52,6 +52,15 @@ set(VCPKG_DEPS_OPTIONAL
     ffmpeg ENABLE_FFMPEG
 )
 
+if(WIN32)
+    find_program(POWERSHELL
+        NAMES powershell.exe pwsh.exe
+        HINTS "/Windows/System32/WindowsPowerShell/v1.0"
+        REQUIRED)
+else()
+    find_program(powershell pwsh REQUIRED)
+endif()
+
 include(Set-Toolchain-vcpkg)
 
 set(VBAM_STATIC_DEFAULT OFF)

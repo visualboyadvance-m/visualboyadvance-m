@@ -94,12 +94,6 @@ if (WIN32)
     add_definitions(-D_UNICODE -DUNICODE -DwxUSE_GUI=1 -D__WXMSW__ -DWINVER=0x0A00 -DNTDDI_VERSION=0x0A000007)
 endif()
 
-if(CMAKE_HOST_WIN32)
-    find_program(POWERSHELL powershell.exe HINTS "/Windows/System32/WindowsPowerShell/v1.0" REQUIRED)
-else()
-    find_program(POWERSHELL pwsh)
-endif()
-
 find_program(ZIP_PROGRAM zip)
 if(ZIP_PROGRAM)
     set(ZIP_PROGRAM "${ZIP_PROGRAM}" CACHE STRING "zip compressor executable" FORCE)
