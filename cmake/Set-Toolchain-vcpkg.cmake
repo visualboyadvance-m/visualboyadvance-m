@@ -277,12 +277,6 @@ function(get_binary_packages vcpkg_exe)
         FetchContent_Populate(vcpkg_binpkg)
     endif()
 
-    if(WIN32)
-        find_program(powershell powershell.exe HINTS "/Windows/System32/WindowsPowerShell/v1.0" REQUIRED)
-    else()
-        find_program(powershell pwsh REQUIRED)
-    endif()
-
     unset(to_install)
     foreach(pkg ${binary_packages})
         if(NOT pkg MATCHES "([^_]+)_([^_]+)_([^.]+)[.]zip")
@@ -292,7 +286,7 @@ function(get_binary_packages vcpkg_exe)
         set(pkg_version ${CMAKE_MATCH_2})
         set(pkg_triplet ${CMAKE_MATCH_3})
 
-        vcpkg_is_installed(${vcpkg_exe} ${pkg_name} ${pkg_version} ${pkg_triplet} ${powershell} pkg_installed)
+        vcpkg_is_installed(${vcpkg_exe} ${pkg_name} ${pkg_version} ${pkg_triplet} ${POWERSHELL} pkg_installed)
 
         if(NOT pkg_installed)
             list(APPEND to_install ${pkg})
