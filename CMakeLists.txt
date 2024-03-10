@@ -1,34 +1,10 @@
-if(COMMAND cmake_policy)
-    cmake_policy(SET CMP0003 NEW) # link to full path of libs
-    cmake_policy(SET CMP0005 NEW) # escapes in add_definitions
+cmake_minimum_required(VERSION 3.19)
 
-    if(POLICY CMP0074)
-        cmake_policy(SET CMP0074 NEW) # use Package_ROOT if set
-    endif()
-
-    if(POLICY CMP0077)
-        cmake_policy(SET CMP0077 NEW) # use vars for options
-    endif()
-
-    if(POLICY CMP0043)
-        cmake_policy(SET CMP0043 NEW) # for wxWidgets, use generator expressions
-    endif()
-
-    if(POLICY CMP0048)
-        cmake_policy(SET CMP0048 NEW) # set CMAKE_PROJECT_VERSION*
-    endif()
-
-    if(POLICY CMP0011)
-        cmake_policy(SET CMP0011 NEW) # Policy PUSH/POP for scripts.
-    endif()
-
-    if(POLICY CMP0012)
-        cmake_policy(SET CMP0012 NEW) # Saner if() behavior.
-    endif()
-
-    if(POLICY CMP0060)
-        cmake_policy(SET CMP0060 NEW) # Full lib paths.
-    endif()
+if(POLICY CMP0074)
+    cmake_policy(SET CMP0074 NEW) # use Package_ROOT if set
+endif()
+if(POLICY CMP0077)
+    cmake_policy(SET CMP0077 NEW) # use vars for options
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
@@ -63,15 +39,8 @@ endif()
 
 include(Set-Toolchain-vcpkg)
 
-set(VBAM_STATIC_DEFAULT OFF)
-
-if(VCPKG_TARGET_TRIPLET MATCHES -static OR CMAKE_TOOLCHAIN_FILE MATCHES "mxe|-static")
-    set(VBAM_STATIC_DEFAULT ON)
-endif()
-
 # Use ccache if available and not already enabled on the command line.
 # This has to be done before the project() call.
-
 if(NOT CMAKE_CXX_COMPILER_LAUNCHER)
     find_program(CCACHE_EXECUTABLE ccache)
     if(CCACHE_EXECUTABLE)
@@ -83,11 +52,16 @@ if(NOT CMAKE_CXX_COMPILER_LAUNCHER)
     endif()
 endif()
 
-cmake_minimum_required(VERSION 3.8.2)
-
 set(CMAKE_CXX_STANDARD 17)
 
 project(VBA-M C CXX)
+
+find_package(Git)
+find_package(PkgConfig)
+
+include(GNUInstallDirs)
+include(Options)
+include(Architecture)
 
 if(NOT CMAKE_PREFIX_PATH AND (NOT ("$ENV{CMAKE_PREFIX_PATH}" STREQUAL "")))
     set(CMAKE_PREFIX_PATH "$ENV{CMAKE_PREFIX_PATH}")
@@ -105,7 +79,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 endif()
 
 include(CTest)
-
 if(BUILD_TESTING)
     enable_testing()
 endif()
@@ -117,143 +90,9 @@ add_custom_target(generate)
 #Output all binaries at top level
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
-option(ENABLE_SDL "Build the SDL port" OFF)
-option(ENABLE_WX "Build the wxWidgets port" ON)
-option(ENABLE_DEBUGGER "Enable the debugger" ON)
-option(ENABLE_ASAN "Enable -fsanitize=<option>, address by default, requires debug build" OFF)
-
-# Default to static builds on MinGW and all MSYS2 envs.
-if(MINGW OR (NOT "$ENV{MSYSTEM_PREFIX}" STREQUAL ""))
-    set(VBAM_STATIC_DEFAULT ON)
-endif()
-
-option(VBAM_STATIC "Try to link all libraries statically" ${VBAM_STATIC_DEFAULT})
-
-if(VBAM_STATIC)
-    set(SDL2_STATIC ON)
-    set(SFML_STATIC_LIBRARIES ON)
-    set(FFMPEG_STATIC ON)
-    set(SSP_STATIC ON)
-    set(OPENAL_STATIC ON)
-    set_property(GLOBAL PROPERTY LINK_SEARCH_START_STATIC ON)
-    set_property(GLOBAL PROPERTY LINK_SEARCH_END_STATIC   ON)
-
-    if(MSVC)
-        set(CMAKE_FIND_LIBRARY_SUFFIXES .lib)
-    else()
-        list(INSERT CMAKE_FIND_LIBRARY_SUFFIXES 0 .a)
-    endif()
-endif()
-
-set(SSP_DEFAULT OFF)
-
-option(ENABLE_SSP "Enable gcc stack protector support" ${SSP_DEFAULT})
-
-set(ASM_DEFAULT OFF)
-
-include(Architecture)
-
-option(ENABLE_ASM "Enable x86 ASM related options" ${ASM_DEFAULT})
-
-# The ARM ASM core seems to be very buggy, see #98 and #54. Default to it being
-# OFF for the time being, until it is either fixed or replaced.
-option(ENABLE_ASM_CORE "Enable x86 ASM CPU cores" OFF)
-
-if(ENABLE_ASM_CORE)
-    message(WARNING "!!!!!! The x86 ASM cores are considered buggy and dangerous, use at your own risk. !!!!!!")
-endif()
-
-set(ASM_SCALERS_DEFAULT ${ENABLE_ASM})
-set(MMX_DEFAULT ${ENABLE_ASM})
-
-option(ENABLE_ASM_SCALERS "Enable x86 ASM graphic filters" ${ASM_SCALERS_DEFAULT})
-
-if(ENABLE_ASM_SCALERS)
-    option(ENABLE_MMX "Enable MMX" ${MMX_DEFAULT})
-endif()
-
-find_package(PkgConfig)
-
-set(ENABLE_LINK_DEFAULT OFF)
-
-# msys2 does not have static sfml libs atm
-# while on mxe we use static libs
-if(WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe) AND NOT CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
-    set(SFML_STATIC_LIBRARIES TRUE)
-endif()
-
-find_package(SFML 2.4 COMPONENTS network system)
-
-if(CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo)
-    if(SFML_STATIC_LIBRARIES AND SFML_NETWORK_LIBRARY_STATIC_DEBUG AND SFML_SYSTEM_LIBRARY_STATIC_DEBUG)
-        set(SFML_LIBRARIES ${SFML_NETWORK_LIBRARY_STATIC_DEBUG} ${SFML_SYSTEM_LIBRARY_STATIC_DEBUG})
-    elseif(SFML_NETWORK_LIBRARY_DYNAMIC_DEBUG AND SFML_SYSTEM_LIBRARY_DYNAMIC_DEBUG)
-        set(SFML_LIBRARIES ${SFML_NETWORK_LIBRARY_DYNAMIC_DEBUG} ${SFML_SYSTEM_LIBRARY_DYNAMIC_DEBUG})
-    endif()
-endif()
-
-if(SFML_FOUND)
-    set(ENABLE_LINK_DEFAULT ON)
-endif()
-
-option(ENABLE_LINK "Enable GBA linking functionality" ${ENABLE_LINK_DEFAULT})
-
-option(ENABLE_LIRC "Enable LIRC support" OFF)
-
-set(FFMPEG_DEFAULT OFF)
-
-set(FFMPEG_COMPONENTS         AVCODEC            AVFORMAT            SWSCALE          AVUTIL            SWRESAMPLE)
-set(FFMPEG_COMPONENT_VERSIONS AVCODEC>=58.18.100 AVFORMAT>=58.12.100 SWSCALE>=5.1.100 AVUTIL>=56.14.100 SWRESAMPLE>=3.1.100)
-
-macro(check_ffmpeg_component_versions)
-    # check versions, but only if pkgconfig is available
-    if(FFMPEG_FOUND AND PKG_CONFIG_FOUND AND NOT CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
-        foreach(component ${FFMPEG_COMPONENT_VERSIONS})
-            string(REPLACE ">=" ";" parts ${component})
-            list(GET parts 0 name)
-            list(GET parts 1 version)
-
-            if((NOT DEFINED ${name}_VERSION) OR ${name}_VERSION VERSION_LESS ${version})
-                set(FFMPEG_FOUND OFF)
-            endif()
-        endforeach()
-    endif()
-endmacro()
-
-if(NOT DEFINED ENABLE_FFMPEG OR ENABLE_FFMPEG)
-    set(FFMPEG_DEFAULT ON)
-
-    find_package(FFmpeg COMPONENTS ${FFMPEG_COMPONENTS})
-    check_ffmpeg_component_versions()
-
-    if(NOT FFMPEG_FOUND)
-        set(FFMPEG_DEFAULT OFF)
-    endif()
-endif()
-
-option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
-
-set(ONLINEUPDATES_DEFAULT OFF)
-
-if((WIN32 AND (X64 OR X86)) OR APPLE) # winsparkle/sparkle
-    set(ONLINEUPDATES_DEFAULT ON)
-endif()
-
-option(ENABLE_ONLINEUPDATES "Enable online update checks" ${ONLINEUPDATES_DEFAULT})
-option(HTTPS "Use https URL for winsparkle" ON)
 if(NOT HTTPS)
     add_definitions(-DNO_HTTPS)
 endif()
-
-set(LTO_DEFAULT ON)
-
-# gcc lto produces buggy binaries for 64 bit mingw
-# and we generally don't want it when debugging because it makes linking slow
-if(CMAKE_BUILD_TYPE STREQUAL Debug OR (WIN32 AND CMAKE_COMPILER_IS_GNUCXX))
-    set(LTO_DEFAULT OFF)
-endif()
-
-option(ENABLE_LTO "Compile with Link Time Optimization (gcc and clang only)" ${LTO_DEFAULT})
 
 if(WIN32 OR CMAKE_TOOLCHAIN_FILE MATCHES "[Mm][Ii][Nn][Gg][Ww]")
     # Win32 deps submodule
@@ -393,13 +232,6 @@ if(MSYS AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" CACHE INTERNAL "prefix search path for find_XXXX" FORCE)
 endif()
 
-# Add support for Homebrew, MacPorts and Fink on macOS
-option(DISABLE_MACOS_PACKAGE_MANAGERS "Set to TRUE to disable support for macOS Homebrew, MacPorts and Fink." FALSE)
-
-if(APPLE AND NOT DISABLE_MACOS_PACKAGE_MANAGERS)
-    include(MacPackageManagers)
-endif()
-
 # We do not support amd64 asm yet
 if(X86_64 AND (ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS OR ENABLE_MMX))
     message(FATAL_ERROR "The options ASM_CORE, ASM_SCALERS and MMX are not supported on X86_64 yet.")
@@ -530,8 +362,6 @@ else()
     set(WITHLIRC 0)
 endif()
 
-include(GNUInstallDirs)
-
 # C defines
 add_definitions(-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DSDL -DUSE_OPENGL -DSYSCONF_INSTALL_DIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}" -DWITH_LIRC=${WITHLIRC})
 add_definitions(-DPKGDATADIR="${CMAKE_INSTALL_FULL_DATADIR}/vbam" -DPACKAGE=)
@@ -579,10 +409,6 @@ if(NOT ENABLE_ASM_CORE)
     add_definitions(-DC_CORE)
 endif()
 
-set(NLS_DEFAULT ON)
-
-option(ENABLE_NLS "Enable translations" ${NLS_DEFAULT})
-
 # Enable internationalization
 if(ENABLE_NLS)
     set(LOCALEDIR ${CMAKE_INSTALL_PREFIX}/share/locale)
@@ -627,9 +453,6 @@ include(ProcessorCount)
 ProcessorCount(num_cpus)
 
 # Compiler stuff
-
-option(UPSTREAM_RELEASE "do some optimizations and release automation tasks" OFF)
-
 include(SetCompilerLinkerFlags)
 
 if(CMAKE_C_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_ID STREQUAL Clang AND NOT MSVC)
@@ -681,7 +504,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang AND NOT MSVC
     endif()
 
     # Common flags.
-    set(MY_C_FLAGS -pipe -Wformat -Wformat-security -feliminate-unused-debug-types)
+    set(MY_C_FLAGS -pipe -Wformat -Wformat-security)
 
     include(CheckCXXCompilerFlag)
 
@@ -784,7 +607,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang AND NOT MSVC
         endif()
     endif()
 
-    if(MINGW)
+    if(MINGW AND NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         set(MY_C_FLAGS ${MY_C_FLAGS} -static-libgcc -static-libstdc++)
     endif()
 
@@ -859,29 +682,21 @@ elseif(MSVC)
 
     add_compiler_flags(/std:c++17 -D__STDC_LIMIT_MACROS /fp:fast /Oi)
 
-    if(VBAM_STATIC)
-        set(runtime "/MT")
-    else()
-        set(runtime "/MD")
-    endif()
-
-    if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
-        set(runtime "${runtime}d")
-    endif()
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:DEBUG>:Debug>" CACHE INTERNAL "")
 
     if(CMAKE_BUILD_TYPE STREQUAL Debug)
-        add_compiler_flags(${runtime} /ZI /W4 /Ob0 /Od /RTC1 /DDEBUG /EHsc)
+        add_compiler_flags(/ZI /W4 /Ob0 /Od /RTC1 /DDEBUG /EHsc)
     else()
         # Enable severe warnings for release builds, but suppress macro
         # redefinition warnings.
         add_compiler_flags(/W1 /wd4005 /DNDEBUG /EHsc)
 
         if(CMAKE_BUILD_TYPE STREQUAL Release)
-            add_compiler_flags(${runtime} /O2 /Ob3)
+            add_compiler_flags(/O2 /Ob3)
         elseif(CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo)
-            add_compiler_flags(${runtime} /Zi /Ob1)
+            add_compiler_flags(/Zi /Ob1)
         elseif(CMAKE_BUILD_TYPE STREQUAL MinSizeRel)
-            add_compiler_flags(${runtime} /O1 /Ob1)
+            add_compiler_flags(/O1 /Ob1)
         else()
             message(FATAL_ERROR "Unknown CMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}'")
         endif()
