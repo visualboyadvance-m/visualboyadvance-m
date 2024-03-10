@@ -84,7 +84,7 @@ Ignore the following cmake error.
 
     if(CMAKE_HOST_SYSTEM MATCHES Windows OR ((NOT DEFINED CMAKE_HOST_SYSTEM) AND WIN32))
         execute_process(
-            COMMAND powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command [=[
+            COMMAND ${POWERSHELL} -NoLogo -NoProfile -ExecutionPolicy Bypass -Command [=[
                 $text = [IO.File]::ReadAllText("appcast.xml.work") -replace "`r`n", "`n"
                 [IO.File]::WriteAllText("appcast.xml", $text)
             ]=]

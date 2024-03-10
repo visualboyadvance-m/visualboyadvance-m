@@ -319,7 +319,7 @@ function(get_binary_packages vcpkg_exe)
 
 #                -command "import-module ($env:USERPROFILE + '/source/repos/vcpkg-binpkg-prototype/vcpkg-binpkg.psm1'); vcpkg-instpkg ."
         execute_process(
-            COMMAND ${powershell}
+            COMMAND ${POWERSHELL}
                 -executionpolicy bypass -noprofile
                 -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-instpkg ."
             WORKING_DIRECTORY ${bin_pkgs_dir}
