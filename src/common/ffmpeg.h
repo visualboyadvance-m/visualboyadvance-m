@@ -3,10 +3,6 @@
 
 // simplified interface for recording audio and/or video from emulator
 
-// required for ffmpeg
-#define __STDC_LIMIT_MACROS
-#define __STDC_CONSTANT_MACROS
-
 extern "C" {
 /* From: http://redino.net/blog/2013/12/uint64_c-defined-including-libavformatavformat-h-vs-2008/ */
 
