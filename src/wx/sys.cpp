@@ -81,7 +81,7 @@ void systemSendScreen()
 {
 #ifndef NO_FFMPEG
     GameArea* ga = wxGetApp().frame->GetPanel();
-    if (ga) ga->AddFrame(pix);
+    if (ga) ga->AddFrame(g_pix);
 #endif
 }
 
@@ -97,12 +97,12 @@ void systemDrawScreen()
 #ifndef NO_FFMPEG
 
     if (ga)
-        ga->AddFrame(pix);
+        ga->AddFrame(g_pix);
 
 #endif
 
     if (ga && ga->panel)
-        ga->panel->DrawArea(&pix);
+        ga->panel->DrawArea(&g_pix);
 }
 
 // record a game "movie"
@@ -275,7 +275,7 @@ void systemStartGamePlayback(const wxString& fname, MVFormatID format)
     if (fn.size() < 4 || !wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".vmv"), false))
         fn.append(wxT(".vmv"));
 
-    uint32_t version;
+    uint32_t version = 0;
 
     if (!game_file.Open(fn, wxT("rb")) || game_file.Read(&version, sizeof(version)) != sizeof(version) || wxUINT32_SWAP_ON_BE(version) < 1 || wxUINT32_SWAP_ON_BE(version) > 2) {
         wxLogError(_("Cannot open recording file %s"), fname.c_str());

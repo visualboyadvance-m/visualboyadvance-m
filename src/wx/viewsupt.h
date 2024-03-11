@@ -253,13 +253,13 @@ public:
     void SetRGB(int r, int g, int b);
     void GetRGB(int& _r, int& _g, int& _b)
     {
-        _r = r;
-        _g = g;
-        _b = b;
+        _r = r_;
+        _g = g_;
+        _b = b_;
     }
 
 protected:
-    int r, g, b;
+    int r_, g_, b_;
     wxPanel* cp;
     wxStaticText *rt, *gt, *bt;
 };
@@ -385,9 +385,9 @@ protected:
     GfxPanel* gv;
 
 private:
-    static wxString bmp_save_dir;
-    wxScrolledWindow* gvs;
-    wxCheckBox* str;
+    static wxString bmp_save_dir_;
+    wxScrolledWindow* gvs_;
+    wxCheckBox* str_;
 
     DECLARE_EVENT_TABLE()
 };

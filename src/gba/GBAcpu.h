@@ -20,7 +20,7 @@ extern int thumbExecute();
 
 #define UPDATE_REG(address, value)                 \
     {                                              \
-        WRITE16LE(((uint16_t*)&ioMem[address]), value); \
+        WRITE16LE(((uint16_t*)&g_ioMem[address]), value); \
     }
 
 #define ARM_PREFETCH                                        \

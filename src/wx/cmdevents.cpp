@@ -1,7 +1,5 @@
 #include "wxvbam.h"
 
-#include <algorithm>
-
 #include <wx/aboutdlg.h>
 #include <wx/ffile.h>
 #include <wx/numdlg.h>
@@ -315,29 +313,29 @@ EVT_HANDLER_MASK(RomInformation, "ROM information...", CMDEN_GB | CMDEN_GBA)
         wxString rom_crc32;
         rom_crc32.Printf(wxT("%08X"), panel->rom_crc32);
         SetDialogLabel(dlg, wxT("Title"), panel->rom_name, 30);
-        setlabs("IntTitle", rom[0xa0], 12);
+        setlabs("IntTitle", g_rom[0xa0], 12);
         SetDialogLabel(dlg, wxT("Scene"), panel->rom_scene_rls_name, 30);
         SetDialogLabel(dlg, wxT("Release"), panel->rom_scene_rls, 4);
         SetDialogLabel(dlg, wxT("CRC32"), rom_crc32, 8);
-        setlabs("GameCode", rom[0xac], 4);
-        setlabs("MakerCode", rom[0xb0], 2);
+        setlabs("GameCode", g_rom[0xac], 4);
+        setlabs("MakerCode", g_rom[0xb0], 2);
         s = dialogs::GetGameMakerName(s.ToStdString());
         setlab("MakerName");
-        setblab("UnitCode", rom[0xb3]);
-        s.Printf(wxT("%02x"), (unsigned int)rom[0xb4]);
+        setblab("UnitCode", g_rom[0xb3]);
+        s.Printf(wxT("%02x"), (unsigned int)g_rom[0xb4]);
 
-        if (rom[0xb4] & 0x80)
+        if (g_rom[0xb4] & 0x80)
             s.append(wxT(" (DACS)"));
 
         setlab("DeviceType");
-        setblab("Version", rom[0xbc]);
+        setblab("Version", g_rom[0xbc]);
         uint8_t crc = 0x19;
 
         for (int i = 0xa0; i < 0xbd; i++)
-            crc += rom[i];
+            crc += g_rom[i];
 
         crc = -crc;
-        s.Printf(wxT("%02x (%02x)"), crc, rom[0xbd]);
+        s.Printf(wxT("%02x (%02x)"), crc, g_rom[0xbd]);
         setlab("CRC");
         dlg->Fit();
         ShowModal(dlg);
@@ -485,12 +483,12 @@ EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import Game Shark code file...", CMDE
                     if (f.Read(&slen, sizeof(slen)) != sizeof(slen) || slen > 1024) // arbitrary upper bound
                         break;
 
-                    char buf[1024];
+                    char buf2[1024];
 
-                    if (f.Read(buf, slen) != slen)
+                    if (f.Read(buf2, slen) != slen)
                         break;
 
-                    lst->Append(wxString(buf, wxConvLibc, slen));
+                    lst->Append(wxString(buf2, wxConvLibc, slen));
                     uint32_t ncodes;
 
                     if (f.Read(&ncodes, sizeof(ncodes)) != sizeof(ncodes))
@@ -635,7 +633,7 @@ EVT_HANDLER_MASK(ExportGamesharkSnapshot, "Export GameShark snapshot...", CMDEN_
     wxTextCtrl *tit = XRCCTRL(*infodlg, "Title", wxTextCtrl),
                *dsc = XRCCTRL(*infodlg, "Description", wxTextCtrl),
                *n = XRCCTRL(*infodlg, "Notes", wxTextCtrl);
-    tit->SetValue(wxString((const char*)&rom[0xa0], wxConvLibc, 12));
+    tit->SetValue(wxString((const char*)&g_rom[0xa0], wxConvLibc, 12));
     dsc->SetValue(wxDateTime::Now().Format(wxT("%c")));
     n->SetValue(_("Exported from Visual Boy Advance-M"));
 
@@ -835,8 +833,6 @@ EVT_HANDLER_MASK(RecordAVIStopRecording, "Stop video recording", CMDEN_VREC)
     panel->StopVidRecording();
 #endif
 }
-
-static wxString mov_path;
 
 EVT_HANDLER_MASK(RecordMovieStartRecording, "Start game recording...", CMDEN_NGREC)
 {
@@ -1408,8 +1404,6 @@ EVT_HANDLER_MASK(IncrGameSlotSave, "Increase state slot number and save", CMDEN_
 
 EVT_HANDLER_MASK(Rewind, "Rewind", CMDEN_REWIND)
 {
-    MainFrame* mf = wxGetApp().frame;
-    GameArea* panel = mf->GetPanel();
     int rew_st = (panel->next_rewind_state + NUM_REWINDS - 1) % NUM_REWINDS;
 
     // if within 5 seconds of last one, and > 1 state, delete last state & move back
@@ -2003,10 +1997,10 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
              *ovmir = XRCCTRL(*dlg, "OvMirroring", wxChoice);
 
     if (panel->game_type() == IMAGE_GBA) {
-        wxString s = wxString((const char*)&rom[0xac], wxConvLibc, 4);
+        wxString s = wxString((const char*)&g_rom[0xac], wxConvLibc, 4);
         XRCCTRL(*dlg, "GameCode", wxControl)
             ->SetLabel(s);
-        cmt = wxString((const char*)&rom[0xa0], wxConvLibc, 12);
+        cmt = wxString((const char*)&g_rom[0xa0], wxConvLibc, 12);
         wxFileConfig* cfg = wxGetApp().overrides;
 
         if (cfg->HasGroup(s)) {
@@ -2040,7 +2034,7 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
 
     if (panel->game_type() == IMAGE_GBA) {
         agbPrintEnable(OPTION(kPrefAgbPrint));
-        wxString s = wxString((const char*)&rom[0xac], wxConvLibc, 4);
+        wxString s = wxString((const char*)&g_rom[0xac], wxConvLibc, 4);
         wxFileConfig* cfg = wxGetApp().overrides;
         bool chg;
 

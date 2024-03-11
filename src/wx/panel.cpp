@@ -312,20 +312,20 @@ void GameArea::LoadGame(const wxString& name)
             return;
         }
 
-        rom_crc32 = crc32(0L, rom, rom_size);
+        rom_crc32 = crc32(0L, g_rom, rom_size);
 
         if (loadpatch) {
             // don't use real rom size or it might try to resize rom[]
             // instead, use known size of rom[]
             int size = 0x2000000 < rom_size ? 0x2000000 : rom_size;
-            applyPatch(UTF8(pfn.GetFullPath()), &rom, &size);
+            applyPatch(UTF8(pfn.GetFullPath()), &g_rom, &size);
             // that means we no longer really know rom_size either <sigh>
 
             gbaUpdateRomSize(size);
         }
 
         wxFileConfig* cfg = wxGetApp().overrides;
-        wxString id = wxString((const char*)&rom[0xac], wxConvLibc, 4);
+        wxString id = wxString((const char*)&g_rom[0xac], wxConvLibc, 4);
 
         if (cfg->HasGroup(id)) {
             cfg->SetPath(id);

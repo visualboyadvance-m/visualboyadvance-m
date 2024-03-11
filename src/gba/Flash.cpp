@@ -22,7 +22,7 @@ uint8_t flashSaveMemory[SIZE_FLASH1M];
 
 int flashState = FLASH_READ_ARRAY;
 int flashReadState = FLASH_READ_ARRAY;
-int flashSize = SIZE_FLASH512;
+int g_flashSize = SIZE_FLASH512;
 int flashDeviceID = 0x1b;
 int flashManufacturerID = 0x32;
 int flashBank = 0;
@@ -51,9 +51,9 @@ void flashSetSize(int size)
     }
     // Added to make 64k saves compatible with 128k ones
     // (allow wrongfuly set 64k saves to work for Pokemon games)
-    if ((size == SIZE_FLASH1M) && (flashSize == SIZE_FLASH512))
+    if ((size == SIZE_FLASH1M) && (g_flashSize == SIZE_FLASH512))
         memcpy((uint8_t*)(flashSaveMemory + SIZE_FLASH512), (uint8_t*)(flashSaveMemory), SIZE_FLASH512);
-    flashSize = size;
+    g_flashSize = size;
 }
 
 uint8_t flashRead(uint32_t address)
@@ -144,7 +144,7 @@ void flashWrite(uint32_t address, uint8_t byte)
                 flashReadState = FLASH_READ_ARRAY;
             } else if (byte == 0xA0) {
                 flashState = FLASH_PROGRAM;
-            } else if (byte == 0xB0 && flashSize == SIZE_FLASH1M) {
+            } else if (byte == 0xB0 && g_flashSize == SIZE_FLASH1M) {
                 flashState = FLASH_SETBANK;
             } else {
                 flashState = FLASH_READ_ARRAY;
@@ -181,7 +181,7 @@ void flashWrite(uint32_t address, uint8_t byte)
             flashReadState = FLASH_ERASE_COMPLETE;
         } else if (byte == 0x10) {
             // CHIP ERASE
-            memset(flashSaveMemory, 0xff, flashSize);
+            memset(flashSaveMemory, 0xff, g_flashSize);
             systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
             flashReadState = FLASH_ERASE_COMPLETE;
         } else {
@@ -219,7 +219,7 @@ void flashWrite(uint32_t address, uint8_t byte)
 static variable_desc flashSaveData3[] = {
     { &flashState, sizeof(int) },
     { &flashReadState, sizeof(int) },
-    { &flashSize, sizeof(int) },
+    { &g_flashSize, sizeof(int) },
     { &flashBank, sizeof(int) },
     { &flashSaveMemory[0], SIZE_FLASH1M },
     { NULL, 0 }
@@ -247,7 +247,7 @@ static variable_desc flashSaveData[] = {
 static variable_desc flashSaveData2[] = {
     { &flashState, sizeof(int) },
     { &flashReadState, sizeof(int) },
-    { &flashSize, sizeof(int) },
+    { &g_flashSize, sizeof(int) },
     { &flashSaveMemory[0], SIZE_FLASH1M },
     { NULL, 0 }
 };
@@ -264,7 +264,7 @@ void flashReadGame(gzFile gzFile, int version)
     else if (version < SAVE_GAME_VERSION_7) {
         utilReadData(gzFile, flashSaveData2);
         flashBank = 0;
-        flashSetSize(flashSize);
+        flashSetSize(g_flashSize);
     } else {
         utilReadData(gzFile, flashSaveData3);
     }

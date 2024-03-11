@@ -688,7 +688,7 @@ uint8_t parseExpressionType(char* given_type)
     //for such a small string, pays off to convert first
     char* type = strdup(given_type);
     for (int i = 0; type[i] != '\0'; i++) {
-        type[i] = toupper(type[i]);
+        type[i] = static_cast<uint8_t>(toupper(type[i]));
     }
     if ((type[0] == 'S') || type[0] == 'U') {
         flags |= (4 - ((type[0] - 'S') << 1));

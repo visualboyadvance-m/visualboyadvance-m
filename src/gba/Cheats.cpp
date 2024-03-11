@@ -300,10 +300,10 @@ uint8_t v3_deadtable2[256] = {
 #define CHEAT_IS_HEX(a) (((a) >= 'A' && (a) <= 'F') || ((a) >= '0' && (a) <= '9'))
 
 #define CHEAT_PATCH_ROM_16BIT(a, v) \
-    WRITE16LE(((uint16_t*)&rom[(a)&0x1ffffff]), v);
+    WRITE16LE(((uint16_t*)&g_rom[(a)&0x1ffffff]), v);
 
 #define CHEAT_PATCH_ROM_32BIT(a, v) \
-    WRITE32LE(((uint32_t*)&rom[(a)&0x1ffffff]), v);
+    WRITE32LE(((uint32_t*)&g_rom[(a)&0x1ffffff]), v);
 
 static bool isMultilineWithData(int i)
 {
@@ -602,10 +602,10 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
             i++;
             if (i < cheatsNumber) {
                 uint32_t addr = cheatsList[i - 1].value;
-                uint8_t value = cheatsList[i].rawaddress;
-                int vinc = (cheatsList[i].value >> 24) & 255;
-                int count = (cheatsList[i].value >> 16) & 255;
-                int ainc = (cheatsList[i].value & 0xffff);
+                uint8_t value = DowncastU8(cheatsList[i].rawaddress);
+                const uint8_t vinc = DowncastU8(cheatsList[i].value >> 24);
+                uint8_t count = DowncastU8(cheatsList[i].value >> 16);
+                const uint16_t ainc = DowncastU16(cheatsList[i].value);
                 while (count > 0) {
                     CPUWriteByte(addr, value);
                     value += vinc;
@@ -618,10 +618,10 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
             i++;
             if (i < cheatsNumber) {
                 uint32_t addr = cheatsList[i - 1].value;
-                uint16_t value = cheatsList[i].rawaddress;
-                int vinc = (cheatsList[i].value >> 24) & 255;
-                int count = (cheatsList[i].value >> 16) & 255;
-                int ainc = (cheatsList[i].value & 0xffff) * 2;
+                uint16_t value = DowncastU16(cheatsList[i].rawaddress);
+                const uint16_t vinc = DowncastU16(cheatsList[i].value >> 24);
+                uint8_t count = DowncastU8(cheatsList[i].value >> 16);
+                const uint16_t ainc = DowncastU16(cheatsList[i].value & 0xffff) * 2;
                 while (count > 0) {
                     CPUWriteHalfWord(addr, value);
                     value += vinc;
@@ -1082,15 +1082,15 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
                 break;
             case GSA_16_BIT_WRITE_IOREGS:
                 if ((cheatsList[i].address <= 0x3FF) && (cheatsList[i].address != 0x6) && (cheatsList[i].address != 0x130))
-                    ioMem[cheatsList[i].address & 0x3FE] = cheatsList[i].value & 0xFFFF;
+                    g_ioMem[cheatsList[i].address & 0x3FE] = cheatsList[i].value & 0xFFFF;
                 break;
             case GSA_32_BIT_WRITE_IOREGS:
                 if (cheatsList[i].address <= 0x3FF) {
                     uint32_t cheat_addr = cheatsList[i].address & 0x3FC;
                     if ((cheat_addr != 6) && (cheat_addr != 0x130))
-                        ioMem[cheat_addr] = (cheatsList[i].value & 0xFFFF);
+                        g_ioMem[cheat_addr] = (cheatsList[i].value & 0xFFFF);
                     if (((cheat_addr + 2) != 0x6) && (cheat_addr + 2) != 0x130)
-                        ioMem[cheat_addr + 2] = ((cheatsList[i].value >> 16) & 0xFFFF);
+                        g_ioMem[cheat_addr + 2] = ((cheatsList[i].value >> 16) & 0xFFFF);
                 }
                 break;
             case GSA_8_BIT_IF_TRUE3:
@@ -1583,16 +1583,16 @@ void cheatsAddGSACode(const char* code, const char* desc, bool v3)
     cheatsDecryptGSACode(address, value, v3);
 
     if (value == 0x1DC0DE) {
-        uint32_t gamecode = READ32LE(((uint32_t*)&rom[0xac]));
+        uint32_t gamecode = READ32LE(((uint32_t*)&g_rom[0xac]));
         if (gamecode != address) {
-            char buffer[5];
-            *((uint32_t*)buffer) = address;
-            buffer[4] = 0;
-            char buffer2[5];
-            *((uint32_t*)buffer2) = READ32LE(((uint32_t*)&rom[0xac]));
-            buffer2[4] = 0;
+            char buf[5];
+            *((uint32_t*)buf) = address;
+            buf[4] = 0;
+            char buf2[5];
+            *((uint32_t*)buf2) = READ32LE(((uint32_t*)&g_rom[0xac]));
+            buf2[4] = 0;
             systemMessage(MSG_GBA_CODE_WARNING, N_("Warning: cheats are for game %s. Current game is %s.\nCodes may not work correctly."),
-                buffer, buffer2);
+                buf, buf2);
         }
         cheatsAdd(code, desc, address, address & 0x0FFFFFFF, value, v3 ? 257 : 256,
             UNKNOWN_CODE);
@@ -2258,12 +2258,12 @@ uint32_t cheatsCBACalcIndex(uint32_t x, uint32_t y)
     return 0;
 }
 
-void cheatsCBAUpdateSeedBuffer(uint32_t a, uint8_t* buffer, int count)
+void cheatsCBAUpdateSeedBuffer(uint32_t address, uint8_t* buffer, int count)
 {
     int i;
     for (i = 0; i < count; i++)
         buffer[i] = i;
-    for (i = 0; (uint32_t)i < a; i++) {
+    for (i = 0; (uint32_t)i < address; i++) {
         uint32_t a = cheatsCBACalcIndex(cheatsCBAEncWorker(), count);
         uint32_t b = cheatsCBACalcIndex(cheatsCBAEncWorker(), count);
         uint32_t t = buffer[a];
@@ -2501,7 +2501,7 @@ void cheatsAddCBACode(const char* code, const char* desc)
         case 0x00: {
             if (!cheatsCBATableGenerated)
                 cheatsCBAGenTable();
-            uint32_t crc = cheatsCBACalcCRC(rom, 0x10000);
+            uint32_t crc = cheatsCBACalcCRC(g_rom, 0x10000);
             if (crc != address) {
                 systemMessage(MSG_CBA_CODE_WARNING,
                     N_("Warning: Codes seem to be for a different game.\nCodes may not work correctly."));

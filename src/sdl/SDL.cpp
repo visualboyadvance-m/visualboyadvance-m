@@ -552,10 +552,10 @@ static void sdlApplyPerImagePreferences()
 
     char buffer[7];
     buffer[0] = '[';
-    buffer[1] = rom[0xac];
-    buffer[2] = rom[0xad];
-    buffer[3] = rom[0xae];
-    buffer[4] = rom[0xaf];
+    buffer[1] = g_rom[0xac];
+    buffer[2] = g_rom[0xad];
+    buffer[3] = g_rom[0xae];
+    buffer[4] = g_rom[0xaf];
     buffer[5] = ']';
     buffer[6] = 0;
 
@@ -1751,7 +1751,7 @@ int main(int argc, char** argv)
                 int patchnum;
                 for (patchnum = 0; patchnum < patchNum; patchnum++) {
                     fprintf(stdout, "Trying patch %s%s\n", patchNames[patchnum],
-                        applyPatch(patchNames[patchnum], &rom, &size) ? " [success]" : "");
+                        applyPatch(patchNames[patchnum], &g_rom, &size) ? " [success]" : "");
                 }
                 CPUReset();
             }
@@ -1765,15 +1765,15 @@ int main(int argc, char** argv)
         soundInit();
         cartridgeType = 0;
         strcpy(filename, "gnu_stub");
-        rom = (uint8_t*)malloc(0x2000000);
-        workRAM = (uint8_t*)calloc(1, 0x40000);
-        bios = (uint8_t*)calloc(1, 0x4000);
-        internalRAM = (uint8_t*)calloc(1, 0x8000);
-        paletteRAM = (uint8_t*)calloc(1, 0x400);
-        vram = (uint8_t*)calloc(1, 0x20000);
-        oam = (uint8_t*)calloc(1, 0x400);
-        pix = (uint8_t*)calloc(1, 4 * 241 * 162);
-        ioMem = (uint8_t*)calloc(1, 0x400);
+        g_rom = (uint8_t*)malloc(0x2000000);
+        g_workRAM = (uint8_t*)calloc(1, 0x40000);
+        g_bios = (uint8_t*)calloc(1, 0x4000);
+        g_internalRAM = (uint8_t*)calloc(1, 0x8000);
+        g_paletteRAM = (uint8_t*)calloc(1, 0x400);
+        g_vram = (uint8_t*)calloc(1, 0x20000);
+        g_oam = (uint8_t*)calloc(1, 0x400);
+        g_pix = (uint8_t*)calloc(1, 4 * 241 * 162);
+        g_ioMem = (uint8_t*)calloc(1, 0x400);
 
         emulator = GBASystem;
 
@@ -1918,7 +1918,7 @@ int main(int argc, char** argv)
         SDL_GL_DeleteContext(glcontext);
     }
 
-    if (gbRom != NULL || rom != NULL) {
+    if (gbRom != NULL || g_rom != NULL) {
         sdlWriteBattery();
         emulator.emuCleanUp();
     }
@@ -2001,9 +2001,9 @@ void systemDrawScreen()
     }
 
     if (ifbFunction)
-        ifbFunction(pix + srcPitch, srcPitch, sizeX, sizeY);
+        ifbFunction(g_pix + srcPitch, srcPitch, sizeX, sizeY);
 
-    filterFunction(pix + srcPitch, srcPitch, delta, screen,
+    filterFunction(g_pix + srcPitch, srcPitch, delta, screen,
         destPitch, sizeX, sizeY);
 
     if (openGL) {

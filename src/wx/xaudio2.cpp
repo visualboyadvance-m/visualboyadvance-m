@@ -132,7 +132,7 @@ public:
         return S_OK;
     }
 
-    HRESULT STDMETHODCALLTYPE OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR pwstrDeviceId)
+    HRESULT STDMETHODCALLTYPE OnDefaultDeviceChanged(EDataFlow flow, ERole, LPCWSTR pwstrDeviceId)
     {
         if (flow == eRender && last_device.compare(pwstrDeviceId) != 0) {
             last_device = pwstrDeviceId;
@@ -148,10 +148,10 @@ public:
         return S_OK;
     }
 
-    HRESULT STDMETHODCALLTYPE OnDeviceAdded(LPCWSTR pwstrDeviceId) { return S_OK; }
-    HRESULT STDMETHODCALLTYPE OnDeviceRemoved(LPCWSTR pwstrDeviceId) { return S_OK; }
-    HRESULT STDMETHODCALLTYPE OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWORD dwNewState) { return S_OK; }
-    HRESULT STDMETHODCALLTYPE OnPropertyValueChanged(LPCWSTR pwstrDeviceId, const PROPERTYKEY key) { return S_OK; }
+    HRESULT STDMETHODCALLTYPE OnDeviceAdded(LPCWSTR) { return S_OK; }
+    HRESULT STDMETHODCALLTYPE OnDeviceRemoved(LPCWSTR) { return S_OK; }
+    HRESULT STDMETHODCALLTYPE OnDeviceStateChanged(LPCWSTR, DWORD) { return S_OK; }
+    HRESULT STDMETHODCALLTYPE OnPropertyValueChanged(LPCWSTR, const PROPERTYKEY) { return S_OK; }
 
     void do_register(XAudio2_Output* p_instance)
     {
@@ -211,7 +211,7 @@ public:
     }
 
     STDMETHOD_(void, OnBufferEnd)
-    (void* pBufferContext)
+    (void*)
     {
         assert(hBufferEndEvent != NULL);
         SetEvent(hBufferEndEvent);
@@ -219,17 +219,17 @@ public:
 
     // dummies:
     STDMETHOD_(void, OnVoiceProcessingPassStart)
-    (UINT32 BytesRequired) {}
+    (UINT32) {}
     STDMETHOD_(void, OnVoiceProcessingPassEnd)
     () {}
     STDMETHOD_(void, OnStreamEnd)
     () {}
     STDMETHOD_(void, OnBufferStart)
-    (void* pBufferContext) {}
+    (void*) {}
     STDMETHOD_(void, OnLoopEnd)
-    (void* pBufferContext) {}
+    (void*) {}
     STDMETHOD_(void, OnVoiceError)
-    (void* pBufferContext, HRESULT Error){};
+    (void*, HRESULT){};
 };
 
 // Class Declaration
@@ -512,7 +512,7 @@ bool XAudio2_Output::init(long sampleRate)
     return true;
 }
 
-void XAudio2_Output::write(uint16_t* finalWave, int length)
+void XAudio2_Output::write(uint16_t* finalWave, int)
 {
     if (!initialized || failed)
         return;

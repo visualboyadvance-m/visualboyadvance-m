@@ -3,6 +3,7 @@
 #include "../Util.h"
 #include "../common/Port.h"
 #include "GBA.h"
+#include "GBAinline.h"
 #include "Globals.h"
 
 #include <memory.h>
@@ -56,7 +57,7 @@ void rtcEnableRumble(bool e)
 
 uint16_t rtcRead(uint32_t address)
 {
-    int res = 0;
+    uint16_t res = 0;
 
     switch (address) {
     case 0x80000c8:
@@ -81,7 +82,7 @@ uint16_t rtcRead(uint32_t address)
 
         // WarioWare Twisted Tilt Sensor
         if (rtcClockData.select == 0x0b) {
-            uint16_t v = systemGetSensorZ();
+            uint16_t v = DowncastU16(systemGetSensorZ());
             v = 0x6C0 + v;
             res |= ((v >> rtcClockData.reserved[11]) & 1) << 2;
         }
@@ -95,14 +96,14 @@ uint16_t rtcRead(uint32_t address)
         break;
     }
 
-    return READ16LE((&rom[address & 0x1FFFFFE]));
+    return READ16LE((&g_rom[address & 0x1FFFFFE]));
 }
 
 static uint8_t toBCD(uint8_t value)
 {
     value = value % 100;
-    int l = value % 10;
-    int h = value / 10;
+    uint8_t l = value % 10;
+    uint8_t h = value / 10;
     return h * 16 + l;
 }
 
@@ -221,13 +222,13 @@ bool rtcWrite(uint32_t address, uint16_t value)
                                 SetGBATime();
 
                             rtcClockData.dataLen = 7;
-                            rtcClockData.data[0] = toBCD(gba_time.tm_year);
-                            rtcClockData.data[1] = toBCD(gba_time.tm_mon + 1);
-                            rtcClockData.data[2] = toBCD(gba_time.tm_mday);
-                            rtcClockData.data[3] = toBCD(gba_time.tm_wday);
-                            rtcClockData.data[4] = toBCD(gba_time.tm_hour);
-                            rtcClockData.data[5] = toBCD(gba_time.tm_min);
-                            rtcClockData.data[6] = toBCD(gba_time.tm_sec);
+                            rtcClockData.data[0] = toBCD(DowncastU8(gba_time.tm_year));
+                            rtcClockData.data[1] = toBCD(DowncastU8(gba_time.tm_mon + 1));
+                            rtcClockData.data[2] = toBCD(DowncastU8(gba_time.tm_mday));
+                            rtcClockData.data[3] = toBCD(DowncastU8(gba_time.tm_wday));
+                            rtcClockData.data[4] = toBCD(DowncastU8(gba_time.tm_hour));
+                            rtcClockData.data[5] = toBCD(DowncastU8(gba_time.tm_min));
+                            rtcClockData.data[6] = toBCD(DowncastU8(gba_time.tm_sec));
                             rtcClockData.state = DATA;
                         } break;
 
@@ -236,9 +237,9 @@ bool rtcWrite(uint32_t address, uint16_t value)
                                 SetGBATime();
 
                             rtcClockData.dataLen = 3;
-                            rtcClockData.data[0] = toBCD(gba_time.tm_hour);
-                            rtcClockData.data[1] = toBCD(gba_time.tm_min);
-                            rtcClockData.data[2] = toBCD(gba_time.tm_sec);
+                            rtcClockData.data[0] = toBCD(DowncastU8(gba_time.tm_hour));
+                            rtcClockData.data[1] = toBCD(DowncastU8(gba_time.tm_min));
+                            rtcClockData.data[2] = toBCD(DowncastU8(gba_time.tm_sec));
                             rtcClockData.state = DATA;
                         } break;
 

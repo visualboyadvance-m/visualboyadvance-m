@@ -540,9 +540,9 @@ void MemView::KeyEvent(wxKeyEvent& ev)
         }
 
         // write value; this will not return until value has been written
-        wxCommandEvent ev(EVT_WRITEVAL, GetId());
-        ev.SetEventObject(this);
-        GetEventHandler()->ProcessEvent(ev);
+        wxCommandEvent new_event(EVT_WRITEVAL, GetId());
+        new_event.SetEventObject(this);
+        GetEventHandler()->ProcessEvent(new_event);
         // now refresh whole screen.  Really need to make this more
         // efficient some day
         Repaint();
@@ -766,9 +766,9 @@ DEFINE_EVENT_TYPE(EVT_WRITEVAL)
 ColorView::ColorView(wxWindow* parent, wxWindowID id)
     // default for MSW appears to be BORDER_SUNKEN
     : wxControl(parent, id, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE),
-      r(0),
-      g(0),
-      b(0)
+      r_(0),
+      g_(0),
+      b_(0)
 {
     wxBoxSizer* sz = new wxBoxSizer(wxHORIZONTAL);
     cp = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(75, 75),
@@ -1107,23 +1107,28 @@ GfxViewer::GfxViewer(const wxString& dname, int maxw, int maxh)
     , image(maxw, maxh)
 {
     gv = XRCCTRL(*this, "GfxView", GfxPanel);
-
-    if (!gv || !(gvs = dynamic_cast<wxScrolledWindow*>(gv->GetParent())))
+    if (!gv) {
         baddialog();
+    }
 
-    gvs->SetMinSize(gvs->GetSize());
-    gvs->SetScrollRate(1, 1);
+    gvs_ = dynamic_cast<wxScrolledWindow*>(gv->GetParent());
+    if (!gvs_) {
+        baddialog();
+    }
+
+    gvs_->SetMinSize(gvs_->GetSize());
+    gvs_->SetScrollRate(1, 1);
     gv->SetSize(maxw, maxh);
-    gvs->SetVirtualSize(maxw, maxh);
+    gvs_->SetVirtualSize(maxw, maxh);
     gv->im = &image;
     gv->bmw = maxw;
     gv->bmh = maxh;
     ColorView* cv;
     colorctrl(cv, "Color");
     pixview(gv->pv, "Zoom", 8, 8, cv);
-    str = XRCCTRL(*this, "Stretch", wxCheckBox);
+    str_ = XRCCTRL(*this, "Stretch", wxCheckBox);
 
-    if (!str)
+    if (!str_)
         baddialog();
 }
 
@@ -1140,9 +1145,9 @@ void GfxViewer::BMPSize(int w, int h)
         gv->bmw = w;
         gv->bmh = h;
 
-        if (!str->GetValue()) {
+        if (!str_->GetValue()) {
             gv->SetSize(w, h);
-            gvs->SetVirtualSize(gv->GetSize());
+            gvs_->SetVirtualSize(gv->GetSize());
         }
     }
 }
@@ -1152,23 +1157,23 @@ void GfxViewer::StretchTog(wxCommandEvent& ev)
     (void)ev; // unused params
     wxSize sz;
 
-    if (str->GetValue()) {
+    if (str_->GetValue()) {
         // first time to remove scrollbars
-        gvs->SetVirtualSize(gvs->GetClientSize());
+        gvs_->SetVirtualSize(gvs_->GetClientSize());
         // second time to expand to outer edges
-        sz = gvs->GetClientSize();
+        sz = gvs_->GetClientSize();
     } else
         sz = wxSize(gv->bmw, gv->bmh);
 
     gv->SetSize(sz);
-    gvs->SetVirtualSize(sz);
+    gvs_->SetVirtualSize(sz);
 }
 
 void GfxViewer::SaveBMP(wxCommandEvent& ev)
 {
     (void)ev; // unused params
     GameArea* panel = wxGetApp().frame->GetPanel();
-    bmp_save_dir = wxGetApp().frame->GetGamePath(OPTION(kGenScreenshotDir));
+    bmp_save_dir_ = wxGetApp().frame->GetGamePath(OPTION(kGenScreenshotDir));
     // no attempt is made here to translate the dialog type name
     // it's just a suggested name, anyway
     wxString def_name = panel->game_name() + wxT('-') + dname;
@@ -1180,11 +1185,11 @@ void GfxViewer::SaveBMP(wxCommandEvent& ev)
     else
         def_name.append(".bmp");
 
-    wxFileDialog dlg(GetGrandParent(), _("Select output file"), bmp_save_dir, def_name,
+    wxFileDialog dlg(GetGrandParent(), _("Select output file"), bmp_save_dir_, def_name,
         _("PNG images|*.png|BMP images|*.bmp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     dlg.SetFilterIndex(capture_format);
     int ret = dlg.ShowModal();
-    bmp_save_dir = dlg.GetDirectory();
+    bmp_save_dir_ = dlg.GetDirectory();
 
     if (ret != wxID_OK)
         return;
@@ -1209,7 +1214,7 @@ void GfxViewer::RefreshEv(wxCommandEvent& ev)
     Update();
 }
 
-wxString GfxViewer::bmp_save_dir = wxEmptyString;
+wxString GfxViewer::bmp_save_dir_ = wxEmptyString;
 
 BEGIN_EVENT_TABLE(GfxViewer, Viewer)
 EVT_CHECKBOX(XRCID("Stretch"), GfxViewer::StretchTog)

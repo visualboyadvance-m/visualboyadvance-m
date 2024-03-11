@@ -2574,14 +2574,14 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
             unsigned effective_address = address - 0x2000000;
 
             if (effective_address + section_size < SIZE_WRAM) {
-                memcpy(&workRAM[effective_address], source, section_size);
+                memcpy(&g_workRAM[effective_address], source, section_size);
                 size += section_size;
             }
         } else {
             unsigned effective_address = address - 0x8000000;
 
             if (effective_address + section_size < SIZE_ROM) {
-                memcpy(&rom[effective_address], source, section_size);
+                memcpy(&g_rom[effective_address], source, section_size);
                 size += section_size;
             }
         }
@@ -2623,13 +2623,13 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
         if (READ32LE(&sh[i]->flags) & 2) { // load section
             if (coreOptions.cpuIsMultiBoot) {
                 if (READ32LE(&sh[i]->addr) >= 0x2000000 && READ32LE(&sh[i]->addr) <= 0x203ffff) {
-                    memcpy(&workRAM[READ32LE(&sh[i]->addr) & 0x3ffff], data + READ32LE(&sh[i]->offset),
+                    memcpy(&g_workRAM[READ32LE(&sh[i]->addr) & 0x3ffff], data + READ32LE(&sh[i]->offset),
                         READ32LE(&sh[i]->size));
                     size += READ32LE(&sh[i]->size);
                 }
             } else {
                 if (READ32LE(&sh[i]->addr) >= 0x8000000 && READ32LE(&sh[i]->addr) <= 0x9ffffff) {
-                    memcpy(&rom[READ32LE(&sh[i]->addr) & 0x1ffffff],
+                    memcpy(&g_rom[READ32LE(&sh[i]->addr) & 0x1ffffff],
                         data + READ32LE(&sh[i]->offset),
                         READ32LE(&sh[i]->size));
                     size += READ32LE(&sh[i]->size);

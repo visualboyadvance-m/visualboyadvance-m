@@ -95,7 +95,7 @@ int CheckEReaderRegion(void) //US = 1, JAP = 2, JAP+ = 3
 {
     int i;
     for (i = 0; i < 18; i++)
-        rom_info[i] = rom[0xA0 + i];
+        rom_info[i] = g_rom[0xA0 + i];
     rom_info[i] = 0;
 
     if (!strcasecmp(rom_info, US_Ereader))
@@ -200,13 +200,13 @@ void EReaderWriteMemory(uint32_t address, uint32_t value)
 {
     switch (address >> 24) {
     case 2:
-        WRITE32LE(((uint32_t*)&workRAM[address & 0x3FFFF]), value);
+        WRITE32LE(((uint32_t*)&g_workRAM[address & 0x3FFFF]), value);
         break;
     case 3:
-        WRITE32LE(((uint32_t*)&internalRAM[address & 0x7FFF]), value);
+        WRITE32LE(((uint32_t*)&g_internalRAM[address & 0x7FFF]), value);
         break;
     default:
-        WRITE32LE(((uint32_t*)&rom[address & 0x1FFFFFF]), value);
+        WRITE32LE(((uint32_t*)&g_rom[address & 0x1FFFFFF]), value);
         //rom[address & 0x1FFFFFF] = data;
         break;
     }

@@ -4,8 +4,11 @@
 
 #include "../common/cstdint.h"
 
+#include <limits>
+
 #include <wx/ffile.h>
 #include <wx/vlbox.h>
+
 #include "../gba/armdis.h"
 #include "config/option-proxy.h"
 #include "keep-on-top-styler.h"
@@ -363,18 +366,18 @@ public:
                 baddialog();
         }
 
-        addr = XRCCTRL(*this, "Address", wxChoice);
+        addr_ = XRCCTRL(*this, "Address", wxChoice);
         val = XRCCTRL(*this, "Value", wxControl);
 
-        if (!addr || !val)
+        if (!addr_ || !val)
             baddialog();
 
-        addr->Clear();
+        addr_->Clear();
         wxString longline = lline;
         int lwidth = 0;
 
         for (long unsigned int i = 0; i < NUM_IOREGS; i++) {
-            addr->Append(wxGetTranslation(ioregs[i].name));
+            addr_->Append(wxGetTranslation(ioregs[i].name));
 
             // find longest label
             // this is probably horribly expensive
@@ -401,14 +404,14 @@ public:
 
         bitlab[0]->SetLabel(lline);
         Fit();
-        addr->SetSelection(0);
+        addr_->SetSelection(0);
         Select(0);
     }
 
     void SelectEv(wxCommandEvent& ev)
     {
 	(void)ev; // unused params
-        Select(addr->GetSelection());
+        Select(addr_->GetSelection());
     }
 
     void Select(int sel)
@@ -424,14 +427,11 @@ public:
         Update(sel);
     }
 
-    void Update()
-    {
-        Update(addr->GetSelection());
-    }
+    void Update() { Update(addr_->GetSelection()); }
 
     void Update(int sel)
     {
-        uint16_t* addr = ioregs[sel].address ? ioregs[sel].address : (uint16_t*)&ioMem[ioregs[sel].offset];
+        uint16_t* addr = ioregs[sel].address ? ioregs[sel].address : (uint16_t*)&g_ioMem[ioregs[sel].offset];
         uint16_t mask, reg = *addr;
         int i;
 
@@ -474,8 +474,8 @@ public:
     void Apply(wxCommandEvent& ev)
     {
 	(void)ev; // unused params
-        int sel = addr->GetSelection();
-        uint16_t* addr = ioregs[sel].address ? ioregs[sel].address : (uint16_t*)&ioMem[ioregs[sel].offset];
+        int sel = addr_->GetSelection();
+        uint16_t* addr = ioregs[sel].address ? ioregs[sel].address : (uint16_t*)&g_ioMem[ioregs[sel].offset];
         uint16_t mask, reg = *addr;
         reg &= ~ioregs[sel].write;
         int i;
@@ -490,7 +490,7 @@ public:
     }
 
     static wxString lline;
-    wxChoice* addr;
+    wxChoice* addr_;
     wxControl* val;
     wxCheckBox* bit[16];
     wxControl* bitlab[16];
@@ -614,11 +614,15 @@ public:
     MemViewerBase(uint32_t max)
         : Viewer(wxT("MemViewer"))
     {
-        if (!(mv = XRCCTRL(*this, "MemView", MemView)))
+        mv = XRCCTRL(*this, "MemView", MemView);
+        if (!mv) {
             baddialog();
+        }
 
-        if (!(bs = XRCCTRL(*this, "BlockStart", wxChoice)))
+        bs = XRCCTRL(*this, "BlockStart", wxChoice);
+        if (bs) {
             baddialog();
+        }
 
         bs->Append(wxT(""));
         bs->SetFocus();
@@ -809,9 +813,7 @@ END_EVENT_TABLE()
 
 class MemViewer : public MemViewerBase {
 public:
-    MemViewer()
-        : MemViewerBase(~0)
-    {
+    MemViewer() : MemViewerBase(std::numeric_limits<uint32_t>::max()) {
         bs->Append("0x00000000 - BIOS");
         bs->Append("0x02000000 - WRAM");
         bs->Append("0x03000000 - IRAM");

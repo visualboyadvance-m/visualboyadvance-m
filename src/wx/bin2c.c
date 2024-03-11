@@ -28,10 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 #include <stdio.h>
 #include <stdarg.h>
-#include <ctype.h>
 #include <wchar.h>
 #include <locale.h>
 #ifndef _MSC_VER
@@ -51,8 +49,8 @@ void format_perror(const char* fmt, va_list args) {
     static char error_str[MSG_SIZE];
     static char fmt_str[MSG_SIZE];
     strcpy(fmt_str, msg_prefix);
-    strncat(fmt_str, fmt, MSG_SIZE - sizeof(msg_prefix));
-    vsnprintf(error_str, sizeof(error_str), fmt_str, args);
+    strncat(fmt_str, fmt, MSG_SIZE - strlen(msg_prefix));
+    vsnprintf(error_str, MSG_SIZE, fmt_str, args);
     perror(error_str);
 }
 
@@ -65,9 +63,10 @@ void die(const char* fmt, ...) {
 }
 
 void* safe_malloc(size_t size) {
-    void* allocated;
-    if (!(allocated = malloc(size)))
+    void* allocated = malloc(size);
+    if (!allocated) {
         die("out of memory");
+    }
     return allocated;
 }
 
@@ -81,8 +80,10 @@ char* file_name_to_identifier(const char* file_name_cstr) {
     size_t   file_name_len   = 0;
     int between_tokens       = 0;
 
-    if ((file_name_len = mbstowcs(file_name, file_name_cstr, BUF_SIZE - 1)) == -1)
+    file_name_len = mbstowcs(file_name, file_name_cstr, BUF_SIZE - 1);
+    if (file_name_len == (size_t)(-1)) {
         die("cannot convert '%s' to locale representation", file_name_cstr);
+    }
 
     *identifier = 0;
 
@@ -108,7 +109,7 @@ char* file_name_to_identifier(const char* file_name_cstr) {
 
     *identifier_ptr = 0;
 
-    if (wcstombs(identifier_cstr, identifier, WBUF_SIZE - 1) == -1)
+    if (wcstombs(identifier_cstr, identifier, WBUF_SIZE - 1) == (size_t)(-1))
         die("failed to convert wide character string to bytes");
 
     free(file_name);
@@ -151,7 +152,8 @@ void die_usage(const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
     strcpy(fmt_str, msg_prefix);
-    strncat(fmt_str, fmt, MSG_SIZE - sizeof(msg_prefix));
+    // Need to reserve 1 byte for the newline.
+    strncat(fmt_str, fmt, MSG_SIZE - strlen(msg_prefix) - 1);
     strcat(fmt_str, "\n");
     vfprintf(stderr, fmt_str, args);
     va_end(args);
@@ -171,7 +173,8 @@ int main(int argc, const char** argv) {
     const char* out_file_name  = argc >= 3 ? argv[2] : NULL;
     const char* var_name       = argc >= 4 ? argv[3] : NULL;
     char* computed_identifier  = NULL;
-    int i = 0, file_pos = 0, in_fd = -1;
+    size_t i = 0;
+    int file_pos = 0;
     size_t bytes_read   = 0;
     unsigned char* buf  = safe_malloc(BUF_SIZE);
     FILE *in_file, *out_file;
@@ -194,11 +197,23 @@ int main(int argc, const char** argv) {
         }
     }
 
-    if (!(in_file  = !in_file_name  || !strcmp(in_file_name, "-")  ?  stdin : fopen(in_file_name,  "rb")))
-        die("can't open input file '%s'", in_file_name);
+    if (!in_file_name || !strcmp(in_file_name, "-")) {
+        in_file = stdin;
+    } else {
+        in_file = fopen(in_file_name, "rb");
+        if (!in_file) {
+            die("can't open input file '%s'", in_file_name);
+        }
+    }
 
-    if (!(out_file = !out_file_name || !strcmp(out_file_name, "-") ? stdout : fopen(out_file_name, "w")))
-        die("can't open '%s' for writing", out_file_name);
+    if (!out_file_name || !strcmp(out_file_name, "-")) {
+        out_file = stdout;
+    } else {
+        out_file = fopen(out_file_name, "w");
+        if (!out_file) {
+            die("can't open output file '%s'", out_file_name);
+        }
+    }
 
     if (in_file_name && !var_name)
         var_name = computed_identifier = file_name_to_identifier(in_file_name);
@@ -209,16 +224,19 @@ int main(int argc, const char** argv) {
                       var_name     ? var_name     : "resource_data"
     );
 
-    in_fd = fileno(in_file);
-
-    while ((bytes_read = read(in_fd, buf, BUF_SIZE))) {
+    bytes_read = fread(buf, 1, BUF_SIZE, in_file);
+    while (bytes_read != 0) {
         for (i = 0; i < bytes_read; i++) {
             char* comma = bytes_read < BUF_SIZE && i == bytes_read - 1 ? "" : ",";
 
             fprintf(out_file, "0x%02x%s", buf[i], comma);
 
-            if (++file_pos % 16 == 0) fputc('\n', out_file);
+            file_pos++;
+            if (file_pos % 16 == 0) {
+                fputc('\n', out_file);
+            }
         }
+        bytes_read = fread(buf, 1, BUF_SIZE, in_file);
     }
 
     fputs("};\n", out_file);

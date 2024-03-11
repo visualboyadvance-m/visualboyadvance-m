@@ -151,7 +151,7 @@ void Gb_Apu::reset( mode_t mode, bool agb_wave )
 	{
 		// Init both banks (does nothing if not in AGB mode)
 		// TODO: verify that this works
-		write_register( 0, 0xFF1A, b * 0x40 );
+		write_register( 0, 0xFF1A, static_cast<uint8_t>(b) * 0x40 );
 		for ( unsigned i = 0; i < sizeof initial_wave [0]; i++ )
 			write_register( 0, i + wave_ram, initial_wave [(mode != mode_dmg)] [i] );
 	}
@@ -285,7 +285,7 @@ void Gb_Apu::apply_stereo()
 	}
 }
 
-void Gb_Apu::write_register( blip_time_t time, unsigned addr, int data )
+void Gb_Apu::write_register( blip_time_t time, unsigned addr, uint8_t data )
 {
 	require( (unsigned) data < 0x100 );
 
@@ -353,7 +353,7 @@ void Gb_Apu::write_register( blip_time_t time, unsigned addr, int data )
 	}
 }
 
-int Gb_Apu::read_register( blip_time_t time, unsigned addr )
+uint8_t Gb_Apu::read_register( blip_time_t time, unsigned addr )
 {
 	run_until( time );
 
@@ -376,10 +376,10 @@ int Gb_Apu::read_register( blip_time_t time, unsigned addr )
 		0x00,0x00,0x70,
 		0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
 	};
-	int mask = masks [reg];
+	uint8_t mask = masks [reg];
 	if ( wave.agb_mask && (reg == 10 || reg == 12) )
 		mask = 0x1F; // extra implemented bits in wave regs on AGB
-	int data = regs [reg] | mask;
+	uint8_t data = regs [reg] | mask;
 
 	// Status register
 	if ( addr == status_reg )

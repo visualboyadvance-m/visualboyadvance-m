@@ -64,7 +64,7 @@ void agbPrintFlush()
         return;
     }
 
-    uint8_t* data = &rom[address];
+    uint8_t* data = &g_rom[address];
 
     while (get != put) {
         char c = data[get++];

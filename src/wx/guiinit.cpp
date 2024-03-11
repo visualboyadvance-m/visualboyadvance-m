@@ -992,13 +992,13 @@ public:
                 block->size = 0x40000;
                 block->offset = 0x2000000;
                 block->bits = (uint8_t*)malloc(0x40000 >> 3);
-                block->data = workRAM;
+                block->data = g_workRAM;
                 block->saved = (uint8_t*)malloc(0x40000);
                 block++;
                 block->size = 0x8000;
                 block->offset = 0x3000000;
                 block->bits = (uint8_t*)malloc(0x8000 >> 3);
-                block->data = internalRAM;
+                block->data = g_internalRAM;
                 block->saved = (uint8_t*)malloc(0x8000);
             }
 
@@ -1460,7 +1460,7 @@ public:
         type->SetSelection(coreOptions.saveType);
 
         if (coreOptions.saveType == GBA_SAVE_FLASH) {
-            size->SetSelection(flashSize == 0x20000 ? 1 : 0);
+            size->SetSelection(g_flashSize == 0x20000 ? 1 : 0);
             size->Enable();
         } else {
             size->Disable();

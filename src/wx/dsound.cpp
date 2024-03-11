@@ -239,7 +239,7 @@ void DirectSound::resume()
     }
 }
 
-void DirectSound::write(uint16_t* finalWave, int length)
+void DirectSound::write(uint16_t* finalWave, int)
 {
     if (!pDirectSound)
         return;
@@ -332,7 +332,7 @@ struct devnames {
     wxArrayString *names, *ids;
 };
 
-static BOOL CALLBACK DSEnumCB(LPGUID guid, LPCTSTR desc, LPCTSTR drvnam, LPVOID user)
+static BOOL CALLBACK DSEnumCB(LPGUID guid, LPCTSTR desc, LPCTSTR, LPVOID user)
 {
     devnames* dn = (devnames*)user;
     dn->names->push_back(desc);

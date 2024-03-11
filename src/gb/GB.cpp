@@ -28,7 +28,7 @@
 #define _stricmp strcasecmp
 #endif
 
-extern uint8_t* pix;
+extern uint8_t* g_pix;
 
 namespace {
 
@@ -2559,7 +2559,7 @@ void gbCPUInit(const char* biosFileName, bool useBiosFile)
         int size = expectedSize;
         if (utilLoad(biosFileName,
                 CPUIsGBBios,
-                bios,
+                g_bios,
                 size)) {
             if (size == expectedSize)
                 coreOptions.useBios = true;
@@ -2762,8 +2762,8 @@ void gbReset()
         memset(gbLineBuffer, 0, kGBLineBufferSize);
     }
     // clean Pix
-    if (pix != nullptr) {
-        memset(pix, 0, kGBPixSize);
+    if (g_pix != nullptr) {
+        memset(g_pix, 0, kGBPixSize);
     }
     // clean Vram
     if (gbVram != nullptr) {
@@ -2938,12 +2938,12 @@ void gbReset()
     }
 
     // used for the handling of the gb Boot Rom
-    if ((gbHardware & 7) && (bios != NULL) && coreOptions.useBios && !coreOptions.skipBios) {
+    if ((gbHardware & 7) && (g_bios != NULL) && coreOptions.useBios && !coreOptions.skipBios) {
         if (gbHardware & 5) {
             memcpy((uint8_t*)(gbMemory), (uint8_t*)(gbRom), 0x1000);
-            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), kGBBiosSize);
+            memcpy((uint8_t*)(gbMemory), (uint8_t*)(g_bios), kGBBiosSize);
         } else {
-            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), kCGBBiosSize);
+            memcpy((uint8_t*)(gbMemory), (uint8_t*)(g_bios), kCGBBiosSize);
             memcpy((uint8_t*)(gbMemory + 0x100), (uint8_t*)(gbRom + 0x100), 0x100);
         }
         gbWhiteScreen = 0;
@@ -3466,9 +3466,9 @@ static bool gbReadSaveState(gzFile gzFile)
     }
 
     if (version < GBSAVE_GAME_VERSION_5) {
-        utilGzRead(gzFile, pix, 256 * 224 * sizeof(uint16_t));
+        utilGzRead(gzFile, g_pix, 256 * 224 * sizeof(uint16_t));
     }
-    memset(pix, 0, kGBPixSize);
+    memset(g_pix, 0, kGBPixSize);
 
     if (version < GBSAVE_GAME_VERSION_6) {
         utilGzRead(gzFile, gbPalette, 64 * sizeof(uint16_t));
@@ -3518,9 +3518,9 @@ static bool gbReadSaveState(gzFile gzFile)
         gbMemoryMap[0x00] = &gbMemory[0x0000];
         if (gbHardware & 5) {
             memcpy((uint8_t*)(gbMemory), (uint8_t*)(gbRom), 0x1000);
-            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), kGBBiosSize);
+            memcpy((uint8_t*)(gbMemory), (uint8_t*)(g_bios), kGBBiosSize);
         } else if (gbHardware & 2) {
-            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), kCGBBiosSize);
+            memcpy((uint8_t*)(gbMemory), (uint8_t*)(g_bios), kCGBBiosSize);
             memcpy((uint8_t*)(gbMemory + 0x100), (uint8_t*)(gbRom + 0x100), 0x100);
         }
 
@@ -3729,15 +3729,15 @@ bool gbReadSaveState(const char* name)
 bool gbWritePNGFile(const char* fileName)
 {
     if (gbBorderOn)
-        return utilWritePNGFile(fileName, kSGBWidth, kSGBHeight, pix);
-    return utilWritePNGFile(fileName, kGBWidth, kGBHeight, pix);
+        return utilWritePNGFile(fileName, kSGBWidth, kSGBHeight, g_pix);
+    return utilWritePNGFile(fileName, kGBWidth, kGBHeight, g_pix);
 }
 
 bool gbWriteBMPFile(const char* fileName)
 {
     if (gbBorderOn)
-        return utilWriteBMPFile(fileName, kSGBWidth, kSGBHeight, pix);
-    return utilWriteBMPFile(fileName, kGBWidth, kGBHeight, pix);
+        return utilWriteBMPFile(fileName, kSGBWidth, kSGBHeight, g_pix);
+    return utilWriteBMPFile(fileName, kGBWidth, kGBHeight, g_pix);
 }
 #endif // !__LIBRETRO__
 
@@ -3753,9 +3753,9 @@ void gbCleanUp()
         gbRom = nullptr;
     }
 
-    if (bios != nullptr) {
-        free(bios);
-        bios = nullptr;
+    if (g_bios != nullptr) {
+        free(g_bios);
+        g_bios = nullptr;
     }
 
     if (gbMemory != nullptr) {
@@ -3768,9 +3768,9 @@ void gbCleanUp()
         gbLineBuffer = nullptr;
     }
 
-    if (pix != nullptr) {
-        free(pix);
-        pix = nullptr;
+    if (g_pix != nullptr) {
+        free(g_pix);
+        g_pix = nullptr;
     }
 
     gbSgbShutdown();
@@ -3817,12 +3817,12 @@ bool gbLoadRom(const char* filename) {
 
     g_gbBatteryError = false;
 
-    if (bios != nullptr) {
-        free(bios);
-        bios = nullptr;
+    if (g_bios != nullptr) {
+        free(g_bios);
+        g_bios = nullptr;
     }
-    bios = (uint8_t*)calloc(1, kGBBiosBufferSize);
-    if (bios == nullptr) {
+    g_bios = (uint8_t*)calloc(1, kGBBiosBufferSize);
+    if (g_bios == nullptr) {
         return false;
     }
 
@@ -3831,8 +3831,8 @@ bool gbLoadRom(const char* filename) {
         return false;
     }
 
-    pix = (uint8_t*)calloc(1, kGBPixSize);
-    if (pix == nullptr) {
+    g_pix = (uint8_t*)calloc(1, kGBPixSize);
+    if (g_pix == nullptr) {
         return false;
     }
 
@@ -3880,10 +3880,10 @@ void gbDrawLine()
     switch (systemColorDepth) {
     case 16: {
 #ifdef __LIBRETRO__
-        uint16_t* dest = (uint16_t*)pix + gbBorderLineSkip * (register_LY + gbBorderRowSkip)
+        uint16_t* dest = (uint16_t*)g_pix + gbBorderLineSkip * (register_LY + gbBorderRowSkip)
             + gbBorderColumnSkip;
 #else
-        uint16_t* dest = (uint16_t*)pix + (gbBorderLineSkip + 2) * (register_LY + gbBorderRowSkip + 1)
+        uint16_t* dest = (uint16_t*)g_pix + (gbBorderLineSkip + 2) * (register_LY + gbBorderRowSkip + 1)
             + gbBorderColumnSkip;
 #endif
         for (size_t x = 0; x < kGBWidth;) {
@@ -3915,7 +3915,7 @@ void gbDrawLine()
     } break;
 
     case 24: {
-        uint8_t* dest = (uint8_t*)pix + 3 * (gbBorderLineSkip * (register_LY + gbBorderRowSkip) + gbBorderColumnSkip);
+        uint8_t* dest = (uint8_t*)g_pix + 3 * (gbBorderLineSkip * (register_LY + gbBorderRowSkip) + gbBorderColumnSkip);
         for (size_t x = 0; x < kGBWidth;) {
             *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
             dest += 3;
@@ -3957,10 +3957,10 @@ void gbDrawLine()
 
     case 32: {
 #ifdef __LIBRETRO__
-        uint32_t* dest = (uint32_t*)pix + gbBorderLineSkip * (register_LY + gbBorderRowSkip)
+        uint32_t* dest = (uint32_t*)g_pix + gbBorderLineSkip * (register_LY + gbBorderRowSkip)
             + gbBorderColumnSkip;
 #else
-        uint32_t* dest = (uint32_t*)pix + (gbBorderLineSkip + 1) * (register_LY + gbBorderRowSkip + 1)
+        uint32_t* dest = (uint32_t*)g_pix + (gbBorderLineSkip + 1) * (register_LY + gbBorderRowSkip + 1)
             + gbBorderColumnSkip;
 #endif
         for (size_t x = 0; x < kGBWidth;) {
@@ -4904,13 +4904,13 @@ bool gbLoadRomData(const char* data, size_t size) {
 
     g_gbBatteryError = false;
 
-    if (bios != nullptr) {
-        free(bios);
-        bios = nullptr;
+    if (g_bios != nullptr) {
+        free(g_bios);
+        g_bios = nullptr;
     }
 
-    bios = (uint8_t*)calloc(1, kGBBiosBufferSize);
-    if (bios == nullptr) {
+    g_bios = (uint8_t*)calloc(1, kGBBiosBufferSize);
+    if (g_bios == nullptr) {
         return false;
     }
 
@@ -4919,8 +4919,8 @@ bool gbLoadRomData(const char* data, size_t size) {
         return false;
     }
 
-    pix = (uint8_t*)calloc(1, kGBPixSize);
-    if (pix == nullptr) {
+    g_pix = (uint8_t*)calloc(1, kGBPixSize);
+    if (g_pix == nullptr) {
         return false;
     }
 
@@ -5130,9 +5130,9 @@ bool gbReadSaveState(const uint8_t* data)
         gbMemoryMap[0x00] = &gbMemory[0x0000];
         if (gbHardware & 5) {
             memcpy((uint8_t*)(gbMemory), (uint8_t*)(gbRom), 0x1000);
-            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), kGBBiosSize);
+            memcpy((uint8_t*)(gbMemory), (uint8_t*)(g_bios), kGBBiosSize);
         } else if (gbHardware & 2) {
-            memcpy((uint8_t*)(gbMemory), (uint8_t*)(bios), kCGBBiosSize);
+            memcpy((uint8_t*)(gbMemory), (uint8_t*)(g_bios), kCGBBiosSize);
             memcpy((uint8_t*)(gbMemory + 0x100), (uint8_t*)(gbRom + 0x100), 0x100);
         }
 

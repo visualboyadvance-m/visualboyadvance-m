@@ -22,6 +22,6 @@ extern void flashReset();
 extern void flashSetSize(int size);
 extern void flashInit();
 
-extern int flashSize;
+extern int g_flashSize;
 
 #endif // FLASH_H

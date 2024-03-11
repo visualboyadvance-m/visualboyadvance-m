@@ -16,7 +16,6 @@
 #include "config/option-observer.h"
 #include "config/option-proxy.h"
 #include "dialogs/validated-child.h"
-#include "widgets/group-check-box.h"
 #include "widgets/option-validator.h"
 
 namespace dialogs {

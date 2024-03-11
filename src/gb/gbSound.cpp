@@ -1,10 +1,11 @@
-#include <string.h>
+#include "gbSound.h"
+
+#include <cstring>
 
 #include "../Util.h"
 #include "../gba/Sound.h"
 #include "gb.h"
 #include "gbGlobals.h"
-#include "gbSound.h"
 
 #include "../apu/Effects_Buffer.h"
 #include "../apu/Gb_Apu.h"
@@ -32,7 +33,7 @@ uint8_t gbSoundRead(int st, uint16_t address)
     return gbMemory[address];
 }
 
-void gbSoundEvent(int st, uint16_t address, int data)
+void gbSoundEvent(int st, uint16_t address, uint8_t data)
 {
     gbMemory[address] = data;
 

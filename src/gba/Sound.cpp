@@ -106,11 +106,11 @@ void Gba_Pcm::init()
 
 void Gba_Pcm::apply_control(int idx)
 {
-    shift = ~ioMem[SGCNT0_H] >> (2 + idx) & 1;
+    shift = ~g_ioMem[SGCNT0_H] >> (2 + idx) & 1;
 
     int ch = 0;
-    if ((soundEnableFlag >> idx & 0x100) && (ioMem[NR52] & 0x80))
-        ch = ioMem[SGCNT0_H + 1] >> (idx * 4) & 3;
+    if ((soundEnableFlag >> idx & 0x100) && (g_ioMem[NR52] & 0x80))
+        ch = g_ioMem[SGCNT0_H + 1] >> (idx * 4) & 3;
 
     Blip_Buffer* out = 0;
     switch (ch) {
@@ -186,10 +186,10 @@ void Gba_Pcm_Fifo::timer_overflowed(int which_timer)
                 CPUCheckDMA(3, which ? 4 : 2);
             if (count == 0) {
                 // Not filled by DMA, so fill with 16 bytes of silence
-                int reg = which ? FIFOB_L : FIFOA_L;
+                const int io_reg = which ? FIFOB_L : FIFOA_L;
                 for (int n = 8; n--;) {
-                    soundEvent16(reg, (uint16_t)0);
-                    soundEvent16(reg + 2, (uint16_t)0);
+                    soundEvent16(io_reg, (uint16_t)0);
+                    soundEvent16(io_reg + 2, (uint16_t)0);
                 }
             }
         }
@@ -223,7 +223,7 @@ void Gba_Pcm_Fifo::write_control(int data)
 void Gba_Pcm_Fifo::write_fifo(int data)
 {
     fifo[writeIndex] = data & 0xFF;
-    fifo[writeIndex + 1] = data >> 8;
+    fifo[writeIndex + 1] = static_cast<uint8_t>(data >> 8);
     count += 2;
     writeIndex = (writeIndex + 2) & 31;
 }
@@ -255,7 +255,7 @@ void soundEvent8(uint32_t address, uint8_t data)
 {
     int gb_addr = gba_to_gb_sound(address);
     if (gb_addr) {
-        ioMem[address] = data;
+        g_ioMem[address] = data;
         gb_apu->write_register(soundTicks, gb_addr, data);
 
         if (address == NR52)
@@ -272,7 +272,7 @@ static void apply_volume(bool apu_only = false)
 
     if (gb_apu) {
         static float const apu_vols[4] = { 0.25f, 0.5f, 1.0f, 0.25f };
-        gb_apu->volume(soundVolume_ * apu_vols[ioMem[SGCNT0_H] & 3]);
+        gb_apu->volume(soundVolume_ * apu_vols[g_ioMem[SGCNT0_H] & 3]);
     }
 
     if (!apu_only) {
@@ -285,7 +285,7 @@ static void apply_volume(bool apu_only = false)
 
 static void write_SGCNT0_H(int data)
 {
-    WRITE16LE(&ioMem[SGCNT0_H], data & 0x770F);
+    WRITE16LE(&g_ioMem[SGCNT0_H], data & 0x770F);
     pcm[0].write_control(data);
     pcm[1].write_control(data >> 4);
     apply_volume(true);
@@ -301,18 +301,18 @@ void soundEvent16(uint32_t address, uint16_t data)
     case FIFOA_L:
     case FIFOA_H:
         pcm[0].write_fifo(data);
-        WRITE16LE(&ioMem[address], data);
+        WRITE16LE(&g_ioMem[address], data);
         break;
 
     case FIFOB_L:
     case FIFOB_H:
         pcm[1].write_fifo(data);
-        WRITE16LE(&ioMem[address], data);
+        WRITE16LE(&g_ioMem[address], data);
         break;
 
     case SOUNDBIAS:
         data &= 0xC3FF;
-        WRITE16LE(&ioMem[address], data);
+        WRITE16LE(&g_ioMem[address], data);
         break;
 
     default:
@@ -406,7 +406,7 @@ void psoundTickfn()
 
 static void apply_muting()
 {
-    if (!stereo_buffer || !ioMem)
+    if (!stereo_buffer || !g_ioMem)
         return;
 
     // PCM
@@ -436,7 +436,7 @@ static void reset_apu()
 
 static void remake_stereo_buffer()
 {
-    if (!ioMem)
+    if (!g_ioMem)
         return;
 
     // Clears pointers kept to old stereo_buffer
@@ -777,14 +777,14 @@ static void soundReadGameOld(gzFile in, int version)
         NR50, NR51, NR52, -1
     };
 
-    ioMem[NR52] |= 0x80; // old sound played even when this wasn't set (power on)
+    g_ioMem[NR52] |= 0x80; // old sound played even when this wasn't set (power on)
 
     for (int i = 0; regs_to_copy[i] >= 0; i++)
-        state.apu.regs[gba_to_gb_sound(regs_to_copy[i]) - 0xFF10] = ioMem[regs_to_copy[i]];
+        state.apu.regs[gba_to_gb_sound(regs_to_copy[i]) - 0xFF10] = g_ioMem[regs_to_copy[i]];
 
     // Copy wave RAM to both banks
-    memcpy(&state.apu.regs[0x20], &ioMem[0x90], 0x10);
-    memcpy(&state.apu.regs[0x30], &ioMem[0x90], 0x10);
+    memcpy(&state.apu.regs[0x20], &g_ioMem[0x90], 0x10);
+    memcpy(&state.apu.regs[0x30], &g_ioMem[0x90], 0x10);
 
     // Read both banks of wave RAM if available
     if (version >= SAVE_GAME_VERSION_3)
@@ -811,7 +811,7 @@ void soundReadGame(gzFile in, int version)
         soundReadGameOld(in, version);
 
     gb_apu->load_state(state.apu);
-    write_SGCNT0_H(READ16LE(&ioMem[SGCNT0_H]) & 0x770F);
+    write_SGCNT0_H(READ16LE(&g_ioMem[SGCNT0_H]) & 0x770F);
 
     apply_muting();
 }
@@ -837,7 +837,7 @@ void soundReadGame(const uint8_t*& in)
     utilReadDataMem(in, gba_state);
 
     gb_apu->load_state(state.apu);
-    write_SGCNT0_H(READ16LE(&ioMem[SGCNT0_H]) & 0x770F);
+    write_SGCNT0_H(READ16LE(&g_ioMem[SGCNT0_H]) & 0x770F);
 
     apply_muting();
 }

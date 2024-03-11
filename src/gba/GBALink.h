@@ -1,9 +1,10 @@
 #ifndef GBA_GBALINK_H
 #define GBA_GBALINK_H
 
-#include <stdint.h>
+#include <cstdint>
+#include <string>
 
-extern uint32_t IP_LINK_PORT;
+extern uint16_t IP_LINK_PORT;
 
 extern std::string IP_LINK_BIND_ADDRESS;
 

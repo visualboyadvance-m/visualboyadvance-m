@@ -131,8 +131,8 @@ void utilGBAFindSave(const int size)
     bool rtcFound_ = false;
     int detectedSaveType = 0;
     int flashSize_ = 0x10000;
-    uint32_t *p = (uint32_t *)&rom[0];
-    uint32_t *end = (uint32_t *)(&rom[0] + size);
+    uint32_t *p = (uint32_t *)&g_rom[0];
+    uint32_t *end = (uint32_t *)(&g_rom[0] + size);
 
     while (p < end) {
         uint32_t d = READ32LE(p);
@@ -183,7 +183,7 @@ void utilGBAFindSave(const int size)
 
     coreOptions.cpuSaveType = detectedSaveType;
     coreOptions.rtcEnabled = rtcFound_;
-    flashSize = flashSize_;
+    g_flashSize = flashSize_;
 }
 
 void utilUpdateSystemColorMaps(bool lcd)
