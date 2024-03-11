@@ -254,7 +254,7 @@ UserInput StringToUserInput(const wxString& string) {
         // This is weird, but keycode events are sent as "uppercase", but the
         // accelerator parsing always considers them "lowercase", so we force
         // an uppercase conversion here.
-        int key = accel.GetKeyCode();
+        key = accel.GetKeyCode();
         if (key < WXK_START && wxIslower(key)) {
             key = wxToupper(key);
         }

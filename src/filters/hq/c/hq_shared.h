@@ -81,7 +81,7 @@ inline bool Diff(unsigned int YUV1, unsigned int YUV2)
 // hq3x, hq4x
 #define Interp2_32(pc, c1, c2, c3)                                                                 \
         (*((unsigned int *)(pc)) =                                                                 \
-             (((c1) == (c2)) == (c3))                                                              \
+             (((c1) == (c2)) && ((c2) == (c3)))                                                    \
                  ? c1                                                                              \
                  : ((((((c1)&0x00FF00) * 2) + ((c2)&0x00FF00) + ((c3)&0x00FF00)) & 0x0003FC00) +   \
                     (((((c1)&0xFF00FF) * 2) + ((c2)&0xFF00FF) + ((c3)&0xFF00FF)) & 0x03FC03FC)) >> \
@@ -99,7 +99,7 @@ inline bool Diff(unsigned int YUV1, unsigned int YUV2)
 // hq3x, not used by hq4x
 #define Interp4_32(pc, c1, c2, c3)                                                                 \
         (*((unsigned int *)(pc)) =                                                                 \
-             (((c1) == (c2)) == (c3))                                                              \
+             (((c1) == (c2)) && ((c2) == (c3)))                                                    \
                  ? c1                                                                              \
                  : ((((((c1)&0x00FF00) * 2) + ((((c2)&0x00FF00) + ((c3)&0x00FF00)) * 7)) &         \
                      0x000FF000) +                                                                 \
@@ -119,7 +119,7 @@ inline bool Diff(unsigned int YUV1, unsigned int YUV2)
 // hq4x
 #define Interp6_32(pc, c1, c2, c3)                                                                 \
         (*((unsigned int *)(pc)) =                                                                 \
-             (((c1) == (c2)) == (c3))                                                              \
+             (((c1) == (c2)) && ((c2) == (c3)))                                                    \
                  ? c1                                                                              \
                  : ((((((c1)&0x00FF00) * 5) + (((c2)&0x00FF00) * 2) + ((c3)&0x00FF00)) &           \
                      0x0007F800) +                                                                 \
@@ -131,7 +131,7 @@ inline bool Diff(unsigned int YUV1, unsigned int YUV2)
 // hq4x
 #define Interp7_32(pc, c1, c2, c3)                                                                 \
         (*((unsigned int *)(pc)) =                                                                 \
-             (((c1) == (c2)) == (c3))                                                              \
+             (((c1) == (c2)) && ((c2) == (c3)))                                                    \
                  ? c1                                                                              \
                  : ((((((c1)&0x00FF00) * 6) + ((c2)&0x00FF00) + ((c3)&0x00FF00)) & 0x0007F800) +   \
                     (((((c1)&0xFF00FF) * 6) + ((c2)&0xFF00FF) + ((c3)&0xFF00FF)) & 0x07F807F8)) >> \
@@ -155,7 +155,7 @@ inline unsigned int RGBtoYUV_32(unsigned int c)
         unsigned char r, g, b;
         b = c & 0x0000FF;
         g = (c & 0x00FF00) >> 8;
-        r = c >> 16;
+        r = (unsigned char)(c >> 16);
         return ((r + g + b) << 14) + ((r - b + 512) << 4) + ((2 * g - r - b) >> 3) + 128;
 
         // unoptimized:
@@ -185,7 +185,7 @@ inline unsigned int RGBtoYUV_32(unsigned int c)
 // hq3x, hq4x
 #define Interp2_16(pc, c1, c2, c3)                                                                 \
         (*((unsigned short *)(pc)) =                                                               \
-             (((c1) == (c2)) == (c3))                                                              \
+             (((c1) == (c2)) && ((c2) == (c3)))                                                    \
                  ? c1                                                                              \
                  : ((((((c1)&GMASK) * 2) + ((c2)&GMASK) + ((c3)&GMASK)) & GSHIFT2MASK) +           \
                     (((((c1)&RBMASK) * 2) + ((c2)&RBMASK) + ((c3)&RBMASK)) & RBSHIFT2MASK)) >>     \
@@ -203,7 +203,7 @@ inline unsigned int RGBtoYUV_32(unsigned int c)
 // hq3x, not used by hq4x
 #define Interp4_16(pc, c1, c2, c3)                                                                 \
         (*((unsigned short *)(pc)) =                                                               \
-             (((c1) == (c2)) == (c3))                                                              \
+             (((c1) == (c2)) && ((c2) == (c3)))                                                    \
                  ? c1                                                                              \
                  : ((((((c1)&GMASK) * 2) + ((((c2)&GMASK) + ((c3)&GMASK)) * 7)) & GSHIFT4MASK) +   \
                     (((((c1)&RBMASK) * 2) + ((((c2)&RBMASK) + ((c3)&RBMASK)) * 7)) &               \
@@ -222,7 +222,7 @@ inline unsigned int RGBtoYUV_32(unsigned int c)
 // hq4x
 #define Interp6_16(pc, c1, c2, c3)                                                                 \
         (*((unsigned short *)(pc)) =                                                               \
-             (((c1) == (c2)) == (c3))                                                              \
+             (((c1) == (c2)) && ((c2) == (c3)))                                                    \
                  ? c1                                                                              \
                  : ((((((c1)&GMASK) * 5) + (((c2)&GMASK) * 2) + ((c3)&GMASK)) & GSHIFT3MASK) +     \
                     (((((c1)&RBMASK) * 5) + (((c2)&RBMASK) * 2) + ((c3)&RBMASK)) &                 \
@@ -233,7 +233,7 @@ inline unsigned int RGBtoYUV_32(unsigned int c)
 // hq4x
 #define Interp7_16(pc, c1, c2, c3)                                                                 \
         (*((unsigned short *)(pc)) =                                                               \
-             (((c1) == (c2)) == (c3))                                                              \
+             (((c1) == (c2)) && ((c2) == (c3)))                                                    \
                  ? c1                                                                              \
                  : ((((((c1)&GMASK) * 6) + ((c2)&GMASK) + ((c3)&GMASK)) & GSHIFT3MASK) +           \
                     (((((c1)&RBMASK) * 6) + ((c2)&RBMASK) + ((c3)&RBMASK)) & RBSHIFT3MASK)) >>     \
@@ -260,9 +260,9 @@ inline unsigned int RGBtoYUV_16(unsigned short c)
         g = (c & 0x03E0) >> 2;
         b = (c & 0x001F) << 3;
 #else
-        r = (c & 0xF800) >> 8;
-        g = (c & 0x07E0) >> 3;
-        b = (c & 0x001F) << 3;
+        r = (unsigned char)((c & 0xF800) >> 8);
+        g = (unsigned char)((c & 0x07E0) >> 3);
+        b = (unsigned char)((c & 0x001F) << 3);
 #endif
 
         return ((r + g + b) << 14) + ((r - b + 512) << 4) + ((2 * g - r - b) >> 3) + 128;
