@@ -21,7 +21,7 @@ jobs:
           nix_path: nixpkgs=channel:nixos-unstable
       - name: Configure
         run: >-
-          nix-shell --command 'cmake -B build -G Ninja ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}'
+          nix-shell --command 'cmake -B build -G Ninja ${{ matrix.cmake_build }} -DENABLE_LTO=OFF ${{ matrix.cmake_options }}'
       - name: Build
         run: >-
           nix-shell --command 'ninja -C build'
