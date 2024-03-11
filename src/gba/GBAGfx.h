@@ -49,14 +49,14 @@ void mode5RenderLine();
 void mode5RenderLineNoWindow();
 void mode5RenderLineAll();
 
-extern int coeff[32];
-extern uint32_t line0[240];
-extern uint32_t line1[240];
-extern uint32_t line2[240];
-extern uint32_t line3[240];
-extern uint32_t lineOBJ[240];
-extern uint32_t lineOBJWin[240];
-extern uint32_t lineMix[240];
+extern int g_coeff[32];
+extern uint32_t g_line0[240];
+extern uint32_t g_line1[240];
+extern uint32_t g_line2[240];
+extern uint32_t g_line3[240];
+extern uint32_t g_lineOBJ[240];
+extern uint32_t g_lineOBJWin[240];
+extern uint32_t g_lineMix[240];
 extern bool gfxInWin0[240];
 extern bool gfxInWin1[240];
 extern int lineOBJpixleft[128];
@@ -80,9 +80,9 @@ static inline void gfxClearArray(uint32_t* array)
 #ifndef TILED_RENDERING
 static inline void gfxDrawTextScreen(uint16_t control, uint16_t hofs, uint16_t vofs, uint32_t* line)
 {
-    uint16_t* palette = (uint16_t*)paletteRAM;
+    uint16_t* palette = (uint16_t*)g_paletteRAM;
     const size_t charBankBaseOffset = ((control >> 2) & 0x03) * 0x4000;
-    uint16_t* screenBase = (uint16_t*)&vram[((control >> 8) & 0x1f) * 0x800];
+    uint16_t* screenBase = (uint16_t*)&g_vram[((control >> 8) & 0x1f) * 0x800];
     uint32_t prio = ((control & 3) << 25) + 0x1000000;
     int sizeX = 256;
     int sizeY = 256;
@@ -153,7 +153,7 @@ static inline void gfxDrawTextScreen(uint16_t control, uint16_t hofs, uint16_t v
                 // use 0 here.
                 color = 0;
             } else {
-                color = vram[charBankTotalOffset];
+                color = g_vram[charBankTotalOffset];
             }
 
             line[x] = color ? (READ16LE(&palette[color]) | prio) : 0x80000000;
@@ -198,7 +198,7 @@ static inline void gfxDrawTextScreen(uint16_t control, uint16_t hofs, uint16_t v
                 // use 0 here.
                 color = 0;
             } else {
-                color = vram[charBankTotalOffset];
+                color = g_vram[charBankTotalOffset];
                 if (tileX & 1) {
                     color = (color >> 4);
                 } else {
@@ -243,9 +243,9 @@ static inline void gfxDrawRotScreen(uint16_t control, uint16_t x_l, uint16_t x_h
     uint16_t pc, uint16_t pd, int& currentX, int& currentY, int changed,
     uint32_t* line)
 {
-    uint16_t* palette = (uint16_t*)paletteRAM;
-    uint8_t* charBase = &vram[((control >> 2) & 0x03) * 0x4000];
-    uint8_t* screenBase = (uint8_t*)&vram[((control >> 8) & 0x1f) * 0x800];
+    uint16_t* palette = (uint16_t*)g_paletteRAM;
+    uint8_t* charBase = &g_vram[((control >> 2) & 0x03) * 0x4000];
+    uint8_t* screenBase = (uint8_t*)&g_vram[((control >> 8) & 0x1f) * 0x800];
     int prio = ((control & 3) << 25) + 0x1000000;
 
     int sizeX = 128;
@@ -370,7 +370,7 @@ static inline void gfxDrawRotScreen16Bit(uint16_t control, uint16_t x_l, uint16_
     uint16_t pb, uint16_t pc, uint16_t pd, int& currentX, int& currentY,
     int changed, uint32_t* line)
 {
-    uint16_t* screenBase = (uint16_t*)&vram[0];
+    uint16_t* screenBase = (uint16_t*)&g_vram[0];
     int prio = ((control & 3) << 25) + 0x1000000;
     int sizeX = 240;
     int sizeY = 160;
@@ -459,8 +459,8 @@ static inline void gfxDrawRotScreen256(uint16_t control, uint16_t x_l, uint16_t 
     uint16_t pb, uint16_t pc, uint16_t pd, int& currentX, int& currentY,
     int changed, uint32_t* line)
 {
-    uint16_t* palette = (uint16_t*)paletteRAM;
-    uint8_t* screenBase = (DISPCNT & 0x0010) ? &vram[0xA000] : &vram[0x0000];
+    uint16_t* palette = (uint16_t*)g_paletteRAM;
+    uint8_t* screenBase = (DISPCNT & 0x0010) ? &g_vram[0xA000] : &g_vram[0x0000];
     int prio = ((control & 3) << 25) + 0x1000000;
     int sizeX = 240;
     int sizeY = 160;
@@ -552,7 +552,7 @@ static inline void gfxDrawRotScreen16Bit160(uint16_t control, uint16_t x_l, uint
     uint16_t pb, uint16_t pc, uint16_t pd, int& currentX, int& currentY,
     int changed, uint32_t* line)
 {
-    uint16_t* screenBase = (DISPCNT & 0x0010) ? (uint16_t*)&vram[0xa000] : (uint16_t*)&vram[0];
+    uint16_t* screenBase = (DISPCNT & 0x0010) ? (uint16_t*)&g_vram[0xa000] : (uint16_t*)&g_vram[0];
     int prio = ((control & 3) << 25) + 0x1000000;
     int sizeX = 160;
     int sizeY = 128;
@@ -647,8 +647,8 @@ static inline void gfxDrawSprites(uint32_t* lineOBJ)
     int m = 0;
     gfxClearArray(lineOBJ);
     if (coreOptions.layerEnable & 0x1000) {
-        uint16_t* sprites = (uint16_t*)oam;
-        uint16_t* spritePalette = &((uint16_t*)paletteRAM)[256];
+        uint16_t* sprites = (uint16_t*)g_oam;
+        uint16_t* spritePalette = &((uint16_t*)g_paletteRAM)[256];
         int mosaicY = ((MOSAIC & 0xF000) >> 12) + 1;
         int mosaicX = ((MOSAIC & 0xF00) >> 8) + 1;
         for (int x = 0; x < 128; x++) {
@@ -744,7 +744,7 @@ static inline void gfxDrawSprites(uint32_t* lineOBJ)
                             lineOBJpix -= 8;
                             // int t2 = t - (fieldY >> 1);
                             int rot = (a1 >> 9) & 0x1F;
-                            uint16_t* OAM = (uint16_t*)oam;
+                            uint16_t* OAM = (uint16_t*)g_oam;
                             int dx = READ16LE(&OAM[3 + (rot << 4)]);
                             if (dx & 0x8000)
                                 dx |= 0xFFFF8000;
@@ -776,8 +776,8 @@ static inline void gfxDrawSprites(uint32_t* lineOBJ)
                                     inc = sizeX >> 2;
                                 else
                                     c &= 0x3FE;
-                                for (int x = 0; x < fieldX; x++) {
-                                    if (x >= startpix)
+                                for (int y = 0; y < fieldX; y++) {
+                                    if (y >= startpix)
                                         lineOBJpix -= 2;
                                     if (lineOBJpix < 0)
                                         continue;
@@ -787,7 +787,7 @@ static inline void gfxDrawSprites(uint32_t* lineOBJ)
                                     if (xxx < 0 || xxx >= sizeX || yyy < 0 || yyy >= sizeY || sx >= 240)
                                         ;
                                     else {
-                                        uint32_t color = vram
+                                        uint32_t color = g_vram
                                             [0x10000 + ((((c + (yyy >> 3) * inc)
                                                              << 5)
                                                             + ((yyy & 7)
@@ -845,8 +845,8 @@ static inline void gfxDrawSprites(uint32_t* lineOBJ)
                                 if (DISPCNT & 0x40)
                                     inc = sizeX >> 3;
                                 int palette = (a2 >> 8) & 0xF0;
-                                for (int x = 0; x < fieldX; x++) {
-                                    if (x >= startpix)
+                                for (int y = 0; y < fieldX; y++) {
+                                    if (y >= startpix)
                                         lineOBJpix -= 2;
                                     if (lineOBJpix < 0)
                                         continue;
@@ -855,7 +855,7 @@ static inline void gfxDrawSprites(uint32_t* lineOBJ)
                                     if (xxx < 0 || xxx >= sizeX || yyy < 0 || yyy >= sizeY || sx >= 240)
                                         ;
                                     else {
-                                        uint32_t color = vram
+                                        uint32_t color = g_vram
                                             [0x10000 + ((((c + (yyy >> 3) * inc)
                                                              << 5)
                                                             + ((yyy & 7)
@@ -956,7 +956,7 @@ static inline void gfxDrawSprites(uint32_t* lineOBJ)
                                 if (lineOBJpix < 0)
                                     continue;
                                 if (sx < 240) {
-                                    uint8_t color = vram[address];
+                                    uint8_t color = g_vram[address];
                                     if ((color == 0) && (((prio >> 25) & 3) < ((lineOBJ[sx] >> 25) & 3))) {
                                         lineOBJ[sx] = (lineOBJ[sx] & 0xF9FFFFFF) | prio;
                                         if ((a0 & 0x1000) && m)
@@ -1040,7 +1040,7 @@ static inline void gfxDrawSprites(uint32_t* lineOBJ)
                                     if (lineOBJpix < 0)
                                         continue;
                                     if (sx < 240) {
-                                        uint8_t color = vram[address];
+                                        uint8_t color = g_vram[address];
                                         if (xx & 1) {
                                             color = (color >> 4);
                                         } else
@@ -1099,7 +1099,7 @@ static inline void gfxDrawSprites(uint32_t* lineOBJ)
                                     if (lineOBJpix < 0)
                                         continue;
                                     if (sx < 240) {
-                                        uint8_t color = vram[address];
+                                        uint8_t color = g_vram[address];
                                         if (xx & 1) {
                                             color = (color >> 4);
                                         } else
@@ -1164,8 +1164,8 @@ static inline void gfxDrawOBJWin(uint32_t* lineOBJWin)
 {
     gfxClearArray(lineOBJWin);
     if ((coreOptions.layerEnable & 0x9000) == 0x9000) {
-        uint16_t* sprites = (uint16_t*)oam;
-        // uint16_t *spritePalette = &((uint16_t *)paletteRAM)[256];
+        uint16_t* sprites = (uint16_t*)g_oam;
+        // uint16_t *spritePalette = &((uint16_t *)g_paletteRAM)[256];
         for (int x = 0; x < 128; x++) {
             int lineOBJpix = lineOBJpixleft[x];
             uint16_t a0 = READ16LE(sprites++);
@@ -1225,7 +1225,7 @@ static inline void gfxDrawOBJWin(uint32_t* lineOBJWin)
                         lineOBJpix -= 8;
                         // int t2 = t - (fieldY >> 1);
                         int rot = (a1 >> 9) & 0x1F;
-                        uint16_t* OAM = (uint16_t*)oam;
+                        uint16_t* OAM = (uint16_t*)g_oam;
                         int dx = READ16LE(&OAM[3 + (rot << 4)]);
                         if (dx & 0x8000)
                             dx |= 0xFFFF8000;
@@ -1254,8 +1254,8 @@ static inline void gfxDrawOBJWin(uint32_t* lineOBJWin)
                                 inc = sizeX >> 2;
                             else
                                 c &= 0x3FE;
-                            for (int x = 0; x < fieldX; x++) {
-                                if (x >= startpix)
+                            for (int y = 0; y < fieldX; y++) {
+                                if (y >= startpix)
                                     lineOBJpix -= 2;
                                 if (lineOBJpix < 0)
                                     continue;
@@ -1264,7 +1264,7 @@ static inline void gfxDrawOBJWin(uint32_t* lineOBJWin)
 
                                 if (xxx < 0 || xxx >= sizeX || yyy < 0 || yyy >= sizeY || sx >= 240) {
                                 } else {
-                                    uint32_t color = vram
+                                    uint32_t color = g_vram
                                         [0x10000 + ((((c + (yyy >> 3) * inc)
                                                          << 5)
                                                         + ((yyy & 7) << 3) + ((xxx >> 3) << 6) + (xxx & 7))
@@ -1286,8 +1286,8 @@ static inline void gfxDrawOBJWin(uint32_t* lineOBJWin)
                             if (DISPCNT & 0x40)
                                 inc = sizeX >> 3;
                             // int palette = (a2 >> 8) & 0xF0;
-                            for (int x = 0; x < fieldX; x++) {
-                                if (x >= startpix)
+                            for (int y = 0; y < fieldX; y++) {
+                                if (y >= startpix)
                                     lineOBJpix -= 2;
                                 if (lineOBJpix < 0)
                                     continue;
@@ -1298,12 +1298,12 @@ static inline void gfxDrawOBJWin(uint32_t* lineOBJWin)
                                 //              (sizeX-1) ||
                                 //                 t == 0 || t ==
                                 //                 (sizeY-1)) {
-                                //                lineOBJ[sx] =
+                                //                g_lineOBJ[sx] =
                                 //                0x001F | prio;
                                 //              } else {
                                 if (xxx < 0 || xxx >= sizeX || yyy < 0 || yyy >= sizeY || sx >= 240) {
                                 } else {
-                                    uint32_t color = vram
+                                    uint32_t color = g_vram
                                         [0x10000 + ((((c + (yyy >> 3) * inc)
                                                          << 5)
                                                         + ((yyy & 7) << 2) + ((xxx >> 3) << 5) + ((xxx & 7) >> 1))
@@ -1364,7 +1364,7 @@ static inline void gfxDrawOBJWin(uint32_t* lineOBJWin)
                                 if (lineOBJpix < 0)
                                     continue;
                                 if (sx < 240) {
-                                    uint8_t color = vram[address];
+                                    uint8_t color = g_vram[address];
                                     if (color) {
                                         lineOBJWin[sx] = 1;
                                     }
@@ -1418,7 +1418,7 @@ static inline void gfxDrawOBJWin(uint32_t* lineOBJWin)
                                     if (lineOBJpix < 0)
                                         continue;
                                     if (sx < 240) {
-                                        uint8_t color = vram[address];
+                                        uint8_t color = g_vram[address];
                                         if (xx & 1) {
                                             color = (color >> 4);
                                         } else
@@ -1448,7 +1448,7 @@ static inline void gfxDrawOBJWin(uint32_t* lineOBJWin)
                                     if (lineOBJpix < 0)
                                         continue;
                                     if (sx < 240) {
-                                        uint8_t color = vram[address];
+                                        uint8_t color = g_vram[address];
                                         if (xx & 1) {
                                             color = (color >> 4);
                                         } else

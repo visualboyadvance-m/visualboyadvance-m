@@ -2,18 +2,18 @@
 #include "GBAGfx.h"
 #include "../System.h"
 
-int coeff[32] = {
+int g_coeff[32] = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
     16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
 };
 
-uint32_t line0[240];
-uint32_t line1[240];
-uint32_t line2[240];
-uint32_t line3[240];
-uint32_t lineOBJ[240];
-uint32_t lineOBJWin[240];
-uint32_t lineMix[240];
+uint32_t g_line0[240];
+uint32_t g_line1[240];
+uint32_t g_line2[240];
+uint32_t g_line3[240];
+uint32_t g_lineOBJ[240];
+uint32_t g_lineOBJWin[240];
+uint32_t g_lineMix[240];
 bool gfxInWin0[240];
 bool gfxInWin1[240];
 int lineOBJpixleft[128];
@@ -177,9 +177,9 @@ template <TileReader readTile>
 static void gfxDrawTextScreen(uint16_t control, uint16_t hofs, uint16_t vofs,
     uint32_t* line)
 {
-    uint16_t* palette = (uint16_t*)paletteRAM;
-    uint8_t* charBase = &vram[((control >> 2) & 0x03) * 0x4000];
-    uint16_t* screenBase = (uint16_t*)&vram[((control >> 8) & 0x1f) * 0x800];
+    uint16_t* palette = (uint16_t*)g_paletteRAM;
+    uint8_t* charBase = &g_vram[((control >> 2) & 0x03) * 0x4000];
+    uint16_t* screenBase = (uint16_t*)&g_vram[((control >> 8) & 0x1f) * 0x800];
     uint32_t prio = ((control & 3) << 25) + 0x1000000;
     int sizeX = 256;
     int sizeY = 256;

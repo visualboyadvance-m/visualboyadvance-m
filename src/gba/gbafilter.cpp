@@ -30,7 +30,7 @@ inline void swap(short& a, short& b)
 void gbafilter_pal(uint16_t* buf, int count)
 {
     short temp[3 * 3], s;
-    unsigned pix;
+    uint16_t pix;
     uint8_t red, green, blue;
 
     while (count--) {

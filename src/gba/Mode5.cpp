@@ -6,13 +6,13 @@ void mode5RenderLine()
 {
     if (DISPCNT & 0x0080) {
         for (int x = 0; x < 240; x++) {
-            lineMix[x] = 0x7fff;
+            g_lineMix[x] = 0x7fff;
         }
         gfxLastVCOUNT = VCOUNT;
         return;
     }
 
-    uint16_t* palette = (uint16_t*)paletteRAM;
+    uint16_t* palette = (uint16_t*)g_paletteRAM;
 
     if (coreOptions.layerEnable & 0x0400) {
         int changed = gfxBG2Changed;
@@ -24,10 +24,10 @@ void mode5RenderLine()
             BG2Y_L, BG2Y_H, BG2PA, BG2PB,
             BG2PC, BG2PD,
             gfxBG2X, gfxBG2Y, changed,
-            line2);
+            g_line2);
     }
 
-    gfxDrawSprites(lineOBJ);
+    gfxDrawSprites(g_lineOBJ);
 
     uint32_t background;
     if (customBackdropColor == -1) {
@@ -40,13 +40,13 @@ void mode5RenderLine()
         uint32_t color = background;
         uint8_t top = 0x20;
 
-        if (line2[x] < color) {
-            color = line2[x];
+        if (g_line2[x] < color) {
+            color = g_line2[x];
             top = 0x04;
         }
 
-        if ((uint8_t)(lineOBJ[x] >> 24) < (uint8_t)(color >> 24)) {
-            color = lineOBJ[x];
+        if ((uint8_t)(g_lineOBJ[x] >> 24) < (uint8_t)(color >> 24)) {
+            color = g_lineOBJ[x];
             top = 0x10;
         }
 
@@ -55,30 +55,30 @@ void mode5RenderLine()
             uint32_t back = background;
             uint8_t top2 = 0x20;
 
-            if (line2[x] < back) {
-                back = line2[x];
+            if (g_line2[x] < back) {
+                back = g_line2[x];
                 top2 = 0x04;
             }
 
             if (top2 & (BLDMOD >> 8))
                 color = gfxAlphaBlend(color, back,
-                    coeff[COLEV & 0x1F],
-                    coeff[(COLEV >> 8) & 0x1F]);
+                    g_coeff[COLEV & 0x1F],
+                    g_coeff[(COLEV >> 8) & 0x1F]);
             else {
                 switch ((BLDMOD >> 6) & 3) {
                 case 2:
                     if (BLDMOD & top)
-                        color = gfxIncreaseBrightness(color, coeff[COLY & 0x1F]);
+                        color = gfxIncreaseBrightness(color, g_coeff[COLY & 0x1F]);
                     break;
                 case 3:
                     if (BLDMOD & top)
-                        color = gfxDecreaseBrightness(color, coeff[COLY & 0x1F]);
+                        color = gfxDecreaseBrightness(color, g_coeff[COLY & 0x1F]);
                     break;
                 }
             }
         }
 
-        lineMix[x] = color;
+        g_lineMix[x] = color;
     }
     gfxBG2Changed = 0;
     gfxLastVCOUNT = VCOUNT;
@@ -88,13 +88,13 @@ void mode5RenderLineNoWindow()
 {
     if (DISPCNT & 0x0080) {
         for (int x = 0; x < 240; x++) {
-            lineMix[x] = 0x7fff;
+            g_lineMix[x] = 0x7fff;
         }
         gfxLastVCOUNT = VCOUNT;
         return;
     }
 
-    uint16_t* palette = (uint16_t*)paletteRAM;
+    uint16_t* palette = (uint16_t*)g_paletteRAM;
 
     if (coreOptions.layerEnable & 0x0400) {
         int changed = gfxBG2Changed;
@@ -106,10 +106,10 @@ void mode5RenderLineNoWindow()
             BG2Y_L, BG2Y_H, BG2PA, BG2PB,
             BG2PC, BG2PD,
             gfxBG2X, gfxBG2Y, changed,
-            line2);
+            g_line2);
     }
 
-    gfxDrawSprites(lineOBJ);
+    gfxDrawSprites(g_lineOBJ);
 
     uint32_t background;
     if (customBackdropColor == -1) {
@@ -122,13 +122,13 @@ void mode5RenderLineNoWindow()
         uint32_t color = background;
         uint8_t top = 0x20;
 
-        if (line2[x] < color) {
-            color = line2[x];
+        if (g_line2[x] < color) {
+            color = g_line2[x];
             top = 0x04;
         }
 
-        if ((uint8_t)(lineOBJ[x] >> 24) < (uint8_t)(color >> 24)) {
-            color = lineOBJ[x];
+        if ((uint8_t)(g_lineOBJ[x] >> 24) < (uint8_t)(color >> 24)) {
+            color = g_lineOBJ[x];
             top = 0x10;
         }
 
@@ -141,33 +141,33 @@ void mode5RenderLineNoWindow()
                     uint32_t back = background;
                     uint8_t top2 = 0x20;
 
-                    if (line2[x] < back) {
+                    if (g_line2[x] < back) {
                         if (top != 0x04) {
-                            back = line2[x];
+                            back = g_line2[x];
                             top2 = 0x04;
                         }
                     }
 
-                    if ((uint8_t)(lineOBJ[x] >> 24) < (uint8_t)(back >> 24)) {
+                    if ((uint8_t)(g_lineOBJ[x] >> 24) < (uint8_t)(back >> 24)) {
                         if (top != 0x10) {
-                            back = lineOBJ[x];
+                            back = g_lineOBJ[x];
                             top2 = 0x10;
                         }
                     }
 
                     if (top2 & (BLDMOD >> 8))
                         color = gfxAlphaBlend(color, back,
-                            coeff[COLEV & 0x1F],
-                            coeff[(COLEV >> 8) & 0x1F]);
+                            g_coeff[COLEV & 0x1F],
+                            g_coeff[(COLEV >> 8) & 0x1F]);
                 }
             } break;
             case 2:
                 if (BLDMOD & top)
-                    color = gfxIncreaseBrightness(color, coeff[COLY & 0x1F]);
+                    color = gfxIncreaseBrightness(color, g_coeff[COLY & 0x1F]);
                 break;
             case 3:
                 if (BLDMOD & top)
-                    color = gfxDecreaseBrightness(color, coeff[COLY & 0x1F]);
+                    color = gfxDecreaseBrightness(color, g_coeff[COLY & 0x1F]);
                 break;
             }
         } else {
@@ -175,30 +175,30 @@ void mode5RenderLineNoWindow()
             uint32_t back = background;
             uint8_t top2 = 0x20;
 
-            if (line2[x] < back) {
-                back = line2[x];
+            if (g_line2[x] < back) {
+                back = g_line2[x];
                 top2 = 0x04;
             }
 
             if (top2 & (BLDMOD >> 8))
                 color = gfxAlphaBlend(color, back,
-                    coeff[COLEV & 0x1F],
-                    coeff[(COLEV >> 8) & 0x1F]);
+                    g_coeff[COLEV & 0x1F],
+                    g_coeff[(COLEV >> 8) & 0x1F]);
             else {
                 switch ((BLDMOD >> 6) & 3) {
                 case 2:
                     if (BLDMOD & top)
-                        color = gfxIncreaseBrightness(color, coeff[COLY & 0x1F]);
+                        color = gfxIncreaseBrightness(color, g_coeff[COLY & 0x1F]);
                     break;
                 case 3:
                     if (BLDMOD & top)
-                        color = gfxDecreaseBrightness(color, coeff[COLY & 0x1F]);
+                        color = gfxDecreaseBrightness(color, g_coeff[COLY & 0x1F]);
                     break;
                 }
             }
         }
 
-        lineMix[x] = color;
+        g_lineMix[x] = color;
     }
     gfxBG2Changed = 0;
     gfxLastVCOUNT = VCOUNT;
@@ -208,13 +208,13 @@ void mode5RenderLineAll()
 {
     if (DISPCNT & 0x0080) {
         for (int x = 0; x < 240; x++) {
-            lineMix[x] = 0x7fff;
+            g_lineMix[x] = 0x7fff;
         }
         gfxLastVCOUNT = VCOUNT;
         return;
     }
 
-    uint16_t* palette = (uint16_t*)paletteRAM;
+    uint16_t* palette = (uint16_t*)g_paletteRAM;
 
     if (coreOptions.layerEnable & 0x0400) {
         int changed = gfxBG2Changed;
@@ -226,11 +226,11 @@ void mode5RenderLineAll()
             BG2Y_L, BG2Y_H, BG2PA, BG2PB,
             BG2PC, BG2PD,
             gfxBG2X, gfxBG2Y, changed,
-            line2);
+            g_line2);
     }
 
-    gfxDrawSprites(lineOBJ);
-    gfxDrawOBJWin(lineOBJWin);
+    gfxDrawSprites(g_lineOBJ);
+    gfxDrawOBJWin(g_lineOBJWin);
 
     bool inWindow0 = false;
     bool inWindow1 = false;
@@ -270,7 +270,7 @@ void mode5RenderLineAll()
         uint8_t top = 0x20;
         uint8_t mask = outMask;
 
-        if (!(lineOBJWin[x] & 0x80000000)) {
+        if (!(g_lineOBJWin[x] & 0x80000000)) {
             mask = WINOUT >> 8;
         }
 
@@ -285,13 +285,13 @@ void mode5RenderLineAll()
             }
         }
 
-        if ((mask & 4) && (line2[x] < color)) {
-            color = line2[x];
+        if ((mask & 4) && (g_line2[x] < color)) {
+            color = g_line2[x];
             top = 0x04;
         }
 
-        if ((mask & 16) && ((uint8_t)(lineOBJ[x] >> 24) < (uint8_t)(color >> 24))) {
-            color = lineOBJ[x];
+        if ((mask & 16) && ((uint8_t)(g_lineOBJ[x] >> 24) < (uint8_t)(color >> 24))) {
+            color = g_lineOBJ[x];
             top = 0x10;
         }
 
@@ -300,24 +300,24 @@ void mode5RenderLineAll()
             uint32_t back = background;
             uint8_t top2 = 0x20;
 
-            if ((mask & 4) && line2[x] < back) {
-                back = line2[x];
+            if ((mask & 4) && g_line2[x] < back) {
+                back = g_line2[x];
                 top2 = 0x04;
             }
 
             if (top2 & (BLDMOD >> 8))
                 color = gfxAlphaBlend(color, back,
-                    coeff[COLEV & 0x1F],
-                    coeff[(COLEV >> 8) & 0x1F]);
+                    g_coeff[COLEV & 0x1F],
+                    g_coeff[(COLEV >> 8) & 0x1F]);
             else {
                 switch ((BLDMOD >> 6) & 3) {
                 case 2:
                     if (BLDMOD & top)
-                        color = gfxIncreaseBrightness(color, coeff[COLY & 0x1F]);
+                        color = gfxIncreaseBrightness(color, g_coeff[COLY & 0x1F]);
                     break;
                 case 3:
                     if (BLDMOD & top)
-                        color = gfxDecreaseBrightness(color, coeff[COLY & 0x1F]);
+                        color = gfxDecreaseBrightness(color, g_coeff[COLY & 0x1F]);
                     break;
                 }
             }
@@ -330,38 +330,38 @@ void mode5RenderLineAll()
                     uint32_t back = background;
                     uint8_t top2 = 0x20;
 
-                    if ((mask & 4) && line2[x] < back) {
+                    if ((mask & 4) && g_line2[x] < back) {
                         if (top != 0x04) {
-                            back = line2[x];
+                            back = g_line2[x];
                             top2 = 0x04;
                         }
                     }
 
-                    if ((mask & 16) && (uint8_t)(lineOBJ[x] >> 24) < (uint8_t)(back >> 24)) {
+                    if ((mask & 16) && (uint8_t)(g_lineOBJ[x] >> 24) < (uint8_t)(back >> 24)) {
                         if (top != 0x10) {
-                            back = lineOBJ[x];
+                            back = g_lineOBJ[x];
                             top2 = 0x10;
                         }
                     }
 
                     if (top2 & (BLDMOD >> 8))
                         color = gfxAlphaBlend(color, back,
-                            coeff[COLEV & 0x1F],
-                            coeff[(COLEV >> 8) & 0x1F]);
+                            g_coeff[COLEV & 0x1F],
+                            g_coeff[(COLEV >> 8) & 0x1F]);
                 }
             } break;
             case 2:
                 if (BLDMOD & top)
-                    color = gfxIncreaseBrightness(color, coeff[COLY & 0x1F]);
+                    color = gfxIncreaseBrightness(color, g_coeff[COLY & 0x1F]);
                 break;
             case 3:
                 if (BLDMOD & top)
-                    color = gfxDecreaseBrightness(color, coeff[COLY & 0x1F]);
+                    color = gfxDecreaseBrightness(color, g_coeff[COLY & 0x1F]);
                 break;
             }
         }
 
-        lineMix[x] = color;
+        g_lineMix[x] = color;
     }
     gfxBG2Changed = 0;
     gfxLastVCOUNT = VCOUNT;

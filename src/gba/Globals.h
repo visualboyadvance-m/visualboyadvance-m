@@ -30,15 +30,15 @@ extern bool gba_joybus_enabled;
 extern bool gba_joybus_active;
 extern int customBackdropColor;
 
-extern uint8_t* bios;
-extern uint8_t* rom;
-extern uint8_t* internalRAM;
-extern uint8_t* workRAM;
-extern uint8_t* paletteRAM;
-extern uint8_t* vram;
-extern uint8_t* pix;
-extern uint8_t* oam;
-extern uint8_t* ioMem;
+extern uint8_t* g_bios;
+extern uint8_t* g_rom;
+extern uint8_t* g_internalRAM;
+extern uint8_t* g_workRAM;
+extern uint8_t* g_paletteRAM;
+extern uint8_t* g_vram;
+extern uint8_t* g_pix;
+extern uint8_t* g_oam;
+extern uint8_t* g_ioMem;
 
 extern uint16_t DISPCNT;
 extern uint16_t DISPSTAT;

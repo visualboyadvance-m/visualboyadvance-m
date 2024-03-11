@@ -1,6 +1,12 @@
 #ifndef GBSOUND_H
 #define GBSOUND_H
 
+#include <cstdint>
+
+#if !defined(__LIBRETRO__)
+#include <zlib.h>
+#endif
+
 // GB sound emulation
 
 // See Sound.h for sound setup/options
@@ -56,7 +62,7 @@ extern gb_effects_config_t gb_effects_config; // current configuration
 void gbSoundReset();
 
 // Emulates write to sound hardware
-void gbSoundEvent(int st, uint16_t address, int data);
+void gbSoundEvent(int st, uint16_t address, uint8_t data);
 #define SOUND_EVENT gbSoundEvent
 
 // Emulates read from sound hardware

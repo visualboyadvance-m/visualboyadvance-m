@@ -4,6 +4,9 @@
 #ifndef GB_APU_H
 #define GB_APU_H
 
+#include <cstdint>
+
+#include "blargg_common.h"
 #include "Gb_Oscs.h"
 
 struct gb_apu_state_t;
@@ -42,10 +45,10 @@ class Gb_Apu
         // current time frame.
 
         // Emulates CPU write of data to addr at specified time.
-        void write_register(blip_time_t time, unsigned addr, int data);
+        void write_register(blip_time_t time, unsigned addr, uint8_t data);
 
         // Emulates CPU read from addr at specified time.
-        int read_register(blip_time_t time, unsigned addr);
+        uint8_t read_register(blip_time_t time, unsigned addr);
 
         // Emulates sound hardware up to specified time, ends current time frame, then
         // starts a new frame at time 0.
@@ -126,7 +129,7 @@ class Gb_Apu
         blip_time_t frame_time; // time of next frame sequencer action
         int frame_phase;        // phase of next frame sequencer step
         enum { regs_size = register_count + 0x10 };
-        BOOST::uint8_t regs[regs_size]; // last values written to registers
+        uint8_t regs[regs_size]; // last values written to registers
 
         // large objects after everything else
         Gb_Osc::Good_Synth good_synth;

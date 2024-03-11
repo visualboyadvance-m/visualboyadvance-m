@@ -178,7 +178,7 @@ void utilReadScreenPixels(uint8_t *dest, int w, int h)
         int sizeY = h;
         switch (systemColorDepth) {
         case 16: {
-                uint16_t *p = (uint16_t *)(pix + (w + 2) * 2); // skip first black line
+                uint16_t *p = (uint16_t *)(g_pix + (w + 2) * 2); // skip first black line
                 for (int y = 0; y < sizeY; y++) {
                         for (int x = 0; x < sizeX; x++) {
                                 uint16_t v = *p++;
@@ -192,7 +192,7 @@ void utilReadScreenPixels(uint8_t *dest, int w, int h)
                 }
         } break;
         case 24: {
-                uint8_t *pixU8 = (uint8_t *)pix;
+                uint8_t *pixU8 = (uint8_t *)g_pix;
                 for (int y = 0; y < sizeY; y++) {
                         for (int x = 0; x < sizeX; x++) {
                                 if (systemRedShift < systemBlueShift) {
@@ -200,9 +200,9 @@ void utilReadScreenPixels(uint8_t *dest, int w, int h)
                                         *b++ = *pixU8++; // G
                                         *b++ = *pixU8++; // B
                                 } else {
-                                        int blue = *pixU8++;
-                                        int green = *pixU8++;
-                                        int red = *pixU8++;
+                                        uint8_t blue = *pixU8++;
+                                        uint8_t green = *pixU8++;
+                                        uint8_t red = *pixU8++;
 
                                         *b++ = red;
                                         *b++ = green;
@@ -212,7 +212,7 @@ void utilReadScreenPixels(uint8_t *dest, int w, int h)
                 }
         } break;
         case 32: {
-                uint32_t *pixU32 = (uint32_t *)(pix + 4 * (w + 1));
+                uint32_t *pixU32 = (uint32_t *)(g_pix + 4 * (w + 1));
                 for (int y = 0; y < sizeY; y++) {
                         for (int x = 0; x < sizeX; x++) {
                                 uint32_t v = *pixU32++;
@@ -262,9 +262,9 @@ bool utilWritePNGFile(const char *fileName, int w, int h, uint8_t *pix)
                                             *b++ = *pixU8++; // G
                                             *b++ = *pixU8++; // B
                                     } else {
-                                            int blue = *pixU8++;
-                                            int green = *pixU8++;
-                                            int red = *pixU8++;
+                                            uint8_t blue = *pixU8++;
+                                            uint8_t green = *pixU8++;
+                                            uint8_t red = *pixU8++;
 
                                             *b++ = red;
                                             *b++ = green;
@@ -387,9 +387,9 @@ bool utilWriteBMPFile(const char *fileName, int w, int h, uint8_t *pix)
                                         *b++ = *pixU8++; // G
                                         *b++ = *pixU8++; // R
                                 } else {
-                                        int red = *pixU8++;
-                                        int green = *pixU8++;
-                                        int blue = *pixU8++;
+                                        uint8_t red = *pixU8++;
+                                        uint8_t green = *pixU8++;
+                                        uint8_t blue = *pixU8++;
 
                                         *b++ = blue;
                                         *b++ = green;
@@ -518,7 +518,7 @@ static fex_t *scan_arc(const char *file, bool (*accept)(const char *), char (&bu
                         break;
                 }
 
-                fex_err_t err = fex_next(fe);
+                err = fex_next(fe);
                 if (err) {
                         systemMessage(MSG_BAD_ZIP_FILE,
                                       N_("Cannot read archive %s: %s"),
@@ -816,8 +816,8 @@ long utilGzMemTell(gzFile file)
 
 void utilGBAFindSave(const int size)
 {
-        uint32_t *p = (uint32_t *)&rom[0];
-        uint32_t *end = (uint32_t *)(&rom[0] + size);
+        uint32_t *p = (uint32_t *)&g_rom[0];
+        uint32_t *end = (uint32_t *)(&g_rom[0] + size);
         int detectedSaveType = 0;
         int flashSize = 0x10000;
         bool rtcFound = false;

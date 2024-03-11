@@ -4,8 +4,9 @@
 #ifndef GB_OSCS_H
 #define GB_OSCS_H
 
+#include <cstdint>
+
 #include "Blip_Buffer.h"
-#include "blargg_common.h"
 
 #ifndef GB_APU_OVERCLOCK
 #define GB_APU_OVERCLOCK 1
@@ -33,7 +34,7 @@ class Gb_Osc
 
         Blip_Buffer *outputs[4]; // NULL, right, left, center
         Blip_Buffer *output;     // where to output sound
-        BOOST::uint8_t *regs;    // osc's 5 registers
+        uint8_t *regs;           // osc's 5 registers
         int mode;                // mode_dmg, mode_cgb, mode_agb
         int dac_off_amp;         // amplitude when DAC is off
         int last_amp;            // current amplitude in Blip_Buffer
@@ -173,8 +174,8 @@ class Gb_Wave : public Gb_Osc
         void run(blip_time_t, blip_time_t);
 
         // Reads/writes wave RAM
-        int read(unsigned addr) const;
-        void write(unsigned addr, int data);
+        uint8_t read(unsigned addr) const;
+        void write(unsigned addr, uint8_t data);
 
         void reset()
         {
@@ -187,7 +188,7 @@ class Gb_Wave : public Gb_Osc
         enum { bank_size = 32 };
 
         int agb_mask;             // 0xFF if AGB features enabled, 0 otherwise
-        BOOST::uint8_t *wave_ram; // 32 bytes (64 nybbles), stored in APU
+        uint8_t *wave_ram; // 32 bytes (64 nybbles), stored in APU
 
         friend class Gb_Apu;
 
@@ -205,7 +206,7 @@ class Gb_Wave : public Gb_Osc
 
         void corrupt_wave();
 
-        BOOST::uint8_t *wave_bank() const
+        uint8_t *wave_bank() const
         {
                 return &wave_ram[(~regs[0] & bank40_mask) >> 2 & agb_mask];
         }
@@ -214,13 +215,13 @@ class Gb_Wave : public Gb_Osc
         int access(unsigned addr) const;
 };
 
-inline int Gb_Wave::read(unsigned addr) const
+inline uint8_t Gb_Wave::read(unsigned addr) const
 {
         int index = access(addr);
         return (index < 0 ? 0xFF : wave_bank()[index]);
 }
 
-inline void Gb_Wave::write(unsigned addr, int data)
+inline void Gb_Wave::write(unsigned addr, uint8_t data)
 {
         int index = access(addr);
         if (index >= 0)

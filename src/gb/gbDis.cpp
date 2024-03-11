@@ -135,7 +135,7 @@ static char* addStr(char* p, const char* s)
 int gbDis(char* buffer, uint16_t address)
 {
     char* p = buffer;
-    int instr = 1;
+    uint16_t instr = 1;
     uint16_t addr = address;
     sprintf(p, "%04x        ", address);
     p += 12;
@@ -220,7 +220,7 @@ int gbDis(char* buffer, uint16_t address)
         } else
             *p++ = *mnen++;
     }
-    for (int i = 0; i < instr; i++) {
+    for (uint16_t i = 0; i < instr; i++) {
         uint16_t a = addr + i;
         addHex(buffer + 5 + i * 2, GB_READ(a));
     }

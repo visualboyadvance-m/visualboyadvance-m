@@ -761,22 +761,22 @@ unsigned int SearchResults;
 
 unsigned int AddressToGBA(uint8_t* mem)
 {
-    if (mem >= &bios[0] && mem <= &bios[0x3fff])
-        return 0x00000000 + (mem - &bios[0]);
-    else if (mem >= &workRAM[0] && mem <= &workRAM[0x3ffff])
-        return 0x02000000 + (mem - &workRAM[0]);
-    else if (mem >= &internalRAM[0] && mem <= &internalRAM[0x7fff])
-        return 0x03000000 + (mem - &internalRAM[0]);
-    else if (mem >= &ioMem[0] && mem <= &ioMem[0x3ff])
-        return 0x04000000 + (mem - &ioMem[0]);
-    else if (mem >= &paletteRAM[0] && mem <= &paletteRAM[0x3ff])
-        return 0x05000000 + (mem - &paletteRAM[0]);
-    else if (mem >= &vram[0] && mem <= &vram[0x1ffff])
-        return 0x06000000 + (mem - &vram[0]);
-    else if (mem >= &oam[0] && mem <= &oam[0x3ff])
-        return 0x07000000 + (mem - &oam[0]);
-    else if (mem >= &rom[0] && mem <= &rom[0x1ffffff])
-        return 0x08000000 + (mem - &rom[0]);
+    if (mem >= &g_bios[0] && mem <= &g_bios[0x3fff])
+        return 0x00000000 + (mem - &g_bios[0]);
+    else if (mem >= &g_workRAM[0] && mem <= &g_workRAM[0x3ffff])
+        return 0x02000000 + (mem - &g_workRAM[0]);
+    else if (mem >= &g_internalRAM[0] && mem <= &g_internalRAM[0x7fff])
+        return 0x03000000 + (mem - &g_internalRAM[0]);
+    else if (mem >= &g_ioMem[0] && mem <= &g_ioMem[0x3ff])
+        return 0x04000000 + (mem - &g_ioMem[0]);
+    else if (mem >= &g_paletteRAM[0] && mem <= &g_paletteRAM[0x3ff])
+        return 0x05000000 + (mem - &g_paletteRAM[0]);
+    else if (mem >= &g_vram[0] && mem <= &g_vram[0x1ffff])
+        return 0x06000000 + (mem - &g_vram[0]);
+    else if (mem >= &g_oam[0] && mem <= &g_oam[0x3ff])
+        return 0x07000000 + (mem - &g_oam[0]);
+    else if (mem >= &g_rom[0] && mem <= &g_rom[0x1ffffff])
+        return 0x08000000 + (mem - &g_rom[0]);
     else
         return 0xFFFFFFFF;
 };
@@ -796,8 +796,8 @@ void debuggerDoSearch()
                 SearchStart = 0x02000000;
                 continue;
             } else {
-                start = bios + (SearchStart & 0x3FFF);
-                end = bios + 0x3FFF;
+                start = g_bios + (SearchStart & 0x3FFF);
+                end = g_bios + 0x3FFF;
                 break;
             };
         case 2:
@@ -805,8 +805,8 @@ void debuggerDoSearch()
                 SearchStart = 0x03000000;
                 continue;
             } else {
-                start = workRAM + (SearchStart & 0x3FFFF);
-                end = workRAM + 0x3FFFF;
+                start = g_workRAM + (SearchStart & 0x3FFFF);
+                end = g_workRAM + 0x3FFFF;
                 break;
             };
         case 3:
@@ -814,8 +814,8 @@ void debuggerDoSearch()
                 SearchStart = 0x04000000;
                 continue;
             } else {
-                start = internalRAM + (SearchStart & 0x7FFF);
-                end = internalRAM + 0x7FFF;
+                start = g_internalRAM + (SearchStart & 0x7FFF);
+                end = g_internalRAM + 0x7FFF;
                 break;
             };
         case 4:
@@ -823,8 +823,8 @@ void debuggerDoSearch()
                 SearchStart = 0x05000000;
                 continue;
             } else {
-                start = ioMem + (SearchStart & 0x3FF);
-                end = ioMem + 0x3FF;
+                start = g_ioMem + (SearchStart & 0x3FF);
+                end = g_ioMem + 0x3FF;
                 break;
             };
         case 5:
@@ -832,8 +832,8 @@ void debuggerDoSearch()
                 SearchStart = 0x06000000;
                 continue;
             } else {
-                start = paletteRAM + (SearchStart & 0x3FF);
-                end = paletteRAM + 0x3FF;
+                start = g_paletteRAM + (SearchStart & 0x3FF);
+                end = g_paletteRAM + 0x3FF;
                 break;
             };
         case 6:
@@ -841,8 +841,8 @@ void debuggerDoSearch()
                 SearchStart = 0x07000000;
                 continue;
             } else {
-                start = vram + (SearchStart & 0x1FFFF);
-                end = vram + 0x1FFFF;
+                start = g_vram + (SearchStart & 0x1FFFF);
+                end = g_vram + 0x1FFFF;
                 break;
             };
         case 7:
@@ -850,8 +850,8 @@ void debuggerDoSearch()
                 SearchStart = 0x08000000;
                 continue;
             } else {
-                start = oam + (SearchStart & 0x3FF);
-                end = oam + 0x3FF;
+                start = g_oam + (SearchStart & 0x3FF);
+                end = g_oam + 0x3FF;
                 break;
             };
         case 8:
@@ -861,8 +861,8 @@ void debuggerDoSearch()
         case 12:
         case 13:
             if (final <= 0x09FFFFFF) {
-                start = rom + (SearchStart & 0x01FFFFFF);
-                end = rom + 0x01FFFFFF;
+                start = g_rom + (SearchStart & 0x01FFFFFF);
+                end = g_rom + 0x01FFFFFF;
                 break;
             };
         default: {

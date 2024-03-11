@@ -1,4 +1,7 @@
 #include "gbMemory.h"
+
+#include <cstdint>
+
 #include "../System.h"
 #include "../common/Port.h"
 #include "../common/sizes.h"
@@ -446,19 +449,19 @@ uint8_t mapperMBC3ReadRAM(uint16_t address)
         } else if (g_gbCartData.has_rtc()) {
             switch (gbDataMBC3.mapperClockRegister) {
             case 0x08:
-                return gbDataMBC3.mapperLSeconds;
+                return (uint8_t)(gbDataMBC3.mapperLSeconds);
                 break;
             case 0x09:
-                return gbDataMBC3.mapperLMinutes;
+                return (uint8_t)(gbDataMBC3.mapperLMinutes);
                 break;
             case 0x0a:
-                return gbDataMBC3.mapperLHours;
+                return (uint8_t)(gbDataMBC3.mapperLHours);
                 break;
             case 0x0b:
-                return gbDataMBC3.mapperLDays;
+                return (uint8_t)(gbDataMBC3.mapperLDays);
                 break;
             case 0x0c:
-                return gbDataMBC3.mapperLControl;
+                return (uint8_t)(gbDataMBC3.mapperLControl);
             }
         }
     }
@@ -1024,7 +1027,7 @@ uint8_t mapperHuC3ReadRAM(uint16_t address)
     if (gbDataHuC3.mapperRAMFlag > 0x0b && gbDataHuC3.mapperRAMFlag < 0x0e) {
         if (gbDataHuC3.mapperRAMFlag != 0x0c)
             return 1;
-        return gbDataHuC3.mapperRAMValue;
+        return (uint8_t)(gbDataHuC3.mapperRAMValue);
     } else
         return gbMemoryMap[address >> 12][address & 0x0fff];
 }
@@ -1327,17 +1330,17 @@ void mapperTAMA5RAM(uint16_t address, uint8_t value)
                         gbDataTAMA5.mapperLYears = gbDataTAMA5.mapperYears;
                         gbDataTAMA5.mapperLControl = gbDataTAMA5.mapperControl;
 
-                        int seconds = (gbDataTAMA5.mapperLSeconds / 10) * 16 + gbDataTAMA5.mapperLSeconds % 10;
-                        int secondsL = (gbDataTAMA5.mapperLSeconds % 10);
-                        int secondsH = (gbDataTAMA5.mapperLSeconds / 10);
-                        int minutes = (gbDataTAMA5.mapperLMinutes / 10) * 16 + gbDataTAMA5.mapperLMinutes % 10;
-                        int hours = (gbDataTAMA5.mapperLHours / 10) * 16 + gbDataTAMA5.mapperLHours % 10;
-                        int DaysL = gbDataTAMA5.mapperLDays % 10;
-                        int DaysH = gbDataTAMA5.mapperLDays / 10;
-                        int MonthsL = gbDataTAMA5.mapperLMonths % 10;
-                        int MonthsH = gbDataTAMA5.mapperLMonths / 10;
-                        int Years3 = (gbDataTAMA5.mapperLYears / 100) % 10;
-                        int Years4 = (gbDataTAMA5.mapperLYears / 1000);
+                        uint8_t seconds = (gbDataTAMA5.mapperLSeconds / 10) * 16 + gbDataTAMA5.mapperLSeconds % 10;
+                        uint8_t secondsL = (gbDataTAMA5.mapperLSeconds % 10);
+                        uint8_t secondsH = (gbDataTAMA5.mapperLSeconds / 10);
+                        uint8_t minutes = (gbDataTAMA5.mapperLMinutes / 10) * 16 + gbDataTAMA5.mapperLMinutes % 10;
+                        uint8_t hours = (gbDataTAMA5.mapperLHours / 10) * 16 + gbDataTAMA5.mapperLHours % 10;
+                        uint8_t DaysL = gbDataTAMA5.mapperLDays % 10;
+                        uint8_t DaysH = gbDataTAMA5.mapperLDays / 10;
+                        uint8_t MonthsL = gbDataTAMA5.mapperLMonths % 10;
+                        uint8_t MonthsH = gbDataTAMA5.mapperLMonths / 10;
+                        uint8_t Years3 = (gbDataTAMA5.mapperLYears / 100) % 10;
+                        uint8_t Years4 = (gbDataTAMA5.mapperLYears / 1000);
 
                         switch (data & 0x0f) {
                         // I guess cases 0 and 1 are used for secondsL and secondsH

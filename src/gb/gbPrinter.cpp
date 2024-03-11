@@ -9,7 +9,7 @@ uint8_t gbPrinterPacket[0x400];
 int gbPrinterCount = 0;
 int gbPrinterDataCount = 0;
 int gbPrinterDataSize = 0;
-int gbPrinterResult = 0;
+uint8_t gbPrinterResult = 0;
 
 bool gbPrinterCheckCRC()
 {

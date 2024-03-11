@@ -48,11 +48,11 @@ public:
         getlab(prio, "Priority", "3");
         getlab(mosaic, "Mosaic", "0");
         getlab(overflow, "Overflow", "0");
-        getlab(coords, "Coords", "(1023,1023)");
-        getlab(addr, "Address", "0xWWWWWWWW");
-        getlab(tile, "Tile", "1023");
-        getlab(flip, "Flip", "HV");
-        getlab(palette, "Palette", "---");
+        getlab(coords_, "Coords", "(1023,1023)");
+        getlab(addr_, "Address", "0xWWWWWWWW");
+        getlab(tile_, "Tile", "1023");
+        getlab(flip_, "Flip", "HV");
+        getlab(palette_, "Palette", "---");
         Fit();
         selx = sely = -1;
         Update();
@@ -218,37 +218,37 @@ public:
             selx = sely = -1;
 
         if (selx < 0) {
-            coords->SetLabel(wxEmptyString);
-            addr->SetLabel(wxEmptyString);
-            tile->SetLabel(wxEmptyString);
-            flip->SetLabel(wxEmptyString);
-            palette->SetLabel(wxEmptyString);
+            coords_->SetLabel(wxEmptyString);
+            addr_->SetLabel(wxEmptyString);
+            tile_->SetLabel(wxEmptyString);
+            flip_->SetLabel(wxEmptyString);
+            palette_->SetLabel(wxEmptyString);
         } else {
             wxString s;
             s.Printf(wxT("(%d,%d)"), selx, sely);
-            coords->SetLabel(s);
+            coords_->SetLabel(s);
             uint32_t address = AddressFromSel();
             s.Printf(wxT("0x%08X"), address);
-            addr->SetLabel(s);
+            addr_->SetLabel(s);
 
             if ((!mode || (mode < 3 || mode > 5)) && bg < 2) {
-                uint16_t value = *((uint16_t*)&vram[address - 0x6000000]);
+                uint16_t value = *((uint16_t*)&g_vram[address - 0x6000000]);
                 s.Printf(wxT("%d"), value & 1023);
-                tile->SetLabel(s);
+                tile_->SetLabel(s);
                 s = value & 1024 ? wxT('H') : wxT('-');
                 s += value & 2048 ? wxT('V') : wxT('-');
-                flip->SetLabel(s);
+                flip_->SetLabel(s);
 
                 if (control & 0x80)
-                    palette->SetLabel(wxT("---"));
+                    palette_->SetLabel(wxT("---"));
                 else {
                     s.Printf(wxT("%d"), (value >> 12) & 15);
-                    palette->SetLabel(s);
+                    palette_->SetLabel(s);
                 }
             } else {
-                tile->SetLabel(wxT("---"));
-                flip->SetLabel(wxT("--"));
-                palette->SetLabel(wxT("---"));
+                tile_->SetLabel(wxT("---"));
+                flip_->SetLabel(wxT("--"));
+                palette_->SetLabel(wxT("---"));
             }
         }
     }
@@ -259,7 +259,7 @@ protected:
     wxRadioButton *fr0, *fr1, *bg0, *bg1, *bg2, *bg3;
     wxControl *modelab, *mapbase, *charbase, *size, *colors, *prio, *mosaic,
         *overflow;
-    wxControl *coords, *addr, *tile, *flip, *palette;
+    wxControl *coords_, *addr_, *tile_, *flip_, *palette_;
     int selx, sely;
 
     // following routines were copied from win32/MapView.cpp with little
@@ -269,9 +269,9 @@ protected:
 
     void renderTextScreen()
     {
-        uint16_t* palette = (uint16_t*)paletteRAM;
-        uint8_t* charBase = &vram[((control >> 2) & 0x03) * 0x4000];
-        uint16_t* screenBase = (uint16_t*)&vram[((control >> 8) & 0x1f) * 0x800];
+        uint16_t* palette = (uint16_t*)g_paletteRAM;
+        uint8_t* charBase = &g_vram[((control >> 2) & 0x03) * 0x4000];
+        uint16_t* screenBase = (uint16_t*)&g_vram[((control >> 8) & 0x1f) * 0x800];
         uint8_t* bmp = image.GetData();
         int sizeX = 256;
         int sizeY = 256;
@@ -440,9 +440,9 @@ protected:
 
     void renderRotScreen()
     {
-        uint16_t* palette = (uint16_t*)paletteRAM;
-        uint8_t* charBase = &vram[((control >> 2) & 0x03) * 0x4000];
-        uint8_t* screenBase = (uint8_t*)&vram[((control >> 8) & 0x1f) * 0x800];
+        uint16_t* palette = (uint16_t*)g_paletteRAM;
+        uint8_t* charBase = &g_vram[((control >> 2) & 0x03) * 0x4000];
+        uint8_t* screenBase = (uint8_t*)&g_vram[((control >> 8) & 0x1f) * 0x800];
         uint8_t* bmp = image.GetData();
         int sizeX = 128;
         int sizeY = 128;
@@ -502,7 +502,7 @@ protected:
     void renderMode3()
     {
         uint8_t* bmp = image.GetData();
-        uint16_t* src = (uint16_t*)&vram[0];
+        uint16_t* src = (uint16_t*)&g_vram[0];
         BMPSize(240, 160);
 
         for (int y = 0; y < 160; y++) {
@@ -520,8 +520,8 @@ protected:
     void renderMode4()
     {
         uint8_t* bmp = image.GetData();
-        uint8_t* src = frame ? &vram[0xa000] : &vram[0];
-        uint16_t* pal = (uint16_t*)&paletteRAM[0];
+        uint8_t* src = frame ? &g_vram[0xa000] : &g_vram[0];
+        uint16_t* pal = (uint16_t*)&g_paletteRAM[0];
         BMPSize(240, 160);
 
         for (int y = 0; y < 160; y++) {
@@ -540,7 +540,7 @@ protected:
     void renderMode5()
     {
         uint8_t* bmp = image.GetData();
-        uint16_t* src = (uint16_t*)(frame ? &vram[0xa000] : &vram[0]);
+        uint16_t* src = (uint16_t*)(frame ? &g_vram[0xa000] : &g_vram[0]);
         BMPSize(160, 128);
 
         for (int y = 0; y < 128; y++) {
@@ -573,12 +573,12 @@ public:
         getradio(, "CharBase1", charbase, 0x0800);
         getradio(, "MapBase0", mapbase, 0x1800);
         getradio(, "MapBase1", mapbase, 0x1c00);
-        getlab(coords, "Coords", "(2WW,2WW)");
-        getlab(addr, "Address", "0xWWWW");
-        getlab(tile, "Tile", "2WW");
-        getlab(flip, "Flip", "HV");
-        getlab(palette, "Palette", "---");
-        getlab(prio, "Priority", "P");
+        getlab(coords_, "Coords", "(2WW,2WW)");
+        getlab(addr_, "Address", "0xWWWW");
+        getlab(tile_, "Tile", "2WW");
+        getlab(flip_, "Flip", "HV");
+        getlab(palette_, "Palette", "---");
+        getlab(prio_, "Priority", "P");
         Fit();
         selx = sely = -1;
         Update();
@@ -673,19 +673,19 @@ public:
             selx = sely = -1;
 
         if (selx < 0) {
-            coords->SetLabel(wxEmptyString);
-            addr->SetLabel(wxEmptyString);
-            tile->SetLabel(wxEmptyString);
-            flip->SetLabel(wxEmptyString);
-            palette->SetLabel(wxEmptyString);
-            prio->SetLabel(wxEmptyString);
+            coords_->SetLabel(wxEmptyString);
+            addr_->SetLabel(wxEmptyString);
+            tile_->SetLabel(wxEmptyString);
+            flip_->SetLabel(wxEmptyString);
+            palette_->SetLabel(wxEmptyString);
+            prio_->SetLabel(wxEmptyString);
         } else {
             wxString s;
             s.Printf(wxT("(%d,%d)"), selx, sely);
-            coords->SetLabel(s);
+            coords_->SetLabel(s);
             uint16_t address = mapbase + 0x8000 + (sely >> 3) * 32 + (selx >> 3);
             s.Printf(wxT("0x%04X"), address);
-            addr->SetLabel(s);
+            addr_->SetLabel(s);
             uint8_t attrs = 0;
             uint8_t tilev = gbMemoryMap[9][address & 0xfff];
 
@@ -702,24 +702,24 @@ public:
             }
 
             s.Printf(wxT("%d"), (int)tilev);
-            tile->SetLabel(s);
+            tile_->SetLabel(s);
             s = attrs & 0x20 ? wxT('H') : wxT('-');
             s += attrs & 0x40 ? wxT('V') : wxT('-');
-            flip->SetLabel(s);
+            flip_->SetLabel(s);
 
             if (gbCgbMode) {
                 s.Printf(wxT("%d"), attrs & 7);
-                palette->SetLabel(s);
+                palette_->SetLabel(s);
             } else
-                palette->SetLabel(wxT("---"));
+                palette_->SetLabel(wxT("---"));
 
-            prio->SetLabel(wxString(attrs & 0x80 ? wxT('P') : wxT('-')));
+            prio_->SetLabel(wxString(attrs & 0x80 ? wxT('P') : wxT('-')));
         }
     }
 
 protected:
     int charbase, mapbase;
-    wxControl *coords, *addr, *tile, *flip, *palette, *prio;
+    wxControl *coords_, *addr_, *tile_, *flip_, *palette_, *prio_;
     int selx, sely;
 
     DECLARE_EVENT_TABLE()
@@ -780,9 +780,9 @@ public:
         systemBlueShift = 19;
 
         for (int sprite_no = 0; sprite_no < 128; sprite_no++) {
-            uint16_t* sparms = &((uint16_t*)oam)[4 * sprite_no];
+            uint16_t* sparms = &((uint16_t*)g_oam)[4 * sprite_no];
             uint16_t a0 = sparms[0], a1 = sparms[1], a2 = sparms[2];
-            uint16_t* pal = &((uint16_t*)paletteRAM)[0x100];
+            uint16_t* pal = &((uint16_t*)g_paletteRAM)[0x100];
             int sizeX = 8, sizeY = 8;
 
             // following is almost verbatim from OamView.cpp
@@ -869,7 +869,7 @@ public:
 
                 for (int y = 0; y < sizeY; y++) {
                     for (int x = 0; x < sizeX; x++) {
-                        uint32_t color = vram[0x10000 + (((c + (y >> 3) * inc) * 32 + (y & 7) * 8 + (x >> 3) * 64 + (x & 7)) & 0x7FFF)];
+                        uint32_t color = g_vram[0x10000 + (((c + (y >> 3) * inc) * 32 + (y & 7) * 8 + (x >> 3) * 64 + (x & 7)) & 0x7FFF)];
                         color = pal[color];
                         *bmp++ = (color & 0x1f) << 3;
                         *bmp++ = ((color >> 5) & 0x1f) << 3;
@@ -891,7 +891,7 @@ public:
 
                 for (int y = 0; y < sizeY; y++) {
                     for (int x = 0; x < sizeX; x++) {
-                        uint32_t color = vram[0x10000 + (((c + (y >> 3) * inc) * 32 + (y & 7) * 4 + (x >> 3) * 32 + ((x & 7) >> 1)) & 0x7FFF)];
+                        uint32_t color = g_vram[0x10000 + (((c + (y >> 3) * inc) * 32 + (y & 7) * 4 + (x >> 3) * 32 + ((x & 7) >> 1)) & 0x7FFF)];
 
                         if (x & 1)
                             color >>= 4;
@@ -1225,8 +1225,8 @@ public:
     }
     void Update()
     {
-        if (paletteRAM) {
-            uint16_t* pp = (uint16_t*)paletteRAM;
+        if (g_paletteRAM) {
+            uint16_t* pp = (uint16_t*)g_paletteRAM;
             uint8_t* bmp = colbmp;
 
             for (int i = 0; i < 512; i++, pp++) {
@@ -1451,35 +1451,35 @@ public:
     TileViewer()
         : GfxViewer(wxT("TileViewer"), 32 * 8, 32 * 8)
     {
-        is256 = charbase = 0;
-        getradio(, "Color16", is256, 0);
-        getradio(, "Color256", is256, 1);
-        getradio(, "CharBase0", charbase, 0);
-        getradio(, "CharBase1", charbase, 0x4000);
-        getradio(, "CharBase2", charbase, 0x8000);
-        getradio(, "CharBase3", charbase, 0xc000);
-        getradio(, "CharBase4", charbase, 0x10000);
-        getslider(, "Palette", palette);
-        getlab(tileno, "Tile", "1WWW");
-        getlab(addr, "Address", "06WWWWWW");
-        selx = sely = -1;
+        is256_ = charbase_ = 0;
+        getradio(, "Color16", is256_, 0);
+        getradio(, "Color256", is256_, 1);
+        getradio(, "CharBase0", charbase_, 0);
+        getradio(, "CharBase1", charbase_, 0x4000);
+        getradio(, "CharBase2", charbase_, 0x8000);
+        getradio(, "CharBase3", charbase_, 0xc000);
+        getradio(, "CharBase4", charbase_, 0x10000);
+        getslider(, "Palette", palette_);
+        getlab(tileno_, "Tile", "1WWW");
+        getlab(addr_, "Address", "06WWWWWW");
+        selx_ = sely_ = -1;
         Fit();
         Update();
     }
     void Update()
     {
         // Following copied almost verbatim from TileView.cpp
-        uint16_t* palette = (uint16_t*)paletteRAM;
-        uint8_t* charBase = &vram[charbase];
+        uint16_t* palette = (uint16_t*)g_paletteRAM;
+        uint8_t* charBase = &g_vram[charbase_];
         int maxY;
 
-        if (is256) {
+        if (is256_) {
             int tile = 0;
             maxY = 16;
 
             for (int y = 0; y < maxY; y++) {
                 for (int x = 0; x < 32; x++) {
-                    if (charbase == 4 * 0x4000)
+                    if (charbase_ == 4 * 0x4000)
                         render256(tile, x, y, charBase, &palette[256]);
                     else
                         render256(tile, x, y, charBase, palette);
@@ -1493,7 +1493,7 @@ public:
             int tile = 0;
             maxY = 32;
 
-            if (charbase == 3 * 0x4000)
+            if (charbase_ == 3 * 0x4000)
                 maxY = 16;
 
             for (int y = 0; y < maxY; y++) {
@@ -1511,32 +1511,32 @@ public:
     }
     void UpdateMouseInfoEv(wxMouseEvent& ev)
     {
-        selx = ev.GetX();
-        sely = ev.GetY();
+        selx_ = ev.GetX();
+        sely_ = ev.GetY();
         UpdateMouseInfo();
     }
 
     void UpdateMouseInfo()
     {
-        if (selx > gv->bmw || sely > gv->bmh)
-            selx = sely = -1;
+        if (selx_ > gv->bmw || sely_ > gv->bmh)
+            selx_ = sely_ = -1;
 
-        if (selx < 0) {
-            addr->SetLabel(wxEmptyString);
-            tileno->SetLabel(wxEmptyString);
+        if (selx_ < 0) {
+            addr_->SetLabel(wxEmptyString);
+            tileno_->SetLabel(wxEmptyString);
         } else {
-            int x = selx / 8;
-            int y = sely / 8;
+            int x = selx_ / 8;
+            int y = sely_ / 8;
             int t = 32 * y + x;
 
-            if (is256)
+            if (is256_)
                 t *= 2;
 
             wxString s;
             s.Printf(wxT("%d"), t);
-            tileno->SetLabel(s);
-            s.Printf(wxT("%08X"), 0x6000000 + charbase + 32 * t);
-            addr->SetLabel(s);
+            tileno_->SetLabel(s);
+            s.Printf(wxT("%08X"), 0x6000000 + charbase_ + 32 * t);
+            addr_->SetLabel(s);
         }
     }
     // following 2 functions copied almost verbatim from TileView.cpp
@@ -1560,9 +1560,9 @@ public:
     void render16(int tile, int x, int y, uint8_t* charBase, uint16_t* palette)
     {
         uint8_t* bmp = &image.GetData()[24 * x + 8 * 32 * 24 * y];
-        int pal = this->palette;
+        int pal = this->palette_;
 
-        if (this->charbase == 4 * 0x4000)
+        if (this->charbase_ == 4 * 0x4000)
             pal += 16;
 
         for (int j = 0; j < 8; j++) {
@@ -1624,9 +1624,9 @@ public:
     }
 
 protected:
-    int charbase, is256, palette;
-    wxControl *tileno, *addr;
-    int selx, sely;
+    int charbase_, is256_, palette_;
+    wxControl *tileno_, *addr_;
+    int selx_, sely_;
 
     DECLARE_EVENT_TABLE()
 };

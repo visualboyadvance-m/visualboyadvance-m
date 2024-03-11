@@ -3,7 +3,7 @@
 
 #include "../common/Types.h"
 
-extern uint8_t* bios;
+extern uint8_t* g_bios;
 
 extern uint8_t* gbRom;
 extern uint8_t* gbRam;

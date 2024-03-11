@@ -2,7 +2,6 @@
 
 #include "../strutils.h"
 #include "opts.h"
-#include "wx/log.h"
 #include "wxlogdebug.h"
 
 namespace config {

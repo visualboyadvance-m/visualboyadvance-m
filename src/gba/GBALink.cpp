@@ -15,7 +15,7 @@
 #define snprintf _snprintf
 #endif
 
-#define UPDATE_REG(address, value) WRITE16LE(((uint16_t*)&ioMem[address]), value)
+#define UPDATE_REG(address, value) WRITE16LE(((uint16_t*)&g_ioMem[address]), value)
 
 static int vbaid = 0;
 const char* MakeInstanceFilename(const char* Input)
@@ -63,7 +63,7 @@ bool speedhack = true;
 
 #include <stdint.h>
 
-uint32_t IP_LINK_PORT = 5738;
+uint16_t IP_LINK_PORT = 5738;
 
 std::string IP_LINK_BIND_ADDRESS = "*";
 
@@ -400,7 +400,6 @@ typedef struct {
 } LANLINKDATA;
 
 class CableServer {
-    int numbytes;
     sf::SocketSelector fdset;
     //timeval udptimeout;
     char inbuffer[256], outbuffer[256];
@@ -442,7 +441,6 @@ public:
     void CheckConn(void);
 };
 
-static int i, j;
 static int linktimeout = 1;
 static LANLINKDATA lanlink;
 static uint16_t cable_data[4];
@@ -475,7 +473,7 @@ static const int trtimeend[3][4] = {
 // Hodgepodge
 static uint8_t tspeed = 3;
 static bool transfer_direction = false;
-static int linkid = 0;
+static uint16_t linkid = 0;
 #if (defined __WIN32__ || defined _WIN32)
 static HANDLE linksync[4];
 #else
@@ -712,13 +710,13 @@ void StartGPLink(uint16_t value)
     if (!value)
         return;
 
-    switch (GetSIOMode(READ16LE(&ioMem[COMM_SIOCNT]), value)) {
+    switch (GetSIOMode(READ16LE(&g_ioMem[COMM_SIOCNT]), value)) {
     case MULTIPLAYER:
         value &= 0xc0f0;
         value |= 3;
         if (linkid)
             value |= 4;
-        UPDATE_REG(COMM_SIOCNT, ((READ16LE(&ioMem[COMM_SIOCNT]) & 0xff8b) | (linkid ? 0xc : 8) | (linkid << 4)));
+        UPDATE_REG(COMM_SIOCNT, ((READ16LE(&g_ioMem[COMM_SIOCNT]) & 0xff8b) | (linkid ? 0xcu : 8u) | (linkid << 4u)));
         break;
 
     case GP:
@@ -817,14 +815,14 @@ void CableServer::Recv(void)
     if (lanlink.type == 0) { // TCP
         fdset.clear();
 
-        for (i = 0; i < lanlink.numslaves; i++)
+        for (int i = 0; i < lanlink.numslaves; i++)
             fdset.add(tcpsocket[i + 1]);
 
         if (fdset.wait(sf::milliseconds(50)) == 0) {
             return;
         }
 
-        for (i = 0; i < lanlink.numslaves; i++) {
+        for (int i = 0; i < lanlink.numslaves; i++) {
             numbytes = 0;
             inbuffer[0] = 1;
             while (numbytes < inbuffer[0]) {
@@ -878,14 +876,14 @@ bool CableServer::RecvGB(void)
     if (lanlink.type == 0) { // TCP
         fdset.clear();
 
-        for (i = 0; i < lanlink.numslaves; i++)
+        for (int i = 0; i < lanlink.numslaves; i++)
             fdset.add(tcpsocket[i + 1]);
 
         if (fdset.wait(sf::milliseconds(1)) == 0) {
             return false;
         }
 
-        for (i = 0; i < lanlink.numslaves; i++) {
+        for (int i = 0; i < lanlink.numslaves; i++) {
             numbytes = 0;
             uint8_t recv_byte = 0;
 
@@ -946,10 +944,10 @@ void CableClient::CheckConn(void)
         transfer_start_time_from_master = 0;
         cable_data[0] = READ16LE(&uint16_tinbuffer[1]);
         tspeed = inbuffer[1] & 3;
-        for (i = 1, numbytes = 4; i <= lanlink.numslaves; i++)
+        for (int i = 1, bytes = 4; i <= lanlink.numslaves; i++)
             if (i != linkid) {
-                cable_data[i] = READ16LE(&uint16_tinbuffer[numbytes]);
-                numbytes++;
+                cable_data[i] = READ16LE(&uint16_tinbuffer[bytes]);
+                bytes++;
             }
     }
     return;
@@ -1025,10 +1023,10 @@ void CableClient::Recv(void)
     tspeed = inbuffer[1] & 3;
     cable_data[0] = READ16LE(&uint16_tinbuffer[1]);
     transfer_start_time_from_master = (int32_t)READ32LE(&intinbuffer[1]);
-    for (i = 1, numbytes = 4; i < lanlink.numslaves + 1; i++) {
+    for (int i = 1, bytes = 4; i < lanlink.numslaves + 1; i++) {
         if (i != linkid) {
-            cable_data[i] = READ16LE(&uint16_tinbuffer[numbytes]);
-            numbytes++;
+            cable_data[i] = READ16LE(&uint16_tinbuffer[bytes]);
+            bytes++;
         }
     }
 }
@@ -1168,7 +1166,7 @@ static ConnectionState ConnectUpdateSocket(char* const message, size_t size)
 
 void StartCableSocket(uint16_t value)
 {
-    switch (GetSIOMode(value, READ16LE(&ioMem[COMM_RCNT]))) {
+    switch (GetSIOMode(value, READ16LE(&g_ioMem[COMM_RCNT]))) {
     case MULTIPLAYER: {
         bool start = (value & 0x80) && !linkid && !transfer_direction;
         // clear start, seqno, si (RO on slave, start = pulse on master)
@@ -1178,10 +1176,10 @@ void StartCableSocket(uint16_t value)
             if (!transfer_direction)
                 value |= 4;
             else
-                value |= READ16LE(&ioMem[COMM_SIOCNT]) & 4;
+                value |= READ16LE(&g_ioMem[COMM_SIOCNT]) & 4;
         }
         if (start) {
-            cable_data[0] = READ16LE(&ioMem[COMM_SIODATA8]);
+            cable_data[0] = READ16LE(&g_ioMem[COMM_SIODATA8]);
             transfer_start_time_from_master = linktime;
             tspeed = value & 3;
             ls.Send();
@@ -1189,7 +1187,7 @@ void StartCableSocket(uint16_t value)
             linktime = 0;
             UPDATE_REG(COMM_SIOMULTI0, cable_data[0]);
             UPDATE_REG(COMM_SIOMULTI1, 0xffff);
-            WRITE32LE(&ioMem[COMM_SIOMULTI2], 0xffffffff);
+            WRITE32LE(&g_ioMem[COMM_SIOMULTI2], 0xffffffff);
             value &= ~0x40;
         }
         value |= (transfer_direction ? 1 : 0) << 7;
@@ -1220,22 +1218,22 @@ static void UpdateCableSocket(int ticks)
 {
     (void)ticks; // unused param
     if (linkid && transfer_direction == SENDING && lc.transferring && linktime >= transfer_start_time_from_master) {
-        cable_data[linkid] = READ16LE(&ioMem[COMM_SIODATA8]);
+        cable_data[linkid] = READ16LE(&g_ioMem[COMM_SIODATA8]);
 
         lc.Send();
         UPDATE_REG(COMM_SIODATA32_L, cable_data[0]);
-        UPDATE_REG(COMM_SIOCNT, READ16LE(&ioMem[COMM_SIOCNT]) | 0x80);
+        UPDATE_REG(COMM_SIOCNT, READ16LE(&g_ioMem[COMM_SIOCNT]) | 0x80);
         transfer_direction = RECEIVING;
         linktime = 0;
     }
 
     if (transfer_direction == RECEIVING && linktime >= trtimeend[lanlink.numslaves - 1][tspeed]) {
-        if (READ16LE(&ioMem[COMM_SIOCNT]) & 0x4000) {
+        if (READ16LE(&g_ioMem[COMM_SIOCNT]) & 0x4000) {
             IF |= 0x80;
             UPDATE_REG(0x202, IF);
         }
 
-        UPDATE_REG(COMM_SIOCNT, (READ16LE(&ioMem[COMM_SIOCNT]) & 0xff0f) | (linkid << 4));
+        UPDATE_REG(COMM_SIOCNT, (READ16LE(&g_ioMem[COMM_SIOCNT]) & 0xff0f) | (linkid << 4));
         transfer_direction = SENDING;
         linktime -= trtimeend[lanlink.numslaves - 1][tspeed];
 
@@ -1306,7 +1304,7 @@ static void JoyBusUpdate(int ticks)
     lastjoybusupdate += ticks;
     lastcommand += ticks;
 
-    bool joybus_activated = ((READ16LE(&ioMem[COMM_RCNT])) >> 14) == 3;
+    bool joybus_activated = ((READ16LE(&g_ioMem[COMM_RCNT])) >> 14) == 3;
     gba_joybus_active = dol && gba_joybus_enabled && joybus_activated;
 
     if ((lastjoybusupdate > nextjoybusupdate)) {
@@ -1350,7 +1348,7 @@ static void JoyBusUpdate(int ticks)
 
         switch (cmd) {
         case JOY_CMD_RESET:
-            UPDATE_REG(COMM_JOYCNT, READ16LE(&ioMem[COMM_JOYCNT]) | JOYCNT_RESET);
+            UPDATE_REG(COMM_JOYCNT, READ16LE(&g_ioMem[COMM_JOYCNT]) | JOYCNT_RESET);
             resp.push_back(0x00); // GBA device ID
             resp.push_back(0x04);
             nextjoybusupdate = TICKS_PER_SECOND / BYTES_PER_SECOND;
@@ -1364,12 +1362,12 @@ static void JoyBusUpdate(int ticks)
             break;
 
         case JOY_CMD_READ:
-            resp.push_back((uint8_t)(READ16LE(&ioMem[COMM_JOY_TRANS_L]) & 0xff));
-            resp.push_back((uint8_t)(READ16LE(&ioMem[COMM_JOY_TRANS_L]) >> 8));
-            resp.push_back((uint8_t)(READ16LE(&ioMem[COMM_JOY_TRANS_H]) & 0xff));
-            resp.push_back((uint8_t)(READ16LE(&ioMem[COMM_JOY_TRANS_H]) >> 8));
+            resp.push_back((uint8_t)(READ16LE(&g_ioMem[COMM_JOY_TRANS_L]) & 0xff));
+            resp.push_back((uint8_t)(READ16LE(&g_ioMem[COMM_JOY_TRANS_L]) >> 8));
+            resp.push_back((uint8_t)(READ16LE(&g_ioMem[COMM_JOY_TRANS_H]) & 0xff));
+            resp.push_back((uint8_t)(READ16LE(&g_ioMem[COMM_JOY_TRANS_H]) >> 8));
 
-            UPDATE_REG(COMM_JOYCNT, READ16LE(&ioMem[COMM_JOYCNT]) | JOYCNT_SEND_COMPLETE);
+            UPDATE_REG(COMM_JOYCNT, READ16LE(&g_ioMem[COMM_JOYCNT]) | JOYCNT_SEND_COMPLETE);
             nextjoybusupdate = TICKS_PER_SECOND / BYTES_PER_SECOND;
             booted = true;
             break;
@@ -1377,8 +1375,8 @@ static void JoyBusUpdate(int ticks)
         case JOY_CMD_WRITE:
             UPDATE_REG(COMM_JOY_RECV_L, (uint16_t)((uint16_t)data[2] << 8) | (uint8_t)data[1]);
             UPDATE_REG(COMM_JOY_RECV_H, (uint16_t)((uint16_t)data[4] << 8) | (uint8_t)data[3]);
-            UPDATE_REG(COMM_JOYSTAT, READ16LE(&ioMem[COMM_JOYSTAT]) | JOYSTAT_RECV);
-            UPDATE_REG(COMM_JOYCNT, READ16LE(&ioMem[COMM_JOYCNT]) | JOYCNT_RECV_COMPLETE);
+            UPDATE_REG(COMM_JOYSTAT, READ16LE(&g_ioMem[COMM_JOYSTAT]) | JOYSTAT_RECV);
+            UPDATE_REG(COMM_JOYCNT, READ16LE(&g_ioMem[COMM_JOYCNT]) | JOYCNT_RECV_COMPLETE);
             nextjoybusupdate = TICKS_PER_SECOND / BYTES_PER_SECOND;
             booted = true;
             break;
@@ -1390,17 +1388,17 @@ static void JoyBusUpdate(int ticks)
         }
 
         lastjoybusupdate = 0;
-        resp.push_back((uint8_t)READ16LE(&ioMem[COMM_JOYSTAT]));
+        resp.push_back((uint8_t)READ16LE(&g_ioMem[COMM_JOYSTAT]));
 
         if (cmd == JOY_CMD_READ) {
-            UPDATE_REG(COMM_JOYSTAT, READ16LE(&ioMem[COMM_JOYSTAT]) & ~JOYSTAT_SEND);
+            UPDATE_REG(COMM_JOYSTAT, READ16LE(&g_ioMem[COMM_JOYSTAT]) & ~JOYSTAT_SEND);
         }
 
         dol->Send(resp);
 
         // Generate SIO interrupt if we can
         if (((cmd == JOY_CMD_RESET) || (cmd == JOY_CMD_READ) || (cmd == JOY_CMD_WRITE))
-            && (READ16LE(&ioMem[COMM_JOYCNT]) & JOYCNT_INT_ENABLE)) {
+            && (READ16LE(&g_ioMem[COMM_JOYCNT]) & JOYCNT_INT_ENABLE)) {
             IF |= 0x80;
             UPDATE_REG(0x202, IF);
         }
@@ -1521,7 +1519,7 @@ void RFUServer::Recv(void)
     if (lanlink.type == 0) { // TCP
         fdset.clear();
 
-        for (i = 0; i < lanlink.numslaves; i++)
+        for (int i = 0; i < lanlink.numslaves; i++)
             fdset.add(tcpsocket[i + 1]);
 
         //bool all_ready = false;
@@ -1538,7 +1536,7 @@ void RFUServer::Recv(void)
         //		all_ready = true;
         //}
 
-        for (i = 0; i < lanlink.numslaves; i++) {
+        for (int i = 0; i < lanlink.numslaves; i++) {
             sf::Packet packet;
             tcpsocket[i + 1].setBlocking(false);
             sf::Socket::Status status = tcpsocket[i + 1].receive(packet);
@@ -1750,19 +1748,19 @@ static ConnectionState ConnectUpdateRFUSocket(char* const message, size_t size)
 // The GBA wireless RFU (see adapter3.txt)
 static void StartRFUSocket(uint16_t value)
 {
-    int siomode = GetSIOMode(value, READ16LE(&ioMem[COMM_RCNT]));
+    int siomode = GetSIOMode(value, READ16LE(&g_ioMem[COMM_RCNT]));
 
     if (value)
         rfu_enabled = (siomode == NORMAL32);
 
-    if (((READ16LE(&ioMem[COMM_SIOCNT]) & 0x5080) == SIO_TRANS_32BIT) && ((value & 0x5080) == (SIO_TRANS_32BIT | SIO_IRQ_ENABLE | SIO_TRANS_START))) { //RFU Reset, may also occur before cable link started
+    if (((READ16LE(&g_ioMem[COMM_SIOCNT]) & 0x5080) == SIO_TRANS_32BIT) && ((value & 0x5080) == (SIO_TRANS_32BIT | SIO_IRQ_ENABLE | SIO_TRANS_START))) { //RFU Reset, may also occur before cable link started
         rfu_data.rfu_listfront[linkid] = 0;
         rfu_data.rfu_listback[linkid] = 0;
     }
 
     if (!rfu_enabled) {
         if ((value & 0x5080) == (SIO_TRANS_32BIT | SIO_IRQ_ENABLE | SIO_TRANS_START)) { //0x5083 //game tried to send wireless command but w/o the adapter
-            if (READ16LE(&ioMem[COMM_SIOCNT]) & SIO_IRQ_ENABLE) //IRQ Enable
+            if (READ16LE(&g_ioMem[COMM_SIOCNT]) & SIO_IRQ_ENABLE) //IRQ Enable
             {
                 IF |= 0x80; //Serial Communication
                 UPDATE_REG(0x202, IF); //Interrupt Request Flags / IRQ Acknowledge
@@ -1776,7 +1774,7 @@ static void StartRFUSocket(uint16_t value)
 
     uint32_t CurCOM = 0, CurDAT = 0;
 
-    switch (GetSIOMode(value, READ16LE(&ioMem[COMM_RCNT]))) {
+    switch (GetSIOMode(value, READ16LE(&g_ioMem[COMM_RCNT]))) {
     case NORMAL8:
         rfu_polarity = 0;
         UPDATE_REG(COMM_SIOCNT, value);
@@ -1806,34 +1804,34 @@ static void StartRFUSocket(uint16_t value)
             else
                 rfu_transfer_end = 256;
 
-            uint16_t siodata_h = READ16LE(&ioMem[COMM_SIODATA32_H]);
+            uint16_t siodata_h = READ16LE(&g_ioMem[COMM_SIODATA32_H]);
             switch (rfu_state) {
             case RFU_INIT:
-                if (READ32LE(&ioMem[COMM_SIODATA32_L]) == 0xb0bb8001) {
+                if (READ32LE(&g_ioMem[COMM_SIODATA32_L]) == 0xb0bb8001) {
                     rfu_state = RFU_COMM; // end of startup
                     rfu_initialized = true;
                     value &= ~SIO_TRANS_FLAG_RECV_ENABLE; //0xff7b; //Bit.2 need to be 0 to indicate a finished initialization to fix MarioGolfAdv from occasionally Not Detecting wireless adapter (prevent it from sending 0x7FFE8001 comm)?
                     rfu_polarity = 0; //not needed?
                 }
-                rfu_buf = (READ16LE(&ioMem[COMM_SIODATA32_L]) << 16) | siodata_h;
+                rfu_buf = (READ16LE(&g_ioMem[COMM_SIODATA32_L]) << 16) | siodata_h;
                 break;
             case RFU_COMM:
-                CurCOM = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                CurCOM = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                 if (siodata_h == 0x9966) //initialize cmd
                 {
                     uint8_t tmpcmd = CurCOM;
                     if (tmpcmd != 0x10 && tmpcmd != 0x11 && tmpcmd != 0x13 && tmpcmd != 0x14 && tmpcmd != 0x16 && tmpcmd != 0x17 && tmpcmd != 0x19 && tmpcmd != 0x1a && tmpcmd != 0x1b && tmpcmd != 0x1c && tmpcmd != 0x1d && tmpcmd != 0x1e && tmpcmd != 0x1f && tmpcmd != 0x20 && tmpcmd != 0x21 && tmpcmd != 0x24 && tmpcmd != 0x25 && tmpcmd != 0x26 && tmpcmd != 0x27 && tmpcmd != 0x30 && tmpcmd != 0x32 && tmpcmd != 0x33 && tmpcmd != 0x34 && tmpcmd != 0x3d && tmpcmd != 0xa8 && tmpcmd != 0xee) {
                     }
                     rfu_counter = 0;
-                    if ((rfu_qsend2 = rfu_qsend = ioMem[0x121]) != 0) { //COMM_SIODATA32_L+1, following data [to send]
+                    if ((rfu_qsend2 = rfu_qsend = g_ioMem[0x121]) != 0) { //COMM_SIODATA32_L+1, following data [to send]
                         rfu_state = RFU_SEND;
                     }
-                    if (ioMem[COMM_SIODATA32_L] == 0xee) { //0xee cmd shouldn't override previous cmd
+                    if (g_ioMem[COMM_SIODATA32_L] == 0xee) { //0xee cmd shouldn't override previous cmd
                         rfu_lastcmd = rfu_cmd2;
-                        rfu_cmd2 = ioMem[COMM_SIODATA32_L];
+                        rfu_cmd2 = g_ioMem[COMM_SIODATA32_L];
                     } else {
                         rfu_lastcmd = rfu_cmd;
-                        rfu_cmd = ioMem[COMM_SIODATA32_L];
+                        rfu_cmd = g_ioMem[COMM_SIODATA32_L];
                         rfu_cmd2 = 0;
                         if (rfu_cmd == 0x27 || rfu_cmd == 0x37) {
                             rfu_lastcmd2 = rfu_cmd;
@@ -1868,7 +1866,7 @@ static void StartRFUSocket(uint16_t value)
                         }
                     }
                     if (rfu_waiting)
-                        rfu_buf = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                        rfu_buf = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                     else
                         rfu_buf = 0x80000000;
                 } else if (siodata_h == 0x8000) //finalize cmd, the game will send this when polarity reversed (expecting something)
@@ -2295,44 +2293,44 @@ static void StartRFUSocket(uint16_t value)
                         if (!rfu_waiting)
                             rfu_buf = 0x99660000 | (rfu_qrecv_broadcast_data_len << 8) | rfu_cmd;
                         else
-                            rfu_buf = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                            rfu_buf = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                     }
                 } else { //unknown COMM word //in MarioGolfAdv (when a player/client exiting lobby), There is a possibility COMM = 0x7FFE8001, PrevVAL = 0x5087, PrevCOM = 0, is this part of initialization?
-                    log("%09d: UnkCOM %08X  %04X  %08X %08X\n", linktime, READ32LE(&ioMem[COMM_SIODATA32_L]), PrevVAL, PrevCOM, PrevDAT);
-                    if ((READ32LE(&ioMem[COMM_SIODATA32_L]) >> 24) != 0x7ff)
+                    log("%09d: UnkCOM %08X  %04X  %08X %08X\n", linktime, READ32LE(&g_ioMem[COMM_SIODATA32_L]), PrevVAL, PrevCOM, PrevDAT);
+                    if ((READ32LE(&g_ioMem[COMM_SIODATA32_L]) >> 24) != 0x7ff)
                         rfu_state = RFU_INIT; //to prevent the next reinit words from getting in finalization processing (here), may cause MarioGolfAdv to show Linking error when this occurs instead of continuing with COMM cmd
-                    rfu_buf = (READ16LE(&ioMem[COMM_SIODATA32_L]) << 16) | siodata_h;
+                    rfu_buf = (READ16LE(&g_ioMem[COMM_SIODATA32_L]) << 16) | siodata_h;
                 }
                 break;
 
             case RFU_SEND: //data following after initialize cmd
-                CurDAT = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                CurDAT = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                 if (--rfu_qsend == 0) {
                     rfu_state = RFU_COMM;
                 }
 
                 switch (rfu_cmd) {
                 case 0x16:
-                    rfu_data.rfu_broadcastdata[linkid][1 + rfu_counter++] = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                    rfu_data.rfu_broadcastdata[linkid][1 + rfu_counter++] = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                     break;
 
                 case 0x17:
-                    rfu_masterdata[rfu_counter++] = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                    rfu_masterdata[rfu_counter++] = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                     break;
 
                 case 0x1f:
-                    rfu_masterdata[rfu_counter++] = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                    rfu_masterdata[rfu_counter++] = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                     break;
 
                 case 0x24:
                 //if(rfu_data.rfu_proto[linkid]) break; //important data from 0x25 shouldn't be overwritten by 0x24
                 case 0x25:
                 case 0x35:
-                    rfu_masterdata[rfu_counter++] = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                    rfu_masterdata[rfu_counter++] = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                     break;
 
                 default:
-                    rfu_masterdata[rfu_counter++] = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                    rfu_masterdata[rfu_counter++] = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                     break;
                 }
                 rfu_buf = 0x80000000;
@@ -2401,7 +2399,6 @@ static void StartRFUSocket(uint16_t value)
         UPDATE_REG(COMM_SIOCNT, value);
         return;
     }
-    UPDATE_REG(COMM_SIOCNT, value);
 }
 
 bool LinkRFUUpdateSocket()
@@ -2425,7 +2422,7 @@ bool LinkRFUUpdateSocket()
                         else if (rfu_cmd == 0xb5 || rfu_cmd == 0xb7)
                             rfu_cmd = 0x36;
 
-                        if (READ32LE(&ioMem[COMM_SIODATA32_L]) == 0x80000000)
+                        if (READ32LE(&g_ioMem[COMM_SIODATA32_L]) == 0x80000000)
                             rfu_buf = 0x99660000 | (rfu_qrecv_broadcast_data_len << 8) | rfu_cmd;
                         else
                             rfu_buf = 0x80000000;
@@ -2471,7 +2468,7 @@ static void UpdateRFUSocket(int ticks)
         if (LinkRFUUpdateSocket()) {
             if (transfer_direction == RECEIVING && rfu_transfer_end <= 0) {
                 transfer_direction = SENDING;
-                uint16_t value = READ16LE(&ioMem[COMM_SIOCNT]);
+                uint16_t value = READ16LE(&g_ioMem[COMM_SIOCNT]);
                 if (value & SIO_IRQ_ENABLE) {
                     IF |= 0x80;
                     UPDATE_REG(0x202, IF);
@@ -2636,7 +2633,7 @@ static ConnectionState InitIPC()
         linkmem->linkflags = 1;
         linkmem->numgbas = 1;
         linkmem->numtransfers = 0;
-        for (i = 0; i < 4; i++)
+        for (int i = 0; i < 4; i++)
             linkmem->linkdata[i] = 0xffff;
     } else {
         // FIXME: this should be done while linkmem is locked
@@ -2667,14 +2664,14 @@ static ConnectionState InitIPC()
     }
     linkid = vbaid;
 
-    for (i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++) {
         linkevent[sizeof(linkevent) - 2] = (char)i + '1';
 #if (defined __WIN32__ || defined _WIN32)
         linksync[i] = firstone ? CreateSemaphore(NULL, 0, 4, linkevent) : OpenSemaphore(SEMAPHORE_ALL_ACCESS, false, linkevent);
         if (linksync[i] == NULL) {
             UnmapViewOfFile(linkmem);
             CloseHandle(mmf);
-            for (j = 0; j < i; j++) {
+            for (int j = 0; j < i; j++) {
                 CloseHandle(linksync[j]);
             }
             systemMessage(0, N_("Error opening event"));
@@ -2707,7 +2704,7 @@ static ConnectionState InitIPC()
 
 static void StartCableIPC(uint16_t value)
 {
-    switch (GetSIOMode(value, READ16LE(&ioMem[COMM_RCNT]))) {
+    switch (GetSIOMode(value, READ16LE(&g_ioMem[COMM_RCNT]))) {
     case MULTIPLAYER: {
         bool start = (value & 0x80) && !linkid && !transfer_direction;
         // clear start, seqno, si (RO on slave, start = pulse on master)
@@ -2717,7 +2714,7 @@ static void StartCableIPC(uint16_t value)
             if (!transfer_direction)
                 value |= 4;
             else
-                value |= READ16LE(&ioMem[COMM_SIOCNT]) & 4;
+                value |= READ16LE(&g_ioMem[COMM_SIOCNT]) & 4;
         }
         if (start) {
             if (linkmem->numgbas > 1) {
@@ -2743,7 +2740,7 @@ static void StartCableIPC(uint16_t value)
 
                 // transmit first value
                 linkmem->linkcmd[0] = ('M' << 8) + (value & 3);
-                linkmem->linkdata[0] = READ16LE(&ioMem[COMM_SIODATA8]);
+                linkmem->linkdata[0] = READ16LE(&g_ioMem[COMM_SIODATA8]);
 
                 // start up slaves & sync clocks
                 numtransfers = linkmem->numtransfers;
@@ -2760,8 +2757,8 @@ static void StartCableIPC(uint16_t value)
                 transfer_direction = 1;
                 linktime = 0;
                 tspeed = value & 3;
-                WRITE32LE(&ioMem[COMM_SIOMULTI0], 0xffffffff);
-                WRITE32LE(&ioMem[COMM_SIOMULTI2], 0xffffffff);
+                WRITE32LE(&g_ioMem[COMM_SIOMULTI0], 0xffffffff);
+                WRITE32LE(&g_ioMem[COMM_SIOMULTI2], 0xffffffff);
                 value &= ~0x40;
             } else {
                 value |= 0x40; // comm error
@@ -2806,9 +2803,9 @@ static void ReconnectCableIPC()
     systemScreenMessage(_("Lost link; reconnected"));
 }
 
-static void UpdateCableIPC(int ticks)
+static void UpdateCableIPC(int)
 {
-    if (((READ16LE(&ioMem[COMM_RCNT])) >> 14) == 3)
+    if (((READ16LE(&g_ioMem[COMM_RCNT])) >> 14) == 3)
         return;
 
     // slave startup depends on detecting change in numtransfers
@@ -2852,9 +2849,9 @@ static void UpdateCableIPC(int ticks)
 #endif
         tspeed = linkmem->linkcmd[0] & 3;
         transfer_direction = 1;
-        WRITE32LE(&ioMem[COMM_SIOMULTI0], 0xffffffff);
-        WRITE32LE(&ioMem[COMM_SIOMULTI2], 0xffffffff);
-        UPDATE_REG(COMM_SIOCNT, READ16LE(&ioMem[COMM_SIOCNT]) & ~0x40 | 0x80);
+        WRITE32LE(&g_ioMem[COMM_SIOMULTI0], 0xffffffff);
+        WRITE32LE(&g_ioMem[COMM_SIOMULTI2], 0xffffffff);
+        UPDATE_REG(COMM_SIOCNT, READ16LE(&g_ioMem[COMM_SIOCNT]) & ~0x40 | 0x80);
 #if 0
 			break;
 		}
@@ -2900,9 +2897,9 @@ static void UpdateCableIPC(int ticks)
                 return;
             }
             // SI becomes low
-            UPDATE_REG(COMM_SIOCNT, READ16LE(&ioMem[COMM_SIOCNT]) & ~4);
+            UPDATE_REG(COMM_SIOCNT, READ16LE(&g_ioMem[COMM_SIOCNT]) & ~4);
             UPDATE_REG(COMM_RCNT, 10);
-            linkmem->linkdata[linkid] = READ16LE(&ioMem[COMM_SIODATA8]);
+            linkmem->linkdata[linkid] = READ16LE(&g_ioMem[COMM_SIODATA8]);
             ReleaseSemaphore(linksync[linkid], linkmem->numgbas - 1, NULL);
         }
         if (linkid == transfer_direction - 1) {
@@ -2933,7 +2930,7 @@ static void UpdateCableIPC(int ticks)
             ReleaseSemaphore(linksync[0], 1, NULL);
         linktime -= trtimeend[transfer_direction - 3][tspeed];
         transfer_direction = 0;
-        uint16_t value = READ16LE(&ioMem[COMM_SIOCNT]);
+        uint16_t value = READ16LE(&g_ioMem[COMM_SIOCNT]);
         if (!linkid)
             value |= 4; // SI becomes high on slaves after xfer
         UPDATE_REG(COMM_SIOCNT, (value & 0xff0f) | (linkid << 4));
@@ -2949,13 +2946,13 @@ static void UpdateCableIPC(int ticks)
 // The GBA wireless RFU (see adapter3.txt)
 static void StartRFU(uint16_t value)
 {
-    int siomode = GetSIOMode(value, READ16LE(&ioMem[COMM_RCNT]));
+    int siomode = GetSIOMode(value, READ16LE(&g_ioMem[COMM_RCNT]));
 
     if (value)
         rfu_enabled = (siomode == NORMAL32);
 
-    if (((READ16LE(&ioMem[COMM_SIOCNT]) & 0x5080) == 0x1000) && ((value & 0x5080) == 0x5080)) { //RFU Reset, may also occur before cable link started
-        log("RFU Reset2 : %04X  %04X  %d\n", READ16LE(&ioMem[COMM_RCNT]), READ16LE(&ioMem[COMM_SIOCNT]), GetTickCount());
+    if (((READ16LE(&g_ioMem[COMM_SIOCNT]) & 0x5080) == 0x1000) && ((value & 0x5080) == 0x5080)) { //RFU Reset, may also occur before cable link started
+        log("RFU Reset2 : %04X  %04X  %d\n", READ16LE(&g_ioMem[COMM_RCNT]), READ16LE(&g_ioMem[COMM_SIOCNT]), GetTickCount());
         linkmem->rfu_listfront[vbaid] = 0;
         linkmem->rfu_listback[vbaid] = 0;
     }
@@ -2966,7 +2963,7 @@ static void StartRFU(uint16_t value)
 			value &= 0xfffb; //Transfer enable flag receive (0=Enable Transfer/Ready, bit.2=bit.3 of otherside)	// A kind of acknowledge procedure
 			else //(Bit.3, 0=Enable Transfer/Ready)
 			value |= 4; //bit.2=1 (otherside is Not Ready)*/
-            if (READ16LE(&ioMem[COMM_SIOCNT]) & 0x4000) //IRQ Enable
+            if (READ16LE(&g_ioMem[COMM_SIOCNT]) & 0x4000) //IRQ Enable
             {
                 IF |= 0x80; //Serial Communication
                 UPDATE_REG(0x202, IF); //Interrupt Request Flags / IRQ Acknowledge
@@ -2981,9 +2978,9 @@ static void StartRFU(uint16_t value)
     linktimeout = 1;
 
     uint32_t CurCOM = 0, CurDAT = 0;
-    bool rfulogd = (READ16LE(&ioMem[COMM_SIOCNT]) != value);
+    // bool rfulogd = (READ16LE(&g_ioMem[COMM_SIOCNT]) != value);
 
-    switch (GetSIOMode(value, READ16LE(&ioMem[COMM_RCNT]))) {
+    switch (GetSIOMode(value, READ16LE(&g_ioMem[COMM_RCNT]))) {
     case NORMAL8:
         rfu_polarity = 0;
         UPDATE_REG(COMM_SIOCNT, value);
@@ -3011,19 +3008,19 @@ static void StartRFU(uint16_t value)
                 rfu_transfer_end = 2048;
             else
                 rfu_transfer_end = 256;
-            uint16_t siodata_h = READ16LE(&ioMem[COMM_SIODATA32_H]);
+            uint16_t siodata_h = READ16LE(&g_ioMem[COMM_SIODATA32_H]);
             switch (rfu_state) {
             case RFU_INIT:
-                if (READ32LE(&ioMem[COMM_SIODATA32_L]) == 0xb0bb8001) {
+                if (READ32LE(&g_ioMem[COMM_SIODATA32_L]) == 0xb0bb8001) {
                     rfu_state = RFU_COMM; // end of startup
                     rfu_initialized = true;
                     value &= 0xfffb; //0xff7b; //Bit.2 need to be 0 to indicate a finished initialization to fix MarioGolfAdv from occasionally Not Detecting wireless adapter (prevent it from sending 0x7FFE8001 comm)?
                     rfu_polarity = 0; //not needed?
                 }
-                rfu_buf = (READ16LE(&ioMem[COMM_SIODATA32_L]) << 16) | siodata_h;
+                rfu_buf = (READ16LE(&g_ioMem[COMM_SIODATA32_L]) << 16) | siodata_h;
                 break;
             case RFU_COMM:
-                CurCOM = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                CurCOM = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                 if (siodata_h == 0x9966) //initialize cmd
                 {
                     uint8_t tmpcmd = CurCOM;
@@ -3031,16 +3028,16 @@ static void StartRFU(uint16_t value)
                         log("%08X : UnkCMD %08X  %04X  %08X %08X\n", GetTickCount(), CurCOM, PrevVAL, PrevCOM, PrevDAT);
                     }
                     rfu_counter = 0;
-                    if ((rfu_qsend2 = rfu_qsend = ioMem[0x121]) != 0) { //COMM_SIODATA32_L+1, following data [to send]
+                    if ((rfu_qsend2 = rfu_qsend = g_ioMem[0x121]) != 0) { //COMM_SIODATA32_L+1, following data [to send]
                         rfu_state = RFU_SEND;
                     }
-                    if (ioMem[COMM_SIODATA32_L] == 0xee) { //0xee cmd shouldn't override previous cmd
+                    if (g_ioMem[COMM_SIODATA32_L] == 0xee) { //0xee cmd shouldn't override previous cmd
                         rfu_lastcmd = rfu_cmd2;
-                        rfu_cmd2 = ioMem[COMM_SIODATA32_L];
+                        rfu_cmd2 = g_ioMem[COMM_SIODATA32_L];
                         //rfu_polarity = 0; //when polarity back to normal the game can initiate a new cmd even when 0xee hasn't been finalized, but it looks improper isn't?
                     } else {
                         rfu_lastcmd = rfu_cmd;
-                        rfu_cmd = ioMem[COMM_SIODATA32_L];
+                        rfu_cmd = g_ioMem[COMM_SIODATA32_L];
                         rfu_cmd2 = 0;
                         if (rfu_cmd == 0x27 || rfu_cmd == 0x37) {
                             rfu_lastcmd2 = rfu_cmd;
@@ -3129,14 +3126,14 @@ static void StartRFU(uint16_t value)
                                 rfu_waiting = true;
                         } else if (rfu_cmd == 0xa8 || rfu_cmd == 0xb6) {
                             //wait for [important] data when previously sent is important data, might only need to wait for the 1st 0x25 cmd
-                            bool ok = false;
+                            // bool ok = false;
                         } else if (rfu_cmd == 0x11 || rfu_cmd == 0x1a || rfu_cmd == 0x26) {
                             if (rfu_lastcmd2 == 0x24)
                                 rfu_waiting = true;
                         }
                     }
                     if (rfu_waiting)
-                        rfu_buf = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                        rfu_buf = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                     else
                         rfu_buf = 0x80000000;
                 } else if (siodata_h == 0x8000) //finalize cmd, the game will send this when polarity reversed (expecting something)
@@ -3766,39 +3763,39 @@ static void StartRFU(uint16_t value)
                         if (!rfu_waiting)
                             rfu_buf = 0x99660000 | (rfu_qrecv_broadcast_data_len << 8) | rfu_cmd;
                         else
-                            rfu_buf = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                            rfu_buf = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                     }
                 } else { //unknown COMM word //in MarioGolfAdv (when a player/client exiting lobby), There is a possibility COMM = 0x7FFE8001, PrevVAL = 0x5087, PrevCOM = 0, is this part of initialization?
-                    log("%08X : UnkCOM %08X  %04X  %08X %08X\n", GetTickCount(), READ32LE(&ioMem[COMM_SIODATA32_L]), PrevVAL, PrevCOM, PrevDAT);
+                    log("%08X : UnkCOM %08X  %04X  %08X %08X\n", GetTickCount(), READ32LE(&g_ioMem[COMM_SIODATA32_L]), PrevVAL, PrevCOM, PrevDAT);
                     /*rfu_cmd ^= 0x80;
 				 UPDATE_REG(COMM_SIODATA32_L, 0);
 				 UPDATE_REG(COMM_SIODATA32_H, 0x8000);*/
                     rfu_state = RFU_INIT; //to prevent the next reinit words from getting in finalization processing (here), may cause MarioGolfAdv to show Linking error when this occurs instead of continuing with COMM cmd
-                    //UPDATE_REG(COMM_SIODATA32_H, READ16LE(&ioMem[COMM_SIODATA32_L])); //replying with reversed words may cause MarioGolfAdv to reinit RFU when COMM = 0x7FFE8001
+                    //UPDATE_REG(COMM_SIODATA32_H, READ16LE(&g_ioMem[COMM_SIODATA32_L])); //replying with reversed words may cause MarioGolfAdv to reinit RFU when COMM = 0x7FFE8001
                     //UPDATE_REG(COMM_SIODATA32_L, a);
-                    rfu_buf = (READ16LE(&ioMem[COMM_SIODATA32_L]) << 16) | siodata_h;
+                    rfu_buf = (READ16LE(&g_ioMem[COMM_SIODATA32_L]) << 16) | siodata_h;
                 }
                 break;
 
             case RFU_SEND: //data following after initialize cmd
                 //if(rfu_qsend==0) {rfu_state = RFU_COMM; break;}
-                CurDAT = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                CurDAT = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                 if (--rfu_qsend == 0) {
                     rfu_state = RFU_COMM;
                 }
 
                 switch (rfu_cmd) {
                 case 0x16:
-                    linkmem->rfu_broadcastdata[vbaid][1 + rfu_counter++] = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                    linkmem->rfu_broadcastdata[vbaid][1 + rfu_counter++] = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                     break;
 
                 case 0x17:
                     //linkid = 1;
-                    rfu_masterdata[rfu_counter++] = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                    rfu_masterdata[rfu_counter++] = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                     break;
 
                 case 0x1f:
-                    rfu_masterdata[rfu_counter++] = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                    rfu_masterdata[rfu_counter++] = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                     break;
 
                 case 0x24:
@@ -3806,12 +3803,12 @@ static void StartRFU(uint16_t value)
                 case 0x25:
                 case 0x35:
                     //if(rfu_cansend)
-                    //linkmem->rfu_data[vbaid][rfu_counter++] = READ32LE(&ioMem[COMM_SIODATA32_L]);
-                    rfu_masterdata[rfu_counter++] = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                    //linkmem->rfu_data[vbaid][rfu_counter++] = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
+                    rfu_masterdata[rfu_counter++] = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                     break;
 
                 default:
-                    rfu_masterdata[rfu_counter++] = READ32LE(&ioMem[COMM_SIODATA32_L]);
+                    rfu_masterdata[rfu_counter++] = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                     break;
                 }
                 rfu_buf = 0x80000000;
@@ -3900,7 +3897,6 @@ static void StartRFU(uint16_t value)
         UPDATE_REG(COMM_SIOCNT, value);
         return;
     }
-    UPDATE_REG(COMM_SIOCNT, value);
 }
 
 bool LinkRFUUpdate()
@@ -3911,10 +3907,8 @@ bool LinkRFUUpdate()
         if (transfer_direction && rfu_transfer_end <= 0) {
             if (rfu_waiting) {
                 bool ok = false;
-                uint8_t oldcmd = rfu_cmd;
-                uint8_t oldq = linkmem->rfu_q[vbaid];
-                uint32_t tmout = linktimeout;
-                //if ((!lanlink.active&&speedhack) || (lanlink.speed&&IsLinkConnected()))tmout = 16;
+                // uint32_t tmout = linktimeout;
+                // if ((!lanlink.active&&speedhack) || (lanlink.speed&&IsLinkConnected()))tmout = 16;
                 if (rfu_state != RFU_INIT) {
                     if (rfu_cmd == 0x24 || rfu_cmd == 0x25 || rfu_cmd == 0x35) {
                         //c_s.Lock();
@@ -3957,7 +3951,7 @@ bool LinkRFUUpdate()
                         else if (rfu_cmd == 0xb5 || rfu_cmd == 0xb7)
                             rfu_cmd = 0x36;
 
-                        if (READ32LE(&ioMem[COMM_SIODATA32_L]) == 0x80000000)
+                        if (READ32LE(&g_ioMem[COMM_SIODATA32_L]) == 0x80000000)
                             rfu_buf = 0x99660000 | (rfu_qrecv_broadcast_data_len << 8) | rfu_cmd;
                         else
                             rfu_buf = 0x80000000;
@@ -3980,7 +3974,7 @@ static void UpdateRFUIPC(int ticks)
         if (LinkRFUUpdate()) {
             if (transfer_direction && rfu_transfer_end <= 0) {
                 transfer_direction = 0;
-                uint16_t value = READ16LE(&ioMem[COMM_SIOCNT]);
+                uint16_t value = READ16LE(&g_ioMem[COMM_SIOCNT]);
                 if (value & 0x4000) {
                     IF |= 0x80;
                     UPDATE_REG(0x202, IF);
@@ -3990,9 +3984,9 @@ static void UpdateRFUIPC(int ticks)
                 value &= 0xfffb;
                 value |= (value & 1) << 2; //this will automatically set the correct polarity, even w/o rfu_polarity since the game will be the one who change the polarity instead of the adapter
 
-                //UPDATE_REG(COMM_SIOCNT, READ16LE(&ioMem[COMM_SIOCNT]) & 0xff7f);
+                //UPDATE_REG(COMM_SIOCNT, READ16LE(&g_ioMem[COMM_SIOCNT]) & 0xff7f);
                 UPDATE_REG(COMM_SIOCNT, (value & 0xff7f) | 0x0008); //Start bit.7 reset, SO bit.3 set automatically upon transfer completion?
-                //log("SIOn32 : %04X %04X  %08X  (VCOUNT = %d) %d %d\n", READ16LE(&ioMem[COMM_RCNT]), READ16LE(&ioMem[COMM_SIOCNT]), READ32LE(&ioMem[COMM_SIODATA32_L]), VCOUNT);
+                //log("SIOn32 : %04X %04X  %08X  (VCOUNT = %d) %d %d\n", READ16LE(&g_ioMem[COMM_RCNT]), READ16LE(&g_ioMem[COMM_SIOCNT]), READ32LE(&g_ioMem[COMM_SIODATA32_L]), VCOUNT);
             }
             return;
         }
@@ -4011,7 +4005,6 @@ uint8_t gbStartLinkIPC(uint8_t b) //used on internal clock
 {
     uint8_t dat = 0xff; //master (w/ internal clock) will gets 0xff if slave is turned off (or not ready yet also?)
     //if(linkid) return 0xff; //b; //Slave shouldn't be sending from here
-    BOOL sent = false;
     //int gbSerialOn = (gbMemory[0xff02] & 0x80); //not needed?
     gba_link_enabled = true; //(gbMemory[0xff02]!=0); //not needed?
     rfu_enabled = false;
@@ -4055,7 +4048,6 @@ uint16_t gbLinkUpdateIPC(uint8_t b, int gbSerialOn) //used on external clock
 {
     uint8_t dat = b; //0xff; //slave (w/ external clocks) won't be getting 0xff if master turned off
     BOOL recvd = false;
-    int idx = 0;
 
     gba_link_enabled = true; //(gbMemory[0xff02]!=0);
     rfu_enabled = false;
@@ -4113,7 +4105,7 @@ static void CloseIPC()
             }
     }
 
-    for (i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++) {
         if (linksync[i] != NULL) {
 #if (defined __WIN32__ || defined _WIN32)
             ReleaseSemaphore(linksync[i], 1, NULL);
