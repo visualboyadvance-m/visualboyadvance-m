@@ -1,11 +1,3 @@
-if(POLICY CMP0012)
-    cmake_policy(SET CMP0012 NEW) # Saner if() behavior.
-endif()
-
-if(POLICY CMP0135)
-    cmake_policy(SET CMP0135 NEW) # Use timestamps from archives.
-endif()
-
 if(NOT DEFINED VCPKG_TARGET_TRIPLET)
     if(NOT WIN32)
         return()
@@ -54,28 +46,6 @@ if(NOT DEFINED VCPKG_TARGET_TRIPLET)
     set(VCPKG_TARGET_TRIPLET ${VBAM_VCPKG_PLATFORM} CACHE STRING "Vcpkg target triplet (ex. x64-windows-static)" FORCE)
     message(STATUS "Inferred VCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}")
 endif()
-
-function(vcpkg_seconds)
-    if(CMAKE_HOST_SYSTEM MATCHES Windows OR ((NOT DEFINED CMAKE_HOST_SYSTEM) AND WIN32))
-        execute_process(
-            COMMAND cmd /c echo %TIME:~0,8%
-            OUTPUT_VARIABLE time
-        )
-    else()
-        execute_process(
-            COMMAND date +%H:%M:%S
-            OUTPUT_VARIABLE time
-        )
-    endif()
-
-    string(SUBSTRING "${time}" 0 2 hours)
-    string(SUBSTRING "${time}" 3 2 minutes)
-    string(SUBSTRING "${time}" 6 2 secs)
-
-    math(EXPR seconds "(${hours} * 60 * 60) + (${minutes} * 60) + ${secs}")
-
-    set(seconds ${seconds} PARENT_SCOPE)
-endfunction()
 
 function(vcpkg_check_git_status git_status)
     # The VS vcpkg component cannot be written to without elevation.

@@ -3,8 +3,7 @@ function(git_version version revision version_release)
     set(${revision}        "" CACHE STRING "Latest Git Tag Revision" FORCE)
     set(${version_release} 0  CACHE STRING "Is this a versioned release without revision" FORCE)
 
-    find_package(Git)
-    if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+    if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
         # get latest version from tag history
         execute_process(COMMAND "${GIT_EXECUTABLE}" tag "--format=%(align:width=20)%(refname:short)%(end)%(if)%(*objectname)%(then)%(*objectname)%(else)%(objectname)%(end)" --sort=-v:refname OUTPUT_VARIABLE tags OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
