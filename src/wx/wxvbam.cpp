@@ -308,7 +308,9 @@ wxString wxvbamApp::GetAbsolutePath(wxString path)
 
     if (fn.IsRelative()) {
         fn.MakeRelativeTo(GetConfigurationPath());
-        fn.Normalize();
+        fn.Normalize(wxPATH_NORM_ENV_VARS | wxPATH_NORM_DOTS | wxPATH_NORM_TILDE |
+                     wxPATH_NORM_CASE | wxPATH_NORM_ABSOLUTE | wxPATH_NORM_LONG |
+                     wxPATH_NORM_SHORTCUT);
         return fn.GetFullPath();
     }
 

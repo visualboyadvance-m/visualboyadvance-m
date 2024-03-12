@@ -1,6 +1,6 @@
 // This file was written by denopqrihg
 // with major changes by tjm
-#include <stdio.h>
+#include <cstdio>
 #include <cstring>
 #include <string>
 
@@ -36,8 +36,8 @@ const char* MakeInstanceFilename(const char* Input)
 #ifndef NO_LINK
 
 enum {
-    SENDING = false,
-    RECEIVING = true
+    SENDING = 0,
+    RECEIVING = 1
 };
 
 enum siocnt_lo_32bit {
@@ -472,7 +472,7 @@ static const int trtimeend[3][4] = {
 
 // Hodgepodge
 static uint8_t tspeed = 3;
-static bool transfer_direction = false;
+static int transfer_direction = 0;
 static uint16_t linkid = 0;
 #if (defined __WIN32__ || defined _WIN32)
 static HANDLE linksync[4];
@@ -2451,7 +2451,8 @@ static void UpdateRFUSocket(int ticks)
             rfu_client.Recv(); // recv broadcast data
         }
         {
-            for (int i = 0; i < MAX_CLIENTS; i++) {
+            const int max_clients = MAX_CLIENTS > 5 ? 5 : MAX_CLIENTS;
+            for (int i = 0; i < max_clients; i++) {
                 if (i != linkid) {
                     rfu_data.rfu_listback[i] = 0; // Flush the queue
                 }

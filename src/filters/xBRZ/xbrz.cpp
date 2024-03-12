@@ -428,7 +428,7 @@ void blendPixel(const Kernel_3x3& ker,
                 return true;
 
             //make sure there is no second blending in an adjacent rotation for this pixel: handles insular pixels, mario eyes
-            if (getTopR(blend) != BLEND_NONE && !eq(e, g)) //but support double-blending for 90° corners
+            if (getTopR(blend) != BLEND_NONE && !eq(e, g)) //but support double-blending for 90ï¿½ corners
                 return false;
             if (getBottomL(blend) != BLEND_NONE && !eq(e, c))
                 return false;
@@ -1019,7 +1019,7 @@ struct Scaler6x : public ColorGradient
 
 struct ColorDistanceRGB
 {
-    static double dist(uint32_t pix1, uint32_t pix2, double luminanceWeight)
+    static double dist(uint32_t pix1, uint32_t pix2, double /* luminanceWeight */)
     {
         return distYCbCrBuffered(pix1, pix2);
 
@@ -1031,7 +1031,7 @@ struct ColorDistanceRGB
 
 struct ColorDistanceARGB
 {
-    static double dist(uint32_t pix1, uint32_t pix2, double luminanceWeight)
+    static double dist(uint32_t pix1, uint32_t pix2, double /* luminanceWeight */)
     {
         const double a1 = getAlpha(pix1) / 255.0 ;
         const double a2 = getAlpha(pix2) / 255.0 ;

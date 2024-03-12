@@ -692,21 +692,20 @@ uint8_t parseExpressionType(char* given_type)
     }
     if ((type[0] == 'S') || type[0] == 'U') {
         flags |= (4 - ((type[0] - 'S') << 1));
-        type++;
-        if (type[0] == 'H') {
-            type[0] = '1';
-            type[1] = '6';
+        if (type[1] == 'H') {
+            type[1] = '1';
+            type[2] = '6';
+            type[3] = '\0';
+        } else if (type[1] == 'W') {
+            type[1] = '3';
+            type[2] = '2';
+            type[3] = '\0';
+        } else if (type[1] == 'B') {
+            type[1] = '8';
             type[2] = '\0';
-        } else if (type[0] == 'W') {
-            type[0] = '3';
-            type[1] = '2';
-            type[2] = '\0';
-        } else if (type[0] == 'B') {
-            type[0] = '8';
-            type[1] = '\0';
         }
         int size;
-        sscanf(type, "%d", &size);
+        sscanf(type + 1, "%d", &size);
         size = (size >> 3) - 1;
         flags |= (size >= 2 ? 2 : ((uint8_t)size));
         free(type);

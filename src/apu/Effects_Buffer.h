@@ -4,6 +4,8 @@
 #ifndef EFFECTS_BUFFER_H
 #define EFFECTS_BUFFER_H
 
+#include <vector>
+
 #include "Multi_Buffer.h"
 
 // See Simple_Effects_Buffer (below) for a simpler interface
@@ -94,21 +96,8 @@ class Effects_Buffer : public Multi_Buffer
         struct buf_t : Tracked_Blip_Buffer {
                 fixed_t vol[stereo];
                 bool echo;
-
-                void *operator new(size_t, void *p)
-                {
-                        return p;
-                }
-                void operator delete(void *)
-                {
-                }
-
-                ~buf_t()
-                {
-                }
         };
-        buf_t *bufs;
-        int bufs_size;
+        std::vector<buf_t> bufs;
         int bufs_max; // bufs_size <= bufs_max, to limit memory usage
         Stereo_Mixer mixer;
 

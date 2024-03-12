@@ -265,7 +265,7 @@ public:
     void ResetMenuAccelerators();
 
     // 2.8 has no HasFocus(), and FindFocus() doesn't work right
-    bool HasFocus() const
+    bool HasFocus() const override
     {
         return focused;
     }

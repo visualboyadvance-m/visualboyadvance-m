@@ -18,10 +18,8 @@
 #include "config/option.h"
 #include "dialogs/validated-child.h"
 #include "rpi.h"
-#include "wayland.h"
 #include "widgets/option-validator.h"
 #include "widgets/render-plugin.h"
-#include "widgets/wx/wxmisc.h"
 #include "wxvbam.h"
 
 namespace dialogs {

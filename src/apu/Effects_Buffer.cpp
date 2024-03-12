@@ -28,8 +28,6 @@ Effects_Buffer::Effects_Buffer( int max_bufs, long echo_size_ ) : Multi_Buffer( 
 	echo_size   = max( max_read * (long) stereo, echo_size_ & ~1 );
 	clock_rate_ = 0;
 	bass_freq_  = 90;
-	bufs        = 0;
-	bufs_size   = 0;
 	bufs_max    = max( max_bufs, (int) extra_chans );
 	no_echo     = true;
 	no_effects  = true;
@@ -59,24 +57,13 @@ Effects_Buffer::~Effects_Buffer()
 // avoid using new []
 blargg_err_t Effects_Buffer::new_bufs( int size )
 {
-	bufs = (buf_t*) malloc( size * sizeof *bufs );
-	CHECK_ALLOC( bufs );
-	for ( int i = 0; i < size; i++ )
-		new (bufs + i) buf_t;
-	bufs_size = size;
+	bufs = std::vector<buf_t>( size );
 	return 0;
 }
 
 void Effects_Buffer::delete_bufs()
 {
-	if ( bufs )
-	{
-		for ( int i = bufs_size; --i >= 0; )
-			bufs [i].~buf_t();
-		free( bufs );
-		bufs = 0;
-	}
-	bufs_size = 0;
+	bufs.clear();
 }
 
 blargg_err_t Effects_Buffer::set_sample_rate( long rate, int msec )
@@ -90,15 +77,15 @@ blargg_err_t Effects_Buffer::set_sample_rate( long rate, int msec )
 void Effects_Buffer::clock_rate( long rate )
 {
 	clock_rate_ = rate;
-	for ( int i = bufs_size; --i >= 0; )
-		bufs [i].clock_rate( clock_rate_ );
+	for ( auto& buf : bufs )
+		buf.clock_rate( clock_rate_ );
 }
 
 void Effects_Buffer::bass_freq( int freq )
 {
 	bass_freq_ = freq;
-	for ( int i = bufs_size; --i >= 0; )
-		bufs [i].bass_freq( bass_freq_ );
+	for ( auto& buf : bufs )
+		buf.bass_freq( bass_freq_ );
 }
 
 blargg_err_t Effects_Buffer::set_channel_count( int count, int const* types )
@@ -113,8 +100,8 @@ blargg_err_t Effects_Buffer::set_channel_count( int count, int const* types )
 
 	RETURN_ERR( new_bufs( min( bufs_max, count + extra_chans ) ) );
 
-	for ( int i = bufs_size; --i >= 0; )
-		RETURN_ERR( bufs [i].set_sample_rate( sample_rate(), length() ) );
+	for ( auto& buf : bufs )
+		RETURN_ERR( buf.set_sample_rate( sample_rate(), length() ) );
 
 	for ( int i = chans.size(); --i >= 0; )
 	{
@@ -149,8 +136,8 @@ void Effects_Buffer::clear()
 	s.low_pass [1] = 0;
 	mixer.samples_read = 0;
 
-	for ( int i = bufs_size; --i >= 0; )
-		bufs [i].clear();
+	for ( auto& buf : bufs )
+		buf.clear();
 	clear_echo();
 }
 
@@ -246,7 +233,7 @@ void Effects_Buffer::apply_config()
 {
 	int i;
 
-	if ( !bufs_size )
+	if ( bufs.empty() )
 		return;
 
 	s.treble = TO_FIXED( config_.treble );
@@ -427,8 +414,8 @@ void Effects_Buffer::assign_buffers()
 
 void Effects_Buffer::end_frame( blip_time_t time )
 {
-	for ( int i = bufs_size; --i >= 0; )
-		bufs [i].end_frame( time );
+	for ( auto& buf : bufs )
+		buf.end_frame( time );
 }
 
 long Effects_Buffer::read_samples( blip_sample_t* out, long out_size )
@@ -476,14 +463,13 @@ long Effects_Buffer::read_samples( blip_sample_t* out, long out_size )
 
 		if ( samples_avail() <= 0 || immediate_removal() )
 		{
-			for ( int i = bufs_size; --i >= 0; )
+			for ( buf_t& buf : bufs )
 			{
-				buf_t& b = bufs [i];
 				// TODO: might miss non-silence settling since it checks END of last read
-				if ( b.non_silent() )
-					b.remove_samples( mixer.samples_read );
+				if ( buf.non_silent() )
+					buf.remove_samples( mixer.samples_read );
 				else
-					b.remove_silence( mixer.samples_read );
+					buf.remove_silence( mixer.samples_read );
 			}
 			mixer.samples_read = 0;
 		}
@@ -501,8 +487,8 @@ void Effects_Buffer::mix_effects( blip_sample_t* out_, int pair_count )
 	{
 		// mix any modified buffers
 		{
-			buf_t* buf = bufs;
-			int bufs_remain = bufs_size;
+			buf_t* buf = bufs.data();
+			int bufs_remain = bufs.size();
 			do
 			{
 				if ( buf->non_silent() && ( buf->echo == !!echo_phase ) )
