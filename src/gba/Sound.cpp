@@ -1,6 +1,7 @@
-#include <string.h>
-
 #include "Sound.h"
+
+#include <array>
+#include <cstring>
 
 #include "../Util.h"
 #include "../common/Port.h"
@@ -769,18 +770,22 @@ static void soundReadGameOld(gzFile in, int version)
     skip_read(in, 6 * 735 + 2 * 735);
 
     // Copy APU regs
-    static int const regs_to_copy[] = {
+    static constexpr std::array<int, 21> regs_to_copy {
         NR10, NR11, NR12, NR13, NR14,
         NR21, NR22, NR23, NR24,
         NR30, NR31, NR32, NR33, NR34,
         NR41, NR42, NR43, NR44,
-        NR50, NR51, NR52, -1
+        NR50, NR51, NR52,
     };
 
     g_ioMem[NR52] |= 0x80; // old sound played even when this wasn't set (power on)
 
-    for (int i = 0; regs_to_copy[i] >= 0; i++)
-        state.apu.regs[gba_to_gb_sound(regs_to_copy[i]) - 0xFF10] = g_ioMem[regs_to_copy[i]];
+    for (const int gba_reg: regs_to_copy) {
+        const int gb_reg = gba_to_gb_sound(gba_reg);
+        if (gb_reg >= 0xFF10) {
+            state.apu.regs[gb_reg - 0xFF10] = g_ioMem[gba_reg];
+        }
+    }
 
     // Copy wave RAM to both banks
     memcpy(&state.apu.regs[0x20], &g_ioMem[0x90], 0x10);

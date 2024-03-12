@@ -543,7 +543,8 @@ static inline void CPUWriteMemory(uint32_t address, uint32_t value)
             (*cpuSaveGameFunc)(address, (uint8_t)value);
             break;
         }
-    // default
+        goto unwritable;
+    // fallthrough
     default:
     unwritable:
 #ifdef GBA_LOGGING
@@ -802,6 +803,7 @@ static inline void CPUWriteByte(uint32_t address, uint8_t b)
             (*cpuSaveGameFunc)(address, b);
             break;
         }
+        goto unwritable;
     // default
     default:
     unwritable:

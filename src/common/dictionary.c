@@ -89,7 +89,7 @@ unsigned dictionary_hash(const char *key)
 {
         size_t len;
         unsigned hash;
-        int i;
+        size_t i;
 
         len = strlen(key);
         for (hash = 0, i = 0; i < len; i++) {

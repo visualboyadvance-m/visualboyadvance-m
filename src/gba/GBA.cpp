@@ -1689,7 +1689,7 @@ int CPULoadRomData(const char* data, int size)
 
 void doMirroring(bool b)
 {
-    if (romSize > k32MiB)
+    if (static_cast<size_t>(romSize) > k32MiB)
         return;
 
     int romSizeRounded = romSize;

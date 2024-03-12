@@ -239,8 +239,8 @@ int sdlMirroringEnable = 1;
 void systemConsoleMessage(const char*);
 
 char* home;
-char homeConfigDir[1024];
-char homeDataDir[1024];
+char homeConfigDir[1024] = "";
+char homeDataDir[1024] = "";
 
 bool screenMessage = false;
 char screenMessageBuffer[21];
@@ -399,7 +399,7 @@ FILE* sdlFindFile(const char* name)
         return f;
     }
 
-    if (homeDataDir) {
+    if (strlen(homeDataDir)) {
         fprintf(stdout, "Searching home directory: %s\n", homeDataDir);
         sprintf(path, "%s%c%s", homeDataDir, FILE_SEP, name);
         f = fopen(path, "r");

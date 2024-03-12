@@ -4,6 +4,25 @@
 #define STREAM_PIXEL_FORMAT AV_PIX_FMT_YUV420P
 #define IN_SOUND_FORMAT AV_SAMPLE_FMT_S16
 
+namespace {
+
+// Wrapper around an AVPacket that frees the underlying packet on destruction.
+class ScopedAVPacket {
+public:
+    ScopedAVPacket() : av_packet_(av_packet_alloc()) {}
+    ~ScopedAVPacket() {
+        av_packet_free(&av_packet_);
+    }
+
+    AVPacket* operator->() { return av_packet_; }
+    AVPacket* get() { return av_packet_; }
+
+private:
+    AVPacket* av_packet_;
+};
+
+}  // namespace
+
 struct supportedCodecs {
     AVCodecID codecId;
     char const *longName;
@@ -377,10 +396,9 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint8_t *vid)
     if (!isRecording) return MRET_OK;
     // fill and encode frame variables
     int got_packet = 0, ret = 0;
-    AVPacket pkt;
-    av_init_packet(&pkt);
-    pkt.data = NULL;
-    pkt.size = 0;
+    ScopedAVPacket pkt;
+    pkt->data = NULL;
+    pkt->size = 0;
     // fill frame with current pic
     ret = av_image_fill_arrays(frameIn->data, frameIn->linesize,
                                (uint8_t *)vid + tbord * (linesize + pixsize * rbord),
@@ -393,17 +411,17 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint8_t *vid)
     // set valid pts for frame
     frameOut->pts = npts++;
     // finally, encode frame
-    got_packet = avcodec_receive_packet(enc, &pkt);
+    got_packet = avcodec_receive_packet(enc, pkt.get());
     ret = avcodec_send_frame(enc, frameOut);
     if (ret < 0) return MRET_ERR_RECORDING;
     if (!got_packet)
     {
         // rescale output packet timestamp values from codec
         // to stream timebase
-        av_packet_rescale_ts(&pkt, enc->time_base, st->time_base);
-        pkt.stream_index = st->index;
-        //log_packet(oc, &pkt);
-        ret = av_interleaved_write_frame(oc, &pkt);
+        av_packet_rescale_ts(pkt.get(), enc->time_base, st->time_base);
+        pkt->stream_index = st->index;
+        //log_packet(oc, pkt.get());
+        ret = av_interleaved_write_frame(oc, pkt.get());
         if (ret < 0) return MRET_ERR_RECORDING;
     }
     return MRET_OK;
@@ -584,10 +602,9 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
     }
 
     int got_packet;
-    AVPacket pkt;
-    av_init_packet(&pkt);
-    pkt.data = NULL;
-    pkt.size = 0;
+    ScopedAVPacket pkt;
+    pkt->data = NULL;
+    pkt->size = 0;
 
     if (avcodec_fill_audio_frame(audioframeTmp, c->channels, IN_SOUND_FORMAT, (const uint8_t *)audioBuffer, samples_size, 1) < 0)
     {
@@ -604,17 +621,17 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
     audioframe->pts = av_rescale_q(samplesCount, {1, c->sample_rate}, c->time_base);
     samplesCount += dst_nb_samples;
 
-    got_packet = avcodec_receive_packet(c, &pkt);
+    got_packet = avcodec_receive_packet(c, pkt.get());
     if (avcodec_send_frame(c, audioframe) < 0)
     {
         return MRET_ERR_RECORDING;
     }
     if (!got_packet)
     {
-        av_packet_rescale_ts(&pkt, { 1, c->sample_rate }, ast->time_base);
-        pkt.stream_index = ast->index;
-        //log_packet(oc, &pkt);
-        if (av_interleaved_write_frame(oc, &pkt) < 0)
+        av_packet_rescale_ts(pkt.get(), { 1, c->sample_rate }, ast->time_base);
+        pkt->stream_index = ast->index;
+        //log_packet(oc, pkt.get());
+        if (av_interleaved_write_frame(oc, pkt.get()) < 0)
         {
             return MRET_ERR_RECORDING;
         }
@@ -637,11 +654,10 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
 // "X frames left in the queue on closing"
 void recording::MediaRecorder::flush_frames()
 {
-    AVPacket pkt;
-    av_init_packet(&pkt);
-    pkt.data = NULL;
-    pkt.size = 0;
+    ScopedAVPacket pkt;
+    pkt->data = NULL;
+    pkt->size = 0;
     // flush last audio frames
-    while (avcodec_receive_packet(aenc, &pkt) >= 0)
+    while (avcodec_receive_packet(aenc, pkt.get()) >= 0)
         avcodec_send_frame(aenc, NULL);
 }

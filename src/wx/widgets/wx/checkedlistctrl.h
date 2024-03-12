@@ -40,24 +40,6 @@
 DECLARE_EXPORTED_EVENT_TYPE(WXDLLIMPEXP_WEBUPDATE, wxEVT_COMMAND_LIST_ITEM_CHECKED, -1);
 DECLARE_EXPORTED_EVENT_TYPE(WXDLLIMPEXP_WEBUPDATE, wxEVT_COMMAND_LIST_ITEM_UNCHECKED, -1);
 
-#define EVT_LIST_ITEM_CHECKED(id, fn)                          \
-    DECLARE_EVENT_TABLE_ENTRY(wxEVT_COMMAND_LIST_ITEM_CHECKED, \
-        id,                                                    \
-        -1,                                                    \
-        (wxObjectEventFunction)(wxEventFunction)(              \
-                                  wxListEventFunction)&fn,     \
-        (wxObject*)NULL)                                       \
-    ,
-
-#define EVT_LIST_ITEM_UNCHECKED(id, fn)                          \
-    DECLARE_EVENT_TABLE_ENTRY(wxEVT_COMMAND_LIST_ITEM_UNCHECKED, \
-        id,                                                      \
-        -1,                                                      \
-        (wxObjectEventFunction)(wxEventFunction)(                \
-                                  wxListEventFunction)&fn,       \
-        (wxObject*)NULL)                                         \
-    ,
-
 //! This is the class which performs all transactions with the server.
 //! It uses the wxSocket facilities.
 class WXDLLIMPEXP_WEBUPDATE wxCheckedListCtrl : public wxListCtrl {
