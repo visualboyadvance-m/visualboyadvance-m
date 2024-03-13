@@ -4,7 +4,7 @@ option(BUILD_SHARED_LIBS "Build dynamic libraries" OFF)
 option(ENABLE_SDL "Build the SDL port" ON)
 option(ENABLE_WX "Build the wxWidgets port" ON)
 option(ENABLE_DEBUGGER "Enable the debugger" ON)
-option(ENABLE_ASAN "Enable -fsanitize=<option>, address by default, requires debug build" OFF)
+option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build with GCC/Clang" OFF)
 
 # Static linking
 set(VBAM_STATIC_DEFAULT OFF)
@@ -49,7 +49,7 @@ option(ENABLE_LIRC "Enable LIRC support" OFF)
 
 # Link / SFML
 find_package(SFML 2.4 COMPONENTS network system)
-if(CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo)
+if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     if(SFML_STATIC_LIBRARIES AND SFML_NETWORK_LIBRARY_STATIC_DEBUG AND SFML_SYSTEM_LIBRARY_STATIC_DEBUG)
         set(SFML_LIBRARIES ${SFML_NETWORK_LIBRARY_STATIC_DEBUG} ${SFML_SYSTEM_LIBRARY_STATIC_DEBUG})
     elseif(SFML_NETWORK_LIBRARY_DYNAMIC_DEBUG AND SFML_SYSTEM_LIBRARY_DYNAMIC_DEBUG)
@@ -99,7 +99,7 @@ option(ENABLE_ONLINEUPDATES "Enable online update checks" ${ONLINEUPDATES_DEFAUL
 option(HTTPS "Use https URL for winsparkle" ON)
 
 # We generally don't want LTO when debugging because it makes linking slow
-if(CMAKE_BUILD_TYPE STREQUAL Debug)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(LTO_DEFAULT OFF)
 else()
     set(LTO_DEFAULT ON)

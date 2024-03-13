@@ -1,7 +1,7 @@
 # Set the runtime library properly.
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:DEBUG>:Debug>" CACHE INTERNAL "")
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # MSVC-specific flags (not supported by clang-cl).
     add_compile_options(/nologo)
     if (NOT CMAKE_GENERATOR MATCHES "Ninja")
@@ -28,16 +28,15 @@ add_compile_options(
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_definitions(_DEBUG DEBUG)
+    add_compile_definitions(_DEBUG)
     add_compile_options(/Ob0 /Od /RTC1)
-    if (CMAKE_CXX_COMPILER_ID STREQUAL MSVC)
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND NOT ENABLE_ASAN)
         # Use Edit and Continue with MSVC.
         add_compile_options(/ZI)
     else()
         add_compile_options(/Zi)
     endif()
 else()
-    add_compile_definitions(NDEBUG)
     add_compile_options(/MT /Oi /Gy /Zi)
     add_link_options(/OPT:REF /OPT:ICF)
 
