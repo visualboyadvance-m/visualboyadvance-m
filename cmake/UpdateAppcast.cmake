@@ -2,12 +2,6 @@
 # Update version in appcast.xml to latest tag.
 # Commit web-data.
 
-find_package(Git)
-
-if(NOT GIT_FOUND)
-    message(FATAL_ERROR "git is required to update the appcast")
-endif()
-
 function(update_appcast)
     if(UPDATE_APPCAST STREQUAL UNDO)
 	file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/web-data)

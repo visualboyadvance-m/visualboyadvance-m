@@ -10,8 +10,6 @@ if(NOT EXISTS "${CMAKE_SOURCE_DIR}/.git")
     message(FATAL_ERROR "releases can only be done from a git clone")
 endif()
 
-find_package(Git)
-
 if(NOT GIT_FOUND)
     message(FATAL_ERROR "git is required to make a release")
 endif()

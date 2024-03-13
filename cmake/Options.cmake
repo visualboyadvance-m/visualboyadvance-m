@@ -6,8 +6,6 @@ option(ENABLE_WX "Build the wxWidgets port" ON)
 option(ENABLE_DEBUGGER "Enable the debugger" ON)
 option(ENABLE_ASAN "Enable -fsanitize=<option>, address by default, requires debug build" OFF)
 
-option(ENABLE_SSP "Enable gcc stack protector support" OFF)
-
 # Static linking
 set(VBAM_STATIC_DEFAULT OFF)
 if(VCPKG_TARGET_TRIPLET MATCHES -static OR CMAKE_TOOLCHAIN_FILE MATCHES "mxe|-static")
@@ -22,7 +20,6 @@ if(VBAM_STATIC)
     set(SDL2_STATIC ON)
     set(SFML_STATIC_LIBRARIES ON)
     set(FFMPEG_STATIC ON)
-    set(SSP_STATIC ON)
     set(OPENAL_STATIC ON)
     set_property(GLOBAL PROPERTY LINK_SEARCH_START_STATIC ON)
     set_property(GLOBAL PROPERTY LINK_SEARCH_END_STATIC   ON)
@@ -101,16 +98,13 @@ endif()
 option(ENABLE_ONLINEUPDATES "Enable online update checks" ${ONLINEUPDATES_DEFAULT})
 option(HTTPS "Use https URL for winsparkle" ON)
 
-set(LTO_DEFAULT ON)
-
-# gcc lto produces buggy binaries for 64 bit mingw
-# and we generally don't want it when debugging because it makes linking slow
-if(CMAKE_BUILD_TYPE STREQUAL Debug OR (WIN32 AND CMAKE_COMPILER_IS_GNUCXX))
+# We generally don't want LTO when debugging because it makes linking slow
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
     set(LTO_DEFAULT OFF)
+else()
+    set(LTO_DEFAULT ON)
 endif()
-
 option(ENABLE_LTO "Compile with Link Time Optimization" ${LTO_DEFAULT})
-set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ${ENABLE_LTO})
 
 option(ENABLE_GBA_LOGGING "Enable extended GBA logging" ON)
 
@@ -129,7 +123,14 @@ option(TRANSLATIONS_ONLY "Build only the translations.zip" OFF)
 if(WIN32)
     # not yet implemented
     option(ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" OFF)
-    option(ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ON)
+
+    set(XAUDIO2_DEFAULT ON)
+    if (MSVC AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+        # TODO: We should update the XAudio headers to build with clang-cl. See
+        # https://github.com/visualboyadvance-m/visualboyadvance-m/issues/1021
+        set(XAUDIO2_DEFAULT OFF)
+    endif()
+    option(ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ${XAUDIO2_DEFAULT})
 endif()
 
 option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" OFF)

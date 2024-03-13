@@ -1,23 +1,4 @@
 # Do not use this file directly.  Always use the top level CMakeLists.txt file
-
-if(COMMAND cmake_policy)
-    cmake_policy(SET CMP0003 NEW) # link to full path of libs
-    cmake_policy(SET CMP0005 NEW) # escapes in add_definitions
-
-
-    if(POLICY CMP0074)
-        cmake_policy(SET CMP0074 NEW) # use Package_ROOT if set
-    endif()
-
-    if(POLICY CMP0077)
-        cmake_policy(SET CMP0077 NEW) # use vars for options
-    endif()
-
-    if(POLICY CMP0043)
-        cmake_policy(SET CMP0043 NEW) # for wxWidgets, use generator expressions
-    endif()
-endif()
-
 include(VbamFunctions)
 
 set(VBAM_LIBS ${VBAMCORE_LIBS})
