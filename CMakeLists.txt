@@ -1,14 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
-
-if(POLICY CMP0074)
-    cmake_policy(SET CMP0074 NEW) # use Package_ROOT if set
-endif()
-if(POLICY CMP0077)
-    cmake_policy(SET CMP0077 NEW) # use vars for options
-endif()
-if(POLICY CMP0135)
-    cmake_policy(SET CMP0135 NEW) # use extraction timestamp for downloads, not archive timestamp
-endif()
+cmake_policy(VERSION 3.19...3.28.3)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
@@ -56,6 +47,9 @@ if(NOT CMAKE_CXX_COMPILER_LAUNCHER)
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED True)
 
 project(VBA-M C CXX)
 

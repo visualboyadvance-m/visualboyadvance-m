@@ -2,17 +2,29 @@
 include(ProcessorCount)
 ProcessorCount(num_cpus)
 
+if (ENABLE_LTO)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT LTO_SUPPORTED)
+    if (LTO_SUPPORTED)
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+    else()
+        message(WARNING "LTO is not supported by the compiler, diasabling LTO")
+        set(ENABLE_LTO OFF)
+    endif()
+endif()
+
 if(CMAKE_C_COMPILER_ID STREQUAL Clang AND CMAKE_CXX_COMPILER_ID STREQUAL Clang AND NOT MSVC)
     # TODO: This should also be done for clang-cl.
     include(Toolchain-llvm)
 endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang AND NOT MSVC)
-    include(Toolchain-gcc-clang)
-elseif(MSVC)
+if(MSVC)
+    # This also includes clang-cl.
     include(Toolchain-msvc)
 elseif(MINGW)
     include(Toolchain-mingw)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL GNU OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+    include(Toolchain-gcc-clang)
 else()
     message(FATAL_ERROR "Unsupported compiler")
 endif()
