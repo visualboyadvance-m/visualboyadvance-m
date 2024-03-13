@@ -53,7 +53,7 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 
 project(VBA-M C CXX)
 
-find_package(Git REQUIRED)
+find_package(Git)
 find_package(PkgConfig)
 
 include(GNUInstallDirs)

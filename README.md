@@ -7,7 +7,6 @@
   - [Building a Libretro core](#building-a-libretro-core)
   - [Visual Studio Support](#visual-studio-support)
   - [Visual Studio Code Support](#visual-studio-code-support)
-    - [Optional: clangd](#optional-clangd)
   - [Dependencies](#dependencies)
   - [Cross compiling for 32 bit on a 64 bit host](#cross-compiling-for-32-bit-on-a-64-bit-host)
   - [Cross Compiling for Win32](#cross-compiling-for-win32)
@@ -220,7 +219,6 @@ Here is the complete list:
 | ENABLE_DIRECT3D       | Direct3D rendering for wxWidgets (Windows, **NOT IMPLEMENTED!!!**)   | ON                    |
 | ENABLE_XAUDIO2        | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |
 | ENABLE_OPENAL         | Enable OpenAL for the wxWidgets port                                 | AUTO                  |
-| ENABLE_SSP            | Enable gcc stack protector support (gcc only)                        | OFF                   |
 | ENABLE_ASAN           | Enable libasan sanitizers (by default address, only in debug mode)   | OFF                   |
 | UPSTREAM_RELEASE      | Do some release tasks, like codesigning, making zip and gpg sigs.    | OFF                   |
 | BUILD_TESTING         | Build the tests and enable ctest support.                            | ON                    |
@@ -228,9 +226,7 @@ Here is the complete list:
 | SDL2_STATIC           | Try to link static SDL2 libraries                                    | OFF                   |
 | SFML_STATIC_LIBRARIES | Try to link static SFML libraries                                    | OFF                   |
 | FFMPEG_STATIC         | Try to link static ffmpeg libraries                                  | OFF                   |
-| SSP_STATIC            | Try to link static gcc stack protector library (gcc only)            | OFF except Win32      |
 | OPENAL_STATIC         | Try to link static OpenAL libraries                                  | OFF                   |
-| SSP_STATIC            | Link gcc stack protecter libssp statically (gcc, with ENABLE_SSP)    | OFF                   |
 | TRANSLATIONS_ONLY     | Build only the translations.zip and nothing else                     | OFF                   |
 
 Note for distro packagers, we use the CMake module
