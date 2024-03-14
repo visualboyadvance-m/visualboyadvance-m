@@ -46,6 +46,29 @@ if(NOT CMAKE_CXX_COMPILER_LAUNCHER)
     endif()
 endif()
 
+find_package(Git)
+
+# Make sure we pull in the submodules on windows and mingw.
+if(GIT_FOUND AND (WIN32 OR MINGW))
+    # Win32 deps submodule
+    set(SUBMODULE_MANUAL_UPDATE FALSE)
+
+    if(EXISTS "${CMAKE_SOURCE_DIR}/.git" AND NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
+        set(SUBMODULE_MANUAL_UPDATE TRUE)
+        execute_process(
+            COMMAND "${GIT_EXECUTABLE}" submodule update --init --remote --recursive
+            RESULT_VARIABLE SUBMODULE_UPDATE_STATUS
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        )
+    endif()
+
+    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
+        if(NOT (SUBMODULE_MANUAL_UPDATE AND SUBMODULE_UPDATE_STATUS EQUAL 0))
+            message(FATAL_ERROR "Please pull in git submodules, e.g.\nrun: git submodule update --init --remote --recursive")
+        endif()
+    endif()
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_C_STANDARD 11)
@@ -53,7 +76,6 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 
 project(VBA-M C CXX)
 
-find_package(Git)
 find_package(PkgConfig)
 
 if(NOT CMAKE_PREFIX_PATH AND (NOT ("$ENV{CMAKE_PREFIX_PATH}" STREQUAL "")))

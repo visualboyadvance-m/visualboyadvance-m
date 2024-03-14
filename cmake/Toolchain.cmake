@@ -32,14 +32,16 @@ if(X86_64)
     add_compile_definitions(__AMD64__ __X86_64__)
 endif()
 
+# Enable ASAN if requested and supported.
 include(Toolchain-asan)
+
+# MINGW/MSYS-specific settings.
+include(Toolchain-mingw)
 
 # Toolchain-specific settings.
 if(MSVC)
     # This also includes clang-cl.
     include(Toolchain-msvc)
-elseif(MINGW)
-    include(Toolchain-mingw)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL GNU OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     include(Toolchain-gcc-clang)
 else()
