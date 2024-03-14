@@ -34,7 +34,7 @@ extern "C" {
 #include "gba/Globals.h"
 #include "gba/RTC.h"
 
-#include "fex/fex.h"
+#include "core/fex/fex.h"
 
 extern "C" {
 #include "common/memgzio.h"
