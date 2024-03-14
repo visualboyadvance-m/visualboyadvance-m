@@ -249,12 +249,16 @@ set(SDL2_TARGETS SDL2::SDL2 ${SDL2_LIBRARY_TEMP})
 set(
     VBAMCORE_LIBS
     vbamcore
-    fex
+    vbam-fex
     ${SDL2_TARGETS}
     ${SFML_LIBRARIES}
     ${OPENGL_LIBRARIES}
     ${ZLIB_LIBRARY}
 )
+
+# Set up "src" as a global include directory.
+include_directories(${CMAKE_SOURCE_DIR}/src)
+
 
 if(ENABLE_FFMPEG)
     if(NOT FFMPEG_LIBRARIES)
@@ -380,7 +384,7 @@ if(ENABLE_NLS)
 endif()
 
 if(NOT TRANSLATIONS_ONLY)
-    add_subdirectory(fex)
+    add_subdirectory(src/core/fex)
 endif()
 
 set(
@@ -653,7 +657,6 @@ set(
 
 include_directories(
     ${ZLIB_INCLUDE_DIR}
-    fex
     third_party/include
     third_party/include/stb
 )
@@ -764,5 +767,3 @@ set(CPACK_PACKAGE_VERSION_MINOR "0")
 set(CPACK_PACKAGE_VERSION_PATCH "0-Git-${COMMITHASH}")
 list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
 include(CPack)
-
-# vim:sw=4 et tw=0:

@@ -4,9 +4,10 @@
 #ifndef ZLIB_INFLATER_H
 #define ZLIB_INFLATER_H
 
+#include <zlib.h>
+
 #include "Data_Reader.h"
 #include "blargg_common.h"
-#include "zlib.h"
 
 class Zlib_Inflater
 {
