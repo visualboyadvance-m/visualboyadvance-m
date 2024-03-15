@@ -1,36 +1,31 @@
+#include "ConfigManager.h"
+
 // necessary to get portable strerror_r
 #undef _GNU_SOURCE
 #include <string.h>
 #define _GNU_SOURCE 1
 
-#include "ConfigManager.h"
-extern "C" {
-#include "../common/iniparser.h"
-}
 
-#include <stdarg.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <cerrno>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <cmath>
-#include <cerrno>
 
-#include "core/base/file_util.h"
-#include "../common/Patch.h"
-#include "../gba/GBA.h"
-#include "../gba/agbprint.h"
+#include "iniparser.h"
+#include "../Util.h"
+#include "../gb/gbGlobals.h"
+#include "../gb/gbSound.h"
 #include "../gba/Flash.h"
-#include "../gba/Cheats.h"
-#include "../gba/remote.h"
+#include "../gba/GBA.h"
 #include "../gba/RTC.h"
 #include "../gba/Sound.h"
-#include "../gb/gb.h"
-#include "../gb/gbGlobals.h"
-#include "../gb/gbCheats.h"
-#include "../gb/gbSound.h"
-#include "../Util.h"
+#include "../gba/agbprint.h"
+#include "../gba/remote.h"
+#include "core/base/file_util.h"
 
 #ifndef _WIN32
 #define GETCWD getcwd

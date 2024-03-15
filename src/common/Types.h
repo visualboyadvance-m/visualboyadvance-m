@@ -18,11 +18,16 @@
 #ifndef __VBA_TYPES_H__
 #define __VBA_TYPES_H__
 
-#ifdef __LIBRETRO__
-#include <stdint.h>
-#else
+#if defined(__LIBRETRO__)
+
+#include <cstdint>
+
+#else  // !defined(__LIBRETRO__)
+
+#include <cstdint>
+
 #include <zlib.h>
-#include "cstdint.h"
-#endif
+
+#endif  // defined(__LIBRETRO__)
 
 #endif // __VBA_TYPES_H__
