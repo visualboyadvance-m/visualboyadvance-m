@@ -1,3 +1,5 @@
+#include "Patch.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,7 +8,6 @@
 #include <zlib.h>
 #endif
 
-#include "Patch.h"
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
 #include <sys/param.h>
@@ -24,6 +25,8 @@
 #define __MUSL__
 #endif
 #endif
+
+#include "core/base/file_util.h"
 
 #ifdef __GNUC__
 #if defined(__MUSL__) || defined(__APPLE__) || defined(BSD) || defined(__NetBSD__)

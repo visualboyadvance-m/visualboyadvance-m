@@ -16,10 +16,19 @@ VBA_DEFINES += -DNO_LINK
 endif
 
 SOURCES_CXX :=
+
+SOURCES_CXX += \
+	$(CORE_DIR)/Util_common.cpp \
+
 SOURCES_CXX += \
 	$(CORE_DIR)/libretro/libretro.cpp \
 	$(CORE_DIR)/libretro/UtilRetro.cpp \
 	$(CORE_DIR)/libretro/SoundRetro.cpp
+
+SOURCES_CXX += \
+	$(CORE_DIR)/core/base/internal/file_util_internal.cpp \
+	$(CORE_DIR)/core/base/file_util_common.cpp \
+	$(CORE_DIR)/core/base/file_util_libretro.cpp
 
 SOURCES_CXX += \
 	$(CORE_DIR)/apu/Gb_Oscs.cpp \

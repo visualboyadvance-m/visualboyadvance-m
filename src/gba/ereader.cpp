@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "core/base/file_util.h"
 #include "GBA.h"
 #include "GBAinline.h"
 #include "Globals.h"

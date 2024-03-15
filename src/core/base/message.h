@@ -1,4 +1,12 @@
+#ifndef VBAM_CORE_BASE_MESSAGE_H_
+#define VBAM_CORE_BASE_MESSAGE_H_
+
+// Display a message to the user. To be implemented by the frontend.
+void systemMessage(int, const char *, ...);
+
+#if !defined(N_)
 #define N_(String) (String)
+#endif  // !defined(N_)
 
 #define MSG_UNSUPPORTED_VBA_SGM 1
 #define MSG_CANNOT_LOAD_SGM 2
@@ -45,3 +53,5 @@
 #define MSG_UNSUPPORTED_GAMESHARK_CODE 43
 #define MSG_INVALID_GAME_BOY_NINTENDO_LOGO 44
 #define MSG_INVALID_HEADER_CHECKSUM 45
+
+#endif  // VBAM_CORE_BASE_MESSAGE_H_

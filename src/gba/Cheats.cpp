@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../NLS.h"
+#include "core/base/file_util.h"
 #include "../Util.h"
 #include "Cheats.h"
 #include "GBA.h"

@@ -1,8 +1,9 @@
 #include "EEprom.h"
-#include "../Util.h"
+
+#include <cstring>
+
+#include "core/base/file_util.h"
 #include "GBA.h"
-#include <memory.h>
-#include <string.h>
 
 extern int cpuDmaCount;
 

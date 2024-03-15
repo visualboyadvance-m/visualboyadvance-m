@@ -3,6 +3,8 @@
 
 #include "common/Types.h"
 
+#include "core/base/message.h"
+
 #define winlog log
 
 #ifdef __LIBRETRO__
@@ -86,7 +88,6 @@ extern bool systemReadJoypads();
 // return information about the given joystick, -1 for default joystick
 extern uint32_t systemReadJoypad(int);
 extern uint32_t systemGetClock();
-extern void systemMessage(int, const char *, ...);
 extern void systemSetTitle(const char *);
 extern SoundDriver *systemSoundInit();
 extern void systemOnWriteDataToSoundBuffer(const uint16_t *finalWave, int length);

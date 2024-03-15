@@ -25,23 +25,12 @@ extern "C" {
 #include "stb_image_write.h"
 }
 
-#include "NLS.h"
+#include "core/fex/fex.h"
+#include "core/base/file_util.h"
+#include "core/base/message.h"
 #include "System.h"
 #include "Util.h"
-#include "common/Port.h"
-#include "gba/Flash.h"
-#include "gba/GBA.h"
 #include "gba/Globals.h"
-#include "gba/RTC.h"
-
-#include "core/fex/fex.h"
-
-extern "C" {
-#include "common/memgzio.h"
-}
-
-#include "gb/gbGlobals.h"
-#include "gba/gbafilter.h"
 
 #ifndef _MSC_VER
 #define _stricmp strcasecmp
@@ -55,61 +44,7 @@ extern int systemBlueShift;
 extern uint16_t systemColorMap16[0x10000];
 extern uint32_t systemColorMap32[0x10000];
 
-static int(ZEXPORT *utilGzWriteFunc)(gzFile, const voidp, unsigned int) = NULL;
-static int(ZEXPORT *utilGzReadFunc)(gzFile, voidp, unsigned int) = NULL;
-static int(ZEXPORT *utilGzCloseFunc)(gzFile) = NULL;
-static z_off_t(ZEXPORT *utilGzSeekFunc)(gzFile, z_off_t, int) = NULL;
-
 #define MAX_CART_SIZE 0x8000000 // 128MB
-
-bool FileExists(const char *filename)
-{
-#ifdef _WIN32
-        return (_access(filename, 0) != -1);
-#else
-        struct stat buffer;
-        return (stat(filename, &buffer) == 0);
-#endif
-}
-
-#ifdef _WIN32
-#include <windows.h>
-
-wchar_t* utf8ToUtf16(const char *utf8)
-{
-    wchar_t *utf16 = nullptr;
-    size_t size = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL , 0);
-    if (size == 0) return nullptr; // error
-    utf16 = new wchar_t[size];
-    size = MultiByteToWideChar(CP_UTF8, 0, utf8 , -1, utf16, size);
-    if (size == 0) {
-        delete[] utf16;
-        return nullptr; // error
-    }
-    return utf16;
-}
-#endif // _WIN32
-
-FILE* utilOpenFile(const char *filename, const char *mode)
-{
-    FILE *f = NULL;
-#ifdef _WIN32
-    wchar_t *wfilename = utf8ToUtf16(filename);
-    if (!wfilename) return nullptr;
-    wchar_t *wmode = utf8ToUtf16(mode);
-    if (!wmode) {
-        delete[] wfilename;
-        return nullptr;
-    }
-
-    f = _wfopen(wfilename, wmode);
-    delete[] wfilename;
-    delete[] wmode;
-#else
-    f = fopen(filename, mode);
-#endif // _WIN32
-    return f;
-}
 
 // Get user-specific config dir manually.
 // apple:   ~/Library/Application Support/
@@ -293,21 +228,6 @@ bool utilWritePNGFile(const char *fileName, int w, int h, uint8_t *pix)
         return ret;
 }
 
-void utilPutDword(uint8_t *p, uint32_t value)
-{
-        *p++ = value & 255;
-        *p++ = (value >> 8) & 255;
-        *p++ = (value >> 16) & 255;
-        *p = (value >> 24) & 255;
-}
-
-void utilPutWord(uint8_t *p, uint16_t value)
-{
-        *p++ = value & 255;
-        *p = (value >> 8) & 255;
-}
-
-#ifndef __LIBRETRO__
 bool utilWriteBMPFile(const char *fileName, int w, int h, uint8_t *pix)
 {
         uint8_t writeBuffer[512 * 3];
@@ -426,43 +346,6 @@ bool utilWriteBMPFile(const char *fileName, int w, int h, uint8_t *pix)
 
         return true;
 }
-#endif /* !__LIBRETRO__ */
-
-bool utilIsGBAImage(const char *file)
-{
-        coreOptions.cpuIsMultiBoot = false;
-        if (strlen(file) > 4) {
-                const char *p = strrchr(file, '.');
-
-                if (p != NULL) {
-                        if ((_stricmp(p, ".agb") == 0) || (_stricmp(p, ".gba") == 0) ||
-                            (_stricmp(p, ".bin") == 0) || (_stricmp(p, ".elf") == 0))
-                                return true;
-                        if (_stricmp(p, ".mb") == 0) {
-                                coreOptions.cpuIsMultiBoot = true;
-                                return true;
-                        }
-                }
-        }
-
-        return false;
-}
-
-bool utilIsGBImage(const char *file)
-{
-        if (strlen(file) > 4) {
-                const char *p = strrchr(file, '.');
-
-                if (p != NULL) {
-                        if ((_stricmp(p, ".dmg") == 0) || (_stricmp(p, ".gb") == 0) ||
-                            (_stricmp(p, ".gbc") == 0) || (_stricmp(p, ".cgb") == 0) ||
-                            (_stricmp(p, ".sgb") == 0))
-                                return true;
-                }
-        }
-
-        return false;
-}
 
 bool utilIsGzipFile(const char *file)
 {
@@ -478,20 +361,6 @@ bool utilIsGzipFile(const char *file)
         }
 
         return false;
-}
-
-// strip .gz or .z off end
-void utilStripDoubleExtension(const char *file, char *buffer)
-{
-        if (buffer != file) // allows conversion in place
-                strcpy(buffer, file);
-
-        if (utilIsGzipFile(file)) {
-                char *p = strrchr(buffer, '.');
-
-                if (p)
-                        *p = 0;
-        }
 }
 
 // Opens and scans archive using accept(). Returns fex_t if found.
@@ -552,35 +421,11 @@ IMAGE_TYPE utilFindType(const char *file)
 
 IMAGE_TYPE utilFindType(const char *file, char (&buffer)[2048])
 {
-#ifdef WIN32
-        DWORD dwNum = MultiByteToWideChar(CP_ACP, 0, file, -1, NULL, 0);
-        wchar_t *pwText;
-        pwText = new wchar_t[dwNum];
-        if (!pwText) {
-                return IMAGE_UNKNOWN;
-        }
-        MultiByteToWideChar(CP_ACP, 0, file, -1, pwText, dwNum);
-        //char *file_conv = fex_wide_to_path(file);
-        char *file_conv = (char *)file;
-        //	if ( !utilIsImage( file_conv ) ) // TODO: utilIsArchive() instead?
-        //	{
-        fex_t *fe = scan_arc(file_conv, utilIsImage, buffer);
-        if (!fe)
-                return IMAGE_UNKNOWN;
-        fex_close(fe);
-        file = buffer;
-        //	}
-        //free(file_conv);
-#else
-        //	if ( !utilIsImage( file ) ) // TODO: utilIsArchive() instead?
-        //	{
         fex_t *fe = scan_arc(file, utilIsImage, buffer);
         if (!fe)
                 return IMAGE_UNKNOWN;
         fex_close(fe);
         file = buffer;
-//	}
-#endif
         return utilIsGBAImage(file) ? IMAGE_GBA : IMAGE_GB;
 }
 
@@ -596,26 +441,10 @@ uint8_t *utilLoad(const char *file, bool (*accept)(const char *), uint8_t *data,
 {
         // find image file
         char buffer[2048];
-#ifdef WIN32
-        DWORD dwNum = MultiByteToWideChar(CP_ACP, 0, file, -1, NULL, 0);
-        wchar_t *pwText;
-        pwText = new wchar_t[dwNum];
-        if (!pwText) {
-                return NULL;
-        }
-        MultiByteToWideChar(CP_ACP, 0, file, -1, pwText, dwNum);
-        //char *file_conv = fex_wide_to_path(file);
-        char *file_conv = (char *)file;
-        delete[] pwText;
-        fex_t *fe = scan_arc(file_conv, accept, buffer);
-        if (!fe)
-                return NULL;
-        //free(file_conv);
-#else
         fex_t *fe = scan_arc(file, accept, buffer);
         if (!fe)
                 return NULL;
-#endif
+
         // Allocate space for image
         fex_err_t err = fex_stat(fe);
         int fileSize = fex_size(fe);
@@ -668,243 +497,5 @@ void replaceAll(std::string &str, const std::string &from, const std::string &to
                 str.replace(start_pos, from.length(), to);
                 start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with
                                           // 'yx'
-        }
-}
-
-void utilExtract(const char *filepath, const char *filename)
-{
-        fex_t *fex;
-        std::string archive_name(filepath);
-        archive_name.append(filename);
-
-        fex_open(&fex, archive_name.c_str());
-        while (!fex_done(fex)) {
-                std::string extracted_filename(filepath);
-                extracted_filename.append(fex_name(fex));
-#ifdef WIN32
-                replaceAll(extracted_filename, "/", "\\");
-#endif
-
-                std::string new_dir(filepath);
-                new_dir.append(fex_name(fex));
-#ifdef WIN32
-                replaceAll(new_dir, "/", "\\");
-#endif
-                new_dir = new_dir.substr(0, new_dir.find_last_of("\\"));
-                if (!FileExists(new_dir.c_str()))
-                        mkdir(new_dir.c_str()
-#ifndef WIN32
-                                  ,
-                              0777
-#endif
-                              );
-
-                if (FileExists(extracted_filename.c_str())) {
-                        std::string new_name(filepath);
-                        new_name.append("old-");
-                        new_name.append(fex_name(fex));
-#ifdef WIN32
-                        replaceAll(new_name, "/", "\\");
-#endif
-                        remove(new_name.c_str());
-                        rename(extracted_filename.c_str(), new_name.c_str());
-                }
-
-                FILE *extracted_file = fopen(extracted_filename.c_str(), "wb");
-                const void *p;
-                fex_data(fex, &p);
-                fwrite(p, fex_size(fex), 1, extracted_file);
-                fclose(extracted_file);
-                fex_next(fex);
-        }
-        fex_close(fex);
-}
-
-void utilWriteInt(gzFile gzFile, int i)
-{
-        utilGzWrite(gzFile, &i, sizeof(int));
-}
-
-int utilReadInt(gzFile gzFile)
-{
-        int i = 0;
-        utilGzRead(gzFile, &i, sizeof(int));
-        return i;
-}
-
-void utilReadData(gzFile gzFile, variable_desc *data)
-{
-        while (data->address) {
-                utilGzRead(gzFile, data->address, data->size);
-                data++;
-        }
-}
-
-void utilReadDataSkip(gzFile gzFile, variable_desc *data)
-{
-        while (data->address) {
-                utilGzSeek(gzFile, data->size, SEEK_CUR);
-                data++;
-        }
-}
-
-void utilWriteData(gzFile gzFile, variable_desc *data)
-{
-        while (data->address) {
-                utilGzWrite(gzFile, data->address, data->size);
-                data++;
-        }
-}
-
-gzFile utilAutoGzOpen(const char *file, const char *mode)
-{
-#ifdef _WIN32
-        wchar_t *wfile = utf8ToUtf16(file);
-        if (!wfile) return nullptr;
-        gzFile handler = gzopen_w(wfile, mode);
-        delete[] wfile;
-        return handler;
-#else
-        return gzopen(file, mode);
-#endif
-}
-
-gzFile utilGzOpen(const char *file, const char *mode)
-{
-        utilGzWriteFunc = (int(ZEXPORT *)(gzFile, void *const, unsigned int))gzwrite;
-        utilGzReadFunc = gzread;
-        utilGzCloseFunc = gzclose;
-        utilGzSeekFunc = gzseek;
-
-        return utilAutoGzOpen(file, mode);
-}
-
-gzFile utilMemGzOpen(char *memory, int available, const char *mode)
-{
-        utilGzWriteFunc = memgzwrite;
-        utilGzReadFunc = memgzread;
-        utilGzCloseFunc = memgzclose;
-        utilGzSeekFunc = memgzseek;
-
-        return memgzopen(memory, available, mode);
-}
-
-int utilGzWrite(gzFile file, const voidp buffer, unsigned int len)
-{
-        return utilGzWriteFunc(file, buffer, len);
-}
-
-int utilGzRead(gzFile file, voidp buffer, unsigned int len)
-{
-        return utilGzReadFunc(file, buffer, len);
-}
-
-int utilGzClose(gzFile file)
-{
-        return utilGzCloseFunc(file);
-}
-
-z_off_t utilGzSeek(gzFile file, z_off_t offset, int whence)
-{
-        return utilGzSeekFunc(file, offset, whence);
-}
-
-long utilGzMemTell(gzFile file)
-{
-        return memtell(file);
-}
-
-void utilGBAFindSave(const int size)
-{
-        uint32_t *p = (uint32_t *)&g_rom[0];
-        uint32_t *end = (uint32_t *)(&g_rom[0] + size);
-        int detectedSaveType = 0;
-        int flashSize = 0x10000;
-        bool rtcFound = false;
-
-        while (p < end) {
-                uint32_t d = READ32LE(p);
-
-                if (d == 0x52504545) {
-                        if (memcmp(p, "EEPROM_", 7) == 0) {
-                                if (detectedSaveType == 0 || detectedSaveType == 4)
-                                        detectedSaveType = 1;
-                        }
-                } else if (d == 0x4D415253) {
-                        if (memcmp(p, "SRAM_", 5) == 0) {
-                                if (detectedSaveType == 0 || detectedSaveType == 1 ||
-                                    detectedSaveType == 4)
-                                        detectedSaveType = 2;
-                        }
-                } else if (d == 0x53414C46) {
-                        if (memcmp(p, "FLASH1M_", 8) == 0) {
-                                if (detectedSaveType == 0) {
-                                        detectedSaveType = 3;
-                                        flashSize = 0x20000;
-                                }
-                        } else if (memcmp(p, "FLASH512_", 9) == 0) {
-                                if (detectedSaveType == 0) {
-                                        detectedSaveType = 3;
-                                        flashSize = 0x10000;
-                                }
-                        } else if (memcmp(p, "FLASH", 5) == 0) {
-                                if (detectedSaveType == 0) {
-                                        detectedSaveType = 4;
-                                        flashSize = 0x10000;
-                                }
-                        }
-                } else if (d == 0x52494953) {
-                        if (memcmp(p, "SIIRTC_V", 8) == 0)
-                                rtcFound = true;
-                }
-                p++;
-        }
-        // if no matches found, then set it to NONE
-        if (detectedSaveType == 0) {
-                detectedSaveType = 5;
-        }
-        if (detectedSaveType == 4) {
-                detectedSaveType = 3;
-        }
-        rtcEnable(rtcFound);
-        rtcEnableRumble(!rtcFound);
-        coreOptions.saveType = detectedSaveType;
-        flashSetSize(flashSize);
-}
-
-void utilUpdateSystemColorMaps(bool lcd)
-{
-        switch (systemColorDepth) {
-        case 16: {
-                for (int i = 0; i < 0x10000; i++) {
-                        systemColorMap16[i] = ((i & 0x1f) << systemRedShift) |
-                                              (((i & 0x3e0) >> 5) << systemGreenShift) |
-                                              (((i & 0x7c00) >> 10) << systemBlueShift);
-                }
-                if (lcd)
-                        gbafilter_pal(systemColorMap16, 0x10000);
-        } break;
-        case 24:
-        case 32: {
-                for (int i = 0; i < 0x10000; i++) {
-                        systemColorMap32[i] = ((i & 0x1f) << systemRedShift) |
-                                              (((i & 0x3e0) >> 5) << systemGreenShift) |
-                                              (((i & 0x7c00) >> 10) << systemBlueShift);
-                }
-                if (lcd)
-                        gbafilter_pal32(systemColorMap32, 0x10000);
-        } break;
-        }
-}
-
-// Check for existence of file.
-bool utilFileExists(const char *filename)
-{
-        FILE *f = fopen(filename, "r");
-        if (f == NULL) {
-                return false;
-        } else {
-                fclose(f);
-                return true;
         }
 }

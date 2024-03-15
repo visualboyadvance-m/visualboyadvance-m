@@ -1,5 +1,5 @@
-#ifndef MEMGZIO_H
-#define MEMGZIO_H
+#ifndef VBAM_CORE_BASE_INTERNAL_MEMGZIO_H_
+#define VBAM_CORE_BASE_INTERNAL_MEMGZIO_H_
 
 /* gzio.c -- IO on .gz files
  * Copyright (C) 1995-2002 Jean-loup Gailly.
@@ -13,6 +13,10 @@
  */
 
 #include <zlib.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 gzFile ZEXPORT memgzopen(char *memory, int available, const char *mode);
 int ZEXPORT memgzread(gzFile file, voidp buf, unsigned len);
@@ -30,4 +34,8 @@ z_off_t ZEXPORT memgzseek(gzFile file, z_off_t off, int whence);
 #  endif
 #endif
 
-#endif // MEMGZIO_H
+#ifdef __cplusplus
+}  // extern "C"
+#endif
+
+#endif  // VBAM_CORE_BASE_INTERNAL_MEMGZIO_H_

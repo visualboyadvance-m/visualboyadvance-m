@@ -1,11 +1,10 @@
-#include "../NLS.h"
 #include "../System.h"
-#include "../Util.h"
 #include "../common/Port.h"
 #include "GBA.h"
 #include "GBAinline.h"
 #include "Globals.h"
 
+#include "core/base/file_util.h"
 #include <memory.h>
 #include <string.h>
 #include <time.h>

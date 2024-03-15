@@ -17,6 +17,7 @@ extern "C" {
 #include <cmath>
 #include <cerrno>
 
+#include "core/base/file_util.h"
 #include "../common/Patch.h"
 #include "../gba/GBA.h"
 #include "../gba/agbprint.h"
@@ -35,6 +36,7 @@ extern "C" {
 #define GETCWD getcwd
 #else // _WIN32
 #include <direct.h>
+#include <io.h>
 #define GETCWD _getcwd
 #define stat _stat
 #define mkdir(X,Y) (_mkdir(X))
@@ -54,6 +56,19 @@ extern "C" {
 #endif // ! __GNUC__
 #include <string>
 #include <sstream>
+
+namespace {
+
+bool FileExists(const char *filename) {
+#ifdef _WIN32
+	return (_access(filename, 0) != -1);
+#else
+	struct stat buffer;
+	return (stat(filename, &buffer) == 0);
+#endif
+}
+
+}  // namespace
 
 enum named_opts
 {

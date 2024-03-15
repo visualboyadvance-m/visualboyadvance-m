@@ -45,6 +45,7 @@
 
 #include "SDL.h"
 
+#include "core/base/file_util.h"
 #include "../Util.h"
 #include "../common/Patch.h"
 #include "../gb/gb.h"
