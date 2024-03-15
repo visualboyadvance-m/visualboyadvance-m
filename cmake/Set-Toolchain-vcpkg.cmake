@@ -320,6 +320,9 @@ function(vcpkg_remove_optional_deps vcpkg_exe)
 endfunction()
 
 function(vcpkg_set_toolchain)
+    if(NOT DEFINED POWERSHELL)
+        message(FATAL_ERROR "Powershell is required to use vcpkg binaries.")
+    endif()
     if(NOT DEFINED ENV{VCPKG_ROOT})
         get_filename_component(preferred_root ${CMAKE_SOURCE_DIR}/../vcpkg ABSOLUTE)
 

@@ -28,7 +28,7 @@ if(WIN32)
         HINTS "/Windows/System32/WindowsPowerShell/v1.0"
         REQUIRED)
 else()
-    find_program(POWERSHELL pwsh REQUIRED)
+    find_program(POWERSHELL pwsh)
 endif()
 
 include(Set-Toolchain-vcpkg)

@@ -184,8 +184,10 @@ Ignore the following cmake error.
     endwhile()
 
     # Convert to UNIX line endings on Windows, just copy the file otherwise.
-
     if(CMAKE_HOST_SYSTEM MATCHES Windows OR ((NOT DEFINED CMAKE_HOST_SYSTEM) AND WIN32))
+        if(NOT DEFINED POWERSHELL)
+            message(FATAL_ERROR "Powershell is required to convert line endings on Windows.")
+        endif()
         execute_process(
             COMMAND ${POWERSHELL} -NoLogo -NoProfile -ExecutionPolicy Bypass -Command [=[
                 $text = [IO.File]::ReadAllText("CHANGELOG.md.work") -replace "`r`n", "`n"

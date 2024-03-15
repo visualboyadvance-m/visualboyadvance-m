@@ -158,6 +158,9 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     set(ENV{PATH} "${dbg_prefix}/bin;${common_prefix}/bin;$ENV{PATH}")
 
     if(NOT ZIP_PROGRAM AND NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/zip.exe)
+        if(NOT DEFINED POWERSHELL)
+            message(FATAL_ERROR "Powershell is required for extraction.")
+        endif()
         # get zip binary for wxrc
         file(DOWNLOAD "https://www.willus.com/archive/zip64/infozip_binaries_win32.zip" ${CMAKE_CURRENT_BINARY_DIR}/infozip_binaries_win32.zip)
         # unzip it
