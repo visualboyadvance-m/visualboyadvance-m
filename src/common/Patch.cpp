@@ -11,7 +11,11 @@
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
 #include <sys/param.h>
-#include "BSD.h"
+#define fopen64     fopen
+#define fseeko64    fseeko
+#define fseek64     fseek
+#define ftell64     ftell
+#define ftello64    ftello
 #endif
 
 #ifndef __LIBRETRO__

@@ -1,13 +1,25 @@
 #include "background-input.h"
 
-#include "../common/contains.h"
+#if defined(__WXMSW__)
+
+#include <windows.h>
+
+#elif defined(__WXMAC__)
+#else  // defined(__WXGTK__)
+
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
+#include <X11/XKBlib.h>
+#include "wayland.h"
+
+#endif  // defined(__WXMSW__)
+
+#include <unordered_map>
 
 #define NO_ERROR  (wxThread::ExitCode)0
 #define ANY_ERROR (wxThread::ExitCode)1
 
 #if defined(__WXMSW__)
-
-#include <windows.h>
 
 /* The following functions are copied from wxWidgets repo file
  * `src/msw/window.cpp` that convert a Windows Virtual Key into a
@@ -22,7 +34,7 @@ int ChooseNormalOrExtended(int lParam, int keyNormal, int keyExtended)
     return !lParam || (HIWORD(lParam) & KF_EXTENDED) ? keyExtended : keyNormal;
 }
 
-std::unordered_map<int, wxKeyCode> gs_specialKeys =
+static const std::unordered_map<int, wxKeyCode> kSpecialKeys =
 {
     { VK_CANCEL,        WXK_CANCEL },
     { VK_BACK,          WXK_BACK },
@@ -113,8 +125,9 @@ int VKToWX(WXWORD vk, WXLPARAM lParam, wchar_t *uc)
     int wxk;
 
     // check the table first
-    if (contains(gs_specialKeys, vk)) {
-        wxk = gs_specialKeys[vk];
+    const auto iter = kSpecialKeys.find(vk);
+    if (iter != kSpecialKeys.end()) {
+        wxk = iter->second;
         if (wxk < WXK_START) {
              // Unicode code for this key is the same as its ASCII code.
              if (uc) *uc = wxk;
@@ -247,16 +260,11 @@ int VKToWX(WXWORD vk, WXLPARAM lParam, wchar_t *uc)
 
 #else // defined(__WXGTK__)
 
-#include <X11/Xlib.h>
-#include <X11/keysym.h>
-#include <X11/XKBlib.h>
-#include "wayland.h"
-
 /* The following functions are copied from wxWidgets repo file
  * `src/x11/utils.cpp` that convert a XLib keycode into a
  * WX keycode.
  */
-std::unordered_map<unsigned, int> x11KeySym = {
+static const std::unordered_map<unsigned, int> kKeyMap = {
     #include "x11keymap.h"
 };
 
@@ -459,13 +467,14 @@ int wxUnicodeCharXToWX(unsigned long keySym)
     if ((keySym & 0xff000000) == 0x01000000)
         return keySym & 0x00ffffff;
 
-    if (contains(x11KeySym, keySym))
-        return x11KeySym[keySym];
+    const auto iter = kKeyMap.find(keySym);
+    if (iter != kKeyMap.end())
+        return iter->second;
 
     return WXK_NONE;
 }
 
-#endif
+#endif  // defined(__WXMSW__)
 
 class BackgroundInput : public wxThread {
 public:
@@ -576,9 +585,7 @@ wxThread::ExitCode BackgroundInput::CheckKeyboard()
                             if (xKeySym >= 'a' && xKeySym <= 'z') xKeySym = xKeySym + 'A' - 'a';
                             //fprintf(stderr, "(%d,%d): %ld - %s --- %d\n", i, j, kSym, XKeysymToString(kSym), xKeySym);
                             wxKeyEvent ev(wxEVT_KEY_DOWN);
-#if wxUSE_UNICODE
                             ev.m_uniChar = xKeySym;
-#endif
                             ev.m_keyCode = xKeySym;
                             handler->AddPendingEvent(ev);
                         }
@@ -596,9 +603,7 @@ wxThread::ExitCode BackgroundInput::CheckKeyboard()
                             if (xKeySym >= 'a' && xKeySym <= 'z') xKeySym = xKeySym + 'A' - 'a';
                             //fprintf(stderr, "(%d,%d): %ld - %s --- %d\n", i, j, kSym, XKeysymToString(kSym), xKeySym);
                             wxKeyEvent ev(wxEVT_KEY_UP);
-#if wxUSE_UNICODE
                             ev.m_uniChar = xKeySym;
-#endif
                             ev.m_keyCode = xKeySym;
                             handler->AddPendingEvent(ev);
                         }

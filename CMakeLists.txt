@@ -393,10 +393,9 @@ set(
     SRC_MAIN
     src/Util.cpp
     src/Util_common.cpp
-    src/common/dictionary.c
-    src/common/iniparser.c
     src/common/Patch.cpp
     src/common/SoundSDL.cpp
+    src/common/version.cpp
 )
 
 if(MSVC)
@@ -408,12 +407,11 @@ set(
     src/System.h
     src/Util.h
     src/common/array.h
-    src/common/dictionary.h
-    src/common/iniparser.h
     src/common/Port.h
     src/common/sizes.h
     src/common/SoundDriver.h
     src/common/SoundSDL.h
+    src/common/version_cpp.h
 )
 
 if(MSVC)
@@ -542,25 +540,27 @@ set(
 set(
     SRC_SDL
     src/sdl/ConfigManager.cpp
-    src/sdl/SDL.cpp
-    src/sdl/filters.cpp
-    src/sdl/text.cpp
-    src/sdl/inputSDL.cpp
+    src/sdl/dictionary.c
     src/sdl/expr.cpp
     src/sdl/exprNode.cpp
     src/sdl/expr-lex.cpp
-    src/common/version.cpp
+    src/sdl/filters.cpp
+    src/sdl/iniparser.c
+    src/sdl/inputSDL.cpp
+    src/sdl/SDL.cpp
+    src/sdl/text.cpp
 )
 
 set(
     HDR_SDL
     src/sdl/ConfigManager.h
-    src/sdl/filters.h
-    src/sdl/text.h
-    src/sdl/inputSDL.h
+    src/sdl/dictionary.h
     src/sdl/expr.cpp.h
     src/sdl/exprNode.h
-    src/common/version_cpp.h
+    src/sdl/filters.h
+    src/sdl/iniparser.h
+    src/sdl/inputSDL.h
+    src/sdl/text.h
 )
 
 set(

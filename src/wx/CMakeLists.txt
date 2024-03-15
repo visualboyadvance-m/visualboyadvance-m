@@ -767,7 +767,6 @@ set(
     ../sdl/text.cpp
     # from external source with minor modifications
     widgets/checkedlistctrl.cpp
-    ../common/version.cpp
 )
 
 set(ALL_SRC_WX ${SRC_WX})
@@ -824,9 +823,6 @@ set(
     ../sdl/text.h
     # from external source with minor modifications
     widgets/wx/checkedlistctrl.h
-    ../common/version_cpp.h
-    ../common/range.hpp
-    ../common/contains.h
 )
 
 set(ALL_HDR_WX ${HDR_WX})
