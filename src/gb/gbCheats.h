@@ -1,6 +1,12 @@
 #ifndef GBCHEATS_H
 #define GBCHEATS_H
 
+#include <cstdint>
+
+#if !defined(__LIBRETRO__)
+#include <zlib.h>
+#endif  // defined(__LIBRETRO__)
+
 #include "../System.h"
 
 struct gbXxCheat {

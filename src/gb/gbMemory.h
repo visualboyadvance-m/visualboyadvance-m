@@ -1,8 +1,8 @@
 #ifndef GBMEMORY_H
 #define GBMEMORY_H
 
-#include "../common/Types.h"
-#include <time.h>
+#include <cstdint>
+#include <ctime>
 
 struct mapperMBC1 {
     int mapperRAMEnable;

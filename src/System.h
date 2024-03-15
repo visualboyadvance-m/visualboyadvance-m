@@ -1,15 +1,9 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#include "common/Types.h"
+#include <cstdint>
 
 #include "core/base/message.h"
-
-#define winlog log
-
-#ifdef __LIBRETRO__
-#define utilOpenFile fopen
-#endif
 
 class SoundDriver;
 

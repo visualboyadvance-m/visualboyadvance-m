@@ -1,5 +1,6 @@
 #include "../autoupdater.h"
-#include "../../../common/version_cpp.h"
+
+#include "core/base/version.h"
 #include "../../strutils.h"
 #include "winsparkle-wrapper.h"
 
@@ -7,7 +8,7 @@
 void initAutoupdater()
 {
     // even if we are a nightly, only check latest stable version
-    wxString version = strutils::split(vbam_version, '-')[0];
+    wxString version = strutils::split(kVbamVersion, '-')[0];
 #ifndef NO_HTTPS
     win_sparkle_set_appcast_url("https://data.visualboyadvance-m.org/appcast.xml");
 #else

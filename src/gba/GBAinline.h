@@ -4,7 +4,7 @@
 #include <type_traits>
 
 #include "../System.h"
-#include "../common/Port.h"
+#include "core/base/port.h"
 #include "GBALink.h"
 #include "GBAcpu.h"
 #include "RTC.h"

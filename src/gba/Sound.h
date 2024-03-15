@@ -1,9 +1,13 @@
 #ifndef SOUND_H
 #define SOUND_H
 
-// Sound emulation setup/options and GBA sound emulation
+#include <cstdint>
 
-#include "../System.h"
+#if !defined(__LIBRETRO__)
+#include <zlib.h>
+#endif  // !defined(__LIBRETRO__)
+
+// Sound emulation setup/options and GBA sound emulation
 
 //// Setup/options (these affect GBA and GB sound)
 

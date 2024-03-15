@@ -20,7 +20,7 @@
 
 #include <SDL.h>
 
-#include "ringbuffer.h"
+#include "core/base/ringbuffer.h"
 #include "SoundDriver.h"
 
 class SoundSDL : public SoundDriver {

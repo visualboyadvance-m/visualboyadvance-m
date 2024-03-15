@@ -3,7 +3,7 @@
 #include <wx/control.h>
 #include <wx/xrc/xmlres.h>
 
-#include "../common/sizes.h"
+#include "core/base/sizes.h"
 #include "../gb/gb.h"
 #include "dialogs/game-maker.h"
 #include "dialogs/validated-child.h"

@@ -1,11 +1,12 @@
-#include "Patch.h"
+#include "core/base/patch.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "zconf.h"
-#ifndef __LIBRETRO__
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
+#if !defined(__LIBRETRO__)
 #include <zlib.h>
+#include <zconf.h>
 #endif
 
 

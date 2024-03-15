@@ -68,7 +68,7 @@ uint16_t IP_LINK_PORT = 5738;
 std::string IP_LINK_BIND_ADDRESS = "*";
 
 #include "core/base/message.h"
-#include "../common/Port.h"
+#include "core/base/port.h"
 #include "GBA.h"
 #include "GBALink.h"
 #include "GBASockClient.h"

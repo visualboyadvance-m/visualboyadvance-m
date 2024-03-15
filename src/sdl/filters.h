@@ -19,8 +19,7 @@
 #ifndef VBA_SDL_FILTERS_H
 #define VBA_SDL_FILTERS_H
 
-#include "../common/Types.h"
-#include "../System.h"
+#include <cstdint>
 
 //
 // Screen filters

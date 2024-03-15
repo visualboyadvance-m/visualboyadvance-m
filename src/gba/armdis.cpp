@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <cstring>
 
+#include "core/base/port.h"
 #include "../System.h"
-#include "../common/Port.h"
 #include "GBA.h"
 #include "armdis.h"
 #include "elf.h"

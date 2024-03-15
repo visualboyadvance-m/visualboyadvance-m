@@ -10,7 +10,7 @@
 #include <wx/wfstream.h>
 #include <wx/msgdlg.h>
 
-#include "../common/version_cpp.h"
+#include "core/base/version.h"
 #include "../gb/gbPrinter.h"
 #include "../gba/agbprint.h"
 #include "config/option-proxy.h"
@@ -2297,7 +2297,7 @@ EVT_HANDLER(wxID_ABOUT, "About...")
 {
     wxAboutDialogInfo ai;
     ai.SetName(wxT("VisualBoyAdvance-M"));
-    wxString version(vbam_version);
+    wxString version(kVbamVersion);
     ai.SetVersion(version);
     // setting website, icon, license uses custom aboutbox on win32 & macosx
     // but at least win32 standard about is nothing special

@@ -1,6 +1,5 @@
 #include <cmath>
 #include <memory.h>
-#include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,8 +12,8 @@
 #include "core/base/file_util.h"
 #include "../System.h"
 #include "../Util.h"
-#include "../common/Port.h"
-#include "../common/sizes.h"
+#include "core/base/port.h"
+#include "core/base/sizes.h"
 #include "Cheats.h"
 #include "EEprom.h"
 #include "Flash.h"

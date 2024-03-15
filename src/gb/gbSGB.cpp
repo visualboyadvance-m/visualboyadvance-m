@@ -2,8 +2,8 @@
 #include <stdlib.h>
 
 #include "core/base/file_util.h"
+#include "core/base/port.h"
 #include "../System.h"
-#include "../common/Port.h"
 #include "gb.h"
 #include "gbGlobals.h"
 

@@ -1,7 +1,7 @@
-#ifndef PORT_H
-#define PORT_H
+#ifndef VBAM_CORE_BASE_PORT_H_
+#define VBAM_CORE_BASE_PORT_H_
 
-#include "Types.h"
+#include <cstdint>
 
 #ifdef __PS3__
 /* PlayStation3 */
@@ -60,4 +60,4 @@ static inline uint32_t swap32(uint32_t v)
 #define WRITE32LE(x, v) *((uint32_t *)x) = (v)
 #endif
 
-#endif // PORT_H
+#endif  // VBAM_CORE_BASE_PORT_H_

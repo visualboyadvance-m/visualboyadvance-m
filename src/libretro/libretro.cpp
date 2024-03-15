@@ -12,11 +12,11 @@
 
 #include "../System.h"
 #include "../Util.h"
+#include "core/base/port.h"
+#include "core/base/sizes.h"
 #include "../apu/Blip_Buffer.h"
 #include "../apu/Gb_Apu.h"
 #include "../apu/Gb_Oscs.h"
-#include "../common/Port.h"
-#include "../common/sizes.h"
 #include "../gba/Cheats.h"
 #include "../gba/EEprom.h"
 #include "../gba/Flash.h"

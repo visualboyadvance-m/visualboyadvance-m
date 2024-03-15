@@ -1,5 +1,4 @@
-#include <cstddef>
-#include "../common/Types.h"
+#include "gbGlobals.h"
 
 uint8_t* gbMemoryMap[16];
 
@@ -30,4 +29,4 @@ bool gbCgbMode = false;
 bool gbSgbMode = false;
 bool gbColorOption = false;
 
-uint8_t (*gbSerialFunction)(uint8_t) = NULL;
+uint8_t (*gbSerialFunction)(uint8_t) = nullptr;

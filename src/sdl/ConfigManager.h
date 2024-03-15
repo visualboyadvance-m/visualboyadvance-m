@@ -2,6 +2,8 @@
 #define _CONFIGMANAGER_H
 
 #pragma once
+
+#include "../System.h"
 #include "../sdl/filters.h"
 #include <stdio.h>
 
