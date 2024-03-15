@@ -5,6 +5,10 @@
 
 #include "../System.h"
 
+#if !defined(__LIBRETRO__)
+#include <zlib.h>
+#endif  // defined(__LIBRETRO__)
+
 struct CheatsData {
     int code;
     int size;

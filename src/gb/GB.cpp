@@ -9,9 +9,9 @@
 #include <vector>
 
 #include "core/base/file_util.h"
+#include "core/base/sizes.h"
 #include "../System.h"
 #include "../Util.h"
-#include "../common/sizes.h"
 #include "../gba/GBALink.h"
 #include "../gba/Sound.h"
 #include "gbCheats.h"
@@ -20,9 +20,9 @@
 #include "gbSGB.h"
 #include "gbSound.h"
 
-#ifndef __LIBRETRO__
-#include "../common/Patch.h"
-#endif  // __LIBRETRO__
+#if !defined(__LIBRETRO__)
+#include "core/base/patch.h"
+#endif  // defined(__LIBRETRO__)
 
 #ifdef __GNUC__
 #define _stricmp strcasecmp

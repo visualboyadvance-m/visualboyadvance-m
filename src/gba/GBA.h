@@ -1,7 +1,8 @@
 #ifndef GBA_H
 #define GBA_H
 
-#include "../common/Types.h"
+#include <cstdint>
+
 #include "../System.h"
 #include "../Util.h"
 

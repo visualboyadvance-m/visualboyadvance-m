@@ -1,6 +1,12 @@
 #ifndef RTC_H
 #define RTC_H
 
+#include <cstdint>
+
+#if !defined(__LIBRETRO__)
+#include <zlib.h>
+#endif  // defined(__LIBRETRO__)
+
 uint16_t rtcRead(uint32_t address);
 void rtcUpdateTime(int ticks);
 bool rtcWrite(uint32_t address, uint16_t value);
@@ -9,12 +15,12 @@ void rtcEnableRumble(bool e);
 bool rtcIsEnabled();
 void rtcReset();
 
-#ifdef __LIBRETRO__
+#if defined(__LIBRETRO__)
 void rtcReadGame(const uint8_t*& data);
 void rtcSaveGame(uint8_t*& data);
-#else
+#else  // !defined(__LIBRETRO__)
 void rtcReadGame(gzFile gzFile);
 void rtcSaveGame(gzFile gzFile);
-#endif
+#endif  // defined(__LIBRETRO__)
 
 #endif // RTC_H

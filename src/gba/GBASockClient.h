@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../common/Types.h"
+#include <cstdint>
 
 #include <SFML/Network.hpp>
 

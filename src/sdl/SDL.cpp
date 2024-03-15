@@ -23,10 +23,12 @@
 #endif
 
 #include <cmath>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+
 #include <sys/stat.h>
 #include <sys/types.h>
 #ifdef __APPLE__
@@ -39,15 +41,12 @@
 #include <GL/glu.h>
 #endif
 
-#include <time.h>
-
-#include "../common/version_cpp.h"
-
-#include "SDL.h"
+#include <SDL.h>
 
 #include "core/base/file_util.h"
+#include "core/base/patch.h"
+#include "core/base/version.h"
 #include "../Util.h"
-#include "../common/Patch.h"
 #include "../gb/gb.h"
 #include "../gb/gbCheats.h"
 #include "../gb/gbGlobals.h"
@@ -1555,7 +1554,7 @@ void SetHomeDataDir()
 
 int main(int argc, char** argv)
 {
-    fprintf(stdout, "%s\n", vba_name_and_subversion);
+    fprintf(stdout, "%s\n", kVbamNameAndSubversion.c_str());
 
     home = argv[0];
     SetHome(home);

@@ -125,7 +125,7 @@ endif()
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
     include(GitTagVersion)
-    git_version(VERSION REVISION VERSION_RELEASE)
+    git_version(VBAM_VERSION VBAM_REVISION VBAM_VERSION_RELEASE)
 
     # only use the plugin to tie the configure state to the sha to force rebuilds
     # of files that depend on version.h
@@ -174,15 +174,10 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
 endif()
 
 # no git or no tags, use ChangeLog
-if(NOT VERSION)
+if(NOT VBAM_VERSION)
     include(ChangeLogVersion)
-    changelog_version(VERSION REVISION VERSION_RELEASE)
+    changelog_version(VBAM_VERSION VBAM_REVISION VBAM_VERSION_RELEASE)
 endif()
-
-# generate version.h
-include_directories(${CMAKE_BINARY_DIR})
-string(REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+).*" "\\1,\\2,\\3,0" WIN_VERSION "${VERSION}")
-configure_file("${CMAKE_SOURCE_DIR}/src/version.h.in" "${CMAKE_BINARY_DIR}/version.h" @ONLY)
 
 # We do not support amd64 asm yet
 if(X86_64 AND (ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS OR ENABLE_MMX))
@@ -257,8 +252,13 @@ set(
     ${ZLIB_LIBRARY}
 )
 
+set(VBAM_GENERATED_DIR ${CMAKE_BINARY_DIR}/generated)
+
 # Set up "src" as a global include directory.
-include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(
+    ${CMAKE_SOURCE_DIR}/src
+    ${VBAM_GENERATED_DIR}
+)
 
 
 if(ENABLE_FFMPEG)
@@ -393,9 +393,7 @@ set(
     SRC_MAIN
     src/Util.cpp
     src/Util_common.cpp
-    src/common/Patch.cpp
     src/common/SoundSDL.cpp
-    src/common/version.cpp
 )
 
 if(MSVC)
@@ -406,12 +404,8 @@ set(
     HDR_MAIN
     src/System.h
     src/Util.h
-    src/common/array.h
-    src/common/Port.h
-    src/common/sizes.h
     src/common/SoundDriver.h
     src/common/SoundSDL.h
-    src/common/version_cpp.h
 )
 
 if(MSVC)

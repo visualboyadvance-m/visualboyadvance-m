@@ -3,7 +3,7 @@
 #include <cstring>
 
 #include "System.h"
-#include "common/Port.h"
+#include "core/base/port.h"
 #include "gba/Globals.h"
 #include "gba/RTC.h"
 #include "gba/gbafilter.h"

@@ -3,7 +3,7 @@
   
 #include "../System.h"
 #include "GBA.h"
-#include "../common/Port.h"
+#include "core/base/port.h"
 
 #include <string>
 #include <map>

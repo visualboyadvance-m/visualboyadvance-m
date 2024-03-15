@@ -1,6 +1,12 @@
 #ifndef GBSGB_H
 #define GBSGB_H
 
+#include <cstdint>
+
+#if !defined(__LIBRETRO__)
+#include <zlib.h>
+#endif  // !defined(__LIBRETRO__)
+
 void gbSgbInit();
 void gbSgbShutdown();
 void gbSgbCommand();

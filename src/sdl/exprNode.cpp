@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../common/Port.h"
+#include "core/base/port.h"
 #include "../gba/GBA.h"
 #include "../gba/elf.h"
 #include "exprNode.h"

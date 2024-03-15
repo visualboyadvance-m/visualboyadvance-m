@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "core/base/port.h"
 #include "../System.h"
-#include "../common/Port.h"
 #include "GBA.h"
 #include "Globals.h"
 

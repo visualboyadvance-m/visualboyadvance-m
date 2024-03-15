@@ -1,5 +1,5 @@
 #include "../System.h"
-#include "../common/Port.h"
+#include "core/base/port.h"
 #include "GBA.h"
 #include "GBAinline.h"
 #include "Globals.h"

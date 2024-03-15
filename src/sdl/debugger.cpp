@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../common/Port.h"
+#include "core/base/port.h"
 #include "../gba/GBA.h"
 #include "../gba/Sound.h"
 #include "../gba/armdis.h"

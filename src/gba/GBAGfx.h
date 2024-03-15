@@ -1,10 +1,9 @@
 #ifndef GFX_H
 #define GFX_H
 
+#include "core/base/port.h"
 #include "GBA.h"
 #include "Globals.h"
-
-#include "../common/Port.h"
 
 //#define SPRITE_DEBUG
 

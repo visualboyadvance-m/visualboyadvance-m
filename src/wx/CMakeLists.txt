@@ -1223,10 +1223,10 @@ if(NOT TRANSLATIONS_ONLY)
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
-        set(ver ${VERSION})
+        set(ver ${VBAM_VERSION})
 
-        if(NOT VERSION_RELEASE)
-            set(ver "${ver}-${REVISION}")
+        if(NOT VBAM_VERSION_RELEASE)
+            set(ver "${ver}-${VBAM_REVISION}")
         endif()
 
         add_custom_command(

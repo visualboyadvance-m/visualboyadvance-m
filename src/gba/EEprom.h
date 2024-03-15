@@ -1,16 +1,20 @@
 #ifndef EEPROM_H
 #define EEPROM_H
 
-#include "../common/Types.h"
+#include <cstdint>
 
-#ifdef __LIBRETRO__
+#if !defined(__LIBRETRO__)
+#include <zlib.h>
+#endif  // defined(__LIBRETRO__)
+
+#if defined(__LIBRETRO__)
 extern void eepromSaveGame(uint8_t*& data);
 extern void eepromReadGame(const uint8_t*& data);
-#else // !__LIBRETRO__
+#else // !defined(__LIBRETRO__)
 extern void eepromSaveGame(gzFile _gzFile);
 extern void eepromReadGame(gzFile _gzFile, int version);
 extern void eepromReadGameSkip(gzFile _gzFile, int version);
-#endif
+#endif  // defined(__LIBRETRO__)
 extern uint8_t eepromData[0x2000];
 extern int eepromRead(uint32_t address);
 extern void eepromWrite(uint32_t address, uint8_t value);

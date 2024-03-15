@@ -1,11 +1,11 @@
-#ifndef RINGBUFFER_H
-#define RINGBUFFER_H
+#ifndef VBAM_CORE_BASE_RINGBUFFER_H_
+#define VBAM_CORE_BASE_RINGBUFFER_H_
 
 #include <algorithm>
 #include <iterator>
 #include <cstddef>
-#include "array.h"
 
+#include "core/base/array.h"
 
 template <typename T> class RingBuffer
 {
@@ -92,4 +92,4 @@ template <typename T> class RingBuffer
   }
 };
 
-#endif
+#endif  // VBAM_CORE_BASE_RINGBUFFER_H_

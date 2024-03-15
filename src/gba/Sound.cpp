@@ -4,7 +4,7 @@
 #include <cstring>
 
 #include "core/base/file_util.h"
-#include "../common/Port.h"
+#include "core/base/port.h"
 #include "GBA.h"
 #include "Globals.h"
 

@@ -1,7 +1,7 @@
 #ifndef GBGLOBALS_H
 #define GBGLOBALS_H
 
-#include "../common/Types.h"
+#include <cstdint>
 
 extern uint8_t* g_bios;
 
