@@ -42,5 +42,3 @@ ADD_LIBRARY(
     STATIC
     ${SRC_FEX}
 )
-
-add_dependencies(fex generate)

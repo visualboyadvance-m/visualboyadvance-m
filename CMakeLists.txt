@@ -46,6 +46,29 @@ if(NOT CMAKE_CXX_COMPILER_LAUNCHER)
     endif()
 endif()
 
+find_package(Git)
+
+# Make sure we pull in the submodules on windows and mingw.
+if(GIT_FOUND AND (WIN32 OR MINGW))
+    # Win32 deps submodule
+    set(SUBMODULE_MANUAL_UPDATE FALSE)
+
+    if(EXISTS "${CMAKE_SOURCE_DIR}/.git" AND NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
+        set(SUBMODULE_MANUAL_UPDATE TRUE)
+        execute_process(
+            COMMAND "${GIT_EXECUTABLE}" submodule update --init --remote --recursive
+            RESULT_VARIABLE SUBMODULE_UPDATE_STATUS
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        )
+    endif()
+
+    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
+        if(NOT (SUBMODULE_MANUAL_UPDATE AND SUBMODULE_UPDATE_STATUS EQUAL 0))
+            message(FATAL_ERROR "Please pull in git submodules, e.g.\nrun: git submodule update --init --remote --recursive")
+        endif()
+    endif()
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_C_STANDARD 11)
@@ -53,12 +76,7 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 
 project(VBA-M C CXX)
 
-find_package(Git)
 find_package(PkgConfig)
-
-include(GNUInstallDirs)
-include(Options)
-include(Architecture)
 
 if(NOT CMAKE_PREFIX_PATH AND (NOT ("$ENV{CMAKE_PREFIX_PATH}" STREQUAL "")))
     set(CMAKE_PREFIX_PATH "$ENV{CMAKE_PREFIX_PATH}")
@@ -80,66 +98,29 @@ if(BUILD_TESTING)
     enable_testing()
 endif()
 
-set(ALL_TARGETS fex visualboyadvance-m vbamcore vbam)
-
-add_custom_target(generate)
+include(GNUInstallDirs)
+include(Options)
+include(Architecture)
+include(Toolchain)
 
 #Output all binaries at top level
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
 if(NOT HTTPS)
-    add_definitions(-DNO_HTTPS)
+    add_compile_definitions(NO_HTTPS)
 endif()
 
-if(WIN32 OR CMAKE_TOOLCHAIN_FILE MATCHES "[Mm][Ii][Nn][Gg][Ww]")
-    # Win32 deps submodule
-    set(git_checkout FALSE)
-
-    if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
-        set(git_checkout TRUE)
-        execute_process(
-            COMMAND git submodule update --init --remote --recursive
-            RESULT_VARIABLE git_status
-            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-        )
-    endif()
-
-    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
-        if(NOT (git_checkout AND git_status EQUAL 0))
-            message(FATAL_ERROR "Please pull in git submodules, e.g.\nrun: git submodule update --init --remote --recursive")
-        endif()
-    endif()
-endif()
-
-if(MSVC)
-    include_directories("${CMAKE_SOURCE_DIR}/dependencies/msvc")
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-endif()
-
-if(MSVC AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-    # TODO: We should update the XAudio headers to build with clang-cl. See
-    # https://github.com/visualboyadvance-m/visualboyadvance-m/issues/1021
-    add_definitions(-DNO_XAUDIO2)
-endif()
-
-option(ENABLE_GBA_LOGGING "Enable extended GBA logging" ON)
 if(ENABLE_GBA_LOGGING)
-    add_definitions(-DGBA_LOGGING )
+    add_compile_definitions(GBA_LOGGING )
 endif()
+
 if(ENABLE_MMX)
-    add_definitions(-DMMX)
+    add_compile_definitions(MMX)
 endif()
 
 # The SDL port can't be built without debugging support
 if(NOT ENABLE_DEBUGGER AND ENABLE_SDL)
     message(SEND_ERROR "The SDL port can't be built without debugging support")
-endif()
-
-# this has to run after the toolchain is initialized so it can't be in
-# Win32deps.cmake
-if(MINGW)
-    include_directories("${CMAKE_SOURCE_DIR}/dependencies/mingw-include")
-    include_directories("${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
 endif()
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
@@ -203,55 +184,9 @@ include_directories(${CMAKE_BINARY_DIR})
 string(REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+).*" "\\1,\\2,\\3,0" WIN_VERSION "${VERSION}")
 configure_file("${CMAKE_SOURCE_DIR}/src/version.h.in" "${CMAKE_BINARY_DIR}/version.h" @ONLY)
 
-if(CMAKE_BUILD_TYPE STREQUAL Debug)
-    add_definitions(-DDEBUG)
-else()
-    add_definitions(-DNDEBUG)
-endif()
-
-# hack for ninja in msys2
-if(WIN32 AND CMAKE_GENERATOR STREQUAL Ninja AND NOT "$ENV{MSYSTEM_PREFIX}" STREQUAL "")
-    set(MSYS ON)
-endif()
-
-include(VbamFunctions)
-
-if(MSYS AND CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-    if($ENV{MSYSTEM} STREQUAL CLANG64)
-        cygpath(prefix "$ENV{MSYSTEM_PREFIX}/x86_64-w64-mingw32")
-        list(APPEND CMAKE_PREFIX_PATH "${prefix}")
-    elseif($ENV{MSYSTEM} STREQUAL CLANG32)
-        cygpath(prefix "$ENV{MSYSTEM_PREFIX}/i686-w64-mingw32")
-        list(APPEND CMAKE_PREFIX_PATH "${prefix}")
-    endif()
-
-    set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" CACHE INTERNAL "prefix search path for find_XXXX" FORCE)
-endif()
-
 # We do not support amd64 asm yet
 if(X86_64 AND (ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS OR ENABLE_MMX))
     message(FATAL_ERROR "The options ASM_CORE, ASM_SCALERS and MMX are not supported on X86_64 yet.")
-endif()
-
-if(ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS)
-    if(MSVC)
-        if(NOT EXISTS ${CMAKE_BINARY_DIR}/nuget.exe)
-            file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" ${CMAKE_BINARY_DIR}/nuget.exe)
-        endif()
-
-        execute_process(
-            COMMAND nuget.exe install nasm2 -OutputDirectory ${CMAKE_BINARY_DIR}/nuget
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        )
-
-        file(GLOB pkg ${CMAKE_BINARY_DIR}/nuget/nasm2*)
-
-        list(APPEND CMAKE_PROGRAM_PATH ${pkg}/tools)
-    endif()
-
-    enable_language(ASM_NASM)
-
-    set(ASM_ENABLED ON)
 endif()
 
 if(NOT WIN32)
@@ -345,11 +280,11 @@ if(ENABLE_FFMPEG)
         endif()
     endif()
 else()
-    add_definitions(-DNO_FFMPEG)
+    add_compile_definitions(NO_FFMPEG)
 endif()
 
 if(NOT ENABLE_ONLINEUPDATES)
-  add_definitions(-DNO_ONLINEUPDATES)
+  add_compile_definitions(NO_ONLINEUPDATES)
 endif()
 
 if(ENABLE_LIRC)
@@ -359,19 +294,18 @@ else()
 endif()
 
 # C defines
-add_definitions(-DHAVE_NETINET_IN_H -DHAVE_ARPA_INET_H -DHAVE_ZLIB_H -DFINAL_VERSION -DSDL -DUSE_OPENGL -DSYSCONF_INSTALL_DIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}" -DWITH_LIRC=${WITHLIRC})
-add_definitions(-DPKGDATADIR="${CMAKE_INSTALL_FULL_DATADIR}/vbam" -DPACKAGE=)
-
-add_definitions(-D__STDC_FORMAT_MACROS)
+add_compile_definitions(HAVE_NETINET_IN_H HAVE_ARPA_INET_H HAVE_ZLIB_H FINAL_VERSION SDL USE_OPENGL SYSCONF_INSTALL_DIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}" WITH_LIRC=${WITHLIRC})
+add_compile_definitions(PKGDATADIR="${CMAKE_INSTALL_FULL_DATADIR}/vbam")
+add_compile_definitions(__STDC_FORMAT_MACROS)
 
 # For C++, default to nonstd::optional and nonstd::variant for now due to mac
 # build issues.
 if(APPLE)
-    add_definitions(-Doptional_CONFIG_SELECT_OPTIONAL=optional_OPTIONAL_NONSTD)
-    add_definitions(-Dvariant_CONFIG_SELECT_VARIANT=variant_VARIANT_NONSTD)
+    add_compile_definitions(optional_CONFIG_SELECT_OPTIONAL=optional_OPTIONAL_NONSTD)
+    add_compile_definitions(variant_CONFIG_SELECT_VARIANT=variant_VARIANT_NONSTD)
 else()
-    add_definitions(-Doptional_CONFIG_SELECT_OPTIONAL=optional_OPTIONAL_STD)
-    add_definitions(-Dvariant_CONFIG_SELECT_VARIANT=variant_VARIANT_STD)
+    add_compile_definitions(optional_CONFIG_SELECT_OPTIONAL=optional_OPTIONAL_STD)
+    add_compile_definitions(variant_CONFIG_SELECT_VARIANT=variant_VARIANT_STD)
 endif()
 
 if(ENABLE_LINK)
@@ -387,29 +321,29 @@ if(ENABLE_LINK)
     include(CheckFunctionExists)
     check_function_exists(sem_timedwait SEM_TIMEDWAIT)
     if(SEM_TIMEDWAIT)
-        add_definitions(-DHAVE_SEM_TIMEDWAIT)
+        add_compile_definitions(HAVE_SEM_TIMEDWAIT)
     endif()
 else()
-    add_definitions(-DNO_LINK)
+    add_compile_definitions(NO_LINK)
 endif()
 
 # The debugger is enabled by default
 if(NOT ENABLE_DEBUGGER)
-    add_definitions(-DNO_DEBUGGER)
+    add_compile_definitions(NO_DEBUGGER)
 else()
-    add_definitions(-DBKPT_SUPPORT)
+    add_compile_definitions(BKPT_SUPPORT)
 endif()
 
 # The ASM core is disabled by default because we don't know on which platform we are
 if(NOT ENABLE_ASM_CORE)
-    add_definitions(-DC_CORE)
+    add_compile_definitions(C_CORE)
 endif()
 
 # Enable internationalization
 if(ENABLE_NLS)
     set(LOCALEDIR ${CMAKE_INSTALL_PREFIX}/share/locale)
-    add_definitions(-DENABLE_NLS)
-    add_definitions(-DLOCALEDIR="${LOCALEDIR}")
+    add_compile_definitions(ENABLE_NLS)
+    add_compile_definitions(LOCALEDIR="${LOCALEDIR}")
     # for now, only GBALink.cpp uses gettext() directly
     if(APPLE)
         # use Homebrew gettext if available
@@ -443,18 +377,6 @@ if(ENABLE_NLS)
         endif()
         include_directories(${LIBINTL_INC})
     endif()
-endif()
-
-include(Toolchain)
-
-if(APPLE)
-    add_definitions(-DMACHO)
-elseif("${CMAKE_SYSTEM}" MATCHES "Linux")
-    add_definitions(-DELF)
-endif()
-
-if(X86_64)
-    add_definitions(-D__AMD64__ -D__X86_64__)
 endif()
 
 if(NOT TRANSLATIONS_ONLY)
@@ -694,7 +616,7 @@ if(ENABLE_ASM_SCALERS)
 else()
     set(SRC_FILTERS ${SRC_FILTERS} ${SRC_HQ_C})
     set(HDR_FILTERS ${HDR_FILTERS} ${HDR_HQ_C})
-    add_definitions(-DNO_ASM)
+    add_compile_definitions(NO_ASM)
 endif()
 
 
@@ -761,7 +683,6 @@ if(NOT TRANSLATIONS_ONLY)
         ${HDR_DEBUGGER}
         ${HDR_STB_IMAGE}
     )
-    add_dependencies(vbamcore generate)
     target_include_directories(vbamcore PUBLIC ${SDL2_INCLUDE_DIRS})
 endif()
 

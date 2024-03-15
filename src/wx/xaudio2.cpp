@@ -58,11 +58,7 @@ bool GetXA2Devices(wxArrayString& names, wxArrayString& ids)
 {
     HRESULT hr;
     IXAudio2* xa = NULL;
-    UINT32 flags = 0;
-#ifdef _DEBUG
-    flags = XAUDIO2_DEBUG_ENGINE;
-#endif
-    hr = XAudio2Create(&xa, flags);
+    hr = XAudio2Create(&xa, 0);
 
     if (hr != S_OK) {
         wxLogError(_("The XAudio2 interface failed to initialize!"));
@@ -342,11 +338,7 @@ bool XAudio2_Output::init(long sampleRate)
 
     HRESULT hr;
     // Initialize XAudio2
-    UINT32 flags = 0;
-    //#ifdef _DEBUG
-    //	flags = XAUDIO2_DEBUG_ENGINE;
-    //#endif
-    hr = XAudio2Create(&xaud, flags);
+    hr = XAudio2Create(&xaud, 0);
 
     if (hr != S_OK) {
         wxLogError(_("The XAudio2 interface failed to initialize!"));

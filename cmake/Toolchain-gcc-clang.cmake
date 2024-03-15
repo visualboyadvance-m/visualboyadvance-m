@@ -1,5 +1,3 @@
-include(CheckCXXCompilerFlag)
-
 if(X86_32 OR X86_64)
     add_compile_options(-mfpmath=sse -msse2)
 endif()
@@ -21,27 +19,6 @@ add_compile_options(
     -feliminate-unused-debug-types
     -fdiagnostics-color=always
 )
-
-if(ENABLE_ASAN)
-    if(NOT CMAKE_BUILD_TYPE STREQUAL Debug)
-        message(WARNING "ASAN requires debug build, set -DCMAKE_BUILD_TYPE=Debug, disabling.")
-        set(ENABLE_ASAN OFF)
-    endif()
-
-    # It is necessary to modify the linker flagas for the compiler check to work.
-    set(BACKUP_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS})
-    set(CMAKE_EXE_LINKER_FLAGS "-fsanitize=address")
-    check_cxx_compiler_flag(-fsanitize=address ASAN_SUPPORTED)
-    set(CMAKE_EXE_LINKER_FLAGS ${BACKUP_LINKER_FLAGS})
-
-    if(ASAN_SUPPORTED)
-        add_compile_options(-fsanitize=address)
-        add_link_options(-fsanitize=address)
-    else()
-        message(WARNING "ASAN not available for the compiler, disabling.")
-        set(ENABLE_ASAN OFF)
-    endif()
-endif()
 
 # check if ssp flags are supported.
 if(CMAKE_BUILD_TYPE STREQUAL Debug)

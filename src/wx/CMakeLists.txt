@@ -3,42 +3,33 @@ include(VbamFunctions)
 
 set(VBAM_LIBS ${VBAMCORE_LIBS})
 
-if(WIN32)
-    # not yet implemented
-    option(ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" OFF)
-
-    option(ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ON)
-endif()
-
-option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" OFF)
-
 find_package(OpenAL REQUIRED)
 
 include_directories(${OPENAL_INCLUDE_DIR})
 
 if(OPENAL_STATIC OR (WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)))
-    add_definitions(-DAL_LIBTYPE_STATIC)
+    add_compile_definitions(AL_LIBTYPE_STATIC)
 endif()
 
 list(APPEND VBAM_LIBS ${OPENAL_LIBRARY})
 
 if(APPLE)
-    add_definitions(-DwxMAC_USE_CORE_GRAPHICS)
+    add_compile_definitions(wxMAC_USE_CORE_GRAPHICS)
 endif()
 
 if(NOT ENABLE_XAUDIO2)
-    add_definitions(-DNO_XAUDIO2)
+    add_compile_definitions(NO_XAUDIO2)
 endif()
 
 if(NOT ENABLE_DIRECT3D)
-    add_definitions(-DNO_D3D)
+    add_compile_definitions(NO_D3D)
 endif()
 
 if(ENABLE_FAUDIO)
     find_package(FAudio REQUIRED)
     list(APPEND VBAM_LIBS FAudio::FAudio)
 else()
-    add_definitions(-DNO_FAUDIO)
+    add_compile_definitions(NO_FAUDIO)
 endif()
 
 # on unix we have to check for X11 before we overwrite all the compile/link
@@ -49,10 +40,10 @@ if(NOT WIN32 AND NOT APPLE)
     if(X11_X11_LIB)
         include_directories(${X11_INCLUDE_DIR})
         list(APPEND VBAM_LIBS ${X11_X11_LIB})
-        add_definitions(-DHAVE_X11)
+        add_compile_definitions(HAVE_X11)
         if(X11_Xscreensaver_LIB)
             list(APPEND VBAM_LIBS ${X11_Xscreensaver_LIB})
-            add_definitions(-DHAVE_XSS)
+            add_compile_definitions(HAVE_XSS)
         endif()
     endif()
 
@@ -60,7 +51,7 @@ if(NOT WIN32 AND NOT APPLE)
 
     if(EGL_LIBRARY)
         list(APPEND VBAM_LIBS ${EGL_LIBRARY})
-        add_definitions(-DHAVE_EGL)
+        add_compile_definitions(HAVE_EGL)
     endif()
 
     find_library(WAYLAND_LIBRARY wayland-client)
@@ -72,7 +63,7 @@ endif()
 
 # Win32 definitions common to all toolchains.
 if (WIN32)
-    add_definitions(-D_UNICODE -DUNICODE -DwxUSE_GUI=1 -D__WXMSW__ -DWINVER=0x0A00 -DNTDDI_VERSION=0x0A000007)
+    add_compile_definitions(_UNICODE UNICODE wxUSE_GUI=1 __WXMSW__ WINVER=0x0A00 NTDDI_VERSION=0x0A000007)
 endif()
 
 find_program(ZIP_PROGRAM zip)
@@ -94,7 +85,7 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
         set(path_prefix debug)
         set(build_suffix -dbg)
 
-        add_definitions(-D_DEBUG)
+        add_compile_definitions(_DEBUG)
     endif()
 
     set(build_suffix_rel -rel)
@@ -108,7 +99,7 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
 
         set(build_suffix -static${build_suffix})
     else()
-        add_definitions(-DWXUSINGDLL)
+        add_compile_definitions(WXUSINGDLL)
     endif()
 
     set(common_prefix    ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix})
@@ -195,11 +186,6 @@ else()
         set(wxWidgets_USE_DEBUG ON) # noop if wx is compiled with --disable-debug, like in Mac Homebrew atm
     endif()
 
-    # on e.g. msys2 add a couple of libraries wx needs
-    #if(WIN32 AND (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL Clang))
-    #    set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -luuid -lwinspool")
-    #endif()
-
     set(wxWidgets_USE_UNICODE ON)
 
     # Check for gtk4 then gtk3 packages first, some dists like arch rename the
@@ -240,15 +226,15 @@ else()
         execute_process(COMMAND "${wxWidgets_CONFIG_EXECUTABLE} --debug=yes" RESULT_VARIABLE WX_CONFIG_DEBUG OUTPUT_QUIET ERROR_QUIET)
 
         if(WX_CONFIG_DEBUG EQUAL 0)
-            add_definitions(-DwxDEBUG_LEVEL=1)
+            add_compile_definitions(wxDEBUG_LEVEL=1)
         endif()
 
         # this one should be safe in non-debug builds too
-        add_definitions(-DWXDEBUG)
+        add_compile_definitions(WXDEBUG)
     endif()
 
     foreach(DEF ${wxWidgets_DEFINITIONS})
-        add_definitions("-D${DEF}")
+        add_compile_definitions("${DEF}")
     endforeach()
 
     foreach(CXX_COMPILE_FLAG ${wxWidgets_CXX_FLAGS})
@@ -458,7 +444,7 @@ int main(int argc, char** argv) {
     endif()
 
     if(NOT WX_HAS_OPENGL)
-        add_definitions(-DNO_OGL)
+        add_compile_definitions(NO_OGL)
     endif()
 
     # end of wx compile checks
@@ -1061,8 +1047,6 @@ if(NOT TRANSLATIONS_ONLY)
     endif()
 endif()
 
-option(TRANSLATIONS_ONLY "Build only the translations.zip" OFF)
-
 # Make the translations.zip
 if(ENABLE_NLS)
     add_custom_command(
@@ -1121,8 +1105,6 @@ if(NOT TRANSLATIONS_ONLY)
             ERROR_QUIET
         )
     endif()
-
-    option(ZIP_SUFFIX [=[suffix for release zip files, e.g.  "-somebranch".zip]=] OFF)
 
     if(NOT ZIP_SUFFIX)
         set(ZIP_SUFFIX "")
@@ -1334,7 +1316,6 @@ if(NOT TRANSLATIONS_ONLY)
                 TARGET visualboyadvance-m
                 POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E remove ${appzip}.asc
-#                COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/interactive-pause.cmake
                 COMMAND ${GPG_PROGRAM} --detach-sign -a ${appzip}
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             )
@@ -1364,5 +1345,3 @@ if(NOT TRANSLATIONS_ONLY)
         add_subdirectory(tests)
     endif()
 endif()
-
-# vim:sw=4 et tw=0:

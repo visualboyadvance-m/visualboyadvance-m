@@ -57,7 +57,7 @@
 
 # define the SFML_STATIC macro if static build was chosen
 if(SFML_STATIC_LIBRARIES)
-    add_definitions(-DSFML_STATIC)
+    add_compile_definitions(SFML_STATIC)
 endif()
 
 # define the list of search paths for headers and libraries
