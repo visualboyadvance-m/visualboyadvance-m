@@ -5,10 +5,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #ifndef _MSC_VER
 #include <strings.h>
 #endif
-#include "../NLS.h"
+
+#include "core/base/file_util.h"
 #include "../System.h"
 #include "../Util.h"
 #include "../common/Port.h"

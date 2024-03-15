@@ -7,7 +7,6 @@
 #include <strings.h>
 #endif
 
-#include "../NLS.h"
 #include "../System.h"
 #include "../Util.h"
 #include "Cheats.h"

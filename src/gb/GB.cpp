@@ -8,7 +8,7 @@
 #include <cstring>
 #include <vector>
 
-#include "../NLS.h"
+#include "core/base/file_util.h"
 #include "../System.h"
 #include "../Util.h"
 #include "../common/sizes.h"

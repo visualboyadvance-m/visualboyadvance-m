@@ -67,6 +67,7 @@ uint16_t IP_LINK_PORT = 5738;
 
 std::string IP_LINK_BIND_ADDRESS = "*";
 
+#include "core/base/message.h"
 #include "../common/Port.h"
 #include "GBA.h"
 #include "GBALink.h"
@@ -80,7 +81,6 @@ std::string IP_LINK_BIND_ADDRESS = "*";
 #else
 #define _(x) x
 #endif
-#define N_(x) x
 
 #if (defined __WIN32__ || defined _WIN32)
 #include <windows.h>

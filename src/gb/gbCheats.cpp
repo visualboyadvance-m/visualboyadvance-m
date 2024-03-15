@@ -3,10 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../NLS.h"
 #include "../System.h"
 #include "../Util.h"
 
+#include "core/base/file_util.h"
 #include "gb.h"
 #include "gbCheats.h"
 #include "gbGlobals.h"

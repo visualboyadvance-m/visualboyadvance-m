@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "memgzio.h"
+#include "core/base/internal/memgzio.h"
 
 #ifndef local
 #define local static

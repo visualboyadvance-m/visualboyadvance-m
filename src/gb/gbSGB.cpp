@@ -1,8 +1,8 @@
 #include <memory.h>
 #include <stdlib.h>
 
+#include "core/base/file_util.h"
 #include "../System.h"
-#include "../Util.h"
 #include "../common/Port.h"
 #include "gb.h"
 #include "gbGlobals.h"

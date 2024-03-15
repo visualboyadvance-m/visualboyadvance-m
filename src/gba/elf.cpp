@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../NLS.h"
 #include "../common/Port.h"
 #include "GBA.h"
 #include "elf.h"

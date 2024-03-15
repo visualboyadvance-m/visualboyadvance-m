@@ -249,6 +249,7 @@ set(SDL2_TARGETS SDL2::SDL2 ${SDL2_LIBRARY_TEMP})
 set(
     VBAMCORE_LIBS
     vbamcore
+    vbam-core-base
     vbam-fex
     ${SDL2_TARGETS}
     ${SFML_LIBRARIES}
@@ -385,15 +386,16 @@ endif()
 
 if(NOT TRANSLATIONS_ONLY)
     add_subdirectory(src/core/fex)
+    add_subdirectory(src/core/base)
 endif()
 
 set(
     SRC_MAIN
     src/Util.cpp
+    src/Util_common.cpp
     src/common/dictionary.c
     src/common/iniparser.c
     src/common/Patch.cpp
-    src/common/memgzio.c
     src/common/SoundSDL.cpp
 )
 
@@ -408,7 +410,6 @@ set(
     src/common/array.h
     src/common/dictionary.h
     src/common/iniparser.h
-    src/common/memgzio.h
     src/common/Port.h
     src/common/sizes.h
     src/common/SoundDriver.h
@@ -422,10 +423,6 @@ endif()
 if(ENABLE_FFMPEG)
     set(SRC_MAIN ${SRC_MAIN} src/common/ffmpeg.cpp)
     set(HDR_MAIN ${HDR_MAIN} src/common/ffmpeg.h)
-endif()
-
-if(ENABLE_NLS)
-    set(HDR_MAIN ${HDR_MAIN} src/NLS.h)
 endif()
 
 set(

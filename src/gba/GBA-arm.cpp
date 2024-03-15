@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../NLS.h"
 #include "../System.h"
 #include "../Util.h"
 #include "Cheats.h"

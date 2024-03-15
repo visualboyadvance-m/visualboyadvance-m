@@ -1,11 +1,12 @@
 #include "Flash.h"
-#include "../Util.h"
-#include "GBA.h"
-#include "Globals.h"
-#include "Sram.h"
+
 #include <memory.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "core/base/file_util.h"
+#include "GBA.h"
+#include "Sram.h"
 
 #define FLASH_READ_ARRAY 0
 #define FLASH_CMD_1 1
