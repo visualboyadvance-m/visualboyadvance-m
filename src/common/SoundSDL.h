@@ -21,7 +21,7 @@
 #include <SDL.h>
 
 #include "core/base/ringbuffer.h"
-#include "SoundDriver.h"
+#include "core/base/sound_driver.h"
 
 class SoundSDL : public SoundDriver {
 public:

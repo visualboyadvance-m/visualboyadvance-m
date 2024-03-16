@@ -1,11 +1,11 @@
+#include "armdis.h"
+
 /************************************************************************/
 /* Arm/Thumb command set disassembler                                   */
 /************************************************************************/
-#include <stdio.h>
 #include <cstring>
 
 #include "core/base/port.h"
-#include "../System.h"
 #include "GBA.h"
 #include "armdis.h"
 #include "elf.h"

@@ -1,23 +1,7 @@
-#include <memory.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "../System.h"
-#include "../Util.h"
-#include "Cheats.h"
-#include "EEprom.h"
-#include "Flash.h"
 #include "GBA.h"
 #include "GBAcpu.h"
 #include "GBAinline.h"
 #include "Globals.h"
-#include "Sound.h"
-#include "Sram.h"
-#include "agbprint.h"
-#include "bios.h"
-#include "elf.h"
 #include "remote.h"
 
 #ifdef PROFILING

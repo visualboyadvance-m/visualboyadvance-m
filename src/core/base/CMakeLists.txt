@@ -26,8 +26,9 @@ add_dependencies(vbam-core-base vbam-core-base-generated)
 
 target_sources(vbam-core-base
     PRIVATE
-    file_util.cpp
     file_util_common.cpp
+    file_util_desktop.cpp
+    image_util.cpp
     internal/file_util_internal.cpp
     internal/file_util_internal.h
     internal/memgzio.c
@@ -38,18 +39,23 @@ target_sources(vbam-core-base
     PUBLIC
     array.h
     file_util.h
+    image_util.h
     message.h
     patch.h
     port.h
     ringbuffer.h
     sizes.h
+    sound_driver.h
+    system.h
+    version.h
 )
 
 target_include_directories(vbam-core-base
+    PRIVATE ${STB_INCLUDE_DIR}
     PUBLIC ${ZLIB_INCLUDE_DIR}
 )
 
 target_link_libraries(vbam-core-base
-    INTERFACE vbam-fex
+    INTERFACE vbam-fex stb-image
     PUBLIC ${ZLIB_LIBRARY}
 )

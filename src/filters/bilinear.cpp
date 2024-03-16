@@ -4,7 +4,7 @@
  **	Written: 6/14/00 - JSF
  **/
 
-#include "../System.h"
+#include "core/base/system.h"
 
 #define RGB(r,g,b) ((r)>>3) << systemRedShift |\
   ((g) >> 3) << systemGreenShift |\

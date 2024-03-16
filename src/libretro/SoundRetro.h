@@ -18,7 +18,7 @@
 #ifndef __VBA_SOUND_RETRO_H__
 #define __VBA_SOUND_RETRO_H__
 
-#include "../common/SoundDriver.h"
+#include "core/base/sound_driver.h"
 
 class SoundRetro : public SoundDriver {
 public:

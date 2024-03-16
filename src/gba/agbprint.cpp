@@ -1,8 +1,6 @@
-#include <stdio.h>
-#include <string.h>
+#include "agbprint.h"
 
 #include "core/base/port.h"
-#include "../System.h"
 #include "GBA.h"
 #include "Globals.h"
 

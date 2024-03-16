@@ -37,6 +37,7 @@
 
 // The built-in vba-over.ini
 #include "builtin-over.h"
+#include "../Util.h"
 #include "config/game-control.h"
 #include "config/option-proxy.h"
 #include "config/option.h"
@@ -45,7 +46,6 @@
 #include "wayland.h"
 #include "widgets/group-check-box.h"
 #include "widgets/user-input-ctrl.h"
-#include "wxhead.h"
 
 #ifdef __WXGTK__
 #include <gdk/gdk.h>

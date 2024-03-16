@@ -9,6 +9,63 @@
 #include "viewsupt.h"
 #include "wxvbam.h"
 
+namespace {
+void utilReadScreenPixels(uint8_t* dest, int w, int h) {
+    uint8_t* b = dest;
+    int sizeX = w;
+    int sizeY = h;
+    switch (systemColorDepth) {
+        case 16: {
+            uint16_t* p = (uint16_t*)(g_pix + (w + 2) * 2);  // skip first black line
+            for (int y = 0; y < sizeY; y++) {
+                for (int x = 0; x < sizeX; x++) {
+                    uint16_t v = *p++;
+
+                    *b++ = ((v >> systemRedShift) & 0x001f) << 3;    // R
+                    *b++ = ((v >> systemGreenShift) & 0x001f) << 3;  // G
+                    *b++ = ((v >> systemBlueShift) & 0x01f) << 3;    // B
+                }
+                p++;  // skip black pixel for filters
+                p++;  // skip black pixel for filters
+            }
+        } break;
+        case 24: {
+            uint8_t* pixU8 = (uint8_t*)g_pix;
+            for (int y = 0; y < sizeY; y++) {
+                for (int x = 0; x < sizeX; x++) {
+                    if (systemRedShift < systemBlueShift) {
+                        *b++ = *pixU8++;  // R
+                        *b++ = *pixU8++;  // G
+                        *b++ = *pixU8++;  // B
+                    } else {
+                        uint8_t blue = *pixU8++;
+                        uint8_t green = *pixU8++;
+                        uint8_t red = *pixU8++;
+
+                        *b++ = red;
+                        *b++ = green;
+                        *b++ = blue;
+                    }
+                }
+            }
+        } break;
+        case 32: {
+            uint32_t* pixU32 = (uint32_t*)(g_pix + 4 * (w + 1));
+            for (int y = 0; y < sizeY; y++) {
+                for (int x = 0; x < sizeX; x++) {
+                    uint32_t v = *pixU32++;
+                    *b++ = ((v >> systemBlueShift) & 0x001f) << 3;   // B
+                    *b++ = ((v >> systemGreenShift) & 0x001f) << 3;  // G
+                    *b++ = ((v >> systemRedShift) & 0x001f) << 3;    // R
+                }
+                pixU32++;
+            }
+        } break;
+    }
+}
+
+}  // namespace
+
 // FIXME: many of these read e.g. palette data directly without regard to
 // byte order.  Need to determine where things are stored in emulated machine
 // order and where in native order, and swap the latter on big-endian

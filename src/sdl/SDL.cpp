@@ -44,6 +44,7 @@
 #include <SDL.h>
 
 #include "core/base/file_util.h"
+#include "core/base/message.h"
 #include "core/base/patch.h"
 #include "core/base/version.h"
 #include "../Util.h"
@@ -56,7 +57,6 @@
 #include "../gba/GBA.h"
 #include "../gba/RTC.h"
 #include "../gba/Sound.h"
-#include "../gba/agbprint.h"
 
 #include "../common/SoundSDL.h"
 

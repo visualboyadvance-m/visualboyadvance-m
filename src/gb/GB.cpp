@@ -8,12 +8,12 @@
 #include <cstring>
 #include <vector>
 
-#include "core/base/file_util.h"
-#include "core/base/sizes.h"
-#include "../System.h"
-#include "../Util.h"
 #include "../gba/GBALink.h"
 #include "../gba/Sound.h"
+#include "core/base/file_util.h"
+#include "core/base/message.h"
+#include "core/base/sizes.h"
+#include "core/base/system.h"
 #include "gbCheats.h"
 #include "gbGlobals.h"
 #include "gbMemory.h"
@@ -21,6 +21,7 @@
 #include "gbSound.h"
 
 #if !defined(__LIBRETRO__)
+#include "core/base/image_util.h"
 #include "core/base/patch.h"
 #endif  // defined(__LIBRETRO__)
 

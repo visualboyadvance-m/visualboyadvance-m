@@ -6,6 +6,7 @@
 #include <wx/printdlg.h>
 #include <SDL.h>
 
+#include "core/base/image_util.h"
 #include "../common/SoundSDL.h"
 #include "config/game-control.h"
 #include "config/option-proxy.h"

@@ -10,8 +10,9 @@
 #include "libretro_core_options.h"
 #include "scrc32.h"
 
-#include "../System.h"
+#include "core/base/system.h"
 #include "../Util.h"
+#include "core/base/file_util.h"
 #include "core/base/port.h"
 #include "core/base/sizes.h"
 #include "../apu/Blip_Buffer.h"

@@ -4,7 +4,7 @@
 #include <string.h>
 #include <cstdlib>
 
-#include "../System.h"
+#include "core/base/system.h"
 #include "../gba/elf.h"
 #include "exprNode.h" 
 

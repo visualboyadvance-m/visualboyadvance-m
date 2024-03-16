@@ -1,11 +1,10 @@
-#include <ctype.h>
-#include <memory.h>
-#include <stdio.h>
-#include <string.h>
+#include "Cheats.h"
+
+#include <cstdio>
+#include <cstring>
 
 #include "core/base/file_util.h"
-#include "../Util.h"
-#include "Cheats.h"
+#include "core/base/message.h"
 #include "GBA.h"
 #include "GBAinline.h"
 #include "Globals.h"

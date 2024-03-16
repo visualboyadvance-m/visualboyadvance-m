@@ -1,4 +1,4 @@
-#include "../System.h"
+#include <cstdint>
 
 #include "xBRZ/xbrz.h"
 

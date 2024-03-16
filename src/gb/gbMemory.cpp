@@ -2,11 +2,12 @@
 
 #include <cstdint>
 
-#include "../System.h"
 #include "core/base/port.h"
 #include "core/base/sizes.h"
+#include "core/base/system.h"
 #include "gb.h"
 #include "gbGlobals.h"
+
 uint8_t gbDaysinMonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 extern int gbGBCColorType;
 extern gbRegister PC;

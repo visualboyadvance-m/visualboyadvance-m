@@ -10,8 +10,8 @@
 #endif
 
 #include "core/base/file_util.h"
-#include "../System.h"
-#include "../Util.h"
+#include "core/base/message.h"
+#include "core/base/system.h"
 #include "core/base/port.h"
 #include "core/base/sizes.h"
 #include "Cheats.h"
@@ -29,6 +29,10 @@
 #include "bios.h"
 #include "elf.h"
 #include "ereader.h"
+
+#if !defined(__LIBRETRO__)
+#include "core/base/image_util.h"
+#endif // !__LIBRETRO__
 
 #ifdef PROFILING
 #include "prof/prof.h"

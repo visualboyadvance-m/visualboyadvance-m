@@ -1,6 +1,6 @@
 #include <memory.h>
 
-#include "../System.h"
+#include "core/base/system.h"
 #include "gbGlobals.h"
 #include "gbSGB.h"
 

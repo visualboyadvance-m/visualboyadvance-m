@@ -1,4 +1,4 @@
-#include "../System.h"
+#include "core/base/system.h"
 
 extern int RGB_LOW_BITS_MASK;
 

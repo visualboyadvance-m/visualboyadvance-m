@@ -5,13 +5,12 @@
 
 #include "core/base/file_util.h"
 #include "core/base/port.h"
+#include "core/base/sound_driver.h"
 #include "GBA.h"
 #include "Globals.h"
 
 #include "../apu/Gb_Apu.h"
 #include "../apu/Multi_Buffer.h"
-
-#include "../common/SoundDriver.h"
 
 #define NR10 0x60
 #define NR11 0x62

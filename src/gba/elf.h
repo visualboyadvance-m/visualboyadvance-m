@@ -1,6 +1,9 @@
 #ifndef ELF_H
 #define ELF_H
 
+#include <cstdint>
+#include <cstdio>
+
 enum LocationType { LOCATION_register,
     LOCATION_memory,
     LOCATION_value };

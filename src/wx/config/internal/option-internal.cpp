@@ -10,7 +10,7 @@
 #include <wx/log.h>
 #include <wx/translation.h>
 
-#include "../System.h"
+#include "core/base/system.h"
 #include "../gba/Sound.h"
 #include "../gb/gbGlobals.h"
 #include "opts.h"

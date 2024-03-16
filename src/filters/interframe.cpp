@@ -1,8 +1,6 @@
-#include "../System.h"
-#include <stdlib.h>
-#include <memory.h>
-
 #include "interframe.hpp"
+
+#include <cstdlib>
 
 #ifdef MMX
 extern "C" bool cpu_mmx;

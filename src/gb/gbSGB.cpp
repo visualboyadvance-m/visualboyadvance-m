@@ -3,7 +3,7 @@
 
 #include "core/base/file_util.h"
 #include "core/base/port.h"
-#include "../System.h"
+#include "core/base/system.h"
 #include "gb.h"
 #include "gbGlobals.h"
 
