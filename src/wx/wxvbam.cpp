@@ -30,7 +30,12 @@
 #include <wx/wxcrtvararg.h>
 #include <wx/zipstrm.h>
 
-#include "../gba/remote.h"
+#include "core/gb/gbGlobals.h"
+#include "core/gba/gbaSound.h"
+
+#if defined(VBAM_ENABLE_DEBUGGER)
+#include "core/gba/gbaRemote.h"
+#endif  // defined(VBAM_ENABLE_DEBUGGER)
 
 // The built-in xrc file
 #include "builtin-xrc.h"
@@ -86,11 +91,11 @@ static const char kDotDir[] = "visualboyadvance-m";
 
 }  // namespace
 
-#ifndef NO_DEBUGGER
+#if defined(VBAM_ENABLE_DEBUGGER)
 void(*dbgMain)() = remoteStubMain;
 void(*dbgSignal)(int, int) = remoteStubSignal;
 void(*dbgOutput)(const char *, uint32_t) = debuggerOutput;
-#endif
+#endif  // defined(VBAM_ENABLE_DEBUGGER)
 
 #ifdef __WXMSW__
 

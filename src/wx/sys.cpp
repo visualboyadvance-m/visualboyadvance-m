@@ -6,10 +6,13 @@
 #include <wx/printdlg.h>
 #include <SDL.h>
 
-#include "core/base/image_util.h"
 #include "../common/SoundSDL.h"
 #include "config/game-control.h"
 #include "config/option-proxy.h"
+#include "core/base/image_util.h"
+#include "core/gb/gbGlobals.h"
+#include "core/gba/gbaGlobals.h"
+#include "core/gba/gbaSound.h"
 #include "wxvbam.h"
 
 // These should probably be in vbamcore
@@ -1274,7 +1277,7 @@ void systemOnSoundShutdown()
 {
 }
 
-#ifndef NO_DEBUGGER
+#if defined(VBAM_ENABLE_DEBUGGER)
 
 extern int (*remoteSendFnc)(char*, int);
 extern int (*remoteRecvFnc)(char*, int);
@@ -1440,7 +1443,7 @@ bool debugWaitSocket()
     return debug_remote != NULL;
 }
 
-#endif
+#endif  // defined(VBAM_ENABLE_DEBUGGER)
 
 void log(const char* defaultMsg, ...)
 {

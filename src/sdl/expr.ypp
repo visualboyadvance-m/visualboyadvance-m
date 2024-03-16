@@ -5,7 +5,7 @@
 #include <cstdlib>
 
 #include "core/base/system.h"
-#include "../gba/elf.h"
+#include "core/gba/gbaElf.h"
 #include "exprNode.h" 
 
 extern int yyerror(const char *);

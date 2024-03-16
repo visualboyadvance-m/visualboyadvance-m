@@ -5,7 +5,6 @@
 #include <string.h>
 #define _GNU_SOURCE 1
 
-
 #include <cerrno>
 #include <cmath>
 #include <cstdio>
@@ -15,17 +14,17 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "iniparser.h"
 #include "../Util.h"
-#include "../gb/gbGlobals.h"
-#include "../gb/gbSound.h"
-#include "../gba/Flash.h"
-#include "../gba/GBA.h"
-#include "../gba/RTC.h"
-#include "../gba/Sound.h"
-#include "../gba/agbprint.h"
-#include "../gba/remote.h"
 #include "core/base/file_util.h"
+#include "core/gb/gbGlobals.h"
+#include "core/gb/gbSound.h"
+#include "core/gba/gba.h"
+#include "core/gba/gbaFlash.h"
+#include "core/gba/gbaPrint.h"
+#include "core/gba/gbaRemote.h"
+#include "core/gba/gbaRtc.h"
+#include "core/gba/gbaSound.h"
+#include "iniparser.h"
 
 #ifndef _WIN32
 #define GETCWD getcwd
@@ -142,11 +141,11 @@ const char* preparedCheatCodes[MAX_CHEATS];
 int	patchNum = 0;
 char *patchNames[PATCH_MAX_NUM] = { NULL }; // and so on
 
-#ifndef NO_DEBUGGER
+#if defined(VBAM_ENABLE_DEBUGGER)
 void(*dbgMain)() = remoteStubMain;
 void(*dbgSignal)(int, int) = remoteStubSignal;
 void(*dbgOutput)(const char *, uint32_t) = debuggerOutput;
-#endif
+#endif  // defined(VBAM_ENABLE_DEBUGGER)
 
 char* arg0 = NULL;
 
@@ -705,7 +704,7 @@ int ReadOpts(int argc, char ** argv)
 				patchNum++;
 			}
 			break;
-#ifndef NO_DEBUGGER
+#if defined(VBAM_ENABLE_DEBUGGER)
 		case 'G':
 			dbgMain = remoteStubMain;
 			dbgSignal = remoteStubSignal;
@@ -734,7 +733,7 @@ int ReadOpts(int argc, char ** argv)
 				remoteSetProtocol(0);
 			}
 			break;
-#endif
+#endif  // defined(VBAM_ENABLE_DEBUGGER)
 		case 'N':
 			coreOptions.parseDebug = false;
 			break;

@@ -4,9 +4,10 @@
 
 #include "core/base/port.h"
 #include "core/base/system.h"
-#include "gba/Globals.h"
-#include "gba/RTC.h"
-#include "gba/gbafilter.h"
+#include "core/gba/gbaFilter.h"
+#include "core/gba/gbaFlash.h"
+#include "core/gba/gbaGlobals.h"
+#include "core/gba/gbaRtc.h"
 
 #if defined(_MSC_VER)
 #define strcasecmp _stricmp

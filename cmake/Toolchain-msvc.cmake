@@ -20,6 +20,7 @@ add_compile_definitions(
     __STDC_LIMIT_MACROS
     __STDC_CONSTANT_MACROS
     _CRT_SECURE_NO_WARNINGS
+    NOMINMAX
 )
 add_compile_options(
     /W4

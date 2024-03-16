@@ -24,10 +24,10 @@
 #include <string.h>
 
 #include "core/base/port.h"
-#include "../gba/GBA.h"
-#include "../gba/Sound.h"
-#include "../gba/armdis.h"
-#include "../gba/elf.h"
+#include "core/gba/gbaCpu.h"
+#include "core/gba/gbaCpuArmDis.h"
+#include "core/gba/gbaElf.h"
+#include "core/gba/gbaSound.h"
 #include "exprNode.h"
 
 extern bool debugger;
@@ -1747,7 +1747,7 @@ static void debuggerRegisters(int, char**)
     char* command[3] = { m, 0, one };
     char buffer[10];
 
-#ifdef BKPT_SUPPORT
+#ifdef VBAM_ENABLE_DEBUGGER
     if (debugger_last) {
         printf("R00=%08x R04=%08x R08=%08x R12=%08x\n",
             oldreg[0], oldreg[4], oldreg[8], oldreg[12]);

@@ -4,7 +4,7 @@
 #include <wx/xrc/xmlres.h>
 
 #include "core/base/sizes.h"
-#include "../gb/gb.h"
+#include "core/gb/gb.h"
 #include "dialogs/game-maker.h"
 #include "dialogs/validated-child.h"
 

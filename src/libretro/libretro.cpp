@@ -1,38 +1,30 @@
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <string>
-#include <vector>
+#include <cassert>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
+#include <libretro.h>
 
 #include "SoundRetro.h"
-#include "libretro.h"
 #include "libretro_core_options.h"
 #include "scrc32.h"
 
-#include "core/base/system.h"
 #include "../Util.h"
+#include "core/base/system.h"
 #include "core/base/file_util.h"
-#include "core/base/port.h"
 #include "core/base/sizes.h"
-#include "../apu/Blip_Buffer.h"
-#include "../apu/Gb_Apu.h"
-#include "../apu/Gb_Oscs.h"
-#include "../gba/Cheats.h"
-#include "../gba/EEprom.h"
-#include "../gba/Flash.h"
-#include "../gba/GBAGfx.h"
-#include "../gba/Globals.h"
-#include "../gba/RTC.h"
-#include "../gba/Sound.h"
-#include "../gba/bios.h"
-
-#include "../gb/gb.h"
-#include "../gb/gbCheats.h"
-#include "../gb/gbGlobals.h"
-#include "../gb/gbMemory.h"
-#include "../gb/gbSGB.h"
-#include "../gb/gbSound.h"
+#include "core/gb/gb.h"
+#include "core/gb/gbCheats.h"
+#include "core/gb/gbGlobals.h"
+#include "core/gb/gbMemory.h"
+#include "core/gb/gbSound.h"
+#include "core/gba/gbaCheats.h"
+#include "core/gba/gbaEeprom.h"
+#include "core/gba/gbaFlash.h"
+#include "core/gba/gbaGlobals.h"
+#include "core/gba/gbaRtc.h"
+#include "core/gba/gbaSound.h"
 
 #include "../filters/interframe.hpp"
 
@@ -91,7 +83,7 @@ int emulating = 0;
 
 struct CoreOptions coreOptions;
 
-#ifdef BKPT_SUPPORT
+#ifdef VBAM_ENABLE_DEBUGGER
 void (*dbgOutput)(const char* s, uint32_t addr);
 void (*dbgSignal)(int sig, int number);
 #endif
@@ -294,17 +286,17 @@ static void SetGBBorder(unsigned val)
 
     switch (val) {
         case 0:
-            _changed = ((systemWidth != gbWidth) || (systemHeight != gbHeight)) ? 1 : 0;
-            systemWidth = gbBorderLineSkip = gbWidth;
-            systemHeight = gbHeight;
+            _changed = ((systemWidth != kGBWidth) || (systemHeight != kGBHeight)) ? 1 : 0;
+            systemWidth = gbBorderLineSkip = kGBWidth;
+            systemHeight = kGBHeight;
             gbBorderColumnSkip = gbBorderRowSkip = 0;
             break;
         case 1:
-            _changed = ((systemWidth != sgbWidth) || (systemHeight != sgbHeight)) ? 1 : 0;
-            systemWidth = gbBorderLineSkip = sgbWidth;
-            systemHeight = sgbHeight;
-            gbBorderColumnSkip = (sgbWidth - gbWidth) >> 1;
-            gbBorderRowSkip = (sgbHeight - gbHeight) >> 1;
+            _changed = ((systemWidth != kSGBWidth) || (systemHeight != kSGBHeight)) ? 1 : 0;
+            systemWidth = gbBorderLineSkip = kSGBWidth;
+            systemHeight = kSGBHeight;
+            gbBorderColumnSkip = (kSGBWidth - kGBWidth) >> 1;
+            gbBorderRowSkip = (kSGBHeight - kGBHeight) >> 1;
             break;
     }
 
@@ -582,8 +574,8 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
 
    if (type == IMAGE_GB) {
       aspect = !gbBorderOn ? (10.0 / 9.0) : (8.0 / 7.0);
-      maxWidth = !gbBorderOn ? gbWidth : sgbWidth;
-      maxHeight = !gbBorderOn ? gbHeight : sgbHeight;
+      maxWidth = !gbBorderOn ? kGBWidth : kSGBWidth;
+      maxHeight = !gbBorderOn ? kGBHeight : kSGBHeight;
    }
 
    info->geometry.base_width = systemWidth;
@@ -941,13 +933,13 @@ static void gb_init(void)
     gbCPUInit(biosfile, option_useBios);
 
     if (gbBorderOn) {
-        systemWidth = gbBorderLineSkip = sgbWidth;
-        systemHeight = sgbHeight;
-        gbBorderColumnSkip = (sgbWidth - gbWidth) >> 1;
-        gbBorderRowSkip = (sgbHeight - gbHeight) >> 1;
+        systemWidth = gbBorderLineSkip = kSGBWidth;
+        systemHeight = kSGBHeight;
+        gbBorderColumnSkip = (kSGBWidth - kGBWidth) >> 1;
+        gbBorderRowSkip = (kSGBHeight - kGBHeight) >> 1;
     } else {
-        systemWidth = gbBorderLineSkip = gbWidth;
-        systemHeight = gbHeight;
+        systemWidth = gbBorderLineSkip = kGBWidth;
+        systemHeight = kGBHeight;
         gbBorderColumnSkip = gbBorderRowSkip = 0;
     }
 
