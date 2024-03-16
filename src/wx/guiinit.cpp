@@ -33,9 +33,14 @@
 #include <wx/wfstream.h>
 
 #include "../Util.h"
-#include "../gba/CheatSearch.h"
 #include "config/option-proxy.h"
-#include "config/option.h"
+#include "core/gb/gb.h"
+#include "core/gb/gbCheats.h"
+#include "core/gb/gbGlobals.h"
+#include "core/gba/gbaCheats.h"
+#include "core/gba/gbaCheatSearch.h"
+#include "core/gba/gbaFlash.h"
+#include "core/gba/gbaGlobals.h"
 #include "dialogs/accel-config.h"
 #include "dialogs/directories-config.h"
 #include "dialogs/display-config.h"
@@ -2038,7 +2043,7 @@ bool MainFrame::BindControls()
             }
 
 #endif
-#ifdef NO_DEBUGGER
+#if !defined(VBAM_ENABLE_DEBUGGER)
 
             if (cmdtab[i].cmd_id == XRCID("DebugGDBBreak") || cmdtab[i].cmd_id == XRCID("DebugGDBDisconnect") || cmdtab[i].cmd_id == XRCID("DebugGDBBreakOnLoad") || cmdtab[i].cmd_id == XRCID("DebugGDBPort"))
             {
@@ -2050,7 +2055,7 @@ bool MainFrame::BindControls()
                 cmdtab[i].mi = NULL;
                 continue;
             }
-#endif
+#endif  // !defined(VBAM_ENABLE_DEBUGGER)
 #if defined(NO_ONLINEUPDATES)
             if (cmdtab[i].cmd_id == XRCID("UpdateEmu"))
             {
@@ -2091,12 +2096,12 @@ bool MainFrame::BindControls()
             }
         }
 
-#ifdef NO_DEBUGGER
+#if !defined(VBAM_ENABLE_DEBUGGER)
         // remove this item from the menu completely
         wxMenuItem* gdbmi = XRCITEM("GDBMenu");
         gdbmi->GetMenu()->Remove(gdbmi);
         gdbmi = nullptr;
-#endif
+#endif  // !defined(VBAM_ENABLE_DEBUGGER)
 #ifdef NO_LINK
         // remove this item from the menu completely
         wxMenuItem* linkmi = XRCITEM("LinkMenu");

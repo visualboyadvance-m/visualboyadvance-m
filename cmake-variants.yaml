@@ -21,3 +21,32 @@ linkage:
       short: Shared
       long: Create shared libraries/DLLs
       linkage: shared
+
+useLink:
+  default: withlink
+  choices:
+    withlink:
+      short: WithLink
+      long: Enable the Link feature
+      settings:
+        ENABLE_LINK: ON
+    nolink:
+      short: NoLink
+      long: Disable the Link feature
+      settings:
+        ENABLE_LINK: OFF
+
+useDebugger:
+  default: withdebugger
+  choices:
+    withdebugger:
+      short: WithDebugger
+      long: Enable the Debugger feature
+      settings:
+        ENABLE_DEBUGGER: ON
+    nodebugger:
+      short: NoDebugger
+      long: Disable the Debugger feature
+      settings:
+        ENABLE_DEBUGGER: OFF
+        ENABLE_SDL: OFF

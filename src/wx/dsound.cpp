@@ -4,8 +4,8 @@
 // Internals
 #include "core/base/sound_driver.h"
 #include "core/base/system.h"
-#include "../gba/Globals.h"
-#include "../gba/Sound.h"
+#include "core/gba/gbaGlobals.h"
+#include "core/gba/gbaSound.h"
 
 // DirectSound8
 #define DIRECTSOUND_VERSION 0x0800

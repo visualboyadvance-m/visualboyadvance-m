@@ -10,11 +10,19 @@
 #include <wx/wfstream.h>
 #include <wx/msgdlg.h>
 
-#include "core/base/version.h"
-#include "../gb/gbPrinter.h"
-#include "../gba/agbprint.h"
 #include "config/option-proxy.h"
 #include "config/option.h"
+#include "core/base/version.h"
+#include "core/gb/gb.h"
+#include "core/gb/gbCheats.h"
+#include "core/gb/gbGlobals.h"
+#include "core/gb/gbPrinter.h"
+#include "core/gb/gbSound.h"
+#include "core/gba/gbaCheats.h"
+#include "core/gba/gbaEeprom.h"
+#include "core/gba/gbaGlobals.h"
+#include "core/gba/gbaPrint.h"
+#include "core/gba/gbaSound.h"
 #include "dialogs/game-maker.h"
 
 #define GetXRCDialog(n) \
@@ -1758,7 +1766,7 @@ EVT_HANDLER_MASK(TileViewer, "Tile Viewer...", CMDEN_GB | CMDEN_GBA)
     TileViewer();
 }
 
-#ifndef NO_DEBUGGER
+#if defined(VBAM_ENABLE_DEBUGGER)
 extern int remotePort;
 
 int GetGDBPort(MainFrame* mf)
@@ -1779,28 +1787,28 @@ int GetGDBPort(MainFrame* mf)
 #endif
         65535, mf);
 }
-#endif
+#endif  // defined(VBAM_ENABLE_DEBUGGER)
 
 EVT_HANDLER(DebugGDBPort, "Configure port...")
 {
-#ifndef NO_DEBUGGER
+#if defined(VBAM_ENABLE_DEBUGGER)
     int port_selected = GetGDBPort(this);
 
     if (port_selected != -1) {
         gopts.gdb_port = port_selected;
         update_opts();
     }
-#endif
+#endif  // defined(VBAM_ENABLE_DEBUGGER)
 }
 
 EVT_HANDLER(DebugGDBBreakOnLoad, "Break on load")
 {
-#ifndef NO_DEBUGGER
+#if defined(VBAM_ENABLE_DEBUGGER)
     GetMenuOptionConfig("DebugGDBBreakOnLoad", config::OptionID::kPrefGDBBreakOnLoad);
-#endif
+#endif  // defined(VBAM_ENABLE_DEBUGGER)
 }
 
-#ifndef NO_DEBUGGER
+#if defined(VBAM_ENABLE_DEBUGGER)
 void MainFrame::GDBBreak()
 {
     ModalPause mp;
@@ -1879,18 +1887,18 @@ void MainFrame::GDBBreak()
         }
     }
 }
-#endif
+#endif  // defined(VBAM_ENABLE_DEBUGGER)
 
 EVT_HANDLER_MASK(DebugGDBBreak, "Break into GDB", CMDEN_NGDB_GBA | CMDEN_GDB)
 {
-#ifndef NO_DEBUGGER
+#if defined(VBAM_ENABLE_DEBUGGER)
     GDBBreak();
-#endif
+#endif  // defined(VBAM_ENABLE_DEBUGGER)
 }
 
 EVT_HANDLER_MASK(DebugGDBDisconnect, "Disconnect GDB", CMDEN_GDB)
 {
-#ifndef NO_DEBUGGER
+#if defined(VBAM_ENABLE_DEBUGGER)
     debugger = false;
     dbgMain = NULL;
     dbgSignal = NULL;
@@ -1900,7 +1908,7 @@ EVT_HANDLER_MASK(DebugGDBDisconnect, "Disconnect GDB", CMDEN_GDB)
     cmd_enable &= ~CMDEN_GDB;
     cmd_enable |= CMDEN_NGDB_GBA | CMDEN_NGDB_ANY;
     enable_menus();
-#endif
+#endif  // defined(VBAM_ENABLE_DEBUGGER)
 }
 
 // Options menu

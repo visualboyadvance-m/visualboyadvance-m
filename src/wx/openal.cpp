@@ -14,8 +14,8 @@
 #include "openal.h"
 
 // Internals
-#include "../gba/Globals.h" // for 'speedup' and 'synchronize'
-#include "../gba/Sound.h"
+#include "core/gba/gbaGlobals.h"  // for 'speedup' and 'synchronize'
+#include "core/gba/gbaSound.h"
 
 // Debug
 #include <assert.h>

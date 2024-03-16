@@ -1,7 +1,6 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
-#include <vector>
 
 #ifdef __WXGTK__
     #include <X11/Xlib.h>
@@ -22,18 +21,26 @@
 #include <SDL_joystick.h>
 
 #include "../Util.h"
-#include "core/base/file_util.h"
-#include "core/base/patch.h"
-#include "core/base/version.h"
-#include "../gb/gbPrinter.h"
-#include "../gba/RTC.h"
-#include "../gba/agbprint.h"
 #include "../sdl/text.h"
 #include "background-input.h"
 #include "config/game-control.h"
 #include "config/option-proxy.h"
 #include "config/option.h"
 #include "config/user-input.h"
+#include "core/base/file_util.h"
+#include "core/base/patch.h"
+#include "core/base/version.h"
+#include "core/gb/gb.h"
+#include "core/gb/gbCheats.h"
+#include "core/gb/gbGlobals.h"
+#include "core/gb/gbSound.h"
+#include "core/gb/gbPrinter.h"
+#include "core/gba/gbaCheats.h"
+#include "core/gba/gbaGlobals.h"
+#include "core/gba/gbaFlash.h"
+#include "core/gba/gbaPrint.h"
+#include "core/gba/gbaRtc.h"
+#include "core/gba/gbaSound.h"
 #include "drawing.h"
 #include "filters.h"
 #include "wayland.h"
@@ -530,11 +537,11 @@ void GameArea::LoadGame(const wxString& name)
     }
 #endif
 
-#ifndef NO_DEBUGGER
+#if defined(VBAM_ENABLE_DEBUGGER)
     if (OPTION(kPrefGDBBreakOnLoad)) {
         mf->GDBBreak();
     }
-#endif
+#endif  // defined(VBAM_ENABLE_DEBUGGER)
 }
 
 void GameArea::SetFrameTitle()
@@ -626,11 +633,11 @@ void GameArea::UnloadGame(bool destruct)
     systemStopGameRecording();
     systemStopGamePlayback();
 
-#ifndef NO_DEBUGGER
+#if defined(VBAM_ENABLE_DEBUGGER)
     debugger = false;
     remoteCleanUp();
     mf->cmd_enable |= CMDEN_NGDB_ANY;
-#endif
+#endif  // VBAM_ENABLE_DEBUGGER
 
     if (loaded == IMAGE_GB) {
         gbCleanUp();
@@ -1087,7 +1094,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
         wxGetApp().pending_load = wxEmptyString;
         LoadGame(pl);
 
-#ifndef NO_DEBUGGER
+#if defined(VBAM_ENABLE_DEBUGGER)
         if (OPTION(kPrefGDBBreakOnLoad)) {
             mf->GDBBreak();
         }
@@ -1096,7 +1103,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
             wxLogError(_("Not a valid Game Boy Advance cartridge"));
             UnloadGame();
         }
-#endif
+#endif  // defined(VBAM_ENABLE_DEBUGGER)
     }
 
     // stupid wx doesn't resize to screen size
@@ -1218,7 +1225,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
         HideMenuBar();
         event.RequestMore();
 
-#ifndef NO_DEBUGGER
+#if defined(VBAM_ENABLE_DEBUGGER)
         if (debugger) {
             was_paused = true;
             dbgMain();
@@ -1231,7 +1238,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
             return;
         }
-#endif
+#endif  // defined(VBAM_ENABLE_DEBUGGER)
 
         emusys->emuMain(emusys->emuCount);
 #ifndef NO_LINK

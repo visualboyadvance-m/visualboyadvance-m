@@ -21,7 +21,7 @@
 
 // Internals
 #include "core/base/system.h" // for systemMessage()
-#include "../gba/Globals.h"
+#include "core/gba/gbaGlobals.h"
 
 int GetXA2Devices(IXAudio2* xa, wxArrayString* names, wxArrayString* ids,
     const wxString* match)

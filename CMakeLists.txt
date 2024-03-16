@@ -244,10 +244,11 @@ set(SDL2_TARGETS SDL2::SDL2 ${SDL2_LIBRARY_TEMP})
 set(
     VBAMCORE_LIBS
     vbamcore
+    vbam-core-apu
     vbam-core-base
+    vbam-core-emulator
     vbam-fex
     ${SDL2_TARGETS}
-    ${SFML_LIBRARIES}
     ${OPENGL_LIBRARIES}
     ${ZLIB_LIBRARY}
 )
@@ -333,10 +334,8 @@ else()
 endif()
 
 # The debugger is enabled by default
-if(NOT ENABLE_DEBUGGER)
-    add_compile_definitions(NO_DEBUGGER)
-else()
-    add_compile_definitions(BKPT_SUPPORT)
+if(ENABLE_DEBUGGER)
+    add_compile_definitions(VBAM_ENABLE_DEBUGGER)
 endif()
 
 # The ASM core is disabled by default because we don't know on which platform we are
@@ -386,8 +385,7 @@ endif()
 
 if(NOT TRANSLATIONS_ONLY)
     add_subdirectory(third_party/include/stb)
-    add_subdirectory(src/core/fex)
-    add_subdirectory(src/core/base)
+    add_subdirectory(src/core)
 endif()
 
 set(
@@ -415,120 +413,6 @@ if(ENABLE_FFMPEG)
     set(SRC_MAIN ${SRC_MAIN} src/common/ffmpeg.cpp)
     set(HDR_MAIN ${HDR_MAIN} src/common/ffmpeg.h)
 endif()
-
-set(
-    SRC_GBA
-    src/gba/agbprint.cpp
-    src/gba/bios.cpp
-    src/gba/Cheats.cpp
-    src/gba/CheatSearch.cpp
-    # Built with flex -o debugger-expr-lex.cpp -P dexp_ debugger-expr.l
-    src/gba/debugger-expr-lex.cpp
-    # Built with bison -L c -o debugger-expr-yacc.cpp -H -p dexp_ debugger-expr.y
-    # The yyerrorlab label handler was manually commented out to silence a
-    # compiler warning.
-    src/gba/debugger-expr-yacc.cpp
-    src/gba/EEprom.cpp
-    src/gba/ereader.cpp
-    src/gba/Flash.cpp
-    src/gba/GBA.cpp
-    src/gba/GBAGfx.cpp
-    src/gba/GBALink.cpp
-    src/gba/GBASockClient.cpp
-    src/gba/GBA-thumb.cpp
-    src/gba/GBA-arm.cpp
-    src/gba/gbafilter.cpp
-    src/gba/Globals.cpp
-    src/gba/Mode0.cpp
-    src/gba/Mode1.cpp
-    src/gba/Mode2.cpp
-    src/gba/Mode3.cpp
-    src/gba/Mode4.cpp
-    src/gba/Mode5.cpp
-    src/gba/RTC.cpp
-    src/gba/Sound.cpp
-    src/gba/Sram.cpp
-)
-
-if(ENABLE_DEBUGGER)
-    list(APPEND SRC_GBA
-        src/gba/BreakpointStructures.cpp
-    )
-endif()
-
-set(
-    HDR_GBA
-    src/gba/agbprint.h
-    src/gba/bios.h
-    src/gba/BreakpointStructures.h
-    src/gba/Cheats.h
-    src/gba/CheatSearch.h
-    src/gba/debugger-expr-yacc.hpp
-    src/gba/EEprom.h
-    src/gba/ereader.h
-    src/gba/Flash.h
-    src/gba/GBA.h
-    src/gba/GBAcpu.h
-    src/gba/gbafilter.h
-    src/gba/GBAGfx.h
-    src/gba/GBAinline.h
-    src/gba/GBALink.h
-    src/gba/GBASockClient.h
-    src/gba/Globals.h
-    src/gba/RTC.h
-    src/gba/Sound.h
-    src/gba/Sram.h
-)
-
-set(
-    SRC_GB
-    src/gb/GB.cpp
-    src/gb/gbCartData.cpp
-    src/gb/gbCheats.cpp
-    src/gb/gbDis.cpp
-    src/gb/gbGfx.cpp
-    src/gb/gbGlobals.cpp
-    src/gb/gbMemory.cpp
-    src/gb/gbPrinter.cpp
-    src/gb/gbSGB.cpp
-    src/gb/gbSound.cpp
-)
-
-set(
-    HDR_GB
-    src/gb/gb.h
-    src/gb/gbCartData.h
-    src/gb/gbCheats.h
-    src/gb/gbCodes.h
-    src/gb/gbCodesCB.h
-    src/gb/gbGlobals.h
-    src/gb/gbMemory.h
-    src/gb/gbPrinter.h
-    src/gb/gbSGB.h
-    src/gb/gbSound.h
-)
-
-set(
-    SRC_APU
-    src/apu/Blip_Buffer.cpp
-    src/apu/Effects_Buffer.cpp
-    src/apu/Gb_Apu.cpp
-    src/apu/Gb_Apu_State.cpp
-    src/apu/Gb_Oscs.cpp
-    src/apu/Multi_Buffer.cpp
-)
-
-set(
-    HDR_APU
-    src/apu/blargg_common.h #Unused(?) but in the VS projects
-    src/apu/blargg_config.h #Unused(?) but in the VS projects
-    src/apu/blargg_source.h
-    src/apu/Blip_Buffer.h
-    src/apu/Effects_Buffer.h
-    src/apu/Gb_Apu.h
-    src/apu/Gb_Oscs.h
-    src/apu/Multi_Buffer.h
-)
 
 set(
     SRC_SDL
@@ -614,31 +498,6 @@ else()
 endif()
 
 
-set(
-    SRC_DEBUGGER
-    src/gba/armdis.cpp
-    src/gba/elf.cpp
-)
-
-set(
-    HDR_DEBUGGER
-    src/gba/armdis.h
-    src/gba/elf.h
-)
-
-if(ENABLE_DEBUGGER)
-    set(
-        SRC_DEBUGGER
-        ${SRC_DEBUGGER}
-        src/gba/remote.cpp
-    )
-    set(
-        HDR_DEBUGGER
-        ${HDR_DEBUGGER}
-        src/gba/remote.h
-    )
-endif()
-
 include_directories(
     ${ZLIB_INCLUDE_DIR}
     third_party/include
@@ -657,16 +516,8 @@ if(NOT TRANSLATIONS_ONLY)
         ${PROJECT_SRCS}
         ${SRC_MAIN}
         ${HDR_MAIN}
-        ${SRC_GBA}
-        ${HDR_GBA}
-        ${SRC_GB}
-        ${HDR_GB}
-        ${SRC_APU}
-        ${HDR_APU}
         ${SRC_FILTERS}
         ${HDR_FILTERS}
-        ${SRC_DEBUGGER}
-        ${HDR_DEBUGGER}
     )
     target_include_directories(vbamcore PUBLIC ${SDL2_INCLUDE_DIRS})
 endif()

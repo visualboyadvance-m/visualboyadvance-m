@@ -11,6 +11,7 @@
 #include <wx/propdlg.h>
 #include <wx/datetime.h>
 
+#include "core/base/system.h"
 #include "config/option-observer.h"
 #include "widgets/dpi-support.h"
 #include "widgets/keep-on-top-styler.h"
@@ -18,14 +19,9 @@
 #include "wx/wxmisc.h"
 #include "wxhead.h"
 
-#include "../gb/gb.h"
-#include "../gb/gbCheats.h"
-#include "../gb/gbGlobals.h"
-#include "../gb/gbSound.h"
-#include "../gba/Cheats.h"
-#include "../gba/GBALink.h"
-#include "../gba/Globals.h"
-#include "../gba/Sound.h"
+#ifndef NO_LINK
+#include "core/gba/gbaLink.h"
+#endif
 
 #ifndef NO_FFMPEG
 #include "../common/ffmpeg.h"
@@ -728,7 +724,7 @@ extern bool GetFADevices(wxArrayString& names, wxArrayString& ids);
 #endif
 #endif
 
-#ifndef NO_DEBUGGER
+#if defined(VBAM_ENABLE_DEBUGGER)
 extern bool debugger;
 extern void (*dbgMain)();
 extern void (*dbgSignal)(int, int);
@@ -743,7 +739,7 @@ extern const wxString& debugGetSlavePty();
 extern bool debugWaitPty();
 extern bool debugStartListen(int port);
 extern bool debugWaitSocket();
-#endif
+#endif  // defined(VBAM_ENABLE_DEBUGGER)
 
 // supported movie format for game recording
 enum MVFormatID {

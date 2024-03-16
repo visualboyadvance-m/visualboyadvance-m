@@ -6,6 +6,8 @@
 #include <wx/ffile.h>
 
 #include "config/option-proxy.h"
+#include "core/gb/gbGlobals.h"
+#include "core/gba/gbaGlobals.h"
 #include "viewsupt.h"
 #include "wxvbam.h"
 

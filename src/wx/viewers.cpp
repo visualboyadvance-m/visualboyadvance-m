@@ -7,9 +7,12 @@
 #include <wx/ffile.h>
 #include <wx/vlbox.h>
 
-#include "../gba/armdis.h"
 #include "config/option-proxy.h"
-#include "keep-on-top-styler.h"
+#include "core/gb/gb.h"
+#include "core/gb/gbDis.h"
+#include "core/gb/gbGlobals.h"
+#include "core/gba/gbaCpu.h"
+#include "core/gba/gbaCpuArmDis.h"
 #include "viewsupt.h"
 #include "wxvbam.h"
 
@@ -344,7 +347,7 @@ void MainFrame::Disassemble(void)
 
 // for CPUWriteHalfWord
 // and CPURead... below
-#include "../gba/GBAinline.h"
+#include "core/gba/gbaInline.h"
 
 namespace Viewers {
 #include "ioregs.h"

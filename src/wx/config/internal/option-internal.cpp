@@ -11,8 +11,8 @@
 #include <wx/translation.h>
 
 #include "core/base/system.h"
-#include "../gba/Sound.h"
-#include "../gb/gbGlobals.h"
+#include "core/gb/gbGlobals.h"
+#include "core/gba/gbaSound.h"
 #include "opts.h"
 
 #define VBAM_OPTION_INTERNAL_INCLUDE

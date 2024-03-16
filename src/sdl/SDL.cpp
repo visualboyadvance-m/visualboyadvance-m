@@ -43,20 +43,21 @@
 
 #include <SDL.h>
 
+#include "../Util.h"
 #include "core/base/file_util.h"
 #include "core/base/message.h"
 #include "core/base/patch.h"
 #include "core/base/version.h"
-#include "../Util.h"
-#include "../gb/gb.h"
-#include "../gb/gbCheats.h"
-#include "../gb/gbGlobals.h"
-#include "../gb/gbSound.h"
-#include "../gba/Cheats.h"
-#include "../gba/Flash.h"
-#include "../gba/GBA.h"
-#include "../gba/RTC.h"
-#include "../gba/Sound.h"
+#include "core/gb/gb.h"
+#include "core/gb/gbCheats.h"
+#include "core/gb/gbGlobals.h"
+#include "core/gb/gbSound.h"
+#include "core/gba/gba.h"
+#include "core/gba/gbaCheats.h"
+#include "core/gba/gbaFlash.h"
+#include "core/gba/gbaGlobals.h"
+#include "core/gba/gbaRtc.h"
+#include "core/gba/gbaSound.h"
 
 #include "../common/SoundSDL.h"
 
