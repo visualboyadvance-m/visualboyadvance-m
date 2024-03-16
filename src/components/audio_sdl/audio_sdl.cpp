@@ -15,10 +15,13 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "components/audio_sdl/audio_sdl.h"
+
 #include <cmath>
 #include <iostream>
+
 #include <SDL_events.h>
-#include "SoundSDL.h"
+
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaSound.h"
 

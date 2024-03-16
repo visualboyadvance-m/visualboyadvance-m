@@ -20,6 +20,8 @@
 
 /* Code originally from fceu/drawing.h file, adapted by Forgotten
  */
+#include "components/draw_text/draw_text.h"
+
 #include "core/base/system.h"
 
 extern int RGB_LOW_BITS_MASK;

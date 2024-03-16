@@ -2,12 +2,13 @@
 #error "Do not include "config/internal/option-internal.h" outside of the implementation."
 #endif
 
-#include <wx/string.h>
 #include <array>
-#include <string>
+
+#include <optional.hpp>
+
+#include <wx/string.h>
 
 #include "config/option.h"
-#include "nonstd/optional.hpp"
 
 namespace config {
 namespace internal {

@@ -1,7 +1,8 @@
 #include "config/option.h"
 
 #include <cstring>
-#include "nonstd/variant.hpp"
+
+#include <variant.hpp>
 
 #include <wx/log.h>
 #include <wx/translation.h>

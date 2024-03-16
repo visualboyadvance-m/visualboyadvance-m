@@ -238,19 +238,14 @@ if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     endif()
 endif()
 
-set(SDL2_TARGETS SDL2::SDL2 ${SDL2_LIBRARY_TEMP})
+set(VBAM_SDL2_LIBS SDL2::SDL2 ${SDL2_LIBRARY_TEMP})
 
 # set the standard libraries all ports use
 set(
     VBAMCORE_LIBS
-    vbamcore
-    vbam-core-apu
-    vbam-core-base
-    vbam-core-emulator
-    vbam-fex
-    ${SDL2_TARGETS}
+    vbam-core
+    ${VBAM_SDL2_LIBS}
     ${OPENGL_LIBRARIES}
-    ${ZLIB_LIBRARY}
 )
 
 set(VBAM_GENERATED_DIR ${CMAKE_BINARY_DIR}/generated)
@@ -260,7 +255,6 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src
     ${VBAM_GENERATED_DIR}
 )
-
 
 if(ENABLE_FFMPEG)
     if(NOT FFMPEG_LIBRARIES)
@@ -303,16 +297,6 @@ endif()
 add_compile_definitions(HAVE_NETINET_IN_H HAVE_ARPA_INET_H HAVE_ZLIB_H FINAL_VERSION SDL USE_OPENGL SYSCONF_INSTALL_DIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}" WITH_LIRC=${WITHLIRC})
 add_compile_definitions(PKGDATADIR="${CMAKE_INSTALL_FULL_DATADIR}/vbam")
 add_compile_definitions(__STDC_FORMAT_MACROS)
-
-# For C++, default to nonstd::optional and nonstd::variant for now due to mac
-# build issues.
-if(APPLE)
-    add_compile_definitions(optional_CONFIG_SELECT_OPTIONAL=optional_OPTIONAL_NONSTD)
-    add_compile_definitions(variant_CONFIG_SELECT_VARIANT=variant_VARIANT_NONSTD)
-else()
-    add_compile_definitions(optional_CONFIG_SELECT_OPTIONAL=optional_OPTIONAL_STD)
-    add_compile_definitions(variant_CONFIG_SELECT_VARIANT=variant_VARIANT_STD)
-endif()
 
 if(ENABLE_LINK)
     # IPC linking code needs sem_timedwait which can be either in librt or pthreads
@@ -364,54 +348,29 @@ if(ENABLE_NLS)
         find_library(LIBCHARSET_LIB NAMES libcharset charset)
         if(LIBINTL_LIB)
             list(APPEND CMAKE_REQUIRED_LIBRARIES ${LIBINTL_LIB})
-            list(APPEND VBAMCORE_LIBS            ${LIBINTL_LIB})
+            list(APPEND NLS_LIBS                 ${LIBINTL_LIB})
         endif()
         if(LIBICONV_LIB)
             list(APPEND CMAKE_REQUIRED_LIBRARIES ${LIBICONV_LIB})
-            list(APPEND VBAMCORE_LIBS            ${LIBICONV_LIB})
+            list(APPEND NLS_LIBS                 ${LIBICONV_LIB})
         endif()
         if(LIBCHARSET_LIB)
             list(APPEND CMAKE_REQUIRED_LIBRARIES ${LIBCHARSET_LIB})
-            list(APPEND VBAMCORE_LIBS            ${LIBCHARSET_LIB})
+            list(APPEND NLS_LIBS                 ${LIBCHARSET_LIB})
         endif()
         include(CheckFunctionExists)
         check_function_exists(gettext GETTEXT_FN)
         if(NOT (LIBINTL_INC OR GETTEXT_FN))
             message(FATAL_ERROR "NLS requires libintl/gettext")
         endif()
-        include_directories(${LIBINTL_INC})
     endif()
 endif()
 
 if(NOT TRANSLATIONS_ONLY)
+    add_subdirectory(third_party/include/nonstd)
     add_subdirectory(third_party/include/stb)
     add_subdirectory(src/core)
-endif()
-
-set(
-    SRC_MAIN
-    src/Util_common.cpp
-    src/Util_desktop.cpp
-    src/common/SoundSDL.cpp
-)
-
-if(MSVC)
-    set(SRC_MAIN ${SRC_MAIN} "dependencies/msvc/getopt.c")
-endif()
-
-set(
-    HDR_MAIN
-    src/Util.h
-    src/common/SoundSDL.h
-)
-
-if(MSVC)
-    set(HDR_MAIN ${HDR_MAIN} "dependencies/msvc/getopt.h")
-endif()
-
-if(ENABLE_FFMPEG)
-    set(SRC_MAIN ${SRC_MAIN} src/common/ffmpeg.cpp)
-    set(HDR_MAIN ${HDR_MAIN} src/common/ffmpeg.h)
+    add_subdirectory(src/components)
 endif()
 
 set(
@@ -425,8 +384,10 @@ set(
     src/sdl/iniparser.c
     src/sdl/inputSDL.cpp
     src/sdl/SDL.cpp
-    src/sdl/text.cpp
 )
+if(MSVC)
+    list(APPEND SRC_SDL "dependencies/msvc/getopt.c")
+endif()
 
 set(
     HDR_SDL
@@ -437,89 +398,9 @@ set(
     src/sdl/filters.h
     src/sdl/iniparser.h
     src/sdl/inputSDL.h
-    src/sdl/text.h
 )
-
-set(
-    SRC_FILTERS
-    src/filters/2xSaI.cpp
-    src/filters/admame.cpp
-    src/filters/bilinear.cpp
-    src/filters/hq2x.cpp
-    src/filters/interframe.cpp
-    src/filters/pixel.cpp
-    src/filters/scanline.cpp
-    src/filters/simpleFilter.cpp
-    src/filters/xbrzfilter.cpp
-    src/filters/xBRZ/xbrz.cpp
-)
-
-set(
-    HDR_FILTERS
-    src/filters/hq2x.h
-    src/filters/interp.h
-    src/filters/lq2x.h
-    src/filters/xBRZ/xbrz_config.h
-    src/filters/xBRZ/xbrz.h
-    src/filters/xBRZ/xbrz_tools.h
-)
-
-set(
-    SRC_HQ_C
-    src/filters/hq/c/hq_implementation.cpp
-)
-
-set(
-    HDR_HQ_C
-    src/filters/hq/c/hq3x_pattern.h
-    src/filters/hq/c/hq4x_pattern.h
-    src/filters/hq/c/hq_base.h
-    src/filters/hq/c/hq_shared.h
-)
-
-set(
-    SRC_HQ_ASM
-    src/filters/hq/asm/hq3x_16.asm
-    src/filters/hq/asm/hq3x_32.asm
-    src/filters/hq/asm/hq4x_16.asm
-    src/filters/hq/asm/hq4x_32.asm
-    src/filters/hq/asm/hq3x32.cpp
-)
-
-if(ENABLE_ASM_SCALERS)
-    set(SRC_FILTERS ${SRC_FILTERS} ${SRC_HQ_ASM})
-    if(ENABLE_MMX)
-        set(SRC_FILTERS ${SRC_FILTERS} src/filters/2xSaImmx.asm)
-    endif()
-else()
-    set(SRC_FILTERS ${SRC_FILTERS} ${SRC_HQ_C})
-    set(HDR_FILTERS ${HDR_FILTERS} ${HDR_HQ_C})
-    add_compile_definitions(NO_ASM)
-endif()
-
-
-include_directories(
-    ${ZLIB_INCLUDE_DIR}
-    third_party/include
-)
-
-if(ENABLE_FFMPEG)
-    include_directories(
-        ${FFMPEG_INCLUDE_DIRS}
-    )
-endif()
-
-if(NOT TRANSLATIONS_ONLY)
-    add_library(
-        vbamcore
-        STATIC
-        ${PROJECT_SRCS}
-        ${SRC_MAIN}
-        ${HDR_MAIN}
-        ${SRC_FILTERS}
-        ${HDR_FILTERS}
-    )
-    target_include_directories(vbamcore PUBLIC ${SDL2_INCLUDE_DIRS})
+if(MSVC)
+    list(APPEND HDR_SDL "dependencies/msvc/getopt.h")
 endif()
 
 if((NOT TRANSLATIONS_ONLY) AND ENABLE_SDL)
@@ -543,8 +424,13 @@ if((NOT TRANSLATIONS_ONLY) AND ENABLE_SDL)
         set(LIRC_CLIENT_LIBRARY lirc_client)
     endif()
 
-    target_link_libraries(
-        vbam
+    target_link_libraries(vbam
+        vbam-components-audio-sdl
+        vbam-components-draw-text
+        vbam-components-filters
+        vbam-components-filters-agb
+        vbam-components-filters-interframe
+        vbam-components-user-config
         ${VBAMCORE_LIBS}
         ${WIN32_LIBRARIES}
         ${LIRC_CLIENT_LIBRARY}

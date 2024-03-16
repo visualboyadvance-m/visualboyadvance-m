@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef __VBA_SOUND_SDL_H__
-#define __VBA_SOUND_SDL_H__
+#ifndef VBAM_COMPONENTS_AUDIO_SDL_AUDIO_SDL_H_
+#define VBAM_COMPONENTS_AUDIO_SDL_AUDIO_SDL_H_
 
 #include <SDL.h>
 
@@ -60,4 +60,4 @@ private:
         static const double buftime;
 };
 
-#endif // __VBA_SOUND_SDL_H__
+#endif  // VBAM_COMPONENTS_AUDIO_SDL_AUDIO_SDL_H_

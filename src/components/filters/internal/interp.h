@@ -28,12 +28,10 @@
  * do so, delete this exception statement from your version.
  */
 
-#ifndef __INTERP_H
-#define __INTERP_H
+#ifndef VBAM_COMPONENTS_FILTERS_INTERNAL_INTERP_H
+#define VBAM_COMPONENTS_FILTERS_INTERNAL_INTERP_H
 
-#define __STDC_CONSTANT_MACROS
-
-#include <stdint.h>
+#include <cstdint>
 
 typedef uint16_t interp_uint16;
 typedef uint32_t interp_uint32;
@@ -342,4 +340,4 @@ static void interp_set(unsigned bits_per_pixel)
         }
 }
 
-#endif
+#endif  // VBAM_COMPONENTS_FILTERS_INTERNAL_INTERP_H

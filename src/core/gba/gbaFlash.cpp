@@ -4,7 +4,10 @@
 #include <cstring>
 
 #include "core/base/file_util.h"
+#include "core/base/port.h"
 #include "core/gba/gba.h"
+#include "core/gba/gbaGlobals.h"
+#include "core/gba/gbaRtc.h"
 #include "core/gba/internal/gbaSram.h"
 
 #define FLASH_READ_ARRAY 0
@@ -26,6 +29,62 @@ int g_flashSize = SIZE_FLASH512;
 int flashDeviceID = 0x1b;
 int flashManufacturerID = 0x32;
 int flashBank = 0;
+
+void flashDetectSaveType(const int size) {
+    uint32_t* p = (uint32_t*)&g_rom[0];
+    uint32_t* end = (uint32_t*)(&g_rom[0] + size);
+    int detectedSaveType = 0;
+    int flashSize = 0x10000;
+    bool rtcFound = false;
+
+    while (p < end) {
+        uint32_t d = READ32LE(p);
+
+        if (d == 0x52504545) {
+            if (memcmp(p, "EEPROM_", 7) == 0) {
+                if (detectedSaveType == 0 || detectedSaveType == 4)
+                    detectedSaveType = 1;
+            }
+        } else if (d == 0x4D415253) {
+            if (memcmp(p, "SRAM_", 5) == 0) {
+                if (detectedSaveType == 0 || detectedSaveType == 1 || detectedSaveType == 4)
+                    detectedSaveType = 2;
+            }
+        } else if (d == 0x53414C46) {
+            if (memcmp(p, "FLASH1M_", 8) == 0) {
+                if (detectedSaveType == 0) {
+                    detectedSaveType = 3;
+                    flashSize = 0x20000;
+                }
+            } else if (memcmp(p, "FLASH512_", 9) == 0) {
+                if (detectedSaveType == 0) {
+                    detectedSaveType = 3;
+                    flashSize = 0x10000;
+                }
+            } else if (memcmp(p, "FLASH", 5) == 0) {
+                if (detectedSaveType == 0) {
+                    detectedSaveType = 4;
+                    flashSize = 0x10000;
+                }
+            }
+        } else if (d == 0x52494953) {
+            if (memcmp(p, "SIIRTC_V", 8) == 0)
+                rtcFound = true;
+        }
+        p++;
+    }
+    // if no matches found, then set it to NONE
+    if (detectedSaveType == 0) {
+        detectedSaveType = 5;
+    }
+    if (detectedSaveType == 4) {
+        detectedSaveType = 3;
+    }
+    rtcEnable(rtcFound);
+    rtcEnableRumble(!rtcFound);
+    coreOptions.saveType = detectedSaveType;
+    flashSetSize(flashSize);
+}
 
 void flashInit()
 {

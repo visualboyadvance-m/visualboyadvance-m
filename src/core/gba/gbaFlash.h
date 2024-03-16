@@ -9,6 +9,8 @@
 
 #define FLASH_128K_SZ 0x20000
 
+void flashDetectSaveType(const int size);
+
 #if defined(__LIBRETRO__)
 extern void flashSaveGame(uint8_t*& data);
 extern void flashReadGame(const uint8_t*& data);

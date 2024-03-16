@@ -56,6 +56,6 @@ target_include_directories(vbam-core-base
 )
 
 target_link_libraries(vbam-core-base
-    INTERFACE vbam-fex stb-image
+    PRIVATE vbam-fex stb-image
     PUBLIC ${ZLIB_LIBRARY}
 )

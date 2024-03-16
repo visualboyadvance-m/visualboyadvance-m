@@ -763,8 +763,6 @@ set(
     widgets/sdljoy.cpp
     widgets/user-input-ctrl.cpp
     widgets/wxmisc.cpp
-    # probably ought to be in common
-    ../sdl/text.cpp
     # from external source with minor modifications
     widgets/checkedlistctrl.cpp
 )
@@ -786,7 +784,6 @@ set(
     background-input.h
     wxlogdebug.h
     drawing.h
-    filters.h
     ioregs.h
     opts.h
     viewsupt.h
@@ -819,8 +816,6 @@ set(
     widgets/wx/sdljoy.h
     widgets/wx/webupdatedef.h
     widgets/wx/wxmisc.h
-    # probably ought to be in common
-    ../sdl/text.h
     # from external source with minor modifications
     widgets/wx/checkedlistctrl.h
 )
@@ -924,6 +919,8 @@ if(NOT TRANSLATIONS_ONLY)
         ${CM_STUFF}
     )
 
+    target_include_directories(visualboyadvance-m PRIVATE ${NONSTD_INCLUDE_DIR})
+
     if(WIN32 AND (X86_64 OR X86_32) AND ENABLE_ONLINEUPDATES)
         if(NOT DEFINED WINSPARKLE_BIN_RELEASE_DIR)
             set(WINSPARKLE_BIN_RELEASE_DIR ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.6.0)
@@ -987,11 +984,19 @@ if(NOT TRANSLATIONS_ONLY)
         visualboyadvance-m
         ${wxWidgets_LIBRARIES}
         ${VBAM_LIBS}
+        nonstd-lib
+        vbam-components-audio-sdl
+        vbam-components-draw-text
+        vbam-components-filters
+        vbam-components-filters-agb
+        vbam-components-filters-interframe
+        vbam-components-user-config
     )
 
     if(ENABLE_FFMPEG)
         target_link_libraries(
             visualboyadvance-m
+            vbam-components-av-recording
             ${FFMPEG_LIBRARIES}
         )
 

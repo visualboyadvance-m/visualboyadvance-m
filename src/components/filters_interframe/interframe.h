@@ -1,7 +1,7 @@
 /// Interframe blending filters
 
-#ifndef INTERFRAME_HPP
-#define INTERFRAME_HPP
+#ifndef VBAM_COMPONENTS_FILTERS_INTERFRAME_INTERFRAME_H_
+#define VBAM_COMPONENTS_FILTERS_INTERFRAME_INTERFRAME_H_
 
 #include <cstdint>
 
@@ -30,4 +30,5 @@ void SmartIB(uint8_t *srcPtr, uint32_t srcPitch, int width, int height);
 void SmartIB32(uint8_t *srcPtr, uint32_t srcPitch, int width, int height);
 void MotionBlurIB(uint8_t *srcPtr, uint32_t srcPitch, int width, int height);
 void MotionBlurIB32(uint8_t *srcPtr, uint32_t srcPitch, int width, int height);
-#endif  //INTERFRAME_HPP
+
+#endif  //VBAM_COMPONENTS_FILTERS_INTERFRAME_INTERFRAME_H_

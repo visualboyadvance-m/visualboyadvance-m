@@ -24,7 +24,7 @@
 #endif
 
 #ifndef NO_FFMPEG
-#include "../common/ffmpeg.h"
+#include "components/av_recording/av_recording.h"
 #endif
 
 #include "wxlogdebug.h"
@@ -796,7 +796,5 @@ extern int autofire, autohold;
 #define KEYM_MOTION_RIGHT (1 << 18)
 #define KEYM_MOTION_IN (1 << 19)
 #define KEYM_MOTION_OUT (1 << 20)
-
-#include "filters.h"
 
 #endif /* WX_WXVBAM_H */

@@ -10,6 +10,7 @@
 #include <wx/wfstream.h>
 #include <wx/msgdlg.h>
 
+#include "components/filters_interframe/interframe.h"
 #include "config/option-proxy.h"
 #include "config/option.h"
 #include "core/base/version.h"
