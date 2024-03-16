@@ -18,9 +18,6 @@ endif
 SOURCES_CXX :=
 
 SOURCES_CXX += \
-	$(CORE_DIR)/Util_common.cpp \
-
-SOURCES_CXX += \
 	$(CORE_DIR)/libretro/libretro.cpp \
 	$(CORE_DIR)/libretro/SoundRetro.cpp
 
@@ -72,5 +69,5 @@ SOURCES_CXX += \
 
 # Filters
 SOURCES_CXX += \
-	$(CORE_DIR)/filters/interframe.cpp \
-	$(CORE_DIR)/core/gba/gbaFilter.cpp
+	$(CORE_DIR)/components/filters_agb/filters_agb.cpp \
+	$(CORE_DIR)/components/filters_interframe/interframe.cpp

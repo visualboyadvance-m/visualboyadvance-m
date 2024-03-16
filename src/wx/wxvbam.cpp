@@ -30,6 +30,7 @@
 #include <wx/wxcrtvararg.h>
 #include <wx/zipstrm.h>
 
+#include "components/user_config/user_config.h"
 #include "core/gb/gbGlobals.h"
 #include "core/gba/gbaSound.h"
 
@@ -42,7 +43,6 @@
 
 // The built-in vba-over.ini
 #include "builtin-over.h"
-#include "../Util.h"
 #include "config/game-control.h"
 #include "config/option-proxy.h"
 #include "config/option.h"
@@ -223,7 +223,7 @@ static void get_config_path(wxPathList& path, bool exists = true)
 #if defined(__WXGTK__)
     // XDG spec manual support
     // ${XDG_CONFIG_HOME:-$HOME/.config}/`appname`
-    wxString old_config = wxString(getenv("HOME"), wxConvLibc) + wxT(FILE_SEP) + wxT(".vbam");
+    wxString old_config = wxString(getenv("HOME"), wxConvLibc) + kFileSep + ".vbam";
     wxString new_config(get_xdg_user_config_home().c_str(), wxConvLibc);
     if (!wxDirExists(old_config) && wxIsWritable(new_config))
     {

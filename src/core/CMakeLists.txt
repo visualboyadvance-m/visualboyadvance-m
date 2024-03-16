@@ -2,13 +2,13 @@ add_subdirectory(apu)
 add_subdirectory(base)
 add_subdirectory(fex)
 
-# The vbam-core-emulator target contains both the Game Boy and Game Boy Advance
+# The vbam-core target contains both the Game Boy and Game Boy Advance
 # emulators. These should be broken down into 2 separate targets. The issue lies
 # with the Link and Sound emulation, which are tangled together between the two
 # systems.
-add_library(vbam-core-emulator OBJECT)
+add_library(vbam-core STATIC)
 
-target_sources(vbam-core-emulator
+target_sources(vbam-core
     PRIVATE
     # Game Boy
     gb/internal/gbCodes.h
@@ -39,7 +39,6 @@ target_sources(vbam-core-emulator
     gba/gbaCheatSearch.cpp
     gba/gbaEeprom.cpp
     gba/gbaElf.cpp
-    gba/gbaFilter.cpp
     gba/gbaFlash.cpp
     gba/gbaGfx.cpp
     gba/gbaGlobals.cpp
@@ -80,7 +79,6 @@ target_sources(vbam-core-emulator
     gba/gbaCpuArmDis.h
     gba/gbaEeprom.h
     gba/gbaElf.h
-    gba/gbaFilter.h
     gba/gbaFlash.h
     gba/gbaGfx.h
     gba/gbaGlobals.h
@@ -90,17 +88,17 @@ target_sources(vbam-core-emulator
     gba/gbaSound.h
 )
 
-target_include_directories(vbam-core-base
+target_include_directories(vbam-core
     PUBLIC ${ZLIB_INCLUDE_DIR}
 )
 
-target_link_libraries(vbam-core-emulator
-    PRIVATE vbam-core-apu
+target_link_libraries(vbam-core
+    PRIVATE vbam-core-apu vbam-fex
     PUBLIC vbam-core-base ${ZLIB_LIBRARY}
 )
 
 if(ENABLE_DEBUGGER)
-    target_sources(vbam-core-emulator
+    target_sources(vbam-core
         PRIVATE
         gba/gbaRemote.cpp
         gba/internal/gbaBreakpoint.cpp
@@ -112,7 +110,7 @@ if(ENABLE_DEBUGGER)
 endif()
 
 if(ENABLE_LINK)
-    target_sources(vbam-core-emulator
+    target_sources(vbam-core
         PRIVATE
         gba/gbaLink.cpp
         gba/internal/gbaSockClient.cpp
@@ -122,10 +120,18 @@ if(ENABLE_LINK)
         gba/gbaLink.h
     )
 
-    target_include_directories(vbam-core-emulator
+    target_include_directories(vbam-core
         PRIVATE ${SFML_INCLUDE_DIR})
 
-    target_link_libraries(vbam-core-emulator
+    target_link_libraries(vbam-core
         PRIVATE ${SFML_LIBRARIES})
-endif()
 
+    if(ENABLE_NLS)
+        # Add libintl.h
+        target_include_directories(vbam-core
+            PRIVATE ${LIBINTL_INC})
+        target_link_libraries(vbam-core
+            PRIVATE ${NLS_LIBS})
+    endif()
+
+endif()

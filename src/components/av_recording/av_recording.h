@@ -1,12 +1,12 @@
-#ifndef WX_FFMPEG_H
-#define WX_FFMPEG_H
+#ifndef VBAM_COMPONENTS_AV_RECORDING_AV_RECORDING_H_
+#define VBAM_COMPONENTS_AV_RECORDING_AV_RECORDING_H_
 
 // simplified interface for recording audio and/or video from emulator
 
 extern "C" {
 /* From: http://redino.net/blog/2013/12/uint64_c-defined-including-libavformatavformat-h-vs-2008/ */
 
-#include <stdint.h>
+#include <cstdint>
 
 #ifndef INT64_C
 #define INT64_C(c) (c ## LL)
@@ -29,7 +29,6 @@ extern "C" {
 }
 
 #include <vector>
-#include <string>
 
 namespace recording {
 
@@ -127,4 +126,4 @@ class MediaRecorder
 
 }
 
-#endif /* WX_FFMPEG_H */
+#endif  // VBAM_COMPONENTS_AV_RECORDING_AV_RECORDING_H_

@@ -1,6 +1,8 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include "components/filters_agb/filters_agb.h"
+#include "components/filters_interframe/interframe.h"
 
 #ifdef __WXGTK__
     #include <X11/Xlib.h>
@@ -20,9 +22,9 @@
 #include <wx/menu.h>
 #include <SDL_joystick.h>
 
-#include "../Util.h"
-#include "../sdl/text.h"
 #include "background-input.h"
+#include "components/draw_text/draw_text.h"
+#include "components/filters/filters.h"
 #include "config/game-control.h"
 #include "config/option-proxy.h"
 #include "config/option.h"
@@ -33,16 +35,15 @@
 #include "core/gb/gb.h"
 #include "core/gb/gbCheats.h"
 #include "core/gb/gbGlobals.h"
-#include "core/gb/gbSound.h"
 #include "core/gb/gbPrinter.h"
+#include "core/gb/gbSound.h"
 #include "core/gba/gbaCheats.h"
-#include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaFlash.h"
+#include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaPrint.h"
 #include "core/gba/gbaRtc.h"
 #include "core/gba/gbaSound.h"
 #include "drawing.h"
-#include "filters.h"
 #include "wayland.h"
 #include "widgets/render-plugin.h"
 #include "wxutil.h"
@@ -354,7 +355,7 @@ void GameArea::LoadGame(const wxString& name)
                 ovSaveType = 0;
 
             if (ovSaveType == 0)
-                utilGBAFindSave(rom_size);
+                flashDetectSaveType(rom_size);
             else
                 coreOptions.saveType = ovSaveType;
 
@@ -368,7 +369,7 @@ void GameArea::LoadGame(const wxString& name)
                 coreOptions.cpuSaveType = 0;
 
             if (coreOptions.cpuSaveType == 0)
-                utilGBAFindSave(rom_size);
+                flashDetectSaveType(rom_size);
             else
                 coreOptions.saveType = coreOptions.cpuSaveType;
 
@@ -2680,11 +2681,11 @@ void GameArea::OnGBBorderChanged(config::Option* option) {
 
 void GameArea::UpdateLcdFilter() {
     if (loaded == IMAGE_GBA)
-        utilUpdateSystemColorMaps(OPTION(kGBALCDFilter));
+        gbafilter_update_colors(OPTION(kGBALCDFilter));
     else if (loaded == IMAGE_GB)
-        utilUpdateSystemColorMaps(OPTION(kGBLCDFilter));
+        gbafilter_update_colors(OPTION(kGBLCDFilter));
     else
-        utilUpdateSystemColorMaps(false);
+        gbafilter_update_colors(false);
 }
 
 void GameArea::SuspendScreenSaver() {

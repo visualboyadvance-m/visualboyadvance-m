@@ -1,4 +1,4 @@
-#include "Util.h"
+#include "components/user_config/user_config.h"
 
 #include <cstdlib>
 
@@ -26,7 +26,7 @@ std::string get_xdg_user_config_home()
         path = xdg_var;
     }
 #endif
-    return path + FILE_SEP;
+    return path + kFileSep;
 }
 
 // Get user-specific data dir manually.
@@ -53,6 +53,6 @@ std::string get_xdg_user_data_home()
         path = xdg_var;
     }
 #endif
-    return path + FILE_SEP;
+    return path + kFileSep;
 }
 

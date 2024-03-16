@@ -17,4 +17,11 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#ifndef VBAM_COMPONENTS_DRAW_TEXT_DRAW_TEXT_H_
+#define VBAM_COMPONENTS_DRAW_TEXT_DRAW_TEXT_H_
+
+#include <cstdint>
+
 extern void drawText(uint8_t*, int, int, int, const char*, bool);
+
+#endif  // VBAM_COMPONENTS_DRAW_TEXT_DRAW_TEXT_H_

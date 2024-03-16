@@ -1,4 +1,5 @@
 #include "ConfigManager.h"
+#include "components/user_config/user_config.h"
 
 // necessary to get portable strerror_r
 #undef _GNU_SOURCE
@@ -14,7 +15,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "../Util.h"
 #include "core/base/file_util.h"
 #include "core/gb/gbGlobals.h"
 #include "core/gb/gbSound.h"
@@ -452,7 +452,7 @@ const char* FindConfigFile(const char *name)
 		mkdir(fullDir, 0755);
 
 	if (fullDir) {
-		sprintf(path, "%s%c%s", fullDir, FILE_SEP, name);
+		sprintf(path, "%s%c%s", fullDir, kFileSep, name);
 		if (FileExists(path))
 		{
 			return path;
@@ -462,7 +462,7 @@ const char* FindConfigFile(const char *name)
 #ifdef _WIN32
 	char *home = getenv("USERPROFILE");
 	if (home != NULL) {
-		sprintf(path, "%s%c%s", home, FILE_SEP, name);
+		sprintf(path, "%s%c%s", home, kFileSep, name);
 		if (FileExists(path))
 		{
 			return path;
@@ -479,10 +479,10 @@ const char* FindConfigFile(const char *name)
 			char *tok = strtok(buffer, PATH_SEP);
 
 			while (tok) {
-				sprintf(env_path, "%s%c%s", tok, FILE_SEP, EXE_NAME);
+				sprintf(env_path, "%s%c%s", tok, kFileSep, EXE_NAME);
 				if (FileExists(env_path)) {
 					static char path2[2048];
-					sprintf(path2, "%s%c%s", tok, FILE_SEP, name);
+					sprintf(path2, "%s%c%s", tok, kFileSep, name);
 					if (FileExists(path2)) {
 						return path2;
 					}
@@ -494,10 +494,10 @@ const char* FindConfigFile(const char *name)
 	else {
 		// executable is relative to some directory
 		strcpy(buffer, arg0);
-		char *p = strrchr(buffer, FILE_SEP);
+		char *p = strrchr(buffer, kFileSep);
 		if (p) {
 			*p = 0;
-			sprintf(path, "%s%c%s", buffer, FILE_SEP, name);
+			sprintf(path, "%s%c%s", buffer, kFileSep, name);
 			if (FileExists(path))
 			{
 				return path;
@@ -505,13 +505,13 @@ const char* FindConfigFile(const char *name)
 		}
 	}
 #else // ! _WIN32
-	sprintf(path, "%s%c%s", PKGDATADIR, FILE_SEP, name);
+	sprintf(path, "%s%c%s", PKGDATADIR, kFileSep, name);
 	if (FileExists(path))
 	{
 		return path;
 	}
 
-	sprintf(path, "%s%c%s", SYSCONF_INSTALL_DIR, FILE_SEP, name);
+	sprintf(path, "%s%c%s", SYSCONF_INSTALL_DIR, kFileSep, name);
 	if (FileExists(path))
 	{
 		return path;

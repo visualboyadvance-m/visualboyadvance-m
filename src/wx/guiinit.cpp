@@ -32,7 +32,6 @@
 #include <wx/valtext.h>
 #include <wx/wfstream.h>
 
-#include "../Util.h"
 #include "config/option-proxy.h"
 #include "core/gb/gb.h"
 #include "core/gb/gbCheats.h"
@@ -1458,7 +1457,7 @@ public:
     {
         (void)ev; // unused params
         uint32_t sz = wxGetApp().frame->GetPanel()->game_size();
-        utilGBAFindSave(sz);
+        flashDetectSaveType(sz);
         type->SetSelection(coreOptions.saveType);
 
         if (coreOptions.saveType == GBA_SAVE_FLASH) {

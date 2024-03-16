@@ -10,7 +10,6 @@ Known preprocessor switches:
 - FINAL_VERSION: Defined for release versions, disables additional GBA logging and completely disables GB logging. Increases the amount of CPU cycles being emulated in one go.
 - VBAM_ENABLE_DEBUGGER: Enable remote debugging support
 - MMX: Enable MMX instruction set
-- NO_ASM: Use C++ version of hq3x/4x filters
 - RGB555: Use 16bit colors with 5bit green instead of 6bit green in hq3x/4x filters (C++ version)
 - NO_OGL: Exclude OpenGL code
 - NO_D3D: Exclude Direct3D code

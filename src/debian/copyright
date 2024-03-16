@@ -25,22 +25,22 @@ Copyright: 2011-2017 VBA-M development team
            2011 Thomas J. Moore (aka tjm, aka darktjm) <darktjm@gmail.com>
 License: GPL-2+
 
-Files: fex/*
+Files: src/core/fex/*
 Copyright: 2005-2009 Shay Green <gblargg@gmail.com>
 License: LGPL-2.1+
 
-Files: fex/7z_C/*
+Files: src/core/fex/7z_C/*
 Copyright: 2008-2010 Igor Pavlov
 License: public-domain
 
-Files: fex/7z_C/Ppmd.h
-       fex/7z_C/Ppmd7.*
-       fex/7z_C/Ppmd7Dec.c
+Files: src/core/fex/7z_C/Ppmd.h
+       src/core/fex/7z_C/Ppmd7.*
+       src/core/fex/7z_C/Ppmd7Dec.c
 Copyright: 2010 Igor Pavlov
            2001 Dmitry Shkarin
 License: public-domain
 
-Files: src/apu/*
+Files: src/core/apu/*
 Copyright: 2003-2007 Shay Green <gblargg@gmail.com>
 License: LGPL-2.1+
 
@@ -51,30 +51,30 @@ Copyright: 2014, 2015 Sergio Benjamim (sergio-br2)
            2006 Matteo Drera
 License: GPL-2+
 
-Files: src/common/iniparser.*
-       src/common/dictionary.*
+Files: src/sdl/iniparser.*
+       src/sdl/dictionary.*
 Copyright: 2010-2014 Nicolas Devillard <ndevilla@free.fr>
 License: Expat
 
-Files: src/common/memgzio.*
+Files: src/core/base/internal/memgzio.*
 Copyright: 2007, 2009, 2011, 2012, 2013, 2015 VBA-M development team
            ????-2006 Forgotten
            1995-2002 Jean-loup Gailly
 License: Zlib
 
-Files: src/filters/hq/asm/hq3x_16.asm
-       src/filters/hq/asm/hq3x_32.asm
-       src/filters/hq/asm/hq4x_16.asm
-       src/filters/hq/asm/hq4x_32.asm
+Files: src/components/filters/hq/asm/hq3x_16.asm
+       src/components/filters/internal/hq/asm/hq3x_32.asm
+       src/components/filters/internal/hq/asm/hq4x_16.asm
+       src/components/filters/internal/hq/asm/hq4x_32.asm
 Copyright: 2007, 2008 VBA-M development team
            2003 Maxim Stepin (MaxSt) <maxst@hiend3d.com>
 License: GPL-2+
 
-Files: src/filters/hq/asm/macros.mac
+Files: src/components/filters/internal/hq/asm/macros.mac
 Copyright: 1997-2007 ZSNES Team (zsKnight, _Demo_, pagefault, Nach)
 License: GPL-2+
 
-Files: src/filters/xBRZ/*
+Files: src/components/filters/internal/xBRZ/*
 Copyright: 2012-2015 Zenju (zenju AT gmx DOT de)
 License: GPL-3
     Additionally and as a special exception, the author gives permission
@@ -86,12 +86,12 @@ License: GPL-3
     of the file, but you are not obligated to do so. If you do not wish to
     do so, delete this exception statement from your version.
 
-Files: src/filters/2xSaI.cpp
-       src/filters/2xSaImmx.asm
+Files: src/components/filters/internal/2xSaI.cpp
+       src/components/filters/internal/2xSaImmx.asm
 Copyright: 1999-2001 Derek Liauw Kie Fa (aka Kreed) <DerekL666@yahoo.com>
 License: GPL-2+
 
-Files: src/filters/admame.cpp
+Files: src/components/filters/internal/admame.cpp
 Copyright: 1999-2002 Andrea Mazzoleni
 License: GPL-2+
     In addition, as a special exception, Andrea Mazzoleni
@@ -109,15 +109,15 @@ License: GPL-2+
     - the program is not used in commercial activities.
     - the whole source code of the program is released with the binary.
 
-Files: src/filters/bilinear.cpp
+Files: src/components/filters/internal/bilinear.cpp
 Copyright: 2008, 2009 VBA-M development team
            2004 Forgotten and the VBA development team
            2003 Forgotten
            2000 Jeffrey S. Freedman (JSF)
 License: GPL-2+
 
-Files: src/filters/hq2x.*
-       src/filters/interp.h
+Files: src/components/filters/internal/hq2x.*
+       src/components/filters/internal/interp.h
 Copyright: 2003 Andrea Mazzoleni
 License: GPL-2+
     In addition, as a special exception, Andrea Mazzoleni
@@ -130,7 +130,7 @@ License: GPL-2+
     file, but you are not obligated to do so.  If you do not wish to
     do so, delete this exception statement from your version.
 
-Files: src/gba/debugger-expr-yacc.*
+Files: src/core/gba/debugger-expr-yacc.*
 Copyright: 2015 VBA-M development team
            1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 License: GPL-2+
@@ -147,7 +147,7 @@ License: GPL-2+
     This special exception was added by the Free Software Foundation in
     version 2.2 of Bison.
 
-Files: src/gba/GBALink.*
+Files: src/core/gba/GBALink.*
 Copyright: 2008, 2009, 2010, 2011, 2012, 2015 VBA-M development team
            ???? Thomas J. Moore (aka tjm, aka darktjm) <darktjm@gmail.com>
            2004-2006 denopqrihg <denopqrihg@users.sourceforge.net> <denopqrihg@centrum.cz>

@@ -43,7 +43,10 @@
 
 #include <SDL.h>
 
-#include "../Util.h"
+#include "components/audio_sdl/audio_sdl.h"
+#include "components/draw_text/draw_text.h"
+#include "components/filters_agb/filters_agb.h"
+#include "components/user_config/user_config.h"
 #include "core/base/file_util.h"
 #include "core/base/message.h"
 #include "core/base/patch.h"
@@ -59,12 +62,10 @@
 #include "core/gba/gbaRtc.h"
 #include "core/gba/gbaSound.h"
 
-#include "../common/SoundSDL.h"
 
 #include "ConfigManager.h"
 #include "filters.h"
 #include "inputSDL.h"
-#include "text.h"
 
 // from: https://stackoverflow.com/questions/7608714/why-is-my-pointer-not-null-after-free
 #define freeSafe(ptr) free(ptr); ptr = NULL;
@@ -287,7 +288,7 @@ void StartLirc(void)
         fprintf(stdout, "Success\n");
         //read the config file
         char LIRCConfigLoc[2048];
-        sprintf(LIRCConfigLoc, "%s%c%s", homeConfigDir, FILE_SEP, "lircrc");
+        sprintf(LIRCConfigLoc, "%s%c%s", homeConfigDir, kFileSep, "lircrc");
         fprintf(stdout, "LIRC Config file:");
         if (lirc_readconfig(LIRCConfigLoc, &LIRCConfigInfo, NULL) == 0) {
             //check vbam dir for lircrc
@@ -349,7 +350,7 @@ bool sdlCheckDirectory(const char* dir)
 char* sdlGetFilename(const char* name)
 {
     char path[1024];
-    const char *filename = strrchr(name, FILE_SEP);
+    const char *filename = strrchr(name, kFileSep);
     if (filename)
         strcpy(path, filename + 1);
     else
@@ -360,7 +361,7 @@ char* sdlGetFilename(const char* name)
 char* sdlGetFilePath(const char* name)
 {
     char path[1024];
-    const char *filename = strrchr(name, FILE_SEP);
+    const char *filename = strrchr(name, kFileSep);
     if (filename) {
         size_t length = strlen(name) - strlen(filename);
         memcpy(path, name, length);
@@ -368,7 +369,7 @@ char* sdlGetFilePath(const char* name)
     }
     else {
         path[0] = '.';
-        path[1] = FILE_SEP;
+        path[1] = kFileSep;
         path[2] = '\0';
     }
     return strdup(path);
@@ -381,11 +382,11 @@ FILE* sdlFindFile(const char* name)
 
 #ifdef _WIN32
 #define PATH_SEP ";"
-#define FILE_SEP '\\'
+#define kFileSep '\\'
 #define EXE_NAME "vbam.exe"
 #else // ! _WIN32
 #define PATH_SEP ":"
-#define FILE_SEP '/'
+#define kFileSep '/'
 #define EXE_NAME "vbam"
 #endif // ! _WIN32
 
@@ -402,7 +403,7 @@ FILE* sdlFindFile(const char* name)
 
     if (strlen(homeDataDir)) {
         fprintf(stdout, "Searching home directory: %s\n", homeDataDir);
-        sprintf(path, "%s%c%s", homeDataDir, FILE_SEP, name);
+        sprintf(path, "%s%c%s", homeDataDir, kFileSep, name);
         f = fopen(path, "r");
         if (f != NULL)
             return f;
@@ -412,7 +413,7 @@ FILE* sdlFindFile(const char* name)
     char* profileDir = getenv("USERPROFILE");
     if (profileDir != NULL) {
         fprintf(stdout, "Searching user profile directory: %s\n", profileDir);
-        sprintf(path, "%s%c%s", profileDir, FILE_SEP, name);
+        sprintf(path, "%s%c%s", profileDir, kFileSep, name);
         f = fopen(path, "r");
         if (f != NULL)
             return f;
@@ -428,12 +429,12 @@ FILE* sdlFindFile(const char* name)
             char* tok = strtok(buffer, PATH_SEP);
 
             while (tok) {
-                sprintf(path, "%s%c%s", tok, FILE_SEP, EXE_NAME);
+                sprintf(path, "%s%c%s", tok, kFileSep, EXE_NAME);
                 f = fopen(path, "r");
                 if (f != NULL) {
                     char path2[2048];
                     fclose(f);
-                    sprintf(path2, "%s%c%s", tok, FILE_SEP, name);
+                    sprintf(path2, "%s%c%s", tok, kFileSep, name);
                     f = fopen(path2, "r");
                     if (f != NULL) {
                         fprintf(stdout, "Found at %s\n", path2);
@@ -447,10 +448,10 @@ FILE* sdlFindFile(const char* name)
         // executable is relative to some directory
         fprintf(stdout, "Searching executable directory\n");
         strcpy(buffer, home);
-        char* p = strrchr(buffer, FILE_SEP);
+        char* p = strrchr(buffer, kFileSep);
         if (p) {
             *p = 0;
-            sprintf(path, "%s%c%s", buffer, FILE_SEP, name);
+            sprintf(path, "%s%c%s", buffer, kFileSep, name);
             f = fopen(path, "r");
             if (f != NULL)
                 return f;
@@ -458,13 +459,13 @@ FILE* sdlFindFile(const char* name)
     }
 #else // ! _WIN32
     fprintf(stdout, "Searching data directory: %s\n", PKGDATADIR);
-    sprintf(path, "%s%c%s", PKGDATADIR, FILE_SEP, name);
+    sprintf(path, "%s%c%s", PKGDATADIR, kFileSep, name);
     f = fopen(path, "r");
     if (f != NULL)
         return f;
 
     fprintf(stdout, "Searching system config directory: %s\n", SYSCONF_INSTALL_DIR);
-    sprintf(path, "%s%c%s", SYSCONF_INSTALL_DIR, FILE_SEP, name);
+    sprintf(path, "%s%c%s", SYSCONF_INSTALL_DIR, kFileSep, name);
     f = fopen(path, "r");
     if (f != NULL)
         return f;
@@ -652,11 +653,11 @@ static char* sdlStateName(int num)
     char *gameFile = sdlGetFilename(filename);
 
     if (saveDir)
-        sprintf(stateName, "%s%c%s%d.sgm", saveDir, FILE_SEP, gameFile, num + 1);
+        sprintf(stateName, "%s%c%s%d.sgm", saveDir, kFileSep, gameFile, num + 1);
     else if (access(gameDir, W_OK) == 0)
-        sprintf(stateName, "%s%c%s%d.sgm", gameDir, FILE_SEP, gameFile, num + 1);
+        sprintf(stateName, "%s%c%s%d.sgm", gameDir, kFileSep, gameFile, num + 1);
     else
-        sprintf(stateName, "%s%c%s%d.sgm", homeDataDir, FILE_SEP, gameFile, num + 1);
+        sprintf(stateName, "%s%c%s%d.sgm", homeDataDir, kFileSep, gameFile, num + 1);
 
     freeSafe(gameDir);
     freeSafe(gameFile);
@@ -755,11 +756,11 @@ void sdlWriteBattery()
     char *gameFile = sdlGetFilename(filename);
 
     if (batteryDir)
-        sprintf(buffer, "%s%c%s.sav", batteryDir, FILE_SEP, gameFile);
+        sprintf(buffer, "%s%c%s.sav", batteryDir, kFileSep, gameFile);
     else if (access(gameDir, W_OK) == 0)
-        sprintf(buffer, "%s%c%s.sav", gameDir, FILE_SEP, gameFile);
+        sprintf(buffer, "%s%c%s.sav", gameDir, kFileSep, gameFile);
     else
-        sprintf(buffer, "%s%c%s.sav", homeDataDir, FILE_SEP, gameFile);
+        sprintf(buffer, "%s%c%s.sav", homeDataDir, kFileSep, gameFile);
 
     bool result = emulator.emuWriteBattery(buffer);
 
@@ -777,11 +778,11 @@ void sdlReadBattery()
     char *gameFile = sdlGetFilename(filename);
 
     if (batteryDir)
-        sprintf(buffer, "%s%c%s.sav", batteryDir, FILE_SEP, gameFile);
+        sprintf(buffer, "%s%c%s.sav", batteryDir, kFileSep, gameFile);
     else if (access(gameDir, W_OK) == 0)
-        sprintf(buffer, "%s%c%s.sav", gameDir, FILE_SEP, gameFile);
+        sprintf(buffer, "%s%c%s.sav", gameDir, kFileSep, gameFile);
     else
-        sprintf(buffer, "%s%c%s.sav", homeDataDir, FILE_SEP, gameFile);
+        sprintf(buffer, "%s%c%s.sav", homeDataDir, kFileSep, gameFile);
 
     bool result = emulator.emuReadBattery(buffer);
 
@@ -1737,7 +1738,7 @@ int main(int argc, char** argv)
             failed = (size == 0);
             if (!failed) {
                 if (coreOptions.cpuSaveType == 0)
-                    utilGBAFindSave(size);
+                    flashDetectSaveType(size);
                 else
                     coreOptions.saveType = coreOptions.cpuSaveType;
 
@@ -1847,7 +1848,7 @@ int main(int argc, char** argv)
 
     fprintf(stdout, "Color depth: %d\n", systemColorDepth);
 
-    utilUpdateSystemColorMaps();
+    gbafilter_update_colors();
 
     if (delta == NULL) {
         delta = (uint8_t*)malloc(delta_size);
@@ -2145,20 +2146,20 @@ void systemScreenCapture(int a)
 
     if (captureFormat) {
         if (screenShotDir)
-            sprintf(buffer, "%s%c%s%02d.bmp", screenShotDir, FILE_SEP, gameFile, a);
+            sprintf(buffer, "%s%c%s%02d.bmp", screenShotDir, kFileSep, gameFile, a);
         else if (access(gameDir, W_OK) == 0)
-            sprintf(buffer, "%s%c%s%02d.bmp", gameDir, FILE_SEP, gameFile, a);
+            sprintf(buffer, "%s%c%s%02d.bmp", gameDir, kFileSep, gameFile, a);
         else
-            sprintf(buffer, "%s%c%s%02d.bmp", homeDataDir, FILE_SEP, gameFile, a);
+            sprintf(buffer, "%s%c%s%02d.bmp", homeDataDir, kFileSep, gameFile, a);
 
         result = emulator.emuWriteBMP(buffer);
     } else {
         if (screenShotDir)
-            sprintf(buffer, "%s%c%s%02d.png", screenShotDir, FILE_SEP, gameFile, a);
+            sprintf(buffer, "%s%c%s%02d.png", screenShotDir, kFileSep, gameFile, a);
         else if (access(gameDir, W_OK) == 0)
-            sprintf(buffer, "%s%c%s%02d.png", gameDir, FILE_SEP, gameFile, a);
+            sprintf(buffer, "%s%c%s%02d.png", gameDir, kFileSep, gameFile, a);
         else
-            sprintf(buffer, "%s%c%s%02d.png", homeDataDir, FILE_SEP, gameFile, a);
+            sprintf(buffer, "%s%c%s%02d.png", homeDataDir, kFileSep, gameFile, a);
 
         result = emulator.emuWritePNG(buffer);
     }

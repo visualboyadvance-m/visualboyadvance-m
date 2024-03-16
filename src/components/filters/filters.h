@@ -1,13 +1,11 @@
-#ifndef FILTERS_H
-#define FILTERS_H
+#ifndef VBAM_COMPONENTS_FILTERS_FILTERS_H_
+#define VBAM_COMPONENTS_FILTERS_FILTERS_H_
 
-// FIXME: these should be in a system header included by all users and all
-// files which define these functions
+#include <cstdint>
+
 // most 16-bit filters require space in src rounded up to uint32_t
 // those that take delta take 1 src line of pixels, rounded up to uint32_t size
 // initial value appears to be all-0xff
-
-#include "../filters/interframe.hpp"
 
 void Pixelate32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t dstp, int w, int h);
 void Pixelate(uint8_t* src, uint32_t spitch, uint8_t* delta, uint8_t* dst, uint32_t dstp, int w, int h);
@@ -71,4 +69,4 @@ void xbrz4x32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t ds
 void xbrz5x32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t dstp, int w, int h);
 void xbrz6x32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t dstp, int w, int h);
 
-#endif /* FILTERS_H */
+#endif  // VBAM_COMPONENTS_FILTERS_FILTERS_H_

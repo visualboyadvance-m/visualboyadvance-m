@@ -10,7 +10,8 @@
 #include "libretro_core_options.h"
 #include "scrc32.h"
 
-#include "../Util.h"
+#include "components/filters_agb/filters_agb.h"
+#include "components/filters_interframe/interframe.h"
 #include "core/base/system.h"
 #include "core/base/file_util.h"
 #include "core/base/sizes.h"
@@ -25,8 +26,6 @@
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaRtc.h"
 #include "core/gba/gbaSound.h"
-
-#include "../filters/interframe.hpp"
 
 #define FRAMERATE  (16777216.0 / 280896.0) // 59.73
 #define SAMPLERATE 32768.0
@@ -855,7 +854,7 @@ static void load_image_preferences(void)
     coreOptions.mirroringEnable = (buffer[0] == 'F') ? true : false;
 
     if (!coreOptions.cpuSaveType)
-        utilGBAFindSave(romSize);
+        flashDetectSaveType(romSize);
 
     coreOptions.saveType = coreOptions.cpuSaveType;
 
@@ -1220,7 +1219,7 @@ static void update_variables(bool startup)
         bool prev_lcdfilter = option_lcdfilter;
         option_lcdfilter = (!strcmp(var.value, "enabled")) ? true : false;
         if (prev_lcdfilter != option_lcdfilter)
-            utilUpdateSystemColorMaps(option_lcdfilter);
+            gbafilter_update_colors(option_lcdfilter);
     }
 
     var.key = "vbam_interframeblending";
@@ -1610,7 +1609,7 @@ bool retro_load_game(const struct retro_game_info *game)
       return false;
    }
 
-   utilUpdateSystemColorMaps(option_lcdfilter);
+   gbafilter_update_colors(option_lcdfilter);
    update_variables(true);
    soundInit();
 

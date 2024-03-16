@@ -1,4 +1,4 @@
-#include "ffmpeg.h"
+#include "components/av_recording/av_recording.h"
 
 #define STREAM_FRAME_RATE 60
 #define STREAM_PIXEL_FORMAT AV_PIX_FMT_YUV420P

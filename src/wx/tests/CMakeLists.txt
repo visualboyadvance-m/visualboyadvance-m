@@ -12,7 +12,8 @@ function(add_doctest_test test_src)
 
     target_link_libraries("${test_name}" ${wxWidgets_LIBRARIES})
 
-    target_include_directories("${test_name}" PRIVATE ${wxWidgets_INCLUDE_DIRS})
+    target_include_directories("${test_name}"
+        PRIVATE ${wxWidgets_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/third_party/include)
 
     set_target_properties("${test_name}"
         PROPERTIES

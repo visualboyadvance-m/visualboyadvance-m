@@ -1,12 +1,11 @@
 #ifndef VBAM_WX_CONFIG_OPTIONS_H_
 #define VBAM_WX_CONFIG_OPTIONS_H_
 
-#include "nonstd/variant.hpp"
-
 #include <array>
 #include <cstdint>
-#include <functional>
 #include <unordered_set>
+
+#include <variant.hpp>
 
 #include <wx/string.h>
 
