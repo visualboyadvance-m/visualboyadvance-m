@@ -8,7 +8,7 @@
 #include "wxvbam.h"
 
 // Interface
-#include "../common/SoundDriver.h"
+#include "core/base/sound_driver.h"
 
 // OpenAL
 #include "openal.h"

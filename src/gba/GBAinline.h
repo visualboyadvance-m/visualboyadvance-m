@@ -3,7 +3,7 @@
 
 #include <type_traits>
 
-#include "../System.h"
+#include "core/base/system.h"
 #include "core/base/port.h"
 #include "GBALink.h"
 #include "GBAcpu.h"

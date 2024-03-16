@@ -1,6 +1,9 @@
-#include "../System.h"
-#include <memory.h>
-#include <stdio.h>
+#include "gbPrinter.h"
+
+#include <cstdint>
+#include <cstring>
+
+#include "core/base/system.h"
 
 uint8_t gbPrinterStatus = 0;
 int gbPrinterState = 0;

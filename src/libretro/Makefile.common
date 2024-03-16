@@ -22,7 +22,6 @@ SOURCES_CXX += \
 
 SOURCES_CXX += \
 	$(CORE_DIR)/libretro/libretro.cpp \
-	$(CORE_DIR)/libretro/UtilRetro.cpp \
 	$(CORE_DIR)/libretro/SoundRetro.cpp
 
 SOURCES_CXX += \

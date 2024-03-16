@@ -289,11 +289,11 @@ static void debuggerPrintBaseType(Type* t, uint32_t value, uint32_t location,
     }
 
     if (t->size == 8) {
-        u64 value = 0;
+        uint64_t value = 0;
         if (type == LOCATION_memory) {
-            value = debuggerReadMemory(location) | ((u64)debuggerReadMemory(location + 4) << 32);
+            value = debuggerReadMemory(location) | ((uint64_t)debuggerReadMemory(location + 4) << 32);
         } else if (type == LOCATION_register) {
-            value = reg[location].I | ((u64)reg[location + 1].I << 32);
+            value = reg[location].I | ((uint64_t)reg[location + 1].I << 32);
         }
         switch (t->encoding) {
         case DW_ATE_signed:
@@ -1590,8 +1590,8 @@ void debuggerDoSearch()
                 SearchStart = 0x02000000;
                 continue;
             } else {
-                start = bios + (SearchStart & 0x3FFF);
-                end = bios + 0x3FFF;
+                start = g_bios + (SearchStart & 0x3FFF);
+                end = g_bios + 0x3FFF;
                 break;
             };
         case 2:
@@ -1655,8 +1655,8 @@ void debuggerDoSearch()
         case 12:
         case 13:
             if (final <= 0x09FFFFFF) {
-                start = rom + (SearchStart & 0x01FFFFFF);
-                end = rom + 0x01FFFFFF;
+                start = g_rom + (SearchStart & 0x01FFFFFF);
+                end = g_rom + 0x01FFFFFF;
                 break;
             };
         default:
@@ -1698,8 +1698,8 @@ void debuggerDoSearch()
 
 unsigned int AddressToGBA(uint8_t* mem)
 {
-    if (mem >= &bios[0] && mem <= &bios[0x3fff])
-        return 0x00000000 + (mem - &bios[0]);
+    if (mem >= &g_bios[0] && mem <= &g_bios[0x3fff])
+        return 0x00000000 + (mem - &g_bios[0]);
     else if (mem >= &g_workRAM[0] && mem <= &g_workRAM[0x3ffff])
         return 0x02000000 + (mem - &g_workRAM[0]);
     else if (mem >= &g_internalRAM[0] && mem <= &g_internalRAM[0x7fff])
@@ -1712,8 +1712,8 @@ unsigned int AddressToGBA(uint8_t* mem)
         return 0x06000000 + (mem - &g_vram[0]);
     else if (mem >= &g_oam[0] && mem <= &g_oam[0x3ff])
         return 0x07000000 + (mem - &g_oam[0]);
-    else if (mem >= &rom[0] && mem <= &rom[0x1ffffff])
-        return 0x08000000 + (mem - &rom[0]);
+    else if (mem >= &g_rom[0] && mem <= &g_rom[0x1ffffff])
+        return 0x08000000 + (mem - &g_rom[0]);
     else
         return 0xFFFFFFFF;
 };

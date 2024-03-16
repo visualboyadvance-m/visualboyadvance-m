@@ -1,4 +1,4 @@
-#include "../System.h"
+#include <cstdint>
 
 void Simple2x16(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
               uint8_t *dstPtr, uint32_t dstPitch, int width, int height)

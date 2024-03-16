@@ -2,9 +2,8 @@
 #include "wxvbam.h"
 
 // Internals
-#include "../System.h"
-#include "../common/SoundDriver.h"
-#include "../gba/GBA.h"
+#include "core/base/sound_driver.h"
+#include "core/base/system.h"
 #include "../gba/Globals.h"
 #include "../gba/Sound.h"
 

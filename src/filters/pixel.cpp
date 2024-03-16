@@ -1,4 +1,4 @@
-#include "../System.h"
+#include <cstdint>
 
 extern int RGB_LOW_BITS_MASK;
 

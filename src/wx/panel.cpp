@@ -21,6 +21,8 @@
 #include <wx/menu.h>
 #include <SDL_joystick.h>
 
+#include "../Util.h"
+#include "core/base/file_util.h"
 #include "core/base/patch.h"
 #include "core/base/version.h"
 #include "../gb/gbPrinter.h"

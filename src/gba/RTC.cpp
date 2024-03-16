@@ -1,13 +1,15 @@
-#include "../System.h"
+#include "RTC.h"
+
+#include <cstring>
+#include <ctime>
+
+#include "core/base/file_util.h"
+#include "core/base/message.h"
 #include "core/base/port.h"
 #include "GBA.h"
 #include "GBAinline.h"
 #include "Globals.h"
 
-#include "core/base/file_util.h"
-#include <memory.h>
-#include <string.h>
-#include <time.h>
 
 enum RTCSTATE {
     IDLE = 0,

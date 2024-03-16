@@ -7,7 +7,7 @@
 #include <zlib.h>
 #endif  // defined(__LIBRETRO__)
 
-#include "../System.h"
+#include "core/base/system.h"
 
 struct gbXxCheat {
     char cheatDesc[100];

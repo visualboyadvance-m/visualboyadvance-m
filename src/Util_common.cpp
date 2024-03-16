@@ -2,8 +2,8 @@
 
 #include <cstring>
 
-#include "System.h"
 #include "core/base/port.h"
+#include "core/base/system.h"
 #include "gba/Globals.h"
 #include "gba/RTC.h"
 #include "gba/gbafilter.h"
@@ -11,47 +11,6 @@
 #if defined(_MSC_VER)
 #define strcasecmp _stricmp
 #endif  // defined(_MSC_VER)
-
-bool utilIsGBAImage(const char* file) {
-    coreOptions.cpuIsMultiBoot = false;
-    if (strlen(file) > 4) {
-        const char* p = strrchr(file, '.');
-
-        if (p != NULL) {
-            if ((strcasecmp(p, ".agb") == 0) || (strcasecmp(p, ".gba") == 0) ||
-                (strcasecmp(p, ".bin") == 0) || (strcasecmp(p, ".elf") == 0))
-                return true;
-            if (strcasecmp(p, ".mb") == 0) {
-                coreOptions.cpuIsMultiBoot = true;
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-bool utilIsGBImage(const char* file) {
-    if (strlen(file) > 4) {
-        const char* p = strrchr(file, '.');
-
-        if (p != NULL) {
-            if ((strcasecmp(p, ".dmg") == 0) || (strcasecmp(p, ".gb") == 0) ||
-                (strcasecmp(p, ".gbc") == 0) || (strcasecmp(p, ".cgb") == 0) ||
-                (strcasecmp(p, ".sgb") == 0))
-                return true;
-        }
-    }
-
-    return false;
-}
-
-void utilPutDword(uint8_t* p, uint32_t value) {
-    *p++ = value & 255;
-    *p++ = (value >> 8) & 255;
-    *p++ = (value >> 16) & 255;
-    *p = (value >> 24) & 255;
-}
 
 void utilUpdateSystemColorMaps(bool lcd) {
     switch (systemColorDepth) {

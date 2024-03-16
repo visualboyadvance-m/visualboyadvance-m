@@ -1,7 +1,7 @@
 #ifndef GBPRINTER_H
 #define GBPRINTER_H
 
-#include "../System.h"
+#include <cstdint>
 
 uint8_t gbPrinterSend(uint8_t b);
 

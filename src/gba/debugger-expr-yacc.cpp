@@ -78,13 +78,11 @@
 
 #include <stdio.h>
   
-#include "../System.h"
 #include "GBA.h"
 #include "core/base/port.h"
 
 #include <string>
 #include <map>
-#include <iostream>
 
 unsigned int dexp_result = 0;
 extern int dexp_error(const char *);

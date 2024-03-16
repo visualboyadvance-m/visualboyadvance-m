@@ -385,14 +385,15 @@ if(ENABLE_NLS)
 endif()
 
 if(NOT TRANSLATIONS_ONLY)
+    add_subdirectory(third_party/include/stb)
     add_subdirectory(src/core/fex)
     add_subdirectory(src/core/base)
 endif()
 
 set(
     SRC_MAIN
-    src/Util.cpp
     src/Util_common.cpp
+    src/Util_desktop.cpp
     src/common/SoundSDL.cpp
 )
 
@@ -402,9 +403,7 @@ endif()
 
 set(
     HDR_MAIN
-    src/System.h
     src/Util.h
-    src/common/SoundDriver.h
     src/common/SoundSDL.h
 )
 
@@ -640,16 +639,9 @@ if(ENABLE_DEBUGGER)
     )
 endif()
 
-set(
-    HDR_STB_IMAGE
-    third_party/include/stb/stb_image.h
-    third_party/include/stb/stb_image_write.h
-)
-
 include_directories(
     ${ZLIB_INCLUDE_DIR}
     third_party/include
-    third_party/include/stb
 )
 
 if(ENABLE_FFMPEG)
@@ -675,7 +667,6 @@ if(NOT TRANSLATIONS_ONLY)
         ${HDR_FILTERS}
         ${SRC_DEBUGGER}
         ${HDR_DEBUGGER}
-        ${HDR_STB_IMAGE}
     )
     target_include_directories(vbamcore PUBLIC ${SDL2_INCLUDE_DIRS})
 endif()

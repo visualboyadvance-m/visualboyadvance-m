@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 // Interface
-#include "../common/SoundDriver.h"
+#include "core/base/sound_driver.h"
 
 // FAudio
 #include <faudio.h>
@@ -16,7 +16,7 @@
 #include <vector>
 
 // Internals
-#include "../System.h" // for systemMessage()
+#include "core/base/system.h" // for systemMessage()
 #include "../gba/Globals.h"
 
 int GetFADevices(FAudio* fa, wxArrayString* names, wxArrayString* ids,

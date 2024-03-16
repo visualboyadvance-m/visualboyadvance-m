@@ -1,6 +1,8 @@
 #ifndef AGBPRINT_H
 #define AGBPRINT_H
 
+#include <cstdint>
+
 void agbPrintEnable(bool enable);
 bool agbPrintIsEnabled();
 void agbPrintReset();

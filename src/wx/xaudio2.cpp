@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 // Interface
-#include "../common/SoundDriver.h"
+#include "core/base/sound_driver.h"
 
 // XAudio2
 #if _MSC_VER
@@ -20,7 +20,7 @@
 #include <vector>
 
 // Internals
-#include "../System.h" // for systemMessage()
+#include "core/base/system.h" // for systemMessage()
 #include "../gba/Globals.h"
 
 int GetXA2Devices(IXAudio2* xa, wxArrayString* names, wxArrayString* ids,

@@ -90,8 +90,6 @@ enum yytokentype {
 #include <string.h>
 #include <cstdlib>
 
-#include "../System.h"
-#include "../gba/elf.h"
 #include "exprNode.h"
 
 extern int yyerror(const char*);

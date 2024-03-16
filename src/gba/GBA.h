@@ -3,8 +3,7 @@
 
 #include <cstdint>
 
-#include "../System.h"
-#include "../Util.h"
+#include "core/base/system.h"
 
 const uint64_t TICKS_PER_SECOND = 16777216;
 

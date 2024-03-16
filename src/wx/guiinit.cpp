@@ -8,7 +8,6 @@
 #include "wxvbam.h"
 
 #include <cmath>
-#include <algorithm>
 #include <stdexcept>
 #include <typeinfo>
 
@@ -33,11 +32,10 @@
 #include <wx/valtext.h>
 #include <wx/wfstream.h>
 
+#include "../Util.h"
 #include "../gba/CheatSearch.h"
-#include "config/game-control.h"
 #include "config/option-proxy.h"
 #include "config/option.h"
-#include "config/user-input.h"
 #include "dialogs/accel-config.h"
 #include "dialogs/directories-config.h"
 #include "dialogs/display-config.h"
@@ -46,7 +44,6 @@
 #include "dialogs/joypad-config.h"
 #include "opts.h"
 #include "widgets/option-validator.h"
-#include "widgets/user-input-ctrl.h"
 #include "wxhead.h"
 
 #if defined(__WXGTK__)

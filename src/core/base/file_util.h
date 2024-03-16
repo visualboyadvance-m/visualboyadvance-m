@@ -2,6 +2,7 @@
 #define VBAM_CORE_BASE_FILE_UTIL_H_
 
 #include <cstdio>
+#include <cstdint>
 
 #if defined(__LIBRETRO__)
 #include <cstdint>
@@ -9,13 +10,22 @@
 #include <zlib.h>
 #endif  // defined(__LIBRETRO__)
 
+#include "core/base/system.h"
+
+#define FREAD_UNCHECKED(A,B,C,D) (void)(fread(A,B,C,D) + 1)
+
 // save game
 typedef struct {
         void *address;
         int size;
 } variable_desc;
 
+void utilPutDword(uint8_t *, uint32_t);
 FILE* utilOpenFile(const char *filename, const char *mode);
+uint8_t *utilLoad(const char *, bool (*)(const char *), uint8_t *, int &);
+IMAGE_TYPE utilFindType(const char *);
+bool utilIsGBAImage(const char *);
+bool utilIsGBImage(const char *);
 
 #if defined(__LIBRETRO__)
 

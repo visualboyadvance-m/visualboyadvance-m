@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-#include "../System.h"
+#include "core/base/system.h"
 #include "core/base/file_util.h"
 #include "../gba/Sound.h"
 #include "gb.h"

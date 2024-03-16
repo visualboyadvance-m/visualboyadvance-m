@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "core/base/message.h"
 #include "core/base/port.h"
 #include "GBA.h"
 #include "elf.h"

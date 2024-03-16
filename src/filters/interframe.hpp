@@ -3,6 +3,8 @@
 #ifndef INTERFRAME_HPP
 #define INTERFRAME_HPP
 
+#include <cstdint>
+
 extern int RGB_LOW_BITS_MASK;
 
 void InterframeFilterInit();

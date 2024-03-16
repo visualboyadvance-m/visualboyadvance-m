@@ -1,7 +1,5 @@
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
 
-#include "../System.h"
 #include "gbGlobals.h"
 
 typedef struct {

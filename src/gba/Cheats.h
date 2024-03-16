@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-#include "../System.h"
+#include "core/base/system.h"
 
 #if !defined(__LIBRETRO__)
 #include <zlib.h>

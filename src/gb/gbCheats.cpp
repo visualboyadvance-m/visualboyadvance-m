@@ -1,14 +1,14 @@
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "gbCheats.h"
 
-#include "../System.h"
-#include "../Util.h"
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
+#include "core/base/message.h"
+#include "core/base/system.h"
 
 #include "core/base/file_util.h"
 #include "gb.h"
-#include "gbCheats.h"
 #include "gbGlobals.h"
 
 gbCheat gbCheatList[MAX_CHEATS];
