@@ -11,8 +11,8 @@
 */
 /*--------------------------------------------------------------------------*/
 
-#ifndef _DICTIONARY_H_
-#define _DICTIONARY_H_
+#ifndef VBAM_SDL_DICTIONARY_H_
+#define VBAM_SDL_DICTIONARY_H_
 
 /*---------------------------------------------------------------------------
                                 Includes
@@ -165,4 +165,4 @@ void dictionary_dump(dictionary *d, FILE *out);
 }  // extern "C"
 #endif
 
-#endif
+#endif  // VBAM_SDL_DICTIONARY_H_

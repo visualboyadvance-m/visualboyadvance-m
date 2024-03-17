@@ -16,12 +16,6 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-//OpenGL library
-#if (defined _MSC_VER)
-#pragma comment(lib, "OpenGL32")
-#include <windows.h>
-#endif
-
 #include <cmath>
 #include <cstdarg>
 #include <cstdio>
@@ -31,17 +25,71 @@
 
 #include <sys/stat.h>
 #include <sys/types.h>
-#ifdef __APPLE__
+
+// System includes.
+#ifdef _WIN32
+
+#include <direct.h>
+#include <io.h>
+
+#define getcwd _getcwd
+#define snprintf sprintf
+#define stat _stat
+#define access _access
+
+#ifndef W_OK
+    #define W_OK 2
+#endif
+#define mkdir(X,Y) (_mkdir(X))
+
+// from: https://www.linuxquestions.org/questions/programming-9/porting-to-win32-429334/
+#ifndef S_ISDIR
+    #define S_ISDIR(mode)  (((mode) & _S_IFMT) == _S_IFDIR)
+#endif
+
+#endif // _WIN32
+
+#ifndef __GNUC__
+
+#define HAVE_DECL_GETOPT 0
+#define __STDC__ 1
+#include "getopt.h"
+
+#else // ! __GNUC__
+
+#define HAVE_DECL_GETOPT 1
+#include <getopt.h>
+
+#endif // ! __GNUC__
+
+// OpenGL library.
+#if defined(_WIN32)
+
+#pragma comment(lib, "OpenGL32")
+#include <Windows.h>
+
+#endif  // defined(_WIN32)
+
+#if defined(__APPLE__)
+
 #include <OpenGL/OpenGL.h>
 #include <OpenGL/glext.h>
 #include <OpenGL/glu.h>
-#else
+
+#else  // !defined(__APPLE__)
+
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include <GL/glu.h>
-#endif
+
+#endif  // defined(__APPLE__)
 
 #include <SDL.h>
+
+#if defined(VBAM_ENABLE_LIRC)
+#include <lirc/lirc_client.h>
+#include <sys/poll.h>
+#endif
 
 #include "components/audio_sdl/audio_sdl.h"
 #include "components/draw_text/draw_text.h"
@@ -61,48 +109,12 @@
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaRtc.h"
 #include "core/gba/gbaSound.h"
-
-
-#include "ConfigManager.h"
-#include "filters.h"
-#include "inputSDL.h"
+#include "sdl/ConfigManager.h"
+#include "sdl/filters.h"
+#include "sdl/inputSDL.h"
 
 // from: https://stackoverflow.com/questions/7608714/why-is-my-pointer-not-null-after-free
 #define freeSafe(ptr) free(ptr); ptr = NULL;
-
-#ifndef _WIN32
-#include <unistd.h>
-#define GETCWD getcwd
-#else // _WIN32
-#include <direct.h>
-#include <io.h>
-#define GETCWD _getcwd
-#define snprintf sprintf
-#define stat _stat
-#define access _access
-#ifndef W_OK
-    #define W_OK 2
-#endif
-#define mkdir(X,Y) (_mkdir(X))
-// from: https://www.linuxquestions.org/questions/programming-9/porting-to-win32-429334/
-#ifndef S_ISDIR
-    #define S_ISDIR(mode)  (((mode) & _S_IFMT) == _S_IFDIR)
-#endif
-#endif // _WIN32
-
-#ifndef __GNUC__
-#define HAVE_DECL_GETOPT 0
-#define __STDC__ 1
-#include "getopt.h"
-#else // ! __GNUC__
-#define HAVE_DECL_GETOPT 1
-#include <getopt.h>
-#endif // ! __GNUC__
-
-#if WITH_LIRC
-#include <lirc/lirc_client.h>
-#include <sys/poll.h>
-#endif
 
 extern void remoteInit();
 extern void remoteCleanUp();
@@ -270,7 +282,7 @@ static void sdlChangeVolume(float d)
     }
 }
 
-#if WITH_LIRC
+#if defined(VBAM_ENABLE_LIRC)
 //LIRC code
 bool LIRCEnabled = false;
 int LIRCfd = 0;
@@ -392,7 +404,7 @@ FILE* sdlFindFile(const char* name)
 
     fprintf(stdout, "Searching for file %s\n", name);
 
-    if (GETCWD(buffer, sizeof(buffer))) {
+    if (getcwd(buffer, sizeof(buffer))) {
         fprintf(stdout, "Searching current directory: %s\n", buffer);
     }
 
@@ -1327,7 +1339,7 @@ void sdlPollEvents()
     }
 }
 
-#if WITH_LIRC
+#if defined(VBAM_ENABLE_LIRC)
 void lircCheckInput(void)
 {
     if (LIRCEnabled) {
@@ -1799,7 +1811,7 @@ int main(int argc, char** argv)
         systemMessage(0, "Failed to init joystick support: %s", SDL_GetError());
     }
 
-#if WITH_LIRC
+#if defined(VBAM_ENABLE_LIRC)
     StartLirc();
 #endif
     inputInitJoysticks();
@@ -1901,7 +1913,7 @@ int main(int argc, char** argv)
             SDL_Delay(500);
         }
         sdlPollEvents();
-#if WITH_LIRC
+#if defined(VBAM_ENABLE_LIRC)
         lircCheckInput();
 #endif
         if (mouseCounter) {
@@ -1939,7 +1951,7 @@ int main(int argc, char** argv)
         free(patchNames[i]);
     }
 
-#if WITH_LIRC
+#if defined(VBAM_ENABLE_LIRC)
     StopLirc();
 #endif
 

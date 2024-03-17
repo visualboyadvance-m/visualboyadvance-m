@@ -6,7 +6,7 @@
 
 #include "core/base/system.h"
 #include "core/gba/gbaElf.h"
-#include "exprNode.h" 
+#include "sdl/exprNode.h" 
 
 extern int yyerror(const char *);
 extern int yylex(); 
