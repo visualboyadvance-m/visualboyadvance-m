@@ -1,20 +1,46 @@
-#include "ConfigManager.h"
-#include "components/user_config/user_config.h"
+#include "sdl/ConfigManager.h"
 
-// necessary to get portable strerror_r
-#undef _GNU_SOURCE
-#include <string.h>
-#define _GNU_SOURCE 1
-
+#include <cstring>
 #include <cerrno>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
+#include <string>
+#include <sstream>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#ifdef _WIN32
+
+#include <direct.h>
+#include <io.h>
+
+#define getcwd _getcwd
+#define stat _stat
+#define mkdir(X,Y) (_mkdir(X))
+
+// from: https://www.linuxquestions.org/questions/programming-9/porting-to-win32-429334/
+#ifndef S_ISDIR
+    #define S_ISDIR(mode)  (((mode) & _S_IFMT) == _S_IFDIR)
+#endif
+
+#endif // _WIN32
+
+#ifndef __GNUC__
+
+#define HAVE_DECL_GETOPT 0
+#define __STDC__ 1
+#include "getopt.h"
+
+#else // ! __GNUC__
+
+#define HAVE_DECL_GETOPT 1
+#include <getopt.h>
+
+#endif // ! __GNUC__
+
+#include "components/user_config/user_config.h"
 #include "core/base/file_util.h"
 #include "core/gb/gbGlobals.h"
 #include "core/gb/gbSound.h"
@@ -24,32 +50,8 @@
 #include "core/gba/gbaRemote.h"
 #include "core/gba/gbaRtc.h"
 #include "core/gba/gbaSound.h"
-#include "iniparser.h"
-
-#ifndef _WIN32
-#define GETCWD getcwd
-#else // _WIN32
-#include <direct.h>
-#include <io.h>
-#define GETCWD _getcwd
-#define stat _stat
-#define mkdir(X,Y) (_mkdir(X))
-// from: https://www.linuxquestions.org/questions/programming-9/porting-to-win32-429334/
-#ifndef S_ISDIR
-    #define S_ISDIR(mode)  (((mode) & _S_IFMT) == _S_IFDIR)
-#endif
-#endif // _WIN32
-
-#ifndef __GNUC__
-#define HAVE_DECL_GETOPT 0
-#define __STDC__ 1
-#include "getopt.h"
-#else // ! __GNUC__
-#define HAVE_DECL_GETOPT 1
-#include <getopt.h>
-#endif // ! __GNUC__
-#include <string>
-#include <sstream>
+#include "sdl/filters.h"
+#include "sdl/iniparser.h"
 
 namespace {
 
@@ -437,7 +439,7 @@ const char* FindConfigFile(const char *name)
 #define EXE_NAME "vbam"
 #endif // ! _WIN32
 
-	if (GETCWD(buffer, 2048)) {
+	if (getcwd(buffer, 2048)) {
 	}
 
 	if (FileExists(name))

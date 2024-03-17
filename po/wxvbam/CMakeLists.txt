@@ -1,7 +1,7 @@
 file(GLOB po_files "${CMAKE_CURRENT_SOURCE_DIR}/*.po")
 
 gettext_create_translations(
-	wxvbam.pot
+        wxvbam.pot
         ${po_files}
 )
 

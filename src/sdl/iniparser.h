@@ -7,8 +7,8 @@
 */
 /*--------------------------------------------------------------------------*/
 
-#ifndef _INIPARSER_H_
-#define _INIPARSER_H_
+#ifndef VBAM_SDL_INIPARSER_H_
+#define VBAM_SDL_INIPARSER_H_
 
 /*---------------------------------------------------------------------------
                                 Includes
@@ -308,4 +308,4 @@ void iniparser_freedict(dictionary *d);
 }  // extern "C"
 #endif
 
-#endif
+#endif  // VBAM_SDL_INIPARSER_H_

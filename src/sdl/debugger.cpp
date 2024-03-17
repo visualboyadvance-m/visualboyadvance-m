@@ -18,17 +18,17 @@
 
 // Parts adapted from VBA-H (VBA for Hackers) by LabMaster
 
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cctype>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #include "core/base/port.h"
 #include "core/gba/gbaCpu.h"
 #include "core/gba/gbaCpuArmDis.h"
 #include "core/gba/gbaElf.h"
 #include "core/gba/gbaSound.h"
-#include "exprNode.h"
+#include "sdl/exprNode.h"
 
 extern bool debugger;
 extern int emulating;

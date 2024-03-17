@@ -90,7 +90,7 @@ enum yytokentype {
 #include <string.h>
 #include <cstdlib>
 
-#include "exprNode.h"
+#include "sdl/exprNode.h"
 
 extern int yyerror(const char*);
 extern int yylex();

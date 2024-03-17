@@ -17,6 +17,13 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#ifndef VBAM_SDL_DEBUGGER_H_
+#define VBAM_SDL_DEBUGGER_H_
+
+#include <cstdint>
+
 extern void debuggerMain();
 extern void debuggerOutput(const char*, uint32_t);
 extern void debuggerSignal(int, int);
+
+#endif  // VBAM_SDL_DEBUGGER_H_

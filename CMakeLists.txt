@@ -188,21 +188,21 @@ if(NOT WIN32)
     find_library(PTHREAD_LIB pthread)
     if(PTHREAD_LIB)
        set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${PTHREAD_LIB})
-       set(VBAMCORE_LIBS ${VBAMCORE_LIBS} ${PTHREAD_LIB})
+       set(VBAM_PTHREAD_LIB ${PTHREAD_LIB})
     endif()
 elseif(MINGW)
     if(NOT VBAM_STATIC)
         set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} -lpthread)
-        set(VBAMCORE_LIBS ${VBAMCORE_LIBS} -lpthread)
+        set(VBAM_PTHREAD_LIB -lpthread)
     else()
         set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "-Wl,-Bstatic -lwinpthread -Wl,-Bdynamic")
-        set(VBAMCORE_LIBS ${VBAMCORE_LIBS} "-Wl,-Bstatic -lwinpthread -Wl,-Bdynamic")
+        set(VBAM_PTHREAD_LIB "-Wl,-Bstatic -lwinpthread -Wl,-Bdynamic")
     endif()
 else()
     find_package(PThreads4W)
     if(PThreads4W_FOUND)
         set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} PThreads4W::PThreads4W)
-        set(VBAMCORE_LIBS ${VBAMCORE_LIBS} PThreads4W::PThreads4W)
+        set(VBAM_PTHREAD_LIB PThreads4W::PThreads4W)
     endif()
 endif()
 
@@ -287,14 +287,8 @@ if(NOT ENABLE_ONLINEUPDATES)
   add_compile_definitions(NO_ONLINEUPDATES)
 endif()
 
-if(ENABLE_LIRC)
-    set(WITHLIRC 1)
-else()
-    set(WITHLIRC 0)
-endif()
-
 # C defines
-add_compile_definitions(HAVE_NETINET_IN_H HAVE_ARPA_INET_H HAVE_ZLIB_H FINAL_VERSION SDL USE_OPENGL SYSCONF_INSTALL_DIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}" WITH_LIRC=${WITHLIRC})
+add_compile_definitions(HAVE_NETINET_IN_H HAVE_ARPA_INET_H HAVE_ZLIB_H FINAL_VERSION SDL USE_OPENGL SYSCONF_INSTALL_DIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}")
 add_compile_definitions(PKGDATADIR="${CMAKE_INSTALL_FULL_DATADIR}/vbam")
 add_compile_definitions(__STDC_FORMAT_MACROS)
 
@@ -371,97 +365,12 @@ if(NOT TRANSLATIONS_ONLY)
     add_subdirectory(third_party/include/stb)
     add_subdirectory(src/core)
     add_subdirectory(src/components)
-endif()
-
-set(
-    SRC_SDL
-    src/sdl/ConfigManager.cpp
-    src/sdl/dictionary.c
-    src/sdl/expr.cpp
-    src/sdl/exprNode.cpp
-    src/sdl/expr-lex.cpp
-    src/sdl/filters.cpp
-    src/sdl/iniparser.c
-    src/sdl/inputSDL.cpp
-    src/sdl/SDL.cpp
-)
-if(MSVC)
-    list(APPEND SRC_SDL "dependencies/msvc/getopt.c")
-endif()
-
-set(
-    HDR_SDL
-    src/sdl/ConfigManager.h
-    src/sdl/dictionary.h
-    src/sdl/expr.cpp.h
-    src/sdl/exprNode.h
-    src/sdl/filters.h
-    src/sdl/iniparser.h
-    src/sdl/inputSDL.h
-)
-if(MSVC)
-    list(APPEND HDR_SDL "dependencies/msvc/getopt.h")
-endif()
-
-if((NOT TRANSLATIONS_ONLY) AND ENABLE_SDL)
-    add_executable(
-        vbam
-        WIN32
-        ${SRC_SDL}
-        ${HDR_SDL}
-    )
-
-    if(WIN32)
-        set(WIN32_LIBRARIES wsock32 ws2_32 winmm version imm32)
-    endif()
-
-    if(MSVC)
-        # the debug lib libcmtd is linked in debug mode, so don't link the normal version
-        set_target_properties(vbam PROPERTIES LINK_FLAGS_DEBUG "/nodefaultlib:libcmt")
-    endif()
-
-    if(ENABLE_LIRC)
-        set(LIRC_CLIENT_LIBRARY lirc_client)
-    endif()
-
-    target_link_libraries(vbam
-        vbam-components-audio-sdl
-        vbam-components-draw-text
-        vbam-components-filters
-        vbam-components-filters-agb
-        vbam-components-filters-interframe
-        vbam-components-user-config
-        ${VBAMCORE_LIBS}
-        ${WIN32_LIBRARIES}
-        ${LIRC_CLIENT_LIBRARY}
-    )
-
-    if(WIN32)
-        target_link_libraries(vbam ${SDL2MAIN_LIBRARY})
-    endif()
-
-    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vbam${CMAKE_EXECUTABLE_SUFFIX} DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
-
-    if(WIN32)
-        install(
-            FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
-            DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR}
-            RENAME vbam.cfg
-        )
-    else()
-        install(
-            FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/vbam.cfg-example
-            DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR}
-            RENAME vbam.cfg
-        )
-    endif()
+    add_subdirectory(src/sdl)
 endif()
 
 if(ENABLE_WX)
     add_subdirectory(src/wx)
-endif()
 
-if(ENABLE_WX)
     # Native Language Support
     if(ENABLE_NLS)
         add_subdirectory(po)
@@ -471,9 +380,6 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/vba-over.ini DESTINATION ${CMAKE_I
 
 # manual pages
 if(UNIX)
-    if(ENABLE_SDL)
-        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/debian/vbam.6 DESTINATION ${CMAKE_INSTALL_FULL_MANDIR}/man6)
-    endif()
     if(ENABLE_WX)
         install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/debian/visualboyadvance-m.6 DESTINATION ${CMAKE_INSTALL_FULL_MANDIR}/man6)
     endif()

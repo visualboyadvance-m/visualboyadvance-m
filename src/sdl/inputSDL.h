@@ -15,10 +15,12 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef VBAM_SDL_INPUT_H
-#define VBAM_SDL_INPUT_H
+#ifndef VBAM_SDL_INPUT_H_
+#define VBAM_SDL_INPUT_H_
 
-#include "SDL.h"
+#include <cstdint>
+
+#include <SDL_events.h>
 
 enum EKey {
     KEY_LEFT,
@@ -136,4 +138,4 @@ void inputSetDefaultJoypad(EPad pad);
  */
 EPad inputGetDefaultJoypad();
 
-#endif // VBAM_SDL_INPUT_H
+#endif // VBAM_SDL_INPUT_H_
