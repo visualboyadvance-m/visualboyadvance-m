@@ -285,8 +285,8 @@ if(VBAM_STATIC)
 endif()
 find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl)
 if(NOT wxWidgets_FOUND)
-    set(WX_HAS_OPENGL FALSE)
     find_package(wxWidgets COMPONENTS xrc xml html adv net core base REQUIRED)
+    target_compile_definitions(visualboyadvance-m PRIVATE NO_OGL)
 endif()
 
 target_link_libraries(visualboyadvance-m ${wxWidgets_LIBRARIES})
@@ -303,23 +303,6 @@ list(APPEND CMAKE_REQUIRED_FLAGS ${wxWidgets_CXX_FLAGS})
 foreach(DEF ${wxWidgets_DEFINITIONS})
     list(APPEND CMAKE_REQUIRED_DEFINITIONS "-D${DEF}")
 endforeach()
-
-# Check for OpenGL.
-include(CheckCXXSourceCompiles)
-if(NOT DEFINED WX_HAS_OPENGL)
-    check_cxx_source_compiles("
-#include <wx/wx.h>
-#include <wx/config.h>
-#include <wx/glcanvas.h>
-
-int main(int argc, char** argv) {
-wxGLCanvas canvas(NULL, wxID_ANY, NULL, wxPoint(0, 0), wxSize(300, 300), 0);
-return 0;
-}" WX_HAS_OPENGL)
-endif()
-if(NOT WX_HAS_OPENGL)
-    target_compile_definitions(visualboyadvance-m PRIVATE NO_OGL)
-endif()
 
 # we make some direct gtk/gdk calls on linux and such
 # so need to link the gtk that wx was built with
