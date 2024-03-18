@@ -1,4 +1,4 @@
-#include "widgets/group-check-box.h"
+#include "wx/widgets/group-check-box.h"
 
 namespace widgets {
 

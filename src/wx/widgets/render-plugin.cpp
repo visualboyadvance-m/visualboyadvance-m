@@ -1,4 +1,4 @@
-#include "widgets/render-plugin.h"
+#include "wx/widgets/render-plugin.h"
 
 namespace widgets {
 

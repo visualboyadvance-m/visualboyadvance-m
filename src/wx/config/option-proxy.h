@@ -4,8 +4,8 @@
 #include <array>
 #include <type_traits>
 
-#include "config/option-id.h"
-#include "config/option.h"
+#include "wx/config/option-id.h"
+#include "wx/config/option.h"
 
 namespace config {
 

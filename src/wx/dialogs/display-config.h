@@ -4,8 +4,8 @@
 #include <wx/dialog.h>
 #include <wx/event.h>
 
-#include "config/option-observer.h"
-#include "widgets/keep-on-top-styler.h"
+#include "wx/config/option-observer.h"
+#include "wx/widgets/keep-on-top-styler.h"
 
 // Forward declarations.
 class wxChoice;

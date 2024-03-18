@@ -1,12 +1,10 @@
 #ifndef VBAM_WX_DIALOGS_GAME_BOY_CONFIG_H_
 #define VBAM_WX_DIALOGS_GAME_BOY_CONFIG_H_
 
-#include <cstddef>
-
 #include <wx/clrpicker.h>
 #include <wx/dialog.h>
 
-#include "widgets/keep-on-top-styler.h"
+#include "wx/widgets/keep-on-top-styler.h"
 
 namespace dialogs {
 

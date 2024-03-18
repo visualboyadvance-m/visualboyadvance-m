@@ -1,4 +1,4 @@
-#include "dialogs/game-boy-config.h"
+#include "wx/dialogs/game-boy-config.h"
 
 #include <array>
 #include <cstddef>
@@ -13,10 +13,10 @@
 
 #include <wx/xrc/xmlres.h>
 
-#include "config/option-observer.h"
-#include "config/option-proxy.h"
-#include "dialogs/validated-child.h"
-#include "widgets/option-validator.h"
+#include "wx/config/option-observer.h"
+#include "wx/config/option-proxy.h"
+#include "wx/dialogs/validated-child.h"
+#include "wx/widgets/option-validator.h"
 
 namespace dialogs {
 

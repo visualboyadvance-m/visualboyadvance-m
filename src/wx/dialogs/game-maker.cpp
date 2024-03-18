@@ -1,4 +1,4 @@
-#include "game-maker.h"
+#include "wx/dialogs/game-maker.h"
 
 #include <unordered_map>
 

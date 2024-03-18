@@ -1,15 +1,15 @@
-#ifndef WX_OPTS_H
-#define WX_OPTS_H
+#ifndef VBAM_WX_OPTS_H_
+#define VBAM_WX_OPTS_H_
 
 #include <map>
 
 #include <wx/string.h>
 #include <wx/vidmode.h>
 
-#include "config/game-control.h"
-#include "config/shortcuts.h"
-#include "config/user-input.h"
-#include "wxhead.h"
+#include "wx/config/game-control.h"
+#include "wx/config/shortcuts.h"
+#include "wx/config/user-input.h"
+#include "wx/wxhead.h"
 
 // Forward declaration.
 class wxFileHistory;
@@ -95,4 +95,4 @@ void update_shortcut_opts();
 // returns true if option name correct; prints error if val invalid
 void opt_set(const wxString& name, const wxString& val);
 
-#endif /* WX_OPTS_H */
+#endif // VBAM_WX_OPTS_H_

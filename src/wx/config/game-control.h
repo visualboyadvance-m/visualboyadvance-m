@@ -9,7 +9,7 @@
 
 #include <wx/string.h>
 
-#include "config/user-input.h"
+#include "wx/config/user-input.h"
 
 namespace config {
 

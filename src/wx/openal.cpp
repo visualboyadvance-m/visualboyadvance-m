@@ -5,7 +5,7 @@
 
 // for gopts
 // also, wx-related
-#include "wxvbam.h"
+#include "wx/wxvbam.h"
 
 // Interface
 #include "core/base/sound_driver.h"

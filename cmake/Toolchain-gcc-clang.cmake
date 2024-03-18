@@ -14,6 +14,7 @@ endif()
 add_compile_options(
     -pipe
     -Wno-unused-command-line-argument
+    -Wno-deprecated-copy
     -Wformat
     -Wformat-security
     -feliminate-unused-debug-types

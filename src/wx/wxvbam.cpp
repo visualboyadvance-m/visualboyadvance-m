@@ -3,7 +3,7 @@
 //   load xrc file (guiinit.cpp does most of instantiation)
 //   create & display main frame
 
-#include "wxvbam.h"
+#include "wx/wxvbam.h"
 
 #ifdef __WXMSW__
 #include <windows.h>
@@ -39,18 +39,18 @@
 #endif  // defined(VBAM_ENABLE_DEBUGGER)
 
 // The built-in xrc file
-#include "builtin-xrc.h"
+#include "wx/builtin-xrc.h"
 
 // The built-in vba-over.ini
-#include "builtin-over.h"
-#include "config/game-control.h"
-#include "config/option-proxy.h"
-#include "config/option.h"
-#include "config/user-input.h"
-#include "strutils.h"
-#include "wayland.h"
-#include "widgets/group-check-box.h"
-#include "widgets/user-input-ctrl.h"
+#include "wx/builtin-over.h"
+#include "wx/config/game-control.h"
+#include "wx/config/option-proxy.h"
+#include "wx/config/option.h"
+#include "wx/config/user-input.h"
+#include "wx/strutils.h"
+#include "wx/wayland.h"
+#include "wx/widgets/group-check-box.h"
+#include "wx/widgets/user-input-ctrl.h"
 
 #ifdef __WXGTK__
 #include <gdk/gdk.h>
@@ -878,7 +878,7 @@ void MainFrame::OnStatusBarChanged() {
 }
 
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
-#include "cmd-evtable.h"
+#include "wx/cmd-evtable.h"
 EVT_CONTEXT_MENU(MainFrame::OnMenu)
 // this is the main window focus?  Or EVT_SET_FOCUS/EVT_KILL_FOCUS?
 EVT_ACTIVATE(MainFrame::OnActivate)

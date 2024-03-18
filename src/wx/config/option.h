@@ -9,7 +9,7 @@
 
 #include <wx/string.h>
 
-#include "config/option-id.h"
+#include "wx/config/option-id.h"
 
 using std::uint8_t;
 using std::uint16_t;

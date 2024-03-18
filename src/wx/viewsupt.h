@@ -1,5 +1,5 @@
-#ifndef WX_VIEWSUPT_H
-#define WX_VIEWSUPT_H
+#ifndef VBAM_WX_VIEWSUPT_H_
+#define VBAM_WX_VIEWSUPT_H_
 
 #include <wx/wx.h>
 #include <wx/window.h>
@@ -421,4 +421,4 @@ public:
 
 // standard widgets in graphical viewers
 }
-#endif /* WX_VIEWSUPT_H */
+#endif // VBAM_WX_VIEWSUPT_H_

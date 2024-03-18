@@ -13,7 +13,7 @@ STRING(REGEX MATCHALL "\nEVT_HANDLER([^\")]|\"[^\"]*\")*\\)" MW "${MW}")
 
 # cmdtab.cpp is a table of cmd-id-name/cmd-name pairs
 # sorted for binary searching
-FILE(WRITE "${CMDTAB}" "// Generated from cmdevents.cpp; do not edit\n#include <wx/xrc/xmlres.h>\n\n#include \"wxvbam.h\"\n#include \"wxhead.h\"\n\nstruct cmditem cmdtab[] = {\n")
+FILE(WRITE "${CMDTAB}" "// Generated from cmdevents.cpp; do not edit\n#include <wx/xrc/xmlres.h>\n\n#include \"wx/wxvbam.h\"\n#include \"wx/wxhead.h\"\n\nstruct cmditem cmdtab[] = {\n")
 SET(EVLINES )
 FOREACH(EV ${MW})
     # stripping the wxID_ makes it look better, but it's still all-caps

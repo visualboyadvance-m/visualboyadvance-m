@@ -1,4 +1,4 @@
-#include "config/user-input.h"
+#include "wx/config/user-input.h"
 
 #include <map>
 
@@ -7,8 +7,8 @@
 #include <wx/regex.h>
 #include <wx/translation.h>
 
-#include "strutils.h"
-#include "wxutil.h"
+#include "wx/strutils.h"
+#include "wx/wxutil.h"
 
 namespace config {
 

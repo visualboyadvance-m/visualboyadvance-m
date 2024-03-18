@@ -1,7 +1,7 @@
 #ifndef NO_FAUDIO
 
 // Application
-#include "wxvbam.h"
+#include "wx/wxvbam.h"
 #include <stdio.h>
 
 // Interface

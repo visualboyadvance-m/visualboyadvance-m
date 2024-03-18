@@ -1,4 +1,4 @@
-#include "config/option.h"
+#include "wx/config/option.h"
 
 #include <cstring>
 
@@ -8,10 +8,10 @@
 #include <wx/translation.h>
 
 #define VBAM_OPTION_INTERNAL_INCLUDE
-#include "config/internal/option-internal.h"
+#include "wx/config/internal/option-internal.h"
 #undef VBAM_OPTION_INTERNAL_INCLUDE
 
-#include "config/option-proxy.h"
+#include "wx/config/option-proxy.h"
 
 namespace config {
 

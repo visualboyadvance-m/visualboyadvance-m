@@ -1,4 +1,4 @@
-#include "wxvbam.h"
+#include "wx/wxvbam.h"
 
 #include <wx/aboutdlg.h>
 #include <wx/ffile.h>
@@ -11,8 +11,6 @@
 #include <wx/msgdlg.h>
 
 #include "components/filters_interframe/interframe.h"
-#include "config/option-proxy.h"
-#include "config/option.h"
 #include "core/base/version.h"
 #include "core/gb/gb.h"
 #include "core/gb/gbCheats.h"
@@ -24,7 +22,9 @@
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaPrint.h"
 #include "core/gba/gbaSound.h"
-#include "dialogs/game-maker.h"
+#include "wx/config/option-proxy.h"
+#include "wx/config/option.h"
+#include "wx/dialogs/game-maker.h"
 
 #define GetXRCDialog(n) \
     wxStaticCast(wxGetApp().frame->FindWindowByName(n), wxDialog)

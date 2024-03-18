@@ -1,4 +1,4 @@
-#include "wayland.h"
+#include "wx/wayland.h"
 
 #ifdef HAVE_WAYLAND_SUPPORT
 

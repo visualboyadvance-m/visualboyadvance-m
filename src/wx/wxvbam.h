@@ -1,5 +1,5 @@
-#ifndef WX_WXVBAM_H
-#define WX_WXVBAM_H
+#ifndef VBAM_WX_WXVBAM_H_
+#define VBAM_WX_WXVBAM_H_
 
 #include <list>
 #include <stdexcept>
@@ -12,12 +12,12 @@
 #include <wx/datetime.h>
 
 #include "core/base/system.h"
-#include "config/option-observer.h"
-#include "widgets/dpi-support.h"
-#include "widgets/keep-on-top-styler.h"
-#include "wx/sdljoy.h"
-#include "wx/wxmisc.h"
-#include "wxhead.h"
+#include "wx/config/option-observer.h"
+#include "wx/widgets/dpi-support.h"
+#include "wx/widgets/keep-on-top-styler.h"
+#include "wx/widgets/sdljoy.h"
+#include "wx/widgets/wxmisc.h"
+#include "wx/wxhead.h"
 
 #ifndef NO_LINK
 #include "core/gba/gbaLink.h"
@@ -27,8 +27,8 @@
 #include "components/av_recording/av_recording.h"
 #endif
 
-#include "wxlogdebug.h"
-#include "wxutil.h"
+#include "wx/wxlogdebug.h"
+#include "wx/wxutil.h"
 
 template <typename T>
 void CheckPointer(T pointer)
@@ -385,7 +385,7 @@ private:
     // Load a named wxDialog from the XRC file
     wxDialog* LoadXRCropertySheetDialog(const char* name);
 
-#include "cmdhandlers.h"
+#include "wx/cmdhandlers.h"
 };
 
 // a class for polling joystick keys
@@ -644,7 +644,7 @@ cmditem new_cmditem(const wxString cmd = wxT(""), const wxString name = wxT(""),
 // for binary search
 extern bool cmditem_lt(const struct cmditem& cmd1, const struct cmditem& cmd2);
 
-#include "rpi.h"
+#include "wx/rpi.h"
 #include <wx/dynlib.h>
 
 class FilterThread;
@@ -698,7 +698,7 @@ private:
     DECLARE_EVENT_TABLE()
 };
 
-#include "opts.h"
+#include "wx/opts.h"
 
 // I should add this to SoundDriver, but wxArrayString is wx-specific
 // I suppose I could make subclass wxSoundDriver.  maybe later.
@@ -797,4 +797,4 @@ extern int autofire, autohold;
 #define KEYM_MOTION_IN (1 << 19)
 #define KEYM_MOTION_OUT (1 << 20)
 
-#endif /* WX_WXVBAM_H */
+#endif // VBAM_WX_WXVBAM_H_

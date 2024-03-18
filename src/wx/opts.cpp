@@ -1,4 +1,4 @@
-#include "opts.h"
+#include "wx/opts.h"
 
 #include <algorithm>
 #include <limits>
@@ -10,13 +10,13 @@
 #include <wx/log.h>
 #include <wx/xrc/xmlres.h>
 
-#include "config/option-observer.h"
-#include "config/option-proxy.h"
-#include "config/option.h"
-#include "config/user-input.h"
-#include "strutils.h"
-#include "wxhead.h"
-#include "wxvbam.h"
+#include "wx/config/option-observer.h"
+#include "wx/config/option-proxy.h"
+#include "wx/config/option.h"
+#include "wx/config/user-input.h"
+#include "wx/strutils.h"
+#include "wx/wxhead.h"
+#include "wx/wxvbam.h"
 
 /*
        disableSfx(F) -> cpuDisableSfx

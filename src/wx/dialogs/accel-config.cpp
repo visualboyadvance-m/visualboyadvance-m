@@ -1,4 +1,4 @@
-#include "dialogs/accel-config.h"
+#include "wx/dialogs/accel-config.h"
 
 #include <wx/ctrlsub.h>
 #include <wx/event.h>
@@ -7,12 +7,12 @@
 #include <wx/msgdlg.h>
 #include <wx/xrc/xmlres.h>
 
-#include "config/shortcuts.h"
-#include "config/user-input.h"
-#include "dialogs/validated-child.h"
-#include "opts.h"
-#include "widgets/user-input-ctrl.h"
-#include "wxvbam.h"
+#include "wx/config/shortcuts.h"
+#include "wx/config/user-input.h"
+#include "wx/dialogs/validated-child.h"
+#include "wx/opts.h"
+#include "wx/widgets/user-input-ctrl.h"
+#include "wx/wxvbam.h"
 
 namespace dialogs {
 

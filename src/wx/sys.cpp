@@ -7,13 +7,13 @@
 #include <SDL.h>
 
 #include "components/audio_sdl/audio_sdl.h"
-#include "config/game-control.h"
-#include "config/option-proxy.h"
 #include "core/base/image_util.h"
 #include "core/gb/gbGlobals.h"
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaSound.h"
-#include "wxvbam.h"
+#include "wx/config/game-control.h"
+#include "wx/config/option-proxy.h"
+#include "wx/wxvbam.h"
 
 // These should probably be in vbamcore
 int systemVerbose;

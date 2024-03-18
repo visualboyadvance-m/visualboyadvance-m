@@ -5,14 +5,13 @@
 // other non-viewer dialogs are at least validated enough that they won't crash
 // viewer dialogs are not commonly used, so they are initialized on demand
 
-#include "wxvbam.h"
+#include "wx/wxvbam.h"
 
 #include <cmath>
 #include <stdexcept>
 #include <typeinfo>
 
 #include <wx/checkbox.h>
-#include <wx/checkedlistctrl.h>
 #include <wx/choice.h>
 #include <wx/clrpicker.h>
 #include <wx/dialog.h>
@@ -32,26 +31,27 @@
 #include <wx/valtext.h>
 #include <wx/wfstream.h>
 
-#include "config/option-proxy.h"
 #include "core/gb/gb.h"
 #include "core/gb/gbCheats.h"
 #include "core/gb/gbGlobals.h"
-#include "core/gba/gbaCheats.h"
 #include "core/gba/gbaCheatSearch.h"
+#include "core/gba/gbaCheats.h"
 #include "core/gba/gbaFlash.h"
 #include "core/gba/gbaGlobals.h"
-#include "dialogs/accel-config.h"
-#include "dialogs/directories-config.h"
-#include "dialogs/display-config.h"
-#include "dialogs/game-boy-config.h"
-#include "dialogs/gb-rom-info.h"
-#include "dialogs/joypad-config.h"
-#include "opts.h"
-#include "widgets/option-validator.h"
-#include "wxhead.h"
+#include "wx/config/option-proxy.h"
+#include "wx/dialogs/accel-config.h"
+#include "wx/dialogs/directories-config.h"
+#include "wx/dialogs/display-config.h"
+#include "wx/dialogs/game-boy-config.h"
+#include "wx/dialogs/gb-rom-info.h"
+#include "wx/dialogs/joypad-config.h"
+#include "wx/opts.h"
+#include "wx/widgets/option-validator.h"
+#include "wx/widgets/checkedlistctrl.h"
+#include "wx/wxhead.h"
 
 #if defined(__WXGTK__)
-#include "wayland.h"
+#include "wx/wayland.h"
 #endif
 
 // The program icon, in case it's missing from .xrc (MSW gets it from .rc file)

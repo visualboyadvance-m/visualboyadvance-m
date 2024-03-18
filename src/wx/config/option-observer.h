@@ -6,7 +6,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "config/option-id.h"
+#include "wx/config/option-id.h"
 
 namespace config {
 

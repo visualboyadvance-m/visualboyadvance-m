@@ -1,9 +1,9 @@
-#include "config/shortcuts.h"
+#include "wx/config/shortcuts.h"
 
 #include <wx/xrc/xmlres.h>
 
 #define VBAM_SHORTCUTS_INTERNAL_INCLUDE
-#include "config/internal/shortcuts-internal.h"
+#include "wx/config/internal/shortcuts-internal.h"
 #undef VBAM_SHORTCUTS_INTERNAL_INCLUDE
 
 namespace config {

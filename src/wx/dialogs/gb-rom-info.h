@@ -3,7 +3,7 @@
 
 #include <wx/dialog.h>
 
-#include "widgets/keep-on-top-styler.h"
+#include "wx/widgets/keep-on-top-styler.h"
 
 namespace dialogs {
 

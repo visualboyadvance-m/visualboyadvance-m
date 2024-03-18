@@ -1,9 +1,8 @@
-#include "widgets/keep-on-top-styler.h"
+#include "wx/widgets/keep-on-top-styler.h"
 
 #include <wx/toplevel.h>
 
-#include "config/option-proxy.h"
-#include "config/option.h"
+#include "wx/config/option.h"
 
 namespace widgets {
 

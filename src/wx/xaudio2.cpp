@@ -1,7 +1,7 @@
 #ifndef NO_XAUDIO2
 
 // Application
-#include "wxvbam.h"
+#include "wx/wxvbam.h"
 #include <stdio.h>
 
 // Interface

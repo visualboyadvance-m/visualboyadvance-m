@@ -184,28 +184,6 @@ if(X86_64 AND (ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS OR ENABLE_MMX))
     message(FATAL_ERROR "The options ASM_CORE, ASM_SCALERS and MMX are not supported on X86_64 yet.")
 endif()
 
-if(NOT WIN32)
-    find_library(PTHREAD_LIB pthread)
-    if(PTHREAD_LIB)
-       set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${PTHREAD_LIB})
-       set(VBAM_PTHREAD_LIB ${PTHREAD_LIB})
-    endif()
-elseif(MINGW)
-    if(NOT VBAM_STATIC)
-        set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} -lpthread)
-        set(VBAM_PTHREAD_LIB -lpthread)
-    else()
-        set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} "-Wl,-Bstatic -lwinpthread -Wl,-Bdynamic")
-        set(VBAM_PTHREAD_LIB "-Wl,-Bstatic -lwinpthread -Wl,-Bdynamic")
-    endif()
-else()
-    find_package(PThreads4W)
-    if(PThreads4W_FOUND)
-        set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} PThreads4W::PThreads4W)
-        set(VBAM_PTHREAD_LIB PThreads4W::PThreads4W)
-    endif()
-endif()
-
 # Look for some dependencies using CMake scripts
 find_package(ZLIB REQUIRED)
 
@@ -240,17 +218,9 @@ endif()
 
 set(VBAM_SDL2_LIBS SDL2::SDL2 ${SDL2_LIBRARY_TEMP})
 
-# set the standard libraries all ports use
-set(
-    VBAMCORE_LIBS
-    vbam-core
-    ${VBAM_SDL2_LIBS}
-    ${OPENGL_LIBRARIES}
-)
-
 set(VBAM_GENERATED_DIR ${CMAKE_BINARY_DIR}/generated)
 
-# Set up "src" as a global include directory.
+# Set up "src" and generated directory as a global include directory.
 include_directories(
     ${CMAKE_SOURCE_DIR}/src
     ${VBAM_GENERATED_DIR}
@@ -262,10 +232,10 @@ if(ENABLE_FFMPEG)
     endif()
 
     if(APPLE)
-        set(FFMPEG_LDFLAGS ${FFMPEG_LDFLAGS} -framework CoreText -framework ApplicationServices)
+        list(APPEND FFMPEG_LDFLAGS "SHELL:-framework CoreText" "SHELL:-framework ApplicationServices")
 
         if(UPSTREAM_RELEASE)
-            set(FFMPEG_LDFLAGS ${FFMPEG_LDFLAGS} -lbz2 -ltiff -framework DiskArbitration -lfreetype -lfontconfig -llzma -lxml2 -lharfbuzz)
+            list(APPEND FFMPEG_LDFLAGS -lbz2 -ltiff "SHELL:-framework DiskArbitration" -lfreetype -lfontconfig -llzma -lxml2 -lharfbuzz)
         endif()
     elseif(WIN32)
         set(WIN32_MEDIA_FOUNDATION_LIBS dxva2 evr mf mfplat mfplay mfreadwrite mfuuid amstrmid)
@@ -366,24 +336,10 @@ if(NOT TRANSLATIONS_ONLY)
     add_subdirectory(src/core)
     add_subdirectory(src/components)
     add_subdirectory(src/sdl)
-endif()
-
-if(ENABLE_WX)
     add_subdirectory(src/wx)
-
-    # Native Language Support
-    if(ENABLE_NLS)
-        add_subdirectory(po)
-    endif()
 endif()
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/vba-over.ini DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/vbam)
 
-# manual pages
-if(UNIX)
-    if(ENABLE_WX)
-        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/debian/visualboyadvance-m.6 DESTINATION ${CMAKE_INSTALL_FULL_MANDIR}/man6)
-    endif()
-endif()
+add_subdirectory(po/wxvbam)
 
 set(CPACK_GENERATOR "ZIP")
 set(CPACK_SOURCE_GENERATOR "TGZ")

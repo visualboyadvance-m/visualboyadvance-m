@@ -7,14 +7,14 @@
 #include <wx/ffile.h>
 #include <wx/vlbox.h>
 
-#include "config/option-proxy.h"
 #include "core/gb/gb.h"
 #include "core/gb/gbDis.h"
 #include "core/gb/gbGlobals.h"
 #include "core/gba/gbaCpu.h"
 #include "core/gba/gbaCpuArmDis.h"
-#include "viewsupt.h"
-#include "wxvbam.h"
+#include "wx/config/option-proxy.h"
+#include "wx/viewsupt.h"
+#include "wx/wxvbam.h"
 
 // avoid exporting classes
 namespace Viewers {

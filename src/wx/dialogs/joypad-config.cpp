@@ -1,11 +1,11 @@
-#include "dialogs/joypad-config.h"
+#include "wx/dialogs/joypad-config.h"
 
 #include <wx/xrc/xmlres.h>
 
-#include "dialogs/validated-child.h"
-#include "opts.h"
-#include "widgets/option-validator.h"
-#include "widgets/user-input-ctrl.h"
+#include "wx/dialogs/validated-child.h"
+#include "wx/opts.h"
+#include "wx/widgets/option-validator.h"
+#include "wx/widgets/user-input-ctrl.h"
 
 namespace dialogs {
 

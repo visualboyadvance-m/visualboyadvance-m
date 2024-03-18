@@ -1,6 +1,6 @@
-#include "config/option-observer.h"
+#include "wx/config/option-observer.h"
 
-#include "config/option.h"
+#include "wx/config/option.h"
 
 namespace config {
 

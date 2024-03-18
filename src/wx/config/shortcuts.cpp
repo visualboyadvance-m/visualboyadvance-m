@@ -1,13 +1,13 @@
-#include "config/shortcuts.h"
+#include "wx/config/shortcuts.h"
 
 #include <wx/string.h>
 #include <wx/translation.h>
 #include <wx/xrc/xmlres.h>
 
-#include "config/user-input.h"
+#include "wx/config/user-input.h"
 
 #define VBAM_SHORTCUTS_INTERNAL_INCLUDE
-#include "config/internal/shortcuts-internal.h"
+#include "wx/config/internal/shortcuts-internal.h"
 #undef VBAM_SHORTCUTS_INTERNAL_INCLUDE
 
 namespace config {

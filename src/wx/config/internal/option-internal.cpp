@@ -1,4 +1,4 @@
-#include "config/option.h"
+#include "wx/config/option.h"
 
 // Helper implementation file to define and compile all of these huge constants
 // separately. These should not be updated very often, so having these in a
@@ -13,10 +13,10 @@
 #include "core/base/system.h"
 #include "core/gb/gbGlobals.h"
 #include "core/gba/gbaSound.h"
-#include "opts.h"
+#include "wx/opts.h"
 
 #define VBAM_OPTION_INTERNAL_INCLUDE
-#include "config/internal/option-internal.h"
+#include "wx/config/internal/option-internal.h"
 #undef VBAM_OPTION_INTERNAL_INCLUDE
 
 struct CoreOptions coreOptions;

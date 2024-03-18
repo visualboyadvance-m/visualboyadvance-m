@@ -1,8 +1,8 @@
-#include "config/game-control.h"
+#include "wx/config/game-control.h"
 
-#include "../strutils.h"
-#include "opts.h"
-#include "wxlogdebug.h"
+#include "wx/opts.h"
+#include "wx/strutils.h"
+#include "wx/wxlogdebug.h"
 
 namespace config {
 

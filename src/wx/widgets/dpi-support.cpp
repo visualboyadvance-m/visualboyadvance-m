@@ -1,4 +1,4 @@
-#include "widgets/dpi-support.h"
+#include "wx/widgets/dpi-support.h"
 
 #include <wx/window.h>
 

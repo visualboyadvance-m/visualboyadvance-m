@@ -1,5 +1,5 @@
-#ifndef WX_MISC_H
-#define WX_MISC_H
+#ifndef VBAM_WX_WIDGETS_WX_MISC_H_
+#define VBAM_WX_WIDGETS_WX_MISC_H_
 // utility widgets
 
 #include <cstdint>
@@ -250,4 +250,4 @@ public:
 // for wxTextValidator include lists
 extern const wxArrayString val_hexdigits, val_sigdigits, val_unsdigits;
 
-#endif /* WX_MISC_H */
+#endif // VBAM_WX_WIDGETS_WX_MISC_H_

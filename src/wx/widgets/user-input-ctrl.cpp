@@ -1,8 +1,7 @@
-#include "widgets/user-input-ctrl.h"
+#include "wx/widgets/user-input-ctrl.h"
 
-#include "config/user-input.h"
-
-#include "opts.h"
+#include "wx/config/user-input.h"
+#include "wx/opts.h"
 
 namespace widgets {
 

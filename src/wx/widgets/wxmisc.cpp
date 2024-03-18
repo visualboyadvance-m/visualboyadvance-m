@@ -4,9 +4,10 @@
 #include <string>
 #include <algorithm>
 
-#include "wx/wxmisc.h"
 #include <wx/wx.h>
 #include <wx/spinctrl.h>
+
+#include "wx/widgets/wxmisc.h"
 
 bool wxBoolIntValidator::TransferToWindow()
 {

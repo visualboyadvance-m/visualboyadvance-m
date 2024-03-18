@@ -1,4 +1,4 @@
-#include "widgets/option-validator.h"
+#include "wx/widgets/option-validator.h"
 
 #include <wx/checkbox.h>
 #include <wx/choice.h>

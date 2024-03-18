@@ -3,7 +3,7 @@
 
 #include <wx/event.h>
 
-#include "config/option-observer.h"
+#include "wx/config/option-observer.h"
 
 // Forward declarations.
 class wxTopLevelWindow;
