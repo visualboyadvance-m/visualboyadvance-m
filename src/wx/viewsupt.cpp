@@ -1,8 +1,8 @@
-#include "viewsupt.h"
+#include "wx/viewsupt.h"
 
-#include "config/option-proxy.h"
-#include "wxvbam.h"
-#include "wxutil.h"
+#include "wx/config/option-proxy.h"
+#include "wx/wxutil.h"
+#include "wx/wxvbam.h"
 
 namespace Viewers {
 void Viewer::CloseDlg(wxCloseEvent& ev)

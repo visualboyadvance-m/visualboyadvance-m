@@ -2601,7 +2601,7 @@ static ConnectionState InitIPC()
     linkid = 0;
 
 #if (defined __WIN32__ || defined _WIN32)
-    if ((mmf = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(LINKDATA), LOCAL_LINK_NAME)) == NULL) {
+    if ((mmf = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(LINKDATA), LOCAL_LINK_NAME)) == NULL) {
         systemMessage(0, N_("Error creating file mapping"));
         return LINK_ERROR;
     }
@@ -2672,7 +2672,7 @@ static ConnectionState InitIPC()
     for (int i = 0; i < 4; i++) {
         linkevent[sizeof(linkevent) - 2] = (char)i + '1';
 #if (defined __WIN32__ || defined _WIN32)
-        linksync[i] = firstone ? CreateSemaphore(NULL, 0, 4, linkevent) : OpenSemaphore(SEMAPHORE_ALL_ACCESS, false, linkevent);
+        linksync[i] = firstone ? CreateSemaphoreA(NULL, 0, 4, linkevent) : OpenSemaphoreA(SEMAPHORE_ALL_ACCESS, false, linkevent);
         if (linksync[i] == NULL) {
             UnmapViewOfFile(linkmem);
             CloseHandle(mmf);

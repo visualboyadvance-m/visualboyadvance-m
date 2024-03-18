@@ -8,7 +8,7 @@
 
 #include <wx/string.h>
 
-#include "config/option.h"
+#include "wx/config/option.h"
 
 namespace config {
 namespace internal {

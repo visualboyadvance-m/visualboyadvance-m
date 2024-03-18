@@ -8,9 +8,9 @@
 #include <wx/validate.h>
 #include <wx/xrc/xmlres.h>
 
-#include "config/game-control.h"
-#include "config/user-input.h"
-#include "widgets/wx/sdljoy.h"
+#include "wx/config/game-control.h"
+#include "wx/config/user-input.h"
+#include "wx/widgets/sdljoy.h"
 
 namespace widgets {
 

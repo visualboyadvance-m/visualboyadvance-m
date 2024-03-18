@@ -1,11 +1,11 @@
-#include "dialogs/directories-config.h"
+#include "wx/dialogs/directories-config.h"
 
 #include <wx/filepicker.h>
 
 #include <wx/xrc/xmlres.h>
 
-#include "dialogs/validated-child.h"
-#include "widgets/option-validator.h"
+#include "wx/dialogs/validated-child.h"
+#include "wx/widgets/option-validator.h"
 
 namespace dialogs {
 

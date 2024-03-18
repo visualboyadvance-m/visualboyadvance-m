@@ -1,8 +1,8 @@
-#ifndef _WX_UTIL_H
-#define _WX_UTIL_H
+#ifndef VBAM_WX_UTIL_H_
+#define VBAM_WX_UTIL_H_
 
 #include <wx/event.h>
 
 int getKeyboardKeyCode(const wxKeyEvent& event);
 
-#endif
+#endif  // VBAM_WX_UTIL_H_

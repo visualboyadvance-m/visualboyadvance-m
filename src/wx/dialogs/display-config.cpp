@@ -1,4 +1,4 @@
-#include "dialogs/display-config.h"
+#include "wx/dialogs/display-config.h"
 
 #include <wx/arrstr.h>
 #include <wx/choice.h>
@@ -13,14 +13,14 @@
 
 #include <wx/xrc/xmlres.h>
 
-#include "config/option-id.h"
-#include "config/option-proxy.h"
-#include "config/option.h"
-#include "dialogs/validated-child.h"
-#include "rpi.h"
-#include "widgets/option-validator.h"
-#include "widgets/render-plugin.h"
-#include "wxvbam.h"
+#include "wx/config/option-id.h"
+#include "wx/config/option-proxy.h"
+#include "wx/config/option.h"
+#include "wx/dialogs/validated-child.h"
+#include "wx/rpi.h"
+#include "wx/widgets/option-validator.h"
+#include "wx/widgets/render-plugin.h"
+#include "wx/wxvbam.h"
 
 namespace dialogs {
 

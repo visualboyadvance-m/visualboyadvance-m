@@ -1,11 +1,10 @@
 #ifndef VBAM_WX_WIDGETS_RENDER_PLUGIN_H_
 #define VBAM_WX_WIDGETS_RENDER_PLUGIN_H_
 
-#include <cstdint>
 #include <wx/dynlib.h>
 #include <wx/string.h>
 
-#include "rpi.h"
+#include "wx/rpi.h"
 
 namespace widgets {
 

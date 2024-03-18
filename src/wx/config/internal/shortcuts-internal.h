@@ -5,7 +5,7 @@
 #include <set>
 #include <unordered_map>
 
-#include "config/user-input.h"
+#include "wx/config/user-input.h"
 
 namespace config {
 namespace internal {

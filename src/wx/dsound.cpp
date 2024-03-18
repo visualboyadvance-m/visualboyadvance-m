@@ -1,5 +1,5 @@
 // Application
-#include "wxvbam.h"
+#include "wx/wxvbam.h"
 
 // Internals
 #include "core/base/sound_driver.h"

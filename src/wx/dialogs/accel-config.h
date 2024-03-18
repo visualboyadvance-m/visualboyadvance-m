@@ -6,8 +6,8 @@
 #include <wx/dialog.h>
 #include <wx/treectrl.h>
 
-#include "config/shortcuts.h"
-#include "widgets/keep-on-top-styler.h"
+#include "wx/config/shortcuts.h"
+#include "wx/widgets/keep-on-top-styler.h"
 
 // Forward declarations.
 class wxControl;

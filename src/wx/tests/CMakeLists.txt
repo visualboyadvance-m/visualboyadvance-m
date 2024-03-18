@@ -15,6 +15,12 @@ function(add_doctest_test test_src)
     target_include_directories("${test_name}"
         PRIVATE ${wxWidgets_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/third_party/include)
 
+    target_compile_options("${test_name}" PRIVATE ${wxWidgets_CXX_FLAGS})
+    target_compile_definitions("${test_name}" PRIVATE ${wxWidgets_DEFINITIONS})
+    if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
+        target_compile_definitions("${test_name}" PRIVATE ${wxWidgets_DEFINITIONS_DEBUG})
+    endif()
+
     set_target_properties("${test_name}"
         PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests"

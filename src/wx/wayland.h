@@ -1,5 +1,5 @@
-#ifndef VBAM_WAYLAND_H
-#define VBAM_WAYLAND_H
+#ifndef VBAM_WX_WAYLAND_H_
+#define VBAM_WX_WAYLAND_H_
 
 #include <wx/config.h>
 
@@ -48,4 +48,4 @@ inline void MoveWaylandSubsurface([[maybe_unused]] wxGLCanvas* win) {};
 
 #endif // gtk
 
-#endif // VBAM_WAYLAND_H
+#endif // VBAM_WX_WAYLAND_H_

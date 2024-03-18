@@ -20,6 +20,10 @@ add_compile_definitions(
     __STDC_LIMIT_MACROS
     __STDC_CONSTANT_MACROS
     _CRT_SECURE_NO_WARNINGS
+    _UNICODE
+    UNICODE
+    WINVER=0x0A00
+    NTDDI_VERSION=0x0A000007
     NOMINMAX
 )
 add_compile_options(

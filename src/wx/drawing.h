@@ -1,7 +1,7 @@
-#ifndef GAME_DRAWING_H
-#define GAME_DRAWING_H
+#ifndef VBAM_WX_DRAWING_H_
+#define VBAM_WX_DRAWING_H_
 
-#include "wxvbam.h"
+#include "wx/wxvbam.h"
 
 class BasicDrawingPanel : public DrawingPanel {
 public:
@@ -67,4 +67,4 @@ public:
 };
 #endif
 
-#endif /* GAME_DRAWING_H */
+#endif // VBAM_WX_DRAWING_H_

@@ -3,7 +3,8 @@
 //
 // Please sort.
 
-#include "wxhead.h"
+#include <wx/string.h>
+#include <wx/translation.h>
 
 [[maybe_unused]] void f()
 {

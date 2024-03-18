@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <utility>
 
-#include "config/user-input.h"
+#include "wx/config/user-input.h"
 
 // by default, only 9 recent items
 #define wxID_FILE10 (wxID_FILE9 + 1)

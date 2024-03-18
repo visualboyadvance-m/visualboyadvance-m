@@ -5,11 +5,11 @@
 #include <wx/colordlg.h>
 #include <wx/ffile.h>
 
-#include "config/option-proxy.h"
 #include "core/gb/gbGlobals.h"
 #include "core/gba/gbaGlobals.h"
-#include "viewsupt.h"
-#include "wxvbam.h"
+#include "wx/config/option-proxy.h"
+#include "wx/viewsupt.h"
+#include "wx/wxvbam.h"
 
 namespace {
 void utilReadScreenPixels(uint8_t* dest, int w, int h) {

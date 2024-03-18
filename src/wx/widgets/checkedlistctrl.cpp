@@ -9,6 +9,8 @@
 // Licence:     wxWidgets licence
 /////////////////////////////////////////////////////////////////////////////
 
+#include "wx/widgets/checkedlistctrl.h"
+
 #include <wx/wx.h>
 
 #ifdef __BORLANDC__
@@ -16,7 +18,6 @@
 #endif
 
 // includes
-#include "wx/checkedlistctrl.h"
 #include <wx/icon.h>
 #include <wx/settings.h>
 

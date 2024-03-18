@@ -4,8 +4,8 @@
 
 #include <wx/rawbmp.h>
 
-#include "wxvbam.h"
-#include "drawing.h"
+#include "wx/drawing.h"
+#include "wx/wxvbam.h"
 
 Quartz2DDrawingPanel::Quartz2DDrawingPanel(wxWindow* parent, int _width, int _height)
     : BasicDrawingPanel(parent, _width, _height)

@@ -5,7 +5,7 @@
 #include <wx/string.h>
 #include <set>
 
-#include "widgets/wx/sdljoy.h"
+#include "wx/widgets/sdljoy.h"
 
 namespace config {
 

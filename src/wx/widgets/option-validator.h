@@ -3,7 +3,7 @@
 
 #include <wx/validate.h>
 
-#include "config/option.h"
+#include "wx/config/option.h"
 
 #if wxCHECK_VERSION(3, 1, 1)
 #define WX_HAS_VALIDATOR_SET_WINDOW_OVERRIDE 1

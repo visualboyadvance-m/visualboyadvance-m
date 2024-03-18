@@ -1,10 +1,9 @@
-#include "wx/sdljoy.h"
+#include "wx/widgets/sdljoy.h"
 
-#include <algorithm>
 #include <wx/timer.h>
 #include <SDL.h>
 
-#include "../wxvbam.h"
+#include "wx/wxvbam.h"
 
 namespace {
 

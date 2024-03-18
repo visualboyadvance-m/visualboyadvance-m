@@ -10,7 +10,7 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/XKBlib.h>
-#include "wayland.h"
+#include "wx/wayland.h"
 
 #endif  // defined(__WXMSW__)
 

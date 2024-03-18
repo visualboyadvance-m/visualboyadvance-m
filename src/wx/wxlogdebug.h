@@ -1,5 +1,5 @@
-#ifndef WXLOGDEBUG_H_
-#define WXLOGDEBUG_H_
+#ifndef VBAM_WX_WXLOGDEBUG_H_
+#define VBAM_WX_WXLOGDEBUG_H_
 
 #include <wx/log.h>
 
@@ -20,4 +20,4 @@
     } while(0)
 #endif
 
-#endif /* WXLOGDEBUG_H_ */
+#endif // VBAM_WX_WXLOGDEBUG_H_

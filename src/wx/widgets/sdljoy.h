@@ -1,12 +1,13 @@
-#ifndef _WX_SDLJOY_H
-#define _WX_SDLJOY_H
+#ifndef VBAM_WX_WIDGETS_SDLJOY_H_
+#define VBAM_WX_WIDGETS_SDLJOY_H_
 
 #include <memory>
 #include <set>
-#include <map>
 #include <unordered_map>
+
 #include <wx/time.h>
 #include <wx/event.h>
+
 #include <SDL_joystick.h>
 #include <SDL_gamecontroller.h>
 #include <SDL_events.h>
@@ -152,4 +153,4 @@ private:
     wxLongLong last_poll_ = wxGetUTCTimeMillis();
 };
 
-#endif /* _WX_SDLJOY_H */
+#endif // VBAM_WX_WIDGETS_SDLJOY_H_

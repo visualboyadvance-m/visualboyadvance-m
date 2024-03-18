@@ -9,11 +9,11 @@
 // Licence:     wxWidgets licence
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef _WX_CHECKEDLISTCTRL_H_
-#define _WX_CHECKEDLISTCTRL_H_
+#ifndef VBAM_WX_WIDGETS_CHECKEDLISTCTRL_H_
+#define VBAM_WX_WIDGETS_CHECKEDLISTCTRL_H_
 
 // wxWidgets headers
-#include "wx/webupdatedef.h" // for the WXDLLIMPEXP_WEBUPDATE macro
+#include "wx/widgets/webupdatedef.h" // for the WXDLLIMPEXP_WEBUPDATE macro
 #include <wx/imaglist.h>
 #include <wx/listctrl.h>
 
@@ -179,4 +179,4 @@ private:
 
 #endif // wxUSE_CHECKEDLISTCTRL
 
-#endif // _WX_CHECKEDLISTCTRL_H_
+#endif // VBAM_WX_WIDGETS_CHECKEDLISTCTRL_H_

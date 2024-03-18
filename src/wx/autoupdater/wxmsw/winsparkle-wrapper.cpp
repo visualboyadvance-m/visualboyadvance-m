@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 #include <wx/utils.h>
-#include "wxvbam.h"
+#include "wx/wxvbam.h"
 #include "winsparkle-wrapper.h"
 #include "wx/msw/private.h"
 

@@ -1,48 +1,3 @@
-# From: https://stackoverflow.com/a/41416298/262458
-function(REMOVE_DUPES ARG_STR OUTPUT)
-  set(ARG_LIST ${ARG_STR})
-  separate_arguments(ARG_LIST)
-  list(REMOVE_DUPLICATES ARG_LIST)
-  string (REGEX REPLACE "([^\\]|^);" "\\1 " _TMP_STR "${ARG_LIST}")
-  string (REGEX REPLACE "[\\](.)" "\\1" _TMP_STR "${_TMP_STR}") #fixes escaping
-  set (${OUTPUT} "${_TMP_STR}" PARENT_SCOPE)
-endfunction()
-
-# From: https://stackoverflow.com/a/7216542
-function(JOIN VALUES GLUE OUTPUT)
-  string (REGEX REPLACE "([^\\]|^);" "\\1${GLUE}" _TMP_STR "${VALUES}")
-  string (REGEX REPLACE "[\\](.)" "\\1" _TMP_STR "${_TMP_STR}") #fixes escaping
-  set (${OUTPUT} "${_TMP_STR}" PARENT_SCOPE)
-endfunction()
-
-# On MSYS2 transform wx lib paths to native paths for Ninja.
-function(normalize_wx_paths)
-    if(MSYS)
-        set(libs "")
-
-        foreach(lib ${wxWidgets_LIBRARIES})
-            if(NOT lib MATCHES "^(-Wl,|-mwindows$|-pipe$)")
-                if(lib MATCHES "^/")
-                    cygpath(lib "${lib}")
-                endif()
-
-                if(VBAM_STATIC AND lib MATCHES "^-l(wx.*|jpeg|tiff|jbig|lzma|expat)$")
-                    cygpath(lib "$ENV{MSYSTEM_PREFIX}/lib/lib${CMAKE_MATCH_1}.a")
-                endif()
-
-                list(APPEND libs "${lib}")
-            endif()
-        endforeach()
-
-        set(wxWidgets_LIBRARIES "${libs}" PARENT_SCOPE)
-    endif()
-endfunction()
-
-macro(cleanup_wx_vars)
-    if(wxWidgets_CXX_FLAGS)
-        list(REMOVE_ITEM wxWidgets_CXX_FLAGS -fpermissive)
-    endif()
-endmacro()
 
 function(cygpath var path)
     execute_process(
@@ -157,5 +112,3 @@ function(find_wx_util var util)
         set(${var} ${util} PARENT_SCOPE)
     endforeach()
 endfunction()
-
-# vim:sw=4 sts et:

@@ -1,12 +1,12 @@
-#include "dialogs/gb-rom-info.h"
+#include "wx/dialogs/gb-rom-info.h"
 
 #include <wx/control.h>
 #include <wx/xrc/xmlres.h>
 
 #include "core/base/sizes.h"
 #include "core/gb/gb.h"
-#include "dialogs/game-maker.h"
-#include "dialogs/validated-child.h"
+#include "wx/dialogs/game-maker.h"
+#include "wx/dialogs/validated-child.h"
 
 namespace dialogs {
 
