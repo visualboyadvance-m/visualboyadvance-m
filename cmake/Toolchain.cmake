@@ -42,10 +42,8 @@ include(Toolchain-mingw)
 if(MSVC)
     # This also includes clang-cl.
     include(Toolchain-msvc)
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL GNU OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-    include(Toolchain-gcc-clang)
 else()
-    message(FATAL_ERROR "Unsupported compiler")
+    include(Toolchain-gcc-clang)
 endif()
 
 # Assembler flags.
