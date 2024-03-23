@@ -50,7 +50,7 @@ target_link_libraries(vbam
 )
 
 if(WIN32)
-    target_link_libraries(vbam ${SDL2_LIBRARY} ${SDL2MAIN_LIBRARY})
+    target_link_libraries(vbam SDL3::SDL3)
 endif()
 
 if(ENABLE_LIRC)
@@ -59,7 +59,7 @@ if(ENABLE_LIRC)
 endif()
 
 if(WIN32)
-    target_link_libraries(vbam wsock32 ws2_32 winmm version imm32 ${SDL2MAIN_LIBRARY})
+    target_link_libraries(vbam wsock32 ws2_32 winmm version imm32)
 endif()
 
 # Installation scripts.

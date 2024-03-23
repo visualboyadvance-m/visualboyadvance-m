@@ -47,9 +47,9 @@ private:
 
         SDL_AudioDeviceID sound_device = 0;
 
-        SDL_mutex* mutex;
-        SDL_sem* data_available;
-        SDL_sem* data_read;
+        SDL_Mutex* mutex;
+        SDL_Semaphore* data_available;
+        SDL_Semaphore* data_read;
         SDL_AudioSpec audio_spec;
 
         unsigned short current_rate;

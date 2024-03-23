@@ -37,10 +37,6 @@ SoundSDL::SoundSDL():
     initialized(false)
 {}
 
-void SoundSDL::soundCallback(void* data, uint8_t* stream, int len) {
-    reinterpret_cast<SoundSDL*>(data)->read(reinterpret_cast<uint16_t*>(stream), len);
-}
-
 bool SoundSDL::should_wait() {
     return emulating && !coreOptions.speedup && current_rate && !gba_joybus_active;
 }
@@ -65,7 +61,7 @@ void SoundSDL::read(uint16_t* stream, int length) {
 
     if (!buffer_size()) {
         if (should_wait())
-            SDL_SemWait(data_available);
+            SDL_WaitSemaphore(data_available);
         else
             return;
     }
@@ -76,7 +72,7 @@ void SoundSDL::read(uint16_t* stream, int length) {
 
     SDL_UnlockMutex(mutex);
 
-    SDL_SemPost(data_read);
+    SDL_PostSemaphore(data_read);
 }
 
 void SoundSDL::write(uint16_t * finalWave, int length) {
@@ -85,8 +81,7 @@ void SoundSDL::write(uint16_t * finalWave, int length) {
 
     SDL_LockMutex(mutex);
 
-    if (SDL_GetAudioDeviceStatus(sound_device) != SDL_AUDIO_PLAYING)
-	SDL_PauseAudioDevice(sound_device, 0);
+    SDL_PauseAudioDevice(sound_device);
 
     std::size_t samples = length / 4;
     std::size_t avail;
@@ -99,10 +94,10 @@ void SoundSDL::write(uint16_t * finalWave, int length) {
 
 	SDL_UnlockMutex(mutex);
 
-	SDL_SemPost(data_available);
+	SDL_PostSemaphore(data_available);
 
 	if (should_wait())
-	    SDL_SemWait(data_read);
+	    SDL_WaitSemaphore(data_read);
 	else
 	    // Drop the remainder of the audio data
 	    return;
@@ -124,21 +119,18 @@ bool SoundSDL::init(long sampleRate) {
 
     // for "no throttle" use regular rate, audio is just dropped
     audio.freq     = current_rate ? static_cast<int>(sampleRate * (current_rate / 100.0)) : sampleRate;
-
-    audio.format   = AUDIO_S16SYS;
+    audio.format   = SDL_AUDIO_S16;
     audio.channels = 2;
-    audio.samples  = 2048;
-    audio.callback = soundCallback;
-    audio.userdata = this;
+
+    
 
     if (!SDL_WasInit(SDL_INIT_AUDIO)) SDL_Init(SDL_INIT_AUDIO);
 
-    sound_device = SDL_OpenAudioDevice(NULL, 0, &audio, NULL, 0);
+    //This needs to be better flushed out especially where callback and userdata since that's done differently now
+    //SDL_OpenAudioDevice(deviceID (which can be SDL_AUDIO_DEVICE_DEFAULT_OUTPUT), AudioSpec, callback, userdata) So I need to flesh this out properly.
+    //sound_device needs to be an SDL_AudioStream, but this most probably not the best way to go just yet
 
-    if(sound_device == 0) {
-        std::cerr << "Failed to open audio: " << SDL_GetError() << std::endl;
-        return false;
-    }
+    SDL_AudioStream *sound_device = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_OUTPUT, &audio, NULL, NULL);
 
     samples_buf.reset(static_cast<size_t>(std::ceil(buftime * sampleRate * 2)));
 
@@ -147,10 +139,10 @@ bool SoundSDL::init(long sampleRate) {
     data_read      = SDL_CreateSemaphore(1);
 
     // turn off audio events because we are not processing them
-#if SDL_VERSION_ATLEAST(2, 0, 4)
-    SDL_EventState(SDL_AUDIODEVICEADDED,   SDL_IGNORE);
-    SDL_EventState(SDL_AUDIODEVICEREMOVED, SDL_IGNORE);
-#endif
+//#if SDL_VERSION_ATLEAST(2, 0, 4)
+//    SDL_EventState(SDL_EVENT_AUDIO_DEVICE_ADDED);
+//    SDL_EventState(SDL_EVENT_AUDIO_DEVICE_REMOVED);
+//#endif
 
     return initialized = true;
 }
@@ -164,8 +156,8 @@ void SoundSDL::deinit() {
     SDL_LockMutex(mutex);
     int is_emulating = emulating;
     emulating = 0;
-    SDL_SemPost(data_available);
-    SDL_SemPost(data_read);
+    SDL_PostSemaphore(data_available);
+    SDL_PostSemaphore(data_read);
     SDL_UnlockMutex(mutex);
 
     SDL_Delay(100);

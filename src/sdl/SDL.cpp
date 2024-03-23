@@ -809,7 +809,7 @@ void sdlReadDesktopVideoMode()
 {
     if (window) {
         SDL_DisplayMode dm;
-        SDL_GetDesktopDisplayMode(SDL_GetWindowDisplayIndex(window), &dm);
+        SDL_GetDesktopDisplayMode(SDL_GetDisplayForWindow(window), &dm);
         desktopWidth = dm.w;
         desktopHeight = dm.h;
     }
@@ -829,7 +829,7 @@ static void sdlResizeVideo()
     }
 
     if (surface)
-        SDL_FreeSurface(surface);
+        SDL_DestroySurface(surface);
     if (texture)
         SDL_DestroyTexture(texture);
 
@@ -924,13 +924,13 @@ void sdlInitVideo()
 }
 
 #ifndef KMOD_META
-#define KMOD_META KMOD_GUI
+#define KMOD_META SDL_KMOD_GUI
 #endif
 
-#define MOD_KEYS (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_META)
-#define MOD_NOCTRL (KMOD_SHIFT | KMOD_ALT | KMOD_META)
-#define MOD_NOALT (KMOD_CTRL | KMOD_SHIFT | KMOD_META)
-#define MOD_NOSHIFT (KMOD_CTRL | KMOD_ALT | KMOD_META)
+#define MOD_KEYS (SDL_KMOD_CTRL | SDL_KMOD_SHIFT | SDL_KMOD_ALT | KMOD_META)
+#define MOD_NOCTRL (SDL_KMOD_SHIFT | SDL_KMOD_ALT | KMOD_META)
+#define MOD_NOALT (SDL_KMOD_CTRL | SDL_KMOD_SHIFT | KMOD_META)
+#define MOD_NOSHIFT (SDL_KMOD_CTRL | SDL_KMOD_ALT | KMOD_META)
 
 /*
  * 04.02.2008 (xKiv): factored out from sdlPollEvents
@@ -1052,12 +1052,12 @@ void sdlPollEvents()
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
-        case SDL_QUIT:
+        case SDL_EVENT_QUIT:
             emulating = 0;
             break;
         case SDL_WINDOWEVENT:
             switch (event.window.event) {
-            case SDL_WINDOWEVENT_FOCUS_GAINED:
+            case SDL_EVENT_WINDOW_FOCUS_GAINED:
                 if (pauseWhenInactive)
                     if (paused) {
                         if (emulating) {
@@ -1066,7 +1066,7 @@ void sdlPollEvents()
                         }
                     }
                 break;
-            case SDL_WINDOWEVENT_FOCUS_LOST:
+            case SDL_EVENT_WINDOW_FOCUS_LOST:
                 if (pauseWhenInactive) {
                     wasPaused = true;
                     if (emulating) {
@@ -1077,31 +1077,31 @@ void sdlPollEvents()
                     memset(delta, 255, delta_size);
                 }
                 break;
-            case SDL_WINDOWEVENT_RESIZED:
+            case SDL_EVENT_WINDOW_RESIZED:
                 if (openGL)
                     sdlOpenGLScaleWithAspect(event.window.data1, event.window.data2);
                 break;
             }
             break;
-        case SDL_MOUSEMOTION:
-        case SDL_MOUSEBUTTONUP:
-        case SDL_MOUSEBUTTONDOWN:
+        case SDL_EVENT_MOUSE_MOTION:
+        case SDL_EVENT_MOUSE_BUTTON_UP:
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
             if (fullScreen) {
                 SDL_ShowCursor(SDL_ENABLE);
                 mouseCounter = 120;
             }
             break;
-        case SDL_JOYHATMOTION:
-        case SDL_JOYBUTTONDOWN:
-        case SDL_JOYBUTTONUP:
-        case SDL_JOYAXISMOTION:
-        case SDL_KEYDOWN:
+        case SDL_EVENT_JOYSTICK_HAT_MOTION:
+        case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
+        case SDL_EVENT_JOYSTICK_BUTTON_UP:
+        case SDL_EVENT_JOYSTICK_AXIS_MOTION:
+        case SDL_EVENT_KEY_DOWN:
             inputProcessSDLEvent(event);
             break;
-        case SDL_KEYUP:
+        case SDL_EVENT_KEY_UP:
             switch (event.key.keysym.sym) {
             case SDLK_r:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & SDL_KMOD_CTRL)) {
                     if (emulating) {
                         emulator.emuReset();
 
@@ -1110,30 +1110,30 @@ void sdlPollEvents()
                 }
                 break;
             case SDLK_b:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL))
+                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & SDL_KMOD_CTRL))
                     change_rewind(-1);
                 break;
             case SDLK_v:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL))
+                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & SDL_KMOD_CTRL))
                     change_rewind(+1);
                 break;
             case SDLK_h:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL))
+                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & SDL_KMOD_CTRL))
                     change_rewind(0);
                 break;
             case SDLK_j:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL))
+                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & SDL_KMOD_CTRL))
                     change_rewind((rewindTopPos - rewindPos) * ((rewindTopPos > rewindPos) ? +1 : -1));
                 break;
             case SDLK_e:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & SDL_KMOD_CTRL)) {
                     coreOptions.cheatsEnabled = !coreOptions.cheatsEnabled;
                     systemConsoleMessage(coreOptions.cheatsEnabled ? "Cheats on" : "Cheats off");
                 }
                 break;
 
             case SDLK_s:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & SDL_KMOD_CTRL)) {
                     if (sdlSoundToggledOff) { // was off
                         // restore saved state
                         soundSetEnable(sdlSoundToggledOff);
@@ -1196,7 +1196,7 @@ void sdlPollEvents()
                 break;
 
             case SDLK_p:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & SDL_KMOD_CTRL)) {
                     paused = !paused;
                     if (paused)
                         soundPause();
@@ -1211,7 +1211,7 @@ void sdlPollEvents()
                 emulating = 0;
                 break;
             case SDLK_f:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & SDL_KMOD_CTRL)) {
                     fullScreen = !fullScreen;
                     SDL_SetWindowFullscreen(window, fullScreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
                     if (openGL) {
@@ -1224,7 +1224,7 @@ void sdlPollEvents()
                 }
                 break;
             case SDLK_g:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & SDL_KMOD_CTRL)) {
                     filterFunction = 0;
                     while (!filterFunction) {
                         filter = (Filter)((filter + 1) % kInvalidFilter);
@@ -1256,7 +1256,7 @@ void sdlPollEvents()
             case SDLK_F6:
             case SDLK_F7:
             case SDLK_F8:
-                if (!(event.key.keysym.mod & MOD_NOSHIFT) && (event.key.keysym.mod & KMOD_SHIFT)) {
+                if (!(event.key.keysym.mod & MOD_NOSHIFT) && (event.key.keysym.mod & SDL_KMOD_SHIFT)) {
                     sdlHandleSavestateKey(event.key.keysym.sym - SDLK_F1, 1); // with SHIFT
                 } else if (!(event.key.keysym.mod & MOD_KEYS)) {
                     sdlHandleSavestateKey(event.key.keysym.sym - SDLK_F1, 0); // without SHIFT
@@ -1281,7 +1281,7 @@ void sdlPollEvents()
             case SDLK_2:
             case SDLK_3:
             case SDLK_4:
-                if (!(event.key.keysym.mod & MOD_NOALT) && (event.key.keysym.mod & KMOD_ALT)) {
+                if (!(event.key.keysym.mod & MOD_NOALT) && (event.key.keysym.mod & SDL_KMOD_ALT)) {
                     const char* disableMessages[4] = { "autofire A disabled",
                         "autofire B disabled",
                         "autofire R disabled",
@@ -1306,7 +1306,7 @@ void sdlPollEvents()
                     } else {
                         systemScreenMessage(disableMessages[event.key.keysym.sym - SDLK_1]);
                     }
-                } else if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+                } else if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & SDL_KMOD_CTRL)) {
                     int mask = 0x0100 << (event.key.keysym.sym - SDLK_1);
                     coreOptions.layerSettings ^= mask;
                     coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
@@ -1317,14 +1317,14 @@ void sdlPollEvents()
             case SDLK_6:
             case SDLK_7:
             case SDLK_8:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & SDL_KMOD_CTRL)) {
                     int mask = 0x0100 << (event.key.keysym.sym - SDLK_1);
                     coreOptions.layerSettings ^= mask;
                     coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
                 }
                 break;
             case SDLK_n:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & SDL_KMOD_CTRL)) {
                     if (paused)
                         paused = false;
                     pauseNextFrame = true;
@@ -2062,7 +2062,7 @@ void systemDrawScreen()
     } else {
         SDL_UnlockSurface(surface);
         SDL_UpdateTexture(texture, NULL, surface->pixels, surface->pitch);
-        SDL_RenderCopy(renderer, texture, NULL, NULL);
+        SDL_RenderTexture(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
     }
 }

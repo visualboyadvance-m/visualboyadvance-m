@@ -6,9 +6,9 @@ target_sources(vbam-components-audio-sdl
 )
 
 target_include_directories(vbam-components-audio-sdl
-    PUBLIC ${SDL2_INCLUDE_DIRS}
+    PUBLIC ${SDL3_INCLUDE_DIRS}
 )
 
 target_link_libraries(vbam-components-audio-sdl
-    PUBLIC vbam-core-base ${VBAM_SDL2_LIBS}
+    PUBLIC vbam-core-base ${VBAM_SDL3_LIBS}
 )

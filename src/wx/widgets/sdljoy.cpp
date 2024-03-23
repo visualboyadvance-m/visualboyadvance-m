@@ -55,7 +55,7 @@ wxJoyControl HatStatusToJoyControl(const uint8_t status) {
 } // namespace
 
 // For testing a GameController as a Joystick:
-//#define SDL_IsGameController(x) false
+//#define SDL_IsGamepad(x) false
 
 // static
 wxJoystick wxJoystick::Invalid() {
@@ -148,7 +148,7 @@ private:
     SDL_JoystickID joystick_id_;
 
     // The SDL GameController instance.
-    SDL_GameController* game_controller_ = nullptr;
+    SDL_Gamepad* game_controller_ = nullptr;
 
     // The SDL Joystick instance.
     SDL_Joystick* sdl_joystick_ = nullptr;
@@ -171,21 +171,21 @@ wxSDLJoyState::wxSDLJoyState(int sdl_index)
 
 wxSDLJoyState::wxSDLJoyState(wxJoystick joystick) : wx_joystick_(joystick) {
     int sdl_index = wx_joystick_.sdl_index_;
-    if (SDL_IsGameController(sdl_index)) {
-        game_controller_ = SDL_GameControllerOpen(sdl_index);
+    if (SDL_IsGamepad(sdl_index)) {
+        game_controller_ = SDL_GamepadOpen(sdl_index);
         if (game_controller_)
-            sdl_joystick_ = SDL_GameControllerGetJoystick(game_controller_);
+            sdl_joystick_ = SDL_GamepadGetJoystick(game_controller_);
     } else {
-        sdl_joystick_ = SDL_JoystickOpen(sdl_index);
+        sdl_joystick_ = SDL_OpenJoystick(sdl_index);
     }
 
     if (!sdl_joystick_)
         return;
 
-    joystick_id_ = SDL_JoystickInstanceID(sdl_joystick_);
+    joystick_id_ = SDL_GetJoystickInstanceID(sdl_joystick_);
     systemScreenMessage(
         wxString::Format(_("Connected %s: %s"),
-            wx_joystick_.ToString(), SDL_JoystickNameForIndex(sdl_index)));
+            wx_joystick_.ToString(), SDL_GetJoystickNameForIndex(sdl_index)));
 }
 
 wxSDLJoyState::~wxSDLJoyState() {
@@ -194,9 +194,9 @@ wxSDLJoyState::~wxSDLJoyState() {
         return;
 
     if (game_controller_)
-        SDL_GameControllerClose(game_controller_);
+        SDL_GamepadClose(game_controller_);
     else
-        SDL_JoystickClose(sdl_joystick_);
+        SDL_CloseJoystick(sdl_joystick_);
 
     systemScreenMessage(
         wxString::Format(_("Disconnected %s"), wx_joystick_.ToString()));
@@ -322,11 +322,11 @@ void wxSDLJoyState::SetRumble(bool activate_rumble) {
         return;
 
     if (rumbling_) {
-        SDL_GameControllerRumble(game_controller_, 0xFFFF, 0xFFFF, 300);
+        SDL_GamepadRumble(game_controller_, 0xFFFF, 0xFFFF, 300);
         if (!IsRunning())
             Start(150);
     } else {
-        SDL_GameControllerRumble(game_controller_, 0, 0, 0);
+        SDL_GamepadRumble(game_controller_, 0, 0, 0);
         Stop();
     }
 #endif
@@ -339,8 +339,8 @@ void wxSDLJoyState::Notify() {
 wxJoyPoller::wxJoyPoller() {
     // Start up joystick if not already started
     // FIXME: check for errors
-    SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
-    SDL_GameControllerEventState(SDL_ENABLE);
+    SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD);
+    SDL_GamepadEventState(SDL_ENABLE);
     SDL_JoystickEventState(SDL_ENABLE);
 }
 
@@ -348,7 +348,7 @@ wxJoyPoller::~wxJoyPoller() {
     // It is necessary to free all SDL resources before quitting SDL.
     joystick_states_.clear();
     SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
-    SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
+    SDL_QuitSubSystem(SDL_INIT_GAMEPAD);
 }
 
 void wxJoyPoller::Poll() {
@@ -357,8 +357,8 @@ void wxJoyPoller::Poll() {
 
     while (SDL_PollEvent(&e)) {
         switch (e.type) {
-        case SDL_CONTROLLERBUTTONDOWN:
-        case SDL_CONTROLLERBUTTONUP:
+        case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+        case SDL_EVENT_GAMEPAD_BUTTON_UP:
             joy_state = FindJoyState(e.cbutton.which);
             if (joy_state) {
                 joy_state->ProcessButtonEvent(
@@ -366,7 +366,7 @@ void wxJoyPoller::Poll() {
             }
             break;
 
-        case SDL_CONTROLLERAXISMOTION:
+        case SDL_EVENT_GAMEPAD_AXIS_MOTION:
             joy_state = FindJoyState(e.caxis.which);
             if (joy_state) {
                 joy_state->ProcessAxisEvent(
@@ -374,15 +374,15 @@ void wxJoyPoller::Poll() {
             }
             break;
 
-        case SDL_CONTROLLERDEVICEADDED:
-        case SDL_CONTROLLERDEVICEREMOVED:
+        case SDL_EVENT_GAMEPAD_ADDED:
+        case SDL_EVENT_GAMEPAD_REMOVED:
             // Do nothing. This will be handled with JOYDEVICEADDED and
             // JOYDEVICEREMOVED events.
             break;
 
         // Joystick events for non-GameControllers.
-        case SDL_JOYBUTTONDOWN:
-        case SDL_JOYBUTTONUP:
+        case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
+        case SDL_EVENT_JOYSTICK_BUTTON_UP:
             joy_state = FindJoyState(e.jbutton.which);
             if (joy_state && !joy_state->is_game_controller()) {
                 joy_state->ProcessButtonEvent(
@@ -390,7 +390,7 @@ void wxJoyPoller::Poll() {
             }
             break;
 
-        case SDL_JOYAXISMOTION:
+        case SDL_EVENT_JOYSTICK_AXIS_MOTION:
             joy_state = FindJoyState(e.jaxis.which);
             if (joy_state && !joy_state->is_game_controller()) {
                 joy_state->ProcessAxisEvent(
@@ -398,7 +398,7 @@ void wxJoyPoller::Poll() {
             }
             break;
 
-        case SDL_JOYHATMOTION:
+        case SDL_EVENT_JOYSTICK_HAT_MOTION:
             joy_state = FindJoyState(e.jhat.which);
             if (joy_state && !joy_state->is_game_controller()) {
                 joy_state->ProcessHatEvent(
@@ -406,12 +406,12 @@ void wxJoyPoller::Poll() {
             }
             break;
 
-        case SDL_JOYDEVICEADDED:
+        case SDL_EVENT_JOYSTICK_ADDED:
             // Always remap all controllers.
             RemapControllers();
             break;
 
-        case SDL_JOYDEVICEREMOVED:
+        case SDL_EVENT_JOYSTICK_REMOVED:
             joystick_states_.erase(e.jdevice.which);
             break;
         }

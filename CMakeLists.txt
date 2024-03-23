@@ -15,7 +15,7 @@ if(TAG_RELEASE)
     include(MakeReleaseCommitAndTag)
 endif()
 
-set(VCPKG_DEPS pkgconf zlib pthreads "sdl2[samplerate]" gettext wxwidgets)
+set(VCPKG_DEPS pkgconf zlib pthreads "sdl3[samplerate]" gettext wxwidgets)
 
 set(VCPKG_DEPS_OPTIONAL
     sfml   ENABLE_LINK
@@ -194,10 +194,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
 endif()
 
 find_package(OpenGL REQUIRED)
-find_package(SDL2   REQUIRED)
+find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3)
 
 # Add libsamplerate to SDL2 with vcpkg
-unset(SDL2_LIBRARY_TEMP)
+#unset(SDL2_LIBRARY_TEMP)
 if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     if(WIN32)
         unset(arch_suffix)
@@ -210,13 +210,13 @@ if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
         endif()
         set(installed_prefix ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix}/${path_prefix})
 
-        SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} ${installed_prefix}/lib/samplerate.lib)
-    else()
-        SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} -lsamplerate)
+        #SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} ${installed_prefix}/lib/samplerate.lib)
+    #else()
+        #SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} -lsamplerate)
     endif()
 endif()
 
-set(VBAM_SDL2_LIBS SDL2::SDL2 ${SDL2_LIBRARY_TEMP})
+set(VBAM_SDL3_LIBS SDL3::SDL3)
 
 set(VBAM_GENERATED_DIR ${CMAKE_BINARY_DIR}/generated)
 
