@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-06 18:49+0800\n"
+"POT-Creation-Date: 2024-03-26 22:17+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Greg@Cyberdyne, 2018\n"
 "Language-Team: Hungarian (Hungary) (http://app.transifex.com/bgk/vba-m/language/hu_HU/)\n"
@@ -20,284 +20,7 @@ msgstr ""
 "Language: hu_HU\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: wxvbam.cpp:393 wxvbam.cpp:410
-#, c-format
-msgid "Invalid configuration file provided: %s"
-msgstr ""
-
-#: wxvbam.cpp:554
-msgid "Could not create main window"
-msgstr "A főablak nem nyitható meg"
-
-#: wxvbam.cpp:635
-msgid "Save built-in XRC file and exit"
-msgstr "Beépített XRC fájl mentése és kilépés"
-
-#: wxvbam.cpp:638
-msgid "Save built-in vba-over.ini and exit"
-msgstr "Beépített vba-over.ini mentése és kilépés"
-
-#: wxvbam.cpp:641
-msgid "Print configuration path and exit"
-msgstr "Konfigurációs útvonal kiírása és kilépés"
-
-#: wxvbam.cpp:644
-msgid "Start in full-screen mode"
-msgstr "Indítás teljesképernyős módban"
-
-#: wxvbam.cpp:647
-msgid "Set a configuration file"
-msgstr "Adj meg konfigurációs fájlt"
-
-#: wxvbam.cpp:651
-msgid "Delete shared link state first, if it exists"
-msgstr "Megosztott hivatkozás állapotának törlése elsőként, ha létezik"
-
-#: wxvbam.cpp:658
-msgid "List all settable options and exit"
-msgstr "Összes beállítható elem listázása, majd kilépés"
-
-#: wxvbam.cpp:661
-msgid "ROM file"
-msgstr "ROM fájl"
-
-#: wxvbam.cpp:663
-msgid "<config>=<value>"
-msgstr "<elem>=<érték>"
-
-#: wxvbam.cpp:694
-msgid "Configuration / build error: can't find built-in xrc"
-msgstr ""
-
-#: wxvbam.cpp:702
-#, c-format
-msgid ""
-"Wrote built-in configuration to %s.\n"
-"To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr ""
-
-#: wxvbam.cpp:716
-msgid "Configuration is read from, in order:"
-msgstr "Kiolvasási sorrendben, a konfiguráció a következő:"
-
-#: wxvbam.cpp:730
-#, c-format
-msgid ""
-"Wrote built-in override file to %s\n"
-"To override, delete all but changed section. First found section is used from search path:"
-msgstr ""
-
-#: wxvbam.cpp:736
-msgid ""
-"\n"
-"\tbuilt-in"
-msgstr "\n\tbeépített"
-
-#: wxvbam.cpp:751
-msgid ""
-"Options set from the command line are saved if any configuration changes are made in the user interface.\n"
-"\n"
-"For flag options, true and false are specified as 1 and 0, respectively.\n"
-"\n"
-msgstr "A parancssorból kezdeményezett beállítási módosítások akkor kerülnek mentésre, ha a felhasználói felületről is változtatás történik.\n\nFájljelölő beállításoknál, a TRUE és FALSE, 1 és 0-ként lesz meghatározva.\n\n"
-
-#: wxvbam.cpp:759
-msgid ""
-"The commands available for the Keyboard/* option are:\n"
-"\n"
-msgstr "A billentyűzethez rendelkezésre álló parancsok:\n\n"
-
-#: wxvbam.cpp:770
-msgid "Configuration file not found."
-msgstr "A konfigurációs fájl nem található."
-
-#: wxvbam.cpp:801
-msgid "Bad configuration option or multiple ROM files given:\n"
-msgstr "Hibás konfigurációs beállítás, vagy több ROM fájl lett megadva:\n"
-
-#: guiinit.cpp:104
-msgid "Start!"
-msgstr "Kezdés!"
-
-#: guiinit.cpp:123
-msgid "Connect"
-msgstr "Csatlakozás"
-
-#: guiinit.cpp:140
-msgid "You must enter a valid host name"
-msgstr "Adj meg egy létező gazda nevet"
-
-#: guiinit.cpp:141
-msgid "Host name invalid"
-msgstr "A gazdanév nem létezik"
-
-#: guiinit.cpp:159
-msgid "Waiting for clients..."
-msgstr "Várakozás kliensekre..."
-
-#: guiinit.cpp:160
-#, c-format
-msgid "Server IP address is: %s\n"
-msgstr "A szerver IP címe: %s\n"
-
-#: guiinit.cpp:162
-msgid "Waiting for connection..."
-msgstr "Várakozás kapcsolódásra..."
-
-#: guiinit.cpp:163
-#, c-format
-msgid "Connecting to %s\n"
-msgstr "Kapcsolódás ehhez: %s\n"
-
-#: guiinit.cpp:196
-msgid ""
-"Error occurred.\n"
-"Please try again."
-msgstr "Hiba történt.\nPróbáld újra."
-
-#: guiinit.cpp:263 guiinit.cpp:316
-msgid "Select cheat file"
-msgstr "Válassz csalás fájlt"
-
-#: guiinit.cpp:264
-msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
-msgstr "VBA csaláslista (*.clt)|*.clt|CHT csaláslista (*.cht)|*.cht"
-
-#: guiinit.cpp:283 panel.cpp:517
-msgid "Loaded cheats"
-msgstr "Betöltött csalások"
-
-#: guiinit.cpp:317
-msgid "VBA cheat lists (*.clt)|*.clt"
-msgstr "VBA csaláslista (*.clt)|*.clt"
-
-#: guiinit.cpp:335
-msgid "Saved cheats"
-msgstr "Mentett csalások"
-
-#: guiinit.cpp:366 guiinit.cpp:385
-msgid "Restore old values?"
-msgstr "Visszaállítod a régi értékeket?"
-
-#: guiinit.cpp:367 guiinit.cpp:386
-msgid "Removing cheats"
-msgstr "Csalások eltávolítása"
-
-#: guiinit.cpp:781
-msgid "Generic Code"
-msgstr "Általános Kód"
-
-#: guiinit.cpp:853 guiinit.cpp:1108
-msgid "Number cannot be empty"
-msgstr "A szám mező nem lehet üres"
-
-#: guiinit.cpp:903
-msgid "Search produced no results"
-msgstr "A keresés nem járt eredménnyel"
-
-#: guiinit.cpp:1066
-msgid "8-bit "
-msgstr "8-bit "
-
-#: guiinit.cpp:1070
-msgid "16-bit "
-msgstr "16-bit "
-
-#: guiinit.cpp:1074
-msgid "32-bit "
-msgstr "32-bit "
-
-#: guiinit.cpp:1080
-msgid "signed decimal"
-msgstr "előjeles decimális"
-
-#: guiinit.cpp:1084
-msgid "unsigned decimal"
-msgstr "előjel nélküli decimális"
-
-#: guiinit.cpp:1088
-msgid "unsigned hexadecimal"
-msgstr "előjel nélküli hexadecimális"
-
-#: guiinit.cpp:1489
-#, c-format
-msgid "%d frames = %.2f ms"
-msgstr "%d képkocka = %.2f ms"
-
-#: guiinit.cpp:1501
-msgid "Default device"
-msgstr "Alapértelmezett eszköz"
-
-#: guiinit.cpp:1920
-msgid "Main icon not found"
-msgstr "A főikon nem található"
-
-#: guiinit.cpp:1938
-msgid "Main display panel not found"
-msgstr "A főkijelző nem található"
-
-#: guiinit.cpp:2197
-#, c-format
-msgid "Invalid menu item %s; removing"
-msgstr "A %s érvénytelen menüelem; eltávolítás"
-
-#: guiinit.cpp:2382
-msgid "Code"
-msgstr "Kód"
-
-#: guiinit.cpp:2391
-msgid "Description"
-msgstr "Leírás"
-
-#: guiinit.cpp:2465 xrc/CheatAdd.xrc:31
-msgid "Address"
-msgstr "Cím"
-
-#: guiinit.cpp:2466
-msgid "Old Value"
-msgstr "Régi Érték"
-
-#: guiinit.cpp:2467
-msgid "New Value"
-msgstr "Új Érték"
-
-#: guiinit.cpp:2796
-msgid "JoyBus host invalid; disabling"
-msgstr "A JoyBus gazda érvénytelen; letiltás"
-
-#: viewers.cpp:561
-msgid "Text files (*.txt;*.log)|*.txt;*.log|"
-msgstr "Szövegfájlok (*.txt;*.log)|*.txt;*.log|"
-
-#: viewers.cpp:563 viewers.cpp:773 gfxviewers.cpp:1603 gfxviewers.cpp:1746
-#: cmdevents.cpp:670 cmdevents.cpp:748 cmdevents.cpp:818 cmdevents.cpp:889
-#: viewsupt.cpp:1183
-msgid "Select output file"
-msgstr "Válassz kimeneti fájlt"
-
-#: viewers.cpp:699 viewers.cpp:771
-msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
-msgstr "Memória kiirások (*.dmp;*.bin)|*.dmp;*.bin|"
-
-#: viewers.cpp:701
-msgid "Select memory dump file"
-msgstr "Válassz memória kiírás fájlt"
-
-#: gfxviewers.cpp:1143
-msgid "Select output file and type"
-msgstr "Válassz kimeneti típust és fájlt"
-
-#: gfxviewers.cpp:1144
-msgid ""
-"Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
-"Table (*.act)|*.act"
-msgstr "Windows Paletta (*.pal)|*.pal|PaintShop Paletta (*.pal)|*.pal|Adobe Színtábla (*.act)|*.act"
-
-#: gfxviewers.cpp:1604 gfxviewers.cpp:1747 cmdevents.cpp:671 viewsupt.cpp:1184
-msgid "PNG images|*.png|BMP images|*.bmp"
-msgstr "PNG képek|*.png|BMP képek|*.bmp"
-
-#: cmdevents.cpp:129
+#: cmdevents.cpp:136
 msgid ""
 "Game Boy Advance Files "
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
@@ -305,262 +28,272 @@ msgid ""
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr ""
 
-#: cmdevents.cpp:140
+#: cmdevents.cpp:147
 msgid "Open ROM file"
 msgstr "ROM fájl megnyitása"
 
-#: cmdevents.cpp:161
+#: cmdevents.cpp:168
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr ""
 
-#: cmdevents.cpp:167
+#: cmdevents.cpp:174
 msgid "Open GB ROM file"
 msgstr "GB ROM fájl megnyitása"
 
-#: cmdevents.cpp:188
+#: cmdevents.cpp:195
 msgid ""
 "Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr ""
 
-#: cmdevents.cpp:194
+#: cmdevents.cpp:201
 msgid "Open GBC ROM file"
 msgstr "GBC ROM fájl megnyitása"
 
-#: cmdevents.cpp:359 cmdevents.cpp:381
+#: cmdevents.cpp:366 cmdevents.cpp:388
 msgid "Select Dot Code file"
 msgstr "Válassz Dot Code fájlt"
 
-#: cmdevents.cpp:361 cmdevents.cpp:383
+#: cmdevents.cpp:368 cmdevents.cpp:390
 msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 msgstr "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 
-#: cmdevents.cpp:402 cmdevents.cpp:597
+#: cmdevents.cpp:409 cmdevents.cpp:604
 msgid "Select battery file"
 msgstr "Válassz battery fájlt"
 
-#: cmdevents.cpp:403 cmdevents.cpp:598
+#: cmdevents.cpp:410 cmdevents.cpp:605
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "Battery fájl (*.sav)|*.sav|Flash mentés (*.dat)|*.dat"
 
-#: cmdevents.cpp:411
+#: cmdevents.cpp:418
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
 msgstr ""
 
-#: cmdevents.cpp:412 cmdevents.cpp:440 cmdevents.cpp:560
+#: cmdevents.cpp:419 cmdevents.cpp:447 cmdevents.cpp:567
 msgid "Confirm import"
 msgstr "Importálás megerősítése"
 
-#: cmdevents.cpp:418 panel.cpp:460
+#: cmdevents.cpp:425 panel.cpp:470
 #, c-format
 msgid "Loaded battery %s"
 msgstr "%s battery betöltve"
 
-#: cmdevents.cpp:420
+#: cmdevents.cpp:427
 #, c-format
 msgid "Error loading battery %s"
 msgstr "% battery betöltése sikertelen"
 
-#: cmdevents.cpp:429
+#: cmdevents.cpp:436
 msgid "Select code file"
 msgstr "Válassz code fájlt"
 
-#: cmdevents.cpp:430
+#: cmdevents.cpp:437
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
 msgstr ""
 
-#: cmdevents.cpp:430
+#: cmdevents.cpp:437
 msgid "Game Shark Code File (*.gcf)|*.gcf"
 msgstr ""
 
-#: cmdevents.cpp:439
+#: cmdevents.cpp:446
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
 msgstr ""
 
-#: cmdevents.cpp:456
+#: cmdevents.cpp:463
 #, c-format
 msgid "Cannot open file %s"
 msgstr "A %s megnyitása nem lehetséges"
 
-#: cmdevents.cpp:466
+#: cmdevents.cpp:473
 #, c-format
 msgid "Unsupported code file %s"
 msgstr "A %s nem támogatott code fájl"
 
-#: cmdevents.cpp:536
+#: cmdevents.cpp:543
 #, c-format
 msgid "Loaded code file %s"
 msgstr "%s code fájl betöltve"
 
-#: cmdevents.cpp:538
+#: cmdevents.cpp:545
 #, c-format
 msgid "Error loading code file %s"
 msgstr "A %s code fájl betöltése sikertelen"
 
-#: cmdevents.cpp:549 cmdevents.cpp:625
+#: cmdevents.cpp:556 cmdevents.cpp:632
 msgid "Select snapshot file"
 msgstr "Válassz pillanatkép fájlt"
 
-#: cmdevents.cpp:550
+#: cmdevents.cpp:557
 msgid ""
 "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
 " (*.gsv)|*.gsv"
 msgstr ""
 
-#: cmdevents.cpp:550
+#: cmdevents.cpp:557
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
 msgstr ""
 
-#: cmdevents.cpp:559
+#: cmdevents.cpp:566
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
 msgstr ""
 
-#: cmdevents.cpp:584
+#: cmdevents.cpp:591
 #, c-format
 msgid "Loaded snapshot file %s"
 msgstr "A %s pillanatkép fájl betöltve"
 
-#: cmdevents.cpp:586
+#: cmdevents.cpp:593
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr "A %s pillanatkép fájl betöltése sikertelen"
 
-#: cmdevents.cpp:609
+#: cmdevents.cpp:616
 #, c-format
 msgid "Wrote battery %s"
 msgstr "%s battery megírva"
 
-#: cmdevents.cpp:611 panel.cpp:772
+#: cmdevents.cpp:618 panel.cpp:782
 #, c-format
 msgid "Error writing battery %s"
 msgstr "A %s battery írása sikertelen"
 
-#: cmdevents.cpp:619
+#: cmdevents.cpp:626
 msgid "EEPROM saves cannot be exported"
 msgstr "Az EEPROM mentések nem exportálhatók"
 
-#: cmdevents.cpp:626
+#: cmdevents.cpp:633
 msgid "Game Shark Snapshot (*.sps)|*.sps"
 msgstr ""
 
-#: cmdevents.cpp:640
+#: cmdevents.cpp:647
 msgid "Exported from Visual Boy Advance-M"
 msgstr ""
 
-#: cmdevents.cpp:652
+#: cmdevents.cpp:659
 #, c-format
 msgid "Saved snapshot file %s"
 msgstr "A %s pillanatkép fájl mentve"
 
-#: cmdevents.cpp:654
+#: cmdevents.cpp:661
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr "A %s pillanatkép fájl mentése sikertelen"
 
-#: cmdevents.cpp:695 sys.cpp:574
+#: cmdevents.cpp:677 cmdevents.cpp:755 cmdevents.cpp:825 cmdevents.cpp:894
+#: gfxviewers.cpp:1662 gfxviewers.cpp:1805 viewers.cpp:564 viewers.cpp:778
+#: viewsupt.cpp:1188
+msgid "Select output file"
+msgstr "Válassz kimeneti fájlt"
+
+#: cmdevents.cpp:678 gfxviewers.cpp:1663 gfxviewers.cpp:1806 viewsupt.cpp:1189
+msgid "PNG images|*.png|BMP images|*.bmp"
+msgstr "PNG képek|*.png|BMP képek|*.bmp"
+
+#: cmdevents.cpp:702 sys.cpp:578
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "A %s pillanatkép kiírva"
 
-#: cmdevents.cpp:716 cmdevents.cpp:786 cmdevents.cpp:857 cmdevents.cpp:923
+#: cmdevents.cpp:723 cmdevents.cpp:793 cmdevents.cpp:862 cmdevents.cpp:928
 msgid " files ("
 msgstr " fájlok ("
 
-#: cmdevents.cpp:956
+#: cmdevents.cpp:961
 msgid "Select file"
 msgstr "Válassz fájlt"
 
-#: cmdevents.cpp:1260 cmdevents.cpp:1353
+#: cmdevents.cpp:1265 cmdevents.cpp:1358
 msgid "Select state file"
 msgstr "Válassz mentett játékállást"
 
-#: cmdevents.cpp:1261 cmdevents.cpp:1354
+#: cmdevents.cpp:1266 cmdevents.cpp:1359
 msgid "Visual Boy Advance saved game files|*.sgm"
 msgstr ""
 
-#: cmdevents.cpp:1384 cmdevents.cpp:1394 cmdevents.cpp:1405
+#: cmdevents.cpp:1389 cmdevents.cpp:1399 cmdevents.cpp:1410
 #, c-format
 msgid "Current state slot #%d"
 msgstr "#%d Játékállás hely"
 
-#: cmdevents.cpp:1470
+#: cmdevents.cpp:1473
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
 msgstr ""
 
-#: cmdevents.cpp:1681
+#: cmdevents.cpp:1684
 msgid "Sound enabled"
 msgstr "Hang bekapcsolva"
 
-#: cmdevents.cpp:1681
+#: cmdevents.cpp:1684
 msgid "Sound disabled"
 msgstr "Hang kikapcsolva"
 
-#: cmdevents.cpp:1694 cmdevents.cpp:1708
+#: cmdevents.cpp:1697 cmdevents.cpp:1711
 #, c-format
 msgid "Volume: %d %%"
 msgstr ""
 
-#: cmdevents.cpp:1777
+#: cmdevents.cpp:1780
 msgid "Set to 0 for pseudo tty"
 msgstr "Ál-TTY-hez állítsd 0-ra"
 
-#: cmdevents.cpp:1779
+#: cmdevents.cpp:1782
 msgid "Port to wait for connection:"
 msgstr "Kapcsolatokhoz figyelt port:"
 
-#: cmdevents.cpp:1780
+#: cmdevents.cpp:1783
 msgid "GDB Connection"
 msgstr "GDB Kapcsolat"
 
-#: cmdevents.cpp:1832
+#: cmdevents.cpp:1835
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "Várakozás a kapcsolódásra itt: %s"
 
-#: cmdevents.cpp:1839
+#: cmdevents.cpp:1842
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "Kapcsolódás kezdeményezése a %d porton"
 
-#: cmdevents.cpp:1842
+#: cmdevents.cpp:1845
 msgid "Waiting for GDB..."
 msgstr "Várakozás a GDB-re"
 
-#: cmdevents.cpp:2207 panel.cpp:260 panel.cpp:372
+#: cmdevents.cpp:2210 panel.cpp:270 panel.cpp:382
 msgid "Could not initialize the sound driver!"
 msgstr "A hang meghajtóprogramja nem indítható!"
 
-#: cmdevents.cpp:2276
+#: cmdevents.cpp:2279
 msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
 msgstr ""
 
-#: cmdevents.cpp:2277
+#: cmdevents.cpp:2280
 msgid "FACTORY RESET"
 msgstr ""
 
-#: cmdevents.cpp:2312
+#: cmdevents.cpp:2315
 msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr ""
 
-#: cmdevents.cpp:2313
+#: cmdevents.cpp:2316
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "Szerzői jog (C) 1999-2003 Forgotten\nSzerzői jog (C) 2004-2006 VBA fejlesztői csapat\nSzerzői jog (C) 2007-2020 VBA-M fejlesztői csapat"
 
-#: cmdevents.cpp:2315
+#: cmdevents.cpp:2318
 msgid ""
 "This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -576,323 +309,17 @@ msgid ""
 "along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr ""
 
-#: cmdevents.cpp:2500
+#: cmdevents.cpp:2503
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 msgstr ""
 
-#: cmdevents.cpp:2566
+#: cmdevents.cpp:2569
 msgid "LAN link is already active. Disable link mode to disconnect."
 msgstr ""
 
-#: cmdevents.cpp:2572
+#: cmdevents.cpp:2575
 msgid "Network is not supported in local mode."
 msgstr "Helyi módban hálózat nem támogatott."
-
-#: extra-translations.cpp:12
-msgid "&Apply"
-msgstr "&Alkalmaz"
-
-#: extra-translations.cpp:13
-msgid "Artists"
-msgstr "Művészek"
-
-#: extra-translations.cpp:14
-msgid "Cancel"
-msgstr "Mégse"
-
-#: extra-translations.cpp:15
-msgid "Close"
-msgstr "Bezár"
-
-#: extra-translations.cpp:16
-msgid "Developers"
-msgstr "Fejlesztők"
-
-#: extra-translations.cpp:17
-msgid "License"
-msgstr "Licenc"
-
-#: extra-translations.cpp:18
-msgid "OK"
-msgstr "OK"
-
-#: opts.cpp:290
-msgid ""
-"The INI file was written for a more recent version of VBA-M. Some INI option"
-" values may have been reset."
-msgstr ""
-
-#: opts.cpp:457 opts.cpp:477 opts.cpp:665
-#, c-format
-msgid "Invalid key binding %s for %s"
-msgstr "A %s - %s érvénytelen billentyű hozzárendelés"
-
-#: opts.cpp:601 opts.cpp:610 opts.cpp:619 opts.cpp:628 config/option.cpp:492
-#, c-format
-msgid "Invalid value %s for option %s"
-msgstr "%s érvénytelen érték a %s beállításhoz"
-
-#: opts.cpp:687
-#, c-format
-msgid "Unknown option %s with value %s"
-msgstr "%s ismeretlen beállítás %s értékkel"
-
-#: sys.cpp:200 sys.cpp:261
-msgid "No game in progress to record"
-msgstr "Nincs rögzíthető elindított játék"
-
-#: sys.cpp:218
-#, c-format
-msgid "Cannot open output file %s"
-msgstr "A %s kimeneti fájl nem nyitható meg"
-
-#: sys.cpp:225 sys.cpp:245 sys.cpp:395
-msgid "Error writing game recording"
-msgstr "Hiba a játék rögzítésének írásakor"
-
-#: sys.cpp:266
-msgid "Cannot play game recording while recording"
-msgstr "Játékfelvétel lejátszása nem lehetséges rögzítéskor"
-
-#: sys.cpp:281
-#, c-format
-msgid "Cannot open recording file %s"
-msgstr "A %s felvételfájl megnyitása nem lehetséges"
-
-#: sys.cpp:290 sys.cpp:300
-msgid "Error reading game recording"
-msgstr "Hiba a játékfelvétel beolvasásakor"
-
-#: sys.cpp:410 sys.cpp:429
-msgid "Playback ended"
-msgstr "A lejátszás véget ért"
-
-#: sys.cpp:453
-#, c-format
-msgid "%d %% (%d, %d fps)"
-msgstr ""
-
-#: sys.cpp:895 xrc/GBPrinter.xrc:65
-msgid "&Discard"
-msgstr "El&dobás"
-
-#: sys.cpp:929
-msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
-msgstr "Képfájlok (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
-
-#: sys.cpp:938
-msgid "Save printer image to"
-msgstr "Nyomtatási kép mentésének helye"
-
-#: sys.cpp:952 sys.cpp:1136
-#, c-format
-msgid "Wrote printer output to %s"
-msgstr "Nyomtatási kép kiírva ide: %s"
-
-#: sys.cpp:957 sys.cpp:1028
-msgid "&Close"
-msgstr "Bezár"
-
-#: sys.cpp:1023
-msgid "Printed"
-msgstr "Kinyomtatva"
-
-#: sys.cpp:1326
-#, c-format
-msgid "Error opening pseudo tty: %s"
-msgstr "Hiba az ál-TTY megnyitásakor: %s"
-
-#: sys.cpp:1425
-#, c-format
-msgid "Error setting up server socket (%d)"
-msgstr "Hiba a szerver socket beállításakor (%d)"
-
-#: panel.cpp:183
-#, c-format
-msgid "%s is not a valid ROM file"
-msgstr "%s nem létező ROM fájl"
-
-#: panel.cpp:184 panel.cpp:245 panel.cpp:310
-msgid "Problem loading file"
-msgstr "Probléma a fájl betöltésénél"
-
-#: panel.cpp:244
-#, c-format
-msgid "Unable to load Game Boy ROM %s"
-msgstr "A %s Game Boy ROM nem tölthető be"
-
-#: panel.cpp:272
-msgid ""
-"Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
-" Boy BIOS file."
-msgstr ""
-
-#: panel.cpp:286 panel.cpp:386
-#, c-format
-msgid "Could not load BIOS %s"
-msgstr "A %s BIOS nem tölthető be"
-
-#: panel.cpp:309
-#, c-format
-msgid "Unable to load Game Boy Advance ROM %s"
-msgstr "A %s Game Boy Advance ROM nem tölthető be"
-
-#: panel.cpp:554
-msgid " player "
-msgstr " játékos "
-
-#: panel.cpp:720
-#, c-format
-msgid "Loaded state %s"
-msgstr "A %s játékállás betöltve"
-
-#: panel.cpp:720
-#, c-format
-msgid "Error loading state %s"
-msgstr "Hiba a %s játékállás betöltésekor"
-
-#: panel.cpp:744
-#, c-format
-msgid "Saved state %s"
-msgstr "A %s játékállás mentve"
-
-#: panel.cpp:744
-#, c-format
-msgid "Error saving state %s"
-msgstr "Hiba a %s játékállás mentésekor"
-
-#: panel.cpp:948
-#, c-format
-msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
-msgstr ""
-
-#: panel.cpp:986
-#, c-format
-msgid "Fullscreen mode %d x %d - %d @ %d not supported"
-msgstr ""
-
-#: panel.cpp:991
-#, c-format
-msgid "Valid mode: %d x %d - %d @ %d"
-msgstr ""
-
-#: panel.cpp:999
-#, c-format
-msgid "Chose mode %d x %d - %d @ %d"
-msgstr ""
-
-#: panel.cpp:1003
-#, c-format
-msgid "Failed to change mode to %d x %d - %d @ %d"
-msgstr ""
-
-#: panel.cpp:1094
-msgid "Not a valid Game Boy Advance cartridge"
-msgstr ""
-
-#: panel.cpp:1257
-msgid "No memory for rewinding"
-msgstr "Visszajátszáshoz kevés a memória"
-
-#: panel.cpp:1267
-msgid "Error writing rewind state"
-msgstr "Hiba a visszajátszás-állás írásakor"
-
-#: panel.cpp:2299
-msgid "Enabling EGL VSync."
-msgstr "EGL VSync bekapcsolása."
-
-#: panel.cpp:2301
-msgid "Disabling EGL VSync."
-msgstr "EGL VSync kikapcsolása."
-
-#: panel.cpp:2308
-msgid "Enabling GLX VSync."
-msgstr "GLX VSync bekapcsolása."
-
-#: panel.cpp:2310
-msgid "Disabling GLX VSync."
-msgstr "GLX VSync kikapcsolása."
-
-#: panel.cpp:2328
-msgid "Failed to set glXSwapIntervalEXT"
-msgstr "A glXSwapIntervalEXT beállítása sikertelen"
-
-#: panel.cpp:2337
-msgid "Failed to set glXSwapIntervalSGI"
-msgstr "A glXSwapIntervalSGI beállítása sikertelen"
-
-#: panel.cpp:2346
-msgid "Failed to set glXSwapIntervalMESA"
-msgstr "A glXSwapIntervalMESA beállítása sikertelen"
-
-#: panel.cpp:2353
-msgid "No support for wglGetExtensionsStringEXT"
-msgstr "A wglGetExtensionsStringEXT nem támogatott"
-
-#: panel.cpp:2356
-msgid "No support for WGL_EXT_swap_control"
-msgstr "A WGL_EXT_swap_control nem támogatott"
-
-#: panel.cpp:2365
-msgid "Failed to set wglSwapIntervalEXT"
-msgstr "A wglSwapIntervalEXT beállítása sikertelen"
-
-#: panel.cpp:2371
-msgid "No VSYNC available on this platform"
-msgstr "Nincs VSYNC ezen a platformon"
-
-#: panel.cpp:2473
-msgid "memory allocation error"
-msgstr "memóriakioszási hiba"
-
-#: panel.cpp:2476
-msgid "error initializing codec"
-msgstr "hiba a kodek inicializálásnál"
-
-#: panel.cpp:2479
-msgid "error writing to output file"
-msgstr "hiba a kimeneti fájl írásakor"
-
-#: panel.cpp:2482
-msgid "can't guess output format from file name"
-msgstr "a fájlnévből nem állapítható meg a kimenet formátuma"
-
-#: panel.cpp:2487
-msgid "programming error; aborting!"
-msgstr "programhiba; megszakítás!"
-
-#: panel.cpp:2499 panel.cpp:2528
-#, c-format
-msgid "Unable to begin recording to %s (%s)"
-msgstr "Nem lehet megkezdeni a rögzítést ide: %s (%s)"
-
-#: panel.cpp:2556
-#, c-format
-msgid "Error in audio / video recording (%s); aborting"
-msgstr ""
-
-#: panel.cpp:2562
-#, c-format
-msgid "Error in audio recording (%s); aborting"
-msgstr "Hiba a hangrögzítéskor (%s); megszakítás"
-
-#: panel.cpp:2572
-#, c-format
-msgid "Error in video recording (%s); aborting"
-msgstr "Hiba a videórögzítéskor (%s); megszakítás"
-
-#: viewsupt.cpp:778
-msgid "Red:"
-msgstr ""
-
-#: viewsupt.cpp:787
-msgid "Green:"
-msgstr ""
-
-#: viewsupt.cpp:796
-msgid "Blue:"
-msgstr ""
 
 #: config/internal/option-internal.cpp:379
 msgid "Use bilinear filter with 3d renderer"
@@ -1321,20 +748,25 @@ msgstr "Hangerő (%)"
 msgid "Invalid value %s for option %s; valid values are %s"
 msgstr "%s érvénytelen érték a %s opcióhoz; használható értékek: %s"
 
-#: config/option.cpp:327
+#: config/option.cpp:328
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "A %f érvénytelen érték a %s opcióhoz; használható értékek: %f - %f"
 
-#: config/option.cpp:345 config/option.cpp:363
+#: config/option.cpp:346 config/option.cpp:364
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "A %d érvénytelen érték a %s opcióhoz; használható értékek: %d - %d"
 
-#: config/option.cpp:455
+#: config/option.cpp:456
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %s"
 msgstr "%d érvénytelen érték a %s opcióhoz; használható értékek: %s"
+
+#: config/option.cpp:493 opts.cpp:601 opts.cpp:610 opts.cpp:619 opts.cpp:628
+#, c-format
+msgid "Invalid value %s for option %s"
+msgstr "%s érvénytelen érték a %s beállításhoz"
 
 #: config/user-input.cpp:23
 msgid "Backspace"
@@ -1529,38 +961,38 @@ msgstr ""
 msgid "Browse"
 msgstr "Tallózás"
 
-#: dialogs/display-config.cpp:54
+#: dialogs/display-config.cpp:52
 msgid "Invalid value for Default magnification."
 msgstr ""
 
-#: dialogs/display-config.cpp:341 xrc/DisplayConfig.xrc:86
+#: dialogs/display-config.cpp:339 xrc/DisplayConfig.xrc:86
 #: xrc/DisplayConfig.xrc:136 xrc/DisplayConfig.xrc:222
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:221 xrc/SoundConfig.xrc:311
 msgid "None"
 msgstr "Nincs"
 
-#: dialogs/display-config.cpp:371
+#: dialogs/display-config.cpp:369
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "A %s helyen nincs használható RPI bővítmény"
 
-#: dialogs/display-config.cpp:410 dialogs/display-config.cpp:452
+#: dialogs/display-config.cpp:408 dialogs/display-config.cpp:450
 #: xrc/DisplayConfig.xrc:108
 msgid "Plugin"
 msgstr "Bővítmény"
 
-#: dialogs/display-config.cpp:417
+#: dialogs/display-config.cpp:415
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "Alkalmazott pixelszűrő: %s"
 
-#: dialogs/display-config.cpp:424
+#: dialogs/display-config.cpp:422
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr "Alkalmazott képkockaközi átmenet: %s"
 
-#: dialogs/game-boy-config.cpp:142 xrc/GameBoyAdvanceConfig.xrc:122
+#: dialogs/game-boy-config.cpp:141 xrc/GameBoyAdvanceConfig.xrc:122
 #: xrc/GameBoyConfig.xrc:138 xrc/GameBoyConfig.xrc:159
 msgid "(None)"
 msgstr "(Nincs)"
@@ -1712,31 +1144,628 @@ msgstr ""
 msgid "%04X (Actual: %04X)"
 msgstr ""
 
-#: widgets/sdljoy.cpp:188
+#: extra-translations.cpp:13
+msgid "&Apply"
+msgstr "&Alkalmaz"
+
+#: extra-translations.cpp:14
+msgid "Artists"
+msgstr "Művészek"
+
+#: extra-translations.cpp:15
+msgid "Cancel"
+msgstr "Mégse"
+
+#: extra-translations.cpp:16
+msgid "Close"
+msgstr "Bezár"
+
+#: extra-translations.cpp:17
+msgid "Developers"
+msgstr "Fejlesztők"
+
+#: extra-translations.cpp:18
+msgid "License"
+msgstr "Licenc"
+
+#: extra-translations.cpp:19
+msgid "OK"
+msgstr "OK"
+
+#: gfxviewers.cpp:1202
+msgid "Select output file and type"
+msgstr "Válassz kimeneti típust és fájlt"
+
+#: gfxviewers.cpp:1203
+msgid ""
+"Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
+"Table (*.act)|*.act"
+msgstr "Windows Paletta (*.pal)|*.pal|PaintShop Paletta (*.pal)|*.pal|Adobe Színtábla (*.act)|*.act"
+
+#: guiinit.cpp:105
+msgid "Start!"
+msgstr "Kezdés!"
+
+#: guiinit.cpp:124
+msgid "Connect"
+msgstr "Csatlakozás"
+
+#: guiinit.cpp:141
+msgid "You must enter a valid host name"
+msgstr "Adj meg egy létező gazda nevet"
+
+#: guiinit.cpp:142
+msgid "Host name invalid"
+msgstr "A gazdanév nem létezik"
+
+#: guiinit.cpp:160
+msgid "Waiting for clients..."
+msgstr "Várakozás kliensekre..."
+
+#: guiinit.cpp:161
+#, c-format
+msgid "Server IP address is: %s\n"
+msgstr "A szerver IP címe: %s\n"
+
+#: guiinit.cpp:163
+msgid "Waiting for connection..."
+msgstr "Várakozás kapcsolódásra..."
+
+#: guiinit.cpp:164
+#, c-format
+msgid "Connecting to %s\n"
+msgstr "Kapcsolódás ehhez: %s\n"
+
+#: guiinit.cpp:197
+msgid ""
+"Error occurred.\n"
+"Please try again."
+msgstr "Hiba történt.\nPróbáld újra."
+
+#: guiinit.cpp:264 guiinit.cpp:317
+msgid "Select cheat file"
+msgstr "Válassz csalás fájlt"
+
+#: guiinit.cpp:265
+msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
+msgstr "VBA csaláslista (*.clt)|*.clt|CHT csaláslista (*.cht)|*.cht"
+
+#: guiinit.cpp:284 panel.cpp:527
+msgid "Loaded cheats"
+msgstr "Betöltött csalások"
+
+#: guiinit.cpp:318
+msgid "VBA cheat lists (*.clt)|*.clt"
+msgstr "VBA csaláslista (*.clt)|*.clt"
+
+#: guiinit.cpp:336
+msgid "Saved cheats"
+msgstr "Mentett csalások"
+
+#: guiinit.cpp:367 guiinit.cpp:386
+msgid "Restore old values?"
+msgstr "Visszaállítod a régi értékeket?"
+
+#: guiinit.cpp:368 guiinit.cpp:387
+msgid "Removing cheats"
+msgstr "Csalások eltávolítása"
+
+#: guiinit.cpp:782
+msgid "Generic Code"
+msgstr "Általános Kód"
+
+#: guiinit.cpp:854 guiinit.cpp:1109
+msgid "Number cannot be empty"
+msgstr "A szám mező nem lehet üres"
+
+#: guiinit.cpp:904
+msgid "Search produced no results"
+msgstr "A keresés nem járt eredménnyel"
+
+#: guiinit.cpp:1067
+msgid "8-bit "
+msgstr "8-bit "
+
+#: guiinit.cpp:1071
+msgid "16-bit "
+msgstr "16-bit "
+
+#: guiinit.cpp:1075
+msgid "32-bit "
+msgstr "32-bit "
+
+#: guiinit.cpp:1081
+msgid "signed decimal"
+msgstr "előjeles decimális"
+
+#: guiinit.cpp:1085
+msgid "unsigned decimal"
+msgstr "előjel nélküli decimális"
+
+#: guiinit.cpp:1089
+msgid "unsigned hexadecimal"
+msgstr "előjel nélküli hexadecimális"
+
+#: guiinit.cpp:1490
+#, c-format
+msgid "%d frames = %.2f ms"
+msgstr "%d képkocka = %.2f ms"
+
+#: guiinit.cpp:1502
+msgid "Default device"
+msgstr "Alapértelmezett eszköz"
+
+#: guiinit.cpp:1921
+msgid "Main icon not found"
+msgstr "A főikon nem található"
+
+#: guiinit.cpp:1939
+msgid "Main display panel not found"
+msgstr "A főkijelző nem található"
+
+#: guiinit.cpp:2198
+#, c-format
+msgid "Invalid menu item %s; removing"
+msgstr "A %s érvénytelen menüelem; eltávolítás"
+
+#: guiinit.cpp:2383
+msgid "Code"
+msgstr "Kód"
+
+#: guiinit.cpp:2392
+msgid "Description"
+msgstr "Leírás"
+
+#: guiinit.cpp:2466 xrc/CheatAdd.xrc:31
+msgid "Address"
+msgstr "Cím"
+
+#: guiinit.cpp:2467
+msgid "Old Value"
+msgstr "Régi Érték"
+
+#: guiinit.cpp:2468
+msgid "New Value"
+msgstr "Új Érték"
+
+#: guiinit.cpp:2797
+msgid "JoyBus host invalid; disabling"
+msgstr "A JoyBus gazda érvénytelen; letiltás"
+
+#: opts.cpp:290
+msgid ""
+"The INI file was written for a more recent version of VBA-M. Some INI option"
+" values may have been reset."
+msgstr ""
+
+#: opts.cpp:457 opts.cpp:477 opts.cpp:665
+#, c-format
+msgid "Invalid key binding %s for %s"
+msgstr "A %s - %s érvénytelen billentyű hozzárendelés"
+
+#: opts.cpp:687
+#, c-format
+msgid "Unknown option %s with value %s"
+msgstr "%s ismeretlen beállítás %s értékkel"
+
+#: panel.cpp:193
+#, c-format
+msgid "%s is not a valid ROM file"
+msgstr "%s nem létező ROM fájl"
+
+#: panel.cpp:194 panel.cpp:255 panel.cpp:320
+msgid "Problem loading file"
+msgstr "Probléma a fájl betöltésénél"
+
+#: panel.cpp:254
+#, c-format
+msgid "Unable to load Game Boy ROM %s"
+msgstr "A %s Game Boy ROM nem tölthető be"
+
+#: panel.cpp:282
+msgid ""
+"Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
+" Boy BIOS file."
+msgstr ""
+
+#: panel.cpp:296 panel.cpp:396
+#, c-format
+msgid "Could not load BIOS %s"
+msgstr "A %s BIOS nem tölthető be"
+
+#: panel.cpp:319
+#, c-format
+msgid "Unable to load Game Boy Advance ROM %s"
+msgstr "A %s Game Boy Advance ROM nem tölthető be"
+
+#: panel.cpp:564
+msgid " player "
+msgstr " játékos "
+
+#: panel.cpp:730
+#, c-format
+msgid "Loaded state %s"
+msgstr "A %s játékállás betöltve"
+
+#: panel.cpp:730
+#, c-format
+msgid "Error loading state %s"
+msgstr "Hiba a %s játékállás betöltésekor"
+
+#: panel.cpp:754
+#, c-format
+msgid "Saved state %s"
+msgstr "A %s játékállás mentve"
+
+#: panel.cpp:754
+#, c-format
+msgid "Error saving state %s"
+msgstr "Hiba a %s játékállás mentésekor"
+
+#: panel.cpp:958
+#, c-format
+msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
+msgstr ""
+
+#: panel.cpp:996
+#, c-format
+msgid "Fullscreen mode %d x %d - %d @ %d not supported"
+msgstr ""
+
+#: panel.cpp:1001
+#, c-format
+msgid "Valid mode: %d x %d - %d @ %d"
+msgstr ""
+
+#: panel.cpp:1009
+#, c-format
+msgid "Chose mode %d x %d - %d @ %d"
+msgstr ""
+
+#: panel.cpp:1013
+#, c-format
+msgid "Failed to change mode to %d x %d - %d @ %d"
+msgstr ""
+
+#: panel.cpp:1104
+msgid "Not a valid Game Boy Advance cartridge"
+msgstr ""
+
+#: panel.cpp:1267
+msgid "No memory for rewinding"
+msgstr "Visszajátszáshoz kevés a memória"
+
+#: panel.cpp:1277
+msgid "Error writing rewind state"
+msgstr "Hiba a visszajátszás-állás írásakor"
+
+#: panel.cpp:2309
+msgid "Enabling EGL VSync."
+msgstr "EGL VSync bekapcsolása."
+
+#: panel.cpp:2311
+msgid "Disabling EGL VSync."
+msgstr "EGL VSync kikapcsolása."
+
+#: panel.cpp:2318
+msgid "Enabling GLX VSync."
+msgstr "GLX VSync bekapcsolása."
+
+#: panel.cpp:2320
+msgid "Disabling GLX VSync."
+msgstr "GLX VSync kikapcsolása."
+
+#: panel.cpp:2338
+msgid "Failed to set glXSwapIntervalEXT"
+msgstr "A glXSwapIntervalEXT beállítása sikertelen"
+
+#: panel.cpp:2347
+msgid "Failed to set glXSwapIntervalSGI"
+msgstr "A glXSwapIntervalSGI beállítása sikertelen"
+
+#: panel.cpp:2356
+msgid "Failed to set glXSwapIntervalMESA"
+msgstr "A glXSwapIntervalMESA beállítása sikertelen"
+
+#: panel.cpp:2363
+msgid "No support for wglGetExtensionsStringEXT"
+msgstr "A wglGetExtensionsStringEXT nem támogatott"
+
+#: panel.cpp:2366
+msgid "No support for WGL_EXT_swap_control"
+msgstr "A WGL_EXT_swap_control nem támogatott"
+
+#: panel.cpp:2375
+msgid "Failed to set wglSwapIntervalEXT"
+msgstr "A wglSwapIntervalEXT beállítása sikertelen"
+
+#: panel.cpp:2381
+msgid "No VSYNC available on this platform"
+msgstr "Nincs VSYNC ezen a platformon"
+
+#: panel.cpp:2483
+msgid "memory allocation error"
+msgstr "memóriakioszási hiba"
+
+#: panel.cpp:2486
+msgid "error initializing codec"
+msgstr "hiba a kodek inicializálásnál"
+
+#: panel.cpp:2489
+msgid "error writing to output file"
+msgstr "hiba a kimeneti fájl írásakor"
+
+#: panel.cpp:2492
+msgid "can't guess output format from file name"
+msgstr "a fájlnévből nem állapítható meg a kimenet formátuma"
+
+#: panel.cpp:2497
+msgid "programming error; aborting!"
+msgstr "programhiba; megszakítás!"
+
+#: panel.cpp:2509 panel.cpp:2538
+#, c-format
+msgid "Unable to begin recording to %s (%s)"
+msgstr "Nem lehet megkezdeni a rögzítést ide: %s (%s)"
+
+#: panel.cpp:2566
+#, c-format
+msgid "Error in audio / video recording (%s); aborting"
+msgstr ""
+
+#: panel.cpp:2572
+#, c-format
+msgid "Error in audio recording (%s); aborting"
+msgstr "Hiba a hangrögzítéskor (%s); megszakítás"
+
+#: panel.cpp:2582
+#, c-format
+msgid "Error in video recording (%s); aborting"
+msgstr "Hiba a videórögzítéskor (%s); megszakítás"
+
+#: sys.cpp:204 sys.cpp:265
+msgid "No game in progress to record"
+msgstr "Nincs rögzíthető elindított játék"
+
+#: sys.cpp:222
+#, c-format
+msgid "Cannot open output file %s"
+msgstr "A %s kimeneti fájl nem nyitható meg"
+
+#: sys.cpp:229 sys.cpp:249 sys.cpp:399
+msgid "Error writing game recording"
+msgstr "Hiba a játék rögzítésének írásakor"
+
+#: sys.cpp:270
+msgid "Cannot play game recording while recording"
+msgstr "Játékfelvétel lejátszása nem lehetséges rögzítéskor"
+
+#: sys.cpp:285
+#, c-format
+msgid "Cannot open recording file %s"
+msgstr "A %s felvételfájl megnyitása nem lehetséges"
+
+#: sys.cpp:294 sys.cpp:304
+msgid "Error reading game recording"
+msgstr "Hiba a játékfelvétel beolvasásakor"
+
+#: sys.cpp:414 sys.cpp:433
+msgid "Playback ended"
+msgstr "A lejátszás véget ért"
+
+#: sys.cpp:457
+#, c-format
+msgid "%d %% (%d, %d fps)"
+msgstr ""
+
+#: sys.cpp:899 xrc/GBPrinter.xrc:65
+msgid "&Discard"
+msgstr "El&dobás"
+
+#: sys.cpp:933
+msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
+msgstr "Képfájlok (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
+
+#: sys.cpp:942
+msgid "Save printer image to"
+msgstr "Nyomtatási kép mentésének helye"
+
+#: sys.cpp:956 sys.cpp:1140
+#, c-format
+msgid "Wrote printer output to %s"
+msgstr "Nyomtatási kép kiírva ide: %s"
+
+#: sys.cpp:961 sys.cpp:1032
+msgid "&Close"
+msgstr "Bezár"
+
+#: sys.cpp:1027
+msgid "Printed"
+msgstr "Kinyomtatva"
+
+#: sys.cpp:1330
+#, c-format
+msgid "Error opening pseudo tty: %s"
+msgstr "Hiba az ál-TTY megnyitásakor: %s"
+
+#: sys.cpp:1429
+#, c-format
+msgid "Error setting up server socket (%d)"
+msgstr "Hiba a szerver socket beállításakor (%d)"
+
+#: viewers.cpp:562
+msgid "Text files (*.txt;*.log)|*.txt;*.log|"
+msgstr "Szövegfájlok (*.txt;*.log)|*.txt;*.log|"
+
+#: viewers.cpp:704 viewers.cpp:776
+msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
+msgstr "Memória kiirások (*.dmp;*.bin)|*.dmp;*.bin|"
+
+#: viewers.cpp:706
+msgid "Select memory dump file"
+msgstr "Válassz memória kiírás fájlt"
+
+#: viewsupt.cpp:778
+msgid "Red:"
+msgstr ""
+
+#: viewsupt.cpp:787
+msgid "Green:"
+msgstr ""
+
+#: viewsupt.cpp:796
+msgid "Blue:"
+msgstr ""
+
+#: viewsupt.h:61
+#, c-format
+msgid "Unable to load dialog %s from resources"
+msgstr "Nem tölthető be a %s párbeszédablak a forrásból"
+
+#: widgets/sdljoy.cpp:187
 #, c-format
 msgid "Connected %s: %s"
 msgstr "%s kapcsolódása: %s"
 
-#: widgets/sdljoy.cpp:203
+#: widgets/sdljoy.cpp:202
 #, c-format
 msgid "Disconnected %s"
 msgstr "%s leválasztva"
 
-#: xaudio2.cpp:34
-msgid "XAudio2: Enumerating devices failed!"
-msgstr "XAudio2: Az eszközök beolvasása sikertelen!"
+#: wxvbam.cpp:400 wxvbam.cpp:417
+#, c-format
+msgid "Invalid configuration file provided: %s"
+msgstr ""
 
-#: xaudio2.cpp:68 xaudio2.cpp:352
-msgid "The XAudio2 interface failed to initialize!"
-msgstr "Az XAudio2 felület indítása sikertelen!"
+#: wxvbam.cpp:561
+msgid "Could not create main window"
+msgstr "A főablak nem nyitható meg"
 
-#: xaudio2.cpp:383
-msgid "XAudio2: Creating mastering voice failed!"
-msgstr "XAudio2: A főhang létrehozása sikertelen!"
+#: wxvbam.cpp:642
+msgid "Save built-in XRC file and exit"
+msgstr "Beépített XRC fájl mentése és kilépés"
 
-#: xaudio2.cpp:392
-msgid "XAudio2: Creating source voice failed!"
-msgstr "XAudio2: A forráshang létrehozása sikertelen!"
+#: wxvbam.cpp:645
+msgid "Save built-in vba-over.ini and exit"
+msgstr "Beépített vba-over.ini mentése és kilépés"
+
+#: wxvbam.cpp:648
+msgid "Print configuration path and exit"
+msgstr "Konfigurációs útvonal kiírása és kilépés"
+
+#: wxvbam.cpp:651
+msgid "Start in full-screen mode"
+msgstr "Indítás teljesképernyős módban"
+
+#: wxvbam.cpp:654
+msgid "Set a configuration file"
+msgstr "Adj meg konfigurációs fájlt"
+
+#: wxvbam.cpp:658
+msgid "Delete shared link state first, if it exists"
+msgstr "Megosztott hivatkozás állapotának törlése elsőként, ha létezik"
+
+#: wxvbam.cpp:665
+msgid "List all settable options and exit"
+msgstr "Összes beállítható elem listázása, majd kilépés"
+
+#: wxvbam.cpp:668
+msgid "ROM file"
+msgstr "ROM fájl"
+
+#: wxvbam.cpp:670
+msgid "<config>=<value>"
+msgstr "<elem>=<érték>"
+
+#: wxvbam.cpp:701
+msgid "Configuration / build error: can't find built-in xrc"
+msgstr ""
+
+#: wxvbam.cpp:709
+#, c-format
+msgid ""
+"Wrote built-in configuration to %s.\n"
+"To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
+msgstr ""
+
+#: wxvbam.cpp:723
+msgid "Configuration is read from, in order:"
+msgstr "Kiolvasási sorrendben, a konfiguráció a következő:"
+
+#: wxvbam.cpp:737
+#, c-format
+msgid ""
+"Wrote built-in override file to %s\n"
+"To override, delete all but changed section. First found section is used from search path:"
+msgstr ""
+
+#: wxvbam.cpp:743
+msgid ""
+"\n"
+"\tbuilt-in"
+msgstr "\n\tbeépített"
+
+#: wxvbam.cpp:758
+msgid ""
+"Options set from the command line are saved if any configuration changes are made in the user interface.\n"
+"\n"
+"For flag options, true and false are specified as 1 and 0, respectively.\n"
+"\n"
+msgstr "A parancssorból kezdeményezett beállítási módosítások akkor kerülnek mentésre, ha a felhasználói felületről is változtatás történik.\n\nFájljelölő beállításoknál, a TRUE és FALSE, 1 és 0-ként lesz meghatározva.\n\n"
+
+#: wxvbam.cpp:766
+msgid ""
+"The commands available for the Keyboard/* option are:\n"
+"\n"
+msgstr "A billentyűzethez rendelkezésre álló parancsok:\n\n"
+
+#: wxvbam.cpp:777
+msgid "Configuration file not found."
+msgstr "A konfigurációs fájl nem található."
+
+#: wxvbam.cpp:808
+msgid "Bad configuration option or multiple ROM files given:\n"
+msgstr "Hibás konfigurációs beállítás, vagy több ROM fájl lett megadva:\n"
+
+#: dsound.cpp:90 dsound.cpp:104
+#, c-format
+msgid "Cannot create Direct Sound %08x"
+msgstr ""
+
+#: dsound.cpp:109
+#, c-format
+msgid "Cannot SetCooperativeLevel %08x"
+msgstr "SetCooperativeLevel nem használható %08x"
+
+#: dsound.cpp:123
+#, c-format
+msgid "Cannot CreateSoundBuffer %08x"
+msgstr "CreateSoundBuffer nem állítható be %08x"
+
+#: dsound.cpp:142
+#, c-format
+msgid "CreateSoundBuffer(primary) failed %08x"
+msgstr "CreateSoundBuffer(elsődleges) sikertelen %08x"
+
+#: dsound.cpp:159
+#, c-format
+msgid "CreateSoundBuffer(secondary) failed %08x"
+msgstr "CreateSoundBuffer(másodlagos) sikertelen %08x"
+
+#: dsound.cpp:164
+#, c-format
+msgid "dsbSecondary->SetCurrentPosition failed %08x"
+msgstr "dsbSecondary->SetCurrentPosition sikertelen %08x"
+
+#: dsound.cpp:187
+#, c-format
+msgid "Cannot Play primary %08x"
+msgstr "Az elsődleges hang nem játszható le %08x"
+
+#: dsound.cpp:322
+#, c-format
+msgid "dsbSecondary->Lock() failed: %08x"
+msgstr "dsbSecondary->Lock() sikertelen: %08x"
 
 #: faudio.cpp:31
 msgid "FAudio: Enumerating devices failed!"
@@ -1754,50 +1783,111 @@ msgstr "FAudio: A főhang létrehozása sikertelen!"
 msgid "FAudio: Creating source voice failed!"
 msgstr "FAudio: A forráshang létrehozása sikertelen!"
 
-#: dsound.cpp:89 dsound.cpp:103
-#, c-format
-msgid "Cannot create Direct Sound %08x"
+#: xaudio2.cpp:34
+msgid "XAudio2: Enumerating devices failed!"
+msgstr "XAudio2: Az eszközök beolvasása sikertelen!"
+
+#: xaudio2.cpp:64 xaudio2.cpp:344
+msgid "The XAudio2 interface failed to initialize!"
+msgstr "Az XAudio2 felület indítása sikertelen!"
+
+#: xaudio2.cpp:375
+msgid "XAudio2: Creating mastering voice failed!"
+msgstr "XAudio2: A főhang létrehozása sikertelen!"
+
+#: xaudio2.cpp:384
+msgid "XAudio2: Creating source voice failed!"
+msgstr "XAudio2: A forráshang létrehozása sikertelen!"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:643
+msgid "Error, link already connected"
 msgstr ""
 
-#: dsound.cpp:108
-#, c-format
-msgid "Cannot SetCooperativeLevel %08x"
-msgstr "SetCooperativeLevel nem használható %08x"
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:657
+msgid "Unable to find link driver"
+msgstr ""
 
-#: dsound.cpp:122
-#, c-format
-msgid "Cannot CreateSoundBuffer %08x"
-msgstr "CreateSoundBuffer nem állítható be %08x"
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:700
+msgid "Link connection does not need updates."
+msgstr ""
 
-#: dsound.cpp:141
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:839
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:903
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1549
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2882
 #, c-format
-msgid "CreateSoundBuffer(primary) failed %08x"
-msgstr "CreateSoundBuffer(elsődleges) sikertelen %08x"
+msgid "Player %d disconnected."
+msgstr ""
 
-#: dsound.cpp:158
-#, c-format
-msgid "CreateSoundBuffer(secondary) failed %08x"
-msgstr "CreateSoundBuffer(másodlagos) sikertelen %08x"
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:943
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:983
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1023
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1658
+msgid "Server disconnected."
+msgstr ""
 
-#: dsound.cpp:163
-#, c-format
-msgid "dsbSecondary->SetCurrentPosition failed %08x"
-msgstr "dsbSecondary->SetCurrentPosition sikertelen %08x"
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1105
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1137
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1682
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1715
+msgid "Network error."
+msgstr ""
 
-#: dsound.cpp:186
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1114
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1691
 #, c-format
-msgid "Cannot Play primary %08x"
-msgstr "Az elsődleges hang nem játszható le %08x"
+msgid "Player %d connected"
+msgstr ""
 
-#: dsound.cpp:321
-#, c-format
-msgid "dsbSecondary->Lock() failed: %08x"
-msgstr "dsbSecondary->Lock() sikertelen: %08x"
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1128
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1705
+msgid "All players connected"
+msgstr ""
 
-#: viewsupt.h:61
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1149
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1727
 #, c-format
-msgid "Unable to load dialog %s from resources"
-msgstr "Nem tölthető be a %s párbeszédablak a forrásból"
+msgid "Connected as #%d, Waiting for %d players to join"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1158
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1736
+msgid "All players joined."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1651
+msgid "Server timed out."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2605
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2626
+msgid "Error creating file mapping"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2616
+msgid "Error mapping file"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2663
+msgid "5 or more GBAs not supported."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2682
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2701
+msgid "Error opening event"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2801
+msgid "Lost link; reinitialize to reconnect"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2808
+msgid "Lost link; reconnected"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2929
+msgid "Unknown slave timed out; resetting comm"
+msgstr ""
 
 #: xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
