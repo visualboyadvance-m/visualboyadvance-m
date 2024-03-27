@@ -320,9 +320,17 @@ endif()
 if(VBAM_STATIC)
     set(wxWidgets_USE_STATIC ON)
 endif()
-find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl)
+
+unset(wx_find_extra)
+if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
+  set(wx_find_extra NO_DEFAULT_PATH)
+  set(wxWidgets_DIR "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/share/wxwidgets")
+endif()
+
+find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl ${wx_find_extra})
+
 if(NOT wxWidgets_FOUND)
-    find_package(wxWidgets COMPONENTS xrc xml html adv net core base REQUIRED)
+    find_package(wxWidgets COMPONENTS xrc xml html adv net core base ${wx_find_extra} REQUIRED)
     target_compile_definitions(visualboyadvance-m PRIVATE NO_OGL)
 endif()
 
