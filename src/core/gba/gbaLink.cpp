@@ -28,12 +28,8 @@
 
 #include <SFML/Network.hpp>
 
-#ifdef ENABLE_NLS
 #include <libintl.h>
 #define _(x) gettext(x)
-#else
-#define _(x) x
-#endif
 
 #include "core/base/message.h"
 #include "core/base/port.h"

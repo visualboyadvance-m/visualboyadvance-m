@@ -1,8 +1,15 @@
 option(BUILD_TESTING "Build testing" ON)
 option(BUILD_SHARED_LIBS "Build dynamic libraries" OFF)
 
-option(ENABLE_SDL "Build the SDL port" ON)
-option(ENABLE_WX "Build the wxWidgets port" ON)
+option(TRANSLATIONS_ONLY "Build only the translations.zip" OFF)
+if(TRANSLATIONS_ONLY)
+    set(BUILD_DEFAULT OFF)
+else()
+    set(BUILD_DEFAULT ON)
+endif()
+
+option(ENABLE_SDL "Build the SDL port" ${BUILD_DEFAULT})
+option(ENABLE_WX "Build the wxWidgets port" ${BUILD_DEFAULT})
 option(ENABLE_DEBUGGER "Enable the debugger" ON)
 option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build with GCC/Clang" OFF)
 
@@ -114,11 +121,7 @@ if(APPLE AND NOT DISABLE_MACOS_PACKAGE_MANAGERS)
     include(MacPackageManagers)
 endif()
 
-option(ENABLE_NLS "Enable translations" ON)
-
 option(UPSTREAM_RELEASE "do some optimizations and release automation tasks" OFF)
-
-option(TRANSLATIONS_ONLY "Build only the translations.zip" OFF)
 
 if(WIN32)
     # not yet implemented
