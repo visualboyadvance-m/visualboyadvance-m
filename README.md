@@ -148,7 +148,7 @@ And the following development libraries:
 - [zlib](https://zlib.net/) (required)
 - [mesa](https://mesa3d.org/) (if using X11 or any OpenGL otherwise)
 - [ffmpeg](https://ffmpeg.org/) (optional, at least version `4.0.4`, for game recording)
-- [gettext](https://www.gnu.org/software/gettext/) and gettext-tools (optional, with ENABLE_NLS)
+- [gettext](https://www.gnu.org/software/gettext/) and gettext-tools
 - [SDL2](https://www.libsdl.org/) (required)
 - [SFML](https://www.sfml-dev.org/) (optional, for link)
 - [OpenAL](https://www.openal.org/) or [openal-soft](https://kcat.strangesoft.net/openal.html) (required, a sound interface)
@@ -205,7 +205,6 @@ Here is the complete list:
 | ENABLE_SDL            | Build the SDL port                                                   | OFF                   |
 | ENABLE_WX             | Build the wxWidgets port                                             | ON                    |
 | ENABLE_DEBUGGER       | Enable the debugger                                                  | ON                    |
-| ENABLE_NLS            | Enable translations                                                  | ON                    |
 | ENABLE_ASM_CORE       | Enable x86 ASM CPU cores (**BUGGY AND DANGEROUS**)                   | OFF                   |
 | ENABLE_ASM            | Enable the following two ASM options                                 | ON for 32 bit builds  |
 | ENABLE_ASM_SCALERS    | Enable x86 ASM graphic filters                                       | ON for 32 bit builds  |

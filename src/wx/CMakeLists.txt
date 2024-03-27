@@ -1,3 +1,7 @@
+if(NOT TRANSLATIONS_ONLY AND NOT ENABLE_WX)
+    return()
+endif()
+
 # Do not use this file directly.  Always use the top level CMakeLists.txt file
 include(VbamFunctions)
 
@@ -114,22 +118,57 @@ if(NOT ZIP_PROGRAM)
     endif()
 endif()
 
-# Make the translations.zip
-if(ENABLE_NLS OR TRANSLATIONS_ONLY)
-    add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/translations.zip
-        COMMAND ${CMAKE_COMMAND} -D "ZIP_PROGRAM=${ZIP_PROGRAM}" -P ${CMAKE_CURRENT_SOURCE_DIR}/make-translations-zip.cmake
+if(MSVC)
+    # Install gettext tools from nuget.
+
+    # First fetch the nuget binary.
+    if(NOT EXISTS ${CMAKE_BINARY_DIR}/nuget.exe)
+        file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" ${CMAKE_BINARY_DIR}/nuget.exe)
+    endif()
+
+    # Add nuget package source.
+    execute_process(
+        COMMAND nuget sources add -Name "NuGet official package source" -Source "https://api.nuget.org/v3/index.json"
+        OUTPUT_QUIET
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        DEPENDS translations make-translations-zip.cmake
     )
 
-    add_custom_target(
-        translations-zip
-        SOURCES ${CMAKE_BINARY_DIR}/translations.zip
+    # Install the Gettext.Tools package.
+    execute_process(
+        COMMAND nuget.exe install Gettext.Tools -OutputDirectory ${CMAKE_BINARY_DIR}/nuget
+        OUTPUT_QUIET
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
+
+    # Find the path to the binaries in the package and add them to find path.
+    file(GLOB pkg ${CMAKE_BINARY_DIR}/nuget/Gettext.Tools*)
+
+    list(APPEND CMAKE_PROGRAM_PATH ${pkg}/tools/bin)
 endif()
 
-if(TRANSLATIONS_ONLY OR NOT ENABLE_WX)
+find_package(Gettext REQUIRED)
+find_program(XGETTEXT xgettext)
+find_program(MSGINIT  msginit)
+
+if(NOT XGETTEXT OR NOT MSGINIT)
+    message(SEND_ERROR "Cannot find gettext xgettext:'${XGETTEXT}' msginit:'${MSGINIT}'")
+endif()
+
+# Make the translations.zip
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/translations.zip
+    COMMAND ${CMAKE_COMMAND} -D "ZIP_PROGRAM=${ZIP_PROGRAM}" -P ${CMAKE_CURRENT_SOURCE_DIR}/make-translations-zip.cmake
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    DEPENDS translations make-translations-zip.cmake
+)
+add_custom_target(
+    translations-zip
+    ALL
+    SOURCES ${CMAKE_BINARY_DIR}/translations.zip
+)
+
+if(TRANSLATIONS_ONLY)
+    # Nothing more to do if we are only building the translations.zip file.
     return()
 endif()
 
@@ -158,9 +197,7 @@ target_link_libraries(
     ${OPENGL_LIBRARIES}
 )
 
-if(ENABLE_NLS)
-    add_dependencies(visualboyadvance-m translations-zip)
-endif()
+add_dependencies(visualboyadvance-m translations-zip)
 
 # on unix we have to check for X11 before we overwrite all the compile/link
 # flags with the wx tests
@@ -378,44 +415,6 @@ if(ENABLE_FFMPEG)
 
     if(FFMPEG_LDFLAGS)
         target_link_options(visualboyadvance-m PRIVATE ${FFMPEG_LDFLAGS})
-    endif()
-endif()
-
-if(ENABLE_NLS)
-    if(MSVC)
-        # Install gettext tools from nuget.
-
-        # First fetch the nuget binary.
-        if(NOT EXISTS ${CMAKE_BINARY_DIR}/nuget.exe)
-            file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" ${CMAKE_BINARY_DIR}/nuget.exe)
-        endif()
-
-        # Add nuget package source.
-        execute_process(
-            COMMAND nuget sources add -Name "NuGet official package source" -Source "https://api.nuget.org/v3/index.json"
-            OUTPUT_QUIET
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        )
-
-        # Install the Gettext.Tools package.
-        execute_process(
-            COMMAND nuget.exe install Gettext.Tools -OutputDirectory ${CMAKE_BINARY_DIR}/nuget
-            OUTPUT_QUIET
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        )
-
-        # Find the path to the binaries in the package and add them to find path.
-        file(GLOB pkg ${CMAKE_BINARY_DIR}/nuget/Gettext.Tools*)
-
-        list(APPEND CMAKE_PROGRAM_PATH ${pkg}/tools/bin)
-    endif()
-
-    find_package(Gettext REQUIRED)
-    find_program(XGETTEXT xgettext)
-    find_program(MSGINIT  msginit)
-
-    if(NOT XGETTEXT OR NOT MSGINIT)
-        message(SEND_ERROR "Cannot find gettext xgettext:'${XGETTEXT}' msginit:'${MSGINIT}'")
     endif()
 endif()
 
@@ -661,45 +660,43 @@ endif()
 
 # Update the gettext pot source.
 # Do this automatically instead of manually to make sure we don't forget to update.
-if(ENABLE_NLS)
-    add_custom_target(
-        vbam-wx-xrc-strings
-        COMMAND ${CMAKE_COMMAND}
-            -E env
-            "PATH=$ENV{PATH}"
-            ${WXRC}
-            -g ${VBAM_XRC_FILES}
-            -o ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
-        BYPRODUCTS
-            ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
-        WORKING_DIRECTORY
-            ${CMAKE_CURRENT_SOURCE_DIR}
-        DEPENDS
-            ${VBAM_XRC_FILES}
-    )
+add_custom_target(
+    vbam-wx-xrc-strings
+    COMMAND ${CMAKE_COMMAND}
+        -E env
+        "PATH=$ENV{PATH}"
+        ${WXRC}
+        -g ${VBAM_XRC_FILES}
+        -o ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
+    BYPRODUCTS
+        ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
+    WORKING_DIRECTORY
+        ${CMAKE_CURRENT_SOURCE_DIR}
+    DEPENDS
+        ${VBAM_XRC_FILES}
+)
 
-    add_custom_target(
-        vbam-wx-pot
-        COMMAND ${XGETTEXT}
-            -k_ -kN_ 
-            -o ${CMAKE_BINARY_DIR}/wxvbam.pot
-            ${VBAM_LOCALIZABLE_FILES} ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
-        BYPRODUCTS
-            ${CMAKE_BINARY_DIR}/wxvbam.pot
-        DEPENDS
-            ${VBAM_LOCALIZABLE_FILES} ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    )
+add_custom_target(
+    vbam-wx-pot
+    COMMAND ${XGETTEXT}
+        -k_ -kN_ 
+        -o ${CMAKE_BINARY_DIR}/wxvbam.pot
+        ${VBAM_LOCALIZABLE_FILES} ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
+    BYPRODUCTS
+        ${CMAKE_BINARY_DIR}/wxvbam.pot
+    DEPENDS
+        ${VBAM_LOCALIZABLE_FILES} ${CMAKE_BINARY_DIR}/wx-xrc-strings.h
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
 
-    add_custom_command(
-        TARGET vbam-wx-pot
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND}
-            -DSRC_DIR=${CMAKE_SOURCE_DIR}/po/wxvbam
-            -DBIN_DIR=${CMAKE_BINARY_DIR}
-            -P ${CMAKE_CURRENT_SOURCE_DIR}/check-pot-updated.cmake
-    )
-endif()
+add_custom_command(
+    TARGET vbam-wx-pot
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND}
+        -DSRC_DIR=${CMAKE_SOURCE_DIR}/po/wxvbam
+        -DBIN_DIR=${CMAKE_BINARY_DIR}
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/check-pot-updated.cmake
+)
 
 find_program(GPG_PROGRAM gpg)
 if(GPG_PROGRAM)

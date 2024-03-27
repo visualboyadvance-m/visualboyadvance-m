@@ -121,17 +121,18 @@ if(ENABLE_LINK)
     )
 
     target_include_directories(vbam-core
-        PRIVATE ${SFML_INCLUDE_DIR})
+        PRIVATE ${SFML_INCLUDE_DIR}
+    )
 
     target_link_libraries(vbam-core
-        PRIVATE ${SFML_LIBRARIES})
+        PRIVATE ${SFML_LIBRARIES}
+    )
 
-    if(ENABLE_NLS)
-        # Add libintl.h
-        target_include_directories(vbam-core
-            PRIVATE ${LIBINTL_INC})
-        target_link_libraries(vbam-core
-            PRIVATE ${NLS_LIBS})
-    endif()
-
+    # Add libintl.h
+    target_include_directories(vbam-core
+        PRIVATE ${LIBINTL_INC}
+    )
+    target_link_libraries(vbam-core
+        PRIVATE ${NLS_LIBS}
+    )
 endif()
