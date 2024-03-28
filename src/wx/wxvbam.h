@@ -314,6 +314,8 @@ public:
     }
 
     void PollJoysticks() { joy.Poll(); }
+    
+    void PollAllJoysticks() { joy.PollAllJoysticks(); }
 
     // Poll joysticks with timer.
     void StartJoyPollTimer();
