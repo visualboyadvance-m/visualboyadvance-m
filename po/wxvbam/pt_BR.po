@@ -1827,15 +1827,15 @@ msgstr "XAudio2: Falhou em criar a voz de origem!"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:643
 msgid "Error, link already connected"
-msgstr ""
+msgstr "Erro, link já conectado"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:657
 msgid "Unable to find link driver"
-msgstr ""
+msgstr "Incapaz de achar o driver do link"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:700
 msgid "Link connection does not need updates."
-msgstr ""
+msgstr "A conexão do link não precisa de atualizações."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:839
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:903
@@ -1843,77 +1843,77 @@ msgstr ""
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2882
 #, c-format
 msgid "Player %d disconnected."
-msgstr ""
+msgstr "Jogador %d desconectado."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:943
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:983
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1023
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1658
 msgid "Server disconnected."
-msgstr ""
+msgstr "O servidor desconectou."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1105
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1137
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1682
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1715
 msgid "Network error."
-msgstr ""
+msgstr "Erro da rede."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1114
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1691
 #, c-format
 msgid "Player %d connected"
-msgstr ""
+msgstr "Jogador %d conectado"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1128
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1705
 msgid "All players connected"
-msgstr ""
+msgstr "Todos os jogadores conectados"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1149
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1727
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
-msgstr ""
+msgstr "Conectado como #%d, esperando %d jogadores se juntarem"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1158
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1736
 msgid "All players joined."
-msgstr ""
+msgstr "Todos os jogadores entraram."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1651
 msgid "Server timed out."
-msgstr ""
+msgstr "O tempo do servidor se esgotou."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2605
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2626
 msgid "Error creating file mapping"
-msgstr ""
+msgstr "Erro ao criar o mapeamento do arquivo"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2616
 msgid "Error mapping file"
-msgstr ""
+msgstr "Erro ao mapear o arquivo"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2663
 msgid "5 or more GBAs not supported."
-msgstr ""
+msgstr "5 ou mais GBAs não suportados."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2682
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2701
 msgid "Error opening event"
-msgstr ""
+msgstr "Erro ao abrir o evento"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2801
 msgid "Lost link; reinitialize to reconnect"
-msgstr ""
+msgstr "Link perdido; reinicializar pra reconectar"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2808
 msgid "Lost link; reconnected"
-msgstr ""
+msgstr "Link perdido; reconectado"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2929
 msgid "Unknown slave timed out; resetting comm"
-msgstr ""
+msgstr "O tempo do escravo desconhecido se esgotou; resetando a comunicação"
 
 #: xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"

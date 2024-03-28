@@ -10,7 +10,7 @@
 # Rythm Tse <ksusix@gmail.com>, 2016
 # Xuntao Chi <1139954766@qq.com>, 2019
 # 后海游泳大老爷 <my.yuicn@gmail.com>, 2015,2020
-# 天绝星 <c.cejhb@gmail.com>, 2016-2017,2019-2020,2022-2023
+# 天绝星 <c.cejhb@gmail.com>, 2016-2017,2019-2020,2022-2024
 # 威 诸 <zw57203247@126.com>, 2020
 # 智弘 王, 2022
 # 沈舒超 <ssc19940105@gmail.com>, 2015
@@ -22,7 +22,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-26 22:17+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: 陈 依云 <c1998lf@qq.com>, 2023-2024\n"
+"Last-Translator: 天绝星 <c.cejhb@gmail.com>, 2016-2017,2019-2020,2022-2024\n"
 "Language-Team: Chinese Simplified (http://app.transifex.com/bgk/vba-m/language/zh-Hans/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -325,7 +325,7 @@ msgstr "启用色彩修改时无法使用 GB BIOS。"
 
 #: cmdevents.cpp:2569
 msgid "LAN link is already active. Disable link mode to disconnect."
-msgstr "局域网连接已激活，禁用连接模式即可断开联网。"
+msgstr "局域网联机已激活，禁用联机模式即可断开联网。"
 
 #: cmdevents.cpp:2575
 msgid "Network is not supported in local mode."
@@ -426,7 +426,7 @@ msgstr "要使用的 BIOS 文件（如果启用）"
 
 #: config/internal/option-internal.cpp:432
 msgid "Enable link at boot"
-msgstr "在启动时启用链接"
+msgstr "在启动时启用联机"
 
 #: config/internal/option-internal.cpp:437
 msgid "Enable faster network protocol by default"
@@ -434,15 +434,15 @@ msgstr "默认启用更快的网络协议"
 
 #: config/internal/option-internal.cpp:439
 msgid "Default network link client host"
-msgstr "默认网络链接客户端主机"
+msgstr "默认网络联机客户端主机"
 
 #: config/internal/option-internal.cpp:440
 msgid "Default network link server IP to bind"
-msgstr "要绑定的默认网络链接服务器 IP"
+msgstr "要绑定的默认网络联机服务器 IP"
 
 #: config/internal/option-internal.cpp:442
 msgid "Default network link port (server and client)"
-msgstr "默认网络链接端口（服务器和客户端）"
+msgstr "默认网络联机端口（服务器和客户端）"
 
 #: config/internal/option-internal.cpp:443
 msgid "Default network protocol"
@@ -450,11 +450,11 @@ msgstr "默认网络协议"
 
 #: config/internal/option-internal.cpp:444
 msgid "Link timeout (ms)"
-msgstr "链接超时（毫秒）"
+msgstr "联机超时（毫秒）"
 
 #: config/internal/option-internal.cpp:445
 msgid "Link cable type"
-msgstr "链接线缆类型"
+msgstr "联机线缆类型"
 
 #: config/internal/option-internal.cpp:451
 msgid "Automatically load last saved state"
@@ -1673,7 +1673,7 @@ msgstr "设置配置文件"
 
 #: wxvbam.cpp:658
 msgid "Delete shared link state first, if it exists"
-msgstr "请先删除共享链接状态，如果存在的话"
+msgstr "请先删除共享联机状态，如果存在的话"
 
 #: wxvbam.cpp:665
 msgid "List all settable options and exit"
@@ -1811,15 +1811,15 @@ msgstr "XAudio2: 创建源语音失败！"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:643
 msgid "Error, link already connected"
-msgstr ""
+msgstr "错误，联机已连接"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:657
 msgid "Unable to find link driver"
-msgstr ""
+msgstr "无法找到联机驱动程序"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:700
 msgid "Link connection does not need updates."
-msgstr ""
+msgstr "联机连接不需要更新。"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:839
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:903
@@ -1827,77 +1827,77 @@ msgstr ""
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2882
 #, c-format
 msgid "Player %d disconnected."
-msgstr ""
+msgstr "玩家 %d 已断开连接。"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:943
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:983
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1023
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1658
 msgid "Server disconnected."
-msgstr ""
+msgstr "服务器已断开连接。"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1105
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1137
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1682
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1715
 msgid "Network error."
-msgstr ""
+msgstr "网络错误。"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1114
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1691
 #, c-format
 msgid "Player %d connected"
-msgstr ""
+msgstr "玩家 %d 已连接"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1128
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1705
 msgid "All players connected"
-msgstr ""
+msgstr "所有玩家已连接"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1149
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1727
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
-msgstr ""
+msgstr "以 #%d 方式连接，正在等待 %d 名玩家加入"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1158
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1736
 msgid "All players joined."
-msgstr ""
+msgstr "所有玩家已加入。"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1651
 msgid "Server timed out."
-msgstr ""
+msgstr "服务器超时。"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2605
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2626
 msgid "Error creating file mapping"
-msgstr ""
+msgstr "创建文件映射错误"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2616
 msgid "Error mapping file"
-msgstr ""
+msgstr "映射文件错误"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2663
 msgid "5 or more GBAs not supported."
-msgstr ""
+msgstr "不支持 5 台或更多 GBA 机器。"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2682
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2701
 msgid "Error opening event"
-msgstr ""
+msgstr "打开事件错误"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2801
 msgid "Lost link; reinitialize to reconnect"
-msgstr ""
+msgstr "联机丢失；重新初始化以重新连接"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2808
 msgid "Lost link; reconnected"
-msgstr ""
+msgstr "联机丢失；已重新连接"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2929
 msgid "Unknown slave timed out; resetting comm"
-msgstr ""
+msgstr "未知从机超时；正在重置通讯"
 
 #: xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
@@ -2902,11 +2902,11 @@ msgstr "玩家 4"
 
 #: xrc/LinkConfig.xrc:4
 msgid "Link configuration"
-msgstr "连接设置"
+msgstr "联机设置"
 
 #: xrc/LinkConfig.xrc:11
 msgid "Link timeout (in milliseconds)"
-msgstr "最大等待连接时间 (毫秒)"
+msgstr "最大等待联机时间 (毫秒)"
 
 #: xrc/Logging.xrc:4
 msgid "Logging"
@@ -3202,11 +3202,11 @@ msgstr "选项(&O)"
 
 #: xrc/MainMenu.xrc:270
 msgid "&Link"
-msgstr "连接(&L)"
+msgstr "联机(&L)"
 
 #: xrc/MainMenu.xrc:272
 msgid "Start &Network Link..."
-msgstr "开始网络连接(&N)..."
+msgstr "开始网络联机(&N)..."
 
 #: xrc/MainMenu.xrc:277
 msgid "&Nothing"
@@ -3226,7 +3226,7 @@ msgstr "本地模式(&L)"
 
 #: xrc/MainMenu.xrc:302
 msgid "&Link at boot"
-msgstr "启动时连接(&L)"
+msgstr "启动时联机(&L)"
 
 #: xrc/MainMenu.xrc:306
 msgid "&Speed hack"
@@ -3651,11 +3651,11 @@ msgstr "载入(&L)..."
 
 #: xrc/NetLink.xrc:4
 msgid "Start Network Link"
-msgstr "开始网络连接"
+msgstr "开始网络联机"
 
 #: xrc/NetLink.xrc:13
 msgid "WARNING: Link will likely not work over the internet or LAN."
-msgstr "警告：连接可能无法工作于互联网或局域网。"
+msgstr "警告：联机可能无法工作于互联网或局域网。"
 
 #: xrc/NetLink.xrc:38
 msgid "Server"
