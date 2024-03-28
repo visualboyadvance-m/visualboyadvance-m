@@ -1,5 +1,7 @@
 #include "wx/dialogs/joypad-config.h"
 
+#include "wx/wxvbam.h"
+
 #include <wx/xrc/xmlres.h>
 
 #include "wx/dialogs/validated-child.h"
@@ -25,6 +27,11 @@ JoypadConfig::JoypadConfig(wxWindow* parent) : wxDialog(), keep_on_top_styler_(t
 
     for (int joypad = 0; joypad < 4; joypad++) {
         wxWindow* panel = GetValidatedChild(this, wxString::Format("joy%d", joypad + 1));
+        
+        panel->Bind(wxEVT_CHECKBOX, std::bind(&JoypadConfig::ToggleSDLGameControllerMode, this, panel, this),
+                    XRCID("SDLGameControllerMode"));
+        
+        GetValidatedChild<wxCheckBox>(panel, "SDLGameControllerMode")->SetValue(gopts.sdl_game_controller_mode);
 
         GetValidatedChild(panel, "DefaultConfig")
             ->SetValidator(
@@ -80,6 +87,27 @@ void JoypadConfig::ClearJoypad(wxWindow* panel) {
         GetValidatedChild<widgets::UserInputCtrl>(panel, config::GameKeyToString(game_key))
             ->Clear();
     }
+}
+
+void JoypadConfig::ToggleSDLGameControllerMode(wxWindow* panel, wxWindow* parent) {
+    bool toggled = GetValidatedChild<wxCheckBox>(panel, "SDLGameControllerMode")
+                    ->IsChecked();
+
+    gopts.sdl_game_controller_mode = toggled;
+    update_opts();
+
+    // Clear all joypads because when changing modes the keys can change.
+    // And set the checkboxes on all the panels to the same value.
+    for (unsigned joypad = 0; joypad < 4; joypad++) {
+        wxWindow* panel = GetValidatedChild(parent, wxString::Format("joy%d", joypad + 1));
+
+        GetValidatedChild<wxCheckBox>(panel, "SDLGameControllerMode")
+            ->SetValue(toggled);
+
+        ClearJoypad(panel);
+    }
+
+    wxGetApp().frame->PollAllJoysticks();
 }
 
 }  // namespace dialogs

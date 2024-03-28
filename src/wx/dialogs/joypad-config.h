@@ -24,6 +24,9 @@ private:
 
     // Clears all Joypad controls.
     void ClearJoypad(wxWindow* panel);
+    
+    // Toggle SDL GameController mode for all joysticks.
+    void ToggleSDLGameControllerMode(wxWindow* panel, wxWindow* parent);
 
     const widgets::KeepOnTopStyler keep_on_top_styler_;
 };

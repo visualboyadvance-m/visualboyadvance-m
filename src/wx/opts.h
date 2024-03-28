@@ -42,6 +42,7 @@ extern struct opts_t {
     std::map<config::GameControl, std::set<config::UserInput>>
         game_control_bindings;
     int autofire_rate = 1;
+    bool sdl_game_controller_mode = true;
 
     /// Keyboard
     config::Shortcuts shortcuts;

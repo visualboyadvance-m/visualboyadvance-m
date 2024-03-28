@@ -293,6 +293,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kJoy),
         Option(OptionID::kJoyAutofireThrottle, &gopts.autofire_rate, 1, 1000),
         Option(OptionID::kJoyDefault, &g_owned_opts.default_stick, 1, 4),
+        Option(OptionID::kSDLGameControllerMode, &gopts.sdl_game_controller_mode),
 
         /// Keyboard
         Option(OptionID::kKeyboard),
@@ -478,6 +479,8 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                _("The autofire toggle period, in frames (1/60 s)")},
     OptionData{"Joypad/Default", "",
                _("The number of the stick to use in single-player mode")},
+    OptionData{"Joypad/SDLGameControllerMode", "SDLGameControllerMode",
+               _("Whether to enable SDL GameController mode")},
 
     /// Keyboard
     OptionData{"Keyboard/*", "",

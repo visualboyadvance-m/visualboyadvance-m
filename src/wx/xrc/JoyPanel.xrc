@@ -4,6 +4,12 @@
     <object class="wxBoxSizer">
       <orient>wxVERTICAL</orient>
       <object class="sizeritem">
+        <flag>wxALIGN_CENTRE_HORIZONTAL</flag>
+        <object class="wxCheckBox" name="SDLGameControllerMode">
+          <label>SDL GameController Mode</label>
+        </object>
+      </object>
+      <object class="sizeritem">
         <object class="wxNotebook">
           <tooltip>Click a field and press a key or move joystick to add. Press backspace to delete last added key. Resize window or click inside and move pointer to see entire contents if too small.</tooltip>
           <object class="notebookpage">

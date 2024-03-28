@@ -4,6 +4,7 @@
 #include <SDL.h>
 
 #include "wx/wxvbam.h"
+#include "wx/opts.h"
 
 namespace {
 
@@ -171,7 +172,7 @@ wxSDLJoyState::wxSDLJoyState(int sdl_index)
 
 wxSDLJoyState::wxSDLJoyState(wxJoystick joystick) : wx_joystick_(joystick) {
     int sdl_index = wx_joystick_.sdl_index_;
-    if (SDL_IsGameController(sdl_index)) {
+    if (gopts.sdl_game_controller_mode && SDL_IsGameController(sdl_index)) {
         game_controller_ = SDL_GameControllerOpen(sdl_index);
         if (game_controller_)
             sdl_joystick_ = SDL_GameControllerGetJoystick(game_controller_);
