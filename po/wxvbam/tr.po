@@ -10,7 +10,7 @@
 # Erdoğan Şahin, 2016
 # Justice League <denizden788@gmail.com>, 2020
 # Bone Cruncher (SilentChaos) <mrzabuzaxtr@gmail.com>, 2018
-# Sinan H., 2016,2018,2022
+# Sinan H., 2016,2018,2022,2024
 # Tmp341, 2016,2021,2023
 msgid ""
 msgstr ""
@@ -18,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-26 22:17+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Tmp341, 2016,2021,2023\n"
+"Last-Translator: Sinan H., 2016,2018,2022,2024\n"
 "Language-Team: Turkish (http://app.transifex.com/bgk/vba-m/language/tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -313,7 +313,7 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program. If not, see http://www.gnu.org/licenses ."
-msgstr ""
+msgstr "Bu ücretsiz bir programdır:Free Software Foundation'ın yayımladığı GNU General Public lisansına uygun olarak paylaşılabilir, üzerinde değişiklikler yapılabilir (lisansın 2. sürümü ya da sonrasında çıkan sürümü, sizin tercihinizdir.)\n\nBu program işe yaraması amacı ile yazılmıştır, ancak HİÇBİR GARANTİ içermez; ima edilen TİCARETE UYGUNLUK garantisi ya da BELLİ BİR AMACA UYGUNLUK garantisi bile içermez. Daha fazla bilgi için GNU General Public Lisansını inceleyiniz.\n\nBu programın içinde GNU General Public lisansının bir kopyasının da bulunması gerekir. Eğer bu kopya programdan çıkmadıysa, http://www.gnu.org/licenses sitesinden Lisansa ulaşabilirsiniz."
 
 #: cmdevents.cpp:2503
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
@@ -337,7 +337,7 @@ msgstr ""
 
 #: config/internal/option-internal.cpp:381
 msgid "Filter plugin library"
-msgstr ""
+msgstr "Filtre eklenti kütüphanesi"
 
 #: config/internal/option-internal.cpp:382
 msgid "Interframe blending function"
@@ -3771,7 +3771,7 @@ msgstr "Orta"
 
 #: xrc/SoundConfig.xrc:271
 msgid "Left / Right"
-msgstr ""
+msgstr "Sol/Sağ"
 
 #: xrc/SoundConfig.xrc:300
 msgid "Sound filtering"
