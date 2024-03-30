@@ -93,6 +93,10 @@ if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     set(CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO "Debug")
 endif()
 
+if(NOT ENV{MSYSTEM_PREFIX} STREQUAL "")
+    set(MSYS ON)
+endif()
+
 include(CTest)
 if(BUILD_TESTING)
     enable_testing()
@@ -216,7 +220,11 @@ if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     endif()
 endif()
 
-set(VBAM_SDL2_LIBS SDL2::SDL2 ${SDL2_LIBRARY_TEMP})
+if(VBAM_STATIC)
+    set(VBAM_SDL2_LIBS SDL2::SDL2-static ${SDL2_LIBRARY_TEMP})
+else()
+    set(VBAM_SDL2_LIBS SDL2::SDL2        ${SDL2_LIBRARY_TEMP})
+endif()
 
 set(VBAM_GENERATED_DIR ${CMAKE_BINARY_DIR}/generated)
 

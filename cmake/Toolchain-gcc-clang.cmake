@@ -49,3 +49,7 @@ endif()
 if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
     include_directories(/usr/local/include)
 endif()
+
+if(VBAM_STATIC)
+    add_link_options("-static-libgcc" "-static-libstdc++")
+endif()

@@ -286,7 +286,7 @@ endif()
 
 # OpenAL.
 find_package(OpenAL REQUIRED)
-if(OPENAL_STATIC OR (WIN32 AND ((NOT (MINGW AND MSYS)) OR CMAKE_TOOLCHAIN_FILE MATCHES mxe)))
+if(OPENAL_STATIC)
     target_compile_definitions(visualboyadvance-m PRIVATE AL_LIBTYPE_STATIC)
 endif()
 target_include_directories(visualboyadvance-m PRIVATE ${OPENAL_INCLUDE_DIR})
@@ -332,6 +332,20 @@ find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl ${wx_find_ex
 if(NOT wxWidgets_FOUND)
     find_package(wxWidgets COMPONENTS xrc xml html adv net core base ${wx_find_extra} REQUIRED)
     target_compile_definitions(visualboyadvance-m PRIVATE NO_OGL)
+endif()
+
+# Workaround of static liblzma not being found on MSYS2.
+if(VBAM_STATIC AND MSYS)
+    unset(cleaned_up_wx_libs)
+    foreach(lib ${wxWidgets_LIBRARIES})
+        if(lib STREQUAL "-llzma")
+            set(lib "liblzma.a")
+        endif()
+
+        list(APPEND cleaned_up_wx_libs "${lib}")
+    endforeach()
+
+    set(wxWidgets_LIBRARIES "${cleaned_up_wx_libs}")
 endif()
 
 target_link_libraries(visualboyadvance-m ${wxWidgets_LIBRARIES})
