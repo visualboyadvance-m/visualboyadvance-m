@@ -2,12 +2,14 @@ if(X86_32 OR X86_64)
     add_compile_options(-mfpmath=sse -msse2)
 endif()
 
-if(X86_64)
-    # Require and optimize for Core2 level support, tune for generic.
-    add_compile_options(-march=core2 -mtune=generic)
-elseif(X86_32)
-    # Optimize for pentium-mmx and tune for generic for older builds.
-    add_compile_options(-march=pentium-mmx -mtune=generic)
+if(UPSTREAM_RELEASE)
+    if(X86_64)
+        # Require and optimize for Core2 level support, tune for generic.
+        add_compile_options(-march=core2 -mtune=generic)
+    elseif(X86_32)
+        # Optimize for pentium-mmx and tune for generic for older builds.
+        add_compile_options(-march=pentium-mmx -mtune=generic)
+    endif()
 endif()
 
 # Common flags.
@@ -54,5 +56,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
 endif()
 
 if(VBAM_STATIC)
-    add_link_options("-static-libgcc" "-static-libstdc++" "-Wl,-Bstatic" "-lstdc++" "-lpthread")
+    add_link_options(-static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread)
 endif()
+
+# To support LTO, this must always fail.
+add_compile_options(-Werror=odr -Werror=lto-type-mismatch -Werror=strict-aliasing)
+add_link_options(   -Werror=odr -Werror=lto-type-mismatch -Werror=strict-aliasing)
