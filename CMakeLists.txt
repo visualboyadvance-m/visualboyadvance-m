@@ -49,7 +49,7 @@ endif()
 find_package(Git)
 
 # Make sure we pull in the submodules on windows and mingw.
-if(GIT_FOUND AND (WIN32 OR MINGW))
+if(GIT_FOUND AND WIN32)
     # Win32 deps submodule
     set(SUBMODULE_MANUAL_UPDATE FALSE)
 

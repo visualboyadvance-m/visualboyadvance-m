@@ -197,6 +197,23 @@ target_link_libraries(
     ${OPENGL_LIBRARIES}
 )
 
+# adjust link command when making a static binary for gcc
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND VBAM_STATIC)
+    if(MSYS)
+        add_custom_command(
+            TARGET visualboyadvance-m PRE_LINK
+            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/msys-link-static.cmake
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        )
+    else()
+        add_custom_command(
+            TARGET visualboyadvance-m PRE_LINK
+            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/link-static.cmake
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        )
+    endif()
+endif()
+
 add_dependencies(visualboyadvance-m translations-zip)
 
 # on unix we have to check for X11 before we overwrite all the compile/link

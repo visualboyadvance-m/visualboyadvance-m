@@ -13,13 +13,16 @@ endif()
 # Common flags.
 add_compile_options(
     -pipe
-    -Wno-unused-command-line-argument
-    -Wno-deprecated-copy
+    $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-copy>
     -Wformat
     -Wformat-security
     -feliminate-unused-debug-types
     -fdiagnostics-color=always
 )
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    add_compile_options(-Wno-unused-command-line-argument)
+endif()
 
 # check if ssp flags are supported.
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
@@ -51,5 +54,5 @@ if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
 endif()
 
 if(VBAM_STATIC)
-    add_link_options("-static-libgcc" "-static-libstdc++")
+    add_link_options("-static-libgcc" "-static-libstdc++" "-Wl,-Bstatic" "-lstdc++" "-lpthread")
 endif()

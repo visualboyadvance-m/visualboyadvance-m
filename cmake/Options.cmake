@@ -17,7 +17,7 @@ option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build w
 set(VBAM_STATIC_DEFAULT OFF)
 if(VCPKG_TARGET_TRIPLET MATCHES -static OR CMAKE_TOOLCHAIN_FILE MATCHES "mxe|-static")
     set(VBAM_STATIC_DEFAULT ON)
-elseif(MINGW OR (NOT "$ENV{MSYSTEM_PREFIX}" STREQUAL ""))
+elseif(MINGW OR MSYS)
     # Default to static builds on MinGW and all MSYS2 envs.
     set(VBAM_STATIC_DEFAULT ON)
 endif()
