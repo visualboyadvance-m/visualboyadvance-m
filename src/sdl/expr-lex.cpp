@@ -151,7 +151,7 @@ typedef unsigned int flex_uint32_t;
 
 #ifndef YY_TYPEDEF_YY_BUFFER_STATE
 #define YY_TYPEDEF_YY_BUFFER_STATE
-typedef struct yy_buffer_state* YY_BUFFER_STATE;
+typedef struct yy_buffer_state_sdl* YY_BUFFER_STATE;
 #endif
 
 extern int yyleng;
@@ -184,7 +184,7 @@ typedef size_t yy_size_t;
 
 #ifndef YY_STRUCT_YY_BUFFER_STATE
 #define YY_STRUCT_YY_BUFFER_STATE
-struct yy_buffer_state {
+struct yy_buffer_state_sdl {
     FILE* yy_input_file;
 
     char* yy_ch_buf; /* input buffer */
@@ -1218,7 +1218,7 @@ YY_BUFFER_STATE yy_create_buffer(FILE* file, int size)
 {
     YY_BUFFER_STATE b;
 
-    b = (YY_BUFFER_STATE)yyalloc(sizeof(struct yy_buffer_state));
+    b = (YY_BUFFER_STATE)yyalloc(sizeof(struct yy_buffer_state_sdl));
     if (!b)
         YY_FATAL_ERROR("out of dynamic memory in yy_create_buffer()");
 
@@ -1381,11 +1381,11 @@ static void yyensure_buffer_stack(void)
 		 * immediate realloc on the next call.
          */
         num_to_alloc = 1;
-        (yy_buffer_stack) = (struct yy_buffer_state**)yyalloc(num_to_alloc * sizeof(struct yy_buffer_state*));
+        (yy_buffer_stack) = (struct yy_buffer_state_sdl**)yyalloc(num_to_alloc * sizeof(struct yy_buffer_state_sdl*));
         if (!(yy_buffer_stack))
             YY_FATAL_ERROR("out of dynamic memory in yyensure_buffer_stack()");
 
-        memset((yy_buffer_stack), 0, num_to_alloc * sizeof(struct yy_buffer_state*));
+        memset((yy_buffer_stack), 0, num_to_alloc * sizeof(struct yy_buffer_state_sdl*));
 
         (yy_buffer_stack_max) = num_to_alloc;
         (yy_buffer_stack_top) = 0;
@@ -1398,13 +1398,13 @@ static void yyensure_buffer_stack(void)
         int grow_size = 8 /* arbitrary grow size */;
 
         num_to_alloc = (yy_buffer_stack_max) + grow_size;
-        (yy_buffer_stack) = (struct yy_buffer_state**)yyrealloc((yy_buffer_stack),
-            num_to_alloc * sizeof(struct yy_buffer_state*));
+        (yy_buffer_stack) = (struct yy_buffer_state_sdl**)yyrealloc((yy_buffer_stack),
+            num_to_alloc * sizeof(struct yy_buffer_state_sdl*));
         if (!(yy_buffer_stack))
             YY_FATAL_ERROR("out of dynamic memory in yyensure_buffer_stack()");
 
         /* zero only the new slots.*/
-        memset((yy_buffer_stack) + (yy_buffer_stack_max), 0, grow_size * sizeof(struct yy_buffer_state*));
+        memset((yy_buffer_stack) + (yy_buffer_stack_max), 0, grow_size * sizeof(struct yy_buffer_state_sdl*));
         (yy_buffer_stack_max) = num_to_alloc;
     }
 }
@@ -1423,7 +1423,7 @@ YY_BUFFER_STATE yy_scan_buffer(char* base, yy_size_t size)
         /* They forgot to leave room for the EOB's. */
         return 0;
 
-    b = (YY_BUFFER_STATE)yyalloc(sizeof(struct yy_buffer_state));
+    b = (YY_BUFFER_STATE)yyalloc(sizeof(struct yy_buffer_state_sdl));
     if (!b)
         YY_FATAL_ERROR("out of dynamic memory in yy_scan_buffer()");
 
