@@ -65,6 +65,7 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /*kJoy*/ Option::Type::kNone,
     /*kJoyAutofireThrottle*/ Option::Type::kInt,
     /*kJoyDefault*/ Option::Type::kUnsigned,
+    /*kSDLGameControllerMode*/ Option::Type::kBool,
 
     /// Keyboard
     /*kKeyboard*/ Option::Type::kNone,

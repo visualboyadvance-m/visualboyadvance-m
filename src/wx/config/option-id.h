@@ -61,6 +61,7 @@ enum class OptionID {
     kJoy,
     kJoyAutofireThrottle,
     kJoyDefault,
+    kSDLGameControllerMode,
 
     /// Keyboard
     kKeyboard,
