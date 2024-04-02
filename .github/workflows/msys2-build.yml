@@ -5,8 +5,23 @@ jobs:
   build:
     strategy:
       matrix:
-        cmake_build: ['-DCMAKE_BUILD_TYPE=Release', '-DCMAKE_BUILD_TYPE=Debug']
-        cmake_options: ['', '-DENABLE_LINK=OFF', '-DENABLE_SDL=ON']
+        build_type: [release, debug]
+        build_options: [default, link_off, translations_only, libretro]
+        include:
+          - cmake_build: '-DCMAKE_BUILD_TYPE=Release'
+            build_type: release
+          - cmake_build: '-DCMAKE_BUILD_TYPE=Debug'
+            build_type: debug
+          - cmake_options: '-DENABLE_LINK=OFF'
+            build_options: link_off
+          - cmake_options: '-DTRANSLATIONS_ONLY=ON'
+            build_options: translations_only
+          - libretro_build: 'DEBUG=0'
+            build_type: release
+            build_options: libretro
+          - libretro_build: 'DEBUG=1'
+            build_type: debug
+            build_options: libretro
     runs-on: windows-latest
     env:
       MSYSTEM: CLANG64
@@ -16,7 +31,7 @@ jobs:
 
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with: 
           submodules: recursive
       - name: Setup msys2
@@ -27,11 +42,19 @@ jobs:
       - name: Install deps
         run: >-
           bash installdeps
-      - name: Configure
-        run: >-
-          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}
-      - name: Build
-        run: ninja -C build
 
-      - name: Install
+      # CMake build
+      - if: matrix.build_options != 'libretro'
+        name: Configure CMake
+        run: cmake -B build -G Ninja ${{ matrix.cmake_build }} -DENABLE_LTO=OFF ${{ matrix.cmake_options }}
+      - if: matrix.build_options != 'libretro'
+        name: Build
+        run: ninja -C build
+      - if: matrix.build_options != 'libretro'
+        name: Install
         run: ninja -C build install
+
+      # Libretro build
+      - if: matrix.build_options == 'libretro'
+        name: Build libretro core
+        run: make -C src/libretro ${{ matrix.libretro_build }} CC=clang CXX=clang++
