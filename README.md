@@ -217,7 +217,6 @@ Here is the complete list:
 | ENABLE_GBA_LOGGING    | Enable extended GBA logging                                          | ON                    |
 | ENABLE_DIRECT3D       | Direct3D rendering for wxWidgets (Windows, **NOT IMPLEMENTED!!!**)   | ON                    |
 | ENABLE_XAUDIO2        | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |
-| ENABLE_OPENAL         | Enable OpenAL for the wxWidgets port                                 | AUTO                  |
 | ENABLE_ASAN           | Enable libasan sanitizers (by default address, only in debug mode)   | OFF                   |
 | UPSTREAM_RELEASE      | Do some release tasks, like codesigning, making zip and gpg sigs.    | OFF                   |
 | BUILD_TESTING         | Build the tests and enable ctest support.                            | ON                    |

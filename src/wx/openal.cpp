@@ -1,8 +1,6 @@
 // === LOGALL writes very detailed informations to vba-trace.log ===
 //#define LOGALL
 
-#ifndef NO_OAL
-
 // for gopts
 // also, wx-related
 #include "wx/wxvbam.h"
@@ -363,5 +361,3 @@ bool OpenAL::GetDevices(wxArrayString& names, wxArrayString& ids)
     // should work anyway, but must always use default driver
     return true;
 }
-
-#endif
