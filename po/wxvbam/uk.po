@@ -505,7 +505,7 @@ msgstr "Номер важеля для використання в одинич�
 
 #: config/internal/option-internal.cpp:484
 msgid "Whether to enable SDL GameController mode"
-msgstr ""
+msgstr "Увімкнення режиму SDL Game Controller."
 
 #: config/internal/option-internal.cpp:488
 msgid ""
@@ -1820,7 +1820,7 @@ msgstr "З'єднання за посиланням не потребує оно
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2878
 #, c-format
 msgid "Player %d disconnected."
-msgstr "Гравця %d від'єднано."
+msgstr "Гравця %d роз'єднано."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:939
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:979
@@ -2879,7 +2879,7 @@ msgstr "Конфігурація джойстика"
 
 #: xrc/JoypadConfig.xrc:10
 msgid "SDL GameController Mode"
-msgstr ""
+msgstr "Режим SDL Game Controller"
 
 #: xrc/JoypadConfig.xrc:19
 msgid "Player 1"
