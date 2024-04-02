@@ -1,3 +1,7 @@
+if(TRANSLATIONS_ONLY)
+    return()
+endif()
+
 if(NOT CMAKE_SYSTEM_PROCESSOR)
     if(NOT CMAKE_TOOLCHAIN_FILE AND CMAKE_HOST_SYSTEM_PROCESSOR)
         set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_HOST_SYSTEM_PROCESSOR})
@@ -62,4 +66,9 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "[aA][aA][rR][cC][hH]|[aA][rR][mM]")
     if(NOT CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "[aA][aA][rR][cC][hH]|[aA][rR][mM]")
         set(CMAKE_CROSSCOMPILING TRUE)
     endif()
+endif()
+
+# We do not support amd64 asm yet
+if(X86_64 AND (ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS OR ENABLE_MMX))
+    message(FATAL_ERROR "The options ASM_CORE, ASM_SCALERS and MMX are not supported on X86_64 yet.")
 endif()

@@ -27,6 +27,13 @@ jobs:
           - libretro_build: 'DEBUG=1'
             build_type: debug
             build_options: libretro
+        exclude:
+          # Exclude debug/translations_only build
+          - build_type: debug
+            build_options: translations_only
+          - build_type: release
+            build_options: translations_only
+            build_compiler: clang
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
