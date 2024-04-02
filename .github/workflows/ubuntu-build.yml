@@ -5,26 +5,52 @@ jobs:
   build:
     strategy:
       matrix:
-        cmake_compiler: ['-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++', '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++']
-        cmake_build: ['-DCMAKE_BUILD_TYPE=Release', '-DCMAKE_BUILD_TYPE=Debug']
-        cmake_options: ['', '-DENABLE_LINK=OFF', '-DENABLE_SDL=ON']
+        build_compiler: [gcc, clang]
+        build_type: [release, debug]
+        build_options: [default, link_off, translations_only, libretro]
+        include:
+          - cmake_compiler: '-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++'
+            build_compiler: gcc
+          - cmake_compiler: '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
+            build_compiler: clang
+          - cmake_build: '-DCMAKE_BUILD_TYPE=Release'
+            build_type: release
+          - cmake_build: '-DCMAKE_BUILD_TYPE=Debug'
+            build_type: debug
+          - cmake_options: '-DENABLE_LINK=OFF'
+            build_options: link_off
+          - cmake_options: '-DTRANSLATIONS_ONLY=ON'
+            build_options: translations_only
+          - libretro_build: 'DEBUG=0'
+            build_type: release
+            build_options: libretro
+          - libretro_build: 'DEBUG=1'
+            build_type: debug
+            build_options: libretro
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with: 
           submodules: recursive
 
       - name: Install Dependencies
         run: >-
-          bash installdeps; if [ "${{ matrix.compiler }}" = clang ]; then sudo apt -y install clang; fi
+          bash installdeps; if [ "${{ matrix.build_compiler }}" = clang ]; then sudo apt -y install clang; fi
 
-      - name: Configure
+      # CMake build
+      - if: matrix.build_options != 'libretro'
+        name: Configure CMake
         run: >-
           cmake -B build -G Ninja ${{ matrix.cmake_compiler }} ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}
-
-      - name: Build
+      - if: matrix.build_options != 'libretro'
+        name: Build
         run: ninja -C build
-
-      - name: Install
+      - if: matrix.build_options != 'libretro'
+        name: Install
         run: sudo ninja -C build install
+
+      # Libretro build
+      - name: Build libretro core
+        if: matrix.build_options == 'libretro'
+        run: make -C src/libretro ${{ matrix.libretro_build }}
