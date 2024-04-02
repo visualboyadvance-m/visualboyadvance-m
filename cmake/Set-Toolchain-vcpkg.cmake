@@ -1,3 +1,7 @@
+if(TRANSLATIONS_ONLY)
+    return()
+endif()
+
 if(NOT DEFINED VCPKG_TARGET_TRIPLET)
     if(NOT WIN32)
         return()

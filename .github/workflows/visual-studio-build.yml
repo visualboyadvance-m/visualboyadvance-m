@@ -19,6 +19,22 @@ jobs:
             build_options: link_off
           - cmake_options: '-DTRANSLATIONS_ONLY=ON'
             build_options: translations_only
+          - cmake_vcpkg_triplet: 'x64-windows-static'
+            msvc_arch: x64
+          - cmake_vcpkg_triplet: 'x86-windows-static'
+            msvc_arch: amd64_x86
+          - cmake_vcpkg_triplet: 'arm64-windows-static'
+            msvc_arch: amd64_arm64
+        exclude:
+          # Exclude debug/translations_only build
+          - build_type: debug
+            build_options: translations_only
+          - build_type: release
+            build_options: translations_only
+            msvc_arch: amd64_x86
+          - build_type: release
+            build_options: translations_only
+            msvc_arch: amd64_arm64
     runs-on: windows-latest
     steps:
       - name: Checkout the code
@@ -31,20 +47,9 @@ jobs:
         with:
           arch: ${{ matrix.msvc_arch }}
 
-      - if: matrix.msvc_arch == 'x64'
-        name: Configure (x64)
+      - name: Configure
         run: >-
-          cmake -B build -G ${{ matrix.cmake_generator }} -DVCPKG_TARGET_TRIPLET=x64-windows-static ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}
-
-      - if: matrix.msvc_arch == 'amd64_x86'
-        name: Configure (x86)
-        run: >-
-          cmake -B build -G ${{ matrix.cmake_generator }} -DVCPKG_TARGET_TRIPLET=x86-windows-static ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}
-
-      - if: matrix.msvc_arch == 'amd64_arm64'
-        name: Configure (arm64)
-        run: >-
-          cmake -B build -G ${{ matrix.cmake_generator }} -DVCPKG_TARGET_TRIPLET=arm64-windows-static ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}
+          cmake -B build -G ${{ matrix.cmake_generator }} -DVCPKG_TARGET_TRIPLET=${{ matrix.cmake_vcpkg_triplet }} ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}
 
       - name: Build
         run: cmake --build build
