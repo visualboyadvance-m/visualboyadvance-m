@@ -1233,11 +1233,9 @@ SoundDriver* systemSoundInit()
     switch (gopts.audio_api) {
     case AUD_SDL:
         return new SoundSDL();
-#ifndef NO_OAL
 
     case AUD_OPENAL:
         return newOpenAL();
-#endif
 #ifdef __WXMSW__
 
     case AUD_DIRECTSOUND:

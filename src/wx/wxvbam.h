@@ -703,11 +703,9 @@ private:
 // I should add this to SoundDriver, but wxArrayString is wx-specific
 // I suppose I could make subclass wxSoundDriver.  maybe later.
 
-#ifndef NO_OAL
 class SoundDriver;
 extern SoundDriver* newOpenAL();
 extern bool GetOALDevices(wxArrayString& names, wxArrayString& ids);
-#endif
 
 #ifdef __WXMSW__
 extern SoundDriver* newDirectSound();

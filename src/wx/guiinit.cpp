@@ -1506,14 +1506,12 @@ public:
         switch (api) {
         case AUD_SDL:
             break;
-#ifndef NO_OAL
 
         case AUD_OPENAL:
             if (!GetOALDevices(names, dev_ids))
                 return false;
 
             break;
-#endif
 #ifdef __WXMSW__
 
         case AUD_DIRECTSOUND:
@@ -2700,9 +2698,6 @@ bool MainFrame::BindControls()
             rb->Hide(); // currently disabled
 
             audapi_rb("OpenAL", AUD_OPENAL);
-#ifdef NO_OAL
-            rb->Hide();
-#endif
             audapi_rb("DirectSound", AUD_DIRECTSOUND);
 #ifndef __WXMSW__
             rb->Hide();

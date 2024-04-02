@@ -13,7 +13,6 @@ Known preprocessor switches:
 - RGB555: Use 16bit colors with 5bit green instead of 6bit green in hq3x/4x filters (C++ version)
 - NO_OGL: Exclude OpenGL code
 - NO_D3D: Exclude Direct3D code
-- NO_OAL: Exclude OpenAL code
 - NO_XAUDIO2: Exclude XAudio2 code (the XAudio2 interface is DirectSound's successor)
 - NO_LINK: Exclude linking code (joybus, multilink, ...)
 - WIN64: This macro is only defined for 64 bit builds
