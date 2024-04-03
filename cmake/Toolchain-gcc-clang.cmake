@@ -27,7 +27,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 # check if ssp flags are supported.
-if(CMAKE_BUILD_TYPE STREQUAL Debug)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     check_cxx_compiler_flag(-fstack-protector-strong STACK_PROTECTOR_SUPPORTED)
 
     if(STACK_PROTECTOR_SUPPORTED)
@@ -44,14 +44,14 @@ if(NOT ENABLE_ASM) # inline asm is not allowed with -fPIC
     add_compile_options(-fPIC)
 endif()
 
-if(CMAKE_BUILD_TYPE STREQUAL Debug)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-ggdb3 -Og -fno-omit-frame-pointer -Wall -Wextra)
 else()
     add_compile_options(-Ofast -fomit-frame-pointer)
 endif()
 
 # for some reason this is necessary
-if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
+if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
     include_directories(/usr/local/include)
 endif()
 
@@ -60,5 +60,10 @@ if(VBAM_STATIC)
 endif()
 
 # To support LTO, this must always fail.
-add_compile_options(-Werror=odr -Werror=lto-type-mismatch -Werror=strict-aliasing)
-add_link_options(   -Werror=odr -Werror=lto-type-mismatch -Werror=strict-aliasing)
+add_compile_options(-Werror=odr -Werror=strict-aliasing)
+add_link_options(   -Werror=odr -Werror=strict-aliasing)
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(-Werror=lto-type-mismatch)
+    add_link_options(   -Werror=lto-type-mismatch)
+endif()
