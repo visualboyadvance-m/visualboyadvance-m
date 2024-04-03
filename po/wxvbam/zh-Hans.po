@@ -22,7 +22,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 13:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: 天绝星 <c.cejhb@gmail.com>, 2016-2017,2019-2020,2022-2024\n"
+"Last-Translator: 陈 依云 <c1998lf@qq.com>, 2023-2024\n"
 "Language-Team: Chinese Simplified (http://app.transifex.com/bgk/vba-m/language/zh-Hans/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -516,7 +516,7 @@ msgstr "在单人模式中使用的摇杆数量"
 
 #: config/internal/option-internal.cpp:484
 msgid "Whether to enable SDL GameController mode"
-msgstr ""
+msgstr "选择是否启用 SDL 游戏控制器模式"
 
 #: config/internal/option-internal.cpp:488
 msgid ""
@@ -2890,7 +2890,7 @@ msgstr "手柄设置"
 
 #: xrc/JoypadConfig.xrc:10
 msgid "SDL GameController Mode"
-msgstr ""
+msgstr "SDL 游戏控制器模式"
 
 #: xrc/JoypadConfig.xrc:19
 msgid "Player 1"
