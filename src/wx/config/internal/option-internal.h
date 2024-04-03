@@ -27,18 +27,18 @@ nonstd::optional<OptionID> StringToOptionId(const wxString& input);
 wxString FilterToString(const Filter& value);
 wxString InterframeToString(const Interframe& value);
 wxString RenderMethodToString(const RenderMethod& value);
-wxString AudioApiToString(int value);
-wxString SoundQualityToString(int value);
+wxString AudioApiToString(const AudioApi& value);
+wxString AudioRateToString(const AudioRate& value);
 Filter StringToFilter(const wxString& config_name, const wxString& input);
 Interframe StringToInterframe(const wxString& config_name, const wxString& input);
 RenderMethod StringToRenderMethod(const wxString& config_name, const wxString& input);
-int StringToAudioApi(const wxString& config_name, const wxString& input);
-int StringToSoundQuality(const wxString& config_name, const wxString& input);
+AudioApi StringToAudioApi(const wxString& config_name, const wxString& input);
+AudioRate StringToSoundQuality(const wxString& config_name, const wxString& input);
 
 wxString AllEnumValuesForType(Option::Type type);
 
 // Max value for enum types.
-int MaxForType(Option::Type type);
+size_t MaxForType(Option::Type type);
 
 }  // namespace internal
 }  // namespace config

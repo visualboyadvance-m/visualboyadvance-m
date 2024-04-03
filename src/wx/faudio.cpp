@@ -1,23 +1,24 @@
-#ifndef NO_FAUDIO
+#if !defined(VBAM_ENABLE_FAUDIO)
+#error "This file should only be compiled if FAudio is enabled"
+#endif
 
-// Application
-#include "wx/wxvbam.h"
-#include <stdio.h>
+#include <cstdio>
 
-// Interface
-#include "core/base/sound_driver.h"
+#include <string>
+#include <vector>
 
 // FAudio
 #include <faudio.h>
 
 // MMDevice API
 #include <mmdeviceapi.h>
-#include <string>
-#include <vector>
 
-// Internals
-#include "core/base/system.h" // for systemMessage()
+#include <wx/arrstr.h>
+
+#include "core/base/sound_driver.h"
+#include "core/base/system.h"
 #include "core/gba/gbaGlobals.h"
+#include "wx/config/option-proxy.h"
 
 int GetFADevices(FAudio* fa, wxArrayString* names, wxArrayString* ids,
     const wxString* match)
@@ -75,10 +76,11 @@ bool GetFADevices(wxArrayString& names, wxArrayString& ids)
 
 static int FAGetDev(FAudio* fa)
 {
-    if (gopts.audio_dev.empty())
+    const wxString& audio_device = OPTION(kSoundAudioDevice);
+    if (audio_device.empty())
         return 0;
     else {
-        int ret = GetFADevices(fa, NULL, NULL, &gopts.audio_dev);
+        int ret = GetFADevices(fa, NULL, NULL, &audio_device);
         return ret < 0 ? 0 : ret;
     }
 }
@@ -281,7 +283,7 @@ FAudio_Output::FAudio_Output()
     initialized = false;
     playing = false;
     freq = 0;
-    bufferCount = gopts.audio_buffers;
+    bufferCount = OPTION(kSoundBuffers);
     buffers = NULL;
     currentBuffer = 0;
     device_changed = false;
@@ -396,7 +398,7 @@ bool FAudio_Output::init(long sampleRate)
         return false;
     }
 
-    if (gopts.upmix) {
+    if (OPTION(kSoundUpmix)) {
         // set up stereo upmixing
         FAudioDeviceDetails dd;
         ZeroMemory(&dd, sizeof(dd));
@@ -626,5 +628,3 @@ SoundDriver* newFAudio_Output()
 {
     return new FAudio_Output();
 }
-
-#endif // #ifndef NO_FAUDIO

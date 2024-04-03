@@ -1,22 +1,19 @@
 // === LOGALL writes very detailed informations to vba-trace.log ===
 //#define LOGALL
 
-// for gopts
-// also, wx-related
-#include "wx/wxvbam.h"
+#include "wx/openal.h"
 
-// Interface
+#include <cassert>
+
+#include <wx/arrstr.h>
+#include <wx/utils.h>
+
 #include "core/base/sound_driver.h"
-
-// OpenAL
-#include "openal.h"
-
-// Internals
-#include "core/gba/gbaGlobals.h"  // for 'speedup' and 'synchronize'
+#include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaSound.h"
+#include "wx/config/option-proxy.h"
 
 // Debug
-#include <assert.h>
 #define ASSERT_SUCCESS assert(AL_NO_ERROR == alGetError())
 
 #ifndef LOGALL
@@ -66,8 +63,8 @@ OpenAL::OpenAL()
     buffersLoaded = false;
     device = NULL;
     context = NULL;
-    buffer = (ALuint*)malloc(gopts.audio_buffers * sizeof(ALuint));
-    memset(buffer, 0, gopts.audio_buffers * sizeof(ALuint));
+    buffer = (ALuint*)malloc(OPTION(kSoundBuffers) * sizeof(ALuint));
+    memset(buffer, 0, OPTION(kSoundBuffers) * sizeof(ALuint));
     tempBuffer = 0;
     source = 0;
 }
@@ -83,7 +80,7 @@ OpenAL::~OpenAL()
     ASSERT_SUCCESS;
     alDeleteSources(1, &source);
     ASSERT_SUCCESS;
-    alDeleteBuffers(gopts.audio_buffers, buffer);
+    alDeleteBuffers(OPTION(kSoundBuffers), buffer);
     ASSERT_SUCCESS;
     free(buffer);
     alcMakeContextCurrent(NULL);
@@ -146,8 +143,9 @@ bool OpenAL::init(long sampleRate)
     winlog("OpenAL::init\n");
     assert(initialized == false);
 
-    if (!gopts.audio_dev.empty()) {
-        device = alcOpenDevice(gopts.audio_dev.utf8_str());
+    const wxString& audio_device = OPTION(kSoundAudioDevice);
+    if (!audio_device.empty()) {
+        device = alcOpenDevice(audio_device.utf8_str());
     } else {
         device = alcOpenDevice(NULL);
     }
@@ -157,7 +155,7 @@ bool OpenAL::init(long sampleRate)
     assert(context != NULL);
     ALCboolean retVal = alcMakeContextCurrent(context);
     assert(ALC_TRUE == retVal);
-    alGenBuffers(gopts.audio_buffers, buffer);
+    alGenBuffers(OPTION(kSoundBuffers), buffer);
     ASSERT_SUCCESS;
     alGenSources(1, &source);
     ASSERT_SUCCESS;
@@ -264,14 +262,14 @@ void OpenAL::write(uint16_t* finalWave, int length)
         // ==initial buffer filling==
         winlog(" initial buffer filling\n");
 
-        for (int i = 0; i < gopts.audio_buffers; i++) {
+        for (int i = 0; i < OPTION(kSoundBuffers); i++) {
             // Filling the buffers explicitly with silence would be cleaner,
             // but the very first sample is usually silence anyway.
             alBufferData(buffer[i], AL_FORMAT_STEREO16, finalWave, soundBufferLen, freq);
             ASSERT_SUCCESS;
         }
 
-        alSourceQueueBuffers(source, gopts.audio_buffers, buffer);
+        alSourceQueueBuffers(source, OPTION(kSoundBuffers), buffer);
         ASSERT_SUCCESS;
         buffersLoaded = true;
     } else {
@@ -280,7 +278,7 @@ void OpenAL::write(uint16_t* finalWave, int length)
         alGetSourcei(source, AL_BUFFERS_PROCESSED, &nBuffersProcessed);
         ASSERT_SUCCESS;
 
-        if (nBuffersProcessed == gopts.audio_buffers) {
+        if (nBuffersProcessed == OPTION(kSoundBuffers)) {
             // we only want to know about it when we are emulating at full speed or faster:
             if ((coreOptions.throttle >= 100) || (coreOptions.throttle == 0)) {
                 if (systemVerbose & VERBOSE_SOUNDOUTPUT) {

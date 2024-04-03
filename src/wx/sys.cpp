@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cassert>
 
 #include <wx/ffile.h>
 #include <wx/generic/prntdlgg.h>
@@ -6,13 +7,13 @@
 #include <wx/printdlg.h>
 #include <SDL.h>
 
-#include "components/audio_sdl/audio_sdl.h"
 #include "core/base/image_util.h"
 #include "core/gb/gbGlobals.h"
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaSound.h"
 #include "wx/config/game-control.h"
 #include "wx/config/option-proxy.h"
+#include "wx/config/option.h"
 #include "wx/wxvbam.h"
 
 // These should probably be in vbamcore
@@ -1230,32 +1231,33 @@ SoundDriver* systemSoundInit()
 {
     soundShutdown();
 
-    switch (gopts.audio_api) {
-    case AUD_SDL:
-        return new SoundSDL();
+    switch (OPTION(kSoundAudioAPI)) {
+        case config::AudioApi::kOpenAL:
+            return newOpenAL();
 
-    case AUD_OPENAL:
-        return newOpenAL();
-#ifdef __WXMSW__
-
-    case AUD_DIRECTSOUND:
-        return newDirectSound();
-#ifndef NO_XAUDIO2
-
-    case AUD_XAUDIO2:
-        return newXAudio2_Output();
-#endif
-#ifndef NO_FAUDIO
-    case AUD_FAUDIO:
-        return newFAudio_Output();
-#endif
+#if defined(__WXMSW__)
+        case config::AudioApi::kDirectSound:
+            return newDirectSound();
 #endif
 
-    default:
-        gopts.audio_api = 0;
+#if defined(VBAM_ENABLE_XAUDIO2)
+        case config::AudioApi::kXAudio2:
+            return newXAudio2_Output();
+#endif
+
+#if defined(VBAM_ENABLE_FAUDIO)
+        case config::AudioApi::kFAudio:
+            return newFAudio_Output();
+#endif
+
+        case config::AudioApi::kLast:
+            // This should never happen.
+            assert(false);
+            return nullptr;
     }
 
-    return 0;
+    assert(false);
+    return nullptr;
 }
 
 void systemOnWriteDataToSoundBuffer(const uint16_t* finalWave, int length)

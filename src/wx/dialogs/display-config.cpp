@@ -98,7 +98,7 @@ private:
             return false;
         }
 
-        if (static_cast<size_t>(selection) > config::kNbFilters) {
+        if (static_cast<size_t>(selection) >= option()->GetEnumMax()) {
             return false;
         }
 
@@ -131,7 +131,7 @@ private:
             return false;
         }
 
-        if (static_cast<size_t>(selection) > config::kNbInterframes) {
+        if (static_cast<size_t>(selection) >= option()->GetEnumMax()) {
             return false;
         }
 
@@ -245,7 +245,7 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
     // Speed
     GetValidatedChild(this, "FrameSkip")
         ->SetValidator(
-            widgets::OptionSpinCtrlValidator(config::OptionID::kPrefFrameSkip));
+            widgets::OptionIntValidator(config::OptionID::kPrefFrameSkip));
 
     // On-Screen Display
     GetValidatedChild(this, "SpeedIndicator")

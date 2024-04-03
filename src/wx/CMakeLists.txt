@@ -39,6 +39,8 @@ set(VBAM_WX_COMMON
     dialogs/gb-rom-info.h
     dialogs/joypad-config.cpp
     dialogs/joypad-config.h
+    dialogs/sound-config.cpp
+    dialogs/sound-config.h
     dialogs/validated-child.h
     drawing.h
     extra-translations.cpp
@@ -87,11 +89,11 @@ set(VBAM_WX_COMMON
     x11keymap.h
     xrc/visualboyadvance-m.xpm
     # Generated files.
-    ${VBAM_GENERATED_DIR}/wx//builtin-xrc.h
-    ${VBAM_GENERATED_DIR}/wx//builtin-over.h
-    ${VBAM_GENERATED_DIR}/wx//cmdhandlers.h
-    ${VBAM_GENERATED_DIR}/wx//cmd-evtable.h
-    ${VBAM_GENERATED_DIR}/wx//cmdtab.cpp
+    ${VBAM_GENERATED_DIR}/wx/builtin-xrc.h
+    ${VBAM_GENERATED_DIR}/wx/builtin-over.h
+    ${VBAM_GENERATED_DIR}/wx/cmdhandlers.h
+    ${VBAM_GENERATED_DIR}/wx/cmd-evtable.h
+    ${VBAM_GENERATED_DIR}/wx/cmdtab.cpp
 )
 
 if(NOT ZIP_PROGRAM)
@@ -182,19 +184,19 @@ add_executable(
 )
 
 target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} ${VBAM_ICON_PATH})
-target_include_directories(visualboyadvance-m PRIVATE ${NONSTD_INCLUDE_DIR})
+target_include_directories(visualboyadvance-m PRIVATE ${NONSTD_INCLUDE_DIR} ${SDL2_INCLUDE_DIRS})
 
 target_link_libraries(
     visualboyadvance-m
     nonstd-lib
     vbam-core
-    vbam-components-audio-sdl
     vbam-components-draw-text
     vbam-components-filters
     vbam-components-filters-agb
     vbam-components-filters-interframe
     vbam-components-user-config
     ${OPENGL_LIBRARIES}
+    ${VBAM_SDL2_LIBS}
 )
 
 # adjust link command when making a static binary for gcc
@@ -312,8 +314,7 @@ target_link_libraries(visualboyadvance-m ${OPENAL_LIBRARY})
 # XAudio2.
 if(ENABLE_XAUDIO2)
     target_sources(visualboyadvance-m PRIVATE xaudio2.cpp)
-else()
-    target_compile_definitions(visualboyadvance-m PRIVATE NO_XAUDIO2)
+    target_compile_definitions(visualboyadvance-m PRIVATE VBAM_ENABLE_XAUDIO2)
 endif()
 
 # Direct3D.
@@ -325,8 +326,7 @@ endif()
 if(ENABLE_FAUDIO)
     find_package(FAudio REQUIRED)
     target_link_libraries(visualboyadvance-m FAudio::FAudio)
-else()
-    target_compile_definitions(visualboyadvance-m PRIVATE NO_FAUDIO)
+    target_compile_definitions(visualboyadvance-m PRIVATE VBAM_ENABLE_FAUDIO)
 endif()
 
 # wxWidgets.
@@ -604,11 +604,6 @@ add_custom_command(
         cmdevents.cpp
         copy-events.cmake
 )
-
-# # Win32 definitions common to all toolchains.
-# if (WIN32)
-#     add_compile_definitions(wxUSE_GUI=1)
-# endif()
 
 set(VBAM_LOCALIZABLE_FILES ${VBAM_WX_COMMON})
 list(APPEND VBAM_LOCALIZABLE_FILES

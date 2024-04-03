@@ -2,8 +2,6 @@
 Developer Information File
 ==========================
 
-
-
 Known preprocessor switches:
 - SDL: Defined for the SDL version
 - GBA_LOGGING: Enables logging for the GBA core
@@ -13,46 +11,18 @@ Known preprocessor switches:
 - RGB555: Use 16bit colors with 5bit green instead of 6bit green in hq3x/4x filters (C++ version)
 - NO_OGL: Exclude OpenGL code
 - NO_D3D: Exclude Direct3D code
-- NO_XAUDIO2: Exclude XAudio2 code (the XAudio2 interface is DirectSound's successor)
+- VBAM_ENABLE_XAUDIO2: Enable XAudio2 code (the XAudio2 interface is DirectSound's successor)
+- VBAM_ENABLE_FAUDIO: Enable FAudio code (the FAudio interface is an open source multiplatform re-implementation of XAudio2)
 - NO_LINK: Exclude linking code (joybus, multilink, ...)
-- WIN64: This macro is only defined for 64 bit builds
-
-
-
-Download locations:
-NASM:         http://nasm.us/
-DirectX SDK:  http://msdn.microsoft.com/en-us/xna/aa937788.aspx
-OpenAL SDK:   http://connect.creativelabs.com/openal/default.aspx
-OpenGL files: http://www.opengl.org/registry/
-zlib:         http://zlib.net/
-libpng:       http://libpng.org/pub/png/libpng.html
-
-You can find pre-built versions of zlib & libpng at:
-http://spacy51.sp.funpic.de/VBA-M/libs/
-Just extract them somewhere and point Visual C++ 2008 to the include & lib folders.
-They are built with the static C runtime (this is what the release builds use).
-
-
 
 ###########################
 #  --- Build Systems  --- #
 ###########################
 
-===Win32/MFC===
-This is the full-featured Windows build using the MFC GUI.
-The project files are located in /project/vc2008_mfc (VBA2008.sln) and /project/vs2010_mfc (VBA2010.sln).
-Anyone distributing builds should be using MSVC 2010 SP1, the unpatched release has a bug where it applies SSE2 updates to mov and other instructions resulting in illegal instruction errors on cpu's only supporting SSE.
-You also have to install Microsoft's DirectX SDK for Direct3D, DirectInput & XAudio2.
-If you want to enable OpenAL sound output, install the OpenAL SDK. If you do not want it, add NO_OAL to the VBA-M project's preprocessor definitions.
-SubWCRev.exe is used to append the svn versioning to the output executable, this as of TortoiseSVN 1.7, is only available by installing TortoiseSVN.
-All other dependencies for MSVC builds may be found in the ../dependencies directory (above /trunk).
-Normally, Windows users will want to checkout the root of the repository instead of just the trunk directory. Afterwards, simply opening the .sln of choice, setting preprocessor definitions, and hitting build is all that's required.
-
-===*nix/GTK===
+===src/sdl===
 This is the standard build configuration on non-Windows.
 Running cmake will inform you of any packages you need to install.
 
-===*/wxw===
-The wxWidgets interface is an in-development frontend meant to be more cross-platform friendly than MFC and GTK.
+===src/wx===
+The wxWidgets interface is an in-development frontend meant to be more cross-platform friendly than MFC and SDL.
 Running cmake will inform you of any packages you need to install.
-NOTE: In addition to what cmake currently checks for, you will also need the wxrc tool and libgdiplus.
