@@ -1686,30 +1686,13 @@ EVT_HANDLER(ToggleSound, "Enable/disable all sound channels")
 
 EVT_HANDLER(IncreaseVolume, "Increase volume")
 {
-    gopts.sound_vol += 5;
+    OPTION(kSoundVolume) += 5;
 
-    if (gopts.sound_vol > 200)
-        gopts.sound_vol = 200;
-
-    update_opts();
-    soundSetVolume((float)gopts.sound_vol / 100.0);
-    wxString msg;
-    msg.Printf(_("Volume: %d %%"), gopts.sound_vol);
-    systemScreenMessage(msg);
 }
 
 EVT_HANDLER(DecreaseVolume, "Decrease volume")
 {
-    gopts.sound_vol -= 5;
-
-    if (gopts.sound_vol < 0)
-        gopts.sound_vol = 0;
-
-    update_opts();
-    soundSetVolume((float)gopts.sound_vol / 100.0);
-    wxString msg;
-    msg.Printf(_("Volume: %d %%"), gopts.sound_vol);
-    systemScreenMessage(msg);
+    OPTION(kSoundVolume) -= 5;
 }
 
 EVT_HANDLER_MASK(NextFrame, "Next Frame", CMDEN_GB | CMDEN_GBA)
@@ -2174,45 +2157,13 @@ EVT_HANDLER_MASK(ChangeIFB, "Change Interframe Blending", CMDEN_NREC_ANY)
 
 EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)
 {
-    int oqual = gopts.sound_qual, oapi = gopts.audio_api;
-    bool oupmix = gopts.upmix, ohw = gopts.dsound_hw_accel;
-    wxString odev = gopts.audio_dev;
-    wxDialog* dlg = GetXRCDialog("SoundConfig");
-
-    if (ShowModal(dlg) != wxID_OK)
+    if (ShowModal(GetXRCDialog("SoundConfig")) != wxID_OK)
         return;
 
-    switch (panel->game_type()) {
-    case IMAGE_UNKNOWN:
-        break;
-
-    case IMAGE_GB:
-        gb_effects_config.echo = (float)gopts.gb_echo / 100.0;
-        gb_effects_config.stereo = (float)gopts.gb_stereo / 100.0;
-        gbSoundSetSampleRate(!gopts.sound_qual ? 48000 : 44100 / (1 << (gopts.sound_qual - 1)));
-        break;
-
-    case IMAGE_GBA:
-        soundSetSampleRate(!gopts.sound_qual ? 48000 : 44100 / (1 << (gopts.sound_qual - 1)));
-        soundFiltering = (float)gopts.gba_sound_filter / 100.0f;
-        break;
-    }
-
-    // changing sample rate causes driver reload, so no explicit reload needed
-    if (oqual == gopts.sound_qual &&
-        // otherwise reload if API changes
-        (oapi != gopts.audio_api || odev != gopts.audio_dev ||
-            // or init-only options
-            (oapi == AUD_XAUDIO2 && oupmix != gopts.upmix) || (oapi == AUD_FAUDIO && oupmix != gopts.upmix) || (oapi == AUD_DIRECTSOUND && ohw != gopts.dsound_hw_accel))) {
-        soundShutdown();
-
-        if (!soundInit()) {
-            wxLogError(_("Could not initialize the sound driver!"));
-        }
-    }
-
-    soundSetVolume((float)gopts.sound_vol / 100.0);
-    update_opts();
+    // No point in observing these since they can only be set in this dialog.
+    gb_effects_config.echo = (float)OPTION(kSoundGBEcho) / 100.0;
+    gb_effects_config.stereo = (float)OPTION(kSoundGBStereo) / 100.0;
+    soundFiltering = (float)OPTION(kSoundGBAFiltering) / 100.0f;
 }
 
 EVT_HANDLER(EmulatorDirectories, "Directories...")

@@ -9,7 +9,6 @@
 #include "wx/config/game-control.h"
 #include "wx/config/shortcuts.h"
 #include "wx/config/user-input.h"
-#include "wx/wxhead.h"
 
 // Forward declaration.
 class wxFileHistory;
@@ -20,8 +19,6 @@ extern const std::map<config::GameControl, std::set<config::UserInput>>
 
 extern struct opts_t {
     opts_t();
-    // while I would normally put large objects in front to reduce gaps,
-    // I instead organized this by opts.cpp table order
 
     /// Display
     wxVideoMode fs_mode;
@@ -52,23 +49,7 @@ extern struct opts_t {
     int max_scale = 0;
 
     /// Sound
-#ifdef __WXMSW__
-    int audio_api = AUD_XAUDIO2;
-#else
-    int audio_api = AUD_OPENAL;
-#endif
-    // 10 fixes stuttering on mac with openal, as opposed to 5
-    // also should be better for modern hardware in general
-    int audio_buffers = 10;
-    wxString audio_dev;
     int sound_en = 0x30f; // soundSetEnable()
-    int gba_sound_filter = 50;
-    int gb_echo = 20;
-    bool dsound_hw_accel;
-    int gb_stereo = 15;
-    int sound_qual = 1; // soundSetSampleRate() / gbSoundSetSampleRate()
-    int sound_vol = 100; // soundSetVolume()
-    bool upmix = false; // xa2 only
 
     /// Recent
     wxFileHistory* recent = nullptr;

@@ -15,7 +15,6 @@
 #include "wx/config/option.h"
 #include "wx/config/user-input.h"
 #include "wx/strutils.h"
-#include "wx/wxhead.h"
 #include "wx/wxvbam.h"
 
 /*
@@ -55,7 +54,7 @@ void SaveOption(config::Option* option) {
         case config::Option::Type::kInterframe:
         case config::Option::Type::kRenderMethod:
         case config::Option::Type::kAudioApi:
-        case config::Option::Type::kSoundQuality:
+        case config::Option::Type::kAudioRate:
             cfg->Write(option->config_name(), option->GetEnumString());
             break;
         case config::Option::Type::kGbPalette:
@@ -387,6 +386,19 @@ void load_opts(bool first_time_launch) {
     // config file will be updated with unset options
     cfg->SetRecordDefaults();
 
+    // Deprecated / moved options handling.
+    {
+        // The SDL audio API is no longer supported.
+        wxString temp;
+        if (cfg->Read("Sound/AudioAPI", &temp) && temp == "sdl") {
+#if defined(VBAM_ENABLE_XAUDIO2)
+            cfg->Write("Sound/AudioAPI", "xaudio2");
+#else
+            cfg->Write("Sound/AudioAPI", "openal");
+#endif
+        }
+    }
+
     // First access here will also initialize translations.
     for (config::Option& opt : config::Option::All()) {
         switch (opt.type()) {
@@ -427,7 +439,7 @@ void load_opts(bool first_time_launch) {
         case config::Option::Type::kInterframe:
         case config::Option::Type::kRenderMethod:
         case config::Option::Type::kAudioApi:
-        case config::Option::Type::kSoundQuality: {
+        case config::Option::Type::kAudioRate: {
             wxString temp;
             if (cfg->Read(opt.config_name(), &temp) && !temp.empty()) {
                 opt.SetEnumString(temp.MakeLower());
@@ -638,7 +650,7 @@ void opt_set(const wxString& name, const wxString& val) {
         case config::Option::Type::kInterframe:
         case config::Option::Type::kRenderMethod:
         case config::Option::Type::kAudioApi:
-        case config::Option::Type::kSoundQuality:
+        case config::Option::Type::kAudioRate:
             opt->SetEnumString(val);
             return;
         case config::Option::Type::kGbPalette:

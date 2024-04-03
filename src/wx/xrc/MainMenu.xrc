@@ -384,11 +384,9 @@
         </object>
         <object class="wxMenuItem" name="IncreaseVolume">
           <label>_Increase volume</label>
-          <enabled>0</enabled>
         </object>
         <object class="wxMenuItem" name="DecreaseVolume">
           <label>_Decrease volume</label>
-          <enabled>0</enabled>
         </object>
         <object class="wxMenuItem" name="ToggleSound">
           <label>_Toggle sound</label>

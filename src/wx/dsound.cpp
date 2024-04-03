@@ -1,17 +1,26 @@
-// Application
-#include "wx/wxvbam.h"
+#if !defined(__WXMSW__)
+#error "This file should only be compiled on Windows"
+#endif
+
+// DirectSound8
+#define DIRECTSOUND_VERSION 0x0800
+#include <Windows.h>
+#include <mmeapi.h>
+
+#include <dsound.h>
+#include <uuids.h>
+
+#include <wx/arrstr.h>
+#include <wx/log.h>
+#include <wx/translation.h>
 
 // Internals
 #include "core/base/sound_driver.h"
 #include "core/base/system.h"
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaSound.h"
-
-// DirectSound8
-#define DIRECTSOUND_VERSION 0x0800
-#include <mmeapi.h>
-#include <uuids.h>
-#include <dsound.h>
+#include "wx/config/option-proxy.h"
+#include "wx/wxvbam.h"
 
 extern bool soundBufferLow;
 
@@ -31,12 +40,13 @@ public:
     DirectSound();
     virtual ~DirectSound();
 
-    bool init(long sampleRate); // initialize the primary and secondary sound buffer
-    void setThrottle(unsigned short throttle_); // set game speed
-    void pause(); // pause the secondary sound buffer
-    void reset(); // stop and reset the secondary sound buffer
-    void resume(); // resume the secondary sound buffer
-    void write(uint16_t* finalWave, int length); // write the emulated sound to the secondary sound buffer
+    bool init(long sampleRate) override;  // initialize the primary and secondary sound buffer
+    void setThrottle(unsigned short throttle_) override;  // set game speed
+    void pause() override;                                // pause the secondary sound buffer
+    void reset() override;   // stop and reset the secondary sound buffer
+    void resume() override;  // resume the secondary sound buffer
+    void write(uint16_t* finalWave,
+               int length) override;  // write the emulated sound to the secondary sound buffer
 };
 
 DirectSound::DirectSound()
@@ -93,10 +103,11 @@ bool DirectSound::init(long sampleRate)
 
     GUID dev;
 
-    if (gopts.audio_dev.empty())
+    const wxString& audio_device = OPTION(kSoundAudioDevice);
+    if (audio_device.empty())
         dev = DSDEVID_DefaultPlayback;
     else
-        CLSIDFromString(gopts.audio_dev.wc_str(), &dev);
+        CLSIDFromString(audio_device.wc_str(), &dev);
 
     pDirectSound->Initialize(&dev);
 
@@ -115,7 +126,8 @@ bool DirectSound::init(long sampleRate)
     dsbdesc.dwSize = sizeof(DSBUFFERDESC);
     dsbdesc.dwFlags = DSBCAPS_PRIMARYBUFFER;
 
-    if (!gopts.dsound_hw_accel) {
+    const bool hw_accel = OPTION(kSoundDSoundHWAccel);
+    if (!hw_accel) {
         dsbdesc.dwFlags |= DSBCAPS_LOCSOFTWARE;
     }
 
@@ -148,7 +160,7 @@ bool DirectSound::init(long sampleRate)
     dsbdesc.dwSize = sizeof(DSBUFFERDESC);
     dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLPOSITIONNOTIFY | DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLFREQUENCY;
 
-    if (!gopts.dsound_hw_accel) {
+    if (!hw_accel) {
         dsbdesc.dwFlags |= DSBCAPS_LOCSOFTWARE;
     }
 

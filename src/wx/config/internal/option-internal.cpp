@@ -77,47 +77,26 @@ static const std::array<wxString, kNbRenderMethods> kRenderMethodStrings = {
 #endif
 };
 
-// This enum must be kept in sync with the one in wxvbam.h
-// TODO: These 2 enums should be unified and a validator created for this enum.
-// TODO: DirectSound and XAudio2 should only be used on Windows.
-enum class AudioApi {
-    kSdl = 0,
-    kOpenAL,
-    kDirectSound,
-    kXAudio2,
-    kFaudio,
-
-    // Do not add anything under here.
-    kLast,
-};
-constexpr size_t kNbAudioApis = static_cast<size_t>(AudioApi::kLast);
-
 // These MUST follow the same order as the definitions of the enum above.
 // Adding an option without adding to this array will result in a compiler
 // error since kNbAudioApis is automatically updated.
 static const std::array<wxString, kNbAudioApis> kAudioApiStrings = {
-    "sdl",
     "openal",
+#if defined(__WXMSW__)
     "directsound",
+#endif
+#if defined(VBAM_ENABLE_XAUDIO2)
     "xaudio2",
+#endif
+#if defined(VBAM_ENABLE_FAUDIO)
     "faudio",
+#endif
 };
-
-enum class SoundQuality {
-    k48kHz = 0,
-    k44kHz,
-    k22kHz,
-    k11kHz,
-
-    // Do not add anything under here.
-    kLast,
-};
-constexpr size_t kNbSoundQualities = static_cast<size_t>(SoundQuality::kLast);
 
 // These MUST follow the same order as the definitions of the enum above.
 // Adding an option without adding to this array will result in a compiler
 // error since kNbSoundQualities is automatically updated.
-static const std::array<wxString, kNbSoundQualities> kSoundQualityStrings = {
+static const std::array<wxString, kNbSoundRate> kAudioRateStrings = {
     "48",
     "44",
     "22",
@@ -176,9 +155,11 @@ std::array<Option, kNbOptions>& Option::All() {
 
         /// GBA
         bool gba_lcd_filter = false;
+#ifndef NO_LINK
         bool link_auto = false;
         bool link_hacks = true;
         bool link_proto = false;
+#endif
         wxString gba_rom_dir;
 
         /// Core
@@ -226,9 +207,25 @@ std::array<Option, kNbOptions>& Option::All() {
         bool allow_joystick_background_input = true;
 
         /// Sound
+#if defined(VBAM_ENABLE_XAUDIO2)
+        AudioApi audio_api = AudioApi::kXAudio2;
+#else
+        AudioApi audio_api = AudioApi::kOpenAL;
+#endif
+        wxString audio_dev;
+        // 10 fixes stuttering on mac with openal, as opposed to 5
+        // also should be better for modern hardware in general
+        int32_t audio_buffers = 10;
+        int32_t gba_sound_filtering = 50;
         bool gb_declicking = true;
+        int32_t gb_echo = 20;
         bool gb_effects_config_enabled = false;
+        int32_t gb_stereo = 15;
         bool gb_effects_config_surround = false;
+        AudioRate sound_quality = AudioRate::k44kHz;
+        bool dsound_hw_accel = false;
+        bool upmix = false;
+        int32_t volume = 100;
     };
     static OwnedOptions g_owned_opts;
 
@@ -352,19 +349,21 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kUISuspendScreenSaver, &gopts.suspend_screensaver),
 
         /// Sound
-        Option(OptionID::kSoundAudioAPI, &gopts.audio_api),
-        Option(OptionID::kSoundAudioDevice, &gopts.audio_dev),
-        Option(OptionID::kSoundBuffers, &gopts.audio_buffers, 2, 10),
+        Option(OptionID::kSoundAudioAPI, &g_owned_opts.audio_api),
+        Option(OptionID::kSoundAudioDevice, &g_owned_opts.audio_dev),
+        Option(OptionID::kSoundBuffers, &g_owned_opts.audio_buffers, 2, 10),
         Option(OptionID::kSoundEnable, &gopts.sound_en, 0, 0x30f),
-        Option(OptionID::kSoundGBAFiltering, &gopts.gba_sound_filter, 0, 100),
+        Option(OptionID::kSoundGBAFiltering, &g_owned_opts.gba_sound_filtering, 0, 100),
         Option(OptionID::kSoundGBAInterpolation, &g_gbaSoundInterpolation),
         Option(OptionID::kSoundGBDeclicking, &g_owned_opts.gb_declicking),
-        Option(OptionID::kSoundGBEcho, &gopts.gb_echo, 0, 100),
+        Option(OptionID::kSoundGBEcho, &g_owned_opts.gb_echo, 0, 100),
         Option(OptionID::kSoundGBEnableEffects, &g_owned_opts.gb_effects_config_enabled),
-        Option(OptionID::kSoundGBStereo, &gopts.gb_stereo, 0, 100),
+        Option(OptionID::kSoundGBStereo, &g_owned_opts.gb_stereo, 0, 100),
         Option(OptionID::kSoundGBSurround, &g_owned_opts.gb_effects_config_surround),
-        Option(OptionID::kSoundQuality, &gopts.sound_qual),
-        Option(OptionID::kSoundVolume, &gopts.sound_vol, 0, 200),
+        Option(OptionID::kSoundAudioRate, &g_owned_opts.sound_quality),
+        Option(OptionID::kSoundDSoundHWAccel, &g_owned_opts.dsound_hw_accel),
+        Option(OptionID::kSoundUpmix, &g_owned_opts.upmix),
+        Option(OptionID::kSoundVolume, &g_owned_opts.volume, 0, 200),
     };
     // clang-format on
     return g_all_opts;
@@ -377,8 +376,7 @@ namespace internal {
 // error since kNbOptions is automatically updated.
 const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     /// Display
-    OptionData{"Display/Bilinear", "Bilinear",
-               _("Use bilinear filter with 3d renderer")},
+    OptionData{"Display/Bilinear", "Bilinear", _("Use bilinear filter with 3d renderer")},
     OptionData{"Display/Filter", "", _("Full-screen filter to apply")},
     OptionData{"Display/FilterPlugin", "", _("Filter plugin library")},
     OptionData{"Display/IFB", "", _("Interframe blending function")},
@@ -388,20 +386,14 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"Display/RenderMethod", "",
                _("Render method; if unsupported, simple method will be used")},
     OptionData{"Display/Scale", "", _("Default scale factor")},
-    OptionData{"Display/Stretch", "RetainAspect",
-               _("Retain aspect ratio when resizing")},
+    OptionData{"Display/Stretch", "RetainAspect", _("Retain aspect ratio when resizing")},
 
     /// GB
-    OptionData{"GB/BiosFile", "",
-               _("BIOS file to use for Game Boy, if enabled")},
-    OptionData{"GB/ColorOption", "GBColorOption",
-               _("Game Boy color enhancement, if enabled")},
-    OptionData{"GB/ColorizerHack", "ColorizerHack",
-               _("Enable DX Colorization Hacks")},
-    OptionData{"GB/LCDFilter", "GBLcdFilter",
-               _("Apply LCD filter, if enabled")},
-    OptionData{"GB/GBCBiosFile", "",
-               _("BIOS file to use for Game Boy Color, if enabled")},
+    OptionData{"GB/BiosFile", "", _("BIOS file to use for Game Boy, if enabled")},
+    OptionData{"GB/ColorOption", "GBColorOption", _("Game Boy color enhancement, if enabled")},
+    OptionData{"GB/ColorizerHack", "ColorizerHack", _("Enable DX Colorization Hacks")},
+    OptionData{"GB/LCDFilter", "GBLcdFilter", _("Apply LCD filter, if enabled")},
+    OptionData{"GB/GBCBiosFile", "", _("BIOS file to use for Game Boy Color, if enabled")},
     OptionData{"GB/Palette0", "",
                _("The default palette, as 8 comma-separated 4-digit hex "
                  "integers (rgb555).")},
@@ -417,8 +409,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                _("Automatically save printouts as screen captures with -print "
                  "suffix")},
     OptionData{"GB/ROMDir", "", _("Directory to look for ROM files")},
-    OptionData{"GB/GBCROMDir", "",
-               _("Directory to look for Game Boy Color ROM files")},
+    OptionData{"GB/GBCROMDir", "", _("Directory to look for Game Boy Color ROM files")},
 
     /// GBA
     OptionData{"GBA/BiosFile", "", _("BIOS file to use, if enabled")},
@@ -440,8 +431,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     },
     OptionData{"GBA/LinkHost", "", _("Default network link client host")},
     OptionData{"GBA/ServerIP", "", _("Default network link server IP to bind")},
-    OptionData{"GBA/LinkPort", "",
-               _("Default network link port (server and client)")},
+    OptionData{"GBA/LinkPort", "", _("Default network link port (server and client)")},
     OptionData{"GBA/LinkProto", "LinkProto", _("Default network protocol")},
     OptionData{"GBA/LinkTimeout", "LinkTimeout", _("Link timeout (ms)")},
     OptionData{"GBA/LinkType", "LinkType", _("Link cable type")},
@@ -449,8 +439,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"GBA/ROMDir", "", _("Directory to look for ROM files")},
 
     /// General
-    OptionData{"General/AutoLoadLastState", "",
-               _("Automatically load last saved state")},
+    OptionData{"General/AutoLoadLastState", "", _("Automatically load last saved state")},
     OptionData{"General/BatteryDir", "",
                _("Directory to store game save files (relative paths are "
                  "relative to ROM; blank is config dir)")},
@@ -476,10 +465,8 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                  "Button is one of Up, Down, Left, Right, A, B, L, R, Select, "
                  "Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, "
                  "AutoB, Speed, Capture, GS")},
-    OptionData{"Joypad/AutofireThrottle", "",
-               _("The autofire toggle period, in frames (1/60 s)")},
-    OptionData{"Joypad/Default", "",
-               _("The number of the stick to use in single-player mode")},
+    OptionData{"Joypad/AutofireThrottle", "", _("The autofire toggle period, in frames (1/60 s)")},
+    OptionData{"Joypad/Default", "", _("The number of the stick to use in single-player mode")},
     OptionData{"Joypad/SDLGameControllerMode", "SDLGameControllerMode",
                _("Whether to enable SDL GameController mode")},
 
@@ -490,10 +477,8 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                  "pressed, the command <cmd> is executed.")},
 
     /// Core
-    OptionData{"preferences/agbPrint", "AGBPrinter",
-               _("Enable AGB debug print")},
-    OptionData{"preferences/autoFrameSkip", "FrameSkipAuto",
-               _("Auto skip frames")},
+    OptionData{"preferences/agbPrint", "AGBPrinter", _("Enable AGB debug print")},
+    OptionData{"preferences/autoFrameSkip", "FrameSkipAuto", _("Auto skip frames")},
     OptionData{"preferences/autoPatch", "ApplyPatches",
                _("Apply IPS / UPS / IPF patches if found")},
     OptionData{"preferences/autoSaveLoadCheatList", "",
@@ -504,41 +489,32 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
         _("Automatically enable border for Super Game Boy games"),
     },
     OptionData{"preferences/borderOn", "", _("Always enable border")},
-    OptionData{"preferences/captureFormat", "",
-               _("Screen capture file format")},
+    OptionData{"preferences/captureFormat", "", _("Screen capture file format")},
     OptionData{"preferences/cheatsEnabled", "", _("Enable cheats")},
-    OptionData{"preferences/disableStatus", "NoStatusMsg",
-               _("Disable on-screen status messages")},
+    OptionData{"preferences/disableStatus", "NoStatusMsg", _("Disable on-screen status messages")},
     OptionData{"preferences/emulatorType", "", _("Type of system to emulate")},
-    OptionData{"preferences/flashSize", "",
-               _("Flash size 0 = 64 KB 1 = 128 KB")},
+    OptionData{"preferences/flashSize", "", _("Flash size 0 = 64 KB 1 = 128 KB")},
     OptionData{"preferences/frameSkip", "FrameSkip",
                _("Skip frames. Values are 0-9 or -1 to skip automatically "
                  "based on time.")},
     OptionData{"preferences/gbPaletteOption", "", _("The palette to use")},
-    OptionData{"preferences/gbPrinter", "Printer",
-               _("Enable printer emulation")},
+    OptionData{"preferences/gbPrinter", "Printer", _("Enable printer emulation")},
     OptionData{"preferences/gdbBreakOnLoad", "DebugGDBBreakOnLoad",
                _("Break into GDB after loading the game.")},
-    OptionData{"preferences/gdbPort", "DebugGDBPort",
-               _("Port to connect GDB to")},
+    OptionData{"preferences/gdbPort", "DebugGDBPort", _("Port to connect GDB to")},
 #ifndef NO_LINK
-    OptionData{"preferences/LinkNumPlayers", "",
-               _("Number of players in network")},
+    OptionData{"preferences/LinkNumPlayers", "", _("Number of players in network")},
 #endif
-    OptionData{"preferences/maxScale", "",
-               _("Maximum scale factor (0 = no limit)")},
+    OptionData{"preferences/maxScale", "", _("Maximum scale factor (0 = no limit)")},
     OptionData{"preferences/pauseWhenInactive", "PauseWhenInactive",
                _("Pause game when main window loses focus")},
     OptionData{"preferences/rtcEnabled", "RTC",
                _("Enable RTC (vba-over.ini override is rtcEnabled")},
-    OptionData{"preferences/saveType", "",
-               _("Native save (\"battery\") hardware type")},
+    OptionData{"preferences/saveType", "", _("Native save (\"battery\") hardware type")},
     OptionData{"preferences/showSpeed", "", _("Show speed indicator")},
     OptionData{"preferences/showSpeedTransparent", "Transparent",
                _("Draw on-screen messages transparently")},
-    OptionData{"preferences/skipBios", "SkipIntro",
-               _("Skip BIOS initialization")},
+    OptionData{"preferences/skipBios", "SkipIntro", _("Skip BIOS initialization")},
     OptionData{"preferences/skipSaveGameCheats", "",
                _("Do not overwrite cheat list when loading state")},
     OptionData{"preferences/skipSaveGameBattery", "",
@@ -553,54 +529,45 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                  "throttle)")},
     OptionData{"preferences/speedupThrottleFrameSkip", "",
                _("Use frame skip for speedup throttle")},
-    OptionData{"preferences/useBiosGB", "BootRomGB",
-               _("Use the specified BIOS file for Game Boy")},
-    OptionData{"preferences/useBiosGBA", "BootRomEn",
-               _("Use the specified BIOS file")},
+    OptionData{"preferences/useBiosGB", "BootRomGB", _("Use the specified BIOS file for Game Boy")},
+    OptionData{"preferences/useBiosGBA", "BootRomEn", _("Use the specified BIOS file")},
     OptionData{"preferences/useBiosGBC", "BootRomGBC",
                _("Use the specified BIOS file for Game Boy Color")},
     OptionData{"preferences/vsync", "VSync", _("Wait for vertical sync")},
 
     /// Geometry
-    OptionData{"geometry/fullScreen", "Fullscreen",
-               _("Enter fullscreen mode at startup")},
+    OptionData{"geometry/fullScreen", "Fullscreen", _("Enter fullscreen mode at startup")},
     OptionData{"geometry/isMaximized", "Maximized", _("Window maximized")},
-    OptionData{"geometry/windowHeight", "Height",
-               _("Window height at startup")},
+    OptionData{"geometry/windowHeight", "Height", _("Window height at startup")},
     OptionData{"geometry/windowWidth", "Width", _("Window width at startup")},
     OptionData{"geometry/windowX", "X", _("Window axis X position at startup")},
     OptionData{"geometry/windowY", "Y", _("Window axis Y position at startup")},
 
     /// UI
-    OptionData{"ui/allowKeyboardBackgroundInput",
-               "AllowKeyboardBackgroundInput",
+    OptionData{"ui/allowKeyboardBackgroundInput", "AllowKeyboardBackgroundInput",
                _("Capture key events while on background")},
-    OptionData{"ui/allowJoystickBackgroundInput",
-               "AllowJoystickBackgroundInput",
+    OptionData{"ui/allowJoystickBackgroundInput", "AllowJoystickBackgroundInput",
                _("Capture joy events while on background")},
     OptionData{"ui/hideMenuBar", "HideMenuBar", _("Hide menu bar when mouse is inactive")},
-    OptionData{"ui/suspendScreenSaver", "SuspendScreenSaver", _("Suspend screensaver when game is running")},
+    OptionData{"ui/suspendScreenSaver", "SuspendScreenSaver",
+               _("Suspend screensaver when game is running")},
 
     /// Sound
-    OptionData{"Sound/AudioAPI", "",
-               _("Sound API; if unsupported, default API will be used")},
-    OptionData{"Sound/AudioDevice", "",
-               _("Device ID of chosen audio device for chosen driver")},
+    OptionData{"Sound/AudioAPI", "", _("Sound API; if unsupported, default API will be used")},
+    OptionData{"Sound/AudioDevice", "", _("Device ID of chosen audio device for chosen driver")},
     OptionData{"Sound/Buffers", "", _("Number of sound buffers")},
     OptionData{"Sound/Enable", "", _("Bit mask of sound channels to enable")},
-    OptionData{"Sound/GBAFiltering", "",
-               _("Game Boy Advance sound filtering (%)")},
+    OptionData{"Sound/GBAFiltering", "", _("Game Boy Advance sound filtering (%)")},
     OptionData{"Sound/GBAInterpolation", "GBASoundInterpolation",
                _("Game Boy Advance sound interpolation")},
-    OptionData{"Sound/GBDeclicking", "GBDeclicking",
-               _("Game Boy sound declicking")},
+    OptionData{"Sound/GBDeclicking", "GBDeclicking", _("Game Boy sound declicking")},
     OptionData{"Sound/GBEcho", "", _("Game Boy echo effect (%)")},
-    OptionData{"Sound/GBEnableEffects", "GBEnhanceSound",
-               _("Enable Game Boy sound effects")},
+    OptionData{"Sound/GBEnableEffects", "GBEnhanceSound", _("Enable Game Boy sound effects")},
     OptionData{"Sound/GBStereo", "", _("Game Boy stereo effect (%)")},
-    OptionData{"Sound/GBSurround", "GBSurround",
-               _("Game Boy surround sound effect (%)")},
+    OptionData{"Sound/GBSurround", "GBSurround", _("Game Boy surround sound effect (%)")},
     OptionData{"Sound/Quality", "", _("Sound sample rate (kHz)")},
+    OptionData{"Sound/DSoundHWAccel", "DSoundHWAccel", _("Use DirectSound hardware acceleration")},
+    OptionData{"Sound/Upmix", "Upmix", _("Upmix stereo to surround")},
     OptionData{"Sound/Volume", "", _("Sound volume (%)")},
 
     // Last. This should never be used, it actually maps to OptionID::kLast.
@@ -646,14 +613,16 @@ wxString RenderMethodToString(const RenderMethod& value) {
     return kRenderMethodStrings[size_value];
 }
 
-wxString AudioApiToString(int value) {
-    assert(value >= 0 && static_cast<size_t>(value) < kNbAudioApis);
-    return kAudioApiStrings[value];
+wxString AudioApiToString(const AudioApi& value) {
+    const size_t size_value = static_cast<size_t>(value);
+    assert(size_value < kNbAudioApis);
+    return kAudioApiStrings[size_value];
 }
 
-wxString SoundQualityToString(int value) {
-    assert(value >= 0 && static_cast<size_t>(value) < kNbSoundQualities);
-    return kSoundQualityStrings[value];
+wxString AudioRateToString(const AudioRate& value) {
+    const size_t size_value = static_cast<size_t>(value);
+    assert(size_value < kNbSoundRate);
+    return kAudioRateStrings[size_value];
 }
 
 Filter StringToFilter(const wxString& config_name, const wxString& input) {
@@ -716,7 +685,7 @@ RenderMethod StringToRenderMethod(const wxString& config_name,
     return iter->second;
 }
 
-int StringToAudioApi(const wxString& config_name, const wxString& input_) {
+AudioApi StringToAudioApi(const wxString& config_name, const wxString& input) {
     static std::map<wxString, AudioApi> kStringToAudioApi;
     if (kStringToAudioApi.empty()) {
         for (size_t i = 0; i < kNbAudioApis; i++) {
@@ -726,45 +695,32 @@ int StringToAudioApi(const wxString& config_name, const wxString& input_) {
         assert(kStringToAudioApi.size() == kNbAudioApis);
     }
 
-    wxString input = input_;
-
-    // sdl has been removed, rewrite to new default
-    if (input == "sdl") {
-#ifdef __WXMSW__
-        input = "xaudio2";
-#else
-        input = "openal";
-#endif
-    }
-
     const auto iter = kStringToAudioApi.find(input);
     if (iter == kStringToAudioApi.end()) {
         wxLogWarning(_("Invalid value %s for option %s; valid values are %s"),
                      input, config_name,
                      AllEnumValuesForType(Option::Type::kAudioApi));
-        return 0;
+        return AudioApi::kOpenAL;
     }
-    return static_cast<int>(iter->second);
+    return iter->second;
 }
 
-int StringToSoundQuality(const wxString& config_name, const wxString& input) {
-    static std::map<wxString, SoundQuality> kStringToSoundQuality;
+AudioRate StringToSoundQuality(const wxString& config_name, const wxString& input) {
+    static std::map<wxString, AudioRate> kStringToSoundQuality;
     if (kStringToSoundQuality.empty()) {
-        for (size_t i = 0; i < kNbSoundQualities; i++) {
-            kStringToSoundQuality.emplace(kSoundQualityStrings[i],
-                                          static_cast<SoundQuality>(i));
+        for (size_t i = 0; i < kNbSoundRate; i++) {
+            kStringToSoundQuality.emplace(kAudioRateStrings[i], static_cast<AudioRate>(i));
         }
-        assert(kStringToSoundQuality.size() == kNbSoundQualities);
+        assert(kStringToSoundQuality.size() == kNbSoundRate);
     }
 
     const auto iter = kStringToSoundQuality.find(input);
     if (iter == kStringToSoundQuality.end()) {
-        wxLogWarning(_("Invalid value %s for option %s; valid values are %s"),
-                     input, config_name,
-                     AllEnumValuesForType(Option::Type::kSoundQuality));
-        return 0;
+        wxLogWarning(_("Invalid value %s for option %s; valid values are %s"), input, config_name,
+                     AllEnumValuesForType(Option::Type::kAudioRate));
+        return AudioRate::k44kHz;
     }
-    return static_cast<int>(iter->second);
+    return iter->second;
 }
 
 wxString AllEnumValuesForType(Option::Type type) {
@@ -789,9 +745,9 @@ wxString AllEnumValuesForType(Option::Type type) {
                 AllEnumValuesForArray(kAudioApiStrings);
             return kAllAudioApiValues;
         }
-        case Option::Type::kSoundQuality: {
+        case Option::Type::kAudioRate: {
             static const wxString kAllSoundQualityValues =
-                AllEnumValuesForArray(kSoundQualityStrings);
+                AllEnumValuesForArray(kAudioRateStrings);
             return kAllSoundQualityValues;
         }
 
@@ -811,7 +767,7 @@ wxString AllEnumValuesForType(Option::Type type) {
     return wxEmptyString;
 }
 
-int MaxForType(Option::Type type) {
+size_t MaxForType(Option::Type type) {
     switch (type) {
         case Option::Type::kFilter:
             return kNbFilters;
@@ -821,8 +777,8 @@ int MaxForType(Option::Type type) {
             return kNbRenderMethods;
         case Option::Type::kAudioApi:
             return kNbAudioApis;
-        case Option::Type::kSoundQuality:
-            return kNbSoundQualities;
+        case Option::Type::kAudioRate:
+            return kNbSoundRate;
 
         // We don't use default here to explicitly trigger a compiler warning
         // when adding a new value.

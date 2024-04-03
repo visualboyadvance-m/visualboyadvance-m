@@ -1,27 +1,29 @@
-#ifndef NO_XAUDIO2
+#if !defined(VBAM_ENABLE_XAUDIO2)
+#error "This file should only be compiled if XAudio2 is enabled"
+#endif
 
-// Application
-#include "wx/wxvbam.h"
-#include <stdio.h>
+#include <cstdio>
 
-// Interface
-#include "core/base/sound_driver.h"
+#include <string>
+#include <vector>
 
-// XAudio2
+// MMDevice API
+#include <mmdeviceapi.h>
+
 #if _MSC_VER
 #include <xaudio2.legacy.h>
 #else
 #include <XAudio2.h>
 #endif 
 
-// MMDevice API
-#include <mmdeviceapi.h>
-#include <string>
-#include <vector>
+#include <wx/arrstr.h>
+#include <wx/log.h>
+#include <wx/translation.h>
 
-// Internals
+#include "core/base/sound_driver.h"
 #include "core/base/system.h" // for systemMessage()
 #include "core/gba/gbaGlobals.h"
+#include "wx/config/option-proxy.h"
 
 int GetXA2Devices(IXAudio2* xa, wxArrayString* names, wxArrayString* ids,
     const wxString* match)
@@ -72,10 +74,11 @@ bool GetXA2Devices(wxArrayString& names, wxArrayString& ids)
 
 static int XA2GetDev(IXAudio2* xa)
 {
-    if (gopts.audio_dev.empty())
+    const wxString& audio_device = OPTION(kSoundAudioDevice);
+    if (audio_device.empty())
         return 0;
     else {
-        int ret = GetXA2Devices(xa, NULL, NULL, &gopts.audio_dev);
+        int ret = GetXA2Devices(xa, NULL, NULL, &audio_device);
         return ret < 0 ? 0 : ret;
     }
 }
@@ -278,7 +281,7 @@ XAudio2_Output::XAudio2_Output()
     initialized = false;
     playing = false;
     freq = 0;
-    bufferCount = gopts.audio_buffers;
+    bufferCount = OPTION(kSoundBuffers);
     buffers = NULL;
     currentBuffer = 0;
     device_changed = false;
@@ -386,7 +389,7 @@ bool XAudio2_Output::init(long sampleRate)
         return false;
     }
 
-    if (gopts.upmix) {
+    if (OPTION(kSoundUpmix)) {
         // set up stereo upmixing
         XAUDIO2_DEVICE_DETAILS dd;
         ZeroMemory(&dd, sizeof(dd));
@@ -615,5 +618,3 @@ SoundDriver* newXAudio2_Output()
 {
     return new XAudio2_Output();
 }
-
-#endif // #ifndef NO_XAUDIO2

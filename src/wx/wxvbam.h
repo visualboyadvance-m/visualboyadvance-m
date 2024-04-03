@@ -13,6 +13,7 @@
 
 #include "core/base/system.h"
 #include "wx/config/option-observer.h"
+#include "wx/config/option.h"
 #include "wx/widgets/dpi-support.h"
 #include "wx/widgets/keep-on-top-styler.h"
 #include "wx/widgets/sdljoy.h"
@@ -616,12 +617,20 @@ protected:
     DECLARE_EVENT_TABLE()
 
 private:
+    void OnAudioRateChanged();
+    void OnVolumeChanged(config::Option* option);
+
+    bool schedule_audio_restart_ = false;
+
     const config::OptionsObserver render_observer_;
     const config::OptionsObserver scale_observer_;
     const config::OptionsObserver gb_border_observer_;
     const config::OptionsObserver gb_palette_observer_;
     const config::OptionsObserver gb_declick_observer_;
     const config::OptionsObserver lcd_filters_observer_;
+    const config::OptionsObserver audio_rate_observer_;
+    const config::OptionsObserver audio_volume_observer_;
+    const config::OptionsObserver audio_observer_;
 };
 
 // wxString version of OSD message
@@ -704,25 +713,24 @@ private:
 
 // I should add this to SoundDriver, but wxArrayString is wx-specific
 // I suppose I could make subclass wxSoundDriver.  maybe later.
-
 class SoundDriver;
 extern SoundDriver* newOpenAL();
 extern bool GetOALDevices(wxArrayString& names, wxArrayString& ids);
 
-#ifdef __WXMSW__
+#if defined(__WXMSW__)
 extern SoundDriver* newDirectSound();
 extern bool GetDSDevices(wxArrayString& names, wxArrayString& ids);
+#endif  // defined(__WXMSW__)
 
-#ifndef NO_XAUDIO2
+#if defined(VBAM_ENABLE_XAUDIO2)
 extern SoundDriver* newXAudio2_Output();
 extern bool GetXA2Devices(wxArrayString& names, wxArrayString& ids);
-#endif
+#endif  // defined(VBAM_ENABLE_XAUDIO2)
 
-#ifndef NO_FAUDIO
+#if defined(VBAM_ENABLE_FAUDIO)
 extern SoundDriver* newFAudio_Output();
 extern bool GetFADevices(wxArrayString& names, wxArrayString& ids);
-#endif
-#endif
+#endif  // defined(VBAM_ENABLE_FAUDIO)
 
 #if defined(VBAM_ENABLE_DEBUGGER)
 extern bool debugger;

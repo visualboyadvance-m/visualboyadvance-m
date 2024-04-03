@@ -134,7 +134,9 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /*kSoundGBEnableEffects*/ Option::Type::kBool,
     /*kSoundGBStereo*/ Option::Type::kInt,
     /*kSoundGBSurround*/ Option::Type::kBool,
-    /*kSoundQuality*/ Option::Type::kSoundQuality,
+    /*kSoundAudioRate*/ Option::Type::kAudioRate,
+    /*kSoundDSoundHWAccel*/ Option::Type::kBool,
+    /*kSoundUpmix*/ Option::Type::kBool,
     /*kSoundVolume*/ Option::Type::kInt,
 };
 
@@ -208,6 +210,22 @@ public:
     int32_t Max() const { return option_->GetIntMax(); }
 
     bool operator=(int32_t value) { return Set(value); }
+    bool operator+=(int32_t value) {
+        const int new_value = Get() + value;
+        if (new_value > Max()) {
+            return Set(Max());
+        } else {
+            return Set(new_value);
+        }
+    }
+    bool operator-=(int32_t value) {
+        const int new_value = Get() - value;
+        if (new_value < Min()) {
+            return Set(Min());
+        } else {
+            return Set(new_value);
+        }
+    }
     operator int32_t() const { return Get(); }
 
 private:
@@ -308,6 +326,44 @@ public:
 
     bool operator=(RenderMethod value) { return Set(value); }
     operator RenderMethod() const { return Get(); }
+
+private:
+    Option* option_;
+};
+
+template <OptionID ID>
+class OptionProxy<
+    ID,
+    typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
+                            Option::Type::kAudioApi>::type> {
+public:
+    OptionProxy() : option_(Option::ByID(ID)) {}
+    ~OptionProxy() = default;
+
+    AudioApi Get() const { return option_->GetAudioApi(); }
+    bool Set(AudioApi value) { return option_->SetAudioApi(value); }
+
+    bool operator=(AudioApi value) { return Set(value); }
+    operator AudioApi() const { return Get(); }
+
+private:
+    Option* option_;
+};
+
+template <OptionID ID>
+class OptionProxy<
+    ID,
+    typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
+                            Option::Type::kAudioRate>::type> {
+public:
+    OptionProxy() : option_(Option::ByID(ID)) {}
+    ~OptionProxy() = default;
+
+    AudioRate Get() const { return option_->GetAudioRate(); }
+    bool Set(AudioRate value) { return option_->SetAudioRate(value); }
+
+    bool operator=(AudioRate value) { return Set(value); }
+    operator AudioRate() const { return Get(); }
 
 private:
     Option* option_;

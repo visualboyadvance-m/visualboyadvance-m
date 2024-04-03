@@ -45,9 +45,10 @@
 #include "wx/dialogs/game-boy-config.h"
 #include "wx/dialogs/gb-rom-info.h"
 #include "wx/dialogs/joypad-config.h"
+#include "wx/dialogs/sound-config.h"
 #include "wx/opts.h"
-#include "wx/widgets/option-validator.h"
 #include "wx/widgets/checkedlistctrl.h"
+#include "wx/widgets/option-validator.h"
 #include "wx/wxhead.h"
 
 #if defined(__WXGTK__)
@@ -1469,143 +1470,6 @@ public:
     }
 } BatConfigHandler;
 
-// manage the sound prefs dialog
-static class SoundConfig_t : public wxEvtHandler {
-public:
-    wxSlider *vol, *bufs;
-    wxControl* bufinfo;
-    int lastapi;
-    wxChoice* dev;
-    wxControl *umix, *hwacc;
-    wxArrayString dev_ids;
-
-    void FullVol(wxCommandEvent& ev)
-    {
-        (void)ev; // unused params
-        vol->SetValue(100);
-    }
-    void AdjustFrames(int count)
-    {
-        wxString s;
-        s.Printf(_("%d frames = %.2f ms"), count, (double)count / 60.0 * 1000.0);
-        bufinfo->SetLabel(s);
-    }
-    void AdjustFramesEv(wxCommandEvent& ev)
-    {
-        (void)ev; // unused params
-        AdjustFrames(bufs->GetValue());
-    }
-
-    bool FillDev(int api)
-    {
-        dev->Clear();
-        dev->Append(_("Default device"));
-        dev_ids.clear();
-        wxArrayString names;
-
-        switch (api) {
-        case AUD_SDL:
-            break;
-
-        case AUD_OPENAL:
-            if (!GetOALDevices(names, dev_ids))
-                return false;
-
-            break;
-#ifdef __WXMSW__
-
-        case AUD_DIRECTSOUND:
-            if (!(GetDSDevices(names, dev_ids)))
-                return false;
-
-            break;
-#ifndef NO_XAUDIO2
-
-        case AUD_XAUDIO2:
-            if (!GetXA2Devices(names, dev_ids))
-                return false;
-
-            break;
-#endif
-#ifndef NO_FAUDIO
-
-        case AUD_FAUDIO:
-            if (!GetFADevices(names, dev_ids))
-                return false;
-
-            break;
-#endif
-#endif
-        }
-
-        dev->SetSelection(0);
-
-        for (size_t i = 0; i < names.size(); i++) {
-            dev->Append(names[i]);
-
-            if (api == gopts.audio_api && gopts.audio_dev == dev_ids[i])
-                dev->SetSelection(i + 1);
-        }
-
-        umix->Enable(api == AUD_XAUDIO2);
-        hwacc->Enable(api == AUD_DIRECTSOUND);
-        lastapi = api;
-        return true;
-    }
-    void SetAPI(wxCommandEvent& ev)
-    {
-        int api = gopts.audio_api;
-        wxValidator* v = wxStaticCast(ev.GetEventObject(), wxWindow)->GetValidator();
-        v->TransferFromWindow();
-        int newapi = gopts.audio_api;
-        gopts.audio_api = api;
-
-        if (newapi == lastapi)
-            return;
-
-        gopts.audio_dev = wxT("");
-        FillDev(newapi);
-    }
-} sound_config_handler;
-
-// Validator/widget filler for sound device selector & time indicator
-class SoundConfigLoad : public wxValidator {
-public:
-    SoundConfigLoad()
-        : wxValidator()
-    {
-    }
-    SoundConfigLoad(const SoundConfigLoad& e)
-        : wxValidator()
-    {
-        (void)e; // unused params
-    }
-    wxObject* Clone() const { return new SoundConfigLoad(*this); }
-    bool Validate(wxWindow* p) {
-        (void)p; // unused params
-        return true;
-    }
-    bool TransferToWindow()
-    {
-        SoundConfig_t& sch = sound_config_handler;
-        sch.FillDev(gopts.audio_api);
-        sch.AdjustFrames(gopts.audio_buffers);
-        return true;
-    }
-    bool TransferFromWindow()
-    {
-        SoundConfig_t& sch = sound_config_handler;
-        int devs = sch.dev->GetSelection();
-
-        if (devs <= 0)
-            gopts.audio_dev = wxEmptyString;
-        else
-            gopts.audio_dev = sch.dev_ids[devs - 1];
-
-        return true;
-    }
-};
-
 // manage throttle spinctrl/canned setting choice interaction
 static class ThrottleCtrl_t : public wxEvtHandler {
 public:
@@ -2398,12 +2262,12 @@ bool MainFrame::BindControls()
             cheat_list_handler.item1.SetFont(cl->GetFont());
             cheat_list_handler.item1.SetColumn(1);
 #if 0
-                        // the ideal way to set col 0's width would be to use
-                        // wxLIST_AUTOSIZE after setting value to a sample:
-                        cheat_list_handler.item0.SetText(wxT("00000000 00000000"));
-                        cl->InsertItem(cheat_list_handler.item0);
-                        cl->SetColumnWidth(0, wxLIST_AUTOSIZE);
-                        cl->RemoveItem(0);
+            // the ideal way to set col 0's width would be to use
+            // wxLIST_AUTOSIZE after setting value to a sample:
+            cheat_list_handler.item0.SetText(wxT("00000000 00000000"));
+            cl->InsertItem(cheat_list_handler.item0);
+            cl->SetColumnWidth(0, wxLIST_AUTOSIZE);
+            cl->RemoveItem(0);
 #else
             // however, the generic listctrl implementation uses the wrong
             // font to determine width (window vs. item), and does not
@@ -2544,12 +2408,6 @@ bool MainFrame::BindControls()
         }
         //// config menu
         d = LoadXRCDialog("GeneralConfig");
-        wxCheckBox* cb;
-#define getcbb(n, o)                              \
-    do {                                          \
-        cb = SafeXRCCTRL<wxCheckBox>(d, n);       \
-        cb->SetValidator(wxGenericValidator(&o)); \
-    } while (0)
         wxSpinCtrl* sc;
 #define getsc(n, o)                               \
     do {                                          \
@@ -2670,77 +2528,7 @@ bool MainFrame::BindControls()
         }
 
         dialogs::DisplayConfig::NewInstance(this);
-
-        d = LoadXRCropertySheetDialog("SoundConfig");
-        wxSlider* sl;
-#define getsl(n, o)                               \
-    do {                                          \
-        sl = SafeXRCCTRL<wxSlider>(d, n);         \
-        sl->SetValidator(wxGenericValidator(&o)); \
-    } while (0)
-        {
-            /// Basic
-            getsl("Volume", gopts.sound_vol);
-            sound_config_handler.vol = sl;
-            d->Connect(XRCID("Volume100"), wxEVT_COMMAND_BUTTON_CLICKED,
-                wxCommandEventHandler(SoundConfig_t::FullVol),
-                NULL, &sound_config_handler);
-            ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "Rate", wxGenericValidator(&gopts.sound_qual));
-/// Advanced
-#define audapi_rb(n, v)                                   \
-    do {                                                  \
-        getrbi(n, gopts.audio_api, v);                    \
-        rb->Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED,   \
-            wxCommandEventHandler(SoundConfig_t::SetAPI), \
-            NULL, &sound_config_handler);                 \
-    } while (0)
-            audapi_rb("SDL", AUD_SDL);
-            rb->Hide(); // currently disabled
-
-            audapi_rb("OpenAL", AUD_OPENAL);
-            audapi_rb("DirectSound", AUD_DIRECTSOUND);
-#ifndef __WXMSW__
-            rb->Hide();
-#endif
-            audapi_rb("XAudio2", AUD_XAUDIO2);
-#if !defined(__WXMSW__) || defined(NO_XAUDIO2)
-            rb->Hide();
-#endif
-            audapi_rb("FAudio", AUD_FAUDIO);
-#ifdef NO_FAUDIO
-            rb->Hide();
-#endif
-            sound_config_handler.dev = SafeXRCCTRL<wxChoice>(d, "Device");
-            sound_config_handler.dev->SetValidator(SoundConfigLoad());
-            getcbb("Upmix", gopts.upmix);
-            sound_config_handler.umix = cb;
-#if !defined(__WXMSW__) || defined(NO_XAUDIO2)
-            cb->Hide();
-#endif
-            getcbb("HWAccel", gopts.dsound_hw_accel);
-            sound_config_handler.hwacc = cb;
-#ifndef __WXMSW__
-            cb->Hide();
-#endif
-            getsl("Buffers", gopts.audio_buffers);
-            sound_config_handler.bufs = sl;
-            getlab("BuffersInfo");
-            sound_config_handler.bufinfo = lab;
-            sl->Connect(wxEVT_SCROLL_CHANGED,
-                wxCommandEventHandler(SoundConfig_t::AdjustFramesEv),
-                NULL, &sound_config_handler);
-            sl->Connect(wxEVT_SCROLL_THUMBTRACK,
-                wxCommandEventHandler(SoundConfig_t::AdjustFramesEv),
-                NULL, &sound_config_handler);
-            sound_config_handler.AdjustFrames(10);
-            /// Game Boy
-            SafeXRCCTRL<wxPanel>(d, "GBEnhanceSoundDep");
-            getsl("GBEcho", gopts.gb_echo);
-            getsl("GBStereo", gopts.gb_stereo);
-            /// Game Boy Advance
-            getsl("GBASoundFiltering", gopts.gba_sound_filter);
-            d->Fit();
-        }
+        dialogs::SoundConfig::NewInstance(this);
         dialogs::DirectoriesConfig::NewInstance(this);
         dialogs::JoypadConfig::NewInstance(this);
 

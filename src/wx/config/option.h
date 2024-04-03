@@ -75,8 +75,36 @@ enum class RenderMethod {
     // Do not add anything under here.
     kLast,
 };
-static constexpr size_t kNbRenderMethods =
-    static_cast<size_t>(RenderMethod::kLast);
+static constexpr size_t kNbRenderMethods = static_cast<size_t>(RenderMethod::kLast);
+
+// Values for kAudioApi.
+enum class AudioApi {
+    kOpenAL,
+#if defined(__WXMSW__)
+    kDirectSound,
+#endif  // __WXMSW__
+#if defined(VBAM_ENABLE_XAUDIO2)
+    kXAudio2,
+#endif  // VBAM_ENABLE_XAUDIO2
+#if defined(VBAM_ENABLE_FAUDIO)
+    kFAudio,
+#endif  // VBAM_ENABLE_FAUDIO
+
+    // Do not add anything under here.
+    kLast,
+};
+static constexpr size_t kNbAudioApis = static_cast<size_t>(AudioApi::kLast);
+
+enum class AudioRate {
+    k48kHz = 0,
+    k44kHz,
+    k22kHz,
+    k11kHz,
+
+    // Do not add anything under here.
+    kLast,
+};
+static constexpr size_t kNbSoundRate = static_cast<size_t>(AudioRate::kLast);
 
 // This is incremented whenever we want to change a default value between
 // release versions. The option update code is in load_opts.
@@ -108,7 +136,7 @@ public:
         kInterframe,
         kRenderMethod,
         kAudioApi,
-        kSoundQuality,
+        kAudioRate,
         kGbPalette,
     };
 
@@ -165,11 +193,11 @@ public:
     bool is_interframe() const { return type() == Type::kInterframe; }
     bool is_render_method() const { return type() == Type::kRenderMethod; }
     bool is_audio_api() const { return type() == Type::kAudioApi; }
-    bool is_sound_quality() const { return type() == Type::kSoundQuality; }
+    bool is_audio_rate() const { return type() == Type::kAudioRate; }
     bool is_gb_palette() const { return type() == Type::kGbPalette; }
 
     // Returns a reference to the stored data. Will assert on type mismatch.
-    // Only enum types can use through GetEnumString().
+    // Only enum types can use GetEnumString().
     bool GetBool() const;
     double GetDouble() const;
     int32_t GetInt() const;
@@ -178,6 +206,8 @@ public:
     Filter GetFilter() const;
     Interframe GetInterframe() const;
     RenderMethod GetRenderMethod() const;
+    AudioApi GetAudioApi() const;
+    AudioRate GetAudioRate() const;
     wxString GetEnumString() const;
     std::array<uint16_t, 8> GetGbPalette() const;
     wxString GetGbPaletteString() const;
@@ -193,6 +223,8 @@ public:
     bool SetFilter(const Filter& value);
     bool SetInterframe(const Interframe& value);
     bool SetRenderMethod(const RenderMethod& value);
+    bool SetAudioApi(const AudioApi& value);
+    bool SetAudioRate(const AudioRate& value);
     bool SetEnumString(const wxString& value);
     bool SetGbPalette(const std::array<uint16_t, 8>& value);
     bool SetGbPaletteString(const wxString& value);
@@ -204,6 +236,7 @@ public:
     int32_t GetIntMax() const;
     uint32_t GetUnsignedMin() const;
     uint32_t GetUnsignedMax() const;
+    size_t GetEnumMax() const;
 
     // Special convenience modifiers.
     void NextFilter();
@@ -226,11 +259,10 @@ private:
     Option(OptionID id, Filter* option);
     Option(OptionID id, Interframe* option);
     Option(OptionID id, RenderMethod* option);
+    Option(OptionID id, AudioApi* option);
+    Option(OptionID id, AudioRate* option);
     Option(OptionID id, int* option);
     Option(OptionID id, uint16_t* option);
-
-    // Helper method for enums not fully converted yet.
-    bool SetEnumInt(int value);
 
     // Observer.
     void AddObserver(Observer* observer);
@@ -259,11 +291,16 @@ private:
                           Filter*,
                           Interframe*,
                           RenderMethod*,
+                          AudioApi*,
+                          AudioRate*,
                           uint16_t*>
         value_;
 
+    // Technically, `uint64_t` is only needed for 64 bits targets, as `size_t`.
+    // However, `size_t` is the same as `uint32_t` on 32 bits targets, resulting
+    // in a compiler error if we use `size_t` here.
     const nonstd::variant<nonstd::monostate, double, int32_t, uint32_t> min_;
-    const nonstd::variant<nonstd::monostate, double, int32_t, uint32_t> max_;
+    const nonstd::variant<nonstd::monostate, double, int32_t, uint32_t, uint64_t> max_;
 };
 
 }  // namespace config

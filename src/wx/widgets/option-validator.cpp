@@ -3,6 +3,7 @@
 #include <wx/checkbox.h>
 #include <wx/choice.h>
 #include <wx/radiobut.h>
+#include <wx/slider.h>
 #include <wx/spinctrl.h>
 
 namespace widgets {
@@ -90,30 +91,49 @@ bool OptionSelectedValidator::WriteToOption() {
     return false;
 }
 
-OptionSpinCtrlValidator::OptionSpinCtrlValidator(config::OptionID option_id)
+OptionIntValidator::OptionIntValidator(config::OptionID option_id)
     : OptionValidator(option_id) {
     assert(option()->is_int());
 }
 
-wxObject* OptionSpinCtrlValidator::Clone() const {
-    return new OptionSpinCtrlValidator(option()->id());
+wxObject* OptionIntValidator::Clone() const {
+    return new OptionIntValidator(option()->id());
 }
 
-bool OptionSpinCtrlValidator::IsWindowValueValid() {
+bool OptionIntValidator::IsWindowValueValid() {
     return true;
 }
 
-bool OptionSpinCtrlValidator::WriteToWindow() {
+bool OptionIntValidator::WriteToWindow() {
     wxSpinCtrl* spin_ctrl = wxDynamicCast(GetWindow(), wxSpinCtrl);
-    assert(spin_ctrl);
-    spin_ctrl->SetValue(option()->GetInt());
-    return true;
+    if (spin_ctrl) {
+        spin_ctrl->SetValue(option()->GetInt());
+        return true;
+    }
+
+    wxSlider* slider = wxDynamicCast(GetWindow(), wxSlider);
+    if (slider) {
+        slider->SetValue(option()->GetInt());
+        return true;
+    }
+
+    assert(false);
+    return false;
 }
 
-bool OptionSpinCtrlValidator::WriteToOption() {
+bool OptionIntValidator::WriteToOption() {
     const wxSpinCtrl* spin_ctrl = wxDynamicCast(GetWindow(), wxSpinCtrl);
-    assert(spin_ctrl);
-    return option()->SetInt(spin_ctrl->GetValue());
+    if (spin_ctrl) {
+        return option()->SetInt(spin_ctrl->GetValue());
+    }
+
+    const wxSlider* slider = wxDynamicCast(GetWindow(), wxSlider);
+    if (slider) {
+        return option()->SetInt(slider->GetValue());
+    }
+
+    assert(false);
+    return false;
 }
 
 OptionChoiceValidator::OptionChoiceValidator(config::OptionID option_id)
@@ -140,6 +160,32 @@ bool OptionChoiceValidator::WriteToOption() {
     const wxChoice* choice = wxDynamicCast(GetWindow(), wxChoice);
     assert(choice);
     return option()->SetUnsigned(choice->GetSelection());
+}
+
+OptionBoolValidator::OptionBoolValidator(config::OptionID option_id)
+    : OptionValidator(option_id) {
+    assert(option()->is_bool());
+}
+
+wxObject* OptionBoolValidator::Clone() const {
+    return new OptionBoolValidator(option()->id());
+}
+
+bool OptionBoolValidator::IsWindowValueValid() {
+    return true;
+}
+
+bool OptionBoolValidator::WriteToWindow() {
+    wxCheckBox* checkbox = wxDynamicCast(GetWindow(), wxCheckBox);
+    assert(checkbox);
+    checkbox->SetValue(option()->GetBool());
+    return true;
+}
+
+bool OptionBoolValidator::WriteToOption() {
+    const wxCheckBox* checkbox = wxDynamicCast(GetWindow(), wxCheckBox);
+    assert(checkbox);
+    return option()->SetBool(checkbox->GetValue());
 }
 
 }  // namespace widgets

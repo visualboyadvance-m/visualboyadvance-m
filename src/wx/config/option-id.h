@@ -130,7 +130,9 @@ enum class OptionID {
     kSoundGBEnableEffects,
     kSoundGBStereo,
     kSoundGBSurround,
-    kSoundQuality,
+    kSoundAudioRate,
+    kSoundDSoundHWAccel,
+    kSoundUpmix,
     kSoundVolume,
 
     // Do not add anything under here.

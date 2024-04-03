@@ -3,6 +3,8 @@
 #include <cstring>
 #include "components/filters_agb/filters_agb.h"
 #include "components/filters_interframe/interframe.h"
+#include "core/base/system.h"
+#include "wx/config/option-id.h"
 
 #ifdef __WXGTK__
     #include <X11/Xlib.h>
@@ -94,6 +96,28 @@ double GetFilterScale() {
     return 1.0;
 }
 
+long GetSampleRate() {
+    switch (OPTION(kSoundAudioRate)) {
+        case config::AudioRate::k48kHz:
+            return 48000;
+            break;
+        case config::AudioRate::k44kHz:
+            return 44100;
+            break;
+        case config::AudioRate::k22kHz:
+            return 22050;
+            break;
+        case config::AudioRate::k11kHz:
+            return 11025;
+            break;
+        case config::AudioRate::kLast:
+            assert(false);
+            return 44100;
+    }
+    assert(false);
+    return 44100;
+}
+
 #define out_16 (systemColorDepth == 16)
 
 }  // namespace
@@ -118,28 +142,29 @@ GameArea::GameArea()
       paused(false),
       pointer_blanked(false),
       mouse_active_time(0),
-      render_observer_(
-          {config::OptionID::kDispBilinear, config::OptionID::kDispFilter,
-           config::OptionID::kDispRenderMethod, config::OptionID::kDispIFB,
-           config::OptionID::kDispStretch, config::OptionID::kPrefVsync},
-          std::bind(&GameArea::ResetPanel, this)),
-      scale_observer_(config::OptionID::kDispScale,
-                      std::bind(&GameArea::AdjustSize, this, true)),
-      gb_border_observer_(
-          config::OptionID::kPrefBorderOn,
-          std::bind(&GameArea::OnGBBorderChanged, this, std::placeholders::_1)),
-      gb_palette_observer_(
-          {config::OptionID::kGBPalette0, config::OptionID::kGBPalette1,
-           config::OptionID::kGBPalette2,
-           config::OptionID::kPrefGBPaletteOption},
-          std::bind(&gbResetPalette)),
-      gb_declick_observer_(config::OptionID::kSoundGBDeclicking,
-                           [&](config::Option* option) {
-                               gbSoundSetDeclicking(option->GetBool());
-                           }),
-      lcd_filters_observer_(
-          {config::OptionID::kGBLCDFilter, config::OptionID::kGBALCDFilter},
-          std::bind(&GameArea::UpdateLcdFilter, this)) {
+      render_observer_({config::OptionID::kDispBilinear, config::OptionID::kDispFilter,
+                        config::OptionID::kDispRenderMethod, config::OptionID::kDispIFB,
+                        config::OptionID::kDispStretch, config::OptionID::kPrefVsync},
+                       std::bind(&GameArea::ResetPanel, this)),
+      scale_observer_(config::OptionID::kDispScale, std::bind(&GameArea::AdjustSize, this, true)),
+      gb_border_observer_(config::OptionID::kPrefBorderOn,
+                          std::bind(&GameArea::OnGBBorderChanged, this, std::placeholders::_1)),
+      gb_palette_observer_({config::OptionID::kGBPalette0, config::OptionID::kGBPalette1,
+                            config::OptionID::kGBPalette2, config::OptionID::kPrefGBPaletteOption},
+                           std::bind(&gbResetPalette)),
+      gb_declick_observer_(
+          config::OptionID::kSoundGBDeclicking,
+          [&](config::Option* option) { gbSoundSetDeclicking(option->GetBool()); }),
+      lcd_filters_observer_({config::OptionID::kGBLCDFilter, config::OptionID::kGBALCDFilter},
+                            std::bind(&GameArea::UpdateLcdFilter, this)),
+      audio_rate_observer_(config::OptionID::kSoundAudioRate,
+                           std::bind(&GameArea::OnAudioRateChanged, this)),
+      audio_volume_observer_(config::OptionID::kSoundVolume,
+                             std::bind(&GameArea::OnVolumeChanged, this, std::placeholders::_1)),
+      audio_observer_({config::OptionID::kSoundAudioAPI, config::OptionID::kSoundAudioDevice,
+                       config::OptionID::kSoundBuffers, config::OptionID::kSoundDSoundHWAccel,
+                       config::OptionID::kSoundUpmix},
+                      [&](config::Option*) { schedule_audio_restart_ = true; }) {
     SetSizer(new wxBoxSizer(wxVERTICAL));
     // all renderers prefer 32-bit
     // well, "simple" prefers 24-bit, but that's not available for filters
@@ -237,15 +262,15 @@ void GameArea::LoadGame(const wxString& name)
         if (!pfn.IsFileReadable()) {
             pfn.SetExt(wxT("ups"));
 
-			if (!pfn.IsFileReadable()) {
-				pfn.SetExt(wxT("bps"));
+            if (!pfn.IsFileReadable()) {
+                pfn.SetExt(wxT("bps"));
 
-				if (!pfn.IsFileReadable()) {
-					pfn.SetExt(wxT("ppf"));
-					loadpatch = pfn.IsFileReadable();
-				}
-			}
-		}
+                if (!pfn.IsFileReadable()) {
+                    pfn.SetExt(wxT("ppf"));
+                    loadpatch = pfn.IsFileReadable();
+                }
+            }
+        }
     }
 
     if (t == IMAGE_GB) {
@@ -264,14 +289,13 @@ void GameArea::LoadGame(const wxString& name)
         // start sound; this must happen before CPU stuff
         gb_effects_config.enabled = OPTION(kSoundGBEnableEffects);
         gb_effects_config.surround = OPTION(kSoundGBSurround);
-        gb_effects_config.echo = (float)gopts.gb_echo / 100.0;
-        gb_effects_config.stereo = (float)gopts.gb_stereo / 100.0;
+        gb_effects_config.echo = (float)OPTION(kSoundGBEcho) / 100.0;
+        gb_effects_config.stereo = (float)OPTION(kSoundGBStereo) / 100.0;
         if (!soundInit()) {
             wxLogError(_("Could not initialize the sound driver!"));
         }
         soundSetEnable(gopts.sound_en);
-        gbSoundSetSampleRate(!gopts.sound_qual ? 48000 : 44100 / (1 << (gopts.sound_qual - 1)));
-        soundSetVolume((float)gopts.sound_vol / 100.0);
+        gbSoundSetSampleRate(GetSampleRate());
         // this **MUST** be called **AFTER** setting sample rate because the core calls soundInit()
         soundSetThrottle(coreOptions.throttle);
         gbGetHardwareType();
@@ -382,11 +406,10 @@ void GameArea::LoadGame(const wxString& name)
             wxLogError(_("Could not initialize the sound driver!"));
         }
         soundSetEnable(gopts.sound_en);
-        soundSetSampleRate(!gopts.sound_qual ? 48000 : 44100 / (1 << (gopts.sound_qual - 1)));
-        soundSetVolume((float)gopts.sound_vol / 100.0);
+        soundSetSampleRate(GetSampleRate());
         // this **MUST** be called **AFTER** setting sample rate because the core calls soundInit()
         soundSetThrottle(coreOptions.throttle);
-        soundFiltering = (float)gopts.gba_sound_filter / 100.0f;
+        soundFiltering = (float)OPTION(kSoundGBAFiltering) / 100.0f;
 
         rtcEnableRumble(true);
 
@@ -415,6 +438,7 @@ void GameArea::LoadGame(const wxString& name)
     AdjustSize(false);
     emulating = true;
     was_paused = true;
+    schedule_audio_restart_ = false;
     MainFrame* mf = wxGetApp().frame;
     mf->StopJoyPollTimer();
     mf->SetJoystick();
@@ -1122,6 +1146,14 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
     if (!emusys)
         return;
+
+    if (schedule_audio_restart_) {
+        soundShutdown();
+        if (!soundInit()) {
+            wxLogError(_("Could not initialize the sound driver!"));
+        }
+        schedule_audio_restart_ = false;
+    }
 
     if (!panel) {
         switch (OPTION(kDispRenderMethod)) {
@@ -2710,4 +2742,29 @@ void GameArea::UnsuspendScreenSaver() {
         xscreensaver_suspended = false;
     }
 #endif // HAVE_XSS
+}
+
+void GameArea::OnAudioRateChanged() {
+    if (loaded == IMAGE_UNKNOWN) {
+        return;
+    }
+
+    switch (game_type()) {
+        case IMAGE_UNKNOWN:
+            break;
+
+        case IMAGE_GB:
+            gbSoundSetSampleRate(GetSampleRate());
+            break;
+
+        case IMAGE_GBA:
+            soundSetSampleRate(GetSampleRate());
+            break;
+    }
+}
+
+void GameArea::OnVolumeChanged(config::Option* option) {
+    const int volume = option->GetInt();
+    soundSetVolume((float)volume / 100.0);
+    systemScreenMessage(wxString::Format(_("Volume: %d %%"), volume));
 }

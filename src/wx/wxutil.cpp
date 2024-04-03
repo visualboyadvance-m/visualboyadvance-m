@@ -1,6 +1,10 @@
 #include "wx/wxutil.h"
 
 int getKeyboardKeyCode(const wxKeyEvent& event) {
+    const int key_code = event.GetKeyCode();
+    if (key_code > WXK_START) {
+        return key_code;
+    }
     int uc = event.GetUnicodeKey();
     if (uc != WXK_NONE) {
         if (uc < 32) {  // not all control chars
