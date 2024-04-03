@@ -532,7 +532,7 @@ msgstr "O número do direcional a usar no modo de um jogador"
 
 #: config/internal/option-internal.cpp:484
 msgid "Whether to enable SDL GameController mode"
-msgstr ""
+msgstr "Se deve ativar o modo GameController do SDL"
 
 #: config/internal/option-internal.cpp:488
 msgid ""
@@ -2906,7 +2906,7 @@ msgstr "Configuração do Joypad"
 
 #: xrc/JoypadConfig.xrc:10
 msgid "SDL GameController Mode"
-msgstr ""
+msgstr "Modo GameController do SDL"
 
 #: xrc/JoypadConfig.xrc:19
 msgid "Player 1"
