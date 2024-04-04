@@ -4,6 +4,7 @@
 
 #include <limits>
 
+#include <wx/event.h>
 #include <wx/ffile.h>
 #include <wx/vlbox.h>
 
@@ -79,7 +80,7 @@ public:
         Fit();
         SetMinSize(GetSize());
         dis->maxaddr = (uint32_t)~0;
-        dismode = 0;
+        disassembly_mode_ = DisassemblyMode::Automatic;
         GotoPC();
     }
     void Update()
@@ -88,13 +89,13 @@ public:
     }
     void Next(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         CPULoop(1);
         GotoPC();
     }
     void Goto(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         wxString as = goto_addr->GetValue();
 
         if (!as.size())
@@ -106,30 +107,29 @@ public:
         UpdateDis();
     }
     // wx-2.8.4 or MacOSX compiler can't resolve overloads in evt table
-    void GotoPCEv(wxCommandEvent& ev)
+    void GotoPCEv(wxCommandEvent&)
     {
-	(void)ev; // unused params
         GotoPC();
     }
     void GotoPC()
     {
 #if 0
 
-		// this is what the win32 interface used
-		if (armState)
-			dis->SetSel(armNextPC - 16);
-		else
-			dis->SetSel(armNextPC - 8);
+        // this is what the win32 interface used
+        if (armState)
+            dis->SetSel(armNextPC - 16);
+        else
+            dis->SetSel(armNextPC - 8);
 
-		// doesn't make sense, though.  Maybe it's just trying to keep the
-		// sel 4 instructions below top...
+        // doesn't make sense, though.  Maybe it's just trying to keep the
+        // sel 4 instructions below top...
 #endif
         dis->SetSel(armNextPC);
         UpdateDis();
     }
     void RefreshCmd(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         UpdateDis();
     }
     void UpdateDis()
@@ -161,13 +161,14 @@ public:
         dis->strings.clear();
         dis->addrs.clear();
         uint32_t addr = dis->topaddr;
-        bool arm = dismode == 1 || (armState && dismode != 2);
-        dis->back_size = arm ? 4 : 2;
+        const bool arm_mode = disassembly_mode_ == DisassemblyMode::Arm ||
+                              (armState && disassembly_mode_ == DisassemblyMode::Automatic);
+        dis->back_size = arm_mode ? 4 : 2;
 
         for (int i = 0; i < dis->nlines; i++) {
             dis->addrs.push_back(addr);
 
-            if (arm)
+            if (arm_mode)
                 addr += disArm(addr, buf, 4096, DIS_VIEW_CODE | DIS_VIEW_ADDRESS);
             else
                 addr += disThumb(addr, buf, 4096, DIS_VIEW_CODE | DIS_VIEW_ADDRESS);
@@ -178,10 +179,32 @@ public:
         dis->Refill();
     }
 
+private:
+    enum class DisassemblyMode {
+        Automatic,
+        Arm,
+        Thumb,
+    };
+
+    void AutomaticMode(wxCommandEvent& ev) {
+        disassembly_mode_ = DisassemblyMode::Automatic;
+        RefillListEv(ev);
+    }
+
+    void ArmMode(wxCommandEvent& ev) {
+        disassembly_mode_ = DisassemblyMode::Arm;
+        RefillListEv(ev);
+    }
+
+    void ThumbMode(wxCommandEvent& ev) {
+        disassembly_mode_ = DisassemblyMode::Thumb;
+        RefillListEv(ev);
+    }
+
     DisList* dis;
     wxTextCtrl* goto_addr;
     wxCheckBox *N, *Z, *C, *V, *I, *F, *T;
-    int dismode;
+    DisassemblyMode disassembly_mode_;
     wxControl *regv[17], *Modev;
     DECLARE_EVENT_TABLE()
 };
@@ -193,6 +216,9 @@ EVT_TEXT_ENTER(XRCID("GotoAddress"), DisassembleViewer::Goto)
 EVT_BUTTON(XRCID("GotoPC"), DisassembleViewer::GotoPCEv)
 EVT_BUTTON(XRCID("Next"), DisassembleViewer::Next)
 EVT_BUTTON(XRCID("Refresh"), DisassembleViewer::RefreshCmd)
+EVT_BUTTON(XRCID("InsAuto"), DisassembleViewer::AutomaticMode)
+EVT_BUTTON(XRCID("InsARM"), DisassembleViewer::ArmMode)
+EVT_BUTTON(XRCID("InsThumb"), DisassembleViewer::ThumbMode)
 END_EVENT_TABLE()
 
 class GBDisassembleViewer : public Viewer {
@@ -386,7 +412,7 @@ public:
             // and while at it, translate all the strings
             if (!lline) {
                 for (int j = 0; j < 16; j++) {
-                    if (ioregs[i].bits[j][0]) {
+                    if (!ioregs[i].bits[j].IsEmpty()) {
                         ioregs[i].bits[j] = wxGetTranslation(ioregs[i].bits[j]);
                         int w, h;
                         bitlab[0]->GetTextExtent(ioregs[i].bits[j], &w, &h);
@@ -621,7 +647,7 @@ public:
         }
 
         bs = XRCCTRL(*this, "BlockStart", wxChoice);
-        if (bs) {
+        if (!bs) {
             baddialog();
         }
 

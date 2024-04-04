@@ -1683,7 +1683,9 @@ public:
     }
 
 protected:
-    int charbase_, is256_, palette_;
+    int charbase_ = 0;
+    int is256_ = 0;
+    int palette_ = 0;
     wxControl *tileno_, *addr_;
     int selx_, sely_;
 
