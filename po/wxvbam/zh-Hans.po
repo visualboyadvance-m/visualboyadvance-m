@@ -742,11 +742,11 @@ msgstr "声音采样率 (kHz)"
 
 #: config/internal/option-internal.cpp:569
 msgid "Use DirectSound hardware acceleration"
-msgstr ""
+msgstr "启用 DirectSound 硬件加速"
 
 #: config/internal/option-internal.cpp:570
 msgid "Upmix stereo to surround"
-msgstr ""
+msgstr "将立体声升级为环绕立体声"
 
 #: config/internal/option-internal.cpp:571
 msgid "Sound volume (%)"
@@ -1155,7 +1155,7 @@ msgstr "%04X (实际: %04X)"
 #: dialogs/sound-config.cpp:250
 #, c-format
 msgid "%d frame = %.2f ms"
-msgstr ""
+msgstr "%d 帧 = %.2f 毫秒"
 
 #: dialogs/sound-config.cpp:258
 msgid "Default device"
