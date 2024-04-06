@@ -140,7 +140,17 @@ if(WIN32)
     option(ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ${XAUDIO2_DEFAULT})
 endif()
 
-option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" OFF)
+set(ENABLE_FAUDIO_DEFAULT OFF)
+
+if(WIN32)
+    find_package(FAudio)
+
+    if(FAudio_FOUND)
+        set(ENABLE_FAUDIO_DEFAULT ON)
+    endif()
+endif()
+
+option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" ${ENABLE_FAUDIO_DEFAULT})
 
 option(ZIP_SUFFIX [=[suffix for release zip files, e.g.  "-somebranch".zip]=] OFF)
 
