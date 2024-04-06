@@ -53,7 +53,7 @@ endif()
 
 function(vcpkg_check_git_status git_status)
     # The VS vcpkg component cannot be written to without elevation.
-    if(NOT git_status EQUAL 0 AND NOT VCPKG_ROOT MATCHES "^C:/Program Files/Microsoft Visual Studio/")
+    if(NOT git_status EQUAL 0 AND NOT VCPKG_ROOT MATCHES "Visual Studio")
         message(FATAL_ERROR "Error updating vcpkg from git, please make sure git for windows is installed correctly, it can be installed from Visual Studio components")
     endif()
 endfunction()
@@ -120,7 +120,7 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver pkg_triplet powershell ou
     string(REPLACE "-" "." pkg_ver ${pkg_ver})
 
     if(NOT DEFINED VCPKG_INSTALLED_COUNT)
-        if(VCPKG_ROOT MATCHES "^C:/Program Files/Microsoft Visual Studio/")
+        if(VCPKG_ROOT MATCHES "Visual Studio")
             execute_process(
                 COMMAND ${powershell}
                     -executionpolicy bypass -noprofile
