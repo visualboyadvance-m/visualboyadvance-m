@@ -7,6 +7,8 @@ add_executable(vbam WIN32)
 
 target_sources(vbam
     PRIVATE
+    audio_sdl.cpp
+    audio_sdl.h
     ConfigManager.cpp
     ConfigManager.h
     dictionary.c
@@ -38,15 +40,19 @@ if(ENABLE_LIRC)
     set(LIRC_CLIENT_LIBRARY lirc_client)
 endif()
 
+target_include_directories(vbam
+    PRIVATE ${SDL2_INCLUDE_DIRS}
+)
+
 target_link_libraries(vbam
     vbam-core
-    vbam-components-audio-sdl
     vbam-components-draw-text
     vbam-components-filters
     vbam-components-filters-agb
     vbam-components-filters-interframe
     vbam-components-user-config
     ${OPENGL_LIBRARIES}
+    ${VBAM_SDL2_LIBS}
 )
 
 if(WIN32)

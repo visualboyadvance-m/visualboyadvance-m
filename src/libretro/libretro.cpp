@@ -1949,10 +1949,10 @@ uint32_t systemGetClock(void)
     return 0;
 }
 
-SoundDriver* systemSoundInit(void)
+std::unique_ptr<SoundDriver> systemSoundInit(void)
 {
     soundShutdown();
-    return new SoundRetro();
+    return std::make_unique<SoundRetro>();
 }
 
 void log(const char* defaultMsg, ...)

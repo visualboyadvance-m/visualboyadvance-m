@@ -236,25 +236,20 @@ class XAudio2_Output
     : public SoundDriver {
 public:
     XAudio2_Output();
-    ~XAudio2_Output();
+    ~XAudio2_Output() override;
 
-    // Initialization
-    bool init(long sampleRate);
-
-    // Sound Data Feed
-    void write(uint16_t* finalWave, int length);
-
-    // Play Control
-    void pause();
-    void resume();
-    void reset();
-    void close();
     void device_change();
-
-    // Configuration Changes
-    void setThrottle(unsigned short throttle);
-
 private:
+    void close();
+
+    // SoundDriver implementation.
+    bool init(long sampleRate) override;
+    void pause() override;
+    void reset() override;
+    void resume() override;
+    void write(uint16_t *finalWave, int length) override;
+    void setThrottle(unsigned short throttle_) override;
+
     bool failed;
     bool initialized;
     bool playing;
@@ -614,7 +609,7 @@ void xaudio2_device_changed(XAudio2_Output* instance)
     instance->device_change();
 }
 
-SoundDriver* newXAudio2_Output()
+std::unique_ptr<SoundDriver> newXAudio2_Output()
 {
-    return new XAudio2_Output();
+    return std::make_unique<XAudio2_Output>();
 }

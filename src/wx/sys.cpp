@@ -1227,7 +1227,7 @@ void systemGbBorderOn()
 }
 
 class SoundDriver;
-SoundDriver* systemSoundInit()
+std::unique_ptr<SoundDriver> systemSoundInit()
 {
     soundShutdown();
 

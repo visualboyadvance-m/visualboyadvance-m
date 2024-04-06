@@ -23,14 +23,16 @@
 class SoundRetro : public SoundDriver {
 public:
     SoundRetro();
-    virtual ~SoundRetro();
+    ~SoundRetro() override;
 
-    virtual bool init(long sampleRate);
-    virtual void pause();
-    virtual void reset();
-    virtual void resume();
-    virtual void write(uint16_t* finalWave, int length);
-    virtual void setThrottle(unsigned short throttle);
+private:
+    // SoundDriver implementation.
+    bool init(long sampleRate) override;
+    void pause() override;
+    void reset() override;
+    void resume() override;
+    void write(uint16_t *finalWave, int length) override;
+    void setThrottle(unsigned short throttle_) override;
 };
 
 #endif // __VBA_SOUND_RETRO_H__

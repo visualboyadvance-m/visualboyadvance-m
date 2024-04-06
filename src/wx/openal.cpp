@@ -31,7 +31,7 @@ struct OPENALFNTABLE;
 class OpenAL : public SoundDriver {
 public:
     OpenAL();
-    virtual ~OpenAL();
+    ~OpenAL() override;
 
     static bool GetDevices(wxArrayString& names, wxArrayString& ids);
     bool init(long sampleRate); // initialize the sound buffer queue
@@ -327,10 +327,10 @@ void OpenAL::write(uint16_t* finalWave, int length)
     }
 }
 
-SoundDriver* newOpenAL()
+std::unique_ptr<SoundDriver> newOpenAL()
 {
     winlog("newOpenAL\n");
-    return new OpenAL();
+    return std::make_unique<OpenAL>();
 }
 
 bool GetOALDevices(wxArrayString& names, wxArrayString& ids)

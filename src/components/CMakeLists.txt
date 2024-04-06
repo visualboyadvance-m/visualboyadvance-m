@@ -1,4 +1,3 @@
-add_subdirectory(audio_sdl)
 add_subdirectory(av_recording)
 add_subdirectory(draw_text)
 add_subdirectory(filters)

@@ -2,8 +2,9 @@
 #define VBAM_CORE_BASE_SYSTEM_H_
 
 #include <cstdint>
+#include <memory>
 
-class SoundDriver;
+#include "core/base/sound_driver.h"
 
 enum IMAGE_TYPE {
     IMAGE_UNKNOWN = -1,
@@ -89,7 +90,7 @@ extern bool systemReadJoypads();
 extern uint32_t systemReadJoypad(int);
 extern uint32_t systemGetClock();
 extern void systemSetTitle(const char*);
-extern SoundDriver* systemSoundInit();
+extern std::unique_ptr<SoundDriver> systemSoundInit();
 extern void systemOnWriteDataToSoundBuffer(const uint16_t* finalWave, int length);
 extern void systemOnSoundShutdown();
 extern void systemScreenMessage(const char*);
