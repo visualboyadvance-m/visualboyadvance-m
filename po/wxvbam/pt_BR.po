@@ -758,11 +758,11 @@ msgstr "Taxa de amostra do som (kHz)"
 
 #: config/internal/option-internal.cpp:569
 msgid "Use DirectSound hardware acceleration"
-msgstr ""
+msgstr "Usar aceleração do hardware pro DirectSound"
 
 #: config/internal/option-internal.cpp:570
 msgid "Upmix stereo to surround"
-msgstr ""
+msgstr "Aumentar número de canais de estéreo pra surroun"
 
 #: config/internal/option-internal.cpp:571
 msgid "Sound volume (%)"
@@ -1171,7 +1171,7 @@ msgstr "%04X (Real: %04X)"
 #: dialogs/sound-config.cpp:250
 #, c-format
 msgid "%d frame = %.2f ms"
-msgstr ""
+msgstr "%d frame = %.2f ms"
 
 #: dialogs/sound-config.cpp:258
 msgid "Default device"
