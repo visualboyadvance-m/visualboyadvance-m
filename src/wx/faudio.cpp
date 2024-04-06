@@ -60,7 +60,7 @@ int FAGetDev(FAudio* fa)
     if (audio_device.empty())
         return 0;
     else {
-        int ret = GetFADevices(fa, NULL, NULL, &audio_device);
+        int ret = GetFADevices(fa, nullptr, nullptr, &audio_device);
         return ret < 0 ? 0 : ret;
     }
 }
@@ -94,19 +94,18 @@ public:
 private:
     void* buffer_end_event_;
 
-    static void StaticOnBufferEnd(FAudioVoiceCallback* callback, void * pBufferContext) {
+    static void StaticOnBufferEnd(FAudioVoiceCallback* callback, void*) {
         FAudio_BufferNotify* self = static_cast<FAudio_BufferNotify*>(callback);
-        if (self != nullptr && self->buffer_end_event_ != NULL)
-        {
+        if (self != nullptr && self->buffer_end_event_ != nullptr) {
             SetEvent(self->buffer_end_event_);
         }
     }
-    static void StaticOnVoiceProcessingPassStart(FAudioVoiceCallback* callback, uint32_t BytesRequired) {}
-    static void StaticOnVoiceProcessingPassEnd(FAudioVoiceCallback* callback) {}
-    static void StaticOnStreamEnd(FAudioVoiceCallback* callback) {}    
-    static void StaticOnBufferStart(FAudioVoiceCallback* callback, void * pBufferContext) {}
-    static void StaticOnLoopEnd(FAudioVoiceCallback* callback, void * pBufferContext) {}
-    static void StaticOnVoiceError(FAudioVoiceCallback* callback, void * pBufferContext, uint32_t Error) {}
+    static void StaticOnVoiceProcessingPassStart(FAudioVoiceCallback*, uint32_t) {}
+    static void StaticOnVoiceProcessingPassEnd(FAudioVoiceCallback*) {}
+    static void StaticOnStreamEnd(FAudioVoiceCallback*) {}
+    static void StaticOnBufferStart(FAudioVoiceCallback*, void*) {}
+    static void StaticOnLoopEnd(FAudioVoiceCallback*, void*) {}
+    static void StaticOnVoiceError(FAudioVoiceCallback*, void*, uint32_t) {}
 };
 
 class FAudio_Output
@@ -115,31 +114,27 @@ public:
     FAudio_Output();
     ~FAudio_Output();
 
-    // Initialization
-    bool init(long sampleRate);
-
-    // Sound Data Feed
-    void write(uint16_t* finalWave, int length);
-
-    // Play Control
-    void pause();
-    void resume();
-    void reset();
-    void close();
     void device_change();
 
-    // Configuration Changes
-    void setThrottle(unsigned short throttle_);
-
 private:
+    void close();
+
+    // SoundDriver implementation.
+    bool init(long sampleRate) override;
+    void pause() override;
+    void reset() override;
+    void resume() override;
+    void write(uint16_t* finalWave, int length) override;
+    void setThrottle(unsigned short throttle_) override;
+
     bool failed;
     bool initialized;
     bool playing;
-    uint32_t freq;
-    uint32_t bufferCount;
-    uint8_t* buffers;
+    uint32_t freq_;
+    const uint32_t buffer_count_;
+    std::vector<uint8_t> buffers_;
     int currentBuffer;
-    int soundBufferLen;
+    int sound_buffer_len_;
 
     volatile bool device_changed;
 
@@ -180,21 +175,18 @@ public:
 FAudio_Device_Notifier f_notifier;
 
 // Class Implementation
-FAudio_Output::FAudio_Output()
-{
+FAudio_Output::FAudio_Output() : buffer_count_(OPTION(kSoundBuffers)) {
     failed = false;
     initialized = false;
     playing = false;
-    freq = 0;
-    bufferCount = OPTION(kSoundBuffers);
-    buffers = NULL;
+    freq_ = 0;
     currentBuffer = 0;
     device_changed = false;
-    faud = NULL;
-    mVoice = NULL;
-    sVoice = NULL;
-    memset(&buf, NULL, sizeof(buf));
-    memset(&vState, NULL, sizeof(vState));
+    faud = nullptr;
+    mVoice = nullptr;
+    sVoice = nullptr;
+    memset(&buf, 0, sizeof(buf));
+    memset(&vState, 0, sizeof(vState));
     f_notifier.do_register(this);
 }
 
@@ -214,22 +206,17 @@ void FAudio_Output::close()
         }
 
         FAudioVoice_DestroyVoice(sVoice);
-        sVoice = NULL;
-    }
-
-    if (buffers) {
-        free(buffers);
-        buffers = NULL;
+        sVoice = nullptr;
     }
 
     if (mVoice) {
         FAudioVoice_DestroyVoice(mVoice);
-        mVoice = NULL;
+        mVoice = nullptr;
     }
 
     if (faud) {
         FAudio_Release(faud);
-        faud = NULL;
+        faud = nullptr;
     }
 }
 
@@ -257,30 +244,30 @@ bool FAudio_Output::init(long sampleRate)
         return false;
     }
 
-    freq = sampleRate;
+    freq_ = sampleRate;
     // calculate the number of samples per frame first
     // then multiply it with the size of a sample frame (16 bit * stereo)
-    soundBufferLen = (freq / 60) * 4;
+    sound_buffer_len_ = (freq_ / 60) * 4;
     // create own buffers to store sound data because it must not be
-    // manipulated while the voice plays from it
-    buffers = (uint8_t*)malloc((bufferCount + 1) * soundBufferLen);
-    // + 1 because we need one temporary buffer when all others are in use
-    FAudioWaveFormatEx wfx;
-    memset(&wfx, NULL, sizeof(wfx));
-    wfx.wFormatTag = FAUDIO_FORMAT_PCM;
-    wfx.nChannels = 2;
-    wfx.nSamplesPerSec = freq;
-    wfx.wBitsPerSample = 16;
-    wfx.nBlockAlign = wfx.nChannels * (wfx.wBitsPerSample / 8);
-    wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign;
+    // manipulated while the voice plays from it.
+    // +1 because we need one temporary buffer when all others are in use.
+    buffers_.resize((buffer_count_ + 1) * sound_buffer_len_);
+    static const uint16_t kNumChannels = 2;
+    static const uint16_t kBitsPerSample = 16;
+    static const uint16_t kBlockAlign = kNumChannels * (kBitsPerSample / 8);
+    FAudioWaveFormatEx wfx {
+        /*.wFormatTag=*/ FAUDIO_FORMAT_PCM,
+        /*.nChannels=*/kNumChannels,
+        /*.nSamplesPerSec=*/freq_,
+        /*.nAvgBytesPerSec=*/freq_ * kBlockAlign,
+        /*.nBlockAlign=*/kNumChannels * (kBitsPerSample / 8),
+        /*.wBitsPerSample=*/kBitsPerSample,
+        /*.cbSize=*/0,
+    };
+
     // create sound receiver
-    hr = FAudio_CreateMasteringVoice(faud,
-    &mVoice,
-    FAUDIO_DEFAULT_CHANNELS,
-    FAUDIO_DEFAULT_SAMPLERATE,
-    0,
-    FAGetDev(faud),
-    NULL);
+    hr = FAudio_CreateMasteringVoice(faud, &mVoice, FAUDIO_DEFAULT_CHANNELS,
+                                     FAUDIO_DEFAULT_SAMPLERATE, 0, FAGetDev(faud), nullptr);
 
     if (hr != 0) {
         wxLogError(_("FAudio: Creating mastering voice failed!"));
@@ -289,8 +276,7 @@ bool FAudio_Output::init(long sampleRate)
     }
 
     // create sound emitter
-    //This should be  FAudio_CreateSourceVoice()
-    hr = FAudio_CreateSourceVoice(faud, &sVoice, &wfx, 0, 4.0f, &notify, NULL, NULL);
+    hr = FAudio_CreateSourceVoice(faud, &sVoice, &wfx, 0, 4.0f, &notify, nullptr, nullptr);
 
     if (hr != 0) {
         wxLogError(_("FAudio: Creating source voice failed!"));
@@ -301,13 +287,8 @@ bool FAudio_Output::init(long sampleRate)
     if (OPTION(kSoundUpmix)) {
         // set up stereo upmixing
         FAudioDeviceDetails dd {};
-        //memset(&dd, NULL, sizeof(dd));
         assert(FAudio_GetDeviceDetails(faud, 0, &dd) == 0);
-        float* matrix = NULL;
-        matrix = (float*)malloc(sizeof(float) * 2 * dd.OutputFormat.Format.nChannels);
-
-        if (matrix == NULL)
-            return false;
+        std::vector<float> matrix(sizeof(float) * 2 * dd.OutputFormat.Format.nChannels);
 
         bool matrixAvailable = true;
 
@@ -398,12 +379,10 @@ bool FAudio_Output::init(long sampleRate)
         }
 
         if (matrixAvailable) {
-            hr = FAudioVoice_SetOutputMatrix(sVoice, NULL, 2, dd.OutputFormat.Format.nChannels, matrix, FAUDIO_DEFAULT_CHANNELS);
+            hr = FAudioVoice_SetOutputMatrix(sVoice, nullptr, 2, dd.OutputFormat.Format.nChannels,
+                                             matrix.data(), FAUDIO_DEFAULT_CHANNELS);
             assert(hr == 0);
         }
-
-        free(matrix);
-        matrix = NULL;
     }
 
     hr = FAudioSourceVoice_Start(sVoice, 0, FAUDIO_COMMIT_NOW);
@@ -415,8 +394,7 @@ bool FAudio_Output::init(long sampleRate)
     return true;
 }
 
-void FAudio_Output::write(uint16_t* finalWave, int length)
-{
+void FAudio_Output::write(uint16_t* finalWave, int) {
     uint32_t flags = 0;
     if (!initialized || failed)
         return;
@@ -425,14 +403,14 @@ void FAudio_Output::write(uint16_t* finalWave, int length)
         if (device_changed) {
             close();
 
-            if (!init(freq))
+            if (!init(freq_))
                 return;
         }
 
         FAudioSourceVoice_GetState(sVoice, &vState, flags);
-        assert(vState.BuffersQueued <= bufferCount);
+        assert(vState.BuffersQueued <= buffer_count_);
 
-        if (vState.BuffersQueued < bufferCount) {
+        if (vState.BuffersQueued < buffer_count_) {
             if (vState.BuffersQueued == 0) {
                 // buffers ran dry
                 if (systemVerbose & VERBOSE_SOUNDOUTPUT) {
@@ -458,12 +436,12 @@ void FAudio_Output::write(uint16_t* finalWave, int length)
     }
 
     // copy & protect the audio data in own memory area while playing it
-    memcpy(&buffers[currentBuffer * soundBufferLen], finalWave, soundBufferLen);
-    buf.AudioBytes = soundBufferLen;
-    buf.pAudioData = &buffers[currentBuffer * soundBufferLen];
+    memcpy(&buffers_[currentBuffer * sound_buffer_len_], finalWave, sound_buffer_len_);
+    buf.AudioBytes = sound_buffer_len_;
+    buf.pAudioData = &buffers_[currentBuffer * sound_buffer_len_];
     currentBuffer++;
-    currentBuffer %= (bufferCount + 1); // + 1 because we need one temporary buffer
-    uint32_t hr = FAudioSourceVoice_SubmitSourceBuffer(sVoice, &buf, NULL);
+    currentBuffer %= (buffer_count_ + 1);  // + 1 because we need one temporary buffer
+    [[maybe_unused]] uint32_t hr = FAudioSourceVoice_SubmitSourceBuffer(sVoice, &buf, nullptr);
     assert(hr == 0);
 }
 
@@ -473,7 +451,7 @@ void FAudio_Output::pause()
         return;
 
     if (playing) {
-        uint32_t hr = FAudioSourceVoice_Stop(sVoice, 0, FAUDIO_COMMIT_NOW);
+        [[maybe_unused]] uint32_t hr = FAudioSourceVoice_Stop(sVoice, 0, FAUDIO_COMMIT_NOW);
         assert(hr == 0);
         playing = false;
     }
@@ -485,7 +463,7 @@ void FAudio_Output::resume()
         return;
 
     if (!playing) {
-        uint32_t hr = FAudioSourceVoice_Start(sVoice, 0, FAUDIO_COMMIT_NOW);
+        [[maybe_unused]] int32_t hr = FAudioSourceVoice_Start(sVoice, 0, FAUDIO_COMMIT_NOW);
         assert(hr == 0);
         playing = true;
     }
@@ -497,7 +475,7 @@ void FAudio_Output::reset()
         return;
 
     if (playing) {
-        uint32_t hr = FAudioSourceVoice_Stop(sVoice, 0, FAUDIO_COMMIT_NOW);
+        [[maybe_unused]] uint32_t hr = FAudioSourceVoice_Stop(sVoice, 0, FAUDIO_COMMIT_NOW);
         assert(hr == 0);
     }
 
@@ -514,7 +492,8 @@ void FAudio_Output::setThrottle(unsigned short throttle_)
     if (throttle_ == 0)
         throttle_ = 100;
 
-    uint32_t hr = FAudioSourceVoice_SetFrequencyRatio(sVoice, (float)throttle_ / 100.0f, FAUDIO_COMMIT_NOW);
+    [[maybe_unused]] uint32_t hr =
+        FAudioSourceVoice_SetFrequencyRatio(sVoice, (float)throttle_ / 100.0f, FAUDIO_COMMIT_NOW);
     assert(hr == 0);
 }
 
@@ -545,15 +524,16 @@ HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::QueryInterface(REFIID riid, VO
     } else if (__uuidof(IMMNotificationClient) == riid) {
         *ppvInterface = (IMMNotificationClient*)this;
     } else {
-        *ppvInterface = NULL;
+        *ppvInterface = nullptr;
         return E_NOINTERFACE;
     }
 
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR pwstrDeviceId)
-{
+HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::OnDefaultDeviceChanged(EDataFlow flow,
+                                                                         ERole,
+                                                                         LPCWSTR pwstrDeviceId) {
     if (flow == eRender && last_device.compare(pwstrDeviceId) != 0) {
         last_device = pwstrDeviceId;
         EnterCriticalSection(&lock);
@@ -568,16 +548,26 @@ HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::OnDefaultDeviceChanged(EDataFl
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::OnDeviceAdded(LPCWSTR pwstrDeviceId) { return S_OK; }
-HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::OnDeviceRemoved(LPCWSTR pwstrDeviceId) { return S_OK; }
-HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWORD dwNewState) { return S_OK; }
-HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, const PROPERTYKEY key) { return S_OK; }
+HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::OnDeviceAdded(LPCWSTR) {
+    return S_OK;
+}
+HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::OnDeviceRemoved(LPCWSTR) {
+    return S_OK;
+}
+HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::OnDeviceStateChanged(LPCWSTR, DWORD) {
+    return S_OK;
+}
+HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::OnPropertyValueChanged(LPCWSTR,
+                                                                         const PROPERTYKEY) {
+    return S_OK;
+}
 
 void FAudio_Device_Notifier::do_register(FAudio_Output* p_instance)
 {
     if (InterlockedIncrement(&registered) == 1) {
-        pEnumerator = NULL;
-        HRESULT hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator), (void**)&pEnumerator);
+        pEnumerator = nullptr;
+        HRESULT hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_INPROC_SERVER,
+                                      __uuidof(IMMDeviceEnumerator), (void**)&pEnumerator);
 
         if (SUCCEEDED(hr)) {
             pEnumerator->RegisterEndpointNotificationCallback(this);
@@ -595,7 +585,7 @@ void FAudio_Device_Notifier::do_unregister(FAudio_Output* p_instance)
         if (pEnumerator) {
             pEnumerator->UnregisterEndpointNotificationCallback(this);
             pEnumerator->Release();
-            pEnumerator = NULL;
+            pEnumerator = nullptr;
         }
     }
 
@@ -617,7 +607,7 @@ void FAudio_Device_Notifier::do_unregister(FAudio_Output* p_instance)
 bool GetFADevices(wxArrayString& names, wxArrayString& ids)
 {
     uint32_t hr;
-    FAudio* fa = NULL;
+    FAudio* fa = nullptr;
     uint32_t flags = 0;
 #ifdef _DEBUG
     flags = FAUDIO_DEBUG_ENGINE;
@@ -629,13 +619,12 @@ bool GetFADevices(wxArrayString& names, wxArrayString& ids)
         return false;
     }
 
-    GetFADevices(fa, &names, &ids, NULL);
+    GetFADevices(fa, &names, &ids, nullptr);
     FAudio_Release(fa);
     return true;
 }
 
 // Class Declaration
-SoundDriver* newFAudio_Output()
-{
-    return new FAudio_Output();
+std::unique_ptr<SoundDriver> newFAudio_Output() {
+    return std::make_unique<FAudio_Output>();
 }

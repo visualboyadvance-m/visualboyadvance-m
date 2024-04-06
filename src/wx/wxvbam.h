@@ -714,21 +714,21 @@ private:
 // I should add this to SoundDriver, but wxArrayString is wx-specific
 // I suppose I could make subclass wxSoundDriver.  maybe later.
 class SoundDriver;
-extern SoundDriver* newOpenAL();
+extern std::unique_ptr<SoundDriver> newOpenAL();
 extern bool GetOALDevices(wxArrayString& names, wxArrayString& ids);
 
 #if defined(__WXMSW__)
-extern SoundDriver* newDirectSound();
+extern std::unique_ptr<SoundDriver> newDirectSound();
 extern bool GetDSDevices(wxArrayString& names, wxArrayString& ids);
 #endif  // defined(__WXMSW__)
 
 #if defined(VBAM_ENABLE_XAUDIO2)
-extern SoundDriver* newXAudio2_Output();
+extern std::unique_ptr<SoundDriver> newXAudio2_Output();
 extern bool GetXA2Devices(wxArrayString& names, wxArrayString& ids);
 #endif  // defined(VBAM_ENABLE_XAUDIO2)
 
 #if defined(VBAM_ENABLE_FAUDIO)
-extern SoundDriver* newFAudio_Output();
+extern std::unique_ptr<SoundDriver> newFAudio_Output();
 extern bool GetFADevices(wxArrayString& names, wxArrayString& ids);
 #endif  // defined(VBAM_ENABLE_FAUDIO)
 

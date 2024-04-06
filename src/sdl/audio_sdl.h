@@ -15,34 +15,34 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef VBAM_COMPONENTS_AUDIO_SDL_AUDIO_SDL_H_
-#define VBAM_COMPONENTS_AUDIO_SDL_AUDIO_SDL_H_
+#ifndef VBAM_SDL_AUDIO_SDL_H_
+#define VBAM_SDL_AUDIO_SDL_H_
 
 #include <SDL.h>
 
 #include "core/base/ringbuffer.h"
 #include "core/base/sound_driver.h"
 
-class SoundSDL : public SoundDriver {
+class SoundSDL final : public SoundDriver {
 public:
         SoundSDL();
-        virtual ~SoundSDL();
-
-        virtual bool init(long sampleRate);
-        virtual void pause();
-        virtual void reset();
-        virtual void resume();
-        virtual void write(uint16_t *finalWave, int length);
-        virtual void setThrottle(unsigned short throttle_);
-
-protected:
-        static void soundCallback(void* data, uint8_t* stream, int length);
-        virtual void read(uint16_t* stream, int length);
-        virtual bool should_wait();
-        virtual std::size_t buffer_size();
-        virtual void deinit();
+        ~SoundSDL() override;
 
 private:
+        static void soundCallback(void* data, uint8_t* stream, int length);
+        void read(uint16_t* stream, int length);
+        bool should_wait();
+        std::size_t buffer_size();
+        void deinit();
+
+        // SoundDriver implementation.
+        bool init(long sampleRate) override;
+        void pause() override;
+        void reset() override;
+        void resume() override;
+        void write(uint16_t *finalWave, int length) override;
+        void setThrottle(unsigned short throttle_) override;
+
         RingBuffer<uint16_t> samples_buf;
 
         SDL_AudioDeviceID sound_device = 0;
@@ -60,4 +60,4 @@ private:
         static const double buftime;
 };
 
-#endif  // VBAM_COMPONENTS_AUDIO_SDL_AUDIO_SDL_H_
+#endif  // VBAM_SDL_AUDIO_SDL_H_

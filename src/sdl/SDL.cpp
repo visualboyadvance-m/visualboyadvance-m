@@ -68,6 +68,8 @@
 #pragma comment(lib, "OpenGL32")
 #include <Windows.h>
 
+#define strdup _strdup
+
 #endif  // defined(_WIN32)
 
 #if defined(__APPLE__)
@@ -91,7 +93,6 @@
 #include <sys/poll.h>
 #endif
 
-#include "components/audio_sdl/audio_sdl.h"
 #include "components/draw_text/draw_text.h"
 #include "components/filters_agb/filters_agb.h"
 #include "components/user_config/user_config.h"
@@ -110,6 +111,7 @@
 #include "core/gba/gbaRtc.h"
 #include "core/gba/gbaSound.h"
 #include "sdl/ConfigManager.h"
+#include "sdl/audio_sdl.h"
 #include "sdl/filters.h"
 #include "sdl/inputSDL.h"
 
@@ -2315,11 +2317,10 @@ uint8_t systemGetSensorDarkness()
     return 0xE8;
 }
 
-SoundDriver* systemSoundInit()
-{
+std::unique_ptr<SoundDriver> systemSoundInit() {
     soundShutdown();
 
-    return new SoundSDL();
+    return std::make_unique<SoundSDL>();
 }
 
 void systemOnSoundShutdown()

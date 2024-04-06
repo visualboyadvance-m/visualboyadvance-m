@@ -38,15 +38,15 @@ private:
 
 public:
     DirectSound();
-    virtual ~DirectSound();
+    ~DirectSound() override;
 
-    bool init(long sampleRate) override;  // initialize the primary and secondary sound buffer
-    void setThrottle(unsigned short throttle_) override;  // set game speed
-    void pause() override;                                // pause the secondary sound buffer
-    void reset() override;   // stop and reset the secondary sound buffer
-    void resume() override;  // resume the secondary sound buffer
-    void write(uint16_t* finalWave,
-               int length) override;  // write the emulated sound to the secondary sound buffer
+    // SoundDriver implementation.
+    bool init(long sampleRate) override;
+    void pause() override;
+    void reset() override;
+    void resume() override;
+    void write(uint16_t *finalWave, int length) override;
+    void setThrottle(unsigned short throttle_) override;
 };
 
 DirectSound::DirectSound()
@@ -336,9 +336,9 @@ void DirectSound::write(uint16_t* finalWave, int)
     }
 }
 
-SoundDriver* newDirectSound()
+std::unique_ptr<SoundDriver> newDirectSound()
 {
-    return new DirectSound();
+    return std::make_unique<DirectSound>();
 }
 
 struct devnames {

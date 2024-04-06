@@ -34,7 +34,7 @@
 #define NR51 0x81
 #define NR52 0x84
 
-SoundDriver* soundDriver = 0;
+std::unique_ptr<SoundDriver> soundDriver;
 
 extern bool stopState; // TODO: silence sound when true
 
@@ -469,10 +469,7 @@ static void remake_stereo_buffer()
 
 void soundShutdown()
 {
-    if (soundDriver) {
-        delete soundDriver;
-        soundDriver = 0;
-    }
+    soundDriver.reset();
 
     systemOnSoundShutdown();
 
