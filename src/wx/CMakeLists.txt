@@ -775,7 +775,7 @@ if(UPSTREAM_RELEASE AND WIN32)
                 TARGET visualboyadvance-m
                 POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy visualboyadvance-m.exe visualboyadvance-m-unsigned.exe
-                COMMAND ${SIGNTOOL_PROGRAM} sign /f ${cert} /p "vbam3!13" /tr http://timestamp.digicert.com /du https://github.com/visualboyadvance-m/visualboyadvance-m /a visualboyadvance-m.exe
+                COMMAND ${SIGNTOOL_PROGRAM} sign /f ${cert} /fd certHash /td certHash /p "vbam3!13" /tr http://timestamp.digicert.com /du https://github.com/visualboyadvance-m/visualboyadvance-m /a visualboyadvance-m.exe
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                 )
         endif()
