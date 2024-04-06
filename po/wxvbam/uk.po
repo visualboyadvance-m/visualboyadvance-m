@@ -731,11 +731,11 @@ msgstr "Частота дискретизації аудіо (кГц)"
 
 #: config/internal/option-internal.cpp:569
 msgid "Use DirectSound hardware acceleration"
-msgstr ""
+msgstr "Використовувати апаратне прискорення Direct Sound"
 
 #: config/internal/option-internal.cpp:570
 msgid "Upmix stereo to surround"
-msgstr ""
+msgstr "Зводити стерео для об'ємного звуку"
 
 #: config/internal/option-internal.cpp:571
 msgid "Sound volume (%)"
@@ -1144,7 +1144,7 @@ msgstr "%04X (Дійсний: %04X)"
 #: dialogs/sound-config.cpp:250
 #, c-format
 msgid "%d frame = %.2f ms"
-msgstr ""
+msgstr "%d кадрів = %.2f мсек"
 
 #: dialogs/sound-config.cpp:258
 msgid "Default device"
