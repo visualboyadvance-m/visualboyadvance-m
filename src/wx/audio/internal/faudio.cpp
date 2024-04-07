@@ -7,12 +7,12 @@
 
 #include <cassert>
 
+#include <condition_variable>
+#include <mutex>
 #include <vector>
 
 // FAudio
 #include <FAudio.h>
-
-#include <mmdeviceapi.h>
 
 #include <wx/arrstr.h>
 #include <wx/log.h>
@@ -59,13 +59,19 @@ int FAGetDev(FAudio* fa) {
 
 class FAudio_BufferNotify : public FAudioVoiceCallback {
 public:
-    bool WaitForSignal() { return WaitForSingleObject(buffer_end_event_, 10000) != WAIT_TIMEOUT; }
+    // Waits for the buffer end event to be signaled for 10 seconds.
+    // Returns true if the buffer end event was signaled, false if the wait timed out.
+    bool WaitForSignal() {
+        std::unique_lock<std::mutex> lock(mutex_);
+        waiting_for_buffer_end_ = true;
+        const bool was_signaled =
+            buffer_end_cv_.wait_for(lock, std::chrono::seconds(10), [this] { return signaled_; });
+        waiting_for_buffer_end_ = false;
+        signaled_ = false;
+        return was_signaled;
+    }
 
     FAudio_BufferNotify() {
-        buffer_end_event_ = nullptr;
-        buffer_end_event_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-        assert(buffer_end_event_ != nullptr);
-
         OnBufferEnd = &FAudio_BufferNotify::StaticOnBufferEnd;
         OnVoiceProcessingPassStart = &FAudio_BufferNotify::StaticOnVoiceProcessingPassStart;
         OnVoiceProcessingPassEnd = &FAudio_BufferNotify::StaticOnVoiceProcessingPassEnd;
@@ -74,19 +80,32 @@ public:
         OnLoopEnd = &FAudio_BufferNotify::StaticOnLoopEnd;
         OnVoiceError = &FAudio_BufferNotify::StaticOnVoiceError;
     }
-    ~FAudio_BufferNotify() {
-        CloseHandle(buffer_end_event_);
-        buffer_end_event_ = nullptr;
-    }
+    ~FAudio_BufferNotify() = default;
 
 private:
-    void* buffer_end_event_;
+    // Signals that the buffer end event has occurred.
+    void SignalBufferEnd() {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (!waiting_for_buffer_end_) {
+            return;
+        }
+        signaled_ = true;
+        buffer_end_cv_.notify_one();
+    }
+
+    // Protects `waiting_for_buffer_end_` and `signaled_`.
+    std::mutex mutex_;
+    // Used to wait for the buffer end event.
+    std::condition_variable buffer_end_cv_;
+    // Set to true when we are waiting for the buffer end event.
+    // Must be protected by `mutex_`.
+    bool waiting_for_buffer_end_ = false;
+    // Set to true when the buffer end event has been signaled.
+    // Must be protected by `mutex_`.
+    bool signaled_ = false;
 
     static void StaticOnBufferEnd(FAudioVoiceCallback* callback, void*) {
-        FAudio_BufferNotify* self = static_cast<FAudio_BufferNotify*>(callback);
-        if (self != nullptr && self->buffer_end_event_ != nullptr) {
-            SetEvent(self->buffer_end_event_);
-        }
+        static_cast<FAudio_BufferNotify*>(callback)->SignalBufferEnd();
     }
     static void StaticOnVoiceProcessingPassStart(FAudioVoiceCallback*, uint32_t) {}
     static void StaticOnVoiceProcessingPassEnd(FAudioVoiceCallback*) {}
@@ -133,36 +152,6 @@ private:
     FAudio_BufferNotify notify;  // buffer end notification
 };
 
-class FAudio_Device_Notifier : public IMMNotificationClient {
-private:
-    volatile LONG registered;
-    IMMDeviceEnumerator* pEnumerator;
-
-    std::wstring last_device;
-
-    CRITICAL_SECTION lock;
-    std::vector<FAudio_Output*> instances;
-
-public:
-    FAudio_Device_Notifier();
-    ~FAudio_Device_Notifier();
-    ULONG STDMETHODCALLTYPE AddRef();
-    ULONG STDMETHODCALLTYPE Release();
-    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, VOID** ppvInterface);
-    HRESULT STDMETHODCALLTYPE OnDefaultDeviceChanged(EDataFlow flow,
-                                                     ERole role,
-                                                     LPCWSTR pwstrDeviceId);
-    HRESULT STDMETHODCALLTYPE OnDeviceAdded(LPCWSTR pwstrDeviceId);
-    HRESULT STDMETHODCALLTYPE OnDeviceRemoved(LPCWSTR pwstrDeviceId);
-    HRESULT STDMETHODCALLTYPE OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWORD dwNewState);
-    HRESULT STDMETHODCALLTYPE OnPropertyValueChanged(LPCWSTR pwstrDeviceId, const PROPERTYKEY key);
-
-    void do_register(FAudio_Output* p_instance);
-    void do_unregister(FAudio_Output* p_instance);
-};
-
-FAudio_Device_Notifier f_notifier;
-
 // Class Implementation
 FAudio_Output::FAudio_Output() : buffer_count_(OPTION(kSoundBuffers)) {
     failed = false;
@@ -176,11 +165,9 @@ FAudio_Output::FAudio_Output() : buffer_count_(OPTION(kSoundBuffers)) {
     sVoice = nullptr;
     memset(&buf, 0, sizeof(buf));
     memset(&vState, 0, sizeof(vState));
-    f_notifier.do_register(this);
 }
 
 FAudio_Output::~FAudio_Output() {
-    f_notifier.do_unregister(this);
     close();
 }
 
@@ -476,102 +463,6 @@ void FAudio_Output::setThrottle(unsigned short throttle_) {
     [[maybe_unused]] uint32_t hr =
         FAudioSourceVoice_SetFrequencyRatio(sVoice, (float)throttle_ / 100.0f, FAUDIO_COMMIT_NOW);
     assert(hr == 0);
-}
-
-FAudio_Device_Notifier::FAudio_Device_Notifier() : registered(0) {
-    InitializeCriticalSection(&lock);
-}
-FAudio_Device_Notifier::~FAudio_Device_Notifier() {
-    DeleteCriticalSection(&lock);
-}
-
-ULONG STDMETHODCALLTYPE FAudio_Device_Notifier::AddRef() {
-    return 1;
-}
-
-ULONG STDMETHODCALLTYPE FAudio_Device_Notifier::Release() {
-    return 1;
-}
-
-HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::QueryInterface(REFIID riid, VOID** ppvInterface) {
-    if (IID_IUnknown == riid) {
-        *ppvInterface = (IUnknown*)this;
-    } else if (__uuidof(IMMNotificationClient) == riid) {
-        *ppvInterface = (IMMNotificationClient*)this;
-    } else {
-        *ppvInterface = nullptr;
-        return E_NOINTERFACE;
-    }
-
-    return S_OK;
-}
-
-HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::OnDefaultDeviceChanged(EDataFlow flow,
-                                                                         ERole,
-                                                                         LPCWSTR pwstrDeviceId) {
-    if (flow == eRender && last_device.compare(pwstrDeviceId) != 0) {
-        last_device = pwstrDeviceId;
-        EnterCriticalSection(&lock);
-
-        for (auto it = instances.begin(); it < instances.end(); ++it) {
-            (*it)->device_change();
-        }
-
-        LeaveCriticalSection(&lock);
-    }
-
-    return S_OK;
-}
-
-HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::OnDeviceAdded(LPCWSTR) {
-    return S_OK;
-}
-HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::OnDeviceRemoved(LPCWSTR) {
-    return S_OK;
-}
-HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::OnDeviceStateChanged(LPCWSTR, DWORD) {
-    return S_OK;
-}
-HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::OnPropertyValueChanged(LPCWSTR,
-                                                                         const PROPERTYKEY) {
-    return S_OK;
-}
-
-void FAudio_Device_Notifier::do_register(FAudio_Output* p_instance) {
-    if (InterlockedIncrement(&registered) == 1) {
-        pEnumerator = nullptr;
-        HRESULT hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_INPROC_SERVER,
-                                      __uuidof(IMMDeviceEnumerator), (void**)&pEnumerator);
-
-        if (SUCCEEDED(hr)) {
-            pEnumerator->RegisterEndpointNotificationCallback(this);
-        }
-    }
-
-    EnterCriticalSection(&lock);
-    instances.push_back(p_instance);
-    LeaveCriticalSection(&lock);
-}
-
-void FAudio_Device_Notifier::do_unregister(FAudio_Output* p_instance) {
-    if (InterlockedDecrement(&registered) == 0) {
-        if (pEnumerator) {
-            pEnumerator->UnregisterEndpointNotificationCallback(this);
-            pEnumerator->Release();
-            pEnumerator = nullptr;
-        }
-    }
-
-    EnterCriticalSection(&lock);
-
-    for (auto it = instances.begin(); it < instances.end(); ++it) {
-        if (*it == p_instance) {
-            instances.erase(it);
-            break;
-        }
-    }
-
-    LeaveCriticalSection(&lock);
 }
 
 }  // namespace
