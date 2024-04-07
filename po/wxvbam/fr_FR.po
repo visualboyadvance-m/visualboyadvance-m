@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-04 22:00+0000\n"
+"POT-Creation-Date: 2024-04-07 11:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Thibault <thibaultbruneliere@gmail.com>, 2019\n"
 "Language-Team: French (France) (http://app.transifex.com/bgk/vba-m/language/fr_FR/)\n"
@@ -24,6 +24,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fr_FR\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+
+#: audio/internal/openal.cpp:189
+msgid "OpenAL: Failed to open audio device"
+msgstr ""
+
+#: audio/internal/openal.cpp:387 audio/internal/faudio.cpp:602
+#: audio/internal/xaudio2.cpp:577
+msgid "Default device"
+msgstr "Périphérique par défaut"
 
 #: cmdevents.cpp:136
 msgid ""
@@ -203,7 +212,7 @@ msgstr "Sélectionner le fichier de sortie"
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "Images PNG|*.png|Images BMP|*.bmp"
 
-#: cmdevents.cpp:702 sys.cpp:579
+#: cmdevents.cpp:702 sys.cpp:578
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "Écriture de la copie d'écran %s"
@@ -1147,14 +1156,10 @@ msgstr ""
 msgid "%04X (Actual: %04X)"
 msgstr ""
 
-#: dialogs/sound-config.cpp:250
+#: dialogs/sound-config.cpp:257
 #, c-format
 msgid "%d frame = %.2f ms"
 msgstr ""
-
-#: dialogs/sound-config.cpp:258
-msgid "Default device"
-msgstr "Périphérique par défaut"
 
 #: extra-translations.cpp:13
 msgid "&Apply"
@@ -1535,72 +1540,72 @@ msgstr "Erreur dans l'enregistrement vidéo (%s) ; arrêt"
 msgid "Volume: %d %%"
 msgstr ""
 
-#: sys.cpp:205 sys.cpp:266
+#: sys.cpp:204 sys.cpp:265
 msgid "No game in progress to record"
 msgstr "Aucun jeu en cours à enregistrer"
 
-#: sys.cpp:223
+#: sys.cpp:222
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "Ne peut pas ouvrir le fichier de sortie %s"
 
-#: sys.cpp:230 sys.cpp:250 sys.cpp:400
+#: sys.cpp:229 sys.cpp:249 sys.cpp:399
 msgid "Error writing game recording"
 msgstr "Erreur d'écriture de l'enregistrement du jeu"
 
-#: sys.cpp:271
+#: sys.cpp:270
 msgid "Cannot play game recording while recording"
 msgstr "Ne peut pas lancer l'enregistrement du jeu pendant l'enregistrement"
 
-#: sys.cpp:286
+#: sys.cpp:285
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "Ne peut pas ouvrir le fichier d'enregistrement %s"
 
-#: sys.cpp:295 sys.cpp:305
+#: sys.cpp:294 sys.cpp:304
 msgid "Error reading game recording"
 msgstr "Erreur de l'enregistrement de lecture du jeu"
 
-#: sys.cpp:415 sys.cpp:434
+#: sys.cpp:414 sys.cpp:433
 msgid "Playback ended"
 msgstr "Playback terminé"
 
-#: sys.cpp:458
+#: sys.cpp:457
 #, c-format
 msgid "%d %% (%d, %d fps)"
 msgstr ""
 
-#: sys.cpp:900 xrc/GBPrinter.xrc:65
+#: sys.cpp:899 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "&Jeter"
 
-#: sys.cpp:934
+#: sys.cpp:933
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "Fichiers image (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:943
+#: sys.cpp:942
 msgid "Save printer image to"
 msgstr "Sauvegarder l'image de l'imprimante vers"
 
-#: sys.cpp:957 sys.cpp:1141
+#: sys.cpp:956 sys.cpp:1140
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "Ecrire la sortie de l'imprimante vers %s"
 
-#: sys.cpp:962 sys.cpp:1033
+#: sys.cpp:961 sys.cpp:1032
 msgid "&Close"
 msgstr "&Fermer"
 
-#: sys.cpp:1028
+#: sys.cpp:1027
 msgid "Printed"
 msgstr "Imprimé"
 
-#: sys.cpp:1330
+#: sys.cpp:1302
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "Erreur de l'ouverture du pseudo tty: %s"
 
-#: sys.cpp:1429
+#: sys.cpp:1401
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "Erreur du paramétrage du socket du serveur (%d)"
@@ -1739,75 +1744,75 @@ msgstr ""
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "L'option de mauvaise configuration ou des fichiers ROM multiples donnés :\n"
 
-#: dsound.cpp:100 dsound.cpp:115
+#: audio/internal/dsound.cpp:105 audio/internal/dsound.cpp:120
 #, c-format
 msgid "Cannot create Direct Sound %08x"
 msgstr ""
 
-#: dsound.cpp:120
+#: audio/internal/dsound.cpp:126
 #, c-format
 msgid "Cannot SetCooperativeLevel %08x"
 msgstr "Ne peut pas SetCooperativeLevel %08x"
 
-#: dsound.cpp:135
+#: audio/internal/dsound.cpp:141
 #, c-format
 msgid "Cannot CreateSoundBuffer %08x"
 msgstr "Ne peut pas CreateSoundBuffer %08x"
 
-#: dsound.cpp:154
+#: audio/internal/dsound.cpp:160
 #, c-format
 msgid "CreateSoundBuffer(primary) failed %08x"
 msgstr "CreateSoundBuffer(primary) a échoué %08x"
 
-#: dsound.cpp:171
+#: audio/internal/dsound.cpp:178
 #, c-format
 msgid "CreateSoundBuffer(secondary) failed %08x"
 msgstr "CreateSoundBuffer(secondary) a échoué %08x"
 
-#: dsound.cpp:176
+#: audio/internal/dsound.cpp:183
 #, c-format
 msgid "dsbSecondary->SetCurrentPosition failed %08x"
 msgstr "dsbSecondary->SetCurrentPosition a échoué %08x"
 
-#: dsound.cpp:199
+#: audio/internal/dsound.cpp:207
 #, c-format
 msgid "Cannot Play primary %08x"
 msgstr "Ne peut pas lancer le primaire %08x"
 
-#: dsound.cpp:334
+#: audio/internal/dsound.cpp:328
 #, c-format
 msgid "dsbSecondary->Lock() failed: %08x"
 msgstr "dsbSecondary->Lock() a échoué : %08x"
 
-#: faudio.cpp:32
+#: audio/internal/faudio.cpp:41 audio/internal/faudio.cpp:596
 msgid "FAudio: Enumerating devices failed!"
 msgstr "FAudio : échec du dénombrement des périphériques !"
 
-#: faudio.cpp:67 faudio.cpp:353
+#: audio/internal/faudio.cpp:227 audio/internal/faudio.cpp:589
 msgid "The FAudio interface failed to initialize!"
 msgstr " 100% match \nL'interface XAudio2 a échoué à l'initialisation !"
 
-#: faudio.cpp:385
+#: audio/internal/faudio.cpp:258
 msgid "FAudio: Creating mastering voice failed!"
 msgstr "FAudio : échec de la création de la voix maître !"
 
-#: faudio.cpp:396
+#: audio/internal/faudio.cpp:267
 msgid "FAudio: Creating source voice failed!"
 msgstr "FAudio : échec de la création de la voix source !"
 
-#: xaudio2.cpp:36
+#: audio/internal/xaudio2.cpp:46 audio/internal/xaudio2.cpp:571
 msgid "XAudio2: Enumerating devices failed!"
 msgstr "XAudio2 : échec du dénombrement des périphériques !"
 
-#: xaudio2.cpp:66 xaudio2.cpp:347
+#: audio/internal/xaudio2.cpp:297 audio/internal/xaudio2.cpp:564
 msgid "The XAudio2 interface failed to initialize!"
 msgstr " 100% match \nL'interface XAudio2 a échoué à l'initialisation !"
 
-#: xaudio2.cpp:378
+#: audio/internal/xaudio2.cpp:323
 msgid "XAudio2: Creating mastering voice failed!"
 msgstr "XAudio2 : la création de la voix maître a échoué !"
 
-#: xaudio2.cpp:387
+#: audio/internal/xaudio2.cpp:332
 msgid "XAudio2: Creating source voice failed!"
 msgstr "XAudio2 :  la création de la voix source a échoué !"
 

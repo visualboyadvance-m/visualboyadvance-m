@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-04 22:00+0000\n"
+"POT-Creation-Date: 2024-04-07 11:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: 陈 依云 <c1998lf@qq.com>, 2023-2024\n"
 "Language-Team: Chinese Simplified (http://app.transifex.com/bgk/vba-m/language/zh-Hans/)\n"
@@ -29,6 +29,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: zh-Hans\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+#: audio/internal/openal.cpp:189
+msgid "OpenAL: Failed to open audio device"
+msgstr ""
+
+#: audio/internal/openal.cpp:387 audio/internal/faudio.cpp:602
+#: audio/internal/xaudio2.cpp:577
+msgid "Default device"
+msgstr "默认设备"
 
 #: cmdevents.cpp:136
 msgid ""
@@ -208,7 +217,7 @@ msgstr "选择输出文件"
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG 图片|*.png|BMP 图片|*.bmp"
 
-#: cmdevents.cpp:702 sys.cpp:579
+#: cmdevents.cpp:702 sys.cpp:578
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "写入快照 %s"
@@ -1152,14 +1161,10 @@ msgstr "%02X (实际: %02X)"
 msgid "%04X (Actual: %04X)"
 msgstr "%04X (实际: %04X)"
 
-#: dialogs/sound-config.cpp:250
+#: dialogs/sound-config.cpp:257
 #, c-format
 msgid "%d frame = %.2f ms"
 msgstr "%d 帧 = %.2f 毫秒"
-
-#: dialogs/sound-config.cpp:258
-msgid "Default device"
-msgstr "默认设备"
 
 #: extra-translations.cpp:13
 msgid "&Apply"
@@ -1540,72 +1545,72 @@ msgstr "录制视频时错误 (%s); 正在中止"
 msgid "Volume: %d %%"
 msgstr "音量: %d %%"
 
-#: sys.cpp:205 sys.cpp:266
+#: sys.cpp:204 sys.cpp:265
 msgid "No game in progress to record"
 msgstr "没有游戏在进行录制"
 
-#: sys.cpp:223
+#: sys.cpp:222
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "无法打开输出文件 %s"
 
-#: sys.cpp:230 sys.cpp:250 sys.cpp:400
+#: sys.cpp:229 sys.cpp:249 sys.cpp:399
 msgid "Error writing game recording"
 msgstr "回写游戏录像错误"
 
-#: sys.cpp:271
+#: sys.cpp:270
 msgid "Cannot play game recording while recording"
 msgstr "在录制时无法播放游戏录像"
 
-#: sys.cpp:286
+#: sys.cpp:285
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "无法打开录像文件 %s"
 
-#: sys.cpp:295 sys.cpp:305
+#: sys.cpp:294 sys.cpp:304
 msgid "Error reading game recording"
 msgstr "读取游戏录像错误"
 
-#: sys.cpp:415 sys.cpp:434
+#: sys.cpp:414 sys.cpp:433
 msgid "Playback ended"
 msgstr "回放已结束"
 
-#: sys.cpp:458
+#: sys.cpp:457
 #, c-format
 msgid "%d %% (%d, %d fps)"
 msgstr "%d %% (%d, %d fps)"
 
-#: sys.cpp:900 xrc/GBPrinter.xrc:65
+#: sys.cpp:899 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "丢弃(&D)"
 
-#: sys.cpp:934
+#: sys.cpp:933
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "图像文件 (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:943
+#: sys.cpp:942
 msgid "Save printer image to"
 msgstr "保存打印图像到"
 
-#: sys.cpp:957 sys.cpp:1141
+#: sys.cpp:956 sys.cpp:1140
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "写入打印输出到 %s"
 
-#: sys.cpp:962 sys.cpp:1033
+#: sys.cpp:961 sys.cpp:1032
 msgid "&Close"
 msgstr "关闭(&C)"
 
-#: sys.cpp:1028
+#: sys.cpp:1027
 msgid "Printed"
 msgstr "已打印"
 
-#: sys.cpp:1330
+#: sys.cpp:1302
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "打开伪 tty 错误: %s"
 
-#: sys.cpp:1429
+#: sys.cpp:1401
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "设置服务器插口错误 (%d)"
@@ -1744,75 +1749,75 @@ msgstr "未找到配置文件。"
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "错误的配置选项或多个 ROM 文件被指定:\n"
 
-#: dsound.cpp:100 dsound.cpp:115
+#: audio/internal/dsound.cpp:105 audio/internal/dsound.cpp:120
 #, c-format
 msgid "Cannot create Direct Sound %08x"
 msgstr "无法创建 DirectSound %08x"
 
-#: dsound.cpp:120
+#: audio/internal/dsound.cpp:126
 #, c-format
 msgid "Cannot SetCooperativeLevel %08x"
 msgstr "无法设置协同级别 %08x"
 
-#: dsound.cpp:135
+#: audio/internal/dsound.cpp:141
 #, c-format
 msgid "Cannot CreateSoundBuffer %08x"
 msgstr "无法创建声音缓冲 %08x"
 
-#: dsound.cpp:154
+#: audio/internal/dsound.cpp:160
 #, c-format
 msgid "CreateSoundBuffer(primary) failed %08x"
 msgstr "创建声音缓冲（主）失败 %08x"
 
-#: dsound.cpp:171
+#: audio/internal/dsound.cpp:178
 #, c-format
 msgid "CreateSoundBuffer(secondary) failed %08x"
 msgstr "创建声音缓冲（副）失败 %08x"
 
-#: dsound.cpp:176
+#: audio/internal/dsound.cpp:183
 #, c-format
 msgid "dsbSecondary->SetCurrentPosition failed %08x"
 msgstr "dsbSecondary->SetCurrentPosition 失败 %08x"
 
-#: dsound.cpp:199
+#: audio/internal/dsound.cpp:207
 #, c-format
 msgid "Cannot Play primary %08x"
 msgstr "无法运行主 %08x"
 
-#: dsound.cpp:334
+#: audio/internal/dsound.cpp:328
 #, c-format
 msgid "dsbSecondary->Lock() failed: %08x"
 msgstr "dsbSecondary->Lock() 失败: %08x"
 
-#: faudio.cpp:32
+#: audio/internal/faudio.cpp:41 audio/internal/faudio.cpp:596
 msgid "FAudio: Enumerating devices failed!"
 msgstr "FAudio: 枚举设备失败！"
 
-#: faudio.cpp:67 faudio.cpp:353
+#: audio/internal/faudio.cpp:227 audio/internal/faudio.cpp:589
 msgid "The FAudio interface failed to initialize!"
 msgstr "FAudio 接口初始化失败！"
 
-#: faudio.cpp:385
+#: audio/internal/faudio.cpp:258
 msgid "FAudio: Creating mastering voice failed!"
 msgstr "FAudio:  创建主语音失败！"
 
-#: faudio.cpp:396
+#: audio/internal/faudio.cpp:267
 msgid "FAudio: Creating source voice failed!"
 msgstr "FAudio: 创建源语音失败！"
 
-#: xaudio2.cpp:36
+#: audio/internal/xaudio2.cpp:46 audio/internal/xaudio2.cpp:571
 msgid "XAudio2: Enumerating devices failed!"
 msgstr "XAudio2: 枚举设备失败！"
 
-#: xaudio2.cpp:66 xaudio2.cpp:347
+#: audio/internal/xaudio2.cpp:297 audio/internal/xaudio2.cpp:564
 msgid "The XAudio2 interface failed to initialize!"
 msgstr "XAudio2 接口初始化失败！"
 
-#: xaudio2.cpp:378
+#: audio/internal/xaudio2.cpp:323
 msgid "XAudio2: Creating mastering voice failed!"
 msgstr "XAudio2:  创建主语音失败！"
 
-#: xaudio2.cpp:387
+#: audio/internal/xaudio2.cpp:332
 msgid "XAudio2: Creating source voice failed!"
 msgstr "XAudio2: 创建源语音失败！"
 
