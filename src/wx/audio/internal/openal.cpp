@@ -1,17 +1,50 @@
-// === LOGALL writes very detailed informations to vba-trace.log ===
-//#define LOGALL
+#include "wx/audio/internal/openal.h"
 
-#include "wx/openal.h"
+// === LOGALL writes very detailed informations to vba-trace.log ===
+// #define LOGALL
+
+// on win32 and mac, pointer typedefs only happen with AL_NO_PROTOTYPES
+// on mac, ALC_NO_PROTOTYPES as well
+
+// #define AL_NO_PROTOTYPES 1
+
+// on mac, alc pointer typedefs ony happen for ALC if ALC_NO_PROTOTYPES
+// unfortunately, there is a bug in the system headers (use of ALCvoid when
+// void should be used; shame on Apple for introducing this error, and shame
+// on Creative for making a typedef to void in the first place)
+// #define ALC_NO_PROTOTYPES 1
+
+#include <al.h>
+#include <alc.h>
+
+// since the ALC typedefs are broken on Mac:
+
+#ifdef __WXMAC__
+typedef ALCcontext*(ALC_APIENTRY* LPALCCREATECONTEXT)(ALCdevice* device, const ALCint* attrlist);
+typedef ALCboolean(ALC_APIENTRY* LPALCMAKECONTEXTCURRENT)(ALCcontext* context);
+typedef void(ALC_APIENTRY* LPALCDESTROYCONTEXT)(ALCcontext* context);
+typedef ALCdevice*(ALC_APIENTRY* LPALCOPENDEVICE)(const ALCchar* devicename);
+typedef ALCboolean(ALC_APIENTRY* LPALCCLOSEDEVICE)(ALCdevice* device);
+typedef ALCboolean(ALC_APIENTRY* LPALCISEXTENSIONPRESENT)(ALCdevice* device,
+                                                          const ALCchar* extname);
+typedef const ALCchar*(ALC_APIENTRY* LPALCGETSTRING)(ALCdevice* device, ALCenum param);
+#endif
 
 #include <cassert>
 
 #include <wx/arrstr.h>
+#include <wx/log.h>
+#include <wx/translation.h>
 #include <wx/utils.h>
 
-#include "core/base/sound_driver.h"
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaSound.h"
 #include "wx/config/option-proxy.h"
+
+namespace audio {
+namespace internal {
+
+namespace {
 
 // Debug
 #define ASSERT_SUCCESS assert(AL_NO_ERROR == alGetError())
@@ -22,8 +55,10 @@
 #undef winlog
 #endif
 // https://stackoverflow.com/a/1306690/262458
-#define winlog(x,...) do {} while(0)
-#define debugState() //
+#define winlog(x, ...) \
+    do {               \
+    } while (0)
+#define debugState()  //
 #endif
 
 struct OPENALFNTABLE;
@@ -33,13 +68,13 @@ public:
     OpenAL();
     ~OpenAL() override;
 
-    static bool GetDevices(wxArrayString& names, wxArrayString& ids);
-    bool init(long sampleRate); // initialize the sound buffer queue
-    void setThrottle(unsigned short throttle_); // set game speed
-    void pause(); // pause the secondary sound buffer
-    void reset(); // stop and reset the secondary sound buffer
-    void resume(); // play/resume the secondary sound buffer
-    void write(uint16_t* finalWave, int length); // write the emulated sound to a sound buffer
+    bool init(long sampleRate) override;                  // initialize the sound buffer queue
+    void setThrottle(unsigned short throttle_) override;  // set game speed
+    void pause() override;                                // pause the secondary sound buffer
+    void reset() override;   // stop and reset the secondary sound buffer
+    void resume() override;  // play/resume the secondary sound buffer
+    void write(uint16_t* finalWave,
+               int length) override;  // write the emulated sound to a sound buffer
 
 private:
     bool initialized;
@@ -57,20 +92,18 @@ private:
 #endif
 };
 
-OpenAL::OpenAL()
-{
+OpenAL::OpenAL() {
     initialized = false;
     buffersLoaded = false;
-    device = NULL;
-    context = NULL;
+    device = nullptr;
+    context = nullptr;
     buffer = (ALuint*)malloc(OPTION(kSoundBuffers) * sizeof(ALuint));
     memset(buffer, 0, OPTION(kSoundBuffers) * sizeof(ALuint));
     tempBuffer = 0;
     source = 0;
 }
 
-OpenAL::~OpenAL()
-{
+OpenAL::~OpenAL() {
     if (!initialized)
         return;
 
@@ -83,22 +116,21 @@ OpenAL::~OpenAL()
     alDeleteBuffers(OPTION(kSoundBuffers), buffer);
     ASSERT_SUCCESS;
     free(buffer);
-    alcMakeContextCurrent(NULL);
+    alcMakeContextCurrent(nullptr);
     // Wine incorrectly returns ALC_INVALID_VALUE
     // and then fails the rest of these functions as well
     // so there will be a leak under Wine, but that's a bug in Wine, not
     // this code
-    //ASSERT_SUCCESS;
+    // ASSERT_SUCCESS;
     alcDestroyContext(context);
-    //ASSERT_SUCCESS;
+    // ASSERT_SUCCESS;
     alcCloseDevice(device);
-    //ASSERT_SUCCESS;
-    alGetError(); // reset error state
+    // ASSERT_SUCCESS;
+    alGetError();  // reset error state
 }
 
 #ifdef LOGALL
-void OpenAL::debugState()
-{
+void OpenAL::debugState() {
     ALint value = 0;
     alGetSourcei(source, AL_SOURCE_STATE, &value);
     ASSERT_SUCCESS;
@@ -107,27 +139,26 @@ void OpenAL::debugState()
     winlog("  State: ");
 
     switch (value) {
-    case AL_INITIAL:
-        winlog("AL_INITIAL\n");
-        break;
+        case AL_INITIAL:
+            winlog("AL_INITIAL\n");
+            break;
 
-    case AL_PLAYING:
-        winlog("AL_PLAYING\n");
-        break;
+        case AL_PLAYING:
+            winlog("AL_PLAYING\n");
+            break;
 
-    case AL_PAUSED:
-        winlog("AL_PAUSED\n");
-        break;
+        case AL_PAUSED:
+            winlog("AL_PAUSED\n");
+            break;
 
-    case AL_STOPPED:
-        winlog("AL_STOPPED\n");
-        break;
+        case AL_STOPPED:
+            winlog("AL_STOPPED\n");
+            break;
 
-    default:
-        winlog("!unknown!\n");
-        break;
+        default:
+            winlog("!unknown!\n");
+            break;
     }
-
 
     alGetSourcei(source, AL_BUFFERS_QUEUED, &value);
     ASSERT_SUCCESS;
@@ -138,21 +169,29 @@ void OpenAL::debugState()
 }
 #endif
 
-bool OpenAL::init(long sampleRate)
-{
+bool OpenAL::init(long sampleRate) {
     winlog("OpenAL::init\n");
     assert(initialized == false);
 
     const wxString& audio_device = OPTION(kSoundAudioDevice);
     if (!audio_device.empty()) {
         device = alcOpenDevice(audio_device.utf8_str());
+        if (device == nullptr) {
+            // Might be the default device. Try again.
+            OPTION(kSoundAudioDevice) = wxEmptyString;
+            device = alcOpenDevice(nullptr);
+        }
     } else {
-        device = alcOpenDevice(NULL);
+        device = alcOpenDevice(nullptr);
     }
 
-    assert(device != NULL);
-    context = alcCreateContext(device, NULL);
-    assert(context != NULL);
+    if (!device) {
+        wxLogError(_("OpenAL: Failed to open audio device"));
+        return false;
+    }
+
+    context = alcCreateContext(device, nullptr);
+    assert(context != nullptr);
     ALCboolean retVal = alcMakeContextCurrent(context);
     assert(ALC_TRUE == retVal);
     alGenBuffers(OPTION(kSoundBuffers), buffer);
@@ -178,8 +217,7 @@ void OpenAL::setThrottle(unsigned short throttle_) {
     ASSERT_SUCCESS;
 }
 
-void OpenAL::resume()
-{
+void OpenAL::resume() {
     if (!initialized)
         return;
 
@@ -201,8 +239,7 @@ void OpenAL::resume()
     debugState();
 }
 
-void OpenAL::pause()
-{
+void OpenAL::pause() {
     if (!initialized)
         return;
 
@@ -224,8 +261,7 @@ void OpenAL::pause()
     debugState();
 }
 
-void OpenAL::reset()
-{
+void OpenAL::reset() {
     if (!initialized)
         return;
 
@@ -247,9 +283,8 @@ void OpenAL::reset()
     debugState();
 }
 
-void OpenAL::write(uint16_t* finalWave, int length)
-{
-    (void)length; // unused param
+void OpenAL::write(uint16_t* finalWave, int length) {
+    (void)length;  // unused param
     if (!initialized)
         return;
 
@@ -327,35 +362,39 @@ void OpenAL::write(uint16_t* finalWave, int length)
     }
 }
 
-std::unique_ptr<SoundDriver> newOpenAL()
-{
+}  // namespace
+
+std::vector<AudioDevice> GetOpenALDevices() {
+    std::vector<AudioDevice> devices;
+
+#ifdef ALC_DEVICE_SPECIFIER
+
+    if (alcIsExtensionPresent(nullptr, "ALC_ENUMERATION_EXT") == AL_FALSE) {
+        // this extension isn't critical to OpenAL operating
+        return devices;
+    }
+
+    const char* devs = alcGetString(nullptr, ALC_DEVICE_SPECIFIER);
+
+    while (*devs) {
+        const wxString device_name(devs, wxConvLibc);
+        devices.push_back({device_name, device_name});
+        devs += strlen(devs) + 1;
+    }
+
+#else
+
+    devices.push_back({_("Default device"), wxEmptyString});
+
+#endif
+
+    return devices;
+}
+
+std::unique_ptr<SoundDriver> CreateOpenALDriver() {
     winlog("newOpenAL\n");
     return std::make_unique<OpenAL>();
 }
 
-bool GetOALDevices(wxArrayString& names, wxArrayString& ids)
-{
-    return OpenAL::GetDevices(names, ids);
-}
-
-bool OpenAL::GetDevices(wxArrayString& names, wxArrayString& ids)
-{
-#ifdef ALC_DEVICE_SPECIFIER
-
-    if (alcIsExtensionPresent(NULL, "ALC_ENUMERATION_EXT") == AL_FALSE)
-        // this extension isn't critical to OpenAL operating
-        return true;
-
-    const char* devs = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
-
-    while (*devs) {
-        names.push_back(wxString(devs, wxConvLibc));
-        ids.push_back(names[names.size() - 1]);
-        devs += strlen(devs) + 1;
-    }
-
-#endif
-
-    // should work anyway, but must always use default driver
-    return true;
-}
+}  // namespace internal
+}  // namespace audio
