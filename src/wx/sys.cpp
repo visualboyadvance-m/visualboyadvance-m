@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <cassert>
 
 #include <wx/ffile.h>
 #include <wx/generic/prntdlgg.h>
@@ -11,9 +10,9 @@
 #include "core/gb/gbGlobals.h"
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaSound.h"
+#include "wx/audio/audio.h"
 #include "wx/config/game-control.h"
 #include "wx/config/option-proxy.h"
-#include "wx/config/option.h"
 #include "wx/wxvbam.h"
 
 // These should probably be in vbamcore
@@ -1230,34 +1229,7 @@ class SoundDriver;
 std::unique_ptr<SoundDriver> systemSoundInit()
 {
     soundShutdown();
-
-    switch (OPTION(kSoundAudioAPI)) {
-        case config::AudioApi::kOpenAL:
-            return newOpenAL();
-
-#if defined(__WXMSW__)
-        case config::AudioApi::kDirectSound:
-            return newDirectSound();
-#endif
-
-#if defined(VBAM_ENABLE_XAUDIO2)
-        case config::AudioApi::kXAudio2:
-            return newXAudio2_Output();
-#endif
-
-#if defined(VBAM_ENABLE_FAUDIO)
-        case config::AudioApi::kFAudio:
-            return newFAudio_Output();
-#endif
-
-        case config::AudioApi::kLast:
-            // This should never happen.
-            assert(false);
-            return nullptr;
-    }
-
-    assert(false);
-    return nullptr;
+    return audio::CreateSoundDriver(OPTION(kSoundAudioAPI));
 }
 
 void systemOnWriteDataToSoundBuffer(const uint16_t* finalWave, int length)

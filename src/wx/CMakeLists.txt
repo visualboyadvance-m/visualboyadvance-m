@@ -6,6 +6,10 @@ endif()
 include(VbamFunctions)
 
 set(VBAM_WX_COMMON
+    audio/audio.cpp
+    audio/audio.h
+    audio/internal/openal.cpp
+    audio/internal/openal.h
     background-input.cpp
     background-input.h
     cmdevents.cpp
@@ -47,8 +51,6 @@ set(VBAM_WX_COMMON
     gfxviewers.cpp
     guiinit.cpp
     ioregs.h
-    openal.cpp
-    openal.h
     opts.cpp
     opts.h
     panel.cpp
@@ -249,7 +251,7 @@ endif()
 if(WIN32)
     target_sources(visualboyadvance-m
         PRIVATE
-        dsound.cpp
+        audio/internal/dsound.cpp
         wxvbam.rc
     )
     target_link_libraries(visualboyadvance-m
@@ -313,7 +315,7 @@ target_link_libraries(visualboyadvance-m ${OPENAL_LIBRARY})
 
 # XAudio2.
 if(ENABLE_XAUDIO2)
-    target_sources(visualboyadvance-m PRIVATE xaudio2.cpp)
+    target_sources(visualboyadvance-m PRIVATE audio/internal/xaudio2.cpp)
     target_compile_definitions(visualboyadvance-m PRIVATE VBAM_ENABLE_XAUDIO2)
 endif()
 
@@ -324,7 +326,7 @@ endif()
 
 # FAudio.
 if(ENABLE_FAUDIO)
-    target_sources(visualboyadvance-m PRIVATE faudio.cpp)
+    target_sources(visualboyadvance-m PRIVATE audio/internal/faudio.cpp)
     target_link_libraries(visualboyadvance-m FAudio::FAudio)
     target_compile_definitions(visualboyadvance-m PRIVATE VBAM_ENABLE_FAUDIO)
 endif()
@@ -607,6 +609,9 @@ add_custom_command(
 
 set(VBAM_LOCALIZABLE_FILES ${VBAM_WX_COMMON})
 list(APPEND VBAM_LOCALIZABLE_FILES
+    audio/internal/dsound.cpp
+    audio/internal/faudio.cpp
+    audio/internal/xaudio2.cpp
     autoupdater/autoupdater.h
     autoupdater/macos/autoupdater.cpp
     autoupdater/macos/sparkle-wrapper.h
@@ -614,11 +619,8 @@ list(APPEND VBAM_LOCALIZABLE_FILES
     autoupdater/wxmsw/winsparkle-rc.h
     autoupdater/wxmsw/winsparkle-wrapper.cpp
     autoupdater/wxmsw/winsparkle-wrapper.h
-    dsound.cpp
-    faudio.cpp
     widgets/dpi-support.cpp
     widgets/dpi-support-mac.mm
-    xaudio2.cpp
     ${CMAKE_SOURCE_DIR}/src/core/gba/gbaLink.cpp
 )
 

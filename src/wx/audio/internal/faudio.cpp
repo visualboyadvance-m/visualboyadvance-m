@@ -1,10 +1,12 @@
+#include <wx/string.h>
 #if !defined(VBAM_ENABLE_FAUDIO)
 #error "This file should only be compiled if FAudio is enabled"
 #endif
 
-#include <cstdio>
+#include "wx/audio/internal/faudio.h"
 
-#include <string>
+#include <cassert>
+
 #include <vector>
 
 // FAudio
@@ -16,63 +18,50 @@
 #include <wx/log.h>
 #include <wx/translation.h>
 
-#include "core/base/sound_driver.h"
 #include "core/base/system.h"
 #include "core/gba/gbaGlobals.h"
 #include "wx/config/option-proxy.h"
 
+namespace audio {
+namespace internal {
+
 namespace {
 
-int GetFADevices(FAudio* fa, wxArrayString* names, wxArrayString* ids,
-    const wxString* match)
-{
+int FAGetDev(FAudio* fa) {
+    const wxString& audio_device = OPTION(kSoundAudioDevice);
+    if (audio_device.empty()) {
+        // Just use the default device.
+        return 0;
+    }
+
     uint32_t hr;
     uint32_t dev_count = 0;
     hr = FAudio_GetDeviceCount(fa, &dev_count);
-
     if (hr != 0) {
         wxLogError(_("FAudio: Enumerating devices failed!"));
-        return -1;
-    } else {
-        FAudioDeviceDetails dd;
+        return 0;
+    }
 
-        for (uint32_t i = 0; i < dev_count; i++) {
-            hr = FAudio_GetDeviceDetails(fa, i, &dd);
-
-            if (hr != 0) {
-                continue;
-            } else {
-                if (ids) {
-                    ids->push_back((wchar_t*) dd.DeviceID);
-                    names->push_back((wchar_t*) dd.DisplayName);
-                } else if (*match == wxString((wchar_t*) dd.DeviceID))
-                    return i;
-            }
+    FAudioDeviceDetails dd;
+    for (uint32_t i = 0; i < dev_count; i++) {
+        hr = FAudio_GetDeviceDetails(fa, i, &dd);
+        if (hr != 0) {
+            continue;
+        }
+        const wxString device_id(reinterpret_cast<wchar_t*>(dd.DeviceID));
+        if (audio_device == device_id) {
+            return i;
         }
     }
 
-    return -1;
-}
-
-int FAGetDev(FAudio* fa)
-{
-    const wxString& audio_device = OPTION(kSoundAudioDevice);
-    if (audio_device.empty())
-        return 0;
-    else {
-        int ret = GetFADevices(fa, nullptr, nullptr, &audio_device);
-        return ret < 0 ? 0 : ret;
-    }
+    return 0;
 }
 
 class FAudio_BufferNotify : public FAudioVoiceCallback {
 public:
-    bool WaitForSignal() {
-        return WaitForSingleObject(buffer_end_event_, 10000) != WAIT_TIMEOUT;
-    }
+    bool WaitForSignal() { return WaitForSingleObject(buffer_end_event_, 10000) != WAIT_TIMEOUT; }
 
-    FAudio_BufferNotify()
-    {
+    FAudio_BufferNotify() {
         buffer_end_event_ = nullptr;
         buffer_end_event_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
         assert(buffer_end_event_ != nullptr);
@@ -85,8 +74,7 @@ public:
         OnLoopEnd = &FAudio_BufferNotify::StaticOnLoopEnd;
         OnVoiceError = &FAudio_BufferNotify::StaticOnVoiceError;
     }
-    ~FAudio_BufferNotify()
-    {
+    ~FAudio_BufferNotify() {
         CloseHandle(buffer_end_event_);
         buffer_end_event_ = nullptr;
     }
@@ -108,8 +96,7 @@ private:
     static void StaticOnVoiceError(FAudioVoiceCallback*, void*, uint32_t) {}
 };
 
-class FAudio_Output
-    : public SoundDriver {
+class FAudio_Output : public SoundDriver {
 public:
     FAudio_Output();
     ~FAudio_Output();
@@ -139,11 +126,11 @@ private:
     volatile bool device_changed;
 
     FAudio* faud;
-    FAudioMasteringVoice* mVoice; // listener
-    FAudioSourceVoice* sVoice; // sound source
+    FAudioMasteringVoice* mVoice;  // listener
+    FAudioSourceVoice* sVoice;     // sound source
     FAudioBuffer buf;
     FAudioVoiceState vState;
-    FAudio_BufferNotify notify; // buffer end notification
+    FAudio_BufferNotify notify;  // buffer end notification
 };
 
 class FAudio_Device_Notifier : public IMMNotificationClient {
@@ -162,7 +149,9 @@ public:
     ULONG STDMETHODCALLTYPE AddRef();
     ULONG STDMETHODCALLTYPE Release();
     HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, VOID** ppvInterface);
-    HRESULT STDMETHODCALLTYPE OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR pwstrDeviceId);
+    HRESULT STDMETHODCALLTYPE OnDefaultDeviceChanged(EDataFlow flow,
+                                                     ERole role,
+                                                     LPCWSTR pwstrDeviceId);
     HRESULT STDMETHODCALLTYPE OnDeviceAdded(LPCWSTR pwstrDeviceId);
     HRESULT STDMETHODCALLTYPE OnDeviceRemoved(LPCWSTR pwstrDeviceId);
     HRESULT STDMETHODCALLTYPE OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWORD dwNewState);
@@ -190,14 +179,12 @@ FAudio_Output::FAudio_Output() : buffer_count_(OPTION(kSoundBuffers)) {
     f_notifier.do_register(this);
 }
 
-FAudio_Output::~FAudio_Output()
-{
+FAudio_Output::~FAudio_Output() {
     f_notifier.do_unregister(this);
     close();
 }
 
-void FAudio_Output::close()
-{
+void FAudio_Output::close() {
     initialized = false;
 
     if (sVoice) {
@@ -220,22 +207,20 @@ void FAudio_Output::close()
     }
 }
 
-void FAudio_Output::device_change()
-{
+void FAudio_Output::device_change() {
     device_changed = true;
 }
 
-bool FAudio_Output::init(long sampleRate)
-{
+bool FAudio_Output::init(long sampleRate) {
     if (failed || initialized)
         return false;
 
     uint32_t hr;
     // Initialize FAudio
     uint32_t flags = 0;
-    //#ifdef _DEBUG
+    // #ifdef _DEBUG
     //	flags = FAUDIO_DEBUG_ENGINE;
-    //#endif
+    // #endif
     hr = FAudioCreate(&faud, flags, FAUDIO_DEFAULT_PROCESSOR);
 
     if (hr != 0) {
@@ -255,8 +240,8 @@ bool FAudio_Output::init(long sampleRate)
     static const uint16_t kNumChannels = 2;
     static const uint16_t kBitsPerSample = 16;
     static const uint16_t kBlockAlign = kNumChannels * (kBitsPerSample / 8);
-    FAudioWaveFormatEx wfx {
-        /*.wFormatTag=*/ FAUDIO_FORMAT_PCM,
+    FAudioWaveFormatEx wfx{
+        /*.wFormatTag=*/FAUDIO_FORMAT_PCM,
         /*.nChannels=*/kNumChannels,
         /*.nSamplesPerSec=*/freq_,
         /*.nAvgBytesPerSec=*/freq_ * kBlockAlign,
@@ -286,96 +271,96 @@ bool FAudio_Output::init(long sampleRate)
 
     if (OPTION(kSoundUpmix)) {
         // set up stereo upmixing
-        FAudioDeviceDetails dd {};
+        FAudioDeviceDetails dd{};
         assert(FAudio_GetDeviceDetails(faud, 0, &dd) == 0);
         std::vector<float> matrix(sizeof(float) * 2 * dd.OutputFormat.Format.nChannels);
 
         bool matrixAvailable = true;
 
         switch (dd.OutputFormat.Format.nChannels) {
-        case 4: // 4.0
-            //Speaker \ Left Source           Right Source
-            /*Front L*/ matrix[0] = 1.0000f;
-            matrix[1] = 0.0000f;
-            /*Front R*/ matrix[2] = 0.0000f;
-            matrix[3] = 1.0000f;
-            /*Back  L*/ matrix[4] = 1.0000f;
-            matrix[5] = 0.0000f;
-            /*Back  R*/ matrix[6] = 0.0000f;
-            matrix[7] = 1.0000f;
-            break;
+            case 4:  // 4.0
+                     // Speaker \ Left Source           Right Source
+                /*Front L*/ matrix[0] = 1.0000f;
+                matrix[1] = 0.0000f;
+                /*Front R*/ matrix[2] = 0.0000f;
+                matrix[3] = 1.0000f;
+                /*Back  L*/ matrix[4] = 1.0000f;
+                matrix[5] = 0.0000f;
+                /*Back  R*/ matrix[6] = 0.0000f;
+                matrix[7] = 1.0000f;
+                break;
 
-        case 5: // 5.0
-            //Speaker \ Left Source           Right Source
-            /*Front L*/ matrix[0] = 1.0000f;
-            matrix[1] = 0.0000f;
-            /*Front R*/ matrix[2] = 0.0000f;
-            matrix[3] = 1.0000f;
-            /*Front C*/ matrix[4] = 0.7071f;
-            matrix[5] = 0.7071f;
-            /*Side  L*/ matrix[6] = 1.0000f;
-            matrix[7] = 0.0000f;
-            /*Side  R*/ matrix[8] = 0.0000f;
-            matrix[9] = 1.0000f;
-            break;
+            case 5:  // 5.0
+                     // Speaker \ Left Source           Right Source
+                /*Front L*/ matrix[0] = 1.0000f;
+                matrix[1] = 0.0000f;
+                /*Front R*/ matrix[2] = 0.0000f;
+                matrix[3] = 1.0000f;
+                /*Front C*/ matrix[4] = 0.7071f;
+                matrix[5] = 0.7071f;
+                /*Side  L*/ matrix[6] = 1.0000f;
+                matrix[7] = 0.0000f;
+                /*Side  R*/ matrix[8] = 0.0000f;
+                matrix[9] = 1.0000f;
+                break;
 
-        case 6: // 5.1
-            //Speaker \ Left Source           Right Source
-            /*Front L*/ matrix[0] = 1.0000f;
-            matrix[1] = 0.0000f;
-            /*Front R*/ matrix[2] = 0.0000f;
-            matrix[3] = 1.0000f;
-            /*Front C*/ matrix[4] = 0.7071f;
-            matrix[5] = 0.7071f;
-            /*LFE    */ matrix[6] = 0.0000f;
-            matrix[7] = 0.0000f;
-            /*Side  L*/ matrix[8] = 1.0000f;
-            matrix[9] = 0.0000f;
-            /*Side  R*/ matrix[10] = 0.0000f;
-            matrix[11] = 1.0000f;
-            break;
+            case 6:  // 5.1
+                     // Speaker \ Left Source           Right Source
+                /*Front L*/ matrix[0] = 1.0000f;
+                matrix[1] = 0.0000f;
+                /*Front R*/ matrix[2] = 0.0000f;
+                matrix[3] = 1.0000f;
+                /*Front C*/ matrix[4] = 0.7071f;
+                matrix[5] = 0.7071f;
+                /*LFE    */ matrix[6] = 0.0000f;
+                matrix[7] = 0.0000f;
+                /*Side  L*/ matrix[8] = 1.0000f;
+                matrix[9] = 0.0000f;
+                /*Side  R*/ matrix[10] = 0.0000f;
+                matrix[11] = 1.0000f;
+                break;
 
-        case 7: // 6.1
-            //Speaker \ Left Source           Right Source
-            /*Front L*/ matrix[0] = 1.0000f;
-            matrix[1] = 0.0000f;
-            /*Front R*/ matrix[2] = 0.0000f;
-            matrix[3] = 1.0000f;
-            /*Front C*/ matrix[4] = 0.7071f;
-            matrix[5] = 0.7071f;
-            /*LFE    */ matrix[6] = 0.0000f;
-            matrix[7] = 0.0000f;
-            /*Side  L*/ matrix[8] = 1.0000f;
-            matrix[9] = 0.0000f;
-            /*Side  R*/ matrix[10] = 0.0000f;
-            matrix[11] = 1.0000f;
-            /*Back  C*/ matrix[12] = 0.7071f;
-            matrix[13] = 0.7071f;
-            break;
+            case 7:  // 6.1
+                     // Speaker \ Left Source           Right Source
+                /*Front L*/ matrix[0] = 1.0000f;
+                matrix[1] = 0.0000f;
+                /*Front R*/ matrix[2] = 0.0000f;
+                matrix[3] = 1.0000f;
+                /*Front C*/ matrix[4] = 0.7071f;
+                matrix[5] = 0.7071f;
+                /*LFE    */ matrix[6] = 0.0000f;
+                matrix[7] = 0.0000f;
+                /*Side  L*/ matrix[8] = 1.0000f;
+                matrix[9] = 0.0000f;
+                /*Side  R*/ matrix[10] = 0.0000f;
+                matrix[11] = 1.0000f;
+                /*Back  C*/ matrix[12] = 0.7071f;
+                matrix[13] = 0.7071f;
+                break;
 
-        case 8: // 7.1
-            //Speaker \ Left Source           Right Source
-            /*Front L*/ matrix[0] = 1.0000f;
-            matrix[1] = 0.0000f;
-            /*Front R*/ matrix[2] = 0.0000f;
-            matrix[3] = 1.0000f;
-            /*Front C*/ matrix[4] = 0.7071f;
-            matrix[5] = 0.7071f;
-            /*LFE    */ matrix[6] = 0.0000f;
-            matrix[7] = 0.0000f;
-            /*Back  L*/ matrix[8] = 1.0000f;
-            matrix[9] = 0.0000f;
-            /*Back  R*/ matrix[10] = 0.0000f;
-            matrix[11] = 1.0000f;
-            /*Side  L*/ matrix[12] = 1.0000f;
-            matrix[13] = 0.0000f;
-            /*Side  R*/ matrix[14] = 0.0000f;
-            matrix[15] = 1.0000f;
-            break;
+            case 8:  // 7.1
+                     // Speaker \ Left Source           Right Source
+                /*Front L*/ matrix[0] = 1.0000f;
+                matrix[1] = 0.0000f;
+                /*Front R*/ matrix[2] = 0.0000f;
+                matrix[3] = 1.0000f;
+                /*Front C*/ matrix[4] = 0.7071f;
+                matrix[5] = 0.7071f;
+                /*LFE    */ matrix[6] = 0.0000f;
+                matrix[7] = 0.0000f;
+                /*Back  L*/ matrix[8] = 1.0000f;
+                matrix[9] = 0.0000f;
+                /*Back  R*/ matrix[10] = 0.0000f;
+                matrix[11] = 1.0000f;
+                /*Side  L*/ matrix[12] = 1.0000f;
+                matrix[13] = 0.0000f;
+                /*Side  R*/ matrix[14] = 0.0000f;
+                matrix[15] = 1.0000f;
+                break;
 
-        default:
-            matrixAvailable = false;
-            break;
+            default:
+                matrixAvailable = false;
+                break;
         }
 
         if (matrixAvailable) {
@@ -445,8 +430,7 @@ void FAudio_Output::write(uint16_t* finalWave, int) {
     assert(hr == 0);
 }
 
-void FAudio_Output::pause()
-{
+void FAudio_Output::pause() {
     if (!initialized || failed)
         return;
 
@@ -457,8 +441,7 @@ void FAudio_Output::pause()
     }
 }
 
-void FAudio_Output::resume()
-{
+void FAudio_Output::resume() {
     if (!initialized || failed)
         return;
 
@@ -469,8 +452,7 @@ void FAudio_Output::resume()
     }
 }
 
-void FAudio_Output::reset()
-{
+void FAudio_Output::reset() {
     if (!initialized || failed)
         return;
 
@@ -484,8 +466,7 @@ void FAudio_Output::reset()
     playing = true;
 }
 
-void FAudio_Output::setThrottle(unsigned short throttle_)
-{
+void FAudio_Output::setThrottle(unsigned short throttle_) {
     if (!initialized || failed)
         return;
 
@@ -497,28 +478,22 @@ void FAudio_Output::setThrottle(unsigned short throttle_)
     assert(hr == 0);
 }
 
-FAudio_Device_Notifier::FAudio_Device_Notifier()
-    : registered(0)
-{
+FAudio_Device_Notifier::FAudio_Device_Notifier() : registered(0) {
     InitializeCriticalSection(&lock);
 }
-FAudio_Device_Notifier::~FAudio_Device_Notifier()
-{
+FAudio_Device_Notifier::~FAudio_Device_Notifier() {
     DeleteCriticalSection(&lock);
 }
 
-ULONG STDMETHODCALLTYPE FAudio_Device_Notifier::AddRef()
-{
+ULONG STDMETHODCALLTYPE FAudio_Device_Notifier::AddRef() {
     return 1;
 }
 
-ULONG STDMETHODCALLTYPE FAudio_Device_Notifier::Release()
-{
+ULONG STDMETHODCALLTYPE FAudio_Device_Notifier::Release() {
     return 1;
 }
 
-HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::QueryInterface(REFIID riid, VOID** ppvInterface)
-{
+HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::QueryInterface(REFIID riid, VOID** ppvInterface) {
     if (IID_IUnknown == riid) {
         *ppvInterface = (IUnknown*)this;
     } else if (__uuidof(IMMNotificationClient) == riid) {
@@ -562,8 +537,7 @@ HRESULT STDMETHODCALLTYPE FAudio_Device_Notifier::OnPropertyValueChanged(LPCWSTR
     return S_OK;
 }
 
-void FAudio_Device_Notifier::do_register(FAudio_Output* p_instance)
-{
+void FAudio_Device_Notifier::do_register(FAudio_Output* p_instance) {
     if (InterlockedIncrement(&registered) == 1) {
         pEnumerator = nullptr;
         HRESULT hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_INPROC_SERVER,
@@ -579,8 +553,7 @@ void FAudio_Device_Notifier::do_register(FAudio_Output* p_instance)
     LeaveCriticalSection(&lock);
 }
 
-void FAudio_Device_Notifier::do_unregister(FAudio_Output* p_instance)
-{
+void FAudio_Device_Notifier::do_unregister(FAudio_Output* p_instance) {
     if (InterlockedDecrement(&registered) == 0) {
         if (pEnumerator) {
             pEnumerator->UnregisterEndpointNotificationCallback(this);
@@ -601,13 +574,11 @@ void FAudio_Device_Notifier::do_unregister(FAudio_Output* p_instance)
     LeaveCriticalSection(&lock);
 }
 
-
 }  // namespace
 
-bool GetFADevices(wxArrayString& names, wxArrayString& ids)
-{
-    uint32_t hr;
+std::vector<AudioDevice> GetFAudioDevices() {
     FAudio* fa = nullptr;
+    uint32_t hr;
     uint32_t flags = 0;
 #ifdef _DEBUG
     flags = FAUDIO_DEBUG_ENGINE;
@@ -616,15 +587,40 @@ bool GetFADevices(wxArrayString& names, wxArrayString& ids)
 
     if (hr != 0) {
         wxLogError(_("The FAudio interface failed to initialize!"));
-        return false;
+        return {};
     }
 
-    GetFADevices(fa, &names, &ids, nullptr);
+    uint32_t dev_count = 0;
+    hr = FAudio_GetDeviceCount(fa, &dev_count);
+    if (hr != 0) {
+        wxLogError(_("FAudio: Enumerating devices failed!"));
+        return {};
+    }
+
+    std::vector<AudioDevice> devices;
+    devices.reserve(dev_count + 1);
+    devices.push_back({_("Default device"), wxEmptyString});
+
+    for (uint32_t i = 0; i < dev_count; i++) {
+        FAudioDeviceDetails dd;
+        hr = FAudio_GetDeviceDetails(fa, i, &dd);
+        if (hr != 0) {
+            continue;
+        }
+
+        const wxString display_name(reinterpret_cast<wchar_t*>(dd.DisplayName));
+        const wxString device_id(reinterpret_cast<wchar_t*>(dd.DeviceID));
+
+        devices.push_back({display_name, device_id});
+    }
+
     FAudio_Release(fa);
-    return true;
+    return devices;
 }
 
-// Class Declaration
-std::unique_ptr<SoundDriver> newFAudio_Output() {
+std::unique_ptr<SoundDriver> CreateFAudioDriver() {
     return std::make_unique<FAudio_Output>();
 }
+
+}  // namespace internal
+}  // namespace audio

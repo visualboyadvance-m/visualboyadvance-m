@@ -2,6 +2,8 @@
 #error "This file should only be compiled on Windows"
 #endif
 
+#include "wx/audio/internal/dsound.h"
+
 // DirectSound8
 #define DIRECTSOUND_VERSION 0x0800
 #include <Windows.h>
@@ -24,14 +26,19 @@
 
 extern bool soundBufferLow;
 
+namespace audio {
+namespace internal {
+
+namespace {
+
 class DirectSound : public SoundDriver {
 private:
-    LPDIRECTSOUND8 pDirectSound; // DirectSound interface
-    LPDIRECTSOUNDBUFFER dsbPrimary; // Primary DirectSound buffer
-    LPDIRECTSOUNDBUFFER dsbSecondary; // Secondary DirectSound buffer
+    LPDIRECTSOUND8 pDirectSound;       // DirectSound interface
+    LPDIRECTSOUNDBUFFER dsbPrimary;    // Primary DirectSound buffer
+    LPDIRECTSOUNDBUFFER dsbSecondary;  // Secondary DirectSound buffer
     LPDIRECTSOUNDNOTIFY dsbNotify;
     HANDLE dsbEvent;
-    WAVEFORMATEX wfx; // Primary buffer wave format
+    WAVEFORMATEX wfx;  // Primary buffer wave format
     int soundBufferLen;
     int soundBufferTotalLen;
     unsigned int soundNextPosition;
@@ -45,12 +52,11 @@ public:
     void pause() override;
     void reset() override;
     void resume() override;
-    void write(uint16_t *finalWave, int length) override;
+    void write(uint16_t* finalWave, int length) override;
     void setThrottle(unsigned short throttle_) override;
 };
 
-DirectSound::DirectSound()
-{
+DirectSound::DirectSound() {
     pDirectSound = NULL;
     dsbPrimary = NULL;
     dsbSecondary = NULL;
@@ -60,8 +66,7 @@ DirectSound::DirectSound()
     soundNextPosition = 0;
 }
 
-DirectSound::~DirectSound()
-{
+DirectSound::~DirectSound() {
     if (dsbNotify) {
         dsbNotify->Release();
         dsbNotify = NULL;
@@ -88,13 +93,13 @@ DirectSound::~DirectSound()
     }
 }
 
-bool DirectSound::init(long sampleRate)
-{
+bool DirectSound::init(long sampleRate) {
     HRESULT hr;
     DWORD freq;
     DSBUFFERDESC dsbdesc;
     int i;
-    hr = CoCreateInstance(CLSID_DirectSound8, NULL, CLSCTX_INPROC_SERVER, IID_IDirectSound8, (LPVOID*)&pDirectSound);
+    hr = CoCreateInstance(CLSID_DirectSound8, NULL, CLSCTX_INPROC_SERVER, IID_IDirectSound8,
+                          (LPVOID*)&pDirectSound);
 
     if (hr != S_OK) {
         wxLogError(_("Cannot create Direct Sound %08x"), hr);
@@ -116,7 +121,8 @@ bool DirectSound::init(long sampleRate)
         return false;
     }
 
-    if (FAILED(hr = pDirectSound->SetCooperativeLevel((HWND)wxGetApp().frame->GetHandle(), DSSCL_PRIORITY))) {
+    if (FAILED(hr = pDirectSound->SetCooperativeLevel((HWND)wxGetApp().frame->GetHandle(),
+                                                      DSSCL_PRIORITY))) {
         wxLogError(_("Cannot SetCooperativeLevel %08x"), hr);
         return false;
     }
@@ -158,7 +164,8 @@ bool DirectSound::init(long sampleRate)
     // Create secondary sound buffer
     ZeroMemory(&dsbdesc, sizeof(DSBUFFERDESC));
     dsbdesc.dwSize = sizeof(DSBUFFERDESC);
-    dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLPOSITIONNOTIFY | DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLFREQUENCY;
+    dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLPOSITIONNOTIFY |
+                      DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLFREQUENCY;
 
     if (!hw_accel) {
         dsbdesc.dwFlags |= DSBCAPS_LOCSOFTWARE;
@@ -177,7 +184,8 @@ bool DirectSound::init(long sampleRate)
         return false;
     }
 
-    if (SUCCEEDED(hr = dsbSecondary->QueryInterface(IID_IDirectSoundNotify8, (LPVOID*)&dsbNotify))) {
+    if (SUCCEEDED(hr =
+                      dsbSecondary->QueryInterface(IID_IDirectSoundNotify8, (LPVOID*)&dsbNotify))) {
         dsbEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
         DSBPOSITIONNOTIFY notify[10];
 
@@ -207,7 +215,7 @@ void DirectSound::setThrottle(unsigned short throttle_) {
     HRESULT hr;
 
     if (throttle_ == 0)
-        throttle_ = 450; // Close to upper bound on frequency.
+        throttle_ = 450;  // Close to upper bound on frequency.
 
     long freq = soundGetSampleRate();
 
@@ -216,8 +224,7 @@ void DirectSound::setThrottle(unsigned short throttle_) {
     }
 }
 
-void DirectSound::pause()
-{
+void DirectSound::pause() {
     LPDIRECTSOUNDBUFFER bufs[] = {dsbPrimary, dsbSecondary};
     for (auto buf : bufs) {
         if (buf == NULL)
@@ -231,8 +238,7 @@ void DirectSound::pause()
     }
 }
 
-void DirectSound::reset()
-{
+void DirectSound::reset() {
     if (dsbSecondary == NULL)
         return;
 
@@ -241,8 +247,7 @@ void DirectSound::reset()
     soundNextPosition = 0;
 }
 
-void DirectSound::resume()
-{
+void DirectSound::resume() {
     LPDIRECTSOUNDBUFFER bufs[] = {dsbPrimary, dsbSecondary};
     for (auto buf : bufs) {
         if (buf == NULL)
@@ -252,8 +257,7 @@ void DirectSound::resume()
     }
 }
 
-void DirectSound::write(uint16_t* finalWave, int)
-{
+void DirectSound::write(uint16_t* finalWave, int) {
     if (!pDirectSound)
         return;
 
@@ -272,7 +276,9 @@ void DirectSound::write(uint16_t* finalWave, int)
             if (!soundPaused) {
                 while (true) {
                     dsbSecondary->GetCurrentPosition(&play, NULL);
-                    int BufferLeft = ((soundNextPosition <= play) ? play - soundNextPosition : soundBufferTotalLen - soundNextPosition + play);
+                    int BufferLeft = ((soundNextPosition <= play)
+                                          ? play - soundNextPosition
+                                          : soundBufferTotalLen - soundNextPosition + play);
 
                     if (BufferLeft > soundBufferLen) {
                         if (BufferLeft > soundBufferTotalLen - (soundBufferLen * 3))
@@ -297,24 +303,12 @@ void DirectSound::write(uint16_t* finalWave, int)
 
     // Obtain memory address of write block.
     // This will be in two parts if the block wraps around.
-    if (DSERR_BUFFERLOST == (hr = dsbSecondary->Lock(
-                                 soundNextPosition,
-                                 soundBufferLen,
-                                 &lpvPtr1,
-                                 &dwBytes1,
-                                 &lpvPtr2,
-                                 &dwBytes2,
-                                 0))) {
+    if (DSERR_BUFFERLOST == (hr = dsbSecondary->Lock(soundNextPosition, soundBufferLen, &lpvPtr1,
+                                                     &dwBytes1, &lpvPtr2, &dwBytes2, 0))) {
         // If DSERR_BUFFERLOST is returned, restore and retry lock.
         dsbSecondary->Restore();
-        hr = dsbSecondary->Lock(
-            soundNextPosition,
-            soundBufferLen,
-            &lpvPtr1,
-            &dwBytes1,
-            &lpvPtr2,
-            &dwBytes2,
-            0);
+        hr = dsbSecondary->Lock(soundNextPosition, soundBufferLen, &lpvPtr1, &dwBytes1, &lpvPtr2,
+                                &dwBytes2, 0);
     }
 
     soundNextPosition += soundBufferLen;
@@ -336,27 +330,33 @@ void DirectSound::write(uint16_t* finalWave, int)
     }
 }
 
-std::unique_ptr<SoundDriver> newDirectSound()
-{
-    return std::make_unique<DirectSound>();
-}
+static BOOL CALLBACK DSEnumCB(LPGUID guid, LPCTSTR desc, LPCTSTR /*module*/, LPVOID user) {
+    std::vector<AudioDevice>* devices = static_cast<std::vector<AudioDevice>*>(user);
 
-struct devnames {
-    wxArrayString *names, *ids;
-};
+    if (guid == nullptr) {
+        devices->push_back({desc, {}});
+        return TRUE;
+    }
 
-static BOOL CALLBACK DSEnumCB(LPGUID guid, LPCTSTR desc, LPCTSTR, LPVOID user)
-{
-    devnames* dn = (devnames*)user;
-    dn->names->push_back(desc);
-    WCHAR buf[32 + 4 + 2 + 1]; // hex digits + "-" + "{}" + \0
-    StringFromGUID2(*guid, buf, sizeof(buf));
-    dn->ids->push_back(buf);
+    static constexpr size_t kGuidLength = 32 + 4 + 2 + 1;  // hex digits + "-" + "{}" + \0
+    std::array<WCHAR, kGuidLength> device_id;
+    StringFromGUID2(*guid, device_id.data(), device_id.size());
+
+    devices->push_back({desc, device_id.data()});
     return TRUE;
 }
 
-bool GetDSDevices(wxArrayString& names, wxArrayString& ids)
-{
-    devnames dn = { &names, &ids };
-    return DirectSoundEnumerate(DSEnumCB, (LPVOID)&dn) == DS_OK;
+}  // namespace
+
+std::vector<AudioDevice> GetDirectSoundDevices() {
+    std::vector<AudioDevice> devices;
+    DirectSoundEnumerateW(DSEnumCB, &devices);
+    return devices;
 }
+
+std::unique_ptr<SoundDriver> CreateDirectSoundDriver() {
+    return std::make_unique<DirectSound>();
+}
+
+}  // namespace internal
+}  // namespace audio

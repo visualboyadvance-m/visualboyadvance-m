@@ -8,15 +8,16 @@
 #include <wx/radiobut.h>
 #include <wx/slider.h>
 
+#include <wx/string.h>
 #include <wx/xrc/xmlres.h>
 #include <functional>
 
+#include "wx/audio/audio.h"
 #include "wx/config/option-id.h"
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
 #include "wx/dialogs/validated-child.h"
 #include "wx/widgets/option-validator.h"
-#include "wx/wxvbam.h"
 
 namespace dialogs {
 
@@ -103,13 +104,18 @@ private:
     bool WriteToWindow() override {
         wxChoice* choice = wxDynamicCast(GetWindow(), wxChoice);
         assert(choice);
-        const wxString& device = option()->GetString();
-        const int selection = choice->FindString(device);
-        if (selection == wxNOT_FOUND) {
-            return true;
+
+        const wxString& device_id = option()->GetString();
+        for (size_t i = 0; i < choice->GetCount(); i++) {
+            const wxString& choide_id =
+                dynamic_cast<wxStringClientData*>(choice->GetClientObject(i))->GetData();
+            if (device_id == choide_id) {
+                choice->SetSelection(i);
+                return true;
+            }
         }
 
-        choice->SetSelection(selection);
+        choice->SetSelection(0);
         return true;
     }
 
@@ -121,7 +127,8 @@ private:
             return option()->SetString(wxEmptyString);
         }
 
-        return option()->SetString(choice->GetString(selection));
+        return option()->SetString(
+            dynamic_cast<wxStringClientData*>(choice->GetClientObject(selection))->GetData());
     }
 };
 
@@ -255,56 +262,21 @@ void SoundConfig::OnBuffersChanged(wxCommandEvent& event) {
 
 void SoundConfig::OnAudioApiChanged(wxCommandEvent& event, config::AudioApi audio_api) {
     audio_device_selector_->Clear();
-    audio_device_selector_->Append(_("Default device"), new wxStringClientData(wxEmptyString));
 
-    // Gather device names and IDs.
-    wxArrayString device_names;
-    wxArrayString device_ids;
-    switch (audio_api) {
-        case config::AudioApi::kOpenAL:
-            if (!GetOALDevices(device_names, device_ids)) {
-                return;
-            }
-            break;
+    bool audio_device_found = false;
+    for (const auto& device : audio::EnumerateAudioDevices(audio_api)) {
+        const int i =
+            audio_device_selector_->Append(device.name, new wxStringClientData(device.id));
 
-#if defined(__WXMSW__)
-        case config::AudioApi::kDirectSound:
-            if (!(GetDSDevices(device_names, device_ids))) {
-                return;
-            }
-            break;
-#endif
-
-#if defined(VBAM_ENABLE_XAUDIO2)
-        case config::AudioApi::kXAudio2:
-            if (!GetXA2Devices(device_names, device_ids)) {
-                return;
-            }
-            break;
-#endif
-
-#if defined(VBAM_ENABLE_FAUDIO)
-        case config::AudioApi::kFAudio:
-            if (!GetFADevices(device_names, device_ids)) {
-                return;
-            }
-            break;
-#endif
-
-        case config::AudioApi::kLast:
-            // This should never happen.
-            assert(false);
-            return;
+        if (!audio_device_found && audio_api == OPTION(kSoundAudioAPI) &&
+            OPTION(kSoundAudioDevice) == device.id) {
+            audio_device_selector_->SetSelection(i);
+            audio_device_found = true;
+        }
     }
 
-    audio_device_selector_->SetSelection(0);
-
-    for (size_t i = 0; i < device_names.size(); i++) {
-        audio_device_selector_->Append(device_names[i], new wxStringClientData(device_ids[i]));
-
-        if (audio_api == OPTION(kSoundAudioAPI) && OPTION(kSoundAudioDevice) == device_ids[i]) {
-            audio_device_selector_->SetSelection(i + 1);
-        }
+    if (!audio_device_found) {
+        audio_device_selector_->SetSelection(0);
     }
 
 #if defined(VBAM_ENABLE_XAUDIO2) && defined(VBAM_ENABLE_FAUDIO)
