@@ -1,11 +1,8 @@
 #ifndef VBAM_WX_DIALOGS_SOUND_CONFIG_H_
 #define VBAM_WX_DIALOGS_SOUND_CONFIG_H_
 
-#include <wx/dialog.h>
-#include <wx/event.h>
-
 #include "wx/config/option.h"
-#include "wx/widgets/keep-on-top-styler.h"
+#include "wx/dialogs/base-dialog.h"
 
 // Forward declarations.
 class wxChoice;
@@ -17,7 +14,7 @@ class wxWindow;
 namespace dialogs {
 
 // Manages the sound configuration dialog.
-class SoundConfig : public wxDialog {
+class SoundConfig : public BaseDialog {
 public:
     static SoundConfig* NewInstance(wxWindow* parent);
     ~SoundConfig() override = default;
@@ -42,7 +39,6 @@ private:
     wxCheckBox* upmix_checkbox_;
     wxCheckBox* hw_accel_checkbox_;
     config::AudioApi current_audio_api_;
-    const widgets::KeepOnTopStyler keep_on_top_styler_;
 };
 
 }  // namespace dialogs

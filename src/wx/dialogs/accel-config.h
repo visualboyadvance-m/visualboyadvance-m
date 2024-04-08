@@ -3,11 +3,10 @@
 
 #include <unordered_map>
 
-#include <wx/dialog.h>
 #include <wx/treectrl.h>
 
 #include "wx/config/shortcuts.h"
-#include "wx/widgets/keep-on-top-styler.h"
+#include "wx/dialogs/base-dialog.h"
 
 // Forward declarations.
 class wxControl;
@@ -23,7 +22,7 @@ class UserInputCtrl;
 namespace dialogs {
 
 // Manages the shortcuts editor dialog.
-class AccelConfig : public wxDialog {
+class AccelConfig : public BaseDialog {
 public:
     static AccelConfig* NewInstance(wxWindow* parent, wxMenuBar* menu_bar, wxMenu* recents);
 
@@ -74,8 +73,6 @@ private:
 
     config::Shortcuts config_shortcuts_;
     int selected_command_ = 0;
-
-    const widgets::KeepOnTopStyler keep_on_top_styler_;
 };
 
 }  // namespace dialogs

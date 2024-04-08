@@ -16,7 +16,7 @@
 #include "wx/config/option-id.h"
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
-#include "wx/dialogs/validated-child.h"
+#include "wx/dialogs/base-dialog.h"
 #include "wx/widgets/option-validator.h"
 
 namespace dialogs {
@@ -140,31 +140,24 @@ SoundConfig* SoundConfig::NewInstance(wxWindow* parent) {
     return new SoundConfig(parent);
 }
 
-SoundConfig::SoundConfig(wxWindow* parent) : wxDialog(), keep_on_top_styler_(this) {
-#if !wxCHECK_VERSION(3, 1, 0)
-    // This needs to be set before loading any element on the window. This also
-    // has no effect since wx 3.1.0, where it became the default.
-    this->SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);
-#endif
-    wxXmlResource::Get()->LoadDialog(this, parent, "SoundConfig");
-
+SoundConfig::SoundConfig(wxWindow* parent) : BaseDialog(parent, "SoundConfig") {
     // Volume slider configuration.
-    wxSlider* volume_slider = GetValidatedChild<wxSlider>(this, "Volume");
+    wxSlider* volume_slider = GetValidatedChild<wxSlider>("Volume");
     volume_slider->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundVolume));
-    GetValidatedChild(this, "Volume100")
+    GetValidatedChild("Volume100")
         ->Bind(wxEVT_BUTTON, std::bind(&wxSlider::SetValue, volume_slider, 100));
 
     // Sound quality.
-    GetValidatedChild(this, "Rate")->SetValidator(SoundRateValidator());
+    GetValidatedChild("Rate")->SetValidator(SoundRateValidator());
 
     // Audio API selection.
-    wxWindow* audio_api_button = GetValidatedChild(this, "OpenAL");
+    wxWindow* audio_api_button = GetValidatedChild("OpenAL");
     audio_api_button->SetValidator(AudioApiValidator(config::AudioApi::kOpenAL));
     audio_api_button->Bind(wxEVT_RADIOBUTTON,
                            std::bind(&SoundConfig::OnAudioApiChanged, this, std::placeholders::_1,
                                      config::AudioApi::kOpenAL));
 
-    audio_api_button = GetValidatedChild(this, "DirectSound");
+    audio_api_button = GetValidatedChild("DirectSound");
 #if defined(__WXMSW__)
     audio_api_button->SetValidator(AudioApiValidator(config::AudioApi::kDirectSound));
     audio_api_button->Bind(wxEVT_RADIOBUTTON,
@@ -174,7 +167,7 @@ SoundConfig::SoundConfig(wxWindow* parent) : wxDialog(), keep_on_top_styler_(thi
     audio_api_button->Hide();
 #endif
 
-    audio_api_button = GetValidatedChild(this, "XAudio2");
+    audio_api_button = GetValidatedChild("XAudio2");
 #if defined(VBAM_ENABLE_XAUDIO2)
     audio_api_button->SetValidator(AudioApiValidator(config::AudioApi::kXAudio2));
     audio_api_button->Bind(wxEVT_RADIOBUTTON,
@@ -184,7 +177,7 @@ SoundConfig::SoundConfig(wxWindow* parent) : wxDialog(), keep_on_top_styler_(thi
     audio_api_button->Hide();
 #endif
 
-    audio_api_button = GetValidatedChild(this, "FAudio");
+    audio_api_button = GetValidatedChild("FAudio");
 #if defined(VBAM_ENABLE_FAUDIO)
     audio_api_button->SetValidator(AudioApiValidator(config::AudioApi::kFAudio));
     audio_api_button->Bind(wxEVT_RADIOBUTTON,
@@ -195,7 +188,7 @@ SoundConfig::SoundConfig(wxWindow* parent) : wxDialog(), keep_on_top_styler_(thi
 #endif
 
     // Upmix configuration.
-    upmix_checkbox_ = GetValidatedChild<wxCheckBox>(this, "Upmix");
+    upmix_checkbox_ = GetValidatedChild<wxCheckBox>("Upmix");
 #if defined(VBAM_ENABLE_XAUDIO2) || defined(VBAM_ENABLE_FAUDIO)
     upmix_checkbox_->SetValidator(widgets::OptionBoolValidator(config::OptionID::kSoundUpmix));
 #else
@@ -203,7 +196,7 @@ SoundConfig::SoundConfig(wxWindow* parent) : wxDialog(), keep_on_top_styler_(thi
 #endif
 
     // DSound HW acceleration.
-    hw_accel_checkbox_ = GetValidatedChild<wxCheckBox>(this, "HWAccel");
+    hw_accel_checkbox_ = GetValidatedChild<wxCheckBox>("HWAccel");
 #if defined(__WXMSW__)
     hw_accel_checkbox_->SetValidator(
         widgets::OptionBoolValidator(config::OptionID::kSoundDSoundHWAccel));
@@ -212,23 +205,23 @@ SoundConfig::SoundConfig(wxWindow* parent) : wxDialog(), keep_on_top_styler_(thi
 #endif
 
     // Buffers configuration.
-    buffers_info_label_ = GetValidatedChild<wxControl>(this, "BuffersInfo");
-    buffers_slider_ = GetValidatedChild<wxSlider>(this, "Buffers");
+    buffers_info_label_ = GetValidatedChild<wxControl>("BuffersInfo");
+    buffers_slider_ = GetValidatedChild<wxSlider>("Buffers");
     buffers_slider_->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundBuffers));
     buffers_slider_->Bind(wxEVT_SLIDER, &SoundConfig::OnBuffersChanged, this);
 
     // Game Boy configuration.
-    GetValidatedChild(this, "GBEcho")
-        ->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundGBEcho));
-    GetValidatedChild(this, "GBStereo")
+    GetValidatedChild("GBEcho")->SetValidator(
+        widgets::OptionIntValidator(config::OptionID::kSoundGBEcho));
+    GetValidatedChild("GBStereo")
         ->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundGBStereo));
 
     // Game Boy Advance configuration.
-    GetValidatedChild(this, "GBASoundFiltering")
+    GetValidatedChild("GBASoundFiltering")
         ->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundGBAFiltering));
 
     // Audio Device configuration.
-    audio_device_selector_ = GetValidatedChild<wxChoice>(this, "Device");
+    audio_device_selector_ = GetValidatedChild<wxChoice>("Device");
     audio_device_selector_->SetValidator(AudioDeviceValidator());
 
     this->Bind(wxEVT_SHOW, &SoundConfig::OnShow, this);

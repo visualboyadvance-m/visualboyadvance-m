@@ -15,8 +15,9 @@
 
 #include "wx/config/option-observer.h"
 #include "wx/config/option-proxy.h"
-#include "wx/dialogs/validated-child.h"
+#include "wx/dialogs/base-dialog.h"
 #include "wx/widgets/option-validator.h"
+#include "wx/widgets/utils.h"
 
 namespace dialogs {
 
@@ -221,23 +222,22 @@ private:
 
 GBPalettePanelData::GBPalettePanelData(wxPanel* panel, size_t palette_id)
     : wxClientData(),
-      default_selector_(GetValidatedChild<wxChoice>(panel, "DefaultPalette")),
-      option_id_(static_cast<config::OptionID>(
-          static_cast<size_t>(config::OptionID::kGBPalette0) + palette_id)) {
+      default_selector_(widgets::GetValidatedChild<wxChoice>(panel, "DefaultPalette")),
+      option_id_(static_cast<config::OptionID>(static_cast<size_t>(config::OptionID::kGBPalette0) +
+                                               palette_id)) {
     assert(panel);
     assert(palette_id < kNbPalettes);
 
     default_selector_->Bind(
         wxEVT_CHOICE, &GBPalettePanelData::OnDefaultPaletteSelected, this);
 
-    GetValidatedChild<wxCheckBox>(panel, "UsePalette")
-        ->SetValidator(widgets::OptionSelectedValidator(
-            config::OptionID::kPrefGBPaletteOption, palette_id));
+    widgets::GetValidatedChild<wxCheckBox>(panel, "UsePalette")
+        ->SetValidator(
+            widgets::OptionSelectedValidator(config::OptionID::kPrefGBPaletteOption, palette_id));
 
     for (size_t i = 0; i < colour_pickers_.size(); i++) {
         wxColourPickerCtrl* colour_picker =
-            GetValidatedChild<wxColourPickerCtrl>(
-                panel, wxString::Format("Color%zu", i));
+            widgets::GetValidatedChild<wxColourPickerCtrl>(panel, wxString::Format("Color%zu", i));
         colour_pickers_[i] = colour_picker;
 
         // Update the internal palette reference on colour change.
@@ -247,7 +247,7 @@ GBPalettePanelData::GBPalettePanelData(wxPanel* panel, size_t palette_id)
                             colour_picker->GetId());
     }
 
-    GetValidatedChild(panel, "Reset")
+    widgets::GetValidatedChild(panel, "Reset")
         ->Bind(wxEVT_BUTTON, &GBPalettePanelData::OnPaletteReset, this);
 }
 
@@ -317,39 +317,27 @@ GameBoyConfig* GameBoyConfig::NewInstance(wxWindow* parent) {
     return new GameBoyConfig(parent);
 }
 
-GameBoyConfig::GameBoyConfig(wxWindow* parent)
-    : wxDialog(), keep_on_top_styler_(this) {
-#if !wxCHECK_VERSION(3, 1, 0)
-    // This needs to be set before loading any element on the window. This also
-    // has no effect since wx 3.1.0, where it became the default.
-    this->SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);
-#endif
-    wxXmlResource::Get()->LoadDialog(this, parent, "GameBoyConfig");
-
+GameBoyConfig::GameBoyConfig(wxWindow* parent) : BaseDialog(parent, "GameBoyConfig") {
     // System and Peripherals.
-    GetValidatedChild(this, "System")
-        ->SetValidator(widgets::OptionChoiceValidator(
-            config::OptionID::kPrefEmulatorType));
+    GetValidatedChild("System")->SetValidator(
+        widgets::OptionChoiceValidator(config::OptionID::kPrefEmulatorType));
 
     // "Display borders" corresponds to 2 variables.
-    GetValidatedChild(this, "Borders")->SetValidator(BorderSelectorValidator());
+    GetValidatedChild("Borders")->SetValidator(BorderSelectorValidator());
 
     // GB BIOS ROM
-    GetValidatedChild(this, "GBBiosPicker")
-        ->SetValidator(BIOSPickerValidator(
-            config::OptionID::kGBBiosFile,
-            GetValidatedChild<wxStaticText>(this, "GBBiosLabel")));
+    GetValidatedChild("GBBiosPicker")
+        ->SetValidator(BIOSPickerValidator(config::OptionID::kGBBiosFile,
+                                           GetValidatedChild<wxStaticText>("GBBiosLabel")));
 
     // GBC BIOS ROM
-    GetValidatedChild(this, "GBCBiosPicker")
-        ->SetValidator(BIOSPickerValidator(
-            config::OptionID::kGBGBCBiosFile,
-            GetValidatedChild<wxStaticText>(this, "GBCBiosLabel")));
+    GetValidatedChild("GBCBiosPicker")
+        ->SetValidator(BIOSPickerValidator(config::OptionID::kGBGBCBiosFile,
+                                           GetValidatedChild<wxStaticText>("GBCBiosLabel")));
 
     for (size_t i = 0; i < kNbPalettes; i++) {
         // All of the wxPanel logic is handled in its client object.
-        wxPanel* panel =
-            GetValidatedChild<wxPanel>(this, wxString::Format("cp%zu", i));
+        wxPanel* panel = GetValidatedChild<wxPanel>(wxString::Format("cp%zu", i));
         GBPalettePanelData* palette_data = new GBPalettePanelData(panel, i);
 
         // `panel` takes ownership of `palette_data` here.

@@ -2,11 +2,11 @@
 
 #include <wx/xrc/xmlres.h>
 
-#include "wx/dialogs/validated-child.h"
 #include "wx/config/option-proxy.h"
-#include "wx/config/option.h"
+#include "wx/dialogs/base-dialog.h"
 #include "wx/widgets/option-validator.h"
 #include "wx/widgets/user-input-ctrl.h"
+#include "wx/widgets/utils.h"
 #include "wx/wxvbam.h"
 
 namespace dialogs {
@@ -17,23 +17,17 @@ JoypadConfig* JoypadConfig::NewInstance(wxWindow* parent) {
     return new JoypadConfig(parent);
 }
 
-JoypadConfig::JoypadConfig(wxWindow* parent) : wxDialog(), keep_on_top_styler_(this) {
-#if !wxCHECK_VERSION(3, 1, 0)
-    // This needs to be set before loading any element on the window. This also
-    // has no effect since wx 3.1.0, where it became the default.
-    this->SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);
-#endif
-    wxXmlResource::Get()->LoadDialog(this, parent, "JoypadConfig");
-
+JoypadConfig::JoypadConfig(wxWindow* parent) : BaseDialog(parent, "JoypadConfig") {
     this->Bind(wxEVT_CHECKBOX, std::bind(&JoypadConfig::ToggleSDLGameControllerMode, this),
                XRCID("SDLGameControllerMode"));
 
-    GetValidatedChild<wxCheckBox>(this, "SDLGameControllerMode")->SetValue(OPTION(kSDLGameControllerMode));
+    GetValidatedChild<wxCheckBox>("SDLGameControllerMode")
+        ->SetValue(OPTION(kSDLGameControllerMode));
 
     for (int joypad = 0; joypad < 4; joypad++) {
-        wxWindow* panel = GetValidatedChild(this, wxString::Format("joy%d", joypad + 1));
+        wxWindow* panel = GetValidatedChild(wxString::Format("joy%d", joypad + 1));
 
-        GetValidatedChild(panel, "DefaultConfig")
+        widgets::GetValidatedChild(panel, "DefaultConfig")
             ->SetValidator(
                 widgets::OptionSelectedValidator(config::OptionID::kJoyDefault, joypad + 1));
 
@@ -45,7 +39,7 @@ JoypadConfig::JoypadConfig(wxWindow* parent) : wxDialog(), keep_on_top_styler_(t
         for (const config::GameKey& game_key : config::kAllGameKeys) {
             const wxString game_key_name = config::GameKeyToString(game_key);
             widgets::UserInputCtrl* game_key_control =
-                GetValidatedChild<widgets::UserInputCtrl>(panel, game_key_name);
+                widgets::GetValidatedChild<widgets::UserInputCtrl>(panel, game_key_name);
             wxWindow* current_parent = game_key_control->GetParent();
 
             game_key_control->SetValidator(
@@ -77,28 +71,28 @@ JoypadConfig::JoypadConfig(wxWindow* parent) : wxDialog(), keep_on_top_styler_(t
 
 void JoypadConfig::ResetToDefaults(wxWindow* panel) {
     for (const config::GameKey& game_key : config::kAllGameKeys) {
-        GetValidatedChild<widgets::UserInputCtrl>(panel, config::GameKeyToString(game_key))
+        widgets::GetValidatedChild<widgets::UserInputCtrl>(panel, config::GameKeyToString(game_key))
             ->SetInputs(kDefaultBindings.find(config::GameControl(0, game_key))->second);
     }
 }
 
 void JoypadConfig::ClearJoypad(wxWindow* panel) {
     for (const config::GameKey& game_key : config::kAllGameKeys) {
-        GetValidatedChild<widgets::UserInputCtrl>(panel, config::GameKeyToString(game_key))
+        widgets::GetValidatedChild<widgets::UserInputCtrl>(panel, config::GameKeyToString(game_key))
             ->Clear();
     }
 }
 
 void JoypadConfig::ToggleSDLGameControllerMode() {
-    OPTION(kSDLGameControllerMode) = GetValidatedChild<wxCheckBox>(this, "SDLGameControllerMode")
-                                        ->IsChecked();
+    OPTION(kSDLGameControllerMode) =
+        GetValidatedChild<wxCheckBox>("SDLGameControllerMode")->IsChecked();
     ClearAllJoypads();
     wxGetApp().frame->PollAllJoysticks();
 }
 
 void JoypadConfig::ClearAllJoypads() {
     for (unsigned joypad = 0; joypad < 4; joypad++) {
-        wxWindow* panel = GetValidatedChild(this, wxString::Format("joy%d", joypad + 1));
+        wxWindow* panel = GetValidatedChild(wxString::Format("joy%d", joypad + 1));
 
         ClearJoypad(panel);
     }

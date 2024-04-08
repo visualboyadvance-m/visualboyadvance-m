@@ -14,6 +14,7 @@
 #include "core/base/system.h"
 #include "wx/config/option-observer.h"
 #include "wx/config/option.h"
+#include "wx/dialogs/base-dialog.h"
 #include "wx/widgets/dpi-support.h"
 #include "wx/widgets/keep-on-top-styler.h"
 #include "wx/widgets/sdljoy.h"
@@ -292,7 +293,7 @@ public:
 
     // this won't actually be destroyed, but it needs to be tracked so only
     // one is ever up and it needs to be pinged when new messages arrive
-    LogDialog* logdlg;
+    std::unique_ptr<LogDialog> logdlg;
 
     // the cheat search dialog isn't destroyed or tracked, but it needs
     // to be cleared between games
@@ -385,8 +386,6 @@ private:
     void OnSize(wxSizeEvent& event);
     // Load a named wxDialog from the XRC file
     wxDialog* LoadXRCDialog(const char* name);
-    // Load a named wxDialog from the XRC file
-    wxDialog* LoadXRCropertySheetDialog(const char* name);
 
 #include "wx/cmdhandlers.h"
 };
@@ -695,14 +694,13 @@ public:
     DrawingPanel(wxWindow* parent, int _width, int _height);
 };
 
-class LogDialog : public wxDialog {
+class LogDialog : public dialogs::BaseDialog {
 public:
     LogDialog();
     void Update();
 
 private:
     wxTextCtrl* log;
-    widgets::KeepOnTopStyler keep_on_top_styler_;
     void Save(wxCommandEvent& ev);
     void Clear(wxCommandEvent& ev);
 

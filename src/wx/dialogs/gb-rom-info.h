@@ -1,13 +1,11 @@
 #ifndef VBAM_WX_DIALOGS_GB_ROM_INFO_H_
 #define VBAM_WX_DIALOGS_GB_ROM_INFO_H_
 
-#include <wx/dialog.h>
-
-#include "wx/widgets/keep-on-top-styler.h"
+#include "wx/dialogs/base-dialog.h"
 
 namespace dialogs {
 
-class GbRomInfo : public wxDialog {
+class GbRomInfo : public BaseDialog {
 public:
     static GbRomInfo* NewInstance(wxWindow* parent);
     ~GbRomInfo() override = default;
@@ -20,8 +18,6 @@ private:
 
     // Handler for the wxEVT_SHOW event.
     void OnDialogShowEvent(wxShowEvent& event);
-
-    const widgets::KeepOnTopStyler keep_on_top_styler_;
 };
 
 }  // namespace dialogs

@@ -1714,7 +1714,7 @@ EVT_HANDLER_MASK(Disassemble, "Disassemble...", CMDEN_GB | CMDEN_GBA)
 
 EVT_HANDLER(Logging, "Logging...")
 {
-    wxDialog* dlg = wxGetApp().frame->logdlg;
+    wxDialog* dlg = wxGetApp().frame->logdlg.get();
     dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
     dlg->Show();
     dlg->Raise();
