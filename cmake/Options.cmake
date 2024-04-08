@@ -142,12 +142,10 @@ endif()
 
 set(ENABLE_FAUDIO_DEFAULT OFF)
 
-if(WIN32)
-    find_package(FAudio)
+find_package(FAudio)
 
-    if(FAudio_FOUND)
-        set(ENABLE_FAUDIO_DEFAULT ON)
-    endif()
+if(FAudio_FOUND)
+    set(ENABLE_FAUDIO_DEFAULT ON)
 endif()
 
 option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" ${ENABLE_FAUDIO_DEFAULT})
