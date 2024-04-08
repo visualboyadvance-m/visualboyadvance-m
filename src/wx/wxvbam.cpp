@@ -51,6 +51,7 @@
 #include "wx/wayland.h"
 #include "wx/widgets/group-check-box.h"
 #include "wx/widgets/user-input-ctrl.h"
+#include "wx/widgets/utils.h"
 
 #ifdef __WXGTK__
 #include <gdk/gdk.h>
@@ -567,14 +568,8 @@ bool wxvbamApp::OnInit() {
         return false;
     }
 
-    // Measure the full display area.
-    wxRect display_rect;
-    for (unsigned int i = 0; i < wxDisplay::GetCount(); i++) {
-        display_rect.Union(wxDisplay(i).GetClientArea());
-    }
-
     // Ensure we are not drawing out of bounds.
-    if (display_rect.Intersects(client_rect)) {
+    if (widgets::GetDisplayRect().Intersects(client_rect)) {
         frame->SetSize(client_rect);
     }
 
@@ -1257,11 +1252,6 @@ void MainFrame::SetMenusOpened(bool state)
 int MainFrame::ShowModal(wxDialog* dlg)
 {
     dlg->SetWindowStyle(dlg->GetWindowStyle() | wxCAPTION | wxRESIZE_BORDER);
-
-    if (OPTION(kDispKeepOnTop))
-        dlg->SetWindowStyle(dlg->GetWindowStyle() | wxSTAY_ON_TOP);
-    else
-        dlg->SetWindowStyle(dlg->GetWindowStyle() & ~wxSTAY_ON_TOP);
 
     CheckPointer(dlg);
     StartModal();

@@ -295,12 +295,14 @@ void load_opts(bool first_time_launch) {
     for (cont = cfg->GetFirstGroup(s, grp_idx); cont;
          cont = cfg->GetNextGroup(s, grp_idx)) {
         // ignore wxWidgets-managed global library settings
-        if (s == wxT("wxWindows"))
+        if (s == "Persistent_Options") {
             continue;
+        }
 
         // ignore file history
-        if (s == wxT("Recent"))
+        if (s == "Recent") {
             continue;
+        }
 
         cfg->SetPath(s);
         int poff = s.size();

@@ -31,6 +31,8 @@ set(VBAM_WX_COMMON
     config/user-input.h
     dialogs/accel-config.cpp
     dialogs/accel-config.h
+    dialogs/base-dialog.cpp
+    dialogs/base-dialog.h
     dialogs/directories-config.cpp
     dialogs/directories-config.h
     dialogs/display-config.cpp
@@ -45,7 +47,6 @@ set(VBAM_WX_COMMON
     dialogs/joypad-config.h
     dialogs/sound-config.cpp
     dialogs/sound-config.h
-    dialogs/validated-child.h
     drawing.h
     extra-translations.cpp
     gfxviewers.cpp
@@ -79,6 +80,8 @@ set(VBAM_WX_COMMON
     widgets/user-input-ctrl.h
     widgets/sdljoy.cpp
     widgets/sdljoy.h
+    widgets/utils.cpp
+    widgets/utils.h
     widgets/webupdatedef.h
     widgets/wxmisc.h
     widgets/wxmisc.cpp

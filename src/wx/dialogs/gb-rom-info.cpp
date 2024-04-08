@@ -5,8 +5,8 @@
 
 #include "core/base/sizes.h"
 #include "core/gb/gb.h"
+#include "wx/dialogs/base-dialog.h"
 #include "wx/dialogs/game-maker.h"
-#include "wx/dialogs/validated-child.h"
 
 namespace dialogs {
 
@@ -171,14 +171,7 @@ GbRomInfo* GbRomInfo::NewInstance(wxWindow* parent) {
     return new GbRomInfo(parent);
 }
 
-GbRomInfo::GbRomInfo(wxWindow* parent) : wxDialog(), keep_on_top_styler_(this) {
-#if !wxCHECK_VERSION(3, 1, 0)
-    // This needs to be set before loading any element on the window. This also
-    // has no effect since wx 3.1.0, where it became the default.
-    this->SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);
-#endif
-    wxXmlResource::Get()->LoadDialog(this, parent, "GBROMInfo");
-
+GbRomInfo::GbRomInfo(wxWindow* parent) : BaseDialog(parent, "GBROMInfo") {
     Bind(wxEVT_SHOW, &GbRomInfo::OnDialogShowEvent, this);
 }
 
@@ -191,23 +184,23 @@ void GbRomInfo::OnDialogShowEvent(wxShowEvent& event) {
     }
 
     // Populate the dialog.
-    GetValidatedChild(this, "Title")->SetLabel(g_gbCartData.title());
-    GetValidatedChild(this, "MakerCode")->SetLabel(g_gbCartData.maker_code());
-    GetValidatedChild(this, "MakerName")->SetLabel(GetGameMakerName(g_gbCartData.maker_code()));
-    GetValidatedChild(this, "CartridgeType")->SetLabel(GetCartType());
-    GetValidatedChild(this, "SGBCode")->SetLabel(GetCartSGBFlag());
-    GetValidatedChild(this, "CGBCode")->SetLabel(GetCartCGBFlag());
-    GetValidatedChild(this, "ROMSize")->SetLabel(GetCartRomSize());
-    GetValidatedChild(this, "RAMSize")->SetLabel(GetCartRamSize());
-    GetValidatedChild(this, "DestCode")->SetLabel(GetCartDestinationCode());
-    GetValidatedChild(this, "LicCode")
+    GetValidatedChild("Title")->SetLabel(g_gbCartData.title());
+    GetValidatedChild("MakerCode")->SetLabel(g_gbCartData.maker_code());
+    GetValidatedChild("MakerName")->SetLabel(GetGameMakerName(g_gbCartData.maker_code()));
+    GetValidatedChild("CartridgeType")->SetLabel(GetCartType());
+    GetValidatedChild("SGBCode")->SetLabel(GetCartSGBFlag());
+    GetValidatedChild("CGBCode")->SetLabel(GetCartCGBFlag());
+    GetValidatedChild("ROMSize")->SetLabel(GetCartRomSize());
+    GetValidatedChild("RAMSize")->SetLabel(GetCartRamSize());
+    GetValidatedChild("DestCode")->SetLabel(GetCartDestinationCode());
+    GetValidatedChild("LicCode")
         ->SetLabel(wxString::Format("%02X", g_gbCartData.old_licensee_code()));
-    GetValidatedChild(this, "Version")
+    GetValidatedChild("Version")
         ->SetLabel(wxString::Format("%02X", g_gbCartData.version_flag()));
-    GetValidatedChild(this, "HeaderChecksum")
+    GetValidatedChild("HeaderChecksum")
         ->SetLabel(wxString::Format(_("%02X (Actual: %02X)"), g_gbCartData.header_checksum(),
                                     g_gbCartData.actual_header_checksum()));
-    GetValidatedChild(this, "CartridgeChecksum")
+    GetValidatedChild("CartridgeChecksum")
         ->SetLabel(wxString::Format(_("%04X (Actual: %04X)"), g_gbCartData.global_checksum(),
                                     g_gbCartData.actual_global_checksum()));
 

@@ -1428,7 +1428,7 @@ void log(const char* defaultMsg, ...)
     wxGetApp().log.append(msg);
 
     if (wxGetApp().IsMainLoopRunning()) {
-        LogDialog* d = wxGetApp().frame->logdlg;
+        LogDialog* d = wxGetApp().frame->logdlg.get();
 
         if (d && d->IsShown()) {
             d->Update();

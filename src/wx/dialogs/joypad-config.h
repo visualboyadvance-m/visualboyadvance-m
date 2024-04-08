@@ -1,14 +1,11 @@
 #ifndef VBAM_WX_DIALOGS_JOYPAD_CONFIG_H_
 #define VBAM_WX_DIALOGS_JOYPAD_CONFIG_H_
 
-#include <wx/dialog.h>
-
-#include "wx/widgets/keep-on-top-styler.h"
-
+#include "wx/dialogs/base-dialog.h"
 namespace dialogs {
 
 // Manages the Joypad configuration dialog.
-class JoypadConfig : public wxDialog {
+class JoypadConfig : public BaseDialog {
 public:
     static JoypadConfig* NewInstance(wxWindow* parent);
     ~JoypadConfig() override = default;
@@ -30,8 +27,6 @@ private:
     
     // Toggle SDL GameController mode for all joysticks.
     void ToggleSDLGameControllerMode();
-
-    const widgets::KeepOnTopStyler keep_on_top_styler_;
 };
 
 }  // namespace dialogs

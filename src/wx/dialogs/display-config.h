@@ -1,11 +1,8 @@
 #ifndef VBAM_WX_DIALOGS_DISPLAY_CONFIG_H_
 #define VBAM_WX_DIALOGS_DISPLAY_CONFIG_H_
 
-#include <wx/dialog.h>
-#include <wx/event.h>
-
+#include "wx/dialogs/base-dialog.h"
 #include "wx/config/option-observer.h"
-#include "wx/widgets/keep-on-top-styler.h"
 
 // Forward declarations.
 class wxChoice;
@@ -19,7 +16,7 @@ class Option;
 namespace dialogs {
 
 // Manages the display configuration dialog.
-class DisplayConfig : public wxDialog {
+class DisplayConfig : public BaseDialog {
 public:
     static DisplayConfig* NewInstance(wxWindow* parent);
     ~DisplayConfig() override = default;
@@ -58,7 +55,6 @@ private:
     wxChoice* interframe_selector_;
     const config::OptionsObserver filter_observer_;
     const config::OptionsObserver interframe_observer_;
-    const widgets::KeepOnTopStyler keep_on_top_styler_;
 };
 
 }  // namespace dialogs

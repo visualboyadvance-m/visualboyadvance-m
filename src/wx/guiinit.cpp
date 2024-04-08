@@ -40,6 +40,7 @@
 #include "core/gba/gbaGlobals.h"
 #include "wx/config/option-proxy.h"
 #include "wx/dialogs/accel-config.h"
+#include "wx/dialogs/base-dialog.h"
 #include "wx/dialogs/directories-config.h"
 #include "wx/dialogs/display-config.h"
 #include "wx/dialogs/game-boy-config.h"
@@ -64,26 +65,8 @@ const
 #undef wxvbam
 #endif
 
-    // this is supposed to happen automatically if a parent is marked recursive
-    // but some dialogs don't do it (propertydialog?)
-    // so go ahead and mark all dialogs for fully recursive validation
-    static void
-    mark_recursive(wxWindowBase* w)
-{
-    w->SetExtraStyle(w->GetExtraStyle() | wxWS_EX_VALIDATE_RECURSIVELY);
-    wxWindowList l = w->GetChildren();
-
-    for (wxWindowList::iterator ch = l.begin(); ch != l.end(); ++ch)
-        mark_recursive(*ch);
-}
-
-#if (wxMAJOR_VERSION < 3)
-#define GetXRCDialog(n) \
-    wxStaticCast(wxGetApp().frame->FindWindow(XRCID(n)), wxDialog)
-#else
 #define GetXRCDialog(n) \
     wxStaticCast(wxGetApp().frame->FindWindowByName(n), wxDialog)
-#endif
 
 // Event handlers must be methods of wxEvtHandler-derived objects
 
@@ -343,11 +326,6 @@ public:
             wxDialog* subdlg = GetXRCDialog("CheatEdit");
             dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
 
-            if (OPTION(kDispKeepOnTop))
-                subdlg->SetWindowStyle(subdlg->GetWindowStyle() | wxSTAY_ON_TOP);
-            else
-                subdlg->SetWindowStyle(subdlg->GetWindowStyle() & ~wxSTAY_ON_TOP);
-
             subdlg->ShowModal();
             AddCheat();
             Reload(ncheats);
@@ -565,11 +543,6 @@ public:
 
         wxDialog* subdlg = GetXRCDialog("CheatEdit");
         dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
-
-        if (OPTION(kDispKeepOnTop))
-            subdlg->SetWindowStyle(subdlg->GetWindowStyle() | wxSTAY_ON_TOP);
-        else
-            subdlg->SetWindowStyle(subdlg->GetWindowStyle() & ~wxSTAY_ON_TOP);
 
         if (subdlg->ShowModal() != wxID_OK)
             return;
@@ -1098,11 +1071,6 @@ public:
         wxDialog* subdlg = GetXRCDialog("CheatAdd");
         dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
 
-        if (OPTION(kDispKeepOnTop))
-            subdlg->SetWindowStyle(subdlg->GetWindowStyle() | wxSTAY_ON_TOP);
-        else
-            subdlg->SetWindowStyle(subdlg->GetWindowStyle() & ~wxSTAY_ON_TOP);
-
         if (subdlg->ShowModal() != wxID_OK)
             return;
 
@@ -1629,38 +1597,8 @@ void CheckThrowXRCError(T pointer, const char* name)
 wxDialog* MainFrame::LoadXRCDialog(const char* name)
 {
     wxString dname = wxString::FromUTF8(name);
-    wxDialog* dialog = wxXmlResource::Get()->LoadDialog(this, dname);
+    wxDialog* dialog = dialogs::BaseDialog::LoadDialog(this, dname);
     CheckThrowXRCError(dialog, name);
-/* wx-2.9.1 doesn't set parent for propertysheetdialogs for some reason */
-/* this will generate a gtk warning but it is necessary for later */
-/* retrieval using FindWindow() */
-#if (wxMAJOR_VERSION < 3)
-
-    if (!dialog->GetParent())
-        dialog->Reparent(this);
-
-#endif
-    mark_recursive(dialog);
-    return dialog;
-}
-
-wxDialog* MainFrame::LoadXRCropertySheetDialog(const char* name)
-{
-    wxString dname = wxString::FromUTF8(name);
-    //Seems like the only way to do this
-    wxObject* anObject = wxXmlResource::Get()->LoadObject(this, dname, wxEmptyString);
-    wxDialog* dialog = dynamic_cast<wxDialog*>(anObject);
-    CheckThrowXRCError(dialog, name);
-/* wx-2.9.1 doesn't set parent for propertysheetdialogs for some reason */
-/* this will generate a gtk warning but it is necessary for later */
-/* retrieval using FindWindow() */
-#if (wxMAJOR_VERSION < 3)
-
-    if (!dialog->GetParent())
-        dialog->Reparent(this);
-
-#endif
-    mark_recursive(dialog);
     return dialog;
 }
 
@@ -2488,7 +2426,7 @@ bool MainFrame::BindControls()
         fp->SetValidator(wxFileDirPickerValidator(&o, l)); \
     } while (0)
         dialogs::GameBoyConfig::NewInstance(this);
-        d = LoadXRCropertySheetDialog("GameBoyAdvanceConfig");
+        d = LoadXRCDialog("GameBoyAdvanceConfig");
         {
             /// System and peripherals
             ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "SaveType", wxGenericValidator(&coreOptions.cpuSaveType));
@@ -2554,7 +2492,7 @@ bool MainFrame::BindControls()
     // at popup time.
     // The only one that can only be popped up once is logging, so allocate
     // and check it already.
-    logdlg = new LogDialog;
+    logdlg = std::make_unique<LogDialog>();
 // activate OnDropFile event handler
 #if !defined(__WXGTK__) || wxCHECK_VERSION(2, 8, 10)
     // may not actually do anything, but verfied to work w/ Linux/Nautilus

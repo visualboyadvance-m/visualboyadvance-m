@@ -5,12 +5,10 @@
 #include <wx/listbox.h>
 #include <wx/menu.h>
 #include <wx/msgdlg.h>
-#include <wx/xrc/xmlres.h>
 
 #include "wx/config/shortcuts.h"
 #include "wx/config/user-input.h"
-#include "wx/dialogs/validated-child.h"
-#include "wx/opts.h"
+#include "wx/dialogs/base-dialog.h"
 #include "wx/widgets/user-input-ctrl.h"
 #include "wx/wxvbam.h"
 
@@ -132,21 +130,16 @@ AccelConfig* AccelConfig::NewInstance(wxWindow* parent, wxMenuBar* menu, wxMenu*
 }
 
 AccelConfig::AccelConfig(wxWindow* parent, wxMenuBar* menu, wxMenu* recents)
-    : wxDialog(), keep_on_top_styler_(this) {
-    assert(parent);
+    : BaseDialog(parent, "AccelConfig") {
     assert(menu);
 
-    // Load the dialog XML.
-    const bool success = wxXmlResource::Get()->LoadDialog(this, parent, "AccelConfig");
-    assert(success);
-
     // Loads the various dialog elements.
-    tree_ = GetValidatedChild<wxTreeCtrl>(this, "Commands");
-    current_keys_ = GetValidatedChild<wxListBox>(this, "Current");
-    assign_button_ = GetValidatedChild(this, "Assign");
-    remove_button_ = GetValidatedChild(this, "Remove");
-    key_input_ = GetValidatedChild<widgets::UserInputCtrl>(this, "Shortcut");
-    currently_assigned_label_ = GetValidatedChild<wxControl>(this, "AlreadyThere");
+    tree_ = GetValidatedChild<wxTreeCtrl>("Commands");
+    current_keys_ = GetValidatedChild<wxListBox>("Current");
+    assign_button_ = GetValidatedChild("Assign");
+    remove_button_ = GetValidatedChild("Remove");
+    key_input_ = GetValidatedChild<widgets::UserInputCtrl>("Shortcut");
+    currently_assigned_label_ = GetValidatedChild<wxControl>("AlreadyThere");
 
     // Configure the key input.
     key_input_->MoveBeforeInTabOrder(assign_button_);

@@ -544,11 +544,9 @@ void MainFrame::IOViewer()
             baddialog();                                                \
         cb->SetValidator(wxBoolIntValidator(&systemVerbose, val, val)); \
     } while (0)
-LogDialog::LogDialog() : keep_on_top_styler_(this) {
+LogDialog::LogDialog() :
+dialogs::BaseDialog(nullptr, "Logging") {
     const wxString dname = wxT("Logging");
-
-    if (!wxXmlResource::Get()->LoadDialog(this, wxGetApp().frame, dname))
-        baddialog();
 
     SetEscapeId(wxID_OK);
     getlogf("SWI", VERBOSE_SWI);

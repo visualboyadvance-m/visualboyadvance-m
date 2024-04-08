@@ -1,12 +1,18 @@
-#ifndef VBAM_WX_DIALOGS_VALIDATED_CHILD_H_
-#define VBAM_WX_DIALOGS_VALIDATED_CHILD_H_
+#ifndef VBAM_WX_WIDGETS_UTILS_H_
+#define VBAM_WX_WIDGETS_UTILS_H_
 
 #include <cassert>
 
-#include <wx/string.h>
 #include <wx/window.h>
+#include <wx/gdicmn.h>
 
-namespace dialogs {
+// This file contains a collection of various utility functions for wxWidgets.
+
+namespace widgets {
+
+// Helper function to get the display rectangle. Useful for avoiding drawing a
+// dialog outside the screen.
+wxRect GetDisplayRect();
 
 // Helper functions to assert on the returned value.
 inline wxWindow* GetValidatedChild(const wxWindow* parent,
@@ -23,6 +29,7 @@ T* GetValidatedChild(const wxWindow* parent, const wxString& name) {
     return child;
 }
 
-}  // namespace dialogs
 
-#endif  // VBAM_WX_DIALOGS_VALIDATED_CHILD_H_
+} // namespace widgets
+
+#endif // VBAM_WX_WIDGETS_UTILS_H_
