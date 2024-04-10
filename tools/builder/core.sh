@@ -41,7 +41,7 @@ case "\$CC" in
 esac
 
 export CPPFLAGS="$CPPFLAGS${CPPFLAGS:+ }-I\$BUILD_ROOT/root/include -DCURL_STATICLIB -DGRAPHITE2_STATIC -DFLOAT_APPROX"
-export CFLAGS="$CFLAGS${CFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -pthread -lm -DCURL_STATICLIB -DGRAPHITE2_STATIC -DFLOAT_APPROX -Ofast -march=core2 -mtune=generic -pipe"
+export CFLAGS="$CFLAGS${CFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -pthread -lm -DCURL_STATICLIB -DGRAPHITE2_STATIC -DFLOAT_APPROX -Ofast -march=core2 -mtune=generic -pipe -Wno-error=implicit-int"
 export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -DCURL_STATICLIB -DGRAPHITE2_STATIC -DFLOAT_APPROX -Ofast -march=core2 -mtune=generic -pipe"
 export OBJCXXFLAGS="$OBJCXXFLAGS${OBJCXXFLAGS:+ }-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -DCURL_STATICLIB -DGRAPHITE2_STATIC -DFLOAT_APPROX -Ofast -march=core2 -mtune=generic -pipe"
 export LDFLAGS="$LDFLAGS${LDFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -pthread -lm -Ofast -march=core2 -mtune=generic -pipe"
@@ -122,9 +122,9 @@ DISTS=$DISTS'
     xorg-macros     https://www.x.org/archive//individual/util/util-macros-1.19.1.tar.bz2                       share/pkgconfig/xorg-macros.pc
     help2man        https://ftp.gnu.org/gnu/help2man/help2man-1.49.2.tar.xz                                     bin/help2man
     libiconv        https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz                                   lib/libiconv.a
-    gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-0.21.tar.xz                                  lib/libintl.a
+    gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-0.22.5.tar.xz                                    lib/libintl.a
     getopt          http://frodo.looijaard.name/system/files/software/getopt/getopt-1.1.6.tar.gz                bin/getopt
-    gsed            http://ftp.gnu.org/gnu/sed/sed-4.8.tar.xz                                                   bin/sed
+    gsed            http://ftp.gnu.org/gnu/sed/sed-4.9.tar.xz                                                   bin/sed
     bison           https://ftp.gnu.org/gnu/bison/bison-3.8.2.tar.xz                                            bin/bison
     texinfo         http://ftp.gnu.org/gnu/texinfo/texinfo-6.8.tar.xz                                           bin/makeinfo
     flex-2.6.3      https://github.com/westes/flex/releases/download/v2.6.3/flex-2.6.3.tar.gz                   bin/flex
@@ -179,13 +179,14 @@ DISTS=$DISTS'
     libgpg-error    https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.45.tar.bz2                         lib/libgpg-error.a
     libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.1.tar.bz2                             lib/libgcrypt.a
     libsecret       https://gitlab.gnome.org/GNOME/libsecret/-/archive/0.20.5/libsecret-0.20.5.tar.bz2          lib/libsecret-1.a
-    sdl2            https://github.com/libsdl-org/SDL/releases/download/release-2.28.5/SDL2-2.28.5.tar.gz       lib/libSDL2.a
+    sdl2            https://github.com/libsdl-org/SDL/releases/download/release-2.30.2/SDL2-2.30.2.tar.gz       lib/libSDL2.a
+    faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/24.04.tar.gz                            lib/libFAudio.a
     flac            https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.3.4.tar.xz                             lib/libFLAC.a
     harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/5.1.0/harfbuzz-5.1.0.tar.xz          lib/libharfbuzz.a
     sfml            https://github.com/SFML/SFML/archive/refs/tags/2.6.1.tar.gz                                 lib/libsfml-system-s.a
     shared-mime-info https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.2/shared-mime-info-2.2.tar.bz2  bin/update-mime-database
     wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.4/wxWidgets-3.2.4.tar.bz2     lib/libwx_baseu-3.*.a
-    ffmpeg          http://ffmpeg.org/releases/ffmpeg-6.1.tar.xz                                                lib/libavformat.a
+    ffmpeg          https://ffmpeg.org/releases/ffmpeg-6.1.1.tar.xz                                             lib/libavformat.a
 '
 
 BUILD_FFMPEG=1
@@ -2694,7 +2695,7 @@ find_checkout() {
     (
         cd "$(dirname "$0")"
         while [ "$PWD" != / ]; do
-            if [ -f src/version.h.in ]; then
+            if [ -f src/wx/wxvbam.h ]; then
                 puts "$PWD"
                 exit 0
             fi

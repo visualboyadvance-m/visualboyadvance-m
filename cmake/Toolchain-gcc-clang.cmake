@@ -56,7 +56,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
 endif()
 
 if(VBAM_STATIC)
-    add_link_options(-static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread)
+    if(APPLE)
+        add_link_options(-static-libstdc++)
+    else()
+        add_link_options(-static-libgcc -static-libstdc++ -Wl,-Bstatic -lgcc -lstdc++ -lpthread)
+    endif()
 endif()
 
 # To support LTO, this must always fail.
