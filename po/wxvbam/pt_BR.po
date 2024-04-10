@@ -48,7 +48,7 @@ msgstr ""
 
 #: audio/internal/openal.cpp:189
 msgid "OpenAL: Failed to open audio device"
-msgstr ""
+msgstr "OpenAL: Falhou em abrir o dispositivo de áudio"
 
 #: audio/internal/openal.cpp:387 audio/internal/faudio.cpp:602
 #: audio/internal/xaudio2.cpp:577
