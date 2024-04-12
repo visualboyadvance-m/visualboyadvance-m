@@ -1936,6 +1936,7 @@ void CPUSwitchMode(int mode, bool saveState, bool breakLoop)
         CPUSwap(&reg[12].I, &reg[R12_FIQ].I);
         reg[13].I = reg[R13_FIQ].I;
         reg[14].I = reg[R14_FIQ].I;
+        reg[16].I = SPSR;
         if (saveState)
             reg[17].I = CPSR;
         else
