@@ -142,7 +142,7 @@ endif()
 
 set(ENABLE_FAUDIO_DEFAULT OFF)
 
-find_package(FAudio)
+find_package(FAudio QUIET)
 
 if(FAudio_FOUND)
     set(ENABLE_FAUDIO_DEFAULT ON)
