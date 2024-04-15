@@ -137,18 +137,7 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
         }
     }
     if (!isSupported && acodec->supported_samplerates) return MRET_ERR_NOCODEC;
-    aenc->channels = av_get_channel_layout_nb_channels(aenc->channel_layout);
-    aenc->channel_layout = AV_CH_LAYOUT_STEREO;
-    if (acodec->channel_layouts)
-    {
-        aenc->channel_layout = acodec->channel_layouts[0];
-        for (int i = 0; acodec->channel_layouts[i]; ++i)
-        {
-            if (acodec->channel_layouts[i] == AV_CH_LAYOUT_STEREO)
-                aenc->channel_layout = AV_CH_LAYOUT_STEREO;
-        }
-    }
-    aenc->channels = av_get_channel_layout_nb_channels(aenc->channel_layout);
+    av_channel_layout_from_mask(&(aenc->ch_layout), AV_CH_LAYOUT_STEREO);
     aenc->time_base = { 1, aenc->sample_rate };
     ast->time_base  = { 1, STREAM_FRAME_RATE };
     // open and use codec on stream
@@ -169,7 +158,7 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
     audioframeTmp = av_frame_alloc();
     if (!audioframeTmp) return MRET_ERR_BUFSIZE;
     audioframeTmp->format = IN_SOUND_FORMAT;
-    audioframeTmp->channel_layout = aenc->channel_layout;
+    audioframeTmp->ch_layout = aenc->ch_layout;
     audioframeTmp->sample_rate = aenc->sample_rate;
     audioframeTmp->nb_samples = nb_samples;
     if (nb_samples)
@@ -181,7 +170,7 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
     audioframe = av_frame_alloc();
     if (!audioframe) return MRET_ERR_BUFSIZE;
     audioframe->format = aenc->sample_fmt;
-    audioframe->channel_layout = aenc->channel_layout;
+    audioframe->ch_layout = aenc->ch_layout;
     audioframe->sample_rate = aenc->sample_rate;
     audioframe->nb_samples = nb_samples;
     if (nb_samples)
@@ -195,10 +184,10 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
     {
         return MRET_ERR_BUFSIZE;
     }
-    av_opt_set_int       (swr, "in_channel_count",  aenc->channels,    0);
+    av_opt_set_chlayout  (swr, "in_chlayout",       &(aenc->ch_layout),0);
     av_opt_set_int       (swr, "in_sample_rate",    aenc->sample_rate, 0);
     av_opt_set_sample_fmt(swr, "in_sample_fmt",     IN_SOUND_FORMAT,   0);
-    av_opt_set_int       (swr, "out_channel_count", aenc->channels,    0);
+    av_opt_set_chlayout  (swr, "out_chlayout",      &(aenc->ch_layout),0);
     av_opt_set_int       (swr, "out_sample_rate",   aenc->sample_rate, 0);
     av_opt_set_sample_fmt(swr, "out_sample_fmt",    aenc->sample_fmt,  0);
     if (swr_init(swr) < 0)
@@ -207,8 +196,8 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
         return MRET_ERR_BUFSIZE;
     }
     // auxiliary buffer for setting up frames for encode
-    audioBufferSize = nb_samples * aenc->channels * sizeof(uint16_t);
-    audioBuffer = (uint16_t *) calloc(nb_samples * aenc->channels, sizeof(uint16_t));
+    audioBufferSize = nb_samples * 2 * sizeof(uint16_t);
+    audioBuffer = (uint16_t *) calloc(nb_samples * 2, sizeof(uint16_t));
     if (!audioBuffer) return MRET_ERR_BUFSIZE;
     samplesInAudioBuffer = 0;
     posInAudioBuffer = 0;
@@ -565,7 +554,7 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
 {
     if (!isRecording) return MRET_OK;
     AVCodecContext *c = aenc;
-    int samples_size = av_samples_get_buffer_size(NULL, c->channels, audioframeTmp->nb_samples, IN_SOUND_FORMAT, 1);
+    int samples_size = av_samples_get_buffer_size(NULL, 2, audioframeTmp->nb_samples, IN_SOUND_FORMAT, 1);
 
     int realLength = length / sizeof *aud;
     bool isMissing = false;
@@ -606,7 +595,7 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
     pkt->data = NULL;
     pkt->size = 0;
 
-    if (avcodec_fill_audio_frame(audioframeTmp, c->channels, IN_SOUND_FORMAT, (const uint8_t *)audioBuffer, samples_size, 1) < 0)
+    if (avcodec_fill_audio_frame(audioframeTmp, 2, IN_SOUND_FORMAT, (const uint8_t *)audioBuffer, samples_size, 1) < 0)
     {
         return MRET_ERR_RECORDING;
     }
