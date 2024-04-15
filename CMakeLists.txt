@@ -77,8 +77,6 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 
 project(VBA-M C CXX)
 
-find_package(PkgConfig)
-
 if(NOT CMAKE_PREFIX_PATH AND (NOT ("$ENV{CMAKE_PREFIX_PATH}" STREQUAL "")))
     set(CMAKE_PREFIX_PATH "$ENV{CMAKE_PREFIX_PATH}")
 endif()

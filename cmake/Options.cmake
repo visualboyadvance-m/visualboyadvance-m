@@ -54,6 +54,14 @@ cmake_dependent_option(ENABLE_MMX "Enable MMX" ${MMX_DEFAULT} "ENABLE_ASM_SCALER
 
 option(ENABLE_LIRC "Enable LIRC support" OFF)
 
+# Add support for Homebrew, MacPorts and Fink on macOS
+option(DISABLE_MACOS_PACKAGE_MANAGERS "Set to TRUE to disable support for macOS Homebrew, MacPorts and Fink." FALSE)
+if(APPLE AND NOT DISABLE_MACOS_PACKAGE_MANAGERS)
+    include(MacPackageManagers)
+endif()
+
+find_package(PkgConfig)
+
 # Link / SFML
 if(TRANSLATIONS_ONLY)
     set(ENABLE_LINK_DEFAULT OFF)
@@ -118,12 +126,6 @@ endif()
 option(ENABLE_LTO "Compile with Link Time Optimization" ${LTO_DEFAULT})
 
 option(ENABLE_GBA_LOGGING "Enable extended GBA logging" ON)
-
-# Add support for Homebrew, MacPorts and Fink on macOS
-option(DISABLE_MACOS_PACKAGE_MANAGERS "Set to TRUE to disable support for macOS Homebrew, MacPorts and Fink." FALSE)
-if(APPLE AND NOT DISABLE_MACOS_PACKAGE_MANAGERS)
-    include(MacPackageManagers)
-endif()
 
 option(UPSTREAM_RELEASE "do some optimizations and release automation tasks" OFF)
 

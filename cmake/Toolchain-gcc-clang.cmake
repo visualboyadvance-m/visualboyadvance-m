@@ -18,12 +18,13 @@ add_compile_options(
     $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-copy>
     -Wformat
     -Wformat-security
-    -feliminate-unused-debug-types
     -fdiagnostics-color=always
 )
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     add_compile_options(-Wno-unused-command-line-argument)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(-feliminate-unused-debug-types)
 endif()
 
 # check if ssp flags are supported.
