@@ -186,7 +186,7 @@ DISTS=$DISTS'
     sfml            https://github.com/SFML/SFML/archive/refs/tags/2.6.1.tar.gz                                 lib/libsfml-system-s.a
     shared-mime-info https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.2/shared-mime-info-2.2.tar.bz2  bin/update-mime-database
     wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.4/wxWidgets-3.2.4.tar.bz2     lib/libwx_baseu-3.*.a
-    ffmpeg          https://ffmpeg.org/releases/ffmpeg-6.1.1.tar.xz                                             lib/libavformat.a
+    ffmpeg          https://ffmpeg.org/releases/ffmpeg-7.0.tar.xz                                               lib/libavformat.a
 '
 
 BUILD_FFMPEG=1
