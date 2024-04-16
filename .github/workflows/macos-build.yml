@@ -27,6 +27,8 @@ jobs:
           - build_type: debug
             build_options: translations_only
     runs-on: macos-latest
+    env:
+      NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM: 1
 
     steps:
       - name: Checkout the code

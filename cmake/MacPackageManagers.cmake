@@ -11,8 +11,8 @@
 # In addition, the following commands are called with the package manager's
 # paths:
 #
-# INCLUDE_DIRECTORIES()
-# LINK_DIRECTORIES()
+# include_directories()
+# link_directories()
 #
 # The paths of package managers not currently in $ENV{PATH} are added to
 # CMAKE_IGNORE_PATH .
@@ -41,68 +41,75 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IF(NOT APPLE)
-    RETURN()
-ENDIF()
+if(NOT APPLE)
+    return()
+endif()
 
-IF(EXISTS /usr/local/bin/brew AND $ENV{PATH} MATCHES "(^|:)/usr/local/bin/?(:|$)")
-    MESSAGE("-- Configuring for Mac Homebrew")
+if(NOT "$ENV{IN_NIX_SHELL}" STREQUAL "")
+    message(STATUS "Configuring for Nix")
 
-    SET(MAC_HOMEBREW ON)
+    set(NIX ON)
 
-    SET(CMAKE_IGNORE_PATH /opt/local /opt/local/bin /opt/local/include /opt/local/Library/Frameworks /opt/local/lib ${CMAKE_IGNORE_PATH})
-    SET(CMAKE_IGNORE_PATH /sw /sw/bin /sw/include /sw/Library/Frameworks /sw/lib ${CMAKE_IGNORE_PATH})
+    set(CMAKE_IGNORE_PATH /opt/local /opt/local/bin /opt/local/include /opt/local/Library/Frameworks /opt/local/lib ${CMAKE_IGNORE_PATH})
+    set(CMAKE_IGNORE_PATH /sw /sw/bin /sw/include /sw/Library/Frameworks /sw/lib ${CMAKE_IGNORE_PATH})
+elseif(EXISTS /usr/local/bin/brew AND $ENV{PATH} MATCHES "(^|:)/usr/local/bin/?(:|$)")
+    message(STATUS "Configuring for Mac Homebrew")
 
-    SET(CMAKE_FRAMEWORK_PATH /usr/local/Frameworks ${CMAKE_FRAMEWORK_PATH})
+    set(MAC_HOMEBREW ON)
 
-    SET(CMAKE_INCLUDE_PATH /usr/local/include ${CMAKE_INCLUDE_PATH})
-    INCLUDE_DIRECTORIES("/usr/local/include")
+    set(CMAKE_IGNORE_PATH /opt/local /opt/local/bin /opt/local/include /opt/local/Library/Frameworks /opt/local/lib ${CMAKE_IGNORE_PATH})
+    set(CMAKE_IGNORE_PATH /sw /sw/bin /sw/include /sw/Library/Frameworks /sw/lib ${CMAKE_IGNORE_PATH})
 
-    SET(CMAKE_LIBRARY_PATH /usr/local/lib ${CMAKE_LIBRARY_PATH})
-    LINK_DIRECTORIES("/usr/local/lib")
+    set(CMAKE_FRAMEWORK_PATH /usr/local/Frameworks ${CMAKE_FRAMEWORK_PATH})
 
-    SET(CMAKE_PROGRAM_PATH /usr/local/bin ${CMAKE_PROGRAM_PATH})
+    set(CMAKE_INCLUDE_PATH /usr/local/include ${CMAKE_INCLUDE_PATH})
+    include_directories("/usr/local/include")
+
+    set(CMAKE_LIBRARY_PATH /usr/local/lib ${CMAKE_LIBRARY_PATH})
+    link_directories("/usr/local/lib")
+
+    set(CMAKE_PROGRAM_PATH /usr/local/bin ${CMAKE_PROGRAM_PATH})
 
     set(ZLIB_ROOT /usr/local/opt/zlib)
-ELSEIF(EXISTS /opt/local/bin/port AND $ENV{PATH} MATCHES "(^|:)/opt/local/bin/?(:|$)")
-    MESSAGE("-- Configuring for MacPorts")
+elseif(EXISTS /opt/local/bin/port AND $ENV{PATH} MATCHES "(^|:)/opt/local/bin/?(:|$)")
+    message(STATUS "Configuring for MacPorts")
 
-    SET(MACPORTS ON)
+    set(MACPORTS ON)
 
-    SET(CMAKE_IGNORE_PATH /sw /sw/bin /sw/include /sw/Library/Frameworks /sw/lib ${CMAKE_IGNORE_PATH})
+    set(CMAKE_IGNORE_PATH /sw /sw/bin /sw/include /sw/Library/Frameworks /sw/lib ${CMAKE_IGNORE_PATH})
 
-    SET(CMAKE_FRAMEWORK_PATH /opt/local/Library/Frameworks ${CMAKE_FRAMEWORK_PATH})
+    set(CMAKE_FRAMEWORK_PATH /opt/local/Library/Frameworks ${CMAKE_FRAMEWORK_PATH})
 
-    SET(CMAKE_INCLUDE_PATH /opt/local/include ${CMAKE_INCLUDE_PATH})
-    INCLUDE_DIRECTORIES("/opt/local/include")
+    set(CMAKE_INCLUDE_PATH /opt/local/include ${CMAKE_INCLUDE_PATH})
+    include_directories("/opt/local/include")
 
-    SET(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
-    LINK_DIRECTORIES("/opt/local/lib")
+    set(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
+    link_directories("/opt/local/lib")
 
-    SET(CMAKE_PROGRAM_PATH /opt/local/bin ${CMAKE_PROGRAM_PATH})
-ELSEIF(EXISTS /sw/bin/fink AND $ENV{PATH} MATCHES "(^|:)/sw/bin/?(:|$)")
-    MESSAGE("-- Configuring for Fink")
+    set(CMAKE_PROGRAM_PATH /opt/local/bin ${CMAKE_PROGRAM_PATH})
+elseif(EXISTS /sw/bin/fink AND $ENV{PATH} MATCHES "(^|:)/sw/bin/?(:|$)")
+    message(STATUS "Configuring for Fink")
 
-    SET(FINK ON)
+    set(FINK ON)
 
-    SET(CMAKE_IGNORE_PATH /opt/local /opt/local/bin /opt/local/include /opt/local/Library/Frameworks /opt/local/lib ${CMAKE_IGNORE_PATH})
+    set(CMAKE_IGNORE_PATH /opt/local /opt/local/bin /opt/local/include /opt/local/Library/Frameworks /opt/local/lib ${CMAKE_IGNORE_PATH})
 
-    SET(CMAKE_FRAMEWORK_PATH /sw/Library/Frameworks ${CMAKE_FRAMEWORK_PATH})
+    set(CMAKE_FRAMEWORK_PATH /sw/Library/Frameworks ${CMAKE_FRAMEWORK_PATH})
 
-    SET(CMAKE_INCLUDE_PATH /sw/include ${CMAKE_INCLUDE_PATH})
-    INCLUDE_DIRECTORIES("/sw/include")
+    set(CMAKE_INCLUDE_PATH /sw/include ${CMAKE_INCLUDE_PATH})
+    include_directories("/sw/include")
 
-    SET(CMAKE_LIBRARY_PATH /sw/lib ${CMAKE_LIBRARY_PATH})
-    LINK_DIRECTORIES("/sw/lib")
+    set(CMAKE_LIBRARY_PATH /sw/lib ${CMAKE_LIBRARY_PATH})
+    link_directories("/sw/lib")
 
-    SET(CMAKE_PROGRAM_PATH /sw/bin ${CMAKE_PROGRAM_PATH})
-ELSE()
+    set(CMAKE_PROGRAM_PATH /sw/bin ${CMAKE_PROGRAM_PATH})
+else()
     # no package manager found or active, do nothing
-    RETURN()
-ENDIF()
+    return()
+endif()
 
 # only ignore /usr/local if brew is installed and not in the PATH
 # in other cases, it is the user's personal installations
-IF(NOT MAC_HOMEBREW AND EXISTS /usr/local/bin/brew)
-    SET(CMAKE_IGNORE_PATH /usr/local /usr/local/bin /usr/local/include /usr/local/Library/Frameworks /usr/local/lib ${CMAKE_IGNORE_PATH})
-ENDIF()
+if(NOT MAC_HOMEBREW AND EXISTS /usr/local/bin/brew)
+    set(CMAKE_IGNORE_PATH /usr/local /usr/local/bin /usr/local/include /usr/local/Library/Frameworks /usr/local/lib /usr/local/opt/gettext/bin /usr/local/opt/gettext/lib ${CMAKE_IGNORE_PATH})
+endif()
