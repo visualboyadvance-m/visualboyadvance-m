@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version=1.3
+version=1.4
 
 main() {
     # parse options
@@ -68,12 +68,22 @@ main() {
 
     mkdir -p "$frameworks"
 
-    scan_libs "$@" | fully_resolve_links | sort -u | \
+    scan_libs "$@" | sort -u | \
     while read lib; do
         if [ -n "$list" ]; then
             echo "$lib"
         else
-            cp -f "$lib" "$frameworks" 2>/dev/null
+            resolved=$(echo "$lib" | fully_resolve_links)
+            resolved_basename=${resolved##*/}
+            if [ ! -f "$frameworks/$resolved_basename" ]; then
+                cp -f "$resolved" "$frameworks" 2>/dev/null
+            fi
+            if [ "$resolved" != "$lib" ]; then
+                lib_basename=${lib##*/}
+                if [ ! -f "$frameworks/$lib_basename" ]; then
+                    ln -s "$resolved_basename" "$frameworks/$lib_basename"
+                fi
+            fi
         fi
     done
 
@@ -223,13 +233,13 @@ relink() {
     target=$2
 
     lib_basename=${lib##*/}
-    lib_basename_unversioned_re=$(echo "$lib_basename" | sed 's/[0-9.-]*\.dylib$//; s/\./\\./g')
+    lib_basename_unversioned_re=$(echo "$lib_basename" | sed 's/\.[0-9.-]*\.dylib$//; s/\./\\./g')
 
     # remove full path and version of lib in executable
     lib_link_path=$(
         otool -l "$target" 2>/dev/null | \
-        sed -n 's,^ *name \(.*/*'"$lib_basename_unversioned_re"'[0-9.-]*\.dylib\) (offset .*,\1,p' | \
-        head -1
+        sed -n 's,^ *name \(.*/*'"$lib_basename_unversioned_re"'\.[0-9.-]*\.dylib\) (offset .*,\1,p' | \
+          head -1
     )
 
     [ -z "$lib_link_path" ] && return 0
