@@ -137,7 +137,12 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
         }
     }
     if (!isSupported && acodec->supported_samplerates) return MRET_ERR_NOCODEC;
+#if LIBAVCODEC_VERSION_MAJOR >= 60
     av_channel_layout_from_mask(&(aenc->ch_layout), AV_CH_LAYOUT_STEREO);
+#else
+    aenc->channel_layout = AV_CH_LAYOUT_STEREO;
+    aenc->channels = 2;
+#endif
     aenc->time_base = { 1, aenc->sample_rate };
     ast->time_base  = { 1, STREAM_FRAME_RATE };
     // open and use codec on stream
@@ -158,7 +163,11 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
     audioframeTmp = av_frame_alloc();
     if (!audioframeTmp) return MRET_ERR_BUFSIZE;
     audioframeTmp->format = IN_SOUND_FORMAT;
+#if LIBAVCODEC_VERSION_MAJOR >= 60
     audioframeTmp->ch_layout = aenc->ch_layout;
+#else
+    audioframeTmp->channel_layout = AV_CH_LAYOUT_STEREO;
+#endif
     audioframeTmp->sample_rate = aenc->sample_rate;
     audioframeTmp->nb_samples = nb_samples;
     if (nb_samples)
@@ -170,7 +179,11 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
     audioframe = av_frame_alloc();
     if (!audioframe) return MRET_ERR_BUFSIZE;
     audioframe->format = aenc->sample_fmt;
+#if LIBAVCODEC_VERSION_MAJOR >= 60
     audioframe->ch_layout = aenc->ch_layout;
+#else
+    audioframe->channel_layout = AV_CH_LAYOUT_STEREO;
+#endif
     audioframe->sample_rate = aenc->sample_rate;
     audioframe->nb_samples = nb_samples;
     if (nb_samples)
@@ -184,10 +197,15 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
     {
         return MRET_ERR_BUFSIZE;
     }
+#if LIBAVCODEC_VERSION_MAJOR >= 60
     av_opt_set_chlayout  (swr, "in_chlayout",       &(aenc->ch_layout),0);
+    av_opt_set_chlayout  (swr, "out_chlayout",      &(aenc->ch_layout),0);
+#else
+    av_opt_set_int       (swr, "in_channel_count",  2,                 0);
+    av_opt_set_int       (swr, "out_channel_count", 2,                 0);
+#endif
     av_opt_set_int       (swr, "in_sample_rate",    aenc->sample_rate, 0);
     av_opt_set_sample_fmt(swr, "in_sample_fmt",     IN_SOUND_FORMAT,   0);
-    av_opt_set_chlayout  (swr, "out_chlayout",      &(aenc->ch_layout),0);
     av_opt_set_int       (swr, "out_sample_rate",   aenc->sample_rate, 0);
     av_opt_set_sample_fmt(swr, "out_sample_fmt",    aenc->sample_fmt,  0);
     if (swr_init(swr) < 0)
