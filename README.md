@@ -3,6 +3,7 @@
 
 
 - [Visual Boy Advance - M](#visual-boy-advance---m)
+  - [System Requirements](#system-requirements)
   - [Building](#building)
   - [Building a Libretro core](#building-a-libretro-core)
   - [Visual Studio Support](#visual-studio-support)
@@ -55,6 +56,14 @@ the `translations.zip` to the same directory as the executable.
 
 If you are having issues, try resetting the config file first, go to `Help ->
 Factory Reset`.
+
+## System Requirements
+
+Windows 7, 8.1 or 10/11, Varios Linus distro's and OSX
+2Ghz x86(or x86-64) Intel Core 2 or AMD Athlon processor with SSE, ??? Ghz Arm processor on Windows for ARM OS.
+- (Just a guideline, lower clock speeds and Celeron processors may be able to run at full speed on lower settings.
+DirectX June 2010 Redist Full(https://www.microsoft.com/en-au/download/details.aspx?id=8109) / Websetup(https://www.microsoft.com/en-au/download/details.aspx?id=35) (For Xaudio) (Remember to uncheck Bing on the websetup)
+OpenAL-Soft(https://github.com/kcat/openal-soft) or Creative OpenAL 1.1 (https://www.openal.org/downloads/) (For OpenAL)
 
 ## Building
 
