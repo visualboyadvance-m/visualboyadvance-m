@@ -59,12 +59,15 @@ Factory Reset`.
 
 ## System Requirements
 
-Windows 7, 8.1 or 10/11, Linux distro's and OSX.
+Windows 7, 8.1 or 10/11, Linux distro's or OSX.
+
 2Ghz x86(or x86-64) Intel Core 2 or AMD Athlon processor with SSE, Snapdragon 835 
 or newer cpu compatible with Arm for Windows.
 - Just a guideline, lower clock speeds and Celeron processors may be able to run at full
-- speed on lower settings, and Linux based ARM Operating systems have wider cpu support.
+speed on lower settings, and Linux based ARM Operating systems have wider cpu support.
+
 DirectX June 2010 Redist [Full](https://www.microsoft.com/en-au/download/details.aspx?id=8109) / [Websetup](https://www.microsoft.com/en-au/download/details.aspx?id=35) For Xaudio (Remember to uncheck Bing on the websetup)
+
 [OpenAL-Soft](https://github.com/kcat/openal-soft) or [Creative OpenAL 1.1](https://www.openal.org/downloads/) For OpenAL
 
 ## Building
