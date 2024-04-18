@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version=1.4
+version=1.5
 
 main() {
     # parse options
@@ -35,7 +35,7 @@ main() {
     app_bundle=$(echo "$1" | fully_resolve_links)
 
     case "$app_bundle" in
-        *.app|*.APP)
+        *.[aA][pP][pP])
             if [ ! -d "$app_bundle" ]; then
                 usage
                 quit 1
@@ -196,21 +196,45 @@ fully_resolve_links() {
     done
 }
 
+lock() {
+    mkdir -p "$lock_dir/$1"
+}
+
+unlock() {
+    rm -rf "$lock_dir/$1"
+}
+
+wait_lock() {
+    while [ -d "$lock_dir/$1" ]; do
+        /bin/bash -c 'sleep 0.1'
+    done
+}
+
 relink_all() {
-    for exe in "$@"; do
+    lock_dir="$tmp/locks"
+
+    find "$app_bundle/Contents/Frameworks" -name '*.dylib' > "$tmp/libs"
+
+    for exe in "$@"; do (
         # dylib search path for executable
+        wait_lock "$exe"
+        lock "$exe"
         install_name_tool -add_rpath '@loader_path/../Frameworks' "$exe"
+        unlock "$exe"
 
         OLDIFS=$IFS
         IFS='
 '
         set --
-        for lib in $(find "$app_bundle/Contents/Frameworks" -name '*.dylib'); do
+        for lib in $(cat "$tmp/libs"); do
             set -- "$@" "$lib"
         done
         IFS=$OLDIFS
 
         for lib in "$@"; do
+            wait_lock "$lib"
+            lock "$lib"
+
             # make lib writable
             chmod u+w "$lib"
 
@@ -220,12 +244,18 @@ relink_all() {
             # set search path of lib
             install_name_tool -add_rpath '@loader_path/../Frameworks' "$lib"
 
+            unlock "$lib"
+
             # relink executable and all other libs to this lib
-            for target in "$exe" "$@"; do
+            for target in "$exe" "$@"; do (
                 relink "$lib" "$target"
-            done
+            ) & done
+            wait
         done
-    done
+    ) & done
+    wait
+
+    rm -rf "$tmp/libs" "$lock_dir"
 }
 
 relink() {
@@ -261,7 +291,12 @@ relink() {
     case "$longer" in
         "$shorter"*)
             # and if so, relink target to the lib
+            wait_lock "$lib"
+            lock "$lib"
+
             install_name_tool -change "$lib_link_path" "@rpath/$lib_basename" "$target"
+
+            unlock "$lib"
             ;;
     esac
 }
