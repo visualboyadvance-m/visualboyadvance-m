@@ -1,13 +1,55 @@
 #ifndef VBAM_WX_CONFIG_USER_INPUT_H_
 #define VBAM_WX_CONFIG_USER_INPUT_H_
 
-#include <wx/event.h>
-#include <wx/string.h>
+#include <cstdint>
 #include <set>
 
-#include "wx/widgets/sdljoy.h"
+#include <wx/event.h>
+#include <wx/log.h>
+#include <wx/string.h>
 
 namespace config {
+
+// Forward declaration.
+class UserInput;
+
+// One of the possible joystick controls.
+enum class JoyControl {
+    AxisPlus = 0,
+    AxisMinus,
+    Button,
+    HatNorth,
+    HatSouth,
+    HatWest,
+    HatEast,
+    Last = HatEast
+};
+
+// Abstraction for a single joystick. In the current implementation, this
+// encapsulates an `sdl_index_`.
+class JoyId {
+public:
+    static JoyId Invalid();
+
+    explicit JoyId(int sdl_index);
+    virtual ~JoyId() = default;
+
+    wxString ToString();
+
+    bool operator==(const JoyId& other) const;
+    bool operator!=(const JoyId& other) const;
+    bool operator<(const JoyId& other) const;
+    bool operator<=(const JoyId& other) const;
+    bool operator>(const JoyId& other) const;
+    bool operator>=(const JoyId& other) const;
+
+private:
+    JoyId() = delete;
+
+    int sdl_index_;
+
+    friend class UserInput;
+};
 
 // Abstraction for a user input, which can come from a keyboard or a joystick.
 // This class implements comparison operators so it can be used in sets and as
@@ -34,14 +76,15 @@ public:
     // Invalid UserInput, mainly used for comparison.
     UserInput() : UserInput(Device::Invalid, 0, 0, 0) {}
 
-    // Constructor from a wxKeyEvent.
-    UserInput(const wxKeyEvent& event);
+    // Constructor for a joystick input.
+    UserInput(uint8_t control_index, JoyControl control, JoyId joystick);
 
-    // Constructor from a wxJoyEvent.
-    UserInput(const wxJoyEvent& event);
+    // Constructors for a keyboard input.
+    UserInput(wxKeyCode key, wxKeyModifier mod = wxMOD_NONE);
+    UserInput(char c, wxKeyModifier mod = wxMOD_NONE);
 
     // TODO: Remove this once all uses have been removed.
-    UserInput(int key, int mod = 0, int joy = 0)
+    explicit UserInput(int key, int mod = 0, int joy = 0)
         : UserInput(joy == 0 ? Device::Keyboard : Device::Joystick,
                     mod,
                     key,
@@ -55,13 +98,26 @@ public:
     // Converts to a localized string for display.
     wxString ToLocalizedString() const;
 
-    wxJoystick joystick() const { return joystick_; }
+    JoyId joystick() const { return joystick_; }
     constexpr bool is_valid() const { return device_ != Device::Invalid; }
     constexpr operator bool() const { return is_valid(); }
+
+    bool is_joystick() const { return device_ == Device::Joystick; }
+    bool is_keyboard() const { return device_ == Device::Keyboard; }
 
     int key() const { return key_; }
     int mod() const { return mod_; }
     unsigned joy() const { return joy_; }
+
+    JoyControl joy_control() const { 
+        assert(is_joystick());
+        return static_cast<JoyControl>(mod_);
+    }
+
+    wxKeyCode key_code() const {
+        assert(is_keyboard());
+        return static_cast<wxKeyCode>(key_);
+    }
 
     constexpr bool operator==(const UserInput& other) const {
         return device_ == other.device_ && mod_ == other.mod_ &&
@@ -98,14 +154,14 @@ public:
 private:
     UserInput(Device device, int mod, int key, unsigned joy)
         : device_(device),
-          joystick_(joy == 0 ? wxJoystick::Invalid()
-                             : wxJoystick::FromLegacyPlayerIndex(joy)),
+          joystick_(joy == 0 ? JoyId::Invalid()
+                             : JoyId(joy - 1)),
           mod_(mod),
           key_(key),
           joy_(joy) {}
 
     Device device_;
-    wxJoystick joystick_;
+    JoyId joystick_;
     int mod_;
     int key_;
     unsigned joy_;

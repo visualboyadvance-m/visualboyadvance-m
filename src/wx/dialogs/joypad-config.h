@@ -2,6 +2,7 @@
 #define VBAM_WX_DIALOGS_JOYPAD_CONFIG_H_
 
 #include "wx/dialogs/base-dialog.h"
+
 namespace dialogs {
 
 // Manages the Joypad configuration dialog.
@@ -24,7 +25,7 @@ private:
 
     // Clears all Joypad controls for all Joypads.
     void ClearAllJoypads();
-    
+
     // Toggle SDL GameController mode for all joysticks.
     void ToggleSDLGameControllerMode();
 };

@@ -87,16 +87,6 @@ int Shortcuts::CommandForInput(const UserInput& input) const {
     return iter->second;
 }
 
-std::set<wxJoystick> Shortcuts::Joysticks() const {
-    std::set<wxJoystick> output;
-    for (const auto& iter : command_to_inputs_) {
-        for (const UserInput& user_input : iter.second) {
-            output.insert(user_input.joystick());
-        }
-    }
-    return output;
-}
-
 Shortcuts Shortcuts::Clone() const {
     return Shortcuts(this->command_to_inputs_, this->input_to_command_, this->disabled_defaults_);
 }

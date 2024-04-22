@@ -3,6 +3,7 @@
 
 #include <set>
 
+#include <wx/longlong.h>
 #include <wx/string.h>
 #include <wx/textctrl.h>
 #include <wx/validate.h>
@@ -10,7 +11,7 @@
 
 #include "wx/config/game-control.h"
 #include "wx/config/user-input.h"
-#include "wx/widgets/sdljoy.h"
+#include "wx/widgets/user-input-event.h"
 
 namespace widgets {
 
@@ -59,20 +60,23 @@ public:
     void Clear() override;
 
     wxDECLARE_DYNAMIC_CLASS(UserInputCtrl);
-    wxDECLARE_EVENT_TABLE();
 
 private:
-    // Event handlers.
-    void OnJoy(wxJoyEvent& event);
-    void OnKeyDown(wxKeyEvent& event);
-    void OnKeyUp(wxKeyEvent& event);
+    // Event handler.
+    void OnUserInputUp(widgets::UserInputEvent& event);
 
     // Updates the text in the control to reflect the current inputs.
     void UpdateText();
 
     bool is_multikey_ = false;
-    int last_mod_ = 0;
-    int last_key_ = 0;
+
+    // The last time the control was focused. This is used to ignore events sent
+    // very shortly after activation.
+    wxLongLong last_focus_time_ = 0;
+
+    // Set to true after one input has been received. This is used to ignore
+    // subsequent events until the control is focused again.
+    bool is_navigating_away_ = false;
 
     std::set<config::UserInput> inputs_;
 };

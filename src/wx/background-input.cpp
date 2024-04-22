@@ -547,17 +547,17 @@ wxThread::ExitCode BackgroundInput::CheckKeyboard()
         // virtual key "i" is pressed
         if ((bits & 0x8000) && (previousState[i] & 0x8000) == 0) {
             if (handler && !wxWindow::FindFocus()) {
-                wxKeyEvent ev(wxEVT_KEY_DOWN);
-                ev.m_keyCode = xKeySym;
-                handler->AddPendingEvent(ev);
+                wxKeyEvent* event = new wxKeyEvent(wxEVT_KEY_DOWN);
+                event->m_keyCode = xKeySym;
+                handler->QueueEvent(event);
             }
         }
         // virtual key "i" is released
         else if (((bits & 0x8000) == 0) && (previousState[i] & 0x8000)) {
             if (handler && !wxWindow::FindFocus()) {
-                wxKeyEvent ev(wxEVT_KEY_UP);
-                ev.m_keyCode = xKeySym;
-                handler->AddPendingEvent(ev);
+                wxKeyEvent* event = new wxKeyEvent(wxEVT_KEY_UP);
+                event->m_keyCode = xKeySym;
+                handler->QueueEvent(event);
             }
         }
         previousState[i] = bits;

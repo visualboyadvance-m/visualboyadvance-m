@@ -1184,7 +1184,7 @@ EVT_HANDLER(AllowKeyboardBackgroundInput, "Allow keyboard background input (togg
     disableKeyboardBackgroundInput();
     if (OPTION(kUIAllowKeyboardBackgroundInput)) {
         if (panel && panel->panel) {
-            enableKeyboardBackgroundInput(panel->panel->GetWindow());
+            enableKeyboardBackgroundInput(panel->panel->GetWindow()->GetEventHandler());
         }
     }
 }
@@ -2173,44 +2173,17 @@ EVT_HANDLER(EmulatorDirectories, "Directories...")
 
 EVT_HANDLER(JoypadConfigure, "Joypad options...")
 {
-    joy.PollAllJoysticks();
-
-    auto frame = wxGetApp().frame;
-    bool joy_timer = frame->IsJoyPollTimerRunning();
-
-    if (!joy_timer) {
-         frame->StartJoyPollTimer();
-    }
-
     if (ShowModal(GetXRCDialog("JoypadConfig")) == wxID_OK) {
         update_joypad_opts();
     }
-
-    if (!joy_timer) {
-        frame->StopJoyPollTimer();
-    }
-
-    SetJoystick();
 }
 
 EVT_HANDLER(Customize, "Customize UI...")
 {
-    wxDialog* dlg = GetXRCDialog("AccelConfig");
-    joy.PollAllJoysticks();
-
-    auto frame = wxGetApp().frame;
-    bool joy_timer = frame->IsJoyPollTimerRunning();
-
-    if (!joy_timer) frame->StartJoyPollTimer();
-
-    if (ShowModal(dlg) == wxID_OK) {
+    if (ShowModal(GetXRCDialog("AccelConfig")) == wxID_OK) {
         update_shortcut_opts();
         ResetMenuAccelerators();
     }
-
-    if (!joy_timer) frame->StopJoyPollTimer();
-
-    SetJoystick();
 }
 
 #ifndef NO_ONLINEUPDATES

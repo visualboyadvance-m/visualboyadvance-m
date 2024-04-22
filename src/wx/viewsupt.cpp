@@ -1,10 +1,38 @@
 #include "wx/viewsupt.h"
 
 #include "wx/config/option-proxy.h"
-#include "wx/wxutil.h"
 #include "wx/wxvbam.h"
 
 namespace Viewers {
+
+namespace {
+
+int getKeyboardKeyCode(const wxKeyEvent& event) {
+    const int key_code = event.GetKeyCode();
+    if (key_code > WXK_START) {
+        return key_code;
+    }
+    int uc = event.GetUnicodeKey();
+    if (uc != WXK_NONE) {
+        if (uc < 32) {  // not all control chars
+            switch (uc) {
+                case WXK_BACK:
+                case WXK_TAB:
+                case WXK_RETURN:
+                case WXK_ESCAPE:
+                    return uc;
+                default:
+                    return WXK_NONE;
+            }
+        }
+        return uc;
+    } else {
+        return event.GetKeyCode();
+    }
+}
+
+}  // namespace
+
 void Viewer::CloseDlg(wxCloseEvent& ev)
 {
     (void)ev; // unused params

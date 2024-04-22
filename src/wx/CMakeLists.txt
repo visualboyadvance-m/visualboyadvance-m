@@ -78,8 +78,10 @@ set(VBAM_WX_COMMON
     widgets/render-plugin.h
     widgets/user-input-ctrl.cpp
     widgets/user-input-ctrl.h
-    widgets/sdljoy.cpp
-    widgets/sdljoy.h
+    widgets/user-input-event.cpp
+    widgets/user-input-event.h
+    widgets/sdl-poller.cpp
+    widgets/sdl-poller.h
     widgets/utils.cpp
     widgets/utils.h
     widgets/webupdatedef.h
@@ -87,8 +89,6 @@ set(VBAM_WX_COMMON
     widgets/wxmisc.cpp
     wxhead.h
     wxlogdebug.h
-    wxutil.cpp
-    wxutil.h
     wxvbam.cpp
     wxvbam.h
     x11keymap.h

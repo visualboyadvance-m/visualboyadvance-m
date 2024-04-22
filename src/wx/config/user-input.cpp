@@ -8,7 +8,6 @@
 #include <wx/translation.h>
 
 #include "wx/strutils.h"
-#include "wx/wxutil.h"
 
 namespace config {
 
@@ -202,26 +201,26 @@ UserInput StringToUserInput(const wxString& string) {
         if (kAxisRegex.Matches(remainder)) {
             kAxisRegex.GetMatch(&start, &length, 1);
             const int key = StringToInt(remainder.Mid(start, length));
-            const int mod =
-                remainder[start + length] == '+' ? wxJoyControl::AxisPlus : wxJoyControl::AxisMinus;
-            return UserInput(key, mod, joy);
+            const JoyControl control =
+                remainder[start + length] == '+' ? JoyControl::AxisPlus : JoyControl::AxisMinus;
+            return UserInput(key, control, JoyId(joy - 1));
         }
         if (kButtonRegex.Matches(remainder)) {
             kButtonRegex.GetMatch(&start, &length, 1);
             const int key = StringToInt(remainder.Mid(start, length));
-            return UserInput(key, wxJoyControl::Button, joy);
+            return UserInput(key, JoyControl::Button, JoyId(joy - 1));
         }
         if (kHatRegex.Matches(remainder)) {
             kHatRegex.GetMatch(&start, &length, 1);
             const int key = StringToInt(remainder.Mid(start, length));
             if (kHatRegex.GetMatch(remainder, 3).Length()) {
-                return UserInput(key, wxJoyControl::HatNorth, joy);
+                return UserInput(key, JoyControl::HatNorth, JoyId(joy - 1));
             } else if (kHatRegex.GetMatch(remainder, 4).Length()) {
-                return UserInput(key, wxJoyControl::HatSouth, joy);
+                return UserInput(key, JoyControl::HatSouth, JoyId(joy - 1));
             } else if (kHatRegex.GetMatch(remainder, 5).Length()) {
-                return UserInput(key, wxJoyControl::HatEast, joy);
+                return UserInput(key, JoyControl::HatEast, JoyId(joy - 1));
             } else if (kHatRegex.GetMatch(remainder, 6).Length()) {
-                return UserInput(key, wxJoyControl::HatWest, joy);
+                return UserInput(key, JoyControl::HatWest, JoyId(joy - 1));
             }
         }
 
@@ -267,14 +266,47 @@ UserInput StringToUserInput(const wxString& string) {
 
 }  // namespace
 
-UserInput::UserInput(const wxKeyEvent& event)
-    : UserInput(Device::Keyboard, event.GetModifiers(), getKeyboardKeyCode(event), 0) {}
+// static
+JoyId JoyId::Invalid() {
+    static constexpr int kInvalidSdlIndex = -1;
+    return JoyId(kInvalidSdlIndex);
+}
 
-UserInput::UserInput(const wxJoyEvent& event)
+wxString JoyId::ToString() {
+    return wxString::Format("Joy%d", sdl_index_ + 1);
+}
+
+bool JoyId::operator==(const JoyId& other) const {
+    return sdl_index_ == other.sdl_index_;
+}
+bool JoyId::operator!=(const JoyId& other) const {
+    return !(*this == other);
+}
+bool JoyId::operator<(const JoyId& other) const {
+    return sdl_index_ < other.sdl_index_;
+}
+bool JoyId::operator<=(const JoyId& other) const {
+    return !(*this > other);
+}
+bool JoyId::operator>(const JoyId& other) const {
+    return other < *this;
+}
+bool JoyId::operator>=(const JoyId& other) const {
+    return !(*this < other);
+}
+
+JoyId::JoyId(int sdl_index) : sdl_index_(sdl_index) {}
+
+UserInput::UserInput(uint8_t control_index, JoyControl control, JoyId joystick)
     : UserInput(Device::Joystick,
-                event.control(),
-                event.control_index(),
-                event.joystick().player_index()) {}
+                static_cast<int>(control),
+                control_index,
+                joystick.sdl_index_ + 1) {}
+
+UserInput::UserInput(wxKeyCode key, wxKeyModifier mod)
+        : UserInput(Device::Keyboard, mod, key, 0) {}
+
+UserInput::UserInput(char c, wxKeyModifier mod) : UserInput(Device::Keyboard, mod, c, 0) {}
 
 // static
 std::set<UserInput> UserInput::FromConfigString(const wxString& string) {
@@ -315,26 +347,26 @@ wxString UserInput::ToConfigString() const {
             return KeyboardInputToConfigString(mod_, key_);
         case Device::Joystick:
             wxString key;
-            switch (mod_) {
-                case wxJoyControl::AxisPlus:
+            switch (static_cast<JoyControl>(mod_)) {
+                case JoyControl::AxisPlus:
                     key = wxString::Format(("Axis%d+"), key_);
                     break;
-                case wxJoyControl::AxisMinus:
+                case JoyControl::AxisMinus:
                     key = wxString::Format(("Axis%d-"), key_);
                     break;
-                case wxJoyControl::Button:
+                case JoyControl::Button:
                     key = wxString::Format(("Button%d"), key_);
                     break;
-                case wxJoyControl::HatNorth:
+                case JoyControl::HatNorth:
                     key = wxString::Format(("Hat%dN"), key_);
                     break;
-                case wxJoyControl::HatSouth:
+                case JoyControl::HatSouth:
                     key = wxString::Format(("Hat%dS"), key_);
                     break;
-                case wxJoyControl::HatWest:
+                case JoyControl::HatWest:
                     key = wxString::Format(("Hat%dW"), key_);
                     break;
-                case wxJoyControl::HatEast:
+                case JoyControl::HatEast:
                     key = wxString::Format(("Hat%dE"), key_);
                     break;
             }

@@ -1,13 +1,13 @@
 #include "wx/dialogs/joypad-config.h"
 
-#include <wx/xrc/xmlres.h>
+#include <wx/checkbox.h>
 
 #include "wx/config/option-proxy.h"
 #include "wx/dialogs/base-dialog.h"
+#include "wx/opts.h"
 #include "wx/widgets/option-validator.h"
 #include "wx/widgets/user-input-ctrl.h"
 #include "wx/widgets/utils.h"
-#include "wx/wxvbam.h"
 
 namespace dialogs {
 
@@ -87,7 +87,6 @@ void JoypadConfig::ToggleSDLGameControllerMode() {
     OPTION(kSDLGameControllerMode) =
         GetValidatedChild<wxCheckBox>("SDLGameControllerMode")->IsChecked();
     ClearAllJoypads();
-    wxGetApp().frame->PollAllJoysticks();
 }
 
 void JoypadConfig::ClearAllJoypads() {

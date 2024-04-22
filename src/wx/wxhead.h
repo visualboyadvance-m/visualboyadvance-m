@@ -57,8 +57,6 @@ using std::int32_t;
 // GetAccel is inefficent anyway (often I don't want to convert to wxAccEnt)
 // This is a working replacement for SetAccel, at least.
 
-#include "wx/wxutil.h"
-
 // wxrc helpers (for dynamic strings instead of constant)
 #define XRCID_D(str) wxXmlResource::GetXRCID(str)
 //#define XRCCTRL_D(win, id, type) (wxStaticCast((win).FindWindow(XRCID_D(id)), type))
