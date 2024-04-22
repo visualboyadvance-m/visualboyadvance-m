@@ -1,10 +1,8 @@
+#include "wx/wxvbam.h"
+
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
-#include "components/filters_agb/filters_agb.h"
-#include "components/filters_interframe/interframe.h"
-#include "core/base/system.h"
-#include "wx/config/option-id.h"
 
 #ifdef __WXGTK__
     #include <X11/Xlib.h>
@@ -22,13 +20,14 @@
 
 #include <wx/dcbuffer.h>
 #include <wx/menu.h>
-#include <SDL_joystick.h>
 
-#include "background-input.h"
 #include "components/draw_text/draw_text.h"
 #include "components/filters/filters.h"
+#include "components/filters_agb/filters_agb.h"
+#include "components/filters_interframe/interframe.h"
 #include "core/base/file_util.h"
 #include "core/base/patch.h"
+#include "core/base/system.h"
 #include "core/base/version.h"
 #include "core/gb/gb.h"
 #include "core/gb/gbCheats.h"
@@ -41,15 +40,15 @@
 #include "core/gba/gbaPrint.h"
 #include "core/gba/gbaRtc.h"
 #include "core/gba/gbaSound.h"
+#include "wx/background-input.h"
 #include "wx/config/game-control.h"
+#include "wx/config/option-id.h"
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
-#include "wx/config/user-input.h"
 #include "wx/drawing.h"
 #include "wx/wayland.h"
 #include "wx/widgets/render-plugin.h"
-#include "wx/wxutil.h"
-#include "wx/wxvbam.h"
+#include "wx/widgets/user-input-event.h"
 
 #ifdef __WXMSW__
 #include <windows.h>
@@ -165,6 +164,7 @@ GameArea::GameArea()
                        config::OptionID::kSoundBuffers, config::OptionID::kSoundDSoundHWAccel,
                        config::OptionID::kSoundUpmix},
                       [&](config::Option*) { schedule_audio_restart_ = true; }) {
+    this->SetClientObject(new widgets::UserInputEventSender(this));
     SetSizer(new wxBoxSizer(wxVERTICAL));
     // all renderers prefer 32-bit
     // well, "simple" prefers 24-bit, but that's not available for filters
@@ -440,8 +440,6 @@ void GameArea::LoadGame(const wxString& name)
     was_paused = true;
     schedule_audio_restart_ = false;
     MainFrame* mf = wxGetApp().frame;
-    mf->StopJoyPollTimer();
-    mf->SetJoystick();
     mf->cmd_enable &= ~(CMDEN_GB | CMDEN_GBA);
     mf->cmd_enable |= ONLOAD_CMDEN;
     mf->cmd_enable |= loaded == IMAGE_GB ? CMDEN_GB : (CMDEN_GBA | CMDEN_NGDB_GBA);
@@ -697,8 +695,6 @@ void GameArea::UnloadGame(bool destruct)
     mf->cmd_enable &= UNLOAD_CMDEN_KEEP;
     mf->update_state_ts(true);
     mf->enable_menus();
-    mf->StartJoyPollTimer();
-    mf->SetJoystick();
     mf->ResetCheatSearch();
 
     if (rewind_mem)
@@ -1087,8 +1083,6 @@ void GameArea::Pause()
 
     if (loaded != IMAGE_UNKNOWN)
         soundPause();
-
-    wxGetApp().frame->StartJoyPollTimer();
 }
 
 void GameArea::Resume()
@@ -1102,8 +1096,6 @@ void GameArea::Resume()
 
     if (loaded != IMAGE_UNKNOWN)
         soundResume();
-
-    wxGetApp().frame->StopJoyPollTimer();
 
     SetFocus();
 }
@@ -1184,31 +1176,32 @@ void GameArea::OnIdle(wxIdleEvent& event)
         wxWindow* w = panel->GetWindow();
 
         // set up event handlers
-        w->Connect(wxEVT_KEY_DOWN,         wxKeyEventHandler(GameArea::OnKeyDown),         NULL, this);
-        w->Connect(wxEVT_KEY_UP,           wxKeyEventHandler(GameArea::OnKeyUp),           NULL, this);
-        w->Connect(wxEVT_PAINT,            wxPaintEventHandler(GameArea::PaintEv),         NULL, this);
-        w->Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(GameArea::EraseBackground), NULL, this);
+        w->Bind(VBAM_EVT_USER_INPUT_DOWN, &GameArea::OnUserInputDown, this);
+        w->Bind(VBAM_EVT_USER_INPUT_UP, &GameArea::OnUserInputUp, this);
+        w->Bind(wxEVT_PAINT, &GameArea::PaintEv, this);
+        w->Bind(wxEVT_ERASE_BACKGROUND, &GameArea::EraseBackground, this);
 
         // set userdata so we know it's the panel and not the frame being resized
         // the userdata is freed on disconnect/destruction
-        this->Connect(wxEVT_SIZE,          wxSizeEventHandler(GameArea::OnSize),           NULL, this);
+        this->Bind(wxEVT_SIZE, &GameArea::OnSize, this);
 
         // We need to check if the buttons stayed pressed when focus the panel.
-        w->Connect(wxEVT_KILL_FOCUS,       wxFocusEventHandler(GameArea::OnKillFocus),     NULL, this);
+        w->Bind(wxEVT_KILL_FOCUS, &GameArea::OnKillFocus, this);
 
         // Update mouse last-used timers on mouse events etc..
-        w->Connect(wxEVT_MOTION,           wxMouseEventHandler(GameArea::MouseEvent),      NULL, this);
-        w->Connect(wxEVT_LEFT_DOWN,        wxMouseEventHandler(GameArea::MouseEvent),      NULL, this);
-        w->Connect(wxEVT_RIGHT_DOWN,       wxMouseEventHandler(GameArea::MouseEvent),      NULL, this);
-        w->Connect(wxEVT_MIDDLE_DOWN,      wxMouseEventHandler(GameArea::MouseEvent),      NULL, this);
-        w->Connect(wxEVT_MOUSEWHEEL,       wxMouseEventHandler(GameArea::MouseEvent),      NULL, this);
+        w->Bind(wxEVT_MOTION, &GameArea::MouseEvent, this);
+        w->Bind(wxEVT_LEFT_DOWN, &GameArea::MouseEvent, this);
+        w->Bind(wxEVT_RIGHT_DOWN, &GameArea::MouseEvent, this);
+        w->Bind(wxEVT_MIDDLE_DOWN, &GameArea::MouseEvent, this);
+        w->Bind(wxEVT_MOUSEWHEEL, &GameArea::MouseEvent, this);
 
         w->SetBackgroundStyle(wxBG_STYLE_CUSTOM);
         w->SetSize(wxSize(basic_width, basic_height));
 
         // Allow input while on background
-        if (OPTION(kUIAllowKeyboardBackgroundInput))
-            enableKeyboardBackgroundInput(w);
+        if (OPTION(kUIAllowKeyboardBackgroundInput)) {
+            enableKeyboardBackgroundInput(w->GetEventHandler());
+        }
 
         if (gopts.max_scale)
             w->SetMaxSize(wxSize(basic_width * gopts.max_scale,
@@ -1250,8 +1243,6 @@ void GameArea::OnIdle(wxIdleEvent& event)
         // generate system color maps (after output module init)
         UpdateLcdFilter();
     }
-
-    mf->PollJoysticks();
 
     if (!paused) {
         HidePointer();
@@ -1323,14 +1314,6 @@ void GameArea::OnIdle(wxIdleEvent& event)
     }
 }
 
-static bool process_user_input(bool down, const config::UserInput& user_input)
-{
-    if (down)
-        return config::GameControlState::Instance().OnInputPressed(user_input);
-    else
-        return config::GameControlState::Instance().OnInputReleased(user_input);
-}
-
 static void draw_black_background(wxWindow* win) {
     wxClientDC dc(win);
     wxCoord w, h;
@@ -1340,70 +1323,32 @@ static void draw_black_background(wxWindow* win) {
     dc.DrawRectangle(0, 0, w, h);
 }
 
-static void process_keyboard_event(const wxKeyEvent& ev, bool down)
-{
-    int kc = ev.GetKeyCode();
-
-    // Under Wayland or if the key is unicode, we can't use wxGetKeyState().
-    if (!IsWayland() && kc != WXK_NONE) {
-        // Check if the key state corresponds to the event.
-        if (down != wxGetKeyState(static_cast<wxKeyCode>(kc))) {
-            return;
-        }
-    }
-
-    int key = getKeyboardKeyCode(ev);
-    int mod = ev.GetModifiers();
-
-    if (key == WXK_NONE) {
-        return;
-    }
-
-    // modifier-only key releases do not set the modifier flag
-    // so we set it here to match key release events to key press events
-    switch (key) {
-        case WXK_SHIFT:
-            mod |= wxMOD_SHIFT;
-            break;
-        case WXK_ALT:
-            mod |= wxMOD_ALT;
-            break;
-        case WXK_CONTROL:
-            mod |= wxMOD_CONTROL;
-            break;
-#ifdef __WXMAC__
-        case WXK_RAW_CONTROL:
-            mod |= wxMOD_RAW_CONTROL;
-            break;
-#endif
-        default:
-            // This resets mod for any non-modifier key. This has the side
-            // effect of not being able to set up a modifier+key for a game
-            // control.
-            mod = 0;
-            break;
-    }
-
-    if (process_user_input(down, config::UserInput(key, mod, 0))) {
-        wxWakeUpIdle();
-    };
-}
-
 #ifdef __WXGTK__
-static Display* GetX11Display()
-{
+static Display* GetX11Display() {
     return GDK_WINDOW_XDISPLAY(gtk_widget_get_window(wxGetApp().frame->GetHandle()));
 }
-#endif // __WXGTK__
+#endif  // __WXGTK__
 
-void GameArea::OnKeyDown(wxKeyEvent& ev)
-{
-    process_keyboard_event(ev, true);
+void GameArea::OnUserInputDown(widgets::UserInputEvent& event) {
+    if (config::GameControlState::Instance().OnInputPressed(event.input())) {
+        wxWakeUpIdle();
+    }
 }
 
-void GameArea::OnKeyUp(wxKeyEvent& ev)
-{
-    process_keyboard_event(ev, false);
+void GameArea::OnUserInputUp(widgets::UserInputEvent& event) {
+    if (config::GameControlState::Instance().OnInputReleased(event.input())) {
+        wxWakeUpIdle();
+    }
+
+    // tell Linux to turn off the screensaver/screen-blank if joystick button was pressed
+    // this shouldn't be necessary of course
+#if defined(__WXGTK__) && defined(HAVE_X11) && !defined(HAVE_XSS)
+    if (event.input().is_joystick() && !wxGetApp().UsingWayland()) {
+        auto display = GetX11Display();
+        XResetScreenSaver(display);
+        XFlush(display);
+    }
+#endif
 }
 
 // these three are forwarded to the DrawingPanel instance
@@ -1430,24 +1375,8 @@ void GameArea::OnSize(wxSizeEvent& ev)
     ev.Skip();
 }
 
-void GameArea::OnSDLJoy(wxJoyEvent& ev)
-{
-    process_user_input(ev.pressed(), config::UserInput(ev));
-
-    // tell Linux to turn off the screensaver/screen-blank if joystick button was pressed
-    // this shouldn't be necessary of course
-#if defined(__WXGTK__) && defined(HAVE_X11) && !defined(HAVE_XSS)
-    if (!wxGetApp().UsingWayland()) {
-        auto display = GetX11Display();
-        XResetScreenSaver(display);
-        XFlush(display);
-    }
-#endif
-}
-
 BEGIN_EVENT_TABLE(GameArea, wxPanel)
 EVT_IDLE(GameArea::OnIdle)
-EVT_SDLJOY(GameArea::OnSDLJoy)
 // FIXME: wxGTK does not generate motion events in MainFrame (not sure
 // what to do about it)
 EVT_MOUSE_EVENTS(GameArea::MouseEvent)
@@ -1525,6 +1454,7 @@ DrawingPanel::DrawingPanel(wxWindow* parent, int _width, int _height)
     , wxPanel(parent, wxID_ANY, wxPoint(0, 0), parent->GetClientSize(),
           wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
 {
+    this->SetClientData(new widgets::UserInputEventSender(this));
 }
 
 void DrawingPanelBase::DrawingPanelInit()
@@ -2256,6 +2186,7 @@ GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
     , wxglc(parent, wxID_ANY, glopts, wxPoint(0, 0), parent->GetClientSize(),
           wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
 {
+    this->SetClientData(new widgets::UserInputEventSender(this));
     widgets::RequestHighResolutionOpenGlSurfaceForWindow(this);
     SetContext();
 }

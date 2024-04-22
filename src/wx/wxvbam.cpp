@@ -1,12 +1,11 @@
-// mainline:
-//   parse cmd line
-//   load xrc file (guiinit.cpp does most of instantiation)
-//   create & display main frame
-
 #include "wx/wxvbam.h"
 
 #ifdef __WXMSW__
 #include <windows.h>
+#endif
+
+#ifdef __WXGTK__
+#include <gdk/gdk.h>
 #endif
 
 #include <stdio.h>
@@ -31,18 +30,9 @@
 #include <wx/zipstrm.h>
 
 #include "components/user_config/user_config.h"
-#include "core/gb/gbGlobals.h"
 #include "core/gba/gbaSound.h"
-
-#if defined(VBAM_ENABLE_DEBUGGER)
-#include "core/gba/gbaRemote.h"
-#endif  // defined(VBAM_ENABLE_DEBUGGER)
-
-// The built-in xrc file
-#include "wx/builtin-xrc.h"
-
-// The built-in vba-over.ini
 #include "wx/builtin-over.h"
+#include "wx/builtin-xrc.h"
 #include "wx/config/game-control.h"
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
@@ -53,9 +43,9 @@
 #include "wx/widgets/user-input-ctrl.h"
 #include "wx/widgets/utils.h"
 
-#ifdef __WXGTK__
-#include <gdk/gdk.h>
-#endif
+#if defined(VBAM_ENABLE_DEBUGGER)
+#include "core/gba/gbaRemote.h"
+#endif  // defined(VBAM_ENABLE_DEBUGGER)
 
 namespace {
 
@@ -260,6 +250,13 @@ static void tack_full_path(wxString& s, const wxString& app = wxEmptyString)
     for (size_t i = 0; i < full_config_path.size(); i++)
         s += wxT("\n\t") + full_config_path[i] + app;
 }
+
+wxvbamApp::wxvbamApp()
+    : wxApp(),
+      pending_fullscreen(false),
+      frame(nullptr),
+      using_wayland(false),
+      sdl_poller_(widgets::SdlPoller(std::bind(&wxvbamApp::GetJoyEventHandler, this))) {}
 
 const wxString wxvbamApp::GetPluginsDir()
 {
@@ -836,6 +833,30 @@ wxvbamApp::~wxvbamApp() {
 #endif
 }
 
+wxEvtHandler* wxvbamApp::GetJoyEventHandler() {
+    // Use the active window, if any.
+    wxWindow* focused_window = wxWindow::FindFocus();
+    if (focused_window) {
+        return focused_window;
+    }
+
+    if (!frame) {
+        return nullptr;
+    }
+
+    auto panel = frame->GetPanel();
+    if (!panel || !panel->panel) {
+        return nullptr;
+    }
+
+    if (OPTION(kUIAllowJoystickBackgroundInput)) {
+        // Use the game panel, if the background polling option is enabled.
+        return panel->panel->GetWindow()->GetEventHandler();
+    }
+
+    return nullptr;
+}
+
 MainFrame::MainFrame()
     : wxFrame(),
       paused(false),
@@ -849,8 +870,6 @@ MainFrame::MainFrame()
       keep_on_top_styler_(this),
       status_bar_observer_(config::OptionID::kGenStatusBar,
                            std::bind(&MainFrame::OnStatusBarChanged, this)) {
-    jpoll = new JoystickPoller();
-    this->Connect(wxID_ANY, wxEVT_SHOW, wxShowEventHandler(JoystickPoller::ShowDialog), jpoll, jpoll);
 }
 
 MainFrame::~MainFrame() {
@@ -983,19 +1002,15 @@ int MainFrame::FilterEvent(wxEvent& event) {
         return wxEventFilter::Event_Skip;
     }
 
-    int command = 0;
-    if (event.GetEventType() == wxEVT_KEY_DOWN) {
-        const wxKeyEvent& key_event = static_cast<wxKeyEvent&>(event);
-        command = gopts.shortcuts.CommandForInput(config::UserInput(key_event));
-    } else if (event.GetEventType() == wxEVT_JOY) {
-        const wxJoyEvent& joy_event = static_cast<wxJoyEvent&>(event);
-        if (joy_event.pressed()) {
-            // We ignore "button up" events here.
-            command = gopts.shortcuts.CommandForInput(config::UserInput(joy_event));
-        }
+    if (event.GetEventType() != VBAM_EVT_USER_INPUT_DOWN) {
+        // We only treat "VBAM_EVT_USER_INPUT_DOWN" events here.
+        return wxEventFilter::Event_Skip;
     }
 
+    const widgets::UserInputEvent& user_input_event = static_cast<widgets::UserInputEvent&>(event);
+    const int command = gopts.shortcuts.CommandForInput(user_input_event.input());
     if (command == 0) {
+        // No associated command found.
         return wxEventFilter::Event_Skip;
     }
 
@@ -1026,58 +1041,6 @@ wxString MainFrame::GetGamePath(wxString path)
     }
 
     return game_path;
-}
-
-void MainFrame::SetJoystick()
-{
-    /* Remove all attached joysticks to avoid errors while
-     * destroying and creating the GameArea `panel`. */
-    joy.StopPolling();
-
-    if (!emulating)
-        return;
-
-    std::set<wxJoystick> needed_joysticks = gopts.shortcuts.Joysticks();
-    for (const auto& iter : gopts.game_control_bindings) {
-        for (const auto& input_iter : iter.second) {
-            needed_joysticks.emplace(input_iter.joystick());
-        }
-    }
-    joy.PollJoysticks(std::move(needed_joysticks));
-}
-
-void MainFrame::StopJoyPollTimer()
-{
-    if (jpoll && jpoll->IsRunning())
-        jpoll->Stop();
-}
-
-void MainFrame::StartJoyPollTimer()
-{
-    if (jpoll && !jpoll->IsRunning())
-        jpoll->Start();
-}
-
-bool MainFrame::IsJoyPollTimerRunning()
-{
-    return jpoll->IsRunning();
-}
-
-wxEvtHandler* MainFrame::GetJoyEventHandler()
-{
-    auto focused_window = wxWindow::FindFocus();
-
-    if (focused_window)
-        return focused_window;
-
-    auto panel = GetPanel();
-    if (!panel)
-        return nullptr;
-
-    if (OPTION(kUIAllowJoystickBackgroundInput))
-        return panel->GetEventHandler();
-
-    return nullptr;
 }
 
 void MainFrame::enable_menus()
@@ -1403,7 +1366,8 @@ void MainFrame::IdentifyRom()
 // grabbing those keys, but I can't track it down.
 int wxvbamApp::FilterEvent(wxEvent& event)
 {
-    if (frame)
+    if (frame) {
         return frame->FilterEvent(event);
+    }
     return wxApp::FilterEvent(event);
 }

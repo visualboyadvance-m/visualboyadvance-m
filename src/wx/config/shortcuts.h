@@ -9,7 +9,7 @@
 
 #include "wx/config/user-input.h"
 
-// by default, only 9 recent items
+// wxWidgets only goes up to `wxID_FILE9` but we want 10 recent files.
 #define wxID_FILE10 (wxID_FILE9 + 1)
 
 namespace config {
@@ -44,9 +44,6 @@ public:
 
     // Returns the command currently assigned to `input` or nullptr if none.
     int CommandForInput(const UserInput& input) const;
-
-    // Returns the set of joysticks used by shortcuts.
-    std::set<wxJoystick> Joysticks() const;
 
     // Returns a copy of this object. This can be an expensive operation and
     // should only be used to modify the currently active shortcuts

@@ -17,7 +17,8 @@
 #include "wx/dialogs/base-dialog.h"
 #include "wx/widgets/dpi-support.h"
 #include "wx/widgets/keep-on-top-styler.h"
-#include "wx/widgets/sdljoy.h"
+#include "wx/widgets/sdl-poller.h"
+#include "wx/widgets/user-input-event.h"
 #include "wx/widgets/wxmisc.h"
 #include "wx/wxhead.h"
 
@@ -30,7 +31,6 @@
 #endif
 
 #include "wx/wxlogdebug.h"
-#include "wx/wxutil.h"
 
 template <typename T>
 void CheckPointer(T pointer)
@@ -59,13 +59,7 @@ class MainFrame;
 
 class wxvbamApp : public wxApp {
 public:
-    wxvbamApp()
-        : wxApp()
-        , pending_fullscreen(false)
-        , frame(NULL)
-        , using_wayland(false)
-    {
-    }
+    wxvbamApp();
     virtual bool OnInit();
     virtual int OnRun();
     virtual bool OnCmdLineHelp(wxCmdLineParser&);
@@ -93,6 +87,8 @@ public:
 #endif
     // without this, global accels don't always work
     int FilterEvent(wxEvent&);
+
+    widgets::SdlPoller* sdl_poller() { return &sdl_poller_; }
 
     // vba-over.ini
     wxFileConfig* overrides = nullptr;
@@ -130,8 +126,13 @@ protected:
     int console_status = 0;
 
 private:
+    // Returns the currently active event handler to use for user input events.
+    wxEvtHandler* GetJoyEventHandler();
+
     wxPathList config_path;
     char* home = nullptr;
+
+    widgets::SdlPoller sdl_poller_;
 
     // Main configuration file.
     wxFileName config_file_;
@@ -215,8 +216,6 @@ public:
     void GetMenuOptionInt(const wxString& menuName, int* field, int mask);
     void GetMenuOptionBool(const wxString& menuName, bool* field);
     void SetMenuOption(const wxString& menuName, bool value);
-
-    void SetJoystick();
 
     int FilterEvent(wxEvent& event);
 
@@ -308,23 +307,10 @@ public:
 
     virtual bool DialogOpened() { return dialog_opened != 0; }
 
-    virtual void SetJoystickRumble(bool b) { joy.SetRumble(b); }
-
     bool IsPaused(bool incendental = false)
     {
         return (paused && !pause_next && !incendental) || dialog_opened;
     }
-
-    void PollJoysticks() { joy.Poll(); }
-    
-    void PollAllJoysticks() { joy.PollAllJoysticks(); }
-
-    // Poll joysticks with timer.
-    void StartJoyPollTimer();
-    void StopJoyPollTimer();
-    bool IsJoyPollTimerRunning();
-
-    wxEvtHandler* GetJoyEventHandler();
 
     // required for building from xrc
     DECLARE_DYNAMIC_CLASS(MainFrame);
@@ -351,9 +337,6 @@ private:
     checkable_mi_array_t checkable_mi;
     // recent menu item accels
     wxMenu* recent;
-    // joystick reader
-    wxJoyPoller joy;
-    JoystickPoller* jpoll = nullptr;
     // quicker & more accurate than FindFocus() != NULL
     bool focused;
     // One-time toggle to indicate that this object is fully initialized. This
@@ -388,20 +371,6 @@ private:
     wxDialog* LoadXRCDialog(const char* name);
 
 #include "wx/cmdhandlers.h"
-};
-
-// a class for polling joystick keys
-class JoystickPoller : public wxTimer {
-    public:
-        void Notify() {
-            wxGetApp().frame->PollJoysticks();
-        }
-        void ShowDialog(wxShowEvent& ev) {
-            if (ev.IsShown())
-                Start(50);
-            else
-                Stop();
-        }
 };
 
 // a helper class to avoid forgetting StopModal()
@@ -581,9 +550,8 @@ protected:
 
     bool paused;
     void OnIdle(wxIdleEvent&);
-    void OnKeyDown(wxKeyEvent& ev);
-    void OnKeyUp(wxKeyEvent& ev);
-    void OnSDLJoy(wxJoyEvent& ev);
+    void OnUserInputDown(widgets::UserInputEvent& event);
+    void OnUserInputUp(widgets::UserInputEvent& event);
     void PaintEv(wxPaintEvent& ev);
     void EraseBackground(wxEraseEvent& ev);
     void OnSize(wxSizeEvent& ev);

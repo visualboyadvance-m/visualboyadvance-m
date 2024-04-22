@@ -1,6 +1,7 @@
 #ifndef VBAM_WX_CONFIG_GAME_CONTROL_H_
 #define VBAM_WX_CONFIG_GAME_CONTROL_H_
 
+#include <cstdint>
 #include <array>
 #include <map>
 #include <set>

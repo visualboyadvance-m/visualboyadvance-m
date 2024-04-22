@@ -1,34 +1,12 @@
 #include "wx/widgets/user-input-ctrl.h"
 
+#include <wx/time.h>
+
 #include "wx/config/user-input.h"
 #include "wx/opts.h"
+#include "wx/widgets/user-input-event.h"
 
 namespace widgets {
-
-namespace {
-
-int FilterKeyCode(const wxKeyEvent& event) {
-    const wxChar keycode = event.GetUnicodeKey();
-    if (keycode == WXK_NONE) {
-        return event.GetKeyCode();
-    }
-
-    if (keycode < 32) {
-        switch (keycode) {
-            case WXK_BACK:
-            case WXK_TAB:
-            case WXK_RETURN:
-            case WXK_ESCAPE:
-                return keycode;
-            default:
-                return WXK_NONE;
-        }
-    }
-
-    return keycode;
-}
-
-}  // namespace
 
 extern const char UserInputCtrlNameStr[] = "userinputctrl";
 
@@ -53,6 +31,13 @@ bool UserInputCtrl::Create(wxWindow* parent,
                            const wxSize& size,
                            long style,
                            const wxString& name) {
+    this->SetClientObject(new UserInputEventSender(this));
+    this->Bind(VBAM_EVT_USER_INPUT_UP, &UserInputCtrl::OnUserInputUp, this);
+    this->Bind(wxEVT_SET_FOCUS, [this](wxFocusEvent& event) {
+        is_navigating_away_ = false;
+        last_focus_time_ = wxGetUTCTimeMillis();
+        event.Skip();
+    });
     return wxTextCtrl::Create(parent, id, value, pos, size, style, wxValidator(), name);
 }
 
@@ -81,28 +66,18 @@ void UserInputCtrl::Clear() {
 
 wxIMPLEMENT_DYNAMIC_CLASS(UserInputCtrl, wxTextCtrl);
 
-// clang-format off
-wxBEGIN_EVENT_TABLE(UserInputCtrl, wxTextCtrl)
-    EVT_SDLJOY(UserInputCtrl::OnJoy)
-    EVT_KEY_DOWN(UserInputCtrl::OnKeyDown)
-    EVT_KEY_UP(UserInputCtrl::OnKeyUp)
-wxEND_EVENT_TABLE();
-// clang-format on
-
-void UserInputCtrl::OnJoy(wxJoyEvent& event) {
-    static wxLongLong last_event = 0;
-
-    // Filter consecutive axis motions within 300ms, as this adds two bindings
-    // +1/-1 instead of the one intended.
-    if ((event.control() == wxJoyControl::AxisPlus || event.control() == wxJoyControl::AxisMinus) &&
-        wxGetUTCTimeMillis() - last_event < 300) {
+void UserInputCtrl::OnUserInputUp(UserInputEvent& event) {
+    static const wxLongLong kInterval = 100;
+    if (wxGetUTCTimeMillis() - last_focus_time_ < kInterval) {
+        // Ignore events sent very shortly after focus. This is used to ignore
+        // some spurious joystick events like an accidental axis motion.
+        event.Skip();
         return;
     }
 
-    last_event = wxGetUTCTimeMillis();
-
-    // Control was unpressed, ignore.
-    if (!event.pressed()) {
+    if (is_navigating_away_) {
+        // Ignore events sent after the control has been navigated away from.
+        event.Skip();
         return;
     }
 
@@ -110,35 +85,10 @@ void UserInputCtrl::OnJoy(wxJoyEvent& event) {
         inputs_.clear();
     }
 
-    inputs_.emplace(event);
+    inputs_.insert(event.input());
     UpdateText();
     Navigate();
-}
-
-void UserInputCtrl::OnKeyDown(wxKeyEvent& event) {
-    last_mod_ = event.GetModifiers();
-    last_key_ = FilterKeyCode(event);
-}
-
-void UserInputCtrl::OnKeyUp(wxKeyEvent&) {
-    const int mod = last_mod_;
-    const int key = last_key_;
-    last_mod_ = last_key_ = 0;
-
-    // key is only 0 if we missed the keydown event
-    // or if we are being shipped pseudo keypress events
-    // either way, just ignore.
-    if (!key) {
-        return;
-    }
-
-    if (!is_multikey_) {
-        inputs_.clear();
-    }
-
-    inputs_.emplace(key, mod);
-    UpdateText();
-    Navigate();
+    is_navigating_away_ = true;
 }
 
 void UserInputCtrl::UpdateText() {
@@ -153,6 +103,7 @@ void UserInputCtrl::UpdateText() {
     if (value.empty()) {
         SetValue(wxEmptyString);
     } else {
+        // Remove the trailing comma.
         SetValue(value.substr(0, value.size() - 1));
     }
 }
