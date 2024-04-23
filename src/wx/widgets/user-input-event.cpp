@@ -3,7 +3,6 @@
 #include <vector>
 
 #include <wx/event.h>
-#include <wx/timer.h>
 #include <wx/window.h>
 
 #include "wx/config/user-input.h"
@@ -162,7 +161,7 @@ void UserInputEventSender::OnKeyDown(wxKeyEvent& event) {
     }
 
     const wxKeyModifier active_mods = GetModifiersFromSet(active_mods_);
-    std::vector<config::UserInput> new_inputs;
+    std::vector<config::KeyboardInput> new_inputs;
     if (key_pressed == WXK_NONE) {
         // A new standalone modifier was pressed, send the event.
         new_inputs.emplace_back(KeyFromModifier(mod_pressed), mod_pressed);
@@ -179,7 +178,7 @@ void UserInputEventSender::OnKeyDown(wxKeyEvent& event) {
         }
     }
 
-    for (const config::UserInput& input : new_inputs) {
+    for (const config::KeyboardInput& input : new_inputs) {
         wxQueueEvent(window_, new UserInputEvent(input, true));
     }
 }
@@ -221,7 +220,7 @@ void UserInputEventSender::OnKeyUp(wxKeyEvent& event) {
         return;
     }
 
-    std::vector<config::UserInput> released_inputs;
+    std::vector<config::KeyboardInput> released_inputs;
     if (key_released == WXK_NONE) {
         // A standalone modifier was released, send it.
         released_inputs.emplace_back(KeyFromModifier(mod_released), mod_released);
@@ -232,7 +231,7 @@ void UserInputEventSender::OnKeyUp(wxKeyEvent& event) {
             released_inputs.emplace_back(key, wxMOD_NONE);
         } else {
             // Check if the key was pressed with the active modifiers.
-            const config::UserInput input_with_modifiers(key, previous_mods);
+            const config::KeyboardInput input_with_modifiers(key, previous_mods);
             auto iter = active_mod_inputs_.find(input_with_modifiers);
             if (iter == active_mod_inputs_.end()) {
                 // The key press event was never sent, so do it now.
@@ -252,7 +251,7 @@ void UserInputEventSender::OnKeyUp(wxKeyEvent& event) {
     // Also check for any key that were pressed with the previously active
     // modifiers and release them.
     for (const wxKeyCode active_key : active_keys_) {
-        const config::UserInput input(active_key, previous_mods);
+        const config::KeyboardInput input(active_key, previous_mods);
         auto iter = active_mod_inputs_.find(input);
         if (iter != active_mod_inputs_.end()) {
             active_mod_inputs_.erase(iter);
@@ -261,7 +260,7 @@ void UserInputEventSender::OnKeyUp(wxKeyEvent& event) {
     }
 
 
-    for (const config::UserInput& input : released_inputs) {
+    for (const config::KeyboardInput& input : released_inputs) {
         active_mod_inputs_.erase(input);
         wxQueueEvent(window_, new UserInputEvent(input, false));
     }

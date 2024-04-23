@@ -14,7 +14,7 @@
 class wxFileHistory;
 
 // Default joystick bindings.
-extern const std::map<config::GameControl, std::set<config::UserInput>>
+extern const std::map<config::GameControl, std::unordered_set<config::UserInput>>
     kDefaultBindings;
 
 extern struct opts_t {
@@ -36,7 +36,7 @@ extern struct opts_t {
     int rewind_interval = 0;
 
     /// Joypad
-    std::map<config::GameControl, std::set<config::UserInput>>
+    std::map<config::GameControl, std::unordered_set<config::UserInput>>
         game_control_bindings;
     int autofire_rate = 1;
 
