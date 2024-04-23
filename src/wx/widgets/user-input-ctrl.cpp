@@ -46,8 +46,9 @@ void UserInputCtrl::SetMultiKey(bool multikey) {
     Clear();
 }
 
-void UserInputCtrl::SetInputs(const std::set<config::UserInput>& inputs) {
-    inputs_ = inputs;
+void UserInputCtrl::SetInputs(const std::unordered_set<config::UserInput>& inputs) {
+    inputs_.clear();
+    inputs_.insert(inputs.begin(), inputs.end());
     UpdateText();
 }
 
@@ -126,7 +127,7 @@ bool UserInputCtrlValidator::TransferFromWindow() {
     UserInputCtrl* control = wxDynamicCast(GetWindow(), UserInputCtrl);
     assert(control);
 
-    gopts.game_control_bindings[game_control_] = control->inputs();
+    gopts.game_control_bindings.insert({game_control_, control->inputs()});
     return true;
 }
 

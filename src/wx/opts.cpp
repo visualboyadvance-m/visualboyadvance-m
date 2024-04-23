@@ -107,68 +107,68 @@ uint32_t LoadUnsignedOption(wxConfigBase* cfg,
 
 opts_t gopts;
 
-const std::map<config::GameControl, std::set<config::UserInput>> kDefaultBindings = {
+const std::map<config::GameControl, std::unordered_set<config::UserInput>> kDefaultBindings = {
     {config::GameControl(0, config::GameKey::Up),
      {
-         config::UserInput('W'),
-         config::UserInput(11, config::JoyControl::Button, config::JoyId(0)),
-         config::UserInput(1, config::JoyControl::AxisMinus, config::JoyId(0)),
-         config::UserInput(3, config::JoyControl::AxisMinus, config::JoyId(0)),
+         config::KeyboardInput('W'),
+         config::JoyInput(config::JoyId(0), config::JoyControl::Button, 11),
+         config::JoyInput(config::JoyId(0), config::JoyControl::AxisMinus, 1),
+         config::JoyInput(config::JoyId(0), config::JoyControl::AxisMinus, 3),
      }},
     {config::GameControl(0, config::GameKey::Down),
      {
-         config::UserInput('S'),
-         config::UserInput(12, config::JoyControl::Button, config::JoyId(0)),
-         config::UserInput(1, config::JoyControl::AxisPlus, config::JoyId(0)),
-         config::UserInput(3, config::JoyControl::AxisPlus, config::JoyId(0)),
+         config::KeyboardInput('S'),
+         config::JoyInput(config::JoyId(0), config::JoyControl::Button, 12),
+         config::JoyInput(config::JoyId(0), config::JoyControl::AxisPlus, 1),
+         config::JoyInput(config::JoyId(0), config::JoyControl::AxisPlus, 3),
      }},
     {config::GameControl(0, config::GameKey::Left),
      {
-         config::UserInput('A'),
-         config::UserInput(13, config::JoyControl::Button, config::JoyId(0)),
-         config::UserInput(0, config::JoyControl::AxisMinus, config::JoyId(0)),
-         config::UserInput(2, config::JoyControl::AxisMinus, config::JoyId(0)),
+         config::KeyboardInput('A'),
+         config::JoyInput(config::JoyId(0), config::JoyControl::Button, 13),
+         config::JoyInput(config::JoyId(0), config::JoyControl::AxisMinus, 0),
+         config::JoyInput(config::JoyId(0), config::JoyControl::AxisMinus, 2),
      }},
     {config::GameControl(0, config::GameKey::Right),
      {
-         config::UserInput('D'),
-         config::UserInput(14, config::JoyControl::Button, config::JoyId(0)),
-         config::UserInput(0, config::JoyControl::AxisPlus, config::JoyId(0)),
-         config::UserInput(2, config::JoyControl::AxisPlus, config::JoyId(0)),
+         config::KeyboardInput('D'),
+         config::JoyInput(config::JoyId(0), config::JoyControl::Button, 14),
+         config::JoyInput(config::JoyId(0), config::JoyControl::AxisPlus, 0),
+         config::JoyInput(config::JoyId(0), config::JoyControl::AxisPlus, 2),
      }},
     {config::GameControl(0, config::GameKey::A),
      {
-         config::UserInput('L'),
-         config::UserInput(0, config::JoyControl::Button, config::JoyId(0)),
+         config::KeyboardInput('L'),
+         config::JoyInput(config::JoyId(0), config::JoyControl::Button, 0),
      }},
     {config::GameControl(0, config::GameKey::B),
      {
-         config::UserInput('K'),
-         config::UserInput(1, config::JoyControl::Button, config::JoyId(0)),
+         config::KeyboardInput('K'),
+         config::JoyInput(config::JoyId(0), config::JoyControl::Button, 1),
      }},
     {config::GameControl(0, config::GameKey::L),
      {
-         config::UserInput('I'),
-         config::UserInput(2, config::JoyControl::Button, config::JoyId(0)),
-         config::UserInput(9, config::JoyControl::Button, config::JoyId(0)),
-         config::UserInput(4, config::JoyControl::AxisPlus, config::JoyId(0)),
+         config::KeyboardInput('I'),
+         config::JoyInput(config::JoyId(0), config::JoyControl::Button, 2),
+         config::JoyInput(config::JoyId(0), config::JoyControl::Button, 9),
+         config::JoyInput(config::JoyId(0), config::JoyControl::AxisPlus, 4),
      }},
     {config::GameControl(0, config::GameKey::R),
      {
-         config::UserInput('O'),
-         config::UserInput(3, config::JoyControl::Button, config::JoyId(0)),
-         config::UserInput(10, config::JoyControl::Button, config::JoyId(0)),
-         config::UserInput(5, config::JoyControl::AxisPlus, config::JoyId(0)),
+         config::KeyboardInput('O'),
+         config::JoyInput(config::JoyId(0), config::JoyControl::Button, 3),
+         config::JoyInput(config::JoyId(0), config::JoyControl::Button, 10),
+         config::JoyInput(config::JoyId(0), config::JoyControl::AxisPlus, 5),
      }},
     {config::GameControl(0, config::GameKey::Select),
      {
-         config::UserInput(WXK_BACK),
-         config::UserInput(4, config::JoyControl::Button, config::JoyId(0)),
+         config::KeyboardInput(WXK_BACK),
+         config::JoyInput(config::JoyId(0), config::JoyControl::Button, 4),
      }},
     {config::GameControl(0, config::GameKey::Start),
      {
-         config::UserInput(WXK_RETURN),
-         config::UserInput(6, config::JoyControl::Button, config::JoyId(0)),
+         config::KeyboardInput(WXK_RETURN),
+         config::JoyInput(config::JoyId(0), config::JoyControl::Button, 6),
      }},
     {config::GameControl(0, config::GameKey::MotionUp), {}},
     {config::GameControl(0, config::GameKey::MotionDown), {}},
@@ -180,7 +180,7 @@ const std::map<config::GameControl, std::set<config::UserInput>> kDefaultBinding
     {config::GameControl(0, config::GameKey::AutoB), {}},
     {config::GameControl(0, config::GameKey::Speed),
      {
-         config::UserInput(WXK_SPACE),
+         config::KeyboardInput(WXK_SPACE),
      }},
     {config::GameControl(0, config::GameKey::Capture), {}},
     {config::GameControl(0, config::GameKey::Gameshark), {}},
@@ -562,14 +562,11 @@ void update_opts() {
 void update_joypad_opts() {
     wxConfigBase* cfg = wxConfigBase::Get();
 
-    // For joypad, compare the UserInput sets. Since UserInput guarantees a
-    // certain ordering, it is possible that the user control in the panel shows
-    // a different ordering than the one that will be eventually saved, but this
-    // is nothing to worry about.
+    // For joypad, compare the UserInput sets.
     bool game_bindings_changed = false;
     for (const auto &iter : gopts.game_control_bindings) {
         wxString option_name = iter.first.ToString();
-        std::set<config::UserInput> saved_config =
+        std::unordered_set<config::UserInput> saved_config =
             config::UserInput::FromConfigString(cfg->Read(option_name, ""));
         if (saved_config != iter.second) {
             game_bindings_changed = true;

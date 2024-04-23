@@ -40,7 +40,7 @@ std::vector<std::pair<int, wxString>> Shortcuts::GetConfiguration() const {
     config.reserve(command_to_inputs_.size() + 1);
 
     if (!disabled_defaults_.empty()) {
-        std::set<UserInput> noop_inputs;
+        std::unordered_set<UserInput> noop_inputs;
         for (const auto& iter : disabled_defaults_) {
             noop_inputs.insert(iter.first);
         }
@@ -48,7 +48,7 @@ std::vector<std::pair<int, wxString>> Shortcuts::GetConfiguration() const {
     }
 
     for (const auto& iter : command_to_inputs_) {
-        std::set<UserInput> inputs;
+        std::unordered_set<UserInput> inputs;
         for (const auto& input : iter.second) {
             if (internal::DefaultShortcutForCommand(iter.first) != input) {
                 // Not a default input.

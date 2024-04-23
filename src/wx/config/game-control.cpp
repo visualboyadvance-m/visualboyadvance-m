@@ -2,6 +2,7 @@
 
 #include "wx/opts.h"
 #include "wx/strutils.h"
+#include "wx/wxlogdebug.h"
 
 namespace config {
 

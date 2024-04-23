@@ -1,7 +1,7 @@
 #ifndef VBAM_WX_WIDGETS_USER_INPUT_CTRL_H_
 #define VBAM_WX_WIDGETS_USER_INPUT_CTRL_H_
 
-#include <set>
+#include <unordered_set>
 
 #include <wx/longlong.h>
 #include <wx/string.h>
@@ -46,7 +46,7 @@ public:
     void SetMultiKey(bool multikey);
 
     // Sets this control inputs.
-    void SetInputs(const std::set<config::UserInput>& inputs);
+    void SetInputs(const std::unordered_set<config::UserInput>& inputs);
 
     // Helper method to return the single input for no multikey UserInputCtrls.
     // Asserts if `is_multikey_` is true.
@@ -54,7 +54,7 @@ public:
     config::UserInput SingleInput() const;
 
     // Returns the inputs set in this control.
-    const std::set<config::UserInput>& inputs() const { return inputs_; }
+    const std::unordered_set<config::UserInput>& inputs() const { return inputs_; }
 
     // Clears the inputs set in this control.
     void Clear() override;
@@ -78,7 +78,7 @@ private:
     // subsequent events until the control is focused again.
     bool is_navigating_away_ = false;
 
-    std::set<config::UserInput> inputs_;
+    std::unordered_set<config::UserInput> inputs_;
 };
 
 // A validator for the UserInputCtrl. This validator is used to transfer the

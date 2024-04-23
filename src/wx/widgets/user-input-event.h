@@ -50,7 +50,7 @@ private:
 
     std::unordered_set<wxKeyCode> active_keys_;
     std::unordered_set<wxKeyModifier> active_mods_;
-    std::set<config::UserInput> active_mod_inputs_;
+    std::unordered_set<config::KeyboardInput> active_mod_inputs_;
 
     // The wxWindow this object is attached to.
     // Must outlive this object.

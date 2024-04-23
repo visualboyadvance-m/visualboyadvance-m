@@ -208,8 +208,7 @@ std::vector<UserInputEvent> JoyState::ProcessAxisEvent(const uint8_t index,
     if (previous_status != JoyAxisStatus::Neutral) {
         // Send the "unpressed" event.
         events.push_back(UserInputEvent(
-            config::UserInput(index, AxisStatusToJoyControl(previous_status), wx_joystick_),
-            false));
+            config::JoyInput(wx_joystick_, AxisStatusToJoyControl(previous_status), index), false));
     }
 
     // We already sent the "unpressed" event so nothing more to do.
@@ -219,7 +218,7 @@ std::vector<UserInputEvent> JoyState::ProcessAxisEvent(const uint8_t index,
 
     // Send the "pressed" event.
     events.push_back(UserInputEvent(
-        config::UserInput(index, AxisStatusToJoyControl(status), wx_joystick_), true));
+        config::JoyInput(wx_joystick_, AxisStatusToJoyControl(status), index), true));
 
     return events;
 }
@@ -238,7 +237,7 @@ std::vector<UserInputEvent> JoyState::ProcessButtonEvent(const uint8_t index, co
 
     // Send the event.
     events.push_back(
-        UserInputEvent(config::UserInput(index, config::JoyControl::Button, wx_joystick_), status));
+        UserInputEvent(config::JoyInput(wx_joystick_, config::JoyControl::Button, index), status));
 
     return events;
 }
@@ -264,12 +263,12 @@ std::vector<UserInputEvent> JoyState::ProcessHatEvent(const uint8_t index, const
         if (old_control_pressed && !new_control_pressed) {
             // Send the "unpressed" event.
             events.push_back(UserInputEvent(
-                config::UserInput(index, HatStatusToJoyControl(bit), wx_joystick_), false));
+                config::JoyInput(wx_joystick_, HatStatusToJoyControl(bit), index), false));
         }
         if (!old_control_pressed && new_control_pressed) {
             // Send the "pressed" event.
             events.push_back(UserInputEvent(
-                config::UserInput(index, HatStatusToJoyControl(bit), wx_joystick_), true));
+                config::JoyInput(wx_joystick_, HatStatusToJoyControl(bit), index), true));
         }
     }
 

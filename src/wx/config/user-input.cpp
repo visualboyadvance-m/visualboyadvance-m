@@ -109,52 +109,6 @@ wxString ModToLocalizedString(int mod) {
     return config_string;
 }
 
-wxString KeyboardInputToConfigString(int mod, int key) {
-    // Handle the modifier case separately.
-    if (KeyIsModifier(key)) {
-        return wxString::Format("%d:%d", key, mod);
-    }
-
-    // Custom overrides.
-    const auto iter = kKeyCodeOverrides.find(static_cast<wxKeyCode>(key));
-    if (iter != kKeyCodeOverrides.end()) {
-        return ModToConfigString(mod) + iter->second.config_name;
-    }
-
-    const wxString accel_string = wxAcceleratorEntry(mod, key).ToRawString().MakeUpper();
-    if (!accel_string.IsAscii()) {
-        // Unicode handling.
-        return wxString::Format("%d:%d", key, mod);
-    }
-    return accel_string;
-}
-
-wxString KeyboardInputToLocalizedString(int mod, int key) {
-    static const std::map<int, wxString> kStandaloneModifiers = {
-        {WXK_ALT, _("Alt")},
-        {WXK_SHIFT, _("Shift")},
-#ifdef __WXMAC__
-        {WXK_RAW_CONTROL, _("Ctrl")},
-        {WXK_COMMAND, _("Cmd")},
-#else
-        {WXK_CONTROL, _("Ctrl")},
-#endif
-    };
-
-    const auto iter = kStandaloneModifiers.find(key);
-    if (iter != kStandaloneModifiers.end()) {
-        return iter->second;
-    }
-
-    // Custom overrides.
-    const auto iter2 = kKeyCodeOverrides.find(static_cast<wxKeyCode>(key));
-    if (iter2 != kKeyCodeOverrides.end()) {
-        return ModToLocalizedString(mod) + iter2->second.display_name;
-    }
-
-    return wxAcceleratorEntry(mod, key).ToString();
-}
-
 int StringToInt(const wxString& string) {
     int ret = 0;
     for (const auto& c : string) {
@@ -178,14 +132,14 @@ UserInput StringToUserInput(const wxString& string) {
 
     // Standalone modifiers do not get parsed properly by wxWidgets.
     static const std::map<wxString, UserInput> kStandaloneModifiers = {
-        {"ALT", UserInput(WXK_ALT, wxMOD_ALT)},
-        {"SHIFT", UserInput(WXK_SHIFT, wxMOD_SHIFT)},
-        {"RAWCTRL", UserInput(WXK_RAW_CONTROL, wxMOD_RAW_CONTROL)},
-        {"RAW_CTRL", UserInput(WXK_RAW_CONTROL, wxMOD_RAW_CONTROL)},
-        {"RAWCONTROL", UserInput(WXK_RAW_CONTROL, wxMOD_RAW_CONTROL)},
-        {"RAW_CONTROL", UserInput(WXK_RAW_CONTROL, wxMOD_RAW_CONTROL)},
-        {"CTRL", UserInput(WXK_CONTROL, wxMOD_CONTROL)},
-        {"CONTROL", UserInput(WXK_CONTROL, wxMOD_CONTROL)},
+        {"ALT", KeyboardInput(WXK_ALT, wxMOD_ALT)},
+        {"SHIFT", KeyboardInput(WXK_SHIFT, wxMOD_SHIFT)},
+        {"RAWCTRL", KeyboardInput(WXK_RAW_CONTROL, wxMOD_RAW_CONTROL)},
+        {"RAW_CTRL", KeyboardInput(WXK_RAW_CONTROL, wxMOD_RAW_CONTROL)},
+        {"RAWCONTROL", KeyboardInput(WXK_RAW_CONTROL, wxMOD_RAW_CONTROL)},
+        {"RAW_CONTROL", KeyboardInput(WXK_RAW_CONTROL, wxMOD_RAW_CONTROL)},
+        {"CTRL", KeyboardInput(WXK_CONTROL, wxMOD_CONTROL)},
+        {"CONTROL", KeyboardInput(WXK_CONTROL, wxMOD_CONTROL)},
     };
 
     if (string.empty()) {
@@ -197,30 +151,31 @@ UserInput StringToUserInput(const wxString& string) {
         size_t start, length;
         kJoyRegex.GetMatch(&start, &length, 1);
         const int joy = StringToInt(string.Mid(start, length));
+        const JoyId joy_id(joy - 1);
         const wxString remainder = string.Mid(start + length + 1);
         if (kAxisRegex.Matches(remainder)) {
             kAxisRegex.GetMatch(&start, &length, 1);
             const int key = StringToInt(remainder.Mid(start, length));
             const JoyControl control =
                 remainder[start + length] == '+' ? JoyControl::AxisPlus : JoyControl::AxisMinus;
-            return UserInput(key, control, JoyId(joy - 1));
+            return JoyInput(joy_id, control, key);
         }
         if (kButtonRegex.Matches(remainder)) {
             kButtonRegex.GetMatch(&start, &length, 1);
             const int key = StringToInt(remainder.Mid(start, length));
-            return UserInput(key, JoyControl::Button, JoyId(joy - 1));
+            return JoyInput(joy_id, JoyControl::Button, key);
         }
         if (kHatRegex.Matches(remainder)) {
             kHatRegex.GetMatch(&start, &length, 1);
             const int key = StringToInt(remainder.Mid(start, length));
             if (kHatRegex.GetMatch(remainder, 3).Length()) {
-                return UserInput(key, JoyControl::HatNorth, JoyId(joy - 1));
+                return JoyInput(joy_id, JoyControl::HatNorth, key);
             } else if (kHatRegex.GetMatch(remainder, 4).Length()) {
-                return UserInput(key, JoyControl::HatSouth, JoyId(joy - 1));
+                return JoyInput(joy_id, JoyControl::HatSouth, key);
             } else if (kHatRegex.GetMatch(remainder, 5).Length()) {
-                return UserInput(key, JoyControl::HatEast, JoyId(joy - 1));
+                return JoyInput(joy_id, JoyControl::HatEast, key);
             } else if (kHatRegex.GetMatch(remainder, 6).Length()) {
-                return UserInput(key, JoyControl::HatWest, JoyId(joy - 1));
+                return JoyInput(joy_id, JoyControl::HatWest, key);
             }
         }
 
@@ -230,11 +185,13 @@ UserInput StringToUserInput(const wxString& string) {
 
     // Not a joystick.
 
+    // Non-ASCII keyboard input are treated as a pair of integers "key:mod".
     const auto pair = strutils::split(string, ":");
-    long mod, key;
+    long mod = 0;
+    long key = 0;
     if (pair.size() == 2 && pair[0].ToLong(&key) && pair[1].ToLong(&mod)) {
         // Pair of integers, likely a unicode input.
-        return UserInput(key, mod);
+        return KeyboardInput(static_cast<wxKeyCode>(key), static_cast<wxKeyModifier>(mod));
     }
 
     wxString upper(string);
@@ -257,7 +214,8 @@ UserInput StringToUserInput(const wxString& string) {
         if (key < WXK_START && wxIslower(key)) {
             key = wxToupper(key);
         }
-        return UserInput(key, accel.GetFlags());
+        return KeyboardInput(static_cast<wxKeyCode>(key),
+                             static_cast<wxKeyModifier>(accel.GetFlags()));
     }
 
     // Invalid.
@@ -272,45 +230,77 @@ JoyId JoyId::Invalid() {
     return JoyId(kInvalidSdlIndex);
 }
 
-wxString JoyId::ToString() {
+wxString JoyId::ToString() const {
     return wxString::Format("Joy%d", sdl_index_ + 1);
 }
 
-bool JoyId::operator==(const JoyId& other) const {
-    return sdl_index_ == other.sdl_index_;
-}
-bool JoyId::operator!=(const JoyId& other) const {
-    return !(*this == other);
-}
-bool JoyId::operator<(const JoyId& other) const {
-    return sdl_index_ < other.sdl_index_;
-}
-bool JoyId::operator<=(const JoyId& other) const {
-    return !(*this > other);
-}
-bool JoyId::operator>(const JoyId& other) const {
-    return other < *this;
-}
-bool JoyId::operator>=(const JoyId& other) const {
-    return !(*this < other);
+wxString JoyInput::ToString() const {
+    const wxString joy_string = joy_.ToString();
+    switch (control_) {
+        case JoyControl::AxisPlus:
+            return wxString::Format("%s-Axis%d+", joy_string, control_index_);
+        case JoyControl::AxisMinus:
+            return wxString::Format("%s-Axis%d-", joy_string, control_index_);
+        case JoyControl::Button:
+            return wxString::Format("%s-Button%d", joy_string, control_index_);
+        case JoyControl::HatNorth:
+            return wxString::Format("%s-Hat%dN", joy_string, control_index_);
+        case JoyControl::HatSouth:
+            return wxString::Format("%s-Hat%dS", joy_string, control_index_);
+        case JoyControl::HatWest:
+            return wxString::Format("%s-Hat%dW", joy_string, control_index_);
+        case JoyControl::HatEast:
+            return wxString::Format("%s-Hat%dE", joy_string, control_index_);
+    }
+
+    // Unreachable.
+    assert(false);
+    return wxEmptyString;
 }
 
-JoyId::JoyId(int sdl_index) : sdl_index_(sdl_index) {}
+wxString KeyboardInput::ToConfigString() const {
+    // Handle the modifier case separately.
+    if (KeyIsModifier(key_)) {
+        return wxString::Format("%d:%d", key_, mod_);
+    }
 
-UserInput::UserInput(uint8_t control_index, JoyControl control, JoyId joystick)
-    : UserInput(Device::Joystick,
-                static_cast<int>(control),
-                control_index,
-                joystick.sdl_index_ + 1) {}
+    // Custom overrides.
+    const auto iter = kKeyCodeOverrides.find(key_);
+    if (iter != kKeyCodeOverrides.end()) {
+        return ModToConfigString(mod_) + iter->second.config_name;
+    }
 
-UserInput::UserInput(wxKeyCode key, wxKeyModifier mod)
-        : UserInput(Device::Keyboard, mod, key, 0) {}
+    const wxString accel_string = wxAcceleratorEntry(mod_, key_).ToRawString().MakeUpper();
+    if (!accel_string.IsAscii()) {
+        // Unicode handling.
+        return wxString::Format("%d:%d", key_, mod_);
+    }
+    return accel_string;
+}
 
-UserInput::UserInput(char c, wxKeyModifier mod) : UserInput(Device::Keyboard, mod, c, 0) {}
+wxString KeyboardInput::ToLocalizedString() const {
+    // Handle the modifier case separately.
+    if (KeyIsModifier(key_)) {
+        return ModToLocalizedString(mod_) + _("Key");
+    }
+
+    // Custom overrides.
+    const auto iter = kKeyCodeOverrides.find(key_);
+    if (iter != kKeyCodeOverrides.end()) {
+        return ModToLocalizedString(mod_) + iter->second.display_name;
+    }
+
+    const wxString accel_string = wxAcceleratorEntry(mod_, key_).ToRawString().MakeUpper();
+    if (!accel_string.IsAscii()) {
+        // Unicode handling.
+        return wxString::Format("%d:%d", key_, mod_);
+    }
+    return accel_string;
+}
 
 // static
-std::set<UserInput> UserInput::FromConfigString(const wxString& string) {
-    std::set<UserInput> user_inputs;
+std::unordered_set<UserInput> UserInput::FromConfigString(const wxString& string) {
+    std::unordered_set<UserInput> user_inputs;
 
     if (string.empty()) {
         return user_inputs;
@@ -328,7 +318,7 @@ std::set<UserInput> UserInput::FromConfigString(const wxString& string) {
 }
 
 // static
-wxString UserInput::SpanToConfigString(const std::set<UserInput>& user_inputs) {
+wxString UserInput::SpanToConfigString(const std::unordered_set<UserInput>& user_inputs) {
     wxString config_string;
     if (user_inputs.empty()) {
         return config_string;
@@ -344,34 +334,9 @@ wxString UserInput::ToConfigString() const {
         case Device::Invalid:
             return wxEmptyString;
         case Device::Keyboard:
-            return KeyboardInputToConfigString(mod_, key_);
+            return keyboard_input().ToConfigString();
         case Device::Joystick:
-            wxString key;
-            switch (static_cast<JoyControl>(mod_)) {
-                case JoyControl::AxisPlus:
-                    key = wxString::Format(("Axis%d+"), key_);
-                    break;
-                case JoyControl::AxisMinus:
-                    key = wxString::Format(("Axis%d-"), key_);
-                    break;
-                case JoyControl::Button:
-                    key = wxString::Format(("Button%d"), key_);
-                    break;
-                case JoyControl::HatNorth:
-                    key = wxString::Format(("Hat%dN"), key_);
-                    break;
-                case JoyControl::HatSouth:
-                    key = wxString::Format(("Hat%dS"), key_);
-                    break;
-                case JoyControl::HatWest:
-                    key = wxString::Format(("Hat%dW"), key_);
-                    break;
-                case JoyControl::HatEast:
-                    key = wxString::Format(("Hat%dE"), key_);
-                    break;
-            }
-
-            return wxString::Format("Joy%d-%s", joy_, key);
+            return joy_input().ToString();
     }
 
     // Unreachable.
@@ -384,10 +349,9 @@ wxString UserInput::ToLocalizedString() const {
         case Device::Invalid:
             return wxEmptyString;
         case Device::Keyboard:
-            return KeyboardInputToLocalizedString(mod_, key_);
+            return keyboard_input().ToLocalizedString();
         case Device::Joystick:
-            // Same as Config string.
-            return ToConfigString();
+            return joy_input().ToString();
     }
 
     // Unreachable.
