@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-07 11:00+0000\n"
+"POT-Creation-Date: 2024-04-23 19:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Hoseok Seo <ddinghoya@gmail.com>, 2022-2023\n"
 "Language-Team: Korean (Korea) (http://app.transifex.com/bgk/vba-m/language/ko_KR/)\n"
@@ -26,7 +26,7 @@ msgstr ""
 msgid "OpenAL: Failed to open audio device"
 msgstr ""
 
-#: audio/internal/openal.cpp:387 audio/internal/faudio.cpp:602
+#: audio/internal/openal.cpp:387 audio/internal/faudio.cpp:493
 #: audio/internal/xaudio2.cpp:577
 msgid "Default device"
 msgstr "기본 장치"
@@ -89,7 +89,7 @@ msgstr "배터리 파일을 가져오면 저장된 게임이 모두 지워집니
 msgid "Confirm import"
 msgstr "가져오기 확인"
 
-#: cmdevents.cpp:425 panel.cpp:494
+#: cmdevents.cpp:425 panel.cpp:492
 #, c-format
 msgid "Loaded battery %s"
 msgstr "%s를 로드한 배터리"
@@ -172,7 +172,7 @@ msgstr "로드중 %s 스넵샷 파일 에러"
 msgid "Wrote battery %s"
 msgstr "%s 배터리가 기록됨"
 
-#: cmdevents.cpp:618 panel.cpp:806
+#: cmdevents.cpp:618 panel.cpp:802
 #, c-format
 msgid "Error writing battery %s"
 msgstr "%s 배터리 기록 오류"
@@ -200,12 +200,12 @@ msgid "Error saving snapshot file %s"
 msgstr "스넵샷%s저장 중 에러"
 
 #: cmdevents.cpp:677 cmdevents.cpp:755 cmdevents.cpp:825 cmdevents.cpp:894
-#: gfxviewers.cpp:1662 gfxviewers.cpp:1807 viewers.cpp:590 viewers.cpp:804
-#: viewsupt.cpp:1188
+#: gfxviewers.cpp:1662 gfxviewers.cpp:1807 viewers.cpp:588 viewers.cpp:802
+#: viewsupt.cpp:1216
 msgid "Select output file"
 msgstr "출력파일 선택"
 
-#: cmdevents.cpp:678 gfxviewers.cpp:1663 gfxviewers.cpp:1808 viewsupt.cpp:1189
+#: cmdevents.cpp:678 gfxviewers.cpp:1663 gfxviewers.cpp:1808 viewsupt.cpp:1217
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG 이미지|*.png|BMP 이미지|*.bmp"
 
@@ -273,29 +273,29 @@ msgstr "포트%d에 연결중이니 기다려주세요"
 msgid "Waiting for GDB..."
 msgstr "GDB 대기 중..."
 
-#: cmdevents.cpp:2230
+#: cmdevents.cpp:2203
 msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
 msgstr "설정이 삭제됩니다!\n\n확실한가요?"
 
-#: cmdevents.cpp:2231
+#: cmdevents.cpp:2204
 msgid "FACTORY RESET"
 msgstr "공장 초기화"
 
-#: cmdevents.cpp:2266
+#: cmdevents.cpp:2239
 msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr "닌텐도 게임보이 / 컬러 / 어드밴스 에뮬레이터입니다."
 
-#: cmdevents.cpp:2267
+#: cmdevents.cpp:2240
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA 개발팀\nCopyright (C) 2007-2020 VBA-M 개발팀"
 
-#: cmdevents.cpp:2269
+#: cmdevents.cpp:2242
 msgid ""
 "This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -311,15 +311,15 @@ msgid ""
 "along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr "이 프로그램은 자유 소프트웨어이므로 재배포 및/또는 수정할 수 있습니다.\n자유 소프트웨어 재단에서 게시한 GNU 일반 공중 사용 허가서 조건에 따라\n자유 소프트웨어 재단, 라이선스 버전 2 또는 (귀하의 선택에 따라)\n이후 버전에 따라 재배포할 수 있습니다.\n\n이 프로그램은 유용하게 사용되기를 바라는 마음으로 배포되며, 어떠한 보증도 없이\n상품성 또는 특정 목적에의 적합성에 대한 묵시적 보증도 없이 배포됩니다.\n자세한 내용은 GNU 일반 공중 사용 허가서를 참조하세요.\n\n이 프로그램과 함께 GNU 일반 공중 사용 허가서 사본을 이 프로그램과 함께 받았어야 합니다.\n그렇지 않은 경우 http://www.gnu.org/licenses 을 참조하세요."
 
-#: cmdevents.cpp:2454
+#: cmdevents.cpp:2427
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 msgstr "컬러라이저 해킹이 활성화된 경우 게임보이 바이오스를 사용할 수 없습니다."
 
-#: cmdevents.cpp:2520
+#: cmdevents.cpp:2493
 msgid "LAN link is already active. Disable link mode to disconnect."
 msgstr "랜 링크가 이미 활성화되어 있습니다. 연결을 끊으려면 링크 모드를 비활성화합니다."
 
-#: cmdevents.cpp:2526
+#: cmdevents.cpp:2499
 msgid "Network is not supported in local mode."
 msgstr "로컬 모드에서는 네트워크가 지원되지 않음."
 
@@ -772,201 +772,201 @@ msgstr "%f 값은 %s 옵션에 무효합니다; 유효한 값은 %f - %f입니�
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "%d 값은 %s 옵션에 무효합니다; 유효한 값은 %d - %d입니다."
 
-#: config/option.cpp:480 opts.cpp:613 opts.cpp:622 opts.cpp:631 opts.cpp:640
+#: config/option.cpp:480 opts.cpp:624 opts.cpp:633 opts.cpp:642 opts.cpp:651
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr "옵션 %s 에 대해 유효하지 않은 값 %s"
 
-#: config/user-input.cpp:23
+#: config/user-input.cpp:22
 msgid "Backspace"
 msgstr "Backspace"
 
-#: config/user-input.cpp:24
+#: config/user-input.cpp:23
 msgid "Delete"
 msgstr "Delete"
 
-#: config/user-input.cpp:25
+#: config/user-input.cpp:24
 msgid "Page Up"
 msgstr "Page Up"
 
-#: config/user-input.cpp:26
+#: config/user-input.cpp:25
 msgid "Page Down"
 msgstr "Page Down"
 
-#: config/user-input.cpp:27
+#: config/user-input.cpp:26
 msgid "Num Lock"
 msgstr "Num Lock"
 
-#: config/user-input.cpp:28
+#: config/user-input.cpp:27
 msgid "Scroll Lock"
 msgstr "Scroll Lock"
 
-#: config/user-input.cpp:31
+#: config/user-input.cpp:30
 msgid "Num Space"
 msgstr "Num Space"
 
-#: config/user-input.cpp:32
+#: config/user-input.cpp:31
 msgid "Num Tab"
 msgstr "Num Tab"
 
-#: config/user-input.cpp:33
+#: config/user-input.cpp:32
 msgid "Num Enter"
 msgstr "Num Enter"
 
-#: config/user-input.cpp:34
+#: config/user-input.cpp:33
 msgid "Num Home"
 msgstr "Num Home"
 
-#: config/user-input.cpp:35
+#: config/user-input.cpp:34
 msgid "Num left"
 msgstr "Num left"
 
-#: config/user-input.cpp:36
+#: config/user-input.cpp:35
 msgid "Num Up"
 msgstr "Num Up"
 
-#: config/user-input.cpp:37
+#: config/user-input.cpp:36
 msgid "Num Right"
 msgstr "Num Right"
 
-#: config/user-input.cpp:38
+#: config/user-input.cpp:37
 msgid "Num Down"
 msgstr "Num Down"
 
-#: config/user-input.cpp:39
+#: config/user-input.cpp:38
 msgid "Num PageUp"
 msgstr "Num PageUp"
 
-#: config/user-input.cpp:40
+#: config/user-input.cpp:39
 msgid "Num PageDown"
 msgstr "Num PageDown"
 
-#: config/user-input.cpp:41
+#: config/user-input.cpp:40
 msgid "Num End"
 msgstr "Num End"
 
-#: config/user-input.cpp:42
+#: config/user-input.cpp:41
 msgid "Num Begin"
 msgstr "Num Begin"
 
-#: config/user-input.cpp:43
+#: config/user-input.cpp:42
 msgid "Num Insert"
 msgstr "Num Insert"
 
-#: config/user-input.cpp:44
+#: config/user-input.cpp:43
 msgid "Num Delete"
 msgstr "Num Delete"
 
-#: config/user-input.cpp:45
+#: config/user-input.cpp:44
 msgid "Num ="
 msgstr "Num ="
 
-#: config/user-input.cpp:46
+#: config/user-input.cpp:45
 msgid "Num *"
 msgstr "Num *"
 
-#: config/user-input.cpp:47
+#: config/user-input.cpp:46
 msgid "Num +"
 msgstr "Num +"
 
-#: config/user-input.cpp:48
+#: config/user-input.cpp:47
 msgid "Num ,"
 msgstr "Num ,"
 
-#: config/user-input.cpp:49
+#: config/user-input.cpp:48
 msgid "Num -"
 msgstr "Num -"
 
-#: config/user-input.cpp:50
+#: config/user-input.cpp:49
 msgid "Num ."
 msgstr "Num ."
 
-#: config/user-input.cpp:51
+#: config/user-input.cpp:50
 msgid "Num /"
 msgstr "Num /"
 
-#: config/user-input.cpp:55
+#: config/user-input.cpp:54
 msgid "Volume Mute"
 msgstr "볼륨 무음"
 
-#: config/user-input.cpp:56
+#: config/user-input.cpp:55
 msgid "Volume Down"
 msgstr "볼륨 낮춤"
 
-#: config/user-input.cpp:57
+#: config/user-input.cpp:56
 msgid "Volume Up"
 msgstr "Volume Up"
 
-#: config/user-input.cpp:58
+#: config/user-input.cpp:57
 msgid "Next Track"
 msgstr "다음 트랙"
 
-#: config/user-input.cpp:59
+#: config/user-input.cpp:58
 msgid "Previous Track"
 msgstr "이전 트랙"
 
-#: config/user-input.cpp:60
+#: config/user-input.cpp:59
 msgid "Stop"
 msgstr "정지"
 
-#: config/user-input.cpp:61
+#: config/user-input.cpp:60
 msgid "Play/Pause"
 msgstr "재생/잠시 멈춤"
 
-#: config/user-input.cpp:94
+#: config/user-input.cpp:93
 msgid "Alt+"
 msgstr "Alt+"
 
-#: config/user-input.cpp:97
+#: config/user-input.cpp:96
 msgid "Ctrl+"
 msgstr "Ctrl+"
 
-#: config/user-input.cpp:101
+#: config/user-input.cpp:100
 msgid "Rawctrl+"
 msgstr "Rawctrl+"
 
-#: config/user-input.cpp:105
+#: config/user-input.cpp:104
 msgid "Shift+"
 msgstr "Shift+"
 
-#: config/user-input.cpp:108
+#: config/user-input.cpp:107
 msgid "Meta+"
 msgstr "Meta+"
 
-#: config/user-input.cpp:135
+#: config/user-input.cpp:134
 msgid "Alt"
 msgstr "Alt"
 
-#: config/user-input.cpp:136
+#: config/user-input.cpp:135
 msgid "Shift"
 msgstr "Shift"
 
-#: config/user-input.cpp:138 config/user-input.cpp:141
+#: config/user-input.cpp:137 config/user-input.cpp:140
 msgid "Ctrl"
 msgstr "Ctrl"
 
-#: config/user-input.cpp:139
+#: config/user-input.cpp:138
 msgid "Cmd"
 msgstr "Cmd"
 
-#: dialogs/accel-config.cpp:156
+#: dialogs/accel-config.cpp:149
 msgid "Menu commands"
 msgstr "메뉴 명령"
 
-#: dialogs/accel-config.cpp:268
+#: dialogs/accel-config.cpp:261
 msgid "This will clear all user-defined accelerators. Are you sure?"
 msgstr "이렇게 하면 모든 사용자 정의 가속기가 지워집니다. 확실한가요?"
 
-#: dialogs/accel-config.cpp:268 dialogs/accel-config.cpp:305
+#: dialogs/accel-config.cpp:261 dialogs/accel-config.cpp:298
 msgid "Confirm"
 msgstr "확인"
 
-#: dialogs/accel-config.cpp:302
+#: dialogs/accel-config.cpp:295
 #, c-format
 msgid "This will unassign \"%s\" from \"%s\". Are you sure?"
 msgstr "이렇게 하면 \"%s\"에서 \"%s\"의 할당이 해제됩니다. 확실한가요?"
 
-#: dialogs/directories-config.cpp:50
+#: dialogs/directories-config.cpp:48
 msgid "Browse"
 msgstr "Browse"
 
@@ -974,34 +974,34 @@ msgstr "Browse"
 msgid "Invalid value for Default magnification."
 msgstr "기본 배율에 대한 잘못된 값입니다."
 
-#: dialogs/display-config.cpp:339 xrc/DisplayConfig.xrc:86
+#: dialogs/display-config.cpp:331 xrc/DisplayConfig.xrc:86
 #: xrc/DisplayConfig.xrc:136 xrc/DisplayConfig.xrc:222
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:213 xrc/SoundConfig.xrc:303
 msgid "None"
 msgstr "없음"
 
-#: dialogs/display-config.cpp:369
+#: dialogs/display-config.cpp:361
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "%s에서 사용가능한 rpi 플러그인을 찾을 수 없음"
 
-#: dialogs/display-config.cpp:408 dialogs/display-config.cpp:450
+#: dialogs/display-config.cpp:400 dialogs/display-config.cpp:442
 #: xrc/DisplayConfig.xrc:108
 msgid "Plugin"
 msgstr "플러그인"
 
-#: dialogs/display-config.cpp:415
+#: dialogs/display-config.cpp:407
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "픽셀 필터 사용: %s"
 
-#: dialogs/display-config.cpp:422
+#: dialogs/display-config.cpp:414
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr "프레임 간 블렌딩 사용: %s"
 
-#: dialogs/game-boy-config.cpp:141 xrc/GameBoyAdvanceConfig.xrc:122
+#: dialogs/game-boy-config.cpp:142 xrc/GameBoyAdvanceConfig.xrc:122
 #: xrc/GameBoyConfig.xrc:138 xrc/GameBoyConfig.xrc:159
 msgid "(None)"
 msgstr "(없음)"
@@ -1143,17 +1143,17 @@ msgstr "%02X (일본)"
 msgid "%02X (World)"
 msgstr "%02X (세계)"
 
-#: dialogs/gb-rom-info.cpp:208
+#: dialogs/gb-rom-info.cpp:201
 #, c-format
 msgid "%02X (Actual: %02X)"
 msgstr "%02X (실제: %02X)"
 
-#: dialogs/gb-rom-info.cpp:211
+#: dialogs/gb-rom-info.cpp:204
 #, c-format
 msgid "%04X (Actual: %04X)"
 msgstr "%04X (실제: %04X)"
 
-#: dialogs/sound-config.cpp:257
+#: dialogs/sound-config.cpp:250
 #, c-format
 msgid "%d frame = %.2f ms"
 msgstr ""
@@ -1196,159 +1196,159 @@ msgid ""
 "Table (*.act)|*.act"
 msgstr "윈도우즈 팔레트 (*.pal)|*.pal| 페인트샵 팔레트 (*.pal)|*.pal| 어도비 컬러 테이블 (*.act)|*.act"
 
-#: guiinit.cpp:106
+#: guiinit.cpp:89
 msgid "Start!"
 msgstr "시작!"
 
-#: guiinit.cpp:125
+#: guiinit.cpp:108
 msgid "Connect"
 msgstr "연결"
 
-#: guiinit.cpp:142
+#: guiinit.cpp:125
 msgid "You must enter a valid host name"
 msgstr "유효한 호스트 이름을 입력해야 합니다."
 
-#: guiinit.cpp:143
+#: guiinit.cpp:126
 msgid "Host name invalid"
 msgstr "호스트 이름이 잘못되었습니다."
 
-#: guiinit.cpp:161
+#: guiinit.cpp:144
 msgid "Waiting for clients..."
 msgstr "클라이언트를 기다리는 중..."
 
-#: guiinit.cpp:162
+#: guiinit.cpp:145
 #, c-format
 msgid "Server IP address is: %s\n"
 msgstr "서버 IP주소: %s\n"
 
-#: guiinit.cpp:164
+#: guiinit.cpp:147
 msgid "Waiting for connection..."
 msgstr "연결중... 기다려주세요."
 
-#: guiinit.cpp:165
+#: guiinit.cpp:148
 #, c-format
 msgid "Connecting to %s\n"
 msgstr "%s에 연결합니다.\n"
 
-#: guiinit.cpp:198
+#: guiinit.cpp:181
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr "오류가 발생했습니다.\n다시 시도해보십시오."
 
-#: guiinit.cpp:265 guiinit.cpp:318
+#: guiinit.cpp:248 guiinit.cpp:301
 msgid "Select cheat file"
 msgstr "치트파일 선택"
 
-#: guiinit.cpp:266
+#: guiinit.cpp:249
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA 치트 리스트 (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 
-#: guiinit.cpp:285 panel.cpp:551
+#: guiinit.cpp:268 panel.cpp:549
 msgid "Loaded cheats"
 msgstr "치트 불러오기"
 
-#: guiinit.cpp:319
+#: guiinit.cpp:302
 msgid "VBA cheat lists (*.clt)|*.clt"
 msgstr "VBA 치트 파일 (*.clt)|*.clt"
 
-#: guiinit.cpp:337
+#: guiinit.cpp:320
 msgid "Saved cheats"
 msgstr "치트 저장됨"
 
-#: guiinit.cpp:368 guiinit.cpp:387
+#: guiinit.cpp:346 guiinit.cpp:365
 msgid "Restore old values?"
 msgstr "이전 값을 복원하시겠습니까?"
 
-#: guiinit.cpp:369 guiinit.cpp:388
+#: guiinit.cpp:347 guiinit.cpp:366
 msgid "Removing cheats"
 msgstr "치트 지우기"
 
-#: guiinit.cpp:783
+#: guiinit.cpp:756
 msgid "Generic Code"
 msgstr "제네릭 코드"
 
-#: guiinit.cpp:855 guiinit.cpp:1110
+#: guiinit.cpp:828 guiinit.cpp:1078
 msgid "Number cannot be empty"
 msgstr "번호는 비워 둘 수 없습니다"
 
-#: guiinit.cpp:905
+#: guiinit.cpp:878
 msgid "Search produced no results"
 msgstr "검색 결과 없음"
 
-#: guiinit.cpp:1068
+#: guiinit.cpp:1041
 msgid "8-bit "
 msgstr "8비트"
 
-#: guiinit.cpp:1072
+#: guiinit.cpp:1045
 msgid "16-bit "
 msgstr "16비트"
 
-#: guiinit.cpp:1076
+#: guiinit.cpp:1049
 msgid "32-bit "
 msgstr "32비트"
 
-#: guiinit.cpp:1082
+#: guiinit.cpp:1055
 msgid "signed decimal"
 msgstr "부호화 10진수"
 
-#: guiinit.cpp:1086
+#: guiinit.cpp:1059
 msgid "unsigned decimal"
 msgstr "부호없는 10진수"
 
-#: guiinit.cpp:1090
+#: guiinit.cpp:1063
 msgid "unsigned hexadecimal"
 msgstr "부호없는 16진수"
 
-#: guiinit.cpp:1783
+#: guiinit.cpp:1721
 msgid "Main icon not found"
 msgstr "메인 아이콘 찾을 수 없음"
 
-#: guiinit.cpp:1801
+#: guiinit.cpp:1739
 msgid "Main display panel not found"
 msgstr "메인 디스플레이 패널을 찾을 수 없음"
 
-#: guiinit.cpp:2060
+#: guiinit.cpp:1998
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "무효한 %s메뉴 항목 ; 제거합니다."
 
-#: guiinit.cpp:2245
+#: guiinit.cpp:2183
 msgid "Code"
 msgstr "코드"
 
-#: guiinit.cpp:2254
+#: guiinit.cpp:2192
 msgid "Description"
 msgstr "서술"
 
-#: guiinit.cpp:2328 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:2266 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "주소"
 
-#: guiinit.cpp:2329
+#: guiinit.cpp:2267
 msgid "Old Value"
 msgstr "오래된 값"
 
-#: guiinit.cpp:2330
+#: guiinit.cpp:2268
 msgid "New Value"
 msgstr "새로운 값"
 
-#: guiinit.cpp:2580
+#: guiinit.cpp:2518
 msgid "JoyBus host invalid; disabling"
 msgstr "조이버스 호스트 무효; 비활성화합니다."
 
-#: opts.cpp:289
+#: opts.cpp:298
 msgid ""
 "The INI file was written for a more recent version of VBA-M. Some INI option"
 " values may have been reset."
 msgstr "INI 파일은 최신 버전의 VBA-M용으로 작성되었습니다. 일부 INI 옵션 값이 재설정되었을 수 있습니다."
 
-#: opts.cpp:469 opts.cpp:489 opts.cpp:677
+#: opts.cpp:480 opts.cpp:500 opts.cpp:688
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr " %s 키는 %s에 무효한 키 설정입니다."
 
-#: opts.cpp:699
+#: opts.cpp:710
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr "값이 %s 알 수 없는 옵션 %s"
@@ -1367,7 +1367,7 @@ msgstr "파일을 불러올 수 없습니다."
 msgid "Unable to load Game Boy ROM %s"
 msgstr "%s 게임보이 ROM을 불러올 수 없습니다."
 
-#: panel.cpp:295 panel.cpp:406 panel.cpp:1153
+#: panel.cpp:295 panel.cpp:406 panel.cpp:1145
 msgid "Could not initialize the sound driver!"
 msgstr "사운드 드라이버를 초기화할 수 없습니다!"
 
@@ -1387,152 +1387,152 @@ msgstr "%s BIOS를 불러올 수 없습니다."
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "%s 게임보이 어드밴스 ROM을 불러올 수 없습니다."
 
-#: panel.cpp:588
+#: panel.cpp:586
 msgid " player "
 msgstr "플레이어"
 
-#: panel.cpp:754
+#: panel.cpp:750
 #, c-format
 msgid "Loaded state %s"
 msgstr "상태 %s 불러옴"
 
-#: panel.cpp:754
+#: panel.cpp:750
 #, c-format
 msgid "Error loading state %s"
 msgstr "상태 %s 불러오기 오류"
 
-#: panel.cpp:778
+#: panel.cpp:774
 #, c-format
 msgid "Saved state %s"
 msgstr "상태 %s 저장함"
 
-#: panel.cpp:778
+#: panel.cpp:774
 #, c-format
 msgid "Error saving state %s"
 msgstr "상태 %s 저장 오류"
 
-#: panel.cpp:982
+#: panel.cpp:978
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 msgstr "전체 화면 모드 %d x %d - %d @ %d 지원되지 않음; 다른 것을 찾고 있음"
 
-#: panel.cpp:1020
+#: panel.cpp:1016
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
 msgstr "전체 화면 모드 %d x %d - %d @ %d 지원되지 않음"
 
-#: panel.cpp:1025
+#: panel.cpp:1021
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
 msgstr "유효한 모드: %d x %d - %d @ %d"
 
-#: panel.cpp:1033
+#: panel.cpp:1029
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
 msgstr "선택 모드 %d x %d - %d @ %d"
 
-#: panel.cpp:1037
+#: panel.cpp:1033
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr "모드를 %d x %d - %d @ %d로 변경하지 못했음"
 
-#: panel.cpp:1128
+#: panel.cpp:1120
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr "유효한 게임보이 어드밴스 카트리지가 아님"
 
-#: panel.cpp:1299
+#: panel.cpp:1290
 msgid "No memory for rewinding"
 msgstr "되감기할 메모리가 없습니다."
 
-#: panel.cpp:1309
+#: panel.cpp:1300
 msgid "Error writing rewind state"
 msgstr "오류 - 되감기 상태 작성을 할 수 없습니다."
 
-#: panel.cpp:2341
+#: panel.cpp:2272
 msgid "Enabling EGL VSync."
 msgstr "EGL 수직동기화 활성화"
 
-#: panel.cpp:2343
+#: panel.cpp:2274
 msgid "Disabling EGL VSync."
 msgstr "EGL 수직동기화 비활성화"
 
-#: panel.cpp:2350
+#: panel.cpp:2281
 msgid "Enabling GLX VSync."
 msgstr "GLX 수직동기화 활성화"
 
-#: panel.cpp:2352
+#: panel.cpp:2283
 msgid "Disabling GLX VSync."
 msgstr "GLX 수직동기화 비활성화"
 
-#: panel.cpp:2370
+#: panel.cpp:2301
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "glXSwapIntervalEXT 설정 실패"
 
-#: panel.cpp:2379
+#: panel.cpp:2310
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "glXSwapIntervalSGI 설정 실패"
 
-#: panel.cpp:2388
+#: panel.cpp:2319
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "glXSwapIntervalMESA 설정 실패"
 
-#: panel.cpp:2395
+#: panel.cpp:2326
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "wglGetExtensionsStringEXT은 지원하지 않습니다."
 
-#: panel.cpp:2398
+#: panel.cpp:2329
 msgid "No support for WGL_EXT_swap_control"
 msgstr "WGL_EXT_swap_control은 지원하지 않습니다."
 
-#: panel.cpp:2407
+#: panel.cpp:2338
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "wglSwapIntervalEXT 설정 실패"
 
-#: panel.cpp:2413
+#: panel.cpp:2344
 msgid "No VSYNC available on this platform"
 msgstr "이 플랫폼에서는 VSYNC를 사용할 수 없습니다."
 
-#: panel.cpp:2515
+#: panel.cpp:2446
 msgid "memory allocation error"
 msgstr "메모리 할당 오류"
 
-#: panel.cpp:2518
+#: panel.cpp:2449
 msgid "error initializing codec"
 msgstr "코덱 초기화 오류"
 
-#: panel.cpp:2521
+#: panel.cpp:2452
 msgid "error writing to output file"
 msgstr "출력 파일 작성 오류"
 
-#: panel.cpp:2524
+#: panel.cpp:2455
 msgid "can't guess output format from file name"
 msgstr "파일명으로부터 출력 포맷을 알 수 없습니다."
 
-#: panel.cpp:2529
+#: panel.cpp:2460
 msgid "programming error; aborting!"
 msgstr "프로그래밍 오류; 종료합니다!"
 
-#: panel.cpp:2541 panel.cpp:2570
+#: panel.cpp:2472 panel.cpp:2501
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "%s (%s)부터 녹화를 시작할 수 없습니다."
 
-#: panel.cpp:2598
+#: panel.cpp:2529
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "오디오 / 비디오 녹음 중 오류 (%s); 중단 중"
 
-#: panel.cpp:2604
+#: panel.cpp:2535
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "(%s) 에서 오디오 녹음 오류; 종료합니다."
 
-#: panel.cpp:2614
+#: panel.cpp:2545
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "(%s) 에서 비디오 녹화 오류; 종료합니다."
 
-#: panel.cpp:2769
+#: panel.cpp:2700
 #, c-format
 msgid "Volume: %d %%"
 msgstr "볼륨: %d %%"
@@ -1607,27 +1607,27 @@ msgstr "가상 tty %s를 열 수 없습니다."
 msgid "Error setting up server socket (%d)"
 msgstr "서버 소켓을 설정할 수 없습니다. (%d)"
 
-#: viewers.cpp:588
+#: viewers.cpp:586
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr "텍스트 파일 (*.txt;*.log)|*.txt;*.log|"
 
-#: viewers.cpp:730 viewers.cpp:802
+#: viewers.cpp:728 viewers.cpp:800
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
 msgstr "메모리 덤프 (*.dmp;*.bin)|*.dmp;*.bin|"
 
-#: viewers.cpp:732
+#: viewers.cpp:730
 msgid "Select memory dump file"
 msgstr "메모리 덤프 파일을 선택"
 
-#: viewsupt.cpp:778
+#: viewsupt.cpp:806
 msgid "Red:"
 msgstr ""
 
-#: viewsupt.cpp:787
+#: viewsupt.cpp:815
 msgid "Green:"
 msgstr ""
 
-#: viewsupt.cpp:796
+#: viewsupt.cpp:824
 msgid "Blue:"
 msgstr ""
 
@@ -1636,90 +1636,80 @@ msgstr ""
 msgid "Unable to load dialog %s from resources"
 msgstr "리소스로부터 대화 %s을 불러올 수 없습니다."
 
-#: widgets/sdljoy.cpp:189
-#, c-format
-msgid "Connected %s: %s"
-msgstr "연결됨 %s: %s"
-
-#: widgets/sdljoy.cpp:204
-#, c-format
-msgid "Disconnected %s"
-msgstr "연결 끊김 %s"
-
-#: wxvbam.cpp:400 wxvbam.cpp:417
+#: wxvbam.cpp:398 wxvbam.cpp:415
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "제공된 구성 파일이 잘못되었습니다: %s"
 
-#: wxvbam.cpp:561
+#: wxvbam.cpp:559
 msgid "Could not create main window"
 msgstr "메인 윈도우를 생성할 수 없습니다."
 
-#: wxvbam.cpp:642
+#: wxvbam.cpp:634
 msgid "Save built-in XRC file and exit"
 msgstr "built-in XRC 파일을 저장하고 종료합니다."
 
-#: wxvbam.cpp:645
+#: wxvbam.cpp:637
 msgid "Save built-in vba-over.ini and exit"
 msgstr "built-in vba-over.ini 를 저장하고 종료합니다."
 
-#: wxvbam.cpp:648
+#: wxvbam.cpp:640
 msgid "Print configuration path and exit"
 msgstr "설정 경로를 출력하고 종료합니다."
 
-#: wxvbam.cpp:651
+#: wxvbam.cpp:643
 msgid "Start in full-screen mode"
 msgstr "전체화면으로 시작합니다."
 
-#: wxvbam.cpp:654
+#: wxvbam.cpp:646
 msgid "Set a configuration file"
 msgstr "구성 설정 파일을 설정합니다."
 
-#: wxvbam.cpp:658
+#: wxvbam.cpp:650
 msgid "Delete shared link state first, if it exists"
 msgstr "shared link state 파일이 존재한다면 삭제합니다."
 
-#: wxvbam.cpp:665
+#: wxvbam.cpp:657
 msgid "List all settable options and exit"
 msgstr "설정 가능한 옵션을 나열하고 종료합니다."
 
-#: wxvbam.cpp:668
+#: wxvbam.cpp:660
 msgid "ROM file"
 msgstr "ROM 파일"
 
-#: wxvbam.cpp:670
+#: wxvbam.cpp:662
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:701
+#: wxvbam.cpp:693
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "구성 / 빌드 오류: 기본 제공 xrc를 찾을 수 없음"
 
-#: wxvbam.cpp:709
+#: wxvbam.cpp:701
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "기본 구성을 %s로 작성했습니다.\n재정의하려면 변경된 루트 노드를 제외한 모든 노드를 제거하세요. 다음 검색 경로에서 .xrc 또는 .xrs 파일에서 올바른 이름의 루트 노드를 처음 발견하면 기본값이 재정의됩니다:"
 
-#: wxvbam.cpp:723
+#: wxvbam.cpp:715
 msgid "Configuration is read from, in order:"
 msgstr "설정은 다음으로부터 순서대로 불러옵니다 :"
 
-#: wxvbam.cpp:737
+#: wxvbam.cpp:729
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "기본 제공 오버라이드 파일을 %s로 작성했습니다.\n재정의하려면 변경된 섹션을 제외한 모든 섹션을 삭제합니다. 검색 경로에서 처음 찾은 섹션이 사용됩니다:"
 
-#: wxvbam.cpp:743
+#: wxvbam.cpp:735
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\t빌트인"
 
-#: wxvbam.cpp:758
+#: wxvbam.cpp:750
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1727,17 +1717,17 @@ msgid ""
 "\n"
 msgstr "사용자 인터페이스에서 설정이 변경되면, 명령 줄에서 선택된 옵션이 저장됩니다. \n\n플래그 옵션에서, true와 false는 각각 1과 0으로 지정됩니다.\n\n"
 
-#: wxvbam.cpp:766
+#: wxvbam.cpp:758
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "키보드 / * 옵션으로 사용 가능한 수준 :\n\n"
 
-#: wxvbam.cpp:777
+#: wxvbam.cpp:769
 msgid "Configuration file not found."
 msgstr "설정 파일을 찾을 수 없습니다."
 
-#: wxvbam.cpp:808
+#: wxvbam.cpp:800
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "설정 옵션이 잘못되었거나, 여러 개의 ROM 파일이 주어졌습니다:\n"
 
@@ -1781,19 +1771,19 @@ msgstr "주 %08x 재생 실패"
 msgid "dsbSecondary->Lock() failed: %08x"
 msgstr "dsbSecondary->Lock() 실패: %08x"
 
-#: audio/internal/faudio.cpp:41 audio/internal/faudio.cpp:596
+#: audio/internal/faudio.cpp:41 audio/internal/faudio.cpp:487
 msgid "FAudio: Enumerating devices failed!"
 msgstr "FAudio: 장치 열거에 실패했습니다!"
 
-#: audio/internal/faudio.cpp:227 audio/internal/faudio.cpp:589
+#: audio/internal/faudio.cpp:214 audio/internal/faudio.cpp:480
 msgid "The FAudio interface failed to initialize!"
 msgstr "FAudio 인터페이스 초기화에 실패했습니다!"
 
-#: audio/internal/faudio.cpp:258
+#: audio/internal/faudio.cpp:245
 msgid "FAudio: Creating mastering voice failed!"
 msgstr "FAudio: 마스터링 음성 작성에 실패했습니다!"
 
-#: audio/internal/faudio.cpp:267
+#: audio/internal/faudio.cpp:254
 msgid "FAudio: Creating source voice failed!"
 msgstr "FAudio: 소스 음성 작성에 실패했습니다!"
 
