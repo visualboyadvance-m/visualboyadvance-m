@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-23 19:00+0000\n"
+"POT-Creation-Date: 2024-04-23 22:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Damian Drakon <dragon1590@gmail.com>, 2019-2020,2022-2023\n"
 "Language-Team: Polish (Poland) (http://app.transifex.com/bgk/vba-m/language/pl_PL/)\n"
@@ -768,7 +768,7 @@ msgstr "Nieprawidłowa wartość %f dla opcji %s; prawidłowe wartości to %f - 
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Nieprawidłowa wartość %d dla opcji %s; prawidłowe wartości to %d - %d"
 
-#: config/option.cpp:480 opts.cpp:624 opts.cpp:633 opts.cpp:642 opts.cpp:651
+#: config/option.cpp:480 opts.cpp:621 opts.cpp:630 opts.cpp:639 opts.cpp:648
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr "Nieprawidłowa wartość %s dla opcji %s"
@@ -929,21 +929,9 @@ msgstr "Shift+"
 msgid "Meta+"
 msgstr "Meta+"
 
-#: config/user-input.cpp:134
-msgid "Alt"
-msgstr "Alt"
-
-#: config/user-input.cpp:135
-msgid "Shift"
-msgstr "Shift"
-
-#: config/user-input.cpp:137 config/user-input.cpp:140
-msgid "Ctrl"
-msgstr "Ctrl"
-
-#: config/user-input.cpp:138
-msgid "Cmd"
-msgstr "Cmd"
+#: config/user-input.cpp:284
+msgid "Key"
+msgstr ""
 
 #: dialogs/accel-config.cpp:149
 msgid "Menu commands"
@@ -1339,12 +1327,12 @@ msgid ""
 " values may have been reset."
 msgstr "Plik INI został napisany dla nowszej wersji VBA-M. Niektóre wartości opcji INI mogły zostać zresetowane."
 
-#: opts.cpp:480 opts.cpp:500 opts.cpp:688
+#: opts.cpp:480 opts.cpp:500 opts.cpp:685
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Nieprawidłowe przypisanie klawisza/szy %s dla %s"
 
-#: opts.cpp:710
+#: opts.cpp:707
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr "Nieznana opcja %s z wartością %s"

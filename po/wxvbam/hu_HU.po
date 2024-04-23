@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-23 19:00+0000\n"
+"POT-Creation-Date: 2024-04-23 22:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Greg@Cyberdyne, 2018\n"
 "Language-Team: Hungarian (Hungary) (http://app.transifex.com/bgk/vba-m/language/hu_HU/)\n"
@@ -770,7 +770,7 @@ msgstr "A %f érvénytelen érték a %s opcióhoz; használható értékek: %f -
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "A %d érvénytelen érték a %s opcióhoz; használható értékek: %d - %d"
 
-#: config/option.cpp:480 opts.cpp:624 opts.cpp:633 opts.cpp:642 opts.cpp:651
+#: config/option.cpp:480 opts.cpp:621 opts.cpp:630 opts.cpp:639 opts.cpp:648
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr "%s érvénytelen érték a %s beállításhoz"
@@ -931,20 +931,8 @@ msgstr ""
 msgid "Meta+"
 msgstr "Meta+"
 
-#: config/user-input.cpp:134
-msgid "Alt"
-msgstr ""
-
-#: config/user-input.cpp:135
-msgid "Shift"
-msgstr ""
-
-#: config/user-input.cpp:137 config/user-input.cpp:140
-msgid "Ctrl"
-msgstr ""
-
-#: config/user-input.cpp:138
-msgid "Cmd"
+#: config/user-input.cpp:284
+msgid "Key"
 msgstr ""
 
 #: dialogs/accel-config.cpp:149
@@ -1341,12 +1329,12 @@ msgid ""
 " values may have been reset."
 msgstr ""
 
-#: opts.cpp:480 opts.cpp:500 opts.cpp:688
+#: opts.cpp:480 opts.cpp:500 opts.cpp:685
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "A %s - %s érvénytelen billentyű hozzárendelés"
 
-#: opts.cpp:710
+#: opts.cpp:707
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr "%s ismeretlen beállítás %s értékkel"

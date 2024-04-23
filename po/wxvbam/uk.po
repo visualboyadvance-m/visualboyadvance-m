@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-23 19:00+0000\n"
+"POT-Creation-Date: 2024-04-23 22:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Svyatoslav <zarazafamila@gmail.com>, 2023\n"
 "Language-Team: Ukrainian (http://app.transifex.com/bgk/vba-m/language/uk/)\n"
@@ -769,7 +769,7 @@ msgstr "Недійсне значення %f для опції %s; дійсні 
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Недійсне значення %d для опції %s; дійсні значення: %d - %d."
 
-#: config/option.cpp:480 opts.cpp:624 opts.cpp:633 opts.cpp:642 opts.cpp:651
+#: config/option.cpp:480 opts.cpp:621 opts.cpp:630 opts.cpp:639 opts.cpp:648
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr "Недійсне значення %s для опції %s."
@@ -930,21 +930,9 @@ msgstr "Shift+"
 msgid "Meta+"
 msgstr "Meta+"
 
-#: config/user-input.cpp:134
-msgid "Alt"
-msgstr "Alt"
-
-#: config/user-input.cpp:135
-msgid "Shift"
-msgstr "Shift"
-
-#: config/user-input.cpp:137 config/user-input.cpp:140
-msgid "Ctrl"
-msgstr "Ctrl"
-
-#: config/user-input.cpp:138
-msgid "Cmd"
-msgstr "Cmd"
+#: config/user-input.cpp:284
+msgid "Key"
+msgstr ""
 
 #: dialogs/accel-config.cpp:149
 msgid "Menu commands"
@@ -1340,12 +1328,12 @@ msgid ""
 " values may have been reset."
 msgstr "INI записано для новішої версії Visual Boy Advance-M. Можливе відновлення деяких значень INI-опцій."
 
-#: opts.cpp:480 opts.cpp:500 opts.cpp:688
+#: opts.cpp:480 opts.cpp:500 opts.cpp:685
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Недійсна призначена кнопка %s для %s."
 
-#: opts.cpp:710
+#: opts.cpp:707
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr "Невідома опція %s зі значенням %s."
