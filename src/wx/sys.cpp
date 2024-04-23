@@ -340,7 +340,7 @@ uint32_t systemReadJoypad(int joy)
     if (joy < 0 || joy > 3)
         joy = OPTION(kJoyDefault) - 1;
 
-    uint32_t ret = config::GameControlState::Instance().GetJoypad(joy);
+    uint32_t ret = wxGetApp().game_control_state()->GetJoypad(joy);
 
     if (turbo)
         ret |= KEYM_SPEED;
@@ -662,8 +662,7 @@ void systemUpdateSolarSensor()
 void systemUpdateMotionSensor()
 {
     for (int i = 0; i < 4; i++) {
-        const uint32_t joy_value =
-            config::GameControlState::Instance().GetJoypad(i);
+        const uint32_t joy_value = wxGetApp().game_control_state()->GetJoypad(i);
 
         if (!sensorx[i])
             sensorx[i] = 2047;

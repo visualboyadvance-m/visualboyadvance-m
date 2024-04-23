@@ -13,6 +13,7 @@
 #include "wx/config/option-observer.h"
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
+#include "wx/config/shortcuts.h"
 #include "wx/config/user-input.h"
 #include "wx/strutils.h"
 #include "wx/wxvbam.h"
@@ -107,7 +108,7 @@ uint32_t LoadUnsignedOption(wxConfigBase* cfg,
 
 opts_t gopts;
 
-const std::map<config::GameControl, std::unordered_set<config::UserInput>> kDefaultBindings = {
+const config::GameControlBindings kDefaultBindings = {
     {config::GameControl(0, config::GameKey::Up),
      {
          config::KeyboardInput('W'),
@@ -469,10 +470,10 @@ void load_opts(bool first_time_launch) {
     }
 
     // Initialize game control bindings to populate the configuration map.
-    gopts.game_control_bindings.insert(kDefaultBindings.begin(), kDefaultBindings.end());
+    wxGetApp().game_control_bindings()->insert(kDefaultBindings.begin(), kDefaultBindings.end());
 
     // joypad is special
-    for (auto& iter : gopts.game_control_bindings) {
+    for (auto& iter : *wxGetApp().game_control_bindings()) {
         const wxString optname = iter.first.ToString();
         if (cfg->Read(optname, &s)) {
             iter.second = config::UserInput::FromConfigString(s);
@@ -487,8 +488,9 @@ void load_opts(bool first_time_launch) {
 
     // keyboard is special
     // Keyboard does not get written with defaults
-    wxString kbopt(wxT("Keyboard/"));
+    wxString kbopt("Keyboard/");
     int kboff = kbopt.size();
+    config::Shortcuts* shortcuts = wxGetApp().shortcuts();
 
     for (int i = 0; i < ncmds; i++) {
         kbopt.resize(kboff);
@@ -500,7 +502,7 @@ void load_opts(bool first_time_launch) {
                 wxLogWarning(_("Invalid key binding %s for %s"), s.c_str(), kbopt.c_str());
             } else {
                 for (const auto& input : inputs) {
-                    gopts.shortcuts.AssignInputToCommand(input, cmdtab[i].cmd_id);
+                    shortcuts->AssignInputToCommand(input, cmdtab[i].cmd_id);
                 }
             }
         }
@@ -564,7 +566,7 @@ void update_joypad_opts() {
 
     // For joypad, compare the UserInput sets.
     bool game_bindings_changed = false;
-    for (const auto &iter : gopts.game_control_bindings) {
+    for (const auto& iter : *wxvbamApp().game_control_bindings()) {
         wxString option_name = iter.first.ToString();
         std::unordered_set<config::UserInput> saved_config =
             config::UserInput::FromConfigString(cfg->Read(option_name, ""));
@@ -575,7 +577,7 @@ void update_joypad_opts() {
     }
 
     if (game_bindings_changed) {
-        config::GameControlState::Instance().OnGameBindingsChanged();
+        wxvbamApp().game_control_state()->OnGameBindingsChanged();
     }
 
     cfg->SetPath("/");
@@ -588,7 +590,7 @@ void update_shortcut_opts() {
     // For shortcuts, it's easier to delete everything and start over.
     cfg->DeleteGroup("/Keyboard");
     cfg->SetPath("/Keyboard");
-    for (const auto& iter : gopts.shortcuts.GetConfiguration()) {
+    for (const auto& iter : wxGetApp().shortcuts()->GetKeyboardConfiguration()) {
         int cmd = 0;
         for (cmd = 0; cmd < ncmds; cmd++)
             if (cmdtab[cmd].cmd_id == iter.first)
@@ -685,7 +687,7 @@ void opt_set(const wxString& name, const wxString& val) {
                 wxLogWarning(_("Invalid key binding %s for %s"), val.c_str(), name.c_str());
             }
             for (const auto& input : inputs) {
-                gopts.shortcuts.AssignInputToCommand(input, cmd->cmd_id);
+                wxGetApp().shortcuts()->AssignInputToCommand(input, cmd->cmd_id);
             }
         }
 
@@ -694,11 +696,12 @@ void opt_set(const wxString& name, const wxString& val) {
 
     const nonstd::optional<config::GameControl> game_control =
         config::GameControl::FromString(name);
+    auto game_control_bindings = wxGetApp().game_control_bindings();
     if (game_control) {
         if (val.empty()) {
-            gopts.game_control_bindings[game_control.value()].clear();
+            (*game_control_bindings)[game_control.value()].clear();
         } else {
-            gopts.game_control_bindings[game_control.value()] =
+            (*game_control_bindings)[game_control.value()] =
                 config::UserInput::FromConfigString(val);
         }
         return;

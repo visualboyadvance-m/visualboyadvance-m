@@ -58,8 +58,8 @@ void ResetMenuItemAccelerator(wxMenuItem* menu_item) {
     if (tab_index != wxString::npos) {
         new_label.resize(tab_index);
     }
-    std::set<config::UserInput> user_inputs =
-        gopts.shortcuts.InputsForCommand(menu_item->GetId());
+    std::unordered_set<config::UserInput> user_inputs =
+        wxGetApp().shortcuts()->InputsForCommand(menu_item->GetId());
     for (const config::UserInput& user_input : user_inputs) {
         if (user_input.device() != config::UserInput::Device::Keyboard) {
             // Cannot use joystick keybinding as text without wx assertion error.
@@ -256,7 +256,8 @@ wxvbamApp::wxvbamApp()
       pending_fullscreen(false),
       frame(nullptr),
       using_wayland(false),
-      sdl_poller_(widgets::SdlPoller(std::bind(&wxvbamApp::GetJoyEventHandler, this))) {}
+      game_control_state_(std::bind(&wxvbamApp::game_control_bindings, this)),
+      sdl_poller_(std::bind(&wxvbamApp::GetJoyEventHandler, this)) {}
 
 const wxString wxvbamApp::GetPluginsDir()
 {
@@ -541,7 +542,7 @@ bool wxvbamApp::OnInit() {
 
     // Initialize game bindings here, after defaults bindings, vbam.ini bindings
     // and command line overrides have been applied.
-    config::GameControlState::Instance().OnGameBindingsChanged();
+    game_control_state()->OnGameBindingsChanged();
 
     // We need to gather this information before crating the MainFrame as the
     // OnSize / OnMove event handlers can fire during construction.
@@ -1008,7 +1009,7 @@ int MainFrame::FilterEvent(wxEvent& event) {
     }
 
     const widgets::UserInputEvent& user_input_event = static_cast<widgets::UserInputEvent&>(event);
-    const int command = gopts.shortcuts.CommandForInput(user_input_event.input());
+    const int command = wxGetApp().shortcuts()->CommandForInput(user_input_event.input());
     if (command == 0) {
         // No associated command found.
         return wxEventFilter::Event_Skip;

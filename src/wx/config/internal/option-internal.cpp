@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <map>
 
 #include <wx/log.h>
 #include <wx/translation.h>

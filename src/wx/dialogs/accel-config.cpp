@@ -122,15 +122,21 @@ void PopulateTreeWithMenu(std::unordered_map<int, wxTreeItemId>* command_to_item
 }  // namespace
 
 // static
-AccelConfig* AccelConfig::NewInstance(wxWindow* parent, wxMenuBar* menu, wxMenu* recents) {
+AccelConfig* AccelConfig::NewInstance(wxWindow* parent,
+                                      wxMenuBar* menu,
+                                      wxMenu* recents,
+                                      const config::ShortcutsProvider shortcuts_provider) {
     assert(parent);
     assert(menu);
     assert(recents);
-    return new AccelConfig(parent, menu, recents);
+    return new AccelConfig(parent, menu, recents, shortcuts_provider);
 }
 
-AccelConfig::AccelConfig(wxWindow* parent, wxMenuBar* menu, wxMenu* recents)
-    : BaseDialog(parent, "AccelConfig") {
+AccelConfig::AccelConfig(wxWindow* parent,
+                         wxMenuBar* menu,
+                         wxMenu* recents,
+                         const config::ShortcutsProvider shortcuts_provider)
+    : BaseDialog(parent, "AccelConfig"), shortcuts_provider_(shortcuts_provider) {
     assert(menu);
 
     // Loads the various dialog elements.
@@ -213,11 +219,11 @@ void AccelConfig::OnDialogShown(wxShowEvent& ev) {
     remove_button_->Enable(false);
     currently_assigned_label_->SetLabel("");
 
-    config_shortcuts_ = gopts.shortcuts.Clone();
+    config_shortcuts_ = shortcuts_provider_()->Clone();
 }
 
 void AccelConfig::OnValidate(wxCommandEvent& ev) {
-    gopts.shortcuts = std::move(config_shortcuts_);
+    *shortcuts_provider_() = std::move(config_shortcuts_);
     ev.Skip();
 }
 

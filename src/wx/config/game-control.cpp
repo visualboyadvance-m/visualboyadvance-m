@@ -1,6 +1,5 @@
 #include "wx/config/game-control.h"
 
-#include "wx/opts.h"
 #include "wx/strutils.h"
 #include "wx/wxlogdebug.h"
 
@@ -195,13 +194,8 @@ bool GameControl::operator>=(const GameControl& other) const {
     return !(*this < other);
 }
 
-GameControlState& GameControlState::Instance() {
-    static GameControlState g_game_control_state;
-    return g_game_control_state;
-}
-
-GameControlState::GameControlState() : joypads_({0, 0, 0, 0}) {}
-GameControlState::~GameControlState() = default;
+GameControlState::GameControlState(const GameControlBindingsProvider bindings_provider)
+    : joypads_({0, 0, 0, 0}), bindings_provider_(bindings_provider) {}
 
 bool GameControlState::OnInputPressed(const config::UserInput& user_input) {
     assert(user_input);
@@ -282,7 +276,7 @@ void GameControlState::OnGameBindingsChanged() {
     Reset();
 
     input_bindings_.clear();
-    for (const auto& iter : gopts.game_control_bindings) {
+    for (const auto& iter : *bindings_provider_()) {
         for (const auto& user_input : iter.second) {
             input_bindings_[user_input].emplace(iter.first);
         }
