@@ -1058,7 +1058,7 @@ GameArea::~GameArea()
 
 void GameArea::OnKillFocus(wxFocusEvent& ev)
 {
-    config::GameControlState::Instance().Reset();
+    wxGetApp().game_control_state()->Reset();
     ev.Skip();
 }
 
@@ -1079,7 +1079,7 @@ void GameArea::Pause()
     // when the game is paused like this, we should not allow any
     // input to remain pressed, because they could be released
     // outside of the game zone and we would not know about it.
-    config::GameControlState::Instance().Reset();
+    wxGetApp().game_control_state()->Reset();
 
     if (loaded != IMAGE_UNKNOWN)
         soundPause();
@@ -1330,13 +1330,13 @@ static Display* GetX11Display() {
 #endif  // __WXGTK__
 
 void GameArea::OnUserInputDown(widgets::UserInputEvent& event) {
-    if (config::GameControlState::Instance().OnInputPressed(event.input())) {
+    if (wxGetApp().game_control_state()->OnInputPressed(event.input())) {
         wxWakeUpIdle();
     }
 }
 
 void GameArea::OnUserInputUp(widgets::UserInputEvent& event) {
-    if (config::GameControlState::Instance().OnInputReleased(event.input())) {
+    if (wxGetApp().game_control_state()->OnInputReleased(event.input())) {
         wxWakeUpIdle();
     }
 

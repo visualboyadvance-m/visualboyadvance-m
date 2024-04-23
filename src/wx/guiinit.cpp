@@ -2480,7 +2480,8 @@ bool MainFrame::BindControls()
             d->Fit();
         }
 #endif
-        dialogs::AccelConfig::NewInstance(this, menubar, recent);
+        dialogs::AccelConfig::NewInstance(this, menubar, recent,
+                                          std::bind(&wxvbamApp::shortcuts, &wxGetApp()));
     } catch (std::exception& e) {
         wxLogError(wxString::FromUTF8(e.what()));
         return false;

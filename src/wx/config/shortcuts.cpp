@@ -3,6 +3,7 @@
 #include <wx/string.h>
 #include <wx/translation.h>
 #include <wx/xrc/xmlres.h>
+#include <unordered_set>
 
 #include "wx/config/user-input.h"
 
@@ -28,14 +29,14 @@ Shortcuts::Shortcuts() {
     }
 }
 
-Shortcuts::Shortcuts(const std::unordered_map<int, std::set<UserInput>>& command_to_inputs,
-                     const std::map<UserInput, int>& input_to_command,
-                     const std::map<UserInput, int>& disabled_defaults)
+Shortcuts::Shortcuts(const std::unordered_map<int, std::unordered_set<UserInput>>& command_to_inputs,
+                     const std::unordered_map<UserInput, int>& input_to_command,
+                     const std::unordered_map<UserInput, int>& disabled_defaults)
     : command_to_inputs_(command_to_inputs.begin(), command_to_inputs.end()),
       input_to_command_(input_to_command.begin(), input_to_command.end()),
       disabled_defaults_(disabled_defaults.begin(), disabled_defaults.end()) {}
 
-std::vector<std::pair<int, wxString>> Shortcuts::GetConfiguration() const {
+std::vector<std::pair<int, wxString>> Shortcuts::GetKeyboardConfiguration() const {
     std::vector<std::pair<int, wxString>> config;
     config.reserve(command_to_inputs_.size() + 1);
 
@@ -63,9 +64,9 @@ std::vector<std::pair<int, wxString>> Shortcuts::GetConfiguration() const {
     return config;
 }
 
-std::set<UserInput> Shortcuts::InputsForCommand(int command) const {
+std::unordered_set<UserInput> Shortcuts::InputsForCommand(int command) const {
     if (command == NoopCommand()) {
-        std::set<UserInput> noop_inputs;
+        std::unordered_set<UserInput> noop_inputs;
         for (const auto& iter : disabled_defaults_) {
             noop_inputs.insert(iter.first);
         }

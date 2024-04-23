@@ -12,8 +12,10 @@
 #include <wx/datetime.h>
 
 #include "core/base/system.h"
+#include "wx/config/game-control.h"
 #include "wx/config/option-observer.h"
 #include "wx/config/option.h"
+#include "wx/config/shortcuts.h"
 #include "wx/dialogs/base-dialog.h"
 #include "wx/widgets/dpi-support.h"
 #include "wx/widgets/keep-on-top-styler.h"
@@ -118,6 +120,11 @@ public:
         }
     }
 
+    // Accessors for configuration data.
+    config::Shortcuts* shortcuts() { return &shortcuts_; }
+    config::GameControlState* game_control_state() { return &game_control_state_; }
+    config::GameControlBindings* game_control_bindings() { return &game_control_bindings_; }
+
     virtual ~wxvbamApp();
 
 protected:
@@ -128,6 +135,10 @@ protected:
 private:
     // Returns the currently active event handler to use for user input events.
     wxEvtHandler* GetJoyEventHandler();
+
+    config::Shortcuts shortcuts_;
+    config::GameControlState game_control_state_;
+    config::GameControlBindings game_control_bindings_;
 
     wxPathList config_path;
     char* home = nullptr;

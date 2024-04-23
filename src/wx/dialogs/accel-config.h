@@ -24,7 +24,10 @@ namespace dialogs {
 // Manages the shortcuts editor dialog.
 class AccelConfig : public BaseDialog {
 public:
-    static AccelConfig* NewInstance(wxWindow* parent, wxMenuBar* menu_bar, wxMenu* recents);
+    static AccelConfig* NewInstance(wxWindow* parent,
+                                    wxMenuBar* menu_bar,
+                                    wxMenu* recents,
+                                    const config::ShortcutsProvider shortcuts_provider);
 
     ~AccelConfig() override = default;
 
@@ -32,7 +35,10 @@ private:
     // The constructor is private so initialization has to be done via the
     // static method. This is because this class is destroyed when its
     // owner, `parent` is destroyed. This prevents accidental deletion.
-    AccelConfig(wxWindow* parent, wxMenuBar* menu_bar, wxMenu* recents);
+    AccelConfig(wxWindow* parent,
+                wxMenuBar* menu_bar,
+                wxMenu* recents,
+                const config::ShortcutsProvider shortcuts_provider);
 
     // Re-initializes the configuration.
     void OnDialogShown(wxShowEvent& ev);
@@ -73,6 +79,8 @@ private:
 
     config::Shortcuts config_shortcuts_;
     int selected_command_ = 0;
+
+    const config::ShortcutsProvider shortcuts_provider_;
 };
 
 }  // namespace dialogs

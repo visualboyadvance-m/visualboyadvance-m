@@ -5,6 +5,7 @@
 #include <array>
 #include <map>
 #include <set>
+#include <unordered_set>
 
 #include <optional.hpp>
 
@@ -107,12 +108,16 @@ private:
     friend class GameControlState;
 };
 
+using GameControlBindings = std::map<GameControl, std::unordered_set<UserInput>>;
+using GameControlBindingsProvider = std::function<GameControlBindings*()>;
+
 // Tracks in-game input and computes the joypad value used to send control input
-// data to the emulator.
-class GameControlState {
+// data to the emulator. This class should be kept as a singleton owned by the
+// application.
+class GameControlState final {
 public:
-    // This is a global singleton.
-    static GameControlState& Instance();
+    explicit GameControlState(const GameControlBindingsProvider bindings_provider);
+    ~GameControlState() = default;
 
     // Disable copy constructor and assignment operator.
     GameControlState(const GameControlState&) = delete;
@@ -120,8 +125,8 @@ public:
 
     // Processes `user_input` and updates the internal tracking state.
     // Returns true if `user_input` corresponds to a game input.
-    bool OnInputPressed(const config::UserInput& user_input);
-    bool OnInputReleased(const config::UserInput& user_input);
+    bool OnInputPressed(const UserInput& user_input);
+    bool OnInputReleased(const UserInput& user_input);
 
     // Clears all input.
     void Reset();
@@ -133,14 +138,15 @@ public:
     uint32_t GetJoypad(int joypad) const;
 
 private:
-    GameControlState();
-    ~GameControlState();
-
     std::map<config::UserInput, std::set<GameControl>> input_bindings_;
-    std::map<GameControl, std::set<config::UserInput>> active_controls_;
-    std::set<config::UserInput> keys_pressed_;
+    std::map<GameControl, std::unordered_set<UserInput>> active_controls_;
+    std::unordered_set<config::UserInput> keys_pressed_;
     std::array<uint32_t, kNbJoypads> joypads_;
+
+    const GameControlBindingsProvider bindings_provider_;
 };
+
+using GameControlStateProvider = std::function<GameControlState*()>;
 
 }  // namespace config
 

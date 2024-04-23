@@ -3,8 +3,8 @@
 #include <wx/time.h>
 
 #include "wx/config/user-input.h"
-#include "wx/opts.h"
 #include "wx/widgets/user-input-event.h"
+#include "wx/wxvbam.h"
 
 namespace widgets {
 
@@ -119,7 +119,7 @@ bool UserInputCtrlValidator::TransferToWindow() {
     UserInputCtrl* control = wxDynamicCast(GetWindow(), UserInputCtrl);
     assert(control);
 
-    control->SetInputs(gopts.game_control_bindings[game_control_]);
+    control->SetInputs((*wxGetApp().game_control_bindings())[game_control_]);
     return true;
 }
 
@@ -127,7 +127,7 @@ bool UserInputCtrlValidator::TransferFromWindow() {
     UserInputCtrl* control = wxDynamicCast(GetWindow(), UserInputCtrl);
     assert(control);
 
-    gopts.game_control_bindings.insert({game_control_, control->inputs()});
+    wxGetApp().game_control_bindings()->insert({game_control_, control->inputs()});
     return true;
 }
 

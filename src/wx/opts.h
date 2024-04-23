@@ -1,21 +1,18 @@
 #ifndef VBAM_WX_OPTS_H_
 #define VBAM_WX_OPTS_H_
 
-#include <map>
+#include <cstdint>
 
 #include <wx/string.h>
 #include <wx/vidmode.h>
 
 #include "wx/config/game-control.h"
-#include "wx/config/shortcuts.h"
-#include "wx/config/user-input.h"
 
 // Forward declaration.
 class wxFileHistory;
 
 // Default joystick bindings.
-extern const std::map<config::GameControl, std::unordered_set<config::UserInput>>
-    kDefaultBindings;
+extern const config::GameControlBindings kDefaultBindings;
 
 extern struct opts_t {
     opts_t();
@@ -36,12 +33,7 @@ extern struct opts_t {
     int rewind_interval = 0;
 
     /// Joypad
-    std::map<config::GameControl, std::unordered_set<config::UserInput>>
-        game_control_bindings;
     int autofire_rate = 1;
-
-    /// Keyboard
-    config::Shortcuts shortcuts;
 
     /// Core
     int gdb_port = 55555;
