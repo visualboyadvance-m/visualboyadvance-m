@@ -381,27 +381,27 @@ msgstr "体感 下"
 
 #: config/command.cpp:30
 msgid "Motion Left"
-msgstr ""
+msgstr "体感 左"
 
 #: config/command.cpp:30
 msgid "Motion Right"
-msgstr ""
+msgstr "体感 右"
 
 #: config/command.cpp:30
 msgid "Motion In"
-msgstr ""
+msgstr "体感 后"
 
 #: config/command.cpp:31
 msgid "Motion Out"
-msgstr ""
+msgstr "体感 前"
 
 #: config/command.cpp:31
 msgid "Auto A"
-msgstr ""
+msgstr "连发 A"
 
 #: config/command.cpp:31
 msgid "Auto B"
-msgstr ""
+msgstr "连发 B"
 
 #: config/command.cpp:31 xrc/DisplayConfig.xrc:200
 msgid "Speed"
@@ -409,16 +409,16 @@ msgstr "速度"
 
 #: config/command.cpp:31
 msgid "Capture"
-msgstr ""
+msgstr "截图"
 
 #: config/command.cpp:32
 msgid "GameShark"
-msgstr ""
+msgstr "GameShark"
 
 #: config/command.cpp:106
 #, c-format
 msgid "Joypad %zu %s"
-msgstr ""
+msgstr "手柄 %zu %s"
 
 #: config/internal/option-internal.cpp:380
 msgid "Use bilinear filter with 3d renderer"
@@ -1032,7 +1032,7 @@ msgstr "Meta+"
 
 #: config/user-input.cpp:284
 msgid "Key"
-msgstr ""
+msgstr "按键"
 
 #: dialogs/accel-config.cpp:148
 msgid "Menu commands"
