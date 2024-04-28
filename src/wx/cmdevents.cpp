@@ -365,7 +365,7 @@ EVT_HANDLER_MASK(SetLoadingDotCodeFile, "Load e-Reader Dot Code...", CMDEN_GBA)
     static wxString loaddotcodefile_path;
     wxFileDialog dlg(this, _("Select Dot Code file"), loaddotcodefile_path, wxEmptyString,
         _(
-                         "e-Reader Dot Code (*.bin;*.raw)|"
+                         "E-Reader Dot Code (*.bin;*.raw)|"
                          "*.bin;*.raw"),
         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     int ret = ShowModal(&dlg);
@@ -387,7 +387,7 @@ EVT_HANDLER_MASK(SetSavingDotCodeFile, "Save e-Reader Dot Code...", CMDEN_GBA)
     static wxString savedotcodefile_path;
     wxFileDialog dlg(this, _("Select Dot Code file"), savedotcodefile_path, wxEmptyString,
         _(
-                         "e-Reader Dot Code (*.bin;*.raw)|"
+                         "E-Reader Dot Code (*.bin;*.raw)|"
                          "*.bin;*.raw"),
         wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     int ret = ShowModal(&dlg);

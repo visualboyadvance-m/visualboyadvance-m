@@ -2443,21 +2443,21 @@ static const wxString media_err(recording::MediaRet ret)
         return wxT("");
 
     case recording::MRET_ERR_NOMEM:
-        return _("memory allocation error");
+        return _("Memory allocation error");
 
     case recording::MRET_ERR_NOCODEC:
-        return _("error initializing codec");
+        return _("Error initializing codec");
 
     case recording::MRET_ERR_FERR:
-        return _("error writing to output file");
+        return _("Error writing to output file");
 
     case recording::MRET_ERR_FMTGUESS:
-        return _("can't guess output format from file name");
+        return _("Can't guess output format from file name");
 
     default:
         //    case MRET_ERR_RECORDING:
         //    case MRET_ERR_BUFSIZE:
-        return _("programming error; aborting!");
+        return _("Programming error; aborting!");
     }
 }
 

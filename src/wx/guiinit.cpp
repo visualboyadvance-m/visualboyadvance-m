@@ -1052,15 +1052,15 @@ public:
 
         switch (fmt) {
         case CFVFMT_SD:
-            s += _("signed decimal");
+            s += _("Signed decimal");
             break;
 
         case CFVFMT_UD:
-            s += _("unsigned decimal");
+            s += _("Unsigned decimal");
             break;
 
         case CFVFMT_UH:
-            s += _("unsigned hexadecimal");
+            s += _("Unsigned hexadecimal");
             break;
         }
 
