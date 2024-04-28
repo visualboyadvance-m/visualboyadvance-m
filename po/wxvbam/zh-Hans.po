@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-24 02:00+0000\n"
+"POT-Creation-Date: 2024-04-28 19:15+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: 天绝星 <c.cejhb@gmail.com>, 2016-2017,2019-2020,2022-2024\n"
 "Language-Team: Chinese Simplified (http://app.transifex.com/bgk/vba-m/language/zh-Hans/)\n"
@@ -76,8 +76,8 @@ msgid "Select Dot Code file"
 msgstr "选择点代码文件"
 
 #: cmdevents.cpp:368 cmdevents.cpp:390
-msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr "电子阅读器点代码 (*.bin;*.raw)|*.bin;*.raw"
+msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
+msgstr ""
 
 #: cmdevents.cpp:409 cmdevents.cpp:604
 msgid "Select battery file"
@@ -1374,16 +1374,16 @@ msgid "32-bit "
 msgstr "32 位"
 
 #: guiinit.cpp:1055
-msgid "signed decimal"
-msgstr "十进制-有符号"
+msgid "Signed decimal"
+msgstr ""
 
 #: guiinit.cpp:1059
-msgid "unsigned decimal"
-msgstr "十进制-无符号"
+msgid "Unsigned decimal"
+msgstr ""
 
 #: guiinit.cpp:1063
-msgid "unsigned hexadecimal"
-msgstr "十六进制-无符号"
+msgid "Unsigned hexadecimal"
+msgstr ""
 
 #: guiinit.cpp:1721
 msgid "Main icon not found"
@@ -1578,24 +1578,24 @@ msgid "No VSYNC available on this platform"
 msgstr "垂直同步在该平台上不可用 "
 
 #: panel.cpp:2446
-msgid "memory allocation error"
-msgstr "内存分配错误"
+msgid "Memory allocation error"
+msgstr ""
 
 #: panel.cpp:2449
-msgid "error initializing codec"
-msgstr "初始化代码错误"
+msgid "Error initializing codec"
+msgstr ""
 
 #: panel.cpp:2452
-msgid "error writing to output file"
-msgstr "写入输出文件错误"
+msgid "Error writing to output file"
+msgstr ""
 
 #: panel.cpp:2455
-msgid "can't guess output format from file name"
-msgstr "无法从文件名猜测输出格式"
+msgid "Can't guess output format from file name"
+msgstr ""
 
 #: panel.cpp:2460
-msgid "programming error; aborting!"
-msgstr "程序错误；正在中止！"
+msgid "Programming error; aborting!"
+msgstr ""
 
 #: panel.cpp:2472 panel.cpp:2501
 #, c-format
@@ -1888,93 +1888,93 @@ msgstr "XAudio2:  创建主语音失败！"
 msgid "XAudio2: Creating source voice failed!"
 msgstr "XAudio2: 创建源语音失败！"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:639
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:639
 msgid "Error, link already connected"
 msgstr "错误，联机已连接"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:653
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:653
 msgid "Unable to find link driver"
 msgstr "无法找到联机驱动程序"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:696
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:696
 msgid "Link connection does not need updates."
 msgstr "联机连接不需要更新。"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:835
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:899
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1545
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2878
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:835
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:899
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1545
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2878
 #, c-format
 msgid "Player %d disconnected."
 msgstr "玩家 %d 已断开连接。"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:939
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:979
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1019
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1654
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:939
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:979
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1019
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1654
 msgid "Server disconnected."
 msgstr "服务器已断开连接。"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1101
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1133
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1678
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1711
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1101
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1133
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1678
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1711
 msgid "Network error."
 msgstr "网络错误。"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1110
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1687
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1110
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1687
 #, c-format
 msgid "Player %d connected"
 msgstr "玩家 %d 已连接"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1124
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1701
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1124
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1701
 msgid "All players connected"
 msgstr "所有玩家已连接"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1145
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1723
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1145
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1723
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
 msgstr "以 #%d 方式连接，正在等待 %d 名玩家加入"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1154
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1732
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1154
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1732
 msgid "All players joined."
 msgstr "所有玩家已加入。"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1647
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1647
 msgid "Server timed out."
 msgstr "服务器超时。"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2601
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2622
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2601
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2622
 msgid "Error creating file mapping"
 msgstr "创建文件映射错误"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2612
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2612
 msgid "Error mapping file"
 msgstr "映射文件错误"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2659
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2659
 msgid "5 or more GBAs not supported."
 msgstr "不支持 5 台或更多 GBA 机器。"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2678
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2697
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2678
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2697
 msgid "Error opening event"
 msgstr "打开事件错误"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2797
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2797
 msgid "Lost link; reinitialize to reconnect"
 msgstr "联机丢失；重新初始化以重新连接"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2804
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2804
 msgid "Lost link; reconnected"
 msgstr "联机丢失；已重新连接"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2925
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2925
 msgid "Unknown slave timed out; resetting comm"
 msgstr "未知从机超时；正在重置通讯"
 
@@ -2829,16 +2829,16 @@ msgid "If not empty or 0, enable rewind (seconds)"
 msgstr "如果不为空也不为 0，则启用回退 (秒)"
 
 #: xrc/GeneralConfig.xrc:67
-msgid "seconds (0-600); 0 = disable"
-msgstr "秒 (0-600); 0 = 禁用"
+msgid "Seconds (0-600); 0 = disable"
+msgstr ""
 
 #: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
 msgstr "阀门(&T)"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
-msgid "percent of normal:"
-msgstr "正常百分比："
+msgid "Percent of normal:"
+msgstr ""
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"

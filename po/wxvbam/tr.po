@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-24 02:00+0000\n"
+"POT-Creation-Date: 2024-04-28 19:15+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Sinan H., 2016,2018,2022,2024\n"
 "Language-Team: Turkish (http://app.transifex.com/bgk/vba-m/language/tr/)\n"
@@ -72,8 +72,8 @@ msgid "Select Dot Code file"
 msgstr "Dot Kodu dosyasını seçin"
 
 #: cmdevents.cpp:368 cmdevents.cpp:390
-msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr "e-Reader Dot Kodu (*.bin;*.raw)|*.bin;*.raw"
+msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
+msgstr ""
 
 #: cmdevents.cpp:409 cmdevents.cpp:604
 msgid "Select battery file"
@@ -1370,16 +1370,16 @@ msgid "32-bit "
 msgstr "32-bit "
 
 #: guiinit.cpp:1055
-msgid "signed decimal"
-msgstr "işaretli ondalık"
+msgid "Signed decimal"
+msgstr ""
 
 #: guiinit.cpp:1059
-msgid "unsigned decimal"
-msgstr "İşaretsiz ondalık"
+msgid "Unsigned decimal"
+msgstr ""
 
 #: guiinit.cpp:1063
-msgid "unsigned hexadecimal"
-msgstr "işaretsiz onaltılık"
+msgid "Unsigned hexadecimal"
+msgstr ""
 
 #: guiinit.cpp:1721
 msgid "Main icon not found"
@@ -1574,24 +1574,24 @@ msgid "No VSYNC available on this platform"
 msgstr "Bu platform için Dikey Eşitleme mevcut değil"
 
 #: panel.cpp:2446
-msgid "memory allocation error"
-msgstr "Hafıza atama hatası"
+msgid "Memory allocation error"
+msgstr ""
 
 #: panel.cpp:2449
-msgid "error initializing codec"
-msgstr "Çözücü başlatılırken hata"
+msgid "Error initializing codec"
+msgstr ""
 
 #: panel.cpp:2452
-msgid "error writing to output file"
-msgstr "Çıktı dosyası yazılırken hata"
+msgid "Error writing to output file"
+msgstr ""
 
 #: panel.cpp:2455
-msgid "can't guess output format from file name"
-msgstr "çıktı biçimi, dosya adından anlaşılamıyor"
+msgid "Can't guess output format from file name"
+msgstr ""
 
 #: panel.cpp:2460
-msgid "programming error; aborting!"
-msgstr "Programlama hatası; İşlem durduruluyor!"
+msgid "Programming error; aborting!"
+msgstr ""
 
 #: panel.cpp:2472 panel.cpp:2501
 #, c-format
@@ -1884,93 +1884,93 @@ msgstr "XAudio2: Ana ses oluşturulamadı!"
 msgid "XAudio2: Creating source voice failed!"
 msgstr "XAudio2: Kaynak seslerin oluşturulması başarısız!"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:639
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:639
 msgid "Error, link already connected"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:653
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:653
 msgid "Unable to find link driver"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:696
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:696
 msgid "Link connection does not need updates."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:835
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:899
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1545
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2878
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:835
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:899
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1545
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2878
 #, c-format
 msgid "Player %d disconnected."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:939
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:979
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1019
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1654
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:939
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:979
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1019
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1654
 msgid "Server disconnected."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1101
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1133
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1678
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1711
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1101
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1133
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1678
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1711
 msgid "Network error."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1110
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1687
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1110
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1687
 #, c-format
 msgid "Player %d connected"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1124
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1701
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1124
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1701
 msgid "All players connected"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1145
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1723
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1145
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1723
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1154
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1732
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1154
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1732
 msgid "All players joined."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1647
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1647
 msgid "Server timed out."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2601
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2622
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2601
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2622
 msgid "Error creating file mapping"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2612
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2612
 msgid "Error mapping file"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2659
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2659
 msgid "5 or more GBAs not supported."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2678
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2697
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2678
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2697
 msgid "Error opening event"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2797
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2797
 msgid "Lost link; reinitialize to reconnect"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2804
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2804
 msgid "Lost link; reconnected"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2925
+#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2925
 msgid "Unknown slave timed out; resetting comm"
 msgstr ""
 
@@ -2825,15 +2825,15 @@ msgid "If not empty or 0, enable rewind (seconds)"
 msgstr "Eğer boş yada 0 değilse, geri sarmayı aktif et (saniye)"
 
 #: xrc/GeneralConfig.xrc:67
-msgid "seconds (0-600); 0 = disable"
-msgstr "saniye (0-600); 0=kapalı"
+msgid "Seconds (0-600); 0 = disable"
+msgstr ""
 
 #: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
 msgstr "&Hızlandırma"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
-msgid "percent of normal:"
+msgid "Percent of normal:"
 msgstr ""
 
 #: xrc/GeneralConfig.xrc:106
