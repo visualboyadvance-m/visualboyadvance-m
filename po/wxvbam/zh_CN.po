@@ -76,7 +76,7 @@ msgstr "选择点代码文件"
 
 #: cmdevents.cpp:368 cmdevents.cpp:390
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr ""
+msgstr "E-Reader 点代码 (*.bin;*.raw)|*.bin;*.raw"
 
 #: cmdevents.cpp:409 cmdevents.cpp:604
 msgid "Select battery file"
@@ -1374,15 +1374,15 @@ msgstr "32 位"
 
 #: guiinit.cpp:1055
 msgid "Signed decimal"
-msgstr ""
+msgstr "有符号十进制"
 
 #: guiinit.cpp:1059
 msgid "Unsigned decimal"
-msgstr ""
+msgstr "无符号十进制"
 
 #: guiinit.cpp:1063
 msgid "Unsigned hexadecimal"
-msgstr ""
+msgstr "无符号十六进制"
 
 #: guiinit.cpp:1721
 msgid "Main icon not found"
@@ -1578,23 +1578,23 @@ msgstr "垂直同步在该平台上不可用 "
 
 #: panel.cpp:2446
 msgid "Memory allocation error"
-msgstr ""
+msgstr "内存分配错误"
 
 #: panel.cpp:2449
 msgid "Error initializing codec"
-msgstr ""
+msgstr "初始化代码错误"
 
 #: panel.cpp:2452
 msgid "Error writing to output file"
-msgstr ""
+msgstr "写入输出文件错误"
 
 #: panel.cpp:2455
 msgid "Can't guess output format from file name"
-msgstr ""
+msgstr "无法从文件名猜测输出格式"
 
 #: panel.cpp:2460
 msgid "Programming error; aborting!"
-msgstr ""
+msgstr "程序错误；正在中止！"
 
 #: panel.cpp:2472 panel.cpp:2501
 #, c-format
@@ -2829,7 +2829,7 @@ msgstr "如果不为空也不为 0，则启用回退 (秒)"
 
 #: xrc/GeneralConfig.xrc:67
 msgid "Seconds (0-600); 0 = disable"
-msgstr ""
+msgstr "秒 (0-600); 0 = 禁用"
 
 #: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
@@ -2837,7 +2837,7 @@ msgstr "节流(&T)"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "Percent of normal:"
-msgstr ""
+msgstr "正常百分比："
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
