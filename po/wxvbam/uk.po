@@ -66,7 +66,7 @@ msgstr "Вибір Dot-коду"
 
 #: cmdevents.cpp:368 cmdevents.cpp:390
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr ""
+msgstr "E-Reader Dot-код|*.bin;*.raw"
 
 #: cmdevents.cpp:409 cmdevents.cpp:604
 msgid "Select battery file"
@@ -1364,15 +1364,15 @@ msgstr "32 біт "
 
 #: guiinit.cpp:1055
 msgid "Signed decimal"
-msgstr ""
+msgstr "Знакове десяткове"
 
 #: guiinit.cpp:1059
 msgid "Unsigned decimal"
-msgstr ""
+msgstr "Беззнакове десяткове"
 
 #: guiinit.cpp:1063
 msgid "Unsigned hexadecimal"
-msgstr ""
+msgstr "Беззнакове шістнадцяткове"
 
 #: guiinit.cpp:1721
 msgid "Main icon not found"
@@ -1568,23 +1568,23 @@ msgstr "Вертикальна синхронізація недоступна �
 
 #: panel.cpp:2446
 msgid "Memory allocation error"
-msgstr ""
+msgstr "Помилка розподілу пам'яті."
 
 #: panel.cpp:2449
 msgid "Error initializing codec"
-msgstr ""
+msgstr "Помилка визначення кодека."
 
 #: panel.cpp:2452
 msgid "Error writing to output file"
-msgstr ""
+msgstr "Помилка запису до кінцевого файлу."
 
 #: panel.cpp:2455
 msgid "Can't guess output format from file name"
-msgstr ""
+msgstr "Неможливо визначити кінцевий формат імені файлу."
 
 #: panel.cpp:2460
 msgid "Programming error; aborting!"
-msgstr ""
+msgstr "Програмна помилка; перервано!"
 
 #: panel.cpp:2472 panel.cpp:2501
 #, c-format
@@ -2819,7 +2819,7 @@ msgstr "Час увімкнення звороту (сек)."
 
 #: xrc/GeneralConfig.xrc:67
 msgid "Seconds (0-600); 0 = disable"
-msgstr ""
+msgstr "Секунд (0-600; 0: вимкнути)"
 
 #: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
@@ -2827,7 +2827,7 @@ msgstr "&Прискорити"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "Percent of normal:"
-msgstr ""
+msgstr "Процент норми:"
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"

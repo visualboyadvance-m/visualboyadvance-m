@@ -93,7 +93,7 @@ msgstr "Selecionar o arquivo do Código Dot"
 
 #: cmdevents.cpp:368 cmdevents.cpp:390
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr ""
+msgstr "Código Dot do e-Reader (*.bin;*.raw)|*.bin;*.raw"
 
 #: cmdevents.cpp:409 cmdevents.cpp:604
 msgid "Select battery file"
@@ -101,7 +101,7 @@ msgstr "Selecionar o arquivo de bateria"
 
 #: cmdevents.cpp:410 cmdevents.cpp:605
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
-msgstr "Arquivo da bateria (*.sav)|*.sav| Salvamento no flash (*.dat)|*.dat"
+msgstr "Arquivo da bateria (*.sav)|*.sav| Save do flash (*.dat)|*.dat"
 
 #: cmdevents.cpp:418
 msgid ""
@@ -563,13 +563,13 @@ msgstr "Tipo de cabo do link"
 
 #: config/internal/option-internal.cpp:443
 msgid "Automatically load last saved state"
-msgstr "Carregar automaticamente o último estado salvo"
+msgstr "Carregar automaticamente o último state salvo"
 
 #: config/internal/option-internal.cpp:445
 msgid ""
 "Directory to store game save files (relative paths are relative to ROM; "
 "blank is config dir)"
-msgstr "Diretório pra armazenar os arquivos de salvamento dos jogos (os caminhos relativos são relativos a ROM; em branco é o diretório de configuração)"
+msgstr "Diretório pra armazenar os arquivos dos saves dos jogos (os caminhos relativos são relativos a ROM; em branco é o diretório de configuração)"
 
 #: config/internal/option-internal.cpp:447
 msgid "Freeze recent load list"
@@ -1391,15 +1391,15 @@ msgstr "32 bits "
 
 #: guiinit.cpp:1055
 msgid "Signed decimal"
-msgstr ""
+msgstr "Decimal assinado"
 
 #: guiinit.cpp:1059
 msgid "Unsigned decimal"
-msgstr ""
+msgstr "Decimal não assinado"
 
 #: guiinit.cpp:1063
 msgid "Unsigned hexadecimal"
-msgstr ""
+msgstr "Hexadecimal não assinado"
 
 #: guiinit.cpp:1721
 msgid "Main icon not found"
@@ -1595,23 +1595,23 @@ msgstr "Não há VSYNC disponível nesta plataforma"
 
 #: panel.cpp:2446
 msgid "Memory allocation error"
-msgstr ""
+msgstr "Erro de alocação da memória"
 
 #: panel.cpp:2449
 msgid "Error initializing codec"
-msgstr ""
+msgstr "Erro ao inicializar o codec"
 
 #: panel.cpp:2452
 msgid "Error writing to output file"
-msgstr ""
+msgstr "Erro ao gravar no arquivo de saída"
 
 #: panel.cpp:2455
 msgid "Can't guess output format from file name"
-msgstr ""
+msgstr "Não pôde adivinhar o formato de saída a partir do nome do arquivo"
 
 #: panel.cpp:2460
 msgid "Programming error; aborting!"
-msgstr ""
+msgstr "Erro de programação; abortando!"
 
 #: panel.cpp:2472 panel.cpp:2501
 #, c-format
@@ -2846,7 +2846,7 @@ msgstr "Se não for vazio ou 0, ativar retrocesso (segundos)"
 
 #: xrc/GeneralConfig.xrc:67
 msgid "Seconds (0-600); 0 = disable"
-msgstr ""
+msgstr "Segundos (0-600); 0 = desativar"
 
 #: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
@@ -2854,7 +2854,7 @@ msgstr "&Acelerar"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "Percent of normal:"
-msgstr ""
+msgstr "Porcentagem do normal:"
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
