@@ -244,7 +244,7 @@ const std::unordered_map<Command, std::unordered_set<UserInput>>& DefaultInputs(
             {
                 KeyboardInput(WXK_F2, wxMOD_CMD)
             }},
-        {ShortcutCommand(wxID_FILE4),
+        {ShortcutCommand(wxID_FILE3),
             {
                 KeyboardInput(WXK_F3, wxMOD_CMD)
             }},
