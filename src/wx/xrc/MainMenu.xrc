@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
-  <object class="wxMenuBar" name="MainMenu">
+  <object class="wxMenuBar" name="MainMenu" subclass="ShortcutMenuBar">
     <object class="wxMenu">
       <label>_File</label>
       <object class="wxMenuItem" name="wxID_OPEN">

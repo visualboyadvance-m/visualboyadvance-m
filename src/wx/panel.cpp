@@ -165,7 +165,6 @@ GameArea::GameArea()
                        config::OptionID::kSoundBuffers, config::OptionID::kSoundDSoundHWAccel,
                        config::OptionID::kSoundUpmix},
                       [&](config::Option*) { schedule_audio_restart_ = true; }) {
-    this->SetClientObject(new widgets::UserInputEventSender(this));
     SetSizer(new wxBoxSizer(wxVERTICAL));
     // all renderers prefer 32-bit
     // well, "simple" prefers 24-bit, but that's not available for filters
@@ -1461,7 +1460,6 @@ DrawingPanel::DrawingPanel(wxWindow* parent, int _width, int _height)
     , wxPanel(parent, wxID_ANY, wxPoint(0, 0), parent->GetClientSize(),
           wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
 {
-    this->SetClientObject(new widgets::UserInputEventSender(this));
 }
 
 void DrawingPanelBase::DrawingPanelInit()
@@ -2193,7 +2191,6 @@ GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
     , wxglc(parent, wxID_ANY, glopts, wxPoint(0, 0), parent->GetClientSize(),
           wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
 {
-    this->SetClientObject(new widgets::UserInputEventSender(this));
     widgets::RequestHighResolutionOpenGlSurfaceForWindow(this);
     SetContext();
 }

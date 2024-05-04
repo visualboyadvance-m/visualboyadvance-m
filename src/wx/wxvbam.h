@@ -18,6 +18,7 @@
 #include "wx/config/option.h"
 #include "wx/dialogs/base-dialog.h"
 #include "wx/widgets/dpi-support.h"
+#include "wx/widgets/event-handler-provider.h"
 #include "wx/widgets/keep-on-top-styler.h"
 #include "wx/widgets/sdl-poller.h"
 #include "wx/widgets/user-input-event.h"
@@ -59,7 +60,7 @@ inline std::string ToString(const wxChar* aString)
 
 class MainFrame;
 
-class wxvbamApp final : public wxApp {
+class wxvbamApp final : public wxApp, public widgets::EventHandlerProvider {
 public:
     wxvbamApp();
 
@@ -133,8 +134,8 @@ protected:
     int console_status = 0;
 
 private:
-    // Returns the currently active event handler to use for user input events.
-    wxEvtHandler* GetJoyEventHandler();
+    // EventHandlerProvider implementation.
+    wxEvtHandler* event_handler() override;
 
     config::Bindings bindings_;
     config::EmulatedGamepad emulated_gamepad_;
@@ -143,6 +144,7 @@ private:
     char* home = nullptr;
 
     widgets::SdlPoller sdl_poller_;
+    widgets::KeyboardInputSender keyboard_input_sender_;
 
     // Main configuration file.
     wxFileName config_file_;
@@ -200,14 +202,14 @@ public:
     void GetMenuOptionBool(const wxString& menuName, bool* field);
     void SetMenuOption(const wxString& menuName, bool value);
 
-    int FilterEvent(wxEvent& event);
-
     GameArea* GetPanel()
     {
         return panel;
     }
 
     wxString GetGamePath(wxString path);
+
+    bool CanProcessShortcuts() const { return !menus_opened && !dialog_opened; }
 
     // wxMSW pauses the game for menu popups and modal dialogs, but wxGTK
     // does not.  It's probably desirable to pause the game.  To do this for

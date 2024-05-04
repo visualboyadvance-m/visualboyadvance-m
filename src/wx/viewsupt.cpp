@@ -1,37 +1,10 @@
 #include "wx/viewsupt.h"
 
 #include "wx/config/option-proxy.h"
+#include "wx/config/user-input.h"
 #include "wx/wxvbam.h"
 
 namespace Viewers {
-
-namespace {
-
-int getKeyboardKeyCode(const wxKeyEvent& event) {
-    const int key_code = event.GetKeyCode();
-    if (key_code > WXK_START) {
-        return key_code;
-    }
-    int uc = event.GetUnicodeKey();
-    if (uc != WXK_NONE) {
-        if (uc < 32) {  // not all control chars
-            switch (uc) {
-                case WXK_BACK:
-                case WXK_TAB:
-                case WXK_RETURN:
-                case WXK_ESCAPE:
-                    return uc;
-                default:
-                    return WXK_NONE;
-            }
-        }
-        return uc;
-    } else {
-        return event.GetKeyCode();
-    }
-}
-
-}  // namespace
 
 void Viewer::CloseDlg(wxCloseEvent& ev)
 {
@@ -339,12 +312,11 @@ void MemView::Refit()
             NULL, this);
         disp.Connect(wxEVT_LEFT_UP, wxMouseEventHandler(MemView::MouseEvent),
             NULL, this);
-        disp.Connect(wxEVT_CHAR, wxKeyEventHandler(MemView::KeyEvent),
-            NULL, this);
         disp.SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOX));
         sb.Create(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
             wxSB_VERTICAL);
         sb.SetScrollbar(0, 15, 500, 15);
+        disp.Bind(VBAM_EVT_USER_INPUT, &MemView::KeyEvent, this);
     }
 
     wxClientDC dc(&disp);
@@ -443,17 +415,28 @@ void MemView::ShowCaret()
     disp.SetFocus();
 }
 
-void MemView::KeyEvent(wxKeyEvent& ev)
+void MemView::KeyEvent(widgets::UserInputEvent& ev)
 {
-    uint32_t k = getKeyboardKeyCode(ev);
-    int nnib = 2 << fmt;
+    const nonstd::optional<config::UserInput> opt_user_input = ev.FirstReleasedInput();
+    if (opt_user_input == nonstd::nullopt) {
+        return;
+    }
 
-    switch (k) {
+    const config::UserInput& user_input = opt_user_input.value();
+    if (!user_input.is_keyboard()) {
+        return;
+    }
+
+    const wxKeyCode key = user_input.keyboard_input().key();
+    const wxKeyModifier mod = user_input.keyboard_input().mod();
+
+    int nnib = 2 << fmt;
+    switch (key) {
     case WXK_RIGHT:
     case WXK_NUMPAD_RIGHT:
         if (isasc)
             selnib += 2;
-        else if (ev.GetModifiers() == wxMOD_SHIFT)
+        else if (mod == wxMOD_SHIFT)
             selnib += 2 << fmt;
         else if (!(selnib % nnib))
             selnib += nnib + nnib - 1;
@@ -475,7 +458,7 @@ void MemView::KeyEvent(wxKeyEvent& ev)
     case WXK_NUMPAD_LEFT:
         if (isasc)
             selnib -= 2;
-        else if (ev.GetModifiers() == wxMOD_SHIFT)
+        else if (mod == wxMOD_SHIFT)
             selnib -= 2 << fmt;
         else if (!(++selnib % nnib))
             selnib -= nnib * 2;
@@ -506,7 +489,7 @@ void MemView::KeyEvent(wxKeyEvent& ev)
         break;
 
     default:
-        if (k > 0x7f || (isasc && !isprint(k)) || (!isasc && !isxdigit(k))) {
+        if (key > 0x7f || (isasc && !isprint(key)) || (!isasc && !isxdigit(key))) {
             ev.Skip();
             return;
         }
@@ -537,10 +520,10 @@ void MemView::KeyEvent(wxKeyEvent& ev)
 
         if (isasc) {
             mask = 0xff << bno * 8;
-            val = k << bno * 8;
+            val = key << bno * 8;
         } else {
             mask = 8 * (0xf << bno) + 4 * nibno;
-            val = isdigit(k) ? k - '0' : tolower(k) + 10 - 'a';
+            val = isdigit(key) ? key - '0' : tolower(key) + 10 - 'a';
             val <<= bno * 8 + nibno * 4;
         }
 

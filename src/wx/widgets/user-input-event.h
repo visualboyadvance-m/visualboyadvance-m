@@ -10,6 +10,7 @@
 #include <wx/event.h>
 
 #include "wx/config/user-input.h"
+#include "wx/widgets/event-handler-provider.h"
 
 namespace widgets {
 
@@ -53,34 +54,32 @@ private:
 };
 
 // Object that is used to fire user input events when a key is pressed or
-// released. To use this object, attach it to a wxWindow and listen for
-// the VBAM_EVT_USER_INPUT_DOWN and VBAM_EVT_USER_INPUT_UP events.
-class UserInputEventSender final : public wxClientData {
+// released. This class should be kept as a singleton owned by the application
+// object. It is meant to be used in the FilterEvent() method of the app.
+class KeyboardInputSender final : public wxClientData {
 public:
-    // `window` must not be nullptr. Will assert otherwise.
-    // `window` must outlive this object.
-    explicit UserInputEventSender(wxWindow* const window);
-    ~UserInputEventSender() override;
+    explicit KeyboardInputSender(EventHandlerProvider* const handler_provider);
+    ~KeyboardInputSender() override;
 
     // Disable copy and copy assignment.
-    UserInputEventSender(const UserInputEventSender&) = delete;
-    UserInputEventSender& operator=(const UserInputEventSender&) = delete;
+    KeyboardInputSender(const KeyboardInputSender&) = delete;
+    KeyboardInputSender& operator=(const KeyboardInputSender&) = delete;
+
+    // Processes the provided key event and sends the appropriate user input
+    // event to the current event handler.
+    void ProcessKeyEvent(wxKeyEvent& event);
 
 private:
     // Keyboard event handlers.
     void OnKeyDown(wxKeyEvent& event);
     void OnKeyUp(wxKeyEvent& event);
 
-    // Resets the internal state. Called on focus in/out.
-    void Reset(wxFocusEvent& event);
-
     std::unordered_set<wxKeyCode> active_keys_;
     std::unordered_set<wxKeyModifier> active_mods_;
     std::unordered_set<config::KeyboardInput> active_mod_inputs_;
 
-    // The wxWindow this object is attached to.
-    // Must outlive this object.
-    wxWindow* const window_;
+    // The provider of event handlers to send the events to.
+    EventHandlerProvider* const handler_provider_;
 };
 
 }  // namespace widgets

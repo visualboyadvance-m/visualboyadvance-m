@@ -300,12 +300,14 @@ void JoyState::Notify() {
     SetRumble(rumbling_);
 }
 
-SdlPoller::SdlPoller(const EventHandlerProvider handler_provider)
+SdlPoller::SdlPoller(EventHandlerProvider* const handler_provider)
     : enable_game_controller_(OPTION(kSDLGameControllerMode)),
       handler_provider_(handler_provider),
       game_controller_enabled_observer_(
           config::OptionID::kSDLGameControllerMode,
           [this](config::Option* option) { ReconnectControllers(option->GetBool()); }) {
+    assert(handler_provider);
+
     wxTimer::Start(50);
     SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS);
     SDL_GameControllerEventState(SDL_ENABLE);
@@ -406,7 +408,7 @@ void SdlPoller::Notify() {
         }
 
         if (!event_data.empty()) {
-            wxEvtHandler* handler = handler_provider_();
+            wxEvtHandler* handler = handler_provider_->event_handler();
             if (handler) {
                 handler->QueueEvent(new UserInputEvent(std::move(event_data)));
             }

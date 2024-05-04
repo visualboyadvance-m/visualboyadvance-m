@@ -70,7 +70,8 @@ public:
     constexpr explicit JoyId(int sdl_index) : sdl_index_(sdl_index){};
     ~JoyId() = default;
 
-    wxString ToString() const;
+    wxString ToConfigString() const;
+    wxString ToLocalizedString() const;
 
     constexpr bool operator==(const JoyId& other) const { return sdl_index_ == other.sdl_index_; }
     constexpr bool operator!=(const JoyId& other) const { return sdl_index_ != other.sdl_index_; }
@@ -100,7 +101,8 @@ public:
     constexpr JoyControl control() const { return control_; }
     constexpr uint8_t control_index() const { return control_index_; }
 
-    wxString ToString() const;
+    wxString ToConfigString() const;
+    wxString ToLocalizedString() const;
 
     constexpr bool operator==(const JoyInput& other) const {
         return joy_ == other.joy_ && control_ == other.control_ &&

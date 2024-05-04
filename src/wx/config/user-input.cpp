@@ -230,12 +230,16 @@ JoyId JoyId::Invalid() {
     return JoyId(kInvalidSdlIndex);
 }
 
-wxString JoyId::ToString() const {
+wxString JoyId::ToConfigString() const {
     return wxString::Format("Joy%d", sdl_index_ + 1);
 }
 
-wxString JoyInput::ToString() const {
-    const wxString joy_string = joy_.ToString();
+wxString JoyId::ToLocalizedString() const {
+    return wxString::Format(_("Joystick %d"), sdl_index_ + 1);
+}
+
+wxString JoyInput::ToConfigString() const {
+    const wxString joy_string = joy_.ToConfigString();
     switch (control_) {
         case JoyControl::AxisPlus:
             return wxString::Format("%s-Axis%d+", joy_string, control_index_);
@@ -251,6 +255,30 @@ wxString JoyInput::ToString() const {
             return wxString::Format("%s-Hat%dW", joy_string, control_index_);
         case JoyControl::HatEast:
             return wxString::Format("%s-Hat%dE", joy_string, control_index_);
+    }
+
+    // Unreachable.
+    assert(false);
+    return wxEmptyString;
+}
+
+wxString JoyInput::ToLocalizedString() const {
+    const wxString joy_string = joy_.ToLocalizedString();
+    switch (control_) {
+        case JoyControl::AxisPlus:
+            return wxString::Format(_("%s: Axis %d+"), joy_string, control_index_);
+        case JoyControl::AxisMinus:
+            return wxString::Format(_("%s: Axis %d-"), joy_string, control_index_);
+        case JoyControl::Button:
+            return wxString::Format(_("%s: Button %d"), joy_string, control_index_);
+        case JoyControl::HatNorth:
+            return wxString::Format(_("%s: Hat %d North"), joy_string, control_index_);
+        case JoyControl::HatSouth:
+            return wxString::Format(_("%s: Hat %d South"), joy_string, control_index_);
+        case JoyControl::HatWest:
+            return wxString::Format(_("%s: Hat %d West"), joy_string, control_index_);
+        case JoyControl::HatEast:
+            return wxString::Format(_("%s: Hat %d East"), joy_string, control_index_);
     }
 
     // Unreachable.
@@ -291,10 +319,6 @@ wxString KeyboardInput::ToLocalizedString() const {
     }
 
     const wxString accel_string = wxAcceleratorEntry(mod_, key_).ToRawString().MakeUpper();
-    if (!accel_string.IsAscii()) {
-        // Unicode handling.
-        return wxString::Format("%d:%d", key_, mod_);
-    }
     return accel_string;
 }
 
@@ -336,7 +360,7 @@ wxString UserInput::ToConfigString() const {
         case Device::Keyboard:
             return keyboard_input().ToConfigString();
         case Device::Joystick:
-            return joy_input().ToString();
+            return joy_input().ToConfigString();
     }
 
     // Unreachable.
@@ -351,7 +375,7 @@ wxString UserInput::ToLocalizedString() const {
         case Device::Keyboard:
             return keyboard_input().ToLocalizedString();
         case Device::Joystick:
-            return joy_input().ToString();
+            return joy_input().ToLocalizedString();
     }
 
     // Unreachable.
