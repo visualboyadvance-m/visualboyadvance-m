@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include <wx/clntdata.h>
+#include <wx/ctrlsub.h>
 #include <wx/window.h>
 
 namespace widgets {
@@ -15,6 +16,13 @@ public:
     // Returns the data stored in the ClientData object.
     static const T& From(wxWindow* window) {
         wxClientData* data = window->GetClientObject();
+        assert(data);
+        return static_cast<ClientData<T>*>(data)->data();
+    }
+
+    // Returns the data stored in the ClientData object for a container.
+    static const T& From(wxItemContainer* container, size_t index) {
+        wxClientData* data = container->GetClientObject(index);
         assert(data);
         return static_cast<ClientData<T>*>(data)->data();
     }

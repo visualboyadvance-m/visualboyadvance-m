@@ -11,6 +11,7 @@
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaSound.h"
 #include "wx/audio/audio.h"
+#include "wx/config/cmdtab.h"
 #include "wx/config/emulated-gamepad.h"
 #include "wx/config/option-proxy.h"
 #include "wx/wxvbam.h"

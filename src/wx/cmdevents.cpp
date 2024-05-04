@@ -22,17 +22,13 @@
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaPrint.h"
 #include "core/gba/gbaSound.h"
+#include "wx/config/cmdtab.h"
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
 #include "wx/dialogs/game-maker.h"
 
 #define GetXRCDialog(n) \
     wxStaticCast(wxGetApp().frame->FindWindowByName(n), wxDialog)
-
-bool cmditem_lt(const struct cmditem& cmd1, const struct cmditem& cmd2)
-{
-    return wxStrcmp(cmd1.cmd, cmd2.cmd) < 0;
-}
 
 void MainFrame::GetMenuOptionBool(const wxString& menuName, bool* field)
 {

@@ -2,10 +2,11 @@
 
 #include <map>
 
-#include <wx/wxchar.h>
+#include <wx/log.h>
+#include <wx/translation.h>
 
+#include "wx/config/cmdtab.h"
 #include "wx/strutils.h"
-#include "wx/wxvbam.h"
 
 namespace config {
 namespace {
@@ -107,17 +108,15 @@ wxString GameCommand::ToUXString() const {
 }
 
 wxString ShortcutCommand::ToConfigString() const {
-    int cmd = 0;
-    for (cmd = 0; cmd < ncmds; cmd++)
-        if (cmdtab[cmd].cmd_id == id_)
-            break;
-    if (cmd == ncmds) {
-        // Command not found. This should never happen.
-        assert(false);
-        return wxEmptyString;
+    for (const cmditem& cmd_item : cmdtab) {
+        if (cmd_item.cmd_id == id_) {
+            return wxString::Format("Keyboard/%s", cmd_item.cmd);
+        }
     }
 
-    return wxString::Format("Keyboard/%s", cmdtab[cmd].cmd);
+    // Command not found. This should never happen.
+    assert(false);
+    return wxEmptyString;
 }
 
 // static
@@ -158,14 +157,14 @@ nonstd::optional<Command> Command::FromString(const wxString& name) {
             return nonstd::nullopt;
         }
 
-        const cmditem* cmd = std::lower_bound(
-            &cmdtab[0], &cmdtab[ncmds], cmditem{parts[1], wxString(), 0, 0, NULL}, cmditem_lt);
-        if (cmd == &cmdtab[ncmds] || wxStrcmp(parts[1], cmd->cmd)) {
+        const auto iter = std::lower_bound(cmdtab.begin(), cmdtab.end(),
+                                           cmditem{parts[1], wxString(), 0, 0, NULL}, cmditem_lt);
+        if (iter == cmdtab.end()) {
             wxLogDebug("Command ID %s not found", parts[1]);
             return nonstd::nullopt;
         }
 
-        return Command(ShortcutCommand(cmd->cmd_id));
+        return Command(ShortcutCommand(iter->cmd_id));
     }
 }
 

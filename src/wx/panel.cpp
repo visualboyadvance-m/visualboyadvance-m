@@ -41,6 +41,7 @@
 #include "core/gba/gbaRtc.h"
 #include "core/gba/gbaSound.h"
 #include "wx/background-input.h"
+#include "wx/config/cmdtab.h"
 #include "wx/config/emulated-gamepad.h"
 #include "wx/config/option-id.h"
 #include "wx/config/option-proxy.h"

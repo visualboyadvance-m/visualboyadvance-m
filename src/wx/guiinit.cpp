@@ -38,6 +38,7 @@
 #include "core/gba/gbaCheats.h"
 #include "core/gba/gbaFlash.h"
 #include "core/gba/gbaGlobals.h"
+#include "wx/config/cmdtab.h"
 #include "wx/config/option-proxy.h"
 #include "wx/dialogs/accel-config.h"
 #include "wx/dialogs/base-dialog.h"
@@ -1785,82 +1786,82 @@ bool MainFrame::BindControls()
 #endif
 
         // save all menu items in the command table
-        for (int i = 0; i < ncmds; i++) {
-            wxMenuItem* mi = cmdtab[i].mi = XRCITEM_I(cmdtab[i].cmd_id);
+        for (cmditem& cmd_item : cmdtab) {
+            wxMenuItem* mi = cmd_item.mi = XRCITEM_I(cmd_item.cmd_id);
 // remove unsupported commands first
 #ifdef NO_FFMPEG
 
-            if (cmdtab[i].mask_flags & (CMDEN_SREC | CMDEN_NSREC | CMDEN_VREC | CMDEN_NVREC)) {
+            if (cmd_item.mask_flags & (CMDEN_SREC | CMDEN_NSREC | CMDEN_VREC | CMDEN_NVREC)) {
                 if (mi)
                     mi->GetMenu()->Remove(mi);
-                cmdtab[i].mi = NULL;
+                cmd_item.mi = NULL;
                 continue;
             }
 
 #endif
 #ifndef GBA_LOGGING
 
-            if (cmdtab[i].cmd_id == XRCID("Logging")) {
+            if (cmd_item.cmd_id == XRCID("Logging")) {
                 if (mi)
                     mi->GetMenu()->Remove(mi);
-                cmdtab[i].mi = NULL;
+                cmd_item.mi = NULL;
                 continue;
             }
 
 #endif
 #if defined(__WXMAC__) || defined(__WXGTK__)
 
-            if (cmdtab[i].cmd_id == XRCID("AllowKeyboardBackgroundInput")
+            if (cmd_item.cmd_id == XRCID("AllowKeyboardBackgroundInput")
 #if defined(__WXGTK__)
                 && IsWayland()
 #endif
                ) {
                 if (mi)
                     mi->GetMenu()->Remove(mi);
-                cmdtab[i].mi = NULL;
+                cmd_item.mi = NULL;
                 continue;
             }
 
 #endif
 #ifdef NO_LINK
 
-            if (cmdtab[i].cmd_id == XRCID("LanLink") || cmdtab[i].cmd_id == XRCID("LinkType0Nothing") || cmdtab[i].cmd_id == XRCID("LinkType1Cable") || cmdtab[i].cmd_id == XRCID("LinkType2Wireless") || cmdtab[i].cmd_id == XRCID("LinkType3GameCube") || cmdtab[i].cmd_id == XRCID("LinkType4Gameboy") || cmdtab[i].cmd_id == XRCID("LinkAuto") || cmdtab[i].cmd_id == XRCID("SpeedOn") || cmdtab[i].cmd_id == XRCID("LinkProto") || cmdtab[i].cmd_id == XRCID("LinkConfigure")) {
+            if (cmd_item.cmd_id == XRCID("LanLink") || cmd_item.cmd_id == XRCID("LinkType0Nothing") || cmd_item.cmd_id == XRCID("LinkType1Cable") || cmd_item.cmd_id == XRCID("LinkType2Wireless") || cmd_item.cmd_id == XRCID("LinkType3GameCube") || cmd_item.cmd_id == XRCID("LinkType4Gameboy") || cmd_item.cmd_id == XRCID("LinkAuto") || cmd_item.cmd_id == XRCID("SpeedOn") || cmd_item.cmd_id == XRCID("LinkProto") || cmd_item.cmd_id == XRCID("LinkConfigure")) {
                 if (mi)
                     mi->GetMenu()->Remove(mi);
-                cmdtab[i].mi = NULL;
+                cmd_item.mi = NULL;
                 continue;
             }
 
 #else
 
             // Always disable Wireless link for now, this has never worked.
-            if (cmdtab[i].cmd_id == XRCID("LinkType2Wireless")) {
+            if (cmd_item.cmd_id == XRCID("LinkType2Wireless")) {
                 if (mi)
                     mi->GetMenu()->Remove(mi);
-                cmdtab[i].mi = NULL;
+                cmd_item.mi = NULL;
                 continue;
             }
 
 #endif
 #if !defined(VBAM_ENABLE_DEBUGGER)
 
-            if (cmdtab[i].cmd_id == XRCID("DebugGDBBreak") || cmdtab[i].cmd_id == XRCID("DebugGDBDisconnect") || cmdtab[i].cmd_id == XRCID("DebugGDBBreakOnLoad") || cmdtab[i].cmd_id == XRCID("DebugGDBPort"))
+            if (cmd_item.cmd_id == XRCID("DebugGDBBreak") || cmd_item.cmd_id == XRCID("DebugGDBDisconnect") || cmd_item.cmd_id == XRCID("DebugGDBBreakOnLoad") || cmd_item.cmd_id == XRCID("DebugGDBPort"))
             {
                 if (mi)
                 {
                     mi->GetMenu()->Enable(mi->GetId(), false);
                     //mi->GetMenu()->Remove(mi);
                 }
-                cmdtab[i].mi = NULL;
+                cmd_item.mi = NULL;
                 continue;
             }
 #endif  // !defined(VBAM_ENABLE_DEBUGGER)
 #if defined(NO_ONLINEUPDATES)
-            if (cmdtab[i].cmd_id == XRCID("UpdateEmu"))
+            if (cmd_item.cmd_id == XRCID("UpdateEmu"))
             {
                 if (mi)
                     mi->GetMenu()->Remove(mi);
-                cmdtab[i].mi = NULL;
+                cmd_item.mi = NULL;
                 continue;
             }
 #endif
@@ -1877,11 +1878,11 @@ bool MainFrame::BindControls()
 
                 // store checkable items
                 if (mi->IsCheckable()) {
-                    checkable_mi_t cmi = { cmdtab[i].cmd_id, mi, 0, 0 };
+                    checkable_mi_t cmi = { cmd_item.cmd_id, mi, 0, 0 };
                     checkable_mi.push_back(cmi);
 
                     for (const config::Option& option : config::Option::All()) {
-                        if (cmdtab[i].cmd == option.command()) {
+                        if (cmd_item.cmd == option.command()) {
                             if (option.is_int()) {
                                 MenuOptionIntMask(
                                     option.command(), option.GetInt(), (1 << 0));
