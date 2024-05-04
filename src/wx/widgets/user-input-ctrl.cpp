@@ -31,9 +31,8 @@ bool UserInputCtrl::Create(wxWindow* parent,
                            long style,
                            const wxString& name) {
     this->SetClientObject(new UserInputEventSender(this));
-    this->Bind(VBAM_EVT_USER_INPUT_UP, &UserInputCtrl::OnUserInputUp, this);
+    this->Bind(VBAM_EVT_USER_INPUT, &UserInputCtrl::OnUserInput, this);
     this->Bind(wxEVT_SET_FOCUS, [this](wxFocusEvent& event) {
-        is_navigating_away_ = false;
         last_focus_time_ = wxGetUTCTimeMillis();
         event.Skip();
     });
@@ -66,7 +65,15 @@ void UserInputCtrl::Clear() {
 
 wxIMPLEMENT_DYNAMIC_CLASS(UserInputCtrl, wxTextCtrl);
 
-void UserInputCtrl::OnUserInputUp(UserInputEvent& event) {
+void UserInputCtrl::OnUserInput(UserInputEvent& event) {
+    // Find the first pressed input.
+    nonstd::optional<config::UserInput> input = event.FirstReleasedInput();
+
+    if (input == nonstd::nullopt) {
+        // No pressed inputs.
+        return;
+    }
+
     static const wxLongLong kInterval = 100;
     if (wxGetUTCTimeMillis() - last_focus_time_ < kInterval) {
         // Ignore events sent very shortly after focus. This is used to ignore
@@ -75,20 +82,13 @@ void UserInputCtrl::OnUserInputUp(UserInputEvent& event) {
         return;
     }
 
-    if (is_navigating_away_) {
-        // Ignore events sent after the control has been navigated away from.
-        event.Skip();
-        return;
-    }
-
     if (!is_multikey_) {
         inputs_.clear();
     }
 
-    inputs_.insert(event.input());
+    inputs_.insert(std::move(input.value()));
     UpdateText();
     Navigate();
-    is_navigating_away_ = true;
 }
 
 void UserInputCtrl::UpdateText() {

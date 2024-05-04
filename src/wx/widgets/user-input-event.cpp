@@ -1,8 +1,10 @@
 #include "wx/widgets/user-input-event.h"
 
+#include <algorithm>
 #include <vector>
 
 #include <wx/event.h>
+#include <wx/eventfilter.h>
 #include <wx/window.h>
 
 #include "wx/config/user-input.h"
@@ -109,11 +111,44 @@ wxKeyCode KeyFromModifier(const wxKeyModifier mod) {
 
 }  // namespace
 
-UserInputEvent::UserInputEvent(const config::UserInput& input, bool pressed)
-    : wxEvent(0, pressed ? VBAM_EVT_USER_INPUT_DOWN : VBAM_EVT_USER_INPUT_UP), input_(input) {}
+UserInputEvent::UserInputEvent(std::vector<Data> event_data)
+    : wxEvent(0, VBAM_EVT_USER_INPUT), data_(std::move(event_data)) {}
+
+nonstd::optional<config::UserInput> UserInputEvent::FirstReleasedInput() const {
+    const auto iter =
+        std::find_if(data_.begin(), data_.end(), [](const auto& data) { return !data.pressed; });
+
+    if (iter == data_.end()) {
+        // No pressed inputs.
+        return nonstd::nullopt;
+    }
+
+    return iter->input;
+}
+
+int UserInputEvent::FilterProcessedInput(const config::UserInput& user_input) {
+    // Keep all data not using `user_input`.
+    std::vector<Data> new_data;
+    for (const auto& data : data_) {
+        if (data.input != user_input) {
+            new_data.push_back(data);
+        }
+    }
+
+    // Update the internal data.
+    data_ = std::move(new_data);
+
+    if (data_.empty()) {
+        // All data was removed, the event was fully processed.
+        return wxEventFilter::Event_Processed;
+    } else {
+        // Some data remains, let the event propagate.
+        return wxEventFilter::Event_Skip;
+    }
+}
 
 wxEvent* UserInputEvent::Clone() const {
-    return new UserInputEvent(*this);
+    return new UserInputEvent(this->data_);
 }
 
 UserInputEventSender::UserInputEventSender(wxWindow* const window)
@@ -161,26 +196,25 @@ void UserInputEventSender::OnKeyDown(wxKeyEvent& event) {
     }
 
     const wxKeyModifier active_mods = GetModifiersFromSet(active_mods_);
-    std::vector<config::KeyboardInput> new_inputs;
+    std::vector<UserInputEvent::Data> event_data;
     if (key_pressed == WXK_NONE) {
         // A new standalone modifier was pressed, send the event.
-        new_inputs.emplace_back(KeyFromModifier(mod_pressed), mod_pressed);
+        event_data.emplace_back(config::KeyboardInput(KeyFromModifier(mod_pressed), mod_pressed),
+                                true);
     } else {
         // A new key was pressed, send the event with modifiers, first.
-        new_inputs.emplace_back(key, active_mods);
+        event_data.emplace_back(config::KeyboardInput(key, active_mods), true);
 
         if (active_mods != wxMOD_NONE) {
             // Keep track of the key pressed with the active modifiers.
             active_mod_inputs_.emplace(key, active_mods);
 
             // Also send the key press event without modifiers.
-            new_inputs.emplace_back(key, wxMOD_NONE);
+            event_data.emplace_back(config::KeyboardInput(key, wxMOD_NONE), true);
         }
     }
 
-    for (const config::KeyboardInput& input : new_inputs) {
-        wxQueueEvent(window_, new UserInputEvent(input, true));
-    }
+    wxQueueEvent(window_, new UserInputEvent(std::move(event_data)));
 }
 
 void UserInputEventSender::OnKeyUp(wxKeyEvent& event) {
@@ -220,31 +254,32 @@ void UserInputEventSender::OnKeyUp(wxKeyEvent& event) {
         return;
     }
 
-    std::vector<config::KeyboardInput> released_inputs;
+    std::vector<UserInputEvent::Data> event_data;
     if (key_released == WXK_NONE) {
         // A standalone modifier was released, send it.
-        released_inputs.emplace_back(KeyFromModifier(mod_released), mod_released);
+        event_data.emplace_back(config::KeyboardInput(KeyFromModifier(mod_released), mod_released),
+                                false);
     } else {
         // A key was released.
         if (previous_mods == wxMOD_NONE) {
             // The key was pressed without modifiers, just send the key release event.
-            released_inputs.emplace_back(key, wxMOD_NONE);
+            event_data.emplace_back(config::KeyboardInput(key, wxMOD_NONE), false);
         } else {
             // Check if the key was pressed with the active modifiers.
             const config::KeyboardInput input_with_modifiers(key, previous_mods);
             auto iter = active_mod_inputs_.find(input_with_modifiers);
             if (iter == active_mod_inputs_.end()) {
                 // The key press event was never sent, so do it now.
-                wxQueueEvent(window_, new UserInputEvent(input_with_modifiers, true));
+                event_data.emplace_back(input_with_modifiers, true);
             } else {
                 active_mod_inputs_.erase(iter);
             }
 
             // Send the key release event with the active modifiers.
-            released_inputs.emplace_back(key, previous_mods);
+            event_data.emplace_back(config::KeyboardInput(key, previous_mods), false);
 
             // Also send the key release event without modifiers.
-            released_inputs.emplace_back(key, wxMOD_NONE);
+            event_data.emplace_back(config::KeyboardInput(key, wxMOD_NONE), false);
         }
     }
 
@@ -255,15 +290,14 @@ void UserInputEventSender::OnKeyUp(wxKeyEvent& event) {
         auto iter = active_mod_inputs_.find(input);
         if (iter != active_mod_inputs_.end()) {
             active_mod_inputs_.erase(iter);
-            released_inputs.push_back(std::move(input));
+            event_data.emplace_back(std::move(input), false);
         }
     }
 
-
-    for (const config::KeyboardInput& input : released_inputs) {
-        active_mod_inputs_.erase(input);
-        wxQueueEvent(window_, new UserInputEvent(input, false));
+    for (const auto& data : event_data) {
+        active_mod_inputs_.erase(data.input.keyboard_input());
     }
+    wxQueueEvent(window_, new UserInputEvent(std::move(event_data)));
 }
 
 void UserInputEventSender::Reset(wxFocusEvent& event) {
@@ -278,5 +312,4 @@ void UserInputEventSender::Reset(wxFocusEvent& event) {
 
 }  // namespace widgets
 
-wxDEFINE_EVENT(VBAM_EVT_USER_INPUT_DOWN, widgets::UserInputEvent);
-wxDEFINE_EVENT(VBAM_EVT_USER_INPUT_UP, widgets::UserInputEvent);
+wxDEFINE_EVENT(VBAM_EVT_USER_INPUT, widgets::UserInputEvent);

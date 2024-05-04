@@ -3,7 +3,6 @@
 #include <cassert>
 #include <map>
 
-#include <SDL_events.h>
 #include <wx/timer.h>
 #include <wx/toplevel.h>
 
@@ -86,9 +85,10 @@ public:
     bool is_game_controller() const { return !!game_controller_; }
 
     // Processes the corresponding events.
-    std::vector<UserInputEvent> ProcessAxisEvent(const uint8_t index, const JoyAxisStatus status);
-    std::vector<UserInputEvent> ProcessButtonEvent(const uint8_t index, const bool pressed);
-    std::vector<UserInputEvent> ProcessHatEvent(const uint8_t index, const uint8_t status);
+    std::vector<UserInputEvent::Data> ProcessAxisEvent(const uint8_t index,
+                                                       const JoyAxisStatus status);
+    std::vector<UserInputEvent::Data> ProcessButtonEvent(const uint8_t index, const bool pressed);
+    std::vector<UserInputEvent::Data> ProcessHatEvent(const uint8_t index, const uint8_t status);
 
     // Activates or deactivates rumble.
     void SetRumble(bool activate_rumble);
@@ -192,14 +192,14 @@ bool JoyState::IsValid() const {
     return sdl_joystick_;
 }
 
-std::vector<UserInputEvent> JoyState::ProcessAxisEvent(const uint8_t index,
-                                                       const JoyAxisStatus status) {
+std::vector<UserInputEvent::Data> JoyState::ProcessAxisEvent(const uint8_t index,
+                                                             const JoyAxisStatus status) {
     const JoyAxisStatus previous_status = axis_[index];
-    std::vector<UserInputEvent> events;
+    std::vector<UserInputEvent::Data> event_data;
 
     // Nothing to do if no-op.
     if (status == previous_status) {
-        return events;
+        return event_data;
     }
 
     // Update the value.
@@ -207,48 +207,50 @@ std::vector<UserInputEvent> JoyState::ProcessAxisEvent(const uint8_t index,
 
     if (previous_status != JoyAxisStatus::Neutral) {
         // Send the "unpressed" event.
-        events.push_back(UserInputEvent(
-            config::JoyInput(wx_joystick_, AxisStatusToJoyControl(previous_status), index), false));
+        event_data.emplace_back(
+            config::JoyInput(wx_joystick_, AxisStatusToJoyControl(previous_status), index), false);
     }
 
     // We already sent the "unpressed" event so nothing more to do.
     if (status == JoyAxisStatus::Neutral) {
-        return events;
+        return event_data;
     }
 
     // Send the "pressed" event.
-    events.push_back(UserInputEvent(
-        config::JoyInput(wx_joystick_, AxisStatusToJoyControl(status), index), true));
+    event_data.emplace_back(config::JoyInput(wx_joystick_, AxisStatusToJoyControl(status), index),
+                            true);
 
-    return events;
+    return event_data;
 }
 
-std::vector<UserInputEvent> JoyState::ProcessButtonEvent(const uint8_t index, const bool status) {
+std::vector<UserInputEvent::Data> JoyState::ProcessButtonEvent(const uint8_t index,
+                                                               const bool status) {
     const bool previous_status = buttons_[index];
-    std::vector<UserInputEvent> events;
+    std::vector<UserInputEvent::Data> event_data;
 
     // Nothing to do if no-op.
     if (status == previous_status) {
-        return events;
+        return event_data;
     }
 
     // Update the value.
     buttons_[index] = status;
 
     // Send the event.
-    events.push_back(
-        UserInputEvent(config::JoyInput(wx_joystick_, config::JoyControl::Button, index), status));
+    event_data.emplace_back(config::JoyInput(wx_joystick_, config::JoyControl::Button, index),
+                            status);
 
-    return events;
+    return event_data;
 }
 
-std::vector<UserInputEvent> JoyState::ProcessHatEvent(const uint8_t index, const uint8_t status) {
+std::vector<UserInputEvent::Data> JoyState::ProcessHatEvent(const uint8_t index,
+                                                            const uint8_t status) {
     const uint16_t previous_status = hats_[index];
-    std::vector<UserInputEvent> events;
+    std::vector<UserInputEvent::Data> event_data;
 
     // Nothing to do if no-op.
     if (status == previous_status) {
-        return events;
+        return event_data;
     }
 
     // Update the value.
@@ -262,17 +264,17 @@ std::vector<UserInputEvent> JoyState::ProcessHatEvent(const uint8_t index, const
         const bool new_control_pressed = (status & bit) != 0;
         if (old_control_pressed && !new_control_pressed) {
             // Send the "unpressed" event.
-            events.push_back(UserInputEvent(
-                config::JoyInput(wx_joystick_, HatStatusToJoyControl(bit), index), false));
+            event_data.emplace_back(
+                config::JoyInput(wx_joystick_, HatStatusToJoyControl(bit), index), false);
         }
         if (!old_control_pressed && new_control_pressed) {
             // Send the "pressed" event.
-            events.push_back(UserInputEvent(
-                config::JoyInput(wx_joystick_, HatStatusToJoyControl(bit), index), true));
+            event_data.emplace_back(
+                config::JoyInput(wx_joystick_, HatStatusToJoyControl(bit), index), true);
         }
     }
 
-    return events;
+    return event_data;
 }
 
 void JoyState::SetRumble(bool activate_rumble) {
@@ -341,23 +343,23 @@ void SdlPoller::Notify() {
     SDL_Event sdl_event;
 
     while (SDL_PollEvent(&sdl_event)) {
-        std::vector<UserInputEvent> events;
+        std::vector<UserInputEvent::Data> event_data;
         JoyState* joy_state = nullptr;
         switch (sdl_event.type) {
             case SDL_CONTROLLERBUTTONDOWN:
             case SDL_CONTROLLERBUTTONUP:
                 joy_state = FindJoyState(sdl_event.cbutton.which);
                 if (joy_state) {
-                    events = joy_state->ProcessButtonEvent(sdl_event.cbutton.button,
-                                                           sdl_event.cbutton.state);
+                    event_data = joy_state->ProcessButtonEvent(sdl_event.cbutton.button,
+                                                               sdl_event.cbutton.state);
                 }
                 break;
 
             case SDL_CONTROLLERAXISMOTION:
                 joy_state = FindJoyState(sdl_event.caxis.which);
                 if (joy_state) {
-                    events = joy_state->ProcessAxisEvent(sdl_event.caxis.axis,
-                                                         AxisValueToStatus(sdl_event.caxis.value));
+                    event_data = joy_state->ProcessAxisEvent(
+                        sdl_event.caxis.axis, AxisValueToStatus(sdl_event.caxis.value));
                 }
                 break;
 
@@ -372,23 +374,24 @@ void SdlPoller::Notify() {
             case SDL_JOYBUTTONUP:
                 joy_state = FindJoyState(sdl_event.jbutton.which);
                 if (joy_state && !joy_state->is_game_controller()) {
-                    events = joy_state->ProcessButtonEvent(sdl_event.jbutton.button,
-                                                           sdl_event.jbutton.state);
+                    event_data = joy_state->ProcessButtonEvent(sdl_event.jbutton.button,
+                                                               sdl_event.jbutton.state);
                 }
                 break;
 
             case SDL_JOYAXISMOTION:
                 joy_state = FindJoyState(sdl_event.jaxis.which);
                 if (joy_state && !joy_state->is_game_controller()) {
-                    events = joy_state->ProcessAxisEvent(sdl_event.jaxis.axis,
-                                                         AxisValueToStatus(sdl_event.jaxis.value));
+                    event_data = joy_state->ProcessAxisEvent(
+                        sdl_event.jaxis.axis, AxisValueToStatus(sdl_event.jaxis.value));
                 }
                 break;
 
             case SDL_JOYHATMOTION:
                 joy_state = FindJoyState(sdl_event.jhat.which);
                 if (joy_state && !joy_state->is_game_controller()) {
-                    events = joy_state->ProcessHatEvent(sdl_event.jhat.hat, sdl_event.jhat.value);
+                    event_data =
+                        joy_state->ProcessHatEvent(sdl_event.jhat.hat, sdl_event.jhat.value);
                 }
                 break;
 
@@ -402,12 +405,10 @@ void SdlPoller::Notify() {
                 break;
         }
 
-        if (!events.empty()) {
+        if (!event_data.empty()) {
             wxEvtHandler* handler = handler_provider_();
             if (handler) {
-                for (const auto& user_input_event : events) {
-                    handler->QueueEvent(user_input_event.Clone());
-                }
+                handler->QueueEvent(new UserInputEvent(std::move(event_data)));
             }
         }
     }

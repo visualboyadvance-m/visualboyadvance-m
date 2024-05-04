@@ -530,8 +530,7 @@ protected:
 
     bool paused;
     void OnIdle(wxIdleEvent&);
-    void OnUserInputDown(widgets::UserInputEvent& event);
-    void OnUserInputUp(widgets::UserInputEvent& event);
+    void OnUserInput(widgets::UserInputEvent& event);
     void PaintEv(wxPaintEvent& ev);
     void EraseBackground(wxEraseEvent& ev);
     void OnSize(wxSizeEvent& ev);

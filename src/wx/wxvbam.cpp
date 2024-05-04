@@ -1,5 +1,4 @@
 #include "wx/wxvbam.h"
-#include "wx/config/command.h"
 
 #ifdef __WXMSW__
 #include <windows.h>
@@ -35,6 +34,7 @@
 #include "wx/builtin-over.h"
 #include "wx/builtin-xrc.h"
 #include "wx/config/cmdtab.h"
+#include "wx/config/command.h"
 #include "wx/config/emulated-gamepad.h"
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
@@ -995,27 +995,46 @@ int MainFrame::FilterEvent(wxEvent& event) {
         return wxEventFilter::Event_Skip;
     }
 
-    if (event.GetEventType() != VBAM_EVT_USER_INPUT_DOWN) {
-        // We only treat "VBAM_EVT_USER_INPUT_DOWN" events here.
+    if (event.GetEventType() != VBAM_EVT_USER_INPUT) {
+        // We only treat "VBAM_EVT_USER_INPUT" events here.
         return wxEventFilter::Event_Skip;
     }
 
-    const widgets::UserInputEvent& user_input_event = static_cast<widgets::UserInputEvent&>(event);
-    nonstd::optional<config::Command> command =
-        wxGetApp().bindings()->CommandForInput(user_input_event.input());
-    if (command == nonstd::nullopt) {
+    widgets::UserInputEvent& user_input_event = static_cast<widgets::UserInputEvent&>(event);
+    const config::Bindings* bindings = wxGetApp().bindings();
+    int command_id = wxID_NONE;
+    nonstd::optional<config::UserInput> user_input;
+
+    for (const auto& event_data : user_input_event.data()) {
+        if (!event_data.pressed) {
+            // We only treat key press events here.
+            continue;
+        }
+
+        const nonstd::optional<config::Command> command =
+            bindings->CommandForInput(event_data.input);
+        if (command != nonstd::nullopt && command->is_shortcut()) {
+            // Associated shortcut command found.
+            command_id = command->shortcut().id();
+            user_input.emplace(event_data.input);
+            break;
+        }
+    }
+
+    if (command_id == wxID_NONE) {
         // No associated command found.
         return wxEventFilter::Event_Skip;
     }
 
-    if (!command->is_shortcut()) {
-        return wxEventFilter::Event_Skip;
-    }
-
-    wxCommandEvent command_event(wxEVT_COMMAND_MENU_SELECTED, command->shortcut().id());
+    // Execute the associated shortcut command.
+    wxCommandEvent command_event(wxEVT_COMMAND_MENU_SELECTED, command_id);
     command_event.SetEventObject(this);
     this->GetEventHandler()->ProcessEvent(command_event);
-    return wxEventFilter::Event_Processed;
+
+    // Filter out the processed input so it is not processed again. This also
+    // prevents us from firing 2 commands if the user presses "Ctrl+1" and has
+    // a shortcut for both "Ctrl+1" and "1". Only one will be handled here.
+    return user_input_event.FilterProcessedInput(user_input.value());
 }
 
 wxString MainFrame::GetGamePath(wxString path)
