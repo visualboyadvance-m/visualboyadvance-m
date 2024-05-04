@@ -61,7 +61,7 @@ public:
 
 private:
     // Event handler.
-    void OnUserInputUp(widgets::UserInputEvent& event);
+    void OnUserInput(widgets::UserInputEvent& event);
 
     // Updates the text in the control to reflect the current inputs.
     void UpdateText();
@@ -71,10 +71,6 @@ private:
     // The last time the control was focused. This is used to ignore events sent
     // very shortly after activation.
     wxLongLong last_focus_time_ = 0;
-
-    // Set to true after one input has been received. This is used to ignore
-    // subsequent events until the control is focused again.
-    bool is_navigating_away_ = false;
 
     std::unordered_set<config::UserInput> inputs_;
 };

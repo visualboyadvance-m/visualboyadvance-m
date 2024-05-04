@@ -1177,8 +1177,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
         wxWindow* w = panel->GetWindow();
 
         // set up event handlers
-        w->Bind(VBAM_EVT_USER_INPUT_DOWN, &GameArea::OnUserInputDown, this);
-        w->Bind(VBAM_EVT_USER_INPUT_UP, &GameArea::OnUserInputUp, this);
+        w->Bind(VBAM_EVT_USER_INPUT, &GameArea::OnUserInput, this);
         w->Bind(wxEVT_PAINT, &GameArea::PaintEv, this);
         w->Bind(wxEVT_ERASE_BACKGROUND, &GameArea::EraseBackground, this);
 
@@ -1330,26 +1329,33 @@ static Display* GetX11Display() {
 }
 #endif  // __WXGTK__
 
-void GameArea::OnUserInputDown(widgets::UserInputEvent& event) {
-    if (wxGetApp().emulated_gamepad()->OnInputPressed(event.input())) {
-        wxWakeUpIdle();
+void GameArea::OnUserInput(widgets::UserInputEvent& event) {
+    bool emulated_key_pressed = false;
+    for (const auto& event_data : event.data()) {
+        if (event_data.pressed) {
+            if (wxGetApp().emulated_gamepad()->OnInputPressed(event_data.input)) {
+                emulated_key_pressed = true;
+            }
+        } else {
+            if (wxGetApp().emulated_gamepad()->OnInputReleased(event_data.input)) {
+                emulated_key_pressed = true;
+            }
+        }
     }
-}
 
-void GameArea::OnUserInputUp(widgets::UserInputEvent& event) {
-    if (wxGetApp().emulated_gamepad()->OnInputReleased(event.input())) {
+    if (emulated_key_pressed) {
         wxWakeUpIdle();
-    }
 
-    // tell Linux to turn off the screensaver/screen-blank if joystick button was pressed
-    // this shouldn't be necessary of course
 #if defined(__WXGTK__) && defined(HAVE_X11) && !defined(HAVE_XSS)
-    if (event.input().is_joystick() && !wxGetApp().UsingWayland()) {
-        auto display = GetX11Display();
-        XResetScreenSaver(display);
-        XFlush(display);
-    }
+        // Tell X11 to turn off the screensaver/screen-blank if a button was
+        // was pressed. This shouldn't be necessary.
+        if (!wxGetApp().UsingWayland()) {
+            auto display = GetX11Display();
+            XResetScreenSaver(display);
+            XFlush(display);
+        }
 #endif
+    }
 }
 
 // these three are forwarded to the DrawingPanel instance
