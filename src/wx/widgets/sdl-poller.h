@@ -1,7 +1,6 @@
 #ifndef WX_WIDGETS_SDL_POLLER_H_
 #define WX_WIDGETS_SDL_POLLER_H_
 
-#include <functional>
 #include <map>
 
 #include <wx/timer.h>
@@ -9,6 +8,7 @@
 #include <SDL.h>
 
 #include "wx/config/option-observer.h"
+#include "wx/widgets/event-handler-provider.h"
 
 // Forward declarations.
 class wxEvtHandler;
@@ -18,16 +18,13 @@ namespace widgets {
 // Forward declaration.
 class JoyState;
 
-// Provider for the event handler to send the events to.
-using EventHandlerProvider = std::function<wxEvtHandler*()>;
-
 // The SDL worker is responsible for handling SDL events and firing the
 // appropriate `UserInputEvent` for joysticks.
 // It is used to fire `UserInputEvent` for joysticks. This class should be kept
 // as a singleton owned by the application object.
 class SdlPoller final : public wxTimer {
 public:
-    explicit SdlPoller(const EventHandlerProvider handler_provider);
+    explicit SdlPoller(EventHandlerProvider* const handler_provider);
     ~SdlPoller() final;
 
     // Disable copy and copy assignment.
@@ -59,7 +56,7 @@ private:
     bool enable_game_controller_ = false;
 
     // The provider of event handlers to send the events to.
-    const EventHandlerProvider handler_provider_;
+    EventHandlerProvider* const handler_provider_;
 
     // Observer for the game controller enabled option.
     const config::OptionsObserver game_controller_enabled_observer_;

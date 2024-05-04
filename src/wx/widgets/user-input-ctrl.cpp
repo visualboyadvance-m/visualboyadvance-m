@@ -30,7 +30,6 @@ bool UserInputCtrl::Create(wxWindow* parent,
                            const wxSize& size,
                            long style,
                            const wxString& name) {
-    this->SetClientObject(new UserInputEventSender(this));
     this->Bind(VBAM_EVT_USER_INPUT, &UserInputCtrl::OnUserInput, this);
     this->Bind(wxEVT_SET_FOCUS, [this](wxFocusEvent& event) {
         last_focus_time_ = wxGetUTCTimeMillis();

@@ -73,6 +73,7 @@ set(VBAM_WX_COMMON
     widgets/checkedlistctrl.h
     widgets/client-data.h
     widgets/dpi-support.h
+    widgets/event-handler-provider.h
     widgets/group-check-box.cpp
     widgets/group-check-box.h
     widgets/keep-on-top-styler.cpp
@@ -87,6 +88,8 @@ set(VBAM_WX_COMMON
     widgets/user-input-event.h
     widgets/sdl-poller.cpp
     widgets/sdl-poller.h
+    widgets/shortcut-menu-bar.cpp
+    widgets/shortcut-menu-bar.h
     widgets/utils.cpp
     widgets/utils.h
     widgets/webupdatedef.h

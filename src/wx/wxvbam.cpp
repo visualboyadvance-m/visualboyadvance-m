@@ -64,11 +64,6 @@ void ResetMenuItemAccelerator(wxMenuItem* menu_item) {
         wxGetApp().bindings()->InputsForCommand(
             config::ShortcutCommand(menu_item->GetId()));
     for (const config::UserInput& user_input : user_inputs) {
-        if (user_input.device() != config::UserInput::Device::Keyboard) {
-            // Cannot use joystick keybinding as text without wx assertion error.
-            continue;
-        }
-
         new_label.append('\t');
         new_label.append(user_input.ToLocalizedString());
         break;
@@ -252,7 +247,8 @@ wxvbamApp::wxvbamApp()
       frame(nullptr),
       using_wayland(false),
       emulated_gamepad_(std::bind(&wxvbamApp::bindings, this)),
-      sdl_poller_(std::bind(&wxvbamApp::GetJoyEventHandler, this)) {}
+      sdl_poller_(this),
+      keyboard_input_sender_(this) {}
 
 const wxString wxvbamApp::GetPluginsDir()
 {
@@ -826,7 +822,7 @@ wxvbamApp::~wxvbamApp() {
 #endif
 }
 
-wxEvtHandler* wxvbamApp::GetJoyEventHandler() {
+wxEvtHandler* wxvbamApp::event_handler() {
     // Use the active window, if any.
     wxWindow* focused_window = wxWindow::FindFocus();
     if (focused_window) {
@@ -842,7 +838,7 @@ wxEvtHandler* wxvbamApp::GetJoyEventHandler() {
         return nullptr;
     }
 
-    if (OPTION(kUIAllowJoystickBackgroundInput)) {
+    if (OPTION(kUIAllowJoystickBackgroundInput) || OPTION(kUIAllowKeyboardBackgroundInput)) {
         // Use the game panel, if the background polling option is enabled.
         return panel->panel->GetWindow()->GetEventHandler();
     }
@@ -988,53 +984,6 @@ void MainFrame::OnSize(wxSizeEvent& event)
 
     OPTION(kGeomIsMaximized) = IsMaximized();
     OPTION(kGeomFullScreen) = IsFullScreen();
-}
-
-int MainFrame::FilterEvent(wxEvent& event) {
-    if (menus_opened || dialog_opened) {
-        return wxEventFilter::Event_Skip;
-    }
-
-    if (event.GetEventType() != VBAM_EVT_USER_INPUT) {
-        // We only treat "VBAM_EVT_USER_INPUT" events here.
-        return wxEventFilter::Event_Skip;
-    }
-
-    widgets::UserInputEvent& user_input_event = static_cast<widgets::UserInputEvent&>(event);
-    const config::Bindings* bindings = wxGetApp().bindings();
-    int command_id = wxID_NONE;
-    nonstd::optional<config::UserInput> user_input;
-
-    for (const auto& event_data : user_input_event.data()) {
-        if (!event_data.pressed) {
-            // We only treat key press events here.
-            continue;
-        }
-
-        const nonstd::optional<config::Command> command =
-            bindings->CommandForInput(event_data.input);
-        if (command != nonstd::nullopt && command->is_shortcut()) {
-            // Associated shortcut command found.
-            command_id = command->shortcut().id();
-            user_input.emplace(event_data.input);
-            break;
-        }
-    }
-
-    if (command_id == wxID_NONE) {
-        // No associated command found.
-        return wxEventFilter::Event_Skip;
-    }
-
-    // Execute the associated shortcut command.
-    wxCommandEvent command_event(wxEVT_COMMAND_MENU_SELECTED, command_id);
-    command_event.SetEventObject(this);
-    this->GetEventHandler()->ProcessEvent(command_event);
-
-    // Filter out the processed input so it is not processed again. This also
-    // prevents us from firing 2 commands if the user presses "Ctrl+1" and has
-    // a shortcut for both "Ctrl+1" and "1". Only one will be handled here.
-    return user_input_event.FilterProcessedInput(user_input.value());
 }
 
 wxString MainFrame::GetGamePath(wxString path)
@@ -1376,15 +1325,57 @@ void MainFrame::IdentifyRom()
     }
 }
 
-// global event filter
-// apparently required for win32; just setting accel table still misses
-// a few keys (e.g. only ctrl-x works for exit, but not esc & ctrl-q;
-// ctrl-w does not work for close).  It's possible another entity is
-// grabbing those keys, but I can't track it down.
 int wxvbamApp::FilterEvent(wxEvent& event)
 {
-    if (frame) {
-        return frame->FilterEvent(event);
+    if (!frame) {
+        // Ignore early events.
+        return wxEventFilter::Event_Skip;
     }
-    return wxApp::FilterEvent(event);
+
+    if (event.GetEventType() == wxEVT_KEY_DOWN || event.GetEventType() == wxEVT_KEY_UP) {
+        // Handle keyboard input events here. No control will receive them.
+        keyboard_input_sender_.ProcessKeyEvent(static_cast<wxKeyEvent&>(event));
+        return wxEventFilter::Event_Processed;
+    }
+
+    if (!frame->CanProcessShortcuts()) {
+        return wxEventFilter::Event_Skip;
+    }
+
+    if (event.GetEventType() != VBAM_EVT_USER_INPUT) {
+        // We only treat "VBAM_EVT_USER_INPUT" events here.
+        return wxEventFilter::Event_Skip;
+    }
+
+    widgets::UserInputEvent& user_input_event = static_cast<widgets::UserInputEvent&>(event);
+    int command_id = wxID_NONE;
+    nonstd::optional<config::UserInput> user_input;
+
+    for (const auto& event_data : user_input_event.data()) {
+        if (!event_data.pressed) {
+            // We only treat key press events here.
+            continue;
+        }
+
+        const nonstd::optional<config::Command> command =
+            bindings_.CommandForInput(event_data.input);
+        if (command != nonstd::nullopt && command->is_shortcut()) {
+            // Associated shortcut command found.
+            command_id = command->shortcut().id();
+            user_input.emplace(event_data.input);
+            break;
+        }
+    }
+
+    if (command_id == wxID_NONE) {
+        // No associated command found.
+        return wxEventFilter::Event_Skip;
+    }
+
+    // Queue the associated shortcut command.
+    wxCommandEvent* command_event = new wxCommandEvent(wxEVT_COMMAND_MENU_SELECTED, command_id);
+    command_event->SetEventObject(this);
+    frame->GetEventHandler()->QueueEvent(command_event);
+
+    return user_input_event.FilterProcessedInput(user_input.value());
 }

@@ -1,6 +1,8 @@
 #ifndef VBAM_WX_VIEWSUPT_H_
 #define VBAM_WX_VIEWSUPT_H_
 
+#include <cstdint>
+
 #include <wx/wx.h>
 #include <wx/window.h>
 #include <wx/image.h>
@@ -14,7 +16,7 @@
 #include <wx/stattext.h>
 #include <wx/checkbox.h>
 
-#include <stdint.h> // for uint32_t
+#include "wx/widgets/user-input-event.h"
 
 // avoid exporting too much stuff
 namespace Viewers {
@@ -218,7 +220,7 @@ protected:
     int addrlen;
 
     void MouseEvent(wxMouseEvent& ev);
-    void KeyEvent(wxKeyEvent& ev);
+    void KeyEvent(widgets::UserInputEvent& ev);
     // the subwidgets
     wxPanel disp;
     wxScrollBar sb;

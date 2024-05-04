@@ -151,20 +151,27 @@ wxEvent* UserInputEvent::Clone() const {
     return new UserInputEvent(this->data_);
 }
 
-UserInputEventSender::UserInputEventSender(wxWindow* const window)
-    : window_(window) {
-    assert(window);
-
-    // Attach the event handlers.
-    window_->Bind(wxEVT_KEY_DOWN, &UserInputEventSender::OnKeyDown, this);
-    window_->Bind(wxEVT_KEY_UP, &UserInputEventSender::OnKeyUp, this);
-    window_->Bind(wxEVT_SET_FOCUS, &UserInputEventSender::Reset, this, window_->GetId());
-    window_->Bind(wxEVT_KILL_FOCUS, &UserInputEventSender::Reset, this, window_->GetId());
+KeyboardInputSender::KeyboardInputSender(EventHandlerProvider* const handler_provider)
+    : handler_provider_(handler_provider) {
+    assert(handler_provider_);
 }
 
-UserInputEventSender::~UserInputEventSender() = default;
+KeyboardInputSender::~KeyboardInputSender() = default;
 
-void UserInputEventSender::OnKeyDown(wxKeyEvent& event) {
+void KeyboardInputSender::ProcessKeyEvent(wxKeyEvent& event) {
+    if (!handler_provider_->event_handler()) {
+        // No event handler to send the event to.
+        return;
+    }
+
+    if (event.GetEventType() == wxEVT_KEY_DOWN) {
+        OnKeyDown(event);
+    } else if (event.GetEventType() == wxEVT_KEY_UP) {
+        OnKeyUp(event);
+    }
+}
+
+void KeyboardInputSender::OnKeyDown(wxKeyEvent& event) {
     // Stop propagation of the event.
     event.Skip(false);
 
@@ -214,10 +221,10 @@ void UserInputEventSender::OnKeyDown(wxKeyEvent& event) {
         }
     }
 
-    wxQueueEvent(window_, new UserInputEvent(std::move(event_data)));
+    wxQueueEvent(handler_provider_->event_handler(), new UserInputEvent(std::move(event_data)));
 }
 
-void UserInputEventSender::OnKeyUp(wxKeyEvent& event) {
+void KeyboardInputSender::OnKeyUp(wxKeyEvent& event) {
     // Stop propagation of the event.
     event.Skip(false);
 
@@ -297,17 +304,8 @@ void UserInputEventSender::OnKeyUp(wxKeyEvent& event) {
     for (const auto& data : event_data) {
         active_mod_inputs_.erase(data.input.keyboard_input());
     }
-    wxQueueEvent(window_, new UserInputEvent(std::move(event_data)));
-}
 
-void UserInputEventSender::Reset(wxFocusEvent& event) {
-    // Reset the internal state.
-    active_keys_.clear();
-    active_mods_.clear();
-    active_mod_inputs_.clear();
-
-    // Let the event propagate.
-    event.Skip();
+    wxQueueEvent(handler_provider_->event_handler(), new UserInputEvent(std::move(event_data)));
 }
 
 }  // namespace widgets
