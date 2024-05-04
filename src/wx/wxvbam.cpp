@@ -34,6 +34,7 @@
 #include "core/gba/gbaSound.h"
 #include "wx/builtin-over.h"
 #include "wx/builtin-xrc.h"
+#include "wx/config/cmdtab.h"
 #include "wx/config/emulated-gamepad.h"
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
@@ -163,14 +164,6 @@ IMPLEMENT_DYNAMIC_CLASS(MainFrame, wxFrame)
 #ifndef NO_ONLINEUPDATES
 #include "autoupdater/autoupdater.h"
 #endif // NO_ONLINEUPDATES
-
-// Initializer for struct cmditem
-cmditem new_cmditem(const wxString cmd, const wxString name, int cmd_id,
-                    int mask_flags, wxMenuItem* mi)
-{
-    struct cmditem tmp = {cmd, name, cmd_id, mask_flags, mi};
-    return tmp;
-}
 
 // generate config file path
 static void get_config_path(wxPathList& path, bool exists = true)
@@ -755,8 +748,9 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
         }
 
         wxPrintf(_("The commands available for the Keyboard/* option are:\n\n"));
-        for (int i = 0; i < ncmds; i++)
-            wxPrintf(wxT("%s (%s)\n"), cmdtab[i].cmd.c_str(), cmdtab[i].name.c_str());
+        for (const cmditem& cmd_item : cmdtab) {
+            wxPrintf("%s (%s)\n", cmd_item.cmd.c_str(), cmd_item.name.c_str());
+        }
 
         console_mode = true;
         return true;
@@ -1049,9 +1043,11 @@ wxString MainFrame::GetGamePath(wxString path)
 
 void MainFrame::enable_menus()
 {
-    for (int i = 0; i < ncmds; i++)
-        if (cmdtab[i].mask_flags && cmdtab[i].mi)
-            cmdtab[i].mi->Enable((cmdtab[i].mask_flags & cmd_enable) != 0);
+    for (const cmditem& cmd_item : cmdtab) {
+        if (cmd_item.mask_flags && cmd_item.mi) {
+            cmd_item.mi->Enable((cmd_item.mask_flags & cmd_enable) != 0);
+        }
+    }
 
     if (cmd_enable & CMDEN_SAVST)
         for (int i = 0; i < 10; i++)
@@ -1179,11 +1175,11 @@ void MainFrame::ResetRecentAccelerators() {
 }
 
 void MainFrame::ResetMenuAccelerators() {
-    for (int i = 0; i < ncmds; i++) {
-        if (!cmdtab[i].mi) {
+    for (const cmditem& cmd_item : cmdtab) {
+        if (!cmd_item.mi) {
             continue;
         }
-        ResetMenuItemAccelerator(cmdtab[i].mi);
+        ResetMenuItemAccelerator(cmd_item.mi);
     }
     ResetRecentAccelerators();
 }

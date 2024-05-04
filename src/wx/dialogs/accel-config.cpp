@@ -7,12 +7,12 @@
 #include <wx/msgdlg.h>
 
 #include "wx/config/bindings.h"
+#include "wx/config/cmdtab.h"
 #include "wx/config/command.h"
 #include "wx/config/user-input.h"
 #include "wx/dialogs/base-dialog.h"
 #include "wx/widgets/client-data.h"
 #include "wx/widgets/user-input-ctrl.h"
-#include "wx/wxvbam.h"
 
 namespace dialogs {
 
@@ -59,22 +59,23 @@ void AppendItemToTree(std::unordered_map<config::ShortcutCommand, wxTreeItemId>*
                       int command,
                       const wxString& prefix,
                       int level) {
-    int i = 0;
-    for (; i < ncmds; i++) {
-        if (command == cmdtab[i].cmd_id) {
+    wxString name;
+    for (const cmditem& cmd_item : cmdtab) {
+        if (command == cmd_item.cmd_id) {
+            name = cmd_item.name;
             break;
         }
     }
-    assert(i < ncmds);
+    assert(!name.empty());
 
-    const wxTreeItemId tree_item_id = tree->AppendItem(
-        parent,
-        /*text=*/cmdtab[i].name,
-        /*image=*/-1,
-        /*selImage=*/-1,
-        /*data=*/
-        new CommandTreeItemData(config::ShortcutCommand(command),
-                                AppendString(prefix, level, cmdtab[i].name), cmdtab[i].name));
+    const wxTreeItemId tree_item_id =
+        tree->AppendItem(parent,
+                         /*text=*/name,
+                         /*image=*/-1,
+                         /*selImage=*/-1,
+                         /*data=*/
+                         new CommandTreeItemData(config::ShortcutCommand(command),
+                                                 AppendString(prefix, level, name), name));
     command_to_item_id->emplace(command, tree_item_id);
 }
 
@@ -154,16 +155,9 @@ AccelConfig::AccelConfig(wxWindow* parent,
     tree_->ExpandAll();
     tree_->SelectItem(menu_id);
 
-    // Set the initial tree size.
-    wxSize size = tree_->GetBestSize();
-    size.SetHeight(std::min(200, size.GetHeight()));
-    tree_->SetSize(size);
-    size.SetWidth(-1);  // maybe allow it to become bigger
-    tree_->SetSizeHints(size, size);
-
     int w, h;
     current_keys_->GetTextExtent("CTRL-ALT-SHIFT-ENTER", &w, &h);
-    size.Set(w, h);
+    wxSize size(w, h);
     current_keys_->SetMinSize(size);
 
     // Compute max size for currently_assigned_label_.
@@ -178,7 +172,6 @@ AccelConfig::AccelConfig(wxWindow* parent,
         size.SetHeight(std::max(h, size.GetHeight()));
     }
     currently_assigned_label_->SetMinSize(size);
-    currently_assigned_label_->SetSizeHints(size);
 
     // Finally, bind the events.
     Bind(wxEVT_SHOW, &AccelConfig::OnDialogShown, this, GetId());
@@ -250,7 +243,7 @@ void AccelConfig::OnRemoveBinding(wxCommandEvent&) {
         return;
     }
 
-    config_shortcuts_.UnassignInput(UserInputClientData::From(current_keys_));
+    config_shortcuts_.UnassignInput(UserInputClientData::From(current_keys_, selection));
     PopulateCurrentKeys();
 }
 

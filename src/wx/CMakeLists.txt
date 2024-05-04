@@ -17,6 +17,8 @@ set(VBAM_WX_COMMON
     config/bindings.h
     config/command.cpp
     config/command.h
+    config/cmdtab.cpp
+    config/cmdtab.h
     config/emulated-gamepad.cpp
     config/emulated-gamepad.h
     config/internal/bindings-internal.cpp
@@ -101,7 +103,7 @@ set(VBAM_WX_COMMON
     ${VBAM_GENERATED_DIR}/wx/builtin-over.h
     ${VBAM_GENERATED_DIR}/wx/cmdhandlers.h
     ${VBAM_GENERATED_DIR}/wx/cmd-evtable.h
-    ${VBAM_GENERATED_DIR}/wx/cmdtab.cpp
+    ${VBAM_GENERATED_DIR}/wx/config/internal/cmdtab.cpp
 )
 
 if(NOT ZIP_PROGRAM)
@@ -601,7 +603,7 @@ add_custom_command(
 # all using portable cmake code
 add_custom_command(
     OUTPUT
-        ${VBAM_GENERATED_DIR}/wx/cmdtab.cpp
+        ${VBAM_GENERATED_DIR}/wx/config/internal/cmdtab.cpp
         ${VBAM_GENERATED_DIR}/wx/cmdhandlers.h
         ${VBAM_GENERATED_DIR}/wx/cmd-evtable.h
     COMMAND

@@ -11,6 +11,7 @@
 #include <wx/xrc/xmlres.h>
 
 #include "wx/config/bindings.h"
+#include "wx/config/cmdtab.h"
 #include "wx/config/command.h"
 #include "wx/config/option-observer.h"
 #include "wx/config/option-proxy.h"
@@ -221,7 +222,7 @@ void load_opts(bool first_time_launch) {
             if (s == wxT("Keyboard")) {
                 const cmditem dummy = new_cmditem(e);
 
-                if (!std::binary_search(&cmdtab[0], &cmdtab[ncmds], dummy, cmditem_lt)) {
+                if (!std::binary_search(cmdtab.begin(), cmdtab.end(), dummy, cmditem_lt)) {
                     s.append(wxT('/'));
                     s.append(e);
                     //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
@@ -329,9 +330,9 @@ void load_opts(bool first_time_launch) {
     // Keyboard does not get written with defaults
     wxString kbopt("Keyboard/");
     int kboff = kbopt.size();
-    for (int i = 0; i < ncmds; i++) {
+    for (const cmditem& cmd_item : cmdtab) {
         kbopt.resize(kboff);
-        kbopt.append(cmdtab[i].cmd);
+        kbopt.append(cmd_item.cmd);
 
         if (cfg->Read(kbopt, &s) && s.size()) {
             auto inputs = config::UserInput::FromConfigString(s);
@@ -340,7 +341,7 @@ void load_opts(bool first_time_launch) {
             } else {
                 for (const auto& input : inputs) {
                     bindings->AssignInputToCommand(input,
-                                                   config::ShortcutCommand(cmdtab[i].cmd_id));
+                                                   config::ShortcutCommand(cmd_item.cmd_id));
                 }
             }
         }
@@ -420,17 +421,17 @@ void update_shortcut_opts() {
     cfg->DeleteGroup("/Keyboard");
     cfg->SetPath("/Keyboard");
     for (const auto& iter : wxGetApp().bindings()->GetKeyboardConfiguration()) {
-        int cmd = 0;
-        for (cmd = 0; cmd < ncmds; cmd++)
-            if (cmdtab[cmd].cmd_id == iter.first)
+        bool found = false;
+        for (const cmditem& cmd_item : cmdtab) {
+            if (cmd_item.cmd_id == iter.first) {
+                found = true;
+                cfg->Write(cmd_item.cmd, iter.second);
                 break;
-        if (cmd == ncmds) {
-            // Command not found. This should never happen.
-            assert(false);
-            continue;
+            }
         }
 
-        cfg->Write(cmdtab[cmd].cmd, iter.second);
+        // Command not found. This should never happen.
+        assert(found);
     }
 
     cfg->SetPath("/");
