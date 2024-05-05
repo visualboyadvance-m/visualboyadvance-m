@@ -1022,42 +1022,42 @@ msgstr "Meta+"
 #: config/user-input.cpp:238
 #, c-format
 msgid "Joystick %d"
-msgstr ""
+msgstr "Джойстик %d"
 
 #: config/user-input.cpp:269
 #, c-format
 msgid "%s: Axis %d+"
-msgstr ""
+msgstr "%s: Вісь %d+"
 
 #: config/user-input.cpp:271
 #, c-format
 msgid "%s: Axis %d-"
-msgstr ""
+msgstr "%s: Вісь %d-"
 
 #: config/user-input.cpp:273
 #, c-format
 msgid "%s: Button %d"
-msgstr ""
+msgstr "%s: Кнопка %d"
 
 #: config/user-input.cpp:275
 #, c-format
 msgid "%s: Hat %d North"
-msgstr ""
+msgstr "%s: Капелюх %d ↑"
 
 #: config/user-input.cpp:277
 #, c-format
 msgid "%s: Hat %d South"
-msgstr ""
+msgstr "%s: Капелюх %d ↓"
 
 #: config/user-input.cpp:279
 #, c-format
 msgid "%s: Hat %d West"
-msgstr ""
+msgstr "%s: Капелюх %d ←"
 
 #: config/user-input.cpp:281
 #, c-format
 msgid "%s: Hat %d East"
-msgstr ""
+msgstr "%s: Капелюх %d →"
 
 #: config/user-input.cpp:312
 msgid "Key"
