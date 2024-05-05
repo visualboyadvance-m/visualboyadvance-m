@@ -1049,42 +1049,42 @@ msgstr "Meta+"
 #: config/user-input.cpp:238
 #, c-format
 msgid "Joystick %d"
-msgstr ""
+msgstr "Joystick %d"
 
 #: config/user-input.cpp:269
 #, c-format
 msgid "%s: Axis %d+"
-msgstr ""
+msgstr "%s: Eixo %d+"
 
 #: config/user-input.cpp:271
 #, c-format
 msgid "%s: Axis %d-"
-msgstr ""
+msgstr "%s: Eixo %d-"
 
 #: config/user-input.cpp:273
 #, c-format
 msgid "%s: Button %d"
-msgstr ""
+msgstr "%s: Botão %d"
 
 #: config/user-input.cpp:275
 #, c-format
 msgid "%s: Hat %d North"
-msgstr ""
+msgstr "%s: Hat %d Norte"
 
 #: config/user-input.cpp:277
 #, c-format
 msgid "%s: Hat %d South"
-msgstr ""
+msgstr "%s: Hat %d Sul"
 
 #: config/user-input.cpp:279
 #, c-format
 msgid "%s: Hat %d West"
-msgstr ""
+msgstr "%s: Hat %d Oeste"
 
 #: config/user-input.cpp:281
 #, c-format
 msgid "%s: Hat %d East"
-msgstr ""
+msgstr "%s: Hat %d Leste"
 
 #: config/user-input.cpp:312
 msgid "Key"
