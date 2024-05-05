@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-28 19:15+0000\n"
+"POT-Creation-Date: 2024-05-05 00:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Svyatoslav <zarazafamila@gmail.com>, 2023\n"
 "Language-Team: Ukrainian (http://app.transifex.com/bgk/vba-m/language/uk/)\n"
@@ -28,7 +28,7 @@ msgstr "OpenAL: Не вдалося відкрити аудіопристрій.
 msgid "Default device"
 msgstr "Типовий пристрій"
 
-#: cmdevents.cpp:136
+#: cmdevents.cpp:132
 msgid ""
 "Game Boy Advance Files "
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
@@ -36,263 +36,263 @@ msgid ""
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "Game Boy Advance|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game Boy|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:147
+#: cmdevents.cpp:143
 msgid "Open ROM file"
 msgstr "Відкриття ROM"
 
-#: cmdevents.cpp:168
+#: cmdevents.cpp:164
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "Game Boy|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:174
+#: cmdevents.cpp:170
 msgid "Open GB ROM file"
 msgstr "Відкриття Game Boy ROM"
 
-#: cmdevents.cpp:195
+#: cmdevents.cpp:191
 msgid ""
 "Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr "Game Boy Color|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:201
+#: cmdevents.cpp:197
 msgid "Open GBC ROM file"
 msgstr "Відкриття Game Boy Color ROM"
 
-#: cmdevents.cpp:366 cmdevents.cpp:388
+#: cmdevents.cpp:362 cmdevents.cpp:384
 msgid "Select Dot Code file"
 msgstr "Вибір Dot-коду"
 
-#: cmdevents.cpp:368 cmdevents.cpp:390
+#: cmdevents.cpp:364 cmdevents.cpp:386
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 msgstr "E-Reader Dot-код|*.bin;*.raw"
 
-#: cmdevents.cpp:409 cmdevents.cpp:604
+#: cmdevents.cpp:405 cmdevents.cpp:600
 msgid "Select battery file"
 msgstr "Вибір батареї"
 
-#: cmdevents.cpp:410 cmdevents.cpp:605
+#: cmdevents.cpp:406 cmdevents.cpp:601
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "Батарея|*.sav|Флеш-збереження|*.dat"
 
-#: cmdevents.cpp:418
+#: cmdevents.cpp:414
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
 msgstr "Видалити всі збережені ігри імпортом батареї остаточно після наступного запису?"
 
-#: cmdevents.cpp:419 cmdevents.cpp:447 cmdevents.cpp:567
+#: cmdevents.cpp:415 cmdevents.cpp:443 cmdevents.cpp:563
 msgid "Confirm import"
 msgstr "Підтвердити імпорт"
 
-#: cmdevents.cpp:425 panel.cpp:492
+#: cmdevents.cpp:421 panel.cpp:492
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Завантажено батарею %s."
 
-#: cmdevents.cpp:427
+#: cmdevents.cpp:423
 #, c-format
 msgid "Error loading battery %s"
 msgstr "Помилка завантаження батареї %s."
 
-#: cmdevents.cpp:436
+#: cmdevents.cpp:432
 msgid "Select code file"
 msgstr "Вибір кодів"
 
-#: cmdevents.cpp:437
+#: cmdevents.cpp:433
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
 msgstr "Game Shark-коди|*.spc;*.xpc"
 
-#: cmdevents.cpp:437
+#: cmdevents.cpp:433
 msgid "Game Shark Code File (*.gcf)|*.gcf"
 msgstr "Game Shark-коди|*.gcf"
 
-#: cmdevents.cpp:446
+#: cmdevents.cpp:442
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
 msgstr "Замінити всі завантажені чіти імпортом кодів?"
 
-#: cmdevents.cpp:463
+#: cmdevents.cpp:459
 #, c-format
 msgid "Cannot open file %s"
 msgstr "Неможливо відкрити %s."
 
-#: cmdevents.cpp:473
+#: cmdevents.cpp:469
 #, c-format
 msgid "Unsupported code file %s"
 msgstr "Непідтримуваний файл кодів %s."
 
-#: cmdevents.cpp:543
+#: cmdevents.cpp:539
 #, c-format
 msgid "Loaded code file %s"
 msgstr "Завантажено коди %s."
 
-#: cmdevents.cpp:545
+#: cmdevents.cpp:541
 #, c-format
 msgid "Error loading code file %s"
 msgstr "Помилка завантаження кодів %s."
 
-#: cmdevents.cpp:556 cmdevents.cpp:632
+#: cmdevents.cpp:552 cmdevents.cpp:628
 msgid "Select snapshot file"
 msgstr "Вибір знімка"
 
-#: cmdevents.cpp:557
+#: cmdevents.cpp:553
 msgid ""
 "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
 " (*.gsv)|*.gsv"
 msgstr "Game Shark & PAC-знімки|*.sps;*.xps|Game Shark SP-знімки|*.gsv"
 
-#: cmdevents.cpp:557
+#: cmdevents.cpp:553
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
 msgstr "Game Boy-знімки|*.gbs"
 
-#: cmdevents.cpp:566
+#: cmdevents.cpp:562
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
 msgstr "Видалити всі збережені ігри імпортом знімка остаточно після наступного запису?"
 
-#: cmdevents.cpp:591
+#: cmdevents.cpp:587
 #, c-format
 msgid "Loaded snapshot file %s"
 msgstr "Завантажено знімок %s."
 
-#: cmdevents.cpp:593
+#: cmdevents.cpp:589
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr "Помилка завантаження знімка %s."
 
-#: cmdevents.cpp:616
+#: cmdevents.cpp:612
 #, c-format
 msgid "Wrote battery %s"
 msgstr "Записано батарею %s."
 
-#: cmdevents.cpp:618 panel.cpp:802
+#: cmdevents.cpp:614 panel.cpp:802
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Помилка запису батареї %s."
 
-#: cmdevents.cpp:626
+#: cmdevents.cpp:622
 msgid "EEPROM saves cannot be exported"
 msgstr "EEPROM-збереження неможливо експортувати."
 
-#: cmdevents.cpp:633
+#: cmdevents.cpp:629
 msgid "Game Shark Snapshot (*.sps)|*.sps"
 msgstr "Game Shark-знімки|*.sps"
 
-#: cmdevents.cpp:647
+#: cmdevents.cpp:643
 msgid "Exported from Visual Boy Advance-M"
 msgstr "Експортовано з Visual Boy Advance-M."
 
-#: cmdevents.cpp:659
+#: cmdevents.cpp:655
 #, c-format
 msgid "Saved snapshot file %s"
 msgstr "Збережено знімок %s."
 
-#: cmdevents.cpp:661
+#: cmdevents.cpp:657
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr "Помилка збереження знімка %s."
 
-#: cmdevents.cpp:677 cmdevents.cpp:755 cmdevents.cpp:825 cmdevents.cpp:894
+#: cmdevents.cpp:673 cmdevents.cpp:751 cmdevents.cpp:821 cmdevents.cpp:890
 #: gfxviewers.cpp:1662 gfxviewers.cpp:1807 viewers.cpp:588 viewers.cpp:802
-#: viewsupt.cpp:1216
+#: viewsupt.cpp:1199
 msgid "Select output file"
 msgstr "Вибір кінцевого файлу"
 
-#: cmdevents.cpp:678 gfxviewers.cpp:1663 gfxviewers.cpp:1808 viewsupt.cpp:1217
+#: cmdevents.cpp:674 gfxviewers.cpp:1663 gfxviewers.cpp:1808 viewsupt.cpp:1200
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG-зображення|*.png|BMP-зображення|*.bmp"
 
-#: cmdevents.cpp:702 sys.cpp:578
+#: cmdevents.cpp:698 sys.cpp:579
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "Записано знімок %s."
 
-#: cmdevents.cpp:723 cmdevents.cpp:793 cmdevents.cpp:862 cmdevents.cpp:928
+#: cmdevents.cpp:719 cmdevents.cpp:789 cmdevents.cpp:858 cmdevents.cpp:924
 msgid " files ("
 msgstr " ("
 
-#: cmdevents.cpp:961
+#: cmdevents.cpp:957
 msgid "Select file"
 msgstr "Вибір файлу"
 
-#: cmdevents.cpp:1265 cmdevents.cpp:1358
+#: cmdevents.cpp:1261 cmdevents.cpp:1354
 msgid "Select state file"
 msgstr "Вибір стану"
 
-#: cmdevents.cpp:1266 cmdevents.cpp:1359
+#: cmdevents.cpp:1262 cmdevents.cpp:1355
 msgid "Visual Boy Advance saved game files|*.sgm"
 msgstr "Visual Boy Advance-збереження|*.sgm"
 
-#: cmdevents.cpp:1389 cmdevents.cpp:1399 cmdevents.cpp:1410
+#: cmdevents.cpp:1385 cmdevents.cpp:1395 cmdevents.cpp:1406
 #, c-format
 msgid "Current state slot #%d"
 msgstr "Поточний слот стану %d"
 
-#: cmdevents.cpp:1473
+#: cmdevents.cpp:1469
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
 msgstr "Неможливо використати колірний хак при увімкненому Game Boy BIOS."
 
-#: cmdevents.cpp:1684
+#: cmdevents.cpp:1680
 msgid "Sound enabled"
 msgstr "Звук увімкнено."
 
-#: cmdevents.cpp:1684
+#: cmdevents.cpp:1680
 msgid "Sound disabled"
 msgstr "Звук вимкнено."
 
-#: cmdevents.cpp:1763
+#: cmdevents.cpp:1759
 msgid "Set to 0 for pseudo tty"
 msgstr "Встановити 0 для псевдо-tty"
 
-#: cmdevents.cpp:1765
+#: cmdevents.cpp:1761
 msgid "Port to wait for connection:"
 msgstr "Порт очікування з'єднання:"
 
-#: cmdevents.cpp:1766
+#: cmdevents.cpp:1762
 msgid "GDB Connection"
 msgstr "GDB-з'єднання"
 
-#: cmdevents.cpp:1818
+#: cmdevents.cpp:1814
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "Очікування з'єднання з %s."
 
-#: cmdevents.cpp:1825
+#: cmdevents.cpp:1821
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "Очікування з'єднання на порті %d."
 
-#: cmdevents.cpp:1828
+#: cmdevents.cpp:1824
 msgid "Waiting for GDB..."
 msgstr "Очікування GDB..."
 
-#: cmdevents.cpp:2203
+#: cmdevents.cpp:2199
 msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
 msgstr "Видалити конфігурацію?"
 
-#: cmdevents.cpp:2204
+#: cmdevents.cpp:2200
 msgid "FACTORY RESET"
 msgstr "Відновити заводські налаштування"
 
-#: cmdevents.cpp:2239
+#: cmdevents.cpp:2235
 msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr "Емулятор Nintendo Game Boy / Color / Advance."
 
-#: cmdevents.cpp:2240
+#: cmdevents.cpp:2236
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "Forgotten, 1999-2003\nКоманда виробників Visual Boy Advance, 2004-2006\nКоманда виробників Visual Boy Advance-M, 2007-2024"
 
-#: cmdevents.cpp:2242
+#: cmdevents.cpp:2238
 msgid ""
 "This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -308,103 +308,103 @@ msgid ""
 "along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr "Програма - безкоштовне програмне забезпечення: можна розповсюджувати\nїї та / або змінювати за умовами Загальної Публічної Ліцензії GNU,\nопублікованої Фондом Безкоштовного Програмного Забезпечення, чи\nверсії 2 Ліцензії, чи (на твій вибір) будь-якої пізнішої версії.\nПрограму розповсюджено з надією на користь, але БЕЗ ГАРАНТІЙ;\nнавіть без неявної гарантії ПРИДАТНОСТІ ДО ПРОДАЖУ\nЧИ ОСОБЛИВОЇ МЕТИ. Докладно в Загальній Публічній Ліцензії GNU.\n\nТи отримаєш копію Загальної Публічної Ліцензії GNU\nразом із програмою, чи за посиланням.\nhttp://gnu.org/licenses"
 
-#: cmdevents.cpp:2427
+#: cmdevents.cpp:2423
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 msgstr "Неможливо використати Game Boy BIOS при увімкненому колірному хаку."
 
-#: cmdevents.cpp:2493
+#: cmdevents.cpp:2489
 msgid "LAN link is already active. Disable link mode to disconnect."
 msgstr "LAN-з'єднання активне. Вимкни режим з'єднання для роз'єднання."
 
-#: cmdevents.cpp:2499
+#: cmdevents.cpp:2495
 msgid "Network is not supported in local mode."
 msgstr "Мережа непідтримувана в локальному режимі."
 
-#: config/command.cpp:28 xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:450
+#: config/command.cpp:29 xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:450
 msgid "Up"
 msgstr "↑"
 
-#: config/command.cpp:28 xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:454
+#: config/command.cpp:29 xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:454
 msgid "Down"
 msgstr "↓"
 
-#: config/command.cpp:28 xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:458
+#: config/command.cpp:29 xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:458
 msgid "Left"
 msgstr "←"
 
-#: config/command.cpp:28 xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:462
+#: config/command.cpp:29 xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:462
 msgid "Right"
 msgstr "→"
 
-#: config/command.cpp:28 xrc/JoyPanel.xrc:37
+#: config/command.cpp:29 xrc/JoyPanel.xrc:37
 msgid "A"
 msgstr "A"
 
-#: config/command.cpp:29 xrc/JoyPanel.xrc:83
+#: config/command.cpp:30 xrc/JoyPanel.xrc:83
 msgid "B"
 msgstr "B"
 
-#: config/command.cpp:29 xrc/JoyPanel.xrc:129
+#: config/command.cpp:30 xrc/JoyPanel.xrc:129
 msgid "L"
 msgstr "L"
 
-#: config/command.cpp:29 xrc/JoyPanel.xrc:175
+#: config/command.cpp:30 xrc/JoyPanel.xrc:175
 msgid "R"
 msgstr "R"
 
-#: config/command.cpp:29 xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:482
+#: config/command.cpp:30 xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:482
 msgid "Select"
 msgstr "Select"
 
-#: config/command.cpp:29 xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:486
+#: config/command.cpp:30 xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:486
 msgid "Start"
 msgstr "Start"
 
-#: config/command.cpp:30 xrc/JoyPanel.xrc:254
+#: config/command.cpp:31 xrc/JoyPanel.xrc:254
 msgid "Motion Up"
 msgstr "Рух ↑"
 
-#: config/command.cpp:30 xrc/JoyPanel.xrc:298
+#: config/command.cpp:31 xrc/JoyPanel.xrc:298
 msgid "Motion Down"
 msgstr "Рух ↓"
 
-#: config/command.cpp:30
+#: config/command.cpp:31
 msgid "Motion Left"
 msgstr "Рух ←"
 
-#: config/command.cpp:30
+#: config/command.cpp:31
 msgid "Motion Right"
 msgstr "Рух →"
 
-#: config/command.cpp:30
+#: config/command.cpp:31
 msgid "Motion In"
 msgstr "Рух назад"
 
-#: config/command.cpp:31
+#: config/command.cpp:32
 msgid "Motion Out"
 msgstr "Рух уперед"
 
-#: config/command.cpp:31
+#: config/command.cpp:32
 msgid "Auto A"
 msgstr "A-Turbo"
 
-#: config/command.cpp:31
+#: config/command.cpp:32
 msgid "Auto B"
 msgstr "B-Turbo"
 
-#: config/command.cpp:31 xrc/DisplayConfig.xrc:200
+#: config/command.cpp:32 xrc/DisplayConfig.xrc:200
 msgid "Speed"
 msgstr "Швидкість"
 
-#: config/command.cpp:31
+#: config/command.cpp:32
 msgid "Capture"
 msgstr "Захопити"
 
-#: config/command.cpp:32
+#: config/command.cpp:33
 msgid "GameShark"
 msgstr "Game Shark"
 
-#: config/command.cpp:106
+#: config/command.cpp:107
 #, c-format
 msgid "Joypad %zu %s"
 msgstr "Джойстик %zu %s"
@@ -858,7 +858,7 @@ msgstr "Недійсне значення %f для опції %s; дійсні 
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Недійсне значення %d для опції %s; дійсні значення: %d - %d."
 
-#: config/option.cpp:480 opts.cpp:468 opts.cpp:477 opts.cpp:486 opts.cpp:495
+#: config/option.cpp:480 opts.cpp:469 opts.cpp:478 opts.cpp:487 opts.cpp:496
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr "Недійсне значення %s для опції %s."
@@ -1019,23 +1019,63 @@ msgstr "Shift+"
 msgid "Meta+"
 msgstr "Meta+"
 
-#: config/user-input.cpp:284
+#: config/user-input.cpp:238
+#, c-format
+msgid "Joystick %d"
+msgstr ""
+
+#: config/user-input.cpp:269
+#, c-format
+msgid "%s: Axis %d+"
+msgstr ""
+
+#: config/user-input.cpp:271
+#, c-format
+msgid "%s: Axis %d-"
+msgstr ""
+
+#: config/user-input.cpp:273
+#, c-format
+msgid "%s: Button %d"
+msgstr ""
+
+#: config/user-input.cpp:275
+#, c-format
+msgid "%s: Hat %d North"
+msgstr ""
+
+#: config/user-input.cpp:277
+#, c-format
+msgid "%s: Hat %d South"
+msgstr ""
+
+#: config/user-input.cpp:279
+#, c-format
+msgid "%s: Hat %d West"
+msgstr ""
+
+#: config/user-input.cpp:281
+#, c-format
+msgid "%s: Hat %d East"
+msgstr ""
+
+#: config/user-input.cpp:312
 msgid "Key"
 msgstr "Кнопка"
 
-#: dialogs/accel-config.cpp:148
+#: dialogs/accel-config.cpp:149
 msgid "Menu commands"
 msgstr "Команди меню"
 
-#: dialogs/accel-config.cpp:259
+#: dialogs/accel-config.cpp:252
 msgid "This will clear all user-defined accelerators. Are you sure?"
 msgstr "Очистити всі користувацькі гарячі кнопки?"
 
-#: dialogs/accel-config.cpp:259 dialogs/accel-config.cpp:306
+#: dialogs/accel-config.cpp:252 dialogs/accel-config.cpp:299
 msgid "Confirm"
 msgstr "Підтвердити"
 
-#: dialogs/accel-config.cpp:304
+#: dialogs/accel-config.cpp:297
 #, c-format
 msgid "This will unassign \"%s\" from \"%s\". Are you sure?"
 msgstr "Скасувати призначення \"%s\" з \"%s\"?"
@@ -1270,159 +1310,159 @@ msgid ""
 "Table (*.act)|*.act"
 msgstr "Windows-палітра|*.pal|Paint Shop-палітра|*.pal|Adobe Color Table|*.act"
 
-#: guiinit.cpp:89
+#: guiinit.cpp:90
 msgid "Start!"
 msgstr "Запустити!"
 
-#: guiinit.cpp:108
+#: guiinit.cpp:109
 msgid "Connect"
 msgstr "З'єднати"
 
-#: guiinit.cpp:125
+#: guiinit.cpp:126
 msgid "You must enter a valid host name"
 msgstr "Необхідно вказати дійсне ім'я хоста."
 
-#: guiinit.cpp:126
+#: guiinit.cpp:127
 msgid "Host name invalid"
 msgstr "Недійсне ім'я хоста."
 
-#: guiinit.cpp:144
+#: guiinit.cpp:145
 msgid "Waiting for clients..."
 msgstr "Очікування клієнтів..."
 
-#: guiinit.cpp:145
+#: guiinit.cpp:146
 #, c-format
 msgid "Server IP address is: %s\n"
 msgstr "IP-адреса сервера: %s\n"
 
-#: guiinit.cpp:147
+#: guiinit.cpp:148
 msgid "Waiting for connection..."
 msgstr "Очікування з'єднання..."
 
-#: guiinit.cpp:148
+#: guiinit.cpp:149
 #, c-format
 msgid "Connecting to %s\n"
 msgstr "З'єднання з %s\n"
 
-#: guiinit.cpp:181
+#: guiinit.cpp:182
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr "Помилка.\nСпробуй знову."
 
-#: guiinit.cpp:248 guiinit.cpp:301
+#: guiinit.cpp:249 guiinit.cpp:302
 msgid "Select cheat file"
 msgstr "Вибір чітів"
 
-#: guiinit.cpp:249
+#: guiinit.cpp:250
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Visual Boy Advance-чіти|*.clt|CHT-чіти|*.cht"
 
-#: guiinit.cpp:268 panel.cpp:549
+#: guiinit.cpp:269 panel.cpp:549
 msgid "Loaded cheats"
 msgstr "Завантажено чіти."
 
-#: guiinit.cpp:302
+#: guiinit.cpp:303
 msgid "VBA cheat lists (*.clt)|*.clt"
 msgstr "Visual Boy Advance-чіти|*.clt"
 
-#: guiinit.cpp:320
+#: guiinit.cpp:321
 msgid "Saved cheats"
 msgstr "Збережено чіти."
 
-#: guiinit.cpp:346 guiinit.cpp:365
+#: guiinit.cpp:347 guiinit.cpp:366
 msgid "Restore old values?"
 msgstr "Відновити старі значення?"
 
-#: guiinit.cpp:347 guiinit.cpp:366
+#: guiinit.cpp:348 guiinit.cpp:367
 msgid "Removing cheats"
 msgstr "Вилучення чітів."
 
-#: guiinit.cpp:756
+#: guiinit.cpp:757
 msgid "Generic Code"
 msgstr "Загальний код"
 
-#: guiinit.cpp:828 guiinit.cpp:1078
+#: guiinit.cpp:829 guiinit.cpp:1079
 msgid "Number cannot be empty"
 msgstr "Число не може бути порожнім."
 
-#: guiinit.cpp:878
+#: guiinit.cpp:879
 msgid "Search produced no results"
 msgstr "Не знайдено результатів."
 
-#: guiinit.cpp:1041
+#: guiinit.cpp:1042
 msgid "8-bit "
 msgstr "8 біт "
 
-#: guiinit.cpp:1045
+#: guiinit.cpp:1046
 msgid "16-bit "
 msgstr "16 біт "
 
-#: guiinit.cpp:1049
+#: guiinit.cpp:1050
 msgid "32-bit "
 msgstr "32 біт "
 
-#: guiinit.cpp:1055
+#: guiinit.cpp:1056
 msgid "Signed decimal"
 msgstr "Знакове десяткове"
 
-#: guiinit.cpp:1059
+#: guiinit.cpp:1060
 msgid "Unsigned decimal"
 msgstr "Беззнакове десяткове"
 
-#: guiinit.cpp:1063
+#: guiinit.cpp:1064
 msgid "Unsigned hexadecimal"
 msgstr "Беззнакове шістнадцяткове"
 
-#: guiinit.cpp:1721
+#: guiinit.cpp:1722
 msgid "Main icon not found"
 msgstr "Головну піктограму не знайдено."
 
-#: guiinit.cpp:1739
+#: guiinit.cpp:1740
 msgid "Main display panel not found"
 msgstr "Головну панель дисплея не знайдено."
 
-#: guiinit.cpp:1998
+#: guiinit.cpp:1999
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Вилучено недійсний пункт меню %s."
 
-#: guiinit.cpp:2183
+#: guiinit.cpp:2184
 msgid "Code"
 msgstr "Код"
 
-#: guiinit.cpp:2192
+#: guiinit.cpp:2193
 msgid "Description"
 msgstr "Опис"
 
-#: guiinit.cpp:2266 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:2267 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Адреса"
 
-#: guiinit.cpp:2267
+#: guiinit.cpp:2268
 msgid "Old Value"
 msgstr "Старе значення"
 
-#: guiinit.cpp:2268
+#: guiinit.cpp:2269
 msgid "New Value"
 msgstr "Нове значення"
 
-#: guiinit.cpp:2519
+#: guiinit.cpp:2520
 msgid "JoyBus host invalid; disabling"
 msgstr "Вимкнено недійсний хост Joy Bus."
 
-#: opts.cpp:154
+#: opts.cpp:155
 msgid ""
 "The INI file was written for a more recent version of VBA-M. Some INI option"
 " values may have been reset."
 msgstr "INI записано для новішої версії Visual Boy Advance-M. Можливе відновлення деяких значень INI-опцій."
 
-#: opts.cpp:339 opts.cpp:355 opts.cpp:522
+#: opts.cpp:340 opts.cpp:356 opts.cpp:523
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Недійсна призначена кнопка %s для %s."
 
-#: opts.cpp:528
+#: opts.cpp:529
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr "Невідома опція %s зі значенням %s."
@@ -1514,169 +1554,169 @@ msgstr "Не вдалося змінити режим на %d * %d - %d @ %d."
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr "Недійсний Game Boy Advance-картридж."
 
-#: panel.cpp:1290
+#: panel.cpp:1289
 msgid "No memory for rewinding"
 msgstr "Відсутня пам'ять для звороту."
 
-#: panel.cpp:1300
+#: panel.cpp:1299
 msgid "Error writing rewind state"
 msgstr "Помилка запису стану звороту."
 
-#: panel.cpp:2272
+#: panel.cpp:2276
 msgid "Enabling EGL VSync."
 msgstr "Увімкнення вертикальної синхронізації EGL."
 
-#: panel.cpp:2274
+#: panel.cpp:2278
 msgid "Disabling EGL VSync."
 msgstr "Вимкнення вертикальної синхронізації EGL."
 
-#: panel.cpp:2281
+#: panel.cpp:2285
 msgid "Enabling GLX VSync."
 msgstr "Увімкнення вертикальної синхронізації GLX."
 
-#: panel.cpp:2283
+#: panel.cpp:2287
 msgid "Disabling GLX VSync."
 msgstr "Вимкнення вертикальної синхронізації GLX."
 
-#: panel.cpp:2301
+#: panel.cpp:2305
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Не вдалося встановити glXSwapIntervalEXT."
 
-#: panel.cpp:2310
+#: panel.cpp:2314
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Не вдалося встановити glXSwapIntervalSGI."
 
-#: panel.cpp:2319
+#: panel.cpp:2323
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Не вдалося встановити glXSwapIntervalMESA."
 
-#: panel.cpp:2326
+#: panel.cpp:2330
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "Відсутня підтримка wglGetExtensionsStringEXT."
 
-#: panel.cpp:2329
+#: panel.cpp:2333
 msgid "No support for WGL_EXT_swap_control"
 msgstr "Відсутня підтримка WGL_EXT_swap_control."
 
-#: panel.cpp:2338
+#: panel.cpp:2342
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Не вдалося встановити wglSwapIntervalEXT."
 
-#: panel.cpp:2344
+#: panel.cpp:2348
 msgid "No VSYNC available on this platform"
 msgstr "Вертикальна синхронізація недоступна для платформи."
 
-#: panel.cpp:2446
+#: panel.cpp:2450
 msgid "Memory allocation error"
 msgstr "Помилка розподілу пам'яті."
 
-#: panel.cpp:2449
+#: panel.cpp:2453
 msgid "Error initializing codec"
 msgstr "Помилка визначення кодека."
 
-#: panel.cpp:2452
+#: panel.cpp:2456
 msgid "Error writing to output file"
 msgstr "Помилка запису до кінцевого файлу."
 
-#: panel.cpp:2455
+#: panel.cpp:2459
 msgid "Can't guess output format from file name"
 msgstr "Неможливо визначити кінцевий формат імені файлу."
 
-#: panel.cpp:2460
+#: panel.cpp:2464
 msgid "Programming error; aborting!"
 msgstr "Програмна помилка; перервано!"
 
-#: panel.cpp:2472 panel.cpp:2501
+#: panel.cpp:2476 panel.cpp:2505
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Неможливо почати запис до %s (%s)."
 
-#: panel.cpp:2529
+#: panel.cpp:2533
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "Помилка аудіо- / відеозапису (%s); перервано."
 
-#: panel.cpp:2535
+#: panel.cpp:2539
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Помилка аудіозапису (%s); перервано."
 
-#: panel.cpp:2545
+#: panel.cpp:2549
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Помилка відеозапису (%s); перервано."
 
-#: panel.cpp:2700
+#: panel.cpp:2704
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Гучність: %d %%"
 
-#: sys.cpp:204 sys.cpp:265
+#: sys.cpp:205 sys.cpp:266
 msgid "No game in progress to record"
 msgstr "Відсутні ігри для запису."
 
-#: sys.cpp:222
+#: sys.cpp:223
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "Неможливо відкрити кінцевий %s."
 
-#: sys.cpp:229 sys.cpp:249 sys.cpp:399
+#: sys.cpp:230 sys.cpp:250 sys.cpp:400
 msgid "Error writing game recording"
 msgstr "Помилка запису гри."
 
-#: sys.cpp:270
+#: sys.cpp:271
 msgid "Cannot play game recording while recording"
 msgstr "Неможливо відтворити запис гри при записі."
 
-#: sys.cpp:285
+#: sys.cpp:286
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "Неможливо відкрити запис %s."
 
-#: sys.cpp:294 sys.cpp:304
+#: sys.cpp:295 sys.cpp:305
 msgid "Error reading game recording"
 msgstr "Помилка читання запису гри."
 
-#: sys.cpp:414 sys.cpp:433
+#: sys.cpp:415 sys.cpp:434
 msgid "Playback ended"
 msgstr "Відтворення завершено."
 
-#: sys.cpp:457
+#: sys.cpp:458
 #, c-format
 msgid "%d %% (%d, %d fps)"
 msgstr "%d %% (%d, %d Гц)"
 
-#: sys.cpp:898 xrc/GBPrinter.xrc:65
+#: sys.cpp:899 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "&Скасувати"
 
-#: sys.cpp:932
+#: sys.cpp:933
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "Зображення|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:941
+#: sys.cpp:942
 msgid "Save printer image to"
 msgstr "Зберегти зображення принтера до"
 
-#: sys.cpp:955 sys.cpp:1139
+#: sys.cpp:956 sys.cpp:1140
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "Записано кінцеві дані принтера до %s."
 
-#: sys.cpp:960 sys.cpp:1031
+#: sys.cpp:961 sys.cpp:1032
 msgid "&Close"
 msgstr "&Закрити"
 
-#: sys.cpp:1026
+#: sys.cpp:1027
 msgid "Printed"
 msgstr "Роздруковано."
 
-#: sys.cpp:1301
+#: sys.cpp:1302
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "Помилка відкриття псевдо-tty: %s."
 
-#: sys.cpp:1400
+#: sys.cpp:1401
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "Помилка налаштування серверного сокета (%d)."
@@ -1693,97 +1733,97 @@ msgstr "Дампи пам'яті|*.dmp;*.bin|"
 msgid "Select memory dump file"
 msgstr "Вибір дампа пам'яті"
 
-#: viewsupt.cpp:806
+#: viewsupt.cpp:789
 msgid "Red:"
 msgstr "Червоний:"
 
-#: viewsupt.cpp:815
+#: viewsupt.cpp:798
 msgid "Green:"
 msgstr "Зелений:"
 
-#: viewsupt.cpp:824
+#: viewsupt.cpp:807
 msgid "Blue:"
 msgstr "Синій:"
 
-#: viewsupt.h:61
+#: viewsupt.h:63
 #, c-format
 msgid "Unable to load dialog %s from resources"
 msgstr "Неможливо завантажити вікно %s з ресурсів."
 
-#: wxvbam.cpp:401 wxvbam.cpp:418
+#: wxvbam.cpp:390 wxvbam.cpp:407
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "Надано недійсний файл конфігурації: %s."
 
-#: wxvbam.cpp:558
+#: wxvbam.cpp:547
 msgid "Could not create main window"
 msgstr "Неможливо створити головне вікно."
 
-#: wxvbam.cpp:633
+#: wxvbam.cpp:622
 msgid "Save built-in XRC file and exit"
 msgstr "Зберегти вбудований XRC та вийти"
 
-#: wxvbam.cpp:636
+#: wxvbam.cpp:625
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Зберегти вбудований vba-over.ini та вийти"
 
-#: wxvbam.cpp:639
+#: wxvbam.cpp:628
 msgid "Print configuration path and exit"
 msgstr "Роздрукувати шлях конфігурації та вийти"
 
-#: wxvbam.cpp:642
+#: wxvbam.cpp:631
 msgid "Start in full-screen mode"
 msgstr "Запускати в повному екрані"
 
-#: wxvbam.cpp:645
+#: wxvbam.cpp:634
 msgid "Set a configuration file"
 msgstr "Встановити файл конфігурації"
 
-#: wxvbam.cpp:649
+#: wxvbam.cpp:638
 msgid "Delete shared link state first, if it exists"
 msgstr "Видалити спочатку стан загального з'єднання за наявності"
 
-#: wxvbam.cpp:656
+#: wxvbam.cpp:645
 msgid "List all settable options and exit"
 msgstr "Показати всі налаштовувані опції та вийти"
 
-#: wxvbam.cpp:659
+#: wxvbam.cpp:648
 msgid "ROM file"
 msgstr "ROM-файл"
 
-#: wxvbam.cpp:661
+#: wxvbam.cpp:650
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:692
+#: wxvbam.cpp:681
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "Помилка конфігурації / випуску: неможливо знайти вбудований xrc."
 
-#: wxvbam.cpp:700
+#: wxvbam.cpp:689
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Записано вбудовану конфігурацію до %s.\nДля перевизначення вилучи всі вузли, крім змінених кореневих. Перший знайдений кореневий вузол із правильним іменем у будь-якому файлі .xrc чи .xrs у наведених шляхах пошуку перевизначає вбудований:"
 
-#: wxvbam.cpp:714
+#: wxvbam.cpp:703
 msgid "Configuration is read from, in order:"
 msgstr "Конфігурацію прочитано з файлів за порядком:"
 
-#: wxvbam.cpp:728
+#: wxvbam.cpp:717
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "Записано вбудоване перевизначення файлу до %s.\nДля перевизначення видали всі розділи, крім змінених. Перший знайдений розділ буде використано зі шляху пошуку:"
 
-#: wxvbam.cpp:734
+#: wxvbam.cpp:723
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tвбудовано"
 
-#: wxvbam.cpp:749
+#: wxvbam.cpp:738
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1791,17 +1831,17 @@ msgid ""
 "\n"
 msgstr "Опції, встановлені з командного рядка, буде збережено при зміні конфігурації інтерфейсу користувача.\n\nДля позначення значення \"істина\" та \"хиба\" вказуються як 1 і 0 відповідно.\n\n"
 
-#: wxvbam.cpp:757
+#: wxvbam.cpp:746
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Доступні команди для опцій клавіатури:\n"
 
-#: wxvbam.cpp:768
+#: wxvbam.cpp:758
 msgid "Configuration file not found."
 msgstr "Файл конфігурації не знайдено."
 
-#: wxvbam.cpp:799
+#: wxvbam.cpp:789
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Неправильна опція конфігурації чи вибрано декілька ROM'ів:\n"
 
@@ -1877,93 +1917,93 @@ msgstr "XAudio2: Не вдалося створити основний голо�
 msgid "XAudio2: Creating source voice failed!"
 msgstr "XAudio2: Не вдалося створити голос-джерело!"
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:639
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:639
 msgid "Error, link already connected"
 msgstr "Помилка, посилання вже з'єднано."
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:653
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:653
 msgid "Unable to find link driver"
 msgstr "Неможливо знайти драйвер посилання."
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:696
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:696
 msgid "Link connection does not need updates."
 msgstr "З'єднання за посиланням не потребує оновлення."
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:835
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:899
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1545
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2878
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:835
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:899
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1545
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2878
 #, c-format
 msgid "Player %d disconnected."
 msgstr "Гравця %d роз'єднано."
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:939
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:979
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1019
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1654
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:939
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:979
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1019
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1654
 msgid "Server disconnected."
 msgstr "Сервер роз'єднано."
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1101
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1133
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1678
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1711
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1101
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1133
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1678
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1711
 msgid "Network error."
 msgstr "Помилка мережі."
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1110
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1687
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1110
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1687
 #, c-format
 msgid "Player %d connected"
 msgstr "Гравця %d з'єднано."
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1124
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1701
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1124
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1701
 msgid "All players connected"
 msgstr "Усіх гравців з'єднано."
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1145
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1723
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1145
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1723
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
 msgstr "З'єднано як %d, очікування приєднання %d гравців."
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1154
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1732
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1154
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1732
 msgid "All players joined."
 msgstr "Усіх гравців приєднано."
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:1647
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1647
 msgid "Server timed out."
 msgstr "Час очікування сервера минув."
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2601
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2622
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2601
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2622
 msgid "Error creating file mapping"
 msgstr "Помилка створення відображення файлів."
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2612
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2612
 msgid "Error mapping file"
 msgstr "Помилка відображення файлу."
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2659
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2659
 msgid "5 or more GBAs not supported."
 msgstr "5+ GBA непідтримувані."
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2678
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2697
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2678
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2697
 msgid "Error opening event"
 msgstr "Помилка відкриття події."
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2797
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2797
 msgid "Lost link; reinitialize to reconnect"
 msgstr "Втрачено посилання; перевизначення для перез'єднання."
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2804
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2804
 msgid "Lost link; reconnected"
 msgstr "Втрачено посилання; перез'єднання."
 
-#: C:/Users/rkito/source/repos/visualboyadvance-m/src/core/gba/gbaLink.cpp:2925
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2925
 msgid "Unknown slave timed out; resetting comm"
 msgstr "Час очікування невідомого підпорядкування минув; перезавантаження зв'язку."
 
@@ -1971,31 +2011,31 @@ msgstr "Час очікування невідомого підпорядкув�
 msgid "Key Shortcuts"
 msgstr "Гарячі кнопки"
 
-#: xrc/AccelConfig.xrc:13
+#: xrc/AccelConfig.xrc:26
 msgid "Co&mmands:"
 msgstr "Ко&манди:"
 
-#: xrc/AccelConfig.xrc:34
+#: xrc/AccelConfig.xrc:47
 msgid "Current Keys:"
 msgstr "Поточні кнопки:"
 
-#: xrc/AccelConfig.xrc:53
+#: xrc/AccelConfig.xrc:62
 msgid "&Assign"
 msgstr "&Призначити"
 
-#: xrc/AccelConfig.xrc:60
+#: xrc/AccelConfig.xrc:69
 msgid "&Remove"
 msgstr "&Вилучити"
 
-#: xrc/AccelConfig.xrc:67
+#: xrc/AccelConfig.xrc:76
 msgid "Re&set All"
 msgstr "Від&новити всі"
 
-#: xrc/AccelConfig.xrc:81
+#: xrc/AccelConfig.xrc:92
 msgid "Currently assigned to:"
 msgstr "Призначено для:"
 
-#: xrc/AccelConfig.xrc:96
+#: xrc/AccelConfig.xrc:106
 msgid "Shortcut Key:"
 msgstr "Гаряча кнопка:"
 
