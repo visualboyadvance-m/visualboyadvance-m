@@ -55,3 +55,9 @@ jobs:
         name: Build libretro core
         run: >-
           nix-shell --command 'make -C src/libretro ${{ matrix.libretro_build }}'
+
+      # Run tests
+      - if: matrix.build_options == 'default'
+        name: Run tests
+        run: >-
+          nix-shell --command 'cd build && ctest -j'

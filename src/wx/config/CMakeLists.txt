@@ -69,3 +69,20 @@ target_link_libraries(vbam-wx-config
 
 configure_wx_deps(vbam-wx-config)
 target_include_directories(vbam-wx-config PUBLIC ${NONSTD_INCLUDE_DIR})
+
+if (BUILD_TESTING)
+    add_executable(vbam-wx-config-tests
+        strutils_test.cpp
+    )
+    target_link_libraries(vbam-wx-config-tests
+        vbam-core
+        vbam-core-fake
+        vbam-wx-config
+        vbam-wx-fake-opts
+        GTest::gtest_main
+    )
+
+    if (NOT CMAKE_CROSSCOMPILING)
+        gtest_discover_tests(vbam-wx-config-tests)
+    endif()
+endif()

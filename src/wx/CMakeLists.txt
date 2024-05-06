@@ -207,10 +207,9 @@ foreach(DEF ${wxWidgets_DEFINITIONS})
     list(APPEND CMAKE_REQUIRED_DEFINITIONS "-D${DEF}")
 endforeach()
 
-# Sets the wxWidgets dependencies for a given target.
 function(configure_wx_deps target)
     get_target_property(target_type ${target} TYPE)
-    if (target_type STREQUAL "EXECUTABLE")
+    if(target_type STREQUAL "EXECUTABLE")
         target_link_libraries(${target} ${wxWidgets_LIBRARIES})
         target_include_directories(${target} PRIVATE ${wxWidgets_INCLUDE_DIRS})
         target_compile_options(${target} PRIVATE ${wxWidgets_CXX_FLAGS})
@@ -230,6 +229,7 @@ endif()
 endfunction()
 
 # Sub-projects.
+add_subdirectory(test)
 add_subdirectory(config)
 
 set(VBAM_ICON visualboyadvance-m.icns)
@@ -969,10 +969,6 @@ install(
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     BUNDLE  DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-
-if(BUILD_TESTING AND (NOT CMAKE_CROSSCOMPILING))
-    add_subdirectory(tests)
-endif()
 
 # Installation scripts.
 install(
