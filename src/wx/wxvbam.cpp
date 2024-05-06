@@ -39,7 +39,7 @@
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
 #include "wx/config/user-input.h"
-#include "wx/strutils.h"
+#include "wx/config/strutils.h"
 #include "wx/wayland.h"
 #include "wx/widgets/group-check-box.h"
 #include "wx/widgets/user-input-ctrl.h"
@@ -433,7 +433,7 @@ bool wxvbamApp::OnInit() {
 
     // process command-line options
     for (size_t i = 0; i < pending_optset.size(); i++) {
-        auto parts = strutils::split(pending_optset[i], wxT('='));
+        auto parts = config::str_split(pending_optset[i], wxT('='));
         opt_set(parts[0], parts[1]);
     }
 
@@ -773,7 +773,7 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
 
     for (int i = 0; i < nparm; i++) {
         auto p     = cl.GetParam(i);
-        auto parts = strutils::split(p, wxT('='));
+        auto parts = config::str_split(p, wxT('='));
 
         if (parts.size() > 1) {
             opt_set(parts[0], parts[1]);

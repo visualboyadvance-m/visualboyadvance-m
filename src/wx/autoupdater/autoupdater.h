@@ -1,8 +1,8 @@
-#ifndef AUTOUPDATER_H
-#define AUTOUPDATER_H
+#ifndef VBAM_WX_AUTOUPDATER_AUTOUPDATER_H_
+#define VBAM_WX_AUTOUPDATER_AUTOUPDATER_H_
 
 void initAutoupdater();
 void checkUpdatesUi();
 void shutdownAutoupdater();
 
-#endif // AUTOUPDATER_H
+#endif // VBAM_WX_AUTOUPDATER_AUTOUPDATER_H_

@@ -6,7 +6,7 @@
 #include <wx/translation.h>
 
 #include "wx/config/cmdtab.h"
-#include "wx/strutils.h"
+#include "wx/config/strutils.h"
 
 namespace config {
 namespace {
@@ -131,7 +131,7 @@ nonstd::optional<Command> Command::FromString(const wxString& name) {
         return nonstd::nullopt;
     }
 
-    auto parts = strutils::split(name, "/");
+    auto parts = config::str_split(name, "/");
     if (is_joypad) {
         if (parts.size() != 3) {
             wxLogDebug("Wrong split size: %d", parts.size());

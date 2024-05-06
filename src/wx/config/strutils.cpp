@@ -1,13 +1,13 @@
-#include "wx/strutils.h"
+#include "wx/config/strutils.h"
 
 #include <wx/tokenzr.h>
 
-namespace strutils {
+namespace config {
 
 // From: https://stackoverflow.com/a/7408245/262458
 //
 // Modified to ignore empty tokens or return sep for them.
-wxArrayString split(const wxString& text, const wxString& sep, bool empty_token_is_sep) {
+wxArrayString str_split(const wxString& text, const wxString& sep, bool empty_token_is_sep) {
     wxArrayString tokens;
     size_t start = 0, end = 0;
 
@@ -32,9 +32,9 @@ wxArrayString split(const wxString& text, const wxString& sep, bool empty_token_
     return tokens;
 }
 
-wxArrayString split_with_sep(const wxString& text, const wxString& sep)
+wxArrayString str_split_with_sep(const wxString& text, const wxString& sep)
 {
-    return split(text, sep, true);
+    return str_split(text, sep, true);
 }
 
-} // namespace strutils
+} // namespace config

@@ -29,4 +29,4 @@ function(add_doctest_test test_src)
     doctest_discover_tests("${test_name}")
 endfunction()
 
-add_doctest_test(strutils.cpp ../strutils.h ../strutils.cpp)
+add_doctest_test(strutils.cpp ../config/strutils.h ../config/strutils.cpp)

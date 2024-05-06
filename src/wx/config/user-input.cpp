@@ -7,7 +7,7 @@
 #include <wx/regex.h>
 #include <wx/translation.h>
 
-#include "wx/strutils.h"
+#include "wx/config/strutils.h"
 
 namespace config {
 
@@ -186,7 +186,7 @@ UserInput StringToUserInput(const wxString& string) {
     // Not a joystick.
 
     // Non-ASCII keyboard input are treated as a pair of integers "key:mod".
-    const auto pair = strutils::split(string, ":");
+    const auto pair = config::str_split(string, ":");
     long mod = 0;
     long key = 0;
     if (pair.size() == 2 && pair[0].ToLong(&key) && pair[1].ToLong(&mod)) {
@@ -330,7 +330,7 @@ std::unordered_set<UserInput> UserInput::FromConfigString(const wxString& string
         return user_inputs;
     }
 
-    for (const auto& token : strutils::split_with_sep(string, ",")) {
+    for (const auto& token : config::str_split_with_sep(string, ",")) {
         UserInput user_input = StringToUserInput(token);
         if (!user_input) {
             user_inputs.clear();

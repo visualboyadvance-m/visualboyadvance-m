@@ -1,12 +1,13 @@
+#include "wx/autoupdater/wxmsw/winsparkle-wrapper.h"
+
 #include <cstdio>
-#include <string>
-#include <stdexcept>
 
+#include <wx/file.h>
+#include <wx/filename.h>
+#include <wx/msw/private.h>
 #include <wx/utils.h>
-#include "wx/wxvbam.h"
-#include "winsparkle-wrapper.h"
-#include "wx/msw/private.h"
 
+#include "wx/autoupdater/wxmsw/winsparkle-rc.h"
 
 WinSparkleDllWrapper *WinSparkleDllWrapper::GetInstance()
 {

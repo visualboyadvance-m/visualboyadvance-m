@@ -1,11 +1,11 @@
-#include "wx/strutils.h"
+#include "wx/config/strutils.h"
 
 #include "tests.hpp"
 
-TEST_CASE("strutils::split() basic test") {
+TEST_CASE("config::str_split() basic test") {
     wxString foo = "foo|bar|baz";
 
-    auto vec = strutils::split(foo, '|');
+    auto vec = config::str_split(foo, '|');
 
     CHECK(vec.size() == 3);
 
@@ -14,10 +14,10 @@ TEST_CASE("strutils::split() basic test") {
     CHECK(vec[2] == "baz");
 }
 
-TEST_CASE("strutils::split() multi-char separator") {
+TEST_CASE("config::str_split() multi-char separator") {
     wxString foo = "foo|-|bar|-|baz";
 
-    auto vec = strutils::split(foo, "|-|");
+    auto vec = config::str_split(foo, "|-|");
 
     CHECK(vec.size() == 3);
 
@@ -26,10 +26,10 @@ TEST_CASE("strutils::split() multi-char separator") {
     CHECK(vec[2] == "baz");
 }
 
-TEST_CASE("strutils::split() skips empty tokens") {
+TEST_CASE("config::str_split() skips empty tokens") {
     wxString foo = "|-|foo|-||-|bar|-|baz|-|";
 
-    auto vec = strutils::split(foo, "|-|");
+    auto vec = config::str_split(foo, "|-|");
 
     CHECK(vec.size() == 3);
 
@@ -38,26 +38,26 @@ TEST_CASE("strutils::split() skips empty tokens") {
     CHECK(vec[2] == "baz");
 }
 
-TEST_CASE("strutils::split() empty input") {
+TEST_CASE("config::str_split() empty input") {
     wxString foo;
 
-    auto vec = strutils::split(foo, "|-|");
+    auto vec = config::str_split(foo, "|-|");
 
     CHECK(vec.size() == 0);
 }
 
-TEST_CASE("strutils::split() no tokens, just separators") {
+TEST_CASE("config::str_split() no tokens, just separators") {
     wxString foo = "|-||-||-||-||-|";
 
-    auto vec = strutils::split(foo, "|-|");
+    auto vec = config::str_split(foo, "|-|");
 
     CHECK(vec.size() == 0);
 }
 
-TEST_CASE("strutils::split_with_sep() basic test") {
+TEST_CASE("config::str_split_with_sep() basic test") {
     wxString foo = "foo|bar|baz|";
 
-    auto vec = strutils::split_with_sep(foo, '|');
+    auto vec = config::str_split_with_sep(foo, '|');
 
     CHECK(vec.size() == 4);
 
@@ -67,10 +67,10 @@ TEST_CASE("strutils::split_with_sep() basic test") {
     CHECK(vec[3] == "|");
 }
 
-TEST_CASE("strutils::split_with_sep() multi-char sep") {
+TEST_CASE("config::str_split_with_sep() multi-char sep") {
     wxString foo = "foo|-|bar|-|baz|-|";
 
-    auto vec = strutils::split_with_sep(foo, "|-|");
+    auto vec = config::str_split_with_sep(foo, "|-|");
 
     CHECK(vec.size() == 4);
 
@@ -80,10 +80,10 @@ TEST_CASE("strutils::split_with_sep() multi-char sep") {
     CHECK(vec[3] == "|-|");
 }
 
-TEST_CASE("strutils::split_with_sep() multiple sep tokens") {
+TEST_CASE("config::str_split_with_sep() multiple sep tokens") {
     wxString foo = "|-|foo|-||-|bar|-|baz|-|";
 
-    auto vec = strutils::split_with_sep(foo, "|-|");
+    auto vec = config::str_split_with_sep(foo, "|-|");
 
     CHECK(vec.size() == 6);
 

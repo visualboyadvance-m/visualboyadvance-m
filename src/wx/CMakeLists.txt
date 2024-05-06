@@ -31,6 +31,8 @@ set(VBAM_WX_COMMON
     config/option-proxy.h
     config/option.cpp
     config/option.h
+    config/strutils.cpp
+    config/strutils.h
     config/user-input.cpp
     config/user-input.h
     dialogs/accel-config.cpp
@@ -60,8 +62,6 @@ set(VBAM_WX_COMMON
     opts.h
     panel.cpp
     rpi.h
-    strutils.cpp
-    strutils.h
     sys.cpp
     viewers.cpp
     viewsupt.cpp

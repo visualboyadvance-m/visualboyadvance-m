@@ -4,8 +4,6 @@
 #include <wx/string.h>
 #include <wx/dynlib.h>
 
-#include "winsparkle-rc.h"
-
 class WinSparkleDllWrapper {
 public:
     static WinSparkleDllWrapper *GetInstance();

@@ -1,5 +1,5 @@
-#ifndef SPARKLE_WRAPPER_H
-#define SPARKLE_WRAPPER_H
+#ifndef VBAM_WX_AUTOUPDATER_MACOS_SPARKLE_WRAPPER_H_
+#define VBAM_WX_AUTOUPDATER_MACOS_SPARKLE_WRAPPER_H_
 
 class SparkleWrapper
 {
@@ -14,4 +14,4 @@ class SparkleWrapper
     Private* d;
 };
 
-#endif // SPARKLE_WRAPPER_H
+#endif // VBAM_WX_AUTOUPDATER_MACOS_SPARKLE_WRAPPER_H_

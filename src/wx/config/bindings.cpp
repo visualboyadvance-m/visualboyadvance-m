@@ -3,7 +3,6 @@
 #include <wx/string.h>
 #include <wx/translation.h>
 #include <wx/xrc/xmlres.h>
-#include <unordered_set>
 
 #include "wx/config/user-input.h"
 
