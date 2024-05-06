@@ -13,28 +13,6 @@ set(VBAM_WX_COMMON
     background-input.cpp
     background-input.h
     cmdevents.cpp
-    config/bindings.cpp
-    config/bindings.h
-    config/command.cpp
-    config/command.h
-    config/cmdtab.cpp
-    config/cmdtab.h
-    config/emulated-gamepad.cpp
-    config/emulated-gamepad.h
-    config/internal/bindings-internal.cpp
-    config/internal/bindings-internal.h
-    config/internal/option-internal.cpp
-    config/internal/option-internal.h
-    config/option-id.h
-    config/option-observer.cpp
-    config/option-observer.h
-    config/option-proxy.h
-    config/option.cpp
-    config/option.h
-    config/strutils.cpp
-    config/strutils.h
-    config/user-input.cpp
-    config/user-input.h
     dialogs/accel-config.cpp
     dialogs/accel-config.h
     dialogs/base-dialog.cpp
@@ -106,7 +84,6 @@ set(VBAM_WX_COMMON
     ${VBAM_GENERATED_DIR}/wx/builtin-over.h
     ${VBAM_GENERATED_DIR}/wx/cmdhandlers.h
     ${VBAM_GENERATED_DIR}/wx/cmd-evtable.h
-    ${VBAM_GENERATED_DIR}/wx/config/internal/cmdtab.cpp
 )
 
 if(NOT ZIP_PROGRAM)
@@ -187,6 +164,74 @@ if(TRANSLATIONS_ONLY)
     return()
 endif()
 
+# wxWidgets configuration.
+set(wxWidgets_USE_UNICODE ON)
+if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
+    set(wxWidgets_USE_DEBUG ON) # noop if wx is compiled with --disable-debug, like in Mac Homebrew atm
+endif()
+if(VBAM_STATIC)
+    set(wxWidgets_USE_STATIC ON)
+endif()
+
+unset(wx_find_extra)
+if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
+  set(wx_find_extra NO_DEFAULT_PATH)
+  set(wxWidgets_DIR "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/share/wxwidgets")
+endif()
+
+find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl ${wx_find_extra})
+
+if(NOT wxWidgets_FOUND)
+    find_package(wxWidgets COMPONENTS xrc xml html adv net core base ${wx_find_extra} REQUIRED)
+    target_compile_definitions(visualboyadvance-m PRIVATE NO_OGL)
+endif()
+
+# Workaround of static liblzma not being found on MSYS2.
+if(VBAM_STATIC AND MSYS)
+    unset(cleaned_up_wx_libs)
+    foreach(lib ${wxWidgets_LIBRARIES})
+        if(lib STREQUAL "-llzma")
+            set(lib "liblzma.a")
+        endif()
+
+        list(APPEND cleaned_up_wx_libs "${lib}")
+    endforeach()
+
+    set(wxWidgets_LIBRARIES "${cleaned_up_wx_libs}")
+endif()
+
+list(APPEND CMAKE_REQUIRED_LIBRARIES ${wxWidgets_LIBRARIES})
+list(APPEND CMAKE_REQUIRED_INCLUDES ${wxWidgets_INCLUDE_DIRS})
+list(APPEND CMAKE_REQUIRED_FLAGS ${wxWidgets_CXX_FLAGS})
+foreach(DEF ${wxWidgets_DEFINITIONS})
+    list(APPEND CMAKE_REQUIRED_DEFINITIONS "-D${DEF}")
+endforeach()
+
+# Sets the wxWidgets dependencies for a given target.
+function(configure_wx_deps target)
+    get_target_property(target_type ${target} TYPE)
+    if (target_type STREQUAL "EXECUTABLE")
+        target_link_libraries(${target} ${wxWidgets_LIBRARIES})
+        target_include_directories(${target} PRIVATE ${wxWidgets_INCLUDE_DIRS})
+        target_compile_options(${target} PRIVATE ${wxWidgets_CXX_FLAGS})
+        target_compile_definitions(${target} PRIVATE ${wxWidgets_DEFINITIONS})
+        if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
+            target_compile_definitions(${target} PRIVATE ${wxWidgets_DEFINITIONS_DEBUG})
+        endif()
+    else()
+        target_link_libraries(${target} PUBLIC ${wxWidgets_LIBRARIES})
+        target_include_directories(${target} PUBLIC ${wxWidgets_INCLUDE_DIRS})
+        target_compile_options(${target} PUBLIC ${wxWidgets_CXX_FLAGS})
+        target_compile_definitions(${target} PUBLIC ${wxWidgets_DEFINITIONS})
+        if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
+            target_compile_definitions(${target} PUBLIC ${wxWidgets_DEFINITIONS_DEBUG})
+        endif()
+endif()
+endfunction()
+
+# Sub-projects.
+add_subdirectory(config)
+
 set(VBAM_ICON visualboyadvance-m.icns)
 set(VBAM_ICON_PATH ${CMAKE_CURRENT_SOURCE_DIR}/icons/${VBAM_ICON})
 
@@ -208,6 +253,7 @@ target_link_libraries(
     vbam-components-filters-agb
     vbam-components-filters-interframe
     vbam-components-user-config
+    vbam-wx-config
     ${OPENGL_LIBRARIES}
     ${VBAM_SDL2_LIBS}
 )
@@ -342,56 +388,7 @@ if(ENABLE_FAUDIO)
     target_compile_definitions(visualboyadvance-m PRIVATE VBAM_ENABLE_FAUDIO)
 endif()
 
-# wxWidgets.
-set(wxWidgets_USE_UNICODE ON)
-if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
-    set(wxWidgets_USE_DEBUG ON) # noop if wx is compiled with --disable-debug, like in Mac Homebrew atm
-endif()
-if(VBAM_STATIC)
-    set(wxWidgets_USE_STATIC ON)
-endif()
-
-unset(wx_find_extra)
-if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
-  set(wx_find_extra NO_DEFAULT_PATH)
-  set(wxWidgets_DIR "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/share/wxwidgets")
-endif()
-
-find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl ${wx_find_extra})
-
-if(NOT wxWidgets_FOUND)
-    find_package(wxWidgets COMPONENTS xrc xml html adv net core base ${wx_find_extra} REQUIRED)
-    target_compile_definitions(visualboyadvance-m PRIVATE NO_OGL)
-endif()
-
-# Workaround of static liblzma not being found on MSYS2.
-if(VBAM_STATIC AND MSYS)
-    unset(cleaned_up_wx_libs)
-    foreach(lib ${wxWidgets_LIBRARIES})
-        if(lib STREQUAL "-llzma")
-            set(lib "liblzma.a")
-        endif()
-
-        list(APPEND cleaned_up_wx_libs "${lib}")
-    endforeach()
-
-    set(wxWidgets_LIBRARIES "${cleaned_up_wx_libs}")
-endif()
-
-target_link_libraries(visualboyadvance-m ${wxWidgets_LIBRARIES})
-target_include_directories(visualboyadvance-m PRIVATE ${wxWidgets_INCLUDE_DIRS})
-target_compile_options(visualboyadvance-m PRIVATE ${wxWidgets_CXX_FLAGS})
-target_compile_definitions(visualboyadvance-m PRIVATE ${wxWidgets_DEFINITIONS})
-if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
-    target_compile_definitions(visualboyadvance-m PRIVATE ${wxWidgets_DEFINITIONS_DEBUG})
-endif()
-
-list(APPEND CMAKE_REQUIRED_LIBRARIES ${wxWidgets_LIBRARIES})
-list(APPEND CMAKE_REQUIRED_INCLUDES ${wxWidgets_INCLUDE_DIRS})
-list(APPEND CMAKE_REQUIRED_FLAGS ${wxWidgets_CXX_FLAGS})
-foreach(DEF ${wxWidgets_DEFINITIONS})
-    list(APPEND CMAKE_REQUIRED_DEFINITIONS "-D${DEF}")
-endforeach()
+configure_wx_deps(visualboyadvance-m)
 
 # we make some direct gtk/gdk calls on linux and such
 # so need to link the gtk that wx was built with
@@ -601,24 +598,7 @@ add_custom_command(
     DEPENDS ${CMAKE_SOURCE_DIR}/src/vba-over.ini ${BIN2C}
 )
 
-# I don't like duplicating/triplicating code, so I only declare
-# event handlers once, and copy them in other places they are needed
-# all using portable cmake code
-add_custom_command(
-    OUTPUT
-        ${VBAM_GENERATED_DIR}/wx/config/internal/cmdtab.cpp
-        ${VBAM_GENERATED_DIR}/wx/cmdhandlers.h
-        ${VBAM_GENERATED_DIR}/wx/cmd-evtable.h
-    COMMAND
-        ${CMAKE_COMMAND} -D OUTDIR=${VBAM_GENERATED_DIR}/wx/ -P copy-events.cmake
-    WORKING_DIRECTORY
-        ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS
-        cmdevents.cpp
-        copy-events.cmake
-)
-
-set(VBAM_LOCALIZABLE_FILES ${VBAM_WX_COMMON})
+set(VBAM_LOCALIZABLE_FILES ${VBAM_WX_COMMON} ${VBAM_LOCALIZABLE_WX_CONFIG_FILES})
 list(APPEND VBAM_LOCALIZABLE_FILES
     audio/internal/dsound.cpp
     audio/internal/faudio.cpp

@@ -8,7 +8,7 @@ SET(CMDTAB "${OUTDIR}/config/internal/cmdtab.cpp")
 SET(EVPROTO "${OUTDIR}/cmdhandlers.h")
 SET(EVTABLE "${OUTDIR}/cmd-evtable.h")
 
-FILE(READ cmdevents.cpp MW)
+FILE(READ ../cmdevents.cpp MW)
 STRING(REGEX MATCHALL "\nEVT_HANDLER([^\")]|\"[^\"]*\")*\\)" MW "${MW}")
 
 # cmdtab.cpp is a table of cmd-id-name/cmd-name pairs

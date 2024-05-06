@@ -5,7 +5,9 @@
 # Generate version_gen.h
 string(REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+).*" "\\1,\\2,\\3,0" VBAM_WIN_VERSION "${VBAM_VERSION}")
 set(VBAM_GENERATED_VERSION_H ${VBAM_GENERATED_DIR}/core/base/version_gen.h)
-add_custom_target(vbam-core-base-generated
+add_custom_command(
+    OUTPUT
+        ${VBAM_GENERATED_VERSION_H}
     COMMAND ${CMAKE_COMMAND}
         -DVBAM_GENERATED_VERSION_H=${VBAM_GENERATED_VERSION_H}
         -DVBAM_VERSION=${VBAM_VERSION}
@@ -13,16 +15,12 @@ add_custom_target(vbam-core-base-generated
         -DVBAM_VERSION_RELEASE=${VBAM_VERSION_RELEASE}
         -DVBAM_WIN_VERSION=${VBAM_WIN_VERSION}
         -P ${CMAKE_CURRENT_SOURCE_DIR}/build-version.cmake
-    BYPRODUCTS
-        ${VBAM_GENERATED_VERSION_H}
     DEPENDS
         version_gen.h.in
         build-version.cmake
 )
 
 add_library(vbam-core-base OBJECT)
-
-add_dependencies(vbam-core-base vbam-core-base-generated)
 
 target_sources(vbam-core-base
     PRIVATE
@@ -48,6 +46,8 @@ target_sources(vbam-core-base
     sound_driver.h
     system.h
     version.h
+    # Generated file.
+    ${VBAM_GENERATED_VERSION_H}
 )
 
 target_include_directories(vbam-core-base
