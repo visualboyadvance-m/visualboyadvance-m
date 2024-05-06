@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-05 00:00+0000\n"
+"POT-Creation-Date: 2024-05-06 06:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Damian Drakon <dragon1590@gmail.com>, 2019-2020,2022-2023\n"
 "Language-Team: Polish (Poland) (http://app.transifex.com/bgk/vba-m/language/pl_PL/)\n"
@@ -318,749 +318,6 @@ msgstr "Połączenie LAN jest już aktywne. Wyłącz tryb połączenia aby się 
 #: cmdevents.cpp:2495
 msgid "Network is not supported in local mode."
 msgstr "W trybie lokalnym sieć nie jest wspierana."
-
-#: config/command.cpp:29 xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:450
-msgid "Up"
-msgstr "Góra"
-
-#: config/command.cpp:29 xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:454
-msgid "Down"
-msgstr "Dół"
-
-#: config/command.cpp:29 xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:458
-msgid "Left"
-msgstr "Lewo"
-
-#: config/command.cpp:29 xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:462
-msgid "Right"
-msgstr "Prawo"
-
-#: config/command.cpp:29 xrc/JoyPanel.xrc:37
-msgid "A"
-msgstr "A"
-
-#: config/command.cpp:30 xrc/JoyPanel.xrc:83
-msgid "B"
-msgstr "B"
-
-#: config/command.cpp:30 xrc/JoyPanel.xrc:129
-msgid "L"
-msgstr "L"
-
-#: config/command.cpp:30 xrc/JoyPanel.xrc:175
-msgid "R"
-msgstr "P"
-
-#: config/command.cpp:30 xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:482
-msgid "Select"
-msgstr "Wybierz"
-
-#: config/command.cpp:30 xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:486
-msgid "Start"
-msgstr "Start"
-
-#: config/command.cpp:31 xrc/JoyPanel.xrc:254
-msgid "Motion Up"
-msgstr "Ruch w górę"
-
-#: config/command.cpp:31 xrc/JoyPanel.xrc:298
-msgid "Motion Down"
-msgstr "Ruch w dół"
-
-#: config/command.cpp:31
-msgid "Motion Left"
-msgstr ""
-
-#: config/command.cpp:31
-msgid "Motion Right"
-msgstr ""
-
-#: config/command.cpp:31
-msgid "Motion In"
-msgstr ""
-
-#: config/command.cpp:32
-msgid "Motion Out"
-msgstr ""
-
-#: config/command.cpp:32
-msgid "Auto A"
-msgstr ""
-
-#: config/command.cpp:32
-msgid "Auto B"
-msgstr ""
-
-#: config/command.cpp:32 xrc/DisplayConfig.xrc:200
-msgid "Speed"
-msgstr "Prędkość"
-
-#: config/command.cpp:32
-msgid "Capture"
-msgstr ""
-
-#: config/command.cpp:33
-msgid "GameShark"
-msgstr ""
-
-#: config/command.cpp:107
-#, c-format
-msgid "Joypad %zu %s"
-msgstr ""
-
-#: config/internal/option-internal.cpp:380
-msgid "Use bilinear filter with 3d renderer"
-msgstr "Użyj filtra bilinearnego z rendererem 3d"
-
-#: config/internal/option-internal.cpp:381
-msgid "Full-screen filter to apply"
-msgstr "Filtr pełnoekranowy do zastosowania"
-
-#: config/internal/option-internal.cpp:382
-msgid "Filter plugin library"
-msgstr "Biblioteka wtyczek filtrów"
-
-#: config/internal/option-internal.cpp:383
-msgid "Interframe blending function"
-msgstr "Funkcja mieszania międzyklatkowego"
-
-#: config/internal/option-internal.cpp:384
-msgid "Keep window on top"
-msgstr "Zachowaj okno na wierzchu"
-
-#: config/internal/option-internal.cpp:386
-msgid "Maximum number of threads to run filters in"
-msgstr "Maksymalna liczba wątków do uruchomienia filtrów w"
-
-#: config/internal/option-internal.cpp:388
-msgid "Render method; if unsupported, simple method will be used"
-msgstr "Metoda renderowania; jeśli nie jest obsługiwana, zostanie użyta metoda prosta"
-
-#: config/internal/option-internal.cpp:389
-msgid "Default scale factor"
-msgstr "Domyślny współczynnik skali"
-
-#: config/internal/option-internal.cpp:390
-msgid "Retain aspect ratio when resizing"
-msgstr "Zachowaj współczynnik proporcji podczas zmiany rozmiaru"
-
-#: config/internal/option-internal.cpp:393
-msgid "BIOS file to use for Game Boy, if enabled"
-msgstr "Plik BIOS-u używany dla konsoli Game Boy, jeśli jest włączony"
-
-#: config/internal/option-internal.cpp:394
-msgid "Game Boy color enhancement, if enabled"
-msgstr "Wzmocnienie kolorów konsoli Game Boy, jeśli jest włączone"
-
-#: config/internal/option-internal.cpp:395
-msgid "Enable DX Colorization Hacks"
-msgstr "Włącz hacki do koloryzacji DX-a"
-
-#: config/internal/option-internal.cpp:396
-#: config/internal/option-internal.cpp:420
-msgid "Apply LCD filter, if enabled"
-msgstr "Zastosuj filtr LCD, jeśli jest włączony"
-
-#: config/internal/option-internal.cpp:397
-msgid "BIOS file to use for Game Boy Color, if enabled"
-msgstr "Plik BIOS-u używany dla konsoli Game Boy Color, jeśli jest włączony"
-
-#: config/internal/option-internal.cpp:399
-msgid ""
-"The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr "Domyślna paleta, jako 8 oddzielonych przecinkami 4-cyfrowych liczb całkowitych w formacie hex (rgb555)."
-
-#: config/internal/option-internal.cpp:402
-msgid ""
-"The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr "Pierwsza paleta użytkownika, jako 8 oddzielonych przecinkami 4-cyfrowych liczb całkowitych w formacie hex (rgb555)."
-
-#: config/internal/option-internal.cpp:405
-msgid ""
-"The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr "Druga paleta użytkownika, jako 8 oddzielonych przecinkami 4-cyfrowych liczb całkowitych w formacie hex (rgb555)."
-
-#: config/internal/option-internal.cpp:408
-msgid "Automatically gather a full page before printing"
-msgstr "Automatycznie zbieraj pełną stronę przed drukowaniem"
-
-#: config/internal/option-internal.cpp:410
-msgid "Automatically save printouts as screen captures with -print suffix"
-msgstr "Automatycznie zapisuj wydruki jako zrzuty ekranu z przyrostkiem -print"
-
-#: config/internal/option-internal.cpp:412
-#: config/internal/option-internal.cpp:440
-msgid "Directory to look for ROM files"
-msgstr "Katalog, w którym należy szukać plików ROM"
-
-#: config/internal/option-internal.cpp:413
-msgid "Directory to look for Game Boy Color ROM files"
-msgstr "Katalog do szukania plików ROM konsoli Game Boy Color"
-
-#: config/internal/option-internal.cpp:416
-msgid "BIOS file to use, if enabled"
-msgstr "Plik BIOS-u do użycia, jeśli jest włączony"
-
-#: config/internal/option-internal.cpp:426
-msgid "Enable link at boot"
-msgstr "Włącz połączenie przy rozruchu"
-
-#: config/internal/option-internal.cpp:431
-msgid "Enable faster network protocol by default"
-msgstr "Włącz domyślnie szybszy protokół sieciowy"
-
-#: config/internal/option-internal.cpp:433
-msgid "Default network link client host"
-msgstr "Domyślny host klienta łącza sieciowego"
-
-#: config/internal/option-internal.cpp:434
-msgid "Default network link server IP to bind"
-msgstr "Domyślne IP serwera łącza sieciowego do powiązania"
-
-#: config/internal/option-internal.cpp:435
-msgid "Default network link port (server and client)"
-msgstr "Domyślny port łącza sieciowego (serwer i klient)"
-
-#: config/internal/option-internal.cpp:436
-msgid "Default network protocol"
-msgstr "Domyślny protokół sieciowy"
-
-#: config/internal/option-internal.cpp:437
-msgid "Link timeout (ms)"
-msgstr "Limit czasu oczekiwania na połączenie (ms)"
-
-#: config/internal/option-internal.cpp:438
-msgid "Link cable type"
-msgstr "Rodzaj kabla łączącego"
-
-#: config/internal/option-internal.cpp:443
-msgid "Automatically load last saved state"
-msgstr "Automatycznie wczytaj ostatnio zapisany stan"
-
-#: config/internal/option-internal.cpp:445
-msgid ""
-"Directory to store game save files (relative paths are relative to ROM; "
-"blank is config dir)"
-msgstr "Katalog do przechowywania plików zapisu gry (ścieżki względne są względne do pamięci ROM; pusty jest katalogiem konfiguracyjnym)"
-
-#: config/internal/option-internal.cpp:447
-msgid "Freeze recent load list"
-msgstr "Zamroź listę ostatnich załadowań"
-
-#: config/internal/option-internal.cpp:449
-msgid ""
-"Directory to store A / V and game recordings (relative paths are relative to"
-" ROM)"
-msgstr "Katalog do przechowywania nagrań A / V i gier (ścieżki względne są względne do pamięci ROM)"
-
-#: config/internal/option-internal.cpp:452
-msgid "Number of seconds between rewind snapshots (0 to disable)"
-msgstr "Liczba sekund pomiędzy kolejnymi migawkami do przewijania (0, aby wyłączyć)"
-
-#: config/internal/option-internal.cpp:454
-msgid "Directory to store screenshots (relative paths are relative to ROM)"
-msgstr "Katalog do przechowywania zrzutów ekranu (ścieżki względne są względne do pamięci ROM)"
-
-#: config/internal/option-internal.cpp:457
-msgid ""
-"Directory to store saved state files (relative paths are relative to "
-"BatteryDir)"
-msgstr "Katalog do przechowywania plików zapisanego stanu (ścieżki względne są względne do katalogu baterii)"
-
-#: config/internal/option-internal.cpp:459
-msgid "Enable status bar"
-msgstr "Włącz pasek stanu"
-
-#: config/internal/option-internal.cpp:460
-msgid "INI file version (DO NOT MODIFY)"
-msgstr "Wersja pliku INI (NIE MODYFIKUJ)"
-
-#: config/internal/option-internal.cpp:464
-msgid ""
-"The parameter Joypad/<n>/<button> contains a comma-separated list of key "
-"names which map to joypad #<n> button <button>. Button is one of Up, Down, "
-"Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
-"MotionRight, AutoA, AutoB, Speed, Capture, GS"
-msgstr "Parametr Joypad/<n>/<button> zawiera oddzieloną przecinkami listę nazw klawiszy, które odpowiadają przyciskowi <button> na joypadzie #3. Przycisk jest jednym z następujących: góra, dół, lewo, prawo, A, B, L, R, Wybierz, Start, Ruch w górę, Ruch w dół, Ruch w lewo, Ruch w prawo, Autostrzał A, Autostrzał B, Prędkość, Capture, GS"
-
-#: config/internal/option-internal.cpp:469
-msgid "The autofire toggle period, in frames (1/60 s)"
-msgstr "Okres przełączania autostrzału, w klatkach (1/60 s)"
-
-#: config/internal/option-internal.cpp:470
-msgid "The number of the stick to use in single-player mode"
-msgstr "Numer drążka do użycia w trybie dla jednego gracza"
-
-#: config/internal/option-internal.cpp:472
-msgid "Whether to enable SDL GameController mode"
-msgstr ""
-
-#: config/internal/option-internal.cpp:476
-msgid ""
-"The parameter Keyboard/<cmd> contains a comma-separated list of key names "
-"(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
-"executed."
-msgstr "Parametr Klawiatura/<cmd> zawiera listę nazw klawiszy oddzielonych przecinkami (np. Alt-Shift-F1).  Po naciśnięciu nazwanego klawisza wykonywane jest polecenie <cmd> ."
-
-#: config/internal/option-internal.cpp:481
-msgid "Enable AGB debug print"
-msgstr "Włącz wydruk debugowania konsoli AGB"
-
-#: config/internal/option-internal.cpp:482
-msgid "Auto skip frames"
-msgstr "Automatyczne pomijanie klatek"
-
-#: config/internal/option-internal.cpp:484
-msgid "Apply IPS / UPS / IPF patches if found"
-msgstr "Zastosuj poprawki IPS / UPS / IPF, jeśli zostały znalezione"
-
-#: config/internal/option-internal.cpp:486
-msgid "Automatically save and load cheat list"
-msgstr "Automatycznie zapisz i wczytaj listę kodów"
-
-#: config/internal/option-internal.cpp:490
-msgid "Automatically enable border for Super Game Boy games"
-msgstr "Automatyczne włączanie obramowania dla gier Super Game Boy"
-
-#: config/internal/option-internal.cpp:492
-msgid "Always enable border"
-msgstr "Zawsze włączaj obramowanie"
-
-#: config/internal/option-internal.cpp:493
-msgid "Screen capture file format"
-msgstr "Format pliku zrzutu ekranu"
-
-#: config/internal/option-internal.cpp:494
-msgid "Enable cheats"
-msgstr "Włącz kody"
-
-#: config/internal/option-internal.cpp:495
-msgid "Disable on-screen status messages"
-msgstr "Wyłącz komunikaty o stanie na ekranie"
-
-#: config/internal/option-internal.cpp:496
-msgid "Type of system to emulate"
-msgstr "Typ systemu do emulacji"
-
-#: config/internal/option-internal.cpp:497
-msgid "Flash size 0 = 64 KB 1 = 128 KB"
-msgstr "Rozmiar pamięci flash 0 = 64 KB 1 = 128 KB"
-
-#: config/internal/option-internal.cpp:499
-msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
-msgstr "Pomijanie klatek. Wartości to 0-9 lub -1, aby pomijać automatycznie na podstawie czasu."
-
-#: config/internal/option-internal.cpp:501
-msgid "The palette to use"
-msgstr "Paleta do użycia"
-
-#: config/internal/option-internal.cpp:502
-msgid "Enable printer emulation"
-msgstr "Włącz emulację drukarki"
-
-#: config/internal/option-internal.cpp:504
-msgid "Break into GDB after loading the game."
-msgstr "Włam się do GDB po załadowaniu gry."
-
-#: config/internal/option-internal.cpp:505
-msgid "Port to connect GDB to"
-msgstr "Port, do którego należy podłączyć GDB"
-
-#: config/internal/option-internal.cpp:507
-msgid "Number of players in network"
-msgstr "Liczba graczy w sieci"
-
-#: config/internal/option-internal.cpp:509
-msgid "Maximum scale factor (0 = no limit)"
-msgstr "Maksymalny współczynnik skali (0 = bez limitu)"
-
-#: config/internal/option-internal.cpp:511
-msgid "Pause game when main window loses focus"
-msgstr "Wstrzymaj grę, gdy główne okno straci fokus"
-
-#: config/internal/option-internal.cpp:513
-msgid "Enable RTC (vba-over.ini override is rtcEnabled"
-msgstr "Włącz RTC (nadpisanie vba-over.ini to rtcEnabled)"
-
-#: config/internal/option-internal.cpp:514
-msgid "Native save (\"battery\") hardware type"
-msgstr "Typ sprzętu natywnego zapisu (\"bateryjnego\")"
-
-#: config/internal/option-internal.cpp:515
-msgid "Show speed indicator"
-msgstr "Pokaż wskaźnik prędkości"
-
-#: config/internal/option-internal.cpp:517
-msgid "Draw on-screen messages transparently"
-msgstr "Rysuj komunikaty na ekranie w przejrzysty sposób"
-
-#: config/internal/option-internal.cpp:518
-msgid "Skip BIOS initialization"
-msgstr "Pomiń inicjalizację BIOS-u"
-
-#: config/internal/option-internal.cpp:520
-msgid "Do not overwrite cheat list when loading state"
-msgstr "Nie nadpisuj listy kodów podczas ładowania zapisanego stanu gry"
-
-#: config/internal/option-internal.cpp:522
-msgid "Do not overwrite native (battery) save when loading state"
-msgstr "Nie nadpisuj natywnego (bateryjnego) zapisu podczas ładowania zapisanego stanu gry"
-
-#: config/internal/option-internal.cpp:524
-msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
-msgstr "Dławienie prędkości gry, nawet gdy jest przyspieszona (0-450%, 0 = brak dławienia)"
-
-#: config/internal/option-internal.cpp:527
-msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
-msgstr ""
-
-#: config/internal/option-internal.cpp:529
-msgid "Number of frames to skip with speedup (instead of speedup throttle)"
-msgstr ""
-
-#: config/internal/option-internal.cpp:532
-msgid "Use frame skip for speedup throttle"
-msgstr ""
-
-#: config/internal/option-internal.cpp:533
-msgid "Use the specified BIOS file for Game Boy"
-msgstr "Użyj określonego pliku BIOS dla konsoli Game Boy"
-
-#: config/internal/option-internal.cpp:534
-msgid "Use the specified BIOS file"
-msgstr "Użyj określonego pliku BIOS"
-
-#: config/internal/option-internal.cpp:536
-msgid "Use the specified BIOS file for Game Boy Color"
-msgstr "Użyj określonego pliku BIOS dla konsoli Game Boy Color"
-
-#: config/internal/option-internal.cpp:537
-msgid "Wait for vertical sync"
-msgstr "Zaczekaj na synchronizację pionową"
-
-#: config/internal/option-internal.cpp:540
-msgid "Enter fullscreen mode at startup"
-msgstr "Wejdź w tryb pełnoekranowy przy uruchomieniu"
-
-#: config/internal/option-internal.cpp:541
-msgid "Window maximized"
-msgstr "Okno zmaksymalizowane"
-
-#: config/internal/option-internal.cpp:542
-msgid "Window height at startup"
-msgstr "Wysokość okna przy uruchomieniu"
-
-#: config/internal/option-internal.cpp:543
-msgid "Window width at startup"
-msgstr "Szerokość okna przy uruchomieniu"
-
-#: config/internal/option-internal.cpp:544
-msgid "Window axis X position at startup"
-msgstr "Położenie osi X okna przy uruchomieniu"
-
-#: config/internal/option-internal.cpp:545
-msgid "Window axis Y position at startup"
-msgstr "Położenie osi Y okna przy uruchomieniu"
-
-#: config/internal/option-internal.cpp:549
-msgid "Capture key events while on background"
-msgstr "Przechwyć kluczowe zdarzenia w tle"
-
-#: config/internal/option-internal.cpp:551
-msgid "Capture joy events while on background"
-msgstr "Przechwyć radosne zdarzenia w tle"
-
-#: config/internal/option-internal.cpp:552
-msgid "Hide menu bar when mouse is inactive"
-msgstr "Ukryj pasek menu, gdy mysz jest nieaktywna"
-
-#: config/internal/option-internal.cpp:554
-msgid "Suspend screensaver when game is running"
-msgstr "Zawieś wygaszacz ekranu, gdy gra jest uruchomiona"
-
-#: config/internal/option-internal.cpp:557
-msgid "Sound API; if unsupported, default API will be used"
-msgstr "Interfejs API dźwięku; jeśli nie jest obsługiwany, użyty zostanie domyślny interfejs API"
-
-#: config/internal/option-internal.cpp:558
-msgid "Device ID of chosen audio device for chosen driver"
-msgstr "Identyfikator urządzenia wybranego urządzenia audio dla wybranego sterownika"
-
-#: config/internal/option-internal.cpp:559
-msgid "Number of sound buffers"
-msgstr "Liczba buforów dźwięku"
-
-#: config/internal/option-internal.cpp:560
-msgid "Bit mask of sound channels to enable"
-msgstr "Maska bitowa kanałów dźwięku do włączenia"
-
-#: config/internal/option-internal.cpp:561
-msgid "Game Boy Advance sound filtering (%)"
-msgstr "Filtrowanie dźwięku konsoli Game Boy Advance (%)"
-
-#: config/internal/option-internal.cpp:563
-msgid "Game Boy Advance sound interpolation"
-msgstr "Interpolacja dźwięku konsoli Game Boy Advance"
-
-#: config/internal/option-internal.cpp:564
-msgid "Game Boy sound declicking"
-msgstr "Tłumienie kliknięć dźwięku konsoli Game Boy"
-
-#: config/internal/option-internal.cpp:565
-msgid "Game Boy echo effect (%)"
-msgstr "Efekt echa konsoli Game Boy (%)"
-
-#: config/internal/option-internal.cpp:566
-msgid "Enable Game Boy sound effects"
-msgstr "Włącz efekty dźwiękowe konsoli Game Boy"
-
-#: config/internal/option-internal.cpp:567
-msgid "Game Boy stereo effect (%)"
-msgstr "Efekt stereo konsoli Game Boy (%)"
-
-#: config/internal/option-internal.cpp:568
-msgid "Game Boy surround sound effect (%)"
-msgstr "Efekt dźwięku przestrzennego konsoli Game Boy (%)"
-
-#: config/internal/option-internal.cpp:569
-msgid "Sound sample rate (kHz)"
-msgstr "Częstotliwość próbkowania dźwięku (kHz)"
-
-#: config/internal/option-internal.cpp:570
-msgid "Use DirectSound hardware acceleration"
-msgstr ""
-
-#: config/internal/option-internal.cpp:571
-msgid "Upmix stereo to surround"
-msgstr ""
-
-#: config/internal/option-internal.cpp:572
-msgid "Sound volume (%)"
-msgstr "Głośność dźwięku (%)"
-
-#: config/internal/option-internal.cpp:640
-#: config/internal/option-internal.cpp:660
-#: config/internal/option-internal.cpp:681
-#: config/internal/option-internal.cpp:701
-#: config/internal/option-internal.cpp:720
-#, c-format
-msgid "Invalid value %s for option %s; valid values are %s"
-msgstr "Nieprawidłowa wartość %s dla opcji %s; prawidłowe wartości to %s"
-
-#: config/option.cpp:320
-#, c-format
-msgid "Invalid value %f for option %s; valid values are %f - %f"
-msgstr "Nieprawidłowa wartość %f dla opcji %s; prawidłowe wartości to %f - %f"
-
-#: config/option.cpp:335 config/option.cpp:350
-#, c-format
-msgid "Invalid value %d for option %s; valid values are %d - %d"
-msgstr "Nieprawidłowa wartość %d dla opcji %s; prawidłowe wartości to %d - %d"
-
-#: config/option.cpp:480 opts.cpp:469 opts.cpp:478 opts.cpp:487 opts.cpp:496
-#, c-format
-msgid "Invalid value %s for option %s"
-msgstr "Nieprawidłowa wartość %s dla opcji %s"
-
-#: config/user-input.cpp:22
-msgid "Backspace"
-msgstr "Backspace"
-
-#: config/user-input.cpp:23
-msgid "Delete"
-msgstr "Delete"
-
-#: config/user-input.cpp:24
-msgid "Page Up"
-msgstr "Page Up"
-
-#: config/user-input.cpp:25
-msgid "Page Down"
-msgstr "Page Down"
-
-#: config/user-input.cpp:26
-msgid "Num Lock"
-msgstr "Num Lock"
-
-#: config/user-input.cpp:27
-msgid "Scroll Lock"
-msgstr "Scroll Lock"
-
-#: config/user-input.cpp:30
-msgid "Num Space"
-msgstr "Num Space"
-
-#: config/user-input.cpp:31
-msgid "Num Tab"
-msgstr "Num Tab"
-
-#: config/user-input.cpp:32
-msgid "Num Enter"
-msgstr "Num Enter"
-
-#: config/user-input.cpp:33
-msgid "Num Home"
-msgstr "Num Home"
-
-#: config/user-input.cpp:34
-msgid "Num left"
-msgstr "Num left"
-
-#: config/user-input.cpp:35
-msgid "Num Up"
-msgstr "Num Up"
-
-#: config/user-input.cpp:36
-msgid "Num Right"
-msgstr "Num Right"
-
-#: config/user-input.cpp:37
-msgid "Num Down"
-msgstr "Num Down"
-
-#: config/user-input.cpp:38
-msgid "Num PageUp"
-msgstr "Num PageUp"
-
-#: config/user-input.cpp:39
-msgid "Num PageDown"
-msgstr "Num PageDown"
-
-#: config/user-input.cpp:40
-msgid "Num End"
-msgstr "Num End"
-
-#: config/user-input.cpp:41
-msgid "Num Begin"
-msgstr "Num Begin"
-
-#: config/user-input.cpp:42
-msgid "Num Insert"
-msgstr "Num Insert"
-
-#: config/user-input.cpp:43
-msgid "Num Delete"
-msgstr "Num Delete"
-
-#: config/user-input.cpp:44
-msgid "Num ="
-msgstr "Num ="
-
-#: config/user-input.cpp:45
-msgid "Num *"
-msgstr "Num *"
-
-#: config/user-input.cpp:46
-msgid "Num +"
-msgstr "Num +"
-
-#: config/user-input.cpp:47
-msgid "Num ,"
-msgstr "Num ,"
-
-#: config/user-input.cpp:48
-msgid "Num -"
-msgstr "Num -"
-
-#: config/user-input.cpp:49
-msgid "Num ."
-msgstr "Num ."
-
-#: config/user-input.cpp:50
-msgid "Num /"
-msgstr "Num /"
-
-#: config/user-input.cpp:54
-msgid "Volume Mute"
-msgstr "Wyciszenie głośności"
-
-#: config/user-input.cpp:55
-msgid "Volume Down"
-msgstr "Zmniejszenie głośności"
-
-#: config/user-input.cpp:56
-msgid "Volume Up"
-msgstr "Zwiększenie głośności"
-
-#: config/user-input.cpp:57
-msgid "Next Track"
-msgstr "Następny utwór"
-
-#: config/user-input.cpp:58
-msgid "Previous Track"
-msgstr "Poprzedni utwór"
-
-#: config/user-input.cpp:59
-msgid "Stop"
-msgstr "Zatrzymaj"
-
-#: config/user-input.cpp:60
-msgid "Play/Pause"
-msgstr "Odtwarzanie/Pauza"
-
-#: config/user-input.cpp:93
-msgid "Alt+"
-msgstr "Alt+"
-
-#: config/user-input.cpp:96
-msgid "Ctrl+"
-msgstr "Ctrl+"
-
-#: config/user-input.cpp:100
-msgid "Rawctrl+"
-msgstr "Rawctrl+"
-
-#: config/user-input.cpp:104
-msgid "Shift+"
-msgstr "Shift+"
-
-#: config/user-input.cpp:107
-msgid "Meta+"
-msgstr "Meta+"
-
-#: config/user-input.cpp:238
-#, c-format
-msgid "Joystick %d"
-msgstr ""
-
-#: config/user-input.cpp:269
-#, c-format
-msgid "%s: Axis %d+"
-msgstr ""
-
-#: config/user-input.cpp:271
-#, c-format
-msgid "%s: Axis %d-"
-msgstr ""
-
-#: config/user-input.cpp:273
-#, c-format
-msgid "%s: Button %d"
-msgstr ""
-
-#: config/user-input.cpp:275
-#, c-format
-msgid "%s: Hat %d North"
-msgstr ""
-
-#: config/user-input.cpp:277
-#, c-format
-msgid "%s: Hat %d South"
-msgstr ""
-
-#: config/user-input.cpp:279
-#, c-format
-msgid "%s: Hat %d West"
-msgstr ""
-
-#: config/user-input.cpp:281
-#, c-format
-msgid "%s: Hat %d East"
-msgstr ""
-
-#: config/user-input.cpp:312
-msgid "Key"
-msgstr ""
 
 #: dialogs/accel-config.cpp:149
 msgid "Menu commands"
@@ -1461,6 +718,12 @@ msgstr "Plik INI został napisany dla nowszej wersji VBA-M. Niektóre wartości 
 msgid "Invalid key binding %s for %s"
 msgstr "Nieprawidłowe przypisanie klawisza/szy %s dla %s"
 
+#: opts.cpp:469 opts.cpp:478 opts.cpp:487 opts.cpp:496
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:480
+#, c-format
+msgid "Invalid value %s for option %s"
+msgstr "Nieprawidłowa wartość %s dla opcji %s"
+
 #: opts.cpp:529
 #, c-format
 msgid "Unknown option %s with value %s"
@@ -1843,6 +1106,758 @@ msgstr "Nie znaleziono pliku konfiguracyjnego."
 #: wxvbam.cpp:789
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Nieprawidłowe ustawienia lub podanych zostało wiele plików pamięci ROM:\n"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
+#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:450
+msgid "Up"
+msgstr "Góra"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
+#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:454
+msgid "Down"
+msgstr "Dół"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
+#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:458
+msgid "Left"
+msgstr "Lewo"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
+#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:462
+msgid "Right"
+msgstr "Prawo"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
+#: xrc/JoyPanel.xrc:37
+msgid "A"
+msgstr "A"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
+#: xrc/JoyPanel.xrc:83
+msgid "B"
+msgstr "B"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
+#: xrc/JoyPanel.xrc:129
+msgid "L"
+msgstr "L"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
+#: xrc/JoyPanel.xrc:175
+msgid "R"
+msgstr "P"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
+#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:482
+msgid "Select"
+msgstr "Wybierz"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
+#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:486
+msgid "Start"
+msgstr "Start"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
+#: xrc/JoyPanel.xrc:254
+msgid "Motion Up"
+msgstr "Ruch w górę"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
+#: xrc/JoyPanel.xrc:298
+msgid "Motion Down"
+msgstr "Ruch w dół"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
+msgid "Motion Left"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
+msgid "Motion Right"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
+msgid "Motion In"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
+msgid "Motion Out"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
+msgid "Auto A"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
+msgid "Auto B"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
+#: xrc/DisplayConfig.xrc:200
+msgid "Speed"
+msgstr "Prędkość"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
+msgid "Capture"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:33
+msgid "GameShark"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:107
+#, c-format
+msgid "Joypad %zu %s"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:380
+msgid "Use bilinear filter with 3d renderer"
+msgstr "Użyj filtra bilinearnego z rendererem 3d"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:381
+msgid "Full-screen filter to apply"
+msgstr "Filtr pełnoekranowy do zastosowania"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:382
+msgid "Filter plugin library"
+msgstr "Biblioteka wtyczek filtrów"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:383
+msgid "Interframe blending function"
+msgstr "Funkcja mieszania międzyklatkowego"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:384
+msgid "Keep window on top"
+msgstr "Zachowaj okno na wierzchu"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:386
+msgid "Maximum number of threads to run filters in"
+msgstr "Maksymalna liczba wątków do uruchomienia filtrów w"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:388
+msgid "Render method; if unsupported, simple method will be used"
+msgstr "Metoda renderowania; jeśli nie jest obsługiwana, zostanie użyta metoda prosta"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:389
+msgid "Default scale factor"
+msgstr "Domyślny współczynnik skali"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:390
+msgid "Retain aspect ratio when resizing"
+msgstr "Zachowaj współczynnik proporcji podczas zmiany rozmiaru"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:393
+msgid "BIOS file to use for Game Boy, if enabled"
+msgstr "Plik BIOS-u używany dla konsoli Game Boy, jeśli jest włączony"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:394
+msgid "Game Boy color enhancement, if enabled"
+msgstr "Wzmocnienie kolorów konsoli Game Boy, jeśli jest włączone"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:395
+msgid "Enable DX Colorization Hacks"
+msgstr "Włącz hacki do koloryzacji DX-a"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:396
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:420
+msgid "Apply LCD filter, if enabled"
+msgstr "Zastosuj filtr LCD, jeśli jest włączony"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:397
+msgid "BIOS file to use for Game Boy Color, if enabled"
+msgstr "Plik BIOS-u używany dla konsoli Game Boy Color, jeśli jest włączony"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:399
+msgid ""
+"The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
+msgstr "Domyślna paleta, jako 8 oddzielonych przecinkami 4-cyfrowych liczb całkowitych w formacie hex (rgb555)."
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:402
+msgid ""
+"The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
+msgstr "Pierwsza paleta użytkownika, jako 8 oddzielonych przecinkami 4-cyfrowych liczb całkowitych w formacie hex (rgb555)."
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:405
+msgid ""
+"The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
+msgstr "Druga paleta użytkownika, jako 8 oddzielonych przecinkami 4-cyfrowych liczb całkowitych w formacie hex (rgb555)."
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:408
+msgid "Automatically gather a full page before printing"
+msgstr "Automatycznie zbieraj pełną stronę przed drukowaniem"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:410
+msgid "Automatically save printouts as screen captures with -print suffix"
+msgstr "Automatycznie zapisuj wydruki jako zrzuty ekranu z przyrostkiem -print"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:412
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:440
+msgid "Directory to look for ROM files"
+msgstr "Katalog, w którym należy szukać plików ROM"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:413
+msgid "Directory to look for Game Boy Color ROM files"
+msgstr "Katalog do szukania plików ROM konsoli Game Boy Color"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:416
+msgid "BIOS file to use, if enabled"
+msgstr "Plik BIOS-u do użycia, jeśli jest włączony"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:426
+msgid "Enable link at boot"
+msgstr "Włącz połączenie przy rozruchu"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:431
+msgid "Enable faster network protocol by default"
+msgstr "Włącz domyślnie szybszy protokół sieciowy"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:433
+msgid "Default network link client host"
+msgstr "Domyślny host klienta łącza sieciowego"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:434
+msgid "Default network link server IP to bind"
+msgstr "Domyślne IP serwera łącza sieciowego do powiązania"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:435
+msgid "Default network link port (server and client)"
+msgstr "Domyślny port łącza sieciowego (serwer i klient)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:436
+msgid "Default network protocol"
+msgstr "Domyślny protokół sieciowy"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:437
+msgid "Link timeout (ms)"
+msgstr "Limit czasu oczekiwania na połączenie (ms)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:438
+msgid "Link cable type"
+msgstr "Rodzaj kabla łączącego"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:443
+msgid "Automatically load last saved state"
+msgstr "Automatycznie wczytaj ostatnio zapisany stan"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:445
+msgid ""
+"Directory to store game save files (relative paths are relative to ROM; "
+"blank is config dir)"
+msgstr "Katalog do przechowywania plików zapisu gry (ścieżki względne są względne do pamięci ROM; pusty jest katalogiem konfiguracyjnym)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:447
+msgid "Freeze recent load list"
+msgstr "Zamroź listę ostatnich załadowań"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:449
+msgid ""
+"Directory to store A / V and game recordings (relative paths are relative to"
+" ROM)"
+msgstr "Katalog do przechowywania nagrań A / V i gier (ścieżki względne są względne do pamięci ROM)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:452
+msgid "Number of seconds between rewind snapshots (0 to disable)"
+msgstr "Liczba sekund pomiędzy kolejnymi migawkami do przewijania (0, aby wyłączyć)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:454
+msgid "Directory to store screenshots (relative paths are relative to ROM)"
+msgstr "Katalog do przechowywania zrzutów ekranu (ścieżki względne są względne do pamięci ROM)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:457
+msgid ""
+"Directory to store saved state files (relative paths are relative to "
+"BatteryDir)"
+msgstr "Katalog do przechowywania plików zapisanego stanu (ścieżki względne są względne do katalogu baterii)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:459
+msgid "Enable status bar"
+msgstr "Włącz pasek stanu"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:460
+msgid "INI file version (DO NOT MODIFY)"
+msgstr "Wersja pliku INI (NIE MODYFIKUJ)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:464
+msgid ""
+"The parameter Joypad/<n>/<button> contains a comma-separated list of key "
+"names which map to joypad #<n> button <button>. Button is one of Up, Down, "
+"Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
+"MotionRight, AutoA, AutoB, Speed, Capture, GS"
+msgstr "Parametr Joypad/<n>/<button> zawiera oddzieloną przecinkami listę nazw klawiszy, które odpowiadają przyciskowi <button> na joypadzie #3. Przycisk jest jednym z następujących: góra, dół, lewo, prawo, A, B, L, R, Wybierz, Start, Ruch w górę, Ruch w dół, Ruch w lewo, Ruch w prawo, Autostrzał A, Autostrzał B, Prędkość, Capture, GS"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:469
+msgid "The autofire toggle period, in frames (1/60 s)"
+msgstr "Okres przełączania autostrzału, w klatkach (1/60 s)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:470
+msgid "The number of the stick to use in single-player mode"
+msgstr "Numer drążka do użycia w trybie dla jednego gracza"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:472
+msgid "Whether to enable SDL GameController mode"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:476
+msgid ""
+"The parameter Keyboard/<cmd> contains a comma-separated list of key names "
+"(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
+"executed."
+msgstr "Parametr Klawiatura/<cmd> zawiera listę nazw klawiszy oddzielonych przecinkami (np. Alt-Shift-F1).  Po naciśnięciu nazwanego klawisza wykonywane jest polecenie <cmd> ."
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:481
+msgid "Enable AGB debug print"
+msgstr "Włącz wydruk debugowania konsoli AGB"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:482
+msgid "Auto skip frames"
+msgstr "Automatyczne pomijanie klatek"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:484
+msgid "Apply IPS / UPS / IPF patches if found"
+msgstr "Zastosuj poprawki IPS / UPS / IPF, jeśli zostały znalezione"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:486
+msgid "Automatically save and load cheat list"
+msgstr "Automatycznie zapisz i wczytaj listę kodów"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:490
+msgid "Automatically enable border for Super Game Boy games"
+msgstr "Automatyczne włączanie obramowania dla gier Super Game Boy"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:492
+msgid "Always enable border"
+msgstr "Zawsze włączaj obramowanie"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:493
+msgid "Screen capture file format"
+msgstr "Format pliku zrzutu ekranu"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:494
+msgid "Enable cheats"
+msgstr "Włącz kody"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:495
+msgid "Disable on-screen status messages"
+msgstr "Wyłącz komunikaty o stanie na ekranie"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:496
+msgid "Type of system to emulate"
+msgstr "Typ systemu do emulacji"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:497
+msgid "Flash size 0 = 64 KB 1 = 128 KB"
+msgstr "Rozmiar pamięci flash 0 = 64 KB 1 = 128 KB"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:499
+msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
+msgstr "Pomijanie klatek. Wartości to 0-9 lub -1, aby pomijać automatycznie na podstawie czasu."
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:501
+msgid "The palette to use"
+msgstr "Paleta do użycia"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:502
+msgid "Enable printer emulation"
+msgstr "Włącz emulację drukarki"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:504
+msgid "Break into GDB after loading the game."
+msgstr "Włam się do GDB po załadowaniu gry."
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:505
+msgid "Port to connect GDB to"
+msgstr "Port, do którego należy podłączyć GDB"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:507
+msgid "Number of players in network"
+msgstr "Liczba graczy w sieci"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:509
+msgid "Maximum scale factor (0 = no limit)"
+msgstr "Maksymalny współczynnik skali (0 = bez limitu)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:511
+msgid "Pause game when main window loses focus"
+msgstr "Wstrzymaj grę, gdy główne okno straci fokus"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:513
+msgid "Enable RTC (vba-over.ini override is rtcEnabled"
+msgstr "Włącz RTC (nadpisanie vba-over.ini to rtcEnabled)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:514
+msgid "Native save (\"battery\") hardware type"
+msgstr "Typ sprzętu natywnego zapisu (\"bateryjnego\")"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:515
+msgid "Show speed indicator"
+msgstr "Pokaż wskaźnik prędkości"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:517
+msgid "Draw on-screen messages transparently"
+msgstr "Rysuj komunikaty na ekranie w przejrzysty sposób"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:518
+msgid "Skip BIOS initialization"
+msgstr "Pomiń inicjalizację BIOS-u"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:520
+msgid "Do not overwrite cheat list when loading state"
+msgstr "Nie nadpisuj listy kodów podczas ładowania zapisanego stanu gry"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:522
+msgid "Do not overwrite native (battery) save when loading state"
+msgstr "Nie nadpisuj natywnego (bateryjnego) zapisu podczas ładowania zapisanego stanu gry"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:524
+msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
+msgstr "Dławienie prędkości gry, nawet gdy jest przyspieszona (0-450%, 0 = brak dławienia)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:527
+msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:529
+msgid "Number of frames to skip with speedup (instead of speedup throttle)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:532
+msgid "Use frame skip for speedup throttle"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:533
+msgid "Use the specified BIOS file for Game Boy"
+msgstr "Użyj określonego pliku BIOS dla konsoli Game Boy"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:534
+msgid "Use the specified BIOS file"
+msgstr "Użyj określonego pliku BIOS"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:536
+msgid "Use the specified BIOS file for Game Boy Color"
+msgstr "Użyj określonego pliku BIOS dla konsoli Game Boy Color"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:537
+msgid "Wait for vertical sync"
+msgstr "Zaczekaj na synchronizację pionową"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:540
+msgid "Enter fullscreen mode at startup"
+msgstr "Wejdź w tryb pełnoekranowy przy uruchomieniu"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:541
+msgid "Window maximized"
+msgstr "Okno zmaksymalizowane"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:542
+msgid "Window height at startup"
+msgstr "Wysokość okna przy uruchomieniu"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:543
+msgid "Window width at startup"
+msgstr "Szerokość okna przy uruchomieniu"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:544
+msgid "Window axis X position at startup"
+msgstr "Położenie osi X okna przy uruchomieniu"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:545
+msgid "Window axis Y position at startup"
+msgstr "Położenie osi Y okna przy uruchomieniu"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:549
+msgid "Capture key events while on background"
+msgstr "Przechwyć kluczowe zdarzenia w tle"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:551
+msgid "Capture joy events while on background"
+msgstr "Przechwyć radosne zdarzenia w tle"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:552
+msgid "Hide menu bar when mouse is inactive"
+msgstr "Ukryj pasek menu, gdy mysz jest nieaktywna"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:554
+msgid "Suspend screensaver when game is running"
+msgstr "Zawieś wygaszacz ekranu, gdy gra jest uruchomiona"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:557
+msgid "Sound API; if unsupported, default API will be used"
+msgstr "Interfejs API dźwięku; jeśli nie jest obsługiwany, użyty zostanie domyślny interfejs API"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:558
+msgid "Device ID of chosen audio device for chosen driver"
+msgstr "Identyfikator urządzenia wybranego urządzenia audio dla wybranego sterownika"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:559
+msgid "Number of sound buffers"
+msgstr "Liczba buforów dźwięku"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:560
+msgid "Bit mask of sound channels to enable"
+msgstr "Maska bitowa kanałów dźwięku do włączenia"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:561
+msgid "Game Boy Advance sound filtering (%)"
+msgstr "Filtrowanie dźwięku konsoli Game Boy Advance (%)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:563
+msgid "Game Boy Advance sound interpolation"
+msgstr "Interpolacja dźwięku konsoli Game Boy Advance"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:564
+msgid "Game Boy sound declicking"
+msgstr "Tłumienie kliknięć dźwięku konsoli Game Boy"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:565
+msgid "Game Boy echo effect (%)"
+msgstr "Efekt echa konsoli Game Boy (%)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:566
+msgid "Enable Game Boy sound effects"
+msgstr "Włącz efekty dźwiękowe konsoli Game Boy"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:567
+msgid "Game Boy stereo effect (%)"
+msgstr "Efekt stereo konsoli Game Boy (%)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:568
+msgid "Game Boy surround sound effect (%)"
+msgstr "Efekt dźwięku przestrzennego konsoli Game Boy (%)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:569
+msgid "Sound sample rate (kHz)"
+msgstr "Częstotliwość próbkowania dźwięku (kHz)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:570
+msgid "Use DirectSound hardware acceleration"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:571
+msgid "Upmix stereo to surround"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:572
+msgid "Sound volume (%)"
+msgstr "Głośność dźwięku (%)"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:640
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:660
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:681
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:701
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:720
+#, c-format
+msgid "Invalid value %s for option %s; valid values are %s"
+msgstr "Nieprawidłowa wartość %s dla opcji %s; prawidłowe wartości to %s"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:320
+#, c-format
+msgid "Invalid value %f for option %s; valid values are %f - %f"
+msgstr "Nieprawidłowa wartość %f dla opcji %s; prawidłowe wartości to %f - %f"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:335
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:350
+#, c-format
+msgid "Invalid value %d for option %s; valid values are %d - %d"
+msgstr "Nieprawidłowa wartość %d dla opcji %s; prawidłowe wartości to %d - %d"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:22
+msgid "Backspace"
+msgstr "Backspace"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:23
+msgid "Delete"
+msgstr "Delete"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:24
+msgid "Page Up"
+msgstr "Page Up"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:25
+msgid "Page Down"
+msgstr "Page Down"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:26
+msgid "Num Lock"
+msgstr "Num Lock"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:27
+msgid "Scroll Lock"
+msgstr "Scroll Lock"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:30
+msgid "Num Space"
+msgstr "Num Space"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:31
+msgid "Num Tab"
+msgstr "Num Tab"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:32
+msgid "Num Enter"
+msgstr "Num Enter"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:33
+msgid "Num Home"
+msgstr "Num Home"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:34
+msgid "Num left"
+msgstr "Num left"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:35
+msgid "Num Up"
+msgstr "Num Up"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:36
+msgid "Num Right"
+msgstr "Num Right"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:37
+msgid "Num Down"
+msgstr "Num Down"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:38
+msgid "Num PageUp"
+msgstr "Num PageUp"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:39
+msgid "Num PageDown"
+msgstr "Num PageDown"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:40
+msgid "Num End"
+msgstr "Num End"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:41
+msgid "Num Begin"
+msgstr "Num Begin"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:42
+msgid "Num Insert"
+msgstr "Num Insert"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:43
+msgid "Num Delete"
+msgstr "Num Delete"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:44
+msgid "Num ="
+msgstr "Num ="
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:45
+msgid "Num *"
+msgstr "Num *"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:46
+msgid "Num +"
+msgstr "Num +"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:47
+msgid "Num ,"
+msgstr "Num ,"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:48
+msgid "Num -"
+msgstr "Num -"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:49
+msgid "Num ."
+msgstr "Num ."
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:50
+msgid "Num /"
+msgstr "Num /"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:54
+msgid "Volume Mute"
+msgstr "Wyciszenie głośności"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:55
+msgid "Volume Down"
+msgstr "Zmniejszenie głośności"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:56
+msgid "Volume Up"
+msgstr "Zwiększenie głośności"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:57
+msgid "Next Track"
+msgstr "Następny utwór"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:58
+msgid "Previous Track"
+msgstr "Poprzedni utwór"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:59
+msgid "Stop"
+msgstr "Zatrzymaj"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:60
+msgid "Play/Pause"
+msgstr "Odtwarzanie/Pauza"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:93
+msgid "Alt+"
+msgstr "Alt+"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:96
+msgid "Ctrl+"
+msgstr "Ctrl+"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:100
+msgid "Rawctrl+"
+msgstr "Rawctrl+"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:104
+msgid "Shift+"
+msgstr "Shift+"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:107
+msgid "Meta+"
+msgstr "Meta+"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:238
+#, c-format
+msgid "Joystick %d"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:269
+#, c-format
+msgid "%s: Axis %d+"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:271
+#, c-format
+msgid "%s: Axis %d-"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:273
+#, c-format
+msgid "%s: Button %d"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:275
+#, c-format
+msgid "%s: Hat %d North"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:277
+#, c-format
+msgid "%s: Hat %d South"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:279
+#, c-format
+msgid "%s: Hat %d West"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:281
+#, c-format
+msgid "%s: Hat %d East"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:312
+msgid "Key"
+msgstr ""
 
 #: audio/internal/dsound.cpp:105 audio/internal/dsound.cpp:120
 #, c-format
