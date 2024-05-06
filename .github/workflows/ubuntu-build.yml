@@ -58,6 +58,11 @@ jobs:
         run: sudo ninja -C build install
 
       # Libretro build
-      - name: Build libretro core
-        if: matrix.build_options == 'libretro'
+      - if: matrix.build_options == 'libretro'
+        name: Build libretro core
         run: make -C src/libretro ${{ matrix.libretro_build }}
+
+      # Run tests
+      - if: matrix.build_options == 'default'
+        name: Run tests
+        run: cd build && ctest -j

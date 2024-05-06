@@ -77,6 +77,26 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 
 project(VBA-M C CXX)
 
+include(CTest)
+include(FetchContent)
+include(GNUInstallDirs)
+include(Options)
+include(Architecture)
+include(Toolchain)
+include(Dependencies)
+
+# Configure gtest
+if(BUILD_TESTING)
+    FetchContent_Declare(googletest
+        URL https://github.com/google/googletest/archive/2d16ed055d09c3689d44b272adc097393de948a0.zip
+    )
+
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+
+    include(GoogleTest)
+endif()
+
 if(NOT CMAKE_PREFIX_PATH AND (NOT ("$ENV{CMAKE_PREFIX_PATH}" STREQUAL "")))
     set(CMAKE_PREFIX_PATH "$ENV{CMAKE_PREFIX_PATH}")
 endif()
@@ -96,17 +116,6 @@ set(MSYS OFF)
 if(NOT "$ENV{MSYSTEM_PREFIX}" STREQUAL "")
     set(MSYS ON)
 endif()
-
-include(CTest)
-if(BUILD_TESTING)
-    enable_testing()
-endif()
-
-include(GNUInstallDirs)
-include(Options)
-include(Architecture)
-include(Toolchain)
-include(Dependencies)
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
     include(GitTagVersion)

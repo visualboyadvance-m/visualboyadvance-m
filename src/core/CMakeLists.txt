@@ -136,3 +136,5 @@ if(ENABLE_LINK)
         PRIVATE ${NLS_LIBS}
     )
 endif()
+
+add_subdirectory(test)
