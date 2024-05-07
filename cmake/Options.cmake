@@ -162,3 +162,5 @@ endif()
 if(TRANSLATIONS_ONLY AND (ENABLE_SDL OR ENABLE_WX))
     message(FATAL_ERROR "The SDL and wxWidgets ports can't be built when TRANSLATIONS_ONLY is enabled")
 endif()
+
+option(GPG_SIGNATURES "Create GPG signatures for release files" OFF)

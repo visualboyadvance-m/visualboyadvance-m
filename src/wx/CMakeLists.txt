@@ -793,7 +793,7 @@ if(UPSTREAM_RELEASE AND WIN32)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
-    if(GPG_KEYS)
+    if(GPG_SIGNATURES AND GPG_KEYS)
         add_custom_command(
             OUTPUT ${CMAKE_BINARY_DIR}/translations.zip.asc
             COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/translations.zip.asc
