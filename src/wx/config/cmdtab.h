@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include <optional.hpp>
+
 #include <wx/string.h>
 
 // Forward declaration.
@@ -29,8 +31,29 @@ cmditem new_cmditem(const wxString cmd = "",
                     int mask_flags = 0,
                     wxMenuItem* mi = nullptr);
 
-// for binary search
-bool cmditem_lt(const struct cmditem& cmd1, const struct cmditem& cmd2);
+namespace config {
+    // Returns the command INI entry name for the given XRC ID. Will assert if
+    // the command is not found. The INI entry name is the command name prefixed
+    // with "Keyboard/". This is used to store the command in the INI file.
+    // Examples:
+    // * wxID_OPEN -> "Keyboard/OPEN"
+    // * XRCID("NOOP") -> "Keyboard/NOOP"
+    // O(n) search.
+    wxString GetCommandINIEntry(int xrc_id);
+
+    // Returns the command helper string for the given XRC ID. Will assert if
+    // the command is not found.
+    // O(n) search.
+    wxString GetCommandHelper(int xrc_id);
+
+    // Returns the XRC ID for the given command config name, without the
+    // "Keyboard/" prefix. Examples:
+    // * "OPEN" -> wxID_OPEN
+    // * "Keyboard/OPEN" -> nonstd::nullopt
+    // * "NOOP" -> XRCID("NOOP")
+    // O(log(n)) search.
+    nonstd::optional<int> CommandFromConfigString(const wxString& config);
+}
 
 // here are those conditions
 enum { CMDEN_GB = (1 << 0), // GB ROM loaded

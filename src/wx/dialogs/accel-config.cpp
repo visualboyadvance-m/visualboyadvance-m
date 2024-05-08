@@ -59,23 +59,15 @@ void AppendItemToTree(std::unordered_map<config::ShortcutCommand, wxTreeItemId>*
                       int command,
                       const wxString& prefix,
                       int level) {
-    wxString name;
-    for (const cmditem& cmd_item : cmdtab) {
-        if (command == cmd_item.cmd_id) {
-            name = cmd_item.name;
-            break;
-        }
-    }
-    assert(!name.empty());
-
+    const wxString helper = config::GetCommandHelper(command);
     const wxTreeItemId tree_item_id =
         tree->AppendItem(parent,
-                         /*text=*/name,
+                         /*text=*/helper,
                          /*image=*/-1,
                          /*selImage=*/-1,
                          /*data=*/
                          new CommandTreeItemData(config::ShortcutCommand(command),
-                                                 AppendString(prefix, level, name), name));
+                                                 AppendString(prefix, level, helper), helper));
     command_to_item_id->emplace(command, tree_item_id);
 }
 

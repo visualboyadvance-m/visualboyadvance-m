@@ -71,6 +71,7 @@ configure_wx_target(vbam-wx-config)
 
 if (BUILD_TESTING)
     add_executable(vbam-wx-config-tests
+        bindings-test.cpp
         command-test.cpp
         option-test.cpp
         strutils-test.cpp

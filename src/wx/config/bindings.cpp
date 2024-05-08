@@ -43,8 +43,8 @@ Bindings::Bindings(
       input_to_control_(input_to_control.begin(), input_to_control.end()),
       disabled_defaults_(disabled_defaults.begin(), disabled_defaults.end()) {}
 
-std::vector<std::pair<int, wxString>> Bindings::GetKeyboardConfiguration() const {
-    std::vector<std::pair<int, wxString>> config;
+std::vector<std::pair<wxString, wxString>> Bindings::GetKeyboardConfiguration() const {
+    std::vector<std::pair<wxString, wxString>> config;
     config.reserve(control_to_inputs_.size() + 1);
 
     if (!disabled_defaults_.empty()) {
@@ -52,7 +52,8 @@ std::vector<std::pair<int, wxString>> Bindings::GetKeyboardConfiguration() const
         for (const auto& iter : disabled_defaults_) {
             noop_inputs.insert(iter.first);
         }
-        config.push_back(std::make_pair(NoopCommand(), UserInput::SpanToConfigString(noop_inputs)));
+        config.push_back(std::make_pair(ShortcutCommand(NoopCommand()).ToConfigString(),
+                                        UserInput::SpanToConfigString(noop_inputs)));
     }
 
     for (const auto& iter : control_to_inputs_) {
@@ -73,8 +74,8 @@ std::vector<std::pair<int, wxString>> Bindings::GetKeyboardConfiguration() const
         }
 
         if (!inputs.empty()) {
-            const int command_id = iter.first.shortcut().id();
-            config.push_back(std::make_pair(command_id, UserInput::SpanToConfigString(inputs)));
+            config.push_back(std::make_pair(iter.first.shortcut().ToConfigString(),
+                                            UserInput::SpanToConfigString(inputs)));
         }
     }
 
@@ -158,7 +159,7 @@ void Bindings::AssignInputToCommand(const UserInput& input, const Command& comma
 }
 
 void Bindings::AssignInputsToCommand(const std::unordered_set<UserInput>& inputs,
-                                      const Command& command) {
+                                     const Command& command) {
     // Remove the existing binding if it exists.
     const auto iter = control_to_inputs_.find(command);
     if (iter != control_to_inputs_.end()) {
@@ -204,16 +205,19 @@ void Bindings::UnassignInput(const UserInput& input) {
 }
 
 void Bindings::ClearCommandAssignments(const Command& command) {
-    auto iter = control_to_inputs_.find(command);
+    const auto iter = control_to_inputs_.find(command);
     if (iter == control_to_inputs_.end()) {
         // Command not found, nothing to do.
         return;
     }
 
-    for (const UserInput& input : iter->second) {
-        input_to_control_.erase(input);
+    // Keep a copy of the inputs to unassign.
+    std::unordered_set<UserInput> inputs_to_unassign(iter->second);
+
+    // Unassign all inputs.
+    for (const UserInput& input : inputs_to_unassign) {
+        UnassignInput(input);
     }
-    control_to_inputs_.erase(iter);
 }
 
 void Bindings::UnassignDefaultBinding(const UserInput& input) {

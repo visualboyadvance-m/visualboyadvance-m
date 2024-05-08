@@ -1,6 +1,5 @@
 #include "wx/config/command.h"
 
-#include <algorithm>
 #include <map>
 
 #include <wx/log.h>
@@ -109,15 +108,7 @@ wxString GameCommand::ToUXString() const {
 }
 
 wxString ShortcutCommand::ToConfigString() const {
-    for (const cmditem& cmd_item : cmdtab) {
-        if (cmd_item.cmd_id == id_) {
-            return wxString::Format("Keyboard/%s", cmd_item.cmd);
-        }
-    }
-
-    // Command not found. This should never happen.
-    assert(false);
-    return wxEmptyString;
+    return GetCommandINIEntry(id_);
 }
 
 // static
@@ -158,14 +149,13 @@ nonstd::optional<Command> Command::FromString(const wxString& name) {
             return nonstd::nullopt;
         }
 
-        const auto iter = std::lower_bound(cmdtab.begin(), cmdtab.end(),
-                                           cmditem{parts[1], wxString(), 0, 0, NULL}, cmditem_lt);
-        if (iter == cmdtab.end() || iter->cmd != parts[1]) {
+        const auto xrc_id = CommandFromConfigString(parts[1]);
+        if (!xrc_id.has_value()) {
             wxLogDebug("Command ID %s not found", parts[1]);
             return nonstd::nullopt;
         }
 
-        return Command(ShortcutCommand(iter->cmd_id));
+        return Command(ShortcutCommand(xrc_id.value()));
     }
 }
 
