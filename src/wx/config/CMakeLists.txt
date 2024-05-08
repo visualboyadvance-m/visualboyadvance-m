@@ -73,6 +73,7 @@ if (BUILD_TESTING)
     add_executable(vbam-wx-config-tests
         bindings-test.cpp
         command-test.cpp
+        emulated-gamepad-test.cpp
         option-test.cpp
         strutils-test.cpp
         user-input-test.cpp
