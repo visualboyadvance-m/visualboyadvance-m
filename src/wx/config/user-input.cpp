@@ -289,13 +289,18 @@ wxString JoyInput::ToLocalizedString() const {
 wxString KeyboardInput::ToConfigString() const {
     // Handle the modifier case separately.
     if (KeyIsModifier(key_)) {
-        return wxString::Format("%d:%d", key_, mod_);
+        return ModToConfigString(mod_).RemoveLast();
     }
 
     // Custom overrides.
     const auto iter = kKeyCodeOverrides.find(key_);
     if (iter != kKeyCodeOverrides.end()) {
         return ModToConfigString(mod_) + iter->second.config_name;
+    }
+
+    if (key_ == ',' || key_ == ':') {
+        // Special case for comma and colon to avoid parsing issues.
+        return wxString::Format("%d:%d", key_, mod_);
     }
 
     const wxString accel_string = wxAcceleratorEntry(mod_, key_).ToRawString().MakeUpper();

@@ -1,5 +1,6 @@
 #include "wx/config/command.h"
 
+#include <algorithm>
 #include <map>
 
 #include <wx/log.h>
@@ -159,7 +160,7 @@ nonstd::optional<Command> Command::FromString(const wxString& name) {
 
         const auto iter = std::lower_bound(cmdtab.begin(), cmdtab.end(),
                                            cmditem{parts[1], wxString(), 0, 0, NULL}, cmditem_lt);
-        if (iter == cmdtab.end()) {
+        if (iter == cmdtab.end() || iter->cmd != parts[1]) {
             wxLogDebug("Command ID %s not found", parts[1]);
             return nonstd::nullopt;
         }

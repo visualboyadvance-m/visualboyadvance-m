@@ -487,6 +487,9 @@ bool Option::SetGbPaletteString(const wxString& value) {
         long temp = 0;
         if (number.ToLong(&temp, 16)) {
             new_value[i] = temp;
+        } else {
+            wxLogWarning(_("Invalid value %s for option %s"), value, config_name_);
+            return false;
         }
     }
 

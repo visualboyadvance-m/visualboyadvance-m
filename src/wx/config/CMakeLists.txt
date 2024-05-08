@@ -72,7 +72,10 @@ target_include_directories(vbam-wx-config PUBLIC ${NONSTD_INCLUDE_DIR})
 
 if (BUILD_TESTING)
     add_executable(vbam-wx-config-tests
-        strutils_test.cpp
+        command-test.cpp
+        option-test.cpp
+        strutils-test.cpp
+        user-input-test.cpp
     )
     target_link_libraries(vbam-wx-config-tests
         vbam-core
