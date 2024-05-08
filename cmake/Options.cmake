@@ -8,7 +8,12 @@ else()
     set(BUILD_DEFAULT ON)
 endif()
 
-option(ENABLE_SDL "Build the SDL port" ${BUILD_DEFAULT})
+set(ENABLE_SDL_DEFAULT ${BUILD_DEFAULT})
+if(WIN32 OR APPLE)
+    set(ENABLE_SDL_DEFAULT OFF)
+endif()
+
+option(ENABLE_SDL "Build the SDL port" ${ENABLE_SDL_DEFAULT})
 option(ENABLE_WX "Build the wxWidgets port" ${BUILD_DEFAULT})
 option(ENABLE_DEBUGGER "Enable the debugger" ON)
 option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build with GCC/Clang" OFF)
