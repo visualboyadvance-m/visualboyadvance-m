@@ -43,7 +43,7 @@ public:
     // - User-added custom bindings. These appear under [Keyboard/CommandName].
     // Essentially, this is a diff between the default shortcuts and the user
     // configuration.
-    std::vector<std::pair<int, wxString>> GetKeyboardConfiguration() const;
+    std::vector<std::pair<wxString, wxString>> GetKeyboardConfiguration() const;
 
     // Returns the game control configuration for the INI file. These go in the
     // [Joypad] section of the INI file.

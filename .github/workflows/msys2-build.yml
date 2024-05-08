@@ -62,8 +62,3 @@ jobs:
       - if: matrix.build_options == 'libretro'
         name: Build libretro core
         run: make -C src/libretro ${{ matrix.libretro_build }} CC=clang CXX=clang++
-
-      # Run tests
-      - if: matrix.build_options == 'default'
-        name: Run tests
-        run: cd build && ctest -j

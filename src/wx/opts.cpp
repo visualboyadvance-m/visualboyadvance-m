@@ -1,6 +1,5 @@
 #include "wx/opts.h"
 
-#include <algorithm>
 #include <limits>
 #include <memory>
 #include <unordered_set>
@@ -220,9 +219,7 @@ void load_opts(bool first_time_launch) {
              cont = cfg->GetNextEntry(e, entry_idx)) {
             // kb options come from a different list
             if (s == wxT("Keyboard")) {
-                const cmditem dummy = new_cmditem(e);
-
-                if (!std::binary_search(cmdtab.begin(), cmdtab.end(), dummy, cmditem_lt)) {
+                if (!config::CommandFromConfigString(e).has_value()) {
                     s.append(wxT('/'));
                     s.append(e);
                     //wxLogWarning(_("Invalid option %s present; removing if possible"), s.c_str());
@@ -421,19 +418,8 @@ void update_shortcut_opts() {
     cfg->DeleteGroup("/Keyboard");
     cfg->SetPath("/Keyboard");
     for (const auto& iter : wxGetApp().bindings()->GetKeyboardConfiguration()) {
-        bool found = false;
-        for (const cmditem& cmd_item : cmdtab) {
-            if (cmd_item.cmd_id == iter.first) {
-                found = true;
-                cfg->Write(cmd_item.cmd, iter.second);
-                break;
-            }
-        }
-
-        // Command not found. This should never happen.
-        assert(found);
+        cfg->Write(iter.first, iter.second);
     }
-
     cfg->SetPath("/");
 
     // For joypads, we just compare the strings.

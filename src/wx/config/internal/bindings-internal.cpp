@@ -26,7 +26,7 @@ const std::unordered_map<Command, std::unordered_set<UserInput>>& DefaultInputs(
         // this was annoying people A LOT #334
         // {ShortcutCommand(wxID_EXIT),
         //     {
-        //         KeyboardInput(WXK_ESCAPE, wxMOD_NONE)
+        //         KeyboardInput(WXK_ESCAPE)
         //     }},
         // this was annoying people #298
         // {ShortcutCommand(wxID_EXIT),
@@ -52,46 +52,46 @@ const std::unordered_map<Command, std::unordered_set<UserInput>>& DefaultInputs(
             }},
         {ShortcutCommand(XRCID("LoadGame01")),
             {
-                KeyboardInput(WXK_F1, wxMOD_NONE)
+                KeyboardInput(WXK_F1)
             }},
         {ShortcutCommand(XRCID("LoadGame02")),
             {
-                KeyboardInput(WXK_F2, wxMOD_NONE)
+                KeyboardInput(WXK_F2)
             }},
         {ShortcutCommand(XRCID("LoadGame03")),
             {
-                KeyboardInput(WXK_F3, wxMOD_NONE)
+                KeyboardInput(WXK_F3)
             }},
         {ShortcutCommand(XRCID("LoadGame04")),
             {
-                KeyboardInput(WXK_F4, wxMOD_NONE)
+                KeyboardInput(WXK_F4)
             }},
         {ShortcutCommand(XRCID("LoadGame05")),
             {
-                KeyboardInput(WXK_F5, wxMOD_NONE)
+                KeyboardInput(WXK_F5)
             }},
         {ShortcutCommand(XRCID("LoadGame06")),
             {
-                KeyboardInput(WXK_F6, wxMOD_NONE)
+                KeyboardInput(WXK_F6)
             }},
         {ShortcutCommand(XRCID("LoadGame07")),
             {
-                KeyboardInput(WXK_F7, wxMOD_NONE)
+                KeyboardInput(WXK_F7)
             }},
         {ShortcutCommand(XRCID("LoadGame08")),
             {
-                KeyboardInput(WXK_F8, wxMOD_NONE)
+                KeyboardInput(WXK_F8)
             }},
         {ShortcutCommand(XRCID("LoadGame09")),
             {
-                KeyboardInput(WXK_F9, wxMOD_NONE)
+                KeyboardInput(WXK_F9)
             }},
         {ShortcutCommand(XRCID("LoadGame10")),
             {
-                KeyboardInput(WXK_F10, wxMOD_NONE)
+                KeyboardInput(WXK_F10)
             }},
         {ShortcutCommand(XRCID("Pause")),
-         {KeyboardInput(WXK_PAUSE, wxMOD_NONE), KeyboardInput('P', wxMOD_CMD)}},
+         {KeyboardInput(WXK_PAUSE), KeyboardInput('P', wxMOD_CMD)}},
         {ShortcutCommand(XRCID("Reset")),
             {
                 KeyboardInput('R', wxMOD_CMD)
@@ -99,27 +99,27 @@ const std::unordered_map<Command, std::unordered_set<UserInput>>& DefaultInputs(
         // add shortcuts for original size multiplier #415
         {ShortcutCommand(XRCID("SetSize1x")),
             {
-                KeyboardInput('1', wxMOD_NONE)
+                KeyboardInput('1')
             }},
         {ShortcutCommand(XRCID("SetSize2x")),
             {
-                KeyboardInput('2', wxMOD_NONE)
+                KeyboardInput('2')
             }},
         {ShortcutCommand(XRCID("SetSize3x")),
             {
-                KeyboardInput('3', wxMOD_NONE)
+                KeyboardInput('3')
             }},
         {ShortcutCommand(XRCID("SetSize4x")),
             {
-                KeyboardInput('4', wxMOD_NONE)
+                KeyboardInput('4')
             }},
         {ShortcutCommand(XRCID("SetSize5x")),
             {
-                KeyboardInput('5', wxMOD_NONE)
+                KeyboardInput('5')
             }},
         {ShortcutCommand(XRCID("SetSize6x")),
             {
-                KeyboardInput('6', wxMOD_NONE)
+                KeyboardInput('6')
             }},
         // save oldest is more commonly used than save other
         // {ShortcutCommand(XRCID("Save")),
@@ -173,7 +173,7 @@ const std::unordered_map<Command, std::unordered_set<UserInput>>& DefaultInputs(
         // I prefer the SDL ESC key binding
         // {ShortcutCommand(XRCID("ToggleFullscreen")),
         //     {
-        //         KeyboardInput(WXK_ESCAPE, wxMOD_NONE)
+        //         KeyboardInput(WXK_ESCAPE)
         //     }},
         // alt-enter is more standard anyway
         {ShortcutCommand(XRCID("ToggleFullscreen")),
@@ -290,15 +290,15 @@ const std::unordered_map<Command, std::unordered_set<UserInput>>& DefaultInputs(
             }},
         {ShortcutCommand(XRCID("IncreaseVolume")),
             {
-                KeyboardInput(WXK_NUMPAD_ADD, wxMOD_NONE)
+                KeyboardInput(WXK_NUMPAD_ADD)
             }},
         {ShortcutCommand(XRCID("DecreaseVolume")),
             {
-                KeyboardInput(WXK_NUMPAD_SUBTRACT, wxMOD_NONE)
+                KeyboardInput(WXK_NUMPAD_SUBTRACT)
             }},
         {ShortcutCommand(XRCID("ToggleSound")),
             {
-                KeyboardInput(WXK_NUMPAD_ENTER, wxMOD_NONE)
+                KeyboardInput(WXK_NUMPAD_ENTER)
             }},
 
         // Player 1 controls.
