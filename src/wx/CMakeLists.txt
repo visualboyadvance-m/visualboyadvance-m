@@ -384,7 +384,10 @@ endif()
 # FAudio.
 if(ENABLE_FAUDIO)
     target_sources(visualboyadvance-m PRIVATE audio/internal/faudio.cpp)
-    target_link_libraries(visualboyadvance-m FAudio::FAudio)
+    target_link_libraries(visualboyadvance-m faudio)
+    if(WIN32)
+        target_link_libraries(visualboyadvance-m dxguid uuid winmm ole32 advapi32 user32 mfplat mfreadwrite mfuuid propsys)
+    endif()
     target_compile_definitions(visualboyadvance-m PRIVATE VBAM_ENABLE_FAUDIO)
 endif()
 
