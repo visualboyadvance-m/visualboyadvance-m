@@ -151,7 +151,7 @@ set(ENABLE_FAUDIO_DEFAULT OFF)
 
 find_package(FAudio QUIET)
 
-if(FAudio_FOUND)
+if(FAudio_FOUND AND NOT (MINGW AND X86))
     set(ENABLE_FAUDIO_DEFAULT ON)
 endif()
 

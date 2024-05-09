@@ -1,10 +1,6 @@
 #ifndef WX_AUDIO_INTERNAL_XAUDIO2_H_
 #define WX_AUDIO_INTERNAL_XAUDIO2_H_
 
-#if !defined(VBAM_ENABLE_FAUDIO)
-#error "This file should only be included if FAudio is enabled"
-#endif
-
 #include "wx/audio/audio.h"
 
 namespace audio {
