@@ -12,4 +12,4 @@ target_sources(vbam-wx-fake-opts
     fake_opts.cpp
 )
 
-configure_wx_deps(vbam-wx-fake-opts)
+configure_wx_target(vbam-wx-fake-opts)

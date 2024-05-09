@@ -179,12 +179,16 @@ if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
   set(wxWidgets_DIR "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/share/wxwidgets")
 endif()
 
+set(ENABLE_OPENGL TRUE)
 find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl ${wx_find_extra})
 
 if(NOT wxWidgets_FOUND)
     find_package(wxWidgets COMPONENTS xrc xml html adv net core base ${wx_find_extra} REQUIRED)
-    target_compile_definitions(visualboyadvance-m PRIVATE NO_OGL)
+    set(ENABLE_OPENGL FALSE)
 endif()
+
+# Find OpenAL (required).
+find_package(OpenAL REQUIRED)
 
 # Workaround of static liblzma not being found on MSYS2.
 if(VBAM_STATIC AND MSYS)
@@ -207,25 +211,101 @@ foreach(DEF ${wxWidgets_DEFINITIONS})
     list(APPEND CMAKE_REQUIRED_DEFINITIONS "-D${DEF}")
 endforeach()
 
-function(configure_wx_deps target)
+# Configure common settings for wx-based targets, like linking, include
+# directories, compile options, and definitions.
+function(configure_wx_target target)
     get_target_property(target_type ${target} TYPE)
     if(target_type STREQUAL "EXECUTABLE")
-        target_link_libraries(${target} ${wxWidgets_LIBRARIES})
-        target_include_directories(${target} PRIVATE ${wxWidgets_INCLUDE_DIRS})
-        target_compile_options(${target} PRIVATE ${wxWidgets_CXX_FLAGS})
-        target_compile_definitions(${target} PRIVATE ${wxWidgets_DEFINITIONS})
-        if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
-            target_compile_definitions(${target} PRIVATE ${wxWidgets_DEFINITIONS_DEBUG})
-        endif()
+        set(target_is_executable TRUE)
     else()
-        target_link_libraries(${target} PUBLIC ${wxWidgets_LIBRARIES})
-        target_include_directories(${target} PUBLIC ${wxWidgets_INCLUDE_DIRS})
-        target_compile_options(${target} PUBLIC ${wxWidgets_CXX_FLAGS})
-        target_compile_definitions(${target} PUBLIC ${wxWidgets_DEFINITIONS})
-        if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
-            target_compile_definitions(${target} PUBLIC ${wxWidgets_DEFINITIONS_DEBUG})
+        set(target_is_executable FALSE)
+    endif()
+
+    function(_add_link_libraries)
+        if(${target_is_executable})
+            target_link_libraries(${target} ${ARGN})
+        else()
+            target_link_libraries(${target} PUBLIC ${ARGN})
         endif()
-endif()
+    endfunction()
+
+    function(_add_include_directories)
+        if(${target_is_executable})
+            target_include_directories(${target} PRIVATE ${ARGN})
+        else()
+            target_include_directories(${target} PUBLIC ${ARGN})
+        endif()
+    endfunction()
+
+    function(_add_compile_options)
+        if(${target_is_executable})
+            target_compile_options(${target} PRIVATE ${ARGN})
+        else()
+            target_compile_options(${target} PUBLIC ${ARGN})
+        endif()
+    endfunction()
+
+    function(_add_compile_definitions)
+        if(${target_is_executable})
+            target_compile_definitions(${target} PRIVATE ${ARGN})
+        else()
+            target_compile_definitions(${target} PUBLIC ${ARGN})
+        endif()
+    endfunction()
+
+    # Nonstd.
+    _add_link_libraries(nonstd-lib)
+    _add_include_directories(${NONSTD_INCLUDE_DIR})
+
+    # wxWidgets.
+    _add_link_libraries(${wxWidgets_LIBRARIES})
+    _add_include_directories(${wxWidgets_INCLUDE_DIRS})
+    _add_compile_options(${wxWidgets_CXX_FLAGS})
+    _add_compile_definitions(${wxWidgets_DEFINITIONS})
+    if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
+        _add_compile_definitions(${wxWidgets_DEFINITIONS_DEBUG})
+    endif()
+
+    # OpenAL.
+    if(OPENAL_STATIC)
+        _add_compile_definitions(AL_LIBTYPE_STATIC)
+    endif()
+    _add_include_directories(${OPENAL_INCLUDE_DIR})
+    _add_link_libraries(${OPENAL_LIBRARY})
+
+    # XAudio2.
+    if(ENABLE_XAUDIO2)
+        _add_compile_definitions(VBAM_ENABLE_XAUDIO2)
+    endif()
+
+    # FAudio.
+    if(ENABLE_FAUDIO)
+        _add_compile_definitions(VBAM_ENABLE_FAUDIO)
+        if(MSVC)
+            _add_link_libraries(FAudio::FAudio)
+        else()
+            _add_link_libraries(FAudio)
+            if(WIN32)
+                _add_link_libraries(dxguid uuid winmm ole32 advapi32 user32 mfplat mfreadwrite mfuuid propsys)
+            endif()
+        endif()
+    endif()
+
+    # Direct3D.
+    if(NOT ENABLE_DIRECT3D)
+        _add_compile_definitions(NO_D3D)
+    endif()
+
+    # SDL2.
+    _add_link_libraries(${VBAM_SDL2_LIBS})
+
+    # OpenGL.
+    if(ENABLE_OPENGL)
+        _add_link_libraries(${OPENGL_LIBRARIES})
+    else()
+        _add_compile_definitions(NO_OGL)
+    endif()
+
 endfunction()
 
 # Sub-projects.
@@ -242,11 +322,10 @@ add_executable(
 )
 
 target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} ${VBAM_ICON_PATH})
-target_include_directories(visualboyadvance-m PRIVATE ${NONSTD_INCLUDE_DIR} ${SDL2_INCLUDE_DIRS})
+target_include_directories(visualboyadvance-m PRIVATE ${SDL2_INCLUDE_DIRS})
 
 target_link_libraries(
     visualboyadvance-m
-    nonstd-lib
     vbam-core
     vbam-components-draw-text
     vbam-components-filters
@@ -254,8 +333,6 @@ target_link_libraries(
     vbam-components-filters-interframe
     vbam-components-user-config
     vbam-wx-config
-    ${OPENGL_LIBRARIES}
-    ${VBAM_SDL2_LIBS}
 )
 
 # adjust link command when making a static binary for gcc
@@ -362,40 +439,17 @@ if(CMAKE_COMPILER_IS_GNUCXX AND VBAM_STATIC)
     endif()
 endif()
 
-# OpenAL.
-find_package(OpenAL REQUIRED)
-if(OPENAL_STATIC)
-    target_compile_definitions(visualboyadvance-m PRIVATE AL_LIBTYPE_STATIC)
-endif()
-target_include_directories(visualboyadvance-m PRIVATE ${OPENAL_INCLUDE_DIR})
-target_link_libraries(visualboyadvance-m ${OPENAL_LIBRARY})
-
 # XAudio2.
 if(ENABLE_XAUDIO2)
     target_sources(visualboyadvance-m PRIVATE audio/internal/xaudio2.cpp)
-    target_compile_definitions(visualboyadvance-m PRIVATE VBAM_ENABLE_XAUDIO2)
-endif()
-
-# Direct3D.
-if(NOT ENABLE_DIRECT3D)
-    target_compile_definitions(visualboyadvance-m PRIVATE NO_D3D)
 endif()
 
 # FAudio.
 if(ENABLE_FAUDIO)
     target_sources(visualboyadvance-m PRIVATE audio/internal/faudio.cpp)
-    if(MSVC)
-        target_link_libraries(visualboyadvance-m FAudio::FAudio)
-    else()
-        target_link_libraries(visualboyadvance-m FAudio)
-        if(WIN32)
-            target_link_libraries(visualboyadvance-m dxguid uuid winmm ole32 advapi32 user32 mfplat mfreadwrite mfuuid propsys)
-        endif()
-    endif()
-    target_compile_definitions(visualboyadvance-m PRIVATE VBAM_ENABLE_FAUDIO)
 endif()
 
-configure_wx_deps(visualboyadvance-m)
+configure_wx_target(visualboyadvance-m)
 
 # we make some direct gtk/gdk calls on linux and such
 # so need to link the gtk that wx was built with
