@@ -6,6 +6,7 @@
 # Alexis Anstett <arkaniste54@gmail.com>, 2020
 # Benjamin Siskoo <siskoo@tradu-france.com>, 2018,2020
 # Benjamin Siskoo <siskoo@tradu-france.com>, 2018
+# Fabrice de Gans, 2024
 # Nyu, 2018
 # Nyu, 2018
 # Simon NOIRHOMME <sim041004@hotmail.com>, 2019
@@ -17,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-06 06:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Thibault <thibaultbruneliere@gmail.com>, 2019\n"
+"Last-Translator: Fabrice de Gans, 2024\n"
 "Language-Team: French (France) (http://app.transifex.com/bgk/vba-m/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,7 +28,7 @@ msgstr ""
 
 #: audio/internal/openal.cpp:189
 msgid "OpenAL: Failed to open audio device"
-msgstr ""
+msgstr "OpenAL : Impossible d'ouvrir le périphérique audio"
 
 #: audio/internal/openal.cpp:387 audio/internal/faudio.cpp:493
 #: audio/internal/xaudio2.cpp:577
@@ -40,7 +41,7 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
 " Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Fichiers Game Boy Advance (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game Boy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:143
 msgid "Open ROM file"
@@ -50,7 +51,7 @@ msgstr "Ouvrir un Fichier ROM"
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Fichiers Game Boy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:170
 msgid "Open GB ROM file"
@@ -60,7 +61,7 @@ msgstr "Ouvrir un Fichier ROM GB"
 msgid ""
 "Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Fichiers Game Boy Color Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:197
 msgid "Open GBC ROM file"
@@ -68,11 +69,11 @@ msgstr "Ouvrir un Fichier ROM GBC"
 
 #: cmdevents.cpp:362 cmdevents.cpp:384
 msgid "Select Dot Code file"
-msgstr "Choisir le fichier Code Dot"
+msgstr "Choisir un fichier Dot Code"
 
 #: cmdevents.cpp:364 cmdevents.cpp:386
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr ""
+msgstr "Dot Code e-Reader (*.bin;*.raw)|*.bin;*.raw"
 
 #: cmdevents.cpp:405 cmdevents.cpp:600
 msgid "Select battery file"
@@ -86,7 +87,7 @@ msgstr "Fichier Batterie (*.sav)|*.sav|Sauvegarde Flash (*.dat)|*.dat"
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "Importer un fichier batterie va effacer toute sauvegarde existante (de façon définitive après la prochaine sauvegarde). Souhaitez-vous continuer ?"
 
 #: cmdevents.cpp:415 cmdevents.cpp:443 cmdevents.cpp:563
 msgid "Confirm import"
@@ -108,22 +109,22 @@ msgstr "Sélectionner un fichier code"
 
 #: cmdevents.cpp:433
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
-msgstr ""
+msgstr "Fichier Code Game Shark (*.spc;*.xpc)|*.spc;*.xpc"
 
 #: cmdevents.cpp:433
 msgid "Game Shark Code File (*.gcf)|*.gcf"
-msgstr ""
+msgstr "Fichier Code Game Shark (*.gcf)|*.gcf"
 
 #: cmdevents.cpp:442
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
-msgstr ""
+msgstr "Importer un fichier code va remplacer tous les codes de triche existants. Souhaitez-vous continuer ?"
 
 #: cmdevents.cpp:459
 #, c-format
 msgid "Cannot open file %s"
-msgstr "Ne peut pas ouvrir le fichier %s"
+msgstr "Impossible d'ouvrir le fichier %s"
 
 #: cmdevents.cpp:469
 #, c-format
@@ -133,7 +134,7 @@ msgstr "Fichier code non supporté %s"
 #: cmdevents.cpp:539
 #, c-format
 msgid "Loaded code file %s"
-msgstr "Chargement d'un fichier code %s"
+msgstr "Fichier code %s chargé"
 
 #: cmdevents.cpp:541
 #, c-format
@@ -142,65 +143,65 @@ msgstr "Erreur de chargement du fichier code %s"
 
 #: cmdevents.cpp:552 cmdevents.cpp:628
 msgid "Select snapshot file"
-msgstr "Sélectionner une copie d'écran"
+msgstr "Sélectionner un fichier de sauvegarde instantanée"
 
 #: cmdevents.cpp:553
 msgid ""
 "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
 " (*.gsv)|*.gsv"
-msgstr ""
+msgstr "Sauvegarde instantanée Game Shark & PAC (*.sps;*.xps)|*.sps;*.xps|Sauvegarde instantanée Game Shark SP (*.gsv)|*.gsv"
 
 #: cmdevents.cpp:553
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
-msgstr ""
+msgstr "Sauvegarde instantanée Game Boy (*.gbs)|*.gbs"
 
 #: cmdevents.cpp:562
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "Importer un fichier de suavegarde instantanée va effacer toute sauvegarde existante (de façon définitive après la prochaine sauvegarde). Souhaitez-vous continuer ?"
 
 #: cmdevents.cpp:587
 #, c-format
 msgid "Loaded snapshot file %s"
-msgstr "Copie d'écran chargée %s"
+msgstr "Fichier de sauvegarde instantanée %s chargé"
 
 #: cmdevents.cpp:589
 #, c-format
 msgid "Error loading snapshot file %s"
-msgstr "Erreur de chargement du fichier de copie d'écran %s"
+msgstr "Erreur de chargement du fichier de sauvegarde instantanée %s"
 
 #: cmdevents.cpp:612
 #, c-format
 msgid "Wrote battery %s"
-msgstr "Écriture de la batterie %s"
+msgstr "Batterie exportée %s"
 
 #: cmdevents.cpp:614 panel.cpp:802
 #, c-format
 msgid "Error writing battery %s"
-msgstr "Erreur d'écriture sur la batterie %s"
+msgstr "Erreur d'export de la batterie %s"
 
 #: cmdevents.cpp:622
 msgid "EEPROM saves cannot be exported"
-msgstr "Les sauvegardes de l'EEPROM ne peuvent pas être exportées"
+msgstr "Les sauvegardes EEPROM ne peuvent pas être exportées"
 
 #: cmdevents.cpp:629
 msgid "Game Shark Snapshot (*.sps)|*.sps"
-msgstr ""
+msgstr "Sauvegarde instantanée Game Shark (*.sps)|*.sps"
 
 #: cmdevents.cpp:643
 msgid "Exported from Visual Boy Advance-M"
-msgstr ""
+msgstr "Exporté depuis Visual Boy Advance-M"
 
 #: cmdevents.cpp:655
 #, c-format
 msgid "Saved snapshot file %s"
-msgstr "Fichier de copie d'écran sauvegardé %s"
+msgstr "Fichier de sauvegarde instantanée %s enregistré"
 
 #: cmdevents.cpp:657
 #, c-format
 msgid "Error saving snapshot file %s"
-msgstr "Erreur de sauvegarde du fichier de copie d'écran %s"
+msgstr "Erreur pendant l'enregistrement du fichier de sauvegarde instantanée %s"
 
 #: cmdevents.cpp:673 cmdevents.cpp:751 cmdevents.cpp:821 cmdevents.cpp:890
 #: gfxviewers.cpp:1662 gfxviewers.cpp:1807 viewers.cpp:588 viewers.cpp:802
@@ -215,7 +216,7 @@ msgstr "Images PNG|*.png|Images BMP|*.bmp"
 #: cmdevents.cpp:698 sys.cpp:579
 #, c-format
 msgid "Wrote snapshot %s"
-msgstr "Écriture de la copie d'écran %s"
+msgstr "Fichier de sauvegarde instantanée %s enregistré"
 
 #: cmdevents.cpp:719 cmdevents.cpp:789 cmdevents.cpp:858 cmdevents.cpp:924
 msgid " files ("
@@ -227,20 +228,20 @@ msgstr "Sélectionner un fichier"
 
 #: cmdevents.cpp:1261 cmdevents.cpp:1354
 msgid "Select state file"
-msgstr "Sélectionner un fichier d'état"
+msgstr "Sélectionner un fichier de sauvegarde instantanée"
 
 #: cmdevents.cpp:1262 cmdevents.cpp:1355
 msgid "Visual Boy Advance saved game files|*.sgm"
-msgstr ""
+msgstr "Fichiers de sauvegarde Visual Boy Advance|*.sgm"
 
 #: cmdevents.cpp:1385 cmdevents.cpp:1395 cmdevents.cpp:1406
 #, c-format
 msgid "Current state slot #%d"
-msgstr "Etat de l'emplacement actuel #%d"
+msgstr "Emplacement de sauvegarde instantanée actuel #%d "
 
 #: cmdevents.cpp:1469
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
-msgstr ""
+msgstr "Impossible d'utiliser le Hack de Colorisation avec le fichier de BIOS Game Boy."
 
 #: cmdevents.cpp:1680
 msgid "Sound enabled"
@@ -252,11 +253,11 @@ msgstr "Son désactivé"
 
 #: cmdevents.cpp:1759
 msgid "Set to 0 for pseudo tty"
-msgstr "Mettre sur 0 pour le pseudo tty"
+msgstr "Mettre 0 pour le pseudo tty"
 
 #: cmdevents.cpp:1761
 msgid "Port to wait for connection:"
-msgstr "Port en attente de connexion :"
+msgstr "Attente de connexion sur le port :"
 
 #: cmdevents.cpp:1762
 msgid "GDB Connection"
@@ -281,22 +282,22 @@ msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
-msgstr ""
+msgstr "VOTRE CONFIGURATION VA ÊTRE EFFACÉE !\n\nÊtes-vous certain ?"
 
 #: cmdevents.cpp:2200
 msgid "FACTORY RESET"
-msgstr ""
+msgstr "RÉINITIALISATION"
 
 #: cmdevents.cpp:2235
 msgid "Nintendo Game Boy / Color / Advance emulator."
-msgstr ""
+msgstr "Émulateur Nintendo Game Boy / Color / Advance."
 
 #: cmdevents.cpp:2236
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr ""
+msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 L'équipe de développement VBA\nCopyright (C) 2007-2020 L'équipe de développement VBA-M"
 
 #: cmdevents.cpp:2238
 msgid ""
@@ -312,15 +313,15 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program. If not, see http://www.gnu.org/licenses ."
-msgstr ""
+msgstr "Ceci est une traduction non officielle de la licence publique générale GNU (GNU GPL) en français. Elle n'a pas été publiée par la Free Software Foundation et n'établit pas juridiquement les termes de distribution des logiciels qui utilisent la GNU GPL – seul le texte anglais original de la GNU GPL le fait. Cependant, nous espérons que cette traduction aidera les francophones à mieux comprendre la GNU GPL.\n\nCe programme est un logiciel libre ; vous pouvez le redistribuer et/ou le\nmodifier au titre des clauses de la Licence Publique Générale GNU, telle\nque publiée par la Free Software Foundation ; soit la version 2 de la\nLicence, ou (à votre discrétion) une version ultérieure quelconque.\n\nCe programme est distribué dans l'espoir qu'il sera utile, mais SANS\nAUCUNE GARANTIE ; sans même une garantie implicite de COMMERCIABILITE ou\nDE CONFORMITE A UNE UTILISATION PARTICULIERE. Voir la Licence Publique\nGénérale GNU pour plus de détails.\n\nVous devriez avoir reçu un exemplaire de la Licence Publique Générale GNU\navec ce programme ; si ce n'est pas le cas, consultez http://www.gnu.org/licenses ."
 
 #: cmdevents.cpp:2423
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
-msgstr ""
+msgstr "Impossible d'utiliser le fichier de BIOS Game Boy avec le Hack de Colorisation."
 
 #: cmdevents.cpp:2489
 msgid "LAN link is already active. Disable link mode to disconnect."
-msgstr ""
+msgstr "La connexion LAN est déjà active. Désactivez le mode Link pour vous déconnecter."
 
 #: cmdevents.cpp:2495
 msgid "Network is not supported in local mode."
@@ -332,7 +333,7 @@ msgstr "Commandes du menu"
 
 #: dialogs/accel-config.cpp:252
 msgid "This will clear all user-defined accelerators. Are you sure?"
-msgstr ""
+msgstr "Cette action va effacer tous les raccourcis définis par l'utilisateur. Êtes-vous sûr ?"
 
 #: dialogs/accel-config.cpp:252 dialogs/accel-config.cpp:299
 msgid "Confirm"
@@ -341,15 +342,15 @@ msgstr "Confirmer"
 #: dialogs/accel-config.cpp:297
 #, c-format
 msgid "This will unassign \"%s\" from \"%s\". Are you sure?"
-msgstr ""
+msgstr "Cette action va supprimer l'attribution de \"%s\" pour la commande \"%s\". Êtes-vous sûr ?"
 
 #: dialogs/directories-config.cpp:48
 msgid "Browse"
-msgstr "Navigateur"
+msgstr "Naviguer"
 
 #: dialogs/display-config.cpp:52
 msgid "Invalid value for Default magnification."
-msgstr ""
+msgstr "Valeur de zoom par défaut invalide"
 
 #: dialogs/display-config.cpp:331 xrc/DisplayConfig.xrc:86
 #: xrc/DisplayConfig.xrc:136 xrc/DisplayConfig.xrc:222
@@ -366,7 +367,7 @@ msgstr "Aucun plugin RPI utilisable n'a été trouvé dans %s"
 #: dialogs/display-config.cpp:400 dialogs/display-config.cpp:442
 #: xrc/DisplayConfig.xrc:108
 msgid "Plugin"
-msgstr "Module externe"
+msgstr "Plugin"
 
 #: dialogs/display-config.cpp:407
 #, c-format
@@ -376,12 +377,12 @@ msgstr "Utilisation du filtre pixel : %s"
 #: dialogs/display-config.cpp:414
 #, c-format
 msgid "Using interframe blending: %s"
-msgstr "Utilisation du mélange interframe : %s"
+msgstr "Utilisation du filtre de fusion inter-image : %s"
 
 #: dialogs/game-boy-config.cpp:142 xrc/GameBoyAdvanceConfig.xrc:122
 #: xrc/GameBoyConfig.xrc:138 xrc/GameBoyConfig.xrc:159
 msgid "(None)"
-msgstr "(None)"
+msgstr "(Aucun)"
 
 #: dialogs/game-maker.cpp:234 dialogs/gb-rom-info.cpp:63
 msgid "Unknown"
@@ -389,146 +390,146 @@ msgstr "Inconnu"
 
 #: dialogs/game-maker.cpp:235
 msgid "Invalid"
-msgstr ""
+msgstr "Invalide"
 
 #: dialogs/gb-rom-info.cpp:21
 msgid "No mapper"
-msgstr ""
+msgstr "Aucun mapper"
 
 #: dialogs/gb-rom-info.cpp:42
 msgid "Pocket Camera"
-msgstr ""
+msgstr "Pocket Camera"
 
 #: dialogs/gb-rom-info.cpp:67
 msgid " + RAM"
-msgstr ""
+msgstr " + RAM"
 
 #: dialogs/gb-rom-info.cpp:68
 msgid " + RTC"
-msgstr ""
+msgstr " + RTC"
 
 #: dialogs/gb-rom-info.cpp:69
 msgid " + Battery"
-msgstr ""
+msgstr " + Battery"
 
 #: dialogs/gb-rom-info.cpp:70
 msgid " + Rumble"
-msgstr ""
+msgstr " + Vibrations"
 
 #: dialogs/gb-rom-info.cpp:71
 msgid " + Motion Sensor"
-msgstr ""
+msgstr " + Capteur de Mouvement"
 
 #: dialogs/gb-rom-info.cpp:73
 #, c-format
 msgid "%02X (%s%s%s%s%s%s)"
-msgstr ""
+msgstr "%02X (%s%s%s%s%s%s)"
 
 #: dialogs/gb-rom-info.cpp:80 dialogs/gb-rom-info.cpp:92
 #, c-format
 msgid "%02X (Supported)"
-msgstr ""
+msgstr "%02X (Compatible)"
 
 #: dialogs/gb-rom-info.cpp:82 dialogs/gb-rom-info.cpp:90
 #, c-format
 msgid "%02X (Not supported)"
-msgstr ""
+msgstr "%02X (Non compatible)"
 
 #: dialogs/gb-rom-info.cpp:94
 #, c-format
 msgid "%02X (Required)"
-msgstr ""
+msgstr "%02X (Requis)"
 
 #: dialogs/gb-rom-info.cpp:106 dialogs/gb-rom-info.cpp:140
 #, c-format
 msgid "%02X (32 KiB)"
-msgstr ""
+msgstr "%02X (32 Kio)"
 
 #: dialogs/gb-rom-info.cpp:108 dialogs/gb-rom-info.cpp:144
 #, c-format
 msgid "%02X (64 KiB)"
-msgstr ""
+msgstr "%02X (64 Kio)"
 
 #: dialogs/gb-rom-info.cpp:110 dialogs/gb-rom-info.cpp:142
 #, c-format
 msgid "%02X (128 KiB)"
-msgstr ""
+msgstr "%02X (128 Kio)"
 
 #: dialogs/gb-rom-info.cpp:112
 #, c-format
 msgid "%02X (256 KiB)"
-msgstr ""
+msgstr "%02X (256 Kio)"
 
 #: dialogs/gb-rom-info.cpp:114
 #, c-format
 msgid "%02X (512 KiB)"
-msgstr ""
+msgstr "%02X (512 Kio)"
 
 #: dialogs/gb-rom-info.cpp:116
 #, c-format
 msgid "%02X (1 MiB)"
-msgstr ""
+msgstr "%02X (1 Mio)"
 
 #: dialogs/gb-rom-info.cpp:118
 #, c-format
 msgid "%02X (2 MiB)"
-msgstr ""
+msgstr "%02X (2 Mio)"
 
 #: dialogs/gb-rom-info.cpp:120
 #, c-format
 msgid "%02X (4 MiB)"
-msgstr ""
+msgstr "%02X (4 Mio)"
 
 #: dialogs/gb-rom-info.cpp:122 dialogs/gb-rom-info.cpp:146
 #: dialogs/gb-rom-info.cpp:158
 #, c-format
 msgid "%02X (Unknown)"
-msgstr ""
+msgstr "%02X (Inconnu)"
 
 #: dialogs/gb-rom-info.cpp:130
 #, c-format
 msgid "%02X (None)"
-msgstr ""
+msgstr "%02X (Aucun)"
 
 #: dialogs/gb-rom-info.cpp:132
 #, c-format
 msgid "%02X (256 B)"
-msgstr ""
+msgstr "%02X (256 o)"
 
 #: dialogs/gb-rom-info.cpp:134
 #, c-format
 msgid "%02X (512 B)"
-msgstr ""
+msgstr "%02X (512 o)"
 
 #: dialogs/gb-rom-info.cpp:136
 #, c-format
 msgid "%02X (2 KiB)"
-msgstr ""
+msgstr "%02X (2 Kio)"
 
 #: dialogs/gb-rom-info.cpp:138
 #, c-format
 msgid "%02X (8 KiB)"
-msgstr ""
+msgstr "%02X (8 Kio)"
 
 #: dialogs/gb-rom-info.cpp:154
 #, c-format
 msgid "%02X (Japan)"
-msgstr ""
+msgstr "%02X (Japon)"
 
 #: dialogs/gb-rom-info.cpp:156
 #, c-format
 msgid "%02X (World)"
-msgstr ""
+msgstr "%02X (International)"
 
 #: dialogs/gb-rom-info.cpp:201
 #, c-format
 msgid "%02X (Actual: %02X)"
-msgstr ""
+msgstr "%02X (Réel : %02X)"
 
 #: dialogs/gb-rom-info.cpp:204
 #, c-format
 msgid "%04X (Actual: %04X)"
-msgstr ""
+msgstr "%04X (Réel : %04X)"
 
 #: dialogs/sound-config.cpp:250
 #, c-format
