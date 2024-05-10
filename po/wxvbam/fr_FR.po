@@ -1900,7 +1900,7 @@ msgstr "Erreur pendant dsbSecondary->SetCurrentPosition %08x"
 #: audio/internal/dsound.cpp:207
 #, c-format
 msgid "Cannot Play primary %08x"
-msgstr "Ne peut pas lancer le primaire %08x"
+msgstr "Impossible de lancer la lecture %08x"
 
 #: audio/internal/dsound.cpp:328
 #, c-format
@@ -1913,7 +1913,7 @@ msgstr "FAudio : échec du dénombrement des périphériques !"
 
 #: audio/internal/faudio.cpp:214 audio/internal/faudio.cpp:480
 msgid "The FAudio interface failed to initialize!"
-msgstr " 100% match \nL'interface XAudio2 a échoué à l'initialisation !"
+msgstr "L'interface XAudio2 a échoué à l'initialisation !"
 
 #: audio/internal/faudio.cpp:245
 msgid "FAudio: Creating mastering voice failed!"
@@ -1929,7 +1929,7 @@ msgstr "XAudio2 : échec du dénombrement des périphériques !"
 
 #: audio/internal/xaudio2.cpp:297 audio/internal/xaudio2.cpp:564
 msgid "The XAudio2 interface failed to initialize!"
-msgstr " 100% match \nL'interface XAudio2 a échoué à l'initialisation !"
+msgstr "L'interface XAudio2 a échoué à l'initialisation !"
 
 #: audio/internal/xaudio2.cpp:323
 msgid "XAudio2: Creating mastering voice failed!"
@@ -1941,15 +1941,15 @@ msgstr "XAudio2 :  la création de la voix source a échoué !"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:639
 msgid "Error, link already connected"
-msgstr ""
+msgstr "Erreur, Link déja actif"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:653
 msgid "Unable to find link driver"
-msgstr ""
+msgstr "Impossible de trouver le pilote de Link"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:696
 msgid "Link connection does not need updates."
-msgstr ""
+msgstr "La connexion Link n'a pas besoin de mise à jour"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:835
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:899
@@ -1957,81 +1957,81 @@ msgstr ""
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2878
 #, c-format
 msgid "Player %d disconnected."
-msgstr ""
+msgstr "Joueur %d déconnecté"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:939
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:979
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1019
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1654
 msgid "Server disconnected."
-msgstr ""
+msgstr "Serveur déconnecté"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1101
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1133
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1678
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1711
 msgid "Network error."
-msgstr ""
+msgstr "Erreur réseau."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1110
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1687
 #, c-format
 msgid "Player %d connected"
-msgstr ""
+msgstr "Joueur %d coonnecté"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1124
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1701
 msgid "All players connected"
-msgstr ""
+msgstr "Tous les joueurs connectés"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1145
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1723
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
-msgstr ""
+msgstr "Connecté en tant que joueur #%d, en attente de %d joueurs"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1154
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1732
 msgid "All players joined."
-msgstr ""
+msgstr "Tous les joueurs connectés"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1647
 msgid "Server timed out."
-msgstr ""
+msgstr "Délai de connexion au serveur expiré."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2601
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2622
 msgid "Error creating file mapping"
-msgstr ""
+msgstr "Erreur pendant la création du fichier de partage mémoire"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2612
 msgid "Error mapping file"
-msgstr ""
+msgstr "Erreur de partage mémoire"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2659
 msgid "5 or more GBAs not supported."
-msgstr ""
+msgstr "5 GBAs ou plus non supportées."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2678
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2697
 msgid "Error opening event"
-msgstr ""
+msgstr "Erreur pendant l'ouverture de l'event"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2797
 msgid "Lost link; reinitialize to reconnect"
-msgstr ""
+msgstr "Connexion Link perdue, réinitialisez pour reconnecter"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2804
 msgid "Lost link; reconnected"
-msgstr ""
+msgstr "Connexion Link retrouvée"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2925
 msgid "Unknown slave timed out; resetting comm"
-msgstr ""
+msgstr "Délai de connexion à un esclave expiré ; réinitialisation de la communication"
 
 #: xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
-msgstr "Raccourcis Touche"
+msgstr "Raccourcis clavier"
 
 #: xrc/AccelConfig.xrc:26
 msgid "Co&mmands:"
@@ -2123,7 +2123,7 @@ msgstr "&Hexadécimal"
 
 #: xrc/CheatCreate.xrc:97
 msgid "Signed / Unsigned"
-msgstr ""
+msgstr "Signé / Non signé"
 
 #: xrc/CheatCreate.xrc:107
 msgid "&8 bits"
@@ -2301,7 +2301,7 @@ msgstr "Filtres"
 
 #: xrc/DisplayConfig.xrc:80
 msgid "Display filter:"
-msgstr ""
+msgstr "Filtre d'affichage :"
 
 #: xrc/DisplayConfig.xrc:88
 msgid "Super 2xSaI"
@@ -2317,7 +2317,7 @@ msgstr "Pixeliser"
 
 #: xrc/DisplayConfig.xrc:91
 msgid "Advance MAME Scale 2x"
-msgstr ""
+msgstr "Advance MAME Scale 2x"
 
 #: xrc/DisplayConfig.xrc:92
 msgid "Bilinear"
@@ -2349,7 +2349,7 @@ msgstr "Simple 4x"
 
 #: xrc/DisplayConfig.xrc:116
 msgid "Plugin:"
-msgstr ""
+msgstr "Plugin :"
 
 #: xrc/DisplayConfig.xrc:128
 msgid "Interframe blending:"
@@ -2357,11 +2357,11 @@ msgstr "Filtre de fusion inter-image :"
 
 #: xrc/DisplayConfig.xrc:137
 msgid "Smart"
-msgstr ""
+msgstr "Intelligent"
 
 #: xrc/DisplayConfig.xrc:138
 msgid "Motion Blur"
-msgstr ""
+msgstr "Motion Blur"
 
 #: xrc/DisplayConfig.xrc:152 xrc/SoundConfig.xrc:93
 msgid "Basic"
@@ -2373,11 +2373,11 @@ msgstr "Saut d'image"
 
 #: xrc/DisplayConfig.xrc:178
 msgid "&Number of frames to skip:"
-msgstr ""
+msgstr "&Nombre d'images à passer :"
 
 #: xrc/DisplayConfig.xrc:216
 msgid "Speed indicator:"
-msgstr ""
+msgstr "Indicateur de vitesse :"
 
 #: xrc/DisplayConfig.xrc:223
 msgid "Percentage"
@@ -2393,11 +2393,11 @@ msgstr "Affichage sur l'écran"
 
 #: xrc/DisplayConfig.xrc:248
 msgid "Default magnification:"
-msgstr ""
+msgstr "Zoom par défaut :"
 
 #: xrc/DisplayConfig.xrc:267
 msgid "Maximum magnification factor:"
-msgstr ""
+msgstr "Zoom maximum :"
 
 #: xrc/DisplayConfig.xrc:268
 msgid "0 = no maximum"
@@ -2417,7 +2417,7 @@ msgstr "Titre :"
 
 #: xrc/ExportSPS.xrc:22
 msgid "Description:"
-msgstr "Déscription :"
+msgstr "Description :"
 
 #: xrc/ExportSPS.xrc:34
 msgid "Notes:"
@@ -2437,7 +2437,7 @@ msgstr "Titre Interne :"
 
 #: xrc/GBAROMInfo.xrc:35
 msgid "Scene Release:"
-msgstr "Scene Release:"
+msgstr "Scene Release :"
 
 #: xrc/GBAROMInfo.xrc:47
 msgid "Release Number:"
@@ -2473,7 +2473,7 @@ msgstr "Information sur la ROM"
 
 #: xrc/GBColorPrefPanel.xrc:9
 msgid "Custom"
-msgstr ""
+msgstr "Personnalisé"
 
 #: xrc/GBColorPrefPanel.xrc:10 xrc/JoyPanel.xrc:247
 msgid "Standard"
@@ -2505,11 +2505,11 @@ msgstr "Couleurs Bizarres"
 
 #: xrc/GBColorPrefPanel.xrc:17
 msgid "Real Game Boy Colors"
-msgstr ""
+msgstr "Vraies couleurs de la Game Boy"
 
 #: xrc/GBColorPrefPanel.xrc:18
 msgid "Real 'Game Boy on Game Boy Advance Special' Colors"
-msgstr ""
+msgstr "Vraies couleurs de la \"Game Boy sur Game Boy Advance Special\""
 
 #: xrc/GBColorPrefPanel.xrc:46 xrc/GBPaletteViewer.xrc:17 xrc/MapViewer.xrc:54
 #: xrc/PaletteViewer.xrc:19
@@ -2662,11 +2662,11 @@ msgstr "Type de cartouche :"
 
 #: xrc/GBROMInfo.xrc:60
 msgid "SGB code:"
-msgstr ""
+msgstr "Code SGB :"
 
 #: xrc/GBROMInfo.xrc:72
 msgid "CGB code:"
-msgstr ""
+msgstr "Code CGB :"
 
 #: xrc/GBROMInfo.xrc:84
 msgid "ROM size:"
@@ -2678,7 +2678,7 @@ msgstr "Taille RAM :"
 
 #: xrc/GBROMInfo.xrc:108
 msgid "Dest. code:"
-msgstr "Code de dést. :"
+msgstr "Code de dest. :"
 
 #: xrc/GBROMInfo.xrc:120
 msgid "License code:"
@@ -2686,11 +2686,11 @@ msgstr "Code licence :"
 
 #: xrc/GBROMInfo.xrc:144
 msgid "Header checksum:"
-msgstr ""
+msgstr "Parité du header :"
 
 #: xrc/GBROMInfo.xrc:156
 msgid "Cartridge checksum:"
-msgstr ""
+msgstr "Parité de la cartouche :"
 
 #: xrc/GBTileViewer.xrc:23
 msgid "VRAM Bank"
@@ -2702,7 +2702,7 @@ msgstr "Paramètres Game Boy Advance"
 
 #: xrc/GameBoyAdvanceConfig.xrc:21
 msgid "Save type:"
-msgstr ""
+msgstr "Type de sauvegarde :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
 #: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
@@ -2723,15 +2723,15 @@ msgstr "EEPROM + Détecteur"
 
 #: xrc/GameBoyAdvanceConfig.xrc:43
 msgid "Flash size:"
-msgstr ""
+msgstr "Taille Flash  :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
 msgid "64 K"
-msgstr ""
+msgstr "64 K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:50 xrc/GameBoyAdvanceConfig.xrc:222
 msgid "128 K"
-msgstr ""
+msgstr "128 K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:64
 msgid "Detect Now"
@@ -2747,11 +2747,11 @@ msgstr "Type de sauvegarde"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file:"
-msgstr ""
+msgstr "Fichier Bios :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file:"
-msgstr ""
+msgstr "Fichier BIOS actuel :"
 
 #: xrc/GameBoyAdvanceConfig.xrc:136 xrc/GameBoyConfig.xrc:168
 msgid "Boot ROM"
@@ -2801,19 +2801,19 @@ msgstr "&Défauts"
 
 #: xrc/GameBoyAdvanceConfig.xrc:261
 msgid "Game Overrides"
-msgstr "Passer outre le jeu"
+msgstr "Dérogations pour ce jeu"
 
 #: xrc/GameBoyConfig.xrc:4
 msgid "Game Boy settings"
-msgstr ""
+msgstr "Paramètres Game Boy"
 
 #: xrc/GameBoyConfig.xrc:20
 msgid "Emulated &system:"
-msgstr ""
+msgstr "&Système émulé :"
 
 #: xrc/GameBoyConfig.xrc:48
 msgid "Display &borders:"
-msgstr ""
+msgstr "Afficher les &bordures :"
 
 #: xrc/GameBoyConfig.xrc:57
 msgid "Never"
@@ -2829,23 +2829,23 @@ msgstr "Système"
 
 #: xrc/GameBoyConfig.xrc:84
 msgid "Game Boy Boot &ROM file:"
-msgstr ""
+msgstr "Fichier &ROM de démarrage Game Boy : "
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
-msgstr ""
+msgstr "Sélectionner un fichier"
 
 #: xrc/GameBoyConfig.xrc:106
 msgid "Game Boy Color Boot ROM &file:"
-msgstr ""
+msgstr "&Fichier ROM de démarrage Game Boy Color : "
 
 #: xrc/GameBoyConfig.xrc:131
 msgid "Current Game Boy BIOS file:"
-msgstr ""
+msgstr "Fichier BIOS Game Boy actuel :"
 
 #: xrc/GameBoyConfig.xrc:152
 msgid "Current Game Boy Color BIOS file:"
-msgstr ""
+msgstr "Fichier BIOS Game Boy Color actuel :"
 
 #: xrc/GameBoyConfig.xrc:186
 msgid "User 1"
@@ -2873,7 +2873,7 @@ msgstr "Format de la capture d'écran :"
 
 #: xrc/GeneralConfig.xrc:57
 msgid "&Rewind interval:"
-msgstr ""
+msgstr "Intervalle de &rembobinage :"
 
 #: xrc/GeneralConfig.xrc:58
 msgid "If not empty or 0, enable rewind (seconds)"
@@ -2881,7 +2881,7 @@ msgstr "Si pas vide ou à 0, activer le rembobinage (secondes)"
 
 #: xrc/GeneralConfig.xrc:67
 msgid "Seconds (0-600); 0 = disable"
-msgstr ""
+msgstr "secondes (0-600); 0 = désactiver"
 
 #: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
@@ -2889,7 +2889,7 @@ msgstr "&Accélérer"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "Percent of normal:"
-msgstr ""
+msgstr "% de la normale :"
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
@@ -2901,14 +2901,14 @@ msgstr "Illimité"
 
 #: xrc/IOViewer.xrc:4
 msgid "IO Viewer"
-msgstr "Visualiseur ES"
+msgstr "Visualiseur IO"
 
 #: xrc/JoyPanel.xrc:8
 msgid ""
 "Click a field and press a key or move joystick to add. Press backspace to "
 "delete last added key. Resize window or click inside and move pointer to see"
 " entire contents if too small."
-msgstr ""
+msgstr "Cliquer sur un champ et presser une touche ou bouger l'analogique pour ajouter. Presser la touche « retour arrière » pour effacer la dernière touche ajoutée. Redimensionner la fenêtre ou cliquer à l'intérieur et bouger le pointeur pour voir les contenus en entier si trop petit."
 
 #: xrc/JoyPanel.xrc:276
 msgid "Autofire A"
@@ -2920,11 +2920,11 @@ msgstr "Tir automatique B"
 
 #: xrc/JoyPanel.xrc:342
 msgid "Motion Left / Dark"
-msgstr ""
+msgstr "Mouvement Gauche / Assombrir"
 
 #: xrc/JoyPanel.xrc:386
 msgid "Motion Right / Light"
-msgstr ""
+msgstr "Mouvement Droite / Éclaircir"
 
 #: xrc/JoyPanel.xrc:408
 msgid "Speed Up"
@@ -2964,7 +2964,7 @@ msgstr "Configuration de la manette"
 
 #: xrc/JoypadConfig.xrc:10
 msgid "SDL GameController Mode"
-msgstr ""
+msgstr "Mode GameController SDL"
 
 #: xrc/JoypadConfig.xrc:19
 msgid "Player 1"
@@ -3028,11 +3028,11 @@ msgstr "Ouvrir..."
 
 #: xrc/MainMenu.xrc:10
 msgid "Open &Game Boy..."
-msgstr ""
+msgstr "Ouvrir &Game Boy"
 
 #: xrc/MainMenu.xrc:13
 msgid "Open Game Boy &Color..."
-msgstr ""
+msgstr "Ouvrir Game Boy &Color"
 
 #: xrc/MainMenu.xrc:16
 msgid "Open rece&nt"
@@ -3060,15 +3060,15 @@ msgstr "&Redémarrer le Chargement du Code Dot"
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
-msgstr "&Charger un code Dot..."
+msgstr "&Charger un Dot Code..."
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr "&Redémarrer la Sauvegarde du Code Dot"
+msgstr "&Réinitialiser la sauvegarde du Dot Code"
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
-msgstr "&Sauvegarder un code Dot..."
+msgstr "&Sauvegarder un Dot Code..."
 
 #: xrc/MainMenu.xrc:47
 msgid "Most &recent"
@@ -3084,7 +3084,7 @@ msgstr "Charger &automatiquement le plus récent"
 
 #: xrc/MainMenu.xrc:89
 msgid "From &File..."
-msgstr ""
+msgstr "Depuis le &fichier..."
 
 #: xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
@@ -3148,19 +3148,19 @@ msgstr "1&0"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File..."
-msgstr ""
+msgstr "Vers le &fichier..."
 
 #: xrc/MainMenu.xrc:147
 msgid "&Save state"
-msgstr "&Sauvegarder un état"
+msgstr "Effectuer une &sauvegarde instantanée"
 
 #: xrc/MainMenu.xrc:150
 msgid "Increase state slot number"
-msgstr "Augmenter le nombre d'emplacement d'état"
+msgstr "Utiliser l'emplacement de sauvegarde instantanée suivant"
 
 #: xrc/MainMenu.xrc:153
 msgid "Decrease state slot number"
-msgstr "Diminuer le nombre d'emplacement d'état"
+msgstr "Utiliser l'emplacement de sauvegarde instantanée précédent"
 
 #: xrc/MainMenu.xrc:158 xrc/MainMenu.xrc:170
 msgid "&Battery file..."
@@ -3168,11 +3168,11 @@ msgstr "Fichier &batterie..."
 
 #: xrc/MainMenu.xrc:161
 msgid "Game Shark &code file..."
-msgstr ""
+msgstr "Fichier &code Game Shark..."
 
 #: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
 msgid "&Game Shark snapshot..."
-msgstr ""
+msgstr "Fichier de sauvegarde instantanée &Game Shark"
 
 #: xrc/MainMenu.xrc:166
 msgid "&Import"
@@ -3204,11 +3204,11 @@ msgstr "Arrêter l'enregistrement v&idéo"
 
 #: xrc/MainMenu.xrc:195
 msgid "Start &game recording..."
-msgstr "Démarrer l'enregistrement du &jeu..."
+msgstr "Démarrer l'enre&gistrement de la rediffusion..."
 
 #: xrc/MainMenu.xrc:198
 msgid "Stop g&ame recording"
-msgstr "Arrêter l'enregistrement du j&eu"
+msgstr "&Arrêter l'enregistrement de la rediffusion"
 
 #: xrc/MainMenu.xrc:200
 msgid "&Record"
@@ -3216,11 +3216,11 @@ msgstr "&Enregistrer"
 
 #: xrc/MainMenu.xrc:204
 msgid "Start playing &movie..."
-msgstr "Démarrer la lecture du &film..."
+msgstr "Démarrer la lecture de la &rediffusion..."
 
 #: xrc/MainMenu.xrc:207
 msgid "Stop playing m&ovie"
-msgstr "Arrêter la lecture du f&ilm"
+msgstr "Arrêter la lecture de la r&ediffusion"
 
 #: xrc/MainMenu.xrc:209
 msgid "&Play"
@@ -3268,7 +3268,7 @@ msgstr "Pa&sser le BIOS"
 
 #: xrc/MainMenu.xrc:255
 msgid "&Auto IPS / UPS / IPF patch"
-msgstr ""
+msgstr "Patch IPS/UPS/IPF &automatique"
 
 #: xrc/MainMenu.xrc:259
 msgid "&Pause when inactive"
@@ -3288,7 +3288,7 @@ msgstr "&Link"
 
 #: xrc/MainMenu.xrc:272
 msgid "Start &Network Link..."
-msgstr ""
+msgstr "Démarrer le Link en &réseau..."
 
 #: xrc/MainMenu.xrc:277
 msgid "&Nothing"
@@ -3317,7 +3317,7 @@ msgstr "Hack pour la vite&sse"
 #: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:383
 #: xrc/MainMenu.xrc:417
 msgid "&Configure..."
-msgstr ""
+msgstr "&Configurer..."
 
 #: xrc/MainMenu.xrc:314
 msgid "&Video"
@@ -3401,31 +3401,31 @@ msgstr "&Changer le Son"
 
 #: xrc/MainMenu.xrc:397
 msgid "&Game Boy Advance sound interpolation"
-msgstr ""
+msgstr "Interpolation du son de la &Game Boy Advance"
 
 #: xrc/MainMenu.xrc:402
 msgid "&Game Boy sound enhancement"
-msgstr ""
+msgstr "Amélioration du son de la &Game Boy"
 
 #: xrc/MainMenu.xrc:406
 msgid "&Game Boy surround sound effect"
-msgstr ""
+msgstr "Effet de son surround pour la &Game Boy"
 
 #: xrc/MainMenu.xrc:410
 msgid "&Game Boy sound declicking"
-msgstr ""
+msgstr "Déclicage du son &Game Boy"
 
 #: xrc/MainMenu.xrc:415
 msgid "&Input"
-msgstr "&Contrôleur"
+msgstr "&Entrée"
 
 #: xrc/MainMenu.xrc:420
 msgid "Allow &keyboard background input"
-msgstr ""
+msgstr "Lire le &clavier en arrière-plan"
 
 #: xrc/MainMenu.xrc:424
 msgid "Allow &joystick background input"
-msgstr ""
+msgstr "Lire les &manettes en arrière-plan"
 
 #: xrc/MainMenu.xrc:429
 msgid "&Autofire"
@@ -3453,7 +3453,7 @@ msgstr "&R"
 
 #: xrc/MainMenu.xrc:494 xrc/MainMenu.xrc:517
 msgid "Configure..."
-msgstr ""
+msgstr "Configurer..."
 
 #: xrc/MainMenu.xrc:498
 msgid "&Real-time clock"
@@ -3473,15 +3473,15 @@ msgstr "Filtre &LCD"
 
 #: xrc/MainMenu.xrc:521
 msgid "&Game Boy color option"
-msgstr ""
+msgstr "Option Couleur de la &Game Boy"
 
 #: xrc/MainMenu.xrc:529
 msgid "&Game Boy Colorizer Hack (requires restart)"
-msgstr ""
+msgstr "Hack de colorisation &Game Boy (redémarrage requis)"
 
 #: xrc/MainMenu.xrc:533
 msgid "&Game Boy printer"
-msgstr ""
+msgstr "&Game Boy printer"
 
 #: xrc/MainMenu.xrc:537
 msgid "&Gather a full page before printing"
@@ -3493,43 +3493,43 @@ msgstr "&Sauvegarder les sorties d'impression en tant que captures d'écrans"
 
 #: xrc/MainMenu.xrc:546
 msgid "&Use Game Boy BIOS file (requires restart)"
-msgstr ""
+msgstr "&Utiliser le fichier BIOS Game Boy (redémarrage requis)"
 
 #: xrc/MainMenu.xrc:550
 msgid "&Use Game Boy Color BIOS file"
-msgstr ""
+msgstr "&Utiliser le fichier BIOS Game Boy Color"
 
 #: xrc/MainMenu.xrc:555
 msgid "&General..."
-msgstr ""
+msgstr "&Général..."
 
 #: xrc/MainMenu.xrc:558
 msgid "&Speedup / Turbo..."
-msgstr ""
+msgstr "&Accélérer / Turbo..."
 
 #: xrc/MainMenu.xrc:561
 msgid "D&irectories..."
-msgstr ""
+msgstr "Réperto&ires..."
 
 #: xrc/MainMenu.xrc:564
 msgid "&Key Shortcuts..."
-msgstr ""
+msgstr "Raccourcis &clavier..."
 
 #: xrc/MainMenu.xrc:567
 msgid "UI Settings"
-msgstr ""
+msgstr "Paramétrages de l'&Interface"
 
 #: xrc/MainMenu.xrc:569
 msgid "Enable &Status bar"
-msgstr ""
+msgstr "Activer la &barre d'état"
 
 #: xrc/MainMenu.xrc:573
 msgid "Hide &Menu Bar"
-msgstr ""
+msgstr "Cacher la Barre de &Menu"
 
 #: xrc/MainMenu.xrc:577
 msgid "Suspend &Screen Saver"
-msgstr ""
+msgstr "Arrêter l'économi&seur d'écran"
 
 #: xrc/MainMenu.xrc:583
 msgid "&Tools"
@@ -3541,15 +3541,15 @@ msgstr "&Codes de triche"
 
 #: xrc/MainMenu.xrc:587
 msgid "List &cheats..."
-msgstr ""
+msgstr "Liste de &codes de triche..."
 
 #: xrc/MainMenu.xrc:590
 msgid "Find c&heat..."
-msgstr ""
+msgstr "Trouver un c&ode de triche..."
 
 #: xrc/MainMenu.xrc:594
 msgid "A&utomatically save / load cheats"
-msgstr ""
+msgstr "Sauvegarder / charger a&utomatiquement les codes de triche"
 
 #: xrc/MainMenu.xrc:598
 msgid "&Enable cheats"
@@ -3581,7 +3581,7 @@ msgstr "&Journalisation..."
 
 #: xrc/MainMenu.xrc:628
 msgid "&IO Viewer..."
-msgstr "Visualiseur &ES..."
+msgstr "Visualiseur &IO..."
 
 #: xrc/MainMenu.xrc:631
 msgid "&Map Viewer..."
@@ -3601,7 +3601,7 @@ msgstr "Visualiseur de &palette..."
 
 #: xrc/MainMenu.xrc:643
 msgid "&Tile Viewer..."
-msgstr "Visualiseur de &tuile..."
+msgstr "Visualiseur de &Tile..."
 
 #: xrc/MainMenu.xrc:648
 msgid "Show all video layers"
@@ -3649,7 +3649,7 @@ msgstr "Rapporter des &bogues"
 
 #: xrc/MainMenu.xrc:733
 msgid "Visual Boy Advance-M Support &Forum"
-msgstr ""
+msgstr "Forum & Support Visual Boy Advance-M"
 
 #: xrc/MainMenu.xrc:736
 msgid "Translations"
@@ -3737,7 +3737,7 @@ msgstr "Démarrer le Link en réseau"
 
 #: xrc/NetLink.xrc:13
 msgid "WARNING: Link will likely not work over the internet or LAN."
-msgstr ""
+msgstr "ATTENTION : Le Link ne marchera probablement pas via LAN ou internet."
 
 #: xrc/NetLink.xrc:38
 msgid "Server"
@@ -3753,7 +3753,7 @@ msgstr "Joueurs :"
 
 #: xrc/NetLink.xrc:83
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: xrc/NetLink.xrc:107
 msgid "Server:"
@@ -3785,7 +3785,7 @@ msgstr "Paramètres du son"
 
 #: xrc/SoundConfig.xrc:18
 msgid "Volume:"
-msgstr ""
+msgstr "Volume :"
 
 #: xrc/SoundConfig.xrc:36
 msgid "Mute"
@@ -3797,7 +3797,7 @@ msgstr "Maximum"
 
 #: xrc/SoundConfig.xrc:73
 msgid "Sample rate:"
-msgstr ""
+msgstr "Echantillonage :"
 
 #: xrc/SoundConfig.xrc:79
 msgid "48 KHz"
@@ -3817,7 +3817,7 @@ msgstr "11 KHz"
 
 #: xrc/SoundConfig.xrc:112
 msgid "Direct Sound"
-msgstr ""
+msgstr "Direct Sound"
 
 #: xrc/SoundConfig.xrc:140
 msgid "Device"
@@ -3857,7 +3857,7 @@ msgstr "Centre"
 
 #: xrc/SoundConfig.xrc:263
 msgid "Left / Right"
-msgstr ""
+msgstr "Gauche / Droite"
 
 #: xrc/SoundConfig.xrc:292
 msgid "Sound filtering"
