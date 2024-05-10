@@ -1,0 +1,33 @@
+name: Libretro Devkitpro
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        target_name: [ngc, wii, wiiu, switch]
+        build_type: [release, debug]
+        include:
+          - libretro_build: 'DEBUG=0'
+            build_type: release
+          - libretro_build: 'DEBUG=1'
+            build_type: debug
+          - devkit_container: 'devkitpro/devkitppc:latest'
+            target_name: ngc
+          - devkit_container: 'devkitpro/devkitppc:latest'
+            target_name: wii
+          - devkit_container: 'devkitpro/devkitppc:latest'
+            target_name: wiiu
+          - devkit_container: 'devkitpro/devkita64:latest'
+            target_name: switch
+    runs-on: ubuntu-latest
+    container: ${{ matrix.devkit_container }}
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with: 
+          submodules: recursive
+
+      # Libretro build
+      - name: Build libretro core
+        run: make -C src/libretro ${{ matrix.libretro_build }} platform=${{ matrix.target_name }}

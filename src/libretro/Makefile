@@ -311,7 +311,7 @@ else ifeq ($(platform), wiiu)
 	CXX = $(DEVKITPPC)/bin/powerpc-eabi-g++$(EXE_EXT)
 	AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
 	ENDIANNESS_DEFINES += -DMSB_FIRST -DWORDS_BIGENDIAN=1
-	PLATFORM_DEFINES += -DGEKKO -DWIIU -DHW_RVL -mwup -mcpu=750 -meabi -mhard-float -D__ppc__
+	PLATFORM_DEFINES += -DGEKKO -DWIIU -DHW_WUP -mcpu=750 -meabi -mhard-float -D__ppc__
 	PLATFORM_DEFINES += -U__INT32_TYPE__ -U __UINT32_TYPE__ -D__INT32_TYPE__=int
 	STATIC_LINKING=1
 	TILED_RENDERING=1
@@ -322,17 +322,18 @@ else ifeq ($(platform), libnx)
 	TARGET := $(TARGET_NAME)_libretro_$(platform).a
 	DEFINES := -DSWITCH=1 -U__linux__ -U__linux -DRARCH_INTERNAL -DHAVE_THREADS=1
 	CFLAGS := $(DEFINES) -g -O3 \
-		      -fPIE -I$(LIBNX)/include/ -ffunction-sections -fdata-sections -ftls-model=local-exec -Wl,--allow-multiple-definition -specs=$(LIBNX)/switch.specs
+		-fPIE -I$(LIBNX)/include/ -ffunction-sections -fdata-sections -ftls-model=local-exec -Wl,--allow-multiple-definition -specs=$(LIBNX)/switch.specs
 	CFLAGS += $(INCDIRS)
 	CFLAGS += $(INCLUDE) -D__SWITCH__ -DHAVE_LIBNX
-	CXXFLAGS := $(ASFLAGS) $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
-	CFLAGS += -std=gnu11
+	CXXFLAGS := $(ASFLAGS) $(CFLAGS) -fno-rtti -fno-exceptions
 	STATIC_LINKING=1
 
-# Nintendo Switch (libtransistor)
+# Nintendo Switch (devkitpro)
 else ifeq ($(platform), switch)
 	TARGET := $(TARGET_NAME)_libretro_$(platform).a
-	include $(LIBTRANSISTOR_HOME)/libtransistor.mk
+	CC = $(DEVKITPRO)/devkitA64/bin/aarch64-none-elf-gcc$(EXE_EXT)
+	CXX = $(DEVKITPRO)/devkitA64/bin/aarch64-none-elf-g++$(EXE_EXT)
+	AR = $(DEVKITPRO)/devkitA64/bin/aarch64-none-elf-ar$(EXE_EXT)
 	STATIC_LINKING=1
 	TILED_RENDERING=1
 
