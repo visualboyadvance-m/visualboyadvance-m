@@ -1,11 +1,10 @@
 #include "wx/dialogs/base-dialog.h"
 
-#include <cassert>
-
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
 #include <wx/xrc/xmlres.h>
 
+#include "core/base/check.h"
 #include "wx/config/option-proxy.h"
 #include "wx/widgets/utils.h"
 
@@ -73,7 +72,7 @@ private:
 
 // static
 wxDialog* BaseDialog::LoadDialog(wxWindow* parent, const wxString& xrc_file) {
-    assert(parent);
+    VBAM_CHECK(parent);
     return new BaseDialog(parent, xrc_file);
 }
 
@@ -85,8 +84,7 @@ BaseDialog::BaseDialog(wxWindow* parent, const wxString& xrc_file)
     this->SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);
 #endif
 
-    [[maybe_unused]] const bool success = wxXmlResource::Get()->LoadDialog(this, parent, xrc_file);
-    assert(success);
+    VBAM_CHECK(wxXmlResource::Get()->LoadDialog(this, parent, xrc_file));
 
     // Bind the event handler.
     this->Bind(wxEVT_SHOW, &BaseDialog::OnBaseDialogShow, this);
@@ -96,7 +94,7 @@ BaseDialog::BaseDialog(wxWindow* parent, const wxString& xrc_file)
 
 wxWindow* BaseDialog::GetValidatedChild(const wxString& name) const {
     wxWindow* window = this->FindWindow(name);
-    assert(window);
+    VBAM_CHECK(window);
     return window;
 }
 

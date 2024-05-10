@@ -146,7 +146,7 @@ public:
     explicit RenderValidator(config::RenderMethod render_method)
         : OptionValidator(config::OptionID::kDispRenderMethod),
           render_method_(render_method) {
-        assert(render_method != config::RenderMethod::kLast);
+        VBAM_CHECK(render_method != config::RenderMethod::kLast);
     }
     ~RenderValidator() override = default;
 
@@ -189,7 +189,7 @@ private:
 
     bool WriteToWindow() override {
         wxChoice* plugin_selector = wxDynamicCast(GetWindow(), wxChoice);
-        assert(plugin_selector);
+        VBAM_CHECK(plugin_selector);
         const wxString selected_plugin = option()->GetString();
         for (size_t i = 0; i < plugin_selector->GetCount(); i++) {
             const wxString& plugin_data =
@@ -206,7 +206,7 @@ private:
 
     bool WriteToOption() override {
         wxChoice* plugin_selector = wxDynamicCast(GetWindow(), wxChoice);
-        assert(plugin_selector);
+        VBAM_CHECK(plugin_selector);
         const wxString& selected_window_plugin =
             dynamic_cast<wxStringClientData*>(
                 plugin_selector->GetClientObject(
@@ -220,7 +220,7 @@ private:
 
 // static
 DisplayConfig* DisplayConfig::NewInstance(wxWindow* parent) {
-    assert(parent);
+    VBAM_CHECK(parent);
     return new DisplayConfig(parent);
 }
 

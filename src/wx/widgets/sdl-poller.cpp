@@ -1,6 +1,5 @@
 #include "wx/widgets/sdl-poller.h"
 
-#include <cassert>
 #include <map>
 
 #include <wx/timer.h>
@@ -8,6 +7,7 @@
 
 #include <SDL.h>
 
+#include "core/base/check.h"
 #include "wx/config/option-id.h"
 #include "wx/config/option-observer.h"
 #include "wx/config/option-proxy.h"
@@ -38,7 +38,7 @@ config::JoyControl AxisStatusToJoyControl(const JoyAxisStatus& status) {
         case JoyAxisStatus::Neutral:
         default:
             // This should never happen.
-            assert(false);
+            VBAM_NOTREACHED();
             return config::JoyControl::AxisPlus;
     }
 }
@@ -55,7 +55,7 @@ config::JoyControl HatStatusToJoyControl(const uint8_t status) {
             return config::JoyControl::HatEast;
         default:
             // This should never happen.
-            assert(false);
+            VBAM_NOTREACHED();
             return config::JoyControl::HatNorth;
     }
 }
@@ -306,7 +306,7 @@ SdlPoller::SdlPoller(EventHandlerProvider* const handler_provider)
       game_controller_enabled_observer_(
           config::OptionID::kSDLGameControllerMode,
           [this](config::Option* option) { ReconnectControllers(option->GetBool()); }) {
-    assert(handler_provider);
+    VBAM_CHECK(handler_provider);
 
     wxTimer::Start(50);
     SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS);

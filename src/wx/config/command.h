@@ -2,13 +2,14 @@
 #define VBAM_WX_CONFIG_COMMAND_H_
 
 #include <array>
-#include <cassert>
 #include <functional>
 
 #include <optional.hpp>
 #include <variant.hpp>
 
 #include <wx/string.h>
+
+#include "core/base/check.h"
 
 namespace config {
 
@@ -56,7 +57,7 @@ static constexpr size_t kNbJoypads = 4;
 // Represents an emulated joypad. The internal index is zero-based.
 class GameJoy {
 public:
-    constexpr explicit GameJoy(size_t index) : index_(index) { assert(index < kNbJoypads); }
+    constexpr explicit GameJoy(size_t index) : index_(index) { VBAM_CHECK(index < kNbJoypads); }
 
     // The underlying zero-based index for this emulated joypad.
     constexpr size_t index() const { return index_; }
@@ -179,12 +180,12 @@ public:
     bool is_shortcut() const { return tag() == Tag::kShortcut; }
 
     const GameCommand& game() const {
-        assert(is_game());
+        VBAM_CHECK(is_game());
         return nonstd::get<GameCommand>(control_);
     }
 
     const ShortcutCommand& shortcut() const {
-        assert(is_shortcut());
+        VBAM_CHECK(is_shortcut());
         return nonstd::get<ShortcutCommand>(control_);
     }
 
@@ -201,8 +202,7 @@ public:
                     return shortcut() < other.shortcut();
             }
 
-            // Unreachable.
-            assert(false);
+            VBAM_NOTREACHED();
             return false;
         } else {
             return tag_ < other.tag_;
@@ -260,8 +260,7 @@ struct std::hash<config::Command> {
                 return std::hash<config::ShortcutCommand>{}(control.shortcut());
         }
 
-        // Unreachable.
-        assert(false);
+        VBAM_NOTREACHED();
         return 0;
     }
 };

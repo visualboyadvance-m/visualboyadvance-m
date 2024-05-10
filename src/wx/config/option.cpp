@@ -11,6 +11,7 @@
 #include "wx/config/internal/option-internal.h"
 #undef VBAM_OPTION_INTERNAL_INCLUDE
 
+#include "core/base/check.h"
 #include "wx/config/option-proxy.h"
 
 namespace config {
@@ -26,14 +27,14 @@ Option* Option::ByName(const wxString& config_name) {
 
 // static
 Option* Option::ByID(OptionID id) {
-    assert(id != OptionID::Last);
+    VBAM_CHECK(id != OptionID::Last);
     return &All()[static_cast<size_t>(id)];
 }
 
 Option::~Option() = default;
 
 Option::Observer::Observer(OptionID option_id) : option_(Option::ByID(option_id)) {
-    assert(option_);
+    VBAM_CHECK(option_);
     option_->AddObserver(this);
 }
 Option::Observer::~Observer() {
@@ -49,8 +50,8 @@ Option::Option(OptionID id)
       value_(),
       min_(),
       max_() {
-    assert(id != OptionID::Last);
-    assert(is_none());
+    VBAM_CHECK(id != OptionID::Last);
+    VBAM_CHECK(is_none());
 }
 
 Option::Option(OptionID id, bool* option)
@@ -62,8 +63,8 @@ Option::Option(OptionID id, bool* option)
       value_(option),
       min_(),
       max_() {
-    assert(id != OptionID::Last);
-    assert(is_bool());
+    VBAM_CHECK(id != OptionID::Last);
+    VBAM_CHECK(is_bool());
 }
 
 Option::Option(OptionID id, double* option, double min, double max)
@@ -75,8 +76,8 @@ Option::Option(OptionID id, double* option, double min, double max)
       value_(option),
       min_(min),
       max_(max) {
-    assert(id != OptionID::Last);
-    assert(is_double());
+    VBAM_CHECK(id != OptionID::Last);
+    VBAM_CHECK(is_double());
 
     // Validate the initial value.
     SetDouble(*option);
@@ -91,8 +92,8 @@ Option::Option(OptionID id, int32_t* option, int32_t min, int32_t max)
       value_(option),
       min_(min),
       max_(max) {
-    assert(id != OptionID::Last);
-    assert(is_int());
+    VBAM_CHECK(id != OptionID::Last);
+    VBAM_CHECK(is_int());
 
     // Validate the initial value.
     SetInt(*option);
@@ -107,8 +108,8 @@ Option::Option(OptionID id, uint32_t* option, uint32_t min, uint32_t max)
       value_(option),
       min_(min),
       max_(max) {
-    assert(id != OptionID::Last);
-    assert(is_unsigned());
+    VBAM_CHECK(id != OptionID::Last);
+    VBAM_CHECK(is_unsigned());
 
     // Validate the initial value.
     SetUnsigned(*option);
@@ -123,8 +124,8 @@ Option::Option(OptionID id, wxString* option)
       value_(option),
       min_(),
       max_() {
-    assert(id != OptionID::Last);
-    assert(is_string());
+    VBAM_CHECK(id != OptionID::Last);
+    VBAM_CHECK(is_string());
 }
 
 Option::Option(OptionID id, Filter* option)
@@ -136,8 +137,8 @@ Option::Option(OptionID id, Filter* option)
       value_(option),
       min_(),
       max_(nonstd::in_place_type<size_t>, internal::MaxForType(type_)) {
-    assert(id != OptionID::Last);
-    assert(is_filter());
+    VBAM_CHECK(id != OptionID::Last);
+    VBAM_CHECK(is_filter());
 }
 
 Option::Option(OptionID id, Interframe* option)
@@ -149,8 +150,8 @@ Option::Option(OptionID id, Interframe* option)
       value_(option),
       min_(),
       max_(nonstd::in_place_type<size_t>, internal::MaxForType(type_)) {
-    assert(id != OptionID::Last);
-    assert(is_interframe());
+    VBAM_CHECK(id != OptionID::Last);
+    VBAM_CHECK(is_interframe());
 }
 
 Option::Option(OptionID id, RenderMethod* option)
@@ -162,8 +163,8 @@ Option::Option(OptionID id, RenderMethod* option)
       value_(option),
       min_(),
       max_(nonstd::in_place_type<size_t>, internal::MaxForType(type_)) {
-    assert(id != OptionID::Last);
-    assert(is_render_method());
+    VBAM_CHECK(id != OptionID::Last);
+    VBAM_CHECK(is_render_method());
 }
 
 Option::Option(OptionID id, AudioApi* option)
@@ -175,8 +176,8 @@ Option::Option(OptionID id, AudioApi* option)
       value_(option),
       min_(),
       max_(nonstd::in_place_type<size_t>, internal::MaxForType(type_)) {
-    assert(id != OptionID::Last);
-    assert(is_audio_api());
+    VBAM_CHECK(id != OptionID::Last);
+    VBAM_CHECK(is_audio_api());
 }
 
 Option::Option(OptionID id, AudioRate* option)
@@ -188,8 +189,8 @@ Option::Option(OptionID id, AudioRate* option)
       value_(option),
       min_(),
       max_(nonstd::in_place_type<size_t>, internal::MaxForType(type_)) {
-    assert(id != OptionID::Last);
-    assert(is_audio_rate());
+    VBAM_CHECK(id != OptionID::Last);
+    VBAM_CHECK(is_audio_rate());
 }
 
 Option::Option(OptionID id, uint16_t* option)
@@ -201,57 +202,57 @@ Option::Option(OptionID id, uint16_t* option)
       value_(option),
       min_(),
       max_() {
-    assert(id != OptionID::Last);
-    assert(is_gb_palette());
+    VBAM_CHECK(id != OptionID::Last);
+    VBAM_CHECK(is_gb_palette());
 }
 
 bool Option::GetBool() const {
-    assert(is_bool());
+    VBAM_CHECK(is_bool());
     return *(nonstd::get<bool*>(value_));
 }
 
 double Option::GetDouble() const {
-    assert(is_double());
+    VBAM_CHECK(is_double());
     return *(nonstd::get<double*>(value_));
 }
 
 int32_t Option::GetInt() const {
-    assert(is_int());
+    VBAM_CHECK(is_int());
     return *(nonstd::get<int32_t*>(value_));
 }
 
 uint32_t Option::GetUnsigned() const {
-    assert(is_unsigned());
+    VBAM_CHECK(is_unsigned());
     return *(nonstd::get<uint32_t*>(value_));
 }
 
 const wxString& Option::GetString() const {
-    assert(is_string());
+    VBAM_CHECK(is_string());
     return *(nonstd::get<wxString*>(value_));
 }
 
 Filter Option::GetFilter() const {
-    assert(is_filter());
+    VBAM_CHECK(is_filter());
     return *(nonstd::get<Filter*>(value_));
 }
 
 Interframe Option::GetInterframe() const {
-    assert(is_interframe());
+    VBAM_CHECK(is_interframe());
     return *(nonstd::get<Interframe*>(value_));
 }
 
 RenderMethod Option::GetRenderMethod() const {
-    assert(is_render_method());
+    VBAM_CHECK(is_render_method());
     return *(nonstd::get<RenderMethod*>(value_));
 }
 
 AudioApi Option::GetAudioApi() const {
-    assert(is_audio_api());
+    VBAM_CHECK(is_audio_api());
     return *(nonstd::get<AudioApi*>(value_));
 }
 
 AudioRate Option::GetAudioRate() const {
-    assert(is_audio_rate());
+    VBAM_CHECK(is_audio_rate());
     return *(nonstd::get<AudioRate*>(value_));
 }
 
@@ -277,15 +278,15 @@ wxString Option::GetEnumString() const {
         case Option::Type::kUnsigned:
         case Option::Type::kString:
         case Option::Type::kGbPalette:
-            assert(false);
+            VBAM_CHECK(false);
             return wxEmptyString;
     }
-    assert(false);
+    VBAM_NOTREACHED();
     return wxEmptyString;
 }
 
 std::array<uint16_t, 8> Option::GetGbPalette() const {
-    assert(is_gb_palette());
+    VBAM_CHECK(is_gb_palette());
 
     const uint16_t* raw_palette = (nonstd::get<uint16_t*>(value_));
     std::array<uint16_t, 8> palette;
@@ -294,7 +295,7 @@ std::array<uint16_t, 8> Option::GetGbPalette() const {
 }
 
 wxString Option::GetGbPaletteString() const {
-    assert(is_gb_palette());
+    VBAM_CHECK(is_gb_palette());
 
     wxString palette_string;
     uint16_t const* value = nonstd::get<uint16_t*>(value_);
@@ -304,7 +305,7 @@ wxString Option::GetGbPaletteString() const {
 }
 
 bool Option::SetBool(bool value) {
-    assert(is_bool());
+    VBAM_CHECK(is_bool());
     bool old_value = GetBool();
     *nonstd::get<bool*>(value_) = value;
     if (old_value != value) {
@@ -314,7 +315,7 @@ bool Option::SetBool(bool value) {
 }
 
 bool Option::SetDouble(double value) {
-    assert(is_double());
+    VBAM_CHECK(is_double());
     double old_value = GetDouble();
     if (value < nonstd::get<double>(min_) || value > nonstd::get<double>(max_)) {
         wxLogWarning(_("Invalid value %f for option %s; valid values are %f - %f"), value,
@@ -329,7 +330,7 @@ bool Option::SetDouble(double value) {
 }
 
 bool Option::SetInt(int32_t value) {
-    assert(is_int());
+    VBAM_CHECK(is_int());
     int old_value = GetInt();
     if (value < nonstd::get<int32_t>(min_) || value > nonstd::get<int32_t>(max_)) {
         wxLogWarning(_("Invalid value %d for option %s; valid values are %d - %d"), value,
@@ -344,7 +345,7 @@ bool Option::SetInt(int32_t value) {
 }
 
 bool Option::SetUnsigned(uint32_t value) {
-    assert(is_unsigned());
+    VBAM_CHECK(is_unsigned());
     uint32_t old_value = GetUnsigned();
     if (value < nonstd::get<uint32_t>(min_) || value > nonstd::get<uint32_t>(max_)) {
         wxLogWarning(_("Invalid value %d for option %s; valid values are %d - %d"), value,
@@ -359,7 +360,7 @@ bool Option::SetUnsigned(uint32_t value) {
 }
 
 bool Option::SetString(const wxString& value) {
-    assert(is_string());
+    VBAM_CHECK(is_string());
     const wxString old_value = GetString();
     *nonstd::get<wxString*>(value_) = value;
     if (old_value != value) {
@@ -369,8 +370,8 @@ bool Option::SetString(const wxString& value) {
 }
 
 bool Option::SetFilter(const Filter& value) {
-    assert(is_filter());
-    assert(value < Filter::kLast);
+    VBAM_CHECK(is_filter());
+    VBAM_CHECK(value < Filter::kLast);
     const Filter old_value = GetFilter();
     *nonstd::get<Filter*>(value_) = value;
     if (old_value != value) {
@@ -380,8 +381,8 @@ bool Option::SetFilter(const Filter& value) {
 }
 
 bool Option::SetInterframe(const Interframe& value) {
-    assert(is_interframe());
-    assert(value < Interframe::kLast);
+    VBAM_CHECK(is_interframe());
+    VBAM_CHECK(value < Interframe::kLast);
     const Interframe old_value = GetInterframe();
     *nonstd::get<Interframe*>(value_) = value;
     if (old_value != value) {
@@ -391,8 +392,8 @@ bool Option::SetInterframe(const Interframe& value) {
 }
 
 bool Option::SetRenderMethod(const RenderMethod& value) {
-    assert(is_render_method());
-    assert(value < RenderMethod::kLast);
+    VBAM_CHECK(is_render_method());
+    VBAM_CHECK(value < RenderMethod::kLast);
     const RenderMethod old_value = GetRenderMethod();
     *nonstd::get<RenderMethod*>(value_) = value;
     if (old_value != value) {
@@ -402,8 +403,8 @@ bool Option::SetRenderMethod(const RenderMethod& value) {
 }
 
 bool Option::SetAudioApi(const AudioApi& value) {
-    assert(is_audio_api());
-    assert(value < AudioApi::kLast);
+    VBAM_CHECK(is_audio_api());
+    VBAM_CHECK(value < AudioApi::kLast);
     const AudioApi old_value = GetAudioApi();
     *nonstd::get<AudioApi*>(value_) = value;
     if (old_value != value) {
@@ -413,8 +414,8 @@ bool Option::SetAudioApi(const AudioApi& value) {
 }
 
 bool Option::SetAudioRate(const AudioRate& value) {
-    assert(is_audio_rate());
-    assert(value < AudioRate::kLast);
+    VBAM_CHECK(is_audio_rate());
+    VBAM_CHECK(value < AudioRate::kLast);
     const AudioRate old_value = GetAudioRate();
     *nonstd::get<AudioRate*>(value_) = value;
     if (old_value != value) {
@@ -445,15 +446,15 @@ bool Option::SetEnumString(const wxString& value) {
         case Option::Type::kUnsigned:
         case Option::Type::kString:
         case Option::Type::kGbPalette:
-            assert(false);
+            VBAM_CHECK(false);
             return false;
     }
-    assert(false);
+    VBAM_NOTREACHED();
     return false;
 }
 
 bool Option::SetGbPalette(const std::array<uint16_t, 8>& value) {
-    assert(is_gb_palette());
+    VBAM_CHECK(is_gb_palette());
 
     uint16_t* dest = nonstd::get<uint16_t*>(value_);
 
@@ -471,7 +472,7 @@ bool Option::SetGbPalette(const std::array<uint16_t, 8>& value) {
 }
 
 bool Option::SetGbPaletteString(const wxString& value) {
-    assert(is_gb_palette());
+    VBAM_CHECK(is_gb_palette());
 
     // 8 values of 4 chars and 7 commas.
     static constexpr size_t kPaletteStringSize = 8 * 4 + 7;
@@ -497,50 +498,50 @@ bool Option::SetGbPaletteString(const wxString& value) {
 }
 
 double Option::GetDoubleMin() const {
-    assert(is_double());
+    VBAM_CHECK(is_double());
     return nonstd::get<double>(min_);
 }
 
 double Option::GetDoubleMax() const {
-    assert(is_double());
+    VBAM_CHECK(is_double());
     return nonstd::get<double>(max_);
 }
 
 int32_t Option::GetIntMin() const {
-    assert(is_int());
+    VBAM_CHECK(is_int());
     return nonstd::get<int32_t>(min_);
 }
 
 int32_t Option::GetIntMax() const {
-    assert(is_int());
+    VBAM_CHECK(is_int());
     return nonstd::get<int32_t>(max_);
 }
 
 uint32_t Option::GetUnsignedMin() const {
-    assert(is_unsigned());
+    VBAM_CHECK(is_unsigned());
     return nonstd::get<uint32_t>(min_);
 }
 
 uint32_t Option::GetUnsignedMax() const {
-    assert(is_unsigned());
+    VBAM_CHECK(is_unsigned());
     return nonstd::get<uint32_t>(max_);
 }
 
 size_t Option::GetEnumMax() const {
-    assert(is_filter() || is_interframe() || is_render_method() || is_audio_api() ||
+    VBAM_CHECK(is_filter() || is_interframe() || is_render_method() || is_audio_api() ||
            is_audio_rate());
     return nonstd::get<size_t>(max_);
 }
 
 void Option::NextFilter() {
-    assert(is_filter());
+    VBAM_CHECK(is_filter());
     const int old_value = static_cast<int>(GetFilter());
     const int new_value = (old_value + 1) % kNbFilters;
     SetFilter(static_cast<Filter>(new_value));
 }
 
 void Option::NextInterframe() {
-    assert(is_interframe());
+    VBAM_CHECK(is_interframe());
     const int old_value = static_cast<int>(GetInterframe());
     const int new_value = (old_value + 1) % kNbInterframes;
     SetInterframe(static_cast<Interframe>(new_value));
@@ -588,19 +589,19 @@ wxString Option::ToHelperString() const {
 }
 
 void Option::AddObserver(Observer* observer) {
-    assert(observer);
+    VBAM_CHECK(observer);
     [[maybe_unused]] const auto pair = observers_.emplace(observer);
-    assert(pair.second);
+    VBAM_CHECK(pair.second);
 }
 
 void Option::RemoveObserver(Observer* observer) {
-    assert(observer);
+    VBAM_CHECK(observer);
     [[maybe_unused]] const size_t removed = observers_.erase(observer);
-    assert(removed == 1u);
+    VBAM_CHECK(removed == 1u);
 }
 
 void Option::CallObservers() {
-    assert(!calling_observers_);
+    VBAM_CHECK(!calling_observers_);
     calling_observers_ = true;
     for (const auto observer : observers_) {
         observer->OnValueChanged();

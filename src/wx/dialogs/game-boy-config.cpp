@@ -13,6 +13,7 @@
 
 #include <wx/xrc/xmlres.h>
 
+#include "core/base/check.h"
 #include "wx/config/option-observer.h"
 #include "wx/config/option-proxy.h"
 #include "wx/dialogs/base-dialog.h"
@@ -90,8 +91,8 @@ public:
     PaletteValidator(GBPalettePanelData* palette_data)
         : widgets::OptionValidator(palette_data->option_id_),
           palette_data_(palette_data) {
-        assert(option()->is_gb_palette());
-        assert(palette_data);
+        VBAM_CHECK(option()->is_gb_palette());
+        VBAM_CHECK(palette_data);
     }
     ~PaletteValidator() final = default;
 
@@ -122,8 +123,8 @@ class BIOSPickerValidator final : public widgets::OptionValidator {
 public:
     BIOSPickerValidator(config::OptionID option_id, wxStaticText* label)
         : widgets::OptionValidator(option_id), label_(label) {
-        assert(label_);
-        assert(option()->is_string());
+        VBAM_CHECK(label_);
+        VBAM_CHECK(option()->is_string());
     }
     ~BIOSPickerValidator() final = default;
 
@@ -143,7 +144,7 @@ private:
         } else {
             wxFilePickerCtrl* file_picker =
                 wxDynamicCast(GetWindow(), wxFilePickerCtrl);
-            assert(file_picker);
+            VBAM_CHECK(file_picker);
             file_picker->SetPath(selection);
             label_->SetLabel(selection);
         }
@@ -154,7 +155,7 @@ private:
     bool WriteToOption() final {
         const wxFilePickerCtrl* file_picker =
             wxDynamicCast(GetWindow(), wxFilePickerCtrl);
-        assert(file_picker);
+        VBAM_CHECK(file_picker);
         return option()->SetString(file_picker->GetPath());
     }
 
@@ -175,7 +176,7 @@ private:
 
     bool TransferFromWindow() final {
         const wxChoice* borders_selector = wxDynamicCast(GetWindow(), wxChoice);
-        assert(borders_selector);
+        VBAM_CHECK(borders_selector);
         switch (borders_selector->GetSelection()) {
             case 0:
                 OPTION(kPrefBorderOn) = false;
@@ -199,7 +200,7 @@ private:
 
     bool TransferToWindow() final {
         wxChoice* borders_selector = wxDynamicCast(GetWindow(), wxChoice);
-        assert(borders_selector);
+        VBAM_CHECK(borders_selector);
 
         if (!OPTION(kPrefBorderOn) && !OPTION(kPrefBorderAutomatic)) {
             borders_selector->SetSelection(0);
@@ -225,8 +226,8 @@ GBPalettePanelData::GBPalettePanelData(wxPanel* panel, size_t palette_id)
       default_selector_(widgets::GetValidatedChild<wxChoice>(panel, "DefaultPalette")),
       option_id_(static_cast<config::OptionID>(static_cast<size_t>(config::OptionID::kGBPalette0) +
                                                palette_id)) {
-    assert(panel);
-    assert(palette_id < kNbPalettes);
+    VBAM_CHECK(panel);
+    VBAM_CHECK(palette_id < kNbPalettes);
 
     default_selector_->Bind(
         wxEVT_CHOICE, &GBPalettePanelData::OnDefaultPaletteSelected, this);
@@ -274,7 +275,7 @@ void GBPalettePanelData::UpdateColourPickers() {
 
 void GBPalettePanelData::OnColourChanged(size_t colour_index,
                                          wxColourPickerEvent& event) {
-    assert(colour_index < palette_.size());
+    VBAM_CHECK(colour_index < palette_.size());
 
     // Update the colour value.
     const wxColour colour = event.GetColour();
@@ -313,7 +314,7 @@ void GBPalettePanelData::OnPaletteReset(wxCommandEvent& event) {
 
 // static
 GameBoyConfig* GameBoyConfig::NewInstance(wxWindow* parent) {
-    assert(parent);
+    VBAM_CHECK(parent);
     return new GameBoyConfig(parent);
 }
 

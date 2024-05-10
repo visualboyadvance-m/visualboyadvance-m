@@ -3,6 +3,7 @@
 #include <wx/control.h>
 #include <wx/xrc/xmlres.h>
 
+#include "core/base/check.h"
 #include "core/base/sizes.h"
 #include "core/gb/gb.h"
 #include "wx/dialogs/base-dialog.h"
@@ -92,11 +93,11 @@ wxString GetCartCGBFlag() {
             return wxString::Format(_("%02X (Supported)"), g_gbCartData.cgb_flag());
         case gbCartData::CGBSupport::kRequired:
             return wxString::Format(_("%02X (Required)"), g_gbCartData.cgb_flag());
-        default:
-            // Unreachable.
-            assert(false);
-            return "";
     }
+
+    VBAM_NOTREACHED();
+    return "";
+
 }
 
 // Returns a localized string indicating the ROM size of the loaded GB/GBC cartridge.
@@ -156,18 +157,17 @@ wxString GetCartDestinationCode() {
             return wxString::Format(_("%02X (World)"), g_gbCartData.destination_code_flag());
         case gbCartData::DestinationCode::kUnknown:
             return wxString::Format(_("%02X (Unknown)"), g_gbCartData.destination_code_flag());
-        default:
-            // Unreachable.
-            assert(false);
-            return "";
     }
+
+    VBAM_NOTREACHED();
+    return "";
 }
 
 }  // namespace
 
 // static
 GbRomInfo* GbRomInfo::NewInstance(wxWindow* parent) {
-    assert(parent);
+    VBAM_CHECK(parent);
     return new GbRomInfo(parent);
 }
 

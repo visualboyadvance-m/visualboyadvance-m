@@ -30,13 +30,12 @@ typedef ALCboolean(ALC_APIENTRY* LPALCISEXTENSIONPRESENT)(ALCdevice* device,
 typedef const ALCchar*(ALC_APIENTRY* LPALCGETSTRING)(ALCdevice* device, ALCenum param);
 #endif
 
-#include <cassert>
-
 #include <wx/arrstr.h>
 #include <wx/log.h>
 #include <wx/translation.h>
 #include <wx/utils.h>
 
+#include "core/base/check.h"
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaSound.h"
 #include "wx/config/option-proxy.h"
@@ -47,7 +46,7 @@ namespace internal {
 namespace {
 
 // Debug
-#define ASSERT_SUCCESS assert(AL_NO_ERROR == alGetError())
+#define ASSERT_SUCCESS VBAM_CHECK(AL_NO_ERROR == alGetError())
 
 #ifndef LOGALL
 // replace logging functions with comments
@@ -171,7 +170,7 @@ void OpenAL::debugState() {
 
 bool OpenAL::init(long sampleRate) {
     winlog("OpenAL::init\n");
-    assert(initialized == false);
+    VBAM_CHECK(initialized == false);
 
     const wxString& audio_device = OPTION(kSoundAudioDevice);
     if (!audio_device.empty()) {
@@ -191,9 +190,9 @@ bool OpenAL::init(long sampleRate) {
     }
 
     context = alcCreateContext(device, nullptr);
-    assert(context != nullptr);
+    VBAM_CHECK(context != nullptr);
     ALCboolean retVal = alcMakeContextCurrent(context);
-    assert(ALC_TRUE == retVal);
+    VBAM_CHECK(ALC_TRUE == retVal);
     alGenBuffers(OPTION(kSoundBuffers), buffer);
     ASSERT_SUCCESS;
     alGenSources(1, &source);
@@ -338,7 +337,7 @@ void OpenAL::write(uint16_t* finalWave, int length) {
                 return;
         }
 
-        assert(nBuffersProcessed > 0);
+        VBAM_CHECK(nBuffersProcessed > 0);
 
         // unqueue buffer
         tempBuffer = 0;

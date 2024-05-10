@@ -11,6 +11,7 @@
 #include <wx/msgdlg.h>
 
 #include "components/filters_interframe/interframe.h"
+#include "core/base/check.h"
 #include "core/base/version.h"
 #include "core/gb/gb.h"
 #include "core/gb/gbCheats.h"
@@ -32,7 +33,7 @@
 
 void MainFrame::GetMenuOptionBool(const wxString& menuName, bool* field)
 {
-    assert(field);
+    VBAM_CHECK(field);
     *field = !*field;
     int id = wxXmlResource::GetXRCID(menuName);
 
@@ -48,7 +49,7 @@ void MainFrame::GetMenuOptionBool(const wxString& menuName, bool* field)
 void MainFrame::GetMenuOptionConfig(const wxString& menu_name,
                                     const config::OptionID& option_id) {
     config::Option* option = config::Option::ByID(option_id);
-    assert(option);
+    VBAM_CHECK(option);
 
     int id = wxXmlResource::GetXRCID(menu_name);
     for (size_t i = 0; i < checkable_mi.size(); i++) {
@@ -64,7 +65,7 @@ void MainFrame::GetMenuOptionConfig(const wxString& menu_name,
                 option->SetInt(is_checked);
                 break;
             default:
-                assert(false);
+                VBAM_CHECK(false);
                 return;
         }
         break;
@@ -73,7 +74,7 @@ void MainFrame::GetMenuOptionConfig(const wxString& menu_name,
 
 void MainFrame::GetMenuOptionInt(const wxString& menuName, int* field, int mask)
 {
-    assert(field);
+    VBAM_CHECK(field);
     int value = mask;
     bool is_checked = ((*field) & (mask)) != (value);
     int id = wxXmlResource::GetXRCID(menuName);

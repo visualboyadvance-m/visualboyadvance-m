@@ -1,11 +1,11 @@
 #ifndef VBAM_WX_WIDGETS_CLIENT_DATA_H_
 #define VBAM_WX_WIDGETS_CLIENT_DATA_H_
 
-#include <cassert>
-
 #include <wx/clntdata.h>
 #include <wx/ctrlsub.h>
 #include <wx/window.h>
+
+#include "core/base/check.h"
 
 namespace widgets {
 
@@ -16,14 +16,14 @@ public:
     // Returns the data stored in the ClientData object.
     static const T& From(wxWindow* window) {
         wxClientData* data = window->GetClientObject();
-        assert(data);
+        VBAM_CHECK(data);
         return static_cast<ClientData<T>*>(data)->data();
     }
 
     // Returns the data stored in the ClientData object for a container.
     static const T& From(wxItemContainer* container, size_t index) {
         wxClientData* data = container->GetClientObject(index);
-        assert(data);
+        VBAM_CHECK(data);
         return static_cast<ClientData<T>*>(data)->data();
     }
 

@@ -2,6 +2,7 @@
 
 #include <wx/filepicker.h>
 
+#include "core/base/check.h"
 #include "wx/dialogs/base-dialog.h"
 #include "wx/widgets/option-validator.h"
 
@@ -14,7 +15,7 @@ class DirectoryStringValidator final : public widgets::OptionValidator {
 public:
     DirectoryStringValidator(config::OptionID option_id)
         : widgets::OptionValidator(option_id) {
-        assert(option()->is_string());
+        VBAM_CHECK(option()->is_string());
     }
     ~DirectoryStringValidator() final = default;
 
@@ -29,7 +30,7 @@ private:
     bool WriteToWindow() final {
         wxDirPickerCtrl* dir_picker =
             wxDynamicCast(GetWindow(), wxDirPickerCtrl);
-        assert(dir_picker);
+        VBAM_CHECK(dir_picker);
         dir_picker->SetPath(option()->GetString());
         return true;
     }
@@ -37,7 +38,7 @@ private:
     bool WriteToOption() final {
         const wxDirPickerCtrl* dir_picker =
             wxDynamicCast(GetWindow(), wxDirPickerCtrl);
-        assert(dir_picker);
+        VBAM_CHECK(dir_picker);
         return option()->SetString(dir_picker->GetPath());
     }
 };
@@ -52,7 +53,7 @@ void SetUpDirPicker(wxDirPickerCtrl* dir_picker,
 
 // static
 DirectoriesConfig* DirectoriesConfig::NewInstance(wxWindow* parent) {
-    assert(parent);
+    VBAM_CHECK(parent);
     return new DirectoriesConfig(parent);
 }
 

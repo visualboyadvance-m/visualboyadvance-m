@@ -11,6 +11,7 @@
 #include <wx/log.h>
 #include <wx/translation.h>
 
+#include "core/base/check.h"
 #include "core/base/system.h"
 #include "core/gb/gbGlobals.h"
 #include "core/gba/gbaSound.h"
@@ -580,14 +581,14 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
 };
 
 nonstd::optional<OptionID> StringToOptionId(const wxString& input) {
-    static std::map<wxString, OptionID> kStringToOptionId;
-    if (kStringToOptionId.empty()) {
+    static const std::map<wxString, OptionID> kStringToOptionId([] {
+        std::map<wxString, OptionID> string_to_option_id;
         for (size_t i = 0; i < kNbOptions; i++) {
-            kStringToOptionId.emplace(kAllOptionsData[i].config_name,
-                                      static_cast<OptionID>(i));
+            string_to_option_id.emplace(kAllOptionsData[i].config_name, static_cast<OptionID>(i));
         }
-        assert(kStringToOptionId.size() == kNbOptions);
-    }
+        VBAM_CHECK(string_to_option_id.size() == kNbOptions);
+        return string_to_option_id;
+    }());
 
     const auto iter = kStringToOptionId.find(input);
     if (iter == kStringToOptionId.end()) {
@@ -598,42 +599,43 @@ nonstd::optional<OptionID> StringToOptionId(const wxString& input) {
 
 wxString FilterToString(const Filter& value) {
     const size_t size_value = static_cast<size_t>(value);
-    assert(size_value < kNbFilters);
+    VBAM_CHECK(size_value < kNbFilters);
     return kFilterStrings[size_value];
 }
 
 wxString InterframeToString(const Interframe& value) {
     const size_t size_value = static_cast<size_t>(value);
-    assert(size_value < kNbInterframes);
+    VBAM_CHECK(size_value < kNbInterframes);
     return kInterframeStrings[size_value];
 }
 
 wxString RenderMethodToString(const RenderMethod& value) {
     const size_t size_value = static_cast<size_t>(value);
-    assert(size_value < kNbRenderMethods);
+    VBAM_CHECK(size_value < kNbRenderMethods);
     return kRenderMethodStrings[size_value];
 }
 
 wxString AudioApiToString(const AudioApi& value) {
     const size_t size_value = static_cast<size_t>(value);
-    assert(size_value < kNbAudioApis);
+    VBAM_CHECK(size_value < kNbAudioApis);
     return kAudioApiStrings[size_value];
 }
 
 wxString AudioRateToString(const AudioRate& value) {
     const size_t size_value = static_cast<size_t>(value);
-    assert(size_value < kNbSoundRate);
+    VBAM_CHECK(size_value < kNbSoundRate);
     return kAudioRateStrings[size_value];
 }
 
 Filter StringToFilter(const wxString& config_name, const wxString& input) {
-    static std::map<wxString, Filter> kStringToFilter;
-    if (kStringToFilter.empty()) {
+    static const std::map<wxString, Filter> kStringToFilter([] {
+        std::map<wxString, Filter> string_to_filter;
         for (size_t i = 0; i < kNbFilters; i++) {
-            kStringToFilter.emplace(kFilterStrings[i], static_cast<Filter>(i));
+            string_to_filter.emplace(kFilterStrings[i], static_cast<Filter>(i));
         }
-        assert(kStringToFilter.size() == kNbFilters);
-    }
+        VBAM_CHECK(string_to_filter.size() == kNbFilters);
+        return string_to_filter;
+    }());
 
     const auto iter = kStringToFilter.find(input);
     if (iter == kStringToFilter.end()) {
@@ -646,14 +648,14 @@ Filter StringToFilter(const wxString& config_name, const wxString& input) {
 }
 
 Interframe StringToInterframe(const wxString& config_name, const wxString& input) {
-    static std::map<wxString, Interframe> kStringToInterframe;
-    if (kStringToInterframe.empty()) {
+    static const std::map<wxString, Interframe> kStringToInterframe([] {
+        std::map<wxString, Interframe> string_to_interframe;
         for (size_t i = 0; i < kNbInterframes; i++) {
-            kStringToInterframe.emplace(kInterframeStrings[i],
-                                        static_cast<Interframe>(i));
+            string_to_interframe.emplace(kInterframeStrings[i], static_cast<Interframe>(i));
         }
-        assert(kStringToInterframe.size() == kNbInterframes);
-    }
+        VBAM_CHECK(string_to_interframe.size() == kNbInterframes);
+        return string_to_interframe;
+    }());
 
     const auto iter = kStringToInterframe.find(input);
     if (iter == kStringToInterframe.end()) {
@@ -667,14 +669,14 @@ Interframe StringToInterframe(const wxString& config_name, const wxString& input
 
 RenderMethod StringToRenderMethod(const wxString& config_name,
                                   const wxString& input) {
-    static std::map<wxString, RenderMethod> kStringToRenderMethod;
-    if (kStringToRenderMethod.empty()) {
+    static const std::map<wxString, RenderMethod> kStringToRenderMethod([] {
+        std::map<wxString, RenderMethod> string_to_render_method;
         for (size_t i = 0; i < kNbRenderMethods; i++) {
-            kStringToRenderMethod.emplace(kRenderMethodStrings[i],
-                                          static_cast<RenderMethod>(i));
+            string_to_render_method.emplace(kRenderMethodStrings[i], static_cast<RenderMethod>(i));
         }
-        assert(kStringToRenderMethod.size() == kNbRenderMethods);
-    }
+        VBAM_CHECK(string_to_render_method.size() == kNbRenderMethods);
+        return string_to_render_method;
+    }());
 
     const auto iter = kStringToRenderMethod.find(input);
     if (iter == kStringToRenderMethod.end()) {
@@ -687,14 +689,14 @@ RenderMethod StringToRenderMethod(const wxString& config_name,
 }
 
 AudioApi StringToAudioApi(const wxString& config_name, const wxString& input) {
-    static std::map<wxString, AudioApi> kStringToAudioApi;
-    if (kStringToAudioApi.empty()) {
+    static const std::map<wxString, AudioApi> kStringToAudioApi([] {
+        std::map<wxString, AudioApi> string_to_audio_api;
         for (size_t i = 0; i < kNbAudioApis; i++) {
-            kStringToAudioApi.emplace(kAudioApiStrings[i],
-                                      static_cast<AudioApi>(i));
+            string_to_audio_api.emplace(kAudioApiStrings[i], static_cast<AudioApi>(i));
         }
-        assert(kStringToAudioApi.size() == kNbAudioApis);
-    }
+        VBAM_CHECK(string_to_audio_api.size() == kNbAudioApis);
+        return string_to_audio_api;
+    }());
 
     const auto iter = kStringToAudioApi.find(input);
     if (iter == kStringToAudioApi.end()) {
@@ -707,13 +709,14 @@ AudioApi StringToAudioApi(const wxString& config_name, const wxString& input) {
 }
 
 AudioRate StringToSoundQuality(const wxString& config_name, const wxString& input) {
-    static std::map<wxString, AudioRate> kStringToSoundQuality;
-    if (kStringToSoundQuality.empty()) {
+    static const std::map<wxString, AudioRate> kStringToSoundQuality([] {
+        std::map<wxString, AudioRate> string_to_sound_quality;
         for (size_t i = 0; i < kNbSoundRate; i++) {
-            kStringToSoundQuality.emplace(kAudioRateStrings[i], static_cast<AudioRate>(i));
+            string_to_sound_quality.emplace(kAudioRateStrings[i], static_cast<AudioRate>(i));
         }
-        assert(kStringToSoundQuality.size() == kNbSoundRate);
-    }
+        VBAM_CHECK(string_to_sound_quality.size() == kNbSoundRate);
+        return string_to_sound_quality;
+    }());
 
     const auto iter = kStringToSoundQuality.find(input);
     if (iter == kStringToSoundQuality.end()) {
@@ -727,28 +730,23 @@ AudioRate StringToSoundQuality(const wxString& config_name, const wxString& inpu
 wxString AllEnumValuesForType(Option::Type type) {
     switch (type) {
         case Option::Type::kFilter: {
-            static const wxString kAllFilterValues =
-                AllEnumValuesForArray(kFilterStrings);
+            static const wxString kAllFilterValues(AllEnumValuesForArray(kFilterStrings));
             return kAllFilterValues;
         }
         case Option::Type::kInterframe: {
-            static const wxString kAllInterframeValues =
-                AllEnumValuesForArray(kInterframeStrings);
+            static const wxString kAllInterframeValues(AllEnumValuesForArray(kInterframeStrings));
             return kAllInterframeValues;
         }
         case Option::Type::kRenderMethod: {
-            static const wxString kAllRenderValues =
-                AllEnumValuesForArray(kRenderMethodStrings);
+            static const wxString kAllRenderValues(AllEnumValuesForArray(kRenderMethodStrings));
             return kAllRenderValues;
         }
         case Option::Type::kAudioApi: {
-            static const wxString kAllAudioApiValues =
-                AllEnumValuesForArray(kAudioApiStrings);
+            static const wxString kAllAudioApiValues(AllEnumValuesForArray(kAudioApiStrings));
             return kAllAudioApiValues;
         }
         case Option::Type::kAudioRate: {
-            static const wxString kAllSoundQualityValues =
-                AllEnumValuesForArray(kAudioRateStrings);
+            static const wxString kAllSoundQualityValues(AllEnumValuesForArray(kAudioRateStrings));
             return kAllSoundQualityValues;
         }
 
@@ -761,10 +759,10 @@ wxString AllEnumValuesForType(Option::Type type) {
         case Option::Type::kUnsigned:
         case Option::Type::kString:
         case Option::Type::kGbPalette:
-            assert(false);
+            VBAM_NOTREACHED();
             return wxEmptyString;
     }
-    assert(false);
+    VBAM_NOTREACHED();
     return wxEmptyString;
 }
 
@@ -790,10 +788,10 @@ size_t MaxForType(Option::Type type) {
         case Option::Type::kUnsigned:
         case Option::Type::kString:
         case Option::Type::kGbPalette:
-            assert(false);
+            VBAM_NOTREACHED();
             return 0;
     }
-    assert(false);
+    VBAM_NOTREACHED();
     return 0;
 }
 

@@ -1,13 +1,14 @@
 #ifndef VBAM_WX_CONFIG_USER_INPUT_H_
 #define VBAM_WX_CONFIG_USER_INPUT_H_
 
-#include <cassert>
 #include <cstdint>
 #include <unordered_set>
 
 #include <variant.hpp>
 
 #include <wx/string.h>
+
+#include "core/base/check.h"
 
 namespace config {
 
@@ -160,12 +161,12 @@ public:
     Device device() const { return device_; }
 
     const KeyboardInput& keyboard_input() const {
-        assert(is_keyboard());
+        VBAM_CHECK(is_keyboard());
         return nonstd::get<KeyboardInput>(input_);
     };
 
     const JoyInput& joy_input() const {
-        assert(is_joystick());
+        VBAM_CHECK(is_joystick());
         return nonstd::get<JoyInput>(input_);
     };
 
@@ -247,8 +248,7 @@ struct std::hash<config::UserInput> {
                        std::hash<config::KeyboardInput>{}(user_input.keyboard_input());
         }
 
-        // Unreachable.
-        assert(false);
+        VBAM_NOTREACHED();
         return 0;
     }
 };

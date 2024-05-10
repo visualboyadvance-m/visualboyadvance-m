@@ -63,10 +63,10 @@ void ResetMenuItemAccelerator(wxMenuItem* menu_item) {
     std::unordered_set<config::UserInput> user_inputs =
         wxGetApp().bindings()->InputsForCommand(
             config::ShortcutCommand(menu_item->GetId()));
-    for (const config::UserInput& user_input : user_inputs) {
+    if (!user_inputs.empty()) {
+        const config::UserInput& user_input = *user_inputs.begin();
         new_label.append('\t');
         new_label.append(user_input.ToLocalizedString());
-        break;
     }
 
     if (old_label != new_label) {

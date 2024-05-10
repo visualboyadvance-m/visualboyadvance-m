@@ -1,13 +1,13 @@
 #include "core/gb/gb.h"
 
 #include <array>
-#include <cassert>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <vector>
 
+#include "core/base/check.h"
 #include "core/base/file_util.h"
 #include "core/base/message.h"
 #include "core/base/sizes.h"
@@ -291,8 +291,7 @@ bool gbInitializeRom(size_t romSize) {
         switch (g_gbCartData.validity()) {
             case gbCartData::Validity::kValid:
             case gbCartData::Validity::kUninitialized:
-                // Unreachable.
-                assert(false);
+                VBAM_NOTREACHED();
                 break;
             case gbCartData::Validity::kSizeTooSmall:
                 systemMessage(MSG_UNSUPPORTED_ROM_SIZE,
