@@ -2,6 +2,7 @@
 
 #include <wx/toplevel.h>
 
+#include "core/base/check.h"
 #include "wx/config/option.h"
 
 namespace widgets {
@@ -12,7 +13,7 @@ KeepOnTopStyler::KeepOnTopStyler(wxTopLevelWindow* window)
                        std::bind(&KeepOnTopStyler::OnKeepOnTopChanged,
                                  this,
                                  std::placeholders::_1)) {
-    assert(window_);
+    VBAM_CHECK(window_);
     window_->Bind(wxEVT_SHOW, &KeepOnTopStyler::OnShow, this);
 }
 

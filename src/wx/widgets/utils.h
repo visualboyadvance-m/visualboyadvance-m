@@ -1,10 +1,10 @@
 #ifndef VBAM_WX_WIDGETS_UTILS_H_
 #define VBAM_WX_WIDGETS_UTILS_H_
 
-#include <cassert>
-
 #include <wx/window.h>
 #include <wx/gdicmn.h>
+
+#include "core/base/check.h"
 
 // This file contains a collection of various utility functions for wxWidgets.
 
@@ -18,14 +18,14 @@ wxRect GetDisplayRect();
 inline wxWindow* GetValidatedChild(const wxWindow* parent,
                                    const wxString& name) {
     wxWindow* window = parent->FindWindow(name);
-    assert(window);
+    VBAM_CHECK(window);
     return window;
 }
 
 template <class T>
 T* GetValidatedChild(const wxWindow* parent, const wxString& name) {
     T* child = wxDynamicCast(GetValidatedChild(parent, name), T);
-    assert(child);
+    VBAM_CHECK(child);
     return child;
 }
 

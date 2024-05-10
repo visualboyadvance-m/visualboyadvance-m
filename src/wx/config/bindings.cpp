@@ -176,7 +176,7 @@ void Bindings::AssignInputsToCommand(const std::unordered_set<UserInput>& inputs
 }
 
 void Bindings::UnassignInput(const UserInput& input) {
-    assert(input);
+    VBAM_CHECK(input);
 
     auto iter = input_to_control_.find(input);
     if (iter == input_to_control_.end()) {
@@ -194,7 +194,7 @@ void Bindings::UnassignInput(const UserInput& input) {
 
     // Otherwise, just remove it from the 2 maps.
     auto command_iter = control_to_inputs_.find(iter->second);
-    assert(command_iter != control_to_inputs_.end());
+    VBAM_CHECK(command_iter != control_to_inputs_.end());
 
     command_iter->second.erase(input);
     if (command_iter->second.empty()) {
@@ -238,7 +238,7 @@ void Bindings::UnassignDefaultBinding(const UserInput& input) {
     }
 
     auto command_iter = control_to_inputs_.find(input_iter->second);
-    assert(command_iter != control_to_inputs_.end());
+    VBAM_CHECK(command_iter != control_to_inputs_.end());
 
     command_iter->second.erase(input);
     if (command_iter->second.empty()) {

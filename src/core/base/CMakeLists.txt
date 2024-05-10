@@ -35,6 +35,7 @@ target_sources(vbam-core-base
     version.cpp
 
     PUBLIC
+    check.h
     array.h
     file_util.h
     image_util.h

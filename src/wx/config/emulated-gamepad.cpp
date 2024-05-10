@@ -1,5 +1,7 @@
 #include "wx/config/emulated-gamepad.h"
 
+#include "core/base/check.h"
+
 namespace config {
 
 namespace {
@@ -62,7 +64,7 @@ EmulatedGamepad::EmulatedGamepad(const BindingsProvider bindings_provider)
     : joypads_({0, 0, 0, 0}), bindings_provider_(bindings_provider) {}
 
 bool EmulatedGamepad::OnInputPressed(const config::UserInput& user_input) {
-    assert(user_input);
+    VBAM_CHECK(user_input);
 
     const auto command = bindings_provider_()->CommandForInput(user_input);
     if (!command || !command->is_game()) {
@@ -85,7 +87,7 @@ bool EmulatedGamepad::OnInputPressed(const config::UserInput& user_input) {
 }
 
 bool EmulatedGamepad::OnInputReleased(const config::UserInput& user_input) {
-    assert(user_input);
+    VBAM_CHECK(user_input);
 
     const auto command = bindings_provider_()->CommandForInput(user_input);
     if (!command || !command->is_game()) {

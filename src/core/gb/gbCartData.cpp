@@ -2,8 +2,8 @@
 
 #include <algorithm>
 #include <array>
-#include <cassert>
 
+#include "core/base/check.h"
 #include "core/base/sizes.h"
 
 namespace {
@@ -62,7 +62,7 @@ char byte_to_char(uint8_t byte) {
     } else if (byte < 16) {
         return 'A' + (byte - 10);
     } else {
-        assert(false);
+        VBAM_NOTREACHED();
         return '\0';
     }
 }
@@ -98,7 +98,7 @@ bool is_valid_manufacturer_code(const std::string& manufacturer_code) {
 constexpr size_t kHeaderGlobalChecksumAdress = 0x14e;
 
 uint16_t get_rom_checksum(const uint8_t* romData, size_t romDataSize) {
-    assert(romData);
+    VBAM_CHECK(romData);
 
     uint16_t checksum = 0;
     for (size_t i = 0; i < romDataSize; i++) {
@@ -160,7 +160,7 @@ constexpr size_t kHeaderChecksumEndAdress = 0x14c;
 }  // namespace
 
 gbCartData::gbCartData(const uint8_t* romData, size_t romDataSize) {
-    assert(romData);
+    VBAM_CHECK(romData);
 
     if (romDataSize < sizeof(gbRomHeader)) {
         validity_ = Validity::kSizeTooSmall;

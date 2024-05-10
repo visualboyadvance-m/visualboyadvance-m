@@ -2,6 +2,7 @@
 
 #include <wx/time.h>
 
+#include "core/base/check.h"
 #include "wx/config/user-input.h"
 #include "wx/widgets/user-input-event.h"
 
@@ -50,7 +51,7 @@ void UserInputCtrl::SetInputs(const std::unordered_set<config::UserInput>& input
 }
 
 config::UserInput UserInputCtrl::SingleInput() const {
-    assert(!is_multikey_);
+    VBAM_CHECK(!is_multikey_);
     if (inputs_.empty()) {
         return config::UserInput();
     }

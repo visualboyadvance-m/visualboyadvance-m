@@ -5,8 +5,6 @@
 
 #include "wx/audio/internal/faudio.h"
 
-#include <cassert>
-
 #include <condition_variable>
 #include <mutex>
 #include <vector>
@@ -18,6 +16,7 @@
 #include <wx/log.h>
 #include <wx/translation.h>
 
+#include "core/base/check.h"
 #include "core/base/system.h"
 #include "core/gba/gbaGlobals.h"
 #include "wx/config/option-proxy.h"
@@ -176,7 +175,7 @@ void FAudio_Output::close() {
 
     if (sVoice) {
         if (playing) {
-            assert(FAudioSourceVoice_Stop(sVoice, 0, FAUDIO_COMMIT_NOW) == 0);
+            VBAM_CHECK(FAudioSourceVoice_Stop(sVoice, 0, FAUDIO_COMMIT_NOW) == 0);
         }
 
         FAudioVoice_DestroyVoice(sVoice);
@@ -259,7 +258,7 @@ bool FAudio_Output::init(long sampleRate) {
     if (OPTION(kSoundUpmix)) {
         // set up stereo upmixing
         FAudioDeviceDetails dd{};
-        assert(FAudio_GetDeviceDetails(faud, 0, &dd) == 0);
+        VBAM_CHECK(FAudio_GetDeviceDetails(faud, 0, &dd) == 0);
         std::vector<float> matrix(sizeof(float) * 2 * dd.OutputFormat.Format.nChannels);
 
         bool matrixAvailable = true;
@@ -353,12 +352,12 @@ bool FAudio_Output::init(long sampleRate) {
         if (matrixAvailable) {
             hr = FAudioVoice_SetOutputMatrix(sVoice, nullptr, 2, dd.OutputFormat.Format.nChannels,
                                              matrix.data(), FAUDIO_DEFAULT_CHANNELS);
-            assert(hr == 0);
+            VBAM_CHECK(hr == 0);
         }
     }
 
     hr = FAudioSourceVoice_Start(sVoice, 0, FAUDIO_COMMIT_NOW);
-    assert(hr == 0);
+    VBAM_CHECK(hr == 0);
     playing = true;
     currentBuffer = 0;
     device_changed = false;
@@ -380,7 +379,7 @@ void FAudio_Output::write(uint16_t* finalWave, int) {
         }
 
         FAudioSourceVoice_GetState(sVoice, &vState, flags);
-        assert(vState.BuffersQueued <= buffer_count_);
+        VBAM_CHECK(vState.BuffersQueued <= buffer_count_);
 
         if (vState.BuffersQueued < buffer_count_) {
             if (vState.BuffersQueued == 0) {
@@ -414,7 +413,7 @@ void FAudio_Output::write(uint16_t* finalWave, int) {
     currentBuffer++;
     currentBuffer %= (buffer_count_ + 1);  // + 1 because we need one temporary buffer
     [[maybe_unused]] uint32_t hr = FAudioSourceVoice_SubmitSourceBuffer(sVoice, &buf, nullptr);
-    assert(hr == 0);
+    VBAM_CHECK(hr == 0);
 }
 
 void FAudio_Output::pause() {
@@ -423,7 +422,7 @@ void FAudio_Output::pause() {
 
     if (playing) {
         [[maybe_unused]] uint32_t hr = FAudioSourceVoice_Stop(sVoice, 0, FAUDIO_COMMIT_NOW);
-        assert(hr == 0);
+        VBAM_CHECK(hr == 0);
         playing = false;
     }
 }
@@ -434,7 +433,7 @@ void FAudio_Output::resume() {
 
     if (!playing) {
         [[maybe_unused]] int32_t hr = FAudioSourceVoice_Start(sVoice, 0, FAUDIO_COMMIT_NOW);
-        assert(hr == 0);
+        VBAM_CHECK(hr == 0);
         playing = true;
     }
 }
@@ -445,7 +444,7 @@ void FAudio_Output::reset() {
 
     if (playing) {
         [[maybe_unused]] uint32_t hr = FAudioSourceVoice_Stop(sVoice, 0, FAUDIO_COMMIT_NOW);
-        assert(hr == 0);
+        VBAM_CHECK(hr == 0);
     }
 
     FAudioSourceVoice_FlushSourceBuffers(sVoice);
@@ -462,7 +461,7 @@ void FAudio_Output::setThrottle(unsigned short throttle_) {
 
     [[maybe_unused]] uint32_t hr =
         FAudioSourceVoice_SetFrequencyRatio(sVoice, (float)throttle_ / 100.0f, FAUDIO_COMMIT_NOW);
-    assert(hr == 0);
+    VBAM_CHECK(hr == 0);
 }
 
 }  // namespace

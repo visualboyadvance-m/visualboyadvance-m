@@ -153,7 +153,7 @@ wxEvent* UserInputEvent::Clone() const {
 
 KeyboardInputSender::KeyboardInputSender(EventHandlerProvider* const handler_provider)
     : handler_provider_(handler_provider) {
-    assert(handler_provider_);
+    VBAM_CHECK(handler_provider_);
 }
 
 KeyboardInputSender::~KeyboardInputSender() = default;

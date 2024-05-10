@@ -4,6 +4,8 @@
 
 #include <wx/wxcrt.h>
 
+#include "core/base/check.h"
+
 // Initializer for struct cmditem
 cmditem new_cmditem(const wxString cmd,
                     const wxString name,
@@ -22,7 +24,7 @@ namespace config {
         }
 
         // Command not found. This should never happen.
-        assert(false);
+        VBAM_NOTREACHED();
         return wxEmptyString;
     }
 
@@ -34,7 +36,7 @@ namespace config {
         }
 
         // Command not found. This should never happen.
-        assert(false);
+        VBAM_NOTREACHED();
         return wxEmptyString;
     }
 

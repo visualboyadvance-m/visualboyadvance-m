@@ -21,18 +21,16 @@ TEST(OptionTest, Bool) {
     EXPECT_TRUE(option->SetBool(false));
     EXPECT_FALSE(option->GetBool());
 
-#if !defined(NDEBUG)
-    EXPECT_DEATH(option->SetDouble(2.0), ".*");
-    EXPECT_DEATH(option->SetInt(2), ".*");
-    EXPECT_DEATH(option->SetUnsigned(2), ".*");
-    EXPECT_DEATH(option->SetString("foo"), ".*");
-    EXPECT_DEATH(option->SetFilter(config::Filter::kNone), ".*");
-    EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), ".*");
-    EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), ".*");
-    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), ".*");
-    EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), ".*");
-    EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), ".*");
-#endif  // !defined(NDEBUG)
+    EXPECT_DEATH(option->SetDouble(2.0), "is_double\\(\\)");
+    EXPECT_DEATH(option->SetInt(2), "is_int\\(\\)");
+    EXPECT_DEATH(option->SetUnsigned(2), "is_unsigned\\(\\)");
+    EXPECT_DEATH(option->SetString("foo"), "is_string\\(\\)");
+    EXPECT_DEATH(option->SetFilter(config::Filter::kNone), "is_filter\\(\\)");
+    EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), "is_interframe\\(\\)");
+    EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), "is_audio_rate\\(\\)");
+    EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), "is_gb_palette\\(\\)");
 }
 
 TEST(OptionTest, Double) {
@@ -56,18 +54,205 @@ TEST(OptionTest, Double) {
     EXPECT_FALSE(option->SetDouble(7.0));
     EXPECT_DOUBLE_EQ(option->GetDouble(), 2.5);
 
-#if !defined(NDEBUG)
-    EXPECT_DEATH(option->SetBool(true), ".*");
-    EXPECT_DEATH(option->SetInt(2), ".*");
-    EXPECT_DEATH(option->SetUnsigned(2), ".*");
-    EXPECT_DEATH(option->SetString("foo"), ".*");
-    EXPECT_DEATH(option->SetFilter(config::Filter::kNone), ".*");
-    EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), ".*");
-    EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), ".*");
-    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), ".*");
-    EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), ".*");
-    EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), ".*");
-#endif  // !defined(NDEBUG)
+    EXPECT_DEATH(option->SetBool(true), "is_bool\\(\\)");
+    EXPECT_DEATH(option->SetInt(2), "is_int\\(\\)");
+    EXPECT_DEATH(option->SetUnsigned(2), "is_unsigned\\(\\)");
+    EXPECT_DEATH(option->SetString("foo"), "is_string\\(\\)");
+    EXPECT_DEATH(option->SetFilter(config::Filter::kNone), "is_filter\\(\\)");
+    EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), "is_interframe\\(\\)");
+    EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), "is_audio_rate\\(\\)");
+    EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), "is_gb_palette\\(\\)");
+}
+
+TEST(OptionTest, Int) {
+    config::Option* option = config::Option::ByID(config::OptionID::kSoundBuffers);
+    ASSERT_TRUE(option);
+
+    EXPECT_TRUE(option->command().empty());
+    EXPECT_EQ(option->config_name(), "Sound/Buffers");
+    EXPECT_EQ(option->id(), config::OptionID::kSoundBuffers);
+    EXPECT_EQ(option->type(), config::Option::Type::kInt);
+    EXPECT_TRUE(option->is_int());
+
+    EXPECT_TRUE(option->SetInt(8));
+    EXPECT_EQ(option->GetInt(), 8);
+
+    // Need to disable logging to test for errors.
+    const wxLogNull disable_logging;
+
+    // Test out of bounds values.
+    EXPECT_FALSE(option->SetInt(-1));
+    EXPECT_FALSE(option->SetInt(42));
+    EXPECT_EQ(option->GetInt(), 8);
+
+    EXPECT_DEATH(option->SetBool(true), "is_bool\\(\\)");
+    EXPECT_DEATH(option->SetDouble(2.0), "is_double\\(\\)");
+    EXPECT_DEATH(option->SetUnsigned(2), "is_unsigned\\(\\)");
+    EXPECT_DEATH(option->SetString("foo"), "is_string\\(\\)");
+    EXPECT_DEATH(option->SetFilter(config::Filter::kNone), "is_filter\\(\\)");
+    EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), "is_interframe\\(\\)");
+    EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), "is_audio_rate\\(\\)");
+    EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), "is_gb_palette\\(\\)");
+}
+
+TEST(OptionTest, Unsigned) {
+    config::Option* option = config::Option::ByID(config::OptionID::kGeomWindowHeight);
+    ASSERT_TRUE(option);
+
+    EXPECT_EQ(option->config_name(), "geometry/windowHeight");
+    EXPECT_EQ(option->id(), config::OptionID::kGeomWindowHeight);
+    EXPECT_EQ(option->type(), config::Option::Type::kUnsigned);
+    EXPECT_TRUE(option->is_unsigned());
+
+    EXPECT_TRUE(option->SetUnsigned(100));
+    EXPECT_EQ(option->GetUnsigned(), 100);
+
+    // Need to disable logging to test for errors.
+    const wxLogNull disable_logging;
+
+    // Test out of bounds values.
+    EXPECT_FALSE(option->SetUnsigned(100000));
+    EXPECT_EQ(option->GetUnsigned(), 100);
+
+    EXPECT_DEATH(option->SetBool(true), "is_bool\\(\\)");
+    EXPECT_DEATH(option->SetDouble(2.0), "is_double\\(\\)");
+    EXPECT_DEATH(option->SetInt(2), "is_int\\(\\)");
+    EXPECT_DEATH(option->SetString("foo"), "is_string\\(\\)");
+    EXPECT_DEATH(option->SetFilter(config::Filter::kNone), "is_filter\\(\\)");
+    EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), "is_interframe\\(\\)");
+    EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), "is_audio_rate\\(\\)");
+    EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), "is_gb_palette\\(\\)");
+}
+
+TEST(OptionTest, String) {
+    config::Option* option = config::Option::ByID(config::OptionID::kGenStateDir);
+    ASSERT_TRUE(option);
+
+    EXPECT_TRUE(option->command().empty());
+    EXPECT_EQ(option->config_name(), "General/StateDir");
+    EXPECT_EQ(option->id(), config::OptionID::kGenStateDir);
+    EXPECT_EQ(option->type(), config::Option::Type::kString);
+    EXPECT_TRUE(option->is_string());
+
+    EXPECT_TRUE(option->SetString("/path/to/sthg"));
+    EXPECT_EQ(option->GetString(), "/path/to/sthg");
+
+    EXPECT_DEATH(option->SetBool(true), "is_bool\\(\\)");
+    EXPECT_DEATH(option->SetDouble(2.0), "is_double\\(\\)");
+    EXPECT_DEATH(option->SetInt(2), "is_int\\(\\)");
+    EXPECT_DEATH(option->SetUnsigned(2), "is_unsigned\\(\\)");
+    EXPECT_DEATH(option->SetFilter(config::Filter::kNone), "is_filter\\(\\)");
+    EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), "is_interframe\\(\\)");
+    EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), "is_audio_rate\\(\\)");
+    EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), "is_gb_palette\\(\\)");
+}
+
+TEST(OptionTest, Filter) {
+    config::Option* option = config::Option::ByID(config::OptionID::kDispFilter);
+    ASSERT_TRUE(option);
+
+    EXPECT_TRUE(option->command().empty());
+    EXPECT_EQ(option->config_name(), "Display/Filter");
+    EXPECT_EQ(option->id(), config::OptionID::kDispFilter);
+    EXPECT_EQ(option->type(), config::Option::Type::kFilter);
+    EXPECT_TRUE(option->is_filter());
+
+    EXPECT_TRUE(option->SetFilter(config::Filter::kNone));
+    EXPECT_EQ(option->GetFilter(), config::Filter::kNone);
+
+    EXPECT_DEATH(option->SetBool(true), "is_bool\\(\\)");
+    EXPECT_DEATH(option->SetDouble(2.0), "is_double\\(\\)");
+    EXPECT_DEATH(option->SetInt(2), "is_int\\(\\)");
+    EXPECT_DEATH(option->SetUnsigned(2), "is_unsigned\\(\\)");
+    EXPECT_DEATH(option->SetString("foo"), "is_string\\(\\)");
+    EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), "is_interframe\\(\\)");
+    EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), "is_audio_rate\\(\\)");
+    EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), "is_gb_palette\\(\\)");
+}
+
+TEST(OptionTest, Interframe) {
+    config::Option* option = config::Option::ByID(config::OptionID::kDispIFB);
+    ASSERT_TRUE(option);
+
+    EXPECT_TRUE(option->command().empty());
+    EXPECT_EQ(option->config_name(), "Display/IFB");
+    EXPECT_EQ(option->id(), config::OptionID::kDispIFB);
+    EXPECT_EQ(option->type(), config::Option::Type::kInterframe);
+    EXPECT_TRUE(option->is_interframe());
+
+    EXPECT_TRUE(option->SetInterframe(config::Interframe::kNone));
+    EXPECT_EQ(option->GetInterframe(), config::Interframe::kNone);
+
+    EXPECT_DEATH(option->SetBool(true), "is_bool\\(\\)");
+    EXPECT_DEATH(option->SetDouble(2.0), "is_double\\(\\)");
+    EXPECT_DEATH(option->SetInt(2), "is_int\\(\\)");
+    EXPECT_DEATH(option->SetUnsigned(2), "is_unsigned\\(\\)");
+    EXPECT_DEATH(option->SetString("foo"), "is_string\\(\\)");
+    EXPECT_DEATH(option->SetFilter(config::Filter::kNone), "is_filter\\(\\)");
+    EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), "is_audio_rate\\(\\)");
+    EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), "is_gb_palette\\(\\)");
+}
+
+TEST(OptionTest, AudioApi) {
+    config::Option* option = config::Option::ByID(config::OptionID::kSoundAudioAPI);
+    ASSERT_TRUE(option);
+
+    EXPECT_TRUE(option->command().empty());
+    EXPECT_EQ(option->config_name(), "Sound/AudioAPI");
+    EXPECT_EQ(option->id(), config::OptionID::kSoundAudioAPI);
+    EXPECT_EQ(option->type(), config::Option::Type::kAudioApi);
+    EXPECT_TRUE(option->is_audio_api());
+
+    EXPECT_TRUE(option->SetAudioApi(config::AudioApi::kOpenAL));
+    EXPECT_EQ(option->GetAudioApi(), config::AudioApi::kOpenAL);
+
+    EXPECT_DEATH(option->SetBool(true), "is_bool\\(\\)");
+    EXPECT_DEATH(option->SetDouble(2.0), "is_double\\(\\)");
+    EXPECT_DEATH(option->SetInt(2), "is_int\\(\\)");
+    EXPECT_DEATH(option->SetUnsigned(2), "is_unsigned\\(\\)");
+    EXPECT_DEATH(option->SetString("foo"), "is_string\\(\\)");
+    EXPECT_DEATH(option->SetFilter(config::Filter::kNone), "is_filter\\(\\)");
+    EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), "is_interframe\\(\\)");
+    EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
+    EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), "is_audio_rate\\(\\)");
+    EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), "is_gb_palette\\(\\)");
+}
+
+TEST(OptionTest, AudioRate) {
+    config::Option* option = config::Option::ByID(config::OptionID::kSoundAudioRate);
+    ASSERT_TRUE(option);
+
+    EXPECT_TRUE(option->command().empty());
+    EXPECT_EQ(option->config_name(), "Sound/Quality");
+    EXPECT_EQ(option->id(), config::OptionID::kSoundAudioRate);
+    EXPECT_EQ(option->type(), config::Option::Type::kAudioRate);
+    EXPECT_TRUE(option->is_audio_rate());
+
+    EXPECT_TRUE(option->SetAudioRate(config::AudioRate::k11kHz));
+    EXPECT_EQ(option->GetAudioRate(), config::AudioRate::k11kHz);
+
+    EXPECT_DEATH(option->SetBool(true), "is_bool\\(\\)");
+    EXPECT_DEATH(option->SetDouble(2.0), "is_double\\(\\)");
+    EXPECT_DEATH(option->SetInt(2), "is_int\\(\\)");
+    EXPECT_DEATH(option->SetUnsigned(2), "is_unsigned\\(\\)");
+    EXPECT_DEATH(option->SetString("foo"), "is_string\\(\\)");
+    EXPECT_DEATH(option->SetFilter(config::Filter::kNone), "is_filter\\(\\)");
+    EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), "is_interframe\\(\\)");
+    EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), "is_gb_palette\\(\\)");
 }
 
 TEST(OptionTest, Enum) {
@@ -110,6 +295,16 @@ TEST(Optiontest, GbPalette) {
     EXPECT_FALSE(option->SetGbPaletteString(""));
     EXPECT_FALSE(option->SetGbPaletteString("0000,0001,0002,0003,0004,0005,0006,000Q"));
 
+    EXPECT_DEATH(option->SetBool(true), "is_bool\\(\\)");
+    EXPECT_DEATH(option->SetDouble(2.0), "is_double\\(\\)");
+    EXPECT_DEATH(option->SetInt(2), "is_int\\(\\)");
+    EXPECT_DEATH(option->SetUnsigned(2), "is_unsigned\\(\\)");
+    EXPECT_DEATH(option->SetString("foo"), "is_string\\(\\)");
+    EXPECT_DEATH(option->SetFilter(config::Filter::kNone), "is_filter\\(\\)");
+    EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), "is_interframe\\(\\)");
+    EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), "is_audio_rate\\(\\)");
 }
 
 TEST(OptionObserverTest, Basic) {

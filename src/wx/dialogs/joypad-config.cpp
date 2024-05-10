@@ -2,6 +2,7 @@
 
 #include <wx/checkbox.h>
 
+#include "core/base/check.h"
 #include "wx/config/command.h"
 #include "wx/config/option-proxy.h"
 #include "wx/dialogs/base-dialog.h"
@@ -40,7 +41,7 @@ protected:
 UserInputCtrlValidator::UserInputCtrlValidator(const config::GameCommand game_control,
                                                config::BindingsProvider const bindings_provider)
     : wxValidator(), game_control_(game_control), bindings_provider(bindings_provider) {
-    assert(bindings_provider);
+    VBAM_CHECK(bindings_provider);
 }
 
 wxObject* UserInputCtrlValidator::Clone() const {
@@ -49,7 +50,7 @@ wxObject* UserInputCtrlValidator::Clone() const {
 
 bool UserInputCtrlValidator::TransferToWindow() {
     widgets::UserInputCtrl* control = wxDynamicCast(GetWindow(), widgets::UserInputCtrl);
-    assert(control);
+    VBAM_CHECK(control);
 
     control->SetInputs(bindings_provider()->InputsForCommand(config::Command(game_control_)));
     return true;
@@ -57,7 +58,7 @@ bool UserInputCtrlValidator::TransferToWindow() {
 
 bool UserInputCtrlValidator::TransferFromWindow() {
     widgets::UserInputCtrl* control = wxDynamicCast(GetWindow(), widgets::UserInputCtrl);
-    assert(control);
+    VBAM_CHECK(control);
 
     bindings_provider()->ClearCommandAssignments(config::Command(game_control_));
     for (const auto& input : control->inputs()) {
@@ -72,8 +73,8 @@ bool UserInputCtrlValidator::TransferFromWindow() {
 // static
 JoypadConfig* JoypadConfig::NewInstance(wxWindow* parent,
                                         const config::BindingsProvider bindings_provider) {
-    assert(parent);
-    assert(bindings_provider);
+    VBAM_CHECK(parent);
+    VBAM_CHECK(bindings_provider);
     return new JoypadConfig(parent, bindings_provider);
 }
 
@@ -110,7 +111,7 @@ JoypadConfig::JoypadConfig(wxWindow* parent, const config::BindingsProvider bind
             if (current_parent == prev_parent) {
                 // The first control will be skipped here, but that's fine since
                 // we don't care where it fits in the tab order.
-                assert(prev);
+                VBAM_CHECK(prev);
                 game_key_control->MoveAfterInTabOrder(prev);
             }
             prev = game_key_control;

@@ -1,5 +1,7 @@
 #include "wx/widgets/group-check-box.h"
 
+#include "core/base/check.h"
+
 namespace widgets {
 
 namespace {
@@ -8,7 +10,7 @@ wxWindow* FindTopLevelWindow(wxWindow* window) {
     while (window != nullptr && !window->IsTopLevel()) {
         window = window->GetParent();
     }
-    assert(window);
+    VBAM_CHECK(window);
     return window;
 }
 
@@ -77,7 +79,7 @@ bool GroupCheckBox::Create(wxWindow* parent,
 }
 
 void GroupCheckBox::AddToGroup() {
-    assert(next_ == this);
+    VBAM_CHECK(next_ == this);
 
     if (GetName().IsEmpty()) {
         // No name means a singleton.

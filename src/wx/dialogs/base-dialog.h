@@ -6,6 +6,8 @@
 
 #include "wx/widgets/keep-on-top-styler.h"
 
+#include "core/base/check.h"
+
 namespace dialogs {
 
 class BaseDialog : public wxDialog {
@@ -23,7 +25,7 @@ protected:
     template <class T>
     T* GetValidatedChild(const wxString& name) const {
         T* child = wxDynamicCast(this->GetValidatedChild(name), T);
-        assert(child);
+        VBAM_CHECK(child);
         return child;
     }
 

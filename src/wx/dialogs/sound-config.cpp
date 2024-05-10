@@ -12,6 +12,7 @@
 #include <wx/xrc/xmlres.h>
 #include <functional>
 
+#include "core/base/check.h"
 #include "wx/audio/audio.h"
 #include "wx/config/option-id.h"
 #include "wx/config/option-proxy.h"
@@ -37,14 +38,14 @@ private:
 
     bool WriteToWindow() override {
         wxChoice* choice = wxDynamicCast(GetWindow(), wxChoice);
-        assert(choice);
+        VBAM_CHECK(choice);
         choice->SetSelection(static_cast<int>(option()->GetAudioRate()));
         return true;
     }
 
     bool WriteToOption() override {
         const wxChoice* choice = wxDynamicCast(GetWindow(), wxChoice);
-        assert(choice);
+        VBAM_CHECK(choice);
         const int selection = choice->GetSelection();
         if (selection == wxNOT_FOUND) {
             return false;
@@ -63,7 +64,7 @@ class AudioApiValidator : public widgets::OptionValidator {
 public:
     explicit AudioApiValidator(config::AudioApi audio_api)
         : OptionValidator(config::OptionID::kSoundAudioAPI), audio_api_(audio_api) {
-        assert(audio_api < config::AudioApi::kLast);
+        VBAM_CHECK(audio_api < config::AudioApi::kLast);
     }
     ~AudioApiValidator() override = default;
 
@@ -103,7 +104,7 @@ private:
 
     bool WriteToWindow() override {
         wxChoice* choice = wxDynamicCast(GetWindow(), wxChoice);
-        assert(choice);
+        VBAM_CHECK(choice);
 
         const wxString& device_id = option()->GetString();
         for (size_t i = 0; i < choice->GetCount(); i++) {
@@ -121,7 +122,7 @@ private:
 
     bool WriteToOption() override {
         const wxChoice* choice = wxDynamicCast(GetWindow(), wxChoice);
-        assert(choice);
+        VBAM_CHECK(choice);
         const int selection = choice->GetSelection();
         if (selection == wxNOT_FOUND) {
             return option()->SetString(wxEmptyString);
@@ -136,7 +137,7 @@ private:
 
 // static
 SoundConfig* SoundConfig::NewInstance(wxWindow* parent) {
-    assert(parent);
+    VBAM_CHECK(parent);
     return new SoundConfig(parent);
 }
 

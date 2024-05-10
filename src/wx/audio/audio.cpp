@@ -1,11 +1,11 @@
 #include "wx/audio/audio.h"
 
+#include "core/base/check.h"
 #include "wx/audio/internal/openal.h"
 
 #if defined(__WXMSW__)
 #include "wx/audio/internal/dsound.h"
 #endif
-
 
 #if defined(VBAM_ENABLE_FAUDIO)
 #include "wx/audio/internal/faudio.h"
@@ -39,8 +39,7 @@ std::vector<AudioDevice> EnumerateAudioDevices(const config::AudioApi& audio_api
 
         case config::AudioApi::kLast:
         default:
-            // This should never happen.
-            assert(false);
+            VBAM_NOTREACHED();
             return {};
     }
 }
@@ -67,8 +66,7 @@ std::unique_ptr<SoundDriver> CreateSoundDriver(const config::AudioApi& api) {
 
         case config::AudioApi::kLast:
         default:
-            // This should never happen.
-            assert(false);
+            VBAM_NOTREACHED();
             return nullptr;
     }
 }

@@ -25,6 +25,7 @@
 #include "components/filters/filters.h"
 #include "components/filters_agb/filters_agb.h"
 #include "components/filters_interframe/interframe.h"
+#include "core/base/check.h"
 #include "core/base/file_util.h"
 #include "core/base/patch.h"
 #include "core/base/system.h"
@@ -89,10 +90,10 @@ double GetFilterScale() {
             return 6.0;
         case config::Filter::kPlugin:
         case config::Filter::kLast:
-            assert(false);
+            VBAM_NOTREACHED();
             return 1.0;
     }
-    assert(false);
+    VBAM_NOTREACHED();
     return 1.0;
 }
 
@@ -111,10 +112,10 @@ long GetSampleRate() {
             return 11025;
             break;
         case config::AudioRate::kLast:
-            assert(false);
+            VBAM_NOTREACHED();
             return 44100;
     }
-    assert(false);
+    VBAM_NOTREACHED();
     return 44100;
 }
 
@@ -1169,7 +1170,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
                 break;
 #endif
             case config::RenderMethod::kLast:
-                assert(false);
+                VBAM_NOTREACHED();
                 return;
         }
 
@@ -1615,7 +1616,7 @@ private:
                 break;
 
             case config::Interframe::kLast:
-                assert(false);
+                VBAM_NOTREACHED();
                 break;
         }
     }
@@ -1758,7 +1759,7 @@ private:
 
             case config::Filter::kNone:
             case config::Filter::kLast:
-                assert(false);
+                VBAM_NOTREACHED();
                 break;
         }
     }

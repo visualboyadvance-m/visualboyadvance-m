@@ -1,9 +1,11 @@
 #include "wx/widgets/render-plugin.h"
 
+#include "core/base/check.h"
+
 namespace widgets {
 
 RENDER_PLUGIN_INFO* MaybeLoadFilterPlugin(const wxString& path, wxDynamicLibrary* filter_plugin) {
-    assert(filter_plugin);
+    VBAM_CHECK(filter_plugin);
 
     if (!filter_plugin->Load(path, wxDL_VERBATIM | wxDL_NOW | wxDL_QUIET)) {
         return nullptr;

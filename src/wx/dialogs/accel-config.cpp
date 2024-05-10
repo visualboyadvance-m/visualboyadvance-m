@@ -6,6 +6,7 @@
 #include <wx/menu.h>
 #include <wx/msgdlg.h>
 
+#include "core/base/check.h"
 #include "wx/config/bindings.h"
 #include "wx/config/cmdtab.h"
 #include "wx/config/command.h"
@@ -112,9 +113,9 @@ AccelConfig* AccelConfig::NewInstance(wxWindow* parent,
                                       wxMenuBar* menu,
                                       wxMenu* recents,
                                       const config::BindingsProvider bindings_provider) {
-    assert(parent);
-    assert(menu);
-    assert(recents);
+    VBAM_CHECK(parent);
+    VBAM_CHECK(menu);
+    VBAM_CHECK(recents);
     return new AccelConfig(parent, menu, recents, bindings_provider);
 }
 
@@ -123,7 +124,7 @@ AccelConfig::AccelConfig(wxWindow* parent,
                          wxMenu* recents,
                          const config::BindingsProvider bindings_provider)
     : BaseDialog(parent, "AccelConfig"), bindings_provider_(bindings_provider) {
-    assert(menu);
+    VBAM_CHECK(menu);
 
     // Loads the various dialog elements.
     tree_ = GetValidatedChild<wxTreeCtrl>("Commands");
@@ -157,7 +158,7 @@ AccelConfig::AccelConfig(wxWindow* parent,
     for (const auto& iter : command_to_item_id_) {
         const CommandTreeItemData* item_data =
             static_cast<const CommandTreeItemData*>(tree_->GetItemData(iter.second));
-        assert(item_data);
+        VBAM_CHECK(item_data);
 
         currently_assigned_label_->GetTextExtent(item_data->assigned_string(), &w, &h);
         size.SetWidth(std::max(w, size.GetWidth()));
@@ -277,10 +278,10 @@ void AccelConfig::OnAssignBinding(wxCommandEvent&) {
                 break;
             case config::Command::Tag::kShortcut:
                 const auto iter = command_to_item_id_.find(old_command->shortcut());
-                assert(iter != command_to_item_id_.end());
+                VBAM_CHECK(iter != command_to_item_id_.end());
                 const CommandTreeItemData* old_command_item_data =
                     static_cast<const CommandTreeItemData*>(tree_->GetItemData(iter->second));
-                assert(old_command_item_data);
+                VBAM_CHECK(old_command_item_data);
                 old_command_name = old_command_item_data->message_string();
                 break;
         }
@@ -318,7 +319,7 @@ void AccelConfig::OnKeyInput(wxCommandEvent&) {
                 break;
             case config::Command::Tag::kShortcut:
                 const auto iter = command_to_item_id_.find(command->shortcut());
-                assert(iter != command_to_item_id_.end());
+                VBAM_CHECK(iter != command_to_item_id_.end());
                 currently_assigned_label_->SetLabel(
                     static_cast<CommandTreeItemData*>(tree_->GetItemData(iter->second))
                         ->assigned_string());

@@ -118,7 +118,7 @@ opts_t::opts_t()
 void load_opts(bool first_time_launch) {
     // just for sanity...
     static bool did_init = false;
-    assert(!did_init);
+    VBAM_CHECK(!did_init);
     did_init = true;
 
     // enumvals should not be translated, since they would cause config file
@@ -447,8 +447,7 @@ void opt_set(const wxString& name, const wxString& val) {
     if (opt && !opt->is_none()) {
         switch (opt->type()) {
         case config::Option::Type::kNone:
-            // This should never happen.
-            assert(false);
+            VBAM_NOTREACHED();
             return;
         case config::Option::Type::kBool:
             if (val != '0' && val != '1') {

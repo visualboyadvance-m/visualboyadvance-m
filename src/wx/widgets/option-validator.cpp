@@ -6,6 +6,8 @@
 #include <wx/slider.h>
 #include <wx/spinctrl.h>
 
+#include "core/base/check.h"
+
 namespace widgets {
 
 OptionValidator::OptionValidator(config::OptionID option_id)
@@ -27,21 +29,21 @@ bool OptionValidator::TransferToWindow() {
 void OptionValidator::SetWindow(wxWindow* window) {
     wxValidator::SetWindow(window);
     [[maybe_unused]] const bool write_success = WriteToWindow();
-    assert(write_success);
+    VBAM_CHECK(write_success);
 }
 #endif
 
 void OptionValidator::OnValueChanged() {
     [[maybe_unused]] const bool write_success = WriteToWindow();
-    assert(write_success);
+    VBAM_CHECK(write_success);
 }
 
 OptionSelectedValidator::OptionSelectedValidator(config::OptionID option_id,
                                                  uint32_t value)
     : OptionValidator(option_id), value_(value) {
-    assert(option()->is_unsigned());
-    assert(value_ >= option()->GetUnsignedMin());
-    assert(value_ <= option()->GetUnsignedMax());
+    VBAM_CHECK(option()->is_unsigned());
+    VBAM_CHECK(value_ >= option()->GetUnsignedMin());
+    VBAM_CHECK(value_ <= option()->GetUnsignedMax());
 }
 
 wxObject* OptionSelectedValidator::Clone() const {
@@ -65,7 +67,7 @@ bool OptionSelectedValidator::WriteToWindow() {
         return true;
     }
 
-    assert(false);
+    VBAM_NOTREACHED();
     return false;
 }
 
@@ -87,13 +89,13 @@ bool OptionSelectedValidator::WriteToOption() {
         return true;
     }
 
-    assert(false);
+    VBAM_NOTREACHED();
     return false;
 }
 
 OptionIntValidator::OptionIntValidator(config::OptionID option_id)
     : OptionValidator(option_id) {
-    assert(option()->is_int());
+    VBAM_CHECK(option()->is_int());
 }
 
 wxObject* OptionIntValidator::Clone() const {
@@ -117,7 +119,7 @@ bool OptionIntValidator::WriteToWindow() {
         return true;
     }
 
-    assert(false);
+    VBAM_NOTREACHED();
     return false;
 }
 
@@ -132,13 +134,13 @@ bool OptionIntValidator::WriteToOption() {
         return option()->SetInt(slider->GetValue());
     }
 
-    assert(false);
+    VBAM_NOTREACHED();
     return false;
 }
 
 OptionChoiceValidator::OptionChoiceValidator(config::OptionID option_id)
     : OptionValidator(option_id) {
-    assert(option()->is_unsigned());
+    VBAM_CHECK(option()->is_unsigned());
 }
 
 wxObject* OptionChoiceValidator::Clone() const {
@@ -151,20 +153,20 @@ bool OptionChoiceValidator::IsWindowValueValid() {
 
 bool OptionChoiceValidator::WriteToWindow() {
     wxChoice* choice = wxDynamicCast(GetWindow(), wxChoice);
-    assert(choice);
+    VBAM_CHECK(choice);
     choice->SetSelection(option()->GetUnsigned());
     return true;
 }
 
 bool OptionChoiceValidator::WriteToOption() {
     const wxChoice* choice = wxDynamicCast(GetWindow(), wxChoice);
-    assert(choice);
+    VBAM_CHECK(choice);
     return option()->SetUnsigned(choice->GetSelection());
 }
 
 OptionBoolValidator::OptionBoolValidator(config::OptionID option_id)
     : OptionValidator(option_id) {
-    assert(option()->is_bool());
+    VBAM_CHECK(option()->is_bool());
 }
 
 wxObject* OptionBoolValidator::Clone() const {
@@ -177,14 +179,14 @@ bool OptionBoolValidator::IsWindowValueValid() {
 
 bool OptionBoolValidator::WriteToWindow() {
     wxCheckBox* checkbox = wxDynamicCast(GetWindow(), wxCheckBox);
-    assert(checkbox);
+    VBAM_CHECK(checkbox);
     checkbox->SetValue(option()->GetBool());
     return true;
 }
 
 bool OptionBoolValidator::WriteToOption() {
     const wxCheckBox* checkbox = wxDynamicCast(GetWindow(), wxCheckBox);
-    assert(checkbox);
+    VBAM_CHECK(checkbox);
     return option()->SetBool(checkbox->GetValue());
 }
 

@@ -1,4 +1,3 @@
-#include <cassert>
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
@@ -12,6 +11,7 @@
 
 #include "components/filters_agb/filters_agb.h"
 #include "components/filters_interframe/interframe.h"
+#include "core/base/check.h"
 #include "core/base/system.h"
 #include "core/base/file_util.h"
 #include "core/base/sizes.h"
@@ -177,8 +177,7 @@ static void* gb_rtcdata_prt(void)
     case gbCartData::MapperType::kGameGenie:
     case gbCartData::MapperType::kGameShark:
     case gbCartData::MapperType::kUnknown:
-        // Unreachable.
-        assert(false);
+        VBAM_NOTREACHED();
         return nullptr;
     }
     return nullptr;
@@ -205,8 +204,7 @@ static size_t gb_rtcdata_size(void)
     case gbCartData::MapperType::kGameGenie:
     case gbCartData::MapperType::kGameShark:
     case gbCartData::MapperType::kUnknown:
-        // Unreachable.
-        assert(false);
+        VBAM_NOTREACHED();
         break;
     }
     return 0;
@@ -272,8 +270,7 @@ static void gbInitRTC(void)
     case gbCartData::MapperType::kGameGenie:
     case gbCartData::MapperType::kGameShark:
     case gbCartData::MapperType::kUnknown:
-        // Unreachable.
-        assert(false);
+        VBAM_NOTREACHED();
         break;
     }
 }
@@ -1456,8 +1453,7 @@ void retro_run(void)
             case gbCartData::MapperType::kGameGenie:
             case gbCartData::MapperType::kGameShark:
             case gbCartData::MapperType::kUnknown:
-                // Unreachable.
-                assert(false);
+                VBAM_NOTREACHED();
                 break;
             }
             /* Initialize RTC using local time if needed */

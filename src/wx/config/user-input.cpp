@@ -257,8 +257,7 @@ wxString JoyInput::ToConfigString() const {
             return wxString::Format("%s-Hat%dE", joy_string, control_index_);
     }
 
-    // Unreachable.
-    assert(false);
+    VBAM_NOTREACHED();
     return wxEmptyString;
 }
 
@@ -281,8 +280,7 @@ wxString JoyInput::ToLocalizedString() const {
             return wxString::Format(_("%s: Hat %d East"), joy_string, control_index_);
     }
 
-    // Unreachable.
-    assert(false);
+    VBAM_NOTREACHED();
     return wxEmptyString;
 }
 
@@ -368,8 +366,7 @@ wxString UserInput::ToConfigString() const {
             return joy_input().ToConfigString();
     }
 
-    // Unreachable.
-    assert(false);
+    VBAM_NOTREACHED();
     return wxEmptyString;
 }
 
@@ -383,8 +380,7 @@ wxString UserInput::ToLocalizedString() const {
             return joy_input().ToLocalizedString();
     }
 
-    // Unreachable.
-    assert(false);
+    VBAM_NOTREACHED();
     return wxEmptyString;
 }
 
