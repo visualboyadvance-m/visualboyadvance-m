@@ -17,7 +17,7 @@
 #define VBAM_IMMEDIATE_CRASH_DETAIL() __builtin_trap()
 #define VBAM_INTRINSIC_UNREACHABLE_DETAIL() __builtin_unreachable()
 
-#elif defined(_MSC_VER) // defined(__GNUC__) || defined(__clang__)
+#elif defined(_MSC_VER)  // defined(__GNUC__) || defined(__clang__)
 
 // MSVC.
 #define VBAM_IMMEDIATE_CRASH_DETAIL() __debugbreak()
@@ -33,29 +33,25 @@
 #define VBAM_STRINGIFY(x) VBAM_STRINGIFY_DETAIL(x)
 
 #define VBAM_REQUIRE_SEMICOLON_DETAIL() \
-  static_assert(true, "Require a semicolon after macros invocation.")
+    static_assert(true, "Require a semicolon after macros invocation.")
 
-#define VBAM_CHECK(condition) \
-  if (!(condition)) { \
-    fputs("CHECK failed at " __FILE__ ":" VBAM_STRINGIFY(__LINE__) ": " #condition "\n", stderr); \
-    VBAM_IMMEDIATE_CRASH_DETAIL(); \
-  } \
-  VBAM_REQUIRE_SEMICOLON_DETAIL()
-
-#define VBAM_NOTREACHED_MESSAGE_DETAIL() \
-  fputs("NOTREACHED code reached at " __FILE__ ":" VBAM_STRINGIFY(__LINE__) "\n", stderr)
+#define VBAM_CHECK(condition)                                                                \
+    if (!(condition)) {                                                                      \
+        fputs("CHECK failed at " __FILE__ ":" VBAM_STRINGIFY(__LINE__) ": " #condition "\n", \
+              stderr);                                                                       \
+        VBAM_IMMEDIATE_CRASH_DETAIL();                                                       \
+    }                                                                                        \
+    VBAM_REQUIRE_SEMICOLON_DETAIL()
 
 #if defined(DEBUG)
 
-#define VBAM_NOTREACHED() \
-  VBAM_NOTREACHED_MESSAGE_DETAIL(); \
-  VBAM_IMMEDIATE_CRASH_DETAIL()
+#define VBAM_NOTREACHED()                                                                    \
+    fputs("NOTREACHED code reached at " __FILE__ ":" VBAM_STRINGIFY(__LINE__) "\n", stderr); \
+    VBAM_IMMEDIATE_CRASH_DETAIL()
 
 #else  // defined(DEBUG)
 
-#define VBAM_NOTREACHED() \
-  VBAM_NOTREACHED_MESSAGE_DETAIL(); \
-  VBAM_INTRINSIC_UNREACHABLE_DETAIL()
+#define VBAM_NOTREACHED() VBAM_INTRINSIC_UNREACHABLE_DETAIL()
 
 #endif  // defined(DEBUG)
 

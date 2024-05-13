@@ -6,10 +6,8 @@ if(NOT BUILD_TESTING)
 endif()
 
 add_library(vbam-wx-fake-opts OBJECT)
-
 target_sources(vbam-wx-fake-opts
     PRIVATE
-    fake_opts.cpp
+    fake-opts.cpp
 )
-
 configure_wx_target(vbam-wx-fake-opts)

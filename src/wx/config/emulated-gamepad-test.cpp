@@ -135,7 +135,8 @@ TEST_F(GamepadTest, NonDefaultInput) {
     const config::KeyboardInput f1(WXK_F1);
 
     // Assign F1 to "Up".
-    bindings()->AssignInputToCommand(f1, config::GameCommand(config::GameJoy(0), config::GameKey::Up));
+    bindings()->AssignInputToCommand(f1,
+                                     config::GameCommand(config::GameJoy(0), config::GameKey::Up));
 
     // Press F1, the up key should be pressed.
     EXPECT_TRUE(gamepad()->OnInputPressed(f1));

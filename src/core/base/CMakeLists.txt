@@ -60,3 +60,5 @@ target_link_libraries(vbam-core-base
     PRIVATE vbam-fex stb-image
     PUBLIC ${ZLIB_LIBRARY}
 )
+
+add_subdirectory(test)

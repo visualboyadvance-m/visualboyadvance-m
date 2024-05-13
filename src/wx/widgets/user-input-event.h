@@ -39,7 +39,7 @@ public:
     // Returns the first pressed input, if any.
     nonstd::optional<config::UserInput> FirstReleasedInput() const;
 
-    // Mark `event_data` as processed and returns the new event filter. This is
+    // Marks `user_input` as processed and returns the new event filter. This is
     // meant to be used with FilterEvent() to process global shortcuts before
     // sending the event to the next handler.
     int FilterProcessedInput(const config::UserInput& user_input);

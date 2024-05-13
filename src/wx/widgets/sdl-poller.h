@@ -36,10 +36,10 @@ public:
 
 private:
     // Helper method to find a joystick state from a joystick ID.
-    // Returns nullptr if not present. Called from the SDL worker thread.
+    // Returns nullptr if not present.
     JoyState* FindJoyState(const SDL_JoystickID& joy_id);
 
-    // Remap all controllers. Called from the SDL worker thread.
+    // Remap all controllers.
     void RemapControllers();
 
     // Reconnects all controllers.

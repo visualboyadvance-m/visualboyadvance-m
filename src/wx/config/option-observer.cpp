@@ -3,6 +3,8 @@
 #include "core/base/check.h"
 #include "wx/config/option.h"
 
+#include "core/base/check.h"
+
 namespace config {
 
 // An Option::Observer that calls a callback when an option has changed.

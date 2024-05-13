@@ -1,4 +1,4 @@
-name: macOS Latest Build
+name: macOS Latest
 on: [push, pull_request]
 
 jobs:
@@ -60,4 +60,4 @@ jobs:
       - if: matrix.build_options == 'default'
         name: Run tests
         run: >-
-          nix-shell --command 'cd build && ctest -j'
+          nix-shell --command 'cd build && ctest -j --output-on-failure'

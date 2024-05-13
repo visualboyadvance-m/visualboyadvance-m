@@ -51,6 +51,28 @@ if(NOT DEFINED VCPKG_TARGET_TRIPLET)
     message(STATUS "Inferred VCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}")
 endif()
 
+function(vcpkg_seconds)
+    if(CMAKE_HOST_SYSTEM MATCHES Windows OR ((NOT DEFINED CMAKE_HOST_SYSTEM) AND WIN32))
+        execute_process(
+            COMMAND cmd /c echo %TIME:~0,8%
+            OUTPUT_VARIABLE time
+        )
+    else()
+        execute_process(
+            COMMAND date +%H:%M:%S
+            OUTPUT_VARIABLE time
+        )
+    endif()
+
+    string(SUBSTRING "${time}" 0 2 hours)
+    string(SUBSTRING "${time}" 3 2 minutes)
+    string(SUBSTRING "${time}" 6 2 secs)
+
+    math(EXPR seconds "(${hours} * 60 * 60) + (${minutes} * 60) + ${secs}")
+
+    set(seconds ${seconds} PARENT_SCOPE)
+endfunction()
+
 function(vcpkg_check_git_status git_status)
     # The VS vcpkg component cannot be written to without elevation.
     if(NOT git_status EQUAL 0 AND NOT VCPKG_ROOT MATCHES "Visual Studio")

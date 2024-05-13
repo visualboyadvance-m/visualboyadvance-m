@@ -85,7 +85,7 @@ private:
     void OnValueChanged() final;
 };
 
-// "Generic" validator for a wxChecBox or wxRadioButton widget with a kUnsigned
+// "Generic" validator for a wxCheckBox or wxRadioButton widget with a kUnsigned
 // Option. This will make sure the kUnsigned Option and the wxRadioButton or
 // wxCheckBox are kept in sync. The widget will be checked if the kUnsigned
 // Option matches the provided `value` parameter in the constructor.

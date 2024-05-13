@@ -1,4 +1,4 @@
-name: Ubuntu Latest Build
+name: Ubuntu Latest
 on: [push, pull_request]
 
 jobs:
@@ -45,6 +45,9 @@ jobs:
         run: >-
           bash installdeps; if [ "${{ matrix.build_compiler }}" = clang ]; then sudo apt -y install clang; fi
 
+      - name: Install xvfb
+        run: sudo apt -y install xvfb
+
       # CMake build
       - if: matrix.build_options != 'libretro'
         name: Configure CMake
@@ -65,4 +68,4 @@ jobs:
       # Run tests
       - if: matrix.build_options == 'default'
         name: Run tests
-        run: cd build && ctest -j
+        run: cd build && xvfb-run ctest -j --output-on-failure
