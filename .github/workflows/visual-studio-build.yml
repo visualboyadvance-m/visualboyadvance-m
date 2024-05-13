@@ -1,4 +1,4 @@
-name: Visual Studio Build
+name: Visual Studio
 on: [push, pull_request]
 
 jobs:
@@ -57,4 +57,4 @@ jobs:
       # Run tests
       - if: matrix.build_options == 'default' && matrix.msvc_arch != 'amd64_arm64'
         name: Run tests
-        run: cd build && ctest -j
+        run: cd build && ctest -j --output-on-failure

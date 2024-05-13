@@ -46,33 +46,6 @@ set(VBAM_WX_COMMON
     viewsupt.h
     wayland.cpp
     wayland.h
-    # from external source with minor modifications
-    widgets/checkedlistctrl.cpp
-    widgets/checkedlistctrl.h
-    widgets/client-data.h
-    widgets/dpi-support.h
-    widgets/event-handler-provider.h
-    widgets/group-check-box.cpp
-    widgets/group-check-box.h
-    widgets/keep-on-top-styler.cpp
-    widgets/keep-on-top-styler.h
-    widgets/option-validator.cpp
-    widgets/option-validator.h
-    widgets/render-plugin.cpp
-    widgets/render-plugin.h
-    widgets/user-input-ctrl.cpp
-    widgets/user-input-ctrl.h
-    widgets/user-input-event.cpp
-    widgets/user-input-event.h
-    widgets/sdl-poller.cpp
-    widgets/sdl-poller.h
-    widgets/shortcut-menu-bar.cpp
-    widgets/shortcut-menu-bar.h
-    widgets/utils.cpp
-    widgets/utils.h
-    widgets/webupdatedef.h
-    widgets/wxmisc.h
-    widgets/wxmisc.cpp
     wxhead.h
     wxlogdebug.h
     wxvbam.cpp
@@ -253,6 +226,9 @@ function(configure_wx_target target)
         endif()
     endfunction()
 
+    # Core emulator.
+    _add_link_libraries(vbam-core)
+
     # Nonstd.
     _add_link_libraries(nonstd-lib)
     _add_include_directories(${NONSTD_INCLUDE_DIR})
@@ -311,6 +287,7 @@ endfunction()
 # Sub-projects.
 add_subdirectory(test)
 add_subdirectory(config)
+add_subdirectory(widgets)
 
 set(VBAM_ICON visualboyadvance-m.icns)
 set(VBAM_ICON_PATH ${CMAKE_CURRENT_SOURCE_DIR}/icons/${VBAM_ICON})
@@ -326,13 +303,13 @@ target_include_directories(visualboyadvance-m PRIVATE ${SDL2_INCLUDE_DIRS})
 
 target_link_libraries(
     visualboyadvance-m
-    vbam-core
     vbam-components-draw-text
     vbam-components-filters
     vbam-components-filters-agb
     vbam-components-filters-interframe
     vbam-components-user-config
     vbam-wx-config
+    vbam-wx-widgets
 )
 
 # adjust link command when making a static binary for gcc

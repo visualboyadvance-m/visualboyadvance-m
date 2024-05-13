@@ -1,4 +1,4 @@
-name: MSYS2 Build
+name: MSYS2
 on: [push, pull_request]
 
 jobs:

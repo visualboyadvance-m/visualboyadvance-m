@@ -1,5 +1,5 @@
 # This defines the vbam-wx-config target and the
-# `VBAM_LOCALIZABLE_WX_CONFIG_FILES` variable, containing the  list of
+# `VBAM_LOCALIZABLE_WX_CONFIG_FILES` variable, containing the list of
 # localizable files in the vbam-wx-config target.
 
 # I don't like duplicating/triplicating code, so I only declare
@@ -61,15 +61,9 @@ target_sources(vbam-wx-config
     user-input.h
 )
 
-target_link_libraries(vbam-wx-config
-    PUBLIC
-    nonstd-lib
-    vbam-core
-)
-
 configure_wx_target(vbam-wx-config)
 
-if (BUILD_TESTING)
+if(BUILD_TESTING)
     add_executable(vbam-wx-config-tests
         bindings-test.cpp
         command-test.cpp
@@ -79,10 +73,12 @@ if (BUILD_TESTING)
         user-input-test.cpp
     )
     target_link_libraries(vbam-wx-config-tests
-        vbam-core
+        # Test deps.
         vbam-core-fake
-        vbam-wx-config
         vbam-wx-fake-opts
+
+        # Target deps.
+        vbam-wx-config
         GTest::gtest_main
     )
 
