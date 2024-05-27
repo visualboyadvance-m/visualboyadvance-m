@@ -18,13 +18,14 @@
 # Overtry <marcoruhl@hotmail.de>, 2019
 # Peter Tpoint <peter.traxl@gmail.com>, 2021
 # RootCore <administrator@root-core.net>, 2019
+# R S, 2024
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-06 06:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Peter Tpoint <peter.traxl@gmail.com>, 2021\n"
+"Last-Translator: R S, 2024\n"
 "Language-Team: German (http://app.transifex.com/bgk/vba-m/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -47,7 +48,7 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
 " Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Game Boy Advance Formate (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game Boy Formate (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:143
 msgid "Open ROM file"
@@ -303,7 +304,7 @@ msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA Entwicklerteam\nCopyright (C) 2007-2017 VBA-M Entwicklerteam"
+msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA Entwicklerteam\nCopyright (C) 2007-2020 VBA-M Entwicklerteam"
 
 #: cmdevents.cpp:2238
 msgid ""
@@ -396,7 +397,7 @@ msgstr "Unbekannt"
 
 #: dialogs/game-maker.cpp:235
 msgid "Invalid"
-msgstr ""
+msgstr "Ungültig"
 
 #: dialogs/gb-rom-info.cpp:21
 msgid "No mapper"
@@ -3807,23 +3808,23 @@ msgstr ""
 
 #: xrc/SoundConfig.xrc:79
 msgid "48 KHz"
-msgstr "48 KHz"
+msgstr "48 kHz"
 
 #: xrc/SoundConfig.xrc:80
 msgid "44.1 KHz"
-msgstr "44,1 KHz"
+msgstr "44,1 kHz"
 
 #: xrc/SoundConfig.xrc:81
 msgid "22 KHz"
-msgstr "22 KHz"
+msgstr "22 kHz"
 
 #: xrc/SoundConfig.xrc:82
 msgid "11 KHz"
-msgstr "11 KHz"
+msgstr "11 kHz"
 
 #: xrc/SoundConfig.xrc:112
 msgid "Direct Sound"
-msgstr ""
+msgstr "DirectSound"
 
 #: xrc/SoundConfig.xrc:140
 msgid "Device"
@@ -3863,7 +3864,7 @@ msgstr "Center"
 
 #: xrc/SoundConfig.xrc:263
 msgid "Left / Right"
-msgstr ""
+msgstr "Links / Rechts"
 
 #: xrc/SoundConfig.xrc:292
 msgid "Sound filtering"
