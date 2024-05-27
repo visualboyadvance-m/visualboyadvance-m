@@ -3031,15 +3031,15 @@ msgstr "Datei"
 
 #: xrc/MainMenu.xrc:7
 msgid "Open..."
-msgstr "Öffnen..."
+msgstr "Öffne..."
 
 #: xrc/MainMenu.xrc:10
 msgid "Open &Game Boy..."
-msgstr ""
+msgstr "Öffne &Game Boy..."
 
 #: xrc/MainMenu.xrc:13
 msgid "Open Game Boy &Color..."
-msgstr ""
+msgstr "Öffne Game Boy &Color..."
 
 #: xrc/MainMenu.xrc:16
 msgid "Open rece&nt"
@@ -3091,7 +3091,7 @@ msgstr "Zuletzte verwendete automatisch laden"
 
 #: xrc/MainMenu.xrc:89
 msgid "From &File..."
-msgstr ""
+msgstr "Von &Datei..."
 
 #: xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
@@ -3155,7 +3155,7 @@ msgstr "1&0"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File..."
-msgstr ""
+msgstr "In &Datei..."
 
 #: xrc/MainMenu.xrc:147
 msgid "&Save state"
@@ -3235,7 +3235,7 @@ msgstr "Abs&pielen"
 
 #: xrc/MainMenu.xrc:214
 msgid "&Quit"
-msgstr "&Verlassen"
+msgstr "&Schließen"
 
 #: xrc/MainMenu.xrc:218
 msgid "&Emulation"
@@ -3255,7 +3255,7 @@ msgstr "Zurückspulen"
 
 #: xrc/MainMenu.xrc:231
 msgid "Toggle &full screen"
-msgstr "&Vollbild umschalten"
+msgstr "&Vollbild an/aus"
 
 #: xrc/MainMenu.xrc:238
 msgid "&Turbo mode"
@@ -3324,7 +3324,7 @@ msgstr "&Speed-Hack"
 #: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:383
 #: xrc/MainMenu.xrc:417
 msgid "&Configure..."
-msgstr ""
+msgstr "Anpassen..."
 
 #: xrc/MainMenu.xrc:314
 msgid "&Video"
@@ -3404,7 +3404,7 @@ msgstr "Lautstärke &verringern"
 
 #: xrc/MainMenu.xrc:392
 msgid "&Toggle sound"
-msgstr "Sound umschal&ten"
+msgstr "S&tummschaltung an/aus"
 
 #: xrc/MainMenu.xrc:397
 msgid "&Game Boy Advance sound interpolation"
@@ -3428,11 +3428,11 @@ msgstr "Steuerung"
 
 #: xrc/MainMenu.xrc:420
 msgid "Allow &keyboard background input"
-msgstr "Ermöglichen &Tastatur Hintergrund Eingang"
+msgstr "&Tastatureingabe im Hintergrund zulassen"
 
 #: xrc/MainMenu.xrc:424
 msgid "Allow &joystick background input"
-msgstr "Ermöglichen &Joystick Hintergrund Eingang"
+msgstr "&Joystickeingabe im Hintergrund zulassen"
 
 #: xrc/MainMenu.xrc:429
 msgid "&Autofire"
@@ -3460,7 +3460,7 @@ msgstr "&R"
 
 #: xrc/MainMenu.xrc:494 xrc/MainMenu.xrc:517
 msgid "Configure..."
-msgstr ""
+msgstr "Anpassen..."
 
 #: xrc/MainMenu.xrc:498
 msgid "&Real-time clock"
@@ -3508,7 +3508,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:555
 msgid "&General..."
-msgstr ""
+msgstr "All&gemein..."
 
 #: xrc/MainMenu.xrc:558
 msgid "&Speedup / Turbo..."
@@ -3516,15 +3516,15 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:561
 msgid "D&irectories..."
-msgstr ""
+msgstr "Verzeichnisse..."
 
 #: xrc/MainMenu.xrc:564
 msgid "&Key Shortcuts..."
-msgstr ""
+msgstr "Tasten&kürzel"
 
 #: xrc/MainMenu.xrc:567
 msgid "UI Settings"
-msgstr ""
+msgstr "Benutzeroberfläche..."
 
 #: xrc/MainMenu.xrc:569
 msgid "Enable &Status bar"
@@ -3532,7 +3532,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:573
 msgid "Hide &Menu Bar"
-msgstr ""
+msgstr "&Menüleiste verstecken"
 
 #: xrc/MainMenu.xrc:577
 msgid "Suspend &Screen Saver"
@@ -3636,11 +3636,11 @@ msgstr "Kanal &4"
 
 #: xrc/MainMenu.xrc:715
 msgid "Direct Sound &A"
-msgstr "Direct Sound &A"
+msgstr "DirectSound &A"
 
 #: xrc/MainMenu.xrc:720
 msgid "Direct Sound &B"
-msgstr "Direct Sound &B"
+msgstr "DirectSound &B"
 
 #: xrc/MainMenu.xrc:724
 msgid "&Sound Channels"
@@ -3744,7 +3744,7 @@ msgstr "Netzwerk-Link starten"
 
 #: xrc/NetLink.xrc:13
 msgid "WARNING: Link will likely not work over the internet or LAN."
-msgstr ""
+msgstr "WARNUNG: Der Link wird wahrscheinlich nicht über das Internet oder LAN funktionieren."
 
 #: xrc/NetLink.xrc:38
 msgid "Server"
@@ -3760,7 +3760,7 @@ msgstr "Spieler:"
 
 #: xrc/NetLink.xrc:83
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: xrc/NetLink.xrc:107
 msgid "Server:"
@@ -3792,7 +3792,7 @@ msgstr "Toneinstellungen"
 
 #: xrc/SoundConfig.xrc:18
 msgid "Volume:"
-msgstr ""
+msgstr "Lautstärke:"
 
 #: xrc/SoundConfig.xrc:36
 msgid "Mute"
