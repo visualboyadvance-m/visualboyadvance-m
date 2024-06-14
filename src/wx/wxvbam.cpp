@@ -4,7 +4,7 @@
 #include <windows.h>
 #endif
 
-#ifdef __WXGTK__
+#ifdef __WXGTK3__
 #include <gdk/gdk.h>
 #endif
 
@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
 #endif  // DEBUG
 
     // Launch under xwayland on Wayland if EGL is not available.
-#if defined(__WXGTK__) && !defined(HAVE_WAYLAND_EGL)
+#if defined(__WXGTK3__) && !defined(HAVE_WAYLAND_EGL)
     wxString xdg_session_type = wxGetenv("XDG_SESSION_TYPE");
     wxString wayland_display  = wxGetenv("WAYLAND_DISPLAY");
 
