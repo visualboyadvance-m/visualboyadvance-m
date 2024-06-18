@@ -66,7 +66,7 @@ endif
 ifneq (,$(findstring unix,$(platform)))
 	TARGET := $(TARGET_NAME)_libretro.so
 	fpic := -fPIC
-	SHARED := -shared -Wl,-no-undefined
+	SHARED := -shared -Wl,-version-script=$(LIBRETRO_DIR)/link.T -Wl,-no-undefined
 	TILED_RENDERING=1
 
 # Classic Platforms ####################
@@ -78,8 +78,8 @@ ifneq (,$(findstring unix,$(platform)))
 else ifeq ($(platform), classic_armv7_a7)
 	TARGET := $(TARGET_NAME)_libretro.so
 	fpic := -fPIC
-	SHARED := -shared -Wl,--no-undefined -fPIC
-	CFLAGS += -O3 -ffast-math \
+	SHARED := -shared -Wl,--version-script=$(LIBRETRO_DIR)/link.T -Wl,--no-undefined -fPIC
+	CFLAGS += -Ofast \
 	-flto=4 -fwhole-program -fuse-linker-plugin \
 	-fdata-sections -ffunction-sections -Wl,--gc-sections \
 	-fno-stack-protector -fno-ident -fomit-frame-pointer \
@@ -112,7 +112,7 @@ else ifeq ($(platform), classic_armv8_a35)
 	fpic := -fPIC
 	SHARED := -shared
 	TILED_RENDERING=1
-	CFLAGS += -O3 -ffast-math \
+	CFLAGS += -Ofast \
 	-flto=4 -fwhole-program -fuse-linker-plugin \
 	-fdata-sections -ffunction-sections -Wl,--gc-sections \
 	-fno-stack-protector -fno-ident -fomit-frame-pointer \
@@ -188,6 +188,8 @@ else ifneq (,$(findstring ios,$(platform)))
 	  MINVERSION = -miphoneos-version-min=5.0
 	endif
         CFLAGS += $(MINVERSION)
+        CXXFLAGS += $(MINVERSION)
+        LDFLAGS += $(MINVERSION)
 	TILED_RENDERING=1
 
 else ifeq ($(platform), tvos-arm64)
@@ -200,6 +202,10 @@ endif
    TILED_RENDERING = 1
    CC = cc -arch arm64 -isysroot $(IOSSDK)
    CXX = c++ -arch arm64 -isysroot $(IOSSDK)
+   MINVERSION = -mappletvos-version-min=11.0
+   CFLAGS += $(MINVERSION)
+   CXXFLAGS += $(MINVERSION)
+   LDFLAGS += $(MINVERSION)
 
 # Theos iOS
 else ifeq ($(platform), theos_ios)
@@ -216,7 +222,7 @@ else ifeq ($(platform), theos_ios)
 else ifeq ($(platform), qnx)
 	TARGET := $(TARGET_NAME)_libretro_$(platform).so
 	fpic := -fPIC
-	SHARED := -lcpp -lm -shared -Wl,-no-undefined
+	SHARED := -lcpp -lm -shared -Wl,-version-script=$(LIBRETRO_DIR)/link.T -Wl,-no-undefined
 	CC = qcc -Vgcc_ntoarmv7le
 	CXX = QCC -Vgcc_ntoarmv7le_cpp
 	AR = QCC -Vgcc_ntoarmv7le
@@ -311,8 +317,8 @@ else ifeq ($(platform), wiiu)
 	CXX = $(DEVKITPPC)/bin/powerpc-eabi-g++$(EXE_EXT)
 	AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
 	ENDIANNESS_DEFINES += -DMSB_FIRST -DWORDS_BIGENDIAN=1
-	PLATFORM_DEFINES += -DGEKKO -DWIIU -DHW_WUP -mcpu=750 -meabi -mhard-float -D__ppc__
-	PLATFORM_DEFINES += -U__INT32_TYPE__ -U __UINT32_TYPE__ -D__INT32_TYPE__=int
+	PLATFORM_DEFINES += -DGEKKO -DWIIU -DHW_RVL -mcpu=750 -meabi -mhard-float -D__ppc__
+	PLATFORM_DEFINES += -ffunction-sections -fdata-sections -D__wiiu__ -D__wut__
 	STATIC_LINKING=1
 	TILED_RENDERING=1
 
@@ -322,18 +328,17 @@ else ifeq ($(platform), libnx)
 	TARGET := $(TARGET_NAME)_libretro_$(platform).a
 	DEFINES := -DSWITCH=1 -U__linux__ -U__linux -DRARCH_INTERNAL -DHAVE_THREADS=1
 	CFLAGS := $(DEFINES) -g -O3 \
-		-fPIE -I$(LIBNX)/include/ -ffunction-sections -fdata-sections -ftls-model=local-exec -Wl,--allow-multiple-definition -specs=$(LIBNX)/switch.specs
+		      -fPIE -I$(LIBNX)/include/ -ffunction-sections -fdata-sections -ftls-model=local-exec -Wl,--allow-multiple-definition -specs=$(LIBNX)/switch.specs
 	CFLAGS += $(INCDIRS)
 	CFLAGS += $(INCLUDE) -D__SWITCH__ -DHAVE_LIBNX
-	CXXFLAGS := $(ASFLAGS) $(CFLAGS) -fno-rtti -fno-exceptions
+	CXXFLAGS := $(ASFLAGS) $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
+	CFLAGS += -std=gnu11
 	STATIC_LINKING=1
 
-# Nintendo Switch (devkitpro)
+# Nintendo Switch (libtransistor)
 else ifeq ($(platform), switch)
 	TARGET := $(TARGET_NAME)_libretro_$(platform).a
-	CC = $(DEVKITPRO)/devkitA64/bin/aarch64-none-elf-gcc$(EXE_EXT)
-	CXX = $(DEVKITPRO)/devkitA64/bin/aarch64-none-elf-g++$(EXE_EXT)
-	AR = $(DEVKITPRO)/devkitA64/bin/aarch64-none-elf-ar$(EXE_EXT)
+	include $(LIBTRANSISTOR_HOME)/libtransistor.mk
 	STATIC_LINKING=1
 	TILED_RENDERING=1
 
@@ -528,7 +533,7 @@ else
 	TARGET := $(TARGET_NAME)_libretro.dll
 	CC ?= gcc
 	CXX ?= g++
-	SHARED := -shared -static-libgcc -static-libstdc++ -Wl,-no-undefined
+	SHARED := -shared -static-libgcc -static-libstdc++ -Wl,-no-undefined -Wl,-version-script=$(LIBRETRO_DIR)/link.T
 	TILED_RENDERING=1
 endif
 
