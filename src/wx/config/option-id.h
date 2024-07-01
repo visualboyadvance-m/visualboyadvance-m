@@ -99,6 +99,7 @@ enum class OptionID {
     kPrefSpeedupThrottle,
     kPrefSpeedupFrameSkip,
     kPrefSpeedupThrottleFrameSkip,
+    kPrefSpeedupMute,
     kPrefUseBiosGB,
     kPrefUseBiosGBA,
     kPrefUseBiosGBC,

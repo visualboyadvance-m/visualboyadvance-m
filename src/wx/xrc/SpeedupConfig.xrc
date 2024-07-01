@@ -11,7 +11,7 @@
             <weight>bold</weight>
           </font>
         </object>
-        <flag>wxALL</flag>
+        <flag>wxALL|wxALIGN_CENTRE_HORIZONTAL</flag>
         <border>5</border>
       </object>
       <object class="sizeritem">
@@ -32,9 +32,7 @@
               </object>
               <object class="sizeritem">
                 <object class="wxSpinCtrl" name="SpeedupThrottleSpin">
-                  <value>0</value>
-                  <min>0</min>
-                  <max>4000</max>
+                  <size>40,-1d</size>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>
@@ -46,23 +44,48 @@
         <border>5</border>
       </object>
       <object class="sizeritem">
-        <object class="wxCheckBox" name="SpeedupThrottleFrameSkip">
-          <label>Frame skip</label>
+        <object class="wxFlexGridSizer">
+          <rows>1</rows>
+          <cols>2</cols>
+          <growablerows>0</growablerows>
+          <growablecols>0,1</growablecols>
+          <object class="sizeritem">
+            <object class="wxCheckBox" name="SpeedupThrottleFrameSkip">
+              <label>Frame skip</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxCheckBox" name="SpeedupMute">
+              <label>Mute Sound</label>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
         </object>
-        <flag>wxALL</flag>
+        <flag>wxALL|wxEXPAND</flag>
         <border>5</border>
       </object>
       <object class="sizeritem">
-        <flag>wxALL|wxEXPAND</flag>
-        <border>5</border>
-        <object class="wxStdDialogButtonSizer">
-          <object class="button">
+        <object class="wxFlexGridSizer">
+          <rows>1</rows>
+          <cols>2</cols>
+          <growablerows>0</growablerows>
+          <growablecols>0,1</growablecols>
+          <object class="sizeritem">
             <object class="wxButton" name="wxID_OK"/>
+            <flag>wxALL</flag>
+            <border>10</border>
           </object>
-          <object class="button">
+          <object class="sizeritem">
             <object class="wxButton" name="wxID_CANCEL"/>
+            <flag>wxALL|wxALIGN_RIGHT</flag>
+            <border>10</border>
           </object>
         </object>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>10</border>
       </object>
     </object>
   </object>

@@ -3845,6 +3845,8 @@ void CPULoop(int ticks)
                     bool turbo_button_pressed        = (joy >> 10) & 1;
 #ifndef __LIBRETRO__
                     static uint32_t last_throttle;
+                    static bool current_volume_saved = false;
+                    static float current_volume;
 
                     if (turbo_button_pressed) {
                         if (coreOptions.speedup_frame_skip)
@@ -3859,10 +3861,23 @@ void CPULoop(int ticks)
                             if (coreOptions.speedup_throttle_frame_skip)
                                 framesToSkip += static_cast<int>(std::ceil(double(coreOptions.speedup_throttle) / 100.0) - 1);
                         }
+
+                        if (coreOptions.speedup_mute && !current_volume_saved) {
+                            current_volume = soundGetVolume();
+                            current_volume_saved = true;
+                            soundSetVolume(0);
+                        }
                     }
-                    else if (speedup_throttle_set) {
-                        soundSetThrottle(DowncastU16(last_throttle));
-                        speedup_throttle_set = false;
+                    else {
+                        if (current_volume_saved) {
+                            soundSetVolume(current_volume);
+                            current_volume_saved = false;
+                        }
+
+                        if (speedup_throttle_set) {
+                            soundSetThrottle(DowncastU16(last_throttle));
+                            speedup_throttle_set = false;
+                        }
                     }
 #else
                     if (turbo_button_pressed)

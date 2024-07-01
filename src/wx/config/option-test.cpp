@@ -353,3 +353,109 @@ TEST(OptionProxyTest, MatchingTypes) {
         EXPECT_EQ(option->type(), proxy_type);
     }
 }
+
+TEST(OptionProxyTest, NumericOperators) {
+    wxLogNull disable_logging;
+
+    int32_t int_opt = OPTION(kDispMaxThreads);
+
+    int_opt++;
+    OPTION(kDispMaxThreads)++;
+    EXPECT_EQ(int_opt, OPTION(kDispMaxThreads));
+
+    int_opt--;
+    OPTION(kDispMaxThreads)--;
+    EXPECT_EQ(int_opt, OPTION(kDispMaxThreads));
+
+    ++int_opt;
+    OPTION(kDispMaxThreads)++;
+    EXPECT_EQ(int_opt, OPTION(kDispMaxThreads));
+
+    --int_opt;
+    OPTION(kDispMaxThreads)--;
+    EXPECT_EQ(int_opt, OPTION(kDispMaxThreads));
+
+    int_opt += 2;
+    OPTION(kDispMaxThreads) += 2;
+    EXPECT_EQ(int_opt, OPTION(kDispMaxThreads));
+
+    int_opt -= 2;
+    OPTION(kDispMaxThreads) -= 2;
+    EXPECT_EQ(int_opt, OPTION(kDispMaxThreads));
+
+    OPTION(kDispMaxThreads) = OPTION(kDispMaxThreads).Max();
+    OPTION(kDispMaxThreads)++;
+    EXPECT_EQ(OPTION(kDispMaxThreads), OPTION(kDispMaxThreads).Max());
+
+    OPTION(kDispMaxThreads) = OPTION(kDispMaxThreads).Min();
+    OPTION(kDispMaxThreads)--;
+    EXPECT_EQ(OPTION(kDispMaxThreads), OPTION(kDispMaxThreads).Min());
+
+    uint32_t unsigned_opt = OPTION(kJoyDefault);
+
+    unsigned_opt++;
+    OPTION(kJoyDefault)++;
+    EXPECT_EQ(unsigned_opt, OPTION(kJoyDefault));
+
+    unsigned_opt--;
+    OPTION(kJoyDefault)--;
+    EXPECT_EQ(unsigned_opt, OPTION(kJoyDefault));
+
+    ++unsigned_opt;
+    OPTION(kJoyDefault)++;
+    EXPECT_EQ(unsigned_opt, OPTION(kJoyDefault));
+
+    --unsigned_opt;
+    OPTION(kJoyDefault)--;
+    EXPECT_EQ(unsigned_opt, OPTION(kJoyDefault));
+
+    unsigned_opt += 2;
+    OPTION(kJoyDefault) += 2;
+    EXPECT_EQ(unsigned_opt, OPTION(kJoyDefault));
+
+    unsigned_opt -= 2;
+    OPTION(kJoyDefault) -= 2;
+    EXPECT_EQ(unsigned_opt, OPTION(kJoyDefault));
+
+    OPTION(kJoyDefault) = OPTION(kJoyDefault).Max();
+    OPTION(kJoyDefault)++;
+    EXPECT_EQ(OPTION(kJoyDefault), OPTION(kJoyDefault).Max());
+
+    OPTION(kJoyDefault) = OPTION(kJoyDefault).Min();
+    OPTION(kJoyDefault)--;
+    EXPECT_EQ(OPTION(kJoyDefault), OPTION(kJoyDefault).Min());
+
+    double double_opt = OPTION(kDispScale);
+
+    double_opt++;
+    OPTION(kDispScale)++;
+    EXPECT_EQ(double_opt, OPTION(kDispScale));
+
+    double_opt--;
+    OPTION(kDispScale)--;
+    EXPECT_EQ(double_opt, OPTION(kDispScale));
+
+    ++double_opt;
+    OPTION(kDispScale)++;
+    EXPECT_EQ(double_opt, OPTION(kDispScale));
+
+    --double_opt;
+    OPTION(kDispScale)--;
+    EXPECT_EQ(double_opt, OPTION(kDispScale));
+
+    double_opt += 2;
+    OPTION(kDispScale) += 2;
+    EXPECT_EQ(double_opt, OPTION(kDispScale));
+
+    double_opt -= 2;
+    OPTION(kDispScale) -= 2;
+    EXPECT_EQ(double_opt, OPTION(kDispScale));
+
+    OPTION(kDispScale) = OPTION(kDispScale).Max();
+    OPTION(kDispScale)++;
+    EXPECT_EQ(OPTION(kDispScale), OPTION(kDispScale).Max());
+
+    OPTION(kDispScale) = OPTION(kDispScale).Min();
+    OPTION(kDispScale)--;
+    EXPECT_EQ(OPTION(kDispScale), OPTION(kDispScale).Min());
+}

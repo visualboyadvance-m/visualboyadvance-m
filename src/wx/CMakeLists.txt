@@ -31,6 +31,8 @@ set(VBAM_WX_COMMON
     dialogs/joypad-config.h
     dialogs/sound-config.cpp
     dialogs/sound-config.h
+    dialogs/speedup-config.cpp
+    dialogs/speedup-config.h
     drawing.h
     extra-translations.cpp
     gfxviewers.cpp

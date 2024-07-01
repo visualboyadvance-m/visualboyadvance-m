@@ -98,7 +98,8 @@ enum named_opts
 	OPT_SOUND_FILTERING,
 	OPT_SPEEDUP_THROTTLE,
 	OPT_SPEEDUP_FRAME_SKIP,
-	OPT_NO_SPEEDUP_THROTTLE_FRAME_SKIP
+	OPT_NO_SPEEDUP_THROTTLE_FRAME_SKIP,
+	OPT_NO_SPEEDUP_MUTE
 };
 
 #define SOUND_MAX_VOLUME 2.0
@@ -232,6 +233,7 @@ struct option argOptions[] = {
 	{ "speedup-throttle", required_argument, 0, OPT_SPEEDUP_THROTTLE },
 	{ "speedup-frame-skip", required_argument, 0, OPT_SPEEDUP_FRAME_SKIP },
 	{ "no-speedup-throttle-frame-skip", no_argument, 0, OPT_NO_SPEEDUP_THROTTLE_FRAME_SKIP },
+	{ "no-speedup-mute", no_argument, 0, OPT_NO_SPEEDUP_MUTE },
 	{ "use-bios", no_argument, &coreOptions.useBios, 1 },
 	{ "verbose", required_argument, 0, 'v' },
 	{ "win-gb-printer-enabled", no_argument, &coreOptions.winGbPrinterEnabled, 1 },
@@ -347,6 +349,7 @@ void LoadConfig()
 	coreOptions.speedup_throttle = ReadPref("speedupThrottle", 100);
 	coreOptions.speedup_frame_skip = ReadPref("speedupFrameSkip", 9);
 	coreOptions.speedup_throttle_frame_skip = ReadPref("speedupThrottleFrameSkip", 0);
+	coreOptions.speedup_mute = ReadPref("speedupMute", 1);
 	coreOptions.useBios = ReadPrefHex("useBiosGBA");
 	coreOptions.winGbPrinterEnabled = ReadPref("gbPrinter", 0);
 
@@ -989,6 +992,9 @@ int ReadOpts(int argc, char ** argv)
 			break;
 		case OPT_NO_SPEEDUP_THROTTLE_FRAME_SKIP:
 			coreOptions.speedup_throttle_frame_skip = false;
+			break;
+		case OPT_NO_SPEEDUP_MUTE:
+			coreOptions.speedup_mute = false;
 			break;
 		}
 	}
