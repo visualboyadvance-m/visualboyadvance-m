@@ -103,6 +103,7 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /*kPrefSpeedupThrottle*/ Option::Type::kUnsigned,
     /*kPrefSpeedupFrameSkip*/ Option::Type::kUnsigned,
     /*kPrefSpeedupThrottleFrameSkip*/ Option::Type::kBool,
+    /*kPrefSpeedupMute*/ Option::Type::kBool,
     /*kPrefUseBiosGB*/ Option::Type::kBool,
     /*kPrefUseBiosGBA*/ Option::Type::kBool,
     /*kPrefUseBiosGBC*/ Option::Type::kBool,
@@ -174,11 +175,43 @@ private:
     Option* option_;
 };
 
+template <typename T>
+class OptionProxyNumeric {
+public:
+    virtual T Get() const = 0;
+    virtual bool Set(T value) = 0;
+    virtual T Min() const = 0;
+    virtual T Max() const = 0;
+
+    bool operator++() { return *this += 1; }
+    bool operator--() { return *this -= 1; }
+    bool operator++(int) { return *this += 1; }
+    bool operator--(int) { return *this -= 1; }
+    bool operator+=(T value) {
+        const int new_value = Get() + value;
+        if (new_value > Max()) {
+            return Set(Max());
+        } else {
+            return Set(new_value);
+        }
+    }
+    bool operator-=(T value) {
+        const int new_value = Get() - value;
+        if (new_value < Min()) {
+            return Set(Min());
+        } else {
+            return Set(new_value);
+        }
+    }
+
+    operator T() const { return Get(); }
+};
+
 template <OptionID ID>
 class OptionProxy<
     ID,
     typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
-                            Option::Type::kDouble>::type> {
+                            Option::Type::kDouble>::type> : public OptionProxyNumeric<double> {
 public:
     OptionProxy() : option_(Option::ByID(ID)) {}
     ~OptionProxy() = default;
@@ -187,9 +220,7 @@ public:
     bool Set(double value) { return option_->SetDouble(value); }
     double Min() const { return option_->GetDoubleMin(); }
     double Max() const { return option_->GetDoubleMax(); }
-
     bool operator=(double value) { return Set(value); }
-    operator double() const { return Get(); }
 
 private:
     Option* option_;
@@ -199,7 +230,7 @@ template <OptionID ID>
 class OptionProxy<
     ID,
     typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
-                            Option::Type::kInt>::type> {
+                            Option::Type::kInt>::type> : public OptionProxyNumeric<int32_t> {
 public:
     OptionProxy() : option_(Option::ByID(ID)) {}
     ~OptionProxy() = default;
@@ -208,25 +239,7 @@ public:
     bool Set(int32_t value) { return option_->SetInt(value); }
     int32_t Min() const { return option_->GetIntMin(); }
     int32_t Max() const { return option_->GetIntMax(); }
-
     bool operator=(int32_t value) { return Set(value); }
-    bool operator+=(int32_t value) {
-        const int new_value = Get() + value;
-        if (new_value > Max()) {
-            return Set(Max());
-        } else {
-            return Set(new_value);
-        }
-    }
-    bool operator-=(int32_t value) {
-        const int new_value = Get() - value;
-        if (new_value < Min()) {
-            return Set(Min());
-        } else {
-            return Set(new_value);
-        }
-    }
-    operator int32_t() const { return Get(); }
 
 private:
     Option* option_;
@@ -236,7 +249,7 @@ template <OptionID ID>
 class OptionProxy<
     ID,
     typename std::enable_if<kOptionsTypes[static_cast<size_t>(ID)] ==
-                            Option::Type::kUnsigned>::type> {
+                            Option::Type::kUnsigned>::type> : public OptionProxyNumeric<uint32_t> {
 public:
     OptionProxy() : option_(Option::ByID(ID)) {}
     ~OptionProxy() = default;
@@ -245,9 +258,7 @@ public:
     bool Set(uint32_t value) { return option_->SetUnsigned(value); }
     uint32_t Min() const { return option_->GetUnsignedMin(); }
     uint32_t Max() const { return option_->GetUnsignedMax(); }
-
-    bool operator=(int32_t value) { return Set(value); }
-    operator int32_t() const { return Get(); }
+    bool operator=(uint32_t value) { return Set(value); }
 
 private:
     Option* option_;

@@ -48,6 +48,7 @@
 #include "wx/dialogs/gb-rom-info.h"
 #include "wx/dialogs/joypad-config.h"
 #include "wx/dialogs/sound-config.h"
+#include "wx/dialogs/speedup-config.h"
 #include "wx/opts.h"
 #include "wx/widgets/checkedlistctrl.h"
 #include "wx/widgets/option-validator.h"
@@ -1483,92 +1484,6 @@ public:
     }
 } throttle_ctrl;
 
-static class SpeedupThrottleCtrl_t : public wxEvtHandler {
-public:
-    wxSpinCtrl* speedup_throttle_spin;
-    wxCheckBox* frame_skip_cb;
-
-    void SetSpeedupThrottle(wxCommandEvent& evt)
-    {
-        unsigned val = speedup_throttle_spin->GetValue();
-
-        evt.Skip(false);
-
-        if (val == 0) {
-            coreOptions.speedup_throttle            = 0;
-            coreOptions.speedup_frame_skip          = 0;
-            coreOptions.speedup_throttle_frame_skip = false;
-
-            frame_skip_cb->SetValue(false);
-            frame_skip_cb->Disable();
-
-            if (evt.GetEventType() == wxEVT_TEXT)
-                return; // Do not update value if user cleared text box.
-        }
-        else if (val <= 450) {
-            coreOptions.speedup_throttle   = val;
-            coreOptions.speedup_frame_skip = 0;
-
-            frame_skip_cb->SetValue(prev_frame_skip_cb);
-            frame_skip_cb->Enable();
-        }
-        else { // val > 450
-            coreOptions.speedup_throttle            = 100;
-            coreOptions.speedup_throttle_frame_skip = false;
-
-            unsigned rounded = std::round((double)val / 100) * 100;
-
-            coreOptions.speedup_frame_skip = rounded / 100 - 1;
-
-            // Round up or down to the nearest 100%.
-            // For example, when the up/down buttons are pressed on the spin
-            // control.
-            if ((int)(val - rounded) > 0)
-                coreOptions.speedup_frame_skip++;
-            else if ((int)(val - rounded) < 0)
-                coreOptions.speedup_frame_skip--;
-
-            frame_skip_cb->SetValue(true);
-            frame_skip_cb->Disable();
-
-            val = (coreOptions.speedup_frame_skip + 1) * 100;
-        }
-
-        speedup_throttle_spin->SetValue(val);
-    }
-
-    void SetSpeedupFrameSkip(wxCommandEvent& evt)
-    {
-        (void)evt; // Unused param.
-
-        bool checked = frame_skip_cb->GetValue();
-
-        coreOptions.speedup_throttle_frame_skip = prev_frame_skip_cb = checked;
-    }
-
-    void Init(wxShowEvent& ev)
-    {
-        if (coreOptions.speedup_frame_skip != 0) {
-            speedup_throttle_spin->SetValue((coreOptions.speedup_frame_skip + 1) * 100);
-            frame_skip_cb->SetValue(true);
-            frame_skip_cb->Disable();
-        }
-        else {
-            speedup_throttle_spin->SetValue(coreOptions.speedup_throttle);
-            frame_skip_cb->SetValue(coreOptions.speedup_throttle_frame_skip);
-
-            if (coreOptions.speedup_throttle != 0)
-                frame_skip_cb->Enable();
-            else
-                frame_skip_cb->Disable();
-        }
-
-        ev.Skip();
-    }
-private:
-    bool prev_frame_skip_cb = coreOptions.speedup_throttle_frame_skip;
-} speedup_throttle_ctrl;
-
 /////////////////////////////
 //Check if a pointer from the XRC file is valid. If it's not, throw an error telling the user.
 template <typename T>
@@ -2376,38 +2291,6 @@ bool MainFrame::BindControls()
             d->Fit();
         }
 
-        // SpeedUp Key Config
-        d = LoadXRCDialog("SpeedupConfig");
-        {
-            speedup_throttle_ctrl.frame_skip_cb         = SafeXRCCTRL<wxCheckBox>(d, "SpeedupThrottleFrameSkip");
-            speedup_throttle_ctrl.speedup_throttle_spin = SafeXRCCTRL<wxSpinCtrl>(d, "SpeedupThrottleSpin");
-
-            speedup_throttle_ctrl.speedup_throttle_spin->Connect(wxEVT_SPIN_UP,
-                wxCommandEventHandler(SpeedupThrottleCtrl_t::SetSpeedupThrottle),
-                NULL, &speedup_throttle_ctrl);
-
-            speedup_throttle_ctrl.speedup_throttle_spin->Connect(wxEVT_SPIN_DOWN,
-                wxCommandEventHandler(SpeedupThrottleCtrl_t::SetSpeedupThrottle),
-                NULL, &speedup_throttle_ctrl);
-
-            speedup_throttle_ctrl.speedup_throttle_spin->Connect(wxEVT_SPIN,
-                wxCommandEventHandler(SpeedupThrottleCtrl_t::SetSpeedupThrottle),
-                NULL, &speedup_throttle_ctrl);
-
-            speedup_throttle_ctrl.speedup_throttle_spin->Connect(wxEVT_TEXT,
-                wxCommandEventHandler(SpeedupThrottleCtrl_t::SetSpeedupThrottle),
-                NULL, &speedup_throttle_ctrl);
-
-            speedup_throttle_ctrl.frame_skip_cb->Connect(wxEVT_CHECKBOX,
-                wxCommandEventHandler(SpeedupThrottleCtrl_t::SetSpeedupFrameSkip),
-                NULL, &speedup_throttle_ctrl);
-
-            d->Connect(wxEVT_SHOW, wxShowEventHandler(SpeedupThrottleCtrl_t::Init),
-                NULL, &speedup_throttle_ctrl);
-
-            d->Fit();
-        }
-
         wxMenuItem* suspend_scr_saver_mi = XRCITEM("SuspendScreenSaver");
         if (suspend_scr_saver_mi)
         {
@@ -2470,6 +2353,7 @@ bool MainFrame::BindControls()
         dialogs::SoundConfig::NewInstance(this);
         dialogs::DirectoriesConfig::NewInstance(this);
         dialogs::JoypadConfig::NewInstance(this, std::bind(&wxvbamApp::bindings, &wxGetApp()));
+        dialogs::SpeedupConfig::NewInstance(this);
 
 #ifndef NO_LINK
         d = LoadXRCDialog("LinkConfig");

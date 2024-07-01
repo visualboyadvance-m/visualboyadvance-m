@@ -59,6 +59,7 @@ extern struct CoreOptions {
     bool speedHack = false;
     bool speedup = false;
     bool speedup_throttle_frame_skip = false;
+    bool speedup_mute = true;
     int cheatsEnabled = 1;
     int cpuDisableSfx = 0;
     int cpuSaveType = 0;
