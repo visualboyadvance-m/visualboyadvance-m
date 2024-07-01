@@ -2368,13 +2368,6 @@ void GLDrawingPanel::AdjustViewport()
     int x, y;
     widgets::GetRealPixelClientSize(this, &x, &y);
     glViewport(0, 0, x, y);
-
-#ifdef DEBUG
-    // you can use this to check that the gl surface is indeed high res
-    GLint m_viewport[4];
-    glGetIntegerv(GL_VIEWPORT, m_viewport);
-    wxLogDebug(wxT("GL VIEWPORT: %d, %d, %d, %d"), m_viewport[0], m_viewport[1], m_viewport[2], m_viewport[3]);
-#endif
 }
 
 void GLDrawingPanel::RefreshGL()
