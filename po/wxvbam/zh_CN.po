@@ -9,6 +9,7 @@
 # Weiran Wu <wwrustc@mail.ustc.edu.cn>, 2024
 # wr superboy, 2023
 # Xuntao Chi <1139954766@qq.com>, 2019
+# 乙家 丁, 2024
 # 后海游泳大老爷 <my.yuicn@gmail.com>, 2015
 # 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020,2022-2024
 # 智弘 王, 2022
@@ -21,7 +22,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-05 20:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: 陈 依云 <c1998lf@qq.com>, 2023-2024\n"
+"Last-Translator: 乙家 丁, 2024\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/bgk/vba-m/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,12 +32,12 @@ msgstr ""
 
 #: audio/internal/openal.cpp:188
 msgid "OpenAL: Failed to open audio device"
-msgstr "OpenAL：打开音频设备失败"
+msgstr "OpenAL: Failed to open audio device"
 
 #: audio/internal/openal.cpp:386 audio/internal/faudio.cpp:492
 #: audio/internal/xaudio2.cpp:577
 msgid "Default device"
-msgstr "默认设备"
+msgstr "Default device"
 
 #: cmdevents.cpp:133
 msgid ""
@@ -44,263 +45,263 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
 " Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "GBA 文件\n(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GB 文件\n(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr "Game Boy Advance Files (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game Boy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:144
 msgid "Open ROM file"
-msgstr "打开 ROM 文件"
+msgstr "Open ROM file"
 
 #: cmdevents.cpp:165
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "GB 文件 (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr "Game Boy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:171
 msgid "Open GB ROM file"
-msgstr "打开 GB ROM 文件"
+msgstr "Open GB ROM file"
 
 #: cmdevents.cpp:192
 msgid ""
 "Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "GBC 文件\n(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr "Game Boy Color Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:198
 msgid "Open GBC ROM file"
-msgstr "打开 GBC ROM 文件"
+msgstr "Open GBC ROM file"
 
 #: cmdevents.cpp:363 cmdevents.cpp:385
 msgid "Select Dot Code file"
-msgstr "选择点代码文件"
+msgstr "Select Dot Code file"
 
 #: cmdevents.cpp:365 cmdevents.cpp:387
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr "E-Reader 点代码 (*.bin;*.raw)|*.bin;*.raw"
+msgstr "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 
 #: cmdevents.cpp:406 cmdevents.cpp:601
 msgid "Select battery file"
-msgstr "选择电池文件"
+msgstr "Select battery file"
 
 #: cmdevents.cpp:407 cmdevents.cpp:602
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
-msgstr "电池文件 (*.sav)|*.sav|Flash 存档(*.dat)|*.dat"
+msgstr "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 
 #: cmdevents.cpp:415
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr "导入电池文件将删除之前保存的游戏进度(直到下次写入前)。你确定要继续吗？"
+msgstr "Importing a battery file will erase any saved games (permanently after the next write). Do you want to continue?"
 
 #: cmdevents.cpp:416 cmdevents.cpp:444 cmdevents.cpp:564
 msgid "Confirm import"
-msgstr "确认导入"
+msgstr "Confirm import"
 
 #: cmdevents.cpp:422 panel.cpp:493
 #, c-format
 msgid "Loaded battery %s"
-msgstr "已读取电池档 %s"
+msgstr "Loaded battery %s"
 
 #: cmdevents.cpp:424
 #, c-format
 msgid "Error loading battery %s"
-msgstr "读取电池档 %s错误"
+msgstr "Error loading battery %s"
 
 #: cmdevents.cpp:433
 msgid "Select code file"
-msgstr "选择代码文件"
+msgstr "Select code file"
 
 #: cmdevents.cpp:434
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
-msgstr "Gameshark 代码文件 (*.spc;*.xpc)|*.spc;*.xpc"
+msgstr "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
 
 #: cmdevents.cpp:434
 msgid "Game Shark Code File (*.gcf)|*.gcf"
-msgstr "Gameshark 代码文件 (*.gcf)|*.gcf"
+msgstr "Game Shark Code File (*.gcf)|*.gcf"
 
 #: cmdevents.cpp:443
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
-msgstr "导入代码文件将会重置之前已读取的所有金手指代码。你确定要继续吗？"
+msgstr "Importing a code file will replace any loaded cheats. Do you want to continue?"
 
 #: cmdevents.cpp:460
 #, c-format
 msgid "Cannot open file %s"
-msgstr "无法打开文件 %s"
+msgstr "Cannot open file %s"
 
 #: cmdevents.cpp:470
 #, c-format
 msgid "Unsupported code file %s"
-msgstr "不支持的代码文件 %s"
+msgstr "Unsupported code file %s"
 
 #: cmdevents.cpp:540
 #, c-format
 msgid "Loaded code file %s"
-msgstr "已读取的代码文件 %s"
+msgstr "Loaded code file %s"
 
 #: cmdevents.cpp:542
 #, c-format
 msgid "Error loading code file %s"
-msgstr "读取代码文件错误 %s"
+msgstr "Error loading code file %s"
 
 #: cmdevents.cpp:553 cmdevents.cpp:629
 msgid "Select snapshot file"
-msgstr "选择快照文件"
+msgstr "Select snapshot file"
 
 #: cmdevents.cpp:554
 msgid ""
 "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
 " (*.gsv)|*.gsv"
-msgstr "GameShark & PAC 快照 (*.sps;*.xps)|*.sps;*.xps|GameShark SP 快照 (*.gsv)|*.gsv"
+msgstr "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots (*.gsv)|*.gsv"
 
 #: cmdevents.cpp:554
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
-msgstr "Gameboy 快照 (*.gbs)|*.gbs"
+msgstr "Game Boy Snapshot (*.gbs)|*.gbs"
 
 #: cmdevents.cpp:563
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr "导入快照将删除之前保存的游戏进度(直到下次保存前)。你确定要继续吗？ "
+msgstr "Importing a snapshot file will erase any saved games (permanently after the next write). Do you want to continue?"
 
 #: cmdevents.cpp:588
 #, c-format
 msgid "Loaded snapshot file %s"
-msgstr "已读取的快照文件 %s"
+msgstr "Loaded snapshot file %s"
 
 #: cmdevents.cpp:590
 #, c-format
 msgid "Error loading snapshot file %s"
-msgstr "快照文件读取错误 %s"
+msgstr "Error loading snapshot file %s"
 
 #: cmdevents.cpp:613
 #, c-format
 msgid "Wrote battery %s"
-msgstr "已写入电池档 %s"
+msgstr "Wrote battery %s"
 
 #: cmdevents.cpp:615 panel.cpp:803
 #, c-format
 msgid "Error writing battery %s"
-msgstr "写入电池档错误 %s"
+msgstr "Error writing battery %s"
 
 #: cmdevents.cpp:623
 msgid "EEPROM saves cannot be exported"
-msgstr "EEPROM 存档无法导出"
+msgstr "EEPROM saves cannot be exported"
 
 #: cmdevents.cpp:630
 msgid "Game Shark Snapshot (*.sps)|*.sps"
-msgstr "Gameshark 快照 (*.sps)|*.sps"
+msgstr "Game Shark Snapshot (*.sps)|*.sps"
 
 #: cmdevents.cpp:644
 msgid "Exported from Visual Boy Advance-M"
-msgstr "从 VBA-M 导出"
+msgstr "Exported from Visual Boy Advance-M"
 
 #: cmdevents.cpp:656
 #, c-format
 msgid "Saved snapshot file %s"
-msgstr "保存快照文件 %s "
+msgstr "Saved snapshot file %s"
 
 #: cmdevents.cpp:658
 #, c-format
 msgid "Error saving snapshot file %s"
-msgstr "保存快照文件错误 %s"
+msgstr "Error saving snapshot file %s"
 
 #: cmdevents.cpp:674 cmdevents.cpp:752 cmdevents.cpp:822 cmdevents.cpp:891
 #: gfxviewers.cpp:1662 gfxviewers.cpp:1807 viewers.cpp:588 viewers.cpp:802
 #: viewsupt.cpp:1199
 msgid "Select output file"
-msgstr "选择输出文件"
+msgstr "Select output file"
 
 #: cmdevents.cpp:675 gfxviewers.cpp:1663 gfxviewers.cpp:1808 viewsupt.cpp:1200
 msgid "PNG images|*.png|BMP images|*.bmp"
-msgstr "PNG 图片|*.png|BMP 图片|*.bmp"
+msgstr "PNG images|*.png|BMP images|*.bmp"
 
 #: cmdevents.cpp:699 sys.cpp:579
 #, c-format
 msgid "Wrote snapshot %s"
-msgstr "写入快照 %s"
+msgstr "Wrote snapshot %s"
 
 #: cmdevents.cpp:720 cmdevents.cpp:790 cmdevents.cpp:859 cmdevents.cpp:925
 msgid " files ("
-msgstr "文件 ("
+msgstr " files ("
 
 #: cmdevents.cpp:958
 msgid "Select file"
-msgstr "选择文件"
+msgstr "Select file"
 
 #: cmdevents.cpp:1262 cmdevents.cpp:1355
 msgid "Select state file"
-msgstr "选择状态文件"
+msgstr "Select state file"
 
 #: cmdevents.cpp:1263 cmdevents.cpp:1356
 msgid "Visual Boy Advance saved game files|*.sgm"
-msgstr "Visual Boy Advance 保存游戏文件|*.sgm"
+msgstr "Visual Boy Advance saved game files|*.sgm"
 
 #: cmdevents.cpp:1386 cmdevents.cpp:1396 cmdevents.cpp:1407
 #, c-format
 msgid "Current state slot #%d"
-msgstr "当前状态插槽 #%d"
+msgstr "Current state slot #%d"
 
 #: cmdevents.cpp:1470
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
-msgstr "启用 GB BIOS 文件时无法使用色彩修改。"
+msgstr "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
 
 #: cmdevents.cpp:1681
 msgid "Sound enabled"
-msgstr "声音已启用"
+msgstr "Sound enabled"
 
 #: cmdevents.cpp:1681
 msgid "Sound disabled"
-msgstr "声音已禁用"
+msgstr "Sound disabled"
 
 #: cmdevents.cpp:1760
 msgid "Set to 0 for pseudo tty"
-msgstr "把伪 tty 设置成 0"
+msgstr "Set to 0 for pseudo tty"
 
 #: cmdevents.cpp:1762
 msgid "Port to wait for connection:"
-msgstr "准备连接的端口："
+msgstr "Port to wait for connection:"
 
 #: cmdevents.cpp:1763
 msgid "GDB Connection"
-msgstr "GDB 连接"
+msgstr "GDB Connection"
 
 #: cmdevents.cpp:1815
 #, c-format
 msgid "Waiting for connection at %s"
-msgstr "等待连接到 %s"
+msgstr "Waiting for connection at %s"
 
 #: cmdevents.cpp:1822
 #, c-format
 msgid "Waiting for connection on port %d"
-msgstr "等待连接到端口 %d"
+msgstr "Waiting for connection on port %d"
 
 #: cmdevents.cpp:1825
 msgid "Waiting for GDB..."
-msgstr "等待 GDB..."
+msgstr "Waiting for GDB..."
 
 #: cmdevents.cpp:2200
 msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
-msgstr "你的配置将被删除！\n\n是否确定？"
+msgstr "YOUR CONFIGURATION WILL BE DELETED!\n\nAre you sure?"
 
 #: cmdevents.cpp:2201
 msgid "FACTORY RESET"
-msgstr "恢复默认"
+msgstr "FACTORY RESET"
 
 #: cmdevents.cpp:2236
 msgid "Nintendo Game Boy / Color / Advance emulator."
-msgstr "任天堂 GameBoy/Color/Advance 模拟器。"
+msgstr "Nintendo Game Boy / Color / Advance emulator."
 
 #: cmdevents.cpp:2237
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr "版权 (C) 1999-2003 Forgotten\n版权 (C) 2004-2006 VBA 开发团队\n版权 (C) 2007-2020 VBA-M 开发团队"
+msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2020 VBA-M development team"
 
 #: cmdevents.cpp:2239
 msgid ""
@@ -316,112 +317,112 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program. If not, see http://www.gnu.org/licenses ."
-msgstr "本程序是自由软件: 你可以在自由软件基金会公布的 GNU 通用发布\n许可证条款下重新分发和/或修改此软件，依自己意愿许可证 V2 版或\n任意更新版许可证选其一即可。\n\n本程序希望是能有作用的分发出去，但【无任何担保】；甚至没有隐含\n的【可销售性】或【特定用途的适用性】保证。请查阅 GNU 通用发布\n许可证了解更多信息。\n\n你应该已经收到 GNU 通用发布许可证的副本以及本程序。\n如果没有，请查看 http://www.gnu.org/licenses 。"
+msgstr "This program is free software: you can redistribute it and / or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program. If not, see http://www.gnu.org/licenses ."
 
 #: cmdevents.cpp:2424
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
-msgstr "启用色彩修改时无法使用 GB BIOS。"
+msgstr "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 
 #: cmdevents.cpp:2490
 msgid "LAN link is already active. Disable link mode to disconnect."
-msgstr "局域网联机已激活，禁用联机模式即可断开联网。"
+msgstr "LAN link is already active. Disable link mode to disconnect."
 
 #: cmdevents.cpp:2496
 msgid "Network is not supported in local mode."
-msgstr "本地模式不支持网络"
+msgstr "Network is not supported in local mode."
 
 #: dialogs/accel-config.cpp:142
 msgid "Menu commands"
-msgstr "菜单命令"
+msgstr "Menu commands"
 
 #: dialogs/accel-config.cpp:245
 msgid "This will clear all user-defined accelerators. Are you sure?"
-msgstr "将清除所有自定义加速，是否确定？"
+msgstr "This will clear all user-defined accelerators. Are you sure?"
 
 #: dialogs/accel-config.cpp:245 dialogs/accel-config.cpp:292
 msgid "Confirm"
-msgstr "确定"
+msgstr "Confirm"
 
 #: dialogs/accel-config.cpp:290
 #, c-format
 msgid "This will unassign \"%s\" from \"%s\". Are you sure?"
-msgstr "这将从“%s”中取消分配“%s”。您确定吗？"
+msgstr "This will unassign \"%s\" from \"%s\". Are you sure?"
 
 #: dialogs/directories-config.cpp:49
 msgid "Browse"
-msgstr "浏览"
+msgstr "Browse"
 
 #: dialogs/display-config.cpp:52
 msgid "Invalid value for Default magnification."
-msgstr "无效的默认放大倍数值。"
+msgstr "Invalid value for Default magnification."
 
 #: dialogs/display-config.cpp:331 xrc/DisplayConfig.xrc:86
 #: xrc/DisplayConfig.xrc:136 xrc/DisplayConfig.xrc:222
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:213 xrc/SoundConfig.xrc:303
 msgid "None"
-msgstr "无"
+msgstr "None"
 
 #: dialogs/display-config.cpp:361
 #, c-format
 msgid "No usable rpi plugins found in %s"
-msgstr "在 %s 中没有可用 rpi 插件"
+msgstr "No usable rpi plugins found in %s"
 
 #: dialogs/display-config.cpp:400 dialogs/display-config.cpp:442
 #: xrc/DisplayConfig.xrc:108
 msgid "Plugin"
-msgstr "插件"
+msgstr "Plugin"
 
 #: dialogs/display-config.cpp:407
 #, c-format
 msgid "Using pixel filter: %s"
-msgstr "正在使用像素滤镜: %s"
+msgstr "Using pixel filter: %s"
 
 #: dialogs/display-config.cpp:414
 #, c-format
 msgid "Using interframe blending: %s"
-msgstr "正在使用帧间混合: %s"
+msgstr "Using interframe blending: %s"
 
 #: dialogs/game-boy-config.cpp:143 xrc/GameBoyAdvanceConfig.xrc:122
 #: xrc/GameBoyConfig.xrc:138 xrc/GameBoyConfig.xrc:159
 msgid "(None)"
-msgstr "(无)"
+msgstr "(None)"
 
 #: dialogs/game-maker.cpp:234 dialogs/gb-rom-info.cpp:64
 msgid "Unknown"
-msgstr "未知"
+msgstr "Unknown"
 
 #: dialogs/game-maker.cpp:235
 msgid "Invalid"
-msgstr "无效"
+msgstr "Invalid"
 
 #: dialogs/gb-rom-info.cpp:22
 msgid "No mapper"
-msgstr "未映射"
+msgstr "No mapper"
 
 #: dialogs/gb-rom-info.cpp:43
 msgid "Pocket Camera"
-msgstr "口袋摄像机"
+msgstr "Pocket Camera"
 
 #: dialogs/gb-rom-info.cpp:68
 msgid " + RAM"
-msgstr " + 内存"
+msgstr " + RAM"
 
 #: dialogs/gb-rom-info.cpp:69
 msgid " + RTC"
-msgstr " + 实时时钟"
+msgstr " + RTC"
 
 #: dialogs/gb-rom-info.cpp:70
 msgid " + Battery"
-msgstr " + 电池"
+msgstr " + Battery"
 
 #: dialogs/gb-rom-info.cpp:71
 msgid " + Rumble"
-msgstr " + 震动"
+msgstr " + Rumble"
 
 #: dialogs/gb-rom-info.cpp:72
 msgid " + Motion Sensor"
-msgstr " + 体感"
+msgstr " + Motion Sensor"
 
 #: dialogs/gb-rom-info.cpp:74
 #, c-format
@@ -431,17 +432,17 @@ msgstr "%02X (%s%s%s%s%s%s)"
 #: dialogs/gb-rom-info.cpp:81 dialogs/gb-rom-info.cpp:93
 #, c-format
 msgid "%02X (Supported)"
-msgstr "%02X (支持)"
+msgstr "%02X (Supported)"
 
 #: dialogs/gb-rom-info.cpp:83 dialogs/gb-rom-info.cpp:91
 #, c-format
 msgid "%02X (Not supported)"
-msgstr "%02X (不支持)"
+msgstr "%02X (Not supported)"
 
 #: dialogs/gb-rom-info.cpp:95
 #, c-format
 msgid "%02X (Required)"
-msgstr "%02X (必需)"
+msgstr "%02X (Required)"
 
 #: dialogs/gb-rom-info.cpp:107 dialogs/gb-rom-info.cpp:141
 #, c-format
@@ -487,12 +488,12 @@ msgstr "%02X (4 MiB)"
 #: dialogs/gb-rom-info.cpp:159
 #, c-format
 msgid "%02X (Unknown)"
-msgstr "%02X (未知)"
+msgstr "%02X (Unknown)"
 
 #: dialogs/gb-rom-info.cpp:131
 #, c-format
 msgid "%02X (None)"
-msgstr "%02X (无)"
+msgstr "%02X (None)"
 
 #: dialogs/gb-rom-info.cpp:133
 #, c-format
@@ -517,443 +518,443 @@ msgstr "%02X (8 KiB)"
 #: dialogs/gb-rom-info.cpp:155
 #, c-format
 msgid "%02X (Japan)"
-msgstr "%02X (日本)"
+msgstr "%02X (Japan)"
 
 #: dialogs/gb-rom-info.cpp:157
 #, c-format
 msgid "%02X (World)"
-msgstr "%02X (世界)"
+msgstr "%02X (World)"
 
 #: dialogs/gb-rom-info.cpp:201
 #, c-format
 msgid "%02X (Actual: %02X)"
-msgstr "%02X (实际: %02X)"
+msgstr "%02X (Actual: %02X)"
 
 #: dialogs/gb-rom-info.cpp:204
 #, c-format
 msgid "%04X (Actual: %04X)"
-msgstr "%04X (实际: %04X)"
+msgstr "%04X (Actual: %04X)"
 
 #: dialogs/sound-config.cpp:251
 #, c-format
 msgid "%d frame = %.2f ms"
-msgstr "%d 帧 = %.2f 毫秒"
+msgstr "%d frame = %.2f ms"
 
 #: extra-translations.cpp:13
 msgid "&Apply"
-msgstr "应用(&A)"
+msgstr "&Apply"
 
 #: extra-translations.cpp:14
 msgid "Artists"
-msgstr "美术"
+msgstr "Artists"
 
 #: extra-translations.cpp:15
 msgid "Cancel"
-msgstr "取消"
+msgstr "Cancel"
 
 #: extra-translations.cpp:16
 msgid "Close"
-msgstr "关闭"
+msgstr "Close"
 
 #: extra-translations.cpp:17
 msgid "Developers"
-msgstr "开发者"
+msgstr "Developers"
 
 #: extra-translations.cpp:18
 msgid "License"
-msgstr "授权"
+msgstr "License"
 
 #: extra-translations.cpp:19
 msgid "OK"
-msgstr "确定"
+msgstr "OK"
 
 #: gfxviewers.cpp:1202
 msgid "Select output file and type"
-msgstr "选择输出文件类型"
+msgstr "Select output file and type"
 
 #: gfxviewers.cpp:1203
 msgid ""
 "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
 "Table (*.act)|*.act"
-msgstr "Windows 调色板 (*.pal)|*.pal|PaintShop 调色板 (*.pal)|*.pal|Adobe 色表 (*.act)|*.act"
+msgstr "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color Table (*.act)|*.act"
 
 #: guiinit.cpp:91
 msgid "Start!"
-msgstr "开始！"
+msgstr "Start!"
 
 #: guiinit.cpp:110
 msgid "Connect"
-msgstr "连接"
+msgstr "Connect"
 
 #: guiinit.cpp:127
 msgid "You must enter a valid host name"
-msgstr "必须输入有效的主机名"
+msgstr "You must enter a valid host name"
 
 #: guiinit.cpp:128
 msgid "Host name invalid"
-msgstr "主机名无效"
+msgstr "Host name invalid"
 
 #: guiinit.cpp:146
 msgid "Waiting for clients..."
-msgstr "正在等待客户端..."
+msgstr "Waiting for clients..."
 
 #: guiinit.cpp:147
 #, c-format
 msgid "Server IP address is: %s\n"
-msgstr "服务器 IP 地址: %s\n"
+msgstr "Server IP address is: %s\n"
 
 #: guiinit.cpp:149
 msgid "Waiting for connection..."
-msgstr "等待连接"
+msgstr "Waiting for connection..."
 
 #: guiinit.cpp:150
 #, c-format
 msgid "Connecting to %s\n"
-msgstr "正在连接到 %s\n"
+msgstr "Connecting to %s\n"
 
 #: guiinit.cpp:183
 msgid ""
 "Error occurred.\n"
 "Please try again."
-msgstr "发生错误。\n请重试。"
+msgstr "Error occurred.\nPlease try again."
 
 #: guiinit.cpp:250 guiinit.cpp:303
 msgid "Select cheat file"
-msgstr "选择金手指文件"
+msgstr "Select cheat file"
 
 #: guiinit.cpp:251
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
-msgstr "VBA 金手指列表 (*.clt)|*.clt|CHT 金手指列表 (*.cht)|*.cht"
+msgstr "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 
 #: guiinit.cpp:270 panel.cpp:550
 msgid "Loaded cheats"
-msgstr "打开金手指"
+msgstr "Loaded cheats"
 
 #: guiinit.cpp:304
 msgid "VBA cheat lists (*.clt)|*.clt"
-msgstr "VBA 金手指列表 (*.clt)|*.clt"
+msgstr "VBA cheat lists (*.clt)|*.clt"
 
 #: guiinit.cpp:322
 msgid "Saved cheats"
-msgstr "保存金手指"
+msgstr "Saved cheats"
 
 #: guiinit.cpp:348 guiinit.cpp:367
 msgid "Restore old values?"
-msgstr "恢复原先数值？"
+msgstr "Restore old values?"
 
 #: guiinit.cpp:349 guiinit.cpp:368
 msgid "Removing cheats"
-msgstr "正在移除金手指"
+msgstr "Removing cheats"
 
 #: guiinit.cpp:758
 msgid "Generic Code"
-msgstr "通用代码"
+msgstr "Generic Code"
 
 #: guiinit.cpp:830 guiinit.cpp:1080
 msgid "Number cannot be empty"
-msgstr "编号不能为空"
+msgstr "Number cannot be empty"
 
 #: guiinit.cpp:880
 msgid "Search produced no results"
-msgstr "搜索不到结果"
+msgstr "Search produced no results"
 
 #: guiinit.cpp:1043
 msgid "8-bit "
-msgstr "8 位"
+msgstr "8-bit "
 
 #: guiinit.cpp:1047
 msgid "16-bit "
-msgstr "16 位"
+msgstr "16-bit "
 
 #: guiinit.cpp:1051
 msgid "32-bit "
-msgstr "32 位"
+msgstr "32-bit "
 
 #: guiinit.cpp:1057
 msgid "Signed decimal"
-msgstr "有符号十进制"
+msgstr "Signed decimal"
 
 #: guiinit.cpp:1061
 msgid "Unsigned decimal"
-msgstr "无符号十进制"
+msgstr "Unsigned decimal"
 
 #: guiinit.cpp:1065
 msgid "Unsigned hexadecimal"
-msgstr "无符号十六进制"
+msgstr "Unsigned hexadecimal"
 
 #: guiinit.cpp:1637
 msgid "Main icon not found"
-msgstr "未找到主图标"
+msgstr "Main icon not found"
 
 #: guiinit.cpp:1655
 msgid "Main display panel not found"
-msgstr "未找到主显示面板"
+msgstr "Main display panel not found"
 
 #: guiinit.cpp:1914
 #, c-format
 msgid "Invalid menu item %s; removing"
-msgstr "无效的菜单项目 %s; 正在移除"
+msgstr "Invalid menu item %s; removing"
 
 #: guiinit.cpp:2099
 msgid "Code"
-msgstr "代码"
+msgstr "Code"
 
 #: guiinit.cpp:2108
 msgid "Description"
-msgstr "描述"
+msgstr "Description"
 
 #: guiinit.cpp:2182 xrc/CheatAdd.xrc:31
 msgid "Address"
-msgstr "地址"
+msgstr "Address"
 
 #: guiinit.cpp:2183
 msgid "Old Value"
-msgstr "旧数值"
+msgstr "Old Value"
 
 #: guiinit.cpp:2184
 msgid "New Value"
-msgstr "新数值"
+msgstr "New Value"
 
 #: guiinit.cpp:2404
 msgid "JoyBus host invalid; disabling"
-msgstr "JoyBus 主机无效; 正在禁用"
+msgstr "JoyBus host invalid; disabling"
 
 #: opts.cpp:154
 msgid ""
 "The INI file was written for a more recent version of VBA-M. Some INI option"
 " values may have been reset."
-msgstr "此 INI 文件是为新版本 VBA-M 编写的。某些 INI 选项值可能已被重置。"
+msgstr "The INI file was written for a more recent version of VBA-M. Some INI option values may have been reset."
 
 #: opts.cpp:337 opts.cpp:353 opts.cpp:508
 #, c-format
 msgid "Invalid key binding %s for %s"
-msgstr "%s 键不能绑定为 %s"
+msgstr "Invalid key binding %s for %s"
 
 #: opts.cpp:454 opts.cpp:463 opts.cpp:472 opts.cpp:481
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:481
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:492
 #, c-format
 msgid "Invalid value %s for option %s"
-msgstr "数值 %s 对于选项 %s 无效"
+msgstr "Invalid value %s for option %s"
 
 #: opts.cpp:514
 #, c-format
 msgid "Unknown option %s with value %s"
-msgstr "未知选项 %s 带有数值 %s"
+msgstr "Unknown option %s with value %s"
 
 #: panel.cpp:219
 #, c-format
 msgid "%s is not a valid ROM file"
-msgstr "%s 不是有效的 ROM 文件"
+msgstr "%s is not a valid ROM file"
 
 #: panel.cpp:220 panel.cpp:281 panel.cpp:345
 msgid "Problem loading file"
-msgstr "载入文件发生问题"
+msgstr "Problem loading file"
 
 #: panel.cpp:280
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
-msgstr "无法载入 Game Boy ROM %s"
+msgstr "Unable to load Game Boy ROM %s"
 
 #: panel.cpp:296 panel.cpp:407 panel.cpp:1146
 msgid "Could not initialize the sound driver!"
-msgstr "无法初始化声音驱动！"
+msgstr "Could not initialize the sound driver!"
 
 #: panel.cpp:307
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
-msgstr "启用色彩修改时无法使用 GB BIOS 文件，正在禁用 GB BIOS 文件。"
+msgstr "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game Boy BIOS file."
 
 #: panel.cpp:321 panel.cpp:420
 #, c-format
 msgid "Could not load BIOS %s"
-msgstr "无法载入 BIOS %s"
+msgstr "Could not load BIOS %s"
 
 #: panel.cpp:344
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
-msgstr "无法载入 Game Boy Advance ROM %s"
+msgstr "Unable to load Game Boy Advance ROM %s"
 
 #: panel.cpp:587
 msgid " player "
-msgstr "玩家"
+msgstr " player "
 
 #: panel.cpp:751
 #, c-format
 msgid "Loaded state %s"
-msgstr "载入状态 %s"
+msgstr "Loaded state %s"
 
 #: panel.cpp:751
 #, c-format
 msgid "Error loading state %s"
-msgstr "载入状态错误 %s"
+msgstr "Error loading state %s"
 
 #: panel.cpp:775
 #, c-format
 msgid "Saved state %s"
-msgstr "保存状态 %s"
+msgstr "Saved state %s"
 
 #: panel.cpp:775
 #, c-format
 msgid "Error saving state %s"
-msgstr "保存状态错误 %s"
+msgstr "Error saving state %s"
 
 #: panel.cpp:979
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
-msgstr "不支持 %d x %d - %d @ %d 全屏模式，正在寻找其他模式"
+msgstr "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 
 #: panel.cpp:1017
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
-msgstr "不支持 %d x %d - %d @ %d 全屏模式"
+msgstr "Fullscreen mode %d x %d - %d @ %d not supported"
 
 #: panel.cpp:1022
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
-msgstr "有效模式: %d x %d - %d @ %d"
+msgstr "Valid mode: %d x %d - %d @ %d"
 
 #: panel.cpp:1030
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
-msgstr "选择模式 %d x %d - %d @ %d"
+msgstr "Chose mode %d x %d - %d @ %d"
 
 #: panel.cpp:1034
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
-msgstr "切换模式失败 %d x %d - %d @ %d"
+msgstr "Failed to change mode to %d x %d - %d @ %d"
 
 #: panel.cpp:1121
 msgid "Not a valid Game Boy Advance cartridge"
-msgstr "无效 GBA 卡带"
+msgstr "Not a valid Game Boy Advance cartridge"
 
 #: panel.cpp:1290
 msgid "No memory for rewinding"
-msgstr "没有用于回退的内存"
+msgstr "No memory for rewinding"
 
 #: panel.cpp:1300
 msgid "Error writing rewind state"
-msgstr "回写状态错误"
+msgstr "Error writing rewind state"
 
 #: panel.cpp:2277
 msgid "Enabling EGL VSync."
-msgstr "正在启用 EGL 垂直同步。"
+msgstr "Enabling EGL VSync."
 
 #: panel.cpp:2279
 msgid "Disabling EGL VSync."
-msgstr "正在禁用 EGL 垂直同步。"
+msgstr "Disabling EGL VSync."
 
 #: panel.cpp:2286
 msgid "Enabling GLX VSync."
-msgstr "正在启用 GLX 垂直同步。"
+msgstr "Enabling GLX VSync."
 
 #: panel.cpp:2288
 msgid "Disabling GLX VSync."
-msgstr "正在禁用 GLX 垂直同步。"
+msgstr "Disabling GLX VSync."
 
 #: panel.cpp:2306
 msgid "Failed to set glXSwapIntervalEXT"
-msgstr "设置 glXSwapIntervalEXT 失败"
+msgstr "Failed to set glXSwapIntervalEXT"
 
 #: panel.cpp:2315
 msgid "Failed to set glXSwapIntervalSGI"
-msgstr "设置 glXSwapIntervalSGI 失败"
+msgstr "Failed to set glXSwapIntervalSGI"
 
 #: panel.cpp:2324
 msgid "Failed to set glXSwapIntervalMESA"
-msgstr "设置 glXSwapIntervalMESA 失败"
+msgstr "Failed to set glXSwapIntervalMESA"
 
 #: panel.cpp:2331
 msgid "No support for wglGetExtensionsStringEXT"
-msgstr "不支持 wglGetExtensionsStringEXT"
+msgstr "No support for wglGetExtensionsStringEXT"
 
 #: panel.cpp:2334
 msgid "No support for WGL_EXT_swap_control"
-msgstr "不支持 WGL_EXT_swap_control"
+msgstr "No support for WGL_EXT_swap_control"
 
 #: panel.cpp:2343
 msgid "Failed to set wglSwapIntervalEXT"
-msgstr "设置 wglSwapIntervalEXT 失败"
+msgstr "Failed to set wglSwapIntervalEXT"
 
 #: panel.cpp:2349
 msgid "No VSYNC available on this platform"
-msgstr "垂直同步在该平台上不可用 "
+msgstr "No VSYNC available on this platform"
 
 #: panel.cpp:2444
 msgid "Memory allocation error"
-msgstr "内存分配错误"
+msgstr "Memory allocation error"
 
 #: panel.cpp:2447
 msgid "Error initializing codec"
-msgstr "初始化代码错误"
+msgstr "Error initializing codec"
 
 #: panel.cpp:2450
 msgid "Error writing to output file"
-msgstr "写入输出文件错误"
+msgstr "Error writing to output file"
 
 #: panel.cpp:2453
 msgid "Can't guess output format from file name"
-msgstr "无法从文件名猜测输出格式"
+msgstr "Can't guess output format from file name"
 
 #: panel.cpp:2458
 msgid "Programming error; aborting!"
-msgstr "程序错误；正在中止！"
+msgstr "Programming error; aborting!"
 
 #: panel.cpp:2470 panel.cpp:2499
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
-msgstr "不能开始录制到 %s (%s)"
+msgstr "Unable to begin recording to %s (%s)"
 
 #: panel.cpp:2527
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
-msgstr "录制音频/视频时错误 (%s); 正在中止"
+msgstr "Error in audio / video recording (%s); aborting"
 
 #: panel.cpp:2533
 #, c-format
 msgid "Error in audio recording (%s); aborting"
-msgstr "录制音频时错误 (%s); 正在中止"
+msgstr "Error in audio recording (%s); aborting"
 
 #: panel.cpp:2543
 #, c-format
 msgid "Error in video recording (%s); aborting"
-msgstr "录制视频时错误 (%s); 正在中止"
+msgstr "Error in video recording (%s); aborting"
 
 #: panel.cpp:2698
 #, c-format
 msgid "Volume: %d %%"
-msgstr "音量: %d %%"
+msgstr "Volume: %d %%"
 
 #: sys.cpp:205 sys.cpp:266
 msgid "No game in progress to record"
-msgstr "没有游戏在进行录制"
+msgstr "No game in progress to record"
 
 #: sys.cpp:223
 #, c-format
 msgid "Cannot open output file %s"
-msgstr "无法打开输出文件 %s"
+msgstr "Cannot open output file %s"
 
 #: sys.cpp:230 sys.cpp:250 sys.cpp:400
 msgid "Error writing game recording"
-msgstr "回写游戏录像错误"
+msgstr "Error writing game recording"
 
 #: sys.cpp:271
 msgid "Cannot play game recording while recording"
-msgstr "在录制时无法播放游戏录像"
+msgstr "Cannot play game recording while recording"
 
 #: sys.cpp:286
 #, c-format
 msgid "Cannot open recording file %s"
-msgstr "无法打开录像文件 %s"
+msgstr "Cannot open recording file %s"
 
 #: sys.cpp:295 sys.cpp:305
 msgid "Error reading game recording"
-msgstr "读取游戏录像错误"
+msgstr "Error reading game recording"
 
 #: sys.cpp:415 sys.cpp:434
 msgid "Playback ended"
-msgstr "回放已结束"
+msgstr "Playback ended"
 
 #: sys.cpp:458
 #, c-format
@@ -962,50 +963,50 @@ msgstr "%d %% (%d, %d fps)"
 
 #: sys.cpp:899 xrc/GBPrinter.xrc:65
 msgid "&Discard"
-msgstr "丢弃(&D)"
+msgstr "&Discard"
 
 #: sys.cpp:933
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
-msgstr "图像文件 (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
+msgstr "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
 #: sys.cpp:942
 msgid "Save printer image to"
-msgstr "保存打印图像到"
+msgstr "Save printer image to"
 
 #: sys.cpp:956 sys.cpp:1140
 #, c-format
 msgid "Wrote printer output to %s"
-msgstr "写入打印输出到 %s"
+msgstr "Wrote printer output to %s"
 
 #: sys.cpp:961 sys.cpp:1032
 msgid "&Close"
-msgstr "关闭(&C)"
+msgstr "&Close"
 
 #: sys.cpp:1027
 msgid "Printed"
-msgstr "已打印"
+msgstr "Printed"
 
 #: sys.cpp:1302
 #, c-format
 msgid "Error opening pseudo tty: %s"
-msgstr "打开伪 tty 错误: %s"
+msgstr "Error opening pseudo tty: %s"
 
 #: sys.cpp:1401
 #, c-format
 msgid "Error setting up server socket (%d)"
-msgstr "设置服务器插口错误 (%d)"
+msgstr "Error setting up server socket (%d)"
 
 #: viewers.cpp:586
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
-msgstr "文本文件 (*.txt;*.log)|*.txt;*.log|"
+msgstr "Text files (*.txt;*.log)|*.txt;*.log|"
 
 #: viewers.cpp:728 viewers.cpp:800
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
-msgstr "内存转储 (*.dmp;*.bin)|*.dmp;*.bin|"
+msgstr "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
 
 #: viewers.cpp:730
 msgid "Select memory dump file"
-msgstr "选择内存转储文件"
+msgstr "Select memory dump file"
 
 #: viewsupt.cpp:789
 msgid "Red:"
@@ -1022,48 +1023,48 @@ msgstr "Blue:"
 #: viewsupt.h:63
 #, c-format
 msgid "Unable to load dialog %s from resources"
-msgstr "无法从源加载对话框 %s "
+msgstr "Unable to load dialog %s from resources"
 
 #: wxvbam.cpp:390 wxvbam.cpp:407
 #, c-format
 msgid "Invalid configuration file provided: %s"
-msgstr "提供的配置文件无效: %s"
+msgstr "Invalid configuration file provided: %s"
 
 #: wxvbam.cpp:547
 msgid "Could not create main window"
-msgstr "无法创建主窗口"
+msgstr "Could not create main window"
 
 #: wxvbam.cpp:622
 msgid "Save built-in XRC file and exit"
-msgstr "保存内置 XRC 文件并退出"
+msgstr "Save built-in XRC file and exit"
 
 #: wxvbam.cpp:625
 msgid "Save built-in vba-over.ini and exit"
-msgstr "保存内置 vba-over.ini 文件并退出"
+msgstr "Save built-in vba-over.ini and exit"
 
 #: wxvbam.cpp:628
 msgid "Print configuration path and exit"
-msgstr "打印配置路径并退出"
+msgstr "Print configuration path and exit"
 
 #: wxvbam.cpp:631
 msgid "Start in full-screen mode"
-msgstr "以全屏模式启动"
+msgstr "Start in full-screen mode"
 
 #: wxvbam.cpp:634
 msgid "Set a configuration file"
-msgstr "设置配置文件"
+msgstr "Set a configuration file"
 
 #: wxvbam.cpp:638
 msgid "Delete shared link state first, if it exists"
-msgstr "请先删除共享联机状态，如果存在的话"
+msgstr "Delete shared link state first, if it exists"
 
 #: wxvbam.cpp:645
 msgid "List all settable options and exit"
-msgstr "列出所有可设置的选项并退出"
+msgstr "List all settable options and exit"
 
 #: wxvbam.cpp:648
 msgid "ROM file"
-msgstr "ROM 文件"
+msgstr "ROM file"
 
 #: wxvbam.cpp:650
 msgid "<config>=<value>"
@@ -1071,31 +1072,31 @@ msgstr "<config>=<value>"
 
 #: wxvbam.cpp:681
 msgid "Configuration / build error: can't find built-in xrc"
-msgstr "配置/建构错误：无法找到内置 xrc 文件"
+msgstr "Configuration / build error: can't find built-in xrc"
 
 #: wxvbam.cpp:689
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr "已将内置配置写入到 %s。\n如要覆盖，请删除所有未更改的根节点。首先在以下搜索覆盖内置路径里找到任意 .xrc 或 .xrs 文件中正确名称的根节点："
+msgstr "Wrote built-in configuration to %s.\nTo override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 
 #: wxvbam.cpp:703
 msgid "Configuration is read from, in order:"
-msgstr "配置按顺序从中读取："
+msgstr "Configuration is read from, in order:"
 
 #: wxvbam.cpp:717
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
-msgstr "已将内置覆盖文件写入到 %s\n 如要覆盖，请删除所有未更改的部分。首个找到的部分从以下搜索路径使用："
+msgstr "Wrote built-in override file to %s\nTo override, delete all but changed section. First found section is used from search path:"
 
 #: wxvbam.cpp:723
 msgid ""
 "\n"
 "\tbuilt-in"
-msgstr "\n\t内置"
+msgstr "\n\tbuilt-in"
 
 #: wxvbam.cpp:738
 msgid ""
@@ -1103,41 +1104,41 @@ msgid ""
 "\n"
 "For flag options, true and false are specified as 1 and 0, respectively.\n"
 "\n"
-msgstr "如果在用户界面中进行了任何配置更改，则保存从命令行设置的选项。\n\n对于标志选项，true 和 false 分别指定为 1 和 0。\n\n"
+msgstr "Options set from the command line are saved if any configuration changes are made in the user interface.\n\nFor flag options, true and false are specified as 1 and 0, respectively.\n\n"
 
 #: wxvbam.cpp:746
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
-msgstr "可用于键盘 /* 选项的命令是:\n\n"
+msgstr "The commands available for the Keyboard/* option are:\n\n"
 
 #: wxvbam.cpp:758
 msgid "Configuration file not found."
-msgstr "未找到配置文件。"
+msgstr "Configuration file not found."
 
 #: wxvbam.cpp:789
 msgid "Bad configuration option or multiple ROM files given:\n"
-msgstr "错误的配置选项或多个 ROM 文件被指定:\n"
+msgstr "Bad configuration option or multiple ROM files given:\n"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
 #: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:450
 msgid "Up"
-msgstr "上"
+msgstr "Up"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
 #: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:454
 msgid "Down"
-msgstr "下"
+msgstr "Down"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
 #: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:458
 msgid "Left"
-msgstr "左"
+msgstr "Left"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
 #: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:462
 msgid "Right"
-msgstr "右"
+msgstr "Right"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
 #: xrc/JoyPanel.xrc:37
@@ -1162,55 +1163,55 @@ msgstr "R"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
 #: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:482
 msgid "Select"
-msgstr "选择"
+msgstr "Select"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
 #: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:486
 msgid "Start"
-msgstr "开始"
+msgstr "Start"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
 #: xrc/JoyPanel.xrc:254
 msgid "Motion Up"
-msgstr "体感 上"
+msgstr "Motion Up"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
 #: xrc/JoyPanel.xrc:298
 msgid "Motion Down"
-msgstr "体感 下"
+msgstr "Motion Down"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
 msgid "Motion Left"
-msgstr "体感 左"
+msgstr "Motion Left"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
 msgid "Motion Right"
-msgstr "体感 右"
+msgstr "Motion Right"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
 msgid "Motion In"
-msgstr "体感 后"
+msgstr "Motion In"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
 msgid "Motion Out"
-msgstr "体感 前"
+msgstr "Motion Out"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
 msgid "Auto A"
-msgstr "连发 A"
+msgstr "Auto A"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
 msgid "Auto B"
-msgstr "连发 B"
+msgstr "Auto B"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
 #: xrc/DisplayConfig.xrc:200
 msgid "Speed"
-msgstr "速度"
+msgstr "Speed"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
 msgid "Capture"
-msgstr "截图"
+msgstr "Capture"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:33
 msgid "GameShark"
@@ -1219,174 +1220,174 @@ msgstr "GameShark"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:107
 #, c-format
 msgid "Joypad %zu %s"
-msgstr "手柄 %zu %s"
+msgstr "Joypad %zu %s"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:382
 msgid "Use bilinear filter with 3d renderer"
-msgstr "在 3D 渲染器中使用双线过滤 "
+msgstr "Use bilinear filter with 3d renderer"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:383
 msgid "Full-screen filter to apply"
-msgstr "要应用的全屏滤镜"
+msgstr "Full-screen filter to apply"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:384
 msgid "Filter plugin library"
-msgstr "滤镜插件库"
+msgstr "Filter plugin library"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:385
 msgid "Interframe blending function"
-msgstr "帧间混合功能"
+msgstr "Interframe blending function"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:386
 msgid "Keep window on top"
-msgstr "保持窗口在最前"
+msgstr "Keep window on top"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:388
 msgid "Maximum number of threads to run filters in"
-msgstr "运行滤镜的最大线程数"
+msgstr "Maximum number of threads to run filters in"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:390
 msgid "Render method; if unsupported, simple method will be used"
-msgstr "渲染方式；如果不支持，则使用简单方式"
+msgstr "Render method; if unsupported, simple method will be used"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:391
 msgid "Default scale factor"
-msgstr "默认缩放系数"
+msgstr "Default scale factor"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:392
 msgid "Retain aspect ratio when resizing"
-msgstr "调整大小时保持长宽比"
+msgstr "Retain aspect ratio when resizing"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:395
 msgid "BIOS file to use for Game Boy, if enabled"
-msgstr "用于 GB 的 BIOS 文件（如果启用）"
+msgstr "BIOS file to use for Game Boy, if enabled"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:396
 msgid "Game Boy color enhancement, if enabled"
-msgstr "GB 色彩增强（如果启用）"
+msgstr "Game Boy color enhancement, if enabled"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:397
 msgid "Enable DX Colorization Hacks"
-msgstr "启用 DX 色彩修改"
+msgstr "Enable DX Colorization Hacks"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:398
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:422
 msgid "Apply LCD filter, if enabled"
-msgstr "应用 LCD 滤镜（如果启用）"
+msgstr "Apply LCD filter, if enabled"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:399
 msgid "BIOS file to use for Game Boy Color, if enabled"
-msgstr "用于 GBC 的 BIOS 文件（如果启用）"
+msgstr "BIOS file to use for Game Boy Color, if enabled"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:401
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr "默认调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
+msgstr "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:404
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr "第一用户调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
+msgstr "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:407
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr "第二用户调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
+msgstr "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:410
 msgid "Automatically gather a full page before printing"
-msgstr "打印前自动聚集整个页面"
+msgstr "Automatically gather a full page before printing"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:412
 msgid "Automatically save printouts as screen captures with -print suffix"
-msgstr "使用 -print 后缀自动将打印输出保存为屏幕截图"
+msgstr "Automatically save printouts as screen captures with -print suffix"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:414
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:442
 msgid "Directory to look for ROM files"
-msgstr "要查找 ROM 文件的目录"
+msgstr "Directory to look for ROM files"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:415
 msgid "Directory to look for Game Boy Color ROM files"
-msgstr "要查找 GBC ROM 文件的目录"
+msgstr "Directory to look for Game Boy Color ROM files"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:418
 msgid "BIOS file to use, if enabled"
-msgstr "要使用的 BIOS 文件（如果启用）"
+msgstr "BIOS file to use, if enabled"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:428
 msgid "Enable link at boot"
-msgstr "在启动时启用联机"
+msgstr "Enable link at boot"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:433
 msgid "Enable faster network protocol by default"
-msgstr "默认启用更快的网络协议"
+msgstr "Enable faster network protocol by default"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:435
 msgid "Default network link client host"
-msgstr "默认网络联机客户端主机"
+msgstr "Default network link client host"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:436
 msgid "Default network link server IP to bind"
-msgstr "要绑定的默认网络联机服务器 IP"
+msgstr "Default network link server IP to bind"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:437
 msgid "Default network link port (server and client)"
-msgstr "默认网络联机端口（服务器和客户端）"
+msgstr "Default network link port (server and client)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:438
 msgid "Default network protocol"
-msgstr "默认网络协议"
+msgstr "Default network protocol"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:439
 msgid "Link timeout (ms)"
-msgstr "联机超时（毫秒）"
+msgstr "Link timeout (ms)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:440
 msgid "Link cable type"
-msgstr "联机线缆类型"
+msgstr "Link cable type"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:445
 msgid "Automatically load last saved state"
-msgstr "自动加载上次保存的状态"
+msgstr "Automatically load last saved state"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:447
 msgid ""
 "Directory to store game save files (relative paths are relative to ROM; "
 "blank is config dir)"
-msgstr "存放游戏存档文件的目录（相对路径是相对于 ROM；空白是配置目录）"
+msgstr "Directory to store game save files (relative paths are relative to ROM; blank is config dir)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:449
 msgid "Freeze recent load list"
-msgstr "冻结最近的加载列表"
+msgstr "Freeze recent load list"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:451
 msgid ""
 "Directory to store A / V and game recordings (relative paths are relative to"
 " ROM)"
-msgstr "存储 A/V 和游戏录像的目录（相对路径是相对于 ROM）"
+msgstr "Directory to store A / V and game recordings (relative paths are relative to ROM)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:454
 msgid "Number of seconds between rewind snapshots (0 to disable)"
-msgstr "倒带快照之间的秒数（0 表示禁用）"
+msgstr "Number of seconds between rewind snapshots (0 to disable)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:456
 msgid "Directory to store screenshots (relative paths are relative to ROM)"
-msgstr "存放截图的目录（相对路径是相对于 ROM）"
+msgstr "Directory to store screenshots (relative paths are relative to ROM)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:459
 msgid ""
 "Directory to store saved state files (relative paths are relative to "
 "BatteryDir)"
-msgstr "存储保存状态文件的目录（相对路径是相对于 BatteryDir）"
+msgstr "Directory to store saved state files (relative paths are relative to BatteryDir)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:461
 msgid "Enable status bar"
-msgstr "启用状态栏"
+msgstr "Enable status bar"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:462
 msgid "INI file version (DO NOT MODIFY)"
-msgstr "INI 文件版本 (请勿修改)"
+msgstr "INI file version (DO NOT MODIFY)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:466
 msgid ""
@@ -1394,266 +1395,266 @@ msgid ""
 "names which map to joypad #<n> button <button>. Button is one of Up, Down, "
 "Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
-msgstr "参数 手柄/<n>/<button> 包含一个逗号分隔的键名列表，这些键名映射到 手柄 #<n> 按键 <button>。 按键是 上、下、左、右、A、B、L、R、Select、Start、体感上、体感下、体感左、体感右、连发A、连发B、加速、截图、GS 中某一个"
+msgstr "The parameter Joypad/<n>/<button> contains a comma-separated list of key names which map to joypad #<n> button <button>. Button is one of Up, Down, Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, AutoB, Speed, Capture, GS"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:471
 msgid "The autofire toggle period, in frames (1/60 s)"
-msgstr "连发切换周期，以帧为单位（1/60 秒）"
+msgstr "The autofire toggle period, in frames (1/60 s)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:472
 msgid "The number of the stick to use in single-player mode"
-msgstr "在单人模式中使用的摇杆数量"
+msgstr "The number of the stick to use in single-player mode"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:474
 msgid "Whether to enable SDL GameController mode"
-msgstr "选择是否启用 SDL 游戏控制器模式"
+msgstr "Whether to enable SDL GameController mode"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:478
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
-msgstr "参数 键盘/<cmd> 包含一个以逗号分隔的键名列表（例如 Alt-Shift-F1）。 当按下指定的键时，命令 <cmd> 被执行。"
+msgstr "The parameter Keyboard/<cmd> contains a comma-separated list of key names (e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is executed."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:483
 msgid "Enable AGB debug print"
-msgstr "启用 AGB 调试打印"
+msgstr "Enable AGB debug print"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:484
 msgid "Auto skip frames"
-msgstr "自动跳帧"
+msgstr "Auto skip frames"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:486
 msgid "Apply IPS / UPS / IPF patches if found"
-msgstr "如发现 IPS/UPS/IPF 补丁即应用"
+msgstr "Apply IPS / UPS / IPF patches if found"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:488
 msgid "Automatically save and load cheat list"
-msgstr "自动保存和加载金手指列表"
+msgstr "Automatically save and load cheat list"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:492
 msgid "Automatically enable border for Super Game Boy games"
-msgstr "对 Super GameBoy 游戏自动启用边框"
+msgstr "Automatically enable border for Super Game Boy games"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:494
 msgid "Always enable border"
-msgstr "始终启用边框"
+msgstr "Always enable border"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:495
 msgid "Screen capture file format"
-msgstr "屏幕截图文件格式"
+msgstr "Screen capture file format"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:496
 msgid "Enable cheats"
-msgstr "启用金手指"
+msgstr "Enable cheats"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:497
 msgid "Disable on-screen status messages"
-msgstr "禁用屏幕状态消息"
+msgstr "Disable on-screen status messages"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:498
 msgid "Type of system to emulate"
-msgstr "要模拟的系统类型"
+msgstr "Type of system to emulate"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:499
 msgid "Flash size 0 = 64 KB 1 = 128 KB"
-msgstr "Flash 大小 0 = 64 KB 1 = 128 KB"
+msgstr "Flash size 0 = 64 KB 1 = 128 KB"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:501
 msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
-msgstr "跳帧。值为 0-9 或 -1 以根据时间自动跳过。"
+msgstr "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:503
 msgid "The palette to use"
-msgstr "要使用的调色板"
+msgstr "The palette to use"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:504
 msgid "Enable printer emulation"
-msgstr "启用打印机模拟"
+msgstr "Enable printer emulation"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:506
 msgid "Break into GDB after loading the game."
-msgstr "加载游戏后切入 GDB"
+msgstr "Break into GDB after loading the game."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:507
 msgid "Port to connect GDB to"
-msgstr "连接 GDB 的端口"
+msgstr "Port to connect GDB to"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:509
 msgid "Number of players in network"
-msgstr "联机中的玩家数量"
+msgstr "Number of players in network"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:511
 msgid "Maximum scale factor (0 = no limit)"
-msgstr "最大缩放系数（0 = 无限制）"
+msgstr "Maximum scale factor (0 = no limit)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:513
 msgid "Pause game when main window loses focus"
-msgstr "当主窗口非活动时暂停游戏"
+msgstr "Pause game when main window loses focus"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:515
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
-msgstr "启用 RTC（vba-over.ini 里覆盖为 rtcEnabled"
+msgstr "Enable RTC (vba-over.ini override is rtcEnabled"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:516
 msgid "Native save (\"battery\") hardware type"
-msgstr "原生存档（“电池档”）硬件类型"
+msgstr "Native save (\"battery\") hardware type"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:517
 msgid "Show speed indicator"
-msgstr "显示速度指示器"
+msgstr "Show speed indicator"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:519
 msgid "Draw on-screen messages transparently"
-msgstr "透明显示屏幕消息"
+msgstr "Draw on-screen messages transparently"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:520
 msgid "Skip BIOS initialization"
-msgstr "跳过 BIOS 初始化"
+msgstr "Skip BIOS initialization"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:522
 msgid "Do not overwrite cheat list when loading state"
-msgstr "加载状态时不覆盖金手指列表"
+msgstr "Do not overwrite cheat list when loading state"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:524
 msgid "Do not overwrite native (battery) save when loading state"
-msgstr "加载状态时不覆盖原生 (电池) 存档"
+msgstr "Do not overwrite native (battery) save when loading state"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:526
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
-msgstr "阀门加快游戏速度，即使已经在加速时（0-450 %，0 = 无阀门）"
+msgstr "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:529
 msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
-msgstr "设置加速键的阀门值（0-3000 %，0 = 无阀门）"
+msgstr "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:531
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
-msgstr "加速时跳过的帧数（而不是阀门加速）"
+msgstr "Number of frames to skip with speedup (instead of speedup throttle)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:534
 msgid "Use frame skip for speedup throttle"
-msgstr "使用跳帧来阀门加速"
+msgstr "Use frame skip for speedup throttle"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:536
 msgid "Mute sound during speedup"
-msgstr "游戏加速时静音"
+msgstr "Mute sound during speedup"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:537
 msgid "Use the specified BIOS file for Game Boy"
-msgstr "对 GB 使用指定的 BIOS 文件"
+msgstr "Use the specified BIOS file for Game Boy"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:538
 msgid "Use the specified BIOS file"
-msgstr "使用指定的 BIOS 文件"
+msgstr "Use the specified BIOS file"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:540
 msgid "Use the specified BIOS file for Game Boy Color"
-msgstr "对 GBC 使用指定的 BIOS 文件"
+msgstr "Use the specified BIOS file for Game Boy Color"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:541
 msgid "Wait for vertical sync"
-msgstr "等待垂直同步"
+msgstr "Wait for vertical sync"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:544
 msgid "Enter fullscreen mode at startup"
-msgstr "启动时进入全屏模式"
+msgstr "Enter fullscreen mode at startup"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:545
 msgid "Window maximized"
-msgstr "窗口最大化"
+msgstr "Window maximized"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:546
 msgid "Window height at startup"
-msgstr "启动时的窗口高度"
+msgstr "Window height at startup"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:547
 msgid "Window width at startup"
-msgstr "启动时的窗口宽度"
+msgstr "Window width at startup"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:548
 msgid "Window axis X position at startup"
-msgstr "启动时的窗口 X 坐标位置"
+msgstr "Window axis X position at startup"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:549
 msgid "Window axis Y position at startup"
-msgstr "启动时的窗口 Y 坐标位置"
+msgstr "Window axis Y position at startup"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:553
 msgid "Capture key events while on background"
-msgstr "在后台截取按键事件"
+msgstr "Capture key events while on background"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:555
 msgid "Capture joy events while on background"
-msgstr "在后台截取摇杆事件"
+msgstr "Capture joy events while on background"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:556
 msgid "Hide menu bar when mouse is inactive"
-msgstr "鼠标非活动时隐藏菜单栏"
+msgstr "Hide menu bar when mouse is inactive"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:558
 msgid "Suspend screensaver when game is running"
-msgstr "游戏运行时暂停屏幕保护程序"
+msgstr "Suspend screensaver when game is running"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:561
 msgid "Sound API; if unsupported, default API will be used"
-msgstr "声音 API；如果不支持，将使用默认 API"
+msgstr "Sound API; if unsupported, default API will be used"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:562
 msgid "Device ID of chosen audio device for chosen driver"
-msgstr "所选驱动程序下的所选音频设备 ID"
+msgstr "Device ID of chosen audio device for chosen driver"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:563
 msgid "Number of sound buffers"
-msgstr "声音缓冲区数"
+msgstr "Number of sound buffers"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:564
 msgid "Bit mask of sound channels to enable"
-msgstr "要启用的声道位掩码"
+msgstr "Bit mask of sound channels to enable"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:565
 msgid "Game Boy Advance sound filtering (%)"
-msgstr "GBA 声音过滤 (%)"
+msgstr "Game Boy Advance sound filtering (%)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:567
 msgid "Game Boy Advance sound interpolation"
-msgstr "GBA 声音插值"
+msgstr "Game Boy Advance sound interpolation"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:568
 msgid "Game Boy sound declicking"
-msgstr "GB 声音降噪"
+msgstr "Game Boy sound declicking"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:569
 msgid "Game Boy echo effect (%)"
-msgstr "GB 回声音效 (%)"
+msgstr "Game Boy echo effect (%)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:570
 msgid "Enable Game Boy sound effects"
-msgstr "启用 GB 音效"
+msgstr "Enable Game Boy sound effects"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:571
 msgid "Game Boy stereo effect (%)"
-msgstr "GB 立体声音效 (%)"
+msgstr "Game Boy stereo effect (%)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:572
 msgid "Game Boy surround sound effect (%)"
-msgstr "GB 环绕音效 (%)"
+msgstr "Game Boy surround sound effect (%)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:573
 msgid "Sound sample rate (kHz)"
-msgstr "声音采样率 (kHz)"
+msgstr "Sound sample rate (kHz)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
 msgid "Use DirectSound hardware acceleration"
-msgstr "启用 DirectSound 硬件加速"
+msgstr "Use DirectSound hardware acceleration"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:575
 msgid "Upmix stereo to surround"
-msgstr "将立体声升级为环绕立体声"
+msgstr "Upmix stereo to surround"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:576
 msgid "Sound volume (%)"
-msgstr "音量 (%)"
+msgstr "Sound volume (%)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:645
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:665
@@ -1662,18 +1663,18 @@ msgstr "音量 (%)"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:726
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
-msgstr "数值 %s 对于选项 %s 无效，有效数值为 %s"
+msgstr "Invalid value %s for option %s; valid values are %s"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:321
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
-msgstr "数值 %f 对于选项 %s； 有效数值为 %f - %f"
+msgstr "Invalid value %f for option %s; valid values are %f - %f"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:336
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:351
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
-msgstr "数值 %d 对于选项 %s 无效；有效数值为 %d - %d"
+msgstr "Invalid value %d for option %s; valid values are %d - %d"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:22
 msgid "Backspace"
@@ -1785,31 +1786,31 @@ msgstr "Num /"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:54
 msgid "Volume Mute"
-msgstr "静音"
+msgstr "Volume Mute"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:55
 msgid "Volume Down"
-msgstr "音量减"
+msgstr "Volume Down"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:56
 msgid "Volume Up"
-msgstr "音量加"
+msgstr "Volume Up"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:57
 msgid "Next Track"
-msgstr "下一曲"
+msgstr "Next Track"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:58
 msgid "Previous Track"
-msgstr "上一曲"
+msgstr "Previous Track"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:59
 msgid "Stop"
-msgstr "停止"
+msgstr "Stop"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:60
 msgid "Play/Pause"
-msgstr "开始/暂停"
+msgstr "Play/Pause"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:93
 msgid "Alt+"
@@ -1834,130 +1835,130 @@ msgstr "Meta+"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:238
 #, c-format
 msgid "Joystick %d"
-msgstr "摇杆 %d"
+msgstr "Joystick %d"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:268
 #, c-format
 msgid "%s: Axis %d+"
-msgstr "%s: 轴 %d+"
+msgstr "%s: Axis %d+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:270
 #, c-format
 msgid "%s: Axis %d-"
-msgstr "%s: 轴 %d-"
+msgstr "%s: Axis %d-"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:272
 #, c-format
 msgid "%s: Button %d"
-msgstr "%s: 按钮 %d"
+msgstr "%s: Button %d"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:274
 #, c-format
 msgid "%s: Hat %d North"
-msgstr "%s: 方向键 %d 北"
+msgstr "%s: Hat %d North"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:276
 #, c-format
 msgid "%s: Hat %d South"
-msgstr "%s: 方向键 %d 南"
+msgstr "%s: Hat %d South"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:278
 #, c-format
 msgid "%s: Hat %d West"
-msgstr "%s: 方向键 %d 西"
+msgstr "%s: Hat %d West"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:280
 #, c-format
 msgid "%s: Hat %d East"
-msgstr "%s: 方向键 %d 东"
+msgstr "%s: Hat %d East"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:315
 msgid "Key"
-msgstr "按键"
+msgstr "Key"
 
 #: audio/internal/dsound.cpp:105 audio/internal/dsound.cpp:120
 #, c-format
 msgid "Cannot create Direct Sound %08x"
-msgstr "无法创建 DirectSound %08x"
+msgstr "Cannot create Direct Sound %08x"
 
 #: audio/internal/dsound.cpp:126
 #, c-format
 msgid "Cannot SetCooperativeLevel %08x"
-msgstr "无法设置协同级别 %08x"
+msgstr "Cannot SetCooperativeLevel %08x"
 
 #: audio/internal/dsound.cpp:141
 #, c-format
 msgid "Cannot CreateSoundBuffer %08x"
-msgstr "无法创建声音缓冲 %08x"
+msgstr "Cannot CreateSoundBuffer %08x"
 
 #: audio/internal/dsound.cpp:160
 #, c-format
 msgid "CreateSoundBuffer(primary) failed %08x"
-msgstr "创建声音缓冲（主）失败 %08x"
+msgstr "CreateSoundBuffer(primary) failed %08x"
 
 #: audio/internal/dsound.cpp:178
 #, c-format
 msgid "CreateSoundBuffer(secondary) failed %08x"
-msgstr "创建声音缓冲（副）失败 %08x"
+msgstr "CreateSoundBuffer(secondary) failed %08x"
 
 #: audio/internal/dsound.cpp:183
 #, c-format
 msgid "dsbSecondary->SetCurrentPosition failed %08x"
-msgstr "dsbSecondary->SetCurrentPosition 失败 %08x"
+msgstr "dsbSecondary->SetCurrentPosition failed %08x"
 
 #: audio/internal/dsound.cpp:207
 #, c-format
 msgid "Cannot Play primary %08x"
-msgstr "无法运行主 %08x"
+msgstr "Cannot Play primary %08x"
 
 #: audio/internal/dsound.cpp:328
 #, c-format
 msgid "dsbSecondary->Lock() failed: %08x"
-msgstr "dsbSecondary->Lock() 失败: %08x"
+msgstr "dsbSecondary->Lock() failed: %08x"
 
 #: audio/internal/faudio.cpp:40 audio/internal/faudio.cpp:486
 msgid "FAudio: Enumerating devices failed!"
-msgstr "FAudio: 枚举设备失败！"
+msgstr "FAudio: Enumerating devices failed!"
 
 #: audio/internal/faudio.cpp:213 audio/internal/faudio.cpp:479
 msgid "The FAudio interface failed to initialize!"
-msgstr "FAudio 接口初始化失败！"
+msgstr "The FAudio interface failed to initialize!"
 
 #: audio/internal/faudio.cpp:244
 msgid "FAudio: Creating mastering voice failed!"
-msgstr "FAudio:  创建主语音失败！"
+msgstr "FAudio: Creating mastering voice failed!"
 
 #: audio/internal/faudio.cpp:253
 msgid "FAudio: Creating source voice failed!"
-msgstr "FAudio: 创建源语音失败！"
+msgstr "FAudio: Creating source voice failed!"
 
 #: audio/internal/xaudio2.cpp:46 audio/internal/xaudio2.cpp:571
 msgid "XAudio2: Enumerating devices failed!"
-msgstr "XAudio2: 枚举设备失败！"
+msgstr "XAudio2: Enumerating devices failed!"
 
 #: audio/internal/xaudio2.cpp:297 audio/internal/xaudio2.cpp:564
 msgid "The XAudio2 interface failed to initialize!"
-msgstr "XAudio2 接口初始化失败！"
+msgstr "The XAudio2 interface failed to initialize!"
 
 #: audio/internal/xaudio2.cpp:323
 msgid "XAudio2: Creating mastering voice failed!"
-msgstr "XAudio2:  创建主语音失败！"
+msgstr "XAudio2: Creating mastering voice failed!"
 
 #: audio/internal/xaudio2.cpp:332
 msgid "XAudio2: Creating source voice failed!"
-msgstr "XAudio2: 创建源语音失败！"
+msgstr "XAudio2: Creating source voice failed!"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:639
 msgid "Error, link already connected"
-msgstr "错误，联机已连接"
+msgstr "Error, link already connected"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:653
 msgid "Unable to find link driver"
-msgstr "无法找到联机驱动程序"
+msgstr "Unable to find link driver"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:696
 msgid "Link connection does not need updates."
-msgstr "联机连接不需要更新。"
+msgstr "Link connection does not need updates."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:835
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:899
@@ -1965,209 +1966,209 @@ msgstr "联机连接不需要更新。"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2878
 #, c-format
 msgid "Player %d disconnected."
-msgstr "玩家 %d 已断开连接。"
+msgstr "Player %d disconnected."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:939
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:979
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1019
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1654
 msgid "Server disconnected."
-msgstr "服务器已断开连接。"
+msgstr "Server disconnected."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1101
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1133
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1678
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1711
 msgid "Network error."
-msgstr "网络错误。"
+msgstr "Network error."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1110
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1687
 #, c-format
 msgid "Player %d connected"
-msgstr "玩家 %d 已连接"
+msgstr "Player %d connected"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1124
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1701
 msgid "All players connected"
-msgstr "所有玩家已连接"
+msgstr "All players connected"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1145
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1723
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
-msgstr "以 #%d 方式连接，正在等待 %d 名玩家加入"
+msgstr "Connected as #%d, Waiting for %d players to join"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1154
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1732
 msgid "All players joined."
-msgstr "所有玩家已加入。"
+msgstr "All players joined."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1647
 msgid "Server timed out."
-msgstr "服务器超时。"
+msgstr "Server timed out."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2601
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2622
 msgid "Error creating file mapping"
-msgstr "创建文件映射错误"
+msgstr "Error creating file mapping"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2612
 msgid "Error mapping file"
-msgstr "映射文件错误"
+msgstr "Error mapping file"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2659
 msgid "5 or more GBAs not supported."
-msgstr "不支持 5 台或更多 GBA 机器。"
+msgstr "5 or more GBAs not supported."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2678
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2697
 msgid "Error opening event"
-msgstr "打开事件错误"
+msgstr "Error opening event"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2797
 msgid "Lost link; reinitialize to reconnect"
-msgstr "联机丢失；重新初始化以重新连接"
+msgstr "Lost link; reinitialize to reconnect"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2804
 msgid "Lost link; reconnected"
-msgstr "联机丢失；已重新连接"
+msgstr "Lost link; reconnected"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2925
 msgid "Unknown slave timed out; resetting comm"
-msgstr "未知从机超时；正在重置通讯"
+msgstr "Unknown slave timed out; resetting comm"
 
 #: xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
-msgstr "快捷键"
+msgstr "Key Shortcuts"
 
 #: xrc/AccelConfig.xrc:26
 msgid "Co&mmands:"
-msgstr "命令(&M):"
+msgstr "Co&mmands:"
 
 #: xrc/AccelConfig.xrc:47
 msgid "Current Keys:"
-msgstr "当前键:"
+msgstr "Current Keys:"
 
 #: xrc/AccelConfig.xrc:62
 msgid "&Assign"
-msgstr "分配(&A)"
+msgstr "&Assign"
 
 #: xrc/AccelConfig.xrc:69
 msgid "&Remove"
-msgstr "移除(&R)"
+msgstr "&Remove"
 
 #: xrc/AccelConfig.xrc:76
 msgid "Re&set All"
-msgstr "重置全部(&S)"
+msgstr "Re&set All"
 
 #: xrc/AccelConfig.xrc:92
 msgid "Currently assigned to:"
-msgstr "当前分配给:"
+msgstr "Currently assigned to:"
 
 #: xrc/AccelConfig.xrc:106
 msgid "Shortcut Key:"
-msgstr "快捷键:"
+msgstr "Shortcut Key:"
 
 #: xrc/CheatAdd.xrc:4
 msgid "Add Cheat"
-msgstr "添加金手指"
+msgstr "Add Cheat"
 
 #: xrc/CheatAdd.xrc:9 xrc/CheatEdit.xrc:9
 msgid "&Description"
-msgstr "描述(&D)"
+msgstr "&Description"
 
 #: xrc/CheatAdd.xrc:53
 msgid "&Value"
-msgstr "数值(&V)"
+msgstr "&Value"
 
 #: xrc/CheatAdd.xrc:77
 msgid "Format"
-msgstr "格式"
+msgstr "Format"
 
 #: xrc/CheatCreate.xrc:4
 msgid "Cheat Search"
-msgstr "搜索金手指"
+msgstr "Cheat Search"
 
 #: xrc/CheatCreate.xrc:23
 msgid "E&qual"
-msgstr "等于(&Q)"
+msgstr "E&qual"
 
 #: xrc/CheatCreate.xrc:31
 msgid "&Not equal"
-msgstr "不等于(&N)"
+msgstr "&Not equal"
 
 #: xrc/CheatCreate.xrc:38
 msgid "&Less than"
-msgstr "少于(&L)"
+msgstr "&Less than"
 
 #: xrc/CheatCreate.xrc:45
 msgid "L&ess or equal"
-msgstr "少或等于(&E)"
+msgstr "L&ess or equal"
 
 #: xrc/CheatCreate.xrc:52
 msgid "&Greater than"
-msgstr "大于(&G)"
+msgstr "&Greater than"
 
 #: xrc/CheatCreate.xrc:59
 msgid "G&reater or equal"
-msgstr "大或等于(&R)"
+msgstr "G&reater or equal"
 
 #: xrc/CheatCreate.xrc:64
 msgid "Compare type"
-msgstr "比较类型"
+msgstr "Compare type"
 
 #: xrc/CheatCreate.xrc:77
 msgid "S&igned"
-msgstr "有符号(&I)"
+msgstr "S&igned"
 
 #: xrc/CheatCreate.xrc:85
 msgid "&Unsigned"
-msgstr "无符号(&U)"
+msgstr "&Unsigned"
 
 #: xrc/CheatCreate.xrc:92
 msgid "&Hexadecimal"
-msgstr "十六进制(&H)"
+msgstr "&Hexadecimal"
 
 #: xrc/CheatCreate.xrc:97
 msgid "Signed / Unsigned"
-msgstr "有符号/无符号"
+msgstr "Signed / Unsigned"
 
 #: xrc/CheatCreate.xrc:107
 msgid "&8 bits"
-msgstr "8 位(&8)"
+msgstr "&8 bits"
 
 #: xrc/CheatCreate.xrc:115
 msgid "&16 bits"
-msgstr "16 位(&1)"
+msgstr "&16 bits"
 
 #: xrc/CheatCreate.xrc:122
 msgid "&32 bits"
-msgstr "32 位(&3)"
+msgstr "&32 bits"
 
 #: xrc/CheatCreate.xrc:127
 msgid "Data size"
-msgstr "数据大小"
+msgstr "Data size"
 
 #: xrc/CheatCreate.xrc:144
 msgid "Ol&d value"
-msgstr "旧数值(&D)"
+msgstr "Ol&d value"
 
 #: xrc/CheatCreate.xrc:152
 msgid "Specific &value"
-msgstr "特定值(&V)"
+msgstr "Specific &value"
 
 #: xrc/CheatCreate.xrc:163
 msgid "Search value"
-msgstr "搜索值"
+msgstr "Search value"
 
 #: xrc/CheatCreate.xrc:181
 msgid "&Search"
-msgstr "搜索(&S)"
+msgstr "&Search"
 
 #: xrc/CheatCreate.xrc:188
 msgid "U&pdate Old"
-msgstr "更新旧值(&P)"
+msgstr "U&pdate Old"
 
 #: xrc/CheatCreate.xrc:195 xrc/JoyPanel.xrc:29 xrc/JoyPanel.xrc:52
 #: xrc/JoyPanel.xrc:75 xrc/JoyPanel.xrc:98 xrc/JoyPanel.xrc:121
@@ -2178,55 +2179,55 @@ msgstr "更新旧值(&P)"
 #: xrc/JoyPanel.xrc:422 xrc/JoyPanel.xrc:444 xrc/JoyPanel.xrc:475
 #: xrc/JoyPanel.xrc:497 xrc/Logging.xrc:119
 msgid "&Clear"
-msgstr "清除(&C)"
+msgstr "&Clear"
 
 #: xrc/CheatCreate.xrc:202
 msgid "&Add cheat"
-msgstr "添加金手指(&A)"
+msgstr "&Add cheat"
 
 #: xrc/CheatEdit.xrc:4
 msgid "Edit Cheat"
-msgstr "编辑金手指"
+msgstr "Edit Cheat"
 
 #: xrc/CheatEdit.xrc:31 xrc/MainMenu.xrc:275
 msgid "&Type"
-msgstr "类型(&T)"
+msgstr "&Type"
 
 #: xrc/CheatEdit.xrc:53
 msgid "C&odes"
-msgstr "代码(&O)"
+msgstr "C&odes"
 
 #: xrc/CheatList.xrc:4
 msgid "Cheat List"
-msgstr "金手指"
+msgstr "Cheat List"
 
 #: xrc/CheatList.xrc:11
 msgid "Open cheat list"
-msgstr "打开金手指列表"
+msgstr "Open cheat list"
 
 #: xrc/CheatList.xrc:15
 msgid "Save cheat list"
-msgstr "保存金手指列表"
+msgstr "Save cheat list"
 
 #: xrc/CheatList.xrc:20
 msgid "Add new cheat"
-msgstr "添加金手指"
+msgstr "Add new cheat"
 
 #: xrc/CheatList.xrc:24
 msgid "Delete selected cheat"
-msgstr "删除金手指"
+msgstr "Delete selected cheat"
 
 #: xrc/CheatList.xrc:29
 msgid "Delete all cheats"
-msgstr "删除全部金手指"
+msgstr "Delete all cheats"
 
 #: xrc/CheatList.xrc:35
 msgid "Toggle all Cheats"
-msgstr "开启全部金手指"
+msgstr "Toggle all Cheats"
 
 #: xrc/DirectoriesConfig.xrc:4
 msgid "Directories"
-msgstr "目录"
+msgstr "Directories"
 
 #: xrc/DirectoriesConfig.xrc:11 xrc/DirectoriesConfig.xrc:18
 msgid "Game Boy Advance ROMs"
@@ -2242,354 +2243,354 @@ msgstr "Game Boy Color ROMs"
 
 #: xrc/DirectoriesConfig.xrc:57 xrc/DirectoriesConfig.xrc:64
 msgid "Native Saves"
-msgstr "原生存档"
+msgstr "Native Saves"
 
 #: xrc/DirectoriesConfig.xrc:72 xrc/DirectoriesConfig.xrc:79
 msgid "Emulator Saves"
-msgstr "模拟器存档"
+msgstr "Emulator Saves"
 
 #: xrc/DirectoriesConfig.xrc:87 xrc/DirectoriesConfig.xrc:94
 msgid "Screenshots"
-msgstr "截图"
+msgstr "Screenshots"
 
 #: xrc/DirectoriesConfig.xrc:102 xrc/DirectoriesConfig.xrc:109
 msgid "Recordings"
-msgstr "录制"
+msgstr "Recordings"
 
 #: xrc/Disassemble.xrc:4
 msgid "Disassemble"
-msgstr "反编译"
+msgstr "Disassemble"
 
 #: xrc/Disassemble.xrc:15
 msgid "&Automatic"
-msgstr "自动(&A)"
+msgstr "&Automatic"
 
 #: xrc/Disassemble.xrc:45 xrc/GBDisassemble.xrc:18 xrc/MemViewer.xrc:47
 msgid "&Go"
-msgstr "开始(&G)"
+msgstr "&Go"
 
 #: xrc/Disassemble.xrc:414 xrc/MapViewer.xrc:76 xrc/OAMViewer.xrc:37
 msgid "Mode:"
-msgstr "模式:"
+msgstr "Mode:"
 
 #: xrc/Disassemble.xrc:443 xrc/GBDisassemble.xrc:212 xrc/GBOAMViewer.xrc:93
 #: xrc/GBPaletteViewer.xrc:105 xrc/GBTileViewer.xrc:75 xrc/IOViewer.xrc:318
 #: xrc/MemViewer.xrc:72 xrc/OAMViewer.xrc:109 xrc/PaletteViewer.xrc:81
 #: xrc/TileViewer.xrc:91
 msgid "Automatic &update"
-msgstr "自动更新(U)"
+msgstr "Automatic &update"
 
 #: xrc/Disassemble.xrc:453 xrc/GBDisassemble.xrc:222
 msgid "G&oto PC"
-msgstr "转到 PC(&O)"
+msgstr "G&oto PC"
 
 #: xrc/Disassemble.xrc:460 xrc/GBDisassemble.xrc:229
 msgid "Re&fresh"
-msgstr "刷新(&F)"
+msgstr "Re&fresh"
 
 #: xrc/Disassemble.xrc:467 xrc/GBDisassemble.xrc:236
 msgid "&Next"
-msgstr "下一个(&N)"
+msgstr "&Next"
 
 #: xrc/DisplayConfig.xrc:4
 msgid "Display settings"
-msgstr "显示设置"
+msgstr "Display settings"
 
 #: xrc/DisplayConfig.xrc:16
 msgid "Output module"
-msgstr "输出模块"
+msgstr "Output module"
 
 #: xrc/DisplayConfig.xrc:34
 msgid "Simple"
-msgstr "简单"
+msgstr "Simple"
 
 #: xrc/DisplayConfig.xrc:66
 msgid "Filters"
-msgstr "滤镜"
+msgstr "Filters"
 
 #: xrc/DisplayConfig.xrc:80
 msgid "Display filter:"
-msgstr "显示滤镜："
+msgstr "Display filter:"
 
 #: xrc/DisplayConfig.xrc:88
 msgid "Super 2xSaI"
-msgstr "超级 2xSaI"
+msgstr "Super 2xSaI"
 
 #: xrc/DisplayConfig.xrc:89
 msgid "Super Eagle"
-msgstr "超级锐化"
+msgstr "Super Eagle"
 
 #: xrc/DisplayConfig.xrc:90
 msgid "Pixelate"
-msgstr "像素化"
+msgstr "Pixelate"
 
 #: xrc/DisplayConfig.xrc:91
 msgid "Advance MAME Scale 2x"
-msgstr "高级 MAME 缩放 2x"
+msgstr "Advance MAME Scale 2x"
 
 #: xrc/DisplayConfig.xrc:92
 msgid "Bilinear"
-msgstr "双线性"
+msgstr "Bilinear"
 
 #: xrc/DisplayConfig.xrc:93
 msgid "Bilinear Plus"
-msgstr "增强双线性"
+msgstr "Bilinear Plus"
 
 #: xrc/DisplayConfig.xrc:94
 msgid "Scanlines"
-msgstr "扫描线"
+msgstr "Scanlines"
 
 #: xrc/DisplayConfig.xrc:95
 msgid "TV Mode"
-msgstr "电视模式"
+msgstr "TV Mode"
 
 #: xrc/DisplayConfig.xrc:98
 msgid "Simple 2x"
-msgstr "采样 2x"
+msgstr "Simple 2x"
 
 #: xrc/DisplayConfig.xrc:99
 msgid "Simple 3x"
-msgstr "采样 3x"
+msgstr "Simple 3x"
 
 #: xrc/DisplayConfig.xrc:101
 msgid "Simple 4x"
-msgstr "采样 4x"
+msgstr "Simple 4x"
 
 #: xrc/DisplayConfig.xrc:116
 msgid "Plugin:"
-msgstr "插件:"
+msgstr "Plugin:"
 
 #: xrc/DisplayConfig.xrc:128
 msgid "Interframe blending:"
-msgstr "帧间混合:"
+msgstr "Interframe blending:"
 
 #: xrc/DisplayConfig.xrc:137
 msgid "Smart"
-msgstr "智能"
+msgstr "Smart"
 
 #: xrc/DisplayConfig.xrc:138
 msgid "Motion Blur"
-msgstr "动态模糊"
+msgstr "Motion Blur"
 
 #: xrc/DisplayConfig.xrc:152 xrc/SoundConfig.xrc:93
 msgid "Basic"
-msgstr "基本"
+msgstr "Basic"
 
 #: xrc/DisplayConfig.xrc:160
 msgid "Frame Skip"
-msgstr "跳帧"
+msgstr "Frame Skip"
 
 #: xrc/DisplayConfig.xrc:178
 msgid "&Number of frames to skip:"
-msgstr "要跳过的帧数(&N) :"
+msgstr "&Number of frames to skip:"
 
 #: xrc/DisplayConfig.xrc:216
 msgid "Speed indicator:"
-msgstr "速度指示器："
+msgstr "Speed indicator:"
 
 #: xrc/DisplayConfig.xrc:223
 msgid "Percentage"
-msgstr "百分比"
+msgstr "Percentage"
 
 #: xrc/DisplayConfig.xrc:224
 msgid "Detailed"
-msgstr "详细"
+msgstr "Detailed"
 
 #: xrc/DisplayConfig.xrc:238
 msgid "On-Screen Display"
-msgstr "屏幕显示信息"
+msgstr "On-Screen Display"
 
 #: xrc/DisplayConfig.xrc:248
 msgid "Default magnification:"
-msgstr "默认比例:"
+msgstr "Default magnification:"
 
 #: xrc/DisplayConfig.xrc:267
 msgid "Maximum magnification factor:"
-msgstr "最高放大倍速:"
+msgstr "Maximum magnification factor:"
 
 #: xrc/DisplayConfig.xrc:268
 msgid "0 = no maximum"
-msgstr "0 = 无上限"
+msgstr "0 = no maximum"
 
 #: xrc/DisplayConfig.xrc:276
 msgid "0 = no limit"
-msgstr "0 = 无限制"
+msgstr "0 = no limit"
 
 #: xrc/DisplayConfig.xrc:286
 msgid "Zoom"
-msgstr "缩放"
+msgstr "Zoom"
 
 #: xrc/ExportSPS.xrc:10
 msgid "Title:"
-msgstr "标题 : "
+msgstr "Title:"
 
 #: xrc/ExportSPS.xrc:22
 msgid "Description:"
-msgstr "描述 : "
+msgstr "Description:"
 
 #: xrc/ExportSPS.xrc:34
 msgid "Notes:"
-msgstr "注释 : "
+msgstr "Notes:"
 
 #: xrc/GBAROMInfo.xrc:4 xrc/GBROMInfo.xrc:4
 msgid "Rom Information"
-msgstr "ROM 信息"
+msgstr "Rom Information"
 
 #: xrc/GBAROMInfo.xrc:11 xrc/GBROMInfo.xrc:12
 msgid "Game title:"
-msgstr "游戏名 : "
+msgstr "Game title:"
 
 #: xrc/GBAROMInfo.xrc:23
 msgid "Internal title:"
-msgstr "内部代号 :"
+msgstr "Internal title:"
 
 #: xrc/GBAROMInfo.xrc:35
 msgid "Scene Release:"
-msgstr "版本 : "
+msgstr "Scene Release:"
 
 #: xrc/GBAROMInfo.xrc:47
 msgid "Release Number:"
-msgstr "版本号:"
+msgstr "Release Number:"
 
 #: xrc/GBAROMInfo.xrc:71
 msgid "Game code:"
-msgstr "游戏代码:"
+msgstr "Game code:"
 
 #: xrc/GBAROMInfo.xrc:83 xrc/GBROMInfo.xrc:24
 msgid "Maker code:"
-msgstr "厂商代码:"
+msgstr "Maker code:"
 
 #: xrc/GBAROMInfo.xrc:95 xrc/GBROMInfo.xrc:36
 msgid "Maker name:"
-msgstr "厂商名称:"
+msgstr "Maker name:"
 
 #: xrc/GBAROMInfo.xrc:107
 msgid "Main unit code:"
-msgstr "主单元代码:"
+msgstr "Main unit code:"
 
 #: xrc/GBAROMInfo.xrc:119
 msgid "Device type:"
-msgstr "设备类型 :"
+msgstr "Device type:"
 
 #: xrc/GBAROMInfo.xrc:131 xrc/GBROMInfo.xrc:132
 msgid "ROM version:"
-msgstr "ROM 版本 :"
+msgstr "ROM version:"
 
 #: xrc/GBAROMInfo.xrc:150
 msgid "ROM Information"
-msgstr "ROM 信息"
+msgstr "ROM Information"
 
 #: xrc/GBColorPrefPanel.xrc:9
 msgid "Custom"
-msgstr "自定义"
+msgstr "Custom"
 
 #: xrc/GBColorPrefPanel.xrc:10 xrc/JoyPanel.xrc:247
 msgid "Standard"
-msgstr "标准"
+msgstr "Standard"
 
 #: xrc/GBColorPrefPanel.xrc:11
 msgid "Blue Sea"
-msgstr "蓝海"
+msgstr "Blue Sea"
 
 #: xrc/GBColorPrefPanel.xrc:12
 msgid "Dark Night"
-msgstr "黑夜"
+msgstr "Dark Night"
 
 #: xrc/GBColorPrefPanel.xrc:13
 msgid "Green Forest"
-msgstr "绿林"
+msgstr "Green Forest"
 
 #: xrc/GBColorPrefPanel.xrc:14
 msgid "Hot Desert"
-msgstr "热沙"
+msgstr "Hot Desert"
 
 #: xrc/GBColorPrefPanel.xrc:15
 msgid "Pink Dreams"
-msgstr "粉梦"
+msgstr "Pink Dreams"
 
 #: xrc/GBColorPrefPanel.xrc:16
 msgid "Weird Colors"
-msgstr "怪异色彩"
+msgstr "Weird Colors"
 
 #: xrc/GBColorPrefPanel.xrc:17
 msgid "Real Game Boy Colors"
-msgstr "实机 GB 颜色"
+msgstr "Real Game Boy Colors"
 
 #: xrc/GBColorPrefPanel.xrc:18
 msgid "Real 'Game Boy on Game Boy Advance Special' Colors"
-msgstr "实机 'GB on GBASP' 颜色"
+msgstr "Real 'Game Boy on Game Boy Advance Special' Colors"
 
 #: xrc/GBColorPrefPanel.xrc:46 xrc/GBPaletteViewer.xrc:17 xrc/MapViewer.xrc:54
 #: xrc/PaletteViewer.xrc:19
 msgid "Background"
-msgstr "背景"
+msgstr "Background"
 
 #: xrc/GBColorPrefPanel.xrc:74
 msgid "Sprites"
-msgstr "精灵块"
+msgstr "Sprites"
 
 #: xrc/GBColorPrefPanel.xrc:84
 msgid "Use this palette"
-msgstr "使用此调色板"
+msgstr "Use this palette"
 
 #: xrc/GBColorPrefPanel.xrc:94
 msgid "Restore"
-msgstr "恢复默认"
+msgstr "Restore"
 
 #: xrc/GBMapViewer.xrc:23 xrc/GBTileViewer.xrc:42 xrc/TileViewer.xrc:58
 msgid "Char Base"
-msgstr "字符库"
+msgstr "Char Base"
 
 #: xrc/GBMapViewer.xrc:42
 msgid "Map Base"
-msgstr "图层库"
+msgstr "Map Base"
 
 #: xrc/GBMapViewer.xrc:54 xrc/GBOAMViewer.xrc:88 xrc/GBTileViewer.xrc:68
 #: xrc/MapViewer.xrc:62 xrc/OAMViewer.xrc:104 xrc/TileViewer.xrc:84
 msgid "Stretch to &fit"
-msgstr "拉伸以适应(&F)"
+msgstr "Stretch to &fit"
 
 #: xrc/GBMapViewer.xrc:59 xrc/MapViewer.xrc:67
 msgid "Auto &update"
-msgstr "自动更新(U)"
+msgstr "Auto &update"
 
 #: xrc/GBMapViewer.xrc:74 xrc/GBTileViewer.xrc:99 xrc/MapViewer.xrc:144
 #: xrc/MemSelRegion.xrc:10 xrc/PaletteViewer.xrc:50 xrc/TileViewer.xrc:115
 msgid "Address:"
-msgstr "地址:"
+msgstr "Address:"
 
 #: xrc/GBMapViewer.xrc:82 xrc/GBOAMViewer.xrc:37 xrc/GBTileViewer.xrc:91
 #: xrc/MapViewer.xrc:152 xrc/OAMViewer.xrc:61 xrc/TileViewer.xrc:107
 msgid "Tile:"
-msgstr "标题:"
+msgstr "Tile:"
 
 #: xrc/GBMapViewer.xrc:90 xrc/MapViewer.xrc:160
 msgid "Flip:"
-msgstr "翻转:"
+msgstr "Flip:"
 
 #: xrc/GBMapViewer.xrc:98 xrc/GBTileViewer.xrc:50 xrc/MapViewer.xrc:168
 #: xrc/TileViewer.xrc:66
 msgid "Palette:"
-msgstr "调色板:"
+msgstr "Palette:"
 
 #: xrc/GBMapViewer.xrc:106 xrc/MapViewer.xrc:116
 msgid "Priority:"
-msgstr "优先级:"
+msgstr "Priority:"
 
 #: xrc/GBMapViewer.xrc:152 xrc/GBOAMViewer.xrc:142 xrc/GBPaletteViewer.xrc:114
 #: xrc/GBTileViewer.xrc:145 xrc/IOViewer.xrc:327 xrc/MapViewer.xrc:214
 #: xrc/MemViewer.xrc:101 xrc/OAMViewer.xrc:155 xrc/PaletteViewer.xrc:100
 #: xrc/TileViewer.xrc:161
 msgid "&Refresh"
-msgstr "刷新(&R)"
+msgstr "&Refresh"
 
 #: xrc/GBMapViewer.xrc:157 xrc/Logging.xrc:112 xrc/MapViewer.xrc:219
 msgid "&Save"
-msgstr "保存(&S)"
+msgstr "&Save"
 
 #: xrc/GBOAMViewer.xrc:13 xrc/OAMViewer.xrc:14
 msgid "Sprite:"
-msgstr "精灵块:"
+msgstr "Sprite:"
 
 #: xrc/GBOAMViewer.xrc:29 xrc/OAMViewer.xrc:29
 msgid "Pos:"
@@ -2605,7 +2606,7 @@ msgstr "Pal:"
 
 #: xrc/GBOAMViewer.xrc:69 xrc/OAMViewer.xrc:93
 msgid "Flags:"
-msgstr "标志:"
+msgstr "Flags:"
 
 #: xrc/GBOAMViewer.xrc:77
 msgid "Bank:"
@@ -2614,35 +2615,35 @@ msgstr "Bank:"
 #: xrc/GBOAMViewer.xrc:149 xrc/GBTileViewer.xrc:152 xrc/MemViewer.xrc:115
 #: xrc/OAMViewer.xrc:162 xrc/TileViewer.xrc:168
 msgid "&Save..."
-msgstr "保存(&S)..."
+msgstr "&Save..."
 
 #: xrc/GBPaletteViewer.xrc:8 xrc/PaletteViewer.xrc:9
 msgid "Click on a color for more information"
-msgstr "单击一个颜色以获取更多信息"
+msgstr "Click on a color for more information"
 
 #: xrc/GBPaletteViewer.xrc:27 xrc/PaletteViewer.xrc:105
 msgid "Save &BG..."
-msgstr "保存 BG(&B)..."
+msgstr "Save &BG..."
 
 #: xrc/GBPaletteViewer.xrc:38 xrc/PaletteViewer.xrc:33
 msgid "Sprite"
-msgstr "精灵块"
+msgstr "Sprite"
 
 #: xrc/GBPaletteViewer.xrc:48 xrc/PaletteViewer.xrc:111
 msgid "Save &Sprite..."
-msgstr "保存精灵块(&S)..."
+msgstr "Save &Sprite..."
 
 #: xrc/GBPaletteViewer.xrc:67
 msgid "Index:"
-msgstr "索引:"
+msgstr "Index:"
 
 #: xrc/GBPaletteViewer.xrc:79 xrc/IOViewer.xrc:21 xrc/PaletteViewer.xrc:62
 msgid "Value:"
-msgstr "数值 : "
+msgstr "Value:"
 
 #: xrc/GBPrinter.xrc:21
 msgid "Print Si&ze"
-msgstr "打印尺寸(&Z)"
+msgstr "Print Si&ze"
 
 #: xrc/GBPrinter.xrc:29
 msgid "1x"
@@ -2662,60 +2663,60 @@ msgstr "4x"
 
 #: xrc/GBPrinter.xrc:58
 msgid "C&ontinue"
-msgstr "继续(&O)"
+msgstr "C&ontinue"
 
 #: xrc/GBROMInfo.xrc:48
 msgid "Cartridge type:"
-msgstr "卡带类型:"
+msgstr "Cartridge type:"
 
 #: xrc/GBROMInfo.xrc:60
 msgid "SGB code:"
-msgstr "SGB 代码："
+msgstr "SGB code:"
 
 #: xrc/GBROMInfo.xrc:72
 msgid "CGB code:"
-msgstr "CGB 代码："
+msgstr "CGB code:"
 
 #: xrc/GBROMInfo.xrc:84
 msgid "ROM size:"
-msgstr "ROM 大小:"
+msgstr "ROM size:"
 
 #: xrc/GBROMInfo.xrc:96
 msgid "RAM size:"
-msgstr "RAM 大小:"
+msgstr "RAM size:"
 
 #: xrc/GBROMInfo.xrc:108
 msgid "Dest. code:"
-msgstr "目标点代码:"
+msgstr "Dest. code:"
 
 #: xrc/GBROMInfo.xrc:120
 msgid "License code:"
-msgstr "许可证代码:"
+msgstr "License code:"
 
 #: xrc/GBROMInfo.xrc:144
 msgid "Header checksum:"
-msgstr "头部校验和："
+msgstr "Header checksum:"
 
 #: xrc/GBROMInfo.xrc:156
 msgid "Cartridge checksum:"
-msgstr "卡带校验和："
+msgstr "Cartridge checksum:"
 
 #: xrc/GBTileViewer.xrc:23
 msgid "VRAM Bank"
-msgstr "虚拟内存空间"
+msgstr "VRAM Bank"
 
 #: xrc/GameBoyAdvanceConfig.xrc:4
 msgid "Game Boy Advance settings"
-msgstr "Game Boy Advance 设置"
+msgstr "Game Boy Advance settings"
 
 #: xrc/GameBoyAdvanceConfig.xrc:21
 msgid "Save type:"
-msgstr "保存类型:"
+msgstr "Save type:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
 #: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
 msgid "Automatic"
-msgstr "自动"
+msgstr "Automatic"
 
 #: xrc/GameBoyAdvanceConfig.xrc:29 xrc/GameBoyAdvanceConfig.xrc:201
 msgid "SRAM"
@@ -2723,15 +2724,15 @@ msgstr "SRAM"
 
 #: xrc/GameBoyAdvanceConfig.xrc:30 xrc/GameBoyAdvanceConfig.xrc:202
 msgid "Flash"
-msgstr "闪存"
+msgstr "Flash"
 
 #: xrc/GameBoyAdvanceConfig.xrc:31 xrc/GameBoyAdvanceConfig.xrc:203
 msgid "EEPROM + Sensor"
-msgstr "EEPROM + 传感器"
+msgstr "EEPROM + Sensor"
 
 #: xrc/GameBoyAdvanceConfig.xrc:43
 msgid "Flash size:"
-msgstr "闪存大小:"
+msgstr "Flash size:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
 msgid "64 K"
@@ -2743,380 +2744,380 @@ msgstr "128 K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:64
 msgid "Detect Now"
-msgstr "马上检测"
+msgstr "Detect Now"
 
 #: xrc/GameBoyAdvanceConfig.xrc:69
 msgid "Cartridge"
-msgstr "卡带"
+msgstr "Cartridge"
 
 #: xrc/GameBoyAdvanceConfig.xrc:77
 msgid "Save type"
-msgstr "保存类型"
+msgstr "Save type"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file:"
-msgstr "BIOS 文件："
+msgstr "BIOS file:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file:"
-msgstr "当前 BIOS 文件:"
+msgstr "Current BIOS file:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:136 xrc/GameBoyConfig.xrc:168
 msgid "Boot ROM"
-msgstr "引导 ROM"
+msgstr "Boot ROM"
 
 #: xrc/GameBoyAdvanceConfig.xrc:146
 msgid "Game Code"
-msgstr "游戏代码"
+msgstr "Game Code"
 
 #: xrc/GameBoyAdvanceConfig.xrc:160
 msgid "Comment"
-msgstr "注释"
+msgstr "Comment"
 
 #: xrc/GameBoyAdvanceConfig.xrc:172
 msgid "Real Time Clock:"
-msgstr "实时时钟"
+msgstr "Real Time Clock:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:180 xrc/GameBoyAdvanceConfig.xrc:198
 #: xrc/GameBoyAdvanceConfig.xrc:220 xrc/GameBoyAdvanceConfig.xrc:238
 #: xrc/GameBoyConfig.xrc:180
 msgid "Default"
-msgstr "默认"
+msgstr "Default"
 
 #: xrc/GameBoyAdvanceConfig.xrc:181 xrc/GameBoyAdvanceConfig.xrc:239
 msgid "Disabled"
-msgstr "已禁用"
+msgstr "Disabled"
 
 #: xrc/GameBoyAdvanceConfig.xrc:182 xrc/GameBoyAdvanceConfig.xrc:240
 msgid "Enabled"
-msgstr "已启用"
+msgstr "Enabled"
 
 #: xrc/GameBoyAdvanceConfig.xrc:190
 msgid "Save Type:"
-msgstr "保存类型 : "
+msgstr "Save Type:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:212
 msgid "Flash Size:"
-msgstr "闪存大小 :"
+msgstr "Flash Size:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:230
 msgid "Mirroring:"
-msgstr "镜像:"
+msgstr "Mirroring:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:254
 msgid "&Defaults"
-msgstr "默认(&D)"
+msgstr "&Defaults"
 
 #: xrc/GameBoyAdvanceConfig.xrc:261
 msgid "Game Overrides"
-msgstr "游戏覆盖"
+msgstr "Game Overrides"
 
 #: xrc/GameBoyConfig.xrc:4
 msgid "Game Boy settings"
-msgstr "GameBoy 设置"
+msgstr "Game Boy settings"
 
 #: xrc/GameBoyConfig.xrc:20
 msgid "Emulated &system:"
-msgstr "模拟系统(&S) :"
+msgstr "Emulated &system:"
 
 #: xrc/GameBoyConfig.xrc:48
 msgid "Display &borders:"
-msgstr "显示边框(&B) :"
+msgstr "Display &borders:"
 
 #: xrc/GameBoyConfig.xrc:57
 msgid "Never"
-msgstr "从不"
+msgstr "Never"
 
 #: xrc/GameBoyConfig.xrc:58
 msgid "Always"
-msgstr "总是"
+msgstr "Always"
 
 #: xrc/GameBoyConfig.xrc:72
 msgid "System"
-msgstr "系统"
+msgstr "System"
 
 #: xrc/GameBoyConfig.xrc:84
 msgid "Game Boy Boot &ROM file:"
-msgstr "GB 引导 ROM 文件(&R) :"
+msgstr "Game Boy Boot &ROM file:"
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
-msgstr "选择一个文件"
+msgstr "Select a File"
 
 #: xrc/GameBoyConfig.xrc:106
 msgid "Game Boy Color Boot ROM &file:"
-msgstr "GBC 引导 ROM 文件(&F) :"
+msgstr "Game Boy Color Boot ROM &file:"
 
 #: xrc/GameBoyConfig.xrc:131
 msgid "Current Game Boy BIOS file:"
-msgstr "当前 GB BIOS 文件:"
+msgstr "Current Game Boy BIOS file:"
 
 #: xrc/GameBoyConfig.xrc:152
 msgid "Current Game Boy Color BIOS file:"
-msgstr "当前 GBC BIOS 文件:"
+msgstr "Current Game Boy Color BIOS file:"
 
 #: xrc/GameBoyConfig.xrc:186
 msgid "User 1"
-msgstr "用户 1"
+msgstr "User 1"
 
 #: xrc/GameBoyConfig.xrc:192
 msgid "User 2"
-msgstr "用户 2"
+msgstr "User 2"
 
 #: xrc/GameBoyConfig.xrc:198
 msgid "Custom Colors"
-msgstr "自定义颜色"
+msgstr "Custom Colors"
 
 #: xrc/GeneralConfig.xrc:4
 msgid "General settings"
-msgstr "通用设置"
+msgstr "General settings"
 
 #: xrc/GeneralConfig.xrc:9
 msgid "General"
-msgstr "通用"
+msgstr "General"
 
 #: xrc/GeneralConfig.xrc:26
 msgid "Screenshot Format:"
-msgstr "截图格式:"
+msgstr "Screenshot Format:"
 
 #: xrc/GeneralConfig.xrc:57
 msgid "&Rewind interval:"
-msgstr "回退间隔(&R) :"
+msgstr "&Rewind interval:"
 
 #: xrc/GeneralConfig.xrc:58
 msgid "If not empty or 0, enable rewind (seconds)"
-msgstr "如果不为空也不为 0，则启用回退 (秒)"
+msgstr "If not empty or 0, enable rewind (seconds)"
 
 #: xrc/GeneralConfig.xrc:67
 msgid "Seconds (0-600); 0 = disable"
-msgstr "秒 (0-600); 0 = 禁用"
+msgstr "Seconds (0-600); 0 = disable"
 
 #: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
-msgstr "节流(&T)"
+msgstr "&Throttle"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "Percent of normal:"
-msgstr "正常百分比："
+msgstr "Percent of normal:"
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
-msgstr "0 = 无阀门"
+msgstr "0 = no throttle"
 
 #: xrc/GeneralConfig.xrc:114
 msgid "Unlimited"
-msgstr "无限制"
+msgstr "Unlimited"
 
 #: xrc/IOViewer.xrc:4
 msgid "IO Viewer"
-msgstr "IO 查看器"
+msgstr "IO Viewer"
 
 #: xrc/JoyPanel.xrc:8
 msgid ""
 "Click a field and press a key or move joystick to add. Press backspace to "
 "delete last added key. Resize window or click inside and move pointer to see"
 " entire contents if too small."
-msgstr "单击字段，然后按键或移动操纵杆以添加。按退格键删除最后添加的键值。如果太小则调整窗口尺寸或单击内部再移动指针以查看整个内容。"
+msgstr "Click a field and press a key or move joystick to add. Press backspace to delete last added key. Resize window or click inside and move pointer to see entire contents if too small."
 
 #: xrc/JoyPanel.xrc:276
 msgid "Autofire A"
-msgstr "连发 A"
+msgstr "Autofire A"
 
 #: xrc/JoyPanel.xrc:320
 msgid "Autofire B"
-msgstr "连发 B"
+msgstr "Autofire B"
 
 #: xrc/JoyPanel.xrc:342
 msgid "Motion Left / Dark"
-msgstr "体感 左/暗"
+msgstr "Motion Left / Dark"
 
 #: xrc/JoyPanel.xrc:386
 msgid "Motion Right / Light"
-msgstr "体感 右/亮"
+msgstr "Motion Right / Light"
 
 #: xrc/JoyPanel.xrc:408
 msgid "Speed Up"
-msgstr "加速"
+msgstr "Speed Up"
 
 #: xrc/JoyPanel.xrc:430
 msgid "Spin Left"
-msgstr "左旋转"
+msgstr "Spin Left"
 
 #: xrc/JoyPanel.xrc:461
 msgid "Spin Right"
-msgstr "右旋转"
+msgstr "Spin Right"
 
 #: xrc/JoyPanel.xrc:483
 msgid "Screenshot"
-msgstr "截图"
+msgstr "Screenshot"
 
 #: xrc/JoyPanel.xrc:507
 msgid "Special"
-msgstr " 特定"
+msgstr "Special"
 
 #: xrc/JoyPanel.xrc:515
 msgid "Use as default"
-msgstr " 作为默认值"
+msgstr "Use as default"
 
 #: xrc/JoyPanel.xrc:522
 msgid "Defaults"
-msgstr "默认"
+msgstr "Defaults"
 
 #: xrc/JoyPanel.xrc:529
 msgid "Clear All"
-msgstr "全部清除"
+msgstr "Clear All"
 
 #: xrc/JoypadConfig.xrc:4
 msgid "Joypad Configuration"
-msgstr "手柄设置"
+msgstr "Joypad Configuration"
 
 #: xrc/JoypadConfig.xrc:10
 msgid "SDL GameController Mode"
-msgstr "SDL 游戏控制器模式"
+msgstr "SDL GameController Mode"
 
 #: xrc/JoypadConfig.xrc:19
 msgid "Player 1"
-msgstr "玩家 1"
+msgstr "Player 1"
 
 #: xrc/JoypadConfig.xrc:25
 msgid "Player 2"
-msgstr "玩家 2"
+msgstr "Player 2"
 
 #: xrc/JoypadConfig.xrc:31
 msgid "Player 3"
-msgstr "玩家 3"
+msgstr "Player 3"
 
 #: xrc/JoypadConfig.xrc:37
 msgid "Player 4"
-msgstr "玩家 4"
+msgstr "Player 4"
 
 #: xrc/LinkConfig.xrc:4
 msgid "Link configuration"
-msgstr "联机设置"
+msgstr "Link configuration"
 
 #: xrc/LinkConfig.xrc:11
 msgid "Link timeout (in milliseconds)"
-msgstr "最大等待联机时间 (毫秒)"
+msgstr "Link timeout (in milliseconds)"
 
 #: xrc/Logging.xrc:4
 msgid "Logging"
-msgstr "正在记录"
+msgstr "Logging"
 
 #: xrc/Logging.xrc:20
 msgid "Unaligned &memory"
-msgstr "未校准的内存(&M)"
+msgstr "Unaligned &memory"
 
 #: xrc/Logging.xrc:27
 msgid "Illegal &write"
-msgstr "非法写入(&W)"
+msgstr "Illegal &write"
 
 #: xrc/Logging.xrc:34
 msgid "Illegal &read"
-msgstr "非法读取(&R)"
+msgstr "Illegal &read"
 
 #: xrc/Logging.xrc:69
 msgid "&Undefined instruction"
-msgstr "未定义指令(&U)"
+msgstr "&Undefined instruction"
 
 #: xrc/Logging.xrc:83
 msgid "Soun&d output"
-msgstr "声音输出(&D)"
+msgstr "Soun&d output"
 
 #: xrc/Logging.xrc:88
 msgid "Verbose"
-msgstr "详细"
+msgstr "Verbose"
 
 #: xrc/MainMenu.xrc:5
 msgid "&File"
-msgstr "文件(&F)"
+msgstr "&File"
 
 #: xrc/MainMenu.xrc:7
 msgid "Open..."
-msgstr "打开..."
+msgstr "Open..."
 
 #: xrc/MainMenu.xrc:10
 msgid "Open &Game Boy..."
-msgstr "打开 GB(&G)..."
+msgstr "Open &Game Boy..."
 
 #: xrc/MainMenu.xrc:13
 msgid "Open Game Boy &Color..."
-msgstr "打开 GBC(&C)..."
+msgstr "Open Game Boy &Color..."
 
 #: xrc/MainMenu.xrc:16
 msgid "Open rece&nt"
-msgstr "打开最近(&N)"
+msgstr "Open rece&nt"
 
 #: xrc/MainMenu.xrc:18
 msgid "&Reset recent list"
-msgstr "重置最近列表(&R)"
+msgstr "&Reset recent list"
 
 #: xrc/MainMenu.xrc:21
 msgid "&Freeze recent list"
-msgstr "冻结最近列表(&F)"
+msgstr "&Freeze recent list"
 
 #: xrc/MainMenu.xrc:26
 msgid "ROM in&formation..."
-msgstr "ROM 信息(&F)"
+msgstr "ROM in&formation..."
 
 #: xrc/MainMenu.xrc:30
 msgid "&e-Reader"
-msgstr "e-Reader(&E)"
+msgstr "&e-Reader"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
-msgstr "重置载入的点代码(&R)"
+msgstr "&Reset Loading Dot Code"
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
-msgstr "载入点代码(&L)..."
+msgstr "&Load Dot Code..."
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr "重置保存的点代码(&R)..."
+msgstr "&Reset Saving Dot Code"
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
-msgstr "保存点代码(&S)..."
+msgstr "&Save Dot Code..."
 
 #: xrc/MainMenu.xrc:47
 msgid "Most &recent"
-msgstr "最近(&R)"
+msgstr "Most &recent"
 
 #: xrc/MainMenu.xrc:50
 msgid "Load current state slot"
-msgstr "载入当前状态插槽"
+msgstr "Load current state slot"
 
 #: xrc/MainMenu.xrc:53
 msgid "&Auto load most recent"
-msgstr "自动载入最近(&A)"
+msgstr "&Auto load most recent"
 
 #: xrc/MainMenu.xrc:89
 msgid "From &File..."
-msgstr "从文件(&F)..."
+msgstr "From &File..."
 
 #: xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
-msgstr "不更改电池存档(&B)"
+msgstr "Do not change &battery save"
 
 #: xrc/MainMenu.xrc:97
 msgid "Do not change &cheat list"
-msgstr "不更改金手指列表(&C)"
+msgstr "Do not change &cheat list"
 
 #: xrc/MainMenu.xrc:100
 msgid "&Load state"
-msgstr "载入状态(&L)"
+msgstr "&Load state"
 
 #: xrc/MainMenu.xrc:104
 msgid "&Oldest slot"
-msgstr "最近插槽(&O)"
+msgstr "&Oldest slot"
 
 #: xrc/MainMenu.xrc:107
 msgid "Save current state slot"
-msgstr "保存当前状态插槽"
+msgstr "Save current state slot"
 
 #: xrc/MainMenu.xrc:110
 msgid "Increase state slot number and save"
-msgstr "增加状态插槽号并保存"
+msgstr "Increase state slot number and save"
 
 #: xrc/MainMenu.xrc:117
 msgid "&2"
@@ -3156,188 +3157,188 @@ msgstr "1&0"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File..."
-msgstr "到文件(&F)..."
+msgstr "To &File..."
 
 #: xrc/MainMenu.xrc:147
 msgid "&Save state"
-msgstr "保存状态(&S)"
+msgstr "&Save state"
 
 #: xrc/MainMenu.xrc:150
 msgid "Increase state slot number"
-msgstr "增加状态插槽号"
+msgstr "Increase state slot number"
 
 #: xrc/MainMenu.xrc:153
 msgid "Decrease state slot number"
-msgstr "减少状态插槽号"
+msgstr "Decrease state slot number"
 
 #: xrc/MainMenu.xrc:158 xrc/MainMenu.xrc:170
 msgid "&Battery file..."
-msgstr "电池文件(&B)..."
+msgstr "&Battery file..."
 
 #: xrc/MainMenu.xrc:161
 msgid "Game Shark &code file..."
-msgstr "Gameshark 代码文件(&C)..."
+msgstr "Game Shark &code file..."
 
 #: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
 msgid "&Game Shark snapshot..."
-msgstr "Gameshark 快照(&G)..."
+msgstr "&Game Shark snapshot..."
 
 #: xrc/MainMenu.xrc:166
 msgid "&Import"
-msgstr "导入(&I)"
+msgstr "&Import"
 
 #: xrc/MainMenu.xrc:175
 msgid "&Export"
-msgstr "导出(&E)"
+msgstr "&Export"
 
 #: xrc/MainMenu.xrc:179
 msgid "Screen capt&ure..."
-msgstr "屏幕捕获(&U)..."
+msgstr "Screen capt&ure..."
 
 #: xrc/MainMenu.xrc:183
 msgid "Start &sound recording..."
-msgstr "开始录制声音(&S)..."
+msgstr "Start &sound recording..."
 
 #: xrc/MainMenu.xrc:186
 msgid "Stop s&ound recording"
-msgstr "停止录制声音(&O)"
+msgstr "Stop s&ound recording"
 
 #: xrc/MainMenu.xrc:189
 msgid "Start &video recording..."
-msgstr "开始录制视频(&V)..."
+msgstr "Start &video recording..."
 
 #: xrc/MainMenu.xrc:192
 msgid "Stop v&ideo recording"
-msgstr "停止录制视频(&I)"
+msgstr "Stop v&ideo recording"
 
 #: xrc/MainMenu.xrc:195
 msgid "Start &game recording..."
-msgstr "开始录制游戏(&G)..."
+msgstr "Start &game recording..."
 
 #: xrc/MainMenu.xrc:198
 msgid "Stop g&ame recording"
-msgstr "停止录制游戏(&A)"
+msgstr "Stop g&ame recording"
 
 #: xrc/MainMenu.xrc:200
 msgid "&Record"
-msgstr "录制(&R)"
+msgstr "&Record"
 
 #: xrc/MainMenu.xrc:204
 msgid "Start playing &movie..."
-msgstr "开始播放影片(&M)..."
+msgstr "Start playing &movie..."
 
 #: xrc/MainMenu.xrc:207
 msgid "Stop playing m&ovie"
-msgstr "停止播放影片(&O)"
+msgstr "Stop playing m&ovie"
 
 #: xrc/MainMenu.xrc:209
 msgid "&Play"
-msgstr "播放(&P)"
+msgstr "&Play"
 
 #: xrc/MainMenu.xrc:214
 msgid "&Quit"
-msgstr "退出(&Q)"
+msgstr "&Quit"
 
 #: xrc/MainMenu.xrc:218
 msgid "&Emulation"
-msgstr "模拟(&E)"
+msgstr "&Emulation"
 
 #: xrc/MainMenu.xrc:220
 msgid "&Pause"
-msgstr "暂停(&P)"
+msgstr "&Pause"
 
 #: xrc/MainMenu.xrc:224
 msgid "&Next frame"
-msgstr "下一帧(&N)"
+msgstr "&Next frame"
 
 #: xrc/MainMenu.xrc:227
 msgid "Re&wind"
-msgstr "回退(&W)"
+msgstr "Re&wind"
 
 #: xrc/MainMenu.xrc:231
 msgid "Toggle &full screen"
-msgstr "切换全屏(&F)"
+msgstr "Toggle &full screen"
 
 #: xrc/MainMenu.xrc:238
 msgid "&Turbo mode"
-msgstr "加速模式(&T)"
+msgstr "&Turbo mode"
 
 #: xrc/MainMenu.xrc:242
 msgid "&VSync"
-msgstr "垂直同步(&V)"
+msgstr "&VSync"
 
 #: xrc/MainMenu.xrc:246
 msgid "&Auto skip frames"
-msgstr "自动跳帧(&A)"
+msgstr "&Auto skip frames"
 
 #: xrc/MainMenu.xrc:251
 msgid "&Skip BIOS"
-msgstr "跳过 BIOS(&S)"
+msgstr "&Skip BIOS"
 
 #: xrc/MainMenu.xrc:255
 msgid "&Auto IPS / UPS / IPF patch"
-msgstr "自动 IPS/UPS/IPF 补丁(&A)"
+msgstr "&Auto IPS / UPS / IPF patch"
 
 #: xrc/MainMenu.xrc:259
 msgid "&Pause when inactive"
-msgstr "非激活状态时暂停(&P)"
+msgstr "&Pause when inactive"
 
 #: xrc/MainMenu.xrc:264
 msgid "&Reset"
-msgstr "重置(&R)"
+msgstr "&Reset"
 
 #: xrc/MainMenu.xrc:268
 msgid "&Options"
-msgstr "选项(&O)"
+msgstr "&Options"
 
 #: xrc/MainMenu.xrc:270
 msgid "&Link"
-msgstr "联机(&L)"
+msgstr "&Link"
 
 #: xrc/MainMenu.xrc:272
 msgid "Start &Network Link..."
-msgstr "开始网络联机(&N)..."
+msgstr "Start &Network Link..."
 
 #: xrc/MainMenu.xrc:277
 msgid "&Nothing"
-msgstr "无(&N)"
+msgstr "&Nothing"
 
 #: xrc/MainMenu.xrc:281
 msgid "&Cable"
-msgstr "有线(&C)"
+msgstr "&Cable"
 
 #: xrc/MainMenu.xrc:285
 msgid "&Wireless"
-msgstr "无线(&W)"
+msgstr "&Wireless"
 
 #: xrc/MainMenu.xrc:298
 msgid "&Local mode"
-msgstr "本地模式(&L)"
+msgstr "&Local mode"
 
 #: xrc/MainMenu.xrc:302
 msgid "&Link at boot"
-msgstr "启动时联机(&L)"
+msgstr "&Link at boot"
 
 #: xrc/MainMenu.xrc:306
 msgid "&Speed hack"
-msgstr "速度破解(&S)"
+msgstr "&Speed hack"
 
 #: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:383
 #: xrc/MainMenu.xrc:417
 msgid "&Configure..."
-msgstr "配置(&C)..."
+msgstr "&Configure..."
 
 #: xrc/MainMenu.xrc:314
 msgid "&Video"
-msgstr "视频(&V)"
+msgstr "&Video"
 
 #: xrc/MainMenu.xrc:320
 msgid "&Start in full screen"
-msgstr "启动时全屏(&S)"
+msgstr "&Start in full screen"
 
 #: xrc/MainMenu.xrc:324
 msgid "&Scaled resize"
-msgstr "缩放大小(&S)"
+msgstr "&Scaled resize"
 
 #: xrc/MainMenu.xrc:326
 msgid "&1x"
@@ -3365,83 +3366,83 @@ msgstr "&6x"
 
 #: xrc/MainMenu.xrc:345
 msgid "Change pixel filter"
-msgstr "更改像素滤镜"
+msgstr "Change pixel filter"
 
 #: xrc/MainMenu.xrc:348
 msgid "Change interframe blending"
-msgstr "更改帧间混合"
+msgstr "Change interframe blending"
 
 #: xrc/MainMenu.xrc:351
 msgid "&Retain aspect ratio"
-msgstr "保持长宽比(&R)"
+msgstr "&Retain aspect ratio"
 
 #: xrc/MainMenu.xrc:356
 msgid "&Bilinear filter"
-msgstr "双线性过滤(&B)"
+msgstr "&Bilinear filter"
 
 #: xrc/MainMenu.xrc:367
 msgid "&Keep window on top"
-msgstr "保持窗口在最前(&K)"
+msgstr "&Keep window on top"
 
 #: xrc/MainMenu.xrc:372
 msgid "&Disable on-screen display"
-msgstr "禁用屏幕显示信息(&D)"
+msgstr "&Disable on-screen display"
 
 #: xrc/MainMenu.xrc:376
 msgid "&Transparent on-screen display"
-msgstr "透明屏幕显示信息(&T)"
+msgstr "&Transparent on-screen display"
 
 #: xrc/MainMenu.xrc:381
 msgid "&Audio"
-msgstr "音频(&A)"
+msgstr "&Audio"
 
 #: xrc/MainMenu.xrc:386
 msgid "&Increase volume"
-msgstr "增大音量(&I)"
+msgstr "&Increase volume"
 
 #: xrc/MainMenu.xrc:389
 msgid "&Decrease volume"
-msgstr "减小音量(&D)"
+msgstr "&Decrease volume"
 
 #: xrc/MainMenu.xrc:392
 msgid "&Toggle sound"
-msgstr "声音开/关(&T)"
+msgstr "&Toggle sound"
 
 #: xrc/MainMenu.xrc:397
 msgid "&Game Boy Advance sound interpolation"
-msgstr "GBA 声音插值(&G)"
+msgstr "&Game Boy Advance sound interpolation"
 
 #: xrc/MainMenu.xrc:402
 msgid "&Game Boy sound enhancement"
-msgstr "GB 声音加强(&G)"
+msgstr "&Game Boy sound enhancement"
 
 #: xrc/MainMenu.xrc:406
 msgid "&Game Boy surround sound effect"
-msgstr "GB 环绕音效(&G)"
+msgstr "&Game Boy surround sound effect"
 
 #: xrc/MainMenu.xrc:410
 msgid "&Game Boy sound declicking"
-msgstr "GB 声音降噪(&G)"
+msgstr "&Game Boy sound declicking"
 
 #: xrc/MainMenu.xrc:415
 msgid "&Input"
-msgstr "输入(&I)"
+msgstr "&Input"
 
 #: xrc/MainMenu.xrc:420
 msgid "Allow &keyboard background input"
-msgstr "允许键盘后台输入(&K)"
+msgstr "Allow &keyboard background input"
 
 #: xrc/MainMenu.xrc:424
 msgid "Allow &joystick background input"
-msgstr "允许摇杆后台输入(&J)"
+msgstr "Allow &joystick background input"
 
 #: xrc/MainMenu.xrc:429
 msgid "&Autofire"
-msgstr "连发(&A)"
+msgstr "&Autofire"
 
 #: xrc/MainMenu.xrc:448
 msgid "&Autohold"
-msgstr "自动保持(&A)"
+msgstr "&Autohold"
 
 #: xrc/MainMenu.xrc:466
 msgid "&A"
@@ -3461,303 +3462,303 @@ msgstr "&R"
 
 #: xrc/MainMenu.xrc:494 xrc/MainMenu.xrc:517
 msgid "Configure..."
-msgstr "设置..."
+msgstr "Configure..."
 
 #: xrc/MainMenu.xrc:498
 msgid "&Real-time clock"
-msgstr "实时时钟(&R)"
+msgstr "&Real-time clock"
 
 #: xrc/MainMenu.xrc:502
 msgid "&Use BIOS file"
-msgstr "使用 BIOS 文件(&U)"
+msgstr "&Use BIOS file"
 
 #: xrc/MainMenu.xrc:506
 msgid "&Debug print"
-msgstr "调试打印(&D)"
+msgstr "&Debug print"
 
 #: xrc/MainMenu.xrc:510 xrc/MainMenu.xrc:525
 msgid "&LCD Filter"
-msgstr "LCD 滤镜(&L)"
+msgstr "&LCD Filter"
 
 #: xrc/MainMenu.xrc:521
 msgid "&Game Boy color option"
-msgstr "GB 颜色选项(&G)"
+msgstr "&Game Boy color option"
 
 #: xrc/MainMenu.xrc:529
 msgid "&Game Boy Colorizer Hack (requires restart)"
-msgstr "GB 色彩修改（需要重启）(&G)"
+msgstr "&Game Boy Colorizer Hack (requires restart)"
 
 #: xrc/MainMenu.xrc:533
 msgid "&Game Boy printer"
-msgstr "GB 打印机(&G)"
+msgstr "&Game Boy printer"
 
 #: xrc/MainMenu.xrc:537
 msgid "&Gather a full page before printing"
-msgstr "在打印前聚集整个页面(&G)"
+msgstr "&Gather a full page before printing"
 
 #: xrc/MainMenu.xrc:541
 msgid "&Save printouts as screen captures"
-msgstr "将打印输出保存为截图(&S)"
+msgstr "&Save printouts as screen captures"
 
 #: xrc/MainMenu.xrc:546
 msgid "&Use Game Boy BIOS file (requires restart)"
-msgstr "使用 GB BIOS 文件（需要重启）(&U)"
+msgstr "&Use Game Boy BIOS file (requires restart)"
 
 #: xrc/MainMenu.xrc:550
 msgid "&Use Game Boy Color BIOS file"
-msgstr "使用 GBC BIOS 文件(&U)"
+msgstr "&Use Game Boy Color BIOS file"
 
 #: xrc/MainMenu.xrc:555
 msgid "&General..."
-msgstr "通用(&G)..."
+msgstr "&General..."
 
 #: xrc/MainMenu.xrc:558
 msgid "&Speedup / Turbo..."
-msgstr "加速/超频(&S)..."
+msgstr "&Speedup / Turbo..."
 
 #: xrc/MainMenu.xrc:561
 msgid "D&irectories..."
-msgstr "目录(&I)..."
+msgstr "D&irectories..."
 
 #: xrc/MainMenu.xrc:564
 msgid "&Key Shortcuts..."
-msgstr "快捷键(&K)..."
+msgstr "&Key Shortcuts..."
 
 #: xrc/MainMenu.xrc:567
 msgid "UI Settings"
-msgstr "界面设置"
+msgstr "UI Settings"
 
 #: xrc/MainMenu.xrc:569
 msgid "Enable &Status bar"
-msgstr "启用状态栏(&S)"
+msgstr "Enable &Status bar"
 
 #: xrc/MainMenu.xrc:573
 msgid "Hide &Menu Bar"
-msgstr "隐藏菜单栏(&M)"
+msgstr "Hide &Menu Bar"
 
 #: xrc/MainMenu.xrc:577
 msgid "Suspend &Screen Saver"
-msgstr "暂停屏幕保护程序(&S)"
+msgstr "Suspend &Screen Saver"
 
 #: xrc/MainMenu.xrc:583
 msgid "&Tools"
-msgstr "工具(&T)"
+msgstr "&Tools"
 
 #: xrc/MainMenu.xrc:585
 msgid "&Cheats"
-msgstr "金手指(&C)"
+msgstr "&Cheats"
 
 #: xrc/MainMenu.xrc:587
 msgid "List &cheats..."
-msgstr "金手指列表(&C)..."
+msgstr "List &cheats..."
 
 #: xrc/MainMenu.xrc:590
 msgid "Find c&heat..."
-msgstr "搜索金手指(&H)..."
+msgstr "Find c&heat..."
 
 #: xrc/MainMenu.xrc:594
 msgid "A&utomatically save / load cheats"
-msgstr "自动保存/载入金手指(&U)"
+msgstr "A&utomatically save / load cheats"
 
 #: xrc/MainMenu.xrc:598
 msgid "&Enable cheats"
-msgstr "启用金手指(&E)"
+msgstr "&Enable cheats"
 
 #: xrc/MainMenu.xrc:605
 msgid "&Break into GDB"
-msgstr "切入 GDB(&B)"
+msgstr "&Break into GDB"
 
 #: xrc/MainMenu.xrc:609
 msgid "&Configure port..."
-msgstr "配置端口(&C)..."
+msgstr "&Configure port..."
 
 #: xrc/MainMenu.xrc:612
 msgid "&Break on load"
-msgstr "加载时切入(&B)"
+msgstr "&Break on load"
 
 #: xrc/MainMenu.xrc:617
 msgid "&Disconnect"
-msgstr "断开连接(&D)"
+msgstr "&Disconnect"
 
 #: xrc/MainMenu.xrc:622
 msgid "&Disassemble..."
-msgstr "反编译(&D)..."
+msgstr "&Disassemble..."
 
 #: xrc/MainMenu.xrc:625
 msgid "&Logging..."
-msgstr "日志(&L)..."
+msgstr "&Logging..."
 
 #: xrc/MainMenu.xrc:628
 msgid "&IO Viewer..."
-msgstr "IO 查看器(&I)..."
+msgstr "&IO Viewer..."
 
 #: xrc/MainMenu.xrc:631
 msgid "&Map Viewer..."
-msgstr "图层查看器(&M)..."
+msgstr "&Map Viewer..."
 
 #: xrc/MainMenu.xrc:634
 msgid "M&emory Viewer..."
-msgstr "内存查看器(&E)..."
+msgstr "M&emory Viewer..."
 
 #: xrc/MainMenu.xrc:637
 msgid "&OAM Viewer..."
-msgstr "OAM 查看器(&O)..."
+msgstr "&OAM Viewer..."
 
 #: xrc/MainMenu.xrc:640
 msgid "&Palette Viewer..."
-msgstr "调色板查看器(&P)..."
+msgstr "&Palette Viewer..."
 
 #: xrc/MainMenu.xrc:643
 msgid "&Tile Viewer..."
-msgstr "碎片查看器(&T)..."
+msgstr "&Tile Viewer..."
 
 #: xrc/MainMenu.xrc:648
 msgid "Show all video layers"
-msgstr "显示所有视频图层"
+msgstr "Show all video layers"
 
 #: xrc/MainMenu.xrc:691
 msgid "&View Layers"
-msgstr "查看图层(&V)"
+msgstr "&View Layers"
 
 #: xrc/MainMenu.xrc:695
 msgid "Channel &1"
-msgstr "通道 1(&1)"
+msgstr "Channel &1"
 
 #: xrc/MainMenu.xrc:700
 msgid "Channel &2"
-msgstr "通道 2(&2)"
+msgstr "Channel &2"
 
 #: xrc/MainMenu.xrc:705
 msgid "Channel &3"
-msgstr "通道 3(&3)"
+msgstr "Channel &3"
 
 #: xrc/MainMenu.xrc:710
 msgid "Channel &4"
-msgstr "通道 4(&4)"
+msgstr "Channel &4"
 
 #: xrc/MainMenu.xrc:715
 msgid "Direct Sound &A"
-msgstr "Direct Sound A(&A)"
+msgstr "Direct Sound &A"
 
 #: xrc/MainMenu.xrc:720
 msgid "Direct Sound &B"
-msgstr "Direct Sound B(&B)"
+msgstr "Direct Sound &B"
 
 #: xrc/MainMenu.xrc:724
 msgid "&Sound Channels"
-msgstr "声道(&S)"
+msgstr "&Sound Channels"
 
 #: xrc/MainMenu.xrc:728
 msgid "&Help"
-msgstr "帮助(&H)"
+msgstr "&Help"
 
 #: xrc/MainMenu.xrc:730
 msgid "Report &Bugs"
-msgstr "反馈Bug(&B)"
+msgstr "Report &Bugs"
 
 #: xrc/MainMenu.xrc:733
 msgid "Visual Boy Advance-M Support &Forum"
-msgstr "VBA-M 支持与论坛(&F)"
+msgstr "Visual Boy Advance-M Support &Forum"
 
 #: xrc/MainMenu.xrc:736
 msgid "Translations"
-msgstr "翻译"
+msgstr "Translations"
 
 #: xrc/MainMenu.xrc:744
 msgid "Check for updates"
-msgstr "检查更新"
+msgstr "Check for updates"
 
 #: xrc/MainMenu.xrc:747
 msgid "&Factory Reset..."
-msgstr "恢复默认设置(&F)"
+msgstr "&Factory Reset..."
 
 #: xrc/MainMenu.xrc:751
 msgid "&About..."
-msgstr "关于(&A)..."
+msgstr "&About..."
 
 #: xrc/MapViewer.xrc:4
 msgid "Map Viewer"
-msgstr "图层查看器"
+msgstr "Map Viewer"
 
 #: xrc/MapViewer.xrc:16
 msgid "Frame 0"
-msgstr "帧 0"
+msgstr "Frame 0"
 
 #: xrc/MapViewer.xrc:22
 msgid "Frame 1"
-msgstr "帧 1"
+msgstr "Frame 1"
 
 #: xrc/MapViewer.xrc:25
 msgid "Frame"
-msgstr "帧"
+msgstr "Frame"
 
 #: xrc/MapViewer.xrc:84
 msgid "Map Base:"
-msgstr "图层库:"
+msgstr "Map Base:"
 
 #: xrc/MapViewer.xrc:92
 msgid "Char Base:"
-msgstr "字符库:"
+msgstr "Char Base:"
 
 #: xrc/MapViewer.xrc:100 xrc/MemSelRegion.xrc:22 xrc/OAMViewer.xrc:77
 msgid "Size:"
-msgstr "大小: "
+msgstr "Size:"
 
 #: xrc/MapViewer.xrc:108 xrc/OAMViewer.xrc:45
 msgid "Colors:"
-msgstr "颜色: "
+msgstr "Colors:"
 
 #: xrc/MapViewer.xrc:124
 msgid "Mosaic:"
-msgstr "马赛克: "
+msgstr "Mosaic:"
 
 #: xrc/MapViewer.xrc:132
 msgid "Overflow:"
-msgstr "溢出: "
+msgstr "Overflow:"
 
 #: xrc/MemViewer.xrc:4
 msgid "Memory Viewer"
-msgstr "内存查看器"
+msgstr "Memory Viewer"
 
 #: xrc/MemViewer.xrc:17
 msgid "&8-bit"
-msgstr "8-位(&8)"
+msgstr "&8-bit"
 
 #: xrc/MemViewer.xrc:25
 msgid "&16-bit"
-msgstr "16-位(&1)"
+msgstr "&16-bit"
 
 #: xrc/MemViewer.xrc:32
 msgid "&32-bit"
-msgstr "32-位(&3)"
+msgstr "&32-bit"
 
 #: xrc/MemViewer.xrc:83
 msgid "Current address:"
-msgstr "当前地址: "
+msgstr "Current address:"
 
 #: xrc/MemViewer.xrc:108
 msgid "&Load..."
-msgstr "载入(&L)..."
+msgstr "&Load..."
 
 #: xrc/NetLink.xrc:4
 msgid "Start Network Link"
-msgstr "开始网络联机"
+msgstr "Start Network Link"
 
 #: xrc/NetLink.xrc:13
 msgid "WARNING: Link will likely not work over the internet or LAN."
-msgstr "警告：联机可能无法工作于互联网或局域网。"
+msgstr "WARNING: Link will likely not work over the internet or LAN."
 
 #: xrc/NetLink.xrc:38
 msgid "Server"
-msgstr "服务器"
+msgstr "Server"
 
 #: xrc/NetLink.xrc:47
 msgid "Client"
-msgstr "客户端"
+msgstr "Client"
 
 #: xrc/NetLink.xrc:66
 msgid "Players:"
-msgstr "玩家:"
+msgstr "Players:"
 
 #: xrc/NetLink.xrc:83
 msgid "2"
@@ -3765,47 +3766,47 @@ msgstr "2"
 
 #: xrc/NetLink.xrc:107
 msgid "Server:"
-msgstr "服务器:"
+msgstr "Server:"
 
 #: xrc/NetLink.xrc:124
 msgid "Port:"
-msgstr "端口:"
+msgstr "Port:"
 
 #: xrc/OAMViewer.xrc:4
 msgid "OAM Viewer"
-msgstr "OAM 查看器"
+msgstr "OAM Viewer"
 
 #: xrc/OAMViewer.xrc:85
 msgid "Rot.:"
-msgstr "旋转:"
+msgstr "Rot.:"
 
 #: xrc/PaletteViewer.xrc:4
 msgid "Palette Viewer"
-msgstr "调色板"
+msgstr "Palette Viewer"
 
 #: xrc/PaletteViewer.xrc:88
 msgid "C&hange backdrop color..."
-msgstr "更改背景颜色(&H)..."
+msgstr "C&hange backdrop color..."
 
 #: xrc/SoundConfig.xrc:4
 msgid "Sound Settings"
-msgstr "声音设置"
+msgstr "Sound Settings"
 
 #: xrc/SoundConfig.xrc:18
 msgid "Volume:"
-msgstr "音量:"
+msgstr "Volume:"
 
 #: xrc/SoundConfig.xrc:36
 msgid "Mute"
-msgstr "静音"
+msgstr "Mute"
 
 #: xrc/SoundConfig.xrc:56 xrc/SoundConfig.xrc:314
 msgid "Maximum"
-msgstr "最大"
+msgstr "Maximum"
 
 #: xrc/SoundConfig.xrc:73
 msgid "Sample rate:"
-msgstr "采样率:"
+msgstr "Sample rate:"
 
 #: xrc/SoundConfig.xrc:79
 msgid "48 KHz"
@@ -3829,68 +3830,68 @@ msgstr "Direct Sound"
 
 #: xrc/SoundConfig.xrc:140
 msgid "Device"
-msgstr "设备"
+msgstr "Device"
 
 #: xrc/SoundConfig.xrc:148
 msgid "Enable stereo upmixing"
-msgstr "启用立体声上混响"
+msgstr "Enable stereo upmixing"
 
 #: xrc/SoundConfig.xrc:155
 msgid "Enable hardware acceleration"
-msgstr "启用硬件加速"
+msgstr "Enable hardware acceleration"
 
 #: xrc/SoundConfig.xrc:184
 msgid "Number of sound buffers:"
-msgstr " 声音缓冲区数:"
+msgstr "Number of sound buffers:"
 
 #: xrc/SoundConfig.xrc:192
 msgid "Advanced"
-msgstr "高级"
+msgstr "Advanced"
 
 #: xrc/SoundConfig.xrc:224
 msgid "Lots"
-msgstr "大量"
+msgstr "Lots"
 
 #: xrc/SoundConfig.xrc:233
 msgid "Echo"
-msgstr "回声"
+msgstr "Echo"
 
 #: xrc/SoundConfig.xrc:241
 msgid "Stereo"
-msgstr "立体声"
+msgstr "Stereo"
 
 #: xrc/SoundConfig.xrc:252
 msgid "Center"
-msgstr "中间"
+msgstr "Center"
 
 #: xrc/SoundConfig.xrc:263
 msgid "Left / Right"
-msgstr "左/右"
+msgstr "Left / Right"
 
 #: xrc/SoundConfig.xrc:292
 msgid "Sound filtering"
-msgstr "声音过滤"
+msgstr "Sound filtering"
 
 #: xrc/TileViewer.xrc:4
 msgid "Tile Viewer"
-msgstr "碎片查看器"
+msgstr "Tile Viewer"
 
 #: xrc/TileViewer.xrc:24
 msgid "Colors"
-msgstr "颜色"
+msgstr "Colors"
 
 #: xrc/SpeedupConfig.xrc:4
 msgid "SpeedUp / Turbo Settings"
-msgstr "加速/超频设置"
+msgstr "SpeedUp / Turbo Settings"
 
 #: xrc/SpeedupConfig.xrc:9
 msgid "Speedup Throttle"
-msgstr "阀门加速"
+msgstr "Speedup Throttle"
 
 #: xrc/SpeedupConfig.xrc:54
 msgid "Frame skip"
-msgstr "跳帧"
+msgstr "Frame skip"
 
 #: xrc/SpeedupConfig.xrc:61
 msgid "Mute Sound"
-msgstr "静音"
+msgstr "Mute Sound"
