@@ -242,19 +242,19 @@ msgstr "VisualBoyAdvance 已保存的游戏文件|*.sgm"
 #: cmdevents.cpp:1386 cmdevents.cpp:1396 cmdevents.cpp:1407
 #, c-format
 msgid "Current state slot #%d"
-msgstr ""
+msgstr "当前状态插槽 #%d"
 
 #: cmdevents.cpp:1470
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
-msgstr ""
+msgstr "启用 GameBoy BIOS 文件时无法使用色彩修改。"
 
 #: cmdevents.cpp:1681
 msgid "Sound enabled"
-msgstr ""
+msgstr "声音已启用"
 
 #: cmdevents.cpp:1681
 msgid "Sound disabled"
-msgstr ""
+msgstr "声音已禁用"
 
 #: cmdevents.cpp:1760
 msgid "Set to 0 for pseudo tty"
