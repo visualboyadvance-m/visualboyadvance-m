@@ -262,40 +262,40 @@ msgstr ""
 
 #: cmdevents.cpp:1762
 msgid "Port to wait for connection:"
-msgstr ""
+msgstr "准备连接的端口："
 
 #: cmdevents.cpp:1763
 msgid "GDB Connection"
-msgstr ""
+msgstr "GDB 连接"
 
 #: cmdevents.cpp:1815
 #, c-format
 msgid "Waiting for connection at %s"
-msgstr ""
+msgstr "等待连接到 %s"
 
 #: cmdevents.cpp:1822
 #, c-format
 msgid "Waiting for connection on port %d"
-msgstr ""
+msgstr "等待连接到端口 %d"
 
 #: cmdevents.cpp:1825
 msgid "Waiting for GDB..."
-msgstr ""
+msgstr "等待 GDB..."
 
 #: cmdevents.cpp:2200
 msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
-msgstr ""
+msgstr "你的配置将被删除！\n\n是否确定？"
 
 #: cmdevents.cpp:2201
 msgid "FACTORY RESET"
-msgstr ""
+msgstr "恢复初始设置"
 
 #: cmdevents.cpp:2236
 msgid "Nintendo Game Boy / Color / Advance emulator."
-msgstr ""
+msgstr "任天堂 GameBoy/Color/Advance 模拟器。"
 
 #: cmdevents.cpp:2237
 msgid ""
