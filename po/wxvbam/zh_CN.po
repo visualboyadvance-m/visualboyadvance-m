@@ -318,256 +318,256 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program. If not, see http://www.gnu.org/licenses ."
-msgstr ""
+msgstr "本程序为自由软件: 在自由软件联盟发布的GNU通用公共许可协议的约束下，\n你可以对其进行再发布及修改。协议版本为第2版或（由你决定的）任意\n更新的版本。\n\n我们希望发布的这款程序有用，但【无任何担保】，也没有隐含的【可销售性】\n或【特定用途的适用性】保证。请查阅 GNU 通用发布许可证了解更多信息。\n\n你应该已经收到 GNU 通用发布许可证的副本以及本程序。\n如果没有，请查看 http://www.gnu.org/licenses 。"
 
 #: cmdevents.cpp:2424
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
-msgstr ""
+msgstr "启用色彩修改时无法使用 GameBoy BIOS。"
 
 #: cmdevents.cpp:2490
 msgid "LAN link is already active. Disable link mode to disconnect."
-msgstr ""
+msgstr "局域网联机已激活，禁用联机模式即可断开连接。"
 
 #: cmdevents.cpp:2496
 msgid "Network is not supported in local mode."
-msgstr ""
+msgstr "本地模式不支持网络。"
 
 #: dialogs/accel-config.cpp:142
 msgid "Menu commands"
-msgstr ""
+msgstr "菜单命令"
 
 #: dialogs/accel-config.cpp:245
 msgid "This will clear all user-defined accelerators. Are you sure?"
-msgstr ""
+msgstr "将清除所有自定义加速，是否确定？"
 
 #: dialogs/accel-config.cpp:245 dialogs/accel-config.cpp:292
 msgid "Confirm"
-msgstr ""
+msgstr "确定"
 
 #: dialogs/accel-config.cpp:290
 #, c-format
 msgid "This will unassign \"%s\" from \"%s\". Are you sure?"
-msgstr ""
+msgstr "这将从“%s”中取消分配“%s”。您确定吗？"
 
 #: dialogs/directories-config.cpp:49
 msgid "Browse"
-msgstr ""
+msgstr "浏览"
 
 #: dialogs/display-config.cpp:52
 msgid "Invalid value for Default magnification."
-msgstr ""
+msgstr "无效的默认放大倍数。"
 
 #: dialogs/display-config.cpp:331 xrc/DisplayConfig.xrc:86
 #: xrc/DisplayConfig.xrc:136 xrc/DisplayConfig.xrc:222
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:213 xrc/SoundConfig.xrc:303
 msgid "None"
-msgstr ""
+msgstr "无"
 
 #: dialogs/display-config.cpp:361
 #, c-format
 msgid "No usable rpi plugins found in %s"
-msgstr ""
+msgstr "在 %s 中没有可用的 rpi 插件"
 
 #: dialogs/display-config.cpp:400 dialogs/display-config.cpp:442
 #: xrc/DisplayConfig.xrc:108
 msgid "Plugin"
-msgstr ""
+msgstr "插件"
 
 #: dialogs/display-config.cpp:407
 #, c-format
 msgid "Using pixel filter: %s"
-msgstr ""
+msgstr "正在使用像素滤镜: %s"
 
 #: dialogs/display-config.cpp:414
 #, c-format
 msgid "Using interframe blending: %s"
-msgstr ""
+msgstr "正在使用帧间混合: %s"
 
 #: dialogs/game-boy-config.cpp:143 xrc/GameBoyAdvanceConfig.xrc:122
 #: xrc/GameBoyConfig.xrc:138 xrc/GameBoyConfig.xrc:159
 msgid "(None)"
-msgstr ""
+msgstr "(无)"
 
 #: dialogs/game-maker.cpp:234 dialogs/gb-rom-info.cpp:64
 msgid "Unknown"
-msgstr ""
+msgstr "未知"
 
 #: dialogs/game-maker.cpp:235
 msgid "Invalid"
-msgstr ""
+msgstr "无效"
 
 #: dialogs/gb-rom-info.cpp:22
 msgid "No mapper"
-msgstr ""
+msgstr "未映射"
 
 #: dialogs/gb-rom-info.cpp:43
 msgid "Pocket Camera"
-msgstr ""
+msgstr "口袋摄像机"
 
 #: dialogs/gb-rom-info.cpp:68
 msgid " + RAM"
-msgstr ""
+msgstr " + 内存"
 
 #: dialogs/gb-rom-info.cpp:69
 msgid " + RTC"
-msgstr ""
+msgstr " + 实时时钟"
 
 #: dialogs/gb-rom-info.cpp:70
 msgid " + Battery"
-msgstr ""
+msgstr " + 电池"
 
 #: dialogs/gb-rom-info.cpp:71
 msgid " + Rumble"
-msgstr ""
+msgstr " + 震动"
 
 #: dialogs/gb-rom-info.cpp:72
 msgid " + Motion Sensor"
-msgstr ""
+msgstr " + 运动传感器"
 
 #: dialogs/gb-rom-info.cpp:74
 #, c-format
 msgid "%02X (%s%s%s%s%s%s)"
-msgstr ""
+msgstr "%02X (%s%s%s%s%s%s)"
 
 #: dialogs/gb-rom-info.cpp:81 dialogs/gb-rom-info.cpp:93
 #, c-format
 msgid "%02X (Supported)"
-msgstr ""
+msgstr "%02X (支持)"
 
 #: dialogs/gb-rom-info.cpp:83 dialogs/gb-rom-info.cpp:91
 #, c-format
 msgid "%02X (Not supported)"
-msgstr ""
+msgstr "%02X (不支持)"
 
 #: dialogs/gb-rom-info.cpp:95
 #, c-format
 msgid "%02X (Required)"
-msgstr ""
+msgstr "%02X (必需)"
 
 #: dialogs/gb-rom-info.cpp:107 dialogs/gb-rom-info.cpp:141
 #, c-format
 msgid "%02X (32 KiB)"
-msgstr ""
+msgstr "%02X (32 KiB)"
 
 #: dialogs/gb-rom-info.cpp:109 dialogs/gb-rom-info.cpp:145
 #, c-format
 msgid "%02X (64 KiB)"
-msgstr ""
+msgstr "%02X (64 KiB)"
 
 #: dialogs/gb-rom-info.cpp:111 dialogs/gb-rom-info.cpp:143
 #, c-format
 msgid "%02X (128 KiB)"
-msgstr ""
+msgstr "%02X (128 KiB)"
 
 #: dialogs/gb-rom-info.cpp:113
 #, c-format
 msgid "%02X (256 KiB)"
-msgstr ""
+msgstr "%02X (256 KiB)"
 
 #: dialogs/gb-rom-info.cpp:115
 #, c-format
 msgid "%02X (512 KiB)"
-msgstr ""
+msgstr "%02X (512 KiB)"
 
 #: dialogs/gb-rom-info.cpp:117
 #, c-format
 msgid "%02X (1 MiB)"
-msgstr ""
+msgstr "%02X (1 MiB)"
 
 #: dialogs/gb-rom-info.cpp:119
 #, c-format
 msgid "%02X (2 MiB)"
-msgstr ""
+msgstr "%02X (2 MiB)"
 
 #: dialogs/gb-rom-info.cpp:121
 #, c-format
 msgid "%02X (4 MiB)"
-msgstr ""
+msgstr "%02X (4 MiB)"
 
 #: dialogs/gb-rom-info.cpp:123 dialogs/gb-rom-info.cpp:147
 #: dialogs/gb-rom-info.cpp:159
 #, c-format
 msgid "%02X (Unknown)"
-msgstr ""
+msgstr "%02X (未知)"
 
 #: dialogs/gb-rom-info.cpp:131
 #, c-format
 msgid "%02X (None)"
-msgstr ""
+msgstr "%02X (无)"
 
 #: dialogs/gb-rom-info.cpp:133
 #, c-format
 msgid "%02X (256 B)"
-msgstr ""
+msgstr "%02X (256 B)"
 
 #: dialogs/gb-rom-info.cpp:135
 #, c-format
 msgid "%02X (512 B)"
-msgstr ""
+msgstr "%02X (512 B)"
 
 #: dialogs/gb-rom-info.cpp:137
 #, c-format
 msgid "%02X (2 KiB)"
-msgstr ""
+msgstr "%02X (2 KiB)"
 
 #: dialogs/gb-rom-info.cpp:139
 #, c-format
 msgid "%02X (8 KiB)"
-msgstr ""
+msgstr "%02X (8 KiB)"
 
 #: dialogs/gb-rom-info.cpp:155
 #, c-format
 msgid "%02X (Japan)"
-msgstr ""
+msgstr "%02X (日本)"
 
 #: dialogs/gb-rom-info.cpp:157
 #, c-format
 msgid "%02X (World)"
-msgstr ""
+msgstr "%02X (世界)"
 
 #: dialogs/gb-rom-info.cpp:201
 #, c-format
 msgid "%02X (Actual: %02X)"
-msgstr ""
+msgstr "%02X (实际: %02X)"
 
 #: dialogs/gb-rom-info.cpp:204
 #, c-format
 msgid "%04X (Actual: %04X)"
-msgstr ""
+msgstr "%04X (实际: %04X)"
 
 #: dialogs/sound-config.cpp:251
 #, c-format
 msgid "%d frame = %.2f ms"
-msgstr ""
+msgstr "%d 帧 = %.2f 毫秒"
 
 #: extra-translations.cpp:13
 msgid "&Apply"
-msgstr ""
+msgstr "应用(&A)"
 
 #: extra-translations.cpp:14
 msgid "Artists"
-msgstr ""
+msgstr "艺术家"
 
 #: extra-translations.cpp:15
 msgid "Cancel"
-msgstr ""
+msgstr "取消"
 
 #: extra-translations.cpp:16
 msgid "Close"
-msgstr ""
+msgstr "关闭"
 
 #: extra-translations.cpp:17
 msgid "Developers"
-msgstr ""
+msgstr "开发者"
 
 #: extra-translations.cpp:18
 msgid "License"
-msgstr ""
+msgstr "授权"
 
 #: extra-translations.cpp:19
 msgid "OK"
-msgstr ""
+msgstr "确定"
 
 #: gfxviewers.cpp:1202
 msgid "Select output file and type"
