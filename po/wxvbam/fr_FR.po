@@ -3522,7 +3522,7 @@ msgstr "Raccourcis &clavier..."
 
 #: xrc/MainMenu.xrc:567
 msgid "UI Settings"
-msgstr "Paramétrages de l'&Interface"
+msgstr "Paramétrages de l'Interface"
 
 #: xrc/MainMenu.xrc:569
 msgid "Enable &Status bar"
@@ -3662,7 +3662,7 @@ msgstr "Traductions"
 
 #: xrc/MainMenu.xrc:744
 msgid "Check for updates"
-msgstr "Vérifier les mises à jour :"
+msgstr "Vérifier les mises à jour"
 
 #: xrc/MainMenu.xrc:747
 msgid "&Factory Reset..."
