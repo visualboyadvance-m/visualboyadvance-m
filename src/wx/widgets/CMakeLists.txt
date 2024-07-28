@@ -8,6 +8,7 @@ target_sources(vbam-wx-widgets
     PRIVATE
     # from external source with minor modifications
     checkedlistctrl.cpp
+    $<IF:$<BOOL:${APPLE}>,dpi-support-mac.mm,dpi-support.cpp>
     group-check-box.cpp
     keep-on-top-styler.cpp
     option-validator.cpp
@@ -46,6 +47,7 @@ if(BUILD_TESTING)
         group-check-box-test.cpp
         keep-on-top-styler-test.cpp
         option-validator-test.cpp
+        user-input-ctrl-test.cpp
     )
 
     target_link_libraries(vbam-wx-widgets-tests

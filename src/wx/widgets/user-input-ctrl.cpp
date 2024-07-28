@@ -8,25 +8,33 @@
 
 namespace widgets {
 
+namespace {
+
+// Helper callback to disable an event. This is bound dynmically to prevent
+// the event from being processed by the base class.
+void DisableEvent(wxEvent& event) {
+    event.Skip(false);
+}
+
+}  // namespace
+
 extern const char UserInputCtrlNameStr[] = "userinputctrl";
 
 UserInputCtrl::UserInputCtrl() : wxTextCtrl() {}
 
 UserInputCtrl::UserInputCtrl(wxWindow* parent,
                              wxWindowID id,
-                             const wxString& value,
                              const wxPoint& pos,
                              const wxSize& size,
                              long style,
                              const wxString& name) {
-    Create(parent, id, value, pos, size, style, name);
+    Create(parent, id, pos, size, style, name);
 }
 
 UserInputCtrl::~UserInputCtrl() = default;
 
 bool UserInputCtrl::Create(wxWindow* parent,
                            wxWindowID id,
-                           const wxString& value,
                            const wxPoint& pos,
                            const wxSize& size,
                            long style,
@@ -36,7 +44,12 @@ bool UserInputCtrl::Create(wxWindow* parent,
         last_focus_time_ = wxGetUTCTimeMillis();
         event.Skip();
     });
-    return wxTextCtrl::Create(parent, id, value, pos, size, style, wxValidator(), name);
+
+    // Diable key events.
+    this->Bind(wxEVT_CHAR, &DisableEvent);
+    this->Bind(wxEVT_KEY_DOWN, &DisableEvent);
+
+    return wxTextCtrl::Create(parent, id, wxEmptyString, pos, size, style, wxValidator(), name);
 }
 
 void UserInputCtrl::SetMultiKey(bool multikey) {
@@ -115,7 +128,7 @@ UserInputCtrlXmlHandler::UserInputCtrlXmlHandler() : wxXmlResourceHandler() {
 wxObject* UserInputCtrlXmlHandler::DoCreateResource() {
     XRC_MAKE_INSTANCE(control, UserInputCtrl)
 
-    control->Create(m_parentAsWindow, GetID(), GetText("value"), GetPosition(), GetSize(),
+    control->Create(m_parentAsWindow, GetID(), GetPosition(), GetSize(),
                     GetStyle() | wxTE_PROCESS_ENTER | wxTE_PROCESS_TAB, GetName());
     SetupWindow(control);
 

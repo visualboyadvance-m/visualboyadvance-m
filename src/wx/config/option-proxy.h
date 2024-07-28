@@ -188,7 +188,7 @@ public:
     bool operator++(int) { return *this += 1; }
     bool operator--(int) { return *this -= 1; }
     bool operator+=(T value) {
-        const int new_value = Get() + value;
+        const T new_value = Get() + value;
         if (new_value > Max()) {
             return Set(Max());
         } else {
@@ -196,7 +196,7 @@ public:
         }
     }
     bool operator-=(T value) {
-        const int new_value = Get() - value;
+        const T new_value = Get() - value;
         if (new_value < Min()) {
             return Set(Min());
         } else {

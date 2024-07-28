@@ -389,11 +389,6 @@ endif()
 if(APPLE)
     target_sources(visualboyadvance-m PRIVATE
         macsupport.mm
-        widgets/dpi-support-mac.mm
-  )
-else()
-    target_sources(visualboyadvance-m PRIVATE
-        widgets/dpi-support.cpp
     )
 endif()
 

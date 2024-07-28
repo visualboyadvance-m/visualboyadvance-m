@@ -1333,9 +1333,9 @@ int wxvbamApp::FilterEvent(wxEvent& event)
     }
 
     if (event.GetEventType() == wxEVT_KEY_DOWN || event.GetEventType() == wxEVT_KEY_UP) {
-        // Handle keyboard input events here. No control will receive them.
+        // Handle keyboard input events here to generate user input events.
         keyboard_input_sender_.ProcessKeyEvent(static_cast<wxKeyEvent&>(event));
-        return wxEventFilter::Event_Processed;
+        return wxEventFilter::Event_Skip;
     }
 
     if (!frame->CanProcessShortcuts()) {
