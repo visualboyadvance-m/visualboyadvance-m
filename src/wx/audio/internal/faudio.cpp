@@ -20,6 +20,7 @@
 #include "core/base/system.h"
 #include "core/gba/gbaGlobals.h"
 #include "wx/config/option-proxy.h"
+#include "wx/config/strutils.h"
 
 namespace audio {
 namespace internal {
@@ -27,7 +28,7 @@ namespace internal {
 namespace {
 
 int FAGetDev(FAudio* fa) {
-    const wxString& audio_device = OPTION(kSoundAudioDevice);
+    const wxString audio_device = OPTION(kSoundAudioDevice).Get();
     if (audio_device.empty()) {
         // Just use the default device.
         return 0;
@@ -47,7 +48,10 @@ int FAGetDev(FAudio* fa) {
         if (hr != 0) {
             continue;
         }
-        const wxString device_id(reinterpret_cast<wchar_t*>(dd.DeviceID));
+        const std::vector<uint8_t> device_id_u8 =
+            config::utf16_to_utf8(reinterpret_cast<uint16_t*>(dd.DeviceID));
+        const wxString device_id = wxString::FromUTF8(
+            reinterpret_cast<const char*>(device_id_u8.data()), device_id_u8.size());
         if (audio_device == device_id) {
             return i;
         }
@@ -119,8 +123,6 @@ public:
     FAudio_Output();
     ~FAudio_Output();
 
-    void device_change();
-
 private:
     void close();
 
@@ -191,10 +193,6 @@ void FAudio_Output::close() {
         FAudio_Release(faud);
         faud = nullptr;
     }
-}
-
-void FAudio_Output::device_change() {
-    device_changed = true;
 }
 
 bool FAudio_Output::init(long sampleRate) {
@@ -488,8 +486,11 @@ std::vector<AudioDevice> GetFAudioDevices() {
     }
 
     std::vector<AudioDevice> devices;
+#if defined(__WXMSW__)
+    // Add a separate default device on Windows.
     devices.reserve(dev_count + 1);
     devices.push_back({_("Default device"), wxEmptyString});
+#endif
 
     for (uint32_t i = 0; i < dev_count; i++) {
         FAudioDeviceDetails dd;
@@ -498,9 +499,15 @@ std::vector<AudioDevice> GetFAudioDevices() {
             continue;
         }
 
-        const wxString display_name(reinterpret_cast<wchar_t*>(dd.DisplayName));
-        const wxString device_id(reinterpret_cast<wchar_t*>(dd.DeviceID));
-
+        // Convert to UTF-8.
+        const std::vector<uint8_t> display_name_u8 =
+            config::utf16_to_utf8(reinterpret_cast<uint16_t*>(dd.DisplayName));
+        const std::vector<uint8_t> device_id_u8 =
+            config::utf16_to_utf8(reinterpret_cast<uint16_t*>(dd.DeviceID));
+        const wxString display_name = wxString::FromUTF8(
+            reinterpret_cast<const char*>(display_name_u8.data()), display_name_u8.size());
+        const wxString device_id = wxString::FromUTF8(
+            reinterpret_cast<const char*>(device_id_u8.data()), device_id_u8.size());
         devices.push_back({display_name, device_id});
     }
 
