@@ -94,3 +94,76 @@ TEST(StrSplitWithSepTest, MultipleSepTokens) {
     EXPECT_EQ(vec[4], "baz");
     EXPECT_EQ(vec[5], "|-|");
 }
+
+TEST(UTF16ToUTF8Test, Basic) {
+    std::vector<uint16_t> utf16 = {'f', 'o', 'o', 0};
+    auto vec = config::utf16_to_utf8(utf16.data());
+
+    ASSERT_EQ(vec.size(), 3);
+
+    EXPECT_EQ(vec[0], 'f');
+    EXPECT_EQ(vec[1], 'o');
+    EXPECT_EQ(vec[2], 'o');
+}
+
+TEST(UTF16ToUTF8Test, MultiByte) {
+    // U+20AC EURO SIGN.
+    std::vector<uint16_t> utf16 = {0x20AC, 0};
+    auto vec = config::utf16_to_utf8(utf16.data());
+
+    ASSERT_EQ(vec.size(), 3);
+
+    EXPECT_EQ(vec[0], 0xE2);
+    EXPECT_EQ(vec[1], 0x82);
+    EXPECT_EQ(vec[2], 0xAC);
+}
+
+TEST(UTF16ToUTF8Test, SurrogatePair) {
+    // U+1F914 THINKING FACE.
+    std::vector<uint16_t> utf16 = {0xD83E, 0xDD14, 0};
+    auto vec = config::utf16_to_utf8(utf16.data());
+
+    ASSERT_EQ(vec.size(), 4);
+
+    EXPECT_EQ(vec[0], 0xF0);
+    EXPECT_EQ(vec[1], 0x9F);
+    EXPECT_EQ(vec[2], 0xA4);
+    EXPECT_EQ(vec[3], 0x94);
+}
+
+TEST(UTF16ToUTF8Test, InvalidSurrogatePair) {
+    // U+D800 HIGH SURROGATE.
+    std::vector<uint16_t> utf16 = {0xD800, 0};
+    EXPECT_DEATH(config::utf16_to_utf8(utf16.data()), ".*");
+}
+
+TEST(UTF16ToUTF8Test, InvalidSurrogatePair2) {
+    // U+D800 HIGH SURROGATE followed by U+0020 SPACE.
+    std::vector<uint16_t> utf16 = {0xD800, 0x0020, 0};
+    EXPECT_DEATH(config::utf16_to_utf8(utf16.data()), ".*");
+}
+
+TEST(UTF16ToUTF8Test, InvalidSurrogatePair3) {
+    // U+D800 HIGH SURROGATE followed by U+D800 HIGH SURROGATE.
+    std::vector<uint16_t> utf16 = {0xD800, 0xD800, 0};
+    EXPECT_DEATH(config::utf16_to_utf8(utf16.data()), ".*");
+}
+
+TEST(UTF16ToUTF8Test, FullString) {
+    // "foo€🤔"
+    std::vector<uint16_t> utf16 = {'f', 'o', 'o', 0x20AC, 0xD83E, 0xDD14, 0};
+    auto vec = config::utf16_to_utf8(utf16.data());
+
+    ASSERT_EQ(vec.size(), 10);
+
+    EXPECT_EQ(vec[0], 'f');
+    EXPECT_EQ(vec[1], 'o');
+    EXPECT_EQ(vec[2], 'o');
+    EXPECT_EQ(vec[3], 0xE2);
+    EXPECT_EQ(vec[4], 0x82);
+    EXPECT_EQ(vec[5], 0xAC);
+    EXPECT_EQ(vec[6], 0xF0);
+    EXPECT_EQ(vec[7], 0x9F);
+    EXPECT_EQ(vec[8], 0xA4);
+    EXPECT_EQ(vec[9], 0x94);
+}
