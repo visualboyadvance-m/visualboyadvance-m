@@ -42,7 +42,7 @@ msgstr "Berkas Game Boy Advance (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|
 
 #: cmdevents.cpp:144
 msgid "Open ROM file"
-msgstr "Buka file ROM"
+msgstr "Buka berkas ROM"
 
 #: cmdevents.cpp:165
 msgid ""
@@ -52,7 +52,7 @@ msgstr "Berkas Game Boy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.
 
 #: cmdevents.cpp:171
 msgid "Open GB ROM file"
-msgstr "Buka file GB ROM"
+msgstr "Buka berkas ROM GB"
 
 #: cmdevents.cpp:192
 msgid ""
@@ -62,11 +62,11 @@ msgstr "Berkas Game Boy Color (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.
 
 #: cmdevents.cpp:198
 msgid "Open GBC ROM file"
-msgstr "Buka file GBC ROM"
+msgstr "Buka berkas ROM GBC"
 
 #: cmdevents.cpp:363 cmdevents.cpp:385
 msgid "Select Dot Code file"
-msgstr "Pilih file Dot Code"
+msgstr "Pilih berkas Dot Code"
 
 #: cmdevents.cpp:365 cmdevents.cpp:387
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
@@ -74,11 +74,11 @@ msgstr "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 
 #: cmdevents.cpp:406 cmdevents.cpp:601
 msgid "Select battery file"
-msgstr "Pilih file baterai"
+msgstr "Pilih berkas baterai"
 
 #: cmdevents.cpp:407 cmdevents.cpp:602
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
-msgstr "File baterai (*.sav)|*.sav|Simpanan Flash (*.dat)|*.dat"
+msgstr "Berkas baterai (*.sav)|*.sav|Simpanan Flash (*.dat)|*.dat"
 
 #: cmdevents.cpp:415
 msgid ""
@@ -102,7 +102,7 @@ msgstr "Terjadi kesalahan dalam memuat baterai %s"
 
 #: cmdevents.cpp:433
 msgid "Select code file"
-msgstr "Pilih file kode"
+msgstr "Pilih berkas kode"
 
 #: cmdevents.cpp:434
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
