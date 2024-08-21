@@ -121,26 +121,26 @@ msgstr "Mengimpor berkas kode akan menimpa cheat yang aktif. Apakah ingin lanjut
 #: cmdevents.cpp:460
 #, c-format
 msgid "Cannot open file %s"
-msgstr "Tidak dapat membuka file %s"
+msgstr "Tak dapat buka berkas %s"
 
 #: cmdevents.cpp:470
 #, c-format
 msgid "Unsupported code file %s"
-msgstr "File kode tidak didukung %s"
+msgstr "Berkas kode tak didukung %s"
 
 #: cmdevents.cpp:540
 #, c-format
 msgid "Loaded code file %s"
-msgstr "File kode yang dimuat %s"
+msgstr "Berkas kode yang dimuat %s"
 
 #: cmdevents.cpp:542
 #, c-format
 msgid "Error loading code file %s"
-msgstr "Terjadi kesalahan dalam memuat file kode %s"
+msgstr "Galat memuat berkas kode %s"
 
 #: cmdevents.cpp:553 cmdevents.cpp:629
 msgid "Select snapshot file"
-msgstr "Pilih file snapshot"
+msgstr "Pilih snapshot"
 
 #: cmdevents.cpp:554
 msgid ""
@@ -156,17 +156,17 @@ msgstr ""
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "Mengimpor snapshot akan menghapus simpanan permainan (dihapus permanen setelah ini dilakukan). Apakah ingin lanjut?"
 
 #: cmdevents.cpp:588
 #, c-format
 msgid "Loaded snapshot file %s"
-msgstr "File snapshot yang dimuat %s"
+msgstr "Snapshot yang dimuat %s"
 
 #: cmdevents.cpp:590
 #, c-format
 msgid "Error loading snapshot file %s"
-msgstr "Terjadi kesalahan dalam memuat file snapshot %s"
+msgstr "Galat memuat snapshot %s"
 
 #: cmdevents.cpp:613
 #, c-format
@@ -180,7 +180,7 @@ msgstr "Terjadi kesalahan dalam menyimpan baterai %s"
 
 #: cmdevents.cpp:623
 msgid "EEPROM saves cannot be exported"
-msgstr "Simpanan EEPROM tidak dapat diekspor"
+msgstr "Simpanan EEPROM tak dapat diekspor"
 
 #: cmdevents.cpp:630
 msgid "Game Shark Snapshot (*.sps)|*.sps"
@@ -193,18 +193,18 @@ msgstr ""
 #: cmdevents.cpp:656
 #, c-format
 msgid "Saved snapshot file %s"
-msgstr "File snapshot yang disimpan %s"
+msgstr "Snapshot yang disimpan %s"
 
 #: cmdevents.cpp:658
 #, c-format
 msgid "Error saving snapshot file %s"
-msgstr "Terjadi kesalahan dalam meyimpan file snapshot %s"
+msgstr "Galat menyimpan snapshot %s"
 
 #: cmdevents.cpp:674 cmdevents.cpp:752 cmdevents.cpp:822 cmdevents.cpp:891
 #: gfxviewers.cpp:1662 gfxviewers.cpp:1807 viewers.cpp:588 viewers.cpp:802
 #: viewsupt.cpp:1199
 msgid "Select output file"
-msgstr "Pilih file keluaran"
+msgstr "Pilih berkas keluaran"
 
 #: cmdevents.cpp:675 gfxviewers.cpp:1663 gfxviewers.cpp:1808 viewsupt.cpp:1200
 msgid "PNG images|*.png|BMP images|*.bmp"
@@ -217,19 +217,19 @@ msgstr "Menyimpan snapshot %s"
 
 #: cmdevents.cpp:720 cmdevents.cpp:790 cmdevents.cpp:859 cmdevents.cpp:925
 msgid " files ("
-msgstr "file ("
+msgstr " berkas ("
 
 #: cmdevents.cpp:958
 msgid "Select file"
-msgstr "Pilih file"
+msgstr "Pilih berkas"
 
 #: cmdevents.cpp:1262 cmdevents.cpp:1355
 msgid "Select state file"
-msgstr "Pilih file state"
+msgstr "Pilih berkas state"
 
 #: cmdevents.cpp:1263 cmdevents.cpp:1356
 msgid "Visual Boy Advance saved game files|*.sgm"
-msgstr ""
+msgstr "Simpanan permainan Visual Boy Advance|*.sgm"
 
 #: cmdevents.cpp:1386 cmdevents.cpp:1396 cmdevents.cpp:1407
 #, c-format
@@ -238,7 +238,7 @@ msgstr "Slot keadaan saat ini #%d"
 
 #: cmdevents.cpp:1470
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
-msgstr ""
+msgstr "Tak dapat menggunakan Retasan Colorizer jika BIOS Game Boy sedang aktif."
 
 #: cmdevents.cpp:1681
 msgid "Sound enabled"
@@ -314,7 +314,7 @@ msgstr ""
 
 #: cmdevents.cpp:2424
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
-msgstr ""
+msgstr "Tak dapat menggunakan BIOS Game Boy jika Retasan Colorizer sedang aktif."
 
 #: cmdevents.cpp:2490
 msgid "LAN link is already active. Disable link mode to disconnect."
@@ -543,7 +543,7 @@ msgstr ""
 
 #: extra-translations.cpp:15
 msgid "Cancel"
-msgstr ""
+msgstr "Batal"
 
 #: extra-translations.cpp:16
 msgid "Close"
@@ -563,7 +563,7 @@ msgstr ""
 
 #: gfxviewers.cpp:1202
 msgid "Select output file and type"
-msgstr "Pilih tipe dan file keluaran"
+msgstr "Pilih berkas dan jenis keluaran"
 
 #: gfxviewers.cpp:1203
 msgid ""
@@ -613,7 +613,7 @@ msgstr "Terjadi kesalahan.\nCoba lagi."
 
 #: guiinit.cpp:250 guiinit.cpp:303
 msgid "Select cheat file"
-msgstr "Pilih file cheat"
+msgstr "Pilih berkas cheat"
 
 #: guiinit.cpp:251
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
@@ -716,7 +716,7 @@ msgstr "Host JoyBus tidak valid; menonaktifkan"
 msgid ""
 "The INI file was written for a more recent version of VBA-M. Some INI option"
 " values may have been reset."
-msgstr ""
+msgstr "Berkas ekstensi INI dibuat untuk versi VBA-M lebih baru. Beberapa nilai opsi INI akan diatur ulang."
 
 #: opts.cpp:337 opts.cpp:353 opts.cpp:508
 #, c-format
@@ -738,11 +738,11 @@ msgstr ""
 #: panel.cpp:219
 #, c-format
 msgid "%s is not a valid ROM file"
-msgstr "%s bukan merupakan file ROM yang valid"
+msgstr "%s bukan ROM yang absah"
 
 #: panel.cpp:220 panel.cpp:281 panel.cpp:345
 msgid "Problem loading file"
-msgstr "Terjadi kesalahan ketika memuat file"
+msgstr "Bermasalah memuat berkas"
 
 #: panel.cpp:280
 #, c-format
@@ -757,7 +757,7 @@ msgstr ""
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
-msgstr ""
+msgstr "Tak dapat menggunakan BIOS Game Boy jika Retasan Colorizer sedang aktif, BIOS Game Boy dinonaktifkan."
 
 #: panel.cpp:321 panel.cpp:420
 #, c-format
@@ -884,11 +884,11 @@ msgstr ""
 
 #: panel.cpp:2450
 msgid "Error writing to output file"
-msgstr ""
+msgstr "Galat menulis ke keluaran"
 
 #: panel.cpp:2453
 msgid "Can't guess output format from file name"
-msgstr ""
+msgstr "Tak dapat menebak format keluaran dari nama"
 
 #: panel.cpp:2458
 msgid "Programming error; aborting!"
@@ -926,7 +926,7 @@ msgstr "Tidak sedang memainkan permainan; tidak dapat merekam"
 #: sys.cpp:223
 #, c-format
 msgid "Cannot open output file %s"
-msgstr "Tidak dapat membuka file keluaran %s"
+msgstr "Tak dapat buka berkas keluaran %s"
 
 #: sys.cpp:230 sys.cpp:250 sys.cpp:400
 msgid "Error writing game recording"
@@ -934,12 +934,12 @@ msgstr "Terjadi kesalahan dalam menyimpan rekaman permainan"
 
 #: sys.cpp:271
 msgid "Cannot play game recording while recording"
-msgstr "Tidak dapat memutar rekaman permainan ketika sedang merekam"
+msgstr "Tak dapat memutar rekaman main selagi merekam"
 
 #: sys.cpp:286
 #, c-format
 msgid "Cannot open recording file %s"
-msgstr "Tidak dapat membuka file rekaman %s"
+msgstr "Tak dapat buka berkas rekaman %s"
 
 #: sys.cpp:295 sys.cpp:305
 msgid "Error reading game recording"
@@ -960,7 +960,7 @@ msgstr "&Buang"
 
 #: sys.cpp:933
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
-msgstr "File gambar (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
+msgstr "Gambar (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
 #: sys.cpp:942
 msgid "Save printer image to"
@@ -991,7 +991,7 @@ msgstr "Terjadi kesalahan dalam mempersiapkan socket server (%d)"
 
 #: viewers.cpp:586
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
-msgstr "File teks (*.txt;*.log)|*.txt;*.log|"
+msgstr "Teks (*.txt;*.log)|*.txt;*.log|"
 
 #: viewers.cpp:728 viewers.cpp:800
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
@@ -999,7 +999,7 @@ msgstr "Memory dump (*.dmp;*.bin)|*.dmp;*.bin|"
 
 #: viewers.cpp:730
 msgid "Select memory dump file"
-msgstr "Pilih file memory dump"
+msgstr "Pilih berkas dump memori"
 
 #: viewsupt.cpp:789
 msgid "Red:"
@@ -1021,7 +1021,7 @@ msgstr "Tidak dapat memuat dialog %s dari sumber"
 #: wxvbam.cpp:390 wxvbam.cpp:407
 #, c-format
 msgid "Invalid configuration file provided: %s"
-msgstr ""
+msgstr "Terdapat berkas konfigurasi tak absah: %s"
 
 #: wxvbam.cpp:547
 msgid "Could not create main window"
@@ -1029,7 +1029,7 @@ msgstr "Tidak dapat membuat window utama"
 
 #: wxvbam.cpp:622
 msgid "Save built-in XRC file and exit"
-msgstr "Simpan file XRC built-in dan keluar"
+msgstr "Simpan XRC tertanam dan keluar"
 
 #: wxvbam.cpp:625
 msgid "Save built-in vba-over.ini and exit"
@@ -1045,7 +1045,7 @@ msgstr "Mulai dalam mode layar penuh"
 
 #: wxvbam.cpp:634
 msgid "Set a configuration file"
-msgstr ""
+msgstr "Atur berkas konfigurasi"
 
 #: wxvbam.cpp:638
 msgid "Delete shared link state first, if it exists"
@@ -1057,7 +1057,7 @@ msgstr "Tampilkan semua pilihan yang dapat diubah dan keluar"
 
 #: wxvbam.cpp:648
 msgid "ROM file"
-msgstr "File ROM"
+msgstr "Berkas ROM"
 
 #: wxvbam.cpp:650
 msgid "<config>=<value>"
@@ -1065,7 +1065,7 @@ msgstr "<config>=<value>"
 
 #: wxvbam.cpp:681
 msgid "Configuration / build error: can't find built-in xrc"
-msgstr ""
+msgstr "Galat bina / konfigurasi: Tak dapat cari xrc tertanam"
 
 #: wxvbam.cpp:689
 #, c-format
@@ -1872,17 +1872,17 @@ msgstr ""
 #: audio/internal/dsound.cpp:105 audio/internal/dsound.cpp:120
 #, c-format
 msgid "Cannot create Direct Sound %08x"
-msgstr ""
+msgstr "Tak dapat membuat Direct Sound %08x"
 
 #: audio/internal/dsound.cpp:126
 #, c-format
 msgid "Cannot SetCooperativeLevel %08x"
-msgstr "Tidak dapat MenyimpanTingkatKoperatif %08x"
+msgstr "Tak dapat SetCooperativeLevel %08x"
 
 #: audio/internal/dsound.cpp:141
 #, c-format
 msgid "Cannot CreateSoundBuffer %08x"
-msgstr "Tidak dapat MembuatBufferSuara %08x"
+msgstr "Tak dapat CreateSoundBuffer %08x"
 
 #: audio/internal/dsound.cpp:160
 #, c-format
@@ -1902,7 +1902,7 @@ msgstr "dsbSecondary->MenyimpanPosisiSaatIni gagal %08x"
 #: audio/internal/dsound.cpp:207
 #, c-format
 msgid "Cannot Play primary %08x"
-msgstr "Tidak dapat Memainkan utama %08x"
+msgstr "Tak dapat Play primary %08x"
 
 #: audio/internal/dsound.cpp:328
 #, c-format
@@ -2331,7 +2331,7 @@ msgstr "Bilinear Plus"
 
 #: xrc/DisplayConfig.xrc:94
 msgid "Scanlines"
-msgstr "Garis scan"
+msgstr "Garis pindai"
 
 #: xrc/DisplayConfig.xrc:95
 msgid "TV Mode"
