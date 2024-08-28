@@ -88,7 +88,7 @@ msgstr "Mengimpor berkas baterai akan menghapus simpanan permainan (dihapus perm
 
 #: cmdevents.cpp:416 cmdevents.cpp:444 cmdevents.cpp:564
 msgid "Confirm import"
-msgstr "Konfirmasi untuk mengimpor"
+msgstr "Konfirmasi impor"
 
 #: cmdevents.cpp:422 panel.cpp:493
 #, c-format
@@ -98,7 +98,7 @@ msgstr "Baterai yang dimuat %s"
 #: cmdevents.cpp:424
 #, c-format
 msgid "Error loading battery %s"
-msgstr "Terjadi kesalahan dalam memuat baterai %s"
+msgstr "Galat memuat baterai %s"
 
 #: cmdevents.cpp:433
 msgid "Select code file"
