@@ -30,7 +30,7 @@ msgstr "OpenAL: Gagal membuka perangkat audio"
 #: audio/internal/openal.cpp:386 audio/internal/faudio.cpp:492
 #: audio/internal/xaudio2.cpp:577
 msgid "Default device"
-msgstr "Perangkat default"
+msgstr "Perangkat bawaan"
 
 #: cmdevents.cpp:133
 msgid ""
@@ -84,7 +84,7 @@ msgstr "Berkas baterai (*.sav)|*.sav|Simpanan Flash (*.dat)|*.dat"
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr "Mengimpor berkas baterai akan menghapus simpanan permainan (dihapus permanen setelah ini dilakukan). Apakah ingin lanjut?"
+msgstr "Mengimpor berkas baterai akan menghapus simpanan permainan (dihapus permanen setelah ini). Apakah ingin lanjut?"
 
 #: cmdevents.cpp:416 cmdevents.cpp:444 cmdevents.cpp:564
 msgid "Confirm import"
