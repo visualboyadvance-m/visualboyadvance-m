@@ -16,6 +16,7 @@
 # Larson März <larson@protonmail.ch>, 2014
 # Marcel Dominic Bandowski <marcel.bandowski@gmx.de>, 2024
 # Overtry <marcoruhl@hotmail.de>, 2019
+# Marco Ruhl, 2024
 # Overtry <marcoruhl@hotmail.de>, 2019
 # Peter Tpoint <peter.traxl@gmail.com>, 2021
 # RootCore <administrator@root-core.net>, 2019
@@ -26,7 +27,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-05 20:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Marcel Dominic Bandowski <marcel.bandowski@gmx.de>, 2024\n"
+"Last-Translator: Marco Ruhl, 2024\n"
 "Language-Team: German (http://app.transifex.com/bgk/vba-m/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,7 +37,7 @@ msgstr ""
 
 #: audio/internal/openal.cpp:188
 msgid "OpenAL: Failed to open audio device"
-msgstr ""
+msgstr "OpenAL: Audiogerät konnte nicht geöffnet werden"
 
 #: audio/internal/openal.cpp:386 audio/internal/faudio.cpp:492
 #: audio/internal/xaudio2.cpp:577
@@ -49,11 +50,11 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
 " Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "Game Boy Advance Formate (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game Boy Formate (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+msgstr "Game Boy Advance Dateiformate (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game Boy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:144
 msgid "Open ROM file"
-msgstr "ROM-Datei öffnen"
+msgstr "ROM Datei öffnen"
 
 #: cmdevents.cpp:165
 msgid ""
@@ -63,39 +64,39 @@ msgstr "Game Boy Dateiformate (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.
 
 #: cmdevents.cpp:171
 msgid "Open GB ROM file"
-msgstr "GB ROM-Datei öffnen"
+msgstr "GB ROM Datei öffnen"
 
 #: cmdevents.cpp:192
 msgid ""
 "Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Game Boy Color Dateiformate (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:198
 msgid "Open GBC ROM file"
-msgstr "GBC ROM-Datei öffnen"
+msgstr "GBC ROM Datei öffnen"
 
 #: cmdevents.cpp:363 cmdevents.cpp:385
 msgid "Select Dot Code file"
-msgstr "Dot Code-Datei auswählen"
+msgstr "Punktecode-Datei Auswählen"
 
 #: cmdevents.cpp:365 cmdevents.cpp:387
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr ""
+msgstr "e-Reader Punktecode (*.bin;*.raw)|*.bin;*.raw"
 
 #: cmdevents.cpp:406 cmdevents.cpp:601
 msgid "Select battery file"
-msgstr "Batterie-Datei auswählen"
+msgstr "Batterie Datei auswählen"
 
 #: cmdevents.cpp:407 cmdevents.cpp:602
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
-msgstr "Batterie-Datei (*.sav)|*.sav|Flash-Speicher (*.dat)|*.dat"
+msgstr "Batterie Datei (*.sav)|*.sav|Flash Speicher (*.dat)|*.dat"
 
 #: cmdevents.cpp:415
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "Beim Importieren einer Batteriedatei werden alle gespeicherten Spiele gelöscht (nach dem nächsten Schreibvorgang dauerhaft). Möchten Sie fortfahren?"
 
 #: cmdevents.cpp:416 cmdevents.cpp:444 cmdevents.cpp:564
 msgid "Confirm import"
@@ -113,21 +114,21 @@ msgstr "Fehler beim Laden der Batterie %s"
 
 #: cmdevents.cpp:433
 msgid "Select code file"
-msgstr "Code-Datei auswählen"
+msgstr "Code Datei auswählen"
 
 #: cmdevents.cpp:434
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
-msgstr ""
+msgstr "GameShark Code-Datei (*.spc;*.xpc)|*.spc;*.xpc"
 
 #: cmdevents.cpp:434
 msgid "Game Shark Code File (*.gcf)|*.gcf"
-msgstr ""
+msgstr "GameShark Code-Datei (*.gcf)|*.gcf"
 
 #: cmdevents.cpp:443
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
-msgstr ""
+msgstr "Durch das Importieren einer Codedatei werden alle geladenen Cheats ersetzt. Möchten Sie fortfahren?"
 
 #: cmdevents.cpp:460
 #, c-format
@@ -142,42 +143,42 @@ msgstr "Unbekannte Code-Datei %s"
 #: cmdevents.cpp:540
 #, c-format
 msgid "Loaded code file %s"
-msgstr "Code-Datei %s geladen"
+msgstr "Code Datei %s geladen"
 
 #: cmdevents.cpp:542
 #, c-format
 msgid "Error loading code file %s"
-msgstr "Fehler beim Laden der Code-Datei %s"
+msgstr "Fehler beim Laden der Code Datei %s"
 
 #: cmdevents.cpp:553 cmdevents.cpp:629
 msgid "Select snapshot file"
-msgstr "Snapshot-Datei auswählen"
+msgstr "Schnappschuss Datei auswählen"
 
 #: cmdevents.cpp:554
 msgid ""
 "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
 " (*.gsv)|*.gsv"
-msgstr ""
+msgstr "GameShark & PAC Schnapschüsse (*.sps;*.xps)|*.sps;*.xps|GameShark SP Schnapschüsse (*.gsv)|*.gsv"
 
 #: cmdevents.cpp:554
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
-msgstr ""
+msgstr "GameBoy Schnapschüsse (*.gbs)|*.gbs"
 
 #: cmdevents.cpp:563
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "Durch das Importieren einer Snapshot-Datei werden alle gespeicherten Spiele gelöscht (nach dem nächsten Schreibvorgang dauerhaft). Möchten Sie fortfahren?"
 
 #: cmdevents.cpp:588
 #, c-format
 msgid "Loaded snapshot file %s"
-msgstr "Snapshot-Datei %s geladen"
+msgstr "Schnappschusst Datei %s geladen"
 
 #: cmdevents.cpp:590
 #, c-format
 msgid "Error loading snapshot file %s"
-msgstr "Fehler beim Laden der Snapshot-Datei %s"
+msgstr "Fehler beim Laden der Schnappschuss Datei %s"
 
 #: cmdevents.cpp:613
 #, c-format
@@ -191,25 +192,25 @@ msgstr "Fehler beim Schreiben der Batterie %s"
 
 #: cmdevents.cpp:623
 msgid "EEPROM saves cannot be exported"
-msgstr "EEPROM-Speicherdatei konnte nicht exportiert werden"
+msgstr "EEPROM Speicher konnte nicht exportiert werden"
 
 #: cmdevents.cpp:630
 msgid "Game Shark Snapshot (*.sps)|*.sps"
-msgstr ""
+msgstr "GameShark Schnapschuss (*.sps)|*.sps"
 
 #: cmdevents.cpp:644
 msgid "Exported from Visual Boy Advance-M"
-msgstr ""
+msgstr "Exportiert aus Visual Boy Advance-M"
 
 #: cmdevents.cpp:656
 #, c-format
 msgid "Saved snapshot file %s"
-msgstr "Snapshot-Datei %s gespeichert"
+msgstr "Schnappschuss Datei %s gespeichert"
 
 #: cmdevents.cpp:658
 #, c-format
 msgid "Error saving snapshot file %s"
-msgstr "Fehler beim Speichern der Snapshot-Datei %s"
+msgstr "Fehler beim Speichern der Schnappschuss Datei %s"
 
 #: cmdevents.cpp:674 cmdevents.cpp:752 cmdevents.cpp:822 cmdevents.cpp:891
 #: gfxviewers.cpp:1662 gfxviewers.cpp:1807 viewers.cpp:588 viewers.cpp:802
@@ -224,7 +225,7 @@ msgstr "PNG Bilder|*.png|BMP Bilder|*.bmp"
 #: cmdevents.cpp:699 sys.cpp:579
 #, c-format
 msgid "Wrote snapshot %s"
-msgstr "Snapshot %s geschrieben"
+msgstr "Schnappschuss %s geschrieben"
 
 #: cmdevents.cpp:720 cmdevents.cpp:790 cmdevents.cpp:859 cmdevents.cpp:925
 msgid " files ("
@@ -236,20 +237,20 @@ msgstr "Datei auswählen"
 
 #: cmdevents.cpp:1262 cmdevents.cpp:1355
 msgid "Select state file"
-msgstr "Savestate auswählen"
+msgstr "Spielstand auswählen"
 
 #: cmdevents.cpp:1263 cmdevents.cpp:1356
 msgid "Visual Boy Advance saved game files|*.sgm"
-msgstr ""
+msgstr "Visual Boy Advance gespeicherte Spieldateien|*.sgm"
 
 #: cmdevents.cpp:1386 cmdevents.cpp:1396 cmdevents.cpp:1407
 #, c-format
 msgid "Current state slot #%d"
-msgstr "Aktueller Savestate-Slot #%d"
+msgstr "Aktueller Spielstand #%d"
 
 #: cmdevents.cpp:1470
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
-msgstr ""
+msgstr "Der Färber-Hack kann nicht verwendet werden, wenn die Game Boy BIOS-Datei aktiviert ist."
 
 #: cmdevents.cpp:1681
 msgid "Sound enabled"
@@ -261,15 +262,15 @@ msgstr "Sound deaktiviert"
 
 #: cmdevents.cpp:1760
 msgid "Set to 0 for pseudo tty"
-msgstr "Für Pseudo-TTY auf 0 setzen"
+msgstr "Pseudo TTY auf 0 setzen"
 
 #: cmdevents.cpp:1762
 msgid "Port to wait for connection:"
-msgstr "Port zum Horchen auf eine Verbindung:"
+msgstr "Port der auf die Verbindung wartet:"
 
 #: cmdevents.cpp:1763
 msgid "GDB Connection"
-msgstr "GDB-Verbindung"
+msgstr "GDB Verbindung"
 
 #: cmdevents.cpp:1815
 #, c-format
@@ -279,7 +280,7 @@ msgstr "Warte auf Verbindung bei %s"
 #: cmdevents.cpp:1822
 #, c-format
 msgid "Waiting for connection on port %d"
-msgstr "Warte auf Verbindung auf Port %d"
+msgstr "Warte auf Verbindung bei Port %d"
 
 #: cmdevents.cpp:1825
 msgid "Waiting for GDB..."
@@ -290,15 +291,15 @@ msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
-msgstr ""
+msgstr "DEINE KONFIGURATION WIRD GELÖSCHT!\n\nBist du sicher?"
 
 #: cmdevents.cpp:2201
 msgid "FACTORY RESET"
-msgstr ""
+msgstr "WERKSRESET"
 
 #: cmdevents.cpp:2236
 msgid "Nintendo Game Boy / Color / Advance emulator."
-msgstr ""
+msgstr "Nintendo GameBoy / Color / Advance Emulator."
 
 #: cmdevents.cpp:2237
 msgid ""
@@ -321,7 +322,7 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program. If not, see http://www.gnu.org/licenses ."
-msgstr ""
+msgstr "Dieses Programm ist freie Software: Sie können es weiterverbreiten und/oder modifizieren\nunter den Bedingungen der GNU General Public License, wie veröffentlicht von\nder Free Software Foundation, entweder Version 2 der Lizenz, oder\n(nach Ihrer Wahl) jede spätere Version.\n\nDieses Programm wird in der Hoffnung verbreitet, dass es nützlich sein wird,\naber OHNE JEGLICHE GARANTIE; ohne die stillschweigende Garantie von\nMARKTGÄNGIGKEIT oder EIGNUNG FÜR EINEN BESTIMMTEN ZWECK. \nWeitere Informationen finden Sie unter der GNU General Public License.\n\nSie sollten eine Kopie der GNU General Public License erhalten haben\nzusammen mit diesem Programm. Wenn nicht, lesen Sie http://www.gnu.org/licenses."
 
 #: cmdevents.cpp:2424
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
@@ -337,7 +338,7 @@ msgstr "Netzwerk wird in lokalem Modus nicht unterstützt."
 
 #: dialogs/accel-config.cpp:142
 msgid "Menu commands"
-msgstr "Menükommandos"
+msgstr "Menübefehle"
 
 #: dialogs/accel-config.cpp:245
 msgid "This will clear all user-defined accelerators. Are you sure?"
@@ -370,7 +371,7 @@ msgstr "Keine"
 #: dialogs/display-config.cpp:361
 #, c-format
 msgid "No usable rpi plugins found in %s"
-msgstr "Es wurden keine anwendbaren RPI-Plugins in %s gefunden"
+msgstr "Keine anwendbaren RPI-Plugins in %s gefunden"
 
 #: dialogs/display-config.cpp:400 dialogs/display-config.cpp:442
 #: xrc/DisplayConfig.xrc:108
@@ -574,7 +575,7 @@ msgstr ""
 
 #: gfxviewers.cpp:1202
 msgid "Select output file and type"
-msgstr "Ausgabedatei und -typ auswählen"
+msgstr "Ausgabedatei und Typ auswählen"
 
 #: gfxviewers.cpp:1203
 msgid ""
@@ -584,7 +585,7 @@ msgstr "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Colo
 
 #: guiinit.cpp:91
 msgid "Start!"
-msgstr "Los!"
+msgstr "Start!"
 
 #: guiinit.cpp:110
 msgid "Connect"
@@ -600,7 +601,7 @@ msgstr "Host-Name ungültig"
 
 #: guiinit.cpp:146
 msgid "Waiting for clients..."
-msgstr "Warte auf Klienten..."
+msgstr "Warte auf Client..."
 
 #: guiinit.cpp:147
 #, c-format
@@ -620,7 +621,7 @@ msgstr "Verbinde mit %s\n"
 msgid ""
 "Error occurred.\n"
 "Please try again."
-msgstr "Es ist ein Fehler aufgetreten.\nVersuch es noch einmal."
+msgstr "Es ist ein Fehler aufgetreten.\nBitte versuchen Sie es erneut."
 
 #: guiinit.cpp:250 guiinit.cpp:303
 msgid "Select cheat file"
@@ -644,7 +645,7 @@ msgstr "Cheats gespeichert"
 
 #: guiinit.cpp:348 guiinit.cpp:367
 msgid "Restore old values?"
-msgstr "Ursprüngliche Werte wiederherstellen?"
+msgstr "Alte Werte wiederherstellen?"
 
 #: guiinit.cpp:349 guiinit.cpp:368
 msgid "Removing cheats"
@@ -688,11 +689,11 @@ msgstr ""
 
 #: guiinit.cpp:1637
 msgid "Main icon not found"
-msgstr "Haupt-Icon nicht gefunden"
+msgstr "Haupt Icon nicht gefunden"
 
 #: guiinit.cpp:1655
 msgid "Main display panel not found"
-msgstr "Haupt-Display nicht gefunden"
+msgstr "Haupt Display nicht gefunden"
 
 #: guiinit.cpp:1914
 #, c-format
@@ -713,7 +714,7 @@ msgstr "Adresse"
 
 #: guiinit.cpp:2183
 msgid "Old Value"
-msgstr "Ursprünglicher Wert"
+msgstr "Alter Wert"
 
 #: guiinit.cpp:2184
 msgid "New Value"
@@ -721,7 +722,7 @@ msgstr "Neuer Wert"
 
 #: guiinit.cpp:2404
 msgid "JoyBus host invalid; disabling"
-msgstr "JoyBus-Host ungültig; wird deaktiviert"
+msgstr "JoyBus Host ungültig; wird deaktiviert"
 
 #: opts.cpp:154
 msgid ""
@@ -787,22 +788,22 @@ msgstr " Spieler "
 #: panel.cpp:751
 #, c-format
 msgid "Loaded state %s"
-msgstr "Savestate %s geladen"
+msgstr "Spielstand %s geladen"
 
 #: panel.cpp:751
 #, c-format
 msgid "Error loading state %s"
-msgstr "Fehler beim Laden von Savestate %s"
+msgstr "Fehler beim Laden von Spielstand %s"
 
 #: panel.cpp:775
 #, c-format
 msgid "Saved state %s"
-msgstr "Savestate %s gespeichert"
+msgstr "Spielstand %s gespeichert"
 
 #: panel.cpp:775
 #, c-format
 msgid "Error saving state %s"
-msgstr "Fehler beim Speichern von Savestate %s"
+msgstr "Fehler beim Speichern des Spielstands %s"
 
 #: panel.cpp:979
 #, c-format
@@ -835,11 +836,11 @@ msgstr ""
 
 #: panel.cpp:1290
 msgid "No memory for rewinding"
-msgstr "Kein freier Speicher für Zurückspuhl-Datei"
+msgstr "Kein Speicher zum Zurückspulen"
 
 #: panel.cpp:1300
 msgid "Error writing rewind state"
-msgstr "Fehler beim Speichern von Zurückspuhl-Datei"
+msgstr "Fehler beim Schreiben des Rückspulstatus"
 
 #: panel.cpp:2277
 msgid "Enabling EGL VSync."
@@ -871,7 +872,7 @@ msgstr "Das belegen von glXSwapIntervalMESA ist fehlgeschlagen"
 
 #: panel.cpp:2331
 msgid "No support for wglGetExtensionsStringEXT"
-msgstr " \nKeine Unterstützung für wglGetExtensionsStringEXT"
+msgstr "Keine Unterstützung für wglGetExtensionsStringEXT"
 
 #: panel.cpp:2334
 msgid "No support for WGL_EXT_swap_control"
@@ -883,7 +884,7 @@ msgstr "Das belegen von wglSwapIntervalEXT ist fehlgeschlagen"
 
 #: panel.cpp:2349
 msgid "No VSYNC available on this platform"
-msgstr "VSYNC ist auf dieser Plattform nicht verfügbar"
+msgstr "V-Sync ist auf dieser Plattform nicht verfügbar"
 
 #: panel.cpp:2444
 msgid "Memory allocation error"
@@ -975,7 +976,7 @@ msgstr "Bilddateien (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
 #: sys.cpp:942
 msgid "Save printer image to"
-msgstr "Druckerbild speichern in"
+msgstr "Druckerbild speichern unter"
 
 #: sys.cpp:956 sys.cpp:1140
 #, c-format
@@ -984,7 +985,7 @@ msgstr "Druckerbild gespeichert in %s"
 
 #: sys.cpp:961 sys.cpp:1032
 msgid "&Close"
-msgstr "S&chließen"
+msgstr "Schließen"
 
 #: sys.cpp:1027
 msgid "Printed"
@@ -3534,7 +3535,7 @@ msgstr "Benutzeroberfläche..."
 
 #: xrc/MainMenu.xrc:569
 msgid "Enable &Status bar"
-msgstr ""
+msgstr "Statusleiste aktivieren"
 
 #: xrc/MainMenu.xrc:573
 msgid "Hide &Menu Bar"
@@ -3542,7 +3543,7 @@ msgstr "&Menüleiste verstecken"
 
 #: xrc/MainMenu.xrc:577
 msgid "Suspend &Screen Saver"
-msgstr ""
+msgstr "Bildschirmschoner unterbrechen"
 
 #: xrc/MainMenu.xrc:583
 msgid "&Tools"
@@ -3554,15 +3555,15 @@ msgstr "&Cheats"
 
 #: xrc/MainMenu.xrc:587
 msgid "List &cheats..."
-msgstr ""
+msgstr "Cheats auflisten..."
 
 #: xrc/MainMenu.xrc:590
 msgid "Find c&heat..."
-msgstr ""
+msgstr "Cheat finden..."
 
 #: xrc/MainMenu.xrc:594
 msgid "A&utomatically save / load cheats"
-msgstr ""
+msgstr "Cheats automatisch Speichern / Laden"
 
 #: xrc/MainMenu.xrc:598
 msgid "&Enable cheats"
@@ -3662,7 +3663,7 @@ msgstr "Fehler melden"
 
 #: xrc/MainMenu.xrc:733
 msgid "Visual Boy Advance-M Support &Forum"
-msgstr ""
+msgstr "Visual Boy Advance-M Support Forum"
 
 #: xrc/MainMenu.xrc:736
 msgid "Translations"
@@ -3790,7 +3791,7 @@ msgstr "Paletten-Betrachter"
 
 #: xrc/PaletteViewer.xrc:88
 msgid "C&hange backdrop color..."
-msgstr "&Hintergrundfarbe ändern..."
+msgstr "Hintergrundfarbe ändern..."
 
 #: xrc/SoundConfig.xrc:4
 msgid "Sound Settings"
@@ -3810,7 +3811,7 @@ msgstr "Maximum"
 
 #: xrc/SoundConfig.xrc:73
 msgid "Sample rate:"
-msgstr ""
+msgstr "Abtastrate:"
 
 #: xrc/SoundConfig.xrc:79
 msgid "48 KHz"
@@ -3898,4 +3899,4 @@ msgstr "Bildsprung"
 
 #: xrc/SpeedupConfig.xrc:61
 msgid "Mute Sound"
-msgstr ""
+msgstr "Ton stumm schalten"
