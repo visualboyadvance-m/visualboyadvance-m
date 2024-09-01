@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Hoseok Seo <ddinghoya@gmail.com>, 2022-2023
+# Hoseok Seo <ddinghoya@gmail.com>, 2022-2024
 # JunYoung Ahn <ajy9812@gmail.com>, 2021
 # mp hdte <mphdte@gmail.com>, 2020
 # park seungbin <parksengbin48@gmail.com>, 2019
@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-05 20:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Hoseok Seo <ddinghoya@gmail.com>, 2022-2023\n"
+"Last-Translator: Hoseok Seo <ddinghoya@gmail.com>, 2022-2024\n"
 "Language-Team: Korean (Korea) (http://app.transifex.com/bgk/vba-m/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,7 +24,7 @@ msgstr ""
 
 #: audio/internal/openal.cpp:188
 msgid "OpenAL: Failed to open audio device"
-msgstr ""
+msgstr "OpenAL: 오디오 장치 열기 실패함"
 
 #: audio/internal/openal.cpp:386 audio/internal/faudio.cpp:492
 #: audio/internal/xaudio2.cpp:577
@@ -69,7 +69,7 @@ msgstr "닷 코드 파일을 선택"
 
 #: cmdevents.cpp:365 cmdevents.cpp:387
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr ""
+msgstr "E-리더 닷 코드 (*.bin;*.raw)|*.bin;*.raw"
 
 #: cmdevents.cpp:406 cmdevents.cpp:601
 msgid "Select battery file"
@@ -530,11 +530,11 @@ msgstr "%04X (실제: %04X)"
 #: dialogs/sound-config.cpp:251
 #, c-format
 msgid "%d frame = %.2f ms"
-msgstr ""
+msgstr "%d 프레임 = %.2f ms"
 
 #: extra-translations.cpp:13
 msgid "&Apply"
-msgstr "적용(&A)"
+msgstr "적용 (&A)"
 
 #: extra-translations.cpp:14
 msgid "Artists"
@@ -664,15 +664,15 @@ msgstr "32비트"
 
 #: guiinit.cpp:1057
 msgid "Signed decimal"
-msgstr ""
+msgstr "부호가 있는 10진수"
 
 #: guiinit.cpp:1061
 msgid "Unsigned decimal"
-msgstr ""
+msgstr "부호 없는 10진수"
 
 #: guiinit.cpp:1065
 msgid "Unsigned hexadecimal"
-msgstr ""
+msgstr "부호 없는 16진수"
 
 #: guiinit.cpp:1637
 msgid "Main icon not found"
@@ -875,23 +875,23 @@ msgstr "이 플랫폼에서는 VSYNC를 사용할 수 없습니다."
 
 #: panel.cpp:2444
 msgid "Memory allocation error"
-msgstr ""
+msgstr "메모리 할당 오류"
 
 #: panel.cpp:2447
 msgid "Error initializing codec"
-msgstr ""
+msgstr "코덱 초기화 오류"
 
 #: panel.cpp:2450
 msgid "Error writing to output file"
-msgstr ""
+msgstr "출력 파일에 쓰는 중 오류"
 
 #: panel.cpp:2453
 msgid "Can't guess output format from file name"
-msgstr ""
+msgstr "파일 이름으로 출력 형식을 추측할 수 없음"
 
 #: panel.cpp:2458
 msgid "Programming error; aborting!"
-msgstr ""
+msgstr "프로그래밍 오류; 중단합니다!"
 
 #: panel.cpp:2470 panel.cpp:2499
 #, c-format
@@ -1002,15 +1002,15 @@ msgstr "메모리 덤프 파일을 선택"
 
 #: viewsupt.cpp:789
 msgid "Red:"
-msgstr ""
+msgstr "빨강:"
 
 #: viewsupt.cpp:798
 msgid "Green:"
-msgstr ""
+msgstr "초록:"
 
 #: viewsupt.cpp:807
 msgid "Blue:"
-msgstr ""
+msgstr "파랑:"
 
 #: viewsupt.h:63
 #, c-format
@@ -1174,27 +1174,27 @@ msgstr "아래 동작"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
 msgid "Motion Left"
-msgstr ""
+msgstr "모션 왼쪽"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
 msgid "Motion Right"
-msgstr ""
+msgstr "모션 오른쪽"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
 msgid "Motion In"
-msgstr ""
+msgstr "모션 인"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
 msgid "Motion Out"
-msgstr ""
+msgstr "모션 아웃"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
 msgid "Auto A"
-msgstr ""
+msgstr "자동 A"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
 msgid "Auto B"
-msgstr ""
+msgstr "자동 B"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
 #: xrc/DisplayConfig.xrc:200
@@ -1203,16 +1203,16 @@ msgstr "속도"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
 msgid "Capture"
-msgstr ""
+msgstr "캡처"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:33
 msgid "GameShark"
-msgstr ""
+msgstr "게임샤크"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:107
 #, c-format
 msgid "Joypad %zu %s"
-msgstr ""
+msgstr "조이패드 %zu %s"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:382
 msgid "Use bilinear filter with 3d renderer"
@@ -1399,7 +1399,7 @@ msgstr "싱글 플레이어 모드에서 사용할 스틱의 수"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:474
 msgid "Whether to enable SDL GameController mode"
-msgstr ""
+msgstr "SDL 게임컨트롤러 모드를 활성화할지 여부"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:478
 msgid ""
@@ -1530,7 +1530,7 @@ msgstr "스로틀 속도 향상을 위해 프레임 건너뛰기 사용"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:536
 msgid "Mute sound during speedup"
-msgstr ""
+msgstr "속도 향상 중 소리 음소거"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:537
 msgid "Use the specified BIOS file for Game Boy"
@@ -1638,11 +1638,11 @@ msgstr "사운드 샘플링 속도 (kHz)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
 msgid "Use DirectSound hardware acceleration"
-msgstr ""
+msgstr "DirectSound 하드웨어 가속 사용"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:575
 msgid "Upmix stereo to surround"
-msgstr ""
+msgstr "스테레오를 서라운드로 업믹스"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:576
 msgid "Sound volume (%)"
@@ -1827,46 +1827,46 @@ msgstr "Meta+"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:238
 #, c-format
 msgid "Joystick %d"
-msgstr ""
+msgstr "조이스틱 %d"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:268
 #, c-format
 msgid "%s: Axis %d+"
-msgstr ""
+msgstr "%s: 축 %d+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:270
 #, c-format
 msgid "%s: Axis %d-"
-msgstr ""
+msgstr "%s: 축 %d-"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:272
 #, c-format
 msgid "%s: Button %d"
-msgstr ""
+msgstr "%s: 버튼 %d"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:274
 #, c-format
 msgid "%s: Hat %d North"
-msgstr ""
+msgstr "%s: 햇 %d 북쪽"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:276
 #, c-format
 msgid "%s: Hat %d South"
-msgstr ""
+msgstr "%s: 햇 %d 남쪽"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:278
 #, c-format
 msgid "%s: Hat %d West"
-msgstr ""
+msgstr "%s: 햇 %d 서쪽"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:280
 #, c-format
 msgid "%s: Hat %d East"
-msgstr ""
+msgstr "%s: 햇 %d 동쪽"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:315
 msgid "Key"
-msgstr ""
+msgstr "키"
 
 #: audio/internal/dsound.cpp:105 audio/internal/dsound.cpp:120
 #, c-format
@@ -1942,15 +1942,15 @@ msgstr "XAudio2: 소스 음성 작성에 실패했습니다!"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:639
 msgid "Error, link already connected"
-msgstr ""
+msgstr "오류, 링크가 이미 연결됨"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:653
 msgid "Unable to find link driver"
-msgstr ""
+msgstr "링크 드라이버를 찾을 수 없음"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:696
 msgid "Link connection does not need updates."
-msgstr ""
+msgstr "링크 연결에 업데이트가 필요하지 않습니다."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:835
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:899
@@ -1958,77 +1958,77 @@ msgstr ""
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2878
 #, c-format
 msgid "Player %d disconnected."
-msgstr ""
+msgstr "플레이어 %d의 연결이 끊어졌습니다."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:939
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:979
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1019
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1654
 msgid "Server disconnected."
-msgstr ""
+msgstr "서버 연결이 끊어졌습니다."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1101
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1133
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1678
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1711
 msgid "Network error."
-msgstr ""
+msgstr "네트워크 오류입니다."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1110
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1687
 #, c-format
 msgid "Player %d connected"
-msgstr ""
+msgstr "플레이어 %d 연결됨"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1124
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1701
 msgid "All players connected"
-msgstr ""
+msgstr "모든 플레이어 연결됨"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1145
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1723
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
-msgstr ""
+msgstr "#%d으로 연결됨, %d 플레이어 참여 대기 중"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1154
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1732
 msgid "All players joined."
-msgstr ""
+msgstr "모든 플레이어가 참여했습니다."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1647
 msgid "Server timed out."
-msgstr ""
+msgstr "서버 시간이 초과되었습니다."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2601
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2622
 msgid "Error creating file mapping"
-msgstr ""
+msgstr "파일 매핑 생성 오류"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2612
 msgid "Error mapping file"
-msgstr ""
+msgstr "매핑 파일 오류"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2659
 msgid "5 or more GBAs not supported."
-msgstr ""
+msgstr "5개 이상의 GBA는 지원되지 않습니다."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2678
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2697
 msgid "Error opening event"
-msgstr ""
+msgstr "이벤트 열기 오류"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2797
 msgid "Lost link; reinitialize to reconnect"
-msgstr ""
+msgstr "링크가 끊어짐; 다시 연결하려면 다시 초기화"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2804
 msgid "Lost link; reconnected"
-msgstr ""
+msgstr "링크가 끊어짐; 다시 연결됨"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2925
 msgid "Unknown slave timed out; resetting comm"
-msgstr ""
+msgstr "알 수 없는 슬레이브 시간 초과; 통신 재설정"
 
 #: xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
@@ -2036,7 +2036,7 @@ msgstr "단축키"
 
 #: xrc/AccelConfig.xrc:26
 msgid "Co&mmands:"
-msgstr "커맨드(&M):"
+msgstr "커맨드 (&M):"
 
 #: xrc/AccelConfig.xrc:47
 msgid "Current Keys:"
@@ -2044,15 +2044,15 @@ msgstr "현재 키:"
 
 #: xrc/AccelConfig.xrc:62
 msgid "&Assign"
-msgstr "할당(&A)"
+msgstr "할당 (&A)"
 
 #: xrc/AccelConfig.xrc:69
 msgid "&Remove"
-msgstr "제거(&R)"
+msgstr "제거 (&R)"
 
 #: xrc/AccelConfig.xrc:76
 msgid "Re&set All"
-msgstr "전부 리셋(&S)"
+msgstr "모두 재설정 (&S)"
 
 #: xrc/AccelConfig.xrc:92
 msgid "Currently assigned to:"
@@ -2068,11 +2068,11 @@ msgstr "치트 추가"
 
 #: xrc/CheatAdd.xrc:9 xrc/CheatEdit.xrc:9
 msgid "&Description"
-msgstr "설명(&D)"
+msgstr "설명 (&D)"
 
 #: xrc/CheatAdd.xrc:53
 msgid "&Value"
-msgstr "값(&V)"
+msgstr "값 (&V)"
 
 #: xrc/CheatAdd.xrc:77
 msgid "Format"
@@ -2084,27 +2084,27 @@ msgstr "치트 검색"
 
 #: xrc/CheatCreate.xrc:23
 msgid "E&qual"
-msgstr "동일(&Q)"
+msgstr "같음 (&Q)"
 
 #: xrc/CheatCreate.xrc:31
 msgid "&Not equal"
-msgstr "비동일 (&N)"
+msgstr "같지 않음 (&N)"
 
 #: xrc/CheatCreate.xrc:38
 msgid "&Less than"
-msgstr "보다 작음(&L)"
+msgstr "보다 작음 (&L)"
 
 #: xrc/CheatCreate.xrc:45
 msgid "L&ess or equal"
-msgstr "작거나 같음(&E)"
+msgstr "작거나 같음 (&E)"
 
 #: xrc/CheatCreate.xrc:52
 msgid "&Greater than"
-msgstr "보다 큼(&G)"
+msgstr "보다 큼 (&G)"
 
 #: xrc/CheatCreate.xrc:59
 msgid "G&reater or equal"
-msgstr "크거나 같음(&R)"
+msgstr "크거나 같음 (&R)"
 
 #: xrc/CheatCreate.xrc:64
 msgid "Compare type"
@@ -2116,11 +2116,11 @@ msgstr "부호화 (&I)"
 
 #: xrc/CheatCreate.xrc:85
 msgid "&Unsigned"
-msgstr "비부호화(&U)"
+msgstr "비부호화 (&U)"
 
 #: xrc/CheatCreate.xrc:92
 msgid "&Hexadecimal"
-msgstr "16진수(&H)"
+msgstr "16진수 (&H)"
 
 #: xrc/CheatCreate.xrc:97
 msgid "Signed / Unsigned"
@@ -2128,15 +2128,15 @@ msgstr "서명 / 미서명"
 
 #: xrc/CheatCreate.xrc:107
 msgid "&8 bits"
-msgstr "&8 비트"
+msgstr "8 비트 (&8)"
 
 #: xrc/CheatCreate.xrc:115
 msgid "&16 bits"
-msgstr "&16 비트"
+msgstr "16 비트 (&1)"
 
 #: xrc/CheatCreate.xrc:122
 msgid "&32 bits"
-msgstr "&32 비트"
+msgstr "32 비트 (&3)"
 
 #: xrc/CheatCreate.xrc:127
 msgid "Data size"
@@ -2144,11 +2144,11 @@ msgstr "데이터 크기"
 
 #: xrc/CheatCreate.xrc:144
 msgid "Ol&d value"
-msgstr "이전 값(&D)"
+msgstr "이전 값 (&D)"
 
 #: xrc/CheatCreate.xrc:152
 msgid "Specific &value"
-msgstr "특정 값(&V)"
+msgstr "특정 값 (&V)"
 
 #: xrc/CheatCreate.xrc:163
 msgid "Search value"
@@ -2156,11 +2156,11 @@ msgstr "값 찾기"
 
 #: xrc/CheatCreate.xrc:181
 msgid "&Search"
-msgstr "검색(&S)"
+msgstr "검색 (&S)"
 
 #: xrc/CheatCreate.xrc:188
 msgid "U&pdate Old"
-msgstr "이전 값 갱신(&U)"
+msgstr "이전 업데이트 (&U)"
 
 #: xrc/CheatCreate.xrc:195 xrc/JoyPanel.xrc:29 xrc/JoyPanel.xrc:52
 #: xrc/JoyPanel.xrc:75 xrc/JoyPanel.xrc:98 xrc/JoyPanel.xrc:121
@@ -2171,11 +2171,11 @@ msgstr "이전 값 갱신(&U)"
 #: xrc/JoyPanel.xrc:422 xrc/JoyPanel.xrc:444 xrc/JoyPanel.xrc:475
 #: xrc/JoyPanel.xrc:497 xrc/Logging.xrc:119
 msgid "&Clear"
-msgstr "지우기(&C)"
+msgstr "지우기 (&C)"
 
 #: xrc/CheatCreate.xrc:202
 msgid "&Add cheat"
-msgstr "치트 추가(&A)"
+msgstr "치트 추가 (&A)"
 
 #: xrc/CheatEdit.xrc:4
 msgid "Edit Cheat"
@@ -2183,11 +2183,11 @@ msgstr "치트 편집"
 
 #: xrc/CheatEdit.xrc:31 xrc/MainMenu.xrc:275
 msgid "&Type"
-msgstr "형식(&T)"
+msgstr "형식 (&T)"
 
 #: xrc/CheatEdit.xrc:53
 msgid "C&odes"
-msgstr "코드(&O)"
+msgstr "코드 (&O)"
 
 #: xrc/CheatList.xrc:4
 msgid "Cheat List"
@@ -2255,11 +2255,11 @@ msgstr "분해"
 
 #: xrc/Disassemble.xrc:15
 msgid "&Automatic"
-msgstr "자동(&A)"
+msgstr "자동 (&A)"
 
 #: xrc/Disassemble.xrc:45 xrc/GBDisassemble.xrc:18 xrc/MemViewer.xrc:47
 msgid "&Go"
-msgstr "&Go"
+msgstr "가기 (&G)"
 
 #: xrc/Disassemble.xrc:414 xrc/MapViewer.xrc:76 xrc/OAMViewer.xrc:37
 msgid "Mode:"
@@ -2270,7 +2270,7 @@ msgstr "모드:"
 #: xrc/MemViewer.xrc:72 xrc/OAMViewer.xrc:109 xrc/PaletteViewer.xrc:81
 #: xrc/TileViewer.xrc:91
 msgid "Automatic &update"
-msgstr "자동 업데이트(&U)"
+msgstr "자동 업데이트 (&U)"
 
 #: xrc/Disassemble.xrc:453 xrc/GBDisassemble.xrc:222
 msgid "G&oto PC"
@@ -2882,7 +2882,7 @@ msgstr "공백이나 0 입력 시 되감기 비활성화 (단위: 초)"
 
 #: xrc/GeneralConfig.xrc:67
 msgid "Seconds (0-600); 0 = disable"
-msgstr ""
+msgstr "초 (0-600); 0 = 비활성화"
 
 #: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
@@ -2890,7 +2890,7 @@ msgstr "명령 처리빈도 조절(&T)"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "Percent of normal:"
-msgstr ""
+msgstr "정상의 퍼센트:"
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
@@ -2965,7 +2965,7 @@ msgstr "조이패드 설정"
 
 #: xrc/JoypadConfig.xrc:10
 msgid "SDL GameController Mode"
-msgstr ""
+msgstr "SDL 게임 컨트롤러 모드"
 
 #: xrc/JoypadConfig.xrc:19
 msgid "Player 1"
@@ -3498,111 +3498,111 @@ msgstr "게임보이 바이오스 파일 사용 (재시작 필요)(&U)"
 
 #: xrc/MainMenu.xrc:550
 msgid "&Use Game Boy Color BIOS file"
-msgstr "게임보이 컬러 바이오스 파일 사용(&U)"
+msgstr "게임보이 컬러 바이오스 파일 사용 (&U)"
 
 #: xrc/MainMenu.xrc:555
 msgid "&General..."
-msgstr "일반사항(&G)..."
+msgstr "일반사항 (&G)..."
 
 #: xrc/MainMenu.xrc:558
 msgid "&Speedup / Turbo..."
-msgstr "스피드업 / 터보(&S)..."
+msgstr "스피드업 / 터보 (&S)..."
 
 #: xrc/MainMenu.xrc:561
 msgid "D&irectories..."
-msgstr "디렉토리(&I)..."
+msgstr "디렉토리 (&I)..."
 
 #: xrc/MainMenu.xrc:564
 msgid "&Key Shortcuts..."
-msgstr "키 단축키(&K)..."
+msgstr "단축키 (&K)..."
 
 #: xrc/MainMenu.xrc:567
 msgid "UI Settings"
-msgstr ""
+msgstr "UI 설정"
 
 #: xrc/MainMenu.xrc:569
 msgid "Enable &Status bar"
-msgstr ""
+msgstr "상태 표시줄 활성화 (&S)"
 
 #: xrc/MainMenu.xrc:573
 msgid "Hide &Menu Bar"
-msgstr ""
+msgstr "&메뉴바 숨기기 (&M)"
 
 #: xrc/MainMenu.xrc:577
 msgid "Suspend &Screen Saver"
-msgstr ""
+msgstr "화면 보호기 일시 중지 (&S)"
 
 #: xrc/MainMenu.xrc:583
 msgid "&Tools"
-msgstr "도구(&T)"
+msgstr "도구 (&T)"
 
 #: xrc/MainMenu.xrc:585
 msgid "&Cheats"
-msgstr "치트(&C)"
+msgstr "치트 (&C)"
 
 #: xrc/MainMenu.xrc:587
 msgid "List &cheats..."
-msgstr "치트 목록(&C)..."
+msgstr "치트 목록 (&C)..."
 
 #: xrc/MainMenu.xrc:590
 msgid "Find c&heat..."
-msgstr "치트 찾기(&H)..."
+msgstr "치트 찾기 (&H)..."
 
 #: xrc/MainMenu.xrc:594
 msgid "A&utomatically save / load cheats"
-msgstr "자동으로 치트 저장 / 불러오기(&U)"
+msgstr "자동으로 치트 저장 / 불러오기 (&U)"
 
 #: xrc/MainMenu.xrc:598
 msgid "&Enable cheats"
-msgstr "치트 활성화(&E)"
+msgstr "치트 활성화 (&E)"
 
 #: xrc/MainMenu.xrc:605
 msgid "&Break into GDB"
-msgstr "GNU 디버깅 시스템 침입(&B)"
+msgstr "GDN  브레이크 (&B)"
 
 #: xrc/MainMenu.xrc:609
 msgid "&Configure port..."
-msgstr "포트 구성(&C)..."
+msgstr "포트 구성 (&C)..."
 
 #: xrc/MainMenu.xrc:612
 msgid "&Break on load"
-msgstr "불러오기 시 침입(&B)"
+msgstr "불러오기 시 브레이크 (&B)"
 
 #: xrc/MainMenu.xrc:617
 msgid "&Disconnect"
-msgstr "연결 끊기(&D)"
+msgstr "연결 끊기 (&D)"
 
 #: xrc/MainMenu.xrc:622
 msgid "&Disassemble..."
-msgstr "파일 분석(&D)..."
+msgstr "파일 분석 (&D)..."
 
 #: xrc/MainMenu.xrc:625
 msgid "&Logging..."
-msgstr "기록(&L)..."
+msgstr "기록 (&L)..."
 
 #: xrc/MainMenu.xrc:628
 msgid "&IO Viewer..."
-msgstr "입출력 뷰어(&I)..."
+msgstr "입출력 뷰어 (&I)..."
 
 #: xrc/MainMenu.xrc:631
 msgid "&Map Viewer..."
-msgstr "맵 뷰어(&M)..."
+msgstr "맵 뷰어 (&M)..."
 
 #: xrc/MainMenu.xrc:634
 msgid "M&emory Viewer..."
-msgstr "메모리 뷰어(&E)..."
+msgstr "메모리 뷰어 (&E)..."
 
 #: xrc/MainMenu.xrc:637
 msgid "&OAM Viewer..."
-msgstr "OAM(운용관리 시스템) 뷰어(&O)..."
+msgstr "OAM 뷰어 (&O)..."
 
 #: xrc/MainMenu.xrc:640
 msgid "&Palette Viewer..."
-msgstr "팔레트 뷰어(&P)..."
+msgstr "팔레트 뷰어 (&P)..."
 
 #: xrc/MainMenu.xrc:643
 msgid "&Tile Viewer..."
-msgstr "타일 뷰어(&T)..."
+msgstr "타일 뷰어 (&T)..."
 
 #: xrc/MainMenu.xrc:648
 msgid "Show all video layers"
@@ -3610,47 +3610,47 @@ msgstr "모든 비디오 레이어 표시"
 
 #: xrc/MainMenu.xrc:691
 msgid "&View Layers"
-msgstr "레이어 보기(&V)"
+msgstr "레이어 보기 (&V)"
 
 #: xrc/MainMenu.xrc:695
 msgid "Channel &1"
-msgstr "채널 &1"
+msgstr "채널 1 (&1)"
 
 #: xrc/MainMenu.xrc:700
 msgid "Channel &2"
-msgstr "채널 &2"
+msgstr "채널 2 (&2)"
 
 #: xrc/MainMenu.xrc:705
 msgid "Channel &3"
-msgstr "채널 &3"
+msgstr "채널 3 (&3)"
 
 #: xrc/MainMenu.xrc:710
 msgid "Channel &4"
-msgstr "채널 &4"
+msgstr "채널 4 (&4)"
 
 #: xrc/MainMenu.xrc:715
 msgid "Direct Sound &A"
-msgstr "다이렉트 사운드 &A"
+msgstr "다이렉트 사운드 A (&A)"
 
 #: xrc/MainMenu.xrc:720
 msgid "Direct Sound &B"
-msgstr "다이렉트 사운드 &B"
+msgstr "다이렉트 사운드 B (&B)"
 
 #: xrc/MainMenu.xrc:724
 msgid "&Sound Channels"
-msgstr "음향 채널(&S)"
+msgstr "음향 채널 (&S)"
 
 #: xrc/MainMenu.xrc:728
 msgid "&Help"
-msgstr "도움말(&H)"
+msgstr "도움말 (&H)"
 
 #: xrc/MainMenu.xrc:730
 msgid "Report &Bugs"
-msgstr "버그 제보(&B)"
+msgstr "버그 제보 (&B)"
 
 #: xrc/MainMenu.xrc:733
 msgid "Visual Boy Advance-M Support &Forum"
-msgstr "Visual Boy Advance-M 지원 포럼(&F)"
+msgstr "Visual Boy Advance-M 지원 포럼 (&F)"
 
 #: xrc/MainMenu.xrc:736
 msgid "Translations"
@@ -3738,7 +3738,7 @@ msgstr "네트워크 연결 시작"
 
 #: xrc/NetLink.xrc:13
 msgid "WARNING: Link will likely not work over the internet or LAN."
-msgstr ""
+msgstr "경고: 인터넷이나 LAN에서는 링크가 작동하지 않을 가능성이 높습니다."
 
 #: xrc/NetLink.xrc:38
 msgid "Server"
@@ -3754,7 +3754,7 @@ msgstr "사용자 수:"
 
 #: xrc/NetLink.xrc:83
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: xrc/NetLink.xrc:107
 msgid "Server:"
@@ -3886,4 +3886,4 @@ msgstr "프레임 생략"
 
 #: xrc/SpeedupConfig.xrc:61
 msgid "Mute Sound"
-msgstr ""
+msgstr "소리 음소거"
