@@ -616,7 +616,7 @@ msgstr "치트파일 선택"
 
 #: guiinit.cpp:251
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
-msgstr "VBA 치트 리스트 (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
+msgstr "VBA 치트 목록 (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 
 #: guiinit.cpp:270 panel.cpp:550
 msgid "Loaded cheats"
@@ -624,7 +624,7 @@ msgstr "치트 불러오기"
 
 #: guiinit.cpp:304
 msgid "VBA cheat lists (*.clt)|*.clt"
-msgstr "VBA 치트 파일 (*.clt)|*.clt"
+msgstr "VBA 치트 목록 (*.clt)|*.clt"
 
 #: guiinit.cpp:322
 msgid "Saved cheats"
@@ -1052,7 +1052,7 @@ msgstr "shared link state 파일이 존재한다면 삭제합니다."
 
 #: wxvbam.cpp:645
 msgid "List all settable options and exit"
-msgstr "설정 가능한 옵션을 나열하고 종료합니다."
+msgstr "설정 가능한 옵션을 나열하고 종료"
 
 #: wxvbam.cpp:648
 msgid "ROM file"
@@ -2274,15 +2274,15 @@ msgstr "자동 업데이트 (&U)"
 
 #: xrc/Disassemble.xrc:453 xrc/GBDisassemble.xrc:222
 msgid "G&oto PC"
-msgstr "PC로 가기(&o)"
+msgstr "PC로 가기 (&O)"
 
 #: xrc/Disassemble.xrc:460 xrc/GBDisassemble.xrc:229
 msgid "Re&fresh"
-msgstr "새로고침(&F)"
+msgstr "새로고침 (&F)"
 
 #: xrc/Disassemble.xrc:467 xrc/GBDisassemble.xrc:236
 msgid "&Next"
-msgstr "다음(&N)"
+msgstr "다음 (&N)"
 
 #: xrc/DisplayConfig.xrc:4
 msgid "Display settings"
@@ -2374,7 +2374,7 @@ msgstr "프레임 생략"
 
 #: xrc/DisplayConfig.xrc:178
 msgid "&Number of frames to skip:"
-msgstr "건너뛸 프레임 수(&N):"
+msgstr "건너뛸 프레임 수 (&N):"
 
 #: xrc/DisplayConfig.xrc:216
 msgid "Speed indicator:"
@@ -2540,11 +2540,11 @@ msgstr "맵 베이스"
 #: xrc/GBMapViewer.xrc:54 xrc/GBOAMViewer.xrc:88 xrc/GBTileViewer.xrc:68
 #: xrc/MapViewer.xrc:62 xrc/OAMViewer.xrc:104 xrc/TileViewer.xrc:84
 msgid "Stretch to &fit"
-msgstr "화면에 맞춤(&F)"
+msgstr "화면에 맞춤 (&F)"
 
 #: xrc/GBMapViewer.xrc:59 xrc/MapViewer.xrc:67
 msgid "Auto &update"
-msgstr "자동 업데이트(&U)"
+msgstr "자동 업데이트 (&U)"
 
 #: xrc/GBMapViewer.xrc:74 xrc/GBTileViewer.xrc:99 xrc/MapViewer.xrc:144
 #: xrc/MemSelRegion.xrc:10 xrc/PaletteViewer.xrc:50 xrc/TileViewer.xrc:115
@@ -2574,11 +2574,11 @@ msgstr "우선도:"
 #: xrc/MemViewer.xrc:101 xrc/OAMViewer.xrc:155 xrc/PaletteViewer.xrc:100
 #: xrc/TileViewer.xrc:161
 msgid "&Refresh"
-msgstr "새로고침(&R)"
+msgstr "새로고침 (&R)"
 
 #: xrc/GBMapViewer.xrc:157 xrc/Logging.xrc:112 xrc/MapViewer.xrc:219
 msgid "&Save"
-msgstr "저장(&S)"
+msgstr "저장 (&S)"
 
 #: xrc/GBOAMViewer.xrc:13 xrc/OAMViewer.xrc:14
 msgid "Sprite:"
@@ -2607,7 +2607,7 @@ msgstr "뱅크:"
 #: xrc/GBOAMViewer.xrc:149 xrc/GBTileViewer.xrc:152 xrc/MemViewer.xrc:115
 #: xrc/OAMViewer.xrc:162 xrc/TileViewer.xrc:168
 msgid "&Save..."
-msgstr "저장(&S)..."
+msgstr "저장 (&S)..."
 
 #: xrc/GBPaletteViewer.xrc:8 xrc/PaletteViewer.xrc:9
 msgid "Click on a color for more information"
@@ -2615,7 +2615,7 @@ msgstr "색을 클릭하면 추가 정보를 볼 수 있습니다."
 
 #: xrc/GBPaletteViewer.xrc:27 xrc/PaletteViewer.xrc:105
 msgid "Save &BG..."
-msgstr "배경 저장(&B)..."
+msgstr "배경 저장 (&B)..."
 
 #: xrc/GBPaletteViewer.xrc:38 xrc/PaletteViewer.xrc:33
 msgid "Sprite"
@@ -2623,7 +2623,7 @@ msgstr "스프라이트"
 
 #: xrc/GBPaletteViewer.xrc:48 xrc/PaletteViewer.xrc:111
 msgid "Save &Sprite..."
-msgstr "스프라이트 저장(&S)..."
+msgstr "스프라이트 저장 (&S)..."
 
 #: xrc/GBPaletteViewer.xrc:67
 msgid "Index:"
@@ -2635,7 +2635,7 @@ msgstr "값:"
 
 #: xrc/GBPrinter.xrc:21
 msgid "Print Si&ze"
-msgstr "출력 크기(&Z)"
+msgstr "출력 크기 (&Z)"
 
 #: xrc/GBPrinter.xrc:29
 msgid "1x"
@@ -2655,7 +2655,7 @@ msgstr "4배율"
 
 #: xrc/GBPrinter.xrc:58
 msgid "C&ontinue"
-msgstr "계속(&O)"
+msgstr "계속하기 (&O)"
 
 #: xrc/GBROMInfo.xrc:48
 msgid "Cartridge type:"
@@ -2798,7 +2798,7 @@ msgstr "미러링:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:254
 msgid "&Defaults"
-msgstr "기본(&D)"
+msgstr "기본 (&D)"
 
 #: xrc/GameBoyAdvanceConfig.xrc:261
 msgid "Game Overrides"
@@ -2810,11 +2810,11 @@ msgstr "게임보이 설정"
 
 #: xrc/GameBoyConfig.xrc:20
 msgid "Emulated &system:"
-msgstr "에뮬레이트된 시스템(&S):"
+msgstr "에뮬레이트된 시스템 (&S):"
 
 #: xrc/GameBoyConfig.xrc:48
 msgid "Display &borders:"
-msgstr "테두리 표시(&B):"
+msgstr "테두리 표시 (&B):"
 
 #: xrc/GameBoyConfig.xrc:57
 msgid "Never"
@@ -2830,7 +2830,7 @@ msgstr "시스템"
 
 #: xrc/GameBoyConfig.xrc:84
 msgid "Game Boy Boot &ROM file:"
-msgstr "게임보이 부팅  롬 파일(&R):"
+msgstr "게임보이 부팅  롬 파일 (&R):"
 
 #: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
 msgid "Select a File"
@@ -2838,7 +2838,7 @@ msgstr "파일을 선택하세요."
 
 #: xrc/GameBoyConfig.xrc:106
 msgid "Game Boy Color Boot ROM &file:"
-msgstr "게임보이 컬러 부팅 롬 파일(&F):"
+msgstr "게임보이 컬러 부팅 롬 파일 (&F):"
 
 #: xrc/GameBoyConfig.xrc:131
 msgid "Current Game Boy BIOS file:"
@@ -2874,7 +2874,7 @@ msgstr "스크린샷 형식:"
 
 #: xrc/GeneralConfig.xrc:57
 msgid "&Rewind interval:"
-msgstr "되감기 간격(&R):"
+msgstr "되감기 간격 (&R):"
 
 #: xrc/GeneralConfig.xrc:58
 msgid "If not empty or 0, enable rewind (seconds)"
@@ -2886,7 +2886,7 @@ msgstr "초 (0-600); 0 = 비활성화"
 
 #: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
-msgstr "명령 처리빈도 조절(&T)"
+msgstr "명령 처리빈도 조절 (&T)"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "Percent of normal:"
@@ -2997,23 +2997,23 @@ msgstr "로그 기록중"
 
 #: xrc/Logging.xrc:20
 msgid "Unaligned &memory"
-msgstr "비할당 메모리(&M)"
+msgstr "비할당 메모리 (&M)"
 
 #: xrc/Logging.xrc:27
 msgid "Illegal &write"
-msgstr "비정상적인 작성(&W)"
+msgstr "비정상적인 작성 (&W)"
 
 #: xrc/Logging.xrc:34
 msgid "Illegal &read"
-msgstr "비정상적인 읽기(&R)"
+msgstr "비정상적인 읽기 (&R)"
 
 #: xrc/Logging.xrc:69
 msgid "&Undefined instruction"
-msgstr "정의되지 않은 지시(&U)"
+msgstr "정의되지 않은 지시 (&U)"
 
 #: xrc/Logging.xrc:83
 msgid "Soun&d output"
-msgstr "음향 출력(&D)"
+msgstr "사운드 출력 (&D)"
 
 #: xrc/Logging.xrc:88
 msgid "Verbose"
@@ -3021,7 +3021,7 @@ msgstr "상세"
 
 #: xrc/MainMenu.xrc:5
 msgid "&File"
-msgstr "파일(&F)"
+msgstr "파일 (&F)"
 
 #: xrc/MainMenu.xrc:7
 msgid "Open..."
@@ -3029,51 +3029,51 @@ msgstr "열기..."
 
 #: xrc/MainMenu.xrc:10
 msgid "Open &Game Boy..."
-msgstr "게임보이 열기(&G)..."
+msgstr "게임보이 열기 (&G)..."
 
 #: xrc/MainMenu.xrc:13
 msgid "Open Game Boy &Color..."
-msgstr "게임보이 컬러 열기(&C)..."
+msgstr "게임보이 컬러 열기 (&C)..."
 
 #: xrc/MainMenu.xrc:16
 msgid "Open rece&nt"
-msgstr "최근 ROM 열기(&N)"
+msgstr "최근 ROM 열기 (&N)"
 
 #: xrc/MainMenu.xrc:18
 msgid "&Reset recent list"
-msgstr "최근 목록 지우기(&R)"
+msgstr "최근 목록 지우기 (&R)"
 
 #: xrc/MainMenu.xrc:21
 msgid "&Freeze recent list"
-msgstr "최근 목록 고정(&F)"
+msgstr "최근 목록 고정 (&F)"
 
 #: xrc/MainMenu.xrc:26
 msgid "ROM in&formation..."
-msgstr "ROM 정보(&F)..."
+msgstr "ROM 정보 (&F)..."
 
 #: xrc/MainMenu.xrc:30
 msgid "&e-Reader"
-msgstr "&e-Reader"
+msgstr "e-리더 (&E)"
 
 #: xrc/MainMenu.xrc:32
 msgid "&Reset Loading Dot Code"
-msgstr "Dot Code 불러오기 취소(&R)"
+msgstr "닷 코드 불러오기 취소 (&R)"
 
 #: xrc/MainMenu.xrc:35
 msgid "&Load Dot Code..."
-msgstr "Dot Code 불러오기(&L)..."
+msgstr "닷 코드 불러오기 (&L)..."
 
 #: xrc/MainMenu.xrc:38
 msgid "&Reset Saving Dot Code"
-msgstr "Dot Code 저장 취소(&R)"
+msgstr "닷 코드 저장 취소 (&R)"
 
 #: xrc/MainMenu.xrc:41
 msgid "&Save Dot Code..."
-msgstr "Dot Code 저장(&S)..."
+msgstr "닷 코드 저장 (&S)..."
 
 #: xrc/MainMenu.xrc:47
 msgid "Most &recent"
-msgstr "가장 최근 ROM(&R)"
+msgstr "가장 최근 ROM (&R)"
 
 #: xrc/MainMenu.xrc:50
 msgid "Load current state slot"
@@ -3081,27 +3081,27 @@ msgstr "최근 저장 슬롯을 불러오기"
 
 #: xrc/MainMenu.xrc:53
 msgid "&Auto load most recent"
-msgstr "가장 최근 저장 자동 불러오기(&A)"
+msgstr "가장 최근 저장 자동 불러오기 (&A)"
 
 #: xrc/MainMenu.xrc:89
 msgid "From &File..."
-msgstr "파일에서(&F)..."
+msgstr "파일에서 (&F)..."
 
 #: xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
-msgstr "배터리 세이브 변경하지 않기(&B)"
+msgstr "배터리 세이브 변경하지 않기 (&B)"
 
 #: xrc/MainMenu.xrc:97
 msgid "Do not change &cheat list"
-msgstr "치트 목록 변경하지 않기(&C)"
+msgstr "치트 목록 변경하지 않기 (&C)"
 
 #: xrc/MainMenu.xrc:100
 msgid "&Load state"
-msgstr "상태 불러오기(&L)"
+msgstr "상태 불러오기 (&L)"
 
 #: xrc/MainMenu.xrc:104
 msgid "&Oldest slot"
-msgstr "가장 오래된 슬롯(&O)"
+msgstr "가장 오래된 슬롯 (&O)"
 
 #: xrc/MainMenu.xrc:107
 msgid "Save current state slot"
@@ -3113,47 +3113,47 @@ msgstr "저장 슬롯 수 확장 후 저장"
 
 #: xrc/MainMenu.xrc:117
 msgid "&2"
-msgstr "&2"
+msgstr "2 (&2)"
 
 #: xrc/MainMenu.xrc:120
 msgid "&3"
-msgstr "&3"
+msgstr "3 (&3)"
 
 #: xrc/MainMenu.xrc:123
 msgid "&4"
-msgstr "&4"
+msgstr "4 (&4)"
 
 #: xrc/MainMenu.xrc:126
 msgid "&5"
-msgstr "&5"
+msgstr "5 (&5)"
 
 #: xrc/MainMenu.xrc:129
 msgid "&6"
-msgstr "&6"
+msgstr "6 (&6)"
 
 #: xrc/MainMenu.xrc:132
 msgid "&7"
-msgstr "&7"
+msgstr "7 (&7)"
 
 #: xrc/MainMenu.xrc:135
 msgid "&8"
-msgstr "&8"
+msgstr "8 (&8)"
 
 #: xrc/MainMenu.xrc:138
 msgid "&9"
-msgstr "&9"
+msgstr "9 (&9)"
 
 #: xrc/MainMenu.xrc:141
 msgid "1&0"
-msgstr "1&0"
+msgstr "10 (&1)"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File..."
-msgstr "파일로(&F)..."
+msgstr "파일로 (&F)..."
 
 #: xrc/MainMenu.xrc:147
 msgid "&Save state"
-msgstr "상태 저장(&S)"
+msgstr "상태 저장 (&S)"
 
 #: xrc/MainMenu.xrc:150
 msgid "Increase state slot number"
@@ -3165,196 +3165,196 @@ msgstr "저장 슬롯 수 감축"
 
 #: xrc/MainMenu.xrc:158 xrc/MainMenu.xrc:170
 msgid "&Battery file..."
-msgstr "배터리 파일(&B)..."
+msgstr "배터리 파일 (&B)..."
 
 #: xrc/MainMenu.xrc:161
 msgid "Game Shark &code file..."
-msgstr "게임 샤크 코드 파일(&C)..."
+msgstr "게임 샤크 코드 파일 (&C)..."
 
 #: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
 msgid "&Game Shark snapshot..."
-msgstr "게임 샤크 스냅샷(&G)..."
+msgstr "게임 샤크 스냅샷 (&G)..."
 
 #: xrc/MainMenu.xrc:166
 msgid "&Import"
-msgstr "가져오기(&I)"
+msgstr "가져오기 (&I)"
 
 #: xrc/MainMenu.xrc:175
 msgid "&Export"
-msgstr "내보내기(&E)"
+msgstr "내보내기 (&E)"
 
 #: xrc/MainMenu.xrc:179
 msgid "Screen capt&ure..."
-msgstr "스크린 캡쳐(&U)..."
+msgstr "스크린 캡쳐 (&U)..."
 
 #: xrc/MainMenu.xrc:183
 msgid "Start &sound recording..."
-msgstr "녹음 시작(&S)..."
+msgstr "녹음 시작 (&S)..."
 
 #: xrc/MainMenu.xrc:186
 msgid "Stop s&ound recording"
-msgstr "녹음 중지(&O)"
+msgstr "녹음 중지 (&O)"
 
 #: xrc/MainMenu.xrc:189
 msgid "Start &video recording..."
-msgstr "동영상 녹화 시작(&V)..."
+msgstr "동영상 녹화 시작 (&V)..."
 
 #: xrc/MainMenu.xrc:192
 msgid "Stop v&ideo recording"
-msgstr "동영상 녹화 중지(&I)"
+msgstr "동영상 녹화 중지 (&I)"
 
 #: xrc/MainMenu.xrc:195
 msgid "Start &game recording..."
-msgstr "리플레이 기록 시작(&G)..."
+msgstr "리플레이 기록 시작 (&G)..."
 
 #: xrc/MainMenu.xrc:198
 msgid "Stop g&ame recording"
-msgstr "리플레이 기록 중지(&A)"
+msgstr "리플레이 기록 중지 (&A)"
 
 #: xrc/MainMenu.xrc:200
 msgid "&Record"
-msgstr "기록(&R)"
+msgstr "녹화 (&R)"
 
 #: xrc/MainMenu.xrc:204
 msgid "Start playing &movie..."
-msgstr "리플레이 재생 시작(&M)..."
+msgstr "리플레이 재생 시작 (&M)..."
 
 #: xrc/MainMenu.xrc:207
 msgid "Stop playing m&ovie"
-msgstr "리플레이 재생 정지(&O)"
+msgstr "리플레이 재생 정지 (&O)"
 
 #: xrc/MainMenu.xrc:209
 msgid "&Play"
-msgstr "재생(&P)"
+msgstr "재생 (&P)"
 
 #: xrc/MainMenu.xrc:214
 msgid "&Quit"
-msgstr "프로그램 종료(&Q)"
+msgstr "나가기 (&Q)"
 
 #: xrc/MainMenu.xrc:218
 msgid "&Emulation"
-msgstr "에뮬레이션(&E)"
+msgstr "에뮬레이션 (&E)"
 
 #: xrc/MainMenu.xrc:220
 msgid "&Pause"
-msgstr "일시정지(&P)"
+msgstr "일시정지 (&P)"
 
 #: xrc/MainMenu.xrc:224
 msgid "&Next frame"
-msgstr "다음 프레임(&N)"
+msgstr "다음 프레임 (&N)"
 
 #: xrc/MainMenu.xrc:227
 msgid "Re&wind"
-msgstr "되감기(&W)"
+msgstr "되감기 (&W)"
 
 #: xrc/MainMenu.xrc:231
 msgid "Toggle &full screen"
-msgstr "전체화면 전환(&F)"
+msgstr "전체화면 전환 (&F)"
 
 #: xrc/MainMenu.xrc:238
 msgid "&Turbo mode"
-msgstr "터보 모드(&T)"
+msgstr "터보 모드 (&T)"
 
 #: xrc/MainMenu.xrc:242
 msgid "&VSync"
-msgstr "수직동기화(&V)"
+msgstr "수직동기화 (&V)"
 
 #: xrc/MainMenu.xrc:246
 msgid "&Auto skip frames"
-msgstr "프레임 자동 생략(&A)"
+msgstr "프레임 자동 건너뛰기 (&A)"
 
 #: xrc/MainMenu.xrc:251
 msgid "&Skip BIOS"
-msgstr "BIOS 생략(&S)"
+msgstr "BIOS 건너뛰기 (&S)"
 
 #: xrc/MainMenu.xrc:255
 msgid "&Auto IPS / UPS / IPF patch"
-msgstr "자동 IPS / UPS / IPF 패치(&A)"
+msgstr "자동 IPS / UPS / IPF 패치 (&A)"
 
 #: xrc/MainMenu.xrc:259
 msgid "&Pause when inactive"
-msgstr "창이 비활성일 때 일시정지(&P)"
+msgstr "창이 비활성일 때 일시정지 (&P)"
 
 #: xrc/MainMenu.xrc:264
 msgid "&Reset"
-msgstr "리셋(&R)"
+msgstr "재설정 (&R)"
 
 #: xrc/MainMenu.xrc:268
 msgid "&Options"
-msgstr "옵션(&O)"
+msgstr "옵션 (&O)"
 
 #: xrc/MainMenu.xrc:270
 msgid "&Link"
-msgstr "연결(&L)"
+msgstr "링크 (&L)"
 
 #: xrc/MainMenu.xrc:272
 msgid "Start &Network Link..."
-msgstr "네트워크 링크 시작(&N)..."
+msgstr "네트워크 링크 시작 (&N)..."
 
 #: xrc/MainMenu.xrc:277
 msgid "&Nothing"
-msgstr "없음(&N)"
+msgstr "없음 (&N)"
 
 #: xrc/MainMenu.xrc:281
 msgid "&Cable"
-msgstr "케이블(&C)"
+msgstr "케이블 (&C)"
 
 #: xrc/MainMenu.xrc:285
 msgid "&Wireless"
-msgstr "무선(&W)"
+msgstr "무선 (&W)"
 
 #: xrc/MainMenu.xrc:298
 msgid "&Local mode"
-msgstr "로컬 모드(&L)"
+msgstr "로컬 모드 (&L)"
 
 #: xrc/MainMenu.xrc:302
 msgid "&Link at boot"
-msgstr "시작할 때 연결(&L)"
+msgstr "시작할 때 연결 (&L)"
 
 #: xrc/MainMenu.xrc:306
 msgid "&Speed hack"
-msgstr "스피드 핵(&S)"
+msgstr "스피드 핵 (&S)"
 
 #: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:383
 #: xrc/MainMenu.xrc:417
 msgid "&Configure..."
-msgstr "구성(&C)..."
+msgstr "구성 (&C)..."
 
 #: xrc/MainMenu.xrc:314
 msgid "&Video"
-msgstr "화면(&V)"
+msgstr "화면 (&V)"
 
 #: xrc/MainMenu.xrc:320
 msgid "&Start in full screen"
-msgstr "전체화면으로 시작(&S)"
+msgstr "전체화면으로 시작 (&S)"
 
 #: xrc/MainMenu.xrc:324
 msgid "&Scaled resize"
-msgstr "화면 확대 배율"
+msgstr "크기 조절 (&S)"
 
 #: xrc/MainMenu.xrc:326
 msgid "&1x"
-msgstr "&1x"
+msgstr "1x (&1)"
 
 #: xrc/MainMenu.xrc:329
 msgid "&2x"
-msgstr "&2x"
+msgstr "2x (&2)"
 
 #: xrc/MainMenu.xrc:332
 msgid "&3x"
-msgstr "&3x"
+msgstr "3x (&3)"
 
 #: xrc/MainMenu.xrc:335
 msgid "&4x"
-msgstr "&4x"
+msgstr "4x (&4)"
 
 #: xrc/MainMenu.xrc:338
 msgid "&5x"
-msgstr "&5x"
+msgstr "5x (&5)"
 
 #: xrc/MainMenu.xrc:341
 msgid "&6x"
-msgstr "&6x"
+msgstr "6x (&6)"
 
 #: xrc/MainMenu.xrc:345
 msgid "Change pixel filter"
@@ -3366,91 +3366,91 @@ msgstr "인터프레임 블렌딩(부드러운 프레임 전환) 타입 변경"
 
 #: xrc/MainMenu.xrc:351
 msgid "&Retain aspect ratio"
-msgstr "화면비율 유지(&R)"
+msgstr "화면비율 유지 (&R)"
 
 #: xrc/MainMenu.xrc:356
 msgid "&Bilinear filter"
-msgstr "격자 필터(&B)"
+msgstr "이중선형 필터 (&B)"
 
 #: xrc/MainMenu.xrc:367
 msgid "&Keep window on top"
-msgstr "창 맨 위로 고정(&K)"
+msgstr "창 맨 위로 고정 (&K)"
 
 #: xrc/MainMenu.xrc:372
 msgid "&Disable on-screen display"
-msgstr "화면 상 표시 비활성화(&D)"
+msgstr "화면 상 표시 비활성화 (&D)"
 
 #: xrc/MainMenu.xrc:376
 msgid "&Transparent on-screen display"
-msgstr "화면 상 표시를 투명하게(&T)"
+msgstr "화면 상 표시를 투명하게 (&T)"
 
 #: xrc/MainMenu.xrc:381
 msgid "&Audio"
-msgstr "소리(&A)"
+msgstr "오디오 (&A)"
 
 #: xrc/MainMenu.xrc:386
 msgid "&Increase volume"
-msgstr "음량 높이기(&I)"
+msgstr "볼륨 높이기 (&I)"
 
 #: xrc/MainMenu.xrc:389
 msgid "&Decrease volume"
-msgstr "음량 낮추기(&D)"
+msgstr "볼륨 낮추기 (&D)"
 
 #: xrc/MainMenu.xrc:392
 msgid "&Toggle sound"
-msgstr "음향 전환(&T)"
+msgstr "사운드 전환 (&T)"
 
 #: xrc/MainMenu.xrc:397
 msgid "&Game Boy Advance sound interpolation"
-msgstr "게임보이 어드밴스 사운드 보간(&G)"
+msgstr "게임보이 어드밴스 사운드 보간 (&G)"
 
 #: xrc/MainMenu.xrc:402
 msgid "&Game Boy sound enhancement"
-msgstr "게임보이 사운드 향상(&G)"
+msgstr "게임보이 사운드 향상 (&G)"
 
 #: xrc/MainMenu.xrc:406
 msgid "&Game Boy surround sound effect"
-msgstr "게임보이 서라운드 사운드 효과(&G)"
+msgstr "게임보이 서라운드 사운드 효과 (&G)"
 
 #: xrc/MainMenu.xrc:410
 msgid "&Game Boy sound declicking"
-msgstr "게임보이 사운드 감소(&G)"
+msgstr "게임보이 사운드 감소 (&G)"
 
 #: xrc/MainMenu.xrc:415
 msgid "&Input"
-msgstr "입력(&I)"
+msgstr "입력 (&I)"
 
 #: xrc/MainMenu.xrc:420
 msgid "Allow &keyboard background input"
-msgstr "키보드 백그라운드 입력 허용(&K)"
+msgstr "키보드 백그라운드 입력 허용 (&K)"
 
 #: xrc/MainMenu.xrc:424
 msgid "Allow &joystick background input"
-msgstr "조이스틱 백그라운드 입력 허용(&J)"
+msgstr "조이스틱 백그라운드 입력 허용 (&J)"
 
 #: xrc/MainMenu.xrc:429
 msgid "&Autofire"
-msgstr "버튼 연사(&A)"
+msgstr "버튼 연사 (&A)"
 
 #: xrc/MainMenu.xrc:448
 msgid "&Autohold"
-msgstr "자동 입력(&A)"
+msgstr "자동 입력 (&A)"
 
 #: xrc/MainMenu.xrc:466
 msgid "&A"
-msgstr "&A"
+msgstr "A (&A)"
 
 #: xrc/MainMenu.xrc:470
 msgid "&B"
-msgstr "&B"
+msgstr "B (&B)"
 
 #: xrc/MainMenu.xrc:474
 msgid "&L"
-msgstr "&L"
+msgstr "L (&L)"
 
 #: xrc/MainMenu.xrc:478
 msgid "&R"
-msgstr "&R"
+msgstr "R (&R)"
 
 #: xrc/MainMenu.xrc:494 xrc/MainMenu.xrc:517
 msgid "Configure..."
@@ -3458,23 +3458,23 @@ msgstr "구성..."
 
 #: xrc/MainMenu.xrc:498
 msgid "&Real-time clock"
-msgstr "실시간 시계(&R)"
+msgstr "실시간 시계 (&R)"
 
 #: xrc/MainMenu.xrc:502
 msgid "&Use BIOS file"
-msgstr "BIOS 파일을 사용(&U)"
+msgstr "BIOS 파일 사용 (&U)"
 
 #: xrc/MainMenu.xrc:506
 msgid "&Debug print"
-msgstr "디버그 출력(&D)"
+msgstr "디버그 출력 (&D)"
 
 #: xrc/MainMenu.xrc:510 xrc/MainMenu.xrc:525
 msgid "&LCD Filter"
-msgstr "&LCD 필터"
+msgstr "LCD 필터 (&L)"
 
 #: xrc/MainMenu.xrc:521
 msgid "&Game Boy color option"
-msgstr "게임보이 컬러 옵션(&G)"
+msgstr "게임보이 컬러 옵션 (&G)"
 
 #: xrc/MainMenu.xrc:529
 msgid "&Game Boy Colorizer Hack (requires restart)"
@@ -3482,19 +3482,19 @@ msgstr "게임보이 컬러라이저 해킹 (재시작 필요)(&G)"
 
 #: xrc/MainMenu.xrc:533
 msgid "&Game Boy printer"
-msgstr "게임보이 프린터(&G)"
+msgstr "게임보이 프린터 (&G)"
 
 #: xrc/MainMenu.xrc:537
 msgid "&Gather a full page before printing"
-msgstr "출력 전 모든 페이지를 모으기(&G)"
+msgstr "출력 전 모든 페이지를 모으기 (&G)"
 
 #: xrc/MainMenu.xrc:541
 msgid "&Save printouts as screen captures"
-msgstr "출력물 스크린 캡쳐로 저장하기(&S)"
+msgstr "출력물 스크린 캡쳐로 저장하기 (&S)"
 
 #: xrc/MainMenu.xrc:546
 msgid "&Use Game Boy BIOS file (requires restart)"
-msgstr "게임보이 바이오스 파일 사용 (재시작 필요)(&U)"
+msgstr "게임보이 바이오스 파일 사용 (재시작 필요) (&U)"
 
 #: xrc/MainMenu.xrc:550
 msgid "&Use Game Boy Color BIOS file"
@@ -3662,11 +3662,11 @@ msgstr "업데이트 확인"
 
 #: xrc/MainMenu.xrc:747
 msgid "&Factory Reset..."
-msgstr "공장 초기화(&F)..."
+msgstr "공장 초기화 (&F)..."
 
 #: xrc/MainMenu.xrc:751
 msgid "&About..."
-msgstr "정보(&A)..."
+msgstr "정보 (&A)..."
 
 #: xrc/MapViewer.xrc:4
 msgid "Map Viewer"
@@ -3714,15 +3714,15 @@ msgstr "메모리 뷰어"
 
 #: xrc/MemViewer.xrc:17
 msgid "&8-bit"
-msgstr "&8-bit"
+msgstr "8 비트 (&8)"
 
 #: xrc/MemViewer.xrc:25
 msgid "&16-bit"
-msgstr "&16-bit"
+msgstr "16 비트 (&1)"
 
 #: xrc/MemViewer.xrc:32
 msgid "&32-bit"
-msgstr "&32-bit"
+msgstr "32 비트 (&3)"
 
 #: xrc/MemViewer.xrc:83
 msgid "Current address:"
@@ -3730,7 +3730,7 @@ msgstr "현재 주소:"
 
 #: xrc/MemViewer.xrc:108
 msgid "&Load..."
-msgstr "불러오기(&L)..."
+msgstr "불러오기 (&L)..."
 
 #: xrc/NetLink.xrc:4
 msgid "Start Network Link"
@@ -3778,7 +3778,7 @@ msgstr "팔레트 뷰어"
 
 #: xrc/PaletteViewer.xrc:88
 msgid "C&hange backdrop color..."
-msgstr "배경색 변경(&H)..."
+msgstr "배경색 변경 (&H)..."
 
 #: xrc/SoundConfig.xrc:4
 msgid "Sound Settings"
