@@ -41,10 +41,10 @@ wxArrayString str_split_with_sep(const wxString& text, const wxString& sep)
     return str_split(text, sep, true);
 }
 
-std::vector<uint8_t> utf16_to_utf8(const uint16_t* utf16) {
+std::vector<uint8_t> utf16_to_utf8_vector(const uint16_t* utf16) {
     std::vector<uint8_t> out;
     for (size_t i = 0; utf16[i]; i++) {
-        uint16_t c = utf16[i];
+        const uint16_t c = utf16[i];
         if (c < 0x80) {
             out.push_back(c);
         } else if (c < 0x800) {
@@ -75,6 +75,16 @@ std::vector<uint8_t> utf16_to_utf8(const uint16_t* utf16) {
         }
     }
     return out;
+}
+
+wxString utf16_to_utf8(const uint16_t* utf16) {
+    std::vector<uint8_t> output_vector = utf16_to_utf8_vector(utf16);
+    return wxString::FromUTF8(reinterpret_cast<const char*>(output_vector.data()),
+                              output_vector.size());
+}
+
+wxString utf16_to_utf8(const int16_t* utf16) {
+    return utf16_to_utf8(reinterpret_cast<const uint16_t*>(utf16));
 }
 
 } // namespace config
