@@ -5,6 +5,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 if(WIN32)
     include(RemoveStrawberryPerlFromPATH)
+
+    find_program(POWERSHELL
+        NAMES powershell.exe pwsh.exe
+        HINTS "/Windows/System32/WindowsPowerShell/v1.0"
+        REQUIRED)
+else()
+    find_program(POWERSHELL pwsh)
 endif()
 
 if(UPDATE_APPCAST)
@@ -22,15 +29,6 @@ set(VCPKG_DEPS_OPTIONAL
     ffmpeg ENABLE_FFMPEG
     faudio ENABLE_FAUDIO
 )
-
-if(WIN32)
-    find_program(POWERSHELL
-        NAMES powershell.exe pwsh.exe
-        HINTS "/Windows/System32/WindowsPowerShell/v1.0"
-        REQUIRED)
-else()
-    find_program(POWERSHELL pwsh)
-endif()
 
 include(Set-Toolchain-vcpkg)
 

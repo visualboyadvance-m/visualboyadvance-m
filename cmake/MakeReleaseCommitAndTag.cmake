@@ -10,10 +10,6 @@ if(NOT EXISTS "${CMAKE_SOURCE_DIR}/.git")
     message(FATAL_ERROR "releases can only be done from a git clone")
 endif()
 
-if(NOT GIT_FOUND)
-    message(FATAL_ERROR "git is required to make a release")
-endif()
-
 find_program(GPG_EXECUTABLE gpg)
 
 if(NOT GPG_EXECUTABLE)
@@ -35,7 +31,7 @@ function(make_release_commit_and_tag)
     # First make sure we are on master.
 
     execute_process(
-        COMMAND ${GIT_EXECUTABLE} rev-parse --short --abbrev-ref=strict HEAD
+        COMMAND git rev-parse --short --abbrev-ref=strict HEAD
         OUTPUT_VARIABLE git_branch
         OUTPUT_STRIP_TRAILING_WHITESPACE
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -46,7 +42,7 @@ function(make_release_commit_and_tag)
     endif()
 
     execute_process(
-        COMMAND ${GIT_EXECUTABLE} status --porcelain=2
+        COMMAND git status --porcelain=2
         OUTPUT_VARIABLE git_status
         OUTPUT_STRIP_TRAILING_WHITESPACE
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -59,7 +55,7 @@ function(make_release_commit_and_tag)
     endif()
 
     execute_process(
-        COMMAND ${GIT_EXECUTABLE} tag --sort=-v:refname
+        COMMAND git tag --sort=-v:refname
         OUTPUT_VARIABLE git_tags
         OUTPUT_STRIP_TRAILING_WHITESPACE
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -80,7 +76,7 @@ function(make_release_commit_and_tag)
     endif()
 
     execute_process(
-        COMMAND ${GIT_EXECUTABLE} log ${git_last_tag}.. "--pretty=format:* %h - %s [%aL]"
+        COMMAND git log ${git_last_tag}.. "--pretty=format:* %h - %s [%aL]"
         OUTPUT_VARIABLE release_log
         OUTPUT_STRIP_TRAILING_WHITESPACE
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -90,17 +86,17 @@ function(make_release_commit_and_tag)
 
     if(TAG_RELEASE STREQUAL UNDO)
         execute_process(
-            COMMAND ${GIT_EXECUTABLE} tag -d ${git_last_tag}
+            COMMAND git tag -d ${git_last_tag}
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         )
 
         execute_process(
-            COMMAND ${GIT_EXECUTABLE} reset HEAD~1
+            COMMAND git reset HEAD~1
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         )
 
         execute_process(
-            COMMAND ${GIT_EXECUTABLE} checkout HEAD CHANGELOG.md
+            COMMAND git checkout HEAD CHANGELOG.md
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         )
 
@@ -212,45 +208,37 @@ Ignore the following cmake error.
     )
 
     execute_process(
-        COMMAND ${GIT_EXECUTABLE} add CHANGELOG.md
+        COMMAND git add CHANGELOG.md
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )
 
-    # Make the release commit.
+    message(FATAL_ERROR "
 
-    execute_process(
-        COMMAND ${GIT_EXECUTABLE} commit -m "release ${new_tag}" --signoff -S
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    )
+Release prepared.
 
-    # Make release tag.
+Edit CHANGELOG.md to remove any non-user-facing commits, and optionally add any
+release notes.
 
-    execute_process(
-        COMMAND ${GIT_EXECUTABLE} tag -s -m${new_tag} ${new_tag}
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    )
+Run the following commands to commit the change:
 
-    message(FATAL_ERROR [=[
-
-Release commit and tag generated.
-
-**** IF YOU ARE SURE YOU WANT TO RELEASE ****
-
-Run the following commands to push the release commit and tag:
-
-    git push
-    git push --tags
-
-**** TO UNDO THE RELEASE ****
+    git commit -m'release ${new_tag}' --signoff -S
+    git tag -s -m'${new_tag}' ${new_tag}
 
 To rollback these changes, run this command:
 
     cmake .. -DTAG_RELEASE=UNDO
 
-Ignore the "configuration incomplete" message following, this mode does not
+==== IF YOU ARE SURE YOU WANT TO RELEASE, THIS **CANNOT** BE REVERSED ====
+
+Run the following to push the release commit and tag:
+
+    git push
+    git push --tags
+
+Ignore the 'configuration incomplete' message following, this mode does not
 build anything.
 
-]=])
+")
 endfunction()
 
 make_release_commit_and_tag()
