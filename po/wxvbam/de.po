@@ -326,11 +326,11 @@ msgstr "Dieses Programm ist freie Software: Sie können es weiterverbreiten und/
 
 #: cmdevents.cpp:2424
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
-msgstr ""
+msgstr "Das GameBoy BIOS kann nicht verwendet werden, wenn der Farb-Hack aktiviert ist."
 
 #: cmdevents.cpp:2490
 msgid "LAN link is already active. Disable link mode to disconnect."
-msgstr ""
+msgstr "LAN-Verbindung ist bereits aktiv. Deaktivieren Sie den Verbindungsmodus, um die Verbindung zu trennen."
 
 #: cmdevents.cpp:2496
 msgid "Network is not supported in local mode."
@@ -342,7 +342,7 @@ msgstr "Menübefehle"
 
 #: dialogs/accel-config.cpp:245
 msgid "This will clear all user-defined accelerators. Are you sure?"
-msgstr ""
+msgstr "Dadurch werden alle benutzerdefinierten Beschleuniger gelöscht. Bist du sicher?"
 
 #: dialogs/accel-config.cpp:245 dialogs/accel-config.cpp:292
 msgid "Confirm"
@@ -351,7 +351,7 @@ msgstr "Bestätigen"
 #: dialogs/accel-config.cpp:290
 #, c-format
 msgid "This will unassign \"%s\" from \"%s\". Are you sure?"
-msgstr ""
+msgstr "Dadurch wird die Zuweisung von „%s“ zu „%s“ aufgehoben. Bist du sicher?"
 
 #: dialogs/directories-config.cpp:49
 msgid "Browse"
@@ -359,7 +359,7 @@ msgstr "Durchsuchen"
 
 #: dialogs/display-config.cpp:52
 msgid "Invalid value for Default magnification."
-msgstr ""
+msgstr "Ungültiger Wert für die Standardvergrößerung."
 
 #: dialogs/display-config.cpp:331 xrc/DisplayConfig.xrc:86
 #: xrc/DisplayConfig.xrc:136 xrc/DisplayConfig.xrc:222
@@ -381,12 +381,12 @@ msgstr "Plugin"
 #: dialogs/display-config.cpp:407
 #, c-format
 msgid "Using pixel filter: %s"
-msgstr ""
+msgstr "Pixelfilter verwenden: %s"
 
 #: dialogs/display-config.cpp:414
 #, c-format
 msgid "Using interframe blending: %s"
-msgstr ""
+msgstr "Verwenden von Interframe-Blending: %s"
 
 #: dialogs/game-boy-config.cpp:143 xrc/GameBoyAdvanceConfig.xrc:122
 #: xrc/GameBoyConfig.xrc:138 xrc/GameBoyConfig.xrc:159
@@ -403,175 +403,175 @@ msgstr "Ungültig"
 
 #: dialogs/gb-rom-info.cpp:22
 msgid "No mapper"
-msgstr ""
+msgstr "Kein Mapper"
 
 #: dialogs/gb-rom-info.cpp:43
 msgid "Pocket Camera"
-msgstr ""
+msgstr "Taschenkamera"
 
 #: dialogs/gb-rom-info.cpp:68
 msgid " + RAM"
-msgstr ""
+msgstr " + RAM"
 
 #: dialogs/gb-rom-info.cpp:69
 msgid " + RTC"
-msgstr ""
+msgstr " + RTC"
 
 #: dialogs/gb-rom-info.cpp:70
 msgid " + Battery"
-msgstr ""
+msgstr " + Batterie"
 
 #: dialogs/gb-rom-info.cpp:71
 msgid " + Rumble"
-msgstr ""
+msgstr " + Rumble"
 
 #: dialogs/gb-rom-info.cpp:72
 msgid " + Motion Sensor"
-msgstr ""
+msgstr "+ Bewegungssensor"
 
 #: dialogs/gb-rom-info.cpp:74
 #, c-format
 msgid "%02X (%s%s%s%s%s%s)"
-msgstr ""
+msgstr "%02X (%s%s%s%s%s%s)"
 
 #: dialogs/gb-rom-info.cpp:81 dialogs/gb-rom-info.cpp:93
 #, c-format
 msgid "%02X (Supported)"
-msgstr ""
+msgstr "%02X (Unterstützt)"
 
 #: dialogs/gb-rom-info.cpp:83 dialogs/gb-rom-info.cpp:91
 #, c-format
 msgid "%02X (Not supported)"
-msgstr ""
+msgstr "%02X (Nicht Unterstützt)"
 
 #: dialogs/gb-rom-info.cpp:95
 #, c-format
 msgid "%02X (Required)"
-msgstr ""
+msgstr "%02X (Benötigt)"
 
 #: dialogs/gb-rom-info.cpp:107 dialogs/gb-rom-info.cpp:141
 #, c-format
 msgid "%02X (32 KiB)"
-msgstr ""
+msgstr "%02X (32 KiB)"
 
 #: dialogs/gb-rom-info.cpp:109 dialogs/gb-rom-info.cpp:145
 #, c-format
 msgid "%02X (64 KiB)"
-msgstr ""
+msgstr "%02X (64 KiB)"
 
 #: dialogs/gb-rom-info.cpp:111 dialogs/gb-rom-info.cpp:143
 #, c-format
 msgid "%02X (128 KiB)"
-msgstr ""
+msgstr "%02X (128 KiB)"
 
 #: dialogs/gb-rom-info.cpp:113
 #, c-format
 msgid "%02X (256 KiB)"
-msgstr ""
+msgstr "%02X (256 KiB)"
 
 #: dialogs/gb-rom-info.cpp:115
 #, c-format
 msgid "%02X (512 KiB)"
-msgstr ""
+msgstr "%02X (512 KiB)"
 
 #: dialogs/gb-rom-info.cpp:117
 #, c-format
 msgid "%02X (1 MiB)"
-msgstr ""
+msgstr "%02X (1 MiB)"
 
 #: dialogs/gb-rom-info.cpp:119
 #, c-format
 msgid "%02X (2 MiB)"
-msgstr ""
+msgstr "%02X (2 MiB)"
 
 #: dialogs/gb-rom-info.cpp:121
 #, c-format
 msgid "%02X (4 MiB)"
-msgstr ""
+msgstr "%02X (4 MiB)"
 
 #: dialogs/gb-rom-info.cpp:123 dialogs/gb-rom-info.cpp:147
 #: dialogs/gb-rom-info.cpp:159
 #, c-format
 msgid "%02X (Unknown)"
-msgstr ""
+msgstr "%02X (Unbekannt)"
 
 #: dialogs/gb-rom-info.cpp:131
 #, c-format
 msgid "%02X (None)"
-msgstr ""
+msgstr "%02X (Nichts)"
 
 #: dialogs/gb-rom-info.cpp:133
 #, c-format
 msgid "%02X (256 B)"
-msgstr ""
+msgstr "%02X (256 B)"
 
 #: dialogs/gb-rom-info.cpp:135
 #, c-format
 msgid "%02X (512 B)"
-msgstr ""
+msgstr "%02X (512 B)"
 
 #: dialogs/gb-rom-info.cpp:137
 #, c-format
 msgid "%02X (2 KiB)"
-msgstr ""
+msgstr "%02X (2 KiB)"
 
 #: dialogs/gb-rom-info.cpp:139
 #, c-format
 msgid "%02X (8 KiB)"
-msgstr ""
+msgstr "%02X (8 KiB)"
 
 #: dialogs/gb-rom-info.cpp:155
 #, c-format
 msgid "%02X (Japan)"
-msgstr ""
+msgstr "%02X (Japan)"
 
 #: dialogs/gb-rom-info.cpp:157
 #, c-format
 msgid "%02X (World)"
-msgstr ""
+msgstr "%02X (Welt)"
 
 #: dialogs/gb-rom-info.cpp:201
 #, c-format
 msgid "%02X (Actual: %02X)"
-msgstr ""
+msgstr "%02X (Tatsächlich: %02X)"
 
 #: dialogs/gb-rom-info.cpp:204
 #, c-format
 msgid "%04X (Actual: %04X)"
-msgstr ""
+msgstr "%04X (Tatsächlich: %04X)"
 
 #: dialogs/sound-config.cpp:251
 #, c-format
 msgid "%d frame = %.2f ms"
-msgstr ""
+msgstr "%d frame = %.2f ms"
 
 #: extra-translations.cpp:13
 msgid "&Apply"
-msgstr ""
+msgstr "Anwenden"
 
 #: extra-translations.cpp:14
 msgid "Artists"
-msgstr ""
+msgstr "Künstler"
 
 #: extra-translations.cpp:15
 msgid "Cancel"
-msgstr ""
+msgstr "Abbruch"
 
 #: extra-translations.cpp:16
 msgid "Close"
-msgstr ""
+msgstr "Schließen"
 
 #: extra-translations.cpp:17
 msgid "Developers"
-msgstr ""
+msgstr "Entwickler"
 
 #: extra-translations.cpp:18
 msgid "License"
-msgstr ""
+msgstr "Lizenz"
 
 #: extra-translations.cpp:19
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: gfxviewers.cpp:1202
 msgid "Select output file and type"
@@ -1015,15 +1015,15 @@ msgstr "Speicherabbild-Datei auswählen"
 
 #: viewsupt.cpp:789
 msgid "Red:"
-msgstr ""
+msgstr "Rot:"
 
 #: viewsupt.cpp:798
 msgid "Green:"
-msgstr ""
+msgstr "Grün:"
 
 #: viewsupt.cpp:807
 msgid "Blue:"
-msgstr ""
+msgstr "Blau:"
 
 #: viewsupt.h:63
 #, c-format
@@ -1203,11 +1203,11 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
 msgid "Auto A"
-msgstr ""
+msgstr "Auto A"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
 msgid "Auto B"
-msgstr ""
+msgstr "Auto B"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
 #: xrc/DisplayConfig.xrc:200
@@ -1220,7 +1220,7 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:33
 msgid "GameShark"
-msgstr ""
+msgstr "GameShark"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:107
 #, c-format
@@ -1811,19 +1811,19 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:59
 msgid "Stop"
-msgstr ""
+msgstr "Stop"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:60
 msgid "Play/Pause"
-msgstr ""
+msgstr "Play/Pause"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:93
 msgid "Alt+"
-msgstr ""
+msgstr "Alt+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:96
 msgid "Ctrl+"
-msgstr ""
+msgstr "Ctrl+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:100
 msgid "Rawctrl+"
@@ -1831,7 +1831,7 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:104
 msgid "Shift+"
-msgstr ""
+msgstr "Shift+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:107
 msgid "Meta+"
@@ -1985,7 +1985,7 @@ msgstr ""
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1678
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1711
 msgid "Network error."
-msgstr ""
+msgstr "Netzwerk Error."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1110
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1687
@@ -2315,7 +2315,7 @@ msgstr "Filter"
 
 #: xrc/DisplayConfig.xrc:80
 msgid "Display filter:"
-msgstr ""
+msgstr "Display filter:"
 
 #: xrc/DisplayConfig.xrc:88
 msgid "Super 2xSaI"
@@ -2363,7 +2363,7 @@ msgstr "Simple 4x"
 
 #: xrc/DisplayConfig.xrc:116
 msgid "Plugin:"
-msgstr ""
+msgstr "Plugin:"
 
 #: xrc/DisplayConfig.xrc:128
 msgid "Interframe blending:"
@@ -2676,11 +2676,11 @@ msgstr "Steckkartentyp:"
 
 #: xrc/GBROMInfo.xrc:60
 msgid "SGB code:"
-msgstr ""
+msgstr "SGB code:"
 
 #: xrc/GBROMInfo.xrc:72
 msgid "CGB code:"
-msgstr ""
+msgstr "CGB code:"
 
 #: xrc/GBROMInfo.xrc:84
 msgid "ROM size:"
@@ -2741,11 +2741,11 @@ msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
 msgid "64 K"
-msgstr ""
+msgstr "64 K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:50 xrc/GameBoyAdvanceConfig.xrc:222
 msgid "128 K"
-msgstr ""
+msgstr "128 K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:64
 msgid "Detect Now"
