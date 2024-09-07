@@ -48,10 +48,7 @@ int FAGetDev(FAudio* fa) {
         if (hr != 0) {
             continue;
         }
-        const std::vector<uint8_t> device_id_u8 =
-            config::utf16_to_utf8(reinterpret_cast<uint16_t*>(dd.DeviceID));
-        const wxString device_id = wxString::FromUTF8(
-            reinterpret_cast<const char*>(device_id_u8.data()), device_id_u8.size());
+        const wxString device_id = config::utf16_to_utf8(reinterpret_cast<char16_t*>(dd.DeviceID));
         if (audio_device == device_id) {
             return i;
         }
@@ -500,14 +497,9 @@ std::vector<AudioDevice> GetFAudioDevices() {
         }
 
         // Convert to UTF-8.
-        const std::vector<uint8_t> display_name_u8 =
-            config::utf16_to_utf8(reinterpret_cast<uint16_t*>(dd.DisplayName));
-        const std::vector<uint8_t> device_id_u8 =
-            config::utf16_to_utf8(reinterpret_cast<uint16_t*>(dd.DeviceID));
-        const wxString display_name = wxString::FromUTF8(
-            reinterpret_cast<const char*>(display_name_u8.data()), display_name_u8.size());
-        const wxString device_id = wxString::FromUTF8(
-            reinterpret_cast<const char*>(device_id_u8.data()), device_id_u8.size());
+        const wxString display_name =
+            config::utf16_to_utf8(reinterpret_cast<char16_t*>(dd.DisplayName));
+        const wxString device_id = config::utf16_to_utf8(reinterpret_cast<char16_t*>(dd.DeviceID));
         devices.push_back({display_name, device_id});
     }
 
