@@ -177,6 +177,14 @@ AccelConfig::AccelConfig(wxWindow* parent,
     Bind(wxEVT_BUTTON, &AccelConfig::OnResetAll, this, XRCID("ResetAll"));
     Bind(wxEVT_TEXT, &AccelConfig::OnKeyInput, this, key_input_->GetId());
 
+#if !WX_RESIZE_DIALOGS
+    // On wxGTK, the dialog resizing is broken, so we need to set a fixed size.
+    SetWindowStyle(GetWindowStyle() & ~wxRESIZE_BORDER);
+    const wxSize dialog_size(800, 800);
+    SetMinSize(dialog_size);
+    SetMaxSize(dialog_size);
+#endif  // !WX_RESIZE_DIALOGS
+
     // And fit everything nicely.
     Fit();
 }

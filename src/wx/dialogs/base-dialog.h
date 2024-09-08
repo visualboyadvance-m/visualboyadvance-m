@@ -8,6 +8,13 @@
 
 #include "core/base/check.h"
 
+#if defined(__WXGTK__)
+// Moving and resizing dialogs does not work properly on wxGTK.
+#define WX_RESIZE_DIALOGS 0
+#else
+#define WX_RESIZE_DIALOGS 1
+#endif
+
 namespace dialogs {
 
 class BaseDialog : public wxDialog {

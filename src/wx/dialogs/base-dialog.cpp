@@ -38,15 +38,19 @@ private:
             return;
         }
 
+#if WX_RESIZE_DIALOGS
         const wxRect dialog_rect = this->Get()->GetRect();
         this->SaveValue("x", dialog_rect.x);
         this->SaveValue("y", dialog_rect.y);
         this->SaveValue("width", dialog_rect.width);
         this->SaveValue("height", dialog_rect.height);
+#endif  // WX_RESIZE_DIALOGS
     }
 
     bool Restore() override {
         dialog_shown_ = true;
+
+#if WX_RESIZE_DIALOGS
         wxRect dialog_rect(0, 0, 0, 0);
         if (!this->RestoreValue("x", &dialog_rect.x)) {
             return false;
@@ -62,6 +66,7 @@ private:
         };
 
         this->Get()->SetSize(dialog_rect);
+#endif  // WX_RESIZE_DIALOGS
         return true;
     }
 
