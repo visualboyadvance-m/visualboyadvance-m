@@ -9,17 +9,15 @@
     - [Commit Message](#commit-message)
     - [Collaboration on a Branch](#collaboration-on-a-branch)
     - [Commits from Maintainers](#commits-from-maintainers)
-  - [Strings, Character Sets and Translations](#strings-character-sets-and-translations)
-    - [Pulling Updated Translations](#pulling-updated-translations)
-    - [Translations Message Catalog](#translations-message-catalog)
-    - [Interaction with non-wxWidgets Code](#interaction-with-non-wxwidgets-code)
-  - [Windows Native Development Environment Setup](#windows-native-development-environment-setup)
+  - [Miscellaneous](#miscellaneous)
+    - [Debug Messages](#debug-messages)
   - [Release Process](#release-process)
-    - [Environment](#environment)
+    - [Certificates](#certificates)
     - [Release Commit and Tag](#release-commit-and-tag)
     - [64-bit Windows Binary](#64-bit-windows-binary)
     - [32-bit Windows Binary](#32-bit-windows-binary)
-    - [64-bit Mac Binary](#64-bit-mac-binary)
+    - [ARM64 Windows Binary](#arm64-windows-binary)
+    - [macOS Binary](#macos-binary)
     - [Final steps](#final-steps)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -53,11 +51,12 @@ Follow the following steps to process newly submitted issues:
 - An issue is resolved by closing it in github. A commit that fixes the issue
   should have the following line near the end of the body of the commit message:
 ```
-- Fix #999.
+Fix #999.
 ```
   This will automatically close the issue and assign the closing commit in the
   github metadata when it is merged to master. The issue can be reopened if
   needed.
+
 - A commit that is work towards resolving an issue, should have the issue number
   preceded by a pound sign either at the end of a commit message title, if it is
   of primary relevance to the issue, or the body otherwise.
@@ -70,7 +69,7 @@ Follow these guidelines always:
 
 https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 
-the description of your work should be in the **commit message NOT the pull
+, the description of your work should be in the **commit message NOT the pull
 request description**.
 
 The title line must be no more than 50 characters and the description must be
@@ -95,16 +94,21 @@ other projects, fewer is better.
 The commit title line should be prefixed with an area, unless it involves the
 wxWidgets GUI app, in which case it should **NOT** have a prefix.
 
+If the commit is a user-facing functionality change or enhancement, the title
+line of the commit must be a non-technical description of this change. For
+example "Mute on speedup" because this will go into the changelog.
+
 The text after the area prefix should not be capitalized.
 
-Please use one of these area prefixes otherwise:
+Please use one of these area prefixes for non-main-GUI-app commits:
 
 - doc: documentation, README.md etc.
-- build: cmake, installdeps, preprocessor compatibility defines, etc.
-- gb-core: the GameBoy emulator core
-- gba-core: the GameBoy Advance emulator core
+- build: cmake, installdeps, preprocessor compatibility defines, compatibility
+  headers, etc.
+- gb: the GameBoy emulator core
+- gba: the GameBoy Advance emulator core
 - libretro: the libretro core glue and build
-- sdl-app: anything for the SDL app
+- sdl: anything for the SDL port
 - translations: anything related to translations
 
 . Add other areas here if needed.
@@ -138,137 +142,67 @@ things in mind:
   better to edit the history than to add more commits. Never add commits fixing
   previous commits, only improving or adding to them.
 
-- To update when someone else (very rudely you might say) did a `push -f`, `pull
-  --rebase` will **USUALLY** work. Verify the log, and if necessary do this
-  instead:
-
+- To update when someone else updated the branch with a `push -f`
 ```bash
 git status # should be clean, with your work having been already pushed
 git fetch --all --prune
 git reset --hard origin/<branch-name>
 ```
+.
 
-While actively working on a branch, keep it rebased on top of master.
+- While actively working on a branch, keep it rebased on top of master.
 
 #### Commits from Maintainers
 
-Maintainers have the power to commit directly to master. This power must be
-used responsibly, something I fail to do myself often, and will try to improve
-upon.
+Maintainers and project members have the power to commit directly to master.
+This power must be used responsibly.
 
-Make your most earnest attempt to follow these general guidelines to keep our
+Make your best attempt to follow these general guidelines to keep our
 history clean:
 
-- Things that are a straight fix or improvement that does not require discussion
+- Things that are a minor fix or improvement that does not require discussion
   can be committed directly, keeping the following guidelines in mind.
 
 - Bigger new features, code refactors and changes in architecture should go
   through the PR process.
 
-- Push code changes to a branch first, so they can run through the CI.
-  Differences in what different compilers allow is a problem that comes up
-  **VERY** frequently. As well as incompatibilities between different
-  configurations for both the C++ code and any supporting code.
+- Push code changes to a branch first, so they can run through the CI. When you
+  open the commit in GitHub there is a little icon in the upper left corner that
+  shows the CI status for this commit. Differences in what different compilers
+  allow is a problem that comes up **VERY** frequently. As well as
+  incompatibilities between different configurations for both the C++ code and
+  any supporting code.
 
+### Miscellaneous
 
-### Strings, Character Sets and Translations
+#### Debug Messages
 
-#### Pulling Updated Translations
+We have an override for `wxLogDebug()` to make it work even in non-debug builds
+of wx and on windows, even in mintty.
 
-Once in a while it is necessary to pull new and updated translations from
-transifex.
-
-For this you need the transifex client, available for Windows as well from
-chocolatey as `transifex-client`.
-
-To pull translations run:
-
-```bash
-tx pull -af
-```
-
-then check `git status` and if any message catalogs were updated, commit the
-result as:
-
-```bash
-git commit -a --signoff -S -m'Transifex pull.'
-git push
-```
-
-#### Translations Message Catalog
-
-Strings that need to be translated by our wonderful translators on transifex
-(thank you guys very much) need to be enclosed in `_("...")`, for example:
+It works like `printf()`, e.g.:
 
 ```cpp
-wxLogError(_("error: something very wrong"));
+int foo = 42;
+wxLogDebug(wxT("the value of foo = %d"), foo);
 ```
 
-The next time you run cmake after adding a string to be translated, the `.pot`
-message catalog source will be regenerated, and you will see a loud message
-telling you to push to transifex.
-
-Strings in the XRC XML GUI definition files are automatically added to the
-message catalog as well.
-
-If you are working on a branch or a PR, don't push to transifex until it has
-been merged to master.
-
-Once it is, push it with:
-
-```bash
-tx push -s
-```
-
-#### Interaction with non-wxWidgets Code
-
-Use our `UTF8(...)` function to force any `wxString` to UTF-8 for use by other
-libraries, screen output or OS APIs. For example:
+From the core etc. the usual:
 
 ```cpp
-fprintf(STDERR, "Error: %s\n", UTF8(err_msg));
+fprintf(stderr, "...", ...);
 ```
+, will work fine.
 
-There is one exception to this, when using `wxString::Printf()` and such, you
-can't pass another `wxString` to the `%s` format directly, use something like
-this:
-
-```cpp
-wxString err;
-err.Printf("Cannot read file: %s", fname.wc_str());
-```
-
-this uses the `wchar_t` UTF-16 representation on Windows and does nothing
-elsewhere.
-
-For calling Windows APIs with strings, use the wide char `W` variants and the
-`wc_str()` method as well.
-
-### Windows Native Development Environment Setup
-
-This guide has been moved to:
-
-https://github.com/rkitover/windows-dev-guide
+You need a debug build for this to work or to even have a console on Windows.
+Pass `-DCMAKE_BUILD_TYPE=Debug` to cmake.
 
 ### Release Process
 
-#### Environment
+#### Certificates
 
-The variable `VBAM_NO_PAUSE`, if set, will cause cmake to not pause before gpg
-signing operations, you want to set this if you've disabled your gpg passphrase
-to not require interaction during release builds.
-
-gpg set up with your key is helpful for the release process on all environments
-where a binary is built, but you can also make the detached signature files
-yourself at the end of the process.
-
-For codesigning windows binaries, put your certificate into
-`~/.codesign/windows_comodo.pkcs12`.
-
-On Mac the 'Developer ID Application' certificate stored in your login keychain
-is used, `keychain unlock` will prompt you for your login keychain password, to
-avoid that set the `LOGIN_KEYCHAIN_PASSWORD` environment variable to your
-password.
+Make sure you have set up a Windows code signing certificate with the right
+password and a Mac 'Developer ID Application' certificate.
 
 #### Release Commit and Tag
 
@@ -280,8 +214,7 @@ tag:
 mkdir build && cd build
 cmake .. -DTAG_RELEASE=TRUE
 ```
-
-then push the release:
+, follow the instructions to edit the `CHANGELOG.md` and then push the release:
 
 ```bash
 git push
@@ -296,84 +229,103 @@ cmake .. -DTAG_RELEASE=UNDO
 
 #### 64-bit Windows Binary
 
-For this you will preferably need the powershell environment setup described
-earlier, however you can use a regular Visual Studio 64 bit native developer
-command prompt as well.
+For this you will preferably need the PowerShell environment setup described
+[here](https://github.com/rkitover/windows-dev-guide), or by starting the `x64
+Native Tools Command Prompt` from your Start Menu.
 
 ```powershell
-mkdir build
-cd build
-cmake .. -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_BUILD_TYPE=Release -DUPSTREAM_RELEASE=TRUE -G Ninja
+mkdir build-msvc64
+cd build-msvc64
+cmake .. -DCMAKE_BUILD_TYPE=Release -DUPSTREAM_RELEASE=TRUE -G Ninja
 ninja
 ```
 
 Collect the following files for the release:
 
-- `visualboyadvance-m-Win-64bit.zip`
-- `visualboyadvance-m-Win-64bit.zip.asc`
+- `visualboyadvance-m-Win-x86_64.zip`
 - `translations.zip`
-- `translations.zip.asc`
+
+Repeat the process for the debug build, with `-DCMAKE_BUILD_TYPE=Debug` and
+collect this file:
+
+- `visualboyadvance-m-Win-x86_64-debug.zip`
+.
 
 #### 32-bit Windows Binary
 
-For this the optimal environment is a linux distribution with the mingw
-toolchain, I use fedora.
+The 32-bit build is a legacy build for Windows XP compatibility. You will need
+the MinGW toolchain to build it. The easiest method is to use the MINGW32 MSYS2
+environment.
 
-You can set up a shell on a fedora distribution with docker as described here:
-
-https://gist.github.com/rkitover/6379764c619c10e829e4b2fa0ae243fd
-
-If using fedora, the cross script will install all necessary dependencies, if
-not install the base toolchain (mingw gcc, binutils, winpthreads) using the
-preferred method for your distribution, you can also use mxe for this.
-
-https://mxe.cc/
+First install dependencies with:
 
 ```bash
-sh tools/win/linux-cross-builder -32
+./installdeps
 ```
-
-You can also use msys2 on Windows, this is not recommended:
+. Then build the 32-bit binary as follows:
 
 ```bash
-sh tools/win/msys2-builder -32
+mkdir build-mingw32
+cd build-mingw32
+cmake .. -DCMAKE_BUILD_TYPE=Release -DUPSTREAM_RELEASE=TRUE -G Ninja
+ninja
 ```
+. Collect this file for the release:
 
-To set up msys2, see this guide:
+- `visualboyadvance-m-Win-x86_32.zip`
 
-https://gist.github.com/rkitover/d008324309044fc0cc742bdb16064454
+. Then repeat the process for the debug build with `-DCMAKE_BUILD_TYPE=Debug`,
+and collect this file:
 
-Collect the following files from `~/vbam-build-mingw32/project` if using linux,
-or `~/vbam-build-msys2-x86_64/project` if using msys2:
+- `visualboyadvance-m-Win-x86_32-debug.zip`
+.
 
-- `visualboyadvance-m-Win-32bit.zip`
-- `visualboyadvance-m-Win-32bit.zip.asc`
+#### ARM64 Windows Binary
 
-#### 64-bit Mac Binary
+You will need the MSVC ARM64 cross toolchain to build this binary, if you used
+the install script from [here](https://github.com/rkitover/windows-dev-guide)
+you will have it installed, otherwise run Visual Studio Installer and install
+the component.
+
+To enter the ARM64 cross environment, edit the PowerShell profile described
+[here](https://github.com/rkitover/windows-dev-guide) or use the `vcvarsall.bat`
+script with the `amd64_arm64` argument as described
+[here](https://learn.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=msvc-170).
+
+From there the process is the same as for the 64-bit build, collect the
+following files for the release:
+
+- `visualboyadvance-m-Win-arm64.zip`
+- 'visualboyadvance-m-Win-arm64-debug.zip'
+.
+
+#### macOS Binary
 
 Install the latest Xcode for your OS.
 
-You will need bash and (optionally) gpg from homebrew (which you will also need
-to install):
-
-```bash
-brew install bash gnupg
-```
+You will need bash from Homebrew/nix/MacPorts/whatever to run the build script.
 
 You will need a codesigning certificate from Apple, which you will be able to
-generate once you join their developer program. This is the certificate of the
-type 'Developer ID Application' stored in your login keychain. `keychain
-unlock` will prompt you for your login keychain password, to avoid that set the
-`LOGIN_KEYCHAIN_PASSWORD` environment variable to your password.
+generate once you join their developer program from XCode. This is the
+certificate of the type 'Developer ID Application' stored in your login
+keychain.
+
+If you are not using a GUI session, you will need to use a method to unlock your
+login keychain before building. Adding the certificate and key to the System
+keychain is also a method that some people use.
+
+Then run:
 
 ```bash
-/usr/local/bin/bash tools/osx/builder -64
+tools/osx/builder
 ```
+, this will take a while because it builds all of the dependencies.
 
 Collect the following files from `~/vbam-build-mac-64bit/project`:
 
-- `visualboyadvance-m-Mac-64bit.zip`
-- `visualboyadvance-m-Mac-64bit.zip.asc`
+- `visualboyadvance-m-Mac-x86_64.zip`
+- `visualboyadvance-m-Mac-x86_64-debug.zip`
+.
 
 #### Final steps
 
@@ -381,27 +333,26 @@ Go to the github releases tab, and make a release for the tag you pushed
 earlier.
 
 Put any notes to users and distro maintainers into the description as well as
-the entries from `CHANGELOG.md` generated earlier from git by the release
-commit script.
+the generated entries from `CHANGELOG.md` you edited earlier.
 
 Upload all files collected during the earlier builds, the complete list is:
 
 
 - `translations.zip`
-- `translations.zip.asc`
-- `visualboyadvance-m-Mac-64bit.zip`
-- `visualboyadvance-m-Mac-64bit.zip.asc`
-- `visualboyadvance-m-Win-32bit.zip`
-- `visualboyadvance-m-Win-32bit.zip.asc`
-- `visualboyadvance-m-Win-64bit.zip`
-- `visualboyadvance-m-Win-64bit.zip.asc`
+- `visualboyadvance-m-Win-x86_64.zip`
+- `visualboyadvance-m-Win-x86_64-debug.zip`
+- `visualboyadvance-m-Win-x86_32.zip`
+- `visualboyadvance-m-Win-x86_32-debug.zip`
+- `visualboyadvance-m-Win-arm64.zip`
+- 'visualboyadvance-m-Win-arm64-debug.zip'
+- `visualboyadvance-m-Mac-x86_64.zip`
+- `visualboyadvance-m-Mac-x86_64-debug.zip`
 
-Update the winsparkle appcast.xml by running this cmake command:
+Update the winsparkle `appcast.xml` by running this cmake command:
 
 ```bash
 cmake .. -DUPDATE_APPCAST=TRUE
 ```
-
-follow the instructions to push the change to the web data repo.
+, follow the instructions to push the change to the web data repo.
 
 Announce the release on reddit r/emulation and the forum.
