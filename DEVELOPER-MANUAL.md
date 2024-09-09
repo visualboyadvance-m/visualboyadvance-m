@@ -199,6 +199,14 @@ Pass `-DCMAKE_BUILD_TYPE=Debug` to cmake.
 
 ### Release Process
 
+#### GnuPG Key
+
+You will need to create a GnuPG key for signing your commits and release tags,
+and upload it to a keyserver.
+
+Make sure to install GnuPG on all environments where you will be making commits
+and tags.
+
 #### Certificates
 
 Make sure you have set up a Windows code signing certificate with the right
@@ -215,6 +223,9 @@ mkdir build && cd build
 cmake .. -DTAG_RELEASE=TRUE
 ```
 , follow the instructions to edit the `CHANGELOG.md` and then push the release:
+
+To reiterate, **make sure you edit the `CHANGELOG.md`** to remove any
+non-user-facing changes before you make the release commit.
 
 ```bash
 git push
@@ -256,6 +267,10 @@ collect this file:
 The 32-bit build is a legacy build for Windows XP compatibility. You will need
 the MinGW toolchain to build it. The easiest method is to use the MINGW32 MSYS2
 environment.
+
+Make sure the Visual Studio `signtool.exe` is in your path, you can start MSYS2
+with an inherited `PATH` from a Visual Studio enabled environment or add it to
+your shell configuration.
 
 First install dependencies with:
 
