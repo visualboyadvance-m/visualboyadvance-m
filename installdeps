@@ -1118,9 +1118,12 @@ windows_installdeps() {
         *i686*)
             pkgs="$pkgs nasm"
             ;;
+        *)
+            pkgs="$pkgs FAudio"
+            ;;
     esac
 
-    pkgs="$pkgs SDL2 sfml FAudio wxWidgets3.2 zlib binutils cmake crt-git headers-git make pkgconf tools-git windows-default-manifest libmangle-git ninja gdb ccache openal"
+    pkgs="$pkgs SDL2 sfml wxWidgets3.2 zlib binutils cmake crt-git headers-git make pkgconf tools-git windows-default-manifest libmangle-git ninja gdb ccache openal"
 
     case "$target" in
         *x86_64)
