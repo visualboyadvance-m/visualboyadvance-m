@@ -87,6 +87,7 @@ include(Dependencies)
 if(BUILD_TESTING)
     FetchContent_Declare(googletest
         URL https://github.com/google/googletest/archive/2d16ed055d09c3689d44b272adc097393de948a0.zip
+        EXCLUDE_FROM_ALL
     )
 
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
