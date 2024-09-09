@@ -218,6 +218,7 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_LINK=NO -G Ninja
 | `ENABLE_LTO`            | Compile with Link Time Optimization (gcc and clang only)             | ON for release build  |
 | `ENABLE_GBA_LOGGING`    | Enable extended GBA logging                                          | ON                    |
 | `ENABLE_XAUDIO2`        | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |
+| `ENABLE_FAUDIO`         | Enable faudio sound output for wxWidgets,                            | ON, not 32 bit Win    |
 | `ENABLE_ASAN`           | Enable libasan sanitizers (by default address, only in debug mode)   | OFF                   |
 | `UPSTREAM_RELEASE`      | Do some release tasks, like codesigning, making zip and gpg sigs.    | OFF                   |
 | `BUILD_TESTING`         | Build the tests and enable ctest support.                            | ON                    |
