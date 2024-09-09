@@ -185,7 +185,7 @@ DISTS=$DISTS'
     harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/5.1.0/harfbuzz-5.1.0.tar.xz          lib/libharfbuzz.a
     sfml            https://github.com/SFML/SFML/archive/refs/tags/2.6.1.tar.gz                                 lib/libsfml-system-s.a
     shared-mime-info https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.2/shared-mime-info-2.2.tar.bz2  bin/update-mime-database
-    wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.5/wxWidgets-3.2.5.tar.bz2     lib/libwx_baseu-3.*.a
+    wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.6/wxWidgets-3.2.6.tar.bz2     lib/libwx_baseu-3.*.a
     ffmpeg          http://ffmpeg.org/releases/ffmpeg-7.0.2.tar.xz                                              lib/libavformat.a
 '
 
