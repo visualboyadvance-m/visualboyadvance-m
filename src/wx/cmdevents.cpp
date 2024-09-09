@@ -126,7 +126,7 @@ static void toggleBitVar(bool *menuValue, int *globalVar, int mask)
 EVT_HANDLER(wxID_OPEN, "Open ROM...")
 {
     static int open_ft = 0;
-    const wxString& gba_rom_dir = OPTION(kGBAROMDir);
+    const wxString gba_rom_dir = OPTION(kGBAROMDir);
 
     // FIXME: ignore if non-existent or not a dir
     wxString pats = _(
@@ -158,7 +158,7 @@ EVT_HANDLER(wxID_OPEN, "Open ROM...")
 EVT_HANDLER(OpenGB, "Open GB...")
 {
     static int open_ft = 0;
-    const wxString& gb_rom_dir = OPTION(kGBROMDir);
+    const wxString gb_rom_dir = OPTION(kGBROMDir);
 
     // FIXME: ignore if non-existent or not a dir
     wxString pats = _(
@@ -185,7 +185,7 @@ EVT_HANDLER(OpenGB, "Open GB...")
 EVT_HANDLER(OpenGBC, "Open GBC...")
 {
     static int open_ft = 0;
-    const wxString& gbc_rom_dir = OPTION(kGBGBCROMDir);
+    const wxString gbc_rom_dir = OPTION(kGBGBCROMDir);
 
     // FIXME: ignore if non-existent or not a dir
     wxString pats = _(
