@@ -189,19 +189,19 @@ void GameArea::LoadGame(const wxString& name)
         wxString rp = fnfn.GetPath();
 
         // can't really decide which dir to use, so try GBA first, then GB
-        const wxString& gba_rom_dir = OPTION(kGBAROMDir);
+        const wxString gba_rom_dir = OPTION(kGBAROMDir);
         if (!wxGetApp().GetAbsolutePath(gba_rom_dir).empty()) {
             fnfn.SetPath(wxGetApp().GetAbsolutePath(gba_rom_dir) + '/' + rp);
             badfile = !fnfn.IsFileReadable();
         }
 
-        const wxString& gb_rom_dir = OPTION(kGBROMDir);
+        const wxString gb_rom_dir = OPTION(kGBROMDir);
         if (badfile && !wxGetApp().GetAbsolutePath(gb_rom_dir).empty()) {
             fnfn.SetPath(wxGetApp().GetAbsolutePath(gb_rom_dir) + '/' + rp);
             badfile = !fnfn.IsFileReadable();
         }
 
-        const wxString& gbc_rom_dir = OPTION(kGBGBCROMDir);
+        const wxString gbc_rom_dir = OPTION(kGBGBCROMDir);
         if (badfile && !wxGetApp().GetAbsolutePath(gbc_rom_dir).empty()) {
             fnfn.SetPath(wxGetApp().GetAbsolutePath(gbc_rom_dir) + '/' + rp);
             badfile = !fnfn.IsFileReadable();

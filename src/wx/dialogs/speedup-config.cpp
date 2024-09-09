@@ -56,10 +56,7 @@ bool SpeedupConfigValidator::TransferToWindow() {
 
 bool SpeedupConfigValidator::TransferFromWindow() {
     auto dialog = static_cast<SpeedupConfig*>(GetWindow());
-
     uint32_t val = dialog->speedup_throttle_spin_->GetValue();
-
-    VBAM_CHECK(val >= 0);
 
     if (val == 0) {
         OPTION(kPrefSpeedupThrottle)          = 0;
@@ -116,10 +113,7 @@ SpeedupConfig::SpeedupConfig(wxWindow* parent)
 void SpeedupConfig::SetSpeedupThrottle(wxCommandEvent& evt)
 {
     VBAM_CHECK(evt.GetEventObject() == speedup_throttle_spin_);
-
     uint32_t val = speedup_throttle_spin_->GetValue();
-
-    VBAM_CHECK(val >= 0);
 
     if (val == 0) {
         frame_skip_cb_->SetValue(false);

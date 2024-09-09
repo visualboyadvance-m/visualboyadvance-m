@@ -330,7 +330,7 @@ void DisplayConfig::PopulatePluginOptions() {
     plugin_selector_->Clear();
     plugin_selector_->Append(_("None"), new wxStringClientData());
 
-    const wxString& selected_plugin = OPTION(kDispFilterPlugin);
+    const wxString selected_plugin = OPTION(kDispFilterPlugin);
     bool is_plugin_selected = false;
 
     for (const wxString& plugin : plugins) {
