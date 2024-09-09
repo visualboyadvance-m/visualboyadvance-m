@@ -179,14 +179,14 @@ DISTS=$DISTS'
     libgpg-error    https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.45.tar.bz2                         lib/libgpg-error.a
     libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.1.tar.bz2                             lib/libgcrypt.a
     libsecret       https://gitlab.gnome.org/GNOME/libsecret/-/archive/0.20.5/libsecret-0.20.5.tar.bz2          lib/libsecret-1.a
-    sdl2            https://github.com/libsdl-org/SDL/releases/download/release-2.30.3/SDL2-2.30.3.tar.gz       lib/libSDL2.a
-    faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/24.06.tar.gz                            lib/libFAudio.a
+    sdl2            https://github.com/libsdl-org/SDL/releases/download/release-2.30.7/SDL2-2.30.7.tar.gz       lib/libSDL2.a
+    faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/24.09.tar.gz                            lib/libFAudio.a
     flac            https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.3.4.tar.xz                             lib/libFLAC.a
     harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/5.1.0/harfbuzz-5.1.0.tar.xz          lib/libharfbuzz.a
     sfml            https://github.com/SFML/SFML/archive/refs/tags/2.6.1.tar.gz                                 lib/libsfml-system-s.a
     shared-mime-info https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.2/shared-mime-info-2.2.tar.bz2  bin/update-mime-database
     wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.5/wxWidgets-3.2.5.tar.bz2     lib/libwx_baseu-3.*.a
-    ffmpeg          http://ffmpeg.org/releases/ffmpeg-7.0.1.tar.xz                                              lib/libavformat.a
+    ffmpeg          http://ffmpeg.org/releases/ffmpeg-7.0.2.tar.xz                                              lib/libavformat.a
 '
 
 BUILD_FFMPEG=1
