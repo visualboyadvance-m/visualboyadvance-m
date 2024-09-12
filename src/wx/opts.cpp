@@ -416,11 +416,9 @@ void update_shortcut_opts() {
 
     // For keyboard shortcuts, it's easier to delete everything and start over.
     cfg->DeleteGroup("/Keyboard");
-    cfg->SetPath("/Keyboard");
     for (const auto& iter : wxGetApp().bindings()->GetKeyboardConfiguration()) {
         cfg->Write(iter.first, iter.second);
     }
-    cfg->SetPath("/");
 
     // For joypads, we just compare the strings.
     bool game_bindings_changed = false;
