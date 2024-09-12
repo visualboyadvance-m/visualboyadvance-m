@@ -1010,13 +1010,13 @@ install(
 # Installation scripts.
 install(
     PROGRAMS ${PROJECT_BINARY_DIR}/visualboyadvance-m${CMAKE_EXECUTABLE_SUFFIX}
-    DESTINATION ${CMAKE_INSTALL_FULL_BINDIR}
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 install(
     FILES ${CMAKE_SOURCE_DIR}/src/vba-over.ini
-    DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/vbam
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/vbam
 )
 
 if (UNIX)
-    install(FILES ${CMAKE_SOURCE_DIR}/src/debian/visualboyadvance-m.6 DESTINATION ${CMAKE_INSTALL_FULL_MANDIR}/man6)
+    install(FILES ${CMAKE_SOURCE_DIR}/src/debian/visualboyadvance-m.6 DESTINATION ${CMAKE_INSTALL_MANDIR}/man6)
 endif()
