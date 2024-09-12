@@ -1372,8 +1372,19 @@ int wxvbamApp::FilterEvent(wxEvent& event)
         return wxEventFilter::Event_Skip;
     }
 
-    // Queue the associated shortcut command.
-    wxCommandEvent* command_event = new wxCommandEvent(wxEVT_COMMAND_MENU_SELECTED, command_id);
+    // Find the associated checkable menu item (if any).
+    for (const cmditem& cmd_item : cmdtab) {
+        if (cmd_item.cmd_id == command_id) {
+            if (cmd_item.mi && cmd_item.mi->IsCheckable()) {
+                // Toggle the checkable menu item.
+                cmd_item.mi->Check(!cmd_item.mi->IsChecked());
+            }
+            break;
+        }
+    }
+
+    // Queue the associated shortcut command event.
+    wxCommandEvent* command_event = new wxCommandEvent(wxEVT_MENU, command_id);
     command_event->SetEventObject(this);
     frame->GetEventHandler()->QueueEvent(command_event);
 
