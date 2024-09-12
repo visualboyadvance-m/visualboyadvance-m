@@ -2219,7 +2219,7 @@ EVT_HANDLER(FAQ, "VBA-M support forum")
 
 EVT_HANDLER(Translate, "Translations")
 {
-    wxLaunchDefaultBrowser(wxT("http://www.transifex.com/projects/p/vba-m"));
+    wxLaunchDefaultBrowser(wxT("https://explore.transifex.com/bgk/vba-m/"));
 }
 
 // was About
