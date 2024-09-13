@@ -61,7 +61,7 @@ endif()
 
 if(ENABLE_LIRC)
     target_link_libraries(vbam lirc_client)
-    target_compile_definitions(vbam VBAM_ENABLE_LIRC)
+    target_compile_definitions(vbam PUBLIC VBAM_ENABLE_LIRC)
 endif()
 
 if(WIN32)
