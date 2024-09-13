@@ -83,6 +83,11 @@ include(Options)
 include(Toolchain)
 include(Dependencies)
 
+# Disable tests when not in a git checkout.
+if(NOT EXISTS "${CMAKE_SOURCE_DIR}/.git")
+    set(BUILD_TESTING OFF)
+endif()
+
 # Configure gtest
 if(BUILD_TESTING)
     FetchContent_Declare(googletest
