@@ -326,10 +326,29 @@ certificate of the type 'Developer ID Application' stored in your login
 keychain.
 
 If you are not using a GUI session, you will need to use a method to unlock your
-login keychain before building. Adding the certificate and key to the System
-keychain is also a method that some people use.
+login keychain before building so that your codesigning certificate can be used.
+Adding the certificate and key to the System keychain is also a method that some
+people use.
 
-Then run:
+To unlock your keychain on login, you can add something like this to your
+`~/.zshrc`:
+
+```bash
+security unlock-keychain -p "$(cat ~/.login-keychain-password)" login.keychain
+```
+, with your login password in that file.
+
+For notarization to work, you will need to create an app-specific password on
+https://appleid.apple.com , get your Team ID from your Apple Developer account,
+and store them with this command:
+
+```bash
+xcrun notarytool store-credentials AC_PASSWORD \
+               --apple-id you@domain.com \
+               --team-id <DeveloperTeamID> \
+               --password <secret_app_specific_2FA_password>
+```
+. Once all of this is set up, run:
 
 ```bash
 tools/osx/builder
