@@ -34,8 +34,6 @@ case "\$CC" in
                     CMAKE_REQUIRED_ARGS="\$CMAKE_REQUIRED_ARGS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=\$CC -DCMAKE_CXX_COMPILER=\$CXX"
                     ;;
             esac
-            export CC="ccache \$CC"
-            export CXX="ccache \$CXX"
         fi
         ;;
 esac
@@ -294,6 +292,7 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
 
 DIST_POST_BUILD="$DIST_POST_BUILD
     pkgconf         ln -sf \"\$BUILD_ROOT/root/bin/pkgconf\" \"\$BUILD_ROOT/root/bin/pkg-config\";
+    ccache          setup_ccache
     harfbuzz        rebuild_dist freetype -Dharfbuzz=enabled;
     flex-2.6.3      build_dist flex || :;
     libtool         ln -sf \"\$BUILD_ROOT/root/bin/libtoolize\" \"\$BUILD_ROOT/root/bin/glibtoolize\";
@@ -445,6 +444,7 @@ builder() {
     install_core_deps
     setup_perl
     setup_meson
+    setup_ccache
     setup_ninja
     delete_outdated_dists
     pre_build_all
@@ -620,6 +620,13 @@ setup_meson() {
                 ln -sf "$meson" "$BUILD_ROOT/root/bin/meson"
             fi
         fi
+    fi
+}
+
+setup_ccache() {
+    if command -v ccache >/dev/null; then
+        ln -sf "$(command -v ccache)" "$BUILD_ROOT/root/bin/${CC##*/}"
+        ln -sf "$(command -v ccache)" "$BUILD_ROOT/root/bin/${CXX##*/}"
     fi
 }
 
