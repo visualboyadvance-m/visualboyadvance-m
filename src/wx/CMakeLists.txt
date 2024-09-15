@@ -141,7 +141,7 @@ endif()
 
 # wxWidgets configuration.
 set(wxWidgets_USE_UNICODE ON)
-if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(wxWidgets_USE_DEBUG ON) # noop if wx is compiled with --disable-debug, like in Mac Homebrew atm
 endif()
 if(VBAM_STATIC)
@@ -160,6 +160,13 @@ find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl ${wx_find_ex
 if(NOT wxWidgets_FOUND)
     find_package(wxWidgets COMPONENTS xrc xml html adv net core base ${wx_find_extra} REQUIRED)
     set(ENABLE_OPENGL FALSE)
+endif()
+
+# Fixup wxWidgets paths for vcpkg debug builds.
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
+    set(wxWidgets_ROOT_DIR "${wxWidgets_ROOT_DIR}/debug" CACHE INTERNAL "wxWidgets root directory" FORCE)
+    string(REGEX REPLACE "/lib$" "/debug/lib" wxWidgets_LIB_DIR "${wxWidgets_LIB_DIR}")
+    set(wxWidgets_LIB_DIR "${wxWidgets_LIB_DIR}" CACHE INTERNAL "wxWidgets library directory" FORCE)
 endif()
 
 # Find OpenAL (required).
@@ -380,10 +387,6 @@ if(WIN32)
         # Disable the auto-generated manifest from CMake.
         target_link_options(visualboyadvance-m PRIVATE "/MANIFEST:NO")
     endif()
-
-    # wxWidgets fails to bring in its dependency.
-    find_library(PCRE_LIB pcre2-16 REQUIRED)
-    target_link_libraries(visualboyadvance-m ${PCRE_LIB})
 endif()
 
 if(APPLE)
