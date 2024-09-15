@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.1.11] - 2024-09-15 
+
+==========================
+* 3eea90af - build: set BUILD_TESTING=OFF when not git checkout [rkitover]
+* b3952d74 - build: fix ENABLE_LIRC=ON [rkitover]
+* f264e7f8 - Fix Help -> Translations URL [rkitover]
+* 61f427de - Write shortcuts in the proper section (#1335) [Steelskin]
+* d619ee2b - build: fix installing GoogleTest [rkitover]
+* 26207038 - Update WinSparkle to 0.8.1 and add ARM64 [rkitover]
+
 ## [2.1.10] - 2024-09-08 
 
 ==========================
