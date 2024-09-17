@@ -111,11 +111,6 @@ elseif(NOT CMAKE_BUILD_TYPE MATCHES "^(Release|Debug|RelWithDebInfo|MinSizeRel)$
     message(FATAL_ERROR "Invalid CMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}', must be one of: 'Release', 'Debug', 'RelWithDebInfo' or 'MinSizeRel'")
 endif()
 
-# Link debug libs for RelWithDebInfo
-if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-    set(CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO "Debug")
-endif()
-
 set(MSYS OFF)
 if(NOT "$ENV{MSYSTEM_PREFIX}" STREQUAL "")
     set(MSYS ON)

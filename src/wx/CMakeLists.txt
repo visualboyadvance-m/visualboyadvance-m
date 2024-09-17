@@ -247,7 +247,7 @@ function(configure_wx_target target)
     _add_include_directories(${wxWidgets_INCLUDE_DIRS})
     _add_compile_options(${wxWidgets_CXX_FLAGS})
     _add_compile_definitions(${wxWidgets_DEFINITIONS})
-    if(CMAKE_BUILD_TYPE MATCHES "^(Debug|RelWithDebInfo)$")
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         _add_compile_definitions(${wxWidgets_DEFINITIONS_DEBUG})
     endif()
 
