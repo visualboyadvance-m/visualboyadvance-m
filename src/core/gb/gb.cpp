@@ -2969,8 +2969,13 @@ void gbReset()
         inBios = true;
     } else if (gbHardware & 0xa) {
         // Set compatibility mode if it is a DMG ROM.
-        const uint8_t gbcFlag = g_gbCartData.SupportsCGB() ? 0x80 : 0x00;
-        gbMemory[0xff6c] = 0xfe | gbcFlag;
+        if (g_gbCartData.SupportsCGB()) {
+            // OPRI with bit 0 set to 0 = CGB mode.
+            gbMemory[0xff6c] = 0xfe;
+        } else {
+            // OPRI with bit 0 set to 1 = DMG mode.
+            gbMemory[0xff6c] = 0xff;
+        }
     }
 
     gbLine99Ticks = 1;
