@@ -145,8 +145,10 @@ AccelConfig::AccelConfig(wxWindow* parent,
         PopulateTreeWithMenu(&command_to_item_id_, tree_, id, menu->GetMenu(i), recents,
                              menu->GetMenuLabelText(i) + '\n');
     }
-    tree_->ExpandAll();
     tree_->SelectItem(menu_id);
+
+    // Set a minimum size for the tree so the default dialog size is reasonable.
+    tree_->SetMinSize(wxSize(300, 300));
 
     int w, h;
     current_keys_->GetTextExtent("CTRL-ALT-SHIFT-ENTER", &w, &h);
