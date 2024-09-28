@@ -894,10 +894,14 @@ EVT_MOVE_START(MainFrame::OnMoveStart)
 EVT_MOVE_END(MainFrame::OnMoveEnd)
 EVT_SIZE(MainFrame::OnSize)
 
+#if defined(__WXMSW__)
+
 // For tracking menubar state.
 EVT_MENU_OPEN(MainFrame::MenuPopped)
 EVT_MENU_CLOSE(MainFrame::MenuPopped)
 EVT_MENU_HIGHLIGHT_ALL(MainFrame::MenuPopped)
+
+#endif  // defined(__WXMSW__)
 
 END_EVENT_TABLE()
 
@@ -1152,8 +1156,9 @@ void MainFrame::ResetMenuAccelerators() {
     ResetRecentAccelerators();
 }
 
-void MainFrame::MenuPopped(wxMenuEvent& evt)
-{
+#if defined(__WXMSW__)
+
+void MainFrame::MenuPopped(wxMenuEvent& evt) {
     // We consider the menu closed when the main menubar or system menu is closed, not any submenus.
     // On Windows nullptr is the system menu.
     if (evt.GetEventType() == wxEVT_MENU_CLOSE && (evt.GetMenu() == nullptr || evt.GetMenu()->GetMenuBar() == GetMenuBar()))
@@ -1166,17 +1171,15 @@ void MainFrame::MenuPopped(wxMenuEvent& evt)
 
 // On Windows, opening the menubar will stop the app, but DirectSound will
 // loop, so we pause audio here.
-void MainFrame::SetMenusOpened(bool state)
-{
+void MainFrame::SetMenusOpened(bool state) {
     menus_opened = state;
-
-#ifdef __WXMSW__
     if (menus_opened)
         soundPause();
     else if (!paused)
         soundResume();
-#endif
 }
+
+#endif  // defined(__WXMSW__)
 
 // ShowModal that also disables emulator loop
 // uses dialog_opened as a nesting counter
@@ -1338,12 +1341,12 @@ int wxvbamApp::FilterEvent(wxEvent& event)
         return wxEventFilter::Event_Skip;
     }
 
-    if (!frame->CanProcessShortcuts()) {
+    if (event.GetEventType() != VBAM_EVT_USER_INPUT) {
+        // We only treat "VBAM_EVT_USER_INPUT" events here.
         return wxEventFilter::Event_Skip;
     }
 
-    if (event.GetEventType() != VBAM_EVT_USER_INPUT) {
-        // We only treat "VBAM_EVT_USER_INPUT" events here.
+    if (!frame->CanProcessShortcuts()) {
         return wxEventFilter::Event_Skip;
     }
 

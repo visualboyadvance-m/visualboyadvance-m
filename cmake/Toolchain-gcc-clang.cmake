@@ -46,7 +46,7 @@ if(NOT ENABLE_ASM) # inline asm is not allowed with -fPIC
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_options(-ggdb3 -Og -fno-omit-frame-pointer -Wall -Wextra)
+    add_compile_options(-ggdb3 -fno-omit-frame-pointer -Wall -Wextra)
 else()
     add_compile_options(-Ofast -fomit-frame-pointer)
 endif()

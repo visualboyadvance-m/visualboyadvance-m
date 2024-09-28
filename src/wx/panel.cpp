@@ -952,10 +952,6 @@ void GameArea::ShowFullScreen(bool full)
         while (!tlw->popups.empty())
             tlw->popups.front()->Close();
 
-        // Some kbd accels can send a menu open event without a close event,
-        // this happens on Mac in HiDPI mode for the fullscreen toggle accel.
-        main_frame->SetMenusOpened(false);
-
         // mouse stays blank whenever full-screen
         HidePointer();
         cursz_valid = true;
