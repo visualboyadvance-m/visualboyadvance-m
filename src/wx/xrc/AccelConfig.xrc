@@ -2,7 +2,7 @@
 <resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
   <object class="wxDialog" name="AccelConfig">
     <title>Key Shortcuts</title>
-    <style>wxRESIZE_BORDER</style>
+    <style>wxRESIZE_BORDER|wxCLOSE_BOX</style>
     <object class="wxBoxSizer">
       <orient>wxVERTICAL</orient>
       <flag>wxEXPAND</flag>
@@ -56,6 +56,7 @@
             </object>
           </object>
           <object class="sizeritem">
+            <flag>wxEXPAND</flag>
             <object class="wxBoxSizer">
               <object class="sizeritem">
                 <object class="wxButton" name="Assign">
@@ -80,7 +81,6 @@
               </object>
               <orient>wxVERTICAL</orient>
             </object>
-            <flag>wxEXPAND</flag>
           </object>
           <object class="sizeritem">
             <flag>wxALL</flag>
@@ -98,6 +98,7 @@
             </object>
           </object>
           <object class="sizeritem">
+            <flag>wxEXPAND</flag>
             <object class="wxBoxSizer">
               <object class="sizeritem">
                 <flag>wxALL</flag>
@@ -113,7 +114,6 @@
               </object>
               <orient>wxVERTICAL</orient>
             </object>
-            <flag>wxEXPAND</flag>
           </object>
         </object>
       </object>

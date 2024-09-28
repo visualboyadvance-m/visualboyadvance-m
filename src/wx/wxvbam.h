@@ -97,7 +97,7 @@ public:
     bool pending_fullscreen;
 #if __WXMAC__
     // I suppose making this work will require tweaking the bundle
-    void MacOpenFile(const wxString& f)
+    void MacOpenFile(const wxString& f) override
     {
         pending_load = f;
     };
