@@ -788,7 +788,7 @@ endif()
 if(UPSTREAM_RELEASE AND WIN32)
     set(home "$ENV{HOME}")
 
-    if((MSVC OR NOT CMAKE_CROSSCOMPILING) AND NOT DEFINED ENV{MSYSTEM_PREFIX})
+    if(NOT home OR ((MSVC OR NOT CMAKE_CROSSCOMPILING) AND NOT DEFINED ENV{MSYSTEM_PREFIX}))
         set(home "$ENV{USERPROFILE}")
     endif()
 
@@ -796,8 +796,9 @@ if(UPSTREAM_RELEASE AND WIN32)
     string(REGEX REPLACE "\\\\" "/" home "${home}")
 
     set(cert "${home}/.codesign/windows_comodo.pkcs12")
+    file(STRINGS "${home}/.codesign/windows_comodo.pkcs12.password" cert_password)
 
-    if(EXISTS "${cert}")
+    if(EXISTS "${cert}" AND cert_password)
         find_program(OSSLSIGNCODE_PROGRAM osslsigncode)
         find_program(SIGNTOOL_PROGRAM     signtool)
 
@@ -806,7 +807,7 @@ if(UPSTREAM_RELEASE AND WIN32)
                 TARGET visualboyadvance-m
                 POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E rename visualboyadvance-m.exe visualboyadvance-m-unsigned.exe
-                COMMAND ${OSSLSIGNCODE_PROGRAM} sign -pkcs12 ${cert} -pass "vbam3!13" -t http://timestamp.digicert.com -n visualboyadvance-m -i https://github.com/visualboyadvance-m/visualboyadvance-m -in visualboyadvance-m-unsigned.exe -out visualboyadvance-m.exe
+                COMMAND ${OSSLSIGNCODE_PROGRAM} sign -pkcs12 ${cert} -pass "${cert_password}" -t http://timestamp.digicert.com -n visualboyadvance-m -i https://github.com/visualboyadvance-m/visualboyadvance-m -in visualboyadvance-m-unsigned.exe -out visualboyadvance-m.exe
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                 )
         elseif(SIGNTOOL_PROGRAM)
@@ -814,7 +815,7 @@ if(UPSTREAM_RELEASE AND WIN32)
                 TARGET visualboyadvance-m
                 POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy visualboyadvance-m.exe visualboyadvance-m-unsigned.exe
-                COMMAND ${SIGNTOOL_PROGRAM} sign /f ${cert} /fd certHash /td certHash /p "vbam3!13" /tr http://timestamp.digicert.com /du https://github.com/visualboyadvance-m/visualboyadvance-m /a visualboyadvance-m.exe
+                COMMAND ${SIGNTOOL_PROGRAM} sign /f ${cert} /fd certHash /td certHash /p "${cert_password}" /tr http://timestamp.digicert.com /du https://github.com/visualboyadvance-m/visualboyadvance-m /a visualboyadvance-m.exe
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                 )
         endif()

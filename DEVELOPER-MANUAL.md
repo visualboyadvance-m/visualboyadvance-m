@@ -212,6 +212,10 @@ and tags.
 Make sure you have set up a Windows code signing certificate with the right
 password and a Mac 'Developer ID Application' certificate.
 
+Put the Windows certificate into `~/.codesign/windows_comodo.pkcs12` as a PKCS12
+file that is password protected, and put the password for it into
+`~/.codesign/windows_comodo.pkcs12.password`.
+
 #### Release Commit and Tag
 
 Once you are sure you're ready to release, and you are in a git clone on master
