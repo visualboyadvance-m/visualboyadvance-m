@@ -219,9 +219,14 @@ public:
     // possible
     void StartModal();
     void StopModal();
-    // however, adding a handler for open/close menu to do the same is unsafe.
-    // there is no guarantee every show will be matched by a hide.
+
+#if defined(__WXMSW__)
+
+    // On Windows, we need to disable the audio loop when the menu is open. We also disable
+    // shortcuts to prevent issues. This is not necessary on other systems.
     void MenuPopped(wxMenuEvent& evt);
+
+#endif  // defined(__WXMSW__)
 
     // flags for enabling commands
     int cmd_enable;
@@ -285,7 +290,9 @@ public:
 
     virtual bool MenusOpened() { return menus_opened; }
 
-    virtual void SetMenusOpened(bool state);
+#if defined(__WXMSW__)
+    void SetMenusOpened(bool state);
+#endif  // defined(__WXMSW__)
 
     virtual bool DialogOpened() { return dialog_opened != 0; }
 
