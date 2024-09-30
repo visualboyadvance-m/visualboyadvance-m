@@ -1822,6 +1822,16 @@ static INSN_REGPARM void thumbE0(uint32_t opcode)
     busPrefetchCount = 0;
 }
 
+static INSN_REGPARM void thumbE8(uint32_t opcode)
+{
+#ifdef GBA_LOGGING
+    // TODO: This is (erroneously) used by some Wii U VC ROMs. We should have a configuration
+    // toggle to enable the correct hardware behavior, which would be to call CPUUndefinedException.
+    if (systemVerbose & VERBOSE_UNDEFINED)
+        log("Undefined Wii U THUMB instruction %04x at %08x (ignored)\n", opcode, armNextPC - 2);
+#endif
+}
+
 // BLL #offset (forward)
 static INSN_REGPARM void thumbF0(uint32_t opcode)
 {
@@ -1979,7 +1989,7 @@ static insnfunc_t thumbInsnTable[1024] = {
     thumbE0, thumbE0, thumbE0, thumbE0, thumbE0, thumbE0, thumbE0, thumbE0,
     thumbE0, thumbE0, thumbE0, thumbE0, thumbE0, thumbE0, thumbE0, thumbE0,
     thumbE0, thumbE0, thumbE0, thumbE0, thumbE0, thumbE0, thumbE0, thumbE0,
-    thumbUI, thumbUI, thumbUI, thumbUI, thumbUI, thumbUI, thumbUI, thumbUI, // E8
+    thumbE8, thumbUI, thumbUI, thumbUI, thumbUI, thumbUI, thumbUI, thumbUI, // E8
     thumbUI, thumbUI, thumbUI, thumbUI, thumbUI, thumbUI, thumbUI, thumbUI,
     thumbUI, thumbUI, thumbUI, thumbUI, thumbUI, thumbUI, thumbUI, thumbUI,
     thumbUI, thumbUI, thumbUI, thumbUI, thumbUI, thumbUI, thumbUI, thumbUI,
