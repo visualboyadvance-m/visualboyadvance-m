@@ -180,7 +180,7 @@ DISTS=$DISTS'
     sdl2            https://github.com/libsdl-org/SDL/releases/download/release-2.30.7/SDL2-2.30.7.tar.gz       lib/libSDL2.a
     faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/24.09.tar.gz                            lib/libFAudio.a
     flac            https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.3.4.tar.xz                             lib/libFLAC.a
-    harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/5.1.0/harfbuzz-5.1.0.tar.xz          lib/libharfbuzz.a
+    harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/10.0.1/harfbuzz-10.0.1.tar.xz        lib/libharfbuzz.a
     sfml            https://github.com/SFML/SFML/archive/refs/tags/2.6.1.tar.gz                                 lib/libsfml-system-s.a
     shared-mime-info https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.2/shared-mime-info-2.2.tar.bz2  bin/update-mime-database
     wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.6/wxWidgets-3.2.6.tar.bz2     lib/libwx_baseu-3.*.a
@@ -236,7 +236,6 @@ DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     pkgconf         autoreconf_noargs
     fontconfig      autoreconf
     libgd           autoreconf
-    harfbuzz        autoconf
     python2         autoreconf
     python3         autoreconf
     graphviz        autoreconf
@@ -272,7 +271,6 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
                     sed -i.bak '/SUBDIRS/{; s/ doc//; }' Makefile.am;
     graphviz        sed -i.bak 's/ -export-symbols/ -Wl,-export-symbols/g' \$(find . -name Makefile.am); \
                     putsln '#define __declspec(x)' > declspec.h;
-    harfbuzz        touch test/CMakeLists.txt;
     xvidcore        cd build/generic; \
                     sed -i.bak '/^all:/{ s/ *\\\$(SHARED_LIB)//; }; \
                                 /^install:/{ s, *\\\$(BUILD_DIR)/\\\$(SHARED_LIB),,; }; \
@@ -370,7 +368,7 @@ DIST_ARGS="$DIST_ARGS
     libjpeg-turbo -DWITH_JPEG8=ON -DWITH_SIMD=OFF
     libtiff     --disable-lzma --disable-webp
     freetype    -Dharfbuzz=disabled
-    harfbuzz    --with-cairo=no --with-icu=no
+    harfbuzz    -Dcairo=disabled -Dicu=disabled
     graphite2   -DGRAPHITE2_NFILEFACE=ON -DGRAPHITE2_TESTS=OFF -DGRAPHITE2_DOCS=OFF
     flac        --disable-ogg
     libsoxr     -DWITH_OPENMP=NO
