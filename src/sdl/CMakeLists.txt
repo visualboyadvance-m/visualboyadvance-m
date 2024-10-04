@@ -31,8 +31,8 @@ if(MSVC)
     # We should probably use an external library for this.
     target_sources(vbam
         PRIVATE
-        ${CMAKE_SOURCE_DIR}/dependencies/msvc/getopt.c
-        ${CMAKE_SOURCE_DIR}/dependencies/msvc/getopt.h
+        ${CMAKE_SOURCE_DIR}/win32-deps/msvc/getopt.c
+        ${CMAKE_SOURCE_DIR}/win32-deps/msvc/getopt.h
     )
 endif()
 

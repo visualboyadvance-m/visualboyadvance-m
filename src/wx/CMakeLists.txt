@@ -519,7 +519,7 @@ host_compile(${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c ${BIN2C})
 
 # Override wxrc when cross-compiling.
 if(CMAKE_HOST_WIN32 AND CMAKE_CROSSCOMPILING)
-    set(WXRC ${CMAKE_SOURCE_DIR}/dependencies/wxrc/wxrc.exe)
+    set(WXRC ${CMAKE_SOURCE_DIR}/win32-deps/wxrc/wxrc.exe)
 endif()
 
 # Configure wxrc.
@@ -666,7 +666,7 @@ endif()
 
 if(WIN32 AND (X86_64 OR ARM64 OR X86_32) AND ENABLE_ONLINEUPDATES)
     if(NOT DEFINED WINSPARKLE_BIN_RELEASE_DIR)
-        set(WINSPARKLE_BIN_RELEASE_DIR ${CMAKE_SOURCE_DIR}/dependencies/WinSparkle-0.8.1)
+        set(WINSPARKLE_BIN_RELEASE_DIR ${CMAKE_SOURCE_DIR}/win32-deps/WinSparkle-0.8.1)
     endif()
 
     target_include_directories(

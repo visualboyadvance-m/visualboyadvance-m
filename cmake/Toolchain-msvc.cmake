@@ -10,7 +10,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     endif()
 endif()
 
-include_directories("${CMAKE_SOURCE_DIR}/dependencies/msvc")
+include_directories("${CMAKE_SOURCE_DIR}/win32-deps/msvc")
 
 add_compile_definitions(
     _FORCENAMELESSUNION

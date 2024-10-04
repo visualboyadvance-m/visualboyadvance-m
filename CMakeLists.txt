@@ -52,7 +52,7 @@ if(GIT_FOUND AND WIN32)
     # Win32 deps submodule
     set(SUBMODULE_MANUAL_UPDATE FALSE)
 
-    if(EXISTS "${CMAKE_SOURCE_DIR}/.git" AND NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
+    if(EXISTS "${CMAKE_SOURCE_DIR}/.git" AND NOT EXISTS "${CMAKE_SOURCE_DIR}/win32-deps/mingw-xaudio/include")
         set(SUBMODULE_MANUAL_UPDATE TRUE)
         execute_process(
             COMMAND "${GIT_EXECUTABLE}" submodule update --init --remote --recursive
@@ -61,7 +61,7 @@ if(GIT_FOUND AND WIN32)
         )
     endif()
 
-    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/dependencies/mingw-xaudio/include")
+    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/win32-deps/mingw-xaudio/include")
         if(NOT (SUBMODULE_MANUAL_UPDATE AND SUBMODULE_UPDATE_STATUS EQUAL 0))
             message(FATAL_ERROR "Please pull in git submodules, e.g.\nrun: git submodule update --init --remote --recursive")
         endif()
@@ -191,5 +191,5 @@ set(CPACK_SOURCE_GENERATOR "TGZ")
 set(CPACK_PACKAGE_VERSION_MAJOR "2")
 set(CPACK_PACKAGE_VERSION_MINOR "0")
 set(CPACK_PACKAGE_VERSION_PATCH "0-Git-${COMMITHASH}")
-list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
+list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/win32-deps")
 include(CPack)
