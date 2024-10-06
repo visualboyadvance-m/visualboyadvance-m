@@ -248,7 +248,14 @@ wxvbamApp::wxvbamApp()
       using_wayland(false),
       emulated_gamepad_(std::bind(&wxvbamApp::bindings, this)),
       sdl_poller_(this),
-      keyboard_input_sender_(this) {}
+      keyboard_input_handler_(this) {
+    Bind(wxEVT_ACTIVATE_APP, [this](wxActivateEvent& event) {
+        if (!event.GetActive()) {
+            keyboard_input_handler_.Reset();
+        }
+        event.Skip();
+    });
+}
 
 const wxString wxvbamApp::GetPluginsDir()
 {
@@ -851,7 +858,6 @@ MainFrame::MainFrame()
       paused(false),
       menus_opened(0),
       dialog_opened(0),
-      focused(false),
 #ifndef NO_LINK
       gba_link_observer_(config::OptionID::kGBALinkHost,
                          std::bind(&MainFrame::EnableNetworkMenu, this)),
@@ -905,18 +911,24 @@ EVT_MENU_HIGHLIGHT_ALL(MainFrame::MenuPopped)
 
 END_EVENT_TABLE()
 
-void MainFrame::OnActivate(wxActivateEvent& event)
-{
-    focused = event.GetActive();
+void MainFrame::OnActivate(wxActivateEvent& event) {
+    const bool focused = event.GetActive();
 
-    if (panel && focused)
+    if (!panel) {
+        // Nothing more to do if no game is active.
+        return;
+    }
+
+    if (focused) {
+        // Set the focus to the game panel.
         panel->SetFocus();
+    }
 
     if (OPTION(kPrefPauseWhenInactive)) {
-        if (panel && focused && !paused) {
+        // Handle user preferences for pausing the game when the window is inactive.
+        if (focused && !paused) {
             panel->Resume();
-        }
-        else if (panel && !focused) {
+        } else if (!focused) {
             panel->Pause();
         }
     }
@@ -1337,7 +1349,7 @@ int wxvbamApp::FilterEvent(wxEvent& event)
 
     if (event.GetEventType() == wxEVT_KEY_DOWN || event.GetEventType() == wxEVT_KEY_UP) {
         // Handle keyboard input events here to generate user input events.
-        keyboard_input_sender_.ProcessKeyEvent(static_cast<wxKeyEvent&>(event));
+        keyboard_input_handler_.ProcessKeyEvent(static_cast<wxKeyEvent&>(event));
         return wxEventFilter::Event_Skip;
     }
 

@@ -3,7 +3,6 @@
 
 #include <list>
 #include <stdexcept>
-#include <typeinfo>
 #include <iostream>
 #include <stdio.h>
 #include <time.h>
@@ -20,6 +19,7 @@
 #include "wx/widgets/dpi-support.h"
 #include "wx/widgets/event-handler-provider.h"
 #include "wx/widgets/keep-on-top-styler.h"
+#include "wx/widgets/keyboard-input-handler.h"
 #include "wx/widgets/sdl-poller.h"
 #include "wx/widgets/user-input-event.h"
 #include "wx/widgets/wxmisc.h"
@@ -144,7 +144,7 @@ private:
     char* home = nullptr;
 
     widgets::SdlPoller sdl_poller_;
-    widgets::KeyboardInputSender keyboard_input_sender_;
+    widgets::KeyboardInputHandler keyboard_input_handler_;
 
     // Main configuration file.
     wxFileName config_file_;
@@ -251,9 +251,6 @@ public:
     // Resets all menu accelerators.
     void ResetMenuAccelerators();
 
-    // 2.8 has no HasFocus(), and FindFocus() doesn't work right
-    bool HasFocus() const override { return focused; }
-
 #ifndef NO_LINK
     // Returns the link mode to set according to the options
     LinkMode GetConfiguredLinkMode();
@@ -326,8 +323,6 @@ private:
     checkable_mi_array_t checkable_mi;
     // recent menu item accels
     wxMenu* recent;
-    // quicker & more accurate than FindFocus() != NULL
-    bool focused;
     // One-time toggle to indicate that this object is fully initialized. This
     // used to filter events that are sent during initialization.
     bool init_complete_ = false;

@@ -11,6 +11,7 @@ target_sources(vbam-wx-widgets
     $<IF:$<BOOL:${APPLE}>,dpi-support-mac.mm,dpi-support.cpp>
     group-check-box.cpp
     keep-on-top-styler.cpp
+    keyboard-input-handler.cpp
     option-validator.cpp
     render-plugin.cpp
     user-input-ctrl.cpp
@@ -28,6 +29,7 @@ target_sources(vbam-wx-widgets
     event-handler-provider.h
     group-check-box.h
     keep-on-top-styler.h
+    keyboard-input-handler.h
     option-validator.h
     render-plugin.h
     user-input-ctrl.h
@@ -46,8 +48,10 @@ if(BUILD_TESTING)
         client-data-test.cpp
         group-check-box-test.cpp
         keep-on-top-styler-test.cpp
+        keyboard-input-handler-test.cpp
         option-validator-test.cpp
         user-input-ctrl-test.cpp
+        user-input-event-test.cpp
     )
 
     target_link_libraries(vbam-wx-widgets-tests
@@ -61,6 +65,7 @@ if(BUILD_TESTING)
         vbam-wx-config
         vbam-wx-widgets
         GTest::gtest_main
+        GTest::gmock_main
     )
 
     configure_wx_target(vbam-wx-widgets-tests)

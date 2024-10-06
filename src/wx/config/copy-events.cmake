@@ -31,7 +31,6 @@ LIST(SORT EVLINES)
 STRING(REGEX REPLACE ",\n\$" "\n" EVLINES "${EVLINES}")
 FILE(APPEND "${CMDTAB}" ${EVLINES})
 FILE(APPEND "${CMDTAB}" "};\n")
-FILE(APPEND "${CMDTAB}" "const int ncmds = sizeof(cmdtab) / sizeof(cmdtab[0]);\n")
 
 # cmdhandlers.h contains prototypes for all handlers
 FILE(WRITE "${EVPROTO}" "// Generated from cmdevents.cpp; do not edit\n")
