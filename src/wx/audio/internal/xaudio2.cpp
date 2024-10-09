@@ -2,9 +2,11 @@
 #error "This file should only be compiled if XAudio2 is enabled"
 #endif
 
+#include "wx/audio/internal/xaudio27-dll-rc.h"
 #include "wx/audio/internal/xaudio2.h"
 
 #include <cstdio>
+#include <cstdlib>
 
 #include <string>
 #include <vector>
@@ -19,8 +21,17 @@
 #endif
 
 #include <wx/arrstr.h>
+#include <wx/chartype.h>
+#include <wx/dir.h>
+#include <wx/dynlib.h>
+#include <wx/file.h>
+#include <wx/filename.h>
 #include <wx/log.h>
+#include <wx/process.h>
+#include <wx/msw/private.h>
+#include <wx/string.h>
 #include <wx/translation.h>
+#include <wx/utils.h>
 
 #include "core/base/sound_driver.h"
 #include "core/base/system.h"  // for systemMessage()
@@ -199,6 +210,7 @@ public:
 
     void device_change();
 
+    inline static wxString temp_dir_path;
 private:
     void close();
 
@@ -220,6 +232,10 @@ private:
     int soundBufferLen;
 
     volatile bool device_changed;
+
+    wxDynamicLibrary xaudio2_dll;
+    typedef HRESULT (*func_XAudio2Create)(IXAudio2**, UINT32);
+    func_XAudio2Create dll_XAudio2Create = nullptr;
 
     IXAudio2* xaud;
     IXAudio2MasteringVoice* mVoice;  // listener
@@ -245,11 +261,41 @@ XAudio2_Output::XAudio2_Output() {
     ZeroMemory(&buf, sizeof(buf));
     ZeroMemory(&vState, sizeof(vState));
     g_notifier.do_register(this);
+
+    HRSRC res = FindResource(wxGetInstance(), MAKEINTRESOURCE(XAUDIO27_DLL_RC), RT_RCDATA);
+
+    if (!res)
+	wxLogFatalError("Could not find resource for 'XAudio2_7.dll'.");
+
+    HGLOBAL res_handle = LoadResource(NULL, res);
+
+    if (!res_handle)
+	wxLogFatalError("Could not find resource for 'XAudio2_7.dll'.");
+
+    uint64_t res_size = SizeofResource(NULL, res);
+
+    char *res_data = (char *)LockResource(res_handle);
+
+    wxString pid = wxString{} << wxProcessEvent{}.GetPid();
+    temp_dir_path = wxFileName::GetTempDir() + "/visualboyadvance-m/" + pid;
+    wxDir{}.Make(temp_dir_path, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
+    wxString dll_path = temp_dir_path + "/XAudio2_7.dll";
+    wxFile dll(dll_path, wxFile::write);
+    dll.Write((void *)res_data, res_size);
+    dll.Close();
+
+    xaudio2_dll.Load(dll_path, wxDL_VERBATIM | wxDL_QUIET);
+    dll_XAudio2Create = reinterpret_cast<func_XAudio2Create>(xaudio2_dll.GetSymbol("XAudio2Create"));
 }
 
 XAudio2_Output::~XAudio2_Output() {
     g_notifier.do_unregister(this);
     close();
+
+    HMODULE hmod = xaudio2_dll.Detach();
+    while(::FreeLibrary(hmod)) {
+        wxMilliSleep(50);
+    }
 }
 
 void XAudio2_Output::close() {
@@ -291,7 +337,7 @@ bool XAudio2_Output::init(long sampleRate) {
 
     HRESULT hr;
     // Initialize XAudio2
-    hr = XAudio2Create(&xaud, 0);
+    hr = dll_XAudio2Create(&xaud, 0);
 
     if (hr != S_OK) {
         wxLogError(_("The XAudio2 interface failed to initialize!"));

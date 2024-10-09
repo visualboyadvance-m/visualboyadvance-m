@@ -1,0 +1,1 @@
+#define XAUDIO27_DLL_PATH "@XAUDIO_27_DLL@"
