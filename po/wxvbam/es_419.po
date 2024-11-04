@@ -12,6 +12,7 @@
 # Kevin Bustinza <ufreshx@gmail.com>, 2021
 # MELERIX, 2023
 # Sebastián Castro Saldarriaga, 2023
+# Timoteo Traiber Minnaard, 2024
 # Yeferson Galviz, 2023
 # yocsan Cañderón <yecoyocsan@gmail.com>, 2021
 msgid ""
@@ -20,7 +21,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-05 20:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Yeferson Galviz, 2023\n"
+"Last-Translator: Timoteo Traiber Minnaard, 2024\n"
 "Language-Team: Spanish (Latin America) (http://app.transifex.com/bgk/vba-m/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,12 +31,12 @@ msgstr ""
 
 #: audio/internal/openal.cpp:188
 msgid "OpenAL: Failed to open audio device"
-msgstr ""
+msgstr "OpenAL: No se pudo abrir el dispositivo de audio"
 
 #: audio/internal/openal.cpp:386 audio/internal/faudio.cpp:492
 #: audio/internal/xaudio2.cpp:577
 msgid "Default device"
-msgstr "Default device"
+msgstr "Dispositivo predeterminado"
 
 #: cmdevents.cpp:133
 msgid ""
@@ -47,7 +48,7 @@ msgstr "Archivos Game Boy Advance (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar
 
 #: cmdevents.cpp:144
 msgid "Open ROM file"
-msgstr "Open ROM file"
+msgstr "Abrir archivo ROM"
 
 #: cmdevents.cpp:165
 msgid ""
@@ -392,7 +393,7 @@ msgstr "Unknown"
 
 #: dialogs/game-maker.cpp:235
 msgid "Invalid"
-msgstr ""
+msgstr "Inválido"
 
 #: dialogs/gb-rom-info.cpp:22
 msgid "No mapper"
@@ -412,7 +413,7 @@ msgstr ""
 
 #: dialogs/gb-rom-info.cpp:70
 msgid " + Battery"
-msgstr ""
+msgstr "+ Batería"
 
 #: dialogs/gb-rom-info.cpp:71
 msgid " + Rumble"
@@ -420,7 +421,7 @@ msgstr ""
 
 #: dialogs/gb-rom-info.cpp:72
 msgid " + Motion Sensor"
-msgstr ""
+msgstr "+ Sensor de Movimiento"
 
 #: dialogs/gb-rom-info.cpp:74
 #, c-format
@@ -486,7 +487,7 @@ msgstr ""
 #: dialogs/gb-rom-info.cpp:159
 #, c-format
 msgid "%02X (Unknown)"
-msgstr ""
+msgstr "%02X (Desconocido)"
 
 #: dialogs/gb-rom-info.cpp:131
 #, c-format
@@ -516,7 +517,7 @@ msgstr ""
 #: dialogs/gb-rom-info.cpp:155
 #, c-format
 msgid "%02X (Japan)"
-msgstr ""
+msgstr "%02X (Japón)"
 
 #: dialogs/gb-rom-info.cpp:157
 #, c-format
