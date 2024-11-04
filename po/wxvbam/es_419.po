@@ -569,7 +569,7 @@ msgstr "Aceptar"
 
 #: gfxviewers.cpp:1202
 msgid "Select output file and type"
-msgstr "Select output file and type"
+msgstr "Seleccionar archivo de salida y tipo"
 
 #: gfxviewers.cpp:1203
 msgid ""
@@ -583,15 +583,15 @@ msgstr "Start!"
 
 #: guiinit.cpp:110
 msgid "Connect"
-msgstr "Connect"
+msgstr "Conectar"
 
 #: guiinit.cpp:127
 msgid "You must enter a valid host name"
-msgstr "You must enter a valid host name"
+msgstr "Debe introducir un nombre de host válido"
 
 #: guiinit.cpp:128
 msgid "Host name invalid"
-msgstr "Host name invalid"
+msgstr "Nombre de host inválido"
 
 #: guiinit.cpp:146
 msgid "Waiting for clients..."
