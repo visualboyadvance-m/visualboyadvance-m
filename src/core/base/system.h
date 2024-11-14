@@ -70,7 +70,7 @@ extern struct CoreOptions {
     int skipSaveGameBattery = 1;
     int skipSaveGameCheats = 0;
     int useBios = 0;
-    int winGbPrinterEnabled = 1;
+    int gbPrinterEnabled = 1;
     uint32_t speedup_throttle = 100;
     uint32_t speedup_frame_skip = 9;
     uint32_t throttle = 100;

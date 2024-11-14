@@ -1990,7 +1990,7 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
         XRCCTRL(*dlg, "GameCode", wxControl)
             ->SetLabel(s);
         cmt = wxString((const char*)&g_rom[0xa0], wxConvLibc, 12);
-        wxFileConfig* cfg = wxGetApp().overrides;
+        wxFileConfig* cfg = wxGetApp().overrides_.get();
 
         if (cfg->HasGroup(s)) {
             cfg->SetPath(s);
@@ -2024,7 +2024,7 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
     if (panel->game_type() == IMAGE_GBA) {
         agbPrintEnable(OPTION(kPrefAgbPrint));
         wxString s = wxString((const char*)&g_rom[0xac], wxConvLibc, 4);
-        wxFileConfig* cfg = wxGetApp().overrides;
+        wxFileConfig* cfg = wxGetApp().overrides_.get();
         bool chg;
 
         if (cfg->HasGroup(s)) {
@@ -2297,7 +2297,7 @@ EVT_HANDLER(RetainAspect, "Retain aspect ratio when resizing")
 
 EVT_HANDLER(Printer, "Enable printer emulation")
 {
-    GetMenuOptionInt("Printer", &coreOptions.winGbPrinterEnabled, 1);
+    GetMenuOptionInt("Printer", &coreOptions.gbPrinterEnabled, 1);
 #if (defined __WIN32__ || defined _WIN32)
 #ifndef NO_LINK
     gbSerialFunction = gbStartLink;
@@ -2305,7 +2305,7 @@ EVT_HANDLER(Printer, "Enable printer emulation")
     gbSerialFunction = NULL;
 #endif
 #endif
-    if (coreOptions.winGbPrinterEnabled)
+    if (coreOptions.gbPrinterEnabled)
         gbSerialFunction = gbPrinterSend;
 
     update_opts();
