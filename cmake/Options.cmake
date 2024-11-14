@@ -68,7 +68,7 @@ endif()
 find_package(PkgConfig)
 
 # Link / SFML
-if(TRANSLATIONS_ONLY)
+if(TRANSLATIONS_ONLY OR MINGW)
     set(ENABLE_LINK_DEFAULT OFF)
 else()
     find_package(SFML 2.4 COMPONENTS network system)

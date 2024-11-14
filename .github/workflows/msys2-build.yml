@@ -6,14 +6,12 @@ jobs:
     strategy:
       matrix:
         build_type: [release, debug]
-        build_options: [default, link_off, translations_only, libretro]
+        build_options: [default, translations_only, libretro]
         include:
           - cmake_build: '-DCMAKE_BUILD_TYPE=Release'
             build_type: release
           - cmake_build: '-DCMAKE_BUILD_TYPE=Debug'
             build_type: debug
-          - cmake_options: '-DENABLE_LINK=OFF'
-            build_options: link_off
           - cmake_options: '-DTRANSLATIONS_ONLY=ON'
             build_options: translations_only
           - libretro_build: 'DEBUG=0'
