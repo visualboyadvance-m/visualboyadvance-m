@@ -287,6 +287,15 @@ void GameArea::LoadGame(const wxString& name)
             gbApplyPatch(UTF8(pfn.GetFullPath()));
         }
 
+        // Apply overrides.
+        wxFileConfig* cfg = wxGetApp().gb_overrides_.get();
+        const std::string& title = g_gbCartData.title();
+        if (cfg->HasGroup(title)) {
+            cfg->SetPath(title);
+            coreOptions.gbPrinterEnabled = cfg->Read("gbPrinter", coreOptions.gbPrinterEnabled);
+            cfg->SetPath("/");
+        }
+
         // start sound; this must happen before CPU stuff
         gb_effects_config.enabled = OPTION(kSoundGBEnableEffects);
         gb_effects_config.surround = OPTION(kSoundGBSurround);
@@ -359,7 +368,7 @@ void GameArea::LoadGame(const wxString& name)
             gbaUpdateRomSize(size);
         }
 
-        wxFileConfig* cfg = wxGetApp().overrides;
+        wxFileConfig* cfg = wxGetApp().overrides_.get();
         wxString id = wxString((const char*)&g_rom[0xac], wxConvLibc, 4);
 
         if (cfg->HasGroup(id)) {
@@ -456,7 +465,7 @@ void GameArea::LoadGame(const wxString& name)
     SuspendScreenSaver();
 
     // probably only need to do this for GB carts
-    if (coreOptions.winGbPrinterEnabled)
+    if (coreOptions.gbPrinterEnabled)
         gbSerialFunction = gbPrinterSend;
 
     // probably only need to do this for GBA carts
@@ -666,6 +675,9 @@ void GameArea::UnloadGame(bool destruct)
     if (loaded == IMAGE_GB) {
         gbCleanUp();
         gbCheatRemoveAll();
+
+        // Reset overrides.
+        coreOptions.gbPrinterEnabled = OPTION(kPrefGBPrinter);
     } else if (loaded == IMAGE_GBA) {
         CPUCleanUp();
         cheatsDeleteAll(false);

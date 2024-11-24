@@ -1416,7 +1416,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
         EmuReseted = false;
         gbMemory[0xff02] = value;
         if (gbSerialOn && (GetLinkMode() == LINK_GAMEBOY_IPC || GetLinkMode() == LINK_GAMEBOY_SOCKET
-        || GetLinkMode() == LINK_DISCONNECTED || coreOptions.winGbPrinterEnabled)) {
+        || GetLinkMode() == LINK_DISCONNECTED || coreOptions.gbPrinterEnabled)) {
 
             gbSerialTicks = GBSERIAL_CLOCK_TICKS;
 

@@ -312,7 +312,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kPrefFlashSize, &g_owned_opts.flash_size, 0, 1),
         Option(OptionID::kPrefFrameSkip, &g_owned_opts.frame_skip, -1, 9),
         Option(OptionID::kPrefGBPaletteOption, &gbPaletteOption, 0, 2),
-        Option(OptionID::kPrefGBPrinter, &coreOptions.winGbPrinterEnabled, 0, 1),
+        Option(OptionID::kPrefGBPrinter, &coreOptions.gbPrinterEnabled, 0, 1),
         Option(OptionID::kPrefGDBBreakOnLoad, &g_owned_opts.gdb_break_on_load),
         Option(OptionID::kPrefGDBPort, &gopts.gdb_port, 0, 65535),
 #ifndef NO_LINK

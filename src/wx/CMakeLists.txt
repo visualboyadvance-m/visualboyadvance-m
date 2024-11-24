@@ -59,6 +59,7 @@ set(VBAM_WX_COMMON
     ${VBAM_GENERATED_DIR}/wx/builtin-over.h
     ${VBAM_GENERATED_DIR}/wx/cmdhandlers.h
     ${VBAM_GENERATED_DIR}/wx/cmd-evtable.h
+    ${VBAM_GENERATED_DIR}/wx/gb-builtin-over.h
 )
 
 if(NOT ZIP_PROGRAM)
@@ -640,6 +641,12 @@ add_custom_command(
     OUTPUT ${VBAM_GENERATED_DIR}/wx/builtin-over.h
     COMMAND ${BIN2C} ${CMAKE_SOURCE_DIR}/src/vba-over.ini ${VBAM_GENERATED_DIR}/wx/builtin-over.h builtin_over
     DEPENDS ${CMAKE_SOURCE_DIR}/src/vba-over.ini ${BIN2C}
+)
+
+add_custom_command(
+    OUTPUT ${VBAM_GENERATED_DIR}/wx/gb-builtin-over.h
+    COMMAND ${BIN2C} ${CMAKE_SOURCE_DIR}/src/gb-over.ini ${VBAM_GENERATED_DIR}/wx/gb-builtin-over.h gb_builtin_over
+    DEPENDS ${CMAKE_SOURCE_DIR}/src/gb-over.ini ${BIN2C}
 )
 
 set(VBAM_LOCALIZABLE_FILES ${VBAM_WX_COMMON} ${VBAM_LOCALIZABLE_WX_CONFIG_FILES})

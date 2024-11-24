@@ -1,11 +1,13 @@
 #ifndef VBAM_WX_WXVBAM_H_
 #define VBAM_WX_WXVBAM_H_
 
+#include <cstdio>
+#include <ctime>
 #include <list>
+#include <memory>
 #include <stdexcept>
 #include <iostream>
-#include <stdio.h>
-#include <time.h>
+
 #include <wx/log.h>
 #include <wx/propdlg.h>
 #include <wx/datetime.h>
@@ -106,7 +108,8 @@ public:
     widgets::SdlPoller* sdl_poller() { return &sdl_poller_; }
 
     // vba-over.ini
-    wxFileConfig* overrides = nullptr;
+    std::unique_ptr<wxFileConfig> overrides_;
+    std::unique_ptr<wxFileConfig> gb_overrides_;
 
     wxFileName rom_database;
     wxFileName rom_database_scene;

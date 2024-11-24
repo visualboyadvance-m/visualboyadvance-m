@@ -31,6 +31,7 @@
 
 #include "components/user_config/user_config.h"
 #include "core/gba/gbaSound.h"
+#include "wx/gb-builtin-over.h"
 #include "wx/builtin-over.h"
 #include "wx/builtin-xrc.h"
 #include "wx/config/cmdtab.h"
@@ -470,13 +471,17 @@ bool wxvbamApp::OnInit() {
         }
     }
 
+    // load gb-over.ini
+    wxMemoryInputStream stream(gb_builtin_over, sizeof(gb_builtin_over));
+    gb_overrides_ = std::make_unique<wxFileConfig>(stream);
+
     // load vba-over.ini
     // rather than dealing with wxConfig's broken search path, just use
     // the same one that the xrc overrides use
     // this also allows us to override a group at a time, add commments, and
     // add the file from which the group came
     wxMemoryInputStream mis(builtin_over, sizeof(builtin_over));
-    overrides = new wxFileConfig(mis);
+    overrides_ = std::make_unique<wxFileConfig>(mis);
     wxRegEx cmtre;
     // not the most efficient thing to do: read entire file into a string
     // just to parse the comments out
@@ -486,8 +491,8 @@ bool wxvbamApp::OnInit() {
     long grp_idx;
 #define CMT_RE_START wxT("(^|[\n\r])# ?([^\n\r]*)(\r?\n|\r)\\[")
 
-    for (cont = overrides->GetFirstGroup(s, grp_idx); cont;
-         cont = overrides->GetNextGroup(s, grp_idx)) {
+    for (cont = overrides_->GetFirstGroup(s, grp_idx); cont;
+         cont = overrides_->GetNextGroup(s, grp_idx)) {
         // apparently even MacOSX sometimes uses the old \r by itself
         wxString cmt(CMT_RE_START);
         cmt += s + wxT("\\]");
@@ -497,7 +502,7 @@ bool wxvbamApp::OnInit() {
         else
             cmt = wxEmptyString;
 
-        overrides->Write(s + wxT("/comment"), cmt);
+        overrides_->Write(s + wxT("/comment"), cmt);
     }
 
     if (vba_over.FileExists()) {
@@ -513,10 +518,10 @@ bool wxvbamApp::OnInit() {
 
         for (cont = ov.GetFirstGroup(s, grp_idx); cont;
              cont = ov.GetNextGroup(s, grp_idx)) {
-            overrides->DeleteGroup(s);
-            overrides->SetPath(s);
+            overrides_->DeleteGroup(s);
+            overrides_->SetPath(s);
             ov.SetPath(s);
-            overrides->Write(wxT("path"), GetConfigurationPath());
+            overrides_->Write(wxT("path"), GetConfigurationPath());
             // apparently even MacOSX sometimes uses \r by itself
             wxString cmt(CMT_RE_START);
             cmt += s + wxT("\\]");
@@ -526,15 +531,15 @@ bool wxvbamApp::OnInit() {
             else
                 cmt = wxEmptyString;
 
-            overrides->Write(wxT("comment"), cmt);
+            overrides_->Write(wxT("comment"), cmt);
             long ent_idx;
 
             for (cont = ov.GetFirstEntry(s, ent_idx); cont;
                  cont = ov.GetNextEntry(s, ent_idx))
-                overrides->Write(s, ov.Read(s, wxEmptyString));
+                overrides_->Write(s, ov.Read(s, wxEmptyString));
 
             ov.SetPath(wxT("/"));
-            overrides->SetPath(wxT("/"));
+            overrides_->SetPath(wxT("/"));
         }
     }
 
@@ -822,7 +827,6 @@ wxvbamApp::~wxvbamApp() {
         free(home);
         home = NULL;
     }
-    delete overrides;
 
 #ifndef NO_ONLINEUPDATES
     shutdownAutoupdater();

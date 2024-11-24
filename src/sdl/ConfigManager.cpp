@@ -189,7 +189,7 @@ struct option argOptions[] = {
 	{ "gb-emulator-type", required_argument, 0, OPT_GB_EMULATOR_TYPE },
 	{ "gb-frame-skip", required_argument, 0, OPT_GB_FRAME_SKIP },
 	{ "gb-palette-option", required_argument, 0, OPT_GB_PALETTE_OPTION },
-	{ "gb-printer", no_argument, &coreOptions.winGbPrinterEnabled, 1 },
+	{ "gb-printer", no_argument, &coreOptions.gbPrinterEnabled, 1 },
 	{ "gdb", required_argument, 0, 'G' },
 	{ "help", no_argument, &optPrintUsage, 1 },
 	{ "ifb-filter", required_argument, 0, 'I' },
@@ -236,7 +236,7 @@ struct option argOptions[] = {
 	{ "no-speedup-mute", no_argument, 0, OPT_NO_SPEEDUP_MUTE },
 	{ "use-bios", no_argument, &coreOptions.useBios, 1 },
 	{ "verbose", required_argument, 0, 'v' },
-	{ "win-gb-printer-enabled", no_argument, &coreOptions.winGbPrinterEnabled, 1 },
+	{ "win-gb-printer-enabled", no_argument, &coreOptions.gbPrinterEnabled, 1 },
 
 
 	{ NULL, no_argument, NULL, 0 }
@@ -351,7 +351,7 @@ void LoadConfig()
 	coreOptions.speedup_throttle_frame_skip = ReadPref("speedupThrottleFrameSkip", 0);
 	coreOptions.speedup_mute = ReadPref("speedupMute", 1);
 	coreOptions.useBios = ReadPrefHex("useBiosGBA");
-	coreOptions.winGbPrinterEnabled = ReadPref("gbPrinter", 0);
+	coreOptions.gbPrinterEnabled = ReadPref("gbPrinter", 0);
 
 	int soundQuality = (ReadPrefHex("soundQuality", 1));
 	switch (soundQuality) {

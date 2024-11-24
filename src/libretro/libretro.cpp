@@ -590,7 +590,7 @@ void retro_init(void)
     coreOptions.parseDebug = true;
     coreOptions.cheatsEnabled = 0;
     coreOptions.skipSaveGameBattery = 0;
-    coreOptions.winGbPrinterEnabled = 0;
+    coreOptions.gbPrinterEnabled = 0;
 
     struct retro_log_callback log;
     struct retro_rumble_interface rumble;
