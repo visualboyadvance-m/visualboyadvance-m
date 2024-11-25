@@ -9,7 +9,6 @@ Known preprocessor switches:
 - VBAM_ENABLE_DEBUGGER: Enable remote debugging support
 - MMX: Enable MMX instruction set
 - RGB555: Use 16bit colors with 5bit green instead of 6bit green in hq3x/4x filters (C++ version)
-- NO_OGL: Exclude OpenGL code
 - NO_D3D: Exclude Direct3D code
 - VBAM_ENABLE_XAUDIO2: Enable XAudio2 code (the XAudio2 interface is DirectSound's successor)
 - VBAM_ENABLE_FAUDIO: Enable FAudio code (the FAudio interface is an open source multiplatform re-implementation of XAudio2)

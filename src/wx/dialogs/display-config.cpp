@@ -263,9 +263,7 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
     GetValidatedChild("OutputQuartz2D")->Hide();
 #endif
 
-#ifdef NO_OGL
-    GetValidatedChild("OutputOpenGL")->Hide();
-#elif defined(HAVE_WAYLAND_SUPPORT) && !defined(HAVE_WAYLAND_EGL)
+#if defined(HAVE_WAYLAND_SUPPORT) && !defined(HAVE_WAYLAND_EGL)
     // wxGLCanvas segfaults on Wayland before wx 3.2.
     if (IsWayland()) {
         GetValidatedChild("OutputOpenGL")->Hide();
@@ -276,7 +274,7 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
 #else
     GetValidatedChild("OutputOpenGL")
         ->SetValidator(RenderValidator(config::RenderMethod::kOpenGL));
-#endif  // NO_OGL
+#endif  // defined(HAVE_WAYLAND_SUPPORT) && !defined(HAVE_WAYLAND_EGL)
 
 #if defined(__WXMSW__) && !defined(NO_D3D)
     // Enable the Direct3D option on Windows.

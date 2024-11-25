@@ -45,3 +45,5 @@ else()
         internal/hq/c/hq_shared.h
     )
 endif()
+
+configure_vbam_target(vbam-components-filters)

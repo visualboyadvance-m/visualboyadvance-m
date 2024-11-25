@@ -4,3 +4,5 @@ target_sources(vbam-components-filters-interframe
     PRIVATE interframe.cpp
     PUBLIC interframe.h
 )
+
+configure_vbam_target(vbam-components-filters-interframe)

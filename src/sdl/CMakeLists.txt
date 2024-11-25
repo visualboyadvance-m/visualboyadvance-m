@@ -68,6 +68,8 @@ if(WIN32)
     target_link_libraries(vbam wsock32 ws2_32 winmm version imm32 ${SDL2MAIN_LIBRARY})
 endif()
 
+configure_vbam_target(vbam)
+
 # Installation scripts.
 install(
     PROGRAMS ${PROJECT_BINARY_DIR}/vbam${CMAKE_EXECUTABLE_SUFFIX}

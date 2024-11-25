@@ -155,37 +155,8 @@ if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
   set(wxWidgets_DIR "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/share/wxwidgets")
 endif()
 
-set(ENABLE_OPENGL TRUE)
-find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl ${wx_find_extra})
-
-if(NOT wxWidgets_FOUND)
-    find_package(wxWidgets COMPONENTS xrc xml html adv net core base ${wx_find_extra} REQUIRED)
-    set(ENABLE_OPENGL FALSE)
-endif()
-
-# Fixup wxWidgets paths for vcpkg debug builds.
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
-    set(wxWidgets_ROOT_DIR "${wxWidgets_ROOT_DIR}/debug" CACHE INTERNAL "wxWidgets root directory" FORCE)
-    string(REGEX REPLACE "/lib$" "/debug/lib" wxWidgets_LIB_DIR "${wxWidgets_LIB_DIR}")
-    set(wxWidgets_LIB_DIR "${wxWidgets_LIB_DIR}" CACHE INTERNAL "wxWidgets library directory" FORCE)
-endif()
-
 # Find OpenAL (required).
 find_package(OpenAL REQUIRED)
-
-# Workaround of static liblzma not being found on MSYS2.
-if(VBAM_STATIC AND MSYS)
-    unset(cleaned_up_wx_libs)
-    foreach(lib ${wxWidgets_LIBRARIES})
-        if(lib STREQUAL "-llzma")
-            set(lib "liblzma.a")
-        endif()
-
-        list(APPEND cleaned_up_wx_libs "${lib}")
-    endforeach()
-
-    set(wxWidgets_LIBRARIES "${cleaned_up_wx_libs}")
-endif()
 
 list(APPEND CMAKE_REQUIRED_LIBRARIES ${wxWidgets_LIBRARIES})
 list(APPEND CMAKE_REQUIRED_INCLUDES ${wxWidgets_INCLUDE_DIRS})
@@ -197,6 +168,7 @@ endforeach()
 # Configure common settings for wx-based targets, like linking, include
 # directories, compile options, and definitions.
 function(configure_wx_target target)
+    configure_vbam_target(${target})
     get_target_property(target_type ${target} TYPE)
     if(target_type STREQUAL "EXECUTABLE")
         set(target_is_executable TRUE)
@@ -292,12 +264,7 @@ function(configure_wx_target target)
     _add_link_libraries(${VBAM_SDL2_LIBS})
 
     # OpenGL.
-    if(ENABLE_OPENGL)
-        _add_link_libraries(${OPENGL_LIBRARIES})
-    else()
-        _add_compile_definitions(NO_OGL)
-    endif()
-
+    _add_link_libraries(${OPENGL_LIBRARIES})
 endfunction()
 
 # Sub-projects.

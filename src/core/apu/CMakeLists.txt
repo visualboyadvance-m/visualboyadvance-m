@@ -22,3 +22,5 @@ target_sources(vbam-core-apu
     Gb_Oscs.h
     Multi_Buffer.h
 )
+
+configure_vbam_target(vbam-core-apu)

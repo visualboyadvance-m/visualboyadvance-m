@@ -29,30 +29,30 @@ endif()
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
 if(NOT HTTPS)
-    add_compile_definitions(NO_HTTPS)
+    list(APPEND VBAM_COMPILE_DEFS NO_HTTPS)
 endif()
 
 if(ENABLE_GBA_LOGGING)
-    add_compile_definitions(GBA_LOGGING )
+    list(APPEND VBAM_COMPILE_DEFS GBA_LOGGING )
 endif()
 
 if(ENABLE_MMX)
-    add_compile_definitions(MMX)
+    list(APPEND VBAM_COMPILE_DEFS MMX)
 endif()
 
 
 if(NOT ENABLE_ONLINEUPDATES)
-  add_compile_definitions(NO_ONLINEUPDATES)
+  list(APPEND VBAM_COMPILE_DEFS NO_ONLINEUPDATES)
 endif()
 
 # The debugger is enabled by default
 if(ENABLE_DEBUGGER)
-    add_compile_definitions(VBAM_ENABLE_DEBUGGER)
+    list(APPEND VBAM_COMPILE_DEFS VBAM_ENABLE_DEBUGGER)
 endif()
 
 # The ASM core is disabled by default because we don't know on which platform we are
 if(NOT ENABLE_ASM_CORE)
-    add_compile_definitions(C_CORE)
+    list(APPEND VBAM_COMPILE_DEFS C_CORE)
 endif()
 
 # Set up "src" and generated directory as a global include directory.
@@ -63,26 +63,19 @@ include_directories(
 )
 
 # C defines
-add_compile_definitions(HAVE_NETINET_IN_H HAVE_ARPA_INET_H HAVE_ZLIB_H FINAL_VERSION SDL USE_OPENGL SYSCONF_INSTALL_DIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}")
-add_compile_definitions(PKGDATADIR="${CMAKE_INSTALL_FULL_DATADIR}/vbam")
-add_compile_definitions(__STDC_FORMAT_MACROS)
-add_compile_definitions(LOCALEDIR="${LOCALEDIR}")
-
-# Common compiler settings.
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_definitions(DEBUG)
-else()
-    add_compile_definitions(NDEBUG)
-endif()
+list(APPEND VBAM_COMPILE_DEFS HAVE_NETINET_IN_H HAVE_ARPA_INET_H HAVE_ZLIB_H FINAL_VERSION SDL USE_OPENGL SYSCONF_INSTALL_DIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}")
+list(APPEND VBAM_COMPILE_DEFS PKGDATADIR="${CMAKE_INSTALL_FULL_DATADIR}/vbam")
+list(APPEND VBAM_COMPILE_DEFS __STDC_FORMAT_MACROS)
+list(APPEND VBAM_COMPILE_DEFS LOCALEDIR="${LOCALEDIR}")
 
 if(APPLE)
-    add_compile_definitions(MACHO)
+    list(APPEND VBAM_COMPILE_DEFS MACHO)
 elseif("${CMAKE_SYSTEM}" MATCHES "Linux")
-    add_compile_definitions(ELF)
+    list(APPEND VBAM_COMPILE_DEFS ELF)
 endif()
 
 if(X86_64)
-    add_compile_definitions(__AMD64__ __X86_64__)
+    list(APPEND VBAM_COMPILE_DEFS __AMD64__ __X86_64__)
 endif()
 
 # Enable ASAN if requested and supported.

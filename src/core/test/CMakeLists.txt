@@ -11,3 +11,5 @@ target_sources(vbam-core-fake
     PRIVATE
     fake_core.cpp
 )
+
+configure_vbam_target(vbam-core-fake)

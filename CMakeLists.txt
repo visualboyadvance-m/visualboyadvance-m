@@ -22,7 +22,7 @@ if(TAG_RELEASE)
     include(MakeReleaseCommitAndTag)
 endif()
 
-set(VCPKG_DEPS pkgconf zlib pthreads "sdl2[samplerate]" gettext wxwidgets)
+set(VCPKG_DEPS pkgconf zlib pthreads "sdl2[samplerate]" gettext)
 
 set(VCPKG_DEPS_OPTIONAL
     sfml   ENABLE_LINK
@@ -73,15 +73,31 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
-project(VBA-M C CXX)
+set(VBAM_LANGUAGES C CXX)
+if(APPLE)
+    list(APPEND VBAM_LANGUAGES OBJCXX)
+endif()
 
-include(CTest)
-include(FetchContent)
+project(VBA-M ${VBAM_LANGUAGES})
+
 include(GNUInstallDirs)
 include(Architecture)
 include(Options)
 include(Toolchain)
 include(Dependencies)
+
+function(configure_vbam_target target)
+    get_target_property(target_type ${target} TYPE)
+    if(target_type STREQUAL "INTERFACE_LIBRARY")
+        set(target_scope "INTERFACE")
+    else()
+        set(target_scope "PRIVATE")
+    endif()
+
+    target_compile_definitions(${target} ${target_scope} ${VBAM_COMPILE_DEFS})
+    target_compile_options(${target} ${target_scope} ${VBAM_COMPILE_OPTS})
+    target_link_options(${target} ${target_scope} ${VBAM_LINK_OPTS})
+endfunction()
 
 # Disable tests when not in a git checkout.
 if(NOT EXISTS "${CMAKE_SOURCE_DIR}/.git")
@@ -92,8 +108,19 @@ endif()
 if(BUILD_TESTING)
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
-    add_subdirectory(./third_party/googletest)
+    add_subdirectory(third_party/googletest)
     include(GoogleTest)
+endif()
+
+# Configure wxWidgets.
+if(NOT VBAM_DEPS_wxWidgets_SYSTEM)
+    set(wxBUILD_SHARED OFF CACHE BOOL "" FORCE)
+    set(wxBUILD_INSTALL OFF CACHE BOOL "" FORCE)
+    set(wxUSE_WEBVIEW OFF CACHE BOOL "" FORCE)
+    set(wxWidgets_SOURCE_DIR "${CMAKE_SOURCE_DIR}/third_party/wxWidgets")
+    add_subdirectory(third_party/wxWidgets)
+    set(wxWidgets_LIBRARIES wx::xrc wx::xml wx::html wx::adv wx::net wx::core wx::base wx::gl)
+    set(wxWidgets_INCLUDE_DIRS third_party/wxWidgets/include)
 endif()
 
 if(NOT CMAKE_PREFIX_PATH AND (NOT ("$ENV{CMAKE_PREFIX_PATH}" STREQUAL "")))

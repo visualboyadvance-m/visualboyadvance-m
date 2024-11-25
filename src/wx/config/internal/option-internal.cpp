@@ -137,11 +137,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Interframe interframe = Interframe::kNone;
         bool keep_on_top = false;
         int32_t max_threads = 0;
-#if defined(NO_OGL)
-        RenderMethod render_method = RenderMethod::kSimple;
-#else
         RenderMethod render_method = RenderMethod::kOpenGL;
-#endif
         double video_scale = 3;
         bool retain_aspect = true;
 

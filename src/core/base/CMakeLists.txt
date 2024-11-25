@@ -61,4 +61,6 @@ target_link_libraries(vbam-core-base
     PUBLIC ${ZLIB_LIBRARY}
 )
 
+configure_vbam_target(vbam-core-base)
+
 add_subdirectory(test)

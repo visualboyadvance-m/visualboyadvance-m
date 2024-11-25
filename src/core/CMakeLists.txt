@@ -137,4 +137,6 @@ if(ENABLE_LINK)
     )
 endif()
 
+configure_vbam_target(vbam-core)
+
 add_subdirectory(test)

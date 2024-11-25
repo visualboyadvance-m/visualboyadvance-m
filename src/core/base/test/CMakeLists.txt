@@ -10,3 +10,6 @@ add_library(vbam-core-base-test
 
 target_link_libraries(vbam-core-base-test
     INTERFACE GTest::gtest)
+
+configure_vbam_target(vbam-core-base-test)
+

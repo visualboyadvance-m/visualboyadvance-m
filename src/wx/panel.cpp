@@ -1167,11 +1167,9 @@ void GameArea::OnIdle(wxIdleEvent& event)
                     new Quartz2DDrawingPanel(this, basic_width, basic_height);
                 break;
 #endif
-#ifndef NO_OGL
             case config::RenderMethod::kOpenGL:
                 panel = new GLDrawingPanel(this, basic_width, basic_height);
                 break;
-#endif
 #if defined(__WXMSW__) && !defined(NO_D3D)
             case config::RenderMethod::kDirect3d:
                 panel = new DXDrawingPanel(this, basic_width, basic_height);
@@ -2147,17 +2145,18 @@ void BasicDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
     dc.DrawBitmap(bm, 0, 0);
 }
 
-#ifndef NO_OGL
 // following 3 for vsync
 #ifdef __WXMAC__
 #include <OpenGL/OpenGL.h>
 #endif
+
 #ifdef __WXGTK__ // should actually check for X11, but GTK implies X11
 #ifndef Status
 #define Status int
 #endif
 #include <GL/glx.h>
 #endif
+
 #ifdef __WXMSW__
 #include <GL/gl.h>
 #include <GL/glext.h>
@@ -2414,8 +2413,6 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 
     SwapBuffers();
 }
-
-#endif // GL support
 
 #if defined(__WXMSW__) && !defined(NO_D3D)
 #define DIRECT3D_VERSION 0x0900

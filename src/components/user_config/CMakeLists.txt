@@ -4,3 +4,5 @@ target_sources(vbam-components-user-config
     PRIVATE user_config.cpp
     PUBLIC user_config.h
 )
+
+configure_vbam_target(vbam-components-user-config)

@@ -161,4 +161,23 @@ if(TRANSLATIONS_ONLY AND (ENABLE_SDL OR ENABLE_WX))
     message(FATAL_ERROR "The SDL and wxWidgets ports can't be built when TRANSLATIONS_ONLY is enabled")
 endif()
 
+if(ENABLE_WX)
+    if(WIN32 OR APPLE)
+        # We always build wxWidgets from source on Windows and macOS. We do not
+        # support using a system wxWidgets on these platforms.
+        set(VBAM_DEPS_wxWidgets_SYSTEM_DEFAULT OFF)
+    else()
+        # On other platforms, we first look for a system wxWidgets, and if that
+        # fails, we build from source. Note that we still prefer building from
+        # source on Linux.
+        find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl)
+        if(wxWidgets_FOUND)
+            set(VBAM_DEPS_wxWidgets_SYSTEM_DEFAULT ON)
+        else()
+            set(VBAM_DEPS_wxWidgets_SYSTEM_DEFAULT OFF)
+        endif()
+    endif()
+    option(VBAM_DEPS_wxWidgets_SYSTEM "Use system wxWidgets" ${VBAM_DEPS_wxWidgets_SYSTEM_DEFAULT})
+endif()
+
 option(GPG_SIGNATURES "Create GPG signatures for release files" OFF)

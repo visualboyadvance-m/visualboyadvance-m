@@ -30,7 +30,6 @@ using std::int8_t;
 using std::int16_t;
 using std::int32_t;
 
-#ifndef NO_OGL
 // glcanvas must be included before SFML for MacOSX
 // originally, this was confined to drawing.h.
 #include <wx/glcanvas.h>
@@ -40,7 +39,6 @@ using std::int32_t;
 #endif
 #ifdef BadRequest
 #undef BadRequest
-#endif
 #endif
 
 // compatibility with wx-2.9

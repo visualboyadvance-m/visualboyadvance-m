@@ -71,3 +71,5 @@ target_include_directories(vbam-fex
 target_link_libraries(vbam-fex
     PRIVATE ${ZLIB_LIBRARY}
 )
+
+configure_vbam_target(vbam-fex)

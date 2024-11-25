@@ -57,7 +57,7 @@
 
 # define the SFML_STATIC macro if static build was chosen
 if(SFML_STATIC_LIBRARIES)
-    add_compile_definitions(SFML_STATIC)
+    list(APPEND VBAM_COMPILE_DEFS SFML_STATIC)
 endif()
 
 # define the list of search paths for headers and libraries

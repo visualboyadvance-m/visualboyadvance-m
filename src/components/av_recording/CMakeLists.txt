@@ -16,3 +16,5 @@ target_include_directories(vbam-components-av-recording
 target_link_libraries(vbam-components-av-recording
     PUBLIC ${FFMPEG_LIBRARIES}
 )
+
+configure_vbam_target(vbam-components-av-recording)

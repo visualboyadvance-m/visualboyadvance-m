@@ -12,12 +12,6 @@ protected:
     virtual void DrawImage(wxWindowDC& dc, wxImage* im);
 };
 
-// wx <= 2.8 may not be compiled with opengl support
-#if !wxCHECK_VERSION(2, 9, 0) && !wxUSE_GLCANVAS
-    #define NO_OGL
-#endif
-
-#ifndef NO_OGL
 #include <wx/glcanvas.h>
 
 // shuffled parms for 2.9 indicates non-auto glcontext
@@ -65,6 +59,5 @@ public:
     Quartz2DDrawingPanel(wxWindow* parent, int _width, int _height);
     virtual void DrawImage(wxWindowDC& dc, wxImage* im);
 };
-#endif
 
 #endif // VBAM_WX_DRAWING_H_
