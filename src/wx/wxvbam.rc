@@ -19,8 +19,11 @@ AAAAA_MAINICON ICON "icons/visualboyadvance-m.ico"
 
 #include "autoupdater/wxmsw/winsparkle-rc.h"
 #include "winsparkle-path.h"
+#include "audio/internal/xaudio27-dll-rc.h"
+#include "xaudio27-dll-path.h"
 
 WINSPARKLE_DLL_RC RCDATA WINSPARKLE_DLL_PATH
+XAUDIO27_DLL_RC   RCDATA XAUDIO27_DLL_PATH
 
 #endif /* NO_ONLINEUPDATES */
 

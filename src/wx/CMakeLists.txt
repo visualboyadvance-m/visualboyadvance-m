@@ -666,6 +666,20 @@ list(APPEND VBAM_LOCALIZABLE_FILES
     ${CMAKE_SOURCE_DIR}/src/core/gba/gbaLink.cpp
 )
 
+if(WIN32 AND (X86_64 OR X86_32) AND ENABLE_XAUDIO2)
+    if(NOT DEFINED XAUDIO_27_BIN_DIR)
+        set(XAUDIO_27_BIN_DIR ${CMAKE_SOURCE_DIR}/win32-deps/xaudio27-dll)
+    endif()
+
+    if(X86_64)
+        set(XAUDIO_27_DLL ${XAUDIO_27_BIN_DIR}/x64/XAudio2_7.dll)
+    elseif(X86_32)
+        set(XAUDIO_27_DLL ${XAUDIO_27_BIN_DIR}/x86/XAudio2_7.dll)
+    endif()
+
+    configure_file(audio/internal/xaudio27-dll-path.h.in ${CMAKE_BINARY_DIR}/xaudio27-dll-path.h)
+endif()
+
 if(APPLE)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
     set(CMAKE_INSTALL_RPATH "@loader_path/../Frameworks")
