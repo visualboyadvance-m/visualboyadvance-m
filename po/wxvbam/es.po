@@ -15,6 +15,7 @@
 # javidg96, 2015
 # jorge perez <theghostxxaz@gmail.com>, 2021
 # Jose Castillo <josecastillo.prz85@gmail.com>, 2021
+# José Montoro, 2024
 # Manu 3L <comokaka777@gmail.com>, 2021
 # Marco123V <MarcoVillalejos@hotmail.com>, 2015
 # Marco Yurazeck <luthias@gmail.com>, 2020
@@ -29,7 +30,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-05 20:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Dani Quiroz, 2022\n"
+"Last-Translator: José Montoro, 2024\n"
 "Language-Team: Spanish (http://app.transifex.com/bgk/vba-m/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -39,7 +40,7 @@ msgstr ""
 
 #: audio/internal/openal.cpp:188
 msgid "OpenAL: Failed to open audio device"
-msgstr ""
+msgstr "OpenAL: Fallo al abrir el dispositivo de audio"
 
 #: audio/internal/openal.cpp:386 audio/internal/faudio.cpp:492
 #: audio/internal/xaudio2.cpp:577
@@ -52,7 +53,7 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
 " Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Archivos de Game boy Advance (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game Boy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:144
 msgid "Open ROM file"
@@ -62,7 +63,7 @@ msgstr "Abrir archivo ROM"
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Archivos de Game Boy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:171
 msgid "Open GB ROM file"
@@ -98,7 +99,7 @@ msgstr "Archivo de batería (*.sav) | *.sav | Guardado Flash (*.dat) | *.dat"
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "Importar un archivo de guardado borrará cualquier partida guardada (permanente después del siguiente guardado). ¿Quieres continuar?"
 
 #: cmdevents.cpp:416 cmdevents.cpp:444 cmdevents.cpp:564
 msgid "Confirm import"
@@ -130,7 +131,7 @@ msgstr ""
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
-msgstr ""
+msgstr "Importar un archivo de códigos reemplazará cualquier cheat cargado. ¿Quieres continuar?"
 
 #: cmdevents.cpp:460
 #, c-format
@@ -170,7 +171,7 @@ msgstr ""
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "Importar una snapshot borrará cualquier partida guardada (permanente una vez se sobrescriba) ¿Quieres continuar?"
 
 #: cmdevents.cpp:588
 #, c-format
@@ -202,7 +203,7 @@ msgstr ""
 
 #: cmdevents.cpp:644
 msgid "Exported from Visual Boy Advance-M"
-msgstr ""
+msgstr "Exportado desde Visual Boy Advance-M"
 
 #: cmdevents.cpp:656
 #, c-format
@@ -293,15 +294,15 @@ msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
-msgstr ""
+msgstr "¡SE BORRARÁ TU CONFIGURACIÓN!\n\n¿Estás seguro?"
 
 #: cmdevents.cpp:2201
 msgid "FACTORY RESET"
-msgstr ""
+msgstr "RESETEO DE FÁBRICA"
 
 #: cmdevents.cpp:2236
 msgid "Nintendo Game Boy / Color / Advance emulator."
-msgstr ""
+msgstr "Emulador de Nintendo Game Boy / Color / Advance"
 
 #: cmdevents.cpp:2237
 msgid ""
@@ -324,11 +325,11 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program. If not, see http://www.gnu.org/licenses ."
-msgstr ""
+msgstr "Este programa es un software gratis: puedes redistribuirlo / o modificarlo bajo los terminos de la Licencia Pública General GNU.\npublicada por\nla Free Software Foundation, ya sea la versión 2 de la Licencia, o\n(a su elección) cualquier versión posterior.\n\nEste programa se distribuye con la esperanza de que sea útil,\npero SIN NINGUNA GARANTÍA; sin siquiera la garantía implícita de\nCOMERCIABILIDAD o IDONEIDAD PARA UN PROPÓSITO PARTICULAR. Ver el\nLicencia pública general GNU para obtener más detalles.\n\nDebería haber recibido una copia de la Licencia Pública General GNU\njunto con este programa. Si no, consulte http://www.gnu.org/licenses."
 
 #: cmdevents.cpp:2424
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
-msgstr ""
+msgstr "No puedes usar la BIOS de la Game Boy cuando el Hack Colorizer está habilitado."
 
 #: cmdevents.cpp:2490
 msgid "LAN link is already active. Disable link mode to disconnect."
