@@ -92,8 +92,20 @@ endif()
 if(BUILD_TESTING)
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
-    add_subdirectory(./third_party/googletest)
-    include(GoogleTest)
+
+    if(NOT EXISTS third_party/googletest/CMakeLists.txt)
+        execute_process(
+            COMMAND git submodule update --init --recursive -- third_party/googletest
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        )
+    endif()
+
+    if(EXISTS third_party/googletest/CMakeLists.txt)
+        add_subdirectory(./third_party/googletest)
+        include(GoogleTest)
+    else()
+        set(BUILD_TESTING OFF)
+    endif()
 endif()
 
 if(NOT CMAKE_PREFIX_PATH AND (NOT ("$ENV{CMAKE_PREFIX_PATH}" STREQUAL "")))
