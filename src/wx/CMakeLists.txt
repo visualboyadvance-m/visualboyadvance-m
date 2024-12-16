@@ -255,6 +255,10 @@ function(configure_wx_target target)
     # OpenAL.
     if(OPENAL_STATIC)
         _add_compile_definitions(AL_LIBTYPE_STATIC)
+
+        if(WIN32)
+            list(APPEND OPENAL_LIBRARY avrt)
+        endif()
     endif()
     _add_include_directories(${OPENAL_INCLUDE_DIR})
     _add_link_libraries(${OPENAL_LIBRARY})
