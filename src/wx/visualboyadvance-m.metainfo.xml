@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<component type="desktop">
+<component type="desktop-application">
  <id>org.visualboyadvance_m.visualboyadvance_m</id>
  <metadata_license>CC-BY-SA-3.0</metadata_license>
  <project_license>GPL-2.0</project_license>
  <content_rating type="oars-1.1"/>
  <name>VisualBoyAdvance-M</name>
+ <developer id="visualboyadvance-m.org">
+  <name>VisualBoyAdvance-M</name>
+ </developer>
  <summary>VisualBoyAdvance-M, a high compatibility Gameboy Advance Emulator</summary>
  <description>
   <p>
