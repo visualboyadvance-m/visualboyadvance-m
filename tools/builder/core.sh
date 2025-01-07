@@ -181,7 +181,6 @@ DISTS=$DISTS'
     faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/24.09.tar.gz                            lib/libFAudio.a
     flac            https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.3.4.tar.xz                             lib/libFLAC.a
     harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/10.0.1/harfbuzz-10.0.1.tar.xz        lib/libharfbuzz.a
-    sfml            https://github.com/SFML/SFML/archive/refs/tags/2.6.1.tar.gz                                 lib/libsfml-system-s.a
     shared-mime-info https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.2/shared-mime-info-2.2.tar.bz2  bin/update-mime-database
     wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.6/wxWidgets-3.2.6.tar.bz2     lib/libwx_baseu-3.*.a
     ffmpeg          http://ffmpeg.org/releases/ffmpeg-7.0.2.tar.xz                                              lib/libavformat.a
@@ -362,7 +361,6 @@ DIST_ARGS="$DIST_ARGS
     bakefile    --enable-shared
     XML-Parser  EXPATINCPATH=\"\$BUILD_ROOT/root/include\" EXPATLIBPATH=\"\$BUILD_ROOT/root/lib\"
     doxygen     -DICONV_ACCEPTS_NONCONST_INPUT:BOOL=FALSE -DICONV_ACCEPTS_CONST_INPUT:BOOL=TRUE
-    sfml        -DSFML_USE_SYSTEM_DEPS=TRUE -DSFML_BUILD_AUDIO=FALSE
     libcroco    --disable-Bsymbolic
     snappy      -DSNAPPY_BUILD_TESTS=OFF -DSNAPPY_BUILD_BENCHMARKS=OFF
     libjpeg-turbo -DWITH_JPEG8=ON -DWITH_SIMD=OFF
@@ -415,7 +413,6 @@ DIST_EXTRA_LDFLAGS="$DIST_EXTRA_LDFLAGS
 DIST_EXTRA_CXXFLAGS="$DIST_EXTRA_CXXFLAGS
     gperf       -std=gnu++11
     doxygen     -std=gnu++11
-    sfml        -std=gnu++11
     wxwidgets   -std=gnu++11
     libmodplug  -std=gnu++11
     libopencore-amrnb -std=gnu++11

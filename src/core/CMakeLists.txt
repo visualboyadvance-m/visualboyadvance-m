@@ -127,6 +127,10 @@ if(ENABLE_LINK)
     target_link_libraries(vbam-core
         PRIVATE ${SFML_LIBRARIES}
     )
+    
+    target_compile_definitions(vbam-core
+        PRIVATE SFML_STATIC
+    )
 
     # Add libintl.h
     target_include_directories(vbam-core
