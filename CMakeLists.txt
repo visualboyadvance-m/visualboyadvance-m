@@ -25,7 +25,6 @@ endif()
 set(VCPKG_DEPS pkgconf zlib pthreads "sdl2[samplerate]" gettext wxwidgets)
 
 set(VCPKG_DEPS_OPTIONAL
-    sfml   ENABLE_LINK
     ffmpeg ENABLE_FFMPEG
     faudio ENABLE_FAUDIO
 )
