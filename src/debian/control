@@ -21,7 +21,7 @@ Build-Depends:	debhelper (>= 9),
 				zip,
 				zlib1g-dev
 Standards-Version: 3.9.5
-Homepage: http://visualboyadvance-m-emu.org
+Homepage: http://visualboyadvance-m.org
 Vcs-Svn: svn://svn.code.sf.net/p/vbam/code/trunk
 Vcs-Browser: http://svn.code.sf.net/p/vbam/code/trunk
 

@@ -715,7 +715,7 @@ if(APPLE AND ENABLE_ONLINEUPDATES)
         PRIVATE ${SPARKLE_INCLUDE_DIR}
     )
 
-    set(APPCAST_URL "https://data.visualboyadvance-m-emu.org/appcast.xml")
+    set(APPCAST_URL "https://data.visualboyadvance-m.org/appcast.xml")
     set(CCS1 rm -rf ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks/Sparkle.framework)
     set(CCS2 mkdir -p ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks)
     # The following commands *should* be run to make sure Sparkle is not going

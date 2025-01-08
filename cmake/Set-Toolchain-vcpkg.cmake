@@ -247,7 +247,7 @@ function(get_binary_packages vcpkg_exe)
 
     foreach(triplet ${triplets})
         file(
-            DOWNLOAD "https://nightly.visualboyadvance-m-emu.org/vcpkg/${triplet}/" "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html"
+            DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${triplet}/" "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html"
             STATUS pkg_list_status
         )
         list(GET pkg_list_status 1 pkg_list_error)
@@ -305,10 +305,10 @@ function(get_binary_packages vcpkg_exe)
         foreach(pkg ${to_install})
             string(REGEX REPLACE "^[^_]+_[^_]+_([^.]+)[.]zip\$" "\\1" pkg_triplet ${pkg})
 
-            message(STATUS "Downloading https://nightly.visualboyadvance-m-emu.org/vcpkg/${pkg_triplet}/${pkg} ...")
+            message(STATUS "Downloading https://nightly.visualboyadvance-m.org/vcpkg/${pkg_triplet}/${pkg} ...")
 
             file(
-                DOWNLOAD "https://nightly.visualboyadvance-m-emu.org/vcpkg/${pkg_triplet}/${pkg}" "${bin_pkgs_dir}/${pkg}"
+                DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${pkg_triplet}/${pkg}" "${bin_pkgs_dir}/${pkg}"
                 STATUS pkg_download_status
             )
             list(GET pkg_download_status 1 pkg_download_error)
