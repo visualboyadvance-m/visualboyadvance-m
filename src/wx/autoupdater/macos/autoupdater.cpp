@@ -6,7 +6,7 @@ SparkleWrapper autoupdater;
 
 void initAutoupdater()
 {
-    autoupdater.addAppcastURL("https://data.visualboyadvance-m.org/appcast.xml");
+    autoupdater.addAppcastURL("https://data.visualboyadvance-m-emu.org/appcast.xml");
 }
 
 

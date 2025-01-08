@@ -44,7 +44,7 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "Comments", "VisualBoyAdvance-M comes with NO WARRANTY. Use it at your own risk."
-            VALUE "CompanyName", "http://visualboyadvance-m.org/"
+            VALUE "CompanyName", "http://visualboyadvance-m-emu.org/"
             VALUE "FileDescription", "VisualBoyAdvance-M"
             VALUE "FileVersion", VER_FILEVERSION_STR
             VALUE "InternalName", "wxvbam"
