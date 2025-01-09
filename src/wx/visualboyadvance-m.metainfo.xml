@@ -5,7 +5,7 @@
  <project_license>GPL-2.0</project_license>
  <content_rating type="oars-1.1"/>
  <name>VisualBoyAdvance-M</name>
- <developer id="visualboyadvance-m.org">
+ <developer id="org.visualboyadvance-m">
   <name>VisualBoyAdvance-M</name>
  </developer>
  <summary>VisualBoyAdvance-M, a high compatibility Gameboy Advance Emulator</summary>
