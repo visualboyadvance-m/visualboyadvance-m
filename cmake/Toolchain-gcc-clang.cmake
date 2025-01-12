@@ -8,7 +8,7 @@ if(UPSTREAM_RELEASE)
         add_compile_options(-march=core2 -mtune=generic)
     elseif(X86_32)
         # Optimize for pentium-mmx and tune for generic for older builds.
-        add_compile_options(-march=pentium-mmx -mtune=generic)
+        add_compile_options(-march=pentium3 -mtune=generic)
     endif()
 endif()
 
