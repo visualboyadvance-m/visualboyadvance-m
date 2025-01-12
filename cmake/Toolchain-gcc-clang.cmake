@@ -7,8 +7,10 @@ if(UPSTREAM_RELEASE)
         # Require and optimize for Core2 level support, tune for generic.
         add_compile_options(-march=core2 -mtune=generic)
     elseif(X86_32)
-        # Optimize for pentium-mmx and tune for generic for older builds.
+        # Optimize for pentiumi3 and tune for generic for Windows XP builds.
+        set(WINXP TRUE)
         add_compile_options(-march=pentium3 -mtune=generic)
+        add_compile_definitions(-DWINXP)
     endif()
 endif()
 
