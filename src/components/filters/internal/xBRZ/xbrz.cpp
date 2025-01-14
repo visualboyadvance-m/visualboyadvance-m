@@ -22,7 +22,7 @@
 #include "xbrz_tools.h"
 
 #ifdef WINXP
-#include "quake3-sqrt.h"
+#include "sqrt_sse.h"
 #endif
 
 // some gcc versions lie about having this C++17 feature
@@ -71,7 +71,7 @@ uint32_t gradientARGB(uint32_t pixFront, uint32_t pixBack) //find intermediate c
 inline double fastSqrt(double n)
 {
 #ifdef WINXP
-    return quake3_sqrt((float)n);
+    return sqrt_sse((float)n);
 #elif (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
     __asm__ ("fsqrt" : "+t" (n));
     return n;
@@ -434,7 +434,7 @@ void blendPixel(const Kernel_3x3& ker,
                 return true;
 
             //make sure there is no second blending in an adjacent rotation for this pixel: handles insular pixels, mario eyes
-            if (getTopR(blend) != BLEND_NONE && !eq(e, g)) //but support double-blending for 90� corners
+            if (getTopR(blend) != BLEND_NONE && !eq(e, g)) //but support double-blending for 90° corners
                 return false;
             if (getBottomL(blend) != BLEND_NONE && !eq(e, c))
                 return false;
