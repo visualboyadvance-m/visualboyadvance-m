@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Claes-Göran Nydahl <goldug@gmail.com>, 2019
+# Daniel Nylander <po@danielnylander.se>, 2025
 # 59031d6847a58cccc64d8da23d16ff59_48f0fae, 2015
 # [deleted], 2015
 # Sebastian Rasmussen <sebras@gmail.com>, 2020,2022
@@ -17,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-05 20:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Sebastian Rasmussen <sebras@gmail.com>, 2020,2022\n"
+"Last-Translator: Daniel Nylander <po@danielnylander.se>, 2025\n"
 "Language-Team: Swedish (http://app.transifex.com/bgk/vba-m/language/sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,7 +28,7 @@ msgstr ""
 
 #: audio/internal/openal.cpp:188
 msgid "OpenAL: Failed to open audio device"
-msgstr ""
+msgstr "OpenAL: Misslyckades med att öppna ljudenhet"
 
 #: audio/internal/openal.cpp:386 audio/internal/faudio.cpp:492
 #: audio/internal/xaudio2.cpp:577
@@ -40,39 +41,39 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
 " Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Game Boy Advance-filer (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game Boy-filer (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:144
 msgid "Open ROM file"
-msgstr "Öppna ROM fil"
+msgstr "Öppna ROM-fil"
 
 #: cmdevents.cpp:165
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Game Boy-filer (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:171
 msgid "Open GB ROM file"
-msgstr "Öppna GB ROM fil"
+msgstr "Öppna GB ROM-fil"
 
 #: cmdevents.cpp:192
 msgid ""
 "Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Game Boy Color-filer (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:198
 msgid "Open GBC ROM file"
-msgstr "Öppna GBC ROM fil"
+msgstr "Öppna GBC ROM-fil"
 
 #: cmdevents.cpp:363 cmdevents.cpp:385
 msgid "Select Dot Code file"
-msgstr "Välj Dot Code fil"
+msgstr "Välj Dot Code-fil"
 
 #: cmdevents.cpp:365 cmdevents.cpp:387
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr ""
+msgstr "E-Reader-punktkod (*.bin;*.raw)|*.bin;*.raw"
 
 #: cmdevents.cpp:406 cmdevents.cpp:601
 msgid "Select battery file"
@@ -95,12 +96,12 @@ msgstr "Bekräfta import"
 #: cmdevents.cpp:422 panel.cpp:493
 #, c-format
 msgid "Loaded battery %s"
-msgstr "Laddade batteri %s"
+msgstr "Läste in batteri %s"
 
 #: cmdevents.cpp:424
 #, c-format
 msgid "Error loading battery %s"
-msgstr "Fel vid laddning av batteri %s"
+msgstr "Fel vid inläsning av batteri %s"
 
 #: cmdevents.cpp:433
 msgid "Select code file"
@@ -108,11 +109,11 @@ msgstr "Välj kodfil"
 
 #: cmdevents.cpp:434
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
-msgstr ""
+msgstr "Game Shark-kodfil (*.spc;*.xpc)|*.spc;*.xpc"
 
 #: cmdevents.cpp:434
 msgid "Game Shark Code File (*.gcf)|*.gcf"
-msgstr ""
+msgstr "Game Shark-kodfil (*.gcf)|*.gcf"
 
 #: cmdevents.cpp:443
 msgid ""
@@ -123,7 +124,7 @@ msgstr ""
 #: cmdevents.cpp:460
 #, c-format
 msgid "Cannot open file %s"
-msgstr "Kan inte öppna fil %s"
+msgstr "Kan inte öppna filen %s"
 
 #: cmdevents.cpp:470
 #, c-format
@@ -133,12 +134,12 @@ msgstr "Kodfilen stöds inte %s"
 #: cmdevents.cpp:540
 #, c-format
 msgid "Loaded code file %s"
-msgstr "Laddade kodfil %s"
+msgstr "Läste in kodfilen %s"
 
 #: cmdevents.cpp:542
 #, c-format
 msgid "Error loading code file %s"
-msgstr "Fel vid laddning av kodfil %s"
+msgstr "Fel vid inläsning av kodfilen %s"
 
 #: cmdevents.cpp:553 cmdevents.cpp:629
 msgid "Select snapshot file"
@@ -163,12 +164,12 @@ msgstr ""
 #: cmdevents.cpp:588
 #, c-format
 msgid "Loaded snapshot file %s"
-msgstr "Laddade ögonblicksfil %s"
+msgstr "Läste in ögonblicksfilen %s"
 
 #: cmdevents.cpp:590
 #, c-format
 msgid "Error loading snapshot file %s"
-msgstr "Fel vid laddning av ögonblicksfil %s"
+msgstr "Fel vid inläsning av ögonblicksfilen %s"
 
 #: cmdevents.cpp:613
 #, c-format
@@ -195,12 +196,12 @@ msgstr ""
 #: cmdevents.cpp:656
 #, c-format
 msgid "Saved snapshot file %s"
-msgstr "Sparade ögonblicksfil %s"
+msgstr "Sparade ögonblicksfilen %s"
 
 #: cmdevents.cpp:658
 #, c-format
 msgid "Error saving snapshot file %s"
-msgstr "Fel vid sparandet av ögonblicksfil%s"
+msgstr "Fel vid sparandet av ögonblicksfilen %s"
 
 #: cmdevents.cpp:674 cmdevents.cpp:752 cmdevents.cpp:822 cmdevents.cpp:891
 #: gfxviewers.cpp:1662 gfxviewers.cpp:1807 viewers.cpp:588 viewers.cpp:802
@@ -210,12 +211,12 @@ msgstr "Välj utdatafil"
 
 #: cmdevents.cpp:675 gfxviewers.cpp:1663 gfxviewers.cpp:1808 viewsupt.cpp:1200
 msgid "PNG images|*.png|BMP images|*.bmp"
-msgstr "PNG bilder|*.png|BMP bilder|*.bmp"
+msgstr "PNG bilder|*.png|BMP-bilder|*.bmp"
 
 #: cmdevents.cpp:699 sys.cpp:579
 #, c-format
 msgid "Wrote snapshot %s"
-msgstr "Skrev ögonblicksfil %s"
+msgstr "Skrev ögonblicksfilen %s"
 
 #: cmdevents.cpp:720 cmdevents.cpp:790 cmdevents.cpp:859 cmdevents.cpp:925
 msgid " files ("
@@ -260,7 +261,7 @@ msgstr "Port att vänta på anslutning vid:"
 
 #: cmdevents.cpp:1763
 msgid "GDB Connection"
-msgstr "GDB anslutning"
+msgstr "GDB-anslutning"
 
 #: cmdevents.cpp:1815
 #, c-format
@@ -281,15 +282,15 @@ msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
-msgstr ""
+msgstr "DIN KONFIGURATION KOMMER ATT TAS BORT!\n\nÄr du säker?"
 
 #: cmdevents.cpp:2201
 msgid "FACTORY RESET"
-msgstr ""
+msgstr "FABRIKSÅTERSTÄLLNING"
 
 #: cmdevents.cpp:2236
 msgid "Nintendo Game Boy / Color / Advance emulator."
-msgstr ""
+msgstr "Nintendo Game Boy / Color / Advance-emulator."
 
 #: cmdevents.cpp:2237
 msgid ""
@@ -389,7 +390,7 @@ msgstr "Okänd"
 
 #: dialogs/game-maker.cpp:235
 msgid "Invalid"
-msgstr ""
+msgstr "Ogiltig"
 
 #: dialogs/gb-rom-info.cpp:22
 msgid "No mapper"
@@ -401,15 +402,15 @@ msgstr ""
 
 #: dialogs/gb-rom-info.cpp:68
 msgid " + RAM"
-msgstr ""
+msgstr " + RAM"
 
 #: dialogs/gb-rom-info.cpp:69
 msgid " + RTC"
-msgstr ""
+msgstr " + RTC"
 
 #: dialogs/gb-rom-info.cpp:70
 msgid " + Battery"
-msgstr ""
+msgstr " + Batteri"
 
 #: dialogs/gb-rom-info.cpp:71
 msgid " + Rumble"
@@ -422,7 +423,7 @@ msgstr ""
 #: dialogs/gb-rom-info.cpp:74
 #, c-format
 msgid "%02X (%s%s%s%s%s%s)"
-msgstr ""
+msgstr "%02X (%s%s%s%s%s%s)"
 
 #: dialogs/gb-rom-info.cpp:81 dialogs/gb-rom-info.cpp:93
 #, c-format
@@ -537,7 +538,7 @@ msgstr ""
 
 #: extra-translations.cpp:13
 msgid "&Apply"
-msgstr ""
+msgstr "&Tillämpa"
 
 #: extra-translations.cpp:14
 msgid "Artists"
@@ -545,23 +546,23 @@ msgstr ""
 
 #: extra-translations.cpp:15
 msgid "Cancel"
-msgstr ""
+msgstr "Avbryt"
 
 #: extra-translations.cpp:16
 msgid "Close"
-msgstr ""
+msgstr "Stäng"
 
 #: extra-translations.cpp:17
 msgid "Developers"
-msgstr ""
+msgstr "Utvecklare"
 
 #: extra-translations.cpp:18
 msgid "License"
-msgstr ""
+msgstr "Licens"
 
 #: extra-translations.cpp:19
 msgid "OK"
-msgstr ""
+msgstr "Ok"
 
 #: gfxviewers.cpp:1202
 msgid "Select output file and type"
@@ -596,7 +597,7 @@ msgstr "Väntar på klienter..."
 #: guiinit.cpp:147
 #, c-format
 msgid "Server IP address is: %s\n"
-msgstr "Serverns IP adress är: %s\n"
+msgstr "Serverns IP-adress är: %s\n"
 
 #: guiinit.cpp:149
 msgid "Waiting for connection..."
@@ -3292,7 +3293,7 @@ msgstr "&Länk"
 
 #: xrc/MainMenu.xrc:272
 msgid "Start &Network Link..."
-msgstr ""
+msgstr "Starta &nätverkslänk..."
 
 #: xrc/MainMenu.xrc:277
 msgid "&Nothing"
@@ -3321,7 +3322,7 @@ msgstr "&Hastighetshack"
 #: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:383
 #: xrc/MainMenu.xrc:417
 msgid "&Configure..."
-msgstr ""
+msgstr "&Konfigurera..."
 
 #: xrc/MainMenu.xrc:314
 msgid "&Video"
@@ -3457,7 +3458,7 @@ msgstr "&R"
 
 #: xrc/MainMenu.xrc:494 xrc/MainMenu.xrc:517
 msgid "Configure..."
-msgstr ""
+msgstr "Konfigurera..."
 
 #: xrc/MainMenu.xrc:498
 msgid "&Real-time clock"
@@ -3505,7 +3506,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:555
 msgid "&General..."
-msgstr ""
+msgstr "A&llmänt..."
 
 #: xrc/MainMenu.xrc:558
 msgid "&Speedup / Turbo..."
@@ -3513,7 +3514,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:561
 msgid "D&irectories..."
-msgstr ""
+msgstr "Ka&taloger..."
 
 #: xrc/MainMenu.xrc:564
 msgid "&Key Shortcuts..."
@@ -3521,7 +3522,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:567
 msgid "UI Settings"
-msgstr ""
+msgstr "Gränssnittsinställningar"
 
 #: xrc/MainMenu.xrc:569
 msgid "Enable &Status bar"
@@ -3789,7 +3790,7 @@ msgstr "Ljudinställningar"
 
 #: xrc/SoundConfig.xrc:18
 msgid "Volume:"
-msgstr ""
+msgstr "Volym:"
 
 #: xrc/SoundConfig.xrc:36
 msgid "Mute"
