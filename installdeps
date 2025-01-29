@@ -799,12 +799,10 @@ suse_installdeps() {
 
     tools="make cmake ccache nasm gettext-tools pkg-config ccache zip sfml2-devel ninja"
 
-    libs="gcc gcc-c++ libSDL2-devel wxWidgets-3_0-devel openal-soft-devel" # ffmpeg-devel
-
-    # ffmpeg requires packman repos
+    libs="gcc gcc-c++ libSDL2-devel wxGTK3-3_2-devel openal-soft-devel ffmpeg-7-libavcodec-devel ffmpeg-7-libavdevice-devel ffmpeg-7-libavfilter-devel ffmpeg-7-libavformat-devel ffmpeg-7-libavutil-devel ffmpeg-7-libpostproc-devel ffmpeg-7-libswresample-devel ffmpeg-7-libswscale-devel"
 
     if [ "$target" = m32 ]; then
-        libs=$(echo "$libs" | sed -E 's/([^ ]) ([^ ])/\1-32bit \2/g; s/$/-32bit/;')
+        error '32 bit cross builds are no longer supported on OpenSUSE'
     fi
 
     check sudo zypper in -y $tools $libs
