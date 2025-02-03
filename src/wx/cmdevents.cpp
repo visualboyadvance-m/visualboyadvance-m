@@ -2161,6 +2161,8 @@ EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)
     gb_effects_config.echo = (float)OPTION(kSoundGBEcho) / 100.0;
     gb_effects_config.stereo = (float)OPTION(kSoundGBStereo) / 100.0;
     soundFiltering = (float)OPTION(kSoundGBAFiltering) / 100.0f;
+    // Missing Setup for volume here
+    soundSetVolume((float)OPTION(kSoundVolume) / 100.0f);
 }
 
 EVT_HANDLER(EmulatorDirectories, "Directories...")
