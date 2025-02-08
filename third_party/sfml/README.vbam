@@ -4,5 +4,7 @@ emulator. The original SFML library can be found at http://www.sfml-dev.org/
 This uses SFML 2.6.2 as a basis, with the following modifications:
 * Upstream commit [9022d956](https://github.com/SFML/SFML/commit/9022d956) was
   partially backported to fix a compilation failure with modern Clang.
+* Added `U32StringCharTraits` in `include\SFML\System\String.hpp` to work around
+  a compilation failure on macOS.
 * `<timeapi.h>` was added as an include in `src\SFML\System\Win32\SleepImpl.cpp`
   to fix a compilation failure with MSVC.

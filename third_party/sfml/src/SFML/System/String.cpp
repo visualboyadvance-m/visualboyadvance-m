@@ -108,9 +108,84 @@ U8StringCharTraits::int_type U8StringCharTraits::not_eof(int_type i) noexcept
     return std::char_traits<char>::not_eof(i);
 }
 
+////////////////////////////////////////////////////////////
+void U32StringCharTraits::assign(char_type& c1, char_type c2) noexcept
+{
+    c1 = c2;
+}
+////////////////////////////////////////////////////////////
+U32StringCharTraits::char_type* U32StringCharTraits::assign(char_type* s, std::size_t n, char_type c)
+{
+    return reinterpret_cast<U32StringCharTraits::char_type*>(
+        std::char_traits<char>::assign(reinterpret_cast<char*>(s), n, static_cast<char>(c)));
+}
+////////////////////////////////////////////////////////////
+bool U32StringCharTraits::eq(char_type c1, char_type c2) noexcept
+{
+    return c1 == c2;
+}
+////////////////////////////////////////////////////////////
+bool U32StringCharTraits::lt(char_type c1, char_type c2) noexcept
+{
+    return c1 < c2;
+}
+////////////////////////////////////////////////////////////
+U32StringCharTraits::char_type* U32StringCharTraits::move(char_type* s1, const char_type* s2, std::size_t n)
+{
+    std::memmove(s1, s2, n);
+    return s1;
+}
+////////////////////////////////////////////////////////////
+U32StringCharTraits::char_type* U32StringCharTraits::copy(char_type* s1, const char_type* s2, std::size_t n)
+{
+    std::memcpy(s1, s2, n);
+    return s1;
+}
+////////////////////////////////////////////////////////////
+int U32StringCharTraits::compare(const char_type* s1, const char_type* s2, std::size_t n)
+{
+    return std::memcmp(s1, s2, n);
+}
+////////////////////////////////////////////////////////////
+std::size_t U32StringCharTraits::length(const char_type* s)
+{
+    return std::strlen(reinterpret_cast<const char*>(s));
+}
+////////////////////////////////////////////////////////////
+const U32StringCharTraits::char_type* U32StringCharTraits::find(const char_type* s, std::size_t n, const char_type& c)
+{
+    return reinterpret_cast<const U32StringCharTraits::char_type*>(
+        std::char_traits<char>::find(reinterpret_cast<const char*>(s), n, static_cast<char>(c)));
+}
+////////////////////////////////////////////////////////////
+U32StringCharTraits::char_type U32StringCharTraits::to_char_type(int_type i) noexcept
+{
+    return static_cast<U32StringCharTraits::char_type>(std::char_traits<char>::to_char_type(i));
+}
+////////////////////////////////////////////////////////////
+U32StringCharTraits::int_type U32StringCharTraits::to_int_type(char_type c) noexcept
+{
+    return std::char_traits<char>::to_int_type(static_cast<char>(c));
+}
+////////////////////////////////////////////////////////////
+bool U32StringCharTraits::eq_int_type(int_type i1, int_type i2) noexcept
+{
+    return i1 == i2;
+}
+////////////////////////////////////////////////////////////
+U32StringCharTraits::int_type U32StringCharTraits::eof() noexcept
+{
+    return std::char_traits<char>::eof();
+}
+////////////////////////////////////////////////////////////
+U32StringCharTraits::int_type U32StringCharTraits::not_eof(int_type i) noexcept
+{
+    return std::char_traits<char>::not_eof(i);
+}
+
 
 ////////////////////////////////////////////////////////////
-const std::size_t String::InvalidPos = std::basic_string<Uint32>::npos;
+const std::size_t String::InvalidPos = sf::U32String::npos;
 
 
 ////////////////////////////////////////////////////////////
@@ -195,7 +270,7 @@ String::String(const Uint32* utf32String)
 
 
 ////////////////////////////////////////////////////////////
-String::String(const std::basic_string<Uint32>& utf32String) :
+String::String(const sf::U32String& utf32String) :
 m_string(utf32String)
 {
 }
@@ -279,7 +354,7 @@ std::basic_string<Uint16> String::toUtf16() const
 
 
 ////////////////////////////////////////////////////////////
-std::basic_string<Uint32> String::toUtf32() const
+sf::U32String String::toUtf32() const
 {
     return m_string;
 }
