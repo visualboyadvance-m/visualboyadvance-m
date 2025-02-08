@@ -67,9 +67,9 @@ endif()
 find_package(PkgConfig)
 
 # Link / SFML
-set(ENABLE_LINK_DEFAULT OFF)
-if(NOT TRANSLATIONS_ONLY)
-    set(ENABLE_LINK_DEFAULT ON)
+set(ENABLE_LINK_DEFAULT ON)
+if(TRANSLATIONS_ONLY)
+    set(ENABLE_LINK_DEFAULT OFF)
 endif()
 option(ENABLE_LINK "Enable GBA linking functionality" ${ENABLE_LINK_DEFAULT})
 
