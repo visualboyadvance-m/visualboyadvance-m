@@ -33,6 +33,7 @@
 #include <iterator>
 #include <locale>
 #include <string>
+#include <cstdint>
 
 
 namespace sf
