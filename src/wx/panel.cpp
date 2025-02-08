@@ -437,6 +437,9 @@ void GameArea::LoadGame(const wxString& name)
         emusys = &GBASystem;
     }
 
+    // Set sound volume.
+    soundSetVolume((float)OPTION(kSoundVolume) / 100.0);
+
     if (OPTION(kGeomFullScreen)) {
         GameArea::ShowFullScreen(true);
     }
