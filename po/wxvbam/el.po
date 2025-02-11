@@ -184,7 +184,7 @@ msgstr "Στιγμιότυπο Game Shark (*.sps)|*.sps"
 
 #: cmdevents.cpp:644
 msgid "Exported from Visual Boy Advance-M"
-msgstr ""
+msgstr "Εξαγωγή από το Visual Boy Advance-M"
 
 #: cmdevents.cpp:656
 #, c-format
@@ -225,16 +225,16 @@ msgstr "Επιλογή αρχείου κατάστασης"
 
 #: cmdevents.cpp:1263 cmdevents.cpp:1356
 msgid "Visual Boy Advance saved game files|*.sgm"
-msgstr ""
+msgstr "Αποθηκευμένα αρχεία παιχνιδιού Visual Boy Advance|*.sgm"
 
 #: cmdevents.cpp:1386 cmdevents.cpp:1396 cmdevents.cpp:1407
 #, c-format
 msgid "Current state slot #%d"
-msgstr ""
+msgstr "Τρέχουσα θέση στιγμιοτύπου #%d"
 
 #: cmdevents.cpp:1470
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
-msgstr ""
+msgstr "Δεν μπορεί να χρησιμοποιηθεί το Colorizer Hack όσο είναι ενεργοποιημένο το αρχείο BIOS του Game Boy "
 
 #: cmdevents.cpp:1681
 msgid "Sound enabled"
@@ -275,22 +275,22 @@ msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
-msgstr ""
+msgstr "ΟΙ ΡΥΘΜΙΣΕΙΣ ΣΑΣ ΘΑ ΔΙΑΓΡΑΦΟΥΝ!"
 
 #: cmdevents.cpp:2201
 msgid "FACTORY RESET"
-msgstr ""
+msgstr "ΕΡΓΟΣΤΑΣΙΑΚΕΣ ΡΥΘΜΙΣΕΙΣ"
 
 #: cmdevents.cpp:2236
 msgid "Nintendo Game Boy / Color / Advance emulator."
-msgstr ""
+msgstr "Εξομοιωτής Nintendo Game Boy / Color / Advance."
 
 #: cmdevents.cpp:2237
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr ""
+msgstr "Πνευματική Ιδιοκτησία (C) 1999-2003 Ξεχασμένη Πνευματική Ιδιοκτησία (C) 2004-2006 VBA Ομάδα ανάπτυξης VBA Πνευματική Ιδιοκτησία (C) 2007-2020 Ομάδα ανάπτυξης VBA-M"
 
 #: cmdevents.cpp:2239
 msgid ""
