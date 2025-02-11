@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Orfeas Artinopoulos, 2025
 # Stathis Galazios <infin1ty@hol.gr>, 2016-2017
 msgid ""
 msgstr ""
@@ -10,7 +11,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-05 20:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Stathis Galazios <infin1ty@hol.gr>, 2016-2017\n"
+"Last-Translator: Orfeas Artinopoulos, 2025\n"
 "Language-Team: Greek (http://app.transifex.com/bgk/vba-m/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,7 +21,7 @@ msgstr ""
 
 #: audio/internal/openal.cpp:188
 msgid "OpenAL: Failed to open audio device"
-msgstr ""
+msgstr "OpenAL: Αποτυχία ανοίγματος της συσκευής ήχου"
 
 #: audio/internal/openal.cpp:386 audio/internal/faudio.cpp:492
 #: audio/internal/xaudio2.cpp:577
@@ -33,7 +34,7 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
 " Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Αρχεία Game Boy Advance  (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game Boy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:144
 msgid "Open ROM file"
@@ -43,7 +44,7 @@ msgstr "Άνοιγμα αρχείου ROM"
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Αρχεία Game Boy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:171
 msgid "Open GB ROM file"
@@ -53,7 +54,7 @@ msgstr "Άνοιγμα αρχείου GB ROM"
 msgid ""
 "Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Αρχεία Game Boy Color (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:198
 msgid "Open GBC ROM file"
@@ -65,7 +66,7 @@ msgstr "Επιλογή αρχείου Dot Code"
 
 #: cmdevents.cpp:365 cmdevents.cpp:387
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr ""
+msgstr "Κώδικας κουκίδας E-Reader (*.bin;*.raw)|*.bin;*.raw"
 
 #: cmdevents.cpp:406 cmdevents.cpp:601
 msgid "Select battery file"
@@ -79,7 +80,7 @@ msgstr "Αρχείο μπαταρίας (*.sav)|*.sav|Αποθήκευση Flash
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "Η εισαγωγή ενός αρχείου μπαταρίας θα διαγράψει το ήδη αποθηκευμένο παιχνίδι (μόνιμα μετά την επόμενη εγγραφή). Θέλετε να προχωρήσετε;"
 
 #: cmdevents.cpp:416 cmdevents.cpp:444 cmdevents.cpp:564
 msgid "Confirm import"
@@ -101,17 +102,17 @@ msgstr "Επιλογή αρχείου κωδικών"
 
 #: cmdevents.cpp:434
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
-msgstr ""
+msgstr "Αρχείο κωδικών Game Shark (*.spc;*.xpc)|*.spc;*.xpc"
 
 #: cmdevents.cpp:434
 msgid "Game Shark Code File (*.gcf)|*.gcf"
-msgstr ""
+msgstr "Αρχείο κωδικών Game Shark (*.gcf)|*.gcf"
 
 #: cmdevents.cpp:443
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
-msgstr ""
+msgstr "Η εισαγωγή αρχείου κωδικών θα αντικαταστήσει τυχόν φορτωμένους κωδικούς. Θέλετε να συνεχίσετε;"
 
 #: cmdevents.cpp:460
 #, c-format
@@ -141,17 +142,17 @@ msgstr "Επιλογή αρχείου στιγμιότυπου"
 msgid ""
 "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
 " (*.gsv)|*.gsv"
-msgstr ""
+msgstr "Στιγμιότυπα Game Shark & PAC (*.sps;*.xps)|*.sps;*.xps|Στιγμιότυπα Game Shark SP (*.gsv)|*.gsv"
 
 #: cmdevents.cpp:554
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
-msgstr ""
+msgstr "Στιγμιότυπο Game Boy (*.gbs)|*.gbs"
 
 #: cmdevents.cpp:563
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "Η εισαγωγή ενός στιγμιοτύπου θα διαγράψει τυχόν αποθηκευμένα παιχνίδια (μόνιμα μετά την επόμενη εγγραφή). Θέλετε να προχωρήσετε;"
 
 #: cmdevents.cpp:588
 #, c-format
@@ -179,7 +180,7 @@ msgstr "Δεν είναι δυνατή η εξαγωγή αρχείων αποθ
 
 #: cmdevents.cpp:630
 msgid "Game Shark Snapshot (*.sps)|*.sps"
-msgstr ""
+msgstr "Στιγμιότυπο Game Shark (*.sps)|*.sps"
 
 #: cmdevents.cpp:644
 msgid "Exported from Visual Boy Advance-M"
