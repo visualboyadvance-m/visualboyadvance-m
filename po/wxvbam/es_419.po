@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Andrés Oña, 2025
 # chxndler perez cueva <chxndlerpc@gmail.com>, 2018
 # Dani Quiroz, 2022
 # David Martínez <david8dgm@gmail.com>, 2020
@@ -21,7 +22,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-05 20:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Timoteo Traiber Minnaard, 2024\n"
+"Last-Translator: Andrés Oña, 2025\n"
 "Language-Team: Spanish (Latin America) (http://app.transifex.com/bgk/vba-m/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -76,7 +77,7 @@ msgstr "Seleccionar archivo de código de punto"
 
 #: cmdevents.cpp:365 cmdevents.cpp:387
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr ""
+msgstr "Código de puntos del lector electrónico (*.bin;*.raw)|*.bin;*.raw"
 
 #: cmdevents.cpp:406 cmdevents.cpp:601
 msgid "Select battery file"
@@ -345,7 +346,7 @@ msgstr "Confirm"
 #: dialogs/accel-config.cpp:290
 #, c-format
 msgid "This will unassign \"%s\" from \"%s\". Are you sure?"
-msgstr ""
+msgstr "Esto desasignará \"1%s\" de \"1%s\". ¿Estás seguro?"
 
 #: dialogs/directories-config.cpp:49
 msgid "Browse"
@@ -353,7 +354,7 @@ msgstr "Browse"
 
 #: dialogs/display-config.cpp:52
 msgid "Invalid value for Default magnification."
-msgstr ""
+msgstr "Valor no válido para ampliación predeterminada."
 
 #: dialogs/display-config.cpp:331 xrc/DisplayConfig.xrc:86
 #: xrc/DisplayConfig.xrc:136 xrc/DisplayConfig.xrc:222
@@ -375,7 +376,7 @@ msgstr "Plugin"
 #: dialogs/display-config.cpp:407
 #, c-format
 msgid "Using pixel filter: %s"
-msgstr ""
+msgstr "Usando filtro de píxeles: 1%s"
 
 #: dialogs/display-config.cpp:414
 #, c-format
@@ -397,19 +398,19 @@ msgstr "Inválido"
 
 #: dialogs/gb-rom-info.cpp:22
 msgid "No mapper"
-msgstr ""
+msgstr "Sin mapeador"
 
 #: dialogs/gb-rom-info.cpp:43
 msgid "Pocket Camera"
-msgstr ""
+msgstr "Cámara de bolsillo"
 
 #: dialogs/gb-rom-info.cpp:68
 msgid " + RAM"
-msgstr ""
+msgstr "+ RAM"
 
 #: dialogs/gb-rom-info.cpp:69
 msgid " + RTC"
-msgstr ""
+msgstr "+RTC"
 
 #: dialogs/gb-rom-info.cpp:70
 msgid " + Battery"
@@ -417,7 +418,7 @@ msgstr "+ Batería"
 
 #: dialogs/gb-rom-info.cpp:71
 msgid " + Rumble"
-msgstr ""
+msgstr "+ Rumble"
 
 #: dialogs/gb-rom-info.cpp:72
 msgid " + Motion Sensor"
@@ -3461,7 +3462,7 @@ msgstr "&R"
 
 #: xrc/MainMenu.xrc:494 xrc/MainMenu.xrc:517
 msgid "Configure..."
-msgstr ""
+msgstr "Configurar..."
 
 #: xrc/MainMenu.xrc:498
 msgid "&Real-time clock"
@@ -3481,15 +3482,15 @@ msgstr "&LCD Filter"
 
 #: xrc/MainMenu.xrc:521
 msgid "&Game Boy color option"
-msgstr ""
+msgstr "Opción de color Game Boy"
 
 #: xrc/MainMenu.xrc:529
 msgid "&Game Boy Colorizer Hack (requires restart)"
-msgstr ""
+msgstr "Hack de color Game Boy (requiere reinicio)"
 
 #: xrc/MainMenu.xrc:533
 msgid "&Game Boy printer"
-msgstr ""
+msgstr "Impresora Game Boy"
 
 #: xrc/MainMenu.xrc:537
 msgid "&Gather a full page before printing"
@@ -3501,43 +3502,43 @@ msgstr "&Save printouts as screen captures"
 
 #: xrc/MainMenu.xrc:546
 msgid "&Use Game Boy BIOS file (requires restart)"
-msgstr ""
+msgstr "Usar archivo BIOS de Game Boy (requiere reinicio)"
 
 #: xrc/MainMenu.xrc:550
 msgid "&Use Game Boy Color BIOS file"
-msgstr ""
+msgstr "Usar archivo BIOS de Game Boy Color"
 
 #: xrc/MainMenu.xrc:555
 msgid "&General..."
-msgstr ""
+msgstr "General"
 
 #: xrc/MainMenu.xrc:558
 msgid "&Speedup / Turbo..."
-msgstr ""
+msgstr "Aceleración / Turbo"
 
 #: xrc/MainMenu.xrc:561
 msgid "D&irectories..."
-msgstr ""
+msgstr "Directorios"
 
 #: xrc/MainMenu.xrc:564
 msgid "&Key Shortcuts..."
-msgstr ""
+msgstr "Atajos de teclas"
 
 #: xrc/MainMenu.xrc:567
 msgid "UI Settings"
-msgstr ""
+msgstr "Configuración de UI"
 
 #: xrc/MainMenu.xrc:569
 msgid "Enable &Status bar"
-msgstr ""
+msgstr "Habilitar barra de estado"
 
 #: xrc/MainMenu.xrc:573
 msgid "Hide &Menu Bar"
-msgstr ""
+msgstr "Ocultar barra de menú"
 
 #: xrc/MainMenu.xrc:577
 msgid "Suspend &Screen Saver"
-msgstr ""
+msgstr "Suspender y proteger pantalla"
 
 #: xrc/MainMenu.xrc:583
 msgid "&Tools"
@@ -3549,15 +3550,15 @@ msgstr "&Cheats"
 
 #: xrc/MainMenu.xrc:587
 msgid "List &cheats..."
-msgstr ""
+msgstr "Lista y trucos"
 
 #: xrc/MainMenu.xrc:590
 msgid "Find c&heat..."
-msgstr ""
+msgstr "Encontrar truco"
 
 #: xrc/MainMenu.xrc:594
 msgid "A&utomatically save / load cheats"
-msgstr ""
+msgstr "Guardar / cargar trucos automáticamente"
 
 #: xrc/MainMenu.xrc:598
 msgid "&Enable cheats"
@@ -3657,7 +3658,7 @@ msgstr "Report &Bugs"
 
 #: xrc/MainMenu.xrc:733
 msgid "Visual Boy Advance-M Support &Forum"
-msgstr ""
+msgstr "Soporte y foro de Visual Boy Advance-M"
 
 #: xrc/MainMenu.xrc:736
 msgid "Translations"
@@ -3745,7 +3746,7 @@ msgstr "Start Network Link"
 
 #: xrc/NetLink.xrc:13
 msgid "WARNING: Link will likely not work over the internet or LAN."
-msgstr ""
+msgstr "ADVERTENCIA: Es probable que el enlace no funcione a través de Internet o LAN."
 
 #: xrc/NetLink.xrc:38
 msgid "Server"
@@ -3761,7 +3762,7 @@ msgstr "Players:"
 
 #: xrc/NetLink.xrc:83
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: xrc/NetLink.xrc:107
 msgid "Server:"
@@ -3793,7 +3794,7 @@ msgstr "Sound Settings"
 
 #: xrc/SoundConfig.xrc:18
 msgid "Volume:"
-msgstr ""
+msgstr "Volumen:"
 
 #: xrc/SoundConfig.xrc:36
 msgid "Mute"
@@ -3805,7 +3806,7 @@ msgstr "Maximum"
 
 #: xrc/SoundConfig.xrc:73
 msgid "Sample rate:"
-msgstr ""
+msgstr "Frecuencia de muestreo:"
 
 #: xrc/SoundConfig.xrc:79
 msgid "48 KHz"
@@ -3825,7 +3826,7 @@ msgstr "11 KHz"
 
 #: xrc/SoundConfig.xrc:112
 msgid "Direct Sound"
-msgstr ""
+msgstr "Sonido directo"
 
 #: xrc/SoundConfig.xrc:140
 msgid "Device"
@@ -3865,7 +3866,7 @@ msgstr "Center"
 
 #: xrc/SoundConfig.xrc:263
 msgid "Left / Right"
-msgstr ""
+msgstr "Izquierda / Derecha"
 
 #: xrc/SoundConfig.xrc:292
 msgid "Sound filtering"
@@ -3893,4 +3894,4 @@ msgstr "Frame skip"
 
 #: xrc/SpeedupConfig.xrc:61
 msgid "Mute Sound"
-msgstr ""
+msgstr "Silenciar sonido"
