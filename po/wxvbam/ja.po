@@ -74,7 +74,7 @@ msgstr "ドットコードファイルを選択"
 
 #: cmdevents.cpp:365 cmdevents.cpp:387
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr ""
+msgstr "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 
 #: cmdevents.cpp:406 cmdevents.cpp:601
 msgid "Select battery file"
@@ -88,7 +88,7 @@ msgstr "バッテリーファイル (*.sav) | *. sav|フラッシュセーブフ
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "バッテリー ファイルを読み込むと、保存したゲームがすべて消去されます (次回の書き込み後、完全に消去されます)続行しますか?"
 
 #: cmdevents.cpp:416 cmdevents.cpp:444 cmdevents.cpp:564
 msgid "Confirm import"
@@ -110,17 +110,17 @@ msgstr "コードファイルを選択"
 
 #: cmdevents.cpp:434
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
-msgstr ""
+msgstr "ゲームシャークのコードファイル (*.spc;*.xpc)|*.spc;*.xpc"
 
 #: cmdevents.cpp:434
 msgid "Game Shark Code File (*.gcf)|*.gcf"
-msgstr ""
+msgstr "ゲームシャークのコードファイル(*.gcf)|*.gcf"
 
 #: cmdevents.cpp:443
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
-msgstr ""
+msgstr "コード ファイルを読み込むと、読み込まれたチートが置き換えられます。続行しますか?"
 
 #: cmdevents.cpp:460
 #, c-format
@@ -150,17 +150,17 @@ msgstr "スナップショットファイルを選択"
 msgid ""
 "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
 " (*.gsv)|*.gsv"
-msgstr ""
+msgstr "ゲームシャーク & PAC のスナップショット (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots (*.gsv)|*.gsv"
 
 #: cmdevents.cpp:554
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
-msgstr ""
+msgstr "ゲームボーイのスナップショット(*.gbs)|*.gbs"
 
 #: cmdevents.cpp:563
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "スナップショット ファイルをインポートすると、保存されたゲームはすべて消去されます (次回の書き込み後には永久に消去されます)。続行しますか?"
 
 #: cmdevents.cpp:588
 #, c-format
