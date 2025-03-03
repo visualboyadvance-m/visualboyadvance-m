@@ -164,12 +164,6 @@ if [ "$target_cpu" = i386 ]; then
     table_line_append DIST_ARGS python2 '--host= --build='
     table_line_append DIST_ARGS python3 '--host= --build='
 
-    table_line_append DIST_ARGS sfml '-DCMAKE_OSX_ARCHITECTURES=i386'
-
-    table_line_append DIST_PRE_BUILD sfml " \
-        sed -i.bak '/FATAL_ERROR \"Only 64-bit architecture is supported/d' CMakeLists.txt; \
-    "
-
     table_line_append DIST_ARGS libicu '--host= --build='
 fi
 

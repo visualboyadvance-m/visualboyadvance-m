@@ -19,8 +19,6 @@ parts:
     cmake-generator: Ninja
     stage-packages:
       - libsdl2-2.0-0
-      - libsfml-network2.5
-      - libsfml-system2.5
       - libnotify4
       - libsm6
       - libopenal1
@@ -46,7 +44,6 @@ parts:
       - zip
       - libnotify-dev
       - libsdl2-dev
-      - libsfml-dev
       - libgtk-3-dev
       - libopenal-dev
       - libwxgtk3.0-gtk3-dev
