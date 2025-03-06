@@ -87,7 +87,7 @@ msgstr "Batterifil (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
-msgstr ""
+msgstr "Om du importerar en batterifil raderas alla sparade spel (permanent efter nästa skrivning). Vill du fortsätta?"
 
 #: cmdevents.cpp:416 cmdevents.cpp:444 cmdevents.cpp:564
 msgid "Confirm import"
@@ -119,7 +119,7 @@ msgstr "Game Shark-kodfil (*.gcf)|*.gcf"
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
-msgstr ""
+msgstr "Att importera en kodfil kommer att ersätta alla inlästa fusk. Vill du fortsätta?"
 
 #: cmdevents.cpp:460
 #, c-format
@@ -191,7 +191,7 @@ msgstr ""
 
 #: cmdevents.cpp:644
 msgid "Exported from Visual Boy Advance-M"
-msgstr ""
+msgstr "Exporterad från Visual Boy Advance-M"
 
 #: cmdevents.cpp:656
 #, c-format
@@ -313,7 +313,7 @@ msgid ""
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program. If not, see http://www.gnu.org/licenses ."
-msgstr ""
+msgstr "Detta program är fri programvara: du kan vidaredistribuera det och / eller ändra det enligt villkoren i GNU General Public License som publiceras av Free Software Foundation, antingen version 2 av licensen eller (efter eget val) någon senare version.\n\nDetta program distribueras i hopp om att det kommer att vara användbart, men UTAN NÅGON GARANTI; utan ens den underförstådda garantin om SÄLJBARHET eller LÄMPLIGHET FÖR ETT BESTÄMT SYFTE. Se GNU General Public License för mer information.\n\nDu bör ha fått en kopia av GNU General Public License tillsammans med detta program. Om inte, se http://www.gnu.org/licenses ."
 
 #: cmdevents.cpp:2424
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
@@ -428,113 +428,113 @@ msgstr "%02X (%s%s%s%s%s%s)"
 #: dialogs/gb-rom-info.cpp:81 dialogs/gb-rom-info.cpp:93
 #, c-format
 msgid "%02X (Supported)"
-msgstr ""
+msgstr "%02X (stöds)"
 
 #: dialogs/gb-rom-info.cpp:83 dialogs/gb-rom-info.cpp:91
 #, c-format
 msgid "%02X (Not supported)"
-msgstr ""
+msgstr "%02X (stöds inte)"
 
 #: dialogs/gb-rom-info.cpp:95
 #, c-format
 msgid "%02X (Required)"
-msgstr ""
+msgstr "%02X (krävs)"
 
 #: dialogs/gb-rom-info.cpp:107 dialogs/gb-rom-info.cpp:141
 #, c-format
 msgid "%02X (32 KiB)"
-msgstr ""
+msgstr "%02X (32 KiB)"
 
 #: dialogs/gb-rom-info.cpp:109 dialogs/gb-rom-info.cpp:145
 #, c-format
 msgid "%02X (64 KiB)"
-msgstr ""
+msgstr "%02X (64 KiB)"
 
 #: dialogs/gb-rom-info.cpp:111 dialogs/gb-rom-info.cpp:143
 #, c-format
 msgid "%02X (128 KiB)"
-msgstr ""
+msgstr "%02X (128 KiB)"
 
 #: dialogs/gb-rom-info.cpp:113
 #, c-format
 msgid "%02X (256 KiB)"
-msgstr ""
+msgstr "%02X (256 KiB)"
 
 #: dialogs/gb-rom-info.cpp:115
 #, c-format
 msgid "%02X (512 KiB)"
-msgstr ""
+msgstr "%02X (512 KiB)"
 
 #: dialogs/gb-rom-info.cpp:117
 #, c-format
 msgid "%02X (1 MiB)"
-msgstr ""
+msgstr "%02X (1 MiB)"
 
 #: dialogs/gb-rom-info.cpp:119
 #, c-format
 msgid "%02X (2 MiB)"
-msgstr ""
+msgstr "%02X (2 MiB)"
 
 #: dialogs/gb-rom-info.cpp:121
 #, c-format
 msgid "%02X (4 MiB)"
-msgstr ""
+msgstr "%02X (4 MiB)"
 
 #: dialogs/gb-rom-info.cpp:123 dialogs/gb-rom-info.cpp:147
 #: dialogs/gb-rom-info.cpp:159
 #, c-format
 msgid "%02X (Unknown)"
-msgstr ""
+msgstr "%02X (okänt)"
 
 #: dialogs/gb-rom-info.cpp:131
 #, c-format
 msgid "%02X (None)"
-msgstr ""
+msgstr "%02X (ingen)"
 
 #: dialogs/gb-rom-info.cpp:133
 #, c-format
 msgid "%02X (256 B)"
-msgstr ""
+msgstr "%02X (256 B)"
 
 #: dialogs/gb-rom-info.cpp:135
 #, c-format
 msgid "%02X (512 B)"
-msgstr ""
+msgstr "%02X (512 B)"
 
 #: dialogs/gb-rom-info.cpp:137
 #, c-format
 msgid "%02X (2 KiB)"
-msgstr ""
+msgstr "%02X (2 KiB)"
 
 #: dialogs/gb-rom-info.cpp:139
 #, c-format
 msgid "%02X (8 KiB)"
-msgstr ""
+msgstr "%02X (8 KiB)"
 
 #: dialogs/gb-rom-info.cpp:155
 #, c-format
 msgid "%02X (Japan)"
-msgstr ""
+msgstr "%02X (Japan)"
 
 #: dialogs/gb-rom-info.cpp:157
 #, c-format
 msgid "%02X (World)"
-msgstr ""
+msgstr "%02X (Världen)"
 
 #: dialogs/gb-rom-info.cpp:201
 #, c-format
 msgid "%02X (Actual: %02X)"
-msgstr ""
+msgstr "%02X (Faktisk: %02X)"
 
 #: dialogs/gb-rom-info.cpp:204
 #, c-format
 msgid "%04X (Actual: %04X)"
-msgstr ""
+msgstr "%04X (Faktisk: %04X)"
 
 #: dialogs/sound-config.cpp:251
 #, c-format
 msgid "%d frame = %.2f ms"
-msgstr ""
+msgstr "%d bildruta = %.2f ms"
 
 #: extra-translations.cpp:13
 msgid "&Apply"
@@ -809,7 +809,7 @@ msgstr ""
 #: panel.cpp:1022
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
-msgstr ""
+msgstr "Giltigt läge: %d x %d - %d @ %d"
 
 #: panel.cpp:1030
 #, c-format
@@ -920,7 +920,7 @@ msgstr "Fel i videoinspelning (%s); avbryter"
 #: panel.cpp:2698
 #, c-format
 msgid "Volume: %d %%"
-msgstr ""
+msgstr "Volym: %d %%"
 
 #: sys.cpp:205 sys.cpp:266
 msgid "No game in progress to record"
@@ -955,7 +955,7 @@ msgstr "Uppspelning slutade"
 #: sys.cpp:458
 #, c-format
 msgid "%d %% (%d, %d fps)"
-msgstr ""
+msgstr "%d %% (%d, %d bilder/s)"
 
 #: sys.cpp:899 xrc/GBPrinter.xrc:65
 msgid "&Discard"
@@ -1006,15 +1006,15 @@ msgstr "Välj minnesdumpsfil"
 
 #: viewsupt.cpp:789
 msgid "Red:"
-msgstr ""
+msgstr "Röd:"
 
 #: viewsupt.cpp:798
 msgid "Green:"
-msgstr ""
+msgstr "Grön:"
 
 #: viewsupt.cpp:807
 msgid "Blue:"
-msgstr ""
+msgstr "Blå:"
 
 #: viewsupt.h:63
 #, c-format
@@ -1211,7 +1211,7 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:33
 msgid "GameShark"
-msgstr ""
+msgstr "GameShark"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:107
 #, c-format
@@ -1379,7 +1379,7 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:461
 msgid "Enable status bar"
-msgstr ""
+msgstr "Aktivera statusrad"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:462
 msgid "INI file version (DO NOT MODIFY)"
@@ -1602,7 +1602,7 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:563
 msgid "Number of sound buffers"
-msgstr ""
+msgstr "Antal ljudbuffertar"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:564
 msgid "Bit mask of sound channels to enable"
@@ -1650,7 +1650,7 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:576
 msgid "Sound volume (%)"
-msgstr ""
+msgstr "Ljudvolym (%)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:645
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:665
@@ -1782,31 +1782,31 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:54
 msgid "Volume Mute"
-msgstr ""
+msgstr "Volym tyst"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:55
 msgid "Volume Down"
-msgstr ""
+msgstr "Sänk volym"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:56
 msgid "Volume Up"
-msgstr ""
+msgstr "Höj volym"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:57
 msgid "Next Track"
-msgstr ""
+msgstr "Nästa spår"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:58
 msgid "Previous Track"
-msgstr ""
+msgstr "Föregående spår"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:59
 msgid "Stop"
-msgstr ""
+msgstr "Stoppa"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:60
 msgid "Play/Pause"
-msgstr ""
+msgstr "Spela upp/Paus"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:93
 msgid "Alt+"
@@ -1846,7 +1846,7 @@ msgstr ""
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:272
 #, c-format
 msgid "%s: Button %d"
-msgstr ""
+msgstr "%s: Knapp %d"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:274
 #, c-format
@@ -1976,7 +1976,7 @@ msgstr ""
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1678
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1711
 msgid "Network error."
-msgstr ""
+msgstr "Nätverksfel."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1110
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1687
@@ -1987,7 +1987,7 @@ msgstr ""
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1124
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1701
 msgid "All players connected"
-msgstr ""
+msgstr "Alla spelare anslutna"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1145
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1723
@@ -2478,7 +2478,7 @@ msgstr "ROM-information"
 
 #: xrc/GBColorPrefPanel.xrc:9
 msgid "Custom"
-msgstr ""
+msgstr "Anpassad"
 
 #: xrc/GBColorPrefPanel.xrc:10 xrc/JoyPanel.xrc:247
 msgid "Standard"
@@ -2732,11 +2732,11 @@ msgstr ""
 
 #: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
 msgid "64 K"
-msgstr ""
+msgstr "64 K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:50 xrc/GameBoyAdvanceConfig.xrc:222
 msgid "128 K"
-msgstr ""
+msgstr "128 K"
 
 #: xrc/GameBoyAdvanceConfig.xrc:64
 msgid "Detect Now"
@@ -2752,7 +2752,7 @@ msgstr "Sparningstyp"
 
 #: xrc/GameBoyAdvanceConfig.xrc:92
 msgid "BIOS file:"
-msgstr ""
+msgstr "BIOS-fil:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file:"
@@ -3089,7 +3089,7 @@ msgstr "&Läs automatiskt in senaste"
 
 #: xrc/MainMenu.xrc:89
 msgid "From &File..."
-msgstr ""
+msgstr "Från &fil..."
 
 #: xrc/MainMenu.xrc:93
 msgid "Do not change &battery save"
@@ -3153,7 +3153,7 @@ msgstr "1&0"
 
 #: xrc/MainMenu.xrc:145
 msgid "To &File..."
-msgstr ""
+msgstr "Till &fil..."
 
 #: xrc/MainMenu.xrc:147
 msgid "&Save state"
@@ -3546,11 +3546,11 @@ msgstr "&Fusk"
 
 #: xrc/MainMenu.xrc:587
 msgid "List &cheats..."
-msgstr ""
+msgstr "Lista fu&sk..."
 
 #: xrc/MainMenu.xrc:590
 msgid "Find c&heat..."
-msgstr ""
+msgstr "Hitta f&usk..."
 
 #: xrc/MainMenu.xrc:594
 msgid "A&utomatically save / load cheats"
@@ -3758,7 +3758,7 @@ msgstr "Spelare:"
 
 #: xrc/NetLink.xrc:83
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: xrc/NetLink.xrc:107
 msgid "Server:"
@@ -3802,7 +3802,7 @@ msgstr "Maximal"
 
 #: xrc/SoundConfig.xrc:73
 msgid "Sample rate:"
-msgstr ""
+msgstr "Samplingsfrekvens:"
 
 #: xrc/SoundConfig.xrc:79
 msgid "48 KHz"
