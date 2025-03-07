@@ -7,7 +7,7 @@
 # horcus Yuan <1257425379@qq.com>, 2019
 # pngai <pngai@ymail.com>, 2016
 # Rythm Tse <ksusix@gmail.com>, 2016
-# Weiran Wu <wwrustc@mail.ustc.edu.cn>, 2024
+# Weiran Wu <wwrustc@mail.ustc.edu.cn>, 2024-2025
 # wr superboy, 2023
 # Xuan Zheng, 2024
 # Xuntao Chi <1139954766@qq.com>, 2019
@@ -26,7 +26,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-05 20:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: 王晨旭 <wcxu21@126.com>, 2021\n"
+"Last-Translator: Weiran Wu <wwrustc@mail.ustc.edu.cn>, 2024-2025\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/bgk/vba-m/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1526,19 +1526,19 @@ msgstr "加载状态时不覆盖原生 (电池) 存档"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:526
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
-msgstr "阀门加快游戏速度，即使已经在加速时（0-450 %，0 = 无阀门）"
+msgstr "限制游戏速度，包括加速后的（0-450 %，0 = 无限制）"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:529
 msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
-msgstr "设置加速键的阀门值（0-3000 %，0 = 无阀门）"
+msgstr "设置加速键的限制（0-3000 %，0 = 无限制）"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:531
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
-msgstr "加速时跳过的帧数（而不是阀门加速）"
+msgstr "加速时跳过的帧数（而不是加速限制）"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:534
 msgid "Use frame skip for speedup throttle"
-msgstr "使用跳帧来阀门加速"
+msgstr "使用跳帧来限制加速"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:536
 msgid "Mute sound during speedup"
@@ -2898,7 +2898,7 @@ msgstr "秒 (0-600); 0 = 禁用"
 
 #: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
-msgstr "阀门(&T)"
+msgstr "限速(&T)"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "Percent of normal:"
@@ -2906,7 +2906,7 @@ msgstr "正常百分比："
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
-msgstr "0 = 无阀门"
+msgstr "0 = 无限制"
 
 #: xrc/GeneralConfig.xrc:114
 msgid "Unlimited"
@@ -3085,7 +3085,7 @@ msgstr "保存点代码(&S)..."
 
 #: xrc/MainMenu.xrc:47
 msgid "Most &recent"
-msgstr "最常用"
+msgstr "最常用(&R)"
 
 #: xrc/MainMenu.xrc:50
 msgid "Load current state slot"
@@ -3285,7 +3285,7 @@ msgstr "自动 IPS/UPS/IPF 补丁(&A)"
 
 #: xrc/MainMenu.xrc:259
 msgid "&Pause when inactive"
-msgstr "非激活状态时暂停(&P)"
+msgstr "非活动状态时暂停(&P)"
 
 #: xrc/MainMenu.xrc:264
 msgid "&Reset"
@@ -3570,7 +3570,7 @@ msgstr "启用金手指(&E)"
 
 #: xrc/MainMenu.xrc:605
 msgid "&Break into GDB"
-msgstr "切入 GDB(&B)"
+msgstr "中断进入 GDB(&B)"
 
 #: xrc/MainMenu.xrc:609
 msgid "&Configure port..."
@@ -3578,7 +3578,7 @@ msgstr "配置端口(&C)..."
 
 #: xrc/MainMenu.xrc:612
 msgid "&Break on load"
-msgstr "加载时切入(&B)"
+msgstr "加载时中断(&B)"
 
 #: xrc/MainMenu.xrc:617
 msgid "&Disconnect"
@@ -3846,7 +3846,7 @@ msgstr "启用硬件加速"
 
 #: xrc/SoundConfig.xrc:184
 msgid "Number of sound buffers:"
-msgstr " 声音缓冲区数:"
+msgstr "声音缓冲区数:"
 
 #: xrc/SoundConfig.xrc:192
 msgid "Advanced"
@@ -3878,7 +3878,7 @@ msgstr "声音过滤"
 
 #: xrc/TileViewer.xrc:4
 msgid "Tile Viewer"
-msgstr "碎片查看器"
+msgstr "瓦片查看器"
 
 #: xrc/TileViewer.xrc:24
 msgid "Colors"
@@ -3890,7 +3890,7 @@ msgstr "加速/超频设置"
 
 #: xrc/SpeedupConfig.xrc:9
 msgid "Speedup Throttle"
-msgstr "阀门加速"
+msgstr "加速限制"
 
 #: xrc/SpeedupConfig.xrc:54
 msgid "Frame skip"
