@@ -278,7 +278,7 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
         ->SetValidator(RenderValidator(config::RenderMethod::kOpenGL));
 #endif  // NO_OGL
 
-#if defined(__WXMSW__) && !defined(NO_D3D)
+#ifndef NO_D3D
     // Enable the Direct3D option on Windows.
     GetValidatedChild("OutputDirect3D")
         ->SetValidator(RenderValidator(config::RenderMethod::kDirect3d));

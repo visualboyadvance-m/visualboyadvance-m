@@ -66,7 +66,7 @@ static constexpr size_t kNbInterframes = static_cast<size_t>(Interframe::kLast);
 enum class RenderMethod {
     kSimple = 0,
     kOpenGL,
-#if defined(__WXMSW__) && !defined(NO_D3D)
+#ifndef NO_D3D
     kDirect3d,
 #elif defined(__WXMAC__)
     kQuartz2d,

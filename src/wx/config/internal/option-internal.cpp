@@ -72,7 +72,7 @@ static const std::array<wxString, kNbInterframes> kInterframeStrings = {
 static const std::array<wxString, kNbRenderMethods> kRenderMethodStrings = {
     "simple",
     "opengl",
-#if defined(__WXMSW__) && !defined(NO_D3D)
+#ifndef NO_D3D
     "direct3d",
 #elif defined(__WXMAC__)
     "quartz2d",

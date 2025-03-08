@@ -1175,9 +1175,9 @@ void GameArea::OnIdle(wxIdleEvent& event)
                 panel = new GLDrawingPanel(this, basic_width, basic_height);
                 break;
 #endif
-#if defined(__WXMSW__) && !defined(NO_D3D)
+#ifndef NO_D3D
             case config::RenderMethod::kDirect3d:
-                panel = new DXDrawingPanel(this, basic_width, basic_height);
+                panel = new D3DDrawingPanel(this, basic_width, basic_height);
                 break;
 #endif
             case config::RenderMethod::kLast:
@@ -2420,28 +2420,690 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 
 #endif // GL support
 
-#if defined(__WXMSW__) && !defined(NO_D3D)
-#define DIRECT3D_VERSION 0x0900
-#include <d3d9.h> // main include file
-//#include <d3dx9core.h> // required for font rendering
-#include <dxerr9.h> // contains debug functions
+#ifndef NO_D3D
 
-DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
-    : DrawingPanel(parent, _width, _height)
-{
-    // FIXME: implement
-}
+BEGIN_EVENT_TABLE(D3DDrawingPanel, DrawingPanel)
+EVT_SIZE(D3DDrawingPanel::OnSize)
+EVT_PAINT(D3DDrawingPanel::PaintEv)
+EVT_ERASE_BACKGROUND(D3DDrawingPanel::EraseBackground)
+END_EVENT_TABLE()
 
-void DXDrawingPanel::DrawArea(wxWindowDC& dc)
-{
-    // FIXME: implement
-    if (!did_init) {
-      DrawingPanelInit();
+D3DDrawingPanel::D3DDrawingPanel(wxWindow* parent, int _width, int _height)
+    : DrawingPanel(parent, _width, _height),
+      d3d_(nullptr),
+      device_(nullptr),
+      texture_(nullptr),
+      font_(nullptr),
+      vertex_buffer_(nullptr) {
+    
+    memset(delta, 0xff, sizeof(delta));
+
+    if (OPTION(kDispFilter) == config::Filter::kPlugin) {
+        rpi_ = widgets::MaybeLoadFilterPlugin(OPTION(kDispFilterPlugin),
+                                              &filter_plugin_);
+        if (rpi_) {
+            rpi_->Flags &= ~RPI_565_SUPP;
+
+            if (rpi_->Flags & RPI_888_SUPP) {
+                rpi_->Flags &= ~RPI_555_SUPP;
+                // FIXME: should this be 32 or 24?  No docs or sample source
+                systemColorDepth = 32;
+            } else
+                systemColorDepth = 16;
+
+            if (!rpi_->Output) {
+                // note that in actual kega fusion plugins, rpi_->Output is
+                // unused (as is rpi_->Handle)
+                rpi_->Output =
+                    (RENDPLUG_Output)filter_plugin_.GetSymbol("RenderPluginOutput");
+            }
+            scale *= (rpi_->Flags & RPI_OUT_SCLMSK) >> RPI_OUT_SCLSH;
+        } else {
+            // This is going to delete the object. Do nothing more here.
+            OPTION(kDispFilterPlugin) = wxEmptyString;
+            OPTION(kDispFilter) = config::Filter::kNone;
+            return;
+        }
     }
 
-    if (todraw) {
+    if (OPTION(kDispFilter) != config::Filter::kPlugin) {
+        scale *= GetFilterScale();
+        systemColorDepth = 32;
+    }
+
+    // Initialize color tables
+    if (systemColorDepth == 32) {
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+        systemRedShift = 3;
+        systemGreenShift = 11;
+        systemBlueShift = 19;
+        RGB_LOW_BITS_MASK = 0x00010101;
+#else
+        systemRedShift = 27;
+        systemGreenShift = 19;
+        systemBlueShift = 11;
+        RGB_LOW_BITS_MASK = 0x01010100;
+#endif
+    } else {
+        // plugins expect RGB in native byte order
+        systemRedShift = 10;
+        systemGreenShift = 5;
+        systemBlueShift = 0;
+        RGB_LOW_BITS_MASK = 0x0421;
+    }
+
+    // wxImage is 24-bit RGB, so 24-bit is preferred. Filters require 16 or 32, though
+    if (OPTION(kDispFilter) == config::Filter::kNone &&
+        OPTION(kDispIFB) == config::Interframe::kNone) {
+        // changing from 32 to 24 does not require regenerating color tables
+        systemColorDepth = 32;
+    }
+
+    DrawingPanelInit();
+}
+
+void D3DDrawingPanel::DrawingPanelInit()
+{
+    // Initialize Direct3D
+    d3d_ = Direct3DCreate9(D3D_SDK_VERSION);
+    if (!d3d_) {
+        wxLogError("Failed to create Direct3D9 object");
+        return;
+    }
+
+    // Get current window size
+    int client_width, client_height;
+    widgets::GetRealPixelClientSize(this, &client_width, &client_height);
+
+    ZeroMemory(&d3dpp_, sizeof(d3dpp_));
+    d3dpp_.Windowed = TRUE;
+    d3dpp_.SwapEffect = D3DSWAPEFFECT_DISCARD;
+    d3dpp_.hDeviceWindow = GetHWND();
+    d3dpp_.BackBufferFormat = D3DFMT_UNKNOWN;
+    d3dpp_.BackBufferWidth = client_width;
+    d3dpp_.BackBufferHeight = client_height;
+    d3dpp_.EnableAutoDepthStencil = FALSE;
+    d3dpp_.PresentationInterval = OPTION(kPrefVsync) ? D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
+
+    HRESULT hr = d3d_->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, GetHWND(),
+                                  D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp_, &device_);
+    if (FAILED(hr)) {
+        wxLogError("Failed to create Direct3D9 device: HRESULT 0x%08X", hr);
+        return;
+    }
+
+    // Set up rendering states
+    device_->SetRenderState(D3DRS_LIGHTING, FALSE);
+    device_->SetRenderState(D3DRS_ZENABLE, FALSE);
+    device_->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+    device_->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+    device_->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+    device_->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+    
+    // Set up alpha blending for OSD text
+    device_->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+    device_->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+    device_->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+    
+    // Set filtering mode based on bilinear option
+    DWORD filter = OPTION(kDispBilinear) ? D3DTEXF_LINEAR : D3DTEXF_POINT;
+    device_->SetSamplerState(0, D3DSAMP_MINFILTER, filter);
+    device_->SetSamplerState(0, D3DSAMP_MAGFILTER, filter);
+
+    // Create a vertex buffer for our quad
+    struct VERTEX { float x, y, z, rhw; float u, v; };
+    hr = device_->CreateVertexBuffer(4 * sizeof(VERTEX), 0, D3DFVF_XYZRHW | D3DFVF_TEX1, 
+                                   D3DPOOL_MANAGED, &vertex_buffer_, NULL);
+    if (FAILED(hr)) {
+        wxLogError("Failed to create vertex buffer: HRESULT 0x%08X", hr);
+        return;
+    }
+
+    // Create font for OSD
+    D3DXFONT_DESC font_desc;
+    ZeroMemory(&font_desc, sizeof(font_desc));
+    font_desc.Height = 24;
+    font_desc.Width = 0;
+    font_desc.Weight = FW_NORMAL;
+    font_desc.MipLevels = 1;
+    font_desc.Italic = FALSE;
+    font_desc.CharSet = DEFAULT_CHARSET;
+    font_desc.OutputPrecision = OUT_DEFAULT_PRECIS;
+    font_desc.Quality = DEFAULT_QUALITY;
+    font_desc.PitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
+    wcscpy(font_desc.FaceName, L"Arial");
+
+    hr = D3DXCreateFontIndirect(device_, &font_desc, &font_);
+    if (FAILED(hr)) {
+        wxLogError("Failed to create Direct3D9 font: HRESULT 0x%08X", hr);
+        return;
+    }
+
+    did_init = true;
+}
+
+void D3DDrawingPanel::PaintEv(wxPaintEvent& ev)
+{
+    (void)ev; // unused params
+    wxPaintDC dc(GetWindow());
+
+    if (!todraw) {
+        // since this is set for custom background, not drawing anything
+        // will cause garbage to be displayed, so draw a black area
+        draw_black_background(GetWindow());
+        return;
+    }
+
+    DrawArea(dc);
+}
+
+void D3DDrawingPanel::EraseBackground(wxEraseEvent& ev)
+{
+    (void)ev; // unused params
+    // do nothing, do not allow propagation
+}
+
+void D3DDrawingPanel::DrawArea(wxWindowDC& dc)
+{
+    (void)dc; // unused params - D3D doesn't use wx DC
+    
+    if (!device_) {
+        return;
+    }
+    
+    // Begin the scene
+    if (SUCCEEDED(device_->BeginScene())) {
+        device_->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+        
+        // Only render if we have valid data
+        if (todraw && texture_) {
+            // Setup quadrilateral to render the texture
+            D3DVIEWPORT9 viewport;
+            device_->GetViewport(&viewport);
+            
+            // Calculate aspect ratio and scaling
+            float dest_width, dest_height;
+            float src_aspect = (float)(width * scale) / (float)(height * scale);
+            float screen_aspect = (float)viewport.Width / (float)viewport.Height;
+            
+            if (OPTION(kDispStretch)) {
+                // Stretch to fill screen
+                dest_width = (float)viewport.Width;
+                dest_height = (float)viewport.Height;
+            } else {
+                // Maintain aspect ratio
+                if (src_aspect > screen_aspect) {
+                    // Width constrained
+                    dest_width = (float)viewport.Width;
+                    dest_height = dest_width / src_aspect;
+                } else {
+                    // Height constrained
+                    dest_height = (float)viewport.Height;
+                    dest_width = dest_height * src_aspect;
+                }
+            }
+            
+            // Center the image
+            float x = (viewport.Width - dest_width) / 2.0f;
+            float y = (viewport.Height - dest_height) / 2.0f;
+            
+            // Update vertex buffer with new coordinates
+            struct VERTEX { float x, y, z, rhw; float u, v; };
+            VERTEX* vertices;
+            vertex_buffer_->Lock(0, 0, (void**)&vertices, 0);
+            
+            // Setup vertices for a quad
+            // Top-left
+            vertices[0].x = x;
+            vertices[0].y = y;
+            vertices[0].z = 0.0f;
+            vertices[0].rhw = 1.0f;
+            vertices[0].u = 0.0f;
+            vertices[0].v = 0.0f;
+            
+            // Top-right
+            vertices[1].x = x + dest_width;
+            vertices[1].y = y;
+            vertices[1].z = 0.0f;
+            vertices[1].rhw = 1.0f;
+            vertices[1].u = 1.0f;
+            vertices[1].v = 0.0f;
+            
+            // Bottom-left
+            vertices[2].x = x;
+            vertices[2].y = y + dest_height;
+            vertices[2].z = 0.0f;
+            vertices[2].rhw = 1.0f;
+            vertices[2].u = 0.0f;
+            vertices[2].v = 1.0f;
+            
+            // Bottom-right
+            vertices[3].x = x + dest_width;
+            vertices[3].y = y + dest_height;
+            vertices[3].z = 0.0f;
+            vertices[3].rhw = 1.0f;
+            vertices[3].u = 1.0f;
+            vertices[3].v = 1.0f;
+            
+            vertex_buffer_->Unlock();
+            
+            // Set the vertex buffer as the data source
+            device_->SetStreamSource(0, vertex_buffer_, 0, sizeof(VERTEX));
+            device_->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
+            device_->SetTexture(0, texture_);
+            
+            // Draw the quad
+            device_->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+            
+            // Reset texture to avoid affecting other rendering
+            device_->SetTexture(0, NULL);
+        }
+        
+        // Draw OSD text if needed
+        DrawOSD();
+        
+        // End the scene
+        device_->EndScene();
+    }
+    
+    // Present the scene
+    device_->Present(NULL, NULL, NULL, NULL);
+}
+
+void D3DDrawingPanel::DrawArea(uint8_t** data)
+{
+    // double-buffer buffer:
+    //   if filtering, this is filter output, retained for redraws
+    //   if not filtering, we still retain current image for redraws
+    int outbpp = out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
+    int outrb = systemColorDepth == 24 ? 0 : 4;
+    int outstride = std::ceil(width * outbpp * scale) + outrb;
+
+    if (!pixbuf2) {
+        int allocstride = outstride, alloch = height;
+
+        // gb may write borders, so allocate enough for them
+        if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
+            allocstride = std::ceil(GameArea::SGBWidth * outbpp * scale) + outrb;
+            alloch = GameArea::SGBHeight;
+        }
+
+        pixbuf2 = (uint8_t*)calloc(allocstride, std::ceil((alloch + 2) * scale));
+    }
+
+    if (OPTION(kDispFilter) == config::Filter::kNone) {
+        todraw = *data;
+        // *data is assigned below, after old buf has been processed
+        pixbuf1 = pixbuf2;
+        pixbuf2 = todraw;
+    } else
+        todraw = pixbuf2;
+
+    // FIXME: filters race condition?
+    const int max_threads = 1;
+
+    // First, apply filters, if applicable, in parallel, if enabled
+    // FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur)
+    if (OPTION(kDispFilter) != config::Filter::kNone ||
+        OPTION(kDispIFB) != config::Interframe::kNone) {
+        if (nthreads != max_threads) {
+            if (nthreads) {
+                if (nthreads > 1)
+                    for (int i = 0; i < nthreads; i++) {
+                        threads[i].lock_.Lock();
+                        threads[i].src_ = NULL;
+                        threads[i].sig_.Signal();
+                        threads[i].lock_.Unlock();
+                        threads[i].Wait();
+                    }
+
+                delete[] threads;
+            }
+
+            nthreads = max_threads;
+            threads = new FilterThread[nthreads];
+            // first time around, no threading in order to avoid
+            // static initializer conflicts
+            threads[0].threadno_ = 0;
+            threads[0].nthreads_ = 1;
+            threads[0].width_ = width;
+            threads[0].height_ = height;
+            threads[0].scale_ = scale;
+            threads[0].src_ = *data;
+            threads[0].dst_ = todraw;
+            threads[0].delta_ = delta;
+            threads[0].rpi_ = rpi_;
+            threads[0].Entry();
+
+            // go ahead and start the threads up, though
+            if (nthreads > 1) {
+                for (int i = 0; i < nthreads; i++) {
+                    threads[i].threadno_ = i;
+                    threads[i].nthreads_ = nthreads;
+                    threads[i].width_ = width;
+                    threads[i].height_ = height;
+                    threads[i].scale_ = scale;
+                    threads[i].dst_ = todraw;
+                    threads[i].delta_ = delta;
+                    threads[i].rpi_ = rpi_;
+                    threads[i].done_ = &filt_done;
+                    threads[i].lock_.Lock();
+                    threads[i].Create();
+                    threads[i].Run();
+                }
+            }
+        } else if (nthreads == 1) {
+            threads[0].threadno_ = 0;
+            threads[0].nthreads_ = 1;
+            threads[0].width_ = width;
+            threads[0].height_ = height;
+            threads[0].scale_ = scale;
+            threads[0].src_ = *data;
+            threads[0].dst_ = todraw;
+            threads[0].delta_ = delta;
+            threads[0].rpi_ = rpi_;
+            threads[0].Entry();
+        } else {
+            for (int i = 0; i < nthreads; i++) {
+                threads[i].lock_.Lock();
+                threads[i].src_ = *data;
+                threads[i].sig_.Signal();
+                threads[i].lock_.Unlock();
+            }
+
+            for (int i = 0; i < nthreads; i++)
+                filt_done.Wait();
+        }
+    }
+
+    // swap buffers now that src has been processed
+    if (OPTION(kDispFilter) == config::Filter::kNone) {
+        *data = pixbuf1;
+    }
+
+    // draw OSD text old-style (directly into output buffer), if needed
+    // new style flickers too much, so we'll stick to this for now
+    if (wxGetApp().frame->IsFullScreen() || !OPTION(kPrefDisableStatus)) {
+        GameArea* panel = wxGetApp().frame->GetPanel();
+
+        if (panel->osdstat.size())
+            drawText(todraw + outstride * (systemColorDepth != 24), outstride,
+                10, 20, UTF8(panel->osdstat), OPTION(kPrefShowSpeedTransparent));
+
+        if (!panel->osdtext.empty()) {
+            if (systemGetClock() - panel->osdtime < OSD_TIME) {
+                wxString message = panel->osdtext;
+                int linelen = std::ceil(width * scale - 20) / 8;
+                int nlines = (message.size() + linelen - 1) / linelen;
+                int cury = height - 14 - nlines * 10;
+                char* buf = strdup(UTF8(message));
+                char* ptr = buf;
+
+                while (nlines > 1) {
+                    char lchar = ptr[linelen];
+                    ptr[linelen] = 0;
+                    drawText(todraw + outstride * (systemColorDepth != 24),
+                        outstride, 10, cury, ptr,
+                        OPTION(kPrefShowSpeedTransparent));
+                    cury += 10;
+                    nlines--;
+                    ptr += linelen;
+                    *ptr = lchar;
+                }
+
+                drawText(todraw + outstride * (systemColorDepth != 24),
+                    outstride, 10, cury, ptr,
+                    OPTION(kPrefShowSpeedTransparent));
+
+                free(buf);
+                buf = NULL;
+            } else
+                panel->osdtext.clear();
+        }
+    }
+    
+    // Create or update texture with the new frame data
+    UpdateTexture();
+    
+    // Draw the current frame
+    wxClientDC dc(GetWindow());
+    DrawArea(dc);
+}
+
+void D3DDrawingPanel::UpdateTexture()
+{
+    if (!device_ || !todraw) return;
+    
+    // Calculate texture dimensions and format
+    int tex_width = std::ceil(width * scale);
+    int tex_height = std::ceil(height * scale);
+    D3DFORMAT format = out_16 ? D3DFMT_A1R5G5B5 : D3DFMT_A8R8G8B8;
+    
+    // Release previous texture if it exists
+    if (texture_) {
+        texture_->Release();
+        texture_ = nullptr;
+    }
+    
+    // Create new texture with appropriate dimensions
+    HRESULT hr = device_->CreateTexture(
+        tex_width, tex_height,
+        1, 0, format,
+        D3DPOOL_MANAGED, &texture_, NULL);
+        
+    if (FAILED(hr)) {
+        wxLogError("Failed to create Direct3D texture: HRESULT 0x%08X", hr);
+        return;
+    }
+    
+    // Lock texture for writing
+    D3DLOCKED_RECT locked_rect;
+    if (FAILED(texture_->LockRect(0, &locked_rect, NULL, 0))) {
+        wxLogError("Failed to lock texture");
+        texture_->Release();
+        texture_ = nullptr;
+        return;
+    }
+    
+    int outbpp = out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
+    int outrb = systemColorDepth == 24 ? 0 : 4;
+    int outstride = std::ceil(width * outbpp * scale) + outrb;
+    
+    // Copy the pixel data to the texture
+    if (out_16) {
+        // 16-bit mode
+        uint16_t* src = (uint16_t*)todraw;
+        uint16_t* dst = (uint16_t*)locked_rect.pBits;
+        int src_pitch = outstride / 2;
+        int dst_pitch = locked_rect.Pitch / 2;
+        
+        for (int y = 0; y < tex_height; y++) {
+            memcpy(dst, src, tex_width * 2);
+            src += src_pitch;
+            dst += dst_pitch;
+        }
+    } 
+    else if (systemColorDepth == 24) {
+        // 24-bit mode
+        // Need to convert 24-bit to 32-bit for Direct3D
+        uint8_t* src = todraw;
+        uint8_t* dst = (uint8_t*)locked_rect.pBits;
+        
+        for (int y = 0; y < tex_height; y++) {
+            for (int x = 0; x < tex_width; x++) {
+                // Read RGB from source
+                uint8_t r = src[x * 3 + 0];
+                uint8_t g = src[x * 3 + 1];
+                uint8_t b = src[x * 3 + 2];
+                
+                // Write ARGB to destination
+                dst[x * 4 + 0] = b;  // B
+                dst[x * 4 + 1] = g;  // G
+                dst[x * 4 + 2] = r;  // R
+                dst[x * 4 + 3] = 255;  // A
+            }
+            
+            src += outstride;
+            dst += locked_rect.Pitch;
+        }
+    } 
+    else {
+        // 32-bit mode
+        uint32_t* src = (uint32_t*)todraw;
+        uint32_t* dst = (uint32_t*)locked_rect.pBits;
+        int src_pitch = outstride / 4;
+        int dst_pitch = locked_rect.Pitch / 4;
+        
+        for (int y = 0; y < tex_height; y++) {
+            for (int x = 0; x < tex_width; x++) {
+                // Convert from GBA RGBA to D3D ARGB
+                uint32_t color = src[x];
+                uint8_t r = (color >> (systemRedShift - 3)) & 0xFF;
+                uint8_t g = (color >> (systemGreenShift - 3)) & 0xFF;
+                uint8_t b = (color >> (systemBlueShift - 3)) & 0xFF;
+                dst[x] = 0xFF000000 | (r << 16) | (g << 8) | b;
+            }
+            
+            src += src_pitch;
+            dst += dst_pitch;
+        }
+    }
+    
+    // Unlock the texture
+    texture_->UnlockRect(0);
+}
+
+void D3DDrawingPanel::OnSize(wxSizeEvent& ev)
+{
+    if (!device_) {
+        ev.Skip();
+        return;
+    }
+
+    // Get the new client size
+    int client_width, client_height;
+    widgets::GetRealPixelClientSize(this, &client_width, &client_height);
+    
+    // Update Direct3D presentation parameters
+    d3dpp_.BackBufferWidth = client_width;
+    d3dpp_.BackBufferHeight = client_height;
+    
+    // Reset the device with new parameters
+    if (device_) {
+        // Release all D3D resources before reset
+        if (texture_) {
+            texture_->Release();
+            texture_ = nullptr;
+        }
+        
+        if (font_) {
+            font_->OnLostDevice();
+        }
+        
+        // Reset the device
+        HRESULT hr = device_->Reset(&d3dpp_);
+        if (FAILED(hr)) {
+            wxLogError("Failed to reset Direct3D device: HRESULT 0x%08X", hr);
+        } else {
+            // Reset was successful, restore resources
+            if (font_) {
+                font_->OnResetDevice();
+            }
+            
+            // Restore device states
+            device_->SetRenderState(D3DRS_LIGHTING, FALSE);
+            device_->SetRenderState(D3DRS_ZENABLE, FALSE);
+            device_->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+            device_->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+            device_->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+            device_->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+            
+            device_->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+            device_->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+            device_->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+            
+            // Restore filtering settings
+            DWORD filter = OPTION(kDispBilinear) ? D3DTEXF_LINEAR : D3DTEXF_POINT;
+            device_->SetSamplerState(0, D3DSAMP_MINFILTER, filter);
+            device_->SetSamplerState(0, D3DSAMP_MAGFILTER, filter);
+            
+            // Recreate texture if we have data
+            if (todraw) {
+                UpdateTexture();
+            }
+        }
+    }
+
+    ev.Skip();
+}
+
+void D3DDrawingPanel::DrawOSD()
+{
+    if (!device_ || !font_) return;
+    
+    GameArea* panel = wxGetApp().frame->GetPanel();
+    D3DCOLOR text_color = D3DCOLOR_ARGB(
+        OPTION(kPrefShowSpeedTransparent) ? 128 : 255,
+        255, 0, 0);
+    
+    // Get viewport dimensions for text positioning
+    D3DVIEWPORT9 viewport;
+    device_->GetViewport(&viewport);
+
+    // Draw status text if available
+    if (panel->osdstat.size()) {
+        RECT text_rect = {10, 20, static_cast<LONG>(viewport.Width - 10), static_cast<LONG>(viewport.Height - 10)};
+        font_->DrawTextA(NULL, panel->osdstat.c_str(), -1, &text_rect, 
+                      DT_LEFT | DT_TOP, text_color);
+    }
+
+    // Draw OSD messages if available and not expired
+    if (!panel->osdtext.empty() && systemGetClock() - panel->osdtime < OSD_TIME) {
+        RECT text_rect = {10, static_cast<LONG>(viewport.Height - 10 - 24), static_cast<LONG>(viewport.Width - 20), static_cast<LONG>(viewport.Height - 10)};
+        font_->DrawTextA(NULL, panel->osdtext.c_str(), -1, &text_rect,
+                      DT_LEFT | DT_BOTTOM, text_color);
     }
 }
+
+void D3DDrawingPanel::DrawOSD(wxWindowDC& dc)
+{
+    // For D3D, we render OSD directly in DrawArea method
+    // This function just satisfies the interface requirement
+    (void)dc; // unused param
+}
+
+D3DDrawingPanel::~D3DDrawingPanel()
+{
+    // Release Direct3D resources
+    if (texture_) {
+        texture_->Release();
+        texture_ = nullptr;
+    }
+    
+    if (vertex_buffer_) {
+        vertex_buffer_->Release();
+        vertex_buffer_ = nullptr;
+    }
+
+    if (font_) {
+        font_->Release();
+        font_ = nullptr;
+    }
+
+    if (device_) {
+        device_->Release();
+        device_ = nullptr;
+    }
+
+    if (d3d_) {
+        d3d_->Release();
+        d3d_ = nullptr;
+    }
+
+    // Base class destructor takes care of other resources
+}
+
+
 #endif
 
 #ifndef NO_FFMPEG

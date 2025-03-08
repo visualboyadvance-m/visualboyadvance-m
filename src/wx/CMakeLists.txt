@@ -288,7 +288,9 @@ function(configure_wx_target target)
     endif()
 
     # Direct3D.
-    if(NOT ENABLE_DIRECT3D)
+    if(ENABLE_DIRECT3D)
+        _add_link_libraries(d3d9 d3dx9)
+    else()
         _add_compile_definitions(NO_D3D)
     endif()
 

@@ -49,15 +49,46 @@ protected:
 };
 #endif
 
-#if defined(__WXMSW__) && !defined(NO_D3D)
-class DXDrawingPanel : public DrawingPanel {
-public:
-    DXDrawingPanel(wxWindow* parent, int _width, int _height);
+#ifndef NO_D3D
+#include <d3d9.h>
+#include <d3dx9.h>
+#include <wrl/client.h>
 
-protected:
-    void DrawArea(wxWindowDC&);
-};
-#endif
+class D3DDrawingPanel : public DrawingPanel {
+    public:
+        D3DDrawingPanel(wxWindow* parent, int width, int height);
+        virtual ~D3DDrawingPanel();
+    
+    protected:
+        // Drawing methods
+        void DrawArea(wxWindowDC& dc) override;
+        void DrawArea(uint8_t** data);
+        void DrawOSD(wxWindowDC& dc) override;
+        void DrawOSD();
+        
+        // Event handlers
+        void OnSize(wxSizeEvent& ev) override;
+        void PaintEv(wxPaintEvent& ev) override;
+        void EraseBackground(wxEraseEvent& ev) override;
+        
+        // D3D management
+        void DrawingPanelInit() override;
+        void UpdateTexture();
+        void AdjustViewport();
+        void Render();
+    
+    private:
+        // Direct3D resources
+        IDirect3D9* d3d_;
+        IDirect3DDevice9* device_;
+        IDirect3DTexture9* texture_;
+        IDirect3DVertexBuffer9* vertex_buffer_;
+        ID3DXFont* font_;
+        D3DPRESENT_PARAMETERS d3dpp_;
+    
+        DECLARE_EVENT_TABLE()
+    };
+    #endif
 
 #if defined(__WXMAC__)
 class Quartz2DDrawingPanel : public BasicDrawingPanel {
