@@ -481,7 +481,7 @@ void gbaUpdateRomSize(int size)
     if (size > romSize) {
         romSize = size;
 
-        uint8_t* tmp = (uint8_t*)realloc(g_rom, SIZE_ROM);
+        uint8_t* tmp = (uint8_t*)realloc(g_rom, romSize);
         g_rom = tmp;
 
         uint16_t* temp = (uint16_t*)(g_rom + ((romSize + 1) & ~1));
