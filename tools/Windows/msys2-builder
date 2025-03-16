@@ -107,7 +107,6 @@ export BUILD_ENV
 
 DIST_TAR_ARGS="
     help2man        --exclude ChangeLog
-    sfml            --exclude libs-osx
     expat           --exclude README.md
     libsoxr         --exclude inst-check-soxr-lsr
     graphviz        --exclude COPYING --exclude graphviz.spec
