@@ -1409,3 +1409,12 @@ int wxvbamApp::FilterEvent(wxEvent& event)
 
     return user_input_event.FilterProcessedInput(user_input.value());
 }
+
+bool wxvbamApp::ProcessEvent(wxEvent& event) {
+    if (event.GetEventType() == wxEVT_KEY_DOWN) {
+        // Mark the event as processed. This prevents wxWidgets from firing alerts on macOS.
+        // See https://github.com/wxWidgets/wxWidgets/issues/25262 for details.
+        return true;
+    }
+    return wxApp::ProcessEvent(event);
+}
