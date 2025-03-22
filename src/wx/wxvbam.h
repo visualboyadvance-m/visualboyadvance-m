@@ -84,6 +84,7 @@ public:
             return false;
         }
     }
+    bool ProcessEvent(wxEvent& event) final;
 
     wxString GetConfigDir();
     wxString GetDataDir();
