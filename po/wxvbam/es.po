@@ -5,6 +5,7 @@
 # Translators:
 # Alain Richell Rodriguez Blazquez, 2021
 # Álvaro Pérez Urbano <alvaro_beta@hotmail.com>, 2021
+# angel quispe, 2025
 # Damián Cabello Jiménez <jdamiancabello@gmail.com>, 2018
 # Dani Quiroz, 2022
 # Dani Quiroz, 2022
@@ -30,7 +31,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-05 20:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: José Montoro, 2024\n"
+"Last-Translator: angel quispe, 2025\n"
 "Language-Team: Spanish (http://app.transifex.com/bgk/vba-m/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -345,7 +346,7 @@ msgstr "Menú de comandos"
 
 #: dialogs/accel-config.cpp:245
 msgid "This will clear all user-defined accelerators. Are you sure?"
-msgstr ""
+msgstr "Esto borrará todos los aceleradores definidos por el usuario. ¿Estás seguro?"
 
 #: dialogs/accel-config.cpp:245 dialogs/accel-config.cpp:292
 msgid "Confirm"
@@ -402,7 +403,7 @@ msgstr "Desconocido"
 
 #: dialogs/game-maker.cpp:235
 msgid "Invalid"
-msgstr ""
+msgstr "No válido "
 
 #: dialogs/gb-rom-info.cpp:22
 msgid "No mapper"
