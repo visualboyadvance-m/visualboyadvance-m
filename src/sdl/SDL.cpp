@@ -71,7 +71,7 @@
 
 #endif  // defined(_WIN32)
 
-#ifndef CONFIG_IDF_TARGET
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
 #if defined(__APPLE__)
 
 #include <OpenGL/OpenGL.h>
@@ -96,6 +96,7 @@
 
 #if CONFIG_IDF_TARGET
 #define CONFIG_16BIT 1
+#define NO_OPENGL 1
 #endif
 
 #include "components/draw_text/draw_text.h"
@@ -493,7 +494,7 @@ FILE* sdlFindFile(const char* name)
     return NULL;
 }
 
-#ifndef CONFIG_IDF_TARGET
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
 static void sdlOpenGLScaleWithAspect(int w, int h)
 {
     float screenAspect = (float)sizeX / sizeY,
@@ -830,7 +831,7 @@ static void sdlResizeVideo()
     destWidth = filter_enlarge * sizeX;
     destHeight = filter_enlarge * sizeY;
 
-#ifndef CONFIG_IDF_TARGET
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
         free(filterPix);
         filterPix = (uint8_t*)calloc(1, (systemColorDepth >> 3) * destWidth * destHeight);
@@ -843,7 +844,7 @@ static void sdlResizeVideo()
     if (texture)
         SDL_DestroyTexture(texture);
 
-#ifndef CONFIG_IDF_TARGET
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (!openGL) {
 #endif
 #if CONFIG_16BIT
@@ -860,11 +861,11 @@ static void sdlResizeVideo()
             SDL_TEXTUREACCESS_STREAMING,
             destWidth, destHeight);
 #endif
-#ifndef CONFIG_IDF_TARGET
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     }
 #endif
 
-#ifndef CONFIG_IDF_TARGET
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (!openGL && surface == NULL) {
 #else
     if (surface == NULL) {
@@ -891,7 +892,7 @@ void sdlInitVideo()
 
     flags = fullScreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE;
 
-#ifndef CONFIG_IDF_TARGET
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
         flags |= SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
@@ -906,11 +907,11 @@ void sdlInitVideo()
     if (renderer)
         SDL_DestroyRenderer(renderer);
     window = SDL_CreateWindow("VBA-M", screenWidth, screenHeight, flags);
-#ifndef CONFIG_IDF_TARGET
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (!openGL) {
 #endif
         renderer = SDL_CreateRenderer(window, NULL);
-#ifndef CONFIG_IDF_TARGET
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     }
 #endif
 
@@ -938,17 +939,11 @@ void sdlInitVideo()
 
     uint32_t rmask, gmask, bmask;
 
-#ifndef CONFIG_IDF_TARGET
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
-#if CONFIG_16BIT
-        rmask = 0x0000F800;
-        gmask = 0x000007E0;
-        bmask = 0x0000001F;
-#else
         rmask = 0xFF000000;
         gmask = 0x00FF0000;
         bmask = 0x0000FF00;
-#endif
     } else {
 #endif
 #if CONFIG_16BIT
@@ -960,7 +955,7 @@ void sdlInitVideo()
         gmask = 0x0000FF00;
         bmask = 0x000000FF;
 #endif
-#ifndef CONFIG_IDF_TARGET
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     }
 #endif
 
@@ -972,14 +967,9 @@ void sdlInitVideo()
     //         systemRedShift, systemGreenShift, systemBlueShift);
     //  originally 3, 11, 19 -> 27, 19, 11
 
-#ifndef CONFIG_IDF_TARGET
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
-#if CONFIG_16BIT
-        // Align to BGRA instead of ABGR
-        systemRedShift += 16;
-        systemGreenShift += 16;
-        systemBlueShift += 16;
-#else
+#if !CONFIG_16BIT
         // Align to BGRA instead of ABGR
         systemRedShift += 8;
         systemGreenShift += 8;
@@ -996,7 +986,7 @@ void sdlInitVideo()
 
     srcPitch = sizeX * 4 + 4;
 
-#ifndef CONFIG_IDF_TARGET
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
         glcontext = SDL_GL_CreateContext(window);
         sdlOpenGLInit(screenWidth, screenHeight);
@@ -1159,8 +1149,10 @@ void sdlPollEvents()
             }
             break;
         case SDL_EVENT_WINDOW_RESIZED:
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
             if (openGL)
                 sdlOpenGLScaleWithAspect(event.window.data1, event.window.data2);
+#endif
             break;
         case SDL_EVENT_MOUSE_MOTION:
         case SDL_EVENT_MOUSE_BUTTON_UP:
@@ -1293,12 +1285,14 @@ void sdlPollEvents()
                 if (!(event.key.mod & MOD_NOCTRL) && (event.key.mod & SDL_KMOD_CTRL)) {
                     fullScreen = !fullScreen;
                     SDL_SetWindowFullscreen(window, fullScreen ? SDL_WINDOW_FULLSCREEN : 0);
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
                     if (openGL) {
                         if (fullScreen)
                             sdlOpenGLScaleWithAspect(desktopWidth, desktopHeight);
                         else
                             sdlOpenGLScaleWithAspect(destWidth, destHeight);
                     }
+#endif
                     //sdlInitVideo();
                 }
                 break;
@@ -2012,7 +2006,7 @@ int main(int argc, char** argv)
     remoteCleanUp();
     soundShutdown();
 
-#ifndef CONFIG_IDF_TARGET
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
         SDL_GL_DestroyContext(glcontext);
     }
@@ -2093,12 +2087,16 @@ void systemDrawScreen()
 
     renderedFrames++;
 
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL)
         screen = filterPix;
     else {
+#endif
         screen = (uint8_t*)surface->pixels;
         SDL_LockSurface(surface);
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     }
+#endif
 
     if (ifbFunction)
         ifbFunction(g_pix + srcPitch, srcPitch, sizeX, sizeY);
@@ -2106,7 +2104,7 @@ void systemDrawScreen()
     filterFunction(g_pix + srcPitch, srcPitch, delta, screen,
         destPitch, sizeX, sizeY);
 
-#ifndef CONFIG_IDF_TARGET
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
         int bytes = (systemColorDepth >> 3);
         for (int i = 0; i < destWidth; i++)
@@ -2124,7 +2122,7 @@ void systemDrawScreen()
     if (showSpeed && fullScreen)
         drawSpeed(screen, destPitch, 10, 20);
 
-#ifndef CONFIG_IDF_TARGET
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
         glClear(GL_COLOR_BUFFER_BIT);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, destWidth);
@@ -2154,7 +2152,7 @@ void systemDrawScreen()
         SDL_UpdateTexture(texture, NULL, surface->pixels, surface->pitch);
         SDL_RenderTexture(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
-#ifndef CONFIG_IDF_TARGET
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     }
 #endif
 }
