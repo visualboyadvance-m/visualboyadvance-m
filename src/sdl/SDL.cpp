@@ -980,11 +980,13 @@ void sdlInitVideo()
 
 #ifdef CONFIG_16BIT
     systemColorDepth = 16;
+
+    srcPitch = sizeX * 2 + 4;
 #else
     systemColorDepth = 32;
-#endif
 
     srcPitch = sizeX * 4 + 4;
+#endif
 
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
@@ -1284,7 +1286,7 @@ void sdlPollEvents()
             case SDLK_F:
                 if (!(event.key.mod & MOD_NOCTRL) && (event.key.mod & SDL_KMOD_CTRL)) {
                     fullScreen = !fullScreen;
-                    SDL_SetWindowFullscreen(window, fullScreen ? SDL_WINDOW_FULLSCREEN : 0);
+                    SDL_SetWindowFullscreen(window, fullScreen ? true : false);
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
                     if (openGL) {
                         if (fullScreen)
@@ -2082,7 +2084,7 @@ void drawSpeed(uint8_t* screen, int pitch, int x, int y)
 
 void systemDrawScreen()
 {
-    unsigned int destPitch = destWidth * (systemColorDepth >> 3);
+    unsigned int destPitch = 0/*destWidth * (systemColorDepth >> 3)*/;
     uint8_t* screen;
 
     renderedFrames++;
@@ -2093,6 +2095,7 @@ void systemDrawScreen()
     else {
 #endif
         screen = (uint8_t*)surface->pixels;
+        destPitch = surface->pitch;
         SDL_LockSurface(surface);
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     }
