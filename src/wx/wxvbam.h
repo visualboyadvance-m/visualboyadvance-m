@@ -1,6 +1,10 @@
 #ifndef VBAM_WX_WXVBAM_H_
 #define VBAM_WX_WXVBAM_H_
 
+#if defined(__APPLE__) && defined(__MACH__)
+#define __WXMAC__ 1
+#endif
+
 #include <cstdio>
 #include <ctime>
 #include <list>
