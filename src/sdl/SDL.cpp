@@ -535,8 +535,13 @@ static void sdlOpenGLVideoResize()
 
     textureSize = (int)pow(2.0f, n);
 
+#if CONFIG_16BIT
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB5, textureSize, textureSize, 0,
+                 GL_BGR, GL_UNSIGNED_SHORT_5_6_5, NULL);
+#else
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureSize, textureSize, 0,
         GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+#endif
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -941,9 +946,15 @@ void sdlInitVideo()
 
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
+#if CONFIG_16BIT
+        rmask = 0x0000F800;
+        gmask = 0x000007E0;
+        bmask = 0x0000001F;
+#else
         rmask = 0xFF000000;
         gmask = 0x00FF0000;
         bmask = 0x0000FF00;
+#endif
     } else {
 #endif
 #if CONFIG_16BIT
@@ -968,14 +979,14 @@ void sdlInitVideo()
     //  originally 3, 11, 19 -> 27, 19, 11
 
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
-    if (openGL) {
 #if !CONFIG_16BIT
+    if (openGL) {
         // Align to BGRA instead of ABGR
         systemRedShift += 8;
         systemGreenShift += 8;
         systemBlueShift += 8;
-#endif
     }
+#endif
 #endif
 
 #ifdef CONFIG_16BIT
@@ -2084,7 +2095,7 @@ void drawSpeed(uint8_t* screen, int pitch, int x, int y)
 
 void systemDrawScreen()
 {
-    unsigned int destPitch = 0/*destWidth * (systemColorDepth >> 3)*/;
+    unsigned int destPitch = destWidth * (systemColorDepth >> 3);
     uint8_t* screen;
 
     renderedFrames++;
@@ -2095,7 +2106,6 @@ void systemDrawScreen()
     else {
 #endif
         screen = (uint8_t*)surface->pixels;
-        destPitch = surface->pitch;
         SDL_LockSurface(surface);
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     }

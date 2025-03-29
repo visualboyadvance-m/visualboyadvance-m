@@ -5,7 +5,7 @@
 
 #include <wx/timer.h>
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include "wx/config/option-observer.h"
 #include "wx/widgets/event-handler-provider.h"
