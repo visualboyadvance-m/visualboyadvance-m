@@ -71,13 +71,18 @@ find_package(PkgConfig)
 if(TRANSLATIONS_ONLY)
     set(ENABLE_LINK_DEFAULT OFF)
 else()
-    find_package(SFML 3.0 COMPONENTS network system)
+    find_package(SFML 2.4 COMPONENTS network system)
     set(ENABLE_LINK_DEFAULT OFF)
     if(SFML_FOUND)
         set(ENABLE_LINK_DEFAULT ON)
     endif()
 endif()
 option(ENABLE_LINK "Enable GBA linking functionality (BROKEN)" ${ENABLE_LINK_DEFAULT})
+
+if(ENABLE_LINK)
+    # Always disable link for now as SFML 2 is broken and we don't have a replacement yet.
+    set(ENABLE_LINK OFF CACHE BOOL "Enable GBA linking functionality (BROKEN)" FORCE)
+endif()
 
 # FFMpeg
 set(FFMPEG_DEFAULT OFF)
