@@ -374,14 +374,14 @@ static const char* debuggerPrintType(Type* t)
 
     if (t->type == TYPE_pointer) {
         if (t->pointer)
-            strcpy(buffer, debuggerPrintType(t->pointer));
+            strncpy(buffer, debuggerPrintType(t->pointer), sizeof(buffer));
         else
-            strcpy(buffer, "void");
-        sprintf(buffer2, "%s *", buffer);
+            strncpy(buffer, "void", sizeof(buffer));
+        snprintf(buffer2, sizeof(buffer2), "%s *", buffer);
         return buffer2;
     } else if (t->type == TYPE_reference) {
-        strcpy(buffer, debuggerPrintType(t->pointer));
-        sprintf(buffer2, "%s &", buffer);
+        strncpy(buffer, debuggerPrintType(t->pointer), sizeof(buffer));
+        snprintf(buffer2, sizeof(buffer2), "%s &", buffer);
         return buffer2;
     }
     return t->name;
@@ -1364,7 +1364,7 @@ static void debuggerDisassembleArm(FILE* f, uint32_t pc, int count)
         if (l > len)
             len = l;
     }
-    sprintf(format, "%%08x %%-%ds %%s\n", len);
+    snprintf(format, sizeof(format), "%%08x %%-%ds %%s\n", len);
     for (i = 0; i < count; i++) {
         uint32_t addr = pc;
         pc += disArm(pc, buffer, 4096, 2);
@@ -1383,7 +1383,7 @@ static void debuggerDisassembleThumb(FILE* f, uint32_t pc, int count)
         if (l > len)
             len = l;
     }
-    sprintf(format, "%%08x %%-%ds %%s\n", len);
+    snprintf(format, sizeof(format), "%%08x %%-%ds %%s\n", len);
 
     for (i = 0; i < count; i++) {
         uint32_t addr = pc;
@@ -1781,7 +1781,7 @@ static void debuggerRegisters(int, char**)
         ((!(reg[16].I & 0x40)) ? '.' : 'F'),
         (armState ? '.' : 'T'),
         armMode);
-    sprintf(buffer, "%08x", armState ? reg[15].I - 4 : reg[15].I - 2);
+    snprintf(buffer, sizeof(buffer), "%08x", armState ? reg[15].I - 4 : reg[15].I - 2);
     command[1] = buffer;
     debuggerDisassemble(3, command);
 }

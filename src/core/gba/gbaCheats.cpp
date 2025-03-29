@@ -1295,8 +1295,8 @@ void cheatsAdd(const char* codeStr,
         cheatsList[x].rawaddress = rawaddress;
         cheatsList[x].address = address;
         cheatsList[x].value = value;
-        strcpy(cheatsList[x].codestring, codeStr);
-        strcpy(cheatsList[x].desc, desc);
+        strncpy(cheatsList[x].codestring, codeStr, sizeof(cheatsList[x].codestring));
+        strncpy(cheatsList[x].desc, desc, sizeof(cheatsList[x].desc));
         cheatsList[x].enabled = true;
         cheatsList[x].status = 0;
 
@@ -2615,15 +2615,15 @@ void cheatsReadGame(gzFile file, int version)
         if (!cheatsList[i].codestring[0]) {
             switch (cheatsList[i].size) {
             case 0:
-                sprintf(cheatsList[i].codestring, "%08x:%02x", cheatsList[i].address,
+                snprintf(cheatsList[i].codestring, sizeof(cheatsList[i].codestring), "%08x:%02x", cheatsList[i].address,
                     cheatsList[i].value);
                 break;
             case 1:
-                sprintf(cheatsList[i].codestring, "%08x:%04x", cheatsList[i].address,
+                snprintf(cheatsList[i].codestring, sizeof(cheatsList[i].codestring), "%08x:%04x", cheatsList[i].address,
                     cheatsList[i].value);
                 break;
             case 2:
-                sprintf(cheatsList[i].codestring, "%08x:%08x", cheatsList[i].address,
+                snprintf(cheatsList[i].codestring, sizeof(cheatsList[i].codestring), "%08x:%08x", cheatsList[i].address,
                     cheatsList[i].value);
                 break;
             }
@@ -2759,15 +2759,15 @@ bool cheatsLoadCheatList(const char* file)
         if (!cheatsList[i].codestring[0]) {
             switch (cheatsList[i].size) {
             case 0:
-                sprintf(cheatsList[i].codestring, "%08x:%02x", cheatsList[i].address,
+                snprintf(cheatsList[i].codestring, sizeof(cheatsList[i].codestring), "%08x:%02x", cheatsList[i].address,
                     cheatsList[i].value);
                 break;
             case 1:
-                sprintf(cheatsList[i].codestring, "%08x:%04x", cheatsList[i].address,
+                snprintf(cheatsList[i].codestring, sizeof(cheatsList[i].codestring), "%08x:%04x", cheatsList[i].address,
                     cheatsList[i].value);
                 break;
             case 2:
-                sprintf(cheatsList[i].codestring, "%08x:%08x", cheatsList[i].address,
+                snprintf(cheatsList[i].codestring, sizeof(cheatsList[i].codestring), "%08x:%08x", cheatsList[i].address,
                     cheatsList[i].value);
                 break;
             }

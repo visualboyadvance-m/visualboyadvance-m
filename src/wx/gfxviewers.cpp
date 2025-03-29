@@ -1246,7 +1246,7 @@ void savepal(wxWindow* parent, const uint8_t* data, int ncols, const wxString ty
 
         for (int i = 0; i < ncols; i++, data += 3) {
             char buf[14];
-            int l = sprintf(buf, "%d %d %d\r\n", data[0], data[1], data[2]);
+            int l = snprintf(buf, sizeof(buf), "%d %d %d\r\n", data[0], data[1], data[2]);
             f.Write(buf, l);
         }
 

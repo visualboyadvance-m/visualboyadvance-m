@@ -1015,7 +1015,7 @@ static void update_variables(bool startup)
     bool sound_changed = false;
 
     var.key = key;
-    strcpy(key, "vbam_layer_x");
+    strncpy(key, "vbam_layer_x", sizeof(key));
     for (int i = 0; i < 8; i++) {
         key[strlen("vbam_layer_")] = '1' + i;
         var.value = NULL;
@@ -1027,7 +1027,7 @@ static void update_variables(bool startup)
     coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
     CPUUpdateRenderBuffers(false);
 
-    strcpy(key, "vbam_sound_x");
+    strncpy(key, "vbam_sound_x", sizeof(key));
     for (unsigned i = 0; i < 6; i++) {
         key[strlen("vbam_sound_")] = '1' + i;
         var.value = NULL;
@@ -1526,7 +1526,7 @@ void retro_cheat_set(unsigned index, bool enabled, const char* code)
     int i = 0;
 
     codeLine = (char *)calloc(codeLineSize, sizeof(char));
-    sprintf(name, "cheat_%d", index);
+    snprintf(name, sizeof(name), "cheat_%d", index);
     for (cursor = 0;; cursor++) {
         if (ISHEXDEC) {
             codeLine[codePos++] = toupper(code[cursor]);
@@ -1791,7 +1791,7 @@ void systemMessage(const char* fmt, ...)
     char buffer[256];
     va_list ap;
     va_start(ap, fmt);
-    vsprintf(buffer, fmt, ap);
+    vsnprintf(buffer, sizeof(buffer), fmt, ap);
     if (log_cb)
         log_cb(RETRO_LOG_INFO, "%s\n", buffer);
     va_end(ap);
@@ -1802,7 +1802,7 @@ void systemMessage(int, const char* fmt, ...)
     char buffer[256];
     va_list ap;
     va_start(ap, fmt);
-    vsprintf(buffer, fmt, ap);
+    vsnprintf(buffer, sizeof(buffer), fmt, ap);
     if (log_cb)
         log_cb(RETRO_LOG_INFO, "%s\n", buffer);
     va_end(ap);

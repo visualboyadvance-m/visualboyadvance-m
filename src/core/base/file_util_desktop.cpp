@@ -155,7 +155,7 @@ IMAGE_TYPE utilFindType(const char* file) {
 
 void utilStripDoubleExtension(const char* file, char* buffer) {
     if (buffer != file)  // allows conversion in place
-        strcpy(buffer, file);
+        strncpy(buffer, file, strlen(file));
 
     if (utilIsGzipFile(file)) {
         char* p = strrchr(buffer, '.');

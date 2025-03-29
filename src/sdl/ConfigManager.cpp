@@ -498,7 +498,7 @@ const char* FindConfigFile(const char *name)
 	}
 	else {
 		// executable is relative to some directory
-		strcpy(buffer, arg0);
+		strncpy(buffer, arg0, sizeof(buffer));
 		char *p = strrchr(buffer, kFileSep);
 		if (p) {
 			*p = 0;
@@ -626,7 +626,7 @@ static char *xstrdup(const char *s)
                 return NULL;
         t = (char *)malloc(strlen(s) + 1);
         if (t) {
-                strcpy(t, s);
+                strncpy(t, s, strlen(s) + 1);
         }
         return t;
 }
@@ -652,7 +652,7 @@ int ReadOpts(int argc, char ** argv)
 		  {
 			  //char* cpy;
 			  //cpy = (char *)malloc(1 + strlen(optarg));
-			  //strcpy(cpy, optarg);
+			  //strncpy(cpy, optarg, strlen(optarg) + 1);
 			  //preparedCheatCodes[preparedCheats++] = cpy;
 			std::string cpy = optarg;
 			preparedCheatCodes[preparedCheats++] = cpy.c_str();
@@ -705,7 +705,7 @@ int ReadOpts(int argc, char ** argv)
 			}
 			else {
 				patchNames[patchNum] = (char *)malloc(1 + strlen(optarg));
-				strcpy(patchNames[patchNum], optarg);
+				strncpy(patchNames[patchNum], optarg, strlen(optarg) + 1);
 				patchNum++;
 			}
 			break;
