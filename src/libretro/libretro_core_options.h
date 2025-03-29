@@ -870,19 +870,19 @@ static INLINE void libretro_set_core_options(retro_environment_t environ_cb,
                   if (!values_buf[i])
                      goto error;
 
-                  strcpy(values_buf[i], desc);
-                  strcat(values_buf[i], "; ");
+                  strncpy(values_buf[i], desc, buf_len * sizeof(char));
+                  strncat(values_buf[i], "; ", buf_len * sizeof(char));
 
                   /* Default value goes first */
-                  strcat(values_buf[i], values[default_index].value);
+                  strncat(values_buf[i], values[default_index].value, buf_len * sizeof(char));
 
                   /* Add remaining values */
                   for (j = 0; j < num_values; j++)
                   {
                      if (j != default_index)
                      {
-                        strcat(values_buf[i], "|");
-                        strcat(values_buf[i], values[j].value);
+                        strncat(values_buf[i], "|", buf_len * sizeof(char));
+                        strncat(values_buf[i], values[j].value, buf_len * sizeof(char));
                      }
                   }
                }

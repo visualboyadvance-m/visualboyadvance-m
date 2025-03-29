@@ -213,7 +213,7 @@ local int memPrintf(MEMFILE *f, const char *format, ...)
         int len;
 
         va_start(list, format);
-        len = vsprintf(buffer, format, list);
+        len = vsnprintf(buffer, sizeof(buffer), format, list);
         va_end(list);
 
         return (int)memWrite(buffer, 1, len, f);

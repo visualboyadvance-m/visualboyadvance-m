@@ -191,7 +191,7 @@ freebsd_installdeps() {
 
     check sudo pkg update
 
-    pkgs="llvm-devel cmake ccache nasm ffmpeg gettext-tools gettext pkgconf sdl2 sfml wx31-gtk3 iconv zip ninja"
+    pkgs="llvm-devel cmake ccache nasm ffmpeg gettext-tools gettext pkgconf sdl3 sfml wx31-gtk3 iconv zip ninja"
 
     [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs ffmpeg"
 
@@ -326,7 +326,7 @@ debian_installdeps() {
 
         glew_lib=$(apt-cache search libglew | grep '^libglew[0-9]' | sed 's/ - .*//' | sort -r | head -1)
 
-        sdl_lib=$(apt-cache search '^libsdl2-2.0' | sed 's/ - .*//' | sort -r | head -1)
+        sdl_lib=$(apt-cache search '^libsdl3.0' | sed 's/ - .*//' | sort -r | head -1)
 
         # not present in trusty
         if [ -n "$ENABLE_FFMPEG" ]; then
@@ -350,7 +350,7 @@ debian_installdeps() {
                 ;;
         esac
 
-        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev libsdl2-dev $sdl_lib libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev libsfml-dev $sfml_libs $glew_lib $wx_libs libgtk2.0-dev libgtk-3-dev ccache zip ninja-build libopenal-dev"
+        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev libsdl3-dev $sdl_lib libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev libsfml-dev $sfml_libs $glew_lib $wx_libs libgtk2.0-dev libgtk-3-dev ccache zip ninja-build libopenal-dev"
 
         [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs libavcodec-dev libavformat-dev libswscale-dev libavutil-dev $libswresample_dev"
 
@@ -401,7 +401,7 @@ debian_installdeps() {
             fi
         fi
 
-        deps="gcc zlib ffmpeg gettext sdl2 sfml openal wxwidgets openal"
+        deps="gcc zlib ffmpeg gettext sdl3 sfml openal wxwidgets openal"
         [ -n "$ENABLE_FFMPEG" ] && deps="$deps ffmpeg"
 
         set --
@@ -498,7 +498,7 @@ fedora_installdeps() {
             # this is sometimes necessary for rawhide
             set -- --exclude='glibc32*'
         fi
-        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel SDL2-devel SFML-devel openal-soft-devel wxGTK-devel gtk3-devel; do
+        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel SDL3-devel SFML-devel openal-soft-devel wxGTK-devel gtk3-devel; do
             case $pkg in
                 *ffmpeg*)
                     [ -z "$ENABLE_FFMPEG" ] && continue
@@ -591,7 +591,7 @@ fedora_installdeps() {
                 ;;
         esac
         # install static deps
-        for pkg in zlib gettext SDL2 wxWidgets3 openal-soft; do
+        for pkg in zlib gettext SDL3 wxWidgets3 openal-soft; do
             set -- "$@" "${target}-${pkg}-static"
         done
 
@@ -686,7 +686,7 @@ rhel_installdeps() {
 
         warning='RHEL does not currently have SFML packages, LINK support will be disabled'
 
-        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel SDL2-devel openal-soft-devel wxGTK3-devel gtk3-devel; do
+        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel SDL3-devel openal-soft-devel wxGTK3-devel gtk3-devel; do
             case $pkg in
                 *ffmpeg*)
                     [ -z "$ENABLE_FFMPEG" ] && continue
@@ -771,7 +771,7 @@ rhel_installdeps() {
                 ;;
         esac
         # install static deps
-        for pkg in zlib gettext SDL2 wxWidgets openal-soft; do
+        for pkg in zlib gettext SDL3 wxWidgets openal-soft; do
             set -- "$@" "${target}-${pkg}-static"
         done
 
@@ -799,7 +799,7 @@ suse_installdeps() {
 
     tools="make cmake ccache nasm gettext-tools pkg-config ccache zip sfml2-devel ninja"
 
-    libs="gcc gcc-c++ libSDL2-devel wxGTK3-3_2-devel openal-soft-devel ffmpeg-7-libavcodec-devel ffmpeg-7-libavdevice-devel ffmpeg-7-libavfilter-devel ffmpeg-7-libavformat-devel ffmpeg-7-libavutil-devel ffmpeg-7-libpostproc-devel ffmpeg-7-libswresample-devel ffmpeg-7-libswscale-devel"
+    libs="gcc gcc-c++ libSDL3-devel wxGTK3-3_2-devel openal-soft-devel ffmpeg-7-libavcodec-devel ffmpeg-7-libavdevice-devel ffmpeg-7-libavfilter-devel ffmpeg-7-libavformat-devel ffmpeg-7-libavutil-devel ffmpeg-7-libpostproc-devel ffmpeg-7-libswresample-devel ffmpeg-7-libswscale-devel"
 
     if [ "$target" = m32 ]; then
         error '32 bit cross builds are no longer supported on OpenSUSE'
@@ -866,7 +866,7 @@ archlinux_installdeps() {
 
     $pacman -Q gtk3-classic >/dev/null 2>&1 && gtk=gtk3-classic
 
-    libs="zlib mesa gettext sdl2 wxgtk3 $gtk sfml openal"
+    libs="zlib mesa gettext sdl3 wxgtk3 $gtk sfml openal"
 
     [ -n "$ENABLE_FFMPEG" ] && libs="$libs ffmpeg"
 
@@ -962,7 +962,7 @@ EOF
           fi
         done
 
-        deps="zlib gettext pkg-config sdl2 wxmsw openal"
+        deps="zlib gettext pkg-config sdl3 wxmsw openal"
 
         # and the actual deps
         for p in $deps; do
@@ -993,7 +993,7 @@ solus_installdeps() {
     check sudo eopkg -y install -c system.devel
     check sudo eopkg -y install git ccache ninja
 
-    set -- sdl2-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel libglu-devel openal-soft-devel
+    set -- sdl3-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel libglu-devel openal-soft-devel
 
     if [ -n "$amd64" -a "$target" = m32 ]; then
         info_msg 'Calculating dependencies, this will take a while..'
@@ -1067,7 +1067,7 @@ gentoo_installdeps() {
       dev-build/cmake \
       dev-util/ccache \
       sys-devel/binutils \
-      media-libs/libsdl2 \
+      media-libs/libsdl3 \
       media-libs/libsfml \
       media-libs/openal \
       x11-libs/wxGTK:$wx_slot \
@@ -1086,7 +1086,7 @@ gentoo_installdeps() {
 alpine_installdeps() {
     installing
 
-    check sudo apk add cmake ninja g++ ccache nasm gettext-dev zlib-dev mesa-dev sdl2-dev glu-dev sfml-dev wxwidgets-dev gtk+3.0-dev zip
+    check sudo apk add cmake ninja g++ ccache nasm gettext-dev zlib-dev mesa-dev sdl3-dev glu-dev sfml-dev wxwidgets-dev gtk+3.0-dev zip
 
     build_instructions
 }
@@ -1121,7 +1121,7 @@ windows_installdeps() {
             ;;
     esac
 
-    pkgs="$pkgs SDL2 sfml wxWidgets3.2 zlib binutils cmake crt-git headers-git make pkgconf tools-git windows-default-manifest libmangle-git ninja gdb ccache openal"
+    pkgs="$pkgs SDL3 sfml wxWidgets3.2 zlib binutils cmake crt-git headers-git make pkgconf tools-git windows-default-manifest libmangle-git ninja gdb ccache openal"
 
     case "$target" in
         *x86_64)
@@ -1193,7 +1193,7 @@ brew_installdeps() {
 
     check brew -v update
 
-    brews="nasm cmake ccache gettext pkg-config sdl2 wxwidgets faudio ccache ninja zlib"
+    brews="nasm cmake ccache gettext pkg-config sdl3 wxwidgets faudio ccache ninja zlib"
 
     [ -n "$ENABLE_FFMPEG" ] && brews="$brews ffmpeg"
 
@@ -1224,7 +1224,7 @@ macports_installdeps() {
 
     check sudo port -v selfupdate
 
-    ports="cmake ccache nasm gettext pkgconfig libsdl2 sfml wxWidgets-3.0 libiconv ninja"
+    ports="cmake ccache nasm gettext pkgconfig libsdl3 sfml wxWidgets-3.0 libiconv ninja"
 
     [ -n "$ENABLE_FFMPEG" ] && ports="$ports ffmpeg"
 
@@ -1240,7 +1240,7 @@ fink_installdeps() {
 
     check sudo fink -vy selfupdate
 
-    pkgs="cmake ccache nasm libgettext8-dev gettext-tools pkgconfig sdl2 wxwidgets300-osxcocoa libiconv-dev sfml24-dev ccache ninja"
+    pkgs="cmake ccache nasm libgettext8-dev gettext-tools pkgconfig sdl3 wxwidgets300-osxcocoa libiconv-dev sfml24-dev ccache ninja"
 
     [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs ffmpeg"
 

@@ -309,7 +309,7 @@ const char* elfGetAddressSymbol(uint32_t addr)
                     strncpy(buffer, s->name, 255);
 		    buffer[255] = '\0';
 		} else
-                    strcpy(buffer, "");
+                    strncpy(buffer, "", sizeof(buffer));
                 return buffer;
             }
         }

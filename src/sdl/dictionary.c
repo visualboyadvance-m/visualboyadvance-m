@@ -64,7 +64,7 @@ static char *xstrdup(const char *s)
                 return NULL;
         t = (char *)malloc(strlen(s) + 1);
         if (t) {
-                strcpy(t, s);
+                strncpy(t, s, strlen(s) + 1);
         }
         return t;
 }
@@ -372,12 +372,12 @@ int main(int argc, char *argv[])
         /* Set values in dictionary */
         printf("setting %d values...\n", NVALS);
         for (i = 0; i < NVALS; i++) {
-                sprintf(cval, "%04d", i);
+                snprintf(cval, sizeof(cval), "%04d", i);
                 dictionary_set(d, cval, "salut");
         }
         printf("getting %d values...\n", NVALS);
         for (i = 0; i < NVALS; i++) {
-                sprintf(cval, "%04d", i);
+                snprintf(cval, sizeof(cval), "%04d", i);
                 val = dictionary_get(d, cval, DICT_INVALID_KEY);
                 if (val == DICT_INVALID_KEY) {
                         printf("cannot get value for key [%s]\n", cval);
@@ -385,7 +385,7 @@ int main(int argc, char *argv[])
         }
         printf("unsetting %d values...\n", NVALS);
         for (i = 0; i < NVALS; i++) {
-                sprintf(cval, "%04d", i);
+                snprintf(cval, sizeof(cval), "%04d", i);
                 dictionary_unset(d, cval);
         }
         if (d->n != 0) {
