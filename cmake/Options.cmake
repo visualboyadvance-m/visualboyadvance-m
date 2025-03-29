@@ -29,7 +29,7 @@ endif()
 option(VBAM_STATIC "Try to link all libraries statically" ${VBAM_STATIC_DEFAULT})
 
 if(VBAM_STATIC)
-    set(SDL2_STATIC ON)
+    set(SDL3_STATIC ON)
     set(SFML_STATIC_LIBRARIES ON)
     set(FFMPEG_STATIC ON)
     set(OPENAL_STATIC ON)
