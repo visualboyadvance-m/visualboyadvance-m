@@ -457,7 +457,7 @@ const char* FindConfigFile(const char *name)
 		mkdir(fullDir, 0755);
 
 	if (fullDir) {
-		sprintf(path, "%s%c%s", fullDir, kFileSep, name);
+		snprintf(path, sizeof(path), "%s%c%s", fullDir, kFileSep, name);
 		if (FileExists(path))
 		{
 			return path;
@@ -467,7 +467,7 @@ const char* FindConfigFile(const char *name)
 #ifdef _WIN32
 	char *home = getenv("USERPROFILE");
 	if (home != NULL) {
-		sprintf(path, "%s%c%s", home, kFileSep, name);
+		snprintf(path, sizeof(path), "%s%c%s", home, kFileSep, name);
 		if (FileExists(path))
 		{
 			return path;
@@ -484,10 +484,10 @@ const char* FindConfigFile(const char *name)
 			char *tok = strtok(buffer, PATH_SEP);
 
 			while (tok) {
-				sprintf(env_path, "%s%c%s", tok, kFileSep, EXE_NAME);
+				snprintf(env_path, 4096, "%s%c%s", tok, kFileSep, EXE_NAME);
 				if (FileExists(env_path)) {
 					static char path2[2048];
-					sprintf(path2, "%s%c%s", tok, kFileSep, name);
+					snprintf(path2, sizeof(path2), "%s%c%s", tok, kFileSep, name);
 					if (FileExists(path2)) {
 						return path2;
 					}
@@ -502,7 +502,7 @@ const char* FindConfigFile(const char *name)
 		char *p = strrchr(buffer, kFileSep);
 		if (p) {
 			*p = 0;
-			sprintf(path, "%s%c%s", buffer, kFileSep, name);
+			snprintf(path, sizeof(path), "%s%c%s", buffer, kFileSep, name);
 			if (FileExists(path))
 			{
 				return path;
@@ -510,13 +510,13 @@ const char* FindConfigFile(const char *name)
 		}
 	}
 #else // ! _WIN32
-	sprintf(path, "%s%c%s", PKGDATADIR, kFileSep, name);
+	snprintf(path, sizeof(path), "%s%c%s", PKGDATADIR, kFileSep, name);
 	if (FileExists(path))
 	{
 		return path;
 	}
 
-	sprintf(path, "%s%c%s", SYSCONF_INSTALL_DIR, kFileSep, name);
+	snprintf(path, sizeof(path), "%s%c%s", SYSCONF_INSTALL_DIR, kFileSep, name);
 	if (FileExists(path))
 	{
 		return path;

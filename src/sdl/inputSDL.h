@@ -20,7 +20,7 @@
 
 #include <cstdint>
 
-#include <SDL_events.h>
+#include <SDL3/SDL.h>
 
 enum EKey {
     KEY_LEFT,

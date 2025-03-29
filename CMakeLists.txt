@@ -22,7 +22,7 @@ if(TAG_RELEASE)
     include(MakeReleaseCommitAndTag)
 endif()
 
-set(VCPKG_DEPS pkgconf zlib pthreads "sdl2[samplerate]" gettext wxwidgets)
+set(VCPKG_DEPS pkgconf zlib pthreads "sdl3[samplerate]" gettext wxwidgets)
 
 set(VCPKG_DEPS_OPTIONAL
     sfml   ENABLE_LINK
