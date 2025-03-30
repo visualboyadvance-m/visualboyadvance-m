@@ -40,7 +40,7 @@ SoundSDL::SoundSDL():
 {}
 
 void SoundSDL::soundCallback(void* data, SDL_AudioStream *stream, int additional_length, int length) {
-    uint16_t *streamdata[8192];
+    uint16_t streamdata[8192];
 
     while (length > 0)
     {
