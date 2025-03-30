@@ -11,11 +11,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
     set(OpenGL_GL_PREFERENCE LEGACY)
 endif()
 
-find_package(OpenGL REQUIRED)
-find_package(SDL2   REQUIRED)
+find_package(OpenGL)
+find_package(SDL3   REQUIRED)
 
-# Add libsamplerate to SDL2 with vcpkg
-unset(SDL2_LIBRARY_TEMP)
+# Add libsamplerate to SDL3 with vcpkg
+unset(SDL3_LIBRARY_TEMP)
 if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     if(WIN32)
         unset(arch_suffix)
@@ -28,16 +28,16 @@ if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
         endif()
         set(installed_prefix ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix}/${path_prefix})
 
-        SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} ${installed_prefix}/lib/samplerate.lib)
+        SET(SDL3_LIBRARY_TEMP ${SDL3_LIBRARY_TEMP} ${installed_prefix}/lib/samplerate.lib)
     else()
-        SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} -lsamplerate)
+        SET(SDL3_LIBRARY_TEMP ${SDL3_LIBRARY_TEMP} -lsamplerate)
     endif()
 endif()
 
 if(VBAM_STATIC)
-    set(VBAM_SDL2_LIBS SDL2::SDL2-static ${SDL2_LIBRARY_TEMP})
+    set(VBAM_SDL3_LIBS SDL3::SDL3-static ${SDL3_LIBRARY_TEMP})
 else()
-    set(VBAM_SDL2_LIBS SDL2::SDL2        ${SDL2_LIBRARY_TEMP})
+    set(VBAM_SDL3_LIBS SDL3::SDL3        ${SDL3_LIBRARY_TEMP})
 endif()
 
 if(ENABLE_FFMPEG)

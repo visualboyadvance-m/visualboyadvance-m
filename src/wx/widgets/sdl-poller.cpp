@@ -5,7 +5,7 @@
 #include <wx/timer.h>
 #include <wx/toplevel.h>
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include "core/base/check.h"
 #include "wx/config/option-id.h"
@@ -107,7 +107,7 @@ private:
     SDL_JoystickID joystick_id_;
 
     // The SDL GameController instance.
-    SDL_GameController* game_controller_ = nullptr;
+    SDL_Gamepad* game_controller_ = nullptr;
 
     // The SDL Joystick instance.
     SDL_Joystick* sdl_joystick_ = nullptr;
@@ -126,18 +126,24 @@ private:
 };
 
 JoyState::JoyState(bool enable_game_controller, int sdl_index) : wx_joystick_(sdl_index) {
-    if (enable_game_controller && SDL_IsGameController(sdl_index)) {
-        game_controller_ = SDL_GameControllerOpen(sdl_index);
+    int nrgamepads = 0;
+    int nrjoysticks = 0;
+    SDL_JoystickID *gamepads = SDL_GetGamepads(&nrgamepads);
+    SDL_JoystickID *joysticks = SDL_GetJoysticks(&nrjoysticks);
+    if (enable_game_controller && SDL_IsGamepad(gamepads[sdl_index])) {
+        game_controller_ = SDL_OpenGamepad(gamepads[sdl_index]);
         if (game_controller_)
-            sdl_joystick_ = SDL_GameControllerGetJoystick(game_controller_);
+        {
+            sdl_joystick_ = SDL_GetGamepadJoystick(game_controller_);
+        }
     } else {
-        sdl_joystick_ = SDL_JoystickOpen(sdl_index);
+        sdl_joystick_ = SDL_OpenJoystick(joysticks[sdl_index]);
     }
 
     if (!sdl_joystick_)
         return;
 
-    joystick_id_ = SDL_JoystickInstanceID(sdl_joystick_);
+    joystick_id_ = SDL_GetJoystickID(sdl_joystick_);
 }
 
 JoyState::~JoyState() {
@@ -146,9 +152,9 @@ JoyState::~JoyState() {
         return;
 
     if (game_controller_) {
-        SDL_GameControllerClose(game_controller_);
+        SDL_CloseGamepad(game_controller_);
     } else {
-        SDL_JoystickClose(sdl_joystick_);
+        SDL_CloseJoystick(sdl_joystick_);
     }
 }
 
@@ -280,17 +286,17 @@ std::vector<UserInputEvent::Data> JoyState::ProcessHatEvent(const uint8_t index,
 void JoyState::SetRumble(bool activate_rumble) {
     rumbling_ = activate_rumble;
 
-#if SDL_VERSION_ATLEAST(2, 0, 9)
-    if (!game_controller_)
+#if SDL_VERSION_ATLEAST(3, 2, 0)
+    if (game_controller_ == NULL)
         return;
 
     if (rumbling_) {
-        SDL_GameControllerRumble(game_controller_, 0xFFFF, 0xFFFF, 300);
+        SDL_RumbleGamepad(game_controller_, 0xFFFF, 0xFFFF, 300);
         if (!IsRunning()) {
             Start(150);
         }
     } else {
-        SDL_GameControllerRumble(game_controller_, 0, 0, 0);
+        SDL_RumbleGamepad(game_controller_, 0, 0, 0);
         Stop();
     }
 #endif
@@ -309,16 +315,17 @@ SdlPoller::SdlPoller(EventHandlerProvider* const handler_provider)
     VBAM_CHECK(handler_provider);
 
     wxTimer::Start(50);
-    SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS);
-    SDL_GameControllerEventState(SDL_ENABLE);
-    SDL_JoystickEventState(SDL_ENABLE);
+    SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD | SDL_INIT_EVENTS);
+    SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD | SDL_INIT_EVENTS);
+    SDL_SetGamepadEventsEnabled(true);
+    SDL_SetJoystickEventsEnabled(true);
 }
 
 SdlPoller::~SdlPoller() {
     wxTimer::Stop();
     SDL_QuitSubSystem(SDL_INIT_EVENTS);
     SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
-    SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
+    SDL_QuitSubSystem(SDL_INIT_GAMEPAD);
     SDL_Quit();
 }
 
@@ -348,40 +355,40 @@ void SdlPoller::Notify() {
         std::vector<UserInputEvent::Data> event_data;
         JoyState* joy_state = nullptr;
         switch (sdl_event.type) {
-            case SDL_CONTROLLERBUTTONDOWN:
-            case SDL_CONTROLLERBUTTONUP:
-                joy_state = FindJoyState(sdl_event.cbutton.which);
+            case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+            case SDL_EVENT_GAMEPAD_BUTTON_UP:
+                joy_state = FindJoyState(sdl_event.gbutton.which);
                 if (joy_state) {
-                    event_data = joy_state->ProcessButtonEvent(sdl_event.cbutton.button,
-                                                               sdl_event.cbutton.state);
+                    event_data = joy_state->ProcessButtonEvent(sdl_event.gbutton.button,
+                                                               sdl_event.gbutton.down);
                 }
                 break;
 
-            case SDL_CONTROLLERAXISMOTION:
-                joy_state = FindJoyState(sdl_event.caxis.which);
+            case SDL_EVENT_GAMEPAD_AXIS_MOTION:
+                joy_state = FindJoyState(sdl_event.gaxis.which);
                 if (joy_state) {
                     event_data = joy_state->ProcessAxisEvent(
-                        sdl_event.caxis.axis, AxisValueToStatus(sdl_event.caxis.value));
+                        sdl_event.gaxis.axis, AxisValueToStatus(sdl_event.gaxis.value));
                 }
                 break;
 
-            case SDL_CONTROLLERDEVICEADDED:
-            case SDL_CONTROLLERDEVICEREMOVED:
+            case SDL_EVENT_GAMEPAD_ADDED:
+            case SDL_EVENT_GAMEPAD_REMOVED:
                 // Do nothing. This will be handled with JOYDEVICEADDED and
                 // JOYDEVICEREMOVED events.
                 break;
 
             // Joystick events for non-GameControllers.
-            case SDL_JOYBUTTONDOWN:
-            case SDL_JOYBUTTONUP:
+            case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
+            case SDL_EVENT_JOYSTICK_BUTTON_UP:
                 joy_state = FindJoyState(sdl_event.jbutton.which);
                 if (joy_state && !joy_state->is_game_controller()) {
                     event_data = joy_state->ProcessButtonEvent(sdl_event.jbutton.button,
-                                                               sdl_event.jbutton.state);
+                                                               sdl_event.jbutton.down);
                 }
                 break;
 
-            case SDL_JOYAXISMOTION:
+            case SDL_EVENT_JOYSTICK_AXIS_MOTION:
                 joy_state = FindJoyState(sdl_event.jaxis.which);
                 if (joy_state && !joy_state->is_game_controller()) {
                     event_data = joy_state->ProcessAxisEvent(
@@ -389,7 +396,7 @@ void SdlPoller::Notify() {
                 }
                 break;
 
-            case SDL_JOYHATMOTION:
+            case SDL_EVENT_JOYSTICK_HAT_MOTION:
                 joy_state = FindJoyState(sdl_event.jhat.which);
                 if (joy_state && !joy_state->is_game_controller()) {
                     event_data =
@@ -397,12 +404,12 @@ void SdlPoller::Notify() {
                 }
                 break;
 
-            case SDL_JOYDEVICEADDED:
+            case SDL_EVENT_JOYSTICK_ADDED:
                 // Always remap all controllers.
                 RemapControllers();
                 break;
 
-            case SDL_JOYDEVICEREMOVED:
+            case SDL_EVENT_JOYSTICK_REMOVED:
                 joystick_states_.erase(sdl_event.jdevice.which);
                 break;
         }
@@ -426,11 +433,15 @@ JoyState* SdlPoller::FindJoyState(const SDL_JoystickID& joy_id) {
 }
 
 void SdlPoller::RemapControllers() {
+    int total_joysticks = 0;
+
+    SDL_GetJoysticks(&total_joysticks);
+
     // Clear the current joystick states.
     joystick_states_.clear();
 
     // Reconnect all controllers.
-    for (int i = 0; i < SDL_NumJoysticks(); ++i) {
+    for (int i = 0; i < total_joysticks; ++i) {
         JoyState joy_state(enable_game_controller_, i);
         if (joy_state.IsValid()) {
             joystick_states_.insert({joy_state.joystick_id(), std::move(joy_state)});

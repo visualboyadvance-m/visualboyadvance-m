@@ -18,7 +18,7 @@
 #ifndef VBAM_SDL_AUDIO_SDL_H_
 #define VBAM_SDL_AUDIO_SDL_H_
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include "core/base/ringbuffer.h"
 #include "core/base/sound_driver.h"
@@ -28,9 +28,10 @@ public:
         SoundSDL();
         ~SoundSDL() override;
 
-private:
-        static void soundCallback(void* data, uint8_t* stream, int length);
         void read(uint16_t* stream, int length);
+
+private:
+        static void soundCallback(void* data, SDL_AudioStream *stream, int additional_length, int length);
         bool should_wait();
         std::size_t buffer_size();
         void deinit();
@@ -46,10 +47,11 @@ private:
         RingBuffer<uint16_t> samples_buf;
 
         SDL_AudioDeviceID sound_device = 0;
+        SDL_AudioStream *sound_stream = NULL;
 
-        SDL_mutex* mutex;
-        SDL_sem* data_available;
-        SDL_sem* data_read;
+        SDL_Mutex* mutex;
+        SDL_Semaphore* data_available;
+        SDL_Semaphore* data_read;
         SDL_AudioSpec audio_spec;
 
         unsigned short current_rate;

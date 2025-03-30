@@ -292,8 +292,8 @@ function(configure_wx_target target)
         _add_compile_definitions(NO_D3D)
     endif()
 
-    # SDL2.
-    _add_link_libraries(${VBAM_SDL2_LIBS})
+    # SDL3.
+    _add_link_libraries(${VBAM_SDL3_LIBS})
 
     # OpenGL.
     if(ENABLE_OPENGL)
@@ -319,7 +319,7 @@ add_executable(
 )
 
 target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} ${VBAM_ICON_PATH})
-target_include_directories(visualboyadvance-m PRIVATE ${SDL2_INCLUDE_DIRS})
+target_include_directories(visualboyadvance-m PRIVATE ${SDL3_INCLUDE_DIRS})
 
 target_link_libraries(
     visualboyadvance-m
