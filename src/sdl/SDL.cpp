@@ -946,7 +946,7 @@ void sdlInitVideo()
 
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
-#if CONFIG_16BIT
+#if 1
         rmask = 0x0000F800;
         gmask = 0x000007E0;
         bmask = 0x0000001F;
@@ -980,6 +980,7 @@ void sdlInitVideo()
 
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
 #if !CONFIG_16BIT
+#if 0
     if (openGL) {
         // Align to BGRA instead of ABGR
         systemRedShift += 8;
@@ -988,15 +989,23 @@ void sdlInitVideo()
     }
 #endif
 #endif
+#endif
 
 #ifdef CONFIG_16BIT
     systemColorDepth = 16;
 
     srcPitch = sizeX * 2 + 4;
 #else
-    systemColorDepth = 32;
-
-    srcPitch = sizeX * 4 + 4;
+    if (openGL)
+    {
+        systemColorDepth = 16;
+        
+        srcPitch = sizeX * 2 + 4;
+    } else {
+        systemColorDepth = 32;
+        
+        srcPitch = sizeX * 4 + 4;
+    }
 #endif
 
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
