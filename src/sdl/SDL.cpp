@@ -544,7 +544,7 @@ static void sdlOpenGLVideoResize()
     if (systemColorDepth == 8)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureSize, textureSize, 0,
-                     GL_RGB, GL_UNSIGNED_BYTE, NULL);
+                     GL_RGB, GL_UNSIGNED_BYTE_3_3_2, NULL);
     } else if (systemColorDepth == 16) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureSize, textureSize, 0,
                      GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
@@ -875,7 +875,7 @@ static void sdlResizeVideo()
             texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB565, SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
         } else if (systemColorDepth == 24) {
             surface = SDL_CreateSurface(destWidth, destHeight, SDL_GetPixelFormatForMasks(24, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000));
-            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+            texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(24, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000), SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
         } else {
             surface = SDL_CreateSurface(destWidth, destHeight, SDL_GetPixelFormatForMasks(32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000));
             texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_XRGB8888, SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
@@ -2211,7 +2211,7 @@ void systemDrawScreen()
         glPixelStorei(GL_UNPACK_ROW_LENGTH, destWidth);
         if (systemColorDepth == 8)
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,
-                GL_RGB, GL_UNSIGNED_BYTE, screen);
+                GL_RGB, GL_UNSIGNED_BYTE_3_3_2, screen);
         else if (systemColorDepth == 16)
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,
                 GL_RGB, GL_UNSIGNED_SHORT_5_6_5, screen);
