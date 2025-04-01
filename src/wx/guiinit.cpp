@@ -142,7 +142,10 @@ public:
 
         if (server) {
             char host[length];
-            GetLinkServerHost(host, length);
+            if (!GetLinkServerHost(host, length)) {
+                wxMessageBox(_("You must enter a valid host name"),
+                    _("Host name invalid"), wxICON_ERROR | wxOK);
+            }
             title.Printf(_("Waiting for clients..."));
             connmsg.Printf(_("Server IP address is: %s\n"), wxString(host, wxConvLibc).c_str());
         } else {

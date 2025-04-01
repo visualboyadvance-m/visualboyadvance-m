@@ -24,7 +24,7 @@ public:
     bool IsDisconnected();
 
 private:
-    sf::IpAddress server_addr;
+    sf::IpAddress server_addr{0};
     sf::TcpSocket client;
     sf::TcpSocket clock_client;
 
