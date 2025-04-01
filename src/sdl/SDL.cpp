@@ -535,13 +535,17 @@ static void sdlOpenGLVideoResize()
 
     textureSize = (int)pow(2.0f, n);
 
-#if CONFIG_16BIT
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureSize, textureSize, 0,
-                 GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
-#else
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureSize, textureSize, 0,
-        GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-#endif
+    if (systemColorDepth == 16)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureSize, textureSize, 0,
+                     GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
+    } else if (systemColorDepth == 24) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureSize, textureSize, 0,
+                     GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    } else {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureSize, textureSize, 0,
+                     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    }
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -889,6 +893,7 @@ void sdlInitVideo()
     int window_width, window_height, render_width, render_height;
     bool makes_sense = false;
     SDL_RendererLogicalPresentation representation;
+    uint32_t rmask, gmask, bmask;
 
     filter_enlarge = getFilterEnlargeFactor(filter);
 
@@ -942,55 +947,6 @@ void sdlInitVideo()
         exit(-1);
     }
 
-    uint32_t rmask, gmask, bmask;
-
-#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
-    if (openGL) {
-#if 1
-        rmask = 0x0000F800;
-        gmask = 0x000007E0;
-        bmask = 0x0000001F;
-#else
-        rmask = 0xFF000000;
-        gmask = 0x00FF0000;
-        bmask = 0x0000FF00;
-#endif
-    } else {
-#endif
-#if CONFIG_16BIT
-        rmask = 0x0000F800;
-        gmask = 0x000007E0;
-        bmask = 0x0000001F;
-#else
-        rmask = 0x00FF0000;
-        gmask = 0x0000FF00;
-        bmask = 0x000000FF;
-#endif
-#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
-    }
-#endif
-
-    systemRedShift = sdlCalculateShift(rmask);
-    systemGreenShift = sdlCalculateShift(gmask);
-    systemBlueShift = sdlCalculateShift(bmask);
-
-    //printf("systemRedShift %d, systemGreenShift %d, systemBlueShift %d\n",
-    //         systemRedShift, systemGreenShift, systemBlueShift);
-    //  originally 3, 11, 19 -> 27, 19, 11
-
-#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
-#if !CONFIG_16BIT
-#if 0
-    if (openGL) {
-        // Align to BGRA instead of ABGR
-        systemRedShift += 8;
-        systemGreenShift += 8;
-        systemBlueShift += 8;
-    }
-#endif
-#endif
-#endif
-
 #ifdef CONFIG_16BIT
     systemColorDepth = 16;
 
@@ -1005,6 +961,58 @@ void sdlInitVideo()
         systemColorDepth = 32;
         
         srcPitch = sizeX * 4 + 4;
+    }
+#endif
+
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
+    if (openGL) {
+        if (systemColorDepth == 16)
+        {
+            rmask = 0x0000F800;
+            gmask = 0x000007E0;
+            bmask = 0x0000001F;
+        } else if (systemColorDepth == 24) {
+            rmask = 0x00FF0000;
+            gmask = 0x0000FF00;
+            bmask = 0x000000FF;
+        } else {
+            rmask = 0xFF000000;
+            gmask = 0x00FF0000;
+            bmask = 0x0000FF00;
+        }
+    } else {
+#endif
+        if (systemColorDepth == 16)
+        {
+            rmask = 0x0000F800;
+            gmask = 0x000007E0;
+            bmask = 0x0000001F;
+        } else {
+            rmask = 0x00FF0000;
+            gmask = 0x0000FF00;
+            bmask = 0x000000FF;
+        }
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
+    }
+#endif
+
+    systemRedShift = sdlCalculateShift(rmask);
+    systemGreenShift = sdlCalculateShift(gmask);
+    systemBlueShift = sdlCalculateShift(bmask);
+
+    //printf("systemRedShift %d, systemGreenShift %d, systemBlueShift %d\n",
+    //         systemRedShift, systemGreenShift, systemBlueShift);
+    //  originally 3, 11, 19 -> 27, 19, 11
+
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
+    if (openGL) {
+        if (systemColorDepth == 32)
+        {
+            // Align to BGRA instead of ABGR
+            systemRedShift += 8;
+            systemGreenShift += 8;
+            systemBlueShift += 8;
+        }
     }
 #endif
 
@@ -2151,6 +2159,9 @@ void systemDrawScreen()
         if (systemColorDepth == 16)
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,
                 GL_RGB, GL_UNSIGNED_SHORT_5_6_5, screen);
+        else if (systemColorDepth == 24)
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,
+                GL_RGB, GL_UNSIGNED_BYTE, screen);
         else
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,
                 //GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, screen);
