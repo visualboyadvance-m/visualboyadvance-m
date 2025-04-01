@@ -1653,7 +1653,7 @@ Long options only:\n\
       --auto-frameskip         Enable auto frameskipping\n\
       --no-agb-print           Disable AGBPrint support\n\
       --no-auto-frameskip      Disable auto frameskipping\n\
-      --color-depth            Set color depth (16, 24 or 32)\n\
+      --color-depth            Set color depth (8, 16, 24 or 32)\n\
       --no-patch               Do not automatically apply patch\n\
       --no-pause-when-inactive Don't pause when inactive\n\
       --no-rtc                 Disable RTC support\n\
