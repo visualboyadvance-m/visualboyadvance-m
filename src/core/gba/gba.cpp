@@ -3965,25 +3965,25 @@ void CPULoop(int ticks)
                                 uint8_t* dest = (uint8_t*)g_pix + 242 * (VCOUNT + 1);
 #endif
                                 for (int x = 0; x < 240;) {
-                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFF];
-                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFF];
-                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFF];
-                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFF];
+                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
 
-                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFF];
-                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFF];
-                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFF];
-                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFF];
+                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
 
-                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFF];
-                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFF];
-                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFF];
-                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFF];
+                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
 
-                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFF];
-                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFF];
-                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFF];
-                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFF];
+                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
                                 }
 // for filters that read past the screen
 #ifndef __LIBRETRO__
