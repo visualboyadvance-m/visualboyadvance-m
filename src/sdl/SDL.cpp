@@ -99,6 +99,10 @@
 #define NO_OPENGL 1
 #endif
 
+//#define CONFIG_8BIT 1
+//#define CONFIG_16BIT 1
+//#define CONFIG_24BIT 1
+
 #include "components/draw_text/draw_text.h"
 #include "components/filters_agb/filters_agb.h"
 #include "components/user_config/user_config.h"
@@ -131,6 +135,7 @@ extern void remoteStubSignal(int, int);
 extern void remoteOutput(const char*, uint32_t);
 extern void remoteSetProtocol(int);
 extern void remoteSetPort(int);
+extern int userColorDepth;
 
 struct CoreOptions coreOptions;
 
@@ -205,6 +210,7 @@ int emulating = 0;
 int RGB_LOW_BITS_MASK = 0x821;
 uint32_t systemColorMap32[0x10000];
 uint16_t systemColorMap16[0x10000];
+uint8_t  systemColorMap8[0x10000];
 uint16_t systemGbPalette[24];
 
 char filename[2048];
@@ -535,8 +541,11 @@ static void sdlOpenGLVideoResize()
 
     textureSize = (int)pow(2.0f, n);
 
-    if (systemColorDepth == 16)
+    if (systemColorDepth == 8)
     {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureSize, textureSize, 0,
+                     GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    } else if (systemColorDepth == 16) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureSize, textureSize, 0,
                      GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
     } else if (systemColorDepth == 24) {
@@ -856,20 +865,21 @@ static void sdlResizeVideo()
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (!openGL) {
 #endif
-#if CONFIG_16BIT
-        surface = SDL_CreateSurface(destWidth, destHeight,
-                                    SDL_GetPixelFormatForMasks(16, 0xF800, 0x07E0, 0x001F, 0x0000));
-        texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB565,
-            SDL_TEXTUREACCESS_STREAMING,
-            destWidth, destHeight);
-#else
-        surface = SDL_CreateSurface(destWidth, destHeight, SDL_GetPixelFormatForMasks(32,
-            0x00FF0000, 0x0000FF00,
-            0x000000FF, 0x00000000));
-        texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_XRGB8888,
-            SDL_TEXTUREACCESS_STREAMING,
-            destWidth, destHeight);
-#endif
+        if (systemColorDepth == 8)
+        {
+            surface = SDL_CreateSurface(destWidth, destHeight, SDL_GetPixelFormatForMasks(8, 0xE0, 0x1C, 0x03, 0x00));
+            texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(8, 0xE0, 0x1C, 0x03, 0x00), SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+        } else if (systemColorDepth == 16)
+        {
+            surface = SDL_CreateSurface(destWidth, destHeight, SDL_GetPixelFormatForMasks(16, 0xF800, 0x07E0, 0x001F, 0x0000));
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB565, SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+        } else if (systemColorDepth == 24) {
+            surface = SDL_CreateSurface(destWidth, destHeight, SDL_GetPixelFormatForMasks(24, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000));
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+        } else {
+            surface = SDL_CreateSurface(destWidth, destHeight, SDL_GetPixelFormatForMasks(32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000));
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_XRGB8888, SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+        }
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     }
 #endif
@@ -947,27 +957,63 @@ void sdlInitVideo()
         exit(-1);
     }
 
-#ifdef CONFIG_16BIT
-    systemColorDepth = 16;
-
-    srcPitch = sizeX * 2 + 4;
-#else
-    if (openGL)
+    if (userColorDepth != 0)
     {
-        systemColorDepth = 16;
+        systemColorDepth = userColorDepth;
         
-        srcPitch = sizeX * 2 + 4;
+        switch (systemColorDepth)
+        {
+            case  8:
+                srcPitch = sizeX * (systemColorDepth >> 3) + 2;
+                break;
+
+            case 16:
+                srcPitch = sizeX * (systemColorDepth >> 3) + 4;
+                break;
+                
+            case 24:
+                srcPitch = sizeX * (systemColorDepth >> 3);
+                break;
+                
+            case 32:
+                srcPitch = sizeX * (systemColorDepth >> 3) + 4;
+                break;
+
+            default:
+                fprintf(stderr, "Wrong color depth %d\n", systemColorDepth);
+                exit(-1);
+                break;
+        }
     } else {
-        systemColorDepth = 32;
-        
-        srcPitch = sizeX * 4 + 4;
-    }
+#ifdef CONFIG_8BIT
+        systemColorDepth = 8;
+        srcPitch = sizeX * (systemColorDepth >> 3) + 2;
+#elif defined(CONFIG_16BIT)
+        systemColorDepth = 16;
+        srcPitch = sizeX * (systemColorDepth >> 3) + 4;
+#elif defined(CONFIG_24BIT)
+        systemColorDepth = 24;
+        srcPitch = sizeX * (systemColorDepth >> 3);
+#else
+        if (openGL)
+        {
+            systemColorDepth = 24;
+            srcPitch = sizeX * (systemColorDepth >> 3);
+        } else {
+            systemColorDepth = 32;
+            srcPitch = sizeX * (systemColorDepth >> 3) + 4;
+        }
 #endif
+    }
 
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
-        if (systemColorDepth == 16)
+        if (systemColorDepth == 8)
         {
+            rmask = 0x000000E0;
+            gmask = 0x0000001C;
+            bmask = 0x00000003;
+        } else if (systemColorDepth == 16) {
             rmask = 0x0000F800;
             gmask = 0x000007E0;
             bmask = 0x0000001F;
@@ -982,7 +1028,12 @@ void sdlInitVideo()
         }
     } else {
 #endif
-        if (systemColorDepth == 16)
+        if (systemColorDepth == 8)
+        {
+            rmask = 0x000000E0;
+            gmask = 0x0000001C;
+            bmask = 0x00000003;
+        } else if (systemColorDepth == 16)
         {
             rmask = 0x0000F800;
             gmask = 0x000007E0;
@@ -1602,6 +1653,7 @@ Long options only:\n\
       --auto-frameskip         Enable auto frameskipping\n\
       --no-agb-print           Disable AGBPrint support\n\
       --no-auto-frameskip      Disable auto frameskipping\n\
+      --color-depth            Set color depth (16, 24 or 32)\n\
       --no-patch               Do not automatically apply patch\n\
       --no-pause-when-inactive Don't pause when inactive\n\
       --no-rtc                 Disable RTC support\n\
@@ -1922,6 +1974,7 @@ int main(int argc, char** argv)
 #if defined(VBAM_ENABLE_LIRC)
     StartLirc();
 #endif
+
     inputInitJoysticks();
 
     if (cartridgeType == IMAGE_GBA) {
@@ -1961,8 +2014,8 @@ int main(int argc, char** argv)
     if (systemColorDepth == 15)
         systemColorDepth = 16;
 
-    if (systemColorDepth != 16 && systemColorDepth != 24 && systemColorDepth != 32) {
-        fprintf(stderr, "Unsupported color depth '%d'.\nOnly 16, 24 and 32 bit color depths are supported\n", systemColorDepth);
+    if (systemColorDepth != 8 && systemColorDepth != 16 && systemColorDepth != 24 && systemColorDepth != 32) {
+        fprintf(stderr, "Unsupported color depth '%d'.\nOnly 8, 16, 24 and 32 bit color depths are supported\n", systemColorDepth);
         exit(-1);
     }
 
@@ -2156,7 +2209,10 @@ void systemDrawScreen()
     if (openGL) {
         glClear(GL_COLOR_BUFFER_BIT);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, destWidth);
-        if (systemColorDepth == 16)
+        if (systemColorDepth == 8)
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,
+                GL_RGB, GL_UNSIGNED_BYTE, screen);
+        else if (systemColorDepth == 16)
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,
                 GL_RGB, GL_UNSIGNED_SHORT_5_6_5, screen);
         else if (systemColorDepth == 24)

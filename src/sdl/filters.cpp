@@ -57,6 +57,14 @@ uint8_t sdlStretcher[16384];
     sdlStretcher[sdlStretcherPos++] = 0x8b; \
     sdlStretcher[sdlStretcherPos++] = 0x1f;
 
+#define SDL_LOADB                           \
+    sdlStretcher[sdlStretcherPos++] = 0x66; \
+    sdlStretcher[sdlStretcherPos++] = 0x8b; \
+    sdlStretcher[sdlStretcherPos++] = 0x06; \
+    sdlStretcher[sdlStretcherPos++] = 0x83; \
+    sdlStretcher[sdlStretcherPos++] = 0xc6; \
+    sdlStretcher[sdlStretcherPos++] = 0x01;
+
 #define SDL_LOADW                           \
     sdlStretcher[sdlStretcherPos++] = 0x66; \
     sdlStretcher[sdlStretcherPos++] = 0x8b; \
@@ -78,6 +86,14 @@ uint8_t sdlStretcher[16384];
     sdlStretcher[sdlStretcherPos++] = 0x83; \
     sdlStretcher[sdlStretcherPos++] = 0xc6; \
     sdlStretcher[sdlStretcherPos++] = 0x03;
+
+#define SDL_STOREB                          \
+    sdlStretcher[sdlStretcherPos++] = 0x66; \
+    sdlStretcher[sdlStretcherPos++] = 0x89; \
+    sdlStretcher[sdlStretcherPos++] = 0x07; \
+    sdlStretcher[sdlStretcherPos++] = 0x83; \
+    sdlStretcher[sdlStretcherPos++] = 0xc7; \
+    sdlStretcher[sdlStretcherPos++] = 0x01;
 
 #define SDL_STOREW                          \
     sdlStretcher[sdlStretcherPos++] = 0x66; \
@@ -144,6 +160,38 @@ void sdlMakeStretcher(int width, int sizeOption) {
     int sdlStretcherPos;
     sdlStretcherPos = 0;
     switch (systemColorDepth) {
+        case 8:
+            if (sizeOption) {
+                SDL_PUSH_EAX;
+                SDL_PUSH_ESI;
+                SDL_PUSH_EDI;
+                for (int i = 0; i < width; i++) {
+                    SDL_LOADB;
+                    SDL_STOREB;
+                    SDL_STOREB;
+                    if (sizeOption > 1) {
+                        SDL_STOREB;
+                    }
+                    if (sizeOption > 2) {
+                        SDL_STOREB;
+                    }
+                }
+                SDL_POP_EDI;
+                SDL_POP_ESI;
+                SDL_POP_EAX;
+                SDL_RET;
+            } else {
+                SDL_PUSH_ESI;
+                SDL_PUSH_EDI;
+                SDL_PUSH_ECX;
+                SDL_MOV_ECX(width);
+                SDL_REP_MOVSB;
+                SDL_POP_ECX;
+                SDL_POP_EDI;
+                SDL_POP_ESI;
+                SDL_RET;
+            }
+            break;
         case 16:
             if (sizeOption) {
                 SDL_PUSH_EAX;
@@ -307,6 +355,9 @@ void sdlStretchx4(uint8_t* src, uint8_t* dest, int width) {
     }
 }
 
+void (*sdlStretcher8[4])(uint8_t*, uint8_t*, int) = {
+    sdlStretchx1<uint8_t>, sdlStretchx2<uint8_t>, sdlStretchx3<uint8_t>, sdlStretchx4<uint8_t>};
+
 void (*sdlStretcher16[4])(uint8_t*, uint8_t*, int) = {
     sdlStretchx1<uint16_t>, sdlStretchx2<uint16_t>, sdlStretchx3<uint16_t>, sdlStretchx4<uint16_t>};
 
@@ -391,6 +442,9 @@ bool sdlStretchInit(int colorDepth, int sizeMultiplier, int srcWidth) {
     sdlMakeStretcher(srcWidth, sizeMultiplier);
 #else
     switch (colorDepth) {
+        case 8:
+            sdlStretcher = sdlStretcher8[sizeMultiplier];
+            break;
         case 16:
             sdlStretcher = sdlStretcher16[sizeMultiplier];
             break;
@@ -493,6 +547,7 @@ void sdlStretch4x(uint8_t* srcPtr,
 struct FilterDesc {
     char name[30];
     int enlargeFactor;
+    FilterFunc func8;
     FilterFunc func16;
     FilterFunc func24;
     FilterFunc func32;
@@ -533,6 +588,9 @@ FilterFunc initFilter(const int f, const int colorDepth, const int srcWidth) {
     FilterFunc func;
 
     switch (colorDepth) {
+        case 8:
+            func = Filters[f].func8;
+            break;
         case 15:
         case 16:
             func = Filters[f].func16;
@@ -585,6 +643,7 @@ FilterFunc initFilter(const int f, const int colorDepth, const int srcWidth) {
 
 struct IFBFilterDesc {
     char name[30];
+    IFBFilterFunc func8;
     IFBFilterFunc func16;
     IFBFilterFunc func32;
 };
@@ -597,6 +656,9 @@ IFBFilterFunc initIFBFilter(const int f, const int colorDepth) {
     IFBFilterFunc func;
 
     switch (colorDepth) {
+        case 8:
+            func = IFBFilters[f].func8;
+            break;
         case 15:
         case 16:
             func = IFBFilters[f].func16;

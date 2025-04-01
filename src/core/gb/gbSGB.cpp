@@ -54,6 +54,11 @@ inline void gbSgbDraw16Bit(uint16_t* p, uint16_t v)
     *p = systemColorMap16[v];
 }
 
+inline void gbSgbDraw8Bit(uint8_t* p, uint16_t v)
+{
+    *p = systemColorMap8[v];
+}
+
 void gbSgbReset()
 {
     gbSgbPacketTimeout = 0;
@@ -112,6 +117,18 @@ void gbSgbShutdown()
 void gbSgbFillScreen(uint16_t color)
 {
     switch (systemColorDepth) {
+    case 8: {
+        for (int y = 0; y < 144; y++) {
+#ifdef __LIBRETRO__
+            int yLine = (y + gbBorderRowSkip) * gbBorderLineSkip + gbBorderColumnSkip;
+#else
+            int yLine = (y + gbBorderRowSkip + 1) * (gbBorderLineSkip + 2) + gbBorderColumnSkip;
+#endif
+            uint8_t* dest = (uint8_t*)g_pix + yLine;
+            for (int x = 0; x < 160; x++)
+                gbSgbDraw8Bit(dest++, color);
+        }
+    } break;
     case 16: {
         for (int y = 0; y < 144; y++) {
 #ifdef __LIBRETRO__
