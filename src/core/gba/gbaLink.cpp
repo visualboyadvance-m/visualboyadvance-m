@@ -41,17 +41,22 @@
 #define snprintf _snprintf
 #endif
 
+#ifdef UPDATE_REG
+#undef UPDATE_REG
+#endif
 #define UPDATE_REG(address, value) WRITE16LE(((uint16_t*)&g_ioMem[address]), value)
 
 static int vbaid = 0;
 const char* MakeInstanceFilename(const char* Input)
 {
-    if (vbaid == 0)
+    if (vbaid == 0) {
         return Input;
+    }
 
     static char* result = NULL;
-    if (result != NULL)
+    if (result != NULL) {
         free(result);
+    }
 
     result = (char*)malloc(strlen(Input) + 3);
     char* p = strrchr((char*)Input, '.');
@@ -270,7 +275,7 @@ class RFUServer {
 
 public:
     sf::TcpSocket tcpsocket[5];
-    sf::IpAddress udpaddr[5];
+    sf::IpAddress udpaddr[5] = { sf::IpAddress{0}, sf::IpAddress{0}, sf::IpAddress{0}, sf::IpAddress{0}, sf::IpAddress{0} };
     RFUServer(void);
     sf::Packet& Serialize(sf::Packet& packet, int slave);
     void DeSerialize(sf::Packet& packet, int slave);
@@ -283,7 +288,7 @@ class RFUClient {
     int numbytes;
 
 public:
-    sf::IpAddress serveraddr;
+    sf::IpAddress serveraddr{0};
     unsigned short serverport;
     bool transferring;
     RFUClient(void);
@@ -392,7 +397,7 @@ enum {
 typedef struct {
     sf::TcpSocket tcpsocket;
     sf::TcpListener tcplistener;
-    int numslaves;
+    uint16_t numslaves;
     int connectedSlaves;
     int type;
     bool server;
@@ -412,7 +417,7 @@ class CableServer {
 
 public:
     sf::TcpSocket tcpsocket[4];
-    sf::IpAddress udpaddr[4];
+    sf::IpAddress udpaddr[4] = { sf::IpAddress{0}, sf::IpAddress{0}, sf::IpAddress{0}, sf::IpAddress{0} };
     CableServer(void);
     void Send(void);
     void Recv(void);
@@ -430,7 +435,7 @@ class CableClient {
     int numbytes;
 
 public:
-    sf::IpAddress serveraddr;
+    sf::IpAddress serveraddr{0};
     unsigned short serverport;
     bool transferring;
     CableClient(void);
@@ -520,33 +525,47 @@ LinkMode GetLinkMode()
         return LINK_DISCONNECTED;
 }
 
-void GetLinkServerHost(char* const host, size_t size)
+bool GetLinkServerHost(char* const host, size_t size)
 {
-    if (host == NULL || size == 0)
-        return;
+    if (host == NULL || size == 0) {
+        return false;
+    }
 
     host[0] = '\0';
 
-    if (linkDriver && linkDriver->mode == LINK_GAMECUBE_DOLPHIN)
+    if (linkDriver && linkDriver->mode == LINK_GAMECUBE_DOLPHIN) {
         strncpy(host, joybusHostAddr.toString().c_str(), size);
-    else if (lanlink.server) {
-        if (IP_LINK_BIND_ADDRESS == "*")
-            strncpy(host, sf::IpAddress::getLocalAddress().toString().c_str(), size);
-        else
+    } else if (lanlink.server) {
+        if (IP_LINK_BIND_ADDRESS == "*") {
+            if (sf::IpAddress::getLocalAddress()) {
+                strncpy(host, sf::IpAddress::getLocalAddress().value().toString().c_str(), size);
+            } else {
+                return false;
+            }
+        } else {
             strncpy(host, IP_LINK_BIND_ADDRESS.c_str(), size);
+        }
     }
-    else
+    else {
         strncpy(host, lc.serveraddr.toString().c_str(), size);
+    }
+
+    return true;
 }
 
 bool SetLinkServerHost(const char* host)
 {
-    sf::IpAddress addr = sf::IpAddress(host);
+    sf::IpAddress addr{0};
 
+    auto resolved = sf::IpAddress::resolve(host);
+    if (!resolved) {
+        return false;
+    }
+    addr = resolved.value();
     lc.serveraddr = addr;
     joybusHostAddr = addr;
 
-    return addr != sf::IpAddress::None;
+    return true;
 }
 
 int GetLinkPlayerId()
@@ -1044,11 +1063,13 @@ static ConnectionState InitSocket()
 {
     linkid = 0;
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++) {
         cable_data[i] = 0xffff;
+    }
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++) {
         cable_gb_data[i] = 0xff;
+    }
 
     if (lanlink.server) {
         lanlink.connectedSlaves = 0;
@@ -1057,26 +1078,33 @@ static ConnectionState InitSocket()
 
         // too bad Listen() doesn't take an address as well
         // then again, old code used INADDR_ANY anyway
-        sf::IpAddress bind_ip = IP_LINK_BIND_ADDRESS == "*" ? sf::IpAddress::Any : IP_LINK_BIND_ADDRESS;
+        sf::IpAddress bind_ip{0};
 
-        if (lanlink.tcplistener.listen(IP_LINK_PORT, bind_ip) == sf::Socket::Error)
+        if (IP_LINK_BIND_ADDRESS != "*") {
+            auto resolved = sf::IpAddress::resolve(IP_LINK_BIND_ADDRESS);
+            if (resolved) {
+                bind_ip = resolved.value();
+            } else {
+                return LINK_ERROR;
+            }
+        }
+
+        if (lanlink.tcplistener.listen(IP_LINK_PORT, bind_ip) == sf::Socket::Status::Error) {
             // Note: old code closed socket & retried once on bind failure
             return LINK_ERROR; // FIXME: error code?
-        else
+        } else {
             return LINK_NEEDS_UPDATE;
+        }
     } else {
         lc.serverport = IP_LINK_PORT;
 
-        if (lc.serveraddr == sf::IpAddress::None) {
+        lanlink.tcpsocket.setBlocking(false);
+        sf::Socket::Status status = lanlink.tcpsocket.connect(lc.serveraddr, lc.serverport);
+
+        if (status == sf::Socket::Status::Error || status == sf::Socket::Status::Disconnected) {
             return LINK_ERROR;
         } else {
-            lanlink.tcpsocket.setBlocking(false);
-            sf::Socket::Status status = lanlink.tcpsocket.connect(lc.serveraddr, lc.serverport);
-
-            if (status == sf::Socket::Error || status == sf::Socket::Disconnected)
-                return LINK_ERROR;
-            else
-                return LINK_NEEDS_UPDATE;
+            return LINK_NEEDS_UPDATE;
         }
     }
 }
@@ -1090,11 +1118,11 @@ static ConnectionState ConnectUpdateSocket(char* const message, size_t size)
         fdset.add(lanlink.tcplistener);
 
         if (fdset.wait(sf::milliseconds(150))) {
-            int nextSlave = lanlink.connectedSlaves + 1;
+            uint16_t nextSlave = lanlink.connectedSlaves + 1;
 
             sf::Socket::Status st = lanlink.tcplistener.accept(ls.tcpsocket[nextSlave]);
 
-            if (st == sf::Socket::Error) {
+            if (st == sf::Socket::Status::Error) {
                 for (int j = 1; j < nextSlave; j++)
                     ls.tcpsocket[j].disconnect();
 
@@ -1102,8 +1130,7 @@ static ConnectionState ConnectUpdateSocket(char* const message, size_t size)
                 newState = LINK_ERROR;
             } else {
                 sf::Packet packet;
-                packet << static_cast<sf::Uint16>(nextSlave)
-                       << static_cast<sf::Uint16>(lanlink.numslaves);
+                packet << nextSlave << lanlink.numslaves;
 
                 ls.tcpsocket[nextSlave].send(packet);
 
@@ -1129,13 +1156,13 @@ static ConnectionState ConnectUpdateSocket(char* const message, size_t size)
         sf::Packet packet;
         sf::Socket::Status status = lanlink.tcpsocket.receive(packet);
 
-        if (status == sf::Socket::Error || status == sf::Socket::Disconnected) {
+        if (status == sf::Socket::Status::Error || status == sf::Socket::Status::Disconnected) {
             snprintf(message, size, N_("Network error."));
             newState = LINK_ERROR;
-        } else if (status == sf::Socket::Done) {
+        } else if (status == sf::Socket::Status::Done) {
 
             if (linkid == 0) {
-                sf::Uint16 receivedId, receivedSlaves;
+                uint16_t receivedId, receivedSlaves;
                 packet >> receivedId >> receivedSlaves;
 
                 if (packet) {
@@ -1540,7 +1567,7 @@ void RFUServer::Recv(void)
             sf::Packet packet;
             tcpsocket[i + 1].setBlocking(false);
             sf::Socket::Status status = tcpsocket[i + 1].receive(packet);
-            if (status == sf::Socket::Disconnected) {
+            if (status == sf::Socket::Status::Disconnected) {
                 char message[30];
                 sprintf(message, _("Player %d disconnected."), i + 1);
                 systemScreenMessage(message);
@@ -1650,7 +1677,7 @@ void RFUClient::Recv(void)
     }
     sf::Packet packet;
     sf::Socket::Status status = lanlink.tcpsocket.receive(packet);
-    if (status == sf::Socket::Disconnected) {
+    if (status == sf::Socket::Status::Disconnected) {
         systemScreenMessage(_("Server disconnected."));
         CloseLink();
         return;
@@ -1671,7 +1698,7 @@ static ConnectionState ConnectUpdateRFUSocket(char* const message, size_t size)
 
             sf::Socket::Status st = lanlink.tcplistener.accept(rfu_server.tcpsocket[nextSlave]);
 
-            if (st == sf::Socket::Error) {
+            if (st == sf::Socket::Status::Error) {
                 for (int j = 1; j < nextSlave; j++)
                     rfu_server.tcpsocket[j].disconnect();
 
@@ -1679,8 +1706,7 @@ static ConnectionState ConnectUpdateRFUSocket(char* const message, size_t size)
                 newState = LINK_ERROR;
             } else {
                 sf::Packet packet;
-                packet << static_cast<sf::Uint16>(nextSlave)
-                       << static_cast<sf::Uint16>(lanlink.numslaves);
+                packet << nextSlave << lanlink.numslaves;
 
                 rfu_server.tcpsocket[nextSlave].send(packet);
 
@@ -1707,13 +1733,13 @@ static ConnectionState ConnectUpdateRFUSocket(char* const message, size_t size)
         lanlink.tcpsocket.setBlocking(false);
         sf::Socket::Status status = lanlink.tcpsocket.receive(packet);
 
-        if (status == sf::Socket::Error || status == sf::Socket::Disconnected) {
+        if (status == sf::Socket::Status::Error || status == sf::Socket::Status::Disconnected) {
             snprintf(message, size, N_("Network error."));
             newState = LINK_ERROR;
-        } else if (status == sf::Socket::Done) {
+        } else if (status == sf::Socket::Status::Done) {
 
             if (linkid == 0) {
-                sf::Uint16 receivedId, receivedSlaves;
+                uint16_t receivedId, receivedSlaves;
                 packet >> receivedId >> receivedSlaves;
 
                 if (packet) {

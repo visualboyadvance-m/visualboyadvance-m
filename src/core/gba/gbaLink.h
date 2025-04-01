@@ -86,8 +86,9 @@ extern bool SetLinkServerHost(const char* host);
  * If in lan client mode, returns the IP adress of the host to connect to
  * If in gamecube mode, returns the IP adress of the dolphin host
  *
+ * @return false on error
  */
-extern void GetLinkServerHost(char* const host, size_t size);
+extern bool GetLinkServerHost(char* const host, size_t size);
 
 /**
  * Set the value in milliseconds of the timeout after which a connection is
