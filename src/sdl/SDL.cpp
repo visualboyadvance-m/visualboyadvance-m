@@ -997,8 +997,8 @@ void sdlInitVideo()
 #else
         if (openGL)
         {
-            systemColorDepth = 24;
-            srcPitch = sizeX * (systemColorDepth >> 3);
+            systemColorDepth = 16;
+            srcPitch = sizeX * (systemColorDepth >> 3) + 4;
         } else {
             systemColorDepth = 32;
             srcPitch = sizeX * (systemColorDepth >> 3) + 4;
