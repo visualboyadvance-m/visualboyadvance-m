@@ -537,8 +537,9 @@ bool GetLinkServerHost(char* const host, size_t size)
         strncpy(host, joybusHostAddr.toString().c_str(), size);
     } else if (lanlink.server) {
         if (IP_LINK_BIND_ADDRESS == "*") {
-            if (sf::IpAddress::getLocalAddress()) {
-                strncpy(host, sf::IpAddress::getLocalAddress().value().toString().c_str(), size);
+            auto local_addr = sf::IpAddress::getLocalAddress();
+            if (local_addr) {
+                strncpy(host, local_addr.value().toString().c_str(), size);
             } else {
                 return false;
             }
