@@ -975,11 +975,11 @@ void sdlInitVideo()
 		renderer = SDL_CreateRenderer(window, -1, 0);
 	}
 
-	SDL_RenderSetLogicalSize(renderer, window_width, window_height);
-	SDL_RenderGetLogicalSize(renderer, &render_width, &render_height);
+    SDL_RenderSetLogicalSize(renderer, screenWidth, screenHeight);
+    SDL_RenderGetLogicalSize(renderer, &render_width, &render_height);
 
-	makes_sense = (SDL_bool)(window_width >= render_width && window_height >= render_height);
-	SDL_RenderSetIntegerScale(renderer, makes_sense);
+    makes_sense = (SDL_bool)(screenWidth >= render_width && screenHeight >= render_height);
+    SDL_RenderSetIntegerScale(renderer, makes_sense);
 #else
     window = SDL_CreateWindow("VBA-M", screenWidth, screenHeight, flags);
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
