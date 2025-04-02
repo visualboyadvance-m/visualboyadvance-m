@@ -40,9 +40,15 @@ if(ENABLE_LIRC)
     set(LIRC_CLIENT_LIBRARY lirc_client)
 endif()
 
+if(ENABLE_SDL3)
 target_include_directories(vbam
     PRIVATE ${SDL3_INCLUDE_DIRS}
 )
+else()
+target_include_directories(vbam
+    PRIVATE ${SDL2_INCLUDE_DIRS}
+)
+endif()
 
 target_link_libraries(vbam
     vbam-core
@@ -52,11 +58,15 @@ target_link_libraries(vbam
     vbam-components-filters-interframe
     vbam-components-user-config
     ${OPENGL_LIBRARIES}
-    ${VBAM_SDL3_LIBS}
+    ${VBAM_SDL_LIBS}
 )
 
 if(WIN32)
+if(ENABLE_SDL3)
     target_link_libraries(vbam ${SDL3_LIBRARY})
+else()
+    target_link_libraries(vbam ${SDL2_LIBRARY} ${SDL2MAIN_LIBRARY})
+endif()
 endif()
 
 if(ENABLE_LIRC)

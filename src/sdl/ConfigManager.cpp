@@ -170,7 +170,7 @@ struct option argOptions[] = {
 	{ "capture-format", required_argument, 0, OPT_CAPTURE_FORMAT },
 	{ "cheat", required_argument, 0, OPT_CHEAT },
 	{ "cheats-enabled", no_argument, &coreOptions.cheatsEnabled, 1 },
-    { "color-depth", required_argument, 0, 'z'},
+	{ "color-depth", required_argument, 0, 'z'},
 	{ "color-option", no_argument, 0, OPT_GB_COLOR_OPTION },
 	{ "config", required_argument, 0, 'c' },
 	{ "cpu-disable-sfx", no_argument, &coreOptions.cpuDisableSfx, 1 },

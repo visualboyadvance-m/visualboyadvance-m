@@ -20,7 +20,11 @@
 
 #include <cstdint>
 
+#ifndef ENABLE_SDL3
+#include <SDL.h>
+#else
 #include <SDL3/SDL.h>
+#endif
 
 enum EKey {
     KEY_LEFT,

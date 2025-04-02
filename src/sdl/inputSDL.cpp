@@ -63,11 +63,23 @@ static uint32_t joypad[5][SDLBUTTONS_NUM] = {
     {
         SDLK_LEFT, SDLK_RIGHT,
         SDLK_UP, SDLK_DOWN,
-        SDLK_Z, SDLK_X,
+#ifdef ENABLE_SDL3
+		SDLK_Z, SDLK_X,
+#else
+		SDLK_z, SDLK_x,
+#endif
         SDLK_RETURN, SDLK_BACKSPACE,
-        SDLK_A, SDLK_S,
+#ifdef ENABLE_SDL3
+		SDLK_A, SDLK_S,
+#else
+		SDLK_a, SDLK_s,
+#endif
         SDLK_SPACE, SDLK_F12,
-        SDLK_Q, SDLK_W,
+#ifdef ENABLE_SDL3
+		SDLK_Q, SDLK_W,
+#else
+		SDLK_q, SDLK_w,
+#endif
     }
 };
 
@@ -106,18 +118,37 @@ static uint32_t sdlGetAxisCode(const SDL_Event& event)
 uint32_t inputGetEventCode(const SDL_Event& event)
 {
     switch (event.type) {
-    case SDL_EVENT_KEY_DOWN:
-    case SDL_EVENT_KEY_UP:
-        return event.key.key;
+#ifdef ENABLE_SDL3
+	case SDL_EVENT_KEY_DOWN:
+	case SDL_EVENT_KEY_UP:
+		return event.key.key;
+#else
+	case SDL_KEYDOWN:
+	case SDL_KEYUP:
+		return event.key.keysym.sym;
+#endif
         break;
+#ifdef ENABLE_SDL3
     case SDL_EVENT_JOYSTICK_HAT_MOTION:
+#else
+	case SDL_JOYHATMOTION:
+#endif
         return sdlGetHatCode(event);
         break;
-    case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
-    case SDL_EVENT_JOYSTICK_BUTTON_UP:
+#ifdef ENABLE_SDL3
+	case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
+	case SDL_EVENT_JOYSTICK_BUTTON_UP:
+#else
+	case SDL_JOYBUTTONDOWN:
+	case SDL_JOYBUTTONUP:
+#endif
         return sdlGetButtonCode(event);
         break;
-    case SDL_EVENT_JOYSTICK_AXIS_MOTION:
+#ifdef ENABLE_SDL3
+	case SDL_EVENT_JOYSTICK_AXIS_MOTION:
+#else
+	case SDL_JOYAXISMOTION:
+#endif
         return sdlGetAxisCode(event);
         break;
     default:
@@ -348,18 +379,30 @@ static bool sdlCheckJoyKey(int key)
         // joystick button
         int button = what - 128;
 
+#ifdef ENABLE_SDL3
         if (button >= SDL_GetNumJoystickButtons(sdlDevices[dev]))
+#else
+		if (button >= SDL_JoystickNumButtons(sdlDevices[dev]))
+#endif
             return false;
     } else if (what < 0x20) {
         // joystick axis
         what >>= 1;
+#ifdef ENABLE_SDL3
         if (what >= SDL_GetNumJoystickAxes(sdlDevices[dev]))
+#else
+		if (what >= SDL_JoystickNumAxes(sdlDevices[dev]))
+#endif
             return false;
     } else if (what < 0x30) {
         // joystick hat
         what = (what & 15);
         what >>= 2;
-        if (what >= SDL_GetNumJoystickHats(sdlDevices[dev]))
+#ifdef ENABLE_SDL3
+		if (what >= SDL_GetNumJoystickHats(sdlDevices[dev]))
+#else
+		if (what >= SDL_JoystickNumHats(sdlDevices[dev]))
+#endif
             return false;
     }
 
@@ -369,7 +412,9 @@ static bool sdlCheckJoyKey(int key)
 
 void inputInitJoysticks()
 {
+#ifdef ENABLE_SDL3
     SDL_JoystickID *joysticks = SDL_GetJoysticks(&sdlNumDevices);
+#endif
     bool usesJoy = false;
 
     // The main joypad has to be entirely defined
@@ -393,7 +438,11 @@ void inputInitJoysticks()
                 if (sdlDevices) {
                     if (dev < sdlNumDevices) {
                         if (sdlDevices[dev] == NULL) {
+#ifndef ENABLE_SDL3
+                            sdlDevices[dev] = SDL_JoystickOpen(dev);
+#else
                             sdlDevices[dev] = SDL_OpenJoystick(joysticks[dev]);
+#endif
                         }
 
                         ok = sdlCheckJoyKey(joypad[j][i]);
@@ -419,7 +468,11 @@ void inputInitJoysticks()
             if (sdlDevices) {
                 if (dev < sdlNumDevices) {
                     if (sdlDevices[dev] == NULL) {
+#ifndef ENABLE_SDL3
+                        sdlDevices[dev] = SDL_JoystickOpen(dev);
+#else
                         sdlDevices[dev] = SDL_OpenJoystick(joysticks[dev]);
+#endif
                     }
 
                     ok = sdlCheckJoyKey(motion[i]);
@@ -436,7 +489,11 @@ void inputInitJoysticks()
 
     if (usesJoy)
     {
+#ifdef ENABLE_SDL3
         SDL_SetJoystickEventsEnabled(true);
+#else
+        SDL_JoystickEventState(SDL_ENABLE);
+#endif
     }
 }
 
@@ -445,26 +502,54 @@ void inputProcessSDLEvent(const SDL_Event& event)
     //	fprintf(stdout, "%x\n", inputGetEventCode(event));
 
     switch (event.type) {
-    case SDL_EVENT_KEY_DOWN:
-        if (!event.key.mod)
+#ifdef ENABLE_SDL3
+	case SDL_EVENT_KEY_DOWN:
+		if (!event.key.mod)
             sdlUpdateKey(event.key.key, true);
+#else
+	case SDL_KEYDOWN:
+		if (!event.key.keysym.mod)
+            sdlUpdateKey(event.key.keysym.sym, true);
+#endif
         break;
+#ifdef ENABLE_SDL3
     case SDL_EVENT_KEY_UP:
         if (!event.key.mod)
-            sdlUpdateKey(event.key.key, false);
+			sdlUpdateKey(event.key.key, false);
+#else
+	case SDL_KEYUP:
+		if (!event.key.keysym.mod)
+			sdlUpdateKey(event.key.keysym.sym, true);
+#endif
         break;
+#ifdef ENABLE_SDL3
     case SDL_EVENT_JOYSTICK_HAT_MOTION:
+#else
+	case SDL_JOYHATMOTION:
+#endif
         sdlUpdateJoyHat(event.jhat.which,
             event.jhat.hat,
             event.jhat.value);
         break;
+#ifdef ENABLE_SDL3
     case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
     case SDL_EVENT_JOYSTICK_BUTTON_UP:
-        sdlUpdateJoyButton(event.jbutton.which,
-            event.jbutton.button,
-            event.jbutton.down == true);
+		sdlUpdateJoyButton(event.jbutton.which,
+			event.jbutton.button,
+			event.jbutton.down == true);
+#else
+	case SDL_JOYBUTTONDOWN:
+	case SDL_JOYBUTTONUP:
+            sdlUpdateJoyButton(event.jbutton.which,
+                event.jbutton.button,
+                event.jbutton.state == SDL_PRESSED);
+#endif
         break;
+#ifdef ENABLE_SDL3
     case SDL_EVENT_JOYSTICK_AXIS_MOTION:
+#else
+	case SDL_JOYAXISMOTION:
+#endif
         sdlUpdateJoyAxis(event.jaxis.which,
             event.jaxis.axis,
             event.jaxis.value);
