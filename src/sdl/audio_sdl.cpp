@@ -138,9 +138,9 @@ void SoundSDL::write(uint16_t * finalWave, int length) {
 
 	if (should_wait())
 #ifndef ENABLE_SDL3
-        SDL_SemWait(data_read);
+		SDL_SemWait(data_read);
 #else
-	SDL_WaitSemaphore(data_read);
+		SDL_WaitSemaphore(data_read);
 #endif
 	else
 	    // Drop the remainder of the audio data
