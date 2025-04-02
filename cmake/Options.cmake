@@ -22,7 +22,7 @@ option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build w
 
 if(ENABLE_SDL3)
    set(CMAKE_C_FLAGS "-DENABLE_SDL3 ${CMAKE_C_FLAGS}")
-   set(CMAKE_CXX_FLAGS "-DENABLE_SDL3 ${CMAKE_C_FLAGS}")
+   set(CMAKE_CXX_FLAGS "-DENABLE_SDL3 ${CMAKE_CXX_FLAGS}")
 endif()
 
 # Static linking
