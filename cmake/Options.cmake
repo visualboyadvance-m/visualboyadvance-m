@@ -15,6 +15,7 @@ if(WIN32 OR APPLE)
 endif()
 
 option(ENABLE_SDL3 "Use SDL3" OFF)
+option(DISABLE_OPENGL "Disable OpenGL" OFF)
 option(ENABLE_SDL "Build the SDL port" ${ENABLE_SDL_DEFAULT})
 option(ENABLE_WX "Build the wxWidgets port" ${BUILD_DEFAULT})
 option(ENABLE_DEBUGGER "Enable the debugger" ON)
@@ -23,6 +24,11 @@ option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build w
 if(ENABLE_SDL3)
    set(CMAKE_C_FLAGS "-DENABLE_SDL3 ${CMAKE_C_FLAGS}")
    set(CMAKE_CXX_FLAGS "-DENABLE_SDL3 ${CMAKE_CXX_FLAGS}")
+endif()
+
+if(DISABLE_OPENGL)
+   set(CMAKE_C_FLAGS "-DNO_OPENGL ${CMAKE_C_FLAGS}")
+   set(CMAKE_CXX_FLAGS "-DNO_OPENGL ${CMAKE_CXX_FLAGS}")
 endif()
 
 # Static linking
@@ -78,7 +84,7 @@ find_package(PkgConfig)
 if(TRANSLATIONS_ONLY)
     set(ENABLE_LINK_DEFAULT OFF)
 else()
-    find_package(SFML 3.0 COMPONENTS network system)
+    find_package(SFML)
     set(ENABLE_LINK_DEFAULT OFF)
     if(SFML_FOUND)
         set(ENABLE_LINK_DEFAULT ON)
