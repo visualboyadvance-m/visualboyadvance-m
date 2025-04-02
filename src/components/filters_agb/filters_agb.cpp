@@ -323,9 +323,9 @@ void UpdateSystemColorMaps(int lcd)
   case 8:
    {
      for(int i = 0; i < 0x10000; i++) {
-       systemColorMap16[i] = ((i & 0x1f) << systemRedShift) |
-         (((i & 0x3e0) >> 5) << systemGreenShift) |
-         (((i & 0x7c00) >> 10) << systemBlueShift);
+       systemColorMap16[i] = (((i & 0x1f) << systemRedShift) & 0xE0) |
+         ((((i & 0x3e0) >> 5) << systemGreenShift) & 0x1C) |
+         ((((i & 0x7c00) >> 10) << systemBlueShift) & 0x3);
       }
       if (lcd == 1) gbafilter_pal8(systemColorMap8, 0x10000);
     }
