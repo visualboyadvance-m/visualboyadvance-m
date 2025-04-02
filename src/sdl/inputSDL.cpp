@@ -414,6 +414,8 @@ void inputInitJoysticks()
 {
 #ifdef ENABLE_SDL3
     SDL_JoystickID *joysticks = SDL_GetJoysticks(&sdlNumDevices);
+#else
+    sdlNumDevices = SDL_NumJoysticks();
 #endif
     bool usesJoy = false;
 
