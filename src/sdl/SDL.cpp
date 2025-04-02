@@ -89,6 +89,10 @@
 
 #include <SDL3/SDL.h>
 
+#ifndef CONFIG_IDF_TARGET
+#include <SDL3/SDL_main.h>
+#endif
+
 #if defined(VBAM_ENABLE_LIRC)
 #include <lirc/lirc_client.h>
 #include <sys/poll.h>
