@@ -62,9 +62,9 @@ private:
         SDL_Semaphore* data_available;
         SDL_Semaphore* data_read;
 #else
-		SDL_mutex* mutex;
-		SDL_semaphore* data_available;
-		SDL_semaphore* data_read;
+        SDL_mutex* mutex;
+        SDL_semaphore* data_available;
+        SDL_semaphore* data_read;
 #endif
 
         SDL_AudioSpec audio_spec;
