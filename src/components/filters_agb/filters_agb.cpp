@@ -198,11 +198,11 @@ void gbafilter_pal8(uint8_t* buf, int count)
         if (green > 31)
             green = 31;
 
-        pix = red << systemRedShift;
-        pix += green << systemGreenShift;
-        pix += blue << systemBlueShift;
+        pix = (red & 0x7) << systemRedShift;
+        pix += (green & 0x7) << systemGreenShift;
+        pix += (blue & 0x3) << systemBlueShift;
 
-        *buf++ = pix;
+        *buf++ = (uint8_t)(pix & 0xff);
     }
 }
 
