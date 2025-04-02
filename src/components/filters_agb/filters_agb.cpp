@@ -141,17 +141,17 @@ void gbafilter_pal8(uint8_t* buf, int count)
     while (count--) {
         pix = *buf;
 
-        s = curve[(pix >> systemGreenShift) & 0x1f];
+        s = curve[(pix >> systemGreenShift) & 0x7];
         temp[3] = s * influence[3];
         temp[4] = s * influence[4];
         temp[5] = s * influence[5];
 
-        s = curve[(pix >> systemRedShift) & 0x1f];
+        s = curve[(pix >> systemRedShift) & 0x7];
         temp[0] = s * influence[0];
         temp[1] = s * influence[1];
         temp[2] = s * influence[2];
 
-        s = curve[(pix >> systemBlueShift) & 0x1f];
+        s = curve[(pix >> systemBlueShift) & 0x3];
         temp[6] = s * influence[6];
         temp[7] = s * influence[7];
         temp[8] = s * influence[8];
