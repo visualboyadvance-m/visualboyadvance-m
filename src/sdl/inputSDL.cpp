@@ -521,7 +521,7 @@ void inputProcessSDLEvent(const SDL_Event& event)
 #else
     case SDL_KEYUP:
         if (!event.key.keysym.mod)
-            sdlUpdateKey(event.key.keysym.sym, true);
+            sdlUpdateKey(event.key.keysym.sym, false);
 #endif
         break;
 #ifdef ENABLE_SDL3
