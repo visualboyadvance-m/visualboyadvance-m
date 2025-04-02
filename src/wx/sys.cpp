@@ -4,7 +4,12 @@
 #include <wx/generic/prntdlgg.h>
 #include <wx/print.h>
 #include <wx/printdlg.h>
+
+#ifdef ENABLE_SDL3
 #include <SDL3/SDL.h>
+#else
+#include <SDL.h>
+#endif
 
 #include "core/base/image_util.h"
 #include "core/gb/gbGlobals.h"
