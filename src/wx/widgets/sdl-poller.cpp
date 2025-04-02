@@ -112,9 +112,9 @@ private:
 
     // The SDL GameController instance.
 #ifndef ENABLE_SDL3
-	SDL_GameController* game_controller_ = nullptr;
+    SDL_GameController* game_controller_ = nullptr;
 #else
-	SDL_Gamepad* game_controller_ = nullptr;
+    SDL_Gamepad* game_controller_ = nullptr;
 #endif
 
     // The SDL Joystick instance.
@@ -422,11 +422,11 @@ void SdlPoller::Notify() {
 #else
             case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
             case SDL_EVENT_GAMEPAD_BUTTON_UP:
-				joy_state = FindJoyState(sdl_event.gbutton.which);
-				if (joy_state) {
-					event_data = joy_state->ProcessButtonEvent(sdl_event.gbutton.button,
+                joy_state = FindJoyState(sdl_event.gbutton.which);
+                if (joy_state) {
+                    event_data = joy_state->ProcessButtonEvent(sdl_event.gbutton.button,
                                                                sdl_event.gbutton.down);
-				}
+                }
 #endif
                 break;
 
@@ -487,7 +487,7 @@ void SdlPoller::Notify() {
                 if (joy_state && !joy_state->is_game_controller()) {
                     event_data = joy_state->ProcessAxisEvent(
 #ifndef ENABLE_SDL3
-						sdl_event.caxis.axis, AxisValueToStatus(sdl_event.caxis.value));
+                        sdl_event.caxis.axis, AxisValueToStatus(sdl_event.caxis.value));
 #else
                         sdl_event.jaxis.axis, AxisValueToStatus(sdl_event.jaxis.value));
 #endif
