@@ -81,7 +81,7 @@ void SoundSDL::read(uint16_t* stream, int length) {
     if (!buffer_size()) {
         if (should_wait())
 #ifndef ENABLE_SDL3
-			SDL_SemWait(data_available);
+            SDL_SemWait(data_available);
 #else
             SDL_WaitSemaphore(data_available);
 #endif
@@ -96,7 +96,7 @@ void SoundSDL::read(uint16_t* stream, int length) {
     SDL_UnlockMutex(mutex);
 
 #ifndef ENABLE_SDL3
-	SDL_SemPost(data_read);
+    SDL_SemPost(data_read);
 #else
     SDL_SignalSemaphore(data_read);
 #endif
@@ -109,7 +109,7 @@ void SoundSDL::write(uint16_t * finalWave, int length) {
     SDL_LockMutex(mutex);
 
 #ifndef ENABLE_SDL3
-	if (SDL_GetAudioDeviceStatus(sound_device) != SDL_AUDIO_PLAYING)
+    if (SDL_GetAudioDeviceStatus(sound_device) != SDL_AUDIO_PLAYING)
 	SDL_PauseAudioDevice(sound_device, 0);
 #else
     if (SDL_AudioDevicePaused(sound_device) == true)
@@ -140,7 +140,7 @@ void SoundSDL::write(uint16_t * finalWave, int length) {
 #ifndef ENABLE_SDL3
         SDL_SemWait(data_read);
 #else
-	    SDL_WaitSemaphore(data_read);
+	SDL_WaitSemaphore(data_read);
 #endif
 	else
 	    // Drop the remainder of the audio data
@@ -165,7 +165,7 @@ bool SoundSDL::init(long sampleRate) {
     audio.freq     = current_rate ? static_cast<int>(sampleRate * (current_rate / 100.0)) : sampleRate;
 
 #ifndef ENABLE_SDL3
-	audio.format   = AUDIO_S16SYS;
+    audio.format   = AUDIO_S16SYS;
 #else
     audio.format   = SDL_AUDIO_S16;
 #endif
@@ -177,7 +177,7 @@ bool SoundSDL::init(long sampleRate) {
     audio.callback = soundCallback;
     audio.userdata = this;
 
-	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
+    if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
 #else
     if (SDL_InitSubSystem(SDL_INIT_AUDIO) == false)
 #endif
@@ -242,8 +242,8 @@ void SoundSDL::deinit() {
     int is_emulating = emulating;
     emulating = 0;
 #ifndef ENABLE_SDL3
-	SDL_SemPost(data_available);
-	SDL_SemPost(data_read);
+    SDL_SemPost(data_available);
+    SDL_SemPost(data_read);
 #else
     SDL_SignalSemaphore(data_available);
     SDL_SignalSemaphore(data_read);

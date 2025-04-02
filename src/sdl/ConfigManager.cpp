@@ -748,21 +748,21 @@ int ReadOpts(int argc, char ** argv)
 		case 'F':
 			fullScreen = 1;
 			break;
-        case 'z':
-            if (optarg != NULL) {
-                userColorDepth = atoi(optarg);
+		case 'z':
+			if (optarg != NULL) {
+				userColorDepth = atoi(optarg);
 
-                if ((userColorDepth != 8) && (userColorDepth != 16) && (userColorDepth != 24) && (userColorDepth != 32))
-                {
-                    fprintf(stderr, "Wrong color depth (%d bit)\n", userColorDepth);
-                    userColorDepth = 0;
-                } else {
-                    log("Set color depth to %d bit\n", userColorDepth);
-                }
-            } else {
-                userColorDepth = 0;
-            }
-            break;
+				if ((userColorDepth != 8) && (userColorDepth != 16) && (userColorDepth != 24) && (userColorDepth != 32))
+				{
+					fprintf(stderr, "Wrong color depth (%d bit)\n", userColorDepth);
+					userColorDepth = 0;
+				} else {
+					log("Set color depth to %d bit\n", userColorDepth);
+				}
+			} else {
+				userColorDepth = 0;
+			}
+			break;
 		case 'f':
 			if (optarg) {
 				filter = (Filter)atoi(optarg);

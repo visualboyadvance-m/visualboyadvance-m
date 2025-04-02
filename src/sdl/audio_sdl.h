@@ -36,7 +36,7 @@ private:
 #ifdef ENABLE_SDL3
         static void soundCallback(void* data, SDL_AudioStream *stream, int additional_length, int length);
 #else
-		static void soundCallback(void* data, uint8_t* stream, int len);
+        static void soundCallback(void* data, uint8_t* stream, int len);
 #endif
 
         bool should_wait();
