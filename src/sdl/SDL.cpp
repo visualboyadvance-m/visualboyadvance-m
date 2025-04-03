@@ -103,7 +103,7 @@
 #include <sys/poll.h>
 #endif
 
-#if CONFIG_IDF_TARGET
+#ifdef CONFIG_IDF_TARGET
 #define CONFIG_16BIT 1
 #define NO_OPENGL 1
 #endif
