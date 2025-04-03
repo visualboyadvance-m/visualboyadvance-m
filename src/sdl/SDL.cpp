@@ -968,6 +968,7 @@ void sdlInitVideo()
         SDL_DestroyWindow(window);
     if (renderer)
         SDL_DestroyRenderer(renderer);
+
 #ifndef ENABLE_SDL3
 	window = SDL_CreateWindow("VBA-M", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight, flags);
 
