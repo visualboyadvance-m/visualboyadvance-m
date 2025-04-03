@@ -8,10 +8,7 @@
 
 GBASockClient::GBASockClient(sf::IpAddress _server_addr)
 {
-    if (_server_addr == sf::IpAddress::None)
-        server_addr = sf::IpAddress::getPublicAddress();
-    else
-        server_addr = _server_addr;
+    server_addr = _server_addr;
 
     client.connect(server_addr, 0xd6ba);
     client.setBlocking(false);
@@ -44,8 +41,9 @@ void GBASockClient::Send(std::vector<char> data)
 // Returns cmd for convenience
 char GBASockClient::ReceiveCmd(char* data_in, bool block)
 {
-    if (IsDisconnected())
+    if (IsDisconnected()) {
         return data_in[0];
+    }
 
     std::size_t num_received = 0;
     if (block || clock_sync == 0) {
@@ -53,8 +51,9 @@ char GBASockClient::ReceiveCmd(char* data_in, bool block)
         Selector.add(client);
         Selector.wait(sf::seconds(6));
     }
-    if (client.receive(data_in, 5, num_received) == sf::Socket::Disconnected)
+    if (client.receive(data_in, 5, num_received) == sf::Socket::Status::Disconnected) {
         Disconnect();
+    }
 
     return data_in[0];
 }
@@ -67,13 +66,15 @@ void GBASockClient::ReceiveClock(bool block)
 
     char sync_ticks[4] = { 0, 0, 0, 0 };
     std::size_t num_received = 0;
-    if (clock_client.receive(sync_ticks, 4, num_received) == sf::Socket::Disconnected)
+    if (clock_client.receive(sync_ticks, 4, num_received) == sf::Socket::Status::Disconnected) {
         Disconnect();
+    }
 
     if (num_received == 4) {
         clock_sync_ticks = 0;
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 4; i++) {
             clock_sync_ticks |= (uint8_t)(sync_ticks[i]) << ((3 - i) * 8);
+        }
         clock_sync += clock_sync_ticks;
     }
 }
