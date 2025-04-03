@@ -20,6 +20,14 @@ bool utilWritePNGFile(const char* fileName, int w, int h, uint8_t* pix) {
     int sizeY = h;
 
     switch (systemColorDepth) {
+        case 8: {
+            uint8_t* pixU8 = (uint8_t*)pix;
+            for (int y = 0; y < sizeY; y++) {
+                for (int x = 0; x < sizeX; x++) {
+                    *b++ = *pixU8++;  // R
+                }
+            }
+        } break;
         case 16: {
             uint16_t* p = (uint16_t*)(pix + (w + 2) * 2);  // skip first black line
             for (int y = 0; y < sizeY; y++) {
