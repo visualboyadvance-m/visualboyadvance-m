@@ -31,13 +31,9 @@ void gbafilter_update_colors(bool lcd) {
         case 8: {
             for (int i = 0; i < 0x10000; i++) {
                 systemColorMap8[i] = (uint8_t)((((i & 0x1f) << systemRedShift) & 0xE0) |
-                ((((i & 0x3e0) >> 5) << systemGreenShift) & 0x1C) |
-                ((((i & 0x7c00) >> 10) << systemBlueShift) & 0x3));
+                                      ((((i & 0x3e0) >> 5) << systemGreenShift) & 0x1C) |
+                                      ((((i & 0x7c00) >> 10) << systemBlueShift) & 0x3));
             }
-#if 0
-            if (lcd)
-                gbafilter_pal8(systemColorMap8, 0x10000);
-#endif
         } break;
         case 16: {
             for (int i = 0; i < 0x10000; i++) {
@@ -134,34 +130,6 @@ void gbafilter_pal(uint16_t* buf, int count)
         *buf++ = pix;
     }
 }
-
-#if 0
-void gbafilter_pal8(uint8_t* buf, int count)
-{
-    uint8_t s;
-    uint8_t pix;
-    uint8_t red, green, blue;
-
-    while (count--) {
-        pix = *buf;
-
-        s = curve[(pix >> systemGreenShift) & 0x7];
-        green = s;
-
-        s = curve[(pix >> systemRedShift) & 0x7];
-        red = s;
-
-        s = curve[(pix >> systemBlueShift) & 0x3];
-        blue = s;
-
-        pix = (red & 0x7) << systemRedShift;
-        pix += (green & 0x7) << systemGreenShift;
-        pix += (blue & 0x3) << systemBlueShift;
-
-        *buf++ = (uint8_t)(pix & 0xff);
-    }
-}
-#endif
 
 void gbafilter_pal32(uint32_t* buf, int count)
 {
@@ -281,11 +249,10 @@ void UpdateSystemColorMaps(int lcd)
  #if 0
    {
      for(int i = 0; i < 0x10000; i++) {
-       systemColorMap16[i] = (((i & 0x1f) << systemRedShift) & 0xE0) |
+       systemColorMap8[i] = (((i & 0x1f) << systemRedShift) & 0xE0) |
          ((((i & 0x3e0) >> 5) << systemGreenShift) & 0x1C) |
          ((((i & 0x7c00) >> 10) << systemBlueShift) & 0x3);
       }
-      if (lcd == 1) gbafilter_pal8(systemColorMap8, 0x10000);
     }
  #endif
     break;
