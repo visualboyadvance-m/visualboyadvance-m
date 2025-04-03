@@ -20,6 +20,7 @@
 #include <wx/progdlg.h>
 #include <wx/protocol/http.h>
 #include <wx/regex.h>
+#include <wx/spinctrl.h>
 #include <wx/sstream.h>
 #include <wx/stdpaths.h>
 #include <wx/string.h>
@@ -1412,6 +1413,17 @@ int wxvbamApp::FilterEvent(wxEvent& event)
 
 bool wxvbamApp::ProcessEvent(wxEvent& event) {
     if (event.GetEventType() == wxEVT_KEY_DOWN) {
+        // First, figure out if the focused window can process the key down event.
+        wxWindow* focused_window = wxWindow::FindFocus();
+        wxTextCtrl* text_ctrl = wxDynamicCast(focused_window, wxTextCtrl);
+        if (text_ctrl) {
+            return wxApp::ProcessEvent(event);
+        }
+        wxSpinCtrl* spin_ctrl = wxDynamicCast(focused_window, wxSpinCtrl);
+        if (spin_ctrl) {
+            return wxApp::ProcessEvent(event);
+        }
+
         // Mark the event as processed. This prevents wxWidgets from firing alerts on macOS.
         // See https://github.com/wxWidgets/wxWidgets/issues/25262 for details.
         return true;
