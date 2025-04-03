@@ -28,14 +28,15 @@ inline void swap(short& a, short& b)
 
 void gbafilter_update_colors(bool lcd) {
     switch (systemColorDepth) {
-        case 8:
+        case 8: {
             for (int i = 0; i < 0x10000; i++) {
-                systemColorMap8[i] = (((i & 0x1f) << systemRedShift) & 0xE0) |
-                                      ((((i & 0x3e0) >> 5) << systemGreenShift) & 0x1C) |
-                                      ((((i & 0x7c00) >> 10) << systemBlueShift) & 0x3);
+                systemColorMap8[i] = (uint8_t)((((i & 0x1f) << systemRedShift) & 0xE0) |
+                ((((i & 0x3e0) >> 5) << systemGreenShift) & 0x1C) |
+                ((((i & 0x7c00) >> 10) << systemBlueShift) & 0x3));
             }
             if (lcd)
                 gbafilter_pal8(systemColorMap8, 0x10000);
+        } break;
         case 16: {
             for (int i = 0; i < 0x10000; i++) {
                 systemColorMap16[i] = ((i & 0x1f) << systemRedShift) |
@@ -134,69 +135,21 @@ void gbafilter_pal(uint16_t* buf, int count)
 
 void gbafilter_pal8(uint8_t* buf, int count)
 {
-    short temp[3 * 3], s;
-    uint16_t pix;
+    uint8_t s;
+    uint8_t pix;
     uint8_t red, green, blue;
 
     while (count--) {
         pix = *buf;
 
         s = curve[(pix >> systemGreenShift) & 0x7];
-        temp[3] = s * influence[3];
-        temp[4] = s * influence[4];
-        temp[5] = s * influence[5];
+        green = s;
 
         s = curve[(pix >> systemRedShift) & 0x7];
-        temp[0] = s * influence[0];
-        temp[1] = s * influence[1];
-        temp[2] = s * influence[2];
+        red = s;
 
         s = curve[(pix >> systemBlueShift) & 0x3];
-        temp[6] = s * influence[6];
-        temp[7] = s * influence[7];
-        temp[8] = s * influence[8];
-
-        if (temp[0] < temp[3])
-            swap(temp[0], temp[3]);
-        if (temp[0] < temp[6])
-            swap(temp[0], temp[6]);
-        if (temp[3] < temp[6])
-            swap(temp[3], temp[6]);
-        temp[3] <<= 1;
-        temp[0] <<= 2;
-        temp[0] += temp[3] + temp[6];
-
-        red = ((int(temp[0]) * 160) >> 17) + 4;
-        if (red > 31)
-            red = 31;
-
-        if (temp[2] < temp[5])
-            swap(temp[2], temp[5]);
-        if (temp[2] < temp[8])
-            swap(temp[2], temp[8]);
-        if (temp[5] < temp[8])
-            swap(temp[5], temp[8]);
-        temp[5] <<= 1;
-        temp[2] <<= 2;
-        temp[2] += temp[5] + temp[8];
-
-        blue = ((int(temp[2]) * 160) >> 17) + 4;
-        if (blue > 31)
-            blue = 31;
-
-        if (temp[1] < temp[4])
-            swap(temp[1], temp[4]);
-        if (temp[1] < temp[7])
-            swap(temp[1], temp[7]);
-        if (temp[4] < temp[7])
-            swap(temp[4], temp[7]);
-        temp[4] <<= 1;
-        temp[1] <<= 2;
-        temp[1] += temp[4] + temp[7];
-
-        green = ((int(temp[1]) * 160) >> 17) + 4;
-        if (green > 31)
-            green = 31;
+        blue = s;
 
         pix = (red & 0x7) << systemRedShift;
         pix += (green & 0x7) << systemGreenShift;
@@ -321,6 +274,7 @@ void UpdateSystemColorMaps(int lcd)
 {
   switch(systemColorDepth) {
   case 8:
+ #if 0
    {
      for(int i = 0; i < 0x10000; i++) {
        systemColorMap16[i] = (((i & 0x1f) << systemRedShift) & 0xE0) |
@@ -329,6 +283,7 @@ void UpdateSystemColorMaps(int lcd)
       }
       if (lcd == 1) gbafilter_pal8(systemColorMap8, 0x10000);
     }
+ #endif
     break;
   case 16:
     {
