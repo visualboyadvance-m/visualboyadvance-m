@@ -34,8 +34,10 @@ void gbafilter_update_colors(bool lcd) {
                 ((((i & 0x3e0) >> 5) << systemGreenShift) & 0x1C) |
                 ((((i & 0x7c00) >> 10) << systemBlueShift) & 0x3));
             }
+#if 0
             if (lcd)
                 gbafilter_pal8(systemColorMap8, 0x10000);
+#endif
         } break;
         case 16: {
             for (int i = 0; i < 0x10000; i++) {
@@ -133,6 +135,7 @@ void gbafilter_pal(uint16_t* buf, int count)
     }
 }
 
+#if 0
 void gbafilter_pal8(uint8_t* buf, int count)
 {
     uint8_t s;
@@ -158,6 +161,7 @@ void gbafilter_pal8(uint8_t* buf, int count)
         *buf++ = (uint8_t)(pix & 0xff);
     }
 }
+#endif
 
 void gbafilter_pal32(uint32_t* buf, int count)
 {
