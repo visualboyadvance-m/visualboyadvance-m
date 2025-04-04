@@ -2122,7 +2122,7 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
             for (int x = 0; x < std::ceil(width * scale); x++, src++) {
                 *dst++ = (((*src >> 5) & 0x7) << 5);
                 *dst++ = (((*src >> 2) & 0x7) << 5);
-		*dst++ = ((*src & 0x3) << 6);
+                *dst++ = ((*src & 0x3) << 6);
             }
 
             src += 2;
