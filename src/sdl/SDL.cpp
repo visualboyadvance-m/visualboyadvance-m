@@ -994,7 +994,7 @@ void sdlInitVideo()
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL)
     {
-        systemMessage(0, "Renderer: OpenGL %s", openGL == 2 ? "bilinear" : "nearest");
+        systemMessage(0, "Renderer: OpenGL (%s)", openGL == 2 ? "bilinear" : "nearest");
     } else {
 #endif
     	systemMessage(0, "Renderer: SDL %d.%d (%s)", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_GetRendererName(renderer));
