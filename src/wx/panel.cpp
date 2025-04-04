@@ -56,6 +56,10 @@
 #include <windows.h>
 #endif
 
+#ifdef _MSC_VER
+#define strdup _strdup
+#endif
+
 namespace {
 
 double GetFilterScale() {
@@ -119,7 +123,9 @@ long GetSampleRate() {
     return 44100;
 }
 
+#define out_8  (systemColorDepth ==  8)
 #define out_16 (systemColorDepth == 16)
+#define out_24 (systemColorDepth == 24)
 
 }  // namespace
 
@@ -1422,8 +1428,14 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
                 rpi_->Flags &= ~RPI_555_SUPP;
                 // FIXME: should this be 32 or 24?  No docs or sample source
                 systemColorDepth = 32;
-            } else
+            } else if (rpi_->Flags & RPI_555_SUPP) {
+                rpi_->Flags &= ~RPI_888_SUPP;
                 systemColorDepth = 16;
+            } else {
+                rpi_->Flags &= ~RPI_888_SUPP;
+                rpi_->Flags &= ~RPI_555_SUPP;
+                systemColorDepth = 8;
+            }
 
             if (!rpi_->Output) {
                 // note that in actual kega fusion plugins, rpi_->Output is
@@ -1446,7 +1458,7 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
     }
 
     // Intialize color tables
-    if (systemColorDepth == 32) {
+    if (systemColorDepth == 24) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
         systemRedShift = 3;
         systemGreenShift = 11;
@@ -1456,6 +1468,18 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
         systemRedShift = 27;
         systemGreenShift = 19;
         systemBlueShift = 11;
+        RGB_LOW_BITS_MASK = 0x00010101;
+#endif
+    } else if (systemColorDepth == 32) {
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+        systemRedShift = 3;
+        systemGreenShift = 11;
+        systemBlueShift = 19;
+        RGB_LOW_BITS_MASK = 0x00010101;
+#else
+        systemRedShift = 31;
+        systemGreenShift = 11;
+        systemBlueShift = 3;
         RGB_LOW_BITS_MASK = 0x01010100;
 #endif
     } else {
@@ -1549,12 +1573,12 @@ public:
         const int procy = height_ * threadno_ / nthreads_;
         height_ = height_ * (threadno_ + 1) / nthreads_ - procy;
         const int inbpp = systemColorDepth >> 3;
-        const int inrb = systemColorDepth == 16   ? 2
+        const int inrb = systemColorDepth == 8 ? 2 : systemColorDepth == 16   ? 2
                          : systemColorDepth == 24 ? 0
                                                   : 1;
         const int instride = (width_ + inrb) * inbpp;
-        const int outbpp = out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
-        const int outrb = systemColorDepth == 24 ? 0 : 4;
+        const int outbpp = out_8 ? 1 : out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
+        const int outrb = systemColorDepth == 8 ? 2 : systemColorDepth == 24 ? 0 : 4;
         const int outstride = std::ceil(width_ * outbpp * scale_) + outrb;
         delta_ += instride * procy;
 
@@ -1615,7 +1639,8 @@ private:
                 if (systemColorDepth == 16)
                     SmartIB(src_, instride, width_, procy, height_);
                 else
-                    SmartIB32(src_, instride, width_, procy, height_);
+                    if ((systemColorDepth != 8) && (systemColorDepth != 24))
+                        SmartIB32(src_, instride, width_, procy, height_);
                 break;
 
             case config::Interframe::kMotionBlur:
@@ -1623,7 +1648,8 @@ private:
                 if (systemColorDepth == 16)
                     MotionBlurIB(src_, instride, width_, procy, height_);
                 else
-                    MotionBlurIB32(src_, instride, width_, procy, height_);
+                    if ((systemColorDepth != 8) && (systemColorDepth != 24))
+                        MotionBlurIB32(src_, instride, width_, procy, height_);
                 break;
 
             case config::Interframe::kLast:
@@ -1781,8 +1807,8 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     // double-buffer buffer:
     //   if filtering, this is filter output, retained for redraws
     //   if not filtering, we still retain current image for redraws
-    int outbpp = out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
-    int outrb = systemColorDepth == 24 ? 0 : 4;
+    int outbpp = out_8 ? 1 : out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
+    int outrb = systemColorDepth == 8  ? 2 : systemColorDepth == 24 ? 0 : 4;
     int outstride = std::ceil(width * outbpp * scale) + outrb;
 
     if (!pixbuf2) {
@@ -2086,20 +2112,48 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
     if (systemColorDepth == 24) {
         // never scaled, no borders, no transformations needed
         im = new wxImage(width, height, todraw, true);
+    } else if (out_8) {
+        // scaled by filters, top/right borders, transform to 24-bit
+        im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
+        uint16_t* src = (uint16_t*)todraw + (int)std::ceil((width + 1) * scale); // skip top border
+        uint8_t* dst = im->GetData();
+
+        for (int y = 0; y < std::ceil(height * scale); y++) {
+            for (int x = 0; x < std::ceil(width * scale); x++, src++) {
+                *dst++ = ((((*src >> systemRedShift) & 0x1f) << 3) & 0xE0) | ((*src >> systemGreenShift) & 0x1C) | (((*src >> systemBlueShift) >> 3) & 0x3);
+            }
+
+            src += 1; // skip rhs border
+        }
     } else if (out_16) {
         // scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
         uint16_t* src = (uint16_t*)todraw + (int)std::ceil((width + 2) * scale); // skip top border
         uint8_t* dst = im->GetData();
-
+        
         for (int y = 0; y < std::ceil(height * scale); y++) {
             for (int x = 0; x < std::ceil(width * scale); x++, src++) {
                 *dst++ = ((*src >> systemRedShift) & 0x1f) << 3;
                 *dst++ = ((*src >> systemGreenShift) & 0x1f) << 3;
                 *dst++ = ((*src >> systemBlueShift) & 0x1f) << 3;
             }
-
+            
             src += 2; // skip rhs border
+        }
+    } else if (out_24) {
+        // not scaled by filters, top/right borders, transform to 24-bit
+        im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
+        uint8_t* src = (uint8_t*)todraw + (int)std::ceil((width + 1) * scale); // skip top border
+        uint8_t* dst = im->GetData();
+
+        for (int y = 0; y < std::ceil(height * scale); y++) {
+            for (int x = 0; x < std::ceil(width * scale); x++, src++) {
+                *dst++ = *src++ >> (systemRedShift - 3);
+                *dst++ = *src++ >> (systemGreenShift - 3);
+                *dst++ = *src++ >> (systemBlueShift - 3);
+            }
+
+            ++src; // skip rhs border
         }
     } else if (OPTION(kDispFilter) != config::Filter::kNone) {
         // scaled by filters, top/right borders, transform to 24-bit
@@ -2261,8 +2315,11 @@ void GLDrawingPanel::DrawingPanelInit()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     bilinear ? GL_LINEAR : GL_NEAREST);
 
-#define int_fmt out_16 ? GL_RGB5 : GL_RGB
-#define tex_fmt out_16 ? GL_BGRA : GL_RGBA, \
+#define int_fmt out_8 ? GL_RGB : out_16 ? GL_RGB5 : GL_RGB
+#define tex_fmt out_8  ? GL_RGB : \
+                out_16 ? GL_BGRA : \
+                out_24 ? GL_RGB : GL_RGBA, \
+                out_8 ? GL_UNSIGNED_BYTE_3_3_2 : \
                 out_16 ? GL_UNSIGNED_SHORT_1_5_5_5_REV : GL_UNSIGNED_BYTE
 #if 0
         texsize = width > height ? width : height;
@@ -2400,7 +2457,7 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
         DrawingPanelInit();
 
     if (todraw) {
-        int rowlen = std::ceil(width * scale) + (out_16 ? 2 : 1);
+        int rowlen = std::ceil(width * scale) + (out_16 ? 2 : out_24 ? 0 : 1);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, rowlen);
 #if wxBYTE_ORDER == wxBIG_ENDIAN
 
@@ -2410,7 +2467,7 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 
 #endif
         glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, std::ceil(width * scale), (int)std::ceil(height * scale),
-            0, tex_fmt, todraw + (int)std::ceil(rowlen * (out_16 ? 2 : 4) * scale));
+            0, tex_fmt, todraw + (int)std::ceil(rowlen * (out_8 ? 1 : out_16 ? 2 : out_24 ? 3 : 4) * scale));
         glCallList(vlist);
     } else
         glClear(GL_COLOR_BUFFER_BIT);

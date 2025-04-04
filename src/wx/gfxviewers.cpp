@@ -17,6 +17,20 @@ void utilReadScreenPixels(uint8_t* dest, int w, int h) {
     int sizeX = w;
     int sizeY = h;
     switch (systemColorDepth) {
+        case 8: {
+            uint8_t* p = (uint8_t*)(g_pix + (w + 2));  // skip first black line
+            for (int y = 0; y < sizeY; y++) {
+                for (int x = 0; x < sizeX; x++) {
+                    uint8_t v = *p++;
+
+                    *b++ = ((v & 0xE0) >> 3);    // R
+                    *b++ = (v & 0x1C);  // G
+                    *b++ = ((v & 0x03) << 3);    // B
+                }
+                p++;  // skip black pixel for filters
+                p++;  // skip black pixel for filters
+            }
+        } break;
         case 16: {
             uint16_t* p = (uint16_t*)(g_pix + (w + 2) * 2);  // skip first black line
             for (int y = 0; y < sizeY; y++) {
@@ -1246,7 +1260,7 @@ void savepal(wxWindow* parent, const uint8_t* data, int ncols, const wxString ty
 
         for (int i = 0; i < ncols; i++, data += 3) {
             char buf[14];
-            int l = sprintf(buf, "%d %d %d\r\n", data[0], data[1], data[2]);
+            int l = snprintf(buf, sizeof(buf), "%d %d %d\r\n", data[0], data[1], data[2]);
             f.Write(buf, l);
         }
 
