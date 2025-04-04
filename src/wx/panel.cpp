@@ -1465,9 +1465,9 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
         systemBlueShift = 19;
         RGB_LOW_BITS_MASK = 0x00010101;
 #else
-        systemRedShift = 27;
-        systemGreenShift = 19;
-        systemBlueShift = 11;
+        systemRedShift = 19;
+        systemGreenShift = 11;
+        systemBlueShift = 3;
         RGB_LOW_BITS_MASK = 0x00010101;
 #endif
     } else if (systemColorDepth == 32) {
@@ -1573,12 +1573,12 @@ public:
         const int procy = height_ * threadno_ / nthreads_;
         height_ = height_ * (threadno_ + 1) / nthreads_ - procy;
         const int inbpp = systemColorDepth >> 3;
-        const int inrb = systemColorDepth == 8 ? 2 : systemColorDepth == 16   ? 2
-                         : systemColorDepth == 24 ? 0
+        const int inrb = out_8 ? 2 : out_16  ? 2
+                         : out_24 ? 0
                                                   : 1;
         const int instride = (width_ + inrb) * inbpp;
-        const int outbpp = out_8 ? 1 : out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
-        const int outrb = systemColorDepth == 8 ? 2 : systemColorDepth == 24 ? 0 : 4;
+        const int outbpp = systemColorDepth >> 3;
+        const int outrb = out_8 ? 2 : out_24 ? 0 : 4;
         const int outstride = std::ceil(width_ * outbpp * scale_) + outrb;
         delta_ += instride * procy;
 
@@ -1636,19 +1636,19 @@ private:
                 break;
 
             case config::Interframe::kSmart:
-                if (systemColorDepth == 16)
+                if (out_16)
                     SmartIB(src_, instride, width_, procy, height_);
                 else
-                    if ((systemColorDepth != 8) && (systemColorDepth != 24))
+                    if ((!out_8) && (!out_24))
                         SmartIB32(src_, instride, width_, procy, height_);
                 break;
 
             case config::Interframe::kMotionBlur:
                 // FIXME: if(renderer == d3d/gl && filter == NONE) break;
-                if (systemColorDepth == 16)
+                if (out_16)
                     MotionBlurIB(src_, instride, width_, procy, height_);
                 else
-                    if ((systemColorDepth != 8) && (systemColorDepth != 24))
+                    if ((!out_8) && (!out_24))
                         MotionBlurIB32(src_, instride, width_, procy, height_);
                 break;
 
@@ -1807,8 +1807,8 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     // double-buffer buffer:
     //   if filtering, this is filter output, retained for redraws
     //   if not filtering, we still retain current image for redraws
-    int outbpp = out_8 ? 1 : out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
-    int outrb = systemColorDepth == 8  ? 2 : systemColorDepth == 24 ? 0 : 4;
+    int outbpp = systemColorDepth >> 3;
+    int outrb = out_8 ? 2 : out_24 ? 0 : 4;
     int outstride = std::ceil(width * outbpp * scale) + outrb;
 
     if (!pixbuf2) {
@@ -2115,15 +2115,15 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
     } else if (out_8) {
         // scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
-        uint16_t* src = (uint16_t*)todraw + (int)std::ceil((width + 1) * scale); // skip top border
+        uint16_t* src = (uint16_t*)todraw + (int)std::ceil((width + 2) * scale); // skip top border
         uint8_t* dst = im->GetData();
 
         for (int y = 0; y < std::ceil(height * scale); y++) {
             for (int x = 0; x < std::ceil(width * scale); x++, src++) {
-                *dst++ = ((((*src >> systemRedShift) & 0x1f) << 3) & 0xE0) | ((*src >> systemGreenShift) & 0x1C) | (((*src >> systemBlueShift) >> 3) & 0x3);
+                *dst++ = (uint8_t)(((((*src >> systemRedShift) & 0x1f) << 3) & 0xE0) | ((*src >> systemGreenShift) & 0x1C) | (((*src >> systemBlueShift) >> 3) & 0x3));
             }
 
-            src += 1; // skip rhs border
+            src += 2;
         }
     } else if (out_16) {
         // scaled by filters, top/right borders, transform to 24-bit
@@ -2315,7 +2315,7 @@ void GLDrawingPanel::DrawingPanelInit()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     bilinear ? GL_LINEAR : GL_NEAREST);
 
-#define int_fmt out_8 ? GL_RGB : out_16 ? GL_RGB5 : GL_RGB
+#define int_fmt out_16 ? GL_RGB5 : GL_RGB
 #define tex_fmt out_8  ? GL_RGB : \
                 out_16 ? GL_BGRA : \
                 out_24 ? GL_RGB : GL_RGBA, \
@@ -2457,7 +2457,7 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
         DrawingPanelInit();
 
     if (todraw) {
-        int rowlen = std::ceil(width * scale) + (out_16 ? 2 : out_24 ? 0 : 1);
+        int rowlen = std::ceil(width * scale) + (out_8 ? 2 : out_16 ? 2 : out_24 ? 0 : 1);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, rowlen);
 #if wxBYTE_ORDER == wxBIG_ENDIAN
 
@@ -2467,7 +2467,7 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 
 #endif
         glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, std::ceil(width * scale), (int)std::ceil(height * scale),
-            0, tex_fmt, todraw + (int)std::ceil(rowlen * (out_8 ? 1 : out_16 ? 2 : out_24 ? 3 : 4) * scale));
+                     0, tex_fmt, todraw + (int)std::ceil(rowlen * (systemColorDepth >> 3) * scale));
         glCallList(vlist);
     } else
         glClear(GL_COLOR_BUFFER_BIT);
