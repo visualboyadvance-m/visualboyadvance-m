@@ -991,7 +991,12 @@ void sdlInitVideo()
     }
 #endif
 
-    systemMessage(0, "Renderer: %s\n", SDL_GetRendererName(renderer));
+    if (openGL)
+    {
+        systemMessage(0, "Renderer: OpenGL %s\n", openGL == 2 ? "bilinear" : "no filter");
+    } else {
+        systemMessage(0, "Renderer: %s\n", SDL_GetRendererName(renderer));
+    }
 
     SDL_GetCurrentRenderOutputSize(renderer, &window_width, &window_height);
     SDL_GetRenderLogicalPresentation(renderer, &render_width, &render_height, &representation);
@@ -1325,8 +1330,10 @@ void sdlPollEvents()
 				}
 				break;
 			case SDL_WINDOWEVENT_RESIZED:
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
 				if (openGL)
 					sdlOpenGLScaleWithAspect(event.window.data1, event.window.data2);
+#endif
 				break;
 			}
 			break;
