@@ -1066,42 +1066,20 @@ void sdlInitVideo()
 #endif
     }
 
-#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
-    if (openGL) {
-        if (systemColorDepth == 8)
-        {
-            rmask = 0x000000E0;
-            gmask = 0x0000001C;
-            bmask = 0x00000003;
-        } else if (systemColorDepth == 16) {
-            rmask = 0x0000F800;
-            gmask = 0x000007E0;
-            bmask = 0x0000001F;
-        } else  {
-            rmask = 0x00FF0000;
-            gmask = 0x0000FF00;
-            bmask = 0x000000FF;
-        }
+    if (systemColorDepth == 8)
+    {
+        rmask = 0x000000E0;
+        gmask = 0x0000001C;
+        bmask = 0x00000003;
+    } else if (systemColorDepth == 16) {
+        rmask = 0x0000F800;
+        gmask = 0x000007E0;
+        bmask = 0x0000001F;
     } else {
-#endif
-        if (systemColorDepth == 8)
-        {
-            rmask = 0x000000E0;
-            gmask = 0x0000001C;
-            bmask = 0x00000003;
-        } else if (systemColorDepth == 16)
-        {
-            rmask = 0x0000F800;
-            gmask = 0x000007E0;
-            bmask = 0x0000001F;
-        } else {
-            rmask = 0x00FF0000;
-            gmask = 0x0000FF00;
-            bmask = 0x000000FF;
-        }
-#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
+        rmask = 0x00FF0000;
+        gmask = 0x0000FF00;
+        bmask = 0x000000FF;
     }
-#endif
 
     systemRedShift = sdlCalculateShift(rmask);
     systemGreenShift = sdlCalculateShift(gmask);
