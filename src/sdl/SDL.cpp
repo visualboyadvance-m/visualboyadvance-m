@@ -998,7 +998,6 @@ void sdlInitVideo()
     } else {
 #endif
     	systemMessage(0, "Renderer: SDL %d.%d (%s)", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_GetRendererName(renderer));
-
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     }
 #endif
