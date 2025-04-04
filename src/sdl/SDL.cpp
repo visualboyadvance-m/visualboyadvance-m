@@ -1051,15 +1051,9 @@ void sdlInitVideo()
 #elif defined(CONFIG_24BIT)
         systemColorDepth = 24;
         srcPitch = sizeX * (systemColorDepth >> 3);
-#else
-        if (openGL)
-        {
-            systemColorDepth = 16;
-            srcPitch = sizeX * (systemColorDepth >> 3) + 4;
-        } else {
-            systemColorDepth = 32;
-            srcPitch = sizeX * (systemColorDepth >> 3) + 4;
-        }
+#else /* defined(CONFIG_32BIT) */
+        systemColorDepth = 32;
+        srcPitch = sizeX * (systemColorDepth >> 3) + 4;
 #endif
     }
 
@@ -1074,14 +1068,10 @@ void sdlInitVideo()
             rmask = 0x0000F800;
             gmask = 0x000007E0;
             bmask = 0x0000001F;
-        } else if (systemColorDepth == 24) {
+        } else  {
             rmask = 0x00FF0000;
             gmask = 0x0000FF00;
             bmask = 0x000000FF;
-        } else {
-            rmask = 0xFF000000;
-            gmask = 0x00FF0000;
-            bmask = 0x0000FF00;
         }
     } else {
 #endif
@@ -2424,18 +2414,33 @@ void systemDrawScreen()
     if (ifbFunction)
         ifbFunction(g_pix + srcPitch, srcPitch, sizeX, sizeY);
 
-    filterFunction(g_pix + srcPitch, srcPitch, delta, screen,
-        destPitch, sizeX, sizeY);
+    filterFunction(g_pix + srcPitch, srcPitch, delta, screen, destPitch, sizeX, sizeY);
 
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
         int bytes = (systemColorDepth >> 3);
         for (int i = 0; i < destWidth; i++)
             for (int j = 0; j < destHeight; j++) {
-                uint8_t k;
-                k = filterPix[i * bytes + j * destPitch + 3];
-                filterPix[i * bytes + j * destPitch + 3] = filterPix[i * bytes + j * destPitch + 1];
-                filterPix[i * bytes + j * destPitch + 1] = k;
+                uint8_t k = 0;
+                uint8_t l = 0;
+
+                if (systemColorDepth == 24)
+                {
+                    k = filterPix[i * bytes + j * destPitch + 2];
+                    filterPix[i * bytes + j * destPitch + 2] = filterPix[i * bytes + j * destPitch];
+                    filterPix[i * bytes + j * destPitch] = k;
+                } else if (systemColorDepth == 32) {
+                    k = filterPix[i * bytes + j * destPitch + 3];
+                    l = filterPix[i * bytes + j * destPitch + 2];
+                    filterPix[i * bytes + j * destPitch + 3] = 0;
+                    filterPix[i * bytes + j * destPitch + 2] = filterPix[i * bytes + j * destPitch + 1];
+                    filterPix[i * bytes + j * destPitch + 1] = l;
+                    filterPix[i * bytes + j * destPitch] = k;
+                } else {
+                    k = filterPix[i * bytes + j * destPitch + 3];
+                    filterPix[i * bytes + j * destPitch + 3] = filterPix[i * bytes + j * destPitch + 1];
+                    filterPix[i * bytes + j * destPitch + 1] = k;
+                }
             }
     }
 #endif
