@@ -991,12 +991,16 @@ void sdlInitVideo()
     }
 #endif
 
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL)
     {
         systemMessage(0, "Renderer: OpenGL %s\n", openGL == 2 ? "bilinear" : "no filter");
     } else {
+#endif
         systemMessage(0, "Renderer: %s\n", SDL_GetRendererName(renderer));
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     }
+#endif
 
     SDL_GetCurrentRenderOutputSize(renderer, &window_width, &window_height);
     SDL_GetRenderLogicalPresentation(renderer, &render_width, &render_height, &representation);
