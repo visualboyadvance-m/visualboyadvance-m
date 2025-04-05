@@ -942,8 +942,9 @@ public:
 
                 for (int y = 0; y < sizeY; y++) {
                     for (int x = 0; x < sizeX; x++) {
-                        uint32_t color = g_vram[0x10000 + (((c + (y >> 3) * inc) * 32 + (y & 7) * 8 + (x >> 3) * 64 + (x & 7)) & 0x7FFF)];
+                        uint32_t color = g_vram[0x10000 + (((c + (((y >> 3) * inc) << 5) + ((y & 7) << 4) + ((x >> 3) << 6) + (x & 7))) & 0x7FFF)];
                         color = pal[color];
+
                         *bmp++ = (color & 0x1f) << 3;
                         *bmp++ = ((color >> 5) & 0x1f) << 3;
                         *bmp++ = ((color >> 10) & 0x1f) << 3;
@@ -964,7 +965,7 @@ public:
 
                 for (int y = 0; y < sizeY; y++) {
                     for (int x = 0; x < sizeX; x++) {
-                        uint32_t color = g_vram[0x10000 + (((c + (y >> 3) * inc) * 32 + (y & 7) * 4 + (x >> 3) * 32 + ((x & 7) >> 1)) & 0x7FFF)];
+                        uint32_t color = g_vram[0x10000 + ((((((c + (((y >> 3) * inc) << 5)) + ((y & 7) << 2)) + ((x >> 3) << 5)) + ((x & 7) >> 1))) & 0x7FFF)];
 
                         if (x & 1)
                             color >>= 4;
@@ -972,6 +973,7 @@ public:
                             color &= 0x0F;
 
                         color = pal[palette + color];
+
                         *bmp++ = (color & 0x1f) << 3;
                         *bmp++ = ((color >> 5) & 0x1f) << 3;
                         *bmp++ = ((color >> 10) & 0x1f) << 3;
