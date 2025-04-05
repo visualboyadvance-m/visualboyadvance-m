@@ -362,6 +362,14 @@ msgstr "Не знайдено придатних rpi-плаґінів у %s."
 msgid "Plugin"
 msgstr "Плаґін"
 
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth"
+msgstr "Біт на піксель"
+
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth:"
+msgstr "Біт на піксель:"
+
 #: dialogs/display-config.cpp:407
 #, c-format
 msgid "Using pixel filter: %s"
