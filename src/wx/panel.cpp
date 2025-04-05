@@ -175,7 +175,13 @@ GameArea::GameArea()
     SetSizer(new wxBoxSizer(wxVERTICAL));
     // all renderers prefer 32-bit
     // well, "simple" prefers 24-bit, but that's not available for filters
-    systemColorDepth = 32;
+    if ((OPTION(kBitDepth) == 8) || (OPTION(kBitDepth) == 16) || (OPTION(kBitDepth) == 24) || (OPTION(kBitDepth) == 32))
+    {
+        systemColorDepth = OPTION(kBitDepth);
+    } else {
+        systemColorDepth = 32;
+    }
+
     hq2x_init(32);
     Init_2xSaI(32);
 }
@@ -1454,7 +1460,13 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
 
     if (OPTION(kDispFilter) != config::Filter::kPlugin) {
         scale *= GetFilterScale();
-        systemColorDepth = 32;
+
+        if ((OPTION(kBitDepth) == 8) || (OPTION(kBitDepth) == 16) || (OPTION(kBitDepth) == 24) || (OPTION(kBitDepth) == 32))
+        {
+            systemColorDepth = OPTION(kBitDepth);
+        } else {
+            systemColorDepth = 32;
+        }
     }
 
     // Intialize color tables
@@ -2098,7 +2110,12 @@ BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
     if (OPTION(kDispFilter) == config::Filter::kNone &&
         OPTION(kDispIFB) == config::Interframe::kNone) {
         // changing from 32 to 24 does not require regenerating color tables
-        systemColorDepth = 32;
+        if ((OPTION(kBitDepth) == 8) || (OPTION(kBitDepth) == 16) || (OPTION(kBitDepth) == 24) || (OPTION(kBitDepth) == 32))
+        {
+            systemColorDepth = OPTION(kBitDepth);
+        } else {
+            systemColorDepth = 32;
+        }
     }
     if (!did_init) {
         DrawingPanelInit();
