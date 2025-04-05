@@ -2451,6 +2451,9 @@ void GLDrawingPanel::RefreshGL()
 
 void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 {
+    uint8_t* src = NULL;
+    uint8_t* dst = NULL;
+
     (void)dc; // unused params
     SetContext();
     RefreshGL();
@@ -2459,7 +2462,7 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
         DrawingPanelInit();
 
     if (todraw) {
-        int rowlen = std::ceil(width * scale) + (out_8 ? 2 : out_16 ? 2 : out_24 ? 0 : 1);
+        int rowlen = std::ceil(width * scale) + (out_8 ? 0 : out_16 ? 2 : out_24 ? 0 : 1);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, rowlen);
 #if wxBYTE_ORDER == wxBIG_ENDIAN
 
@@ -2468,8 +2471,25 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
             glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_TRUE);
 
 #endif
-        glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, std::ceil(width * scale), (int)std::ceil(height * scale),
-                     0, tex_fmt, todraw + (int)std::ceil(rowlen * (systemColorDepth >> 3) * scale));
+        if (out_8)
+        {
+            src = (uint8_t*)todraw + (int)std::ceil((width + 2) * ((systemColorDepth >> 3) * scale)); // skip top border
+            dst = (uint8_t*)todraw;
+
+            for (int y = 0; y < std::ceil(height * scale); y++) {
+                for (int x = 0; x < std::ceil(width * scale); x++) {
+                    *dst++ = *src++;
+                }
+
+                src += 2;
+            }
+
+            glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, (int)std::ceil(width * scale), (int)std::ceil(height * scale),
+                         0, tex_fmt, todraw);
+        } else {
+                glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, (int)std::ceil(width * scale), (int)std::ceil(height * scale),
+                             0, tex_fmt, todraw + (int)std::ceil(rowlen * ((systemColorDepth >> 3) * scale)));
+        }
         glCallList(vlist);
     } else
         glClear(GL_COLOR_BUFFER_BIT);
