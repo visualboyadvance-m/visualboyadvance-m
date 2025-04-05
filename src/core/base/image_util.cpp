@@ -24,9 +24,16 @@ bool utilWritePNGFile(const char* fileName, int w, int h, uint8_t* pix) {
             uint8_t* pixU8 = (uint8_t*)pix + (w);
             for (int y = 0; y < sizeY; y++) {
                 for (int x = 0; x < sizeX; x++, pixU8++) {
-                    *b++ = (((*pixU8 >> 5) & 0x7) << 5);
-                    *b++ = (((*pixU8 >> 2) & 0x7) << 5);
-                    *b++ = ((*pixU8 & 0x3) << 6);
+                    if (*pixU8 == 0xff) // White color fix
+                    {
+                        *b++ = 0xff;
+                        *b++ = 0xff;
+                        *b++ = 0xff;
+                    } else {
+	                 *b++ = (((*pixU8 >> 5) & 0x7) << 5);
+        	         *b++ = (((*pixU8 >> 2) & 0x7) << 5);
+                	 *b++ = ((*pixU8 & 0x3) << 6);
+                    }
                 }
             }
         } break;
@@ -139,9 +146,16 @@ bool utilWriteBMPFile(const char* fileName, int w, int h, uint8_t* pix) {
             uint8_t* pixU8 = (uint8_t*)pix + ((w) * (h));
             for (int y = 0; y < sizeY; y++) {
                 for (int x = 0; x < sizeX; x++, pixU8++) {
-                    *b++ = ((*pixU8 & 0x3) << 6);
-                    *b++ = (((*pixU8 >> 2) & 0x7) << 5);
-                    *b++ = (((*pixU8 >> 5) & 0x7) << 5);
+                    if (*pixU8 == 0xff) // White color fix
+                    {
+                        *b++ = 0xff;
+                        *b++ = 0xff;
+                        *b++ = 0xff;
+                    } else {
+                        *b++ = ((*pixU8 & 0x3) << 6);
+                        *b++ = (((*pixU8 >> 2) & 0x7) << 5);
+                        *b++ = (((*pixU8 >> 5) & 0x7) << 5);
+                    }
                 }
 
                 pixU8 -= 2 * (w);

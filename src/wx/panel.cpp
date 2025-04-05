@@ -2152,9 +2152,16 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
 
         for (int y = 0; y < std::ceil(height * scale); y++) {
             for (int x = 0; x < std::ceil(width * scale); x++, src++) {
-                *dst++ = (((*src >> 5) & 0x7) << 5);
-                *dst++ = (((*src >> 2) & 0x7) << 5);
-                *dst++ = ((*src & 0x3) << 6);
+                if (*src == 0xff) // White color fix
+                {
+                    *dst++ = 0xff;
+                    *dst++ = 0xff;
+                    *dst++ = 0xff;
+                } else {
+                    *dst++ = (((*src >> 5) & 0x7) << 5);
+                    *dst++ = (((*src >> 2) & 0x7) << 5);
+                    *dst++ = ((*src & 0x3) << 6);
+                }
             }
 
             src += 2;
