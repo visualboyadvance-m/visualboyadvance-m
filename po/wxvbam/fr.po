@@ -1563,6 +1563,14 @@ msgstr "Extension rpi utilisable non trouvée dans %s"
 msgid "Plugin"
 msgstr "Extension"
 
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth"
+msgstr "Bits par pixel"
+
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth:"
+msgstr "Bits par pixel:"
+
 #: dialogs/display-config.cpp:417
 #, c-format
 msgid "Using pixel filter: %s"

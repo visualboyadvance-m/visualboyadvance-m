@@ -1549,6 +1549,14 @@ msgstr "A %s helyen nincs használható RPI bővítmény"
 msgid "Plugin"
 msgstr "Bővítmény"
 
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth"
+msgstr "Bit per pixel"
+
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth:"
+msgstr "Bit per pixel:"
+
 #: dialogs/display-config.cpp:417
 #, c-format
 msgid "Using pixel filter: %s"
