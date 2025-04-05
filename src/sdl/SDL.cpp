@@ -985,9 +985,9 @@ void sdlInitVideo()
         systemMessage(0, "Renderer: OpenGL (%s)", openGL == 2 ? "bilinear" : "no filter");
     } else {
 #endif
-        SDL_GetRendererInfo(renderer, &info);
+        SDL_GetRendererInfo(renderer, &render_info);
 
-        systemMessage(0, "Renderer: SDL %d.%d (%s)", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, info.name);
+        systemMessage(0, "Renderer: SDL %d.%d (%s)", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, render_info.name);
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     }
 #endif
