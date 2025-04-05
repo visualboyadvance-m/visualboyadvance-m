@@ -946,6 +946,9 @@ void sdlInitVideo()
     SDL_bool makes_sense = SDL_FALSE;
 #endif
     uint32_t rmask, gmask, bmask;
+#ifndef ENABLE_SDL3
+    SDL_RendererInfo render_info;
+#endif
 
     filter_enlarge = getFilterEnlargeFactor(filter);
 
@@ -970,11 +973,24 @@ void sdlInitVideo()
         SDL_DestroyRenderer(renderer);
 
 #ifndef ENABLE_SDL3
-	window = SDL_CreateWindow("VBA-M", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight, flags);
+    window = SDL_CreateWindow("VBA-M", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight, flags);
 
-	if (!openGL) {
-		renderer = SDL_CreateRenderer(window, -1, 0);
-	}
+    if (!openGL) {
+        renderer = SDL_CreateRenderer(window, -1, 0);
+    }
+
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
+    if (openGL)
+    {
+        systemMessage(0, "Renderer: OpenGL (%s)", openGL == 2 ? "bilinear" : "no filter");
+    } else {
+#endif
+        SDL_GetRendererInfo(renderer, &info);
+
+        systemMessage(0, "Renderer: SDL %d.%d (%s)", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, info.name);
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
+    }
+#endif
 
     SDL_RenderSetLogicalSize(renderer, screenWidth, screenHeight);
     SDL_RenderGetLogicalSize(renderer, &render_width, &render_height);
