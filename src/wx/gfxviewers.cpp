@@ -23,9 +23,9 @@ void utilReadScreenPixels(uint8_t* dest, int w, int h) {
                 for (int x = 0; x < sizeX; x++) {
                     uint8_t v = *p++;
 
-                    *b++ = ((v & 0xE0) >> 3);    // R
-                    *b++ = (v & 0x1C);  // G
-                    *b++ = ((v & 0x03) << 3);    // B
+                    *b++ = (((v >> 5) & 0x7) << 5);
+                    *b++ = (((v >> 2) & 0x7) << 5);
+                    *b++ = ((v & 0x3) << 6);
                 }
                 p++;  // skip black pixel for filters
                 p++;  // skip black pixel for filters
