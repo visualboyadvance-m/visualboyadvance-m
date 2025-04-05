@@ -178,6 +178,9 @@ GameArea::GameArea()
     if ((OPTION(kBitDepth) == 8) || (OPTION(kBitDepth) == 16) || (OPTION(kBitDepth) == 24) || (OPTION(kBitDepth) == 32))
     {
         systemColorDepth = OPTION(kBitDepth);
+    } else if (OPTION(kBitDepth)) {
+        systemScreenMessage(_("Unsupported bit depth defaulting to 32 bit"));
+        systemColorDepth = 32;
     } else {
         systemColorDepth = 32;
     }
@@ -1464,6 +1467,9 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
         if ((OPTION(kBitDepth) == 8) || (OPTION(kBitDepth) == 16) || (OPTION(kBitDepth) == 24) || (OPTION(kBitDepth) == 32))
         {
             systemColorDepth = OPTION(kBitDepth);
+        } else if (OPTION(kBitDepth)) {
+            systemScreenMessage(_("Unsupported bit depth defaulting to 32 bit"));
+            systemColorDepth = 32;
         } else {
             systemColorDepth = 32;
         }
@@ -2113,6 +2119,9 @@ BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
         if ((OPTION(kBitDepth) == 8) || (OPTION(kBitDepth) == 16) || (OPTION(kBitDepth) == 24) || (OPTION(kBitDepth) == 32))
         {
             systemColorDepth = OPTION(kBitDepth);
+        } else if (OPTION(kBitDepth)) {
+            systemScreenMessage(_("Unsupported bit depth defaulting to 32 bit"));
+            systemColorDepth = 32;
         } else {
             systemColorDepth = 32;
         }
