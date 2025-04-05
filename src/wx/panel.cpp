@@ -151,7 +151,8 @@ GameArea::GameArea()
       mouse_active_time(0),
       render_observer_({config::OptionID::kDispBilinear, config::OptionID::kDispFilter,
                         config::OptionID::kDispRenderMethod, config::OptionID::kDispIFB,
-                        config::OptionID::kDispStretch, config::OptionID::kPrefVsync},
+                        config::OptionID::kDispStretch, config::OptionID::kPrefVsync,
+                        config::OptionID::kBitDepth},
                        std::bind(&GameArea::ResetPanel, this)),
       scale_observer_(config::OptionID::kDispScale, std::bind(&GameArea::AdjustSize, this, true)),
       gb_border_observer_(config::OptionID::kPrefBorderOn,
@@ -179,7 +180,7 @@ GameArea::GameArea()
     {
         systemColorDepth = OPTION(kBitDepth);
     } else if (OPTION(kBitDepth)) {
-        systemScreenMessage(_("Unsupported bit depth defaulting to 32 bit"));
+        systemScreenMessage(_("Unsupported bit depth, defaulting to 32 bit"));
         systemColorDepth = 32;
     } else {
         systemColorDepth = 32;
@@ -1468,7 +1469,7 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
         {
             systemColorDepth = OPTION(kBitDepth);
         } else if (OPTION(kBitDepth)) {
-            systemScreenMessage(_("Unsupported bit depth defaulting to 32 bit"));
+            systemScreenMessage(_("Unsupported bit depth, defaulting to 32 bit"));
             systemColorDepth = 32;
         } else {
             systemColorDepth = 32;
@@ -1679,6 +1680,11 @@ private:
     // naturally, any of these with accumulation buffers like those
     // of the IFB filters will screw up royally as well
     void ApplyFilter(int instride, int outstride) {
+        if (systemColorDepth != 32)
+        {
+            return;
+        }
+
         switch (OPTION(kDispFilter)) {
             case config::Filter::k2xsai:
                 _2xSaI32(src_, instride, delta_, dst_, outstride, width_,
@@ -2120,7 +2126,7 @@ BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
         {
             systemColorDepth = OPTION(kBitDepth);
         } else if (OPTION(kBitDepth)) {
-            systemScreenMessage(_("Unsupported bit depth defaulting to 32 bit"));
+            systemScreenMessage(_("Unsupported bit depth, defaulting to 32 bit"));
             systemColorDepth = 32;
         } else {
             systemColorDepth = 32;
