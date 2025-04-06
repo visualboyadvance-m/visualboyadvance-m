@@ -58,3 +58,4 @@ jobs:
       - if: matrix.build_options == 'default' && matrix.msvc_arch != 'amd64_arm64'
         name: Run tests
         run: cd build && ctest -j --output-on-failure
+
