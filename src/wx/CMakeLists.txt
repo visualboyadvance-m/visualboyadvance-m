@@ -404,6 +404,9 @@ if(APPLE)
     target_sources(visualboyadvance-m PRIVATE
         macsupport.mm
     )
+
+    target_link_libraries(visualboyadvance-m
+      tiff zstd deflate)
 endif()
 
 # link libgcc/libstdc++ statically on mingw
