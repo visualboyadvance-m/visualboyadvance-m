@@ -50,7 +50,7 @@ endif()
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-ggdb3 -fno-omit-frame-pointer -Wall -Wextra)
 else()
-    add_compile_options(-Ofast -fomit-frame-pointer)
+    add_compile_options(-O3 -ffast-math -fomit-frame-pointer)
 endif()
 
 # for some reason this is necessary
