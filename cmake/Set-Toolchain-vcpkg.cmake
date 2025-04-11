@@ -502,7 +502,7 @@ function(vcpkg_set_toolchain)
 
         # Install core deps.
         execute_process(
-            COMMAND ${vcpkg_exe} install ${VCPKG_DEPS_QUALIFIED}
+            COMMAND ${vcpkg_exe} --triplet ${VCPKG_TARGET_TRIPLET} install ${pkg}
             WORKING_DIRECTORY ${VCPKG_ROOT}
         )
 
@@ -544,7 +544,7 @@ function(vcpkg_set_toolchain)
                 set(dep_qualified "${dep}:${VCPKG_TARGET_TRIPLET}")
 
                 execute_process(
-                    COMMAND ${vcpkg_exe} install ${dep_qualified}
+                    COMMAND --triplet ${VCPKG_TARGET_TRIPLET} ${vcpkg_exe} install ${dep}
                     WORKING_DIRECTORY ${VCPKG_ROOT}
                 )
 

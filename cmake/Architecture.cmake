@@ -57,11 +57,11 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "[xX]86|i[3-9]86|[aA][mM][dD]64")
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "[aA][aA][rR][cC][hH]|[aA][rR][mM]")
     if(CMAKE_C_SIZEOF_DATA_PTR EQUAL 4) # 32 bit
         set(ARM32 ON)
-        set(ARCH_NAME arm32)
+        set(ARCH_NAME ARM32)
         set(WINARCH arm)
     elseif(CMAKE_C_SIZEOF_DATA_PTR EQUAL 8)
         set(ARM64 ON)
-        set(ARCH_NAME arm64)
+        set(ARCH_NAME ARM64)
         set(WINARCH arm64)
     endif()
 

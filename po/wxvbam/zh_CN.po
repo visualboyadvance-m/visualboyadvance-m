@@ -360,6 +360,14 @@ msgstr "浏览"
 msgid "Invalid value for Default magnification."
 msgstr "无效的默认放大倍数值。"
 
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth"
+msgstr "每像素位数"
+
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth:"
+msgstr "每像素位数:"
+
 #: dialogs/display-config.cpp:331 xrc/DisplayConfig.xrc:86
 #: xrc/DisplayConfig.xrc:136 xrc/DisplayConfig.xrc:222
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204

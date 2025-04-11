@@ -8,6 +8,8 @@ include(VbamFunctions)
 set(VBAM_WX_COMMON
     audio/audio.cpp
     audio/audio.h
+    audio/internal/sdl.cpp
+    audio/internal/sdl.h
     audio/internal/openal.cpp
     audio/internal/openal.h
     background-input.cpp
@@ -292,8 +294,8 @@ function(configure_wx_target target)
         _add_compile_definitions(NO_D3D)
     endif()
 
-    # SDL2.
-    _add_link_libraries(${VBAM_SDL2_LIBS})
+    # SDL.
+    _add_link_libraries(${VBAM_SDL_LIBS})
 
     # OpenGL.
     if(ENABLE_OPENGL)
@@ -319,7 +321,12 @@ add_executable(
 )
 
 target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} ${VBAM_ICON_PATH})
-target_include_directories(visualboyadvance-m PRIVATE ${SDL2_INCLUDE_DIRS})
+
+if(ENABLE_SDL3)
+    target_include_directories(visualboyadvance-m PRIVATE ${SDL3_INCLUDE_DIRS})
+else()
+    target_include_directories(visualboyadvance-m PRIVATE ${SDL2_INCLUDE_DIRS})
+endif()
 
 target_link_libraries(
     visualboyadvance-m
@@ -404,6 +411,9 @@ if(APPLE)
     target_sources(visualboyadvance-m PRIVATE
         macsupport.mm
     )
+
+    target_link_libraries(visualboyadvance-m
+      tiff zstd deflate)
 endif()
 
 # link libgcc/libstdc++ statically on mingw

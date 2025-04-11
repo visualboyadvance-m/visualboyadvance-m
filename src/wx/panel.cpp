@@ -27,6 +27,7 @@
 #include "components/filters_interframe/interframe.h"
 #include "core/base/check.h"
 #include "core/base/file_util.h"
+#include "core/base/image_util.h"
 #include "core/base/patch.h"
 #include "core/base/system.h"
 #include "core/base/version.h"
@@ -54,6 +55,10 @@
 
 #ifdef __WXMSW__
 #include <windows.h>
+#endif
+
+#ifdef _MSC_VER
+#define strdup _strdup
 #endif
 
 namespace {
@@ -119,7 +124,9 @@ long GetSampleRate() {
     return 44100;
 }
 
+#define out_8  (systemColorDepth ==  8)
 #define out_16 (systemColorDepth == 16)
+#define out_24 (systemColorDepth == 24)
 
 }  // namespace
 
@@ -145,7 +152,8 @@ GameArea::GameArea()
       mouse_active_time(0),
       render_observer_({config::OptionID::kDispBilinear, config::OptionID::kDispFilter,
                         config::OptionID::kDispRenderMethod, config::OptionID::kDispIFB,
-                        config::OptionID::kDispStretch, config::OptionID::kPrefVsync},
+                        config::OptionID::kDispStretch, config::OptionID::kPrefVsync,
+                        config::OptionID::kBitDepth},
                        std::bind(&GameArea::ResetPanel, this)),
       scale_observer_(config::OptionID::kDispScale, std::bind(&GameArea::AdjustSize, this, true)),
       gb_border_observer_(config::OptionID::kPrefBorderOn,
@@ -169,9 +177,22 @@ GameArea::GameArea()
     SetSizer(new wxBoxSizer(wxVERTICAL));
     // all renderers prefer 32-bit
     // well, "simple" prefers 24-bit, but that's not available for filters
-    systemColorDepth = 32;
-    hq2x_init(32);
-    Init_2xSaI(32);
+    if ((OPTION(kBitDepth) == 8) || (OPTION(kBitDepth) == 16) || (OPTION(kBitDepth) == 24) || (OPTION(kBitDepth) == 32)) {
+        systemColorDepth = OPTION(kBitDepth);
+    } else if (OPTION(kBitDepth)) {
+        systemScreenMessage(_("Unsupported bit depth, defaulting to 32 bit"));
+        systemColorDepth = 32;
+    } else {
+        systemColorDepth = 32;
+    }
+
+    if (systemColorDepth == 16) {
+        hq2x_init(555);
+        Init_2xSaI(555);
+    } else {
+        hq2x_init(systemColorDepth);
+        Init_2xSaI(systemColorDepth);
+    }
 }
 
 void GameArea::LoadGame(const wxString& name)
@@ -1162,21 +1183,38 @@ void GameArea::OnIdle(wxIdleEvent& event)
     if (!panel) {
         switch (OPTION(kDispRenderMethod)) {
             case config::RenderMethod::kSimple:
+                no_border = false;
+
                 panel = new BasicDrawingPanel(this, basic_width, basic_height);
+                break;
+            case config::RenderMethod::kSDL:
+                no_border = false;
+
+                panel = new SDLDrawingPanel(this, basic_width, basic_height);
                 break;
 #ifdef __WXMAC__
             case config::RenderMethod::kQuartz2d:
+                no_border = false;
+
                 panel =
                     new Quartz2DDrawingPanel(this, basic_width, basic_height);
                 break;
 #endif
 #ifndef NO_OGL
             case config::RenderMethod::kOpenGL:
+                if (out_8) {
+                    no_border = true;
+                } else {
+                    no_border = false;
+                }
+
                 panel = new GLDrawingPanel(this, basic_width, basic_height);
                 break;
 #endif
 #if defined(__WXMSW__) && !defined(NO_D3D)
             case config::RenderMethod::kDirect3d:
+                no_border = false;
+
                 panel = new DXDrawingPanel(this, basic_width, basic_height);
                 break;
 #endif
@@ -1422,8 +1460,14 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
                 rpi_->Flags &= ~RPI_555_SUPP;
                 // FIXME: should this be 32 or 24?  No docs or sample source
                 systemColorDepth = 32;
-            } else
+            } else if (rpi_->Flags & RPI_555_SUPP) {
+                rpi_->Flags &= ~RPI_888_SUPP;
                 systemColorDepth = 16;
+            } else {
+                rpi_->Flags &= ~RPI_888_SUPP;
+                rpi_->Flags &= ~RPI_555_SUPP;
+                systemColorDepth = 8;
+            }
 
             if (!rpi_->Output) {
                 // note that in actual kega fusion plugins, rpi_->Output is
@@ -1442,20 +1486,40 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
 
     if (OPTION(kDispFilter) != config::Filter::kPlugin) {
         scale *= GetFilterScale();
-        systemColorDepth = 32;
+
+        if ((OPTION(kBitDepth) == 8) || (OPTION(kBitDepth) == 16) || (OPTION(kBitDepth) == 24) || (OPTION(kBitDepth) == 32)) {
+            systemColorDepth = OPTION(kBitDepth);
+        } else if (OPTION(kBitDepth)) {
+            systemScreenMessage(_("Unsupported bit depth, defaulting to 32 bit"));
+            systemColorDepth = 32;
+        } else {
+            systemColorDepth = 32;
+        }
     }
 
     // Intialize color tables
-    if (systemColorDepth == 32) {
+    if (systemColorDepth == 24) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
         systemRedShift = 3;
         systemGreenShift = 11;
         systemBlueShift = 19;
         RGB_LOW_BITS_MASK = 0x00010101;
 #else
-        systemRedShift = 27;
-        systemGreenShift = 19;
-        systemBlueShift = 11;
+        systemRedShift = 19;
+        systemGreenShift = 11;
+        systemBlueShift = 3;
+        RGB_LOW_BITS_MASK = 0x00010101;
+#endif
+    } else if (systemColorDepth == 32) {
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+        systemRedShift = 3;
+        systemGreenShift = 11;
+        systemBlueShift = 19;
+        RGB_LOW_BITS_MASK = 0x00010101;
+#else
+        systemRedShift = 31;
+        systemGreenShift = 11;
+        systemBlueShift = 3;
         RGB_LOW_BITS_MASK = 0x01010100;
 #endif
     } else {
@@ -1549,17 +1613,18 @@ public:
         const int procy = height_ * threadno_ / nthreads_;
         height_ = height_ * (threadno_ + 1) / nthreads_ - procy;
         const int inbpp = systemColorDepth >> 3;
-        const int inrb = systemColorDepth == 16   ? 2
-                         : systemColorDepth == 24 ? 0
-                                                  : 1;
+        const int inrb = out_8 ? 2 : out_16  ? 2
+                         : out_24 ? 0 : 1;
         const int instride = (width_ + inrb) * inbpp;
-        const int outbpp = out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
-        const int outrb = systemColorDepth == 24 ? 0 : 4;
+        const int outbpp = systemColorDepth >> 3;
+        const int outrb = out_8 ? 2 : out_24 ? 0 : 4;
         const int outstride = std::ceil(width_ * outbpp * scale_) + outrb;
         delta_ += instride * procy;
 
         // FIXME: fugly hack
         if (OPTION(kDispRenderMethod) == config::RenderMethod::kOpenGL) {
+            dst_ += (int)std::ceil(outstride * (procy + 1) * scale_);
+        } else if (OPTION(kDispRenderMethod) == config::RenderMethod::kSDL) {
             dst_ += (int)std::ceil(outstride * (procy + 1) * scale_);
         } else {
             dst_ += (int)std::ceil(outstride * (procy + (1 / scale_)) * scale_);
@@ -1612,18 +1677,24 @@ private:
                 break;
 
             case config::Interframe::kSmart:
-                if (systemColorDepth == 16)
+                if (out_16) {
                     SmartIB(src_, instride, width_, procy, height_);
-                else
-                    SmartIB32(src_, instride, width_, procy, height_);
+                } else {
+                    if ((!out_8) && (!out_24)) {
+                        SmartIB32(src_, instride, width_, procy, height_);
+                    }
+                }
                 break;
 
             case config::Interframe::kMotionBlur:
                 // FIXME: if(renderer == d3d/gl && filter == NONE) break;
-                if (systemColorDepth == 16)
+                if (out_16) {
                     MotionBlurIB(src_, instride, width_, procy, height_);
-                else
-                    MotionBlurIB32(src_, instride, width_, procy, height_);
+                } else {
+                    if ((!out_8) && (!out_24)) {
+                        MotionBlurIB32(src_, instride, width_, procy, height_);
+                    }
+                }
                 break;
 
             case config::Interframe::kLast:
@@ -1637,83 +1708,165 @@ private:
     void ApplyFilter(int instride, int outstride) {
         switch (OPTION(kDispFilter)) {
             case config::Filter::k2xsai:
-                _2xSaI32(src_, instride, delta_, dst_, outstride, width_,
-                         height_);
+                if (out_16) {
+                    _2xSaI(src_, instride, delta_, dst_, outstride, width_,
+                           height_);
+                } else {
+                    _2xSaI32(src_, instride, delta_, dst_, outstride, width_,
+                             height_);
+                }
                 break;
 
             case config::Filter::kSuper2xsai:
-                Super2xSaI32(src_, instride, delta_, dst_, outstride, width_,
-                             height_);
+                if (out_16) {
+                    Super2xSaI(src_, instride, delta_, dst_, outstride, width_,
+                               height_);
+                } else {
+                    Super2xSaI32(src_, instride, delta_, dst_, outstride, width_,
+                                 height_);
+                }
                 break;
 
             case config::Filter::kSupereagle:
-                SuperEagle32(src_, instride, delta_, dst_, outstride, width_,
-                             height_);
+                if (out_16) {
+                    SuperEagle(src_, instride, delta_, dst_, outstride, width_,
+                               height_);
+                } else {
+                    SuperEagle32(src_, instride, delta_, dst_, outstride, width_,
+                                 height_);
+                }
                 break;
 
             case config::Filter::kPixelate:
-                Pixelate32(src_, instride, delta_, dst_, outstride, width_,
-                           height_);
+                if (out_16) {
+                    Pixelate(src_, instride, delta_, dst_, outstride, width_,
+                             height_);
+                } else {
+                    Pixelate32(src_, instride, delta_, dst_, outstride, width_,
+                               height_);
+                }
                 break;
 
             case config::Filter::kAdvmame:
-                AdMame2x32(src_, instride, delta_, dst_, outstride, width_,
-                           height_);
+                if (out_16) {
+                    AdMame2x(src_, instride, delta_, dst_, outstride, width_,
+                             height_);
+                } else {
+                    AdMame2x32(src_, instride, delta_, dst_, outstride, width_,
+                               height_);
+                }
                 break;
 
             case config::Filter::kBilinear:
-                Bilinear32(src_, instride, delta_, dst_, outstride, width_,
-                           height_);
+                if (out_16) {
+                    Bilinear(src_, instride, delta_, dst_, outstride, width_,
+                             height_);
+                } else {
+                    Bilinear32(src_, instride, delta_, dst_, outstride, width_,
+                               height_);
+                }
                 break;
 
             case config::Filter::kBilinearplus:
-                BilinearPlus32(src_, instride, delta_, dst_, outstride, width_,
-                               height_);
+                if (out_16) {
+                    BilinearPlus(src_, instride, delta_, dst_, outstride, width_,
+                                 height_);
+                } else {
+                    BilinearPlus32(src_, instride, delta_, dst_, outstride, width_,
+                                   height_);
+                }
                 break;
 
             case config::Filter::kScanlines:
-                Scanlines32(src_, instride, delta_, dst_, outstride, width_,
-                            height_);
+                if (out_16) {
+                    Scanlines(src_, instride, delta_, dst_, outstride, width_,
+                              height_);
+                } else {
+                    Scanlines32(src_, instride, delta_, dst_, outstride, width_,
+                                height_);
+                }
                 break;
 
             case config::Filter::kTvmode:
-                ScanlinesTV32(src_, instride, delta_, dst_, outstride, width_,
-                              height_);
+                if (out_16) {
+                    ScanlinesTV(src_, instride, delta_, dst_, outstride, width_,
+                                height_);
+
+                } else {
+                    ScanlinesTV32(src_, instride, delta_, dst_, outstride, width_,
+                                  height_);
+                }
                 break;
 
             case config::Filter::kLQ2x:
-                lq2x32(src_, instride, delta_, dst_, outstride, width_,
-                       height_);
+                if (out_16) {
+                    lq2x(src_, instride, delta_, dst_, outstride, width_,
+                         height_);
+                } else {
+                    lq2x32(src_, instride, delta_, dst_, outstride, width_,
+                           height_);
+                }
                 break;
 
             case config::Filter::kSimple2x:
-                Simple2x32(src_, instride, delta_, dst_, outstride, width_,
-                           height_);
+                if (out_16) {
+                    Simple2x16(src_, instride, delta_, dst_, outstride, width_,
+                               height_);
+                } else {
+                    Simple2x32(src_, instride, delta_, dst_, outstride, width_,
+                               height_);
+                }
                 break;
 
             case config::Filter::kSimple3x:
-                Simple3x32(src_, instride, delta_, dst_, outstride, width_,
-                           height_);
+                if (out_16) {
+                    Simple3x16(src_, instride, delta_, dst_, outstride, width_,
+                               height_);
+                } else {
+                    Simple3x32(src_, instride, delta_, dst_, outstride, width_,
+                               height_);
+                }
                 break;
 
             case config::Filter::kSimple4x:
-                Simple4x32(src_, instride, delta_, dst_, outstride, width_,
-                           height_);
+                if (out_16) {
+                    Simple4x16(src_, instride, delta_, dst_, outstride, width_,
+                             height_);
+                } else {
+                    Simple4x32(src_, instride, delta_, dst_, outstride, width_,
+                               height_);
+                }
                 break;
 
             case config::Filter::kHQ2x:
-                hq2x32(src_, instride, delta_, dst_, outstride, width_,
-                       height_);
+                if (out_16) {
+                    hq2x(src_, instride, delta_, dst_, outstride, width_,
+                         height_);
+                } else {
+                    hq2x32(src_, instride, delta_, dst_, outstride, width_,
+                           height_);
+                }
                 break;
 
             case config::Filter::kHQ3x:
-                hq3x32_32(src_, instride, delta_, dst_, outstride, width_,
-                          height_);
+                if (out_16) {
+                    hq3x16(src_, instride, delta_, dst_, outstride, width_,
+                           height_);
+                } else {
+                    hq3x32_32(src_, instride, delta_, dst_, outstride, width_,
+                              height_);
+                }
                 break;
 
             case config::Filter::kHQ4x:
-                hq4x32_32(src_, instride, delta_, dst_, outstride, width_,
-                          height_);
+                if (out_16) {
+                    hq4x16(src_, instride, delta_, dst_, outstride, width_,
+                           height_);
+
+                } else {
+                    hq4x32_32(src_, instride, delta_, dst_, outstride, width_,
+                              height_);
+                }
                 break;
 
             case config::Filter::kXbrz2x:
@@ -1781,8 +1934,8 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     // double-buffer buffer:
     //   if filtering, this is filter output, retained for redraws
     //   if not filtering, we still retain current image for redraws
-    int outbpp = out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
-    int outrb = systemColorDepth == 24 ? 0 : 4;
+    int outbpp = systemColorDepth >> 3;
+    int outrb = out_8 ? 2 : out_24 ? 0 : 4;
     int outstride = std::ceil(width * outbpp * scale) + outrb;
 
     if (!pixbuf2) {
@@ -2064,6 +2217,424 @@ DrawingPanelBase::~DrawingPanelBase()
     disableKeyboardBackgroundInput();
 }
 
+SDLDrawingPanel::SDLDrawingPanel(wxWindow* parent, int _width, int _height)
+    : DrawingPanel(parent, _width, _height)
+{
+    memset(delta, 0xff, sizeof(delta));
+
+    // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
+    // 16 or 32, though
+    if (OPTION(kDispFilter) == config::Filter::kNone &&
+        OPTION(kDispIFB) == config::Interframe::kNone) {
+        // changing from 32 to 24 does not require regenerating color tables
+        if ((OPTION(kBitDepth) == 8) || (OPTION(kBitDepth) == 16) || (OPTION(kBitDepth) == 24) || (OPTION(kBitDepth) == 32))
+        {
+            systemColorDepth = OPTION(kBitDepth);
+        } else if (OPTION(kBitDepth)) {
+            systemScreenMessage(_("Unsupported bit depth, defaulting to 32 bit"));
+            systemColorDepth = 32;
+        } else {
+            systemColorDepth = 32;
+        }
+    }
+
+    DrawingPanelInit();
+}
+
+SDLDrawingPanel::~SDLDrawingPanel()
+{
+    if (did_init)
+    {
+        SDL_DestroyWindow(sdlwindow);
+        SDL_DestroyTexture(texture);
+        SDL_DestroyRenderer(renderer);
+
+#ifdef ENABLE_SDL3
+        SDL_DestroySurface(surface);
+#else
+        SDL_FreeSurface(surface);
+#endif
+
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
+
+        did_init = false;
+    }
+}
+
+void SDLDrawingPanel::EraseBackground(wxEraseEvent& ev)
+{
+    (void)ev; // unused params
+    // do nothing, do not allow propagation
+}
+
+void SDLDrawingPanel::PaintEv(wxPaintEvent& ev)
+{
+    // FIXME: implement
+    if (!did_init) {
+        DrawingPanelInit();
+    }
+
+    (void)ev; // unused params
+
+    if (!todraw) {
+        // since this is set for custom background, not drawing anything
+        // will cause garbage to be displayed, so draw a black area
+        draw_black_background(GetWindow());
+        return;
+    }
+
+    if (todraw) {
+        DrawArea();
+    }
+}
+
+void SDLDrawingPanel::DrawingPanelInit()
+{
+#ifdef ENABLE_SDL3
+    SDL_PropertiesID props = SDL_CreateProperties();
+#endif
+
+    DrawingPanel::DrawingPanelInit();
+
+#ifdef ENABLE_SDL3
+    if (SDL_InitSubSystem(SDL_INIT_VIDEO) == false) {
+#else
+    if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0) {
+#endif
+        systemScreenMessage(_("Failed to initialize SDL video subsystem"));
+        return;
+    }
+
+#ifdef ENABLE_SDL3
+    if (SDL_WasInit(SDL_INIT_VIDEO) == false) {
+        if (SDL_Init(SDL_INIT_VIDEO) == false) {
+#else
+    if (SDL_WasInit(SDL_INIT_VIDEO) < 0) {
+        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+#endif
+            systemScreenMessage(_("Failed to initialize SDL video"));
+            return;
+        }
+    }
+
+#ifdef ENABLE_SDL3
+    if (SDL_SetPointerProperty(props, "sdl2-compat.external_window", GetWindow()->GetHandle()) == false) {
+        systemScreenMessage(_("Failed to set parent window"));
+        return;
+    }
+
+    sdlwindow = SDL_CreateWindowWithProperties(props);
+
+    if (sdlwindow == NULL) {
+        systemScreenMessage(_("Failed to create SDL window"));
+        return;
+    }
+
+    SDL_DestroyProperties(props);
+
+    renderer = SDL_CreateRenderer(sdlwindow, NULL);
+
+    if (renderer == NULL) {
+        systemScreenMessage(_("Failed to create SDL renderer"));
+        return;
+    }
+#else
+    sdlwindow = SDL_CreateWindowFrom(parent->GetHandle());
+
+    if (sdlwindow == NULL) {
+        systemScreenMessage(_("Failed to create SDL window"));
+        return;
+    }
+
+    renderer = SDL_CreateRenderer(sdlwindow, -1, 0);
+
+    if (renderer == NULL) {
+        systemScreenMessage(_("Failed to create SDL renderer"));
+        return;
+    }
+#endif
+
+    if (out_8) {
+#ifdef ENABLE_SDL3
+        surface = SDL_CreateSurface((width * scale), (height * scale), SDL_GetPixelFormatForMasks(8, 0xE0, 0x1C, 0x03, 0x00));
+        texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(8, 0xE0, 0x1C, 0x03, 0x00), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+#else
+        surface = SDL_CreateRGBSurface(0, (width * scale), (height * scale), 8, 0xE0, 0x1C, 0x03, 0x00);
+        texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(8, 0xE0, 0x1C, 0x03, 0x00), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+#endif
+    } else if (out_16) {
+#ifdef ENABLE_SDL3
+        surface = SDL_CreateSurface((width * scale), (height * scale), SDL_GetPixelFormatForMasks(16, 0x7C00, 0x03E0, 0x001F, 0x0000));
+        texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(16, 0x7C00, 0x03E0, 0x001F, 0x0000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+#else
+        surface = SDL_CreateRGBSurface(0, (width * scale), (height * scale), 16, 0x7C00, 0x03E0, 0x001F, 0x0000);
+        texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(16, 0x7C00, 0x03E0, 0x001F, 0x0000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+#endif
+    } else if (out_24) {
+#ifdef ENABLE_SDL3
+        surface = SDL_CreateSurface((width * scale), (height * scale), SDL_GetPixelFormatForMasks(24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000));
+        texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+#else
+        surface = SDL_CreateRGBSurface(0, (width * scale), (height * scale), 24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000);
+        texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+#endif
+    } else {
+#ifdef ENABLE_SDL3
+        surface = SDL_CreateSurface((width * scale), (height * scale), SDL_GetPixelFormatForMasks(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000));
+        texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+#else
+        surface = SDL_CreateRGBSurface(0, (width * scale), (height * scale), 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000);
+        texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+#endif
+    }
+
+    did_init = true;
+}
+
+void SDLDrawingPanel::OnSize(wxSizeEvent& ev)
+{
+    if (todraw) {
+        DrawArea();
+    }
+
+    ev.Skip();
+}
+
+void SDLDrawingPanel::DrawArea(wxWindowDC& dc)
+{
+    (void)dc;
+    DrawArea();
+}
+
+void SDLDrawingPanel::DrawArea()
+{
+    uint32_t srcPitch = 0;
+
+    if (!did_init)
+        DrawingPanelInit();
+
+    SDL_LockSurface(surface);
+
+    if (out_8) {
+        srcPitch = std::ceil((width + 2) * scale);
+        uint8_t *src = (uint8_t*)todraw + srcPitch; // skip top border
+        uint8_t *dst = (uint8_t *)surface->pixels;
+        
+        for (int y = 0; y < std::ceil(height * scale); y++) {
+            for (int x = 0; x < std::ceil(width * scale); x++) {
+                *dst++ = *src++;
+            }
+            
+            src += 2;
+        }
+    } else if (out_16) {
+        srcPitch = std::ceil((width + 2) * scale);
+        uint16_t *src = (uint16_t*)todraw + srcPitch; // skip top border
+        uint16_t *dst = (uint16_t *)surface->pixels;
+        
+        for (int y = 0; y < std::ceil(height * scale); y++) {
+            for (int x = 0; x < std::ceil(width * scale); x++) {
+                *dst++ = *src++;
+            }
+            
+            src += 2; // skip rhs border
+        }
+    } else if (out_24) {
+        srcPitch = 0;
+        uint8_t *src = (uint8_t*)todraw + srcPitch; // skip top border
+        uint8_t *dst = (uint8_t *)surface->pixels;
+        
+        for (int y = 0; y < std::ceil(height * scale); y++) {
+            for (int x = 0; x < std::ceil(width * scale); x++) {
+                *dst++ = *src++;
+                *dst++ = *src++;
+                *dst++ = *src++;
+            }
+        }
+    } else {
+        srcPitch = std::ceil((width + 1) * scale);
+        uint32_t* src = (uint32_t*)todraw + srcPitch; // skip top border
+        uint32_t *dst = (uint32_t *)surface->pixels;
+        
+        for (int y = 0; y < std::ceil(height * scale); y++) {
+            for (int x = 0; x < std::ceil(width * scale); x++) {
+                *dst++ = *src++;
+            }
+            
+            ++src; // skip rhs border
+        }
+    }
+
+    SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
+    SDL_RenderClear(renderer);
+    SDL_UnlockSurface(surface);
+    SDL_UpdateTexture(texture, NULL, surface->pixels, surface->pitch);
+
+#ifdef ENABLE_SDL3
+    SDL_RenderTexture(renderer, texture, NULL, NULL);
+#else
+    SDL_RenderCopy(renderer, texture, NULL, NULL);
+#endif
+
+    SDL_RenderPresent(renderer);
+}
+
+void SDLDrawingPanel::DrawArea(uint8_t** data)
+{
+    // double-buffer buffer:
+    //   if filtering, this is filter output, retained for redraws
+    //   if not filtering, we still retain current image for redraws
+    int outbpp = systemColorDepth >> 3;
+    int outrb = out_8 ? 2 : out_24 ? 0 : 4;
+    int outstride = std::ceil(width * outbpp * scale) + outrb;
+
+    // FIXME: filters race condition?
+    const int max_threads = 1;
+
+    if (!pixbuf2) {
+        int allocstride = outstride, alloch = height;
+ 
+        // gb may write borders, so allocate enough for them
+        if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
+            allocstride = std::ceil(GameArea::SGBWidth * outbpp * scale) + outrb;
+            alloch = GameArea::SGBHeight;
+        }
+ 
+        pixbuf2 = (uint8_t*)calloc(allocstride, std::ceil((alloch + 2) * scale));
+    }
+ 
+    if (OPTION(kDispFilter) == config::Filter::kNone) {
+        todraw = *data;
+        // *data is assigned below, after old buf has been processed
+        pixbuf1 = pixbuf2;
+        pixbuf2 = todraw;
+    } else
+        todraw = pixbuf2;
+ 
+    // First, apply filters, if applicable, in parallel, if enabled
+    // FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur)
+    if (OPTION(kDispFilter) != config::Filter::kNone ||
+        OPTION(kDispIFB) != config::Interframe::kNone) {
+        if (nthreads != max_threads) {
+            if (nthreads) {
+                if (nthreads > 1)
+                    for (int i = 0; i < nthreads; i++) {
+                        threads[i].lock_.Lock();
+                        threads[i].src_ = NULL;
+                        threads[i].sig_.Signal();
+                        threads[i].lock_.Unlock();
+                        threads[i].Wait();
+                    }
+ 
+                delete[] threads;
+            }
+ 
+            nthreads = max_threads;
+            threads = new FilterThread[nthreads];
+            // first time around, no threading in order to avoid
+            // static initializer conflicts
+            threads[0].threadno_ = 0;
+            threads[0].nthreads_ = 1;
+            threads[0].width_ = width;
+            threads[0].height_ = height;
+            threads[0].scale_ = scale;
+            threads[0].src_ = *data;
+            threads[0].dst_ = todraw;
+            threads[0].delta_ = delta;
+            threads[0].rpi_ = rpi_;
+            threads[0].Entry();
+ 
+            // go ahead and start the threads up, though
+            if (nthreads > 1) {
+                for (int i = 0; i < nthreads; i++) {
+                    threads[i].threadno_ = i;
+                    threads[i].nthreads_ = nthreads;
+                    threads[i].width_ = width;
+                    threads[i].height_ = height;
+                    threads[i].scale_ = scale;
+                    threads[i].dst_ = todraw;
+                    threads[i].delta_ = delta;
+                    threads[i].rpi_ = rpi_;
+                    threads[i].done_ = &filt_done;
+                    threads[i].lock_.Lock();
+                    threads[i].Create();
+                    threads[i].Run();
+                }
+            }
+        } else if (nthreads == 1) {
+            threads[0].threadno_ = 0;
+            threads[0].nthreads_ = 1;
+            threads[0].width_ = width;
+            threads[0].height_ = height;
+            threads[0].scale_ = scale;
+            threads[0].src_ = *data;
+            threads[0].dst_ = todraw;
+            threads[0].delta_ = delta;
+            threads[0].rpi_ = rpi_;
+            threads[0].Entry();
+        } else {
+            for (int i = 0; i < nthreads; i++) {
+                threads[i].lock_.Lock();
+                threads[i].src_ = *data;
+                threads[i].sig_.Signal();
+                threads[i].lock_.Unlock();
+            }
+ 
+            for (int i = 0; i < nthreads; i++)
+                filt_done.Wait();
+        }
+    }
+ 
+    // swap buffers now that src has been processed
+    if (OPTION(kDispFilter) == config::Filter::kNone) {
+        *data = pixbuf1;
+    }
+
+    // draw OSD text old-style (directly into output buffer), if needed
+    // new style flickers too much, so we'll stick to this for now
+    if (wxGetApp().frame->IsFullScreen() || !OPTION(kPrefDisableStatus)) {
+        GameArea* panel = wxGetApp().frame->GetPanel();
+
+        if (panel->osdstat.size())
+            drawText(todraw + outstride * (systemColorDepth != 24), outstride,
+                10, 20, UTF8(panel->osdstat), OPTION(kPrefShowSpeedTransparent));
+ 
+        if (!panel->osdtext.empty()) {
+            if (systemGetClock() - panel->osdtime < OSD_TIME) {
+                wxString message = panel->osdtext;
+                int linelen = std::ceil(width * scale - 20) / 8;
+                int nlines = (message.size() + linelen - 1) / linelen;
+                int cury = height - 14 - nlines * 10;
+                char* buf = strdup(UTF8(message));
+                char* ptr = buf;
+
+                while (nlines > 1) {
+                    char lchar = ptr[linelen];
+                    ptr[linelen] = 0;
+                    drawText(todraw + outstride * (systemColorDepth != 24),
+                        outstride, 10, cury, ptr,
+                        OPTION(kPrefShowSpeedTransparent));
+                    cury += 10;
+                    nlines--;
+                    ptr += linelen;
+                    *ptr = lchar;
+                }
+
+                drawText(todraw + outstride * (systemColorDepth != 24),
+                    outstride, 10, cury, ptr,
+                    OPTION(kPrefShowSpeedTransparent));
+
+                free(buf);
+                buf = NULL;
+            } else
+                panel->osdtext.clear();
+        }
+    }
+
+    // Draw the current frame
+    DrawArea();
+}
+
 BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
     : DrawingPanel(parent, _width, _height)
 {
@@ -2072,33 +2643,61 @@ BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
     if (OPTION(kDispFilter) == config::Filter::kNone &&
         OPTION(kDispIFB) == config::Interframe::kNone) {
         // changing from 32 to 24 does not require regenerating color tables
-        systemColorDepth = 32;
+        if ((OPTION(kBitDepth) == 8) || (OPTION(kBitDepth) == 16) || (OPTION(kBitDepth) == 24) || (OPTION(kBitDepth) == 32)) {
+            systemColorDepth = OPTION(kBitDepth);
+        } else if (OPTION(kBitDepth)) {
+            systemScreenMessage(_("Unsupported bit depth, defaulting to 32 bit"));
+            systemColorDepth = 32;
+        } else {
+            systemColorDepth = 32;
+        }
     }
-    if (!did_init) {
-        DrawingPanelInit();
-    }
+
+    DrawingPanelInit();
 }
 
 void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
 {
     wxImage* im;
 
-    if (systemColorDepth == 24) {
+    if (out_24) {
         // never scaled, no borders, no transformations needed
         im = new wxImage(width, height, todraw, true);
+    } else if (out_8) {
+        // scaled by filters, top/right borders, transform to 24-bit
+        im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
+        uint8_t* src = (uint8_t*)todraw + (int)std::ceil((width + 2) * scale); // skip top border
+        uint8_t* dst = im->GetData();
+
+        for (int y = 0; y < std::ceil(height * scale); y++) {
+            for (int x = 0; x < std::ceil(width * scale); x++, src++) {
+                // White color fix
+                if (*src == 0xff) {
+                    *dst++ = 0xff;
+                    *dst++ = 0xff;
+                    *dst++ = 0xff;
+                } else {
+                    *dst++ = (((*src >> 5) & 0x7) << 5);
+                    *dst++ = (((*src >> 2) & 0x7) << 5);
+                    *dst++ = ((*src & 0x3) << 6);
+                }
+            }
+
+            src += 2;
+        }
     } else if (out_16) {
         // scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
         uint16_t* src = (uint16_t*)todraw + (int)std::ceil((width + 2) * scale); // skip top border
         uint8_t* dst = im->GetData();
-
+        
         for (int y = 0; y < std::ceil(height * scale); y++) {
             for (int x = 0; x < std::ceil(width * scale); x++, src++) {
                 *dst++ = ((*src >> systemRedShift) & 0x1f) << 3;
                 *dst++ = ((*src >> systemGreenShift) & 0x1f) << 3;
                 *dst++ = ((*src >> systemBlueShift) & 0x1f) << 3;
             }
-
+            
             src += 2; // skip rhs border
         }
     } else if (OPTION(kDispFilter) != config::Filter::kNone) {
@@ -2262,7 +2861,10 @@ void GLDrawingPanel::DrawingPanelInit()
                     bilinear ? GL_LINEAR : GL_NEAREST);
 
 #define int_fmt out_16 ? GL_RGB5 : GL_RGB
-#define tex_fmt out_16 ? GL_BGRA : GL_RGBA, \
+#define tex_fmt out_8  ? GL_RGB : \
+                out_16 ? GL_BGRA : \
+                out_24 ? GL_RGB : GL_RGBA, \
+                out_8 ? GL_UNSIGNED_BYTE_3_3_2 : \
                 out_16 ? GL_UNSIGNED_SHORT_1_5_5_5_REV : GL_UNSIGNED_BYTE
 #if 0
         texsize = width > height ? width : height;
@@ -2392,6 +2994,9 @@ void GLDrawingPanel::RefreshGL()
 
 void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 {
+    uint8_t* src = NULL;
+    uint8_t* dst = NULL;
+
     (void)dc; // unused params
     SetContext();
     RefreshGL();
@@ -2400,7 +3005,7 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
         DrawingPanelInit();
 
     if (todraw) {
-        int rowlen = std::ceil(width * scale) + (out_16 ? 2 : 1);
+        int rowlen = std::ceil(width * scale) + (out_8 ? 0 : out_16 ? 2 : out_24 ? 0 : 1);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, rowlen);
 #if wxBYTE_ORDER == wxBIG_ENDIAN
 
@@ -2409,8 +3014,25 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
             glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_TRUE);
 
 #endif
-        glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, std::ceil(width * scale), (int)std::ceil(height * scale),
-            0, tex_fmt, todraw + (int)std::ceil(rowlen * (out_16 ? 2 : 4) * scale));
+        if (out_8) {
+            src = (uint8_t*)todraw + (int)std::ceil((width + 2) * ((systemColorDepth >> 3) * scale)); // skip top border
+            dst = (uint8_t*)todraw;
+
+            for (int y = 0; y < std::ceil(height * scale); y++) {
+                for (int x = 0; x < std::ceil(width * scale); x++) {
+                    *dst++ = *src++;
+                }
+
+                src += 2;
+            }
+
+            glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, (int)std::ceil(width * scale), (int)std::ceil(height * scale),
+                         0, tex_fmt, todraw);
+        } else {
+            glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, (int)std::ceil(width * scale), (int)std::ceil(height * scale),
+                         0, tex_fmt, todraw + (int)std::ceil(rowlen * ((systemColorDepth >> 3) * scale)));
+        }
+
         glCallList(vlist);
     } else
         glClear(GL_COLOR_BUFFER_BIT);

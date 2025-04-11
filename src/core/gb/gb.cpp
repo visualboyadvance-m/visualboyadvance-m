@@ -3887,6 +3887,41 @@ int gbGetNextEvent(int _clockTicks)
 void gbDrawLine()
 {
     switch (systemColorDepth) {
+    case 8: {
+#ifdef __LIBRETRO__
+        uint8_t* dest = (uint8_t*)g_pix + gbBorderLineSkip * (register_LY + gbBorderRowSkip)
+            + gbBorderColumnSkip;
+#else
+        uint8_t* dest = (uint8_t*)g_pix + (gbBorderLineSkip + 2) * (register_LY + gbBorderRowSkip + 1)
+            + gbBorderColumnSkip;
+#endif
+        for (size_t x = 0; x < kGBWidth;) {
+            *dest++ = systemColorMap8[gbLineMix[x++]];
+            *dest++ = systemColorMap8[gbLineMix[x++]];
+            *dest++ = systemColorMap8[gbLineMix[x++]];
+            *dest++ = systemColorMap8[gbLineMix[x++]];
+
+            *dest++ = systemColorMap8[gbLineMix[x++]];
+            *dest++ = systemColorMap8[gbLineMix[x++]];
+            *dest++ = systemColorMap8[gbLineMix[x++]];
+            *dest++ = systemColorMap8[gbLineMix[x++]];
+
+            *dest++ = systemColorMap8[gbLineMix[x++]];
+            *dest++ = systemColorMap8[gbLineMix[x++]];
+            *dest++ = systemColorMap8[gbLineMix[x++]];
+            *dest++ = systemColorMap8[gbLineMix[x++]];
+
+            *dest++ = systemColorMap8[gbLineMix[x++]];
+            *dest++ = systemColorMap8[gbLineMix[x++]];
+            *dest++ = systemColorMap8[gbLineMix[x++]];
+            *dest++ = systemColorMap8[gbLineMix[x++]];
+        }
+        if (gbBorderOn)
+            dest += gbBorderColumnSkip;
+#ifndef __LIBRETRO__
+        *dest++ = 0; // for filters that read one pixel more
+#endif
+    } break;
     case 16: {
 #ifdef __LIBRETRO__
         uint16_t* dest = (uint16_t*)g_pix + gbBorderLineSkip * (register_LY + gbBorderRowSkip)

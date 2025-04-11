@@ -51,6 +51,13 @@
                     <border>5</border>
                   </object>
                   <object class="sizeritem">
+                    <object class="wxRadioButton" name="OutputSDL">
+                      <label translate="0">SDL</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
                     <object class="wxRadioButton" name="OutputDirect3D">
                       <label translate="0">Direct3D 9</label>
                     </object>
@@ -150,6 +157,54 @@
         </object>
       </object>
       <label>Basic</label>
+    </object>
+    <object class="notebookpage">
+      <object class="wxPanel">
+        <object class="wxBoxSizer">
+          <orient>wxVERTICAL</orient>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Bit Depth</label>
+              <font>
+                <weight>bold</weight>
+              </font>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxBoxSizer">
+              <orient>wxVERTICAL</orient>
+              <object class="sizeritem">
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+                <object class="wxBoxSizer">
+                  <orient>wxHORIZONTAL</orient>
+                  <object class="sizeritem">
+                    <object class="wxStaticText" name="BitDepthLab">
+                      <label>Bit Depth:</label>
+                    </object>
+                    <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxSpinCtrl" name="BitDepth">
+                      <min>8</min>
+                      <max>32</max>
+                    </object>
+                    <option>32</option>
+                    <flag>wxALL|wxEXPAND</flag>
+                    <border>5</border>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+        </object>
+      </object>
+      <label>Bit Depth</label>
     </object>
     <object class="notebookpage">
       <object class="wxPanel">
