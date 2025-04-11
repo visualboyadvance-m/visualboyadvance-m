@@ -234,6 +234,10 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
                            std::bind(&DisplayConfig::OnInterframeChanged,
                                      this,
                                      std::placeholders::_1)) {
+    GetValidatedChild("BitDepth")
+        ->SetValidator(
+            widgets::OptionIntValidator(config::OptionID::kBitDepth));
+
     // Speed
     GetValidatedChild("FrameSkip")
         ->SetValidator(
@@ -251,6 +255,10 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
     // validator just for this, and spinctrl is good enough.
     GetValidatedChild("MaxScale")
         ->SetValidator(wxGenericValidator(&gopts.max_scale));
+
+    // SDL
+    GetValidatedChild("OutputSDL")
+        ->SetValidator(RenderValidator(config::RenderMethod::kSDL));
 
     // Basic
     GetValidatedChild("OutputSimple")

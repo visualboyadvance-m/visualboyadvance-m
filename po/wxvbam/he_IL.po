@@ -362,6 +362,14 @@ msgstr "לא נמצא תוסף rpi הניתן לשימוש ב-%s"
 msgid "Plugin"
 msgstr "תוסף"
 
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth"
+msgstr "סיביות לפיקסל"
+
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth:"
+msgstr "סיביות לפיקסל:"
+
 #: dialogs/display-config.cpp:407
 #, c-format
 msgid "Using pixel filter: %s"
