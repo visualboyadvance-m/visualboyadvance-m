@@ -9,7 +9,7 @@
 # Alexey Ter <lexalamer@mail.ru>, 2016
 # Anton Fedenko <gang296@mail.ru>, 2015
 # Artem Abramov <aabramovrussia@yandex.com>, 2015
-# George Matsune <georg29387878@gmail.com>, 2017
+# aa26bd9ab58eaf66f2dd8a133c45eb7b_740a4a0 <e0546a0601f08ad77df0edd7ee27c670_658246>, 2017
 # Irina Fedulova <istartlin@gmail.com>, 2020
 # Koshak Magnificent <coschack@mail.ru>, 2020
 # Matvey Nazarov, 2022
