@@ -59,6 +59,17 @@ int FAGetDev(FAudio* fa) {
 
 class FAudio_BufferNotify : public FAudioVoiceCallback {
 public:
+    FAudio_BufferNotify() {
+        OnBufferEnd = &FAudio_BufferNotify::StaticOnBufferEnd;
+        OnVoiceProcessingPassStart = &FAudio_BufferNotify::StaticOnVoiceProcessingPassStart;
+        OnVoiceProcessingPassEnd = &FAudio_BufferNotify::StaticOnVoiceProcessingPassEnd;
+        OnStreamEnd = &FAudio_BufferNotify::StaticOnStreamEnd;
+        OnBufferStart = &FAudio_BufferNotify::StaticOnBufferStart;
+        OnLoopEnd = &FAudio_BufferNotify::StaticOnLoopEnd;
+        OnVoiceError = &FAudio_BufferNotify::StaticOnVoiceError;
+    }
+    ~FAudio_BufferNotify() = default;
+
     // Waits for the buffer end event to be signaled for 10 seconds.
     // Returns true if the buffer end event was signaled, false if the wait timed out.
     bool WaitForSignal() {
@@ -70,17 +81,6 @@ public:
         signaled_ = false;
         return was_signaled;
     }
-
-    FAudio_BufferNotify() {
-        OnBufferEnd = &FAudio_BufferNotify::StaticOnBufferEnd;
-        OnVoiceProcessingPassStart = &FAudio_BufferNotify::StaticOnVoiceProcessingPassStart;
-        OnVoiceProcessingPassEnd = &FAudio_BufferNotify::StaticOnVoiceProcessingPassEnd;
-        OnStreamEnd = &FAudio_BufferNotify::StaticOnStreamEnd;
-        OnBufferStart = &FAudio_BufferNotify::StaticOnBufferStart;
-        OnLoopEnd = &FAudio_BufferNotify::StaticOnLoopEnd;
-        OnVoiceError = &FAudio_BufferNotify::StaticOnVoiceError;
-    }
-    ~FAudio_BufferNotify() = default;
 
 private:
     // Signals that the buffer end event has occurred.
@@ -391,7 +391,7 @@ void FAudio_Output::write(uint16_t* finalWave, int) {
             // the maximum number of buffers is currently queued
             if (!coreOptions.speedup && coreOptions.throttle && !gba_joybus_active) {
                 // wait for one buffer to finish playing
-                if (notify.WaitForSignal()) {
+                if (!notify.WaitForSignal()) {
                     device_changed = true;
                 }
             } else {
