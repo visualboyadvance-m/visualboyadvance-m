@@ -153,6 +153,7 @@ unset(wx_find_extra)
 if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
   set(wx_find_extra NO_DEFAULT_PATH)
   set(wxWidgets_DIR "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/share/wxwidgets")
+  find_package(nanosvg)
 endif()
 
 set(ENABLE_OPENGL TRUE)
