@@ -904,7 +904,7 @@ if(APPLE)
     if(CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
         add_custom_command(
             TARGET visualboyadvance-m POST_BUILD
-            COMMAND ${CMAKE_SOURCE_DIR}/tools/macOS/third_party_libs_tool ./visualboyadvance-m.app
+            COMMAND bash ${CMAKE_SOURCE_DIR}/tools/macOS/third_party_libs_tool ./visualboyadvance-m.app
             WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
         )
     endif()

@@ -5,45 +5,82 @@ set -e
 LANG=C LC_COLLATE=C LC_CTYPE=C LC_MESSAGES=C LC_MONETARY=C LC_NUMERIC=C LC_TIME=C LC_ALL=C
 export LANG LC_COLLATE LC_CTYPE LC_MESSAGES LC_MONETARY LC_NUMERIC LC_TIME LC_ALL
 
-## bash 3 does not work for this code
-#if [ -z "$IN_DASH" ]; then
-#    if command -v dash >/dev/null; then
-#        export IN_DASH=1
-#        exec dash "$0" "$@"
-#    else
-#        echo >&2 "please install dash from homebrew or macports to run this script"
-#        exit 1
-#    fi
-#fi
+# bash 3 does not work for this code
+if [ -z "$IN_DASH" ]; then
+    if command -v dash >/dev/null; then
+        export IN_DASH=1
+        exec dash "$0" "$@"
+    else
+        echo >&2 "Please install dash from Nix/Homebrew to run this script."
+        exit 1
+    fi
+fi
 
 target_bits=64
-target_cpu=x86_64
+target_build_arch=-m64
+
+if [ "$(uname -m)" = arm64 ]; then
+    export APPLE_SILICON=1
+    target_cpu=ARM64
+else
+    target_cpu=x86_64
+fi
 
 case "$1" in
+    -[Ii][Nn][Tt][Ee][Ll])
+        intel_target=1
+        shift
+        ;;
+    -[Ii][Nn][Tt][Ee][Ll]64)
+        intel_target=1
+        shift
+        ;;
+    -[Xx]86_64)
+        intel_target=1
+        shift
+        ;;
     -64)
         shift
         ;;
-    -32)
-        target_bits=32
-        target_cpu=i386
+    -[Aa][Rr][Mm]64)
         shift
         ;;
-    -arm64)
-        target_bits=arm64
-        target_cpu=arm64
+    -32)
+        target_build_arch=-m32
+        target_cpu=i386
         shift
         ;;
 esac
 
+if [ -n "$APPLE_SILICON" ]; then
+    if [ -n "$intel_target" ]; then
+        target_build_arch='-target x86_64-apple-macos10.15 -march=core2 -mtune=skylake'
+        target_cpu=x86_64
+        export MACOSX_DEPLOYMENT_TARGET=10.15 # Catalina
+    else
+        export MACOSX_DEPLOYMENT_TARGET=11.0 # Big Sur
+    fi
+elif [ "$target_cpu" = x86_64 ]; then
+        target_build_arch='-m64 -march=core2 -mtune=skylake'
+fi
+
 # Need to use Xcode 9 for 32 bit builds on Mojave and newer.
 # Place it in /Applications/Xcode9.app .
-if [ "$target_bits" -eq 32 ] && [ -d /Applications/Xcode9.app ]; then
+if [ "$target_cpu" = i386 ] && [ -d /Applications/Xcode9.app ]; then
     PREV_XCODE=$(xcode-select -p)
     printf "\nSetting Xcode9 as the default Xcode for 32 bit build...\n\n"
     sudo xcode-select -s /Applications/Xcode9.app/Contents/Developer
 fi
 
-export BUILD_ROOT="${BUILD_ROOT:-$HOME/vbam-build-mac-${target_bits}bit}$BUILD_ROOT_SUFFIX"
+if command -v brew >/dev/null; then
+    export BREW_PREFIX=$(brew --prefix)
+elif [ -f /usr/local/bin/brew ]; then
+    export BREW_PREFIX=$(/usr/local/bin/brew --prefix)
+elif [ -f /opt/homebrew/bin/brew ]; then
+    export BREW_PREFIX=$(/opt/homebrew/bin/brew --prefix)
+fi
+
+export BUILD_ROOT="${BUILD_ROOT:-$HOME/vbam-build-mac-${target_cpu}}$BUILD_ROOT_SUFFIX"
 
 ver_file=$(mktemp)
 sw_vers -productVersion | sed 's/\./ /g' > "$ver_file"
@@ -62,7 +99,7 @@ best_llvm=$(
             fi
         done
 
-        for brew_llvm in $(find /usr/local/opt -maxdepth 1 -type l -name 'llvm*'); do
+        for brew_llvm in $(find "$BREW_PREFIX"/Cellar -maxdepth 1 -type l -name 'llvm*'); do
             if [ -x "$brew_llvm/bin/clang++" ]; then
                 echo "$brew_llvm    $($brew_llvm/bin/clang++ --version | head -1 | awk '{ print $NF }')"
             fi
@@ -71,19 +108,19 @@ best_llvm=$(
 )
 
 BUILD_ENV=$(cat <<EOF
-export MACOSX_DEPLOYMENT_TARGET=10.10
+export MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET
 export COMMAND_MODE=unix2003
-export PATH=/usr/bin:/bin:/usr/sbin:/sbin
+export PATH=/usr/bin:/bin:/usr/sbin:/sbin:"$BREW_PREFIX"/bin
 
 [ -n "$best_llvm" ] && export PATH="$best_llvm/bin:\$PATH"
 
 export CC=clang
 export CXX=clang++
-export CPPFLAGS="-DICONV_CONST="
-export CFLAGS="-m${target_bits} -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
-export CXXFLAGS="-m${target_bits} -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
-export OBJCXXFLAGS="-m${target_bits} -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
-export LDFLAGS="-m${target_bits} -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
+export CPPFLAGS=-DICONV_CONST=
+export CFLAGS="$target_build_arch -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+export CXXFLAGS="$target_build_arch -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+export OBJCXXFLAGS="$target_build_arch -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+export LDFLAGS="$target_build_arch -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
 
 export UUID_CFLAGS="-I\$BUILD_ROOT/root/stow/libuuid/include"
 export UUID_LIBS="-L\$BUILD_ROOT/root/stow/libuuid/lib -luuid"
@@ -108,14 +145,6 @@ for dist in flex libsecret c2man graphviz zip; do
     table_line_remove DISTS "$dist"
 done
 
-# LLVM libunwind.
-
-table_insert_after DISTS cmake '
-    libunwind       https://github.com/llvm-mirror/libunwind/archive/3e6ec2ae9afaa3683269b690612f84d907943ea2.tar.gz  lib/libunwind.a
-'
-
-table_line_replace DIST_ARGS libunwind '-DLIBUNWIND_ENABLE_STATIC=ON -DLIBUNWIND_ENABLE_SHARED=OFF'
-
 # issues with perl modules linked to our libs and brew perl
 table_line_remove DISTS shared-mime-info
 
@@ -127,8 +156,10 @@ table_line_append DIST_PRE_BUILD zip " \
 
 if [ "$target_cpu" = i386 ]; then
     table_line_replace DIST_CONFIGURE_OVERRIDES openssl './Configure darwin-i386-cc no-shared --prefix=/usr --openssldir=/etc/ssl'
+elif [ "$target_cpu" = ARM64 ]; then
+    table_line_replace DIST_CONFIGURE_OVERRIDES openssl "./Configure darwin64-arm64-cc no-shared --prefix=/usr --openssldir=/etc/ssl"
 else
-    table_line_replace DIST_CONFIGURE_OVERRIDES openssl './Configure darwin64-x86_64-cc no-shared --prefix=/usr --openssldir=/etc/ssl'
+    table_line_replace DIST_CONFIGURE_OVERRIDES openssl "./Configure darwin64-${target_cpu}-cc no-shared --prefix=/usr --openssldir=/etc/ssl"
 fi
 
 stdint_h=
@@ -173,11 +204,17 @@ if [ "$target_cpu" = i386 ]; then
     table_line_append DIST_ARGS libicu '--host= --build='
 fi
 
+table_line_remove DISTS ninja
+
 table_line_replace DIST_CONFIGURE_TYPES libmodplug autoreconf
 table_line_append  DIST_PRE_BUILD       libmodplug " \
     sed -i.bak '/-mmacosx-version-min=/d' configure.ac; \
     sed -i.bak 's/-lstdc++/-lc++/g' libmodplug.pc.in; \
 "
+
+if [ -z "$APPLE_SILICON" ]; then
+    table_line_replace DISTS glib 'https://download.gnome.org/sources/glib/2.78/glib-2.78.3.tar.xz     lib/libglib-2.0.a'
+fi
 
 table_line_append DIST_PRE_BUILD libzmq "sed -i.bak 's/-lstdc++/-lc++/g' src/libzmq.pc.in"
 table_line_append DIST_PRE_BUILD ffmpeg "sed -i.bak 's/-lstdc++/-lc++/g' configure"
@@ -197,6 +234,21 @@ table_line_append DIST_PRE_BUILD libvpx " \
 table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg "--disable-videotoolbox --extra-ldflags='-framework CoreText'"
 
 #table_line_append DIST_PATCHES ffmpeg "-p0 https://gist.githubusercontent.com/rkitover/db75d083b74617b186eec11965c1da74/raw/20da2f8c6d8c02ce284096c5e805ae671351cc6e/ffmpeg-macos10-7.patch"
+
+table_line_remove DISTS python2
+
+table_line_append DIST_PRE_BUILD sfml " \
+    sed -E -i.bak '/OSX_DEPLOYMENT_TARGET/d' CMakeLists.txt; \
+"
+
+
+if [ -n "$APPLE_SILICON" ] && [ "$target_cpu" != ARM64 ]; then
+    table_line_remove DISTS m4
+    table_line_remove DISTS XML-Parser
+    table_line_remove DISTS libffi
+    table_line_remove DISTS libgcrypt
+    table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg '--disable-asm'
+fi
 
 builder "$@"
 
