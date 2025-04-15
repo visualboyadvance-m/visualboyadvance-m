@@ -157,6 +157,7 @@ FAudio_Output::FAudio_Output() : buffer_count_(OPTION(kSoundBuffers)) {
     playing = false;
     freq_ = 0;
     currentBuffer = 0;
+    sound_buffer_len_ = 0;
     device_changed = false;
     faud = nullptr;
     mVoice = nullptr;
