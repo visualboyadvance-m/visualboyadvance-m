@@ -2325,12 +2325,16 @@ void SDLDrawingPanel::DrawingPanelInit()
     struct wl_surface *wayland_surface = NULL;
     struct wl_display *wayland_display = NULL;
 
+#ifdef ENABLE_SDL3
     if (GDK_IS_WAYLAND_WINDOW(gtk_widget_get_window(widget))) {
         wayland_display = gdk_wayland_display_get_wl_display(gtk_widget_get_display(widget));
         wayland_surface = gdk_wayland_window_get_wl_surface(gtk_widget_get_window(widget));
     } else {
+#endif
         xid = GDK_WINDOW_XID(gtk_widget_get_window(widget));
+#ifdef ENABLE_SDL3
     }
+#endif
 #endif
 
     DrawingPanel::DrawingPanelInit();
@@ -2408,11 +2412,7 @@ void SDLDrawingPanel::DrawingPanelInit()
     }
 #else
 #ifdef __WXGTK__
-    if (GDK_IS_WAYLAND_WINDOW(gtk_widget_get_window(widget))) {
-        sdlwindow = SDL_CreateWindowFrom((void *)wayland_surface);
-    } else {
-        sdlwindow = SDL_CreateWindowFrom((void *)xid);
-    }
+    sdlwindow = SDL_CreateWindowFrom((void *)xid);
 #else
     sdlwindow = SDL_CreateWindowFrom(GetWindow()->GetHandle());
 #endif
