@@ -362,6 +362,14 @@ msgstr "Δεν βρέθηκαν χρήσιμες επεκτάσεις rpi στο
 msgid "Plugin"
 msgstr "Επέκταση"
 
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth"
+msgstr "Bits ανά pixel"
+
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth:"
+msgstr "Bits ανά pixel:"
+
 #: dialogs/display-config.cpp:407
 #, c-format
 msgid "Using pixel filter: %s"

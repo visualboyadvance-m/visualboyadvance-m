@@ -268,6 +268,9 @@ TEST(OptionTest, Enum) {
     EXPECT_TRUE(option->SetRenderMethod(config::RenderMethod::kSimple));
     EXPECT_EQ(option->GetRenderMethod(), config::RenderMethod::kSimple);
 
+    EXPECT_TRUE(option->SetRenderMethod(config::RenderMethod::kSDL));
+    EXPECT_EQ(option->GetRenderMethod(), config::RenderMethod::kSDL);
+
     EXPECT_TRUE(option->SetEnumString("opengl"));
     EXPECT_EQ(option->GetRenderMethod(), config::RenderMethod::kOpenGL);
 }

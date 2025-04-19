@@ -45,6 +45,9 @@ private:
     // Displays the new interframe name on the screen.
     void OnInterframeChanged(config::Option* option);
 
+    // Renderer changed
+    void FillRendererList(wxCommandEvent& event);
+
     // Hides/Shows the plugin-related filter options.
     void HidePluginOptions();
     void ShowPluginOptions();
@@ -53,6 +56,7 @@ private:
     wxChoice* plugin_selector_;
     wxChoice* filter_selector_;
     wxChoice* interframe_selector_;
+    wxChoice* sdlrenderer_selector_;
     const config::OptionsObserver filter_observer_;
     const config::OptionsObserver interframe_observer_;
 };

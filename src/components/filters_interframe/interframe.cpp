@@ -159,6 +159,51 @@ static void SmartIB_MMX(uint8_t *srcPtr, uint32_t srcPitch, int width, int start
 }
 #endif
 
+void SmartIB8(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int height)
+{
+  (void)width; // unused param
+  if(frm1 == NULL) {
+    InterframeFilterInit();
+  }
+
+  uint16_t colorMask = ~RGB_LOW_BITS_MASK;
+
+  uint8_t *src0 = (uint8_t *)srcPtr + starty * srcPitch;
+  uint8_t *src1 = (uint8_t *)frm1 + srcPitch * starty;
+  uint8_t *src2 = (uint8_t *)frm2 + srcPitch * starty;
+  uint8_t *src3 = (uint8_t *)frm3 + srcPitch * starty;
+
+  int sPitch = srcPitch;
+
+  int pos = 0;
+  for (int j = 0; j < height;  j++)
+    for (int i = 0; i < sPitch; i++) {
+      uint16_t color = src0[pos] == 0xff ? 0x7fff : ((src0[pos] & 0xe0) << 7) | ((src0[pos] & 0x1c) << 5) | ((src0[pos] & 0x3) << 3);
+      uint16_t color2 = src1[pos] == 0xff ? 0x7fff : ((src1[pos] & 0xe0) << 7) | ((src1[pos] & 0x1c) << 5) | ((src1[pos] & 0x3) << 3);
+      uint16_t color_dst = ((color & colorMask) >> 1) + ((color2 & colorMask) >> 1);
+      src0[pos] =
+        (src1[pos] != src2[pos]) &&
+        (src3[pos] != color) &&
+        ((color == src2[pos]) || (src1[pos] == src3[pos]))
+        ? (uint8_t)(((color_dst >> 7) & 0xe0) | ((color_dst >> 5) & 0x1c) | ((color_dst >> 3) & 0x3)) :
+        (uint8_t)(((color >> 7) & 0xe0) | ((color >> 5) & 0x1c) | ((color >> 3) & 0x3));
+      src3[pos] = (uint8_t)(((color >> 7) & 0xe0) | ((color >> 5) & 0x1c) | ((color >> 3) & 0x3)); /* oldest buffer now holds newest frame */
+      pos++;
+    }
+
+    /* Swap buffers around */
+    uint8_t *temp = frm1;
+    frm1 = frm3;
+    frm3 = frm2;
+    frm2 = temp;
+
+}
+
+void SmartIB8(uint8_t *srcPtr, uint32_t srcPitch, int width, int height)
+{
+  SmartIB8(srcPtr, srcPitch, width, 0, height);
+}
+
 void SmartIB(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int height)
 {
   (void)width; // unused param
@@ -205,6 +250,64 @@ void SmartIB(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int heig
 void SmartIB(uint8_t *srcPtr, uint32_t srcPitch, int width, int height)
 {
   SmartIB(srcPtr, srcPitch, width, 0, height);
+}
+
+void SmartIB24(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int height)
+{
+  (void)width; // unused param
+  if(frm1 == NULL) {
+    InterframeFilterInit();
+  }
+
+  uint8_t colorMask = 0xfe;
+
+  uint8_t *src0 = (uint8_t *)srcPtr + starty * srcPitch / 3;
+  uint8_t *src1 = (uint8_t *)frm1 + srcPitch * starty / 3;
+  uint8_t *src2 = (uint8_t *)frm2 + srcPitch * starty / 3;
+  uint8_t *src3 = (uint8_t *)frm3 + srcPitch * starty / 3;
+
+  int sPitch = srcPitch / 3;
+
+  int pos = 0;
+  for (int j = 0; j < height;  j++)
+    for (int i = 0; i < sPitch; i++) {
+      uint8_t color = src0[pos];
+      uint8_t color2 = src0[pos+1];
+      uint8_t color3 = src0[pos+2];
+      src0[pos] =
+        (src1[pos] != src2[pos]) &&
+        (src3[pos] != color) &&
+        ((color == src2[pos]) || (src1[pos] == src3[pos]))
+        ? (((color & colorMask) >> 1) + ((src1[pos] & colorMask) >> 1)) :
+        color;
+      src0[pos+1] =
+        (src1[pos+1] != src2[pos+1]) &&
+        (src3[pos+1] != color2) &&
+        ((color2 == src2[pos+1]) || (src1[pos+1] == src3[pos+1]))
+        ? (((color2 & colorMask) >> 1) + ((src1[pos+1] & colorMask) >> 1)) :
+        color2;
+      src0[pos+2] =
+        (src1[pos+2] != src2[pos+2]) &&
+          (src3[pos+2] != color3) &&
+          ((color3 == src2[pos+2]) || (src1[pos+1] == src3[pos+2]))
+          ? (((color3 & colorMask) >> 1) + ((src1[pos+2] & colorMask) >> 1)) :
+          color3;
+      src3[pos] = color; /* oldest buffer now holds newest frame */
+      src3[pos+1] = color2; /* oldest buffer now holds newest frame */
+      src3[pos+2] = color3; /* oldest buffer now holds newest frame */
+      pos += 3;
+    }
+
+  /* Swap buffers around */
+  uint8_t *temp = frm1;
+  frm1 = frm3;
+  frm3 = frm2;
+  frm2 = temp;
+}
+
+void SmartIB24(uint8_t *srcPtr, uint32_t srcPitch, int width, int height)
+{
+  SmartIB24(srcPtr, srcPitch, width, 0, height);
 }
 
 #ifdef MMX
@@ -442,6 +545,70 @@ static void MotionBlurIB_MMX(uint8_t *srcPtr, uint32_t srcPitch, int width, int 
   }
 }
 #endif
+
+void MotionBlurIB24(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int height)
+{
+  (void)width; // unused param
+  if(frm1 == NULL) {
+    InterframeFilterInit();
+  }
+
+  uint8_t colorMask = 0xfe;
+
+  uint8_t *src0 = (uint8_t *)srcPtr + starty * srcPitch / 3;
+  uint8_t *src1 = (uint8_t *)frm1 + starty * srcPitch / 3;
+  int sPitch = srcPitch / 3;
+
+  int pos = 0;
+  for (int j = 0; j < height;  j++)
+    for (int i = 0; i < sPitch; i++) {
+      uint8_t color = src0[pos];
+      uint8_t color2 = src0[pos+1];
+      uint8_t color3 = src0[pos+2];
+      src0[pos] = ((color & colorMask) >> 1) + ((src1[pos] & colorMask) >> 1);
+      src0[pos+1] = ((color2 & colorMask) >> 1) + ((src1[pos+1] & colorMask) >> 1);
+      src0[pos+2] = ((color3 & colorMask) >> 1) + ((src1[pos+2] & colorMask) >> 1);
+      src1[pos] = color;
+      src1[pos+1] = color2;
+      src1[pos+2] = color3;
+      pos += 3;
+    }
+}
+
+void MotionBlurIB24(uint8_t *srcPtr, uint32_t srcPitch, int width, int height)
+{
+    MotionBlurIB24(srcPtr, srcPitch, width, 0, height);
+}
+
+void MotionBlurIB8(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int height)
+{
+  (void)width; // unused param
+  if(frm1 == NULL) {
+    InterframeFilterInit();
+  }
+
+  uint16_t colorMask = ~RGB_LOW_BITS_MASK;
+
+  uint8_t *src0 = (uint8_t *)srcPtr + starty * srcPitch;
+  uint8_t *src1 = (uint8_t *)frm1 + starty * srcPitch;
+  int sPitch = srcPitch;
+
+  int pos = 0;
+  for (int j = 0; j < height;  j++)
+    for (int i = 0; i < sPitch; i++) {
+      uint16_t color = src0[pos] == 0xff ? 0x7fff : ((src0[pos] & 0xe0) << 7) | ((src0[pos] & 0x1c) << 5) | ((src0[pos] & 0x3) << 3);
+      uint16_t color2 = src1[pos] == 0xff ? 0x7fff : ((src1[pos] & 0xe0) << 7) | ((src1[pos] & 0x1c) << 5) | ((src1[pos] & 0x3) << 3);
+      uint16_t color_dst = ((color & colorMask) >> 1) + ((color2 & colorMask) >> 1);
+      src0[pos] = (uint8_t)(((color_dst >> 7) & 0xe0) | ((color_dst >> 5) & 0x1c) | ((color_dst >> 3) & 0x3));
+      src1[pos] = (uint8_t)(((color >> 7) & 0xe0) | ((color >> 5) & 0x1c) | ((color >> 3) & 0x3));
+      pos++;
+    }
+}
+
+void MotionBlurIB8(uint8_t *srcPtr, uint32_t srcPitch, int width, int height)
+{
+  MotionBlurIB8(srcPtr, srcPitch, width, 0, height);
+}
 
 void MotionBlurIB(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int height)
 {

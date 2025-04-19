@@ -365,6 +365,14 @@ msgstr "V %s nenalezeny žádné použitelné zásuvné moduly rpi"
 msgid "Plugin"
 msgstr "Zásuvný modul"
 
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth"
+msgstr "Počet bitů na pixel"
+
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth:"
+msgstr "Počet bitů na pixel:"
+
 #: dialogs/display-config.cpp:407
 #, c-format
 msgid "Using pixel filter: %s"

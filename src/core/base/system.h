@@ -110,6 +110,7 @@ extern void systemFrame();
 extern void systemGbBorderOn();
 extern void (*dbgOutput)(const char* s, uint32_t addr);
 extern void (*dbgSignal)(int sig, int number);
+extern uint8_t  systemColorMap8[0x10000];
 extern uint16_t systemColorMap16[0x10000];
 extern uint32_t systemColorMap32[0x10000];
 extern uint16_t systemGbPalette[24];

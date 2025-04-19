@@ -108,6 +108,13 @@
                     <border>5</border>
                   </object>
                   <object class="sizeritem">
+                    <object class="wxRadioButton" name="SDL">
+                      <label translate="0">SDL</label>
+                    </object>
+                    <flag>wxALL|wxEXPAND</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
                     <object class="wxRadioButton" name="DirectSound">
                       <label>Direct Sound</label>
                     </object>
