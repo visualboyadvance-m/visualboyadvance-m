@@ -10,4 +10,6 @@
 bool utilWritePNGFile(const char*, int, int, uint8_t*);
 bool utilWriteBMPFile(const char*, int, int, uint8_t*);
 
+extern bool no_border;
+
 #endif  // VBAM_CORE_BASE_IMAGE_UTIL_H_

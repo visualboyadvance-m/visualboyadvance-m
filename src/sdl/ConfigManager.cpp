@@ -138,6 +138,8 @@ int rewindTimer = 0;
 int showSpeed;
 int showSpeedTransparent;
 
+int userColorDepth = 0;
+
 const char* preparedCheatCodes[MAX_CHEATS];
 
 // allow up to 100 IPS/UPS/PPF patches given on commandline
@@ -168,6 +170,7 @@ struct option argOptions[] = {
 	{ "capture-format", required_argument, 0, OPT_CAPTURE_FORMAT },
 	{ "cheat", required_argument, 0, OPT_CHEAT },
 	{ "cheats-enabled", no_argument, &coreOptions.cheatsEnabled, 1 },
+	{ "color-depth", required_argument, 0, 'z'},
 	{ "color-option", no_argument, 0, OPT_GB_COLOR_OPTION },
 	{ "config", required_argument, 0, 'c' },
 	{ "cpu-disable-sfx", no_argument, &coreOptions.cpuDisableSfx, 1 },
@@ -744,6 +747,20 @@ int ReadOpts(int argc, char ** argv)
 			break;
 		case 'F':
 			fullScreen = 1;
+			break;
+		case 'z':
+			if (optarg != NULL) {
+				userColorDepth = atoi(optarg);
+
+				if ((userColorDepth != 8) && (userColorDepth != 16) && (userColorDepth != 24) && (userColorDepth != 32)) {
+					fprintf(stderr, "Wrong color depth (%d bit)\n", userColorDepth);
+					userColorDepth = 0;
+				} else {
+					log("Set color depth to %d bit\n", userColorDepth);
+				}
+			} else {
+				userColorDepth = 0;
+			}
 			break;
 		case 'f':
 			if (optarg) {
