@@ -131,7 +131,7 @@ DISTS=$DISTS'
     gperf           http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz                                           bin/gperf
     libicu          https://github.com/unicode-org/icu/releases/download/release-71-1/icu4c-71_1-src.tgz        lib/libicud*t*.a
     pkgconf         https://github.com/pkgconf/pkgconf/archive/refs/tags/pkgconf-1.9.3.tar.gz                   bin/pkgconf
-    nasm            https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/nasm-2.15.05.tar.xz                      bin/nasm
+    nasm            https://github.com/netwide-assembler/nasm/archive/refs/tags/nasm-2.16.03.tar.gz                      bin/nasm
     yasm            http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz                             bin/yasm
     pcre            https://downloads.sourceforge.net/project/pcre/pcre/8.45/pcre-8.45.tar.bz2                  lib/libpcre.a
     pcre2           https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.40/pcre2-10.40.tar.bz2     lib/libpcre2-posix.a
