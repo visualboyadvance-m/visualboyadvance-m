@@ -15,8 +15,13 @@ endif()
 
 option(ENABLE_SDL "Build the SDL port" ${ENABLE_SDL_DEFAULT})
 option(ENABLE_WX "Build the wxWidgets port" ${BUILD_DEFAULT})
+option(ENABLE_TILEDRENDER "Enable tiled renderer" ${BUILD_DEFAULT})
 option(ENABLE_DEBUGGER "Enable the debugger" ON)
 option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build with GCC/Clang" OFF)
+
+if(ENABLE_TILEDRENDER)
+    set(ENABLE_TILEDRENDER OFF)
+endif()
 
 # Static linking
 set(VBAM_STATIC_DEFAULT OFF)
