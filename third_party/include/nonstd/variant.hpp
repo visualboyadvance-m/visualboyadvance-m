@@ -47,6 +47,14 @@
 # define variant_CONFIG_OMIT_VARIANT_ALTERNATIVE_T_MACRO  0
 #endif
 
+// Control marking class bad_variant_access with [[nodiscard]]]:
+
+#if !defined(variant_CONFIG_NO_NODISCARD)
+# define variant_CONFIG_NO_NODISCARD  0
+#else
+# define variant_CONFIG_NO_NODISCARD  1
+#endif
+
 // Control presence of exception handling (try and auto discover):
 
 #ifndef variant_CONFIG_NO_EXCEPTIONS
@@ -364,7 +372,7 @@ namespace nonstd {
 
 // Presence of C++17 language features:
 
-// no flag
+#define variant_HAVE_NODISCARD          variant_CPP17_000
 
 // Presence of C++ library features:
 
@@ -402,6 +410,12 @@ namespace nonstd {
 # define variant_nullptr nullptr
 #else
 # define variant_nullptr NULL
+#endif
+
+#if variant_HAVE_NODISCARD && !variant_CONFIG_NO_NODISCARD
+# define variant_nodiscard [[nodiscard]]
+#else
+# define variant_nodiscard /*[[nodiscard]]*/
 #endif
 
 #if variant_HAVE_OVERRIDE
@@ -1266,7 +1280,7 @@ static const std::size_t variant_npos = static_cast<std::size_t>( -1 );
 
 // 19.7.11 Class bad_variant_access
 
-class bad_variant_access : public std::exception
+class variant_nodiscard bad_variant_access : public std::exception
 {
 public:
 #if variant_CPP11_OR_GREATER

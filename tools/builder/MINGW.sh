@@ -263,10 +263,10 @@ zlib_dist=$(table_line DISTS zlib-target)
 
 table_line_remove  DISTS zlib-target
 
-table_insert_after DISTS cmake "zlib-target $zlib_dist"
+table_insert_after DISTS curl "zlib-target $zlib_dist"
 
 # mingw -ldl equivalent, needed by some things
-table_insert_after DISTS cmake "dlfcn https://github.com/dlfcn-win32/dlfcn-win32/archive/v1.1.2.tar.gz lib/libdl.a"
+table_insert_after DISTS curl "dlfcn https://github.com/dlfcn-win32/dlfcn-win32/archive/v1.1.2.tar.gz lib/libdl.a"
 
 table_line_replace DIST_CONFIGURE_TYPES dlfcn cmake
 
