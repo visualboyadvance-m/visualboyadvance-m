@@ -1828,10 +1828,10 @@ bool MainFrame::BindControls()
 #endif
 
 #ifdef __WXMAC__
-        // Remove UI Config menu item, because it only has an option that does nothing on mac.
-        wxMenuItem* ui_config_mi = XRCITEM("UIConfigure");
-        ui_config_mi->GetMenu()->Remove(ui_config_mi);
-        ui_config_mi = nullptr;
+        // Remove hide menubar in the UI Config submenu on macOS, because it is meaningless there.
+        wxMenuItem* hide_menu_bar = XRCITEM("HideMenuBar");
+        hide_menu_bar->GetMenu()->Remove(hide_menu_bar);
+        hide_menu_bar = nullptr;
 #endif
 
 
