@@ -109,62 +109,62 @@ PRE_BUILD_DISTS="$PRE_BUILD_DISTS bzip2 xz unzip"
 
 DISTS=$DISTS'
     bzip2           ftp://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz                                           lib/libbz2.a
-    xz              https://tukaani.org/xz/xz-5.2.6.tar.gz                                                      lib/liblzma.a
+    xz              https://tukaani.org/xz/xz-5.8.1.tar.gz                                                      lib/liblzma.a
     unzip           https://downloads.sourceforge.net/project/infozip/UnZip%206.x%20%28latest%29/UnZip%206.0/unzip60.tar.gz     bin/unzip
     autoconf        https://ftp.gnu.org/gnu/autoconf/autoconf-2.71.tar.xz                                       bin/autoconf
     autoconf-archive http://gnu.askapache.com/autoconf-archive/autoconf-archive-2022.09.03.tar.xz               share/aclocal/ax_check_gl.m4
     automake        https://ftp.gnu.org/gnu/automake/automake-1.16.5.tar.xz                                     bin/automake
     libtool         https://ftp.gnu.org/gnu/libtool/libtool-2.5.4.tar.xz                                        bin/libtool
-    libiconv        https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz                                   lib/libiconv.a
-    zlib-ng         https://github.com/zlib-ng/zlib-ng/archive/ce01b1e41da298334f8214389cc9369540a7560f.tar.gz  lib/libz.a
+    libiconv        https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.18.tar.gz                                   lib/libiconv.a
+    zlib-ng         https://github.com/zlib-ng/zlib-ng/archive/refs/tags/2.2.4.tar.gz                           lib/libz.a
     zip             https://downloads.sourceforge.net/project/infozip/Zip%203.x%20%28latest%29/3.0/zip30.tar.gz                 bin/zip
-    openssl         https://www.openssl.org/source/openssl-1.1.1w.tar.gz                                        lib/libssl.a
+    openssl         https://github.com/openssl/openssl/releases/download/openssl-3.5.0/openssl-3.5.0.tar.gz     lib/libssl.a
     libunistring    https://ftp.gnu.org/gnu/libunistring/libunistring-1.3.tar.xz                                lib/libunistring.a
     libpsl          https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz          lib/libpsl.a
     curl            https://github.com/curl/curl/releases/download/curl-8_13_0/curl-8.13.0.tar.bz2              lib/libcurl.a
-    cmake           https://github.com/Kitware/CMake/releases/download/v4.0.0/cmake-4.0.0.tar.gz                bin/cmake
+    cmake           https://github.com/Kitware/CMake/releases/download/v4.0.1/cmake-4.0.1.tar.gz                bin/cmake
     zstd            https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz                 lib/libzstd.a
     libdeflate      https://github.com/ebiggers/libdeflate/releases/download/v1.23/libdeflate-1.23.tar.gz       lib/libdeflate.a
     hiredis         https://github.com/redis/hiredis/archive/refs/tags/v1.2.0.tar.gz                            lib/libhiredis.a
-    ccache          https://github.com/ccache/ccache/releases/download/v4.6.3/ccache-4.6.3.tar.xz               bin/ccache
+    ccache          https://github.com/ccache/ccache/releases/download/v4.11.2/ccache-4.11.2.tar.xz             bin/ccache
     m4              http://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.xz                                                  bin/m4
-    xorg-macros     https://www.x.org/archive//individual/util/util-macros-1.19.1.tar.bz2                       share/pkgconfig/xorg-macros.pc
-    help2man        https://ftp.gnu.org/gnu/help2man/help2man-1.49.2.tar.xz                                     bin/help2man
-    gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-0.22.5.tar.xz                                    lib/libintl.a
+    xorg-macros     https://xorg.freedesktop.org/releases/individual/util/util-macros-1.20.2.tar.xz             share/pkgconfig/xorg-macros.pc
+    help2man        https://ftp.gnu.org/gnu/help2man/help2man-1.49.3.tar.xz                                     bin/help2man
+    gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-0.24.tar.xz                                      lib/libintl.a
     getopt          http://frodo.looijaard.name/system/files/software/getopt/getopt-1.1.6.tar.gz                bin/getopt
     gsed            http://ftp.gnu.org/gnu/sed/sed-4.9.tar.xz                                                   bin/sed
     bison           https://ftp.gnu.org/gnu/bison/bison-3.8.2.tar.xz                                            bin/bison
-    texinfo         http://ftp.gnu.org/gnu/texinfo/texinfo-6.8.tar.xz                                           bin/makeinfo
-    flex-2.6.3      https://github.com/westes/flex/releases/download/v2.6.3/flex-2.6.3.tar.gz                   bin/flex
+    texinfo         http://ftp.gnu.org/gnu/texinfo/texinfo-7.2.tar.xz                                           bin/makeinfo
+    flex-2.6.4      https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz                   bin/flex
     flex            https://github.com/westes/flex/archive/ea6493d9b6f1915ba096160df666637a6e1b3f20.tar.gz      bin/flex
-    xmlto           https://releases.pagure.org/xmlto/xmlto-0.0.28.tar.bz2                                      bin/xmlto
+    xmlto           https://releases.pagure.org/xmlto/xmlto-0.0.29.tar.bz2                                      bin/xmlto
     gperf           http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz                                           bin/gperf
-    libicu          https://github.com/unicode-org/icu/releases/download/release-71-1/icu4c-71_1-src.tgz        lib/libicud*t*.a
-    pkgconf         https://github.com/pkgconf/pkgconf/archive/refs/tags/pkgconf-1.9.3.tar.gz                   bin/pkgconf
+    libicu          https://github.com/unicode-org/icu/releases/download/release-76-1/icu4c-76_1-src.tgz        lib/libicud*t*.a
+    pkgconf         https://github.com/pkgconf/pkgconf/archive/refs/tags/pkgconf-2.4.3.tar.gz                   bin/pkgconf
     nasm            https://github.com/netwide-assembler/nasm/archive/refs/tags/nasm-2.16.03.tar.gz             bin/nasm
     pcre            https://downloads.sourceforge.net/project/pcre/pcre/8.45/pcre-8.45.tar.bz2                  lib/libpcre.a
-    pcre2           https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.40/pcre2-10.40.tar.bz2     lib/libpcre2-posix.a
-    libffi          https://github.com/libffi/libffi/releases/download/v3.4.7/libffi-3.4.7.tar.gz               lib/libffi.a
+    pcre2           https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.45/pcre2-10.45.tar.bz2     lib/libpcre2-posix.a
+    libffi          https://github.com/libffi/libffi/releases/download/v3.4.8/libffi-3.4.8.tar.gz               lib/libffi.a
     c2man           https://github.com/fribidi/c2man/archive/577ed4095383ef5284225d45709e6b5f0598a064.tar.gz    bin/c2man
-    libxml2         https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.10.2/libxml2-v2.10.2.tar.bz2            lib/libxml2.a
-    libxslt         https://gitlab.gnome.org/GNOME/libxslt/-/archive/v1.1.37/libxslt-v1.1.37.tar.bz2            lib/libxslt.a
+    libxml2         https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.13.8/libxml2-v2.13.8.tar.bz2            lib/libxml2.a
+    libxslt         https://gitlab.gnome.org/GNOME/libxslt/-/archive/v1.1.43/libxslt-v1.1.43.tar.bz2            lib/libxslt.a
     XML-NamespaceSupport https://cpan.metacpan.org/authors/id/P/PE/PERIGRIN/XML-NamespaceSupport-1.12.tar.gz    perl5/lib/perl5/XML/NamespaceSupport.pm
     XML-SAX-Base    https://cpan.metacpan.org/authors/id/G/GR/GRANTM/XML-SAX-Base-1.09.tar.gz                   perl5/lib/perl5/XML/SAX/Base.pm
     XML-SAX         https://cpan.metacpan.org/authors/id/G/GR/GRANTM/XML-SAX-1.02.tar.gz                        perl5/lib/perl5/XML/SAX.pm
     docbook2x       https://downloads.sourceforge.net/project/docbook2x/docbook2x/0.8.8/docbook2X-0.8.8.tar.gz  bin/docbook2man
-    expat           https://github.com/libexpat/libexpat/releases/download/R_2_4_8/expat-2.4.8.tar.xz           lib/libexpat.a
+    expat           https://github.com/libexpat/libexpat/releases/download/R_2_7_1/expat-2.7.1.tar.xz           lib/libexpat.a
     libpng          https://download.sourceforge.net/libpng/libpng-1.6.47.tar.xz                                lib/libpng.a
-    libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/2.1.4.tar.gz                         lib/libjpeg.a
-    libtiff         https://download.osgeo.org/libtiff/tiff-4.4.0.tar.xz                                        lib/libtiff.a
+    libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/3.1.0.tar.gz                         lib/libjpeg.a
+    libtiff         https://download.osgeo.org/libtiff/tiff-4.7.0.tar.xz                                        lib/libtiff.a
 #    libcroco        http://ftp.gnome.org/pub/gnome/sources/libcroco/0.6/libcroco-0.6.13.tar.xz                  lib/libcroco-0.6.a
     libuuid         https://downloads.sourceforge.net/project/libuuid/libuuid-1.0.3.tar.gz                      lib/libuuid.a
     freetype        https://gitlab.freedesktop.org/freetype/freetype/-/archive/VER-2-13-3/freetype-VER-2-13-3.tar.bz2                  lib/libfreetype.a
-    fontconfig      https://gitlab.freedesktop.org/api/v4/projects/890/packages/generic/fontconfig/2.16.1/fontconfig-2.16.1.tar.xz     lib/libfontconfig.a
+    fontconfig      https://gitlab.freedesktop.org/api/v4/projects/890/packages/generic/fontconfig/2.16.2/fontconfig-2.16.2.tar.xz     lib/libfontconfig.a
     libgd           https://github.com/libgd/libgd/archive/2be005f311232bc3d8a544f73ce8049d2b2fb885.tar.gz     lib/libgd.a
     dejavu          http://sourceforge.net/projects/dejavu/files/dejavu/2.37/dejavu-fonts-ttf-2.37.tar.bz2      share/fonts/dejavu/DejaVuSansMono.ttf
     liberation      https://github.com/liberationfonts/liberation-fonts/files/7261482/liberation-fonts-ttf-2.1.5.tar.gz   share/fonts/liberation/LiberationMono-Regular.ttf
     urw             https://github.com/ArtifexSoftware/urw-base35-fonts/archive/refs/tags/20200910.tar.gz                 share/fonts/urw/URWBookman-Light.ttf
-    graphviz        https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/5.0.1/graphviz-5.0.1.tar.xz       bin/dot_static
+    graphviz        https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/12.2.1/graphviz-12.2.1.tar.xz       bin/dot_static
     docbook4.2      http://www.docbook.org/xml/4.2/docbook-xml-4.2.zip                                                    share/xml/docbook/schema/dtd/4.2/catalog.xml
     docbook4.1.2    http://www.docbook.org/xml/4.1.2/docbkx412.zip                                                        share/xml/docbook/schema/dtd/4.1.2/catalog.xml
     docbook4.3      http://www.docbook.org/xml/4.3/docbook-xml-4.3.zip                                                    share/xml/docbook/schema/dtd/4.3/catalog.xml
@@ -175,23 +175,24 @@ DISTS=$DISTS'
     docbook-xsl     https://downloads.sourceforge.net/project/docbook/docbook-xsl/1.79.1/docbook-xsl-1.79.1.tar.bz2       share/xml/docbook/stylesheet/docbook-xsl/catalog.xml
     docbook-xsl-ns  https://downloads.sourceforge.net/project/docbook/docbook-xsl-ns/1.79.1/docbook-xsl-ns-1.79.1.tar.bz2 share/xml/docbook/stylesheet/docbook-xsl-ns/catalog.xml
     python2         https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tar.xz                               bin/python
-    python3         https://www.python.org/ftp/python/3.10.6/Python-3.10.6.tar.xz                               bin/python3
+    python3         https://www.python.org/ftp/python/3.10.6/Python-3.13.3.tar.xz                               bin/python3
     swig            https://sourceforge.net/projects/swig/files/swig/swig-4.0.2/swig-4.0.2.tar.gz/download      bin/swig
-    doxygen         https://www.doxygen.nl/files/doxygen-1.9.5.src.tar.gz                                       bin/doxygen
-    XML-Parser      https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.46.tar.gz                      perl5/man/man3/XML*Parser.3*
+    doxygen         https://www.doxygen.nl/files/doxygen-1.13.2.src.tar.gz                                      bin/doxygen
+    XML-Parser      https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.47.tar.gz                      perl5/man/man3/XML*Parser.3*
     intltool        https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz                bin/intltoolize
-    ninja           https://github.com/ninja-build/ninja/archive/v1.11.1.tar.gz                                 bin/ninja
+    ninja           https://github.com/ninja-build/ninja/archive/v1.12.1.tar.gz                                 bin/ninja
     glib            https://download.gnome.org/sources/glib/2.84/glib-2.84.1.tar.xz                             lib/libglib-2.0.a
-    libgpg-error    https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.45.tar.bz2                         lib/libgpg-error.a
-    libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.1.tar.bz2                             lib/libgcrypt.a
-    libsecret       https://gitlab.gnome.org/GNOME/libsecret/-/archive/0.20.5/libsecret-0.20.5.tar.bz2          lib/libsecret-1.a
-    sdl2            https://github.com/libsdl-org/SDL/releases/download/release-2.30.7/SDL2-2.30.7.tar.gz       lib/libSDL2.a
-    faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/24.09.tar.gz                            lib/libFAudio.a
-    flac            https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.3.4.tar.xz                             lib/libFLAC.a
-    harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/10.0.1/harfbuzz-10.0.1.tar.xz        lib/libharfbuzz.a
-    shared-mime-info https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.2/shared-mime-info-2.2.tar.bz2  bin/update-mime-database
-    wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.7/wxWidgets-3.2.7.tar.bz2     lib/libwx_baseu-3.*.a
-    ffmpeg          http://ffmpeg.org/releases/ffmpeg-7.0.2.tar.xz                                              lib/libavformat.a
+    libgpg-error    https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.54.tar.bz2                         lib/libgpg-error.a
+    libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.11.0.tar.bz2                             lib/libgcrypt.a
+    libsecret       https://gitlab.gnome.org/GNOME/libsecret/-/archive/0.21.7/libsecret-0.21.7.tar.bz2          lib/libsecret-1.a
+    sdl3            https://github.com/libsdl-org/SDL/archive/refs/tags/release-3.2.10.tar.gz                   lib/libSDL3.a
+    faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/25.04.tar.gz                            lib/libFAudio.a
+    flac            https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.5.0.tar.xz                             lib/libFLAC.a
+    harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/11.1.0/harfbuzz-11.1.0.tar.xz        lib/libharfbuzz.a
+    sfml            https://github.com/SFML/SFML/releases/download/3.0.0/SFML-3.0.0-sources.zip                 lib/libsfml-system-s.a
+    shared-mime-info https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.4/shared-mime-info-2.4.tar.bz2  bin/update-mime-database
+    wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.8/wxWidgets-3.2.8.tar.bz2     lib/libwx_baseu-3.*.a
+    ffmpeg          http://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz                                              lib/libavformat.a
 '
 
 BUILD_FFMPEG=1
@@ -406,6 +407,10 @@ DIST_EXTRA_LDFLAGS="$DIST_EXTRA_LDFLAGS
     doxygen     -lintl -liconv
     ffmpeg      -lm -llzma -lpthread
     fontconfig  -llzma
+"
+
+DIST_EXTRA_CFLAGS="$DIST_EXTRA_CFLAGS
+    sdl3       -fno-fast-math
 "
 
 DIST_EXTRA_CXXFLAGS="$DIST_EXTRA_CXXFLAGS
