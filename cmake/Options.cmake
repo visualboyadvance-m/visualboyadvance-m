@@ -30,7 +30,6 @@ option(VBAM_STATIC "Try to link all libraries statically" ${VBAM_STATIC_DEFAULT}
 
 if(VBAM_STATIC)
     set(SDL2_STATIC ON)
-    set(SFML_STATIC_LIBRARIES ON)
     set(FFMPEG_STATIC ON)
     set(OPENAL_STATIC ON)
     set_property(GLOBAL PROPERTY LINK_SEARCH_START_STATIC ON)
@@ -68,14 +67,8 @@ endif()
 find_package(PkgConfig)
 
 # Link / SFML
-if(TRANSLATIONS_ONLY)
-    set(ENABLE_LINK_DEFAULT OFF)
-else()
-    find_package(SFML 3.0 COMPONENTS network system)
-    set(ENABLE_LINK_DEFAULT OFF)
-    if(SFML_FOUND)
-        set(ENABLE_LINK_DEFAULT ON)
-    endif()
+if(NOT TRANSLATIONS_ONLY)
+    set(ENABLE_LINK_DEFAULT ON)
 endif()
 option(ENABLE_LINK "Enable GBA linking functionality" ${ENABLE_LINK_DEFAULT})
 

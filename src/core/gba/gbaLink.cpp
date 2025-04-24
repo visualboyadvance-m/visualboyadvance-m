@@ -26,7 +26,7 @@
 #include <cstring>
 #include <string>
 
-#include <SFML/Network.hpp>
+#include "SFML/Network.hpp"
 
 #include <libintl.h>
 #define _(x) gettext(x)

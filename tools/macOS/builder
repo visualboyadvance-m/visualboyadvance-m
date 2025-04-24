@@ -195,12 +195,6 @@ if [ "$target_cpu" = i386 ]; then
     table_line_append DIST_ARGS python2 '--host= --build='
     table_line_append DIST_ARGS python3 '--host= --build='
 
-    table_line_append DIST_ARGS sfml '-DCMAKE_OSX_ARCHITECTURES=i386'
-
-    table_line_append DIST_PRE_BUILD sfml " \
-        sed -i.bak '/FATAL_ERROR \"Only 64-bit architecture is supported/d' CMakeLists.txt; \
-    "
-
     table_line_append DIST_ARGS libicu '--host= --build='
 fi
 
@@ -236,11 +230,6 @@ table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg "--disable-videotoolbox --extr
 #table_line_append DIST_PATCHES ffmpeg "-p0 https://gist.githubusercontent.com/rkitover/db75d083b74617b186eec11965c1da74/raw/20da2f8c6d8c02ce284096c5e805ae671351cc6e/ffmpeg-macos10-7.patch"
 
 table_line_remove DISTS python2
-
-table_line_append DIST_PRE_BUILD sfml " \
-    sed -E -i.bak '/OSX_DEPLOYMENT_TARGET/d' CMakeLists.txt; \
-"
-
 
 if [ -n "$APPLE_SILICON" ] && [ "$target_cpu" != ARM64 ]; then
     table_line_remove DISTS m4
