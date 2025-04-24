@@ -166,7 +166,6 @@ And the following development libraries:
 - [ffmpeg](https://ffmpeg.org/) (optional, at least version `4.0.4`, for game recording)
 - [gettext](https://www.gnu.org/software/gettext/) and gettext-tools
 - [SDL2](https://www.libsdl.org/) (required)
-- [SFML](https://www.sfml-dev.org/) (optional, for link)
 - [openal-soft](https://kcat.strangesoft.net/openal.html) (required, a sound interface)
 - [wxWidgets](https://wxwidgets.org/) (required for GUI, 2.8 and non-stl builds are no longer supported)
 
@@ -211,7 +210,7 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_LINK=NO -G Ninja
 | `ENABLE_ASM`            | Enable the following two ASM options                                 | ON for 32 bit builds  |
 | `ENABLE_ASM_SCALERS`    | Enable x86 ASM graphic filters                                       | ON for 32 bit builds  |
 | `ENABLE_MMX`            | Enable MMX                                                           | ON for 32 bit builds  |
-| `ENABLE_LINK`           | Enable GBA linking functionality (requires SFML)                     | AUTO                  |
+| `ENABLE_LINK`           | Enable GBA linking functionality                                     | AUTO                  |
 | `ENABLE_LIRC`           | Enable LIRC support                                                  | OFF                   |
 | `ENABLE_FFMPEG`         | Enable ffmpeg A/V recording                                          | AUTO                  |
 | `ENABLE_ONLINEUPDATES`  | Enable online update checks                                          | ON                    |
@@ -224,7 +223,6 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_LINK=NO -G Ninja
 | `BUILD_TESTING`         | Build the tests and enable ctest support.                            | ON                    |
 | `VBAM_STATIC`           | Try link all libs statically (the following are set to ON if ON)     | OFF                   |
 | `SDL2_STATIC`           | Try to link static SDL2 libraries                                    | OFF                   |
-| `SFML_STATIC_LIBRARIES` | Try to link static SFML libraries                                    | OFF                   |
 | `FFMPEG_STATIC`         | Try to link static ffmpeg libraries                                  | OFF                   |
 | `OPENAL_STATIC`         | Try to link static OpenAL libraries                                  | OFF                   |
 | `TRANSLATIONS_ONLY`     | Build only the translations.zip and nothing else                     | OFF                   |

@@ -14,7 +14,7 @@ export BUILD_ENV
 . "$(dirname "$0")/../builder/core.sh"
 
 # on mac openal is part of the system, on most unixes we need openal-soft
-table_insert_before DISTS sfml '
+table_insert_before DISTS wxwidgets '
     openal          http://kcat.strangesoft.net/openal-releases/openal-soft-1.18.2.tar.bz2                      lib/libopenal.a
 '
 
@@ -27,7 +27,7 @@ libXrender libXrandr libXfixes libXdamage libxshmfence libXi libXtst
 libXxf86vm"
 
 # have to build a large chunk of X11 on *nix
-table_insert_before DISTS sfml '
+table_insert_before DISTS wxwidgets '
     xproto          https://www.x.org/archive/individual/proto/xproto-7.0.31.tar.bz2                            include/X11/X.h
     xcb-proto       https://www.x.org/archive/individual/xcb/xcb-proto-1.13.tar.bz2                             lib/pkgconfig/xcb-proto.pc
     inputproto      https://www.x.org/archive/individual/proto/inputproto-2.3.2.tar.bz2                         include/X11/extensions/XI.h
@@ -65,7 +65,7 @@ for dist in $XORG_DISTS; do
 done
 
 # and Wayland now that that's a thing
-table_insert_before DISTS sfml '
+table_insert_before DISTS wxwidgets '
     wayland         https://wayland.freedesktop.org/releases/wayland-1.16.0.tar.xz                              lib/libwayland-client.so
     wayland-protocols https://wayland.freedesktop.org/releases/wayland-protocols-1.15.tar.xz                    share/pkgconfig/wayland-protocols.pc
 '
@@ -76,7 +76,7 @@ for dist in wayland; do
 done
 
 # and mesa OpenGL (the Gallium drivers in mesa require llvm)
-table_insert_before DISTS sfml '
+table_insert_before DISTS wxwidgets '
     libpciaccess    https://www.x.org/archive//individual/lib/libpciaccess-0.14.tar.bz2                         lib/libpciaccess.a
     libdrm          https://dri.freedesktop.org/libdrm/libdrm-2.4.88.tar.bz2                                    lib/libdrm.a
 #    llvm            http://releases.llvm.org/5.0.0/llvm-5.0.0.src.tar.xz                                       lib/libLLVMCore.a

@@ -321,7 +321,7 @@ table_line_append DIST_PATCHES fontconfig-target " \
 
 table_line_append DIST_PATCHES libgd 'https://gist.githubusercontent.com/rkitover/c64ea5b83ddea94ace58c40c7de42879/raw/fbaf4885fbefb302116b56626c0e191df514e8c6/libgd-2.2.4-mingw-static.patch'
 
-table_insert_before DISTS sfml '
+table_insert_before DISTS wxwidgets '
     openal          https://github.com/kcat/openal-soft/archive/openal-soft-1.19.1.tar.gz                      lib/libOpenAL32.a
 '
 

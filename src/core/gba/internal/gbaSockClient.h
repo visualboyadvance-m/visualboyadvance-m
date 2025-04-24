@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-#include <SFML/Network.hpp>
+#include "SFML/Network.hpp"
 
 class GBASockClient {
 public:
