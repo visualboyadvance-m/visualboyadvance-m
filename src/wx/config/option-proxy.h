@@ -15,6 +15,7 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /*kDispFilter*/ Option::Type::kFilter,
     /*kDispFilterPlugin*/ Option::Type::kString,
     /*kDispIFB*/ Option::Type::kInterframe,
+    /*kBitDepth*/ Option::Type::kUnsigned,
     /*kDispKeepOnTop*/ Option::Type::kBool,
     /*kDispMaxThreads*/ Option::Type::kInt,
     /*kDispRenderMethod*/ Option::Type::kRenderMethod,

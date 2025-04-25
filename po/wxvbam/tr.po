@@ -370,6 +370,14 @@ msgstr "%s'da kullanılabilir bir rpi eklentisi bulunamadı"
 msgid "Plugin"
 msgstr "Eklenti"
 
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth"
+msgstr "Piksel başına bit sayısı"
+
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth:"
+msgstr "Piksel başına bit sayısı:"
+
 #: dialogs/display-config.cpp:407
 #, c-format
 msgid "Using pixel filter: %s"

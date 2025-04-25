@@ -153,6 +153,35 @@
     </object>
     <object class="notebookpage">
       <object class="wxPanel">
+        <object class="wxFlexGridSizer">
+          <orient>wxVERTICAL</orient>
+          <object class="sizeritem">
+            <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border> 
+            <object class="wxStaticText" name="BitDepthLab">
+              <label>Bit Depth:</label>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxChoice" name="BitDepth">
+              <content>
+                <item>8</item>
+                <item>16</item>
+                <item>24</item>
+                <item>32</item>
+              </content>
+            </object>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <cols>2</cols>
+          <growablecols>1</growablecols>
+        </object>
+      </object>
+      <label>Bit Depth</label>
+    </object>
+    <object class="notebookpage">
+      <object class="wxPanel">
         <object class="wxBoxSizer">
           <orient>wxVERTICAL</orient>
           <object class="sizeritem">

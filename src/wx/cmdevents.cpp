@@ -2134,6 +2134,9 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
         return;
     }
 
+    const uint32_t bitdepth = OPTION(kBitDepth);
+    systemColorDepth = (int)((bitdepth + 1) << 3);
+
     const int frame_skip = OPTION(kPrefFrameSkip);
     if (frame_skip != -1) {
         systemFrameSkip = frame_skip;
@@ -2379,6 +2382,11 @@ EVT_HANDLER(StatusBar, "Enable status bar")
 EVT_HANDLER(NoStatusMsg, "Disable on-screen status messages")
 {
     GetMenuOptionConfig("NoStatusMsg", config::OptionID::kPrefDisableStatus);
+}
+
+EVT_HANDLER(BitDepth, "Bit depth.")
+{
+    GetMenuOptionConfig("BitDepth", config::OptionID::kBitDepth);
 }
 
 EVT_HANDLER(FrameSkipAuto, "Auto Skip frames.")

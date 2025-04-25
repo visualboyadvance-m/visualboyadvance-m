@@ -1560,6 +1560,14 @@ msgstr ""
 msgid "Using interframe blending: %s"
 msgstr ""
 
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth"
+msgstr "Bits per pixel"
+
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth:"
+msgstr "Bits per pixel:"
+
 #: dialogs/game-boy-config.cpp:142 xrc/GameBoyAdvanceConfig.xrc:122
 #: xrc/GameBoyConfig.xrc:138 xrc/GameBoyConfig.xrc:159
 msgid "(None)"

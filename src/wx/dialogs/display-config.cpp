@@ -234,6 +234,10 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
                            std::bind(&DisplayConfig::OnInterframeChanged,
                                      this,
                                      std::placeholders::_1)) {
+    GetValidatedChild("BitDepth")
+        ->SetValidator(
+            widgets::OptionChoiceValidator(config::OptionID::kBitDepth));
+
     // Speed
     GetValidatedChild("FrameSkip")
         ->SetValidator(

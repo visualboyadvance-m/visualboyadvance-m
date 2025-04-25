@@ -228,6 +228,7 @@ std::array<Option, kNbOptions>& Option::All() {
         bool dsound_hw_accel = false;
         bool upmix = false;
         int32_t volume = 100;
+        uint32_t bitdepth = 3;
     };
     static OwnedOptions g_owned_opts;
 
@@ -243,6 +244,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kDispFilter, &g_owned_opts.filter),
         Option(OptionID::kDispFilterPlugin, &g_owned_opts.filter_plugin),
         Option(OptionID::kDispIFB, &g_owned_opts.interframe),
+        Option(OptionID::kBitDepth, &g_owned_opts.bitdepth, 0, 3),
         Option(OptionID::kDispKeepOnTop, &g_owned_opts.keep_on_top),
         Option(OptionID::kDispMaxThreads, &g_owned_opts.max_threads, 0, 256),
         Option(OptionID::kDispRenderMethod, &g_owned_opts.render_method),
@@ -383,6 +385,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"Display/Filter", "", _("Full-screen filter to apply")},
     OptionData{"Display/FilterPlugin", "", _("Filter plugin library")},
     OptionData{"Display/IFB", "", _("Interframe blending function")},
+    OptionData{"Display/BitDepth", "BitDepth", _("Bit depth")},
     OptionData{"Display/KeepOnTop", "KeepOnTop", _("Keep window on top")},
     OptionData{"Display/MaxThreads", "Multithread",
                _("Maximum number of threads to run filters in")},

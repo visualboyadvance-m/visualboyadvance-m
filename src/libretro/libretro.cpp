@@ -68,6 +68,7 @@ static IMAGE_TYPE type = IMAGE_UNKNOWN;
 static bool libretro_supports_bitmasks = false;
 
 // global vars
+uint8_t  systemColorMap8[0x10000];
 uint16_t systemColorMap16[0x10000];
 uint32_t systemColorMap32[0x10000];
 int RGB_LOW_BITS_MASK = 0x821; // used for 16bit inter-frame filters

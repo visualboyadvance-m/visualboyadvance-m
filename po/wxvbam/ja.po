@@ -370,6 +370,14 @@ msgstr "%s に使用可能なrpiプラグインが見つかりませんでした
 msgid "Plugin"
 msgstr "プラグイン"
 
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth"
+msgstr "ピクセルあたりのビット数"
+
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth:"
+msgstr "ピクセルあたりのビット数:"
+
 #: dialogs/display-config.cpp:407
 #, c-format
 msgid "Using pixel filter: %s"

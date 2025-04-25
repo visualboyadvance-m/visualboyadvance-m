@@ -199,6 +199,7 @@ int emulating = 0;
 int RGB_LOW_BITS_MASK = 0x821;
 uint32_t systemColorMap32[0x10000];
 uint16_t systemColorMap16[0x10000];
+uint8_t  systemColorMap8[0x10000];
 uint16_t systemGbPalette[24];
 
 char filename[2048];
