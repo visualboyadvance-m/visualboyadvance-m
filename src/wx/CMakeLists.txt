@@ -8,6 +8,7 @@ include(VbamFunctions)
 set(VBAM_WX_COMMON
     audio/audio.cpp
     audio/audio.h
+    audio/internal/sdl.cpp
     audio/internal/openal.cpp
     audio/internal/openal.h
     background-input.cpp

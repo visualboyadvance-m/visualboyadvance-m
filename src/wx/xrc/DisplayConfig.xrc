@@ -51,6 +51,13 @@
                     <border>5</border>
                   </object>
                   <object class="sizeritem">
+                    <object class="wxRadioButton" name="OutputSDL">
+                      <label translate="0">SDL</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
                     <object class="wxRadioButton" name="OutputDirect3D">
                       <label translate="0">Direct3D 9</label>
                     </object>
@@ -137,6 +144,19 @@
                     <item>Smart</item>
                     <item>Motion Blur</item>
                   </content>
+                </object>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="SDLRendererLab">
+                  <label>SDL Renderer:</label>
+                </object>
+                <flag>wxRIGHT|wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxChoice" name="SDLRenderer">
                 </object>
                 <flag>wxALL|wxEXPAND</flag>
                 <border>5</border>

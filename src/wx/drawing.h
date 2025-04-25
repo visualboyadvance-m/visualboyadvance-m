@@ -49,6 +49,26 @@ protected:
 };
 #endif
 
+class SDLDrawingPanel : public DrawingPanel {
+public:
+    SDLDrawingPanel(wxWindow* parent, int _width, int _height);
+    virtual ~SDLDrawingPanel();
+
+protected:
+    void DrawArea();
+    void DrawArea(uint8_t** data);
+    void DrawArea(wxWindowDC&) override;
+    void PaintEv(wxPaintEvent& ev) override;
+    void EraseBackground(wxEraseEvent& ev) override;
+    void OnSize(wxSizeEvent& ev) override;
+    void DrawingPanelInit() override;
+
+private:
+    SDL_Window *sdlwindow;
+    SDL_Texture *texture;
+    SDL_Renderer *renderer;
+};
+
 #if defined(__WXMSW__) && !defined(NO_D3D)
 class DXDrawingPanel : public DrawingPanel {
 public:

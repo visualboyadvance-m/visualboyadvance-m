@@ -1,6 +1,7 @@
 #include "wx/audio/audio.h"
 
 #include "core/base/check.h"
+#include "wx/audio/internal/sdl.h"
 #include "wx/audio/internal/openal.h"
 
 #if defined(__WXMSW__)
@@ -21,6 +22,9 @@ std::vector<AudioDevice> EnumerateAudioDevices(const config::AudioApi& audio_api
     switch (audio_api) {
         case config::AudioApi::kOpenAL:
             return audio::internal::GetOpenALDevices();
+
+        case config::AudioApi::kSDL:
+            return audio::internal::GetSDLDevices();
 
 #if defined(__WXMSW__)
         case config::AudioApi::kDirectSound:
@@ -48,6 +52,9 @@ std::unique_ptr<SoundDriver> CreateSoundDriver(const config::AudioApi& api) {
     switch (api) {
         case config::AudioApi::kOpenAL:
             return audio::internal::CreateOpenALDriver();
+
+        case config::AudioApi::kSDL:
+            return audio::internal::CreateSDLDriver();
 
 #if defined(__WXMSW__)
         case config::AudioApi::kDirectSound:

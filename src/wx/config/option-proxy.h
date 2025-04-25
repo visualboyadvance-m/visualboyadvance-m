@@ -20,6 +20,7 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /*kDispRenderMethod*/ Option::Type::kRenderMethod,
     /*kDispScale*/ Option::Type::kDouble,
     /*kDispStretch*/ Option::Type::kBool,
+    /*kSDLRenderer*/ Option::Type::kString,
 
     /// GB
     /*kGBBiosFile*/ Option::Type::kString,

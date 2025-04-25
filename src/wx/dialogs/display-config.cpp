@@ -26,6 +26,48 @@ namespace dialogs {
 
 namespace {
 
+class SDLDevicesValidator : public widgets::OptionValidator {
+public:
+    SDLDevicesValidator() : widgets::OptionValidator(config::OptionID::kSDLRenderer) {}
+    ~SDLDevicesValidator() override = default;
+
+private:
+    // OptionValidator implementation.
+    wxObject* Clone() const override { return new SDLDevicesValidator(); }
+
+    bool IsWindowValueValid() override { return true; }
+
+    bool WriteToWindow() override {
+        wxChoice* choice = wxDynamicCast(GetWindow(), wxChoice);
+        VBAM_CHECK(choice);
+
+        const wxString& device_id = option()->GetString();
+        for (size_t i = 0; i < choice->GetCount(); i++) {
+            const wxString& choide_id =
+                dynamic_cast<wxStringClientData*>(choice->GetClientObject(i))->GetData();
+            if (device_id == choide_id) {
+                choice->SetSelection(i);
+                return true;
+            }
+        }
+
+        choice->SetSelection(0);
+        return true;
+    }
+
+    bool WriteToOption() override {
+        const wxChoice* choice = wxDynamicCast(GetWindow(), wxChoice);
+        VBAM_CHECK(choice);
+        const int selection = choice->GetSelection();
+        if (selection == wxNOT_FOUND) {
+            return option()->SetString(wxEmptyString);
+        }
+
+        return option()->SetString(
+            dynamic_cast<wxStringClientData*>(choice->GetClientObject(selection))->GetData());
+    }
+};
+
 // Custom validator for the kDispScale option. We rely on the existing
 // wxFloatingPointValidator validator for this.
 class ScaleValidator : public wxFloatingPointValidator<double>,
@@ -256,6 +298,8 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
     GetValidatedChild("OutputSimple")
         ->SetValidator(RenderValidator(config::RenderMethod::kSimple));
 
+    GetValidatedChild("OutputSDL")->SetValidator(RenderValidator(config::RenderMethod::kSDL));
+
 #if defined(__WXMAC__)
     GetValidatedChild("OutputQuartz2D")
         ->SetValidator(RenderValidator(config::RenderMethod::kQuartz2d));
@@ -285,6 +329,9 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
 #else
     GetValidatedChild("OutputDirect3D")->Hide();
 #endif
+
+    sdlrenderer_selector_ = GetValidatedChild<wxChoice>("SDLRenderer");
+    sdlrenderer_selector_->SetValidator(SDLDevicesValidator());
 
     filter_selector_ = GetValidatedChild<wxChoice>("Filter");
     filter_selector_->SetValidator(FilterValidator());

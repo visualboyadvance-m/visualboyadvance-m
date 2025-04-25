@@ -53,6 +53,7 @@ private:
     wxChoice* plugin_selector_;
     wxChoice* filter_selector_;
     wxChoice* interframe_selector_;
+    wxChoice* sdlrenderer_selector_;
     const config::OptionsObserver filter_observer_;
     const config::OptionsObserver interframe_observer_;
 };

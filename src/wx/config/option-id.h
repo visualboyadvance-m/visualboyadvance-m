@@ -16,6 +16,7 @@ enum class OptionID {
     kDispRenderMethod,
     kDispScale,
     kDispStretch,
+    kSDLRenderer,
 
     /// GB
     kGBBiosFile,

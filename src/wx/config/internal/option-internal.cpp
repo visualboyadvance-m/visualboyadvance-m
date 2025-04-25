@@ -72,6 +72,7 @@ static const std::array<wxString, kNbInterframes> kInterframeStrings = {
 static const std::array<wxString, kNbRenderMethods> kRenderMethodStrings = {
     "simple",
     "opengl",
+    "sdl_video",
 #if defined(__WXMSW__) && !defined(NO_D3D)
     "direct3d",
 #elif defined(__WXMAC__)
@@ -84,6 +85,7 @@ static const std::array<wxString, kNbRenderMethods> kRenderMethodStrings = {
 // error since kNbAudioApis is automatically updated.
 static const std::array<wxString, kNbAudioApis> kAudioApiStrings = {
     "openal",
+    "sdl_audio",
 #if defined(__WXMSW__)
     "directsound",
 #endif
@@ -228,6 +230,7 @@ std::array<Option, kNbOptions>& Option::All() {
         bool dsound_hw_accel = false;
         bool upmix = false;
         int32_t volume = 100;
+        wxString sdlrenderer = wxString("default");
     };
     static OwnedOptions g_owned_opts;
 
@@ -248,6 +251,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kDispRenderMethod, &g_owned_opts.render_method),
         Option(OptionID::kDispScale, &g_owned_opts.video_scale, 1, 6),
         Option(OptionID::kDispStretch, &g_owned_opts.retain_aspect),
+        Option(OptionID::kSDLRenderer, &g_owned_opts.sdlrenderer),
 
         /// GB
         Option(OptionID::kGBBiosFile, &g_owned_opts.gb_bios),
