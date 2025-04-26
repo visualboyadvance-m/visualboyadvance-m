@@ -13,6 +13,18 @@ if(WIN32 OR APPLE)
     set(ENABLE_SDL_DEFAULT OFF)
 endif()
 
+if(ENABLE_SDL3)
+   set(CMAKE_C_FLAGS "-DENABLE_SDL3 ${CMAKE_C_FLAGS}")
+   set(CMAKE_CXX_FLAGS "-DENABLE_SDL3 ${CMAKE_CXX_FLAGS}")
+endif()
+
+if(DISABLE_OPENGL)
+   set(CMAKE_C_FLAGS "-DNO_OPENGL -DNO_OGL ${CMAKE_C_FLAGS}")
+   set(CMAKE_CXX_FLAGS "-DNO_OPENGL -DNO_OGL ${CMAKE_CXX_FLAGS}")
+endif()
+
+option(ENABLE_SDL3 "Use SDL3" OFF)
+option(DISABLE_OPENGL "Disable OpenGL" OFF)
 option(ENABLE_SDL "Build the SDL port" ${ENABLE_SDL_DEFAULT})
 option(ENABLE_WX "Build the wxWidgets port" ${BUILD_DEFAULT})
 option(ENABLE_DEBUGGER "Enable the debugger" ON)
@@ -30,6 +42,7 @@ option(VBAM_STATIC "Try to link all libraries statically" ${VBAM_STATIC_DEFAULT}
 
 if(VBAM_STATIC)
     set(SDL2_STATIC ON)
+    set(SDL3_STATIC ON)
     set(FFMPEG_STATIC ON)
     set(OPENAL_STATIC ON)
     set_property(GLOBAL PROPERTY LINK_SEARCH_START_STATIC ON)

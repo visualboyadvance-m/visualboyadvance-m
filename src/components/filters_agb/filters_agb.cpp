@@ -5,6 +5,7 @@ extern int systemRedShift;
 extern int systemGreenShift;
 extern int systemBlueShift;
 
+extern uint8_t  systemColorMap8[0x10000];
 extern uint16_t systemColorMap16[0x10000];
 extern uint32_t systemColorMap32[0x10000];
 
@@ -27,6 +28,13 @@ inline void swap(short& a, short& b)
 
 void gbafilter_update_colors(bool lcd) {
     switch (systemColorDepth) {
+        case 8: {
+            for (int i = 0; i < 0x10000; i++) {
+                systemColorMap8[i] = (uint8_t)((((i & 0x1f) << 3) & 0xE0) |
+                                      ((((i & 0x3e0) >> 5) << 0) & 0x1C) |
+                                      ((((i & 0x7c00) >> 10) >> 3) & 0x3));
+            }
+        } break;
         case 16: {
             for (int i = 0; i < 0x10000; i++) {
                 systemColorMap16[i] = ((i & 0x1f) << systemRedShift) |
@@ -237,6 +245,15 @@ void gbafilter_pad(uint8_t* buf, int count)
 void UpdateSystemColorMaps(int lcd)
 {
   switch(systemColorDepth) {
+  case 8:
+   {
+     for(int i = 0; i < 0x10000; i++) {
+       systemColorMap8[i] = (((i & 0x1f) << systemRedShift) & 0xE0) |
+         ((((i & 0x3e0) >> 5) << systemGreenShift) & 0x1C) |
+         ((((i & 0x7c00) >> 10) << systemBlueShift) & 0x3);
+      }
+    }
+    break;
   case 16:
     {
       for(int i = 0; i < 0x10000; i++) {
