@@ -14,8 +14,7 @@ Quartz2DDrawingPanel::Quartz2DDrawingPanel(wxWindow* parent, int _width, int _he
 
 void Quartz2DDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
 {
-    NSView* view = (NSView*)(GetWindow()->GetHandle());
-
+    NSView *view = (NSView *)GetWindow()->GetHandle();
     size_t w    = std::ceil(width  * scale);
     size_t h    = std::ceil(height * scale);
     size_t size = w * h * 3;
@@ -23,18 +22,19 @@ void Quartz2DDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
     CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, im->GetData(), size, NULL);
 
     CGColorSpaceRef color_space = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB);
+    CGImageRef image = nil;
 
-    CGImageRef image = CGImageCreate(
-        w, h, 8, 24, w * 3, color_space,
-        kCGBitmapByteOrderDefault,
-        provider, NULL, true, kCGRenderingIntentDefault
-    ); 
+    image = CGImageCreate(w, h, 8, 24, w * 3, color_space, kCGBitmapByteOrderDefault,
+                          provider, NULL, true, kCGRenderingIntentDefault);
 
     // draw the image
-
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= 101000
+    CGContextRef context = [[NSGraphicsContext currentContext] CGContext];
+#else
     [view lockFocus];
 
     CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
+#endif
 
     CGContextSaveGState(context);
 
@@ -59,7 +59,11 @@ void Quartz2DDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
         dc.DrawRectangle(w-2, h-2, w, h);
     }
 
+    [view setNeedsDisplay:YES];
+
+#if MAC_OS_X_VERSION_MIN_REQUIRED < 101000
     [view unlockFocus];
+#endif
 
     // and release everything
 
