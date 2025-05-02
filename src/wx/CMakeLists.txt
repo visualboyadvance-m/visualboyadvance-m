@@ -238,11 +238,7 @@ function(configure_wx_target target)
     endfunction()
 
     # Core emulator.
-    _add_link_libraries(vbam-core)
-
-    # Nonstd.
-    _add_link_libraries(nonstd-lib)
-    _add_include_directories(${NONSTD_INCLUDE_DIR})
+    _add_link_libraries(vbam-core nonstd-lib ghc-filesystem)
 
     # wxWidgets.
     _add_link_libraries(${wxWidgets_LIBRARIES})
@@ -302,7 +298,6 @@ function(configure_wx_target target)
     else()
         _add_compile_definitions(NO_OGL)
     endif()
-
 endfunction()
 
 # Sub-projects.
@@ -519,6 +514,8 @@ if(ENABLE_FFMPEG)
         target_link_options(visualboyadvance-m PRIVATE ${FFMPEG_LDFLAGS})
     endif()
 endif()
+
+target_link_libraries(visualboyadvance-m nonstd-lib)
 
 # wxrc does not support xrs files in -c output (> 10x compression)
 # we do it using the bin2c.c utility.

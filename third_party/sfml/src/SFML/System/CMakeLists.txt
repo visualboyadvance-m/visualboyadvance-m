@@ -94,3 +94,5 @@ elseif(WIN32)
 elseif(ANDROID)
     target_link_libraries(sfml-system PRIVATE android log)
 endif()
+
+target_link_libraries(sfml-system PRIVATE nonstd-lib ghc-filesystem)

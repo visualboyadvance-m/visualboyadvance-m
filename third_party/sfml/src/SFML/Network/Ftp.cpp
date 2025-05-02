@@ -122,7 +122,7 @@ Ftp::DirectoryResponse::DirectoryResponse(const Ftp::Response& response) : Ftp::
 
 
 ////////////////////////////////////////////////////////////
-const std::filesystem::path& Ftp::DirectoryResponse::getDirectory() const
+const ghc::filesystem::path& Ftp::DirectoryResponse::getDirectory() const
 {
     return m_directory;
 }
@@ -268,7 +268,7 @@ Ftp::Response Ftp::deleteDirectory(const std::string& name)
 
 
 ////////////////////////////////////////////////////////////
-Ftp::Response Ftp::renameFile(const std::filesystem::path& file, const std::filesystem::path& newName)
+Ftp::Response Ftp::renameFile(const ghc::filesystem::path& file, const ghc::filesystem::path& newName)
 {
     Response response = sendCommand("RNFR", file.string());
     if (response.isOk())
@@ -279,14 +279,14 @@ Ftp::Response Ftp::renameFile(const std::filesystem::path& file, const std::file
 
 
 ////////////////////////////////////////////////////////////
-Ftp::Response Ftp::deleteFile(const std::filesystem::path& name)
+Ftp::Response Ftp::deleteFile(const ghc::filesystem::path& name)
 {
     return sendCommand("DELE", name.string());
 }
 
 
 ////////////////////////////////////////////////////////////
-Ftp::Response Ftp::download(const std::filesystem::path& remoteFile, const std::filesystem::path& localPath, TransferMode mode)
+Ftp::Response Ftp::download(const ghc::filesystem::path& remoteFile, const ghc::filesystem::path& localPath, TransferMode mode)
 {
     // Open a data channel using the given transfer mode
     DataChannel data(*this);
@@ -298,7 +298,7 @@ Ftp::Response Ftp::download(const std::filesystem::path& remoteFile, const std::
         if (response.isOk())
         {
             // Create the file and truncate it if necessary
-            const std::filesystem::path filepath = localPath / remoteFile.filename();
+            const ghc::filesystem::path filepath = localPath / remoteFile.filename();
             std::ofstream               file(filepath, std::ios_base::binary | std::ios_base::trunc);
             if (!file)
                 return Response(Response::Status::InvalidFile);
@@ -314,7 +314,7 @@ Ftp::Response Ftp::download(const std::filesystem::path& remoteFile, const std::
 
             // If the download was unsuccessful, delete the partial file
             if (!response.isOk())
-                std::filesystem::remove(filepath);
+                ghc::filesystem::remove(filepath);
         }
     }
 
@@ -323,8 +323,8 @@ Ftp::Response Ftp::download(const std::filesystem::path& remoteFile, const std::
 
 
 ////////////////////////////////////////////////////////////
-Ftp::Response Ftp::upload(const std::filesystem::path& localFile,
-                          const std::filesystem::path& remotePath,
+Ftp::Response Ftp::upload(const ghc::filesystem::path& localFile,
+                          const ghc::filesystem::path& remotePath,
                           TransferMode                 mode,
                           bool                         append)
 {

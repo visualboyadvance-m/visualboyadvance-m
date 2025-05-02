@@ -53,7 +53,7 @@ struct SocketInitializer
 } // namespace
 
 
-namespace sf::priv
+namespace sf
 {
 ////////////////////////////////////////////////////////////
 sockaddr_in SocketImpl::createAddress(std::uint32_t address, unsigned short port)
@@ -107,4 +107,4 @@ Socket::Status SocketImpl::getErrorStatus()
     }
     // clang-format on
 }
-} // namespace sf::priv
+} // namespace sf

@@ -49,7 +49,7 @@ std::streambuf::int_type LogcatStream::overflow(std::streambuf::int_type c)
     return traits_type::not_eof(c);
 }
 
-namespace sf::priv
+namespace sf
 {
 
 ActivityStates*& getActivityStatesPtr()
@@ -67,8 +67,8 @@ ActivityStates& getActivity()
 {
     ActivityStates* const states = getActivityStatesPtr();
     assert(states != nullptr &&
-           "Cannot dereference null activity states pointer. Call priv::resetActivity() to initialize it.");
+           "Cannot dereference null activity states pointer. Call resetActivity() to initialize it.");
     return *states;
 }
 
-} // namespace sf::priv
+} // namespace sf

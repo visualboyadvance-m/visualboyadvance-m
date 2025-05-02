@@ -37,7 +37,7 @@
 namespace sf
 {
 ////////////////////////////////////////////////////////////
-Socket::Socket(Type type) : m_type(type), m_socket(priv::SocketImpl::invalidSocket())
+Socket::Socket(Type type) : m_type(type), m_socket(SocketImpl::invalidSocket())
 {
 }
 
@@ -53,7 +53,7 @@ Socket::~Socket()
 ////////////////////////////////////////////////////////////
 Socket::Socket(Socket&& socket) noexcept :
 m_type(socket.m_type),
-m_socket(std::exchange(socket.m_socket, priv::SocketImpl::invalidSocket())),
+m_socket(std::exchange(socket.m_socket, SocketImpl::invalidSocket())),
 m_isBlocking(socket.m_isBlocking)
 {
 }
@@ -68,7 +68,7 @@ Socket& Socket::operator=(Socket&& socket) noexcept
     close();
 
     m_type       = socket.m_type;
-    m_socket     = std::exchange(socket.m_socket, priv::SocketImpl::invalidSocket());
+    m_socket     = std::exchange(socket.m_socket, SocketImpl::invalidSocket());
     m_isBlocking = socket.m_isBlocking;
     return *this;
 }
@@ -78,8 +78,8 @@ Socket& Socket::operator=(Socket&& socket) noexcept
 void Socket::setBlocking(bool blocking)
 {
     // Apply if the socket is already created
-    if (m_socket != priv::SocketImpl::invalidSocket())
-        priv::SocketImpl::setBlocking(m_socket, blocking);
+    if (m_socket != SocketImpl::invalidSocket())
+        SocketImpl::setBlocking(m_socket, blocking);
 
     m_isBlocking = blocking;
 }
@@ -103,11 +103,11 @@ SocketHandle Socket::getNativeHandle() const
 void Socket::create()
 {
     // Don't create the socket if it already exists
-    if (m_socket == priv::SocketImpl::invalidSocket())
+    if (m_socket == SocketImpl::invalidSocket())
     {
         const SocketHandle handle = socket(PF_INET, m_type == Type::Tcp ? SOCK_STREAM : SOCK_DGRAM, 0);
 
-        if (handle == priv::SocketImpl::invalidSocket())
+        if (handle == SocketImpl::invalidSocket())
         {
             err() << "Failed to create socket" << std::endl;
             return;
@@ -122,7 +122,7 @@ void Socket::create()
 void Socket::create(SocketHandle handle)
 {
     // Don't create the socket if it already exists
-    if (m_socket == priv::SocketImpl::invalidSocket())
+    if (m_socket == SocketImpl::invalidSocket())
     {
         // Assign the new handle
         m_socket = handle;
@@ -165,10 +165,10 @@ void Socket::create(SocketHandle handle)
 void Socket::close()
 {
     // Close the socket
-    if (m_socket != priv::SocketImpl::invalidSocket())
+    if (m_socket != SocketImpl::invalidSocket())
     {
-        priv::SocketImpl::close(m_socket);
-        m_socket = priv::SocketImpl::invalidSocket();
+        SocketImpl::close(m_socket);
+        m_socket = SocketImpl::invalidSocket();
     }
 }
 

@@ -54,7 +54,7 @@
 #include <cstdint>
 
 
-namespace sf::priv
+namespace sf
 {
 ////////////////////////////////////////////////////////////
 /// \brief Helper class implementing all the non-portable
@@ -120,4 +120,4 @@ public:
     static Socket::Status getErrorStatus();
 };
 
-} // namespace sf::priv
+} // namespace sf

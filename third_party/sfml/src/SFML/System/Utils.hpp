@@ -29,9 +29,9 @@
 ////////////////////////////////////////////////////////////
 #include <SFML/System/Export.hpp>
 
-#include <filesystem>
+#include <array>
+#include "filesystem.hpp"
 #include <string>
-#include <string_view>
 
 #include <cstddef>
 #include <cstdio>
@@ -40,19 +40,22 @@
 namespace sf
 {
 [[nodiscard]] SFML_SYSTEM_API std::string toLower(std::string str);
-[[nodiscard]] SFML_SYSTEM_API std::string formatDebugPathInfo(const std::filesystem::path& path);
+[[nodiscard]] SFML_SYSTEM_API std::string formatDebugPathInfo(const ghc::filesystem::path& path);
 
 // Convert byte sequence into integer
 // toInteger<int>(0x12, 0x34, 0x56) == 0x563412
-template <typename IntegerType, typename... Bytes>
-[[nodiscard]] constexpr IntegerType toInteger(Bytes... byte)
+template <typename IntegerType>
+[[nodiscard]] constexpr IntegerType toInteger(std::array<unsigned char,8> bytes)
 {
-    static_assert(sizeof(IntegerType) >= sizeof...(Bytes), "IntegerType not large enough to contain bytes");
-
-    IntegerType integer = 0;
-    std::size_t index   = 0;
-    return ((integer |= static_cast<IntegerType>(static_cast<IntegerType>(byte) << 8 * index++)), ...);
+    return ((IntegerType)(bytes[0] <<  0)+
+            (IntegerType)(bytes[1] <<  8)+
+            (IntegerType)(bytes[2] << 16)+
+            (IntegerType)(bytes[3] << 24)+
+            (IntegerType)(bytes[4] << 32)+
+            (IntegerType)(bytes[5] << 40)+
+            (IntegerType)(bytes[6] << 48)+
+            (IntegerType)(bytes[7] << 56));
 }
 
-[[nodiscard]] SFML_SYSTEM_API std::FILE* openFile(const std::filesystem::path& filename, std::string_view mode);
+[[nodiscard]] SFML_SYSTEM_API std::FILE* openFile(const ghc::filesystem::path& filename, std::string mode);
 } // namespace sf

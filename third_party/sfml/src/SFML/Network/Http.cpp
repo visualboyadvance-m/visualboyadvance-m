@@ -123,9 +123,10 @@ std::string Http::Request::prepare() const
     out << "HTTP/" << m_majorVersion << "." << m_minorVersion << "\r\n";
 
     // Write fields
-    for (const auto& [fieldKey, fieldValue] : m_fields)
+    auto it = m_fields.begin();
+    for (; it != m_fields.end(); it++)
     {
-        out << fieldKey << ": " << fieldValue << "\r\n";
+        out << it->first << ": " << it->second << "\r\n";
     }
 
     // Use an extra \r\n to separate the header from the body
@@ -148,7 +149,8 @@ bool Http::Request::hasField(const std::string& field) const
 ////////////////////////////////////////////////////////////
 const std::string& Http::Response::getField(const std::string& field) const
 {
-    if (const auto it = m_fields.find(toLower(field)); it != m_fields.end())
+    const auto it = m_fields.find(toLower(field));
+    if (it != m_fields.end())
     {
         return it->second;
     }

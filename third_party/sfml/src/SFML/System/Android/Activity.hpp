@@ -54,7 +54,7 @@ private:
     std::string m_message;
 };
 
-namespace sf::priv
+namespace sf
 {
 struct ActivityStates
 {
@@ -68,7 +68,7 @@ struct ActivityStates
     EGLDisplay  display{};
     EglContext* context{};
 
-    std::vector<std::byte> savedState;
+    std::vector<unsigned char> savedState;
 
     std::recursive_mutex mutex;
 
@@ -100,4 +100,4 @@ SFML_SYSTEM_API void resetActivity(ActivityStates* initializedStates);
 
 SFML_SYSTEM_API ActivityStates& getActivity();
 
-} // namespace sf::priv
+} // namespace sf

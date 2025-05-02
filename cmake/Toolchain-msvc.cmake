@@ -68,6 +68,8 @@ if(CMAKE_VERSION VERSION_LESS "3.25")
     endif()
 endif()
 
+add_compile_options($<$<COMPILE_LANGUAGE:CXX>:/std:c++14>)
+
 set(CMAKE_RC_FLAGS "-c65001 /DWIN32" CACHE STRING "" FORCE)
 
 # We need to explicitly set all of these to override the CMake defaults.

@@ -32,10 +32,10 @@
 #include <mutex>
 
 
-namespace sf::priv
+namespace sf
 {
 ////////////////////////////////////////////////////////////
-bool ResourceStream::open(const std::filesystem::path& filename)
+bool ResourceStream::open(const ghc::filesystem::path& filename)
 {
     ActivityStates&       states = getActivity();
     const std::lock_guard lock(states.mutex);
@@ -45,29 +45,29 @@ bool ResourceStream::open(const std::filesystem::path& filename)
 
 
 ////////////////////////////////////////////////////////////
-std::optional<std::size_t> ResourceStream::read(void* data, std::size_t size)
+nonstd::optional<std::size_t> ResourceStream::read(void* data, std::size_t size)
 {
     assert(m_file && "ResourceStream::read() cannot be called when file is not initialized");
     const auto numBytesRead = AAsset_read(m_file.get(), data, size);
     if (numBytesRead < 0)
-        return std::nullopt;
+        return nonstd::nullopt;
     return numBytesRead;
 }
 
 
 ////////////////////////////////////////////////////////////
-std::optional<std::size_t> ResourceStream::seek(std::size_t position)
+nonstd::optional<std::size_t> ResourceStream::seek(std::size_t position)
 {
     assert(m_file && "ResourceStream::seek() cannot be called when file is not initialized");
     const auto newPosition = AAsset_seek(m_file.get(), static_cast<off_t>(position), SEEK_SET);
     if (newPosition < 0)
-        return std::nullopt;
+        return nonstd::nullopt;
     return newPosition;
 }
 
 
 ////////////////////////////////////////////////////////////
-std::optional<std::size_t> ResourceStream::tell()
+nonstd::optional<std::size_t> ResourceStream::tell()
 {
     assert(m_file && "ResourceStream::tell() cannot be called when file is not initialized");
     return getSize().value() - static_cast<std::size_t>(AAsset_getRemainingLength(m_file.get()));
@@ -75,7 +75,7 @@ std::optional<std::size_t> ResourceStream::tell()
 
 
 ////////////////////////////////////////////////////////////
-std::optional<std::size_t> ResourceStream::getSize()
+nonstd::optional<std::size_t> ResourceStream::getSize()
 {
     assert(m_file && "ResourceStream::getSize() cannot be called when file is not initialized");
     return AAsset_getLength(m_file.get());
@@ -88,4 +88,4 @@ void ResourceStream::AAssetDeleter::operator()(AAsset* file)
     AAsset_close(file);
 }
 
-} // namespace sf::priv
+} // namespace sf

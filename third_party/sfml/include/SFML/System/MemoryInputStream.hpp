@@ -64,42 +64,42 @@ public:
     /// \param data Buffer where to copy the read data
     /// \param size Desired number of bytes to read
     ///
-    /// \return The number of bytes actually read, or `std::nullopt` on error
+    /// \return The number of bytes actually read, or `nonstd::nullopt` on error
     ///
     ////////////////////////////////////////////////////////////
-    [[nodiscard]] std::optional<std::size_t> read(void* data, std::size_t size) override;
+    [[nodiscard]] nonstd::optional<std::size_t> read(void* data, std::size_t size) override;
 
     ////////////////////////////////////////////////////////////
     /// \brief Change the current reading position
     ///
     /// \param position The position to seek to, from the beginning
     ///
-    /// \return The position actually sought to, or `std::nullopt` on error
+    /// \return The position actually sought to, or `nonstd::nullopt` on error
     ///
     ////////////////////////////////////////////////////////////
-    [[nodiscard]] std::optional<std::size_t> seek(std::size_t position) override;
+    [[nodiscard]] nonstd::optional<std::size_t> seek(std::size_t position) override;
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the current reading position in the stream
     ///
-    /// \return The current position, or `std::nullopt` on error.
+    /// \return The current position, or `nonstd::nullopt` on error.
     ///
     ////////////////////////////////////////////////////////////
-    [[nodiscard]] std::optional<std::size_t> tell() override;
+    [[nodiscard]] nonstd::optional<std::size_t> tell() override;
 
     ////////////////////////////////////////////////////////////
     /// \brief Return the size of the stream
     ///
-    /// \return The total number of bytes available in the stream, or `std::nullopt` on error
+    /// \return The total number of bytes available in the stream, or `nonstd::nullopt` on error
     ///
     ////////////////////////////////////////////////////////////
-    std::optional<std::size_t> getSize() override;
+    nonstd::optional<std::size_t> getSize() override;
 
 private:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    const std::byte* m_data{};   //!< Pointer to the data in memory
+    const unsigned char* m_data{};   //!< Pointer to the data in memory
     std::size_t      m_size{};   //!< Total size of the data
     std::size_t      m_offset{}; //!< Current reading position
 };

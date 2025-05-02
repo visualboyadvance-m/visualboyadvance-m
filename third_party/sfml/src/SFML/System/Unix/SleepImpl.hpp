@@ -35,7 +35,7 @@ namespace sf
 class Time;
 }
 
-namespace sf::priv
+namespace sf
 {
 ////////////////////////////////////////////////////////////
 /// \brief Unix implementation of sf::Sleep
@@ -45,4 +45,4 @@ namespace sf::priv
 ////////////////////////////////////////////////////////////
 void sleepImpl(Time time);
 
-} // namespace sf::priv
+} // namespace sf

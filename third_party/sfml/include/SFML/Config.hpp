@@ -114,9 +114,9 @@
 ////////////////////////////////////////////////////////////
 // Ensure minimum C++ language standard version is met
 ////////////////////////////////////////////////////////////
-#if (defined(_MSVC_LANG) && _MSVC_LANG < 201703L) || (!defined(_MSVC_LANG) && __cplusplus < 201703L)
-#error "Enable C++17 or newer for your compiler (e.g. -std=c++17 for GCC/Clang or /std:c++17 for MSVC)"
-#endif
+//#if (defined(_MSVC_LANG) && _MSVC_LANG < 201703L) || (!defined(_MSVC_LANG) && __cplusplus < 201703L)
+//#error "Enable C++17 or newer for your compiler (e.g. -std=c++17 for GCC/Clang or /std:c++17 for MSVC)"
+//#endif
 
 
 ////////////////////////////////////////////////////////////

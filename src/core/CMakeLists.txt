@@ -93,7 +93,7 @@ target_include_directories(vbam-core
 )
 
 target_link_libraries(vbam-core
-    PRIVATE vbam-core-apu vbam-fex
+    PRIVATE vbam-core-apu vbam-fex nonstd-lib
     PUBLIC vbam-core-base ${ZLIB_LIBRARY}
 )
 

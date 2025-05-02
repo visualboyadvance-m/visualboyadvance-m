@@ -64,11 +64,11 @@ TcpSocket::TcpSocket() : Socket(Type::Tcp)
 ////////////////////////////////////////////////////////////
 unsigned short TcpSocket::getLocalPort() const
 {
-    if (getNativeHandle() != priv::SocketImpl::invalidSocket())
+    if (getNativeHandle() != SocketImpl::invalidSocket())
     {
         // Retrieve information about the local end of the socket
         sockaddr_in                  address{};
-        priv::SocketImpl::AddrLength size = sizeof(address);
+        SocketImpl::AddrLength size = sizeof(address);
         if (getsockname(getNativeHandle(), reinterpret_cast<sockaddr*>(&address), &size) != -1)
         {
             return ntohs(address.sin_port);
@@ -81,13 +81,13 @@ unsigned short TcpSocket::getLocalPort() const
 
 
 ////////////////////////////////////////////////////////////
-std::optional<IpAddress> TcpSocket::getRemoteAddress() const
+nonstd::optional<IpAddress> TcpSocket::getRemoteAddress() const
 {
-    if (getNativeHandle() != priv::SocketImpl::invalidSocket())
+    if (getNativeHandle() != SocketImpl::invalidSocket())
     {
         // Retrieve information about the remote end of the socket
         sockaddr_in                  address{};
-        priv::SocketImpl::AddrLength size = sizeof(address);
+        SocketImpl::AddrLength size = sizeof(address);
         if (getpeername(getNativeHandle(), reinterpret_cast<sockaddr*>(&address), &size) != -1)
         {
             return IpAddress(ntohl(address.sin_addr.s_addr));
@@ -95,18 +95,18 @@ std::optional<IpAddress> TcpSocket::getRemoteAddress() const
     }
 
     // We failed to retrieve the address
-    return std::nullopt;
+    return nonstd::nullopt;
 }
 
 
 ////////////////////////////////////////////////////////////
 unsigned short TcpSocket::getRemotePort() const
 {
-    if (getNativeHandle() != priv::SocketImpl::invalidSocket())
+    if (getNativeHandle() != SocketImpl::invalidSocket())
     {
         // Retrieve information about the remote end of the socket
         sockaddr_in                  address{};
-        priv::SocketImpl::AddrLength size = sizeof(address);
+        SocketImpl::AddrLength size = sizeof(address);
         if (getpeername(getNativeHandle(), reinterpret_cast<sockaddr*>(&address), &size) != -1)
         {
             return ntohs(address.sin_port);
@@ -128,7 +128,7 @@ Socket::Status TcpSocket::connect(IpAddress remoteAddress, unsigned short remote
     create();
 
     // Create the remote address
-    sockaddr_in address = priv::SocketImpl::createAddress(remoteAddress.toInteger(), remotePort);
+    sockaddr_in address = SocketImpl::createAddress(remoteAddress.toInteger(), remotePort);
 
     if (timeout <= Time::Zero)
     {
@@ -136,7 +136,7 @@ Socket::Status TcpSocket::connect(IpAddress remoteAddress, unsigned short remote
 
         // Connect the socket
         if (::connect(getNativeHandle(), reinterpret_cast<sockaddr*>(&address), sizeof(address)) == -1)
-            return priv::SocketImpl::getErrorStatus();
+            return SocketImpl::getErrorStatus();
 
         // Connection succeeded
         return Status::Done;
@@ -160,7 +160,7 @@ Socket::Status TcpSocket::connect(IpAddress remoteAddress, unsigned short remote
     }
 
     // Get the error status
-    Status status = priv::SocketImpl::getErrorStatus();
+    Status status = SocketImpl::getErrorStatus();
 
     // If we were in non-blocking mode, return immediately
     if (!blocking)
@@ -192,13 +192,13 @@ Socket::Status TcpSocket::connect(IpAddress remoteAddress, unsigned short remote
             else
             {
                 // Connection refused
-                status = priv::SocketImpl::getErrorStatus();
+                status = SocketImpl::getErrorStatus();
             }
         }
         else
         {
             // Failed to connect before timeout is over
-            status = priv::SocketImpl::getErrorStatus();
+            status = SocketImpl::getErrorStatus();
         }
     }
 
@@ -223,8 +223,8 @@ void TcpSocket::disconnect()
 ////////////////////////////////////////////////////////////
 Socket::Status TcpSocket::send(const void* data, std::size_t size)
 {
-    if (!isBlocking())
-        err() << "Warning: Partial sends might not be handled properly." << std::endl;
+//    if (!isBlocking())
+//        err() << "Warning: Partial sends might not be handled properly." << std::endl;
 
     std::size_t sent = 0;
 
@@ -251,14 +251,14 @@ Socket::Status TcpSocket::send(const void* data, std::size_t size, std::size_t& 
         // Send a chunk of data
         result = static_cast<int>(::send(getNativeHandle(),
                                          static_cast<const char*>(data) + sent,
-                                         static_cast<priv::SocketImpl::Size>(size - sent),
+                                         static_cast<SocketImpl::Size>(size - sent),
                                          flags));
 #pragma GCC diagnostic pop
 
         // Check for errors
         if (result < 0)
         {
-            const Status status = priv::SocketImpl::getErrorStatus();
+            const Status status = SocketImpl::getErrorStatus();
 
             if ((status == Status::NotReady) && sent)
                 return Status::Partial;
@@ -288,7 +288,7 @@ Socket::Status TcpSocket::receive(void* data, std::size_t size, std::size_t& rec
 #pragma GCC diagnostic ignored "-Wuseless-cast"
     // Receive a chunk of bytes
     const int sizeReceived = static_cast<int>(
-        recv(getNativeHandle(), static_cast<char*>(data), static_cast<priv::SocketImpl::Size>(size), flags));
+        recv(getNativeHandle(), static_cast<char*>(data), static_cast<SocketImpl::Size>(size), flags));
 #pragma GCC diagnostic pop
 
     // Check the number of bytes received
@@ -302,7 +302,7 @@ Socket::Status TcpSocket::receive(void* data, std::size_t size, std::size_t& rec
         return Socket::Status::Disconnected;
     }
 
-    return priv::SocketImpl::getErrorStatus();
+    return SocketImpl::getErrorStatus();
 }
 
 
@@ -346,7 +346,7 @@ Socket::Status TcpSocket::send(Packet& packet)
     // Send the data block
     std::size_t  sent   = 0;
     const Status status = send(m_blockToSendBuffer.data() + packet.m_sendPos,
-                               static_cast<priv::SocketImpl::Size>(m_blockToSendBuffer.size() - packet.m_sendPos),
+                               static_cast<SocketImpl::Size>(m_blockToSendBuffer.size() - packet.m_sendPos),
                                sent);
 #pragma GCC diagnostic pop
 #pragma GCC diagnostic pop
@@ -411,7 +411,7 @@ Socket::Status TcpSocket::receive(Packet& packet)
         if (received > 0)
         {
             m_pendingPacket.data.resize(m_pendingPacket.data.size() + received);
-            std::byte* begin = m_pendingPacket.data.data() + m_pendingPacket.data.size() - received;
+            unsigned char* begin = m_pendingPacket.data.data() + m_pendingPacket.data.size() - received;
             std::memcpy(begin, buffer.data(), received);
         }
     }

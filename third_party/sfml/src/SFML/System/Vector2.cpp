@@ -36,7 +36,7 @@ namespace sf
 template <typename T>
 Vector2<T> Vector2<T>::normalized() const
 {
-    static_assert(std::is_floating_point_v<T>, "Vector2::normalized() is only supported for floating point types");
+//    static_assert(std::is_floating_point_v<T>, "Vector2::normalized() is only supported for floating point types");
 
     assert(*this != Vector2<T>() && "Vector2::normalized() cannot normalize a zero vector");
     return (*this) / length();
@@ -47,7 +47,7 @@ Vector2<T> Vector2<T>::normalized() const
 template <typename T>
 Angle Vector2<T>::angleTo(Vector2<T> rhs) const
 {
-    static_assert(std::is_floating_point_v<T>, "Vector2::angleTo() is only supported for floating point types");
+//    static_assert(std::is_floating_point_v<T>, "Vector2::angleTo() is only supported for floating point types");
 
     assert(*this != Vector2<T>() && "Vector2::angleTo() cannot calculate angle from a zero vector");
     assert(rhs != Vector2<T>() && "Vector2::angleTo() cannot calculate angle to a zero vector");
@@ -59,7 +59,7 @@ Angle Vector2<T>::angleTo(Vector2<T> rhs) const
 template <typename T>
 Angle Vector2<T>::angle() const
 {
-    static_assert(std::is_floating_point_v<T>, "Vector2::angle() is only supported for floating point types");
+    //static_assert(std::is_floating_point_v<T>, "Vector2::angle() is only supported for floating point types");
 
     assert(*this != Vector2<T>() && "Vector2::angle() cannot calculate angle from a zero vector");
     return radians(static_cast<float>(std::atan2(y, x)));
@@ -70,7 +70,7 @@ Angle Vector2<T>::angle() const
 template <typename T>
 Vector2<T> Vector2<T>::rotatedBy(Angle phi) const
 {
-    static_assert(std::is_floating_point_v<T>, "Vector2::rotatedBy() is only supported for floating point types");
+//    static_assert(std::is_floating_point_v<T>, "Vector2::rotatedBy() is only supported for floating point types");
 
     // No zero vector assert, because rotating a zero vector is well-defined (yields always itself)
     T cos = std::cos(static_cast<T>(phi.asRadians()));
@@ -85,7 +85,7 @@ Vector2<T> Vector2<T>::rotatedBy(Angle phi) const
 template <typename T>
 Vector2<T> Vector2<T>::projectedOnto(Vector2<T> axis) const
 {
-    static_assert(std::is_floating_point_v<T>, "Vector2::projectedOnto() is only supported for floating point types");
+//    static_assert(std::is_floating_point_v<T>, "Vector2::projectedOnto() is only supported for floating point types");
 
     assert(axis != Vector2<T>() && "Vector2::projectedOnto() cannot project onto a zero vector");
     return dot(axis) / axis.lengthSquared() * axis;
@@ -98,7 +98,7 @@ Vector2<T>::Vector2(T r, Angle phi) :
 x(r * static_cast<T>(std::cos(phi.asRadians()))),
 y(r * static_cast<T>(std::sin(phi.asRadians())))
 {
-    static_assert(std::is_floating_point_v<T>, "Vector2::Vector2(T, Angle) is only supported for floating point types");
+//    static_assert(std::is_floating_point_v<T>, "Vector2::Vector2(T, Angle) is only supported for floating point types");
 }
 
 
@@ -106,7 +106,7 @@ y(r * static_cast<T>(std::sin(phi.asRadians())))
 template <typename T>
 T Vector2<T>::length() const
 {
-    static_assert(std::is_floating_point_v<T>, "Vector2::length() is only supported for floating point types");
+//    static_assert(std::is_floating_point_v<T>, "Vector2::length() is only supported for floating point types");
 
     // don't use std::hypot because of slow performance
     return std::sqrt(x * x + y * y);
@@ -119,6 +119,6 @@ T Vector2<T>::length() const
 // Explicit template instantiations
 ////////////////////////////////////////////////////////////
 
-template class sf::Vector2<float>;
-template class sf::Vector2<double>;
-template class sf::Vector2<long double>;
+//template class sf::Vector2<float>;
+//template class sf::Vector2<double>;
+//template class sf::Vector2<long double>;

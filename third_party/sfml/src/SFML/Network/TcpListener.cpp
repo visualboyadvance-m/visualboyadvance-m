@@ -45,11 +45,11 @@ TcpListener::TcpListener() : Socket(Type::Tcp)
 ////////////////////////////////////////////////////////////
 unsigned short TcpListener::getLocalPort() const
 {
-    if (getNativeHandle() != priv::SocketImpl::invalidSocket())
+    if (getNativeHandle() != SocketImpl::invalidSocket())
     {
         // Retrieve information about the local end of the socket
         sockaddr_in                  address{};
-        priv::SocketImpl::AddrLength size = sizeof(address);
+        SocketImpl::AddrLength size = sizeof(address);
         if (getsockname(getNativeHandle(), reinterpret_cast<sockaddr*>(&address), &size) != -1)
         {
             return ntohs(address.sin_port);
@@ -75,7 +75,7 @@ Socket::Status TcpListener::listen(unsigned short port, IpAddress address)
         return Status::Error;
 
     // Bind the socket to the specified port
-    sockaddr_in addr = priv::SocketImpl::createAddress(address.toInteger(), port);
+    sockaddr_in addr = SocketImpl::createAddress(address.toInteger(), port);
     if (bind(getNativeHandle(), reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1)
     {
         // Not likely to happen, but...
@@ -107,7 +107,7 @@ void TcpListener::close()
 Socket::Status TcpListener::accept(TcpSocket& socket)
 {
     // Make sure that we're listening
-    if (getNativeHandle() == priv::SocketImpl::invalidSocket())
+    if (getNativeHandle() == SocketImpl::invalidSocket())
     {
         err() << "Failed to accept a new connection, the socket is not listening" << std::endl;
         return Status::Error;
@@ -115,12 +115,12 @@ Socket::Status TcpListener::accept(TcpSocket& socket)
 
     // Accept a new connection
     sockaddr_in                  address{};
-    priv::SocketImpl::AddrLength length = sizeof(address);
+    SocketImpl::AddrLength length = sizeof(address);
     const SocketHandle           remote = ::accept(getNativeHandle(), reinterpret_cast<sockaddr*>(&address), &length);
 
     // Check for errors
-    if (remote == priv::SocketImpl::invalidSocket())
-        return priv::SocketImpl::getErrorStatus();
+    if (remote == SocketImpl::invalidSocket())
+        return SocketImpl::getErrorStatus();
 
     // Initialize the new connected socket
     socket.close();

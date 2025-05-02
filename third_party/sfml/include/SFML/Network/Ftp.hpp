@@ -33,7 +33,7 @@
 
 #include <SFML/System/Time.hpp>
 
-#include <filesystem>
+#include "filesystem.hpp"
 #include <string>
 #include <vector>
 
@@ -201,13 +201,13 @@ public:
         /// \return Directory name
         ///
         ////////////////////////////////////////////////////////////
-        [[nodiscard]] const std::filesystem::path& getDirectory() const;
+        [[nodiscard]] const ghc::filesystem::path& getDirectory() const;
 
     private:
         ////////////////////////////////////////////////////////////
         // Member data
         ////////////////////////////////////////////////////////////
-        std::filesystem::path m_directory; //!< Directory extracted from the response message
+        ghc::filesystem::path m_directory; //!< Directory extracted from the response message
     };
 
 
@@ -438,7 +438,7 @@ public:
     /// \see `deleteFile`
     ///
     ////////////////////////////////////////////////////////////
-    [[nodiscard]] Response renameFile(const std::filesystem::path& file, const std::filesystem::path& newName);
+    [[nodiscard]] Response renameFile(const ghc::filesystem::path& file, const ghc::filesystem::path& newName);
 
     ////////////////////////////////////////////////////////////
     /// \brief Remove an existing file
@@ -455,7 +455,7 @@ public:
     /// \see `renameFile`
     ///
     ////////////////////////////////////////////////////////////
-    [[nodiscard]] Response deleteFile(const std::filesystem::path& name);
+    [[nodiscard]] Response deleteFile(const ghc::filesystem::path& name);
 
     ////////////////////////////////////////////////////////////
     /// \brief Download a file from the server
@@ -477,8 +477,8 @@ public:
     /// \see `upload`
     ///
     ////////////////////////////////////////////////////////////
-    [[nodiscard]] Response download(const std::filesystem::path& remoteFile,
-                                    const std::filesystem::path& localPath,
+    [[nodiscard]] Response download(const ghc::filesystem::path& remoteFile,
+                                    const ghc::filesystem::path& localPath,
                                     TransferMode                 mode = TransferMode::Binary);
 
     ////////////////////////////////////////////////////////////
@@ -502,8 +502,8 @@ public:
     /// \see `download`
     ///
     ////////////////////////////////////////////////////////////
-    [[nodiscard]] Response upload(const std::filesystem::path& localFile,
-                                  const std::filesystem::path& remotePath,
+    [[nodiscard]] Response upload(const ghc::filesystem::path& localFile,
+                                  const ghc::filesystem::path& remotePath,
                                   TransferMode                 mode   = TransferMode::Binary,
                                   bool                         append = false);
 

@@ -91,7 +91,7 @@ SocketSelector& SocketSelector::operator=(SocketSelector&&) noexcept = default;
 void SocketSelector::add(Socket& socket)
 {
     const SocketHandle handle = socket.getNativeHandle();
-    if (handle != priv::SocketImpl::invalidSocket())
+    if (handle != SocketImpl::invalidSocket())
     {
 
 #if defined(SFML_SYSTEM_WINDOWS)
@@ -133,7 +133,7 @@ void SocketSelector::add(Socket& socket)
 void SocketSelector::remove(Socket& socket)
 {
     const SocketHandle handle = socket.getNativeHandle();
-    if (handle != priv::SocketImpl::invalidSocket())
+    if (handle != SocketImpl::invalidSocket())
     {
 
 #if defined(SFML_SYSTEM_WINDOWS)
@@ -190,7 +190,7 @@ bool SocketSelector::wait(Time timeout)
 bool SocketSelector::isReady(Socket& socket) const
 {
     const SocketHandle handle = socket.getNativeHandle();
-    if (handle != priv::SocketImpl::invalidSocket())
+    if (handle != SocketImpl::invalidSocket())
     {
 
 #if !defined(SFML_SYSTEM_WINDOWS)

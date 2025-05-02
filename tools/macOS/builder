@@ -52,16 +52,18 @@ case "$1" in
         ;;
 esac
 
+# Intel builds target 10.10 (Yosemite.)
+export MACOSX_DEPLOYMENT_TARGET=10.10
+
 if [ -n "$APPLE_SILICON" ]; then
     if [ -n "$intel_target" ]; then
         target_build_arch='-target x86_64-apple-macos10.15 -march=core2 -mtune=skylake'
         target_cpu=x86_64
-        export MACOSX_DEPLOYMENT_TARGET=10.15 # Catalina
     else
         export MACOSX_DEPLOYMENT_TARGET=11.0 # Big Sur
     fi
 elif [ "$target_cpu" = x86_64 ]; then
-        target_build_arch='-m64 -march=core2 -mtune=skylake'
+    target_build_arch="-m64 -march=core2 -mtune=skylake -mmacosx-version-min=${MACOSX_DEPLOYMENT_TARGET}"
 fi
 
 # Need to use Xcode 9 for 32 bit builds on Mojave and newer.
@@ -80,6 +82,10 @@ elif [ -f /opt/homebrew/bin/brew ]; then
     export BREW_PREFIX=$(/opt/homebrew/bin/brew --prefix)
 fi
 
+if [ -n "$BREW_PREFIX" ]; then
+    "$BREW_PREFIX"/bin/brew unlink gettext >/dev/null 2>&1 || :
+fi
+
 export BUILD_ROOT="${BUILD_ROOT:-$HOME/vbam-build-mac-${target_cpu}}$BUILD_ROOT_SUFFIX"
 
 ver_file=$(mktemp)
@@ -88,7 +94,7 @@ read -r macos_major macos_minor macos_patch < "$ver_file"
 rm -f "$ver_file"
 
 # Find the highest version clang and llvm in Nix or Homebrew.
-best_llvm=$(
+best_llvm_path=$(
     (
         for nix_clang in $(find /nix/store -maxdepth 1 -type d -name '*-clang-[0-9]*[0-9]'); do
             llvm_ver=$(echo "$nix_clang" | sed -E 's/.*-([0-9][0-9.]*[0-9])$/\1/')
@@ -99,7 +105,7 @@ best_llvm=$(
             fi
         done
 
-        for brew_llvm in $(find "$BREW_PREFIX"/Cellar -maxdepth 1 -type l -name 'llvm*'); do
+        for brew_llvm in $(find "$BREW_PREFIX"/Cellar/llvm -maxdepth 1 -type d 2>/dev/null); do
             if [ -x "$brew_llvm/bin/clang++" ]; then
                 echo "$brew_llvm    $($brew_llvm/bin/clang++ --version | head -1 | awk '{ print $NF }')"
             fi
@@ -107,15 +113,19 @@ best_llvm=$(
     ) | sort -k2,2 -V -r | head -1 | awk '{ print $1 }'
 )
 
+# Fallback to XCode version.
+[ -z "$best_llvm_path" ] && best_llvm_path=/usr
+
+clang_path=${best_llvm_path%%:*}
+
 BUILD_ENV=$(cat <<EOF
 export MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET
 export COMMAND_MODE=unix2003
-export PATH=/usr/bin:/bin:/usr/sbin:/sbin:"$BREW_PREFIX"/bin
+export PATH="$best_llvm_path/bin:/usr/bin:/bin:/usr/sbin:/sbin:$BREW_PREFIX/bin"
 
-[ -n "$best_llvm" ] && export PATH="$best_llvm/bin:\$PATH"
-
-export CC=clang
-export CXX=clang++
+export CC="$clang_path/bin/clang"
+export CPP="$clang_path/bin/clang -E"
+export CXX="$clang_path/bin/clang++"
 export CPPFLAGS=-DICONV_CONST=
 export CFLAGS="$target_build_arch -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
 export CXXFLAGS="$target_build_arch -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"

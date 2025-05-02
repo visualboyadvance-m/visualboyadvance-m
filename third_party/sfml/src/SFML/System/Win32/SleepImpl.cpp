@@ -31,7 +31,7 @@
 
 #include <mmsystem.h>
 
-namespace sf::priv
+namespace sf
 {
 ////////////////////////////////////////////////////////////
 void sleepImpl(Time time)
@@ -54,4 +54,4 @@ void sleepImpl(Time time)
     timeEndPeriod(periodMin);
 }
 
-} // namespace sf::priv
+} // namespace sf
