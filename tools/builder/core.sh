@@ -46,9 +46,9 @@ else
 fi
 
 export CPPFLAGS="$CPPFLAGS${CPPFLAGS:+ }-isystem \$BUILD_ROOT/root/include -DCURL_STATICLIB -DGRAPHITE2_STATIC -DFLOAT_APPROX -Diconv=libiconv -Diconv_open=libiconv_open -Diconv_close=libiconv_close"
-export CFLAGS="-mtune=generic $CFLAGS${CFLAGS:+ }-fPIC -isystem \$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -pthread -lm -O3 -ffast-math $MARCH -pipe -Wno-error=implicit-int"
-export CXXFLAGS="-mtune=generic $CXXFLAGS${CXXFLAGS:+ }-fPIC -isystem \$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -DCURL_STATICLIB -DGRAPHITE2_STATIC -DFLOAT_APPROX -O3 -ffast-math $MARCH -pipe"
-export OBJCXXFLAGS="-mtune=generic $OBJCXXFLAGS${OBJCXXFLAGS:+ }-fPIC -isystem \$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -DCURL_STATICLIB -DGRAPHITE2_STATIC -DFLOAT_APPROX -O3 -ffast-math $MARCH -mtune=generic -pipe"
+export CFLAGS="-mtune=generic $CFLAGS${CFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -pthread -lm -O3 -ffast-math $MARCH -pipe -Wno-error=implicit-int"
+export CXXFLAGS="-mtune=generic $CXXFLAGS${CXXFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -O3 -ffast-math $MARCH -pipe"
+export OBJCXXFLAGS="-mtune=generic $OBJCXXFLAGS${OBJCXXFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -O3 -ffast-math $MARCH -mtune=generic -pipe"
 export LDFLAGS="-mtune=generic $LDFLAGS${LDFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -pthread -lm -O3 -ffast-math $MARCH -pipe"
 export STRIP="\${STRIP:-strip}"
 
