@@ -259,6 +259,8 @@ if [ -n "$APPLE_SILICON" ] && [ "$target_cpu" != ARM64 ]; then
     table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg '--disable-asm'
 fi
 
+table_line_remove DISTS cmake
+
 builder "$@"
 
 if [ -n "$PREV_XCODE" ]; then
