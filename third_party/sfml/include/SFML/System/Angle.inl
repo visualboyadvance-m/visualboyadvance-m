@@ -266,6 +266,10 @@ constexpr Angle operator""_rad(unsigned long long angle)
 
 // Note: the 'inline' keyword here is technically not required, but VS2019 fails
 // to compile with a bogus "multiple definition" error if not explicitly used.
+#ifdef _MSC_VER
+inline constexpr Angle Angle::Zero;
+#else
 constexpr Angle Angle::Zero;
+#endif
 
 } // namespace sf
