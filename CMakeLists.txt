@@ -87,6 +87,10 @@ if(NOT EXISTS "${CMAKE_SOURCE_DIR}/.git")
     set(BUILD_TESTING OFF)
 endif()
 
+if(ENABLE_TILEDRENDER)
+    _add_compile_definitions(TILED_RENDERING)
+endif()
+
 # Configure gtest
 if(BUILD_TESTING)
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
