@@ -824,7 +824,9 @@ mac_install_core_deps() {
         error 'Please install Mac Homebrew: [35mhttps://brew.sh/[0m'
     fi
 
-    "$BREW_PREFIX"/bin/brew install -q m4 perl perl-xml-parser meson ninja pyenv cmake
+    "$BREW_PREFIX"/bin/brew install -q m4 perl perl-xml-parser meson ninja pyenv cmake gnu-getopt
+
+    ln -sf "$(find "$BREW_PREFIX"/Cellar/gnu-getopt -path '*/bin/getopt' | head -1)" "$BUILD_ROOT/root/bin/getopt"
 
     if ! [ -d "$(pyenv root)/versions/2.7.18" ]; then
         pyenv install -s 2.7.18

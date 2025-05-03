@@ -86,14 +86,20 @@ if [ -n "$BREW_PREFIX" ]; then
     "$BREW_PREFIX"/bin/brew unlink gettext >/dev/null 2>&1 || :
 fi
 
-oldest_sdk=$(find /Library/Developer/CommandLineTools/SDKs -maxdepth 1 -mindepth 1 2>/dev/null | xargs basename | sed -E 's/^MacOSX//; s/\.sdk$//' | grep -E '[[:digit:]]' | sort -V | head -1)
+latest_sdk=$(find /Library/Developer/CommandLineTools/SDKs -maxdepth 1 -mindepth 1 2>/dev/null | xargs basename | sed -E 's/^MacOSX//; s/\.sdk$//' | grep -E '[[:digit:]]' | sort -V | tail -1)
 
 extra_includes=
 framework_path=
 
-if [ -n "$oldest_sdk" ]; then
-    extra_includes="-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX${oldest_sdk}.sdk/usr/include -isystem /Library/Developer/CommandLineTools/SDKs/MacOSX${oldest_sdk}.sdk/usr/include/c++/v1"
-    framework_path="-F/Library/Developer/CommandLineTools/SDKs/MacOSX${oldest_sdk}.sdk/System/Library/Frameworks"
+if [ -n "$latest_sdk" ]; then
+    extra_includes="-nostdinc -isystem /Library/Developer/CommandLineTools/SDKs/MacOSX${latest_sdk}.sdk/usr/include -isystem /Library/Developer/CommandLineTools/SDKs/MacOSX${latest_sdk}.sdk/usr/include/c++/v1"
+    framework_path="-F/Library/Developer/CommandLineTools/SDKs/MacOSX${latest_sdk}.sdk/System/Library/Frameworks"
+fi
+
+latest_clang_includes=/Library/Developer/CommandLineTools/usr/lib/clang/$(find /Library/Developer/CommandLineTools/usr/lib/clang/ -mindepth 1 -maxdepth 1 | xargs basename | sort -V | tail -1)/include
+
+if [ -d "$latest_clang_includes" ]; then
+    extra_includes="-isystem $latest_clang_includes $extra_includes"
 fi
 
 export BUILD_ROOT="${BUILD_ROOT:-$HOME/vbam-build-mac-${target_cpu}}$BUILD_ROOT_SUFFIX"
@@ -161,12 +167,9 @@ fi
 BUILD_ENV=$(printf '%s' "$BUILD_ENV" | sed 's/ -lm / /g')
 export BUILD_ENV
 
-for dist in flex libsecret c2man graphviz zip; do
-    table_line_remove DISTS "$dist"
+for dist in XML-Parser c2man cmake cmake flex getopt graphviz libffi libgcrypt libsecret m4 ninja python2 shared-mime-info zip; do
+    table_line_remove DISTS $dist
 done
-
-# issues with perl modules linked to our libs and brew perl
-table_line_remove DISTS shared-mime-info
 
 table_line_replace DIST_PREFIX libuuid /usr/stow/libuuid
 
@@ -218,8 +221,6 @@ if [ "$target_cpu" = i386 ]; then
     table_line_append DIST_ARGS libicu '--host= --build='
 fi
 
-table_line_remove DISTS ninja
-
 table_line_replace DIST_CONFIGURE_TYPES libmodplug autoreconf
 table_line_append  DIST_PRE_BUILD       libmodplug " \
     sed -i.bak '/-mmacosx-version-min=/d' configure.ac; \
@@ -249,17 +250,10 @@ table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg "--disable-videotoolbox --extr
 
 #table_line_append DIST_PATCHES ffmpeg "-p0 https://gist.githubusercontent.com/rkitover/db75d083b74617b186eec11965c1da74/raw/20da2f8c6d8c02ce284096c5e805ae671351cc6e/ffmpeg-macos10-7.patch"
 
-table_line_remove DISTS python2
 
 if [ -n "$APPLE_SILICON" ] && [ "$target_cpu" != ARM64 ]; then
-    table_line_remove DISTS m4
-    table_line_remove DISTS XML-Parser
-    table_line_remove DISTS libffi
-    table_line_remove DISTS libgcrypt
     table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg '--disable-asm'
 fi
-
-table_line_remove DISTS cmake
 
 builder "$@"
 
