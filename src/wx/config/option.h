@@ -70,6 +70,9 @@ enum class RenderMethod {
     kDirect3d,
 #elif defined(__WXMAC__)
     kQuartz2d,
+#ifndef NO_METAL
+    kMetal,
+#endif
 #endif
 
     // Do not add anything under here.

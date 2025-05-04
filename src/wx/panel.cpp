@@ -119,7 +119,9 @@ long GetSampleRate() {
     return 44100;
 }
 
+#define out_8 (systemColorDepth == 8)
 #define out_16 (systemColorDepth == 16)
+#define out_24 (systemColorDepth == 24)
 
 }  // namespace
 
@@ -1165,6 +1167,17 @@ void GameArea::OnIdle(wxIdleEvent& event)
                 panel = new BasicDrawingPanel(this, basic_width, basic_height);
                 break;
 #ifdef __WXMAC__
+#ifndef NO_METAL
+            case config::RenderMethod::kMetal:
+                if (is_macosx_1012_or_newer()) {
+                    panel =
+                    new MetalDrawingPanel(this, basic_width, basic_height);
+                } else {
+                    panel = new GLDrawingPanel(this, basic_width, basic_height);
+                    log("Metal is unavailable, defaulting to OpenGL");
+                }
+                break;
+#endif
             case config::RenderMethod::kQuartz2d:
                 panel =
                     new Quartz2DDrawingPanel(this, basic_width, basic_height);
@@ -2708,3 +2721,200 @@ void GameArea::OnVolumeChanged(config::Option* option) {
     soundSetVolume((float)volume / 100.0);
     systemScreenMessage(wxString::Format(_("Volume: %d %%"), volume));
 }
+
+#ifdef __WXMAC__
+#ifndef NO_METAL
+MetalDrawingPanel::MetalDrawingPanel(wxWindow* parent, int _width, int _height)
+        : DrawingPanel(parent, _width, _height)
+{
+    memset(delta, 0xff, sizeof(delta));
+            
+    // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
+    // 16 or 32, though
+    if (OPTION(kDispFilter) == config::Filter::kNone &&
+        OPTION(kDispIFB) == config::Interframe::kNone) {
+        // changing from 32 to 24 does not require regenerating color tables
+        systemColorDepth = 32;
+    }
+
+    DrawingPanelInit();
+}
+
+void MetalDrawingPanel::DrawArea(uint8_t** data)
+{
+    // double-buffer buffer:
+    //   if filtering, this is filter output, retained for redraws
+    //   if not filtering, we still retain current image for redraws
+    int outbpp = systemColorDepth >> 3;
+    int outrb = out_8 ? 2 : out_24 ? 0 : 4;
+    int outstride = std::ceil(width * outbpp * scale) + outrb;
+            
+    // FIXME: filters race condition?
+    const int max_threads = 1;
+            
+    if (!pixbuf2) {
+        int allocstride = outstride, alloch = height;
+                
+        // gb may write borders, so allocate enough for them
+        if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
+            allocstride = std::ceil(GameArea::SGBWidth * outbpp * scale) + outrb;
+            alloch = GameArea::SGBHeight;
+        }
+                
+        pixbuf2 = (uint8_t*)calloc(allocstride, std::ceil((alloch + 2) * scale));
+    }
+
+    if (OPTION(kDispFilter) == config::Filter::kNone) {
+        todraw = *data;
+        // *data is assigned below, after old buf has been processed
+        pixbuf1 = pixbuf2;
+        pixbuf2 = todraw;
+    } else
+        todraw = pixbuf2;
+
+    // First, apply filters, if applicable, in parallel, if enabled
+    // FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur)
+    if (OPTION(kDispFilter) != config::Filter::kNone ||
+        OPTION(kDispIFB) != config::Interframe::kNone) {
+        if (nthreads != max_threads) {
+            if (nthreads) {
+                if (nthreads > 1)
+                    for (int i = 0; i < nthreads; i++) {
+                        threads[i].lock_.Lock();
+                        threads[i].src_ = NULL;
+                        threads[i].sig_.Signal();
+                        threads[i].lock_.Unlock();
+                        threads[i].Wait();
+                    }
+                        
+                delete[] threads;
+            }
+
+            nthreads = max_threads;
+            threads = new FilterThread[nthreads];
+            // first time around, no threading in order to avoid
+            // static initializer conflicts
+            threads[0].threadno_ = 0;
+            threads[0].nthreads_ = 1;
+            threads[0].width_ = width;
+            threads[0].height_ = height;
+            threads[0].scale_ = scale;
+            threads[0].src_ = *data;
+            threads[0].dst_ = todraw;
+            threads[0].delta_ = delta;
+            threads[0].rpi_ = rpi_;
+            threads[0].Entry();
+
+            // go ahead and start the threads up, though
+            if (nthreads > 1) {
+                for (int i = 0; i < nthreads; i++) {
+                    threads[i].threadno_ = i;
+                    threads[i].nthreads_ = nthreads;
+                    threads[i].width_ = width;
+                    threads[i].height_ = height;
+                    threads[i].scale_ = scale;
+                    threads[i].dst_ = todraw;
+                    threads[i].delta_ = delta;
+                    threads[i].rpi_ = rpi_;
+                    threads[i].done_ = &filt_done;
+                    threads[i].lock_.Lock();
+                    threads[i].Create();
+                    threads[i].Run();
+                }
+            }
+        } else if (nthreads == 1) {
+            threads[0].threadno_ = 0;
+            threads[0].nthreads_ = 1;
+            threads[0].width_ = width;
+            threads[0].height_ = height;
+            threads[0].scale_ = scale;
+            threads[0].src_ = *data;
+            threads[0].dst_ = todraw;
+            threads[0].delta_ = delta;
+            threads[0].rpi_ = rpi_;
+            threads[0].Entry();
+        } else {
+            for (int i = 0; i < nthreads; i++) {
+                threads[i].lock_.Lock();
+                threads[i].src_ = *data;
+                threads[i].sig_.Signal();
+                threads[i].lock_.Unlock();
+            }
+                    
+            for (int i = 0; i < nthreads; i++)
+                filt_done.Wait();
+        }
+    }
+            
+    // swap buffers now that src has been processed
+    if (OPTION(kDispFilter) == config::Filter::kNone) {
+        *data = pixbuf1;
+    }
+            
+    // draw OSD text old-style (directly into output buffer), if needed
+    // new style flickers too much, so we'll stick to this for now
+    if (wxGetApp().frame->IsFullScreen() || !OPTION(kPrefDisableStatus)) {
+        GameArea* panel = wxGetApp().frame->GetPanel();
+
+        if (panel->osdstat.size())
+            drawText(todraw + outstride * (systemColorDepth != 24), outstride,
+                        10, 20, UTF8(panel->osdstat), OPTION(kPrefShowSpeedTransparent));
+                
+        if (!panel->osdtext.empty()) {
+            if (systemGetClock() - panel->osdtime < OSD_TIME) {
+                wxString message = panel->osdtext;
+                int linelen = std::ceil(width * scale - 20) / 8;
+                int nlines = (message.size() + linelen - 1) / linelen;
+                int cury = height - 14 - nlines * 10;
+                char* buf = strdup(UTF8(message));
+                char* ptr = buf;
+
+                while (nlines > 1) {
+                    char lchar = ptr[linelen];
+                    ptr[linelen] = 0;
+                    drawText(todraw + outstride * (systemColorDepth != 24),
+                                outstride, 10, cury, ptr,
+                                OPTION(kPrefShowSpeedTransparent));
+                    cury += 10;
+                    nlines--;
+                    ptr += linelen;
+                    *ptr = lchar;
+                }
+
+                drawText(todraw + outstride * (systemColorDepth != 24),
+                            outstride, 10, cury, ptr,
+                            OPTION(kPrefShowSpeedTransparent));
+
+                free(buf);
+                buf = NULL;
+            } else
+                panel->osdtext.clear();
+        }
+    }
+ 
+    // Draw the current frame
+    DrawArea();
+}
+        
+void MetalDrawingPanel::PaintEv(wxPaintEvent& ev)
+{
+    // FIXME: implement
+    if (!did_init) {
+        DrawingPanelInit();
+    }
+
+    (void)ev; // unused params
+            
+    if (!todraw) {
+        // since this is set for custom background, not drawing anything
+        // will cause garbage to be displayed, so draw a black area
+        draw_black_background(GetWindow());
+        return;
+    }
+
+    if (todraw) {
+        DrawArea();
+    }
+}
+#endif
+#endif

@@ -44,6 +44,13 @@
                     <border>5</border>
                   </object>
                   <object class="sizeritem">
+                    <object class="wxRadioButton" name="OutputMetal">
+                      <label translate="0">Metal</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
                     <object class="wxRadioButton" name="OutputOpenGL">
                       <label translate="0">OpenGL</label>
                     </object>

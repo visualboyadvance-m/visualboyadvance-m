@@ -76,6 +76,9 @@ static const std::array<wxString, kNbRenderMethods> kRenderMethodStrings = {
     "direct3d",
 #elif defined(__WXMAC__)
     "quartz2d",
+#ifndef NO_METAL
+    "metal",
+#endif
 #endif
 };
 
@@ -137,10 +140,14 @@ std::array<Option, kNbOptions>& Option::All() {
         Interframe interframe = Interframe::kNone;
         bool keep_on_top = false;
         int32_t max_threads = 0;
+#if defined(__WXMAC__) && !defined(NO_METAL)
+        RenderMethod render_method = RenderMethod::kMetal;
+#else
 #if defined(NO_OGL)
         RenderMethod render_method = RenderMethod::kSimple;
 #else
         RenderMethod render_method = RenderMethod::kOpenGL;
+#endif
 #endif
         double video_scale = 3;
         bool retain_aspect = true;

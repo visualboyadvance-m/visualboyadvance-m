@@ -257,10 +257,15 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
         ->SetValidator(RenderValidator(config::RenderMethod::kSimple));
 
 #if defined(__WXMAC__)
-    GetValidatedChild("OutputQuartz2D")
-        ->SetValidator(RenderValidator(config::RenderMethod::kQuartz2d));
+    GetValidatedChild("OutputMetal")->SetValidator(RenderValidator(config::RenderMethod::kQuartz2d));
+#ifndef NO_METAL
+    GetValidatedChild("OutputMetal")->SetValidator(RenderValidator(config::RenderMethod::kMetal));
+#else
+    GetValidatedChild("OutputMetal")->Hide();
+#endif
 #else
     GetValidatedChild("OutputQuartz2D")->Hide();
+    GetValidatedChild("OutputMetal")->Hide();
 #endif
 
 #ifdef NO_OGL
