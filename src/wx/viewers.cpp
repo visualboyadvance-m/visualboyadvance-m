@@ -331,7 +331,7 @@ public:
 
         for (int i = 0; i < dis->nlines; i++) {
             dis->addrs.push_back(addr);
-            addr += gbDis(buf, addr);
+            addr += gbDis(buf, sizeof(buf), addr);
             dis->strings.push_back(wxString(buf, wxConvLibc));
         }
 

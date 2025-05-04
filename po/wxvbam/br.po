@@ -361,6 +361,14 @@ msgstr "N'eo ket bet kavet an astenn rpi implijadus e-barzh %s"
 msgid "Plugin"
 msgstr "Astenn"
 
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth"
+msgstr "Bits por pixel"
+
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth:"
+msgstr "Bits por pixel:"
+
 #: dialogs/display-config.cpp:407
 #, c-format
 msgid "Using pixel filter: %s"

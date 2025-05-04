@@ -1,3 +1,7 @@
+#if defined(__APPLE__) && defined(__MACH__)
+#define GL_SILENCE_DEPRECATION 1
+#endif
+
 #include "wx/wxvbam.h"
 
 #include <cmath>
@@ -8,6 +12,7 @@
     #include <X11/Xlib.h>
     #define Status int
     #include <gdk/gdkx.h>
+    #include <gdk/gdkwayland.h>
     #include <gtk/gtk.h>
     // For Wayland EGL.
     #ifdef HAVE_EGL
@@ -16,6 +21,12 @@
 #ifdef HAVE_XSS
     #include <X11/extensions/scrnsaver.h>
 #endif
+#endif
+
+#ifdef ENABLE_SDL3
+#include <SDL3/SDL.h>
+#else
+#include <SDL.h>
 #endif
 
 #include <wx/dcbuffer.h>
@@ -27,6 +38,7 @@
 #include "components/filters_interframe/interframe.h"
 #include "core/base/check.h"
 #include "core/base/file_util.h"
+#include "core/base/image_util.h"
 #include "core/base/patch.h"
 #include "core/base/system.h"
 #include "core/base/version.h"
@@ -54,6 +66,10 @@
 
 #ifdef __WXMSW__
 #include <windows.h>
+#endif
+
+#ifdef _MSC_VER
+#define strdup _strdup
 #endif
 
 namespace {
@@ -119,7 +135,9 @@ long GetSampleRate() {
     return 44100;
 }
 
+#define out_8  (systemColorDepth ==  8)
 #define out_16 (systemColorDepth == 16)
+#define out_24 (systemColorDepth == 24)
 
 }  // namespace
 
@@ -145,7 +163,8 @@ GameArea::GameArea()
       mouse_active_time(0),
       render_observer_({config::OptionID::kDispBilinear, config::OptionID::kDispFilter,
                         config::OptionID::kDispRenderMethod, config::OptionID::kDispIFB,
-                        config::OptionID::kDispStretch, config::OptionID::kPrefVsync},
+                        config::OptionID::kDispStretch, config::OptionID::kPrefVsync,
+                        config::OptionID::kSDLRenderer, config::OptionID::kBitDepth},
                        std::bind(&GameArea::ResetPanel, this)),
       scale_observer_(config::OptionID::kDispScale, std::bind(&GameArea::AdjustSize, this, true)),
       gb_border_observer_(config::OptionID::kPrefBorderOn,
@@ -169,7 +188,8 @@ GameArea::GameArea()
     SetSizer(new wxBoxSizer(wxVERTICAL));
     // all renderers prefer 32-bit
     // well, "simple" prefers 24-bit, but that's not available for filters
-    systemColorDepth = 32;
+    systemColorDepth = (OPTION(kBitDepth) + 1) << 3;
+
     hq2x_init(32);
     Init_2xSaI(32);
 }
@@ -1162,21 +1182,51 @@ void GameArea::OnIdle(wxIdleEvent& event)
     if (!panel) {
         switch (OPTION(kDispRenderMethod)) {
             case config::RenderMethod::kSimple:
+                no_border = false;
+
                 panel = new BasicDrawingPanel(this, basic_width, basic_height);
                 break;
+            case config::RenderMethod::kSDL:
+                no_border = false;
+
+                panel = new SDLDrawingPanel(this, basic_width, basic_height);
+                break;
 #ifdef __WXMAC__
+#ifndef NO_METAL
+            case config::RenderMethod::kMetal:
+                no_border = false;
+
+                if (is_macosx_1012_or_newer()) {
+                    panel =
+                    new MetalDrawingPanel(this, basic_width, basic_height);
+                } else {
+                    panel = new GLDrawingPanel(this, basic_width, basic_height);
+                    log("Metal is unavailable, defaulting to OpenGL");
+                }
+                break;
+#endif
             case config::RenderMethod::kQuartz2d:
+                no_border = false;
+
                 panel =
                     new Quartz2DDrawingPanel(this, basic_width, basic_height);
                 break;
 #endif
 #ifndef NO_OGL
             case config::RenderMethod::kOpenGL:
+                if (out_8) {
+                    no_border = true;
+                } else {
+                    no_border = false;
+                }
+
                 panel = new GLDrawingPanel(this, basic_width, basic_height);
                 break;
 #endif
 #if defined(__WXMSW__) && !defined(NO_D3D)
             case config::RenderMethod::kDirect3d:
+                no_border = false;
+
                 panel = new DXDrawingPanel(this, basic_width, basic_height);
                 break;
 #endif
@@ -1422,8 +1472,14 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
                 rpi_->Flags &= ~RPI_555_SUPP;
                 // FIXME: should this be 32 or 24?  No docs or sample source
                 systemColorDepth = 32;
-            } else
+            } else if (rpi_->Flags & RPI_555_SUPP) {
+                rpi_->Flags &= ~RPI_888_SUPP;
                 systemColorDepth = 16;
+            } else {
+                rpi_->Flags &= ~RPI_888_SUPP;
+                rpi_->Flags &= ~RPI_555_SUPP;
+                systemColorDepth = 8;
+            }
 
             if (!rpi_->Output) {
                 // note that in actual kega fusion plugins, rpi_->Output is
@@ -1442,11 +1498,24 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
 
     if (OPTION(kDispFilter) != config::Filter::kPlugin) {
         scale *= GetFilterScale();
-        systemColorDepth = 32;
+
+        systemColorDepth = (OPTION(kBitDepth) + 1) << 3;
     }
 
     // Intialize color tables
-    if (systemColorDepth == 32) {
+    if (systemColorDepth == 24) {
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+        systemRedShift = 3;
+        systemGreenShift = 11;
+        systemBlueShift = 19;
+        RGB_LOW_BITS_MASK = 0x00010101;
+#else
+        systemRedShift = 27;
+        systemGreenShift = 19;
+        systemBlueShift = 11;
+        RGB_LOW_BITS_MASK = 0x01010100;
+#endif
+    } else if (systemColorDepth == 32) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
         systemRedShift = 3;
         systemGreenShift = 11;
@@ -1546,24 +1615,34 @@ public:
     ExitCode Entry() override {
         // This is the band this thread will process
         // threadno == -1 means just do a dummy round on the border line
+        const int height_real = height_;
         const int procy = height_ * threadno_ / nthreads_;
         height_ = height_ * (threadno_ + 1) / nthreads_ - procy;
         const int inbpp = systemColorDepth >> 3;
-        const int inrb = systemColorDepth == 16   ? 2
-                         : systemColorDepth == 24 ? 0
-                                                  : 1;
+        const int inrb = out_8 ? 2 : out_16  ? 2
+                         : out_24 ? 0 : 1;
         const int instride = (width_ + inrb) * inbpp;
-        const int outbpp = out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
-        const int outrb = systemColorDepth == 24 ? 0 : 4;
+        const int instride32 = width_ * 4;
+        const int outbpp = systemColorDepth >> 3;
+        const int outrb = out_8 ? 2 : out_24 ? 0 : 4;
         const int outstride = std::ceil(width_ * outbpp * scale_) + outrb;
+        const int outstride32 = std::ceil(width_ * 4 * scale_);
+        uint8_t *dest = NULL;
+        int pos = 0;
+        uint32_t *src2_ = NULL;
+        uint32_t *dst2_ = NULL;
         delta_ += instride * procy;
 
         // FIXME: fugly hack
         if (OPTION(kDispRenderMethod) == config::RenderMethod::kOpenGL) {
             dst_ += (int)std::ceil(outstride * (procy + 1) * scale_);
+        } else if (OPTION(kDispRenderMethod) == config::RenderMethod::kSDL) {
+            dst_ += (int)std::ceil(outstride * (procy + 1) * scale_);
         } else {
             dst_ += (int)std::ceil(outstride * (procy + (1 / scale_)) * scale_);
         }
+
+        dest = dst_;
 
         while (nthreads_ == 1 || sig_.Wait() == wxCOND_NO_ERROR) {
             if (!src_ /* && nthreads > 1 */) {
@@ -1590,7 +1669,118 @@ public:
 
             // naturally, any of these with accumulation buffers like those
             // of the IFB filters will screw up royally as well
-            ApplyFilter(instride, outstride);
+            if (systemColorDepth == 32) {
+                ApplyFilter(instride, outstride);
+            } else {
+                src2_ = (uint32_t *)calloc(4, std::ceil(width_ * height_real));
+                dst2_ = (uint32_t *)calloc(4, std::ceil((width_ * scale_) * (height_real * scale_)));
+
+                if (out_8) {
+                    int src_pos = 0;
+                    for (int y = 0; y < height_real; y++) {
+                        for (int x = 0; x < width_; x++) {
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+                            src2_[pos] = (src_[src_pos] & 0xe0) + ((src_[src_pos] & 0x1c) << 11) + ((src_[src_pos] & 0x3) << 22);
+#else
+                            src2_[pos] = ((src_[src_pos] & 0xe0) << 24) + ((src_[src_pos] & 0x1c) << 19) + ((src_[src_pos] & 0x3) << 14);
+#endif
+                            pos++;
+                            src_pos++;
+                        }
+                        src_pos += 2;
+                    }
+                } else if (out_16) {
+                    uint16_t *src16_ = (uint16_t *)src_;
+                    int src_pos = 0;
+                    for (int y = 0; y < height_real; y++) {
+                        for (int x = 0; x < width_; x++) {
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+                            src2_[pos] = ((src16_[src_pos] & 0x7c00) >> 7) + ((src16_[src_pos] & 0x03e0) << 6) + ((src16_[src_pos] & 0x1f) << 19);
+#else
+                            src2_[pos] = ((src16_[src_pos] & 0x7c00) << 17) + ((src16_[src_pos] & 0x03e0) << 14) + ((src16_[src_pos] & 0x1f) << 11);
+#endif
+                            pos++;
+                            src_pos++;
+                        }
+                        src_pos += 2;
+                    }
+                } else if (out_24) {
+                    int src_pos = 0;
+                    uint8_t *src8_ = (uint8_t *)src2_;
+                    for (int y = 0; y < height_real; y++) {
+                        for (int x = 0; x < width_; x++) {
+                            src8_[pos] = src_[src_pos];
+                            src8_[pos+1] = src_[src_pos+1];
+                            src8_[pos+2] = src_[src_pos+2];
+                            src8_[pos+3] = 0;
+
+                            pos += 4;
+                            src_pos += 3;
+                        }
+                    }
+                }
+
+                src_ = (uint8_t *)src2_;
+                dst_ = (uint8_t *)dst2_;
+
+                ApplyFilter(instride32, outstride32);
+
+                dst_ = (uint8_t *)dst2_;
+
+                if (out_8) {
+                    int dst_pos = 0;
+                    pos = 0;
+                    for (int y = 0; y < (height_real * scale_); y++) {
+                        for (int x = 0; x < (width_ * scale_); x++) {
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+                            dest[pos] = (uint8_t)(((dst_[dst_pos] >> 5) << 5) + ((dst_[dst_pos+1] >> 5) << 2) + ((dst_[dst_pos+2] >> 6) & 0x3));
+#else
+                            dest[pos] = (uint8_t)(((dst_[dst_pos+3] >> 5) << 5) + ((dst_[dst_pos+2] >> 5) << 2) + ((dst_[dst_pos+1] >> 6) & 0x3));
+#endif
+                            pos++;
+                            dst_pos += 4;
+                        }
+                        pos += 2;
+                    }
+                } else if (out_16) {
+                    uint16_t *dest16_ = (uint16_t *)dest;
+                    int dst_pos = 0;
+                    pos = 0;
+                    for (int y = 0; y < (height_real * scale_); y++) {
+                        for (int x = 0; x < (width_ * scale_); x++) {
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+                            dest16_[pos] = (uint16_t)(((dst_[dst_pos] >> 3) << 10) + ((dst_[dst_pos+1] >> 3) << 5) + (dst_[dst_pos+2] >> 3));
+#else
+                            dest16_[pos] = (uint16_t)(((dst_[dst_pos+3] >> 3) << 10) + ((dst_[dst_pos+2] >> 3) << 5) + (dst_[dst_pos+1] >> 3));
+#endif
+                            pos++;
+                            dst_pos += 4;
+                        }
+                        pos += 2;
+                    }
+                } else if (out_24) {
+                    int dst_pos = 0;
+                    pos = 0;
+                    for (int y = 0; y < (height_real * scale_); y++) {
+                        for (int x = 0; x < (width_ * scale_); x++) {
+                            dest[pos] = dst_[dst_pos];
+                            dest[pos+1] = dst_[dst_pos+1];
+                            dest[pos+2] = dst_[dst_pos+2];
+                            pos += 3;
+                            dst_pos += 4;
+                        }
+                    }
+                }
+
+                if (src2_ != NULL) {
+                    free(src2_);
+                }
+
+                if (dst2_ != NULL) {
+                    free(dst2_);
+                }
+            }
+
             if (nthreads_ == 1) {
                 return 0;
             }
@@ -1612,18 +1802,28 @@ private:
                 break;
 
             case config::Interframe::kSmart:
-                if (systemColorDepth == 16)
+                if (out_8) {
+                    SmartIB8(src_, instride, width_, procy, height_);
+                } else if (out_16) {
                     SmartIB(src_, instride, width_, procy, height_);
-                else
+                } else if (out_24) {
+                    SmartIB24(src_, instride, width_, procy, height_);
+                } else {
                     SmartIB32(src_, instride, width_, procy, height_);
+                }
                 break;
 
             case config::Interframe::kMotionBlur:
                 // FIXME: if(renderer == d3d/gl && filter == NONE) break;
-                if (systemColorDepth == 16)
+                if (out_8) {
+                    MotionBlurIB8(src_, instride, width_, procy, height_);
+                } else if (out_16) {
                     MotionBlurIB(src_, instride, width_, procy, height_);
-                else
+                } else if (out_24) {
+                    MotionBlurIB24(src_, instride, width_, procy, height_);
+                } else {
                     MotionBlurIB32(src_, instride, width_, procy, height_);
+                }
                 break;
 
             case config::Interframe::kLast:
@@ -1781,8 +1981,8 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     // double-buffer buffer:
     //   if filtering, this is filter output, retained for redraws
     //   if not filtering, we still retain current image for redraws
-    int outbpp = out_16 ? 2 : systemColorDepth == 24 ? 3 : 4;
-    int outrb = systemColorDepth == 24 ? 0 : 4;
+    int outbpp = systemColorDepth >> 3;
+    int outrb = out_8 ? 2 : out_24 ? 0 : 4;
     int outstride = std::ceil(width * outbpp * scale) + outrb;
 
     if (!pixbuf2) {
@@ -2064,28 +2264,496 @@ DrawingPanelBase::~DrawingPanelBase()
     disableKeyboardBackgroundInput();
 }
 
-BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
+SDLDrawingPanel::SDLDrawingPanel(wxWindow* parent, int _width, int _height)
     : DrawingPanel(parent, _width, _height)
+{
+    memset(delta, 0xff, sizeof(delta));
+
+    // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
+    // 16 or 32, though
+    if (OPTION(kDispFilter) == config::Filter::kNone &&
+        OPTION(kDispIFB) == config::Interframe::kNone) {
+        // changing from 32 to 24 does not require regenerating color tables
+        systemColorDepth = (OPTION(kBitDepth) + 1) << 3;
+    }
+
+    DrawingPanelInit();
+}
+
+SDLDrawingPanel::~SDLDrawingPanel()
+{
+    if (did_init)
+    {
+        SDL_DestroyWindow(sdlwindow);
+        SDL_DestroyTexture(texture);
+        SDL_DestroyRenderer(renderer);
+
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
+
+        did_init = false;
+    }
+}
+
+void SDLDrawingPanel::EraseBackground(wxEraseEvent& ev)
+{
+    (void)ev; // unused params
+    // do nothing, do not allow propagation
+}
+
+void SDLDrawingPanel::PaintEv(wxPaintEvent& ev)
+{
+    // FIXME: implement
+    if (!did_init) {
+        DrawingPanelInit();
+    }
+
+    (void)ev; // unused params
+
+    if (!todraw) {
+        // since this is set for custom background, not drawing anything
+        // will cause garbage to be displayed, so draw a black area
+        draw_black_background(GetWindow());
+        return;
+    }
+
+    if (todraw) {
+        DrawArea();
+    }
+}
+
+void SDLDrawingPanel::DrawingPanelInit()
+{
+    wxString renderer_name = OPTION(kSDLRenderer);
+
+#ifdef ENABLE_SDL3
+    SDL_PropertiesID props = SDL_CreateProperties();
+#endif
+#ifdef __WXGTK__
+    GtkWidget *widget = wxGetApp().frame->GetPanel()->GetHandle();
+    gtk_widget_realize(widget);
+    XID xid = 0;
+    struct wl_surface *wayland_surface = NULL;
+    struct wl_display *wayland_display = NULL;
+
+#ifdef ENABLE_SDL3
+    if (GDK_IS_WAYLAND_WINDOW(gtk_widget_get_window(widget))) {
+        wayland_display = gdk_wayland_display_get_wl_display(gtk_widget_get_display(widget));
+        wayland_surface = gdk_wayland_window_get_wl_surface(gtk_widget_get_window(widget));
+
+        if (SDL_SetPointerProperty(SDL_GetGlobalProperties(), SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, wayland_display) == false) {
+            systemScreenMessage(_("Failed to set wayland display"));
+            return;
+        }
+    } else {
+#endif
+        xid = GDK_WINDOW_XID(gtk_widget_get_window(widget));
+#ifdef ENABLE_SDL3
+    }
+#endif
+
+#ifdef ENABLE_SDL3
+    if (GDK_IS_WAYLAND_WINDOW(gtk_widget_get_window(widget))) {
+        SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "wayland");
+    } else {
+        SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "x11");
+    }
+#else
+    SDL_SetHint(SDL_HINT_VIDEODRIVER, "x11");
+#endif
+#endif
+
+    DrawingPanel::DrawingPanelInit();
+
+#ifdef ENABLE_SDL3
+    if (SDL_InitSubSystem(SDL_INIT_VIDEO) == false) {
+#else
+    if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0) {
+#endif
+        systemScreenMessage(_("Failed to initialize SDL video subsystem"));
+        return;
+    }
+
+#ifdef ENABLE_SDL3
+    if (SDL_WasInit(SDL_INIT_VIDEO) == false) {
+        if (SDL_Init(SDL_INIT_VIDEO) == false) {
+#else
+    if (SDL_WasInit(SDL_INIT_VIDEO) < 0) {
+        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+#endif
+            systemScreenMessage(_("Failed to initialize SDL video"));
+            return;
+        }
+    }
+
+#ifdef ENABLE_SDL3
+#ifdef __WXGTK__
+    if (GDK_IS_WAYLAND_WINDOW(gtk_widget_get_window(widget))) {
+        if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, wayland_surface) == false) {
+            systemScreenMessage(_("Failed to set wayland surface"));
+            return;
+        }
+    } else {
+        if (SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X11_WINDOW_NUMBER, xid) == false)
+#elif defined(__WXMAC__)
+        if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_COCOA_VIEW_POINTER, wxGetApp().frame->GetPanel()->GetHandle()) == false)
+#else
+        if (SDL_SetPointerProperty(props, "sdl2-compat.external_window", GetWindow()->GetHandle()) == false)
+#endif
+        {
+            systemScreenMessage(_("Failed to set parent window"));
+            return;
+        }
+#ifdef __WXGTK__
+    }
+#endif
+            
+    sdlwindow = SDL_CreateWindowWithProperties(props);
+            
+    if (sdlwindow == NULL) {
+        systemScreenMessage(_("Failed to create SDL window"));
+        return;
+    }
+            
+    SDL_DestroyProperties(props);
+            
+    if (OPTION(kSDLRenderer) == wxString("default")) {
+        renderer = SDL_CreateRenderer(sdlwindow, NULL);
+        log("SDL renderer: default");
+    } else {
+        wxString renderer_name = OPTION(kSDLRenderer);
+        renderer = SDL_CreateRenderer(sdlwindow, renderer_name.mb_str());
+        log("SDL renderer: %s", (const char *)renderer_name.mb_str());
+
+        if (renderer == NULL) {
+            log("ERROR: Renderer creating failed, using default renderer");
+            renderer = SDL_CreateRenderer(sdlwindow, NULL);
+        }
+    }
+            
+    if (renderer == NULL) {
+        systemScreenMessage(_("Failed to create SDL renderer"));
+        return;
+    }
+#else
+#ifdef __WXGTK__
+    sdlwindow = SDL_CreateWindowFrom((void *)xid);
+#elif defined(__WXMAC__)
+    sdlwindow = SDL_CreateWindowFrom(wxGetApp().frame->GetPanel()->GetHandle());
+#else
+    sdlwindow = SDL_CreateWindowFrom(GetWindow()->GetHandle());
+#endif
+            
+    if (sdlwindow == NULL) {
+        systemScreenMessage(_("Failed to create SDL window"));
+        return;
+    }
+            
+    if (OPTION(kSDLRenderer) == wxString("default")) {
+        renderer = SDL_CreateRenderer(sdlwindow, -1, 0);
+        log("SDL renderer: default");
+    } else {
+        for (int i = 0; i < SDL_GetNumRenderDrivers(); i++) {
+            wxString renderer_name = OPTION(kSDLRenderer);
+            SDL_RendererInfo render_info;
+                    
+            SDL_GetRenderDriverInfo(i, &render_info);
+                    
+            if (!strcmp(renderer_name.mb_str(), render_info.name)) {
+                if (!strcmp(render_info.name, "software")) {
+                    renderer = SDL_CreateRenderer(sdlwindow, i, SDL_RENDERER_SOFTWARE);
+                } else {
+                    renderer = SDL_CreateRenderer(sdlwindow, i, SDL_RENDERER_ACCELERATED);
+                }
+                        
+                log("SDL renderer: %s", render_info.name);
+            }
+        }
+                
+        if (renderer == NULL) {
+            log("ERROR: Renderer creating failed, using default renderer");
+            renderer = SDL_CreateRenderer(sdlwindow, -1, 0);
+        }
+    }
+            
+    if (renderer == NULL) {
+        systemScreenMessage(_("Failed to create SDL renderer"));
+        return;
+    }
+#endif
+            
+    if (out_8) {
+#ifdef ENABLE_SDL3
+        texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(8, 0xE0, 0x1C, 0x03, 0x00), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+#else
+        texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(8, 0xE0, 0x1C, 0x03, 0x00), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+#endif
+    } else if (out_16) {
+#ifdef ENABLE_SDL3
+        texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(16, 0x7C00, 0x03E0, 0x001F, 0x0000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+#else
+        texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(16, 0x7C00, 0x03E0, 0x001F, 0x0000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+#endif
+    } else if (out_24) {
+#ifdef ENABLE_SDL3
+        texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+#else
+        texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+#endif
+    } else {
+#ifdef ENABLE_SDL3
+        texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+#else
+        texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+#endif
+    }
+            
+    did_init = true;
+}
+        
+void SDLDrawingPanel::OnSize(wxSizeEvent& ev)
+{
+    if (todraw) {
+        DrawArea();
+    }
+            
+    ev.Skip();
+}
+        
+void SDLDrawingPanel::DrawArea(wxWindowDC& dc)
+{
+    (void)dc;
+    DrawArea();
+}
+
+void SDLDrawingPanel::DrawArea()
+{
+    uint32_t srcPitch = 0;
+            
+    if (!did_init)
+        DrawingPanelInit();
+            
+    if (out_8) {
+        srcPitch = std::ceil(width * scale) + 2;
+    } else if (out_16) {
+        srcPitch = std::ceil(width * scale * 2) + 4;
+    } else if (out_24) {
+        srcPitch = std::ceil(width * scale * 3);
+    } else {
+        srcPitch = std::ceil(width * scale * 4) + 4;
+    }
+            
+    SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
+    SDL_RenderClear(renderer);
+    SDL_UpdateTexture(texture, NULL, todraw + srcPitch, srcPitch);
+            
+#ifdef ENABLE_SDL3
+    SDL_RenderTexture(renderer, texture, NULL, NULL);
+#else
+    SDL_RenderCopy(renderer, texture, NULL, NULL);
+#endif
+            
+    SDL_RenderPresent(renderer);
+}
+        
+void SDLDrawingPanel::DrawArea(uint8_t** data)
+{
+    // double-buffer buffer:
+    //   if filtering, this is filter output, retained for redraws
+    //   if not filtering, we still retain current image for redraws
+    int outbpp = systemColorDepth >> 3;
+    int outrb = out_8 ? 2 : out_24 ? 0 : 4;
+    int outstride = std::ceil(width * outbpp * scale) + outrb;
+            
+    // FIXME: filters race condition?
+    const int max_threads = 1;
+            
+    if (!pixbuf2) {
+        int allocstride = outstride, alloch = height;
+                
+        // gb may write borders, so allocate enough for them
+        if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
+            allocstride = std::ceil(GameArea::SGBWidth * outbpp * scale) + outrb;
+            alloch = GameArea::SGBHeight;
+        }
+
+        pixbuf2 = (uint8_t*)calloc(allocstride, std::ceil((alloch + 2) * scale));
+    }
+            
+    if (OPTION(kDispFilter) == config::Filter::kNone) {
+        todraw = *data;
+        // *data is assigned below, after old buf has been processed
+        pixbuf1 = pixbuf2;
+        pixbuf2 = todraw;
+    } else
+        todraw = pixbuf2;
+
+    // First, apply filters, if applicable, in parallel, if enabled
+    // FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur)
+    if (OPTION(kDispFilter) != config::Filter::kNone ||
+        OPTION(kDispIFB) != config::Interframe::kNone) {
+        if (nthreads != max_threads) {
+            if (nthreads) {
+                if (nthreads > 1)
+                    for (int i = 0; i < nthreads; i++) {
+                        threads[i].lock_.Lock();
+                        threads[i].src_ = NULL;
+                        threads[i].sig_.Signal();
+                        threads[i].lock_.Unlock();
+                        threads[i].Wait();
+                    }
+                        
+                delete[] threads;
+            }
+                    
+            nthreads = max_threads;
+            threads = new FilterThread[nthreads];
+            // first time around, no threading in order to avoid
+            // static initializer conflicts
+            threads[0].threadno_ = 0;
+            threads[0].nthreads_ = 1;
+            threads[0].width_ = width;
+            threads[0].height_ = height;
+            threads[0].scale_ = scale;
+            threads[0].src_ = *data;
+            threads[0].dst_ = todraw;
+            threads[0].delta_ = delta;
+            threads[0].rpi_ = rpi_;
+            threads[0].Entry();
+        
+            // go ahead and start the threads up, though
+            if (nthreads > 1) {
+                for (int i = 0; i < nthreads; i++) {
+                    threads[i].threadno_ = i;
+                    threads[i].nthreads_ = nthreads;
+                    threads[i].width_ = width;
+                    threads[i].height_ = height;
+                    threads[i].scale_ = scale;
+                    threads[i].dst_ = todraw;
+                    threads[i].delta_ = delta;
+                    threads[i].rpi_ = rpi_;
+                    threads[i].done_ = &filt_done;
+                    threads[i].lock_.Lock();
+                    threads[i].Create();
+                    threads[i].Run();
+                }
+            }
+        } else if (nthreads == 1) {
+            threads[0].threadno_ = 0;
+            threads[0].nthreads_ = 1;
+            threads[0].width_ = width;
+            threads[0].height_ = height;
+            threads[0].scale_ = scale;
+            threads[0].src_ = *data;
+            threads[0].dst_ = todraw;
+            threads[0].delta_ = delta;
+            threads[0].rpi_ = rpi_;
+            threads[0].Entry();
+        } else {
+            for (int i = 0; i < nthreads; i++) {
+                threads[i].lock_.Lock();
+                threads[i].src_ = *data;
+                threads[i].sig_.Signal();
+                threads[i].lock_.Unlock();
+            }
+                    
+            for (int i = 0; i < nthreads; i++)
+                filt_done.Wait();
+        }
+    }
+            
+    // swap buffers now that src has been processed
+    if (OPTION(kDispFilter) == config::Filter::kNone) {
+        *data = pixbuf1;
+    }
+            
+    // draw OSD text old-style (directly into output buffer), if needed
+    // new style flickers too much, so we'll stick to this for now
+    if (wxGetApp().frame->IsFullScreen() || !OPTION(kPrefDisableStatus)) {
+        GameArea* panel = wxGetApp().frame->GetPanel();
+                
+        if (panel->osdstat.size())
+            drawText(todraw + outstride * (systemColorDepth != 24), outstride,
+                        10, 20, UTF8(panel->osdstat), OPTION(kPrefShowSpeedTransparent));
+                
+        if (!panel->osdtext.empty()) {
+            if (systemGetClock() - panel->osdtime < OSD_TIME) {
+                wxString message = panel->osdtext;
+                int linelen = std::ceil(width * scale - 20) / 8;
+                int nlines = (message.size() + linelen - 1) / linelen;
+                int cury = height - 14 - nlines * 10;
+                char* buf = strdup(UTF8(message));
+                char* ptr = buf;
+
+                while (nlines > 1) {
+                    char lchar = ptr[linelen];
+                    ptr[linelen] = 0;
+                    drawText(todraw + outstride * (systemColorDepth != 24),
+                                outstride, 10, cury, ptr,
+                                OPTION(kPrefShowSpeedTransparent));
+                    cury += 10;
+                    nlines--;
+                    ptr += linelen;
+                    *ptr = lchar;
+                }
+                        
+                drawText(todraw + outstride * (systemColorDepth != 24),
+                            outstride, 10, cury, ptr,
+                            OPTION(kPrefShowSpeedTransparent));
+                        
+                free(buf);
+                buf = NULL;
+            } else
+                panel->osdtext.clear();
+        }
+    }
+            
+    // Draw the current frame
+    DrawArea();
+}
+        
+BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
+        : DrawingPanel(parent, _width, _height)
 {
     // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
     // 16 or 32, though
     if (OPTION(kDispFilter) == config::Filter::kNone &&
         OPTION(kDispIFB) == config::Interframe::kNone) {
         // changing from 32 to 24 does not require regenerating color tables
-        systemColorDepth = 32;
+        systemColorDepth = (OPTION(kBitDepth) + 1) << 3;
     }
-    if (!did_init) {
-        DrawingPanelInit();
-    }
+            
+    DrawingPanelInit();
 }
-
+        
 void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
 {
     wxImage* im;
-
-    if (systemColorDepth == 24) {
+            
+    if (out_24) {
         // never scaled, no borders, no transformations needed
         im = new wxImage(width, height, todraw, true);
+    } else if (out_8) {
+        // scaled by filters, top/right borders, transform to 24-bit
+        im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
+        uint8_t* src = (uint8_t*)todraw + (int)std::ceil((width + 2) * scale); // skip top border
+        uint8_t* dst = im->GetData();
+                
+        for (int y = 0; y < std::ceil(height * scale); y++) {
+            for (int x = 0; x < std::ceil(width * scale); x++, src++) {
+                // White color fix
+                if (*src == 0xff) {
+                    *dst++ = 0xff;
+                    *dst++ = 0xff;
+                    *dst++ = 0xff;
+                } else {
+                    *dst++ = (((*src >> 5) & 0x7) << 5);
+                    *dst++ = (((*src >> 2) & 0x7) << 5);
+                    *dst++ = ((*src & 0x3) << 6);
+                }
+            }
+                    
+            src += 2;
+        }
     } else if (out_16) {
         // scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
@@ -2098,7 +2766,7 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
                 *dst++ = ((*src >> systemGreenShift) & 0x1f) << 3;
                 *dst++ = ((*src >> systemBlueShift) & 0x1f) << 3;
             }
-
+                    
             src += 2; // skip rhs border
         }
     } else if (OPTION(kDispFilter) != config::Filter::kNone) {
@@ -2113,7 +2781,7 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
                 *dst++ = *src >> (systemGreenShift - 3);
                 *dst++ = *src >> (systemBlueShift - 3);
             }
-
+                    
             ++src; // skip rhs border
         }
     } else {  // 32 bit
@@ -2128,16 +2796,16 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
                 *dst++ = *src >> (systemGreenShift - 3);
                 *dst++ = *src >> (systemBlueShift - 3);
             }
-
+                    
             ++src; // skip rhs border
         }
     }
-
+            
     DrawImage(dc, im);
-
+            
     delete im;
 }
-
+        
 void BasicDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
 {
     double sx, sy;
@@ -2149,7 +2817,7 @@ void BasicDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
     wxBitmap bm(*im);
     dc.DrawBitmap(bm, 0, 0);
 }
-
+        
 #ifndef NO_OGL
 // following 3 for vsync
 #ifdef __WXMAC__
@@ -2165,7 +2833,7 @@ void BasicDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
 #include <GL/gl.h>
 #include <GL/glext.h>
 #endif
-
+        
 // This is supposed to be the default, but DOUBLEBUFFER doesn't seem to be
 // turned on by default for wxGTK.
 static int glopts[] = {
@@ -2178,16 +2846,16 @@ bool GLDrawingPanel::SetContext()
     // Check if the current context is valid
     if (!ctx
 #if wxCHECK_VERSION(3, 1, 0)
-            || !ctx->IsOK()
+        || !ctx->IsOK()
 #endif
-    )
+        )
     {
         // Delete the old context
         if (ctx) {
             delete ctx;
             ctx = nullptr;
         }
-
+                
         // Create a new context
         ctx = new wxGLContext(this);
         DrawingPanelInit();
@@ -2197,16 +2865,16 @@ bool GLDrawingPanel::SetContext()
     return wxGLContext::SetCurrent(*this);
 #endif
 }
-
+        
 GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
-    : DrawingPanelBase(_width, _height)
-    , wxglc(parent, wxID_ANY, glopts, wxPoint(0, 0), parent->GetClientSize(),
-          wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
+        : DrawingPanelBase(_width, _height)
+        , wxglc(parent, wxID_ANY, glopts, wxPoint(0, 0), parent->GetClientSize(),
+                wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
 {
     widgets::RequestHighResolutionOpenGlSurfaceForWindow(this);
     SetContext();
 }
-
+        
 GLDrawingPanel::~GLDrawingPanel()
 {
     // this should be automatically deleted w/ context
@@ -2217,22 +2885,22 @@ GLDrawingPanel::~GLDrawingPanel()
         glDeleteLists(vlist, 1);
         glDeleteTextures(1, &texid);
     }
-
+            
 #ifndef wxGL_IMPLICIT_CONTEXT
     delete ctx;
 #endif
 }
-
+        
 void GLDrawingPanel::DrawingPanelInit()
 {
     SetContext();
 
     DrawingPanelBase::DrawingPanelInit();
-
+            
     AdjustViewport();
-
+            
     const bool bilinear = OPTION(kDispBilinear);
-
+            
     // taken from GTK front end almost verbatim
     glDisable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
@@ -2260,27 +2928,30 @@ void GLDrawingPanel::DrawingPanelInit()
                     bilinear ? GL_LINEAR : GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     bilinear ? GL_LINEAR : GL_NEAREST);
-
+            
 #define int_fmt out_16 ? GL_RGB5 : GL_RGB
-#define tex_fmt out_16 ? GL_BGRA : GL_RGBA, \
-                out_16 ? GL_UNSIGNED_SHORT_1_5_5_5_REV : GL_UNSIGNED_BYTE
+#define tex_fmt out_8  ? GL_RGB : \
+    out_16 ? GL_BGRA : \
+    out_24 ? GL_RGB : GL_RGBA, \
+    out_8 ? GL_UNSIGNED_BYTE_3_3_2 : \
+    out_16 ? GL_UNSIGNED_SHORT_1_5_5_5_REV : GL_UNSIGNED_BYTE
 #if 0
-        texsize = width > height ? width : height;
-        texsize = std::ceil(texsize * scale);
-        // texsize = 1 << ffs(texsize);
-        texsize = texsize | (texsize >> 1);
-        texsize = texsize | (texsize >> 2);
-        texsize = texsize | (texsize >> 4);
-        texsize = texsize | (texsize >> 8);
-        texsize = (texsize >> 1) + 1;
-        glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, texsize, texsize, 0, tex_fmt, NULL);
+    texsize = width > height ? width : height;
+    texsize = std::ceil(texsize * scale);
+    // texsize = 1 << ffs(texsize);
+    texsize = texsize | (texsize >> 1);
+    texsize = texsize | (texsize >> 2);
+    texsize = texsize | (texsize >> 4);
+    texsize = texsize | (texsize >> 8);
+    texsize = (texsize >> 1) + 1;
+    glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, texsize, texsize, 0, tex_fmt, NULL);
 #else
     // but really, most cards support non-p2 and rect
     // if not, use cairo or wx renderer
     glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, std::ceil(width * scale), std::ceil(height * scale), 0, tex_fmt, NULL);
 #endif
     glClearColor(0.0, 0.0, 0.0, 1.0);
-// non-portable vsync code
+    // non-portable vsync code
 #if defined(__WXGTK__)
     if (IsWayland()) {
 #ifdef HAVE_EGL
@@ -2288,7 +2959,7 @@ void GLDrawingPanel::DrawingPanelInit()
             wxLogDebug(_("Enabling EGL VSync."));
         else
             wxLogDebug(_("Disabling EGL VSync."));
-
+                
         eglSwapInterval(0, OPTION(kPrefVsync));
 #endif
     }
@@ -2297,29 +2968,29 @@ void GLDrawingPanel::DrawingPanelInit()
             wxLogDebug(_("Enabling GLX VSync."));
         else
             wxLogDebug(_("Disabling GLX VSync."));
-
+                
         static PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT = NULL;
         static PFNGLXSWAPINTERVALSGIPROC glXSwapIntervalSGI = NULL;
         static PFNGLXSWAPINTERVALMESAPROC glXSwapIntervalMESA = NULL;
 
         auto display        = GetX11Display();
         auto default_screen = DefaultScreen(display);
-
+                
         char* glxQuery = (char*)glXQueryExtensionsString(display, default_screen);
-
+                
         if (strstr(glxQuery, "GLX_EXT_swap_control") != NULL)
         {
             glXSwapIntervalEXT = reinterpret_cast<PFNGLXSWAPINTERVALEXTPROC>(glXGetProcAddress((const GLubyte*)"glXSwapIntervalEXT"));
             if (glXSwapIntervalEXT)
                 glXSwapIntervalEXT(glXGetCurrentDisplay(),
-                                   glXGetCurrentDrawable(), OPTION(kPrefVsync));
+                                    glXGetCurrentDrawable(), OPTION(kPrefVsync));
             else
                 systemScreenMessage(_("Failed to set glXSwapIntervalEXT"));
         }
         if (strstr(glxQuery, "GLX_SGI_swap_control") != NULL)
         {
             glXSwapIntervalSGI = reinterpret_cast<PFNGLXSWAPINTERVALSGIPROC>(glXGetProcAddress((const GLubyte*)("glXSwapIntervalSGI")));
-
+                    
             if (glXSwapIntervalSGI)
                 glXSwapIntervalSGI(OPTION(kPrefVsync));
             else
@@ -2328,7 +2999,7 @@ void GLDrawingPanel::DrawingPanelInit()
         if (strstr(glxQuery, "GLX_MESA_swap_control") != NULL)
         {
             glXSwapIntervalMESA = reinterpret_cast<PFNGLXSWAPINTERVALMESAPROC>(glXGetProcAddress((const GLubyte*)("glXSwapIntervalMESA")));
-
+                    
             if (glXSwapIntervalMESA)
                 glXSwapIntervalMESA(OPTION(kPrefVsync));
             else
@@ -2344,7 +3015,7 @@ void GLDrawingPanel::DrawingPanelInit()
     else if (strstr(wglGetExtensionsStringEXT(), "WGL_EXT_swap_control") == 0) {
         systemScreenMessage(_("No support for WGL_EXT_swap_control"));
     }
-
+            
     typedef BOOL (__stdcall *PFNWGLSWAPINTERVALEXTPROC)(BOOL);
     static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = NULL;
     wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
@@ -2360,126 +3031,146 @@ void GLDrawingPanel::DrawingPanelInit()
     systemScreenMessage(_("No VSYNC available on this platform"));
 #endif
 }
-
+        
 void GLDrawingPanel::OnSize(wxSizeEvent& ev)
 {
     AdjustViewport();
-
+            
     // Temporary hack to backport 800d6ed69b from wxWidgets until 3.2.2 is released.
     if (IsWayland())
         MoveWaylandSubsurface(this);
 
     ev.Skip();
 }
-
+        
 void GLDrawingPanel::AdjustViewport()
 {
     SetContext();
-
+            
     int x, y;
     widgets::GetRealPixelClientSize(this, &x, &y);
     glViewport(0, 0, x, y);
 }
-
+        
 void GLDrawingPanel::RefreshGL()
 {
     SetContext();
-
+            
     // Rebind any textures or other OpenGL resources here
-
+            
     glBindTexture(GL_TEXTURE_2D, texid);
 }
-
+        
 void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 {
+    uint8_t* src = NULL;
+    uint8_t* dst = NULL;
+            
     (void)dc; // unused params
     SetContext();
     RefreshGL();
-
+            
     if (!did_init)
         DrawingPanelInit();
-
+            
     if (todraw) {
-        int rowlen = std::ceil(width * scale) + (out_16 ? 2 : 1);
+        int rowlen = std::ceil(width * scale) + (out_8 ? 0 : out_16 ? 2 : out_24 ? 0 : 1);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, rowlen);
 #if wxBYTE_ORDER == wxBIG_ENDIAN
-
-        // FIXME: is this necessary?
+                
+                // FIXME: is this necessary?
         if (out_16)
             glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_TRUE);
-
+                
 #endif
-        glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, std::ceil(width * scale), (int)std::ceil(height * scale),
-            0, tex_fmt, todraw + (int)std::ceil(rowlen * (out_16 ? 2 : 4) * scale));
+        if (out_8) {
+            src = (uint8_t*)todraw + (int)std::ceil((width + 2) * ((systemColorDepth >> 3) * scale)); // skip top border
+            dst = (uint8_t*)todraw;
+                    
+            for (int y = 0; y < std::ceil(height * scale); y++) {
+                for (int x = 0; x < std::ceil(width * scale); x++) {
+                    *dst++ = *src++;
+                }
+                        
+                src += 2;
+            }
+                    
+            glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, (int)std::ceil(width * scale), (int)std::ceil(height * scale),
+                            0, tex_fmt, todraw);
+        } else {
+            glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, (int)std::ceil(width * scale), (int)std::ceil(height * scale),
+                            0, tex_fmt, todraw + (int)std::ceil(rowlen * ((systemColorDepth >> 3) * scale)));
+        }
+                
         glCallList(vlist);
     } else
         glClear(GL_COLOR_BUFFER_BIT);
-
+            
     SwapBuffers();
 }
-
+        
 #endif // GL support
-
+        
 #if defined(__WXMSW__) && !defined(NO_D3D)
 #define DIRECT3D_VERSION 0x0900
 #include <d3d9.h> // main include file
-//#include <d3dx9core.h> // required for font rendering
+        //#include <d3dx9core.h> // required for font rendering
 #include <dxerr9.h> // contains debug functions
-
+        
 DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
-    : DrawingPanel(parent, _width, _height)
+        : DrawingPanel(parent, _width, _height)
 {
     // FIXME: implement
 }
-
+        
 void DXDrawingPanel::DrawArea(wxWindowDC& dc)
 {
     // FIXME: implement
     if (!did_init) {
-      DrawingPanelInit();
+        DrawingPanelInit();
     }
-
+            
     if (todraw) {
     }
 }
 #endif
-
+        
 #ifndef NO_FFMPEG
 static const wxString media_err(recording::MediaRet ret)
 {
     switch (ret) {
-    case recording::MRET_OK:
-        return wxT("");
+        case recording::MRET_OK:
+            return wxT("");
 
-    case recording::MRET_ERR_NOMEM:
-        return _("Memory allocation error");
+        case recording::MRET_ERR_NOMEM:
+            return _("Memory allocation error");
+                    
+        case recording::MRET_ERR_NOCODEC:
+            return _("Error initializing codec");
+                    
+        case recording::MRET_ERR_FERR:
+            return _("Error writing to output file");
+                    
+        case recording::MRET_ERR_FMTGUESS:
+            return _("Can't guess output format from file name");
 
-    case recording::MRET_ERR_NOCODEC:
-        return _("Error initializing codec");
-
-    case recording::MRET_ERR_FERR:
-        return _("Error writing to output file");
-
-    case recording::MRET_ERR_FMTGUESS:
-        return _("Can't guess output format from file name");
-
-    default:
-        //    case MRET_ERR_RECORDING:
-        //    case MRET_ERR_BUFSIZE:
-        return _("Programming error; aborting!");
+        default:
+            //    case MRET_ERR_RECORDING:
+            //    case MRET_ERR_BUFSIZE:
+            return _("Programming error; aborting!");
     }
 }
-
+        
 void GameArea::StartVidRecording(const wxString& fname)
 {
     recording::MediaRet ret;
-
+            
     vid_rec.SetSampleRate(soundGetSampleRate());
     if ((ret = vid_rec.Record(UTF8(fname), basic_width, basic_height,
-             systemColorDepth))
+                                systemColorDepth))
         != recording::MRET_OK)
         wxLogError(_("Unable to begin recording to %s (%s)"), fname.mb_str(),
-            media_err(ret));
+                    media_err(ret));
     else {
         MainFrame* mf = wxGetApp().frame;
         mf->cmd_enable &= ~(CMDEN_NVREC | CMDEN_NREC_ANY);
@@ -2487,28 +3178,28 @@ void GameArea::StartVidRecording(const wxString& fname)
         mf->enable_menus();
     }
 }
-
+        
 void GameArea::StopVidRecording()
 {
     vid_rec.Stop();
     MainFrame* mf = wxGetApp().frame;
     mf->cmd_enable &= ~CMDEN_VREC;
     mf->cmd_enable |= CMDEN_NVREC;
-
+            
     if (!(mf->cmd_enable & (CMDEN_VREC | CMDEN_SREC)))
         mf->cmd_enable |= CMDEN_NREC_ANY;
-
+            
     mf->enable_menus();
 }
-
+        
 void GameArea::StartSoundRecording(const wxString& fname)
 {
     recording::MediaRet ret;
-
+            
     snd_rec.SetSampleRate(soundGetSampleRate());
     if ((ret = snd_rec.Record(UTF8(fname))) != recording::MRET_OK)
         wxLogError(_("Unable to begin recording to %s (%s)"), fname.mb_str(),
-            media_err(ret));
+                    media_err(ret));
     else {
         MainFrame* mf = wxGetApp().frame;
         mf->cmd_enable &= ~(CMDEN_NSREC | CMDEN_NREC_ANY);
@@ -2516,99 +3207,99 @@ void GameArea::StartSoundRecording(const wxString& fname)
         mf->enable_menus();
     }
 }
-
+        
 void GameArea::StopSoundRecording()
 {
     snd_rec.Stop();
     MainFrame* mf = wxGetApp().frame;
     mf->cmd_enable &= ~CMDEN_SREC;
     mf->cmd_enable |= CMDEN_NSREC;
-
+            
     if (!(mf->cmd_enable & (CMDEN_VREC | CMDEN_SREC)))
         mf->cmd_enable |= CMDEN_NREC_ANY;
-
+            
     mf->enable_menus();
 }
-
+        
 void GameArea::AddFrame(const uint16_t* data, int length)
 {
     recording::MediaRet ret;
-
+            
     if ((ret = vid_rec.AddFrame(data, length)) != recording::MRET_OK) {
         wxLogError(_("Error in audio / video recording (%s); aborting"),
-            media_err(ret));
+                    media_err(ret));
         vid_rec.Stop();
     }
-
+            
     if ((ret = snd_rec.AddFrame(data, length)) != recording::MRET_OK) {
         wxLogError(_("Error in audio recording (%s); aborting"), media_err(ret));
         snd_rec.Stop();
     }
 }
-
+        
 void GameArea::AddFrame(const uint8_t* data)
 {
     recording::MediaRet ret;
-
+            
     if ((ret = vid_rec.AddFrame(data)) != recording::MRET_OK) {
         wxLogError(_("Error in video recording (%s); aborting"), media_err(ret));
         vid_rec.Stop();
     }
 }
 #endif
-
+        
 void GameArea::MouseEvent(wxMouseEvent& ev)
 {
     mouse_active_time = systemGetClock();
-
+            
     wxPoint cur_pos = wxGetMousePosition();
-
+            
     // Ignore small movements.
     if (!ev.Moving() || (std::abs(cur_pos.x - mouse_last_pos.x) >= 11 && std::abs(cur_pos.y - mouse_last_pos.y) >= 11)) {
         ShowPointer();
         ShowMenuBar();
     }
-
+            
     mouse_last_pos = cur_pos;
-
+            
     ev.Skip();
 }
-
+        
 void GameArea::ShowPointer()
 {
     if (!pointer_blanked || fullscreen) return;
-
+            
     pointer_blanked = false;
-
+            
     SetCursor(wxNullCursor);
-
+            
     if (panel)
         panel->GetWindow()->SetCursor(wxNullCursor);
 }
-
+        
 void GameArea::HidePointer()
 {
     if (pointer_blanked || !main_frame) return;
-
+            
     // FIXME: make time configurable
     if ((fullscreen || (systemGetClock() - mouse_active_time) > 3000) &&
         !(main_frame->MenusOpened() || main_frame->DialogOpened())) {
         pointer_blanked = true;
         SetCursor(wxCursor(wxCURSOR_BLANK));
-
+                
         // wxGTK requires that subwindows get the cursor as well
         if (panel)
             panel->GetWindow()->SetCursor(wxCursor(wxCURSOR_BLANK));
     }
 }
-
-// We do not hide the menubar on mac, on mac it is not part of the main frame
-// and the user can adjust hiding behavior herself.
+        
+        // We do not hide the menubar on mac, on mac it is not part of the main frame
+        // and the user can adjust hiding behavior herself.
 void GameArea::HideMenuBar()
 {
 #ifndef __WXMAC__
     if (!main_frame || menu_bar_hidden || !gopts.hide_menu_bar) return;
-
+            
     if (((systemGetClock() - mouse_active_time) > 3000) && !main_frame->MenusOpened()) {
 #ifdef __WXMSW__
         current_hmenu = static_cast<HMENU>(main_frame->GetMenuBar()->GetHMenu());
@@ -2621,12 +3312,12 @@ void GameArea::HideMenuBar()
     }
 #endif
 }
-
+        
 void GameArea::ShowMenuBar()
 {
 #ifndef __WXMAC__
     if (!main_frame || !menu_bar_hidden) return;
-
+            
 #ifdef __WXMSW__
     if (current_hmenu != nullptr) {
         ::SetMenu(main_frame->GetHandle(), current_hmenu);
@@ -2639,7 +3330,7 @@ void GameArea::ShowMenuBar()
     menu_bar_hidden = false;
 #endif
 }
-
+        
 void GameArea::OnGBBorderChanged(config::Option* option) {
     if (game_type() == IMAGE_GB && gbSgbMode) {
         if (option->GetBool()) {
@@ -2650,7 +3341,7 @@ void GameArea::OnGBBorderChanged(config::Option* option) {
         }
     }
 }
-
+        
 void GameArea::UpdateLcdFilter() {
     if (loaded == IMAGE_GBA)
         gbafilter_update_colors(OPTION(kGBALCDFilter));
@@ -2659,7 +3350,7 @@ void GameArea::UpdateLcdFilter() {
     else
         gbafilter_update_colors(false);
 }
-
+        
 void GameArea::SuspendScreenSaver() {
 #ifdef HAVE_XSS
     if (xscreensaver_suspended || !gopts.suspend_screensaver)
@@ -2672,10 +3363,10 @@ void GameArea::SuspendScreenSaver() {
     }
 #endif // HAVE_XSS
 }
-
+        
 void GameArea::UnsuspendScreenSaver() {
 #ifdef HAVE_XSS
-    // unsuspend screensaver
+            // unsuspend screensaver
     if (xscreensaver_suspended) {
         auto display = GetX11Display();
         XScreenSaverSuspend(display, false);
@@ -2683,28 +3374,226 @@ void GameArea::UnsuspendScreenSaver() {
     }
 #endif // HAVE_XSS
 }
-
+        
 void GameArea::OnAudioRateChanged() {
     if (loaded == IMAGE_UNKNOWN) {
         return;
     }
-
+            
     switch (game_type()) {
         case IMAGE_UNKNOWN:
             break;
-
+                    
         case IMAGE_GB:
             gbSoundSetSampleRate(GetSampleRate());
             break;
-
+                    
         case IMAGE_GBA:
             soundSetSampleRate(GetSampleRate());
             break;
     }
 }
-
+        
 void GameArea::OnVolumeChanged(config::Option* option) {
     const int volume = option->GetInt();
     soundSetVolume((float)volume / 100.0);
     systemScreenMessage(wxString::Format(_("Volume: %d %%"), volume));
 }
+        
+#ifdef __WXMAC__
+#ifndef NO_METAL
+MetalDrawingPanel::MetalDrawingPanel(wxWindow* parent, int _width, int _height)
+        : DrawingPanel(parent, _width, _height)
+{
+    memset(delta, 0xff, sizeof(delta));
+            
+    // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
+    // 16 or 32, though
+    if (OPTION(kDispFilter) == config::Filter::kNone &&
+        OPTION(kDispIFB) == config::Interframe::kNone) {
+        // changing from 32 to 24 does not require regenerating color tables
+        systemColorDepth = (OPTION(kBitDepth) + 1) << 3;
+    }
+            
+    DrawingPanelInit();
+}
+        
+void MetalDrawingPanel::DrawArea(uint8_t** data)
+{
+    // double-buffer buffer:
+    //   if filtering, this is filter output, retained for redraws
+    //   if not filtering, we still retain current image for redraws
+    int outbpp = systemColorDepth >> 3;
+    int outrb = out_8 ? 2 : out_24 ? 0 : 4;
+    int outstride = std::ceil(width * outbpp * scale) + outrb;
+            
+    // FIXME: filters race condition?
+    const int max_threads = 1;
+            
+    if (!pixbuf2) {
+        int allocstride = outstride, alloch = height;
+                
+        // gb may write borders, so allocate enough for them
+        if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
+            allocstride = std::ceil(GameArea::SGBWidth * outbpp * scale) + outrb;
+            alloch = GameArea::SGBHeight;
+        }
+                
+        pixbuf2 = (uint8_t*)calloc(allocstride, std::ceil((alloch + 2) * scale));
+    }
+
+    if (OPTION(kDispFilter) == config::Filter::kNone) {
+        todraw = *data;
+        // *data is assigned below, after old buf has been processed
+        pixbuf1 = pixbuf2;
+        pixbuf2 = todraw;
+    } else
+        todraw = pixbuf2;
+
+    // First, apply filters, if applicable, in parallel, if enabled
+    // FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur)
+    if (OPTION(kDispFilter) != config::Filter::kNone ||
+        OPTION(kDispIFB) != config::Interframe::kNone) {
+        if (nthreads != max_threads) {
+            if (nthreads) {
+                if (nthreads > 1)
+                    for (int i = 0; i < nthreads; i++) {
+                        threads[i].lock_.Lock();
+                        threads[i].src_ = NULL;
+                        threads[i].sig_.Signal();
+                        threads[i].lock_.Unlock();
+                        threads[i].Wait();
+                    }
+                        
+                delete[] threads;
+            }
+
+            nthreads = max_threads;
+            threads = new FilterThread[nthreads];
+            // first time around, no threading in order to avoid
+            // static initializer conflicts
+            threads[0].threadno_ = 0;
+            threads[0].nthreads_ = 1;
+            threads[0].width_ = width;
+            threads[0].height_ = height;
+            threads[0].scale_ = scale;
+            threads[0].src_ = *data;
+            threads[0].dst_ = todraw;
+            threads[0].delta_ = delta;
+            threads[0].rpi_ = rpi_;
+            threads[0].Entry();
+
+            // go ahead and start the threads up, though
+            if (nthreads > 1) {
+                for (int i = 0; i < nthreads; i++) {
+                    threads[i].threadno_ = i;
+                    threads[i].nthreads_ = nthreads;
+                    threads[i].width_ = width;
+                    threads[i].height_ = height;
+                    threads[i].scale_ = scale;
+                    threads[i].dst_ = todraw;
+                    threads[i].delta_ = delta;
+                    threads[i].rpi_ = rpi_;
+                    threads[i].done_ = &filt_done;
+                    threads[i].lock_.Lock();
+                    threads[i].Create();
+                    threads[i].Run();
+                }
+            }
+        } else if (nthreads == 1) {
+            threads[0].threadno_ = 0;
+            threads[0].nthreads_ = 1;
+            threads[0].width_ = width;
+            threads[0].height_ = height;
+            threads[0].scale_ = scale;
+            threads[0].src_ = *data;
+            threads[0].dst_ = todraw;
+            threads[0].delta_ = delta;
+            threads[0].rpi_ = rpi_;
+            threads[0].Entry();
+        } else {
+            for (int i = 0; i < nthreads; i++) {
+                threads[i].lock_.Lock();
+                threads[i].src_ = *data;
+                threads[i].sig_.Signal();
+                threads[i].lock_.Unlock();
+            }
+                    
+            for (int i = 0; i < nthreads; i++)
+                filt_done.Wait();
+        }
+    }
+            
+    // swap buffers now that src has been processed
+    if (OPTION(kDispFilter) == config::Filter::kNone) {
+        *data = pixbuf1;
+    }
+            
+    // draw OSD text old-style (directly into output buffer), if needed
+    // new style flickers too much, so we'll stick to this for now
+    if (wxGetApp().frame->IsFullScreen() || !OPTION(kPrefDisableStatus)) {
+        GameArea* panel = wxGetApp().frame->GetPanel();
+
+        if (panel->osdstat.size())
+            drawText(todraw + outstride * (systemColorDepth != 24), outstride,
+                        10, 20, UTF8(panel->osdstat), OPTION(kPrefShowSpeedTransparent));
+                
+        if (!panel->osdtext.empty()) {
+            if (systemGetClock() - panel->osdtime < OSD_TIME) {
+                wxString message = panel->osdtext;
+                int linelen = std::ceil(width * scale - 20) / 8;
+                int nlines = (message.size() + linelen - 1) / linelen;
+                int cury = height - 14 - nlines * 10;
+                char* buf = strdup(UTF8(message));
+                char* ptr = buf;
+
+                while (nlines > 1) {
+                    char lchar = ptr[linelen];
+                    ptr[linelen] = 0;
+                    drawText(todraw + outstride * (systemColorDepth != 24),
+                                outstride, 10, cury, ptr,
+                                OPTION(kPrefShowSpeedTransparent));
+                    cury += 10;
+                    nlines--;
+                    ptr += linelen;
+                    *ptr = lchar;
+                }
+
+                drawText(todraw + outstride * (systemColorDepth != 24),
+                            outstride, 10, cury, ptr,
+                            OPTION(kPrefShowSpeedTransparent));
+
+                free(buf);
+                buf = NULL;
+            } else
+                panel->osdtext.clear();
+        }
+    }
+ 
+    // Draw the current frame
+    DrawArea();
+}
+        
+void MetalDrawingPanel::PaintEv(wxPaintEvent& ev)
+{
+    // FIXME: implement
+    if (!did_init) {
+        DrawingPanelInit();
+    }
+
+    (void)ev; // unused params
+            
+    if (!todraw) {
+        // since this is set for custom background, not drawing anything
+        // will cause garbage to be displayed, so draw a black area
+        draw_black_background(GetWindow());
+        return;
+    }
+
+    if (todraw) {
+        DrawArea();
+    }
+}
+#endif
+#endif
+

@@ -11,6 +11,10 @@
 
 #include <ctype.h>
 
+#if __STDC_WANT_SECURE_LIB__
+#define snprintf sprintf_s
+#endif
+
 /*---------------------------- Defines -------------------------------------*/
 #define ASCIILINESZ (1024)
 #define INI_INVALID_KEY ((char *)-1)
@@ -269,7 +273,7 @@ void iniparser_dumpsection_ini(dictionary *d, char *s, FILE *f)
         seclen = (int)strlen(s);
         // fprintf(f, "\n[%s]\n", s);
         fprintf(f, "[%s]\n", s);
-        sprintf(keym, "%s:", s);
+        snprintf(keym, sizeof(keym), "%s:", s);
         for (j = 0; j < d->size; j++) {
                 if (d->key[j] == NULL)
                         continue;
@@ -303,7 +307,7 @@ int iniparser_getsecnkeys(dictionary *d, char *s)
                 return nkeys;
 
         seclen = (int)strlen(s);
-        sprintf(keym, "%s:", s);
+        snprintf(keym, sizeof(keym), "%s:", s);
 
         for (j = 0; j < d->size; j++) {
                 if (d->key[j] == NULL)
@@ -349,7 +353,7 @@ char **iniparser_getseckeys(dictionary *d, char *s)
         keys = (char **)malloc(nkeys * sizeof(char *));
 
         seclen = (int)strlen(s);
-        sprintf(keym, "%s:", s);
+        snprintf(keym, sizeof(keym), "%s:", s);
 
         i = 0;
 
@@ -710,9 +714,9 @@ dictionary *iniparser_load(const char *ininame)
 
                 case LINE_VALUE:
                         if (strlen(section))
-                                sprintf(tmp, "%s:%s", section, key);
+                                snprintf(tmp, sizeof(tmp), "%s:%s", section, key);
                         else
-                                sprintf(tmp, "preferences:%s", key);
+                                snprintf(tmp, sizeof(tmp), "preferences:%s", key);
                         errs = dictionary_set(dict, tmp, val);
                         break;
 

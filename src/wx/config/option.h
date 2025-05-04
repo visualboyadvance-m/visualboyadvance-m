@@ -66,10 +66,14 @@ static constexpr size_t kNbInterframes = static_cast<size_t>(Interframe::kLast);
 enum class RenderMethod {
     kSimple = 0,
     kOpenGL,
+    kSDL,
 #if defined(__WXMSW__) && !defined(NO_D3D)
     kDirect3d,
 #elif defined(__WXMAC__)
     kQuartz2d,
+#ifndef NO_METAL
+    kMetal,
+#endif
 #endif
 
     // Do not add anything under here.
@@ -80,6 +84,7 @@ static constexpr size_t kNbRenderMethods = static_cast<size_t>(RenderMethod::kLa
 // Values for kAudioApi.
 enum class AudioApi {
     kOpenAL,
+    kSDL,
 #if defined(__WXMSW__)
     kDirectSound,
 #endif  // __WXMSW__

@@ -22,9 +22,57 @@
 #include "wx/widgets/render-plugin.h"
 #include "wx/wxvbam.h"
 
+#ifdef ENABLE_SDL3
+#include <SDL3/SDL.h>
+#else
+#include <SDL.h>
+#endif
+
 namespace dialogs {
 
 namespace {
+
+class SDLDevicesValidator : public widgets::OptionValidator {
+public:
+    SDLDevicesValidator() : widgets::OptionValidator(config::OptionID::kSDLRenderer) {}
+    ~SDLDevicesValidator() override = default;
+
+private:
+    // OptionValidator implementation.
+    wxObject* Clone() const override { return new SDLDevicesValidator(); }
+
+    bool IsWindowValueValid() override { return true; }
+
+    bool WriteToWindow() override {
+        wxChoice* choice = wxDynamicCast(GetWindow(), wxChoice);
+        VBAM_CHECK(choice);
+
+        const wxString& device_id = option()->GetString();
+        for (size_t i = 0; i < choice->GetCount(); i++) {
+            const wxString& choide_id =
+                dynamic_cast<wxStringClientData*>(choice->GetClientObject(i))->GetData();
+            if (device_id == choide_id) {
+                choice->SetSelection(i);
+                return true;
+            }
+        }
+
+        choice->SetSelection(0);
+        return true;
+    }
+
+    bool WriteToOption() override {
+        const wxChoice* choice = wxDynamicCast(GetWindow(), wxChoice);
+        VBAM_CHECK(choice);
+        const int selection = choice->GetSelection();
+        if (selection == wxNOT_FOUND) {
+            return option()->SetString(wxEmptyString);
+        }
+
+        return option()->SetString(
+            dynamic_cast<wxStringClientData*>(choice->GetClientObject(selection))->GetData());
+    }
+};
 
 // Custom validator for the kDispScale option. We rely on the existing
 // wxFloatingPointValidator validator for this.
@@ -234,6 +282,10 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
                            std::bind(&DisplayConfig::OnInterframeChanged,
                                      this,
                                      std::placeholders::_1)) {
+    GetValidatedChild("BitDepth")
+        ->SetValidator(
+            widgets::OptionChoiceValidator(config::OptionID::kBitDepth));
+
     // Speed
     GetValidatedChild("FrameSkip")
         ->SetValidator(
@@ -253,14 +305,24 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
         ->SetValidator(wxGenericValidator(&gopts.max_scale));
 
     // Basic
-    GetValidatedChild("OutputSimple")
-        ->SetValidator(RenderValidator(config::RenderMethod::kSimple));
+    wxWindow *render_method = GetValidatedChild("OutputSimple");
+    render_method->SetValidator(RenderValidator(config::RenderMethod::kSimple));
+
+    render_method = GetValidatedChild("OutputSDL");
+    render_method->SetValidator(RenderValidator(config::RenderMethod::kSDL));
 
 #if defined(__WXMAC__)
-    GetValidatedChild("OutputQuartz2D")
-        ->SetValidator(RenderValidator(config::RenderMethod::kQuartz2d));
+    render_method = GetValidatedChild("OutputQuartz2D");
+    render_method->SetValidator(RenderValidator(config::RenderMethod::kQuartz2d));
+#ifndef NO_METAL
+    render_method = GetValidatedChild("OutputMetal");
+    render_method->SetValidator(RenderValidator(config::RenderMethod::kMetal));
+#else
+    GetValidatedChild("OutputMetal")->Hide();
+#endif
 #else
     GetValidatedChild("OutputQuartz2D")->Hide();
+    GetValidatedChild("OutputMetal")->Hide();
 #endif
 
 #ifdef NO_OGL
@@ -270,21 +332,24 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
     if (IsWayland()) {
         GetValidatedChild("OutputOpenGL")->Hide();
     } else {
-        GetValidatedChild("OutputOpenGL")
-            ->SetValidator(RenderValidator(config::RenderMethod::kOpenGL));
+        render_method = GetValidatedChild("OutputOpenGL");
+        render_method->SetValidator(RenderValidator(config::RenderMethod::kOpenGL));
     }
 #else
-    GetValidatedChild("OutputOpenGL")
-        ->SetValidator(RenderValidator(config::RenderMethod::kOpenGL));
+    render_method = GetValidatedChild("OutputOpenGL");
+    render_method->SetValidator(RenderValidator(config::RenderMethod::kOpenGL));
 #endif  // NO_OGL
 
 #if defined(__WXMSW__) && !defined(NO_D3D)
     // Enable the Direct3D option on Windows.
-    GetValidatedChild("OutputDirect3D")
-        ->SetValidator(RenderValidator(config::RenderMethod::kDirect3d));
+    render_method = GetValidatedChild("OutputDirect3D");
+    render_method->SetValidator(RenderValidator(config::RenderMethod::kDirect3d));
 #else
     GetValidatedChild("OutputDirect3D")->Hide();
 #endif
+
+    sdlrenderer_selector_ = GetValidatedChild<wxChoice>("SDLRenderer");
+    sdlrenderer_selector_->SetValidator(SDLDevicesValidator());
 
     filter_selector_ = GetValidatedChild<wxChoice>("Filter");
     filter_selector_->SetValidator(FilterValidator());
@@ -305,11 +370,15 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
 }
 
 void DisplayConfig::OnDialogShowEvent(wxShowEvent& event) {
+    wxCommandEvent dummy_event;
+
     if (event.IsShown()) {
         PopulatePluginOptions();
     } else {
         StopPluginHandler();
     }
+
+    FillRendererList(dummy_event);
 
     // Let the event propagate.
     event.Skip();
@@ -413,6 +482,43 @@ void DisplayConfig::OnInterframeChanged(config::Option* option) {
     systemScreenMessage(wxString::Format(
         _("Using interframe blending: %s"),
         interframe_selector_->GetString(static_cast<size_t>(interframe))));
+}
+
+void DisplayConfig::FillRendererList(wxCommandEvent& event) {
+#ifndef ENABLE_SDL3
+    SDL_RendererInfo render_info;
+#endif
+    int num_drivers = 0;
+
+    SDL_InitSubSystem(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO);
+
+    num_drivers = SDL_GetNumRenderDrivers();
+
+    sdlrenderer_selector_->Clear();
+    sdlrenderer_selector_->Append("default", new wxStringClientData("default"));
+    sdlrenderer_selector_->SetSelection(0);
+
+    for (int i = 0; i < num_drivers; i++) {
+#ifdef ENABLE_SDL3
+        sdlrenderer_selector_->Append(SDL_GetRenderDriver(i), new wxStringClientData(SDL_GetRenderDriver(i)));
+
+        if (OPTION(kSDLRenderer) == wxString(SDL_GetRenderDriver(i))) {
+            sdlrenderer_selector_->SetSelection(i+1);
+        }
+#else
+        SDL_GetRenderDriverInfo(i, &render_info);
+
+        sdlrenderer_selector_->Append(render_info.name, new wxStringClientData(render_info.name));
+
+        if (OPTION(kSDLRenderer) == wxString(render_info.name)) {
+            sdlrenderer_selector_->SetSelection(i+1);
+        }
+#endif
+    }
+
+    // Let the event propagate.
+    event.Skip();
 }
 
 void DisplayConfig::HidePluginOptions() {

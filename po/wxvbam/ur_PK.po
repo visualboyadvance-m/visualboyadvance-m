@@ -1046,6 +1046,14 @@ msgstr ""
 msgid "Invalid value for Default magnification."
 msgstr ""
 
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth:"
+msgstr ""
+
 #: dialogs/display-config.cpp:331 xrc/DisplayConfig.xrc:86
 #: xrc/DisplayConfig.xrc:136 xrc/DisplayConfig.xrc:222
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204

@@ -158,6 +158,12 @@ SoundConfig::SoundConfig(wxWindow* parent) : BaseDialog(parent, "SoundConfig") {
                            std::bind(&SoundConfig::OnAudioApiChanged, this, std::placeholders::_1,
                                      config::AudioApi::kOpenAL));
 
+    audio_api_button = GetValidatedChild("SDL");
+    audio_api_button->SetValidator(AudioApiValidator(config::AudioApi::kSDL));
+    audio_api_button->Bind(wxEVT_RADIOBUTTON,
+                           std::bind(&SoundConfig::OnAudioApiChanged, this, std::placeholders::_1,
+                                     config::AudioApi::kSDL));
+
     audio_api_button = GetValidatedChild("DirectSound");
 #if defined(__WXMSW__)
     audio_api_button->SetValidator(AudioApiValidator(config::AudioApi::kDirectSound));

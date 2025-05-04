@@ -8,6 +8,8 @@ include(VbamFunctions)
 set(VBAM_WX_COMMON
     audio/audio.cpp
     audio/audio.h
+    audio/internal/sdl.cpp
+    audio/internal/sdl.h
     audio/internal/openal.cpp
     audio/internal/openal.h
     background-input.cpp
@@ -156,6 +158,11 @@ if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
   find_package(nanosvg)
 endif()
 
+if(APPLE)
+    find_library(METAL Metal)
+    find_library(METALKIT MetalKit)
+endif()
+
 set(ENABLE_OPENGL TRUE)
 find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl ${wx_find_extra})
 
@@ -254,6 +261,11 @@ function(configure_wx_target target)
         _add_compile_definitions(${wxWidgets_DEFINITIONS_DEBUG})
     endif()
 
+    # No Metal
+    if(NOT CMAKE_Metal_COMPILER)
+        _add_compile_definitions(NO_METAL)
+    endif()
+
     # OpenAL.
     if(OPENAL_STATIC)
         _add_compile_definitions(AL_LIBTYPE_STATIC)
@@ -294,8 +306,8 @@ function(configure_wx_target target)
         _add_compile_definitions(NO_D3D)
     endif()
 
-    # SDL2.
-    _add_link_libraries(${VBAM_SDL2_LIBS})
+    # SDL.
+    _add_link_libraries(${VBAM_SDL_LIBS})
 
     # OpenGL.
     if(ENABLE_OPENGL)
@@ -303,6 +315,15 @@ function(configure_wx_target target)
     else()
         _add_compile_definitions(NO_OGL)
     endif()
+
+    # Metal
+    if(APPLE)
+        if(CMAKE_Metal_COMPILER)
+            _add_link_libraries($<LINK_LIBRARY:WEAK_FRAMEWORK,${METAL}>)
+            _add_link_libraries($<LINK_LIBRARY:WEAK_FRAMEWORK,${METALKIT}>)
+        endif()
+    endif()
+
 endfunction()
 
 # Sub-projects.
@@ -320,7 +341,12 @@ add_executable(
 )
 
 target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} ${VBAM_ICON_PATH})
-target_include_directories(visualboyadvance-m PRIVATE ${SDL2_INCLUDE_DIRS})
+
+if(ENABLE_SDL3)
+    target_include_directories(visualboyadvance-m PRIVATE ${SDL3_INCLUDE_DIRS})
+else()
+    target_include_directories(visualboyadvance-m PRIVATE ${SDL2_INCLUDE_DIRS})
+endif()
 
 target_link_libraries(
     visualboyadvance-m
@@ -1046,4 +1072,28 @@ install(
 
 if (UNIX)
     install(FILES ${CMAKE_SOURCE_DIR}/src/debian/visualboyadvance-m.6 DESTINATION ${CMAKE_INSTALL_MANDIR}/man6)
+endif()
+
+if(APPLE)
+    if(CMAKE_Metal_COMPILER)
+        set(VBAM_SHADER default.metallib)
+
+        set(ShaderBase_HEADERS
+            AAPLShaderTypes.h
+        )
+
+        set(ShaderBase_SOURCES
+            AAPLShaders.metal
+        )
+
+        add_metal_shader_library(default
+            STANDARD macos-metal1.1
+            ${ShaderBase_SOURCES}
+            ${ShaderBase_HEADERS}
+        )
+
+        target_embed_metal_shader_libraries(visualboyadvance-m
+            default
+        )
+    endif()
 endif()

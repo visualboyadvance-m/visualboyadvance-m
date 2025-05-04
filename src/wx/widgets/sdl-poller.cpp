@@ -5,7 +5,11 @@
 #include <wx/timer.h>
 #include <wx/toplevel.h>
 
+#ifdef ENABLE_SDL3
+#include <SDL3/SDL.h>
+#else
 #include <SDL.h>
+#endif
 
 #include "core/base/check.h"
 #include "wx/config/option-id.h"
@@ -107,7 +111,11 @@ private:
     SDL_JoystickID joystick_id_;
 
     // The SDL GameController instance.
+#ifndef ENABLE_SDL3
     SDL_GameController* game_controller_ = nullptr;
+#else
+    SDL_Gamepad* game_controller_ = nullptr;
+#endif
 
     // The SDL Joystick instance.
     SDL_Joystick* sdl_joystick_ = nullptr;
@@ -126,6 +134,7 @@ private:
 };
 
 JoyState::JoyState(bool enable_game_controller, int sdl_index) : wx_joystick_(sdl_index) {
+#ifndef ENABLE_SDL3
     if (enable_game_controller && SDL_IsGameController(sdl_index)) {
         game_controller_ = SDL_GameControllerOpen(sdl_index);
         if (game_controller_)
@@ -133,11 +142,30 @@ JoyState::JoyState(bool enable_game_controller, int sdl_index) : wx_joystick_(sd
     } else {
         sdl_joystick_ = SDL_JoystickOpen(sdl_index);
     }
+#else
+    int nrgamepads = 0;
+    int nrjoysticks = 0;
+    SDL_JoystickID *gamepads = SDL_GetGamepads(&nrgamepads);
+    SDL_JoystickID *joysticks = SDL_GetJoysticks(&nrjoysticks);
+    if (enable_game_controller && SDL_IsGamepad(gamepads[sdl_index])) {
+        game_controller_ = SDL_OpenGamepad(gamepads[sdl_index]);
+        if (game_controller_)
+        {
+            sdl_joystick_ = SDL_GetGamepadJoystick(game_controller_);
+        }
+    } else {
+        sdl_joystick_ = SDL_OpenJoystick(joysticks[sdl_index]);
+    }
+#endif
 
     if (!sdl_joystick_)
         return;
 
+#ifndef ENABLE_SDL3
     joystick_id_ = SDL_JoystickInstanceID(sdl_joystick_);
+#else
+    joystick_id_ = SDL_GetJoystickID(sdl_joystick_);
+#endif
 }
 
 JoyState::~JoyState() {
@@ -145,11 +173,19 @@ JoyState::~JoyState() {
     if (!sdl_joystick_)
         return;
 
+#ifndef ENABLE_SDL3
     if (game_controller_) {
         SDL_GameControllerClose(game_controller_);
     } else {
         SDL_JoystickClose(sdl_joystick_);
     }
+#else
+    if (game_controller_) {
+        SDL_CloseGamepad(game_controller_);
+    } else {
+        SDL_CloseJoystick(sdl_joystick_);
+    }
+#endif
 }
 
 JoyState::JoyState(JoyState&& other) : wx_joystick_(other.wx_joystick_) {
@@ -280,7 +316,20 @@ std::vector<UserInputEvent::Data> JoyState::ProcessHatEvent(const uint8_t index,
 void JoyState::SetRumble(bool activate_rumble) {
     rumbling_ = activate_rumble;
 
-#if SDL_VERSION_ATLEAST(2, 0, 9)
+#ifdef ENABLE_SDL3
+        if (game_controller_ == NULL)
+            return;
+
+        if (rumbling_) {
+            SDL_RumbleGamepad(game_controller_, 0xFFFF, 0xFFFF, 300);
+            if (!IsRunning()) {
+                Start(150);
+            }
+        } else {
+            SDL_RumbleGamepad(game_controller_, 0, 0, 0);
+            Stop();
+        }
+#elif SDL_VERSION_ATLEAST(2, 0, 9)
     if (!game_controller_)
         return;
 
@@ -309,16 +358,30 @@ SdlPoller::SdlPoller(EventHandlerProvider* const handler_provider)
     VBAM_CHECK(handler_provider);
 
     wxTimer::Start(50);
+#ifndef ENABLE_SDL3
     SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS);
     SDL_GameControllerEventState(SDL_ENABLE);
     SDL_JoystickEventState(SDL_ENABLE);
+#else
+    SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD | SDL_INIT_EVENTS);
+    SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD | SDL_INIT_EVENTS);
+    SDL_SetGamepadEventsEnabled(true);
+    SDL_SetJoystickEventsEnabled(true);
+#endif
 }
 
 SdlPoller::~SdlPoller() {
     wxTimer::Stop();
+#ifndef ENABLE_SDL3
     SDL_QuitSubSystem(SDL_INIT_EVENTS);
     SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
     SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
+#else
+    SDL_QuitSubSystem(SDL_INIT_EVENTS);
+    SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+    SDL_QuitSubSystem(SDL_INIT_GAMEPAD);
+#endif
+
     SDL_Quit();
 }
 
@@ -348,6 +411,7 @@ void SdlPoller::Notify() {
         std::vector<UserInputEvent::Data> event_data;
         JoyState* joy_state = nullptr;
         switch (sdl_event.type) {
+#ifndef ENABLE_SDL3
             case SDL_CONTROLLERBUTTONDOWN:
             case SDL_CONTROLLERBUTTONUP:
                 joy_state = FindJoyState(sdl_event.cbutton.which);
@@ -355,41 +419,86 @@ void SdlPoller::Notify() {
                     event_data = joy_state->ProcessButtonEvent(sdl_event.cbutton.button,
                                                                sdl_event.cbutton.state);
                 }
+#else
+            case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+            case SDL_EVENT_GAMEPAD_BUTTON_UP:
+                joy_state = FindJoyState(sdl_event.gbutton.which);
+                if (joy_state) {
+                    event_data = joy_state->ProcessButtonEvent(sdl_event.gbutton.button,
+                                                               sdl_event.gbutton.down);
+                }
+#endif
                 break;
 
+#ifndef ENABLE_SDL3
             case SDL_CONTROLLERAXISMOTION:
                 joy_state = FindJoyState(sdl_event.caxis.which);
                 if (joy_state) {
                     event_data = joy_state->ProcessAxisEvent(
                         sdl_event.caxis.axis, AxisValueToStatus(sdl_event.caxis.value));
                 }
+#else
+            case SDL_EVENT_GAMEPAD_AXIS_MOTION:
+                joy_state = FindJoyState(sdl_event.gaxis.which);
+                if (joy_state) {
+                    event_data = joy_state->ProcessAxisEvent(
+                        sdl_event.gaxis.axis, AxisValueToStatus(sdl_event.gaxis.value));
+                }
+#endif
                 break;
 
+#ifndef ENABLE_SDL3
             case SDL_CONTROLLERDEVICEADDED:
             case SDL_CONTROLLERDEVICEREMOVED:
+#else
+            case SDL_EVENT_GAMEPAD_ADDED:
+            case SDL_EVENT_GAMEPAD_REMOVED:
+#endif
                 // Do nothing. This will be handled with JOYDEVICEADDED and
                 // JOYDEVICEREMOVED events.
                 break;
 
             // Joystick events for non-GameControllers.
+#ifndef ENABLE_SDL3
             case SDL_JOYBUTTONDOWN:
             case SDL_JOYBUTTONUP:
+#else
+            case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
+            case SDL_EVENT_JOYSTICK_BUTTON_UP:
+#endif
                 joy_state = FindJoyState(sdl_event.jbutton.which);
                 if (joy_state && !joy_state->is_game_controller()) {
+#ifndef ENABLE_SDL3
+                    event_data = joy_state->ProcessButtonEvent(sdl_event.cbutton.button,
+                                                               sdl_event.cbutton.state);
+#else
                     event_data = joy_state->ProcessButtonEvent(sdl_event.jbutton.button,
-                                                               sdl_event.jbutton.state);
+                                                               sdl_event.jbutton.down);
+#endif
                 }
                 break;
 
+#ifndef ENABLE_SDL3
             case SDL_JOYAXISMOTION:
+#else
+            case SDL_EVENT_JOYSTICK_AXIS_MOTION:
+#endif
                 joy_state = FindJoyState(sdl_event.jaxis.which);
                 if (joy_state && !joy_state->is_game_controller()) {
                     event_data = joy_state->ProcessAxisEvent(
+#ifndef ENABLE_SDL3
+                        sdl_event.caxis.axis, AxisValueToStatus(sdl_event.caxis.value));
+#else
                         sdl_event.jaxis.axis, AxisValueToStatus(sdl_event.jaxis.value));
+#endif
                 }
                 break;
 
+#ifndef ENABLE_SDL3
             case SDL_JOYHATMOTION:
+#else
+            case SDL_EVENT_JOYSTICK_HAT_MOTION:
+#endif
                 joy_state = FindJoyState(sdl_event.jhat.which);
                 if (joy_state && !joy_state->is_game_controller()) {
                     event_data =
@@ -397,12 +506,20 @@ void SdlPoller::Notify() {
                 }
                 break;
 
+#ifndef ENABLE_SDL3
             case SDL_JOYDEVICEADDED:
+#else
+            case SDL_EVENT_JOYSTICK_ADDED:
+#endif
                 // Always remap all controllers.
                 RemapControllers();
                 break;
 
+#ifndef ENABLE_SDL3
             case SDL_JOYDEVICEREMOVED:
+#else
+            case SDL_EVENT_JOYSTICK_REMOVED:
+#endif
                 joystick_states_.erase(sdl_event.jdevice.which);
                 break;
         }
@@ -426,11 +543,21 @@ JoyState* SdlPoller::FindJoyState(const SDL_JoystickID& joy_id) {
 }
 
 void SdlPoller::RemapControllers() {
+#ifdef ENABLE_SDL3
+    int total_joysticks = 0;
+
+    SDL_GetJoysticks(&total_joysticks);
+#endif
+
     // Clear the current joystick states.
     joystick_states_.clear();
 
     // Reconnect all controllers.
+#ifndef ENABLE_SDL3
     for (int i = 0; i < SDL_NumJoysticks(); ++i) {
+#else
+    for (int i = 0; i < total_joysticks; ++i) {
+#endif
         JoyState joy_state(enable_game_controller_, i);
         if (joy_state.IsValid()) {
             joystick_states_.insert({joy_state.joystick_id(), std::move(joy_state)});

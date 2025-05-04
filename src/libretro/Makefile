@@ -66,7 +66,7 @@ endif
 ifneq (,$(findstring unix,$(platform)))
 	TARGET := $(TARGET_NAME)_libretro.so
 	fpic := -fPIC
-	SHARED := -shared -Wl,-version-script=$(LIBRETRO_DIR)/link.T -Wl,-no-undefined
+	SHARED := -shared -Wl,--version-script=$(LIBRETRO_DIR)/link.T -Wl,--no-undefined
 	TILED_RENDERING=1
 
 # Classic Platforms ####################
@@ -222,7 +222,7 @@ else ifeq ($(platform), theos_ios)
 else ifeq ($(platform), qnx)
 	TARGET := $(TARGET_NAME)_libretro_$(platform).so
 	fpic := -fPIC
-	SHARED := -lcpp -lm -shared -Wl,-version-script=$(LIBRETRO_DIR)/link.T -Wl,-no-undefined
+	SHARED := -lcpp -lm -shared -Wl,-no-undefined
 	CC = qcc -Vgcc_ntoarmv7le
 	CXX = QCC -Vgcc_ntoarmv7le_cpp
 	AR = QCC -Vgcc_ntoarmv7le
@@ -344,7 +344,7 @@ else ifeq ($(platform), switch)
 
 else ifneq (,$(findstring armv,$(platform)))
 	TARGET := $(TARGET_NAME)_libretro.so
-	SHARED := -shared -Wl,--no-undefined
+	SHARED := -shared -Wl,--version-script=$(LIBRETRO_DIR)/link.T -Wl,--no-undefined
 	TILED_RENDERING=1
 	fpic := -fPIC
 	ifneq (,$(findstring cortexa8,$(platform)))
@@ -533,7 +533,7 @@ else
 	TARGET := $(TARGET_NAME)_libretro.dll
 	CC ?= gcc
 	CXX ?= g++
-	SHARED := -shared -static-libgcc -static-libstdc++ -Wl,-no-undefined -Wl,-version-script=$(LIBRETRO_DIR)/link.T
+	SHARED := -shared -static-libgcc -static-libstdc++ -Wl,-no-undefined
 	TILED_RENDERING=1
 endif
 
