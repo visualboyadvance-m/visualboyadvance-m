@@ -378,6 +378,14 @@ msgstr "Keine anwendbaren RPI-Plugins in %s gefunden"
 msgid "Plugin"
 msgstr "Plugin"
 
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth"
+msgstr "Bits pro Pixel"
+
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth:"
+msgstr "Bits pro Pixel:"
+
 #: dialogs/display-config.cpp:407
 #, c-format
 msgid "Using pixel filter: %s"

@@ -74,6 +74,16 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 
 project(VBA-M C CXX)
 
+if(APPLE)
+    include(CheckLanguage)
+    include(MetalShaderSupport)
+
+    check_language(Metal)
+    if(CMAKE_Metal_COMPILER)
+        enable_language(Metal)
+    endif()
+endif()
+
 include(CTest)
 include(FetchContent)
 include(GNUInstallDirs)

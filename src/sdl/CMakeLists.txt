@@ -40,9 +40,15 @@ if(ENABLE_LIRC)
     set(LIRC_CLIENT_LIBRARY lirc_client)
 endif()
 
-target_include_directories(vbam
-    PRIVATE ${SDL2_INCLUDE_DIRS}
-)
+if(ENABLE_SDL3)
+    target_include_directories(vbam
+        PRIVATE ${SDL3_INCLUDE_DIRS}
+    )
+else()
+    target_include_directories(vbam
+        PRIVATE ${SDL2_INCLUDE_DIRS}
+    )
+endif()
 
 target_link_libraries(vbam
     vbam-core
@@ -52,12 +58,16 @@ target_link_libraries(vbam
     vbam-components-filters-interframe
     vbam-components-user-config
     ${OPENGL_LIBRARIES}
-    ${VBAM_SDL2_LIBS}
+    ${VBAM_SDL_LIBS}
     nonstd-lib
 )
 
 if(WIN32)
-    target_link_libraries(vbam ${SDL2_LIBRARY} ${SDL2MAIN_LIBRARY})
+    if(ENABLE_SDL3)
+        target_link_libraries(vbam ${SDL3_LIBRARY})
+    else()
+        target_link_libraries(vbam ${SDL2_LIBRARY} ${SDL2MAIN_LIBRARY})
+    endif()
 endif()
 
 if(ENABLE_LIRC)
@@ -66,7 +76,7 @@ if(ENABLE_LIRC)
 endif()
 
 if(WIN32)
-    target_link_libraries(vbam wsock32 ws2_32 winmm version imm32 ${SDL2MAIN_LIBRARY})
+    target_link_libraries(vbam wsock32 ws2_32 winmm version imm32)
 endif()
 
 # Installation scripts.

@@ -33,18 +33,17 @@
 #include <io.h>
 
 #define getcwd _getcwd
-#define snprintf sprintf
 #define stat _stat
 #define access _access
 
 #ifndef W_OK
-    #define W_OK 2
+#define W_OK 2
 #endif
 #define mkdir(X,Y) (_mkdir(X))
 
 // from: https://www.linuxquestions.org/questions/programming-9/porting-to-win32-429334/
 #ifndef S_ISDIR
-    #define S_ISDIR(mode)  (((mode) & _S_IFMT) == _S_IFDIR)
+#define S_ISDIR(mode)  (((mode) & _S_IFMT) == _S_IFDIR)
 #endif
 
 #endif // _WIN32
@@ -72,7 +71,9 @@
 
 #endif  // defined(_WIN32)
 
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
 #if defined(__APPLE__)
+#define GL_SILENCE_DEPRECATION 1
 
 #include <OpenGL/OpenGL.h>
 #include <OpenGL/glext.h>
@@ -85,12 +86,27 @@
 #include <GL/glu.h>
 
 #endif  // defined(__APPLE__)
+#endif
 
+#ifdef ENABLE_SDL3
+#include <SDL3/SDL.h>
+
+#ifndef CONFIG_IDF_TARGET
+#include <SDL3/SDL_main.h>
+#endif
+#else
 #include <SDL.h>
+#endif
 
 #if defined(VBAM_ENABLE_LIRC)
 #include <lirc/lirc_client.h>
 #include <sys/poll.h>
+#endif
+
+#ifdef CONFIG_IDF_TARGET
+#define CONFIG_RGB565 1
+#define CONFIG_16BIT 1
+#define NO_OPENGL 1
 #endif
 
 #include "components/draw_text/draw_text.h"
@@ -115,6 +131,10 @@
 #include "sdl/filters.h"
 #include "sdl/inputSDL.h"
 
+#if __STDC_WANT_SECURE_LIB__
+#define snprintf sprintf_s
+#endif
+
 // from: https://stackoverflow.com/questions/7608714/why-is-my-pointer-not-null-after-free
 #define freeSafe(ptr) free(ptr); ptr = NULL;
 
@@ -125,6 +145,7 @@ extern void remoteStubSignal(int, int);
 extern void remoteOutput(const char*, uint32_t);
 extern void remoteSetProtocol(int);
 extern void remoteSetPort(int);
+extern int userColorDepth;
 
 struct CoreOptions coreOptions;
 
@@ -199,6 +220,7 @@ int emulating = 0;
 int RGB_LOW_BITS_MASK = 0x821;
 uint32_t systemColorMap32[0x10000];
 uint16_t systemColorMap16[0x10000];
+uint8_t  systemColorMap8[0x10000];
 uint16_t systemGbPalette[24];
 
 char filename[2048];
@@ -278,7 +300,7 @@ static void sdlChangeVolume(float d)
 
     if (fabs(newVolume - oldVolume) > 0.001) {
         char tmp[32];
-        sprintf(tmp, "Volume: %i%%", (int)(newVolume * 100.0 + 0.5));
+        snprintf(tmp, sizeof(tmp), "Volume: %i%%", (int)(newVolume * 100.0 + 0.5));
         systemScreenMessage(tmp);
         soundSetVolume(newVolume);
     }
@@ -302,7 +324,7 @@ void StartLirc(void)
         fprintf(stdout, "Success\n");
         //read the config file
         char LIRCConfigLoc[2048];
-        sprintf(LIRCConfigLoc, "%s%c%s", homeConfigDir, kFileSep, "lircrc");
+        snprintf(LIRCConfigLoc, sizeof(LIRCConfigLoc), "%s%c%s", homeConfigDir, kFileSep, "lircrc");
         fprintf(stdout, "LIRC Config file:");
         if (lirc_readconfig(LIRCConfigLoc, &LIRCConfigInfo, NULL) == 0) {
             //check vbam dir for lircrc
@@ -417,7 +439,7 @@ FILE* sdlFindFile(const char* name)
 
     if (strlen(homeDataDir)) {
         fprintf(stdout, "Searching home directory: %s\n", homeDataDir);
-        sprintf(path, "%s%c%s", homeDataDir, kFileSep, name);
+        snprintf(path, sizeof(path), "%s%c%s", homeDataDir, kFileSep, name);
         f = fopen(path, "r");
         if (f != NULL)
             return f;
@@ -427,7 +449,7 @@ FILE* sdlFindFile(const char* name)
     char* profileDir = getenv("USERPROFILE");
     if (profileDir != NULL) {
         fprintf(stdout, "Searching user profile directory: %s\n", profileDir);
-        sprintf(path, "%s%c%s", profileDir, kFileSep, name);
+        snprintf(path, sizeof(path), "%s%c%s", profileDir, kFileSep, name);
         f = fopen(path, "r");
         if (f != NULL)
             return f;
@@ -438,17 +460,17 @@ FILE* sdlFindFile(const char* name)
 
         if (path != NULL) {
             fprintf(stdout, "Searching PATH\n");
-            strncpy(buffer, path, sizeof(buffer));
+            strcpy(buffer, path);
             buffer[sizeof(buffer) - 1] = 0;
             char* tok = strtok(buffer, PATH_SEP);
 
             while (tok) {
-                sprintf(path, "%s%c%s", tok, kFileSep, EXE_NAME);
+                snprintf(path, sizeof(path), "%s%c%s", tok, kFileSep, EXE_NAME);
                 f = fopen(path, "r");
                 if (f != NULL) {
                     char path2[2048];
                     fclose(f);
-                    sprintf(path2, "%s%c%s", tok, kFileSep, name);
+                    snprintf(path2, sizeof(path2), "%s%c%s", tok, kFileSep, name);
                     f = fopen(path2, "r");
                     if (f != NULL) {
                         fprintf(stdout, "Found at %s\n", path2);
@@ -465,7 +487,7 @@ FILE* sdlFindFile(const char* name)
         char* p = strrchr(buffer, kFileSep);
         if (p) {
             *p = 0;
-            sprintf(path, "%s%c%s", buffer, kFileSep, name);
+            snprintf(path, sizeof(path), "%s%c%s", buffer, kFileSep, name);
             f = fopen(path, "r");
             if (f != NULL)
                 return f;
@@ -473,13 +495,13 @@ FILE* sdlFindFile(const char* name)
     }
 #else // ! _WIN32
     fprintf(stdout, "Searching data directory: %s\n", PKGDATADIR);
-    sprintf(path, "%s%c%s", PKGDATADIR, kFileSep, name);
+    snprintf(path, sizeof(path), "%s%c%s", PKGDATADIR, kFileSep, name);
     f = fopen(path, "r");
     if (f != NULL)
         return f;
 
     fprintf(stdout, "Searching system config directory: %s\n", SYSCONF_INSTALL_DIR);
-    sprintf(path, "%s%c%s", SYSCONF_INSTALL_DIR, kFileSep, name);
+    snprintf(path, sizeof(path), "%s%c%s", SYSCONF_INSTALL_DIR, kFileSep, name);
     f = fopen(path, "r");
     if (f != NULL)
         return f;
@@ -488,6 +510,7 @@ FILE* sdlFindFile(const char* name)
     return NULL;
 }
 
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
 static void sdlOpenGLScaleWithAspect(int w, int h)
 {
     float screenAspect = (float)sizeX / sizeY,
@@ -528,8 +551,25 @@ static void sdlOpenGLVideoResize()
 
     textureSize = (int)pow(2.0f, n);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureSize, textureSize, 0,
-        GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    if (systemColorDepth == 8)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureSize, textureSize, 0,
+                     GL_RGB, GL_UNSIGNED_BYTE_3_3_2, NULL);
+    } else if (systemColorDepth == 16) {
+#ifdef CONFIG_RGB565
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureSize, textureSize, 0,
+                     GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
+#else
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureSize, textureSize, 0,
+                     GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, NULL);
+#endif
+    } else if (systemColorDepth == 24) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureSize, textureSize, 0,
+                     GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    } else {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureSize, textureSize, 0,
+                     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    }
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -556,6 +596,7 @@ void sdlOpenGLInit(int w, int h)
 
     sdlOpenGLVideoResize();
 }
+#endif
 
 static void sdlApplyPerImagePreferences()
 {
@@ -667,11 +708,11 @@ static char* sdlStateName(int num)
     char *gameFile = sdlGetFilename(filename);
 
     if (saveDir)
-        sprintf(stateName, "%s%c%s%d.sgm", saveDir, kFileSep, gameFile, num + 1);
+        snprintf(stateName, sizeof(stateName), "%s%c%s%d.sgm", saveDir, kFileSep, gameFile, num + 1);
     else if (access(gameDir, W_OK) == 0)
-        sprintf(stateName, "%s%c%s%d.sgm", gameDir, kFileSep, gameFile, num + 1);
+        snprintf(stateName, sizeof(stateName), "%s%c%s%d.sgm", gameDir, kFileSep, gameFile, num + 1);
     else
-        sprintf(stateName, "%s%c%s%d.sgm", homeDataDir, kFileSep, gameFile, num + 1);
+        snprintf(stateName, sizeof(stateName), "%s%c%s%d.sgm", homeDataDir, kFileSep, gameFile, num + 1);
 
     freeSafe(gameDir);
     freeSafe(gameFile);
@@ -689,10 +730,10 @@ void sdlWriteState(int num)
 
     // now we reuse the stateName buffer - 2048 bytes fit in a lot
     if (num == SLOT_POS_LOAD_BACKUP) {
-        sprintf(stateName, "Current state backed up to %d", num + 1);
+        snprintf(stateName, 2048, "Current state backed up to %d", num + 1);
         systemScreenMessage(stateName);
     } else if (num >= 0) {
-        sprintf(stateName, "Wrote state %d", num + 1);
+        snprintf(stateName, 2048, "Wrote state %d", num + 1);
         systemScreenMessage(stateName);
     }
 
@@ -708,11 +749,11 @@ void sdlReadState(int num)
         emulator.emuReadState(stateName);
 
     if (num == SLOT_POS_LOAD_BACKUP) {
-        sprintf(stateName, "Last load UNDONE");
+        snprintf(stateName, 2048, "Last load UNDONE");
     } else if (num == SLOT_POS_SAVE_BACKUP) {
-        sprintf(stateName, "Last save UNDONE");
+        snprintf(stateName, 2048, "Last save UNDONE");
     } else {
-        sprintf(stateName, "Loaded state %d", num + 1);
+        snprintf(stateName, 2048, "Loaded state %d", num + 1);
     }
     systemScreenMessage(stateName);
 
@@ -770,11 +811,11 @@ void sdlWriteBattery()
     char *gameFile = sdlGetFilename(filename);
 
     if (batteryDir)
-        sprintf(buffer, "%s%c%s.sav", batteryDir, kFileSep, gameFile);
+        snprintf(buffer, sizeof(buffer), "%s%c%s.sav", batteryDir, kFileSep, gameFile);
     else if (access(gameDir, W_OK) == 0)
-        sprintf(buffer, "%s%c%s.sav", gameDir, kFileSep, gameFile);
+        snprintf(buffer, sizeof(buffer), "%s%c%s.sav", gameDir, kFileSep, gameFile);
     else
-        sprintf(buffer, "%s%c%s.sav", homeDataDir, kFileSep, gameFile);
+        snprintf(buffer, sizeof(buffer), "%s%c%s.sav", homeDataDir, kFileSep, gameFile);
 
     bool result = emulator.emuWriteBattery(buffer);
 
@@ -792,11 +833,11 @@ void sdlReadBattery()
     char *gameFile = sdlGetFilename(filename);
 
     if (batteryDir)
-        sprintf(buffer, "%s%c%s.sav", batteryDir, kFileSep, gameFile);
+        snprintf(buffer, sizeof(buffer), "%s%c%s.sav", batteryDir, kFileSep, gameFile);
     else if (access(gameDir, W_OK) == 0)
-        sprintf(buffer, "%s%c%s.sav", gameDir, kFileSep, gameFile);
+        snprintf(buffer, sizeof(buffer), "%s%c%s.sav", gameDir, kFileSep, gameFile);
     else
-        sprintf(buffer, "%s%c%s.sav", homeDataDir, kFileSep, gameFile);
+        snprintf(buffer, sizeof(buffer), "%s%c%s.sav", homeDataDir, kFileSep, gameFile);
 
     bool result = emulator.emuReadBattery(buffer);
 
@@ -810,10 +851,16 @@ void sdlReadBattery()
 void sdlReadDesktopVideoMode()
 {
     if (window) {
+#ifdef ENABLE_SDL3
+        const SDL_DisplayMode *dm = SDL_GetDesktopDisplayMode(SDL_GetDisplayForWindow(window));
+        desktopWidth = dm->w;
+        desktopHeight = dm->h;
+#else
         SDL_DisplayMode dm;
         SDL_GetDesktopDisplayMode(SDL_GetWindowDisplayIndex(window), &dm);
         desktopWidth = dm.w;
         desktopHeight = dm.h;
+#endif
     }
 }
 
@@ -824,27 +871,81 @@ static void sdlResizeVideo()
     destWidth = filter_enlarge * sizeX;
     destHeight = filter_enlarge * sizeY;
 
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
         free(filterPix);
         filterPix = (uint8_t*)calloc(1, (systemColorDepth >> 3) * destWidth * destHeight);
         sdlOpenGLVideoResize();
     }
+#endif
 
+#ifdef ENABLE_SDL3
+    if (surface)
+        SDL_DestroySurface(surface);
+#else
     if (surface)
         SDL_FreeSurface(surface);
+#endif
+
     if (texture)
         SDL_DestroyTexture(texture);
 
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (!openGL) {
-        surface = SDL_CreateRGBSurface(0, destWidth, destHeight, 32,
-            0x00FF0000, 0x0000FF00,
-            0x000000FF, 0xFF000000);
-        texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
-            SDL_TEXTUREACCESS_STREAMING,
-            destWidth, destHeight);
+#endif
+        if (systemColorDepth == 8)
+        {
+#ifdef ENABLE_SDL3
+            surface = SDL_CreateSurface(destWidth, destHeight, SDL_GetPixelFormatForMasks(8, 0xE0, 0x1C, 0x03, 0x00));
+            texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(8, 0xE0, 0x1C, 0x03, 0x00), SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+#else
+            surface = SDL_CreateRGBSurface(0, destWidth, destHeight, 8, 0xE0, 0x1C, 0x03, 0x00);
+            texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(8, 0xE0, 0x1C, 0x03, 0x00), SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+#endif
+        } else if (systemColorDepth == 16) {
+#ifdef CONFIG_RGB565
+#ifdef ENABLE_SDL3
+            surface = SDL_CreateSurface(destWidth, destHeight, SDL_GetPixelFormatForMasks(16, 0xF800, 0x07E0, 0x001F, 0x0000));
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB565, SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+#else
+            surface = SDL_CreateRGBSurface(0, destWidth, destHeight, 16, 0xF800, 0x07E0, 0x001F, 0x0000);
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB565, SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+#endif
+#else
+#ifdef ENABLE_SDL3
+            surface = SDL_CreateSurface(destWidth, destHeight, SDL_GetPixelFormatForMasks(16, 0x7C00, 0x03E0, 0x001F, 0x0000));
+            texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(16, 0x7C00, 0x03E0, 0x001F, 0x0000), SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+#else
+            surface = SDL_CreateRGBSurface(0, destWidth, destHeight, 16, 0x7C00, 0x03E0, 0x001F, 0x0000);
+            texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(16, 0x7C00, 0x03E0, 0x001F, 0x0000), SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+#endif
+#endif
+        } else if (systemColorDepth == 24) {
+#ifdef ENABLE_SDL3
+            surface = SDL_CreateSurface(destWidth, destHeight, SDL_GetPixelFormatForMasks(24, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000));
+            texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(24, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000), SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+#else
+            surface = SDL_CreateRGBSurface(0, destWidth, destHeight, 24, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000);
+            texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(24, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000), SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+#endif
+        } else {
+#ifdef ENABLE_SDL3
+            surface = SDL_CreateSurface(destWidth, destHeight, SDL_GetPixelFormatForMasks(32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000));
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_XRGB8888, SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+#else
+            surface = SDL_CreateRGBSurface(0, destWidth, destHeight, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000);
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_XRGB8888, SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+#endif
+        }
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     }
+#endif
 
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (!openGL && surface == NULL) {
+#else
+    if (surface == NULL) {
+#endif
         systemMessage(0, "Failed to set video mode");
         SDL_Quit();
         exit(-1);
@@ -856,17 +957,31 @@ void sdlInitVideo()
     int flags;
     int screenWidth;
     int screenHeight;
+    int window_width, window_height, render_width, render_height;
+#ifdef ENABLE_SDL3
+    SDL_RendererLogicalPresentation representation;
+    bool makes_sense = false;
+#else
+    SDL_bool makes_sense = SDL_FALSE;
+#endif
+    uint32_t rmask, gmask, bmask;
+#ifndef ENABLE_SDL3
+    SDL_RendererInfo render_info;
+#endif
 
     filter_enlarge = getFilterEnlargeFactor(filter);
 
     destWidth = filter_enlarge * sizeX;
     destHeight = filter_enlarge * sizeY;
 
-    flags = fullScreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0;
+    flags = fullScreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE;
+
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
         flags |= SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
     }
+#endif
 
     screenWidth = destWidth;
     screenHeight = destHeight;
@@ -875,11 +990,67 @@ void sdlInitVideo()
         SDL_DestroyWindow(window);
     if (renderer)
         SDL_DestroyRenderer(renderer);
-    window = SDL_CreateWindow("VBA-M", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        screenWidth, screenHeight, flags);
+
+#ifndef ENABLE_SDL3
+    window = SDL_CreateWindow("VBA-M", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight, flags);
+
     if (!openGL) {
         renderer = SDL_CreateRenderer(window, -1, 0);
     }
+
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
+    if (openGL)
+    {
+        systemMessage(0, "Renderer: OpenGL (%s)", openGL == 2 ? "bilinear" : "no filter");
+    } else {
+#endif
+        SDL_GetRendererInfo(renderer, &render_info);
+
+        systemMessage(0, "Renderer: SDL %d.%d (%s)", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, render_info.name);
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
+    }
+#endif
+
+    SDL_RenderSetLogicalSize(renderer, screenWidth, screenHeight);
+    SDL_RenderGetLogicalSize(renderer, &render_width, &render_height);
+
+    makes_sense = (SDL_bool)(screenWidth >= render_width && screenHeight >= render_height);
+    SDL_RenderSetIntegerScale(renderer, makes_sense);
+#else
+    window = SDL_CreateWindow("VBA-M", screenWidth, screenHeight, flags);
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
+    if (!openGL) {
+#endif
+        renderer = SDL_CreateRenderer(window, NULL);
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
+    }
+#endif
+
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
+    if (openGL)
+    {
+        systemMessage(0, "Renderer: OpenGL (%s)", openGL == 2 ? "bilinear" : "nearest");
+    } else {
+#endif
+    	systemMessage(0, "Renderer: SDL %d.%d (%s)", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_GetRendererName(renderer));
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
+    }
+#endif
+
+    SDL_GetCurrentRenderOutputSize(renderer, &window_width, &window_height);
+    SDL_GetRenderLogicalPresentation(renderer, &render_width, &render_height, &representation);
+
+    makes_sense = (window_width >= render_width && window_height >= render_height);
+
+    if (makes_sense == true)
+    {
+        SDL_SetRenderLogicalPresentation(renderer, screenWidth, screenHeight, SDL_LOGICAL_PRESENTATION_INTEGER_SCALE);
+    } else {
+        SDL_SetRenderLogicalPresentation(renderer, screenWidth, screenHeight, SDL_LOGICAL_PRESENTATION_DISABLED);
+    }
+
+    SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_LINEAR);
+#endif
 
     if (window == NULL) {
         systemMessage(0, "Failed to set video mode");
@@ -887,12 +1058,64 @@ void sdlInitVideo()
         exit(-1);
     }
 
-    uint32_t rmask, gmask, bmask;
+    if (userColorDepth != 0)
+    {
+        systemColorDepth = userColorDepth;
 
-    if (openGL) {
-        rmask = 0xFF000000;
-        gmask = 0x00FF0000;
-        bmask = 0x0000FF00;
+        switch (systemColorDepth)
+        {
+            case  8:
+                srcPitch = sizeX * (systemColorDepth >> 3) + 2;
+                break;
+
+            case 16:
+                srcPitch = sizeX * (systemColorDepth >> 3) + 4;
+                break;
+                
+            case 24:
+                srcPitch = sizeX * (systemColorDepth >> 3);
+                break;
+                
+            case 32:
+                srcPitch = sizeX * (systemColorDepth >> 3) + 4;
+                break;
+
+            default:
+                fprintf(stderr, "Wrong color depth %d\n", systemColorDepth);
+                exit(-1);
+                break;
+        }
+    } else {
+#ifdef CONFIG_8BIT
+        systemColorDepth = 8;
+        srcPitch = sizeX * (systemColorDepth >> 3) + 2;
+#elif defined(CONFIG_16BIT)
+        systemColorDepth = 16;
+        srcPitch = sizeX * (systemColorDepth >> 3) + 4;
+#elif defined(CONFIG_24BIT)
+        systemColorDepth = 24;
+        srcPitch = sizeX * (systemColorDepth >> 3);
+#else /* defined(CONFIG_32BIT) */
+        systemColorDepth = 32;
+        srcPitch = sizeX * (systemColorDepth >> 3) + 4;
+#endif
+    }
+
+    if (systemColorDepth == 8)
+    {
+        rmask = 0x000000E0;
+        gmask = 0x0000001C;
+        bmask = 0x00000003;
+    } else if (systemColorDepth == 16) {
+#ifdef CONFIG_RGB565
+        rmask = 0x0000F800;
+        gmask = 0x000007E0;
+        bmask = 0x0000001F;
+#else
+        rmask = 0x00007C00;
+        gmask = 0x000003E0;
+        bmask = 0x0000001F;
+#endif
     } else {
         rmask = 0x00FF0000;
         gmask = 0x0000FF00;
@@ -904,27 +1127,41 @@ void sdlInitVideo()
     systemBlueShift = sdlCalculateShift(bmask);
 
     //printf("systemRedShift %d, systemGreenShift %d, systemBlueShift %d\n",
-    //         systemRedShift, systemGreenShift, systemBlueShift);
+    //   systemRedShift, systemGreenShift, systemBlueShift);
     //  originally 3, 11, 19 -> 27, 19, 11
 
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
-        // Align to BGRA instead of ABGR
-        systemRedShift += 8;
-        systemGreenShift += 8;
-        systemBlueShift += 8;
+        if (systemColorDepth == 32)
+        {
+            // Align to BGRA instead of ABGR
+            systemRedShift += 8;
+            systemGreenShift += 8;
+            systemBlueShift += 8;
+        }
     }
+#endif
 
-    systemColorDepth = 32;
-    srcPitch = sizeX * 4 + 4;
-
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
         glcontext = SDL_GL_CreateContext(window);
         sdlOpenGLInit(screenWidth, screenHeight);
     }
+#endif
 
     sdlResizeVideo();
 }
 
+#ifdef ENABLE_SDL3
+#ifndef SDL_KMOD_META
+#define SDL_KMOD_META SDL_KMOD_GUI
+#endif
+
+#define MOD_KEYS (SDL_KMOD_CTRL | SDL_KMOD_SHIFT | SDL_KMOD_ALT | SDL_KMOD_META)
+#define MOD_NOCTRL (SDL_KMOD_SHIFT | SDL_KMOD_ALT | SDL_KMOD_META)
+#define MOD_NOALT (SDL_KMOD_CTRL | SDL_KMOD_SHIFT | SDL_KMOD_META)
+#define MOD_NOSHIFT (SDL_KMOD_CTRL | SDL_KMOD_ALT | SDL_KMOD_META)
+#else
 #ifndef KMOD_META
 #define KMOD_META KMOD_GUI
 #endif
@@ -933,6 +1170,7 @@ void sdlInitVideo()
 #define MOD_NOCTRL (KMOD_SHIFT | KMOD_ALT | KMOD_META)
 #define MOD_NOALT (KMOD_CTRL | KMOD_SHIFT | KMOD_META)
 #define MOD_NOSHIFT (KMOD_CTRL | KMOD_ALT | KMOD_META)
+#endif
 
 /*
  * 04.02.2008 (xKiv): factored out from sdlPollEvents
@@ -949,7 +1187,7 @@ void change_rewind(int howmuch)
         rewindCounter = 0;
         {
             char rewindMsgBuffer[50];
-            sprintf(rewindMsgBuffer, "Rewind to %1d [%d]", rewindPos + 1, rewindSerials[rewindPos]);
+            snprintf(rewindMsgBuffer, sizeof(rewindMsgBuffer), "Rewind to %1d [%d]", rewindPos + 1, rewindSerials[rewindPos]);
             rewindMsgBuffer[49] = 0;
             systemConsoleMessage(rewindMsgBuffer);
         }
@@ -1054,56 +1292,113 @@ void sdlPollEvents()
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
-        case SDL_QUIT:
+#ifndef ENABLE_SDL3
+		case SDL_QUIT:
+#else
+        case SDL_EVENT_QUIT:
+#endif
             emulating = 0;
             break;
-        case SDL_WINDOWEVENT:
-            switch (event.window.event) {
-            case SDL_WINDOWEVENT_FOCUS_GAINED:
-                if (pauseWhenInactive)
-                    if (paused) {
-                        if (emulating) {
-                            paused = false;
-                            soundResume();
-                        }
-                    }
-                break;
-            case SDL_WINDOWEVENT_FOCUS_LOST:
-                if (pauseWhenInactive) {
-                    wasPaused = true;
+#ifdef ENABLE_SDL3
+        case SDL_EVENT_WINDOW_FOCUS_GAINED:
+            if (pauseWhenInactive)
+                if (paused) {
                     if (emulating) {
-                        paused = true;
-                        soundPause();
+                        paused = false;
+                        soundResume();
                     }
-
-                    memset(delta, 255, delta_size);
                 }
-                break;
-            case SDL_WINDOWEVENT_RESIZED:
-                if (openGL)
-                    sdlOpenGLScaleWithAspect(event.window.data1, event.window.data2);
-                break;
+            break;
+        case SDL_EVENT_WINDOW_FOCUS_LOST:
+            if (pauseWhenInactive) {
+                wasPaused = true;
+                if (emulating) {
+                    paused = true;
+                    soundPause();
+                }
+
+                memset(delta, 255, delta_size);
             }
             break;
-        case SDL_MOUSEMOTION:
-        case SDL_MOUSEBUTTONUP:
-        case SDL_MOUSEBUTTONDOWN:
+        case SDL_EVENT_WINDOW_RESIZED:
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
+            if (openGL)
+                sdlOpenGLScaleWithAspect(event.window.data1, event.window.data2);
+#endif
+            break;
+		case SDL_EVENT_MOUSE_MOTION:
+		case SDL_EVENT_MOUSE_BUTTON_UP:
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
+#else
+		case SDL_WINDOWEVENT:
+			switch (event.window.event) {
+			case SDL_WINDOWEVENT_FOCUS_GAINED:
+				if (pauseWhenInactive)
+					if (paused) {
+						if (emulating) {
+							paused = false;
+							soundResume();
+						}
+					}
+				break;
+			case SDL_WINDOWEVENT_FOCUS_LOST:
+				if (pauseWhenInactive) {
+					wasPaused = true;
+					if (emulating) {
+						paused = true;
+						soundPause();
+					}
+
+					memset(delta, 255, delta_size);
+				}
+				break;
+			case SDL_WINDOWEVENT_RESIZED:
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
+				if (openGL)
+					sdlOpenGLScaleWithAspect(event.window.data1, event.window.data2);
+#endif
+				break;
+			}
+			break;
+		case SDL_MOUSEMOTION:
+		case SDL_MOUSEBUTTONUP:
+		case SDL_MOUSEBUTTONDOWN:
+#endif
             if (fullScreen) {
-                SDL_ShowCursor(SDL_ENABLE);
+#ifdef ENABLE_SDL3
+                SDL_ShowCursor();
+#else
+                SDL_ShowCursor(true);
+#endif
                 mouseCounter = 120;
             }
             break;
-        case SDL_JOYHATMOTION:
-        case SDL_JOYBUTTONDOWN:
-        case SDL_JOYBUTTONUP:
-        case SDL_JOYAXISMOTION:
-        case SDL_KEYDOWN:
+#ifndef ENABLE_SDL3
+		case SDL_JOYHATMOTION:
+		case SDL_JOYBUTTONDOWN:
+		case SDL_JOYBUTTONUP:
+		case SDL_JOYAXISMOTION:
+		case SDL_KEYDOWN:
+#else
+        case SDL_EVENT_JOYSTICK_HAT_MOTION:
+        case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
+        case SDL_EVENT_JOYSTICK_BUTTON_UP:
+        case SDL_EVENT_JOYSTICK_AXIS_MOTION:
+        case SDL_EVENT_KEY_DOWN:
+#endif
             inputProcessSDLEvent(event);
             break;
-        case SDL_KEYUP:
-            switch (event.key.keysym.sym) {
-            case SDLK_r:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+#ifndef ENABLE_SDL3
+		case SDL_KEYUP:
+			switch (event.key.keysym.sym) {
+			case SDLK_r:
+				if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+#else
+        case SDL_EVENT_KEY_UP:
+            switch (event.key.key) {
+            case SDLK_R:
+				if (!(event.key.mod & MOD_NOCTRL) && (event.key.mod & SDL_KMOD_CTRL)) {
+#endif
                     if (emulating) {
                         emulator.emuReset();
 
@@ -1111,31 +1406,61 @@ void sdlPollEvents()
                     }
                 }
                 break;
-            case SDLK_b:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL))
+#ifndef ENABLE_SDL3
+			case SDLK_b:
+				if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL))
+#else
+            case SDLK_B:
+                if (!(event.key.mod & MOD_NOCTRL) && (event.key.mod & SDL_KMOD_CTRL))
+#endif
                     change_rewind(-1);
                 break;
-            case SDLK_v:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL))
+#ifndef ENABLE_SDL3
+			case SDLK_v:
+				if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL))
+#else
+            case SDLK_V:
+                if (!(event.key.mod & MOD_NOCTRL) && (event.key.mod & SDL_KMOD_CTRL))
+#endif
                     change_rewind(+1);
                 break;
-            case SDLK_h:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL))
+#ifndef ENABLE_SDL3
+			case SDLK_h:
+				if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL))
+#else
+			case SDLK_H:
+				if (!(event.key.mod & MOD_NOCTRL) && (event.key.mod & SDL_KMOD_CTRL))
+#endif
                     change_rewind(0);
                 break;
-            case SDLK_j:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL))
+#ifndef ENABLE_SDL3
+			case SDLK_j:
+				if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL))
+#else
+            case SDLK_J:
+                if (!(event.key.mod & MOD_NOCTRL) && (event.key.mod & SDL_KMOD_CTRL))
+#endif
                     change_rewind((rewindTopPos - rewindPos) * ((rewindTopPos > rewindPos) ? +1 : -1));
                 break;
-            case SDLK_e:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+#ifndef ENABLE_SDL3
+			case SDLK_e:
+				if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+#else
+            case SDLK_E:
+                if (!(event.key.mod & MOD_NOCTRL) && (event.key.mod & SDL_KMOD_CTRL)) {
+#endif
                     coreOptions.cheatsEnabled = !coreOptions.cheatsEnabled;
                     systemConsoleMessage(coreOptions.cheatsEnabled ? "Cheats on" : "Cheats off");
                 }
                 break;
 
-            case SDLK_s:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+#ifndef ENABLE_SDL3
+			case SDLK_s:
+				if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+#else
+            case SDLK_S:
+                if (!(event.key.mod & MOD_NOCTRL) && (event.key.mod & SDL_KMOD_CTRL)) {
+#endif
                     if (sdlSoundToggledOff) { // was off
                         // restore saved state
                         soundSetEnable(sdlSoundToggledOff);
@@ -1197,8 +1522,13 @@ void sdlPollEvents()
                 }
                 break;
 
-            case SDLK_p:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+#ifndef ENABLE_SDL3
+			case SDLK_p:
+				if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+#else
+            case SDLK_P:
+                if (!(event.key.mod & MOD_NOCTRL) && (event.key.mod & SDL_KMOD_CTRL)) {
+#endif
                     paused = !paused;
                     if (paused)
                         soundPause();
@@ -1212,21 +1542,35 @@ void sdlPollEvents()
             case SDLK_ESCAPE:
                 emulating = 0;
                 break;
-            case SDLK_f:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+#ifndef ENABLE_SDL3
+			case SDLK_f:
+				if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+					fullScreen = !fullScreen;
+					SDL_SetWindowFullscreen(window, fullScreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+#else
+            case SDLK_F:
+                if (!(event.key.mod & MOD_NOCTRL) && (event.key.mod & SDL_KMOD_CTRL)) {
                     fullScreen = !fullScreen;
-                    SDL_SetWindowFullscreen(window, fullScreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+                    SDL_SetWindowFullscreen(window, fullScreen ? true : false);
+#endif
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
                     if (openGL) {
                         if (fullScreen)
                             sdlOpenGLScaleWithAspect(desktopWidth, desktopHeight);
                         else
                             sdlOpenGLScaleWithAspect(destWidth, destHeight);
                     }
+#endif
                     //sdlInitVideo();
                 }
                 break;
-            case SDLK_g:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+#ifndef ENABLE_SDL3
+			case SDLK_g:
+				if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+#else
+            case SDLK_G:
+                if (!(event.key.mod & MOD_NOCTRL) && (event.key.mod & SDL_KMOD_CTRL)) {
+#endif
                     filterFunction = 0;
                     while (!filterFunction) {
                         filter = (Filter)((filter + 1) % kInvalidFilter);
@@ -1258,23 +1602,38 @@ void sdlPollEvents()
             case SDLK_F6:
             case SDLK_F7:
             case SDLK_F8:
-                if (!(event.key.keysym.mod & MOD_NOSHIFT) && (event.key.keysym.mod & KMOD_SHIFT)) {
-                    sdlHandleSavestateKey(event.key.keysym.sym - SDLK_F1, 1); // with SHIFT
-                } else if (!(event.key.keysym.mod & MOD_KEYS)) {
+#ifndef ENABLE_SDL3
+				if (!(event.key.keysym.mod & MOD_NOSHIFT) && (event.key.keysym.mod & KMOD_SHIFT)) {
+					sdlHandleSavestateKey(event.key.keysym.sym - SDLK_F1, 1); // with SHIFT
+				} else if (!(event.key.keysym.mod & MOD_KEYS)) {
                     sdlHandleSavestateKey(event.key.keysym.sym - SDLK_F1, 0); // without SHIFT
+#else
+                if (!(event.key.mod & MOD_NOSHIFT) && (event.key.mod & SDL_KMOD_SHIFT)) {
+                    sdlHandleSavestateKey(event.key.key - SDLK_F1, 1); // with SHIFT
+                } else if (!(event.key.mod & MOD_KEYS)) {
+                    sdlHandleSavestateKey(event.key.key - SDLK_F1, 0); // without SHIFT
+#endif
                 }
                 break;
             /* backups - only load */
             case SDLK_F9:
                 /* F9 is "load backup" - saved state from *just before* the last restore */
-                if (!(event.key.keysym.mod & MOD_NOSHIFT)) /* must work with or without shift, but only without other modifiers*/
+#ifndef ENABLE_SDL3
+				if (!(event.key.keysym.mod & MOD_NOSHIFT)) /* must work with or without shift, but only without other modifiers*/
+#else
+				if (!(event.key.mod & MOD_NOSHIFT)) /* must work with or without shift, but only without other modifiers*/
+#endif
                 {
                     sdlReadState(SLOT_POS_LOAD_BACKUP);
                 }
                 break;
             case SDLK_F10:
                 /* F10 is "save backup" - what was in the last overwritten savestate before we overwrote it*/
-                if (!(event.key.keysym.mod & MOD_NOSHIFT)) /* must work with or without shift, but only without other modifiers*/
+#ifndef ENABLE_SDL3
+				if (!(event.key.keysym.mod & MOD_NOSHIFT)) /* must work with or without shift, but only without other modifiers*/
+#else
+				if (!(event.key.mod & MOD_NOSHIFT)) /* must work with or without shift, but only without other modifiers*/
+#endif
                 {
                     sdlReadState(SLOT_POS_SAVE_BACKUP);
                 }
@@ -1283,7 +1642,11 @@ void sdlPollEvents()
             case SDLK_2:
             case SDLK_3:
             case SDLK_4:
-                if (!(event.key.keysym.mod & MOD_NOALT) && (event.key.keysym.mod & KMOD_ALT)) {
+#ifndef ENABLE_SDL3
+				if (!(event.key.keysym.mod & MOD_NOALT) && (event.key.keysym.mod & KMOD_ALT)) {
+#else
+				if (!(event.key.mod & MOD_NOALT) && (event.key.mod & SDL_KMOD_ALT)) {
+#endif
                     const char* disableMessages[4] = { "autofire A disabled",
                         "autofire B disabled",
                         "autofire R disabled",
@@ -1294,6 +1657,24 @@ void sdlPollEvents()
                         "autofire L" };
 
                     EKey k = KEY_BUTTON_A;
+#ifdef ENABLE_SDL3
+                    if (event.key.key == SDLK_1)
+                        k = KEY_BUTTON_A;
+                    else if (event.key.key == SDLK_2)
+                        k = KEY_BUTTON_B;
+                    else if (event.key.key == SDLK_3)
+                        k = KEY_BUTTON_R;
+                    else if (event.key.key == SDLK_4)
+                        k = KEY_BUTTON_L;
+
+                    if (inputToggleAutoFire(k)) {
+                        systemScreenMessage(enableMessages[event.key.key - SDLK_1]);
+                    } else {
+                        systemScreenMessage(disableMessages[event.key.key - SDLK_1]);
+                    }
+                } else if (!(event.key.mod & MOD_NOCTRL) && (event.key.mod & SDL_KMOD_CTRL)) {
+                    int mask = 0x0100 << (event.key.key - SDLK_1);
+#else
                     if (event.key.keysym.sym == SDLK_1)
                         k = KEY_BUTTON_A;
                     else if (event.key.keysym.sym == SDLK_2)
@@ -1310,6 +1691,7 @@ void sdlPollEvents()
                     }
                 } else if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
                     int mask = 0x0100 << (event.key.keysym.sym - SDLK_1);
+#endif
                     coreOptions.layerSettings ^= mask;
                     coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
                     CPUUpdateRenderBuffers(false);
@@ -1319,14 +1701,24 @@ void sdlPollEvents()
             case SDLK_6:
             case SDLK_7:
             case SDLK_8:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+#ifndef ENABLE_SDL3
+				if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
                     int mask = 0x0100 << (event.key.keysym.sym - SDLK_1);
+#else
+				if (!(event.key.mod & MOD_NOCTRL) && (event.key.mod & SDL_KMOD_CTRL)) {
+                    int mask = 0x0100 << (event.key.key - SDLK_1);
+#endif
                     coreOptions.layerSettings ^= mask;
                     coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
                 }
                 break;
-            case SDLK_n:
-                if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+#ifndef ENABLE_SDL3
+			case SDLK_n:
+				if (!(event.key.keysym.mod & MOD_NOCTRL) && (event.key.keysym.mod & KMOD_CTRL)) {
+#else
+            case SDLK_N:
+                if (!(event.key.mod & MOD_NOCTRL) && (event.key.mod & SDL_KMOD_CTRL)) {
+#endif
                     if (paused)
                         paused = false;
                     pauseNextFrame = true;
@@ -1447,44 +1839,44 @@ void usage(char* cmd)
     printf("\
 \n\
 Options:\n\
-  -O, --opengl=MODE            Set OpenGL texture filter\n\
-      --no-opengl               0 - Disable OpenGL\n\
-      --opengl-nearest          1 - No filtering\n\
-      --opengl-bilinear         2 - Bilinear filtering\n\
-  -F, --fullscreen             Full screen\n\
+  -O, --opengl=MODE   Set OpenGL texture filter\n\
+      --no-opengl       0 - Disable OpenGL\n\
+      --opengl-nearest  1 - No filtering\n\
+      --opengl-bilinear   2 - Bilinear filtering\n\
+  -F, --fullscreen   Full screen\n\
   -G, --gdb=PROTOCOL           GNU Remote Stub mode:\n\
-                                tcp      - use TCP at port 55555\n\
+                                tcp   - use TCP at port 55555\n\
                                 tcp:PORT - use TCP at port PORT\n\
                                 pipe     - use pipe transport\n\
-  -I, --ifb-filter=FILTER      Select interframe blending filter:\n\
+  -I, --ifb-filter=FILTER   Select interframe blending filter:\n\
 ");
     for (int i = 0; i < (int)kInvalidIFBFilter; i++)
         printf("                                %d - %s\n", i, getIFBFilterName((IFBFilter)i));
     printf("\
   -N, --no-debug               Don't parse debug information\n\
-  -S, --flash-size=SIZE        Set the Flash size\n\
-      --flash-64k               0 -  64K Flash\n\
-      --flash-128k              1 - 128K Flash\n\
-  -T, --throttle=THROTTLE      Set the desired throttle (5...1000)\n\
-  -b, --bios=BIOS              Use given bios file\n\
-  -c, --config=FILE            Read the given configuration file\n\
-  -f, --filter=FILTER          Select filter:\n\
+  -S, --flash-size=SIZE  Set the Flash size\n\
+      --flash-64k       0 -  64K Flash\n\
+      --flash-128k  1 - 128K Flash\n\
+  -T, --throttle=THROTTLE   Set the desired throttle (5...1000)\n\
+  -b, --bios=BIOS       Use given bios file\n\
+  -c, --config=FILE   Read the given configuration file\n\
+  -f, --filter=FILTER     Select filter:\n\
 ");
     for (int i = 0; i < (int)kInvalidFilter; i++)
         printf("                                %d - %s\n", i, getFilterName((Filter)i));
     printf("\
   -h, --help                   Print this help\n\
-  -i, --patch=PATCH            Apply given patch\n\
-  -p, --profile=[HERTZ]        Enable profiling\n\
-  -s, --frameskip=FRAMESKIP    Set frame skip (0...9)\n\
-  -t, --save-type=TYPE         Set the available save type\n\
-      --save-auto               0 - Automatic (EEPROM, SRAM, FLASH)\n\
-      --save-eeprom             1 - EEPROM\n\
-      --save-sram               2 - SRAM\n\
-      --save-flash              3 - FLASH\n\
-      --save-sensor             4 - EEPROM+Sensor\n\
-      --save-none               5 - NONE\n\
-  -v, --verbose=VERBOSE        Set verbose logging (trace.log)\n\
+  -i, --patch=PATCH   Apply given patch\n\
+  -p, --profile=[HERTZ]  Enable profiling\n\
+  -s, --frameskip=FRAMESKIP Set frame skip (0...9)\n\
+  -t, --save-type=TYPE   Set the available save type\n\
+      --save-auto       0 - Automatic (EEPROM, SRAM, FLASH)\n\
+      --save-eeprom 1 - EEPROM\n\
+      --save-sram       2 - SRAM\n\
+      --save-flash  3 - FLASH\n\
+      --save-sensor 4 - EEPROM+Sensor\n\
+      --save-none       5 - NONE\n\
+  -v, --verbose=VERBOSE  Set verbose logging (trace.log)\n\
                                   1 - SWI\n\
                                   2 - Unaligned memory access\n\
                                   4 - Illegal memory write\n\
@@ -1497,20 +1889,21 @@ Options:\n\
                                 512 - AGBPrint messages\n\
 \n\
 Long options only:\n\
-      --agb-print              Enable AGBPrint support\n\
-      --auto-frameskip         Enable auto frameskipping\n\
+      --agb-print       Enable AGBPrint support\n\
+      --auto-frameskip   Enable auto frameskipping\n\
       --no-agb-print           Disable AGBPrint support\n\
-      --no-auto-frameskip      Disable auto frameskipping\n\
+      --no-auto-frameskip   Disable auto frameskipping\n\
+      --color-depth   Set color depth (8, 16, 24 or 32)\n\
       --no-patch               Do not automatically apply patch\n\
       --no-pause-when-inactive Don't pause when inactive\n\
-      --no-rtc                 Disable RTC support\n\
-      --no-show-speed          Don't show emulation speed\n\
-      --no-throttle            Disable throttle\n\
-      --pause-when-inactive    Pause when inactive\n\
-      --rtc                    Enable RTC support\n\
-      --show-speed-normal      Show emulation speed\n\
-      --show-speed-detailed    Show detailed speed data\n\
-      --cheat 'CHEAT'          Add a cheat\n\
+      --no-rtc   Disable RTC support\n\
+      --no-show-speed     Don't show emulation speed\n\
+      --no-throttle   Disable throttle\n\
+      --pause-when-inactive Pause when inactive\n\
+      --rtc  Enable RTC support\n\
+      --show-speed-normal   Show emulation speed\n\
+      --show-speed-detailed Show detailed speed data\n\
+      --cheat 'CHEAT'     Add a cheat\n\
 ");
 }
 
@@ -1535,7 +1928,7 @@ void handleRewinds()
                resize /* actual size */
                )) {
         char rewMsgBuf[100];
-        sprintf(rewMsgBuf, "Remembered rewind %1d (of %1d), serial %d.", curSavePos + 1, rewindCount, rewindSerial);
+        snprintf(rewMsgBuf, sizeof(rewMsgBuf), "Remembered rewind %1d (of %1d), serial %d.", curSavePos + 1, rewindCount, rewindSerial);
         rewMsgBuf[99] = 0;
         systemConsoleMessage(rewMsgBuf);
         rewindSerials[curSavePos] = rewindSerial;
@@ -1554,7 +1947,7 @@ void handleRewinds()
 
 void SetHomeConfigDir()
 {
-    sprintf(homeConfigDir, "%s%s", get_xdg_user_config_home().c_str(), DOT_DIR);
+    snprintf(homeConfigDir, sizeof(homeConfigDir), "%s%s", get_xdg_user_config_home().c_str(), DOT_DIR);
     struct stat s;
     if (stat(homeDataDir, &s) == -1 || !S_ISDIR(s.st_mode))
         mkdir(homeDataDir, 0755);
@@ -1562,7 +1955,7 @@ void SetHomeConfigDir()
 
 void SetHomeDataDir()
 {
-    sprintf(homeDataDir, "%s%s", get_xdg_user_data_home().c_str(), DOT_DIR);
+    snprintf(homeDataDir, sizeof(homeConfigDir), "%s%s", get_xdg_user_data_home().c_str(), DOT_DIR);
     struct stat s;
     if (stat(homeDataDir, &s) == -1 || !S_ISDIR(s.st_mode))
         mkdir(homeDataDir, 0755);
@@ -1695,25 +2088,25 @@ int main(int argc, char** argv)
             char* tmp;
             // no patch given yet - look for ROMBASENAME.ips
             tmp = (char*)malloc(strlen(filename) + 4 + 1);
-            sprintf(tmp, "%s.ips", filename);
+            snprintf(tmp, strlen(filename) + 4, "%s.ips", filename);
             patchNames[patchNum] = tmp;
             patchNum++;
 
             // no patch given yet - look for ROMBASENAME.ups
             tmp = (char*)malloc(strlen(filename) + 4 + 1);
-            sprintf(tmp, "%s.ups", filename);
+            snprintf(tmp, strlen(filename) + 4, "%s.ups", filename);
             patchNames[patchNum] = tmp;
             patchNum++;
 
             // no patch given yet - look for ROMBASENAME.bps
             tmp = (char*)malloc(strlen(filename) + 4 + 1);
-            sprintf(tmp, "%s.bps", filename);
+            snprintf(tmp, strlen(filename) + 4, "%s.bps", filename);
             patchNames[patchNum] = tmp;
             patchNum++;
 
             // no patch given yet - look for ROMBASENAME.ppf
             tmp = (char*)malloc(strlen(filename) + 4 + 1);
-            sprintf(tmp, "%s.ppf", filename);
+            snprintf(tmp, strlen(filename) + 4, "%s.ppf", filename);
             patchNames[patchNum] = tmp;
             patchNum++;
         }
@@ -1802,20 +2195,38 @@ int main(int argc, char** argv)
     if (debugger)
         remoteInit();
 
-    int flags = SDL_INIT_VIDEO | SDL_INIT_TIMER;
+    int flags = SDL_INIT_VIDEO;
 
+#ifdef ENABLE_SDL3
+    if (SDL_InitSubSystem(flags) == false) {
+#else
+    if (SDL_InitSubSystem(flags) < 0) {
+#endif
+        systemMessage(0, "Failed to init SDL subsystem: %s", SDL_GetError());
+        exit(-1);
+    }
+
+#ifdef ENABLE_SDL3
+    if (SDL_Init(flags) == false) {
+#else
     if (SDL_Init(flags) < 0) {
+#endif
         systemMessage(0, "Failed to init SDL: %s", SDL_GetError());
         exit(-1);
     }
 
+#ifdef ENABLE_SDL3
+    if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) == false) {
+#else
     if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0) {
+#endif
         systemMessage(0, "Failed to init joystick support: %s", SDL_GetError());
     }
 
 #if defined(VBAM_ENABLE_LIRC)
     StartLirc();
 #endif
+
     inputInitJoysticks();
 
     if (cartridgeType == IMAGE_GBA) {
@@ -1855,8 +2266,8 @@ int main(int argc, char** argv)
     if (systemColorDepth == 15)
         systemColorDepth = 16;
 
-    if (systemColorDepth != 16 && systemColorDepth != 24 && systemColorDepth != 32) {
-        fprintf(stderr, "Unsupported color depth '%d'.\nOnly 16, 24 and 32 bit color depths are supported\n", systemColorDepth);
+    if (systemColorDepth != 8 && systemColorDepth != 16 && systemColorDepth != 24 && systemColorDepth != 32) {
+        fprintf(stderr, "Unsupported color depth '%d'.\nOnly 8, 16, 24 and 32 bit color depths are supported\n", systemColorDepth);
         exit(-1);
     }
 
@@ -1921,7 +2332,11 @@ int main(int argc, char** argv)
         if (mouseCounter) {
             mouseCounter--;
             if (mouseCounter == 0)
-                SDL_ShowCursor(SDL_DISABLE);
+#ifdef ENABLE_SDL3
+                SDL_HideCursor();
+#else
+                SDL_ShowCursor(false);
+#endif
         }
     }
 
@@ -1930,9 +2345,15 @@ int main(int argc, char** argv)
     remoteCleanUp();
     soundShutdown();
 
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
+#ifdef ENABLE_SDL3
+        SDL_GL_DestroyContext(glcontext);
+#else
         SDL_GL_DeleteContext(glcontext);
+#endif
     }
+#endif
 
     if (gbRom != NULL || g_rom != NULL) {
         sdlWriteBattery();
@@ -1993,9 +2414,9 @@ void drawSpeed(uint8_t* screen, int pitch, int x, int y)
 {
     char buffer[50];
     if (showSpeed == 1)
-        sprintf(buffer, "%d%%", systemSpeed);
+        snprintf(buffer, sizeof(buffer), "%d%%", systemSpeed);
     else
-        sprintf(buffer, "%3d%%(%d, %d fps)", systemSpeed,
+        snprintf(buffer, sizeof(buffer), "%3d%%(%d, %d fps)", systemSpeed,
             systemFrameSkip,
             showRenderedFrames);
 
@@ -2009,41 +2430,74 @@ void systemDrawScreen()
 
     renderedFrames++;
 
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL)
         screen = filterPix;
     else {
+#endif
         screen = (uint8_t*)surface->pixels;
         SDL_LockSurface(surface);
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     }
+#endif
 
     if (ifbFunction)
         ifbFunction(g_pix + srcPitch, srcPitch, sizeX, sizeY);
 
-    filterFunction(g_pix + srcPitch, srcPitch, delta, screen,
-        destPitch, sizeX, sizeY);
+    filterFunction(g_pix + srcPitch, srcPitch, delta, screen, destPitch, sizeX, sizeY);
 
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
         int bytes = (systemColorDepth >> 3);
         for (int i = 0; i < destWidth; i++)
             for (int j = 0; j < destHeight; j++) {
-                uint8_t k;
-                k = filterPix[i * bytes + j * destPitch + 3];
-                filterPix[i * bytes + j * destPitch + 3] = filterPix[i * bytes + j * destPitch + 1];
-                filterPix[i * bytes + j * destPitch + 1] = k;
+                uint8_t k = 0;
+                uint8_t l = 0;
+
+                if (systemColorDepth == 24)
+                {
+                    k = filterPix[i * bytes + j * destPitch + 2];
+                    filterPix[i * bytes + j * destPitch + 2] = filterPix[i * bytes + j * destPitch];
+                    filterPix[i * bytes + j * destPitch] = k;
+                } else if (systemColorDepth == 32) {
+                    k = filterPix[i * bytes + j * destPitch + 3];
+                    l = filterPix[i * bytes + j * destPitch + 2];
+                    filterPix[i * bytes + j * destPitch + 3] = 0;
+                    filterPix[i * bytes + j * destPitch + 2] = filterPix[i * bytes + j * destPitch + 1];
+                    filterPix[i * bytes + j * destPitch + 1] = l;
+                    filterPix[i * bytes + j * destPitch] = k;
+                } else {
+                    k = filterPix[i * bytes + j * destPitch + 3];
+                    filterPix[i * bytes + j * destPitch + 3] = filterPix[i * bytes + j * destPitch + 1];
+                    filterPix[i * bytes + j * destPitch + 1] = k;
+                }
             }
     }
+#endif
 
     drawScreenMessage(screen, destPitch, 10, destHeight - 20, 3000);
 
     if (showSpeed && fullScreen)
         drawSpeed(screen, destPitch, 10, 20);
 
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
         glClear(GL_COLOR_BUFFER_BIT);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, destWidth);
-        if (systemColorDepth == 16)
+        if (systemColorDepth == 8)
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,
+                GL_RGB, GL_UNSIGNED_BYTE_3_3_2, screen);
+        else if (systemColorDepth == 16)
+#ifdef CONFIG_RGB565
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,
                 GL_RGB, GL_UNSIGNED_SHORT_5_6_5, screen);
+#else
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,
+                GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, screen);
+#endif
+        else if (systemColorDepth == 24)
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,
+                GL_RGB, GL_UNSIGNED_BYTE, screen);
         else
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, destWidth, destHeight,
                 //GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, screen);
@@ -2062,11 +2516,18 @@ void systemDrawScreen()
         glEnd();
         SDL_GL_SwapWindow(window);
     } else {
+#endif
         SDL_UnlockSurface(surface);
         SDL_UpdateTexture(texture, NULL, surface->pixels, surface->pitch);
+#ifdef ENABLE_SDL3
+        SDL_RenderTexture(renderer, texture, NULL, NULL);
+#else
         SDL_RenderCopy(renderer, texture, NULL, NULL);
+#endif
         SDL_RenderPresent(renderer);
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     }
+#endif
 }
 
 void systemSendScreen()
@@ -2088,9 +2549,9 @@ void systemShowSpeed(int speed)
     if (!fullScreen && showSpeed) {
         char buffer[80];
         if (showSpeed == 1)
-            sprintf(buffer, "VBA-M - %d%%", systemSpeed);
+            snprintf(buffer, sizeof(buffer), "VBA-M - %d%%", systemSpeed);
         else
-            sprintf(buffer, "VBA-M - %d%%(%d, %d fps)", systemSpeed,
+            snprintf(buffer, sizeof(buffer), "VBA-M - %d%%(%d, %d fps)", systemSpeed,
                 systemFrameSkip,
                 showRenderedFrames);
 
@@ -2160,20 +2621,20 @@ void systemScreenCapture(int a)
 
     if (captureFormat) {
         if (screenShotDir)
-            sprintf(buffer, "%s%c%s%02d.bmp", screenShotDir, kFileSep, gameFile, a);
+            snprintf(buffer, sizeof(buffer), "%s%c%s%02d.bmp", screenShotDir, kFileSep, gameFile, a);
         else if (access(gameDir, W_OK) == 0)
-            sprintf(buffer, "%s%c%s%02d.bmp", gameDir, kFileSep, gameFile, a);
+            snprintf(buffer, sizeof(buffer), "%s%c%s%02d.bmp", gameDir, kFileSep, gameFile, a);
         else
-            sprintf(buffer, "%s%c%s%02d.bmp", homeDataDir, kFileSep, gameFile, a);
+            snprintf(buffer, sizeof(buffer), "%s%c%s%02d.bmp", homeDataDir, kFileSep, gameFile, a);
 
         result = emulator.emuWriteBMP(buffer);
     } else {
         if (screenShotDir)
-            sprintf(buffer, "%s%c%s%02d.png", screenShotDir, kFileSep, gameFile, a);
+            snprintf(buffer, sizeof(buffer), "%s%c%s%02d.png", screenShotDir, kFileSep, gameFile, a);
         else if (access(gameDir, W_OK) == 0)
-            sprintf(buffer, "%s%c%s%02d.png", gameDir, kFileSep, gameFile, a);
+            snprintf(buffer, sizeof(buffer), "%s%c%s%02d.png", gameDir, kFileSep, gameFile, a);
         else
-            sprintf(buffer, "%s%c%s%02d.png", homeDataDir, kFileSep, gameFile, a);
+            snprintf(buffer, sizeof(buffer), "%s%c%s%02d.png", homeDataDir, kFileSep, gameFile, a);
 
         result = emulator.emuWritePNG(buffer);
     }

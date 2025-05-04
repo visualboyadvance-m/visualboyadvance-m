@@ -361,6 +361,14 @@ msgstr "Nie znaleziono użytecznych wtyczek rpi w %s"
 msgid "Plugin"
 msgstr "Wtyczka"
 
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth"
+msgstr "Bity na piksel"
+
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth:"
+msgstr "Bity na piksel:"
+
 #: dialogs/display-config.cpp:407
 #, c-format
 msgid "Using pixel filter: %s"

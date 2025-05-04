@@ -27,6 +27,11 @@
 #include "core/gba/gbaRtc.h"
 #include "core/gba/gbaSound.h"
 
+#if __STDC_WANT_SECURE_LIB__
+#define snprintf sprintf_s
+#define vsnprintf vsprintf_s
+#endif
+
 #define FRAMERATE  (16777216.0 / 280896.0) // 59.73
 #define SAMPLERATE 32768.0
 
@@ -68,6 +73,7 @@ static IMAGE_TYPE type = IMAGE_UNKNOWN;
 static bool libretro_supports_bitmasks = false;
 
 // global vars
+uint8_t  systemColorMap8[0x10000];
 uint16_t systemColorMap16[0x10000];
 uint32_t systemColorMap32[0x10000];
 int RGB_LOW_BITS_MASK = 0x821; // used for 16bit inter-frame filters
@@ -1526,7 +1532,7 @@ void retro_cheat_set(unsigned index, bool enabled, const char* code)
     int i = 0;
 
     codeLine = (char *)calloc(codeLineSize, sizeof(char));
-    sprintf(name, "cheat_%d", index);
+    snprintf(name, sizeof(name), "cheat_%d", index);
     for (cursor = 0;; cursor++) {
         if (ISHEXDEC) {
             codeLine[codePos++] = toupper(code[cursor]);
@@ -1791,7 +1797,7 @@ void systemMessage(const char* fmt, ...)
     char buffer[256];
     va_list ap;
     va_start(ap, fmt);
-    vsprintf(buffer, fmt, ap);
+    vsnprintf(buffer, sizeof(buffer), fmt, ap);
     if (log_cb)
         log_cb(RETRO_LOG_INFO, "%s\n", buffer);
     va_end(ap);
@@ -1802,7 +1808,7 @@ void systemMessage(int, const char* fmt, ...)
     char buffer[256];
     va_list ap;
     va_start(ap, fmt);
-    vsprintf(buffer, fmt, ap);
+    vsnprintf(buffer, sizeof(buffer), fmt, ap);
     if (log_cb)
         log_cb(RETRO_LOG_INFO, "%s\n", buffer);
     va_end(ap);

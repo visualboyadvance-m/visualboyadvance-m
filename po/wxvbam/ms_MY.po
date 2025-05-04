@@ -361,6 +361,14 @@ msgstr "Tiada pemalam rpi boleh guna ditemui dalam %s"
 msgid "Plugin"
 msgstr "Pemalam"
 
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth"
+msgstr "Bit setiap piksel"
+
+#: xrc/DisplayConfig.xrc
+msgid "Bit Depth:"
+msgstr "Bit setiap piksel:"
+
 #: dialogs/display-config.cpp:407
 #, c-format
 msgid "Using pixel filter: %s"

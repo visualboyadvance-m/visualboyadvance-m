@@ -141,8 +141,32 @@ int main(int argc, char** argv) {
     wxString xdg_session_type = wxGetenv("XDG_SESSION_TYPE");
     wxString wayland_display  = wxGetenv("WAYLAND_DISPLAY");
 
-    if (xdg_session_type == "wayland" || wayland_display.Contains("wayland"))
+    if (xdg_session_type == "wayland" || wayland_display.Contains("wayland")) {
         gdk_set_allowed_backends("x11,*");
+
+        if (wxGetenv("GDK_BACKEND") == NULL) {
+            wxSetEnv("GDK_BACKEND", "x11");
+        }
+    }
+#else
+#ifdef __WXGTK__
+    wxString xdg_session_type = wxGetenv("XDG_SESSION_TYPE");
+    wxString wayland_display  = wxGetenv("WAYLAND_DISPLAY");
+
+    if (xdg_session_type == "wayland" || wayland_display.Contains("wayland")) {
+        if (wxGetenv("GDK_BACKEND") == NULL) {
+#ifdef ENABLE_SDL3
+            wxSetEnv("GDK_BACKEND", "wayland");
+#else
+            wxSetEnv("GDK_BACKEND", "x11");
+#endif
+        }
+    } else {
+        if (wxGetenv("GDK_BACKEND") == NULL) {
+            wxSetEnv("GDK_BACKEND", "x11");
+        }
+    }
+#endif
 #endif
 
     // This will be freed on wxEntry exit.
