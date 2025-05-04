@@ -46,28 +46,27 @@ const IpAddress IpAddress::Broadcast(255, 255, 255, 255);
 
 
 ////////////////////////////////////////////////////////////
-std::optional<IpAddress> IpAddress::resolve(std::string_view address)
+nonstd::optional<IpAddress> IpAddress::resolve(std::string address)
 {
-    using namespace std::string_view_literals;
-
     if (address.empty())
     {
         // Not generating en error message here as resolution failure is a valid outcome.
-        return std::nullopt;
+        return nonstd::nullopt;
     }
 
-    if (address == "255.255.255.255"sv)
+    if (address == "255.255.255.255")
     {
         // The broadcast address needs to be handled explicitly,
         // because it is also the value returned by inet_addr on error
         return Broadcast;
     }
 
-    if (address == "0.0.0.0"sv)
+    if (address == "0.0.0.0")
         return Any;
 
     // Try to convert the address as a byte representation ("xxx.xxx.xxx.xxx")
-    if (const std::uint32_t ip = inet_addr(address.data()); ip != INADDR_NONE)
+    const std::uint32_t ip = inet_addr(address.data()); 
+    if (ip != INADDR_NONE)
         return IpAddress(ntohl(ip));
 
     // Not a valid address, try to convert it as a host name
@@ -87,7 +86,7 @@ std::optional<IpAddress> IpAddress::resolve(std::string_view address)
     }
 
     // Not generating en error message here as resolution failure is a valid outcome.
-    return std::nullopt;
+    return nonstd::nullopt;
 }
 
 
@@ -122,7 +121,7 @@ std::uint32_t IpAddress::toInteger() const
 
 
 ////////////////////////////////////////////////////////////
-std::optional<IpAddress> IpAddress::getLocalAddress()
+nonstd::optional<IpAddress> IpAddress::getLocalAddress()
 {
     // The method here is to connect a UDP socket to a public ip,
     // and get the local socket address with the getsockname function.
@@ -130,36 +129,36 @@ std::optional<IpAddress> IpAddress::getLocalAddress()
 
     // Create the socket
     const SocketHandle sock = socket(PF_INET, SOCK_DGRAM, 0);
-    if (sock == priv::SocketImpl::invalidSocket())
+    if (sock == SocketImpl::invalidSocket())
     {
         err() << "Failed to retrieve local address (invalid socket)" << std::endl;
-        return std::nullopt;
+        return nonstd::nullopt;
     }
 
     // Connect the socket to a public ip (here 1.1.1.1) on any
     // port. This will give the local address of the network interface
     // used for default routing which is usually what we want.
-    sockaddr_in address = priv::SocketImpl::createAddress(0x01010101, 9);
+    sockaddr_in address = SocketImpl::createAddress(0x01010101, 9);
     if (connect(sock, reinterpret_cast<sockaddr*>(&address), sizeof(address)) == -1)
     {
-        priv::SocketImpl::close(sock);
+        SocketImpl::close(sock);
 
         err() << "Failed to retrieve local address (socket connection failure)" << std::endl;
-        return std::nullopt;
+        return nonstd::nullopt;
     }
 
     // Get the local address of the socket connection
-    priv::SocketImpl::AddrLength size = sizeof(address);
+    SocketImpl::AddrLength size = sizeof(address);
     if (getsockname(sock, reinterpret_cast<sockaddr*>(&address), &size) == -1)
     {
-        priv::SocketImpl::close(sock);
+        SocketImpl::close(sock);
 
         err() << "Failed to retrieve local address (socket local address retrieval failure)" << std::endl;
-        return std::nullopt;
+        return nonstd::nullopt;
     }
 
     // Close the socket
-    priv::SocketImpl::close(sock);
+    SocketImpl::close(sock);
 
     // Finally build the IP address
     return IpAddress(ntohl(address.sin_addr.s_addr));
@@ -167,7 +166,7 @@ std::optional<IpAddress> IpAddress::getLocalAddress()
 
 
 ////////////////////////////////////////////////////////////
-std::optional<IpAddress> IpAddress::getPublicAddress(Time timeout)
+nonstd::optional<IpAddress> IpAddress::getPublicAddress(Time timeout)
 {
     // The trick here is more complicated, because the only way
     // to get our public IP address is to get it from a distant computer.
@@ -187,7 +186,7 @@ std::optional<IpAddress> IpAddress::getPublicAddress(Time timeout)
     err() << "Failed to retrieve public address from external IP resolution server (HTTP response status "
           << static_cast<int>(status) << ")" << std::endl;
 
-    return std::nullopt;
+    return nonstd::nullopt;
 }
 
 
@@ -234,7 +233,7 @@ bool operator>=(IpAddress left, IpAddress right)
 
 
 ////////////////////////////////////////////////////////////
-std::istream& operator>>(std::istream& stream, std::optional<IpAddress>& address)
+std::istream& operator>>(std::istream& stream, nonstd::optional<IpAddress>& address)
 {
     std::string str;
     stream >> str;

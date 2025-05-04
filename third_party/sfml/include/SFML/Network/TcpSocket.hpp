@@ -33,7 +33,7 @@
 
 #include <SFML/System/Time.hpp>
 
-#include <optional>
+#include "optional.hpp"
 #include <vector>
 
 #include <cstddef>
@@ -82,7 +82,7 @@ public:
     /// \see `getRemotePort`
     ///
     ////////////////////////////////////////////////////////////
-    [[nodiscard]] std::optional<IpAddress> getRemoteAddress() const;
+    [[nodiscard]] nonstd::optional<IpAddress> getRemoteAddress() const;
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the port of the connected peer to which
@@ -225,14 +225,14 @@ private:
     {
         std::uint32_t          size{};         //!< Data of packet size
         std::size_t            sizeReceived{}; //!< Number of size bytes received so far
-        std::vector<std::byte> data;           //!< Data of the packet
+        std::vector<unsigned char> data;           //!< Data of the packet
     };
 
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
     PendingPacket          m_pendingPacket;     //!< Temporary data of the packet currently being received
-    std::vector<std::byte> m_blockToSendBuffer; //!< Buffer used to prepare data being sent from the socket
+    std::vector<unsigned char> m_blockToSendBuffer; //!< Buffer used to prepare data being sent from the socket
 };
 
 } // namespace sf

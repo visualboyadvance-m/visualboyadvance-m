@@ -9,4 +9,5 @@ add_library(vbam-core-base-test
     notreached.h)
 
 target_link_libraries(vbam-core-base-test
-    INTERFACE GTest::gtest)
+    INTERFACE GTest::gtest nonstd-lib
+)

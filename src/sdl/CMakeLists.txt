@@ -59,6 +59,7 @@ target_link_libraries(vbam
     vbam-components-user-config
     ${OPENGL_LIBRARIES}
     ${VBAM_SDL_LIBS}
+    nonstd-lib
 )
 
 if(WIN32)

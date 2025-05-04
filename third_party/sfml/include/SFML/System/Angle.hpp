@@ -495,10 +495,10 @@ namespace Literals
 ///
 /// Usage example:
 /// \code
-/// sf::Angle a1  = sf::degrees(90);
+/// sf::Angle a1  = degrees(90);
 /// float radians = a1.asRadians(); // 1.5708f
 ///
-/// sf::Angle a2 = sf::radians(3.141592654f);
+/// sf::Angle a2 = radians(3.141592654f);
 /// float degrees = a2.asDegrees(); // 180.0f
 ///
 /// using namespace sf::Literals;

@@ -36,7 +36,7 @@
 
 #include <iosfwd>
 #include <map>
-#include <optional>
+#include "optional.hpp"
 #include <string>
 
 
@@ -411,7 +411,7 @@ private:
     // Member data
     ////////////////////////////////////////////////////////////
     TcpSocket                m_connection; //!< Connection to the host
-    std::optional<IpAddress> m_host;       //!< Web host address
+    nonstd::optional<IpAddress> m_host;       //!< Web host address
     std::string              m_hostName;   //!< Web host name
     unsigned short           m_port{};     //!< Port used for connection with host
 };

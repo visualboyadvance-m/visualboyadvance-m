@@ -279,6 +279,10 @@ constexpr Time& operator%=(Time& left, Time right)
 
 // Note: the 'inline' keyword here is technically not required, but VS2019 fails
 // to compile with a bogus "multiple definition" error if not explicitly used.
+#ifdef _MSC_VER
 inline constexpr Time Time::Zero;
+#else
+constexpr Time Time::Zero;
+#endif
 
 } // namespace sf

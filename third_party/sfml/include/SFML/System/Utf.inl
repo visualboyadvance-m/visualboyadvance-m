@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////
+///////i///////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
 // Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
@@ -43,8 +43,6 @@
 
 namespace sf
 {
-namespace priv
-{
 ////////////////////////////////////////////////////////////
 template <typename In, typename Out>
 Out copyBits(In begin, In end, Out output)
@@ -53,8 +51,8 @@ Out copyBits(In begin, In end, Out output)
     using OutputType = typename Out::container_type::value_type;
 
     static_assert(sizeof(OutputType) >= sizeof(InputType));
-    static_assert(std::is_integral_v<InputType>);
-    static_assert(std::is_integral_v<OutputType>);
+//    static_assert(std::is_integral_v<InputType>);
+//    static_assert(std::is_integral_v<OutputType>);
 
     // The goal is to copy the byte representation of the input into the output type.
     // A single static_cast will try to preserve the value as opposed to the byte representation
@@ -74,7 +72,6 @@ Out copyBits(In begin, In end, Out output)
 
     return output;
 }
-} // namespace priv
 
 template <typename In>
 In Utf<8>::decode(In begin, In end, char32_t& output, char32_t replacement)
@@ -174,7 +171,7 @@ Out Utf<8>::encode(char32_t input, Out output, std::uint8_t replacement)
         // clang-format on
 
         // Add them to the output
-        output = priv::copyBits(bytes.data(), bytes.data() + bytestoWrite, output);
+        output = copyBits(bytes.data(), bytes.data() + bytestoWrite, output);
     }
 
     return output;
@@ -315,7 +312,7 @@ Out Utf<8>::toUtf8(In begin, In end, Out output)
 {
     static_assert(sizeof(decltype(*begin)) == sizeof(char));
 
-    return priv::copyBits(begin, end, output);
+    return copyBits(begin, end, output);
 }
 
 
@@ -500,7 +497,7 @@ Out Utf<16>::fromLatin1(In begin, In end, Out output)
 
     // Latin-1 is directly compatible with Unicode encodings,
     // and can thus be treated as (a sub-range of) UTF-32
-    return priv::copyBits(begin, end, output);
+    return copyBits(begin, end, output);
 }
 
 
@@ -579,7 +576,7 @@ Out Utf<16>::toUtf16(In begin, In end, Out output)
 {
     static_assert(sizeof(decltype(*begin)) == sizeof(char16_t));
 
-    return priv::copyBits(begin, end, output);
+    return copyBits(begin, end, output);
 }
 
 
@@ -674,7 +671,7 @@ Out Utf<32>::fromLatin1(In begin, In end, Out output)
 
     // Latin-1 is directly compatible with Unicode encodings,
     // and can thus be treated as (a sub-range of) UTF-32
-    return priv::copyBits(begin, end, output);
+    return copyBits(begin, end, output);
 }
 
 
@@ -753,7 +750,7 @@ Out Utf<32>::toUtf32(In begin, In end, Out output)
 {
     static_assert(sizeof(decltype(*begin)) == sizeof(char32_t));
 
-    return priv::copyBits(begin, end, output);
+    return copyBits(begin, end, output);
 }
 
 

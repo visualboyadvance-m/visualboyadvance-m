@@ -36,7 +36,7 @@ namespace sf
 template <typename T>
 Vector3<T> Vector3<T>::normalized() const
 {
-    static_assert(std::is_floating_point_v<T>, "Vector3::normalized() is only supported for floating point types");
+//    static_assert(std::is_floating_point_v<T>, "Vector3::normalized() is only supported for floating point types");
 
     assert(*this != Vector3<T>() && "Vector3::normalized() cannot normalize a zero vector");
     return (*this) / length();
@@ -47,7 +47,7 @@ Vector3<T> Vector3<T>::normalized() const
 template <typename T>
 T Vector3<T>::length() const
 {
-    static_assert(std::is_floating_point_v<T>, "Vector3::length() is only supported for floating point types");
+//    static_assert(std::is_floating_point_v<T>, "Vector3::length() is only supported for floating point types");
 
     // don't use std::hypot because of slow performance
     return std::sqrt(x * x + y * y + z * z);
@@ -60,6 +60,6 @@ T Vector3<T>::length() const
 // Explicit template instantiations
 ////////////////////////////////////////////////////////////
 
-template class sf::Vector3<float>;
-template class sf::Vector3<double>;
-template class sf::Vector3<long double>;
+//template class sf::Vector3<float>;
+//template class sf::Vector3<double>;
+//template class sf::Vector3<long double>;

@@ -201,6 +201,9 @@ function(configure_wx_target target)
     get_target_property(target_type ${target} TYPE)
     if(target_type STREQUAL "EXECUTABLE")
         set(target_is_executable TRUE)
+    elseif(target_type STREQUAL "INTERFACE_LIBRARY")
+        set(target_is_executable FALSE)
+        set(target_is_interface_library TRUE)
     else()
         set(target_is_executable FALSE)
     endif()
@@ -208,6 +211,8 @@ function(configure_wx_target target)
     function(_add_link_libraries)
         if(${target_is_executable})
             target_link_libraries(${target} ${ARGN})
+        elseif(${target_is_interface_library})
+            target_link_libraries(${target} INTERFACE ${ARGN})
         else()
             target_link_libraries(${target} PUBLIC ${ARGN})
         endif()
@@ -238,11 +243,7 @@ function(configure_wx_target target)
     endfunction()
 
     # Core emulator.
-    _add_link_libraries(vbam-core)
-
-    # Nonstd.
-    _add_link_libraries(nonstd-lib)
-    _add_include_directories(${NONSTD_INCLUDE_DIR})
+    _add_link_libraries(vbam-core nonstd-lib ghc-filesystem)
 
     # wxWidgets.
     _add_link_libraries(${wxWidgets_LIBRARIES})
@@ -302,7 +303,6 @@ function(configure_wx_target target)
     else()
         _add_compile_definitions(NO_OGL)
     endif()
-
 endfunction()
 
 # Sub-projects.
@@ -524,6 +524,8 @@ if(ENABLE_FFMPEG)
         target_link_options(visualboyadvance-m PRIVATE ${FFMPEG_LDFLAGS})
     endif()
 endif()
+
+target_link_libraries(visualboyadvance-m nonstd-lib)
 
 # wxrc does not support xrs files in -c output (> 10x compression)
 # we do it using the bin2c.c utility.

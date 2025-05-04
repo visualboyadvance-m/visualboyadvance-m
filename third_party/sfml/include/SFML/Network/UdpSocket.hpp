@@ -32,7 +32,7 @@
 #include <SFML/Network/IpAddress.hpp>
 #include <SFML/Network/Socket.hpp>
 
-#include <optional>
+#include <optional.hpp>
 #include <vector>
 
 #include <cstddef>
@@ -156,7 +156,7 @@ public:
     [[nodiscard]] Status receive(void*                     data,
                                  std::size_t               size,
                                  std::size_t&              received,
-                                 std::optional<IpAddress>& remoteAddress,
+                                 nonstd::optional<IpAddress>& remoteAddress,
                                  unsigned short&           remotePort);
 
     ////////////////////////////////////////////////////////////
@@ -192,13 +192,13 @@ public:
     /// \see `send`
     ///
     ////////////////////////////////////////////////////////////
-    [[nodiscard]] Status receive(Packet& packet, std::optional<IpAddress>& remoteAddress, unsigned short& remotePort);
+    [[nodiscard]] Status receive(Packet& packet, nonstd::optional<IpAddress>& remoteAddress, unsigned short& remotePort);
 
 private:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    std::vector<std::byte> m_buffer{MaxDatagramSize}; //!< Temporary buffer holding the received data in Receive(Packet)
+    std::vector<unsigned char> m_buffer; //!< Temporary buffer holding the received data in Receive(Packet)
 };
 
 } // namespace sf
@@ -264,7 +264,7 @@ private:
 /// // Receive an answer (most likely from 192.168.1.50, but could be anyone else)
 /// std::array<char, 1024> buffer;
 /// std::size_t received = 0;
-/// std::optional<sf::IpAddress> sender;
+/// nonstd::optional<IpAddress> sender;
 /// unsigned short port;
 /// if (socket.receive(buffer.data(), buffer.size(), received, sender, port) == sf::Socket::Status::Done)
 ///     std::cout << sender->toString() << " said: " << buffer.data() << std::endl;
@@ -278,7 +278,7 @@ private:
 /// // Receive a message from anyone
 /// std::array<char, 1024> buffer;
 /// std::size_t received = 0;
-/// std::optional<sf::IpAddress> sender;
+/// nonstd::optional<IpAddress> sender;
 /// unsigned short port;
 /// if (socket.receive(buffer.data(), buffer.size(), received, sender, port) == sf::Socket::Status::Done)
 ///     std::cout << sender->toString() << " said: " << buffer.data() << std::endl;

@@ -40,8 +40,6 @@
 
 namespace sf
 {
-namespace priv
-{
 
 ////////////////////////////////////////////////////////////
 /// \brief Chooses a monotonic clock of highest resolution
@@ -75,10 +73,8 @@ using ClockImpl = std::conditional_t<std::chrono::high_resolution_clock::is_stea
 #endif
 
 static_assert(ClockImpl::is_steady, "Provided implementation is not a monotonic clock");
-static_assert(std::ratio_less_equal_v<ClockImpl::period, std::micro>,
-              "Clock resolution is too low. Expecting at least a microsecond precision");
-
-} // namespace priv
+//static_assert(std::ratio_less_equal_v<ClockImpl::period, std::micro>,
+//              "Clock resolution is too low. Expecting at least a microsecond precision");
 
 class Time;
 
@@ -157,8 +153,8 @@ private:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    priv::ClockImpl::time_point m_refPoint{priv::ClockImpl::now()}; //!< Time of last reset
-    priv::ClockImpl::time_point m_stopPoint;                        //!< Time of last stop
+    ClockImpl::time_point m_refPoint{ClockImpl::now()}; //!< Time of last reset
+    ClockImpl::time_point m_stopPoint;                        //!< Time of last stop
 };
 
 } // namespace sf

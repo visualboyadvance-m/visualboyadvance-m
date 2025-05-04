@@ -44,7 +44,7 @@ void sleep(Time duration)
     // as it results in inconsistent sleeping times under MinGW-w64.
 
     if (duration >= Time::Zero)
-        priv::sleepImpl(duration);
+        sleepImpl(duration);
 }
 
 } // namespace sf

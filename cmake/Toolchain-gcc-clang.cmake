@@ -47,6 +47,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     endif()
 endif()
 
+#add_compile_options(-std=c++14)
+
 if(NOT ENABLE_ASM) # inline asm is not allowed with -fPIC
     add_compile_options(-fPIC)
 endif()

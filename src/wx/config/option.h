@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <unordered_set>
 
-#include <variant.hpp>
+#include "variant.hpp"
 
 #include <wx/string.h>
 

@@ -34,7 +34,7 @@
 #include <cstddef>
 
 
-namespace sf::priv
+namespace sf
 {
 ////////////////////////////////////////////////////////////
 /// \brief Fixed-size array container indexed by an enumeration
@@ -72,4 +72,4 @@ struct EnumArray : public std::array<Value, Count>
     }
 };
 
-} // namespace sf::priv
+} // namespace sf

@@ -32,10 +32,8 @@
 
 namespace sf
 {
-namespace priv
-{
-inline constexpr float pi  = 3.141592654f;
-inline constexpr float tau = pi * 2.f;
+constexpr float pi  = 3.141592654f;
+constexpr float tau = pi * 2.f;
 
 constexpr float positiveRemainder(float a, float b)
 {
@@ -43,12 +41,11 @@ constexpr float positiveRemainder(float a, float b)
     const float val = a - static_cast<float>(static_cast<int>(a / b)) * b;
     return val >= 0.f ? val : val + b;
 }
-} // namespace priv
 
 ////////////////////////////////////////////////////////////
 constexpr float Angle::asDegrees() const
 {
-    return m_radians * (180.f / priv::pi);
+    return m_radians * (180.f / pi);
 }
 
 
@@ -62,14 +59,14 @@ constexpr float Angle::asRadians() const
 ////////////////////////////////////////////////////////////
 constexpr Angle Angle::wrapSigned() const
 {
-    return radians(priv::positiveRemainder(m_radians + priv::pi, priv::tau) - priv::pi);
+    return radians(positiveRemainder(m_radians + pi, tau) - pi);
 }
 
 
 ////////////////////////////////////////////////////////////
 constexpr Angle Angle::wrapUnsigned() const
 {
-    return radians(priv::positiveRemainder(m_radians, priv::tau));
+    return radians(positiveRemainder(m_radians, tau));
 }
 
 
@@ -82,7 +79,7 @@ constexpr Angle::Angle(float radians) : m_radians(radians)
 ////////////////////////////////////////////////////////////
 constexpr Angle degrees(float angle)
 {
-    return Angle(angle * (priv::pi / 180.f));
+    return Angle(angle * (pi / 180.f));
 }
 
 
@@ -219,7 +216,7 @@ constexpr float operator/(Angle left, Angle right)
 constexpr Angle operator%(Angle left, Angle right)
 {
     assert(right.asRadians() != 0.f && "Angle::operator% cannot modulus by 0");
-    return radians(priv::positiveRemainder(left.asRadians(), right.asRadians()));
+    return radians(positiveRemainder(left.asRadians(), right.asRadians()));
 }
 
 
@@ -269,6 +266,10 @@ constexpr Angle operator""_rad(unsigned long long angle)
 
 // Note: the 'inline' keyword here is technically not required, but VS2019 fails
 // to compile with a bogus "multiple definition" error if not explicitly used.
+#ifdef _MSC_VER
 inline constexpr Angle Angle::Zero;
+#else
+constexpr Angle Angle::Zero;
+#endif
 
 } // namespace sf

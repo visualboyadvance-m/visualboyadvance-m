@@ -32,7 +32,7 @@
 #include <ctime>
 
 
-namespace sf::priv
+namespace sf
 {
 ////////////////////////////////////////////////////////////
 void sleepImpl(Time time)
@@ -54,4 +54,4 @@ void sleepImpl(Time time)
     }
 }
 
-} // namespace sf::priv
+} // namespace sf
