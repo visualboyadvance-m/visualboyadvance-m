@@ -119,24 +119,47 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
     // audio codec context
     aenc = avcodec_alloc_context3(acodec);
     if (!aenc) return MRET_ERR_BUFSIZE;
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(61, 13, 100)
     aenc->sample_fmt = acodec->sample_fmts ? acodec->sample_fmts[0] : AV_SAMPLE_FMT_FLTP;
+#else
+    const enum AVSampleFormat *sample_fmts = NULL;
+    if (acodec) {
+        avcodec_get_supported_config (aenc, acodec, AV_CODEC_CONFIG_SAMPLE_FORMAT, 0,
+                                      (const void **)&sample_fmts, NULL);
+        aenc->sample_fmt = sample_fmts ? sample_fmts[0] : AV_SAMPLE_FMT_FLTP;
+    }
+#endif
     aenc->bit_rate = 128000; // mp3
     aenc->sample_rate = sampleRate;
     // this might be useful to check if the codec suports the
     // sample rate, but it is not strictly needed for now
     bool isSupported = false;
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(61, 13, 100)
     if (acodec->supported_samplerates)
     {
         for (int i = 0; acodec->supported_samplerates[i]; ++i)
         {
             if (acodec->supported_samplerates[i] == sampleRate)
+#else
+    const int *supported_samplerates = NULL;
+    if (acodec) {
+        avcodec_get_supported_config(aenc, acodec, AV_CODEC_CONFIG_SAMPLE_RATE, 0,
+                                     (const void **) &supported_samplerates, NULL);
+        for (int i = 0; supported_samplerates[i]; ++i)
+        {
+            if (supported_samplerates[i] == sampleRate)
+#endif
             {
                 isSupported = true;
                 break;
             }
         }
     }
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(61, 13, 100)
     if (!isSupported && acodec->supported_samplerates) return MRET_ERR_NOCODEC;
+#else
+    if (!isSupported && supported_samplerates) return MRET_ERR_NOCODEC;
+#endif
 #if LIBAVCODEC_VERSION_MAJOR >= 60
     av_channel_layout_from_mask(&(aenc->ch_layout), AV_CH_LAYOUT_STEREO);
 #else
@@ -461,7 +484,9 @@ void recording::MediaRecorder::Stop(bool initSuccess)
     if (enc)
     {
         avcodec_free_context(&enc);
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(61, 13, 100)
         avcodec_close(enc);
+#endif
         enc = NULL;
     }
     if (vcodec)
@@ -510,7 +535,9 @@ void recording::MediaRecorder::Stop(bool initSuccess)
     if (aenc)
     {
         avcodec_free_context(&aenc);
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(61, 13, 100)
         avcodec_close(aenc);
+#endif
         aenc = NULL;
     }
     samplesCount = 0;
