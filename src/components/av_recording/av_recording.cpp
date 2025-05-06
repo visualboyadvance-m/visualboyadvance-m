@@ -143,19 +143,20 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
     aenc->channel_layout = AV_CH_LAYOUT_STEREO;
     aenc->channels = 2;
 #endif
-    aenc->time_base = { 1, aenc->sample_rate };
-    ast->time_base  = { 1, STREAM_FRAME_RATE };
-    // open and use codec on stream
+    aenc->time_base = (AVRational){1, aenc->sample_rate};
+    ast->time_base  = (AVRational){1, STREAM_FRAME_RATE};
+
+    // Open and use codec on stream
     int nb_samples;
     if (avcodec_open2(aenc, acodec, NULL) < 0)
         return MRET_ERR_NOCODEC;
     if (avcodec_parameters_from_context(ast->codecpar, aenc) < 0)
         return MRET_ERR_BUFSIZE;
-    // number of samples per frame
+
+    // Calculate number of samples per frame based on sample rate
     if (aenc->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE)
     {
-        //nb_samples = 10000; // can be any value, but we use our aud buffer size
-        nb_samples = 1470;
+        nb_samples = (int)(aenc->sample_rate / STREAM_FRAME_RATE);
     }
     else
         nb_samples = aenc->frame_size;
