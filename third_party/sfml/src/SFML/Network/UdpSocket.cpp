@@ -114,9 +114,6 @@ Socket::Status UdpSocket::send(const void* data, std::size_t size, IpAddress rem
 
     // Build the target address
     sockaddr_in address = SocketImpl::createAddress(remoteAddress.toInteger(), remotePort);
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
     // Send the data (unlike TCP, all the data is always sent in one call)
     const int sent = static_cast<int>(
         sendto(getNativeHandle(),
@@ -125,7 +122,6 @@ Socket::Status UdpSocket::send(const void* data, std::size_t size, IpAddress rem
                0,
                reinterpret_cast<sockaddr*>(&address),
                sizeof(address)));
-#pragma GCC diagnostic pop
 
     // Check for errors
     if (sent < 0)
@@ -157,8 +153,6 @@ Socket::Status UdpSocket::receive(void*                     data,
     // Data that will be filled with the other computer's address
     sockaddr_in address = SocketImpl::createAddress(INADDR_ANY, 0);
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
     // Receive a chunk of bytes
     SocketImpl::AddrLength addressSize  = sizeof(address);
     const int                    sizeReceived = static_cast<int>(
@@ -168,7 +162,6 @@ Socket::Status UdpSocket::receive(void*                     data,
                  0,
                  reinterpret_cast<sockaddr*>(&address),
                  &addressSize));
-#pragma GCC diagnostic pop
 
     // Check for errors
     if (sizeReceived < 0)

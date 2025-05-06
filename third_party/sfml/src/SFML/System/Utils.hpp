@@ -47,14 +47,14 @@ namespace sf
 template <typename IntegerType>
 [[nodiscard]] constexpr IntegerType toInteger(std::array<unsigned char,8> bytes)
 {
-    return ((IntegerType)(bytes[0] <<  0)+
-            (IntegerType)(bytes[1] <<  8)+
-            (IntegerType)(bytes[2] << 16)+
-            (IntegerType)(bytes[3] << 24)+
-            (IntegerType)(bytes[4] << 32)+
-            (IntegerType)(bytes[5] << 40)+
-            (IntegerType)(bytes[6] << 48)+
-            (IntegerType)(bytes[7] << 56));
+    return (((IntegerType)bytes[0] <<  0)+
+            ((IntegerType)bytes[1] <<  8)+
+            ((IntegerType)bytes[2] << 16)+
+            ((IntegerType)bytes[3] << 24)+
+            ((IntegerType)bytes[4] << 32)+
+            ((IntegerType)bytes[5] << 40)+
+            ((IntegerType)bytes[6] << 48)+
+            ((IntegerType)bytes[7] << 56));
 }
 
 [[nodiscard]] SFML_SYSTEM_API std::FILE* openFile(const ghc::filesystem::path& filename, std::string mode);

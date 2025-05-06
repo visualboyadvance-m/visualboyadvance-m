@@ -65,9 +65,10 @@ nonstd::optional<IpAddress> IpAddress::resolve(std::string address)
         return Any;
 
     // Try to convert the address as a byte representation ("xxx.xxx.xxx.xxx")
-    const std::uint32_t ip = inet_addr(address.data()); 
-    if (ip != INADDR_NONE)
-        return IpAddress(ntohl(ip));
+    std::uint32_t ipaddr = 0;
+    inet_pton(AF_INET, address.data(), &ipaddr);
+    if (ipaddr != INADDR_NONE)
+        return IpAddress(ntohl(ipaddr));
 
     // Not a valid address, try to convert it as a host name
     addrinfo hints{}; // Zero-initialize
@@ -106,10 +107,11 @@ IpAddress::IpAddress(std::uint32_t address) : m_address(address)
 ////////////////////////////////////////////////////////////
 std::string IpAddress::toString() const
 {
+    char address_str[INET_ADDRSTRLEN];
     in_addr address{};
     address.s_addr = htonl(m_address);
-
-    return inet_ntoa(address);
+    inet_ntop(AF_INET, &address, address_str, INET_ADDRSTRLEN);
+    return address_str;
 }
 
 
