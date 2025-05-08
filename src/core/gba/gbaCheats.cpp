@@ -653,7 +653,7 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
             i++;
             if (i < cheatsNumber) {
                 if (extended & 4) {
-                    CPUWriteByte(cheatsList[i - 1].value, cheatsList[i].address);
+                    CPUWriteByte(cheatsList[i - 1].value, (uint8_t)cheatsList[i].address);
                 }
             }
             break;
@@ -661,7 +661,7 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
             i++;
             if (i < cheatsNumber) {
                 if (extended & 4) {
-                    CPUWriteHalfWord(cheatsList[i - 1].value, cheatsList[i].address);
+                    CPUWriteHalfWord(cheatsList[i - 1].value, (uint16_t)cheatsList[i].address);
                 }
             }
             break;
@@ -678,7 +678,7 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
                 if (CPUReadHalfWord(cheatsList[i].address) != cheatsList[i].value) {
                     cheatsList[i].oldValue = CPUReadHalfWord(cheatsList[i].address);
                     cheatsList[i].status |= 1;
-                    CHEAT_PATCH_ROM_16BIT(cheatsList[i].address, cheatsList[i].value);
+                    CHEAT_PATCH_ROM_16BIT(cheatsList[i].address, (uint16_t)cheatsList[i].value);
                 }
             }
             break;
@@ -686,7 +686,7 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
             i++;
             if (i < cheatsNumber) {
                 rompatch2addr[0] = ((cheatsList[i - 1].value & 0x00FFFFFF) << 1) + 0x8000000;
-                rompatch2oldval[0] = CPUReadHalfWord(rompatch2addr[0]);
+                rompatch2oldval[0] = (uint16_t)CPUReadHalfWord(rompatch2addr[0]);
                 rompatch2val[0] = cheatsList[i].rawaddress & 0xFFFF;
             }
             break;
@@ -694,7 +694,7 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
             i++;
             if (i < cheatsNumber) {
                 rompatch2addr[1] = ((cheatsList[i - 1].value & 0x00FFFFFF) << 1) + 0x8000000;
-                rompatch2oldval[1] = CPUReadHalfWord(rompatch2addr[1]);
+                rompatch2oldval[1] = (uint16_t)CPUReadHalfWord(rompatch2addr[1]);
                 rompatch2val[1] = cheatsList[i].rawaddress & 0xFFFF;
             }
             break;
@@ -702,7 +702,7 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
             i++;
             if (i < cheatsNumber) {
                 rompatch2addr[2] = ((cheatsList[i - 1].value & 0x00FFFFFF) << 1) + 0x8000000;
-                rompatch2oldval[2] = CPUReadHalfWord(rompatch2addr[2]);
+                rompatch2oldval[2] = (uint16_t)CPUReadHalfWord(rompatch2addr[2]);
                 rompatch2val[2] = cheatsList[i].rawaddress & 0xFFFF;
             }
             break;
@@ -710,7 +710,7 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
             i++;
             if (i < cheatsNumber) {
                 rompatch2addr[3] = ((cheatsList[i - 1].value & 0x00FFFFFF) << 1) + 0x8000000;
-                rompatch2oldval[3] = CPUReadHalfWord(rompatch2addr[3]);
+                rompatch2oldval[3] = (uint16_t)CPUReadHalfWord(rompatch2addr[3]);
                 rompatch2val[3] = cheatsList[i].rawaddress & 0xFFFF;
             }
             break;
@@ -721,22 +721,22 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
         if (onoff) {
             switch (cheatsList[i].size) {
             case INT_8_BIT_WRITE:
-                CPUWriteByte(cheatsList[i].address, cheatsList[i].value);
+                CPUWriteByte(cheatsList[i].address, (uint8_t)cheatsList[i].value);
                 break;
             case INT_16_BIT_WRITE:
-                CPUWriteHalfWord(cheatsList[i].address, cheatsList[i].value);
+                CPUWriteHalfWord(cheatsList[i].address, (uint16_t)cheatsList[i].value);
                 break;
             case INT_32_BIT_WRITE:
                 CPUWriteMemory(cheatsList[i].address, cheatsList[i].value);
                 break;
             case GSA_8_BIT_GS_WRITE:
                 if (extended & 4) {
-                    CPUWriteByte(cheatsList[i].address, cheatsList[i].value);
+                    CPUWriteByte(cheatsList[i].address, (uint8_t)cheatsList[i].value);
                 }
                 break;
             case GSA_16_BIT_GS_WRITE:
                 if (extended & 4) {
-                    CPUWriteHalfWord(cheatsList[i].address, cheatsList[i].value);
+                    CPUWriteHalfWord(cheatsList[i].address, (uint16_t)cheatsList[i].value);
                 }
                 break;
             case GSA_32_BIT_GS_WRITE:
@@ -745,7 +745,7 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
                 }
                 break;
             case CBA_IF_KEYS_PRESSED: {
-                uint16_t value = cheatsList[i].value;
+                uint16_t value = (uint16_t)cheatsList[i].value;
                 uint32_t addr = cheatsList[i].address;
                 if ((addr & 0xF0) == 0x20) {
                     if ((keys & value) == 0) {
@@ -768,7 +768,7 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
                 break;
             case CBA_SLIDE_CODE: {
                 uint32_t address = cheatsList[i].address;
-                uint16_t value = cheatsList[i].value;
+                uint16_t value = (uint16_t)cheatsList[i].value;
                 i++;
                 if (i < cheatsNumber) {
                     int count = ((cheatsList[i].address - 1) & 0xFFFF);
@@ -788,7 +788,7 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
                 break;
             case CBA_AND:
                 CPUWriteHalfWord(cheatsList[i].address,
-                    CPUReadHalfWord(cheatsList[i].address) & cheatsList[i].value);
+                    CPUReadHalfWord(cheatsList[i].address) & (uint16_t)cheatsList[i].value);
                 break;
             case GSA_8_BIT_IF_TRUE:
                 if (CPUReadByte(cheatsList[i].address) != cheatsList[i].value) {
@@ -861,7 +861,7 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
             case CBA_ADD:
                 if ((cheatsList[i].address & 1) == 0) {
                     CPUWriteHalfWord(cheatsList[i].address,
-                        CPUReadHalfWord(cheatsList[i].address) + cheatsList[i].value);
+                        (uint16_t)(CPUReadHalfWord(cheatsList[i].address) + cheatsList[i].value));
                 } else {
                     CPUWriteMemory(cheatsList[i].address & 0x0FFFFFFE,
                         CPUReadMemory(cheatsList[i].address & 0x0FFFFFFE) + cheatsList[i].value);
@@ -869,7 +869,7 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
                 break;
             case CBA_OR:
                 CPUWriteHalfWord(cheatsList[i].address,
-                    CPUReadHalfWord(cheatsList[i].address) | cheatsList[i].value);
+                    (uint16_t)(CPUReadHalfWord(cheatsList[i].address) | cheatsList[i].value));
                 break;
             case CBA_GT:
                 if (!(CPUReadHalfWord(cheatsList[i].address) > cheatsList[i].value)) {
@@ -1085,15 +1085,15 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
                 break;
             case GSA_16_BIT_WRITE_IOREGS:
                 if ((cheatsList[i].address <= 0x3FF) && (cheatsList[i].address != 0x6) && (cheatsList[i].address != 0x130))
-                    g_ioMem[cheatsList[i].address & 0x3FE] = cheatsList[i].value & 0xFFFF;
+                    g_ioMem[cheatsList[i].address & 0x3FE] = (uint8_t)(cheatsList[i].value & 0xFFFF);
                 break;
             case GSA_32_BIT_WRITE_IOREGS:
                 if (cheatsList[i].address <= 0x3FF) {
                     uint32_t cheat_addr = cheatsList[i].address & 0x3FC;
                     if ((cheat_addr != 6) && (cheat_addr != 0x130))
-                        g_ioMem[cheat_addr] = (cheatsList[i].value & 0xFFFF);
+                        g_ioMem[cheat_addr] = (uint8_t)(cheatsList[i].value & 0xFFFF);
                     if (((cheat_addr + 2) != 0x6) && (cheat_addr + 2) != 0x130)
-                        g_ioMem[cheat_addr + 2] = ((cheatsList[i].value >> 16) & 0xFFFF);
+                        g_ioMem[cheat_addr + 2] = (uint8_t)((cheatsList[i].value >> 16) & 0xFFFF);
                 }
                 break;
             case GSA_8_BIT_IF_TRUE3:
@@ -1263,9 +1263,9 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
                 break;
             case CHEATS_16_BIT_WRITE:
                 if ((cheatsList[i].address >> 24) >= 0x08) {
-                    CHEAT_PATCH_ROM_16BIT(cheatsList[i].address, cheatsList[i].value);
+                    CHEAT_PATCH_ROM_16BIT(cheatsList[i].address, (uint16_t)cheatsList[i].value);
                 } else {
-                    CPUWriteHalfWord(cheatsList[i].address, cheatsList[i].value);
+                    CPUWriteHalfWord(cheatsList[i].address, (uint16_t)cheatsList[i].value);
                 }
                 break;
             case CHEATS_32_BIT_WRITE:
@@ -1345,9 +1345,9 @@ void cheatsDelete(int number, bool restore)
                 break;
             case CHEATS_16_BIT_WRITE:
                 if ((cheatsList[x].address >> 24) >= 0x08) {
-                    CHEAT_PATCH_ROM_16BIT(cheatsList[x].address, cheatsList[x].oldValue);
+                    CHEAT_PATCH_ROM_16BIT(cheatsList[x].address, (uint16_t)cheatsList[x].oldValue);
                 } else {
-                    CPUWriteHalfWord(cheatsList[x].address, cheatsList[x].oldValue);
+                    CPUWriteHalfWord(cheatsList[x].address, (uint16_t)cheatsList[x].oldValue);
                 }
                 break;
             case CHEATS_32_BIT_WRITE:
@@ -1361,7 +1361,7 @@ void cheatsDelete(int number, bool restore)
                 if (cheatsList[x].status & 1) {
                     cheatsList[x].status &= ~1;
                     CHEAT_PATCH_ROM_16BIT(cheatsList[x].address,
-                        cheatsList[x].oldValue);
+                        (uint16_t)cheatsList[x].oldValue);
                 }
                 break;
             case GSA_16_BIT_ROM_PATCH2C:
@@ -1407,7 +1407,7 @@ void cheatsDisable(int i)
             if (cheatsList[i].status & 1) {
                 cheatsList[i].status &= ~1;
                 CHEAT_PATCH_ROM_16BIT(cheatsList[i].address,
-                    cheatsList[i].oldValue);
+                    (uint16_t)cheatsList[i].oldValue);
             }
             break;
         case GSA_16_BIT_ROM_PATCH2C:
@@ -1519,12 +1519,12 @@ void cheatsGSAChangeEncryption(uint16_t value, bool v3)
         deadtable1 = (uint8_t*)(&v3_deadtable1);
         deadtable2 = (uint8_t*)(&v3_deadtable2);
         for (i = 0; i < 4; i++)
-            seeds_v3[i] = seed_gen(((value & 0xFF00) >> 8), (value & 0xFF) + i, deadtable1, deadtable2);
+            seeds_v3[i] = seed_gen((uint8_t)((value & 0xFF00) >> 8), (uint8_t)((value & 0xFF) + i), deadtable1, deadtable2);
     } else {
         deadtable1 = (uint8_t*)(&v1_deadtable1);
         deadtable2 = (uint8_t*)(&v1_deadtable2);
         for (i = 0; i < 4; i++) {
-            seeds_v1[i] = seed_gen(((value & 0xFF00) >> 8), (value & 0xFF) + i, deadtable1, deadtable2);
+            seeds_v1[i] = seed_gen((uint8_t)((value & 0xFF00) >> 8), (uint8_t)((value & 0xFF) + i), deadtable1, deadtable2);
         }
     }
 }
@@ -2130,11 +2130,11 @@ void chatsCBAScramble(uint8_t* array, int count, uint8_t b)
         z = 1;
     if ((*y & (1 << (b & 7))) != 0)
         x0 |= (1 << (count & 7));
-    *x = x0;
+    *x = (uint8_t)x0;
     uint32_t temp = *y & (~(1 << (b & 7)));
     if (z != 0)
         temp |= (1 << (b & 7));
-    *y = temp;
+    *y = (uint8_t)temp;
 }
 
 uint32_t cheatsCBAGetValue(uint8_t* array)
@@ -2265,13 +2265,13 @@ void cheatsCBAUpdateSeedBuffer(uint32_t address, uint8_t* buffer, int count)
 {
     int i;
     for (i = 0; i < count; i++)
-        buffer[i] = i;
+        buffer[i] = (uint8_t)i;
     for (i = 0; (uint32_t)i < address; i++) {
         uint32_t a = cheatsCBACalcIndex(cheatsCBAEncWorker(), count);
         uint32_t b = cheatsCBACalcIndex(cheatsCBAEncWorker(), count);
         uint32_t t = buffer[a];
         buffer[a] = buffer[b];
-        buffer[b] = t;
+        buffer[b] = (uint8_t)t;
     }
 }
 
@@ -2386,13 +2386,13 @@ void cheatsCBADecrypt(uint8_t* decrypt)
 
     uint32_t cs = cheatsCBAGetValue(cheatsCBACurrentSeed);
     for (int i = 0; i <= 4; i++) {
-        array[i] = ((cs >> 8) ^ array[i + 1]) ^ array[i];
+        array[i] = (uint8_t)(((cs >> 8) ^ array[i + 1]) ^ array[i]);
     }
 
-    array[5] = (cs >> 8) ^ array[5];
+    array[5] = (uint8_t)((cs >> 8) ^ array[5]);
 
     for (int j = 5; j >= 0; j--) {
-        array[j] = (cs ^ array[j - 1]) ^ array[j];
+        array[j] = (uint8_t)((cs ^ array[j - 1]) ^ array[j]);
     }
 
     cheatsCBAArrayToValue(array, decrypt);
@@ -2531,7 +2531,7 @@ void cheatsAddCBACode(const char* code, const char* desc)
         case 0x05:
             cheatsAdd(code, desc, address, address & 0x0FFFFFFE, value, 512,
                 CBA_SUPER);
-            super = getCodeLength(cheatsNumber - 1);
+            super = (uint16_t)getCodeLength(cheatsNumber - 1);
             break;
         case 0x06:
             cheatsAdd(code, desc, address, address & 0x0FFFFFFE, value, 512,

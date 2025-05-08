@@ -1105,23 +1105,23 @@ public:
                 addr++;
             }
         } else {
-            wxString s;
+            wxString _s;
 
             switch (size) {
             case BITS_8:
-                s.Printf(wxT(":%02X"), val);
+                _s.Printf(wxT(":%02X"), val);
                 break;
 
             case BITS_16:
-                s.Printf(wxT(":%04X"), val);
+                _s.Printf(wxT(":%04X"), val);
                 break;
 
             case BITS_32:
-                s.Printf(wxT(":%08X"), val);
+                _s.Printf(wxT(":%08X"), val);
                 break;
             }
 
-            addr_s.append(s);
+            addr_s.append(_s);
             cheatsAddCheatCode(addr_s.utf8_str(), ca_desc.utf8_str());
         }
     }
@@ -1145,12 +1145,12 @@ public:
         }
     }
 
-    uint32_t GetValue(wxString& s, int fmt)
+    uint32_t GetValue(wxString& s, int _fmt)
     {
         long val;
         // FIXME: probably ought to throw an error if ToLong
         // returns false or val is out of range
-        s.ToLong(&val, fmt == CFVFMT_UH ? 16 : 10);
+        s.ToLong(&val, _fmt == CFVFMT_UH ? 16 : 10);
 
         if (size != BITS_32)
             val &= size == BITS_8 ? 0xff : 0xffff;
@@ -1158,9 +1158,9 @@ public:
         return val;
     }
 
-    uint32_t GetValue(int fmt)
+    uint32_t GetValue(int _fmt)
     {
-        return GetValue(val_s, fmt);
+        return GetValue(val_s, _fmt);
     }
 
     uint32_t GetValue()
@@ -1168,9 +1168,9 @@ public:
         return GetValue(fmt);
     }
 
-    int32_t SignedValue(wxString& s, int fmt)
+    int32_t SignedValue(wxString& s, int _fmt)
     {
-        int32_t val = GetValue(s, fmt);
+        int32_t val = GetValue(s, _fmt);
 
         if (fmt == CFVFMT_SD) {
             if (size == BITS_8)
@@ -1182,9 +1182,9 @@ public:
         return val;
     }
 
-    int32_t SignedValue(int fmt)
+    int32_t SignedValue(int _fmt)
     {
-        return SignedValue(val_s, fmt);
+        return SignedValue(val_s, _fmt);
     }
 
     int32_t SignedValue()

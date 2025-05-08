@@ -58,7 +58,7 @@ void drawText(uint8_t* screen, int pitch, int x, int y,
             char c = *string++;
             uint8_t* scr = screen;
 
-            uint16_t mask = ~RGB_LOW_BITS_MASK;
+            uint16_t mask = (uint16_t)(~RGB_LOW_BITS_MASK);
             int h, w;
             uint16_t* s = (uint16_t*)scr;
             for (h = 0; h < 8; h++) {

@@ -671,15 +671,15 @@ uint8_t mapperMBC7ReadRAM(uint16_t address)
         return systemGetSensorX() & 255;
     case 0xa030:
         // sensor X high byte
-        return systemGetSensorX() >> 8;
+        return (uint8_t)(systemGetSensorX() >> 8);
     case 0xa040:
         // sensor Y low byte
         return systemGetSensorY() & 255;
     case 0xa050:
         // sensor Y high byte
-        return systemGetSensorY() >> 8;
+        return (uint8_t)(systemGetSensorY() >> 8);
     case 0xa080:
-        return gbDataMBC7.value;
+        return (uint8_t)gbDataMBC7.value;
     }
 
     return 0xff;
@@ -698,7 +698,7 @@ void mapperMBC7RAM(uint16_t address, uint8_t value)
         if (!oldCs && gbDataMBC7.cs) {
             if (gbDataMBC7.state == 5) {
                 if (gbDataMBC7.writeEnable) {
-                    gbRam[gbDataMBC7.address * 2] = gbDataMBC7.buffer >> 8;
+                    gbRam[gbDataMBC7.address * 2] = (uint8_t)(gbDataMBC7.buffer >> 8);
                     gbRam[gbDataMBC7.address * 2 + 1] = gbDataMBC7.buffer & 0xff;
                     systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
                 }
@@ -766,7 +766,7 @@ void mapperMBC7RAM(uint16_t address, uint8_t value)
                             } else if ((gbDataMBC7.address >> 6) == 1) {
                                 if (gbDataMBC7.writeEnable) {
                                     for (int i = 0; i < 256; i++) {
-                                        gbRam[i * 2] = gbDataMBC7.buffer >> 8;
+                                        gbRam[i * 2] = (uint8_t)(gbDataMBC7.buffer >> 8);
                                         gbRam[i * 2 + 1] = gbDataMBC7.buffer & 0xff;
                                         systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
                                     }
@@ -1330,17 +1330,17 @@ void mapperTAMA5RAM(uint16_t address, uint8_t value)
                         gbDataTAMA5.mapperLYears = gbDataTAMA5.mapperYears;
                         gbDataTAMA5.mapperLControl = gbDataTAMA5.mapperControl;
 
-                        uint8_t seconds = (gbDataTAMA5.mapperLSeconds / 10) * 16 + gbDataTAMA5.mapperLSeconds % 10;
+                        uint8_t seconds = (uint8_t)((gbDataTAMA5.mapperLSeconds / 10) * 16 + gbDataTAMA5.mapperLSeconds % 10);
                         uint8_t secondsL = (gbDataTAMA5.mapperLSeconds % 10);
-                        uint8_t secondsH = (gbDataTAMA5.mapperLSeconds / 10);
-                        uint8_t minutes = (gbDataTAMA5.mapperLMinutes / 10) * 16 + gbDataTAMA5.mapperLMinutes % 10;
-                        uint8_t hours = (gbDataTAMA5.mapperLHours / 10) * 16 + gbDataTAMA5.mapperLHours % 10;
+                        uint8_t secondsH = (uint8_t)(gbDataTAMA5.mapperLSeconds / 10);
+                        uint8_t minutes = (uint8_t)((gbDataTAMA5.mapperLMinutes / 10) * 16 + gbDataTAMA5.mapperLMinutes % 10);
+                        uint8_t hours = (uint8_t)((gbDataTAMA5.mapperLHours / 10) * 16 + gbDataTAMA5.mapperLHours % 10);
                         uint8_t DaysL = gbDataTAMA5.mapperLDays % 10;
-                        uint8_t DaysH = gbDataTAMA5.mapperLDays / 10;
+                        uint8_t DaysH = (uint8_t)(gbDataTAMA5.mapperLDays / 10);
                         uint8_t MonthsL = gbDataTAMA5.mapperLMonths % 10;
-                        uint8_t MonthsH = gbDataTAMA5.mapperLMonths / 10;
+                        uint8_t MonthsH = (uint8_t)(gbDataTAMA5.mapperLMonths / 10);
                         uint8_t Years3 = (gbDataTAMA5.mapperLYears / 100) % 10;
-                        uint8_t Years4 = (gbDataTAMA5.mapperLYears / 1000);
+                        uint8_t Years4 = (uint8_t)(gbDataTAMA5.mapperLYears / 1000);
 
                         switch (data & 0x0f) {
                         // I guess cases 0 and 1 are used for secondsL and secondsH
@@ -1392,14 +1392,15 @@ void mapperTAMA5RAM(uint16_t address, uint8_t value)
                     } else if (gbDataTAMA5.mapperRamByteSelect == 0x54) {
                         gbDataTAMA5.mapperHours = (data / 16) * 10 + data % 16;
                     } else {
-                        gbTAMA5ram[gbDataTAMA5.mapperRamByteSelect] = data;
+                        gbTAMA5ram[gbDataTAMA5.mapperRamByteSelect] = (uint8_t)data;
                     }
                 }
             }
         } break;
         case 1: // 'Commands' Register
         {
-            gbMemoryMap[0xa][1] = gbDataTAMA5.mapperCommandNumber = value;
+            gbDataTAMA5.mapperCommandNumber = value;
+            gbMemoryMap[0xa][1] = value;
 
             // This should be only a 'is the flashrom ready ?' command.
             // However as I couldn't find any 'copy' command
@@ -1414,7 +1415,8 @@ void mapperTAMA5RAM(uint16_t address, uint8_t value)
                 /*for (int k = 0; k<0x100; k++)
             gbMemoryMap[0xe][k] = gbTAMA5ram[k];*/
 
-                gbMemoryMap[0xa][0] = gbDataTAMA5.mapperRAMEnable = 1;
+                gbDataTAMA5.mapperRAMEnable = 1;
+                gbMemoryMap[0xa][0] = 1;
             } else {
                 if ((value & 0x0e) == 0x0c) {
                     gbDataTAMA5.mapperRamByteSelect = gbDataTAMA5.mapperCommands[6] | (gbDataTAMA5.mapperCommands[7] << 4);

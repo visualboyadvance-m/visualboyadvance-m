@@ -200,7 +200,7 @@ blargg_err_t Zlib_Inflater::read( void* out, int* count_io )
 					return blargg_err_file_corrupt;
 				}
 
-				RETURN_ERR( fill_buf( buf.size() ) );
+				RETURN_ERR( fill_buf( (int)buf.size() ) );
 				if ( !zbuf.avail_in )
 					return blargg_err_file_corrupt; // stream didn't end but there's no more data
 			}
@@ -248,7 +248,7 @@ blargg_err_t Zlib_Inflater::read( void* out, int* count_io )
 				if ( !remain )
 					break;
 
-				RETURN_ERR( fill_buf( buf.size() - zbuf.total_out % block_size ) );
+				RETURN_ERR( fill_buf( (int)(buf.size() - zbuf.total_out % block_size) ) );
 			}
 		}
 	}

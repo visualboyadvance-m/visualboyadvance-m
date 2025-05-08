@@ -2420,7 +2420,6 @@ void SDLDrawingPanel::DrawingPanelInit()
         renderer = SDL_CreateRenderer(sdlwindow, NULL);
         log("SDL renderer: default");
     } else {
-        wxString renderer_name = OPTION(kSDLRenderer);
         renderer = SDL_CreateRenderer(sdlwindow, renderer_name.mb_str());
         log("SDL renderer: %s", (const char *)renderer_name.mb_str());
 

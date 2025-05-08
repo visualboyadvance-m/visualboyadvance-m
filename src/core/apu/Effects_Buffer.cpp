@@ -103,7 +103,7 @@ blargg_err_t Effects_Buffer::set_channel_count( int count, int const* types )
 	for ( auto& buf : bufs )
 		RETURN_ERR( buf.set_sample_rate( sample_rate(), length() ) );
 
-	for ( int i = chans.size(); --i >= 0; )
+	for ( int i = (int)chans.size(); --i >= 0; )
 	{
 		chan_t& ch = chans [i];
 		ch.cfg.vol      = 1.0f;
@@ -266,7 +266,7 @@ void Effects_Buffer::apply_config()
 	}
 
 	// convert volumes
-	for ( i = chans.size(); --i >= 0; )
+	for ( i = (int)chans.size(); --i >= 0; )
 	{
 		chan_t& ch = chans [i];
 		ch.vol [0] = TO_FIXED( ch.cfg.vol - ch.cfg.vol * ch.cfg.pan );
@@ -278,7 +278,7 @@ void Effects_Buffer::apply_config()
 	assign_buffers();
 
 	// set side channels
-	for ( i = chans.size(); --i >= 0; )
+	for ( i = (int)chans.size(); --i >= 0; )
 	{
 		chan_t& ch = chans [i];
 		ch.channel.left  = chans [ch.cfg.echo*2  ].channel.center;
@@ -290,7 +290,7 @@ void Effects_Buffer::apply_config()
 	// determine whether effects and echo are needed at all
 	no_effects = true;
 	no_echo    = true;
-	for ( i = chans.size(); --i >= extra_chans; )
+	for ( i = (int)chans.size(); --i >= extra_chans; )
 	{
 		chan_t& ch = chans [i];
 		if ( ch.cfg.echo && s.feedback )
@@ -313,7 +313,7 @@ void Effects_Buffer::apply_config()
 
 	if ( no_effects )
 	{
-		for ( i = chans.size(); --i >= 0; )
+		for ( i = (int)chans.size(); --i >= 0; )
 		{
 			chan_t& ch = chans [i];
 			ch.channel.center = &bufs [2];
@@ -343,8 +343,8 @@ void Effects_Buffer::assign_buffers()
 		int x = i;
 		if ( i > 1 )
 			x += 2;
-		if ( x >= (int) chans.size() )
-			x -= (chans.size() - 2);
+		if ( x >= (int)chans.size() )
+			x -= (int)(chans.size() - 2);
 		chan_t& ch = chans [x];
 
 		int b = 0;
@@ -488,7 +488,7 @@ void Effects_Buffer::mix_effects( blip_sample_t* out_, int pair_count )
 		// mix any modified buffers
 		{
 			buf_t* buf = bufs.data();
-			int bufs_remain = bufs.size();
+			int bufs_remain = (int)bufs.size();
 			do
 			{
 				if ( buf->non_silent() && ( buf->echo == !!echo_phase ) )
@@ -513,11 +513,11 @@ void Effects_Buffer::mix_effects( blip_sample_t* out_, int pair_count )
 						int offset = -count;
 						do
 						{
-							fixed_t s = BLIP_READER_READ( in );
+							fixed_t _s = BLIP_READER_READ( in );
 							BLIP_READER_NEXT_IDX_( in, bass, offset );
 
-							out [offset] [0] += s * vol_0;
-							out [offset] [1] += s * vol_1;
+							out [offset] [0] += _s * vol_0;
+							out [offset] [1] += _s * vol_1;
 						}
 						while ( ++offset );
 

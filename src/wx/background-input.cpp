@@ -16,7 +16,10 @@
 
 #include <unordered_map>
 
+#undef  NO_ERROR
 #define NO_ERROR  (wxThread::ExitCode)0
+
+#undef  ANY_ERROR
 #define ANY_ERROR (wxThread::ExitCode)1
 
 #if defined(__WXMSW__)

@@ -146,10 +146,10 @@ blargg_err_t Zip_Extractor::open_v()
 	file_pos -= file_pos % disk_block_size;
 	RETURN_ERR( catalog.resize( arc().size() - file_pos ) );
 	RETURN_ERR( arc().seek( file_pos ) );
-	RETURN_ERR( arc().read( catalog.begin(), catalog.size() ) );
+	RETURN_ERR( arc().read( catalog.begin(), (int)catalog.size() ) );
 
 	// Find end-of-catalog entry
-	int end_pos = catalog.size() - end_entry_size;
+	int end_pos = (int)(catalog.size() - end_entry_size);
 	while ( end_pos >= 0 && memcmp( &catalog [end_pos], "PK\5\6", 4 ) )
 		end_pos--;
 	if ( end_pos < 0 )
@@ -177,7 +177,7 @@ blargg_err_t Zip_Extractor::open_v()
 	{
 		// Catalog begins before bytes read, so it needs to be read
 		RETURN_ERR( arc().seek( catalog_begin ) );
-		RETURN_ERR( arc().read( catalog.begin(), catalog.size() ) );
+		RETURN_ERR( arc().read( catalog.begin(), (int)catalog.size() ) );
 	}
 
 	// First entry in catalog should be a file or end of archive

@@ -10,10 +10,10 @@ GBASockClient::GBASockClient(sf::IpAddress _server_addr)
 {
     server_addr = _server_addr;
 
-    client.connect(server_addr, 0xd6ba);
+    (void)client.connect(server_addr, 0xd6ba);
     client.setBlocking(false);
 
-    clock_client.connect(server_addr, 0xc10c);
+    (void)clock_client.connect(server_addr, 0xc10c);
     clock_client.setBlocking(false);
 
     clock_sync = 0;
@@ -33,7 +33,7 @@ void GBASockClient::Send(std::vector<char> data)
     char* plain_data = new char[data.size()];
     std::copy(data.begin(), data.end(), plain_data);
 
-    client.send(plain_data, data.size());
+    (void)client.send(plain_data, data.size());
 
     delete[] plain_data;
 }
@@ -49,7 +49,7 @@ char GBASockClient::ReceiveCmd(char* data_in, bool block)
     if (block || clock_sync == 0) {
         sf::SocketSelector Selector;
         Selector.add(client);
-        Selector.wait(sf::seconds(6));
+        (void)Selector.wait(sf::seconds(6));
     }
     if (client.receive(data_in, 5, num_received) == sf::Socket::Status::Disconnected) {
         Disconnect();

@@ -335,7 +335,7 @@ bool gbAddGgCheat(const char* code, const char* desc)
         compare = (compare >> 2) | ((compare << 6) & 0xc0);
         compare ^= 0x45;
 
-        gbCheatList[i].compare = compare;
+        gbCheatList[i].compare = (uint8_t)compare;
         //gbCheatList[i].code = 0;
         gbCheatList[i].code = 0x100; // fix for compare value
     }
@@ -488,7 +488,7 @@ void gbCheatWrite(bool reboot)
                         int oldbank = gbMemory[0xff70];
                         gbWriteMemory(0xff70, gbCheatList[i].code & 0xf);
                         gbWriteMemory(address, gbCheatList[i].value);
-                        gbWriteMemory(0xff70, oldbank);
+                        gbWriteMemory(0xff70, (uint8_t)oldbank);
                         gbNextCheat = i + 1;
                         return;
                     }

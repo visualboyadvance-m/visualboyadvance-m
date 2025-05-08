@@ -8,12 +8,12 @@ This code is based on PPMd var.H (2001): Dmitry Shkarin : Public domain */
 
 Bool Ppmd7z_RangeDec_Init(CPpmd7z_RangeDec* p)
 {
-    unsigned i;
+    unsigned _i;
     p->Code = 0;
     p->Range = 0xFFFFFFFF;
     if (p->Stream->Read((void*)p->Stream) != 0)
         return False;
-    for (i = 0; i < 4; i++)
+    for (_i = 0; _i < 4; _i++)
         p->Code = (p->Code << 8) | p->Stream->Read((void*)p->Stream);
     return (p->Code < 0xFFFFFFFF);
 }
@@ -75,7 +75,7 @@ int Ppmd7_DecodeSymbol(CPpmd7* p, IPpmd7_RangeDec* rc)
     size_t charMask[256 / sizeof(size_t)];
     if (p->MinContext->NumStats != 1) {
         CPpmd_State* s = Ppmd7_GetStats(p, p->MinContext);
-        unsigned i;
+        unsigned _i;
         UInt32 count, hiCnt;
         if ((count = rc->GetThreshold(rc, p->MinContext->SummFreq)) < (hiCnt = s->Freq)) {
             Byte symbol;
@@ -86,7 +86,7 @@ int Ppmd7_DecodeSymbol(CPpmd7* p, IPpmd7_RangeDec* rc)
             return symbol;
         }
         p->PrevSuccess = 0;
-        i = p->MinContext->NumStats - 1;
+        _i = p->MinContext->NumStats - 1;
         do {
             if ((hiCnt += (++s)->Freq) > count) {
                 Byte symbol;
@@ -96,17 +96,17 @@ int Ppmd7_DecodeSymbol(CPpmd7* p, IPpmd7_RangeDec* rc)
                 Ppmd7_Update1(p);
                 return symbol;
             }
-        } while (--i);
+        } while (--_i);
         if (count >= p->MinContext->SummFreq)
             return -2;
         p->HiBitsFlag = p->HB2Flag[p->FoundState->Symbol];
         rc->Decode(rc, hiCnt, p->MinContext->SummFreq - hiCnt);
         PPMD_SetAllBitsIn256Bytes(charMask);
         MASK(s->Symbol) = 0;
-        i = p->MinContext->NumStats - 1;
+        _i = p->MinContext->NumStats - 1;
         do {
             MASK((--s)->Symbol) = 0;
-        } while (--i);
+        } while (--_i);
     } else {
         UInt16* prob = Ppmd7_GetBinSumm(p);
         if (rc->DecodeBit(rc, *prob) == 0) {
@@ -126,7 +126,7 @@ int Ppmd7_DecodeSymbol(CPpmd7* p, IPpmd7_RangeDec* rc)
         CPpmd_State *ps[256], *s;
         UInt32 freqSum, count, hiCnt;
         CPpmd_See* see;
-        unsigned i, num, numMasked = p->MinContext->NumStats;
+        unsigned _i, num, numMasked = p->MinContext->NumStats;
         do {
             p->OrderFall++;
             if (!p->MinContext->Suffix)
@@ -135,14 +135,14 @@ int Ppmd7_DecodeSymbol(CPpmd7* p, IPpmd7_RangeDec* rc)
         } while (p->MinContext->NumStats == numMasked);
         hiCnt = 0;
         s = Ppmd7_GetStats(p, p->MinContext);
-        i = 0;
+        _i = 0;
         num = p->MinContext->NumStats - numMasked;
         do {
             int k = (int)(MASK(s->Symbol));
             hiCnt += (s->Freq & k);
-            ps[i] = s++;
-            i -= k;
-        } while (i != num);
+            ps[_i] = s++;
+            _i -= k;
+        } while (_i != num);
 
         see = Ppmd7_MakeEscFreq(p, numMasked, &freqSum);
         freqSum += hiCnt;
@@ -166,7 +166,7 @@ int Ppmd7_DecodeSymbol(CPpmd7* p, IPpmd7_RangeDec* rc)
         rc->Decode(rc, hiCnt, freqSum - hiCnt);
         see->Summ = (UInt16)(see->Summ + freqSum);
         do {
-            MASK(ps[--i]->Symbol) = 0;
-        } while (i != 0);
+            MASK(ps[--_i]->Symbol) = 0;
+        } while (_i != 0);
     }
 }

@@ -128,10 +128,10 @@ uint8_t flashRead(uint32_t address)
         switch (address & 0xFF) {
         case 0:
             // manufacturer ID
-            return flashManufacturerID;
+            return (uint8_t)flashManufacturerID;
         case 1:
             // device ID
-            return flashDeviceID;
+            return (uint8_t)flashDeviceID;
         }
         break;
     case FLASH_ERASE_COMPLETE:

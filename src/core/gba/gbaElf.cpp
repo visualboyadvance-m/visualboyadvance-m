@@ -499,8 +499,8 @@ void elfExecuteCFAInstructions(ELFFrameState* state, uint8_t* data, uint32_t len
     uint32_t pc)
 {
     uint8_t* end = data + len;
-    int bytes;
-    int reg;
+    int _bytes;
+    int _reg;
     ELFFrameStateRegisters* fs;
 
     while (data < end && state->pc < pc) {
@@ -511,10 +511,10 @@ void elfExecuteCFAInstructions(ELFFrameState* state, uint8_t* data, uint32_t len
             state->pc += (op & 0x3f) * state->codeAlign;
             break;
         case DW_CFA_offset:
-            reg = op & 0x3f;
-            state->registers.regs[reg].mode = REG_OFFSET;
-            state->registers.regs[reg].offset = state->dataAlign * (int32_t)elfReadLEB128(data, &bytes);
-            data += bytes;
+            _reg = op & 0x3f;
+            state->registers.regs[_reg].mode = REG_OFFSET;
+            state->registers.regs[_reg].offset = state->dataAlign * (int32_t)elfReadLEB128(data, &_bytes);
+            data += _bytes;
             break;
         case DW_CFA_restore:
             // we don't care much about the other possible settings,
@@ -537,25 +537,25 @@ void elfExecuteCFAInstructions(ELFFrameState* state, uint8_t* data, uint32_t len
                 data += 4;
                 break;
             case DW_CFA_offset_extended:
-                reg = elfReadLEB128(data, &bytes);
-                data += bytes;
-                state->registers.regs[reg].mode = REG_OFFSET;
-                state->registers.regs[reg].offset = state->dataAlign * (int32_t)elfReadLEB128(data, &bytes);
-                data += bytes;
+                _reg = elfReadLEB128(data, &_bytes);
+                data += _bytes;
+                state->registers.regs[_reg].mode = REG_OFFSET;
+                state->registers.regs[_reg].offset = state->dataAlign * (int32_t)elfReadLEB128(data, &_bytes);
+                data += _bytes;
                 break;
             case DW_CFA_restore_extended:
             case DW_CFA_undefined:
             case DW_CFA_same_value:
-                reg = elfReadLEB128(data, &bytes);
-                data += bytes;
-                state->registers.regs[reg].mode = REG_NOT_SET;
+                _reg = elfReadLEB128(data, &_bytes);
+                data += _bytes;
+                state->registers.regs[_reg].mode = REG_NOT_SET;
                 break;
             case DW_CFA_register:
-                reg = elfReadLEB128(data, &bytes);
-                data += bytes;
-                state->registers.regs[reg].mode = REG_REGISTER;
-                state->registers.regs[reg].reg = elfReadLEB128(data, &bytes);
-                data += bytes;
+                _reg = elfReadLEB128(data, &_bytes);
+                data += _bytes;
+                state->registers.regs[_reg].mode = REG_REGISTER;
+                state->registers.regs[_reg].reg = elfReadLEB128(data, &_bytes);
+                data += _bytes;
                 break;
             case DW_CFA_remember_state:
                 fs = (ELFFrameStateRegisters*)calloc(1,
@@ -573,20 +573,20 @@ void elfExecuteCFAInstructions(ELFFrameState* state, uint8_t* data, uint32_t len
                 free(fs);
                 break;
             case DW_CFA_def_cfa:
-                state->cfaRegister = elfReadLEB128(data, &bytes);
-                data += bytes;
-                state->cfaOffset = (int32_t)elfReadLEB128(data, &bytes);
-                data += bytes;
+                state->cfaRegister = elfReadLEB128(data, &_bytes);
+                data += _bytes;
+                state->cfaOffset = (int32_t)elfReadLEB128(data, &_bytes);
+                data += _bytes;
                 state->cfaMode = CFA_REG_OFFSET;
                 break;
             case DW_CFA_def_cfa_register:
-                state->cfaRegister = elfReadLEB128(data, &bytes);
-                data += bytes;
+                state->cfaRegister = elfReadLEB128(data, &_bytes);
+                data += _bytes;
                 state->cfaMode = CFA_REG_OFFSET;
                 break;
             case DW_CFA_def_cfa_offset:
-                state->cfaOffset = (int32_t)elfReadLEB128(data, &bytes);
-                data += bytes;
+                state->cfaOffset = (int32_t)elfReadLEB128(data, &_bytes);
+                data += _bytes;
                 state->cfaMode = CFA_REG_OFFSET;
                 break;
             default:
@@ -651,7 +651,7 @@ void elfPrintCallChain(uint32_t address)
 
         if (state->cfaMode == CFA_REG_OFFSET) {
             memcpy(&newRegs[0], &regs[0], sizeof(reg_pair) * 15);
-            uint32_t addr = 0;
+            uint32_t _addr = 0;
             for (int i = 0; i < 15; i++) {
                 ELFFrameStateRegister* r = &state->registers.regs[i];
 
@@ -671,9 +671,9 @@ void elfPrintCallChain(uint32_t address)
                 }
             }
             memcpy(regs, newRegs, sizeof(reg_pair) * 15);
-            addr = newRegs[14].I;
-            addr &= 0xfffffffe;
-            address = addr;
+            _addr = newRegs[14].I;
+            _addr &= 0xfffffffe;
+            address = _addr;
             count++;
         } else {
             printf("CFA not set\n");
@@ -724,7 +724,7 @@ uint32_t elfDecodeLocation(Function* f, ELFBlock* o, LocationType* type, uint32_
 
     ELFBlock* loc = o;
     uint32_t location = 0;
-    int bytes = 0;
+    int _bytes = 0;
     if (loc) {
         switch (*loc->data) {
         case DW_OP_addr:
@@ -732,7 +732,7 @@ uint32_t elfDecodeLocation(Function* f, ELFBlock* o, LocationType* type, uint32_
             *type = LOCATION_memory;
             break;
         case DW_OP_plus_uconst:
-            location = base + elfReadLEB128(loc->data + 1, &bytes);
+            location = base + elfReadLEB128(loc->data + 1, &_bytes);
             *type = LOCATION_memory;
             break;
         case DW_OP_reg0:
@@ -1738,14 +1738,14 @@ void elfParseType(uint8_t* data, uint32_t offset, ELFAbbrev* abbrev, CompileUnit
     } break;
     case DW_TAG_array_type: {
         uint32_t typeref = 0;
-        int i;
+        int _i;
         Array* array = (Array*)calloc(sizeof(Array), 1);
         Type* t = (Type*)calloc(sizeof(Type), 1);
         t->type = TYPE_array;
         elfAddType(t, unit, offset);
 
-        for (i = 0; i < abbrev->numAttrs; i++) {
-            ELFAttr* attr = &abbrev->attrs[i];
+        for (_i = 0; _i < abbrev->numAttrs; _i++) {
+            ELFAttr* attr = &abbrev->attrs[_i];
             data = elfReadAttribute(data, attr);
             switch (attr->name) {
             case DW_AT_sibling:
@@ -1801,8 +1801,8 @@ void elfParseType(uint8_t* data, uint32_t offset, ELFAbbrev* abbrev, CompileUnit
             array->maxBounds = index;
         }
         t->size = array->type->size;
-        for (i = 0; i < array->maxBounds; i++)
-            t->size *= array->bounds[i];
+        for (_i = 0; _i < array->maxBounds; _i++)
+            t->size *= array->bounds[_i];
         t->array = array;
         *type = t;
         return;
@@ -1815,12 +1815,12 @@ void elfParseType(uint8_t* data, uint32_t offset, ELFAbbrev* abbrev, CompileUnit
 
 Type* elfParseType(CompileUnit* unit, uint32_t offset)
 {
-    Type* t = unit->types;
+    Type* _t = unit->types;
 
-    while (t) {
-        if (t->offset == offset)
-            return t;
-        t = t->next;
+    while (_t) {
+        if (_t->offset == offset)
+            return _t;
+        _t = _t->next;
     }
     if (offset == 0) {
         Type* t = (Type*)calloc(sizeof(Type), 1);
@@ -2456,7 +2456,7 @@ void elfParseAranges(uint8_t* data)
     int index = 0;
 
     while (data < end) {
-        uint32_t len = elfRead4Bytes(data);
+        uint32_t _len = elfRead4Bytes(data);
         data += 4;
         //    uint16_t version = elfRead2Bytes(data);
         data += 2;
@@ -2466,9 +2466,9 @@ void elfParseAranges(uint8_t* data)
         //    uint8_t segSize = *data++;
         data += 2; // remove if uncommenting above
         data += 4;
-        ranges[index].count = (len - 20) / 8;
+        ranges[index].count = (_len - 20) / 8;
         ranges[index].offset = offset;
-        ranges[index].ranges = (ARange*)calloc(sizeof(ARange), (len - 20) / 8);
+        ranges[index].ranges = (ARange*)calloc(sizeof(ARange), (_len - 20) / 8);
         int i = 0;
         while (true) {
             uint32_t addr = elfRead4Bytes(data);
@@ -2544,7 +2544,7 @@ void elfReadSymtab(uint8_t* data)
 bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& size, bool parseDebug)
 {
     int count = READ16LE(&eh->e_phnum);
-    int i;
+    int _i;
 
     if (READ32LE(&eh->e_entry) == 0x2000000)
         coreOptions.cpuIsMultiBoot = true;
@@ -2552,7 +2552,7 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
     // read program headers... should probably move this code down
     uint8_t* p = data + READ32LE(&eh->e_phoff);
     size = 0;
-    for (i = 0; i < count; i++) {
+    for (_i = 0; _i < count; _i++) {
         ELFProgramHeader* ph = (ELFProgramHeader*)p;
         p += sizeof(ELFProgramHeader);
         if (READ16LE(&eh->e_phentsize) != sizeof(ELFProgramHeader)) {
@@ -2604,8 +2604,8 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
     sh = (ELFSectionHeader**)
         malloc(sizeof(ELFSectionHeader*) * count);
 
-    for (i = 0; i < count; i++) {
-        sh[i] = (ELFSectionHeader*)p;
+    for (_i = 0; _i < count; _i++) {
+        sh[_i] = (ELFSectionHeader*)p;
         p += sizeof(ELFSectionHeader);
         if (READ16LE(&eh->e_shentsize) != sizeof(ELFSectionHeader))
             p += READ16LE(&eh->e_shentsize) - sizeof(ELFSectionHeader);
@@ -2617,24 +2617,24 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
     elfSectionHeadersStringTable = stringTable;
     elfSectionHeadersCount       = count;
 
-    for (i = 0; i < count; i++) {
+    for (_i = 0; _i < count; _i++) {
         //    printf("SH %d %-20s %08x %08x %08x %08x %08x %08x %08x %08x\n",
-        //   i, &stringTable[sh[i]->name], sh[i]->name, sh[i]->type,
-        //   sh[i]->flags, sh[i]->addr, sh[i]->offset, sh[i]->size,
-        //   sh[i]->link, sh[i]->info);
-        if (READ32LE(&sh[i]->flags) & 2) { // load section
+        //   i, &stringTable[sh[_i]->name], sh[_i]->name, sh[_i]->type,
+        //   sh[_i]->flags, sh[_i]->addr, sh[_i]->offset, sh[_i]->size,
+        //   sh[_i]->link, sh[_i]->info);
+        if (READ32LE(&sh[_i]->flags) & 2) { // load section
             if (coreOptions.cpuIsMultiBoot) {
-                if (READ32LE(&sh[i]->addr) >= 0x2000000 && READ32LE(&sh[i]->addr) <= 0x203ffff) {
-                    memcpy(&g_workRAM[READ32LE(&sh[i]->addr) & 0x3ffff], data + READ32LE(&sh[i]->offset),
-                        READ32LE(&sh[i]->size));
-                    size += READ32LE(&sh[i]->size);
+                if (READ32LE(&sh[_i]->addr) >= 0x2000000 && READ32LE(&sh[_i]->addr) <= 0x203ffff) {
+                    memcpy(&g_workRAM[READ32LE(&sh[_i]->addr) & 0x3ffff], data + READ32LE(&sh[_i]->offset),
+                        READ32LE(&sh[_i]->size));
+                    size += READ32LE(&sh[_i]->size);
                 }
             } else {
-                if (READ32LE(&sh[i]->addr) >= 0x8000000 && READ32LE(&sh[i]->addr) <= 0x9ffffff) {
-                    memcpy(&g_rom[READ32LE(&sh[i]->addr) & 0x1ffffff],
-                        data + READ32LE(&sh[i]->offset),
-                        READ32LE(&sh[i]->size));
-                    size += READ32LE(&sh[i]->size);
+                if (READ32LE(&sh[_i]->addr) >= 0x8000000 && READ32LE(&sh[_i]->addr) <= 0x9ffffff) {
+                    memcpy(&g_rom[READ32LE(&sh[_i]->addr) & 0x1ffffff],
+                        data + READ32LE(&sh[_i]->offset),
+                        READ32LE(&sh[_i]->size));
+                    size += READ32LE(&sh[_i]->size);
                 }
             }
         }
@@ -2720,7 +2720,7 @@ bool elfRead(const char* name, int& siz, FILE* f)
     unsigned long size = ftell(f);
     elfFileData = (uint8_t*)malloc(size);
     fseek(f, 0, SEEK_SET);
-    int res = fread(elfFileData, 1, size, f);
+    int res = (int)fread(elfFileData, 1, size, f);
     fclose(f);
 
     if (res < 0) {

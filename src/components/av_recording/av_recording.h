@@ -105,7 +105,7 @@ class MediaRecorder
         const AVCodec *acodec;
         AVStream *ast;
         AVCodecContext *aenc;
-        int samplesCount; // for audio frame pts generation
+        int64_t samplesCount; // for audio frame pts generation
         AVFrame *audioframe;
         AVFrame *audioframeTmp;
         // audio buffer

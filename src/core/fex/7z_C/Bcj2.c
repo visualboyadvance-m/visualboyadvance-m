@@ -71,9 +71,9 @@ int Bcj2_Decode(
     UInt32 range, code;
     Byte prevByte = 0;
 
-    unsigned int i;
-    for (i = 0; i < sizeof(p) / sizeof(p[0]); i++)
-        p[i] = kBitModelTotal >> 1;
+    unsigned int _i;
+    for (_i = 0; _i < sizeof(p) / sizeof(p[0]); _i++)
+        p[_i] = kBitModelTotal >> 1;
 
     buffer = buf3;
     bufferLim = buffer + size3;
@@ -92,12 +92,12 @@ int Bcj2_Decode(
         if (outSize - outPos < limit)
             limit = outSize - outPos;
         while (limit != 0) {
-            Byte b = buf0[inPos];
-            outBuf[outPos++] = b;
-            if (IsJ(prevByte, b))
+            Byte _b = buf0[inPos];
+            outBuf[outPos++] = _b;
+            if (IsJ(prevByte, _b))
                 break;
             inPos++;
-            prevByte = b;
+            prevByte = _b;
             limit--;
         }
 

@@ -52,7 +52,7 @@ extern "C"
 		ISeekInStream* stream = STATIC_CAST(ISeekInStream*,vstream);
 		Zip7_Extractor_Impl* impl = STATIC_CAST(Zip7_Extractor_Impl*,stream);
 		
-		long lsize = *size;
+		long lsize = (long)*size;
 		blargg_err_t err = impl->in->read_avail( out, &lsize );
 		if ( err )
 		{
@@ -80,7 +80,7 @@ extern "C"
 		}
 		
 		// assert( mode == SZ_SEEK_SET );
-		blargg_err_t err = impl->in->seek( *pos );
+		blargg_err_t err = impl->in->seek( (int)*pos );
 		if ( err )
 		{
 			// don't set in_err in this case, since it might be benign
@@ -306,7 +306,7 @@ blargg_err_t Zip7_Extractor::next_v()
 			name8.resize( utf8_length + 1 );
 			memcpy( name8.begin(), temp, utf8_length + 1 );
 			set_name( name8.begin(), name16.begin() );
-			set_info( item.Size, 0, (item.CrcDefined ? item.Crc : 0) );
+			set_info( (int)item.Size, 0, (item.CrcDefined ? item.Crc : 0) );
 			break;
 		}
 	}

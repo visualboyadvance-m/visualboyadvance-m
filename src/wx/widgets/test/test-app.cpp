@@ -4,8 +4,8 @@ namespace widgets {
 
 TestApp::TestApp() : previous_app_(wxApp::GetInstance()) {
     // Initialize the wxWidgets app.
-    int argc = 0;
-    wxApp::Initialize(argc, nullptr);
+    int _argc = 0;
+    wxApp::Initialize(_argc, nullptr);
 
     // Set the wxApp instance to this object.
     wxApp::SetInstance(this);

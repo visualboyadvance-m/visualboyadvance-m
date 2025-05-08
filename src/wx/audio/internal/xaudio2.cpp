@@ -257,8 +257,12 @@ void XAudio2_Output::close() {
 
     if (sVoice) {
         if (playing) {
+#ifdef _DEBUG
             HRESULT hr = sVoice->Stop(0);
             assert(hr == S_OK);
+#else
+            sVoice->Stop(0);
+#endif
         }
 
         sVoice->DestroyVoice();
@@ -498,8 +502,13 @@ void XAudio2_Output::write(uint16_t* finalWave, int) {
     buf.pAudioData = &buffers[currentBuffer * soundBufferLen];
     currentBuffer++;
     currentBuffer %= (bufferCount + 1);             // + 1 because we need one temporary buffer
+
+#ifdef _DEBUG
     HRESULT hr = sVoice->SubmitSourceBuffer(&buf);  // send buffer to queue
     assert(hr == S_OK);
+#else
+    sVoice->SubmitSourceBuffer(&buf);
+#endif
 }
 
 void XAudio2_Output::pause() {
@@ -507,8 +516,13 @@ void XAudio2_Output::pause() {
         return;
 
     if (playing) {
+#ifdef _DEBUG
         HRESULT hr = sVoice->Stop(0);
         assert(hr == S_OK);
+#else
+        sVoice->Stop(0);
+#endif
+
         playing = false;
     }
 }
@@ -518,8 +532,13 @@ void XAudio2_Output::resume() {
         return;
 
     if (!playing) {
+#ifdef _DEBUG
         HRESULT hr = sVoice->Start(0);
         assert(hr == S_OK);
+#else
+        sVoice->Start(0);
+#endif
+
         playing = true;
     }
 }
@@ -529,8 +548,12 @@ void XAudio2_Output::reset() {
         return;
 
     if (playing) {
+#ifdef _DEBUG
         HRESULT hr = sVoice->Stop(0);
         assert(hr == S_OK);
+#else
+        sVoice->Stop(0);
+#endif
     }
 
     sVoice->FlushSourceBuffers();
@@ -545,8 +568,12 @@ void XAudio2_Output::setThrottle(unsigned short throttle_) {
     if (throttle_ == 0)
         throttle_ = 100;
 
+#ifdef _DEBUG
     HRESULT hr = sVoice->SetFrequencyRatio((float)throttle_ / 100.0f);
     assert(hr == S_OK);
+#else
+    sVoice->SetFrequencyRatio((float)throttle_ / 100.0f);
+#endif
 }
 
 void xaudio2_device_changed(XAudio2_Output* instance) {

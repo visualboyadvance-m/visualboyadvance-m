@@ -305,13 +305,13 @@ void SDLAudio::write(uint16_t* finalWave, int length) {
 #ifdef ENABLE_SDL3
     res = (int)SDL_PutAudioStreamData(sound_stream, finalWave, length) == true;
 
-    while (res && SDL_GetAudioStreamQueued(sound_stream) > (2048 * audio.channels * sizeof(uint16_t))) {
+    while (res && ((size_t)SDL_GetAudioStreamQueued(sound_stream) > (size_t)(2048 * audio.channels * sizeof(uint16_t)))) {
         SDL_Delay(1);
     }
 #else
     res = SDL_QueueAudio(sound_device, finalWave, length) == 0;
 
-    while (res && SDL_GetQueuedAudioSize(sound_device) > (audio.samples * audio.channels * sizeof(uint16_t))) {
+    while (res && ((size_t)SDL_GetQueuedAudioSize(sound_device) > (size_t)(audio.samples * audio.channels * sizeof(uint16_t)))) {
         SDL_Delay(1);
     }
 #endif

@@ -57,8 +57,8 @@ extern void CPUUpdateCPSR();
 
 int remotePort = 0;
 int remoteSignal = 5;
-SOCKET remoteSocket = -1;
-SOCKET remoteListenSocket = -1;
+SOCKET remoteSocket = (SOCKET)(-1);
+SOCKET remoteListenSocket = (SOCKET)(-1);
 bool remoteConnected = false;
 bool remoteResumed = false;
 
@@ -167,25 +167,25 @@ void breakReg_check(int i)
             if (brkR->flags != 0) {
                 uint32_t regVal = (i == 15 ? (armState ? reg[15].I - 4 : reg[15].I - 2) : reg[i].I);
                 if ((brkR->flags & 0x1) && (regVal == brkR->intVal)) {
-                    debuggerBreakOnRegisterCondition(i, brkR->intVal, regVal, 1);
+                    debuggerBreakOnRegisterCondition((uint8_t)i, brkR->intVal, regVal, 1);
                     notFound = false;
                 }
                 if ((brkR->flags & 0x8)) {
                     if ((brkR->flags & 0x4) && ((int)regVal < (int)brkR->intVal)) {
-                        debuggerBreakOnRegisterCondition(i, brkR->intVal, regVal, 4);
+                        debuggerBreakOnRegisterCondition((uint8_t)i, brkR->intVal, regVal, 4);
                         notFound = false;
                     }
                     if ((brkR->flags & 0x2) && ((int)regVal > (int)brkR->intVal)) {
-                        debuggerBreakOnRegisterCondition(i, brkR->intVal, regVal, 5);
+                        debuggerBreakOnRegisterCondition((uint8_t)i, brkR->intVal, regVal, 5);
                         notFound = false;
                     }
                 }
                 if ((brkR->flags & 0x4) && (regVal < brkR->intVal)) {
-                    debuggerBreakOnRegisterCondition(i, brkR->intVal, regVal, 2);
+                    debuggerBreakOnRegisterCondition((uint8_t)i, brkR->intVal, regVal, 2);
                     notFound = false;
                 }
                 if ((brkR->flags & 0x2) && (regVal > brkR->intVal)) {
-                    debuggerBreakOnRegisterCondition(i, brkR->intVal, regVal, 3);
+                    debuggerBreakOnRegisterCondition((uint8_t)i, brkR->intVal, regVal, 3);
                     notFound = false;
                 }
             }
@@ -409,7 +409,7 @@ void debuggerDumpLoad(int n, char** args)
             c = fgetc(f);
             if (c == -1)
                 break;
-            debuggerWriteByte(address, c);
+            debuggerWriteByte(address, (uint8_t)c);
             address++;
         }
 
@@ -480,7 +480,7 @@ void debuggerEditByte(int n, char** args)
                     monprintf(monbuf);
                 }
             }
-            debuggerWriteByte(address, (uint16_t)value);
+            debuggerWriteByte(address, (uint8_t)value);
             address++;
         }
     } else
@@ -776,21 +776,21 @@ unsigned int SearchResults;
 unsigned int AddressToGBA(uint8_t* mem)
 {
     if (mem >= &g_bios[0] && mem <= &g_bios[0x3fff])
-        return 0x00000000 + (mem - &g_bios[0]);
+        return (unsigned int)(0x00000000 + (mem - &g_bios[0]));
     else if (mem >= &g_workRAM[0] && mem <= &g_workRAM[0x3ffff])
-        return 0x02000000 + (mem - &g_workRAM[0]);
+        return (unsigned int)(0x02000000 + (mem - &g_workRAM[0]));
     else if (mem >= &g_internalRAM[0] && mem <= &g_internalRAM[0x7fff])
-        return 0x03000000 + (mem - &g_internalRAM[0]);
+        return (unsigned int)(0x03000000 + (mem - &g_internalRAM[0]));
     else if (mem >= &g_ioMem[0] && mem <= &g_ioMem[0x3ff])
-        return 0x04000000 + (mem - &g_ioMem[0]);
+        return (unsigned int)(0x04000000 + (mem - &g_ioMem[0]));
     else if (mem >= &g_paletteRAM[0] && mem <= &g_paletteRAM[0x3ff])
-        return 0x05000000 + (mem - &g_paletteRAM[0]);
+        return (unsigned int)(0x05000000 + (mem - &g_paletteRAM[0]));
     else if (mem >= &g_vram[0] && mem <= &g_vram[0x1ffff])
-        return 0x06000000 + (mem - &g_vram[0]);
+        return (unsigned int)(0x06000000 + (mem - &g_vram[0]));
     else if (mem >= &g_oam[0] && mem <= &g_oam[0x3ff])
-        return 0x07000000 + (mem - &g_oam[0]);
+        return (unsigned int)(0x07000000 + (mem - &g_oam[0]));
     else if (mem >= &g_rom[0] && mem <= &g_rom[0x1ffffff])
-        return 0x08000000 + (mem - &g_rom[0]);
+        return (unsigned int)(0x08000000 + (mem - &g_rom[0]));
     else
         return 0xFFFFFFFF;
 };
@@ -936,10 +936,10 @@ void debuggerFindText(int n, char** args)
         if (n == 4) {
             sscanf(args[2], "%u", &SearchMaxMatches);
             strncpy((char*)SearchData, args[3], 64);
-            SearchLength = strlen(args[3]);
+            SearchLength = (unsigned int)strlen(args[3]);
         } else if (n == 3) {
             strncpy((char*)SearchData, args[2], 64);
-            SearchLength = strlen(args[2]);
+            SearchLength = (unsigned int)strlen(args[2]);
         };
 
         if (SearchLength > 64) {
@@ -972,10 +972,10 @@ void debuggerFindHex(int n, char** args)
         if (n == 4) {
             sscanf(args[2], "%u", &SearchMaxMatches);
             strncpy(SearchHex, args[3], 128);
-            SearchLength = strlen(args[3]);
+            SearchLength = (unsigned int)strlen(args[3]);
         } else if (n == 3) {
             strncpy(SearchHex, args[2], 128);
-            SearchLength = strlen(args[2]);
+            SearchLength = (unsigned int)strlen(args[2]);
         };
 
         if (SearchLength & 1) {
@@ -996,7 +996,7 @@ void debuggerFindHex(int n, char** args)
         for (unsigned int i = 0; i < SearchLength; i++) {
             unsigned int cbuf = 0;
             sscanf(&SearchHex[i << 1], "%02x", &cbuf);
-            SearchData[i] = cbuf;
+            SearchData[i] = (uint8_t)cbuf;
         };
 
         debuggerDoSearch();
@@ -1544,7 +1544,7 @@ void debuggerReadCharTable(int n, char** args)
                 wordSymbol[slot] = (char*)' ';
 
             if (largestSymbol < strlen(character))
-                largestSymbol = strlen(character);
+                largestSymbol = (uint8_t)strlen(character);
 
             character = (char*)malloc(10);
         }
@@ -1567,7 +1567,7 @@ void printCharGroup(uint32_t addr, bool useAscii)
                     snprintf(monbuf, sizeof(monbuf), "%s", c);
                     monprintf(monbuf);
                 }
-                j = strlen(c);
+                j = (int)strlen(c);
             } else {
                 j = 0;
             }
@@ -1854,7 +1854,7 @@ void debuggerSymbols(int argc, char** argv)
 
     if (argc == 2) {
         match = true;
-        matchSize = strlen(argv[1]);
+        matchSize = (int)strlen(argv[1]);
         matchStr = argv[1];
     }
     {
@@ -2066,7 +2066,7 @@ uint8_t getFlags(char* flagName)
 {
 
     for (int i = 0; flagName[i] != '\0'; i++) {
-        flagName[i] = toupper(flagName[i]);
+        flagName[i] = (char)toupper(flagName[i]);
     }
 
     if (strcmp(flagName, "ALWAYS") == 0) {
@@ -2119,7 +2119,7 @@ void debuggerBreakRegister(int n, char** args)
         printFlagHelp();
         return;
     }
-    uint8_t reg = (uint8_t)getRegisterNumber(args[0]);
+    uint8_t _reg = (uint8_t)getRegisterNumber(args[0]);
     uint8_t flag = getFlags(args[1]);
     uint32_t value;
     if (!dexp_eval(args[2], &value)) {
@@ -2130,9 +2130,9 @@ void debuggerBreakRegister(int n, char** args)
         return;
     }
     if (flag != 0) {
-        addBreakRegToList(reg, flag, value);
+        addBreakRegToList(_reg, flag, value);
         {
-            snprintf(monbuf, sizeof(monbuf), "Added breakpoint on register R%02d, value %08x\n", reg, value);
+            snprintf(monbuf, sizeof(monbuf), "Added breakpoint on register R%02d, value %08x\n", _reg, value);
             monprintf(monbuf);
         }
     }
@@ -2184,7 +2184,7 @@ void debuggerBreakRegisterDelete(int n, char** args)
         }
         return;
     }
-    deleteFromBreakRegList(r, num);
+    deleteFromBreakRegList((uint8_t)r, num);
     {
         snprintf(monbuf, sizeof(monbuf), "Deleted Breakpoint %d of regsiter %s.\n", num, args[0]);
         monprintf(monbuf);
@@ -2733,7 +2733,7 @@ void listBreaks(uint32_t address, uint8_t flags, char** expression, int howToLis
 void executeBreakCommands(int n, char** cmd)
 {
     char* command = cmd[0];
-    int len = strlen(command);
+    int len = (int)strlen(command);
     bool changed = false;
     if (len <= 4) {
         command = breakSymbolCombo(command, &len);
@@ -2770,7 +2770,7 @@ void executeBreakCommands(int n, char** cmd)
         }
 
         for (int i = 0; cmd[0][i]; i++) {
-            cmd[0][i] = tolower(cmd[0][i]);
+            cmd[0][i] = (char)tolower(cmd[0][i]);
         }
         const char* replaced = replaceAlias(cmd[0], breakAliasTable);
         if (replaced == cmd[0]) {
@@ -2798,7 +2798,7 @@ void executeBreakCommands(int n, char** cmd)
         }
 
         for (int i = 0; cmd[0][i]; i++) {
-            cmd[0][i] = tolower(cmd[0][i]);
+            cmd[0][i] = (char)tolower(cmd[0][i]);
         }
         ope = replaceAlias(cmd[0], breakAliasTable)[0];
         if ((ope == 'c') || (ope == 'd') || (ope == 'l') || (ope == 'm')) {
@@ -2951,7 +2951,7 @@ void debuggerDisable(int n, char** args)
     while (n > 1) {
         int i = 0;
         while (args[3 - n][i]) {
-            args[3 - n][i] = tolower(args[2 - n][i]);
+            args[3 - n][i] = (char)tolower(args[2 - n][i]);
             i++;
         }
         if (strcmp(args[3 - n], "breg")) {
@@ -2987,7 +2987,7 @@ void debuggerEnable(int n, char** args)
     while (n > 1) {
         int i = 0;
         while (args[3 - n][i]) {
-            args[3 - n][i] = tolower(args[2 - n][i]);
+            args[3 - n][i] = (char)tolower(args[2 - n][i]);
             i++;
         }
         if (strcmp(args[3 - n], "breg")) {
@@ -3347,7 +3347,7 @@ void dbgExecute(char* toRun)
     //first, convert the command name to a standart lowercase form
     //if more lowercasing needed, do it on the caller.
     for (int i = 0; commands[0][i]; i++) {
-        commands[0][i] = tolower(commands[0][i]);
+        commands[0][i] = (char)tolower(commands[0][i]);
     }
 
     // checks if it is a quit command, if so quits.
@@ -3408,7 +3408,12 @@ bool remoteTcpInit()
     if (remoteSocket == -1) {
 #ifdef _WIN32
         WSADATA wsaData;
+#ifdef _DEBUG
         int error = WSAStartup(MAKEWORD(1, 1), &wsaData);
+        fprintf(stderr, "WSAStartup: %d\n", error);
+#else
+        WSAStartup(MAKEWORD(1, 1), &wsaData);
+#endif
 #endif // _WIN32
         SOCKET s = socket(PF_INET, SOCK_STREAM, 0);
 
@@ -3429,7 +3434,7 @@ bool remoteTcpInit()
 
         sockaddr_in addr;
         addr.sin_family = AF_INET;
-        addr.sin_port = htons(remotePort);
+        addr.sin_port = htons((unsigned short)remotePort);
         addr.sin_addr.s_addr = htonl(0);
         int count = 0;
         while (count < 3) {
@@ -3463,7 +3468,10 @@ bool remoteTcpInit()
                 ntohs(addr.sin_port));
         } else {
 #ifdef _WIN32
-            int error = WSAGetLastError();
+#ifdef _DEBUG
+            int _error = WSAGetLastError();
+            fprintf(stderr, "WSA Error: %d\n", _error);
+#endif
 #endif // _WIN32
         }
         //char dummy;
@@ -3483,12 +3491,12 @@ void remoteTcpCleanUp()
     if (remoteSocket > 0) {
         fprintf(stderr, "Closing remote socket\n");
         close(remoteSocket);
-        remoteSocket = -1;
+        remoteSocket = (SOCKET)(-1);
     }
     if (remoteListenSocket > 0) {
         fprintf(stderr, "Closing listen socket\n");
         close(remoteListenSocket);
-        remoteListenSocket = -1;
+        remoteListenSocket = (SOCKET)(-1);
     }
 }
 

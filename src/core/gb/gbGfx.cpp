@@ -91,9 +91,9 @@ void gbRenderLine()
 
     int tile_map_address = tile_map_line_y + tx;
 
-    uint8_t attrs = 0;
+    uint8_t _attrs = 0;
     if (bank1 != nullptr)
-        attrs = bank1[tile_map_address];
+        _attrs = bank1[tile_map_address];
 
     uint8_t tile = bank0[tile_map_address];
 
@@ -111,11 +111,11 @@ void gbRenderLine()
                 uint8_t tile_a = 0;
                 uint8_t tile_b = 0;
 
-                if (attrs & 0x40) {
+                if (_attrs & 0x40) {
                     tile_pattern_address = tile_pattern + tile * 16 + (7 - by) * 2;
                 }
 
-                if (attrs & 0x08) {
+                if (_attrs & 0x08) {
                     tile_a = bank1[tile_pattern_address++];
                     tile_b = bank1[tile_pattern_address];
                 } else {
@@ -123,7 +123,7 @@ void gbRenderLine()
                     tile_b = bank0[tile_pattern_address];
                 }
 
-                if (attrs & 0x20) {
+                if (_attrs & 0x20) {
                     tile_a = gbInvertTab[tile_a];
                     tile_b = gbInvertTab[tile_b];
                 }
@@ -134,7 +134,7 @@ void gbRenderLine()
 
                     gbLineBuffer[x] = c; // mark the gbLineBuffer color
 
-                    if (attrs & 0x80)
+                    if (_attrs & 0x80)
                         gbLineBuffer[x] |= 0x300;
 
                     if (gbCgbMode) {
@@ -142,7 +142,7 @@ void gbRenderLine()
                         if (gbMemory[0xff6c] & 1) {
                             c = gbBgp[c];
                         } else {
-                            c = c + (attrs & 7) * 4;
+                            c = c + (_attrs & 7) * 4;
                         }
                     } else {
                         c = (gbBgpLine[x + (gbSpeed ? 5 : 11) + SpritesTicks] >> (c << 1)) & 3;
@@ -155,7 +155,7 @@ void gbRenderLine()
                             if (c == 0)
                                 palette = 0;
 
-                            c = c + 4 * palette;
+                            c = (uint8_t)(c + 4 * palette);
                         }
                     }
                     gbLineMix[x] = gbColorOption ? gbColorFilter[gbPalette[c] & 0x7FFF] : gbPalette[c] & 0x7FFF;
@@ -190,7 +190,7 @@ void gbRenderLine()
                 tile_map_address = tile_map_line_y + tx;
 
                 if (bank1)
-                    attrs = bank1[tile_map_line_y + tx];
+                    _attrs = bank1[tile_map_line_y + tx];
 
                 tile = bank0[tile_map_line_y + tx];
 
@@ -279,9 +279,9 @@ void gbRenderLine()
                     x = wx;
 
                     tile = bank0[tile_map_address];
-                    uint8_t attrs = 0;
+                    _attrs = 0;
                     if (bank1)
-                        attrs = bank1[tile_map_address];
+                        _attrs = bank1[tile_map_address];
                     tile_map_address++;
 
                     if ((register_LCDC & 16) == 0) {
@@ -301,11 +301,11 @@ void gbRenderLine()
                         uint8_t tile_a = 0;
                         uint8_t tile_b = 0;
 
-                        if (attrs & 0x40) {
+                        if (_attrs & 0x40) {
                             tile_pattern_address = tile_pattern + tile * 16 + (7 - by) * 2;
                         }
 
-                        if (attrs & 0x08) {
+                        if (_attrs & 0x08) {
                             tile_a = bank1[tile_pattern_address++];
                             tile_b = bank1[tile_pattern_address];
                         } else {
@@ -313,7 +313,7 @@ void gbRenderLine()
                             tile_b = bank0[tile_pattern_address];
                         }
 
-                        if (attrs & 0x20) {
+                        if (_attrs & 0x20) {
                             tile_a = gbInvertTab[tile_a];
                             tile_b = gbInvertTab[tile_b];
                         }
@@ -323,7 +323,7 @@ void gbRenderLine()
                             c += ((tile_b & bx) != 0 ? 2 : 0);
 
                             if (x >= 0) {
-                                if (attrs & 0x80)
+                                if (_attrs & 0x80)
                                     gbLineBuffer[x] = 0x300 + c;
                                 else
                                     gbLineBuffer[x] = 0x100 + c;
@@ -333,7 +333,7 @@ void gbRenderLine()
                                     if (gbMemory[0xff6c] & 1) {
                                         c = gbBgp[c];
                                     } else {
-                                        c = c + (attrs & 7) * 4;
+                                        c = c + (_attrs & 7) * 4;
                                     }
                                 } else {
                                     c = (gbBgpLine[x + (gbSpeed ? 5 : 11) + gbSpritesTicks[x] * (gbSpeed ? 2 : 4)] >> (c << 1)) & 3;
@@ -346,7 +346,7 @@ void gbRenderLine()
                                         if (c == 0)
                                             palette = 0;
 
-                                        c = c + 4 * palette;
+                                        c = (uint8_t)(c + 4 * palette);
                                     }
                                 }
                                 gbLineMix[x] = gbColorOption ? gbColorFilter[gbPalette[c] & 0x7FFF] : gbPalette[c] & 0x7FFF;
@@ -362,7 +362,7 @@ void gbRenderLine()
                         bx = 128;
                         tile = bank0[tile_map_line_y + tx];
                         if (bank1)
-                            attrs = bank1[tile_map_line_y + tx];
+                            _attrs = bank1[tile_map_line_y + tx];
 
                         if ((register_LCDC & 16) == 0) {
                             if (tile < 128)
@@ -491,7 +491,7 @@ void gbDrawSpriteTile(int tile, int x, int y, int t, int flags,
             }
         }
 
-        gbLineBuffer[xxx] = 0x200 + spriteNumber;
+        gbLineBuffer[xxx] = (uint16_t)(0x200 + spriteNumber);
 
         // make sure that sprites will work even in CGB mode
         if (gbCgbMode) {
@@ -513,7 +513,7 @@ void gbDrawSpriteTile(int tile, int x, int y, int t, int flags,
                 if (c == 0)
                     palette = 0;
 
-                c = c + 4 * palette;
+                c = (uint8_t)(c + 4 * palette);
             } else {
                 c += 4;
             }

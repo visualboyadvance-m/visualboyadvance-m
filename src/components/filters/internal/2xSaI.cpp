@@ -620,7 +620,7 @@ void SuperEagle (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
 
         *((uint32_t *) dP) = product1a;
         *((uint32_t *) (dP + dstPitch)) = product2a;
-        *xP = color5;
+        *xP = (uint16_t)color5;
 
         bP += inc_bP;
         xP += inc_bP;
@@ -1169,7 +1169,7 @@ void Scale_2xSaI (uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
       uint32_t E, F, G, H;
       uint32_t I, J, K, L;
       uint32_t x1, x2, a1, f1, f2;
-      uint32_t position, product1;
+      uint32_t position, product1 = 0;
 
       position = w >> 16;
       A = bP[position]; // current pixel

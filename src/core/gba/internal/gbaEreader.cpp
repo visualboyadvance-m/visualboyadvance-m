@@ -342,7 +342,7 @@ void BIOS_EReader_ScanCard(int swi_num)
         for (i = 0, j = 0; i < 12; i++)
             j ^= DotCodeData[i];
         if (dotcodesize == 0x81C) {
-            LongDotCodeHeader[0x2E] = j;
+            LongDotCodeHeader[0x2E] = (unsigned char)j;
             LongDotCodeHeader[0x0D] = DotCodeData[0];
             LongDotCodeHeader[0x0C] = DotCodeData[1];
             LongDotCodeHeader[0x11] = DotCodeData[2];
@@ -383,10 +383,10 @@ void BIOS_EReader_ScanCard(int swi_num)
             global2 += j;
             global2 &= 0xFF;
             global2 ^= 0xFF;
-            LongDotCodeHeader[0x2F] = global2;
+            LongDotCodeHeader[0x2F] = (unsigned char)global2;
 
         } else {
-            ShortDotCodeHeader[0x2E] = j;
+            ShortDotCodeHeader[0x2E] = (unsigned char)j;
             ShortDotCodeHeader[0x0D] = DotCodeData[0];
             ShortDotCodeHeader[0x0C] = DotCodeData[1];
             ShortDotCodeHeader[0x11] = DotCodeData[2];
@@ -427,7 +427,7 @@ void BIOS_EReader_ScanCard(int swi_num)
             global2 += j;
             global2 &= 0xFF;
             global2 ^= 0xFF;
-            ShortDotCodeHeader[0x2F] = global2;
+            ShortDotCodeHeader[0x2F] = (unsigned char)global2;
         }
 
     } else if (swi_num == 0xE2) //Header
@@ -465,9 +465,9 @@ void BIOS_EReader_ScanCard(int swi_num)
                     else
                         j = CPUReadByte(GFpow + CPUReadByte(GFpow + 0x200 + i)) ^ 0xFF;
 
-                    dotcodeheader[(0x17 - i)] = j;
-                    dotcodeheader[(0x17 - i) + 0x18] = j;
-                    dotcodeheader[(0x17 - i) + 0x30] = j;
+                    dotcodeheader[(0x17 - i)] = (unsigned char)j;
+                    dotcodeheader[(0x17 - i) + 0x18] = (unsigned char)j;
+                    dotcodeheader[(0x17 - i) + 0x30] = (unsigned char)j;
                 }
                 for (i = 0; i < 28; i++)
                     for (j = 0; j < 2; j++)
@@ -480,7 +480,7 @@ void BIOS_EReader_ScanCard(int swi_num)
                         j = CPUReadByte(GFpow + CPUReadByte(GFpow + 0x200 + i));
                     else
                         j = CPUReadByte(GFpow + CPUReadByte(GFpow + 0x200 + i)) ^ 0xFF;
-                    dotcodetemp[((0x3F - i) * dotcodeinterleave) + dotcodepointer] = j;
+                    dotcodetemp[((0x3F - i) * dotcodeinterleave) + dotcodepointer] = (unsigned char)j;
                 }
                 dotcodepointer++;
 
@@ -557,7 +557,7 @@ void BIOS_EReader_ScanCard(int swi_num)
                 else
                     j = CPUReadByte(GFpow + 0x100 + (j ^ 0xFF));
 
-                CPUWriteByte(GFpow + 0x200 + (0x17 - i), j);
+                CPUWriteByte(GFpow + 0x200 + (0x17 - i), (uint8_t)j);
             }
         } else {
             if (dotcodepointer == 0) {
@@ -568,7 +568,7 @@ void BIOS_EReader_ScanCard(int swi_num)
                         j = ShortDotCodeHeader[i];
 
                     j = CPUReadByte(GFpow + 0x100 + j);
-                    CPUWriteByte(GFpow + 0x200 + (0x3F - i), j);
+                    CPUWriteByte(GFpow + 0x200 + (0x3F - i), (uint8_t)j);
                 }
 
             } else {
@@ -576,7 +576,7 @@ void BIOS_EReader_ScanCard(int swi_num)
 
                     j = DotCodeData[((dotcodepointer - 1) * 0x30) + 0x0C + i];
                     j = CPUReadByte(GFpow + 0x100 + j);
-                    CPUWriteByte(GFpow + 0x200 + (0x3F - i), j);
+                    CPUWriteByte(GFpow + 0x200 + (0x3F - i), (uint8_t)j);
                 }
             }
             for (i = 0; i < 16; i++)

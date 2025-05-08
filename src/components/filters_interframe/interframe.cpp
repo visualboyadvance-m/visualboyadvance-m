@@ -166,7 +166,7 @@ void SmartIB8(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int hei
     InterframeFilterInit();
   }
 
-  uint16_t colorMask = ~RGB_LOW_BITS_MASK;
+  uint16_t colorMask = (uint16_t)(~RGB_LOW_BITS_MASK);
 
   uint8_t *src0 = (uint8_t *)srcPtr + starty * srcPitch;
   uint8_t *src1 = (uint8_t *)frm1 + srcPitch * starty;
@@ -217,7 +217,7 @@ void SmartIB(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int heig
   }
 #endif
 
-  uint16_t colorMask = ~RGB_LOW_BITS_MASK;
+  uint16_t colorMask = (uint16_t)(~RGB_LOW_BITS_MASK);
 
   uint16_t *src0 = (uint16_t *)srcPtr + starty * srcPitch / 2;
   uint16_t *src1 = (uint16_t *)frm1 + srcPitch * starty / 2;
@@ -587,7 +587,7 @@ void MotionBlurIB8(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, in
     InterframeFilterInit();
   }
 
-  uint16_t colorMask = ~RGB_LOW_BITS_MASK;
+  uint16_t colorMask = (uint16_t)(~RGB_LOW_BITS_MASK);
 
   uint8_t *src0 = (uint8_t *)srcPtr + starty * srcPitch;
   uint8_t *src1 = (uint8_t *)frm1 + starty * srcPitch;
@@ -624,7 +624,7 @@ void MotionBlurIB(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int
   }
 #endif
 
-  uint16_t colorMask = ~RGB_LOW_BITS_MASK;
+  uint16_t colorMask = (uint16_t)(~RGB_LOW_BITS_MASK);
 
   uint16_t *src0 = (uint16_t *)srcPtr + starty * srcPitch / 2;
   uint16_t *src1 = (uint16_t *)frm1 + starty * srcPitch / 2;

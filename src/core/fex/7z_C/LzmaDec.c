@@ -315,14 +315,14 @@ Out:
                 prob = probs + RepLenCoder;
             }
             {
-                unsigned limit, offset;
+                unsigned _limit, offset;
                 CLzmaProb* probLen = prob + LenChoice;
                 IF_BIT_0(probLen)
                 {
                     UPDATE_0(probLen);
                     probLen = prob + LenLow + (posState << kLenNumLowBits);
                     offset = 0;
-                    limit = (1 << kLenNumLowBits);
+                    _limit = (1 << kLenNumLowBits);
                 }
                 else
                 {
@@ -333,17 +333,17 @@ Out:
                         UPDATE_0(probLen);
                         probLen = prob + LenMid + (posState << kLenNumMidBits);
                         offset = kLenNumLowSymbols;
-                        limit = (1 << kLenNumMidBits);
+                        _limit = (1 << kLenNumMidBits);
                     }
                     else
                     {
                         UPDATE_1(probLen);
                         probLen = prob + LenHigh;
                         offset = kLenNumLowSymbols + kLenNumMidSymbols;
-                        limit = (1 << kLenNumHighBits);
+                        _limit = (1 << kLenNumHighBits);
                     }
                 }
-                TREE_DECODE(probLen, limit, len);
+                TREE_DECODE(probLen, _limit, len);
                 len += offset;
             }
 

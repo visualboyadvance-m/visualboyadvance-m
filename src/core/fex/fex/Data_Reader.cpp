@@ -347,7 +347,7 @@ size_t utf8_encode_char( unsigned wide, char * target )
 		wide |= 0xC0;
 		break;
     case 1:
-		target[0] = wide;
+		target[0] = (char)wide;
 		break;
 	}
 

@@ -144,13 +144,65 @@ Bool CPU_Is_InOrder()
 }
 
 #if !defined(MY_CPU_AMD64) && defined(_WIN32)
+#include <windows.h>
+#include <stdint.h>
+#include <stdlib.h>
+
+static int GetOSMajorVersion()
+{
+    WCHAR path[2048] = {};
+    if (!GetSystemDirectoryW(path, 2048))
+        return 0;
+
+#if __STDC_WANT_SECURE_LIB__
+    wcscat_s(path, 2048, L"\\kernel32.dll" );
+#else
+    wcscat(path, L"\\kernel32.dll");
+#endif
+
+    //
+    // Based on example code from this article
+    // http://support.microsoft.com/kb/167597
+    //
+
+    DWORD handle;
+#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
+    DWORD len = GetFileVersionInfoSizeExW(FILE_VER_GET_NEUTRAL, path, &handle);
+#else
+    DWORD len = GetFileVersionInfoSizeW(path, &handle);
+#endif
+    if (!len)
+        return 0;
+
+    uint8_t *buff = (uint8_t *)malloc(len + 1);
+    if (!buff)
+        return 0;
+
+#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
+    if (!GetFileVersionInfoExW(FILE_VER_GET_NEUTRAL, path, 0, len, buff))
+#else
+    if (!GetFileVersionInfoW(path, 0, len, buff))
+#endif
+        return 0;
+
+    VS_FIXEDFILEINFO *vInfo = NULL;
+    UINT infoSize;
+
+    if (!VerQueryValueW(buff, L"\\", (LPVOID*)(&vInfo), &infoSize))
+        return 0;
+
+    if (buff)
+        free(buff);
+
+    if (!infoSize)
+        return 0;
+
+    return HIWORD(vInfo->dwFileVersionMS);
+}
+
 static Bool CPU_Sys_Is_SSE_Supported()
 {
-    OSVERSIONINFO vi;
-    vi.dwOSVersionInfoSize = sizeof(vi);
-    if (!GetVersionEx(&vi))
-        return False;
-    return (vi.dwMajorVersion >= 5);
+    return (GetOSMajorVersion() >= 5);
 }
 #define CHECK_SYS_SSE_SUPPORT        \
     if (!CPU_Sys_Is_SSE_Supported()) \

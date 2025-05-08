@@ -316,7 +316,7 @@ blargg_err_t File_Extractor::data_v( void const** out )
 	RETURN_ERR( own_data_.resize( size() ) );
 	*out = own_data_.begin();
 	
-	blargg_err_t err = extract_v( own_data_.begin(), own_data_.size() );
+	blargg_err_t err = extract_v( own_data_.begin(), (int)own_data_.size() );
 	if ( err )
 		own_data_.clear();
 	

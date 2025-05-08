@@ -386,9 +386,9 @@ bool sdlCheckDirectory(const char* dir)
 char* sdlGetFilename(const char* name)
 {
     char path[1024];
-    const char *filename = strrchr(name, kFileSep);
-    if (filename)
-        strcpy(path, filename + 1);
+    const char *_filename = strrchr(name, kFileSep);
+    if (_filename)
+        strcpy(path, _filename + 1);
     else
         strcpy(path, name);
     return strdup(path);
@@ -397,9 +397,9 @@ char* sdlGetFilename(const char* name)
 char* sdlGetFilePath(const char* name)
 {
     char path[1024];
-    const char *filename = strrchr(name, kFileSep);
-    if (filename) {
-        size_t length = strlen(name) - strlen(filename);
+    const char *_filename = strrchr(name, kFileSep);
+    if (_filename) {
+        size_t length = strlen(name) - strlen(_filename);
         memcpy(path, name, length);
         path[length] = '\0';
     }
@@ -456,11 +456,11 @@ FILE* sdlFindFile(const char* name)
     }
 
     if (!strchr(home, '/') && !strchr(home, '\\')) {
-        char* path = getenv("PATH");
+        char* _path = getenv("PATH");
 
-        if (path != NULL) {
+        if (_path != NULL) {
             fprintf(stdout, "Searching PATH\n");
-            strcpy(buffer, path);
+            strcpy(buffer, _path);
             buffer[sizeof(buffer) - 1] = 0;
             char* tok = strtok(buffer, PATH_SEP);
 
@@ -1477,10 +1477,10 @@ void sdlPollEvents()
                 }
                 break;
             case SDLK_KP_DIVIDE:
-                sdlChangeVolume(-0.1);
+                sdlChangeVolume((float)-0.1);
                 break;
             case SDLK_KP_MULTIPLY:
-                sdlChangeVolume(0.1);
+                sdlChangeVolume((float)0.1);
                 break;
             case SDLK_KP_MINUS:
                 if (gb_effects_config.stereo > 0.0) {
@@ -1490,7 +1490,7 @@ void sdlPollEvents()
                     }
                     systemScreenMessage("Stereo off");
                 } else {
-                    gb_effects_config.stereo = SOUND_STEREO;
+                    gb_effects_config.stereo = (float)SOUND_STEREO;
                     gb_effects_config.enabled = true;
                     systemScreenMessage("Stereo on");
                 }
@@ -1503,7 +1503,7 @@ void sdlPollEvents()
                     }
                     systemScreenMessage("Echo off");
                 } else {
-                    gb_effects_config.echo = SOUND_ECHO;
+                    gb_effects_config.echo = (float)SOUND_ECHO;
                     gb_effects_config.enabled = true;
                     systemScreenMessage("Echo on");
                 }
@@ -2087,26 +2087,26 @@ int main(int argc, char** argv)
         if (autoPatch && patchNum == 0) {
             char* tmp;
             // no patch given yet - look for ROMBASENAME.ips
-            tmp = (char*)malloc(strlen(filename) + 4 + 1);
-            snprintf(tmp, strlen(filename) + 4, "%s.ips", filename);
+            tmp = (char*)malloc(strlen(filename) + 4 + 2);
+            snprintf(tmp, strlen(filename) + 4 + 1, "%s.ips", filename);
             patchNames[patchNum] = tmp;
             patchNum++;
 
             // no patch given yet - look for ROMBASENAME.ups
-            tmp = (char*)malloc(strlen(filename) + 4 + 1);
-            snprintf(tmp, strlen(filename) + 4, "%s.ups", filename);
+            tmp = (char*)malloc(strlen(filename) + 4 + 2);
+            snprintf(tmp, strlen(filename) + 4 + 1, "%s.ups", filename);
             patchNames[patchNum] = tmp;
             patchNum++;
 
             // no patch given yet - look for ROMBASENAME.bps
             tmp = (char*)malloc(strlen(filename) + 4 + 1);
-            snprintf(tmp, strlen(filename) + 4, "%s.bps", filename);
+            snprintf(tmp, strlen(filename) + 4 + 1, "%s.bps", filename);
             patchNames[patchNum] = tmp;
             patchNum++;
 
             // no patch given yet - look for ROMBASENAME.ppf
             tmp = (char*)malloc(strlen(filename) + 4 + 1);
-            snprintf(tmp, strlen(filename) + 4, "%s.ppf", filename);
+            snprintf(tmp, strlen(filename) + 4 + 1, "%s.ppf", filename);
             patchNames[patchNum] = tmp;
             patchNum++;
         }
@@ -2294,7 +2294,7 @@ int main(int argc, char** argv)
             const char* p;
             int l;
             p = preparedCheatCodes[i];
-            l = strlen(p);
+            l = (int)strlen(p);
             if (l == 17 && p[8] == ':') {
                 fprintf(stdout, "Adding cheat code %s\n", p);
                 cheatsAddCheatCode(p, p);
@@ -2658,7 +2658,7 @@ void systemLoadRecent()
 
 uint32_t systemGetClock()
 {
-    return SDL_GetTicks();
+    return (uint32_t)SDL_GetTicks();
 }
 
 void systemGbPrint(uint8_t* data, int len, int pages, int feed, int palette, int contrast)

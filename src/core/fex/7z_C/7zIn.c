@@ -919,18 +919,18 @@ static SRes SzReadHeader2(
         SzFile_Init(files + i);
 
     for (;;) {
-        UInt64 type;
+        UInt64 _type;
         UInt64 size;
-        RINOK(SzReadID(sd, &type));
+        RINOK(SzReadID(sd, &_type));
         if (type == k7zIdEnd)
             break;
         RINOK(SzReadNumber(sd, &size));
         if (size > sd->Size)
             return SZ_ERROR_ARCHIVE;
-        if ((UInt64)(int)type != type) {
+        if ((UInt64)(int)_type != _type) {
             RINOK(SzSkeepDataSize(sd, size));
         } else
-            switch ((int)type) {
+            switch ((int)_type) {
             case k7zIdName: {
                 size_t namesSize;
                 RINOK(SzReadSwitch(sd));
