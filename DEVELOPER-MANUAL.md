@@ -33,6 +33,8 @@ setup guides.
 
 Follow the following steps to process newly submitted issues:
 
+- Edit the user's post to remove any links to illegal content such as ROM files.
+
 - Edit the user's post to remove unused template sections etc.. Rephrase the
   issue title if it needs to be clarified.
 
@@ -48,13 +50,13 @@ Follow the following steps to process newly submitted issues:
 
 #### Resolving Issues
 
-- An issue is resolved by closing it in github. A commit that fixes the issue
+- An issue is resolved by closing it in GitHub. A commit that fixes the issue
   should have the following line near the end of the body of the commit message:
 ```
 Fix #999.
 ```
   This will automatically close the issue and assign the closing commit in the
-  github metadata when it is merged to master. The issue can be reopened if
+  GitHub metadata when it is merged to master. The issue can be reopened if
   needed.
 
 - A commit that is work towards resolving an issue, should have the issue number
@@ -83,13 +85,8 @@ A commit message must always have a title and a description, the description
 must be independent of the title line, if necessary repeat the information in
 the title line in the description.
 
-Make sure the git history in your branch is clean and logical, edit when
-necessary with `rebase -i`.
-
-Use one commit per logical change if necessary, most work can be squashed into
-one commit when you are done. It is not necessary to have separate commits
-per-file if they are one logical change. We are less strict about this than
-other projects, fewer is better.
+The commit message must **ALL** changes, unless it's a minor refactor or
+white space change or something and is not important.
 
 The commit title line should be prefixed with an area, unless it involves the
 wxWidgets GUI app, in which case it should **NOT** have a prefix.
@@ -102,14 +99,15 @@ The text after the area prefix should not be capitalized.
 
 Please use one of these area prefixes for non-main-GUI-app commits:
 
-- doc: documentation, README.md etc.
-- build: cmake, installdeps, preprocessor compatibility defines, compatibility
-  headers, etc.
-- gb: the GameBoy emulator core
-- gba: the GameBoy Advance emulator core
-- libretro: the libretro core glue and build
-- sdl: anything for the SDL port
-- translations: anything related to translations
+- doc: documentation, README.md etc..
+- build: CMake, installdeps, preprocessor compatibility defines, compatibility
+  headers, macOS build system etc..
+- gb: the GameBoy emulator core or changes related to it.
+- gba: the GameBoy Advance emulator core or changes related to it.
+- libretro: the libretro core glue and build.
+- sdl: anything for the SDL port, but **NOT** SDL functionality in the wxWidgets
+  GUI app.
+- translations: anything related to translations.
 
 . Add other areas here if needed.
 
@@ -118,20 +116,84 @@ If a commit fixes a regression, use a title line such as:
 ```console
 Fix regression <PROBLEM> in <SHORT-SHA>
 ```
-, you can get the short sha from `git log --oneline -100` or similar.
+, you can get the short SHA from `git log --oneline -100` or similar.
 
 The commit description for a regression must refer to the breaking change in
 reference format, which you can get from e.g. `git log --format=reference -20`.
 
-You can refer to github issues using `#<ISSUE-NUMBER>` freely in the description
-text.
+#### Working on Pull Requests
 
-If a commit fixes an issue, add a line at the end of the description such as:
+When opening a pull request, push your branch to our repository if you were
+given access, or a branch in your fork if you have not yet been given access. Do
+**NOT** use `master`, use a specific branch.
 
-```console
-Fix #<ISSUE-NUMBER>.
+If you are using a fork, set up your workflow like this:
+
+```bash
+git clone git@github.com:visualboyadvance-m/visualboyadvance-m
+git remote add fork git@github.com:<your-GitHub-user>/visualboyadvance-m
+git fetch --all --prune
+git checkout -b your-work-branch-name
+git commit -a --verbose --signoff -S
 ```
 .
+
+The `-S` flags tells Git to sign your commit with GnuPG. If you do not have a
+GnuPG key, you will need to create one and upload it to a keyserver. I recommend
+removing the password on your private key to not deal with `gpg-agent` and all
+of this stuff.
+
+All of this works fine on Windows, just install `GnuPG.GnuPG` from WinGet.
+
+Your first push will then be:
+
+```bash
+git push -u fork HEAD
+```
+.
+
+Subsequent commits will then be:
+
+```bash
+git commit -a --verbose --amend --reset-author --signoff -S
+git push -f
+```
+
+. If you are a project member, then the workflow will be roughly:
+
+```bash
+git clone git@github.com:visualboyadvance-m/visualboyadvance-m
+git fetch --all --prune
+git checkout -b your-work-branch-name
+git commit -a --verbose --signoff -S
+```
+
+. Your first push will be:
+
+```bash
+git push -u origin HEAD
+```
+
+. And subsequent pushes will be:
+
+```bash
+git commit -a --verbose --signoff -S --amend --reset-author
+git push -f
+```
+
+. Please push frequently so that we can track your progress and review it.
+
+Make sure the git history in your branch is clean and logical, edit when
+necessary with `rebase -i`. In most cases a single commit with all of the
+changes will be good. Sometimes you may want to split it up into multiple
+logical commits for a large work, but a single commit is also fine if the title
+line encapsulates all of the work for the changelog.
+
+See the previous section on how to write commit messages.
+
+If you are using Windows as your development environment, I recommend reading my
+manual on Windows development environments
+[here](https://github.com/rkitover/windows-dev-guide).
 
 #### Collaboration on a Branch
 
@@ -142,23 +204,32 @@ things in mind:
   better to edit the history than to add more commits. Never add commits fixing
   previous commits, only improving or adding to them.
 
-- To update when someone else updated the branch with a `push -f`
+- To update when someone else updated the branch with a `git push -f`:
+
 ```bash
 git status # should be clean, with your work having been already pushed
 git fetch --all --prune
-git reset --hard origin/<branch-name>
+git reset --hard origin/<work-branch-name>
 ```
 .
 
-- While actively working on a branch, keep it rebased on top of master.
+- While actively working on a branch, keep it rebased on top of master, like
+  this:
 
-#### Commits from Maintainers
+```bash
+git fetch --all --prune
+git rebase origin/master
+git push -f
+```
+
+. You may sometimes need to fix conflicts, follow the instructions.
+
+#### Commits from Admins
 
 Maintainers and project members have the power to commit directly to master.
 This power must be used responsibly.
 
-Make your best attempt to follow these general guidelines to keep our
-history clean:
+Make your best attempt to follow these general guidelines:
 
 - Things that are a minor fix or improvement that does not require discussion
   can be committed directly, keeping the following guidelines in mind.
@@ -166,19 +237,34 @@ history clean:
 - Bigger new features, code refactors and changes in architecture should go
   through the PR process.
 
+- Absolutely **NEVER** `git push -f` on `master`. If you make a mistake, revert
+  or push a fix commit.
+
 - Push code changes to a branch first, so they can run through the CI. When you
   open the commit in GitHub there is a little icon in the upper left corner that
   shows the CI status for this commit. Differences in what different compilers
   allow is a problem that comes up **VERY** frequently. As well as
   incompatibilities between different configurations for both the C++ code and
-  any supporting code.
+  any supporting code. Once the CI is clear, you can merge your branch like
+  this:
+
+```bash
+git push -f
+git checkout master
+git merge --ff-only <your-work-branch-name>
+git push
+git branch -D <your-work-branch-name>
+git push origin ':refs/heads/your-work-branch-nbame'
+```
+
+. The last line there deletes the branch in our repository.
 
 ### Miscellaneous
 
 #### Debug Messages
 
 We have an override for `wxLogDebug()` to make it work even in non-debug builds
-of wx and on windows, even in mintty.
+of wxWidgets and on windows, even in mintty.
 
 It works like `printf()`, e.g.:
 
@@ -195,7 +281,7 @@ fprintf(stderr, "...", ...);
 , will work fine.
 
 You need a debug build for this to work or to even have a console on Windows.
-Pass `-DCMAKE_BUILD_TYPE=Debug` to cmake.
+Pass `-DCMAKE_BUILD_TYPE=Debug` to CMake.
 
 ### Release Process
 
