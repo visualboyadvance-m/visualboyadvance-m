@@ -141,11 +141,12 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
         {
             if (acodec->supported_samplerates[i] == sampleRate)
 #else
-    const int *supported_samplerates = NULL;
+    const int64_t *supported_samplerates = NULL;
+    int num_supported_samplerates = 0;
     if (acodec) {
         avcodec_get_supported_config(aenc, acodec, AV_CODEC_CONFIG_SAMPLE_RATE, 0,
-                                     (const void **) &supported_samplerates, NULL);
-        for (int i = 0; supported_samplerates[i]; ++i)
+                                     (const void **) &supported_samplerates, &num_supported_samplerates);
+        for (int i = 0; i < num_supported_samplerates; ++i)
         {
             if (supported_samplerates[i] == sampleRate)
 #endif
@@ -651,7 +652,7 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
         return MRET_ERR_RECORDING;
     }
 
-    int dst_nb_samples = av_rescale_rnd(swr_get_delay(swr, c->sample_rate) + audioframeTmp->nb_samples, c->sample_rate, c->sample_rate, AV_ROUND_UP);
+    int64_t dst_nb_samples = av_rescale_rnd(swr_get_delay(swr, c->sample_rate) + audioframeTmp->nb_samples, c->sample_rate, c->sample_rate, AV_ROUND_UP);
     av_assert0(dst_nb_samples == audioframeTmp->nb_samples);
 
     if (swr_convert(swr, audioframe->data, audioframe->nb_samples, (const uint8_t **)audioframeTmp->data, audioframeTmp->nb_samples) < 0)
