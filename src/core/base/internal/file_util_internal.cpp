@@ -16,7 +16,7 @@ std::wstring ToUTF16(const char* utf8) {
     }
 
     std::wstring result(len, 0);
-    MultiByteToWideChar(CP_UTF8, 0, utf8, -1, result.data(), len);
+    MultiByteToWideChar(CP_UTF8, 0, utf8, -1, (LPWSTR)result.data(), len);
     return result;
 }
 
