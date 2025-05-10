@@ -65,7 +65,7 @@ std::vector<VBamIoVec> g_vbamIoVecs;
 
 void ResetMBC3RTC() {
     time(&gbDataMBC3.mapperLastTime);
-    struct tm* lt;
+    struct tm* lt = NULL;
 #if __STDC_WANT_SECURE_LIB__
     localtime_s(lt, &gbDataMBC3.mapperLastTime);
 #else
@@ -83,7 +83,7 @@ void ResetTama5RTC() {
     uint8_t gbDaysinMonth[12] = {31, 28, 31, 30, 31, 30,
                                  31, 31, 30, 31, 30, 31};
     time(&gbDataTAMA5.mapperLastTime);
-    struct tm* lt;
+    struct tm* lt = NULL;
 #if __STDC_WANT_SECURE_LIB__
     localtime_s(lt, &gbDataTAMA5.mapperLastTime);
 #else
@@ -120,7 +120,7 @@ void ResetTama5RTC() {
 void ResetHuc3RTC() {
     time(&gbRTCHuC3.mapperLastTime);
 #if __STDC_WANT_SECURE_LIB__
-    struct tm* lt;
+    struct tm* lt = NULL;
     localtime_s(lt, &gbRTCHuC3.mapperLastTime);
 #else
     localtime(&gbRTCHuC3.mapperLastTime);
