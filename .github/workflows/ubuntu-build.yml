@@ -43,11 +43,13 @@ jobs:
           submodules: recursive
 
       - name: Install Dependencies
-        run: >-
+        run: |
           sudo add-apt-repository ppa:hrzhu/sdl3-backport
           sudo apt update
           bash installdeps
-          if [ "${{ matrix.build_compiler }}" = clang ]; then sudo apt -y install clang; fi
+          if [ "${{ matrix.build_compiler }}" = clang ]; then
+            sudo apt -y install clang
+          fi
 
       - name: Install xvfb
         run: sudo apt -y install xvfb
