@@ -13,6 +13,7 @@
 
 #if __STDC_WANT_SECURE_LIB__
 #define snprintf sprintf_s
+#define sscanf sscanf_s
 #endif
 
 /*---------------------------- Defines -------------------------------------*/
@@ -89,7 +90,11 @@ static char *strstrip(const char *s)
         while (isspace((int)*s) && *s)
                 s++;
         memset(l, 0, ASCIILINESZ + 1);
+#if __STDC_WANT_SECURE_LIB__
+        strcpy_s(l, sizeof(l), s);
+#else
         strcpy(l, s);
+#endif
         last = l + strlen(l);
         while (last > l) {
                 if (!isspace((int)*(last - 1)))
@@ -577,7 +582,11 @@ static line_status iniparser_line(const char *input_line, char *section, char *k
         char line[ASCIILINESZ + 1];
         int len;
 
+#if __STDC_WANT_SECURE_LIB__
+        strcpy_s(line, sizeof(line), strstrip(input_line));
+#else
         strcpy(line, strstrip(input_line));
+#endif
         len = (int)strlen(line);
 
         sta = LINE_UNPROCESSED;
@@ -589,6 +598,19 @@ static line_status iniparser_line(const char *input_line, char *section, char *k
                 sta = LINE_COMMENT;
         } else if (line[0] == '[' && line[len - 1] == ']') {
                 /* Section name */
+#if __STDC_WANT_SECURE_LIB__
+                sscanf_s(line, "[%[^]]", section, (unsigned)_countof(section));
+                strcpy_s(section, ASCIILINESZ, strstrip(section));
+                strcpy_s(section, ASCIILINESZ, strlwc(section));
+                sta = LINE_SECTION;
+        } else if (sscanf_s(line, "%[^=] = \"%[^\"]\"", key, (unsigned)_countof(key), value, (unsigned)_countof(value)) == 2 ||
+                   sscanf_s(line, "%[^=] = '%[^\']'", key, (unsigned)_countof(key), value, (unsigned)_countof(value)) == 2 ||
+                   sscanf_s(line, "%[^=] = %[^;#]", key, (unsigned)_countof(key), value, (unsigned)_countof(value)) == 2) {
+               /* Usual key=value, with or without comments */
+                strcpy_s(key, ASCIILINESZ, strstrip(key));
+                strcpy_s(key, ASCIILINESZ, strlwc(key));
+                strcpy_s(value, ASCIILINESZ, strstrip(value));
+#else
                 sscanf(line, "[%[^]]", section);
                 strcpy(section, strstrip(section));
                 strcpy(section, strlwc(section));
@@ -596,10 +618,11 @@ static line_status iniparser_line(const char *input_line, char *section, char *k
         } else if (sscanf(line, "%[^=] = \"%[^\"]\"", key, value) == 2 ||
                    sscanf(line, "%[^=] = '%[^\']'", key, value) == 2 ||
                    sscanf(line, "%[^=] = %[^;#]", key, value) == 2) {
-                /* Usual key=value, with or without comments */
+               /* Usual key=value, with or without comments */
                 strcpy(key, strstrip(key));
                 strcpy(key, strlwc(key));
                 strcpy(value, strstrip(value));
+ #endif
                 /*
                  * sscanf cannot handle '' or "" as empty values
                  * this is done here
@@ -608,16 +631,26 @@ static line_status iniparser_line(const char *input_line, char *section, char *k
                         value[0] = 0;
                 }
                 sta = LINE_VALUE;
+#if __STDC_WANT_SECURE_LIB__
+        } else if (sscanf_s(line, "%[^=] = %[;#]", key, (unsigned)_countof(key), value, (unsigned)_countof(value)) == 2 ||
+                   sscanf_s(line, "%[^=] %[=]", key, (unsigned)_countof(key), value, (unsigned)_countof(value)) == 2) {
+#else
         } else if (sscanf(line, "%[^=] = %[;#]", key, value) == 2 ||
                    sscanf(line, "%[^=] %[=]", key, value) == 2) {
+#endif
                 /*
                  * Special cases:
                  * key=
                  * key=;
                  * key=#
                  */
+#if __STDC_WANT_SECURE_LIB__
+                strcpy_s(key, ASCIILINESZ, strstrip(key));
+                strcpy_s(key, ASCIILINESZ, strlwc(key));
+#else
                 strcpy(key, strstrip(key));
                 strcpy(key, strlwc(key));
+#endif
                 value[0] = 0;
                 sta = LINE_VALUE;
         } else {
@@ -658,7 +691,12 @@ dictionary *iniparser_load(const char *ininame)
 
         dictionary *dict;
 
+#if __STDC_WANT_SECURE_LIB__
+        fopen_s(&in, ininame, "r");
+        if (in == NULL) {
+#else
         if ((in = fopen(ininame, "r")) == NULL) {
+#endif
                 fprintf(stderr, "iniparser: cannot open %s\n", ininame);
                 return NULL;
         }

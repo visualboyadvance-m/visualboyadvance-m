@@ -518,7 +518,11 @@ static FILE* blargg_fopen( const char path [], const char mode [] )
 	{
 		wmode = blargg_to_wide( mode );
 		if ( wmode )
+#if __STDC_WANT_SECURE_LIB__
+			_wfopen_s(&file, wpath, wmode );
+#else                        
 			file = _wfopen( wpath, wmode );
+#endif
 	}
 	
 	// Save and restore errno in case free() clears it

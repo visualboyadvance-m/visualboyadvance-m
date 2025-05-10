@@ -50,6 +50,7 @@
 
 #if __STDC_WANT_SECURE_LIB__
 #define snprintf sprintf_s
+#define sscanf sscanf_s
 #endif
 
 extern int emulating;
@@ -392,7 +393,11 @@ void debuggerDumpLoad(int n, char** args)
             return;
         }
 
+#if __STDC_WANT_SECURE_LIB__
+        fopen_s(&f, file, "rb");
+#else
         f = fopen(file, "rb");
+#endif
         if (f == NULL) {
             {
                 snprintf(monbuf, sizeof(monbuf), "Error opening file.\n");
@@ -442,7 +447,12 @@ void debuggerDumpSave(int n, char** args)
             return;
         }
 
+#if __STDC_WANT_SECURE_LIB__
+        fopen_s(&f, file, "wb");
+#else
         f = fopen(file, "wb");
+#endif
+
         if (f == NULL) {
             {
                 snprintf(monbuf, sizeof(monbuf), "Error opening file.\n");
@@ -935,10 +945,18 @@ void debuggerFindText(int n, char** args)
 
         if (n == 4) {
             sscanf(args[2], "%u", &SearchMaxMatches);
+#if __STDC_WANT_SECURE_LIB__
+            strncpy_s((char*)SearchData, sizeof(SearchData), args[3], 64);
+#else
             strncpy((char*)SearchData, args[3], 64);
+#endif
             SearchLength = (unsigned int)strlen(args[3]);
         } else if (n == 3) {
+#if __STDC_WANT_SECURE_LIB__
+            strncpy_s((char*)SearchData, sizeof(SearchData), args[2], 64);
+#else
             strncpy((char*)SearchData, args[2], 64);
+#endif
             SearchLength = (unsigned int)strlen(args[2]);
         };
 
@@ -971,10 +989,18 @@ void debuggerFindHex(int n, char** args)
         char SearchHex[128];
         if (n == 4) {
             sscanf(args[2], "%u", &SearchMaxMatches);
+#if __STDC_WANT_SECURE_LIB__
+            strncpy_s(SearchHex, sizeof(SearchHex), args[3], 128);
+#else
             strncpy(SearchHex, args[3], 128);
+#endif
             SearchLength = (unsigned int)strlen(args[3]);
         } else if (n == 3) {
+#if __STDC_WANT_SECURE_LIB__
+            strncpy_s(SearchHex, sizeof(SearchHex), args[2], 128);
+#else
             strncpy(SearchHex, args[2], 128);
+#endif
             SearchLength = (unsigned int)strlen(args[2]);
         };
 
@@ -1507,7 +1533,12 @@ void debuggerReadCharTable(int n, char** args)
             }
             return;
         }
+#if __STDC_WANT_SECURE_LIB__
+        FILE* tlb = NULL;
+        fopen_s(&tlb, args[1], "r");
+#else
         FILE* tlb = fopen(args[1], "r");
+#endif
         if (!tlb) {
             {
                 snprintf(monbuf, sizeof(monbuf), "Could not open specified file. Abort.\n");
@@ -1520,8 +1551,11 @@ void debuggerReadCharTable(int n, char** args)
         char* character = (char*)calloc(10, sizeof(char));
         wordSymbol = (char**)calloc(256, sizeof(char*));
         while (fgets(buffer, 30, tlb)) {
-
+#if __STDC_WANT_SECURE_LIB__
+            sscanf_s(buffer, "%02x=%s", &slot, character, 10);
+#else
             sscanf(buffer, "%02x=%s", &slot, character);
+#endif
 
             if (character[0]) {
                 if (strlen(character) == 4) {
@@ -1789,7 +1823,12 @@ void debuggerExecuteCommands(int n, char** args)
         n--;
         args++;
         while (n) {
+#if __STDC_WANT_SECURE_LIB__
+            FILE* toExec = NULL;
+            fopen_s(&toExec, args[0], "r");
+#else
             FILE* toExec = fopen(args[0], "r");
+#endif
             if (toExec) {
                 while (fgets(buffer, 4096, toExec)) {
                     std::string buf(buffer);
@@ -3388,7 +3427,11 @@ void dbgExecute(char* toRun)
 void dbgExecute(std::string& cmd)
 {
     char* dbgCmd = new char[cmd.length() + 1];
+#if __STDC_WANT_SECURE_LIB__
+    strcpy_s(dbgCmd, cmd.length() + 1, cmd.c_str());
+#else
     strcpy(dbgCmd, cmd.c_str());
+#endif
     dbgExecute(dbgCmd);
     delete[] dbgCmd;
 }
@@ -4314,7 +4357,11 @@ void monprintf(std::string line)
 
     if (output.length() <= 1000) {
         char dbgReply[1000];
+#if __STDC_WANT_SECURE_LIB__
+        strcpy_s(dbgReply, sizeof(dbgReply), output.c_str());
+#else
         strcpy(dbgReply, output.c_str());
+#endif
         remotePutPacket(dbgReply);
     }
 }

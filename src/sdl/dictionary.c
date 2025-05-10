@@ -68,7 +68,11 @@ static char *xstrdup(const char *s)
                 return NULL;
         t = (char *)malloc(strlen(s) + 1);
         if (t) {
+#if __STDC_WANT_SECURE_LIB__
+                strcpy_s(t, strlen(s) + 1, s);
+#else
                 strcpy(t, s);
+#endif
         }
         return t;
 }

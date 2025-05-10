@@ -110,6 +110,7 @@ sw, sword, int32_t, int                 --> signed word
 
 #if (defined __WIN32__ || defined _WIN32)
 #define strdup _strdup
+#define sscanf sscanf_s
 #endif
 
 extern bool dexp_eval(char*, uint32_t*);

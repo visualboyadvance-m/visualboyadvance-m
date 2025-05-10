@@ -67,6 +67,10 @@ const
 #undef wxvbam
 #endif
 
+#if __STDC_WANT_SECURE_LIB__
+#define sscanf sscanf_s
+#endif
+
 #define GetXRCDialog(n) \
     wxStaticCast(wxGetApp().frame->FindWindowByName(n), wxDialog)
 
@@ -650,7 +654,11 @@ public:
         } else if (ce_desc != odesc) {
             *dirty = true;
             char* p = isgb ? gbCheatList[id].cheatDesc : cheatsList[id].desc;
+#if __STDC_WANT_SECURE_LIB__
+            strncpy_s(p, sizeof(cheatsList[0].desc), ce_desc.utf8_str(), sizeof(cheatsList[0].desc));
+#else
             strncpy(p, ce_desc.utf8_str(), sizeof(cheatsList[0].desc));
+#endif
             p[sizeof(cheatsList[0].desc) - 1] = 0;
             item1.SetId(id);
             item1.SetText(wxString(p, wxConvUTF8));

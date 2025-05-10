@@ -107,8 +107,15 @@ int __stdcall WinMain(HINSTANCE hInstance,
     // https://github.com/dolphin-emu/dolphin/blob/6cf99195c645f54d54c72322ad0312a0e56bc985/Source/Core/DolphinQt/Main.cpp#L112
     HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
     if (console_attached && stdout_handle) {
+#if __STDC_WANT_SECURE_LIB__
+        FILE *ostream;
+        FILE *estream;
+        freopen_s(&ostream, "CONOUT$", "w", stdout);
+        freopen_s(&estream, "CONOUT$", "w", stderr);
+#else
         freopen("CONOUT$", "w", stdout);
         freopen("CONOUT$", "w", stderr);
+#endif
     }
 
     // Set up logging.

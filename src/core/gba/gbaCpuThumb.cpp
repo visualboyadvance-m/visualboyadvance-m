@@ -20,7 +20,11 @@
 #endif
 
 #ifdef _MSC_VER
+#if __STDC_WANT_SECURE_LIB__
+#define snprintf sprintf_s
+#else
 #define snprintf _snprintf
+#endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////

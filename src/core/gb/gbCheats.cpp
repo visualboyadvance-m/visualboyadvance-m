@@ -209,8 +209,13 @@ bool gbAddGsCheat(const char* code, const char* desc)
 
     int i = gbCheatNumber;
 
+#if __STDC_WANT_SECURE_LIB__
+    strcpy_s(gbCheatList[i].cheatCode, sizeof(gbCheatList[i].cheatCode), code);
+    strcpy_s(gbCheatList[i].cheatDesc, sizeof(gbCheatList[i].cheatDesc), desc);
+#else
     strcpy(gbCheatList[i].cheatCode, code);
     strcpy(gbCheatList[i].cheatDesc, desc);
+#endif
 
     gbCheatList[i].code = GBCHEAT_HEX_VALUE(code[0]) << 4 | GBCHEAT_HEX_VALUE(code[1]);
 
@@ -318,8 +323,13 @@ bool gbAddGgCheat(const char* code, const char* desc)
 
     size_t len = strlen(code);
 
+#if __STDC_WANT_SECURE_LIB__
+    strcpy_s(gbCheatList[i].cheatCode, sizeof(gbCheatList[i].cheatCode), code);
+    strcpy_s(gbCheatList[i].cheatDesc, sizeof(gbCheatList[i].cheatDesc), desc);
+#else
     strcpy(gbCheatList[i].cheatCode, code);
     strcpy(gbCheatList[i].cheatDesc, desc);
+#endif
 
     gbCheatList[i].code = 0x101;
     gbCheatList[i].value = (GBCHEAT_HEX_VALUE(code[0]) << 4) + GBCHEAT_HEX_VALUE(code[1]);

@@ -1516,7 +1516,12 @@ void dexp_saveVars(char *file)
 {
   std::map<std::string, uint32_t>::iterator iter;
 
+#if __STDC_WANT_SECURE_LIB__
+  FILE* f = NULL;
+  fopen_s(&f, file, "w");
+#else
   FILE *f = fopen(file, "w");
+#endif
   if (!f) {
     printf("Could not open file %s\n", file);
     return;
@@ -1535,14 +1540,23 @@ void dexp_loadVars(char *file)
   char name[500];
   uint32_t val;
 
+#if __STDC_WANT_SECURE_LIB__
+  FILE* f = NULL;
+  fopen_s(&f, file, "r");
+#else
   FILE *f = fopen(file, "r");
+#endif
   if (!f) {
     printf("Could not open file %s\n", file);
     return;
   }
 
   while (fgets(buffer, 500, f) != NULL) {
-    if (sscanf(buffer, "%s = %x",name,&val) == 2) {
+#if __STDC_WANT_SECURE_LIB__
+    if (sscanf_s(buffer, "%s = %x", name, (unsigned)_countof(name), &val) == 2) {
+#else
+    if (sscanf(buffer, "%s = %x", name, &val) == 2) {
+#endif
       dexp_setVar(name, val);
     }
   }

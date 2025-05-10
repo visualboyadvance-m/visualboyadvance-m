@@ -11,6 +11,7 @@
 
 #if __STDC_WANT_SECURE_LIB__
 #define snprintf sprintf_s
+#define sscanf sscanf_s
 #endif
 
 /**
@@ -1299,8 +1300,13 @@ void cheatsAdd(const char* codeStr,
         cheatsList[x].rawaddress = rawaddress;
         cheatsList[x].address = address;
         cheatsList[x].value = value;
+#if __STDC_WANT_SECURE_LIB__
+        strcpy_s(cheatsList[x].codestring, sizeof(cheatsList[x].codestring), codeStr);
+        strcpy_s(cheatsList[x].desc, sizeof(cheatsList[x].desc), desc);
+#else
         strcpy(cheatsList[x].codestring, codeStr);
         strcpy(cheatsList[x].desc, desc);
+#endif
         cheatsList[x].enabled = true;
         cheatsList[x].status = 0;
 
@@ -1461,7 +1467,11 @@ bool cheatsVerifyCheatCode(const char* code, const char* desc)
     uint32_t value = 0;
 
     char buffer[10];
+#if __STDC_WANT_SECURE_LIB__
+    strncpy_s(buffer, sizeof(buffer), code, 8);
+#else
     strncpy(buffer, code, 8);
+#endif
     buffer[8] = 0;
     sscanf(buffer, "%x", &address);
 
@@ -1486,7 +1496,12 @@ bool cheatsVerifyCheatCode(const char* code, const char* desc)
         return false;
     }
 
+#if __STDC_WANT_SECURE_LIB__
+    strncpy_s(buffer, sizeof(buffer), &code[9], 8);
+#else
     strncpy(buffer, &code[9], 8);
+#endif
+
     sscanf(buffer, "%x", &value);
     int type = 0;
     if (len == 13)
@@ -1574,11 +1589,19 @@ void cheatsAddGSACode(const char* code, const char* desc, bool v3)
     }
 
     char buffer[10];
+#if __STDC_WANT_SECURE_LIB__
+    strncpy_s(buffer, sizeof(buffer), code, 8);
+#else
     strncpy(buffer, code, 8);
+#endif
     buffer[8] = 0;
     uint32_t address;
     sscanf(buffer, "%x", &address);
+#if __STDC_WANT_SECURE_LIB__
+    strncpy_s(buffer, sizeof(buffer), &code[8], 8);
+#else
     strncpy(buffer, &code[8], 8);
+#endif
     buffer[8] = 0;
     uint32_t value;
     sscanf(buffer, "%x", &value);
@@ -2459,11 +2482,19 @@ void cheatsAddCBACode(const char* code, const char* desc)
     }
 
     char buffer[10];
+#if __STDC_WANT_SECURE_LIB__
+    strncpy_s(buffer, sizeof(buffer), code, 8);
+#else
     strncpy(buffer, code, 8);
+#endif
     buffer[8] = 0;
     uint32_t address;
     sscanf(buffer, "%x", &address);
+#if __STDC_WANT_SECURE_LIB__
+    strncpy_s(buffer, sizeof(buffer), &code[9], 4);
+#else
     strncpy(buffer, &code[9], 4);
+#endif
     buffer[4] = 0;
     uint32_t value;
     sscanf(buffer, "%x", &value);
@@ -2640,12 +2671,20 @@ void cheatsReadGame(gzFile file, int version)
         if (cheatsList[i].code == 512 && firstCodeBreaker) {
             firstCodeBreaker = false;
             char buffer[10];
+#if __STDC_WANT_SECURE_LIB__
+            strncpy_s(buffer, sizeof(buffer), cheatsList[i].codestring, 8);
+#else
             strncpy(buffer, cheatsList[i].codestring, 8);
+#endif
             buffer[8] = 0;
             uint32_t address;
             sscanf(buffer, "%x", &address);
             if ((address >> 28) == 9) {
+#if __STDC_WANT_SECURE_LIB__
+                strncpy_s(buffer, sizeof(buffer), &cheatsList[i].codestring[9], 4);
+#else
                 strncpy(buffer, &cheatsList[i].codestring[9], 4);
+#endif
                 buffer[4] = 0;
                 uint32_t value;
                 sscanf(buffer, "%x", &value);
@@ -2780,12 +2819,20 @@ bool cheatsLoadCheatList(const char* file)
         if (cheatsList[i].code == 512 && firstCodeBreaker) {
             firstCodeBreaker = false;
             char buffer[10];
+#if __STDC_WANT_SECURE_LIB__
+            strncpy_s(buffer, sizeof(buffer), cheatsList[i].codestring, 8);
+#else
             strncpy(buffer, cheatsList[i].codestring, 8);
+#endif
             buffer[8] = 0;
             uint32_t address;
             sscanf(buffer, "%x", &address);
             if ((address >> 28) == 9) {
+#if __STDC_WANT_SECURE_LIB__
+                strncpy_s(buffer, sizeof(buffer), &cheatsList[i].codestring[9], 4);
+#else
                 strncpy(buffer, &cheatsList[i].codestring[9], 4);
+#endif
                 buffer[4] = 0;
                 uint32_t value;
                 sscanf(buffer, "%x", &value);

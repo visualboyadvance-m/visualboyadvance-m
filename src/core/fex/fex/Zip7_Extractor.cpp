@@ -288,7 +288,11 @@ blargg_err_t Zip7_Extractor::next_v()
 				time_t _time = time;
 				
 			#ifdef _WIN32
-				tm = *localtime( &_time );
+				#if __STDC_WANT_SECURE_LIB__
+					localtime_s(&tm, &_time);
+				#else
+					tm = *localtime( &_time );
+				#endif
 			#else
 				localtime_r( &_time, &tm );
 			#endif

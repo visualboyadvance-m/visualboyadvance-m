@@ -280,7 +280,11 @@ const char* elfGetAddressSymbol(uint32_t addr)
                 if (offset)
                     snprintf(buffer, 256, "%s+%d", name, offset);
                 else {
+#if __STDC_WANT_SECURE_LIB__
+                    strncpy_s(buffer, sizeof(buffer), name, 255); //strncpy_s does not allways append a '\0'
+#else
                     strncpy(buffer, name, 255);		//strncpy does not allways append a '\0'
+#endif
 		    buffer[255] = '\0';
 		}
                 return buffer;
@@ -300,16 +304,28 @@ const char* elfGetAddressSymbol(uint32_t addr)
                 if (offset)
                     snprintf(buffer, 256,"%s+%d", name, addr - s->value);
                 else {
+#if __STDC_WANT_SECURE_LIB__
+                    strncpy_s(buffer, sizeof(buffer), name, 255);
+#else
                     strncpy(buffer, name, 255);
+#endif
 		    buffer[255] = '\0';
 		}
                 return buffer;
             } else if (addr == s->value) {
                 if (s->name) {
+#if __STDC_WANT_SECURE_LIB__
+                    strncpy_s(buffer, sizeof(buffer), s->name, 255);
+#else
                     strncpy(buffer, s->name, 255);
+#endif
 		    buffer[255] = '\0';
 		} else
+#if __STDC_WANT_SECURE_LIB__
+                    strcpy_s(buffer, sizeof(buffer), "");
+#else
                     strcpy(buffer, "");
+#endif
                 return buffer;
             }
         }

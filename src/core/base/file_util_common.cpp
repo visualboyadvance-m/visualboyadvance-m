@@ -27,7 +27,13 @@ FILE* utilOpenFile(const char* filename, const char* mode) {
         return nullptr;
     }
 
+#if __STDC_WANT_SECURE_LIB__
+    FILE *ret = NULL;
+    _wfopen_s(&ret, wfilename.data(), wmode.data());
+    return ret;
+#else
     return _wfopen(wfilename.data(), wmode.data());
+#endif
 #else
     return fopen(filename, mode);
 #endif  // _WIN32

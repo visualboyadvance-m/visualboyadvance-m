@@ -18,6 +18,7 @@
 
 #if __STDC_WANT_SECURE_LIB__
 #define snprintf sprintf_s
+#define sscanf sscanf_s
 #endif
 
 #define getcwd _getcwd
@@ -472,7 +473,13 @@ const char* FindConfigFile(const char *name)
 	}
 
 #ifdef _WIN32
+#if __STDC_WANT_SECURE_LIB__
+        char *home = NULL;
+        size_t home_sz = 0;
+        _dupenv_s(&home, &home_sz, "USERPROFILE");
+#else
 	char *home = getenv("USERPROFILE");
+#endif
 	if (home != NULL) {
 		snprintf(path, "%s%c%s", home, kFileSep, name);
 		if (FileExists(path))
@@ -483,12 +490,28 @@ const char* FindConfigFile(const char *name)
 
 	if (!strchr(arg0, '/') &&
 		!strchr(arg0, '\\')) {
+#if __STDC_WANT_SECURE_LIB__
+		char *env_path = NULL;
+                size_t env_path_sz = 0;
+                _dupenv_s(&env_path, &env_path_sz, "PATH");
+#else
 		char *env_path = getenv("PATH");
+#endif
 
 		if (env_path != NULL) {
+#if __STDC_WANT_SECURE_LIB__
+			strncpy_s(buffer, sizeof(buffer), env_path, 4096);
+#else
 			strncpy(buffer, env_path, 4096);
+#endif
 			buffer[4095] = 0;
+#if __STDC_WANT_SECURE_LIB__
+                        char *next_tok1 = NULL;
+                        char *next_tok2 = NULL;
+			char *tok = strtok_s(buffer, PATH_SEP, &next_tok1);
+#else
 			char *tok = strtok(buffer, PATH_SEP);
+#endif
 
 			while (tok) {
 				snprintf(env_path, 4096, "%s%c%s", tok, kFileSep, EXE_NAME);
@@ -499,13 +522,21 @@ const char* FindConfigFile(const char *name)
 						return path2;
 					}
 				}
+#if __STDC_WANT_SECURE_LIB__
+				tok = strtok_s(NULL, PATH_SEP, &next_tok2);
+#else
 				tok = strtok(NULL, PATH_SEP);
+#endif
 			}
 		}
 	}
 	else {
 		// executable is relative to some directory
+#if __STDC_WANT_SECURE_LIB__
+		strcpy_s(buffer, sizeof(buffer), arg0);
+#else
 		strcpy(buffer, arg0);
+#endif
 		char *p = strrchr(buffer, kFileSep);
 		if (p) {
 			*p = 0;
@@ -550,7 +581,11 @@ void SaveConfigFile()
 		FILE *f = utilOpenFile(configFile, "w");
 		if (f == NULL) {
                         char err_msg[4096] = "unknown error";
+#if __STDC_WANT_SECURE_LIB__
+                        strerror_s(err_msg, sizeof(err_msg), errno);
+#else
                         strncpy(err_msg, strerror(errno), 4096);
+#endif
 			fprintf(stderr, "Configuration file '%s' could not be written to: %s\n", configFile, err_msg);
 			return;
 		}
@@ -633,7 +668,11 @@ static char *xstrdup(const char *s)
                 return NULL;
         t = (char *)malloc(strlen(s) + 1);
         if (t) {
+#if __STDC_WANT_SECURE_LIB__
+                strcpy_s(t, strlen(s) + 1, s);
+#else
                 strcpy(t, s);
+#endif
         }
         return t;
 }
@@ -659,7 +698,11 @@ int ReadOpts(int argc, char ** argv)
 		  {
 			  //char* cpy;
 			  //cpy = (char *)malloc(1 + strlen(optarg));
+			  //#if __STDC_WANT_SECURE_LIB__
+			  //strcpy_s(cpy, 1 + strlen(optarg), optarg);
+			  //#else
 			  //strcpy(cpy, optarg);
+			  //#endif
 			  //preparedCheatCodes[preparedCheats++] = cpy;
 			std::string cpy = optarg;
 			preparedCheatCodes[preparedCheats++] = cpy.c_str();
@@ -712,7 +755,11 @@ int ReadOpts(int argc, char ** argv)
 			}
 			else {
 				patchNames[patchNum] = (char *)malloc(1 + strlen(optarg));
+#if __STDC_WANT_SECURE_LIB__
+				strcpy_s(patchNames[patchNum], 1 + strlen(optarg), optarg);
+#else
 				strcpy(patchNames[patchNum], optarg);
+#endif
 				patchNum++;
 			}
 			break;

@@ -100,7 +100,12 @@ bool utilWritePNGFile(const char* fileName, int w, int h, uint8_t* pix) {
 bool utilWriteBMPFile(const char* fileName, int w, int h, uint8_t* pix) {
     uint8_t writeBuffer[512 * 3];
 
+#if __STDC_WANT_SECURE_LIB__
+    FILE* fp = NULL;
+    fopen_s(&fp, fileName, "wb");
+#else
     FILE* fp = fopen(fileName, "wb");
+#endif
 
     if (!fp) {
         systemMessage(MSG_ERROR_CREATING_FILE, N_("Error creating file %s"), fileName);

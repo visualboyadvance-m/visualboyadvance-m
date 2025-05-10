@@ -40,7 +40,7 @@ void utilReadDataMem(const uint8_t *&data, variable_desc *);
 #else  // !defined(__LIBRETRO__)
 
 // strip .gz or .z off end
-void utilStripDoubleExtension(const char *, char *);
+void utilStripDoubleExtension(const char *, char *, size_t);
 
 gzFile utilAutoGzOpen(const char *file, const char *mode);
 gzFile utilGzOpen(const char *file, const char *mode);

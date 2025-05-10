@@ -56,7 +56,13 @@ std::FILE* openFile(const ghc::filesystem::path& filename, std::string mode)
 {
 #ifdef SFML_SYSTEM_WINDOWS
     const std::wstring wmode(mode.begin(), mode.end());
+#if __STDC_WANT_SECURE_LIB__
+    std::FILE* ret = NULL;
+    _wfopen_s(&ret, filename.c_str(), wmode.data());
+    return ret;
+#else
     return _wfopen(filename.c_str(), wmode.data());
+#endif
 #else
     return std::fopen(filename.c_str(), mode.data());
 #endif

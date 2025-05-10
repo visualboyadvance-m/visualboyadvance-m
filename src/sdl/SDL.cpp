@@ -388,9 +388,17 @@ char* sdlGetFilename(const char* name)
     char path[1024];
     const char *_filename = strrchr(name, kFileSep);
     if (_filename)
+#if __STDC_WANT_SECURE_LIB__
+        strcpy_s(path, sizeof(path), _filename + 1);
+#else
         strcpy(path, _filename + 1);
+#endif
     else
+#if __STDC_WANT_SECURE_LIB__
+        strcpy_s(path, sizeof(path), name);
+#else
         strcpy(path, name);
+#endif
     return strdup(path);
 }
 
@@ -432,7 +440,12 @@ FILE* sdlFindFile(const char* name)
         fprintf(stdout, "Searching current directory: %s\n", buffer);
     }
 
+#if __STDC_WANT_SECURE_LIB__
+    FILE* f = NULL;
+    fopen_s(&f, name, "r");
+#else
     FILE* f = fopen(name, "r");
+#endif
     if (f != NULL) {
         return f;
     }
@@ -440,55 +453,105 @@ FILE* sdlFindFile(const char* name)
     if (strlen(homeDataDir)) {
         fprintf(stdout, "Searching home directory: %s\n", homeDataDir);
         snprintf(path, sizeof(path), "%s%c%s", homeDataDir, kFileSep, name);
+#if __STDC_WANT_SECURE_LIB__
+        fopen_s(&f, path, "r");
+#else
         f = fopen(path, "r");
+#endif
         if (f != NULL)
             return f;
     }
 
 #ifdef _WIN32
+#if __STDC_WANT_SECURE_LIB__
+    char* profileDir = NULL;
+    size_t profileDirSz = 0;
+    _dupenv_s(&profileDir, &profileDirSz, "USERPROFILE");
+#else
     char* profileDir = getenv("USERPROFILE");
+#endif
     if (profileDir != NULL) {
         fprintf(stdout, "Searching user profile directory: %s\n", profileDir);
         snprintf(path, sizeof(path), "%s%c%s", profileDir, kFileSep, name);
+#if __STDC_WANT_SECURE_LIB__
+        fopen_s(&f, path, "r");
+#else
         f = fopen(path, "r");
+#endif
         if (f != NULL)
             return f;
     }
 
     if (!strchr(home, '/') && !strchr(home, '\\')) {
+#if __STDC_WANT_SECURE_LIB__
+        char* _path = NULL;
+        size_t _pathSz = 0;
+        _dupenv_s(&_path, &_pathSz, "PATH");
+#else
         char* _path = getenv("PATH");
+#endif
 
         if (_path != NULL) {
             fprintf(stdout, "Searching PATH\n");
+#if __STDC_WANT_SECURE_LIB__
+            strcpy_s(buffer, sizeof(buffer), _path);
+#else
             strcpy(buffer, _path);
+#endif
             buffer[sizeof(buffer) - 1] = 0;
+#if __STDC_WANT_SECURE_LIB__
+            char* tok_next1 = NULL;
+            char* tok_next2 = NULL;
+            char* tok = strtok_s(buffer, PATH_SEP, &tok_next1);
+#else
             char* tok = strtok(buffer, PATH_SEP);
+#endif
 
             while (tok) {
                 snprintf(path, sizeof(path), "%s%c%s", tok, kFileSep, EXE_NAME);
+#if __STDC_WANT_SECURE_LIB__
+                fopen_s(&f, path, "r");
+#else
                 f = fopen(path, "r");
+#endif
                 if (f != NULL) {
                     char path2[2048];
                     fclose(f);
                     snprintf(path2, sizeof(path2), "%s%c%s", tok, kFileSep, name);
+#if __STDC_WANT_SECURE_LIB__
+                    fopen_s(&f, path2, "r");
+#else
                     f = fopen(path2, "r");
+#endif
                     if (f != NULL) {
                         fprintf(stdout, "Found at %s\n", path2);
                         return f;
                     }
                 }
+#if __STDC_WANT_SECURE_LIB__
+                tok = strtok_s(NULL, PATH_SEP, &tok_next2);
+#else
                 tok = strtok(NULL, PATH_SEP);
+#endif
             }
         }
     } else {
         // executable is relative to some directory
         fprintf(stdout, "Searching executable directory\n");
+#if __STDC_WANT_SECURE_LIB__
+        strcpy_s(buffer, sizeof(buffer), home);
+#else
         strcpy(buffer, home);
+#endif
         char* p = strrchr(buffer, kFileSep);
         if (p) {
             *p = 0;
             snprintf(path, sizeof(path), "%s%c%s", buffer, kFileSep, name);
+#if __STDC_WANT_SECURE_LIB__
+            fopen_s(&f, path, "r");
+#else
             f = fopen(path, "r");
+#endif
             if (f != NULL)
                 return f;
         }
@@ -496,13 +559,21 @@ FILE* sdlFindFile(const char* name)
 #else // ! _WIN32
     fprintf(stdout, "Searching data directory: %s\n", PKGDATADIR);
     snprintf(path, sizeof(path), "%s%c%s", PKGDATADIR, kFileSep, name);
+#if __STDC_WANT_SECURE_LIB__
+    fopen_s(&f, path, "r");
+#else
     f = fopen(path, "r");
+#endif
     if (f != NULL)
         return f;
 
     fprintf(stdout, "Searching system config directory: %s\n", SYSCONF_INSTALL_DIR);
     snprintf(path, sizeof(path), "%s%c%s", SYSCONF_INSTALL_DIR, kFileSep, name);
+#if __STDC_WANT_SECURE_LIB__
+    fopen_s(&f, path, "r");
+#else
     f = fopen(path, "r");
+#endif
     if (f != NULL)
         return f;
 #endif // ! _WIN32
@@ -631,7 +702,12 @@ static void sdlApplyPerImagePreferences()
         if (p)
             *p = 0;
 
+#if __STDC_WANT_SECURE_LIB__
+        char* token_next = NULL;
+        char* token = strtok_s(s, " \t\n\r=", &token_next);
+#else
         char* token = strtok(s, " \t\n\r=");
+#endif
 
         if (!token)
             continue;
@@ -655,7 +731,12 @@ static void sdlApplyPerImagePreferences()
             if (p)
                 *p = 0;
 
+#if __STDC_WANT_SECURE_LIB__
+            char* token_next = NULL;
+            char* token = strtok_s(s, " \t\n\r=", &token_next);
+#else
             char* token = strtok(s, " \t\n\r=");
+#endif
             if (!token)
                 continue;
             if (strlen(token) == 0)
@@ -663,7 +744,12 @@ static void sdlApplyPerImagePreferences()
 
             if (token[0] == '[') // starting another image settings
                 break;
+#if __STDC_WANT_SECURE_LIB__
+            char* value_next = NULL;
+            char* value = strtok_s(NULL, "\t\n\r=", &value_next);
+#else
             char* value = strtok(NULL, "\t\n\r=");
+#endif
             if (value == NULL)
                 continue;
 
@@ -774,13 +860,25 @@ void sdlWriteBackupStateExchange(int from, int to, int backup)
 
     dmp = sdlStateName(from);
     stateNameOrig = (char*)realloc(stateNameOrig, strlen(dmp) + 1);
+#if __STDC_WANT_SECURE_LIB__
+    strcpy_s(stateNameOrig, strlen(dmp) + 1, dmp);
+#else
     strcpy(stateNameOrig, dmp);
+#endif
     dmp = sdlStateName(to);
     stateNameDest = (char*)realloc(stateNameDest, strlen(dmp) + 1);
+#if __STDC_WANT_SECURE_LIB__
+    strcpy_s(stateNameDest, strlen(dmp) + 1, dmp);
+#else
     strcpy(stateNameDest, dmp);
+#endif
     dmp = sdlStateName(backup);
     stateNameBack = (char*)realloc(stateNameBack, strlen(dmp) + 1);
+#if __STDC_WANT_SECURE_LIB__
+    strcpy_s(stateNameBack, strlen(dmp) + 1, dmp);
+#else
     strcpy(stateNameBack, dmp);
+#endif
 
     /* on POSIX, rename would not do anything anyway for identical names, but let's check it ourselves anyway */
     if (to != backup) {
@@ -2078,7 +2176,7 @@ int main(int argc, char** argv)
     if (optind < argc) {
         char* szFile = argv[optind];
 
-        utilStripDoubleExtension(szFile, filename);
+        utilStripDoubleExtension(szFile, filename, sizeof(filename));
         char* p = strrchr(filename, '.');
 
         if (p)
@@ -2173,7 +2271,11 @@ int main(int argc, char** argv)
     } else {
         soundInit();
         cartridgeType = 0;
+#if __STDC_WANT_SECURE_LIB__
+        strcpy_s(filename, sizeof(filename), "gnu_stub");
+#else
         strcpy(filename, "gnu_stub");
+#endif
         g_rom = (uint8_t*)malloc(0x2000000);
         g_workRAM = (uint8_t*)calloc(1, 0x40000);
         g_bios = (uint8_t*)calloc(1, 0x4000);
@@ -2678,7 +2780,11 @@ void systemConsoleMessage(const char* msg)
     struct tm now_time_broken;
 
     now_time = time(NULL);
+#if __STDC_WANT_SECURE_LIB__
+    localtime_s(&now_time_broken, &now_time);
+#else
     now_time_broken = *(localtime(&now_time));
+#endif
     fprintf(
         stdout,
         "%02d:%02d:%02d %02d.%02d.%4d: %s\n",
@@ -2697,10 +2803,18 @@ void systemScreenMessage(const char* msg)
     screenMessage = true;
     screenMessageTime = systemGetClock();
     if (strlen(msg) > 20) {
+#if __STDC_WANT_SECURE_LIB__
+        strncpy_s(screenMessageBuffer, sizeof(screenMessageBuffer), msg, 20);
+#else
         strncpy(screenMessageBuffer, msg, 20);
+#endif
         screenMessageBuffer[20] = 0;
     } else
+#if __STDC_WANT_SECURE_LIB__
+        strcpy_s(screenMessageBuffer, sizeof(screenMessageBuffer), msg);
+#else
         strcpy(screenMessageBuffer, msg);
+#endif
 
     systemConsoleMessage(msg);
 }
@@ -2799,7 +2913,11 @@ void log(const char* defaultMsg, ...)
     static FILE* out = NULL;
 
     if (out == NULL) {
+#if __STDC_WANT_SECURE_LIB__
+        fopen_s(&out, "trace.log", "w");
+#else
         out = fopen("trace.log", "w");
+#endif
     }
 
     va_list valist;

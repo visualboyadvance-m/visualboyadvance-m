@@ -111,7 +111,11 @@ void SetGBATime()
 {
     time_t long_time;
     time(&long_time); /* Get time as long integer. */
+#if __STDC_WANT_SECURE_LIB__
+    localtime_s(&gba_time, &long_time); /* Convert to local time. */
+#else
     gba_time = *localtime(&long_time); /* Convert to local time. */
+#endif
 }
 
 void rtcUpdateTime(int ticks)

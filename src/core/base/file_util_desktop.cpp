@@ -48,10 +48,15 @@ fex_t* scanArchive(const char* file, bool (*accept)(const char*), char (&buffer)
     // Scan filenames
     bool found = false;
     while (!fex_done(fe)) {
+#ifdef __STDC_WANT_SECURE_LIB__
+        strncpy_s(buffer, sizeof buffer, fex_name(fe), sizeof buffer);
+#else
         strncpy(buffer, fex_name(fe), sizeof buffer);
+#endif
+
         buffer[sizeof buffer - 1] = '\0';
 
-        utilStripDoubleExtension(buffer, buffer);
+        utilStripDoubleExtension(buffer, buffer, sizeof buffer);
 
         if (accept(buffer)) {
             found = true;
@@ -153,9 +158,16 @@ IMAGE_TYPE utilFindType(const char* file) {
     return utilFindType(file, buffer);
 }
 
-void utilStripDoubleExtension(const char* file, char* buffer) {
+void utilStripDoubleExtension(const char* file, char* buffer, size_t len) {
+#if !__STDC_WANT_SECURE_LIB__
+    (void)len;
+#endif
     if (buffer != file)  // allows conversion in place
+#if __STDC_WANT_SECURE_LIB__
+        strcpy_s(buffer, len, file);
+#else
         strcpy(buffer, file);
+#endif
 
     if (utilIsGzipFile(file)) {
         char* p = strrchr(buffer, '.');

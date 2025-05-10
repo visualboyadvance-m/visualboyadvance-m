@@ -66,7 +66,11 @@ std::vector<VBamIoVec> g_vbamIoVecs;
 void ResetMBC3RTC() {
     time(&gbDataMBC3.mapperLastTime);
     struct tm* lt;
+#if __STDC_WANT_SECURE_LIB__
+    localtime_s(lt, &gbDataMBC3.mapperLastTime);
+#else
     lt = localtime(&gbDataMBC3.mapperLastTime);
+#endif
     gbDataMBC3.mapperSeconds = lt->tm_sec;
     gbDataMBC3.mapperMinutes = lt->tm_min;
     gbDataMBC3.mapperHours = lt->tm_hour;
@@ -80,7 +84,11 @@ void ResetTama5RTC() {
                                  31, 31, 30, 31, 30, 31};
     time(&gbDataTAMA5.mapperLastTime);
     struct tm* lt;
+#if __STDC_WANT_SECURE_LIB__
+    localtime_s(lt, &gbDataTAMA5.mapperLastTime);
+#else
     lt = localtime(&gbDataTAMA5.mapperLastTime);
+#endif
     gbDataTAMA5.mapperSeconds = lt->tm_sec;
     gbDataTAMA5.mapperMinutes = lt->tm_min;
     gbDataTAMA5.mapperHours = lt->tm_hour;
@@ -111,7 +119,12 @@ void ResetTama5RTC() {
 
 void ResetHuc3RTC() {
     time(&gbRTCHuC3.mapperLastTime);
+#if __STDC_WANT_SECURE_LIB__
+    struct tm* lt;
+    localtime_s(lt, &gbRTCHuC3.mapperLastTime);
+#else
     localtime(&gbRTCHuC3.mapperLastTime);
+#endif
 }
 
 bool WriteBatteryFile(const char* file_name) {

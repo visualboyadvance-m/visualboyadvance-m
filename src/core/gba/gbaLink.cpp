@@ -538,21 +538,37 @@ bool GetLinkServerHost(char* const host, size_t size)
     host[0] = '\0';
 
     if (linkDriver && linkDriver->mode == LINK_GAMECUBE_DOLPHIN) {
+#if __STDC_WANT_SECURE_LIB__
+        strncpy_s(host, size, joybusHostAddr.toString().c_str(), size);
+#else
         strncpy(host, joybusHostAddr.toString().c_str(), size);
+#endif
     } else if (lanlink.server) {
         if (IP_LINK_BIND_ADDRESS == "*") {
             auto local_addr = sf::IpAddress::getLocalAddress();
             if (local_addr) {
+#if __STDC_WANT_SECURE_LIB__
+                strncpy_s(host, size, local_addr.value().toString().c_str(), size);
+#else
                 strncpy(host, local_addr.value().toString().c_str(), size);
+#endif
             } else {
                 return false;
             }
         } else {
+#if __STDC_WANT_SECURE_LIB__
+            strncpy_s(host, size, IP_LINK_BIND_ADDRESS.c_str(), size);
+#else
             strncpy(host, IP_LINK_BIND_ADDRESS.c_str(), size);
+#endif
         }
     }
     else {
+#if __STDC_WANT_SECURE_LIB__
+        strncpy_s(host, size, lc.serveraddr.toString().c_str(), size);
+#else
         strncpy(host, lc.serveraddr.toString().c_str(), size);
+#endif
     }
 
     return true;
