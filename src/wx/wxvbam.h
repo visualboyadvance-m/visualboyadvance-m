@@ -36,6 +36,7 @@
 #endif
 
 #include "wx/wxlogdebug.h"
+#include "wx/compat_generic_file_dialog.h"
 
 template <typename T>
 void CheckPointer(T pointer)

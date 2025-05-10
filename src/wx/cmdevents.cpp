@@ -141,9 +141,11 @@ EVT_HANDLER(wxID_OPEN, "Open ROM...")
         "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;"
         "*.zip;*.7z;*.rar|");
     pats.append(wxALL_FILES);
+
     wxFileDialog dlg(this, _("Open ROM file"), gba_rom_dir, "",
         pats,
         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+
     dlg.SetFilterIndex(open_ft);
 
     if (ShowModal(&dlg) == wxID_OK)

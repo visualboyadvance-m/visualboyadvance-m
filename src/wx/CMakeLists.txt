@@ -261,6 +261,11 @@ function(configure_wx_target target)
         _add_compile_definitions(${wxWidgets_DEFINITIONS_DEBUG})
     endif()
 
+    # Generic file dialogs
+    if (ENABLE_GENERIC_FILE_DIALOGS)
+        _add_compile_definitions(USE_GENERIC_FILE_DIALOGS)
+    endif()
+
     # No Metal
     if(NOT CMAKE_Metal_COMPILER)
         _add_compile_definitions(NO_METAL)

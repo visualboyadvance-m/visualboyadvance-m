@@ -15,6 +15,7 @@ if(WIN32 OR APPLE)
 endif()
 
 option(ENABLE_SDL3 "Use SDL3" ON)
+option(ENABLE_GENERIC_FILE_DIALOGS "Use generic file dialogs" OFF)
 option(DISABLE_OPENGL "Disable OpenGL" OFF)
 option(ENABLE_SDL "Build the SDL port" ${ENABLE_SDL_DEFAULT})
 option(ENABLE_WX "Build the wxWidgets port" ${BUILD_DEFAULT})
