@@ -75,3 +75,4 @@ jobs:
       - if: matrix.build_options == 'default'
         name: Run tests
         run: cd build && xvfb-run ctest -j --output-on-failure
+
