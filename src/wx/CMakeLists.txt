@@ -181,6 +181,10 @@ endif()
 # Find OpenAL (required).
 find_package(OpenAL REQUIRED)
 
+if(WIN32)
+    find_library(FMT fmt)
+endif()
+
 # Workaround of static liblzma not being found on MSYS2.
 if(VBAM_STATIC AND MSYS)
     unset(cleaned_up_wx_libs)
@@ -276,7 +280,7 @@ function(configure_wx_target target)
         _add_compile_definitions(AL_LIBTYPE_STATIC)
 
         if(WIN32)
-            list(APPEND OPENAL_LIBRARY avrt)
+            list(APPEND OPENAL_LIBRARY ${FMT} avrt)
         endif()
     endif()
     _add_include_directories(${OPENAL_INCLUDE_DIR})
