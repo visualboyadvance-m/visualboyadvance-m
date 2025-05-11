@@ -1198,6 +1198,9 @@ void GfxViewer::SaveBMP(wxCommandEvent& ev)
 
     wxFileDialog dlg(GetGrandParent(), _("Select output file"), bmp_save_dir_, def_name,
         _("PNG images|*.png|BMP images|*.bmp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+    SetGenericPath(dlg, bmp_save_dir_);
+
     dlg.SetFilterIndex(capture_format);
     int ret = dlg.ShowModal();
     bmp_save_dir_ = dlg.GetDirectory();

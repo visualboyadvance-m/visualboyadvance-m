@@ -947,6 +947,9 @@ void PrintDialog::DoSave(wxCommandEvent&)
 
     wxFileDialog fdlg(dlg, _("Save printer image to"), prsav_path, dn,
         pats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+    SetGenericPath(fdlg, prsav_path);
+
     int ret = fdlg.ShowModal();
     prsav_path = fdlg.GetDirectory();
 

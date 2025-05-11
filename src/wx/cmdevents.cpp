@@ -146,6 +146,8 @@ EVT_HANDLER(wxID_OPEN, "Open ROM...")
         pats,
         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
+    SetGenericPath(dlg, gba_rom_dir);
+
     dlg.SetFilterIndex(open_ft);
 
     if (ShowModal(&dlg) == wxID_OK)
@@ -175,6 +177,8 @@ EVT_HANDLER(OpenGB, "Open GB...")
         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     dlg.SetFilterIndex(open_ft);
 
+    SetGenericPath(dlg, gb_rom_dir);
+
     if (ShowModal(&dlg) == wxID_OK)
         wxGetApp().pending_load = dlg.GetPath();
 
@@ -201,6 +205,8 @@ EVT_HANDLER(OpenGBC, "Open GBC...")
         pats,
         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     dlg.SetFilterIndex(open_ft);
+
+    SetGenericPath(dlg, gbc_rom_dir);
 
     if (ShowModal(&dlg) == wxID_OK)
         wxGetApp().pending_load = dlg.GetPath();
@@ -367,6 +373,9 @@ EVT_HANDLER_MASK(SetLoadingDotCodeFile, "Load e-Reader Dot Code...", CMDEN_GBA)
                          "E-Reader Dot Code (*.bin;*.raw)|"
                          "*.bin;*.raw"),
         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+    
+    SetGenericPath(dlg, loaddotcodefile_path);
+    
     int ret = ShowModal(&dlg);
 
     if (ret != wxID_OK)
@@ -389,6 +398,9 @@ EVT_HANDLER_MASK(SetSavingDotCodeFile, "Save e-Reader Dot Code...", CMDEN_GBA)
                          "E-Reader Dot Code (*.bin;*.raw)|"
                          "*.bin;*.raw"),
         wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+    SetGenericPath(dlg, savedotcodefile_path);
+
     int ret = ShowModal(&dlg);
 
     if (ret != wxID_OK)
@@ -407,6 +419,9 @@ EVT_HANDLER_MASK(ImportBatteryFile, "Import battery file...", CMDEN_GB | CMDEN_G
 
     wxFileDialog dlg(this, _("Select battery file"), batimp_path, wxEmptyString,
         _("Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+
+    SetGenericPath(dlg, batimp_path);
+
     int ret = ShowModal(&dlg);
     batimp_path = dlg.GetDirectory();
 
@@ -435,6 +450,9 @@ EVT_HANDLER_MASK(ImportGamesharkCodeFile, "Import Game Shark code file...", CMDE
     wxFileDialog dlg(this, _("Select code file"), path, wxEmptyString,
         panel->game_type() == IMAGE_GBA ? _("Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc") : _("Game Shark Code File (*.gcf)|*.gcf"),
         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+
+    SetGenericPath(dlg, path);
+
     int ret = ShowModal(&dlg);
     path = dlg.GetDirectory();
 
@@ -555,6 +573,9 @@ EVT_HANDLER_MASK(ImportGamesharkActionReplaySnapshot,
     wxFileDialog dlg(this, _("Select snapshot file"), gss_path, wxEmptyString,
         panel->game_type() == IMAGE_GBA ? _("Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots (*.gsv)|*.gsv") : _("Game Boy Snapshot (*.gbs)|*.gbs"),
         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+
+    SetGenericPath(dlg, gss_path);
+
     int ret = ShowModal(&dlg);
     gss_path = dlg.GetDirectory();
 
@@ -602,6 +623,9 @@ EVT_HANDLER_MASK(ExportBatteryFile, "Export battery file...", CMDEN_GB | CMDEN_G
 
     wxFileDialog dlg(this, _("Select battery file"), batimp_path, wxEmptyString,
         _("Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+    SetGenericPath(dlg, batimp_path);
+
     int ret = ShowModal(&dlg);
     batimp_path = dlg.GetDirectory();
 
@@ -630,6 +654,9 @@ EVT_HANDLER_MASK(ExportGamesharkSnapshot, "Export GameShark snapshot...", CMDEN_
     def_name.append(wxT(".sps"));
     wxFileDialog dlg(this, _("Select snapshot file"), gss_path, def_name,
         _("Game Shark Snapshot (*.sps)|*.sps"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+    SetGenericPath(dlg, gss_path);
+
     int ret = ShowModal(&dlg);
     gss_path = dlg.GetDirectory();
 
@@ -675,6 +702,9 @@ EVT_HANDLER_MASK(ScreenCapture, "Screen capture...", CMDEN_GB | CMDEN_GBA)
 
     wxFileDialog dlg(this, _("Select output file"), scap_path, def_name,
         _("PNG images|*.png|BMP images|*.bmp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+    SetGenericPath(dlg, scap_path);
+
     dlg.SetFilterIndex(capture_format);
     int ret = ShowModal(&dlg);
     scap_path = dlg.GetDirectory();
@@ -753,6 +783,9 @@ EVT_HANDLER_MASK(RecordSoundStartRecording, "Start sound recording...", CMDEN_NS
     def_name += extoff.Left(wxStrcspn(extoff, wxT(";|")));
     wxFileDialog dlg(this, _("Select output file"), sound_path, def_name,
         sound_exts, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+    SetGenericPath(dlg, sound_path);
+
     dlg.SetFilterIndex(sound_extno);
     int ret = ShowModal(&dlg);
     sound_extno = dlg.GetFilterIndex();
@@ -823,6 +856,9 @@ EVT_HANDLER_MASK(RecordAVIStartRecording, "Start video recording...", CMDEN_NVRE
     def_name += extoff.Left(wxStrcspn(extoff, wxT(";|")));
     wxFileDialog dlg(this, _("Select output file"), vid_path, def_name,
         vid_exts, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+    SetGenericPath(dlg, vid_path);
+
     dlg.SetFilterIndex(vid_extno);
     int ret = ShowModal(&dlg);
     vid_extno = dlg.GetFilterIndex();
@@ -892,6 +928,9 @@ EVT_HANDLER_MASK(RecordMovieStartRecording, "Start game recording...", CMDEN_NGR
     def_name += extoff.Left(wxStrcspn(extoff, wxT(";|")));
     wxFileDialog dlg(this, _("Select output file"), mov_path, def_name,
         mov_exts, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+    SetGenericPath(dlg, mov_path);
+
     dlg.SetFilterIndex(mov_extno);
     int ret = ShowModal(&dlg);
     mov_extno = dlg.GetFilterIndex();
@@ -959,6 +998,9 @@ EVT_HANDLER_MASK(PlayMovieStartPlaying, "Start playing movie...", CMDEN_NGREC | 
     def_name += extoff.Left(wxStrcspn(extoff, wxT(";|")));
     wxFileDialog dlg(this, _("Select file"), mov_path, def_name,
         mov_exts, wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+
+    SetGenericPath(dlg, mov_path);
+
     dlg.SetFilterIndex(mov_extno);
     int ret = ShowModal(&dlg);
     mov_extno = dlg.GetFilterIndex();
@@ -1263,6 +1305,9 @@ EVT_HANDLER_MASK(Load, "Load state...", CMDEN_GB | CMDEN_GBA)
 
     wxFileDialog dlg(this, _("Select state file"), st_dir, wxEmptyString,
         _("Visual Boy Advance saved game files|*.sgm"), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+
+    SetGenericPath(dlg, st_dir);
+
     int ret = ShowModal(&dlg);
     st_dir = dlg.GetDirectory();
 
@@ -1356,6 +1401,9 @@ EVT_HANDLER_MASK(Save, "Save state as...", CMDEN_GB | CMDEN_GBA)
 
     wxFileDialog dlg(this, _("Select state file"), st_dir, wxEmptyString,
         _("Visual Boy Advance saved game files|*.sgm"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+    SetGenericPath(dlg, st_dir);
+
     int ret = ShowModal(&dlg);
     st_dir = dlg.GetDirectory();
 

@@ -1229,6 +1229,9 @@ void savepal(wxWindow* parent, const uint8_t* data, int ncols, const wxString ty
     wxFileDialog dlg(parent, _("Select output file and type"), pdir, def_name,
         _("Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color Table (*.act)|*.act"),
         wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+    SetGenericPath(dlg, pdir);
+
     dlg.SetFilterIndex(ptype);
     int ret = dlg.ShowModal();
     ptype = dlg.GetFilterIndex();
@@ -1688,6 +1691,9 @@ public:
 
         wxFileDialog dlg(GetGrandParent(), _("Select output file"), bmp_save_dir, def_name,
             _("PNG images|*.png|BMP images|*.bmp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+        SetGenericPath(dlg, bmp_save_dir);
+
         dlg.SetFilterIndex(capture_format);
         int ret = dlg.ShowModal();
         bmp_save_dir = dlg.GetDirectory();
@@ -1833,6 +1839,9 @@ public:
 
         wxFileDialog dlg(GetGrandParent(), _("Select output file"), bmp_save_dir, def_name,
             _("PNG images|*.png|BMP images|*.bmp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+        SetGenericPath(dlg, bmp_save_dir);
+
         dlg.SetFilterIndex(capture_format);
         int ret = dlg.ShowModal();
         bmp_save_dir = dlg.GetDirectory();

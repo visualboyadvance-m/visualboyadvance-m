@@ -376,12 +376,14 @@ static inline void gfxDrawRotScreen16Bit(uint16_t control, uint16_t x_l, uint16_
     int sizeX = 240;
     int sizeY = 160;
 
+#if 0
     int startX = (x_l) | ((x_h & 0x07FF) << 16);
     if (x_h & 0x0800)
         startX |= 0xF8000000;
     int startY = (y_l) | ((y_h & 0x07FF) << 16);
     if (y_h & 0x0800)
         startY |= 0xF8000000;
+#endif
 
     int dx = pa & 0x7FFF;
     if (pa & 0x8000)

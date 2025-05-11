@@ -228,7 +228,10 @@ class Stereo_Buffer : public Multi_Buffer
         buf_t bufs[bufs_size];
         Stereo_Mixer mixer;
         channel_t chan;
+    
+#if 0
         long samples_avail_;
+#endif
 };
 
 // Silent_Buffer generates no samples, useful where no sound is wanted

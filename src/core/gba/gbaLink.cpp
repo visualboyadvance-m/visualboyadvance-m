@@ -142,6 +142,7 @@ int WaitForSingleObject(sem_t* s, int t)
 #include <signal.h>
 static void alrmhand(int sig)
 {
+    (void)sig;
 }
 #endif
 int WaitForSingleObject(sem_t* s, int t)

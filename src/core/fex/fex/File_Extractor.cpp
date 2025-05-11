@@ -63,9 +63,11 @@ static void make_unbuffered( Std_File_Reader* r )
 	r->make_unbuffered();
 }
 
+#if 0
 inline
 static void make_unbuffered( void* )
 { }
+#endif
 
 blargg_err_t File_Extractor::open_arc_file( bool unbuffered )
 {

@@ -587,6 +587,9 @@ void LogDialog::Save(wxCommandEvent& ev)
     pats.append(wxALL_FILES);
     wxFileDialog dlg(this, _("Select output file"), logdir, def_name,
         pats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+    SetGenericPath(dlg, logdir);
+
     int ret = dlg.ShowModal();
     def_name = dlg.GetPath();
     logdir = dlg.GetDirectory();
@@ -729,6 +732,9 @@ public:
         pats.append(wxALL_FILES);
         wxFileDialog dlg(this, _("Select memory dump file"), memsave_dir, memsave_fn,
             pats, wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+    
+        SetGenericPath(dlg, memsave_dir);
+
         int ret = dlg.ShowModal();
         memsave_fn = dlg.GetPath();
         memsave_dir = dlg.GetDirectory();
@@ -801,6 +807,9 @@ public:
         pats.append(wxALL_FILES);
         wxFileDialog dlg(this, _("Select output file"), memsave_dir, memsave_fn,
             pats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+    
+        SetGenericPath(dlg, memsave_dir);
+
         int ret = dlg.ShowModal();
         memsave_dir = dlg.GetDirectory();
         memsave_fn = dlg.GetPath();

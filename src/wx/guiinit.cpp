@@ -257,6 +257,9 @@ public:
             wxFileDialog subdlg(dlg, _("Select cheat file"), cheatdir, cheatfn,
                 _("VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"),
                 wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+
+            SetGenericPath(subdlg, cheatdir);
+
             int ret = subdlg.ShowModal();
             cheatdir = subdlg.GetDirectory();
             cheatfn = subdlg.GetPath();
@@ -310,6 +313,9 @@ public:
             wxFileDialog subdlg(dlg, _("Select cheat file"), cheatdir,
                 cheatfn, _("VBA cheat lists (*.clt)|*.clt"),
                 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+            SetGenericPath(subdlg, cheatdir);
+
             int ret = subdlg.ShowModal();
             cheatdir = subdlg.GetDirectory();
             cheatfn = subdlg.GetPath();
