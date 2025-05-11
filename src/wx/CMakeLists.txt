@@ -182,7 +182,7 @@ endif()
 find_package(OpenAL REQUIRED)
 
 if(WIN32)
-    if(CMAKE_BUILD_TYPE Debug)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         find_library(FMT fmtd)
     else()
         find_library(FMT fmt)
