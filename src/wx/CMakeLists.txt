@@ -182,7 +182,11 @@ endif()
 find_package(OpenAL REQUIRED)
 
 if(WIN32)
-    find_library(FMT fmt)
+    if(CMAKE_BUILD_TYPE Debug)
+        find_library(FMT fmtd)
+    else()
+        find_library(FMT fmt)
+    endif()
 endif()
 
 # Workaround of static liblzma not being found on MSYS2.
