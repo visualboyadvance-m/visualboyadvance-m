@@ -92,21 +92,54 @@ body:
             Scale Filter Used?:
     validations:
       required: true
-  - type: textarea
-    id: SysInfo
-    attributes:
-      label: Specifications and Build details
-      description: "List your system information, you can obtain this from MSINFO32 and the emulators Titlebar."
-      value: |
-            VBA-M: (include commit version number and whether you are using the 32-bit or 64-bit version)
-            OS: (include version and OS build number using WinVer if on Windows):
-            If using Linux, specify if using xorg or Wayland:
-            CPU:
-            GPU:
-            RAM:
-    validations:
-      required: true
-  - type: checkboxes
+- type: markdown
+  attributes:
+    value: "### Specifications and Build Details\nList your system information, you can obtain this from MSINFO32 and the emulator's title bar."
+- type: input
+  id: VBA-M
+  attributes:
+    label: VBA-M Version
+    description: "Include commit version number and whether you are using the 32-bit or 64-bit version."
+  validations:
+    required: true
+- type: input
+  id: OS
+  attributes:
+    label: Operating System
+    description: "Include version and OS build number using WinVer if on Windows."
+  validations:
+    required: true
+- type: dropdown
+  id: Linux_Display_Server
+  attributes:
+    label: Linux Display Server
+    description: "Specify whether using Xorg or Wayland."
+    options:
+      - Xorg
+      - Wayland
+  validations:
+    required: false
+- type: input
+  id: CPU
+  attributes:
+    label: CPU Model
+    description: "Provide details of your CPU model."
+  validations:
+    required: true
+- type: input
+  id: GPU
+  attributes:
+    label: GPU Model
+    description: "Provide details of your GPU model."
+  validations:
+    required: true
+- type: input
+  id: RAM
+  attributes:
+    label: RAM Size
+    description: "Specify the amount of RAM installed."
+  validations:
+    required: true  - type: checkboxes
     id: Copyright_Compliance
     attributes:
       label: Copyright Compliance
