@@ -833,11 +833,6 @@ mac_install_core_deps() {
 
     ln -sf "$(find "$BREW_PREFIX"/Cellar/gnu-getopt -path '*/bin/getopt' | head -1)" "$BUILD_ROOT/root/bin/getopt"
 
-    if ! [ -d "$(pyenv root)/versions/2.7.18" ]; then
-        pyenv install -s 2.7.18
-    fi
-    pyenv global  2.7.18
-
     export PATH=$(pyenv root)/shims:$PATH
 
     # This is necessary because someone broke my compiler.
