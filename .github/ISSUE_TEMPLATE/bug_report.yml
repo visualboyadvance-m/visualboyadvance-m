@@ -81,15 +81,28 @@ body:
             Clean, Intro'd or Hacked?:(Attach Patch here)
     validations:
       required: false
-  - type: textarea
-    id: Settings
+  - type: markdown
     attributes:
-      label: What settings are you using?
-      description: "Please list them"
-      value: |
-            Video driver (simple, opengl):
-            Sound driver (directsound, xaudio, openal, SDL):
-            Scale Filter Used?:
+      value: "### Emulator Settings\nList the settings you are using."
+  - type: input
+    id: Video_Driver
+    attributes:
+      label: Video Driver
+      description: "Specify which video driver you're using (e.g., Simple, OpenGL)."
+    validations:
+      required: true
+  - type: input
+    id: Sound_Driver
+    attributes:
+      label: Sound Driver
+      description: "Specify which sound driver you're using (e.g., DirectSound, XAudio, OpenAL, SDL)."
+    validations:
+      required: true
+  - type: input
+    id: Scale_Filter
+    attributes:
+      label: Scale Filter
+      description: "Specify which scale filter you are using."
     validations:
       required: true
   - type: markdown
