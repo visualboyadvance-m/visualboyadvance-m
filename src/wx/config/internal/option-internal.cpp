@@ -98,6 +98,9 @@ static const std::array<wxString, kNbAudioApis> kAudioApiStrings = {
 #if defined(VBAM_ENABLE_FAUDIO)
     "faudio",
 #endif
+#if defined(__WXMAC__)
+    "coreaudio",
+#endif
 };
 
 // These MUST follow the same order as the definitions of the enum above.
