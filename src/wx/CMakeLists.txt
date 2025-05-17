@@ -8,7 +8,7 @@ include(VbamFunctions)
 set(VBAM_WX_COMMON
     audio/audio.cpp
     audio/audio.h
-    Audio/internal/coreaudio.cpp
+    audio/internal/coreaudio.cpp
     audio/internal/sdl.cpp
     audio/internal/sdl.h
     audio/internal/openal.cpp
