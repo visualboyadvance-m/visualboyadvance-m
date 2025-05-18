@@ -80,7 +80,7 @@ case "\$PATH" in
     *"\$BUILD_ROOT"*)
         ;;
     *)
-        export PATH="\$BUILD_ROOT/root/bin:\$BUILD_ROOT/root/perl5/bin:\$PATH"
+        export PATH="\$BUILD_ROOT/root/bin:\$BUILD_ROOT/root/perl5/bin:/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin:\$PATH"
         ;;
 esac
 
