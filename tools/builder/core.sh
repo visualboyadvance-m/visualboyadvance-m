@@ -120,7 +120,7 @@ DISTS=$DISTS'
     zip             https://downloads.sourceforge.net/project/infozip/Zip%203.x%20%28latest%29/3.0/zip30.tar.gz                 bin/zip
     openssl         https://github.com/openssl/openssl/releases/download/openssl-3.5.0/openssl-3.5.0.tar.gz     lib/libssl.a
     libunistring    https://ftp.gnu.org/gnu/libunistring/libunistring-1.3.tar.xz                                lib/libunistring.a
-    libpsl          https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz          lib/libpsl.a
+    libpsl          https://github.com/rockdaboot/libpsl/archive/refs/heads/master.zip                          lib/libpsl.a
     curl            https://github.com/curl/curl/releases/download/curl-8_13_0/curl-8.13.0.tar.bz2              lib/libcurl.a
     cmake           https://github.com/Kitware/CMake/releases/download/v4.0.1/cmake-4.0.1.tar.gz                bin/cmake
     zstd            https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz                 lib/libzstd.a
@@ -139,14 +139,14 @@ DISTS=$DISTS'
     flex            https://github.com/westes/flex/archive/ea6493d9b6f1915ba096160df666637a6e1b3f20.tar.gz      bin/flex
     xmlto           https://releases.pagure.org/xmlto/xmlto-0.0.29.tar.bz2                                      bin/xmlto
     gperf           http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz                                           bin/gperf
-    libicu          https://github.com/unicode-org/icu/releases/download/release-76-1/icu4c-76_1-src.tgz        lib/libicud*t*.a
+    libicu          https://github.com/unicode-org/icu/releases/download/release-77-1/icu4c-77_1-src.tgz        lib/libicud*t*.a
     pkgconf         https://github.com/pkgconf/pkgconf/archive/refs/tags/pkgconf-2.4.3.tar.gz                   bin/pkgconf
     nasm            https://github.com/netwide-assembler/nasm/archive/refs/tags/nasm-2.16.03.tar.gz             bin/nasm
     pcre            https://downloads.sourceforge.net/project/pcre/pcre/8.45/pcre-8.45.tar.bz2                  lib/libpcre.a
     pcre2           https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.45/pcre2-10.45.tar.bz2     lib/libpcre2-posix.a
     libffi          https://github.com/libffi/libffi/releases/download/v3.4.8/libffi-3.4.8.tar.gz               lib/libffi.a
     c2man           https://github.com/fribidi/c2man/archive/577ed4095383ef5284225d45709e6b5f0598a064.tar.gz    bin/c2man
-    libxml2         https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.13.8/libxml2-v2.13.8.tar.bz2            lib/libxml2.a
+    libxml2         https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.14.3/libxml2-v2.14.3.tar.bz2            lib/libxml2.a
     libxslt         https://gitlab.gnome.org/GNOME/libxslt/-/archive/v1.1.43/libxslt-v1.1.43.tar.bz2            lib/libxslt.a
     XML-NamespaceSupport https://cpan.metacpan.org/authors/id/P/PE/PERIGRIN/XML-NamespaceSupport-1.12.tar.gz    perl5/lib/perl5/XML/NamespaceSupport.pm
     XML-SAX-Base    https://cpan.metacpan.org/authors/id/G/GR/GRANTM/XML-SAX-Base-1.09.tar.gz                   perl5/lib/perl5/XML/SAX/Base.pm
@@ -246,7 +246,7 @@ DIST_TAR_ARGS="$DIST_TAR_ARGS
 
 DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     expat           autoreconf
-    libxml2         autoreconf
+    libxml2         meson
     unzip           make
     zip             make
     pkgconf         autoreconf_noargs
@@ -267,6 +267,7 @@ DIST_RELOCATION_TYPES="$DIST_RELOCATION_TYPES
 
 DIST_PRE_BUILD="$DIST_PRE_BUILD
     getopt          sed -i.bak 's/\\\$(LDFLAGS)\\(.*\\)\$/\\1 \$(LDFLAGS)/' Makefile;
+    libpsl          rm -rf list; git clone --depth 1 https://github.com/publicsuffix/list; sed -E -i.bak -e '/subdir[(].tools.[)]/d' meson.build
     libicu          cd source;
     flex            mkdir -p build-aux; touch build-aux/config.rpath; mkdir -p po; touch po/Makefile.in.in; sed -i.bak '/po \\\\$/d' Makefile.am;
     unzip           rm -f unix/Contents; ln -sf \$(find unix -mindepth 1 -maxdepth 1) .;
@@ -306,7 +307,7 @@ DIST_POST_BUILD="$DIST_POST_BUILD
     python3         python3 -m pip install six; \
                     rm \"\$BUILD_ROOT/root/bin/meson\"; \
                     python3 -m pip install meson; \
-                    rebuild_dist libxml2 --with-python;
+                    rebuild_dist libxml2 -Dpython=true;
     fontconfig      mkdir -p \"\$BUILD_ROOT/root/etc/fonts\"; \
                     touch \"\$BUILD_ROOT/root/etc/fonts/fonts.conf\"; \
                     sed -i.bak \"s|/usr/share/fonts|\$BUILD_ROOT/root/share/fonts|g\" \"\$BUILD_ROOT/root/etc/fonts/fonts.conf\";
@@ -350,7 +351,7 @@ DIST_BUILD_OVERRIDES="$DIST_BUILD_OVERRIDES
 DIST_ARGS="$DIST_ARGS
     pkgconf     --disable-tests
     libdeflate  -DLIBDEFLATE_BUILD_STATIC_LIB=TRUE -DLIBDEFLATE_BUILD_SHARED_LIB=FALSE
-    libpsl      -Druntime=no
+    libpsl      -Druntime=no -Dtests=false
     curl        --with-openssl --without-nghttp2 --without-libidn2 --without-librtmp --without-brotli
     libffi      --enable-static
     libicu      --enable-static --disable-extras --disable-tools --disable-tests --disable-samples --with-library-bits=64
@@ -378,7 +379,7 @@ DIST_ARGS="$DIST_ARGS
     libsoxr     -DWITH_OPENMP=NO
     libxavs     --disable-asm
     libzvbi     --without-x
-    libxml2     --without-python --without-python3
+    libxml2     -Dpython=false
     libbluray   --disable-bdjava-jar --disable-examples
     libopencore-amrnb   --disable-compile-c
     vidstab     -DUSE_OMP=NO
@@ -462,7 +463,7 @@ builder() {
     unpack_needed_dists $DOWNLOADED_DISTS
 
     rm -Rf "$DISTS_DIR/doxygen"
-    if [ ! -d "$DISTS_DIR/doxygen" ]; then git clone https://github.com/doxygen/doxygen.git "$DISTS_DIR/doxygen"
+    if [ ! -d "$DISTS_DIR/doxygen" ]; then git clone --depth 1 https://github.com/doxygen/doxygen.git "$DISTS_DIR/doxygen"
     fi
 
     build_needed_dists  $UNPACKED_DISTS
@@ -844,6 +845,7 @@ mac_install_core_deps() {
     "$BREW_PREFIX"/bin/brew install -q m4 perl perl-xml-parser meson ninja pyenv cmake gnu-getopt
 
     ln -sf "$(find "$BREW_PREFIX"/Cellar/gnu-getopt -path '*/bin/getopt' | head -1)" "$BUILD_ROOT/root/bin/getopt"
+    ln -sf "$(find "$BREW_PREFIX"/Cellar/m4         -path '*/bin/m4'     | head -1)" "$BUILD_ROOT/root/bin/m4"
 
     export PATH=$(pyenv root)/shims:$PATH
 

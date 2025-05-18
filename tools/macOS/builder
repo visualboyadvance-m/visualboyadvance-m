@@ -137,7 +137,7 @@ clang_path=${best_llvm_path%%:*}
 BUILD_ENV=$(cat <<EOF
 export MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET
 export COMMAND_MODE=unix2003
-export PATH="$best_llvm_path/bin:/usr/bin:/bin:/usr/sbin:/sbin:$BREW_PREFIX/bin"
+export PATH="$best_llvm_path/bin:$BREW_PREFIX/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 export CC="$clang_path/bin/clang"
 export CPP="$clang_path/bin/clang -E"
