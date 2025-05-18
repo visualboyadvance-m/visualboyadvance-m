@@ -229,6 +229,7 @@ export CMAKE_ARGS="$CMAKE_BASE_ARGS $CMAKE_ARGS $CMAKE_INSTALL_ARGS"
 export MESON_ARGS="$meSON_BASE_ARGS --buildtype release --default-library=static -Ddefault_both_libraries=static -Dprefer_static=true $MESON_INSTALL_ARGS"
 
 DIST_PATCHES=$DIST_PATCHES'
+    python3         https://gist.githubusercontent.com/andyvand/d275de733d362bf20a9c0b05f87ff4fc/raw/8d6e1c09fa52611ccf0b959284a6f68596769ba1/python3_configure.diff
     fontconfig      https://gist.githubusercontent.com/andyvand/7ee00be1f5561a1550c6fa97277f7472/raw/9194e9b8e641c8a098f06d13bbfb4ac82b381860/fontconfig_atomic.diff
     expat           https://gist.githubusercontent.com/andyvand/9c3f7497a68188db7d4be5e276c40d4f/raw/5816ef1bfdcb1f295e7ff0f152c4d6b960919c66/expat_buildconf.diff
     xmlto           https://gist.githubusercontent.com/andyvand/77efa5295baa1269c070b3c55981d30f/raw/0ba0a578b11c10af13f6df0b7f4ec1a63112f28d/xmlto_local.diff
@@ -267,7 +268,6 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
     getopt          sed -i.bak 's/\\\$(LDFLAGS)\\(.*\\)\$/\\1 \$(LDFLAGS)/' Makefile;
     libicu          cd source;
     flex            mkdir -p build-aux; touch build-aux/config.rpath; mkdir -p po; touch po/Makefile.in.in; sed -i.bak '/po \\\\$/d' Makefile.am;
-    python3         sed -i.bak '/-Wl,-stack_size,/d' configure.ac;
     unzip           rm -f unix/Contents; ln -sf \$(find unix -mindepth 1 -maxdepth 1) .;
     zip             rm -f unix/Contents; ln -sf \$(find unix -mindepth 1 -maxdepth 1) .;
     gettext         sed -i.bak 's/-Wl,--disable-auto-import//' m4/woe32-dll.m4;
