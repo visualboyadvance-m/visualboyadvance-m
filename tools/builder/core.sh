@@ -241,6 +241,7 @@ DIST_TAR_ARGS="$DIST_TAR_ARGS
 "
 
 DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
+    libxml2         autoreconf
     unzip           make
     zip             make
     pkgconf         autoreconf_noargs
