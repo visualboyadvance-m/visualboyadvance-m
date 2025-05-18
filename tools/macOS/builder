@@ -237,9 +237,6 @@ table_line_append DIST_PRE_BUILD ffmpeg "sed -i.bak 's/-lstdc++/-lc++/g' configu
 # For a 10.7 target:
 #table_line_replace DISTS wxwidgets "https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.5.1/wxWidgets-3.0.5.1.tar.bz2 lib/libwx_baseu-3.0*.a"
 
-# For 10.7 add --disable-stl
-table_line_append DIST_ARGS wxwidgets  "--with-macosx-version-min=\$MACOSX_DEPLOYMENT_TARGET"
-
 table_line_append DIST_ARGS libmodplug "CC=clang++ CXX=clang++"
 
 table_line_append DIST_PRE_BUILD libvpx " \

@@ -47,7 +47,7 @@ fi
 
 export CPPFLAGS="$CPPFLAGS${CPPFLAGS:+ }-isystem \$BUILD_ROOT/root/include -DCURL_STATICLIB -DGRAPHITE2_STATIC -DFLOAT_APPROX -Diconv=libiconv -Diconv_open=libiconv_open -Diconv_close=libiconv_close"
 export CFLAGS="-mtune=generic $CFLAGS${CFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -pthread -lm -O3 -ffast-math $MARCH -pipe -Wno-error=implicit-int -I/"
-export CXXFLAGS="-mtune=generic $CXXFLAGS${CXXFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -O3 -ffast-math $MARCH -pipe -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1 -I -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
+export CXXFLAGS="-mtune=generic $CXXFLAGS${CXXFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -O3 -ffast-math $MARCH -pipe -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1"
 export OBJCXXFLAGS="-mtune=generic $OBJCXXFLAGS${OBJCXXFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -O3 -ffast-math $MARCH -mtune=generic -pipe"
 export LDFLAGS="-mtune=generic $LDFLAGS${LDFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -pthread -lm -O3 -ffast-math $MARCH -pipe"
 export STRIP="\${STRIP:-strip}"
@@ -258,7 +258,7 @@ DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     docbook2x       autoreconf
     libvorbis       autoreconf
     libgpg-error    autoreconf
-    wxwidgets       autoreconf
+    wxwidgets       cmake
 "
 
 DIST_RELOCATION_TYPES="$DIST_RELOCATION_TYPES
@@ -384,7 +384,6 @@ DIST_ARGS="$DIST_ARGS
     vidstab     -DUSE_OMP=NO
     libx264     --enable-static --enable-pic
     libx265     -DHIGH_BIT_DEPTH=ON -DENABLE_ASSEMBLY=OFF -DENABLE_CLI=OFF
-    wxwidgets   --enable-stl --disable-precomp-headers --enable-cxx11 --enable-permissive --with-opengl --with-libpng
 "
 
 export DIST_BARE_MAKE_ARGS='CC="$CC" CXX="$CXX" LD="$CXX"'
