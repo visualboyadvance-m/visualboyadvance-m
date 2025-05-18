@@ -98,6 +98,9 @@ static const std::array<wxString, kNbAudioApis> kAudioApiStrings = {
 #if defined(VBAM_ENABLE_FAUDIO)
     "faudio",
 #endif
+#if defined(__WXMAC__)
+    "coreaudio",
+#endif
 };
 
 // These MUST follow the same order as the definitions of the enum above.
@@ -223,7 +226,11 @@ std::array<Option, kNbOptions>& Option::All() {
 #if defined(VBAM_ENABLE_XAUDIO2)
         AudioApi audio_api = AudioApi::kXAudio2;
 #else
+#if defined(__WXMAC__)
+        AudioApi audio_api = AudioApi::kCoreAudio;
+#else
         AudioApi audio_api = AudioApi::kOpenAL;
+#endif
 #endif
         wxString audio_dev;
         // 10 fixes stuttering on mac with openal, as opposed to 5

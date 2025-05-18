@@ -64,9 +64,9 @@ protected:
     void DrawingPanelInit() override;
 
 private:
-    SDL_Window *sdlwindow;
-    SDL_Texture *texture;
-    SDL_Renderer *renderer;
+    SDL_Window *sdlwindow = NULL;
+    SDL_Texture *texture = NULL;
+    SDL_Renderer *renderer = NULL;
 };
 
 #if defined(__WXMSW__) && !defined(NO_D3D)

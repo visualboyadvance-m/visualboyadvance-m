@@ -94,6 +94,9 @@ enum class AudioApi {
 #if defined(VBAM_ENABLE_FAUDIO)
     kFAudio,
 #endif  // VBAM_ENABLE_FAUDIO
+#if defined(__WXMAC__)
+    kCoreAudio,
+#endif
 
     // Do not add anything under here.
     kLast,

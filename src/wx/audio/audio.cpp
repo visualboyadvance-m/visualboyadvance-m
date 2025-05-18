@@ -12,6 +12,10 @@
 #include "wx/audio/internal/faudio.h"
 #endif
 
+#if defined(__WXMAC__)
+#include "wx/audio/internal/coreaudio.h"
+#endif
+
 #if defined(VBAM_ENABLE_XAUDIO2)
 #include "wx/audio/internal/xaudio2.h"
 #endif
@@ -39,6 +43,11 @@ std::vector<AudioDevice> EnumerateAudioDevices(const config::AudioApi& audio_api
 #if defined(VBAM_ENABLE_FAUDIO)
         case config::AudioApi::kFAudio:
             return audio::internal::GetFAudioDevices();
+#endif
+
+#if defined(__WXMAC__)
+        case config::AudioApi::kCoreAudio:
+            return audio::internal::GetCoreAudioDevices();
 #endif
 
         case config::AudioApi::kLast:
@@ -69,6 +78,11 @@ std::unique_ptr<SoundDriver> CreateSoundDriver(const config::AudioApi& api) {
 #if defined(VBAM_ENABLE_FAUDIO)
         case config::AudioApi::kFAudio:
             return audio::internal::CreateFAudioDriver();
+#endif
+
+#if defined(__WXMAC__)
+        case config::AudioApi::kCoreAudio:
+            return audio::internal::CreateCoreAudioDriver();
 #endif
 
         case config::AudioApi::kLast:

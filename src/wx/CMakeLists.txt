@@ -8,6 +8,7 @@ include(VbamFunctions)
 set(VBAM_WX_COMMON
     audio/audio.cpp
     audio/audio.h
+    audio/internal/coreaudio.cpp
     audio/internal/sdl.cpp
     audio/internal/sdl.h
     audio/internal/openal.cpp
@@ -159,6 +160,9 @@ if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
 endif()
 
 if(APPLE)
+    find_library(COREAUDIO CoreAudio)
+    find_library(COREFOUNDATION CoreFoundation)
+    find_library(AUDIOTOOLBOX AudioToolbox)
     find_library(METAL Metal)
     find_library(METALKIT MetalKit)
 endif()
@@ -333,6 +337,10 @@ function(configure_wx_target target)
 
     # Metal
     if(APPLE)
+        _add_link_libraries(${COREFOUNDATION})
+        _add_link_libraries(${COREAUDIO})
+        _add_link_libraries(${AUDIOTOOLBOX})
+
         if(CMAKE_Metal_COMPILER)
             _add_link_libraries($<LINK_LIBRARY:WEAK_FRAMEWORK,${METAL}>)
             _add_link_libraries($<LINK_LIBRARY:WEAK_FRAMEWORK,${METALKIT}>)

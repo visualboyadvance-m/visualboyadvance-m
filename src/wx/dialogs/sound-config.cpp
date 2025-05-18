@@ -194,6 +194,16 @@ SoundConfig::SoundConfig(wxWindow* parent) : BaseDialog(parent, "SoundConfig") {
     audio_api_button->Hide();
 #endif
 
+    audio_api_button = GetValidatedChild("CoreAudio");
+#if defined(__WXMAC__)
+    audio_api_button->SetValidator(AudioApiValidator(config::AudioApi::kCoreAudio));
+    audio_api_button->Bind(wxEVT_RADIOBUTTON,
+                           std::bind(&SoundConfig::OnAudioApiChanged, this, std::placeholders::_1,
+                                     config::AudioApi::kCoreAudio));
+#else
+    audio_api_button->Hide();
+#endif
+
     // Upmix configuration.
     upmix_checkbox_ = GetValidatedChild<wxCheckBox>("Upmix");
 #if defined(VBAM_ENABLE_XAUDIO2) || defined(VBAM_ENABLE_FAUDIO)
