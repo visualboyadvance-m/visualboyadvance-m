@@ -31,7 +31,7 @@ case "\$CC" in
                     :
                     ;;
                 *)
-                    CMAKE_REQUIRED_ARGS="\$CMAKE_REQUIRED_ARGS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=\$CC -DCMAKE_CXX_COMPILER=\$CXX"
+                    CMAKE_REQUIRED_ARGS="\$CMAKE_REQUIRED_ARGS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=\$CC -DCMAKE_CXX_COMPILER=\$CXX -DCMAKE_PREFIX_PATH=\"destdir${prefix}/lib/cmake\""
                     ;;
             esac
         fi
@@ -459,6 +459,11 @@ builder() {
     download_needed_dists
 
     unpack_needed_dists $DOWNLOADED_DISTS
+
+    rm -Rf "$DISTS_DIR/doxygen"
+    if [ ! -d "$DISTS_DIR/doxygen" ]; then git clone https://github.com/doxygen/doxygen.git "$DISTS_DIR/doxygen"
+    fi
+
     build_needed_dists  $UNPACKED_DISTS
 
     build_project "$@"
