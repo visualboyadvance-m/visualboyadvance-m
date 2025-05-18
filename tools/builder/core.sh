@@ -229,6 +229,7 @@ export CMAKE_ARGS="$CMAKE_BASE_ARGS $CMAKE_ARGS $CMAKE_INSTALL_ARGS"
 export MESON_ARGS="$meSON_BASE_ARGS --buildtype release --default-library=static -Ddefault_both_libraries=static -Dprefer_static=true $MESON_INSTALL_ARGS"
 
 DIST_PATCHES=$DIST_PATCHES'
+    xmlto           https://gist.githubusercontent.com/andyvand/77efa5295baa1269c070b3c55981d30f/raw/0ba0a578b11c10af13f6df0b7f4ec1a63112f28d/xmlto_local.diff
     curl            https://gist.githubusercontent.com/andyvand/e39cff33cb9e157215832c2679c4d80b/raw/77220f513fbc8b2b977bb75bc2158b11a9a6b1b9/curl_macOS.diff
     docbook2x       https://gist.githubusercontent.com/rkitover/0b5dcc95a0703a9b0e0e7eb6d325a98e/raw/e256d2fad8d19633ac8abe02a0d1e119063d1fd9/docbook2x.patch
     graphite2       https://gist.githubusercontent.com/rkitover/e753f41a7f6461ad412c2d076ec24e0f/raw/d0c2b8cccd556e407e15da8a2e739a902bd1a3b5/graphite2-static-cmake-opts.patch
