@@ -177,7 +177,7 @@ DISTS=$DISTS'
     python2         https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tar.xz                               bin/python
     python3         https://www.python.org/ftp/python/3.13.3/Python-3.13.3.tar.xz                               bin/python3
     swig            https://sourceforge.net/projects/swig/files/swig/swig-4.0.2/swig-4.0.2.tar.gz/download      bin/swig
-    doxygen         https://www.doxygen.nl/files/doxygen-1.13.2.src.tar.gz                                      bin/doxygen
+    doxygen         https://github.com/doxygen/doxygen/archive/refs/tags/Release_1_13_2.tar.gz  bin/doxygen
     XML-Parser      https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.47.tar.gz                      perl5/man/man3/XML*Parser.3*
     intltool        https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz                bin/intltoolize
     ninja           https://github.com/ninja-build/ninja/archive/v1.12.1.tar.gz                                 bin/ninja
@@ -226,9 +226,10 @@ fi
 
 export CONFIGURE_ARGS="$CONFIGURE_ARGS --disable-shared $CONFIGURE_INSTALL_ARGS"
 export CMAKE_ARGS="$CMAKE_BASE_ARGS $CMAKE_ARGS $CMAKE_INSTALL_ARGS"
-export MESON_ARGS="$meSON_BASE_ARGS --buildtype release --default-library=static -Ddefault_both_libraries=static -Dprefer_static=true $MESON_INSTALL_ARGS"
+export MESON_ARGS="$meSON_BASE_ARGS --buildtype release --default-library=static -Ddefault_both_libraries=static $MESON_INSTALL_ARGS"
 
 DIST_PATCHES=$DIST_PATCHES'
+    glib            https://gist.githubusercontent.com/andyvand/cc84cf41986a5fb1e89ffcf86e110356/raw/88c6e90ac1338503246c0263ba8cdbcb5b640da8/glib_buildfix.diff
     python3         https://gist.githubusercontent.com/andyvand/d275de733d362bf20a9c0b05f87ff4fc/raw/8d6e1c09fa52611ccf0b959284a6f68596769ba1/python3_configure.diff
     fontconfig      https://gist.githubusercontent.com/andyvand/7ee00be1f5561a1550c6fa97277f7472/raw/9194e9b8e641c8a098f06d13bbfb4ac82b381860/fontconfig_atomic.diff
     expat           https://gist.githubusercontent.com/andyvand/9c3f7497a68188db7d4be5e276c40d4f/raw/5816ef1bfdcb1f295e7ff0f152c4d6b960919c66/expat_buildconf.diff
