@@ -111,9 +111,9 @@ DISTS=$DISTS'
     bzip2           ftp://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz                                           lib/libbz2.a
     xz              https://tukaani.org/xz/xz-5.8.1.tar.gz                                                      lib/liblzma.a
     unzip           https://downloads.sourceforge.net/project/infozip/UnZip%206.x%20%28latest%29/UnZip%206.0/unzip60.tar.gz     bin/unzip
-    autoconf        https://ftp.gnu.org/gnu/autoconf/autoconf-2.71.tar.xz                                       bin/autoconf
+    autoconf        https://ftp.gnu.org/gnu/autoconf/autoconf-2.72.tar.xz                                       bin/autoconf
     autoconf-archive http://gnu.askapache.com/autoconf-archive/autoconf-archive-2022.09.03.tar.xz               share/aclocal/ax_check_gl.m4
-    automake        https://ftp.gnu.org/gnu/automake/automake-1.16.5.tar.xz                                     bin/automake
+    automake        https://ftp.gnu.org/gnu/automake/automake-1.17.tar.xz                                       bin/automake
     libtool         https://ftp.gnu.org/gnu/libtool/libtool-2.5.4.tar.xz                                        bin/libtool
     libiconv        https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.18.tar.gz                                   lib/libiconv.a
     zlib-ng         https://github.com/zlib-ng/zlib-ng/archive/refs/tags/2.2.4.tar.gz                           lib/libz.a
@@ -127,7 +127,7 @@ DISTS=$DISTS'
     libdeflate      https://github.com/ebiggers/libdeflate/releases/download/v1.23/libdeflate-1.23.tar.gz       lib/libdeflate.a
     hiredis         https://github.com/redis/hiredis/archive/refs/tags/v1.2.0.tar.gz                            lib/libhiredis.a
     ccache          https://github.com/ccache/ccache/releases/download/v4.11.2/ccache-4.11.2.tar.xz             bin/ccache
-    m4              http://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.xz                                                  bin/m4
+    m4              http://ftp.gnu.org/gnu/m4/m4-1.4.20.tar.xz                                                  bin/m4
     xorg-macros     https://xorg.freedesktop.org/releases/individual/util/util-macros-1.20.2.tar.xz             share/pkgconfig/xorg-macros.pc
     help2man        https://ftp.gnu.org/gnu/help2man/help2man-1.49.3.tar.xz                                     bin/help2man
     gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-0.24.tar.xz                                      lib/libintl.a
