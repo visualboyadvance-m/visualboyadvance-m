@@ -229,6 +229,7 @@ export CMAKE_ARGS="$CMAKE_BASE_ARGS $CMAKE_ARGS $CMAKE_INSTALL_ARGS"
 export MESON_ARGS="$meSON_BASE_ARGS --buildtype release --default-library=static -Ddefault_both_libraries=static -Dprefer_static=true $MESON_INSTALL_ARGS"
 
 DIST_PATCHES=$DIST_PATCHES'
+    curl            https://gist.githubusercontent.com/andyvand/e39cff33cb9e157215832c2679c4d80b/raw/121a9736366408ea064f96a7f9446c086f10874a/curl_macOS.diff
     docbook2x       https://gist.githubusercontent.com/rkitover/0b5dcc95a0703a9b0e0e7eb6d325a98e/raw/e256d2fad8d19633ac8abe02a0d1e119063d1fd9/docbook2x.patch
     graphite2       https://gist.githubusercontent.com/rkitover/e753f41a7f6461ad412c2d076ec24e0f/raw/d0c2b8cccd556e407e15da8a2e739a902bd1a3b5/graphite2-static-cmake-opts.patch
     python2         https://gist.githubusercontent.com/rkitover/2d9e5baff1f1cc4f2618dee53083bd35/raw/7f33fcf5470a9f1013ac6ae7bb168368a98fe5a0/python-2.7.14-custom-static-openssl.patch https://gist.githubusercontent.com/rkitover/afab7ed3ac7ce1860c43a258571c8ae1/raw/6f5fc90a7acf5f5c3ffda2edf402b28f469a4b3b/python-2.7.14-static-libintl.patch
