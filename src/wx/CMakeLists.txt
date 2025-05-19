@@ -363,6 +363,30 @@ add_executable(
     MACOSX_BUNDLE
 )
 
+if(APPLE)
+    if(CMAKE_Metal_COMPILER)
+        set(VBAM_SHADER default.metallib)
+
+        set(ShaderBase_HEADERS
+            AAPLShaderTypes.h
+        )
+
+        set(ShaderBase_SOURCES
+            AAPLShaders.metal
+        )
+
+        add_metal_shader_library(default
+            STANDARD macos-metal1.1
+            ${ShaderBase_SOURCES}
+            ${ShaderBase_HEADERS}
+        )
+
+        target_embed_metal_shader_libraries(visualboyadvance-m
+            default
+        )
+    endif()
+endif()
+/
 target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} ${VBAM_ICON_PATH})
 
 if(ENABLE_SDL3)
@@ -1095,28 +1119,4 @@ install(
 
 if (UNIX)
     install(FILES ${CMAKE_SOURCE_DIR}/src/debian/visualboyadvance-m.6 DESTINATION ${CMAKE_INSTALL_MANDIR}/man6)
-endif()
-
-if(APPLE)
-    if(CMAKE_Metal_COMPILER)
-        set(VBAM_SHADER default.metallib)
-
-        set(ShaderBase_HEADERS
-            AAPLShaderTypes.h
-        )
-
-        set(ShaderBase_SOURCES
-            AAPLShaders.metal
-        )
-
-        add_metal_shader_library(default
-            STANDARD macos-metal1.1
-            ${ShaderBase_SOURCES}
-            ${ShaderBase_HEADERS}
-        )
-
-        target_embed_metal_shader_libraries(visualboyadvance-m
-            default
-        )
-    endif()
 endif()
