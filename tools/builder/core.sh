@@ -234,7 +234,7 @@ DIST_PATCHES=$DIST_PATCHES'
     python3         https://gist.githubusercontent.com/andyvand/d275de733d362bf20a9c0b05f87ff4fc/raw/8d6e1c09fa52611ccf0b959284a6f68596769ba1/python3_configure.diff
     fontconfig      https://gist.githubusercontent.com/andyvand/7ee00be1f5561a1550c6fa97277f7472/raw/9194e9b8e641c8a098f06d13bbfb4ac82b381860/fontconfig_atomic.diff
     expat           https://gist.githubusercontent.com/andyvand/9c3f7497a68188db7d4be5e276c40d4f/raw/5816ef1bfdcb1f295e7ff0f152c4d6b960919c66/expat_buildconf.diff
-    xmlto           https://gist.githubusercontent.com/andyvand/77efa5295baa1269c070b3c55981d30f/raw/1c69eda377ad942b935f3ee6f03885cf117a887a/xmlto_local.diff
+    xmlto           https://gist.githubusercontent.com/andyvand/77efa5295baa1269c070b3c55981d30f/raw/59489e29529ebbaaac6df9da72e8da52b6eaf637/xmlto_local.diff
     curl            https://gist.githubusercontent.com/andyvand/e39cff33cb9e157215832c2679c4d80b/raw/77220f513fbc8b2b977bb75bc2158b11a9a6b1b9/curl_macOS.diff
     docbook2x       https://gist.githubusercontent.com/rkitover/0b5dcc95a0703a9b0e0e7eb6d325a98e/raw/e256d2fad8d19633ac8abe02a0d1e119063d1fd9/docbook2x.patch
     graphite2       https://gist.githubusercontent.com/rkitover/e753f41a7f6461ad412c2d076ec24e0f/raw/d0c2b8cccd556e407e15da8a2e739a902bd1a3b5/graphite2-static-cmake-opts.patch
