@@ -137,7 +137,6 @@ DISTS=$DISTS'
     texinfo         http://ftp.gnu.org/gnu/texinfo/texinfo-7.2.tar.xz                                           bin/makeinfo
     flex-2.6.4      https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz                   bin/flex
     flex            https://github.com/westes/flex/archive/ea6493d9b6f1915ba096160df666637a6e1b3f20.tar.gz      bin/flex
-    xmlto           https://releases.pagure.org/xmlto/xmlto-0.0.29.tar.bz2                                      bin/xmlto
     gperf           http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz                                           bin/gperf
     libicu          https://github.com/unicode-org/icu/releases/download/release-77-1/icu4c-77_1-src.tgz        lib/libicud*t*.a
     pkgconf         https://github.com/pkgconf/pkgconf/archive/refs/tags/pkgconf-2.4.3.tar.gz                   bin/pkgconf
@@ -174,6 +173,7 @@ DISTS=$DISTS'
     docbook5.1      https://docbook.org/xml/5.1/docbook-v5.1-os.zip                                                       share/xml/docbook/schema/dtd/5.0.1/catalog.xml
     docbook-xsl     https://downloads.sourceforge.net/project/docbook/docbook-xsl/1.79.1/docbook-xsl-1.79.1.tar.bz2       share/xml/docbook/stylesheet/docbook-xsl/catalog.xml
     docbook-xsl-ns  https://downloads.sourceforge.net/project/docbook/docbook-xsl-ns/1.79.1/docbook-xsl-ns-1.79.1.tar.bz2 share/xml/docbook/stylesheet/docbook-xsl-ns/catalog.xml
+    xmlto           https://releases.pagure.org/xmlto/xmlto-0.0.29.tar.bz2                                      bin/xmlto
     python2         https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tar.xz                               bin/python
     python3         https://www.python.org/ftp/python/3.13.3/Python-3.13.3.tar.xz                               bin/python3
     swig            https://sourceforge.net/projects/swig/files/swig/swig-4.0.2/swig-4.0.2.tar.gz/download      bin/swig
