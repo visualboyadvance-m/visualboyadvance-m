@@ -641,8 +641,8 @@ setup_meson() {
 
 setup_ccache() {
     if command -v ccache >/dev/null; then
-        ln -sf "$(command -v ccache)" "$BUILD_ROOT/root/bin/${CC##*/}"
-        ln -sf "$(command -v ccache)" "$BUILD_ROOT/root/bin/${CXX##*/}"
+        ln -sf "/usr/bin/clang" "$BUILD_ROOT/root/bin/${CC##*/}"
+        ln -sf "/usr/bin/clang++" "$BUILD_ROOT/root/bin/${CXX##*/}"
     fi
 }
 
