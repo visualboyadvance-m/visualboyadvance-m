@@ -380,7 +380,7 @@ DIST_ARGS="$DIST_ARGS
     libsoxr     -DWITH_OPENMP=NO
     libxavs     --disable-asm
     libzvbi     --without-x
-    libxml2     -Dpython=false
+    libxml2     -Dpython=None
     libbluray   --disable-bdjava-jar --disable-examples
     libopencore-amrnb   --disable-compile-c
     vidstab     -DUSE_OMP=NO
