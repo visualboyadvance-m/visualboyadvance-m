@@ -308,7 +308,7 @@ DIST_POST_BUILD="$DIST_POST_BUILD
     python3         python3 -m pip install six; \
                     rm \"\$BUILD_ROOT/root/bin/meson\"; \
                     python3 -m pip install meson; \
-                    rebuild_dist libxml2 -Dpython=true;
+                    rebuild_dist libxml2 -Dpython=disabled;
     fontconfig      mkdir -p \"\$BUILD_ROOT/root/etc/fonts\"; \
                     touch \"\$BUILD_ROOT/root/etc/fonts/fonts.conf\"; \
                     sed -i.bak \"s|/usr/share/fonts|\$BUILD_ROOT/root/share/fonts|g\" \"\$BUILD_ROOT/root/etc/fonts/fonts.conf\";
