@@ -1,5 +1,5 @@
 if(X86_32 OR X86_64)
-    add_compile_options(-mfpmath=sse -msse2)
+    add_compile_options(-msse2)
 endif()
 
 if(UPSTREAM_RELEASE)
