@@ -92,6 +92,11 @@ include(Options)
 include(Toolchain)
 include(Dependencies)
 
+# We target Windows XP for 32 bit Windows builds.
+if(WIN32 AND X86)
+    add_compile_definitions(-DWINVER=0x0501 -D_WIN32_WINNT=0x0501)
+endif()
+
 # Disable tests when not in a git checkout.
 if(NOT EXISTS "${CMAKE_SOURCE_DIR}/.git")
     set(BUILD_TESTING OFF)

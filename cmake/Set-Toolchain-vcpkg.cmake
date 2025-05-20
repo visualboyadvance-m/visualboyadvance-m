@@ -279,7 +279,7 @@ function(get_binary_packages vcpkg_exe)
 
     FetchContent_GetProperties(vcpkg_binpkg)
     if(NOT vcpkg_binpkg_POPULATED)
-        FetchContent_Populate(vcpkg_binpkg)
+        FetchContent_MakeAvailable(vcpkg_binpkg)
     endif()
 
     unset(to_install)
