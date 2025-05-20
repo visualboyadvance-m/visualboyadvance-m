@@ -304,6 +304,7 @@ DIST_POST_BUILD="$DIST_POST_BUILD
                     xmlcatalog --noout --create \"\$(cygpath -m \"\$BUILD_ROOT/root/etc/xml/catalog.xml\")\" || :;
     python2         python2 -m pip install six;
     python3         python3 -m pip install six; \
+                    python3 -m pip install setuptools; \
                     rm \"\$BUILD_ROOT/root/bin/meson\"; \
                     python3 -m pip install meson; \
                     rebuild_dist libxml2 -Dpython=disabled;
