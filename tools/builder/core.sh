@@ -189,7 +189,6 @@ DISTS=$DISTS'
     faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/25.04.tar.gz                            lib/libFAudio.a
     flac            https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.5.0.tar.xz                             lib/libFLAC.a
     harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/11.1.0/harfbuzz-11.1.0.tar.xz        lib/libharfbuzz.a
-    sfml            https://github.com/SFML/SFML/releases/download/3.0.0/SFML-3.0.0-sources.zip                 lib/libsfml-system-s.a
     shared-mime-info https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.4/shared-mime-info-2.4.tar.bz2  bin/update-mime-database
     wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.8/wxWidgets-3.2.8.tar.bz2     lib/libwx_baseu-3.*.a
     ffmpeg          http://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz                                              lib/libavformat.a
