@@ -26,9 +26,9 @@ else()
     find_package(SDL2 REQUIRED)
 endif()
 
-# Add libsamplerate to SDL3 with vcpkg
+# Add libsamplerate to SDL2 with vcpkg
 unset(SDL_LIBRARY_TEMP)
-if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
+if((NOT ENABLE_SDL3) AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     if(WIN32)
         unset(arch_suffix)
         unset(path_prefix)
@@ -40,7 +40,7 @@ if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
         endif()
         set(installed_prefix ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix}/${path_prefix})
 
-        SET(SDL_LIBRARY_TEMP ${SDL_LIBRARY_TEMP} ${installed_prefix}/lib/samplerate.lib)
+        SET(SDL_LIBRARY_TEMP ${SDL_LIBRARY_TEMP} "${installed_prefix}/lib/samplerate${CMAKE_STATIC_LIBRARY_SUFFIX}")
     else()
         SET(SDL_LIBRARY_TEMP ${SDL_LIBRARY_TEMP} -lsamplerate)
     endif()

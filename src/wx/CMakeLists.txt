@@ -89,7 +89,10 @@ if(NOT ZIP_PROGRAM)
     endif()
 endif()
 
-if(MSVC)
+find_program(XGETTEXT xgettext)
+find_program(MSGINIT  msginit)
+
+if(CMAKE_HOST_WIN32 AND (NOT XGETTEXT OR NOT MSGINIT))
     # Install gettext tools from nuget.
 
     # First fetch the nuget binary.
@@ -116,6 +119,9 @@ if(MSVC)
 
     list(APPEND CMAKE_PROGRAM_PATH ${pkg}/tools/bin)
 endif()
+
+unset(XGETTEXT)
+unset(MSGINIT)
 
 find_package(Gettext REQUIRED)
 find_program(XGETTEXT xgettext)
@@ -386,7 +392,7 @@ if(APPLE)
         )
     endif()
 endif()
-/
+
 target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} ${VBAM_ICON_PATH})
 
 if(ENABLE_SDL3)
