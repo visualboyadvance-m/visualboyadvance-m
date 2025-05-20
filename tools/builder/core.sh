@@ -315,7 +315,7 @@ DIST_POST_BUILD="$DIST_POST_BUILD
 "
 
 DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
-    ccache       cmake -DCMAKE_INSTALL_PREFIX=$BUILD_ROOT/root -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -S .. -B .
+    ccache      cmake -G Ninja -DCMAKE_INSTALL_PREFIX=$BUILD_ROOT/root -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -S .. -B .
     zlib-ng        ./configure --prefix=/usr --static --zlib-compat
     openssl     ./config no-shared --prefix=/usr --openssldir=/etc/ssl
     cmake       ./configure --prefix=/usr --no-qt-gui --parallel=\$NUM_CPUS
