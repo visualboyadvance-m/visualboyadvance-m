@@ -20,12 +20,6 @@ if(NOT DISABLE_OPENGL)
     endif()
 endif()
 
-if(ENABLE_SDL3)
-    find_package(SDL3 REQUIRED)
-else()
-    find_package(SDL2 REQUIRED)
-endif()
-
 # Add libsamplerate to SDL2 with vcpkg
 unset(SDL_LIBRARY_TEMP)
 if((NOT ENABLE_SDL3) AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")

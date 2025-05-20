@@ -16,6 +16,10 @@ endif()
 
 find_package(SDL3 QUIET)
 
+if (NOT ${SDL3_FOUND}
+  find_package(SDL2 REQUIRED)
+endif()
+
 option(ENABLE_SDL3 "Use SDL3" "${SDL3_FOUND}")
 
 option(ENABLE_GENERIC_FILE_DIALOGS "Use generic file dialogs" OFF)
