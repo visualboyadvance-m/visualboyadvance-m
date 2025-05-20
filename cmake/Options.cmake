@@ -16,7 +16,7 @@ endif()
 
 find_package(SDL3 QUIET)
 
-if (NOT ${SDL3_FOUND}
+if (NOT ${SDL3_FOUND})
   find_package(SDL2 REQUIRED)
 endif()
 
