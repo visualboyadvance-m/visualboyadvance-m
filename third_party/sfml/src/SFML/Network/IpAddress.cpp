@@ -56,19 +56,28 @@ const IpAddress IpAddress::Broadcast(255, 255, 255, 255);
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
-
 static int inet_pton(int af, const char *src, void *dst)
 {
     struct sockaddr_storage ss;
     int size = sizeof(ss);
-    char src_copy[INET6_ADDRSTRLEN];
+    char src_copy[INET6_ADDRSTRLEN+1] = { 0 };
+    wchar_t src_copy_w[INET6_ADDRSTRLEN+1] = { 0 };
+#if __STDC_WANT_SECURE_LIB__
+    size_t src_copy_w_size = 0;
+#endif
 
     ZeroMemory(&ss, sizeof(ss));
     /* stupid non-const API */
     strncpy (src_copy, src, INET6_ADDRSTRLEN);
     src_copy[INET6_ADDRSTRLEN] = 0;
 
-    if (WSAStringToAddressA(src_copy, af, NULL, (struct sockaddr *)&ss, &size) == 0) {
+#if __STDC_WANT_SECURE_LIB__
+    mbstowcs_s(&src_copy_w_size, src_copy_w, INET6_ADDRSTRLEN * sizeof(wchar_t), src_copy, INET6_ADDRSTRLEN);
+#else
+    mbstowcs(src_copy_w, src_copy, INET6_ADDRSTRLEN);
+#endif
+
+    if (WSAStringToAddressW(src_copy_w, af, NULL, (struct sockaddr *)&ss, &size) == 0) {
         switch(af) {
             case AF_INET:
                 *(struct in_addr *)dst = ((struct sockaddr_in *)&ss)->sin_addr;
@@ -85,6 +94,10 @@ static const char *inet_ntop(int af, const void *src, char *dst, socklen_t size)
 {
     struct sockaddr_storage ss;
     unsigned long s = size;
+    wchar_t dst_w[INET6_ADDRSTRLEN+1] = { 0 };
+#if __STDC_WANT_SECURE_LIB__
+    size_t src_copy_size = 0;
+#endif
 
     ZeroMemory(&ss, sizeof(ss));
     ss.ss_family = af;
@@ -99,9 +112,18 @@ static const char *inet_ntop(int af, const void *src, char *dst, socklen_t size)
         default:
             return NULL;
     }
+
     /* cannot direclty use &size because of strict aliasing rules */
-    return (WSAAddressToStringA((struct sockaddr *)&ss, sizeof(ss), NULL, dst, &s) == 0)?
-        dst : NULL;
+    if (WSAAddressToStringW((struct sockaddr *)&ss, sizeof(ss), NULL, dst_w, &s) != 0)
+        return NULL;
+
+#if __STDC_WANT_SECURE_LIB__
+    wcstombs_s(&src_copy_size, dst, INET6_ADDRSTRLEN, dst_w, INET6_ADDRSTRLEN);
+#else
+    wcstombs(dst, dst_w, INET6_ADDRSTRLEN);
+#endif
+
+    return dst;
 }
 #endif // defined(_WIN32) && _WIN32_WINNT <= _WIN32_WINNT_WINXP 
 
