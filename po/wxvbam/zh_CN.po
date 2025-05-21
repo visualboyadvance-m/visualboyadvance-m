@@ -13,7 +13,7 @@
 # Xuntao Chi <1139954766@qq.com>, 2019
 # 乙家 丁, 2024
 # 后海游泳大老爷 <my.yuicn@gmail.com>, 2015,2020
-# 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020,2022-2024
+# 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020,2022-2025
 # 威 诸 <zw57203247@126.com>, 2020
 # 智弘 王, 2022
 # 智弘 王, 2022
@@ -26,7 +26,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-08 21:06+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Weiran Wu <wwrustc@mail.ustc.edu.cn>, 2024-2025\n"
+"Last-Translator: 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020,2022-2025\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/bgk/vba-m/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -845,31 +845,31 @@ msgstr "回写状态错误"
 
 #: panel.cpp:2344
 msgid "Failed to set wayland display"
-msgstr ""
+msgstr "设置 wayland 显示失败"
 
 #: panel.cpp:2372
 msgid "Failed to initialize SDL video subsystem"
-msgstr ""
+msgstr "初始化 SDL 视频子系统失败"
 
 #: panel.cpp:2383
 msgid "Failed to initialize SDL video"
-msgstr ""
+msgstr "初始化 SDL 视频失败"
 
 #: panel.cpp:2392
 msgid "Failed to set wayland surface"
-msgstr ""
+msgstr "设置 wayland 表面失败"
 
 #: panel.cpp:2403
 msgid "Failed to set parent window"
-msgstr ""
+msgstr "设置主窗口失败"
 
 #: panel.cpp:2413 panel.cpp:2446
 msgid "Failed to create SDL window"
-msgstr ""
+msgstr "创建 SDL 窗口失败"
 
 #: panel.cpp:2433 panel.cpp:2478
 msgid "Failed to create SDL renderer"
-msgstr ""
+msgstr "创建 SDL 渲染器失败"
 
 #: panel.cpp:2958
 msgid "Enabling EGL VSync."
@@ -1274,7 +1274,7 @@ msgstr "帧间混合功能"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:401
 msgid "Bit depth"
-msgstr ""
+msgstr "位深"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:402
 msgid "Keep window on top"
@@ -1298,7 +1298,7 @@ msgstr "调整大小时保持长宽比"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:409
 msgid "SDL renderer"
-msgstr ""
+msgstr "SDL 渲染器"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:412
 msgid "BIOS file to use for Game Boy, if enabled"
@@ -2420,7 +2420,7 @@ msgstr "动态模糊"
 
 #: xrc/DisplayConfig.xrc:162
 msgid "SDL Renderer:"
-msgstr ""
+msgstr "SDL 渲染器："
 
 #: xrc/DisplayConfig.xrc:181 xrc/SoundConfig.xrc:93
 msgid "Basic"
@@ -2428,27 +2428,27 @@ msgstr "基本"
 
 #: xrc/DisplayConfig.xrc:191
 msgid "Bit Depth:"
-msgstr ""
+msgstr "位深："
 
 #: xrc/DisplayConfig.xrc:197
 msgid "8"
-msgstr ""
+msgstr "8"
 
 #: xrc/DisplayConfig.xrc:198
 msgid "16"
-msgstr ""
+msgstr "16"
 
 #: xrc/DisplayConfig.xrc:199
 msgid "24"
-msgstr ""
+msgstr "24"
 
 #: xrc/DisplayConfig.xrc:200
 msgid "32"
-msgstr ""
+msgstr "32"
 
 #: xrc/DisplayConfig.xrc:210
 msgid "Bit Depth"
-msgstr ""
+msgstr "位深"
 
 #: xrc/DisplayConfig.xrc:218
 msgid "Frame Skip"
