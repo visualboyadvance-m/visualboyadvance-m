@@ -474,6 +474,10 @@ function(vcpkg_set_toolchain)
 
     foreach(pkg ${VCPKG_DEPS})
         list(APPEND VCPKG_DEPS_QUALIFIED ${pkg}:${VCPKG_TARGET_TRIPLET})
+
+        if(VCPKG_TARGET_TRIPLET STREQUAL "x86-mingw-static")
+            list(APPEND VCPKG_DEPS_QUALIFIED libsamplerate:x86-mingw-static)
+        endif()
     endforeach()
 
     if(WIN32)

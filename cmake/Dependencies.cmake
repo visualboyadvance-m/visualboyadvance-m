@@ -32,9 +32,16 @@ if((NOT ENABLE_SDL3) AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
         if(CMAKE_BUILD_TYPE STREQUAL "Debug")
             set(path_prefix debug)
         endif()
-        set(installed_prefix ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix}/${path_prefix})
 
-        SET(SDL_LIBRARY_TEMP ${SDL_LIBRARY_TEMP} "${installed_prefix}/lib/samplerate${CMAKE_STATIC_LIBRARY_SUFFIX}")
+        set(samplerate_lib_name samplerate)
+        set(installed_prefix    ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix}/${path_prefix})
+
+        if(MINGW)
+            set(installed_prefix    ${_VCPKG_INSTALLED_DIR}/${WINARCH}-mingw${arch_suffix}/${path_prefix})
+            set(samplerate_lib_name lib${samplerate_lib_name})
+        endif()
+
+        SET(SDL_LIBRARY_TEMP ${SDL_LIBRARY_TEMP} "${installed_prefix}/lib/${samplerate_lib_name}${CMAKE_STATIC_LIBRARY_SUFFIX}")
     else()
         SET(SDL_LIBRARY_TEMP ${SDL_LIBRARY_TEMP} -lsamplerate)
     endif()

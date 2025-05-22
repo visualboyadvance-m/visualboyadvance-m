@@ -251,19 +251,6 @@ void load_opts(bool first_time_launch) {
     // config file will be updated with unset options
     cfg->SetRecordDefaults();
 
-    // Deprecated / moved options handling.
-    {
-        // The SDL audio API is no longer supported.
-        wxString temp;
-        if (cfg->Read("Sound/AudioAPI", &temp) && temp == "sdl") {
-#if defined(VBAM_ENABLE_XAUDIO2)
-            cfg->Write("Sound/AudioAPI", "xaudio2");
-#else
-            cfg->Write("Sound/AudioAPI", "openal");
-#endif
-        }
-    }
-
     // First access here will also initialize translations.
     for (config::Option& opt : config::Option::All()) {
         switch (opt.type()) {

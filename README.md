@@ -166,7 +166,7 @@ And the following development libraries:
 - [ffmpeg](https://ffmpeg.org/) (optional, at least version `4.0.4`, for game recording)
 - [gettext](https://www.gnu.org/software/gettext/) and gettext-tools
 - [SDL2](https://www.libsdl.org/) (required)
-- [openal-soft](https://kcat.strangesoft.net/openal.html) (required, a sound interface)
+- [openal-soft](https://kcat.strangesoft.net/openal.html) (optional, a sound interface)
 - [wxWidgets](https://wxwidgets.org/) (required for GUI, 2.8 and non-stl builds are no longer supported)
 
 On Linux and similar, you also need the version of GTK your wxWidgets is linked
@@ -216,6 +216,7 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_LINK=NO -G Ninja
 | `ENABLE_ONLINEUPDATES`  | Enable online update checks                                          | ON                    |
 | `ENABLE_LTO`            | Compile with Link Time Optimization (gcc and clang only)             | ON for release build  |
 | `ENABLE_GBA_LOGGING`    | Enable extended GBA logging                                          | ON                    |
+| `ENABLE_OPENAL`         | Enable openal-soft sound output for wxWidgets                        | ON, not 32 bit Win    |
 | `ENABLE_XAUDIO2`        | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |
 | `ENABLE_FAUDIO`         | Enable faudio sound output for wxWidgets,                            | ON, not 32 bit Win    |
 | `ENABLE_ASAN`           | Enable libasan sanitizers (by default address, only in debug mode)   | OFF                   |

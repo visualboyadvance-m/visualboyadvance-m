@@ -14,31 +14,6 @@ if(WIN32 OR APPLE)
     set(ENABLE_SDL_DEFAULT OFF)
 endif()
 
-find_package(SDL3 QUIET)
-
-if (NOT ${SDL3_FOUND})
-  find_package(SDL2 REQUIRED)
-endif()
-
-option(ENABLE_SDL3 "Use SDL3" "${SDL3_FOUND}")
-
-option(ENABLE_GENERIC_FILE_DIALOGS "Use generic file dialogs" OFF)
-option(DISABLE_OPENGL "Disable OpenGL" OFF)
-option(ENABLE_SDL "Build the SDL port" ${ENABLE_SDL_DEFAULT})
-option(ENABLE_WX "Build the wxWidgets port" ${BUILD_DEFAULT})
-option(ENABLE_DEBUGGER "Enable the debugger" ON)
-option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build with GCC/Clang" OFF)
-
-if(ENABLE_SDL3)
-   set(CMAKE_C_FLAGS "-DENABLE_SDL3 ${CMAKE_C_FLAGS}")
-   set(CMAKE_CXX_FLAGS "-DENABLE_SDL3 ${CMAKE_CXX_FLAGS}")
-endif()
-
-if(DISABLE_OPENGL)
-   set(CMAKE_C_FLAGS "-DNO_OPENGL -DNO_OGL ${CMAKE_C_FLAGS}")
-   set(CMAKE_CXX_FLAGS "-DNO_OPENGL -DNO_OGL ${CMAKE_CXX_FLAGS}")
-endif()
-
 # Static linking
 set(VBAM_STATIC_DEFAULT OFF)
 if(VCPKG_TARGET_TRIPLET MATCHES -static OR CMAKE_TOOLCHAIN_FILE MATCHES "mxe|-static")
@@ -63,6 +38,33 @@ if(VBAM_STATIC)
     else()
         list(INSERT CMAKE_FIND_LIBRARY_SUFFIXES 0 .a)
     endif()
+endif()
+
+find_package(SDL3 QUIET)
+
+option(ENABLE_SDL3 "Use SDL3" "${SDL3_FOUND}")
+
+if(ENABLE_SDL3)
+    find_package(SDL3 CONFIG REQUIRED)
+else()
+    find_package(SDL2 CONFIG REQUIRED)
+endif()
+
+option(ENABLE_GENERIC_FILE_DIALOGS "Use generic file dialogs" OFF)
+option(DISABLE_OPENGL "Disable OpenGL" OFF)
+option(ENABLE_SDL "Build the SDL port" ${ENABLE_SDL_DEFAULT})
+option(ENABLE_WX "Build the wxWidgets port" ${BUILD_DEFAULT})
+option(ENABLE_DEBUGGER "Enable the debugger" ON)
+option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build with GCC/Clang" OFF)
+
+if(ENABLE_SDL3)
+   set(CMAKE_C_FLAGS "-DENABLE_SDL3 ${CMAKE_C_FLAGS}")
+   set(CMAKE_CXX_FLAGS "-DENABLE_SDL3 ${CMAKE_CXX_FLAGS}")
+endif()
+
+if(DISABLE_OPENGL)
+   set(CMAKE_C_FLAGS "-DNO_OPENGL -DNO_OGL ${CMAKE_C_FLAGS}")
+   set(CMAKE_CXX_FLAGS "-DNO_OPENGL -DNO_OGL ${CMAKE_CXX_FLAGS}")
 endif()
 
 option(ENABLE_ASM "Enable x86 ASM related options" OFF)
@@ -155,6 +157,17 @@ if(WIN32)
     endif()
     option(ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ${XAUDIO2_DEFAULT})
 endif()
+
+find_package(OpenAL QUIET)
+
+set(OPENAL_DEFAULT ${OpenAL_FOUND})
+
+if(MINGW AND X86)
+    # OpenAL-Soft uses avrt.dll which is not available on Windows XP.
+    set(OPENAL_DEFAULT OFF)
+endif()
+
+option(ENABLE_OPENAL "Enable OpenAL-Soft sound output for the wxWidgets port" ${OPENAL_DEFAULT})
 
 set(ENABLE_FAUDIO_DEFAULT OFF)
 

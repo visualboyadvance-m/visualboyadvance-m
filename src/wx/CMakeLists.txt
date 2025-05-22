@@ -11,8 +11,6 @@ set(VBAM_WX_COMMON
     audio/internal/coreaudio.cpp
     audio/internal/sdl.cpp
     audio/internal/sdl.h
-    audio/internal/openal.cpp
-    audio/internal/openal.h
     background-input.cpp
     background-input.h
     cmdevents.cpp
@@ -188,13 +186,15 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     set(wxWidgets_LIB_DIR "${wxWidgets_LIB_DIR}" CACHE INTERNAL "wxWidgets library directory" FORCE)
 endif()
 
-# Find OpenAL (required).
-find_package(OpenAL REQUIRED)
+if(ENABLE_OPENAL)
+    find_package(OpenAL REQUIRED)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    find_library(FMT_LIBRARY NAMES fmtd fmt)
-else()
-    find_library(FMT_LIBRARY fmt)
+    target_sources(visualboyadvance-m PRIVATE
+        audio/internal/openal.cpp
+        audio/internal/openal.h
+    )
+
+    target_compile_definitions(visualboyadvance-m PRIVATE VBAM_ENABLE_OPENAL)
 endif()
 
 # Workaround of static liblzma not being found on MSYS2.
@@ -288,19 +288,28 @@ function(configure_wx_target target)
     endif()
 
     # OpenAL.
-    if(OPENAL_STATIC)
-        _add_compile_definitions(AL_LIBTYPE_STATIC)
+    if(ENABLE_OPENAL)
+        if(OPENAL_STATIC)
+            _add_compile_definitions(AL_LIBTYPE_STATIC)
+        endif()
+
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+            find_library(FMT_LIBRARY NAMES fmtd fmt)
+        else()
+            find_library(FMT_LIBRARY fmt)
+        endif()
 
         if(FMT_LIBRARY)
-            list(APPEND OPENAL_LIBRARY ${FMT_LIBRARY} avrt)
+            list(APPEND OPENAL_LIBRARY ${FMT_LIBRARY})
         endif()
 
         if(WIN32)
             list(APPEND OPENAL_LIBRARY avrt)
         endif()
+
+        _add_include_directories(${OPENAL_INCLUDE_DIR})
+        _add_link_libraries(${OPENAL_LIBRARY})
     endif()
-    _add_include_directories(${OPENAL_INCLUDE_DIR})
-    _add_link_libraries(${OPENAL_LIBRARY})
 
     # XAudio2.
     if(ENABLE_XAUDIO2)

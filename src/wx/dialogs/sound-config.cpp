@@ -153,10 +153,14 @@ SoundConfig::SoundConfig(wxWindow* parent) : BaseDialog(parent, "SoundConfig") {
 
     // Audio API selection.
     wxWindow* audio_api_button = GetValidatedChild("OpenAL");
+#if defined(VBAM_ENABLE_OPENAL)
     audio_api_button->SetValidator(AudioApiValidator(config::AudioApi::kOpenAL));
     audio_api_button->Bind(wxEVT_RADIOBUTTON,
                            std::bind(&SoundConfig::OnAudioApiChanged, this, std::placeholders::_1,
                                      config::AudioApi::kOpenAL));
+#else
+    audio_api_button->Hide();
+#endif
 
     audio_api_button = GetValidatedChild("SDL");
     audio_api_button->SetValidator(AudioApiValidator(config::AudioApi::kSDL));

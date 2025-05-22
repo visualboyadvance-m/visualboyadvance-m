@@ -2,7 +2,10 @@
 
 #include "core/base/check.h"
 #include "wx/audio/internal/sdl.h"
+
+#if defined(VBAM_ENABLE_OPENAL)
 #include "wx/audio/internal/openal.h"
+#endif
 
 #if defined(__WXMSW__)
 #include "wx/audio/internal/dsound.h"
@@ -24,11 +27,13 @@ namespace audio {
  
 std::vector<AudioDevice> EnumerateAudioDevices(const config::AudioApi& audio_api) {
     switch (audio_api) {
+#if defined(VBAM_ENABLE_OPENAL)
         case config::AudioApi::kOpenAL:
             return audio::internal::GetOpenALDevices();
+#endif
 
-    case config::AudioApi::kSDL:
-        return audio::internal::GetSDLDevices();
+        case config::AudioApi::kSDL:
+            return audio::internal::GetSDLDevices();
 
 #if defined(__WXMSW__)
         case config::AudioApi::kDirectSound:
@@ -59,8 +64,10 @@ std::vector<AudioDevice> EnumerateAudioDevices(const config::AudioApi& audio_api
 
 std::unique_ptr<SoundDriver> CreateSoundDriver(const config::AudioApi& api) {
     switch (api) {
+#if defined(VBAM_ENABLE_OPENAL)
         case config::AudioApi::kOpenAL:
             return audio::internal::CreateOpenALDriver();
+#endif
 
         case config::AudioApi::kSDL:
             return audio::internal::CreateSDLDriver();

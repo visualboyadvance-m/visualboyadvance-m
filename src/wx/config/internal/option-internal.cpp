@@ -87,7 +87,9 @@ static const std::array<wxString, kNbRenderMethods> kRenderMethodStrings = {
 // Adding an option without adding to this array will result in a compiler
 // error since kNbAudioApis is automatically updated.
 static const std::array<wxString, kNbAudioApis> kAudioApiStrings = {
+#if defined(VBAM_ENABLE_OPENAL)
     "openal",
+#endif
     "sdl_audio",
 #if defined(__WXMSW__)
     "directsound",
@@ -223,10 +225,16 @@ std::array<Option, kNbOptions>& Option::All() {
         bool allow_joystick_background_input = true;
 
         /// Sound
-#if defined(VBAM_ENABLE_XAUDIO2)
+#if defined(__WXMAC__)
+        AudioApi audio_api = AudioApi::kCoreAudio;
+#elif defined(VBAM_ENABLE_FAUDIO)
+        AudioApi audio_api = AudioApi::kFAudio;
+#elif defined(VBAM_ENABLE_XAUDIO2)
         AudioApi audio_api = AudioApi::kXAudio2;
-#else
+#elif defined(VBAM_ENABLE_OPENAL)
         AudioApi audio_api = AudioApi::kOpenAL;
+#else
+        AudioApi audio_api = AudioApi::kSDL;
 #endif
         wxString audio_dev;
         // 10 fixes stuttering on mac with openal, as opposed to 5
