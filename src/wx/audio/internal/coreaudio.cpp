@@ -337,6 +337,7 @@ static bool PrepareDevice(CoreAudioAudio *cadevice)
     pid_t pid = 0;
     size = sizeof(pid);
     addr.mSelector = kAudioDevicePropertyHogMode;
+    addr.mScope = kAudioDevicePropertyScopeOutput;
     result = AudioObjectGetPropertyData(devid, &addr, 0, NULL, &size, &pid);
     if ((result == noErr) && (pid != -1)) {
         return false;
