@@ -226,11 +226,7 @@ std::array<Option, kNbOptions>& Option::All() {
 #if defined(VBAM_ENABLE_XAUDIO2)
         AudioApi audio_api = AudioApi::kXAudio2;
 #else
-#if defined(__WXMAC__)
-        AudioApi audio_api = AudioApi::kCoreAudio;
-#else
         AudioApi audio_api = AudioApi::kOpenAL;
-#endif
 #endif
         wxString audio_dev;
         // 10 fixes stuttering on mac with openal, as opposed to 5
