@@ -100,7 +100,6 @@ public:
     void write(uint16_t* finalWave, int length) override;  // write the emulated sound to a sound buffer
 
     AudioStreamBasicDescription description;
-    AudioQueueBufferRef buffer = NULL;
     AudioQueueBufferRef *buffers = NULL;
     AudioQueueRef audioQueue = NULL;
     AudioDeviceID device = 0;
@@ -132,12 +131,10 @@ static void PlaybackBufferReadyCallback(void *inUserData, AudioQueueRef inAQ, Au
         }
     }
 
-    cadevice->buffer = cadevice->buffers[bufIndex];
-
     // buffer is unexpectedly here? We're probably dying, but try to requeue this buffer with silence.
-    if (cadevice->buffer) {
-        memset(cadevice->buffer->mAudioData, 0, cadevice->buffer->mAudioDataBytesCapacity);
-        cadevice->buffer->mAudioDataByteSize = 0;
+    if (inBuffer) {
+        memset(inBuffer->mAudioData, 0, inBuffer->mAudioDataBytesCapacity);
+        inBuffer->mAudioDataByteSize = 0;
     }
 
     if ((OPTION(kSoundBuffers) - 1) >= bufIndex) {
@@ -272,7 +269,6 @@ void CoreAudioAudio::deinit() {
         AudioQueueFreeBuffer(audioQueue, buffers[i]);
     }
 
-    buffer = NULL;
     AudioQueueStop(audioQueue, TRUE);
     device = 0;
     
