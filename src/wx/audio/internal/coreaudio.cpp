@@ -106,7 +106,9 @@ public:
     uint16_t current_rate = 0;
     int current_buffer = 0;
     int filled_buffers = 0;
+    AudioTimeStamp starttime;
     AudioTimeStamp timestamp;
+    AudioQueueTimelineRef timeline;
 
 private:
     int soundBufferLen = 0;
@@ -418,7 +420,6 @@ void CoreAudioAudio::resume() {
     if (!initialized)
         return;
     
-    AudioQueueDeviceGetNearestStartTime(audioQueue, &timestamp, 0);
     AudioQueueStart(audioQueue, NULL);
 
     winlog("CoreAudioAudio::resume\n");
@@ -444,6 +445,7 @@ void CoreAudioAudio::reset() {
 
 void CoreAudioAudio::setBuffer(uint16_t* finalWave, int length) {
     AudioQueueBufferRef this_buf = NULL;
+    OSStatus status = 0;
 
     this_buf = buffers[current_buffer];
 
@@ -456,7 +458,13 @@ void CoreAudioAudio::setBuffer(uint16_t* finalWave, int length) {
     this_buf->mAudioDataByteSize += (UInt32)length;
 
     if (this_buf->mAudioDataByteSize == this_buf->mAudioDataBytesCapacity) {
-        AudioQueueEnqueueBufferWithParameters(audioQueue, this_buf, 0, NULL, 0, 0, 0, NULL, NULL, &timestamp);
+        status = AudioQueueCreateTimeline(mQueue, &timeLine);
+        if(status == noErr) {
+            AudioQueueGetCurrentTime(audioQueue, timeline, &starttime, NULL);
+            AudioQueueEnqueueBufferWithParameters(audioQueue, this_buf, 0, NULL, 0, 0, 0, NULL, &starttime, &timestamp);
+        } else {
+            AudioQueueEnqueueBufferWithParameters(audioQueue, this_buf, 0, NULL, 0, 0, 0, NULL, NULL, &timestamp);
+        }
     }
 }
 
