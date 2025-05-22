@@ -458,7 +458,7 @@ void CoreAudioAudio::setBuffer(uint16_t* finalWave, int length) {
     this_buf->mAudioDataByteSize += (UInt32)length;
 
     if (this_buf->mAudioDataByteSize == this_buf->mAudioDataBytesCapacity) {
-        status = AudioQueueCreateTimeline(mQueue, &timeLine);
+        status = AudioQueueCreateTimeline(audioQueue, &timeline);
         if(status == noErr) {
             AudioQueueGetCurrentTime(audioQueue, timeline, &starttime, NULL);
             AudioQueueEnqueueBufferWithParameters(audioQueue, this_buf, 0, NULL, 0, 0, 0, NULL, &starttime, &timestamp);
@@ -491,7 +491,7 @@ void CoreAudioAudio::write(uint16_t* finalWave, int length) {
             current_buffer = 0;
         }
 
-        while (filled_buffers >= OPTION(kSoundBuffers)) {
+        while (filled_buffers >= (OPTION(kSoundBuffers) - 1)) {
             wxMilliSleep(1);
         }
     }
@@ -507,7 +507,7 @@ void CoreAudioAudio::write(uint16_t* finalWave, int length) {
         current_buffer = 0;
     }
 
-    while (filled_buffers >= OPTION(kSoundBuffers)) {
+    while (filled_buffers >= (OPTION(kSoundBuffers) - 1)) {
         wxMilliSleep(1);
     }
 }
