@@ -126,8 +126,10 @@ static void PlaybackBufferReadyCallback(void *inUserData, AudioQueueRef inAQ, Au
         memset(inBuffer->mAudioData, 0, inBuffer->mAudioDataBytesCapacity);
         inBuffer->mAudioDataByteSize = 0;
     }
-    
-    cadevice->filled_buffers--;
+
+    if (cadevice->filled_buffers > 0) {
+        cadevice->filled_buffers--;
+    }
 }
 
 static OSStatus DeviceAliveNotification(AudioObjectID devid, UInt32 num_addr, const AudioObjectPropertyAddress *addrs, void *data)
