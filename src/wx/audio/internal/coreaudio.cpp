@@ -121,6 +121,7 @@ static void PlaybackBufferReadyCallback(void *inUserData, AudioQueueRef inAQ, Au
 {
     int bufIndex = 0;
     CoreAudioAudio *cadevice = (CoreAudioAudio *)inUserData;
+    (void)inAQ;
 
     for (int i = 0; i < OPTION(kSoundBuffers); i++)
     {
@@ -489,22 +490,22 @@ void CoreAudioAudio::write(uint16_t* finalWave, int length) {
         finalWave += (avail * (description.mBitsPerChannel / 8));
         samples -= avail;
 
-        if (buffers[current_buffer]->mAudioDataByteSize == buffers[current_buffer]->mAudioDataBytesCapacity) {
+        if (buffers[current_buffer]->mAudioDataByteSize >= buffers[current_buffer]->mAudioDataBytesCapacity) {
             current_buffer++;
         }
 
-        while ((current_buffer >= (OPTION(kSoundBuffers) - 1)) && must_wait) {
+        while ((current_buffer >= OPTION(kSoundBuffers)) && must_wait) {
             wxMilliSleep(1);
         }
     }
 
     setBuffer(finalWave, samples * (description.mBitsPerChannel / 8));
 
-    if (buffers[current_buffer]->mAudioDataByteSize == buffers[current_buffer]->mAudioDataBytesCapacity) {
+    if (buffers[current_buffer]->mAudioDataByteSize >= buffers[current_buffer]->mAudioDataBytesCapacity) {
         current_buffer++;
     }
 
-    while ((current_buffer >= (OPTION(kSoundBuffers) - 1)) && must_wait) {
+    while ((current_buffer >= OPTION(kSoundBuffers)) && must_wait) {
         wxMilliSleep(1);
     }
 }
