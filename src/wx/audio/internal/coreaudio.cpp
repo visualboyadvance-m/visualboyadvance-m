@@ -103,9 +103,9 @@ public:
     AudioQueueBufferRef *buffers = NULL;
     AudioQueueRef audioQueue = NULL;
     AudioDeviceID device = 0;
-    bool must_wait = false;
     uint16_t current_rate = 0;
     int current_buffer = 0;
+    int filled_buffers = 0;
     AudioTimeStamp timestamp;
 
 private:
@@ -118,29 +118,16 @@ private:
 
 static void PlaybackBufferReadyCallback(void *inUserData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer)
 {
-    int bufIndex = 0;
     CoreAudioAudio *cadevice = (CoreAudioAudio *)inUserData;
     (void)inAQ;
-
-    for (int i = 0; i < OPTION(kSoundBuffers); i++)
-    {
-        if (inBuffer == cadevice->buffers[i])
-        {
-            bufIndex = i;
-            break;
-        }
-    }
 
     // buffer is unexpectedly here? We're probably dying, but try to requeue this buffer with silence.
     if (inBuffer) {
         memset(inBuffer->mAudioData, 0, inBuffer->mAudioDataBytesCapacity);
         inBuffer->mAudioDataByteSize = 0;
     }
-
-    if ((OPTION(kSoundBuffers) - 1) >= bufIndex) {
-        cadevice->must_wait = false;
-        cadevice->current_buffer = 0;
-    }
+    
+    cadevice->filled_buffers--;
 }
 
 static OSStatus DeviceAliveNotification(AudioObjectID devid, UInt32 num_addr, const AudioObjectPropertyAddress *addrs, void *data)
@@ -469,8 +456,6 @@ void CoreAudioAudio::setBuffer(uint16_t* finalWave, int length) {
     if (this_buf->mAudioDataByteSize == this_buf->mAudioDataBytesCapacity) {
         AudioQueueEnqueueBufferWithParameters(audioQueue, this_buf, 0, NULL, 0, 0, 0, NULL, NULL, &timestamp);
     }
-
-    must_wait = true;
 }
 
 void CoreAudioAudio::write(uint16_t* finalWave, int length) {
@@ -489,9 +474,14 @@ void CoreAudioAudio::write(uint16_t* finalWave, int length) {
 
         if (buffers[current_buffer]->mAudioDataByteSize >= buffers[current_buffer]->mAudioDataBytesCapacity) {
             current_buffer++;
+            filled_buffers++;
         }
 
-        while ((current_buffer >= OPTION(kSoundBuffers)) && must_wait) {
+        if (current_buffer >= OPTION(kSoundBuffers)) {
+            current_buffer = 0;
+        }
+
+        while (filled_buffers >= OPTION(kSoundBuffers)) {
             wxMilliSleep(1);
         }
     }
@@ -500,9 +490,14 @@ void CoreAudioAudio::write(uint16_t* finalWave, int length) {
 
     if (buffers[current_buffer]->mAudioDataByteSize >= buffers[current_buffer]->mAudioDataBytesCapacity) {
         current_buffer++;
+        filled_buffers++;
     }
 
-    while ((current_buffer >= OPTION(kSoundBuffers)) && must_wait) {
+    if (current_buffer >= OPTION(kSoundBuffers)) {
+        current_buffer = 0;
+    }
+
+    while (filled_buffers >= OPTION(kSoundBuffers)) {
         wxMilliSleep(1);
     }
 }
