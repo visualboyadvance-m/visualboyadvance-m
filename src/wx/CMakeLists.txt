@@ -186,17 +186,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     set(wxWidgets_LIB_DIR "${wxWidgets_LIB_DIR}" CACHE INTERNAL "wxWidgets library directory" FORCE)
 endif()
 
-if(ENABLE_OPENAL)
-    find_package(OpenAL REQUIRED)
-
-    target_sources(visualboyadvance-m PRIVATE
-        audio/internal/openal.cpp
-        audio/internal/openal.h
-    )
-
-    target_compile_definitions(visualboyadvance-m PRIVATE VBAM_ENABLE_OPENAL)
-endif()
-
 # Workaround of static liblzma not being found on MSYS2.
 if(VBAM_STATIC AND MSYS)
     unset(cleaned_up_wx_libs)
@@ -409,6 +398,18 @@ if(ENABLE_SDL3)
 else()
     target_include_directories(visualboyadvance-m PRIVATE ${SDL2_INCLUDE_DIRS})
 endif()
+
+if(ENABLE_OPENAL)
+    find_package(OpenAL REQUIRED)
+
+    target_sources(visualboyadvance-m PRIVATE
+        audio/internal/openal.cpp
+        audio/internal/openal.h
+    )
+
+    target_compile_definitions(visualboyadvance-m PRIVATE VBAM_ENABLE_OPENAL)
+endif()
+
 
 target_link_libraries(
     visualboyadvance-m
