@@ -12,12 +12,6 @@
 // MMDevice API
 #include <mmdeviceapi.h>
 
-#if _MSC_VER
-#include <xaudio2.legacy.h>
-#else
-#include <XAudio2.h>
-#endif
-
 #include <wx/arrstr.h>
 #include <wx/log.h>
 #include <wx/translation.h>
@@ -26,6 +20,12 @@
 #include "core/base/system.h"  // for systemMessage()
 #include "core/gba/gbaGlobals.h"
 #include "wx/config/option-proxy.h"
+
+#if _MSC_VER
+#include <xaudio2.legacy.h>
+#else
+#include <XAudio2.h>
+#endif
 
 namespace audio {
 namespace internal {
