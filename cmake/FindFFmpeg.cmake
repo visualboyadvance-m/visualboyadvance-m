@@ -33,7 +33,7 @@ include(FindPackageHandleStandardArgs)
 
 # The default components were taken from a survey over other FindFFMPEG.cmake files
 if (NOT FFmpeg_FIND_COMPONENTS)
-  set(FFmpeg_FIND_COMPONENTS AVCODEC AVFORMAT AVUTIL)
+  set(FFmpeg_FIND_COMPONENTS AVFORMAT AVCODEC AVUTIL)
 endif ()
 
 #
@@ -99,8 +99,8 @@ endmacro()
 if (NOT FFMPEG_LIBRARIES)
 
   # Check for all possible component.
-  find_component(AVCODEC    libavcodec    avcodec  libavcodec/avcodec.h)
   find_component(AVFORMAT   libavformat   avformat libavformat/avformat.h)
+  find_component(AVCODEC    libavcodec    avcodec  libavcodec/avcodec.h)
   find_component(AVDEVICE   libavdevice   avdevice libavdevice/avdevice.h)
   find_component(AVUTIL     libavutil     avutil   libavutil/avutil.h)
   find_component(AVFILTER   libavfilter   avfilter libavfilter/avfilter.h)
