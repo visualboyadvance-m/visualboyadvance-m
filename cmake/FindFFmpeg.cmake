@@ -33,7 +33,7 @@ include(FindPackageHandleStandardArgs)
 
 # The default components were taken from a survey over other FindFFMPEG.cmake files
 if (NOT FFmpeg_FIND_COMPONENTS)
-  set(FFmpeg_FIND_COMPONENTS AVFORMAT AVCODEC AVUTIL X264 X265)
+  set(FFmpeg_FIND_COMPONENTS AVFORMAT AVCODEC AVUTIL SWSCALE SWRESAMPLE X264 X265)
 endif ()
 
 #
