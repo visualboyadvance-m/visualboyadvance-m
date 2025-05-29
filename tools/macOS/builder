@@ -247,6 +247,7 @@ table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg "--disable-videotoolbox --extr
 
 #table_line_append DIST_PATCHES ffmpeg "-p0 https://gist.githubusercontent.com/rkitover/db75d083b74617b186eec11965c1da74/raw/20da2f8c6d8c02ce284096c5e805ae671351cc6e/ffmpeg-macos10-7.patch"
 
+table_line_append DIST_PATCHES wxwidgets "-p1 https://gist.githubusercontent.com/rkitover/ea85fa30bbb3e6378e845c7934e3e01d/raw/9090dbab11861da8725c8d17433b4d90ebfbb82e/wx-macOS.patch"
 
 if [ -n "$APPLE_SILICON" ] && [ "$target_cpu" != ARM64 ]; then
     table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg '--disable-asm'

@@ -1442,6 +1442,7 @@ int wxvbamApp::FilterEvent(wxEvent& event)
     return user_input_event.FilterProcessedInput(user_input.value());
 }
 
+#ifndef VBAM_WX_MAC_PATCHED_FOR_ALERT_SOUND
 bool wxvbamApp::ProcessEvent(wxEvent& event) {
     if (event.GetEventType() == wxEVT_KEY_DOWN) {
         // First, figure out if the focused window can process the key down event.
@@ -1461,3 +1462,4 @@ bool wxvbamApp::ProcessEvent(wxEvent& event) {
     }
     return wxApp::ProcessEvent(event);
 }
+#endif

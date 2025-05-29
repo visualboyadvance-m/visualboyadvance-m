@@ -85,7 +85,9 @@ public:
             return false;
         }
     }
+#ifndef VBAM_WX_MAC_PATCHED_FOR_ALERT_SOUND
     bool ProcessEvent(wxEvent& event) final;
+#endif
 
     wxString GetConfigDir();
     wxString GetDataDir();

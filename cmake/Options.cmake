@@ -191,3 +191,13 @@ if(TRANSLATIONS_ONLY AND (ENABLE_SDL OR ENABLE_WX))
 endif()
 
 option(GPG_SIGNATURES "Create GPG signatures for release files" OFF)
+
+if(APPLE)
+   set(wx_mac_patched_default OFF)
+
+   if(UPSTREAM_RELEASE)
+      set(wx_mac_patched_default ON)
+   endif()
+
+   option(WX_MAC_PATCHED "A build of wxWidgets that is patched for the alert sound bug is being used" ${wx_mac_patched_default})
+endif()
