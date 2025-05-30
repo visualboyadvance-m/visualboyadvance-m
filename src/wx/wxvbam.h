@@ -38,6 +38,10 @@
 #include "wx/wxlogdebug.h"
 #include "wx/compat_generic_file_dialog.h"
 
+#if defined(__APPLE__) && defined(__MACH__)
+#define VBAM_WX_MAC_PATCHED_FOR_ALERT_SOUND 1
+#endif
+
 template <typename T>
 void CheckPointer(T pointer)
 {
