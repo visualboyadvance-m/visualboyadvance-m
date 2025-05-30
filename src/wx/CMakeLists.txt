@@ -1022,7 +1022,7 @@ endif()
 
 if(APPLE AND UPSTREAM_RELEASE)
     if(WX_MAC_PATCHED)
-        set_target_compile_definitions(visualboyadvance-m PRIVATE VBAM_WX_MAC_PATCHED_FOR_ALERT_SOUND)
+        target_compile_definitions(visualboyadvance-m PRIVATE VBAM_WX_MAC_PATCHED_FOR_ALERT_SOUND)
     endif()
 
     if(CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
