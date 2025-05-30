@@ -190,7 +190,8 @@ DISTS=$DISTS'
     flac            https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.5.0.tar.xz                             lib/libFLAC.a
     harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/11.1.0/harfbuzz-11.1.0.tar.xz        lib/libharfbuzz.a
     shared-mime-info https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.4/shared-mime-info-2.4.tar.bz2  bin/update-mime-database
-    wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.8/wxWidgets-3.2.8.tar.bz2     lib/libwx_baseu-3.*.a
+    libmspack       https://github.com/kyz/libmspack/archive/refs/tags/v1.11.tar.gz lib/libmspack.a
+    wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.0-rc1/wxWidgets-3.3.0-rc1.tar.bz2     lib/libwx_baseu-3.*.a
     ffmpeg          http://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz                                              lib/libavformat.a
 '
 
@@ -258,6 +259,7 @@ DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     docbook2x       autoreconf
     libvorbis       autoreconf
     libgpg-error    autoreconf
+    libmspack       autoreconf
     wxwidgets       cmake
 "
 
@@ -291,7 +293,7 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
     docbook2x       sed -i.bak 's/^\\( *SUBDIRS *= *.*\\)doc\\(.*\\)\$/\1\2/'           Makefile.am; \
                     sed -i.bak 's/^\\( *SUBDIRS *= *.*\\)documentation\\(.*\\)\$/\1\2/' xslt/Makefile.am;
     hiredis         sed -i.bak 's/ SHARED / STATIC /' CMakeLists.txt;
-    wxwidgets       sed -i.bak 's/^WX_LDFLAGS=.*/WX_LDFLAGS=\$USER_LDFLAGS/' configure.in;
+#   wxwidgets       sed -i.bak 's/^WX_LDFLAGS=.*/WX_LDFLAGS=\$USER_LDFLAGS/' configure.in;
 "
 
 DIST_POST_BUILD="$DIST_POST_BUILD
@@ -321,6 +323,7 @@ DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
     cmake       ./configure --prefix=/usr --no-qt-gui --parallel=\$NUM_CPUS
     XML-SAX     echo no | PERL_MM_USE_DEFAULT=0 \"\$perl\" Makefile.PL
     libvpx      ./configure --disable-shared --enable-static --prefix=/usr --disable-unit-tests --disable-tools --disable-docs --disable-examples
+    libmspack   cd libmspack && libtoolize && automake --add-missing && autoreconf && ./configure --enable-static --disable-shared --prefix=/usr
     ffmpeg      ./configure --disable-pthreads --disable-shared --enable-static --prefix=/usr --pkg-config-flags=--static --disable-nonfree --enable-fontconfig --enable-gpl --enable-version3 --disable-libass --disable-libbluray --enable-libfreetype --disable-libgsm --disable-libmodplug --disable-libmp3lame --disable-libopencore-amrnb --disable-libopencore-amrwb --disable-libopus --disable-libsnappy --disable-libsoxr --disable-libspeex --disable-libtheora --disable-libvidstab --disable-libvo-amrwbenc --disable-libvorbis --disable-libvpx --disable-libx264 --disable-libx265 --disable-libxavs --disable-libxvid --disable-libzmq --disable-openssl --enable-lzma --extra-cflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-cxxflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-objcflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-libs=-liconv --cc=\"\$CC\" --cxx=\"\$CXX\"
 "
 
