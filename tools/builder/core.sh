@@ -230,7 +230,7 @@ export MESON_ARGS="$meSON_BASE_ARGS --buildtype release --default-library=static
 
 DIST_PATCHES=$DIST_PATCHES'
     unzip           https://gist.githubusercontent.com/andyvand/23b485fa21139ba3aa08816425f03294/raw/9febcf8725e42ecdb5ff914ac3b1e0899623e620/unzip_buildfix.diff
-    glib            https://gist.githubusercontent.com/andyvand/cc84cf41986a5fb1e89ffcf86e110356/raw/670957e814d721b13ae6685b915bb1779c441cef/glib_buildfix.diff
+#   glib            https://gist.githubusercontent.com/andyvand/cc84cf41986a5fb1e89ffcf86e110356/raw/670957e814d721b13ae6685b915bb1779c441cef/glib_buildfix.diff
     python3         https://gist.githubusercontent.com/andyvand/d275de733d362bf20a9c0b05f87ff4fc/raw/8d6e1c09fa52611ccf0b959284a6f68596769ba1/python3_configure.diff
     fontconfig      https://gist.githubusercontent.com/andyvand/7ee00be1f5561a1550c6fa97277f7472/raw/9194e9b8e641c8a098f06d13bbfb4ac82b381860/fontconfig_atomic.diff
     expat           https://gist.githubusercontent.com/andyvand/9c3f7497a68188db7d4be5e276c40d4f/raw/5816ef1bfdcb1f295e7ff0f152c4d6b960919c66/expat_buildconf.diff
