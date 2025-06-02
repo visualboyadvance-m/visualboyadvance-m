@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Andrés Oña, 2025
+# Camilo Muñoz, 2025
 # chxndler perez cueva <chxndlerpc@gmail.com>, 2018
 # Dani Quiroz, 2022
 # David Martínez <david8dgm@gmail.com>, 2020
@@ -23,7 +24,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-23 02:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Dilan Meza, 2025\n"
+"Last-Translator: Camilo Muñoz, 2025\n"
 "Language-Team: Spanish (Latin America) (http://app.transifex.com/bgk/vba-m/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -59,7 +60,7 @@ msgstr "Archivos Game Boy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;
 
 #: cmdevents.cpp:175
 msgid "Open GB ROM file"
-msgstr "Open GB ROM file"
+msgstr "Abrir archivo GB ROM"
 
 #: cmdevents.cpp:198
 msgid ""
@@ -69,7 +70,7 @@ msgstr "Archivos Game Boy Color (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|
 
 #: cmdevents.cpp:204
 msgid "Open GBC ROM file"
-msgstr "Open GBC ROM file"
+msgstr "Abrir archivo GBC ROM"
 
 #: cmdevents.cpp:371 cmdevents.cpp:396
 msgid "Select Dot Code file"
