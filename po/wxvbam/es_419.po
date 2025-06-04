@@ -342,7 +342,7 @@ msgstr "Esto eliminará todos los aceleradores definidos por el usuario. ¿Está
 
 #: dialogs/accel-config.cpp:255 dialogs/accel-config.cpp:302
 msgid "Confirm"
-msgstr "Confirm"
+msgstr "Confirmar"
 
 #: dialogs/accel-config.cpp:300
 #, c-format
@@ -372,7 +372,7 @@ msgstr "No usable rpi plugins found in %s"
 #: dialogs/display-config.cpp:469 dialogs/display-config.cpp:548
 #: xrc/DisplayConfig.xrc:124
 msgid "Plugin"
-msgstr "Plugin"
+msgstr "Complemento"
 
 #: dialogs/display-config.cpp:476
 #, c-format
@@ -3943,7 +3943,7 @@ msgstr "Tile Viewer"
 
 #: xrc/TileViewer.xrc:24
 msgid "Colors"
-msgstr "Colors"
+msgstr "Colores"
 
 #: xrc/SpeedupConfig.xrc:4
 msgid "SpeedUp / Turbo Settings"
@@ -3955,7 +3955,7 @@ msgstr "Speedup Throttle"
 
 #: xrc/SpeedupConfig.xrc:54
 msgid "Frame skip"
-msgstr "Frame skip"
+msgstr "Saltar fotograma"
 
 #: xrc/SpeedupConfig.xrc:61
 msgid "Mute Sound"
