@@ -31,7 +31,7 @@ case "\$CC" in
                     :
                     ;;
                 *)
-                    CMAKE_REQUIRED_ARGS="\$CMAKE_REQUIRED_ARGS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER=\$CC -DCMAKE_CXX_COMPILER=\$CXX"
+                    CMAKE_REQUIRED_ARGS="\$CMAKE_REQUIRED_ARGS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
                     ;;
             esac
         fi
@@ -45,7 +45,7 @@ else
     export MARCH="core2"
 fi
 
-export CPPFLAGS="$CPPFLAGS${CPPFLAGS:+ }-isystem \$BUILD_ROOT/root/include -DCURL_STATICLIB -DGRAPHITE2_STATIC -DFLOAT_APPROX -Diconv=libiconv -Diconv_open=libiconv_open -Diconv_close=libiconv_close"
+export CPPFLAGS="-isystem \$BUILD_ROOT/root/include $CPPFLAGS${CPPFLAGS:+ } -DCURL_STATICLIB -DGRAPHITE2_STATIC -DFLOAT_APPROX -Diconv=libiconv -Diconv_open=libiconv_open -Diconv_close=libiconv_close"
 export CFLAGS="-mtune=generic $CFLAGS${CFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -pthread -lm -O3 -ffast-math $MARCH -pipe -Wno-error=implicit-int -I/"
 export CXXFLAGS="-mtune=generic $CXXFLAGS${CXXFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -O3 -ffast-math $MARCH -pipe -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
 export OBJCXXFLAGS="-mtune=generic $OBJCXXFLAGS${OBJCXXFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -O3 -ffast-math $MARCH -mtune=generic -pipe"
@@ -96,7 +96,7 @@ export FONTCONFIG_PATH="\$BUILD_ROOT/root/etc/fonts"
 
 export BISON_PKGDATADIR="\$BUILD_ROOT/root/share/bison"
 
-export SWIG_LIB="\$(echo \$BUILD_ROOT/root/share/swig/* 2>/dev/null)"
+export SWIG_LIB="\$(find \$BUILD_ROOT/root/share/swig -mindepth 1 -maxdepth 1 2>/dev/null)"
 
 EOF
 )
@@ -177,11 +177,10 @@ DISTS=$DISTS'
     python2         https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tar.xz                               bin/python
     python3         https://www.python.org/ftp/python/3.13.3/Python-3.13.3.tar.xz                               bin/python3
     swig            https://sourceforge.net/projects/swig/files/swig/swig-4.0.2/swig-4.0.2.tar.gz/download      bin/swig
-    doxygen         https://github.com/doxygen/doxygen/archive/refs/tags/Release_1_13_2.tar.gz  bin/doxygen
     XML-Parser      https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.47.tar.gz                      perl5/man/man3/XML*Parser.3*
     intltool        https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz                bin/intltoolize
     ninja           https://github.com/ninja-build/ninja/archive/v1.12.1.tar.gz                                 bin/ninja
-    glib            https://download.gnome.org/sources/glib/2.84/glib-2.84.1.tar.xz                             lib/libglib-2.0.a
+    glib            https://download.gnome.org/sources/glib/2.85/glib-2.85.0.tar.xz                             lib/libglib-2.0.a
     libgpg-error    https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.54.tar.bz2                         lib/libgpg-error.a
     libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.11.0.tar.bz2                             lib/libgcrypt.a
     libsecret       https://gitlab.gnome.org/GNOME/libsecret/-/archive/0.21.7/libsecret-0.21.7.tar.bz2          lib/libsecret-1.a
@@ -230,7 +229,6 @@ export MESON_ARGS="$meSON_BASE_ARGS --buildtype release --default-library=static
 
 DIST_PATCHES=$DIST_PATCHES'
     unzip           https://gist.githubusercontent.com/andyvand/23b485fa21139ba3aa08816425f03294/raw/9febcf8725e42ecdb5ff914ac3b1e0899623e620/unzip_buildfix.diff
-#   glib            https://gist.githubusercontent.com/andyvand/cc84cf41986a5fb1e89ffcf86e110356/raw/670957e814d721b13ae6685b915bb1779c441cef/glib_buildfix.diff
     python3         https://gist.githubusercontent.com/andyvand/d275de733d362bf20a9c0b05f87ff4fc/raw/8d6e1c09fa52611ccf0b959284a6f68596769ba1/python3_configure.diff
     fontconfig      https://gist.githubusercontent.com/andyvand/7ee00be1f5561a1550c6fa97277f7472/raw/9194e9b8e641c8a098f06d13bbfb4ac82b381860/fontconfig_atomic.diff
     expat           https://gist.githubusercontent.com/andyvand/9c3f7497a68188db7d4be5e276c40d4f/raw/5816ef1bfdcb1f295e7ff0f152c4d6b960919c66/expat_buildconf.diff
@@ -371,8 +369,8 @@ DIST_ARGS="$DIST_ARGS
     graphviz    --disable-ltdl --without-x --disable-swig CFLAGS=\"-include \$PWD/declspec.h \$CFLAGS\" CC=\"\$CXX\"
     python2     --with-ensurepip=install --with-system-expat
     python3     --with-ensurepip=install --with-system-expat
+    glib        -Dtests=false
     XML-Parser  EXPATINCPATH=\"\$BUILD_ROOT/root/include\" EXPATLIBPATH=\"\$BUILD_ROOT/root/lib\"
-    doxygen     -DICONV_ACCEPTS_NONCONST_INPUT:BOOL=FALSE -DICONV_ACCEPTS_CONST_INPUT:BOOL=TRUE
     libcroco    --disable-Bsymbolic
     snappy      -DSNAPPY_BUILD_TESTS=OFF -DSNAPPY_BUILD_BENCHMARKS=OFF
     libjpeg-turbo -DWITH_JPEG8=ON -DWITH_SIMD=OFF
@@ -388,6 +386,7 @@ DIST_ARGS="$DIST_ARGS
     libbluray   --disable-bdjava-jar --disable-examples
     libopencore-amrnb   --disable-compile-c
     vidstab     -DUSE_OMP=NO
+    sdl3        -DSDL_CAMERA=OFF
     libx264     --enable-static --enable-pic
     libx265     -DHIGH_BIT_DEPTH=ON -DENABLE_ASSEMBLY=OFF -DENABLE_CLI=OFF
     wxwidgets   -DwxUSE_LIBJPEG=sys -DwxUSE_LIBPNG=sys -DwxUSE_LIBTIFF=sys
@@ -417,7 +416,6 @@ DIST_EXTRA_LDFLAGS="$DIST_EXTRA_LDFLAGS
     python2     -lffi
     glib        -liconv
     graphviz    -lpcreposix
-    doxygen     -lintl -liconv
     ffmpeg      -lm -llzma -lpthread
     fontconfig  -llzma
 "
@@ -428,7 +426,6 @@ DIST_EXTRA_CFLAGS="$DIST_EXTRA_CFLAGS
 
 DIST_EXTRA_CXXFLAGS="$DIST_EXTRA_CXXFLAGS
     gperf       -std=gnu++11
-    doxygen     -std=gnu++11
     wxwidgets   -std=gnu++11
     libmodplug  -std=gnu++11
     libopencore-amrnb -std=gnu++11
@@ -466,10 +463,6 @@ builder() {
     download_needed_dists
 
     unpack_needed_dists $DOWNLOADED_DISTS
-
-    rm -Rf "$DISTS_DIR/doxygen"
-    if [ ! -d "$DISTS_DIR/doxygen" ]; then git clone --depth 1 https://github.com/doxygen/doxygen.git "$DISTS_DIR/doxygen"
-    fi
 
     build_needed_dists  $UNPACKED_DISTS
 
@@ -1615,8 +1608,27 @@ build_dist() {
                 eval "set -- $extra_dist_args"
                 echo_eval_run "$configure_override $@"
             else
+                saved_CC=$CC
+                set -- $CC
+                export CC=$1
+                shift
+                saved_CFLAGS=$CFLAGS
+                export CFLAGS="$@ $CFLAGS"
+
+                saved_CXX=$CXX
+                set -- $CXX
+                export CXX=$1
+                shift
+                saved_CXXFLAGS=$CXXFLAGS
+                export CXXFLAGS="$@ $CXXFLAGS"
+
                 eval "set -- $CMAKE_REQUIRED_ARGS $(dist_args "$current_dist" cmake) $extra_dist_args -G Ninja"
                 echo_run cmake .. "$@"
+
+                export CC="$saved_CC"
+                export CFLAGS="$saved_CFLAGS"
+                export CXX="$saved_CXX"
+                export CXXFLAGS="$saved_CXXFLAGS"
             fi
             dist_post_configure "$current_dist"
             run_ninja
