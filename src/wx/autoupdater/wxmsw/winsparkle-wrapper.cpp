@@ -7,7 +7,9 @@
 #include <wx/msw/private.h>
 #include <wx/utils.h>
 
+#ifdef WINSPARKLE_DLL
 #include "wx/autoupdater/wxmsw/winsparkle-rc.h"
+#endif
 
 WinSparkleDllWrapper *WinSparkleDllWrapper::GetInstance()
 {
@@ -19,6 +21,7 @@ WinSparkleDllWrapper *WinSparkleDllWrapper::GetInstance()
 
 WinSparkleDllWrapper::WinSparkleDllWrapper()
 {
+#ifdef WINSPARKLE_DLL
     wxFile temp_file;
     temp_file_name = wxFileName::CreateTempFileName("winsparkle", &temp_file);
 
@@ -47,20 +50,24 @@ WinSparkleDllWrapper::WinSparkleDllWrapper()
     winsparkle_set_appcast_url      = reinterpret_cast<func_win_sparkle_set_appcast_url>(winsparkle_dll->GetSymbol("win_sparkle_set_appcast_url"));
     winsparkle_set_app_details      = reinterpret_cast<func_win_sparkle_set_app_details>(winsparkle_dll->GetSymbol("win_sparkle_set_app_details"));
     winsparkle_cleanup              = reinterpret_cast<func_win_sparkle_cleanup>(winsparkle_dll->GetSymbol("win_sparkle_cleanup"));
+#endif
 }
 
 
 WinSparkleDllWrapper::~WinSparkleDllWrapper()
 {
+#ifdef WINSPARKLE_DLL
     HMODULE hMod = winsparkle_dll->Detach();
     while(::FreeLibrary(hMod)) {
         wxMilliSleep(50);
     }
     delete winsparkle_dll;
     wxRemoveFile(temp_file_name);
+#endif
 }
 
 
+#ifdef WINSPARKLE_DLL
 void win_sparkle_init()
 {
     WinSparkleDllWrapper::GetInstance()->winsparkle_init();
@@ -81,6 +88,7 @@ void win_sparkle_set_appcast_url(const char *url)
 
 void win_sparkle_set_app_details(const wchar_t *company_name, const wchar_t *app_name, const wchar_t *app_version)
 {
+    WinSparkleDllWrapper
     WinSparkleDllWrapper::GetInstance()->winsparkle_set_app_details(company_name, app_name, app_version);
 }
 
@@ -89,3 +97,4 @@ void win_sparkle_cleanup()
 {
     WinSparkleDllWrapper::GetInstance()->winsparkle_cleanup();
 }
+#endif

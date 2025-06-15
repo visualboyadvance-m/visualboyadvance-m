@@ -1,8 +1,13 @@
 #include "wx/autoupdater/autoupdater.h"
 
 #include "core/base/version.h"
-#include "wx/autoupdater/wxmsw/winsparkle-wrapper.h"
 
+#ifdef WINSPARKLE_DLL
+#include "wx/autoupdater/wxmsw/winsparkle-wrapper.h"
+#else
+#include <wx/string.h>
+#include <winsparkle.h>
+#endif
 
 void initAutoupdater()
 {

@@ -18,9 +18,12 @@ AAAAA_MAINICON ICON "icons/visualboyadvance-m.ico"
 #ifndef NO_ONLINEUPDATES
 
 #include "autoupdater/wxmsw/winsparkle-rc.h"
+
+#ifdef WINSPARKLE_DLL
 #include "winsparkle-path.h"
 
 WINSPARKLE_DLL_RC RCDATA WINSPARKLE_DLL_PATH
+#endif /* WINSPARKLE_DLL */
 
 #endif /* NO_ONLINEUPDATES */
 

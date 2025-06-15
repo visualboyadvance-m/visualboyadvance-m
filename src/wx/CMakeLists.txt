@@ -780,22 +780,45 @@ if(WIN32 AND (X86_64 OR ARM64 OR X86_32) AND ENABLE_ONLINEUPDATES)
         PRIVATE ${WINSPARKLE_BIN_RELEASE_DIR}/include
     )
 
+    target_sources(visualboyadvance-m
+        PRIVATE
+        autoupdater/wxmsw/autoupdater.cpp
+        autoupdater/wxmsw/winsparkle-rc.h
+        autoupdater/wxmsw/winsparkle-wrapper.cpp
+        autoupdater/wxmsw/winsparkle-wrapper.h
+    )
+
+    if (MINGW)
+        find_library(CRYPTO crypto)
+    else()
+        find_library(CRYPTO libcrypto)
+    endif()
+
+    find_library(ED25519 ed25519)
+    if(CMAKE_BUILD_TYPE STREQUAL Debug)
+        find_library(WEBVIEW NAMES wxmsw33ud_webview wxmsw33u_webview)
+    else()
+        find_library(WEBVIEW wxmsw33u_webview)
+    endif()
+
     if (X86_64 AND MINGW)
-        TARGET_LINK_LIBRARIES(visualboyadvance-m ${WINSPARKLE_BIN_RELEASE_DIR}/mingw/x86_64/libwinsparkle.a)
+        TARGET_LINK_LIBRARIES(visualboyadvance-m ${WINSPARKLE_BIN_RELEASE_DIR}/mingw/x86_64/libwinsparkle.a ${CRYPTO} ${WEBVIEW} ${E25519})
         set(WINSPARKLE_DLL ${WINSPARKLE_BIN_RELEASE_DIR}/mingw/x86_64/WinSparkle.dll)
     elseif (X86_32 AND MINGW)
-        TARGET_LINK_LIBRARIES(visualboyadvance-m ${WINSPARKLE_BIN_RELEASE_DIR}/mingw/i686/libwinsparkle.a)
+        TARGET_LINK_LIBRARIES(visualboyadvance-m ${WINSPARKLE_BIN_RELEASE_DIR}/mingw/i686/libwinsparkle.a ${CRYPTO} ${WEBVIEW} ${E25519})
         set(WINSPARKLE_DLL ${WINSPARKLE_BIN_RELEASE_DIR}/mingw/i686/WinSparkle.dll)
     elseif(X86_64)
-        TARGET_LINK_LIBRARIES(visualboyadvance-m ${WINSPARKLE_BIN_RELEASE_DIR}/x64/Release/WinSparkle.lib)
+        TARGET_LINK_LIBRARIES(visualboyadvance-m ${WINSPARKLE_BIN_RELEASE_DIR}/x64/Release/WinSparkle.lib ${CRYPTO} ${WEBVIEW} ${E25519})
         set(WINSPARKLE_DLL ${WINSPARKLE_BIN_RELEASE_DIR}/x64/Release/WinSparkle.dll)
     elseif(ARM64)
-        TARGET_LINK_LIBRARIES(visualboyadvance-m ${WINSPARKLE_BIN_RELEASE_DIR}/ARM64/Release/WinSparkle.lib)
+        TARGET_LINK_LIBRARIES(visualboyadvance-m ${WINSPARKLE_BIN_RELEASE_DIR}/ARM64/Release/WinSparkle.lib ${CRYPTO} ${WEBVIEW})
         set(WINSPARKLE_DLL ${WINSPARKLE_BIN_RELEASE_DIR}/ARM64/Release/WinSparkle.dll)
     elseif(X86_32)
-        TARGET_LINK_LIBRARIES(visualboyadvance-m ${WINSPARKLE_BIN_RELEASE_DIR}/Release/WinSparkle.lib)
+        TARGET_LINK_LIBRARIES(visualboyadvance-m ${WINSPARKLE_BIN_RELEASE_DIR}/Release/WinSparkle.lib ${CRYPTO} ${WEBVIEW})
         set(WINSPARKLE_DLL ${WINSPARKLE_BIN_RELEASE_DIR}/Release/WinSparkle.dll)
     endif()
+
+    TARGET_LINK_LIBRARIES(visualboyadvance-m ${CRYPTO} ${WEBVIEW} ${ED25519})
 
     configure_file(autoupdater/wxmsw/winsparkle-path.h.in ${CMAKE_BINARY_DIR}/winsparkle-path.h)
 endif()
