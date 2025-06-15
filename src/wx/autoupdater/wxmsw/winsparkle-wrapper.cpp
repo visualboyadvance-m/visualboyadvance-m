@@ -7,9 +7,7 @@
 #include <wx/msw/private.h>
 #include <wx/utils.h>
 
-#ifdef WINSPARKLE_DLL
 #include "wx/autoupdater/wxmsw/winsparkle-rc.h"
-#endif
 
 WinSparkleDllWrapper *WinSparkleDllWrapper::GetInstance()
 {
@@ -65,7 +63,6 @@ WinSparkleDllWrapper::~WinSparkleDllWrapper()
     wxRemoveFile(temp_file_name);
 #endif
 }
-
 
 #ifdef WINSPARKLE_DLL
 void win_sparkle_init()
