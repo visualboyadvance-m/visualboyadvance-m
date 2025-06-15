@@ -117,9 +117,7 @@ opts_t::opts_t()
 // FIXME: simulate MakeInstanceFilename(vbam.ini) using subkeys (Slave%d/*)
 void load_opts(bool first_time_launch) {
     // just for sanity...
-    static bool did_init = false;
-    VBAM_CHECK(!did_init);
-    did_init = true;
+    static bool did_init = true;
 
     // enumvals should not be translated, since they would cause config file
     // change after lang change
