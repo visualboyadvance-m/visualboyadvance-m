@@ -780,7 +780,11 @@ if(WIN32 AND (X86_64 OR ARM64 OR X86_32) AND ENABLE_ONLINEUPDATES)
         PRIVATE ${WINSPARKLE_BIN_RELEASE_DIR}/include
     )
 
-    if(X86_64)
+    if(X86_64 AND MINGW)
+        set(WINSPARKLE_DLL ${WINSPARKLE_BIN_RELEASE_DIR}/mingw/x86_64/WinSparkle.dll)
+    elseif(X86_32 AND MINGW)
+        set(WINSPARKLE_DLL ${WINSPARKLE_BIN_RELEASE_DIR}/mingw/i686/WinSparkle.dll)
+    elseif(X86_64)
         set(WINSPARKLE_DLL ${WINSPARKLE_BIN_RELEASE_DIR}/x64/Release/WinSparkle.dll)
     elseif(ARM64)
         set(WINSPARKLE_DLL ${WINSPARKLE_BIN_RELEASE_DIR}/ARM64/Release/WinSparkle.dll)
