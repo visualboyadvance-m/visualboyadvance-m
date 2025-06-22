@@ -355,11 +355,12 @@ function(vcpkg_remove_optional_deps vcpkg_exe)
 endfunction()
 
 function(vcpkg_set_toolchain)
+    get_filename_component(preferred_root ${CMAKE_SOURCE_DIR}/../vcpkg ABSOLUTE)
+
     if(NOT DEFINED POWERSHELL)
         message(FATAL_ERROR "Powershell is required to use vcpkg binaries.")
     endif()
     if(NOT DEFINED ENV{VCPKG_ROOT})
-        get_filename_component(preferred_root ${CMAKE_SOURCE_DIR}/../vcpkg ABSOLUTE)
 
         if(WIN32)
             if(DEFINED ENV{CI} OR EXISTS /vcpkg)
@@ -388,6 +389,12 @@ function(vcpkg_set_toolchain)
         set(ENV{VCPKG_ROOT} ${VCPKG_ROOT})
     else()
         set(VCPKG_ROOT $ENV{VCPKG_ROOT})
+    endif()
+
+    # Avoid using Visual Studio default vcpkg, because that requires elevaction.
+    if(VCPKG_ROOT MATCHES "Visual Studio")
+        set(VCPKG_ROOT "${preferred_root}")
+        set(ENV{VCPKG_ROOT} ${VCPKG_ROOT})
     endif()
 
     set(VCPKG_ROOT ${VCPKG_ROOT} CACHE FILEPATH "vcpkg installation root path" FORCE)
