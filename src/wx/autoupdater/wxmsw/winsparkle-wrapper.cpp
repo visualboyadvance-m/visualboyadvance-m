@@ -8,6 +8,8 @@
 #include <wx/msw/private.h>
 #include <wx/utils.h>
 
+#include <Shlwapi.h>
+
 #include "wx/autoupdater/wxmsw/winsparkle-rc.h"
 
 WinSparkleDllWrapper *WinSparkleDllWrapper::GetInstance()
@@ -17,6 +19,25 @@ WinSparkleDllWrapper *WinSparkleDllWrapper::GetInstance()
     return &instance;
 }
 
+extern "C" {
+    func_win_sparkle_init ws_init;
+    func_win_sparkle_check_update_with_ui ws_cu_wui;
+    func_win_sparkle_set_appcast_url ws_saurl;
+    func_win_sparkle_set_app_details ws_sad;
+    func_win_sparkle_cleanup ws_cu;
+    wxDynamicLibrary* winsparkle_dll = nullptr;
+
+    void winsparkle_load_symbols(wxString path)
+    {
+        winsparkle_dll = new wxDynamicLibrary(path, wxDL_NOW | wxDL_VERBATIM);
+
+        ws_init = reinterpret_cast<func_win_sparkle_init>(winsparkle_dll->GetSymbol("win_sparkle_init"));
+        ws_cu_wui = reinterpret_cast<func_win_sparkle_check_update_with_ui>(winsparkle_dll->GetSymbol("win_sparkle_check_update_with_ui"));
+        ws_saurl = reinterpret_cast<func_win_sparkle_set_appcast_url>(winsparkle_dll->GetSymbol("win_sparkle_set_appcast_url"));
+        ws_sad = reinterpret_cast<func_win_sparkle_set_app_details>(winsparkle_dll->GetSymbol("win_sparkle_set_app_details"));
+        ws_cu = reinterpret_cast<func_win_sparkle_cleanup>(winsparkle_dll->GetSymbol("win_sparkle_cleanup"));
+    }
+}
 
 WinSparkleDllWrapper::WinSparkleDllWrapper()
 {
@@ -42,17 +63,15 @@ WinSparkleDllWrapper::WinSparkleDllWrapper()
     char *res_data = (char *)LockResource(res_handle);
 
     temp_file.Write((void *)res_data, res_size);
-
     temp_file.Close();
 
+    winsparkle_load_symbols(temp_file_name);
 
-    winsparkle_dll = new wxDynamicLibrary(temp_file_name, wxDL_NOW | wxDL_VERBATIM);
-
-    winsparkle_init                 = reinterpret_cast<func_win_sparkle_init>(winsparkle_dll->GetSymbol("win_sparkle_init"));
-    winsparkle_check_update_with_ui = reinterpret_cast<func_win_sparkle_check_update_with_ui>(winsparkle_dll->GetSymbol("win_sparkle_check_update_with_ui"));
-    winsparkle_set_appcast_url      = reinterpret_cast<func_win_sparkle_set_appcast_url>(winsparkle_dll->GetSymbol("win_sparkle_set_appcast_url"));
-    winsparkle_set_app_details      = reinterpret_cast<func_win_sparkle_set_app_details>(winsparkle_dll->GetSymbol("win_sparkle_set_app_details"));
-    winsparkle_cleanup              = reinterpret_cast<func_win_sparkle_cleanup>(winsparkle_dll->GetSymbol("win_sparkle_cleanup"));
+    winsparkle_init = ws_init;
+    winsparkle_check_update_with_ui = ws_cu_wui;
+    winsparkle_set_appcast_url = ws_saurl;
+    winsparkle_set_app_details = ws_sad;
+    winsparkle_cleanup = ws_cu;
 }
 
 
@@ -63,7 +82,13 @@ WinSparkleDllWrapper::~WinSparkleDllWrapper()
         wxMilliSleep(50);
     }
     delete winsparkle_dll;
-    wxRemoveFile(temp_file_name);
+    if (!temp_file_name) {
+        return; // No need to delete the file if it was never created.
+	}
+
+    if (PathFileExistsW(temp_file_name.wc_str())) {
+        wxRemoveFile(temp_file_name);
+	}
 }
 
 
