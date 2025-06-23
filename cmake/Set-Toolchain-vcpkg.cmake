@@ -499,7 +499,9 @@ function(vcpkg_set_toolchain)
         WORKING_DIRECTORY ${VCPKG_ROOT}
     )
 
-    get_binary_packages(${vcpkg_exe})
+    if (NOT NO_VCPKG_UPDATES)
+        get_binary_packages(${vcpkg_exe})
+    endif()
 
     if(NOT binary_packages_installed)
         # Get number of seconds since midnight (might be wrong if am/pm is in effect on Windows.)
