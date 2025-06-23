@@ -792,6 +792,12 @@ if(WIN32 AND (X86_64 OR ARM64 OR X86_32) AND ENABLE_ONLINEUPDATES)
         set(WINSPARKLE_DLL ${WINSPARKLE_BIN_RELEASE_DIR}/Release/WinSparkle.dll)
     endif()
 
+    target_sources(visualboyadvance-m PRIVATE
+        autoupdater/wxmsw/autoupdater.cpp
+        autoupdater/wxmsw/winsparkle-rc.h
+        autoupdater/wxmsw/winsparkle-wrapper.cpp
+        autoupdater/wxmsw/winsparkle-wrapper.h)
+
     configure_file(autoupdater/wxmsw/winsparkle-path.h.in ${CMAKE_BINARY_DIR}/winsparkle-path.h)
 endif()
 
