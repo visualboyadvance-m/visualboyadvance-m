@@ -20,9 +20,13 @@ WinSparkleDllWrapper *WinSparkleDllWrapper::GetInstance()
 
 WinSparkleDllWrapper::WinSparkleDllWrapper()
 {
-    wxFile temp_file;
-    temp_file_name = wxFileName::CreateTempFileName("winsparkle", &temp_file);
-
+    wchar_t temp_file_path_w[MAX_PATH + 1];
+	GetTempPathW(MAX_PATH, temp_file_path_w);
+    wxString temp_file_path = wxString(temp_file_path_w);
+    wchar_t temp_file_name_w[MAX_PATH + 1];
+	GetLongPathNameW(temp_file_path.wc_str(), temp_file_name_w, MAX_PATH + 1);
+	temp_file_name = wxString(temp_file_name_w) + "WinSparkle.dll";
+    wxFile temp_file = wxFile(temp_file_name, wxFile::write);
     HRSRC res = FindResource(wxGetInstance(), MAKEINTRESOURCE(WINSPARKLE_DLL_RC), RT_RCDATA);
 
     if (!res)
@@ -40,6 +44,7 @@ WinSparkleDllWrapper::WinSparkleDllWrapper()
     temp_file.Write((void *)res_data, res_size);
 
     temp_file.Close();
+
 
     winsparkle_dll = new wxDynamicLibrary(temp_file_name, wxDL_NOW | wxDL_VERBATIM);
 
