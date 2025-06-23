@@ -1,6 +1,7 @@
 #include "wx/autoupdater/wxmsw/winsparkle-wrapper.h"
 
 #include <cstdio>
+#include <cstdint>
 
 #include <wx/file.h>
 #include <wx/filename.h>
