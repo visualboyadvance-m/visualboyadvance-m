@@ -29,8 +29,7 @@ extern "C" {
 
     void winsparkle_load_symbols(wxString path)
     {
-        if (wxGetWinVersion() >= wxWinVersion_6)
-            winsparkle_dll = new wxDynamicLibrary(path, wxDL_NOW | wxDL_VERBATIM);
+        winsparkle_dll = new wxDynamicLibrary(path, wxDL_NOW | wxDL_VERBATIM);
 
         if (winsparkle_dll != nullptr) {
             ws_init = reinterpret_cast<func_win_sparkle_init>(winsparkle_dll->GetSymbol("win_sparkle_init"));
@@ -44,6 +43,9 @@ extern "C" {
 
 WinSparkleDllWrapper::WinSparkleDllWrapper()
 {
+    if (wxGetWinVersion() < wxWinVersion_6)
+        return;
+    
     wchar_t temp_file_path_w[MAX_PATH + 1];
 	GetTempPathW(MAX_PATH, temp_file_path_w);
     wxString temp_file_path = wxString(temp_file_path_w);
