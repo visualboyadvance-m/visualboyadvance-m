@@ -3,6 +3,7 @@
 
 #include <wx/string.h>
 #include <wx/dynlib.h>
+#include <windows.h>
 
 extern "C" {
     typedef void (__cdecl *func_win_sparkle_init)();
@@ -11,7 +12,7 @@ extern "C" {
     typedef void (__cdecl *func_win_sparkle_set_app_details)(const wchar_t*, const wchar_t*, const wchar_t*);
     typedef void (__cdecl *func_win_sparkle_cleanup)();
 
-    extern wxDynamicLibrary* winsparkle_dll;
+    extern HMODULE winsparkle_dll;
 }
 
 class WinSparkleDllWrapper {

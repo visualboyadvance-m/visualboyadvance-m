@@ -25,27 +25,24 @@ extern "C" {
     func_win_sparkle_set_appcast_url ws_saurl;
     func_win_sparkle_set_app_details ws_sad;
     func_win_sparkle_cleanup ws_cu;
-    wxDynamicLibrary* winsparkle_dll = nullptr;
+    HMODULE winsparkle_dll = nullptr;
 
     void winsparkle_load_symbols(wxString path)
     {
-        winsparkle_dll = new wxDynamicLibrary(path, wxDL_NOW | wxDL_VERBATIM);
+        winsparkle_dll = LoadLibraryW(path.wc_str());
 
         if (winsparkle_dll != nullptr) {
-            ws_init = reinterpret_cast<func_win_sparkle_init>(winsparkle_dll->GetSymbol("win_sparkle_init"));
-            ws_cu_wui = reinterpret_cast<func_win_sparkle_check_update_with_ui>(winsparkle_dll->GetSymbol("win_sparkle_check_update_with_ui"));
-            ws_saurl = reinterpret_cast<func_win_sparkle_set_appcast_url>(winsparkle_dll->GetSymbol("win_sparkle_set_appcast_url"));
-            ws_sad = reinterpret_cast<func_win_sparkle_set_app_details>(winsparkle_dll->GetSymbol("win_sparkle_set_app_details"));
-            ws_cu = reinterpret_cast<func_win_sparkle_cleanup>(winsparkle_dll->GetSymbol("win_sparkle_cleanup"));
+            ws_init = reinterpret_cast<func_win_sparkle_init>(GetProcAddress(winsparkle_dll, "win_sparkle_init"));
+            ws_cu_wui = reinterpret_cast<func_win_sparkle_check_update_with_ui>(GetProcAddress(winsparkle_dll, "win_sparkle_check_update_with_ui"));
+            ws_saurl = reinterpret_cast<func_win_sparkle_set_appcast_url>(GetProcAddress(winsparkle_dll, "win_sparkle_set_appcast_url"));
+            ws_sad = reinterpret_cast<func_win_sparkle_set_app_details>(GetProcAddress(winsparkle_dll, "win_sparkle_set_app_details"));
+            ws_cu = reinterpret_cast<func_win_sparkle_cleanup>(GetProcAddress(winsparkle_dll, "win_sparkle_cleanup"));
         }
     }
 }
 
 WinSparkleDllWrapper::WinSparkleDllWrapper()
 {
-    if (wxGetWinVersion() < wxWinVersion_6)
-        return;
-    
     wchar_t temp_file_path_w[MAX_PATH + 1];
 	GetTempPathW(MAX_PATH, temp_file_path_w);
     wxString temp_file_path = wxString(temp_file_path_w);
@@ -82,13 +79,10 @@ WinSparkleDllWrapper::WinSparkleDllWrapper()
 
 WinSparkleDllWrapper::~WinSparkleDllWrapper()
 {
-    HMODULE hMod = NULL;
-    if (wxGetWinVersion() >= wxWinVersion_6) {
-        hMod = winsparkle_dll->Detach();
-        while(::FreeLibrary(hMod)) {
+    if (winsparkle_dll != nullptr) {
+        while(::FreeLibrary(winsparkle_dll)) {
             wxMilliSleep(50);
         }
-        delete winsparkle_dll;
     }
 
     if (!temp_file_name) {
