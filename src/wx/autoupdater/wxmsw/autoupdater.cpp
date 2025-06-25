@@ -3,6 +3,9 @@
 #include "core/base/version.h"
 #include "wx/autoupdater/wxmsw/winsparkle-wrapper.h"
 
+#if _WIN32_WINNT < 0x0600
+#define NO_HTTPS 1
+#endif
 
 void initAutoupdater()
 {
