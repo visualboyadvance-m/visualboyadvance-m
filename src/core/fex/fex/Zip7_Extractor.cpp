@@ -156,7 +156,9 @@ Zip7_Extractor::~Zip7_Extractor()
 	close();
 }
 
+#ifndef kInputBufSize
 #define kInputBufSize ((size_t)1 << 18)
+#endif /* kInputBufSize */
 
 blargg_err_t Zip7_Extractor::open_v()
 {
