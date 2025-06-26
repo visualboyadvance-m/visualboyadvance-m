@@ -49,7 +49,7 @@ extern "C"
 	static SRes zip7_read_( ISeekInStreamPtr vstream, void* out, size_t* size )
 	{
 		assert( out && size );
-        ISeekInStreamPtr stream = (ISeekInStreamPtr)vstream;
+        ISeekInStream *stream = (ISeekInStream *)vstream;
 		Zip7_Extractor_Impl* impl = (Zip7_Extractor_Impl*)stream;
 		
 		long lsize = (long)*size;
@@ -67,7 +67,7 @@ extern "C"
 
 	static SRes zip7_seek_( ISeekInStreamPtr vstream, Int64* pos, ESzSeek mode )
 	{
-		ISeekInStreamPtr stream = (ISeekInStreamPtr)vstream;
+		ISeekInStream *stream = (ISeekInStream *)vstream;
 		Zip7_Extractor_Impl* impl = (Zip7_Extractor_Impl*)stream;
 		
 		// assert( mode != SZ_SEEK_CUR ); // never used
@@ -156,6 +156,8 @@ Zip7_Extractor::~Zip7_Extractor()
 	close();
 }
 
+#define kInputBufSize ((size_t)1 << 18)
+
 blargg_err_t Zip7_Extractor::open_v()
 {
 	RETURN_ERR( init_7z() );
@@ -174,6 +176,8 @@ blargg_err_t Zip7_Extractor::open_v()
 	LookToRead2_CreateVTable( &impl->look, false );
 	impl->ISeekInStream::Read = zip7_read_;
 	impl->ISeekInStream::Seek = zip7_seek_;
+    impl->look.buf = (Byte *)ISzAlloc_Alloc(&zip7_alloc, kInputBufSize);
+    impl->look.bufSize = kInputBufSize;
 	impl->look.realStream     = impl;
 	LookToRead2_INIT( &impl->look );
 	
