@@ -176,8 +176,8 @@ blargg_err_t Zip7_Extractor::open_v()
 	LookToRead2_CreateVTable( &impl->look, false );
 	impl->ISeekInStream::Read = zip7_read_;
 	impl->ISeekInStream::Seek = zip7_seek_;
-    impl->look.buf = (Byte *)ISzAlloc_Alloc(&zip7_alloc, kInputBufSize);
-    impl->look.bufSize = kInputBufSize;
+    impl->look.buf            = (Byte *)ISzAlloc_Alloc(&zip7_alloc, kInputBufSize);
+    impl->look.bufSize        = kInputBufSize;
 	impl->look.realStream     = impl;
 	LookToRead2_INIT( &impl->look );
 	
