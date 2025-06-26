@@ -29,7 +29,7 @@ static ISzAlloc zip7_alloc_temp = { SzAllocTemp, SzFreeTemp };
 struct Zip7_Extractor_Impl :
 	ISeekInStream
 {
-	CLookToRead look;
+	CLookToRead2 look;
 	CSzArEx db;
 	
 	// SzExtract state
@@ -46,11 +46,11 @@ extern "C"
 	// 7-zip callbacks pass an ISeekInStream* for data, so we must cast it
 	// back to ISeekInStream* FIRST, then cast to our Impl structure
 	
-	static SRes zip7_read_( void* vstream, void* out, size_t* size )
+	static SRes zip7_read_( ISeekInStreamPtr vstream, void* out, size_t* size )
 	{
 		assert( out && size );
-		ISeekInStream* stream = STATIC_CAST(ISeekInStream*,vstream);
-		Zip7_Extractor_Impl* impl = STATIC_CAST(Zip7_Extractor_Impl*,stream);
+        ISeekInStreamPtr stream = (ISeekInStreamPtr)vstream;
+		Zip7_Extractor_Impl* impl = (Zip7_Extractor_Impl*)stream;
 		
 		long lsize = (long)*size;
 		blargg_err_t err = impl->in->read_avail( out, &lsize );
@@ -65,10 +65,10 @@ extern "C"
 		return SZ_OK;
 	}
 
-	static SRes zip7_seek_( void* vstream, Int64* pos, ESzSeek mode )
+	static SRes zip7_seek_( ISeekInStreamPtr vstream, Int64* pos, ESzSeek mode )
 	{
-		ISeekInStream* stream = STATIC_CAST(ISeekInStream*,vstream);
-		Zip7_Extractor_Impl* impl = STATIC_CAST(Zip7_Extractor_Impl*,stream);
+		ISeekInStreamPtr stream = (ISeekInStreamPtr)vstream;
+		Zip7_Extractor_Impl* impl = (Zip7_Extractor_Impl*)stream;
 		
 		// assert( mode != SZ_SEEK_CUR ); // never used
 		
@@ -171,16 +171,16 @@ blargg_err_t Zip7_Extractor::open_v()
 	impl->buf         = NULL;
 	impl->buf_size    = 0;
 
-	LookToRead_CreateVTable( &impl->look, false );
+	LookToRead2_CreateVTable( &impl->look, false );
 	impl->ISeekInStream::Read = zip7_read_;
 	impl->ISeekInStream::Seek = zip7_seek_;
 	impl->look.realStream     = impl;
-	LookToRead_Init( &impl->look );
+	LookToRead2_INIT( &impl->look );
 	
 	SzArEx_Init( &impl->db );
 	
 	impl->in_err = NULL;
-	RETURN_ERR( zip7_err( SzArEx_Open( &impl->db, &impl->look.s,
+	RETURN_ERR( zip7_err( SzArEx_Open( &impl->db, &impl->look.vt,
 			&zip7_alloc, &zip7_alloc_temp ) ) );
 	
 	return seek_arc_v( 0 );
@@ -271,18 +271,17 @@ bool Zip7_Extractor::utf16ToUtf8( unsigned char* dest, size_t* destLen, const sh
 
 blargg_err_t Zip7_Extractor::next_v()
 {
-	while ( ++index < (int) impl->db.db.NumFiles )
+	while ( ++index < (int) impl->db.NumFiles )
 	{
-		CSzFileItem const& item = impl->db.db.Files [index];
-		if ( !item.IsDir )
+		if ( !SzArEx_IsDir(&impl->db, index) )
 		{
-			if ( item.MTimeDefined )
+			if ( SzBitWithVals_Check(&impl->db.MTime, index) )
 			{
 				const UInt64 epoch = ((UInt64)0x019db1de << 32) + 0xd53e8000;
 				/* 0x019db1ded53e8000ULL: 1970-01-01 00:00:00 (UTC) */
 				struct tm tm;
 
-				UInt64 time = ((UInt64)item.MTime.High << 32) + item.MTime.Low - epoch;
+				UInt64 time = ((((UInt64)impl->db.MTime.Vals[index].High) << 32) | impl->db.MTime.Vals[index].Low)  - epoch;
 				time /= 1000000;
 
 				time_t _time = time;
@@ -310,7 +309,7 @@ blargg_err_t Zip7_Extractor::next_v()
 			name8.resize( utf8_length + 1 );
 			memcpy( name8.begin(), temp, utf8_length + 1 );
 			set_name( name8.begin(), name16.begin() );
-			set_info( (int)item.Size, 0, (item.CrcDefined ? item.Crc : 0) );
+			set_info( (int)SzArEx_GetFileSize(&impl->db, index), 0, (SzBitWithVals_Check(&impl->db.CRCs, index) ? impl->db.CRCs.Vals[index] : 0) );
 			break;
 		}
 	}
@@ -330,7 +329,7 @@ fex_pos_t Zip7_Extractor::tell_arc_v() const
 
 blargg_err_t Zip7_Extractor::seek_arc_v( fex_pos_t pos )
 {
-	assert( 0 <= pos && pos <= (int) impl->db.db.NumFiles );
+	assert( 0 <= pos && pos <= (int) impl->db.NumFiles );
 	
 	index = pos - 1;
 	return next_v();
@@ -341,7 +340,7 @@ blargg_err_t Zip7_Extractor::data_v( void const** out )
 	impl->in_err = NULL;
 	size_t offset = 0;
 	size_t count  = 0;
-	RETURN_ERR( zip7_err( SzArEx_Extract( &impl->db, &impl->look.s, index,
+	RETURN_ERR( zip7_err( SzArEx_Extract( &impl->db, &impl->look.vt, index,
 			&impl->block_index, &impl->buf, &impl->buf_size,
 			&offset, &count, &zip7_alloc, &zip7_alloc_temp ) ) );
 	assert( count == (size_t) size() );

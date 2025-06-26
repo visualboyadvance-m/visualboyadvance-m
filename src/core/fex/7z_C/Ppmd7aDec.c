@@ -1,35 +1,35 @@
-/* Ppmd7Dec.c -- Ppmd7z (PPMdH with 7z Range Coder) Decoder
+/* Ppmd7aDec.c -- PPMd7a (PPMdH) Decoder
 2023-09-07 : Igor Pavlov : Public domain
 This code is based on:
-  PPMd var.H (2001): Dmitry Shkarin : Public domain */
-
+  PPMd var.H (2001): Dmitry Shkarin : Public domain
+  Carryless rangecoder (1999): Dmitry Subbotin : Public domain */
 
 #include "Precomp.h"
 
 #include "Ppmd7.h"
 
-#define kTopValue ((UInt32)1 << 24)
-
+#define kTop ((UInt32)1 << 24)
+#define kBot ((UInt32)1 << 15)
 
 #define READ_BYTE(p) IByteIn_Read((p)->Stream)
 
-BoolInt Ppmd7z_RangeDec_Init(CPpmd7_RangeDec *p)
+BoolInt Ppmd7a_RangeDec_Init(CPpmd7_RangeDec *p)
 {
   unsigned i;
   p->Code = 0;
   p->Range = 0xFFFFFFFF;
-  if (READ_BYTE(p) != 0)
-    return False;
+  p->Low = 0;
+  
   for (i = 0; i < 4; i++)
     p->Code = (p->Code << 8) | READ_BYTE(p);
   return (p->Code < 0xFFFFFFFF);
 }
 
-#define RC_NORM_BASE(p) if ((p)->Range < kTopValue) \
-  { (p)->Code = ((p)->Code << 8) | READ_BYTE(p); (p)->Range <<= 8;
-
-#define RC_NORM_1(p)  RC_NORM_BASE(p) }
-#define RC_NORM(p)    RC_NORM_BASE(p) RC_NORM_BASE(p) }}
+#define RC_NORM(p) \
+  while ((p->Low ^ (p->Low + p->Range)) < kTop \
+    || (p->Range < kBot && ((p->Range = (0 - p->Low) & (kBot - 1)), 1))) { \
+      p->Code = (p->Code << 8) | READ_BYTE(p); \
+      p->Range <<= 8; p->Low <<= 8; }
 
 // we must use only one type of Normalization from two: LOCAL or REMOTE
 #define RC_NORM_LOCAL(p)    // RC_NORM(p)
@@ -39,29 +39,29 @@ BoolInt Ppmd7z_RangeDec_Init(CPpmd7_RangeDec *p)
 
 Z7_FORCE_INLINE
 // Z7_NO_INLINE
-static void Ppmd7z_RD_Decode(CPpmd7 *p, UInt32 start, UInt32 size)
+static void Ppmd7a_RD_Decode(CPpmd7 *p, UInt32 start, UInt32 size)
 {
-
-  
-  R->Code -= start * R->Range;
+  start *= R->Range;
+  R->Low += start;
+  R->Code -= start;
   R->Range *= size;
   RC_NORM_LOCAL(R)
 }
 
-#define RC_Decode(start, size)  Ppmd7z_RD_Decode(p, start, size);
+#define RC_Decode(start, size)  Ppmd7a_RD_Decode(p, start, size);
 #define RC_DecodeFinal(start, size)  RC_Decode(start, size)  RC_NORM_REMOTE(R)
 #define RC_GetThreshold(total)  (R->Code / (R->Range /= (total)))
 
 
 #define CTX(ref) ((CPpmd7_Context *)Ppmd7_GetContext(p, ref))
-// typedef CPpmd7_Context * CTX_PTR;
+typedef CPpmd7_Context * CTX_PTR;
 #define SUCCESSOR(p) Ppmd_GET_SUCCESSOR(p)
 void Ppmd7_UpdateModel(CPpmd7 *p);
 
 #define MASK(sym)  ((Byte *)charMask)[sym]
-// Z7_FORCE_INLINE
-// static
-int Ppmd7z_DecodeSymbol(CPpmd7 *p)
+
+
+int Ppmd7a_DecodeSymbol(CPpmd7 *p)
 {
   size_t charMask[256 / sizeof(size_t)];
 
@@ -72,9 +72,9 @@ int Ppmd7z_DecodeSymbol(CPpmd7 *p)
     UInt32 count, hiCnt;
     const UInt32 summFreq = p->MinContext->Union2.SummFreq;
 
-    
-    
-    
+    if (summFreq > R->Range)
+      return PPMD7_SYM_ERROR;
+
     count = RC_GetThreshold(summFreq);
     hiCnt = count;
     
@@ -144,15 +144,15 @@ int Ppmd7z_DecodeSymbol(CPpmd7 *p)
       
       // RangeDec_DecodeBit0(size0);
       R->Range = size0;
-      RC_NORM_1(R)
-      /* we can use single byte normalization here because of
-         (min(BinSumm[][]) = 95) > (1 << (14 - 8)) */
-
+      RC_NORM(R)
+      
+        
+        
       // sym = (p->FoundState = Ppmd7Context_OneState(p->MinContext))->Symbol;
       // Ppmd7_UpdateBin(p);
       {
         unsigned freq = s->Freq;
-        CPpmd7_Context *c = CTX(SUCCESSOR(s));
+        CTX_PTR c = CTX(SUCCESSOR(s));
         sym = s->Symbol;
         p->FoundState = s;
         p->PrevSuccess = 1;
@@ -171,9 +171,9 @@ int Ppmd7z_DecodeSymbol(CPpmd7 *p)
     p->InitEsc = p->ExpEscape[pr >> 10];
 
     // RangeDec_DecodeBit1(size0);
-    
+    R->Low += size0;
     R->Code -= size0;
-    R->Range -= size0;
+    R->Range = (R->Range & ~((UInt32)PPMD_BIN_SCALE - 1)) - size0;
     RC_NORM_LOCAL(R)
     
     PPMD_SetAllBitsIn256Bytes(charMask)
@@ -227,8 +227,8 @@ int Ppmd7z_DecodeSymbol(CPpmd7 *p)
     see = Ppmd7_MakeEscFreq(p, numMasked, &freqSum);
     freqSum += hiCnt;
 
-
-
+    if (freqSum > R->Range)
+      return PPMD7_SYM_ERROR;
 
     count = RC_GetThreshold(freqSum);
     
@@ -278,25 +278,8 @@ int Ppmd7z_DecodeSymbol(CPpmd7 *p)
   }
 }
 
-/*
-Byte *Ppmd7z_DecodeSymbols(CPpmd7 *p, Byte *buf, const Byte *lim)
-{
-  int sym = 0;
-  if (buf != lim)
-  do
-  {
-    sym = Ppmd7z_DecodeSymbol(p);
-    if (sym < 0)
-      break;
-    *buf = (Byte)sym;
-  }
-  while (++buf < lim);
-  p->LastSymbol = sym;
-  return buf;
-}
-*/
-
-#undef kTopValue
+#undef kTop
+#undef kBot
 #undef READ_BYTE
 #undef RC_NORM_BASE
 #undef RC_NORM_1

@@ -15,7 +15,7 @@ target_sources(vbam-fex
     7z_C/7zCrc.h
     7z_C/7zCrcOpt.c
     7z_C/7zDec.c
-    7z_C/7zIn.c
+    7z_C/7zArcIn.c
     7z_C/7zStream.c
     7z_C/Bcj2.c
     7z_C/Bcj2.h
@@ -24,6 +24,8 @@ target_sources(vbam-fex
     7z_C/Bra86.c
     7z_C/CpuArch.c
     7z_C/CpuArch.h
+    7z_C/Delta.c
+    7z_C/Delta.h
     7z_C/Lzma2Dec.c
     7z_C/Lzma2Dec.h
     7z_C/LzmaDec.c
@@ -32,7 +34,11 @@ target_sources(vbam-fex
     7z_C/Ppmd7.c
     7z_C/Ppmd7.h
     7z_C/Ppmd7Dec.c
-    7z_C/Types.h
+    7z_C/Ppmd7aDec.c
+    7z_C/Ppmd8.c
+    7z_C/Ppmd8.h
+    7z_C/Ppmd8Dec.c
+    7z_C/7zTypes.h
     fex/Binary_Extractor.cpp
     fex/Binary_Extractor.h
     fex/blargg_common.cpp
