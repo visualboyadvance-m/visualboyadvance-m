@@ -13,7 +13,7 @@
 #ifndef NO_METAL
 bool is_macosx_1013_or_newer()
 {
-    // Mac OS X 10.12 version check
+    // Mac OS X 10.13 version check
     if (NSAppKitVersionNumber >= 1561) {
         return true;
     }
