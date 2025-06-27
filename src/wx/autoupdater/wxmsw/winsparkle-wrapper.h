@@ -11,8 +11,6 @@ extern "C" {
     typedef void (__cdecl *func_win_sparkle_set_appcast_url)(const char*);
     typedef void (__cdecl *func_win_sparkle_set_app_details)(const wchar_t*, const wchar_t*, const wchar_t*);
     typedef void (__cdecl *func_win_sparkle_cleanup)();
-
-    extern HMODULE winsparkle_dll;
 }
 
 class WinSparkleDllWrapper {
@@ -21,6 +19,8 @@ public:
 private:
     WinSparkleDllWrapper();
     ~WinSparkleDllWrapper();
+
+    HMODULE winsparkle_dll;
 
     func_win_sparkle_init                 winsparkle_init = nullptr;
     func_win_sparkle_check_update_with_ui winsparkle_check_update_with_ui = nullptr;

@@ -793,7 +793,7 @@ if(WIN32 AND (X86_64 OR ARM64 OR X86_32) AND ENABLE_ONLINEUPDATES)
     endif()
 
     target_sources(visualboyadvance-m PRIVATE
-        autoupdater/wxmsw/autoupdater.cpp@
+        autoupdater/wxmsw/autoupdater.cpp
         autoupdater/wxmsw/winsparkle-rc.h
         autoupdater/wxmsw/winsparkle-wrapper.cpp
         autoupdater/wxmsw/winsparkle-wrapper.h)
