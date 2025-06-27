@@ -2,17 +2,21 @@
 
 #include "wx/autoupdater/macos/sparkle-wrapper.h"
 
+extern bool is_macosx_1013_or_newer();
+
 SparkleWrapper autoupdater;
 
 void initAutoupdater()
 {
-    autoupdater.addAppcastURL("https://data.visualboyadvance-m.org/appcast.xml");
+    if (is_macosx_1013_or_newer())
+        autoupdater.addAppcastURL("https://data.visualboyadvance-m.org/appcast.xml");
 }
 
 
 void checkUpdatesUi()
 {
-    autoupdater.checkForUpdatesUi();
+    if (is_macosx_1013_or_newer())
+        autoupdater.checkForUpdatesUi();
 }
 
 

@@ -11,6 +11,16 @@
 #include "wx/wxvbam.h"
 
 #ifndef NO_METAL
+bool is_macosx_1013_or_newer()
+{
+    // Mac OS X 10.12 version check
+    if (NSAppKitVersionNumber >= 1561) {
+        return true;
+    }
+
+    return false;
+}
+
 bool is_macosx_1012_or_newer()
 {
     // Mac OS X 10.12 version check
