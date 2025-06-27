@@ -793,7 +793,7 @@ if(WIN32 AND (X86_64 OR ARM64 OR X86_32) AND ENABLE_ONLINEUPDATES)
     endif()
 
     target_sources(visualboyadvance-m PRIVATE
-        autoupdater/wxmsw/autoupdater.cpp
+        autoupdater/wxmsw/autoupdater.cpp@
         autoupdater/wxmsw/winsparkle-rc.h
         autoupdater/wxmsw/winsparkle-wrapper.cpp
         autoupdater/wxmsw/winsparkle-wrapper.h)
@@ -805,10 +805,16 @@ if(APPLE AND ENABLE_ONLINEUPDATES)
     include(FetchContent)
     FetchContent_Declare(Sparkle
         URL "https://github.com/sparkle-project/Sparkle/releases/download/2.7.1/Sparkle-2.7.1.tar.xz"
-        URL_HASH SHA256=6875388aae23c1705c3956c62a9c967f4b788bc4f1dad93ab5645bc6096ef13b
+        URL_HASH SHA256=f7385c3e8c70c37e5928939e6246ac9070757b4b37a5cb558afa1b0d5ef189de
         DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     )
     FetchContent_MakeAvailable(Sparkle)
+
+    target_sources(visualboyadvance-m PRIVATE
+        autoupdater/autoupdater.h
+        autoupdater/macos/autoupdater.cpp
+        autoupdater/macos/sparkle-wrapper.h
+        autoupdater/macos/sparkle-wrapper.mm)
 
     find_library(SPARKLE_FRAMEWORK
         NAMES Sparkle
