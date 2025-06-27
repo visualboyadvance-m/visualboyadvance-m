@@ -225,48 +225,59 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver pkg_triplet powershell ou
     endforeach()
 endfunction()
 
+function(get_triplet_package_list triplet)
+    if(EXISTS "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html")
+        return()
+    endif()
+
+    file(
+        DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${triplet}/" "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html"
+        STATUS pkg_list_status
+    )
+    list(GET pkg_list_status 1 pkg_list_error)
+    list(GET pkg_list_status 0 pkg_list_status)
+
+    if(NOT pkg_list_status EQUAL 0)
+        message(STATUS "Failed to download vcpkg binary package list: ${pkg_list_status} - ${pkg_list_error}")
+        return()
+    endif()
+endfunction()
+
+function(download_package pkg pkgs_dir)
+    string(REGEX REPLACE "^[^_]+_[^_]+_([^.]+)[.]zip\$" "\\1" pkg_triplet ${pkg})
+
+    message(STATUS "Downloading https://nightly.visualboyadvance-m.org/vcpkg/${pkg_triplet}/${pkg} ...")
+
+    file(
+        DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${pkg_triplet}/${pkg}" "${pkgs_dir}/${pkg}"
+        STATUS pkg_download_status
+    )
+    list(GET pkg_download_status 1 pkg_download_error)
+    list(GET pkg_download_status 0 pkg_download_status)
+
+    if(NOT pkg_download_status EQUAL 0)
+        message(STATUS "Failed to download vcpkg binary package '${pkg}': ${pkg_download_status} - ${pkg_download_error}")
+        return()
+    endif()
+
+    message(STATUS "done.")
+endfunction()
+
 function(get_binary_packages vcpkg_exe)
     set(binary_packages_installed FALSE PARENT_SCOPE)
 
-    unset(triplets)
-    unset(host_triplet)
-    # Determine host triplet for vcpkg build dependencies
-    if(WIN32)
-        if($ENV{PROCESSOR_ARCHITECTURE} MATCHES "[Aa][Rr][Mm]64")
-            set(host_triplet "arm64-windows")
-        elseif($ENV{PROCESSOR_ARCHITECTURE} MATCHES "[Aa][Mm][Dd]64|[Xx]64")
-            set(host_triplet "x64-windows")
-        else()
-            set(host_triplet "x86-windows")
-        endif()
+    get_triplet_package_list(${VCPKG_TARGET_TRIPLET})
+
+    if(NOT EXISTS "${CMAKE_BINARY_DIR}/binary_package_list_${VCPKG_TARGET_TRIPLET}.html")
+        message(STATUS "Failed to download binary package list found for triplet '${VCPKG_TARGET_TRIPLET}', aborting.")
+        return()
     endif()
-    if(DEFINED host_triplet)
-        list(APPEND triplets ${host_triplet})
-    endif()
-    list(APPEND triplets ${VCPKG_TARGET_TRIPLET})
 
-    foreach(triplet ${triplets})
-        file(
-            DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${triplet}/" "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html"
-            STATUS pkg_list_status
-        )
-        list(GET pkg_list_status 1 pkg_list_error)
-        list(GET pkg_list_status 0 pkg_list_status)
-
-        if(NOT pkg_list_status EQUAL 0)
-            message(STATUS "Failed to download vcpkg binary package list: ${pkg_list_status} - ${pkg_list_error}")
-            return()
-        endif()
-    endforeach()
-
-    unset(binary_packages)
-    foreach(triplet ${triplets})
-        file(READ "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html" raw_html)
-        string(REGEX MATCHALL "<a href=\"[^\"]+[.]zip\"" links ${raw_html})
-        foreach(link ${links})
-            string(REGEX REPLACE "<a href=\"([^\"]+[.]zip)\"" "\\1" pkg ${link})
-            list(APPEND binary_packages ${pkg})
-        endforeach()
+    file(READ "${CMAKE_BINARY_DIR}/binary_package_list_${VCPKG_TARGET_TRIPLET}.html" raw_html)
+    string(REGEX MATCHALL "<a href=\"[^\"]+[.]zip\"" links ${raw_html})
+    foreach(link ${links})
+        string(REGEX REPLACE "<a href=\"([^\"]+[.]zip)\"" "\\1" pkg ${link})
+        list(APPEND binary_packages ${pkg})
     endforeach()
 
     set(vcpkg_binpkg_dir ${CMAKE_BINARY_DIR}/vcpkg-binpkg)
@@ -282,7 +293,6 @@ function(get_binary_packages vcpkg_exe)
         FetchContent_MakeAvailable(vcpkg_binpkg)
     endif()
 
-    unset(to_install)
     foreach(pkg ${binary_packages})
         if(NOT pkg MATCHES "([^_]+)_([^_]+)_([^.]+)[.]zip")
             continue()
@@ -303,26 +313,66 @@ function(get_binary_packages vcpkg_exe)
         file(MAKE_DIRECTORY ${bin_pkgs_dir})
 
         foreach(pkg ${to_install})
-            string(REGEX REPLACE "^[^_]+_[^_]+_([^.]+)[.]zip\$" "\\1" pkg_triplet ${pkg})
+            download_package("${pkg}" "${bin_pkgs_dir}")
 
-            message(STATUS "Downloading https://nightly.visualboyadvance-m.org/vcpkg/${pkg_triplet}/${pkg} ...")
+            if(NOT EXISTS "${bin_pkgs_dir}/${pkg}")
+                message(STATUS "Failed to download package '${pkg}', aborting.")
+                return()
+            endif()
+        endforeach()
 
-            file(
-                DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${pkg_triplet}/${pkg}" "${bin_pkgs_dir}/${pkg}"
-                STATUS pkg_download_status
+        while(TRUE)
+#                       -command "import-module ($env:USERPROFILE + '/source/repos/vcpkg-binpkg-prototype/vcpkg-binpkg.psm1'); vcpkg-listmissing ."
+            execute_process(
+                COMMAND ${POWERSHELL}
+                    -executionpolicy bypass -noprofile
+                    -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-listmissing ."
+                WORKING_DIRECTORY ${bin_pkgs_dir}
+                OUTPUT_VARIABLE host_deps
+                RESULT_VARIABLE host_deps_status
             )
-            list(GET pkg_download_status 1 pkg_download_error)
-            list(GET pkg_download_status 0 pkg_download_status)
 
-            if(NOT pkg_download_status EQUAL 0)
-                message(STATUS "Failed to download vcpkg binary package '${pkg}': ${pkg_download_status} - ${pkg_download_error}")
+            if(NOT host_deps_status EQUAL 0)
+                message(STATUS "Failed to calculate host dependencies: ${host_deps_status}")
                 return()
             endif()
 
-            message(STATUS "done.")
-        endforeach()
+            string(REGEX REPLACE "\r?\n" ";" host_deps "${host_deps}")
 
-#                -command "import-module ($env:USERPROFILE + '/source/repos/vcpkg-binpkg-prototype/vcpkg-binpkg.psm1'); vcpkg-instpkg ."
+            if(NOT host_deps)
+                break()
+            endif()
+
+            foreach(host_dep ${host_deps})
+                if(NOT host_dep MATCHES "^([^:]+):([^:]+)\$")
+                    continue()
+                endif()
+                set(host_dep_name    ${CMAKE_MATCH_1})
+                set(host_dep_triplet ${CMAKE_MATCH_2})
+
+                get_triplet_package_list(${host_dep_triplet})
+
+                file(READ "${CMAKE_BINARY_DIR}/binary_package_list_${host_dep_triplet}.html" raw_html)
+                string(REGEX MATCHALL "<a href=\"${host_dep_name}_[^\"]+[.]zip\"" links ${raw_html})
+
+                list(LENGTH links links_count)
+
+                if(NOT links_count EQUAL 1)
+                    message(STATUS "Multiple host dependencies found for '${host_dep_name}' for triplet '${host_dep_triplet}', aborting.")
+                    return()
+                endif()
+
+                string(REGEX REPLACE "<a href=\"([^\"]+[.]zip)\"" "\\1" pkg ${links})
+
+                download_package("${pkg}" "${bin_pkgs_dir}")
+
+                if(NOT EXISTS "${bin_pkgs_dir}/${pkg}")
+                    message(STATUS "Failed to download host dependency package '${pkg}', aborting.")
+                    return()
+                endif()
+            endforeach()
+        endwhile()
+
         execute_process(
             COMMAND ${POWERSHELL}
                 -executionpolicy bypass -noprofile
@@ -393,8 +443,18 @@ function(vcpkg_set_toolchain)
 
     # Avoid using Visual Studio default vcpkg, because that requires elevaction.
     if(VCPKG_ROOT MATCHES "Visual Studio")
-        set(VCPKG_ROOT "${preferred_root}")
-        set(ENV{VCPKG_ROOT} ${VCPKG_ROOT})
+        set(mkdir_status 0)
+        if(NOT EXISTS "${preferred_root}")
+            file(
+                MAKE_DIRECTORY "${preferred_root}"
+                RESULT mkdir_status
+            )
+        endif()
+
+        if(mkdir_status EQUAL 0)
+            set(VCPKG_ROOT "${preferred_root}")
+            set(ENV{VCPKG_ROOT} ${VCPKG_ROOT})
+        endif()
     endif()
 
     set(VCPKG_ROOT ${VCPKG_ROOT} CACHE FILEPATH "vcpkg installation root path" FORCE)
