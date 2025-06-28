@@ -23,12 +23,12 @@ AAAAA_MAINICON ICON "icons/visualboyadvance-m.ico"
 WINSPARKLE_DLL_RC RCDATA "../../win32-deps/WinSparkle-0.9.1/mingw/i686/WinSparkle.dll"
 #elif defined(__x86_64__)
 WINSPARKLE_DLL_RC RCDATA "../../win32-deps/WinSparkle-0.9.1/mingw/x86_64/WinSparkle.dll"
-#elif defined(_M_IX86)
-WINSPARKLE_DLL_RC RCDATA "../../win32-deps/WinSparkle-0.9.1/Release/WinSparkle.dll"
 #elif defined(_M_AMD64)
 WINSPARKLE_DLL_RC RCDATA "../../win32-deps/WinSparkle-0.9.1/X64/Release/WinSparkle.dll"
 #elif defined(_M_ARM64)
 WINSPARKLE_DLL_RC RCDATA "../../win32-deps/WinSparkle-0.9.1/ARM64/Release/WinSparkle.dll"
+#elif defined(_M_IX86)
+WINSPARKLE_DLL_RC RCDATA "../../win32-deps/WinSparkle-0.9.1/Release/WinSparkle.dll"
 #else
 #include "winsparkle-path.h"
 
