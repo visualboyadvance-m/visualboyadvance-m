@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-23 02:00+0000\n"
+"POT-Creation-Date: 2025-06-28 13:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Benjamin Siskoo <siskoo@tradu-france.com>, 2018,2020,2024\n"
 "Language-Team: French (France) (http://app.transifex.com/bgk/vba-m/language/fr_FR/)\n"
@@ -852,99 +852,103 @@ msgstr ""
 msgid "Failed to set parent window"
 msgstr ""
 
-#: panel.cpp:2413 panel.cpp:2446
+#: panel.cpp:2411
+msgid "Failed to set OpenGL properties"
+msgstr ""
+
+#: panel.cpp:2417 panel.cpp:2450
 msgid "Failed to create SDL window"
 msgstr ""
 
-#: panel.cpp:2433 panel.cpp:2478
+#: panel.cpp:2437 panel.cpp:2482
 msgid "Failed to create SDL renderer"
 msgstr ""
 
-#: panel.cpp:2958
+#: panel.cpp:2976
 msgid "Enabling EGL VSync."
 msgstr "Activation de la VSync EGL."
 
-#: panel.cpp:2960
+#: panel.cpp:2978
 msgid "Disabling EGL VSync."
 msgstr "Désactivation de la VSync EGL."
 
-#: panel.cpp:2967
+#: panel.cpp:2985
 msgid "Enabling GLX VSync."
 msgstr "Activation de la VSync GLX."
 
-#: panel.cpp:2969
+#: panel.cpp:2987
 msgid "Disabling GLX VSync."
 msgstr "Désactivation de la VSync GLX."
 
-#: panel.cpp:2987
+#: panel.cpp:3005
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Echec du paramétrage du glXSwapIntervalEXT"
 
-#: panel.cpp:2996
+#: panel.cpp:3014
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Echec du paramétrage du glXSwapIntervalSGI"
 
-#: panel.cpp:3005
+#: panel.cpp:3023
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Echec du paramétrage du glXSwapIntervalMESA"
 
-#: panel.cpp:3012
+#: panel.cpp:3030
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "wglGetExtensionsStringEXT non supporté"
 
-#: panel.cpp:3015
+#: panel.cpp:3033
 msgid "No support for WGL_EXT_swap_control"
 msgstr "WGL_EXT_swap_control non supporté"
 
-#: panel.cpp:3024
+#: panel.cpp:3042
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Echec du paramétrage de wglSwapIntervalEXT"
 
-#: panel.cpp:3030
+#: panel.cpp:3048
 msgid "No VSYNC available on this platform"
 msgstr "Aucune VSYNC n'est disponible sur cette plateforme"
 
-#: panel.cpp:3145
+#: panel.cpp:3163
 msgid "Memory allocation error"
 msgstr "Erreur d'allocation mémoire"
 
-#: panel.cpp:3148
+#: panel.cpp:3166
 msgid "Error initializing codec"
 msgstr "Erreur d'initialisation du codec"
 
-#: panel.cpp:3151
+#: panel.cpp:3169
 msgid "Error writing to output file"
 msgstr "Erreur d'écriture du fichier de sortie"
 
-#: panel.cpp:3154
+#: panel.cpp:3172
 msgid "Can't guess output format from file name"
 msgstr "Impossible de déduire le format de sortie à partir du nom de fichier"
 
-#: panel.cpp:3159
+#: panel.cpp:3177
 msgid "Programming error; aborting!"
 msgstr "Erreur de programmation ; arrêt d'urgence !"
 
-#: panel.cpp:3171 panel.cpp:3200
+#: panel.cpp:3189 panel.cpp:3218
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Impossible de commencer l'enregistrement de %s (%s)"
 
-#: panel.cpp:3228
+#: panel.cpp:3246
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "Erreur pendant l'enregistrement audio/vidéo (%s); arrêt d'urgence"
 
-#: panel.cpp:3234
+#: panel.cpp:3252
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Erreur pendant l'enregistrement audio (%s) ; arrêt d'urgence"
 
-#: panel.cpp:3244
+#: panel.cpp:3262
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Erreur pendant l'enregistrement vidéo (%s) ; arrêt d'urgence"
 
-#: panel.cpp:3399
+#: panel.cpp:3417
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Volume : %d %%"
