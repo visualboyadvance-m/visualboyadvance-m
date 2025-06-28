@@ -2411,10 +2411,6 @@ void SDLDrawingPanel::DrawingPanelInit()
         systemScreenMessage(_("Failed to set OpenGL properties"));
     }
 
-    if (SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_VULKAN_BOOLEAN, true) == false) {
-        systemScreenMessage(_("Failed to set Vulkan properties"));
-    }
-
     sdlwindow = SDL_CreateWindowWithProperties(props);
 
     if (sdlwindow == NULL) {
