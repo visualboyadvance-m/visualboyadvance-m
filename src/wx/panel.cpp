@@ -2407,14 +2407,15 @@ void SDLDrawingPanel::DrawingPanelInit()
     }
 #endif
 
-    if ((OPTION(kSDLRenderer) == "opengl") || (OPTION(kSDLRenderer) == "opengles2"))
+    if ((OPTION(kSDLRenderer) == wxString("opengl")) || (OPTION(kSDLRenderer) == wxString("opengles2"))) {
         if (SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_OPENGL_BOOLEAN, true) == false) {
             systemScreenMessage(_("Failed to set OpenGL properties"));
         }
-    else if (OPTION(kSDLRenderer) == "vulkan")
+    } else if (OPTION(kSDLRenderer) == wxString("vulkan")) {
         if (SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_VULKAN_BOOLEAN, true) == false) {
             systemScreenMessage(_("Failed to set Vulkan properties"));
         }
+    }
 
     sdlwindow = SDL_CreateWindowWithProperties(props);
 
