@@ -20,7 +20,7 @@ private:
     WinSparkleDllWrapper();
     ~WinSparkleDllWrapper();
 
-    HMODULE winsparkle_dll;
+    wxDynamicLibrary *winsparkle_dll;
 
     func_win_sparkle_init                 winsparkle_init = nullptr;
     func_win_sparkle_check_update_with_ui winsparkle_check_update_with_ui = nullptr;

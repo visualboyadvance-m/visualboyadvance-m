@@ -40,22 +40,23 @@ WinSparkleDllWrapper::WinSparkleDllWrapper()
     temp_file.Write((void *)res_data, res_size);
     temp_file.Close();
 
-    winsparkle_dll = LoadLibraryW(temp_file_name.wc_str());
+    winsparkle_dll = new wxDynamicLibrary(temp_file_name, wxDL_NOW | wxDL_VERBATIM);
 
     if (winsparkle_dll != nullptr) {
-        winsparkle_init = reinterpret_cast<func_win_sparkle_init>(GetProcAddress(winsparkle_dll, "win_sparkle_init"));
-        winsparkle_check_update_with_ui = reinterpret_cast<func_win_sparkle_check_update_with_ui>(GetProcAddress(winsparkle_dll, "win_sparkle_check_update_with_ui"));
-        winsparkle_set_appcast_url = reinterpret_cast<func_win_sparkle_set_appcast_url>(GetProcAddress(winsparkle_dll, "win_sparkle_set_appcast_url"));
-        winsparkle_set_app_details = reinterpret_cast<func_win_sparkle_set_app_details>(GetProcAddress(winsparkle_dll, "win_sparkle_set_app_details"));
-        winsparkle_cleanup = reinterpret_cast<func_win_sparkle_cleanup>(GetProcAddress(winsparkle_dll, "win_sparkle_cleanup"));
+        winsparkle_init = reinterpret_cast<func_win_sparkle_init>(winsparkle_dll->GetSymbol("win_sparkle_init"));
+        winsparkle_check_update_with_ui = reinterpret_cast<func_win_sparkle_check_update_with_ui>(winsparkle_dll->GetSymbol("win_sparkle_check_update_with_ui"));
+        winsparkle_set_appcast_url = reinterpret_cast<func_win_sparkle_set_appcast_url>(winsparkle_dll->GetSymbol("win_sparkle_set_appcast_url"));
+        winsparkle_set_app_details = reinterpret_cast<func_win_sparkle_set_app_details>(winsparkle_dll->GetSymbol("win_sparkle_set_app_details"));
+        winsparkle_cleanup = reinterpret_cast<func_win_sparkle_cleanup>(winsparkle_dll->GetSymbol("win_sparkle_cleanup"));
     }
 }
 
 
 WinSparkleDllWrapper::~WinSparkleDllWrapper()
 {
-    if (winsparkle_dll != nullptr) {
-        while(::FreeLibrary(winsparkle_dll)) {
+    HMODULE hmod = winsparkle_dll->Detach();
+    if (hmod != nullptr) {
+        while(::FreeLibrary(hmod)) {
             wxMilliSleep(50);
         }
     }
