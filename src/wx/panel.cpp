@@ -2531,7 +2531,6 @@ void SDLDrawingPanel::DrawArea(wxWindowDC& dc)
 void SDLDrawingPanel::DrawArea()
 {
     uint32_t srcPitch = 0;
-    uint32_t *src = NULL;
 
     if (!did_init)
         DrawingPanelInit();
