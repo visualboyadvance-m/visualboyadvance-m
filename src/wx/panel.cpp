@@ -2406,9 +2406,13 @@ void SDLDrawingPanel::DrawingPanelInit()
 #ifdef __WXGTK__
     }
 #endif
-            
+
+    if (SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_OPENGL_BOOLEAN, true) == false) {
+        systemScreenMessage(_("Failed to set OpenGL properties"));
+    }
+
     sdlwindow = SDL_CreateWindowWithProperties(props);
-            
+
     if (sdlwindow == NULL) {
         systemScreenMessage(_("Failed to create SDL window"));
         return;
@@ -2479,7 +2483,7 @@ void SDLDrawingPanel::DrawingPanelInit()
         return;
     }
 #endif
-            
+
     if (out_8) {
 #ifdef ENABLE_SDL3
         texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(8, 0xE0, 0x1C, 0x03, 0x00), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
@@ -2500,9 +2504,9 @@ void SDLDrawingPanel::DrawingPanelInit()
 #endif
     } else {
 #ifdef ENABLE_SDL3
-        texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        texture = SDL_CreateTexture(renderer, /*SDL_GetPixelFormatForMasks(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000)*/ SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
 #else
-        texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        texture = SDL_CreateTexture(renderer, /*SDL_MasksToPixelFormatEnum(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000)*/  SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
 #endif
     }
             
@@ -2527,7 +2531,8 @@ void SDLDrawingPanel::DrawArea(wxWindowDC& dc)
 void SDLDrawingPanel::DrawArea()
 {
     uint32_t srcPitch = 0;
-            
+    uint32_t *src = NULL;
+
     if (!did_init)
         DrawingPanelInit();
             
@@ -2540,11 +2545,24 @@ void SDLDrawingPanel::DrawArea()
     } else {
         srcPitch = std::ceil(width * scale * 4) + 4;
     }
-            
+
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
     SDL_RenderClear(renderer);
-    SDL_UpdateTexture(texture, NULL, todraw + srcPitch, srcPitch);
-            
+
+    if (systemColorDepth == 32) {
+        src = (uint32_t *)((uint8_t *)todraw + srcPitch);
+
+        for (int j = 0; j < (height * scale); j++) {
+            for (int i = 0; i < (width * scale); i++) {
+                src[i + (j * (srcPitch / 4))] = ((src[i + (j * (srcPitch / 4))] & 0xFF) << 16) | (src[i + (j * (srcPitch / 4))] & 0xFF00) | ((src[i + (j * (srcPitch / 4))] & 0xFF0000) >> 16) | 0xFF000000;
+            }
+        }
+
+        SDL_UpdateTexture(texture, NULL, todraw + srcPitch, srcPitch);
+    } else {
+        SDL_UpdateTexture(texture, NULL, todraw + srcPitch, srcPitch);
+    }
+
 #ifdef ENABLE_SDL3
     SDL_RenderTexture(renderer, texture, NULL, NULL);
 #else
