@@ -60,6 +60,7 @@ WinSparkleDllWrapper::~WinSparkleDllWrapper()
             wxMilliSleep(50);
         }
     }
+    delete winsparkle_dll;
 
     if (!temp_file_name) {
         return; // No need to delete the file if it was never created.
