@@ -47,7 +47,7 @@ WinSparkleDllWrapper::WinSparkleDllWrapper()
         winsparkle_check_update_with_ui = reinterpret_cast<func_win_sparkle_check_update_with_ui>(GetProcAddress(winsparkle_dll, "win_sparkle_check_update_with_ui"));
         winsparkle_set_appcast_url = reinterpret_cast<func_win_sparkle_set_appcast_url>(GetProcAddress(winsparkle_dll, "win_sparkle_set_appcast_url"));
         winsparkle_set_app_details = reinterpret_cast<func_win_sparkle_set_app_details>(GetProcAddress(winsparkle_dll, "win_sparkle_set_app_details"));
-        winsparkle_cleanup = reinterpret_cast<func_win_sparkle_cleanup>(winsparkle_dll->GetProcAddress(winsparkle_dll, "win_sparkle_cleanup"));
+        winsparkle_cleanup = reinterpret_cast<func_win_sparkle_cleanup>(GetProcAddress(winsparkle_dll, "win_sparkle_cleanup"));
     }
 }
 
