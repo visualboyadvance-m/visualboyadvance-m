@@ -2403,6 +2403,7 @@ void SDLDrawingPanel::DrawingPanelInit()
             systemScreenMessage(_("Failed to set parent window"));
             return;
         }
+
 #ifdef __WXGTK__
     }
 #endif
@@ -2512,7 +2513,7 @@ void SDLDrawingPanel::DrawingPanelInit()
 #endif
     } else {
 #ifdef ENABLE_SDL3
-        if (!strcmp(SDL_GetRendererName(renderer), "direct3d")) {
+        if (OPTION(kSDLRenderer) == wxString("direct3d")) {
             texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
         } else {
             texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
@@ -2566,11 +2567,7 @@ void SDLDrawingPanel::DrawArea()
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
     SDL_RenderClear(renderer);
 
-#ifdef ENABLE_SDL3
-    if ((!strcmp(SDL_GetRendererName(renderer), "direct3d")) && (systemColorDepth == 32)) {
-#else
-    if ((OPTION(kSDLRenderer) == wxString("direct3d") && (systemColorDepth == 32)) {
-#endif
+    if ((OPTION(kSDLRenderer) == wxString("direct3d")) && (systemColorDepth == 32)) {
         todraw_argb = (uint32_t *)(todraw + srcPitch);
             
         for (int i = 0; i < (height * scale); i++) {
@@ -2580,12 +2577,9 @@ void SDLDrawingPanel::DrawArea()
         }
             
         SDL_UpdateTexture(texture, NULL, todraw_argb, srcPitch);
-#ifdef ENABLE_SDL3
-    } else if ((!strcmp(SDL_GetRendererName(renderer), "direct3d")) && (systemColorDepth == 16)) {
-#else
-    } else if ((OPTION(kSDLRenderer) == wxString("direct3d") && (systemColorDepth == 16)) {
-#endif
+    } else if ((OPTION(kSDLRenderer) == wxString("direct3d")) && (systemColorDepth == 16)) {
         todraw_rgb565 = (uint16_t *)(todraw + srcPitch);
+
         for (int i = 0; i < (height * scale); i++) {
             for (int j = 0; j < (width * scale); j++) {
                 todraw_rgb565[j + (i * (srcPitch / 2))] = ((todraw_rgb565[j + (i * (srcPitch / 2))] & 0x7FE0) << 1) | (todraw_rgb565[j + (i * (srcPitch / 2))] & 0x1F);
