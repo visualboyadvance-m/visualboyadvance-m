@@ -2569,17 +2569,17 @@ void SDLDrawingPanel::DrawArea()
 #ifdef ENABLE_SDL3
     if ((!strcmp(SDL_GetRendererName(renderer), "direct3d")) && (systemColorDepth == 32)) {
 #else
-        if ((OPTION(kSDLRenderer) == wxString("direct3d") && (systemColorDepth == 32)) {
+    if ((OPTION(kSDLRenderer) == wxString("direct3d") && (systemColorDepth == 32)) {
 #endif
-            todraw_argb8888 = (uint32_t *)(todraw + srcPitch));
+        todraw_argb8888 = (uint32_t *)(todraw + srcPitch));
             
-            for (int i = 0; i < (height * scale); i++) {
-                for (int j = 0; j < (width * scale); j++) {
-                    todraw_argb[i + (j * (srcPitch / 4))] = 0xFF000000 | ((todraw_argb[i + (j * (srcPitch / 4))] & 0xFF) << 16) | (todraw_argb[i + (j * (srcPitch / 4))] & 0xFF00) | ((todraw_argb[i + (j * (srcPitch / 4))] & 0xFF0000) >> 16);
-                }
+        for (int i = 0; i < (height * scale); i++) {
+            for (int j = 0; j < (width * scale); j++) {
+                todraw_argb[i + (j * (srcPitch / 4))] = 0xFF000000 | ((todraw_argb[i + (j * (srcPitch / 4))] & 0xFF) << 16) | (todraw_argb[i + (j * (srcPitch / 4))] & 0xFF00) | ((todraw_argb[i + (j * (srcPitch / 4))] & 0xFF0000) >> 16);
             }
+        }
             
-            SDL_UpdateTexture(texture, NULL, todraw_argb, srcPitch);
+        SDL_UpdateTexture(texture, NULL, todraw_argb, srcPitch);
 #ifdef ENABLE_SDL3
     } else if ((!strcmp(SDL_GetRendererName(renderer), "direct3d")) && (systemColorDepth == 16)) {
 #else
