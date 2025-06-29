@@ -2571,7 +2571,7 @@ void SDLDrawingPanel::DrawArea()
 #else
     if ((OPTION(kSDLRenderer) == wxString("direct3d") && (systemColorDepth == 32)) {
 #endif
-        todraw_argb8888 = (uint32_t *)(todraw + srcPitch));
+        todraw_argb = (uint32_t *)(todraw + srcPitch));
             
         for (int i = 0; i < (height * scale); i++) {
             for (int j = 0; j < (width * scale); j++) {
