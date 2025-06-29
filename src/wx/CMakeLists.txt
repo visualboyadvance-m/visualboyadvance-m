@@ -770,7 +770,7 @@ if(APPLE)
     set(CMAKE_INSTALL_RPATH "@loader_path/../Frameworks")
 endif()
 
-if(WIN32 AND (X86_64 OR ARM64 OR X86_32) AND ENABLE_ONLINEUPDATES)
+if(WIN32 AND (X86_64 OR ARM64 OR X86) AND ENABLE_ONLINEUPDATES)
     if(NOT DEFINED WINSPARKLE_BIN_RELEASE_DIR)
         set(WINSPARKLE_BIN_RELEASE_DIR ${CMAKE_SOURCE_DIR}/win32-deps/WinSparkle-0.9.1)
     endif()
@@ -798,7 +798,7 @@ if(WIN32 AND (X86_64 OR ARM64 OR X86_32) AND ENABLE_ONLINEUPDATES)
         autoupdater/wxmsw/winsparkle-wrapper.cpp
         autoupdater/wxmsw/winsparkle-wrapper.h)
 
-    configure_file(autoupdater/wxmsw/winsparkle-path.h.in ${CMAKE_BINARY_DIR}/winsparkle-path.h)
+    configure_file(autoupdater/wxmsw/winsparkle-path.h.in ${CMAKE_SOURCE_DIR}/src/wx/winsparkle-path.h)
 endif()
 
 if(APPLE AND ENABLE_ONLINEUPDATES)

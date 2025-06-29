@@ -17,3 +17,6 @@ compile_commands.json
 
 # mac finder crap
 *.DS_Store
+
+# online updates header
+src/wx/winsparkle-path.h
