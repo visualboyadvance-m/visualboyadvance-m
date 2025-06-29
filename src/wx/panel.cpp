@@ -2492,9 +2492,17 @@ void SDLDrawingPanel::DrawingPanelInit()
 #endif
     } else if (out_16) {
 #ifdef ENABLE_SDL3
-        texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(16, 0x7C00, 0x03E0, 0x001F, 0x0000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        if (OPTION(kSDLRenderer) == wxString("direct3d")) {
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB565, SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        } else {
+            texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(16, 0x7C00, 0x03E0, 0x001F, 0x0000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        }
 #else
-        texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(16, 0x7C00, 0x03E0, 0x001F, 0x0000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        if (OPTION(kSDLRenderer) == wxString("direct3d")) {
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB565, SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        } else {
+            texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(16, 0x7C00, 0x03E0, 0x001F, 0x0000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        }
 #endif
     } else if (out_24) {
 #ifdef ENABLE_SDL3
@@ -2540,6 +2548,7 @@ void SDLDrawingPanel::DrawArea()
 {
     uint32_t srcPitch = 0;
     uint32_t *todraw_argb = NULL;
+    uint16_t *todraw_rgb565 = NULL;
 
     if (!did_init)
         DrawingPanelInit();
@@ -2559,14 +2568,23 @@ void SDLDrawingPanel::DrawArea()
 
     if ((OPTION(kSDLRenderer) == wxString("direct3d") && (systemColorDepth == 32)) {
         todraw_argb8888 = (uint32_t *)(todraw + srcPitch));
-
+        
         for (int i = 0; i < (height * scale); i++) {
             for (int j = 0; j < (width * scale); j++) {
                 todraw_argb[i + (j * (srcPitch / 4))] = 0xFF000000 | ((todraw_argb[i + (j * (srcPitch / 4))] & 0xFF) << 16) | (todraw_argb[i + (j * (srcPitch / 4))] & 0xFF00) | ((todraw_argb[i + (j * (srcPitch / 4))] & 0xFF0000) >> 16);
             }
         }
-
+        
         SDL_UpdateTexture(texture, NULL, todraw_argb, srcPitch);
+    } else if ((OPTION(kSDLRenderer) == wxString("direct3d") && (systemColorDepth == 16)) {
+        todraw_rgb565 = (uint16_t *)(todraw + srcPitch))
+        for (int i = 0; i < (height * scale); i++) {
+            for (int j = 0; j < (width * scale); j++) {
+                todraw_rgb565[i + (j * (srcPitch / 2))] = ((todraw_rgb565[i + (j * (srcPitch / 2))] & 0x7FE0) << 1) | (todraw_rgb565[i + (j * (srcPitch / 2))] & 0x1F);
+            }
+        }
+
+        SDL_UpdateTexture(texture, NULL, todraw_rgb565, srcPitch);
     } else {
         SDL_UpdateTexture(texture, NULL, todraw + srcPitch, srcPitch);
     }
