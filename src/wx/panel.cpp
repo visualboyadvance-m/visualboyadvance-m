@@ -2585,7 +2585,7 @@ void SDLDrawingPanel::DrawArea()
 #else
     } else if ((OPTION(kSDLRenderer) == wxString("direct3d") && (systemColorDepth == 16)) {
 #endif
-        todraw_rgb565 = (uint16_t *)(todraw + srcPitch));
+        todraw_rgb565 = (uint16_t *)(todraw + srcPitch);
         for (int i = 0; i < (height * scale); i++) {
             for (int j = 0; j < (width * scale); j++) {
                 todraw_rgb565[i + (j * (srcPitch / 2))] = ((todraw_rgb565[i + (j * (srcPitch / 2))] & 0x7FE0) << 1) | (todraw_rgb565[i + (j * (srcPitch / 2))] & 0x1F);
