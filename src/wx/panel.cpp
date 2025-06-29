@@ -2575,7 +2575,7 @@ void SDLDrawingPanel::DrawArea()
             
         for (int i = 0; i < (height * scale); i++) {
             for (int j = 0; j < (width * scale); j++) {
-                todraw_argb[i + (j * (srcPitch / 4))] = 0xFF000000 | ((todraw_argb[i + (j * (srcPitch / 4))] & 0xFF) << 16) | (todraw_argb[i + (j * (srcPitch / 4))] & 0xFF00) | ((todraw_argb[i + (j * (srcPitch / 4))] & 0xFF0000) >> 16);
+                todraw_argb[j + (i * (srcPitch / 4))] = 0xFF000000 | ((todraw_argb[j + (i * (srcPitch / 4))] & 0xFF) << 16) | (todraw_argb[j + (i * (srcPitch / 4))] & 0xFF00) | ((todraw_argb[j + (i * (srcPitch / 4))] & 0xFF0000) >> 16);
             }
         }
             
@@ -2588,7 +2588,7 @@ void SDLDrawingPanel::DrawArea()
         todraw_rgb565 = (uint16_t *)(todraw + srcPitch);
         for (int i = 0; i < (height * scale); i++) {
             for (int j = 0; j < (width * scale); j++) {
-                todraw_rgb565[i + (j * (srcPitch / 2))] = ((todraw_rgb565[i + (j * (srcPitch / 2))] & 0x7FE0) << 1) | (todraw_rgb565[i + (j * (srcPitch / 2))] & 0x1F);
+                todraw_rgb565[j + (i * (srcPitch / 2))] = ((todraw_rgb565[j + (i * (srcPitch / 2))] & 0x7FE0) << 1) | (todraw_rgb565[j + (i * (srcPitch / 2))] & 0x1F);
             }
         }
 
