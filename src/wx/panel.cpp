@@ -2504,9 +2504,17 @@ void SDLDrawingPanel::DrawingPanelInit()
 #endif
     } else {
 #ifdef ENABLE_SDL3
-        texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        if (OPTION(kSDLRenderer) == wxString("direct3d")) {
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        } else {
+            texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        }
 #else
-        texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        if (OPTION(kSDLRenderer) == wxString("direct3d")) {
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        } else {
+            texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        }
 #endif
     }
             
@@ -2531,6 +2539,7 @@ void SDLDrawingPanel::DrawArea(wxWindowDC& dc)
 void SDLDrawingPanel::DrawArea()
 {
     uint32_t srcPitch = 0;
+    uint32_t *todraw_argb = NULL;
 
     if (!did_init)
         DrawingPanelInit();
@@ -2547,7 +2556,20 @@ void SDLDrawingPanel::DrawArea()
 
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
     SDL_RenderClear(renderer);
-    SDL_UpdateTexture(texture, NULL, todraw + srcPitch, srcPitch);
+
+    if ((OPTION(kSDLRenderer) == wxString("direct3d") && (systemColorDepth == 32)) {
+        todraw_argb8888 = (uint32_t *)(todraw + srcPitch));
+
+        for (int i = 0; i < (height * scale); i++) {
+            for (int j = 0; j < (width * scale); j++) {
+                todraw_argb[i + (j * (srcPitch / 4))] = 0xFF000000 | ((todraw_argb[i + (j * (srcPitch / 4))] & 0xFF) << 16) | (todraw_argb[i + (j * (srcPitch / 4))] & 0xFF00) | ((todraw_argb[i + (j * (srcPitch / 4))] & 0xFF0000) >> 16);
+            }
+        }
+
+        SDL_UpdateTexture(texture, NULL, todraw_argb, srcPitch);
+    } else {
+        SDL_UpdateTexture(texture, NULL, todraw + srcPitch, srcPitch);
+    }
 
 #ifdef ENABLE_SDL3
     SDL_RenderTexture(renderer, texture, NULL, NULL);
