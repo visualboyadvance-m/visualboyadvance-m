@@ -862,7 +862,7 @@ msgstr "设置主窗口失败"
 
 #: panel.cpp:2411
 msgid "Failed to set OpenGL properties"
-msgstr ""
+msgstr "设置 OpenGL 属性失败"
 
 #: panel.cpp:2417 panel.cpp:2450
 msgid "Failed to create SDL window"
