@@ -2434,6 +2434,8 @@ void SDLDrawingPanel::DrawingPanelInit()
 
         if (renderer == NULL) {
             log("ERROR: Renderer creating failed, using default renderer");
+            printf("SDL Error: %s\n", SDL_GetError());
+
             renderer = SDL_CreateRenderer(sdlwindow, NULL);
         }
     }
