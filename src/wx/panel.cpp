@@ -2412,7 +2412,9 @@ void SDLDrawingPanel::DrawingPanelInit()
         systemScreenMessage(_("Failed to set OpenGL properties"));
     }
 
+#ifdef _WIN32
     SDL_SetHint(SDL_HINT_WINDOWS_USE_D3D9EX, false);
+#endif
 
     sdlwindow = SDL_CreateWindowWithProperties(props);
 
