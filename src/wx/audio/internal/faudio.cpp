@@ -178,7 +178,10 @@ void FAudio_Output::close() {
             VBAM_CHECK(FAudioSourceVoice_Stop(sVoice, 0, FAUDIO_COMMIT_NOW) == 0);
         }
 
-        FAudioVoice_DestroyVoice(sVoice);
+        if ((sVoice != (FAudioMasteringVoice*)0xDDDDDDDDDDDDDDDD) && (sVoice)) {
+            FAudioVoice_DestroyVoice(sVoice);
+        }
+        
         sVoice = nullptr;
     }
 
