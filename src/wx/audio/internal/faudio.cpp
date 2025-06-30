@@ -182,10 +182,11 @@ void FAudio_Output::close() {
         sVoice = nullptr;
     }
 
-    if (mVoice) {
+    if ((mVoice != (FAudioMasteringVoice *)0xDDDDDDDDDDDDDDDD) && (mVoice)) {
         FAudioVoice_DestroyVoice(mVoice);
-        mVoice = nullptr;
     }
+
+    mVoice = nullptr;
 
     if (faud) {
         FAudio_Release(faud);
