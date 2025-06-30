@@ -847,7 +847,7 @@ msgstr "Не вдалося встановити головне вікно."
 
 #: panel.cpp:2411
 msgid "Failed to set OpenGL properties"
-msgstr ""
+msgstr "Не вдалося встановити властивості Open GL."
 
 #: panel.cpp:2417 panel.cpp:2450
 msgid "Failed to create SDL window"
