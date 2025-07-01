@@ -22,11 +22,14 @@ if(TAG_RELEASE)
     include(MakeReleaseCommitAndTag)
 endif()
 
-set(VCPKG_DEPS pkgconf zlib pthreads sdl3 gettext wxwidgets)
+set(VCPKG_DEPS pkgconf zlib pthreads gettext-libintl wxwidgets nanosvg)
 
 set(VCPKG_DEPS_OPTIONAL
-    ffmpeg ENABLE_FFMPEG
-    faudio ENABLE_FAUDIO
+    "sdl3[vulkan]"      ENABLE_SDL3
+    "sdl2[samplerate]"  ENABLE_SDL2
+    openal-soft         ENABLE_OPENAL
+    "ffmpeg[x264,x265]" ENABLE_FFMPEG
+    faudio              ENABLE_FAUDIO
 )
 
 include(Set-Toolchain-vcpkg)
