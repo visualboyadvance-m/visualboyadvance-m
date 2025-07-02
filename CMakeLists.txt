@@ -22,6 +22,8 @@ if(TAG_RELEASE)
     include(MakeReleaseCommitAndTag)
 endif()
 
+option(VCPKG_BINARY_PACKAGES "Use vcpkg binary packages" TRUE)
+
 set(VCPKG_DEPS pkgconf zlib pthreads gettext-libintl wxwidgets nanosvg)
 
 set(VCPKG_DEPS_OPTIONAL

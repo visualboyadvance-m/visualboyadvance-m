@@ -551,7 +551,7 @@ function(vcpkg_set_toolchain)
         WORKING_DIRECTORY ${VCPKG_ROOT}
     )
 
-    if (NOT NO_VCPKG_UPDATES)
+    if (NOT (NO_VCPKG_UPDATES OR (NOT VCPKG_BINARY_PACKAGES)))
         get_binary_packages(${vcpkg_exe})
     endif()
 
