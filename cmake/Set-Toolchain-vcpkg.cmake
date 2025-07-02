@@ -151,20 +151,12 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver pkg_triplet powershell ou
     string(REPLACE "-" "." pkg_ver ${pkg_ver})
 
     if(NOT DEFINED VCPKG_INSTALLED_COUNT)
-        if(VCPKG_ROOT MATCHES "Visual Studio")
-            execute_process(
-                COMMAND ${powershell}
-                    -executionpolicy bypass -noprofile
-                    -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-list"
-                OUTPUT_VARIABLE vcpkg_list_text
-            )
-        else()
-            execute_process(
-                COMMAND ${vcpkg_exe} list
-                OUTPUT_VARIABLE vcpkg_list_text
-                ERROR_QUIET
-            )
-        endif()
+        execute_process(
+            COMMAND ${powershell}
+                -executionpolicy bypass -noprofile
+                -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-list"
+            OUTPUT_VARIABLE vcpkg_list_text
+        )
 
         string(REGEX REPLACE "\r?\n" ";" vcpkg_list_raw "${vcpkg_list_text}")
 
