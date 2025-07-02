@@ -2284,9 +2284,14 @@ SDLDrawingPanel::~SDLDrawingPanel()
 {
     if (did_init)
     {
-        SDL_DestroyWindow(sdlwindow);
-        SDL_DestroyTexture(texture);
-        SDL_DestroyRenderer(renderer);
+        if (sdlwindow != NULL)
+             SDL_DestroyWindow(sdlwindow);
+
+        if (texture != NULL)
+             SDL_DestroyTexture(texture);
+
+        if (renderer != NULL)
+             SDL_DestroyRenderer(renderer);
 
         SDL_QuitSubSystem(SDL_INIT_VIDEO);
 
@@ -2396,6 +2401,8 @@ void SDLDrawingPanel::DrawingPanelInit()
         if (SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X11_WINDOW_NUMBER, xid) == false)
 #elif defined(__WXMAC__)
         if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_COCOA_VIEW_POINTER, wxGetApp().frame->GetPanel()->GetHandle()) == false)
+#elif defined(__WXMSW__)
+        if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_WIN32_HWND_POINTER, GetHWND()) == false)
 #else
         if (SDL_SetPointerProperty(props, "sdl2-compat.external_window", GetWindow()->GetHandle()) == false)
 #endif
@@ -2422,8 +2429,9 @@ void SDLDrawingPanel::DrawingPanelInit()
         systemScreenMessage(_("Failed to create SDL window"));
         return;
     }
-            
-    SDL_DestroyProperties(props);
+
+    if (props != NULL)
+        SDL_DestroyProperties(props);
             
     if (OPTION(kSDLRenderer) == wxString("default")) {
         renderer = SDL_CreateRenderer(sdlwindow, NULL);
@@ -2581,8 +2589,9 @@ void SDLDrawingPanel::DrawArea()
                 todraw_argb[j + (i * (srcPitch / 4))] = 0xFF000000 | ((todraw_argb[j + (i * (srcPitch / 4))] & 0xFF) << 16) | (todraw_argb[j + (i * (srcPitch / 4))] & 0xFF00) | ((todraw_argb[j + (i * (srcPitch / 4))] & 0xFF0000) >> 16);
             }
         }
-            
-        SDL_UpdateTexture(texture, NULL, todraw_argb, srcPitch);
+
+        if (texture != NULL)
+            SDL_UpdateTexture(texture, NULL, todraw_argb, srcPitch);
     } else if ((OPTION(kSDLRenderer) == wxString("direct3d")) && (systemColorDepth == 16)) {
         todraw_rgb565 = (uint16_t *)(todraw + srcPitch);
 
@@ -2592,17 +2601,20 @@ void SDLDrawingPanel::DrawArea()
             }
         }
 
-        SDL_UpdateTexture(texture, NULL, todraw_rgb565, srcPitch);
+        if (texture != NULL)
+            SDL_UpdateTexture(texture, NULL, todraw_rgb565, srcPitch);
     } else {
-        SDL_UpdateTexture(texture, NULL, todraw + srcPitch, srcPitch);
+        if (texture != NULL)
+            SDL_UpdateTexture(texture, NULL, todraw + srcPitch, srcPitch);
     }
 
+    if (texture != NULL)
 #ifdef ENABLE_SDL3
-    SDL_RenderTexture(renderer, texture, NULL, NULL);
+        SDL_RenderTexture(renderer, texture, NULL, NULL);
 #else
-    SDL_RenderCopy(renderer, texture, NULL, NULL);
+        SDL_RenderCopy(renderer, texture, NULL, NULL);
 #endif
-            
+    
     SDL_RenderPresent(renderer);
 }
         
