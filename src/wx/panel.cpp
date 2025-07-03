@@ -2417,10 +2417,6 @@ void SDLDrawingPanel::DrawingPanelInit()
         systemScreenMessage(_("Failed to set OpenGL properties"));
     }
 
-#ifdef _WIN32
-    SDL_SetHint(SDL_HINT_WINDOWS_USE_D3D9EX, false);
-#endif
-
     sdlwindow = SDL_CreateWindowWithProperties(props);
 
     if (sdlwindow == NULL) {
@@ -2433,10 +2429,8 @@ void SDLDrawingPanel::DrawingPanelInit()
             
     if (OPTION(kSDLRenderer) == wxString("default")) {
         renderer = SDL_CreateRenderer(sdlwindow, NULL);
-        log("SDL renderer: default");
     } else {
         renderer = SDL_CreateRenderer(sdlwindow, renderer_name.mb_str());
-        log("SDL renderer: %s", (const char *)renderer_name.mb_str());
 
         if (renderer == NULL) {
             log("ERROR: Renderer creating failed, using default renderer");
@@ -2450,6 +2444,9 @@ void SDLDrawingPanel::DrawingPanelInit()
         systemScreenMessage(_("Failed to create SDL renderer"));
         return;
     }
+
+	renderername = wxString(SDL_GetRendererName(renderer));
+    log("SDL renderer: %s", (const char*)renderername.mb_str());
 #else
 #ifdef __WXGTK__
     sdlwindow = SDL_CreateWindowFrom((void *)xid);
@@ -2495,23 +2492,34 @@ void SDLDrawingPanel::DrawingPanelInit()
         systemScreenMessage(_("Failed to create SDL renderer"));
         return;
     }
+
+    renderername = OPTION(kSDLRenderer);
 #endif
 
     if (out_8) {
 #ifdef ENABLE_SDL3
-        texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(8, 0xE0, 0x1C, 0x03, 0x00), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        if (renderername == wxString("direct3d")) {
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB332, SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        } else {
+            texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(8, 0xE0, 0x1C, 0x03, 0x00), 
+SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        }
 #else
-        texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(8, 0xE0, 0x1C, 0x03, 0x00), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        if (renderername == wxString("direct3d")) {
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB332, SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        } else {
+            texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(8, 0xE0, 0x1C, 0x03, 0x00), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        }
 #endif
     } else if (out_16) {
 #ifdef ENABLE_SDL3
-        if (OPTION(kSDLRenderer) == wxString("direct3d")) {
+        if (renderername == wxString("direct3d")) {
             texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB565, SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
         } else {
             texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(16, 0x7C00, 0x03E0, 0x001F, 0x0000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
         }
 #else
-        if (OPTION(kSDLRenderer) == wxString("direct3d")) {
+        if (renderername == wxString("direct3d")) {
             texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB565, SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
         } else {
             texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(16, 0x7C00, 0x03E0, 0x001F, 0x0000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
@@ -2519,19 +2527,27 @@ void SDLDrawingPanel::DrawingPanelInit()
 #endif
     } else if (out_24) {
 #ifdef ENABLE_SDL3
-        texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        if (renderername == wxString("direct3d")) {
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        } else {
+            texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        }
 #else
-        texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        if (renderername == wxString("direct3d")) {
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        } else {
+            texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
+        }
 #endif
     } else {
 #ifdef ENABLE_SDL3
-        if (OPTION(kSDLRenderer) == wxString("direct3d")) {
+        if (renderername == wxString("direct3d")) {
             texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
         } else {
             texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
         }
 #else
-        if (OPTION(kSDLRenderer) == wxString("direct3d")) {
+        if (renderername == wxString("direct3d")) {
             texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
         } else {
             texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000), SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
@@ -2579,7 +2595,7 @@ void SDLDrawingPanel::DrawArea()
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
     SDL_RenderClear(renderer);
 
-    if ((OPTION(kSDLRenderer) == wxString("direct3d")) && (systemColorDepth == 32)) {
+    if ((renderername == wxString("direct3d")) && (systemColorDepth == 32)) {
         todraw_argb = (uint32_t *)(todraw + srcPitch);
             
         for (int i = 0; i < (height * scale); i++) {
@@ -2590,7 +2606,7 @@ void SDLDrawingPanel::DrawArea()
 
         if (texture != NULL)
             SDL_UpdateTexture(texture, NULL, todraw_argb, srcPitch);
-    } else if ((OPTION(kSDLRenderer) == wxString("direct3d")) && (systemColorDepth == 16)) {
+    } else if ((renderername == wxString("direct3d")) && (systemColorDepth == 16)) {
         todraw_rgb565 = (uint16_t *)(todraw + srcPitch);
 
         for (int i = 0; i < (height * scale); i++) {

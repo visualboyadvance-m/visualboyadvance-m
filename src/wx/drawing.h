@@ -49,6 +49,8 @@ protected:
 };
 #endif
 
+#include <wx/string.h>
+
 class SDLDrawingPanel : public DrawingPanel {
 public:
     SDLDrawingPanel(wxWindow* parent, int _width, int _height);
@@ -67,6 +69,7 @@ private:
     SDL_Window *sdlwindow = NULL;
     SDL_Texture *texture = NULL;
     SDL_Renderer *renderer = NULL;
+	wxString renderername = wxEmptyString;
 };
 
 #if defined(__WXMSW__) && !defined(NO_D3D)
