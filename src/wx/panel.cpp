@@ -1260,7 +1260,8 @@ void GameArea::OnIdle(wxIdleEvent& event)
         w->SetSize(wxSize(basic_width, basic_height));
 
         // Allow input while on background
-        if (OPTION(kUIAllowKeyboardBackgroundInput)) {
+        if (OPTION(kUIAllowKeyboardBackgroundInput) || 
+           (OPTION(kSDLRenderer) == wxString("direct3d"))) {
             enableKeyboardBackgroundInput(w->GetEventHandler());
         }
 
@@ -2264,6 +2265,11 @@ DrawingPanelBase::~DrawingPanelBase()
     disableKeyboardBackgroundInput();
 }
 
+
+BEGIN_EVENT_TABLE(SDLDrawingPanel, wxPanel)
+EVT_PAINT(SDLDrawingPanel::PaintEv)
+END_EVENT_TABLE()
+
 SDLDrawingPanel::SDLDrawingPanel(wxWindow* parent, int _width, int _height)
     : DrawingPanel(parent, _width, _height)
 {
@@ -2401,6 +2407,14 @@ void SDLDrawingPanel::DrawingPanelInit()
         if (SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X11_WINDOW_NUMBER, xid) == false)
 #elif defined(__WXMAC__)
         if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_COCOA_VIEW_POINTER, wxGetApp().frame->GetPanel()->GetHandle()) == false)
+#elif defined(__WXMSW__)
+        if (OPTION(kSDLRenderer) == wxString("direct3d")) {
+             SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, height * scale);
+             SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, width * scale);
+             SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_MAXIMIZED_BOOLEAN, true);
+             SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_RESIZABLE_BOOLEAN, true);
+             SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, "visualboyadvance-m SDL DX9");
+        } else if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_WIN32_HWND_POINTER, GetHandle()) == false)
 #else
         if (SDL_SetPointerProperty(props, "sdl2-compat.external_window", GetWindow()->GetHandle()) == false)
 #endif
@@ -2418,7 +2432,7 @@ void SDLDrawingPanel::DrawingPanelInit()
     }
 
     sdlwindow = SDL_CreateWindowWithProperties(props);
-
+    
     if (sdlwindow == NULL) {
         systemScreenMessage(_("Failed to create SDL window"));
         return;
@@ -2426,7 +2440,7 @@ void SDLDrawingPanel::DrawingPanelInit()
 
     if (props != NULL)
         SDL_DestroyProperties(props);
-            
+
     if (OPTION(kSDLRenderer) == wxString("default")) {
         renderer = SDL_CreateRenderer(sdlwindow, NULL);
     } else {

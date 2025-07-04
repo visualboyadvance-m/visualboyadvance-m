@@ -881,7 +881,8 @@ wxEvtHandler* wxvbamApp::event_handler() {
         return nullptr;
     }
 
-    if (OPTION(kUIAllowJoystickBackgroundInput) || OPTION(kUIAllowKeyboardBackgroundInput)) {
+    if (OPTION(kUIAllowJoystickBackgroundInput) || OPTION(kUIAllowKeyboardBackgroundInput) ||
+       (OPTION(kSDLRenderer) == wxString("direct3d"))) {
         // Use the game panel, if the background polling option is enabled.
         return panel->panel->GetWindow()->GetEventHandler();
     }

@@ -69,7 +69,9 @@ private:
     SDL_Window *sdlwindow = NULL;
     SDL_Texture *texture = NULL;
     SDL_Renderer *renderer = NULL;
-	wxString renderername = wxEmptyString;
+    wxString renderername = wxEmptyString;
+
+    DECLARE_EVENT_TABLE()
 };
 
 #if defined(__WXMSW__) && !defined(NO_D3D)
