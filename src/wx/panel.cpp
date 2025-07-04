@@ -2409,13 +2409,13 @@ void SDLDrawingPanel::DrawingPanelInit()
         if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_COCOA_VIEW_POINTER, wxGetApp().frame->GetPanel()->GetHandle()) == false)
 #elif defined(__WXMSW__)
         if (OPTION(kSDLRenderer) == wxString("direct3d")) {
-             void *title = (void *)"visualboyadvance-m SDL DX9";
+             const char *title = "visualboyadvance-m SDL DX9";
 
              SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, height * scale);
              SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, width * scale);
              SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_MAXIMIZED_BOOLEAN, true);
              SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_RESIZABLE_BOOLEAN, true);
-             SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, title);
+             SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, (void *)title);
         } else if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_WIN32_HWND_POINTER, GetHandle()) == false)
 #else
         if (SDL_SetPointerProperty(props, "sdl2-compat.external_window", GetWindow()->GetHandle()) == false)
