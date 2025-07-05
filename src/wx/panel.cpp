@@ -2434,14 +2434,12 @@ void SDLDrawingPanel::DrawingPanelInit()
     }
 
     sdlwindow = SDL_CreateWindowWithProperties(props);
-    
+    SDL_DestroyProperties(props);
+
     if (sdlwindow == NULL) {
         systemScreenMessage(_("Failed to create SDL window"));
         return;
     }
-
-    if (props != NULL)
-        SDL_DestroyProperties(props);
 
     if (OPTION(kSDLRenderer) == wxString("default")) {
         renderer = SDL_CreateRenderer(sdlwindow, NULL);
