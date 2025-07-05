@@ -33,7 +33,7 @@ include(FindPackageHandleStandardArgs)
 
 # The default components were taken from a survey over other FindFFMPEG.cmake files
 if (NOT FFmpeg_FIND_COMPONENTS)
-  set(FFmpeg_FIND_COMPONENTS AVCODEC AVFORMAT AVUTIL SWSCALE SWRESAMPLE X264 X265)
+  set(FFmpeg_FIND_COMPONENTS AVFORMAT AVCODEC AVUTIL SWSCALE SWRESAMPLE X264 X265)
 endif ()
 
 #
@@ -65,7 +65,7 @@ macro(find_component _component _pkgconfig _library _header)
      if (PKG_CONFIG_FOUND)
        pkg_check_modules(PC_${_component} ${_pkgconfig})
      endif ()
-  endif (NOT WIN32)
+ endif (NOT WIN32)
 
   find_path(${_component}_INCLUDE_DIRS ${_header}
     HINTS
