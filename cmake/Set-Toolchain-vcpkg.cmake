@@ -255,6 +255,19 @@ function(download_package pkg pkgs_dir)
     message(STATUS "done.")
 endfunction()
 
+function(zip_is_installed vcpkg_exe zip outvar)
+    if(NOT zip MATCHES "([^_]+)_([^_]+)_([^.]+)[.]zip")
+        return()
+    endif()
+    set(pkg_name    ${CMAKE_MATCH_1})
+    set(pkg_version ${CMAKE_MATCH_2})
+    set(pkg_triplet ${CMAKE_MATCH_3})
+
+    vcpkg_is_installed(${vcpkg_exe} ${pkg_name} ${pkg_version} ${pkg_triplet} ${POWERSHELL} pkg_installed)
+
+    set(${outvar} ${pkg_installed} PARENT_SCOPE)
+endfunction()
+
 function(get_binary_packages vcpkg_exe)
     set(binary_packages_installed FALSE PARENT_SCOPE)
 
@@ -286,14 +299,7 @@ function(get_binary_packages vcpkg_exe)
     endif()
 
     foreach(pkg ${binary_packages})
-        if(NOT pkg MATCHES "([^_]+)_([^_]+)_([^.]+)[.]zip")
-            continue()
-        endif()
-        set(pkg_name    ${CMAKE_MATCH_1})
-        set(pkg_version ${CMAKE_MATCH_2})
-        set(pkg_triplet ${CMAKE_MATCH_3})
-
-        vcpkg_is_installed(${vcpkg_exe} ${pkg_name} ${pkg_version} ${pkg_triplet} ${POWERSHELL} pkg_installed)
+        zip_is_installed(${vcpkg_exe} ${pkg} pkg_installed)
 
         if(NOT pkg_installed)
             list(APPEND to_install ${pkg})
@@ -356,7 +362,11 @@ function(get_binary_packages vcpkg_exe)
 
                 string(REGEX REPLACE "<a href=\"([^\"]+[.]zip)\"" "\\1" pkg ${links})
 
-                download_package("${pkg}" "${bin_pkgs_dir}")
+                zip_is_installed(${vcpkg_exe} ${pkg} pkg_installed)
+
+                if(NOT pkg_installed)
+                    download_package("${pkg}" "${bin_pkgs_dir}")
+                endif()
 
                 if(NOT EXISTS "${bin_pkgs_dir}/${pkg}")
                     message(STATUS "Failed to download host dependency package '${pkg}', aborting.")
