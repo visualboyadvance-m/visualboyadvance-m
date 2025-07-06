@@ -190,6 +190,7 @@ DISTS=$DISTS'
     harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/11.1.0/harfbuzz-11.1.0.tar.xz        lib/libharfbuzz.a
     shared-mime-info https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.4/shared-mime-info-2.4.tar.bz2  bin/update-mime-database
     libmspack       https://github.com/kyz/libmspack/archive/refs/tags/v1.11.tar.gz lib/libmspack.a
+    libwebp         https://github.com/webmproject/libwebp/archive/refs/tags/v1.5.0.tar.gz lib/libwebp.a
     wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.0/wxWidgets-3.3.0.tar.bz2     lib/libwx_baseu-3.*.a
     libx264         https://code.videolan.org/videolan/x264/-/archive/master/x264-master.tar.bz2                lib/libx264.a
     libx265         https://bitbucket.org/multicoreware/x265_git/downloads/x265_4.1.tar.gz                      lib/libx265.a
@@ -262,6 +263,7 @@ DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     libvorbis       autoreconf
     libgpg-error    autoreconf
     libmspack       autoreconf
+    libwebp         cmake
     wxwidgets       cmake
 "
 
@@ -392,7 +394,7 @@ DIST_ARGS="$DIST_ARGS
     sdl3        -DSDL_CAMERA=OFF
     libx264     --enable-static --enable-pic
     libx265     -DHIGH_BIT_DEPTH=ON -DENABLE_ASSEMBLY=OFF -DENABLE_CLI=OFF
-    wxwidgets   -DwxUSE_LIBJPEG=sys -DwxUSE_LIBPNG=sys -DwxUSE_LIBTIFF=sys
+    wxwidgets   -DwxUSE_LIBJPEG=sys -DwxUSE_LIBPNG=sys -DwxUSE_LIBTIFF=sys -DwxUSE_LIBWEBP=sys -DwxUSE_REGEX=sys
 "
 
 export DIST_BARE_MAKE_ARGS='CC="$CC" CXX="$CXX" LD="$CXX"'
