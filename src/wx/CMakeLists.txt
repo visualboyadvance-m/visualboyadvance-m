@@ -332,6 +332,10 @@ function(configure_wx_target target)
     # SDL.
     _add_link_libraries(${VBAM_SDL_LIBS})
 
+    if(APPLE)
+        _add_link_libraries(sharpyuv)
+    endif()
+
     # OpenGL.
     if(ENABLE_OPENGL)
         _add_link_libraries(${OPENGL_LIBRARIES})
@@ -503,7 +507,7 @@ endif()
 # and adjust link command when making a static binary
 if(CMAKE_COMPILER_IS_GNUCXX AND VBAM_STATIC)
     # some dists don't have a static libpthread
-    set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread ")
+    set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread")
 
     if(WIN32)
         add_custom_command(
