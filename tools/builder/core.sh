@@ -241,7 +241,7 @@ DIST_PATCHES=$DIST_PATCHES'
     graphite2       https://gist.githubusercontent.com/rkitover/e753f41a7f6461ad412c2d076ec24e0f/raw/d0c2b8cccd556e407e15da8a2e739a902bd1a3b5/graphite2-static-cmake-opts.patch
     python2         https://gist.githubusercontent.com/rkitover/2d9e5baff1f1cc4f2618dee53083bd35/raw/7f33fcf5470a9f1013ac6ae7bb168368a98fe5a0/python-2.7.14-custom-static-openssl.patch https://gist.githubusercontent.com/rkitover/afab7ed3ac7ce1860c43a258571c8ae1/raw/6f5fc90a7acf5f5c3ffda2edf402b28f469a4b3b/python-2.7.14-static-libintl.patch
     intltool        https://gist.githubusercontent.com/rkitover/d638882f52e5d5f8e392cbf6842cd6d0/raw/dcfbe358bbb8b89f88b40a9c3402494552fd33f8/intltool-0.51.0.patch
-    wxwidgets       https://gist.githubusercontent.com/andyvand/68b246d2d7dd2fd8d67fbc97f8b17f53/raw/70e40a99654e34c0b25afcd91acd6a855a4d2006/wx-macOS.patch
+    wxwidgets       https://gist.githubusercontent.com/andyvand/68b246d2d7dd2fd8d67fbc97f8b17f53/raw/7ee2e17b0939de8267803131a9197a0fbea60cef/wx-macOS.patch
 '
 
 DIST_TAR_ARGS="$DIST_TAR_ARGS
