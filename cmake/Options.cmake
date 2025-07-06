@@ -89,6 +89,10 @@ if(APPLE AND NOT DISABLE_MACOS_PACKAGE_MANAGERS)
     include(MacPackageManagers)
 endif()
 
+if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "^([xX]86_64|[aA][mM][dD]64)$")
+   set(PKG_CONFIG_EXECUTABLE "$ENV{VCPKG_ROOT}/installed/x64-windows/tools/pkgconf/pkgconf.exe")
+endif()
+
 find_package(PkgConfig)
 
 # Link / SFML

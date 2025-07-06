@@ -28,7 +28,6 @@ if(NOT DEFINED VCPKG_TARGET_TRIPLET)
                     if(path MATCHES "[Hh]ost[Xx]64")
                         set(VCPKG_HOST_TRIPLET "x64-windows" CACHE STRING "Vcpkg host triplet" FORCE)
                         set(VCPKG_USE_HOST_TOOLS ON CACHE BOOL "Use vcpkg host tools" FORCE)
-                        break()
                     endif()
                 endforeach()
 
