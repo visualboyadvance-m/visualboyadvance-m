@@ -26,7 +26,7 @@ if(NOT DEFINED VCPKG_TARGET_TRIPLET)
 
                 foreach(path $ENV{PATH})
                     if(path MATCHES "[Hh]ost[Xx]64")
-                        set(VCPKG_HOST_TRIPLET "x64-windows-static" CACHE STRING "Vcpkg host triplet" FORCE)
+                        set(VCPKG_HOST_TRIPLET "x64-windows" CACHE STRING "Vcpkg host triplet" FORCE)
                         set(VCPKG_USE_HOST_TOOLS ON CACHE BOOL "Use vcpkg host tools" FORCE)
                         break()
                     endif()
@@ -635,14 +635,10 @@ function(vcpkg_set_toolchain)
     endif()
 
     if(WIN32 AND NOT CMAKE_GENERATOR MATCHES "Visual Studio" AND NOT DEFINED CMAKE_CXX_COMPILER)
-        if(VCPKG_TARGET_TRIPLET MATCHES "^x[68][46]-windows-")
+        if(VCPKG_TARGET_TRIPLET MATCHES "-windows-")
             # set toolchain to VS for e.g. Ninja or jom
             set(CMAKE_C_COMPILER   cl CACHE STRING "Microsoft C/C++ Compiler" FORCE)
             set(CMAKE_CXX_COMPILER cl CACHE STRING "Microsoft C/C++ Compiler" FORCE)
-        elseif(VCPKG_TARGET_TRIPLET MATCHES "^x[68][46]-mingw-")
-            # set toolchain to MinGW for e.g. Ninja or jom
-            set(CMAKE_C_COMPILER   gcc CACHE STRING "MinGW GCC C Compiler"   FORCE)
-            set(CMAKE_CXX_COMPILER g++ CACHE STRING "MinGW G++ C++ Compiler" FORCE)
         endif()
     endif()
 
