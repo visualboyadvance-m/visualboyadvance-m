@@ -872,7 +872,7 @@ msgstr "Falhou em definir a superfície do wayland"
 
 #: panel.cpp:2439
 msgid "Failed to set DX9 window"
-msgstr ""
+msgstr "Falhou em definir a janela do DX9"
 
 #: panel.cpp:2447
 msgid "Failed to set parent window"
