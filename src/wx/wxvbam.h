@@ -546,6 +546,7 @@ protected:
     void EraseBackground(wxEraseEvent& ev);
     void OnSize(wxSizeEvent& ev);
     void OnKillFocus(wxFocusEvent& ev);
+    void OnD3DClose(wxCloseEvent& ev);
 
 #ifndef NO_FFMPEG
     recording::MediaRecorder snd_rec, vid_rec;

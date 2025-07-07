@@ -1254,8 +1254,10 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
         w = panel->GetWindow();
 
-        if (panel->d3dframe != NULL)
+        if (panel->d3dframe != NULL) {
              panel->d3dframe->Bind(VBAM_EVT_USER_INPUT, &GameArea::OnUserInput, this);
+             panel->d3dframe->Bind(wxEVT_CLOSE_WINDOW, &GameArea::OnD3DClose, this);
+        }
 
         // set up event handlers
         w->Bind(VBAM_EVT_USER_INPUT, &GameArea::OnUserInput, this);
@@ -1409,6 +1411,14 @@ static Display* GetX11Display() {
     return GDK_WINDOW_XDISPLAY(gtk_widget_get_window(wxGetApp().frame->GetHandle()));
 }
 #endif  // __WXGTK__
+
+void GameArea::OnD3DClose(wxCloseEvent& ev)
+{
+    (void)ev;
+
+    delete panel->d3dframe;
+    panel->d3dframe = NULL;
+}
 
 void GameArea::OnUserInput(widgets::UserInputEvent& event) {
     bool emulated_key_pressed = false;
