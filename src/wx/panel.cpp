@@ -938,6 +938,21 @@ void GameArea::ResetPanel() {
 
 void GameArea::ShowFullScreen(bool full)
 {
+    if (OPTION(kSDLRenderer) == wxString("direct3d")) {
+        if (panel == NULL)
+            return;
+
+        if (panel->d3dframe == NULL)
+            return;
+
+        if (panel->d3dframe->IsFullScreen() == false)
+            panel->d3dframe->ShowFullScreen(true);
+        else
+            panel->d3dframe->ShowFullScreen(false);
+ 
+        return;
+    }
+
     if (full == fullscreen) {
         // in case the tlw somehow lost its mind, force it to proper mode
         if (wxGetApp().frame->IsFullScreen() != fullscreen)
@@ -1235,7 +1250,12 @@ void GameArea::OnIdle(wxIdleEvent& event)
                 return;
         }
 
-        wxWindow* w = panel->GetWindow();
+        wxWindow* w = NULL;
+
+        w = panel->GetWindow();
+
+        if (panel->d3dframe != NULL)
+             panel->d3dframe->Bind(VBAM_EVT_USER_INPUT, &GameArea::OnUserInput, this);
 
         // set up event handlers
         w->Bind(VBAM_EVT_USER_INPUT, &GameArea::OnUserInput, this);
@@ -1260,8 +1280,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
         w->SetSize(wxSize(basic_width, basic_height));
 
         // Allow input while on background
-        if (OPTION(kUIAllowKeyboardBackgroundInput) || 
-           (OPTION(kSDLRenderer) == wxString("direct3d"))) {
+        if (OPTION(kUIAllowKeyboardBackgroundInput)) {
             enableKeyboardBackgroundInput(w->GetEventHandler());
         }
 
@@ -2290,6 +2309,9 @@ SDLDrawingPanel::~SDLDrawingPanel()
 {
     if (did_init)
     {
+        if (d3dframe != NULL)
+             delete d3dframe;
+
         if (sdlwindow != NULL)
              SDL_DestroyWindow(sdlwindow);
 
@@ -2409,13 +2431,14 @@ void SDLDrawingPanel::DrawingPanelInit()
         if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_COCOA_VIEW_POINTER, wxGetApp().frame->GetPanel()->GetHandle()) == false)
 #elif defined(__WXMSW__)
         if (OPTION(kSDLRenderer) == wxString("direct3d")) {
-             const char *title = "visualboyadvance-m SDL DX9";
+            d3dframe = new wxFrame(GetWindow(), wxID_ANY, "visualboyadvance-m SDL DX9", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, "SDL_DX9");
+            d3dframe->Show();
 
-             SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, height * scale);
-             SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, width * scale);
-             SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_MAXIMIZED_BOOLEAN, true);
-             SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_RESIZABLE_BOOLEAN, true);
-             SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, (void *)title);
+            if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_WIN32_HWND_POINTER, d3dframe->GetHandle()) == false)
+            {
+                systemScreenMessage(_("Failed to set DX9 window"));
+                return;
+            }
         } else if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_WIN32_HWND_POINTER, GetHandle()) == false)
 #else
         if (SDL_SetPointerProperty(props, "sdl2-compat.external_window", GetWindow()->GetHandle()) == false)

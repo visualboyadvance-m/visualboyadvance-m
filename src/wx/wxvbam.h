@@ -609,6 +609,8 @@ public:
     virtual void OnSize(wxSizeEvent& ev);
     wxWindow* GetWindow() { return dynamic_cast<wxWindow*>(this); }
     virtual bool Destroy() { return GetWindow()->Destroy(); }
+    wxFrame *d3dframe = NULL;
+
 protected:
     virtual void DrawArea(wxWindowDC&) = 0;
     virtual void DrawOSD(wxWindowDC&);

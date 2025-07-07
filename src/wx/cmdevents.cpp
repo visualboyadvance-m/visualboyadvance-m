@@ -1223,8 +1223,7 @@ EVT_HANDLER(AllowKeyboardBackgroundInput, "Allow keyboard background input (togg
                         config::OptionID::kUIAllowKeyboardBackgroundInput);
 
     disableKeyboardBackgroundInput();
-    if (OPTION(kUIAllowKeyboardBackgroundInput) ||
-       (OPTION(kSDLRenderer) == wxString("direct3d"))) {
+    if (OPTION(kUIAllowKeyboardBackgroundInput)) {
         if (panel && panel->panel) {
             enableKeyboardBackgroundInput(panel->panel->GetWindow()->GetEventHandler());
         }
