@@ -2492,7 +2492,7 @@ void SDLDrawingPanel::DrawingPanelInit()
         return;
     }
 
-	renderername = wxString(SDL_GetRendererName(renderer));
+    renderername = wxString(SDL_GetRendererName(renderer));
     log("SDL renderer: %s", (const char*)renderername.mb_str());
 #else
 #ifdef __WXGTK__
@@ -2507,7 +2507,7 @@ void SDLDrawingPanel::DrawingPanelInit()
         systemScreenMessage(_("Failed to create SDL window"));
         return;
     }
-            
+
     if (OPTION(kSDLRenderer) == wxString("default")) {
         renderer = SDL_CreateRenderer(sdlwindow, -1, 0);
         log("SDL renderer: default");
