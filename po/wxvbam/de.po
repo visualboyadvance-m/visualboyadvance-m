@@ -26,7 +26,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-28 13:00+0000\n"
+"POT-Creation-Date: 2025-07-07 10:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Tom Großkurth, 2025\n"
 "Language-Team: German (http://app.transifex.com/bgk/vba-m/language/de/)\n"
@@ -761,7 +761,7 @@ msgstr "Problem loading file"
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Unable to load Game Boy ROM %s"
 
-#: panel.cpp:325 panel.cpp:436 panel.cpp:1177
+#: panel.cpp:325 panel.cpp:436 panel.cpp:1192
 msgid "Could not initialize the sound driver!"
 msgstr "Could not initialize the sound driver!"
 
@@ -805,160 +805,164 @@ msgstr "Saved state %s"
 msgid "Error saving state %s"
 msgstr "Error saving state %s"
 
-#: panel.cpp:1010
+#: panel.cpp:1025
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 msgstr "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 
-#: panel.cpp:1048
+#: panel.cpp:1063
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
 msgstr "Fullscreen mode %d x %d - %d @ %d not supported"
 
-#: panel.cpp:1053
+#: panel.cpp:1068
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
 msgstr "Valid mode: %d x %d - %d @ %d"
 
-#: panel.cpp:1061
+#: panel.cpp:1076
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
 msgstr "Chose mode %d x %d - %d @ %d"
 
-#: panel.cpp:1065
+#: panel.cpp:1080
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr "Failed to change mode to %d x %d - %d @ %d"
 
-#: panel.cpp:1152
+#: panel.cpp:1167
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr "Not a valid Game Boy Advance cartridge"
 
-#: panel.cpp:1351
+#: panel.cpp:1371
 msgid "No memory for rewinding"
 msgstr "No memory for rewinding"
 
-#: panel.cpp:1361
+#: panel.cpp:1381
 msgid "Error writing rewind state"
 msgstr "Error writing rewind state"
 
-#: panel.cpp:2344
+#: panel.cpp:2377
 msgid "Failed to set wayland display"
 msgstr ""
 
-#: panel.cpp:2372
+#: panel.cpp:2405
 msgid "Failed to initialize SDL video subsystem"
 msgstr ""
 
-#: panel.cpp:2383
+#: panel.cpp:2416
 msgid "Failed to initialize SDL video"
 msgstr ""
 
-#: panel.cpp:2392
+#: panel.cpp:2425
 msgid "Failed to set wayland surface"
 msgstr ""
 
-#: panel.cpp:2403
+#: panel.cpp:2439
+msgid "Failed to set DX9 window"
+msgstr ""
+
+#: panel.cpp:2447
 msgid "Failed to set parent window"
 msgstr ""
 
-#: panel.cpp:2411
+#: panel.cpp:2456
 msgid "Failed to set OpenGL properties"
 msgstr ""
 
-#: panel.cpp:2417 panel.cpp:2450
+#: panel.cpp:2463 panel.cpp:2497
 msgid "Failed to create SDL window"
 msgstr ""
 
-#: panel.cpp:2437 panel.cpp:2482
+#: panel.cpp:2481 panel.cpp:2529
 msgid "Failed to create SDL renderer"
 msgstr ""
 
-#: panel.cpp:2976
+#: panel.cpp:3073
 msgid "Enabling EGL VSync."
 msgstr "Enabling EGL VSync."
 
-#: panel.cpp:2978
+#: panel.cpp:3075
 msgid "Disabling EGL VSync."
 msgstr "Disabling EGL VSync."
 
-#: panel.cpp:2985
+#: panel.cpp:3082
 msgid "Enabling GLX VSync."
 msgstr "Enabling GLX VSync."
 
-#: panel.cpp:2987
+#: panel.cpp:3084
 msgid "Disabling GLX VSync."
 msgstr "Disabling GLX VSync."
 
-#: panel.cpp:3005
+#: panel.cpp:3102
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Failed to set glXSwapIntervalEXT"
 
-#: panel.cpp:3014
+#: panel.cpp:3111
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Failed to set glXSwapIntervalSGI"
 
-#: panel.cpp:3023
+#: panel.cpp:3120
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Failed to set glXSwapIntervalMESA"
 
-#: panel.cpp:3030
+#: panel.cpp:3127
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "No support for wglGetExtensionsStringEXT"
 
-#: panel.cpp:3033
+#: panel.cpp:3130
 msgid "No support for WGL_EXT_swap_control"
 msgstr "No support for WGL_EXT_swap_control"
 
-#: panel.cpp:3042
+#: panel.cpp:3139
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Failed to set wglSwapIntervalEXT"
 
-#: panel.cpp:3048
+#: panel.cpp:3145
 msgid "No VSYNC available on this platform"
 msgstr "No VSYNC available on this platform"
 
-#: panel.cpp:3163
+#: panel.cpp:3260
 msgid "Memory allocation error"
 msgstr "Memory allocation error"
 
-#: panel.cpp:3166
+#: panel.cpp:3263
 msgid "Error initializing codec"
 msgstr "Error initializing codec"
 
-#: panel.cpp:3169
+#: panel.cpp:3266
 msgid "Error writing to output file"
 msgstr "Error writing to output file"
 
-#: panel.cpp:3172
+#: panel.cpp:3269
 msgid "Can't guess output format from file name"
 msgstr "Can't guess output format from file name"
 
-#: panel.cpp:3177
+#: panel.cpp:3274
 msgid "Programming error; aborting!"
 msgstr "Programming error; aborting!"
 
-#: panel.cpp:3189 panel.cpp:3218
+#: panel.cpp:3286 panel.cpp:3315
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Unable to begin recording to %s (%s)"
 
-#: panel.cpp:3246
+#: panel.cpp:3343
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "Error in audio / video recording (%s); aborting"
 
-#: panel.cpp:3252
+#: panel.cpp:3349
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Error in audio recording (%s); aborting"
 
-#: panel.cpp:3262
+#: panel.cpp:3359
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Error in video recording (%s); aborting"
 
-#: panel.cpp:3417
+#: panel.cpp:3514
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Volume: %d %%"

@@ -24,7 +24,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-28 13:00+0000\n"
+"POT-Creation-Date: 2025-07-07 10:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020,2022-2025\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/bgk/vba-m/language/zh_CN/)\n"
@@ -759,7 +759,7 @@ msgstr "载入文件发生问题"
 msgid "Unable to load Game Boy ROM %s"
 msgstr "无法载入 Game Boy ROM %s"
 
-#: panel.cpp:325 panel.cpp:436 panel.cpp:1177
+#: panel.cpp:325 panel.cpp:436 panel.cpp:1192
 msgid "Could not initialize the sound driver!"
 msgstr "无法初始化声音驱动！"
 
@@ -803,160 +803,164 @@ msgstr "保存状态 %s"
 msgid "Error saving state %s"
 msgstr "保存状态错误 %s"
 
-#: panel.cpp:1010
+#: panel.cpp:1025
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 msgstr "不支持 %d x %d - %d @ %d 全屏模式，正在寻找其他模式"
 
-#: panel.cpp:1048
+#: panel.cpp:1063
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
 msgstr "不支持 %d x %d - %d @ %d 全屏模式"
 
-#: panel.cpp:1053
+#: panel.cpp:1068
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
 msgstr "有效模式: %d x %d - %d @ %d"
 
-#: panel.cpp:1061
+#: panel.cpp:1076
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
 msgstr "选择模式 %d x %d - %d @ %d"
 
-#: panel.cpp:1065
+#: panel.cpp:1080
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr "切换模式失败 %d x %d - %d @ %d"
 
-#: panel.cpp:1152
+#: panel.cpp:1167
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr "无效 GBA 卡带"
 
-#: panel.cpp:1351
+#: panel.cpp:1371
 msgid "No memory for rewinding"
 msgstr "没有用于回退的内存"
 
-#: panel.cpp:1361
+#: panel.cpp:1381
 msgid "Error writing rewind state"
 msgstr "回写状态错误"
 
-#: panel.cpp:2344
+#: panel.cpp:2377
 msgid "Failed to set wayland display"
 msgstr "设置 wayland 显示失败"
 
-#: panel.cpp:2372
+#: panel.cpp:2405
 msgid "Failed to initialize SDL video subsystem"
 msgstr "初始化 SDL 视频子系统失败"
 
-#: panel.cpp:2383
+#: panel.cpp:2416
 msgid "Failed to initialize SDL video"
 msgstr "初始化 SDL 视频失败"
 
-#: panel.cpp:2392
+#: panel.cpp:2425
 msgid "Failed to set wayland surface"
 msgstr "设置 wayland 表面失败"
 
-#: panel.cpp:2403
+#: panel.cpp:2439
+msgid "Failed to set DX9 window"
+msgstr ""
+
+#: panel.cpp:2447
 msgid "Failed to set parent window"
 msgstr "设置主窗口失败"
 
-#: panel.cpp:2411
+#: panel.cpp:2456
 msgid "Failed to set OpenGL properties"
 msgstr "设置 OpenGL 属性失败"
 
-#: panel.cpp:2417 panel.cpp:2450
+#: panel.cpp:2463 panel.cpp:2497
 msgid "Failed to create SDL window"
 msgstr "创建 SDL 窗口失败"
 
-#: panel.cpp:2437 panel.cpp:2482
+#: panel.cpp:2481 panel.cpp:2529
 msgid "Failed to create SDL renderer"
 msgstr "创建 SDL 渲染器失败"
 
-#: panel.cpp:2976
+#: panel.cpp:3073
 msgid "Enabling EGL VSync."
 msgstr "正在启用 EGL 垂直同步。"
 
-#: panel.cpp:2978
+#: panel.cpp:3075
 msgid "Disabling EGL VSync."
 msgstr "正在禁用 EGL 垂直同步。"
 
-#: panel.cpp:2985
+#: panel.cpp:3082
 msgid "Enabling GLX VSync."
 msgstr "正在启用 GLX 垂直同步。"
 
-#: panel.cpp:2987
+#: panel.cpp:3084
 msgid "Disabling GLX VSync."
 msgstr "正在禁用 GLX 垂直同步。"
 
-#: panel.cpp:3005
+#: panel.cpp:3102
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "设置 glXSwapIntervalEXT 失败"
 
-#: panel.cpp:3014
+#: panel.cpp:3111
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "设置 glXSwapIntervalSGI 失败"
 
-#: panel.cpp:3023
+#: panel.cpp:3120
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "设置 glXSwapIntervalMESA 失败"
 
-#: panel.cpp:3030
+#: panel.cpp:3127
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "不支持 wglGetExtensionsStringEXT"
 
-#: panel.cpp:3033
+#: panel.cpp:3130
 msgid "No support for WGL_EXT_swap_control"
 msgstr "不支持 WGL_EXT_swap_control"
 
-#: panel.cpp:3042
+#: panel.cpp:3139
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "设置 wglSwapIntervalEXT 失败"
 
-#: panel.cpp:3048
+#: panel.cpp:3145
 msgid "No VSYNC available on this platform"
 msgstr "垂直同步在该平台上不可用 "
 
-#: panel.cpp:3163
+#: panel.cpp:3260
 msgid "Memory allocation error"
 msgstr "内存分配错误"
 
-#: panel.cpp:3166
+#: panel.cpp:3263
 msgid "Error initializing codec"
 msgstr "初始化代码错误"
 
-#: panel.cpp:3169
+#: panel.cpp:3266
 msgid "Error writing to output file"
 msgstr "写入输出文件错误"
 
-#: panel.cpp:3172
+#: panel.cpp:3269
 msgid "Can't guess output format from file name"
 msgstr "无法从文件名猜测输出格式"
 
-#: panel.cpp:3177
+#: panel.cpp:3274
 msgid "Programming error; aborting!"
 msgstr "程序错误；正在中止！"
 
-#: panel.cpp:3189 panel.cpp:3218
+#: panel.cpp:3286 panel.cpp:3315
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "不能开始录制到 %s (%s)"
 
-#: panel.cpp:3246
+#: panel.cpp:3343
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "录制音频/视频时错误 (%s); 正在中止"
 
-#: panel.cpp:3252
+#: panel.cpp:3349
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "录制音频时错误 (%s); 正在中止"
 
-#: panel.cpp:3262
+#: panel.cpp:3359
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "录制视频时错误 (%s); 正在中止"
 
-#: panel.cpp:3417
+#: panel.cpp:3514
 #, c-format
 msgid "Volume: %d %%"
 msgstr "音量: %d %%"
