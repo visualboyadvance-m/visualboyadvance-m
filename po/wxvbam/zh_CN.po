@@ -858,7 +858,7 @@ msgstr "设置 wayland 表面失败"
 
 #: panel.cpp:2439
 msgid "Failed to set DX9 window"
-msgstr ""
+msgstr "设置 DX9 窗口失败"
 
 #: panel.cpp:2447
 msgid "Failed to set parent window"
