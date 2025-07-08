@@ -938,7 +938,7 @@ void GameArea::ResetPanel() {
 
 void GameArea::ShowFullScreen(bool full)
 {
-    if (OPTION(kSDLRenderer) == wxString("direct3d")) {
+    if ((OPTION(kDispRenderMethod) == config::RenderMethod::kSDL) && (OPTION(kSDLRenderer) == wxString("direct3d"))) {
         if (panel == NULL)
             return;
 
