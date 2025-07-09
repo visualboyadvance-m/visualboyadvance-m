@@ -843,7 +843,7 @@ msgstr "Не вдалося встановити Wayland-поверхню."
 
 #: panel.cpp:2439
 msgid "Failed to set DX9 window"
-msgstr ""
+msgstr "Не вдалося встановити DX9-вікно."
 
 #: panel.cpp:2447
 msgid "Failed to set parent window"
