@@ -808,8 +808,8 @@ endif()
 if(APPLE AND ENABLE_ONLINEUPDATES)
     include(FetchContent)
     FetchContent_Declare(Sparkle
-        URL "https://github.com/sparkle-project/Sparkle/releases/download/2.7.1/Sparkle-2.7.1.tar.xz"
-        URL_HASH SHA256=f7385c3e8c70c37e5928939e6246ac9070757b4b37a5cb558afa1b0d5ef189de
+        URL "https://github.com/andyvand/Sparkle/releases/download/Release/Sparkle-2.7.1-MacOSX10.10.tar.xz"
+        URL_HASH SHA256=2d2419118c2ee8fe6e740a953b74cfa3b367606e4bab3fe0ab63332a5324ac5f
         DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     )
     FetchContent_MakeAvailable(Sparkle)
