@@ -20,14 +20,14 @@ Archive::Archive() : Raw( this )
 RARFORMAT Archive::IsSignature(const byte *D,size_t Size)
 {
     RARFORMAT Type=RARFMT_NONE;
-	if (Size>=1 && D[0]==0x52)
+    if (Size>=1 && D[0]==0x52) {
 #ifndef SFX_MODULE
-		if (Size>=4 && D[1]==0x45 && D[2]==0x7e && D[3]==0x5e)
+        if (Size>=4 && D[1]==0x45 && D[2]==0x7e && D[3]==0x5e)
             Type=RARFMT14;
-		else
+        else {
 #endif
-			if (Size>=7 && D[1]==0x61 && D[2]==0x72 && D[3]==0x21 && D[4]==0x1a && D[5]==0x07)
-			{
+            if (Size>=7 && D[1]==0x61 && D[2]==0x72 && D[3]==0x21 && D[4]==0x1a && D[5]==0x07)
+            {
                 // We check for non-zero last signature byte, so we can return
                 // a sensible warning in case we'll want to change the archive
                 // format sometimes in the future.
@@ -37,7 +37,11 @@ RARFORMAT Archive::IsSignature(const byte *D,size_t Size)
                     Type=RARFMT50;
                 else if (D[6]==2)
                     Type=RARFMT_FUTURE;
-			}
+            }
+#ifndef SFX_MODULE
+        }
+#endif
+    }
 	return Type;
 }
 

@@ -466,6 +466,10 @@ unrar_err_t Archive::ReadHeader50(size_t *ReadSize)
             EndArcHead.RevSpace=false;
         }
             break;
+        case HEAD_MARK:
+        case HEAD3_MARK:
+        case HEAD3_MAIN:
+            break;
     }
     
     if (NextBlockPos<=CurBlockPos)
