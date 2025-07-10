@@ -17,8 +17,11 @@
 // Enable support for as building DLL on Windows.
 //#define BLARGG_BUILD_DLL 1
 
-// Support only the listed archive types. Remove any you don't need.
-#define FEX_TYPE_LIST fex_7z_type, fex_gz_type, fex_zip_type,
+#ifndef FEX_ENABLE_RAR
+#define FEX_ENABLE_RAR 1
+#endif
+
+#define FEX_TYPE_LIST fex_7z_type, fex_gz_type, fex_zip_type, fex_rar_type
 
 // Use standard config.h if present
 #ifdef HAVE_CONFIG_H

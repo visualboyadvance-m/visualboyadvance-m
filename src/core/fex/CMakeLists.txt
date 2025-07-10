@@ -65,7 +65,38 @@ target_sources(vbam-fex
     fex/Zip_Extractor.h
     fex/Zlib_Inflater.cpp
     fex/Zlib_Inflater.h
-
+    unrar/archive.cpp
+    unrar/arcread.cpp
+    unrar/blake2s_sse.cpp
+    unrar/blake2s.cpp
+    unrar/blake2sp.cpp
+    unrar/coder.cpp
+    unrar/crc.cpp
+    unrar/encname.cpp
+    unrar/extract.cpp
+    unrar/getbits.cpp
+    unrar/hash.cpp
+    unrar/headers.cpp
+    unrar/model.cpp
+    unrar/pathfn.cpp
+    unrar/rarvm.cpp
+    unrar/rarvmtbl.cpp
+    unrar/rawread.cpp
+    unrar/secpassword.cpp
+    unrar/strfn.cpp
+    unrar/suballoc.cpp
+    unrar/timefn.cpp
+    unrar/unicode.cpp
+    unrar/unpack.cpp
+    unrar/unpack15.cpp
+    unrar/unpack20.cpp
+    unrar/unpack30.cpp
+    unrar/unpack50.cpp
+    unrar/unpack50frag.cpp
+    unrar/unpackinline.cpp
+    unrar/unrar_misc.cpp
+    unrar/unrar_open.cpp
+    unrar/unrar.cpp
     PUBLIC
     fex.h
 )

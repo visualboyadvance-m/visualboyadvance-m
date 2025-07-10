@@ -41,7 +41,7 @@ BLARGG_EXPORT const fex_type_t* fex_type_list( void )
 		fex_bin_type,
 		NULL
 	};
-	
+
 	return fex_type_list_;
 }
 
@@ -77,6 +77,7 @@ BLARGG_EXPORT const char* fex_identify_header( void const* header )
 	case 0x41724301: return ".arc";
 	case 0x4D534346: return ".cab";
 	case 0x5A4F4F20: return ".zoo";
+    case 0x04224D18: return ".lz4";
 	}
 
 	unsigned three = four >> 8;
@@ -130,6 +131,7 @@ static int is_archive_extension( const char str [] )
 		".dmg",
 		".gz",
 		".lha",
+        ".lz4",
 		".lz",
 		".lzh",
 		".lzma",
