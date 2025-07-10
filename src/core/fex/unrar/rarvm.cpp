@@ -1113,6 +1113,8 @@ void RarVM::ExecuteStandardFilter(VM_StandardFilters FilterType)
 				}
 			}
 			break;
+        case VMSF_NONE:
+            break;
 	}
 }
 

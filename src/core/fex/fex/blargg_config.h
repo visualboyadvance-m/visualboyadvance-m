@@ -21,7 +21,7 @@
 #define FEX_ENABLE_RAR 1
 #endif
 
-#define FEX_TYPE_LIST fex_7z_type, fex_gz_type, fex_zip_type, fex_rar_type
+#define FEX_TYPE_LIST fex_7z_type, fex_gz_type, fex_zip_type, fex_rar_type,
 
 // Use standard config.h if present
 #ifdef HAVE_CONFIG_H
