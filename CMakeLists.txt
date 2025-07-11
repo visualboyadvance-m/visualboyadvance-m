@@ -24,7 +24,7 @@ endif()
 
 option(VCPKG_BINARY_PACKAGES "Use vcpkg binary packages" TRUE)
 
-set(VCPKG_DEPS zlib pthreads gettext-libintl wxwidgets nanosvg)
+set(VCPKG_DEPS zlib bzip2 "liblzma[tools]" pthreads gettext-libintl wxwidgets nanosvg)
 
 set(VCPKG_DEPS_OPTIONAL
     "sdl3[vulkan]"      ENABLE_SDL3
