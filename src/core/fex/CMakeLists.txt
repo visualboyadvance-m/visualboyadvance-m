@@ -57,6 +57,10 @@ target_sources(vbam-fex
     fex/Gzip_Extractor.h
     fex/Gzip_Reader.cpp
     fex/Gzip_Reader.h
+    fex/BZ2_Extractor.cpp
+    fex/BZ2_Extractor.h
+    fex/BZ2_Reader.cpp
+    fex/BZ2_Reader.h
     fex/Rar_Extractor.cpp
     fex/Rar_Extractor.h
     fex/Zip7_Extractor.cpp
@@ -65,6 +69,8 @@ target_sources(vbam-fex
     fex/Zip_Extractor.h
     fex/Zlib_Inflater.cpp
     fex/Zlib_Inflater.h
+    fex/BZ2_Inflater.cpp
+    fex/BZ2_Inflater.h
     unrar/archive.cpp
     unrar/arcread.cpp
     unrar/blake2s_sse.cpp
@@ -105,6 +111,12 @@ target_include_directories(vbam-fex
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${ZLIB_INCLUDE_DIRS}
 )
 
+find_library(BZ2_LIBRARY bz2)
+
+if (BZ2_LIBRARY)
+    target_compile_definitions(vbam-fex PRIVATE FEX_ENABLE_BZ2=1)
+endif()
+
 target_link_libraries(vbam-fex
-    PRIVATE ${ZLIB_LIBRARY}
+    PRIVATE ${ZLIB_LIBRARY} ${BZ2_LIBRARY}
 )
