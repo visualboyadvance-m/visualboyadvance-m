@@ -234,8 +234,10 @@ bool LowAscii(const wchar *Str)
 
 int wcsicompc(const wchar *Str1,const wchar *Str2)
 {
-#if defined(_UNIX) || defined(_MSC_VER) || defined(__APPLE__) || defined(__MINGW32__)
+#if defined(_UNIX) || defined(_MSC_VER) || defined(__APPLE__)
   return my_wcscmp(Str1,Str2);
+#elif defined(__MINGW32__)
+  return _wcsicmp(Str1,Str2);
 #else
   return wcsicomp(Str1,Str2);
 #endif
@@ -247,7 +249,7 @@ char* strncpyz(char *dest, const char *src, size_t maxlen)
 {
   if (maxlen>0)
   {
-#if _MSC_VER >= 1300
+#if (_MSC_VER >= 1300) || __STDC_WANT_SECURE_LIB__
 	strcpy_s(dest,maxlen-1,src);
 #else
 	strncpy(dest,src,maxlen-1);
@@ -277,8 +279,8 @@ char* strncatz(char* dest, const char* src, size_t maxlen)
 {
   size_t Length = strlen(dest);
   if (Length + 1 < maxlen)
-#if _MSC_VER >= 1300
-	strcat_s(dest, maxlen - Length - 1, src);
+#if (_MSC_VER >= 1300) || __STDC_WANT_SECURE_LIB__
+    strcat_s(dest, maxlen - Length - 1, src);
 #else
     strncat(dest, src, maxlen - Length - 1);
 #endif
