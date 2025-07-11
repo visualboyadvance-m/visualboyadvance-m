@@ -21,7 +21,7 @@ int const block_size = 4096;
 
 static const char* get_bz2_err( int code )
 {
-	assert( code != Z_OK );
+	assert( code != BZ_OK );
 	switch ( code )
 	{
 	case BZ_MEM_ERROR:   return blargg_err_memory;

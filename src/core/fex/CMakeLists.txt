@@ -61,6 +61,10 @@ target_sources(vbam-fex
     fex/BZ2_Extractor.h
     fex/BZ2_Reader.cpp
     fex/BZ2_Reader.h
+    fex/XZ_Extractor.cpp
+    fex/XZ_Extractor.h
+    fex/XZ_Reader.cpp
+    fex/XZ_Reader.h
     fex/Rar_Extractor.cpp
     fex/Rar_Extractor.h
     fex/Zip7_Extractor.cpp
@@ -69,6 +73,8 @@ target_sources(vbam-fex
     fex/Zip_Extractor.h
     fex/Zlib_Inflater.cpp
     fex/Zlib_Inflater.h
+    fex/LZMA_Inflater.cpp
+    fex/LZMA_Inflater.h
     fex/BZ2_Inflater.cpp
     fex/BZ2_Inflater.h
     unrar/archive.cpp
@@ -112,11 +118,22 @@ target_include_directories(vbam-fex
 )
 
 find_library(BZ2_LIBRARY bz2)
+find_library(LZMA_LIBRARY lzma)
 
 if (BZ2_LIBRARY)
     target_compile_definitions(vbam-fex PRIVATE FEX_ENABLE_BZ2=1)
+    target_link_libraries(vbam-fex
+        PRIVATE ${BZ2_LIBRARY}
+    )
+endif()
+
+if (LZMA_LIBRARY)
+    target_compile_definitions(vbam-fex PRIVATE FEX_ENABLE_LZMA=1)
+    target_link_libraries(vbam-fex
+        PRIVATE ${LZMA_LIBRARY}
+    )
 endif()
 
 target_link_libraries(vbam-fex
-    PRIVATE ${ZLIB_LIBRARY} ${BZ2_LIBRARY}
+    PRIVATE ${ZLIB_LIBRARY}
 )

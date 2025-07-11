@@ -27,7 +27,13 @@
 #define FEX_TYPE_BZ2
 #endif
 
-#define FEX_TYPE_LIST fex_7z_type, fex_gz_type, fex_zip_type, fex_rar_type, FEX_TYPE_BZ2
+#if FEX_ENABLE_LZMA
+#define FEX_TYPE_LZMA fex_xz_type,
+#else
+#define FEX_TYPE_LZMA
+#endif
+
+#define FEX_TYPE_LIST fex_7z_type, fex_gz_type, fex_zip_type, fex_rar_type, FEX_TYPE_BZ2 FEX_TYPE_LZMA
 
 // Use standard config.h if present
 #ifdef HAVE_CONFIG_H
