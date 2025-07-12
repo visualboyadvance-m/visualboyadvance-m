@@ -38,18 +38,16 @@ enum { header_size = 6, trailer_size = 20 };
 
 size_t LZ_Reader::get_uncompressed_size()
 {
-   uint8_t *header_ptr = NULL;
-   uint8_t *trailer_ptr = NULL;
-   const uint8_t *data = (const uint8_t *)malloc(in->size());
+   uint8_t *header_ptr = (uint8_t *)malloc(header_size);
+   uint8_t *trailer_ptr = (uint8_t *)malloc(trailer_size);
 
-   if (data == NULL) {
+   if ((header_ptr == NULL) || (trailer_ptr == NULL)) {
         fprintf(stderr, "Error: Couldn't allocate data\n");
         return 0;
    }
 
    in->seek(0);
-   in->read((void *)data, in->size());
-   header_ptr = (uint8_t *)data;
+   in->read((void *)header_ptr, header_size);
 
    unsigned dict_size = 1 << (header_ptr[5] & 0x1F);
    dict_size -= (dict_size / 16) * ((header_ptr[5] >> 5 ) & 7);
@@ -57,16 +55,22 @@ size_t LZ_Reader::get_uncompressed_size()
    if(dict_size < (1 << 12) || dict_size > (1 << 29))
    {
       fprintf(stderr, "Invalid dictionary size in member header.\n");
+      free((void *)header_ptr);
+      free((void *)trailer_ptr);
       return 0;
    }
 
-   trailer_ptr = (uint8_t *)data + (in->size() - trailer_size);
+   in->seek(in->size() - trailer_size);
+   in->read((void *)trailer_ptr, trailer_size);
 
    unsigned long long data_size = 0;
    for (int i = 11; i >= 4; --i)
        data_size = ( data_size << 8 ) + trailer_ptr[i];
 
    in->seek(0);
+
+   free((void *)header_ptr);
+   free((void *)trailer_ptr);
 
    return (size_t)data_size;
 }
