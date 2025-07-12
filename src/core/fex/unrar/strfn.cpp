@@ -129,7 +129,7 @@ wchar etoupperw(wchar ch)
 {
   if (ch=='i')
     return('I');
-#if defined(__APPLE__) || defined(_MSC_VER) || defined(__MINGW32__)
+#if defined(__APPLE__) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__linux__)
   return(toupper(ch));
 #else
   return(toupperw(ch));
@@ -234,7 +234,7 @@ bool LowAscii(const wchar *Str)
 
 int wcsicompc(const wchar *Str1,const wchar *Str2)
 {
-#if defined(_UNIX) || defined(_MSC_VER) || defined(__APPLE__)
+#if defined(_UNIX) || defined(_MSC_VER) || defined(__APPLE__) || defined(__linux__)
   return my_wcscmp(Str1,Str2);
 #elif defined(__MINGW32__)
   return _wcsicmp(Str1,Str2);
