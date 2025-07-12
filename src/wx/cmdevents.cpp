@@ -132,6 +132,7 @@ EVT_HANDLER(wxID_OPEN, "Open ROM...")
     wxString pats = _(
         "Game Boy Advance Files (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|"
         "*.agb;*.gba;*.bin;*.elf;*.mb;"
+        "*.agb.lz;*.gba.lz;*.bin.lz;*.elf.lz;*.mb.lz;"
         "*.agb.xz;*.gba.xz;*.bin.xz;*.elf.xz;*.mb.xz;"
         "*.agb.bz2;*.gba.bz2;*.bin.bz2;*.elf.bz2;*.mb.bz2;"
         "*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;"
@@ -139,6 +140,7 @@ EVT_HANDLER(wxID_OPEN, "Open ROM...")
         "*.zip;*.7z;*.rar|"
         "Game Boy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|"
         "*.dmg;*.gb;*.gbc;*.cgb;*.sgb;"
+        "*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;"
         "*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;"
         "*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;"
         "*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;"
@@ -172,6 +174,7 @@ EVT_HANDLER(OpenGB, "Open GB...")
     wxString pats = _(
         "Game Boy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|"
         "*.dmg;*.gb;*.gbc;*.cgb;*.sgb;"
+        "*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;"
         "*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;"
         "*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;"
         "*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;"
@@ -203,6 +206,7 @@ EVT_HANDLER(OpenGBC, "Open GBC...")
     wxString pats = _(
         "Game Boy Color Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|"
         "*.dmg;*.gb;*.gbc;*.cgb;*.sgb;"
+        "*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;"
         "*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;"
         "*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;"
         "*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;"
