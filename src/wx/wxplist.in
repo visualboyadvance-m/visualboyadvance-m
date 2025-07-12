@@ -58,17 +58,29 @@
 	        <key>public.filename-extension</key>
 		<array>
 		   <string>agb</string>
+		   <string>agb.lz</string>
+		   <string>agb.xz</string>
+		   <string>agb.bz2</string>
 		   <string>agb.gz</string>
 		   <string>agb.z</string>
 		   <string>gba</string>
+		   <string>gba.lz</string>
+		   <string>gba.xz</string>
+		   <string>gba.bz2</string>
 		   <string>gba.gz</string>
 		   <string>gba.z</string>
 		   <!-- this is probably too generic
 		   <string>bin</string>
+		   <string>bin.lz</string>
+		   <string>bin.xz</string>
+		   <string>bin.bz2</string>
 		   <string>bin.gz</string>
 		   <string>bin.z</string> -->
 		   <!-- slightly less generic, but still..
 		   <string>elf</string>
+		   <string>elf.lz</string>
+		   <string>elf.xz</string>
+		   <string>elf.bz2</string>
 		   <string>elf.gz</string>
 		   <string>elf.z</string>
 		   -->
@@ -93,15 +105,27 @@
 	        <key>public.filename-extension</key>
 		<array>
 		   <string>gb</string>
+		   <string>gb.lz</string>
+		   <string>gb.xz</string>
+		   <string>gb.bz2</string>
 		   <string>gb.gz</string>
 		   <string>gb.z</string>
 		   <string>cgb</string>
+		   <string>cgb.lz</string>
+		   <string>cgb.xz</string>
+		   <string>cgb.bz2</string>
 		   <string>cgb.gz</string>
 		   <string>cgb.z</string>
 		   <string>gbc</string>
+		   <string>gbc.lz</string>
+		   <string>gbc.xz</string>
+		   <string>gbc.bz2</string>
 		   <string>gbc.gz</string>
 		   <string>gbc.z</string>
 		   <string>sgb</string>
+		   <string>sgb.lz</string>
+		   <string>sgb.xz</string>
+		   <string>sgb.bz2</string>
 		   <string>sgb.gz</string>
 		   <string>sgb.z</string>
 		</array>
