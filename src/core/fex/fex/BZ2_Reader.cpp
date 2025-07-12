@@ -65,9 +65,11 @@ blargg_err_t BZ2_Reader::read_v( void* out, int count )
 	int actual = count;
 	RETURN_ERR( inflater.read( out, &actual ) );
 
-	if ( actual < count )
+    if ( actual > count ) {
+        size_ = actual;
         set_remain(0);
-	
+    }
+
 	return blargg_ok;
 }
 

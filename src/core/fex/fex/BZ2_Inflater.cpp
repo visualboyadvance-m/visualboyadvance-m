@@ -173,6 +173,7 @@ blargg_err_t BZ2_Inflater::read( void* out, int* count_io )
 			{
 				unsigned int old_avail_in = (unsigned int)zbuf.avail_in;
 				int err = BZ2_bzDecompress( &zbuf );
+
 				if ( err == BZ_STREAM_END )
 				{
 					remain = zbuf.avail_out;
