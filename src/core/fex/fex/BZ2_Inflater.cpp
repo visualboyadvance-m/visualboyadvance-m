@@ -17,7 +17,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 #include "blargg_source.h"
 
-int const block_size = 4096;
+int const block_size = 100 * 1024;
 
 static const char* get_bz2_err( int code )
 {
@@ -86,7 +86,7 @@ blargg_err_t BZ2_Inflater::begin( callback_t new_callback, void* new_user_data,
 	
 	if ( !new_buf_size )
 	{
-		RETURN_ERR( buf.resize( 4 * block_size ) );
+		RETURN_ERR( buf.resize( 9 * block_size ) );
 		initial_read = 0;
 	}
 	
@@ -177,6 +177,7 @@ blargg_err_t BZ2_Inflater::read( void* out, int* count_io )
 				if ( err == BZ_STREAM_END )
 				{
 					remain = zbuf.avail_out;
+                    fprintf(stderr, "BZ2 stream end: %d remaining, %u total size\n", remain, zbuf.total_out_lo32);
 					end();
 					break; // no more data to inflate
 				}

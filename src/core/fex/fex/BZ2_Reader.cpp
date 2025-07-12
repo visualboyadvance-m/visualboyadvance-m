@@ -34,7 +34,7 @@ static blargg_err_t BZ2_reader_read( void* file, void* out, int* count )
 
 blargg_err_t BZ2_Reader::calc_size()
 {
-	size_  = in->size() * 4;
+	size_  = 33554432;
 	crc32_ = 0;
 	return blargg_ok;
 }
