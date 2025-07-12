@@ -124,14 +124,14 @@ target_include_directories(vbam-fex
 find_library(BZ2_LIBRARY bz2)
 find_library(LZMA_LIBRARY lzma)
 
-if (BZ2_LIBRARY)
+if (BZ2_LIBRARY AND ENABLE_BZ2)
     target_compile_definitions(vbam-fex PRIVATE FEX_ENABLE_BZ2=1)
     target_link_libraries(vbam-fex
         PRIVATE ${BZ2_LIBRARY}
     )
 endif()
 
-if (LZMA_LIBRARY)
+if (LZMA_LIBRARY AND ENABLE_LZMA)
     target_compile_definitions(vbam-fex PRIVATE FEX_ENABLE_LZMA=1)
     target_link_libraries(vbam-fex
         PRIVATE ${LZMA_LIBRARY}

@@ -56,6 +56,8 @@ option(ENABLE_SDL "Build the SDL port" ${ENABLE_SDL_DEFAULT})
 option(ENABLE_WX "Build the wxWidgets port" ${BUILD_DEFAULT})
 option(ENABLE_DEBUGGER "Enable the debugger" ON)
 option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build with GCC/Clang" OFF)
+option(ENABLE_BZ2 "Enable BZ2 archive support" ON)
+option(ENABLE_LZMA "Enable LZMA archive support" ON)
 
 if(ENABLE_SDL3)
    set(CMAKE_C_FLAGS "-DENABLE_SDL3 ${CMAKE_C_FLAGS}")
