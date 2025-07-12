@@ -35,6 +35,7 @@ BLARGG_EXPORT const fex_type_t* fex_type_list( void )
 			fex_gz_type,
             #if FEX_ENABLE_LZMA
                 fex_xz_type,
+                fex_lz_type,
             #endif
             #if FEX_ENABLE_BZ2
                 fex_bz2_type,

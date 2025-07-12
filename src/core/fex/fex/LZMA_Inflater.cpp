@@ -194,6 +194,8 @@ blargg_err_t LZMA_Inflater::set_mode( mode_t mode, int data_offset )
 
         if (mode == mode_raw_deflate)
             err = lzma_alone_decoder( &zbuf, UINT64_MAX);
+        else if (mode == mode_unlz)
+            err = lzma_lzip_decoder( &zbuf, UINT64_MAX, LZMA_CONCATENATED);
         else
             err = lzma_stream_decoder( &zbuf, UINT64_MAX, LZMA_CONCATENATED);
 
@@ -300,7 +302,7 @@ blargg_err_t LZMA_Inflater::read( void* out, int* count_io )
 
 				if ( zbuf.avail_in )
 				{
-                    fprintf(stderr, "Available in: %d, file corrupt\n");
+                    fprintf(stderr, "Available in: %zu, file corrupt\n", zbuf.avail_in);
 					// inflate() should never leave input if there's still space for output
 					check( false );
 					return blargg_err_file_corrupt;

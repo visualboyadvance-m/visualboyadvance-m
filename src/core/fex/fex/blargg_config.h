@@ -28,7 +28,7 @@
 #endif
 
 #if FEX_ENABLE_LZMA
-#define FEX_TYPE_LZMA fex_xz_type,
+#define FEX_TYPE_LZMA fex_xz_type, fex_lz_type,
 #else
 #define FEX_TYPE_LZMA
 #endif
