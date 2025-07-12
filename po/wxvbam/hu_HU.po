@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-12 07:00+0000\n"
+"POT-Creation-Date: 2025-07-12 09:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Greg@Cyberdyne, 2018\n"
 "Language-Team: Hungarian (Hungary) (http://app.transifex.com/bgk/vba-m/language/hu_HU/)\n"
@@ -31,268 +31,268 @@ msgstr "Alapértelmezett eszköz"
 #: cmdevents.cpp:133
 msgid ""
 "Game Boy Advance Files "
-"(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.xz;*.gba.xz;*.bin.xz;*.elf.xz;*.mb.xz;*.agb.bz2;*.gba.bz2;*.bin.bz2;*.elf.bz2;*.mb.bz2;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
+"(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.lz;*.gba.lz;*.bin.lz;*.elf.lz;*.mb.lz;*.agb.xz;*.gba.xz;*.bin.xz;*.elf.xz;*.mb.xz;*.agb.bz2;*.gba.bz2;*.bin.bz2;*.elf.bz2;*.mb.bz2;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
 " Boy Files "
-"(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+"(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr ""
 
-#: cmdevents.cpp:149
+#: cmdevents.cpp:151
 msgid "Open ROM file"
 msgstr "ROM fájl megnyitása"
 
-#: cmdevents.cpp:173
+#: cmdevents.cpp:175
 msgid ""
 "Game Boy Files "
-"(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+"(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr ""
 
-#: cmdevents.cpp:181
+#: cmdevents.cpp:184
 msgid "Open GB ROM file"
 msgstr "GB ROM fájl megnyitása"
 
-#: cmdevents.cpp:204
+#: cmdevents.cpp:207
 msgid ""
 "Game Boy Color Files "
-"(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+"(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
 msgstr ""
 
-#: cmdevents.cpp:212
+#: cmdevents.cpp:216
 msgid "Open GBC ROM file"
 msgstr "GBC ROM fájl megnyitása"
 
-#: cmdevents.cpp:379 cmdevents.cpp:404
+#: cmdevents.cpp:383 cmdevents.cpp:408
 msgid "Select Dot Code file"
 msgstr "Válassz Dot Code fájlt"
 
-#: cmdevents.cpp:381 cmdevents.cpp:406
+#: cmdevents.cpp:385 cmdevents.cpp:410
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 msgstr ""
 
-#: cmdevents.cpp:428 cmdevents.cpp:632
+#: cmdevents.cpp:432 cmdevents.cpp:636
 msgid "Select battery file"
 msgstr "Válassz battery fájlt"
 
-#: cmdevents.cpp:429 cmdevents.cpp:633
+#: cmdevents.cpp:433 cmdevents.cpp:637
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "Battery fájl (*.sav)|*.sav|Flash mentés (*.dat)|*.dat"
 
-#: cmdevents.cpp:440
+#: cmdevents.cpp:444
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
 msgstr ""
 
-#: cmdevents.cpp:441 cmdevents.cpp:472 cmdevents.cpp:595
+#: cmdevents.cpp:445 cmdevents.cpp:476 cmdevents.cpp:599
 msgid "Confirm import"
 msgstr "Importálás megerősítése"
 
-#: cmdevents.cpp:447 panel.cpp:525
+#: cmdevents.cpp:451 panel.cpp:525
 #, c-format
 msgid "Loaded battery %s"
 msgstr "%s battery betöltve"
 
-#: cmdevents.cpp:449
+#: cmdevents.cpp:453
 #, c-format
 msgid "Error loading battery %s"
 msgstr "% battery betöltése sikertelen"
 
-#: cmdevents.cpp:458
+#: cmdevents.cpp:462
 msgid "Select code file"
 msgstr "Válassz code fájlt"
 
-#: cmdevents.cpp:459
+#: cmdevents.cpp:463
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
 msgstr ""
 
-#: cmdevents.cpp:459
+#: cmdevents.cpp:463
 msgid "Game Shark Code File (*.gcf)|*.gcf"
 msgstr ""
 
-#: cmdevents.cpp:471
+#: cmdevents.cpp:475
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
 msgstr ""
 
-#: cmdevents.cpp:488
+#: cmdevents.cpp:492
 #, c-format
 msgid "Cannot open file %s"
 msgstr "A %s megnyitása nem lehetséges"
 
-#: cmdevents.cpp:498
+#: cmdevents.cpp:502
 #, c-format
 msgid "Unsupported code file %s"
 msgstr "A %s nem támogatott code fájl"
 
-#: cmdevents.cpp:568
+#: cmdevents.cpp:572
 #, c-format
 msgid "Loaded code file %s"
 msgstr "%s code fájl betöltve"
 
-#: cmdevents.cpp:570
+#: cmdevents.cpp:574
 #, c-format
 msgid "Error loading code file %s"
 msgstr "A %s code fájl betöltése sikertelen"
 
-#: cmdevents.cpp:581 cmdevents.cpp:663
+#: cmdevents.cpp:585 cmdevents.cpp:667
 msgid "Select snapshot file"
 msgstr "Válassz pillanatkép fájlt"
 
-#: cmdevents.cpp:582
+#: cmdevents.cpp:586
 msgid ""
 "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
 " (*.gsv)|*.gsv"
 msgstr ""
 
-#: cmdevents.cpp:582
+#: cmdevents.cpp:586
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
 msgstr ""
 
-#: cmdevents.cpp:594
+#: cmdevents.cpp:598
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
 msgstr ""
 
-#: cmdevents.cpp:619
+#: cmdevents.cpp:623
 #, c-format
 msgid "Loaded snapshot file %s"
 msgstr "A %s pillanatkép fájl betöltve"
 
-#: cmdevents.cpp:621
+#: cmdevents.cpp:625
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr "A %s pillanatkép fájl betöltése sikertelen"
 
-#: cmdevents.cpp:647
+#: cmdevents.cpp:651
 #, c-format
 msgid "Wrote battery %s"
 msgstr "%s battery megírva"
 
-#: cmdevents.cpp:649 panel.cpp:838
+#: cmdevents.cpp:653 panel.cpp:838
 #, c-format
 msgid "Error writing battery %s"
 msgstr "A %s battery írása sikertelen"
 
-#: cmdevents.cpp:657
+#: cmdevents.cpp:661
 msgid "EEPROM saves cannot be exported"
 msgstr "Az EEPROM mentések nem exportálhatók"
 
-#: cmdevents.cpp:664
+#: cmdevents.cpp:668
 msgid "Game Shark Snapshot (*.sps)|*.sps"
 msgstr ""
 
-#: cmdevents.cpp:681
+#: cmdevents.cpp:685
 msgid "Exported from Visual Boy Advance-M"
 msgstr ""
 
-#: cmdevents.cpp:693
+#: cmdevents.cpp:697
 #, c-format
 msgid "Saved snapshot file %s"
 msgstr "A %s pillanatkép fájl mentve"
 
-#: cmdevents.cpp:695
+#: cmdevents.cpp:699
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr "A %s pillanatkép fájl mentése sikertelen"
 
-#: cmdevents.cpp:711 cmdevents.cpp:792 cmdevents.cpp:865 cmdevents.cpp:937
+#: cmdevents.cpp:715 cmdevents.cpp:796 cmdevents.cpp:869 cmdevents.cpp:941
 #: gfxviewers.cpp:1692 gfxviewers.cpp:1840 viewers.cpp:588 viewers.cpp:808
 #: viewsupt.cpp:1199
 msgid "Select output file"
 msgstr "Válassz kimeneti fájlt"
 
-#: cmdevents.cpp:712 gfxviewers.cpp:1693 gfxviewers.cpp:1841 viewsupt.cpp:1200
+#: cmdevents.cpp:716 gfxviewers.cpp:1693 gfxviewers.cpp:1841 viewsupt.cpp:1200
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG képek|*.png|BMP képek|*.bmp"
 
-#: cmdevents.cpp:739 sys.cpp:585
+#: cmdevents.cpp:743 sys.cpp:585
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "A %s pillanatkép kiírva"
 
-#: cmdevents.cpp:760 cmdevents.cpp:833 cmdevents.cpp:905 cmdevents.cpp:974
+#: cmdevents.cpp:764 cmdevents.cpp:837 cmdevents.cpp:909 cmdevents.cpp:978
 msgid " files ("
 msgstr " fájlok ("
 
-#: cmdevents.cpp:1007
+#: cmdevents.cpp:1011
 msgid "Select file"
 msgstr "Válassz fájlt"
 
-#: cmdevents.cpp:1314 cmdevents.cpp:1410
+#: cmdevents.cpp:1318 cmdevents.cpp:1414
 msgid "Select state file"
 msgstr "Válassz mentett játékállást"
 
-#: cmdevents.cpp:1315 cmdevents.cpp:1411
+#: cmdevents.cpp:1319 cmdevents.cpp:1415
 msgid "Visual Boy Advance saved game files|*.sgm"
 msgstr ""
 
-#: cmdevents.cpp:1444 cmdevents.cpp:1454 cmdevents.cpp:1465
+#: cmdevents.cpp:1448 cmdevents.cpp:1458 cmdevents.cpp:1469
 #, c-format
 msgid "Current state slot #%d"
 msgstr "#%d Játékállás hely"
 
-#: cmdevents.cpp:1528
+#: cmdevents.cpp:1532
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
 msgstr ""
 
-#: cmdevents.cpp:1739
+#: cmdevents.cpp:1743
 msgid "Sound enabled"
 msgstr "Hang bekapcsolva"
 
-#: cmdevents.cpp:1739
+#: cmdevents.cpp:1743
 msgid "Sound disabled"
 msgstr "Hang kikapcsolva"
 
-#: cmdevents.cpp:1818
+#: cmdevents.cpp:1822
 msgid "Set to 0 for pseudo tty"
 msgstr "Ál-TTY-hez állítsd 0-ra"
 
-#: cmdevents.cpp:1820
+#: cmdevents.cpp:1824
 msgid "Port to wait for connection:"
 msgstr "Kapcsolatokhoz figyelt port:"
 
-#: cmdevents.cpp:1821
+#: cmdevents.cpp:1825
 msgid "GDB Connection"
 msgstr "GDB Kapcsolat"
 
-#: cmdevents.cpp:1873
+#: cmdevents.cpp:1877
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "Várakozás a kapcsolódásra itt: %s"
 
-#: cmdevents.cpp:1880
+#: cmdevents.cpp:1884
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "Kapcsolódás kezdeményezése a %d porton"
 
-#: cmdevents.cpp:1883
+#: cmdevents.cpp:1887
 msgid "Waiting for GDB..."
 msgstr "Várakozás a GDB-re"
 
-#: cmdevents.cpp:2261
+#: cmdevents.cpp:2265
 msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
 msgstr ""
 
-#: cmdevents.cpp:2262
+#: cmdevents.cpp:2266
 msgid "FACTORY RESET"
 msgstr ""
 
-#: cmdevents.cpp:2297
+#: cmdevents.cpp:2301
 msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr ""
 
-#: cmdevents.cpp:2298
+#: cmdevents.cpp:2302
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "Szerzői jog (C) 1999-2003 Forgotten\nSzerzői jog (C) 2004-2006 VBA fejlesztői csapat\nSzerzői jog (C) 2007-2020 VBA-M fejlesztői csapat"
 
-#: cmdevents.cpp:2300
+#: cmdevents.cpp:2304
 msgid ""
 "This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -308,15 +308,15 @@ msgid ""
 "along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr ""
 
-#: cmdevents.cpp:2490
+#: cmdevents.cpp:2494
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 msgstr ""
 
-#: cmdevents.cpp:2556
+#: cmdevents.cpp:2560
 msgid "LAN link is already active. Disable link mode to disconnect."
 msgstr ""
 
-#: cmdevents.cpp:2562
+#: cmdevents.cpp:2566
 msgid "Network is not supported in local mode."
 msgstr "Helyi módban hálózat nem támogatott."
 
