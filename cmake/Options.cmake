@@ -44,10 +44,12 @@ find_package(SDL3 QUIET)
 
 option(ENABLE_SDL3 "Use SDL3" "${SDL3_FOUND}")
 
-if(ENABLE_SDL3)
-    find_package(SDL3 CONFIG REQUIRED)
-else()
-    find_package(SDL2 CONFIG REQUIRED)
+if(NOT TRANSLATIONS_ONLY)
+    if(ENABLE_SDL3)
+        find_package(SDL3 CONFIG REQUIRED)
+    else()
+        find_package(SDL2 CONFIG REQUIRED)
+    endif()
 endif()
 
 option(ENABLE_GENERIC_FILE_DIALOGS "Use generic file dialogs" OFF)
