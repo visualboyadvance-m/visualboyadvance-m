@@ -62,6 +62,8 @@ class BZ2_Inflater
                 return zbuf.total_out_lo32;
         }
 
+        blargg_err_t resize_buffer(int count);
+
         // Ends inflation and frees memory
         void end();
 

@@ -68,6 +68,11 @@ blargg_err_t BZ2_Inflater::fill_buf( int count )
 	return blargg_ok;
 }
 
+blargg_err_t BZ2_Inflater::resize_buffer( int count )
+{
+    return buf.resize(count);
+}
+
 blargg_err_t BZ2_Inflater::begin( callback_t new_callback, void* new_user_data,
 		int new_buf_size, int initial_read )
 {

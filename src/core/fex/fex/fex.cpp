@@ -203,11 +203,11 @@ BLARGG_EXPORT fex_err_t fex_identify_file( fex_type_t* type_out, const char path
 		{
 			char h [fex_identify_header_size];
 			RETURN_ERR( in.read( h, sizeof h ) );
-			
+
 			type = fex_identify_extension( fex_identify_header( h ) );
 		}
 	}
-	
+
 	*type_out = type;
 	return blargg_ok;
 }
