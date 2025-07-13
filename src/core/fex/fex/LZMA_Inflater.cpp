@@ -113,7 +113,9 @@ bool LZMA_Inflater::is_format_lzma(void)
         return false;
 
     // Decode the LZMA1 properties.
-    lzma_filter filter = { .id = LZMA_FILTER_LZMA1 };
+    lzma_filter filter;
+    filter.id = LZMA_FILTER_LZMA1;
+
     if (lzma_properties_decode(&filter, NULL, zbuf.next_in, 5) != LZMA_OK)
         return false;
 
