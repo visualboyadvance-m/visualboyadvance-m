@@ -318,6 +318,8 @@ function(get_binary_packages vcpkg_exe)
             endif()
         endforeach()
 
+        set(installed_host_dep_count 0)
+
         while(TRUE)
 #                       -command "import-module ($env:USERPROFILE + '/source/repos/vcpkg-binpkg-prototype/vcpkg-binpkg.psm1'); vcpkg-listmissing ."
             execute_process(
@@ -336,7 +338,9 @@ function(get_binary_packages vcpkg_exe)
 
             string(REGEX REPLACE "\r?\n" ";" host_deps "${host_deps}")
 
-            if(NOT host_deps)
+            list(LENGTH host_deps host_deps_count)
+
+            if(host_deps_count EQUAL installed_host_dep_count)
                 break()
             endif()
 
@@ -370,6 +374,8 @@ function(get_binary_packages vcpkg_exe)
                         message(STATUS "Failed to download host dependency package '${pkg}', aborting.")
                         return()
                     endif()
+                else()
+                    math(EXPR installed_host_dep_count "${installed_host_dep_count} + 1")
                 endif()
             endforeach()
         endwhile()
