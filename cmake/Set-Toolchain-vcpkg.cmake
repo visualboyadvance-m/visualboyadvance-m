@@ -318,7 +318,7 @@ function(get_binary_packages vcpkg_exe)
             endif()
         endforeach()
 
-        set(installed_host_dep_count 0)
+        unset(installed_host_deps)
 
         while(TRUE)
 #                       -command "import-module ($env:USERPROFILE + '/source/repos/vcpkg-binpkg-prototype/vcpkg-binpkg.psm1'); vcpkg-listmissing ."
@@ -336,11 +336,13 @@ function(get_binary_packages vcpkg_exe)
                 return()
             endif()
 
-            string(REGEX REPLACE "\r?\n" ";" host_deps "${host_deps}")
+            string(REGEX REPLACE "\r?\n"   ";" host_deps "${host_deps}")
+            string(REGEX REPLACE " *;+ *$" ""  host_deps "${host_deps}")
 
-            list(LENGTH host_deps host_deps_count)
+            list(LENGTH host_deps           host_deps_count)
+            list(LENGTH installed_host_deps installed_host_deps_count)
 
-            if(host_deps_count EQUAL installed_host_dep_count)
+            if(host_deps_count EQUAL installed_host_deps_count)
                 break()
             endif()
 
@@ -365,17 +367,21 @@ function(get_binary_packages vcpkg_exe)
 
                 string(REGEX REPLACE "<a href=\"([^\"]+[.]zip)\"" "\\1" pkg ${links})
 
-                zip_is_installed(${vcpkg_exe} ${pkg} pkg_installed)
+                list(FIND installed_host_deps "${pkg}" found_idx)
 
-                if(NOT pkg_installed)
-                    download_package("${pkg}" "${bin_pkgs_dir}")
+                if(found_idx EQUAL -1)
+                    zip_is_installed(${vcpkg_exe} ${pkg} pkg_installed)
 
-                    if(NOT EXISTS "${bin_pkgs_dir}/${pkg}")
-                        message(STATUS "Failed to download host dependency package '${pkg}', aborting.")
-                        return()
+                    if(NOT pkg_installed)
+                        download_package("${pkg}" "${bin_pkgs_dir}")
+
+                        if(NOT EXISTS "${bin_pkgs_dir}/${pkg}")
+                            message(STATUS "Failed to download host dependency package '${pkg}', aborting.")
+                            return()
+                        endif()
+                    else()
+                        list(APPEND installed_host_deps "${pkg}")
                     endif()
-                else()
-                    math(EXPR installed_host_dep_count "${installed_host_dep_count} + 1")
                 endif()
             endforeach()
         endwhile()
