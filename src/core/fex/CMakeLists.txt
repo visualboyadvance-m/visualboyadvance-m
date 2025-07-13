@@ -123,7 +123,7 @@ target_include_directories(vbam-fex
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${ZLIB_INCLUDE_DIRS}
 )
 
-if (CMAKE_BUILD_TYPE MATCHES "Debug")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     find_library(BZ2_LIBRARY NAMES bz2d bz2)
 else()
     find_library(BZ2_LIBRARY bz2)
