@@ -33,6 +33,7 @@ BLARGG_EXPORT const fex_type_t* fex_type_list( void )
 			// Modify blargg_config.h to change type list, NOT this file
 			fex_7z_type,
 			fex_gz_type,
+            fex_tar_type,
             #if FEX_ENABLE_LZMA
                 fex_xz_type,
                 fex_lz_type,
@@ -148,6 +149,7 @@ static int is_archive_extension( const char str [] )
 		".rar",
 		".sit",
 		".sitx",
+        ".tar",
 		".tgz",
 		".tlz",
 		".z",

@@ -71,6 +71,8 @@ target_sources(vbam-fex
     fex/LZ_Reader.h
     fex/Rar_Extractor.cpp
     fex/Rar_Extractor.h
+    fex/Tar_Extractor.cpp
+    fex/Tar_Extractor.h
     fex/Zip7_Extractor.cpp
     fex/Zip7_Extractor.h
     fex/Zip_Extractor.cpp

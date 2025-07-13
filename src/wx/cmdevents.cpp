@@ -145,7 +145,7 @@ EVT_HANDLER(wxID_OPEN, "Open ROM...")
         "*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;"
         "*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;"
         "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;"
-        "*.zip;*.7z;*.rar|");
+        "*.tar;*.zip;*.7z;*.rar|");
     pats.append(wxALL_FILES);
 
     wxFileDialog dlg(this, _("Open ROM file"), gba_rom_dir, "",
@@ -179,7 +179,7 @@ EVT_HANDLER(OpenGB, "Open GB...")
         "*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;"
         "*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;"
         "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;"
-        "*.zip;*.7z;*.rar|");
+        "*.tar;*.zip;*.7z;*.rar|");
     pats.append(wxALL_FILES);
     wxFileDialog dlg(this, _("Open GB ROM file"), gb_rom_dir, "",
         pats,
@@ -211,7 +211,7 @@ EVT_HANDLER(OpenGBC, "Open GBC...")
         "*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;"
         "*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;"
         "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;"
-        "*.zip;*.7z;*.rar|");
+        "*.tar;*.zip;*.7z;*.rar|");
     pats.append(wxALL_FILES);
     wxFileDialog dlg(this, _("Open GBC ROM file"), gbc_rom_dir, "",
         pats,

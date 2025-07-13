@@ -213,7 +213,7 @@ struct fex_type_t_ {
         blargg_err_t (*init)(); // Called by fex_init(). Can be NULL.
 };
 
-extern const fex_type_t_ fex_7z_type[1], fex_gz_type[1], fex_bz2_type[1], fex_xz_type[1], fex_lz_type[1], fex_rar_type[1], fex_zip_type[1],
+extern const fex_type_t_ fex_7z_type[1], fex_gz_type[1], fex_bz2_type[1], fex_xz_type[1], fex_lz_type[1], fex_tar_type[1], fex_rar_type[1], fex_zip_type[1],
     fex_bin_type[1];
 
 inline blargg_err_t File_Extractor::open_v()
