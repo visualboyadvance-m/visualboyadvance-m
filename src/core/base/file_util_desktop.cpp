@@ -141,6 +141,7 @@ uint8_t* utilLoad(const char* file, bool (*accept)(const char*), uint8_t* data, 
     int read = fileSize <= size ? fileSize : size;  // do not read beyond file
     err = fex_read(fe, image, read);
     fex_close(fe);
+
     if (err) {
         systemMessage(MSG_ERROR_READING_IMAGE, N_("Error reading image from %s: %s"), buffer, err);
         if (data == nullptr)

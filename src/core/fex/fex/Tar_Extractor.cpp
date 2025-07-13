@@ -65,7 +65,11 @@ blargg_err_t Tar_Extractor::open_v()
 {
     arc().read(&header, BLOCKSIZE);
 	set_name( header.name );
+#if __STDC_WANT_SECURE_LIB__
+    sscanf_s(header.size, "%o", &tarsize);
+#else
     sscanf(header.size, "%o", &tarsize);
+#endif
 	return blargg_ok;
 }
     
@@ -78,7 +82,11 @@ blargg_err_t Tar_Extractor::next_v()
 {
     arc().read(&header, BLOCKSIZE);
     set_name( header.name );
+#if __STDC_WANT_SECURE_LIB__
+    sscanf_s(header.size, "%o", &tarsize);
+#else
     sscanf(header.size, "%o", &tarsize);
+#endif
 	return blargg_ok;
 }
 

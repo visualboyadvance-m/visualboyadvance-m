@@ -26,6 +26,7 @@ uint8_t *utilLoad(const char *, bool (*)(const char *), uint8_t *, int &);
 IMAGE_TYPE utilFindType(const char *);
 bool utilIsGBAImage(const char *);
 bool utilIsGBImage(const char *);
+bool utilIsTARAchive(const char *);
 
 #if defined(__LIBRETRO__)
 

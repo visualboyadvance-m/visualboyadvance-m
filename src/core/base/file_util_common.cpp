@@ -39,6 +39,15 @@ FILE* utilOpenFile(const char* filename, const char* mode) {
 #endif  // _WIN32
 }
 
+bool utilIsTARAchive(const char* file) {
+    const char* p = strrchr(file, '.');
+    
+    if ((strcasecmp(p, ".tar") == 0))
+        return true;
+
+    return false;
+}
+
 bool utilIsGBAImage(const char* file) {
     coreOptions.cpuIsMultiBoot = false;
     if (strlen(file) > 4) {
