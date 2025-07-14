@@ -86,6 +86,7 @@ BLARGG_EXPORT const char* fex_identify_header( void const* header )
 	case 0x4D534346: return ".cab";
 	case 0x5A4F4F20: return ".zoo";
     case 0x04224D18: return ".lz4";
+    case 0x4C5A4950: return ".lz";
 	}
 
 	unsigned three = four >> 8;
@@ -152,6 +153,7 @@ static int is_archive_extension( const char str [] )
         ".tar",
 		".tgz",
 		".tlz",
+        ".xz",
 		".z",
 		".zip",
 		".zoo",
@@ -188,7 +190,7 @@ BLARGG_EXPORT fex_err_t fex_identify_file( fex_type_t* type_out, const char path
 	*type_out = NULL;
 	
 	fex_type_t type = fex_identify_extension( path );
-	
+
 	// Unsupported extension?
 	if ( !type )
 		return blargg_ok; // reject

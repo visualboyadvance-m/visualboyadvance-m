@@ -6,7 +6,7 @@
 
 #include "Data_Reader.h"
 #include "blargg_common.h"
-#include "fex.h"
+#include "../fex.h"
 
 struct fex_t : private Data_Reader {
         public:
@@ -26,6 +26,7 @@ struct fex_t : private Data_Reader {
 
         // See fex.h
         blargg_err_t open(const char path[]);
+
         fex_type_t type() const
         {
                 return type_;
