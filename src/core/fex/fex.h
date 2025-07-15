@@ -56,7 +56,7 @@ int fex_has_extension(const char str[], const char extension[]);
 Returns usual file extension this should have (e.g. ".zip", ".gz", etc.).
 Returns "" if file header is not recognized. */
 const char *fex_identify_header(const void *header);
-enum { fex_identify_header_size = 263 };
+enum { fex_identify_header_size = 16 };
 
 /** Determines type based on extension of a file path, or just a lone extension
 (must include '.', e.g. ".zip", NOT just "zip"). Returns NULL if extension is

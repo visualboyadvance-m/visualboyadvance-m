@@ -72,9 +72,6 @@ BLARGG_EXPORT const char* fex_identify_header( void const* header )
 {
     unsigned char *data = (unsigned char *)header;
 
-    if ((data[257] == 0x75) || (data[258] == 0x73) || (data[259] == 0x74) || (data[260] == 0x61) || (data[261] == 0x72) || (data[262] == 0x00))
-        return ".tar";
-
     if ((data[0] == 0xFD) || (data[1] == 0x37) || (data[2] == 0x7A) || (data[3] == 0x58) || (data[4] == 0x5A) || (data[5] == 0x00))
         return ".xz";
 
