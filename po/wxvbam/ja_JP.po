@@ -4,14 +4,14 @@
 # 
 # Translators:
 # a3133e67d2aed6e988c30c5985554ea8_695ac6e <4f0e15ec6c89de2363f13e3bfa21f388_660035>, 2018
-# 深谷 承太, 2022
+# Shotadft, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-05 20:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: 深谷 承太, 2022\n"
+"Last-Translator: Shotadft, 2022\n"
 "Language-Team: Japanese (Japan) (http://app.transifex.com/bgk/vba-m/language/ja_JP/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
