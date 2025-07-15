@@ -614,6 +614,8 @@ bool wxvbamApp::OnInit() {
 
     frame->Show(true);
 
+    frame->BindAppIcon();
+
 #ifndef NO_ONLINEUPDATES
     initAutoupdater();
 #endif

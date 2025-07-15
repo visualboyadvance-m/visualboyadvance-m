@@ -1681,8 +1681,6 @@ bool MainFrame::BindControls()
     // the idle loop on wxGTK
     wxIdleEvent::SetMode(wxIDLE_PROCESS_SPECIFIED);
 
-    BindAppIcon();
-
     // NOOP if no status area
     SetStatusText(wxT(""));
 

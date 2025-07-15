@@ -68,12 +68,18 @@ BLARGG_EXPORT fex_err_t fex_init( void )
 	return blargg_ok;
 }
 
-BLARGG_EXPORT const char* fex_identify_header( void const* header )
+BLARGG_EXPORT const char* fex_identify_header(const void* header)
 {
-    unsigned char *data = (unsigned char *)header;
+	const unsigned char* data = static_cast<const unsigned char*>(header);
 
-    if ((data[0] == 0xFD) || (data[1] == 0x37) || (data[2] == 0x7A) || (data[3] == 0x58) || (data[4] == 0x5A) || (data[5] == 0x00))
-        return ".xz";
+	// Safely detect .xz (magic bytes at offset 0)
+	if (memcmp(data, "\xFD\x37\x7A\x58\x5A\x00", 6) == 0)
+		return ".xz";
+
+	// Safely detect .tar (magic string at offset 257)
+	const char tar_magic[] = "ustar";
+	if (memcmp(data + 257, tar_magic, sizeof(tar_magic)) == 0 && data[262] == 0x00)
+		return ".tar";
 
 	unsigned four = get_be32( header );
 	switch ( four )
