@@ -434,39 +434,6 @@ static void reset_apu()
     soundTicks = 0;
 }
 
-static void remake_stereo_buffer()
-{
-    if (!g_ioMem)
-        return;
-
-    // Clears pointers kept to old stereo_buffer
-    pcm[0].pcm.init();
-    pcm[1].pcm.init();
-
-    // APU
-    if (!gb_apu) {
-        gb_apu = new Gb_Apu; // TODO: handle out of memory
-        reset_apu();
-    }
-
-    // Stereo_Buffer
-    delete stereo_buffer;
-    stereo_buffer = 0;
-
-    stereo_buffer = new Stereo_Buffer; // TODO: handle out of memory
-    stereo_buffer->set_sample_rate(soundSampleRate); // TODO: handle out of memory
-    stereo_buffer->clock_rate(gb_apu->clock_rate);
-
-    // PCM
-    pcm[0].which = 0;
-    pcm[1].which = 1;
-    apply_filtering();
-
-    // Volume Level
-    apply_muting();
-    apply_volume();
-}
-
 void soundShutdown()
 {
     soundDriver.reset();
@@ -732,6 +699,60 @@ static variable_desc gba_state[] = {
 
     { NULL, 0 }
 };
+
+void remake_stereo_buffer()
+{
+    if (!g_ioMem)
+        return;
+
+    // Clears pointers kept to old stereo_buffer
+    pcm[0].pcm.init();
+    pcm[1].pcm.init();
+
+    // APU
+    if (!gb_apu) {
+        gb_apu = new Gb_Apu; // TODO: handle out of memory
+        reset_apu();
+    }
+
+    gb_apu->save_state(&state.apu);
+
+    // Stereo_Buffer
+    delete stereo_buffer;
+    stereo_buffer = 0;
+
+    stereo_buffer = new Stereo_Buffer; // TODO: handle out of memory
+    stereo_buffer->set_sample_rate(soundSampleRate); // TODO: handle out of memory
+    stereo_buffer->clock_rate(gb_apu->clock_rate);
+
+    // Reapply APU register values from g_ioMem
+    for (int addr = NR10; addr <= NR52; ++addr) {
+        const int gb_reg = gba_to_gb_sound(addr);
+
+        if (addr == NR52)
+            g_ioMem[addr] |= 0x80;
+
+        if (gb_reg >= 0xFF10) {
+            state.apu.regs[gb_reg - 0xFF10] = g_ioMem[addr];
+        }
+    }
+
+    // Reapply wave RAM
+    memcpy(&state.apu.regs[0x20], &g_ioMem[0x90], 0x10);
+    memcpy(&state.apu.regs[0x30], &g_ioMem[0x90], 0x10);
+
+    // PCM
+    pcm[0].which = 0;
+    pcm[1].which = 1;
+    apply_filtering();
+
+    // Volume Level
+    gb_apu->load_state(state.apu);
+    write_SGCNT0_H(READ16LE(&g_ioMem[SGCNT0_H]) & 0x770F);
+
+    apply_muting();
+    apply_volume();
+}
 
 #ifndef __LIBRETRO__
 void soundSaveGame(gzFile out)

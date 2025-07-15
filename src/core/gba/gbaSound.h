@@ -92,4 +92,6 @@ class Multi_Buffer;
 
 void flush_samples(Multi_Buffer* buffer);
 
+void remake_stereo_buffer();
+
 #endif  // VBAM_CORE_GBA_GBASOUND_H_

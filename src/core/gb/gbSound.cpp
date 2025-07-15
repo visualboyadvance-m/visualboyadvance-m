@@ -117,7 +117,7 @@ static void reset_apu()
     soundTicks = 0;
 }
 
-static void remake_stereo_buffer()
+static void gb_remake_stereo_buffer()
 {
     // APU
     if (!gb_apu) {
@@ -172,7 +172,7 @@ void gbSoundReset()
 {
     SOUND_CLOCK_TICKS = 35112;
 
-    remake_stereo_buffer();
+    gb_remake_stereo_buffer();
     reset_apu();
 
     soundPaused = 1;
@@ -227,7 +227,7 @@ void gbSoundSetSampleRate(long sampleRate)
             soundSampleRate = sampleRate;
         }
 
-        remake_stereo_buffer();
+        gb_remake_stereo_buffer();
     }
 }
 
