@@ -159,7 +159,7 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver pkg_triplet powershell ou
 
         string(REGEX REPLACE "\r?\n" ";" vcpkg_list_raw "${vcpkg_list_text}")
 
-        set(VCPKG_INSTALLED_COUNT 0 PARENT_SCOPE)
+        set(VCPKG_INSTALLED_COUNT 0 CACHE INTERNAL "Number of installed vcpkg packages" FORCE)
         foreach(pkg ${vcpkg_list_raw})
             if(NOT pkg MATCHES "^([^:[]+)[^:]*:([^ ]+) +([0-9][^ ]*) +.*\$")
                 continue()
@@ -181,8 +181,8 @@ function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver pkg_triplet powershell ou
             list(APPEND VCPKG_INSTALLED ${inst_pkg_name} ${inst_pkg_ver} ${inst_pkg_rev} ${inst_pkg_triplet})
             math(EXPR VCPKG_INSTALLED_COUNT "${VCPKG_INSTALLED_COUNT} + 1")
         endforeach()
-        set(VCPKG_INSTALLED       ${VCPKG_INSTALLED}       PARENT_SCOPE)
-        set(VCPKG_INSTALLED_COUNT ${VCPKG_INSTALLED_COUNT} PARENT_SCOPE)
+        set(VCPKG_INSTALLED       ${VCPKG_INSTALLED}       CACHE INTERNAL "List of installed vcpkg packages"   FORCE)
+        set(VCPKG_INSTALLED_COUNT ${VCPKG_INSTALLED_COUNT} CACHE INTERNAL "Number of installed vcpkg packages" FORCE)
     endif()
 
     if(NOT VCPKG_INSTALLED_COUNT GREATER 0)
