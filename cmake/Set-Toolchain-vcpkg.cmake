@@ -566,12 +566,6 @@ function(vcpkg_set_toolchain)
         set(vcpkg_exe "${VCPKG_ROOT}/vcpkg")
     endif()
 
-    # update portfiles
-    execute_process(
-        COMMAND ${vcpkg_exe} update
-        WORKING_DIRECTORY ${VCPKG_ROOT}
-    )
-
     if (NOT (NO_VCPKG_UPDATES OR (NOT VCPKG_BINARY_PACKAGES)))
         get_binary_packages(${vcpkg_exe})
     endif()
