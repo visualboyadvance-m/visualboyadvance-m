@@ -267,6 +267,13 @@ function(zip_is_installed vcpkg_exe zip outvar)
     set(${outvar} ${pkg_installed} PARENT_SCOPE)
 endfunction()
 
+function(cleanup_binary_packages)
+    file(REMOVE_RECURSE "${CMAKE_BINARY_DIR}/vcpkg-binary-packages")
+
+    unset(VCPKG_INSTALLED       CACHE)
+    unset(VCPKG_INSTALLED_COUNT CACHE)
+endfunction()
+
 function(get_binary_packages vcpkg_exe)
     set(binary_packages_installed FALSE PARENT_SCOPE)
 
@@ -395,6 +402,8 @@ function(get_binary_packages vcpkg_exe)
 
         file(REMOVE_RECURSE ${bin_pkgs_dir})
     endif()
+
+    cleanup_binary_packages()
 
     set(binary_packages_installed TRUE PARENT_SCOPE)
 endfunction()
