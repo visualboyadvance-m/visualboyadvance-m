@@ -73,14 +73,16 @@ endif()
 # define the sfml-system target
 add_library(sfml-system STATIC ${SRC} ${PLATFORM_SRC})
 
-target_include_directories(sfml-system PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../.. ${CMAKE_CURRENT_SOURCE_DIR}/../../../include)
+include(SystemIncludeDirectories)
+
+target_include_directories(sfml-system SYSTEM BEFORE PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../.. ${CMAKE_CURRENT_SOURCE_DIR}/../../../include)
 
 target_compile_definitions(sfml-system PRIVATE   SFML_STATIC)
 target_compile_definitions(sfml-system INTERFACE SFML_STATIC)
 
 if(ANDROID)
     # glad sources
-    target_include_directories(sfml-system PRIVATE "${PROJECT_SOURCE_DIR}/extlibs/headers/glad/include")
+    target_include_directories(sfml-system SYSTEM BEFORE PRIVATE "${PROJECT_SOURCE_DIR}/extlibs/headers/glad/include")
 endif()
 
 # setup dependencies

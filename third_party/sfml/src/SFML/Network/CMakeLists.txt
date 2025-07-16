@@ -47,7 +47,7 @@ source_group("" FILES ${SRC})
 # define the sfml-network target
 add_library(sfml-network ${SRC})
 
-target_include_directories(sfml-network PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../.. ${CMAKE_CURRENT_SOURCE_DIR}/../../../include)
+target_include_directories(sfml-network SYSTEM BEFORE PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../.. ${CMAKE_CURRENT_SOURCE_DIR}/../../../include)
 
 target_compile_definitions(sfml-network PRIVATE   SFML_STATIC)
 target_compile_definitions(sfml-network INTERFACE SFML_STATIC)

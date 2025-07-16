@@ -29,8 +29,10 @@
 
 #include <algorithm>
 
+#include <cstddef>
 #include <cstring>
 
+#include "optional.hpp"
 
 namespace sf
 {
