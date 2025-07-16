@@ -613,6 +613,13 @@ bool wxvbamApp::OnInit() {
         frame->ShowFullScreen(is_fullscreen);
 
     frame->Show(true);
+    
+    // Windows can render the taskbar icon late if this is done in MainFrame
+    // It may also not update at all until the Window has been minimized/restored
+    // This seems timing related, possibly based on HWND
+    // So do this here since it reliably draws the Taskbar icon on Window creation.
+    frame->BindAppIcon();  
+
 
 #ifndef NO_ONLINEUPDATES
     initAutoupdater();

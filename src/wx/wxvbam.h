@@ -310,7 +310,7 @@ public:
     // required for event handling
     DECLARE_EVENT_TABLE();
 
-protected:
+public:
     virtual void BindAppIcon();
 
 private:
