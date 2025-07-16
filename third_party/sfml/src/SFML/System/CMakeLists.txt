@@ -73,8 +73,6 @@ endif()
 # define the sfml-system target
 add_library(sfml-system STATIC ${SRC} ${PLATFORM_SRC})
 
-include(SystemIncludeDirectories)
-
 target_include_directories(sfml-system SYSTEM BEFORE PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../.. ${CMAKE_CURRENT_SOURCE_DIR}/../../../include)
 
 target_compile_definitions(sfml-system PRIVATE   SFML_STATIC)

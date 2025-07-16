@@ -278,6 +278,7 @@ function(configure_wx_target target)
 
     # OpenAL.
     if(ENABLE_OPENAL)
+        _add_compile_definitions(VBAM_ENABLE_OPENAL)
         if(OPENAL_STATIC)
             _add_compile_definitions(AL_LIBTYPE_STATIC)
         endif()
