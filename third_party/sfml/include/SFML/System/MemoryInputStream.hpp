@@ -27,15 +27,16 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/Config.hpp>
+#include "../../SFML/Config.hpp"
 
-#include <SFML/System/Export.hpp>
+#include "../../SFML/System/Export.hpp"
 
-#include <SFML/System/InputStream.hpp>
+#include "../../SFML/System/InputStream.hpp"
 
 #include <cstddef>
 #include <cstdint>
 
+#include "optional.hpp"
 
 namespace sf
 {

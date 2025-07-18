@@ -27,12 +27,12 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/Network/Socket.hpp>
-#include <SFML/Network/SocketHandle.hpp>
+#include "../../../include/SFML/Network/Socket.hpp"
+#include "../../../include/SFML/Network/SocketHandle.hpp"
 
 #if defined(SFML_SYSTEM_WINDOWS)
 
-#include <SFML/System/Win32/WindowsHeader.hpp>
+#include "../../../include/SFML/System/Win32/WindowsHeader.hpp"
 
 #include <winsock2.h>
 #include <ws2tcpip.h>

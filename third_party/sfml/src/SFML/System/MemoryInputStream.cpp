@@ -25,14 +25,12 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/System/MemoryInputStream.hpp>
+#include "../../../include/SFML/System/MemoryInputStream.hpp"
 
 #include <algorithm>
 
 #include <cstddef>
 #include <cstring>
-
-#include "optional.hpp"
 
 namespace sf
 {

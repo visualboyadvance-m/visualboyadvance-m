@@ -25,8 +25,8 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/System/Time.hpp>
-#include <SFML/System/Unix/SleepImpl.hpp>
+#include "../../../../include/SFML/System/Time.hpp"
+#include "SleepImpl.hpp"
 
 #include <cerrno>
 #include <ctime>

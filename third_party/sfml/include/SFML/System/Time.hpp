@@ -444,7 +444,7 @@ constexpr Time& operator%=(Time& left, Time right);
 
 } // namespace sf
 
-#include <SFML/System/Time.inl>
+#include "../../SFML/System/Time.inl"
 
 
 ////////////////////////////////////////////////////////////

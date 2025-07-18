@@ -25,9 +25,9 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/Network/SocketImpl.hpp>
+#include "../SocketImpl.hpp"
 
-#include <SFML/System/Err.hpp>
+#include "../../../../include/SFML/System/Err.hpp"
 
 #include <fcntl.h>
 #include <ostream>

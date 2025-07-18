@@ -25,7 +25,7 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/System/Angle.hpp> // NOLINT(misc-header-include-cycle)
+#include "../../SFML/System/Angle.hpp" // NOLINT(misc-header-include-cycle)
 
 #include <cassert>
 

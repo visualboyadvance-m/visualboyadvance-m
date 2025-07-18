@@ -27,9 +27,9 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/System/Export.hpp>
+#include "../../../include/SFML/System/Export.hpp"
 
-#include <SFML/System/InputStream.hpp>
+#include "../../../include/SFML/System/InputStream.hpp"
 
 #include <android/asset_manager.h>
 

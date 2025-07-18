@@ -24,9 +24,9 @@
 
 #pragma once
 
-#include <SFML/System/Export.hpp>
+#include "../../SFML/System/Export.hpp"
 
-#include <SFML/System/Angle.hpp>
+#include "../../SFML/System/Angle.hpp"
 
 
 namespace sf
@@ -382,7 +382,7 @@ template <typename T>
 
 } // namespace sf
 
-#include <SFML/System/Vector2.inl>
+#include "../../SFML/System/Vector2.inl"
 
 
 ////////////////////////////////////////////////////////////

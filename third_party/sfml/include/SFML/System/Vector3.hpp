@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <SFML/System/Export.hpp>
+#include "../../SFML/System/Export.hpp"
 
 
 namespace sf
@@ -307,7 +307,7 @@ using Vector3f = Vector3<float>;
 
 } // namespace sf
 
-#include <SFML/System/Vector3.inl>
+#include "../../SFML/System/Vector3.inl"
 
 
 ////////////////////////////////////////////////////////////

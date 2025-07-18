@@ -22,7 +22,7 @@
 //
 ////////////////////////////////////////////////////////////
 
-#include <SFML/System/Vector3.hpp>
+#include "../../../include/SFML/System/Vector3.hpp"
 
 #include <type_traits>
 

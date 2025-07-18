@@ -25,9 +25,9 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/System/Time.hpp>
-#include <SFML/System/Win32/SleepImpl.hpp>
-#include <SFML/System/Win32/WindowsHeader.hpp>
+#include "../../../include/SFML/System/Time.hpp"
+#include "../../../include/SFML/System/Win32/SleepImpl.hpp"
+#include "../../../include/SFML/System/Win32/WindowsHeader.hpp"
 
 #include <mmsystem.h>
 

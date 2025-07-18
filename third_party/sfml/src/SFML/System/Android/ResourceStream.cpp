@@ -26,8 +26,8 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/System/Android/Activity.hpp>
-#include <SFML/System/Android/ResourceStream.hpp>
+#include "../../../include/SFML/System/Android/Activity.hpp"
+#include "../../../include/SFML/System/Android/ResourceStream.hpp"
 
 #include <mutex>
 

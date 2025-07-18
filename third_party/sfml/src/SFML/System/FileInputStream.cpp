@@ -25,18 +25,16 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/System/Exception.hpp>
-#include <SFML/System/FileInputStream.hpp>
-#include <SFML/System/Utils.hpp>
+#include "../../../include/SFML/System/Exception.hpp"
+#include "../../../include/SFML/System/FileInputStream.hpp"
+#include "../../SFML/System/Utils.hpp"
 #ifdef SFML_SYSTEM_ANDROID
-#include <SFML/System/Android/Activity.hpp>
-#include <SFML/System/Android/ResourceStream.hpp>
+#include "../../../include/SFML/System/Android/Activity.hpp"
+#include "../../../include/SFML/System/Android/ResourceStream.hpp"
 #endif
 #include <memory>
 
 #include <cstddef>
-
-#include "optional.hpp"
 
 namespace sf
 {

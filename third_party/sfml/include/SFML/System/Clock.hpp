@@ -27,14 +27,14 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/System/Export.hpp>
+#include "../../SFML/System/Export.hpp"
 
 #include <chrono>
 #include <ratio>
 #include <type_traits>
 
 #ifdef SFML_SYSTEM_ANDROID
-#include <SFML/System/SuspendAwareClock.hpp>
+#include "../../SFML/System/SuspendAwareClock.hpp"
 #endif
 
 

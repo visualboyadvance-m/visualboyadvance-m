@@ -120,9 +120,7 @@ if(ENABLE_LINK)
         gba/gbaLink.h
     )
 
-    target_include_directories(vbam-core
-        PRIVATE ${SFML_INCLUDE_DIR}
-    )
+    target_include_directories(vbam-core PRIVATE ${SFML_INCLUDE_DIR} ${SFML_INCLUDE_DIR}/SFML/Network ${SFML_INCLUDE_DIR}/SFML/System)
 
     target_link_libraries(vbam-core
         PRIVATE ${SFML_LIBRARIES}

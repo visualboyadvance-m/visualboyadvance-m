@@ -25,7 +25,7 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/System/Utf.hpp> // NOLINT(misc-header-include-cycle)
+#include "../../SFML/System/Utf.hpp" // NOLINT(misc-header-include-cycle)
 
 #include <iterator>
 

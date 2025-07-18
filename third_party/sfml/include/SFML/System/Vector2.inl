@@ -25,7 +25,7 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/System/Vector2.hpp> // NOLINT(misc-header-include-cycle)
+#include "../../SFML/System/Vector2.hpp" // NOLINT(misc-header-include-cycle)
 
 #include <cassert>
 

@@ -472,7 +472,7 @@ namespace Literals
 } // namespace Literals
 } // namespace sf
 
-#include <SFML/System/Angle.inl>
+#include "../../SFML/System/Angle.inl"
 
 
 ////////////////////////////////////////////////////////////

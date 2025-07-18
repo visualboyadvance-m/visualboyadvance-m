@@ -27,17 +27,19 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/Config.hpp>
+#include "../../SFML/Config.hpp"
 
-#include <SFML/System/Export.hpp>
+#include "../../SFML/System/Export.hpp"
 
-#include <SFML/System/InputStream.hpp>
+#include "../../SFML/System/InputStream.hpp"
 
 #include "filesystem.hpp"
 #include <memory>
 
 #include <cstdint>
 #include <cstdio>
+
+#include "optional.hpp"
 
 #ifdef SFML_SYSTEM_ANDROID
 namespace sf

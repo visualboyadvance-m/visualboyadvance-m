@@ -27,9 +27,9 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/System/Export.hpp>
+#include "../../SFML/System/Export.hpp"
 
-#include <SFML/System/Utf.hpp>
+#include "../../SFML/System/Utf.hpp"
 
 #include <locale>
 #include <string>
@@ -647,7 +647,7 @@ private:
 
 } // namespace sf
 
-#include <SFML/System/String.inl>
+#include "../../SFML/System/String.inl"
 
 
 ////////////////////////////////////////////////////////////

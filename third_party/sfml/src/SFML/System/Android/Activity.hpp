@@ -27,10 +27,10 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/Window/EglContext.hpp>
-#include <SFML/Window/Event.hpp>
+#include "../../../include/SFML/Window/EglContext.hpp"
+#include "../../../include/SFML/Window/Event.hpp"
 
-#include <SFML/System/EnumArray.hpp>
+#include "../../../include/SFML/System/EnumArray.hpp"
 
 #include <android/configuration.h>
 #include <android/native_activity.h>

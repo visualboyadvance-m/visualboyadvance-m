@@ -25,11 +25,11 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/Network/Http.hpp>
-#include <SFML/Network/IpAddress.hpp>
-#include <SFML/Network/SocketImpl.hpp>
+#include "../../../include/SFML/Network/Http.hpp"
+#include "../../../include/SFML/Network/IpAddress.hpp"
+#include "../../SFML/Network/SocketImpl.hpp"
 
-#include <SFML/System/Err.hpp>
+#include "../../../include/SFML/System/Err.hpp"
 
 #include <istream>
 #include <ostream>

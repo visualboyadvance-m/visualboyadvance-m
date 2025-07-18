@@ -25,13 +25,13 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/System/Sleep.hpp>
-#include <SFML/System/Time.hpp>
+#include "../../../include/SFML/System/Sleep.hpp"
+#include "../../../include/SFML/System/Time.hpp"
 
 #if defined(SFML_SYSTEM_WINDOWS)
-#include <SFML/System/Win32/SleepImpl.hpp>
+#include "Win32/SleepImpl.hpp"
 #else
-#include <SFML/System/Unix/SleepImpl.hpp>
+#include "Unix/SleepImpl.hpp"
 #endif
 
 

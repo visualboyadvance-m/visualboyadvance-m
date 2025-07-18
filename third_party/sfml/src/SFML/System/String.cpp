@@ -25,8 +25,8 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/System/String.hpp>
-#include <SFML/System/Utf.hpp>
+#include "../../../include/SFML/System/String.hpp"
+#include "../../../include/SFML/System/Utf.hpp"
 
 #include <iterator>
 #include <utility>

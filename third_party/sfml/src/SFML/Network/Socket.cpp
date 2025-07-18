@@ -25,10 +25,10 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/Network/Socket.hpp>
-#include <SFML/Network/SocketImpl.hpp>
+#include "../../../include/SFML/Network/Socket.hpp"
+#include "../../SFML/Network/SocketImpl.hpp"
 
-#include <SFML/System/Err.hpp>
+#include "../../../include/SFML/System/Err.hpp"
 
 #include <ostream>
 #include <utility>
