@@ -130,7 +130,7 @@ export CPPFLAGS="-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/us
 export CFLAGS="-framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument"
 export CXXFLAGS="-framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument"
 export OBJCXXFLAGS="-framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument"
-export LDFLAGS="-L\"\$BUILD_ROOT/root/lib\" -lintl -liconv -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
+export LDFLAGS="-L\"\$BUILD_ROOT/root/lib\" -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib -F/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
 
 export UUID_CFLAGS="-I\"\$BUILD_ROOT/root/stow/libuuid/include\""
 export UUID_LIBS="-L\"\$BUILD_ROOT/root/stow/libuuid/lib\" -luuid"
