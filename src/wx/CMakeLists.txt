@@ -394,6 +394,9 @@ if(APPLE)
             default
         )
     endif()
+
+# Needed for CoreAudio.
+    target_compile_options(visualboyadvance-m PRIVATE -Wno-error=elaborated-enum-base)
 endif()
 
 target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} ${VBAM_ICON_PATH})

@@ -180,7 +180,7 @@ DISTS=$DISTS'
     XML-Parser      https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.47.tar.gz                      perl5/man/man3/XML*Parser.3*
     intltool        https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz                bin/intltoolize
     ninja           https://github.com/ninja-build/ninja/archive/v1.12.1.tar.gz                                 bin/ninja
-    glib            https://download.gnome.org/sources/glib/2.85/glib-2.85.0.tar.xz                             lib/libglib-2.0.a
+    glib            https://download.gnome.org/sources/glib/2.85/glib-2.85.1.tar.xz                             lib/libglib-2.0.a
     libgpg-error    https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.54.tar.bz2                         lib/libgpg-error.a
     libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.11.0.tar.bz2                             lib/libgcrypt.a
     libsecret       https://gitlab.gnome.org/GNOME/libsecret/-/archive/0.21.7/libsecret-0.21.7.tar.bz2          lib/libsecret-1.a
@@ -374,7 +374,7 @@ DIST_ARGS="$DIST_ARGS
     graphviz    --disable-ltdl --without-x --disable-swig CFLAGS=\"-include \$PWD/declspec.h \$CFLAGS\" CC=\"\$CXX\"
     python2     --with-ensurepip=install --with-system-expat
     python3     --with-ensurepip=install --with-system-expat
-    glib        -Dtests=false
+    glib        -Dtests=false -Ddtrace=disabled
     XML-Parser  EXPATINCPATH=\"\$BUILD_ROOT/root/include\" EXPATLIBPATH=\"\$BUILD_ROOT/root/lib\"
     libcroco    --disable-Bsymbolic
     snappy      -DSNAPPY_BUILD_TESTS=OFF -DSNAPPY_BUILD_BENCHMARKS=OFF
