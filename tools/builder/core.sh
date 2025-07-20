@@ -356,6 +356,10 @@ DIST_BUILD_OVERRIDES="$DIST_BUILD_OVERRIDES
     urw            install_fonts
 "
 
+DIST_FLAGS="$DIST_FLAGS
+    gettext     no_sdk_paths_in_flags
+"
+
 DIST_ARGS="$DIST_ARGS
     pkgconf     --disable-tests
     libdeflate  -DLIBDEFLATE_BUILD_STATIC_LIB=TRUE -DLIBDEFLATE_BUILD_SHARED_LIB=FALSE
@@ -1482,6 +1486,11 @@ build_dist() {
     export LDFLAGS="$LDFLAGS $(eval puts "$(dist_extra_ldflags "$current_dist")")"
     export LIBS="$LIBS $(eval puts "$(dist_extra_libs "$current_dist")")"
 
+    if dist_flags "$current_dist" no_sdk_paths_in_flags; then
+        CPPFLAGS=$(echo "$CPPFLAGS" | sed -e 's,-isystem /Library/Developer/[^ ]*,,g')
+        LDFLAGS=$( echo "$LDFLAGS"  | sed -e 's,-[LF]/Library/Developer/[^ ]*,,g')
+    fi
+
     configure_override=$(dist_configure_override "$current_dist")
     install_override=$(dist_install_override "$current_dist")
     build_override=$(dist_build_override "$current_dist")
@@ -2288,6 +2297,27 @@ dist_prefix() {
     done
 
     puts "$prefix"
+}
+
+dist_flags() {
+    current_dist=$1
+    [ -n "$current_dist" ] || die 'dist_flags: dist name required'
+    shift
+    [ -n "$1" ] || die 'dist_flags: at least one flag required'
+
+    dist_flags=$(table_line DIST_FLAGS "$current_dist") || :
+
+    while [ $# -ne 0 ]; do
+        flag=$1
+        shift
+
+        case "$dist_flags" in
+            *${flag}*)
+                return 0
+                ;;
+        esac
+        return 1
+    done
 }
 
 dist_tar_args() {
