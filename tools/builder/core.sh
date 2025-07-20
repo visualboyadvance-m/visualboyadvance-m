@@ -358,6 +358,7 @@ DIST_BUILD_OVERRIDES="$DIST_BUILD_OVERRIDES
 
 DIST_FLAGS="$DIST_FLAGS
     gettext     no_sdk_paths_in_flags
+    bison       no_sdk_paths_in_flags
 "
 
 DIST_ARGS="$DIST_ARGS
