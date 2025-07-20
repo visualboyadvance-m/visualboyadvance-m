@@ -19,6 +19,8 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 #include "blargg_source.h"
 
+#include <bzlib.h>
+
 BZ2_Reader::BZ2_Reader()
 {
 	close();
@@ -34,8 +36,9 @@ static blargg_err_t BZ2_reader_read( void* file, void* out, int* count )
 
 blargg_err_t BZ2_Reader::calc_size()
 {
-	size_  = 33554432;
+	size_  = 0x8000000; // Max cart size
 	crc32_ = 0;
+
 	return blargg_ok;
 }
 
@@ -65,7 +68,7 @@ blargg_err_t BZ2_Reader::read_v( void* out, int count )
 	int actual = count;
 	RETURN_ERR( inflater.read( out, &actual ) );
 
-    if ( actual < count ) {
+    if ( actual < size_ ) {
         size_ = actual;
         inflater.resize_buffer(actual);
         set_remain(0);
