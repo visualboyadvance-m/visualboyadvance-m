@@ -39,6 +39,13 @@ blargg_err_t BZ2_Reader::calc_size()
 	size_  = 0x8000000; // Max cart size
 	crc32_ = 0;
 
+    set_remain(size_);
+    inflater.get_size(&size_);
+
+    fprintf(stderr, "Calculated BZ2 size: %d\n", size_);
+
+    in->seek(0);
+
 	return blargg_ok;
 }
 
@@ -51,6 +58,9 @@ blargg_err_t BZ2_Reader::open( File_Reader* new_in )
 	RETURN_ERR( inflater.begin( BZ2_reader_read, new_in ) );
 	RETURN_ERR( inflater.set_mode( inflater.mode_auto ) );
 	RETURN_ERR( calc_size() );
+    inflater.end();
+    RETURN_ERR( inflater.begin( BZ2_reader_read, new_in ) );
+    RETURN_ERR( inflater.set_mode( inflater.mode_auto ) );
 	set_remain( size_ );
 	
 	return blargg_ok;

@@ -20,6 +20,7 @@ class BZ2_Inflater
         // filled to 4K, or specify buf_size and initial_read for custom buffer size
         // and how much to read initially.
         blargg_err_t begin(callback_t, void *user_data, int buf_size = 0, int initial_read = 0);
+        blargg_err_t get_size(int *count_io);
 
         // Data read into buffer by begin()
         const unsigned char *data() const
@@ -85,6 +86,7 @@ class BZ2_Inflater
         void *user_data;
 
         blargg_err_t fill_buf(int count);
+        blargg_err_t skip_buf(int count);
 };
 
 #endif

@@ -59,6 +59,14 @@ BZ2_Inflater::~BZ2_Inflater()
 	end();
 }
 
+blargg_err_t BZ2_Inflater::skip_buf( int count )
+{
+    byte* out = buf.end() - count;
+    zbuf.avail_in = count;
+    zbuf.next_in  = (char *)out;
+    return blargg_ok;
+}
+
 blargg_err_t BZ2_Inflater::fill_buf( int count )
 {
 	byte* out = buf.end() - count;
@@ -163,6 +171,20 @@ blargg_err_t BZ2_Inflater::read_all( void* out, int count )
 	return blargg_ok;
 }
 */
+
+blargg_err_t BZ2_Inflater::get_size( int* count_io )
+{
+    char *buffer = (char *)malloc(*count_io);
+
+    if (buffer == NULL) {
+        return blargg_err_memory;
+    }
+
+    read(buffer, count_io);
+    free(buffer);
+
+    return blargg_ok;
+}
 
 blargg_err_t BZ2_Inflater::read( void* out, int* count_io )
 {
