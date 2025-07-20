@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.2.1] - 2025-07-19
+=======================
+* 23a3d0b2 - build: fix include paths for bundled SFML [rkitover]
+* 53f5ec7b - build: fix building with OpenAL enabled [rkitover]
+* 3ffbe781 - translations: remove ja_JP, 0% and ja exists [rkitover]
+* ae8bfb4a - Several fixes for windows [danialhorton]
+* bbaf70c0 - build: fix slow CMake vcpkg startup time [rkitover]
+* dca11990 - Fix GBA sound [andyvand]
+* 357eccc6 - build: fix checking if bin pkg host deps installed [rkitover]
+* d0463ddb - Initial tar support [andyvand]
+* a808cfb6 - Update macOS plist [andyvand]
+* 604f5412 - Add LZIP support [andyvand]
+* 6fedbdc5 - Add .xz support [andyvand]
+* 0c91d456 - Add .bz2 file support [andyvand]
+* 3e0541c6 - Update unrar to V7.1.8 [andyvand]
+* 00e48e11 - Fix RAR support [andyvand]
+* 3d8ed512 - Use macOS 10.10 Sparkle [andyvand]
+
 ## [2.2.0] - 2025-07-08
 ========================
 * 865add06 - Adjust throttle limit 450 -> 1000 [rkitover]

@@ -32,7 +32,7 @@
 
 #if defined(SFML_SYSTEM_WINDOWS)
 
-#include "../../../include/SFML/System/Win32/WindowsHeader.hpp"
+#include "../System/Win32/WindowsHeader.hpp"
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
