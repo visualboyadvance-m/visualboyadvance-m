@@ -40,7 +40,7 @@ enum {
 };
 
 enum {
-    SIZE_ROM   = 0x2000000,
+    SIZE_ROM   = 0x6000000, // CART0 + CART1 + CART2
     SIZE_BIOS  = 0x0004000,
     SIZE_IRAM  = 0x0008000,
     SIZE_WRAM  = 0x0040000,

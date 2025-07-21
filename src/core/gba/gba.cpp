@@ -1488,7 +1488,7 @@ int CPULoadRom(const char* szFile)
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    g_rom = (uint8_t*)malloc(SIZE_ROM * 4);
+    g_rom = (uint8_t*)malloc(SIZE_ROM + (SIZE_ROM / 3));
     if (g_rom == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "ROM");
@@ -1614,7 +1614,7 @@ int CPULoadRomData(const char* data, int size)
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    g_rom = (uint8_t*)malloc(SIZE_ROM);
+    g_rom = (uint8_t*)malloc(SIZE_ROM + (SIZE_ROM / 3));
     if (g_rom == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "ROM");
