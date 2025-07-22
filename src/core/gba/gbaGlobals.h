@@ -15,6 +15,23 @@
 #define VERBOSE_AGBPRINT 512
 #define VERBOSE_SOUNDOUTPUT 1024
 
+#define GBA_MATRIX_MAPPINGS_MAX 16
+
+typedef struct GBAMatrix {
+    uint32_t cmd;
+    uint32_t paddr;
+    uint32_t vaddr;
+    uint32_t size;
+
+    uint32_t mappings[GBA_MATRIX_MAPPINGS_MAX];
+} GBAMatrix_t;
+
+extern GBAMatrix_t GBAMatrix;
+
+extern void GBAMatrixReset(GBAMatrix_t *matrix);
+extern void GBAMatrixWrite(GBAMatrix_t *matrix, uint32_t address, uint32_t value);
+extern void GBAMatrixWrite16(GBAMatrix_t *matrix, uint32_t address, uint16_t value);
+
 extern reg_pair reg[45];
 extern bool ioReadable[0x400];
 extern bool N_FLAG;
@@ -32,6 +49,7 @@ extern int customBackdropColor;
 
 extern uint8_t* g_bios;
 extern uint8_t* g_rom;
+extern uint8_t* g_rom2;
 extern uint8_t* g_internalRAM;
 extern uint8_t* g_workRAM;
 extern uint8_t* g_paletteRAM;

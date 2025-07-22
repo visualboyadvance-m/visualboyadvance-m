@@ -26,8 +26,11 @@ bool gba_joybus_active = false;
 // 0x0000 to 0x7FFF: set custom 15 bit color
 int customBackdropColor = -1;
 
+GBAMatrix_t GBAMatrix;
+
 uint8_t* g_bios = 0;
 uint8_t* g_rom = 0;
+uint8_t* g_rom2 = 0;
 uint8_t* g_internalRAM = 0;
 uint8_t* g_workRAM = 0;
 uint8_t* g_paletteRAM = 0;

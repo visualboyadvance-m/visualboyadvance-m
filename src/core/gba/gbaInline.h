@@ -535,6 +535,17 @@ static inline void CPUWriteMemory(uint32_t address, uint32_t value)
 #endif
             WRITE32LE(((uint32_t*)&g_oam[address & 0x3fc]), value);
         break;
+    case 0x08:
+    case 0x09:
+    case 0x0A:
+    case 0x0B:
+    case 0x0C:
+        if (GBAMatrix.size && (address & 0x01FFFF00) == 0x00800100)
+        {
+            GBAMatrixWrite(&GBAMatrix, address & 0x3C, value);
+            break;
+        }
+        goto unwritable;
     case 0x0D:
         if (cpuEEPROMEnabled) {
             eepromWrite(address, DowncastU8(value));
@@ -639,12 +650,26 @@ static inline void CPUWriteHalfWord(uint32_t address, uint16_t value)
         break;
     case 8:
     case 9:
+        if (GBAMatrix.size && (address & 0x01FFFF00) == 0x00800100)
+        {
+            GBAMatrixWrite16(&GBAMatrix, address & 0x3C, value);
+            break;
+        }
         if (address == 0x80000c4 || address == 0x80000c6 || address == 0x80000c8) {
             if (!rtcWrite(address, value))
                 goto unwritable;
         } else if (!agbPrintWrite(address, value))
             goto unwritable;
         break;
+    case 10:
+    case 11:
+    case 12:
+        if (GBAMatrix.size && (address & 0x01FFFF00) == 0x00800100)
+        {
+            GBAMatrixWrite16(&GBAMatrix, address & 0x3C, value);
+            break;
+        }
+        goto unwritable;
     case 13:
         if (cpuEEPROMEnabled) {
             eepromWrite(address, (uint8_t)value);

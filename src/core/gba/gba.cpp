@@ -474,6 +474,7 @@ variable_desc saveGameStruct[] = {
 };
 
 static int romSize = SIZE_ROM;
+static int pristineRomSize = 0;
 
 void gbaUpdateRomSize(int size)
 {
@@ -485,7 +486,7 @@ void gbaUpdateRomSize(int size)
         g_rom = tmp;
 
         uint16_t* temp = (uint16_t*)(g_rom + ((romSize + 1) & ~1));
-        for (int i = (romSize + 1) & ~1; i < SIZE_ROM; i += 2) {
+        for (int i = (romSize + 1) & ~1; i < romSize; i += 2) {
             WRITE16LE(temp, (i >> 1) & 0xFFFF);
             temp++;
         }
@@ -1479,16 +1480,124 @@ void SetMapMasks()
 #endif
 }
 
+#define MAPPING_MASK (GBA_MATRIX_MAPPINGS_MAX - 1)
+
+static void _remapMatrix(GBAMatrix_t *matrix)
+{
+    if (matrix == NULL) {
+        log("Matrix is NULL");
+        return;
+    }
+
+    if (matrix->vaddr & 0xFFFFE1FF) {
+        log("Invalid Matrix mapping: %08X", matrix->vaddr);
+        return;
+    }
+    if (matrix->size & 0xFFFFE1FF) {
+        log("Invalid Matrix size: %08X", matrix->size);
+        return;
+    }
+    if ((matrix->vaddr + matrix->size - 1) & 0xFFFFE000) {
+        log("Invalid Matrix mapping end: %08X", matrix->vaddr + matrix->size);
+        return;
+    }
+    int start = matrix->vaddr >> 9;
+    int size = (matrix->size >> 9) & MAPPING_MASK;
+    int i;
+    for (i = 0; i < size; ++i) {
+        matrix->mappings[(start + i) & MAPPING_MASK] = matrix->paddr + (i << 9);
+    }
+
+    memcpy(&g_rom[matrix->vaddr], &g_rom2[matrix->paddr], matrix->size);
+}
+
+void GBAMatrixReset(GBAMatrix_t *matrix) {
+    if (matrix == NULL) {
+        log("Matrix is NULL");
+        return;
+    }
+
+    memset(matrix->mappings, 0, sizeof(matrix->mappings));
+    matrix->size = 0x1000;
+
+    matrix->paddr = 0;
+    matrix->vaddr = 0;
+    _remapMatrix(matrix);
+    matrix->paddr = 0x200;
+    matrix->vaddr = 0x1000;
+    _remapMatrix(matrix);
+}
+
+void GBAMatrixWrite(GBAMatrix_t *matrix, uint32_t address, uint32_t value)
+{
+    if (matrix == NULL) {
+        log("Matrix is NULL");
+        return;
+    }
+
+    switch (address) {
+    case 0x0:
+        matrix->cmd = value;
+        switch (value) {
+        case 0x01:
+        case 0x11:
+            _remapMatrix(matrix);
+            break;
+        default:
+            log("Unknown Matrix command: %08X", value);
+            break;
+        }
+        return;
+    case 0x4:
+        matrix->paddr = value & 0x03FFFFFF;
+        return;
+    case 0x8:
+        matrix->vaddr = value & 0x007FFFFF;
+        return;
+    case 0xC:
+        if (value == 0) {
+            log("Rejecting Matrix write for size 0");
+            return;
+        }
+        matrix->size = value << 9;
+        return;
+    }
+    log("Unknown Matrix write: %08X:%04X", address, value);
+}
+
+void GBAMatrixWrite16(GBAMatrix_t *matrix, uint32_t address, uint16_t value)
+{
+    if (matrix == NULL) {
+        log("Matrix is NULL");
+        return;
+    }
+
+    switch (address) {
+    case 0x0:
+        GBAMatrixWrite(matrix, address, value | (matrix->cmd & 0xFFFF0000));
+        break;
+    case 0x4:
+        GBAMatrixWrite(matrix, address, value | (matrix->paddr & 0xFFFF0000));
+        break;
+    case 0x8:
+        GBAMatrixWrite(matrix, address, value | (matrix->vaddr & 0xFFFF0000));
+        break;
+    case 0xC:
+        GBAMatrixWrite(matrix, address, value | (matrix->size & 0xFFFF0000));
+        break;
+    }
+}
+
 int CPULoadRom(const char* szFile)
 {
-    romSize = SIZE_ROM;
+    romSize = SIZE_ROM * 4;
     if (g_rom != NULL) {
         CPUCleanUp();
     }
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    g_rom = (uint8_t*)malloc(SIZE_ROM + (SIZE_ROM / 3));
+    g_rom = (uint8_t*)malloc(SIZE_ROM * 4);
     if (g_rom == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "ROM");
@@ -1539,11 +1648,30 @@ int CPULoadRom(const char* szFile)
         }
     }
 
+    memset(&GBAMatrix, 0, sizeof(GBAMatrix));
+    pristineRomSize = romSize;
+
     uint16_t* temp = (uint16_t*)(g_rom + ((romSize + 1) & ~1));
     int i;
-    for (i = (romSize + 1) & ~1; i < SIZE_ROM; i += 2) {
+    for (i = (romSize + 1) & ~1; i < romSize; i += 2) {
         WRITE16LE(temp, (i >> 1) & 0xFFFF);
         temp++;
+    }
+
+    char ident = 0;
+
+    if (romSize > SIZE_ROM) {
+        memcpy(&ident, &g_rom[0xAC], 1);
+
+        if (ident == 'M') {
+            g_rom2 = (uint8_t *)malloc(romSize);
+            memcpy(g_rom2, g_rom, romSize);
+
+            log("GBA Matrix detected");
+            romSize = 0x01000000;
+        } else {
+            romSize = SIZE_ROM;
+        }
     }
 
     g_bios = (uint8_t*)calloc(1, SIZE_BIOS);
@@ -1607,14 +1735,14 @@ int CPULoadRom(const char* szFile)
 
 int CPULoadRomData(const char* data, int size)
 {
-    romSize = SIZE_ROM;
+    romSize = SIZE_ROM * 4;
     if (g_rom != NULL) {
         CPUCleanUp();
     }
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    g_rom = (uint8_t*)malloc(SIZE_ROM + (SIZE_ROM / 3));
+    g_rom = (uint8_t*)malloc(SIZE_ROM * 4);
     if (g_rom == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "ROM");
@@ -1632,11 +1760,30 @@ int CPULoadRomData(const char* data, int size)
     romSize = size % 2 == 0 ? size : size + 1;
     memcpy(whereToLoad, data, size);
 
+    memset(&GBAMatrix, 0, sizeof(GBAMatrix));
+    pristineRomSize = romSize;
+
     uint16_t* temp = (uint16_t*)(g_rom + ((romSize + 1) & ~1));
     int i;
-    for (i = (romSize + 1) & ~1; i < SIZE_ROM; i += 2) {
+    for (i = (romSize + 1) & ~1; i < romSize; i += 2) {
         WRITE16LE(temp, (i >> 1) & 0xFFFF);
         temp++;
+    }
+
+
+    if (romSize > SIZE_ROM) {
+        char ident = 0;
+        memcpy(&ident, &g_rom[0xAC], 1);
+
+        if (ident == 'M') {
+            g_rom2 = (uint8_t *)malloc(romSize);
+            memcpy(g_rom2, g_rom, romSize);
+            romSize = 0x01000000;
+
+            log("GBA Matrix detected");
+        } else {
+            romSize = SIZE_ROM;
+        }
     }
 
     g_bios = (uint8_t*)calloc(1, SIZE_BIOS);
@@ -3686,6 +3833,15 @@ void CPUReset()
     lastTime = systemGetClock();
 
     SWITicks = 0;
+
+    if (pristineRomSize > SIZE_ROM) {
+        char ident = 0;
+        memcpy(&ident, &g_rom[0xAC], 1);
+
+        if (ident == 'M') {
+            GBAMatrixReset(&GBAMatrix);
+        }
+    }
 }
 
 void CPUInterrupt()
