@@ -1669,9 +1669,9 @@ int CPULoadRom(const char* szFile)
         if (ident == 'M') {
             g_rom2 = (uint8_t *)malloc(romSize);
             memcpy(g_rom2, g_rom, romSize);
+            romSize = 0x01000000;
 
             log("GBA Matrix detected");
-            romSize = 0x01000000;
         } else {
             romSize = SIZE_ROM;
         }
@@ -1773,6 +1773,8 @@ int CPULoadRomData(const char* data, int size)
         temp++;
     }
 
+    if (g_rom2 != NULL)
+        free(g_rom2);
 
     if (romSize > SIZE_ROM) {
         char ident = 0;
