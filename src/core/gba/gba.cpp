@@ -1660,6 +1660,9 @@ int CPULoadRom(const char* szFile)
 
     char ident = 0;
 
+    if (g_rom2 != NULL)
+        free(g_rom2);
+
     if (romSize > SIZE_ROM) {
         memcpy(&ident, &g_rom[0xAC], 1);
 
