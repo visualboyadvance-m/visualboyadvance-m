@@ -369,7 +369,7 @@ DIST_ARGS="$DIST_ARGS
     libpsl      -Druntime=no -Dtests=false
     curl        --with-openssl --without-nghttp2 --without-libidn2 --without-librtmp --without-brotli
     libffi      --enable-static
-    libicu      --enable-static --disable-extras --disable-tools --disable-tests --disable-samples --with-library-bits=64
+    libicu      --enable-static --disable-extras --disable-tools --disable-tests --disable-samples --with-library-bits=64 CXXFLAGS=\"\$CXXFLAGS\"
     gettext     --with-included-gettext --with-included-glib --with-included-libcroco --with-included-libunistring --with-included-libxml --disable-curses CPPFLAGS=\"\$CPPFLAGS -DLIBXML_STATIC\"
     pkgconfig   --with-internal-glib --with-libiconv=gnu
     curl        --with-ssl --without-brotli
@@ -1493,8 +1493,8 @@ build_dist() {
     export LIBS="$LIBS $(eval puts "$(dist_extra_libs "$current_dist")")"
 
     if dist_flags "$current_dist" no_sdk_paths_in_flags; then
-        CPPFLAGS=$(echo "$CPPFLAGS" | sed -e 's,-isystem /Library/Developer/[^ ]*,,g')
-        LDFLAGS=$( echo "$LDFLAGS"  | sed -e 's,-[LF]/Library/Developer/[^ ]*,,g')
+        CPPFLAGS=$(echo "$CPPFLAGS" | sed -e 's,-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/[^ ]*,,g')
+        LDFLAGS=$( echo "$LDFLAGS"  | sed -e 's,-[LF]/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/[^ ]*,,g')
     fi
 
     configure_override=$(dist_configure_override "$current_dist")
