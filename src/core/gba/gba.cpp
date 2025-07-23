@@ -476,6 +476,39 @@ variable_desc saveGameStruct[] = {
 static int romSize = SIZE_ROM;
 static int pristineRomSize = 0;
 
+#define MAPPING_MASK (GBA_MATRIX_MAPPINGS_MAX - 1)
+
+static void _remapMatrix(GBAMatrix_t *matrix)
+{
+    if (matrix == NULL) {
+        log("Matrix is NULL");
+        return;
+    }
+
+    if (matrix->vaddr & 0xFFFFE1FF) {
+        log("Invalid Matrix mapping: %08X", matrix->vaddr);
+        return;
+    }
+    if (matrix->size & 0xFFFFE1FF) {
+        log("Invalid Matrix size: %08X", matrix->size);
+        return;
+    }
+    if ((matrix->vaddr + matrix->size - 1) & 0xFFFFE000) {
+        log("Invalid Matrix mapping end: %08X", matrix->vaddr + matrix->size);
+        return;
+    }
+    int start = matrix->vaddr >> 9;
+    int size = (matrix->size >> 9) & MAPPING_MASK;
+    int i;
+    for (i = 0; i < size; ++i) {
+        matrix->mappings[(start + i) & MAPPING_MASK] = matrix->paddr + (i << 9);
+    }
+
+    if ((g_rom2 != NULL) && (g_rom != NULL)) {
+        memcpy(&g_rom[matrix->vaddr], &g_rom2[matrix->paddr], matrix->size);
+    }
+}
+
 void gbaUpdateRomSize(int size)
 {
     // Only change memory block if new size is larger
@@ -1531,39 +1564,6 @@ void SetMapMasks()
     }
     clearBreakRegList();
 #endif
-}
-
-#define MAPPING_MASK (GBA_MATRIX_MAPPINGS_MAX - 1)
-
-static void _remapMatrix(GBAMatrix_t *matrix)
-{
-    if (matrix == NULL) {
-        log("Matrix is NULL");
-        return;
-    }
-
-    if (matrix->vaddr & 0xFFFFE1FF) {
-        log("Invalid Matrix mapping: %08X", matrix->vaddr);
-        return;
-    }
-    if (matrix->size & 0xFFFFE1FF) {
-        log("Invalid Matrix size: %08X", matrix->size);
-        return;
-    }
-    if ((matrix->vaddr + matrix->size - 1) & 0xFFFFE000) {
-        log("Invalid Matrix mapping end: %08X", matrix->vaddr + matrix->size);
-        return;
-    }
-    int start = matrix->vaddr >> 9;
-    int size = (matrix->size >> 9) & MAPPING_MASK;
-    int i;
-    for (i = 0; i < size; ++i) {
-        matrix->mappings[(start + i) & MAPPING_MASK] = matrix->paddr + (i << 9);
-    }
-
-    if ((g_rom2 != NULL) && (g_rom != NULL)) {
-        memcpy(&g_rom[matrix->vaddr], &g_rom2[matrix->paddr], matrix->size);
-    }
 }
 
 void GBAMatrixReset(GBAMatrix_t *matrix) {
