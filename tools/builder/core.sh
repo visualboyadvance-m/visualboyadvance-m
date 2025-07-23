@@ -381,7 +381,7 @@ DIST_ARGS="$DIST_ARGS
     graphviz    --disable-ltdl --without-x --disable-swig CFLAGS=\"-include \$PWD/declspec.h \$CFLAGS\" CC=\"\$CXX\"
     python2     --with-ensurepip=install --with-system-expat
     python3     --with-ensurepip=install --with-system-expat
-    glib        -Dtests=false -Ddtrace=disabled
+    glib        -Dtests=false -Ddtrace=false
     XML-Parser  EXPATINCPATH=\"\$BUILD_ROOT/root/include\" EXPATLIBPATH=\"\$BUILD_ROOT/root/lib\"
     libcroco    --disable-Bsymbolic
     snappy      -DSNAPPY_BUILD_TESTS=OFF -DSNAPPY_BUILD_BENCHMARKS=OFF
