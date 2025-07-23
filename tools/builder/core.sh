@@ -40,7 +40,7 @@ esac
 
 export CPPFLAGS="-F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem \$BUILD_ROOT/root/include $CPPFLAGS${CPPFLAGS:+ } -DCURL_STATICLIB -DGRAPHITE2_STATIC -DFLOAT_APPROX -Diconv=libiconv -Diconv_open=libiconv_open -Diconv_close=libiconv_close"
 export CFLAGS="$CFLAGS${CFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -pthread -lm -O3 -ffast-math -pipe -Wno-error=implicit-int -I/"
-export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -O3 -ffast-math -pipe -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
+export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -O3 -ffast-math -pipe"
 export OBJCXXFLAGS="$OBJCXXFLAGS${OBJCXXFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -O3 -ffast-math -pipe"
 export LDFLAGS="$LDFLAGS${LDFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -pthread -lm -O3 -ffast-math -pipe"
 export STRIP="\${STRIP:-strip}"
@@ -1495,8 +1495,11 @@ build_dist() {
     export LIBS="$LIBS $(eval puts "$(dist_extra_libs "$current_dist")")"
 
     if dist_flags "$current_dist" no_sdk_paths_in_flags; then
-        CPPFLAGS=$(echo "$CPPFLAGS" | sed -e 's,-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/[^ ]*,,g')
-        LDFLAGS=$( echo "$LDFLAGS"  | sed -e 's,-[LF]/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/[^ ]*,,g')
+        local xcode_path=$(xcode-select -p)
+        CPPFLAGS=$(   echo "$CPPFLAGS"    | sed -E "s,-isystem (/Library/Developer|${xcode_path})[^ ]*,,g")
+        CXXFLAGS=$(   echo "$CXXFLAGS"    | sed -E "s,-isystem (/Library/Developer|${xcode_path})[^ ]*,,g")
+        OBJCXXFLAGS=$(echo "$OBJCXXFLAGS" | sed -E "s,-isystem (/Library/Developer|${xcode_path})[^ ]*,,g")
+        LDFLAGS=$(    echo "$LDFLAGS"     | sed -E "s,-[LF](/Library/Developer|${xcode_path})[^ ]*,,g")
     fi
 
     configure_override=$(dist_configure_override "$current_dist")
