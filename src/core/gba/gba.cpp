@@ -645,7 +645,6 @@ unsigned int CPUWriteState(uint8_t* data)
 
         if (ident == 'M') {
             utilWriteMem(data, &GBAMatrix, sizeof(GBAMatrix));
-            log("Saved matrix data");
         }
     }
 
@@ -700,7 +699,12 @@ bool CPUReadState(const uint8_t* data)
 
         if (ident == 'M') {
             utilReadMem(&GBAMatrix, data, sizeof(GBAMatrix));
-            log("Saved matrix data");
+
+            for (int i = 0; i < 16; ++i) {
+                GBAMatrix.paddr = GBAMatrix.mappings[i];
+                GBAMatrix.vaddr = i << 9;
+                _remapMatrix(&GBAMatrix);
+            }
         }
     }
 
@@ -776,7 +780,6 @@ static bool CPUWriteState(gzFile gzFile)
 
         if (ident == 'M') {
             utilGzWrite(gzFile, &GBAMatrix, sizeof(GBAMatrix));
-            log("Saved matrix data");
         }
     }
 
@@ -917,7 +920,12 @@ static bool CPUReadState(gzFile gzFile)
 
         if (ident == 'M') {
             utilGzRead(gzFile, &GBAMatrix, sizeof(GBAMatrix));
-            log("Loaded matrix data");
+
+            for (int i = 0; i < 16; ++i) {
+                GBAMatrix.paddr = GBAMatrix.mappings[i];
+                GBAMatrix.vaddr = i << 9;
+                _remapMatrix(&GBAMatrix);
+            }
         }
     }
 
