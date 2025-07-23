@@ -165,6 +165,8 @@ uint8_t memoryWait32[16] = { 0, 0, 5, 0, 0, 1, 1, 0, 7, 7, 9, 9, 13, 13, 4, 0 };
 uint8_t memoryWaitSeq[16] = { 0, 0, 2, 0, 0, 0, 0, 0, 2, 2, 4, 4, 8, 8, 4, 0 };
 uint8_t memoryWaitSeq32[16] = { 0, 0, 5, 0, 0, 1, 1, 0, 5, 5, 9, 9, 17, 17, 4, 0 };
 
+GBAMatrix_t stateMatrix;
+
 // The videoMemoryWait constants are used to add some waitstates
 // if the opcode access video memory data outside of vblank/hblank
 // It seems to happen on only one ticks for each pixel.
@@ -731,13 +733,7 @@ bool CPUReadState(const uint8_t* data)
         memcpy(&ident, &g_rom[0xAC], 1);
 
         if (ident == 'M') {
-            utilReadMem(&GBAMatrix, data, sizeof(GBAMatrix));
-
-            for (int i = 0; i < 16; ++i) {
-                GBAMatrix.paddr = GBAMatrix.mappings[i];
-                GBAMatrix.vaddr = i << 9;
-                _remapMatrix(&GBAMatrix);
-            }
+            utilReadMem(&stateMatrix, data, sizeof(stateMatrix));
         }
     }
 
@@ -767,6 +763,27 @@ bool CPUReadState(const uint8_t* data)
     }
 
     CPUUpdateRegister(0x204, CPUReadHalfWordQuick(0x4000204));
+
+    if (pristineRomSize > SIZE_ROM) {
+        uint8_t ident = 0;
+        memcpy(&ident, &g_rom[0xAC], 1);
+
+        if (ident == 'M') {
+            GBAMatrix.size = 0x200;
+
+            for (int i = 0; i < 16; ++i) {
+                GBAMatrix.mappings[i] = stateMatrix.mappings[i];
+                GBAMatrix.paddr = GBAMatrix.mappings[i];
+                GBAMatrix.vaddr = i << 9;
+                _remapMatrix(&GBAMatrix);
+            }
+
+            GBAMatrix.cmd = stateMatrix.cmd;
+            GBAMatrix.paddr = stateMatrix.paddr;
+            GBAMatrix.vaddr = stateMatrix.vaddr;
+            GBAMatrix.size = stateMatrix.size;
+        }
+    }
 
     return true;
 }
@@ -952,13 +969,7 @@ static bool CPUReadState(gzFile gzFile)
         memcpy(&ident, &g_rom[0xAC], 1);
 
         if (ident == 'M') {
-            utilGzRead(gzFile, &GBAMatrix, sizeof(GBAMatrix));
-
-            for (int i = 0; i < 16; ++i) {
-                GBAMatrix.paddr = GBAMatrix.mappings[i];
-                GBAMatrix.vaddr = i << 9;
-                _remapMatrix(&GBAMatrix);
-            }
+            utilGzRead(gzFile, &stateMatrix, sizeof(stateMatrix));
         }
     }
 
@@ -1011,6 +1022,27 @@ static bool CPUReadState(gzFile gzFile)
     }
 
     CPUUpdateRegister(0x204, CPUReadHalfWordQuick(0x4000204));
+
+    if (pristineRomSize > SIZE_ROM) {
+        uint8_t ident = 0;
+        memcpy(&ident, &g_rom[0xAC], 1);
+
+        if (ident == 'M') {
+            GBAMatrix.size = 0x200;
+
+            for (int i = 0; i < 16; ++i) {
+                GBAMatrix.mappings[i] = stateMatrix.mappings[i];
+                GBAMatrix.paddr = GBAMatrix.mappings[i];
+                GBAMatrix.vaddr = i << 9;
+                _remapMatrix(&GBAMatrix);
+            }
+
+            GBAMatrix.cmd = stateMatrix.cmd;
+            GBAMatrix.paddr = stateMatrix.paddr;
+            GBAMatrix.vaddr = stateMatrix.vaddr;
+            GBAMatrix.size = stateMatrix.size;
+        }
+    }
 
     return true;
 }
