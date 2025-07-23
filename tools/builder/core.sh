@@ -328,7 +328,7 @@ DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
 "
 
 DIST_BUILD_OVERRIDES="$DIST_BUILD_OVERRIDES
-    7zip           cd CPP/7zip/Bundles/Alone2; make -j\$NUM_CPUS -f ../../cmpl_\${GCC_OR_CLANG}.mak CC=\"\$CC\" CXX=\"\$CXX\" CFLAGS=\"\$CPPFLAGS \$CFLAGS -c\" CXXFLAGS=\"\$CPPFLAGS \$CXXFLAGS -c\" LFLAGS=\"\$LDFLAGS\" O=. PROG=7z && cp 7z \$BUILD_ROOT/root/bin
+    7zip           cd CPP/7zip/Bundles/Alone2; make -j\$NUM_CPUS -f ../../cmpl_\${GCC_OR_CLANG}.mak CC=\"\$CC\" CXX=\"\$CXX\" CFLAGS=\"\$CPPFLAGS \$CFLAGS -c\" CXXFLAGS=\"\$CXXFLAGS -c\" LFLAGS=\"\$LDFLAGS\" O=. PROG=7z && cp 7z \$BUILD_ROOT/root/bin
     c2man          ./Configure -de -Dprefix=/usr -Dmansrc=/usr/share/man/man1 -Dcc=\"\$CC\"; \
                    sed -i.bak \"s|/[^ ][^ ]*/libfl[.][^ ]*|-L\$BUILD_ROOT/root/lib -lfl|\" Makefile; \
                    \$MAKE -j\$NUM_CPUS; \
