@@ -2841,7 +2841,7 @@ build_project() {
     # Release build.
     puts "${NL}[32mBuilding Release...[0m${NL}${NL}"
     cd release
-    echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DENABLE_FAUDIO=ON -DENABLE_FFMPEG=ON -DENABLE_GENERIC_FILE_DIALOGS=ON -DVBAM_STATIC=ON -DENABLE_LTO=${lto} -DUPSTREAM_RELEASE=TRUE $CMAKE_ARGS $PROJECT_ARGS -G Ninja $@
+    echo_eval_run PATH="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin:$PATH" cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DENABLE_FAUDIO=ON -DENABLE_FFMPEG=ON -DENABLE_GENERIC_FILE_DIALOGS=ON -DVBAM_STATIC=ON -DENABLE_LTO=${lto} -DUPSTREAM_RELEASE=TRUE $CMAKE_ARGS $PROJECT_ARGS -G Ninja $@
     run_ninja
     dist_post_build project
     cd ..
@@ -2849,7 +2849,7 @@ build_project() {
     # Debug build.
     puts "${NL}[32mBuilding Debug...[0m${NL}${NL}"
     cd debug
-    echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DENABLE_FAUDIO=ON -DENABLE_FFMPEG=ON -DENABLE_GENERIC_FILE_DIALOGS=ON -DVBAM_STATIC=ON -DENABLE_LTO=${lto} -DUPSTREAM_RELEASE=TRUE $CMAKE_ARGS $PROJECT_ARGS -DCMAKE_BUILD_TYPE=Debug -G Ninja $@
+    echo_eval_run PATH="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin:$PATH" cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DENABLE_FAUDIO=ON -DENABLE_FFMPEG=ON -DENABLE_GENERIC_FILE_DIALOGS=ON -DVBAM_STATIC=ON -DENABLE_LTO=${lto} -DUPSTREAM_RELEASE=TRUE $CMAKE_ARGS $PROJECT_ARGS -DCMAKE_BUILD_TYPE=Debug -G Ninja $@
     run_ninja
     dist_post_build project
     cd ..
