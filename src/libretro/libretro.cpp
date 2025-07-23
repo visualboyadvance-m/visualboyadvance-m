@@ -1632,12 +1632,26 @@ bool retro_load_game(const struct retro_game_info *game)
       desc[1].start=0x02000000; desc[1].select=0xFF000000; desc[1].len=0x40000;   desc[1].ptr=g_workRAM;//slow WRAM
       /* TODO: if SRAM is flash, use start=0 addrspace="S" instead */
       desc[2].start=0x0E000000; desc[2].select=0;          desc[2].len=g_flashSize; desc[2].ptr=flashSaveMemory;//SRAM
-      desc[3].start=0x08000000; desc[3].select=0;          desc[3].len=romSize;   desc[3].ptr=g_rom;//ROM
-      desc[3].flags=RETRO_MEMDESC_CONST;
-      desc[4].start=0x0A000000; desc[4].select=0;          desc[4].len=romSize;   desc[4].ptr=g_rom;//ROM mirror 1
-      desc[4].flags=RETRO_MEMDESC_CONST;
-      desc[5].start=0x0C000000; desc[5].select=0;          desc[5].len=romSize;   desc[5].ptr=g_rom;//ROM mirror 2
-      desc[5].flags=RETRO_MEMDESC_CONST;
+
+      char ident = 0;
+      memcpy(&ident, &g_rom[0xAC], 1);
+
+      if (ident == 'M') {
+         desc[3].start=0x08000000; desc[3].select=0;          desc[3].len=SIZE_ROM;  desc[3].ptr=g_rom;//ROM
+         desc[3].flags=RETRO_MEMDESC_CONST;
+         desc[4].start=0x0A000000; desc[4].select=0;          desc[4].len=SIZE_ROM;  desc[4].ptr=g_rom;//ROM mirror 1
+         desc[4].flags=RETRO_MEMDESC_CONST;
+         desc[5].start=0x0C000000; desc[5].select=0;          desc[5].len=SIZE_ROM;  desc[5].ptr=g_rom;//ROM mirror 2
+         desc[5].flags=RETRO_MEMDESC_CONST;
+      } else {
+         desc[3].start=0x08000000; desc[3].select=0;          desc[3].len=romSize;   desc[3].ptr=g_rom;//ROM
+         desc[3].flags=RETRO_MEMDESC_CONST;
+         desc[4].start=0x0A000000; desc[4].select=0;          desc[4].len=romSize;   desc[4].ptr=g_rom;//ROM mirror 1
+         desc[4].flags=RETRO_MEMDESC_CONST;
+         desc[5].start=0x0C000000; desc[5].select=0;          desc[5].len=romSize;   desc[5].ptr=g_rom;//ROM mirror 2
+         desc[5].flags=RETRO_MEMDESC_CONST;
+      }
+
       desc[6].start=0x00000000; desc[6].select=0;          desc[6].len=0x4000;    desc[6].ptr=g_bios;//BIOS
       desc[6].flags=RETRO_MEMDESC_CONST;
       desc[7].start=0x06000000; desc[7].select=0xFF000000; desc[7].len=0x18000;   desc[7].ptr=g_vram;//VRAM
@@ -1732,7 +1746,7 @@ bool retro_load_game(const struct retro_game_info *game)
 
    update_input_descriptors();    // Initialize input descriptors and info
    update_variables(false);
-   uint8_t* state_buf = (uint8_t*)malloc(2000000);
+   uint8_t* state_buf = (uint8_t*)malloc(2000080);
    serialize_size = core->emuWriteState(state_buf);
    free(state_buf);
 

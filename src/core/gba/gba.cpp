@@ -639,6 +639,16 @@ unsigned int CPUWriteState(uint8_t* data)
     soundSaveGame(data);
     rtcSaveGame(data);
 
+    if (pristineRomSize > SIZE_ROM) {
+        uint8_t ident = 0;
+        memcpy(&ident, &g_rom[0xAC], 1);
+
+        if (ident == 'M') {
+            utilWriteMem(data, &GBAMatrix, sizeof(GBAMatrix));
+            log("Saved matrix data");
+        }
+    }
+
     return (ptrdiff_t)data - (ptrdiff_t)orig;
 }
 
@@ -683,6 +693,16 @@ bool CPUReadState(const uint8_t* data)
     flashReadGame(data);
     soundReadGame(data);
     rtcReadGame(data);
+
+    if (pristineRomSize > SIZE_ROM) {
+        uint8_t ident = 0;
+        memcpy(&ident, &g_rom[0xAC], 1);
+
+        if (ident == 'M') {
+            utilReadMem(&GBAMatrix, data, sizeof(GBAMatrix));
+            log("Saved matrix data");
+        }
+    }
 
     //// Copypasta stuff ...
     // set pointers!
@@ -749,6 +769,16 @@ static bool CPUWriteState(gzFile gzFile)
 
     // version 1.5
     rtcSaveGame(gzFile);
+
+    if (pristineRomSize > SIZE_ROM) {
+        uint8_t ident = 0;
+        memcpy(&ident, &g_rom[0xAC], 1);
+
+        if (ident == 'M') {
+            utilGzWrite(gzFile, &GBAMatrix, sizeof(GBAMatrix));
+            log("Saved matrix data");
+        }
+    }
 
     return true;
 }
@@ -879,6 +909,16 @@ static bool CPUReadState(gzFile gzFile)
     }
     if (version > SAVE_GAME_VERSION_6) {
         rtcReadGame(gzFile);
+    }
+
+    if (pristineRomSize > SIZE_ROM) {
+        uint8_t ident = 0;
+        memcpy(&ident, &g_rom[0xAC], 1);
+
+        if (ident == 'M') {
+            utilGzRead(gzFile, &GBAMatrix, sizeof(GBAMatrix));
+            log("Loaded matrix data");
+        }
     }
 
     if (version <= SAVE_GAME_VERSION_7) {
@@ -1390,6 +1430,11 @@ void CPUCleanUp()
         g_rom = NULL;
     }
 
+    if (g_rom2 != NULL) {
+        free(g_rom2);
+        g_rom2 = NULL;
+    }
+
     if (g_vram != NULL) {
         free(g_vram);
         g_vram = NULL;
@@ -1508,7 +1553,9 @@ static void _remapMatrix(GBAMatrix_t *matrix)
         matrix->mappings[(start + i) & MAPPING_MASK] = matrix->paddr + (i << 9);
     }
 
-    memcpy(&g_rom[matrix->vaddr], &g_rom2[matrix->paddr], matrix->size);
+    if ((g_rom2 != NULL) && (g_rom != NULL)) {
+        memcpy(&g_rom[matrix->vaddr], &g_rom2[matrix->paddr], matrix->size);
+    }
 }
 
 void GBAMatrixReset(GBAMatrix_t *matrix) {
@@ -1660,15 +1707,19 @@ int CPULoadRom(const char* szFile)
 
     char ident = 0;
 
-    if (g_rom2 != NULL)
-        free(g_rom2);
-
     if (romSize > SIZE_ROM) {
         memcpy(&ident, &g_rom[0xAC], 1);
 
         if (ident == 'M') {
-            g_rom2 = (uint8_t *)malloc(romSize);
-            memcpy(g_rom2, g_rom, romSize);
+            g_rom2 = (uint8_t*)malloc(SIZE_ROM * 4);
+            if (!utilLoad(szFile,
+                    utilIsGBAImage,
+                    g_rom2,
+                    romSize)) {
+                free(g_rom2);
+                g_rom2 = NULL;
+            }
+
             romSize = 0x01000000;
 
             log("GBA Matrix detected");
@@ -1773,16 +1824,13 @@ int CPULoadRomData(const char* data, int size)
         temp++;
     }
 
-    if (g_rom2 != NULL)
-        free(g_rom2);
-
     if (romSize > SIZE_ROM) {
         char ident = 0;
         memcpy(&ident, &g_rom[0xAC], 1);
 
         if (ident == 'M') {
-            g_rom2 = (uint8_t *)malloc(romSize);
-            memcpy(g_rom2, g_rom, romSize);
+            g_rom2 = (uint8_t *)malloc(SIZE_ROM * 4);
+            memcpy(g_rom2, data, size);
             romSize = 0x01000000;
 
             log("GBA Matrix detected");
