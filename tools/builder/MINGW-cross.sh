@@ -28,7 +28,7 @@ export BUILD_ROOT="$HOME/vbam-build-mingw${target_bits}"
 do_not_remove_dists=
 
 host_dists='
-    unzip zip cmake autoconf autoconf-archive automake getopt m4 gsed bison
+    7zip cmake autoconf autoconf-archive automake getopt m4 gsed bison
     flex-2.6.3 flex c2man docbook2x libtool help2man texinfo xmlto pkgconfig
     nasm yasm xorg-macros dejavu liberation urw graphviz docbook4.2
     docbook4.1.2 docbook4.3 docbook4.4 docbook4.5 docbook5.0 docbook-xsl

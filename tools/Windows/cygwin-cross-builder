@@ -31,8 +31,6 @@ export CMAKE_REQUIRED_ARGS="-DGETTEXT_MSGFMT_EXECUTABLE:FILEPATH=\"\$BUILD_ROOT/
 
 . "${0%/*}/../builder/mingw-cross.sh"
 
-table_line_append DIST_MAKE_ARGS unzip 'CFLAGS="$CFLAGS -DNO_LCHMOD"'
-
 # FIXME: problems with autopoint that need to be sorted
 table_line_remove DISTS flex
 

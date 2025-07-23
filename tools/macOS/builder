@@ -57,7 +57,7 @@ export MACOSX_DEPLOYMENT_TARGET=10.10
 
 if [ -n "$APPLE_SILICON" ]; then
     if [ -n "$intel_target" ]; then
-        target_build_arch='-target x86_64-apple-macos10.15 -march=core2 -mtune=skylake'
+        target_build_arch="-target x86_64-apple-macos${MACOSX_DEPLOYMENT_TARGET}"
         target_cpu=x86_64
     else
         export MACOSX_DEPLOYMENT_TARGET=11.0 # Big Sur
@@ -126,6 +126,7 @@ export PATH="$best_llvm_path/bin:$BREW_PREFIX/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export CC="$clang_path/bin/clang $target_build_arch"
 export CPP="$clang_path/bin/clang -E $target_build_arch"
 export CXX="$clang_path/bin/clang++ $target_build_arch"
+export ARCHFLAGS="$target_build_arch"
 export CPPFLAGS="-isystem /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -DICONV_CONST="
 export CFLAGS="-framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument"
 export CXXFLAGS="-framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument"
@@ -143,6 +144,9 @@ export TAR=tar
 
 if [ "$target_cpu" = i386 ]; then
     export CONFIGURE_REQUIRED_ARGS='--host=i386-apple-darwin --build=x86_64-apple-darwin'
+elif [ -n "$intel_target" ]; then
+    export CONFIGURE_REQUIRED_ARGS='--host=x86_64-apple-darwin --build=arm64-apple-darwin'
+    export CMAKE_BASE_ARGS="-DCMAKE_OSX_ARCHITECTURES=x86_64"
 fi
 
 . "$(dirname "$0")/../builder/core.sh"
@@ -151,15 +155,11 @@ fi
 BUILD_ENV=$(printf '%s' "$BUILD_ENV" | sed 's/ -lm / /g')
 export BUILD_ENV
 
-for dist in XML-Parser c2man cmake cmake flex getopt graphviz libffi libgcrypt libsecret m4 ninja python2 shared-mime-info zip; do
+for dist in XML-Parser c2man cmake cmake ccache flex getopt graphviz libffi libgcrypt libsecret m4 ninja python2 shared-mime-info swig; do
     table_line_remove DISTS $dist
 done
 
 table_line_replace DIST_PREFIX libuuid /usr/stow/libuuid
-
-table_line_append DIST_PRE_BUILD zip " \
-    sed -i.bak 's/-DZMEM//g; s/-DNO_DIR//g;' unix/configure \
-"
 
 if [ "$target_cpu" = i386 ]; then
     table_line_replace DIST_CONFIGURE_OVERRIDES openssl './Configure darwin-i386-cc no-shared --prefix=/usr --openssldir=/etc/ssl'
@@ -186,8 +186,6 @@ table_line_append DIST_EXTRA_CFLAGS libvorbis "-include $stdint_h"
 table_line_append DIST_EXTRA_CFLAGS libtheora "-include $stdint_h"
 
 table_line_append DIST_EXTRA_CFLAGS ffmpeg    "-include $stdint_h"
-
-table_line_append DIST_MAKE_ARGS unzip "LD=clang"
 
 # -Wl,-no_compact_unwind must be passed in LDFLAGS to openssl
 table_line_append DIST_MAKE_ARGS openssl "LDFLAGS=\"\$LDFLAGS\""
@@ -232,6 +230,7 @@ table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg "--disable-videotoolbox --extr
 #table_line_append DIST_PATCHES ffmpeg "-p0 https://gist.githubusercontent.com/rkitover/db75d083b74617b186eec11965c1da74/raw/20da2f8c6d8c02ce284096c5e805ae671351cc6e/ffmpeg-macos10-7.patch"
 
 table_line_append DIST_PATCHES glib "-p0 https://gist.githubusercontent.com/rkitover/100b6ecf6e1c049aa32975be22395c4e/raw/abab7c71458c42d6750f2dec9b913ba085834fce/static-libintle-macos-glib.patch"
+table_line_append DIST_PATCHES glib "-p0 https://gist.githubusercontent.com/rkitover/04899f39a107e4f03ecc66ea1be41a4f/raw/4d3e552b513d8c9b8169f96a9d4035e7c67e6d15/glib-old-macos.patch"
 
 if [ -n "$APPLE_SILICON" ] && [ "$target_cpu" != ARM64 ]; then
     table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg '--disable-asm'

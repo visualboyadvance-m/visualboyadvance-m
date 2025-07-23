@@ -164,31 +164,6 @@ if mime_info_libs=$(table_line DIST_EXTRA_LIBS shared-mime-info); then
     table_line_replace DIST_EXTRA_LIBS shared-mime-info "$(puts "$mime_info_libs" | sed 's/-ldl//g; s/-lresolv//g;')"
 fi
 
-table_line_remove  DIST_CONFIGURE_OVERRIDES unzip
-table_line_remove  DIST_PRE_BUILD           unzip
-
-table_line_replace DIST_MAKE_ARGS         unzip '-f win32/Makefile.gcc NOASM=1 CC_CPU_OPT='
-table_line_replace DIST_INSTALL_OVERRIDES unzip 'cp -af $(find . -name "*.exe") "$BUILD_ROOT/root/bin"'
-
-table_line_replace DIST_PRE_BUILD unzip ":; \
-    sed -i.bak 's,#include \"../unzip\\.h\",#include <windows.h>,; \
-                t; \
-                s,#include <windows.h>,#include \"../unzip.h\",' win32/win32.c win32/nt.c; \
-"
-
-table_line_append  DIST_PATCHES zip 'https://gist.githubusercontent.com/rkitover/17e4c90185b7ad533e848b6230a90b8d/raw/434e0f74c872a928e77b93bdbf4ee9a1140fe879/zip-mingw.patch'
-
-table_line_remove  DIST_CONFIGURE_OVERRIDES zip
-table_line_remove  DIST_PRE_BUILD           zip
-
-table_line_replace DIST_MAKE_ARGS         zip '-f win32/Makefile.gcc'
-table_line_replace DIST_INSTALL_OVERRIDES zip 'cp -af *.exe "$BUILD_ROOT/root/bin"'
-
-table_line_replace DIST_POST_BUILD unzip ":; \
-    mkdir -p \"\$BUILD_ROOT/root/bin\"; \
-    cp -a \"\$BUILD_ROOT/dists/unzip\"/*.exe \"\$BUILD_ROOT/root/bin\"; \
-"
-
 table_line_replace DIST_CONFIGURE_OVERRIDES openssl "$(table_line DIST_CONFIGURE_OVERRIDES openssl | sed 's,^./config ,./Configure Cygwin-x86_64 ,')"
 
 builder "$@"
