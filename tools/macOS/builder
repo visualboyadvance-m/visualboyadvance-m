@@ -230,7 +230,7 @@ table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg "--disable-videotoolbox --extr
 #table_line_append DIST_PATCHES ffmpeg "-p0 https://gist.githubusercontent.com/rkitover/db75d083b74617b186eec11965c1da74/raw/20da2f8c6d8c02ce284096c5e805ae671351cc6e/ffmpeg-macos10-7.patch"
 
 table_line_append DIST_PATCHES glib "-p0 https://gist.githubusercontent.com/rkitover/100b6ecf6e1c049aa32975be22395c4e/raw/abab7c71458c42d6750f2dec9b913ba085834fce/static-libintle-macos-glib.patch"
-table_line_append DIST_PATCHES glib "-p0 https://gist.githubusercontent.com/rkitover/04899f39a107e4f03ecc66ea1be41a4f/raw/4d3e552b513d8c9b8169f96a9d4035e7c67e6d15/glib-old-macos.patch"
+table_line_append DIST_PATCHES glib "-p0 https://gist.githubusercontent.com/andyvand/7dedc31c8a9a46113e05dd887bef6f92/raw/937c6b795a2bd359cece09736ea1711349f3101e/glib-old-macos.patch"
 
 if [ -n "$APPLE_SILICON" ] && [ "$target_cpu" != ARM64 ]; then
     table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg '--disable-asm'
