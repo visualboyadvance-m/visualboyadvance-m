@@ -122,9 +122,9 @@ DISTS=$DISTS'
     openssl         https://github.com/openssl/openssl/releases/download/openssl-3.5.0/openssl-3.5.0.tar.gz     lib/libssl.a
     libunistring    https://ftp.gnu.org/gnu/libunistring/libunistring-1.3.tar.xz                                lib/libunistring.a
     libpsl          https://github.com/rockdaboot/libpsl/archive/refs/heads/master.zip                          lib/libpsl.a
+    zstd            https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz                 lib/libzstd.a
     curl            https://github.com/curl/curl/releases/download/curl-8_13_0/curl-8.13.0.tar.bz2              lib/libcurl.a
     cmake           https://github.com/Kitware/CMake/releases/download/v4.0.1/cmake-4.0.1.tar.gz                bin/cmake
-    zstd            https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz                 lib/libzstd.a
     libdeflate      https://github.com/ebiggers/libdeflate/releases/download/v1.23/libdeflate-1.23.tar.gz       lib/libdeflate.a
     hiredis         https://github.com/redis/hiredis/archive/refs/tags/v1.2.0.tar.gz                            lib/libhiredis.a
     ccache          https://github.com/ccache/ccache/releases/download/v4.11.2/ccache-4.11.2.tar.xz             bin/ccache
@@ -298,6 +298,7 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
 "
 
 DIST_POST_BUILD="$DIST_POST_BUILD
+    giflib          cp -f libutil.a \"\$BUILD_ROOT/root/lib\"
     pkgconf         ln -sf \"\$BUILD_ROOT/root/bin/pkgconf\" \"\$BUILD_ROOT/root/bin/pkg-config\";
     ccache          setup_ccache
     harfbuzz        rebuild_dist freetype -Dharfbuzz=enabled;
@@ -372,7 +373,6 @@ DIST_ARGS="$DIST_ARGS
     libicu      --enable-static --disable-extras --disable-tools --disable-tests --disable-samples --with-library-bits=64 CXXFLAGS=\"\$CXXFLAGS\"
     gettext     --with-included-gettext --with-included-glib --with-included-libcroco --with-included-libunistring --with-included-libxml --disable-curses CPPFLAGS=\"\$CPPFLAGS -DLIBXML_STATIC\"
     pkgconfig   --with-internal-glib --with-libiconv=gnu
-    curl        --with-ssl --without-brotli
     pcre        --enable-utf --enable-unicode-properties --enable-pcre16 --enable-pcre32 --enable-jit
     pcre2       --enable-utf8 --enable-pcre2-8 --enable-pcre2-16 --enable-pcre2-32 --enable-unicode-properties --enable-pcregrep-libz --enable-pcregrep-libbz2 --enable-jit
     libxslt     --without-python --without-crypto
@@ -400,6 +400,7 @@ DIST_ARGS="$DIST_ARGS
     vidstab     -DUSE_OMP=NO
     sdl3        -DSDL_CAMERA=OFF
     libx264     --enable-static --enable-pic
+    libwebp     -DCMAKE_EXE_LINKER_FLAGS=\"-lutil\"
     libx265     -DHIGH_BIT_DEPTH=ON -DENABLE_ASSEMBLY=OFF -DENABLE_CLI=OFF
     wxwidgets   -DwxUSE_LIBJPEG=sys -DwxUSE_LIBPNG=sys -DwxUSE_LIBTIFF=sys -DwxUSE_LIBWEBP=sys -DwxUSE_REGEX=sys
 "
