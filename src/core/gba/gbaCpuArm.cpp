@@ -26,6 +26,12 @@ static int clockTicks;
 
 static INSN_REGPARM void armUnknownInsn(uint32_t opcode)
 {
+    if ((opcode & 0xFFC00000) == 0xEE800000) {
+        if (systemVerbose & VERBOSE_UNDEFINED) {
+            log("Hit Wii U VC opcode: %08x", opcode);
+        }
+        return;
+    }
 #ifdef GBA_LOGGING
     if (systemVerbose & VERBOSE_UNDEFINED) {
         log("Undefined ARM instruction %08x at %08x\n", opcode,

@@ -33,6 +33,12 @@ static int clockTicks;
 
 static INSN_REGPARM void thumbUnknownInsn(uint32_t opcode)
 {
+    if ((opcode & 0xFFC0) == 0xE800) {
+        if (systemVerbose & VERBOSE_UNDEFINED) {
+            log("Hit Wii U VC opcode: %08x", opcode);
+        }
+        return;
+    }
 #ifdef GBA_LOGGING
     if (systemVerbose & VERBOSE_UNDEFINED)
         log("Undefined THUMB instruction %04x at %08x\n", opcode, armNextPC - 2);
