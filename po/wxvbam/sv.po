@@ -1577,23 +1577,23 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:564
 msgid "Mute sound during speedup"
-msgstr ""
+msgstr "Inget ljud under uppsnabbning"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:565
 msgid "Use the specified BIOS file for Game Boy"
-msgstr ""
+msgstr "Använd angiven BIOS-fil för Game Boy"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:566
 msgid "Use the specified BIOS file"
-msgstr ""
+msgstr "Använd angiven BIOS-fil"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:568
 msgid "Use the specified BIOS file for Game Boy Color"
-msgstr ""
+msgstr "Använd angiven BIOS-fil för Game Boy Color"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:569
 msgid "Wait for vertical sync"
-msgstr ""
+msgstr "Vänta på vertikal synk"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:572
 msgid "Enter fullscreen mode at startup"
@@ -1613,27 +1613,27 @@ msgstr "Fönsterbredd vid uppstart"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:576
 msgid "Window axis X position at startup"
-msgstr ""
+msgstr "Fönstrets X-axelposition vid uppstart"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:577
 msgid "Window axis Y position at startup"
-msgstr ""
+msgstr "Fönstrets Y-axelposition vid uppstart"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:581
 msgid "Capture key events while on background"
-msgstr ""
+msgstr "Fånga tangenthändelser när i bakgrunden"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:583
 msgid "Capture joy events while on background"
-msgstr ""
+msgstr "Fånga spakhändelser när i bakgrunden"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:584
 msgid "Hide menu bar when mouse is inactive"
-msgstr ""
+msgstr "Dölj menyraden när musen är inaktiv"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:586
 msgid "Suspend screensaver when game is running"
-msgstr ""
+msgstr "Förhindra skärmsläckaren när spelet är igång"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:589
 msgid "Sound API; if unsupported, default API will be used"
@@ -1669,7 +1669,7 @@ msgstr "Game Boy-ekoeffekt (%)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:598
 msgid "Enable Game Boy sound effects"
-msgstr ""
+msgstr "Aktivera Game Boy-ljudeffekter"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:599
 msgid "Game Boy stereo effect (%)"
@@ -1685,7 +1685,7 @@ msgstr "Samplingsfrekvens för ljud (kHz)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:602
 msgid "Use DirectSound hardware acceleration"
-msgstr ""
+msgstr "Använd DirectSound hårdvaruacceleration"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:603
 msgid "Upmix stereo to surround"
@@ -1702,7 +1702,7 @@ msgstr "Ljudvolym (%)"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:754
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
-msgstr ""
+msgstr "Ogiltigt värde %s för alternativet %s; giltiga värden är %s"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:321
 #, c-format
@@ -1861,11 +1861,11 @@ msgstr "Ctrl+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:100
 msgid "Rawctrl+"
-msgstr ""
+msgstr "Rawctrl+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:104
 msgid "Shift+"
-msgstr ""
+msgstr "Skift+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:107
 msgid "Meta+"
