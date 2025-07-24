@@ -84,14 +84,14 @@ if(APPLE)
     include(MetalShaderSupport)
 
     execute_process(
-        COMMAND xcode-select -p
+        COMMAND xcrun -f metal
         OUTPUT_STRIP_TRAILING_WHITESPACE
-        OUTPUT_VARIABLE xcode_path
+        OUTPUT_VARIABLE CMAKE_Metal_COMPILER
     )
 
-    list(APPEND CMAKE_PROGRAM_PATH "${xcode_path}/Toolchains/XcodeDefault.xctoolchain/usr/bin")
-
-    check_language(Metal)
+    if(NOT CMAKE_Metal_COMPILER)
+        check_language(Metal)
+    endif()
 
     if(CMAKE_Metal_COMPILER)
         enable_language(Metal)
