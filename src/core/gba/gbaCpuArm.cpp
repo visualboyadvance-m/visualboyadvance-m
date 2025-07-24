@@ -28,7 +28,7 @@ static INSN_REGPARM void armUnknownInsn(uint32_t opcode)
 {
     if ((opcode & 0xFFC00000) == 0xEE800000) {
         if (systemVerbose & VERBOSE_UNDEFINED) {
-            log("Hit Wii U VC opcode: %08x", opcode);
+            log("Hit Wii U VC opcode: %08x at %0Xx\n", opcode, armNextPC - 4);
         }
         return;
     }

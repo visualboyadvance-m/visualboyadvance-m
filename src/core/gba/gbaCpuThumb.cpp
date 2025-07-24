@@ -35,7 +35,7 @@ static INSN_REGPARM void thumbUnknownInsn(uint32_t opcode)
 {
     if ((opcode & 0xFFC0) == 0xE800) {
         if (systemVerbose & VERBOSE_UNDEFINED) {
-            log("Hit Wii U VC opcode: %08x", opcode);
+            log("Hit Wii U VC opcode: %08x at %08x\n", opcode, armNextPC - 2);
         }
         return;
     }
