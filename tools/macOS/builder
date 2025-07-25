@@ -156,7 +156,7 @@ fi
 BUILD_ENV=$(printf '%s' "$BUILD_ENV" | sed 's/ -lm / /g')
 export BUILD_ENV
 
-for dist in XML-Parser c2man cmake cmake ccache flex getopt graphviz libffi libgcrypt libsecret m4 ninja python2 shared-mime-info swig; do
+for dist in XML-Parser c2man cmake cmake ccache flex getopt glib graphviz libffi libgcrypt libsecret m4 ninja python2 shared-mime-info swig; do
     table_line_remove DISTS $dist
 done
 
@@ -209,10 +209,6 @@ table_line_append  DIST_PRE_BUILD       libmodplug " \
     sed -i.bak '/-mmacosx-version-min=/d' configure.ac; \
     sed -i.bak 's/-lstdc++/-lc++/g' libmodplug.pc.in; \
 "
-
-if [ -z "$APPLE_SILICON" ]; then
-    table_line_replace DISTS glib 'https://download.gnome.org/sources/glib/2.78/glib-2.78.3.tar.xz     lib/libglib-2.0.a'
-fi
 
 table_line_append DIST_PRE_BUILD libzmq "sed -i.bak 's/-lstdc++/-lc++/g' src/libzmq.pc.in"
 table_line_append DIST_PRE_BUILD ffmpeg "sed -i.bak 's/-lstdc++/-lc++/g' configure"

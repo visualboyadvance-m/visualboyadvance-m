@@ -38,7 +38,7 @@ case "\$CC" in
         ;;
 esac
 
-export CPPFLAGS="-F$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem \$BUILD_ROOT/root/include -I$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include $CPPFLAGS${CPPFLAGS:+ } -DCURL_STATICLIB -DGRAPHITE2_STATIC -DFLOAT_APPROX -Diconv=libiconv -Dicing=libiconv -Diconv_open=libiconv_open -Diconv_close=libiconv_close"
+export CPPFLAGS="-isystem \$BUILD_ROOT/root/include $CPPFLAGS${CPPFLAGS:+ } -DCURL_STATICLIB -DGRAPHITE2_STATIC -DFLOAT_APPROX -Diconv=libiconv -Diconv_open=libiconv_open -Diconv_close=libiconv_close"
 export CFLAGS="$CFLAGS${CFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -pthread -lm -O3 -ffast-math -pipe -Wno-error=implicit-int"
 export CXXFLAGS="$CXXFLAGS${CXXFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -O3 -ffast-math -pipe"
 export OBJCXXFLAGS="$OBJCXXFLAGS${OBJCXXFLAGS:+ }-fPIC -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -pthread -lm -O3 -ffast-math -pipe"
@@ -180,7 +180,7 @@ DISTS=$DISTS'
     XML-Parser      https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.47.tar.gz                      perl5/man/man3/XML*Parser.3*
     intltool        https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz                bin/intltoolize
     ninja           https://github.com/ninja-build/ninja/archive/v1.12.1.tar.gz                                 bin/ninja
-    glib            https://download.gnome.org/sources/glib/2.85/glib-2.85.1.tar.xz                             lib/libglib-2.0.a
+    glib            https://download.gnome.org/sources/glib/2.85/glib-2.85.2.tar.xz                             lib/libglib-2.0.a
     libgpg-error    https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.54.tar.bz2                         lib/libgpg-error.a
     libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.11.0.tar.bz2                             lib/libgcrypt.a
     libsecret       https://gitlab.gnome.org/GNOME/libsecret/-/archive/0.21.7/libsecret-0.21.7.tar.bz2          lib/libsecret-1.a
@@ -232,7 +232,6 @@ export CMAKE_ARGS="$CMAKE_BASE_ARGS $CMAKE_ARGS $CMAKE_INSTALL_ARGS"
 export MESON_ARGS="$meSON_BASE_ARGS --buildtype release --default-library=static -Ddefault_both_libraries=static $MESON_INSTALL_ARGS"
 
 DIST_PATCHES=$DIST_PATCHES'
-    glib            https://gist.githubusercontent.com/andyvand/0a117eabe602e8dcb569ae1f8700ef0c/raw/63fde7a11f84ce5d69dc9d6d03c295e00f11d537/glib-old-macos.patch
     libx265         https://gist.githubusercontent.com/andyvand/9f9770878c63b6307f0b5384b01967da/raw/738672b9dd3a76c44b2368853f9c862366720416/libx265_cmake_fix.diff
     python3         https://gist.githubusercontent.com/andyvand/d275de733d362bf20a9c0b05f87ff4fc/raw/8d6e1c09fa52611ccf0b959284a6f68596769ba1/python3_configure.diff
     fontconfig      https://gist.githubusercontent.com/andyvand/7ee00be1f5561a1550c6fa97277f7472/raw/9194e9b8e641c8a098f06d13bbfb4ac82b381860/fontconfig_atomic.diff
@@ -438,7 +437,7 @@ DIST_EXTRA_CFLAGS="$DIST_EXTRA_CFLAGS
 
 DIST_EXTRA_CXXFLAGS="$DIST_EXTRA_CXXFLAGS
     gperf       -std=gnu++11
-    wxwidgets   -std=gnu++11
+    wxwidgets   -std=gnu++11 -Wno-error=elaborated-enum-base
     libmodplug  -std=gnu++11
     libopencore-amrnb -std=gnu++11
 "
