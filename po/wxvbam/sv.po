@@ -40,7 +40,7 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.lz;*.gba.lz;*.bin.lz;*.elf.lz;*.mb.lz;*.agb.xz;*.gba.xz;*.bin.xz;*.elf.xz;*.mb.xz;*.agb.bz2;*.gba.bz2;*.bin.bz2;*.elf.bz2;*.mb.bz2;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
 " Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Game Boy Advance-filer (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.lz;*.gba.lz;*.bin.lz;*.elf.lz;*.mb.lz;*.agb.xz;*.gba.xz;*.bin.xz;*.elf.xz;*.mb.xz;*.agb.bz2;*.gba.bz2;*.bin.bz2;*.elf.bz2;*.mb.bz2;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game Boy-filer (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:151
 msgid "Open ROM file"
@@ -50,7 +50,7 @@ msgstr "Öppna ROM-fil"
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Game Boy-filer (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:184
 msgid "Open GB ROM file"
@@ -60,7 +60,7 @@ msgstr "Öppna GB ROM-fil"
 msgid ""
 "Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Game Boy Color-filer (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:216
 msgid "Open GBC ROM file"
@@ -148,11 +148,11 @@ msgstr "Välj ögonblicksfil"
 msgid ""
 "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
 " (*.gsv)|*.gsv"
-msgstr ""
+msgstr "Game Shark & PAC-ögonblicksbilder (*.sps;*.xps)|*.sps;*.xps|Game Shark SP-ögonblicksbilder (*.gsv)|*.gsv"
 
 #: cmdevents.cpp:586
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
-msgstr ""
+msgstr "Game Boy-ögonblicksbild (*.gbs)|*.gbs"
 
 #: cmdevents.cpp:598
 msgid ""
@@ -186,7 +186,7 @@ msgstr "EEPROM sparfiler kan inte exporteras"
 
 #: cmdevents.cpp:668
 msgid "Game Shark Snapshot (*.sps)|*.sps"
-msgstr ""
+msgstr "Game Shark-ögonblicksbild (*.sps)|*.sps"
 
 #: cmdevents.cpp:685
 msgid "Exported from Visual Boy Advance-M"
@@ -320,7 +320,7 @@ msgstr ""
 
 #: cmdevents.cpp:2560
 msgid "LAN link is already active. Disable link mode to disconnect."
-msgstr ""
+msgstr "LAN-länk är redan aktiv. Inaktivera länkläge för att koppla från."
 
 #: cmdevents.cpp:2566
 msgid "Network is not supported in local mode."
@@ -730,12 +730,12 @@ msgstr "Ogiltig tangentbindning %s för %s"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:492
 #, c-format
 msgid "Invalid value %s for option %s"
-msgstr ""
+msgstr "Ogiltigt värde %s för alternativet %s"
 
 #: opts.cpp:499
 #, c-format
 msgid "Unknown option %s with value %s"
-msgstr ""
+msgstr "Okänt alternativ %s med värdet %s"
 
 #: panel.cpp:239
 #, c-format
@@ -813,7 +813,7 @@ msgstr "Giltigt läge: %d x %d - %d @ %d"
 #: panel.cpp:1076
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
-msgstr ""
+msgstr "Välj läge %d x %d - %d @ %d"
 
 #: panel.cpp:1080
 #, c-format
@@ -858,31 +858,31 @@ msgstr ""
 
 #: panel.cpp:2454
 msgid "Failed to set OpenGL properties"
-msgstr ""
+msgstr "Misslyckades med att ställa in OpenGL-egenskaper"
 
 #: panel.cpp:2461 panel.cpp:2495
 msgid "Failed to create SDL window"
-msgstr ""
+msgstr "Misslyckades med att skapa SDL-fönster"
 
 #: panel.cpp:2479 panel.cpp:2527
 msgid "Failed to create SDL renderer"
-msgstr ""
+msgstr "Misslyckades med att skapa SDL-renderare"
 
 #: panel.cpp:3071
 msgid "Enabling EGL VSync."
-msgstr ""
+msgstr "Aktiverar EGL VSync."
 
 #: panel.cpp:3073
 msgid "Disabling EGL VSync."
-msgstr ""
+msgstr "Inaktiverar EGL VSync."
 
 #: panel.cpp:3080
 msgid "Enabling GLX VSync."
-msgstr ""
+msgstr "Aktiverar GLX VSync."
 
 #: panel.cpp:3082
 msgid "Disabling GLX VSync."
-msgstr ""
+msgstr "Inaktiverar GLX VSync."
 
 #: panel.cpp:3100
 msgid "Failed to set glXSwapIntervalEXT"
@@ -914,23 +914,23 @@ msgstr "Ingen VSYNC tillgänglig på denna plattform"
 
 #: panel.cpp:3258
 msgid "Memory allocation error"
-msgstr ""
+msgstr "Fel vid minnesallokering"
 
 #: panel.cpp:3261
 msgid "Error initializing codec"
-msgstr ""
+msgstr "Fel vid initiering av kodek"
 
 #: panel.cpp:3264
 msgid "Error writing to output file"
-msgstr ""
+msgstr "Fel vid skrivning till utdatafil"
 
 #: panel.cpp:3267
 msgid "Can't guess output format from file name"
-msgstr ""
+msgstr "Kan inte gissa utdataformatet från filnamnet"
 
 #: panel.cpp:3272
 msgid "Programming error; aborting!"
-msgstr ""
+msgstr "Programmeringsfel; avbryter!"
 
 #: panel.cpp:3284 panel.cpp:3313
 #, c-format
@@ -1242,7 +1242,7 @@ msgstr "Hastighet"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
 msgid "Capture"
-msgstr ""
+msgstr "Fånga"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:33
 msgid "GameShark"
@@ -1271,11 +1271,11 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:412
 msgid "Bit depth"
-msgstr ""
+msgstr "Bitdjup"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:413
 msgid "Keep window on top"
-msgstr ""
+msgstr "Behåll fönstret överst"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:415
 msgid "Maximum number of threads to run filters in"
@@ -1295,11 +1295,11 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:420
 msgid "SDL renderer"
-msgstr ""
+msgstr "SDL-renderare"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:423
 msgid "BIOS file to use for Game Boy, if enabled"
-msgstr ""
+msgstr "BIOS-fil att använda för Game Boy, om aktiverad"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:424
 msgid "Game Boy color enhancement, if enabled"
@@ -1344,23 +1344,23 @@ msgstr ""
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:442
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:470
 msgid "Directory to look for ROM files"
-msgstr ""
+msgstr "Katalog att leta i efter ROM-filer"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:443
 msgid "Directory to look for Game Boy Color ROM files"
-msgstr ""
+msgstr "Katalog att leta i efter Game Boy Color ROM-filer"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:446
 msgid "BIOS file to use, if enabled"
-msgstr ""
+msgstr "BIOS-fil att använda, om aktiverad"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:456
 msgid "Enable link at boot"
-msgstr ""
+msgstr "Aktivera länk vid uppstart"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:461
 msgid "Enable faster network protocol by default"
-msgstr ""
+msgstr "Aktivera snabbare nätverksprotokoll som standard"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:463
 msgid "Default network link client host"
@@ -1384,11 +1384,11 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:468
 msgid "Link cable type"
-msgstr ""
+msgstr "Länkens kabeltyp"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:473
 msgid "Automatically load last saved state"
-msgstr ""
+msgstr "Läs automatiskt in senaste sparade tillstånd"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:475
 msgid ""
@@ -1465,11 +1465,11 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:514
 msgid "Apply IPS / UPS / IPF patches if found"
-msgstr ""
+msgstr "Tillämpa IPS / UPS / IPF-patchar om de hittas"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:516
 msgid "Automatically save and load cheat list"
-msgstr ""
+msgstr "Spara och läs automatiskt in fusklista"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:520
 msgid "Automatically enable border for Super Game Boy games"
@@ -1477,7 +1477,7 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:522
 msgid "Always enable border"
-msgstr ""
+msgstr "Aktivera alltid ram"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:523
 msgid "Screen capture file format"
@@ -1485,7 +1485,7 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:524
 msgid "Enable cheats"
-msgstr ""
+msgstr "Aktivera fusk"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:525
 msgid "Disable on-screen status messages"
@@ -1493,7 +1493,7 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:526
 msgid "Type of system to emulate"
-msgstr ""
+msgstr "Typ av system att emulera"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:527
 msgid "Flash size 0 = 64 KB 1 = 128 KB"
@@ -1505,11 +1505,11 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:531
 msgid "The palette to use"
-msgstr ""
+msgstr "Paletten att använda"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:532
 msgid "Enable printer emulation"
-msgstr ""
+msgstr "Aktivera skrivaremulering"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:534
 msgid "Break into GDB after loading the game."
@@ -1517,11 +1517,11 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:535
 msgid "Port to connect GDB to"
-msgstr ""
+msgstr "Port att ansluta GDB till"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:537
 msgid "Number of players in network"
-msgstr ""
+msgstr "Antal spelare i nätverk"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:539
 msgid "Maximum scale factor (0 = no limit)"
@@ -1541,7 +1541,7 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:545
 msgid "Show speed indicator"
-msgstr ""
+msgstr "Visa hastighetsindikator"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:547
 msgid "Draw on-screen messages transparently"
@@ -1549,7 +1549,7 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:548
 msgid "Skip BIOS initialization"
-msgstr ""
+msgstr "Hoppa över BIOS-initiering"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:550
 msgid "Do not overwrite cheat list when loading state"
@@ -1577,63 +1577,63 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:564
 msgid "Mute sound during speedup"
-msgstr ""
+msgstr "Inget ljud under uppsnabbning"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:565
 msgid "Use the specified BIOS file for Game Boy"
-msgstr ""
+msgstr "Använd angiven BIOS-fil för Game Boy"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:566
 msgid "Use the specified BIOS file"
-msgstr ""
+msgstr "Använd angiven BIOS-fil"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:568
 msgid "Use the specified BIOS file for Game Boy Color"
-msgstr ""
+msgstr "Använd angiven BIOS-fil för Game Boy Color"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:569
 msgid "Wait for vertical sync"
-msgstr ""
+msgstr "Vänta på vertikal synk"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:572
 msgid "Enter fullscreen mode at startup"
-msgstr ""
+msgstr "Aktivera helskärmsläge vid uppstart"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:573
 msgid "Window maximized"
-msgstr ""
+msgstr "Fönster maximerat"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
 msgid "Window height at startup"
-msgstr ""
+msgstr "Fönsterhöjd vid uppstart"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:575
 msgid "Window width at startup"
-msgstr ""
+msgstr "Fönsterbredd vid uppstart"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:576
 msgid "Window axis X position at startup"
-msgstr ""
+msgstr "Fönstrets X-axelposition vid uppstart"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:577
 msgid "Window axis Y position at startup"
-msgstr ""
+msgstr "Fönstrets Y-axelposition vid uppstart"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:581
 msgid "Capture key events while on background"
-msgstr ""
+msgstr "Fånga tangenthändelser när i bakgrunden"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:583
 msgid "Capture joy events while on background"
-msgstr ""
+msgstr "Fånga spakhändelser när i bakgrunden"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:584
 msgid "Hide menu bar when mouse is inactive"
-msgstr ""
+msgstr "Dölj menyraden när musen är inaktiv"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:586
 msgid "Suspend screensaver when game is running"
-msgstr ""
+msgstr "Förhindra skärmsläckaren när spelet är igång"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:589
 msgid "Sound API; if unsupported, default API will be used"
@@ -1665,15 +1665,15 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:597
 msgid "Game Boy echo effect (%)"
-msgstr ""
+msgstr "Game Boy-ekoeffekt (%)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:598
 msgid "Enable Game Boy sound effects"
-msgstr ""
+msgstr "Aktivera Game Boy-ljudeffekter"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:599
 msgid "Game Boy stereo effect (%)"
-msgstr ""
+msgstr "Game Boy-stereoeffekt (%)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:600
 msgid "Game Boy surround sound effect (%)"
@@ -1681,11 +1681,11 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:601
 msgid "Sound sample rate (kHz)"
-msgstr ""
+msgstr "Samplingsfrekvens för ljud (kHz)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:602
 msgid "Use DirectSound hardware acceleration"
-msgstr ""
+msgstr "Använd DirectSound hårdvaruacceleration"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:603
 msgid "Upmix stereo to surround"
@@ -1702,7 +1702,7 @@ msgstr "Ljudvolym (%)"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:754
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
-msgstr ""
+msgstr "Ogiltigt värde %s för alternativet %s; giltiga värden är %s"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:321
 #, c-format
@@ -1717,43 +1717,43 @@ msgstr "Ogiltigt värde %d för alternativet %s; giltiga värden är %d - %d"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:22
 msgid "Backspace"
-msgstr ""
+msgstr "Backsteg"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:23
 msgid "Delete"
-msgstr ""
+msgstr "Delete"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:24
 msgid "Page Up"
-msgstr ""
+msgstr "Page Up"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:25
 msgid "Page Down"
-msgstr ""
+msgstr "Page Down"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:26
 msgid "Num Lock"
-msgstr ""
+msgstr "Num Lock"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:27
 msgid "Scroll Lock"
-msgstr ""
+msgstr "Scroll Lock"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:30
 msgid "Num Space"
-msgstr ""
+msgstr "Num Space"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:31
 msgid "Num Tab"
-msgstr ""
+msgstr "Num Tab"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:32
 msgid "Num Enter"
-msgstr ""
+msgstr "Num Enter"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:33
 msgid "Num Home"
-msgstr ""
+msgstr "Num Home"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:34
 msgid "Num left"
@@ -1777,51 +1777,51 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:39
 msgid "Num PageDown"
-msgstr ""
+msgstr "Num PageDown"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:40
 msgid "Num End"
-msgstr ""
+msgstr "Num End"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:41
 msgid "Num Begin"
-msgstr ""
+msgstr "Num Begin"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:42
 msgid "Num Insert"
-msgstr ""
+msgstr "Num Insert"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:43
 msgid "Num Delete"
-msgstr ""
+msgstr "Num Delete"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:44
 msgid "Num ="
-msgstr ""
+msgstr "Num ="
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:45
 msgid "Num *"
-msgstr ""
+msgstr "Num *"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:46
 msgid "Num +"
-msgstr ""
+msgstr "Num +"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:47
 msgid "Num ,"
-msgstr ""
+msgstr "Num ,"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:48
 msgid "Num -"
-msgstr ""
+msgstr "Num -"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:49
 msgid "Num ."
-msgstr ""
+msgstr "Num ."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:50
 msgid "Num /"
-msgstr ""
+msgstr "Num /"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:54
 msgid "Volume Mute"
@@ -1853,19 +1853,19 @@ msgstr "Spela upp/Paus"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:93
 msgid "Alt+"
-msgstr ""
+msgstr "Alt+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:96
 msgid "Ctrl+"
-msgstr ""
+msgstr "Ctrl+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:100
 msgid "Rawctrl+"
-msgstr ""
+msgstr "Rawctrl+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:104
 msgid "Shift+"
-msgstr ""
+msgstr "Skift+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:107
 msgid "Meta+"
@@ -1874,17 +1874,17 @@ msgstr "Meta+"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:238
 #, c-format
 msgid "Joystick %d"
-msgstr ""
+msgstr "Styrspak %d"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:268
 #, c-format
 msgid "%s: Axis %d+"
-msgstr ""
+msgstr "%s: Axel %d+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:270
 #, c-format
 msgid "%s: Axis %d-"
-msgstr ""
+msgstr "%s: Axel %d-"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:272
 #, c-format
@@ -1913,12 +1913,12 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:315
 msgid "Key"
-msgstr ""
+msgstr "Tangent"
 
 #: audio/internal/dsound.cpp:105 audio/internal/dsound.cpp:120
 #, c-format
 msgid "Cannot create Direct Sound %08x"
-msgstr ""
+msgstr "Kan inte skapa Direct Sound %08x"
 
 #: audio/internal/dsound.cpp:126
 #, c-format
@@ -1989,15 +1989,15 @@ msgstr "XAudio2: Skapande av källröst misslyckades!"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:680
 msgid "Error, link already connected"
-msgstr ""
+msgstr "Fel, länk redan ansluten"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:694
 msgid "Unable to find link driver"
-msgstr ""
+msgstr "Kunde inte hitta länkdrivrutin"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:737
 msgid "Link connection does not need updates."
-msgstr ""
+msgstr "Länkanslutning behöver inte uppdateras."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:876
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:940
@@ -2005,14 +2005,14 @@ msgstr ""
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2926
 #, c-format
 msgid "Player %d disconnected."
-msgstr ""
+msgstr "Spelare %d kopplade från."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:980
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1020
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1060
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1703
 msgid "Server disconnected."
-msgstr ""
+msgstr "Servern kopplade från."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1151
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1182
@@ -2025,7 +2025,7 @@ msgstr "Nätverksfel."
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1735
 #, c-format
 msgid "Player %d connected"
-msgstr ""
+msgstr "Spelare %d ansluten"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1173
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1749
@@ -2036,12 +2036,12 @@ msgstr "Alla spelare anslutna"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1771
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
-msgstr ""
+msgstr "Ansluten som #%d, Väntar på att %d spelare ska gå med"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1203
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1780
 msgid "All players joined."
-msgstr ""
+msgstr "Alla spelare har gått med."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1696
 msgid "Server timed out."
@@ -2058,7 +2058,7 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2707
 msgid "5 or more GBAs not supported."
-msgstr ""
+msgstr "5 eller fler GBA stöds inte."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2726
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2745
@@ -2067,11 +2067,11 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2845
 msgid "Lost link; reinitialize to reconnect"
-msgstr ""
+msgstr "Förlorade länk; återinitiera för att återansluta"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2852
 msgid "Lost link; reconnected"
-msgstr ""
+msgstr "Förlorade länk; återansluten"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2973
 msgid "Unknown slave timed out; resetting comm"
@@ -2103,7 +2103,7 @@ msgstr "Åter&ställ alla"
 
 #: xrc/AccelConfig.xrc:92
 msgid "Currently assigned to:"
-msgstr "Förnärvarande tilldelad till:"
+msgstr "För närvarande tilldelad till:"
 
 #: xrc/AccelConfig.xrc:107
 msgid "Shortcut Key:"
@@ -2353,7 +2353,7 @@ msgstr "Filter"
 
 #: xrc/DisplayConfig.xrc:96
 msgid "Display filter:"
-msgstr ""
+msgstr "Visningsfilter:"
 
 #: xrc/DisplayConfig.xrc:104
 msgid "Super 2xSaI"
@@ -2369,7 +2369,7 @@ msgstr "Pixellera"
 
 #: xrc/DisplayConfig.xrc:107
 msgid "Advance MAME Scale 2x"
-msgstr ""
+msgstr "Advance MAME Scale 2x"
 
 #: xrc/DisplayConfig.xrc:108
 msgid "Bilinear"
@@ -2401,7 +2401,7 @@ msgstr "Enkel 4x"
 
 #: xrc/DisplayConfig.xrc:132
 msgid "Plugin:"
-msgstr ""
+msgstr "Insticksmodul:"
 
 #: xrc/DisplayConfig.xrc:144
 msgid "Interframe blending:"
@@ -2409,15 +2409,15 @@ msgstr ""
 
 #: xrc/DisplayConfig.xrc:153
 msgid "Smart"
-msgstr ""
+msgstr "Smart"
 
 #: xrc/DisplayConfig.xrc:154
 msgid "Motion Blur"
-msgstr ""
+msgstr "Rörelseoskärpa"
 
 #: xrc/DisplayConfig.xrc:162
 msgid "SDL Renderer:"
-msgstr ""
+msgstr "SDL-renderare:"
 
 #: xrc/DisplayConfig.xrc:181 xrc/SoundConfig.xrc:93
 msgid "Basic"
@@ -2425,27 +2425,27 @@ msgstr "Grundläggande"
 
 #: xrc/DisplayConfig.xrc:191
 msgid "Bit Depth:"
-msgstr ""
+msgstr "Bitdjup:"
 
 #: xrc/DisplayConfig.xrc:197
 msgid "8"
-msgstr ""
+msgstr "8"
 
 #: xrc/DisplayConfig.xrc:198
 msgid "16"
-msgstr ""
+msgstr "16"
 
 #: xrc/DisplayConfig.xrc:199
 msgid "24"
-msgstr ""
+msgstr "24"
 
 #: xrc/DisplayConfig.xrc:200
 msgid "32"
-msgstr ""
+msgstr "32"
 
 #: xrc/DisplayConfig.xrc:210
 msgid "Bit Depth"
-msgstr ""
+msgstr "Bitdjup"
 
 #: xrc/DisplayConfig.xrc:218
 msgid "Frame Skip"
@@ -2453,11 +2453,11 @@ msgstr "Hoppa över bildruta"
 
 #: xrc/DisplayConfig.xrc:236
 msgid "&Number of frames to skip:"
-msgstr ""
+msgstr "An&tal bildrutor att hoppa över:"
 
 #: xrc/DisplayConfig.xrc:274
 msgid "Speed indicator:"
-msgstr ""
+msgstr "Hastighetsindikator:"
 
 #: xrc/DisplayConfig.xrc:281
 msgid "Percentage"
@@ -2473,7 +2473,7 @@ msgstr "Visning på skärmen"
 
 #: xrc/DisplayConfig.xrc:306
 msgid "Default magnification:"
-msgstr ""
+msgstr "Standardförstorning:"
 
 #: xrc/DisplayConfig.xrc:325
 msgid "Maximum magnification factor:"
@@ -2742,11 +2742,11 @@ msgstr "Kassett-typ:"
 
 #: xrc/GBROMInfo.xrc:60
 msgid "SGB code:"
-msgstr ""
+msgstr "SGB-kod:"
 
 #: xrc/GBROMInfo.xrc:72
 msgid "CGB code:"
-msgstr ""
+msgstr "CGB-kod:"
 
 #: xrc/GBROMInfo.xrc:84
 msgid "ROM size:"
@@ -2782,7 +2782,7 @@ msgstr "Game Boy Advance-inställningar"
 
 #: xrc/GameBoyAdvanceConfig.xrc:21
 msgid "Save type:"
-msgstr ""
+msgstr "Sparningstyp:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
 #: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
@@ -2831,7 +2831,7 @@ msgstr "BIOS-fil:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:115
 msgid "Current BIOS file:"
-msgstr ""
+msgstr "Aktuell BIOS-fil:"
 
 #: xrc/GameBoyAdvanceConfig.xrc:136 xrc/GameBoyConfig.xrc:168
 msgid "Boot ROM"
@@ -2885,11 +2885,11 @@ msgstr "Åsidosättningar för spel"
 
 #: xrc/GameBoyConfig.xrc:4
 msgid "Game Boy settings"
-msgstr ""
+msgstr "Game Boy-inställningar"
 
 #: xrc/GameBoyConfig.xrc:20
 msgid "Emulated &system:"
-msgstr ""
+msgstr "Emulerat &system:"
 
 #: xrc/GameBoyConfig.xrc:48
 msgid "Display &borders:"
@@ -2961,7 +2961,7 @@ msgstr "Om inte tomt eller 0, aktivera återspolning (sekunder)"
 
 #: xrc/GeneralConfig.xrc:67
 msgid "Seconds (0-600); 0 = disable"
-msgstr ""
+msgstr "Sekunder (0-600); 0 = inaktivera"
 
 #: xrc/GeneralConfig.xrc:78
 msgid "&Throttle"
@@ -2969,7 +2969,7 @@ msgstr "&Strypning"
 
 #: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
 msgid "Percent of normal:"
-msgstr ""
+msgstr "Procentdel av normal:"
 
 #: xrc/GeneralConfig.xrc:106
 msgid "0 = no throttle"
@@ -3108,11 +3108,11 @@ msgstr "Öppna…"
 
 #: xrc/MainMenu.xrc:10
 msgid "Open &Game Boy..."
-msgstr ""
+msgstr "Öppna &Game Boy..."
 
 #: xrc/MainMenu.xrc:13
 msgid "Open Game Boy &Color..."
-msgstr ""
+msgstr "Öppna Game Boy &Color..."
 
 #: xrc/MainMenu.xrc:16
 msgid "Open rece&nt"
@@ -3248,11 +3248,11 @@ msgstr "&Batterifil…"
 
 #: xrc/MainMenu.xrc:161
 msgid "Game Shark &code file..."
-msgstr ""
+msgstr "Game Shark-&kodfil..."
 
 #: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
 msgid "&Game Shark snapshot..."
-msgstr ""
+msgstr "&Game Shark-ögonblicksbild..."
 
 #: xrc/MainMenu.xrc:166
 msgid "&Import"
@@ -3264,7 +3264,7 @@ msgstr "&Exportera"
 
 #: xrc/MainMenu.xrc:179
 msgid "Screen capt&ure..."
-msgstr "Infånging av &skärmbild…"
+msgstr "Fånga &skärmbild…"
 
 #: xrc/MainMenu.xrc:183
 msgid "Start &sound recording..."
@@ -3348,7 +3348,7 @@ msgstr "Hoppa över &BIOS"
 
 #: xrc/MainMenu.xrc:255
 msgid "&Auto IPS / UPS / IPF patch"
-msgstr ""
+msgstr "&Automatisk IPS / UPS / IPF-patch"
 
 #: xrc/MainMenu.xrc:259
 msgid "&Pause when inactive"
@@ -3561,7 +3561,7 @@ msgstr ""
 
 #: xrc/MainMenu.xrc:533
 msgid "&Game Boy printer"
-msgstr ""
+msgstr "&Game Boy-skrivare"
 
 #: xrc/MainMenu.xrc:537
 msgid "&Gather a full page before printing"
@@ -3573,11 +3573,11 @@ msgstr "&Spara utskrifter som skärmbilder"
 
 #: xrc/MainMenu.xrc:546
 msgid "&Use Game Boy BIOS file (requires restart)"
-msgstr ""
+msgstr "A&nvänd Game Boy BIOS-fil (kräver omstart)"
 
 #: xrc/MainMenu.xrc:550
 msgid "&Use Game Boy Color BIOS file"
-msgstr ""
+msgstr "A&nvänd Game Boy Color BIOS-fil"
 
 #: xrc/MainMenu.xrc:555
 msgid "&General..."
@@ -3585,7 +3585,7 @@ msgstr "A&llmänt..."
 
 #: xrc/MainMenu.xrc:558
 msgid "&Speedup / Turbo..."
-msgstr ""
+msgstr "Upp&snabbning / Turbo..."
 
 #: xrc/MainMenu.xrc:561
 msgid "D&irectories..."
@@ -3593,7 +3593,7 @@ msgstr "Ka&taloger..."
 
 #: xrc/MainMenu.xrc:564
 msgid "&Key Shortcuts..."
-msgstr ""
+msgstr "S&nabbtangenter..."
 
 #: xrc/MainMenu.xrc:567
 msgid "UI Settings"
@@ -3601,15 +3601,15 @@ msgstr "Gränssnittsinställningar"
 
 #: xrc/MainMenu.xrc:569
 msgid "Enable &Status bar"
-msgstr ""
+msgstr "Aktivera status&rad"
 
 #: xrc/MainMenu.xrc:573
 msgid "Hide &Menu Bar"
-msgstr ""
+msgstr "Dölj men&yrad"
 
 #: xrc/MainMenu.xrc:577
 msgid "Suspend &Screen Saver"
-msgstr ""
+msgstr "Förhindra &skärmsläckare"
 
 #: xrc/MainMenu.xrc:583
 msgid "&Tools"
@@ -3629,7 +3629,7 @@ msgstr "Hitta f&usk..."
 
 #: xrc/MainMenu.xrc:594
 msgid "A&utomatically save / load cheats"
-msgstr ""
+msgstr "Läs in / s&para fusk automatiskt"
 
 #: xrc/MainMenu.xrc:598
 msgid "&Enable cheats"
@@ -3729,7 +3729,7 @@ msgstr "Rapportera &fel"
 
 #: xrc/MainMenu.xrc:733
 msgid "Visual Boy Advance-M Support &Forum"
-msgstr ""
+msgstr "Support&forum för Visual Boy Advance-M"
 
 #: xrc/MainMenu.xrc:736
 msgid "Translations"
@@ -3817,7 +3817,7 @@ msgstr "Starta nätverkslänk"
 
 #: xrc/NetLink.xrc:13
 msgid "WARNING: Link will likely not work over the internet or LAN."
-msgstr ""
+msgstr "VARNING: Länken kommer antagligen inte att fungera över internet eller LAN."
 
 #: xrc/NetLink.xrc:38
 msgid "Server"
@@ -3897,7 +3897,7 @@ msgstr "11 KHz"
 
 #: xrc/SoundConfig.xrc:119
 msgid "Direct Sound"
-msgstr ""
+msgstr "Direct Sound"
 
 #: xrc/SoundConfig.xrc:162
 msgid "Enable stereo upmixing"
@@ -3933,7 +3933,7 @@ msgstr "Center"
 
 #: xrc/SoundConfig.xrc:277
 msgid "Left / Right"
-msgstr ""
+msgstr "Vänster / Höger"
 
 #: xrc/SoundConfig.xrc:306
 msgid "Sound filtering"
@@ -3961,4 +3961,4 @@ msgstr "Bildöverhoppning"
 
 #: xrc/SpeedupConfig.xrc:61
 msgid "Mute Sound"
-msgstr ""
+msgstr "Inget ljud"
