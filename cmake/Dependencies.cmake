@@ -70,7 +70,7 @@ if(ENABLE_FFMPEG)
         list(APPEND FFMPEG_LDFLAGS "SHELL:-framework CoreText" "SHELL:-framework ApplicationServices")
 
         if(UPSTREAM_RELEASE)
-            list(APPEND FFMPEG_LDFLAGS -lbz2 -ltiff "SHELL:-framework DiskArbitration" -lfreetype -lfontconfig -llzma -lxml2 -lharfbuzz)
+            list(APPEND FFMPEG_LDFLAGS -lbz2 -ltiff "SHELL:-framework DiskArbitration" -lfreetype -lfontconfig -llzma -lxml2 -lharfbuzz -lcrypto -lssl)
         endif()
     elseif(WIN32)
         set(WIN32_MEDIA_FOUNDATION_LIBS dxva2 evr mf mfplat mfplay mfreadwrite mfuuid amstrmid)
