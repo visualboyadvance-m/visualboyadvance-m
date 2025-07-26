@@ -482,6 +482,7 @@ if(WIN32)
         PRIVATE
         audio/internal/dsound.cpp
         wxvbam.rc
+        wxvbam_translations.rc
     )
     target_link_libraries(visualboyadvance-m
         dxguid dsound wsock32 ws2_32 imm32 version winmm)

@@ -366,6 +366,11 @@ bool wxvbamApp::OnInit() {
 #endif
     // load system default locale, if available
     locale.Init();
+
+#ifdef _WIN32
+    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+#endif
+
     locale.AddCatalog("wxvbam");
     // make built-in xrc file available
     // this has to be done before parent OnInit() so xrc dump works
