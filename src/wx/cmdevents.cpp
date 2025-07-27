@@ -2646,14 +2646,14 @@ EVT_HANDLER(LinkConfigure, "Link options...")
 EVT_HANDLER(Language0, "Default Language")
 {
     OPTION(kLocale) = wxLANGUAGE_DEFAULT;
-
+    
     if (wxvbam_locale != NULL)
         wxDELETE(wxvbam_locale);
-
+    
     wxvbam_locale = new wxLocale;
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_DEFAULT);
-
+    
     update_opts();
 }
 
@@ -3136,14 +3136,14 @@ EVT_HANDLER(Language34, "Urdu (Pakistan)")
 EVT_HANDLER(Language35, "Chinese (China)")
 {
     OPTION(kLocale) = wxLANGUAGE_CHINESE_CHINA;
-
+    
     if (wxvbam_locale != NULL)
         wxDELETE(wxvbam_locale);
-
+    
     wxvbam_locale = new wxLocale;
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_CHINESE_CHINA);
-
+    
     update_opts();
 }
 

@@ -113,8 +113,6 @@ void SDLAudio::deinit() {
 
 SDLAudio::~SDLAudio() {
     deinit();
-
-    SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 
 bool SDLAudio::init(long sampleRate) {
