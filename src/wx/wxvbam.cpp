@@ -223,7 +223,7 @@ static void get_config_path(wxPathList& path, bool exists = true)
     if (!debug_dumped) {
         wxLogDebug(wxT("GetUserLocalDataDir(): %s"), stdp.GetUserLocalDataDir().c_str());
         wxLogDebug(wxT("GetUserDataDir(): %s"), stdp.GetUserDataDir().c_str());
-        wxLogDebug(wxT("GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()): %s"), stdp.GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()).c_str());
+        wxLogDebug(wxT("GetLocalizedResourcesDir(wxvbam_locale->GetCanonicalName()): %s"), stdp.GetLocalizedResourcesDir(wxvbam_locale->GetCanonicalName()).c_str());
         wxLogDebug(wxT("GetResourcesDir(): %s"), stdp.GetResourcesDir().c_str());
         wxLogDebug(wxT("GetDataDir(): %s"), stdp.GetDataDir().c_str());
         wxLogDebug(wxT("GetLocalDataDir(): %s"), stdp.GetLocalDataDir().c_str());
@@ -257,7 +257,7 @@ static void get_config_path(wxPathList& path, bool exists = true)
     // NOTE: this does not support XDG (freedesktop.org) paths
     add_path(GetUserLocalDataDir());
     add_path(GetUserDataDir());
-    add_path(GetLocalizedResourcesDir(wxGetApp().locale.GetCanonicalName()));
+    add_path(GetLocalizedResourcesDir(wxvbam_locale->GetCanonicalName()));
     add_path(GetResourcesDir());
     add_path(GetDataDir());
     add_path(GetLocalDataDir());
@@ -352,6 +352,9 @@ wxString wxvbamApp::GetAbsolutePath(wxString path)
     return path;
 }
 
+int language = wxLANGUAGE_DEFAULT;
+wxLocale *wxvbam_locale = NULL;
+
 bool wxvbamApp::OnInit() {
     using_wayland = IsWayland();
 
@@ -364,14 +367,25 @@ bool wxvbamApp::OnInit() {
 #if (wxMAJOR_VERSION >= 3)
     SetAppDisplayName("VisualBoyAdvance-M");
 #endif
-    // load system default locale, if available
-    locale.Init();
+
+    wxvbam_locale = new wxLocale;
+
+    language = OPTION(kLocale);
+
+    if (language != wxLANGUAGE_DEFAULT) {
+        wxvbam_locale->Init(language, wxLOCALE_LOAD_DEFAULT);
+    } else {
+        wxvbam_locale->Init();
+    }
+
+    // load selected language
 
 #ifdef _WIN32
     wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
-    locale.AddCatalog("wxvbam");
+    wxvbam_locale->AddCatalog("wxvbam");
+
     // make built-in xrc file available
     // this has to be done before parent OnInit() so xrc dump works
     wxFileSystem::AddHandler(new wxMemoryFSHandler);
@@ -472,6 +486,29 @@ bool wxvbamApp::OnInit() {
 
     // Load the default options.
     load_opts(!config_file_.Exists());
+
+    if (wxvbam_locale)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+
+    language = OPTION(kLocale);
+
+    if (language != wxLANGUAGE_DEFAULT) {
+        wxvbam_locale->Init(language, wxLOCALE_LOAD_DEFAULT);
+    } else {
+        wxvbam_locale->Init();
+    }
+
+    fprintf(stderr, "Language: %d\n", language);
+
+    // load selected language
+
+#ifdef _WIN32
+    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+#endif
+
+    wxvbam_locale->AddCatalog("wxvbam");
 
     // wxGLCanvas segfaults under wayland before wx 3.2
 #if defined(HAVE_WAYLAND_SUPPORT) && !defined(HAVE_WAYLAND_EGL)

@@ -141,6 +141,7 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /*kSoundDSoundHWAccel*/ Option::Type::kBool,
     /*kSoundUpmix*/ Option::Type::kBool,
     /*kSoundVolume*/ Option::Type::kInt,
+    /*kLocale*/ Option::Type::kInt,
 };
 
 // Less verbose accessor for a specific OptionID with compile-time type checks.

@@ -38,6 +38,8 @@
 #include "wx/wxlogdebug.h"
 #include "wx/compat_generic_file_dialog.h"
 
+extern wxLocale *wxvbam_locale;
+
 template <typename T>
 void CheckPointer(T pointer)
 {

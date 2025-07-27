@@ -1922,6 +1922,42 @@ bool MainFrame::BindControls()
         MenuOptionIntRadioValue("LinkType2Wireless", gopts.gba_link_type, 2);
         MenuOptionIntRadioValue("LinkType3GameCube", gopts.gba_link_type, 3);
         MenuOptionIntRadioValue("LinkType4Gameboy", gopts.gba_link_type, 4);
+        MenuOptionIntRadioValue("Language0", gopts.locale, wxLANGUAGE_DEFAULT);
+        MenuOptionIntRadioValue("Language1", gopts.locale, wxLANGUAGE_BULGARIAN);
+        MenuOptionIntRadioValue("Language2", gopts.locale, wxLANGUAGE_BRETON);
+        MenuOptionIntRadioValue("Language3", gopts.locale, wxLANGUAGE_CZECH);
+        MenuOptionIntRadioValue("Language4", gopts.locale, wxLANGUAGE_GERMAN);
+        MenuOptionIntRadioValue("Language5", gopts.locale, wxLANGUAGE_GREEK);
+        MenuOptionIntRadioValue("Language6", gopts.locale, wxLANGUAGE_ENGLISH_US);
+        MenuOptionIntRadioValue("Language7", gopts.locale, wxLANGUAGE_SPANISH_LATIN_AMERICA);
+        MenuOptionIntRadioValue("Language8", gopts.locale, wxLANGUAGE_SPANISH_COLOMBIA);
+        MenuOptionIntRadioValue("Language9", gopts.locale, wxLANGUAGE_SPANISH_PERU);
+        MenuOptionIntRadioValue("Language10", gopts.locale, wxLANGUAGE_SPANISH_US);
+        MenuOptionIntRadioValue("Language11", gopts.locale, wxLANGUAGE_SPANISH);
+        MenuOptionIntRadioValue("Language12", gopts.locale, wxLANGUAGE_FRENCH_FRANCE);
+        MenuOptionIntRadioValue("Language13", gopts.locale, wxLANGUAGE_FRENCH);
+        MenuOptionIntRadioValue("Language14", gopts.locale, wxLANGUAGE_GALICIAN);
+        MenuOptionIntRadioValue("Language15", gopts.locale, wxLANGUAGE_HEBREW_ISRAEL);
+        MenuOptionIntRadioValue("Language16", gopts.locale, wxLANGUAGE_HUNGARIAN_HUNGARY);
+        MenuOptionIntRadioValue("Language17", gopts.locale, wxLANGUAGE_HUNGARIAN);
+        MenuOptionIntRadioValue("Language18", gopts.locale, wxLANGUAGE_INDONESIAN);
+        MenuOptionIntRadioValue("Language19", gopts.locale, wxLANGUAGE_ITALIAN_ITALY);
+        MenuOptionIntRadioValue("Language20", gopts.locale, wxLANGUAGE_JAPANESE);
+        MenuOptionIntRadioValue("Language21", gopts.locale, wxLANGUAGE_KOREAN_KOREA);
+        MenuOptionIntRadioValue("Language22", gopts.locale, wxLANGUAGE_KOREAN);
+        MenuOptionIntRadioValue("Language23", gopts.locale, wxLANGUAGE_MALAY_MALAYSIA);
+        MenuOptionIntRadioValue("Language24", gopts.locale, wxLANGUAGE_NORWEGIAN);
+        MenuOptionIntRadioValue("Language25", gopts.locale, wxLANGUAGE_DUTCH);
+        MenuOptionIntRadioValue("Language26", gopts.locale, wxLANGUAGE_POLISH_POLAND);
+        MenuOptionIntRadioValue("Language27", gopts.locale, wxLANGUAGE_POLISH);
+        MenuOptionIntRadioValue("Language28", gopts.locale, wxLANGUAGE_PORTUGUESE_BRAZILIAN);
+        MenuOptionIntRadioValue("Language29", gopts.locale, wxLANGUAGE_PORTUGUESE_PORTUGAL);
+        MenuOptionIntRadioValue("Language30", gopts.locale, wxLANGUAGE_RUSSIAN_RUSSIA);
+        MenuOptionIntRadioValue("Language31", gopts.locale, wxLANGUAGE_SWEDISH);
+        MenuOptionIntRadioValue("Language32", gopts.locale, wxLANGUAGE_TURKISH);
+        MenuOptionIntRadioValue("Language33", gopts.locale, wxLANGUAGE_UKRAINIAN);
+        MenuOptionIntRadioValue("Language34", gopts.locale, wxLANGUAGE_URDU_PAKISTAN);
+        MenuOptionIntRadioValue("Language35", gopts.locale, wxLANGUAGE_CHINESE_CHINA);
     }
 
     for (size_t i = 0; i < checkable_mi.size(); i++) {

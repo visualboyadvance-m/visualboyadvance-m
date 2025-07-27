@@ -578,6 +578,153 @@
 							<checkable>1</checkable>
 					</object>
         </object>
+        <object class="wxMenu">
+          <label translate="0">_Languages</label>
+          <object class="wxMenuItem" name="Language0">
+            <label>Default Language</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language1">
+            <label>Bulgarian</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language2">
+            <label>Breton</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language3">
+            <label>Czech</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language4">
+            <label>German</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language5">
+            <label>Greek</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language6">
+            <label>English (US)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language7">
+            <label>Spanish (Latin American)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language8">
+            <label>Spanish (Colombia)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language9">
+            <label>Spanish (Peru)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language10">
+            <label>Spanish (United States)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language11">
+            <label>Spanish</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language12">
+            <label>French (France)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language13">
+            <label>French</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language14">
+            <label>Galician</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language15">
+            <label>Hebrew (Israel)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language16">
+            <label>Hungarian (Hungary)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language17">
+            <label>Hungarian</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language18">
+            <label>Indonesian</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language19">
+            <label>Italian</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language20">
+            <label>Japanese</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language21">
+            <label>Korean (Korea)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language22">
+            <label>Korean</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language23">
+            <label>Malay (Malaysia)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language24">
+            <label>Norwegian</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language25">
+            <label>Dutch</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language26">
+            <label>Polish (Poland)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language27">
+            <label>Polish</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language28">
+            <label>Portuguese (Brazil)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language29">
+            <label>Portuguese (Portugal)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language30">
+            <label>Russian (Russia)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language31">
+            <label>Swedish</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language32">
+            <label>Turkish</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language33">
+            <label>Ukrainian</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language34">
+            <label>Urdu (Pakistan)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="Language35">
+            <label>Chinese (China)</label>
+            <radio>1</radio>
+          </object>
+        </object>
     </object>
     <object class="wxMenu">
       <label>_Tools</label>

@@ -137,6 +137,7 @@ enum class OptionID {
     kSoundDSoundHWAccel,
     kSoundUpmix,
     kSoundVolume,
+    kLocale,
 
     // Do not add anything under here.
     Last,

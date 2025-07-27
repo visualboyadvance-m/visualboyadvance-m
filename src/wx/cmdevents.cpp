@@ -2643,6 +2643,510 @@ EVT_HANDLER(LinkConfigure, "Link options...")
 #endif
 }
 
+EVT_HANDLER(Language0, "Default Language")
+{
+    OPTION(kLocale) = wxLANGUAGE_DEFAULT;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_DEFAULT);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language1, "Bulgarian")
+{
+    OPTION(kLocale) = wxLANGUAGE_BULGARIAN;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_BULGARIAN);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language2, "Breton")
+{
+    OPTION(kLocale) = wxLANGUAGE_BRETON;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_BRETON);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language3, "Czech")
+{
+    OPTION(kLocale) = wxLANGUAGE_CZECH;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_CZECH);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language4, "German")
+{
+    OPTION(kLocale) = wxLANGUAGE_GERMAN;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_GERMAN);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language5, "Greek")
+{
+    OPTION(kLocale) = wxLANGUAGE_GREEK;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_GREEK);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language6, "English (US)")
+{
+    OPTION(kLocale) = wxLANGUAGE_ENGLISH_US;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_ENGLISH_US);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language7, "Spanish (Latin American)")
+{
+    OPTION(kLocale) = wxLANGUAGE_SPANISH_LATIN_AMERICA;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SPANISH_LATIN_AMERICA);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language8, "Spanish (Colombia)")
+{
+    OPTION(kLocale) = wxLANGUAGE_SPANISH_COLOMBIA;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SPANISH_COLOMBIA);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language9, "Spanish (Peru)")
+{
+    OPTION(kLocale) = wxLANGUAGE_SPANISH_PERU;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SPANISH_PERU);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language10, "Spanish (US)")
+{
+    OPTION(kLocale) = wxLANGUAGE_SPANISH_US;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SPANISH_US);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language11, "Spanish")
+{
+    OPTION(kLocale) = wxLANGUAGE_SPANISH;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SPANISH);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language12, "French (France)")
+{
+    OPTION(kLocale) = wxLANGUAGE_FRENCH_FRANCE;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_FRENCH_FRANCE);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language13, "French")
+{
+    OPTION(kLocale) = wxLANGUAGE_FRENCH;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_FRENCH);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language14, "Galician")
+{
+    OPTION(kLocale) = wxLANGUAGE_GALICIAN;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_GALICIAN);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language15, "Hebrew (Israel)")
+{
+    OPTION(kLocale) = wxLANGUAGE_HEBREW_ISRAEL;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_HEBREW_ISRAEL);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language16, "Hungarian (Hungary)")
+{
+    OPTION(kLocale) = wxLANGUAGE_HUNGARIAN_HUNGARY;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_HUNGARIAN_HUNGARY);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language17, "Hungarian")
+{
+    OPTION(kLocale) = wxLANGUAGE_HUNGARIAN;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_HUNGARIAN);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language18, "Indonesian")
+{
+    OPTION(kLocale) = wxLANGUAGE_INDONESIAN;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_INDONESIAN);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language19, "Italian")
+{
+    OPTION(kLocale) = wxLANGUAGE_ITALIAN_ITALY;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_ITALIAN_ITALY);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language20, "Japanese")
+{
+    OPTION(kLocale) = wxLANGUAGE_JAPANESE;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_JAPANESE);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language21, "Korean (Korea)")
+{
+    OPTION(kLocale) = wxLANGUAGE_KOREAN_KOREA;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_KOREAN_KOREA);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language22, "Korean")
+{
+    OPTION(kLocale) = wxLANGUAGE_KOREAN;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_KOREAN);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language23, "Malay (Malaysia)")
+{
+    OPTION(kLocale) = wxLANGUAGE_MALAY_MALAYSIA;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_MALAY_MALAYSIA);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language24, "Norwegian")
+{
+    OPTION(kLocale) = wxLANGUAGE_NORWEGIAN;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_NORWEGIAN);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language25, "Dutch")
+{
+    OPTION(kLocale) = wxLANGUAGE_DUTCH;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_DUTCH);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language26, "Polish (Poland)")
+{
+    OPTION(kLocale) = wxLANGUAGE_POLISH_POLAND;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_POLISH_POLAND);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language27, "Polish")
+{
+    OPTION(kLocale) = wxLANGUAGE_POLISH;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_POLISH);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language28, "Portuguese (Brazil)")
+{
+    OPTION(kLocale) = wxLANGUAGE_PORTUGUESE_BRAZILIAN;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_PORTUGUESE_BRAZILIAN);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language29, "Portuguese (Portugal)")
+{
+    OPTION(kLocale) = wxLANGUAGE_PORTUGUESE_PORTUGAL;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_PORTUGUESE_PORTUGAL);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language30, "Russian (Russia)")
+{
+    OPTION(kLocale) = wxLANGUAGE_RUSSIAN_RUSSIA;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_RUSSIAN_RUSSIA);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language31, "Swedish")
+{
+    OPTION(kLocale) = wxLANGUAGE_SWEDISH;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SWEDISH);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language32, "Turkish")
+{
+    OPTION(kLocale) = wxLANGUAGE_TURKISH;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_TURKISH);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language33, "Ukrainian")
+{
+    OPTION(kLocale) = wxLANGUAGE_UKRAINIAN;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_UKRAINIAN);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language34, "Urdu (Pakistan)")
+{
+    OPTION(kLocale) = wxLANGUAGE_URDU_PAKISTAN;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_URDU_PAKISTAN);
+
+    update_opts();
+}
+
+EVT_HANDLER(Language35, "Chinese (China)")
+{
+    OPTION(kLocale) = wxLANGUAGE_CHINESE_CHINA;
+
+    if (wxvbam_locale != NULL)
+        wxDELETE(wxvbam_locale);
+
+    wxvbam_locale = new wxLocale;
+    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_CHINESE_CHINA);
+
+    update_opts();
+}
+
 // Dummy for disabling system key bindings
 EVT_HANDLER_MASK(NOOP, "Do nothing", CMDEN_NEVER)
 {
