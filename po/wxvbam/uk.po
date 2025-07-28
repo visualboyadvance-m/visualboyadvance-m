@@ -1690,7 +1690,7 @@ msgstr "Гучність звуку (%)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:607
 msgid "Language"
-msgstr ""
+msgstr "Мова"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:676
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:696
@@ -3610,147 +3610,147 @@ msgstr "Призупинити &заставку"
 
 #: xrc/MainMenu.xrc:584
 msgid "Default Language"
-msgstr ""
+msgstr "Типова мова"
 
 #: xrc/MainMenu.xrc:588
 msgid "Bulgarian"
-msgstr ""
+msgstr "Bulgarian (Български)"
 
 #: xrc/MainMenu.xrc:592
 msgid "Breton"
-msgstr ""
+msgstr "Breton (Brezhoneg)"
 
 #: xrc/MainMenu.xrc:596
 msgid "Czech"
-msgstr ""
+msgstr "Czech (Čeština)"
 
 #: xrc/MainMenu.xrc:600
 msgid "German"
-msgstr ""
+msgstr "German (Deutsch)"
 
 #: xrc/MainMenu.xrc:604
 msgid "Greek"
-msgstr ""
+msgstr "Elliniká (Ελληνικά)"
 
 #: xrc/MainMenu.xrc:608
 msgid "English (US)"
-msgstr ""
+msgstr "English (English)"
 
 #: xrc/MainMenu.xrc:612
 msgid "Spanish (Latin American)"
-msgstr ""
+msgstr "Spanish Latin American (Español Latinoamericano)"
 
 #: xrc/MainMenu.xrc:616
 msgid "Spanish (Colombia)"
-msgstr ""
+msgstr "Spanish Colombian (Español Colombiano)"
 
 #: xrc/MainMenu.xrc:620
 msgid "Spanish (Peru)"
-msgstr ""
+msgstr "Spanish Peruvian (Español Peruano)"
 
 #: xrc/MainMenu.xrc:624
 msgid "Spanish (United States)"
-msgstr ""
+msgstr "Spanish American United States (Español Americano Estadounidense)"
 
 #: xrc/MainMenu.xrc:628
 msgid "Spanish"
-msgstr ""
+msgstr "Spanish (Español)"
 
 #: xrc/MainMenu.xrc:632
 msgid "French (France)"
-msgstr ""
+msgstr "French (Français)"
 
 #: xrc/MainMenu.xrc:636
 msgid "French"
-msgstr ""
+msgstr "French (Français)"
 
 #: xrc/MainMenu.xrc:640
 msgid "Galician"
-msgstr ""
+msgstr "Galician (Galego)"
 
 #: xrc/MainMenu.xrc:644
 msgid "Hebrew (Israel)"
-msgstr ""
+msgstr "Ivrit (עברית)"
 
 #: xrc/MainMenu.xrc:648
 msgid "Hungarian (Hungary)"
-msgstr ""
+msgstr "Hungarian (Magyar)"
 
 #: xrc/MainMenu.xrc:652
 msgid "Hungarian"
-msgstr ""
+msgstr "Hungarian (Magyar)"
 
 #: xrc/MainMenu.xrc:656
 msgid "Indonesian"
-msgstr ""
+msgstr "Indonesian (Indonesia)"
 
 #: xrc/MainMenu.xrc:660
 msgid "Italian"
-msgstr ""
+msgstr "Italian (Italiano)"
 
 #: xrc/MainMenu.xrc:664
 msgid "Japanese"
-msgstr ""
+msgstr "Nihongo (日本語)"
 
 #: xrc/MainMenu.xrc:668
 msgid "Korean (Korea)"
-msgstr ""
+msgstr "Hangug-Eo (한국어)"
 
 #: xrc/MainMenu.xrc:672
 msgid "Korean"
-msgstr ""
+msgstr "Hangug-Eo (한국어)"
 
 #: xrc/MainMenu.xrc:676
 msgid "Malay (Malaysia)"
-msgstr ""
+msgstr "Malay (Melayu)"
 
 #: xrc/MainMenu.xrc:680
 msgid "Norwegian"
-msgstr ""
+msgstr "Norwegian (Norsk)"
 
 #: xrc/MainMenu.xrc:684
 msgid "Dutch"
-msgstr ""
+msgstr "Dutch (Nederlands)"
 
 #: xrc/MainMenu.xrc:688
 msgid "Polish (Poland)"
-msgstr ""
+msgstr "Polish (Polski)"
 
 #: xrc/MainMenu.xrc:692
 msgid "Polish"
-msgstr ""
+msgstr "Polish (Polski)"
 
 #: xrc/MainMenu.xrc:696
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Portuguese Brazilian (Português Brasileiro)"
 
 #: xrc/MainMenu.xrc:700
 msgid "Portuguese (Portugal)"
-msgstr ""
+msgstr "Portuguese (Português)"
 
 #: xrc/MainMenu.xrc:704
 msgid "Russian (Russia)"
-msgstr ""
+msgstr "Russian (Русский)"
 
 #: xrc/MainMenu.xrc:708
 msgid "Swedish"
-msgstr ""
+msgstr "Swedish (Svenska)"
 
 #: xrc/MainMenu.xrc:712
 msgid "Turkish"
-msgstr ""
+msgstr "Turkish (Türkçe)"
 
 #: xrc/MainMenu.xrc:716
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrainian (Українська)"
 
 #: xrc/MainMenu.xrc:720
 msgid "Urdu (Pakistan)"
-msgstr ""
+msgstr "Urdū (اُردُو)"
 
 #: xrc/MainMenu.xrc:724
 msgid "Chinese (China)"
-msgstr ""
+msgstr "Zhōngwén Jiǎntǐ (中文简体)"
 
 #: xrc/MainMenu.xrc:730
 msgid "&Tools"
