@@ -3662,7 +3662,7 @@ msgstr "French (Français)"
 
 #: xrc/MainMenu.xrc:636
 msgid "French"
-msgstr "French (Français)"
+msgstr "French (Français) (Non-Region-Specific)"
 
 #: xrc/MainMenu.xrc:640
 msgid "Galician"
@@ -3678,7 +3678,7 @@ msgstr "Hungarian (Magyar)"
 
 #: xrc/MainMenu.xrc:652
 msgid "Hungarian"
-msgstr "Hungarian (Magyar)"
+msgstr "Hungarian (Magyar) (Non-Region-Specific)"
 
 #: xrc/MainMenu.xrc:656
 msgid "Indonesian"
@@ -3698,7 +3698,7 @@ msgstr "Hangug-Eo (한국어)"
 
 #: xrc/MainMenu.xrc:672
 msgid "Korean"
-msgstr "Hangug-Eo (한국어)"
+msgstr "Hangug-Eo (한국어) (Non-Region-Specific)"
 
 #: xrc/MainMenu.xrc:676
 msgid "Malay (Malaysia)"
@@ -3718,7 +3718,7 @@ msgstr "Polish (Polski)"
 
 #: xrc/MainMenu.xrc:692
 msgid "Polish"
-msgstr "Polish (Polski)"
+msgstr "Polish (Polski) (Non-Region-Specific)"
 
 #: xrc/MainMenu.xrc:696
 msgid "Portuguese (Brazil)"
