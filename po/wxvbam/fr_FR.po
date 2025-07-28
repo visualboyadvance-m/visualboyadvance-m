@@ -1999,7 +1999,7 @@ msgstr "XAudio2 :  la création de la voix source a échoué !"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:680
 msgid "Error, link already connected"
-msgstr "Erreur, Link déja actif"
+msgstr "Erreur, Link déja connecté"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:694
 msgid "Unable to find link driver"
@@ -2015,14 +2015,14 @@ msgstr "La connexion Link n'a pas besoin de mise à jour"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2926
 #, c-format
 msgid "Player %d disconnected."
-msgstr "Joueur %d déconnecté"
+msgstr "Joueur %d déconnecté."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:980
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1020
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1060
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1703
 msgid "Server disconnected."
-msgstr "Serveur déconnecté"
+msgstr "Serveur déconnecté."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1151
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1182
@@ -2089,7 +2089,7 @@ msgstr "Délai de connexion à un esclave expiré ; réinitialisation de la comm
 
 #: xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
-msgstr "Raccourcis clavier"
+msgstr "Raccourcis touche"
 
 #: xrc/AccelConfig.xrc:26
 msgid "Co&mmands:"
@@ -2125,7 +2125,7 @@ msgstr "Ajouter un Code de triche"
 
 #: xrc/CheatAdd.xrc:9 xrc/CheatEdit.xrc:9
 msgid "&Description"
-msgstr "&Déscription"
+msgstr "&Description"
 
 #: xrc/CheatAdd.xrc:53
 msgid "&Value"
@@ -2157,11 +2157,11 @@ msgstr "&Moins ou égal"
 
 #: xrc/CheatCreate.xrc:52
 msgid "&Greater than"
-msgstr "Plus &Grand que"
+msgstr "Plus &grand que"
 
 #: xrc/CheatCreate.xrc:59
 msgid "G&reater or equal"
-msgstr "Plus G&rand ou égal"
+msgstr "Plus g&rand ou égal"
 
 #: xrc/CheatCreate.xrc:64
 msgid "Compare type"
@@ -2205,7 +2205,7 @@ msgstr "An&cienne valeur"
 
 #: xrc/CheatCreate.xrc:152
 msgid "Specific &value"
-msgstr "&valeur spécifique"
+msgstr "&Valeur spécifique"
 
 #: xrc/CheatCreate.xrc:163
 msgid "Search value"
@@ -3194,7 +3194,7 @@ msgstr "Emplacement le &plus ancien"
 
 #: xrc/MainMenu.xrc:107
 msgid "Save current state slot"
-msgstr "Sauvegarder l'Emplacement d'Etat en cours"
+msgstr "Sauvegarder l'emplacement d'état en cours"
 
 #: xrc/MainMenu.xrc:110
 msgid "Increase state slot number and save"
@@ -3419,7 +3419,7 @@ msgstr "&Démarrer en plein écran"
 
 #: xrc/MainMenu.xrc:324
 msgid "&Scaled resize"
-msgstr "Redimensionner la mise à l'&Echelle"
+msgstr "Redimensionner la mise à l'&échelle"
 
 #: xrc/MainMenu.xrc:326
 msgid "&1x"
@@ -3447,7 +3447,7 @@ msgstr "&6x"
 
 #: xrc/MainMenu.xrc:345
 msgid "Change pixel filter"
-msgstr "Changer le filtre du Pixel"
+msgstr "Changer le filtre du pixel"
 
 #: xrc/MainMenu.xrc:348
 msgid "Change interframe blending"
@@ -3487,7 +3487,7 @@ msgstr "Baisser le volume"
 
 #: xrc/MainMenu.xrc:392
 msgid "&Toggle sound"
-msgstr "&Changer le Son"
+msgstr "&Activer le son"
 
 #: xrc/MainMenu.xrc:397
 msgid "&Game Boy Advance sound interpolation"
@@ -3523,7 +3523,7 @@ msgstr "Tir &automatique"
 
 #: xrc/MainMenu.xrc:448
 msgid "&Autohold"
-msgstr "Maintenir &Auto"
+msgstr "Maintien &automatique"
 
 #: xrc/MainMenu.xrc:466
 msgid "&A"
@@ -3563,7 +3563,7 @@ msgstr "Filtre &LCD"
 
 #: xrc/MainMenu.xrc:521
 msgid "&Game Boy color option"
-msgstr "Option Couleur de la &Game Boy"
+msgstr "Option couleur de la &Game Boy"
 
 #: xrc/MainMenu.xrc:529
 msgid "&Game Boy Colorizer Hack (requires restart)"
@@ -4035,7 +4035,7 @@ msgstr "Maximum"
 
 #: xrc/SoundConfig.xrc:73
 msgid "Sample rate:"
-msgstr "Echantillonage :"
+msgstr "Échantillonnage :"
 
 #: xrc/SoundConfig.xrc:79
 msgid "48 KHz"
@@ -4115,8 +4115,8 @@ msgstr "&Accélérer"
 
 #: xrc/SpeedupConfig.xrc:54
 msgid "Frame skip"
-msgstr "Saut d'Image"
+msgstr "Saut d'image"
 
 #: xrc/SpeedupConfig.xrc:61
 msgid "Mute Sound"
-msgstr "Couper le Son"
+msgstr "Couper le son"
