@@ -27,9 +27,77 @@
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
 #include "wx/dialogs/game-maker.h"
+#include "wx/wxvbam.h"
+#include "wx/widgets/group-check-box.h"
+#include "wx/widgets/user-input-ctrl.h"
+#include "wx/widgets/utils.h"
 
 #define GetXRCDialog(n) \
     wxStaticCast(wxGetApp().frame->FindWindowByName(n), wxDialog)
+
+void RefreshFrame(void)
+{
+    wxXmlResource* xr = wxXmlResource::Get();
+    const wxRect client_rect(
+        OPTION(kGeomWindowX).Get(),
+        OPTION(kGeomWindowY).Get(),
+        OPTION(kGeomWindowWidth).Get(),
+        OPTION(kGeomWindowHeight).Get());
+    const bool is_fullscreen = OPTION(kGeomFullScreen);
+    const bool is_maximized = OPTION(kGeomIsMaximized);
+
+    // note: if linking statically, next 2 pull in lot of unused code
+    // maybe in future if not wxSHARED, load only builtin-needed handlers
+    xr->InitAllHandlers();
+    xr->AddHandler(new widgets::GroupCheckBoxXmlHandler());
+    xr->AddHandler(new widgets::UserInputCtrlXmlHandler());
+    wxInitAllImageHandlers();
+
+    wxGetApp().SetExitOnFrameDelete(false);
+
+    if (wxGetApp().frame)
+        wxGetApp().frame->Destroy();
+
+    wxGetApp().frame = wxDynamicCast(xr->LoadFrame(nullptr, "MainFrame"), MainFrame);
+    if (!wxGetApp().frame) {
+        wxLogError(_("Could not create main window"));
+        return;
+    }
+
+    wxConfigBase* cfg = wxConfigBase::Get();
+    gopts.recent = new wxFileHistory(10);
+    cfg->SetPath("/Recent");
+    gopts.recent->Load(*cfg);
+    cfg->SetPath("/");
+    cfg->Flush();
+
+    // Create() cannot be overridden easily
+    if (!wxGetApp().frame->BindControls()) {
+        return;
+    }
+
+    // Ensure we are not drawing out of bounds.
+    if (widgets::GetDisplayRect().Intersects(client_rect)) {
+        wxGetApp().frame->SetSize(client_rect);
+    }
+
+    if (is_maximized) {
+        wxGetApp().frame->Maximize();
+    }
+
+    if (is_fullscreen && wxGetApp().pending_load != wxEmptyString)
+        wxGetApp().frame->ShowFullScreen(is_fullscreen);
+
+    wxGetApp().frame->Show(true);
+    
+    // Windows can render the taskbar icon late if this is done in MainFrame
+    // It may also not update at all until the Window has been minimized/restored
+    // This seems timing related, possibly based on HWND
+    // So do this here since it reliably draws the Taskbar icon on Window creation.
+    wxGetApp().frame->BindAppIcon();
+
+    wxGetApp().SetExitOnFrameDelete(true);
+}
 
 void MainFrame::GetMenuOptionBool(const wxString& menuName, bool* field)
 {
@@ -2655,6 +2723,7 @@ EVT_HANDLER(Language0, "Default Language")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_DEFAULT);
     
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language1, "Bulgarian")
@@ -2669,6 +2738,7 @@ EVT_HANDLER(Language1, "Bulgarian")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_BULGARIAN);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language2, "Breton")
@@ -2683,6 +2753,7 @@ EVT_HANDLER(Language2, "Breton")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_BRETON);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language3, "Czech")
@@ -2697,6 +2768,7 @@ EVT_HANDLER(Language3, "Czech")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_CZECH);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language4, "German")
@@ -2711,6 +2783,7 @@ EVT_HANDLER(Language4, "German")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_GERMAN);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language5, "Greek")
@@ -2725,6 +2798,7 @@ EVT_HANDLER(Language5, "Greek")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_GREEK);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language6, "English (US)")
@@ -2739,6 +2813,7 @@ EVT_HANDLER(Language6, "English (US)")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_ENGLISH_US);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language7, "Spanish (Latin American)")
@@ -2753,6 +2828,7 @@ EVT_HANDLER(Language7, "Spanish (Latin American)")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SPANISH_LATIN_AMERICA);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language8, "Spanish (Colombia)")
@@ -2767,6 +2843,7 @@ EVT_HANDLER(Language8, "Spanish (Colombia)")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SPANISH_COLOMBIA);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language9, "Spanish (Peru)")
@@ -2781,6 +2858,7 @@ EVT_HANDLER(Language9, "Spanish (Peru)")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SPANISH_PERU);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language10, "Spanish (US)")
@@ -2795,6 +2873,7 @@ EVT_HANDLER(Language10, "Spanish (US)")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SPANISH_US);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language11, "Spanish")
@@ -2809,6 +2888,7 @@ EVT_HANDLER(Language11, "Spanish")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SPANISH);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language12, "French (France)")
@@ -2823,6 +2903,7 @@ EVT_HANDLER(Language12, "French (France)")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_FRENCH_FRANCE);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language13, "French")
@@ -2837,6 +2918,7 @@ EVT_HANDLER(Language13, "French")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_FRENCH);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language14, "Galician")
@@ -2851,6 +2933,7 @@ EVT_HANDLER(Language14, "Galician")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_GALICIAN);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language15, "Hebrew (Israel)")
@@ -2865,6 +2948,7 @@ EVT_HANDLER(Language15, "Hebrew (Israel)")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_HEBREW_ISRAEL);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language16, "Hungarian (Hungary)")
@@ -2879,6 +2963,7 @@ EVT_HANDLER(Language16, "Hungarian (Hungary)")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_HUNGARIAN_HUNGARY);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language17, "Hungarian")
@@ -2893,6 +2978,7 @@ EVT_HANDLER(Language17, "Hungarian")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_HUNGARIAN);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language18, "Indonesian")
@@ -2907,6 +2993,7 @@ EVT_HANDLER(Language18, "Indonesian")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_INDONESIAN);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language19, "Italian")
@@ -2921,6 +3008,7 @@ EVT_HANDLER(Language19, "Italian")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_ITALIAN_ITALY);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language20, "Japanese")
@@ -2935,6 +3023,7 @@ EVT_HANDLER(Language20, "Japanese")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_JAPANESE);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language21, "Korean (Korea)")
@@ -2949,6 +3038,7 @@ EVT_HANDLER(Language21, "Korean (Korea)")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_KOREAN_KOREA);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language22, "Korean")
@@ -2963,6 +3053,7 @@ EVT_HANDLER(Language22, "Korean")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_KOREAN);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language23, "Malay (Malaysia)")
@@ -2977,6 +3068,7 @@ EVT_HANDLER(Language23, "Malay (Malaysia)")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_MALAY_MALAYSIA);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language24, "Norwegian")
@@ -2991,6 +3083,7 @@ EVT_HANDLER(Language24, "Norwegian")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_NORWEGIAN);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language25, "Dutch")
@@ -3005,6 +3098,7 @@ EVT_HANDLER(Language25, "Dutch")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_DUTCH);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language26, "Polish (Poland)")
@@ -3019,6 +3113,7 @@ EVT_HANDLER(Language26, "Polish (Poland)")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_POLISH_POLAND);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language27, "Polish")
@@ -3033,6 +3128,7 @@ EVT_HANDLER(Language27, "Polish")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_POLISH);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language28, "Portuguese (Brazil)")
@@ -3047,6 +3143,7 @@ EVT_HANDLER(Language28, "Portuguese (Brazil)")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_PORTUGUESE_BRAZILIAN);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language29, "Portuguese (Portugal)")
@@ -3061,6 +3158,7 @@ EVT_HANDLER(Language29, "Portuguese (Portugal)")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_PORTUGUESE_PORTUGAL);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language30, "Russian (Russia)")
@@ -3075,6 +3173,7 @@ EVT_HANDLER(Language30, "Russian (Russia)")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_RUSSIAN_RUSSIA);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language31, "Swedish")
@@ -3089,6 +3188,7 @@ EVT_HANDLER(Language31, "Swedish")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SWEDISH);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language32, "Turkish")
@@ -3103,6 +3203,7 @@ EVT_HANDLER(Language32, "Turkish")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_TURKISH);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language33, "Ukrainian")
@@ -3117,6 +3218,7 @@ EVT_HANDLER(Language33, "Ukrainian")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_UKRAINIAN);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language34, "Urdu (Pakistan)")
@@ -3131,6 +3233,7 @@ EVT_HANDLER(Language34, "Urdu (Pakistan)")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_URDU_PAKISTAN);
 
     update_opts();
+    RefreshFrame();
 }
 
 EVT_HANDLER(Language35, "Chinese (China)")
@@ -3145,6 +3248,7 @@ EVT_HANDLER(Language35, "Chinese (China)")
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_CHINESE_CHINA);
     
     update_opts();
+    RefreshFrame();
 }
 
 // Dummy for disabling system key bindings
@@ -3153,7 +3257,7 @@ EVT_HANDLER_MASK(NOOP, "Do nothing", CMDEN_NEVER)
 }
 
 // The following have been moved to dialogs
-// I will not implement as command unless there is great demand
+// I will not implement as command unless there is great demand cvbn,;
 // CheatsList
 //EVT_HANDLER(CheatsLoad, "Load Cheats...")
 //EVT_HANDLER(CheatsSave, "Save Cheats...")

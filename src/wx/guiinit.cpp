@@ -1846,10 +1846,9 @@ bool MainFrame::BindControls()
         hide_menu_bar = nullptr;
 #endif
 
-
         // if a recent menu is present, save its location
-        wxMenuItem* recentmi = XRCITEM("RecentMenu");
-
+        wxMenuItem *recentmi = XRCITEM("RecentMenu");
+            
         if (recentmi && recentmi->IsSubMenu()) {
             recent = recentmi->GetSubMenu();
             gopts.recent->UseMenu(recent);
