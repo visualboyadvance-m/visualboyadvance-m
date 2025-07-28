@@ -380,10 +380,6 @@ bool wxvbamApp::OnInit() {
 
     // load selected language
 
-#ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
-#endif
-
     wxvbam_locale->AddCatalog("wxvbam");
 
     // make built-in xrc file available
@@ -505,7 +501,8 @@ bool wxvbamApp::OnInit() {
     // load selected language
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam");

@@ -2711,6 +2711,11 @@ EVT_HANDLER(LinkConfigure, "Link options...")
 #endif
 }
 
+EVT_HANDLER(ExternalTranslations, "Use external translations")
+{
+    GetMenuOptionConfig("ExternalTranslations", config::OptionID::kExternalTranslations);
+}
+
 EVT_HANDLER(Language0, "Default Language")
 {
     OPTION(kLocale) = wxLANGUAGE_DEFAULT;
@@ -2722,7 +2727,8 @@ EVT_HANDLER(Language0, "Default Language")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_DEFAULT);
@@ -2742,7 +2748,8 @@ EVT_HANDLER(Language1, "Bulgarian")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_BULGARIAN);
@@ -2762,7 +2769,8 @@ EVT_HANDLER(Language2, "Breton")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_BRETON);
@@ -2782,7 +2790,8 @@ EVT_HANDLER(Language3, "Czech")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_CZECH);
@@ -2822,7 +2831,8 @@ EVT_HANDLER(Language5, "Greek")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_GREEK);
@@ -2842,7 +2852,8 @@ EVT_HANDLER(Language6, "English (US)")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_ENGLISH_US);
@@ -2862,7 +2873,8 @@ EVT_HANDLER(Language7, "Spanish (Latin American)")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SPANISH_LATIN_AMERICA);
@@ -2882,7 +2894,8 @@ EVT_HANDLER(Language8, "Spanish (Colombia)")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SPANISH_COLOMBIA);
@@ -2902,7 +2915,8 @@ EVT_HANDLER(Language9, "Spanish (Peru)")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SPANISH_PERU);
@@ -2922,7 +2936,8 @@ EVT_HANDLER(Language10, "Spanish (US)")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SPANISH_US);
@@ -2942,7 +2957,8 @@ EVT_HANDLER(Language11, "Spanish")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SPANISH);
@@ -2962,7 +2978,8 @@ EVT_HANDLER(Language12, "French (France)")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_FRENCH_FRANCE);
@@ -2982,7 +2999,8 @@ EVT_HANDLER(Language13, "French")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_FRENCH);
@@ -3002,7 +3020,8 @@ EVT_HANDLER(Language14, "Galician")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_GALICIAN);
@@ -3022,7 +3041,8 @@ EVT_HANDLER(Language15, "Hebrew (Israel)")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_HEBREW_ISRAEL);
@@ -3042,7 +3062,8 @@ EVT_HANDLER(Language16, "Hungarian (Hungary)")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_HUNGARIAN_HUNGARY);
@@ -3062,7 +3083,8 @@ EVT_HANDLER(Language17, "Hungarian")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_HUNGARIAN);
@@ -3082,7 +3104,8 @@ EVT_HANDLER(Language18, "Indonesian")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_INDONESIAN);
@@ -3102,7 +3125,8 @@ EVT_HANDLER(Language19, "Italian")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_ITALIAN_ITALY);
@@ -3122,7 +3146,8 @@ EVT_HANDLER(Language20, "Japanese")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_JAPANESE);
@@ -3142,7 +3167,8 @@ EVT_HANDLER(Language21, "Korean (Korea)")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_KOREAN_KOREA);
@@ -3162,7 +3188,8 @@ EVT_HANDLER(Language22, "Korean")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_KOREAN);
@@ -3182,7 +3209,8 @@ EVT_HANDLER(Language23, "Malay (Malaysia)")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_MALAY_MALAYSIA);
@@ -3202,7 +3230,8 @@ EVT_HANDLER(Language24, "Norwegian")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_NORWEGIAN);
@@ -3222,7 +3251,8 @@ EVT_HANDLER(Language25, "Dutch")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_DUTCH);
@@ -3242,7 +3272,8 @@ EVT_HANDLER(Language26, "Polish (Poland)")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_POLISH_POLAND);
@@ -3262,7 +3293,8 @@ EVT_HANDLER(Language27, "Polish")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_POLISH);
@@ -3282,7 +3314,8 @@ EVT_HANDLER(Language28, "Portuguese (Brazil)")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_PORTUGUESE_BRAZILIAN);
@@ -3302,7 +3335,8 @@ EVT_HANDLER(Language29, "Portuguese (Portugal)")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_PORTUGUESE_PORTUGAL);
@@ -3322,7 +3356,8 @@ EVT_HANDLER(Language30, "Russian (Russia)")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_RUSSIAN_RUSSIA);
@@ -3342,7 +3377,8 @@ EVT_HANDLER(Language31, "Swedish")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_SWEDISH);
@@ -3362,7 +3398,8 @@ EVT_HANDLER(Language32, "Turkish")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_TURKISH);
@@ -3382,7 +3419,8 @@ EVT_HANDLER(Language33, "Ukrainian")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_UKRAINIAN);
@@ -3402,7 +3440,8 @@ EVT_HANDLER(Language34, "Urdu (Pakistan)")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_URDU_PAKISTAN);
@@ -3422,7 +3461,8 @@ EVT_HANDLER(Language35, "Chinese (China)")
     wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
 
 #ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+    if (OPTION(kExternalTranslations) == false)
+        wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_CHINESE_CHINA);

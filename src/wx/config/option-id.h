@@ -138,6 +138,7 @@ enum class OptionID {
     kSoundUpmix,
     kSoundVolume,
     kLocale,
+    kExternalTranslations,
 
     // Do not add anything under here.
     Last,

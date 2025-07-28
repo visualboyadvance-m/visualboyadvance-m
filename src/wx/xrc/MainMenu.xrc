@@ -725,6 +725,10 @@
             <radio>1</radio>
           </object>
         </object>
+	<object class="wxMenuItem" name="ExternalTranslations">
+	  <label>_Use external translations</label>
+	  <checkable>1</checkable>
+	</object>
     </object>
     <object class="wxMenu">
       <label>_Tools</label>

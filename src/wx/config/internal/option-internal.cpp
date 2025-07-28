@@ -253,6 +253,7 @@ std::array<Option, kNbOptions>& Option::All() {
         uint32_t bitdepth = 3;
         wxString sdlrenderer = wxString("default");
         int locale = wxLANGUAGE_DEFAULT;
+        bool exttrans = false;
     };
     static OwnedOptions g_owned_opts;
 
@@ -395,6 +396,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kSoundUpmix, &g_owned_opts.upmix),
         Option(OptionID::kSoundVolume, &g_owned_opts.volume, 0, 200),
         Option(OptionID::kLocale, &g_owned_opts.locale, 0, 911),
+        Option(OptionID::kExternalTranslations, &g_owned_opts.exttrans)
     };
     // clang-format on
     return g_all_opts;
@@ -605,6 +607,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"Sound/Upmix", "Upmix", _("Upmix stereo to surround")},
     OptionData{"Sound/Volume", "", _("Sound volume (%)")},
     OptionData{"Language/Locale", _("Language")},
+    OptionData{"Language/ExternalTranslations", _("External translations")},
 
     // Last. This should never be used, it actually maps to OptionID::kLast.
     // This is to prevent a memory access violation error in case something

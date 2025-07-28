@@ -45,8 +45,6 @@ extern struct opts_t {
     bool hide_menu_bar = true;
     bool suspend_screensaver = false;
 
-    int locale = 0;
-
     /// wxWindows
     // wxWidgets-generated options (opaque)
 } gopts;
