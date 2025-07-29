@@ -1709,7 +1709,7 @@ msgstr "语言"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:610
 msgid "External translations"
-msgstr ""
+msgstr "外部翻译"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:679
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:699
@@ -3773,7 +3773,7 @@ msgstr "中文(中国)"
 
 #: xrc/MainMenu.xrc:729
 msgid "&Use external translations"
-msgstr ""
+msgstr "使用外部翻译(&U)"
 
 #: xrc/MainMenu.xrc:734
 msgid "&Tools"
