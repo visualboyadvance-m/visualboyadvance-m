@@ -1694,7 +1694,7 @@ msgstr "Мова"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:610
 msgid "External translations"
-msgstr ""
+msgstr "Зовнішні переклади"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:679
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:699
@@ -3758,7 +3758,7 @@ msgstr "Zhōngwén Jiǎntǐ (中文简体)"
 
 #: xrc/MainMenu.xrc:729
 msgid "&Use external translations"
-msgstr ""
+msgstr "&Використовувати зовнішні переклади"
 
 #: xrc/MainMenu.xrc:734
 msgid "&Tools"
