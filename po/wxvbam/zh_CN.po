@@ -3765,7 +3765,7 @@ msgstr "关于(&A)..."
 
 #: xrc/MainMenu.xrc:755
 msgid "&Languages"
-msgstr ""
+msgstr "语言(&L)"
 
 #: xrc/MainMenu.xrc:757
 msgid "Default Language"
