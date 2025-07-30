@@ -3750,7 +3750,7 @@ msgstr "&Про додаток..."
 
 #: xrc/MainMenu.xrc:755
 msgid "&Languages"
-msgstr ""
+msgstr "&Мови"
 
 #: xrc/MainMenu.xrc:757
 msgid "Default Language"
