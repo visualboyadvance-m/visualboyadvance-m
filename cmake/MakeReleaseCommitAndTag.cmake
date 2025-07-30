@@ -221,7 +221,7 @@ release notes.
 
 Run the following commands to commit the change:
 
-    git commit -m'release ${new_tag}' --signoff -S
+    git commit -a -m'release ${new_tag}' --signoff -S
     git tag -s -m'${new_tag}' ${new_tag}
 
 To rollback these changes, run this command:
