@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-28 15:00+0000\n"
+"POT-Creation-Date: 2025-07-30 01:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Svyatoslav <zarazafamila@gmail.com>, 2023\n"
 "Language-Team: Ukrainian (http://app.transifex.com/bgk/vba-m/language/uk/)\n"
@@ -3612,289 +3612,293 @@ msgstr "Приховати панель &меню"
 msgid "Suspend &Screen Saver"
 msgstr "Призупинити &заставку"
 
-#: xrc/MainMenu.xrc:584
-msgid "Default Language"
-msgstr "Типова мова"
-
-#: xrc/MainMenu.xrc:588
-msgid "Bulgarian"
-msgstr "Bulgarian (Български)"
-
-#: xrc/MainMenu.xrc:592
-msgid "Breton"
-msgstr "Breton (Brezhoneg)"
-
-#: xrc/MainMenu.xrc:596
-msgid "Czech"
-msgstr "Czech (Čeština)"
-
-#: xrc/MainMenu.xrc:600
-msgid "German"
-msgstr "German (Deutsch)"
-
-#: xrc/MainMenu.xrc:604
-msgid "Greek"
-msgstr "Elliniká (Ελληνικά)"
-
-#: xrc/MainMenu.xrc:608
-msgid "English (US)"
-msgstr "English (English)"
-
-#: xrc/MainMenu.xrc:612
-msgid "Spanish (Latin American)"
-msgstr "Spanish Latin American (Español Latinoamericano)"
-
-#: xrc/MainMenu.xrc:616
-msgid "Spanish (Colombia)"
-msgstr "Spanish Colombian (Español Colombiano)"
-
-#: xrc/MainMenu.xrc:620
-msgid "Spanish (Peru)"
-msgstr "Spanish Peruvian (Español Peruano)"
-
-#: xrc/MainMenu.xrc:624
-msgid "Spanish (United States)"
-msgstr "Spanish American United States (Español Americano Estadounidense)"
-
-#: xrc/MainMenu.xrc:628
-msgid "Spanish"
-msgstr "Spanish (Español)"
-
-#: xrc/MainMenu.xrc:632
-msgid "French (France)"
-msgstr "French (Français)"
-
-#: xrc/MainMenu.xrc:636
-msgid "French"
-msgstr "French (Français) (Non-Region-Specific)"
-
-#: xrc/MainMenu.xrc:640
-msgid "Galician"
-msgstr "Galician (Galego)"
-
-#: xrc/MainMenu.xrc:644
-msgid "Hebrew (Israel)"
-msgstr "Ivrit (עברית)"
-
-#: xrc/MainMenu.xrc:648
-msgid "Hungarian (Hungary)"
-msgstr "Hungarian (Magyar)"
-
-#: xrc/MainMenu.xrc:652
-msgid "Hungarian"
-msgstr "Hungarian (Magyar) (Non-Region-Specific)"
-
-#: xrc/MainMenu.xrc:656
-msgid "Indonesian"
-msgstr "Indonesian (Indonesia)"
-
-#: xrc/MainMenu.xrc:660
-msgid "Italian"
-msgstr "Italian (Italiano)"
-
-#: xrc/MainMenu.xrc:664
-msgid "Japanese"
-msgstr "Nihongo (日本語)"
-
-#: xrc/MainMenu.xrc:668
-msgid "Korean (Korea)"
-msgstr "Hangug-Eo (한국어)"
-
-#: xrc/MainMenu.xrc:672
-msgid "Korean"
-msgstr "Hangug-Eo (한국어) (Non-Region-Specific)"
-
-#: xrc/MainMenu.xrc:676
-msgid "Malay (Malaysia)"
-msgstr "Malay (Melayu)"
-
-#: xrc/MainMenu.xrc:680
-msgid "Norwegian"
-msgstr "Norwegian (Norsk)"
-
-#: xrc/MainMenu.xrc:684
-msgid "Dutch"
-msgstr "Dutch (Nederlands)"
-
-#: xrc/MainMenu.xrc:688
-msgid "Polish (Poland)"
-msgstr "Polish (Polski)"
-
-#: xrc/MainMenu.xrc:692
-msgid "Polish"
-msgstr "Polish (Polski) (Non-Region-Specific)"
-
-#: xrc/MainMenu.xrc:696
-msgid "Portuguese (Brazil)"
-msgstr "Portuguese Brazilian (Português Brasileiro)"
-
-#: xrc/MainMenu.xrc:700
-msgid "Portuguese (Portugal)"
-msgstr "Portuguese (Português)"
-
-#: xrc/MainMenu.xrc:704
-msgid "Russian (Russia)"
-msgstr "Russian (Русский)"
-
-#: xrc/MainMenu.xrc:708
-msgid "Swedish"
-msgstr "Swedish (Svenska)"
-
-#: xrc/MainMenu.xrc:712
-msgid "Turkish"
-msgstr "Turkish (Türkçe)"
-
-#: xrc/MainMenu.xrc:716
-msgid "Ukrainian"
-msgstr "Ukrainian (Українська)"
-
-#: xrc/MainMenu.xrc:720
-msgid "Urdu (Pakistan)"
-msgstr "Urdū (اُردُو)"
-
-#: xrc/MainMenu.xrc:724
-msgid "Chinese (China)"
-msgstr "Zhōngwén Jiǎntǐ (中文简体)"
-
-#: xrc/MainMenu.xrc:729
-msgid "&Use external translations"
-msgstr "&Використовувати зовнішні переклади"
-
-#: xrc/MainMenu.xrc:734
+#: xrc/MainMenu.xrc:583
 msgid "&Tools"
 msgstr "&Засоби"
 
-#: xrc/MainMenu.xrc:736
+#: xrc/MainMenu.xrc:585
 msgid "&Cheats"
 msgstr "&Чіти"
 
-#: xrc/MainMenu.xrc:738
+#: xrc/MainMenu.xrc:587
 msgid "List &cheats..."
 msgstr "Перелік &чітів..."
 
-#: xrc/MainMenu.xrc:741
+#: xrc/MainMenu.xrc:590
 msgid "Find c&heat..."
 msgstr "Знайти &чіт..."
 
-#: xrc/MainMenu.xrc:745
+#: xrc/MainMenu.xrc:594
 msgid "A&utomatically save / load cheats"
 msgstr "&Автоматично зберігати / завантажувати чіти"
 
-#: xrc/MainMenu.xrc:749
+#: xrc/MainMenu.xrc:598
 msgid "&Enable cheats"
 msgstr "&Увімкнути чіти"
 
-#: xrc/MainMenu.xrc:756
+#: xrc/MainMenu.xrc:605
 msgid "&Break into GDB"
 msgstr "&Перервати GDB"
 
-#: xrc/MainMenu.xrc:760
+#: xrc/MainMenu.xrc:609
 msgid "&Configure port..."
 msgstr "&Налаштувати порт..."
 
-#: xrc/MainMenu.xrc:763
+#: xrc/MainMenu.xrc:612
 msgid "&Break on load"
 msgstr "&Перервати завантаження"
 
-#: xrc/MainMenu.xrc:768
+#: xrc/MainMenu.xrc:617
 msgid "&Disconnect"
 msgstr "&Роз'єднати"
 
-#: xrc/MainMenu.xrc:773
+#: xrc/MainMenu.xrc:622
 msgid "&Disassemble..."
 msgstr "&Розібрати..."
 
-#: xrc/MainMenu.xrc:776
+#: xrc/MainMenu.xrc:625
 msgid "&Logging..."
 msgstr "&Журнал..."
 
-#: xrc/MainMenu.xrc:779
+#: xrc/MainMenu.xrc:628
 msgid "&IO Viewer..."
 msgstr "&Переглядач введення-виведення..."
 
-#: xrc/MainMenu.xrc:782
+#: xrc/MainMenu.xrc:631
 msgid "&Map Viewer..."
 msgstr "&Переглядач мапи..."
 
-#: xrc/MainMenu.xrc:785
+#: xrc/MainMenu.xrc:634
 msgid "M&emory Viewer..."
 msgstr "Переглядач &пам'яті..."
 
-#: xrc/MainMenu.xrc:788
+#: xrc/MainMenu.xrc:637
 msgid "&OAM Viewer..."
 msgstr "&OAM-переглядач..."
 
-#: xrc/MainMenu.xrc:791
+#: xrc/MainMenu.xrc:640
 msgid "&Palette Viewer..."
 msgstr "&Переглядач палітри..."
 
-#: xrc/MainMenu.xrc:794
+#: xrc/MainMenu.xrc:643
 msgid "&Tile Viewer..."
 msgstr "&Переглядач плитки..."
 
-#: xrc/MainMenu.xrc:799
+#: xrc/MainMenu.xrc:648
 msgid "Show all video layers"
 msgstr "Показати всі відеошари"
 
-#: xrc/MainMenu.xrc:842
+#: xrc/MainMenu.xrc:691
 msgid "&View Layers"
 msgstr "&Переглянути шари"
 
-#: xrc/MainMenu.xrc:846
+#: xrc/MainMenu.xrc:695
 msgid "Channel &1"
 msgstr "Канал &1"
 
-#: xrc/MainMenu.xrc:851
+#: xrc/MainMenu.xrc:700
 msgid "Channel &2"
 msgstr "Канал &2"
 
-#: xrc/MainMenu.xrc:856
+#: xrc/MainMenu.xrc:705
 msgid "Channel &3"
 msgstr "Канал &3"
 
-#: xrc/MainMenu.xrc:861
+#: xrc/MainMenu.xrc:710
 msgid "Channel &4"
 msgstr "Канал &4"
 
-#: xrc/MainMenu.xrc:866
+#: xrc/MainMenu.xrc:715
 msgid "Direct Sound &A"
 msgstr "Direct Sound &A"
 
-#: xrc/MainMenu.xrc:871
+#: xrc/MainMenu.xrc:720
 msgid "Direct Sound &B"
 msgstr "Direct Sound &B"
 
-#: xrc/MainMenu.xrc:875
+#: xrc/MainMenu.xrc:724
 msgid "&Sound Channels"
 msgstr "&Звукові канали"
 
-#: xrc/MainMenu.xrc:879
+#: xrc/MainMenu.xrc:728
 msgid "&Help"
 msgstr "&Довідка"
 
-#: xrc/MainMenu.xrc:881
+#: xrc/MainMenu.xrc:730
 msgid "Report &Bugs"
 msgstr "Повідомити &помилки"
 
-#: xrc/MainMenu.xrc:884
+#: xrc/MainMenu.xrc:733
 msgid "Visual Boy Advance-M Support &Forum"
 msgstr "&Форум підтримки Visual Boy Advance-M"
 
-#: xrc/MainMenu.xrc:887
+#: xrc/MainMenu.xrc:736
 msgid "Translations"
 msgstr "Переклади"
 
-#: xrc/MainMenu.xrc:895
+#: xrc/MainMenu.xrc:744
 msgid "Check for updates"
 msgstr "Перевірити оновлення"
 
-#: xrc/MainMenu.xrc:898
+#: xrc/MainMenu.xrc:747
 msgid "&Factory Reset..."
 msgstr "&Відновити типові налаштування..."
 
-#: xrc/MainMenu.xrc:902
+#: xrc/MainMenu.xrc:751
 msgid "&About..."
 msgstr "&Про додаток..."
+
+#: xrc/MainMenu.xrc:755
+msgid "&Languages"
+msgstr ""
+
+#: xrc/MainMenu.xrc:757
+msgid "Default Language"
+msgstr "Типова мова"
+
+#: xrc/MainMenu.xrc:761
+msgid "Bulgarian"
+msgstr "Bulgarian (Български)"
+
+#: xrc/MainMenu.xrc:765
+msgid "Breton"
+msgstr "Breton (Brezhoneg)"
+
+#: xrc/MainMenu.xrc:769
+msgid "Czech"
+msgstr "Czech (Čeština)"
+
+#: xrc/MainMenu.xrc:773
+msgid "German"
+msgstr "German (Deutsch)"
+
+#: xrc/MainMenu.xrc:777
+msgid "Greek"
+msgstr "Elliniká (Ελληνικά)"
+
+#: xrc/MainMenu.xrc:781
+msgid "English (US)"
+msgstr "English (English)"
+
+#: xrc/MainMenu.xrc:785
+msgid "Spanish (Latin American)"
+msgstr "Spanish Latin American (Español Latinoamericano)"
+
+#: xrc/MainMenu.xrc:789
+msgid "Spanish (Colombia)"
+msgstr "Spanish Colombian (Español Colombiano)"
+
+#: xrc/MainMenu.xrc:793
+msgid "Spanish (Peru)"
+msgstr "Spanish Peruvian (Español Peruano)"
+
+#: xrc/MainMenu.xrc:797
+msgid "Spanish (United States)"
+msgstr "Spanish American United States (Español Americano Estadounidense)"
+
+#: xrc/MainMenu.xrc:801
+msgid "Spanish"
+msgstr "Spanish (Español)"
+
+#: xrc/MainMenu.xrc:805
+msgid "French (France)"
+msgstr "French (Français)"
+
+#: xrc/MainMenu.xrc:809
+msgid "French"
+msgstr "French (Français) (Non-Region-Specific)"
+
+#: xrc/MainMenu.xrc:813
+msgid "Galician"
+msgstr "Galician (Galego)"
+
+#: xrc/MainMenu.xrc:817
+msgid "Hebrew (Israel)"
+msgstr "Ivrit (עברית)"
+
+#: xrc/MainMenu.xrc:821
+msgid "Hungarian (Hungary)"
+msgstr "Hungarian (Magyar)"
+
+#: xrc/MainMenu.xrc:825
+msgid "Hungarian"
+msgstr "Hungarian (Magyar) (Non-Region-Specific)"
+
+#: xrc/MainMenu.xrc:829
+msgid "Indonesian"
+msgstr "Indonesian (Indonesia)"
+
+#: xrc/MainMenu.xrc:833
+msgid "Italian"
+msgstr "Italian (Italiano)"
+
+#: xrc/MainMenu.xrc:837
+msgid "Japanese"
+msgstr "Nihongo (日本語)"
+
+#: xrc/MainMenu.xrc:841
+msgid "Korean (Korea)"
+msgstr "Hangug-Eo (한국어)"
+
+#: xrc/MainMenu.xrc:845
+msgid "Korean"
+msgstr "Hangug-Eo (한국어) (Non-Region-Specific)"
+
+#: xrc/MainMenu.xrc:849
+msgid "Malay (Malaysia)"
+msgstr "Malay (Melayu)"
+
+#: xrc/MainMenu.xrc:853
+msgid "Norwegian"
+msgstr "Norwegian (Norsk)"
+
+#: xrc/MainMenu.xrc:857
+msgid "Dutch"
+msgstr "Dutch (Nederlands)"
+
+#: xrc/MainMenu.xrc:861
+msgid "Polish (Poland)"
+msgstr "Polish (Polski)"
+
+#: xrc/MainMenu.xrc:865
+msgid "Polish"
+msgstr "Polish (Polski) (Non-Region-Specific)"
+
+#: xrc/MainMenu.xrc:869
+msgid "Portuguese (Brazil)"
+msgstr "Portuguese Brazilian (Português Brasileiro)"
+
+#: xrc/MainMenu.xrc:873
+msgid "Portuguese (Portugal)"
+msgstr "Portuguese (Português)"
+
+#: xrc/MainMenu.xrc:877
+msgid "Russian (Russia)"
+msgstr "Russian (Русский)"
+
+#: xrc/MainMenu.xrc:881
+msgid "Swedish"
+msgstr "Swedish (Svenska)"
+
+#: xrc/MainMenu.xrc:885
+msgid "Turkish"
+msgstr "Turkish (Türkçe)"
+
+#: xrc/MainMenu.xrc:889
+msgid "Ukrainian"
+msgstr "Ukrainian (Українська)"
+
+#: xrc/MainMenu.xrc:893
+msgid "Urdu (Pakistan)"
+msgstr "Urdū (اُردُو)"
+
+#: xrc/MainMenu.xrc:897
+msgid "Chinese (China)"
+msgstr "Zhōngwén Jiǎntǐ (中文简体)"
+
+#: xrc/MainMenu.xrc:901
+msgid "&Use external translations"
+msgstr "&Використовувати зовнішні переклади"
 
 #: xrc/MapViewer.xrc:4
 msgid "Map Viewer"

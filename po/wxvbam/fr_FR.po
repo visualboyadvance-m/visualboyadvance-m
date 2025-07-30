@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-28 15:00+0000\n"
+"POT-Creation-Date: 2025-07-30 01:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Nyu, 2025\n"
 "Language-Team: French (France) (http://app.transifex.com/bgk/vba-m/language/fr_FR/)\n"
@@ -3621,289 +3621,293 @@ msgstr "Cacher la Barre de &Menu"
 msgid "Suspend &Screen Saver"
 msgstr "Arrêter l'économi&seur d'écran"
 
-#: xrc/MainMenu.xrc:584
-msgid "Default Language"
-msgstr "Langage par défaut"
-
-#: xrc/MainMenu.xrc:588
-msgid "Bulgarian"
-msgstr "Bulgare"
-
-#: xrc/MainMenu.xrc:592
-msgid "Breton"
-msgstr "Breton"
-
-#: xrc/MainMenu.xrc:596
-msgid "Czech"
-msgstr "Tchèque"
-
-#: xrc/MainMenu.xrc:600
-msgid "German"
-msgstr "Allemand"
-
-#: xrc/MainMenu.xrc:604
-msgid "Greek"
-msgstr "Grec"
-
-#: xrc/MainMenu.xrc:608
-msgid "English (US)"
-msgstr "Anglais (US)"
-
-#: xrc/MainMenu.xrc:612
-msgid "Spanish (Latin American)"
-msgstr "Espagnol (Amérique latine)"
-
-#: xrc/MainMenu.xrc:616
-msgid "Spanish (Colombia)"
-msgstr "Espagnol (Colombie)"
-
-#: xrc/MainMenu.xrc:620
-msgid "Spanish (Peru)"
-msgstr "Espagnol (Pérou)"
-
-#: xrc/MainMenu.xrc:624
-msgid "Spanish (United States)"
-msgstr "Espagnol (États-Unis)"
-
-#: xrc/MainMenu.xrc:628
-msgid "Spanish"
-msgstr "Espagnol"
-
-#: xrc/MainMenu.xrc:632
-msgid "French (France)"
-msgstr "Français (France)"
-
-#: xrc/MainMenu.xrc:636
-msgid "French"
-msgstr "Français"
-
-#: xrc/MainMenu.xrc:640
-msgid "Galician"
-msgstr "Galicien"
-
-#: xrc/MainMenu.xrc:644
-msgid "Hebrew (Israel)"
-msgstr "Hébreu (Israël)"
-
-#: xrc/MainMenu.xrc:648
-msgid "Hungarian (Hungary)"
-msgstr "Hongrois (Hongrie)"
-
-#: xrc/MainMenu.xrc:652
-msgid "Hungarian"
-msgstr "Hongrois"
-
-#: xrc/MainMenu.xrc:656
-msgid "Indonesian"
-msgstr "Indonésien"
-
-#: xrc/MainMenu.xrc:660
-msgid "Italian"
-msgstr "Italien"
-
-#: xrc/MainMenu.xrc:664
-msgid "Japanese"
-msgstr "Japonais"
-
-#: xrc/MainMenu.xrc:668
-msgid "Korean (Korea)"
-msgstr "Coréen (Corée)"
-
-#: xrc/MainMenu.xrc:672
-msgid "Korean"
-msgstr "Coréen"
-
-#: xrc/MainMenu.xrc:676
-msgid "Malay (Malaysia)"
-msgstr "Malaisien (Malaisie)"
-
-#: xrc/MainMenu.xrc:680
-msgid "Norwegian"
-msgstr "Norvégien"
-
-#: xrc/MainMenu.xrc:684
-msgid "Dutch"
-msgstr "Néerlandais"
-
-#: xrc/MainMenu.xrc:688
-msgid "Polish (Poland)"
-msgstr "Polonais (Pologne)"
-
-#: xrc/MainMenu.xrc:692
-msgid "Polish"
-msgstr "Polonais"
-
-#: xrc/MainMenu.xrc:696
-msgid "Portuguese (Brazil)"
-msgstr "Portugais (Brésil)"
-
-#: xrc/MainMenu.xrc:700
-msgid "Portuguese (Portugal)"
-msgstr "Portugais (Portugal)"
-
-#: xrc/MainMenu.xrc:704
-msgid "Russian (Russia)"
-msgstr "Russe (Russie)"
-
-#: xrc/MainMenu.xrc:708
-msgid "Swedish"
-msgstr "Suédois"
-
-#: xrc/MainMenu.xrc:712
-msgid "Turkish"
-msgstr "Turc"
-
-#: xrc/MainMenu.xrc:716
-msgid "Ukrainian"
-msgstr "Ukrainien"
-
-#: xrc/MainMenu.xrc:720
-msgid "Urdu (Pakistan)"
-msgstr "Ourdou (Pakistan)"
-
-#: xrc/MainMenu.xrc:724
-msgid "Chinese (China)"
-msgstr "Chinois (Chine)"
-
-#: xrc/MainMenu.xrc:729
-msgid "&Use external translations"
-msgstr ""
-
-#: xrc/MainMenu.xrc:734
+#: xrc/MainMenu.xrc:583
 msgid "&Tools"
 msgstr "Ou&tils"
 
-#: xrc/MainMenu.xrc:736
+#: xrc/MainMenu.xrc:585
 msgid "&Cheats"
 msgstr "&Codes de triche"
 
-#: xrc/MainMenu.xrc:738
+#: xrc/MainMenu.xrc:587
 msgid "List &cheats..."
 msgstr "Liste de &codes de triche..."
 
-#: xrc/MainMenu.xrc:741
+#: xrc/MainMenu.xrc:590
 msgid "Find c&heat..."
 msgstr "Trouver un c&ode de triche..."
 
-#: xrc/MainMenu.xrc:745
+#: xrc/MainMenu.xrc:594
 msgid "A&utomatically save / load cheats"
 msgstr "Sauvegarder / charger a&utomatiquement les codes de triche"
 
-#: xrc/MainMenu.xrc:749
+#: xrc/MainMenu.xrc:598
 msgid "&Enable cheats"
 msgstr "&Activer les codes de triche"
 
-#: xrc/MainMenu.xrc:756
+#: xrc/MainMenu.xrc:605
 msgid "&Break into GDB"
 msgstr "&Rupture dans le GDB"
 
-#: xrc/MainMenu.xrc:760
+#: xrc/MainMenu.xrc:609
 msgid "&Configure port..."
 msgstr "&Configurer le port..."
 
-#: xrc/MainMenu.xrc:763
+#: xrc/MainMenu.xrc:612
 msgid "&Break on load"
 msgstr "&Rupture au chargement"
 
-#: xrc/MainMenu.xrc:768
+#: xrc/MainMenu.xrc:617
 msgid "&Disconnect"
 msgstr "&Déconnecter"
 
-#: xrc/MainMenu.xrc:773
+#: xrc/MainMenu.xrc:622
 msgid "&Disassemble..."
 msgstr "&Désassembler..."
 
-#: xrc/MainMenu.xrc:776
+#: xrc/MainMenu.xrc:625
 msgid "&Logging..."
 msgstr "&Journalisation..."
 
-#: xrc/MainMenu.xrc:779
+#: xrc/MainMenu.xrc:628
 msgid "&IO Viewer..."
 msgstr "Visualiseur &IO..."
 
-#: xrc/MainMenu.xrc:782
+#: xrc/MainMenu.xrc:631
 msgid "&Map Viewer..."
 msgstr "Visualiseur &MAP..."
 
-#: xrc/MainMenu.xrc:785
+#: xrc/MainMenu.xrc:634
 msgid "M&emory Viewer..."
 msgstr "Visualiseur de mémoir&e..."
 
-#: xrc/MainMenu.xrc:788
+#: xrc/MainMenu.xrc:637
 msgid "&OAM Viewer..."
 msgstr "Visualiseur &OAM..."
 
-#: xrc/MainMenu.xrc:791
+#: xrc/MainMenu.xrc:640
 msgid "&Palette Viewer..."
 msgstr "Visualiseur de &palette..."
 
-#: xrc/MainMenu.xrc:794
+#: xrc/MainMenu.xrc:643
 msgid "&Tile Viewer..."
 msgstr "Visualiseur de &Tile..."
 
-#: xrc/MainMenu.xrc:799
+#: xrc/MainMenu.xrc:648
 msgid "Show all video layers"
 msgstr "Afficher toutes le couches vidéos"
 
-#: xrc/MainMenu.xrc:842
+#: xrc/MainMenu.xrc:691
 msgid "&View Layers"
 msgstr "&Visualiseur de couches"
 
-#: xrc/MainMenu.xrc:846
+#: xrc/MainMenu.xrc:695
 msgid "Channel &1"
 msgstr "Canal &1"
 
-#: xrc/MainMenu.xrc:851
+#: xrc/MainMenu.xrc:700
 msgid "Channel &2"
 msgstr "Canal &2"
 
-#: xrc/MainMenu.xrc:856
+#: xrc/MainMenu.xrc:705
 msgid "Channel &3"
 msgstr "Canal &3"
 
-#: xrc/MainMenu.xrc:861
+#: xrc/MainMenu.xrc:710
 msgid "Channel &4"
 msgstr "Canal &4"
 
-#: xrc/MainMenu.xrc:866
+#: xrc/MainMenu.xrc:715
 msgid "Direct Sound &A"
 msgstr "Direct Sound &A"
 
-#: xrc/MainMenu.xrc:871
+#: xrc/MainMenu.xrc:720
 msgid "Direct Sound &B"
 msgstr "Direct Sound &B"
 
-#: xrc/MainMenu.xrc:875
+#: xrc/MainMenu.xrc:724
 msgid "&Sound Channels"
 msgstr "Canaux &son"
 
-#: xrc/MainMenu.xrc:879
+#: xrc/MainMenu.xrc:728
 msgid "&Help"
 msgstr "&Aide"
 
-#: xrc/MainMenu.xrc:881
+#: xrc/MainMenu.xrc:730
 msgid "Report &Bugs"
 msgstr "Rapporter des &bogues"
 
-#: xrc/MainMenu.xrc:884
+#: xrc/MainMenu.xrc:733
 msgid "Visual Boy Advance-M Support &Forum"
 msgstr "Forum & Support Visual Boy Advance-M"
 
-#: xrc/MainMenu.xrc:887
+#: xrc/MainMenu.xrc:736
 msgid "Translations"
 msgstr "Traductions"
 
-#: xrc/MainMenu.xrc:895
+#: xrc/MainMenu.xrc:744
 msgid "Check for updates"
 msgstr "Vérifier les mises à jour"
 
-#: xrc/MainMenu.xrc:898
+#: xrc/MainMenu.xrc:747
 msgid "&Factory Reset..."
 msgstr "Réinitialisation"
 
-#: xrc/MainMenu.xrc:902
+#: xrc/MainMenu.xrc:751
 msgid "&About..."
 msgstr "&A Propos De..."
+
+#: xrc/MainMenu.xrc:755
+msgid "&Languages"
+msgstr ""
+
+#: xrc/MainMenu.xrc:757
+msgid "Default Language"
+msgstr "Langage par défaut"
+
+#: xrc/MainMenu.xrc:761
+msgid "Bulgarian"
+msgstr "Bulgare"
+
+#: xrc/MainMenu.xrc:765
+msgid "Breton"
+msgstr "Breton"
+
+#: xrc/MainMenu.xrc:769
+msgid "Czech"
+msgstr "Tchèque"
+
+#: xrc/MainMenu.xrc:773
+msgid "German"
+msgstr "Allemand"
+
+#: xrc/MainMenu.xrc:777
+msgid "Greek"
+msgstr "Grec"
+
+#: xrc/MainMenu.xrc:781
+msgid "English (US)"
+msgstr "Anglais (US)"
+
+#: xrc/MainMenu.xrc:785
+msgid "Spanish (Latin American)"
+msgstr "Espagnol (Amérique latine)"
+
+#: xrc/MainMenu.xrc:789
+msgid "Spanish (Colombia)"
+msgstr "Espagnol (Colombie)"
+
+#: xrc/MainMenu.xrc:793
+msgid "Spanish (Peru)"
+msgstr "Espagnol (Pérou)"
+
+#: xrc/MainMenu.xrc:797
+msgid "Spanish (United States)"
+msgstr "Espagnol (États-Unis)"
+
+#: xrc/MainMenu.xrc:801
+msgid "Spanish"
+msgstr "Espagnol"
+
+#: xrc/MainMenu.xrc:805
+msgid "French (France)"
+msgstr "Français (France)"
+
+#: xrc/MainMenu.xrc:809
+msgid "French"
+msgstr "Français"
+
+#: xrc/MainMenu.xrc:813
+msgid "Galician"
+msgstr "Galicien"
+
+#: xrc/MainMenu.xrc:817
+msgid "Hebrew (Israel)"
+msgstr "Hébreu (Israël)"
+
+#: xrc/MainMenu.xrc:821
+msgid "Hungarian (Hungary)"
+msgstr "Hongrois (Hongrie)"
+
+#: xrc/MainMenu.xrc:825
+msgid "Hungarian"
+msgstr "Hongrois"
+
+#: xrc/MainMenu.xrc:829
+msgid "Indonesian"
+msgstr "Indonésien"
+
+#: xrc/MainMenu.xrc:833
+msgid "Italian"
+msgstr "Italien"
+
+#: xrc/MainMenu.xrc:837
+msgid "Japanese"
+msgstr "Japonais"
+
+#: xrc/MainMenu.xrc:841
+msgid "Korean (Korea)"
+msgstr "Coréen (Corée)"
+
+#: xrc/MainMenu.xrc:845
+msgid "Korean"
+msgstr "Coréen"
+
+#: xrc/MainMenu.xrc:849
+msgid "Malay (Malaysia)"
+msgstr "Malaisien (Malaisie)"
+
+#: xrc/MainMenu.xrc:853
+msgid "Norwegian"
+msgstr "Norvégien"
+
+#: xrc/MainMenu.xrc:857
+msgid "Dutch"
+msgstr "Néerlandais"
+
+#: xrc/MainMenu.xrc:861
+msgid "Polish (Poland)"
+msgstr "Polonais (Pologne)"
+
+#: xrc/MainMenu.xrc:865
+msgid "Polish"
+msgstr "Polonais"
+
+#: xrc/MainMenu.xrc:869
+msgid "Portuguese (Brazil)"
+msgstr "Portugais (Brésil)"
+
+#: xrc/MainMenu.xrc:873
+msgid "Portuguese (Portugal)"
+msgstr "Portugais (Portugal)"
+
+#: xrc/MainMenu.xrc:877
+msgid "Russian (Russia)"
+msgstr "Russe (Russie)"
+
+#: xrc/MainMenu.xrc:881
+msgid "Swedish"
+msgstr "Suédois"
+
+#: xrc/MainMenu.xrc:885
+msgid "Turkish"
+msgstr "Turc"
+
+#: xrc/MainMenu.xrc:889
+msgid "Ukrainian"
+msgstr "Ukrainien"
+
+#: xrc/MainMenu.xrc:893
+msgid "Urdu (Pakistan)"
+msgstr "Ourdou (Pakistan)"
+
+#: xrc/MainMenu.xrc:897
+msgid "Chinese (China)"
+msgstr "Chinois (Chine)"
+
+#: xrc/MainMenu.xrc:901
+msgid "&Use external translations"
+msgstr ""
 
 #: xrc/MapViewer.xrc:4
 msgid "Map Viewer"

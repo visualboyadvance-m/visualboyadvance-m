@@ -24,7 +24,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-28 15:00+0000\n"
+"POT-Creation-Date: 2025-07-30 01:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020,2022-2025\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/bgk/vba-m/language/zh_CN/)\n"
@@ -3627,289 +3627,293 @@ msgstr "隐藏菜单栏(&M)"
 msgid "Suspend &Screen Saver"
 msgstr "暂停屏幕保护程序(&S)"
 
-#: xrc/MainMenu.xrc:584
-msgid "Default Language"
-msgstr "默认语言"
-
-#: xrc/MainMenu.xrc:588
-msgid "Bulgarian"
-msgstr "保加利亚语"
-
-#: xrc/MainMenu.xrc:592
-msgid "Breton"
-msgstr "布列塔尼语"
-
-#: xrc/MainMenu.xrc:596
-msgid "Czech"
-msgstr "捷克语"
-
-#: xrc/MainMenu.xrc:600
-msgid "German"
-msgstr "德语"
-
-#: xrc/MainMenu.xrc:604
-msgid "Greek"
-msgstr "希腊语"
-
-#: xrc/MainMenu.xrc:608
-msgid "English (US)"
-msgstr "英语(美国)"
-
-#: xrc/MainMenu.xrc:612
-msgid "Spanish (Latin American)"
-msgstr "西班牙语(拉丁美洲)"
-
-#: xrc/MainMenu.xrc:616
-msgid "Spanish (Colombia)"
-msgstr "西班牙语(哥伦比亚)"
-
-#: xrc/MainMenu.xrc:620
-msgid "Spanish (Peru)"
-msgstr "西班牙语(秘鲁)"
-
-#: xrc/MainMenu.xrc:624
-msgid "Spanish (United States)"
-msgstr "西班牙语(美国)"
-
-#: xrc/MainMenu.xrc:628
-msgid "Spanish"
-msgstr "西班牙语"
-
-#: xrc/MainMenu.xrc:632
-msgid "French (France)"
-msgstr "法语(法国)"
-
-#: xrc/MainMenu.xrc:636
-msgid "French"
-msgstr "法语"
-
-#: xrc/MainMenu.xrc:640
-msgid "Galician"
-msgstr "加利西亚语"
-
-#: xrc/MainMenu.xrc:644
-msgid "Hebrew (Israel)"
-msgstr "希伯来语(以色列)"
-
-#: xrc/MainMenu.xrc:648
-msgid "Hungarian (Hungary)"
-msgstr "匈牙利语(匈牙利)"
-
-#: xrc/MainMenu.xrc:652
-msgid "Hungarian"
-msgstr "匈牙利语"
-
-#: xrc/MainMenu.xrc:656
-msgid "Indonesian"
-msgstr "印度尼西亚语"
-
-#: xrc/MainMenu.xrc:660
-msgid "Italian"
-msgstr "意大利语"
-
-#: xrc/MainMenu.xrc:664
-msgid "Japanese"
-msgstr "日语"
-
-#: xrc/MainMenu.xrc:668
-msgid "Korean (Korea)"
-msgstr "韩语(韩国)"
-
-#: xrc/MainMenu.xrc:672
-msgid "Korean"
-msgstr "韩语"
-
-#: xrc/MainMenu.xrc:676
-msgid "Malay (Malaysia)"
-msgstr "马来语(马来西亚)"
-
-#: xrc/MainMenu.xrc:680
-msgid "Norwegian"
-msgstr "挪威语"
-
-#: xrc/MainMenu.xrc:684
-msgid "Dutch"
-msgstr "荷兰语"
-
-#: xrc/MainMenu.xrc:688
-msgid "Polish (Poland)"
-msgstr "波兰语(波兰)"
-
-#: xrc/MainMenu.xrc:692
-msgid "Polish"
-msgstr "波兰语"
-
-#: xrc/MainMenu.xrc:696
-msgid "Portuguese (Brazil)"
-msgstr "葡萄牙语(巴西)"
-
-#: xrc/MainMenu.xrc:700
-msgid "Portuguese (Portugal)"
-msgstr "葡萄牙语(葡萄牙)"
-
-#: xrc/MainMenu.xrc:704
-msgid "Russian (Russia)"
-msgstr "俄语(俄罗斯)"
-
-#: xrc/MainMenu.xrc:708
-msgid "Swedish"
-msgstr "瑞典语"
-
-#: xrc/MainMenu.xrc:712
-msgid "Turkish"
-msgstr "土耳其语"
-
-#: xrc/MainMenu.xrc:716
-msgid "Ukrainian"
-msgstr "乌克兰语"
-
-#: xrc/MainMenu.xrc:720
-msgid "Urdu (Pakistan)"
-msgstr "乌尔都语(巴基斯坦)"
-
-#: xrc/MainMenu.xrc:724
-msgid "Chinese (China)"
-msgstr "中文(中国)"
-
-#: xrc/MainMenu.xrc:729
-msgid "&Use external translations"
-msgstr "使用外部翻译(&U)"
-
-#: xrc/MainMenu.xrc:734
+#: xrc/MainMenu.xrc:583
 msgid "&Tools"
 msgstr "工具(&T)"
 
-#: xrc/MainMenu.xrc:736
+#: xrc/MainMenu.xrc:585
 msgid "&Cheats"
 msgstr "金手指(&C)"
 
-#: xrc/MainMenu.xrc:738
+#: xrc/MainMenu.xrc:587
 msgid "List &cheats..."
 msgstr "金手指列表(&C)..."
 
-#: xrc/MainMenu.xrc:741
+#: xrc/MainMenu.xrc:590
 msgid "Find c&heat..."
 msgstr "搜索金手指(&H)..."
 
-#: xrc/MainMenu.xrc:745
+#: xrc/MainMenu.xrc:594
 msgid "A&utomatically save / load cheats"
 msgstr "自动保存/载入金手指(&U)"
 
-#: xrc/MainMenu.xrc:749
+#: xrc/MainMenu.xrc:598
 msgid "&Enable cheats"
 msgstr "启用金手指(&E)"
 
-#: xrc/MainMenu.xrc:756
+#: xrc/MainMenu.xrc:605
 msgid "&Break into GDB"
 msgstr "中断进入 GDB(&B)"
 
-#: xrc/MainMenu.xrc:760
+#: xrc/MainMenu.xrc:609
 msgid "&Configure port..."
 msgstr "配置端口(&C)..."
 
-#: xrc/MainMenu.xrc:763
+#: xrc/MainMenu.xrc:612
 msgid "&Break on load"
 msgstr "加载时中断(&B)"
 
-#: xrc/MainMenu.xrc:768
+#: xrc/MainMenu.xrc:617
 msgid "&Disconnect"
 msgstr "断开连接(&D)"
 
-#: xrc/MainMenu.xrc:773
+#: xrc/MainMenu.xrc:622
 msgid "&Disassemble..."
 msgstr "反编译(&D)..."
 
-#: xrc/MainMenu.xrc:776
+#: xrc/MainMenu.xrc:625
 msgid "&Logging..."
 msgstr "日志(&L)..."
 
-#: xrc/MainMenu.xrc:779
+#: xrc/MainMenu.xrc:628
 msgid "&IO Viewer..."
 msgstr "IO 查看器(&I)..."
 
-#: xrc/MainMenu.xrc:782
+#: xrc/MainMenu.xrc:631
 msgid "&Map Viewer..."
 msgstr "图层查看器(&M)..."
 
-#: xrc/MainMenu.xrc:785
+#: xrc/MainMenu.xrc:634
 msgid "M&emory Viewer..."
 msgstr "内存查看器(&E)..."
 
-#: xrc/MainMenu.xrc:788
+#: xrc/MainMenu.xrc:637
 msgid "&OAM Viewer..."
 msgstr "OAM 查看器(&O)..."
 
-#: xrc/MainMenu.xrc:791
+#: xrc/MainMenu.xrc:640
 msgid "&Palette Viewer..."
 msgstr "调色板查看器(&P)..."
 
-#: xrc/MainMenu.xrc:794
+#: xrc/MainMenu.xrc:643
 msgid "&Tile Viewer..."
 msgstr "碎片查看器(&T)..."
 
-#: xrc/MainMenu.xrc:799
+#: xrc/MainMenu.xrc:648
 msgid "Show all video layers"
 msgstr "显示所有视频图层"
 
-#: xrc/MainMenu.xrc:842
+#: xrc/MainMenu.xrc:691
 msgid "&View Layers"
 msgstr "查看图层(&V)"
 
-#: xrc/MainMenu.xrc:846
+#: xrc/MainMenu.xrc:695
 msgid "Channel &1"
 msgstr "通道 1(&1)"
 
-#: xrc/MainMenu.xrc:851
+#: xrc/MainMenu.xrc:700
 msgid "Channel &2"
 msgstr "通道 2(&2)"
 
-#: xrc/MainMenu.xrc:856
+#: xrc/MainMenu.xrc:705
 msgid "Channel &3"
 msgstr "通道 3(&3)"
 
-#: xrc/MainMenu.xrc:861
+#: xrc/MainMenu.xrc:710
 msgid "Channel &4"
 msgstr "通道 4(&4)"
 
-#: xrc/MainMenu.xrc:866
+#: xrc/MainMenu.xrc:715
 msgid "Direct Sound &A"
 msgstr "Direct Sound A(&A)"
 
-#: xrc/MainMenu.xrc:871
+#: xrc/MainMenu.xrc:720
 msgid "Direct Sound &B"
 msgstr "Direct Sound B(&B)"
 
-#: xrc/MainMenu.xrc:875
+#: xrc/MainMenu.xrc:724
 msgid "&Sound Channels"
 msgstr "声道(&S)"
 
-#: xrc/MainMenu.xrc:879
+#: xrc/MainMenu.xrc:728
 msgid "&Help"
 msgstr "帮助(&H)"
 
-#: xrc/MainMenu.xrc:881
+#: xrc/MainMenu.xrc:730
 msgid "Report &Bugs"
 msgstr "反馈"
 
-#: xrc/MainMenu.xrc:884
+#: xrc/MainMenu.xrc:733
 msgid "Visual Boy Advance-M Support &Forum"
 msgstr "VBA-M 支持与论坛(&F)"
 
-#: xrc/MainMenu.xrc:887
+#: xrc/MainMenu.xrc:736
 msgid "Translations"
 msgstr "翻译"
 
-#: xrc/MainMenu.xrc:895
+#: xrc/MainMenu.xrc:744
 msgid "Check for updates"
 msgstr "检查更新"
 
-#: xrc/MainMenu.xrc:898
+#: xrc/MainMenu.xrc:747
 msgid "&Factory Reset..."
 msgstr "恢复默认设置"
 
-#: xrc/MainMenu.xrc:902
+#: xrc/MainMenu.xrc:751
 msgid "&About..."
 msgstr "关于(&A)..."
+
+#: xrc/MainMenu.xrc:755
+msgid "&Languages"
+msgstr ""
+
+#: xrc/MainMenu.xrc:757
+msgid "Default Language"
+msgstr "默认语言"
+
+#: xrc/MainMenu.xrc:761
+msgid "Bulgarian"
+msgstr "保加利亚语"
+
+#: xrc/MainMenu.xrc:765
+msgid "Breton"
+msgstr "布列塔尼语"
+
+#: xrc/MainMenu.xrc:769
+msgid "Czech"
+msgstr "捷克语"
+
+#: xrc/MainMenu.xrc:773
+msgid "German"
+msgstr "德语"
+
+#: xrc/MainMenu.xrc:777
+msgid "Greek"
+msgstr "希腊语"
+
+#: xrc/MainMenu.xrc:781
+msgid "English (US)"
+msgstr "英语(美国)"
+
+#: xrc/MainMenu.xrc:785
+msgid "Spanish (Latin American)"
+msgstr "西班牙语(拉丁美洲)"
+
+#: xrc/MainMenu.xrc:789
+msgid "Spanish (Colombia)"
+msgstr "西班牙语(哥伦比亚)"
+
+#: xrc/MainMenu.xrc:793
+msgid "Spanish (Peru)"
+msgstr "西班牙语(秘鲁)"
+
+#: xrc/MainMenu.xrc:797
+msgid "Spanish (United States)"
+msgstr "西班牙语(美国)"
+
+#: xrc/MainMenu.xrc:801
+msgid "Spanish"
+msgstr "西班牙语"
+
+#: xrc/MainMenu.xrc:805
+msgid "French (France)"
+msgstr "法语(法国)"
+
+#: xrc/MainMenu.xrc:809
+msgid "French"
+msgstr "法语"
+
+#: xrc/MainMenu.xrc:813
+msgid "Galician"
+msgstr "加利西亚语"
+
+#: xrc/MainMenu.xrc:817
+msgid "Hebrew (Israel)"
+msgstr "希伯来语(以色列)"
+
+#: xrc/MainMenu.xrc:821
+msgid "Hungarian (Hungary)"
+msgstr "匈牙利语(匈牙利)"
+
+#: xrc/MainMenu.xrc:825
+msgid "Hungarian"
+msgstr "匈牙利语"
+
+#: xrc/MainMenu.xrc:829
+msgid "Indonesian"
+msgstr "印度尼西亚语"
+
+#: xrc/MainMenu.xrc:833
+msgid "Italian"
+msgstr "意大利语"
+
+#: xrc/MainMenu.xrc:837
+msgid "Japanese"
+msgstr "日语"
+
+#: xrc/MainMenu.xrc:841
+msgid "Korean (Korea)"
+msgstr "韩语(韩国)"
+
+#: xrc/MainMenu.xrc:845
+msgid "Korean"
+msgstr "韩语"
+
+#: xrc/MainMenu.xrc:849
+msgid "Malay (Malaysia)"
+msgstr "马来语(马来西亚)"
+
+#: xrc/MainMenu.xrc:853
+msgid "Norwegian"
+msgstr "挪威语"
+
+#: xrc/MainMenu.xrc:857
+msgid "Dutch"
+msgstr "荷兰语"
+
+#: xrc/MainMenu.xrc:861
+msgid "Polish (Poland)"
+msgstr "波兰语(波兰)"
+
+#: xrc/MainMenu.xrc:865
+msgid "Polish"
+msgstr "波兰语"
+
+#: xrc/MainMenu.xrc:869
+msgid "Portuguese (Brazil)"
+msgstr "葡萄牙语(巴西)"
+
+#: xrc/MainMenu.xrc:873
+msgid "Portuguese (Portugal)"
+msgstr "葡萄牙语(葡萄牙)"
+
+#: xrc/MainMenu.xrc:877
+msgid "Russian (Russia)"
+msgstr "俄语(俄罗斯)"
+
+#: xrc/MainMenu.xrc:881
+msgid "Swedish"
+msgstr "瑞典语"
+
+#: xrc/MainMenu.xrc:885
+msgid "Turkish"
+msgstr "土耳其语"
+
+#: xrc/MainMenu.xrc:889
+msgid "Ukrainian"
+msgstr "乌克兰语"
+
+#: xrc/MainMenu.xrc:893
+msgid "Urdu (Pakistan)"
+msgstr "乌尔都语(巴基斯坦)"
+
+#: xrc/MainMenu.xrc:897
+msgid "Chinese (China)"
+msgstr "中文(中国)"
+
+#: xrc/MainMenu.xrc:901
+msgid "&Use external translations"
+msgstr "使用外部翻译(&U)"
 
 #: xrc/MapViewer.xrc:4
 msgid "Map Viewer"

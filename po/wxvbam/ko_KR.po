@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-28 15:00+0000\n"
+"POT-Creation-Date: 2025-07-30 01:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Hoseok Seo <ddinghoya@gmail.com>, 2022-2025\n"
 "Language-Team: Korean (Korea) (http://app.transifex.com/bgk/vba-m/language/ko_KR/)\n"
@@ -3615,289 +3615,293 @@ msgstr "&메뉴바 숨기기 (&M)"
 msgid "Suspend &Screen Saver"
 msgstr "화면 보호기 일시 중지 (&S)"
 
-#: xrc/MainMenu.xrc:584
-msgid "Default Language"
-msgstr ""
-
-#: xrc/MainMenu.xrc:588
-msgid "Bulgarian"
-msgstr ""
-
-#: xrc/MainMenu.xrc:592
-msgid "Breton"
-msgstr ""
-
-#: xrc/MainMenu.xrc:596
-msgid "Czech"
-msgstr ""
-
-#: xrc/MainMenu.xrc:600
-msgid "German"
-msgstr ""
-
-#: xrc/MainMenu.xrc:604
-msgid "Greek"
-msgstr ""
-
-#: xrc/MainMenu.xrc:608
-msgid "English (US)"
-msgstr ""
-
-#: xrc/MainMenu.xrc:612
-msgid "Spanish (Latin American)"
-msgstr ""
-
-#: xrc/MainMenu.xrc:616
-msgid "Spanish (Colombia)"
-msgstr ""
-
-#: xrc/MainMenu.xrc:620
-msgid "Spanish (Peru)"
-msgstr ""
-
-#: xrc/MainMenu.xrc:624
-msgid "Spanish (United States)"
-msgstr ""
-
-#: xrc/MainMenu.xrc:628
-msgid "Spanish"
-msgstr ""
-
-#: xrc/MainMenu.xrc:632
-msgid "French (France)"
-msgstr ""
-
-#: xrc/MainMenu.xrc:636
-msgid "French"
-msgstr ""
-
-#: xrc/MainMenu.xrc:640
-msgid "Galician"
-msgstr ""
-
-#: xrc/MainMenu.xrc:644
-msgid "Hebrew (Israel)"
-msgstr ""
-
-#: xrc/MainMenu.xrc:648
-msgid "Hungarian (Hungary)"
-msgstr ""
-
-#: xrc/MainMenu.xrc:652
-msgid "Hungarian"
-msgstr ""
-
-#: xrc/MainMenu.xrc:656
-msgid "Indonesian"
-msgstr ""
-
-#: xrc/MainMenu.xrc:660
-msgid "Italian"
-msgstr ""
-
-#: xrc/MainMenu.xrc:664
-msgid "Japanese"
-msgstr ""
-
-#: xrc/MainMenu.xrc:668
-msgid "Korean (Korea)"
-msgstr ""
-
-#: xrc/MainMenu.xrc:672
-msgid "Korean"
-msgstr ""
-
-#: xrc/MainMenu.xrc:676
-msgid "Malay (Malaysia)"
-msgstr ""
-
-#: xrc/MainMenu.xrc:680
-msgid "Norwegian"
-msgstr ""
-
-#: xrc/MainMenu.xrc:684
-msgid "Dutch"
-msgstr ""
-
-#: xrc/MainMenu.xrc:688
-msgid "Polish (Poland)"
-msgstr ""
-
-#: xrc/MainMenu.xrc:692
-msgid "Polish"
-msgstr ""
-
-#: xrc/MainMenu.xrc:696
-msgid "Portuguese (Brazil)"
-msgstr ""
-
-#: xrc/MainMenu.xrc:700
-msgid "Portuguese (Portugal)"
-msgstr ""
-
-#: xrc/MainMenu.xrc:704
-msgid "Russian (Russia)"
-msgstr ""
-
-#: xrc/MainMenu.xrc:708
-msgid "Swedish"
-msgstr ""
-
-#: xrc/MainMenu.xrc:712
-msgid "Turkish"
-msgstr ""
-
-#: xrc/MainMenu.xrc:716
-msgid "Ukrainian"
-msgstr ""
-
-#: xrc/MainMenu.xrc:720
-msgid "Urdu (Pakistan)"
-msgstr ""
-
-#: xrc/MainMenu.xrc:724
-msgid "Chinese (China)"
-msgstr ""
-
-#: xrc/MainMenu.xrc:729
-msgid "&Use external translations"
-msgstr ""
-
-#: xrc/MainMenu.xrc:734
+#: xrc/MainMenu.xrc:583
 msgid "&Tools"
 msgstr "도구 (&T)"
 
-#: xrc/MainMenu.xrc:736
+#: xrc/MainMenu.xrc:585
 msgid "&Cheats"
 msgstr "치트 (&C)"
 
-#: xrc/MainMenu.xrc:738
+#: xrc/MainMenu.xrc:587
 msgid "List &cheats..."
 msgstr "치트 목록 (&C)..."
 
-#: xrc/MainMenu.xrc:741
+#: xrc/MainMenu.xrc:590
 msgid "Find c&heat..."
 msgstr "치트 찾기 (&H)..."
 
-#: xrc/MainMenu.xrc:745
+#: xrc/MainMenu.xrc:594
 msgid "A&utomatically save / load cheats"
 msgstr "자동으로 치트 저장 / 불러오기 (&U)"
 
-#: xrc/MainMenu.xrc:749
+#: xrc/MainMenu.xrc:598
 msgid "&Enable cheats"
 msgstr "치트 활성화 (&E)"
 
-#: xrc/MainMenu.xrc:756
+#: xrc/MainMenu.xrc:605
 msgid "&Break into GDB"
 msgstr "GDN  브레이크 (&B)"
 
-#: xrc/MainMenu.xrc:760
+#: xrc/MainMenu.xrc:609
 msgid "&Configure port..."
 msgstr "포트 구성 (&C)..."
 
-#: xrc/MainMenu.xrc:763
+#: xrc/MainMenu.xrc:612
 msgid "&Break on load"
 msgstr "불러오기 시 브레이크 (&B)"
 
-#: xrc/MainMenu.xrc:768
+#: xrc/MainMenu.xrc:617
 msgid "&Disconnect"
 msgstr "연결 끊기 (&D)"
 
-#: xrc/MainMenu.xrc:773
+#: xrc/MainMenu.xrc:622
 msgid "&Disassemble..."
 msgstr "파일 분석 (&D)..."
 
-#: xrc/MainMenu.xrc:776
+#: xrc/MainMenu.xrc:625
 msgid "&Logging..."
 msgstr "기록 (&L)..."
 
-#: xrc/MainMenu.xrc:779
+#: xrc/MainMenu.xrc:628
 msgid "&IO Viewer..."
 msgstr "입출력 뷰어 (&I)..."
 
-#: xrc/MainMenu.xrc:782
+#: xrc/MainMenu.xrc:631
 msgid "&Map Viewer..."
 msgstr "맵 뷰어 (&M)..."
 
-#: xrc/MainMenu.xrc:785
+#: xrc/MainMenu.xrc:634
 msgid "M&emory Viewer..."
 msgstr "메모리 뷰어 (&E)..."
 
-#: xrc/MainMenu.xrc:788
+#: xrc/MainMenu.xrc:637
 msgid "&OAM Viewer..."
 msgstr "OAM 뷰어 (&O)..."
 
-#: xrc/MainMenu.xrc:791
+#: xrc/MainMenu.xrc:640
 msgid "&Palette Viewer..."
 msgstr "팔레트 뷰어 (&P)..."
 
-#: xrc/MainMenu.xrc:794
+#: xrc/MainMenu.xrc:643
 msgid "&Tile Viewer..."
 msgstr "타일 뷰어 (&T)..."
 
-#: xrc/MainMenu.xrc:799
+#: xrc/MainMenu.xrc:648
 msgid "Show all video layers"
 msgstr "모든 비디오 레이어 표시"
 
-#: xrc/MainMenu.xrc:842
+#: xrc/MainMenu.xrc:691
 msgid "&View Layers"
 msgstr "레이어 보기 (&V)"
 
-#: xrc/MainMenu.xrc:846
+#: xrc/MainMenu.xrc:695
 msgid "Channel &1"
 msgstr "채널 1 (&1)"
 
-#: xrc/MainMenu.xrc:851
+#: xrc/MainMenu.xrc:700
 msgid "Channel &2"
 msgstr "채널 2 (&2)"
 
-#: xrc/MainMenu.xrc:856
+#: xrc/MainMenu.xrc:705
 msgid "Channel &3"
 msgstr "채널 3 (&3)"
 
-#: xrc/MainMenu.xrc:861
+#: xrc/MainMenu.xrc:710
 msgid "Channel &4"
 msgstr "채널 4 (&4)"
 
-#: xrc/MainMenu.xrc:866
+#: xrc/MainMenu.xrc:715
 msgid "Direct Sound &A"
 msgstr "다이렉트 사운드 A (&A)"
 
-#: xrc/MainMenu.xrc:871
+#: xrc/MainMenu.xrc:720
 msgid "Direct Sound &B"
 msgstr "다이렉트 사운드 B (&B)"
 
-#: xrc/MainMenu.xrc:875
+#: xrc/MainMenu.xrc:724
 msgid "&Sound Channels"
 msgstr "음향 채널 (&S)"
 
-#: xrc/MainMenu.xrc:879
+#: xrc/MainMenu.xrc:728
 msgid "&Help"
 msgstr "도움말 (&H)"
 
-#: xrc/MainMenu.xrc:881
+#: xrc/MainMenu.xrc:730
 msgid "Report &Bugs"
 msgstr "버그 제보 (&B)"
 
-#: xrc/MainMenu.xrc:884
+#: xrc/MainMenu.xrc:733
 msgid "Visual Boy Advance-M Support &Forum"
 msgstr "Visual Boy Advance-M 지원 포럼 (&F)"
 
-#: xrc/MainMenu.xrc:887
+#: xrc/MainMenu.xrc:736
 msgid "Translations"
 msgstr "번역 참여"
 
-#: xrc/MainMenu.xrc:895
+#: xrc/MainMenu.xrc:744
 msgid "Check for updates"
 msgstr "업데이트 확인"
 
-#: xrc/MainMenu.xrc:898
+#: xrc/MainMenu.xrc:747
 msgid "&Factory Reset..."
 msgstr "공장 초기화 (&F)..."
 
-#: xrc/MainMenu.xrc:902
+#: xrc/MainMenu.xrc:751
 msgid "&About..."
 msgstr "정보 (&A)..."
+
+#: xrc/MainMenu.xrc:755
+msgid "&Languages"
+msgstr ""
+
+#: xrc/MainMenu.xrc:757
+msgid "Default Language"
+msgstr ""
+
+#: xrc/MainMenu.xrc:761
+msgid "Bulgarian"
+msgstr ""
+
+#: xrc/MainMenu.xrc:765
+msgid "Breton"
+msgstr ""
+
+#: xrc/MainMenu.xrc:769
+msgid "Czech"
+msgstr ""
+
+#: xrc/MainMenu.xrc:773
+msgid "German"
+msgstr ""
+
+#: xrc/MainMenu.xrc:777
+msgid "Greek"
+msgstr ""
+
+#: xrc/MainMenu.xrc:781
+msgid "English (US)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:785
+msgid "Spanish (Latin American)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:789
+msgid "Spanish (Colombia)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:793
+msgid "Spanish (Peru)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:797
+msgid "Spanish (United States)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:801
+msgid "Spanish"
+msgstr ""
+
+#: xrc/MainMenu.xrc:805
+msgid "French (France)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:809
+msgid "French"
+msgstr ""
+
+#: xrc/MainMenu.xrc:813
+msgid "Galician"
+msgstr ""
+
+#: xrc/MainMenu.xrc:817
+msgid "Hebrew (Israel)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:821
+msgid "Hungarian (Hungary)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:825
+msgid "Hungarian"
+msgstr ""
+
+#: xrc/MainMenu.xrc:829
+msgid "Indonesian"
+msgstr ""
+
+#: xrc/MainMenu.xrc:833
+msgid "Italian"
+msgstr ""
+
+#: xrc/MainMenu.xrc:837
+msgid "Japanese"
+msgstr ""
+
+#: xrc/MainMenu.xrc:841
+msgid "Korean (Korea)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:845
+msgid "Korean"
+msgstr ""
+
+#: xrc/MainMenu.xrc:849
+msgid "Malay (Malaysia)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:853
+msgid "Norwegian"
+msgstr ""
+
+#: xrc/MainMenu.xrc:857
+msgid "Dutch"
+msgstr ""
+
+#: xrc/MainMenu.xrc:861
+msgid "Polish (Poland)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:865
+msgid "Polish"
+msgstr ""
+
+#: xrc/MainMenu.xrc:869
+msgid "Portuguese (Brazil)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:873
+msgid "Portuguese (Portugal)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:877
+msgid "Russian (Russia)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:881
+msgid "Swedish"
+msgstr ""
+
+#: xrc/MainMenu.xrc:885
+msgid "Turkish"
+msgstr ""
+
+#: xrc/MainMenu.xrc:889
+msgid "Ukrainian"
+msgstr ""
+
+#: xrc/MainMenu.xrc:893
+msgid "Urdu (Pakistan)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:897
+msgid "Chinese (China)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:901
+msgid "&Use external translations"
+msgstr ""
 
 #: xrc/MapViewer.xrc:4
 msgid "Map Viewer"
