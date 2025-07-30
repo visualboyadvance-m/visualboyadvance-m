@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.2.2] - 2025-07-30
+
+========================
+* 27acf80b - Make language configurable (requires restart) [andyvand]
+* ae09ab71 - Embed translations for Windows [andyvand]
+* 47a8e7e8 - Update wxWidgets for Mac builder to 3.3.1 [andyvand]
+* 8ce4848d - Fix Wii U VC opcodes [andyvand]
+* dab91fc8 - Fix bigger than 32MB ROM files [andyvand]
+
 ## [2.2.1] - 2025-07-19
 =======================
 * 23a3d0b2 - build: fix include paths for bundled SFML [rkitover]
