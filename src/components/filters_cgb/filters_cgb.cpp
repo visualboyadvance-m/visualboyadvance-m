@@ -1,5 +1,5 @@
 /*
- * GBA Color Correction Shader Implementation
+ * GBC Color Correction Shader Implementation
  *
  * Shader modified by Pokefan531.
  * Color Mangler
@@ -9,7 +9,7 @@
  * This code is adapted from the original shader logic.
  */
 
-#include "components/filters_agb/filters_agb.h"
+#include "components/filters_cgb/filters_cgb.h"
 #include <cmath>
 #include <algorithm>
 
@@ -22,33 +22,33 @@ extern uint8_t  systemColorMap8[0x10000];
 extern uint16_t systemColorMap16[0x10000];
 extern uint32_t systemColorMap32[0x10000];
 
-// --- Global Constants and Variables for GBA Color Correction ---
+// --- Global Constants and Variables for GBC Color Correction ---
 // Define the color profile matrix as a static const float 2D array
 // This replicates the column-major order of GLSL mat4 for easier translation.
 // Format: { {col0_row0, col0_row1, col0_row2, col0_row3}, ... }
-static const float GBA_sRGB[4][4] = {
+static const float GBC_sRGB[4][4] = {
     {0.905f, 0.10f, 0.1575f, 0.0f}, // Column 0 (R output contributions from R, G, B, A)
     {0.195f, 0.65f, 0.1425f, 0.0f}, // Column 1 (G output contributions from R, G, B, A)
     {-0.10f, 0.25f, 0.70f,   0.0f}, // Column 2 (B output contributions from R, G, B, A)
     {0.0f,   0.0f,  0.0f,    0.91f} // Column 3 (A/Luminance contribution)
 };
 
-static const float GBA_DCI[4][4] = {
+static const float GBC_DCI[4][4] = {
     {0.76f,  0.125f,  0.16f, 0.0f},
     {0.27f,  0.6375f, 0.18f, 0.0f},
     {-0.03f, 0.2375f, 0.66f, 0.0f},
     {0.0f,   0.0f,    0.0f,  0.97f}
 };
 
-static const float GBA_Rec2020[4][4] = {
+static const float GBC_Rec2020[4][4] = {
     {0.61f,  0.155f, 0.16f,   0.0f},
     {0.345f, 0.615f, 0.1875f, 0.0f},
     {0.045f, 0.23f,  0.6525f, 0.0f},
     {0.0f,   0.0f,   0.0f,    1.0f}
 };
 
-// Screen darkening factor. Default to 0.0f
-static float darken_screen = 0.0f;
+// Screen darkening factor. Default to 0.0f.
+static float lighten_screen = 0.0f;
 
 // Color mode (1 for sRGB, 2 for DCI, 3 for Rec2020). Default to sRGB (1).
 static int color_mode = 1;
@@ -67,41 +67,41 @@ static const float display_gamma = 2.2f;
 static void set_profile_from_mode();
 
 // This constructor-like function runs once when the program starts.
-struct GbafilterInitializer {
-    GbafilterInitializer() {
+struct GbcfilterInitializer {
+    GbcfilterInitializer() {
         set_profile_from_mode();
     }
 };
-static GbafilterInitializer __gbafilter_initializer;
+static GbcfilterInitializer __gbcfilter_initializer;
 
 
 // Helper function to set the 'profile' pointer based on the 'color_mode' variable.
 static void set_profile_from_mode() {
     if (color_mode == 1) {
-        profile = GBA_sRGB;
+        profile = GBC_sRGB;
     }
     else if (color_mode == 2) {
-        profile = GBA_DCI;
+        profile = GBC_DCI;
     }
     else if (color_mode == 3) {
-        profile = GBA_Rec2020;
+        profile = GBC_Rec2020;
     }
     else {
-        profile = GBA_sRGB; // Default to sRGB if an invalid mode is set
+        profile = GBC_sRGB; // Default to sRGB if an invalid mode is set
     }
 }
 
 
 // Public function to set color mode and darken screen from external calls
-void gbafilter_set_params(int new_color_mode, float new_darken_screen) {
+void gbcfilter_set_params(int new_color_mode, float new_lighten_screen) {
     color_mode = new_color_mode;
-    darken_screen = fmaxf(0.0f, fminf(1.0f, new_darken_screen)); // Clamp to 0.0-1.0
+    lighten_screen = fmaxf(0.0f, fminf(1.0f, new_lighten_screen)); // Clamp to 0.0-1.0
 
     // Call the helper to update 'profile' based on the new 'color_mode'
     set_profile_from_mode();
 }
 
-void gbafilter_update_colors(bool lcd) {
+void gbcfilter_update_colors(bool lcd) {
     switch (systemColorDepth) {
     case 8: {
         for (int i = 0; i < 0x10000; i++) {
@@ -117,7 +117,7 @@ void gbafilter_update_colors(bool lcd) {
                 (((i & 0x7c00) >> 10) << systemBlueShift);
         }
         if (lcd)
-            gbafilter_pal(systemColorMap16, 0x10000);
+            gbcfilter_pal(systemColorMap16, 0x10000);
     } break;
     case 24:
     case 32: {
@@ -127,15 +127,15 @@ void gbafilter_update_colors(bool lcd) {
                 (((i & 0x7c00) >> 10) << systemBlueShift);
         }
         if (lcd)
-            gbafilter_pal32(systemColorMap32, 0x10000);
+            gbcfilter_pal32(systemColorMap32, 0x10000);
     } break;
     }
 }
 
-void gbafilter_pal(uint16_t* buf, int count)
+void gbcfilter_pal(uint16_t* buf, int count)
 {
     // Pre-calculate constants for efficiency within function scope
-    const float target_gamma_exponent = target_gamma + darken_screen;
+    const float target_gamma_exponent = target_gamma + (lighten_screen * -1.0f);
     const float display_gamma_reciprocal = 1.0f / display_gamma;
     const float luminance_factor = profile[3][3]; // profile[3].w from GLSL
 
@@ -151,7 +151,7 @@ void gbafilter_pal(uint16_t* buf, int count)
         float g = (float)original_g_val_5bit / 31.0f;
         float b = (float)original_b_val_5bit / 31.0f;
 
-        // 1. Apply initial gamma (including darken_screen as exponent) to convert to linear space.
+        // 1. Apply initial gamma (including lighten_screen as exponent) to convert to linear space.
         // This step will affect non-"white" values.
         r = powf(r, target_gamma_exponent);
         g = powf(g, target_gamma_exponent);
@@ -194,10 +194,10 @@ void gbafilter_pal(uint16_t* buf, int count)
     }
 }
 
-void gbafilter_pal32(uint32_t* buf, int count)
+void gbcfilter_pal32(uint32_t* buf, int count)
 {
     // Pre-calculate constants for efficiency within function scope
-    const float target_gamma_exponent = target_gamma + darken_screen;
+    const float target_gamma_exponent = target_gamma + (lighten_screen * -1.0f);
     const float display_gamma_reciprocal = 1.0f / display_gamma;
     const float luminance_factor = profile[3][3]; // profile[3].w from GLSL
 
@@ -216,7 +216,7 @@ void gbafilter_pal32(uint32_t* buf, int count)
         float g = (float)original_g_val_5bit / 31.0f;
         float b = (float)original_b_val_5bit / 31.0f;
 
-        // 1. Apply initial gamma (including darken_screen as exponent) to convert to linear space.
+        // 1. Apply initial gamma (including lighten_screen as exponent) to convert to linear space.
         r = powf(r, target_gamma_exponent);
         g = powf(g, target_gamma_exponent);
         b = powf(b, target_gamma_exponent);
@@ -255,7 +255,7 @@ void gbafilter_pal32(uint32_t* buf, int count)
         // --- NEW PACKING LOGIC ---
         // This is the critical change to correctly map 8-bit color to the 5-bit shifted format,
         // while allowing FFFFFF.
-        // It uses the top 5 bits of the 8-bit value for the GBA's 5-bit component position,
+        // It uses the top 5 bits of the 8-bit value for the GBC's 5-bit component position,
         // and the bottom 3 bits to fill the lower, normally zeroed, positions.
 
         uint32_t final_pix = 0;
@@ -288,8 +288,8 @@ void gbafilter_pal32(uint32_t* buf, int count)
     }
 }
 
-// gbafilter_pad remains unchanged as it's for masking.
-void gbafilter_pad(uint8_t* buf, int count)
+// gbcfilter_pad remains unchanged as it's for masking.
+void gbcfilter_pad(uint8_t* buf, int count)
 {
     union {
         struct

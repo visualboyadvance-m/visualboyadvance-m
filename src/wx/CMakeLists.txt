@@ -424,6 +424,7 @@ target_link_libraries(
     vbam-components-draw-text
     vbam-components-filters
     vbam-components-filters-agb
+    vbam-components-filters-cgb
     vbam-components-filters-interframe
     vbam-components-user-config
     vbam-wx-config

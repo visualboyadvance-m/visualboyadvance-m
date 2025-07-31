@@ -55,6 +55,7 @@ target_link_libraries(vbam
     vbam-components-draw-text
     vbam-components-filters
     vbam-components-filters-agb
+    vbam-components-filters-cgb
     vbam-components-filters-interframe
     vbam-components-user-config
     ${OPENGL_LIBRARIES}
