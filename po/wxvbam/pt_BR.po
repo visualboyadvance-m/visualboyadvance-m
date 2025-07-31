@@ -34,13 +34,14 @@
 # Mateus Santos <sonicheats@gmail.com>, 2017
 # Mateus, 2020
 # Mauro Sokrates, 2025
+# Nelson Kerber Hennemann Filho, 2025
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-30 01:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Mateus, 2020\n"
+"Last-Translator: Nelson Kerber Hennemann Filho, 2025\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/bgk/vba-m/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1723,7 +1724,7 @@ msgstr "Idioma"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:610
 msgid "External translations"
-msgstr ""
+msgstr "Traduções externas"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:679
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:699
@@ -3779,7 +3780,7 @@ msgstr "&Sobre..."
 
 #: xrc/MainMenu.xrc:755
 msgid "&Languages"
-msgstr ""
+msgstr "&Idiomas"
 
 #: xrc/MainMenu.xrc:757
 msgid "Default Language"
@@ -3927,7 +3928,7 @@ msgstr "Chinês (China)"
 
 #: xrc/MainMenu.xrc:901
 msgid "&Use external translations"
-msgstr ""
+msgstr "&Usar traduções externas"
 
 #: xrc/MapViewer.xrc:4
 msgid "Map Viewer"
