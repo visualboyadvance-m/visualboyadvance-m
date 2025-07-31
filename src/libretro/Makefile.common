@@ -70,4 +70,5 @@ SOURCES_CXX += \
 # Filters
 SOURCES_CXX += \
 	$(CORE_DIR)/components/filters_agb/filters_agb.cpp \
+	$(CORE_DIR)/components/filters_cgb/filters_cgb.cpp \
 	$(CORE_DIR)/components/filters_interframe/interframe.cpp

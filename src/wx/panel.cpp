@@ -35,6 +35,7 @@
 #include "components/draw_text/draw_text.h"
 #include "components/filters/filters.h"
 #include "components/filters_agb/filters_agb.h"
+#include "components/filters_cgb/filters_cgb.h"
 #include "components/filters_interframe/interframe.h"
 #include "core/base/check.h"
 #include "core/base/file_util.h"
@@ -3457,10 +3458,12 @@ void GameArea::OnGBBorderChanged(config::Option* option) {
 void GameArea::UpdateLcdFilter() {
     if (loaded == IMAGE_GBA)
         gbafilter_update_colors(OPTION(kGBALCDFilter));
-    else if (loaded == IMAGE_GB)
-        gbafilter_update_colors(OPTION(kGBLCDFilter));
-    else
+     else if (loaded == IMAGE_GB)
+        gbcfilter_update_colors(OPTION(kGBLCDFilter));
+     else { 
         gbafilter_update_colors(false);
+        gbcfilter_update_colors(false);
+    }
 }
         
 void GameArea::SuspendScreenSaver() {
