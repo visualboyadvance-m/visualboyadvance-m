@@ -4234,9 +4234,9 @@ void CPULoop(int ticks)
                                     *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
                                     *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];
                                 }
-// for filters that read past the screen
+                                // for filters that read past the screen
 #ifndef __LIBRETRO__
-                                *dest++ = 0;
+                                * dest++ = 0;
 #endif
                             } break;
                             case 16: {
@@ -4272,43 +4272,58 @@ void CPULoop(int ticks)
 #endif
                             } break;
                             case 24: {
-                                uint8_t* dest = (uint8_t*)g_pix + 240 * VCOUNT * 3;
+                                uint8_t* dest = (uint8_t*)g_pix + (240 * 3) * (VCOUNT + 1);
                                 for (int x = 0; x < 240;) {
-                                    *((uint32_t*)dest) = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    dest += 3;
-                                    *((uint32_t*)dest) = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    dest += 3;
-                                    *((uint32_t*)dest) = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    dest += 3;
-                                    *((uint32_t*)dest) = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    dest += 3;
+                                    uint32_t color = systemColorMap32[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = (uint8_t)(color & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 8) & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 16) & 0xFF);
+                                    color = systemColorMap32[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = (uint8_t)(color & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 8) & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 16) & 0xFF);
+                                    color = systemColorMap32[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = (uint8_t)(color & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 8) & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 16) & 0xFF);
+                                    color = systemColorMap32[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = (uint8_t)(color & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 8) & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 16) & 0xFF);
 
-                                    *((uint32_t*)dest) = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    dest += 3;
-                                    *((uint32_t*)dest) = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    dest += 3;
-                                    *((uint32_t*)dest) = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    dest += 3;
-                                    *((uint32_t*)dest) = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    dest += 3;
+                                    color = systemColorMap32[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = (uint8_t)(color & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 8) & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 16) & 0xFF);
+                                    color = systemColorMap32[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = (uint8_t)(color & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 8) & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 16) & 0xFF);
+                                    color = systemColorMap32[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = (uint8_t)(color & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 8) & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 16) & 0xFF);
+                                    color = systemColorMap32[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = (uint8_t)(color & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 8) & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 16) & 0xFF);
 
-                                    *((uint32_t*)dest) = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    dest += 3;
-                                    *((uint32_t*)dest) = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    dest += 3;
-                                    *((uint32_t*)dest) = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    dest += 3;
-                                    *((uint32_t*)dest) = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    dest += 3;
-
-                                    *((uint32_t*)dest) = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    dest += 3;
-                                    *((uint32_t*)dest) = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    dest += 3;
-                                    *((uint32_t*)dest) = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    dest += 3;
-                                    *((uint32_t*)dest) = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    dest += 3;
+                                    color = systemColorMap32[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = (uint8_t)(color & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 8) & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 16) & 0xFF);
+                                    color = systemColorMap32[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = (uint8_t)(color & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 8) & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 16) & 0xFF);
+                                    color = systemColorMap32[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = (uint8_t)(color & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 8) & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 16) & 0xFF);
+                                    color = systemColorMap32[g_lineMix[x++] & 0xFFFF];
+                                    *dest++ = (uint8_t)(color & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 8) & 0xFF);
+                                    *dest++ = (uint8_t)((color >> 16) & 0xFF);
                                 }
                             } break;
                             case 32: {
