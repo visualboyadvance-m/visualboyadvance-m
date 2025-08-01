@@ -1,7 +1,6 @@
 wxvbam_bg MOFILE "translations/bg/LC_MESSAGES/wxvbam.mo"
 wxvbam_br MOFILE "translations/br/LC_MESSAGES/wxvbam.mo"
 wxvbam_cs MOFILE "translations/cs/LC_MESSAGES/wxvbam.mo"
-wxvbam_de MOFILE "translations/de/LC_MESSAGES/wxvbam.mo"
 wxvbam_el MOFILE "translations/el/LC_MESSAGES/wxvbam.mo"
 wxvbam_en_US MOFILE "translations/en_US/LC_MESSAGES/wxvbam.mo"
 wxvbam_es MOFILE "translations/es/LC_MESSAGES/wxvbam.mo"
