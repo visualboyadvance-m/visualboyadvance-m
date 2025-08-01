@@ -16,7 +16,7 @@ extern long soundSampleRate; // current sound quality
 gb_effects_config_t gb_effects_config = { false, 0.20f, 0.15f, false };
 
 static gb_effects_config_t gb_effects_config_current;
-static Simple_Effects_Buffer* stereo_buffer;
+static Simple_Effects_Buffer* stereo_buffer = 0;
 static Gb_Apu* gb_apu;
 
 static float soundVolume_ = -1;
