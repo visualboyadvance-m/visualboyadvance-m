@@ -3932,7 +3932,7 @@ void gbDrawLine()
         if (gbBorderOn)
             dest += gbBorderColumnSkip;
 #ifndef __LIBRETRO__
-        *dest++ = 0; // for filters that read one pixel more
+        * dest++ = 0; // for filters that read one pixel more
 #endif
     } break;
     case 16: {
@@ -3970,48 +3970,62 @@ void gbDrawLine()
         *dest++ = 0; // for filters that read one pixel more
 #endif
     } break;
-
     case 24: {
-        uint8_t* dest = (uint8_t*)g_pix + 3 * (gbBorderLineSkip * (register_LY + gbBorderRowSkip) + gbBorderColumnSkip);
+        uint8_t* dest = (uint8_t*)g_pix + (gbBorderLineSkip * 3) * (register_LY + gbBorderRowSkip + 1)
+            + (gbBorderColumnSkip * 3);
         for (size_t x = 0; x < kGBWidth;) {
-            *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
-            dest += 3;
-            *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
-            dest += 3;
-            *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
-            dest += 3;
-            *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
-            dest += 3;
+            uint32_t color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
 
-            *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
-            dest += 3;
-            *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
-            dest += 3;
-            *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
-            dest += 3;
-            *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
-            dest += 3;
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
 
-            *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
-            dest += 3;
-            *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
-            dest += 3;
-            *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
-            dest += 3;
-            *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
-            dest += 3;
-
-            *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
-            dest += 3;
-            *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
-            dest += 3;
-            *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
-            dest += 3;
-            *((uint32_t*)dest) = systemColorMap32[gbLineMix[x++]];
-            dest += 3;
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
         }
     } break;
-
     case 32: {
 #ifdef __LIBRETRO__
         uint32_t* dest = (uint32_t*)g_pix + gbBorderLineSkip * (register_LY + gbBorderRowSkip)
