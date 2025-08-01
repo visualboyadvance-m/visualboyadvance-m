@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.19)
 cmake_policy(VERSION 3.19...3.28.3)
 
+# Use new link library de-duplication behavior.
+cmake_policy(SET CMP0156 NEW)
+cmake_policy(SET CMP0179 NEW)
+
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 if(WIN32)
