@@ -106,12 +106,12 @@ public:
     uint16_t current_rate = 0;
     int current_buffer = 0;
     int filled_buffers = 0;
+    int soundBufferLen = 0;
     AudioTimeStamp starttime;
     AudioTimeStamp timestamp;
     AudioQueueTimelineRef timeline;
 
 private:
-    int soundBufferLen = 0;
     AudioDeviceID GetCoreAudioDevice(wxString name);
     void setBuffer(uint16_t* finalWave, int length);
 
@@ -120,13 +120,29 @@ private:
 
 static void PlaybackBufferReadyCallback(void *inUserData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer)
 {
+    int curbuf = 0;
     CoreAudioAudio *cadevice = (CoreAudioAudio *)inUserData;
     (void)inAQ;
 
+    for (curbuf = 0; curbuf < OPTION(kSoundBuffers); curbuf++) {
+        if (cadevice->buffers[curbuf] == inBuffer) {
+            break;
+        }
+    }
+
+    if (curbuf >= OPTION(kSoundBuffers))
+        return;
+
     // buffer is unexpectedly here? We're probably dying, but try to requeue this buffer with silence.
-    if (inBuffer) {
-        memset(inBuffer->mAudioData, 0, inBuffer->mAudioDataBytesCapacity);
-        inBuffer->mAudioDataByteSize = 0;
+    if (cadevice->buffers[curbuf] != NULL) {
+        AudioQueueFreeBuffer(inAQ, cadevice->buffers[curbuf]);
+        cadevice->soundBufferLen = (soundGetSampleRate() / 60) * cadevice->description.mBytesPerPacket;
+        AudioQueueAllocateBuffer(inAQ, cadevice->soundBufferLen, &cadevice->buffers[curbuf]);
+        cadevice->buffers[curbuf]->mAudioDataByteSize = 0;
+    } else {
+        cadevice->soundBufferLen = (soundGetSampleRate() / 60) * cadevice->description.mBytesPerPacket;
+        AudioQueueAllocateBuffer(inAQ, cadevice->soundBufferLen, &cadevice->buffers[curbuf]);
+        cadevice->buffers[curbuf]->mAudioDataByteSize = 0;
     }
 
     if (cadevice->filled_buffers > 0) {
@@ -491,8 +507,8 @@ void CoreAudioAudio::write(uint16_t* finalWave, int length) {
             current_buffer = 0;
         }
 
-        while (filled_buffers >= (OPTION(kSoundBuffers) - 1)) {
-            wxMilliSleep(1);
+        while (filled_buffers >= OPTION(kSoundBuffers)) {
+            wxMilliSleep(((soundGetSampleRate() / 60) * 4) / (soundGetSampleRate() >> 7));
         }
     }
 
@@ -507,8 +523,8 @@ void CoreAudioAudio::write(uint16_t* finalWave, int length) {
         current_buffer = 0;
     }
 
-    while (filled_buffers >= (OPTION(kSoundBuffers) - 1)) {
-        wxMilliSleep(1);
+    while (filled_buffers >= OPTION(kSoundBuffers)) {
+        wxMilliSleep(((soundGetSampleRate() / 60) * 4) / (soundGetSampleRate() >> 7));
     }
 }
 
