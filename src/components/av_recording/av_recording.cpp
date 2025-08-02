@@ -278,7 +278,7 @@ recording::MediaRet recording::MediaRecorder::setup_video_stream_info(int width,
     switch (pixsize)
     {
         case 1:
-            tbord = 1; rbord = 2;
+            tbord = 1; rbord = 4;
             break;
         case 2:
             // 16-bit: 2 @ right, 1 @ top
