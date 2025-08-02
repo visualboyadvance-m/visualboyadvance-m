@@ -48,7 +48,7 @@ if((NOT ENABLE_SDL3) AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
 endif()
 
 if(ENABLE_SDL3)
-    if(UNIX)
+    if(UNIX AND NOT APPLE)
         set(VBAM_SDL_LIBS "${SDL3_LIBRARIES}")
     else()
         if(VBAM_STATIC)

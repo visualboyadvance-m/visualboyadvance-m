@@ -46,7 +46,7 @@ endif()
 
 find_package(PkgConfig)
 
-if(UNIX)
+if(UNIX AND NOT APPLE)
     pkg_check_modules(SDL3 sdl3 QUIET)
 else()
     find_package(SDL3 QUIET)
