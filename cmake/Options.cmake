@@ -40,15 +40,27 @@ if(VBAM_STATIC)
     endif()
 endif()
 
-find_package(SDL3 QUIET)
+if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "^([xX]86_64|[aA][mM][dD]64)$")
+   set(PKG_CONFIG_EXECUTABLE "$ENV{VCPKG_ROOT}/installed/x64-windows/tools/pkgconf/pkgconf.exe")
+endif()
+
+find_package(PkgConfig)
+
+if(UNIX)
+    pkg_check_modules(SDL3 sdl3 QUIET)
+else()
+    find_package(SDL3 QUIET)
+endif()
 
 option(ENABLE_SDL3 "Use SDL3" "${SDL3_FOUND}")
 
 if(NOT TRANSLATIONS_ONLY)
     if(ENABLE_SDL3)
-        find_package(SDL3 CONFIG REQUIRED)
+        if(NOT UNIX)
+            find_package(SDL3 REQUIRED)
+        endif()
     else()
-        find_package(SDL2 CONFIG REQUIRED)
+        find_package(SDL2 REQUIRED)
     endif()
 endif()
 
@@ -92,12 +104,6 @@ option(DISABLE_MACOS_PACKAGE_MANAGERS "Set to TRUE to disable support for macOS 
 if(APPLE AND NOT DISABLE_MACOS_PACKAGE_MANAGERS)
     include(MacPackageManagers)
 endif()
-
-if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "^([xX]86_64|[aA][mM][dD]64)$")
-   set(PKG_CONFIG_EXECUTABLE "$ENV{VCPKG_ROOT}/installed/x64-windows/tools/pkgconf/pkgconf.exe")
-endif()
-
-find_package(PkgConfig)
 
 # Link / SFML
 if(NOT TRANSLATIONS_ONLY)
