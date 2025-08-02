@@ -268,7 +268,7 @@ void MetalDrawingPanel::DrawArea()
         DrawingPanelInit();
     
     if (systemColorDepth == 8) {
-        srcPitch = std::ceil(width * scale) + 2;
+        srcPitch = std::ceil(width * scale) + 4;
     } else if (systemColorDepth == 16) {
         srcPitch = std::ceil(width * scale * 2) + 4;
     } else if (systemColorDepth == 24) {
@@ -302,7 +302,7 @@ void MetalDrawingPanel::DrawArea()
                 src_pos++;
             }
             pos++;
-            src_pos += 2;
+            src_pos += 4;
         }
 
         _texture = loadTextureUsingData(dst);

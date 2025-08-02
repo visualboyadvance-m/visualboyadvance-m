@@ -1163,7 +1163,7 @@ void sdlInitVideo()
         switch (systemColorDepth)
         {
             case  8:
-                srcPitch = sizeX * (systemColorDepth >> 3) + 2;
+                srcPitch = sizeX * (systemColorDepth >> 3) + 4;
                 break;
 
             case 16:
@@ -1186,7 +1186,7 @@ void sdlInitVideo()
     } else {
 #ifdef CONFIG_8BIT
         systemColorDepth = 8;
-        srcPitch = sizeX * (systemColorDepth >> 3) + 2;
+        srcPitch = sizeX * (systemColorDepth >> 3) + 4;
 #elif defined(CONFIG_16BIT)
         systemColorDepth = 16;
         srcPitch = sizeX * (systemColorDepth >> 3) + 4;

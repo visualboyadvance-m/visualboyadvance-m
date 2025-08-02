@@ -10,8 +10,6 @@ extern "C" {
 #include "core/base/system.h"
 #include "core/base/message.h"
 
-bool no_border = false;
-
 bool utilWritePNGFile(const char* fileName, int w, int h, uint8_t* pix) {
     static constexpr size_t kNumChannels = 3;
     uint8_t* writeBuffer = new uint8_t[w * h * kNumChannels];
@@ -38,9 +36,7 @@ bool utilWritePNGFile(const char* fileName, int w, int h, uint8_t* pix) {
                     }
                 }
 
-                if (no_border == false) {
-                    pixU8 += 2;
-                }
+                pixU8 += 4;
             }
         } break;
         case 16: {
@@ -155,11 +151,7 @@ bool utilWriteBMPFile(const char* fileName, int w, int h, uint8_t* pix) {
     switch (systemColorDepth) {
         case 8: {
             uint8_t* pixU8 = 0;
-            if (no_border == false) {
-                pixU8 = (uint8_t*)pix + ((w + 2) * (h));
-            } else {
-                pixU8 = (uint8_t*)pix + ((w) * (h));
-            }
+            pixU8 = (uint8_t*)pix + ((w + 4) * (h));
 
             for (int y = 0; y < sizeY; y++) {
                 for (int x = 0; x < sizeX; x++, pixU8++) {
@@ -175,13 +167,11 @@ bool utilWriteBMPFile(const char* fileName, int w, int h, uint8_t* pix) {
                     }
                 }
 
-                if (no_border == false) {
-                    pixU8++;
-                    pixU8++;
-                    pixU8 -= 2 * (w + 2);
-                } else {
-                    pixU8 -= 2 * (w);
-                }
+                pixU8++;
+                pixU8++;
+                pixU8++;
+                pixU8++;
+                pixU8 -= 2 * (w + 4);
 
                 fwrite(writeBuffer, 1, 3 * w, fp);
                 b = writeBuffer;

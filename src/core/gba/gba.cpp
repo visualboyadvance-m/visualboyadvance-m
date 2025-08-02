@@ -4211,7 +4211,7 @@ void CPULoop(int ticks)
 #ifdef __LIBRETRO__
                                 uint8_t* dest = (uint8_t*)g_pix + 240 * VCOUNT;
 #else
-                                uint8_t* dest = (uint8_t*)g_pix + 242 * (VCOUNT + 1);
+                                uint8_t* dest = (uint8_t*)g_pix + 244 * (VCOUNT + 1);
 #endif
                                 for (int x = 0; x < 240;) {
                                     *dest++ = systemColorMap8[g_lineMix[x++] & 0xFFFF];

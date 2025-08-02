@@ -3905,7 +3905,7 @@ void gbDrawLine()
         uint8_t* dest = (uint8_t*)g_pix + gbBorderLineSkip * (register_LY + gbBorderRowSkip)
             + gbBorderColumnSkip;
 #else
-        uint8_t* dest = (uint8_t*)g_pix + (gbBorderLineSkip + 2) * (register_LY + gbBorderRowSkip + 1)
+        uint8_t* dest = (uint8_t*)g_pix + (gbBorderLineSkip + 4) * (register_LY + gbBorderRowSkip + 1)
             + gbBorderColumnSkip;
 #endif
         for (size_t x = 0; x < kGBWidth;) {
