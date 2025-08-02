@@ -21,7 +21,7 @@ bool utilWritePNGFile(const char* fileName, int w, int h, uint8_t* pix) {
 
     switch (systemColorDepth) {
         case 8: {
-            uint8_t* pixU8 = (uint8_t*)pix + (w);
+            uint8_t* pixU8 = (uint8_t*)pix + (w + 4);
             for (int y = 0; y < sizeY; y++) {
                 for (int x = 0; x < sizeX; x++, pixU8++) {
                     // White color fix
