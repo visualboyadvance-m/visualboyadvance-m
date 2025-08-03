@@ -31,7 +31,7 @@ uint32_t systemGetClock() {
 void systemSetTitle(const char*) {}
 
 std::unique_ptr<SoundDriver> systemSoundInit() {
-    return nullptr;
+    return NULL;
 }
 
 void systemOnWriteDataToSoundBuffer(const uint16_t* /*finalWave*/, int /*length*/) {}

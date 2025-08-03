@@ -94,8 +94,8 @@ private:
 OpenAL::OpenAL() {
     initialized = false;
     buffersLoaded = false;
-    device = nullptr;
-    context = nullptr;
+    device = NULL;
+    context = NULL;
     buffer = (ALuint*)malloc(OPTION(kSoundBuffers) * sizeof(ALuint));
     memset(buffer, 0, OPTION(kSoundBuffers) * sizeof(ALuint));
     tempBuffer = 0;
@@ -115,7 +115,7 @@ OpenAL::~OpenAL() {
     alDeleteBuffers(OPTION(kSoundBuffers), buffer);
     ASSERT_SUCCESS;
     free(buffer);
-    alcMakeContextCurrent(nullptr);
+    alcMakeContextCurrent(NULL);
     // Wine incorrectly returns ALC_INVALID_VALUE
     // and then fails the rest of these functions as well
     // so there will be a leak under Wine, but that's a bug in Wine, not
@@ -175,13 +175,13 @@ bool OpenAL::init(long sampleRate) {
     const wxString& audio_device = OPTION(kSoundAudioDevice);
     if (!audio_device.empty()) {
         device = alcOpenDevice(audio_device.utf8_str());
-        if (device == nullptr) {
+        if (device == NULL) {
             // Might be the default device. Try again.
             OPTION(kSoundAudioDevice) = wxEmptyString;
-            device = alcOpenDevice(nullptr);
+            device = alcOpenDevice(NULL);
         }
     } else {
-        device = alcOpenDevice(nullptr);
+        device = alcOpenDevice(NULL);
     }
 
     if (!device) {
@@ -189,8 +189,8 @@ bool OpenAL::init(long sampleRate) {
         return false;
     }
 
-    context = alcCreateContext(device, nullptr);
-    VBAM_CHECK(context != nullptr);
+    context = alcCreateContext(device, NULL);
+    VBAM_CHECK(context != NULL);
     ALCboolean retVal = alcMakeContextCurrent(context);
     VBAM_CHECK(ALC_TRUE == retVal);
     alGenBuffers(OPTION(kSoundBuffers), buffer);
@@ -368,12 +368,12 @@ std::vector<AudioDevice> GetOpenALDevices() {
 
 #ifdef ALC_DEVICE_SPECIFIER
 
-    if (alcIsExtensionPresent(nullptr, "ALC_ENUMERATION_EXT") == AL_FALSE) {
+    if (alcIsExtensionPresent(NULL, "ALC_ENUMERATION_EXT") == AL_FALSE) {
         // this extension isn't critical to OpenAL operating
         return devices;
     }
 
-    const char* devs = alcGetString(nullptr, ALC_DEVICE_SPECIFIER);
+    const char* devs = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
 
     while (*devs) {
         const wxString device_name(devs, wxConvLibc);

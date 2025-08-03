@@ -22,11 +22,11 @@ private:
 
     HMODULE winsparkle_dll;
 
-    func_win_sparkle_init                 winsparkle_init = nullptr;
-    func_win_sparkle_check_update_with_ui winsparkle_check_update_with_ui = nullptr;
-    func_win_sparkle_set_appcast_url      winsparkle_set_appcast_url      = nullptr;
-    func_win_sparkle_set_app_details      winsparkle_set_app_details      = nullptr;
-    func_win_sparkle_cleanup              winsparkle_cleanup              = nullptr;
+    func_win_sparkle_init                 winsparkle_init = NULL;
+    func_win_sparkle_check_update_with_ui winsparkle_check_update_with_ui = NULL;
+    func_win_sparkle_set_appcast_url      winsparkle_set_appcast_url      = NULL;
+    func_win_sparkle_set_app_details      winsparkle_set_app_details      = NULL;
+    func_win_sparkle_cleanup              winsparkle_cleanup              = NULL;
 
     wxString temp_file_name;
 

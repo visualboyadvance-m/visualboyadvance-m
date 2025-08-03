@@ -150,7 +150,7 @@ private:
     config::EmulatedGamepad emulated_gamepad_;
 
     wxPathList config_path;
-    char* home = nullptr;
+    char* home = NULL;
 
     widgets::SdlPoller sdl_poller_;
     widgets::KeyboardInputHandler keyboard_input_handler_;
@@ -569,7 +569,7 @@ protected:
     uint32_t mouse_active_time;
     wxPoint mouse_last_pos;
 #ifdef __WXMSW__
-    HMENU current_hmenu = nullptr;
+    HMENU current_hmenu = NULL;
 #endif
 
     DECLARE_DYNAMIC_CLASS(GameArea)

@@ -40,7 +40,7 @@ public:
 
 private:
     // Helper method to find a joystick state from a joystick ID.
-    // Returns nullptr if not present.
+    // Returns NULL if not present.
     JoyState* FindJoyState(const SDL_JoystickID& joy_id);
 
     // Remap all controllers.

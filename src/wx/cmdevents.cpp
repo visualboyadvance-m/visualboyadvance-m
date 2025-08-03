@@ -58,7 +58,7 @@ void RefreshFrame(void)
     if (wxGetApp().frame)
         wxGetApp().frame->Destroy();
 
-    wxGetApp().frame = wxDynamicCast(xr->LoadFrame(nullptr, "MainFrame"), MainFrame);
+    wxGetApp().frame = wxDynamicCast(xr->LoadFrame(NULL, "MainFrame"), MainFrame);
     if (!wxGetApp().frame) {
         wxLogError(_("Could not create main window"));
         return;
@@ -2330,7 +2330,7 @@ EVT_HANDLER(UpdateEmu, "Check for updates...")
 EVT_HANDLER(FactoryReset, "Factory Reset...")
 {
     wxMessageDialog dlg(
-        nullptr, _("YOUR CONFIGURATION WILL BE DELETED!\n\nAre you sure?"),
+        NULL, _("YOUR CONFIGURATION WILL BE DELETED!\n\nAre you sure?"),
         _("FACTORY RESET"), wxYES_NO | wxNO_DEFAULT | wxCENTRE);
 
     if (dlg.ShowModal() == wxID_YES) {

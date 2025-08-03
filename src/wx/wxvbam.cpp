@@ -277,7 +277,7 @@ static void tack_full_path(wxString& s, const wxString& app = wxEmptyString)
 wxvbamApp::wxvbamApp()
     : wxApp(),
       pending_fullscreen(false),
-      frame(nullptr),
+      frame(NULL),
       using_wayland(false),
       emulated_gamepad_(std::bind(&wxvbamApp::bindings, this)),
       sdl_poller_(this),
@@ -629,7 +629,7 @@ bool wxvbamApp::OnInit() {
     const bool is_maximized = OPTION(kGeomIsMaximized);
 
     // Create the main window.
-    frame = wxDynamicCast(xr->LoadFrame(nullptr, "MainFrame"), MainFrame);
+    frame = wxDynamicCast(xr->LoadFrame(NULL, "MainFrame"), MainFrame);
     if (!frame) {
         wxLogError(_("Could not create main window"));
         return false;
@@ -923,12 +923,12 @@ wxEvtHandler* wxvbamApp::event_handler() {
     }
 
     if (!frame) {
-        return nullptr;
+        return NULL;
     }
 
     auto panel = frame->GetPanel();
     if (!panel || !panel->panel) {
-        return nullptr;
+        return NULL;
     }
 
     if (OPTION(kUIAllowJoystickBackgroundInput) || OPTION(kUIAllowKeyboardBackgroundInput)) {
@@ -936,7 +936,7 @@ wxEvtHandler* wxvbamApp::event_handler() {
         return panel->panel->GetWindow()->GetEventHandler();
     }
 
-    return nullptr;
+    return NULL;
 }
 
 MainFrame::MainFrame()
@@ -1258,8 +1258,8 @@ void MainFrame::ResetMenuAccelerators() {
 
 void MainFrame::MenuPopped(wxMenuEvent& evt) {
     // We consider the menu closed when the main menubar or system menu is closed, not any submenus.
-    // On Windows nullptr is the system menu.
-    if (evt.GetEventType() == wxEVT_MENU_CLOSE && (evt.GetMenu() == nullptr || evt.GetMenu()->GetMenuBar() == GetMenuBar()))
+    // On Windows NULL is the system menu.
+    if (evt.GetEventType() == wxEVT_MENU_CLOSE && (evt.GetMenu() == NULL || evt.GetMenu()->GetMenuBar() == GetMenuBar()))
         SetMenusOpened(false);
     else
         SetMenusOpened(true);

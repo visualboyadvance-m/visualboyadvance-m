@@ -20,7 +20,7 @@ namespace config {
 Option* Option::ByName(const wxString& config_name) {
     nonstd::optional<OptionID> option_id = internal::StringToOptionId(config_name);
     if (!option_id) {
-        return nullptr;
+        return NULL;
     }
     return ByID(option_id.value());
 }

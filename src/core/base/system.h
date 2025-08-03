@@ -74,8 +74,8 @@ extern struct CoreOptions {
     uint32_t speedup_throttle = 100;
     uint32_t speedup_frame_skip = 9;
     uint32_t throttle = 100;
-    const char* loadDotCodeFile = nullptr;
-    const char* saveDotCodeFile = nullptr;
+    const char* loadDotCodeFile = NULL;
+    const char* saveDotCodeFile = NULL;
 } coreOptions;
 
 // The following functions must be implemented by the emulator.

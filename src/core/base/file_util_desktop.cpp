@@ -24,7 +24,7 @@ bool utilIsGzipFile(const char* file) {
     if (strlen(file) > 3) {
         const char* p = strrchr(file, '.');
 
-        if (p != nullptr) {
+        if (p != NULL) {
             if (strcasecmp(p, ".gz") == 0)
                 return true;
             if (strcasecmp(p, ".z") == 0)
@@ -36,13 +36,13 @@ bool utilIsGzipFile(const char* file) {
 }
 
 // Opens and scans archive using accept(). Returns fex_t if found.
-// If error or not found, displays message and returns nullptr.
+// If error or not found, displays message and returns NULL.
 fex_t* scanArchive(const char* file, bool (*accept)(const char*), char (&buffer)[2048]) {
     fex_t* fe;
     fex_err_t err = fex_open(&fe, file);
     if (!fe) {
         systemMessage(MSG_CANNOT_OPEN_FILE, N_("Cannot open file %s: %s"), file, err);
-        return nullptr;
+        return NULL;
     }
 
     // Scan filenames
@@ -67,14 +67,14 @@ fex_t* scanArchive(const char* file, bool (*accept)(const char*), char (&buffer)
         if (err) {
             systemMessage(MSG_BAD_ZIP_FILE, N_("Cannot read archive %s: %s"), file, err);
             fex_close(fe);
-            return nullptr;
+            return NULL;
         }
     }
 
     if (!found) {
         systemMessage(MSG_NO_IMAGE_ON_ZIP, N_("No image found in file %s"), file);
         fex_close(fe);
-        return nullptr;
+        return NULL;
     }
     return fe;
 }
@@ -101,10 +101,10 @@ IMAGE_TYPE utilFindType(const char* file, char (&buffer)[2048]) {
     return utilIsGBAImage(file) ? IMAGE_GBA : IMAGE_GB;
 }
 
-int(ZEXPORT* utilGzWriteFunc)(gzFile, const voidp, unsigned int) = nullptr;
-int(ZEXPORT* utilGzReadFunc)(gzFile, voidp, unsigned int) = nullptr;
-int(ZEXPORT* utilGzCloseFunc)(gzFile) = nullptr;
-z_off_t(ZEXPORT* utilGzSeekFunc)(gzFile, z_off_t, int) = nullptr;
+int(ZEXPORT* utilGzWriteFunc)(gzFile, const voidp, unsigned int) = NULL;
+int(ZEXPORT* utilGzReadFunc)(gzFile, voidp, unsigned int) = NULL;
+int(ZEXPORT* utilGzCloseFunc)(gzFile) = NULL;
+z_off_t(ZEXPORT* utilGzSeekFunc)(gzFile, z_off_t, int) = NULL;
 
 }  // namespace
 
@@ -113,7 +113,7 @@ uint8_t* utilLoad(const char* file, bool (*accept)(const char*), uint8_t* data, 
     char buffer[2048];
     fex_t* fe = scanArchive(file, accept, buffer);
     if (!fe)
-        return nullptr;
+        return NULL;
 
     // Allocate space for image
     fex_err_t err = fex_stat(fe);
@@ -122,17 +122,17 @@ uint8_t* utilLoad(const char* file, bool (*accept)(const char*), uint8_t* data, 
         size = fileSize;
 
     if (size > MAX_CART_SIZE)
-        return nullptr;
+        return NULL;
 
     uint8_t* image = data;
 
-    if (image == nullptr) {
+    if (image == NULL) {
         // allocate buffer memory if none was passed to the function
         image = (uint8_t*)malloc(utilGetSize(size));
-        if (image == nullptr) {
+        if (image == NULL) {
             fex_close(fe);
             systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"), "data");
-            return nullptr;
+            return NULL;
         }
         size = fileSize;
     }
@@ -144,9 +144,9 @@ uint8_t* utilLoad(const char* file, bool (*accept)(const char*), uint8_t* data, 
 
     if (err) {
         systemMessage(MSG_ERROR_READING_IMAGE, N_("Error reading image from %s: %s"), buffer, err);
-        if (data == nullptr)
+        if (data == NULL)
             free(image);
-        return nullptr;
+        return NULL;
     }
 
     size = fileSize;
@@ -183,7 +183,7 @@ gzFile utilAutoGzOpen(const char* file, const char* mode) {
 
     std::wstring wfile = core::internal::ToUTF16(file);
     if (wfile.empty()) {
-        return nullptr;
+        return NULL;
     }
 
     return gzopen_w(wfile.data(), mode);

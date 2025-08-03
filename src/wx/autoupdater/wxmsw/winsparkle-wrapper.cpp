@@ -42,7 +42,7 @@ WinSparkleDllWrapper::WinSparkleDllWrapper()
 
     winsparkle_dll = LoadLibraryW(temp_file_name.wc_str());
 
-    if (winsparkle_dll != nullptr) {
+    if (winsparkle_dll != NULL) {
         winsparkle_init = reinterpret_cast<func_win_sparkle_init>(GetProcAddress(winsparkle_dll, "win_sparkle_init"));
         winsparkle_check_update_with_ui = reinterpret_cast<func_win_sparkle_check_update_with_ui>(GetProcAddress(winsparkle_dll, "win_sparkle_check_update_with_ui"));
         winsparkle_set_appcast_url = reinterpret_cast<func_win_sparkle_set_appcast_url>(GetProcAddress(winsparkle_dll, "win_sparkle_set_appcast_url"));
@@ -54,7 +54,7 @@ WinSparkleDllWrapper::WinSparkleDllWrapper()
 
 WinSparkleDllWrapper::~WinSparkleDllWrapper()
 {
-    if (winsparkle_dll != nullptr) {
+    if (winsparkle_dll != NULL) {
         while(::FreeLibrary(winsparkle_dll)) {
             wxMilliSleep(200);
         }

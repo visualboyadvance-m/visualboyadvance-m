@@ -333,7 +333,7 @@ void DirectSound::write(uint16_t* finalWave, int) {
 static BOOL CALLBACK DSEnumCB(LPGUID guid, LPCTSTR desc, LPCTSTR /*module*/, LPVOID user) {
     std::vector<AudioDevice>* devices = static_cast<std::vector<AudioDevice>*>(user);
 
-    if (guid == nullptr) {
+    if (guid == NULL) {
         devices->push_back({desc, {}});
         return TRUE;
     }

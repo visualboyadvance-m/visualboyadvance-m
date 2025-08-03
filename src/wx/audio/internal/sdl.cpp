@@ -104,7 +104,7 @@ void SDLAudio::deinit() {
     SDL_UnlockMutex(mutex);
     
     SDL_DestroyMutex(mutex);
-    mutex = nullptr;
+    mutex = NULL;
     
     SDL_CloseAudioDevice(sound_device);
 

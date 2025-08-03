@@ -584,7 +584,7 @@ void xaudio2_device_changed(XAudio2_Output* instance) {
 
 std::vector<AudioDevice> GetXAudio2Devices() {
     HRESULT hr;
-    IXAudio2* xa = nullptr;
+    IXAudio2* xa = NULL;
     hr = XAudio2Create(&xa, 0);
 
     if (hr != S_OK) {

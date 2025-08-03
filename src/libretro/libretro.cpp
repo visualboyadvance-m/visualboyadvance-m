@@ -184,9 +184,9 @@ static void* gb_rtcdata_prt(void)
     case gbCartData::MapperType::kGameShark:
     case gbCartData::MapperType::kUnknown:
         VBAM_NOTREACHED();
-        return nullptr;
+        return NULL;
     }
-    return nullptr;
+    return NULL;
 }
 
 static size_t gb_rtcdata_size(void)

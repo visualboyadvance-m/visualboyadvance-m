@@ -7,7 +7,7 @@ namespace widgets {
 namespace {
 
 wxWindow* FindTopLevelWindow(wxWindow* window) {
-    while (window != nullptr && !window->IsTopLevel()) {
+    while (window != NULL && !window->IsTopLevel()) {
         window = window->GetParent();
     }
     VBAM_CHECK(window);
@@ -18,7 +18,7 @@ GroupCheckBox* FindGroupCheckBox(wxWindow* window,
                                  const wxString& name,
                                  GroupCheckBox* current) {
     if (window == current) {
-        return nullptr;
+        return NULL;
     }
 
     if (window->IsKindOf(wxCLASSINFO(GroupCheckBox))) {
@@ -35,7 +35,7 @@ GroupCheckBox* FindGroupCheckBox(wxWindow* window,
         }
     }
 
-    return nullptr;
+    return NULL;
 }
 
 }  // namespace

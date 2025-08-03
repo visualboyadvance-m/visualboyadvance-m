@@ -55,7 +55,7 @@ void gbRenderLine()
         bank1 = &gbVram[0x2000];
     } else {
         bank0 = &gbMemory[0x8000];
-        bank1 = nullptr;
+        bank1 = NULL;
     }
 
     int tile_map = 0x1800;
@@ -92,7 +92,7 @@ void gbRenderLine()
     int tile_map_address = tile_map_line_y + tx;
 
     uint8_t _attrs = 0;
-    if (bank1 != nullptr)
+    if (bank1 != NULL)
         _attrs = bank1[tile_map_address];
 
     uint8_t tile = bank0[tile_map_address];
@@ -406,7 +406,7 @@ void gbDrawSpriteTile(int tile, int x, int y, int t, int flags,
         bank1 = &gbVram[0x2000];
     } else {
         bank0 = &gbMemory[0x8000];
-        bank1 = nullptr;
+        bank1 = NULL;
     }
 
     int SpritesTicks = gbSpritesTicks[x + 8] * (gbSpeed ? 2 : 4);

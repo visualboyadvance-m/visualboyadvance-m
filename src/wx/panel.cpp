@@ -932,7 +932,7 @@ void GameArea::AdjustSize(bool force)
 void GameArea::ResetPanel() {
     if (panel) {
         panel->Destroy();
-        panel = nullptr;
+        panel = NULL;
     }
 }
 
@@ -1464,7 +1464,7 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
       pixbuf1(0),
       pixbuf2(0),
       nthreads(0),
-      rpi_(nullptr) {
+      rpi_(NULL) {
     memset(delta, 0xff, sizeof(delta));
 
     if (OPTION(kDispFilter) == config::Filter::kPlugin) {
@@ -2949,7 +2949,7 @@ bool GLDrawingPanel::SetContext()
         // Delete the old context
         if (ctx) {
             delete ctx;
-            ctx = nullptr;
+            ctx = NULL;
         }
                 
         // Create a new context
@@ -3380,7 +3380,7 @@ void GameArea::HideMenuBar()
     if (((systemGetClock() - mouse_active_time) > 3000) && !main_frame->MenusOpened()) {
 #ifdef __WXMSW__
         current_hmenu = static_cast<HMENU>(main_frame->GetMenuBar()->GetHMenu());
-        ::SetMenu(main_frame->GetHandle(), nullptr);
+        ::SetMenu(main_frame->GetHandle(), NULL);
 #else
         main_frame->GetMenuBar()->Hide();
 #endif
@@ -3396,9 +3396,9 @@ void GameArea::ShowMenuBar()
     if (!main_frame || !menu_bar_hidden) return;
             
 #ifdef __WXMSW__
-    if (current_hmenu != nullptr) {
+    if (current_hmenu != NULL) {
         ::SetMenu(main_frame->GetHandle(), current_hmenu);
-        current_hmenu = nullptr;
+        current_hmenu = NULL;
     }
 #else
     main_frame->GetMenuBar()->Show();

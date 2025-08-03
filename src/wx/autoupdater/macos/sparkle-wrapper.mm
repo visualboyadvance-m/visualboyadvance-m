@@ -36,5 +36,5 @@ SparkleWrapper::~SparkleWrapper()
 
 void SparkleWrapper::checkForUpdatesUi()
 {
-    [d->updater checkForUpdates: nullptr];
+    [d->updater checkForUpdates: NULL];
 }

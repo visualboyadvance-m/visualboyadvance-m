@@ -112,13 +112,13 @@ private:
 
     // The SDL GameController instance.
 #ifndef ENABLE_SDL3
-    SDL_GameController* game_controller_ = nullptr;
+    SDL_GameController* game_controller_ = NULL;
 #else
-    SDL_Gamepad* game_controller_ = nullptr;
+    SDL_Gamepad* game_controller_ = NULL;
 #endif
 
     // The SDL Joystick instance.
-    SDL_Joystick* sdl_joystick_ = nullptr;
+    SDL_Joystick* sdl_joystick_ = NULL;
 
     // Current state of Joystick axis.
     std::unordered_map<uint8_t, JoyAxisStatus> axis_{};
@@ -201,8 +201,8 @@ JoyState::JoyState(JoyState&& other) : wx_joystick_(other.wx_joystick_) {
     hats_ = std::move(other.hats_);
     rumbling_ = other.rumbling_;
 
-    other.sdl_joystick_ = nullptr;
-    other.game_controller_ = nullptr;
+    other.sdl_joystick_ = NULL;
+    other.game_controller_ = NULL;
 }
 
 JoyState& JoyState::operator=(JoyState&& other) {
@@ -218,8 +218,8 @@ JoyState& JoyState::operator=(JoyState&& other) {
     hats_ = std::move(other.hats_);
     rumbling_ = other.rumbling_;
 
-    other.sdl_joystick_ = nullptr;
-    other.game_controller_ = nullptr;
+    other.sdl_joystick_ = NULL;
+    other.game_controller_ = NULL;
 
     return *this;
 }
@@ -409,7 +409,7 @@ void SdlPoller::Notify() {
 
     while (SDL_PollEvent(&sdl_event)) {
         std::vector<UserInputEvent::Data> event_data;
-        JoyState* joy_state = nullptr;
+        JoyState* joy_state = NULL;
         switch (sdl_event.type) {
 #ifndef ENABLE_SDL3
             case SDL_CONTROLLERBUTTONDOWN:
@@ -536,7 +536,7 @@ void SdlPoller::Notify() {
 JoyState* SdlPoller::FindJoyState(const SDL_JoystickID& joy_id) {
     auto it = joystick_states_.find(joy_id);
     if (it == joystick_states_.end()) {
-        return nullptr;
+        return NULL;
     }
 
     return &it->second;

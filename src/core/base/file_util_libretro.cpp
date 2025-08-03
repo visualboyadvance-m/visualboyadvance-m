@@ -25,12 +25,12 @@ static int utilGetSize(int size) {
 }
 
 uint8_t* utilLoad(const char* file, bool (*)(const char*), uint8_t* data, int& size) {
-    FILE* fp = nullptr;
+    FILE* fp = NULL;
 
     fp = fopen(file, "rb");
     if (!fp) {
         log("Failed to open file %s", file);
-        return nullptr;
+        return NULL;
     }
     fseek(fp, 0, SEEK_END);  // go to end
 
@@ -38,18 +38,18 @@ uint8_t* utilLoad(const char* file, bool (*)(const char*), uint8_t* data, int& s
     rewind(fp);
 
     uint8_t* image = data;
-    if (image == nullptr) {
+    if (image == NULL) {
         image = (uint8_t*)malloc(utilGetSize(size));
-        if (image == nullptr) {
+        if (image == NULL) {
             log("Failed to allocate memory for %s", file);
-            return nullptr;
+            return NULL;
         }
     }
 
     if (fread(image, 1, size, fp) != (size_t)size) {
         log("Failed to read from %s", file);
         fclose(fp);
-        return nullptr;
+        return NULL;
     }
 
     fclose(fp);

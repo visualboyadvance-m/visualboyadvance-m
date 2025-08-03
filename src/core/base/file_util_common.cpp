@@ -19,12 +19,12 @@ FILE* utilOpenFile(const char* filename, const char* mode) {
 #ifdef _WIN32
     std::wstring wfilename = core::internal::ToUTF16(filename);
     if (wfilename.empty()) {
-        return nullptr;
+        return NULL;
     }
 
     std::wstring wmode = core::internal::ToUTF16(mode);
     if (wmode.empty()) {
-        return nullptr;
+        return NULL;
     }
 
 #if __STDC_WANT_SECURE_LIB__
@@ -53,7 +53,7 @@ bool utilIsGBAImage(const char* file) {
     if (strlen(file) > 4) {
         const char* p = strrchr(file, '.');
 
-        if (p != nullptr) {
+        if (p != NULL) {
             if ((strcasecmp(p, ".agb") == 0) || (strcasecmp(p, ".gba") == 0) ||
                 (strcasecmp(p, ".bin") == 0) || (strcasecmp(p, ".elf") == 0))
                 return true;
@@ -71,7 +71,7 @@ bool utilIsGBImage(const char* file) {
     if (strlen(file) > 4) {
         const char* p = strrchr(file, '.');
 
-        if (p != nullptr) {
+        if (p != NULL) {
             if ((strcasecmp(p, ".dmg") == 0) || (strcasecmp(p, ".gb") == 0) ||
                 (strcasecmp(p, ".gbc") == 0) || (strcasecmp(p, ".cgb") == 0) ||
                 (strcasecmp(p, ".sgb") == 0))

@@ -494,7 +494,7 @@ private:
     SHORT previousState[0xFF];
 #elif defined(__WXMAC__)
 #else // defined(__WXGTK__)
-    Display *x11display = nullptr;
+    Display *x11display = NULL;
     char previousState[32];
     char currentState[32];
     int keySymsPerKeycode;
@@ -629,7 +629,7 @@ void BackgroundInput::Cleanup()
 #else // defined(__WXGTK__)
     if (x11display) {
         XCloseDisplay(x11display);
-        x11display = nullptr;
+        x11display = NULL;
     }
 #endif
 }
@@ -648,7 +648,7 @@ wxThread::ExitCode BackgroundInput::Entry()
     return NO_ERROR;
 }
 
-BackgroundInput *input = nullptr;
+BackgroundInput *input = NULL;
 
 void enableKeyboardBackgroundInput(wxEvtHandler* handler)
 {
@@ -658,7 +658,7 @@ void enableKeyboardBackgroundInput(wxEvtHandler* handler)
     {
         wxLogError(wxT("Failed to create keyboard thread!"));
         delete input;
-        input = nullptr;
+        input = NULL;
     }
 }
 
@@ -667,5 +667,5 @@ void disableKeyboardBackgroundInput()
     if (input && input->IsRunning()) {
         input->Delete();
     }
-    input = nullptr;
+    input = NULL;
 }

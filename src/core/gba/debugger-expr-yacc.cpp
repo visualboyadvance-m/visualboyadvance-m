@@ -117,7 +117,7 @@ std::map<std::string, uint32_t> dexp_vars;
 # ifndef YY_NULLPTR
 #  if defined __cplusplus
 #   if 201103L <= __cplusplus
-#    define YY_NULLPTR nullptr
+#    define YY_NULLPTR NULL
 #   else
 #    define YY_NULLPTR 0
 #   endif

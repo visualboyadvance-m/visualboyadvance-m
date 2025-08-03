@@ -39,7 +39,7 @@ extern struct opts_t {
     int sound_en = 0x30f; // soundSetEnable()
 
     /// Recent
-    wxFileHistory* recent = nullptr;
+    wxFileHistory* recent = NULL;
 
     /// UI Config
     bool hide_menu_bar = true;

@@ -159,9 +159,9 @@ FAudio_Output::FAudio_Output() : buffer_count_(OPTION(kSoundBuffers)) {
     currentBuffer = 0;
     sound_buffer_len_ = 0;
     device_changed = false;
-    faud = nullptr;
-    mVoice = nullptr;
-    sVoice = nullptr;
+    faud = NULL;
+    mVoice = NULL;
+    sVoice = NULL;
     memset(&buf, 0, sizeof(buf));
     memset(&vState, 0, sizeof(vState));
 }
@@ -179,17 +179,17 @@ void FAudio_Output::close() {
         }
 
         FAudioVoice_DestroyVoice(sVoice);
-        sVoice = nullptr;
+        sVoice = NULL;
     }
 
     if (mVoice) {
         FAudioVoice_DestroyVoice(mVoice);
-        mVoice = nullptr;
+        mVoice = NULL;
     }
 
     if (faud) {
         FAudio_Release(faud);
-        faud = nullptr;
+        faud = NULL;
     }
 }
 
@@ -234,7 +234,7 @@ bool FAudio_Output::init(long sampleRate) {
 
     // create sound receiver
     hr = FAudio_CreateMasteringVoice(faud, &mVoice, FAUDIO_DEFAULT_CHANNELS,
-                                     FAUDIO_DEFAULT_SAMPLERATE, 0, FAGetDev(faud), nullptr);
+                                     FAUDIO_DEFAULT_SAMPLERATE, 0, FAGetDev(faud), NULL);
 
     if (hr != 0) {
         wxLogError(_("FAudio: Creating mastering voice failed!"));
@@ -243,7 +243,7 @@ bool FAudio_Output::init(long sampleRate) {
     }
 
     // create sound emitter
-    hr = FAudio_CreateSourceVoice(faud, &sVoice, &wfx, 0, 4.0f, &notify, nullptr, nullptr);
+    hr = FAudio_CreateSourceVoice(faud, &sVoice, &wfx, 0, 4.0f, &notify, NULL, NULL);
 
     if (hr != 0) {
         wxLogError(_("FAudio: Creating source voice failed!"));
@@ -346,7 +346,7 @@ bool FAudio_Output::init(long sampleRate) {
         }
 
         if (matrixAvailable) {
-            hr = FAudioVoice_SetOutputMatrix(sVoice, nullptr, 2, dd.OutputFormat.Format.nChannels,
+            hr = FAudioVoice_SetOutputMatrix(sVoice, NULL, 2, dd.OutputFormat.Format.nChannels,
                                              matrix.data(), FAUDIO_DEFAULT_CHANNELS);
             VBAM_CHECK(hr == 0);
         }
@@ -408,7 +408,7 @@ void FAudio_Output::write(uint16_t* finalWave, int) {
     buf.pAudioData = &buffers_[currentBuffer * sound_buffer_len_];
     currentBuffer++;
     currentBuffer %= (buffer_count_ + 1);  // + 1 because we need one temporary buffer
-    [[maybe_unused]] uint32_t hr = FAudioSourceVoice_SubmitSourceBuffer(sVoice, &buf, nullptr);
+    [[maybe_unused]] uint32_t hr = FAudioSourceVoice_SubmitSourceBuffer(sVoice, &buf, NULL);
     VBAM_CHECK(hr == 0);
 }
 
@@ -463,7 +463,7 @@ void FAudio_Output::setThrottle(unsigned short throttle_) {
 }  // namespace
 
 std::vector<AudioDevice> GetFAudioDevices() {
-    FAudio* fa = nullptr;
+    FAudio* fa = NULL;
     uint32_t hr;
     uint32_t flags = 0;
 #ifdef _DEBUG

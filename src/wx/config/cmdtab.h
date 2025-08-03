@@ -29,7 +29,7 @@ cmditem new_cmditem(const wxString cmd = "",
                     const wxString name = "",
                     int cmd_id = 0,
                     int mask_flags = 0,
-                    wxMenuItem* mi = nullptr);
+                    wxMenuItem* mi = NULL);
 
 namespace config {
     // Returns the command INI entry name for the given XRC ID. Will assert if

@@ -10,7 +10,7 @@ namespace internal {
 #if defined(_WIN32)
 
 std::wstring ToUTF16(const char* utf8) {
-    int len = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, nullptr, 0);
+    int len = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL, 0);
     if (len == 0) {
         return std::wstring();
     }

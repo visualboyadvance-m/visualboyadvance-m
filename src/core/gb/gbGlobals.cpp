@@ -1,14 +1,15 @@
 #include "core/gb/gbGlobals.h"
+#include <stdlib.h>
 
 uint8_t* gbMemoryMap[16];
 
-uint8_t* gbMemory = nullptr;
-uint8_t* gbVram = nullptr;
-uint8_t* gbRom = nullptr;
-uint8_t* gbRam = nullptr;
-uint8_t* gbWram = nullptr;
-uint16_t* gbLineBuffer = nullptr;
-uint8_t* gbTAMA5ram = nullptr;
+uint8_t* gbMemory = NULL;
+uint8_t* gbVram = NULL;
+uint8_t* gbRom = NULL;
+uint8_t* gbRam = NULL;
+uint8_t* gbWram = NULL;
+uint16_t* gbLineBuffer = NULL;
+uint8_t* gbTAMA5ram = NULL;
 
 uint16_t gbPalette[128];
 uint8_t gbBgp[4] = { 0, 1, 2, 3 };
@@ -29,4 +30,4 @@ bool gbCgbMode = false;
 bool gbSgbMode = false;
 bool gbColorOption = false;
 
-uint8_t (*gbSerialFunction)(uint8_t) = nullptr;
+uint8_t (*gbSerialFunction)(uint8_t) = NULL;

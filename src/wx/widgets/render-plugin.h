@@ -9,7 +9,7 @@
 namespace widgets {
 
 // Initializes a RENDER_PLUGIN_INFO, if the plugin at `path` is valid.
-// Otherwise, returns nullptr.
+// Otherwise, returns NULL.
 RENDER_PLUGIN_INFO* MaybeLoadFilterPlugin(const wxString& path, wxDynamicLibrary* filter_plugin);
 
 }  // namespace widgets

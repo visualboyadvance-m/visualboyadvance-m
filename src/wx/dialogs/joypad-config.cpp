@@ -97,8 +97,8 @@ JoypadConfig::JoypadConfig(wxWindow* parent, const config::BindingsProvider bind
         // Set up tab order so input is easy to configure. Note that there are
         // two tabs for each panel, so we must check for the parent before
         // setting up the tab order.
-        wxWindow* prev = nullptr;
-        wxWindow* prev_parent = nullptr;
+        wxWindow* prev = NULL;
+        wxWindow* prev_parent = NULL;
         for (const config::GameKey& game_key : config::kAllGameKeys) {
             const wxString game_key_name = config::GameKeyToString(game_key);
             widgets::UserInputCtrl* game_key_control =

@@ -545,7 +545,7 @@ void MainFrame::IOViewer()
         cb->SetValidator(wxBoolIntValidator(&systemVerbose, val, val)); \
     } while (0)
 LogDialog::LogDialog() :
-dialogs::BaseDialog(nullptr, "Logging") {
+dialogs::BaseDialog(NULL, "Logging") {
     const wxString dname = wxT("Logging");
 
     SetEscapeId(wxID_OK);

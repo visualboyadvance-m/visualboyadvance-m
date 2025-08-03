@@ -38,10 +38,10 @@ extern uint8_t* g_pix;
 namespace {
 
 // Mapper functions.
-void (*g_mapper)(uint16_t, uint8_t) = nullptr;
-void (*g_mapperRAM)(uint16_t, uint8_t) = nullptr;
-uint8_t (*g_mapperReadRAM)(uint16_t) = nullptr;
-void (*g_mapperUpdateClock)() = nullptr;
+void (*g_mapper)(uint16_t, uint8_t) = NULL;
+void (*g_mapperRAM)(uint16_t, uint8_t) = NULL;
+uint8_t (*g_mapperReadRAM)(uint16_t) = NULL;
+void (*g_mapperUpdateClock)() = NULL;
 
 // Set to true on battery load error.
 bool g_gbBatteryError = false;
@@ -59,7 +59,7 @@ struct VBamIoVec {
     int leeway = 0;
     // Optional action to take on read failure.
     // If this is set, `g_gbBatteryError` will not be set.
-    void (*action_on_failure)() = nullptr;
+    void (*action_on_failure)() = NULL;
 };
 std::vector<VBamIoVec> g_vbamIoVecs;
 
@@ -136,7 +136,7 @@ bool WriteBatteryFile(const char* file_name) {
     }
 
     FILE* file = utilOpenFile(file_name, "wb");
-    if (file == nullptr) {
+    if (file == NULL) {
         systemMessage(MSG_ERROR_CREATING_FILE, N_("Error creating file %s"),
                       file_name);
         return false;
@@ -157,7 +157,7 @@ bool ReadBatteryFile(const char* file_name) {
     }
 
     gzFile gzFile = utilAutoGzOpen(file_name, "rb");
-    if (gzFile == nullptr) {
+    if (gzFile == NULL) {
         return false;
     }
 
@@ -404,9 +404,9 @@ bool gbInitializeRom(size_t romSize) {
             break;
         case gbCartData::MapperType::kTama5:
             gbRamFill = 0x00;
-            if (gbTAMA5ram == nullptr) {
+            if (gbTAMA5ram == NULL) {
                 gbTAMA5ram = (uint8_t*)calloc(1, kTama5RamSize);
-                if (gbTAMA5ram == nullptr) {
+                if (gbTAMA5ram == NULL) {
                     return false;
                 }
             }
@@ -432,16 +432,16 @@ bool gbInitializeRom(size_t romSize) {
 
     // We need to explicitly reset gbRam here as the patch application process
     // may have changed the RAM size.
-    if (gbRam != nullptr) {
+    if (gbRam != NULL) {
         free(gbRam);
-        gbRam = nullptr;
+        gbRam = NULL;
     }
 
     const size_t ramSize = g_gbCartData.ram_size();
     if (g_gbCartData.HasRam()) {
         // Always allocate 4 KiB to prevent access issues down the line.
         gbRam = (uint8_t*)malloc(std::max(k4KiB, ramSize));
-        if (gbRam == nullptr) {
+        if (gbRam == NULL) {
             return false;
         }
         memset(gbRam, gbRamFill, ramSize);
@@ -2711,27 +2711,27 @@ void gbReset()
     gbInterruptLaunched = 0;
 
     if (gbCgbMode) {
-        if (gbVram == nullptr) {
+        if (gbVram == NULL) {
             gbVram = (uint8_t*)calloc(1, kGBVRamSize);
-            if (gbVram == nullptr) {
+            if (gbVram == NULL) {
                 return;
             }
         }
-        if (gbWram == nullptr) {
+        if (gbWram == NULL) {
             gbWram = (uint8_t*)malloc(kGBWRamSize);
-            if (gbWram == nullptr) {
+            if (gbWram == NULL) {
                 return;
             }
         }
         memset(gbPalette, 0, sizeof(gbPalette));
     } else {
-        if (gbVram != nullptr) {
+        if (gbVram != NULL) {
             free(gbVram);
-            gbVram = nullptr;
+            gbVram = NULL;
         }
-        if (gbWram != nullptr) {
+        if (gbWram != NULL) {
             free(gbWram);
-            gbWram = nullptr;
+            gbWram = NULL;
         }
     }
 
@@ -2749,7 +2749,7 @@ void gbReset()
     // In all cases, most of the 2nd bank is filled with 00s.
     // The starting data are important for some 'buggy' games, like Buster Brothers or
     // Karamuchou ha Oosawagi!.
-    if (gbMemory != nullptr) {
+    if (gbMemory != NULL) {
         memset(gbMemory, 0xff, 65536);
         for (int temp = 0xC000; temp < 0xE000; temp++)
             if ((temp & 0x8) ^ ((temp & 0x800) >> 8)) {
@@ -2775,15 +2775,15 @@ void gbReset()
     }
 
     // clean LineBuffer
-    if (gbLineBuffer != nullptr) {
+    if (gbLineBuffer != NULL) {
         memset(gbLineBuffer, 0, kGBLineBufferSize);
     }
     // clean Pix
-    if (g_pix != nullptr) {
+    if (g_pix != NULL) {
         memset(g_pix, 0, kGBPixSize);
     }
     // clean Vram
-    if (gbVram != nullptr) {
+    if (gbVram != NULL) {
         memset(gbVram, 0, kGBVRamSize);
     }
     // clean Wram 2
@@ -2793,7 +2793,7 @@ void gbReset()
     // In all cases, most of the 2nd bank is filled with 00s.
     // The starting data are important for some 'buggy' games, like Buster Brothers or
     // Karamuchou ha Oosawagi!
-    if (gbWram != nullptr) {
+    if (gbWram != NULL) {
         for (int i = 0; i < 8; i++)
             if (i != 2)
                 memcpy((uint16_t*)(gbWram + i * 0x1000), (uint16_t*)(gbMemory + 0xC000), 0x1000);
@@ -3433,27 +3433,27 @@ static bool gbReadSaveState(gzFile gzFile)
 
     // Correct crash when loading color gameboy save in regular gameboy type.
     if (gbCgbMode) {
-        if (gbVram == nullptr) {
+        if (gbVram == NULL) {
             gbVram = (uint8_t*)calloc(1, kGBVRamSize);
-            if (gbVram == nullptr) {
+            if (gbVram == NULL) {
                 return false;
             }
         }
-        if (gbWram == nullptr) {
+        if (gbWram == NULL) {
             gbWram = (uint8_t*)malloc(kGBWRamSize);
-            if (gbWram == nullptr) {
+            if (gbWram == NULL) {
                 return false;
             }
         }
         memset(gbPalette, 0, sizeof(gbPalette));
     } else {
-        if (gbVram != nullptr) {
+        if (gbVram != NULL) {
             free(gbVram);
-            gbVram = nullptr;
+            gbVram = NULL;
         }
-        if (gbWram != nullptr) {
+        if (gbWram != NULL) {
             free(gbWram);
-            gbWram = nullptr;
+            gbWram = NULL;
         }
     }
 
@@ -3765,58 +3765,58 @@ bool gbWriteBMPFile(const char* fileName)
 
 void gbCleanUp()
 {
-    if (gbRam != nullptr) {
+    if (gbRam != NULL) {
         free(gbRam);
-        gbRam = nullptr;
+        gbRam = NULL;
     }
 
-    if (gbRom != nullptr) {
+    if (gbRom != NULL) {
         free(gbRom);
-        gbRom = nullptr;
+        gbRom = NULL;
     }
 
-    if (g_bios != nullptr) {
+    if (g_bios != NULL) {
         free(g_bios);
-        g_bios = nullptr;
+        g_bios = NULL;
     }
 
-    if (gbMemory != nullptr) {
+    if (gbMemory != NULL) {
         free(gbMemory);
-        gbMemory = nullptr;
+        gbMemory = NULL;
     }
 
-    if (gbLineBuffer != nullptr) {
+    if (gbLineBuffer != NULL) {
         free(gbLineBuffer);
-        gbLineBuffer = nullptr;
+        gbLineBuffer = NULL;
     }
 
-    if (g_pix != nullptr) {
+    if (g_pix != NULL) {
         free(g_pix);
-        g_pix = nullptr;
+        g_pix = NULL;
     }
 
     gbSgbShutdown();
 
-    if (gbVram != nullptr) {
+    if (gbVram != NULL) {
         free(gbVram);
-        gbVram = nullptr;
+        gbVram = NULL;
     }
 
-    if (gbWram != nullptr) {
+    if (gbWram != NULL) {
         free(gbWram);
-        gbWram = nullptr;
+        gbWram = NULL;
     }
 
-    if (gbTAMA5ram != nullptr) {
+    if (gbTAMA5ram != NULL) {
         free(gbTAMA5ram);
-        gbTAMA5ram = nullptr;
+        gbTAMA5ram = NULL;
     }
 
     g_gbCartData = gbCartData();
-    g_mapper = nullptr;
-    g_mapperRAM = nullptr;
-    g_mapperReadRAM = nullptr;
-    g_mapperUpdateClock = nullptr;
+    g_mapper = NULL;
+    g_mapperRAM = NULL;
+    g_mapperReadRAM = NULL;
+    g_mapperUpdateClock = NULL;
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
 #if !defined(__LIBRETRO__)
@@ -3827,39 +3827,39 @@ void gbCleanUp()
 bool gbLoadRom(const char* filename) {
     int romSize = 0;
 
-    if (gbRom != nullptr) {
+    if (gbRom != NULL) {
         gbCleanUp();
     }
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    gbRom = utilLoad(filename, utilIsGBImage, nullptr, romSize);
+    gbRom = utilLoad(filename, utilIsGBImage, NULL, romSize);
     if (!gbRom)
         return false;
 
     g_gbBatteryError = false;
 
-    if (g_bios != nullptr) {
+    if (g_bios != NULL) {
         free(g_bios);
-        g_bios = nullptr;
+        g_bios = NULL;
     }
     g_bios = (uint8_t*)calloc(1, kGBBiosBufferSize);
-    if (g_bios == nullptr) {
+    if (g_bios == NULL) {
         return false;
     }
 
     gbMemory = (uint8_t*)malloc(65536);
-    if (gbMemory == nullptr) {
+    if (gbMemory == NULL) {
         return false;
     }
 
     g_pix = (uint8_t*)calloc(1, kGBPixSize);
-    if (g_pix == nullptr) {
+    if (g_pix == NULL) {
         return false;
     }
 
     gbLineBuffer = (uint16_t*)malloc(kGBLineBufferSize);
-    if (gbLineBuffer == nullptr) {
+    if (gbLineBuffer == NULL) {
         return false;
     }
 
@@ -4965,14 +4965,14 @@ void gbEmulate(int ticksToStop)
 }
 
 bool gbLoadRomData(const char* data, size_t size) {
-    if (gbRom != nullptr) {
+    if (gbRom != NULL) {
         gbCleanUp();
     }
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
     gbRom = (uint8_t*)calloc(1, size);
-    if (gbRom == nullptr) {
+    if (gbRom == NULL) {
         return false;
     }
 
@@ -4980,28 +4980,28 @@ bool gbLoadRomData(const char* data, size_t size) {
 
     g_gbBatteryError = false;
 
-    if (g_bios != nullptr) {
+    if (g_bios != NULL) {
         free(g_bios);
-        g_bios = nullptr;
+        g_bios = NULL;
     }
 
     g_bios = (uint8_t*)calloc(1, kGBBiosBufferSize);
-    if (g_bios == nullptr) {
+    if (g_bios == NULL) {
         return false;
     }
 
     gbMemory = (uint8_t*)malloc(65536);
-    if (gbMemory == nullptr) {
+    if (gbMemory == NULL) {
         return false;
     }
 
     g_pix = (uint8_t*)calloc(1, kGBPixSize);
-    if (g_pix == nullptr) {
+    if (g_pix == NULL) {
         return false;
     }
 
     gbLineBuffer = (uint16_t*)malloc(kGBLineBufferSize);
-    if (gbLineBuffer == nullptr) {
+    if (gbLineBuffer == NULL) {
         return false;
     }
 
@@ -5052,7 +5052,7 @@ unsigned int gbWriteSaveState(uint8_t* data)
     if (g_gbCartData.mapper_type() == gbCartData::MapperType::kHuC3)
         utilWriteMem(data, &gbRTCHuC3, sizeof(gbRTCHuC3));
     utilWriteMem(data, &gbDataTAMA5, sizeof(gbDataTAMA5));
-    if (gbTAMA5ram != nullptr)
+    if (gbTAMA5ram != NULL)
         utilWriteMem(data, gbTAMA5ram, kTama5RamSize);
     utilWriteMem(data, &gbDataMMM01, sizeof(gbDataMMM01));
 
@@ -5137,27 +5137,27 @@ bool gbReadSaveState(const uint8_t* data)
 
     // Correct crash when loading color gameboy save in regular gameboy type.
     if (gbCgbMode) {
-        if (gbVram == nullptr) {
+        if (gbVram == NULL) {
             gbVram = (uint8_t*)calloc(1, kGBVRamSize);
-            if (gbVram == nullptr) {
+            if (gbVram == NULL) {
                 return false;
             }
         }
-        if (gbWram == nullptr) {
+        if (gbWram == NULL) {
             gbWram = (uint8_t*)malloc(kGBWRamSize);
-            if (gbWram == nullptr) {
+            if (gbWram == NULL) {
                 return false;
             }
         }
         memset(gbPalette, 0, sizeof(gbPalette));
     } else {
-        if (gbVram != nullptr) {
+        if (gbVram != NULL) {
             free(gbVram);
-            gbVram = nullptr;
+            gbVram = NULL;
         }
-        if (gbWram != nullptr) {
+        if (gbWram != NULL) {
             free(gbWram);
-            gbWram = nullptr;
+            gbWram = NULL;
         }
     }
 

@@ -254,12 +254,12 @@ void SoundSDL::deinit() {
     SDL_Delay(100);
 
     SDL_DestroySemaphore(data_available);
-    data_available = nullptr;
+    data_available = NULL;
     SDL_DestroySemaphore(data_read);
-    data_read      = nullptr;
+    data_read      = NULL;
 
     SDL_DestroyMutex(mutex);
-    mutex = nullptr;
+    mutex = NULL;
 
     SDL_CloseAudioDevice(sound_device);
 
