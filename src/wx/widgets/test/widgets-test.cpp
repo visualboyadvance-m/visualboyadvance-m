@@ -14,7 +14,7 @@ WidgetsTest::~WidgetsTest() = default;
 void WidgetsTest::SetUp() {
     // Give the wxFrame a unique name and initialize it.
     const char* test_name(testing::UnitTest::GetInstance()->current_test_info()->name());
-    frame_ = std::make_unique<wxFrame>(0, wxXmlResource::DoGetXRCID(test_name), test_name);
+    frame_ = std::make_unique<wxFrame>(nullptr, wxXmlResource::DoGetXRCID(test_name), test_name);
 }
 
 void WidgetsTest::TearDown() {
