@@ -3971,8 +3971,13 @@ void gbDrawLine()
 #endif
     } break;
     case 24: {
+#ifdef __LIBRETRO__
+        uint8_t* dest = (uint8_t*)g_pix + (gbBorderLineSkip * 3) * (register_LY + gbBorderRowSkip)
+            + (gbBorderColumnSkip * 3);
+#else
         uint8_t* dest = (uint8_t*)g_pix + (gbBorderLineSkip * 3) * (register_LY + gbBorderRowSkip + 1)
             + (gbBorderColumnSkip * 3);
+#endif
         for (size_t x = 0; x < kGBWidth;) {
             uint32_t color = systemColorMap32[gbLineMix[x++]];
             *dest++ = (uint8_t)(color & 0xFF);
