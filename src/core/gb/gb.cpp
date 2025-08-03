@@ -2780,7 +2780,8 @@ void gbReset()
     }
     // clean Pix
     if (g_pix != NULL) {
-        memset(g_pix, 0, kGBPixSize);
+        free(g_pix);
+        g_pix = (uint8_t *)malloc(kGBPixSize);
     }
     // clean Vram
     if (gbVram != NULL) {
