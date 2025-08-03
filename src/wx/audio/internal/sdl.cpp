@@ -152,7 +152,7 @@ bool SDLAudio::init(long sampleRate) {
 #endif
         return false;
     }
-    
+
 #ifdef ENABLE_SDL3
     if (SDL_Init(SDL_INIT_AUDIO) == false) {
 #else

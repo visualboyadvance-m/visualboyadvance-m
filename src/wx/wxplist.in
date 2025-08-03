@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
@@ -20,6 +20,8 @@
 	<string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.games</string>
 	<key>CFBundleShortVersionString</key>
 	<string>${MACOSX_BUNDLE_SHORT_VERSION_STRING}</string>
 	<key>CFBundleSignature</key>
@@ -32,121 +34,102 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>${MACOSX_BUNDLE_COPYRIGHT}</string>
-
-        <!-- this is for retina support in rendered text -->
-        <!-- see: https://wiki.wxwidgets.org/WxMac-specific_topics#Retina_display_support -->
-        <key>NSPrincipalClass</key>
-        <string>NSApplication</string>
-
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
-	   <dict>
-	     <key>UTTypeIdentifier</key>
-	     <string>public.gbarom</string>
-	     <key>UTTypeReferenceURL</key>
-	     <string>http://visualboyadvance-m.org/</string>
-	     <key>UTTypeDescription</key>
-	     <string>GameBoy Advance ROM</string>
-	     <key>UTTypeIconFile</key>
-	     <string>${MACOSX_BUNDLE_ICON_FILE}</string>
-	     <key>UTTypeConformsTo</key>
-	     <array>
-	        <string>public.data</string>
-	     </array>
-	     <key>UTTypeTagSpecification</key>
-	     <dict>
-	        <key>public.filename-extension</key>
-		<array>
-		   <string>agb</string>
-		   <string>agb.lz</string>
-		   <string>agb.xz</string>
-		   <string>agb.bz2</string>
-		   <string>agb.gz</string>
-		   <string>agb.z</string>
-		   <string>gba</string>
-		   <string>gba.lz</string>
-		   <string>gba.xz</string>
-		   <string>gba.bz2</string>
-		   <string>gba.gz</string>
-		   <string>gba.z</string>
-		   <!-- this is probably too generic
-		   <string>bin</string>
-		   <string>bin.lz</string>
-		   <string>bin.xz</string>
-		   <string>bin.bz2</string>
-		   <string>bin.gz</string>
-		   <string>bin.z</string> -->
-		   <!-- slightly less generic, but still..
-		   <string>elf</string>
-		   <string>elf.lz</string>
-		   <string>elf.xz</string>
-		   <string>elf.bz2</string>
-		   <string>elf.gz</string>
-		   <string>elf.z</string>
-		   -->
-		</array>
-	     </dict>
-	   </dict>
-	   <dict>
-	     <key>UTTypeIdentifier</key>
-	     <string>public.gbrom</string>
-	     <key>UTTypeReferenceURL</key>
-	     <string>http://visualboyadvance-m.org/</string>
-	     <key>UTTypeDescription</key>
-	     <string>GameBoy ROM</string>
-	     <key>UTTypeIconFile</key>
-	     <string>${MACOSX_BUNDLE_ICON_FILE}</string>
-	     <key>UTTypeConformsTo</key>
-	     <array>
-	        <string>public.data</string>
-	     </array>
-	     <key>UTTypeTagSpecification</key>
-	     <dict>
-	        <key>public.filename-extension</key>
-		<array>
-		   <string>gb</string>
-		   <string>gb.lz</string>
-		   <string>gb.xz</string>
-		   <string>gb.bz2</string>
-		   <string>gb.gz</string>
-		   <string>gb.z</string>
-		   <string>cgb</string>
-		   <string>cgb.lz</string>
-		   <string>cgb.xz</string>
-		   <string>cgb.bz2</string>
-		   <string>cgb.gz</string>
-		   <string>cgb.z</string>
-		   <string>gbc</string>
-		   <string>gbc.lz</string>
-		   <string>gbc.xz</string>
-		   <string>gbc.bz2</string>
-		   <string>gbc.gz</string>
-		   <string>gbc.z</string>
-		   <string>sgb</string>
-		   <string>sgb.lz</string>
-		   <string>sgb.xz</string>
-		   <string>sgb.bz2</string>
-		   <string>sgb.gz</string>
-		   <string>sgb.z</string>
-		</array>
-	     </dict>
-	   </dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>public.gbarom</string>
+			<key>UTTypeReferenceURL</key>
+			<string>http://visualboyadvance-m.org/</string>
+			<key>UTTypeDescription</key>
+			<string>GameBoy Advance ROM</string>
+			<key>UTTypeIconFile</key>
+			<string>${MACOSX_BUNDLE_ICON_FILE}</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>agb</string>
+					<string>agb.lz</string>
+					<string>agb.xz</string>
+					<string>agb.bz2</string>
+					<string>agb.gz</string>
+					<string>agb.z</string>
+					<string>gba</string>
+					<string>gba.lz</string>
+					<string>gba.xz</string>
+					<string>gba.bz2</string>
+					<string>gba.gz</string>
+					<string>gba.z</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>public.gbrom</string>
+			<key>UTTypeReferenceURL</key>
+			<string>http://visualboyadvance-m.org/</string>
+			<key>UTTypeDescription</key>
+			<string>Boy ROM</string>
+			<key>UTTypeIconFile</key>
+			<string>${MACOSX_BUNDLE_ICON_FILE}</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>gb</string>
+					<string>gb.lz</string>
+					<string>gb.xz</string>
+					<string>gb.bz2</string>
+					<string>gb.gz</string>
+					<string>gb.z</string>
+					<string>cgb</string>
+					<string>cgb.lz</string>
+					<string>cgb.xz</string>
+					<string>cgb.bz2</string>
+					<string>cgb.gz</string>
+					<string>cgb.z</string>
+					<string>gbc</string>
+					<string>gbc.lz</string>
+					<string>gbc.xz</string>
+					<string>gbc.bz2</string>
+					<string>gbc.gz</string>
+					<string>gbc.z</string>
+					<string>sgb</string>
+					<string>sgb.lz</string>
+					<string>sgb.xz</string>
+					<string>sgb.bz2</string>
+					<string>sgb.gz</string>
+					<string>sgb.z</string>
+				</array>
+			</dict>
+		</dict>
 	</array>
 	<key>CFBundleDocumentTypes</key>
 	<array>
-	  <dict>
-	    <key>CFBundleTypeName</key>
-	    <string>Cartridge</string>
-	    <key>CFBundleTypeRole</key>
-	    <string>Viewer</string>
-	    <key>LSItemContentTypes</key>
-	    <array>
-	       <string>public.gbarom</string>
-	       <string>public.gbrom</string>
-	    </array>
-	    <key>LSHandlerRank</key>
-	    <string>Alternate</string>
-	  </dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Cartridge</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.gbarom</string>
+				<string>public.gbrom</string>
+			</array>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+		</dict>
 	</array>
 </dict>
 </plist>
