@@ -3,9 +3,9 @@ add_library(vbam-components-filters OBJECT)
 unset(extra_src)
 if(WINXP)
     list(APPEND extra_src
-        ${CMAKE_SOURCE_DIR}/third_party/quake3-sqrt/quake3-sqrt.h
+        ${CMAKE_SOURCE_DIR}/third_party/sqrt_sse/sqrt_sse.h
     )
-    target_include_directories(vbam-components-filters PRIVATE ${CMAKE_SOURCE_DIR}/third_party/quake3-sqrt)
+    target_include_directories(vbam-components-filters PRIVATE ${CMAKE_SOURCE_DIR}/third_party/sqrt_sse)
 endif()
 
 target_sources(vbam-components-filters
