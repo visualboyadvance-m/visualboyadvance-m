@@ -116,31 +116,25 @@ set(FFMPEG_DEFAULT OFF)
 set(FFMPEG_COMPONENTS         AVFORMAT            AVCODEC            SWSCALE          AVUTIL            SWRESAMPLE          X264    X265)
 set(FFMPEG_COMPONENT_VERSIONS AVFORMAT>=58.12.100 AVCODEC>=58.18.100 SWSCALE>=5.1.100 AVUTIL>=56.14.100 SWRESAMPLE>=3.1.100 X264>=0 X265>=0)
 
-option(FIND_FFMPEG_APPLE "Find using Apple FFMPEG function" OFF)
-
 if(NOT TRANSLATIONS_ONLY AND (NOT DEFINED ENABLE_FFMPEG OR ENABLE_FFMPEG))
     set(FFMPEG_DEFAULT ON)
 
-    if (APPLE OR FIND_FFMPEG_APPLE)
-        find_package(AppleFFMPEG COMPONENTS ${FFMPEG_COMPONENTS})
-    else()
-        find_package(FFMPEG COMPONENTS ${FFMPEG_COMPONENTS})
-    endif()
+    find_package(FFmpeg COMPONENTS ${FFMPEG_COMPONENTS})
 
     # check versions, but only if pkgconfig is available
-    if(FFMPEG_FOUND AND PKG_CONFIG_FOUND AND NOT CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
+    if(FFmpeg_FOUND AND PKG_CONFIG_FOUND AND NOT CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
         foreach(component ${FFMPEG_COMPONENT_VERSIONS})
             string(REPLACE ">=" ";" parts ${component})
             list(GET parts 0 name)
             list(GET parts 1 version)
 
             if((NOT DEFINED ${name}_VERSION) OR ${name}_VERSION VERSION_LESS ${version})
-                set(FFMPEG_FOUND OFF)
+                set(FFmpeg_FOUND OFF)
             endif()
         endforeach()
     endif()
 
-    if(NOT FFMPEG_FOUND)
+    if(NOT FFmpeg_FOUND)
         set(FFMPEG_DEFAULT OFF)
     endif()
 endif()
