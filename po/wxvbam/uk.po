@@ -3846,7 +3846,7 @@ msgstr "Malay (Melayu)"
 
 #: xrc/MainMenu.xrc:849
 msgid "Norwegian"
-msgstr "Norwegian (Norsk)"
+msgstr "Norwegian Bokmål (Norsk Bokmål)"
 
 #: xrc/MainMenu.xrc:853
 msgid "Dutch"
