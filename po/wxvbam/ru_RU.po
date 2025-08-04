@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-30 01:00+0000\n"
+"POT-Creation-Date: 2025-08-04 13:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Кирилл kirillovich, 2025\n"
 "Language-Team: Russian (Russia) (http://app.transifex.com/bgk/vba-m/language/ru_RU/)\n"
@@ -35,7 +35,7 @@ msgstr ""
 "Language: ru_RU\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: audio/internal/coreaudio.cpp:168 audio/internal/coreaudio.cpp:525
+#: audio/internal/coreaudio.cpp:184 audio/internal/coreaudio.cpp:541
 #: audio/internal/sdl.cpp:179 audio/internal/sdl.cpp:197
 #: audio/internal/sdl.cpp:328 audio/internal/sdl.cpp:339
 #: audio/internal/sdl.cpp:359 audio/internal/faudio.cpp:490
@@ -698,32 +698,32 @@ msgstr "Главный значок не найден"
 msgid "Main display panel not found"
 msgstr "Главная панель экрана не найдена"
 
-#: guiinit.cpp:1965
+#: guiinit.cpp:1964
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Неверный пункт меню %s удалён"
 
-#: guiinit.cpp:2150
+#: guiinit.cpp:2149
 msgid "Code"
 msgstr "Код"
 
-#: guiinit.cpp:2159
+#: guiinit.cpp:2158
 msgid "Description"
 msgstr "Описание"
 
-#: guiinit.cpp:2233 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:2232 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Адрес"
 
-#: guiinit.cpp:2234
+#: guiinit.cpp:2233
 msgid "Old Value"
 msgstr "Старое значение"
 
-#: guiinit.cpp:2235
+#: guiinit.cpp:2234
 msgid "New Value"
 msgstr "Новое значение"
 
-#: guiinit.cpp:2455
+#: guiinit.cpp:2454
 msgid "JoyBus host invalid; disabling"
 msgstr "Хост JoyBus неверен; отключено"
 
@@ -837,135 +837,135 @@ msgstr ""
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr ""
 
-#: panel.cpp:1372
+#: panel.cpp:1356
 msgid "No memory for rewinding"
 msgstr "Нет памяти для перемотки назад"
 
-#: panel.cpp:1382
+#: panel.cpp:1366
 msgid "Error writing rewind state"
 msgstr "Ошибка записи состояния перемотки"
 
-#: panel.cpp:2375
+#: panel.cpp:2359
 msgid "Failed to set wayland display"
 msgstr ""
 
-#: panel.cpp:2403
+#: panel.cpp:2387
 msgid "Failed to initialize SDL video subsystem"
 msgstr ""
 
-#: panel.cpp:2414
+#: panel.cpp:2398
 msgid "Failed to initialize SDL video"
 msgstr ""
 
-#: panel.cpp:2423
+#: panel.cpp:2407
 msgid "Failed to set wayland surface"
 msgstr ""
 
-#: panel.cpp:2437
+#: panel.cpp:2421
 msgid "Failed to set DX9 window"
 msgstr ""
 
-#: panel.cpp:2445
+#: panel.cpp:2429
 msgid "Failed to set parent window"
 msgstr ""
 
-#: panel.cpp:2454
+#: panel.cpp:2438
 msgid "Failed to set OpenGL properties"
 msgstr ""
 
-#: panel.cpp:2461 panel.cpp:2495
+#: panel.cpp:2445 panel.cpp:2479
 msgid "Failed to create SDL window"
 msgstr ""
 
-#: panel.cpp:2479 panel.cpp:2527
+#: panel.cpp:2463 panel.cpp:2511
 msgid "Failed to create SDL renderer"
 msgstr ""
 
-#: panel.cpp:3071
+#: panel.cpp:3055
 msgid "Enabling EGL VSync."
 msgstr ""
 
-#: panel.cpp:3073
+#: panel.cpp:3057
 msgid "Disabling EGL VSync."
 msgstr ""
 
-#: panel.cpp:3080
+#: panel.cpp:3064
 msgid "Enabling GLX VSync."
 msgstr ""
 
-#: panel.cpp:3082
+#: panel.cpp:3066
 msgid "Disabling GLX VSync."
 msgstr ""
 
-#: panel.cpp:3100
+#: panel.cpp:3084
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Ошибка установки glXSwapIntervalEXT"
 
-#: panel.cpp:3109
+#: panel.cpp:3093
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Ошибка установки glXSwapIntervalSGI"
 
-#: panel.cpp:3118
+#: panel.cpp:3102
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Ошибка установки glXSwapIntervalMESA"
 
-#: panel.cpp:3125
+#: panel.cpp:3109
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "Нет поддержки wglGetExtensionsStringEXT"
 
-#: panel.cpp:3128
+#: panel.cpp:3112
 msgid "No support for WGL_EXT_swap_control"
 msgstr "Нет поддержки WGL_EXT_swap_control"
 
-#: panel.cpp:3137
+#: panel.cpp:3121
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Ошибка установки wglSwapIntervalEXT"
 
-#: panel.cpp:3143
+#: panel.cpp:3127
 msgid "No VSYNC available on this platform"
 msgstr "VSYNC не доступна на данной платформе"
 
-#: panel.cpp:3258
+#: panel.cpp:3223
 msgid "Memory allocation error"
 msgstr ""
 
-#: panel.cpp:3261
+#: panel.cpp:3226
 msgid "Error initializing codec"
 msgstr ""
 
-#: panel.cpp:3264
+#: panel.cpp:3229
 msgid "Error writing to output file"
 msgstr ""
 
-#: panel.cpp:3267
+#: panel.cpp:3232
 msgid "Can't guess output format from file name"
 msgstr ""
 
-#: panel.cpp:3272
+#: panel.cpp:3237
 msgid "Programming error; aborting!"
 msgstr ""
 
-#: panel.cpp:3284 panel.cpp:3313
+#: panel.cpp:3249 panel.cpp:3278
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Невозможно начать запись в %s (%s)"
 
-#: panel.cpp:3341
+#: panel.cpp:3306
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr ""
 
-#: panel.cpp:3347
+#: panel.cpp:3312
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Ошибка аудиозаписи (%s); отменено"
 
-#: panel.cpp:3357
+#: panel.cpp:3322
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Ошибка видеозаписи (%s); отменено"
 
-#: panel.cpp:3512
+#: panel.cpp:3477
 #, c-format
 msgid "Volume: %d %%"
 msgstr ""
@@ -3785,134 +3785,130 @@ msgid "Czech"
 msgstr ""
 
 #: xrc/MainMenu.xrc:773
-msgid "German"
-msgstr ""
-
-#: xrc/MainMenu.xrc:777
 msgid "Greek"
 msgstr ""
 
-#: xrc/MainMenu.xrc:781
+#: xrc/MainMenu.xrc:777
 msgid "English (US)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:785
+#: xrc/MainMenu.xrc:781
 msgid "Spanish (Latin American)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:789
+#: xrc/MainMenu.xrc:785
 msgid "Spanish (Colombia)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:793
+#: xrc/MainMenu.xrc:789
 msgid "Spanish (Peru)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:797
+#: xrc/MainMenu.xrc:793
 msgid "Spanish (United States)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:801
+#: xrc/MainMenu.xrc:797
 msgid "Spanish"
 msgstr ""
 
-#: xrc/MainMenu.xrc:805
+#: xrc/MainMenu.xrc:801
 msgid "French (France)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:809
+#: xrc/MainMenu.xrc:805
 msgid "French"
 msgstr ""
 
-#: xrc/MainMenu.xrc:813
+#: xrc/MainMenu.xrc:809
 msgid "Galician"
 msgstr ""
 
-#: xrc/MainMenu.xrc:817
+#: xrc/MainMenu.xrc:813
 msgid "Hebrew (Israel)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:821
+#: xrc/MainMenu.xrc:817
 msgid "Hungarian (Hungary)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:825
+#: xrc/MainMenu.xrc:821
 msgid "Hungarian"
 msgstr ""
 
-#: xrc/MainMenu.xrc:829
+#: xrc/MainMenu.xrc:825
 msgid "Indonesian"
 msgstr ""
 
-#: xrc/MainMenu.xrc:833
+#: xrc/MainMenu.xrc:829
 msgid "Italian"
 msgstr ""
 
-#: xrc/MainMenu.xrc:837
+#: xrc/MainMenu.xrc:833
 msgid "Japanese"
 msgstr ""
 
-#: xrc/MainMenu.xrc:841
+#: xrc/MainMenu.xrc:837
 msgid "Korean (Korea)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:845
+#: xrc/MainMenu.xrc:841
 msgid "Korean"
 msgstr ""
 
-#: xrc/MainMenu.xrc:849
+#: xrc/MainMenu.xrc:845
 msgid "Malay (Malaysia)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:853
+#: xrc/MainMenu.xrc:849
 msgid "Norwegian"
 msgstr ""
 
-#: xrc/MainMenu.xrc:857
+#: xrc/MainMenu.xrc:853
 msgid "Dutch"
 msgstr ""
 
-#: xrc/MainMenu.xrc:861
+#: xrc/MainMenu.xrc:857
 msgid "Polish (Poland)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:865
+#: xrc/MainMenu.xrc:861
 msgid "Polish"
 msgstr ""
 
-#: xrc/MainMenu.xrc:869
+#: xrc/MainMenu.xrc:865
 msgid "Portuguese (Brazil)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:873
+#: xrc/MainMenu.xrc:869
 msgid "Portuguese (Portugal)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:877
+#: xrc/MainMenu.xrc:873
 msgid "Russian (Russia)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:881
+#: xrc/MainMenu.xrc:877
 msgid "Swedish"
 msgstr ""
 
-#: xrc/MainMenu.xrc:885
+#: xrc/MainMenu.xrc:881
 msgid "Turkish"
 msgstr ""
 
-#: xrc/MainMenu.xrc:889
+#: xrc/MainMenu.xrc:885
 msgid "Ukrainian"
 msgstr ""
 
-#: xrc/MainMenu.xrc:893
+#: xrc/MainMenu.xrc:889
 msgid "Urdu (Pakistan)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:897
+#: xrc/MainMenu.xrc:893
 msgid "Chinese (China)"
 msgstr ""
 
-#: xrc/MainMenu.xrc:901
+#: xrc/MainMenu.xrc:897
 msgid "&Use external translations"
 msgstr ""
 
