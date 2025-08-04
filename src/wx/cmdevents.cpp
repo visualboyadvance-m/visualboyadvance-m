@@ -2800,26 +2800,6 @@ EVT_HANDLER(Language3, "Czech")
     RefreshFrame();
 }
 
-EVT_HANDLER(Language4, "German")
-{
-    OPTION(kLocale) = wxLANGUAGE_GERMAN;
-
-    if (wxvbam_locale != NULL)
-        wxDELETE(wxvbam_locale);
-
-    wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
-
-#ifdef _WIN32
-    wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
-#endif
-
-    wxvbam_locale->AddCatalog("wxvbam", wxLANGUAGE_GERMAN);
-
-    update_opts();
-    RefreshFrame();
-}
-
 EVT_HANDLER(Language5, "Greek")
 {
     OPTION(kLocale) = wxLANGUAGE_GREEK;

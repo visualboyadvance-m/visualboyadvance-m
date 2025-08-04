@@ -769,10 +769,6 @@
         <label>Czech</label>
         <radio>1</radio>
       </object>
-      <object class="wxMenuItem" name="Language4">
-        <label>German</label>
-        <radio>1</radio>
-      </object>
       <object class="wxMenuItem" name="Language5">
         <label>Greek</label>
         <radio>1</radio>

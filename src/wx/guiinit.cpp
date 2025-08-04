@@ -1925,7 +1925,6 @@ bool MainFrame::BindControls()
         MenuOptionIntRadioValue("Language1", OPTION(kLocale), wxLANGUAGE_BULGARIAN);
         MenuOptionIntRadioValue("Language2", OPTION(kLocale), wxLANGUAGE_BRETON);
         MenuOptionIntRadioValue("Language3", OPTION(kLocale), wxLANGUAGE_CZECH);
-        MenuOptionIntRadioValue("Language4", OPTION(kLocale), wxLANGUAGE_GERMAN);
         MenuOptionIntRadioValue("Language5", OPTION(kLocale), wxLANGUAGE_GREEK);
         MenuOptionIntRadioValue("Language6", OPTION(kLocale), wxLANGUAGE_ENGLISH_US);
         MenuOptionIntRadioValue("Language7", OPTION(kLocale), wxLANGUAGE_SPANISH_LATIN_AMERICA);
