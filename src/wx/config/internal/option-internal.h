@@ -27,11 +27,13 @@ nonstd::optional<OptionID> StringToOptionId(const wxString& input);
 wxString FilterToString(const Filter& value);
 wxString InterframeToString(const Interframe& value);
 wxString RenderMethodToString(const RenderMethod& value);
+wxString ColorCorrectionProfileToString(const ColorCorrectionProfile& value);
 wxString AudioApiToString(const AudioApi& value);
 wxString AudioRateToString(const AudioRate& value);
 Filter StringToFilter(const wxString& config_name, const wxString& input);
 Interframe StringToInterframe(const wxString& config_name, const wxString& input);
 RenderMethod StringToRenderMethod(const wxString& config_name, const wxString& input);
+ColorCorrectionProfile StringToColorCorrectionProfile(const wxString& config_name, const wxString& input);
 AudioApi StringToAudioApi(const wxString& config_name, const wxString& input);
 AudioRate StringToSoundQuality(const wxString& config_name, const wxString& input);
 

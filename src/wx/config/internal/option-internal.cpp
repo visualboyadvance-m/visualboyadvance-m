@@ -83,6 +83,15 @@ static const std::array<wxString, kNbRenderMethods> kRenderMethodStrings = {
 #endif
 };
 
+// These MUST follow the same order as the definitions of the enum.
+// Adding an option without adding to this array will result in a compiler
+// error since kNbColorCorrectionProfiles is automatically updated.
+static const std::array<wxString, kNbColorCorrectionProfiles> kColorCorrectionProfileStrings = {
+    "srgb",
+    "dci",
+    "rec2020"
+};
+
 // These MUST follow the same order as the definitions of the enum above.
 // Adding an option without adding to this array will result in a compiler
 // error since kNbAudioApis is automatically updated.
@@ -158,6 +167,9 @@ std::array<Option, kNbOptions>& Option::All() {
         RenderMethod render_method = RenderMethod::kOpenGL;
 #endif
 #endif
+
+        ColorCorrectionProfile color_correction_profile = ColorCorrectionProfile::kSRGB;
+
         double video_scale = 3;
         bool retain_aspect = true;
 
@@ -170,6 +182,7 @@ std::array<Option, kNbOptions>& Option::All() {
         bool print_screen_cap = false;
         wxString gb_rom_dir = wxEmptyString;
         wxString gbc_rom_dir = wxEmptyString;
+        uint32_t gb_lighten = 70;
 
         /// GBA
         bool gba_lcd_filter = false;
@@ -179,6 +192,7 @@ std::array<Option, kNbOptions>& Option::All() {
         bool link_proto = false;
 #endif
         wxString gba_rom_dir;
+        uint32_t gba_darken = 70;
 
         /// Core
         bool agb_print = false;
@@ -276,6 +290,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kDispScale, &g_owned_opts.video_scale, 1, 6),
         Option(OptionID::kDispStretch, &g_owned_opts.retain_aspect),
         Option(OptionID::kSDLRenderer, &g_owned_opts.sdlrenderer),
+        Option(OptionID::kDispColorCorrectionProfile, &g_owned_opts.color_correction_profile),
 
         /// GB
         Option(OptionID::kGBBiosFile, &g_owned_opts.gb_bios),
@@ -290,6 +305,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kGBPrintScreenCap, &g_owned_opts.print_screen_cap),
         Option(OptionID::kGBROMDir, &g_owned_opts.gb_rom_dir),
         Option(OptionID::kGBGBCROMDir, &g_owned_opts.gbc_rom_dir),
+        Option(OptionID::kGBLighten, &g_owned_opts.gb_lighten, 0, 100),
 
         /// GBA
         Option(OptionID::kGBABiosFile, &gopts.gba_bios),
@@ -305,6 +321,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kGBALinkType, &gopts.gba_link_type, 0, 5),
 #endif
         Option(OptionID::kGBAROMDir, &g_owned_opts.gba_rom_dir),
+        Option(OptionID::kGBADarken, &g_owned_opts.gba_darken, 0, 100),
 
         /// General
         Option(OptionID::kGenAutoLoadLastState, &g_owned_opts.autoload_state),
@@ -422,6 +439,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"Display/Scale", "", _("Default scale factor")},
     OptionData{"Display/Stretch", "RetainAspect", _("Retain aspect ratio when resizing")},
     OptionData{"Display/SDLRenderer", "", _("SDL renderer")},
+    OptionData{"Display/ColorCorrectionProfile", "", _("Color correction profile")},
 
     /// GB
     OptionData{"GB/BiosFile", "", _("BIOS file to use for Game Boy, if enabled")},
@@ -445,6 +463,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                  "suffix")},
     OptionData{"GB/ROMDir", "", _("Directory to look for ROM files")},
     OptionData{"GB/GBCROMDir", "", _("Directory to look for Game Boy Color ROM files")},
+    OptionData{"GB/GBCLighten", "", _("Color lightness factor")},
 
     /// GBA
     OptionData{"GBA/BiosFile", "", _("BIOS file to use, if enabled")},
@@ -472,6 +491,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"GBA/LinkType", "LinkType", _("Link cable type")},
 #endif
     OptionData{"GBA/ROMDir", "", _("Directory to look for ROM files")},
+    OptionData{"GBA/GBADarken", "", _("Color darkness factor")},
 
     /// General
     OptionData{"General/AutoLoadLastState", "", _("Automatically load last saved state")},
@@ -652,6 +672,12 @@ wxString RenderMethodToString(const RenderMethod& value) {
     return kRenderMethodStrings[size_value];
 }
 
+wxString ColorCorrectionProfileToString(const ColorCorrectionProfile& value) {
+    const size_t size_value = static_cast<size_t>(value);
+    VBAM_CHECK(size_value < kNbColorCorrectionProfiles);
+    return kColorCorrectionProfileStrings[size_value];
+}
+
 wxString AudioApiToString(const AudioApi& value) {
     const size_t size_value = static_cast<size_t>(value);
     VBAM_CHECK(size_value < kNbAudioApis);
@@ -725,6 +751,27 @@ RenderMethod StringToRenderMethod(const wxString& config_name,
     return iter->second;
 }
 
+ColorCorrectionProfile StringToColorCorrectionProfile(const wxString& config_name,
+                                  const wxString& input) {
+    static const std::map<wxString, ColorCorrectionProfile> kStringToColorCorrectionProfile([] {
+        std::map<wxString, ColorCorrectionProfile> string_to_color_correction_profile;
+        for (size_t i = 0; i < kNbColorCorrectionProfiles; i++) {
+            string_to_color_correction_profile.emplace(kColorCorrectionProfileStrings[i], static_cast<ColorCorrectionProfile>(i));
+        }
+        VBAM_CHECK(string_to_color_correction_profile.size() == kNbColorCorrectionProfiles);
+        return string_to_color_correction_profile;
+    }());
+
+    const auto iter = kStringToColorCorrectionProfile.find(input);
+    if (iter == kStringToColorCorrectionProfile.end()) {
+        wxLogWarning(_("Invalid value %s for option %s; valid values are %s"),
+                     input, config_name,
+                     AllEnumValuesForType(Option::Type::kColorCorrectionProfile));
+        return ColorCorrectionProfile::kSRGB;
+    }
+    return iter->second;
+}
+
 AudioApi StringToAudioApi(const wxString& config_name, const wxString& input) {
     static const std::map<wxString, AudioApi> kStringToAudioApi([] {
         std::map<wxString, AudioApi> string_to_audio_api;
@@ -778,6 +825,10 @@ wxString AllEnumValuesForType(Option::Type type) {
             static const wxString kAllRenderValues(AllEnumValuesForArray(kRenderMethodStrings));
             return kAllRenderValues;
         }
+        case Option::Type::kColorCorrectionProfile: {
+            static const wxString kAllColorCorrectionValues(AllEnumValuesForArray(kColorCorrectionProfileStrings));
+            return kAllColorCorrectionValues;
+        }
         case Option::Type::kAudioApi: {
             static const wxString kAllAudioApiValues(AllEnumValuesForArray(kAudioApiStrings));
             return kAllAudioApiValues;
@@ -811,6 +862,8 @@ size_t MaxForType(Option::Type type) {
             return kNbInterframes;
         case Option::Type::kRenderMethod:
             return kNbRenderMethods;
+        case Option::Type::kColorCorrectionProfile:
+            return kNbColorCorrectionProfiles;
         case Option::Type::kAudioApi:
             return kNbAudioApis;
         case Option::Type::kAudioRate:

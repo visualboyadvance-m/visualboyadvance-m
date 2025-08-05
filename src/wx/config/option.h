@@ -81,6 +81,17 @@ enum class RenderMethod {
 };
 static constexpr size_t kNbRenderMethods = static_cast<size_t>(RenderMethod::kLast);
 
+// Values for kDispColorCorrectionProfile.
+enum class ColorCorrectionProfile {
+    kSRGB = 0,
+    kDCI,
+    kRec2020,
+
+    // Do not add anything under here.
+    kLast,
+};
+static constexpr size_t kNbColorCorrectionProfiles = static_cast<size_t>(ColorCorrectionProfile::kLast);
+
 // Values for kAudioApi.
 enum class AudioApi {
     kOpenAL,
@@ -143,6 +154,7 @@ public:
         kFilter,
         kInterframe,
         kRenderMethod,
+        kColorCorrectionProfile,
         kAudioApi,
         kAudioRate,
         kGbPalette,
@@ -200,6 +212,7 @@ public:
     bool is_filter() const { return type() == Type::kFilter; }
     bool is_interframe() const { return type() == Type::kInterframe; }
     bool is_render_method() const { return type() == Type::kRenderMethod; }
+    bool is_color_correction_profile() const { return type() == Type::kColorCorrectionProfile; }
     bool is_audio_api() const { return type() == Type::kAudioApi; }
     bool is_audio_rate() const { return type() == Type::kAudioRate; }
     bool is_gb_palette() const { return type() == Type::kGbPalette; }
@@ -214,6 +227,7 @@ public:
     Filter GetFilter() const;
     Interframe GetInterframe() const;
     RenderMethod GetRenderMethod() const;
+    ColorCorrectionProfile GetColorCorrectionProfile() const;
     AudioApi GetAudioApi() const;
     AudioRate GetAudioRate() const;
     wxString GetEnumString() const;
@@ -231,6 +245,7 @@ public:
     bool SetFilter(const Filter& value);
     bool SetInterframe(const Interframe& value);
     bool SetRenderMethod(const RenderMethod& value);
+    bool SetColorCorrectionProfile(const ColorCorrectionProfile& value);
     bool SetAudioApi(const AudioApi& value);
     bool SetAudioRate(const AudioRate& value);
     bool SetEnumString(const wxString& value);
@@ -267,6 +282,7 @@ private:
     Option(OptionID id, Filter* option);
     Option(OptionID id, Interframe* option);
     Option(OptionID id, RenderMethod* option);
+    Option(OptionID id, ColorCorrectionProfile* option);
     Option(OptionID id, AudioApi* option);
     Option(OptionID id, AudioRate* option);
     Option(OptionID id, int* option);
@@ -299,6 +315,7 @@ private:
                           Filter*,
                           Interframe*,
                           RenderMethod*,
+                          ColorCorrectionProfile*,
                           AudioApi*,
                           AudioRate*,
                           uint16_t*>

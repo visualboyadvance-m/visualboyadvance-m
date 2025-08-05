@@ -167,6 +167,19 @@ Option::Option(OptionID id, RenderMethod* option)
     VBAM_CHECK(is_render_method());
 }
 
+Option::Option(OptionID id, ColorCorrectionProfile* option)
+    : id_(id),
+      config_name_(internal::kAllOptionsData[static_cast<size_t>(id)].config_name),
+      command_(internal::kAllOptionsData[static_cast<size_t>(id)].command),
+      ux_helper_(wxGetTranslation(internal::kAllOptionsData[static_cast<size_t>(id)].ux_helper)),
+      type_(kOptionsTypes[static_cast<size_t>(id)]),
+      value_(option),
+      min_(),
+      max_(nonstd::in_place_type<size_t>, internal::MaxForType(type_)) {
+    VBAM_CHECK(id != OptionID::Last);
+    VBAM_CHECK(is_color_correction_profile());
+}
+
 Option::Option(OptionID id, AudioApi* option)
     : id_(id),
       config_name_(internal::kAllOptionsData[static_cast<size_t>(id)].config_name),
@@ -246,6 +259,11 @@ RenderMethod Option::GetRenderMethod() const {
     return *(nonstd::get<RenderMethod*>(value_));
 }
 
+ColorCorrectionProfile Option::GetColorCorrectionProfile() const {
+    VBAM_CHECK(is_color_correction_profile());
+    return *(nonstd::get<ColorCorrectionProfile*>(value_));
+}
+
 AudioApi Option::GetAudioApi() const {
     VBAM_CHECK(is_audio_api());
     return *(nonstd::get<AudioApi*>(value_));
@@ -264,6 +282,8 @@ wxString Option::GetEnumString() const {
             return internal::InterframeToString(GetInterframe());
         case Option::Type::kRenderMethod:
             return internal::RenderMethodToString(GetRenderMethod());
+        case Option::Type::kColorCorrectionProfile:
+            return internal::ColorCorrectionProfileToString(GetColorCorrectionProfile());
         case Option::Type::kAudioApi:
             return internal::AudioApiToString(GetAudioApi());
         case Option::Type::kAudioRate:
@@ -402,6 +422,17 @@ bool Option::SetRenderMethod(const RenderMethod& value) {
     return true;
 }
 
+bool Option::SetColorCorrectionProfile(const ColorCorrectionProfile& value) {
+    VBAM_CHECK(is_color_correction_profile());
+    VBAM_CHECK(value < ColorCorrectionProfile::kLast);
+    const ColorCorrectionProfile old_value = GetColorCorrectionProfile();
+    *nonstd::get<ColorCorrectionProfile*>(value_) = value;
+    if (old_value != value) {
+        CallObservers();
+    }
+    return true;
+}
+
 bool Option::SetAudioApi(const AudioApi& value) {
     VBAM_CHECK(is_audio_api());
     VBAM_CHECK(value < AudioApi::kLast);
@@ -432,6 +463,8 @@ bool Option::SetEnumString(const wxString& value) {
             return SetInterframe(internal::StringToInterframe(config_name_, value));
         case Option::Type::kRenderMethod:
             return SetRenderMethod(internal::StringToRenderMethod(config_name_, value));
+        case Option::Type::kColorCorrectionProfile:
+            return SetColorCorrectionProfile(internal::StringToColorCorrectionProfile(config_name_, value));
         case Option::Type::kAudioApi:
             return SetAudioApi(internal::StringToAudioApi(config_name_, value));
         case Option::Type::kAudioRate:
@@ -571,6 +604,7 @@ wxString Option::ToHelperString() const {
         case Option::Type::kFilter:
         case Option::Type::kInterframe:
         case Option::Type::kRenderMethod:
+        case Option::Type::kColorCorrectionProfile:
         case Option::Type::kAudioApi:
         case Option::Type::kAudioRate:
             helper_string.Append(" (");

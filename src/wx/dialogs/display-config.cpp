@@ -223,6 +223,41 @@ private:
     const config::RenderMethod render_method_;
 };
 
+// Validator for a wxRadioButton with a ColorCorrectionProfile value.
+class ColorCorrectionProfileValidator : public widgets::OptionValidator {
+public:
+    explicit ColorCorrectionProfileValidator(config::ColorCorrectionProfile color_correction_profile)
+        : OptionValidator(config::OptionID::kDispColorCorrectionProfile),
+          color_correction_profile_(color_correction_profile) {
+        VBAM_CHECK(color_correction_profile != config::ColorCorrectionProfile::kLast);
+    }
+    ~ColorCorrectionProfileValidator() override = default;
+
+private:
+    // OptionValidator implementation.
+    wxObject* Clone() const override {
+        return new ColorCorrectionProfileValidator(color_correction_profile_);
+    }
+
+    bool IsWindowValueValid() override { return true; }
+
+    bool WriteToWindow() override {
+        wxDynamicCast(GetWindow(), wxRadioButton)
+            ->SetValue(option()->GetColorCorrectionProfile() == color_correction_profile_);
+        return true;
+    }
+
+    bool WriteToOption() override {
+        if (wxDynamicCast(GetWindow(), wxRadioButton)->GetValue()) {
+            return option()->SetColorCorrectionProfile(color_correction_profile_);
+        }
+
+        return true;
+    }
+
+    const config::ColorCorrectionProfile color_correction_profile_;
+};
+
 class PluginSelectorValidator : public widgets::OptionValidator {
 public:
     PluginSelectorValidator()
@@ -350,6 +385,38 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
 
     sdlrenderer_selector_ = GetValidatedChild<wxChoice>("SDLRenderer");
     sdlrenderer_selector_->SetValidator(SDLDevicesValidator());
+
+    wxWindow* color_profile_srgb = GetValidatedChild("ColorProfileSRGB");
+    color_profile_srgb->SetValidator(
+        ColorCorrectionProfileValidator(config::ColorCorrectionProfile::kSRGB));
+
+    wxWindow* color_profile_dci = GetValidatedChild("ColorProfileDCI");
+    color_profile_dci->SetValidator(
+        ColorCorrectionProfileValidator(config::ColorCorrectionProfile::kDCI));
+
+    wxWindow* color_profile_rec2020 = GetValidatedChild("ColorProfileRec2020");
+    color_profile_rec2020->SetValidator(
+        ColorCorrectionProfileValidator(config::ColorCorrectionProfile::kRec2020));
+
+    switch (OPTION(kDispColorCorrectionProfile)) {
+        case config::ColorCorrectionProfile::kSRGB:
+            wxDynamicCast(color_profile_srgb, wxRadioButton)->SetValue(true);
+            break;
+        case config::ColorCorrectionProfile::kDCI:
+            wxDynamicCast(color_profile_dci, wxRadioButton)->SetValue(true);
+            break;
+        case config::ColorCorrectionProfile::kRec2020:
+            wxDynamicCast(color_profile_rec2020, wxRadioButton)->SetValue(true);
+            break;
+        default:
+            wxLogError(_("Invalid color correction profile"));
+    }
+
+    wxSlider* gba_darken_slider = GetValidatedChild<wxSlider>("GBADarken");
+    gba_darken_slider->SetValidator(widgets::OptionUnsignedValidator(config::OptionID::kGBADarken));
+
+    wxSlider* gbc_lighten_slider = GetValidatedChild<wxSlider>("GBCLighten");
+    gbc_lighten_slider->SetValidator(widgets::OptionUnsignedValidator(config::OptionID::kGBLighten));
 
     filter_selector_ = GetValidatedChild<wxChoice>("Filter");
     filter_selector_->SetValidator(FilterValidator());

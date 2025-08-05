@@ -123,6 +123,23 @@ private:
     bool WriteToOption() override;
 };
 
+// Validator for a wxSpinCtrl or wxSlider widget with a kUnsigned Option. This
+// will keep the kInt Option and the wxSpinCtrl or wxSlider selection in sync.
+class OptionUnsignedValidator : public OptionValidator {
+public:
+    explicit OptionUnsignedValidator(config::OptionID option_id);
+    ~OptionUnsignedValidator() override = default;
+
+    // Returns a copy of the object.
+    wxObject* Clone() const override;
+
+private:
+    // OptionValidator implementation.
+    bool IsWindowValueValid() override;
+    bool WriteToWindow() override;
+    bool WriteToOption() override;
+};
+
 // Validator for a wxChoice widget with a kUnsigned Option. This will keep the
 // kUnsigned Option and the wxChoice selection in sync.
 class OptionChoiceValidator : public OptionValidator {

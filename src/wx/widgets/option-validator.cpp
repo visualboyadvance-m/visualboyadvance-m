@@ -133,6 +133,50 @@ bool OptionIntValidator::WriteToOption() {
     return false;
 }
 
+OptionUnsignedValidator::OptionUnsignedValidator(config::OptionID option_id) : OptionValidator(option_id) {
+    VBAM_CHECK(option()->is_unsigned());
+}
+
+wxObject* OptionUnsignedValidator::Clone() const {
+    return new OptionUnsignedValidator(option()->id());
+}
+
+bool OptionUnsignedValidator::IsWindowValueValid() {
+    return true;
+}
+
+bool OptionUnsignedValidator::WriteToWindow() {
+    wxSpinCtrl* spin_ctrl = wxDynamicCast(GetWindow(), wxSpinCtrl);
+    if (spin_ctrl) {
+        spin_ctrl->SetValue(option()->GetUnsigned());
+        return true;
+    }
+
+    wxSlider* slider = wxDynamicCast(GetWindow(), wxSlider);
+    if (slider) {
+        slider->SetValue(option()->GetUnsigned());
+        return true;
+    }
+
+    VBAM_NOTREACHED();
+    return false;
+}
+
+bool OptionUnsignedValidator::WriteToOption() {
+    const wxSpinCtrl* spin_ctrl = wxDynamicCast(GetWindow(), wxSpinCtrl);
+    if (spin_ctrl) {
+        return option()->SetUnsigned(spin_ctrl->GetValue());
+    }
+
+    const wxSlider* slider = wxDynamicCast(GetWindow(), wxSlider);
+    if (slider) {
+        return option()->SetUnsigned(slider->GetValue());
+    }
+
+    VBAM_NOTREACHED();
+    return false;
+}
+
 OptionChoiceValidator::OptionChoiceValidator(config::OptionID option_id)
     : OptionValidator(option_id) {
     VBAM_CHECK(option()->is_unsigned());

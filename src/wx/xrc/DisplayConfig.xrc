@@ -211,6 +211,151 @@
     </object>
     <object class="notebookpage">
       <object class="wxPanel">
+        <object class="wxFlexGridSizer">
+          <orient>wxVERTICAL</orient>
+          <object class="sizeritem">
+            <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+            <object class="wxStaticText" name="BitDepthLab">
+              <label>Profile:</label>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+            <object class="wxBoxSizer">
+              <orient>wxVERTICAL</orient>
+              <object class="sizeritem">
+                <object class="wxBoxSizer">
+                  <orient>wxHORIZONTAL</orient>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="ColorProfileSRGB">
+                      <label translate="0">sRGB</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="ColorProfileDCI">
+                      <label translate="0">DCI</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="ColorProfileRec2020">
+                      <label translate="0">Rec2020</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+              <label>Profile</label>
+              <orient>wxVERTICAL</orient>
+                </object>
+              </object>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+            <object class="wxStaticText">
+              <label>GBA Darken:</label>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxBoxSizer">
+              <object class="sizeritem">
+                <object class="wxSlider" name="GBADarken">
+                  <value>70</value>
+                  <min>0</min>
+                  <max>100</max>
+                </object>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxBoxSizer">
+                  <object class="sizeritem">
+                    <object class="wxStaticText">
+                      <label>Lighter</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="spacer">
+                    <option>1</option>
+                    <flag>wxEXPAND</flag>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxStaticText">
+                      <label>Very Dark</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <orient>wxHORIZONTAL</orient>
+                </object>
+                <flag>wxEXPAND</flag>
+              </object>
+              <orient>wxVERTICAL</orient>
+            </object>
+            <flag>wxEXPAND</flag>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+            <object class="wxStaticText">
+              <label>GBC Lighten:</label>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxBoxSizer">
+              <object class="sizeritem">
+                <object class="wxSlider" name="GBCLighten">
+                  <value>70</value>
+                  <min>0</min>
+                  <max>100</max>
+                </object>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxBoxSizer">
+                  <object class="sizeritem">
+                    <object class="wxStaticText">
+                      <label>Darker</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="spacer">
+                    <option>1</option>
+                    <flag>wxEXPAND</flag>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxStaticText">
+                      <label>Very Light</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <orient>wxHORIZONTAL</orient>
+                </object>
+                <flag>wxEXPAND</flag>
+              </object>
+              <orient>wxVERTICAL</orient>
+            </object>
+            <flag>wxEXPAND</flag>
+          </object>
+          <flag>wxEXPAND</flag>
+          <cols>2</cols>
+          <growablecols>1</growablecols>
+        </object>
+      </object>
+      <label>Color Correction</label>
+    </object>
+    <object class="notebookpage">
+      <object class="wxPanel">
         <object class="wxBoxSizer">
           <orient>wxVERTICAL</orient>
           <object class="sizeritem">

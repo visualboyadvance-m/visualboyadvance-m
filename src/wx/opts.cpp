@@ -54,6 +54,7 @@ void SaveOption(config::Option* option) {
         case config::Option::Type::kFilter:
         case config::Option::Type::kInterframe:
         case config::Option::Type::kRenderMethod:
+        case config::Option::Type::kColorCorrectionProfile:
         case config::Option::Type::kAudioApi:
         case config::Option::Type::kAudioRate:
             cfg->Write(option->config_name(), option->GetEnumString());
@@ -290,6 +291,7 @@ void load_opts(bool first_time_launch) {
         case config::Option::Type::kFilter:
         case config::Option::Type::kInterframe:
         case config::Option::Type::kRenderMethod:
+        case config::Option::Type::kColorCorrectionProfile:
         case config::Option::Type::kAudioApi:
         case config::Option::Type::kAudioRate: {
             wxString temp;
@@ -475,6 +477,7 @@ void opt_set(const wxString& name, const wxString& val) {
         case config::Option::Type::kFilter:
         case config::Option::Type::kInterframe:
         case config::Option::Type::kRenderMethod:
+        case config::Option::Type::kColorCorrectionProfile:
         case config::Option::Type::kAudioApi:
         case config::Option::Type::kAudioRate:
             opt->SetEnumString(val);
