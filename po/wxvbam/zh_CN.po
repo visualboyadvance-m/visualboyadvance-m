@@ -365,7 +365,7 @@ msgstr "无效的默认放大倍数值。"
 
 #: dialogs/display-config.cpp:412
 msgid "Invalid color correction profile"
-msgstr ""
+msgstr "颜色校正配置文件无效"
 
 #: dialogs/display-config.cpp:467 xrc/DisplayConfig.xrc:102
 #: xrc/DisplayConfig.xrc:152 xrc/DisplayConfig.xrc:425
@@ -1311,7 +1311,7 @@ msgstr "SDL 渲染器"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:442
 msgid "Color correction profile"
-msgstr ""
+msgstr "颜色校正配置文件"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:445
 msgid "BIOS file to use for Game Boy, if enabled"
@@ -1368,7 +1368,7 @@ msgstr "要查找 GBC ROM 文件的目录"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:466
 msgid "Color lightness factor"
-msgstr ""
+msgstr "颜色亮度系数"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:469
 msgid "BIOS file to use, if enabled"
@@ -1408,7 +1408,7 @@ msgstr "联机线缆类型"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:494
 msgid "Color darkness factor"
-msgstr ""
+msgstr "颜色暗度系数"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:497
 msgid "Automatically load last saved state"
@@ -2482,39 +2482,39 @@ msgstr "位深"
 
 #: xrc/DisplayConfig.xrc:220
 msgid "Profile:"
-msgstr ""
+msgstr "配置文件:"
 
 #: xrc/DisplayConfig.xrc:252
 msgid "Profile"
-msgstr ""
+msgstr "配置文件"
 
 #: xrc/DisplayConfig.xrc:262
 msgid "GBA Darken:"
-msgstr ""
+msgstr "GBA 调暗:"
 
 #: xrc/DisplayConfig.xrc:280
 msgid "Lighter"
-msgstr ""
+msgstr "较亮"
 
 #: xrc/DisplayConfig.xrc:291
 msgid "Very Dark"
-msgstr ""
+msgstr "很暗"
 
 #: xrc/DisplayConfig.xrc:308
 msgid "GBC Lighten:"
-msgstr ""
+msgstr "GBC 调亮:"
 
 #: xrc/DisplayConfig.xrc:326
 msgid "Darker"
-msgstr ""
+msgstr "较暗"
 
 #: xrc/DisplayConfig.xrc:337
 msgid "Very Light"
-msgstr ""
+msgstr "很亮"
 
 #: xrc/DisplayConfig.xrc:355
 msgid "Color Correction"
-msgstr ""
+msgstr "颜色校正"
 
 #: xrc/DisplayConfig.xrc:363
 msgid "Frame Skip"
