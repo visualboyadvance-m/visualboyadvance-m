@@ -3448,8 +3448,8 @@ void GameArea::UpdateLcdFilter() {
         gbcfilter_set_params(DCCP, (((float)OPTION(kGBLighten)) / 100));
         gbcfilter_update_colors(OPTION(kGBLCDFilter));
     } else {
-        gbafilter_set_params(0, 0);
-        gbcfilter_set_params(0, 0);
+        gbafilter_set_params(DCCP, (((float)OPTION(kGBADarken)) / 100));
+        gbcfilter_set_params(DCCP, (((float)OPTION(kGBLighten)) / 100));
         gbafilter_update_colors(false);
         gbcfilter_update_colors(false);
     }
