@@ -47,7 +47,7 @@ static const float GBC_Rec2020[4][4] = {
     {0.0f,   0.0f,   0.0f,    1.0f}
 };
 
-// Screen darkening factor. Default to 0.0f.
+// Screen lightening factor. Default to 0.0f.
 static float lighten_screen = 0.0f;
 
 // Color mode (0 for sRGB, 1 for DCI, 2 for Rec2020). Default to sRGB (0).
