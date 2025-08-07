@@ -2487,7 +2487,7 @@ msgstr "Дуже темно"
 
 #: xrc/DisplayConfig.xrc:308
 msgid "GBC Lighten:"
-msgstr "Освітлення Game Boy Advance: "
+msgstr "Освітлення Game Boy Color: "
 
 #: xrc/DisplayConfig.xrc:326
 msgid "Darker"
