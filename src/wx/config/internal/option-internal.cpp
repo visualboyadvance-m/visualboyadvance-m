@@ -182,7 +182,7 @@ std::array<Option, kNbOptions>& Option::All() {
         bool print_screen_cap = false;
         wxString gb_rom_dir = wxEmptyString;
         wxString gbc_rom_dir = wxEmptyString;
-        uint32_t gb_lighten = 70;
+        uint32_t gb_lighten = 0;
 
         /// GBA
         bool gba_lcd_filter = false;
@@ -192,7 +192,7 @@ std::array<Option, kNbOptions>& Option::All() {
         bool link_proto = false;
 #endif
         wxString gba_rom_dir;
-        uint32_t gba_darken = 70;
+        uint32_t gba_darken = 0;
 
         /// Core
         bool agb_print = false;

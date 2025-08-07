@@ -10,6 +10,7 @@
 #include "scrc32.h"
 
 #include "components/filters_agb/filters_agb.h"
+#include "components/filters_cgb/filters_cgb.h"
 #include "components/filters_interframe/interframe.h"
 #include "core/base/check.h"
 #include "core/base/system.h"

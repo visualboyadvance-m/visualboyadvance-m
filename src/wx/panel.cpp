@@ -35,6 +35,7 @@
 #include "components/draw_text/draw_text.h"
 #include "components/filters/filters.h"
 #include "components/filters_agb/filters_agb.h"
+#include "components/filters_cgb/filters_cgb.h"
 #include "components/filters_interframe/interframe.h"
 #include "core/base/check.h"
 #include "core/base/file_util.h"
@@ -175,7 +176,7 @@ GameArea::GameArea()
       gb_declick_observer_(
           config::OptionID::kSoundGBDeclicking,
           [&](config::Option* option) { gbSoundSetDeclicking(option->GetBool()); }),
-      lcd_filters_observer_({config::OptionID::kGBLCDFilter, config::OptionID::kGBALCDFilter},
+      lcd_filters_observer_({config::OptionID::kGBLCDFilter, config::OptionID::kGBADarken, config::OptionID::kGBLighten, config::OptionID::kDispColorCorrectionProfile, config::OptionID::kGBALCDFilter},
                             std::bind(&GameArea::UpdateLcdFilter, this)),
       audio_rate_observer_(config::OptionID::kSoundAudioRate,
                            std::bind(&GameArea::OnAudioRateChanged, this)),
@@ -3420,12 +3421,38 @@ void GameArea::OnGBBorderChanged(config::Option* option) {
 }
         
 void GameArea::UpdateLcdFilter() {
-    if (loaded == IMAGE_GBA)
+    int DCCP = 0;
+
+    switch (OPTION(kDispColorCorrectionProfile)) {
+        case config::ColorCorrectionProfile::kSRGB:
+            DCCP = 0;
+            break;
+
+        case config::ColorCorrectionProfile::kDCI:
+            DCCP = 1;
+            break;
+
+        case config::ColorCorrectionProfile::kRec2020:
+            DCCP = 2;
+            break;
+
+        case config::ColorCorrectionProfile::kLast:
+            DCCP = 0;
+            break;
+    }
+
+    if (loaded == IMAGE_GBA) {
+        gbafilter_set_params(DCCP, (((float)OPTION(kGBADarken)) / 100));
         gbafilter_update_colors(OPTION(kGBALCDFilter));
-    else if (loaded == IMAGE_GB)
-        gbafilter_update_colors(OPTION(kGBLCDFilter));
-    else
+    } else if (loaded == IMAGE_GB) {
+        gbcfilter_set_params(DCCP, (((float)OPTION(kGBLighten)) / 100));
+        gbcfilter_update_colors(OPTION(kGBLCDFilter));
+    } else {
+        gbafilter_set_params(0, 0);
+        gbcfilter_set_params(0, 0);
         gbafilter_update_colors(false);
+        gbcfilter_update_colors(false);
+    }
 }
         
 void GameArea::SuspendScreenSaver() {

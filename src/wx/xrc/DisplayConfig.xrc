@@ -266,7 +266,7 @@
             <object class="wxBoxSizer">
               <object class="sizeritem">
                 <object class="wxSlider" name="GBADarken">
-                  <value>70</value>
+                  <value>0</value>
                   <min>0</min>
                   <max>100</max>
                 </object>
@@ -312,7 +312,7 @@
             <object class="wxBoxSizer">
               <object class="sizeritem">
                 <object class="wxSlider" name="GBCLighten">
-                  <value>70</value>
+                  <value>0</value>
                   <min>0</min>
                   <max>100</max>
                 </object>
