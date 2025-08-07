@@ -350,7 +350,7 @@ msgstr "Недійсне значення типового збільшення.
 
 #: dialogs/display-config.cpp:412
 msgid "Invalid color correction profile"
-msgstr ""
+msgstr "Недійсний профіль виправлення кольору."
 
 #: dialogs/display-config.cpp:467 xrc/DisplayConfig.xrc:102
 #: xrc/DisplayConfig.xrc:152 xrc/DisplayConfig.xrc:425
@@ -1296,7 +1296,7 @@ msgstr "SDL-опрацьовувач"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:442
 msgid "Color correction profile"
-msgstr ""
+msgstr "Профіль виправлення кольору"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:445
 msgid "BIOS file to use for Game Boy, if enabled"
@@ -1353,7 +1353,7 @@ msgstr "Каталог пошуку Game Boy Color ROM"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:466
 msgid "Color lightness factor"
-msgstr ""
+msgstr "Коефіцієнт освітлення кольору"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:469
 msgid "BIOS file to use, if enabled"
@@ -1393,7 +1393,7 @@ msgstr "Тип кабелю з'єднання"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:494
 msgid "Color darkness factor"
-msgstr ""
+msgstr "Коефіцієнт затемнення кольору"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:497
 msgid "Automatically load last saved state"
@@ -2467,39 +2467,39 @@ msgstr "Бітова глибина"
 
 #: xrc/DisplayConfig.xrc:220
 msgid "Profile:"
-msgstr ""
+msgstr "Профіль:"
 
 #: xrc/DisplayConfig.xrc:252
 msgid "Profile"
-msgstr ""
+msgstr "Профіль"
 
 #: xrc/DisplayConfig.xrc:262
 msgid "GBA Darken:"
-msgstr ""
+msgstr "Затемнення Game Boy Advance: "
 
 #: xrc/DisplayConfig.xrc:280
 msgid "Lighter"
-msgstr ""
+msgstr "Світліше"
 
 #: xrc/DisplayConfig.xrc:291
 msgid "Very Dark"
-msgstr ""
+msgstr "Дуже темно"
 
 #: xrc/DisplayConfig.xrc:308
 msgid "GBC Lighten:"
-msgstr ""
+msgstr "Освітлення Game Boy Advance: "
 
 #: xrc/DisplayConfig.xrc:326
 msgid "Darker"
-msgstr ""
+msgstr "Темніше"
 
 #: xrc/DisplayConfig.xrc:337
 msgid "Very Light"
-msgstr ""
+msgstr "Дуже світло"
 
 #: xrc/DisplayConfig.xrc:355
 msgid "Color Correction"
-msgstr ""
+msgstr "Виправлення кольору"
 
 #: xrc/DisplayConfig.xrc:363
 msgid "Frame Skip"
