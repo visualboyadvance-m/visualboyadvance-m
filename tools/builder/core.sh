@@ -185,7 +185,7 @@ DISTS=$DISTS'
     libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.11.0.tar.bz2                             lib/libgcrypt.a
     libsecret       https://gitlab.gnome.org/GNOME/libsecret/-/archive/0.21.7/libsecret-0.21.7.tar.bz2          lib/libsecret-1.a
     sdl3            https://github.com/libsdl-org/SDL/releases/download/release-3.2.20/SDL3-3.2.20.tar.gz       lib/libSDL3.a
-    faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/25.04.tar.gz                            lib/libFAudio.a
+    faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/25.08.tar.gz                            lib/libFAudio.a
     flac            https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.5.0.tar.xz                             lib/libFLAC.a
     harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/11.1.0/harfbuzz-11.1.0.tar.xz        lib/libharfbuzz.a
     shared-mime-info https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.4/shared-mime-info-2.4.tar.bz2  bin/update-mime-database
