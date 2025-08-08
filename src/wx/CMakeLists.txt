@@ -69,16 +69,29 @@ if(NOT ZIP_PROGRAM)
         if(NOT DEFINED POWERSHELL)
             message(FATAL_ERROR "Powershell is required for extraction.")
         endif()
-
-        # Get zip binaries from wxrc.
-        file(DOWNLOAD "https://www.willus.com/archive/zip64/infozip_binaries_win32.zip" ${CMAKE_CURRENT_BINARY_DIR}/infozip_binaries_win32.zip)
-
+        set(_url "https://www.willus.com/archive/zip64/infozip_binaries_win32.zip")
+        set(_path "${CMAKE_CURRENT_BINARY_DIR}/infozip_binaries_win32.zip")
+        set(_sha "b338a0f35e1f849d3466d4260fd8a51f2afe9cdf136cc07cc4d54b00cee13650")
+        foreach(_i RANGE 1 3)
+            # Get zip binaries from wxrc.
+            file(DOWNLOAD "${_url}" "${_path}" SHOW_PROGRESS STATUS _s)
+            list(GET _s 0 _c)
+            if(_c EQUAL 0)
+                file(SHA256 "${_path}" _h)
+                file(SIZE "${_path}" _z)
+                if(_h STREQUAL _sha AND _z GREATER 0)
+                    break()
+                endif()
+            endif()
+            file(REMOVE "${_path}")
+            if(_i EQUAL 3)
+                message(FATAL_ERROR "Download failed or SHA256 mismatch after 3 attempts.")
+            endif()
+        endforeach()
         # Unzip it.
-        execute_process(
-            COMMAND "${POWERSHELL}" -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('${CMAKE_CURRENT_BINARY_DIR}/infozip_binaries_win32.zip', '${CMAKE_CURRENT_BINARY_DIR}'); }"
-        )
-
-        set(ZIP_PROGRAM ${CMAKE_CURRENT_BINARY_DIR}/zip.exe CACHE STRING "zip compressor executable" FORCE)
+        execute_process(COMMAND "${POWERSHELL}" -NoLogo -NoProfile -ExecutionPolicy Bypass
+            -Command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('${_path}', '${CMAKE_CURRENT_BINARY_DIR}'); }")
+        set(ZIP_PROGRAM "${CMAKE_CURRENT_BINARY_DIR}/zip.exe" CACHE STRING "zip compressor executable" FORCE)
     endif()
     if(ZIP_PROGRAM)
         set(ZIP_PROGRAM "${ZIP_PROGRAM}" CACHE STRING "zip compressor executable" FORCE)
