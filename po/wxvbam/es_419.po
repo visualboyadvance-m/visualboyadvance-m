@@ -10,6 +10,7 @@
 # David Martínez <david8dgm@gmail.com>, 2020
 # Dex Galaxy, 2022
 # Dilan Meza, 2025
+# Dreak LDS, 2025
 # Enzo Cortés, 2023
 # FERNANDO AYALA PEREZ, 2021
 # Kevin Bustinza <ufreshx@gmail.com>, 2021
@@ -24,7 +25,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-05 08:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Camilo Muñoz, 2025\n"
+"Last-Translator: Dreak LDS, 2025\n"
 "Language-Team: Spanish (Latin America) (http://app.transifex.com/bgk/vba-m/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -50,7 +51,7 @@ msgid ""
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.lz;*.gba.lz;*.bin.lz;*.elf.lz;*.mb.lz;*.agb.xz;*.gba.xz;*.bin.xz;*.elf.xz;*.mb.xz;*.agb.bz2;*.gba.bz2;*.bin.bz2;*.elf.bz2;*.mb.bz2;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
 " Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Archivos de Game Boy Advance (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.lz;*.gba.lz;*.bin.lz;*.elf.lz;*.mb.lz;*.agb.xz;*.gba.xz;*.bin.xz;*.elf.xz;*.mb.xz;*.agb.bz2;*.gba.bz2;*.bin.bz2;*.elf.bz2;*.mb.bz2;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Archivos de Game Boy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:219
 msgid "Open ROM file"
@@ -60,7 +61,7 @@ msgstr "Abrir archivo ROM"
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Archivos de Game Boy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:252
 msgid "Open GB ROM file"
@@ -70,7 +71,7 @@ msgstr "Abrir archivo GB ROM"
 msgid ""
 "Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Archivos de Game Boy Color (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:284
 msgid "Open GBC ROM file"
@@ -363,7 +364,7 @@ msgstr "Valor no válido para ampliación predeterminada."
 
 #: dialogs/display-config.cpp:412
 msgid "Invalid color correction profile"
-msgstr ""
+msgstr "Perfil de corrección de color inválido"
 
 #: dialogs/display-config.cpp:467 xrc/DisplayConfig.xrc:102
 #: xrc/DisplayConfig.xrc:152 xrc/DisplayConfig.xrc:425
@@ -436,7 +437,7 @@ msgstr "+ Sensor de Movimiento"
 #: dialogs/gb-rom-info.cpp:74
 #, c-format
 msgid "%02X (%s%s%s%s%s%s)"
-msgstr ""
+msgstr "%02X (%s%s%s%s%s%s)"
 
 #: dialogs/gb-rom-info.cpp:81 dialogs/gb-rom-info.cpp:93
 #, c-format
@@ -456,42 +457,42 @@ msgstr ""
 #: dialogs/gb-rom-info.cpp:107 dialogs/gb-rom-info.cpp:141
 #, c-format
 msgid "%02X (32 KiB)"
-msgstr ""
+msgstr "%02X (32 KiB)"
 
 #: dialogs/gb-rom-info.cpp:109 dialogs/gb-rom-info.cpp:145
 #, c-format
 msgid "%02X (64 KiB)"
-msgstr ""
+msgstr "%02X (64 KiB)"
 
 #: dialogs/gb-rom-info.cpp:111 dialogs/gb-rom-info.cpp:143
 #, c-format
 msgid "%02X (128 KiB)"
-msgstr ""
+msgstr "%02X (128 KiB)"
 
 #: dialogs/gb-rom-info.cpp:113
 #, c-format
 msgid "%02X (256 KiB)"
-msgstr ""
+msgstr "%02X (256 KiB)"
 
 #: dialogs/gb-rom-info.cpp:115
 #, c-format
 msgid "%02X (512 KiB)"
-msgstr ""
+msgstr "%02X (512 KiB)"
 
 #: dialogs/gb-rom-info.cpp:117
 #, c-format
 msgid "%02X (1 MiB)"
-msgstr ""
+msgstr "%02X (1 MiB)"
 
 #: dialogs/gb-rom-info.cpp:119
 #, c-format
 msgid "%02X (2 MiB)"
-msgstr ""
+msgstr "%02X (2 MiB)"
 
 #: dialogs/gb-rom-info.cpp:121
 #, c-format
 msgid "%02X (4 MiB)"
-msgstr ""
+msgstr "%02X (4 MiB)"
 
 #: dialogs/gb-rom-info.cpp:123 dialogs/gb-rom-info.cpp:147
 #: dialogs/gb-rom-info.cpp:159
@@ -507,22 +508,22 @@ msgstr ""
 #: dialogs/gb-rom-info.cpp:133
 #, c-format
 msgid "%02X (256 B)"
-msgstr ""
+msgstr "%02X (256 B)"
 
 #: dialogs/gb-rom-info.cpp:135
 #, c-format
 msgid "%02X (512 B)"
-msgstr ""
+msgstr "%02X (512 B)"
 
 #: dialogs/gb-rom-info.cpp:137
 #, c-format
 msgid "%02X (2 KiB)"
-msgstr ""
+msgstr "%02X (2 KiB)"
 
 #: dialogs/gb-rom-info.cpp:139
 #, c-format
 msgid "%02X (8 KiB)"
-msgstr ""
+msgstr "%02X (8 KiB)"
 
 #: dialogs/gb-rom-info.cpp:155
 #, c-format
@@ -1059,11 +1060,11 @@ msgstr "Rojo:"
 
 #: viewsupt.cpp:798
 msgid "Green:"
-msgstr ""
+msgstr "Verde:"
 
 #: viewsupt.cpp:807
 msgid "Blue:"
-msgstr ""
+msgstr "Azul:"
 
 #: viewsupt.h:63
 #, c-format
@@ -1239,11 +1240,11 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
 msgid "Auto A"
-msgstr ""
+msgstr "Auto A"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
 msgid "Auto B"
-msgstr ""
+msgstr "Auto B"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
 #: xrc/DisplayConfig.xrc:403
@@ -1256,7 +1257,7 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:33
 msgid "GameShark"
-msgstr ""
+msgstr "GameShark"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:107
 #, c-format
