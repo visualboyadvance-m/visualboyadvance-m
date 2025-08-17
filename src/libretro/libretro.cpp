@@ -1756,9 +1756,9 @@ bool retro_load_game(const struct retro_game_info *game)
    return emulating;
 }
 
-bool retro_load_game_special(unsigned,  const struct retro_game_info *, size_t)
+bool retro_load_game_special(unsigned,  const struct retro_game_info *game, size_t)
 {
-    return false;
+    return retro_load_game(game);
 }
 
 void retro_unload_game(void)
