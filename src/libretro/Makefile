@@ -239,6 +239,15 @@ else ifeq ($(platform), psl1ght)
 	PLATFORM_DEFINES := -D__PS3__ -D__POWERPC__ -D__ppc__
 	STATIC_LINKING=1
 	TILED_RENDERING=1
+else ifeq ($(platform), ps2)
+	EXT=a
+	TARGET := $(TARGET_NAME)_libretro_$(platform).$(EXT)
+	CC = mips64r5900el-ps2-elf-gcc$(EXE_EXT)
+	CXX = mips64r5900el-ps2-elf-g++$(EXE_EXT)
+	AR = mips64r5900el-ps2-elf-ar$(EXE_EXT)
+	CFLAGS += -DHAVE_STRLWR -DPS2 -G0 -ffast-math -DABGR1555 -DNO_FAST_SQRT
+	STATIC_LINKING = 1
+	TILED_RENDERING=1
 
 # PSP1
 else ifeq ($(platform), psp1)
