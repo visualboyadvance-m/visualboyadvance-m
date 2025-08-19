@@ -612,7 +612,15 @@ void retro_init(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &dir) && dir)
         snprintf(retro_system_directory, sizeof(retro_system_directory), "%s", dir);
 
-#ifdef FRONTEND_SUPPORTS_RGB565
+#ifdef FRONTEND_SUPPORT_BGR1555
+    systemColorDepth = 16;
+    systemRedShift = 0;
+    systemGreenShift = 5;
+    systemBlueShift = 10;
+    enum retro_pixel_format rgb1555 = RETRO_PIXEL_FORMAT_0RGB1555;
+    if (environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &rgb1555) && log_cb)
+        log_cb(RETRO_LOG_INFO, "Frontend supports RGB565 - will use that instead of XRGB1555.\n");
+#elif defined(FRONTEND_SUPPORTS_RGB565)
     systemColorDepth = 16;
     systemRedShift = 11;
     systemGreenShift = 6;
@@ -1788,8 +1796,23 @@ bool systemCanChangeSoundQuality(void)
 void systemDrawScreen(void)
 {
     unsigned pitch = systemWidth * (systemColorDepth >> 3);
+    
     if (ifb_filter_func)
         ifb_filter_func(g_pix, pitch, systemWidth, systemHeight);
+
+/*#ifdef FRONTEND_SUPPORT_BGR1555
+    for (int y = 0; y < systemHeight; y++) {
+        for (int x = 0; x < systemWidth, x++) {
+            uint16_t r = (g_pix[(y * systemWidth) + x] & 0x0x1F);
+            uint16_t g = (g_pix[(y * systemWidth) + x] & 0x7E0) >> 5;
+            uint16_t b = (g_pix[(y * systemWidth) + x] & 0x7C00) >> 10;
+
+            g_pix[(y * systemWidth) + x] = (b << 11) | (g << 5) | r;
+
+        }
+    }
+#endif*/
+
     video_cb(g_pix, systemWidth, systemHeight, pitch);
 }
 
