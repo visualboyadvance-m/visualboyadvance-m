@@ -619,7 +619,7 @@ void retro_init(void)
     systemBlueShift = 10;
     enum retro_pixel_format rgb1555 = RETRO_PIXEL_FORMAT_0RGB1555;
     if (environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &rgb1555) && log_cb)
-        log_cb(RETRO_LOG_INFO, "Frontend supports RGB565 - will use that instead of XRGB1555.\n");
+        log_cb(RETRO_LOG_INFO, "Frontend supports BGR1555 - will use that instead of XRGB1555.\n");
 #elif defined(FRONTEND_SUPPORTS_RGB565)
     systemColorDepth = 16;
     systemRedShift = 11;
