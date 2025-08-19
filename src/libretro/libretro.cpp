@@ -1800,19 +1800,6 @@ void systemDrawScreen(void)
     if (ifb_filter_func)
         ifb_filter_func(g_pix, pitch, systemWidth, systemHeight);
 
-/*#ifdef FRONTEND_SUPPORT_BGR1555
-    for (int y = 0; y < systemHeight; y++) {
-        for (int x = 0; x < systemWidth, x++) {
-            uint16_t r = (g_pix[(y * systemWidth) + x] & 0x0x1F);
-            uint16_t g = (g_pix[(y * systemWidth) + x] & 0x7E0) >> 5;
-            uint16_t b = (g_pix[(y * systemWidth) + x] & 0x7C00) >> 10;
-
-            g_pix[(y * systemWidth) + x] = (b << 11) | (g << 5) | r;
-
-        }
-    }
-#endif*/
-
     video_cb(g_pix, systemWidth, systemHeight, pitch);
 }
 
