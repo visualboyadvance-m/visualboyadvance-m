@@ -207,7 +207,7 @@ struct retro_core_option_v2_definition option_defs_us[] = {
         "vbam_lcdfilter_type",
         "LCD Color Filter Type",
         NULL,
-        "screen filter type for onscreen colors.",
+        "Screen filter type for onscreen colors.",
         NULL,
         "video",
         {
