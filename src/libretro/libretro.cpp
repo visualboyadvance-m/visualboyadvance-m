@@ -1027,6 +1027,10 @@ static void update_variables(bool startup)
     char key[256] = {0};
     int disabled_layers = 0;
     int sound_enabled = 0x30F;
+    int color_mode = 0;
+    float color_change = 0.0f;
+    bool color_mode_changed = false;
+    bool color_change_changed = false;
     bool sound_changed = false;
 
     var.key = key;
@@ -1224,14 +1228,50 @@ static void update_variables(bool startup)
         gbColorOption = (!strcmp(var.value, "enabled"));
     }
 
+    var.key = "vbam_lcdfilter_type";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        if (!strcmp(var.value, "sRGB"))
+            color_mode = 0;
+        else if (!strcmp(var.value, "DCI"))
+            color_mode = 1;
+        else if (!strcmp(var.value, "Rec2020"))
+            color_mode = 2;
+
+        color_mode_changed = true;
+    }
+
+    var.key = "vbam_color_change";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        color_change = ((float)atoi(var.value)) / 100;
+        color_change_changed = true;
+    }
+
     var.key = "vbam_lcdfilter";
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         bool prev_lcdfilter = option_lcdfilter;
         option_lcdfilter = (!strcmp(var.value, "enabled")) ? true : false;
-        if (prev_lcdfilter != option_lcdfilter)
-            gbafilter_update_colors(option_lcdfilter);
+        if ((color_mode_changed == true) || (color_change_changed == true)) {
+            if (type == IMAGE_GBA) {
+                gbafilter_set_params(color_mode, color_change);
+            } else {
+                gbcfilter_set_params(color_mode, color_change);
+            }
+        }
+        if ((prev_lcdfilter != option_lcdfilter) || (color_mode_changed == true) || (color_change_changed == true)) {
+            if (type == IMAGE_GBA) {
+                gbafilter_update_colors(option_lcdfilter);
+            } else {
+                gbcfilter_update_colors(option_lcdfilter);
+            }
+            color_mode_changed = false;
+            color_change_changed = false;
+        }
     }
 
     var.key = "vbam_interframeblending";
