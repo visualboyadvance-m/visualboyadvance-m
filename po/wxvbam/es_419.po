@@ -15,6 +15,7 @@
 # FERNANDO AYALA PEREZ, 2021
 # Kevin Bustinza <ufreshx@gmail.com>, 2021
 # MELERIX, 2023
+# Rene Moreira, 2025
 # Sebastián Castro Saldarriaga, 2023
 # Timoteo Traiber Minnaard, 2024
 # Yeferson Galviz, 2023
@@ -25,7 +26,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-05 08:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Dreak LDS, 2025\n"
+"Last-Translator: Rene Moreira, 2025\n"
 "Language-Team: Spanish (Latin America) (http://app.transifex.com/bgk/vba-m/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -83,11 +84,11 @@ msgstr "Seleccionar archivo de código de punto"
 
 #: cmdevents.cpp:453 cmdevents.cpp:478
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr "Código de puntos del lector electrónico (*.bin;*.raw)|*.bin;*.raw"
+msgstr "Código de puntos del E-Reader (*.bin;*.raw)|*.bin;*.raw"
 
 #: cmdevents.cpp:500 cmdevents.cpp:704
 msgid "Select battery file"
-msgstr "Seleccionar archivo de batgeria"
+msgstr "Seleccionar archivo de batería"
 
 #: cmdevents.cpp:501 cmdevents.cpp:705
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
