@@ -351,37 +351,3 @@ void gbafilter_pal32(uint32_t* buf, int count)
         *buf++ = final_pix;
     }
 }
-
-// gbafilter_pad remains unchanged as it's for masking.
-void gbafilter_pad(uint8_t* buf, int count)
-{
-    union {
-        struct
-        {
-            uint8_t r;
-            uint8_t g;
-            uint8_t b;
-            uint8_t a;
-        } part;
-        unsigned whole;
-    } mask;
-
-    mask.whole = 0x1f << systemRedShift;
-    mask.whole += 0x1f << systemGreenShift;
-    mask.whole += 0x1f << systemBlueShift;
-
-    switch (systemColorDepth) {
-    case 24:
-        while (count--) {
-            *buf++ &= mask.part.r;
-            *buf++ &= mask.part.g;
-            *buf++ &= mask.part.b;
-        }
-        break;
-    case 32:
-        while (count--) {
-            *((uint32_t*)buf) &= mask.whole;
-            buf += 4;
-        }
-    }
-}
