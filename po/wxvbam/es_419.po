@@ -84,7 +84,7 @@ msgstr "Seleccionar archivo de código de punto"
 
 #: cmdevents.cpp:453 cmdevents.cpp:478
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr "Código de puntos del E-Reader (*.bin;*.raw)|*.bin;*.raw"
+msgstr "Código de puntos de e-Reader (*.bin;*.raw)|*.bin;*.raw"
 
 #: cmdevents.cpp:500 cmdevents.cpp:704
 msgid "Select battery file"
@@ -92,7 +92,7 @@ msgstr "Seleccionar archivo de batería"
 
 #: cmdevents.cpp:501 cmdevents.cpp:705
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
-msgstr "Archivo de Batería (*.sav)|*.sav|Flash save (*.dat)|*.dat"
+msgstr "Archivo de batería (*.sav)|*.sav|Guardado Flash (*.dat)|*.dat"
 
 #: cmdevents.cpp:512
 msgid ""
