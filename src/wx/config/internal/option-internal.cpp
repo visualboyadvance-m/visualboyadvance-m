@@ -192,7 +192,7 @@ std::array<Option, kNbOptions>& Option::All() {
         bool link_proto = false;
 #endif
         wxString gba_rom_dir;
-        uint32_t gba_darken = 0;
+        uint32_t gba_darken = 50;
 
         /// Core
         bool agb_print = false;
