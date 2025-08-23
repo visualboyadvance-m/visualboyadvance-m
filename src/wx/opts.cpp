@@ -382,8 +382,11 @@ void load_opts(bool first_time_launch) {
                     OPTION(kGBALinkTimeout) = 500;
                 }
 #endif
-                // Previous default was true.
-                OPTION(kGBALCDFilter) = false;
+            }
+            case 1: { // up to 2.2.2 included.
+                // Previous defaults were false.
+                OPTION(kGBALCDFilter) = true;
+                OPTION(kGBLCDFilter)  = true;
             }
         }
         ini_version++;

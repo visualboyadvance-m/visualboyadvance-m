@@ -176,7 +176,7 @@ std::array<Option, kNbOptions>& Option::All() {
         /// GB
         wxString gb_bios = wxEmptyString;
         bool colorizer_hack = false;
-        bool gb_lcd_filter = false;
+        bool gb_lcd_filter = true;
         wxString gbc_bios = wxEmptyString;
         bool print_auto_page = true;
         bool print_screen_cap = false;
@@ -185,7 +185,7 @@ std::array<Option, kNbOptions>& Option::All() {
         uint32_t gb_lighten = 0;
 
         /// GBA
-        bool gba_lcd_filter = false;
+        bool gba_lcd_filter = true;
 #ifndef NO_LINK
         bool link_auto = false;
         bool link_hacks = true;
