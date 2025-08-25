@@ -26,10 +26,6 @@ extern "C"
   bool cpu_mmx = 1;
 #endif
 }
-static uint32_t colorMask = 0xF7DEF7DE;
-static uint32_t lowPixelMask = 0x08210821;
-static uint32_t qcolorMask = 0xE79CE79C;
-static uint32_t qlowpixelMask = 0x18631863;
 static uint32_t redblueMask = 0xF81F;
 static uint32_t greenMask = 0x7E0;
 
@@ -41,20 +37,12 @@ int Init_2xSaI(uint32_t BitFormat)
 {
   if(systemColorDepth == 16) {
     if (BitFormat == 565) {
-      colorMask = 0xF7DEF7DE;
-      lowPixelMask = 0x08210821;
-      qcolorMask = 0xE79CE79C;
-      qlowpixelMask = 0x18631863;
       redblueMask = 0xF81F;
       greenMask = 0x7E0;
       qRGB_COLOR_MASK[0] = qRGB_COLOR_MASK[1] = 0xF7DEF7DE;
       hq2x_init(16);
       RGB_LOW_BITS_MASK = 0x0821;
     } else if (BitFormat == 555) {
-      colorMask = 0x7BDE7BDE;
-      lowPixelMask = 0x04210421;
-      qcolorMask = 0x739C739C;
-      qlowpixelMask = 0x0C630C63;
       redblueMask = 0x7C1F;
       greenMask = 0x3E0;
       qRGB_COLOR_MASK[0] = qRGB_COLOR_MASK[1] = 0x7BDE7BDE;
@@ -64,10 +52,6 @@ int Init_2xSaI(uint32_t BitFormat)
       return 0;
     }
   } else if(systemColorDepth == 32) {
-    colorMask = 0xfefefe;
-    lowPixelMask = 0x010101;
-    qcolorMask = 0xfcfcfc;
-    qlowpixelMask = 0x030303;
     qRGB_COLOR_MASK[0] = qRGB_COLOR_MASK[1] = 0xfefefe;
     hq2x_init(32);
     RGB_LOW_BITS_MASK = 0x010101;
@@ -146,25 +130,24 @@ static inline int GetResult (uint32_t A, uint32_t B, uint32_t C, uint32_t D)
   return r;
 }
 
-static inline uint32_t INTERPOLATE (uint32_t A, uint32_t B)
-{
-  if (A != B) {
-    return (((A & colorMask) >> 1) + ((B & colorMask) >> 1) +
-            (A & B & lowPixelMask));
-  } else
-    return A;
+static inline uint32_t INTERPOLATE(uint32_t A, uint32_t B) {
+    if (A == B) {
+        return A;
+    }
+    return (
+        (((((A >> 16) & 0xFF) & 0xFE) >> 1) + ((((B >> 16) & 0xFF) & 0xFE) >> 1) + (((A >> 16) & 0xFF) & ((B >> 16) & 0xFF) & 0x01)) << 16) |
+        ((((((A >> 8) & 0xFF) & 0xFE) >> 1) + ((((B >> 8) & 0xFF) & 0xFE) >> 1) + (((A >> 8) & 0xFF) & ((B >> 8) & 0xFF) & 0x01)) << 8) |
+        (((((A & 0xFF) & 0xFE) >> 1) + (((B & 0xFF) & 0xFE) >> 1) + ((A & 0xFF) & (B & 0xFF) & 0x01)));
 }
 
-static inline uint32_t Q_INTERPOLATE (uint32_t A, uint32_t B, uint32_t C, uint32_t D)
-{
-  uint32_t x = ((A & qcolorMask) >> 2) +
-    ((B & qcolorMask) >> 2) +
-    ((C & qcolorMask) >> 2) + ((D & qcolorMask) >> 2);
-  uint32_t y = (A & qlowpixelMask) +
-    (B & qlowpixelMask) + (C & qlowpixelMask) + (D & qlowpixelMask);
-
-  y = (y >> 2) & qlowpixelMask;
-  return x + y;
+static inline uint32_t Q_INTERPOLATE(uint32_t A, uint32_t B, uint32_t C, uint32_t D) {
+    return (
+        (((((A >> 16) & 0xFC) >> 2) + (((B >> 16) & 0xFC) >> 2) + (((C >> 16) & 0xFC) >> 2) + (((D >> 16) & 0xFC) >> 2) +
+            (((A >> 16) & 0x03) + ((B >> 16) & 0x03) + ((C >> 16) & 0x03) + ((D >> 16) & 0x03))) << 16) |
+        (((((A >> 8) & 0xFC) >> 2) + (((B >> 8) & 0xFC) >> 2) + (((C >> 8) & 0xFC) >> 2) + (((D >> 8) & 0xFC) >> 2) +
+            (((A >> 8) & 0x03) + ((B >> 8) & 0x03) + ((C >> 8) & 0x03) + ((D >> 8) & 0x03))) << 8) |
+        ((((A & 0xFC) >> 2) + ((B & 0xFC) >> 2) + ((C & 0xFC) >> 2) + ((D & 0xFC) >> 2) +
+            ((A & 0x03) + (B & 0x03) + (C & 0x03) + (D & 0x03)))));
 }
 
 static inline int GetResult1_32 (uint32_t A, uint32_t B, uint32_t C, uint32_t D,
@@ -1275,4 +1258,3 @@ void Scale_2xSaI (uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
     dstPtr += dstPitch;
   }
 }
-
