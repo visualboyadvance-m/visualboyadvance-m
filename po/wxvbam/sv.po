@@ -1283,19 +1283,19 @@ msgstr "Behåll fönstret överst"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:436
 msgid "Maximum number of threads to run filters in"
-msgstr ""
+msgstr "Maximalt antal trådar för att köra filter i"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:438
 msgid "Render method; if unsupported, simple method will be used"
-msgstr ""
+msgstr "Renderingsmetod; om den inte stöds används en enkel metod."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:439
 msgid "Default scale factor"
-msgstr ""
+msgstr "Standardskalningsfaktor"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:440
 msgid "Retain aspect ratio when resizing"
-msgstr ""
+msgstr "Behåll bildförhållandet vid storleksändring"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:441
 msgid "SDL renderer"
@@ -1324,26 +1324,26 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:449
 msgid "BIOS file to use for Game Boy Color, if enabled"
-msgstr ""
+msgstr "BIOS-fil som ska användas för Game Boy Color, om aktiverad"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:451
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "Standardpaletten, som 8 kommateckenavskilda 4-siffriga hexadecimala heltal (rgb555)."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:454
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "Den första användarpaletten, som 8 kommateckenavskilda 4-siffriga hexadecimala heltal (rgb555)."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:457
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
-msgstr ""
+msgstr "Den andra användarpaletten, som 8 kommateckenavskilda 4-siffriga hexadecimala heltal (rgb555)."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:460
 msgid "Automatically gather a full page before printing"
-msgstr ""
+msgstr "Samla automatiskt en hel sida innan utskrift"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:462
 msgid "Automatically save printouts as screen captures with -print suffix"
@@ -1380,19 +1380,19 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:487
 msgid "Default network link server IP to bind"
-msgstr ""
+msgstr "Standard-IP för nätverkslänkserver att binda"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:488
 msgid "Default network link port (server and client)"
-msgstr ""
+msgstr "Standardport för nätverkslänk (server och klient)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:489
 msgid "Default network protocol"
-msgstr ""
+msgstr "Standardnätverksprotokoll"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:490
 msgid "Link timeout (ms)"
-msgstr ""
+msgstr "Länkens tidsgräns (ms)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:491
 msgid "Link cable type"
@@ -1462,22 +1462,22 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:526
 msgid "Whether to enable SDL GameController mode"
-msgstr ""
+msgstr "Om SDL GameController-läget ska aktiveras"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:530
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
-msgstr ""
+msgstr "Parametern Keyboard/<cmd> innehåller en kommaseparerad lista med tangentnamn (t.ex. Alt-Shift-F1). När den namngivna tangenten trycks ned, utförs kommandot <cmd>."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:535
 msgid "Enable AGB debug print"
-msgstr ""
+msgstr "Aktivera AGB-felsökningsutskrift"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:536
 msgid "Auto skip frames"
-msgstr ""
+msgstr "Hoppa automatiskt över bildrutor"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:538
 msgid "Apply IPS / UPS / IPF patches if found"
@@ -1489,7 +1489,7 @@ msgstr "Spara och läs automatiskt in fusklista"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:544
 msgid "Automatically enable border for Super Game Boy games"
-msgstr ""
+msgstr "Aktivera automatiskt kant för Super Game Boy-spel"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:546
 msgid "Always enable border"
@@ -1497,7 +1497,7 @@ msgstr "Aktivera alltid ram"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:547
 msgid "Screen capture file format"
-msgstr ""
+msgstr "Filformat för skärmdump"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:548
 msgid "Enable cheats"
@@ -1517,7 +1517,7 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:553
 msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
-msgstr ""
+msgstr "Hoppa över bildrutor. Värdena är 0–9 eller -1 för att hoppa över automatiskt baserat på tid."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:555
 msgid "The palette to use"
@@ -1541,15 +1541,15 @@ msgstr "Antal spelare i nätverk"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:563
 msgid "Maximum scale factor (0 = no limit)"
-msgstr ""
+msgstr "Maximal skalfaktor (0 = ingen gräns)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:565
 msgid "Pause game when main window loses focus"
-msgstr ""
+msgstr "Pausa spel när huvudfönstret förlorar fokus"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:567
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
-msgstr ""
+msgstr "Aktivera RTC (åsidosättning av vba-over.ini är rtcEnabled"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:568
 msgid "Native save (\"battery\") hardware type"
@@ -1569,7 +1569,7 @@ msgstr "Hoppa över BIOS-initiering"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
 msgid "Do not overwrite cheat list when loading state"
-msgstr ""
+msgstr "Skriv inte över fusklistan när tillståndet läses in"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:576
 msgid "Do not overwrite native (battery) save when loading state"
@@ -1577,7 +1577,7 @@ msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:578
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
-msgstr ""
+msgstr "Begränsa spelhastigheten, även vid acceleration (0-450 %, 0 = ingen begränsning)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:581
 msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
@@ -1653,11 +1653,11 @@ msgstr "Förhindra skärmsläckaren när spelet är igång"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:613
 msgid "Sound API; if unsupported, default API will be used"
-msgstr ""
+msgstr "Ljud-API; om detta inte stöds används standard-API."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:614
 msgid "Device ID of chosen audio device for chosen driver"
-msgstr ""
+msgstr "Enhets-ID för vald ljudenhet för vald drivrutin"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:615
 msgid "Number of sound buffers"
@@ -1713,11 +1713,11 @@ msgstr "Ljudvolym (%)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:629
 msgid "Language"
-msgstr ""
+msgstr "Språk"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:630
 msgid "External translations"
-msgstr ""
+msgstr "Externa översättningar"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:705
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:725
@@ -2502,7 +2502,7 @@ msgstr "Mörkare"
 
 #: xrc/DisplayConfig.xrc:337
 msgid "Very Light"
-msgstr ""
+msgstr "Mycket ljust"
 
 #: xrc/DisplayConfig.xrc:355
 msgid "Color Correction"
@@ -2538,7 +2538,7 @@ msgstr "Standardförstorning:"
 
 #: xrc/DisplayConfig.xrc:470
 msgid "Maximum magnification factor:"
-msgstr ""
+msgstr "Maximal förstoringsfaktor:"
 
 #: xrc/DisplayConfig.xrc:471
 msgid "0 = no maximum"
@@ -2831,7 +2831,7 @@ msgstr ""
 
 #: xrc/GBROMInfo.xrc:156
 msgid "Cartridge checksum:"
-msgstr ""
+msgstr "Kontrollsumma för kassett:"
 
 #: xrc/GBTileViewer.xrc:23
 msgid "VRAM Bank"
@@ -2982,11 +2982,11 @@ msgstr ""
 
 #: xrc/GameBoyConfig.xrc:131
 msgid "Current Game Boy BIOS file:"
-msgstr ""
+msgstr "Aktuell BIOS-fil för Game Boy:"
 
 #: xrc/GameBoyConfig.xrc:152
 msgid "Current Game Boy Color BIOS file:"
-msgstr ""
+msgstr "Aktuell BIOS-fil för Game Boy Color:"
 
 #: xrc/GameBoyConfig.xrc:186
 msgid "User 1"
