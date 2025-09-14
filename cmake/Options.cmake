@@ -40,7 +40,7 @@ if(VBAM_STATIC)
     endif()
 endif()
 
-if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg" AND CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "^([xX]86_64|[aA][mM][dD]64)$")
+if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
    set(PKG_CONFIG_EXECUTABLE "$ENV{VCPKG_ROOT}/installed/x64-windows/tools/pkgconf/pkgconf.exe")
 endif()
 

@@ -97,6 +97,11 @@ endmacro()
 
 # Check for cached results. If there are skip the costly part.
 if (NOT FFMPEG_LIBRARIES)
+  set(x265_lib "x265")
+
+  if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg" AND FFMPEG_STATIC)
+    set(x265_lib "x265-static")
+  endif()
 
   # Check for all possible component.
   find_component(AVFORMAT   libavformat   avformat libavformat/avformat.h)
@@ -108,7 +113,7 @@ if (NOT FFMPEG_LIBRARIES)
   find_component(POSTPROC   libpostproc   postproc libpostproc/postprocess.h)
   find_component(SWRESAMPLE libswresample swresample libswresample/swresample.h)
   find_component(X264       x264          x264      x264.h)
-  find_component(X265       x265          x265      x265.h)
+  find_component(X265       x265          "${x265_lib}" x265.h)
 
   # Check if the required components were found and add their stuff to the FFMPEG_* vars.
   foreach (_component ${FFmpeg_FIND_COMPONENTS})

@@ -2,6 +2,8 @@ if(TRANSLATIONS_ONLY)
     return()
 endif()
 
+# TODO: Use compiler CPU not CMake.
+
 if(NOT CMAKE_SYSTEM_PROCESSOR)
     if(NOT CMAKE_TOOLCHAIN_FILE AND CMAKE_HOST_SYSTEM_PROCESSOR)
         set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_HOST_SYSTEM_PROCESSOR})
@@ -68,14 +70,6 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "[aA][aA][rR][cC][hH]|[aA][rR][mM]")
 
     if(NOT CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "[aA][aA][rR][cC][hH]|[aA][rR][mM]")
         set(CMAKE_CROSSCOMPILING TRUE)
-    endif()
-endif()
-
-if(DEFINED VCPKG_TARGET_TRIPLET)
-    string(REGEX MATCH "^[^-]+" target_arch ${VCPKG_TARGET_TRIPLET})
-
-    if(NOT WINARCH STREQUAL target_arch)
-        message(FATAL_ERROR "Wrong build environment architecture for VCPKG_TARGET_TRIPLET, you specified ${target_arch} but your compiler is for ${WINARCH}")
     endif()
 endif()
 
