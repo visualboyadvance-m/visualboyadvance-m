@@ -2574,6 +2574,13 @@ SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
         }
 #endif
     }
+
+// Set bilinear or nearest on the texture.
+#ifdef ENABLE_SDL3
+    SDL_SetTextureScaleMode(texture, OPTION(kDispBilinear) ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST);
+#else
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, OPTION(kDispBilinear) ? "1" : "0");
+#endif
             
     did_init = true;
 }
