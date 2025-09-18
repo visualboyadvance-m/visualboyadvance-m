@@ -386,6 +386,14 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
     sdlrenderer_selector_ = GetValidatedChild<wxChoice>("SDLRenderer");
     sdlrenderer_selector_->SetValidator(SDLDevicesValidator());
 
+#if !defined(ENABLE_SDL3) || !defined(HAVE_SDL3_PIXELART)
+    GetValidatedChild<wxCheckBox>("SDLPixelArt")->Hide();
+#else
+    GetValidatedChild<wxCheckBox>("SDLPixelArt")
+        ->SetValidator(
+            widgets::OptionBoolValidator(config::OptionID::kDispSDLPixelArt));
+#endif
+
     wxWindow* color_profile_srgb = GetValidatedChild("ColorProfileSRGB");
     color_profile_srgb->SetValidator(
         ColorCorrectionProfileValidator(config::ColorCorrectionProfile::kSRGB));

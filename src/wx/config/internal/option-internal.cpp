@@ -151,6 +151,7 @@ std::array<Option, kNbOptions>& Option::All() {
     struct OwnedOptions {
         /// Display
         bool bilinear = true;
+        bool sdl_pixel_art = false;
         Filter filter = Filter::kNone;
         wxString filter_plugin = wxEmptyString;
         Interframe interframe = Interframe::kNone;
@@ -280,6 +281,7 @@ std::array<Option, kNbOptions>& Option::All() {
     static std::array<Option, kNbOptions> g_all_opts = {
         /// Display
         Option(OptionID::kDispBilinear, &g_owned_opts.bilinear),
+        Option(OptionID::kDispSDLPixelArt, &g_owned_opts.sdl_pixel_art),
         Option(OptionID::kDispFilter, &g_owned_opts.filter),
         Option(OptionID::kDispFilterPlugin, &g_owned_opts.filter_plugin),
         Option(OptionID::kDispIFB, &g_owned_opts.interframe),
@@ -427,6 +429,7 @@ namespace internal {
 const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     /// Display
     OptionData{"Display/Bilinear", "Bilinear", _("Use bilinear filter with 3d renderer")},
+    OptionData{"Display/SDLPixelArt", "SDLPixelArt", _("Use the SDL pixel art filter with an SDL renderer")},
     OptionData{"Display/Filter", "", _("Full-screen filter to apply")},
     OptionData{"Display/FilterPlugin", "", _("Filter plugin library")},
     OptionData{"Display/IFB", "", _("Interframe blending function")},
