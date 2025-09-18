@@ -37,21 +37,21 @@
 #else
 
 // swaps a 16-bit value
-static inline uint16_t swap16(uint16_t v)
+static inline uint16_t vbswap16(uint16_t v)
 {
         return (v << 8) | (v >> 8);
 }
 
 // swaps a 32-bit value
-static inline uint32_t swap32(uint32_t v)
+static inline uint32_t vbswap32(uint32_t v)
 {
         return (v << 24) | ((v << 8) & 0xff0000) | ((v >> 8) & 0xff00) | (v >> 24);
 }
 
-#define READ16LE(x) swap16(*((uint16_t *)(x)))
-#define READ32LE(x) swap32(*((uint32_t *)(x)))
-#define WRITE16LE(x, v) *((uint16_t *)x) = swap16((v))
-#define WRITE32LE(x, v) *((uint32_t *)x) = swap32((v))
+#define READ16LE(x) vbswap16(*((uint16_t *)(x)))
+#define READ32LE(x) vbswap32(*((uint32_t *)(x)))
+#define WRITE16LE(x, v) *((uint16_t *)x) = vbswap16((v))
+#define WRITE32LE(x, v) *((uint32_t *)x) = vbswap32((v))
 #endif
 #else
 #define READ16LE(x) *((uint16_t *)x)
