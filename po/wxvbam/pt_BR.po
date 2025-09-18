@@ -1286,7 +1286,7 @@ msgstr "Usar o filtro bilinear com renderizador 3D"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:432
 msgid "Use the SDL pixel art filter with an SDL renderer"
-msgstr ""
+msgstr "Usar o filtro da arte dos pixels do SDL com um renderizador SDL"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:433
 msgid "Full-screen filter to apply"
@@ -2473,7 +2473,7 @@ msgstr "Renderizador SDL:"
 
 #: xrc/DisplayConfig.xrc:175
 msgid "SDL Pixel Art Filter"
-msgstr ""
+msgstr "Filtro da Arte dos Pixels do SDL"
 
 #: xrc/DisplayConfig.xrc:188 xrc/SoundConfig.xrc:93
 msgid "Basic"
