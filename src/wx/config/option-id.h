@@ -8,6 +8,7 @@ namespace config {
 enum class OptionID {
     /// Display
     kDispBilinear = 0,
+    kDispSDLPixelArt,
     kDispFilter,
     kDispFilterPlugin,
     kDispIFB,

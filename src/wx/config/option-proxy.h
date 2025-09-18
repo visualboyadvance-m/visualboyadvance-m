@@ -12,6 +12,7 @@ namespace config {
 static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /// Display
     /*kDispBilinear*/ Option::Type::kBool,
+    /*kDispSDLPixelArt*/ Option::Type::kBool,
     /*kDispFilter*/ Option::Type::kFilter,
     /*kDispFilterPlugin*/ Option::Type::kString,
     /*kDispIFB*/ Option::Type::kInterframe,
