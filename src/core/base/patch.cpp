@@ -10,7 +10,7 @@
 #endif
 
 
-#if defined(__FreeBSD__) || defined(__NetBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <sys/param.h>
 #define fopen64     fopen
 #define fseeko64    fseeko
@@ -34,7 +34,7 @@
 #include "core/base/file_util.h"
 
 #ifdef __GNUC__
-#if defined(__MUSL__) || defined(__APPLE__) || defined(BSD) || defined(__NetBSD__)
+#if defined(__MUSL__) || defined(__APPLE__) || defined(BSD)
 typedef off_t __off64_t; /* off_t is 64 bits on BSD. */
 #define fseeko64 fseeko
 #define ftello64 ftello
