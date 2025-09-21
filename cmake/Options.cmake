@@ -77,8 +77,12 @@ if(ENABLE_SDL3)
    set(CMAKE_C_FLAGS "-DENABLE_SDL3 ${CMAKE_C_FLAGS}")
    set(CMAKE_CXX_FLAGS "-DENABLE_SDL3 ${CMAKE_CXX_FLAGS}")
 
-   include(CheckSymbolExists)
-   check_symbol_exists(SDL_SCALEMODE_PIXELART "SDL3/SDL.h" HAVE_SDL_SCALEMODE_PIXELART)
+   include(CheckSourceCompiles)
+   check_source_compiles(CXX
+"#include <SDL3/SDL.h>
+
+int main() { return SDL_SCALEMODE_PIXELART; }
+"       HAVE_SDL_SCALEMODE_PIXELART)
 
    if(HAVE_SDL_SCALEMODE_PIXELART)
       set(CMAKE_C_FLAGS "-DHAVE_SDL3_PIXELART ${CMAKE_C_FLAGS}")
