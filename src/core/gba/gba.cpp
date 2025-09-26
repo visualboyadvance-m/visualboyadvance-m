@@ -1851,7 +1851,7 @@ int CPULoadRomData(const char* data, int size)
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    g_rom = (uint8_t*)malloc(romSize);
+    g_rom = (uint8_t*)malloc(SIZE_ROM);
     if (g_rom == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "ROM");
@@ -1874,7 +1874,7 @@ int CPULoadRomData(const char* data, int size)
 
     uint16_t* temp = (uint16_t*)(g_rom + ((romSize + 1) & ~1));
     int i;
-    for (i = (romSize + 1) & ~1; i < romSize; i += 2) {
+    for (i = (romSize + 1) & ~1; i < SIZE_ROM; i += 2) {
         WRITE16LE(temp, (i >> 1) & 0xFFFF);
         temp++;
     }
