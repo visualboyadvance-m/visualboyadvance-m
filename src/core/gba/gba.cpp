@@ -1675,31 +1675,16 @@ void GBAMatrixWrite16(GBAMatrix_t *matrix, uint32_t address, uint16_t value)
     }
 }
 
-static size_t get_gba_rom_size(const char* szFile)
-{
-    size_t size = 0;
-    FILE *f = fopen(szFile, "rb");
-
-    if (f == NULL)
-        return 0;
-
-    fseek(f, 0, SEEK_END);
-    size = ftell(f);
-    fclose(f);
-
-    return size;
-}
-
 int CPULoadRom(const char* szFile)
 {
-    romSize = get_gba_rom_size(szFile);
+    romSize = SIZE_ROM * 4;
     if (g_rom != NULL) {
         CPUCleanUp();
     }
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    g_rom = (uint8_t*)malloc(romSize);
+    g_rom = (uint8_t*)malloc(SIZE_ROM * 4);
     if (g_rom == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "ROM");
@@ -1844,14 +1829,14 @@ int CPULoadRom(const char* szFile)
 
 int CPULoadRomData(const char* data, int size)
 {
-    romSize = size % 2 == 0 ? size : size + 1;
+    romSize = SIZE_ROM * 4;
     if (g_rom != NULL) {
         CPUCleanUp();
     }
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    g_rom = (uint8_t*)malloc(romSize);
+    g_rom = (uint8_t*)malloc(SIZE_ROM * 4);
     if (g_rom == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "ROM");
@@ -1884,7 +1869,7 @@ int CPULoadRomData(const char* data, int size)
         memcpy(&ident, &g_rom[0xAC], 1);
 
         if (ident == 'M') {
-            g_rom2 = (uint8_t *)malloc(romSize);
+            g_rom2 = (uint8_t *)malloc(SIZE_ROM * 4);
             memcpy(g_rom2, data, size);
             romSize = 0x01000000;
 
