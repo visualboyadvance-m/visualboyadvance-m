@@ -3456,8 +3456,18 @@ void GameArea::UpdateLcdFilter() {
         gbafilter_set_params(DCCP, (((float)OPTION(kGBADarken)) / 100));
         gbafilter_update_colors(OPTION(kGBALCDFilter));
     } else if (loaded == IMAGE_GB) {
-        gbcfilter_set_params(DCCP, (((float)OPTION(kGBLighten)) / 100));
-        gbcfilter_update_colors(OPTION(kGBLCDFilter));
+        if (gbHardware & 4) { // Emulated Hardware is SGB
+            // Prevent CGB LCD filter from applying
+            gbcfilter_update_colors(false);
+        } else if (gbHardware & 8) { // Emulated Hardware is GBA
+            // Apply GBA LCD filter instead of the GBC LCD Filter
+            gbafilter_set_params(DCCP, (((float)OPTION(kGBADarken)) / 100));
+            gbafilter_update_colors(OPTION(kGBLCDFilter));
+        } else {
+            // Apply GBC LCD filter for GB/GBC modes
+            gbcfilter_set_params(DCCP, (((float)OPTION(kGBLighten)) / 100));
+            gbcfilter_update_colors(OPTION(kGBLCDFilter));
+        }
     } else {
         gbafilter_set_params(DCCP, (((float)OPTION(kGBADarken)) / 100));
         gbcfilter_set_params(DCCP, (((float)OPTION(kGBLighten)) / 100));
