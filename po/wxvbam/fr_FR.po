@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-18 02:00+0000\n"
+"POT-Creation-Date: 2025-09-30 16:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Thibault <thibaultbruneliere@gmail.com>, 2019\n"
 "Language-Team: French (France) (http://app.transifex.com/bgk/vba-m/language/fr_FR/)\n"
@@ -964,7 +964,7 @@ msgstr "Erreur pendant l'enregistrement audio (%s) ; annulation"
 msgid "Error in video recording (%s); aborting"
 msgstr "Erreur pendant l'enregistrement vidéo (%s) ; annulation"
 
-#: panel.cpp:3515
+#: panel.cpp:3525
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Volume : %d %%"

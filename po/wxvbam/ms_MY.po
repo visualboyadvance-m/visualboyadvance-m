@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-18 02:00+0000\n"
+"POT-Creation-Date: 2025-09-30 16:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: abuyop <abuyop@gmail.com>, 2017\n"
 "Language-Team: Malay (Malaysia) (http://app.transifex.com/bgk/vba-m/language/ms_MY/)\n"
@@ -952,7 +952,7 @@ msgstr "Ralat dalam rakaman (%s); dihenti paksa"
 msgid "Error in video recording (%s); aborting"
 msgstr "Ralat dalam rakaman video (%s); dihenti paksa"
 
-#: panel.cpp:3515
+#: panel.cpp:3525
 #, c-format
 msgid "Volume: %d %%"
 msgstr ""

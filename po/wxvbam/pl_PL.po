@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-18 02:00+0000\n"
+"POT-Creation-Date: 2025-09-30 16:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Damian Drakon <dragon1590@gmail.com>, 2019-2020,2022-2023\n"
 "Language-Team: Polish (Poland) (http://app.transifex.com/bgk/vba-m/language/pl_PL/)\n"
@@ -952,7 +952,7 @@ msgstr "Błąd podczas nagrywania dźwięku (%s); przerywanie"
 msgid "Error in video recording (%s); aborting"
 msgstr "Błąd podczas nagrywania wideo (%s); przerywanie"
 
-#: panel.cpp:3515
+#: panel.cpp:3525
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Głośność: %d %%"

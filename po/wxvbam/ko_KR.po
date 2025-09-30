@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-18 02:00+0000\n"
+"POT-Creation-Date: 2025-09-30 16:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Hoseok Seo <ddinghoya@gmail.com>, 2022-2025\n"
 "Language-Team: Korean (Korea) (http://app.transifex.com/bgk/vba-m/language/ko_KR/)\n"
@@ -956,7 +956,7 @@ msgstr "(%s) 에서 오디오 녹음 오류; 종료합니다."
 msgid "Error in video recording (%s); aborting"
 msgstr "(%s) 에서 비디오 녹화 오류; 종료합니다."
 
-#: panel.cpp:3515
+#: panel.cpp:3525
 #, c-format
 msgid "Volume: %d %%"
 msgstr "볼륨: %d %%"

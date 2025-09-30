@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-18 02:00+0000\n"
+"POT-Creation-Date: 2025-09-30 16:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Svyatoslav <zarazafamila@gmail.com>, 2023\n"
 "Language-Team: Ukrainian (http://app.transifex.com/bgk/vba-m/language/uk/)\n"
@@ -953,7 +953,7 @@ msgstr "Помилка аудіозапису (%s); перервано."
 msgid "Error in video recording (%s); aborting"
 msgstr "Помилка відеозапису (%s); перервано."
 
-#: panel.cpp:3515
+#: panel.cpp:3525
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Гучність: %d %%"

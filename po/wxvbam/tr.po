@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-18 02:00+0000\n"
+"POT-Creation-Date: 2025-09-30 16:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: adalet Mustafa, 2025\n"
 "Language-Team: Turkish (http://app.transifex.com/bgk/vba-m/language/tr/)\n"
@@ -961,7 +961,7 @@ msgstr "Ses kaydı hatası (%s); İptal ediliyor"
 msgid "Error in video recording (%s); aborting"
 msgstr "Video kaydı hatası (%s); İptal ediliyor"
 
-#: panel.cpp:3515
+#: panel.cpp:3525
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Ses Düzeyi: %d %%"

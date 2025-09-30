@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-18 02:00+0000\n"
+"POT-Creation-Date: 2025-09-30 16:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Lanta Liz, 2025\n"
 "Language-Team: Japanese (http://app.transifex.com/bgk/vba-m/language/ja/)\n"
@@ -961,7 +961,7 @@ msgstr "録音中にエラー (%s) 、中断しています"
 msgid "Error in video recording (%s); aborting"
 msgstr "録画中にエラー (%s) 、中断しています"
 
-#: panel.cpp:3515
+#: panel.cpp:3525
 #, c-format
 msgid "Volume: %d %%"
 msgstr ""
