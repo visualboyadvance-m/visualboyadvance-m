@@ -985,6 +985,7 @@ EVT_MOVE(MainFrame::OnMove)
 EVT_MOVE_START(MainFrame::OnMoveStart)
 EVT_MOVE_END(MainFrame::OnMoveEnd)
 EVT_SIZE(MainFrame::OnSize)
+EVT_ICONIZE(MainFrame::OnIconize)
 
 #if defined(__WXMSW__)
 
@@ -1086,6 +1087,17 @@ void MainFrame::OnSize(wxSizeEvent& event)
 
     OPTION(kGeomIsMaximized) = IsMaximized();
     OPTION(kGeomFullScreen) = IsFullScreen();
+}
+
+void MainFrame::OnIconize(wxIconizeEvent& event)
+{
+    if (!init_complete_) {
+        return;
+    }
+
+    if (OPTION(kPrefPauseWhenInactive)) {
+        panel->Pause();
+    }
 }
 
 wxString MainFrame::GetGamePath(wxString path)
