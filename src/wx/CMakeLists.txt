@@ -1031,7 +1031,9 @@ if(APPLE)
     # bundle dylibs and relink them for releasing .app
     # also install translations into the .app
     # but only in Release mode
-    if(CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
+    option(BUNDLE_DYLIBS "Bundle dylibs into .app" OFF)
+
+    if(GUNDLE_DYLIBS AND CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
         add_custom_command(
             TARGET visualboyadvance-m POST_BUILD
             COMMAND bash ${CMAKE_SOURCE_DIR}/tools/macOS/third_party_libs_tool ./visualboyadvance-m.app
