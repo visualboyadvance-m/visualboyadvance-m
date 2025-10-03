@@ -133,7 +133,7 @@ void MetalDrawingPanel::CreateMetalView()
     _pipelineState = [_device newRenderPipelineStateWithDescriptor:pipelineStateDescriptor
                                                              error:&error];
     if (!_pipelineState) {
-        wxLogError("Failed to create Metal pipeline state: %s", [[error localizedDescription] UTF8String]);
+        wxLogError(_("Failed to create Metal pipeline state: %s"), [[error localizedDescription] UTF8String]);
         return;
     }
 
