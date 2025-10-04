@@ -22,7 +22,17 @@ elseif(MINGW OR MSYS)
     # Default to static builds on MinGW and all MSYS2 envs.
     set(VBAM_STATIC_DEFAULT ON)
 endif()
+
 option(VBAM_STATIC "Try to link all libraries statically" ${VBAM_STATIC_DEFAULT})
+
+# This is a commonly used CMake option.
+if(DEFINED ENABLE_SHARED)
+   if(NOT ENABLE_SHARED)
+      set(VBAM_STATIC ON)
+   else()
+      set(VBAM_STATIC OFF)
+   endif()
+endif()
 
 if(VBAM_STATIC)
     set(SDL2_STATIC ON)
