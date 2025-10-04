@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-30 16:00+0000\n"
+"POT-Creation-Date: 2025-10-04 04:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: LevensLes The, 2022\n"
 "Language-Team: Dutch (http://app.transifex.com/bgk/vba-m/language/nl/)\n"
@@ -22,13 +22,17 @@ msgstr ""
 "Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: audio/internal/coreaudio.cpp:184 audio/internal/coreaudio.cpp:541
+#: audio/internal/coreaudio.cpp:375 audio/internal/coreaudio.cpp:581
 #: audio/internal/sdl.cpp:179 audio/internal/sdl.cpp:197
 #: audio/internal/sdl.cpp:328 audio/internal/sdl.cpp:339
 #: audio/internal/sdl.cpp:359 audio/internal/faudio.cpp:490
 #: audio/internal/xaudio2.cpp:604
 msgid "Default device"
 msgstr "Standaard apparaat"
+
+#: audio/internal/coreaudio.cpp:381
+msgid "Could not get CoreAudio device"
+msgstr ""
 
 #: cmdevents.cpp:63 wxvbam.cpp:634
 msgid "Could not create main window"
