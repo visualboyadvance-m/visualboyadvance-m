@@ -4,6 +4,7 @@
 
 #include <wx/colordlg.h>
 #include <wx/ffile.h>
+#include <wx/slider.h>
 
 #include "core/gb/gbGlobals.h"
 #include "core/gba/gbaGlobals.h"
@@ -16,6 +17,15 @@
 #endif
 
 namespace {
+
+// Helper function to update slider tooltip with its current value
+static void UpdateSliderTooltip(wxSlider* slider, wxCommandEvent& event) {
+    if (slider) {
+        slider->SetToolTip(wxString::Format("%d", slider->GetValue()));
+    }
+    event.Skip();
+}
+
 void utilReadScreenPixels(uint8_t* dest, int w, int h) {
     uint8_t* b = dest;
     int sizeX = w;
@@ -1549,6 +1559,11 @@ public:
         getradio(, "CharBase3", charbase_, 0xc000);
         getradio(, "CharBase4", charbase_, 0x10000);
         getslider(, "Palette", palette_);
+        wxSlider* palette_slider = XRCCTRL(*this, "Palette", wxSlider);
+        if (palette_slider) {
+            palette_slider->SetToolTip(wxString::Format("%d", palette_slider->GetValue()));
+            palette_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, palette_slider, std::placeholders::_1));
+        }
         getlab(tileno_, "Tile", "1WWW");
         getlab(addr_, "Address", "06WWWWWW");
         selx_ = sely_ = -1;
@@ -1741,6 +1756,11 @@ public:
         getradio(, "CharBase0", charbase, 0);
         getradio(, "CharBase1", charbase, 0x800);
         getslider(, "Palette", palette);
+        wxSlider* palette_slider = XRCCTRL(*this, "Palette", wxSlider);
+        if (palette_slider) {
+            palette_slider->SetToolTip(wxString::Format("%d", palette_slider->GetValue()));
+            palette_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, palette_slider, std::placeholders::_1));
+        }
         getlab(tileno, "Tile", "2WW");
         getlab(addr, "Address", "WWWW");
         selx = sely = -1;

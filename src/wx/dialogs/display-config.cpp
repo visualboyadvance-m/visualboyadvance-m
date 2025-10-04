@@ -8,6 +8,7 @@
 #include <wx/log.h>
 #include <wx/object.h>
 #include <wx/radiobut.h>
+#include <wx/slider.h>
 #include <wx/textctrl.h>
 #include <wx/valnum.h>
 
@@ -301,6 +302,14 @@ private:
 
 }  // namespace
 
+// Helper function to update slider tooltip with its current value
+static void UpdateSliderTooltip(wxSlider* slider, wxCommandEvent& event) {
+    if (slider) {
+        slider->SetToolTip(wxString::Format("%d", slider->GetValue()));
+    }
+    event.Skip();
+}
+
 // static
 DisplayConfig* DisplayConfig::NewInstance(wxWindow* parent) {
     VBAM_CHECK(parent);
@@ -422,9 +431,13 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
 
     wxSlider* gba_darken_slider = GetValidatedChild<wxSlider>("GBADarken");
     gba_darken_slider->SetValidator(widgets::OptionUnsignedValidator(config::OptionID::kGBADarken));
+    gba_darken_slider->SetToolTip(wxString::Format("%d", gba_darken_slider->GetValue()));
+    gba_darken_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, gba_darken_slider, std::placeholders::_1));
 
     wxSlider* gbc_lighten_slider = GetValidatedChild<wxSlider>("GBCLighten");
     gbc_lighten_slider->SetValidator(widgets::OptionUnsignedValidator(config::OptionID::kGBLighten));
+    gbc_lighten_slider->SetToolTip(wxString::Format("%d", gbc_lighten_slider->GetValue()));
+    gbc_lighten_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, gbc_lighten_slider, std::placeholders::_1));
 
     filter_selector_ = GetValidatedChild<wxChoice>("Filter");
     filter_selector_->SetValidator(FilterValidator());

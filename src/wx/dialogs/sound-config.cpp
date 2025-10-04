@@ -135,6 +135,14 @@ private:
 
 }  // namespace
 
+// Helper function to update slider tooltip with its current value
+static void UpdateSliderTooltip(wxSlider* slider, wxCommandEvent& event) {
+    if (slider) {
+        slider->SetToolTip(wxString::Format("%d", slider->GetValue()));
+    }
+    event.Skip();
+}
+
 // static
 SoundConfig* SoundConfig::NewInstance(wxWindow* parent) {
     VBAM_CHECK(parent);
@@ -145,6 +153,8 @@ SoundConfig::SoundConfig(wxWindow* parent) : BaseDialog(parent, "SoundConfig") {
     // Volume slider configuration.
     wxSlider* volume_slider = GetValidatedChild<wxSlider>("Volume");
     volume_slider->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundVolume));
+    volume_slider->SetToolTip(wxString::Format("%d", volume_slider->GetValue()));
+    volume_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, volume_slider, std::placeholders::_1));
     GetValidatedChild("Volume100")
         ->Bind(wxEVT_BUTTON, std::bind(&wxSlider::SetValue, volume_slider, 100));
 
@@ -229,17 +239,26 @@ SoundConfig::SoundConfig(wxWindow* parent) : BaseDialog(parent, "SoundConfig") {
     buffers_info_label_ = GetValidatedChild<wxControl>("BuffersInfo");
     buffers_slider_ = GetValidatedChild<wxSlider>("Buffers");
     buffers_slider_->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundBuffers));
+    buffers_slider_->SetToolTip(wxString::Format("%d", buffers_slider_->GetValue()));
+    buffers_slider_->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, buffers_slider_, std::placeholders::_1));
     buffers_slider_->Bind(wxEVT_SLIDER, &SoundConfig::OnBuffersChanged, this);
 
     // Game Boy configuration.
-    GetValidatedChild("GBEcho")->SetValidator(
-        widgets::OptionIntValidator(config::OptionID::kSoundGBEcho));
-    GetValidatedChild("GBStereo")
-        ->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundGBStereo));
+    wxSlider* gb_echo_slider = GetValidatedChild<wxSlider>("GBEcho");
+    gb_echo_slider->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundGBEcho));
+    gb_echo_slider->SetToolTip(wxString::Format("%d", gb_echo_slider->GetValue()));
+    gb_echo_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, gb_echo_slider, std::placeholders::_1));
+
+    wxSlider* gb_stereo_slider = GetValidatedChild<wxSlider>("GBStereo");
+    gb_stereo_slider->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundGBStereo));
+    gb_stereo_slider->SetToolTip(wxString::Format("%d", gb_stereo_slider->GetValue()));
+    gb_stereo_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, gb_stereo_slider, std::placeholders::_1));
 
     // Game Boy Advance configuration.
-    GetValidatedChild("GBASoundFiltering")
-        ->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundGBAFiltering));
+    wxSlider* gba_filtering_slider = GetValidatedChild<wxSlider>("GBASoundFiltering");
+    gba_filtering_slider->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundGBAFiltering));
+    gba_filtering_slider->SetToolTip(wxString::Format("%d", gba_filtering_slider->GetValue()));
+    gba_filtering_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, gba_filtering_slider, std::placeholders::_1));
 
     // Audio Device configuration.
     audio_device_selector_ = GetValidatedChild<wxChoice>("Device");
