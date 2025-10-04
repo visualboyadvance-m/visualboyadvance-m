@@ -65,6 +65,10 @@ else()
     endif()
 endif()
 
+if(APPLE)
+    list(APPEND VBAM_SDL_LIBS "-framework System")
+endif()
+
 if(ENABLE_FFMPEG)
     if(NOT FFMPEG_LIBRARIES)
         message(FATAL_ERROR "ENABLE_FFMPEG was specified, but required versions of ffmpeg libraries cannot be found!")
