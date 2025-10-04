@@ -6,10 +6,10 @@
 namespace audio {
 namespace internal {
 
-// Returns the set of OpenAL devices.
+// Returns the set of CoreAudio devices.
 std::vector<AudioDevice> GetCoreAudioDevices();
 
-// Creates an OpenAL sound driver.
+// Creates a CoreAudio sound driver.
 std::unique_ptr<SoundDriver> CreateCoreAudioDriver();
 
 }  // namespace internal
