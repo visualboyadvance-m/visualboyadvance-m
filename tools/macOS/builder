@@ -116,11 +116,17 @@ best_llvm_path=$(
 # Fallback to XCode version.
 [ -z "$best_llvm_path" ] && best_llvm_path=/usr
 
-case "$best_llvm_path" in
-    /nix/store/*) # Nix
-        rt_lib=$(find /nix/store -maxdepth 1 -type d -name '*-compiler-rt-libc-*[0-9]' | while read -r d; do echo $d $(echo $d | sed -E 's/.*-([0-9.]+)$/\1/'); done | sort -V -k 2 | tail -n 1 | awk '{ print $1 }')/lib/libclang_rt.osx.a
-        ;;
-esac
+if [ -n "$APPLE_SILICON" ] && [ -z "$intel_target" ]; then
+    case "$best_llvm_path" in
+        /nix/store/*) # Nix
+            rt_lib=$(find /nix/store -maxdepth 1 -type d -name '*-compiler-rt-libc-*[0-9]' | while read -r d; do echo $d $(echo $d | sed -E 's/.*-([0-9.]+)$/\1/'); done | sort -V -k 2 | tail -n 1 | awk '{ print $1 }')/lib/libclang_rt.osx.a
+            ;;
+    esac
+fi
+
+if [ -z "$rt_lib" ]; then
+    rt_lib=$(xcode-select -p)/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/"$(/usr/bin/clang --version | head -1 | awk '{ print $4 }')"/lib/darwin/libclang_rt.osx.a
+fi
 
 clang_path=${best_llvm_path%%:*}
 xcode_path=$(xcode-select -p)

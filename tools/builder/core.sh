@@ -403,6 +403,7 @@ DIST_ARGS="$DIST_ARGS
     libx264     --enable-static --enable-pic
     libwebp     -DCMAKE_EXE_LINKER_FLAGS=\"-lutil\"
     libx265     -DHIGH_BIT_DEPTH=ON -DENABLE_ASSEMBLY=OFF -DENABLE_CLI=OFF
+    fmt         -DFMT_TEST=OFF
     wxwidgets   -DwxUSE_LIBJPEG=sys -DwxUSE_LIBPNG=sys -DwxUSE_LIBTIFF=sys -DwxUSE_LIBWEBP=sys -DwxUSE_REGEX=sys
 "
 
