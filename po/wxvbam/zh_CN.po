@@ -44,7 +44,7 @@ msgstr "默认设备"
 
 #: audio/internal/coreaudio.cpp:381
 msgid "Could not get CoreAudio device"
-msgstr ""
+msgstr "无法获取核心音频设备"
 
 #: cmdevents.cpp:63 wxvbam.cpp:634
 msgid "Could not create main window"
