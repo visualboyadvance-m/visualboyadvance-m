@@ -59,7 +59,7 @@ msgstr "Dispositivo padrão"
 
 #: audio/internal/coreaudio.cpp:381
 msgid "Could not get CoreAudio device"
-msgstr ""
+msgstr "Não pôde obter o dispositivo CoreAudio"
 
 #: cmdevents.cpp:63 wxvbam.cpp:634
 msgid "Could not create main window"
