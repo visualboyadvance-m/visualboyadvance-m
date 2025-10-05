@@ -29,7 +29,7 @@ msgstr "Типовий пристрій"
 
 #: audio/internal/coreaudio.cpp:381
 msgid "Could not get CoreAudio device"
-msgstr ""
+msgstr "Неможливо отримати пристрій Core Audio."
 
 #: cmdevents.cpp:63 wxvbam.cpp:634
 msgid "Could not create main window"
