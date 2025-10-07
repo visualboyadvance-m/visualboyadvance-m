@@ -434,7 +434,9 @@ void gbDrawSpriteTile(int tile, int x, int y, int t, int flags,
     int a = 0;
     int b = 0;
 
-    if (gbCgbMode && (flags & 0x08)) {
+    // In CGB mode with DMG compatibility (0xff6c & 1), ignore the VRAM bank flag
+    // because DMG games don't use VRAM banks and the flag bit may be set for other purposes
+    if (gbCgbMode && (flags & 0x08) && !(gbMemory[0xff6c] & 1)) {
         a = bank1[address++];
         b = bank1[address++];
     } else {
