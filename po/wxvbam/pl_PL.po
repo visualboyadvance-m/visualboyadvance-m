@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-18 02:00+0000\n"
+"POT-Creation-Date: 2025-10-04 04:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Damian Drakon <dragon1590@gmail.com>, 2019-2020,2022-2023\n"
 "Language-Team: Polish (Poland) (http://app.transifex.com/bgk/vba-m/language/pl_PL/)\n"
@@ -18,13 +18,17 @@ msgstr ""
 "Language: pl_PL\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
-#: audio/internal/coreaudio.cpp:184 audio/internal/coreaudio.cpp:541
+#: audio/internal/coreaudio.cpp:375 audio/internal/coreaudio.cpp:581
 #: audio/internal/sdl.cpp:179 audio/internal/sdl.cpp:197
 #: audio/internal/sdl.cpp:328 audio/internal/sdl.cpp:339
 #: audio/internal/sdl.cpp:359 audio/internal/faudio.cpp:490
 #: audio/internal/xaudio2.cpp:604
 msgid "Default device"
 msgstr "Urządzenie domyślne"
+
+#: audio/internal/coreaudio.cpp:381
+msgid "Could not get CoreAudio device"
+msgstr ""
 
 #: cmdevents.cpp:63 wxvbam.cpp:634
 msgid "Could not create main window"
@@ -952,7 +956,7 @@ msgstr "Błąd podczas nagrywania dźwięku (%s); przerywanie"
 msgid "Error in video recording (%s); aborting"
 msgstr "Błąd podczas nagrywania wideo (%s); przerywanie"
 
-#: panel.cpp:3515
+#: panel.cpp:3525
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Głośność: %d %%"

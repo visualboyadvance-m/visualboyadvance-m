@@ -143,7 +143,7 @@ int wxCheckedListCtrl::GetItemImageFromAdditionalState(int addstate)
 wxColour wxCheckedListCtrl::GetBgColourFromAdditionalState(int additionalstate)
 {
     if ((additionalstate & wxLIST_STATE_ENABLED) && this->IsEnabled())
-        return *wxWHITE;
+        return wxNullColour;
 
 #ifdef __WXMSW__
     return wxColour(212, 208, 200);

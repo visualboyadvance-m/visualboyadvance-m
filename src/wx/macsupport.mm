@@ -3,6 +3,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include <wx/rawbmp.h>
+#include <wx/log.h>
 
 #include "wx/drawing.h"
 #include "wx/config/option-id.h"
@@ -92,7 +93,7 @@ void MetalDrawingPanel::CreateMetalView()
     metalView.layer.needsDisplayOnBoundsChange = YES;
     ((CAMetalLayer *)metalView.layer).device = metalView.device;
 
-    _device = metalView.device;
+    _device = [metalView.device retain];
     
     const AAPLVertex quadVertices[] =
     {
@@ -131,7 +132,11 @@ void MetalDrawingPanel::CreateMetalView()
     NSError *error = NULL;
     _pipelineState = [_device newRenderPipelineStateWithDescriptor:pipelineStateDescriptor
                                                              error:&error];
-    
+    if (!_pipelineState) {
+        wxLogError(_("Failed to create Metal pipeline state: %s"), [[error localizedDescription] UTF8String]);
+        return;
+    }
+
     _commandQueue = [_device newCommandQueue];
 
     if (OPTION(kDispStretch) == false) {
@@ -186,7 +191,7 @@ id<MTLTexture> MetalDrawingPanel::loadTextureUsingData(void *data)
     // Indicate that each pixel has a blue, green, red, and alpha channel, where each channel is
     // an 8-bit unsigned normalized value (i.e. 0 maps to 0.0 and 255 maps to 1.0)
     textureDescriptor.pixelFormat = metalView.colorPixelFormat;
-    textureDescriptor.usage = MTLTextureUsageRenderTarget;
+    textureDescriptor.usage = MTLTextureUsageShaderRead;
 
     // Set the pixel dimensions of the texture
     textureDescriptor.width = width * scale;
@@ -196,8 +201,7 @@ id<MTLTexture> MetalDrawingPanel::loadTextureUsingData(void *data)
     id<MTLTexture> texture = [_device newTextureWithDescriptor:textureDescriptor];
 
     // Calculate the number of bytes per row in the image.
-    NSUInteger bytesPerRow = 0;
-    bytesPerRow = std::ceil((width * scale * 4) + 4);
+    NSUInteger bytesPerRow = std::ceil(width * scale * 4) + 4;
 
     MTLRegion region = {
         { 0, 0, 0 },                   // MTLOrigin
@@ -305,6 +309,10 @@ void MetalDrawingPanel::DrawArea()
             src_pos += 4;
         }
 
+        if (_texture != nil) {
+            [_texture release];
+            _texture = nil;
+        }
         _texture = loadTextureUsingData(dst);
 
         if (dst != NULL) {
@@ -339,6 +347,10 @@ void MetalDrawingPanel::DrawArea()
             src_pos += 2;
         }
 
+        if (_texture != nil) {
+            [_texture release];
+            _texture = nil;
+        }
         _texture = loadTextureUsingData(dst);
 
         if (dst != NULL) {
@@ -364,12 +376,20 @@ void MetalDrawingPanel::DrawArea()
             pos += 4;
         }
 
+        if (_texture != nil) {
+            [_texture release];
+            _texture = nil;
+        }
         _texture = loadTextureUsingData(dst);
 
         if (dst != NULL) {
             free(dst);
         }
     } else {
+        if (_texture != nil) {
+            [_texture release];
+            _texture = nil;
+        }
         _texture = loadTextureUsingData(todraw + srcPitch);
     }
 
@@ -382,6 +402,9 @@ void MetalDrawingPanel::DrawArea()
 
     if(renderPassDescriptor != nil)
     {
+        // Cache the drawable to avoid potential race condition
+        id<CAMetalDrawable> currentDrawable = metalView.currentDrawable;
+
         renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
         renderEncoder.label = @"MyRenderEncoder";
 
@@ -410,8 +433,10 @@ void MetalDrawingPanel::DrawArea()
 
         [renderEncoder endEncoding];
 
-        // Schedule a present once the framebuffer is complete using the next drawable
-        [commandBuffer presentDrawable:metalView.currentDrawable];
+        // Schedule a present once the framebuffer is complete using the cached drawable
+        if (currentDrawable) {
+            [commandBuffer presentDrawable:currentDrawable];
+        }
     }
 
     // Finalize rendering here & push the command buffer to the GPU

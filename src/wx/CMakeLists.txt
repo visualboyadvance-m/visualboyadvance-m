@@ -177,6 +177,7 @@ if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
 endif()
 
 if(APPLE)
+    find_library(MAC_SYSTEM System)
     find_library(COREAUDIO CoreAudio)
     find_library(COREFOUNDATION CoreFoundation)
     find_library(AUDIOTOOLBOX AudioToolbox)
@@ -359,6 +360,7 @@ function(configure_wx_target target)
 
     # Metal
     if(APPLE)
+        _add_link_libraries(${MAC_SYSTEM})
         _add_link_libraries(${COREFOUNDATION})
         _add_link_libraries(${COREAUDIO})
         _add_link_libraries(${AUDIOTOOLBOX})
@@ -1031,7 +1033,9 @@ if(APPLE)
     # bundle dylibs and relink them for releasing .app
     # also install translations into the .app
     # but only in Release mode
-    if(CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
+    option(BUNDLE_DYLIBS "Bundle dylibs into .app" OFF)
+
+    if(GUNDLE_DYLIBS AND CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
         add_custom_command(
             TARGET visualboyadvance-m POST_BUILD
             COMMAND bash ${CMAKE_SOURCE_DIR}/tools/macOS/third_party_libs_tool ./visualboyadvance-m.app

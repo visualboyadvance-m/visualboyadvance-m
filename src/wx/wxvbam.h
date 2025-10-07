@@ -360,6 +360,8 @@ private:
     void OnMoveStart(wxMoveEvent& event);
     void OnMoveEnd(wxMoveEvent& event);
     void OnSize(wxSizeEvent& event);
+    void OnIconize(wxIconizeEvent& event);
+
     // Load a named wxDialog from the XRC file
     wxDialog* LoadXRCDialog(const char* name);
 

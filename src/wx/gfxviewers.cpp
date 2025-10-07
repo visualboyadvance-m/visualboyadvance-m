@@ -4,6 +4,7 @@
 
 #include <wx/colordlg.h>
 #include <wx/ffile.h>
+#include <wx/slider.h>
 
 #include "core/gb/gbGlobals.h"
 #include "core/gba/gbaGlobals.h"
@@ -16,6 +17,15 @@
 #endif
 
 namespace {
+
+// Helper function to update slider tooltip with its current value
+static void UpdateSliderTooltip(wxSlider* slider, wxCommandEvent& event) {
+    if (slider) {
+        slider->SetToolTip(wxString::Format("%d", slider->GetValue()));
+    }
+    event.Skip();
+}
+
 void utilReadScreenPixels(uint8_t* dest, int w, int h) {
     uint8_t* b = dest;
     int sizeX = w;
@@ -1549,6 +1559,11 @@ public:
         getradio(, "CharBase3", charbase_, 0xc000);
         getradio(, "CharBase4", charbase_, 0x10000);
         getslider(, "Palette", palette_);
+        wxSlider* palette_slider = XRCCTRL(*this, "Palette", wxSlider);
+        if (palette_slider) {
+            palette_slider->SetToolTip(wxString::Format("%d", palette_slider->GetValue()));
+            palette_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, palette_slider, std::placeholders::_1));
+        }
         getlab(tileno_, "Tile", "1WWW");
         getlab(addr_, "Address", "06WWWWWW");
         selx_ = sely_ = -1;
@@ -1741,6 +1756,16 @@ public:
         getradio(, "CharBase0", charbase, 0);
         getradio(, "CharBase1", charbase, 0x800);
         getslider(, "Palette", palette);
+        wxSlider* palette_slider = XRCCTRL(*this, "Palette", wxSlider);
+        if (palette_slider) {
+            palette = palette_slider->GetValue(); // Sync palette to slider value
+            palette_slider->SetToolTip(wxString::Format("%d", palette_slider->GetValue()));
+            palette_slider->Bind(wxEVT_SLIDER, [this, palette_slider](wxCommandEvent& event) {
+                palette = palette_slider->GetValue(); // Update palette on slider change
+                UpdateSliderTooltip(palette_slider, event);
+                this->Update(); // Refresh display
+                });
+        }
         getlab(tileno, "Tile", "2WW");
         getlab(addr, "Address", "WWWW");
         selx = sely = -1;
@@ -1804,13 +1829,22 @@ public:
                 uint8_t c = (tile_a & mask) ? 1 : 0;
                 c += ((tile_b & mask) ? 2 : 0);
 
+                uint16_t color = 0;
                 if (gbCgbMode) {
-                    c = c + palette * 4;
-                } else {
-                    c = gbBgp[c];
+                    int pal_idx = c + palette * 4;
+                    if (pal_idx >= 0 && pal_idx < 64) // CGB palettes: 8 palettes * 4 colors
+                        color = gbPalette[pal_idx];
+                    else
+                        color = 0; // fallback to black
+                }
+                else {
+                    int pal_idx = gbBgp[c];
+                    if (pal_idx >= 0 && pal_idx < 4) // DMG palettes: 4 colors
+                        color = gbPalette[pal_idx];
+                    else
+                        color = 0; // fallback to black
                 }
 
-                uint16_t color = gbPalette[c];
                 *bmp++ = (color & 0x1f) << 3;
                 *bmp++ = ((color >> 5) & 0x1f) << 3;
                 *bmp++ = ((color >> 10) & 0x1f) << 3;

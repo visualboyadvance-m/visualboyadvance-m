@@ -31,7 +31,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-18 02:00+0000\n"
+"POT-Creation-Date: 2025-10-04 04:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Eequiis Vásquez, 2025\n"
 "Language-Team: Spanish (http://app.transifex.com/bgk/vba-m/language/es/)\n"
@@ -41,13 +41,17 @@ msgstr ""
 "Language: es\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
-#: audio/internal/coreaudio.cpp:184 audio/internal/coreaudio.cpp:541
+#: audio/internal/coreaudio.cpp:375 audio/internal/coreaudio.cpp:581
 #: audio/internal/sdl.cpp:179 audio/internal/sdl.cpp:197
 #: audio/internal/sdl.cpp:328 audio/internal/sdl.cpp:339
 #: audio/internal/sdl.cpp:359 audio/internal/faudio.cpp:490
 #: audio/internal/xaudio2.cpp:604
 msgid "Default device"
 msgstr "Dispositivo por defecto"
+
+#: audio/internal/coreaudio.cpp:381
+msgid "Could not get CoreAudio device"
+msgstr ""
 
 #: cmdevents.cpp:63 wxvbam.cpp:634
 msgid "Could not create main window"
@@ -975,7 +979,7 @@ msgstr "Error en la grabación de audio (%s); abortando"
 msgid "Error in video recording (%s); aborting"
 msgstr "Error en la grabación de video (%s); abortando"
 
-#: panel.cpp:3515
+#: panel.cpp:3525
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Volumen: %d %%"
