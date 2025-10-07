@@ -1758,8 +1758,13 @@ public:
         getslider(, "Palette", palette);
         wxSlider* palette_slider = XRCCTRL(*this, "Palette", wxSlider);
         if (palette_slider) {
+            palette = palette_slider->GetValue(); // Sync palette to slider value
             palette_slider->SetToolTip(wxString::Format("%d", palette_slider->GetValue()));
-            palette_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, palette_slider, std::placeholders::_1));
+            palette_slider->Bind(wxEVT_SLIDER, [this, palette_slider](wxCommandEvent& event) {
+                palette = palette_slider->GetValue(); // Update palette on slider change
+                UpdateSliderTooltip(palette_slider, event);
+                this->Update(); // Refresh display
+                });
         }
         getlab(tileno, "Tile", "2WW");
         getlab(addr, "Address", "WWWW");
@@ -1824,13 +1829,22 @@ public:
                 uint8_t c = (tile_a & mask) ? 1 : 0;
                 c += ((tile_b & mask) ? 2 : 0);
 
+                uint16_t color = 0;
                 if (gbCgbMode) {
-                    c = c + palette * 4;
-                } else {
-                    c = gbBgp[c];
+                    int pal_idx = c + palette * 4;
+                    if (pal_idx >= 0 && pal_idx < 64) // CGB palettes: 8 palettes * 4 colors
+                        color = gbPalette[pal_idx];
+                    else
+                        color = 0; // fallback to black
+                }
+                else {
+                    int pal_idx = gbBgp[c];
+                    if (pal_idx >= 0 && pal_idx < 4) // DMG palettes: 4 colors
+                        color = gbPalette[pal_idx];
+                    else
+                        color = 0; // fallback to black
                 }
 
-                uint16_t color = gbPalette[c];
                 *bmp++ = (color & 0x1f) << 3;
                 *bmp++ = ((color >> 5) & 0x1f) << 3;
                 *bmp++ = ((color >> 10) & 0x1f) << 3;
