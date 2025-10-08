@@ -2836,10 +2836,23 @@ BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
 void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
 {
     wxImage* im;
-            
-    if (out_24) {
+
+    if (out_24 && OPTION(kDispFilter) == config::Filter::kNone) {
         // never scaled, no borders, no transformations needed
         im = new wxImage(width, height, todraw, true);
+    } else if (out_24) {
+        // 24-bit with filter: scaled by filters, no color transform needed
+        int scaled_width = (int)std::ceil(width * scale);
+        int scaled_height = (int)std::ceil(height * scale);
+        im = new wxImage(scaled_width, scaled_height, false);
+        uint8_t* src = todraw + scaled_width * 3;
+        uint8_t* dst = im->GetData();
+
+        for (int y = 0; y < scaled_height; y++) {
+            std::memcpy(dst, src, scaled_width * 3);
+            dst += scaled_width * 3;
+            src += scaled_width * 3;
+        }
     } else if (out_8) {
         // scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
