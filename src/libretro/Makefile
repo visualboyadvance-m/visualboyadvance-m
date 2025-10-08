@@ -172,6 +172,7 @@ endif
 	fpic += $(MINVERSION) -stdlib=libc++
 	SHARED := -dynamiclib
 	TILED_RENDERING=1
+	CXXFLAGS += -std=gnu++14
 
 # iOS
 else ifneq (,$(findstring ios,$(platform)))
@@ -199,6 +200,7 @@ else ifneq (,$(findstring ios,$(platform)))
         CXXFLAGS += $(MINVERSION)
         LDFLAGS += $(MINVERSION)
 	TILED_RENDERING=1
+	CXXFLAGS += -std=gnu++14
 
 else ifeq ($(platform), tvos-arm64)
    TARGET := $(TARGET_NAME)_libretro_tvos.dylib
@@ -214,6 +216,7 @@ endif
    CFLAGS += $(MINVERSION)
    CXXFLAGS += $(MINVERSION)
    LDFLAGS += $(MINVERSION)
+   CXXFLAGS += -std=gnu++14
 
 # Theos iOS
 else ifeq ($(platform), theos_ios)
@@ -349,7 +352,7 @@ else ifeq ($(platform), libnx)
 		      -fPIE -I$(LIBNX)/include/ -ffunction-sections -fdata-sections -ftls-model=local-exec -Wl,--allow-multiple-definition -specs=$(LIBNX)/switch.specs
 	CFLAGS += $(INCDIRS)
 	CFLAGS += $(INCLUDE) -D__SWITCH__ -DHAVE_LIBNX
-	CXXFLAGS := $(ASFLAGS) $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
+	CXXFLAGS := $(ASFLAGS) $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++17
 	CFLAGS += -std=gnu11
 	STATIC_LINKING=1
 
