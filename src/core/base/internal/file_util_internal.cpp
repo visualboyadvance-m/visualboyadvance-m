@@ -1,7 +1,7 @@
 #include "core/base/internal/file_util_internal.h"
 
 #if defined(_WIN32)
-#include <Windows.h>
+#include <windows.h>
 #endif  // defined(_WIN32)
 
 namespace core {
