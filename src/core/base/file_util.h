@@ -3,9 +3,14 @@
 
 #include <cstdio>
 #include <cstdint>
+#include <cstring>
 
 #if defined(__LIBRETRO__)
 #include <cstdint>
+#ifdef WIIU
+extern int strcasecmp(const char *a, const char *b);
+extern char *strdup(const char *);
+#endif
 #else  // !defined(__LIBRETRO__)
 #include <zlib.h>
 #endif  // defined(__LIBRETRO__)
