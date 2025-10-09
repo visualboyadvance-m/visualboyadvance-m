@@ -39,7 +39,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-04 04:00+0000\n"
+"POT-Creation-Date: 2025-10-09 00:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Mateus, 2020\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/bgk/vba-m/language/pt_BR/)\n"
@@ -234,12 +234,12 @@ msgid "Error saving snapshot file %s"
 msgstr "Erro ao salvar o arquivo do snapshot %s"
 
 #: cmdevents.cpp:783 cmdevents.cpp:864 cmdevents.cpp:937 cmdevents.cpp:1009
-#: gfxviewers.cpp:1692 gfxviewers.cpp:1840 viewers.cpp:588 viewers.cpp:808
+#: gfxviewers.cpp:1716 gfxviewers.cpp:1884 viewers.cpp:588 viewers.cpp:808
 #: viewsupt.cpp:1199
 msgid "Select output file"
 msgstr "Selecionar o arquivo de saída"
 
-#: cmdevents.cpp:784 gfxviewers.cpp:1693 gfxviewers.cpp:1841 viewsupt.cpp:1200
+#: cmdevents.cpp:784 gfxviewers.cpp:1717 gfxviewers.cpp:1885 viewsupt.cpp:1200
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "Imagens PNG|*.png|Imagens BMP|*.bmp"
 
@@ -378,37 +378,37 @@ msgstr "Isto removerá o \"%s\" do \"%s\". Você tem certeza?"
 msgid "Browse"
 msgstr "Explorar"
 
-#: dialogs/display-config.cpp:100
+#: dialogs/display-config.cpp:101
 msgid "Invalid value for Default magnification."
 msgstr "Valor inválido pra ampliação padrão."
 
-#: dialogs/display-config.cpp:420
+#: dialogs/display-config.cpp:437
 msgid "Invalid color correction profile"
 msgstr "Perfil inválido de correção das cores"
 
-#: dialogs/display-config.cpp:475 xrc/DisplayConfig.xrc:102
+#: dialogs/display-config.cpp:498 xrc/DisplayConfig.xrc:102
 #: xrc/DisplayConfig.xrc:152 xrc/DisplayConfig.xrc:432
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:227 xrc/SoundConfig.xrc:317
 msgid "None"
 msgstr "Nenhum"
 
-#: dialogs/display-config.cpp:505
+#: dialogs/display-config.cpp:528
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Nenhum plugin rpi usável foi encontrado em %s"
 
-#: dialogs/display-config.cpp:544 dialogs/display-config.cpp:623
+#: dialogs/display-config.cpp:567 dialogs/display-config.cpp:646
 #: xrc/DisplayConfig.xrc:124
 msgid "Plugin"
 msgstr "Plugin"
 
-#: dialogs/display-config.cpp:551
+#: dialogs/display-config.cpp:574
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "Usando o filtro dos pixels: %s"
 
-#: dialogs/display-config.cpp:558
+#: dialogs/display-config.cpp:581
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr "Usando a mistura dos interframes: %s"
@@ -565,7 +565,7 @@ msgstr "%02X (Real: %02X)"
 msgid "%04X (Actual: %04X)"
 msgstr "%04X (Real: %04X)"
 
-#: dialogs/sound-config.cpp:271
+#: dialogs/sound-config.cpp:303
 #, c-format
 msgid "%d frame = %.2f ms"
 msgstr "%d frame = %.2f ms"
@@ -598,11 +598,11 @@ msgstr "Licença"
 msgid "OK"
 msgstr "Ok"
 
-#: gfxviewers.cpp:1229
+#: gfxviewers.cpp:1247
 msgid "Select output file and type"
 msgstr "Selecionar o arquivo e o tipo de saída"
 
-#: gfxviewers.cpp:1230
+#: gfxviewers.cpp:1248
 msgid ""
 "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
 "Table (*.act)|*.act"
@@ -786,7 +786,7 @@ msgstr "Problema ao carregar o arquivo"
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Incapaz de carregar a ROM do Game Boy %s"
 
-#: panel.cpp:326 panel.cpp:437 panel.cpp:1193
+#: panel.cpp:326 panel.cpp:437 panel.cpp:1178
 msgid "Could not initialize the sound driver!"
 msgstr "Não pôde inicializar o driver de som!"
 
@@ -830,164 +830,160 @@ msgstr "State salvo %s"
 msgid "Error saving state %s"
 msgstr "Erro ao salvar o state %s"
 
-#: panel.cpp:1026
+#: panel.cpp:1011
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 msgstr "O modo de tela cheia %d x %d - %d @ %d não é suportado; procurando por outro"
 
-#: panel.cpp:1064
+#: panel.cpp:1049
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
 msgstr "O modo de tela cheia %d x %d - %d @ %d não é suportado"
 
-#: panel.cpp:1069
+#: panel.cpp:1054
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
 msgstr "Modo válido: %d x %d - %d @ %d"
 
-#: panel.cpp:1077
+#: panel.cpp:1062
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
 msgstr "Escolher o modo %d x %d - %d @ %d"
 
-#: panel.cpp:1081
+#: panel.cpp:1066
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr "Falhou em mudar o modo pra %d x %d - %d @ %d"
 
-#: panel.cpp:1168
+#: panel.cpp:1153
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr "Não é um cartucho de Game Boy Advance válido"
 
-#: panel.cpp:1357
+#: panel.cpp:1338
 msgid "No memory for rewinding"
 msgstr "Não há memória pra retroceder"
 
-#: panel.cpp:1367
+#: panel.cpp:1348
 msgid "Error writing rewind state"
 msgstr "Erro ao gravar o estado do retrocesso"
 
-#: panel.cpp:2360
+#: panel.cpp:2341
 msgid "Failed to set wayland display"
 msgstr "Falhou em definir a exibição do wayland"
 
-#: panel.cpp:2388
+#: panel.cpp:2369
 msgid "Failed to initialize SDL video subsystem"
 msgstr "Falhou em inicializar o sub-sistema de vídeo do SDL"
 
-#: panel.cpp:2399
+#: panel.cpp:2380
 msgid "Failed to initialize SDL video"
 msgstr "Falhou em inicializar o vídeo do SDL"
 
-#: panel.cpp:2408
+#: panel.cpp:2389
 msgid "Failed to set wayland surface"
 msgstr "Falhou em definir a superfície do wayland"
 
-#: panel.cpp:2422
-msgid "Failed to set DX9 window"
-msgstr "Falhou em definir a janela do DX9"
-
-#: panel.cpp:2430
+#: panel.cpp:2402
 msgid "Failed to set parent window"
 msgstr "Falhou em definir a janela pai"
 
-#: panel.cpp:2439
+#: panel.cpp:2411
 msgid "Failed to set OpenGL properties"
 msgstr "Falhou em definir as propriedades do OpenGL"
 
-#: panel.cpp:2446 panel.cpp:2480
+#: panel.cpp:2418 panel.cpp:2452
 msgid "Failed to create SDL window"
 msgstr "Falhou em criar a janela SDL"
 
-#: panel.cpp:2464 panel.cpp:2512
+#: panel.cpp:2436 panel.cpp:2484
 msgid "Failed to create SDL renderer"
 msgstr "Falhou em criar o renderizador SDL"
 
-#: panel.cpp:3067
+#: panel.cpp:3052
 msgid "Enabling EGL VSync."
 msgstr "Ativando o VSync do EGL."
 
-#: panel.cpp:3069
+#: panel.cpp:3054
 msgid "Disabling EGL VSync."
 msgstr "Desativando o VSync do EGL."
 
-#: panel.cpp:3076
+#: panel.cpp:3061
 msgid "Enabling GLX VSync."
 msgstr "Ativando o VSync do GLX."
 
-#: panel.cpp:3078
+#: panel.cpp:3063
 msgid "Disabling GLX VSync."
 msgstr "Desativando o VSync do GLX."
 
-#: panel.cpp:3096
+#: panel.cpp:3081
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Falhou em definir o glXSwapIntervalEXT"
 
-#: panel.cpp:3105
+#: panel.cpp:3090
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Falhou em definir o glXSwapIntervalSGI"
 
-#: panel.cpp:3114
+#: panel.cpp:3099
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Falhou em definir o glXSwapIntervalMESA"
 
-#: panel.cpp:3121
+#: panel.cpp:3106
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "Não há suporte pro 'wglGetExtensionsStringEXT'"
 
-#: panel.cpp:3124
+#: panel.cpp:3109
 msgid "No support for WGL_EXT_swap_control"
 msgstr "Não há suporte pro WGL_EXT_swap_control"
 
-#: panel.cpp:3133
+#: panel.cpp:3118
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Falhou em definir o wglSwapIntervalEXT"
 
-#: panel.cpp:3139
+#: panel.cpp:3124
 msgid "No VSYNC available on this platform"
 msgstr "Não há VSYNC disponível nesta plataforma"
 
-#: panel.cpp:3235
+#: panel.cpp:3220
 msgid "Memory allocation error"
 msgstr "Erro de alocação da memória"
 
-#: panel.cpp:3238
+#: panel.cpp:3223
 msgid "Error initializing codec"
 msgstr "Erro ao inicializar o codec"
 
-#: panel.cpp:3241
+#: panel.cpp:3226
 msgid "Error writing to output file"
 msgstr "Erro ao gravar no arquivo de saída"
 
-#: panel.cpp:3244
+#: panel.cpp:3229
 msgid "Can't guess output format from file name"
 msgstr "Não pôde adivinhar o formato de saída a partir do nome do arquivo"
 
-#: panel.cpp:3249
+#: panel.cpp:3234
 msgid "Programming error; aborting!"
 msgstr "Erro de programação; abortando!"
 
-#: panel.cpp:3261 panel.cpp:3290
+#: panel.cpp:3246 panel.cpp:3275
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Incapaz de começar a gravar em %s (%s)"
 
-#: panel.cpp:3318
+#: panel.cpp:3303
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "Erro na gravação do áudio/vídeo (%s); abortando"
 
-#: panel.cpp:3324
+#: panel.cpp:3309
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Erro na gravação do áudio (%s); abortando"
 
-#: panel.cpp:3334
+#: panel.cpp:3319
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Erro na gravação do vídeo (%s); abortando"
 
-#: panel.cpp:3525
+#: panel.cpp:3510
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Volume: %d %%"
