@@ -59,7 +59,7 @@ int SWITicks = 0;
 int IRQTicks = 0;
 
 uint32_t mastercode = 0;
-int layerEnableDelay = 0;
+int bgEnableState[4] = { 4, 4, 4, 4 }; // 0=disabled, 1-3=delay states, 4=fully enabled
 bool busPrefetch = false;
 bool busPrefetchEnable = false;
 uint32_t busPrefetchCount = 0;
@@ -2584,14 +2584,29 @@ void CPUCompareVCOUNT()
             IF |= 4;
             UPDATE_REG(0x202, IF);
         }
-    } else {
+    }
+    else {
         DISPSTAT &= 0xFFFB;
         UPDATE_REG(0x4, DISPSTAT);
     }
-    if (layerEnableDelay > 0) {
-        layerEnableDelay--;
-        if (layerEnableDelay == 1)
-            coreOptions.layerEnable = coreOptions.layerSettings & DISPCNT;
+
+    // Update BG enable delay states (3-scanline delay: 1>2>3>4)
+    for (int i = 0; i < 4; i++) {
+        if (bgEnableState[i] > 0 && bgEnableState[i] < 4) {
+            bgEnableState[i]++;
+
+            // Update layerEnable when a BG becomes fully enabled
+            if (bgEnableState[i] == 4) {
+                coreOptions.layerEnable = coreOptions.layerSettings & DISPCNT;
+                // Re-mask any backgrounds still in delay
+                for (int j = 0; j < 4; j++) {
+                    if (bgEnableState[j] != 4) {
+                        coreOptions.layerEnable &= ~(0x0100 << j);
+                    }
+                }
+                CPUUpdateRender();
+            }
+        }
     }
 }
 
@@ -2927,40 +2942,107 @@ void CPUCheckDMA(int reason, int dmamask)
 void CPUUpdateRegister(uint32_t address, uint16_t value)
 {
     switch (address) {
-    case 0x00: { // we need to place the following code in { } because we declare & initialize variables in a case statement
+    case 0x00: {
         if ((value & 7) > 5) {
             // display modes above 0-5 are prohibited
             DISPCNT = (value & 7);
         }
         bool change = (0 != ((DISPCNT ^ value) & 0x80));
         bool changeBG = (0 != ((DISPCNT ^ value) & 0x0F00));
-        uint16_t changeBGon = ((~DISPCNT) & value) & 0x0F00; // these layers are being activated
 
+        uint16_t oldDISPCNT = DISPCNT;
         DISPCNT = (value & 0xFFF7); // bit 3 can only be accessed by the BIOS to enable GBC mode
         UPDATE_REG(0x00, DISPCNT);
 
-        if (changeBGon) {
-            layerEnableDelay = 4;
-            coreOptions.layerEnable = coreOptions.layerSettings & value & (~changeBGon);
-        } else {
-            coreOptions.layerEnable = coreOptions.layerSettings & value;
-            // CPUUpdateTicks();
+        // Handle each background enable/disable individually
+        int videoMode = DISPCNT & 7;
+
+        // BG0
+        bool bg0WasEnabled = (oldDISPCNT & 0x0100) != 0;
+        bool bg0IsEnabled = (DISPCNT & 0x0100) != 0;
+        if (bg0WasEnabled != bg0IsEnabled) {
+            if (!bg0IsEnabled) {
+                bgEnableState[0] = 0; // Immediately disable
+            }
+            else {
+                // Enable with delay logic
+                if (VCOUNT == 0 || videoMode > 2) {
+                    bgEnableState[0] = 4; // Immediately enable at frame start or bitmap modes
+                }
+                else {
+                    bgEnableState[0] = 1; // Start 3-scanline delay
+                }
+            }
         }
+
+        // BG1
+        bool bg1WasEnabled = (oldDISPCNT & 0x0200) != 0;
+        bool bg1IsEnabled = (DISPCNT & 0x0200) != 0;
+        if (bg1WasEnabled != bg1IsEnabled) {
+            if (!bg1IsEnabled) {
+                bgEnableState[1] = 0;
+            }
+            else {
+                if (VCOUNT == 0 || videoMode > 2) {
+                    bgEnableState[1] = 4;
+                }
+                else {
+                    bgEnableState[1] = 1;
+                }
+            }
+        }
+
+        // BG2
+        bool bg2WasEnabled = (oldDISPCNT & 0x0400) != 0;
+        bool bg2IsEnabled = (DISPCNT & 0x0400) != 0;
+        if (bg2WasEnabled != bg2IsEnabled) {
+            if (!bg2IsEnabled) {
+                bgEnableState[2] = 0;
+            }
+            else {
+                if (VCOUNT == 0 || videoMode > 2) {
+                    bgEnableState[2] = 4;
+                }
+                else {
+                    bgEnableState[2] = 1;
+                }
+            }
+        }
+
+        // BG3
+        bool bg3WasEnabled = (oldDISPCNT & 0x0800) != 0;
+        bool bg3IsEnabled = (DISPCNT & 0x0800) != 0;
+        if (bg3WasEnabled != bg3IsEnabled) {
+            if (!bg3IsEnabled) {
+                bgEnableState[3] = 0;
+            }
+            else {
+                if (VCOUNT == 0 || videoMode > 2) {
+                    bgEnableState[3] = 4;
+                }
+                else {
+                    bgEnableState[3] = 1;
+                }
+            }
+        }
+
+        // Update layerEnable based on bgEnableState
+        coreOptions.layerEnable = coreOptions.layerSettings & DISPCNT;
+        // Mask out backgrounds that aren't fully enabled yet
+        if (bgEnableState[0] != 4) coreOptions.layerEnable &= ~0x0100;
+        if (bgEnableState[1] != 4) coreOptions.layerEnable &= ~0x0200;
+        if (bgEnableState[2] != 4) coreOptions.layerEnable &= ~0x0400;
+        if (bgEnableState[3] != 4) coreOptions.layerEnable &= ~0x0800;
 
         windowOn = (coreOptions.layerEnable & 0x6000) ? true : false;
         if (change && !((value & 0x80))) {
             if (!(DISPSTAT & 1)) {
-                //lcdTicks = 1008;
-                //      VCOUNT = 0;
-                //      UPDATE_REG(0x06, VCOUNT);
                 DISPSTAT &= 0xFFFC;
                 UPDATE_REG(0x04, DISPSTAT);
                 CPUCompareVCOUNT();
             }
-            //        (*renderLine)();
         }
         CPUUpdateRender();
-        // we only care about changes in BG0-BG3
         if (changeBG) {
             CPUUpdateRenderBuffers(false);
         }
@@ -3793,6 +3875,11 @@ void CPUReset()
     IF = 0x0000;
     IME = 0x0000;
 
+    bgEnableState[0] = 4;
+    bgEnableState[1] = 4;
+    bgEnableState[2] = 4;
+    bgEnableState[3] = 4;
+
     armMode = 0x1F;
 
     if (coreOptions.cpuIsMultiBoot) {
@@ -4177,6 +4264,13 @@ void CPULoop(int ticks)
                             capturePrevious = capture;
 
                             DISPSTAT |= 1;
+
+                            for (int i = 0; i < 4; i++) {
+                                if (bgEnableState[i] > 0 && bgEnableState[i] < 4) {
+                                    bgEnableState[i] = 4;
+                                }
+                            }
+
                             DISPSTAT &= 0xFFFD;
                             UPDATE_REG(0x04, DISPSTAT);
                             if (DISPSTAT & 0x0008) {
