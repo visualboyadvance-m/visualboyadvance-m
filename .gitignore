@@ -1,22 +1,15 @@
-src/wx/builtin-over.h
-src/wx/builtin-xrc.h
-src/wx/cmd-evtable.h
-src/wx/cmdhandlers.h
-src/wx/cmdtab.cpp
-src/wx/wxvbam.xrs
-build/*
-build32/*
-vsbuild/*
-cmake-build*
-dependencies/*
-vcpkg/*
+/*build*/*
 .vs/*
 .idea
 *.o
 *.so
 *.dll
 *.exe
-.vscode
+.vscode/
+
+# clangd files
+compile_commands.json
+.cache/
 
 # vim swap files
 *.sw?
@@ -24,3 +17,6 @@ vcpkg/*
 
 # mac finder crap
 *.DS_Store
+
+# online updates header
+src/wx/winsparkle-path.h

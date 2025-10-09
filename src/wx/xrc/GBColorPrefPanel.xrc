@@ -4,9 +4,9 @@
     <object class="wxBoxSizer">
       <orient>wxVERTICAL</orient>
       <object class="sizeritem">
-        <object class="wxChoice" name="ColorSet">
+        <object class="wxChoice" name="DefaultPalette">
           <content>
-            <item/>
+            <item>Custom</item>
             <item>Standard</item>
             <item>Blue Sea</item>
             <item>Dark Night</item>
@@ -14,8 +14,8 @@
             <item>Hot Desert</item>
             <item>Pink Dreams</item>
             <item>Weird Colors</item>
-            <item>Real GB Colors</item>
-            <item>Real 'GB on GBASP' Colors</item>
+            <item>Real Game Boy Colors</item>
+            <item>Real 'Game Boy on Game Boy Advance Special' Colors</item>
           </content>
         </object>
         <flag>wxALL|wxEXPAND</flag>
@@ -80,7 +80,7 @@
       <object class="sizeritem">
         <object class="wxBoxSizer">
           <object class="sizeritem">
-            <object class="wxCheckBox" name="UsePalette" subclass="wxFarRadio">
+            <object class="GroupCheckBox" name="UsePalette">
               <label>Use this palette</label>
             </object>
             <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>

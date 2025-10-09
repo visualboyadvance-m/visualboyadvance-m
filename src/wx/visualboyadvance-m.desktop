@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=visualboyadvance-m
+GenericName=Game Boy Advance Emulator
+Comment=Nintendo Game Boy Advance Emulator
+Exec=visualboyadvance-m %f
+Icon=visualboyadvance-m
+Categories=Game;Emulator;
+Keywords=emulator;Nintendo;gameboy;Game Boy;Game Boy Color;Game Boy Advance;
+MimeType=application/x-gameboy-rom;application/x-gameboy-advance-rom;application/x-dmg-rom;application/x-agb-rom;application/x-gb-rom;application/x-gba-rom;

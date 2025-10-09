@@ -9,7 +9,7 @@ function(changelog_version version revision version_release)
         return()
     endif()
 
-    string(REGEX MATCH "\n## +\\[([0-9.]+)(-([^] ]+))?\\] +.* +[0-9][0-9]?/" match_out "${changelog_file}")
+    string(REGEX MATCH "\n## +\\[([0-9.]+)(-([^] ]+))?\\] *.* *[0-9][0-9]?/" match_out "${changelog_file}")
 
     set(changelog_version "${CMAKE_MATCH_1}")
 

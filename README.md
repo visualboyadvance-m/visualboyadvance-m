@@ -3,7 +3,12 @@
 
 
 - [Visual Boy Advance - M](#visual-boy-advance---m)
+  - [System Requirements](#system-requirements)
   - [Building](#building)
+  - [Building a Libretro core](#building-a-libretro-core)
+  - [Visual Studio Support](#visual-studio-support)
+  - [Visual Studio Code Support](#visual-studio-code-support)
+  - [Dependencies](#dependencies)
   - [Cross compiling for 32 bit on a 64 bit host](#cross-compiling-for-32-bit-on-a-64-bit-host)
   - [Cross Compiling for Win32](#cross-compiling-for-win32)
   - [CMake Options](#cmake-options)
@@ -14,89 +19,137 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-[![Join the chat at https://gitter.im/visualboyadvance-m/Lobby](https://badges.gitter.im/visualboyadvance-m/Lobby.svg)](https://gitter.im/visualboyadvance-m/Lobby)
-[![Build Status](https://travis-ci.org/visualboyadvance-m/visualboyadvance-m.svg?branch=master)](https://travis-ci.org/visualboyadvance-m/visualboyadvance-m)
-[![Coverity Scan Build Status](https://scan.coverity.com/projects/16096/badge.svg)](https://scan.coverity.com/projects/visualboyadvance-m-visualboyadvance-m)
+Our bridged Discord server is [Here](https://discord.gg/EpfxEuGMKH).
+
+We are also on *`#vba-m`* on [Libera IRC](https://libera.chat/) which has a [Web
+Chat](https://web.libera.chat/).
+
+[![Get it from flathub](https://dl.flathub.org/assets/badges/flathub-badge-en.svg)](https://flathub.org/apps/com.vba_m.visualboyadvance-m)
+[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/visualboyadvance-m)
+
+***Want to know where you can install visualboyadvance-m in your linux distribution?***
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/visualboyadvance-m.svg)](https://repology.org/project/visualboyadvance-m/versions)
 
 # Visual Boy Advance - M
 
-Game Boy Advance Emulator
+Game Boy and Game Boy Advance Emulator
 
-Homepage and Forum: http://vba-m.com
+The forums are [here](https://board.visualboyadvance-m.org/).
 
 Windows and Mac builds are in the [releases tab](https://github.com/visualboyadvance-m/visualboyadvance-m/releases).
 
-Daily Ubuntu packages here: https://code.launchpad.net/~sergio-br2/+archive/ubuntu/vbam-trunk
+Nightly builds for Windows and macOS are at [https://nightly.visualboyadvance-m.org/](https://nightly.visualboyadvance-m.org/).
 
-Your distribution may have packages available as well, search for "vbam" or "visualboyadvance-m".
+**PLEASE TEST THE NIGHTLY OR MASTER WITH A FACTORY RESET BEFORE REPORTING
+ISSUES**
+
+Your distribution may have packages available as well, search for
+`visualboyadvance-m` or `vbam`.
 
 It is also generally very easy to build from source, see below.
 
 If you are using the windows binary release and you need localization, unzip
 the `translations.zip` to the same directory as the executable.
 
-## Note for Windows Users
+If you are having issues, try resetting the config file first, go to `Help ->
+Factory Reset`.
 
-If you are having issues, try resetting your config file first.
+## System Requirements
 
-- open file explorer
-- in the location bar, type `%USERPROFILE%\AppData\Local` and press enter
-- delete the directory called `visualboyadvance-m`
+Windows XP, Vista, 7, 8.1 or 10/11, Linux distros or macOS.
+
+2Ghz x86 (or x86-64) Intel Core 2 or AMD Athlon processor with SSE, Snapdragon 835 
+or newer CPU compatible with Arm for Windows.
+
+- Just a guideline, lower clock speeds and Celeron processors may be able to run at full
+speed on lower settings, and Linux based ARM Operating systems have wider CPU support.
+
+DirectX June 2010 Redist
+[Full](https://www.microsoft.com/en-au/download/details.aspx?id=8109) /
+[Websetup](https://www.microsoft.com/en-au/download/details.aspx?id=35) for
+Xaudio (Remember to uncheck Bing on the websetup.)
 
 ## Building
 
 The basic formula to build vba-m is:
 
-```shell
+```bash
 cd ~ && mkdir src && cd src
 git clone https://github.com/visualboyadvance-m/visualboyadvance-m.git
 cd visualboyadvance-m
-./installdeps
 
-# ./installdeps will give you build instructions, which will be similar to:
+./installdeps # On Linux or macOS
 
-mkdir build && cd build
-cmake ..
-make -j`nproc`
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -G Ninja
+ninja
 ```
 
-`./installdeps` is supported on MSys2, Linux (Debian/Ubuntu, Fedora, Arch,
-Solus and RHEL/CentOS) and Mac OS X (homebrew, macports or fink.)
-
-The Ninja cmake generator is also now supported, including on msys2 and Visual Studio.
+`./installdeps` is supported on MSYS2, Linux (Debian/Ubuntu, Fedora, Arch,
+Solus, OpenSUSE, Gentoo and RHEL/CentOS) and Mac OS X (homebrew, MacPorts or
+Fink.)
 
 ## Building a Libretro core
 
-```
 Clone this repo and then,
-$ cd src
-$ cd libretro
-$ make
 
-Copy vbam_libretro.so to your RetroArch cores directory.
+```bash
+cd src/libretro
+make -j`nproc`
 ```
 
-### Visual Studio Support
+Copy `vbam_libretro.so` to your RetroArch cores directory.
+
+## Visual Studio Support
 
 For visual studio, dependency management is handled automatically with vcpkg,
-just clone the repository with git and build with cmake. You can do this from
-the developer command line as well. 2019 will not work yet for building
-dependencies, but you can build the dependencies in 2017 and then use the
-project from 2019.
+From the Visual Studio GUI, just clone the repository with git and build with
+the cmake configurations provided.
+
+If the GUI does not detect cmake, go to `File -> Open -> CMake` and open the
+`CMakeLists.txt`.
+
+If you are using 2017, make sure you have all the latest updates, some issues
+with cmake projects in the GUI have been fixed.
+
+You can also build from the developer command prompt or powershell with the
+environment loaded.
 
 Using your own user-wide installation of vcpkg is supported, just make sure the
 environment variable `VCPKG_ROOT` is set.
 
-To build in the visual studio command prompt, use something like this:
+To build in the Visual Studio `x64 Native Tools Command Prompt`, use something
+like this:
 
 ```
-mkdir vsbuild
-cd vsbuild
-cmake .. -DVCPKG_TARGET_TRIPLET=x64-windows
-msbuild /m .\ALL_BUILD.vcxproj
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -G Ninja
+ninja
 ```
+.
 
-### Dependencies
+## Visual Studio Code Support
+
+Make sure the
+[C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
+and [CMake
+Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)
+extensions are installed.
+
+Add the following to your `settings.json`:
+
+```json
+{
+    "cmake.configureOnOpen": true,
+    "cmake.preferredGenerators": [ "Ninja" ]
+}
+```
+.
+
+## Dependencies
 
 If your OS is not supported, you will need the following:
 
@@ -104,22 +157,20 @@ If your OS is not supported, you will need the following:
 - [make](https://en.wikipedia.org/wiki/Make_(software))
 - [CMake](https://cmake.org/)
 - [git](https://git-scm.com/)
-- nasm (optional, for 32 bit builds)
+- [nasm](https://www.nasm.us/) (optional, for 32 bit builds)
 
 And the following development libraries:
 
 - [zlib](https://zlib.net/) (required)
 - [mesa](https://mesa3d.org/) (if using X11 or any OpenGL otherwise)
-- ffmpeg (optional, for game recording)
-- gettext and gettext tools (optional, with ENABLE_NLS)
-- png (required)
-- [SDL](https://www.libsdl.org/)2 (required)
-- [SFML](https://www.sfml-dev.org/) (optional, for link)
-- OpenAL (optional, a sound interface)
-- [wxWidgets](https://wxwidgets.org/) (required, 2.8 is still supported, --enable-stl is supported)
+- [ffmpeg](https://ffmpeg.org/) (optional, at least version `4.0.4`, for game recording)
+- [gettext](https://www.gnu.org/software/gettext/) and gettext-tools
+- [SDL2](https://www.libsdl.org/) (required)
+- [openal-soft](https://kcat.strangesoft.net/openal.html) (optional, a sound interface)
+- [wxWidgets](https://wxwidgets.org/) (required for GUI, 2.8 and non-stl builds are no longer supported)
 
 On Linux and similar, you also need the version of GTK your wxWidgets is linked
-to (usually 2 or 3).
+to (usually 2 or 3) and the xorg development libraries.
 
 Support for more OSes/distributions for `./installdeps` is planned.
 
@@ -133,105 +184,57 @@ This is supported on Fedora, Arch, Solus and MSYS2.
 
 `./installdeps` takes one optional parameter for cross-compiling target, which
 may be `win32` which is an alias for `mingw-w64-i686` to target 32 bit Windows,
-or `mingw-gw64-x86_64` for 64 bit Windows targets.
+or `mingw-w64-x86_64` for 64 bit Windows targets.
 
-The target is implicit on MSys2 depending on which MINGW shell you started (the
-value of `$MSYSTEM`.) It will not run in the MSys shell.
+The target is implicit on MSYS2 depending on which MINGW shell you started (the
+value of `$MSYSTEM`.)
 
-On Debian/Ubuntu this uses the MXE apt repository and works really well.
-
-On Fedora it can build using the Fedora MinGW packages, albeit with wx 2.8, no
-OpenGL support, and no Link support for lack of SFML.
-
-On Arch it currently doesn't work at all because the AUR stuff is completely
-broken, I will at some point redo the arch stuff to use MXE as well.
+On Debian/Ubuntu this uses the MXE apt repository and works quite well.
 
 ## CMake Options
 
 The CMake code tries to guess reasonable defaults for options, but you can
-override them on the cmake command with e.g.:
+override them, for example:
 
 ```shell
-cmake .. -DENABLE_LINK=NO
+cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_LINK=NO -G Ninja
 ```
-
-Of particular interest is making **RELEASE** or **DEBUG** builds, the default
-mode is **RELEASE**, to make a **DEBUG** build use something like:
-
-```shell
-cmake .. -DCMAKE_BUILD_TYPE=Debug
-```
-
-Here is the complete list:
+. Here is the complete list:
 
 | **CMake Option**      | **What it Does**                                                     | **Defaults**          |
 |-----------------------|----------------------------------------------------------------------|-----------------------|
-| ENABLE_SDL            | Build the SDL port                                                   | OFF                   |
-| ENABLE_WX             | Build the wxWidgets port                                             | ON                    |
-| ENABLE_DEBUGGER       | Enable the debugger                                                  | ON                    |
-| ENABLE_NLS            | Enable translations                                                  | ON                    |
-| ENABLE_ASM_CORE       | Enable x86 ASM CPU cores (**BUGGY AND DANGEROUS**)                   | OFF                   |
-| ENABLE_ASM            | Enable the following two ASM options                                 | ON for 32 bit builds  |
-| ENABLE_ASM_SCALERS    | Enable x86 ASM graphic filters                                       | ON for 32 bit builds  |
-| ENABLE_MMX            | Enable MMX                                                           | ON for 32 bit builds  |
-| ENABLE_LINK           | Enable GBA linking functionality (requires SFML)                     | ON                    |
-| ENABLE_LIRC           | Enable LIRC support                                                  | OFF                   |
-| ENABLE_FFMPEG         | Enable ffmpeg A/V recording                                          | OFF                   |
-| ENABLE_ONLINEUPDATES  | Enable online update checks                                          | ON                    |
-| ENABLE_LTO            | Compile with Link Time Optimization (gcc and clang only)             | ON for release build  |
-| ENABLE_GBA_LOGGING    | Enable extended GBA logging                                          | ON                    |
-| ENABLE_DIRECT3D       | Direct3D rendering for wxWidgets (Windows, **NOT IMPLEMENTED!!!**)   | ON                    |
-| ENABLE_XAUDIO2        | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |
-| ENABLE_OPENAL         | Enable OpenAL for the wxWidgets port                                 | OFF                   |
-| ENABLE_SSP            | Enable gcc stack protector support (gcc only)                        | OFF                   |
-| ENABLE_ASAN           | Enable libasan sanitizers (by default address, only in debug mode)   | OFF                   |
-| VBAM_STATIC           | Try link all libs statically (the following are set to ON if ON)     | OFF                   |
-| SDL2_STATIC           | Try to link static SDL2 libraries                                    | OFF                   |
-| SFML_STATIC_LIBRARIES | Try to link static SFML libraries                                    | OFF                   |
-| FFMPEG_STATIC         | Try to link static ffmpeg libraries                                  | OFF                   |
-| SSP_STATIC            | Try to link static gcc stack protector library (gcc only)            | OFF except Win32      |
-| OPENAL_STATIC         | Try to link static OpenAL libraries                                  | OFF                   |
-| SSP_STATIC            | Link gcc stack protecter libssp statically (gcc, with ENABLE_SSP)    | OFF                   |
+| `ENABLE_SDL`            | Build the SDL port                                                   | OFF                   |
+| `ENABLE_WX`             | Build the wxWidgets port                                             | ON                    |
+| `ENABLE_DEBUGGER`       | Enable the debugger                                                  | ON                    |
+| `ENABLE_ASM_CORE`       | Enable x86 ASM CPU cores (**BUGGY AND DANGEROUS**)                   | OFF                   |
+| `ENABLE_ASM`            | Enable the following two ASM options                                 | ON for 32 bit builds  |
+| `ENABLE_ASM_SCALERS`    | Enable x86 ASM graphic filters                                       | ON for 32 bit builds  |
+| `ENABLE_MMX`            | Enable MMX                                                           | ON for 32 bit builds  |
+| `ENABLE_LINK`           | Enable GBA linking functionality                                     | AUTO                  |
+| `ENABLE_LIRC`           | Enable LIRC support                                                  | OFF                   |
+| `ENABLE_FFMPEG`         | Enable ffmpeg A/V recording                                          | AUTO                  |
+| `ENABLE_ONLINEUPDATES`  | Enable online update checks                                          | ON                    |
+| `ENABLE_LTO`            | Compile with Link Time Optimization (gcc and clang only)             | ON for release build  |
+| `ENABLE_GBA_LOGGING`    | Enable extended GBA logging                                          | ON                    |
+| `ENABLE_OPENAL`         | Enable openal-soft sound output for wxWidgets                        | ON, not 32 bit Win    |
+| `ENABLE_XAUDIO2`        | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |
+| `ENABLE_FAUDIO`         | Enable faudio sound output for wxWidgets,                            | ON, not 32 bit Win    |
+| `ENABLE_ASAN`           | Enable libasan sanitizers (by default address, only in debug mode)   | OFF                   |
+| `UPSTREAM_RELEASE`      | Do some release tasks, like codesigning, making zip and gpg sigs.    | OFF                   |
+| `BUILD_TESTING`         | Build the tests and enable ctest support.                            | ON                    |
+| `VBAM_STATIC`           | Try link all libs statically (the following are set to ON if ON)     | OFF                   |
+| `SDL2_STATIC`           | Try to link static SDL2 libraries                                    | OFF                   |
+| `FFMPEG_STATIC`         | Try to link static ffmpeg libraries                                  | OFF                   |
+| `OPENAL_STATIC`         | Try to link static OpenAL libraries                                  | OFF                   |
+| `TRANSLATIONS_ONLY`     | Build only the translations.zip and nothing else                     | OFF                   |
 
 Note for distro packagers, we use the CMake module
 [GNUInstallDirs](https://cmake.org/cmake/help/v2.8.12/cmake.html#module:GNUInstallDirs)
 to configure installation directories.
 
-## MSys2 Notes
-
-To run the resulting binary, you can simply type:
-
-```shell
-./visualboyadvance-m
-```
-
-in the shell where you built it.
-
-If you built with `-DCMAKE_BUILD_TYPE=Debug`, you will get a console app and
-will see debug messages, even in mintty.
-
-If you want to start the binary from e.g. a shortcut or Explorer, you will need
-to put `c:\msys64\mingw32\bin` for 32 bit builds and `c:\msys64\mingw64\bin`
-for 64 bit builds in your PATH (to edit system PATH, go to Control Panel ->
-System -> Advanced system settings -> Environment Variables.)
-
-If you want to package the binary, you will need to include the MinGW DLLs it
-depends on, they can install to the same directory as the binary.
-
-For our own builds, we use MXE to make static builds.
-
-## Debug Messages
-
-We have an override for `wxLogDebug()` to make it work even in non-debug builds
-of wx and on windows, even in mintty. Using this function for console debug
-messages is recommended.
-
-It works like `printf()`, e.g.:
-
-```cpp
-int foo = 42;
-wxLogDebug(wxT("the value of foo = %d"), foo);
-```
+On Unix to use a different version of wxWidgets, set
+`wxWidgets_CONFIG_EXECUTABLE` to the path to the `wx-config` script you want to
+use.
 
 ## Reporting Crash Bugs
 
@@ -251,40 +254,26 @@ do something such as:
 ```shell
 ulimit -c unlimited
 ```
-
-in your shell to enable coredump files.
+, in your shell to enable core files.
 
 [This
 post](https://ask.fedoraproject.org/en/question/98776/where-is-core-dump-located/?answer=98779#post-id-98779)
-explains how to retrieve core dump on Fedora Linux (and possibly other
-distributions.)
+explains how to retrieve core dump on some distributions, when they are managed
+by systemd.
 
-Once you have the core dump file, open it with `gdb`, for example:
+Once you have the core file, open it with `gdb`, for example:
 
 ```shell
 gdb -c core ./visualboyadvance-m
 ```
-
-In the `gdb` shell, to print the backtrace, type:
+. In the `gdb` shell, to start the process and print the backtrace, type:
 
 ```
+run
 bt
 ```
-
-This may be a bit of a hassle, but it helps us out immensely.
+. This may be a bit of a hassle, but it helps us out immensely.
 
 ## Contributing
 
-Please keep in mind that this app needs to run on Windows, Linux and macOS at
-the very least, so code should be portable and/or use the appropriate `#ifdef`s
-and the like when needed.
-
-Please try to craft a good commit message, this post by the great tpope explains
-how to do so:
-http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
-
-If you have multiple small commits for a change, please try to use `git rebase
--i` (interactive rebase) to squash them into one or a few logical commits (with
-good commit messages!) See:
-https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History if you are new to
-this.
+See the [Developer Manual](/DEVELOPER-MANUAL.md).

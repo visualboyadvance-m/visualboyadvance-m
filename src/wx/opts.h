@@ -1,132 +1,64 @@
-#ifndef WX_OPTS_H
-#define WX_OPTS_H
+#ifndef VBAM_WX_OPTS_H_
+#define VBAM_WX_OPTS_H_
 
-#define NUM_KEYS 21
-extern const wxString joynames[NUM_KEYS];
-extern wxJoyKeyBinding defkeys_keyboard[NUM_KEYS]; // keyboard defaults
-extern wxJoyKeyBinding defkeys_joystick[NUM_KEYS]; // joystick defaults
+#include <cstdint>
+
+#include <wx/string.h>
+#include <wx/vidmode.h>
+
+// Forward declaration.
+class wxFileHistory;
 
 extern struct opts_t {
     opts_t();
-    // while I would normally put large objects in front to reduce gaps,
-    // I instead organized this by opts.cpp table order
 
     /// Display
-    bool bilinear;
-    int filter;
-    wxString filter_plugin;
-    int ifb;
     wxVideoMode fs_mode;
-    int max_threads;
-    int render_method;
-    double video_scale;
-    bool retain_aspect;
-    bool keep_on_top;
-
-    /// GB
-    wxString gb_bios;
-    wxString gbc_bios;
-    // uint16_t systemGbPalette[8*3];
-    bool print_auto_page, print_screen_cap;
-    wxString gb_rom_dir;
-    wxString gbc_rom_dir;
 
     /// GBA
     wxString gba_bios;
+    // quick fix for issues #48 and #445
+    wxString link_host = "127.0.0.1";
+    wxString server_ip = "*";
+    uint32_t link_port = 5738;
+    int link_timeout = 500;
     int gba_link_type;
-    wxString link_host;
-    int link_proto;
-    bool link_auto;
-    wxString gba_rom_dir;
 
     /// General
-    bool autoload_state, autoload_cheats;
-    wxString battery_dir;
-#ifndef NO_ONLINEUPDATES
-    int onlineupdates;
-#endif // NO_ONLINEUPDATES
-    long last_update;
-    wxString last_updated_filename;
-    bool recent_freeze;
-    wxString recording_dir;
-    int rewind_interval;
-    wxString scrshot_dir;
-    wxString state_dir;
-    int statusbar;
+    int rewind_interval = 0;
 
     /// Joypad
-    wxJoyKeyBinding_v joykey_bindings[4][NUM_KEYS];
-    int autofire_rate;
-    int default_stick;
+    int autofire_rate = 1;
 
-    /// Keyboard
-    wxAcceleratorEntry_v accels;
+    /// Core
+    int gdb_port = 55555;
+    int link_num_players = 2;
+    int max_scale = 0;
 
     /// Sound
-    int audio_api;
-    int audio_buffers;
-    wxString audio_dev;
-    int sound_en; // soundSetEnable()
-    int gba_sound_filter;
-    bool soundInterpolation;
-    bool gb_declick;
-    int gb_echo;
-    bool gb_effects_config_enabled;
-    bool dsound_hw_accel;
-    int gb_stereo;
-    bool gb_effects_config_surround;
-    int sound_qual; // soundSetSampleRate() / gbSoundSetSampleRate()
-    int sound_vol; // soundSetVolume()
-    bool upmix; // xa2 only
+    int sound_en = 0x30f; // soundSetEnable()
 
     /// Recent
-    wxFileHistory* recent;
+    wxFileHistory* recent = NULL;
+
+    /// UI Config
+    bool hide_menu_bar = true;
+    bool suspend_screensaver = false;
 
     /// wxWindows
     // wxWidgets-generated options (opaque)
 } gopts;
 
-extern struct opt_desc {
-    wxString opt;
-    const char* cmd;
-    wxString desc;
-    wxString* stropt;
-    int* intopt;
-    wxString enumvals;
-    double min, max;
-    bool* boolopt;
-    double* doubleopt;
-    uint32_t* uintopt;
-    // current configured value
-    wxString curstr;
-    int curint;
-    double curdouble;
-    uint32_t curuint;
-#define curbool curint
-} opts[];
-
-// Initializer for struct opt_desc
-opt_desc new_opt_desc(wxString opt = wxT(""), const char* cmd = NULL, wxString desc = wxT(""),
-                      wxString* stropt = NULL, int* intopt = NULL, wxString enumvals = wxT(""),
-                      double min = 0, double max = 0, bool* boolopt = NULL,
-                      double* doubleopt = NULL, uint32_t* uintopt = NULL, wxString curstr = wxT(""),
-                      int curint = 0, double curdouble = 0, uint32_t curuint = 0);
-
-extern const int num_opts;
-
-extern const wxAcceleratorEntry default_accels[];
-extern const int num_def_accels;
-
-// call to setup default keys.
-void set_default_keys();
 // call to load config (once)
 // will write defaults for options not present and delete bad opts
 // will also initialize opts[] array translations
-void load_opts();
+void load_opts(bool first_time_launch);
 // call whenever opt vars change
 // will detect changes and write config if necessary
 void update_opts();
+// Updates the shortcut options.
+void update_shortcut_opts();
 // returns true if option name correct; prints error if val invalid
-bool opt_set(const wxString& name, const wxString& val);
+void opt_set(const wxString& name, const wxString& val);
 
-#endif /* WX_OPTS_H */
+#endif // VBAM_WX_OPTS_H_

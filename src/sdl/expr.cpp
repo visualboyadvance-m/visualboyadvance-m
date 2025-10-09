@@ -90,9 +90,7 @@ enum yytokentype {
 #include <string.h>
 #include <cstdlib>
 
-#include "../System.h"
-#include "../gba/elf.h"
-#include "exprNode.h"
+#include "sdl/exprNode.h"
 
 extern int yyerror(const char*);
 extern int yylex();
@@ -618,6 +616,7 @@ int yytype;
 YYSTYPE const* const yyvaluep;
 #endif
 {
+    (void)yytype;
     if (!yyvaluep)
         return;
 #ifdef YYPRINT
@@ -626,10 +625,6 @@ YYSTYPE const* const yyvaluep;
 #else
     YYUSE(yyoutput);
 #endif
-    switch (yytype) {
-    default:
-        break;
-    }
 }
 
 /*--------------------------------.
@@ -962,17 +957,12 @@ int yytype;
 YYSTYPE* yyvaluep;
 #endif
 {
+    (void)yytype;
     YYUSE(yyvaluep);
 
     if (!yymsg)
         yymsg = "Deleting";
     YY_SYMBOL_PRINT(yymsg, yytype, yyvaluep, yylocationp);
-
-    switch (yytype) {
-
-    default:
-        break;
-    }
 }
 
 /* Prevent warnings from -Wmissing-prototypes.  */
@@ -1047,12 +1037,12 @@ int yyparse()
 
     /* The state stack.  */
     yytype_int16 yyssa[YYINITDEPTH];
-    yytype_int16* yyss = yyssa;
+    yytype_int16* yyss = (yytype_int16 *)yyssa;
     yytype_int16* yyssp;
 
     /* The semantic value stack.  */
     YYSTYPE yyvsa[YYINITDEPTH];
-    YYSTYPE* yyvs = yyvsa;
+    YYSTYPE* yyvs = (YYSTYPE *)yyvsa;
     YYSTYPE* yyvsp;
 
 #define YYPOPSTACK(N) (yyvsp -= (N), yyssp -= (N))
@@ -1093,7 +1083,7 @@ yynewstate:
     yyssp++;
 
 yysetstate:
-    *yyssp = yystate;
+    *yyssp = (yytype_int16)yystate;
 
     if (yyss + yystacksize - 1 <= yyssp) {
         /* Get the current used size of the three stacks, in elements.  */
@@ -1132,7 +1122,7 @@ yysetstate:
             yystacksize = YYMAXDEPTH;
 
         {
-            yytype_int16* yyss1 = yyss;
+            yytype_int16* yyss1 = (yytype_int16 *)yyss;
             union yyalloc* yyptr = (union yyalloc*)YYSTACK_ALLOC(YYSTACK_BYTES(yystacksize));
             if (!yyptr)
                 goto yyexhaustedlab;

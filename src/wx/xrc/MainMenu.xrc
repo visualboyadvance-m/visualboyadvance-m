@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
-  <object class="wxMenuBar" name="MainMenu">
+  <object class="wxMenuBar" name="MainMenu" subclass="ShortcutMenuBar">
     <object class="wxMenu">
       <label>_File</label>
-      <object class="wxMenuItem" name="wxID_OPEN"/>
+      <object class="wxMenuItem" name="wxID_OPEN">
+        <label>Open...</label>
+      </object>
       <object class="wxMenuItem" name="OpenGB">
-        <label>Open _GB...</label>
+        <label>Open _Game Boy...</label>
       </object>
       <object class="wxMenuItem" name="OpenGBC">
-        <label>Open GB_C...</label>
+        <label>Open Game Boy _Color...</label>
       </object>
       <object class="wxMenu" name="RecentMenu">
         <label>Open rece_nt</label>
@@ -26,10 +28,16 @@
       <object class="separator"/>
       <object class="wxMenu">
         <label>_e-Reader</label>
-        <object class="wxMenuItem" name="LoadDotCodeFile">
+        <object class="wxMenuItem" name="ResetLoadingDotCodeFile">
+          <label>_Reset Loading Dot Code</label>
+        </object>
+        <object class="wxMenuItem" name="SetLoadingDotCodeFile">
           <label>_Load Dot Code...</label>
         </object>
-        <object class="wxMenuItem" name="SaveDotCodeFile">
+        <object class="wxMenuItem" name="ResetSavingDotCodeFile">
+          <label>_Reset Saving Dot Code</label>
+        </object>
+        <object class="wxMenuItem" name="SetSavingDotCodeFile">
           <label>_Save Dot Code...</label>
         </object>
       </object>
@@ -38,44 +46,47 @@
         <object class="wxMenuItem" name="LoadGameRecent">
           <label>Most _recent</label>
         </object>
+        <object class="wxMenuItem" name="LoadGameSlot">
+          <label>Load current state slot</label>
+        </object>
         <object class="wxMenuItem" name="LoadGameAutoLoad">
           <label>_Auto load most recent</label>
           <checkable>1</checkable>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="LoadGame01">
-          <label>_1</label>
+          <label translate="0">_1</label>
         </object>
         <object class="wxMenuItem" name="LoadGame02">
-          <label>_2</label>
+          <label translate="0">_2</label>
         </object>
         <object class="wxMenuItem" name="LoadGame03">
-          <label>_3</label>
+          <label translate="0">_3</label>
         </object>
         <object class="wxMenuItem" name="LoadGame04">
-          <label>_4</label>
+          <label translate="0">_4</label>
         </object>
         <object class="wxMenuItem" name="LoadGame05">
-          <label>_5</label>
+          <label translate="0">_5</label>
         </object>
         <object class="wxMenuItem" name="LoadGame06">
-          <label>_6</label>
+          <label translate="0">_6</label>
         </object>
         <object class="wxMenuItem" name="LoadGame07">
-          <label>_7</label>
+          <label translate="0">_7</label>
         </object>
         <object class="wxMenuItem" name="LoadGame08">
-          <label>_8</label>
+          <label translate="0">_8</label>
         </object>
         <object class="wxMenuItem" name="LoadGame09">
-          <label>_9</label>
+          <label translate="0">_9</label>
         </object>
         <object class="wxMenuItem" name="LoadGame10">
-          <label>1_0</label>
+          <label translate="0">1_0</label>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="Load">
-          <label>From _File ...</label>
+          <label>From _File...</label>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="KeepSaves">
@@ -92,9 +103,15 @@
         <object class="wxMenuItem" name="SaveGameOldest">
           <label>_Oldest slot</label>
         </object>
+        <object class="wxMenuItem" name="SaveGameSlot">
+          <label>Save current state slot</label>
+        </object>
+        <object class="wxMenuItem" name="IncrGameSlotSave">
+          <label>Increase state slot number and save</label>
+        </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="SaveGame01">
-          <label>_1</label>
+          <label translate="0">_1</label>
         </object>
         <object class="wxMenuItem" name="SaveGame02">
           <label>_2</label>
@@ -125,9 +142,15 @@
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="Save">
-          <label>To _File ...</label>
+          <label>To _File...</label>
         </object>
         <label>_Save state</label>
+      </object>
+      <object class="wxMenuItem" name="IncrGameSlot">
+        <label>Increase state slot number</label>
+      </object>
+      <object class="wxMenuItem" name="DecrGameSlot">
+        <label>Decrease state slot number</label>
       </object>
       <object class="separator"/>
       <object class="wxMenu">
@@ -135,10 +158,10 @@
           <label>_Battery file...</label>
         </object>
         <object class="wxMenuItem" name="ImportGamesharkCodeFile">
-          <label>Gameshark _code file...</label>
+          <label>Game Shark _code file...</label>
         </object>
         <object class="wxMenuItem" name="ImportGamesharkActionReplaySnapshot">
-          <label>_Gameshark snapshot...</label>
+          <label>_Game Shark snapshot...</label>
         </object>
         <label>_Import</label>
       </object>
@@ -147,7 +170,7 @@
           <label>_Battery file...</label>
         </object>
         <object class="wxMenuItem" name="ExportGamesharkSnapshot">
-          <label>_Gameshark snapshot...</label>
+          <label>_Game Shark snapshot...</label>
         </object>
         <label>_Export</label>
       </object>
@@ -187,7 +210,9 @@
       </object>
       <object class="separator"/>
       <object class="wxMenuItem" name="wxID_CLOSE"/>
-      <object class="wxMenuItem" name="wxID_EXIT"/>
+      <object class="wxMenuItem" name="wxID_EXIT">
+        <label>_Quit</label>
+      </object>
     </object>
     <object class="wxMenu">
       <label>_Emulation</label>
@@ -227,7 +252,7 @@
         <checkable>1</checkable>
       </object>
       <object class="wxMenuItem" name="ApplyPatches">
-        <label>_Auto IPS/UPS/IPF patch</label>
+        <label>_Auto IPS / UPS / IPF patch</label>
         <checkable>1</checkable>
       </object>
       <object class="wxMenuItem" name="PauseWhenInactive">
@@ -241,10 +266,10 @@
     </object>
     <object class="wxMenu">
       <label>_Options</label>
-      <object class="wxMenu">
+      <object class="wxMenu" name="LinkMenu">
         <label>_Link</label>
         <object class="wxMenuItem" name="LanLink">
-          <label>Start _Network Link ...</label>
+          <label>Start _Network Link...</label>
         </object>
         <object class="wxMenu">
           <label>_Type</label>
@@ -261,11 +286,11 @@
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="LinkType3GameCube">
-            <label>_GameCube</label>
+            <label translate="0">_Game Cube</label>
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="LinkType4Gameboy">
-            <label>_Game Boy</label>
+            <label translate="0">_Game Boy</label>
             <checkable>1</checkable>
           </object>
         </object>
@@ -282,13 +307,13 @@
           <checkable>1</checkable>
         </object>
         <object class="wxMenuItem" name="LinkConfigure">
-          <label>_Configure ...</label>
+          <label>_Configure...</label>
         </object>
       </object>
       <object class="wxMenu">
         <label>_Video</label>
         <object class="wxMenuItem" name="DisplayConfigure">
-          <label>_Configure ...</label>
+          <label>_Configure...</label>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="Fullscreen">
@@ -316,6 +341,12 @@
             <label>_6x</label>
           </object>
         </object>
+        <object class="wxMenuItem" name="ChangeFilter">
+          <label>Change pixel filter</label>
+        </object>
+        <object class="wxMenuItem" name="ChangeIFB">
+          <label>Change interframe blending</label>
+        </object>
         <object class="wxMenuItem" name="RetainAspect">
           <label>_Retain aspect ratio</label>
           <checkable>1</checkable>
@@ -337,10 +368,6 @@
           <checkable>1</checkable>
         </object>
         <object class="separator"/>
-        <object class="wxMenuItem" name="StatusBar">
-          <label>_Status bar</label>
-          <checkable>1</checkable>
-        </object>
         <object class="wxMenuItem" name="NoStatusMsg">
           <label>_Disable on-screen display</label>
           <checkable>1</checkable>
@@ -353,69 +380,118 @@
       <object class="wxMenu">
         <label>_Audio</label>
         <object class="wxMenuItem" name="SoundConfigure">
-          <label>_Configure ...</label>
+          <label>_Configure...</label>
         </object>
         <object class="wxMenuItem" name="IncreaseVolume">
           <label>_Increase volume</label>
-          <enabled>0</enabled>
         </object>
         <object class="wxMenuItem" name="DecreaseVolume">
           <label>_Decrease volume</label>
-          <enabled>0</enabled>
         </object>
-	<object class="wxMenuItem" name="ToggleSound">
+        <object class="wxMenuItem" name="ToggleSound">
           <label>_Toggle sound</label>
           <checkable>0</checkable>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="GBASoundInterpolation">
-          <label>_GBA sound interpolation</label>
+          <label>_Game Boy Advance sound interpolation</label>
           <checkable>1</checkable>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="GBEnhanceSound">
-          <label>_GB sound enhancement</label>
+          <label>_Game Boy sound enhancement</label>
           <checkable>1</checkable>
         </object>
         <object class="wxMenuItem" name="GBSurround">
-          <label>_GB surround sound effect</label>
+          <label>_Game Boy surround sound effect</label>
           <checkable>1</checkable>
         </object>
         <object class="wxMenuItem" name="GBDeclicking">
-          <label>_GB sound declicking</label>
+          <label>_Game Boy sound declicking</label>
           <checkable>1</checkable>
         </object>
       </object>
       <object class="wxMenu">
         <label>_Input</label>
         <object class="wxMenuItem" name="JoypadConfigure">
-          <label>_Configure ...</label>
+          <label>_Configure...</label>
+        </object>
+        <object class="wxMenuItem" name="AllowKeyboardBackgroundInput">
+          <label>Allow _keyboard background input</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="AllowJoystickBackgroundInput">
+          <label>Allow _joystick background input</label>
+          <checkable>1</checkable>
         </object>
         <object class="separator"/>
         <object class="wxMenu">
           <label>_Autofire</label>
           <object class="wxMenuItem" name="JoypadAutofireA">
-            <label>_A</label>
+            <label translate="0">_A</label>
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="JoypadAutofireB">
-            <label>_B</label>
+            <label translate="0">_B</label>
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="JoypadAutofireL">
-            <label>_L</label>
+            <label translate="0">_L</label>
             <checkable>1</checkable>
           </object>
           <object class="wxMenuItem" name="JoypadAutofireR">
+            <label translate="0">_R</label>
+            <checkable>1</checkable>
+          </object>
+        </object>
+        <object class="wxMenu">
+          <label>_Autohold</label>
+          <object class="wxMenuItem" name="JoypadAutoholdUp">
+            <label>Up</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdDown">
+            <label>Down</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdLeft">
+            <label>Left</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdRight">
+            <label>Right</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdA">
+            <label>_A</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdB">
+            <label>_B</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdL">
+            <label>_L</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdR">
             <label>_R</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdSelect">
+            <label>Select</label>
+            <checkable>1</checkable>
+          </object>
+          <object class="wxMenuItem" name="JoypadAutoholdStart">
+            <label>Start</label>
             <checkable>1</checkable>
           </object>
         </object>
       </object>
       <object class="wxMenu">
-        <label>_Game Boy Advance</label>
+        <label translate="0">_Game Boy Advance</label>
         <object class="wxMenuItem" name="GameBoyAdvanceConfigure">
-          <label>Configure ...</label>
+          <label>Configure...</label>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="RTC">
@@ -430,15 +506,31 @@
           <label>_Debug print</label>
           <checkable>1</checkable>
         </object>
+        <object class="wxMenuItem" name="GBALcdFilter">
+          <label>_LCD Filter</label>
+          <checkable>1</checkable>
+        </object>
       </object>
       <object class="wxMenu">
-        <label>_Game Boy</label>
+        <label translate="0">_Game Boy</label>
         <object class="wxMenuItem" name="GameBoyConfigure">
-          <label>Configure ...</label>
+          <label>Configure...</label>
         </object>
         <object class="separator"/>
+        <object class="wxMenuItem" name="GBColorOption">
+          <label>_Game Boy color option</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="GBLcdFilter">
+          <label>_LCD Filter</label>
+          <checkable>1</checkable>
+        </object>
+        <object class="wxMenuItem" name="ColorizerHack">
+          <label>_Game Boy Colorizer Hack (requires restart)</label>
+          <checkable>1</checkable>
+        </object>        
         <object class="wxMenuItem" name="Printer">
-          <label>_GB printer</label>
+          <label>_Game Boy printer</label>
           <checkable>1</checkable>
         </object>
         <object class="wxMenuItem" name="PrintGather">
@@ -451,25 +543,40 @@
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="BootRomGB">
-          <label>_Use GB BIOS file</label>
+          <label>_Use Game Boy BIOS file (requires restart)</label>
           <checkable>1</checkable>
         </object>
         <object class="wxMenuItem" name="BootRomGBC">
-          <label>_Use GBC BIOS file</label>
+          <label>_Use Game Boy Color BIOS file</label>
           <checkable>1</checkable>
         </object>
       </object>
         <object class="wxMenuItem" name="GeneralConfigure">
-          <label>_General ...</label>
+          <label>_General...</label>
         </object>
         <object class="wxMenuItem" name="SpeedupConfigure">
-          <label>_Speedup / Turbo ...</label>
+          <label>_Speedup / Turbo...</label>
         </object>
         <object class="wxMenuItem" name="EmulatorDirectories">
-          <label>D_irectories ...</label>
+          <label>D_irectories...</label>
         </object>
         <object class="wxMenuItem" name="Customize">
-          <label>_Key Shortcuts ...</label>
+          <label>_Key Shortcuts...</label>
+        </object>
+        <object class="wxMenu" name="UIConfigure">
+          <label>UI Settings</label>
+					<object class="wxMenuItem" name="StatusBar">
+							<label>Enable _Status bar</label>
+							<checkable>1</checkable>
+					</object>
+					<object class="wxMenuItem" name="HideMenuBar">
+							<label>Hide _Menu Bar</label>
+							<checkable>1</checkable>
+					</object>
+					<object class="wxMenuItem" name="SuspendScreenSaver">
+							<label>Suspend _Screen Saver</label>
+							<checkable>1</checkable>
+					</object>
         </object>
     </object>
     <object class="wxMenu">
@@ -477,14 +584,14 @@
       <object class="wxMenu">
         <label>_Cheats</label>
         <object class="wxMenuItem" name="CheatsList">
-          <label>List _cheats ...</label>
+          <label>List _cheats...</label>
         </object>
         <object class="wxMenuItem" name="CheatsSearch">
-          <label>Find c_heat ...</label>
+          <label>Find c_heat...</label>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="CheatsAutoSaveLoad">
-          <label>A_utomatically save/load cheats</label>
+          <label>A_utomatically save / load cheats</label>
           <checkable>1</checkable>
         </object>
         <object class="wxMenuItem" name="CheatsEnable">
@@ -493,7 +600,7 @@
         </object>
       </object>
       <object class="separator"/>
-      <object class="wxMenu">
+      <object class="wxMenu" name="GDBMenu">
         <object class="wxMenuItem" name="DebugGDBBreak">
           <label>_Break into GDB</label>
         </object>
@@ -509,7 +616,7 @@
         <object class="wxMenuItem" name="DebugGDBDisconnect">
           <label>_Disconnect</label>
         </object>
-        <label>_GDB</label>
+        <label translate="0">_GDB</label>
       </object>
       <object class="wxMenuItem" name="Disassemble">
         <label>_Disassemble...</label>
@@ -537,43 +644,47 @@
       </object>
       <object class="separator"/>
       <object class="wxMenu">
+        <object class="wxMenuItem" name="VideoLayersReset">
+          <label>Show all video layers</label>
+        </object>
+        <object class="separator"/>
         <object class="wxMenuItem" name="VideoLayersBG0">
-          <label>BG _0</label>
+          <label translate="0">BG _0</label>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersBG1">
-          <label>BG _1</label>
+          <label translate="0">BG _1</label>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersBG2">
-          <label>BG _2</label>
+          <label translate="0">BG _2</label>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersBG3">
-          <label>BG _3</label>
+          <label translate="0">BG _3</label>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersOBJ">
-          <label>_OBJ</label>
+          <label translate="0">_OBJ</label>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersWIN0">
-          <label>_WIN 0</label>
+          <label translate="0">_WIN 0</label>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersWIN1">
-          <label>W_IN 1</label>
+          <label translate="0">W_IN 1</label>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
         <object class="wxMenuItem" name="VideoLayersOBJWIN">
-          <label>O_BJ WIN</label>
+          <label translate="0">O_BJ WIN</label>
           <checkable>1</checkable>
           <checked>1</checked>
         </object>
@@ -619,7 +730,7 @@
         <label>Report _Bugs</label>
       </object>
       <object class="wxMenuItem" name="FAQ">
-        <label>VBA-M Support _Forum</label>
+        <label>Visual Boy Advance-M Support _Forum</label>
       </object>
       <object class="wxMenuItem" name="Translate">
         <label>Translations</label>
@@ -628,15 +739,164 @@
       <object class="wxMenuItem" name="UpdateRDB">
         <label>Update ROM database</label>
       </object>
+      -->
       <object class="wxMenuItem" name="UpdateEmu">
         <label>Check for updates</label>
       </object>
-      -->
       <object class="wxMenuItem" name="FactoryReset">
         <label>_Factory Reset...</label>
       </object>
       <object class="separator"/>
-      <object class="wxMenuItem" name="wxID_ABOUT"/>
+      <object class="wxMenuItem" name="wxID_ABOUT">
+        <label>_About...</label>
+      </object>
+    </object>
+    <object class="wxMenu">
+      <label>_Languages</label>
+      <object class="wxMenuItem" name="Language0">
+        <label>Default Language</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language1">
+        <label>Bulgarian</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language2">
+        <label>Breton</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language3">
+        <label>Czech</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language5">
+        <label>Greek</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language6">
+        <label>English (US)</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language7">
+        <label>Spanish (Latin American)</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language8">
+        <label>Spanish (Colombia)</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language9">
+        <label>Spanish (Peru)</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language10">
+        <label>Spanish (United States)</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language11">
+        <label>Spanish</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language12">
+        <label>French (France)</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language13">
+        <label>French</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language14">
+        <label>Galician</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language15">
+        <label>Hebrew (Israel)</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language16">
+        <label>Hungarian (Hungary)</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language17">
+        <label>Hungarian</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language18">
+        <label>Indonesian</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language19">
+        <label>Italian</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language20">
+        <label>Japanese</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language21">
+        <label>Korean (Korea)</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language22">
+        <label>Korean</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language23">
+        <label>Malay (Malaysia)</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language24">
+        <label>Norwegian</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language25">
+        <label>Dutch</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language26">
+        <label>Polish (Poland)</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language27">
+        <label>Polish</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language28">
+        <label>Portuguese (Brazil)</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language29">
+        <label>Portuguese (Portugal)</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language30">
+        <label>Russian (Russia)</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language31">
+        <label>Swedish</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language32">
+        <label>Turkish</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language33">
+        <label>Ukrainian</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language34">
+        <label>Urdu (Pakistan)</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="Language35">
+        <label>Chinese (China)</label>
+        <radio>1</radio>
+      </object>
+      <object class="wxMenuItem" name="ExternalTranslations">
+        <label>_Use external translations</label>
+        <checkable>1</checkable>
+      </object>
     </object>
   </object>
 </resource>

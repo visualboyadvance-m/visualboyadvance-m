@@ -16,14 +16,16 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "sdl/exprNode.h"
 
-#include "../common/Port.h"
-#include "../gba/GBA.h"
-#include "../gba/elf.h"
-#include "exprNode.h"
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
+#include "core/base/port.h"
+#include "core/gba/gba.h"
+#include "core/gba/gbaElf.h"
+#include "core/gba/gbaGlobals.h"
 
 #ifndef __GNUC__
 #define strdup _strdup

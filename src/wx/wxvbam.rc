@@ -1,15 +1,41 @@
-AAAAA_MAINICON ICON "icons/vbam.ico"
+#pragma code_page(65001)
 
-#include "wx/msw/wx.rc"
+AAAAA_MAINICON ICON "icons/visualboyadvance-m.ico"
+
+#define wxUSE_NO_MANIFEST 1
+#include <wx/msw/wx.rc>
+
+#include "core/base/version_gen.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
 //
 
+#define VER_PRODUCTVERSION	VER_FILEVERSION
+#define VER_PRODUCTVERSION_STR	VER_FILEVERSION_STR
+
+#ifndef NO_ONLINEUPDATES
+
+#include "autoupdater/wxmsw/winsparkle-rc.h"
+
+#ifdef __i386__
+WINSPARKLE_DLL_RC RCDATA "../../win32-deps/WinSparkle-0.9.1/mingw/i686/WinSparkle.dll"
+#elif defined(__x86_64__)
+WINSPARKLE_DLL_RC RCDATA "../../win32-deps/WinSparkle-0.9.1/mingw/x86_64/WinSparkle.dll"
+#else
+#include "winsparkle-path.h"
+
+WINSPARKLE_DLL_RC RCDATA WINSPARKLE_DLL_PATH
+#endif /* MinGW */
+
+#endif /* NO_ONLINEUPDATES */
+
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "visualboyadvance-m.manifest"
+
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,0,0,0
- PRODUCTVERSION 2,0,0,0
+ FILEVERSION VER_FILEVERSION
+ PRODUCTVERSION VER_PRODUCTVERSION
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -24,15 +50,15 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "VBA-M comes with NO WARRANTY. Use it at your own risk."
-            VALUE "CompanyName", "http://vba-m.com/"
+            VALUE "Comments", "VisualBoyAdvance-M comes with NO WARRANTY. Use it at your own risk."
+            VALUE "CompanyName", "http://visualboyadvance-m.org/"
             VALUE "FileDescription", "VisualBoyAdvance-M"
-            VALUE "FileVersion", "2, 0, 0, 0"
-            VALUE "InternalName", "VBA-M"
-            VALUE "LegalCopyright", "Copyright © 2008-2015 VBA-M development team"
+            VALUE "FileVersion", VER_FILEVERSION_STR
+            VALUE "InternalName", "wxvbam"
+            VALUE "LegalCopyright", "Copyright Â© 2008-2019 VisualBoyAdvance-M development team"
             VALUE "OriginalFilename", "VisualBoyAdvance-M.exe"
             VALUE "ProductName", "VisualBoyAdvance-M"
-            VALUE "ProductVersion", "2, 0, 0, 0"
+            VALUE "ProductVersion", VER_PRODUCTVERSION_STR
         END
     END
     BLOCK "VarFileInfo"

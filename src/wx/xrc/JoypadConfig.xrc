@@ -5,6 +5,12 @@
     <object class="wxBoxSizer">
     <orient>wxVERTICAL</orient>
     <object class="sizeritem">
+      <flag>wxALIGN_CENTRE_HORIZONTAL</flag>
+      <object class="wxCheckBox" name="SDLGameControllerMode">
+        <label>SDL GameController Mode</label>
+      </object>
+    </object>
+    <object class="sizeritem">
     <object class="wxNotebook">
     <object class="notebookpage">
       <object_ref name="joy1" ref="JoyPanel">

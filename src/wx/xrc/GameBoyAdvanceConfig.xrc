@@ -18,14 +18,14 @@
                     <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
                     <border>5</border>
                     <object class="wxStaticText">
-                      <label>Save type :</label>
+                      <label>Save type:</label>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <object class="wxChoice" name="SaveType">
                       <content>
                         <item>Automatic</item>
-                        <item>EEPROM</item>
+                        <item translate="0">EEPROM</item>
                         <item>SRAM</item>
                         <item>Flash</item>
                         <item>EEPROM + Sensor</item>
@@ -40,14 +40,14 @@
                     <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
                     <border>5</border>
                     <object class="wxStaticText">
-                      <label>Flash size :</label>
+                      <label>Flash size:</label>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <object class="wxChoice" name="FlashSize">
                       <content>
-                        <item>64K</item>
-                        <item>128K</item>
+                        <item>64 K</item>
+                        <item>128 K</item>
                       </content>
                     </object>
                     <option>1</option>
@@ -89,7 +89,7 @@
                   <orient>wxHORIZONTAL</orient>
                   <object class="sizeritem">
                     <object class="wxStaticText" name="BootRomLab">
-                      <label>Bios file :</label>
+                      <label>BIOS file:</label>
                     </object>
                     <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                     <border>5</border>
@@ -112,7 +112,7 @@
                   <orient>wxHORIZONTAL</orient>
                   <object class="sizeritem">
                     <object class="wxStaticText">
-                      <label>Current BIOS file :</label>
+                      <label>Current BIOS file:</label>
                     </object>
                     <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                     <border>5</border>
@@ -197,10 +197,10 @@
                   <content>
                     <item>Default</item>
                     <item>Automatic</item>
-                    <item>EEPROM</item>
+                    <item translate="0">EEPROM</item>
                     <item>SRAM</item>
                     <item>Flash</item>
-                    <item>EEPROM+Sensor</item>
+                    <item>EEPROM + Sensor</item>
                     <item>None</item>
                   </content>
                 </object>
@@ -218,8 +218,8 @@
                 <object class="wxChoice" name="OvFlashSize">
                   <content>
                     <item>Default</item>
-                    <item>64K</item>
-                    <item>128K</item>
+                    <item>64 K</item>
+                    <item>128 K</item>
                   </content>
                 </object>
                 <flag>wxALL|wxEXPAND</flag>

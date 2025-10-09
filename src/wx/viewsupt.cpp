@@ -1,8 +1,11 @@
-#include "viewsupt.h"
-#include "../common/ConfigManager.h"
-#include "wxvbam.h"
+#include "wx/viewsupt.h"
+
+#include "wx/config/option-proxy.h"
+#include "wx/config/user-input.h"
+#include "wx/wxvbam.h"
 
 namespace Viewers {
+
 void Viewer::CloseDlg(wxCloseEvent& ev)
 {
     (void)ev; // unused params
@@ -136,7 +139,7 @@ void DisList::MoveSB()
         pos = (topaddr - 100) / 10 + 100;
     else if (topaddr >= maxaddr - 1100)
         pos = (topaddr - maxaddr + 1100) / 10 + 300;
-    else
+    else // FIXME this pos is very likely wrong... but I cannot trigger it
         pos = 250;
 
     sb.SetScrollbar(pos, 20, 500, 20);
@@ -309,12 +312,11 @@ void MemView::Refit()
             NULL, this);
         disp.Connect(wxEVT_LEFT_UP, wxMouseEventHandler(MemView::MouseEvent),
             NULL, this);
-        disp.Connect(wxEVT_CHAR, wxKeyEventHandler(MemView::KeyEvent),
-            NULL, this);
         disp.SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOX));
         sb.Create(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
             wxSB_VERTICAL);
         sb.SetScrollbar(0, 15, 500, 15);
+        disp.Bind(VBAM_EVT_USER_INPUT, &MemView::KeyEvent, this);
     }
 
     wxClientDC dc(&disp);
@@ -413,17 +415,28 @@ void MemView::ShowCaret()
     disp.SetFocus();
 }
 
-void MemView::KeyEvent(wxKeyEvent& ev)
+void MemView::KeyEvent(widgets::UserInputEvent& ev)
 {
-    uint32_t k = ev.GetKeyCode();
-    int nnib = 2 << fmt;
+    const nonstd::optional<config::UserInput> opt_user_input = ev.FirstReleasedInput();
+    if (opt_user_input == nonstd::nullopt) {
+        return;
+    }
 
-    switch (k) {
+    const config::UserInput& user_input = opt_user_input.value();
+    if (!user_input.is_keyboard()) {
+        return;
+    }
+
+    const wxKeyCode key = user_input.keyboard_input().key();
+    const wxKeyModifier mod = user_input.keyboard_input().mod();
+
+    int nnib = 2 << fmt;
+    switch (key) {
     case WXK_RIGHT:
     case WXK_NUMPAD_RIGHT:
         if (isasc)
             selnib += 2;
-        else if (ev.GetModifiers() == wxMOD_SHIFT)
+        else if (mod == wxMOD_SHIFT)
             selnib += 2 << fmt;
         else if (!(selnib % nnib))
             selnib += nnib + nnib - 1;
@@ -445,7 +458,7 @@ void MemView::KeyEvent(wxKeyEvent& ev)
     case WXK_NUMPAD_LEFT:
         if (isasc)
             selnib -= 2;
-        else if (ev.GetModifiers() == wxMOD_SHIFT)
+        else if (mod == wxMOD_SHIFT)
             selnib -= 2 << fmt;
         else if (!(++selnib % nnib))
             selnib -= nnib * 2;
@@ -476,7 +489,7 @@ void MemView::KeyEvent(wxKeyEvent& ev)
         break;
 
     default:
-        if (k > 0x7f || (isasc && !isprint(k)) || (!isasc && !isxdigit(k))) {
+        if (key > 0x7f || (isasc && !isprint(key)) || (!isasc && !isxdigit(key))) {
             ev.Skip();
             return;
         }
@@ -507,10 +520,10 @@ void MemView::KeyEvent(wxKeyEvent& ev)
 
         if (isasc) {
             mask = 0xff << bno * 8;
-            val = k << bno * 8;
+            val = key << bno * 8;
         } else {
             mask = 8 * (0xf << bno) + 4 * nibno;
-            val = isdigit(k) ? k - '0' : tolower(k) + 10 - 'a';
+            val = isdigit(key) ? key - '0' : tolower(key) + 10 - 'a';
             val <<= bno * 8 + nibno * 4;
         }
 
@@ -538,9 +551,9 @@ void MemView::KeyEvent(wxKeyEvent& ev)
         }
 
         // write value; this will not return until value has been written
-        wxCommandEvent ev(EVT_WRITEVAL, GetId());
-        ev.SetEventObject(this);
-        GetEventHandler()->ProcessEvent(ev);
+        wxCommandEvent new_event(EVT_WRITEVAL, GetId());
+        new_event.SetEventObject(this);
+        GetEventHandler()->ProcessEvent(new_event);
         // now refresh whole screen.  Really need to make this more
         // efficient some day
         Repaint();
@@ -553,16 +566,16 @@ void MemView::MoveSB()
 {
     int pos;
 
-    if (topaddr / 16 <= 100)
+    if (topaddr / 16 <= 100) // <= 100
         pos = topaddr / 16;
-    else if (topaddr / 16 >= maxaddr / 16 - 100)
+    else if (topaddr / 16 >= maxaddr / 16 - 100) // >= 400
         pos = topaddr / 16 - maxaddr / 16 + 500;
-    else if (topaddr / 16 < 1100)
+    else if (topaddr / 16 < 1100) // <= 200
         pos = (topaddr / 16 - 100) / 10 + 100;
-    else if (topaddr / 16 >= maxaddr / 16 - 1100)
+    else if (topaddr / 16 >= maxaddr / 16 - 1100) // >= 300
         pos = (topaddr / 16 - maxaddr / 16 + 1100) / 10 + 300;
-    else
-        pos = 250;
+    else // > 200 && < 300
+        pos = ((topaddr / 16) - 1100) / (((maxaddr / 16) - 2200) / 100) + 200;
 
     sb.SetScrollbar(pos, 20, 500, 20);
 }
@@ -597,6 +610,13 @@ void MemView::MoveView(wxScrollEvent& ev)
 
         MoveSB();
     } // ignore THUMBTRACK and CHANGED
+    // do not interrupt scroll because no event was triggered
+    else if (pos <= 200)
+        topaddr = ((pos - 100) * 10 + 100) * 16;
+    else if (pos >= 300)
+        topaddr = ((pos - 300) * 10 - 1100) * 16 + maxaddr;
+    else if (pos > 200 && pos < 300)
+        topaddr = ((pos - 200) * ((maxaddr / 16 - 2200) / 100) + 1100) * 16;
 
     RefillNeeded();
 }
@@ -649,7 +669,7 @@ void MemView::Refill(wxDC& dc)
 
     for (size_t i = 0; i < (size_t)nlines && i < words.size() / 4; i++) {
         wxString line, word;
-        line.Printf(maxaddr > 0xffff ? wxT("%08X   ") : wxT("%04X   "), topaddr + i * 16);
+        line.Printf(maxaddr > 0xffff ? wxT("%08X   ") : wxT("%04X   "), topaddr + (int)i * 16);
 
         for (int j = 0; j < 4; j++) {
             uint32_t v = words[i * 4 + j];
@@ -718,7 +738,7 @@ void MemView::Resize(wxSizeEvent& ev)
         Refill();
 }
 
-void MemView::Show(uint32_t addr, bool force_update)
+void MemView::ShowAddr(uint32_t addr, bool force_update)
 {
     if (addr < topaddr || addr >= topaddr + (nlines - 1) * 16) {
         // align to nearest 16-byte block
@@ -757,29 +777,41 @@ DEFINE_EVENT_TYPE(EVT_WRITEVAL)
 ColorView::ColorView(wxWindow* parent, wxWindowID id)
     // default for MSW appears to be BORDER_SUNKEN
     : wxControl(parent, id, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE),
-      r(0),
-      g(0),
-      b(0)
+      r_(0),
+      g_(0),
+      b_(0)
 {
     wxBoxSizer* sz = new wxBoxSizer(wxHORIZONTAL);
     cp = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(75, 75),
         wxBORDER_SUNKEN);
     sz->Add(cp);
     wxGridSizer* gs = new wxGridSizer(2);
-    wxStaticText* lab = new wxStaticText(this, wxID_ANY, _("R:"));
+    wxStaticText* lab = new wxStaticText(this, wxID_ANY, _("Red:"));
     gs->Add(lab, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
     rt = new wxStaticText(this, wxID_ANY, wxT("255"), wxDefaultPosition,
+#if !defined(__WXGTK__)
         wxDefaultSize, wxST_NO_AUTORESIZE);
+#else
+        wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL);
+#endif // !defined(__WXGTK__)
     gs->Add(rt, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
-    lab = new wxStaticText(this, wxID_ANY, _("G:"));
+    lab = new wxStaticText(this, wxID_ANY, _("Green:"));
     gs->Add(lab, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
     gt = new wxStaticText(this, wxID_ANY, wxT("255"), wxDefaultPosition,
+#if !defined(__WXGTK__)
         wxDefaultSize, wxST_NO_AUTORESIZE);
+#else
+        wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL);
+#endif // !defined(__WXGTK__)
     gs->Add(gt, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
-    lab = new wxStaticText(this, wxID_ANY, _("B:"));
+    lab = new wxStaticText(this, wxID_ANY, _("Blue:"));
     gs->Add(lab, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
     bt = new wxStaticText(this, wxID_ANY, wxT("255"), wxDefaultPosition,
+#if !defined(__WXGTK__)
         wxDefaultSize, wxST_NO_AUTORESIZE);
+#else
+        wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL);
+#endif // !defined(__WXGTK__)
     gs->Add(bt, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
     sz->Add(gs);
     sz->Layout();
@@ -1086,23 +1118,28 @@ GfxViewer::GfxViewer(const wxString& dname, int maxw, int maxh)
     , image(maxw, maxh)
 {
     gv = XRCCTRL(*this, "GfxView", GfxPanel);
-
-    if (!gv || !(gvs = dynamic_cast<wxScrolledWindow*>(gv->GetParent())))
+    if (!gv) {
         baddialog();
+    }
 
-    gvs->SetMinSize(gvs->GetSize());
-    gvs->SetScrollRate(1, 1);
+    gvs_ = dynamic_cast<wxScrolledWindow*>(gv->GetParent());
+    if (!gvs_) {
+        baddialog();
+    }
+
+    gvs_->SetMinSize(gvs_->GetSize());
+    gvs_->SetScrollRate(1, 1);
     gv->SetSize(maxw, maxh);
-    gvs->SetVirtualSize(maxw, maxh);
+    gvs_->SetVirtualSize(maxw, maxh);
     gv->im = &image;
     gv->bmw = maxw;
     gv->bmh = maxh;
     ColorView* cv;
     colorctrl(cv, "Color");
     pixview(gv->pv, "Zoom", 8, 8, cv);
-    str = XRCCTRL(*this, "Stretch", wxCheckBox);
+    str_ = XRCCTRL(*this, "Stretch", wxCheckBox);
 
-    if (!str)
+    if (!str_)
         baddialog();
 }
 
@@ -1119,9 +1156,9 @@ void GfxViewer::BMPSize(int w, int h)
         gv->bmw = w;
         gv->bmh = h;
 
-        if (!str->GetValue()) {
+        if (!str_->GetValue()) {
             gv->SetSize(w, h);
-            gvs->SetVirtualSize(gv->GetSize());
+            gvs_->SetVirtualSize(gv->GetSize());
         }
     }
 }
@@ -1131,43 +1168,47 @@ void GfxViewer::StretchTog(wxCommandEvent& ev)
     (void)ev; // unused params
     wxSize sz;
 
-    if (str->GetValue()) {
+    if (str_->GetValue()) {
         // first time to remove scrollbars
-        gvs->SetVirtualSize(gvs->GetClientSize());
+        gvs_->SetVirtualSize(gvs_->GetClientSize());
         // second time to expand to outer edges
-        sz = gvs->GetClientSize();
+        sz = gvs_->GetClientSize();
     } else
         sz = wxSize(gv->bmw, gv->bmh);
 
     gv->SetSize(sz);
-    gvs->SetVirtualSize(sz);
+    gvs_->SetVirtualSize(sz);
 }
 
 void GfxViewer::SaveBMP(wxCommandEvent& ev)
 {
     (void)ev; // unused params
     GameArea* panel = wxGetApp().frame->GetPanel();
-    bmp_save_dir = wxGetApp().frame->GetGamePath(gopts.scrshot_dir);
+    bmp_save_dir_ = wxGetApp().frame->GetGamePath(OPTION(kGenScreenshotDir));
     // no attempt is made here to translate the dialog type name
     // it's just a suggested name, anyway
     wxString def_name = panel->game_name() + wxT('-') + dname;
     def_name.resize(def_name.size() - 6); // strlen("Viewer")
 
-    if (captureFormat)
-        def_name += wxT(".bmp");
+    const int capture_format = OPTION(kPrefCaptureFormat);
+    if (capture_format == 0)
+        def_name.append(".png");
     else
-        def_name += wxT(".png");
+        def_name.append(".bmp");
 
-    wxFileDialog dlg(GetGrandParent(), _("Select output file"), bmp_save_dir, def_name,
+    wxFileDialog dlg(GetGrandParent(), _("Select output file"), bmp_save_dir_, def_name,
         _("PNG images|*.png|BMP images|*.bmp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-    dlg.SetFilterIndex(captureFormat);
+
+    SetGenericPath(dlg, bmp_save_dir_);
+
+    dlg.SetFilterIndex(capture_format);
     int ret = dlg.ShowModal();
-    bmp_save_dir = dlg.GetDirectory();
+    bmp_save_dir_ = dlg.GetDirectory();
 
     if (ret != wxID_OK)
         return;
 
-    wxBitmap obmp = gv->bm->GetSubBitmap(wxRect(0, 0, gv->bmh, gv->bmh));
+    wxBitmap obmp = gv->bm->GetSubBitmap(wxRect(0, 0, gv->bmw, gv->bmh));
     wxString fn = dlg.GetPath();
     wxBitmapType fmt = dlg.GetFilterIndex() ? wxBITMAP_TYPE_BMP : wxBITMAP_TYPE_PNG;
 
@@ -1187,12 +1228,14 @@ void GfxViewer::RefreshEv(wxCommandEvent& ev)
     Update();
 }
 
-wxString GfxViewer::bmp_save_dir = wxEmptyString;
+wxString GfxViewer::bmp_save_dir_ = wxEmptyString;
 
 BEGIN_EVENT_TABLE(GfxViewer, Viewer)
 EVT_CHECKBOX(XRCID("Stretch"), GfxViewer::StretchTog)
 EVT_BUTTON(XRCID("Refresh"), GfxViewer::RefreshEv)
 EVT_BUTTON(XRCID("Save"), GfxViewer::SaveBMP)
+EVT_BUTTON(XRCID("SaveGBOAM"), GfxViewer::SaveBMP)
+EVT_BUTTON(XRCID("SaveGBAOAM"), GfxViewer::SaveBMP)
 END_EVENT_TABLE()
 
 IMPLEMENT_DYNAMIC_CLASS(DispCheckBox, wxCheckBox)

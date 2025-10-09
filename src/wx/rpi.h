@@ -1,4 +1,5 @@
-#pragma once
+#ifndef VBAM_WX_RPI_H_
+#define VBAM_WX_RPI_H_
 
 //---------------------------------------------------------------------------------------------------------------------------
 // hq2x plugin example - Steve Snake 2004.
@@ -12,6 +13,8 @@
 #else
 #define HMODULE void*
 #endif
+
+#include <cstdint>
 
 //---------------------------------------------------------------------------------------------------------------------------
 typedef struct {
@@ -73,3 +76,5 @@ bool rpiInit(const char* sPluginName);
 void rpiFilter(uint8_t* srcPtr, uint32_t srcPitch, uint8_t* deltaPtr, uint8_t* dstPtr, uint32_t dstPitch, int width,
     int height);
 void rpiCleanup();
+
+#endif  // VBAM_WX_RPI_H_

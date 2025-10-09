@@ -1,0 +1,77 @@
+name: Ubuntu Latest
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        build_compiler: [gcc, clang]
+        build_type: [release, debug]
+#        build_options: [default, link_off, translations_only, libretro]
+        build_options: [default, link_off, translations_only]
+        include:
+          - cmake_compiler: '-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++'
+            build_compiler: gcc
+          - cmake_compiler: '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
+            build_compiler: clang
+          - cmake_build: '-DCMAKE_BUILD_TYPE=Release'
+            build_type: release
+          - cmake_build: '-DCMAKE_BUILD_TYPE=Debug'
+            build_type: debug
+          - cmake_options: '-DENABLE_LINK=OFF'
+            build_options: link_off
+          - cmake_options: '-DTRANSLATIONS_ONLY=ON'
+            build_options: translations_only
+#          - libretro_build: 'DEBUG=0'
+#            build_type: release
+#            build_options: libretro
+#          - libretro_build: 'DEBUG=1'
+#            build_type: debug
+#            build_options: libretro
+        exclude:
+          # Exclude debug/translations_only build
+          - build_type: debug
+            build_options: translations_only
+          - build_type: release
+            build_options: translations_only
+            build_compiler: clang
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with: 
+          submodules: recursive
+
+      - name: Install Dependencies
+        run: |
+          sudo add-apt-repository ppa:hrzhu/sdl3-backport
+          sudo apt update
+          bash installdeps
+          if [ "${{ matrix.build_compiler }}" = clang ]; then
+            sudo apt -y install clang
+          fi
+
+      - name: Install xvfb
+        run: sudo apt -y install xvfb
+
+      # CMake build
+      - if: matrix.build_options != 'libretro'
+        name: Configure CMake
+        run: >-
+          cmake -B build -G Ninja ${{ matrix.cmake_compiler }} ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}
+      - if: matrix.build_options != 'libretro'
+        name: Build
+        run: ninja -C build
+      - if: matrix.build_options != 'libretro'
+        name: Install
+        run: sudo ninja -C build install
+
+      # Libretro build
+#      - if: matrix.build_options == 'libretro'
+#        name: Build libretro core
+#        run: make -C src/libretro ${{ matrix.libretro_build }}
+
+      # Run tests
+      - if: matrix.build_options == 'default'
+        name: Run tests
+        run: cd build && xvfb-run ctest -j --output-on-failure

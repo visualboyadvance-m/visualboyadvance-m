@@ -5,6 +5,7 @@
     <object class="wxBoxSizer">
     <orient>wxVERTICAL</orient>
     <object class="sizeritem">
+    <flag>wxALL|wxEXPAND</flag>
     <object class="wxNotebook">
     <object class="notebookpage">
       <object class="wxPanel">
@@ -37,25 +38,41 @@
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="OutputQuartz2D">
-                      <label>Quartz2D</label>
+                      <label translate="0">Quartz2D</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="OutputMetal">
+                      <label translate="0">Metal</label>
                     </object>
                     <flag>wxALL</flag>
                     <border>5</border>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="OutputOpenGL">
-                      <label>OpenGL</label>
+                      <label translate="0">OpenGL</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="OutputSDL">
+                      <label translate="0">SDL</label>
                     </object>
                     <flag>wxALL</flag>
                     <border>5</border>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="OutputDirect3D">
-                      <label>Direct3D 9</label>
+                      <label translate="0">Direct3D 9</label>
                     </object>
                     <flag>wxALL</flag>
                     <border>5</border>
                   </object>
+              <label>Device</label>
+              <orient>wxVERTICAL</orient>
                 </object>
               </object>
             </object>
@@ -76,34 +93,34 @@
                 <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>
                 <object class="wxStaticText">
-                  <label>Display filter :</label>
+                  <label>Display filter:</label>
                 </object>
               </object>
               <object class="sizeritem">
                 <object class="wxChoice" name="Filter">
                   <content>
                     <item>None</item>
-                    <item>2xSaI</item>
+                    <item translate="0">2xSaI</item>
                     <item>Super 2xSaI</item>
                     <item>Super Eagle</item>
                     <item>Pixelate</item>
-                    <item>Advance MAME Scale2x</item>
+                    <item>Advance MAME Scale 2x</item>
                     <item>Bilinear</item>
                     <item>Bilinear Plus</item>
                     <item>Scanlines</item>
                     <item>TV Mode</item>
-                    <item>HQ 2x</item>
-                    <item>LQ 2x</item>
+                    <item translate="0">HQ 2x</item>
+                    <item translate="0">LQ 2x</item>
                     <item>Simple 2x</item>
                     <item>Simple 3x</item>
-                    <item>HQ 3x</item>
+                    <item translate="0">HQ 3x</item>
                     <item>Simple 4x</item>
-                    <item>HQ 4x</item>
-                    <item>xBRZ 2x</item>
-                    <item>xBRZ 3x</item>
-                    <item>xBRZ 4x</item>
-                    <item>xBRZ 5x</item>
-                    <item>xBRZ 6x</item>
+                    <item translate="0">HQ 4x</item>
+                    <item translate="0">xBRZ 2x</item>
+                    <item translate="0">xBRZ 3x</item>
+                    <item translate="0">xBRZ 4x</item>
+                    <item translate="0">xBRZ 5x</item>
+                    <item translate="0">xBRZ 6x</item>
                     <item>Plugin</item>
                   </content>
                 </object>
@@ -112,7 +129,7 @@
               </object>
 			  <object class="sizeritem">
                 <object class="wxStaticText" name="PluginLab">
-                  <label>Plugin :</label>
+                  <label>Plugin:</label>
                 </object>
 				<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
 				<border>5</border>
@@ -124,7 +141,7 @@
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>Interframe blending :</label>
+                  <label>Interframe blending:</label>
                 </object>
                 <flag>wxRIGHT|wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>
@@ -133,9 +150,29 @@
                 <object class="wxChoice" name="IFB">
                   <content>
                     <item>None</item>
-                    <item>Smart interframe blending</item>
-                    <item>Interframe motion blur</item>
+                    <item>Smart</item>
+                    <item>Motion Blur</item>
                   </content>
+                </object>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="SDLRendererLab">
+                  <label>SDL Renderer:</label>
+                </object>
+                <flag>wxRIGHT|wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxChoice" name="SDLRenderer">
+                </object>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxCheckBox" name="SDLPixelArt">
+                  <label>SDL Pixel Art Filter</label>
                 </object>
                 <flag>wxALL|wxEXPAND</flag>
                 <border>5</border>
@@ -149,6 +186,180 @@
         </object>
       </object>
       <label>Basic</label>
+    </object>
+    <object class="notebookpage">
+      <object class="wxPanel">
+        <object class="wxFlexGridSizer">
+          <orient>wxVERTICAL</orient>
+          <object class="sizeritem">
+            <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border> 
+            <object class="wxStaticText" name="BitDepthLab">
+              <label>Bit Depth:</label>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxChoice" name="BitDepth">
+              <content>
+                <item>8</item>
+                <item>16</item>
+                <item>24</item>
+                <item>32</item>
+              </content>
+            </object>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <cols>2</cols>
+          <growablecols>1</growablecols>
+        </object>
+      </object>
+      <label>Bit Depth</label>
+    </object>
+    <object class="notebookpage">
+      <object class="wxPanel">
+        <object class="wxFlexGridSizer">
+          <orient>wxVERTICAL</orient>
+          <object class="sizeritem">
+            <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+            <object class="wxStaticText" name="BitDepthLab">
+              <label>Profile:</label>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+            <object class="wxBoxSizer">
+              <orient>wxVERTICAL</orient>
+              <object class="sizeritem">
+                <object class="wxBoxSizer">
+                  <orient>wxHORIZONTAL</orient>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="ColorProfileSRGB">
+                      <label translate="0">sRGB</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="ColorProfileDCI">
+                      <label translate="0">DCI</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="ColorProfileRec2020">
+                      <label translate="0">Rec2020</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+              <label>Profile</label>
+              <orient>wxVERTICAL</orient>
+                </object>
+              </object>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+            <object class="wxStaticText">
+              <label>GBA Darken:</label>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxBoxSizer">
+              <object class="sizeritem">
+                <object class="wxSlider" name="GBADarken">
+                  <value>0</value>
+                  <min>0</min>
+                  <max>100</max>
+                </object>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxBoxSizer">
+                  <object class="sizeritem">
+                    <object class="wxStaticText">
+                      <label>Lighter</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="spacer">
+                    <option>1</option>
+                    <flag>wxEXPAND</flag>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxStaticText">
+                      <label>Very Dark</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <orient>wxHORIZONTAL</orient>
+                </object>
+                <flag>wxEXPAND</flag>
+              </object>
+              <orient>wxVERTICAL</orient>
+            </object>
+            <flag>wxEXPAND</flag>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+            <object class="wxStaticText">
+              <label>GBC Lighten:</label>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxBoxSizer">
+              <object class="sizeritem">
+                <object class="wxSlider" name="GBCLighten">
+                  <value>0</value>
+                  <min>0</min>
+                  <max>100</max>
+                </object>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxBoxSizer">
+                  <object class="sizeritem">
+                    <object class="wxStaticText">
+                      <label>Darker</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <object class="spacer">
+                    <option>1</option>
+                    <flag>wxEXPAND</flag>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxStaticText">
+                      <label>Very Light</label>
+                    </object>
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                  </object>
+                  <orient>wxHORIZONTAL</orient>
+                </object>
+                <flag>wxEXPAND</flag>
+              </object>
+              <orient>wxVERTICAL</orient>
+            </object>
+            <flag>wxEXPAND</flag>
+          </object>
+          <flag>wxEXPAND</flag>
+          <cols>2</cols>
+          <growablecols>1</growablecols>
+        </object>
+      </object>
+      <label>Color Correction</label>
     </object>
     <object class="notebookpage">
       <object class="wxPanel">
@@ -174,7 +385,7 @@
                   <orient>wxHORIZONTAL</orient>
                   <object class="sizeritem">
                     <object class="wxStaticText" name="FrameSkipLab">
-                      <label>_Number of frames to skip :</label>
+                      <label>_Number of frames to skip:</label>
                     </object>
                     <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                     <border>5</border>
@@ -212,7 +423,7 @@
                     <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                     <border>5</border>
                     <object class="wxStaticText">
-                      <label>Speed indicator :</label>
+                      <label>Speed indicator:</label>
                     </object>
                   </object>
                   <object class="sizeritem">
@@ -244,7 +455,7 @@
             <object class="wxBoxSizer">
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>Default magnification :</label>
+                  <label>Default magnification:</label>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>
@@ -263,7 +474,7 @@
             <object class="wxBoxSizer">
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>Maximum magnification factor :</label>
+                  <label>Maximum magnification factor:</label>
                   <tooltip>0 = no maximum</tooltip>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
@@ -285,6 +496,7 @@
       <label>Zoom</label>
     </object>
   </object>
+  <option>1</option>
   </object>
       <object class="sizeritem">
         <flag>wxALL|wxEXPAND</flag>

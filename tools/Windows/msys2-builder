@@ -1,0 +1,169 @@
+#!/bin/sh
+
+set -e
+
+LANG=C LC_COLLATE=C LC_CTYPE=C LC_MESSAGES=C LC_MONETARY=C LC_NUMERIC=C LC_TIME=C LC_ALL=C
+export LANG LC_COLLATE LC_CTYPE LC_MESSAGES LC_MONETARY LC_NUMERIC LC_TIME LC_ALL
+
+case "$1" in
+    -32)
+        shift
+        if [ "$MSYSTEM" != MINGW32 ]; then
+            unset MSYSTEM_PREFIX MSYSTEM_CARCH MSYSTEM_CHOST MINGW_CHOST MINGW_PREFIX MINGW_PACKAGE_PREFIX CONFIG_SITE ACLOCAL_PATH PKG_CONFIG_PATH
+            OPWD=$PWD
+            export MSYSTEM=MINGW32
+            . /etc/profile || :
+            . ~/.bashrc 2>/dev/null || :
+            cd "$OPWD"
+        fi
+        ;;
+    -64)
+        shift
+        if [ "$MSYSTEM" != MINGW64 ]; then
+            unset MSYSTEM_PREFIX MSYSTEM_CARCH MSYSTEM_CHOST MINGW_CHOST MINGW_PREFIX MINGW_PACKAGE_PREFIX CONFIG_SITE ACLOCAL_PATH PKG_CONFIG_PATH
+            OPWD=$PWD
+            export MSYSTEM=MINGW64
+            . /etc/profile || :
+            . ~/.bashrc 2>/dev/null || :
+            cd "$OPWD"
+        fi
+        ;;
+esac
+
+OMSYSTEM=$MSYSTEM
+
+case "$MSYSTEM" in
+    MINGW32)
+        export HOST_SYSTEM=i686-w64-mingw32
+        sys_base=/mingw32
+        export BUILD_ROOT="$HOME/vbam-build-msys2-i686"
+        target_bits=32
+        target_cpu=i686
+        ;;
+    MINGW64)
+        export HOST_SYSTEM=x86_64-w64-mingw32
+        sys_base=/mingw64
+        export BUILD_ROOT="$HOME/vbam-build-msys2-x86_64"
+        target_bits=64
+        target_cpu=x86_64
+        ;;
+    MSYS)
+        exec "$0" "$@" -64
+        ;;
+    *)
+        echo >&2 'You must be in either the MINGW32 or MINGW64 environment.'
+        exit 1
+        ;;
+esac
+
+# turn on real symlinks
+new_msys= replaced=
+for part in $MSYS; do
+    case "$part" in
+        winsymlinks:*)
+            new_msys="$new_msys winsymlinks:nativestrict"
+            replaced=1
+            ;;
+        *)
+            new_msys="$new_msys $part"
+            ;;
+    esac
+done
+
+if [ -n "$replaced" ]; then
+    export MSYS=$new_msys
+else
+    export MSYS="winsymlinks:nativestrict $new_msys"
+fi
+
+PATH_SEP=';'
+
+CMAKE_PREFIX_PATH=
+for dir in /lib /bin "$HOST_SYSTEM/lib" "$HOST_SYSTEM/bin"; do
+    CMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH;$(cygpath -m "$sys_base/$dir")"
+done
+
+export CMAKE_PREFIX_PATH="$(cygpath -m "$BUILD_ROOT/root");${CMAKE_PREFIX_PATH%;}"
+
+ignore_msys_paths=
+for d in /usr /usr/include /usr/lib; do
+    ignore_msys_paths="$ignore_msys_paths;$(cygpath -m "$d")"
+done
+ignore_msys_paths=${ignore_msys_paths#;}
+
+export CMAKE_BASE_ARGS="-G 'MSYS Makefiles' -DCMAKE_IGNORE_PATH='$ignore_msys_paths'"
+
+export TMP_DIR="$BUILD_ROOT/tmp_$$"
+
+BUILD_ENV=$BUILD_ENV$(cat <<'EOF'
+
+# don't translate prefix and defines by default
+export MSYS2_ARG_CONV_EXCL="-D;/usr;/etc"
+
+EOF
+)
+
+export BUILD_ENV
+
+DIST_TAR_ARGS="
+    help2man        --exclude ChangeLog
+    expat           --exclude README.md
+    libsoxr         --exclude inst-check-soxr-lsr
+    graphviz        --exclude COPYING --exclude graphviz.spec
+"
+
+. "${0%/*}/../builder/mingw.sh"
+
+host_env() {
+    cat <<EOF
+unset MSYSTEM_PREFIX MSYSTEM_CARCH MSYSTEM_CHOST MINGW_CHOST MINGW_PREFIX MINGW_PACKAGE_PREFIX CONFIG_SITE ACLOCAL_PATH PKG_CONFIG_PATH
+
+OPWD="\$PWD"
+export MSYSTEM=MSYS
+. /etc/profile || :
+. ~/.bashrc 2>/dev/null || :
+$BUILD_ENV
+EOF
+
+    cd "$OPWD"
+    host_env_base 2>/dev/null || :
+}
+
+target_env() {
+    cat <<EOF
+unset MSYSTEM_PREFIX MSYSTEM_CARCH MSYSTEM_CHOST MINGW_CHOST MINGW_PREFIX MINGW_PACKAGE_PREFIX CONFIG_SITE ACLOCAL_PATH PKG_CONFIG_PATH
+
+OPWD="\$PWD"
+export MSYSTEM="\$OMSYSTEM"
+. /etc/profile || :
+. ~/.bashrc 2>/dev/null || :
+$BUILD_ENV
+EOF
+
+    cd "$OPWD"
+    target_env_base 2>/dev/null || :
+}
+
+table_line_replace DIST_BUILD_OVERRIDES ninja "python configure.py && ninja -j $NUM_CPUS && cp -af ./ninja \"\$BUILD_ROOT/root/bin\""
+
+table_line_append DIST_PRE_BUILD c2man ":; \
+    sed -i.bak '/test -d c:\\//,/^fi\$/d' Configure; \
+"
+
+table_line_append DIST_PATCHES xmlto 'https://gist.githubusercontent.com/rkitover/55d51ab3d55af510b37872a49670436c/raw/b447beaffc2daa747ba6eaf222f69677c7d4a169/xmlto-0.0.28-mingw.patch'
+
+# FIXME: problems with autopoint that need to be sorted
+table_line_remove DISTS flex
+
+table_line_replace DIST_CONFIGURE_TYPES fontconfig autoreconf
+table_line_append  DIST_PRE_BUILD       fontconfig ":; \
+    sed -i.bak 's|ln -s \\\$(templatedir)|cp -af \$(DESTDIR)/\$(templatedir)|g' conf.d/Makefile.am; \
+"
+
+if mime_info_libs=$(table_line DIST_EXTRA_LIBS shared-mime-info); then
+    table_line_replace DIST_EXTRA_LIBS shared-mime-info "$(puts "$mime_info_libs" | sed 's/-ldl//g; s/-lresolv//g;')"
+fi
+
+table_line_replace DIST_CONFIGURE_OVERRIDES openssl "$(table_line DIST_CONFIGURE_OVERRIDES openssl | sed 's,^./config ,./Configure Cygwin-x86_64 ,')"
+
+builder "$@"

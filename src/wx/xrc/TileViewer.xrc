@@ -12,13 +12,13 @@
                 <object class="wxStaticBoxSizer">
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="Color16">
-                      <label>1_6</label>
+                      <label translate="0">1_6</label>
                       <style>wxRB_GROUP</style>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="Color256">
-                      <label>_256</label>
+                      <label translate="0">_256</label>
                     </object>
                   </object>
                   <label>Colors</label>
@@ -31,28 +31,28 @@
                 <object class="wxStaticBoxSizer">
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="CharBase0">
-                      <label>0x600_0000</label>
+                      <label translate="0">0x600_0000</label>
                       <style>wxRB_GROUP</style>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="CharBase1">
-                      <label>0x600_4000</label>
+                      <label translate="0">0x600_4000</label>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="CharBase2">
-                      <label>0x600_8000</label>
+                      <label translate="0">0x600_8000</label>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="CharBase3">
-                      <label>0x600_C000</label>
+                      <label translate="0">0x600_C000</label>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <object class="wxRadioButton" name="CharBase4">
-                      <label>0x60_10000</label>
+                      <label translate="0">0x60_10000</label>
                     </object>
                   </object>
                   <label>Char Base</label>
@@ -133,7 +133,7 @@
               </object>
               <object class="sizeritem">
                 <object class="unknown" name="Color"/>
-                <flag>wxALL|wxALIGN_BOTTOM</flag>
+                <flag>wxALL</flag>
                 <border>5</border>
               </object>
             </object>
@@ -164,7 +164,7 @@
             <border>5</border>
           </object>
           <object class="sizeritem">
-            <object class="wxButton" name="wxID_SAVE">
+            <object class="wxButton" name="SaveGBATile">
               <label>_Save...</label>
             </object>
             <flag>wxALL|wxALIGN_CENTRE_HORIZONTAL</flag>

@@ -1,0 +1,45 @@
+#!/usr/local/bin/bash
+
+set -e
+
+LANG=C LC_COLLATE=C LC_CTYPE=C LC_MESSAGES=C LC_MONETARY=C LC_NUMERIC=C LC_TIME=C LC_ALL=C
+export LANG LC_COLLATE LC_CTYPE LC_MESSAGES LC_MONETARY LC_NUMERIC LC_TIME LC_ALL
+
+export TAR=tar
+
+. "${0%/*}/../builder/mingw-cross.sh"
+
+host_env_hook() {
+    cat <<EOF
+export COMMAND_MODE=unix2003
+export CC='ccache clang'
+export CXX='ccache clang++'
+export CPPFLAGS="-I\$BUILD_ROOT/root/include -DICONV_CONST="
+export CFLAGS="-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+export CXXFLAGS="-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+export OBJCXXFLAGS="-fPIC -I\$BUILD_ROOT/root/include -L\$BUILD_ROOT/root/lib -std=gnu++17 -fpermissive -stdlib=libc++ -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -DICONV_CONST= -Wl,-no_compact_unwind"
+export LDFLAGS="-fPIC -L\$BUILD_ROOT/root/lib -framework Carbon -framework Foundation -framework CoreServices -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
+EOF
+}
+
+target_env_hook() {
+    cat <<EOF
+unset COMMAND_MODE
+EOF
+}
+
+table_line_remove DISTS flex
+table_line_remove DISTS libsecret
+
+# issues with perl modules linked to our libs and brew perl
+table_line_remove DISTS shared-mime-info
+
+# -Wl,-no_compact_unwind must be passed in LDFLAGS to openssl
+table_line_append DIST_MAKE_ARGS openssl "LDFLAGS=\"\$LDFLAGS\""
+
+table_line_replace DIST_CONFIGURE_OVERRIDES openssl './Configure darwin64-x86_64-cc no-shared --prefix=/usr --openssldir=/etc/ssl'
+
+# m4 crashes on 10.13
+table_line_append DIST_PATCHES m4 '-p0 https://raw.githubusercontent.com/macports/macports-ports/edf0ee1e2cf/devel/m4/files/secure_snprintf.patch'
+
+builder "$@"

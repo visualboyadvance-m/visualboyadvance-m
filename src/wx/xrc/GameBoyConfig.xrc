@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
   <object class="wxDialog" name="GameBoyConfig">
-    <title>GameBoy settings</title>
+    <title>Game Boy settings</title>
     <object class="wxBoxSizer">
     <orient>wxVERTICAL</orient>
     <object class="sizeritem">
@@ -17,7 +17,7 @@
               <orient>wxHORIZONTAL</orient>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>Emulated _system :</label>
+                  <label>Emulated _system:</label>
                 </object>
                 <option>1</option>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
@@ -27,11 +27,11 @@
                 <object class="wxChoice" name="System">
                   <content>
                     <item>Automatic</item>
-                    <item>Game Boy Color</item>
-                    <item>Super Game Boy</item>
-                    <item>Game Boy</item>
-                    <item>Game Boy Advance</item>
-                    <item>Super Game Boy 2</item>
+                    <item translate="0">Game Boy Color</item>
+                    <item translate="0">Super Game Boy</item>
+                    <item translate="0">Game Boy</item>
+                    <item translate="0">Game Boy Advance</item>
+                    <item translate="0">Super Game Boy 2</item>
                   </content>
                 </object>
                 <option>1</option>
@@ -45,7 +45,7 @@
               <orient>wxHORIZONTAL</orient>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>Display _borders :</label>
+                  <label>Display _borders:</label>
                 </object>
                 <option>1</option>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
@@ -81,14 +81,14 @@
               <orient>wxHORIZONTAL</orient>
               <object class="sizeritem">
                 <object class="wxStaticText" name="BootRomLab">
-                  <label>GB Boot _ROM file :</label>
+                  <label>Game Boy Boot _ROM file:</label>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
-                <object class="wxFilePickerCtrl" name="BootRom">
-                  <message>Select A File</message>
+                <object class="wxFilePickerCtrl" name="GBBiosPicker">
+                  <message>Select a File</message>
                   <wildcard>BIOS files (*.bin;*.rom)|*.bin;*.rom|All files|*</wildcard>
                   <size>472,30</size>
                 </object>
@@ -103,14 +103,14 @@
               <orient>wxHORIZONTAL</orient>
               <object class="sizeritem">
                 <object class="wxStaticText" name="CBootRomLab">
-                  <label>GBC Boot ROM _file :</label>
+                  <label>Game Boy Color Boot ROM _file:</label>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
-                <object class="wxFilePickerCtrl" name="CBootRom">
-                  <message>Select A File</message>
+                <object class="wxFilePickerCtrl" name="GBCBiosPicker">
+                  <message>Select a File</message>
                   <wildcard>BIOS files (*.bin;*.rom)|*.bin;*.rom|All files|*</wildcard>
                   <size>472,30</size>
                 </object>
@@ -128,13 +128,13 @@
               <orient>wxHORIZONTAL</orient>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>Current GB BIOS file :</label>
+                  <label>Current Game Boy BIOS file:</label>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
-                <object class="wxStaticText" name="BiosFile">
+                <object class="wxStaticText" name="GBBiosLabel">
                   <label>(None)</label>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
@@ -149,13 +149,13 @@
               <orient>wxHORIZONTAL</orient>
               <object class="sizeritem">
                 <object class="wxStaticText">
-              <label>Current GBC BIOS file :</label>
+              <label>Current Game Boy Color BIOS file:</label>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
-                <object class="wxStaticText" name="CBiosFile">
+                <object class="wxStaticText" name="GBCBiosLabel">
               <label>(None)</label>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
@@ -174,19 +174,19 @@
           <object class="sizeritem">
             <object class="wxNotebook">
               <object class="notebookpage">
-                <object_ref name="cp1" ref="GBColorPrefPanel">
+                <object_ref name="cp0" ref="GBColorPrefPanel">
                   <pos>0,0</pos>
                 </object_ref>
                 <label>Default</label>
               </object>
               <object class="notebookpage">
-                <object_ref name="cp2" ref="GBColorPrefPanel">
+                <object_ref name="cp1" ref="GBColorPrefPanel">
                   <pos>0,0</pos>
                 </object_ref>
                 <label>User 1</label>
               </object>
               <object class="notebookpage">
-                <object_ref name="cp3" ref="GBColorPrefPanel">
+                <object_ref name="cp2" ref="GBColorPrefPanel">
                   <pos>0,0</pos>
                 </object_ref>
                 <label>User 2</label>

@@ -1,0 +1,47 @@
+version: '{build}'
+
+image:
+  - Visual Studio 2017
+
+build:
+  verbosity: detailed
+
+configuration:
+  - Debug
+  - Release
+
+platform:
+  - x64
+  - x86
+
+environment:
+  matrix:
+    - STATIC: " "
+    - STATIC: "-static"
+
+matrix:
+  fast_finish: true
+
+install:
+  - set NINJA_URL="https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-win.zip"
+  - appveyor DownloadFile %NINJA_URL% -FileName ninja.zip
+  - 7z x ninja.zip -oc:\projects\ninja > nul
+  - set PATH=c:\projects\ninja;%PATH%
+  - ninja --version
+
+before_build:
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" %PLATFORM%
+
+build_script:
+  - mkdir build
+  - cd build
+  - cmake .. -DVCPKG_TARGET_TRIPLET=%PLATFORM%-windows%STATIC% -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DENABLE_SDL=TRUE -G Ninja
+  - ninja
+
+# only debug builds are console mode apps, in them test --help
+test_script:
+  - if not %CONFIGURATION%==Release .\visualboyadvance-m.exe --help
+  - ctest -V
+
+cache:
+  - c:\vcpkg\installed

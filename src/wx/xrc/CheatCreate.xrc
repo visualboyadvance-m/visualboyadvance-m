@@ -94,7 +94,7 @@
                     <flag>wxALL</flag>
                     <border>5</border>
                   </object>
-                  <label>Signed/Unsigned</label>
+                  <label>Signed / Unsigned</label>
                   <orient>wxVERTICAL</orient>
                 </object>
                 <flag>wxALL|wxEXPAND</flag>

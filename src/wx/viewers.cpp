@@ -2,13 +2,20 @@
 // these are all the viewer dialogs except for the ones with graphical areas
 // they can be instantiated multiple times
 
-#include "../common/cstdint.h"
+#include <limits>
 
-#include "../gba/armdis.h"
-#include "viewsupt.h"
-#include "wxvbam.h"
+#include <wx/event.h>
 #include <wx/ffile.h>
 #include <wx/vlbox.h>
+
+#include "core/gb/gb.h"
+#include "core/gb/gbDis.h"
+#include "core/gb/gbGlobals.h"
+#include "core/gba/gbaCpu.h"
+#include "core/gba/gbaCpuArmDis.h"
+#include "wx/config/option-proxy.h"
+#include "wx/viewsupt.h"
+#include "wx/wxvbam.h"
 
 // avoid exporting classes
 namespace Viewers {
@@ -73,7 +80,7 @@ public:
         Fit();
         SetMinSize(GetSize());
         dis->maxaddr = (uint32_t)~0;
-        dismode = 0;
+        disassembly_mode_ = DisassemblyMode::Automatic;
         GotoPC();
     }
     void Update()
@@ -82,13 +89,13 @@ public:
     }
     void Next(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         CPULoop(1);
         GotoPC();
     }
     void Goto(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         wxString as = goto_addr->GetValue();
 
         if (!as.size())
@@ -100,30 +107,29 @@ public:
         UpdateDis();
     }
     // wx-2.8.4 or MacOSX compiler can't resolve overloads in evt table
-    void GotoPCEv(wxCommandEvent& ev)
+    void GotoPCEv(wxCommandEvent&)
     {
-	(void)ev; // unused params
         GotoPC();
     }
     void GotoPC()
     {
 #if 0
 
-		// this is what the win32 interface used
-		if (armState)
-			dis->SetSel(armNextPC - 16);
-		else
-			dis->SetSel(armNextPC - 8);
+        // this is what the win32 interface used
+        if (armState)
+            dis->SetSel(armNextPC - 16);
+        else
+            dis->SetSel(armNextPC - 8);
 
-		// doesn't make sense, though.  Maybe it's just trying to keep the
-		// sel 4 instructions below top...
+        // doesn't make sense, though.  Maybe it's just trying to keep the
+        // sel 4 instructions below top...
 #endif
         dis->SetSel(armNextPC);
         UpdateDis();
     }
     void RefreshCmd(wxCommandEvent& ev)
     {
-	(void)ev; // unused params
+        (void)ev; // unused params
         UpdateDis();
     }
     void UpdateDis()
@@ -155,13 +161,14 @@ public:
         dis->strings.clear();
         dis->addrs.clear();
         uint32_t addr = dis->topaddr;
-        bool arm = dismode == 1 || (armState && dismode != 2);
-        dis->back_size = arm ? 4 : 2;
+        const bool arm_mode = disassembly_mode_ == DisassemblyMode::Arm ||
+                              (armState && disassembly_mode_ == DisassemblyMode::Automatic);
+        dis->back_size = arm_mode ? 4 : 2;
 
         for (int i = 0; i < dis->nlines; i++) {
             dis->addrs.push_back(addr);
 
-            if (arm)
+            if (arm_mode)
                 addr += disArm(addr, buf, 4096, DIS_VIEW_CODE | DIS_VIEW_ADDRESS);
             else
                 addr += disThumb(addr, buf, 4096, DIS_VIEW_CODE | DIS_VIEW_ADDRESS);
@@ -172,10 +179,32 @@ public:
         dis->Refill();
     }
 
+private:
+    enum class DisassemblyMode {
+        Automatic,
+        Arm,
+        Thumb,
+    };
+
+    void AutomaticMode(wxCommandEvent& ev) {
+        disassembly_mode_ = DisassemblyMode::Automatic;
+        RefillListEv(ev);
+    }
+
+    void ArmMode(wxCommandEvent& ev) {
+        disassembly_mode_ = DisassemblyMode::Arm;
+        RefillListEv(ev);
+    }
+
+    void ThumbMode(wxCommandEvent& ev) {
+        disassembly_mode_ = DisassemblyMode::Thumb;
+        RefillListEv(ev);
+    }
+
     DisList* dis;
     wxTextCtrl* goto_addr;
     wxCheckBox *N, *Z, *C, *V, *I, *F, *T;
-    int dismode;
+    DisassemblyMode disassembly_mode_;
     wxControl *regv[17], *Modev;
     DECLARE_EVENT_TABLE()
 };
@@ -187,6 +216,9 @@ EVT_TEXT_ENTER(XRCID("GotoAddress"), DisassembleViewer::Goto)
 EVT_BUTTON(XRCID("GotoPC"), DisassembleViewer::GotoPCEv)
 EVT_BUTTON(XRCID("Next"), DisassembleViewer::Next)
 EVT_BUTTON(XRCID("Refresh"), DisassembleViewer::RefreshCmd)
+EVT_BUTTON(XRCID("InsAuto"), DisassembleViewer::AutomaticMode)
+EVT_BUTTON(XRCID("InsARM"), DisassembleViewer::ArmMode)
+EVT_BUTTON(XRCID("InsThumb"), DisassembleViewer::ThumbMode)
 END_EVENT_TABLE()
 
 class GBDisassembleViewer : public Viewer {
@@ -299,7 +331,7 @@ public:
 
         for (int i = 0; i < dis->nlines; i++) {
             dis->addrs.push_back(addr);
-            addr += gbDis(buf, addr);
+            addr += gbDis(buf, sizeof(buf), addr);
             dis->strings.push_back(wxString(buf, wxConvLibc));
         }
 
@@ -341,7 +373,7 @@ void MainFrame::Disassemble(void)
 
 // for CPUWriteHalfWord
 // and CPURead... below
-#include "../gba/GBAinline.h"
+#include "core/gba/gbaInline.h"
 
 namespace Viewers {
 #include "ioregs.h"
@@ -361,18 +393,18 @@ public:
                 baddialog();
         }
 
-        addr = XRCCTRL(*this, "Address", wxChoice);
+        addr_ = XRCCTRL(*this, "Address", wxChoice);
         val = XRCCTRL(*this, "Value", wxControl);
 
-        if (!addr || !val)
+        if (!addr_ || !val)
             baddialog();
 
-        addr->Clear();
+        addr_->Clear();
         wxString longline = lline;
         int lwidth = 0;
 
         for (long unsigned int i = 0; i < NUM_IOREGS; i++) {
-            addr->Append(wxGetTranslation(ioregs[i].name));
+            addr_->Append(wxGetTranslation(ioregs[i].name));
 
             // find longest label
             // this is probably horribly expensive
@@ -380,7 +412,7 @@ public:
             // and while at it, translate all the strings
             if (!lline) {
                 for (int j = 0; j < 16; j++) {
-                    if (ioregs[i].bits[j][0]) {
+                    if (!ioregs[i].bits[j].IsEmpty()) {
                         ioregs[i].bits[j] = wxGetTranslation(ioregs[i].bits[j]);
                         int w, h;
                         bitlab[0]->GetTextExtent(ioregs[i].bits[j], &w, &h);
@@ -399,14 +431,14 @@ public:
 
         bitlab[0]->SetLabel(lline);
         Fit();
-        addr->SetSelection(0);
+        addr_->SetSelection(0);
         Select(0);
     }
 
     void SelectEv(wxCommandEvent& ev)
     {
 	(void)ev; // unused params
-        Select(addr->GetSelection());
+        Select(addr_->GetSelection());
     }
 
     void Select(int sel)
@@ -422,22 +454,19 @@ public:
         Update(sel);
     }
 
-    void Update()
-    {
-        Update(addr->GetSelection());
-    }
+    void Update() { Update(addr_->GetSelection()); }
 
     void Update(int sel)
     {
-        uint16_t* addr = ioregs[sel].address ? ioregs[sel].address : (uint16_t*)&ioMem[ioregs[sel].offset];
-        uint16_t mask, reg = *addr;
+        uint16_t* addr = ioregs[sel].address ? ioregs[sel].address : (uint16_t*)&g_ioMem[ioregs[sel].offset];
+        uint16_t mask, _reg = *addr;
         int i;
 
         for (mask = 1, i = 0; mask; mask <<= 1, i++)
-            bit[i]->SetValue(mask & reg);
+            bit[i]->SetValue(mask & _reg);
 
         wxString s;
-        s.Printf(wxT("%04X"), reg);
+        s.Printf(wxT("%04X"), _reg);
         val->SetLabel(s);
     }
 
@@ -447,15 +476,15 @@ public:
             if (ev.GetEventObject() == bit[i]) {
                 // it'd be faster to store the value and just flip
                 // the bit, but it's easier this way
-                uint16_t mask, reg = 0;
+                uint16_t mask, _reg = 0;
                 int j;
 
                 for (mask = 1, j = 0; mask; mask <<= 1, j++)
                     if (bit[j]->GetValue())
-                        reg |= mask;
+                        _reg |= mask;
 
                 wxString s;
-                s.Printf(wxT("%04X"), reg);
+                s.Printf(wxT("%04X"), _reg);
                 val->SetLabel(s);
                 return;
             }
@@ -472,23 +501,23 @@ public:
     void Apply(wxCommandEvent& ev)
     {
 	(void)ev; // unused params
-        int sel = addr->GetSelection();
-        uint16_t* addr = ioregs[sel].address ? ioregs[sel].address : (uint16_t*)&ioMem[ioregs[sel].offset];
-        uint16_t mask, reg = *addr;
-        reg &= ~ioregs[sel].write;
+        int sel = addr_->GetSelection();
+        uint16_t* addr = ioregs[sel].address ? ioregs[sel].address : (uint16_t*)&g_ioMem[ioregs[sel].offset];
+        uint16_t mask, _reg = *addr;
+        _reg &= ~ioregs[sel].write;
         int i;
 
         for (mask = 1, i = 0; mask; mask <<= 1, i++) {
             if ((mask & ioregs[sel].write) && bit[i]->GetValue())
-                reg |= mask;
+                _reg |= mask;
         }
 
-        CPUWriteHalfWord(0x4000000 + ioregs[sel].offset, reg);
+        CPUWriteHalfWord(0x4000000 + ioregs[sel].offset, _reg);
         Update(sel);
     }
 
     static wxString lline;
-    wxChoice* addr;
+    wxChoice* addr_;
     wxControl* val;
     wxCheckBox* bit[16];
     wxControl* bitlab[16];
@@ -515,12 +544,9 @@ void MainFrame::IOViewer()
             baddialog();                                                \
         cb->SetValidator(wxBoolIntValidator(&systemVerbose, val, val)); \
     } while (0)
-LogDialog::LogDialog()
-{
+LogDialog::LogDialog() :
+dialogs::BaseDialog(NULL, "Logging") {
     const wxString dname = wxT("Logging");
-
-    if (!wxXmlResource::Get()->LoadDialog(this, wxGetApp().frame, dname))
-        baddialog();
 
     SetEscapeId(wxID_OK);
     getlogf("SWI", VERBOSE_SWI);
@@ -561,6 +587,9 @@ void LogDialog::Save(wxCommandEvent& ev)
     pats.append(wxALL_FILES);
     wxFileDialog dlg(this, _("Select output file"), logdir, def_name,
         pats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+    SetGenericPath(dlg, logdir);
+
     int ret = dlg.ShowModal();
     def_name = dlg.GetPath();
     logdir = dlg.GetDirectory();
@@ -613,11 +642,15 @@ public:
     MemViewerBase(uint32_t max)
         : Viewer(wxT("MemViewer"))
     {
-        if (!(mv = XRCCTRL(*this, "MemView", MemView)))
+        mv = XRCCTRL(*this, "MemView", MemView);
+        if (!mv) {
             baddialog();
+        }
 
-        if (!(bs = XRCCTRL(*this, "BlockStart", wxChoice)))
+        bs = XRCCTRL(*this, "BlockStart", wxChoice);
+        if (!bs) {
             baddialog();
+        }
 
         bs->Append(wxT(""));
         bs->SetFocus();
@@ -644,8 +677,8 @@ public:
         Goto(0);
         // initialize load/save support dialog already
         {
-            const wxString dname = wxT("MemSelRegion");
-            selregion = wxXmlResource::Get()->LoadDialog(this, dname);
+            const wxString _dname = wxT("MemSelRegion");
+            selregion = wxXmlResource::Get()->LoadDialog(this, _dname);
 
             if (!selregion)
                 baddialog();
@@ -679,7 +712,7 @@ public:
     }
     void Goto(uint32_t addr)
     {
-        mv->Show(addr, true);
+        mv->ShowAddr(addr, true);
     }
     void RefreshCmd(wxCommandEvent& ev)
     {
@@ -699,6 +732,9 @@ public:
         pats.append(wxALL_FILES);
         wxFileDialog dlg(this, _("Select memory dump file"), memsave_dir, memsave_fn,
             pats, wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+    
+        SetGenericPath(dlg, memsave_dir);
+
         int ret = dlg.ShowModal();
         memsave_fn = dlg.GetPath();
         memsave_dir = dlg.GetDirectory();
@@ -727,7 +763,7 @@ public:
         selreg_len->SetValue(s);
         selregion->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
 
-        if (gopts.keep_on_top)
+        if (OPTION(kDispKeepOnTop))
             selregion->SetWindowStyle(selregion->GetWindowStyle() | wxSTAY_ON_TOP);
         else
             selregion->SetWindowStyle(selregion->GetWindowStyle() & ~wxSTAY_ON_TOP);
@@ -752,7 +788,7 @@ public:
         selreg_len->SetValue(wxEmptyString);
         selregion->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
 
-        if (gopts.keep_on_top)
+        if (OPTION(kDispKeepOnTop))
             selregion->SetWindowStyle(selregion->GetWindowStyle() | wxSTAY_ON_TOP);
         else
             selregion->SetWindowStyle(selregion->GetWindowStyle() & ~wxSTAY_ON_TOP);
@@ -771,6 +807,9 @@ public:
         pats.append(wxALL_FILES);
         wxFileDialog dlg(this, _("Select output file"), memsave_dir, memsave_fn,
             pats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+    
+        SetGenericPath(dlg, memsave_dir);
+
         int ret = dlg.ShowModal();
         memsave_dir = dlg.GetDirectory();
         memsave_fn = dlg.GetPath();
@@ -808,17 +847,15 @@ END_EVENT_TABLE()
 
 class MemViewer : public MemViewerBase {
 public:
-    MemViewer()
-        : MemViewerBase(~0)
-    {
-        bs->Append(_("0x00000000 - BIOS"));
-        bs->Append(_("0x02000000 - WRAM"));
-        bs->Append(_("0x03000000 - IRAM"));
-        bs->Append(_("0x04000000 - I/O"));
-        bs->Append(_("0x05000000 - PALETTE"));
-        bs->Append(_("0x06000000 - VRAM"));
-        bs->Append(_("0x07000000 - OAM"));
-        bs->Append(_("0x08000000 - ROM"));
+    MemViewer() : MemViewerBase(std::numeric_limits<uint32_t>::max()) {
+        bs->Append("0x00000000 - BIOS");
+        bs->Append("0x02000000 - WRAM");
+        bs->Append("0x03000000 - IRAM");
+        bs->Append("0x04000000 - I / O");
+        bs->Append("0x05000000 - PALETTE");
+        bs->Append("0x06000000 - VRAM");
+        bs->Append("0x07000000 - OAM");
+        bs->Append("0x08000000 - ROM");
         bs->SetSelection(1);
         Fit();
     }
@@ -921,14 +958,14 @@ public:
     GBMemViewer()
         : MemViewerBase((uint16_t)~0)
     {
-        bs->Append(_("0x0000 - ROM"));
-        bs->Append(_("0x4000 - ROM"));
-        bs->Append(_("0x8000 - VRAM"));
-        bs->Append(_("0xA000 - SRAM"));
-        bs->Append(_("0xC000 - RAM"));
-        bs->Append(_("0xD000 - WRAM"));
-        bs->Append(_("0xFF00 - I/O"));
-        bs->Append(_("0xFF80 - RAM"));
+        bs->Append("0x0000 - ROM");
+        bs->Append("0x4000 - ROM");
+        bs->Append("0x8000 - VRAM");
+        bs->Append("0xA000 - SRAM");
+        bs->Append("0xC000 - RAM");
+        bs->Append("0xD000 - WRAM");
+        bs->Append("0xFF00 - I / O");
+        bs->Append("0xFF80 - RAM");
         bs->SetSelection(1);
         Fit();
     }

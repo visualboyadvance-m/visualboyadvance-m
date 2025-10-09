@@ -1,33 +1,3 @@
-# From: https://stackoverflow.com/a/7216542
-function(JOIN VALUES GLUE OUTPUT)
-  string (REGEX REPLACE "([^\\]|^);" "\\1${GLUE}" _TMP_STR "${VALUES}")
-  string (REGEX REPLACE "[\\](.)" "\\1" _TMP_STR "${_TMP_STR}") #fixes escaping
-  set (${OUTPUT} "${_TMP_STR}" PARENT_SCOPE)
-endfunction()
-
-# convert msys paths like /c/foo to windows paths like c:/foo
-# for variables set by FindWxWidgets
-function(normalize_wx_paths)
-    if(MSYS)
-        unset(new_paths)
-        foreach(p ${wxWidgets_LIBRARY_DIRS})
-            execute_process(COMMAND cygpath -m "${p}" OUTPUT_VARIABLE p_win OUTPUT_STRIP_TRAILING_WHITESPACE)
-            list(APPEND new_paths "${p_win}")
-        endforeach()
-
-        set(wxWidgets_LIBRARY_DIRS ${new_paths} PARENT_SCOPE)
-
-        string(REGEX REPLACE "((^| )[^/]*)/([a-zA-Z])/" "\\1\\3:/" new_libs "${wxWidgets_LIBRARIES}")
-
-        set(wxWidgets_LIBRARIES ${new_libs} PARENT_SCOPE)
-    endif()
-endfunction()
-
-macro(cleanup_wx_vars)
-    if(wxWidgets_CXX_FLAGS)
-        list(REMOVE_ITEM wxWidgets_CXX_FLAGS -fpermissive)
-    endif()
-endmacro()
 
 function(cygpath var path)
     execute_process(
@@ -67,55 +37,94 @@ function(check_clean_exit var)
     set(${var} ${exit_status} PARENT_SCOPE)
 endfunction()
 
+function(try_wx_util var util conf_suffix major_version minor_version)
+    unset(suffix)
+    if(conf_suffix)
+        set(suffix "-${conf_suffix}")
+    endif()
+    if(major_version)
+        set(suffix "${suffix}-${major_version}")
+
+        if(NOT minor_version EQUAL -1)
+            set(suffix "${suffix}.${minor_version}")
+        endif()
+    endif()
+
+    # find_program caches the result
+    set(exe NOTFOUND CACHE INTERNAL "" FORCE)
+    find_program(exe NAMES "${util}${suffix}")
+
+    # try infix variant, as on FreeBSD
+    if(NOT EXISTS "${exe}")
+        string(REGEX REPLACE "^-" "" suffix "${suffix}")
+
+        string(REGEX REPLACE "-" "${suffix}-" try "${util}")
+
+        set(exe NOTFOUND CACHE INTERNAL "" FORCE)
+        find_program(exe NAMES "${try}")
+    endif()
+
+    if(EXISTS "${exe}")
+        # check that the utility can be executed cleanly
+        # in case we find e.g. the wrong architecture binary
+        # when cross-compiling
+        check_clean_exit(exit_status "${exe}" --help)
+
+        if(exit_status EQUAL 0)
+            set("${var}" "${exe}" PARENT_SCOPE)
+            return()
+        endif()
+    endif()
+endfunction()
+
 function(find_wx_util var util)
-    # on win32, including cross builds we prefer the plain utility name first from PATH
-    if(WIN32)
-        set(conf_suffixes  "" gtk4u gtk4 gtk3u gtk3 gtk2u gtk2)
-        set(major_versions "" 4 3 2)
-    else()
-        set(conf_suffixes  gtk4u gtk4 gtk3u gtk3 gtk2u gtk2 "")
-        set(major_versions 4 3 2 "")
+    if((WIN32 AND (NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")) OR EXISTS /etc/gentoo-release)
+        # On win32, including cross builds we prefer the plain utility
+        # name first from PATH, with the exception of -static for static
+        # builds.
+        #
+        # On Gentoo /usr/bin/wx-config loads the eselected build, so we
+        # want to try that first.
+        #
+        # This makes a one element of empty string list.
+
+        if(VBAM_STATIC)
+            set(conf_suffixes "static;")
+        else()
+            set(conf_suffixes  ";")
+        endif()
+
+        set(major_versions ";")
+    endif()
+
+    list(APPEND conf_suffixes  "" gtk3u gtk3 gtk2u gtk2)
+    list(APPEND major_versions "" 3)
+
+    get_target_property(wx_base_lib_prop wx::base LOCATION)
+    string(STRIP "${wx_base_lib_prop}" wx_base_lib)
+
+    if(wx_base_lib MATCHES "wx_baseu?-([0-9]+)\\.([0-9]+)\\.")
+        set(lib_major "${CMAKE_MATCH_1}")
+        set(lib_minor "${CMAKE_MATCH_2}")
     endif()
 
     foreach(conf_suffix IN LISTS conf_suffixes)
+        if(lib_major AND lib_minor)
+            try_wx_util(exe "${util}" "${conf_suffix}" "${lib_major}" "${lib_minor}")
+
+            if(exe)
+                set("${var}" "${exe}" PARENT_SCOPE)
+                return()
+            endif()
+        endif()
+
         foreach(major_version IN LISTS major_versions)
-            foreach(minor_version RANGE 100 -1 -1)
-                unset(suffix)
-                if(conf_suffix)
-                    set(suffix "-${conf_suffix}")
-                endif()
-                if(major_version)
-                    set(suffix "${suffix}-${major_version}")
+            foreach(minor_version RANGE 30 -1 -1)
+                try_wx_util(exe "${util}" "${conf_suffix}" "${major_version}" "${minor_version}")
 
-                    if(NOT minor_version EQUAL -1)
-                        set(suffix "${suffix}.${minor_version}")
-                    endif()
-                endif()
-
-                # find_program caches the result
-                set(exe NOTFOUND CACHE INTERNAL "" FORCE)
-                find_program(exe NAMES "${util}${suffix}")
-
-                # try infix variant, as on FreeBSD
-                if(NOT EXISTS ${exe})
-                    string(REGEX REPLACE "^-" "" suffix "${suffix}")
-
-                    string(REGEX REPLACE "-" "${suffix}-" try ${util})
-
-                    set(exe NOTFOUND CACHE INTERNAL "" FORCE)
-                    find_program(exe NAMES ${try})
-                endif()
-
-                if(EXISTS ${exe})
-                    # check that the utility can be executed cleanly
-                    # in case we find e.g. the wrong architecture binary
-                    # when cross-compiling
-                    check_clean_exit(exit_status ${exe} --help)
-
-                    if(exit_status EQUAL 0)
-                        set(${var} ${exe} PARENT_SCOPE)
-                        return()
-                    endif()
+                if(exe)
+                    set("${var}" "${exe}" PARENT_SCOPE)
+                    return()
                 endif()
 
                 # don't iterate over minor versions for empty major version

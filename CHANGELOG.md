@@ -4,6 +4,567 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.2.2] - 2025-07-30
+
+========================
+* 27acf80b - Make language configurable (requires restart) [andyvand]
+* ae09ab71 - Embed translations for Windows [andyvand]
+* 47a8e7e8 - Update wxWidgets for Mac builder to 3.3.1 [andyvand]
+* 8ce4848d - Fix Wii U VC opcodes [andyvand]
+* dab91fc8 - Fix bigger than 32MB ROM files [andyvand]
+
+## [2.2.1] - 2025-07-19
+=======================
+* 23a3d0b2 - build: fix include paths for bundled SFML [rkitover]
+* 53f5ec7b - build: fix building with OpenAL enabled [rkitover]
+* 3ffbe781 - translations: remove ja_JP, 0% and ja exists [rkitover]
+* ae8bfb4a - Several fixes for windows [danialhorton]
+* bbaf70c0 - build: fix slow CMake vcpkg startup time [rkitover]
+* dca11990 - Fix GBA sound [andyvand]
+* 357eccc6 - build: fix checking if bin pkg host deps installed [rkitover]
+* d0463ddb - Initial tar support [andyvand]
+* a808cfb6 - Update macOS plist [andyvand]
+* 604f5412 - Add LZIP support [andyvand]
+* 6fedbdc5 - Add .xz support [andyvand]
+* 0c91d456 - Add .bz2 file support [andyvand]
+* 3e0541c6 - Update unrar to V7.1.8 [andyvand]
+* 00e48e11 - Fix RAR support [andyvand]
+* 3d8ed512 - Use macOS 10.10 Sparkle [andyvand]
+
+## [2.2.0] - 2025-07-08
+========================
+* 865add06 - Adjust throttle limit 450 -> 1000 [rkitover]
+* 20db9889 - Add dark mode support [andyvand]
+* fac5d565 - build: use vcpkg host pkgconf when cross compiling [rkitover]
+* 5702bc51 - build: fix x64-mingw-static for MSYS2 CLANG64 [rkitover]
+* 5745ed3d - Use external libwebp and use built pcre2 [andyvand]
+* 5f866f85 - Revert beeping fix and fix again the previous way [andyvand]
+* 8002f91c - Fix save dialog [andyvand]
+* cc2bda69 - build: inst host deps for bins only if not [rkitover]
+* d7c6eb81 - Fix MinGW FFMpeg [andyvand]
+* 43a6a90a - Fix FFMPEG for macOS [andyvand]
+* 54f56fc9 - Fix libx265 build for macOS [andyvand]
+* 31cfe304 - Fix MinGW compile with title of DX9 window [andyvand]
+* 2c17201c - Separate window for SDL direct3d9 with background input [andyvand]
+* 6f5c785a - build: add x264+x265 for ffmpeg for macOS [rkitover]
+* 05d18184 - build: rm FindFFmpeg for distro ver, fix x264/x265 [rkitover]
+* 856abf80 - build: add option VCPKG_BINARY_PACKAGES [rkitover]
+* e8d4adaf - build: always use pwsh vcpkg-list [rkitover]
+* 50aa85d9 - build: update vcpkg ports list, drop gettext [rkitover]
+* ce7aa3fa - Fix FAudio crash on Windows debug [andyvand]
+* 4ba7796d - Fix FAudio crash on MSVC [andyvand]
+* 83707cf5 - Fix Direct3D9 [andyvand]
+* b82e7a3b - Update wxvbam.rc [andyvand]
+* f0a30d45 - build: fix installing host build dep bin pkgs [rkitover]
+* 70d6a1ac - Make Sparkle framework optional [andyvand]
+* 77f49ac6 - Clean up WinSparkle code [andyvand]
+* e40c1e71 - Update macOS Sparkle [andyvand]
+* 8579e192 - Check for  kInputBufSize [andyvand]
+* e64a8b69 - Update 7z_C to 2409 and update extractor [andyvand]
+* c31499ca - Fix winsparkle dependency and update win32-deps to latest push [andyvand]
+* 41895eea - Add option not to update vcpkg builds [andyvand]
+* 05f2cb7d - Fix auto updates [andyvand]
+* 61be54d3 - build: avoid using VS vcpkg with elevation [rkitover]
+* 5e2e2ab4 - Add MinGW WinSparkle support [andyvand]
+* 2c2ee701 - build: minor improvements to the Mac builder [rkitover]
+* 3c048f17 - Add alert sound on macOS fix [andyvand]
+* 830c8ccd - Add x264 and x265 to ffmpeg [andyvand]
+* 8ced18c2 - build: make OpenAL-Soft optional again [rkitover]
+* 31ce5d17 - CoreAudio fix [andyvand]
+* ac0dc482 - Fix SDL3 detection [andyvand]
+* 5b9a26ba - build: make some minor CMake improvements [rkitover]
+* 9712c424 - build: make some minor fixes to Mac builder [rkitover]
+* 12f2d88c - Update versions on macOS build script [andyvand]
+* 79d34535 - Implement CoreAudio driver [andyvand]
+* 34e46945 - build: generalize linking openal-soft to libfmt [rkitover]
+* 5529797f - Set directory path for generic file dialog [andyvand]
+* bd0a59cc - ci: fix shell syntax for Ubuntu runner [rkitover]
+* d2762a95 - ci: add libsdl3-dev for Ubuntu runner [rkitover]
+* 1c436f2d - Add MSVC secure library functions [andyvand]
+* 8f47df28 - Add entitlements file for sandboxing [andyvand]
+* db5c890e - Add option for generic file dialogs [andyvand]
+* 7dbad8e8 - translations: transifex pull [rkitover]
+* d3da0492 - Update nixpkgs for SDL3 [andyvand]
+* ef46bb7e - build: in installdeps for SUSE s/libSDL3/SDL3/ [rkitover]
+* a3b92a33 - build: update installdeps to SDL3 [rkitover]
+* 2f92dd73 - Add MSVC 2022 libretro support [andyvand]
+* 07c7bb40 - Fix AVCodec deprecations and fix warnings [andyvand]
+* ed013bd2 - Fix SFML deprecations and fix SFML warnings [andyvand]
+* 116af5c6 - build: replace sdl2 vcpkg port with sdl3 [rkitover]
+* 1788b366 - build: default ENABLE_SDL3=ON in CMake [rkitover]
+* 0820ba58 - BUILDER: Updated core.sh source packages required to build vba-m [zachbacon]
+* f975809e - Update to SDL3 APIs, fix bpps, add SDL audio/video, add Metal video, fix Quartz drawing [andyvand]
+* 18c3c3bd - build: fix link error on MSVC for SFML port [andyvand]
+* 0aecfb5d - build: make minor improvements to the Mac builder [rkitover]
+* dae4397d - build: lower bundled SFML C++17 to C++14 [rkitover]
+* 4cf6cccb - build: bundle SFML 3.x sys/network in third_party [rkitover]
+* 9e724ea4 - build: support building ARM64 binary for Mac [rkitover]
+* eb26ec2e - Enable Hide Status Bar in UI Settings for macOS [rkitover]
+* 6a9eeeae - core.sh Switched to github source for nasm [zachbacon]
+* 9f628584 - initialize sound_buffer_len_ to silence a warning. [danialhorton]
+* e5ad7b34 - build: find_package(nanosvg) w/ vcpkg [rkitover]
+* 94752f83 - [FAudio]Correct the behavior of device_changed check [danialhorton]
+* 8936feaa - build: add libtiff to Nix derivation [rkitover]
+* f93a32ab - build: add libtiff to brews on macOS [rkitover]
+* 3fa850c1 - build: capitalize ARCH_NAME in CMake [rkitover]
+* 364776b8 - build: s/-Ofast/-O3 -ffast-math/ [rkitover]
+* 61394282 - translations: remove dup Chinese translations [rkitover]
+* 29e85e5d - build: update Link SFML usage to SFML 3.x APIs [rkitover]
+* e2283946 - [Input] Process key down event for some controls [steelskin]
+* 3fdc30f7 - Mark `wxEVT_KEY_DOWN` as processed in `wxvbamApp` (#1424) [Steelskin]
+* 2de7efd9 - Reallocate GBA ROM to the new size(#1422) [danialhorton]
+* e4f17d33 - [Sound] Set volume on game startup (#1410) [Steelskin]
+* 2ab707c0 - build: update default.nix [rkitover]
+* 4dba9287 - build: update installdeps for OpenSUSE [rkitover]
+* 44aa859e - build: add cmake var and cpp macro for XP builds [rkitover]
+* 5a2d3a6f - build: set arch to pentium3 not -mmx for XP builds [rkitover]
+* d6b939c4 - Set developer id/component type in metainfo.xml [116445585+PunkPangolin]
+* c6da07fe - build: link avrt for OpenAL on WIN32 [rkitover]
+* 94979eff - build: initialize GTest submodule in CMake [rkitover]
+* dcb9ccca - [gtest] Use googletest as a submodule (#1373) [Steelskin]
+* a8ec85d5 - [GB] Add support for per-game overrides (#1370) [Steelskin]
+* 9d20ce9b - [Input] Reset keyboard tracking on focus loss (#1357) [Steelskin]
+* cdfd37fc - build: rename dependencies submodule -> win32-deps [rkitover]
+* 4f8d0a88 - build: update harfbuzz for macOS builder [rkitover]
+* b22e9fb7 - Ignore illegal opcodes used by Wii U VC (#1351) [Steelskin]
+* 7fa90531 - Disable open menu tracking outside of Windows (#1350) [Steelskin]
+* e1c2ecc5 - [dialogs] Display all controls in AccelConfig on Mac (#1349) [Steelskin]
+* 4c450ab3 - build: fix linking FAudio statically on MINGW [rkitover]
+* d5e1a1f3 - [GB] Properly set OPRI on startup [steelskin]
+* 821b9176 - build: do not use debug libs for RelWithDebInfo [rkitover]
+* 9031103c - build: fix linking non-debug pcre for debug wx [rkitover]
+
+## [2.1.11] - 2024-09-15 
+
+==========================
+* 3eea90af - build: set BUILD_TESTING=OFF when not git checkout [rkitover]
+* b3952d74 - build: fix ENABLE_LIRC=ON [rkitover]
+* f264e7f8 - Fix Help -> Translations URL [rkitover]
+* 61f427de - Write shortcuts in the proper section (#1335) [Steelskin]
+* d619ee2b - build: fix installing GoogleTest [rkitover]
+* 26207038 - Update WinSparkle to 0.8.1 and add ARM64 [rkitover]
+
+## [2.1.10] - 2024-09-08 
+
+==========================
+* 7f06428d - Disable dialog position save/restore on wxGTK (#1331) [Steelskin]
+* e4ef4aa6 - Propagate key events (#1323) [Steelskin]
+* e2cf6ecb - Add option to mute sound during speedup [rkitover]
+* d516683a - build: fix for wx using GTK2 [rkitover]
+* 834c7de8 - build: update macOS builder dists [rkitover]
+* fc82e062 - build: do not build SDL bin on Windows or macOS [rkitover]
+* d543784a - [UserInput] Filter key events globally [steelskin]
+* 902c6c8e - [UserInput] Only process shortcut commands once [steelskin]
+* b7765092 - [bindings] Set default shortcut for recent file 3 [steelskin]
+* cc65ef28 - doc: add system requirements to README.md [danialhorton]
+* 32627f6b - [Dialogs] Save and restore dialog positions [steelskin]
+* 41952d06 - build: update macOS linker tool to 1.5 [rkitover]
+* 0c39a5ba - build: override FindGettext to not update po files [rkitover]
+* 1b77d659 - build: update macOS build to ffmpeg 7.0 [rkitover]
+* 8d08223d - build: fix compatibility with older ffmpeg [rkitover]
+* af6028a9 - build: fix build for nix on macOS [rkitover]
+* b52edf52 - build: fix building on macOS with Homebrew [rkitover]
+* 6766b9ca - build: fix ffmpeg 7.x compat [rkitover]
+* 795f25bb - build: fix nix deps for OpenGL [rkitover]
+* 647be137 - gba: set cpsr=spsr when switching to FIQ mode [40356555+Aikku93]
+* 8abe3e79 - build: remove -lgcc from static link flags [rkitover]
+* f4835674 - [Audio] Rework audio devices enumeration [steelskin]
+* 775a571f - build: fix detecting Visual Studio default vcpkg [rkitover]
+* 64abd3e8 - [Audio] Remove manual memory allocations [steelskin]
+* 047ad277 - [Dialogs] Prevent viewers from causing a crash [steelskin]
+* 045c98d8 - build: only use -Werror=lto-type-mismatch on gcc [rkitover]
+* 3518dc6a - build: fix LTO on Linux [rkitover]
+* cc9a03ce - Add toggle: SDL GameController mode for joysticks [rkitover]
+* 8576733c - [Build] Remove lingering references to OpenAl [steelskin]
+* 05561922 - build: fix MSYS2 check [rkitover]
+* d9432ebb - build: fix build on MINGW{64,32}/UCRT64 on MSYS2 [rkitover]
+* f57cad67 - build: fix static linking on MSYS2 CLANG64 [rkitover]
+* 23e15734 - build: set wxWidgets_DIR with vcpkg [rkitover]
+* 98b51910 - [Build] Remove ENABLE_NLS, fix TRANSLATIONS_ONLY [steelskin]
+* a565cea8 - [Build] Remove the OpenGL check [steelskin]
+* f96e42fe - build: cmake refactor and improvements [Steelskin]
+* 07e49025 - Fix most remaining release warnings (#1243) [Steelskin]
+* 18b97b43 - Fix various build warnings (#1242) [Steelskin]
+* 13a16eb7 - Fix various warnings in filters and headers (#1241) [Steelskin]
+* f46da1c5 - build: remove our version of FindSDL2.cmake [rkitover]
+* 404e9a1a - build: add clang to ./installdeps for MSYS2 [rkitover]
+* 613bd403 - Make menu more reasonably organized (#1230) [wwrustc]
+* 215e3c5a - build: use find_program() to find powershell [rkitover]
+* e5aa685f - build: don't use wx utils as UNIX cmds on Windows [rkitover]
+* 9e4c8e17 - build: fix gentoo dependency namespaces [68k]
+* 5f853b99 - Update metainfo.xml to new standards [jhonny.oliveira]
+* e7d135db - Update links to new domain visualboyadvance-m.org [rkitover]
+* 60fc096f - build: add libglu-devel for solus in installdeps [rkitover]
+
+## [2.1.9] - 2024-02-03
+=======================
+* 84b0a3e3 - Remove SDL sound driver [rkitover]
+* 2ad7dd1a - Fix wav audio recording [40356555+Aikku93]
+* 23ef8ef0 - Dialog appearance improvements + link warning [zachbacon]
+* a0452701 - build: don't fseeko64()/ftello64() on musl libc [rkitover]
+* 9e9fe812 - visualboyadvance-m.metainfo.xml: add screenshots to the metainfo [zachbacon]
+
+## [2.1.8] - 2023-12-13
+
+========================
+* beab0881 - Store the PC register at the appropriate offset [steelskin]
+* bf2452aa - Resize GameArea after MainFrame initialization [steelskin]
+* 71ca0fb2 - Properly hide the status bar at startup [steelskin]
+* 7e1afcd3 - Fix reading joystick hat config values [rkitover]
+* 32581966 - Link: Fix menu not refreshing correctly [74248064+nuive]
+
+## [2.1.7] - 11.09.2023
+
+=========================
+* aca206a7 - Launch on xwayland under Wayland if no EGL [rkitover]
+* 93a24bee - Disable mirroring for ROMs > 32MB [rkitover]
+* 0f4ec575 - [Build] Fix the NO_LINK build [steelskin]
+* 803ab352 - [GB] Save MBC7 EEPROM data to `gbRam` [steelskin]
+* 24b6ac5a - [GBA] Implement missing Thumb instruction [steelskin]
+* 14a4b6f8 - [dialogs] Move JoypadConfig to its own class. [steelskin]
+
+## [2.1.6] - 09.07.2023 
+
+=========================
+* 7561ca97 - Fix Discord streaming for OpenGL [danialhorton]
+* e26f8073 - [bios] Fix lz77 and add BIOS_SndDriverVsyncOn [steelskin]
+* d1f65000 - Refactor accelerator / global shortcuts handling [steelskin]
+* fda429fc - [GBA] Do not draw BG tiles from outside of BG VRAM [steelskin]
+* 5aa3ea92 - Properly initialize wxAcceleratorTable [steelskin]
+* 0e29be87 - Support multiple RAM sizes for MBC7 [steelskin]
+* 75b79d91 - Change MBC7 reported RAM size to 512 bytes [steelskin]
+* 36e88faf - Fix dsound looping when moving/resizing window [rkitover]
+* 019fcda9 - Sanitize and improve the GB header parsing (#1109) [Steelskin]
+* 7005b928 - Sanitize allocations in the Game Boy emulator (#1105) [Steelskin]
+* 3cef52b7 - Fix pause/next-frame [rkitover]
+* d3f8cc17 - Option to suspend the X11 screensaver when running [2306079+multiSnow]
+* df819598 - builder: update macOS build to 10.10, Wx 3.2.2.1 [rkitover]
+* 1ab46f70 - Update SIOCNT when the link driver is disconnected [steelskin]
+* 1d7e8ae4 - build: fix build with new OpenAL [rkitover]
+* a9284b3d - workaround for Stuart Little 2 crashing when set to none [danialhorton]
+* 166299cd - Implements Read/Writes for HUC3 [danialhorton]
+* 640ce453 - Change SOUND_CLOCK_TICKS to 280896 cycles - ~1074 samples per frame [reallibretroretroarch]
+* f1d3f631 - Fix automatic dynamic frame skipping [steelskin]
+* d756f671 - translations: fix some source strings [stanley.udr.kid]
+* 91873254 - Add INI file versioning [steelskin]
+* 7d9cb2b5 - Default GBA LCD filter to off. [rkitover]
+* be1e5ca1 - Check for wx < 3.2.2 for EGL move fix backport [rkitover]
+* 1fb18b32 - Rename appdata to metainfo [polynomial-c]
+* ca7ae336 - Fix regression in bios, port DMA fix from libretro [danialhorton]
+* b34448c9 - Fix record/play dialogs for native recordings [danialhorton]
+* 6307348c - build: support MSVC arm64 cross build on x86 [rkitover]
+* 87bdc93e - Revert "translations: use %% instead of percent" [rkitover]
+* ab4ae96e - Clarify/set condition: wayland && !wayland_egl [rkitover]
+* 8e4acfc9 - Fix build w/wxUSE_GLCANVAS_EGL=0, on Fedora [rkitover]
+* 3c41b68d - Fix the Windows ARM64 build [steelskin]
+* 22578d02 - Increase MAX_CART_SIZE from 32MiB to 128MiB [rkitover]
+
+## [2.1.5] - 2022-12-15
+=======================
+* ea2a929f - Backport 800d6ed69b from wx to fix Wayland EGL pos [rkitover]
+* c40a1417 - Write vsync toggle msg to debug log not OSD [rkitover]
+* 5d2dd01e - Call Layout() after DrawingPanel OnSize event [rkitover]
+* da686a48 - Reinit panel on vsync toggle. [rkitover]
+* ec27885c - Support EGL VSync on Wayland. [rkitover]
+* c27d384a - Enable GL on Wayland for wx 3.2+, no vsync. [rkitover]
+* c249115b - build: set -mtune=generic [rkitover]
+* 297d7c06 - [hidpi] Use wxWidgets 3.2 on Windows [steelskin]
+* 0d86432a - [hidpi] Implement full HiDPI support [steelskin]
+* 69d24fb5 - [build][msvc] Fix debug information and set hidpi support [steelskin]
+* 90fc3e12 - Default CTRL+I to change interframe blender [rkitover]
+* a57d81e1 - Show name of interframe blender not num in OSD [rkitover]
+* 13c558ac - Disable wireless link type [rkitover]
+* 639003a8 - Show pixel filter name not number on cycle [rkitover]
+* 236cffb4 - Make another adjustment to glXQueryExtensions [rkitover]
+* 643ec0f7 - Pass DefaultScreen(display) to glXQueryExtensions [rkitover]
+* 60d7ead5 - Fix menu state after playing a movie [laqieer]
+* d2fee771 - Add VBA Movie Version 2 [laqieer]
+* 3f2d3c13 - Remove manual joystick polling [steelskin]
+* 7726d26f - Enable full optimizations and fix x86 builds [danialhorton]
+* 73223445 - MSVC opt /fp:fast /Oi, intrinsic sqrt() w/ XBRZ. [rkitover]
+* 972f1513 - Enable GB colorization hack support in GUI. [danialhorton]
+* 1741fa32 - Fix autosaveloadcheat and rename pref [danialhorton]
+* a31a7a30 - in Wx, the Option is Enable MMX, make the variable also enableMMX and set its default to on. [danialhorton]
+* 983ea451 - Flash : Erased memory is FFh-filled [negativeExponent]
+* 18e387d1 - Fix Flash chip's erase operation: erased memory is FFh-filled, not zero-filled. [laqieer]
+* c05056ab - HuC3: Update [negativeExponent]
+* 93084990 - HuC3: Refactoring to avoid breaking savestates [negativeExponent]
+* 05a046e7 - HuC3: Enable battery save, update RTC support [negativeExponent]
+* 70477dcd - GBA:Fix serial emulation if compiled with NO_LINK [negativeExponent]
+* 15bcad13 - GB:Fix serial emulation when compiled with NO_LINK [negativeExponent]
+* 025f3079 - GBA:Fix a few memory read/write issues [negativeExponent]
+* 210e79bb - Add descriptions for the 'Interframe Blending' and 'LCD Color Filter' options [jrb22x]
+* 8a3456f8 - Default to not change battery on state load. [rkitover]
+* b50ff858 - add a missing break in half word reads [danialhorton]
+* 064fa7b0 - Fix SDL audio delay [Clownacy]
+* 7db3c817 - Fixed SDL audio using the wrong audio specification [Clownacy]
+* cb0933bf - Stop changing plane ptrs in rec. audio frames. [rkitover]
+* 80634683 - Force a panel update when configuring bilinear. [briansrls]
+* 6a714281 - Differentiate between SDL joy index/instance_id. [rkitover]
+* 11693d83 - Clean up GB MBC30 check. [rkitover]
+* 020daad8 - Fix joy accels when emulation is paused. [rkitover]
+* def5d3e4 - Stop timer when game is loaded again. [rkitover]
+* e0816b0e - Fix weird input/buttons memory leak. [edenisfa]
+* 7031c1d1 - [LINUX,WINDOWS] Key/Joy background input. [edenisfa]
+* 84f3e8ce - Allow joystick background input. [edenisfa]
+* 40741580 - Add GUI cmd line option for config file. (#724) [Steelskin]
+* c169420f - Turbo/throttle config and DirectSound fixes. [rkitover]
+* 378c9493 - Fix joystick config when game is loaded. [rkitover]
+* 95213a6d - GB: Only use mapperLastTime to see if RTC data was loaded [negativeExponent]
+* 86fcffef - GB: Add support for 4MB MBC30 [negativeExponent]
+* 2f9933ae - GBA BIOS: ArcTan/ArcTan2 fixes for HLE bios [negativeExponent]
+* d9732f68 - Fix clock cycle count for MUL, MLA instructions...  (https://github.com/libretro/vba-next/commit/b91f39c787cc99ace97546cb94985f3b658c8b57) - backport Fix clock cycle count for some arm/thumb instructions (https://github.com/libretro/vba-next/commit/5243b2d8064dd2145888ced7cbfe127594ecf6db) - backport Fix base cycle count for MUL, MLA series (https://github.com/libretro/vba-next/commit/b91f39c787cc99ace97546cb94985f3b658c8b57) [negativeExponent]
+* c07d5b65 - Fix vram 16/32 bit unaligned reads(backport https://github.com/libretro/vba-next/commit/7f18771165dd4a6d71a598c51d91668920572eaa) [negativeExponent]
+* 18c2ea61 - Further fixing Multi Buffer formatting. [briansrls]
+* 1e569300 - Addressing audio plugin crash [briansrls]
+* 9c314a15 - Use proper string `"wglGetExtensionsStringEXT"`. [edenisfa]
+* 3ba05295 - Improve BIOS Math tests score from 425 to 625. [edenisfa]
+* 6f2e320d - Improve clock cycle count for THUMB operations. [edenisfa]
+* 9e537a8f - Improve cycle count for MUL, MLA. [edenisfa]
+* 306f92f5 - Check game kbd input with wxGetKeyState() again. [rkitover]
+* 6b257d52 - Avoid override of variable `throttle` for turbo. [edenisfa]
+* bd2483ca - Allow changing connection type without restart. [edenisfa]
+* d379a076 - Decrease mouse sensitivity for menu hiding. [rkitover]
+* 0c5ee994 - Fix PNG capture screen. [edenisfa]
+* 1347026d - Turbo config refactor followup. [rkitover]
+* 1bced474 - Codesign fix for mac. [rkitover]
+* 07064c87 - [Windows,MacOS] Auto-updater refactoring. (#639) [denisfa]
+* 09e8da43 - Joystick refactor pt. Deux: Support Joysticks. [rkitover]
+* 504ca08b - Hide menubar + minor UI refactor. [rkitover]
+* 2868c1b7 - Fix changing aspect ratio option. [rkitover]
+* 045e95ab - GB: Support 4MiB MBC30 ROM bank select. [rkitover]
+* 0b14e9f8 - [WINDOWS] Add function to open unicode files. (#644) [denisfa]
+* 8e3978b3 - Speedup/Turbo/Throttle fixes. [rkitover]
+* 166cf446 - Disable menu LCD filter unless playing GB or GBA. [edenisfa]
+* 06001069 - Init systemColorMaps after output module init. [edenisfa]
+* cd029ae6 - Fix video recording with frame skip enabled. [edenisfa]
+* 008aecde - [LINUX] Fix display of `RGB` values on viewers. [edenisfa]
+* 834d1537 - Fix accel shortcuts when using some menu options. [edenisfa]
+* 994726dd - Do not pause while opening configuration windows. [edenisfa]
+* 54335dc6 - [WINDOWS] Fix weird WX errors messages. [edenisfa]
+* 7bac34ed - Remove duplicate variable `winFlashSize`. [edenisfa]
+* 8d62a790 - Change default options for GB. [edenisfa]
+* 99b66e13 - Expose LCD filter for GBA and GB color saturation. [edenisfa]
+* c789020e - Fix `Save` button on OAM Viewer for GB and GBA. [edenisfa]
+* dcaa1b9a - Fix `Save` button on Tile Viewer for GB and GBA. [edenisfa]
+* d05e8fc1 - Make AGBPrint output to our Logging. [edenisfa]
+* abb82341 - Allow binding specific server IP. (#633) [rkitover]
+* 6c64db07 - cmake: Windows codesigning refactor. [rkitover]
+* 4f1a351d - Try to configure vsync for multiple options. [edenisfa]
+* ed8a9af2 - Use proper functions and checks for OpenGL VSYNC. [edenisfa]
+* 6092082e - Fix Save Failed error for Super Monkey Ball Jr. [54053706+negativeExponent]
+* f1099a21 - Check return value of soundInit(). [rkitover]
+* 410ede54 - Check for null pointer in soundReset(). [alexjnewt]
+* 9d1d707c - Limit ROM size to 32 MiB. [negativeExponent]
+* fd319d21 - GB: Check header for a valid ROM file. [negativeExponent]
+* 513af13d - Replace `libpng` code for `stb_image` one. [edenisfa]
+* 8f48c1f0 - Fix weird `wxWidgets>=3.0` error message. [edenisfa]
+* 2f065382 - Enable XAudio2 for Windows vcpkg build. [rkitover]
+* a3203770 - Fix: a issue with loading e-Reader dot code (#608) [sony.pcv.s520]
+* 83614290 - Turn on winsparkle update checking support. [rkitover]
+* 4aab08c4 - Set link timeout default to 500ms, fix prev. dflt. [rkitover]
+* 136c094f - Add option to set link network port. [rkitover]
+* f69febfd - Add `.wav` support for sound recording. [edenisfa]
+* 6a8a9e62 - Fix integer overflow in cheatsImportGSACodeFile length check. [zack.ref]
+* b50d4845 - GBA: Fix crash when new size is larger than rom size after soft-patching [negativeExponent]
+* 9e1a63af - support for patches in BPS format [ArtiiP]
+* 72d0725b - Allow game window to resize on-the-fly when enabling/disabling borders [negativeExponent]
+* 225e4dc9 - Remove top border black line when using filters. [edenisfa]
+* 0535d5c7 - Optimize CRC32. [mudlord]
+* 4bc9bb84 - Implement joystick rumble. #522 [rkitover]
+* 384f4487 - Fix key accel overriding menus and dialogs. [edenisfa]
+* af0de1c4 - xbrz: fix inline asm check [rkitover]
+
+## [2.1.4]
+=======================
+* c93e017d - builder: minor changes to support mac 32 bit (4 days ago)
+* c1636d1b - builder: fixes for ffmpeg + misc. (4 days ago)
+* aec23e35 - builder: re-enable ffmpeg, update dists (2 weeks ago)
+* 806dd7da - Fix circular `--config` for SDL port. (7 days ago)
+* 1aa8afb4 - Drop dead code entirely. (7 days ago)
+* 531172c4 - Fix displaying of link menu when `ENABLE_LINK=NO`. (2 weeks ago)
+* 07107096 - [Windows] Fix crash when setting weekly updates. (2 weeks ago)
+* efa09bdb - Add faster sqrt code for xBRZ filters. (2 weeks ago)
+* 10f5576e - Fix config file when removing system accels. (3 weeks ago)
+* 1c6b0168 - [Windows] Fix remaining UTF-8 issues. (3 weeks ago)
+* a2f3126e - transifex pull (3 weeks ago)
+* 1e9d1675 - builder: pause before codesigning for win targets (3 weeks ago)
+* 0af5965e - builder: work on linux static binary (3 weeks ago)
+* 33c43e3a - add -p:BuildInParallel=true to appveyor.yml (3 weeks ago)
+* 61141ebd - add -p:BuildInParallel=true to VS instructions (3 weeks ago)
+* 9ee6b54a - cmake: remove invalid opt /std:c++11 for MSVC (3 weeks ago)
+* 0f2c8cab - win: check APPDATA if LOCALAPPDATA is not found (3 weeks ago)
+* 32fbfec4 - transifex pull (3 weeks ago)
+* cc516229 - transifex push/pull (4 weeks ago)
+* 528c37f9 - Allow "Browse" to be translated. (4 weeks ago)
+* d8c981fb - Fix toggles for video/audio layer options on menu. (4 weeks ago)
+* c0f96425 - Show all commands available on menu. (4 weeks ago)
+* 51fa150f - Adjust MMX menu variable and position. (4 weeks ago)
+* 27b038b3 - Show messages about operations of state slot. (4 weeks ago)
+* 2e248457 - Allow translation of the words `Open` and `Quit`. (4 weeks ago)
+* 54991c5b - Add extra keys default input when using GUI. (4 weeks ago)
+* b358c051 - Fix compilation issue when `ENABLE_DEBUGGER=Off`. (4 months ago)
+* 2a2be953 - builder: msys2 fixes (4 weeks ago)
+* f1438e0f - Check ASAN support when `ENABLE_ASAN=ON`. (4 weeks ago)
+* ade64db7 - transifex pull (4 weeks ago)
+* 8b347050 - cmake: check for ffmpeg >= 4.0.4 (4 weeks ago)
+* 0b9c7710 - travis: more ubuntu dists, fix mac cache (5 weeks ago)
+* d9e4a087 - build fixes: ffmpeg, xbrz, travis, C++ version (5 weeks ago)
+* 23224fba - update factory reset instructions in README.md (5 weeks ago)
+* 381a7bfe - /std:c++latest for MSVC, fix bool flip, warn opts (5 weeks ago)
+* 234f1e9b - Update to xBRZ `1.7`. (6 weeks ago)
+* 290012d1 - transifex pull (6 weeks ago)
+* 06a9d786 - Allow UPS patch for GBA games. (6 weeks ago)
+* 1949cdb3 - transifex push/pull (6 weeks ago)
+* 03121c69 - Add support for autohold buttons. (6 weeks ago)
+* e87213e3 - Fix indentation. (6 weeks ago)
+* cf47942f - Fix Autofire {L,R}. (6 weeks ago)
+* 4993cb88 - remove tea-ci .drone.yml and installer.nsi (6 weeks ago)
+* d9a7e0c9 - cmake: auto-detect sfml, ffmpeg and openal (6 weeks ago)
+* c64dd259 - Update README.md (6 weeks ago)
+* 8ceef90f - fix appveyor visual studio build (6 weeks ago)
+* a8b7b72d - transifex pull (6 weeks ago)
+* f5eabb35 - builder: disable LTO on 64 bit mingw (6 weeks ago)
+* fc2eb38f - Fix behaviour of `Tools` > `Memory Viewer` (#486) (6 weeks ago)
+* 2958af01 - builder: mingw improvements + misc. (6 weeks ago)
+* 3923b28f - transifex pull/push (6 weeks ago)
+* 51f61a3a - Merge remote-tracking branch 'vbam-libretro/master' (6 weeks ago)
+* 6bdd6d1b - Merge pull request #77 from negativeExponent/fix_cheat_search (7 weeks ago)
+* dc8d36a0 - minor fix for stl wx builds (7 weeks ago)
+* 51a4f74b - Merge remote-tracking branch 'vbam-libretro/master' (7 weeks ago)
+* 9ccdeac3 - Add missing break; lines for switch statements (7 weeks ago)
+* b8afa8c5 - Merge pull request #76 from RobLoach/intl (7 weeks ago)
+* a17eb471 - Merge branch 'master' of github.com:fpscan/vbam-libretro into intl (7 weeks ago)
+* 9b043daa - libretro: Update core options API (7 weeks ago)
+* 6b18c1f9 - Fix warning about frames left in queue. (8 weeks ago)
+* f5b19475 - [IDEA] Fix recording when using `speedup/turbo`. (8 weeks ago)
+* 738494a2 - Support all sample rate available on GUI. (8 weeks ago)
+* aa3ecaf7 - Add new output formats for recording audio/video. (9 weeks ago)
+* 5848feae - Fix video/audio recording. (2 months ago)
+* 9e3c2615 - Update libretro_core_options.h (7 weeks ago)
+* 6c60ac33 - Turkish Language option (7 weeks ago)
+* d92ca688 - Merge pull request #74 from retro-wertz/update (7 weeks ago)
+* ad43b32b - Fix "index out of bounds" runtime error (7 weeks ago)
+* 36f3a739 - Merge pull request #73 from retro-wertz/libretro_cleanup (8 weeks ago)
+* 82e723a5 - MBC3: Update mapper to check if RTC is present before running RTC functions (8 weeks ago)
+* 03184dd5 - libretro: Use GB RTC data when available (8 weeks ago)
+* b3744b3b - Simplify GB border core option (8 weeks ago)
+* 9757a880 - Core options cleanup and a few readability-related updates (8 weeks ago)
+* cfb03d8b - Set default keybinding when key does not exist. (9 weeks ago)
+* 1ef09126 - Merge pull request #72 from retro-wertz/enable_rtc (8 weeks ago)
+* 496b372d - Allow enabling GBA RTC regardless of rom types (8 weeks ago)
+* 4dbdf87d - Merge pull request #71 from retro-wertz/patch-3 (8 weeks ago)
+* bb109544 - Update Makefile (8 weeks ago)
+* 3e640443 - Merge pull request #70 from retro-wertz/update_makefiles (8 weeks ago)
+* 98313652 - Update Makefile (8 weeks ago)
+* 34de0579 - Merge pull request #67 from retro-wertz/update_makefiles (8 weeks ago)
+* 71e4b7b3 - Merge pull request #69 from retro-wertz/master (8 weeks ago)
+* d9f8396c - Cleanup (8 weeks ago)
+* 9a134497 - Update Makefiles (8 weeks ago)
+* 38b7613e - Setting up basic appveyor (9 weeks ago)
+* 408cab71 - Merge pull request #66 from retro-wertz/libretro (9 weeks ago)
+* d8982881 - Automatically hide some core options depending on rom image type (9 weeks ago)
+* c3edd6d4 - Merge pull request #65 from retro-wertz/libretro (9 weeks ago)
+* 2084a63e - Update GB/GBC memory maps (retro_memory_descriptors) (9 weeks ago)
+* 90b051ee - Update libretro_core_options.h (9 weeks ago)
+* a727e222 - GB: Rename this variable to isolate from a global variable of the same name (10 weeks ago)
+* 0d423b98 - Cleanup GB palette struct and update retro_get_memory_data/size (10 weeks ago)
+* bc80ecdb - UtilRetro.cpp: Cleanup (10 weeks ago)
+* 855db11d - Fix wxWidgets assertion error on `Logging...` menu. (10 weeks ago)
+* c886b6a1 - remove wrong and unnecessary #define (10 weeks ago)
+* 38561b57 - Merge remote-tracking branch 'vbam-libretro/master' (2 months ago)
+* 770b9c1c - Add left analog bind to D-PAD for joystick. (2 months ago)
+* 6de45d4e - Set default binding for keyboard. (3 months ago)
+* 78bbe148 - Add individual clear buttons for input config. (3 months ago)
+* 53002e54 - Use hats from joystick as default D-PAD. (3 months ago)
+* 57b7ddf5 - Fix small memory leak. (3 months ago)
+* 060da968 - [LINUX] Add option to disable the online updater. (3 months ago)
+* dbb5914f - Show which BIOS file is currently selected. (3 months ago)
+* 76756ef9 - Fix key shortcuts for toggle menu actions. (3 months ago)
+* 4622f1b8 - Whitespace fix. (3 months ago)
+* 3dc738b5 - Set default keys for input on first run. (3 months ago)
+* 9bc8f33c - Disable using volume {+,-} actions in main menu. (3 months ago)
+* d1fcffc8 - Merge pull request #63 from retro-wertz/fix_gba_siocnt (2 months ago)
+* 7df7b190 - Merge pull request #64 from retro-wertz/patch-2 (2 months ago)
+* 7f105da3 - Update README.md (2 months ago)
+* 53ce6fb0 - libretro: add SIO Control register (GBA) (2 months ago)
+* 2e96f59e - Merge pull request #62 from retro-wertz/gb_timing_updates (2 months ago)
+* e50812dc - GB: input, audio, video timing updates (2 months ago)
+* 1532f555 - GB: Reduce input lag by 1 frame, video and audio timing updates... (2 months ago)
+* f09a9aa9 - builder: add python3 to msys2 deps (2 months ago)
+* 2fcad3f8 - joysticks: hack to better support 360 triggers (3 months ago)
+* 352eb149 - Merge remote-tracking branch 'vbam-libretro/master' (3 months ago)
+* 2e97b27f - Use --config option to load configuration file. (3 months ago)
+* bdd43868 - Merge pull request #61 from retro-wertz/gb (3 months ago)
+* bd5ba431 - Cleanup: Remove previous core option struct and unused variables etc (3 months ago)
+* aac30c72 - Add GB Color Correction core option (3 months ago)
+* 02a7a48b - GB: Fix selected palette not applied when loading content... (3 months ago)
+* 8462ca76 - Merge pull request #59 from retro-wertz/gb (3 months ago)
+* 1fa78e69 - Fix android build (3 months ago)
+* 6dcf016d - GB: Allow support for colorizer patched games - a new core option is provided since enabling this support means allowing invalid access to vram and palette - works in GBC/GBA hardware mode only (3 months ago)
+* 85bd86cf - GB: Send LCD interrupt only if there is no INT 48h signal (3 months ago)
+* b147e912 - Merge pull request #57 from retro-wertz/sync (3 months ago)
+* d808297b - Fix crash caused by incorrect variable index for analog sticks (3 months ago)
+* 7e882898 - libretro: Add core option sublabels (3 months ago)
+* ce11403b - builder: updates for mingw (3 months ago)
+* c5e6a340 - Libretro: Update GBC memory map (3 months ago)
+* fa45ccdf - builder: fix command(), update c2man url (3 months ago)
+* e64b9904 - builder: fix msys2 (3 months ago)
+* 58022078 - builder: make zip + sig on win + minor changes (3 months ago)
+* 296255d4 - handle SDL joystick query errors #451 (3 months ago)
+* 95658f57 - transifex sync (3 months ago)
+* 86c4dc7d - transifex sync (3 months ago)
+* bcc8b540 - transifex sync (3 months ago)
+* 7569242f - Fix pause behaviour with `Pause when inactive`. (3 months ago)
+* 030740ee - Fix some memory leak. (3 months ago)
+* 8ea607e1 - remove translation from joystick keys (3 months ago)
+* cec32a61 - travis: mac: disable --help check, it segfaults (3 months ago)
+* f54dd25b - travis: fix gettext on mac + brew (3 months ago)
+* e2f06210 - update Visual Studio support (3 months ago)
+* 91501bec - Fix small memory leak. (3 months ago)
+* c366907f - Temporary fix for #65. (3 months ago)
+* d585a610 - followup on kbd trans issues fix in 30b92724 (3 months ago)
+* eaf1ad24 - Merge remote-tracking branch 'vbam-libretro/master' (3 months ago)
+* 30b92724 - hopefully fix kbd control translation issues (3 months ago)
+* 90b3f354 - Add hotkeys for changing sizes (1x ... 6x). (3 months ago)
+* fa77010f - Fix pause toggle keybinding when unmuting. (3 months ago)
+* 8cb42003 - Merge pull request #56 from webgeek1234/master (3 months ago)
+* 8b8efa1b - fix key shortcuts for save/load states (3 months ago)
+* 9fa20b49 - joystick cleanups #444 (3 months ago)
+* 684b1bb7 - fix mem error for config global `homeDir` (3 months ago)
+* ccc91fa0 - quick fix for unicode filenames on windows (3 months ago)
+* dfa4fec3 - Fix missing shortcuts from key bindings. (4 months ago)
+* 69b581f7 - Handle key{bindings,shortcuts} correctly on frame. (4 months ago)
+* cec1dbfd - Split configuration for default keys. (4 months ago)
+* d655031a - Fix removing multiple system keys shortcuts. (4 months ago)
+* 996d5b9d - Do not set these options on `MainMenu.xrc`. (4 months ago)
+* 019ab5a7 - Fix "Joybus host invalid; disabling" warning. (3 months ago)
+* f6bfe676 - Have better support for maximized window. (4 months ago)
+* dcc0afa0 - Fix window size when {en,dis}abling status bar. (4 months ago)
+* bf6f2d4a - Change where the config dir is created. (4 months ago)
+* 3490620e - travis: use Mac OS 10.14 and Xcode 10.2.1 (4 months ago)
+* b0ec8469 - fix stuck keys on ubuntu and on focus loss #142 (4 months ago)
+* 3d57750c - Follow-up work on #142. (4 months ago)
+* 055b7c4d - libretro: jni: Switch to clang compiler in preparation for ndk r20 (4 months ago)
+* 2e1333e1 - regparm is an x86 only attribute, only define it there (4 months ago)
+* 500506cb - travis: disable link/SFML for mac (4 months ago)
+* 22307de6 - Fix continuous sprinting when using a modifier key as a mapping key (#142). (4 months ago)
+* 50459712 - wx: only rename config if new file doesn't exist (5 months ago)
+* 0a95486f - Sound.cpp: Update (5 months ago)
+* a4eae802 - cmake: use LEGACY OpenGL on FreeBSD only 2fedaa63 (5 months ago)
+* 240257a0 - wx: Change max volume from 400 to 200 (5 months ago)
+* 57ed465e - builder: better mac automation (5 months ago)
+* 15f040f3 - cmake: missing space in wx util function (5 months ago)
+* 2fedaa63 - support FreeBSD (5 months ago)
+* a0c375b6 - Merge remote-tracking branch 'vbam-libretro/master' (6 months ago)
+* c013d499 - Merge pull request #55 from Classicmods/master (6 months ago)
+* a8b38681 - remove some old visual studio project files (6 months ago)
+* b6bb24e0 - Merge pull request #1 from libretro/master (6 months ago)
+* 5012969a - Bump version to 2.1.1 (7 months ago)
+* 755f4767 - Fix #52 (8 months ago)
+* f87e0850 - added a8a35 (7 months ago)
+* 286c8ff4 - Fix #52 (8 months ago)
+
 ## [2.1.3] Windows Geometry Fix
 =======================
 * ac35e37c - fix game geometry on windows (4 hours ago)

@@ -1,0 +1,63 @@
+name: macOS Latest
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        build_type: [release, debug]
+        build_options: [default, link_off, translations_only, libretro]
+        include:
+          - cmake_build: '-DCMAKE_BUILD_TYPE=Release'
+            build_type: release
+          - cmake_build: '-DCMAKE_BUILD_TYPE=Debug'
+            build_type: debug
+          - cmake_options: '-DENABLE_LINK=OFF'
+            build_options: link_off
+          - cmake_options: '-DTRANSLATIONS_ONLY=ON'
+            build_options: translations_only
+          - libretro_build: 'DEBUG=0'
+            build_type: release
+            build_options: libretro
+          - libretro_build: 'DEBUG=1'
+            build_type: debug
+            build_options: libretro
+        exclude:
+          # Exclude debug/translations_only build
+          - build_type: debug
+            build_options: translations_only
+    runs-on: macos-latest
+    env:
+      NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM: 1
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with: 
+          submodules: recursive
+      - name: Install nix
+        uses: cachix/install-nix-action@v31
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      # Cmake build
+      - if: matrix.build_options != 'libretro'
+        name: Configure CMake
+        run: >-
+          nix-shell --command 'cmake -B build -G Ninja ${{ matrix.cmake_build }} -DENABLE_LTO=OFF ${{ matrix.cmake_options }}'
+      - if: matrix.build_options != 'libretro'
+        name: Build
+        run: >-
+          nix-shell --command 'ninja -C build'
+
+      # Libretro build
+      - if: matrix.build_options == 'libretro'
+        name: Build libretro core
+        run: >-
+          nix-shell --command 'make -C src/libretro ${{ matrix.libretro_build }}'
+
+      # Run tests
+      - if: matrix.build_options == 'default'
+        name: Run tests
+        run: >-
+          nix-shell --command 'cd build && ctest -j --output-on-failure'

@@ -4,9 +4,9 @@
 #include <string.h>
 #include <cstdlib>
 
-#include "../System.h"
-#include "../gba/elf.h"
-#include "exprNode.h" 
+#include "core/base/system.h"
+#include "core/gba/gbaElf.h"
+#include "sdl/exprNode.h" 
 
 extern int yyerror(const char *);
 extern int yylex(); 

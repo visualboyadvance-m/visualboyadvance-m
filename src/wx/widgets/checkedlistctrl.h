@@ -1,0 +1,193 @@
+/////////////////////////////////////////////////////////////////////////////
+// Name:        checkedlistctrl.h
+// Purpose:     wxCheckedListCtrl
+// Author:      Uknown ? (found at http://wiki.wxwidgets.org/wiki.pl?WxListCtrl)
+// Modified by: Francesco Montorsi
+// Created:     2005/06/29
+// RCS-ID:      $Id$
+// Copyright:   (c) 2005 Francesco Montorsi
+// Licence:     wxWidgets licence
+/////////////////////////////////////////////////////////////////////////////
+
+#ifndef VBAM_WX_WIDGETS_CHECKEDLISTCTRL_H_
+#define VBAM_WX_WIDGETS_CHECKEDLISTCTRL_H_
+
+// wxWidgets headers
+#include <wx/imaglist.h>
+#include <wx/listctrl.h>
+
+// this will never be part of a DLL
+#define WXDLLIMPEXP_WEBUPDATE
+// why would I include it and not enable it?
+#define wxUSE_CHECKEDLISTCTRL 1
+// enable customizations:
+//   - include wx/settings.h (bugfix; always enabled)
+//   - make a dynamic class so it can be subclass in xrc
+//   - only make col0 checkable
+//   - use "native" checkbox (also requires CLC_USE_SYSICONS)
+#define CLC_VBAM_USAGE 1
+#define CLC_USE_SYSICONS 1
+
+#if wxUSE_CHECKEDLISTCTRL
+
+// image indexes (used internally by wxCheckedListCtrl)
+#define wxCLC_UNCHECKED_IMGIDX 0 // unchecked & enabled
+#define wxCLC_CHECKED_IMGIDX 1 // checked & enabled
+#define wxCLC_DISABLED_UNCHECKED_IMGIDX 2 // unchecked & disabled
+#define wxCLC_DISABLED_CHECKED_IMGIDX 3 // checked & disabled
+
+// additional state flags (wx's defines should end at 0x0100; see listbase.h)
+#define wxLIST_STATE_CHECKED 0x010000
+#define wxLIST_STATE_ENABLED 0x100000
+
+// additional wxCheckedListCtrl style flags
+// (wx's defines should at 0x8000; see listbase.h)
+#define wxCLC_CHECK_WHEN_SELECTING 0x10000
+
+// -------------------------
+// wxCheckedListCtrl events
+// -------------------------
+
+DECLARE_EXPORTED_EVENT_TYPE(WXDLLIMPEXP_WEBUPDATE, wxEVT_COMMAND_LIST_ITEM_CHECKED, -1);
+DECLARE_EXPORTED_EVENT_TYPE(WXDLLIMPEXP_WEBUPDATE, wxEVT_COMMAND_LIST_ITEM_UNCHECKED, -1);
+
+//! This is the class which performs all transactions with the server.
+//! It uses the wxSocket facilities.
+class WXDLLIMPEXP_WEBUPDATE wxCheckedListCtrl : public wxListCtrl {
+protected:
+    // we have to keep a different array to keep track of the additional
+    // states we support....
+    wxArrayInt m_stateList;
+
+    // our set of checkbox images...
+    wxImageList m_imageList;
+
+public:
+    wxCheckedListCtrl()
+#if CLC_VBAM_USAGE && CLC_USE_SYSICONS
+        : wxListCtrl()
+        , m_imageList()
+    {
+    }
+#else
+        : wxListCtrl()
+        , m_imageList(16, 16, TRUE)
+    {
+    }
+#endif
+
+    wxCheckedListCtrl(wxWindow* parent, wxWindowID id = -1,
+        const wxPoint& pt = wxDefaultPosition, const wxSize& sz = wxDefaultSize,
+        long style = wxCLC_CHECK_WHEN_SELECTING,
+        const wxValidator& validator = wxDefaultValidator,
+        const wxString& name = wxListCtrlNameStr)
+#if CLC_VBAM_USAGE && CLC_USE_SYSICONS
+        : wxListCtrl()
+        , m_imageList()
+#else
+        : wxListCtrl()
+        , m_imageList(16, 16, TRUE)
+#endif
+    {
+        Create(parent, id, pt, sz, style, validator, name);
+    }
+
+    bool Create(wxWindow* parent, wxWindowID id = -1, const wxPoint& pt = wxDefaultPosition,
+        const wxSize& sz = wxDefaultSize, long style = wxCLC_CHECK_WHEN_SELECTING,
+        const wxValidator& validator = wxDefaultValidator,
+        const wxString& name = wxListCtrlNameStr);
+
+#ifdef CLC_VBAM_USAGE
+    // for xrc usage, a separate init function is needed.
+    bool Init();
+#endif
+    virtual ~wxCheckedListCtrl()
+    {
+    }
+
+public: // utilities
+    // core overloads (i.e. the most generic overloads)
+    bool GetItem(wxListItem& info) const;
+    bool SetItem(wxListItem& info);
+    long InsertItem(wxListItem& info);
+    bool DeleteItem(long item);
+    bool DeleteAllItems()
+    {
+        m_stateList.Clear();
+        return wxListCtrl::DeleteAllItems();
+    }
+
+    bool SortItems(wxListCtrlCompare, long)
+    {
+        wxASSERT_MSG(0, wxT("Not implemented yet ! sorry... "));
+        return FALSE;
+    }
+
+    // shortcuts to the SetItemState function
+    void Check(long item, bool checked);
+    void Enable(long item, bool enable);
+    void CheckAll(bool checked = true);
+    void EnableAll(bool enable = true);
+
+    // this needs to be redeclared otherwise it's hidden by our other Enable() function.
+    // However you should use #EnableAll instead of this function if you want to get
+    // good graphics (try to understand)
+    virtual bool Enable(bool enable = true)
+    {
+        return wxListCtrl::Enable(enable);
+    }
+
+    // shortcuts to the GetItemState function
+    bool IsChecked(long item) const
+    {
+        return GetItemState(item, wxLIST_STATE_CHECKED) != 0;
+    }
+    bool IsEnabled(long item) const
+    {
+        return GetItemState(item, wxLIST_STATE_ENABLED) != 0;
+    }
+
+    // this needs to be redeclared otherwise it's hidden by our other IsEnabled() function.
+    bool IsEnabled() const
+    {
+        return wxWindow::IsEnabled();
+    }
+
+    //! Returns the number of checked items in the control.
+    int GetCheckedItemCount() const;
+
+    // we overload these so we are sure they will use our
+    // #GetItem and #SetItem functions...
+    bool SetItemState(long item, long state, long stateMask);
+    int GetItemState(long item, long stateMask) const;
+    long InsertItem(long index, const wxString& label, int imageIndex = -1);
+    long SetItem(long index, int col, const wxString& label, int imageId = -1);
+
+    // the image associated with an element is already in used by wxCheckedListCtrl
+    // itself to show the checkbox and it cannot be handled by the user !
+    bool SetItemImage(long, int)
+    {
+        wxASSERT_MSG(0, wxT("This function cannot be used with wxCheckedListCtrl !"));
+        return FALSE;
+    }
+
+protected: // event handlers
+    void OnMouseEvent(wxMouseEvent& event);
+
+protected: // internal utilities
+    static int GetItemImageFromAdditionalState(int addstate);
+    static int GetAndRemoveAdditionalState(long* state, int statemask);
+    wxColour GetBgColourFromAdditionalState(int additionalstate);
+
+private:
+#if CLC_VBAM_USAGE
+    DECLARE_DYNAMIC_CLASS(wxCheckedListCtrl)
+#else
+    DECLARE_CLASS(wxCheckedListCtrl)
+#endif
+    DECLARE_EVENT_TABLE()
+};
+
+#endif // wxUSE_CHECKEDLISTCTRL
+
+#endif // VBAM_WX_WIDGETS_CHECKEDLISTCTRL_H_

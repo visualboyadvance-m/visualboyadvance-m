@@ -1,0 +1,323 @@
+#!/bin/sh
+
+version=1.5
+
+main() {
+    # parse options
+    list=
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            -h|--help|--usage)
+                usage
+                quit 0
+                ;;
+            -v|--version)
+                echo "third_party_libs_tool $version"
+                quit 0
+                ;;
+            -l|--list)
+                list=1
+                shift
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+
+    if [ $# -ne 1 ]; then
+        usage
+        quit 1
+    fi
+
+    mktmp
+
+    app_bundle=$(echo "$1" | fully_resolve_links)
+
+    case "$app_bundle" in
+        *.[aA][pP][pP])
+            if [ ! -d "$app_bundle" ]; then
+                usage
+                quit 1
+            fi
+            ;;
+        *)
+            usage
+            quit 1
+            ;;
+    esac
+
+    set --
+
+    OLDIFS=$IFS
+    IFS='
+'
+    for file in $(find "$app_bundle/Contents/MacOS" -type f); do
+        case "$file" in
+            *.dylib)
+                set -- "$@" "$file"
+                ;;
+            *)
+                [ -x "$file" ] && set -- "$@" "$file"
+                ;;
+        esac
+    done
+    IFS=$OLDIFS
+
+    frameworks="$app_bundle/Contents/Frameworks"
+
+    mkdir -p "$frameworks"
+
+    scan_libs "$@" | sort -u | \
+    while read lib; do
+        if [ -n "$list" ]; then
+            echo "$lib"
+        else
+            resolved=$(echo "$lib" | fully_resolve_links)
+            resolved_basename=${resolved##*/}
+            if [ ! -f "$frameworks/$resolved_basename" ]; then
+                cp -f "$resolved" "$frameworks" 2>/dev/null
+            fi
+            if [ "$resolved" != "$lib" ]; then
+                lib_basename=${lib##*/}
+                if [ ! -f "$frameworks/$lib_basename" ]; then
+                    ln -s "$resolved_basename" "$frameworks/$lib_basename"
+                fi
+            fi
+        fi
+    done
+
+    # fix dynamic link info in executables and just copied libs
+    [ -z "$list" ] && relink_all "$@"
+
+    quit 0
+}
+
+usage() {
+    cat <<'EOF'
+Usage: [32mthird_party_libs_tool [1;34m[[1;35mOPTION[1;34m][0m [1;35mBUNDLE.app[0m
+Bundle third party dylibs into [1;35mBUNDLE.app[0m and fix up linkages.
+
+Binaries are searched for in [1;35mBUNDLE.app[0m/Contents/MacOS .
+
+The dylibs are copied into [1;35mBUNDLE.app[0m/Contents/Frameworks .
+
+  [1m-h, --help, --usage[0m                Show this help screen and exit.
+  [1m-v, --version[0m                      Show version information and exit.
+  [1m-l, --list[0m                         Only list dylibs used by binaries, do not copy or link.
+
+Examples:
+  [32mthird_party_libs_tool [1;35m./MyApp.app[0m         # bundle and link [1;35m./MyApp.app[0m
+  [32mthird_party_libs_tool [1m--list[0m [1;35m./MyApp.app[0m  # list third party libs used by [1;35m./MyApp.app[0m
+
+Project homepage and documentation: <[1;34mhttp://github.com/rkitover/mac-third-party-libs-tool[0m>
+EOF
+}
+
+mktmp() {
+    tmp="/tmp/third_party_libs_tool_$$"
+    mkdir "$tmp" || quit 1
+    chmod 700 "$tmp" 2>/dev/null
+    trap "quit 1" PIPE HUP INT QUIT ILL TRAP KILL BUS TERM
+}
+
+quit() {
+    [ -n "$tmp" ] && rm -rf "$tmp" 2>/dev/null
+    exit ${1:-0}
+}
+
+scan_libs() {
+    scratch_dir="$tmp/lib_scan"
+    mkdir -p "$scratch_dir"
+
+    lib_scan "$@"
+
+    rm -rf "$scratch_dir"
+}
+
+lib_scan() {
+    for bin in "$@"; do
+        case "$bin" in
+            *.dylib)
+                ;;
+            *)
+                [ ! -x "$bin" ] && continue
+                ;;
+        esac
+
+        # Remove path parts for mark file
+        bin_mark_file=$(echo "$bin" | sed 's,/,_,g')
+
+        # if binary is already processed, continue
+        [ -d "$scratch_dir/$bin_mark_file" ] && continue
+
+        # otherwise mark it processed
+        mkdir -p "$scratch_dir/$bin_mark_file"
+
+        set --
+
+        OLDIFS=$IFS
+        IFS='
+'
+        for lib in $(otool -L "$bin" 2>/dev/null \
+              | sed -E '1d; s/^[[:space:]]*//; \,^(/System|/usr/lib),d; s/[[:space:]]+\([^()]+\)[[:space:]]*$//'); do
+
+            [ "$lib" = "$bin" ] && continue
+
+            # check for libs already linked as @rpath/ which usually means /usr/local/lib/
+            case "$lib" in
+                '@rpath/'*)
+                    lib='/usr/local/lib'"${lib#@rpath}"
+                    ;;
+                '@loader_path/../../../../'*)
+                    lib='/usr/local/'"${lib#@loader_path/../../../../}"
+                    ;;
+                '@loader_path/'*)
+                    lib='/usr/local/lib'"${lib#@loader_path}"
+                    ;;
+            esac
+
+            echo "$lib"
+            set -- "$@" "$lib"
+        done
+        IFS=$OLDIFS
+
+        # recurse
+        [ $# -ne 0 ] && lib_scan "$@"
+    done
+}
+
+fully_resolve_links() {
+    while read -r file; do
+        while [ -h "$file" ]; do
+            file=$(readlink -f "$file")
+        done
+        echo "$file"
+    done
+}
+
+lock() {
+    mkdir -p "$lock_dir/$1"
+}
+
+unlock() {
+    rm -rf "$lock_dir/$1"
+}
+
+wait_lock() {
+    while [ -d "$lock_dir/$1" ]; do
+        /bin/bash -c 'sleep 0.1'
+    done
+}
+
+relink_all() {
+    lock_dir="$tmp/locks"
+
+    find "$app_bundle/Contents/Frameworks" -name '*.dylib' > "$tmp/libs"
+
+    for exe in "$@"; do (
+        # dylib search path for executable
+        wait_lock "$exe"
+        lock "$exe"
+        install_name_tool -add_rpath '@loader_path/../Frameworks' "$exe"
+        unlock "$exe"
+
+        OLDIFS=$IFS
+        IFS='
+'
+        set --
+        for lib in $(cat "$tmp/libs"); do
+            set -- "$@" "$lib"
+        done
+        IFS=$OLDIFS
+
+        for lib in "$@"; do
+            wait_lock "$lib"
+            lock "$lib"
+
+            # make lib writable
+            chmod u+w "$lib"
+
+            # change id of lib
+            install_name_tool -id "@rpath/${lib##*/}" "$lib"
+
+            # set search path of lib
+            install_name_tool -add_rpath '@loader_path/../Frameworks' "$lib"
+
+            unlock "$lib"
+
+            # relink executable and all other libs to this lib
+            for target in "$exe" "$@"; do (
+                relink "$lib" "$target"
+            ) & done
+            wait
+        done
+    ) & done
+    wait
+
+    rm -rf "$tmp/libs" "$lock_dir"
+}
+
+relink() {
+    lib=$1
+    target=$2
+
+    lib_basename=${lib##*/}
+    lib_basename_unversioned_re=$(echo "$lib_basename" | sed 's/\.[0-9.-]*\.dylib$//; s/\./\\./g')
+
+    # remove full path and version of lib in executable
+    lib_link_path=$(
+        otool -l "$target" 2>/dev/null | \
+        sed -n 's,^ *name \(.*/*'"$lib_basename_unversioned_re"'\.[0-9.-]*\.dylib\) (offset .*,\1,p' | \
+          head -1
+    )
+
+    [ -z "$lib_link_path" ] && return 0
+
+    # check that the shorter basename is the prefix of the longer basename
+    # that is, the lib versions match
+    lib1=${lib_basename%.dylib}
+    lib2=${lib_link_path##*/}
+    lib2=${lib2%.dylib}
+
+    if [ "${#lib1}" -le "${#lib2}" ]; then
+        shorter=$lib1
+        longer=$lib2
+    else
+        shorter=$lib2
+        longer=$lib1
+    fi
+
+    case "$longer" in
+        "$shorter"*)
+            # and if so, relink target to the lib
+            wait_lock "$lib"
+            lock "$lib"
+
+            install_name_tool -change "$lib_link_path" "@rpath/$lib_basename" "$target"
+
+            unlock "$lib"
+            ;;
+    esac
+}
+
+# try with sudo in case it fails,
+# also suppress duplicate path errors
+install_name_tool() {
+    out_file="$tmp/install_name_tool.out"
+
+    if ! command install_name_tool "$@" >"$out_file" 2>&1; then
+        if grep -Eq -i 'permission  denied|bad file descriptor' "$out_file"; then
+            if ! command sudo install_name_tool "$@"; then
+                return 1
+            fi
+        elif ! grep -Eq -i 'would duplicate path' "$out_file"; then
+            cat "$out_file" >&2
+            return 1
+        fi
+    fi
+
+    return 0
+}
+
+main "$@"

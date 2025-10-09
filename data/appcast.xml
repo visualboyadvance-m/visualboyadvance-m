@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <item>
+      <link>https://github.com/visualboyadvance-m/visualboyadvance-m/releases/download/v2.1.4/visualboyadvance-m-Win-64bit.zip</link>
+      <enclosure
+          sparkle:os="windows-x64"
+          sparkle:version="2.1.4"
+          length="0"
+          type="application/octet-stream"
+      />
+    </item>
+    <item>
+      <link>https://github.com/visualboyadvance-m/visualboyadvance-m/releases/download/v2.1.4/visualboyadvance-m-Win-32bit.zip</link>
+      <enclosure
+          sparkle:os="windows-x86"
+          sparkle:version="2.1.4"
+          length="0"
+          type="application/octet-stream"
+      />
+    </item>
+    <item>
+      <link>https://github.com/visualboyadvance-m/visualboyadvance-m/releases/download/v2.1.4/visualboyadvance-m-Mac-64bit.zip</link>
+      <enclosure
+          sparkle:os="macos"
+          sparkle:version="2.1.4"
+          length="0"
+          type="application/octet-stream"
+      />
+    </item>
+  </channel>
+</rss>
+

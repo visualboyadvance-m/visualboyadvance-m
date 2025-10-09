@@ -5,7 +5,7 @@
       <orient>wxVERTICAL</orient>
       <object class="sizeritem">
         <object class="wxNotebook">
-          <tooltip>Click a field and press a key or move joystick to add.  Press backspace to delete last added key.  Resize window or click inside and move pointer to see entire contents if too small.</tooltip>
+          <tooltip>Click a field and press a key or move joystick to add. Press backspace to delete last added key. Resize window or click inside and move pointer to see entire contents if too small.</tooltip>
           <object class="notebookpage">
             <object class="wxPanel">
               <object class="wxFlexGridSizer">
@@ -17,8 +17,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="Up" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="Up">
+                    <multikey>1</multikey>
                   </object>
                   <option>1</option>
                   <flag>wxALL|wxEXPAND</flag>
@@ -40,8 +40,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="A" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="A">
+                    <multikey>1</multikey>
                   </object>
                   <option>1</option>
                   <flag>wxALL|wxEXPAND</flag>
@@ -63,8 +63,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="Down" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="Down">
+                    <multikey>1</multikey>
                   </object>
                   <option>1</option>
                   <flag>wxALL|wxEXPAND</flag>
@@ -86,8 +86,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="B" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="B">
+                    <multikey>1</multikey>
                   </object>
                   <option>1</option>
                   <flag>wxALL|wxEXPAND</flag>
@@ -109,8 +109,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="Left" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="Left">
+                    <multikey>1</multikey>
                   </object>
                   <option>1</option>
                   <flag>wxALL|wxEXPAND</flag>
@@ -132,8 +132,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="L" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="L">
+                    <multikey>1</multikey>
                   </object>
                   <option>1</option>
                   <flag>wxALL|wxEXPAND</flag>
@@ -155,8 +155,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="Right" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="Right">
+                    <multikey>1</multikey>
                   </object>
                   <option>1</option>
                   <flag>wxALL|wxEXPAND</flag>
@@ -179,8 +179,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="R" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="R">
+                    <multikey>1</multikey>
                   </object>
                   <option>1</option>
                   <flag>wxALL|wxEXPAND</flag>
@@ -202,8 +202,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="Select" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="Select">
+                    <multikey>1</multikey>
                   </object>
                   <option>1</option>
                   <flag>wxALL|wxEXPAND</flag>
@@ -225,8 +225,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="Start" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="Start">
+                    <multikey>1</multikey>
                   </object>
                   <option>1</option>
                   <flag>wxALL|wxEXPAND</flag>
@@ -257,8 +257,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="MotionUp" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="MotionUp">
+                    <multikey>1</multikey>
                   </object>
                   <flag>wxALL|wxEXPAND</flag>
                   <border>5</border>
@@ -279,8 +279,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="AutoA" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="AutoA">
+                    <multikey>1</multikey>
                   </object>
                   <flag>wxALL|wxEXPAND</flag>
                   <border>5</border>
@@ -301,8 +301,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="MotionDown" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="MotionDown">
+                    <multikey>1</multikey>
                   </object>
                   <flag>wxALL|wxEXPAND</flag>
                   <border>5</border>
@@ -323,8 +323,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="AutoB" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="AutoB">
+                    <multikey>1</multikey>
                   </object>
                   <flag>wxALL|wxEXPAND</flag>
                   <border>5</border>
@@ -339,14 +339,14 @@
                 </object>
                 <object class="sizeritem">
                   <object class="wxStaticText">
-                    <label>Motion Left/Dark</label>
+                    <label>Motion Left / Dark</label>
                   </object>
                   <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="MotionLeft" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="MotionLeft">
+                    <multikey>1</multikey>
                   </object>
                   <flag>wxALL|wxEXPAND</flag>
                   <border>5</border>
@@ -361,14 +361,14 @@
                 </object>
                 <object class="sizeritem">
                   <object class="wxStaticText">
-                    <label>GameShark</label>
+                    <label translate="0">Game Shark</label>
                   </object>
                   <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="GS" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="GS">
+                    <multikey>1</multikey>
                   </object>
                   <flag>wxALL|wxEXPAND</flag>
                   <border>5</border>
@@ -383,14 +383,14 @@
                 </object>
                 <object class="sizeritem">
                   <object class="wxStaticText">
-                    <label>Motion Right/Light</label>
+                    <label>Motion Right / Light</label>
                   </object>
                   <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="MotionRight" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="MotionRight">
+                    <multikey>1</multikey>
                   </object>
                   <flag>wxALL|wxGROW</flag>
                   <border>5</border>
@@ -411,8 +411,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="Speed" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="Speed">
+                    <multikey>1</multikey>
                   </object>
                   <flag>wxALL|wxEXPAND</flag>
                   <border>5</border>
@@ -433,8 +433,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="MotionIn" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="MotionIn">
+                    <multikey>1</multikey>
                   </object>
                   <flag>wxALL|wxEXPAND</flag>
                   <border>5</border>
@@ -464,8 +464,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="MotionOut" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="MotionOut">
+                    <multikey>1</multikey>
                   </object>
                   <flag>wxALL|wxGROW</flag>
                   <border>5</border>
@@ -486,8 +486,8 @@
                   <border>5</border>
                 </object>
                 <object class="sizeritem">
-                  <object class="wxTextCtrl" name="Capture" subclass="wxJoyKeyTextCtrl">
-                    <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
+                  <object class="UserInputCtrl" name="Capture">
+                    <multikey>1</multikey>
                   </object>
                   <flag>wxALL|wxEXPAND</flag>
                   <border>5</border>
@@ -511,7 +511,7 @@
         <flag>wxEXPAND|wxALL</flag>
       </object>
       <object class="sizeritem">
-        <object class="wxCheckBox" name="DefaultConfig" subclass="wxFarRadio">
+        <object class="GroupCheckBox" name="DefaultConfig">
           <label>Use as default</label>
         </object>
       </object>

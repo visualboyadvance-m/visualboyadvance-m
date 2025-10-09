@@ -1,29 +1,40 @@
 function(host_compile src dst_cmd)
-    unset(link_flags)
-
-    if(CMAKE_HOST_WIN32)
-        if(NOT dst MATCHES "\\.[Ee][Xx][Ee]\$")
-            set(dst "${dst_cmd}.exe")
-        endif()
-
-        if(CMAKE_COMPILER_IS_GNUCXX)
-            set(link_flags -Wl,--subsystem,console)
-        endif()
-    else()
+    if(CMAKE_CROSSCOMPILING)
+        unset(link_flags)
         set(dst "${dst_cmd}")
-    endif()
 
-    if(NOT MSVC)
-        # assume cc foo.c -o foo # will work on most hosts
-        set(compile_command cc ${src} -o ${dst} ${link_flags})
+        if(CMAKE_HOST_WIN32)
+            if(CMAKE_COMPILER_IS_GNUCXX)
+                set(link_flags -Wl,--subsystem,console)
+            endif()
+        endif()
+
+        if(MSVC)
+            set(msvc_compile_script ${CMAKE_SOURCE_DIR}/cmake/MSVC_x86_Host_Compile.cmake)
+
+            add_custom_command(
+                OUTPUT ${dst}
+                DEPENDS ${src} ${msvc_compile_script}
+                COMMAND ${CMAKE_COMMAND} -D "src=${src}" -D "dst=${dst}" -P ${msvc_compile_script}
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            )
+        else()
+            set(dst ${dst_cmd})
+
+            # Assume: cc foo.c -o foo # will work on most hosts
+            add_custom_command(
+                OUTPUT ${dst}
+                DEPENDS ${src}
+                COMMAND cc ${src} -o ${dst} ${link_flags}
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            )
+        endif()
     else()
-        # special case for Visual Studio
-        set(compile_command cl ${src} /link "/out:${dst}")
-    endif()
+        get_filename_component(dst ${dst_cmd} NAME)
 
-    execute_process(COMMAND ${compile_command} OUTPUT_VARIABLE compile_out ERROR_VARIABLE compile_out RESULT_VARIABLE compile_result)
+        add_executable(${dst} ${src})
 
-    if(NOT compile_result EQUAL 0)
-        message(FATAL_ERROR "Failed compiling ${src} for the host: ${compile_out}")
+        # this is necessary because we override main with SDL_main
+        target_compile_definitions(${dst} PRIVATE -Dmain=main)
     endif()
 endfunction()

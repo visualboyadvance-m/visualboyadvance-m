@@ -11,57 +11,68 @@ ifeq ($(FRONTEND_SUPPORTS_RGB565),1)
 VBA_DEFINES += -DFRONTEND_SUPPORTS_RGB565
 endif
 
+ifeq ($(FRONTEND_SUPPORT_BGR1555),1)
+VBA_DEFINES += -DFRONTEND_SUPPORT_BGR1555
+endif
+
 ifeq ($(NO_LINK),1)
 VBA_DEFINES += -DNO_LINK
 endif
 
 SOURCES_CXX :=
+
 SOURCES_CXX += \
 	$(CORE_DIR)/libretro/libretro.cpp \
-	$(CORE_DIR)/libretro/UtilRetro.cpp \
 	$(CORE_DIR)/libretro/SoundRetro.cpp
 
 SOURCES_CXX += \
-	$(CORE_DIR)/apu/Gb_Oscs.cpp \
-	$(CORE_DIR)/apu/Gb_Apu_State.cpp \
-	$(CORE_DIR)/apu/Blip_Buffer.cpp \
-	$(CORE_DIR)/apu/Multi_Buffer.cpp \
-	$(CORE_DIR)/apu/Effects_Buffer.cpp \
-	$(CORE_DIR)/apu/Gb_Apu.cpp
+	$(CORE_DIR)/core/base/internal/file_util_internal.cpp \
+	$(CORE_DIR)/core/base/file_util_common.cpp \
+	$(CORE_DIR)/core/base/file_util_libretro.cpp
 
 SOURCES_CXX += \
-	$(CORE_DIR)/gba/GBA-thumb.cpp \
-	$(CORE_DIR)/gba/Sound.cpp \
-	$(CORE_DIR)/gba/Mode1.cpp \
-	$(CORE_DIR)/gba/CheatSearch.cpp \
-	$(CORE_DIR)/gba/Globals.cpp \
-	$(CORE_DIR)/gba/agbprint.cpp \
-	$(CORE_DIR)/gba/Mode4.cpp \
-	$(CORE_DIR)/gba/Mode3.cpp \
-	$(CORE_DIR)/gba/Mode5.cpp \
-	$(CORE_DIR)/gba/Mode2.cpp \
-	$(CORE_DIR)/gba/ereader.cpp \
-	$(CORE_DIR)/gba/GBA-arm.cpp \
-	$(CORE_DIR)/gba/bios.cpp \
-	$(CORE_DIR)/gba/Mode0.cpp \
-	$(CORE_DIR)/gba/Flash.cpp \
-	$(CORE_DIR)/gba/GBAGfx.cpp \
-	$(CORE_DIR)/gba/Cheats.cpp \
-	$(CORE_DIR)/gba/GBA.cpp \
-	$(CORE_DIR)/gba/EEprom.cpp \
-	$(CORE_DIR)/gba/RTC.cpp \
-	$(CORE_DIR)/gba/Sram.cpp
+	$(CORE_DIR)/core/apu/Gb_Oscs.cpp \
+	$(CORE_DIR)/core/apu/Gb_Apu_State.cpp \
+	$(CORE_DIR)/core/apu/Blip_Buffer.cpp \
+	$(CORE_DIR)/core/apu/Multi_Buffer.cpp \
+	$(CORE_DIR)/core/apu/Effects_Buffer.cpp \
+	$(CORE_DIR)/core/apu/Gb_Apu.cpp
 
 SOURCES_CXX += \
-	$(CORE_DIR)/gb/gbCheats.cpp \
-	$(CORE_DIR)/gb/GB.cpp \
-	$(CORE_DIR)/gb/gbGfx.cpp \
-	$(CORE_DIR)/gb/gbGlobals.cpp \
-	$(CORE_DIR)/gb/gbMemory.cpp \
-	$(CORE_DIR)/gb/gbSGB.cpp \
-	$(CORE_DIR)/gb/gbSound.cpp
+	$(CORE_DIR)/core/gba/gba.cpp \
+	$(CORE_DIR)/core/gba/gbaCheats.cpp \
+	$(CORE_DIR)/core/gba/gbaCheatSearch.cpp \
+	$(CORE_DIR)/core/gba/gbaCpuArm.cpp \
+	$(CORE_DIR)/core/gba/gbaCpuThumb.cpp \
+	$(CORE_DIR)/core/gba/gbaEeprom.cpp \
+	$(CORE_DIR)/core/gba/gbaFlash.cpp \
+	$(CORE_DIR)/core/gba/gbaGfx.cpp \
+	$(CORE_DIR)/core/gba/gbaGlobals.cpp \
+	$(CORE_DIR)/core/gba/gbaMode0.cpp \
+	$(CORE_DIR)/core/gba/gbaMode1.cpp \
+	$(CORE_DIR)/core/gba/gbaMode2.cpp \
+	$(CORE_DIR)/core/gba/gbaMode3.cpp \
+	$(CORE_DIR)/core/gba/gbaMode4.cpp \
+	$(CORE_DIR)/core/gba/gbaMode5.cpp \
+	$(CORE_DIR)/core/gba/gbaPrint.cpp \
+	$(CORE_DIR)/core/gba/gbaRtc.cpp \
+	$(CORE_DIR)/core/gba/gbaSound.cpp \
+	$(CORE_DIR)/core/gba/internal/gbaBios.cpp \
+	$(CORE_DIR)/core/gba/internal/gbaEreader.cpp \
+	$(CORE_DIR)/core/gba/internal/gbaSram.cpp \
+
+SOURCES_CXX += \
+	$(CORE_DIR)/core/gb/gb.cpp \
+	$(CORE_DIR)/core/gb/gbCartData.cpp \
+	$(CORE_DIR)/core/gb/gbCheats.cpp \
+	$(CORE_DIR)/core/gb/gbGfx.cpp \
+	$(CORE_DIR)/core/gb/gbGlobals.cpp \
+	$(CORE_DIR)/core/gb/gbMemory.cpp \
+	$(CORE_DIR)/core/gb/gbSGB.cpp \
+	$(CORE_DIR)/core/gb/gbSound.cpp
 
 # Filters
 SOURCES_CXX += \
-	$(CORE_DIR)/filters/interframe.cpp \
-	$(CORE_DIR)/gba/gbafilter.cpp
+	$(CORE_DIR)/components/filters_agb/filters_agb.cpp \
+	$(CORE_DIR)/components/filters_cgb/filters_cgb.cpp \
+	$(CORE_DIR)/components/filters_interframe/interframe.cpp

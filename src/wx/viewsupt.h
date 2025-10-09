@@ -1,5 +1,7 @@
-#ifndef WX_VIEWSUPT_H
-#define WX_VIEWSUPT_H
+#ifndef VBAM_WX_VIEWSUPT_H_
+#define VBAM_WX_VIEWSUPT_H_
+
+#include <cstdint>
 
 #include <wx/wx.h>
 #include <wx/window.h>
@@ -14,7 +16,7 @@
 #include <wx/stattext.h>
 #include <wx/checkbox.h>
 
-#include <stdint.h> // for uint32_t
+#include "wx/widgets/user-input-event.h"
 
 // avoid exporting too much stuff
 namespace Viewers {
@@ -194,7 +196,7 @@ private:
 
 public:
     // make addr visible
-    void Show(uint32_t addr, bool force_update = false);
+    void ShowAddr(uint32_t addr, bool force_update = false);
 
     // current selection, or topaddr if none
     uint32_t GetAddr();
@@ -218,7 +220,7 @@ protected:
     int addrlen;
 
     void MouseEvent(wxMouseEvent& ev);
-    void KeyEvent(wxKeyEvent& ev);
+    void KeyEvent(widgets::UserInputEvent& ev);
     // the subwidgets
     wxPanel disp;
     wxScrollBar sb;
@@ -253,13 +255,13 @@ public:
     void SetRGB(int r, int g, int b);
     void GetRGB(int& _r, int& _g, int& _b)
     {
-        _r = r;
-        _g = g;
-        _b = b;
+        _r = r_;
+        _g = g_;
+        _b = b_;
     }
 
 protected:
-    int r, g, b;
+    int r_, g_, b_;
     wxPanel* cp;
     wxStaticText *rt, *gt, *bt;
 };
@@ -385,9 +387,9 @@ protected:
     GfxPanel* gv;
 
 private:
-    static wxString bmp_save_dir;
-    wxScrolledWindow* gvs;
-    wxCheckBox* str;
+    static wxString bmp_save_dir_;
+    wxScrolledWindow* gvs_;
+    wxCheckBox* str_;
 
     DECLARE_EVENT_TABLE()
 };
@@ -407,7 +409,7 @@ protected:
 // a display-only checkbox which does not look like it's disabled
 class DispCheckBox : public wxCheckBox {
 public:
-    bool AcceptsFocus()
+    bool AcceptsFocus() const
     {
         return false;
     }
@@ -421,4 +423,4 @@ public:
 
 // standard widgets in graphical viewers
 }
-#endif /* WX_VIEWSUPT_H */
+#endif // VBAM_WX_VIEWSUPT_H_

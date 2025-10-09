@@ -1,0 +1,60 @@
+name: Visual Studio
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        msvc_arch: ['x64', 'amd64_x86', 'amd64_arm64']
+        # TODO: Re-add "Visual Studio 17 2022" once it's working.
+        cmake_generator: ['Ninja']
+        build_type: [release, debug]
+        build_options: [default, link_off, translations_only]
+        include:
+          - cmake_build: '-DCMAKE_BUILD_TYPE=Release'
+            build_type: release
+          - cmake_build: '-DCMAKE_BUILD_TYPE=Debug'
+            build_type: debug
+          - cmake_options: '-DENABLE_LINK=OFF'
+            build_options: link_off
+          - cmake_options: '-DTRANSLATIONS_ONLY=ON'
+            build_options: translations_only
+          - cmake_vcpkg_triplet: 'x64-windows-static'
+            msvc_arch: x64
+          - cmake_vcpkg_triplet: 'x86-windows-static'
+            msvc_arch: amd64_x86
+          - cmake_vcpkg_triplet: 'arm64-windows-static'
+            msvc_arch: amd64_arm64
+        exclude:
+          # Exclude debug/translations_only build
+          - build_type: debug
+            build_options: translations_only
+          - build_type: release
+            build_options: translations_only
+            msvc_arch: amd64_x86
+          - build_type: release
+            build_options: translations_only
+            msvc_arch: amd64_arm64
+    runs-on: windows-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Prepare Visual Studio environment
+        uses: ilammy/msvc-dev-cmd@v1.13.0
+        with:
+          arch: ${{ matrix.msvc_arch }}
+
+      - name: Configure
+        run: >-
+          cmake -B build -G ${{ matrix.cmake_generator }} -DVCPKG_TARGET_TRIPLET=${{ matrix.cmake_vcpkg_triplet }} ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}
+
+      - name: Build
+        run: cmake --build build
+
+      # Run tests
+      - if: matrix.build_options == 'default' && matrix.msvc_arch != 'amd64_arm64'
+        name: Run tests
+        run: cd build && ctest -j --output-on-failure

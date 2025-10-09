@@ -22,44 +22,6 @@
           <object class="sizeritem">
             <object class="wxBoxSizer">
               <object class="sizeritem">
-                <object class="wxStaticText" name="OnlineUpdates">
-                  <label>Check for updates:</label>
-                </object>
-                <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxRadioButton" name="UpdateNever">
-                  <label>_Never</label>
-                  <style>wxRB_GROUP</style>
-                </object>
-                <option>1</option>
-                <flag>wxALL</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxRadioButton" name="UpdateDaily">
-                  <label>_Daily</label>
-                </object>
-                <option>1</option>
-                <flag>wxALL</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxRadioButton" name="UpdateWeekly">
-                  <label>_Weekly</label>
-                </object>
-                <option>1</option>
-                <flag>wxALL</flag>
-                <border>5</border>
-              </object>
-              <orient>wxHORIZONTAL</orient>
-            </object>
-            <flag>wxEXPAND</flag>
-          </object>
-          <object class="sizeritem">
-            <object class="wxBoxSizer">
-              <object class="sizeritem">
                 <object class="wxStaticText">
                   <label>Screenshot Format:</label>
                 </object>
@@ -68,7 +30,7 @@
               </object>
               <object class="sizeritem">
                 <object class="wxRadioButton" name="PNG">
-                  <label>_PNG</label>
+                  <label translate="0">_PNG</label>
                   <style>wxRB_GROUP</style>
                 </object>
                 <option>1</option>
@@ -77,7 +39,7 @@
               </object>
               <object class="sizeritem">
                 <object class="wxRadioButton" name="BMP">
-                  <label>_BMP</label>
+                  <label translate="0">_BMP</label>
                 </object>
                 <option>1</option>
                 <flag>wxALL</flag>
@@ -92,7 +54,7 @@
               <orient>wxHORIZONTAL</orient>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>_Rewind interval :</label>
+                  <label>_Rewind interval:</label>
                   <tooltip>If not empty or 0, enable rewind (seconds)</tooltip>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
@@ -102,7 +64,7 @@
                 <object class="wxSpinCtrl" name="RewindInterval">
                   <min>0</min>
                   <max>600</max>
-                  <tooltip>seconds (0-600); 0 = disable</tooltip>
+                  <tooltip>Seconds (0-600); 0 = disable</tooltip>
                 </object>
                 <flag>wxALL|wxEXPAND</flag>
                 <border>5</border>
@@ -131,7 +93,7 @@
               <orient>wxHORIZONTAL</orient>
               <object class="sizeritem">
                 <object class="wxStaticText">
-                  <label>% of normal:</label>
+                  <label>Percent of normal:</label>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>
@@ -140,7 +102,7 @@
                 <object class="wxSpinCtrl" name="Throttle">
                   <value>0</value>
                   <min>0</min>
-                  <max>1000</max>
+                  <max>450</max>
                   <tooltip>0 = no throttle</tooltip>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
@@ -149,33 +111,26 @@
               <object class="sizeritem">
                 <object class="wxChoice" name="ThrottleSel">
                   <content>
-                    <item>None</item>
-                    <item>25%</item>
-                    <item>50%</item>
-                    <item>75%</item>
-                    <item>100%</item>
-                    <item>125%</item>
-                    <item>150%</item>
-                    <item>175%</item>
-                    <item>200%</item>
-                    <item>225%</item>
-                    <item>250%</item>
-                    <item>275%</item>
-                    <item>300%</item>
-                    <item>325%</item>
-                    <item>350%</item>
-                    <item>375%</item>
-                    <item>400%</item>
-                    <item>425%</item>
-                    <item>450%</item>
-                    <item>475%</item>
-                    <item>500%</item>
-                    <item>525%</item>
-                    <item>550%</item>
-                    <item>575%</item>
-                    <item>600%</item>
+                    <item>Unlimited</item>
+                    <item translate="0">25%</item>
+                    <item translate="0">50%</item>
+                    <item translate="0">75%</item>
+                    <item translate="0">100%</item>
+                    <item translate="0">125%</item>
+                    <item translate="0">150%</item>
+                    <item translate="0">175%</item>
+                    <item translate="0">200%</item>
+                    <item translate="0">225%</item>
+                    <item translate="0">250%</item>
+                    <item translate="0">275%</item>
+                    <item translate="0">300%</item>
+                    <item translate="0">325%</item>
+                    <item translate="0">350%</item>
+                    <item translate="0">375%</item>
+                    <item translate="0">400%</item>
+                    <item translate="0">425%</item>
+                    <item translate="0">450%</item>
                   </content>
-                  <size>40,-1d</size>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>

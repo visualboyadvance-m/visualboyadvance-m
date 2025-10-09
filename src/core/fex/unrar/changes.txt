@@ -1,0 +1,141 @@
+unrar_core source code changes
+------------------------------
+Unrar_core is based on UnRAR (unrarsrc-3.8.5.tar.gz) by Alexander L.
+Roshal. The original sources have been HEAVILY modified, trimmed down,
+and purged of all OS-specific calls for file access and other
+unnecessary operations. Support for encryption, recovery records, and
+segmentation has been REMOVED. See license.txt for licensing. In
+particular, this code cannot be used to re-create the RAR compression
+algorithm, which is proprietary.
+
+If you obtained this code as a part of my File_Extractor library and
+want to use it on its own, get my unrar_core library, which includes
+examples and documentation.
+
+The source is as close as possible to the original, to make it simple to
+update when a new version of UnRAR comes out. In many places the
+original names and object nesting are kept, even though it's a bit
+harder to follow. See rar.hpp for the main "glue".
+
+Website: http://www.slack.net/~ant/
+E-mail : Shay Green <gblargg@gmail.com>
+
+
+Contents
+--------
+* Diff-friendly changes
+* Removal of features
+* Error reporting changes
+* Minor tweaks
+* Unrar findings
+
+
+Diff-friendly changes
+---------------------
+To make my source code changes more easily visible with a line-based
+file diff, I've tried to make changes by inserting or deleting lines,
+rather than modifying them. So if the original declared a static array
+
+	static int array [4] = { 1, 2, 3, 4 };
+
+and I want to make it const, I add the const on a line before
+
+	const // added
+	static int array [4] = { 1, 2, 3, 4 };
+
+rather than on the same line
+
+	static const int array [4] = { 1, 2, 3, 4 };
+
+This way a diff will simply show an added line, making it clear what was
+added. If I simply inserted const on the same line, it wouldn't be as
+clear what all I had changed.
+
+I've also made use of several macros rather than changing the source
+text. For example, since a class name like Unpack might easily conflict,
+I've renamed it to Rar_Unpack by using #define Unpack Rar_Unpack rather
+than changing the source text. These macros are only defined when
+compiling the library sources; the user-visible unrar.h is very clean.
+
+
+Removal of features
+-------------------
+This library is meant for simple access to common archives without
+having to extract them first. Encryption, segmentation, huge files, and
+self-extracting archives aren't common for things that need to be
+accessed in this manner, so I've removed support for them. Also,
+encryption adds complexity to the code that must be maintained.
+Segmentation would require a way to specify the other segments.
+
+
+Error reporting changes
+-----------------------
+The original used C++ exceptions to report errors. I've eliminated use
+of these through a combination of error codes and longjmp. This allows
+use of the library from C or some other language which doesn't easily
+support exceptions.
+
+I tried to make as few changes as possible in the conversion. Due to the
+number of places file reads occur, propagating an error code via return
+statements would have required too many code changes. Instead, I perform
+the read, save the error code, and return 0 bytes read in case of an
+error. I also ensure that the calling code interprets this zero in an
+acceptable way. I then check this saved error code after the operation
+completes, and have it take priority over the error the RAR code
+returned. I do a similar thing for write errors.
+
+
+Minor tweaks
+------------
+- Eliminated as many GCC warnings as reasonably possible. 
+
+- Non-class array allocations now use malloc(), allowing the code to be
+linked without the standard C++ library (particularly, operator new).
+Class object allocations use a class-specific allocator that just calls
+malloc(), also avoiding calls to operator new.
+
+- Made all unchanging static data const. Several pieces of static data
+in the original code weren't marked const where they could be.
+
+- Initialization of some static tables was done on an as-needed basis,
+creating a problem when extracting from archives in multiple threads.
+This initialization can now be done by the user before any archives are
+opened.
+
+- Tweaked CopyString, the major bottleneck during compression. I inlined
+it, cached some variables in locals in case the compiler couldn't easily
+see that the memory accesses don't modify them, and made them use
+memcpy() where possible. This improved performance by at least 20% on
+x86. Perhaps it won't work as well on files with lots of smaller string
+matches.
+
+- Some .cpp files are #included by others. I've added guards to these so
+that you can simply compile all .cpp files and not get any redefinition
+errors.
+
+- The current solid extraction position is kept track of, allowing the
+user to randomly extract files without regard to proper extraction
+order. The library optimizes solid extraction and only restarts it if
+the user is extracting a file earlier in the archive than the last
+solid-extracted one.
+
+- Most of the time a solid file's data is already contiguously in the
+internal Unpack::Window, which unrar_extract_mem() takes advantage of.
+This avoids extra allocation in many cases.
+
+- Allocation of Unpack is delayed until the first extraction, rather
+than being allocated immediately on opening the archive. This allows
+scanning with minimal memory usage.
+
+
+Unrar findings
+--------------
+- Apparently the LHD_SOLID flag indicates that file depends on previous
+files, rather than that later files depend on the current file's
+contents. Thus this flag can't be used to intelligently decide which
+files need to be internally extracted when skipping them, making it
+necessary to internally extract every file before the one to be
+extracted, if the archive is solid.
+
+-- 
+Shay Green <gblargg@gmail.com>

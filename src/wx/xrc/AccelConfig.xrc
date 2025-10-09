@@ -2,51 +2,61 @@
 <resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
   <object class="wxDialog" name="AccelConfig">
     <title>Key Shortcuts</title>
+    <style>wxRESIZE_BORDER|wxCLOSE_BOX</style>
     <object class="wxBoxSizer">
       <orient>wxVERTICAL</orient>
+      <flag>wxEXPAND</flag>
       <object class="sizeritem">
+        <option>1</option>
+        <flag>wxEXPAND</flag>
         <object class="wxFlexGridSizer">
+          <cols>3</cols>
+          <rows>2</rows>
+          <growablerows>0</growablerows>
+          <growablecols>0</growablecols>
           <object class="sizeritem">
+            <flag>wxEXPAND</flag>
             <object class="wxBoxSizer">
+              <orient>wxVERTICAL</orient>
+              <flag>wxEXPAND</flag>
               <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>5</border>
                 <object class="wxStaticText">
                   <label>Co_mmands:</label>
                 </object>
-                <flag>wxALL</flag>
-                <border>5</border>
               </object>
               <object class="sizeritem">
-                <object class="wxTreeCtrl" name="Commands">
-                  <style>wxTR_HAS_BUTTONS|wxTR_NO_LINES|wxTR_FULL_ROW_HIGHLIGHT|wxTR_HIDE_ROOT</style>
-                  <size>300,300</size>
-                </object>
-                <flag>wxALL|wxEXPAND</flag>
-                <border>5</border>
-              </object>
-              <orient>wxVERTICAL</orient>
-            </object>
-            <flag>wxEXPAND</flag>
-          </object>
-          <object class="sizeritem">
-            <object class="wxBoxSizer">
-              <object class="sizeritem">
-                <object class="wxStaticText">
-                  <label>Current Keys:</label>
-                </object>
-                <flag>wxALL</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxListBox" name="Current"/>
                 <option>1</option>
                 <flag>wxALL|wxEXPAND</flag>
                 <border>5</border>
+                <object class="wxTreeCtrl" name="Commands">
+                  <style>wxTR_HAS_BUTTONS|wxTR_NO_LINES|wxTR_FULL_ROW_HIGHLIGHT|wxTR_HIDE_ROOT</style>
+                </object>
               </object>
-              <orient>wxVERTICAL</orient>
             </object>
-            <flag>wxEXPAND</flag>
           </object>
           <object class="sizeritem">
+            <flag>wxEXPAND</flag>
+            <object class="wxBoxSizer">
+              <orient>wxVERTICAL</orient>
+              <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>5</border>
+                <object class="wxStaticText">
+                  <label>Current Keys:</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <option>1</option>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+                <object class="wxListBox" name="Current"/>
+              </object>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxEXPAND</flag>
             <object class="wxBoxSizer">
               <object class="sizeritem">
                 <object class="wxButton" name="Assign">
@@ -71,11 +81,12 @@
               </object>
               <orient>wxVERTICAL</orient>
             </object>
-            <flag>wxEXPAND</flag>
           </object>
-          <cols>3</cols>
           <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>5</border>
             <object class="wxBoxSizer">
+              <orient>wxVERTICAL</orient>
               <object class="sizeritem">
                 <object class="wxStaticText">
                   <label>Currently assigned to:</label>
@@ -84,34 +95,31 @@
               <object class="sizeritem">
                 <object class="wxStaticText" name="AlreadyThere"/>
               </object>
-              <orient>wxVERTICAL</orient>
             </object>
-            <flag>wxALL</flag>
-            <border>5</border>
           </object>
           <object class="sizeritem">
+            <flag>wxEXPAND</flag>
             <object class="wxBoxSizer">
               <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>5</border>
                 <object class="wxStaticText">
                   <label>Shortcut Key:</label>
                 </object>
-                <flag>wxALL</flag>
-                <border>5</border>
               </object>
               <object class="sizeritem">
-                <object class="wxTextCtrl" name="Shortcut" subclass="wxKeyTextCtrl">
-                  <style>wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB</style>
-                </object>
+                <object class="UserInputCtrl" name="Shortcut" />
                 <flag>wxALL|wxEXPAND</flag>
                 <border>5</border>
               </object>
               <orient>wxVERTICAL</orient>
             </object>
-            <flag>wxEXPAND</flag>
           </object>
         </object>
       </object>
       <object class="sizeritem">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
         <object class="wxStdDialogButtonSizer">
           <object class="button">
             <object class="wxButton" name="wxID_OK"/>
@@ -120,8 +128,6 @@
             <object class="wxButton" name="wxID_CANCEL"/>
           </object>
         </object>
-        <flag>wxALL|wxEXPAND</flag>
-        <border>5</border>
       </object>
     </object>
   </object>

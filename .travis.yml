@@ -1,84 +1,96 @@
 ---
+cache: ccache
+dist: xenial
+language: cpp
+services: xvfb
 sudo: required
-
-services:
-    - xvfb
 
 matrix:
     fast_finish: true
     include:
-        - env: BUILD_ENV=ubuntu
-          language: cpp
-          os: linux
-          dist: trusty
-          before_script:
-              - ./installdeps
-          script:
-              - mkdir build
-              - cd build
-              - cmake .. -DENABLE_SDL=ON -DENABLE_OPENAL=ON
-              - make -j2
-              - xvfb-run ./visualboyadvance-m --help
-          cache:
-              directories:
-                  - "$HOME/.ccache"
+        - env: BUILD_ENV=ubuntu-bionic XVFB_RUN=1
+          dist: bionic
+#        - env: BUILD_ENV=utf8 XVFB_RUN=1
+#          dist: bionic
+#        - env: BUILD_ENV=nostl XVFB_RUN=1
+#          dist: bionic
+        - env: BUILD_ENV=ubuntu-xenial XVFB_RUN=1
+        - env: BUILD_ENV=ubuntu-xenial-minimal INSTALLDEPS_ARGS="--no-openal --no-ffmpeg" XVFB_RUN=1
+        - env: BUILD_ENV=ubuntu-xenial XVFB_RUN=1 CC=clang CXX=clang++
         - env: BUILD_ENV=mingw-w64
-          language: cpp
-          os: linux
-          dist: trusty
-          before_script:
-              - ./installdeps MinGW-w64-x86_64
-          script:
-              - mkdir build
-              - cd build
-              - /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-cmake .. -DENABLE_SDL=ON -DENABLE_OPENAL=ON
-              - make -j2
-          cache:
-              directories:
-                  - "$HOME/.ccache"
         - env: BUILD_ENV=mingw-w32
-          language: cpp
-          os: linux
-          dist: trusty
-          before_script:
-              - ./installdeps MinGW-w64-i686
-          script:
-              - mkdir build
-              - cd build
-              - /usr/lib/mxe/usr/bin/i686-w64-mingw32.static-cmake .. -DENABLE_SDL=ON -DENABLE_OPENAL=ON
-              - make -j2
-          cache:
-              directories:
-                  - "$HOME/.ccache"
         - env: BUILD_ENV=libretro
-          language: cpp
-          os: linux
-          dist: trusty
-          before_install:
-              - sudo apt-get -qqy update
-              - sudo apt-get -qqy install build-essential ccache
-          script:
-              - cd src/libretro
-              - make -j2 CXX="ccache g++" CC="ccache gcc"
-          cache:
-              directories:
-                  - "$HOME/.ccache"
+        - env: BUILD_ENV=libretro CC=clang CXX=clang++
         - env: BUILD_ENV=mac
-          language: cpp
           os: osx
-          osx_image: xcode10.2
-          before_script:
-              - ./installdeps
-          script:
-              - mkdir build
-              - cd build
-              - cmake .. -DENABLE_SDL=ON -DENABLE_OPENAL=ON -DENABLE_LINK=ON
-              - make -j2
-#              - ./visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m --help
-          cache:
-              directories:
-                  - "$HOME/.ccache"
-                  - /usr/local
+          osx_image: xcode12
+          install: export PATH="/usr/local/opt/ccache/libexec:$PATH"
+
+before_install:
+    - |
+        case "$BUILD_ENV" in
+            mingw-w64 )
+                ARG=MinGW-w64-x86_64
+                CMAKE=/usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-cmake
+                PATH="$PATH:/usr/lib/mxe/usr/bin"
+            ;;
+            mingw-w32 )
+                ARG=MinGW-w64-i686
+                CMAKE=/usr/lib/mxe/usr/bin/i686-w64-mingw32.static-cmake
+                PATH="$PATH:/usr/lib/mxe/usr/bin"
+            ;;
+            * )
+                CMAKE=cmake
+            ;;
+        esac
+    - |
+        if [ "$BUILD_ENV" != libretro ]; then
+            ./installdeps $INSTALLDEPS_ARGS $ARG
+            DIR=build
+        else
+            DIR=src/libretro
+        fi
+
+before_script:
+    - |
+        if [ -n "$ENABLE_SDL" ]; then
+            CMAKE_ARGS="$CMAKE_ARGS -DENABLE_SDL=ON"
+        fi
+        case "$BUILD_ENV" in
+            utf8|nostl)
+                sudo apt-get -y install stow libwxgtk3.0-gtk3-dev
+                (
+                    cd /
+                    sudo curl -LO 'http://cachemiss.com/files/wxWidgets-gtk3-'"$BUILD_ENV"'-3.0.5.tar.gz'
+                    sudo tar zxvf wxWidgets-gtk3-"$BUILD_ENV"-3.0.5.tar.gz
+                    cd /usr/local/stow
+                    sudo stow wxWidgets-gtk3-"$BUILD_ENV"-3.0.5
+                )
+                export LD_LIBRARY_PATH=/usr/local/lib
+                CMAKE_ARGS="$CMAKE_ARGS -DwxWidgets_CONFIG_EXECUTABLE=/usr/local/bin/wx-config -DWXRC=/usr/local/bin/wxrc"
+                ;;
+        esac
+
+script:
+    - mkdir -p -- "$DIR"
+    - cd -- "$DIR"
+    - if [ "$BUILD_ENV" != libretro ]; then $CMAKE $CMAKE_ARGS ..; fi
+    - if [ "$BUILD_ENV" != libretro ]; then ninja; else make; fi
+    - if [ "$BUILD_ENV" != libretro ]; then DESTDIR=/tmp/VBAM ninja install; fi
+    - |
+        if [ "$BUILD_ENV" = mac ]; then
+            ./$PRGNAM.app/Contents/MacOS/$PRGNAM --help
+        elif [ -n "$XVFB_RUN" ]; then
+            xvfb-run -a ./$PRGNAM --help
+        fi
+        ctest -V
+
+env:
+    global:
+        - CMAKE_ARGS="-G Ninja"
+        - ENABLE_SDL=1
+        - MAKEFLAGS="-j2"
+        - PRGNAM=visualboyadvance-m
 
 notifications:
     webhooks:

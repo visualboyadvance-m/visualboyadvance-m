@@ -1,0 +1,27 @@
+# Distributed under the OSI-approved BSD 3-Clause License.  See accompanying
+# file LICENCE.txt or https://cmake.org/licensing for details.
+
+# CMake(LANG)Compiler.cmake.in  -> used by CMakeDetermine(LANG)Compiler.cmake
+# This file is used to store compiler information and is copied down into try
+# compile directories so that try compiles do not need to re-determine and test
+# the LANG
+
+set(CMAKE_Metal_COMPILER "@CMAKE_Metal_COMPILER@")
+set(CMAKE_Metal_COMPILER_ID "@CMAKE_Metal_COMPILER_ID@")
+set(CMAKE_Metal_COMPILER_VERSION "@CMAKE_Metal_COMPILER_VERSION@")
+
+set(CMAKE_Metal_COMPILER_LOADED 1)
+set(CMAKE_Metal_COMPILER_WORKS "@CMAKE_Metal_COMPILER_WORKS@")
+
+set(CMAKE_Metal_COMPILER_ENV_VAR "METALC")
+
+set(CMAKE_Metal_COMPILER_ID_RUN "@CMAKE_Metal_COMPILER_ID_RUN@")
+set(CMAKE_Metal_SOURCE_FILE_EXTENSIONS metal)
+set(CMAKE_Metal_OUTPUT_EXTENSION ".air")
+set(CMAKE_STATIC_LIBRARY_PREFIX_Metal "")
+set(CMAKE_STATIC_LIBRARY_SUFFIX_Metal ".metal-ar")
+set(CMAKE_SHARED_LIBRARY_PREFIX_Metal "")
+set(CMAKE_SHARED_LIBRARY_SUFFIX_Metal ".metallib")
+set(CMAKE_SHARED_MODULE_PREFIX_Metal "")
+set(CMAKE_SHARED_MODULE_SUFFIX_Metal ".metallib")
+set(CMAKE_EXECUTABLE_SUFFIX_Metal ".metallib")

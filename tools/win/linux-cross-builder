@@ -1,7 +1,0 @@
-#!/bin/sh
-
-set -e
-
-. "${0%/*}/../builder/mingw-cross.sh"
-
-builder "$@"

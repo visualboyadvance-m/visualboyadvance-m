@@ -17,6 +17,11 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#ifndef VBAM_SDL_EXPRNODE_H_H
+#define VBAM_SDL_EXPRNODE_H_H
+
+#include "core/gba/gbaElf.h"
+
 struct Node {
     Type* type;
     uint32_t location;
@@ -66,3 +71,5 @@ extern void exprNodeArrayPrint(Node*);
 extern bool exprNodeArrayResolve(Node*, Function*, CompileUnit*);
 
 #define YYSTYPE struct Node*
+
+#endif  // VBAM_SDL_EXPRNODE_H_H

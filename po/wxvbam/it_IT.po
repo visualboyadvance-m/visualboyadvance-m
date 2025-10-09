@@ -5,1100 +5,1148 @@
 # Translators:
 # Cosimo Battista <mimmo99999@hotmail.it>, 2015
 # Damiano Pastori <dp2104@gmail.com>, 2018
+# Davide, 2020
+# Davide, 2020
+# Davide, 2020
+# Emanuele Baserga <emanuelebaserga@hotmail.it>, 2019
 # Picat <pichu474android@gmail.com>, 2016
+# Giulio Serroni, 2022
+# JustAnOrange, 2023
 # Luca Bonello <fenopiu@gmail.com>, 2016
+# ludo thorn, 2025
+# Michele Rebughini <michelerebughini@gmail.com>, 2020
 # OTTO X <blg.dpnx@gmail.com>, 2015
-# Seb47TV <seb47tv@gmail.com>, 2016
+# Picat <pichu474android@gmail.com>, 2016
+# Seb47 <seb47tv@gmail.com>, 2021
+# Seb47 <seb47tv@gmail.com>, 2016
+# Seb47 <seb47tv@gmail.com>, 2016
+# Sergio Mari, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-04 04:47+0000\n"
-"PO-Revision-Date: 2019-07-04 04:50+0000\n"
-"Last-Translator: Rafael Kitover <rkitover@gmail.com>\n"
-"Language-Team: Italian (Italy) (http://www.transifex.com/bgk/vba-m/language/it_IT/)\n"
+"POT-Creation-Date: 2025-10-04 04:00+0000\n"
+"PO-Revision-Date: 2011-12-03 19:42+0000\n"
+"Last-Translator: ludo thorn, 2025\n"
+"Language-Team: Italian (Italy) (http://app.transifex.com/bgk/vba-m/language/it_IT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: it_IT\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
-#: ../src/wx/cmdevents.cpp:102
+#: audio/internal/coreaudio.cpp:375 audio/internal/coreaudio.cpp:581
+#: audio/internal/sdl.cpp:179 audio/internal/sdl.cpp:197
+#: audio/internal/sdl.cpp:328 audio/internal/sdl.cpp:339
+#: audio/internal/sdl.cpp:359 audio/internal/faudio.cpp:490
+#: audio/internal/xaudio2.cpp:604
+msgid "Default device"
+msgstr "Device predefinito"
+
+#: audio/internal/coreaudio.cpp:381
+msgid "Could not get CoreAudio device"
+msgstr ""
+
+#: cmdevents.cpp:63 wxvbam.cpp:634
+msgid "Could not create main window"
+msgstr "Impossibile creare una finestra principale"
+
+#: cmdevents.cpp:201
 msgid ""
-"GameBoy Advance Files "
-"(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy"
-" Files "
-"(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "File GameBoy Advance (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|GameBoy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+"Game Boy Advance Files "
+"(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.lz;*.gba.lz;*.bin.lz;*.elf.lz;*.mb.lz;*.agb.xz;*.gba.xz;*.bin.xz;*.elf.xz;*.mb.xz;*.agb.bz2;*.gba.bz2;*.bin.bz2;*.elf.bz2;*.mb.bz2;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
+" Boy Files "
+"(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
+msgstr ""
 
-#: ../src/wx/cmdevents.cpp:114
+#: cmdevents.cpp:219
 msgid "Open ROM file"
 msgstr "Apri file ROM"
 
-#: ../src/wx/cmdevents.cpp:131
+#: cmdevents.cpp:243
 msgid ""
-"GameBoy Files "
-"(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "File GameBoy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+"Game Boy Files "
+"(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
+msgstr ""
 
-#: ../src/wx/cmdevents.cpp:138
+#: cmdevents.cpp:252
 msgid "Open GB ROM file"
 msgstr "Apri file GB ROM"
 
-#: ../src/wx/cmdevents.cpp:155
+#: cmdevents.cpp:275
 msgid ""
-"GameBoy Color Files "
-"(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
-msgstr "File GameBoy Color (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.zip;*.7z;*.rar|"
+"Game Boy Color Files "
+"(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
+msgstr ""
 
-#: ../src/wx/cmdevents.cpp:162
+#: cmdevents.cpp:284
 msgid "Open GBC ROM file"
 msgstr "Apri file GBC ROM"
 
-#: ../src/wx/cmdevents.cpp:558 ../src/wx/cmdevents.cpp:674
-#: ../src/wx/cmdevents.cpp:713 ../src/wx/cmdevents.cpp:786
-msgid "Unknown"
-msgstr "Sconosciuto"
-
-#: ../src/wx/cmdevents.cpp:566
-msgid "ROM"
-msgstr "ROM"
-
-#: ../src/wx/cmdevents.cpp:570
-msgid "ROM+MBC1"
-msgstr "ROM+MBC1"
-
-#: ../src/wx/cmdevents.cpp:574
-msgid "ROM+MBC1+RAM"
-msgstr "ROM+MBC1+RAM"
-
-#: ../src/wx/cmdevents.cpp:578
-msgid "ROM+MBC1+RAM+BATT"
-msgstr "ROM+MBC1+RAM+BATT"
-
-#: ../src/wx/cmdevents.cpp:582
-msgid "ROM+MBC2"
-msgstr "ROM+MBC2"
-
-#: ../src/wx/cmdevents.cpp:586
-msgid "ROM+MBC2+BATT"
-msgstr "ROM+MBC2+BATT"
-
-#: ../src/wx/cmdevents.cpp:590
-msgid "ROM+MMM01"
-msgstr "ROM+MMM01"
-
-#: ../src/wx/cmdevents.cpp:594
-msgid "ROM+MMM01+RAM"
-msgstr "ROM+MMM01+RAM"
-
-#: ../src/wx/cmdevents.cpp:598
-msgid "ROM+MMM01+RAM+BATT"
-msgstr "ROM+MMM01+RAM+BATT"
-
-#: ../src/wx/cmdevents.cpp:602
-msgid "ROM+MBC3+TIMER+BATT"
-msgstr "ROM+MBC3+TIMER+BATT"
-
-#: ../src/wx/cmdevents.cpp:606
-msgid "ROM+MBC3+TIMER+RAM+BATT"
-msgstr "ROM+MBC3+TIMER+RAM+BATT"
-
-#: ../src/wx/cmdevents.cpp:610
-msgid "ROM+MBC3"
-msgstr "ROM+MBC3"
-
-#: ../src/wx/cmdevents.cpp:614
-msgid "ROM+MBC3+RAM"
-msgstr "ROM+MBC3+RAM"
-
-#: ../src/wx/cmdevents.cpp:618
-msgid "ROM+MBC3+RAM+BATT"
-msgstr "ROM+MBC3+RAM+BATT "
-
-#: ../src/wx/cmdevents.cpp:622
-msgid "ROM+MBC5"
-msgstr "ROM+MBC5"
-
-#: ../src/wx/cmdevents.cpp:626
-msgid "ROM+MBC5+RAM"
-msgstr "ROM+MBC5+RAM"
-
-#: ../src/wx/cmdevents.cpp:630
-msgid "ROM+MBC5+RAM+BATT"
-msgstr "ROM+MBC5+RAM+BATT"
-
-#: ../src/wx/cmdevents.cpp:634
-msgid "ROM+MBC5+RUMBLE"
-msgstr "ROM+MBC5+RUMBLE"
-
-#: ../src/wx/cmdevents.cpp:638
-msgid "ROM+MBC5+RUMBLE+RAM"
-msgstr "ROM+MBC5+RUMBLE+RAM"
-
-#: ../src/wx/cmdevents.cpp:642
-msgid "ROM+MBC5+RUMBLE+RAM+BATT"
-msgstr "ROM+MBC5+RUMBLE+RAM+BATT"
-
-#: ../src/wx/cmdevents.cpp:646
-msgid "ROM+MBC7+BATT"
-msgstr "ROM+MBC7+BATT"
-
-#: ../src/wx/cmdevents.cpp:650 ../src/wx/guiinit.cpp:734
-msgid "GameGenie"
-msgstr "GameGenie"
-
-#: ../src/wx/cmdevents.cpp:654
-msgid "GameShark V3.0"
-msgstr "GameShark V3.0"
-
-#: ../src/wx/cmdevents.cpp:658
-msgid "ROM+POCKET CAMERA"
-msgstr "ROM+POCKET CAMERA"
-
-#: ../src/wx/cmdevents.cpp:662
-msgid "ROM+BANDAI TAMA5"
-msgstr "ROM+BANDAI TAMA5"
-
-#: ../src/wx/cmdevents.cpp:666
-msgid "ROM+HuC-3"
-msgstr "ROM+HuC-3"
-
-#: ../src/wx/cmdevents.cpp:670
-msgid "ROM+HuC-1"
-msgstr "ROM+HuC-1"
-
-#: ../src/wx/cmdevents.cpp:720 ../src/wx/guiinit.cpp:1814
-#: ../src/wx/xrc/DisplayConfig.xrc:85 ../src/wx/xrc/DisplayConfig.xrc:135
-#: ../src/wx/xrc/DisplayConfig.xrc:221
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:32
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:183
-#: ../src/wx/xrc/GeneralConfig.xrc:152 ../src/wx/xrc/SoundConfig.xrc:219
-#: ../src/wx/xrc/SoundConfig.xrc:309 ../src/wx/xrc/SpeedupConfig.xrc:45
-#: ../src/wx/xrc/SpeedupConfig.xrc:120
-msgid "None"
-msgstr "Vuoto"
-
-#: ../src/wx/cmdevents.cpp:819 ../src/wx/cmdevents.cpp:835
+#: cmdevents.cpp:451 cmdevents.cpp:476
 msgid "Select Dot Code file"
 msgstr "Scegliere file Dot Code"
 
-#: ../src/wx/cmdevents.cpp:821 ../src/wx/cmdevents.cpp:837
-msgid "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
-msgstr "e-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
+#: cmdevents.cpp:453 cmdevents.cpp:478
+msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
+msgstr ""
 
-#: ../src/wx/cmdevents.cpp:856 ../src/wx/cmdevents.cpp:1051
+#: cmdevents.cpp:500 cmdevents.cpp:704
 msgid "Select battery file"
 msgstr "Scegliere file battery"
 
-#: ../src/wx/cmdevents.cpp:857 ../src/wx/cmdevents.cpp:1052
+#: cmdevents.cpp:501 cmdevents.cpp:705
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "File Battery (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 
-#: ../src/wx/cmdevents.cpp:865
+#: cmdevents.cpp:512
 msgid ""
 "Importing a battery file will erase any saved games (permanently after the "
-"next write).  Do you want to continue?"
-msgstr "Importare un file battery cancellerà qualsiasi gioco salvato (permanentemente dopo la prossima scrittura). Continuare?"
+"next write). Do you want to continue?"
+msgstr ""
 
-#: ../src/wx/cmdevents.cpp:866 ../src/wx/cmdevents.cpp:894
-#: ../src/wx/cmdevents.cpp:1014
+#: cmdevents.cpp:513 cmdevents.cpp:544 cmdevents.cpp:667
 msgid "Confirm import"
 msgstr "Conferma importazione"
 
-#: ../src/wx/cmdevents.cpp:872 ../src/wx/panel.cpp:344
+#: cmdevents.cpp:519 panel.cpp:526
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Batteria %s caricata"
 
-#: ../src/wx/cmdevents.cpp:874
+#: cmdevents.cpp:521
 #, c-format
 msgid "Error loading battery %s"
 msgstr "Errore caricamento %s"
 
-#: ../src/wx/cmdevents.cpp:883
+#: cmdevents.cpp:530
 msgid "Select code file"
 msgstr "Scegliere file code"
 
-#: ../src/wx/cmdevents.cpp:884
-msgid "Gameshark Code File (*.spc;*.xpc)|*.spc;*.xpc"
-msgstr " File Gameshark Code (*.spc;*.xpc)|*.spc;*.xpc"
+#: cmdevents.cpp:531
+msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
+msgstr ""
 
-#: ../src/wx/cmdevents.cpp:884
-msgid "Gameshark Code File (*.gcf)|*.gcf"
-msgstr "File codici Gameshark  (*.gcf)|*.gcf"
+#: cmdevents.cpp:531
+msgid "Game Shark Code File (*.gcf)|*.gcf"
+msgstr ""
 
-#: ../src/wx/cmdevents.cpp:893
+#: cmdevents.cpp:543
 msgid ""
-"Importing a code file will replace any loaded cheats.  Do you want to "
+"Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
-msgstr "Importare un file codici rimpiazzera qualunque trucco caricato. Continuare?"
+msgstr ""
 
-#: ../src/wx/cmdevents.cpp:910
+#: cmdevents.cpp:560
 #, c-format
 msgid "Cannot open file %s"
 msgstr "Impossibile aprire file %s"
 
-#: ../src/wx/cmdevents.cpp:920
+#: cmdevents.cpp:570
 #, c-format
 msgid "Unsupported code file %s"
 msgstr "File codici %s non supportato"
 
-#: ../src/wx/cmdevents.cpp:990
+#: cmdevents.cpp:640
 #, c-format
 msgid "Loaded code file %s"
 msgstr "File codici 5s caricato"
 
-#: ../src/wx/cmdevents.cpp:992
+#: cmdevents.cpp:642
 #, c-format
 msgid "Error loading code file %s"
 msgstr "Errore Caricamento file codice %s"
 
-#: ../src/wx/cmdevents.cpp:1003 ../src/wx/cmdevents.cpp:1079
+#: cmdevents.cpp:653 cmdevents.cpp:735
 msgid "Select snapshot file"
 msgstr "Seleziona file snapshot"
 
-#: ../src/wx/cmdevents.cpp:1004
+#: cmdevents.cpp:654
 msgid ""
-"GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots "
-"(*.gsv)|*.gsv"
-msgstr "GS & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|GameShark SP Snapshots (*.gsv)|*.gsv"
+"Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
+" (*.gsv)|*.gsv"
+msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1004
-msgid "Gameboy Snapshot (*.gbs)|*.gbs"
-msgstr "Gameboy Snapshot (*.gbs)|*.gbs"
+#: cmdevents.cpp:654
+msgid "Game Boy Snapshot (*.gbs)|*.gbs"
+msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1013
+#: cmdevents.cpp:666
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
-"next write).  Do you want to continue?"
-msgstr "L'importazione di un file di snapshot cancellerà tutti i giochi salvati (permanentemente dopo la prossima scrittura). Vuoi continuare?"
+"next write). Do you want to continue?"
+msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1038
+#: cmdevents.cpp:691
 #, c-format
 msgid "Loaded snapshot file %s"
 msgstr "Caricato file snapshot %s"
 
-#: ../src/wx/cmdevents.cpp:1040
+#: cmdevents.cpp:693
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr "Errore nel caricare la snapshot %s"
 
-#: ../src/wx/cmdevents.cpp:1063
+#: cmdevents.cpp:719
 #, c-format
 msgid "Wrote battery %s"
 msgstr "Batteria scritta %s"
 
-#: ../src/wx/cmdevents.cpp:1065 ../src/wx/panel.cpp:648
+#: cmdevents.cpp:721 panel.cpp:839
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Errore nello scrivere la batteria %s"
 
-#: ../src/wx/cmdevents.cpp:1073
+#: cmdevents.cpp:729
 msgid "EEPROM saves cannot be exported"
 msgstr "I salvataggi della EEPROM non possono essere esportati"
 
-#: ../src/wx/cmdevents.cpp:1080
-msgid "Gameshark Snapshot (*.sps)|*.sps"
-msgstr "Gameshark Snapshot (*.sps)|*.sps"
+#: cmdevents.cpp:736
+msgid "Game Shark Snapshot (*.sps)|*.sps"
+msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1094
-msgid "Exported from VisualBoyAdvance-M"
-msgstr "Esportati da VisualBoyAdvance-M"
+#: cmdevents.cpp:753
+msgid "Exported from Visual Boy Advance-M"
+msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1106
+#: cmdevents.cpp:765
 #, c-format
 msgid "Saved snapshot file %s"
 msgstr "Salvato lo snapshot %s"
 
-#: ../src/wx/cmdevents.cpp:1108
+#: cmdevents.cpp:767
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr "Errore nel salvare lo snapshot %s"
 
-#: ../src/wx/cmdevents.cpp:1123 ../src/wx/cmdevents.cpp:1204
-#: ../src/wx/cmdevents.cpp:1277 ../src/wx/cmdevents.cpp:1304
-#: ../src/wx/viewers.cpp:562 ../src/wx/viewers.cpp:772
-#: ../src/wx/viewsupt.cpp:1161
+#: cmdevents.cpp:783 cmdevents.cpp:864 cmdevents.cpp:937 cmdevents.cpp:1009
+#: gfxviewers.cpp:1692 gfxviewers.cpp:1840 viewers.cpp:588 viewers.cpp:808
+#: viewsupt.cpp:1199
 msgid "Select output file"
 msgstr "Seleziona il file di destinazione"
 
-#: ../src/wx/cmdevents.cpp:1124 ../src/wx/viewsupt.cpp:1162
+#: cmdevents.cpp:784 gfxviewers.cpp:1693 gfxviewers.cpp:1841 viewsupt.cpp:1200
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "Immagini PNG|*.png|Immagini BMP|*.bmp"
 
-#: ../src/wx/cmdevents.cpp:1148 ../src/wx/sys.cpp:435
+#: cmdevents.cpp:811 sys.cpp:585
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "Scritta snapshot %S"
 
-#: ../src/wx/cmdevents.cpp:1172 ../src/wx/cmdevents.cpp:1245
+#: cmdevents.cpp:832 cmdevents.cpp:905 cmdevents.cpp:977 cmdevents.cpp:1046
 msgid " files ("
 msgstr "file ("
 
-#: ../src/wx/cmdevents.cpp:1305 ../src/wx/cmdevents.cpp:1326
-msgid "VBA Movie files|*.vmv"
-msgstr "VBA Movie files|*.vmv"
-
-#: ../src/wx/cmdevents.cpp:1325
+#: cmdevents.cpp:1079
 msgid "Select file"
 msgstr "Seleziona file"
 
-#: ../src/wx/cmdevents.cpp:1488 ../src/wx/cmdevents.cpp:1573
+#: cmdevents.cpp:1386 cmdevents.cpp:1482
 msgid "Select state file"
 msgstr "Seleziona file di stato"
 
-#: ../src/wx/cmdevents.cpp:1489 ../src/wx/cmdevents.cpp:1574
-msgid "VisualBoyAdvance saved game files|*.sgm"
-msgstr "File di salvataggio di VisualBoyAdvance|*.sgm"
+#: cmdevents.cpp:1387 cmdevents.cpp:1483
+msgid "Visual Boy Advance saved game files|*.sgm"
+msgstr ""
 
-#: ../src/wx/cmdevents.cpp:1806
+#: cmdevents.cpp:1516 cmdevents.cpp:1526 cmdevents.cpp:1537
+#, c-format
+msgid "Current state slot #%d"
+msgstr "Slot attuale #%d"
+
+#: cmdevents.cpp:1600
+msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
+msgstr ""
+
+#: cmdevents.cpp:1811
 msgid "Sound enabled"
 msgstr "Suono abilitato"
 
-#: ../src/wx/cmdevents.cpp:1806
+#: cmdevents.cpp:1811
 msgid "Sound disabled"
 msgstr "Suono disabilitato"
 
-#: ../src/wx/cmdevents.cpp:1819 ../src/wx/cmdevents.cpp:1833
-#, c-format
-msgid "Volume: %d%%"
-msgstr "Volume: %d%%"
-
-#: ../src/wx/cmdevents.cpp:1907
+#: cmdevents.cpp:1890
 msgid "Set to 0 for pseudo tty"
 msgstr "Imposta a 0 per pseudo tty"
 
-#: ../src/wx/cmdevents.cpp:1909
+#: cmdevents.cpp:1892
 msgid "Port to wait for connection:"
 msgstr "Porta in attesa della connessione:"
 
-#: ../src/wx/cmdevents.cpp:1910
+#: cmdevents.cpp:1893
 msgid "GDB Connection"
 msgstr "Connessione GDB"
 
-#: ../src/wx/cmdevents.cpp:1957
+#: cmdevents.cpp:1945
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "Aspetto la connessione a %s"
 
-#: ../src/wx/cmdevents.cpp:1964
+#: cmdevents.cpp:1952
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "Aspetto la connessione sulla porta %d"
 
-#: ../src/wx/cmdevents.cpp:1967
+#: cmdevents.cpp:1955
 msgid "Waiting for GDB..."
-msgstr "Aspetto GDB..."
+msgstr "Aspettando il GDB..."
 
-#: ../src/wx/cmdevents.cpp:2489
-msgid "Nintendo GameBoy (+Color+Advance) emulator."
-msgstr "Nintendo GameBoy (+Color+Advance) emulator."
+#: cmdevents.cpp:2333
+msgid ""
+"YOUR CONFIGURATION WILL BE DELETED!\n"
+"\n"
+"Are you sure?"
+msgstr ""
 
-#: ../src/wx/cmdevents.cpp:2490
+#: cmdevents.cpp:2334
+msgid "FACTORY RESET"
+msgstr ""
+
+#: cmdevents.cpp:2369
+msgid "Nintendo Game Boy / Color / Advance emulator."
+msgstr "Emulatore GB/GBC/GBA"
+
+#: cmdevents.cpp:2370
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
-"Copyright (C) 2007-2017 VBA-M development team"
-msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2017 VBA-M development team"
+"Copyright (C) 2007-2020 VBA-M development team"
+msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA team di sviluppo\nCopyright (C) 2007-2020 VBA-M team di sviluppo"
 
-#: ../src/wx/cmdevents.cpp:2491
+#: cmdevents.cpp:2372
 msgid ""
-"This program is free software: you can redistribute it and/or modify\n"
+"This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
 "the Free Software Foundation, either version 2 of the License, or\n"
 "(at your option) any later version.\n"
 "\n"
 "This program is distributed in the hope that it will be useful,\n"
 "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n"
 "GNU General Public License for more details.\n"
 "\n"
 "You should have received a copy of the GNU General Public License\n"
-"along with this program.  If not, see http://www.gnu.org/licenses ."
-msgstr "Questo programma è un software gratuito: puoi ridistribuirlo e/o modificarlo\nsotto i termini della GNU General Public License pubblicata dalla\nFree Software Foundation, sia la versione due della licenza, o\n(a tua scelta) una qualunque versione successiva.\n\nQuesto programma è distribuito nella speranza che sia utile,\nma SENZA ALCUNA GARANZIA; senza nemmeno l'implicita garanzia di\nRESO o RIMBORSO.\nGuarda la GNU General Public License per maggiori dettagli.\n\nDovresti aver ricevuto una copia della GNU General Public License\nassieme a questo programma. Se no, guarda http://www.gnu.org/licenses ."
+"along with this program. If not, see http://www.gnu.org/licenses ."
+msgstr "Questo programma è un software gratuito: puoi ridistribuirlo e/o modificarlo\nrispettando i termini della GNU General Public License pubblicata dalla\nFree Software Foundation, sia la versione 2 della licenza, o\n(a tua scelta) una qualunque versione successiva.\n\nQuesto programma è distribuito nella speranza che sia utile,\nma SENZA ALCUNA GARANZIA; senza neppure la garanzia di\nCOMMERCIABILITÀ o IDONEITÀ PER FINALITÀ PARTICOLARI.\nConsulta la GNU General Public License per maggiori dettagli.\n\nDovresti aver ricevuto una copia della GNU General Public License\nassieme a questo programma. Altrimenti, consulta http://www.gnu.org/licenses ."
 
-#: ../src/wx/cmdevents.cpp:2751
-msgid "LAN link is already active.  Disable link mode to disconnect."
-msgstr "Il collegamento LAN è già attivo. Disabilitare la modalità link per disconnetterlo."
+#: cmdevents.cpp:2562
+msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
+msgstr "Impossibile usare il bios GameBoy quando la Colorizer Hack è attiva"
 
-#: ../src/wx/cmdevents.cpp:2757
+#: cmdevents.cpp:2628
+msgid "LAN link is already active. Disable link mode to disconnect."
+msgstr "LAN Link è gia attivo. DIsattiva la modalità link per disconnettere."
+
+#: cmdevents.cpp:2634
 msgid "Network is not supported in local mode."
 msgstr "La rete non è supportata in modalità locale."
 
-#: ../src/wx/dsound.cpp:90 ../src/wx/dsound.cpp:104
-#, c-format
-msgid "Cannot create DirectSound %08x"
-msgstr "Non posso creare il suono diretto %08x"
+#: dialogs/accel-config.cpp:142
+msgid "Menu commands"
+msgstr "Menu comandi"
 
-#: ../src/wx/dsound.cpp:109
-#, c-format
-msgid "Cannot SetCooperativeLevel %08x"
-msgstr "Non posso impostare il livello di cooperazione %08x"
-
-#: ../src/wx/dsound.cpp:123
-#, c-format
-msgid "Cannot CreateSoundBuffer %08x"
-msgstr "Non posso creare il buffer del suono %08x"
-
-#: ../src/wx/dsound.cpp:142
-#, c-format
-msgid "CreateSoundBuffer(primary) failed %08x"
-msgstr "Creazione del buffer di suono (primario) fallito %08x"
-
-#: ../src/wx/dsound.cpp:159
-#, c-format
-msgid "CreateSoundBuffer(secondary) failed %08x"
-msgstr "Creazione del buffer di suono (secondario) fallito %08x"
-
-#: ../src/wx/dsound.cpp:164
-#, c-format
-msgid "dsbSecondary->SetCurrentPosition failed %08x"
-msgstr "dsbSecondario->ImpostaPosizioneCorrente fallito %08x"
-
-#: ../src/wx/dsound.cpp:187
-#, c-format
-msgid "Cannot Play primary %08x"
-msgstr "Non puoi far partire il primario %08x"
-
-#: ../src/wx/dsound.cpp:322
-#, c-format
-msgid "dsbSecondary->Lock() failed: %08x"
-msgstr "dsbSecondario->Lock() fallito: %08x"
-
-#: ../src/wx/faudio.cpp:32
-msgid "FAudio: Enumerating devices failed!"
+#: dialogs/accel-config.cpp:255
+msgid "This will clear all user-defined accelerators. Are you sure?"
 msgstr ""
 
-#: ../src/wx/faudio.cpp:67 ../src/wx/faudio.cpp:352
-msgid "The FAudio interface failed to initialize!"
+#: dialogs/accel-config.cpp:255 dialogs/accel-config.cpp:302
+msgid "Confirm"
+msgstr "Conferma"
+
+#: dialogs/accel-config.cpp:300
+#, c-format
+msgid "This will unassign \"%s\" from \"%s\". Are you sure?"
 msgstr ""
 
-#: ../src/wx/faudio.cpp:384
-msgid "FAudio: Creating mastering voice failed!"
+#: dialogs/directories-config.cpp:49
+msgid "Browse"
+msgstr "Esplora"
+
+#: dialogs/display-config.cpp:100
+msgid "Invalid value for Default magnification."
 msgstr ""
 
-#: ../src/wx/faudio.cpp:395
-msgid "FAudio: Creating source voice failed!"
+#: dialogs/display-config.cpp:420
+msgid "Invalid color correction profile"
 msgstr ""
 
-#: ../src/wx/gfxviewers.cpp:1141
+#: dialogs/display-config.cpp:475 xrc/DisplayConfig.xrc:102
+#: xrc/DisplayConfig.xrc:152 xrc/DisplayConfig.xrc:432
+#: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
+#: xrc/SoundConfig.xrc:227 xrc/SoundConfig.xrc:317
+msgid "None"
+msgstr "Vuoto"
+
+#: dialogs/display-config.cpp:505
+#, c-format
+msgid "No usable rpi plugins found in %s"
+msgstr "Non sono stati trovati plugin rpi utilizzabili in %s"
+
+#: dialogs/display-config.cpp:544 dialogs/display-config.cpp:623
+#: xrc/DisplayConfig.xrc:124
+msgid "Plugin"
+msgstr "Plugin"
+
+#: dialogs/display-config.cpp:551
+#, c-format
+msgid "Using pixel filter: %s"
+msgstr ""
+
+#: dialogs/display-config.cpp:558
+#, c-format
+msgid "Using interframe blending: %s"
+msgstr ""
+
+#: dialogs/game-boy-config.cpp:143 xrc/GameBoyAdvanceConfig.xrc:122
+#: xrc/GameBoyConfig.xrc:138 xrc/GameBoyConfig.xrc:159
+msgid "(None)"
+msgstr "(None)"
+
+#: dialogs/game-maker.cpp:234 dialogs/gb-rom-info.cpp:64
+msgid "Unknown"
+msgstr "Sconosciuto"
+
+#: dialogs/game-maker.cpp:235
+msgid "Invalid"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:22
+msgid "No mapper"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:43
+msgid "Pocket Camera"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:68
+msgid " + RAM"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:69
+msgid " + RTC"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:70
+msgid " + Battery"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:71
+msgid " + Rumble"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:72
+msgid " + Motion Sensor"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:74
+#, c-format
+msgid "%02X (%s%s%s%s%s%s)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:81 dialogs/gb-rom-info.cpp:93
+#, c-format
+msgid "%02X (Supported)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:83 dialogs/gb-rom-info.cpp:91
+#, c-format
+msgid "%02X (Not supported)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:95
+#, c-format
+msgid "%02X (Required)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:107 dialogs/gb-rom-info.cpp:141
+#, c-format
+msgid "%02X (32 KiB)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:109 dialogs/gb-rom-info.cpp:145
+#, c-format
+msgid "%02X (64 KiB)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:111 dialogs/gb-rom-info.cpp:143
+#, c-format
+msgid "%02X (128 KiB)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:113
+#, c-format
+msgid "%02X (256 KiB)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:115
+#, c-format
+msgid "%02X (512 KiB)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:117
+#, c-format
+msgid "%02X (1 MiB)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:119
+#, c-format
+msgid "%02X (2 MiB)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:121
+#, c-format
+msgid "%02X (4 MiB)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:123 dialogs/gb-rom-info.cpp:147
+#: dialogs/gb-rom-info.cpp:159
+#, c-format
+msgid "%02X (Unknown)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:131
+#, c-format
+msgid "%02X (None)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:133
+#, c-format
+msgid "%02X (256 B)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:135
+#, c-format
+msgid "%02X (512 B)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:137
+#, c-format
+msgid "%02X (2 KiB)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:139
+#, c-format
+msgid "%02X (8 KiB)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:155
+#, c-format
+msgid "%02X (Japan)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:157
+#, c-format
+msgid "%02X (World)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:201
+#, c-format
+msgid "%02X (Actual: %02X)"
+msgstr ""
+
+#: dialogs/gb-rom-info.cpp:204
+#, c-format
+msgid "%04X (Actual: %04X)"
+msgstr ""
+
+#: dialogs/sound-config.cpp:271
+#, c-format
+msgid "%d frame = %.2f ms"
+msgstr ""
+
+#: extra-translations.cpp:13
+msgid "&Apply"
+msgstr "&Applica"
+
+#: extra-translations.cpp:14
+msgid "Artists"
+msgstr "Artisti"
+
+#: extra-translations.cpp:15
+msgid "Cancel"
+msgstr "Cancella"
+
+#: extra-translations.cpp:16
+msgid "Close"
+msgstr "Chiudi"
+
+#: extra-translations.cpp:17
+msgid "Developers"
+msgstr "Sviluppatori"
+
+#: extra-translations.cpp:18
+msgid "License"
+msgstr "Licenze"
+
+#: extra-translations.cpp:19
+msgid "OK"
+msgstr "Ok"
+
+#: gfxviewers.cpp:1229
 msgid "Select output file and type"
 msgstr "Seleziona tipo e file di destinazione"
 
-#: ../src/wx/gfxviewers.cpp:1142
+#: gfxviewers.cpp:1230
 msgid ""
 "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
 "Table (*.act)|*.act"
 msgstr "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color Table (*.act)|*.act"
 
-#: ../src/wx/guiinit.cpp:77
+#: guiinit.cpp:95
 msgid "Start!"
 msgstr "Inizia!"
 
-#: ../src/wx/guiinit.cpp:82 ../src/wx/xrc/NetLink.xrc:86
+#: guiinit.cpp:114
 msgid "Connect"
 msgstr "Connetti"
 
-#: ../src/wx/guiinit.cpp:96
+#: guiinit.cpp:131 guiinit.cpp:150
 msgid "You must enter a valid host name"
 msgstr "Devi inserire un nome host valido"
 
-#: ../src/wx/guiinit.cpp:97
+#: guiinit.cpp:132 guiinit.cpp:151
 msgid "Host name invalid"
 msgstr "Nome host invalido"
 
-#: ../src/wx/guiinit.cpp:115
+#: guiinit.cpp:153
 msgid "Waiting for clients..."
 msgstr "In attesa dei client..."
 
-#: ../src/wx/guiinit.cpp:116
+#: guiinit.cpp:154
 #, c-format
 msgid "Server IP address is: %s\n"
-msgstr "L'indirizzo IP è: %s\n"
+msgstr "L'indirizzo IP del server è: %s\n"
 
-#: ../src/wx/guiinit.cpp:118
+#: guiinit.cpp:156
 msgid "Waiting for connection..."
 msgstr "In attesa della connessione..."
 
-#: ../src/wx/guiinit.cpp:119
+#: guiinit.cpp:157
 #, c-format
 msgid "Connecting to %s\n"
-msgstr "Connessione a %s\n"
+msgstr "In collegamento con %s\n"
 
-#: ../src/wx/guiinit.cpp:152
+#: guiinit.cpp:190
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr "C'è stato un errore.\nPer favore prova di nuovo."
 
-#: ../src/wx/guiinit.cpp:219 ../src/wx/guiinit.cpp:272
+#: guiinit.cpp:257 guiinit.cpp:313
 msgid "Select cheat file"
 msgstr "Seleziona il file dei trucchi"
 
-#: ../src/wx/guiinit.cpp:220
+#: guiinit.cpp:258
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
-msgstr "Lista di trucchi VBA (*.clt)|*.clt|Lista trucchi CHT (*.cht)|*.cht"
+msgstr "Liste trucchi VBA (*.clt)|*.clt|Liste trucchi CHT (*.cht)|*.cht"
 
-#: ../src/wx/guiinit.cpp:239 ../src/wx/panel.cpp:401
+#: guiinit.cpp:280 panel.cpp:583
 msgid "Loaded cheats"
 msgstr "Trucchi caricati"
 
-#: ../src/wx/guiinit.cpp:273
+#: guiinit.cpp:314
 msgid "VBA cheat lists (*.clt)|*.clt"
 msgstr "Lista trucchi VBA (*.clt)|*.clt"
 
-#: ../src/wx/guiinit.cpp:291
+#: guiinit.cpp:335
 msgid "Saved cheats"
 msgstr "Trucchi salvati"
 
-#: ../src/wx/guiinit.cpp:322 ../src/wx/guiinit.cpp:341
+#: guiinit.cpp:361 guiinit.cpp:380
 msgid "Restore old values?"
-msgstr "Rimettere i vecchi valori?"
+msgstr "Rirpistinare i vecchi valori?"
 
-#: ../src/wx/guiinit.cpp:323 ../src/wx/guiinit.cpp:342
+#: guiinit.cpp:362 guiinit.cpp:381
 msgid "Removing cheats"
 msgstr "Rimozione trucchi"
 
-#: ../src/wx/guiinit.cpp:733 ../src/wx/xrc/JoyPanel.xrc:244
-msgid "GameShark"
-msgstr "GameShark"
-
-#: ../src/wx/guiinit.cpp:736
+#: guiinit.cpp:775
 msgid "Generic Code"
-msgstr "Codice generico"
+msgstr "Codice Generico"
 
-#: ../src/wx/guiinit.cpp:737
-msgid "GameShark Advance"
-msgstr "GameShark Advance"
-
-#: ../src/wx/guiinit.cpp:738
-msgid "CodeBreaker Advance"
-msgstr "CodeBreaker Advance"
-
-#: ../src/wx/guiinit.cpp:739
-msgid "Flashcart CHT"
-msgstr "Flashcart CHT"
-
-#: ../src/wx/guiinit.cpp:807 ../src/wx/guiinit.cpp:1062
+#: guiinit.cpp:847 guiinit.cpp:1097
 msgid "Number cannot be empty"
 msgstr "Il numero non può essere vuoto"
 
-#: ../src/wx/guiinit.cpp:845
-#, c-format
-msgid "Search produced %d results.  Please refine better"
-msgstr "La ricerca ha prodotto %d risultati. Per favore definiscila meglio"
-
-#: ../src/wx/guiinit.cpp:857
+#: guiinit.cpp:897
 msgid "Search produced no results"
 msgstr "La ricerca non ha prodotto risultati"
 
-#: ../src/wx/guiinit.cpp:1020
+#: guiinit.cpp:1060
 msgid "8-bit "
 msgstr "8-bit"
 
-#: ../src/wx/guiinit.cpp:1024
+#: guiinit.cpp:1064
 msgid "16-bit "
 msgstr "16-bit"
 
-#: ../src/wx/guiinit.cpp:1028
+#: guiinit.cpp:1068
 msgid "32-bit "
 msgstr "32-bit"
 
-#: ../src/wx/guiinit.cpp:1034
-msgid "signed decimal"
-msgstr "decimale firmato"
+#: guiinit.cpp:1074
+msgid "Signed decimal"
+msgstr ""
 
-#: ../src/wx/guiinit.cpp:1038
-msgid "unsigned decimal"
-msgstr "decimale non firmato"
+#: guiinit.cpp:1078
+msgid "Unsigned decimal"
+msgstr ""
 
-#: ../src/wx/guiinit.cpp:1042
-msgid "unsigned hexadecimal"
-msgstr "esadecimale non firmato"
+#: guiinit.cpp:1082
+msgid "Unsigned hexadecimal"
+msgstr ""
 
-#: ../src/wx/guiinit.cpp:1520
-#, c-format
-msgid "%d frames = %.2f ms"
-msgstr "%d frame = %.2f ms"
-
-#: ../src/wx/guiinit.cpp:1532
-msgid "Default device"
-msgstr "Device predefinito"
-
-#: ../src/wx/guiinit.cpp:1694
-msgid "Desktop mode"
-msgstr "Modalità desktop"
-
-#: ../src/wx/guiinit.cpp:1701
-#, c-format
-msgid "%d x %d - %dbpp @ %dHz"
-msgstr "%d x %d - %dbpp @ %dHz"
-
-#: ../src/wx/guiinit.cpp:1855
-#, c-format
-msgid "No usable rpi plugins found in %s"
-msgstr "Non sono stati trovati plugin rpi utilizzabili in %s"
-
-#: ../src/wx/guiinit.cpp:1875 ../src/wx/xrc/DisplayConfig.xrc:107
-msgid "Plugin"
-msgstr "Plugin"
-
-#: ../src/wx/guiinit.cpp:1903
-msgid "Please select a plugin or a different filter"
-msgstr "Per favore scegli un plugin od un filtro differente"
-
-#: ../src/wx/guiinit.cpp:1904
-msgid "Plugin selection error"
-msgstr "Selezione del plugin errata"
-
-#: ../src/wx/guiinit.cpp:2103
-msgid "This will clear all user-defined accelerators.  Are you sure?"
-msgstr "Questo cancellerà tutti gli acceleratori scelti dal'utente. Sei sicuro?"
-
-#: ../src/wx/guiinit.cpp:2103
-msgid "Confirm"
-msgstr "Conferma"
-
-#: ../src/wx/guiinit.cpp:2697
+#: guiinit.cpp:1654
 msgid "Main icon not found"
 msgstr "Icona principale non trovata"
 
-#: ../src/wx/guiinit.cpp:2715
+#: guiinit.cpp:1672
 msgid "Main display panel not found"
 msgstr "Pannello dello schermo principale non trovato"
 
-#: ../src/wx/guiinit.cpp:2829
-#, c-format
-msgid "Duplicate menu accelerator: %s for %s and %s; keeping first"
-msgstr "Acceleratore del menu doppione: %s per %s e %s; tengo il primo"
-
-#: ../src/wx/guiinit.cpp:2843
-#, c-format
-msgid "Menu accelerator %s for %s overrides default for %s ; keeping menu"
-msgstr "Acceleratore del menu %s per %s sovrascrive quello di base per %s ; mantengo il menu"
-
-#: ../src/wx/guiinit.cpp:2949
+#: guiinit.cpp:1964
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Oggetto menu invalido %s; lo rimuovo"
 
-#: ../src/wx/guiinit.cpp:3144
+#: guiinit.cpp:2149
 msgid "Code"
 msgstr "Codice"
 
-#: ../src/wx/guiinit.cpp:3153
+#: guiinit.cpp:2158
 msgid "Description"
 msgstr "Descrizione"
 
-#: ../src/wx/guiinit.cpp:3227 ../src/wx/xrc/CheatAdd.xrc:31
+#: guiinit.cpp:2232 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Indirizzo"
 
-#: ../src/wx/guiinit.cpp:3228
+#: guiinit.cpp:2233
 msgid "Old Value"
 msgstr "Vecchio valore"
 
-#: ../src/wx/guiinit.cpp:3229
+#: guiinit.cpp:2234
 msgid "New Value"
 msgstr "Nuovo valore"
 
-#: ../src/wx/guiinit.cpp:3725
-msgid "Menu commands"
-msgstr "Menu comandi"
-
-#: ../src/wx/guiinit.cpp:3748
-msgid "Other commands"
-msgstr "Altri comandi"
-
-#: ../src/wx/guiinit.cpp:3859
+#: guiinit.cpp:2454
 msgid "JoyBus host invalid; disabling"
 msgstr "Host JoyBus invalido; lo disabilito"
 
-#: ../src/wx/opts.cpp:536 ../src/wx/opts.cpp:831
-#, c-format
-msgid "Invalid value %s for option %s; valid values are %s%s%s"
-msgstr "Valore non valido %s per l'opzione %s; i valori validi sono %s%s%s"
+#: opts.cpp:155
+msgid ""
+"The INI file was written for a more recent version of VBA-M. Some INI option"
+" values may have been reset."
+msgstr "Questo file di configurazione è stato creato per una versione più recente di VBA-M.\nAlcune impostazioni potrebbero essere state resettate."
 
-#: ../src/wx/opts.cpp:553 ../src/wx/opts.cpp:843
-#, c-format
-msgid "Invalid value %d for option %s; valid values are %d - %d"
-msgstr "Valore non valido %d per l'opzione %s; I valori validi sono %d - %d"
-
-#: ../src/wx/opts.cpp:560 ../src/wx/opts.cpp:569 ../src/wx/opts.cpp:851
-#: ../src/wx/opts.cpp:859
-#, c-format
-msgid "Invalid value %f for option %s; valid values are %f - %f"
-msgstr "Valore %f per l'opzione %s; i valori validi sono %f - %f"
-
-#: ../src/wx/opts.cpp:628 ../src/wx/opts.cpp:649 ../src/wx/opts.cpp:928
-#: ../src/wx/opts.cpp:954
+#: opts.cpp:326 opts.cpp:342 opts.cpp:499
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Tasto obbligatorio non valido %s per %s"
 
-#: ../src/wx/opts.cpp:814
+#: opts.cpp:444 opts.cpp:453 opts.cpp:462 opts.cpp:471
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:514
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:525
 #, c-format
-msgid "Invalid flag option %s - %s ignored"
-msgstr "Opzione scelta non valida %s - %s ignorata"
+msgid "Invalid value %s for option %s"
+msgstr "Il valore %s non è valido per l'opzione \"%s\""
 
-#: ../src/wx/panel.cpp:90
+#: opts.cpp:505
+#, c-format
+msgid "Unknown option %s with value %s"
+msgstr "L'opzione \"%s\" con valore \"%s\", è invalida."
+
+#: panel.cpp:240
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s non è una ROM valida"
 
-#: ../src/wx/panel.cpp:91 ../src/wx/panel.cpp:148 ../src/wx/panel.cpp:209
+#: panel.cpp:241 panel.cpp:302 panel.cpp:375
 msgid "Problem loading file"
 msgstr "Problema nel caricare il file"
 
-#: ../src/wx/panel.cpp:147
+#: panel.cpp:301
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Impossibile caricare la Game Boy ROM %s"
 
-#: ../src/wx/panel.cpp:185 ../src/wx/panel.cpp:275
+#: panel.cpp:326 panel.cpp:437 panel.cpp:1193
+msgid "Could not initialize the sound driver!"
+msgstr "Impossibile far partire il driver per i suoni!"
+
+#: panel.cpp:337
+msgid ""
+"Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
+" Boy BIOS file."
+msgstr "Impossibile usare il bios GameBoy quando la Colorizer Hack è attiva"
+
+#: panel.cpp:351 panel.cpp:450
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Non posso caricare il BIOS %s"
 
-#: ../src/wx/panel.cpp:208
+#: panel.cpp:374
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Non posso caricare la Game Boy Advance ROM %s"
 
-#: ../src/wx/panel.cpp:434
+#: panel.cpp:620
 msgid " player "
 msgstr "giocatore"
 
-#: ../src/wx/panel.cpp:596
+#: panel.cpp:787
 #, c-format
 msgid "Loaded state %s"
 msgstr "Caricare lo stato %s"
 
-#: ../src/wx/panel.cpp:596
+#: panel.cpp:787
 #, c-format
 msgid "Error loading state %s"
 msgstr "Errore nel caricare lo stato %s"
 
-#: ../src/wx/panel.cpp:620
+#: panel.cpp:811
 #, c-format
 msgid "Saved state %s"
 msgstr "Stato salvato %s"
 
-#: ../src/wx/panel.cpp:620
+#: panel.cpp:811
 #, c-format
 msgid "Error saving state %s"
 msgstr "Errore nel salvare lo stato %s"
 
-#: ../src/wx/panel.cpp:824
+#: panel.cpp:1026
 #, c-format
-msgid "Fullscreen mode %dx%d-%d@%d not supported; looking for another"
-msgstr "Modalità schermo intero %dx%d-%d@%d non supportata; guardo per un'altra"
+msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
+msgstr "La modalità  \"%dx%d-%d %dhz\" non è supportata. Cercando modalità supportate..."
 
-#: ../src/wx/panel.cpp:862
+#: panel.cpp:1064
 #, c-format
-msgid "Fullscreen mode %dx%d-%d@%d not supported"
-msgstr "Modalità schermo intero %dx%d-%d@%d  non supportata"
+msgid "Fullscreen mode %d x %d - %d @ %d not supported"
+msgstr "La modalità  \"%dx%d-%d %dhz\" non è supportata. "
 
-#: ../src/wx/panel.cpp:867
+#: panel.cpp:1069
 #, c-format
-msgid "Valid mode: %dx%d-%d@%d"
-msgstr "Modalità valida: %dx%d-%d@%d "
+msgid "Valid mode: %d x %d - %d @ %d"
+msgstr "RIsoluzione supportata: %dx%d-%d %dhz"
 
-#: ../src/wx/panel.cpp:875
+#: panel.cpp:1077
 #, c-format
-msgid "Chose mode %dx%d-%d@%d"
-msgstr "Modalità scelta %dx%d-%d@%d "
+msgid "Chose mode %d x %d - %d @ %d"
+msgstr ""
 
-#: ../src/wx/panel.cpp:879
+#: panel.cpp:1081
 #, c-format
-msgid "Failed to change mode to %dx%d-%d@%d"
-msgstr "Ho fallito nel cambiate modalità da %dx%d-%d@%d "
+msgid "Failed to change mode to %d x %d - %d @ %d"
+msgstr ""
 
-#: ../src/wx/panel.cpp:962
-msgid "Not a valid GBA cartridge"
-msgstr "Non è una cartuccia GBA valida"
+#: panel.cpp:1168
+msgid "Not a valid Game Boy Advance cartridge"
+msgstr "Cartuccia GBA non valida"
 
-#: ../src/wx/panel.cpp:1100
+#: panel.cpp:1357
 msgid "No memory for rewinding"
 msgstr "Non c'è un salvataggio da caricare"
 
-#: ../src/wx/panel.cpp:1110
+#: panel.cpp:1367
 msgid "Error writing rewind state"
 msgstr "Errore nel salvare lo stato"
 
-#: ../src/wx/panel.cpp:2323
-msgid "memory allocation error"
-msgstr "Errore nell'allocazione della memoria"
+#: panel.cpp:2360
+msgid "Failed to set wayland display"
+msgstr ""
 
-#: ../src/wx/panel.cpp:2326
-msgid "error initializing codec"
-msgstr "errore nell'inizializzazione del codec"
+#: panel.cpp:2388
+msgid "Failed to initialize SDL video subsystem"
+msgstr ""
 
-#: ../src/wx/panel.cpp:2329
-msgid "error writing to output file"
-msgstr "errore nella scrittura del file di destinazione"
+#: panel.cpp:2399
+msgid "Failed to initialize SDL video"
+msgstr ""
 
-#: ../src/wx/panel.cpp:2332
-msgid "can't guess output format from file name"
-msgstr "non posso indovinare il formato di destinazione dal nome del file"
+#: panel.cpp:2408
+msgid "Failed to set wayland surface"
+msgstr ""
 
-#: ../src/wx/panel.cpp:2337
-msgid "programming error; aborting!"
-msgstr "errore di programmazione; annullamento in corso!"
+#: panel.cpp:2422
+msgid "Failed to set DX9 window"
+msgstr ""
 
-#: ../src/wx/panel.cpp:2348 ../src/wx/panel.cpp:2376
+#: panel.cpp:2430
+msgid "Failed to set parent window"
+msgstr ""
+
+#: panel.cpp:2439
+msgid "Failed to set OpenGL properties"
+msgstr ""
+
+#: panel.cpp:2446 panel.cpp:2480
+msgid "Failed to create SDL window"
+msgstr ""
+
+#: panel.cpp:2464 panel.cpp:2512
+msgid "Failed to create SDL renderer"
+msgstr ""
+
+#: panel.cpp:3067
+msgid "Enabling EGL VSync."
+msgstr "Abilitando il VSync EGL"
+
+#: panel.cpp:3069
+msgid "Disabling EGL VSync."
+msgstr "Disabilitando il VSync Egl"
+
+#: panel.cpp:3076
+msgid "Enabling GLX VSync."
+msgstr ""
+
+#: panel.cpp:3078
+msgid "Disabling GLX VSync."
+msgstr ""
+
+#: panel.cpp:3096
+msgid "Failed to set glXSwapIntervalEXT"
+msgstr "Assegnazione glXSwapIntervalEXT fallita"
+
+#: panel.cpp:3105
+msgid "Failed to set glXSwapIntervalSGI"
+msgstr "Assegnazione glXSwapIntervalSGI fallita"
+
+#: panel.cpp:3114
+msgid "Failed to set glXSwapIntervalMESA"
+msgstr "Assegnazione glXSwapIntervalMESA fallita"
+
+#: panel.cpp:3121
+msgid "No support for wglGetExtensionsStringEXT"
+msgstr "Nessun supporto per wglGetExtensionsStringEXT"
+
+#: panel.cpp:3124
+msgid "No support for WGL_EXT_swap_control"
+msgstr "WGL_EXT_swap_control non supportato"
+
+#: panel.cpp:3133
+msgid "Failed to set wglSwapIntervalEXT"
+msgstr "Assegnazione wglSwapIntervalEXT fallita"
+
+#: panel.cpp:3139
+msgid "No VSYNC available on this platform"
+msgstr "V-Sync non disponibile su questa piattaforma"
+
+#: panel.cpp:3235
+msgid "Memory allocation error"
+msgstr ""
+
+#: panel.cpp:3238
+msgid "Error initializing codec"
+msgstr ""
+
+#: panel.cpp:3241
+msgid "Error writing to output file"
+msgstr ""
+
+#: panel.cpp:3244
+msgid "Can't guess output format from file name"
+msgstr ""
+
+#: panel.cpp:3249
+msgid "Programming error; aborting!"
+msgstr ""
+
+#: panel.cpp:3261 panel.cpp:3290
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Impossibile iniziare a registrare %s (%s)"
 
-#: ../src/wx/panel.cpp:2404
+#: panel.cpp:3318
 #, c-format
-msgid "Error in audio/video recording (%s); aborting"
-msgstr "Errore con audio/video registrazione (%s); interruzione"
+msgid "Error in audio / video recording (%s); aborting"
+msgstr ""
 
-#: ../src/wx/panel.cpp:2410
+#: panel.cpp:3324
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Errore con registrazione audio (%s); interruzione"
 
-#: ../src/wx/panel.cpp:2420
+#: panel.cpp:3334
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Errore con registrazione video (%s); interruzione"
 
-#: ../src/wx/sys.cpp:117 ../src/wx/sys.cpp:173
+#: panel.cpp:3525
+#, c-format
+msgid "Volume: %d %%"
+msgstr ""
+
+#: sys.cpp:211 sys.cpp:272
 msgid "No game in progress to record"
 msgstr "Nessuna partita in corso da registrare"
 
-#: ../src/wx/sys.cpp:130
+#: sys.cpp:229
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "Impossibile aprire il file di output %s"
 
-#: ../src/wx/sys.cpp:137 ../src/wx/sys.cpp:157 ../src/wx/sys.cpp:296
+#: sys.cpp:236 sys.cpp:256 sys.cpp:406
 msgid "Error writing game recording"
 msgstr "errore di registrazione scrittura gioco"
 
-#: ../src/wx/sys.cpp:178
+#: sys.cpp:277
 msgid "Cannot play game recording while recording"
 msgstr "Non è possibile riprodurre la registrazione del gioco durante la registrazione"
 
-#: ../src/wx/sys.cpp:191
+#: sys.cpp:292
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "impossibile aprire il file di registrazione %s"
 
-#: ../src/wx/sys.cpp:198 ../src/wx/sys.cpp:208
+#: sys.cpp:301 sys.cpp:311
 msgid "Error reading game recording"
 msgstr "registrazione errore di lettura del gioco"
 
-#: ../src/wx/sys.cpp:307
+#: sys.cpp:421 sys.cpp:440
 msgid "Playback ended"
 msgstr "La riproduzione si è conclusa"
 
-#: ../src/wx/sys.cpp:326
+#: sys.cpp:464
 #, c-format
-msgid "%d%%(%d, %d fps)"
+msgid "%d %% (%d, %d fps)"
 msgstr "%d%%(%d, %d fps)"
 
-#: ../src/wx/sys.cpp:334
-#, c-format
-msgid "%d%%"
-msgstr "%d%%"
-
-#: ../src/wx/sys.cpp:750 ../src/wx/xrc/GBPrinter.xrc:65
+#: sys.cpp:905 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "&scarto"
 
-#: ../src/wx/sys.cpp:784
+#: sys.cpp:939
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "file immagine  (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: ../src/wx/sys.cpp:793
+#: sys.cpp:948
 msgid "Save printer image to"
 msgstr "Salva stampa immagine in"
 
-#: ../src/wx/sys.cpp:807 ../src/wx/sys.cpp:990
+#: sys.cpp:965 sys.cpp:1149
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "Ha scritto l'output di stampa in %s"
 
-#: ../src/wx/sys.cpp:812 ../src/wx/sys.cpp:883
+#: sys.cpp:970 sys.cpp:1041
 msgid "&Close"
-msgstr "&chiuso"
+msgstr "&Chiudi"
 
-#: ../src/wx/sys.cpp:878
+#: sys.cpp:1036
 msgid "Printed"
 msgstr "Stampato"
 
-#: ../src/wx/sys.cpp:1178
+#: sys.cpp:1311
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "l'apertura di pseudo tty Errore: %s"
 
-#: ../src/wx/sys.cpp:1277
+#: sys.cpp:1410
 #, c-format
 msgid "Error setting up server socket (%d)"
 msgstr "errore di impostazione del socket server (%d)"
 
-#: ../src/wx/viewers.cpp:560
+#: viewers.cpp:586
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr "file di testo (*.txt;*.log)|*.txt;*.log|"
 
-#: ../src/wx/viewers.cpp:698 ../src/wx/viewers.cpp:770
+#: viewers.cpp:731 viewers.cpp:806
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
-msgstr "memoria di discarica (*.dmp;*.bin)|*.dmp;*.bin|"
+msgstr "Dump di memoria (*.dmp;*.bin)|*.dmp;*.bin|"
 
-#: ../src/wx/viewers.cpp:700
+#: viewers.cpp:733
 msgid "Select memory dump file"
 msgstr "Select memory dump file"
 
-#: ../src/wx/viewers.cpp:814
-msgid "0x00000000 - BIOS"
-msgstr "0x00000000 - BIOS"
+#: viewsupt.cpp:789
+msgid "Red:"
+msgstr ""
 
-#: ../src/wx/viewers.cpp:815
-msgid "0x02000000 - WRAM"
-msgstr "0x02000000 - WRAM"
+#: viewsupt.cpp:798
+msgid "Green:"
+msgstr ""
 
-#: ../src/wx/viewers.cpp:816
-msgid "0x03000000 - IRAM"
-msgstr "0x03000000 - IRAM"
+#: viewsupt.cpp:807
+msgid "Blue:"
+msgstr ""
 
-#: ../src/wx/viewers.cpp:817
-msgid "0x04000000 - I/O"
-msgstr "0x04000000 - I/O"
+#: viewsupt.h:63
+#, c-format
+msgid "Unable to load dialog %s from resources"
+msgstr "Impossibile caricare il dialogo %s dalle risorse"
 
-#: ../src/wx/viewers.cpp:818
-msgid "0x05000000 - PALETTE"
-msgstr "0x05000000 - TAVOLOZZA"
+#: wxvbam.cpp:449 wxvbam.cpp:466
+#, c-format
+msgid "Invalid configuration file provided: %s"
+msgstr "Il file di configurazione \"%s\" è invalido."
 
-#: ../src/wx/viewers.cpp:819
-msgid "0x06000000 - VRAM"
-msgstr "0x06000000 - VRAM"
-
-#: ../src/wx/viewers.cpp:820
-msgid "0x07000000 - OAM"
-msgstr "0x07000000 - OAM"
-
-#: ../src/wx/viewers.cpp:821
-msgid "0x08000000 - ROM"
-msgstr "0x08000000 - ROM"
-
-#: ../src/wx/viewers.cpp:924
-msgid "0x0000 - ROM"
-msgstr "0x0000 - ROM"
-
-#: ../src/wx/viewers.cpp:925
-msgid "0x4000 - ROM"
-msgstr "0x4000 - ROM"
-
-#: ../src/wx/viewers.cpp:926
-msgid "0x8000 - VRAM"
-msgstr "0x8000 - VRAM"
-
-#: ../src/wx/viewers.cpp:927
-msgid "0xA000 - SRAM"
-msgstr "0xA000 - SRAM"
-
-#: ../src/wx/viewers.cpp:928
-msgid "0xC000 - RAM"
-msgstr "0xC000 - RAM"
-
-#: ../src/wx/viewers.cpp:929
-msgid "0xD000 - WRAM"
-msgstr "0xD000 - WRAM"
-
-#: ../src/wx/viewers.cpp:930
-msgid "0xFF00 - I/O"
-msgstr "0xFF00 - I/O"
-
-#: ../src/wx/viewers.cpp:931
-msgid "0xFF80 - RAM"
-msgstr "0xFF80 - RAM"
-
-#: ../src/wx/viewsupt.cpp:769
-msgid "R:"
-msgstr "R:"
-
-#: ../src/wx/viewsupt.cpp:774
-msgid "G:"
-msgstr "G:"
-
-#: ../src/wx/viewsupt.cpp:779
-msgid "B:"
-msgstr "B:"
-
-#: ../src/wx/wxvbam.cpp:201
-msgid "visualboyadvance-m"
-msgstr "visualboyadvance-m"
-
-#: ../src/wx/wxvbam.cpp:415
-msgid "Could not create main window"
-msgstr "Impossibile creare una finestra principale"
-
-#: ../src/wx/wxvbam.cpp:482
+#: wxvbam.cpp:716
 msgid "Save built-in XRC file and exit"
-msgstr "Salva file XRC incorporato e uscita"
+msgstr "Salva file XRC incorporato ed esci"
 
-#: ../src/wx/wxvbam.cpp:485
+#: wxvbam.cpp:719
 msgid "Save built-in vba-over.ini and exit"
-msgstr "Salva la costruzione vba-over.ini ed esci"
+msgstr "Salva vba-over.ini integrato ed esci"
 
-#: ../src/wx/wxvbam.cpp:488
+#: wxvbam.cpp:722
 msgid "Print configuration path and exit"
-msgstr "Stampa percorso di configurazione e di uscita"
+msgstr "Stampa percorso di configurazione ed esci"
 
-#: ../src/wx/wxvbam.cpp:491
+#: wxvbam.cpp:725
 msgid "Start in full-screen mode"
-msgstr "apri in modalità schermo intero "
+msgstr "Avvia in modalità schermo intero"
 
-#: ../src/wx/wxvbam.cpp:495
+#: wxvbam.cpp:728
+msgid "Set a configuration file"
+msgstr "Imposta un file di configurazione"
+
+#: wxvbam.cpp:732
 msgid "Delete shared link state first, if it exists"
-msgstr "Eliminare il link condiviso, se esiste"
+msgstr "Elimina il link condiviso, se esiste"
 
-#: ../src/wx/wxvbam.cpp:502
+#: wxvbam.cpp:739
 msgid "List all settable options and exit"
 msgstr "Mostra tutte le opzioni impostabili ed esci"
 
-#: ../src/wx/wxvbam.cpp:505
+#: wxvbam.cpp:742
 msgid "ROM file"
 msgstr "ROM file"
 
-#: ../src/wx/wxvbam.cpp:507
+#: wxvbam.cpp:744
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: ../src/wx/wxvbam.cpp:538
-msgid "Configuration/build error: can't find built-in xrc"
-msgstr "Errore di Configurazione/costruzione:non è stato trovato built-in xrc"
+#: wxvbam.cpp:775
+msgid "Configuration / build error: can't find built-in xrc"
+msgstr "C'è un problema con la configurazione/build:\\nImpossibile trovare xrc"
 
-#: ../src/wx/wxvbam.cpp:546
+#: wxvbam.cpp:783
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
-"To override, remove all but changed root node(s).  First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr "Configurazione integrata scritta in %s.\nPer annullare, elimina tutti i nodo(i) di radice non modificati. Il primo nodo di radice con il nome corretto in qualunque file .xrc o .xrs nel seguente percorso di ricerca sovrascrive l'integrata:"
+"To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
+msgstr "Configurazione built-in salvata in %s. Per annullare, elimini tutti i nodi di radice non modificati.\\nIl primo nodo di radice con il nome corretto in qualunque file .xrc o .xrs nel seguente percorso di ricerca sovrascrive l'integrata:"
 
-#: ../src/wx/wxvbam.cpp:561
+#: wxvbam.cpp:797
 msgid "Configuration is read from, in order:"
 msgstr "La configurazione è letta in quest'ordine da"
 
-#: ../src/wx/wxvbam.cpp:575
+#: wxvbam.cpp:811
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
-"To override, delete all but changed section.  First found section is used from search path:"
+"To override, delete all but changed section. First found section is used from search path:"
 msgstr "File di override integrato scritto in %s.\nPer annullare, elimina tutte le sezioni non modificate. La prima sezione usata è trovata partendo dal seguente percorso di ricerca:"
 
-#: ../src/wx/wxvbam.cpp:581
+#: wxvbam.cpp:817
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n⇥costruisci"
 
-#: ../src/wx/wxvbam.cpp:592
+#: wxvbam.cpp:832
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1106,2604 +1154,3041 @@ msgid ""
 "\n"
 msgstr "Opzioni impostate dalla riga di comando sono salvate se un qualunque cambiamento nella configurazione è applicato dalla interfaccia utente.\n\nPer le opzioni di flag, vero e falso sono rispettivamente 1 e 0\n\n"
 
-#: ../src/wx/wxvbam.cpp:613
+#: wxvbam.cpp:840
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "I comandi disponibili per la Tastiera/* option sono:\n\n"
 
-#: ../src/wx/wxvbam.cpp:647
+#: wxvbam.cpp:852
+msgid "Configuration file not found."
+msgstr "File di configurazione non trovato"
+
+#: wxvbam.cpp:883
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Opzione di configurazione errata o file ROM multipli:\n"
 
-#: ../src/wx/xaudio2.cpp:35
-msgid "XAudio2: Enumerating devices failed!"
-msgstr "XAudio2: Enumerazione dei dispositivi fallita!"
-
-#: ../src/wx/xaudio2.cpp:69 ../src/wx/xaudio2.cpp:353
-msgid "The XAudio2 interface failed to initialize!"
-msgstr "L'interfaccia XAudio2 ha fallito l'inizializzazione!"
-
-#: ../src/wx/xaudio2.cpp:384
-msgid "XAudio2: Creating mastering voice failed!"
-msgstr "XAudio2: Creazione della voce mastering fallita!"
-
-#: ../src/wx/xaudio2.cpp:393
-msgid "XAudio2: Creating source voice failed!"
-msgstr "XAudio2: Creazione della voce d'origine fallita!"
-
-#: ../src/wx/viewsupt.h:61
-#, c-format
-msgid "Unable to load dialog %s from resources"
-msgstr "Impossibile caricare il dialogo %s dalle risorse"
-
-#: ../src/wx/widgets/keyedit.cpp:94 ../src/wx/widgets/keyedit.cpp:232
-msgid "SHIFT"
-msgstr "SHIFT"
-
-#: ../src/wx/widgets/keyedit.cpp:98 ../src/wx/widgets/keyedit.cpp:231
-msgid "ALT"
-msgstr "ALT"
-
-#: ../src/wx/widgets/keyedit.cpp:102 ../src/wx/widgets/keyedit.cpp:239
-msgid "CTRL"
-msgstr "CTRL"
-
-#: ../src/wx/widgets/keyedit.cpp:108 ../src/wx/widgets/keyedit.cpp:233
-msgid "RAWCTRL"
-msgstr "RAWCTRL"
-
-#: ../src/wx/widgets/keyedit.cpp:122 ../src/wx/widgets/keyedit.cpp:200
-msgid "Meta-"
-msgstr "Meta-"
-
-#: ../src/wx/widgets/keyedit.cpp:127 ../src/wx/widgets/keyedit.cpp:128
-msgid "Num"
-msgstr ""
-
-#: ../src/wx/widgets/keyedit.cpp:201
-msgid "Meta+"
-msgstr "Meta+"
-
-#: ../src/wx/widgets/keyedit.cpp:234
-msgid "RAW_CTRL"
-msgstr "RAW_CTRL"
-
-#: ../src/wx/widgets/keyedit.cpp:235
-msgid "RAWCONTROL"
-msgstr "RAWCONTROL"
-
-#: ../src/wx/widgets/keyedit.cpp:236
-msgid "RAW_CONTROL"
-msgstr "RAW_CONTROL"
-
-#: ../src/wx/widgets/keyedit.cpp:240
-msgid "CONTROL"
-msgstr "CONTROL"
-
-#: ../src/wx/xrc/AccelConfig.xrc:4
-msgid "Key Shortcuts"
-msgstr "Key Shortcuts"
-
-#: ../src/wx/xrc/AccelConfig.xrc:13
-msgid "Co&mmands:"
-msgstr "Co&mmandi:"
-
-#: ../src/wx/xrc/AccelConfig.xrc:34
-msgid "Current Keys:"
-msgstr "Chiavi correnti:"
-
-#: ../src/wx/xrc/AccelConfig.xrc:53
-msgid "&Assign"
-msgstr "&Assegna"
-
-#: ../src/wx/xrc/AccelConfig.xrc:60
-msgid "&Remove"
-msgstr "&Rimuovi"
-
-#: ../src/wx/xrc/AccelConfig.xrc:67
-msgid "Re&set All"
-msgstr "Re&setta Tutto"
-
-#: ../src/wx/xrc/AccelConfig.xrc:81
-msgid "Currently assigned to:"
-msgstr "Attualmente assegnato a:"
-
-#: ../src/wx/xrc/AccelConfig.xrc:96
-msgid "Shortcut Key:"
-msgstr "scorciatoia chiave:"
-
-#: ../src/wx/xrc/CheatAdd.xrc:4
-msgid "Add Cheat"
-msgstr "Aggiungi Codice"
-
-#: ../src/wx/xrc/CheatAdd.xrc:9 ../src/wx/xrc/CheatEdit.xrc:9
-msgid "&Description"
-msgstr "%Descrizione"
-
-#: ../src/wx/xrc/CheatAdd.xrc:53
-msgid "&Value"
-msgstr "&Valuta"
-
-#: ../src/wx/xrc/CheatAdd.xrc:77
-msgid "Format"
-msgstr "Formato"
-
-#: ../src/wx/xrc/CheatCreate.xrc:4
-msgid "Cheat Search"
-msgstr "Cerca Codice"
-
-#: ../src/wx/xrc/CheatCreate.xrc:23
-msgid "E&qual"
-msgstr "U&guale"
-
-#: ../src/wx/xrc/CheatCreate.xrc:31
-msgid "&Not equal"
-msgstr "&Non uguale"
-
-#: ../src/wx/xrc/CheatCreate.xrc:38
-msgid "&Less than"
-msgstr "&Meno di"
-
-#: ../src/wx/xrc/CheatCreate.xrc:45
-msgid "L&ess or equal"
-msgstr "M%eno o uguale"
-
-#: ../src/wx/xrc/CheatCreate.xrc:52
-msgid "&Greater than"
-msgstr "&Più grande di"
-
-#: ../src/wx/xrc/CheatCreate.xrc:59
-msgid "G&reater or equal"
-msgstr "P&iù grande o uguale"
-
-#: ../src/wx/xrc/CheatCreate.xrc:64
-msgid "Compare type"
-msgstr "Tipo di Confronto"
-
-#: ../src/wx/xrc/CheatCreate.xrc:77
-msgid "S&igned"
-msgstr "F&irmato"
-
-#: ../src/wx/xrc/CheatCreate.xrc:85
-msgid "&Unsigned"
-msgstr "&Non firmato"
-
-#: ../src/wx/xrc/CheatCreate.xrc:92
-msgid "&Hexadecimal"
-msgstr "&Esadecimale"
-
-#: ../src/wx/xrc/CheatCreate.xrc:97
-msgid "Signed/Unsigned"
-msgstr "Firmato/Non firmato"
-
-#: ../src/wx/xrc/CheatCreate.xrc:107
-msgid "&8 bits"
-msgstr "&8 bits"
-
-#: ../src/wx/xrc/CheatCreate.xrc:115
-msgid "&16 bits"
-msgstr "&16 bits"
-
-#: ../src/wx/xrc/CheatCreate.xrc:122
-msgid "&32 bits"
-msgstr "&32 bits"
-
-#: ../src/wx/xrc/CheatCreate.xrc:127
-msgid "Data size"
-msgstr "Dimensione data"
-
-#: ../src/wx/xrc/CheatCreate.xrc:144
-msgid "Ol&d value"
-msgstr "Ve&cchia valuta"
-
-#: ../src/wx/xrc/CheatCreate.xrc:152
-msgid "Specific &value"
-msgstr "&Valuta specifica"
-
-#: ../src/wx/xrc/CheatCreate.xrc:163
-msgid "Search value"
-msgstr "Cerca valuta"
-
-#: ../src/wx/xrc/CheatCreate.xrc:181
-msgid "&Search"
-msgstr "&Cerca"
-
-#: ../src/wx/xrc/CheatCreate.xrc:188
-msgid "U&pdate Old"
-msgstr "V&ecchio Aggiornamento"
-
-#: ../src/wx/xrc/CheatCreate.xrc:195 ../src/wx/xrc/Logging.xrc:119
-msgid "&Clear"
-msgstr "&Pulire"
-
-#: ../src/wx/xrc/CheatCreate.xrc:202
-msgid "&Add cheat"
-msgstr "&Aggiungi codice"
-
-#: ../src/wx/xrc/CheatEdit.xrc:4
-msgid "Edit Cheat"
-msgstr "Modifica Codice"
-
-#: ../src/wx/xrc/CheatEdit.xrc:31 ../src/wx/xrc/MainMenu.xrc:250
-msgid "&Type"
-msgstr "&Tipo"
-
-#: ../src/wx/xrc/CheatEdit.xrc:53
-msgid "C&odes"
-msgstr "C&odice"
-
-#: ../src/wx/xrc/CheatList.xrc:4
-msgid "Cheat List"
-msgstr "Lista codice"
-
-#: ../src/wx/xrc/CheatList.xrc:11
-msgid "Open cheat list"
-msgstr "Apri lista trucchi"
-
-#: ../src/wx/xrc/CheatList.xrc:15
-msgid "Save cheat list"
-msgstr "Salva lista trucchi"
-
-#: ../src/wx/xrc/CheatList.xrc:20
-msgid "Add new cheat"
-msgstr "Aggiungi nuovo codice"
-
-#: ../src/wx/xrc/CheatList.xrc:24
-msgid "Delete selected cheat"
-msgstr "Cancella codici selezionati"
-
-#: ../src/wx/xrc/CheatList.xrc:29
-msgid "Delete all cheats"
-msgstr "Cancella tutti i codici"
-
-#: ../src/wx/xrc/CheatList.xrc:35
-msgid "Toggle all Cheats"
-msgstr "Toggle tutti i Codici"
-
-#: ../src/wx/xrc/DirectoriesConfig.xrc:4
-msgid "Directories"
-msgstr "Elenco"
-
-#: ../src/wx/xrc/DirectoriesConfig.xrc:11
-#: ../src/wx/xrc/DirectoriesConfig.xrc:18
-msgid "Game Boy Advance ROMs"
-msgstr "Game Boy Advance ROMs"
-
-#: ../src/wx/xrc/DirectoriesConfig.xrc:27
-#: ../src/wx/xrc/DirectoriesConfig.xrc:34
-msgid "Game Boy ROMs"
-msgstr "Game Boy ROMs"
-
-#: ../src/wx/xrc/DirectoriesConfig.xrc:42
-#: ../src/wx/xrc/DirectoriesConfig.xrc:49
-msgid "Game Boy Color ROMs"
-msgstr "Game Boy Color ROMs"
-
-#: ../src/wx/xrc/DirectoriesConfig.xrc:57
-#: ../src/wx/xrc/DirectoriesConfig.xrc:64
-msgid "Native Saves"
-msgstr "Salvataggi Nativi"
-
-#: ../src/wx/xrc/DirectoriesConfig.xrc:72
-#: ../src/wx/xrc/DirectoriesConfig.xrc:79
-msgid "Emulator Saves"
-msgstr "Salvataggi Emulatore"
-
-#: ../src/wx/xrc/DirectoriesConfig.xrc:87
-#: ../src/wx/xrc/DirectoriesConfig.xrc:94
-msgid "Screenshots"
-msgstr "Screenshots"
-
-#: ../src/wx/xrc/DirectoriesConfig.xrc:102
-#: ../src/wx/xrc/DirectoriesConfig.xrc:109
-msgid "Recordings"
-msgstr "Registrazioni"
-
-#: ../src/wx/xrc/Disassemble.xrc:4
-msgid "Disassemble"
-msgstr "Smontare"
-
-#: ../src/wx/xrc/Disassemble.xrc:15
-msgid "&Automatic"
-msgstr "&Automatico"
-
-#: ../src/wx/xrc/Disassemble.xrc:23
-msgid "A&RM"
-msgstr "A&RM"
-
-#: ../src/wx/xrc/Disassemble.xrc:30
-msgid "&THUMB"
-msgstr "&THUMB"
-
-#: ../src/wx/xrc/Disassemble.xrc:45 ../src/wx/xrc/GBDisassemble.xrc:18
-#: ../src/wx/xrc/MemViewer.xrc:47
-msgid "&Go"
-msgstr "&Vai"
-
-#: ../src/wx/xrc/Disassemble.xrc:73
-msgid "R0:"
-msgstr "R0:"
-
-#: ../src/wx/xrc/Disassemble.xrc:83 ../src/wx/xrc/Disassemble.xrc:100
-#: ../src/wx/xrc/Disassemble.xrc:117 ../src/wx/xrc/Disassemble.xrc:134
-#: ../src/wx/xrc/Disassemble.xrc:151 ../src/wx/xrc/Disassemble.xrc:168
-#: ../src/wx/xrc/Disassemble.xrc:185 ../src/wx/xrc/Disassemble.xrc:202
-#: ../src/wx/xrc/Disassemble.xrc:219 ../src/wx/xrc/Disassemble.xrc:236
-#: ../src/wx/xrc/Disassemble.xrc:253 ../src/wx/xrc/Disassemble.xrc:270
-#: ../src/wx/xrc/Disassemble.xrc:287 ../src/wx/xrc/Disassemble.xrc:304
-#: ../src/wx/xrc/Disassemble.xrc:321 ../src/wx/xrc/Disassemble.xrc:338
-#: ../src/wx/xrc/Disassemble.xrc:355
-msgid "00000000"
-msgstr "00000000"
-
-#: ../src/wx/xrc/Disassemble.xrc:90
-msgid "R1:"
-msgstr "R1:"
-
-#: ../src/wx/xrc/Disassemble.xrc:107
-msgid "R2:"
-msgstr "R2:"
-
-#: ../src/wx/xrc/Disassemble.xrc:124
-msgid "R3:"
-msgstr "R3:"
-
-#: ../src/wx/xrc/Disassemble.xrc:141
-msgid "R4:"
-msgstr "R4:"
-
-#: ../src/wx/xrc/Disassemble.xrc:158
-msgid "R5:"
-msgstr "R5:"
-
-#: ../src/wx/xrc/Disassemble.xrc:175
-msgid "R6:"
-msgstr "R6:"
-
-#: ../src/wx/xrc/Disassemble.xrc:192
-msgid "R7:"
-msgstr "R7:"
-
-#: ../src/wx/xrc/Disassemble.xrc:209
-msgid "R8:"
-msgstr "R8:"
-
-#: ../src/wx/xrc/Disassemble.xrc:226
-msgid "R9:"
-msgstr "R9:"
-
-#: ../src/wx/xrc/Disassemble.xrc:243
-msgid "R10:"
-msgstr "R10:"
-
-#: ../src/wx/xrc/Disassemble.xrc:260
-msgid "R11:"
-msgstr "R11:"
-
-#: ../src/wx/xrc/Disassemble.xrc:277
-msgid "R12:"
-msgstr "R12:"
-
-#: ../src/wx/xrc/Disassemble.xrc:294 ../src/wx/xrc/GBDisassemble.xrc:111
-msgid "SP:"
-msgstr "SP:"
-
-#: ../src/wx/xrc/Disassemble.xrc:311
-msgid "LR:"
-msgstr "LR:"
-
-#: ../src/wx/xrc/Disassemble.xrc:328 ../src/wx/xrc/GBDisassemble.xrc:128
-msgid "PC:"
-msgstr "PC:"
-
-#: ../src/wx/xrc/Disassemble.xrc:345
-msgid "CPSR:"
-msgstr "CPSR:"
-
-#: ../src/wx/xrc/Disassemble.xrc:362 ../src/wx/xrc/GBDisassemble.xrc:185
-msgid "N"
-msgstr "NN"
-
-#: ../src/wx/xrc/Disassemble.xrc:369
-msgid "I"
-msgstr "II"
-
-#: ../src/wx/xrc/Disassemble.xrc:376 ../src/wx/xrc/GBDisassemble.xrc:179
-msgid "Z"
-msgstr "ZZ"
-
-#: ../src/wx/xrc/Disassemble.xrc:383
-msgid "F"
-msgstr "FF"
-
-#: ../src/wx/xrc/Disassemble.xrc:390 ../src/wx/xrc/GBDisassemble.xrc:197
-msgid "C"
-msgstr "CC"
-
-#: ../src/wx/xrc/Disassemble.xrc:397
-msgid "T"
-msgstr "T"
-
-#: ../src/wx/xrc/Disassemble.xrc:404
-msgid "V"
-msgstr "VV"
-
-#: ../src/wx/xrc/Disassemble.xrc:414 ../src/wx/xrc/MapViewer.xrc:76
-#: ../src/wx/xrc/OAMViewer.xrc:37
-msgid "Mode:"
-msgstr "Modalità:"
-
-#: ../src/wx/xrc/Disassemble.xrc:424 ../src/wx/xrc/GBDisassemble.xrc:172
-msgid "00"
-msgstr "00"
-
-#: ../src/wx/xrc/Disassemble.xrc:443 ../src/wx/xrc/GBDisassemble.xrc:212
-#: ../src/wx/xrc/GBOAMViewer.xrc:93 ../src/wx/xrc/GBPaletteViewer.xrc:105
-#: ../src/wx/xrc/GBTileViewer.xrc:75 ../src/wx/xrc/IOViewer.xrc:318
-#: ../src/wx/xrc/MemViewer.xrc:72 ../src/wx/xrc/OAMViewer.xrc:109
-#: ../src/wx/xrc/PaletteViewer.xrc:81 ../src/wx/xrc/TileViewer.xrc:91
-msgid "Automatic &update"
-msgstr "&Aggiornamento automatico"
-
-#: ../src/wx/xrc/Disassemble.xrc:453 ../src/wx/xrc/GBDisassemble.xrc:222
-msgid "G&oto PC"
-msgstr "V&ai al PC"
-
-#: ../src/wx/xrc/Disassemble.xrc:460 ../src/wx/xrc/GBDisassemble.xrc:229
-msgid "Re&fresh"
-msgstr "Ag&giorna"
-
-#: ../src/wx/xrc/Disassemble.xrc:467 ../src/wx/xrc/GBDisassemble.xrc:236
-msgid "&Next"
-msgstr "&Successivo"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:4
-msgid "Display settings"
-msgstr "Impostazioni video"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:15
-msgid "Output module"
-msgstr "Modulo di output"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:33
-msgid "Simple"
-msgstr "Semplice"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:40
-msgid "Quartz2D"
-msgstr "Quartzz2D"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:47
-msgid "OpenGL"
-msgstr "OpenGL"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:54
-msgid "Direct3D 9"
-msgstr "Direct3D 9"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:65
-msgid "Filters"
-msgstr "Filtri"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:79
-msgid "Display filter :"
-msgstr "Filtro display:"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:86
-msgid "2xSaI"
-msgstr "2xSal"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:87
-msgid "Super 2xSaI"
-msgstr "Super 2xSal"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:88
-msgid "Super Eagle"
-msgstr "Super Eagle"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:89
-msgid "Pixelate"
-msgstr "Pixelato"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:90
-msgid "Advance MAME Scale2x"
-msgstr "Advance MAME Scale2x"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:91
-msgid "Bilinear"
-msgstr "Bilineare"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:92
-msgid "Bilinear Plus"
-msgstr "Bilineare Plus"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:93
-msgid "Scanlines"
-msgstr "Linee di scansione"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:94
-msgid "TV Mode"
-msgstr "Modalità TV"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:95
-msgid "HQ 2x"
-msgstr "HQ 2x"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:96
-msgid "LQ 2x"
-msgstr "LQ 2x"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:97
-msgid "Simple 2x"
-msgstr "2x Semplice"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:98
-msgid "Simple 3x"
-msgstr "3x Semplice"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:99
-msgid "HQ 3x"
-msgstr "HQ 3x"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:100
-msgid "Simple 4x"
-msgstr "4x Semplice"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:101
-msgid "HQ 4x"
-msgstr "HQ 4x"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:102
-msgid "xBRZ 2x"
-msgstr "xBRZ 2x"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:103
-msgid "xBRZ 3x"
-msgstr "xBRZ 3x"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:104
-msgid "xBRZ 4x"
-msgstr "xBRZ 4x"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:105
-msgid "xBRZ 5x"
-msgstr "xBRZ 5x"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:106
-msgid "xBRZ 6x"
-msgstr "xBRZ 6x"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:115
-msgid "Plugin :"
-msgstr "Plugin :"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:127
-msgid "Interframe blending :"
-msgstr "Blending inter-frame"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:136
-msgid "Smart interframe blending"
-msgstr "Fusione interframe intelligente"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:137
-msgid "Interframe motion blur"
-msgstr "Moltion blur inter-frame"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:151 ../src/wx/xrc/SoundConfig.xrc:91
-msgid "Basic"
-msgstr "Basico"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:159
-msgid "Frame Skip"
-msgstr "Frameskip"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:177
-msgid "&Number of frames to skip :"
-msgstr "&Numero di frame da saltare :"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:199
-msgid "Speed"
-msgstr "Velocità"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:215
-msgid "Speed indicator :"
-msgstr "Indicatore di velocità"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:222
-msgid "Percentage"
-msgstr "Percentuale"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:223
-msgid "Detailed"
-msgstr "Dettagliato"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:237
-msgid "On-Screen Display"
-msgstr "Display a schermo"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:247
-msgid "Default magnification :"
-msgstr "Ingrandimento di default:"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:266
-msgid "Maximum magnification factor :"
-msgstr "Fattore di ingrandimento massimo:"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:267
-msgid "0 = no maximum"
-msgstr "0 = senza massimo"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:275
-msgid "0 = no limit"
-msgstr "0 = senza limite"
-
-#: ../src/wx/xrc/DisplayConfig.xrc:285
-msgid "Zoom"
-msgstr "Zoom"
-
-#: ../src/wx/xrc/ExportSPS.xrc:10
-msgid "Title:"
-msgstr "Titolo:"
-
-#: ../src/wx/xrc/ExportSPS.xrc:22
-msgid "Description:"
-msgstr "Descrizione:"
-
-#: ../src/wx/xrc/ExportSPS.xrc:34
-msgid "Notes:"
-msgstr "Note:"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:4
-msgid "Game Boy Advance settings"
-msgstr "Impostazioni Game Boy Advance"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:21
-msgid "Save type :"
-msgstr "Tipo di salvataggio :"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:27
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:178
-#: ../src/wx/xrc/GameBoyConfig.xrc:29 ../src/wx/xrc/GameBoyConfig.xrc:59
-msgid "Automatic"
-msgstr "Automatico"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:28
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:179
-msgid "EEPROM"
-msgstr "EEPROM"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:29
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:180
-msgid "SRAM"
-msgstr "SRAM"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:30
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:181
-msgid "Flash"
-msgstr "Flash"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:31
-msgid "EEPROM + Sensor"
-msgstr "EEPROM + Sensore"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:43
-msgid "Flash size :"
-msgstr "Dimensioni Flash:"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:49
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:200
-msgid "64K"
-msgstr "64K"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:50
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:201
-msgid "128K"
-msgstr "128K"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:64
-msgid "Detect Now"
-msgstr "Individua Ora"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:69
-msgid "Cartridge"
-msgstr "Cartuccia"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:77
-msgid "Save type"
-msgstr "Tipo di salvataggio"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:92
-msgid "Bios file :"
-msgstr "File BIOS :"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:115
-#: ../src/wx/xrc/GameBoyConfig.xrc:126
-msgid "Boot ROM"
-msgstr "ROM di avvio"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:125
-msgid "Game Code"
-msgstr "Codice Gioco"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:139
-msgid "Comment"
-msgstr "Commento"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:151
-msgid "Real Time Clock:"
-msgstr "RTC:"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:159
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:177
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:199
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:217
-#: ../src/wx/xrc/GameBoyConfig.xrc:138
-msgid "Default"
-msgstr "Default"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:160
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:218
-msgid "Disabled"
-msgstr "Disattivato"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:161
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:219
-msgid "Enabled"
-msgstr "Attivato"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:169
-msgid "Save Type:"
-msgstr "Tipo di Salvataggio:"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:182
-msgid "EEPROM+Sensor"
-msgstr "EEPROM+Sensore"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:191
-msgid "Flash Size:"
-msgstr "Dimensioni Flash:"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:209
-msgid "Mirroring:"
-msgstr "Mirroring:"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:233
-msgid "&Defaults"
-msgstr "&Defaults"
-
-#: ../src/wx/xrc/GameBoyAdvanceConfig.xrc:240
-msgid "Game Overrides"
-msgstr "Impostazioni speciali per questo gioco"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:4
-msgid "GameBoy settings"
-msgstr "Impostazioni GameBoy"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:20
-msgid "Emulated &system :"
-msgstr "Sistema emulato :"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:30
-msgid "Game Boy Color"
-msgstr "Game Boy Color"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:31
-msgid "Super Game Boy"
-msgstr "Super Game Boy"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:32 ../src/wx/xrc/SoundConfig.xrc:290
-msgid "Game Boy"
-msgstr "Game Boy"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:33 ../src/wx/xrc/SoundConfig.xrc:335
-msgid "Game Boy Advance"
-msgstr "Game Boy Advance"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:34
-msgid "Super Game Boy 2"
-msgstr "Super Game Boy 2"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:48
-msgid "Display &borders :"
-msgstr "Bordi :"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:57
-msgid "Never"
-msgstr "Mai"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:58
-msgid "Always"
-msgstr "Sempre"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:72
-msgid "System"
-msgstr "Sistema"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:84
-msgid "Boot &ROM file :"
-msgstr "File ROM di avvio :"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:91 ../src/wx/xrc/GameBoyConfig.xrc:113
-msgid "Select A File"
-msgstr "Scegli File"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:106
-msgid "GBC Boot ROM &file :"
-msgstr "File ROM di avvio GBC :"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:144
-msgid "User 1"
-msgstr "Utente 1"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:150
-msgid "User 2"
-msgstr "Utente 2"
-
-#: ../src/wx/xrc/GameBoyConfig.xrc:156
-msgid "Custom Colors"
-msgstr "Colori personalizzati"
-
-#: ../src/wx/xrc/GBAROMInfo.xrc:4 ../src/wx/xrc/GBROMInfo.xrc:4
-msgid "Rom Information"
-msgstr "Info ROM"
-
-#: ../src/wx/xrc/GBAROMInfo.xrc:11 ../src/wx/xrc/GBROMInfo.xrc:12
-msgid "Game title:"
-msgstr "Nome gioco:"
-
-#: ../src/wx/xrc/GBAROMInfo.xrc:23
-msgid "Internal title:"
-msgstr "Nome interno:"
-
-#: ../src/wx/xrc/GBAROMInfo.xrc:35
-msgid "Scene Release:"
-msgstr "Release Scena"
-
-#: ../src/wx/xrc/GBAROMInfo.xrc:47
-msgid "Release Number:"
-msgstr "Numero Release:"
-
-#: ../src/wx/xrc/GBAROMInfo.xrc:59
-msgid "CRC32:"
-msgstr "CRC32:"
-
-#: ../src/wx/xrc/GBAROMInfo.xrc:71
-msgid "Game code:"
-msgstr "Codice gioco:"
-
-#: ../src/wx/xrc/GBAROMInfo.xrc:83 ../src/wx/xrc/GBROMInfo.xrc:24
-msgid "Maker code:"
-msgstr "Codice produttore:"
-
-#: ../src/wx/xrc/GBAROMInfo.xrc:95 ../src/wx/xrc/GBROMInfo.xrc:36
-msgid "Maker name:"
-msgstr "Nome produttore:"
-
-#: ../src/wx/xrc/GBAROMInfo.xrc:107
-msgid "Main unit code:"
-msgstr "Codice unità principale:"
-
-#: ../src/wx/xrc/GBAROMInfo.xrc:119
-msgid "Device type:"
-msgstr "Tipo di dispositivo:"
-
-#: ../src/wx/xrc/GBAROMInfo.xrc:131 ../src/wx/xrc/GBROMInfo.xrc:72
-msgid "ROM version:"
-msgstr "Versione ROM:"
-
-#: ../src/wx/xrc/GBAROMInfo.xrc:143 ../src/wx/xrc/GBROMInfo.xrc:84
-msgid "CRC:"
-msgstr "CRC:"
-
-#: ../src/wx/xrc/GBAROMInfo.xrc:150
-msgid "ROM Information"
-msgstr "Info ROM:"
-
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:10 ../src/wx/xrc/JoyPanel.xrc:167
-msgid "Standard"
-msgstr "Standard"
-
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:11
-msgid "Blue Sea"
-msgstr "Mare Blu"
-
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:12
-msgid "Dark Night"
-msgstr "Notte Scura"
-
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:13
-msgid "Green Forest"
-msgstr "Foresta Verde"
-
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:14
-msgid "Hot Desert"
-msgstr "Deserto Caldo"
-
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:15
-msgid "Pink Dreams"
-msgstr "Rosa Sogno"
-
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:16
-msgid "Weird Colors"
-msgstr "Colori Strani"
-
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:17
-msgid "Real GB Colors"
-msgstr "Veri colori GB"
-
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:18
-msgid "Real 'GB on GBASP' Colors"
-msgstr "Veri colori 'GB su GBASP'"
-
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:46 ../src/wx/xrc/GBPaletteViewer.xrc:17
-#: ../src/wx/xrc/MapViewer.xrc:54 ../src/wx/xrc/PaletteViewer.xrc:19
-msgid "Background"
-msgstr "Sfondo"
-
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:74
-msgid "Sprites"
-msgstr "Sprites"
-
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:84
-msgid "Use this palette"
-msgstr "Usa questa tavolozza"
-
-#: ../src/wx/xrc/GBColorPrefPanel.xrc:94
-msgid "Restore"
-msgstr "Ripristina"
-
-#: ../src/wx/xrc/GBDisassemble.xrc:43
-msgid "AF:"
-msgstr "AF:"
-
-#: ../src/wx/xrc/GBDisassemble.xrc:53 ../src/wx/xrc/GBDisassemble.xrc:70
-#: ../src/wx/xrc/GBDisassemble.xrc:87 ../src/wx/xrc/GBDisassemble.xrc:104
-#: ../src/wx/xrc/GBDisassemble.xrc:121 ../src/wx/xrc/GBDisassemble.xrc:138
-#: ../src/wx/xrc/GBDisassemble.xrc:155
-msgid "0000"
-msgstr "0000"
-
-#: ../src/wx/xrc/GBDisassemble.xrc:60
-msgid "BC:"
-msgstr "BC:"
-
-#: ../src/wx/xrc/GBDisassemble.xrc:77
-msgid "DE:"
-msgstr "DE:"
-
-#: ../src/wx/xrc/GBDisassemble.xrc:94
-msgid "HL:"
-msgstr "HL:"
-
-#: ../src/wx/xrc/GBDisassemble.xrc:145
-msgid "IFF:"
-msgstr "IFF:"
-
-#: ../src/wx/xrc/GBDisassemble.xrc:162
-msgid "LY:"
-msgstr "LY:"
-
-#: ../src/wx/xrc/GBDisassemble.xrc:191
-msgid "H"
-msgstr "H"
-
-#: ../src/wx/xrc/GBMapViewer.xrc:14
-msgid "0x8000"
-msgstr "0x8000"
-
-#: ../src/wx/xrc/GBMapViewer.xrc:20
-msgid "0x8800"
-msgstr "0x8800"
-
-#: ../src/wx/xrc/GBMapViewer.xrc:23 ../src/wx/xrc/GBTileViewer.xrc:42
-#: ../src/wx/xrc/TileViewer.xrc:58
-msgid "Char Base"
-msgstr "Base Char"
-
-#: ../src/wx/xrc/GBMapViewer.xrc:33
-msgid "0x9800"
-msgstr "0x9800"
-
-#: ../src/wx/xrc/GBMapViewer.xrc:39
-msgid "0x9C00"
-msgstr "0x9c00"
-
-#: ../src/wx/xrc/GBMapViewer.xrc:42
-msgid "Map Base"
-msgstr "Base Mappa"
-
-#: ../src/wx/xrc/GBMapViewer.xrc:54 ../src/wx/xrc/GBOAMViewer.xrc:88
-#: ../src/wx/xrc/GBTileViewer.xrc:68 ../src/wx/xrc/MapViewer.xrc:62
-#: ../src/wx/xrc/OAMViewer.xrc:104 ../src/wx/xrc/TileViewer.xrc:84
-msgid "Stretch to &fit"
-msgstr "Allarga per &adattare"
-
-#: ../src/wx/xrc/GBMapViewer.xrc:59 ../src/wx/xrc/MapViewer.xrc:67
-msgid "Auto &update"
-msgstr "Aggiornamento &automatico"
-
-#: ../src/wx/xrc/GBMapViewer.xrc:74 ../src/wx/xrc/GBTileViewer.xrc:99
-#: ../src/wx/xrc/MapViewer.xrc:144 ../src/wx/xrc/MemSelRegion.xrc:10
-#: ../src/wx/xrc/PaletteViewer.xrc:50 ../src/wx/xrc/TileViewer.xrc:115
-msgid "Address:"
-msgstr "Indirizzo:"
-
-#: ../src/wx/xrc/GBMapViewer.xrc:82 ../src/wx/xrc/GBOAMViewer.xrc:37
-#: ../src/wx/xrc/GBTileViewer.xrc:91 ../src/wx/xrc/MapViewer.xrc:152
-#: ../src/wx/xrc/OAMViewer.xrc:61 ../src/wx/xrc/TileViewer.xrc:107
-msgid "Tile:"
-msgstr "Tile:"
-
-#: ../src/wx/xrc/GBMapViewer.xrc:90 ../src/wx/xrc/MapViewer.xrc:160
-msgid "Flip:"
-msgstr "Ribalta:"
-
-#: ../src/wx/xrc/GBMapViewer.xrc:98 ../src/wx/xrc/GBTileViewer.xrc:50
-#: ../src/wx/xrc/MapViewer.xrc:168 ../src/wx/xrc/TileViewer.xrc:66
-msgid "Palette:"
-msgstr "Tavolozza:"
-
-#: ../src/wx/xrc/GBMapViewer.xrc:106 ../src/wx/xrc/MapViewer.xrc:116
-msgid "Priority:"
-msgstr "Priorità:"
-
-#: ../src/wx/xrc/GBMapViewer.xrc:152 ../src/wx/xrc/GBOAMViewer.xrc:142
-#: ../src/wx/xrc/GBPaletteViewer.xrc:114 ../src/wx/xrc/GBTileViewer.xrc:145
-#: ../src/wx/xrc/IOViewer.xrc:327 ../src/wx/xrc/MapViewer.xrc:214
-#: ../src/wx/xrc/MemViewer.xrc:101 ../src/wx/xrc/OAMViewer.xrc:155
-#: ../src/wx/xrc/PaletteViewer.xrc:100 ../src/wx/xrc/TileViewer.xrc:161
-msgid "&Refresh"
-msgstr "&Aggiorna"
-
-#: ../src/wx/xrc/GBMapViewer.xrc:157 ../src/wx/xrc/Logging.xrc:112
-#: ../src/wx/xrc/MapViewer.xrc:219
-msgid "&Save"
-msgstr "&Salva"
-
-#: ../src/wx/xrc/GBOAMViewer.xrc:13 ../src/wx/xrc/OAMViewer.xrc:14
-msgid "Sprite:"
-msgstr "Sprite:"
-
-#: ../src/wx/xrc/GBOAMViewer.xrc:29 ../src/wx/xrc/OAMViewer.xrc:29
-msgid "Pos:"
-msgstr "Pos:"
-
-#: ../src/wx/xrc/GBOAMViewer.xrc:45 ../src/wx/xrc/OAMViewer.xrc:69
-msgid "Prio:"
-msgstr "Prio:"
-
-#: ../src/wx/xrc/GBOAMViewer.xrc:53
-msgid "OAP:"
-msgstr "OAP:"
-
-#: ../src/wx/xrc/GBOAMViewer.xrc:61 ../src/wx/xrc/OAMViewer.xrc:53
-msgid "Pal:"
-msgstr "Tav:"
-
-#: ../src/wx/xrc/GBOAMViewer.xrc:69 ../src/wx/xrc/OAMViewer.xrc:93
-msgid "Flags:"
-msgstr "Flags:"
-
-#: ../src/wx/xrc/GBOAMViewer.xrc:77
-msgid "Bank:"
-msgstr "Bank:"
-
-#: ../src/wx/xrc/GBOAMViewer.xrc:149 ../src/wx/xrc/GBTileViewer.xrc:152
-#: ../src/wx/xrc/MemViewer.xrc:115 ../src/wx/xrc/OAMViewer.xrc:162
-#: ../src/wx/xrc/TileViewer.xrc:168
-msgid "&Save..."
-msgstr "&Salva..."
-
-#: ../src/wx/xrc/GBPaletteViewer.xrc:8 ../src/wx/xrc/PaletteViewer.xrc:9
-msgid "Click on a color for more information"
-msgstr "Fai click su un colore per più informazioni"
-
-#: ../src/wx/xrc/GBPaletteViewer.xrc:27 ../src/wx/xrc/PaletteViewer.xrc:105
-msgid "Save &BG..."
-msgstr "Salva &BG..."
-
-#: ../src/wx/xrc/GBPaletteViewer.xrc:38 ../src/wx/xrc/PaletteViewer.xrc:33
-msgid "Sprite"
-msgstr "Sprite"
-
-#: ../src/wx/xrc/GBPaletteViewer.xrc:48 ../src/wx/xrc/PaletteViewer.xrc:111
-msgid "Save &Sprite..."
-msgstr "Salva &Sprite..."
-
-#: ../src/wx/xrc/GBPaletteViewer.xrc:67
-msgid "Index:"
-msgstr "Indice:"
-
-#: ../src/wx/xrc/GBPaletteViewer.xrc:79 ../src/wx/xrc/IOViewer.xrc:21
-#: ../src/wx/xrc/PaletteViewer.xrc:62
-msgid "Value:"
-msgstr "Valore:"
-
-#: ../src/wx/xrc/GBPrinter.xrc:21
-msgid "Print Si&ze"
-msgstr "Grandezza St&ampa"
-
-#: ../src/wx/xrc/GBPrinter.xrc:29
-msgid "1x"
-msgstr "1x"
-
-#: ../src/wx/xrc/GBPrinter.xrc:30
-msgid "2x"
-msgstr "2x"
-
-#: ../src/wx/xrc/GBPrinter.xrc:31
-msgid "3x"
-msgstr "3x"
-
-#: ../src/wx/xrc/GBPrinter.xrc:32
-msgid "4x"
-msgstr "4x"
-
-#: ../src/wx/xrc/GBPrinter.xrc:58
-msgid "C&ontinue"
-msgstr "C&ontinua"
-
-#: ../src/wx/xrc/GBROMInfo.xrc:48
-msgid "Unit code:"
-msgstr "Codice unità:"
-
-#: ../src/wx/xrc/GBROMInfo.xrc:60
-msgid "Cartridge type:"
-msgstr "Tipo di cartuccia:"
-
-#: ../src/wx/xrc/GBROMInfo.xrc:96
-msgid "Color:"
-msgstr "Colore:"
-
-#: ../src/wx/xrc/GBROMInfo.xrc:108
-msgid "ROM size:"
-msgstr "Dimensione ROM:"
-
-#: ../src/wx/xrc/GBROMInfo.xrc:120
-msgid "RAM size:"
-msgstr "Dimensione RAM:"
-
-#: ../src/wx/xrc/GBROMInfo.xrc:132
-msgid "Dest. code:"
-msgstr "Codice dest.:"
-
-#: ../src/wx/xrc/GBROMInfo.xrc:144
-msgid "License code:"
-msgstr "Codice licenza:"
-
-#: ../src/wx/xrc/GBROMInfo.xrc:156
-msgid "Checksum:"
-msgstr "Checksum:"
-
-#: ../src/wx/xrc/GBTileViewer.xrc:14
-msgid "&0"
-msgstr "&0"
-
-#: ../src/wx/xrc/GBTileViewer.xrc:20 ../src/wx/xrc/MainMenu.xrc:47
-#: ../src/wx/xrc/MainMenu.xrc:97
-msgid "&1"
-msgstr "&1"
-
-#: ../src/wx/xrc/GBTileViewer.xrc:23
-msgid "VRAM Bank"
-msgstr "Banca VRAM"
-
-#: ../src/wx/xrc/GBTileViewer.xrc:33
-msgid "0x&8000"
-msgstr "0x8000"
-
-#: ../src/wx/xrc/GBTileViewer.xrc:39
-msgid "0x&8800"
-msgstr "0x8800"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:4
-msgid "General settings"
-msgstr "Impostazioni generali"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:9
-msgid "General"
-msgstr "Generali"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:26
-msgid "Check for updates:"
-msgstr "Controlla aggiornamenti:"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:33
-msgid "&Never"
-msgstr "&Mai"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:42
-msgid "&Daily"
-msgstr "&Giornalmente"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:50
-msgid "&Weekly"
-msgstr "&Settimanalmente"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:64
-msgid "Screenshot Format:"
-msgstr "Formato Screenshot:"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:71
-msgid "&PNG"
-msgstr "&PNG"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:80
-msgid "&BMP"
-msgstr "&BMP"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:95
-msgid "&Rewind interval :"
-msgstr "&Intervallo riavvolgimento :"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:96
-msgid "If not empty or 0, enable rewind (seconds)"
-msgstr "Se non è vuoto o 0, abilita riavvolgimento (in secondi)"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:105
-msgid "seconds (0-600); 0 = disable"
-msgstr "secondi (0-600); 0 = disabilita"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:116
-msgid "&Throttle"
-msgstr "&Velocità"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:134 ../src/wx/xrc/SpeedupConfig.xrc:27
-#, c-format
-msgid "% of normal:"
-msgstr "% normale:"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:144
-msgid "0 = no throttle"
-msgstr "0 = senza limite"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:153 ../src/wx/xrc/SpeedupConfig.xrc:46
-msgid "25%"
-msgstr "25%"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:154 ../src/wx/xrc/SpeedupConfig.xrc:47
-msgid "50%"
-msgstr "50%"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:155 ../src/wx/xrc/SpeedupConfig.xrc:48
-msgid "75%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:156 ../src/wx/xrc/SoundConfig.xrc:45
-#: ../src/wx/xrc/SpeedupConfig.xrc:49
-msgid "100%"
-msgstr "100%"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:157 ../src/wx/xrc/SpeedupConfig.xrc:50
-msgid "125%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:158 ../src/wx/xrc/SpeedupConfig.xrc:51
-msgid "150%"
-msgstr "150%"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:159 ../src/wx/xrc/SpeedupConfig.xrc:52
-msgid "175%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:160 ../src/wx/xrc/SpeedupConfig.xrc:53
-msgid "200%"
-msgstr "200%"
-
-#: ../src/wx/xrc/GeneralConfig.xrc:161 ../src/wx/xrc/SpeedupConfig.xrc:54
-msgid "225%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:162 ../src/wx/xrc/SpeedupConfig.xrc:55
-msgid "250%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:163 ../src/wx/xrc/SpeedupConfig.xrc:56
-msgid "275%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:164 ../src/wx/xrc/SpeedupConfig.xrc:57
-msgid "300%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:165 ../src/wx/xrc/SpeedupConfig.xrc:58
-msgid "325%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:166 ../src/wx/xrc/SpeedupConfig.xrc:59
-msgid "350%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:167 ../src/wx/xrc/SpeedupConfig.xrc:60
-msgid "375%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:168 ../src/wx/xrc/SpeedupConfig.xrc:61
-msgid "400%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:169 ../src/wx/xrc/SpeedupConfig.xrc:62
-msgid "425%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:170 ../src/wx/xrc/SpeedupConfig.xrc:63
-msgid "450%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:171 ../src/wx/xrc/SpeedupConfig.xrc:64
-msgid "475%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:172 ../src/wx/xrc/SpeedupConfig.xrc:65
-msgid "500%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:173 ../src/wx/xrc/SpeedupConfig.xrc:66
-msgid "525%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:174 ../src/wx/xrc/SpeedupConfig.xrc:67
-msgid "550%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:175 ../src/wx/xrc/SpeedupConfig.xrc:68
-msgid "575%"
-msgstr ""
-
-#: ../src/wx/xrc/GeneralConfig.xrc:176 ../src/wx/xrc/SpeedupConfig.xrc:69
-msgid "600%"
-msgstr ""
-
-#: ../src/wx/xrc/IOViewer.xrc:4
-msgid "IO Viewer"
-msgstr "Visualizzatore IO"
-
-#: ../src/wx/xrc/IOViewer.xrc:10
-msgid "a"
-msgstr "a"
-
-#: ../src/wx/xrc/IOViewer.xrc:11
-msgid "b"
-msgstr "b"
-
-#: ../src/wx/xrc/IOViewer.xrc:47
-msgid "15 "
-msgstr "15"
-
-#: ../src/wx/xrc/IOViewer.xrc:64
-msgid "14 "
-msgstr "14"
-
-#: ../src/wx/xrc/IOViewer.xrc:81
-msgid "13 "
-msgstr "13"
-
-#: ../src/wx/xrc/IOViewer.xrc:98
-msgid "12 "
-msgstr "12"
-
-#: ../src/wx/xrc/IOViewer.xrc:115
-msgid "11 "
-msgstr "11"
-
-#: ../src/wx/xrc/IOViewer.xrc:132
-msgid "10 "
-msgstr "10"
-
-#: ../src/wx/xrc/IOViewer.xrc:149
-msgid "9 "
-msgstr "9"
-
-#: ../src/wx/xrc/IOViewer.xrc:166
-msgid "8 "
-msgstr "8"
-
-#: ../src/wx/xrc/IOViewer.xrc:183
-msgid "7 "
-msgstr "7"
-
-#: ../src/wx/xrc/IOViewer.xrc:200
-msgid "6 "
-msgstr "6"
-
-#: ../src/wx/xrc/IOViewer.xrc:217
-msgid "5 "
-msgstr "5"
-
-#: ../src/wx/xrc/IOViewer.xrc:234
-msgid "4 "
-msgstr "4"
-
-#: ../src/wx/xrc/IOViewer.xrc:251
-msgid "3 "
-msgstr "3"
-
-#: ../src/wx/xrc/IOViewer.xrc:268
-msgid "2 "
-msgstr "2"
-
-#: ../src/wx/xrc/IOViewer.xrc:285
-msgid "1 "
-msgstr "1"
-
-#: ../src/wx/xrc/IOViewer.xrc:302
-msgid "0 "
-msgstr "0"
-
-#: ../src/wx/xrc/JoypadConfig.xrc:4
-msgid "Joypad Configuration"
-msgstr "Configurazione Joypad"
-
-#: ../src/wx/xrc/JoypadConfig.xrc:13
-msgid "Player 1"
-msgstr "Giocatore 1"
-
-#: ../src/wx/xrc/JoypadConfig.xrc:19
-msgid "Player 2"
-msgstr "Giocatore 2"
-
-#: ../src/wx/xrc/JoypadConfig.xrc:25
-msgid "Player 3"
-msgstr "Giocatore 3"
-
-#: ../src/wx/xrc/JoypadConfig.xrc:31
-msgid "Player 4"
-msgstr "Giocatore 4"
-
-#: ../src/wx/xrc/JoyPanel.xrc:8
-msgid ""
-"Click a field and press a key or move joystick to add.  Press backspace to "
-"delete last added key.  Resize window or click inside and move pointer to "
-"see entire contents if too small."
-msgstr "Fai click su un campo e premi un tasto o muovi il joystick per aggiungere. Premi Backspace per annullare l'ultimo tasto aggiunto. Ridimensiona la finestra o fai click all'interno e muovi il puntatore per vedere tutto il contenuto se è troppo piccolo."
-
-#: ../src/wx/xrc/JoyPanel.xrc:14
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
+#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:450
 msgid "Up"
 msgstr "Su"
 
-#: ../src/wx/xrc/JoyPanel.xrc:29
-msgid "A"
-msgstr "A"
-
-#: ../src/wx/xrc/JoyPanel.xrc:44
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
+#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:454
 msgid "Down"
 msgstr "Giù"
 
-#: ../src/wx/xrc/JoyPanel.xrc:59
-msgid "B"
-msgstr "B"
-
-#: ../src/wx/xrc/JoyPanel.xrc:74
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
+#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:458
 msgid "Left"
 msgstr "Sinistra"
 
-#: ../src/wx/xrc/JoyPanel.xrc:89
-msgid "L"
-msgstr "L"
-
-#: ../src/wx/xrc/JoyPanel.xrc:104
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
+#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:462
 msgid "Right"
 msgstr "Destra"
 
-#: ../src/wx/xrc/JoyPanel.xrc:119
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
+#: xrc/JoyPanel.xrc:37
+msgid "A"
+msgstr "A"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
+#: xrc/JoyPanel.xrc:83
+msgid "B"
+msgstr "B"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
+#: xrc/JoyPanel.xrc:129
+msgid "L"
+msgstr "L"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
+#: xrc/JoyPanel.xrc:175
 msgid "R"
 msgstr "R"
 
-#: ../src/wx/xrc/JoyPanel.xrc:135
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
+#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:482
 msgid "Select"
 msgstr "Select"
 
-#: ../src/wx/xrc/JoyPanel.xrc:150
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
+#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:486
 msgid "Start"
 msgstr "Start"
 
-#: ../src/wx/xrc/JoyPanel.xrc:174
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
+#: xrc/JoyPanel.xrc:254
 msgid "Motion Up"
 msgstr "Movimento Su"
 
-#: ../src/wx/xrc/JoyPanel.xrc:188
-msgid "Autofire A"
-msgstr "Fuoco automatico A"
-
-#: ../src/wx/xrc/JoyPanel.xrc:202
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
+#: xrc/JoyPanel.xrc:298
 msgid "Motion Down"
 msgstr "Movimento Giù"
 
-#: ../src/wx/xrc/JoyPanel.xrc:216
-msgid "Autofire B"
-msgstr "Fuoco automatico B"
-
-#: ../src/wx/xrc/JoyPanel.xrc:230
-msgid "Motion Left/Dark"
-msgstr "Movimento a Sinistra / Scuro"
-
-#: ../src/wx/xrc/JoyPanel.xrc:258
-msgid "Motion Right/Light"
-msgstr "Movimento a Destra / Chiaro"
-
-#: ../src/wx/xrc/JoyPanel.xrc:272
-msgid "Speed Up"
-msgstr "Aumenta Velocità"
-
-#: ../src/wx/xrc/JoyPanel.xrc:286
-msgid "Spin Left"
-msgstr "Gira a Sinistra"
-
-#: ../src/wx/xrc/JoyPanel.xrc:306
-msgid "Spin Right"
-msgstr "Gira a Destra"
-
-#: ../src/wx/xrc/JoyPanel.xrc:320
-msgid "Screenshot"
-msgstr "Screenshot"
-
-#: ../src/wx/xrc/JoyPanel.xrc:336
-msgid "Special"
-msgstr "Speciale"
-
-#: ../src/wx/xrc/JoyPanel.xrc:344
-msgid "Use as default"
-msgstr "Usa come Predefinito"
-
-#: ../src/wx/xrc/JoyPanel.xrc:351
-msgid "Defaults"
-msgstr "Predefiniti"
-
-#: ../src/wx/xrc/JoyPanel.xrc:358
-msgid "Clear"
-msgstr "Elimina"
-
-#: ../src/wx/xrc/LinkConfig.xrc:4
-msgid "Link configuration"
-msgstr "Impostazione Link"
-
-#: ../src/wx/xrc/LinkConfig.xrc:11
-msgid "Link timeout (in milliseconds)"
-msgstr "Timeout Link (in millisecondi)"
-
-#: ../src/wx/xrc/Logging.xrc:4
-msgid "Logging"
-msgstr "Logging"
-
-#: ../src/wx/xrc/Logging.xrc:13
-msgid "SW&I"
-msgstr "SW&I"
-
-#: ../src/wx/xrc/Logging.xrc:20
-msgid "Unaligned &memory"
-msgstr "Memoria &non allineata"
-
-#: ../src/wx/xrc/Logging.xrc:27
-msgid "Illegal &write"
-msgstr "Scrittura &illegale"
-
-#: ../src/wx/xrc/Logging.xrc:34
-msgid "Illegal &read"
-msgstr "Lettura &illegale"
-
-#: ../src/wx/xrc/Logging.xrc:41
-msgid "DMA &0"
-msgstr "DMA &0"
-
-#: ../src/wx/xrc/Logging.xrc:48
-msgid "DMA &1"
-msgstr "DMA &1"
-
-#: ../src/wx/xrc/Logging.xrc:55
-msgid "DMA &2"
-msgstr "DMA &2"
-
-#: ../src/wx/xrc/Logging.xrc:62
-msgid "DMA &3"
-msgstr "DMA &3"
-
-#: ../src/wx/xrc/Logging.xrc:69
-msgid "&Undefined instruction"
-msgstr "&istruzione non definita"
-
-#: ../src/wx/xrc/Logging.xrc:76
-msgid "&AGBPrint"
-msgstr "&AGBPrint"
-
-#: ../src/wx/xrc/Logging.xrc:83
-msgid "Soun&d output"
-msgstr "Outpu&t suono"
-
-#: ../src/wx/xrc/Logging.xrc:88
-msgid "Verbose"
-msgstr "Verboso"
-
-#: ../src/wx/xrc/MainMenu.xrc:5
-msgid "&File"
-msgstr "&File"
-
-#: ../src/wx/xrc/MainMenu.xrc:8
-msgid "Open &GB..."
-msgstr "Apri ROM &GB"
-
-#: ../src/wx/xrc/MainMenu.xrc:11
-msgid "Open GB&C..."
-msgstr "Apri ROM GB&C"
-
-#: ../src/wx/xrc/MainMenu.xrc:14
-msgid "Open rece&nt"
-msgstr "Apri ROM rece&nte"
-
-#: ../src/wx/xrc/MainMenu.xrc:16
-msgid "&Reset recent list"
-msgstr "&Pulisci lista ROM recenti"
-
-#: ../src/wx/xrc/MainMenu.xrc:19
-msgid "&Freeze recent list"
-msgstr "&Blocca lista ROM recenti"
-
-#: ../src/wx/xrc/MainMenu.xrc:24
-msgid "ROM in&formation..."
-msgstr "Info ROM..."
-
-#: ../src/wx/xrc/MainMenu.xrc:28
-msgid "&e-Reader"
-msgstr "&e-Reader"
-
-#: ../src/wx/xrc/MainMenu.xrc:30
-msgid "&Load Dot Code..."
-msgstr "&Carica Dot Code..."
-
-#: ../src/wx/xrc/MainMenu.xrc:33
-msgid "&Save Dot Code..."
-msgstr "&Salva Dot Code..."
-
-#: ../src/wx/xrc/MainMenu.xrc:39
-msgid "Most &recent"
-msgstr "Più &recente"
-
-#: ../src/wx/xrc/MainMenu.xrc:42
-msgid "&Auto load most recent"
-msgstr "&Autocarica il più recente"
-
-#: ../src/wx/xrc/MainMenu.xrc:50 ../src/wx/xrc/MainMenu.xrc:100
-msgid "&2"
-msgstr "&2"
-
-#: ../src/wx/xrc/MainMenu.xrc:53 ../src/wx/xrc/MainMenu.xrc:103
-msgid "&3"
-msgstr "&3"
-
-#: ../src/wx/xrc/MainMenu.xrc:56 ../src/wx/xrc/MainMenu.xrc:106
-msgid "&4"
-msgstr "&4"
-
-#: ../src/wx/xrc/MainMenu.xrc:59 ../src/wx/xrc/MainMenu.xrc:109
-msgid "&5"
-msgstr "&5"
-
-#: ../src/wx/xrc/MainMenu.xrc:62 ../src/wx/xrc/MainMenu.xrc:112
-msgid "&6"
-msgstr "&6"
-
-#: ../src/wx/xrc/MainMenu.xrc:65 ../src/wx/xrc/MainMenu.xrc:115
-msgid "&7"
-msgstr "&7"
-
-#: ../src/wx/xrc/MainMenu.xrc:68 ../src/wx/xrc/MainMenu.xrc:118
-msgid "&8"
-msgstr "&8"
-
-#: ../src/wx/xrc/MainMenu.xrc:71 ../src/wx/xrc/MainMenu.xrc:121
-msgid "&9"
-msgstr "&9"
-
-#: ../src/wx/xrc/MainMenu.xrc:74 ../src/wx/xrc/MainMenu.xrc:124
-msgid "1&0"
-msgstr "1&0"
-
-#: ../src/wx/xrc/MainMenu.xrc:78
-msgid "From &File ..."
-msgstr "Da &File..."
-
-#: ../src/wx/xrc/MainMenu.xrc:82
-msgid "Do not change &battery save"
-msgstr "Non cambiare il &salvataggio a batteria"
-
-#: ../src/wx/xrc/MainMenu.xrc:86
-msgid "Do not change &cheat list"
-msgstr "Non cambiare lista di &codici"
-
-#: ../src/wx/xrc/MainMenu.xrc:89
-msgid "&Load state"
-msgstr "&Carica stato"
-
-#: ../src/wx/xrc/MainMenu.xrc:93
-msgid "&Oldest slot"
-msgstr "&Slot più vecchio"
-
-#: ../src/wx/xrc/MainMenu.xrc:128
-msgid "To &File ..."
-msgstr "A &File"
-
-#: ../src/wx/xrc/MainMenu.xrc:130
-msgid "&Save state"
-msgstr "&Salva stato"
-
-#: ../src/wx/xrc/MainMenu.xrc:135 ../src/wx/xrc/MainMenu.xrc:147
-msgid "&Battery file..."
-msgstr "&File batteria..."
-
-#: ../src/wx/xrc/MainMenu.xrc:138
-msgid "Gameshark &code file..."
-msgstr "File &codici GameShark..."
-
-#: ../src/wx/xrc/MainMenu.xrc:141 ../src/wx/xrc/MainMenu.xrc:150
-msgid "&Gameshark snapshot..."
-msgstr "&Snapshot Gameshark..."
-
-#: ../src/wx/xrc/MainMenu.xrc:143
-msgid "&Import"
-msgstr "&Importa"
-
-#: ../src/wx/xrc/MainMenu.xrc:152
-msgid "&Export"
-msgstr "&Esporta"
-
-#: ../src/wx/xrc/MainMenu.xrc:156
-msgid "Screen capt&ure..."
-msgstr "Cattura sche&rmo"
-
-#: ../src/wx/xrc/MainMenu.xrc:160
-msgid "Start &sound recording..."
-msgstr "Inizia registrazione &suono..."
-
-#: ../src/wx/xrc/MainMenu.xrc:163
-msgid "Stop s&ound recording"
-msgstr "Ferma registrazione s&uono"
-
-#: ../src/wx/xrc/MainMenu.xrc:166
-msgid "Start &video recording..."
-msgstr "Inizia registrazione &video..."
-
-#: ../src/wx/xrc/MainMenu.xrc:169
-msgid "Stop v&ideo recording"
-msgstr "Ferma registrazione v&ideo"
-
-#: ../src/wx/xrc/MainMenu.xrc:172
-msgid "Start &game recording..."
-msgstr "Inizia registrazione &gioco..."
-
-#: ../src/wx/xrc/MainMenu.xrc:175
-msgid "Stop g&ame recording"
-msgstr "Ferma registrazione g&ioco"
-
-#: ../src/wx/xrc/MainMenu.xrc:177
-msgid "&Record"
-msgstr "&Registra"
-
-#: ../src/wx/xrc/MainMenu.xrc:181
-msgid "Start playing &movie..."
-msgstr "Riproduci &filmato..."
-
-#: ../src/wx/xrc/MainMenu.xrc:184
-msgid "Stop playing m&ovie"
-msgstr "Ferma il f&ilmato"
-
-#: ../src/wx/xrc/MainMenu.xrc:186
-msgid "&Play"
-msgstr "&Riproduci"
-
-#: ../src/wx/xrc/MainMenu.xrc:193
-msgid "&Emulation"
-msgstr "&Emulazione"
-
-#: ../src/wx/xrc/MainMenu.xrc:195
-msgid "&Pause"
-msgstr "&Pausa"
-
-#: ../src/wx/xrc/MainMenu.xrc:199
-msgid "&Next frame"
-msgstr "&Prossimo frame"
-
-#: ../src/wx/xrc/MainMenu.xrc:202
-msgid "Re&wind"
-msgstr "Ri&avvogimento"
-
-#: ../src/wx/xrc/MainMenu.xrc:206
-msgid "Toggle &full screen"
-msgstr "Schermo &intero"
-
-#: ../src/wx/xrc/MainMenu.xrc:213
-msgid "&Turbo mode"
-msgstr "Modalità &turbo"
-
-#: ../src/wx/xrc/MainMenu.xrc:217
-msgid "&VSync"
-msgstr "&VSync"
-
-#: ../src/wx/xrc/MainMenu.xrc:221
-msgid "&Auto skip frames"
-msgstr "&Salta frame automaticamente"
-
-#: ../src/wx/xrc/MainMenu.xrc:226
-msgid "&Skip BIOS"
-msgstr "&Salta BIOS"
-
-#: ../src/wx/xrc/MainMenu.xrc:230
-msgid "&Auto IPS/UPS/IPF patch"
-msgstr "&Patch automatica IPS/UPS/IPF"
-
-#: ../src/wx/xrc/MainMenu.xrc:234
-msgid "&Pause when inactive"
-msgstr "&Pausa quando inattivo"
-
-#: ../src/wx/xrc/MainMenu.xrc:239
-msgid "&Reset"
-msgstr "&Reset"
-
-#: ../src/wx/xrc/MainMenu.xrc:243
-msgid "&Options"
-msgstr "&Opzioni"
-
-#: ../src/wx/xrc/MainMenu.xrc:245
-msgid "&Link"
-msgstr "&Link"
-
-#: ../src/wx/xrc/MainMenu.xrc:247
-msgid "Start &Network Link ..."
-msgstr "Inizia Link &Network ..."
-
-#: ../src/wx/xrc/MainMenu.xrc:252
-msgid "&Nothing"
-msgstr "&Niente"
-
-#: ../src/wx/xrc/MainMenu.xrc:256
-msgid "&Cable"
-msgstr "&Cavo"
-
-#: ../src/wx/xrc/MainMenu.xrc:260
-msgid "&Wireless"
-msgstr "&Wireless"
-
-#: ../src/wx/xrc/MainMenu.xrc:264
-msgid "&GameCube"
-msgstr "&GameCube"
-
-#: ../src/wx/xrc/MainMenu.xrc:268 ../src/wx/xrc/MainMenu.xrc:435
-msgid "&Game Boy"
-msgstr "&Game Boy"
-
-#: ../src/wx/xrc/MainMenu.xrc:273
-msgid "&Local mode"
-msgstr "&Modalità Locale"
-
-#: ../src/wx/xrc/MainMenu.xrc:277
-msgid "&Link at boot"
-msgstr "&Link all'avvio"
-
-#: ../src/wx/xrc/MainMenu.xrc:281
-msgid "&Speed hack"
-msgstr "&Speed hack"
-
-#: ../src/wx/xrc/MainMenu.xrc:285 ../src/wx/xrc/MainMenu.xrc:291
-#: ../src/wx/xrc/MainMenu.xrc:356 ../src/wx/xrc/MainMenu.xrc:392
-msgid "&Configure ..."
-msgstr "&Configura ..."
-
-#: ../src/wx/xrc/MainMenu.xrc:289
-msgid "&Video"
-msgstr "&Video"
-
-#: ../src/wx/xrc/MainMenu.xrc:295
-msgid "&Start in full screen"
-msgstr "&Avvia a schermo intero"
-
-#: ../src/wx/xrc/MainMenu.xrc:299
-msgid "&Quick resize"
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
+msgid "Motion Left"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:301
-msgid "&1x"
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
+msgid "Motion Right"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:304
-msgid "&2x"
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
+msgid "Motion In"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:307
-msgid "&3x"
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
+msgid "Motion Out"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:310
-msgid "&4x"
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
+msgid "Auto A"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:313
-msgid "&5x"
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
+msgid "Auto B"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:316
-msgid "&6x"
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
+#: xrc/DisplayConfig.xrc:410
+msgid "Speed"
+msgstr "Velocità"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
+msgid "Capture"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:320
-msgid "&Retain aspect ratio"
-msgstr "&Mantieni rapporto d'aspetto"
-
-#: ../src/wx/xrc/MainMenu.xrc:325
-msgid "&Bilinear filter"
-msgstr "&Filtro Bilineare"
-
-#: ../src/wx/xrc/MainMenu.xrc:336
-msgid "&Keep window on top"
-msgstr "&Sempre in primo piano"
-
-#: ../src/wx/xrc/MainMenu.xrc:341
-msgid "&Status bar"
-msgstr "&Barra di stato"
-
-#: ../src/wx/xrc/MainMenu.xrc:345
-msgid "&Disable on-screen display"
-msgstr "&Disabilita OSD"
-
-#: ../src/wx/xrc/MainMenu.xrc:349
-msgid "&Transparent on-screen display"
-msgstr "&OSD Trasparente"
-
-#: ../src/wx/xrc/MainMenu.xrc:354
-msgid "&Audio"
-msgstr "&Audio"
-
-#: ../src/wx/xrc/MainMenu.xrc:359
-msgid "&Increase volume"
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:33
+msgid "GameShark"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:363
-msgid "&Decrease volume"
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:107
+#, c-format
+msgid "Joypad %zu %s"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:367
-msgid "&Toggle sound"
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:431
+msgid "Use bilinear filter with 3d renderer"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:372
-msgid "&GBA sound interpolation"
-msgstr "&Interpolazione suono GBA"
-
-#: ../src/wx/xrc/MainMenu.xrc:377
-msgid "&GB sound enhancement"
-msgstr "&Milgioramento suono GB"
-
-#: ../src/wx/xrc/MainMenu.xrc:381
-msgid "&GB surround sound effect"
-msgstr "&Effetto surround suoni GB"
-
-#: ../src/wx/xrc/MainMenu.xrc:385
-msgid "&GB sound declicking"
-msgstr "&Suono declicking GB"
-
-#: ../src/wx/xrc/MainMenu.xrc:390
-msgid "&Input"
-msgstr "&Input"
-
-#: ../src/wx/xrc/MainMenu.xrc:396
-msgid "&Autofire"
-msgstr "&Fuoco automatico"
-
-#: ../src/wx/xrc/MainMenu.xrc:398
-msgid "&A"
-msgstr "&A"
-
-#: ../src/wx/xrc/MainMenu.xrc:402
-msgid "&B"
-msgstr "&B"
-
-#: ../src/wx/xrc/MainMenu.xrc:406
-msgid "&L"
-msgstr "&L"
-
-#: ../src/wx/xrc/MainMenu.xrc:410
-msgid "&R"
-msgstr "&R"
-
-#: ../src/wx/xrc/MainMenu.xrc:416
-msgid "&Game Boy Advance"
-msgstr "&Game Boy Advance"
-
-#: ../src/wx/xrc/MainMenu.xrc:418 ../src/wx/xrc/MainMenu.xrc:437
-msgid "Configure ..."
-msgstr "Configura ..."
-
-#: ../src/wx/xrc/MainMenu.xrc:422
-msgid "&Real-time clock"
-msgstr "&RTC"
-
-#: ../src/wx/xrc/MainMenu.xrc:426
-msgid "&Use BIOS file"
-msgstr "&Usa file BIOS"
-
-#: ../src/wx/xrc/MainMenu.xrc:430
-msgid "&Debug print"
-msgstr "&Stampa debug"
-
-#: ../src/wx/xrc/MainMenu.xrc:441
-msgid "&GB printer"
-msgstr "&Stampante GB"
-
-#: ../src/wx/xrc/MainMenu.xrc:445
-msgid "&Gather a full page before printing"
-msgstr "&Ottieni pagina intera prima di stampare"
-
-#: ../src/wx/xrc/MainMenu.xrc:449
-msgid "&Save printouts as screen captures"
-msgstr "&Salva stampati come catture di schermo"
-
-#: ../src/wx/xrc/MainMenu.xrc:454
-msgid "&Use GB BIOS file"
-msgstr "&Usa file BIOS GB"
-
-#: ../src/wx/xrc/MainMenu.xrc:458
-msgid "&Use GBC BIOS file"
-msgstr "&Usa file BIOS GBC"
-
-#: ../src/wx/xrc/MainMenu.xrc:463
-msgid "&General ..."
-msgstr "&Generale..."
-
-#: ../src/wx/xrc/MainMenu.xrc:466
-msgid "&Speedup / Turbo ..."
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:432
+msgid "Use the SDL pixel art filter with an SDL renderer"
 msgstr ""
 
-#: ../src/wx/xrc/MainMenu.xrc:469
-msgid "D&irectories ..."
-msgstr "C&artelle ..."
-
-#: ../src/wx/xrc/MainMenu.xrc:472
-msgid "&Key Shortcuts ..."
-msgstr "&Scorciatoie da Tastiera ..."
-
-#: ../src/wx/xrc/MainMenu.xrc:476
-msgid "&Tools"
-msgstr "&Strumenti"
-
-#: ../src/wx/xrc/MainMenu.xrc:478
-msgid "&Cheats"
-msgstr "&Trucchi"
-
-#: ../src/wx/xrc/MainMenu.xrc:480
-msgid "List &cheats ..."
-msgstr "Lista &trucchi ..."
-
-#: ../src/wx/xrc/MainMenu.xrc:483
-msgid "Find c&heat ..."
-msgstr "Trova t&rucco ..."
-
-#: ../src/wx/xrc/MainMenu.xrc:487
-msgid "A&utomatically save/load cheats"
-msgstr "Salva/Carica automaticamente trucchi"
-
-#: ../src/wx/xrc/MainMenu.xrc:491
-msgid "&Enable cheats"
-msgstr "&Abilita trucchi"
-
-#: ../src/wx/xrc/MainMenu.xrc:498
-msgid "&Break into GDB"
-msgstr "&Entra in GDB"
-
-#: ../src/wx/xrc/MainMenu.xrc:502
-msgid "&Configure port..."
-msgstr "&Configura porta..."
-
-#: ../src/wx/xrc/MainMenu.xrc:505
-msgid "&Break on load"
-msgstr "&Ferma al caricamento"
-
-#: ../src/wx/xrc/MainMenu.xrc:510
-msgid "&Disconnect"
-msgstr "&Disconnetti"
-
-#: ../src/wx/xrc/MainMenu.xrc:512
-msgid "&GDB"
-msgstr "&GDB"
-
-#: ../src/wx/xrc/MainMenu.xrc:515
-msgid "&Disassemble..."
-msgstr "&Disassembla..."
-
-#: ../src/wx/xrc/MainMenu.xrc:518
-msgid "&Logging..."
-msgstr "&Logging..."
-
-#: ../src/wx/xrc/MainMenu.xrc:521
-msgid "&IO Viewer..."
-msgstr "&Visualizzatore IO..."
-
-#: ../src/wx/xrc/MainMenu.xrc:524
-msgid "&Map Viewer..."
-msgstr "&Visualizzatore Mappa..."
-
-#: ../src/wx/xrc/MainMenu.xrc:527
-msgid "M&emory Viewer..."
-msgstr "V&isualizzatore Memoria..."
-
-#: ../src/wx/xrc/MainMenu.xrc:530
-msgid "&OAM Viewer..."
-msgstr "&Visore OAM..."
-
-#: ../src/wx/xrc/MainMenu.xrc:533
-msgid "&Palette Viewer..."
-msgstr "&Visualizzatore Tavolozza..."
-
-#: ../src/wx/xrc/MainMenu.xrc:536
-msgid "&Tile Viewer..."
-msgstr "&Visualizatore Tile..."
-
-#: ../src/wx/xrc/MainMenu.xrc:541
-msgid "BG &0"
-msgstr "BG &0"
-
-#: ../src/wx/xrc/MainMenu.xrc:546
-msgid "BG &1"
-msgstr "BG &1"
-
-#: ../src/wx/xrc/MainMenu.xrc:551
-msgid "BG &2"
-msgstr "BG &2"
-
-#: ../src/wx/xrc/MainMenu.xrc:556
-msgid "BG &3"
-msgstr "BG &3"
-
-#: ../src/wx/xrc/MainMenu.xrc:561
-msgid "&OBJ"
-msgstr "&OBJ"
-
-#: ../src/wx/xrc/MainMenu.xrc:566
-msgid "&WIN 0"
-msgstr "&WIN 0"
-
-#: ../src/wx/xrc/MainMenu.xrc:571
-msgid "W&IN 1"
-msgstr "W&IN 1"
-
-#: ../src/wx/xrc/MainMenu.xrc:576
-msgid "O&BJ WIN"
-msgstr "O&BJ WIN"
-
-#: ../src/wx/xrc/MainMenu.xrc:580
-msgid "&View Layers"
-msgstr "&Mostra Piani"
-
-#: ../src/wx/xrc/MainMenu.xrc:584
-msgid "Channel &1"
-msgstr "Canale &1"
-
-#: ../src/wx/xrc/MainMenu.xrc:589
-msgid "Channel &2"
-msgstr "Canale &2"
-
-#: ../src/wx/xrc/MainMenu.xrc:594
-msgid "Channel &3"
-msgstr "Canale &3"
-
-#: ../src/wx/xrc/MainMenu.xrc:599
-msgid "Channel &4"
-msgstr "Canale &4"
-
-#: ../src/wx/xrc/MainMenu.xrc:604
-msgid "Direct Sound &A"
-msgstr "Suono Diretto &A"
-
-#: ../src/wx/xrc/MainMenu.xrc:609
-msgid "Direct Sound &B"
-msgstr "Suono Diretto &B"
-
-#: ../src/wx/xrc/MainMenu.xrc:613
-msgid "&Sound Channels"
-msgstr "&Canali Suono"
-
-#: ../src/wx/xrc/MainMenu.xrc:617
-msgid "&Help"
-msgstr "&Aiuto"
-
-#: ../src/wx/xrc/MainMenu.xrc:619
-msgid "Report &Bugs"
-msgstr "Segnalazione &Bug"
-
-#: ../src/wx/xrc/MainMenu.xrc:622
-msgid "VBA-M Support &Forum"
-msgstr "&Forum di Supporto VBA-M"
-
-#: ../src/wx/xrc/MainMenu.xrc:625
-msgid "Translations"
-msgstr "Traduzione"
-
-#: ../src/wx/xrc/MainMenu.xrc:636
-msgid "&Factory Reset..."
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:433
+msgid "Full-screen filter to apply"
 msgstr ""
 
-#: ../src/wx/xrc/MapViewer.xrc:4
-msgid "Map Viewer"
-msgstr "Visualizzatore Mappa"
-
-#: ../src/wx/xrc/MapViewer.xrc:16
-msgid "Frame 0"
-msgstr "Frame 0"
-
-#: ../src/wx/xrc/MapViewer.xrc:22
-msgid "Frame 1"
-msgstr "Frame 1"
-
-#: ../src/wx/xrc/MapViewer.xrc:25
-msgid "Frame"
-msgstr "Frame"
-
-#: ../src/wx/xrc/MapViewer.xrc:35
-msgid "BG0"
-msgstr "BG0"
-
-#: ../src/wx/xrc/MapViewer.xrc:41
-msgid "BG1"
-msgstr "BG1"
-
-#: ../src/wx/xrc/MapViewer.xrc:46
-msgid "BG2"
-msgstr "BG2"
-
-#: ../src/wx/xrc/MapViewer.xrc:51
-msgid "BG3"
-msgstr "BG3"
-
-#: ../src/wx/xrc/MapViewer.xrc:84
-msgid "Map Base:"
-msgstr "Base mappa:"
-
-#: ../src/wx/xrc/MapViewer.xrc:92
-msgid "Char Base:"
-msgstr "Base Char:"
-
-#: ../src/wx/xrc/MapViewer.xrc:100 ../src/wx/xrc/MemSelRegion.xrc:22
-#: ../src/wx/xrc/OAMViewer.xrc:77
-msgid "Size:"
-msgstr "Dimensione:"
-
-#: ../src/wx/xrc/MapViewer.xrc:108 ../src/wx/xrc/OAMViewer.xrc:45
-msgid "Colors:"
-msgstr "Colori:"
-
-#: ../src/wx/xrc/MapViewer.xrc:124
-msgid "Mosaic:"
-msgstr "Mosaico:"
-
-#: ../src/wx/xrc/MapViewer.xrc:132
-msgid "Overflow:"
-msgstr "Straripamento:"
-
-#: ../src/wx/xrc/MemViewer.xrc:4
-msgid "Memory Viewer"
-msgstr "Visualizzatore Memoria"
-
-#: ../src/wx/xrc/MemViewer.xrc:17
-msgid "&8-bit"
-msgstr "&8-bit"
-
-#: ../src/wx/xrc/MemViewer.xrc:25
-msgid "&16-bit"
-msgstr "&16-bit"
-
-#: ../src/wx/xrc/MemViewer.xrc:32
-msgid "&32-bit"
-msgstr "&32-bit"
-
-#: ../src/wx/xrc/MemViewer.xrc:83
-msgid "Current address:"
-msgstr "Indirizzo corrente:"
-
-#: ../src/wx/xrc/MemViewer.xrc:108
-msgid "&Load..."
-msgstr "&Carica..."
-
-#: ../src/wx/xrc/NetLink.xrc:4
-msgid "Start Network Link"
-msgstr "Inizia Network Link"
-
-#: ../src/wx/xrc/NetLink.xrc:11
-msgid "Server"
-msgstr "Server"
-
-#: ../src/wx/xrc/NetLink.xrc:19
-msgid "Client"
-msgstr "Client"
-
-#: ../src/wx/xrc/NetLink.xrc:32
-msgid "Players:"
-msgstr "Giocatori:"
-
-#: ../src/wx/xrc/NetLink.xrc:41 ../src/wx/xrc/SpeedupConfig.xrc:122
-msgid "2"
-msgstr "2"
-
-#: ../src/wx/xrc/NetLink.xrc:49 ../src/wx/xrc/SpeedupConfig.xrc:123
-msgid "3"
-msgstr "3"
-
-#: ../src/wx/xrc/NetLink.xrc:56 ../src/wx/xrc/SpeedupConfig.xrc:124
-msgid "4"
-msgstr "4"
-
-#: ../src/wx/xrc/NetLink.xrc:67
-msgid "Server:"
-msgstr "Server:"
-
-#: ../src/wx/xrc/OAMViewer.xrc:4
-msgid "OAM Viewer"
-msgstr "Visualizzatore OAM"
-
-#: ../src/wx/xrc/OAMViewer.xrc:85
-msgid "Rot.:"
-msgstr "Rot.:"
-
-#: ../src/wx/xrc/PaletteViewer.xrc:4
-msgid "Palette Viewer"
-msgstr "Visualizzazione Tavolozza"
-
-#: ../src/wx/xrc/PaletteViewer.xrc:88
-msgid "C&hange backdrop color..."
-msgstr "C&ambia colore di sfondo..."
-
-#: ../src/wx/xrc/SoundConfig.xrc:4
-msgid "Sound Settings"
-msgstr "Impostazioni Suono"
-
-#: ../src/wx/xrc/SoundConfig.xrc:16
-msgid "Volume :"
-msgstr "Volume :"
-
-#: ../src/wx/xrc/SoundConfig.xrc:34
-msgid "Mute"
-msgstr "Muto"
-
-#: ../src/wx/xrc/SoundConfig.xrc:54 ../src/wx/xrc/SoundConfig.xrc:320
-msgid "Maximum"
-msgstr "Massimo"
-
-#: ../src/wx/xrc/SoundConfig.xrc:71
-msgid "Sample rate :"
-msgstr "Frequenza di Campionatura :"
-
-#: ../src/wx/xrc/SoundConfig.xrc:77
-msgid "48 KHz"
-msgstr "48 KHz"
-
-#: ../src/wx/xrc/SoundConfig.xrc:78
-msgid "44.1 KHz"
-msgstr "44.1 KHz"
-
-#: ../src/wx/xrc/SoundConfig.xrc:79
-msgid "22 KHz"
-msgstr "22 KHz"
-
-#: ../src/wx/xrc/SoundConfig.xrc:80
-msgid "11 KHz"
-msgstr "11 KHz"
-
-#: ../src/wx/xrc/SoundConfig.xrc:103
-msgid "SDL"
-msgstr "SDL"
-
-#: ../src/wx/xrc/SoundConfig.xrc:111
-msgid "OpenAL"
-msgstr "OpenAL"
-
-#: ../src/wx/xrc/SoundConfig.xrc:118
-msgid "DirectSound"
-msgstr "DirectSound"
-
-#: ../src/wx/xrc/SoundConfig.xrc:125
-msgid "XAudio2"
-msgstr "XAudio2"
-
-#: ../src/wx/xrc/SoundConfig.xrc:132
-msgid "FAudio"
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:434
+msgid "Filter plugin library"
 msgstr ""
 
-#: ../src/wx/xrc/SoundConfig.xrc:146
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:435
+msgid "Interframe blending function"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:436
+msgid "Bit depth"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:437
+msgid "Keep window on top"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:439
+msgid "Maximum number of threads to run filters in"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:441
+msgid "Render method; if unsupported, simple method will be used"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:442
+msgid "Default scale factor"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:443
+msgid "Retain aspect ratio when resizing"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:444
+msgid "SDL renderer"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:445
+msgid "Color correction profile"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:448
+msgid "BIOS file to use for Game Boy, if enabled"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:449
+msgid "Game Boy color enhancement, if enabled"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:450
+msgid "Enable DX Colorization Hacks"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:451
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:476
+msgid "Apply LCD filter, if enabled"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:452
+msgid "BIOS file to use for Game Boy Color, if enabled"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:454
+msgid ""
+"The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:457
+msgid ""
+"The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:460
+msgid ""
+"The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:463
+msgid "Automatically gather a full page before printing"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:465
+msgid "Automatically save printouts as screen captures with -print suffix"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:467
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:496
+msgid "Directory to look for ROM files"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:468
+msgid "Directory to look for Game Boy Color ROM files"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:469
+msgid "Color lightness factor"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:472
+msgid "BIOS file to use, if enabled"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:482
+msgid "Enable link at boot"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:487
+msgid "Enable faster network protocol by default"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:489
+msgid "Default network link client host"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:490
+msgid "Default network link server IP to bind"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:491
+msgid "Default network link port (server and client)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:492
+msgid "Default network protocol"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:493
+msgid "Link timeout (ms)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:494
+msgid "Link cable type"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:497
+msgid "Color darkness factor"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:500
+msgid "Automatically load last saved state"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:502
+msgid ""
+"Directory to store game save files (relative paths are relative to ROM; "
+"blank is config dir)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:504
+msgid "Freeze recent load list"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:506
+msgid ""
+"Directory to store A / V and game recordings (relative paths are relative to"
+" ROM)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:509
+msgid "Number of seconds between rewind snapshots (0 to disable)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:511
+msgid "Directory to store screenshots (relative paths are relative to ROM)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:514
+msgid ""
+"Directory to store saved state files (relative paths are relative to "
+"BatteryDir)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:516
+msgid "Enable status bar"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:517
+msgid "INI file version (DO NOT MODIFY)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:521
+msgid ""
+"The parameter Joypad/<n>/<button> contains a comma-separated list of key "
+"names which map to joypad #<n> button <button>. Button is one of Up, Down, "
+"Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
+"MotionRight, AutoA, AutoB, Speed, Capture, GS"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:526
+msgid "The autofire toggle period, in frames (1/60 s)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:527
+msgid "The number of the stick to use in single-player mode"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:529
+msgid "Whether to enable SDL GameController mode"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:533
+msgid ""
+"The parameter Keyboard/<cmd> contains a comma-separated list of key names "
+"(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
+"executed."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:538
+msgid "Enable AGB debug print"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:539
+msgid "Auto skip frames"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:541
+msgid "Apply IPS / UPS / IPF patches if found"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:543
+msgid "Automatically save and load cheat list"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:547
+msgid "Automatically enable border for Super Game Boy games"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:549
+msgid "Always enable border"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:550
+msgid "Screen capture file format"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:551
+msgid "Enable cheats"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:552
+msgid "Disable on-screen status messages"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:553
+msgid "Type of system to emulate"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:554
+msgid "Flash size 0 = 64 KB 1 = 128 KB"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:556
+msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:558
+msgid "The palette to use"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:559
+msgid "Enable printer emulation"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:561
+msgid "Break into GDB after loading the game."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:562
+msgid "Port to connect GDB to"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:564
+msgid "Number of players in network"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:566
+msgid "Maximum scale factor (0 = no limit)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:568
+msgid "Pause game when main window loses focus"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:570
+msgid "Enable RTC (vba-over.ini override is rtcEnabled"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:571
+msgid "Native save (\"battery\") hardware type"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:572
+msgid "Show speed indicator"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
+msgid "Draw on-screen messages transparently"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:575
+msgid "Skip BIOS initialization"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:577
+msgid "Do not overwrite cheat list when loading state"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:579
+msgid "Do not overwrite native (battery) save when loading state"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:581
+msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:584
+msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:586
+msgid "Number of frames to skip with speedup (instead of speedup throttle)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:589
+msgid "Use frame skip for speedup throttle"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:591
+msgid "Mute sound during speedup"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:592
+msgid "Use the specified BIOS file for Game Boy"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:593
+msgid "Use the specified BIOS file"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:595
+msgid "Use the specified BIOS file for Game Boy Color"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:596
+msgid "Wait for vertical sync"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:599
+msgid "Enter fullscreen mode at startup"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:600
+msgid "Window maximized"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:601
+msgid "Window height at startup"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:602
+msgid "Window width at startup"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:603
+msgid "Window axis X position at startup"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:604
+msgid "Window axis Y position at startup"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:608
+msgid "Capture key events while on background"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:610
+msgid "Capture joy events while on background"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:611
+msgid "Hide menu bar when mouse is inactive"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:613
+msgid "Suspend screensaver when game is running"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:616
+msgid "Sound API; if unsupported, default API will be used"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:617
+msgid "Device ID of chosen audio device for chosen driver"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:618
+msgid "Number of sound buffers"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:619
+msgid "Bit mask of sound channels to enable"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:620
+msgid "Game Boy Advance sound filtering (%)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:622
+msgid "Game Boy Advance sound interpolation"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:623
+msgid "Game Boy sound declicking"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:624
+msgid "Game Boy echo effect (%)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:625
+msgid "Enable Game Boy sound effects"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:626
+msgid "Game Boy stereo effect (%)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:627
+msgid "Game Boy surround sound effect (%)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:628
+msgid "Sound sample rate (kHz)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:629
+msgid "Use DirectSound hardware acceleration"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:630
+msgid "Upmix stereo to surround"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:631
+msgid "Sound volume (%)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:632
+msgid "Language"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:633
+msgid "External translations"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:708
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:728
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:749
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:770
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:790
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:810
+#, c-format
+msgid "Invalid value %s for option %s; valid values are %s"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:341
+#, c-format
+msgid "Invalid value %f for option %s; valid values are %f - %f"
+msgstr "Valore %f per l'opzione %s; i valori validi sono %f - %f"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:356
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:371
+#, c-format
+msgid "Invalid value %d for option %s; valid values are %d - %d"
+msgstr "Valore non valido %d per l'opzione %s; I valori validi sono %d - %d"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:22
+msgid "Backspace"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:23
+msgid "Delete"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:24
+msgid "Page Up"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:25
+msgid "Page Down"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:26
+msgid "Num Lock"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:27
+msgid "Scroll Lock"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:30
+msgid "Num Space"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:31
+msgid "Num Tab"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:32
+msgid "Num Enter"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:33
+msgid "Num Home"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:34
+msgid "Num left"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:35
+msgid "Num Up"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:36
+msgid "Num Right"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:37
+msgid "Num Down"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:38
+msgid "Num PageUp"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:39
+msgid "Num PageDown"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:40
+msgid "Num End"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:41
+msgid "Num Begin"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:42
+msgid "Num Insert"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:43
+msgid "Num Delete"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:44
+msgid "Num ="
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:45
+msgid "Num *"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:46
+msgid "Num +"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:47
+msgid "Num ,"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:48
+msgid "Num -"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:49
+msgid "Num ."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:50
+msgid "Num /"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:54
+msgid "Volume Mute"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:55
+msgid "Volume Down"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:56
+msgid "Volume Up"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:57
+msgid "Next Track"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:58
+msgid "Previous Track"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:59
+msgid "Stop"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:60
+msgid "Play/Pause"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:93
+msgid "Alt+"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:96
+msgid "Ctrl+"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:100
+msgid "Rawctrl+"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:104
+msgid "Shift+"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:107
+msgid "Meta+"
+msgstr "Meta+"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:238
+#, c-format
+msgid "Joystick %d"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:268
+#, c-format
+msgid "%s: Axis %d+"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:270
+#, c-format
+msgid "%s: Axis %d-"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:272
+#, c-format
+msgid "%s: Button %d"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:274
+#, c-format
+msgid "%s: Hat %d North"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:276
+#, c-format
+msgid "%s: Hat %d South"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:278
+#, c-format
+msgid "%s: Hat %d West"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:280
+#, c-format
+msgid "%s: Hat %d East"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:315
+msgid "Key"
+msgstr ""
+
+#: audio/internal/dsound.cpp:105 audio/internal/dsound.cpp:120
+#, c-format
+msgid "Cannot create Direct Sound %08x"
+msgstr ""
+
+#: audio/internal/dsound.cpp:126
+#, c-format
+msgid "Cannot SetCooperativeLevel %08x"
+msgstr "Non posso impostare il livello di cooperazione %08x"
+
+#: audio/internal/dsound.cpp:141
+#, c-format
+msgid "Cannot CreateSoundBuffer %08x"
+msgstr "Non posso creare il buffer del suono %08x"
+
+#: audio/internal/dsound.cpp:160
+#, c-format
+msgid "CreateSoundBuffer(primary) failed %08x"
+msgstr "Creazione del buffer di suono (primario) fallito %08x"
+
+#: audio/internal/dsound.cpp:178
+#, c-format
+msgid "CreateSoundBuffer(secondary) failed %08x"
+msgstr "Creazione del buffer di suono (secondario) fallito %08x"
+
+#: audio/internal/dsound.cpp:183
+#, c-format
+msgid "dsbSecondary->SetCurrentPosition failed %08x"
+msgstr "dsbSecondario->ImpostaPosizioneCorrente fallito %08x"
+
+#: audio/internal/dsound.cpp:207
+#, c-format
+msgid "Cannot Play primary %08x"
+msgstr "Non puoi far partire il primario %08x"
+
+#: audio/internal/dsound.cpp:328
+#, c-format
+msgid "dsbSecondary->Lock() failed: %08x"
+msgstr "dsbSecondario->Lock() fallito: %08x"
+
+#: audio/internal/faudio.cpp:41 audio/internal/faudio.cpp:482
+msgid "FAudio: Enumerating devices failed!"
+msgstr "FAudio: Numerazione dei dispositivi non riuscita!"
+
+#: audio/internal/faudio.cpp:209 audio/internal/faudio.cpp:475
+msgid "The FAudio interface failed to initialize!"
+msgstr "Avvio dell'interfaccia FAudio non riuscito!"
+
+#: audio/internal/faudio.cpp:240
+msgid "FAudio: Creating mastering voice failed!"
+msgstr "FAudio: Creazione mastering voice non riuscita!"
+
+#: audio/internal/faudio.cpp:249
+msgid "FAudio: Creating source voice failed!"
+msgstr "FAudio: Creazione source voice non riuscita!"
+
+#: audio/internal/xaudio2.cpp:46 audio/internal/xaudio2.cpp:598
+msgid "XAudio2: Enumerating devices failed!"
+msgstr "XAudio2: Nuerazione devices fallita!"
+
+#: audio/internal/xaudio2.cpp:301 audio/internal/xaudio2.cpp:591
+msgid "The XAudio2 interface failed to initialize!"
+msgstr "Avvio dell'interfaccia XAudio2 non riuscito!"
+
+#: audio/internal/xaudio2.cpp:327
+msgid "XAudio2: Creating mastering voice failed!"
+msgstr "XAudio2: Creazione mastering voice non riuscita!"
+
+#: audio/internal/xaudio2.cpp:336
+msgid "XAudio2: Creating source voice failed!"
+msgstr "XAudio2: Creazione source voice non riuscita!"
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:680
+msgid "Error, link already connected"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:694
+msgid "Unable to find link driver"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:737
+msgid "Link connection does not need updates."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:876
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:940
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1594
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2926
+#, c-format
+msgid "Player %d disconnected."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:980
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1020
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1060
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1703
+msgid "Server disconnected."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1151
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1182
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1727
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1759
+msgid "Network error."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1159
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1735
+#, c-format
+msgid "Player %d connected"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1173
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1749
+msgid "All players connected"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1194
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1771
+#, c-format
+msgid "Connected as #%d, Waiting for %d players to join"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1203
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1780
+msgid "All players joined."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1696
+msgid "Server timed out."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2649
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2670
+msgid "Error creating file mapping"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2660
+msgid "Error mapping file"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2707
+msgid "5 or more GBAs not supported."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2726
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2745
+msgid "Error opening event"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2845
+msgid "Lost link; reinitialize to reconnect"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2852
+msgid "Lost link; reconnected"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2973
+msgid "Unknown slave timed out; resetting comm"
+msgstr ""
+
+#: xrc/AccelConfig.xrc:4
+msgid "Key Shortcuts"
+msgstr "Key Shortcuts"
+
+#: xrc/AccelConfig.xrc:26
+msgid "Co&mmands:"
+msgstr "Co&mmandi:"
+
+#: xrc/AccelConfig.xrc:47
+msgid "Current Keys:"
+msgstr "Chiavi correnti:"
+
+#: xrc/AccelConfig.xrc:63
+msgid "&Assign"
+msgstr "&Assegna"
+
+#: xrc/AccelConfig.xrc:70
+msgid "&Remove"
+msgstr "&Rimuovi"
+
+#: xrc/AccelConfig.xrc:77
+msgid "Re&set All"
+msgstr "Re&setta Tutto"
+
+#: xrc/AccelConfig.xrc:92
+msgid "Currently assigned to:"
+msgstr "Attualmente assegnato a:"
+
+#: xrc/AccelConfig.xrc:107
+msgid "Shortcut Key:"
+msgstr "scorciatoia chiave:"
+
+#: xrc/CheatAdd.xrc:4
+msgid "Add Cheat"
+msgstr "Aggiungi Codice"
+
+#: xrc/CheatAdd.xrc:9 xrc/CheatEdit.xrc:9
+msgid "&Description"
+msgstr "%Descrizione"
+
+#: xrc/CheatAdd.xrc:53
+msgid "&Value"
+msgstr "&Valuta"
+
+#: xrc/CheatAdd.xrc:77
+msgid "Format"
+msgstr "Formato"
+
+#: xrc/CheatCreate.xrc:4
+msgid "Cheat Search"
+msgstr "Cerca Codice"
+
+#: xrc/CheatCreate.xrc:23
+msgid "E&qual"
+msgstr "U&guale"
+
+#: xrc/CheatCreate.xrc:31
+msgid "&Not equal"
+msgstr "&Non uguale"
+
+#: xrc/CheatCreate.xrc:38
+msgid "&Less than"
+msgstr "&Meno di"
+
+#: xrc/CheatCreate.xrc:45
+msgid "L&ess or equal"
+msgstr "M%eno o uguale"
+
+#: xrc/CheatCreate.xrc:52
+msgid "&Greater than"
+msgstr "&Più grande di"
+
+#: xrc/CheatCreate.xrc:59
+msgid "G&reater or equal"
+msgstr "P&iù grande o uguale"
+
+#: xrc/CheatCreate.xrc:64
+msgid "Compare type"
+msgstr "Tipo di Confronto"
+
+#: xrc/CheatCreate.xrc:77
+msgid "S&igned"
+msgstr "F&irmato"
+
+#: xrc/CheatCreate.xrc:85
+msgid "&Unsigned"
+msgstr "&Non firmato"
+
+#: xrc/CheatCreate.xrc:92
+msgid "&Hexadecimal"
+msgstr "&Esadecimale"
+
+#: xrc/CheatCreate.xrc:97
+msgid "Signed / Unsigned"
+msgstr ""
+
+#: xrc/CheatCreate.xrc:107
+msgid "&8 bits"
+msgstr "&8 bits"
+
+#: xrc/CheatCreate.xrc:115
+msgid "&16 bits"
+msgstr "&16 bits"
+
+#: xrc/CheatCreate.xrc:122
+msgid "&32 bits"
+msgstr "&32 bits"
+
+#: xrc/CheatCreate.xrc:127
+msgid "Data size"
+msgstr "Dimensione data"
+
+#: xrc/CheatCreate.xrc:144
+msgid "Ol&d value"
+msgstr "Ve&cchia valuta"
+
+#: xrc/CheatCreate.xrc:152
+msgid "Specific &value"
+msgstr "&Valuta specifica"
+
+#: xrc/CheatCreate.xrc:163
+msgid "Search value"
+msgstr "Cerca valuta"
+
+#: xrc/CheatCreate.xrc:181
+msgid "&Search"
+msgstr "&Cerca"
+
+#: xrc/CheatCreate.xrc:188
+msgid "U&pdate Old"
+msgstr "V&ecchio Aggiornamento"
+
+#: xrc/CheatCreate.xrc:195 xrc/JoyPanel.xrc:29 xrc/JoyPanel.xrc:52
+#: xrc/JoyPanel.xrc:75 xrc/JoyPanel.xrc:98 xrc/JoyPanel.xrc:121
+#: xrc/JoyPanel.xrc:144 xrc/JoyPanel.xrc:167 xrc/JoyPanel.xrc:191
+#: xrc/JoyPanel.xrc:214 xrc/JoyPanel.xrc:237 xrc/JoyPanel.xrc:268
+#: xrc/JoyPanel.xrc:290 xrc/JoyPanel.xrc:312 xrc/JoyPanel.xrc:334
+#: xrc/JoyPanel.xrc:356 xrc/JoyPanel.xrc:378 xrc/JoyPanel.xrc:400
+#: xrc/JoyPanel.xrc:422 xrc/JoyPanel.xrc:444 xrc/JoyPanel.xrc:475
+#: xrc/JoyPanel.xrc:497 xrc/Logging.xrc:119
+msgid "&Clear"
+msgstr "&Pulire"
+
+#: xrc/CheatCreate.xrc:202
+msgid "&Add cheat"
+msgstr "&Aggiungi codice"
+
+#: xrc/CheatEdit.xrc:4
+msgid "Edit Cheat"
+msgstr "Modifica Codice"
+
+#: xrc/CheatEdit.xrc:31 xrc/MainMenu.xrc:275
+msgid "&Type"
+msgstr "&Tipo"
+
+#: xrc/CheatEdit.xrc:53
+msgid "C&odes"
+msgstr "C&odice"
+
+#: xrc/CheatList.xrc:4
+msgid "Cheat List"
+msgstr "Lista codice"
+
+#: xrc/CheatList.xrc:11
+msgid "Open cheat list"
+msgstr "Apri lista trucchi"
+
+#: xrc/CheatList.xrc:15
+msgid "Save cheat list"
+msgstr "Salva lista trucchi"
+
+#: xrc/CheatList.xrc:20
+msgid "Add new cheat"
+msgstr "Aggiungi nuovo codice"
+
+#: xrc/CheatList.xrc:24
+msgid "Delete selected cheat"
+msgstr "Cancella codici selezionati"
+
+#: xrc/CheatList.xrc:29
+msgid "Delete all cheats"
+msgstr "Cancella tutti i codici"
+
+#: xrc/CheatList.xrc:35
+msgid "Toggle all Cheats"
+msgstr "Toggle tutti i Codici"
+
+#: xrc/DirectoriesConfig.xrc:4
+msgid "Directories"
+msgstr "Elenco"
+
+#: xrc/DirectoriesConfig.xrc:11 xrc/DirectoriesConfig.xrc:18
+msgid "Game Boy Advance ROMs"
+msgstr "Game Boy Advance ROMs"
+
+#: xrc/DirectoriesConfig.xrc:27 xrc/DirectoriesConfig.xrc:34
+msgid "Game Boy ROMs"
+msgstr "Game Boy ROMs"
+
+#: xrc/DirectoriesConfig.xrc:42 xrc/DirectoriesConfig.xrc:49
+msgid "Game Boy Color ROMs"
+msgstr "Game Boy Color ROMs"
+
+#: xrc/DirectoriesConfig.xrc:57 xrc/DirectoriesConfig.xrc:64
+msgid "Native Saves"
+msgstr "Salvataggi Nativi"
+
+#: xrc/DirectoriesConfig.xrc:72 xrc/DirectoriesConfig.xrc:79
+msgid "Emulator Saves"
+msgstr "Salvataggi Emulatore"
+
+#: xrc/DirectoriesConfig.xrc:87 xrc/DirectoriesConfig.xrc:94
+msgid "Screenshots"
+msgstr "Screenshots"
+
+#: xrc/DirectoriesConfig.xrc:102 xrc/DirectoriesConfig.xrc:109
+msgid "Recordings"
+msgstr "Registrazioni"
+
+#: xrc/Disassemble.xrc:4
+msgid "Disassemble"
+msgstr "Smontare"
+
+#: xrc/Disassemble.xrc:15
+msgid "&Automatic"
+msgstr "&Automatico"
+
+#: xrc/Disassemble.xrc:45 xrc/GBDisassemble.xrc:18 xrc/MemViewer.xrc:47
+msgid "&Go"
+msgstr "&Vai"
+
+#: xrc/Disassemble.xrc:414 xrc/MapViewer.xrc:76 xrc/OAMViewer.xrc:37
+msgid "Mode:"
+msgstr "Modalità:"
+
+#: xrc/Disassemble.xrc:443 xrc/GBDisassemble.xrc:212 xrc/GBOAMViewer.xrc:93
+#: xrc/GBPaletteViewer.xrc:105 xrc/GBTileViewer.xrc:75 xrc/IOViewer.xrc:318
+#: xrc/MemViewer.xrc:72 xrc/OAMViewer.xrc:109 xrc/PaletteViewer.xrc:81
+#: xrc/TileViewer.xrc:91
+msgid "Automatic &update"
+msgstr "&Aggiornamento automatico"
+
+#: xrc/Disassemble.xrc:453 xrc/GBDisassemble.xrc:222
+msgid "G&oto PC"
+msgstr "V&ai al PC"
+
+#: xrc/Disassemble.xrc:460 xrc/GBDisassemble.xrc:229
+msgid "Re&fresh"
+msgstr "Ag&giorna"
+
+#: xrc/Disassemble.xrc:467 xrc/GBDisassemble.xrc:236
+msgid "&Next"
+msgstr "&Successivo"
+
+#: xrc/DisplayConfig.xrc:4
+msgid "Display settings"
+msgstr "Impostazioni video"
+
+#: xrc/DisplayConfig.xrc:16
+msgid "Output module"
+msgstr "Modulo di output"
+
+#: xrc/DisplayConfig.xrc:34
+msgid "Simple"
+msgstr "Semplice"
+
+#: xrc/DisplayConfig.xrc:74 xrc/SoundConfig.xrc:154
 msgid "Device"
 msgstr "Dispositivo"
 
-#: ../src/wx/xrc/SoundConfig.xrc:154
-msgid "Enable stereo upmixing"
-msgstr "Abilita upmixing stereo"
+#: xrc/DisplayConfig.xrc:82
+msgid "Filters"
+msgstr "Filtri"
 
-#: ../src/wx/xrc/SoundConfig.xrc:161
-msgid "Enable hardware acceleration"
-msgstr "Abilita accellerazione hardware"
-
-#: ../src/wx/xrc/SoundConfig.xrc:190
-msgid "Number of sound buffers:"
-msgstr "Numero di buffer sonori"
-
-#: ../src/wx/xrc/SoundConfig.xrc:198
-msgid "Advanced"
-msgstr "Avanzato"
-
-#: ../src/wx/xrc/SoundConfig.xrc:230
-msgid "Lots"
-msgstr "Tanti"
-
-#: ../src/wx/xrc/SoundConfig.xrc:239
-msgid "Echo"
-msgstr "Eco"
-
-#: ../src/wx/xrc/SoundConfig.xrc:247
-msgid "Stereo"
-msgstr "Stereo"
-
-#: ../src/wx/xrc/SoundConfig.xrc:258
-msgid "Center"
-msgstr "Centrale"
-
-#: ../src/wx/xrc/SoundConfig.xrc:269
-msgid "Left/Right"
-msgstr "Sinistra/Destra"
-
-#: ../src/wx/xrc/SoundConfig.xrc:298
-msgid "Sound filtering"
-msgstr "Filtraggio suono"
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:4
-msgid "SpeedUp / Turbo Settings"
+#: xrc/DisplayConfig.xrc:96
+msgid "Display filter:"
 msgstr ""
 
-#: ../src/wx/xrc/SpeedupConfig.xrc:9
-msgid "Speedup Throttle"
+#: xrc/DisplayConfig.xrc:104
+msgid "Super 2xSaI"
+msgstr "Super 2xSal"
+
+#: xrc/DisplayConfig.xrc:105
+msgid "Super Eagle"
+msgstr "Super Eagle"
+
+#: xrc/DisplayConfig.xrc:106
+msgid "Pixelate"
+msgstr "Pixelato"
+
+#: xrc/DisplayConfig.xrc:107
+msgid "Advance MAME Scale 2x"
 msgstr ""
 
-#: ../src/wx/xrc/SpeedupConfig.xrc:84
-msgid "Speedup Frame Skip"
+#: xrc/DisplayConfig.xrc:108
+msgid "Bilinear"
+msgstr "Bilineare"
+
+#: xrc/DisplayConfig.xrc:109
+msgid "Bilinear Plus"
+msgstr "Bilineare Plus"
+
+#: xrc/DisplayConfig.xrc:110
+msgid "Scanlines"
+msgstr "Linee di scansione"
+
+#: xrc/DisplayConfig.xrc:111
+msgid "TV Mode"
+msgstr "Modalità TV"
+
+#: xrc/DisplayConfig.xrc:114
+msgid "Simple 2x"
+msgstr "2x Semplice"
+
+#: xrc/DisplayConfig.xrc:115
+msgid "Simple 3x"
+msgstr "3x Semplice"
+
+#: xrc/DisplayConfig.xrc:117
+msgid "Simple 4x"
+msgstr "4x Semplice"
+
+#: xrc/DisplayConfig.xrc:132
+msgid "Plugin:"
 msgstr ""
 
-#: ../src/wx/xrc/SpeedupConfig.xrc:102
-msgid "# of frames:"
+#: xrc/DisplayConfig.xrc:144
+msgid "Interframe blending:"
 msgstr ""
 
-#: ../src/wx/xrc/SpeedupConfig.xrc:121
-msgid "1"
+#: xrc/DisplayConfig.xrc:153
+msgid "Smart"
 msgstr ""
 
-#: ../src/wx/xrc/SpeedupConfig.xrc:125
-msgid "5"
+#: xrc/DisplayConfig.xrc:154
+msgid "Motion Blur"
 msgstr ""
 
-#: ../src/wx/xrc/SpeedupConfig.xrc:126
-msgid "6"
+#: xrc/DisplayConfig.xrc:162
+msgid "SDL Renderer:"
 msgstr ""
 
-#: ../src/wx/xrc/SpeedupConfig.xrc:127
-msgid "7"
+#: xrc/DisplayConfig.xrc:175
+msgid "SDL Pixel Art Filter"
 msgstr ""
 
-#: ../src/wx/xrc/SpeedupConfig.xrc:128
+#: xrc/DisplayConfig.xrc:188 xrc/SoundConfig.xrc:93
+msgid "Basic"
+msgstr "Basico"
+
+#: xrc/DisplayConfig.xrc:198
+msgid "Bit Depth:"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:204
 msgid "8"
 msgstr ""
 
-#: ../src/wx/xrc/SpeedupConfig.xrc:129
-msgid "9"
-msgstr ""
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:130
-msgid "10"
-msgstr ""
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:131
-msgid "11"
-msgstr ""
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:132
-msgid "12"
-msgstr ""
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:133
-msgid "13"
-msgstr ""
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:134
-msgid "14"
-msgstr ""
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:135
-msgid "15"
-msgstr ""
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:136
+#: xrc/DisplayConfig.xrc:205
 msgid "16"
 msgstr ""
 
-#: ../src/wx/xrc/SpeedupConfig.xrc:137
-msgid "17"
-msgstr ""
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:138
-msgid "18"
-msgstr ""
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:139
-msgid "19"
-msgstr ""
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:140
-msgid "20"
-msgstr ""
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:141
-msgid "21"
-msgstr ""
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:142
-msgid "22"
-msgstr ""
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:143
-msgid "23"
-msgstr ""
-
-#: ../src/wx/xrc/SpeedupConfig.xrc:144
+#: xrc/DisplayConfig.xrc:206
 msgid "24"
 msgstr ""
 
-#: ../src/wx/xrc/SpeedupConfig.xrc:145
-msgid "25"
+#: xrc/DisplayConfig.xrc:207
+msgid "32"
 msgstr ""
 
-#: ../src/wx/xrc/SpeedupConfig.xrc:146
-msgid "26"
+#: xrc/DisplayConfig.xrc:217
+msgid "Bit Depth"
 msgstr ""
 
-#: ../src/wx/xrc/SpeedupConfig.xrc:147
-msgid "27"
+#: xrc/DisplayConfig.xrc:227
+msgid "Profile:"
 msgstr ""
 
-#: ../src/wx/xrc/SpeedupConfig.xrc:148
-msgid "28"
+#: xrc/DisplayConfig.xrc:259
+msgid "Profile"
 msgstr ""
 
-#: ../src/wx/xrc/SpeedupConfig.xrc:149
-msgid "29"
+#: xrc/DisplayConfig.xrc:269
+msgid "GBA Darken:"
 msgstr ""
 
-#: ../src/wx/xrc/SpeedupConfig.xrc:150
-msgid "30"
+#: xrc/DisplayConfig.xrc:287
+msgid "Lighter"
 msgstr ""
 
-#: ../src/wx/xrc/TileViewer.xrc:4
+#: xrc/DisplayConfig.xrc:298
+msgid "Very Dark"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:315
+msgid "GBC Lighten:"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:333
+msgid "Darker"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:344
+msgid "Very Light"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:362
+msgid "Color Correction"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:370
+msgid "Frame Skip"
+msgstr "Frameskip"
+
+#: xrc/DisplayConfig.xrc:388
+msgid "&Number of frames to skip:"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:426
+msgid "Speed indicator:"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:433
+msgid "Percentage"
+msgstr "Percentuale"
+
+#: xrc/DisplayConfig.xrc:434
+msgid "Detailed"
+msgstr "Dettagliato"
+
+#: xrc/DisplayConfig.xrc:448
+msgid "On-Screen Display"
+msgstr "Display a schermo"
+
+#: xrc/DisplayConfig.xrc:458
+msgid "Default magnification:"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:477
+msgid "Maximum magnification factor:"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:478
+msgid "0 = no maximum"
+msgstr "0 = senza massimo"
+
+#: xrc/DisplayConfig.xrc:486
+msgid "0 = no limit"
+msgstr "0 = senza limite"
+
+#: xrc/DisplayConfig.xrc:496
+msgid "Zoom"
+msgstr "Zoom"
+
+#: xrc/ExportSPS.xrc:10
+msgid "Title:"
+msgstr "Titolo:"
+
+#: xrc/ExportSPS.xrc:22
+msgid "Description:"
+msgstr "Descrizione:"
+
+#: xrc/ExportSPS.xrc:34
+msgid "Notes:"
+msgstr "Note:"
+
+#: xrc/GBAROMInfo.xrc:4 xrc/GBROMInfo.xrc:4
+msgid "Rom Information"
+msgstr "Info ROM"
+
+#: xrc/GBAROMInfo.xrc:11 xrc/GBROMInfo.xrc:12
+msgid "Game title:"
+msgstr "Nome gioco:"
+
+#: xrc/GBAROMInfo.xrc:23
+msgid "Internal title:"
+msgstr "Nome interno:"
+
+#: xrc/GBAROMInfo.xrc:35
+msgid "Scene Release:"
+msgstr "Release Scena"
+
+#: xrc/GBAROMInfo.xrc:47
+msgid "Release Number:"
+msgstr "Numero Release:"
+
+#: xrc/GBAROMInfo.xrc:71
+msgid "Game code:"
+msgstr "Codice gioco:"
+
+#: xrc/GBAROMInfo.xrc:83 xrc/GBROMInfo.xrc:24
+msgid "Maker code:"
+msgstr "Codice produttore:"
+
+#: xrc/GBAROMInfo.xrc:95 xrc/GBROMInfo.xrc:36
+msgid "Maker name:"
+msgstr "Nome produttore:"
+
+#: xrc/GBAROMInfo.xrc:107
+msgid "Main unit code:"
+msgstr "Codice unità principale:"
+
+#: xrc/GBAROMInfo.xrc:119
+msgid "Device type:"
+msgstr "Tipo di dispositivo:"
+
+#: xrc/GBAROMInfo.xrc:131 xrc/GBROMInfo.xrc:132
+msgid "ROM version:"
+msgstr "Versione ROM:"
+
+#: xrc/GBAROMInfo.xrc:150
+msgid "ROM Information"
+msgstr "Info ROM:"
+
+#: xrc/GBColorPrefPanel.xrc:9
+msgid "Custom"
+msgstr ""
+
+#: xrc/GBColorPrefPanel.xrc:10 xrc/JoyPanel.xrc:247
+msgid "Standard"
+msgstr "Standard"
+
+#: xrc/GBColorPrefPanel.xrc:11
+msgid "Blue Sea"
+msgstr "Mare Blu"
+
+#: xrc/GBColorPrefPanel.xrc:12
+msgid "Dark Night"
+msgstr "Notte Scura"
+
+#: xrc/GBColorPrefPanel.xrc:13
+msgid "Green Forest"
+msgstr "Foresta Verde"
+
+#: xrc/GBColorPrefPanel.xrc:14
+msgid "Hot Desert"
+msgstr "Deserto Caldo"
+
+#: xrc/GBColorPrefPanel.xrc:15
+msgid "Pink Dreams"
+msgstr "Rosa Sogno"
+
+#: xrc/GBColorPrefPanel.xrc:16
+msgid "Weird Colors"
+msgstr "Colori Strani"
+
+#: xrc/GBColorPrefPanel.xrc:17
+msgid "Real Game Boy Colors"
+msgstr ""
+
+#: xrc/GBColorPrefPanel.xrc:18
+msgid "Real 'Game Boy on Game Boy Advance Special' Colors"
+msgstr ""
+
+#: xrc/GBColorPrefPanel.xrc:46 xrc/GBPaletteViewer.xrc:17 xrc/MapViewer.xrc:54
+#: xrc/PaletteViewer.xrc:19
+msgid "Background"
+msgstr "Sfondo"
+
+#: xrc/GBColorPrefPanel.xrc:74
+msgid "Sprites"
+msgstr "Sprites"
+
+#: xrc/GBColorPrefPanel.xrc:84
+msgid "Use this palette"
+msgstr "Usa questa tavolozza"
+
+#: xrc/GBColorPrefPanel.xrc:94
+msgid "Restore"
+msgstr "Ripristina"
+
+#: xrc/GBMapViewer.xrc:23 xrc/GBTileViewer.xrc:42 xrc/TileViewer.xrc:58
+msgid "Char Base"
+msgstr "Base Char"
+
+#: xrc/GBMapViewer.xrc:42
+msgid "Map Base"
+msgstr "Base Mappa"
+
+#: xrc/GBMapViewer.xrc:54 xrc/GBOAMViewer.xrc:88 xrc/GBTileViewer.xrc:68
+#: xrc/MapViewer.xrc:62 xrc/OAMViewer.xrc:104 xrc/TileViewer.xrc:84
+msgid "Stretch to &fit"
+msgstr "Allarga per &adattare"
+
+#: xrc/GBMapViewer.xrc:59 xrc/MapViewer.xrc:67
+msgid "Auto &update"
+msgstr "Aggiornamento &automatico"
+
+#: xrc/GBMapViewer.xrc:74 xrc/GBTileViewer.xrc:99 xrc/MapViewer.xrc:144
+#: xrc/MemSelRegion.xrc:10 xrc/PaletteViewer.xrc:50 xrc/TileViewer.xrc:115
+msgid "Address:"
+msgstr "Indirizzo:"
+
+#: xrc/GBMapViewer.xrc:82 xrc/GBOAMViewer.xrc:37 xrc/GBTileViewer.xrc:91
+#: xrc/MapViewer.xrc:152 xrc/OAMViewer.xrc:61 xrc/TileViewer.xrc:107
+msgid "Tile:"
+msgstr "Tile:"
+
+#: xrc/GBMapViewer.xrc:90 xrc/MapViewer.xrc:160
+msgid "Flip:"
+msgstr "Ribalta:"
+
+#: xrc/GBMapViewer.xrc:98 xrc/GBTileViewer.xrc:50 xrc/MapViewer.xrc:168
+#: xrc/TileViewer.xrc:66
+msgid "Palette:"
+msgstr "Tavolozza:"
+
+#: xrc/GBMapViewer.xrc:106 xrc/MapViewer.xrc:116
+msgid "Priority:"
+msgstr "Priorità:"
+
+#: xrc/GBMapViewer.xrc:152 xrc/GBOAMViewer.xrc:142 xrc/GBPaletteViewer.xrc:114
+#: xrc/GBTileViewer.xrc:145 xrc/IOViewer.xrc:327 xrc/MapViewer.xrc:214
+#: xrc/MemViewer.xrc:101 xrc/OAMViewer.xrc:155 xrc/PaletteViewer.xrc:100
+#: xrc/TileViewer.xrc:161
+msgid "&Refresh"
+msgstr "&Aggiorna"
+
+#: xrc/GBMapViewer.xrc:157 xrc/Logging.xrc:112 xrc/MapViewer.xrc:219
+msgid "&Save"
+msgstr "&Salva"
+
+#: xrc/GBOAMViewer.xrc:13 xrc/OAMViewer.xrc:14
+msgid "Sprite:"
+msgstr "Sprite:"
+
+#: xrc/GBOAMViewer.xrc:29 xrc/OAMViewer.xrc:29
+msgid "Pos:"
+msgstr "Pos:"
+
+#: xrc/GBOAMViewer.xrc:45 xrc/OAMViewer.xrc:69
+msgid "Prio:"
+msgstr "Prio:"
+
+#: xrc/GBOAMViewer.xrc:61 xrc/OAMViewer.xrc:53
+msgid "Pal:"
+msgstr "Tav:"
+
+#: xrc/GBOAMViewer.xrc:69 xrc/OAMViewer.xrc:93
+msgid "Flags:"
+msgstr "Flags:"
+
+#: xrc/GBOAMViewer.xrc:77
+msgid "Bank:"
+msgstr "Bank:"
+
+#: xrc/GBOAMViewer.xrc:149 xrc/GBTileViewer.xrc:152 xrc/MemViewer.xrc:115
+#: xrc/OAMViewer.xrc:162 xrc/TileViewer.xrc:168
+msgid "&Save..."
+msgstr "&Salva..."
+
+#: xrc/GBPaletteViewer.xrc:8 xrc/PaletteViewer.xrc:9
+msgid "Click on a color for more information"
+msgstr "Fai click su un colore per più informazioni"
+
+#: xrc/GBPaletteViewer.xrc:27 xrc/PaletteViewer.xrc:105
+msgid "Save &BG..."
+msgstr "Salva &BG..."
+
+#: xrc/GBPaletteViewer.xrc:38 xrc/PaletteViewer.xrc:33
+msgid "Sprite"
+msgstr "Sprite"
+
+#: xrc/GBPaletteViewer.xrc:48 xrc/PaletteViewer.xrc:111
+msgid "Save &Sprite..."
+msgstr "Salva &Sprite..."
+
+#: xrc/GBPaletteViewer.xrc:67
+msgid "Index:"
+msgstr "Indice:"
+
+#: xrc/GBPaletteViewer.xrc:79 xrc/IOViewer.xrc:21 xrc/PaletteViewer.xrc:62
+msgid "Value:"
+msgstr "Valore:"
+
+#: xrc/GBPrinter.xrc:21
+msgid "Print Si&ze"
+msgstr "Grandezza St&ampa"
+
+#: xrc/GBPrinter.xrc:29
+msgid "1x"
+msgstr "1x"
+
+#: xrc/GBPrinter.xrc:30
+msgid "2x"
+msgstr "2x"
+
+#: xrc/GBPrinter.xrc:31
+msgid "3x"
+msgstr "3x"
+
+#: xrc/GBPrinter.xrc:32
+msgid "4x"
+msgstr "4x"
+
+#: xrc/GBPrinter.xrc:58
+msgid "C&ontinue"
+msgstr "C&ontinua"
+
+#: xrc/GBROMInfo.xrc:48
+msgid "Cartridge type:"
+msgstr "Tipo di cartuccia:"
+
+#: xrc/GBROMInfo.xrc:60
+msgid "SGB code:"
+msgstr ""
+
+#: xrc/GBROMInfo.xrc:72
+msgid "CGB code:"
+msgstr ""
+
+#: xrc/GBROMInfo.xrc:84
+msgid "ROM size:"
+msgstr "Dimensione ROM:"
+
+#: xrc/GBROMInfo.xrc:96
+msgid "RAM size:"
+msgstr "Dimensione RAM:"
+
+#: xrc/GBROMInfo.xrc:108
+msgid "Dest. code:"
+msgstr "Codice dest.:"
+
+#: xrc/GBROMInfo.xrc:120
+msgid "License code:"
+msgstr "Codice licenza:"
+
+#: xrc/GBROMInfo.xrc:144
+msgid "Header checksum:"
+msgstr ""
+
+#: xrc/GBROMInfo.xrc:156
+msgid "Cartridge checksum:"
+msgstr ""
+
+#: xrc/GBTileViewer.xrc:23
+msgid "VRAM Bank"
+msgstr "Banca VRAM"
+
+#: xrc/GameBoyAdvanceConfig.xrc:4
+msgid "Game Boy Advance settings"
+msgstr "Impostazioni Game Boy Advance"
+
+#: xrc/GameBoyAdvanceConfig.xrc:21
+msgid "Save type:"
+msgstr "Tipo di salvataggio"
+
+#: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
+#: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
+msgid "Automatic"
+msgstr "Automatico"
+
+#: xrc/GameBoyAdvanceConfig.xrc:29 xrc/GameBoyAdvanceConfig.xrc:201
+msgid "SRAM"
+msgstr "SRAM"
+
+#: xrc/GameBoyAdvanceConfig.xrc:30 xrc/GameBoyAdvanceConfig.xrc:202
+msgid "Flash"
+msgstr "Flash"
+
+#: xrc/GameBoyAdvanceConfig.xrc:31 xrc/GameBoyAdvanceConfig.xrc:203
+msgid "EEPROM + Sensor"
+msgstr "EEPROM + Sensore"
+
+#: xrc/GameBoyAdvanceConfig.xrc:43
+msgid "Flash size:"
+msgstr ""
+
+#: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
+msgid "64 K"
+msgstr ""
+
+#: xrc/GameBoyAdvanceConfig.xrc:50 xrc/GameBoyAdvanceConfig.xrc:222
+msgid "128 K"
+msgstr ""
+
+#: xrc/GameBoyAdvanceConfig.xrc:64
+msgid "Detect Now"
+msgstr "Individua Ora"
+
+#: xrc/GameBoyAdvanceConfig.xrc:69
+msgid "Cartridge"
+msgstr "Cartuccia"
+
+#: xrc/GameBoyAdvanceConfig.xrc:77
+msgid "Save type"
+msgstr "Tipo di salvataggio"
+
+#: xrc/GameBoyAdvanceConfig.xrc:92
+msgid "BIOS file:"
+msgstr ""
+
+#: xrc/GameBoyAdvanceConfig.xrc:115
+msgid "Current BIOS file:"
+msgstr "File BIOS attuale:"
+
+#: xrc/GameBoyAdvanceConfig.xrc:136 xrc/GameBoyConfig.xrc:168
+msgid "Boot ROM"
+msgstr "ROM di avvio"
+
+#: xrc/GameBoyAdvanceConfig.xrc:146
+msgid "Game Code"
+msgstr "Codice Gioco"
+
+#: xrc/GameBoyAdvanceConfig.xrc:160
+msgid "Comment"
+msgstr "Commento"
+
+#: xrc/GameBoyAdvanceConfig.xrc:172
+msgid "Real Time Clock:"
+msgstr "RTC:"
+
+#: xrc/GameBoyAdvanceConfig.xrc:180 xrc/GameBoyAdvanceConfig.xrc:198
+#: xrc/GameBoyAdvanceConfig.xrc:220 xrc/GameBoyAdvanceConfig.xrc:238
+#: xrc/GameBoyConfig.xrc:180
+msgid "Default"
+msgstr "Default"
+
+#: xrc/GameBoyAdvanceConfig.xrc:181 xrc/GameBoyAdvanceConfig.xrc:239
+msgid "Disabled"
+msgstr "Disattivato"
+
+#: xrc/GameBoyAdvanceConfig.xrc:182 xrc/GameBoyAdvanceConfig.xrc:240
+msgid "Enabled"
+msgstr "Attivato"
+
+#: xrc/GameBoyAdvanceConfig.xrc:190
+msgid "Save Type:"
+msgstr "Tipo di Salvataggio:"
+
+#: xrc/GameBoyAdvanceConfig.xrc:212
+msgid "Flash Size:"
+msgstr "Dimensioni Flash:"
+
+#: xrc/GameBoyAdvanceConfig.xrc:230
+msgid "Mirroring:"
+msgstr "Mirroring:"
+
+#: xrc/GameBoyAdvanceConfig.xrc:254
+msgid "&Defaults"
+msgstr "&Defaults"
+
+#: xrc/GameBoyAdvanceConfig.xrc:261
+msgid "Game Overrides"
+msgstr "Impostazioni speciali per questo gioco"
+
+#: xrc/GameBoyConfig.xrc:4
+msgid "Game Boy settings"
+msgstr "Impostazioni Game Boy"
+
+#: xrc/GameBoyConfig.xrc:20
+msgid "Emulated &system:"
+msgstr ""
+
+#: xrc/GameBoyConfig.xrc:48
+msgid "Display &borders:"
+msgstr ""
+
+#: xrc/GameBoyConfig.xrc:57
+msgid "Never"
+msgstr "Mai"
+
+#: xrc/GameBoyConfig.xrc:58
+msgid "Always"
+msgstr "Sempre"
+
+#: xrc/GameBoyConfig.xrc:72
+msgid "System"
+msgstr "Sistema"
+
+#: xrc/GameBoyConfig.xrc:84
+msgid "Game Boy Boot &ROM file:"
+msgstr ""
+
+#: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
+msgid "Select a File"
+msgstr "Seleziona un file"
+
+#: xrc/GameBoyConfig.xrc:106
+msgid "Game Boy Color Boot ROM &file:"
+msgstr ""
+
+#: xrc/GameBoyConfig.xrc:131
+msgid "Current Game Boy BIOS file:"
+msgstr ""
+
+#: xrc/GameBoyConfig.xrc:152
+msgid "Current Game Boy Color BIOS file:"
+msgstr ""
+
+#: xrc/GameBoyConfig.xrc:186
+msgid "User 1"
+msgstr "Utente 1"
+
+#: xrc/GameBoyConfig.xrc:192
+msgid "User 2"
+msgstr "Utente 2"
+
+#: xrc/GameBoyConfig.xrc:198
+msgid "Custom Colors"
+msgstr "Colori personalizzati"
+
+#: xrc/GeneralConfig.xrc:4
+msgid "General settings"
+msgstr "Impostazioni generali"
+
+#: xrc/GeneralConfig.xrc:9
+msgid "General"
+msgstr "Generali"
+
+#: xrc/GeneralConfig.xrc:26
+msgid "Screenshot Format:"
+msgstr "Formato Screenshot:"
+
+#: xrc/GeneralConfig.xrc:57
+msgid "&Rewind interval:"
+msgstr ""
+
+#: xrc/GeneralConfig.xrc:58
+msgid "If not empty or 0, enable rewind (seconds)"
+msgstr "Se non è vuoto o 0, abilita riavvolgimento (in secondi)"
+
+#: xrc/GeneralConfig.xrc:67
+msgid "Seconds (0-600); 0 = disable"
+msgstr ""
+
+#: xrc/GeneralConfig.xrc:78
+msgid "&Throttle"
+msgstr "&Velocità"
+
+#: xrc/GeneralConfig.xrc:96 xrc/SpeedupConfig.xrc:27
+msgid "Percent of normal:"
+msgstr ""
+
+#: xrc/GeneralConfig.xrc:106
+msgid "0 = no throttle"
+msgstr "0 = senza limite"
+
+#: xrc/GeneralConfig.xrc:114
+msgid "Unlimited"
+msgstr "Illimitato"
+
+#: xrc/IOViewer.xrc:4
+msgid "IO Viewer"
+msgstr "Visualizzatore IO"
+
+#: xrc/JoyPanel.xrc:8
+msgid ""
+"Click a field and press a key or move joystick to add. Press backspace to "
+"delete last added key. Resize window or click inside and move pointer to see"
+" entire contents if too small."
+msgstr ""
+
+#: xrc/JoyPanel.xrc:276
+msgid "Autofire A"
+msgstr "Fuoco automatico A"
+
+#: xrc/JoyPanel.xrc:320
+msgid "Autofire B"
+msgstr "Fuoco automatico B"
+
+#: xrc/JoyPanel.xrc:342
+msgid "Motion Left / Dark"
+msgstr ""
+
+#: xrc/JoyPanel.xrc:386
+msgid "Motion Right / Light"
+msgstr ""
+
+#: xrc/JoyPanel.xrc:408
+msgid "Speed Up"
+msgstr "Aumenta Velocità"
+
+#: xrc/JoyPanel.xrc:430
+msgid "Spin Left"
+msgstr "Gira a Sinistra"
+
+#: xrc/JoyPanel.xrc:461
+msgid "Spin Right"
+msgstr "Gira a Destra"
+
+#: xrc/JoyPanel.xrc:483
+msgid "Screenshot"
+msgstr "Screenshot"
+
+#: xrc/JoyPanel.xrc:507
+msgid "Special"
+msgstr "Speciale"
+
+#: xrc/JoyPanel.xrc:515
+msgid "Use as default"
+msgstr "Usa come Predefinito"
+
+#: xrc/JoyPanel.xrc:522
+msgid "Defaults"
+msgstr "Predefiniti"
+
+#: xrc/JoyPanel.xrc:529
+msgid "Clear All"
+msgstr "Cancella tutto"
+
+#: xrc/JoypadConfig.xrc:4
+msgid "Joypad Configuration"
+msgstr "Configurazione Joypad"
+
+#: xrc/JoypadConfig.xrc:10
+msgid "SDL GameController Mode"
+msgstr ""
+
+#: xrc/JoypadConfig.xrc:19
+msgid "Player 1"
+msgstr "Giocatore 1"
+
+#: xrc/JoypadConfig.xrc:25
+msgid "Player 2"
+msgstr "Giocatore 2"
+
+#: xrc/JoypadConfig.xrc:31
+msgid "Player 3"
+msgstr "Giocatore 3"
+
+#: xrc/JoypadConfig.xrc:37
+msgid "Player 4"
+msgstr "Giocatore 4"
+
+#: xrc/LinkConfig.xrc:4
+msgid "Link configuration"
+msgstr "Impostazione Link"
+
+#: xrc/LinkConfig.xrc:11
+msgid "Link timeout (in milliseconds)"
+msgstr "Timeout Link (in millisecondi)"
+
+#: xrc/Logging.xrc:4
+msgid "Logging"
+msgstr "Logging"
+
+#: xrc/Logging.xrc:20
+msgid "Unaligned &memory"
+msgstr "Memoria &non allineata"
+
+#: xrc/Logging.xrc:27
+msgid "Illegal &write"
+msgstr "Scrittura &illegale"
+
+#: xrc/Logging.xrc:34
+msgid "Illegal &read"
+msgstr "Lettura &illegale"
+
+#: xrc/Logging.xrc:69
+msgid "&Undefined instruction"
+msgstr "&istruzione non definita"
+
+#: xrc/Logging.xrc:83
+msgid "Soun&d output"
+msgstr "Outpu&t suono"
+
+#: xrc/Logging.xrc:88
+msgid "Verbose"
+msgstr "Verboso"
+
+#: xrc/MainMenu.xrc:5
+msgid "&File"
+msgstr "&File"
+
+#: xrc/MainMenu.xrc:7
+msgid "Open..."
+msgstr "Apri..."
+
+#: xrc/MainMenu.xrc:10
+msgid "Open &Game Boy..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:13
+msgid "Open Game Boy &Color..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:16
+msgid "Open rece&nt"
+msgstr "Apri ROM rece&nte"
+
+#: xrc/MainMenu.xrc:18
+msgid "&Reset recent list"
+msgstr "&Pulisci lista ROM recenti"
+
+#: xrc/MainMenu.xrc:21
+msgid "&Freeze recent list"
+msgstr "&Blocca lista ROM recenti"
+
+#: xrc/MainMenu.xrc:26
+msgid "ROM in&formation..."
+msgstr "Info ROM..."
+
+#: xrc/MainMenu.xrc:30
+msgid "&e-Reader"
+msgstr "&e-Reader"
+
+#: xrc/MainMenu.xrc:32
+msgid "&Reset Loading Dot Code"
+msgstr "&Ripristina Caricamento del Dot Code"
+
+#: xrc/MainMenu.xrc:35
+msgid "&Load Dot Code..."
+msgstr "&Carica Dot Code..."
+
+#: xrc/MainMenu.xrc:38
+msgid "&Reset Saving Dot Code"
+msgstr "&Rirpristina Salvataggio del Dot Code"
+
+#: xrc/MainMenu.xrc:41
+msgid "&Save Dot Code..."
+msgstr "&Salva Dot Code..."
+
+#: xrc/MainMenu.xrc:47
+msgid "Most &recent"
+msgstr "Più &recente"
+
+#: xrc/MainMenu.xrc:50
+msgid "Load current state slot"
+msgstr "Carica slot attuale"
+
+#: xrc/MainMenu.xrc:53
+msgid "&Auto load most recent"
+msgstr "&Autocarica il più recente"
+
+#: xrc/MainMenu.xrc:89
+msgid "From &File..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:93
+msgid "Do not change &battery save"
+msgstr "Non cambiare il &salvataggio a batteria"
+
+#: xrc/MainMenu.xrc:97
+msgid "Do not change &cheat list"
+msgstr "Non cambiare lista di &codici"
+
+#: xrc/MainMenu.xrc:100
+msgid "&Load state"
+msgstr "&Carica stato"
+
+#: xrc/MainMenu.xrc:104
+msgid "&Oldest slot"
+msgstr "&Slot più vecchio"
+
+#: xrc/MainMenu.xrc:107
+msgid "Save current state slot"
+msgstr "Salta slot attuale"
+
+#: xrc/MainMenu.xrc:110
+msgid "Increase state slot number and save"
+msgstr "Aumenta il numero di slot di salvataggio"
+
+#: xrc/MainMenu.xrc:117
+msgid "&2"
+msgstr "&2"
+
+#: xrc/MainMenu.xrc:120
+msgid "&3"
+msgstr "&3"
+
+#: xrc/MainMenu.xrc:123
+msgid "&4"
+msgstr "&4"
+
+#: xrc/MainMenu.xrc:126
+msgid "&5"
+msgstr "&5"
+
+#: xrc/MainMenu.xrc:129
+msgid "&6"
+msgstr "&6"
+
+#: xrc/MainMenu.xrc:132
+msgid "&7"
+msgstr "&7"
+
+#: xrc/MainMenu.xrc:135
+msgid "&8"
+msgstr "&8"
+
+#: xrc/MainMenu.xrc:138
+msgid "&9"
+msgstr "&9"
+
+#: xrc/MainMenu.xrc:141
+msgid "1&0"
+msgstr "1&0"
+
+#: xrc/MainMenu.xrc:145
+msgid "To &File..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:147
+msgid "&Save state"
+msgstr "&Salva stato"
+
+#: xrc/MainMenu.xrc:150
+msgid "Increase state slot number"
+msgstr "Aumenta il numero di slot"
+
+#: xrc/MainMenu.xrc:153
+msgid "Decrease state slot number"
+msgstr "Diminuisci il numero di slot"
+
+#: xrc/MainMenu.xrc:158 xrc/MainMenu.xrc:170
+msgid "&Battery file..."
+msgstr "&File batteria..."
+
+#: xrc/MainMenu.xrc:161
+msgid "Game Shark &code file..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:164 xrc/MainMenu.xrc:173
+msgid "&Game Shark snapshot..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:166
+msgid "&Import"
+msgstr "&Importa"
+
+#: xrc/MainMenu.xrc:175
+msgid "&Export"
+msgstr "&Esporta"
+
+#: xrc/MainMenu.xrc:179
+msgid "Screen capt&ure..."
+msgstr "Cattura sche&rmo"
+
+#: xrc/MainMenu.xrc:183
+msgid "Start &sound recording..."
+msgstr "Inizia registrazione &suono..."
+
+#: xrc/MainMenu.xrc:186
+msgid "Stop s&ound recording"
+msgstr "Ferma registrazione s&uono"
+
+#: xrc/MainMenu.xrc:189
+msgid "Start &video recording..."
+msgstr "Inizia registrazione &video..."
+
+#: xrc/MainMenu.xrc:192
+msgid "Stop v&ideo recording"
+msgstr "Ferma registrazione v&ideo"
+
+#: xrc/MainMenu.xrc:195
+msgid "Start &game recording..."
+msgstr "Inizia registrazione &gioco..."
+
+#: xrc/MainMenu.xrc:198
+msgid "Stop g&ame recording"
+msgstr "Ferma registrazione g&ioco"
+
+#: xrc/MainMenu.xrc:200
+msgid "&Record"
+msgstr "&Registra"
+
+#: xrc/MainMenu.xrc:204
+msgid "Start playing &movie..."
+msgstr "Riproduci &filmato..."
+
+#: xrc/MainMenu.xrc:207
+msgid "Stop playing m&ovie"
+msgstr "Ferma il f&ilmato"
+
+#: xrc/MainMenu.xrc:209
+msgid "&Play"
+msgstr "&Riproduci"
+
+#: xrc/MainMenu.xrc:214
+msgid "&Quit"
+msgstr "&Esci"
+
+#: xrc/MainMenu.xrc:218
+msgid "&Emulation"
+msgstr "&Emulazione"
+
+#: xrc/MainMenu.xrc:220
+msgid "&Pause"
+msgstr "&Pausa"
+
+#: xrc/MainMenu.xrc:224
+msgid "&Next frame"
+msgstr "&Prossimo frame"
+
+#: xrc/MainMenu.xrc:227
+msgid "Re&wind"
+msgstr "Ri&avvogimento"
+
+#: xrc/MainMenu.xrc:231
+msgid "Toggle &full screen"
+msgstr "Schermo &intero"
+
+#: xrc/MainMenu.xrc:238
+msgid "&Turbo mode"
+msgstr "Modalità &turbo"
+
+#: xrc/MainMenu.xrc:242
+msgid "&VSync"
+msgstr "&VSync"
+
+#: xrc/MainMenu.xrc:246
+msgid "&Auto skip frames"
+msgstr "&Salta frame automaticamente"
+
+#: xrc/MainMenu.xrc:251
+msgid "&Skip BIOS"
+msgstr "&Salta BIOS"
+
+#: xrc/MainMenu.xrc:255
+msgid "&Auto IPS / UPS / IPF patch"
+msgstr ""
+
+#: xrc/MainMenu.xrc:259
+msgid "&Pause when inactive"
+msgstr "&Pausa quando inattivo"
+
+#: xrc/MainMenu.xrc:264
+msgid "&Reset"
+msgstr "&Reset"
+
+#: xrc/MainMenu.xrc:268
+msgid "&Options"
+msgstr "&Opzioni"
+
+#: xrc/MainMenu.xrc:270
+msgid "&Link"
+msgstr "&Link"
+
+#: xrc/MainMenu.xrc:272
+msgid "Start &Network Link..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:277
+msgid "&Nothing"
+msgstr "&Niente"
+
+#: xrc/MainMenu.xrc:281
+msgid "&Cable"
+msgstr "&Cavo"
+
+#: xrc/MainMenu.xrc:285
+msgid "&Wireless"
+msgstr "&Wireless"
+
+#: xrc/MainMenu.xrc:298
+msgid "&Local mode"
+msgstr "&Modalità Locale"
+
+#: xrc/MainMenu.xrc:302
+msgid "&Link at boot"
+msgstr "&Link all'avvio"
+
+#: xrc/MainMenu.xrc:306
+msgid "&Speed hack"
+msgstr "&Speed hack"
+
+#: xrc/MainMenu.xrc:310 xrc/MainMenu.xrc:316 xrc/MainMenu.xrc:383
+#: xrc/MainMenu.xrc:417
+msgid "&Configure..."
+msgstr "&Configura..."
+
+#: xrc/MainMenu.xrc:314
+msgid "&Video"
+msgstr "&Video"
+
+#: xrc/MainMenu.xrc:320
+msgid "&Start in full screen"
+msgstr "&Avvia a schermo intero"
+
+#: xrc/MainMenu.xrc:324
+msgid "&Scaled resize"
+msgstr "&Regola la dimensione"
+
+#: xrc/MainMenu.xrc:326
+msgid "&1x"
+msgstr "&1x"
+
+#: xrc/MainMenu.xrc:329
+msgid "&2x"
+msgstr "&2x"
+
+#: xrc/MainMenu.xrc:332
+msgid "&3x"
+msgstr "&3x"
+
+#: xrc/MainMenu.xrc:335
+msgid "&4x"
+msgstr "&4x"
+
+#: xrc/MainMenu.xrc:338
+msgid "&5x"
+msgstr "&5x"
+
+#: xrc/MainMenu.xrc:341
+msgid "&6x"
+msgstr "&6x"
+
+#: xrc/MainMenu.xrc:345
+msgid "Change pixel filter"
+msgstr "Modifica filtro pixel"
+
+#: xrc/MainMenu.xrc:348
+msgid "Change interframe blending"
+msgstr "Modifica interframe blending"
+
+#: xrc/MainMenu.xrc:351
+msgid "&Retain aspect ratio"
+msgstr "&Mantieni rapporto d'aspetto"
+
+#: xrc/MainMenu.xrc:356
+msgid "&Bilinear filter"
+msgstr "&Filtro Bilineare"
+
+#: xrc/MainMenu.xrc:367
+msgid "&Keep window on top"
+msgstr "&Sempre in primo piano"
+
+#: xrc/MainMenu.xrc:372
+msgid "&Disable on-screen display"
+msgstr "&Disabilita OSD"
+
+#: xrc/MainMenu.xrc:376
+msgid "&Transparent on-screen display"
+msgstr "&OSD Trasparente"
+
+#: xrc/MainMenu.xrc:381
+msgid "&Audio"
+msgstr "&Audio"
+
+#: xrc/MainMenu.xrc:386
+msgid "&Increase volume"
+msgstr "&Aumenta volume"
+
+#: xrc/MainMenu.xrc:389
+msgid "&Decrease volume"
+msgstr "&Diminuisci volume"
+
+#: xrc/MainMenu.xrc:392
+msgid "&Toggle sound"
+msgstr "&Attiva suono"
+
+#: xrc/MainMenu.xrc:397
+msgid "&Game Boy Advance sound interpolation"
+msgstr "&Game Boy Advance interpolazione suono"
+
+#: xrc/MainMenu.xrc:402
+msgid "&Game Boy sound enhancement"
+msgstr ""
+
+#: xrc/MainMenu.xrc:406
+msgid "&Game Boy surround sound effect"
+msgstr ""
+
+#: xrc/MainMenu.xrc:410
+msgid "&Game Boy sound declicking"
+msgstr ""
+
+#: xrc/MainMenu.xrc:415
+msgid "&Input"
+msgstr "&Input"
+
+#: xrc/MainMenu.xrc:420
+msgid "Allow &keyboard background input"
+msgstr "Consenti l'input &tastiera in background"
+
+#: xrc/MainMenu.xrc:424
+msgid "Allow &joystick background input"
+msgstr "Consenti l'input &joystick in background"
+
+#: xrc/MainMenu.xrc:429
+msgid "&Autofire"
+msgstr "&Fuoco automatico"
+
+#: xrc/MainMenu.xrc:448
+msgid "&Autohold"
+msgstr "&Autohold"
+
+#: xrc/MainMenu.xrc:466
+msgid "&A"
+msgstr "&A"
+
+#: xrc/MainMenu.xrc:470
+msgid "&B"
+msgstr "&B"
+
+#: xrc/MainMenu.xrc:474
+msgid "&L"
+msgstr "&L"
+
+#: xrc/MainMenu.xrc:478
+msgid "&R"
+msgstr "&R"
+
+#: xrc/MainMenu.xrc:494 xrc/MainMenu.xrc:517
+msgid "Configure..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:498
+msgid "&Real-time clock"
+msgstr "&RTC"
+
+#: xrc/MainMenu.xrc:502
+msgid "&Use BIOS file"
+msgstr "&Usa file BIOS"
+
+#: xrc/MainMenu.xrc:506
+msgid "&Debug print"
+msgstr "&Stampa debug"
+
+#: xrc/MainMenu.xrc:510 xrc/MainMenu.xrc:525
+msgid "&LCD Filter"
+msgstr "Filtro &LCD"
+
+#: xrc/MainMenu.xrc:521
+msgid "&Game Boy color option"
+msgstr ""
+
+#: xrc/MainMenu.xrc:529
+msgid "&Game Boy Colorizer Hack (requires restart)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:533
+msgid "&Game Boy printer"
+msgstr ""
+
+#: xrc/MainMenu.xrc:537
+msgid "&Gather a full page before printing"
+msgstr "&Ottieni pagina intera prima di stampare"
+
+#: xrc/MainMenu.xrc:541
+msgid "&Save printouts as screen captures"
+msgstr "&Salva stampati come catture di schermo"
+
+#: xrc/MainMenu.xrc:546
+msgid "&Use Game Boy BIOS file (requires restart)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:550
+msgid "&Use Game Boy Color BIOS file"
+msgstr ""
+
+#: xrc/MainMenu.xrc:555
+msgid "&General..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:558
+msgid "&Speedup / Turbo..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:561
+msgid "D&irectories..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:564
+msgid "&Key Shortcuts..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:567
+msgid "UI Settings"
+msgstr ""
+
+#: xrc/MainMenu.xrc:569
+msgid "Enable &Status bar"
+msgstr ""
+
+#: xrc/MainMenu.xrc:573
+msgid "Hide &Menu Bar"
+msgstr ""
+
+#: xrc/MainMenu.xrc:577
+msgid "Suspend &Screen Saver"
+msgstr ""
+
+#: xrc/MainMenu.xrc:583
+msgid "&Tools"
+msgstr "&Strumenti"
+
+#: xrc/MainMenu.xrc:585
+msgid "&Cheats"
+msgstr "&Trucchi"
+
+#: xrc/MainMenu.xrc:587
+msgid "List &cheats..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:590
+msgid "Find c&heat..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:594
+msgid "A&utomatically save / load cheats"
+msgstr ""
+
+#: xrc/MainMenu.xrc:598
+msgid "&Enable cheats"
+msgstr "&Abilita trucchi"
+
+#: xrc/MainMenu.xrc:605
+msgid "&Break into GDB"
+msgstr "&Entra in GDB"
+
+#: xrc/MainMenu.xrc:609
+msgid "&Configure port..."
+msgstr "&Configura porta..."
+
+#: xrc/MainMenu.xrc:612
+msgid "&Break on load"
+msgstr "&Ferma al caricamento"
+
+#: xrc/MainMenu.xrc:617
+msgid "&Disconnect"
+msgstr "&Disconnetti"
+
+#: xrc/MainMenu.xrc:622
+msgid "&Disassemble..."
+msgstr "&Disassembla..."
+
+#: xrc/MainMenu.xrc:625
+msgid "&Logging..."
+msgstr "&Logging..."
+
+#: xrc/MainMenu.xrc:628
+msgid "&IO Viewer..."
+msgstr "&Visualizzatore IO..."
+
+#: xrc/MainMenu.xrc:631
+msgid "&Map Viewer..."
+msgstr "&Visualizzatore Mappa..."
+
+#: xrc/MainMenu.xrc:634
+msgid "M&emory Viewer..."
+msgstr "V&isualizzatore Memoria..."
+
+#: xrc/MainMenu.xrc:637
+msgid "&OAM Viewer..."
+msgstr "&Visore OAM..."
+
+#: xrc/MainMenu.xrc:640
+msgid "&Palette Viewer..."
+msgstr "&Visualizzatore Tavolozza..."
+
+#: xrc/MainMenu.xrc:643
+msgid "&Tile Viewer..."
+msgstr "&Visualizatore Tile..."
+
+#: xrc/MainMenu.xrc:648
+msgid "Show all video layers"
+msgstr "Mostra tutti i livelli video"
+
+#: xrc/MainMenu.xrc:691
+msgid "&View Layers"
+msgstr "&Mostra Piani"
+
+#: xrc/MainMenu.xrc:695
+msgid "Channel &1"
+msgstr "Canale &1"
+
+#: xrc/MainMenu.xrc:700
+msgid "Channel &2"
+msgstr "Canale &2"
+
+#: xrc/MainMenu.xrc:705
+msgid "Channel &3"
+msgstr "Canale &3"
+
+#: xrc/MainMenu.xrc:710
+msgid "Channel &4"
+msgstr "Canale &4"
+
+#: xrc/MainMenu.xrc:715
+msgid "Direct Sound &A"
+msgstr "Suono Diretto &A"
+
+#: xrc/MainMenu.xrc:720
+msgid "Direct Sound &B"
+msgstr "Suono Diretto &B"
+
+#: xrc/MainMenu.xrc:724
+msgid "&Sound Channels"
+msgstr "&Canali Suono"
+
+#: xrc/MainMenu.xrc:728
+msgid "&Help"
+msgstr "&Aiuto"
+
+#: xrc/MainMenu.xrc:730
+msgid "Report &Bugs"
+msgstr "Segnalazione &Bug"
+
+#: xrc/MainMenu.xrc:733
+msgid "Visual Boy Advance-M Support &Forum"
+msgstr ""
+
+#: xrc/MainMenu.xrc:736
+msgid "Translations"
+msgstr "Traduzione"
+
+#: xrc/MainMenu.xrc:744
+msgid "Check for updates"
+msgstr "Controlla aggiornamenti"
+
+#: xrc/MainMenu.xrc:747
+msgid "&Factory Reset..."
+msgstr "&Ripristino impostazioni di fabbrica..."
+
+#: xrc/MainMenu.xrc:751
+msgid "&About..."
+msgstr "&Maggiori informazioni..."
+
+#: xrc/MainMenu.xrc:755
+msgid "&Languages"
+msgstr ""
+
+#: xrc/MainMenu.xrc:757
+msgid "Default Language"
+msgstr ""
+
+#: xrc/MainMenu.xrc:761
+msgid "Bulgarian"
+msgstr ""
+
+#: xrc/MainMenu.xrc:765
+msgid "Breton"
+msgstr ""
+
+#: xrc/MainMenu.xrc:769
+msgid "Czech"
+msgstr ""
+
+#: xrc/MainMenu.xrc:773
+msgid "Greek"
+msgstr ""
+
+#: xrc/MainMenu.xrc:777
+msgid "English (US)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:781
+msgid "Spanish (Latin American)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:785
+msgid "Spanish (Colombia)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:789
+msgid "Spanish (Peru)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:793
+msgid "Spanish (United States)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:797
+msgid "Spanish"
+msgstr ""
+
+#: xrc/MainMenu.xrc:801
+msgid "French (France)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:805
+msgid "French"
+msgstr ""
+
+#: xrc/MainMenu.xrc:809
+msgid "Galician"
+msgstr ""
+
+#: xrc/MainMenu.xrc:813
+msgid "Hebrew (Israel)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:817
+msgid "Hungarian (Hungary)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:821
+msgid "Hungarian"
+msgstr ""
+
+#: xrc/MainMenu.xrc:825
+msgid "Indonesian"
+msgstr ""
+
+#: xrc/MainMenu.xrc:829
+msgid "Italian"
+msgstr ""
+
+#: xrc/MainMenu.xrc:833
+msgid "Japanese"
+msgstr ""
+
+#: xrc/MainMenu.xrc:837
+msgid "Korean (Korea)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:841
+msgid "Korean"
+msgstr ""
+
+#: xrc/MainMenu.xrc:845
+msgid "Malay (Malaysia)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:849
+msgid "Norwegian"
+msgstr ""
+
+#: xrc/MainMenu.xrc:853
+msgid "Dutch"
+msgstr ""
+
+#: xrc/MainMenu.xrc:857
+msgid "Polish (Poland)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:861
+msgid "Polish"
+msgstr ""
+
+#: xrc/MainMenu.xrc:865
+msgid "Portuguese (Brazil)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:869
+msgid "Portuguese (Portugal)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:873
+msgid "Russian (Russia)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:877
+msgid "Swedish"
+msgstr ""
+
+#: xrc/MainMenu.xrc:881
+msgid "Turkish"
+msgstr ""
+
+#: xrc/MainMenu.xrc:885
+msgid "Ukrainian"
+msgstr ""
+
+#: xrc/MainMenu.xrc:889
+msgid "Urdu (Pakistan)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:893
+msgid "Chinese (China)"
+msgstr ""
+
+#: xrc/MainMenu.xrc:897
+msgid "&Use external translations"
+msgstr ""
+
+#: xrc/MapViewer.xrc:4
+msgid "Map Viewer"
+msgstr "Visualizzatore Mappa"
+
+#: xrc/MapViewer.xrc:16
+msgid "Frame 0"
+msgstr "Frame 0"
+
+#: xrc/MapViewer.xrc:22
+msgid "Frame 1"
+msgstr "Frame 1"
+
+#: xrc/MapViewer.xrc:25
+msgid "Frame"
+msgstr "Frame"
+
+#: xrc/MapViewer.xrc:84
+msgid "Map Base:"
+msgstr "Base mappa:"
+
+#: xrc/MapViewer.xrc:92
+msgid "Char Base:"
+msgstr "Base Char:"
+
+#: xrc/MapViewer.xrc:100 xrc/MemSelRegion.xrc:22 xrc/OAMViewer.xrc:77
+msgid "Size:"
+msgstr "Dimensione:"
+
+#: xrc/MapViewer.xrc:108 xrc/OAMViewer.xrc:45
+msgid "Colors:"
+msgstr "Colori:"
+
+#: xrc/MapViewer.xrc:124
+msgid "Mosaic:"
+msgstr "Mosaico:"
+
+#: xrc/MapViewer.xrc:132
+msgid "Overflow:"
+msgstr "Straripamento:"
+
+#: xrc/MemViewer.xrc:4
+msgid "Memory Viewer"
+msgstr "Visualizzatore Memoria"
+
+#: xrc/MemViewer.xrc:17
+msgid "&8-bit"
+msgstr "&8-bit"
+
+#: xrc/MemViewer.xrc:25
+msgid "&16-bit"
+msgstr "&16-bit"
+
+#: xrc/MemViewer.xrc:32
+msgid "&32-bit"
+msgstr "&32-bit"
+
+#: xrc/MemViewer.xrc:83
+msgid "Current address:"
+msgstr "Indirizzo corrente:"
+
+#: xrc/MemViewer.xrc:108
+msgid "&Load..."
+msgstr "&Carica..."
+
+#: xrc/NetLink.xrc:4
+msgid "Start Network Link"
+msgstr "Inizia Network Link"
+
+#: xrc/NetLink.xrc:13
+msgid "WARNING: Link will likely not work over the internet or LAN."
+msgstr ""
+
+#: xrc/NetLink.xrc:38
+msgid "Server"
+msgstr "Server"
+
+#: xrc/NetLink.xrc:47
+msgid "Client"
+msgstr "Client"
+
+#: xrc/NetLink.xrc:66
+msgid "Players:"
+msgstr "Giocatori:"
+
+#: xrc/NetLink.xrc:83
+msgid "2"
+msgstr ""
+
+#: xrc/NetLink.xrc:107
+msgid "Server:"
+msgstr "Server:"
+
+#: xrc/NetLink.xrc:124
+msgid "Port:"
+msgstr "Porta:"
+
+#: xrc/OAMViewer.xrc:4
+msgid "OAM Viewer"
+msgstr "Visualizzatore OAM"
+
+#: xrc/OAMViewer.xrc:85
+msgid "Rot.:"
+msgstr "Rot.:"
+
+#: xrc/PaletteViewer.xrc:4
+msgid "Palette Viewer"
+msgstr "Visualizzazione Tavolozza"
+
+#: xrc/PaletteViewer.xrc:88
+msgid "C&hange backdrop color..."
+msgstr "C&ambia colore di sfondo..."
+
+#: xrc/SoundConfig.xrc:4
+msgid "Sound Settings"
+msgstr "Impostazioni Suono"
+
+#: xrc/SoundConfig.xrc:18
+msgid "Volume:"
+msgstr ""
+
+#: xrc/SoundConfig.xrc:36
+msgid "Mute"
+msgstr "Muto"
+
+#: xrc/SoundConfig.xrc:56 xrc/SoundConfig.xrc:328
+msgid "Maximum"
+msgstr "Massimo"
+
+#: xrc/SoundConfig.xrc:73
+msgid "Sample rate:"
+msgstr ""
+
+#: xrc/SoundConfig.xrc:79
+msgid "48 KHz"
+msgstr "48 KHz"
+
+#: xrc/SoundConfig.xrc:80
+msgid "44.1 KHz"
+msgstr "44.1 KHz"
+
+#: xrc/SoundConfig.xrc:81
+msgid "22 KHz"
+msgstr "22 KHz"
+
+#: xrc/SoundConfig.xrc:82
+msgid "11 KHz"
+msgstr "11 KHz"
+
+#: xrc/SoundConfig.xrc:119
+msgid "Direct Sound"
+msgstr ""
+
+#: xrc/SoundConfig.xrc:162
+msgid "Enable stereo upmixing"
+msgstr "Abilita upmixing stereo"
+
+#: xrc/SoundConfig.xrc:169
+msgid "Enable hardware acceleration"
+msgstr "Abilita accellerazione hardware"
+
+#: xrc/SoundConfig.xrc:198
+msgid "Number of sound buffers:"
+msgstr "Numero di buffer sonori"
+
+#: xrc/SoundConfig.xrc:206
+msgid "Advanced"
+msgstr "Avanzato"
+
+#: xrc/SoundConfig.xrc:238
+msgid "Lots"
+msgstr "Tanti"
+
+#: xrc/SoundConfig.xrc:247
+msgid "Echo"
+msgstr "Eco"
+
+#: xrc/SoundConfig.xrc:255
+msgid "Stereo"
+msgstr "Stereo"
+
+#: xrc/SoundConfig.xrc:266
+msgid "Center"
+msgstr "Centrale"
+
+#: xrc/SoundConfig.xrc:277
+msgid "Left / Right"
+msgstr ""
+
+#: xrc/SoundConfig.xrc:306
+msgid "Sound filtering"
+msgstr "Filtraggio suono"
+
+#: xrc/TileViewer.xrc:4
 msgid "Tile Viewer"
 msgstr "Visualizzatore Tile"
 
-#: ../src/wx/xrc/TileViewer.xrc:15
-msgid "1&6"
-msgstr "1&6"
-
-#: ../src/wx/xrc/TileViewer.xrc:21
-msgid "&256"
-msgstr "&256"
-
-#: ../src/wx/xrc/TileViewer.xrc:24
+#: xrc/TileViewer.xrc:24
 msgid "Colors"
 msgstr "Colori"
 
-#: ../src/wx/xrc/TileViewer.xrc:34
-msgid "0x600&0000"
-msgstr "0x600&0000"
+#: xrc/SpeedupConfig.xrc:4
+msgid "SpeedUp / Turbo Settings"
+msgstr "Impostazioni SpeedUp / Turbo"
 
-#: ../src/wx/xrc/TileViewer.xrc:40
-msgid "0x600&4000"
-msgstr "0x600&4000"
+#: xrc/SpeedupConfig.xrc:9
+msgid "Speedup Throttle"
+msgstr "Acceleratore"
 
-#: ../src/wx/xrc/TileViewer.xrc:45
-msgid "0x600&8000"
-msgstr "0x600&8000"
+#: xrc/SpeedupConfig.xrc:54
+msgid "Frame skip"
+msgstr "Salta Frame"
 
-#: ../src/wx/xrc/TileViewer.xrc:50
-msgid "0x600&C000"
-msgstr "0x600&C000"
-
-#: ../src/wx/xrc/TileViewer.xrc:55
-msgid "0x60&10000"
-msgstr "0x60&10000"
+#: xrc/SpeedupConfig.xrc:61
+msgid "Mute Sound"
+msgstr ""
