@@ -36,10 +36,6 @@ MetalDrawingPanel::~MetalDrawingPanel()
 {
     if (did_init)
     {
-        renderPassDescriptor = nil;
-        commandBuffer = nil;
-        renderEncoder = nil;
-
         if (metalView != nil)
             [metalView removeFromSuperview];
 
@@ -132,6 +128,13 @@ void MetalDrawingPanel::CreateMetalView()
     NSError *error = NULL;
     _pipelineState = [_device newRenderPipelineStateWithDescriptor:pipelineStateDescriptor
                                                              error:&error];
+    
+    // Release temporary objects
+    [pipelineStateDescriptor release];
+    [fragmentFunction release];
+    [vertexFunction release];
+    [defaultLibrary release];
+    
     if (!_pipelineState) {
         wxLogError(_("Failed to create Metal pipeline state: %s"), [[error localizedDescription] UTF8String]);
         return;
@@ -200,6 +203,9 @@ id<MTLTexture> MetalDrawingPanel::loadTextureUsingData(void *data)
     // Create the texture from the device by using the descriptor
     id<MTLTexture> texture = [_device newTextureWithDescriptor:textureDescriptor];
 
+    // Release the descriptor after use
+    [textureDescriptor release];
+
     // Calculate the number of bytes per row in the image.
     NSUInteger bytesPerRow = std::ceil(width * scale * 4) + 4;
 
@@ -266,181 +272,183 @@ void MetalDrawingPanel::DrawArea(wxWindowDC& dc)
 
 void MetalDrawingPanel::DrawArea()
 {
-    uint32_t srcPitch = 0;
-    
-    if (!did_init)
-        DrawingPanelInit();
-    
-    if (systemColorDepth == 8) {
-        srcPitch = std::ceil(width * scale) + 4;
-    } else if (systemColorDepth == 16) {
-        srcPitch = std::ceil(width * scale * 2) + 4;
-    } else if (systemColorDepth == 24) {
-        srcPitch = std::ceil(width * scale * 3);
-    } else {
-        srcPitch = std::ceil(width * scale * 4) + 4;
-    }
+    @autoreleasepool {
+        uint32_t srcPitch = 0;
+        
+        if (!did_init)
+            DrawingPanelInit();
+        
+        if (systemColorDepth == 8) {
+            srcPitch = std::ceil(width * scale) + 4;
+        } else if (systemColorDepth == 16) {
+            srcPitch = std::ceil(width * scale * 2) + 4;
+        } else if (systemColorDepth == 24) {
+            srcPitch = std::ceil(width * scale * 3);
+        } else {
+            srcPitch = std::ceil(width * scale * 4) + 4;
+        }
 
-    if (systemColorDepth == 8) {
-        int pos = 0;
-        int src_pos = 0;
-        uint8_t *src = todraw + srcPitch;
-        uint32_t *dst = (uint32_t *)calloc(4, std::ceil((width * scale) * (height * scale) + 1));
+        if (systemColorDepth == 8) {
+            int pos = 0;
+            int src_pos = 0;
+            uint8_t *src = todraw + srcPitch;
+            uint32_t *dst = (uint32_t *)calloc(4, std::ceil((width * scale) * (height * scale) + 1));
 
-        for (int y = 0; y < (height * scale); y++) {
-            for (int x = 0; x < (width * scale); x++) {
+            for (int y = 0; y < (height * scale); y++) {
+                for (int x = 0; x < (width * scale); x++) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
-                if (src[src_pos] == 0xff) {
-                    dst[pos] = 0x00ffffff;
-                } else {
-                    dst[pos] = (src[src_pos] & 0xe0) + ((src[src_pos] & 0x1c) << 11) + ((src[src_pos] & 0x3) << 22);
-                }
+                    if (src[src_pos] == 0xff) {
+                        dst[pos] = 0x00ffffff;
+                    } else {
+                        dst[pos] = (src[src_pos] & 0xe0) + ((src[src_pos] & 0x1c) << 11) + ((src[src_pos] & 0x3) << 22);
+                    }
 #else
-                if (src[src_pos] == 0xff) {
-                    dst[pos] = 0xffffff00;
-                } else {
-                    dst[pos] = ((src[src_pos] & 0xe0) << 24) + ((src[src_pos] & 0x1c) << 19) + ((src[src_pos] & 0x3) << 14);
-                }
+                    if (src[src_pos] == 0xff) {
+                        dst[pos] = 0xffffff00;
+                    } else {
+                        dst[pos] = ((src[src_pos] & 0xe0) << 24) + ((src[src_pos] & 0x1c) << 19) + ((src[src_pos] & 0x3) << 14);
+                    }
 #endif
+                    pos++;
+                    src_pos++;
+                }
                 pos++;
-                src_pos++;
+                src_pos += 4;
             }
-            pos++;
-            src_pos += 4;
-        }
 
-        if (_texture != nil) {
-            [_texture release];
-            _texture = nil;
-        }
-        _texture = loadTextureUsingData(dst);
+            if (_texture != nil) {
+                [_texture release];
+                _texture = nil;
+            }
+            _texture = loadTextureUsingData(dst);
 
-        if (dst != NULL) {
-            free(dst);
-        }
-    } else if (systemColorDepth == 16) {
-        int pos = 0;
-        int src_pos = 0;
-        uint8_t *src = todraw + srcPitch;
-        uint32_t *dst = (uint32_t *)calloc(4, std::ceil((width * scale) * (height * scale) + 1));
-        uint16_t *src16 = (uint16_t *)src;
+            if (dst != NULL) {
+                free(dst);
+            }
+        } else if (systemColorDepth == 16) {
+            int pos = 0;
+            int src_pos = 0;
+            uint8_t *src = todraw + srcPitch;
+            uint32_t *dst = (uint32_t *)calloc(4, std::ceil((width * scale) * (height * scale) + 1));
+            uint16_t *src16 = (uint16_t *)src;
 
-        for (int y = 0; y < (height * scale); y++) {
-            for (int x = 0; x < (width * scale); x++) {
+            for (int y = 0; y < (height * scale); y++) {
+                for (int x = 0; x < (width * scale); x++) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
-                if (src16[src_pos] == 0x7fff) {
-                    dst[pos] = 0x00ffffff;
-                } else {
-                    dst[pos] = ((src16[src_pos] & 0x7c00) >> 7) + ((src16[src_pos] & 0x03e0) << 6) + ((src16[src_pos] & 0x1f) << 19);
-                }
+                    if (src16[src_pos] == 0x7fff) {
+                        dst[pos] = 0x00ffffff;
+                    } else {
+                        dst[pos] = ((src16[src_pos] & 0x7c00) >> 7) + ((src16[src_pos] & 0x03e0) << 6) + ((src16[src_pos] & 0x1f) << 19);
+                    }
 #else
-                if (src16[src_pos] == 0x7fff) {
-                    dst[pos] = 0xffffff00;
-                } else {
-                    dst[pos] = ((src16[src_pos] & 0x7c00) << 17) + ((src16[src_pos] & 0x03e0) << 14) + ((src16[src_pos] & 0x1f) << 11);
-                }
+                    if (src16[src_pos] == 0x7fff) {
+                        dst[pos] = 0xffffff00;
+                    } else {
+                        dst[pos] = ((src16[src_pos] & 0x7c00) << 17) + ((src16[src_pos] & 0x03e0) << 14) + ((src16[src_pos] & 0x1f) << 11);
+                    }
 #endif
+                    pos++;
+                    src_pos++;
+                }
                 pos++;
-                src_pos++;
+                src_pos += 2;
             }
-            pos++;
-            src_pos += 2;
-        }
 
-        if (_texture != nil) {
-            [_texture release];
-            _texture = nil;
-        }
-        _texture = loadTextureUsingData(dst);
+            if (_texture != nil) {
+                [_texture release];
+                _texture = nil;
+            }
+            _texture = loadTextureUsingData(dst);
 
-        if (dst != NULL) {
-            free(dst);
-        }
-    } else if (systemColorDepth == 24) {
-        int pos = 0;
-        int src_pos = 0;
-        uint8_t *src = todraw + srcPitch;
-        uint8_t *dst = (uint8_t *)calloc(4, std::ceil((width * scale) * (height * scale) + 1));
+            if (dst != NULL) {
+                free(dst);
+            }
+        } else if (systemColorDepth == 24) {
+            int pos = 0;
+            int src_pos = 0;
+            uint8_t *src = todraw + srcPitch;
+            uint8_t *dst = (uint8_t *)calloc(4, std::ceil((width * scale) * (height * scale) + 1));
 
-        for (int y = 0; y < (height * scale); y++) {
-            for (int x = 0; x < (width * scale); x++) {
-                dst[pos] = src[src_pos];
-                dst[pos+1] = src[src_pos+1];
-                dst[pos+2] = src[src_pos+2];
-                dst[pos+3] = 0;
+            for (int y = 0; y < (height * scale); y++) {
+                for (int x = 0; x < (width * scale); x++) {
+                    dst[pos] = src[src_pos];
+                    dst[pos+1] = src[src_pos+1];
+                    dst[pos+2] = src[src_pos+2];
+                    dst[pos+3] = 0;
+                    
+                    pos += 4;
+                    src_pos += 3;
+                }
                 
                 pos += 4;
-                src_pos += 3;
             }
-            
-            pos += 4;
+
+            if (_texture != nil) {
+                [_texture release];
+                _texture = nil;
+            }
+            _texture = loadTextureUsingData(dst);
+
+            if (dst != NULL) {
+                free(dst);
+            }
+        } else {
+            if (_texture != nil) {
+                [_texture release];
+                _texture = nil;
+            }
+            _texture = loadTextureUsingData(todraw + srcPitch);
         }
 
-        if (_texture != nil) {
-            [_texture release];
-            _texture = nil;
-        }
-        _texture = loadTextureUsingData(dst);
+        // Create a new command buffer for each render pass to the current drawable
+        id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
+        commandBuffer.label = @"MyCommand";
 
-        if (dst != NULL) {
-            free(dst);
+        // Obtain a renderPassDescriptor
+        MTLRenderPassDescriptor *renderPassDescriptor = [metalView currentRenderPassDescriptor];
+
+        if(renderPassDescriptor != nil)
+        {
+            // Cache the drawable to avoid potential race condition
+            id<CAMetalDrawable> currentDrawable = metalView.currentDrawable;
+
+            id<MTLRenderCommandEncoder> renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
+            renderEncoder.label = @"MyRenderEncoder";
+
+            [renderEncoder setViewport:(MTLViewport){0.0, 0.0, (double)(_contentSize.x), (double)(_contentSize.y), 0.0, 1.0 }];
+
+            [renderEncoder setRenderPipelineState:_pipelineState];
+
+            [renderEncoder setVertexBuffer:_vertices
+                                    offset:0
+                                  atIndex:AAPLVertexInputIndexVertices];
+
+            [renderEncoder setVertexBytes:&_viewportSize
+                                   length:sizeof(_viewportSize)
+                                  atIndex:AAPLVertexInputIndexViewportSize];
+
+            // Set the texture object.  The AAPLTextureIndexBaseColor enum value corresponds
+            ///  to the 'colorMap' argument in the 'samplingShader' function because its
+            //   texture attribute qualifier also uses AAPLTextureIndexBaseColor for its index.
+            [renderEncoder setFragmentTexture:_texture
+                                      atIndex:AAPLTextureIndexBaseColor];
+
+            // Draw the triangles.
+            [renderEncoder drawPrimitives:MTLPrimitiveTypeTriangle
+                              vertexStart:0
+                              vertexCount:_numVertices];
+
+            [renderEncoder endEncoding];
+
+            // Schedule a present once the framebuffer is complete using the cached drawable
+            if (currentDrawable) {
+                [commandBuffer presentDrawable:currentDrawable];
+            }
         }
-    } else {
-        if (_texture != nil) {
-            [_texture release];
-            _texture = nil;
-        }
-        _texture = loadTextureUsingData(todraw + srcPitch);
+
+        // Finalize rendering here & push the command buffer to the GPU
+        [commandBuffer commit];
     }
-
-    // Create a new command buffer for each render pass to the current drawable
-    commandBuffer = [_commandQueue commandBuffer];
-    commandBuffer.label = @"MyCommand";
-
-    // Obtain a renderPassDescriptor
-    renderPassDescriptor = [metalView currentRenderPassDescriptor];
-
-    if(renderPassDescriptor != nil)
-    {
-        // Cache the drawable to avoid potential race condition
-        id<CAMetalDrawable> currentDrawable = metalView.currentDrawable;
-
-        renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
-        renderEncoder.label = @"MyRenderEncoder";
-
-        [renderEncoder setViewport:(MTLViewport){0.0, 0.0, (double)(_contentSize.x), (double)(_contentSize.y), 0.0, 1.0 }];
-
-        [renderEncoder setRenderPipelineState:_pipelineState];
-
-        [renderEncoder setVertexBuffer:_vertices
-                                offset:0
-                              atIndex:AAPLVertexInputIndexVertices];
-
-        [renderEncoder setVertexBytes:&_viewportSize
-                               length:sizeof(_viewportSize)
-                              atIndex:AAPLVertexInputIndexViewportSize];
-
-        // Set the texture object.  The AAPLTextureIndexBaseColor enum value corresponds
-        ///  to the 'colorMap' argument in the 'samplingShader' function because its
-        //   texture attribute qualifier also uses AAPLTextureIndexBaseColor for its index.
-        [renderEncoder setFragmentTexture:_texture
-                                  atIndex:AAPLTextureIndexBaseColor];
-
-        // Draw the triangles.
-        [renderEncoder drawPrimitives:MTLPrimitiveTypeTriangle
-                          vertexStart:0
-                          vertexCount:_numVertices];
-
-        [renderEncoder endEncoding];
-
-        // Schedule a present once the framebuffer is complete using the cached drawable
-        if (currentDrawable) {
-            [commandBuffer presentDrawable:currentDrawable];
-        }
-    }
-
-    // Finalize rendering here & push the command buffer to the GPU
-    [commandBuffer commit];
 }
 #endif
 
