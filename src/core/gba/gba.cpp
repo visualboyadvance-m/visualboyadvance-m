@@ -3000,7 +3000,8 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
                 bgEnableState[2] = 0;
             }
             else {
-                if (VCOUNT == 0 || videoMode > 2) {
+                // BG2 is affine in modes 1-2, immediate enable for affine
+                if (VCOUNT == 0 || videoMode > 0) {
                     bgEnableState[2] = 4;
                 }
                 else {
@@ -3017,7 +3018,8 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
                 bgEnableState[3] = 0;
             }
             else {
-                if (VCOUNT == 0 || videoMode > 2) {
+                // BG3 is affine in mode 2, immediate enable for affine
+                if (VCOUNT == 0 || videoMode == 2) {
                     bgEnableState[3] = 4;
                 }
                 else {
