@@ -52,11 +52,20 @@ private:
     void HidePluginOptions();
     void ShowPluginOptions();
 
+    // Hides/Shows the SDL-related output options.
+    void HideSDLOptions();
+    void ShowSDLOptions();
+
+    // Update SDL options visibility based on output module selection.
+    void UpdateSDLOptionsVisibility(wxCommandEvent& event);
+
     wxControl* plugin_label_;
     wxChoice* plugin_selector_;
     wxChoice* filter_selector_;
     wxChoice* interframe_selector_;
     wxChoice* sdlrenderer_selector_;
+    wxControl* sdlrenderer_label_;
+    wxControl* sdlpixelart_checkbox_;
     const config::OptionsObserver filter_observer_;
     const config::OptionsObserver interframe_observer_;
 };

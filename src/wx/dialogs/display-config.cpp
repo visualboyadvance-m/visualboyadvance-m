@@ -19,6 +19,7 @@
 #include "wx/config/option.h"
 #include "wx/dialogs/base-dialog.h"
 #include "wx/rpi.h"
+#include "wx/wayland.h"
 #include "wx/widgets/option-validator.h"
 #include "wx/widgets/render-plugin.h"
 #include "wx/wxvbam.h"
@@ -400,15 +401,46 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
     GetValidatedChild("OutputDirect3D")->Hide();
 #endif
 
+    sdlrenderer_label_ = GetValidatedChild<wxControl>("SDLRendererLab");
     sdlrenderer_selector_ = GetValidatedChild<wxChoice>("SDLRenderer");
     sdlrenderer_selector_->SetValidator(SDLDevicesValidator());
 
+    sdlpixelart_checkbox_ = GetValidatedChild<wxControl>("SDLPixelArt");
 #if !defined(ENABLE_SDL3) || !defined(HAVE_SDL3_PIXELART)
-    GetValidatedChild<wxCheckBox>("SDLPixelArt")->Hide();
+    sdlpixelart_checkbox_->Hide();
 #else
-    GetValidatedChild<wxCheckBox>("SDLPixelArt")
+    wxDynamicCast(sdlpixelart_checkbox_, wxCheckBox)
         ->SetValidator(
             widgets::OptionBoolValidator(config::OptionID::kDispSDLPixelArt));
+#endif
+
+    // Bind event handlers to all output module radio buttons
+    GetValidatedChild("OutputSimple")->Bind(wxEVT_RADIOBUTTON,
+        &DisplayConfig::UpdateSDLOptionsVisibility, this);
+    GetValidatedChild("OutputSDL")->Bind(wxEVT_RADIOBUTTON,
+        &DisplayConfig::UpdateSDLOptionsVisibility, this);
+#ifdef __WXMAC__
+    GetValidatedChild("OutputQuartz2D")->Bind(wxEVT_RADIOBUTTON,
+        &DisplayConfig::UpdateSDLOptionsVisibility, this);
+#ifndef NO_METAL
+    GetValidatedChild("OutputMetal")->Bind(wxEVT_RADIOBUTTON,
+        &DisplayConfig::UpdateSDLOptionsVisibility, this);
+#endif
+#endif
+#ifndef NO_OGL
+#if defined(HAVE_WAYLAND_SUPPORT) && !defined(HAVE_WAYLAND_EGL)
+    if (!IsWayland()) {
+        GetValidatedChild("OutputOpenGL")->Bind(wxEVT_RADIOBUTTON,
+            &DisplayConfig::UpdateSDLOptionsVisibility, this);
+    }
+#else
+    GetValidatedChild("OutputOpenGL")->Bind(wxEVT_RADIOBUTTON,
+        &DisplayConfig::UpdateSDLOptionsVisibility, this);
+#endif
+#endif
+#if defined(__WXMSW__) && !defined(NO_D3D)
+    GetValidatedChild("OutputDirect3D")->Bind(wxEVT_RADIOBUTTON,
+        &DisplayConfig::UpdateSDLOptionsVisibility, this);
 #endif
 
     wxWindow* color_profile_srgb = GetValidatedChild("ColorProfileSRGB");
@@ -472,6 +504,14 @@ void DisplayConfig::OnDialogShowEvent(wxShowEvent& event) {
 
     if (event.IsShown()) {
         PopulatePluginOptions();
+
+        // Set initial SDL options visibility based on current selection
+        wxRadioButton* sdl_button = wxDynamicCast(GetValidatedChild("OutputSDL"), wxRadioButton);
+        if (sdl_button && sdl_button->GetValue()) {
+            ShowSDLOptions();
+        } else {
+            HideSDLOptions();
+        }
     } else {
         StopPluginHandler();
     }
@@ -645,6 +685,35 @@ void DisplayConfig::ShowPluginOptions() {
     if (filter_selector_->GetCount() != config::kNbFilters) {
         filter_selector_->Append(_("Plugin"));
     }
+}
+
+void DisplayConfig::HideSDLOptions() {
+    sdlrenderer_label_->Hide();
+    sdlrenderer_selector_->Hide();
+    sdlpixelart_checkbox_->Hide();
+}
+
+void DisplayConfig::ShowSDLOptions() {
+    sdlrenderer_label_->Show();
+    sdlrenderer_selector_->Show();
+#if defined(ENABLE_SDL3) && defined(HAVE_SDL3_PIXELART)
+    sdlpixelart_checkbox_->Show();
+#endif
+}
+
+void DisplayConfig::UpdateSDLOptionsVisibility(wxCommandEvent& event) {
+    // Check if SDL output module is selected
+    wxRadioButton* sdl_button = wxDynamicCast(GetValidatedChild("OutputSDL"), wxRadioButton);
+    if (sdl_button && sdl_button->GetValue()) {
+        ShowSDLOptions();
+    } else {
+        HideSDLOptions();
+    }
+
+    Layout();
+
+    // Let the event propagate
+    event.Skip();
 }
 
 }  // namespace dialogs
