@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-09 00:00+0000\n"
+"POT-Creation-Date: 2025-10-11 01:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Hoseok Seo <ddinghoya@gmail.com>, 2022-2025\n"
 "Language-Team: Korean (Korea) (http://app.transifex.com/bgk/vba-m/language/ko_KR/)\n"
@@ -351,37 +351,37 @@ msgstr "이렇게 하면 \"%s\"에서 \"%s\"의 할당이 해제됩니다. 확�
 msgid "Browse"
 msgstr "Browse"
 
-#: dialogs/display-config.cpp:101
+#: dialogs/display-config.cpp:102
 msgid "Invalid value for Default magnification."
 msgstr "기본 배율에 대한 잘못된 값입니다."
 
-#: dialogs/display-config.cpp:437
+#: dialogs/display-config.cpp:469
 msgid "Invalid color correction profile"
 msgstr ""
 
-#: dialogs/display-config.cpp:498 xrc/DisplayConfig.xrc:102
-#: xrc/DisplayConfig.xrc:152 xrc/DisplayConfig.xrc:432
+#: dialogs/display-config.cpp:538 xrc/DisplayConfig.xrc:121
+#: xrc/DisplayConfig.xrc:171 xrc/DisplayConfig.xrc:427
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:227 xrc/SoundConfig.xrc:317
 msgid "None"
 msgstr "없음"
 
-#: dialogs/display-config.cpp:528
+#: dialogs/display-config.cpp:568
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "%s에서 사용가능한 rpi 플러그인을 찾을 수 없음"
 
-#: dialogs/display-config.cpp:567 dialogs/display-config.cpp:646
-#: xrc/DisplayConfig.xrc:124
+#: dialogs/display-config.cpp:607 dialogs/display-config.cpp:686
+#: xrc/DisplayConfig.xrc:143
 msgid "Plugin"
 msgstr "플러그인"
 
-#: dialogs/display-config.cpp:574
+#: dialogs/display-config.cpp:614
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "픽셀 필터 사용: %s"
 
-#: dialogs/display-config.cpp:581
+#: dialogs/display-config.cpp:621
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr "프레임 간 블렌딩 사용: %s"
@@ -1236,7 +1236,7 @@ msgid "Auto B"
 msgstr "자동 B"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
-#: xrc/DisplayConfig.xrc:410
+#: xrc/DisplayConfig.xrc:405
 msgid "Speed"
 msgstr "속도"
 
@@ -2364,195 +2364,187 @@ msgstr "화면 설정"
 msgid "Output module"
 msgstr "출력 모듈"
 
-#: xrc/DisplayConfig.xrc:34
+#: xrc/DisplayConfig.xrc:29
 msgid "Simple"
 msgstr "기본"
 
-#: xrc/DisplayConfig.xrc:74 xrc/SoundConfig.xrc:154
-msgid "Device"
-msgstr "장치"
-
-#: xrc/DisplayConfig.xrc:82
-msgid "Filters"
-msgstr "필터"
-
-#: xrc/DisplayConfig.xrc:96
-msgid "Display filter:"
-msgstr "필터 표시:"
-
-#: xrc/DisplayConfig.xrc:104
-msgid "Super 2xSaI"
-msgstr "Super 2xSaI"
-
-#: xrc/DisplayConfig.xrc:105
-msgid "Super Eagle"
-msgstr "Super Eagle"
-
-#: xrc/DisplayConfig.xrc:106
-msgid "Pixelate"
-msgstr "픽셀화"
-
-#: xrc/DisplayConfig.xrc:107
-msgid "Advance MAME Scale 2x"
-msgstr "고급 MAME 스케일 2x"
-
-#: xrc/DisplayConfig.xrc:108
-msgid "Bilinear"
-msgstr "격자 필터"
-
-#: xrc/DisplayConfig.xrc:109
-msgid "Bilinear Plus"
-msgstr "격자+ 필터"
-
-#: xrc/DisplayConfig.xrc:110
-msgid "Scanlines"
-msgstr "스캔라인"
-
-#: xrc/DisplayConfig.xrc:111
-msgid "TV Mode"
-msgstr "TV 모드"
-
-#: xrc/DisplayConfig.xrc:114
-msgid "Simple 2x"
-msgstr "단순 2배율"
-
-#: xrc/DisplayConfig.xrc:115
-msgid "Simple 3x"
-msgstr "단순 3배율"
-
-#: xrc/DisplayConfig.xrc:117
-msgid "Simple 4x"
-msgstr "단순 4배율"
-
-#: xrc/DisplayConfig.xrc:132
-msgid "Plugin:"
-msgstr "플러그인:"
-
-#: xrc/DisplayConfig.xrc:144
-msgid "Interframe blending:"
-msgstr "프레임 간 블렌딩:"
-
-#: xrc/DisplayConfig.xrc:153
-msgid "Smart"
-msgstr "스마트"
-
-#: xrc/DisplayConfig.xrc:154
-msgid "Motion Blur"
-msgstr "모션 블러"
-
-#: xrc/DisplayConfig.xrc:162
+#: xrc/DisplayConfig.xrc:77
 msgid "SDL Renderer:"
 msgstr "SDL 렌더러:"
 
-#: xrc/DisplayConfig.xrc:175
+#: xrc/DisplayConfig.xrc:90
 msgid "SDL Pixel Art Filter"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:188 xrc/SoundConfig.xrc:93
+#: xrc/DisplayConfig.xrc:101
+msgid "Filters"
+msgstr "필터"
+
+#: xrc/DisplayConfig.xrc:113
+msgid "Display filter:"
+msgstr "필터 표시:"
+
+#: xrc/DisplayConfig.xrc:123
+msgid "Super 2xSaI"
+msgstr "Super 2xSaI"
+
+#: xrc/DisplayConfig.xrc:124
+msgid "Super Eagle"
+msgstr "Super Eagle"
+
+#: xrc/DisplayConfig.xrc:125
+msgid "Pixelate"
+msgstr "픽셀화"
+
+#: xrc/DisplayConfig.xrc:126
+msgid "Advance MAME Scale 2x"
+msgstr "고급 MAME 스케일 2x"
+
+#: xrc/DisplayConfig.xrc:127
+msgid "Bilinear"
+msgstr "격자 필터"
+
+#: xrc/DisplayConfig.xrc:128
+msgid "Bilinear Plus"
+msgstr "격자+ 필터"
+
+#: xrc/DisplayConfig.xrc:129
+msgid "Scanlines"
+msgstr "스캔라인"
+
+#: xrc/DisplayConfig.xrc:130
+msgid "TV Mode"
+msgstr "TV 모드"
+
+#: xrc/DisplayConfig.xrc:133
+msgid "Simple 2x"
+msgstr "단순 2배율"
+
+#: xrc/DisplayConfig.xrc:134
+msgid "Simple 3x"
+msgstr "단순 3배율"
+
+#: xrc/DisplayConfig.xrc:136
+msgid "Simple 4x"
+msgstr "단순 4배율"
+
+#: xrc/DisplayConfig.xrc:151
+msgid "Plugin:"
+msgstr "플러그인:"
+
+#: xrc/DisplayConfig.xrc:163
+msgid "Interframe blending:"
+msgstr "프레임 간 블렌딩:"
+
+#: xrc/DisplayConfig.xrc:172
+msgid "Smart"
+msgstr "스마트"
+
+#: xrc/DisplayConfig.xrc:173
+msgid "Motion Blur"
+msgstr "모션 블러"
+
+#: xrc/DisplayConfig.xrc:185 xrc/SoundConfig.xrc:93
 msgid "Basic"
 msgstr "기본"
 
-#: xrc/DisplayConfig.xrc:198
+#: xrc/DisplayConfig.xrc:195
 msgid "Bit Depth:"
 msgstr "비트 심도:"
 
-#: xrc/DisplayConfig.xrc:204
+#: xrc/DisplayConfig.xrc:201
 msgid "8"
 msgstr "8"
 
-#: xrc/DisplayConfig.xrc:205
+#: xrc/DisplayConfig.xrc:202
 msgid "16"
 msgstr "16"
 
-#: xrc/DisplayConfig.xrc:206
+#: xrc/DisplayConfig.xrc:203
 msgid "24"
 msgstr "24"
 
-#: xrc/DisplayConfig.xrc:207
+#: xrc/DisplayConfig.xrc:204
 msgid "32"
 msgstr "32"
 
-#: xrc/DisplayConfig.xrc:217
+#: xrc/DisplayConfig.xrc:214
 msgid "Bit Depth"
 msgstr "비트 심도"
 
-#: xrc/DisplayConfig.xrc:227
+#: xrc/DisplayConfig.xrc:224
 msgid "Profile:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:259
-msgid "Profile"
-msgstr ""
-
-#: xrc/DisplayConfig.xrc:269
+#: xrc/DisplayConfig.xrc:264
 msgid "GBA Darken:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:287
+#: xrc/DisplayConfig.xrc:282
 msgid "Lighter"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:298
+#: xrc/DisplayConfig.xrc:293
 msgid "Very Dark"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:315
+#: xrc/DisplayConfig.xrc:310
 msgid "GBC Lighten:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:333
+#: xrc/DisplayConfig.xrc:328
 msgid "Darker"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:344
+#: xrc/DisplayConfig.xrc:339
 msgid "Very Light"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:362
+#: xrc/DisplayConfig.xrc:357
 msgid "Color Correction"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:370
+#: xrc/DisplayConfig.xrc:365
 msgid "Frame Skip"
 msgstr "프레임 생략"
 
-#: xrc/DisplayConfig.xrc:388
+#: xrc/DisplayConfig.xrc:383
 msgid "&Number of frames to skip:"
 msgstr "건너뛸 프레임 수 (&N):"
 
-#: xrc/DisplayConfig.xrc:426
+#: xrc/DisplayConfig.xrc:421
 msgid "Speed indicator:"
 msgstr "속도 표시기:"
 
-#: xrc/DisplayConfig.xrc:433
+#: xrc/DisplayConfig.xrc:428
 msgid "Percentage"
 msgstr "백분율 표기"
 
-#: xrc/DisplayConfig.xrc:434
+#: xrc/DisplayConfig.xrc:429
 msgid "Detailed"
 msgstr "상세 표기"
 
-#: xrc/DisplayConfig.xrc:448
+#: xrc/DisplayConfig.xrc:443
 msgid "On-Screen Display"
 msgstr "화면에 표시"
 
-#: xrc/DisplayConfig.xrc:458
+#: xrc/DisplayConfig.xrc:453
 msgid "Default magnification:"
 msgstr "기본 배율:"
 
-#: xrc/DisplayConfig.xrc:477
+#: xrc/DisplayConfig.xrc:472
 msgid "Maximum magnification factor:"
 msgstr "최대 배율 계수:"
 
-#: xrc/DisplayConfig.xrc:478
+#: xrc/DisplayConfig.xrc:473
 msgid "0 = no maximum"
 msgstr "0 = 최대치 없음"
 
-#: xrc/DisplayConfig.xrc:486
+#: xrc/DisplayConfig.xrc:481
 msgid "0 = no limit"
 msgstr "0 = 제한 없음"
 
-#: xrc/DisplayConfig.xrc:496
+#: xrc/DisplayConfig.xrc:491
 msgid "Zoom"
 msgstr "화면 배율"
 
@@ -4111,6 +4103,10 @@ msgstr "11 KHz"
 #: xrc/SoundConfig.xrc:119
 msgid "Direct Sound"
 msgstr "다이렉트 사운드"
+
+#: xrc/SoundConfig.xrc:154
+msgid "Device"
+msgstr "장치"
 
 #: xrc/SoundConfig.xrc:162
 msgid "Enable stereo upmixing"

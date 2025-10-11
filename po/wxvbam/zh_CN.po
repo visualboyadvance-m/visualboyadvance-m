@@ -24,7 +24,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-09 00:00+0000\n"
+"POT-Creation-Date: 2025-10-11 01:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020,2022-2025\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/bgk/vba-m/language/zh_CN/)\n"
@@ -363,37 +363,37 @@ msgstr "这将从“%s”中取消分配“%s”。您确定吗？"
 msgid "Browse"
 msgstr "浏览"
 
-#: dialogs/display-config.cpp:101
+#: dialogs/display-config.cpp:102
 msgid "Invalid value for Default magnification."
 msgstr "无效的默认放大倍数值。"
 
-#: dialogs/display-config.cpp:437
+#: dialogs/display-config.cpp:469
 msgid "Invalid color correction profile"
 msgstr "颜色校正配置文件无效"
 
-#: dialogs/display-config.cpp:498 xrc/DisplayConfig.xrc:102
-#: xrc/DisplayConfig.xrc:152 xrc/DisplayConfig.xrc:432
+#: dialogs/display-config.cpp:538 xrc/DisplayConfig.xrc:121
+#: xrc/DisplayConfig.xrc:171 xrc/DisplayConfig.xrc:427
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:227 xrc/SoundConfig.xrc:317
 msgid "None"
 msgstr "无"
 
-#: dialogs/display-config.cpp:528
+#: dialogs/display-config.cpp:568
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "在 %s 中没有可用 rpi 插件"
 
-#: dialogs/display-config.cpp:567 dialogs/display-config.cpp:646
-#: xrc/DisplayConfig.xrc:124
+#: dialogs/display-config.cpp:607 dialogs/display-config.cpp:686
+#: xrc/DisplayConfig.xrc:143
 msgid "Plugin"
 msgstr "插件"
 
-#: dialogs/display-config.cpp:574
+#: dialogs/display-config.cpp:614
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "正在使用像素滤镜: %s"
 
-#: dialogs/display-config.cpp:581
+#: dialogs/display-config.cpp:621
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr "正在使用帧间混合: %s"
@@ -1248,7 +1248,7 @@ msgid "Auto B"
 msgstr "连发 B"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
-#: xrc/DisplayConfig.xrc:410
+#: xrc/DisplayConfig.xrc:405
 msgid "Speed"
 msgstr "速度"
 
@@ -2376,195 +2376,187 @@ msgstr "显示设置"
 msgid "Output module"
 msgstr "输出模块"
 
-#: xrc/DisplayConfig.xrc:34
+#: xrc/DisplayConfig.xrc:29
 msgid "Simple"
 msgstr "简单"
 
-#: xrc/DisplayConfig.xrc:74 xrc/SoundConfig.xrc:154
-msgid "Device"
-msgstr "设备"
-
-#: xrc/DisplayConfig.xrc:82
-msgid "Filters"
-msgstr "滤镜"
-
-#: xrc/DisplayConfig.xrc:96
-msgid "Display filter:"
-msgstr "显示滤镜："
-
-#: xrc/DisplayConfig.xrc:104
-msgid "Super 2xSaI"
-msgstr "超级 2xSaI"
-
-#: xrc/DisplayConfig.xrc:105
-msgid "Super Eagle"
-msgstr "超级锐化"
-
-#: xrc/DisplayConfig.xrc:106
-msgid "Pixelate"
-msgstr "像素化"
-
-#: xrc/DisplayConfig.xrc:107
-msgid "Advance MAME Scale 2x"
-msgstr "高级 MAME 缩放 2x"
-
-#: xrc/DisplayConfig.xrc:108
-msgid "Bilinear"
-msgstr "双线性"
-
-#: xrc/DisplayConfig.xrc:109
-msgid "Bilinear Plus"
-msgstr "增强双线性"
-
-#: xrc/DisplayConfig.xrc:110
-msgid "Scanlines"
-msgstr "扫描线"
-
-#: xrc/DisplayConfig.xrc:111
-msgid "TV Mode"
-msgstr "电视模式"
-
-#: xrc/DisplayConfig.xrc:114
-msgid "Simple 2x"
-msgstr "采样 2x"
-
-#: xrc/DisplayConfig.xrc:115
-msgid "Simple 3x"
-msgstr "采样 3x"
-
-#: xrc/DisplayConfig.xrc:117
-msgid "Simple 4x"
-msgstr "采样 4x"
-
-#: xrc/DisplayConfig.xrc:132
-msgid "Plugin:"
-msgstr "插件:"
-
-#: xrc/DisplayConfig.xrc:144
-msgid "Interframe blending:"
-msgstr "帧间混合:"
-
-#: xrc/DisplayConfig.xrc:153
-msgid "Smart"
-msgstr "智能"
-
-#: xrc/DisplayConfig.xrc:154
-msgid "Motion Blur"
-msgstr "动态模糊"
-
-#: xrc/DisplayConfig.xrc:162
+#: xrc/DisplayConfig.xrc:77
 msgid "SDL Renderer:"
 msgstr "SDL 渲染器："
 
-#: xrc/DisplayConfig.xrc:175
+#: xrc/DisplayConfig.xrc:90
 msgid "SDL Pixel Art Filter"
 msgstr "SDL 像素艺术滤镜"
 
-#: xrc/DisplayConfig.xrc:188 xrc/SoundConfig.xrc:93
+#: xrc/DisplayConfig.xrc:101
+msgid "Filters"
+msgstr "滤镜"
+
+#: xrc/DisplayConfig.xrc:113
+msgid "Display filter:"
+msgstr "显示滤镜："
+
+#: xrc/DisplayConfig.xrc:123
+msgid "Super 2xSaI"
+msgstr "超级 2xSaI"
+
+#: xrc/DisplayConfig.xrc:124
+msgid "Super Eagle"
+msgstr "超级锐化"
+
+#: xrc/DisplayConfig.xrc:125
+msgid "Pixelate"
+msgstr "像素化"
+
+#: xrc/DisplayConfig.xrc:126
+msgid "Advance MAME Scale 2x"
+msgstr "高级 MAME 缩放 2x"
+
+#: xrc/DisplayConfig.xrc:127
+msgid "Bilinear"
+msgstr "双线性"
+
+#: xrc/DisplayConfig.xrc:128
+msgid "Bilinear Plus"
+msgstr "增强双线性"
+
+#: xrc/DisplayConfig.xrc:129
+msgid "Scanlines"
+msgstr "扫描线"
+
+#: xrc/DisplayConfig.xrc:130
+msgid "TV Mode"
+msgstr "电视模式"
+
+#: xrc/DisplayConfig.xrc:133
+msgid "Simple 2x"
+msgstr "采样 2x"
+
+#: xrc/DisplayConfig.xrc:134
+msgid "Simple 3x"
+msgstr "采样 3x"
+
+#: xrc/DisplayConfig.xrc:136
+msgid "Simple 4x"
+msgstr "采样 4x"
+
+#: xrc/DisplayConfig.xrc:151
+msgid "Plugin:"
+msgstr "插件:"
+
+#: xrc/DisplayConfig.xrc:163
+msgid "Interframe blending:"
+msgstr "帧间混合:"
+
+#: xrc/DisplayConfig.xrc:172
+msgid "Smart"
+msgstr "智能"
+
+#: xrc/DisplayConfig.xrc:173
+msgid "Motion Blur"
+msgstr "动态模糊"
+
+#: xrc/DisplayConfig.xrc:185 xrc/SoundConfig.xrc:93
 msgid "Basic"
 msgstr "基本"
 
-#: xrc/DisplayConfig.xrc:198
+#: xrc/DisplayConfig.xrc:195
 msgid "Bit Depth:"
 msgstr "位深："
 
-#: xrc/DisplayConfig.xrc:204
+#: xrc/DisplayConfig.xrc:201
 msgid "8"
 msgstr "8"
 
-#: xrc/DisplayConfig.xrc:205
+#: xrc/DisplayConfig.xrc:202
 msgid "16"
 msgstr "16"
 
-#: xrc/DisplayConfig.xrc:206
+#: xrc/DisplayConfig.xrc:203
 msgid "24"
 msgstr "24"
 
-#: xrc/DisplayConfig.xrc:207
+#: xrc/DisplayConfig.xrc:204
 msgid "32"
 msgstr "32"
 
-#: xrc/DisplayConfig.xrc:217
+#: xrc/DisplayConfig.xrc:214
 msgid "Bit Depth"
 msgstr "位深"
 
-#: xrc/DisplayConfig.xrc:227
+#: xrc/DisplayConfig.xrc:224
 msgid "Profile:"
 msgstr "配置文件:"
 
-#: xrc/DisplayConfig.xrc:259
-msgid "Profile"
-msgstr "配置文件"
-
-#: xrc/DisplayConfig.xrc:269
+#: xrc/DisplayConfig.xrc:264
 msgid "GBA Darken:"
 msgstr "GBA 调暗:"
 
-#: xrc/DisplayConfig.xrc:287
+#: xrc/DisplayConfig.xrc:282
 msgid "Lighter"
 msgstr "较亮"
 
-#: xrc/DisplayConfig.xrc:298
+#: xrc/DisplayConfig.xrc:293
 msgid "Very Dark"
 msgstr "很暗"
 
-#: xrc/DisplayConfig.xrc:315
+#: xrc/DisplayConfig.xrc:310
 msgid "GBC Lighten:"
 msgstr "GBC 调亮:"
 
-#: xrc/DisplayConfig.xrc:333
+#: xrc/DisplayConfig.xrc:328
 msgid "Darker"
 msgstr "较暗"
 
-#: xrc/DisplayConfig.xrc:344
+#: xrc/DisplayConfig.xrc:339
 msgid "Very Light"
 msgstr "很亮"
 
-#: xrc/DisplayConfig.xrc:362
+#: xrc/DisplayConfig.xrc:357
 msgid "Color Correction"
 msgstr "颜色校正"
 
-#: xrc/DisplayConfig.xrc:370
+#: xrc/DisplayConfig.xrc:365
 msgid "Frame Skip"
 msgstr "跳帧"
 
-#: xrc/DisplayConfig.xrc:388
+#: xrc/DisplayConfig.xrc:383
 msgid "&Number of frames to skip:"
 msgstr "要跳过的帧数(&N) :"
 
-#: xrc/DisplayConfig.xrc:426
+#: xrc/DisplayConfig.xrc:421
 msgid "Speed indicator:"
 msgstr "速度指示器："
 
-#: xrc/DisplayConfig.xrc:433
+#: xrc/DisplayConfig.xrc:428
 msgid "Percentage"
 msgstr "百分比"
 
-#: xrc/DisplayConfig.xrc:434
+#: xrc/DisplayConfig.xrc:429
 msgid "Detailed"
 msgstr "详细"
 
-#: xrc/DisplayConfig.xrc:448
+#: xrc/DisplayConfig.xrc:443
 msgid "On-Screen Display"
 msgstr "屏幕显示信息"
 
-#: xrc/DisplayConfig.xrc:458
+#: xrc/DisplayConfig.xrc:453
 msgid "Default magnification:"
 msgstr "默认比例:"
 
-#: xrc/DisplayConfig.xrc:477
+#: xrc/DisplayConfig.xrc:472
 msgid "Maximum magnification factor:"
 msgstr "最高放大倍速:"
 
-#: xrc/DisplayConfig.xrc:478
+#: xrc/DisplayConfig.xrc:473
 msgid "0 = no maximum"
 msgstr "0 = 无上限"
 
-#: xrc/DisplayConfig.xrc:486
+#: xrc/DisplayConfig.xrc:481
 msgid "0 = no limit"
 msgstr "0 = 无限制"
 
-#: xrc/DisplayConfig.xrc:496
+#: xrc/DisplayConfig.xrc:491
 msgid "Zoom"
 msgstr "缩放"
 
@@ -4123,6 +4115,10 @@ msgstr "11 KHz"
 #: xrc/SoundConfig.xrc:119
 msgid "Direct Sound"
 msgstr "Direct Sound"
+
+#: xrc/SoundConfig.xrc:154
+msgid "Device"
+msgstr "设备"
 
 #: xrc/SoundConfig.xrc:162
 msgid "Enable stereo upmixing"

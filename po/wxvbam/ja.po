@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-09 00:00+0000\n"
+"POT-Creation-Date: 2025-10-11 01:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Lanta Liz, 2025\n"
 "Language-Team: Japanese (http://app.transifex.com/bgk/vba-m/language/ja/)\n"
@@ -356,37 +356,37 @@ msgstr ""
 msgid "Browse"
 msgstr "ブラウズ"
 
-#: dialogs/display-config.cpp:101
+#: dialogs/display-config.cpp:102
 msgid "Invalid value for Default magnification."
 msgstr ""
 
-#: dialogs/display-config.cpp:437
+#: dialogs/display-config.cpp:469
 msgid "Invalid color correction profile"
 msgstr ""
 
-#: dialogs/display-config.cpp:498 xrc/DisplayConfig.xrc:102
-#: xrc/DisplayConfig.xrc:152 xrc/DisplayConfig.xrc:432
+#: dialogs/display-config.cpp:538 xrc/DisplayConfig.xrc:121
+#: xrc/DisplayConfig.xrc:171 xrc/DisplayConfig.xrc:427
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:227 xrc/SoundConfig.xrc:317
 msgid "None"
 msgstr "なし"
 
-#: dialogs/display-config.cpp:528
+#: dialogs/display-config.cpp:568
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "%s に使用可能なrpiプラグインが見つかりませんでした"
 
-#: dialogs/display-config.cpp:567 dialogs/display-config.cpp:646
-#: xrc/DisplayConfig.xrc:124
+#: dialogs/display-config.cpp:607 dialogs/display-config.cpp:686
+#: xrc/DisplayConfig.xrc:143
 msgid "Plugin"
 msgstr "プラグイン"
 
-#: dialogs/display-config.cpp:574
+#: dialogs/display-config.cpp:614
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr ""
 
-#: dialogs/display-config.cpp:581
+#: dialogs/display-config.cpp:621
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr ""
@@ -1241,7 +1241,7 @@ msgid "Auto B"
 msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
-#: xrc/DisplayConfig.xrc:410
+#: xrc/DisplayConfig.xrc:405
 msgid "Speed"
 msgstr "スピード"
 
@@ -2369,195 +2369,187 @@ msgstr "描画の設定"
 msgid "Output module"
 msgstr "出力モジュール"
 
-#: xrc/DisplayConfig.xrc:34
+#: xrc/DisplayConfig.xrc:29
 msgid "Simple"
 msgstr "Simple"
 
-#: xrc/DisplayConfig.xrc:74 xrc/SoundConfig.xrc:154
-msgid "Device"
-msgstr "デバイス"
-
-#: xrc/DisplayConfig.xrc:82
-msgid "Filters"
-msgstr "フィルタ"
-
-#: xrc/DisplayConfig.xrc:96
-msgid "Display filter:"
-msgstr ""
-
-#: xrc/DisplayConfig.xrc:104
-msgid "Super 2xSaI"
-msgstr "Super 2xSaI"
-
-#: xrc/DisplayConfig.xrc:105
-msgid "Super Eagle"
-msgstr "Super Eagle"
-
-#: xrc/DisplayConfig.xrc:106
-msgid "Pixelate"
-msgstr "Pixelate"
-
-#: xrc/DisplayConfig.xrc:107
-msgid "Advance MAME Scale 2x"
-msgstr ""
-
-#: xrc/DisplayConfig.xrc:108
-msgid "Bilinear"
-msgstr "Bilinear"
-
-#: xrc/DisplayConfig.xrc:109
-msgid "Bilinear Plus"
-msgstr "Bilinear Plus"
-
-#: xrc/DisplayConfig.xrc:110
-msgid "Scanlines"
-msgstr "Scanlines"
-
-#: xrc/DisplayConfig.xrc:111
-msgid "TV Mode"
-msgstr "TV Mode"
-
-#: xrc/DisplayConfig.xrc:114
-msgid "Simple 2x"
-msgstr "Simple 2x"
-
-#: xrc/DisplayConfig.xrc:115
-msgid "Simple 3x"
-msgstr "Simple 3x"
-
-#: xrc/DisplayConfig.xrc:117
-msgid "Simple 4x"
-msgstr "Simple 4x"
-
-#: xrc/DisplayConfig.xrc:132
-msgid "Plugin:"
-msgstr ""
-
-#: xrc/DisplayConfig.xrc:144
-msgid "Interframe blending:"
-msgstr ""
-
-#: xrc/DisplayConfig.xrc:153
-msgid "Smart"
-msgstr ""
-
-#: xrc/DisplayConfig.xrc:154
-msgid "Motion Blur"
-msgstr ""
-
-#: xrc/DisplayConfig.xrc:162
+#: xrc/DisplayConfig.xrc:77
 msgid "SDL Renderer:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:175
+#: xrc/DisplayConfig.xrc:90
 msgid "SDL Pixel Art Filter"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:188 xrc/SoundConfig.xrc:93
+#: xrc/DisplayConfig.xrc:101
+msgid "Filters"
+msgstr "フィルタ"
+
+#: xrc/DisplayConfig.xrc:113
+msgid "Display filter:"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:123
+msgid "Super 2xSaI"
+msgstr "Super 2xSaI"
+
+#: xrc/DisplayConfig.xrc:124
+msgid "Super Eagle"
+msgstr "Super Eagle"
+
+#: xrc/DisplayConfig.xrc:125
+msgid "Pixelate"
+msgstr "Pixelate"
+
+#: xrc/DisplayConfig.xrc:126
+msgid "Advance MAME Scale 2x"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:127
+msgid "Bilinear"
+msgstr "Bilinear"
+
+#: xrc/DisplayConfig.xrc:128
+msgid "Bilinear Plus"
+msgstr "Bilinear Plus"
+
+#: xrc/DisplayConfig.xrc:129
+msgid "Scanlines"
+msgstr "Scanlines"
+
+#: xrc/DisplayConfig.xrc:130
+msgid "TV Mode"
+msgstr "TV Mode"
+
+#: xrc/DisplayConfig.xrc:133
+msgid "Simple 2x"
+msgstr "Simple 2x"
+
+#: xrc/DisplayConfig.xrc:134
+msgid "Simple 3x"
+msgstr "Simple 3x"
+
+#: xrc/DisplayConfig.xrc:136
+msgid "Simple 4x"
+msgstr "Simple 4x"
+
+#: xrc/DisplayConfig.xrc:151
+msgid "Plugin:"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:163
+msgid "Interframe blending:"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:172
+msgid "Smart"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:173
+msgid "Motion Blur"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:185 xrc/SoundConfig.xrc:93
 msgid "Basic"
 msgstr "基本"
 
-#: xrc/DisplayConfig.xrc:198
+#: xrc/DisplayConfig.xrc:195
 msgid "Bit Depth:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:204
+#: xrc/DisplayConfig.xrc:201
 msgid "8"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:205
+#: xrc/DisplayConfig.xrc:202
 msgid "16"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:206
+#: xrc/DisplayConfig.xrc:203
 msgid "24"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:207
+#: xrc/DisplayConfig.xrc:204
 msgid "32"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:217
+#: xrc/DisplayConfig.xrc:214
 msgid "Bit Depth"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:227
+#: xrc/DisplayConfig.xrc:224
 msgid "Profile:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:259
-msgid "Profile"
-msgstr ""
-
-#: xrc/DisplayConfig.xrc:269
+#: xrc/DisplayConfig.xrc:264
 msgid "GBA Darken:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:287
+#: xrc/DisplayConfig.xrc:282
 msgid "Lighter"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:298
+#: xrc/DisplayConfig.xrc:293
 msgid "Very Dark"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:315
+#: xrc/DisplayConfig.xrc:310
 msgid "GBC Lighten:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:333
+#: xrc/DisplayConfig.xrc:328
 msgid "Darker"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:344
+#: xrc/DisplayConfig.xrc:339
 msgid "Very Light"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:362
+#: xrc/DisplayConfig.xrc:357
 msgid "Color Correction"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:370
+#: xrc/DisplayConfig.xrc:365
 msgid "Frame Skip"
 msgstr "フレームスキップ"
 
-#: xrc/DisplayConfig.xrc:388
+#: xrc/DisplayConfig.xrc:383
 msgid "&Number of frames to skip:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:426
+#: xrc/DisplayConfig.xrc:421
 msgid "Speed indicator:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:433
+#: xrc/DisplayConfig.xrc:428
 msgid "Percentage"
 msgstr "パーセントで表示(％)"
 
-#: xrc/DisplayConfig.xrc:434
+#: xrc/DisplayConfig.xrc:429
 msgid "Detailed"
 msgstr "詳細に表示"
 
-#: xrc/DisplayConfig.xrc:448
+#: xrc/DisplayConfig.xrc:443
 msgid "On-Screen Display"
 msgstr "画面上の表示"
 
-#: xrc/DisplayConfig.xrc:458
+#: xrc/DisplayConfig.xrc:453
 msgid "Default magnification:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:477
+#: xrc/DisplayConfig.xrc:472
 msgid "Maximum magnification factor:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:478
+#: xrc/DisplayConfig.xrc:473
 msgid "0 = no maximum"
 msgstr "0 = 上限なし"
 
-#: xrc/DisplayConfig.xrc:486
+#: xrc/DisplayConfig.xrc:481
 msgid "0 = no limit"
 msgstr "0 = 制限なし"
 
-#: xrc/DisplayConfig.xrc:496
+#: xrc/DisplayConfig.xrc:491
 msgid "Zoom"
 msgstr "拡大縮小"
 
@@ -4116,6 +4108,10 @@ msgstr "11 KHz"
 #: xrc/SoundConfig.xrc:119
 msgid "Direct Sound"
 msgstr ""
+
+#: xrc/SoundConfig.xrc:154
+msgid "Device"
+msgstr "デバイス"
 
 #: xrc/SoundConfig.xrc:162
 msgid "Enable stereo upmixing"
