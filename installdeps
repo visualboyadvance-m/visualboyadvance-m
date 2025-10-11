@@ -1178,7 +1178,7 @@ brew_installdeps() {
 
     check brew -v update
 
-    brews="nasm cmake ccache gettext libtiff pkg-config sdl3 wxwidgets faudio ccache ninja zlib"
+    brews="nasm cmake ccache gettext libtiff pkg-config sdl3 wxwidgets faudio ccache ninja zlib bzip2"
 
     [ -n "$ENABLE_FFMPEG" ] && brews="$brews ffmpeg"
 
