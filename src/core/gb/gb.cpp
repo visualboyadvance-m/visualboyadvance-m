@@ -4030,6 +4030,23 @@ void gbDrawLine()
             *dest++ = (uint8_t)(color & 0xFF);
             *dest++ = (uint8_t)((color >> 8) & 0xFF);
             *dest++ = (uint8_t)((color >> 16) & 0xFF);
+
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
         }
     } break;
     case 32: {
