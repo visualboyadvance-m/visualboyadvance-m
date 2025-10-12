@@ -22,59 +22,78 @@
             <border>5</border>
           </object>
           <object class="sizeritem">
-            <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
             <object class="wxBoxSizer">
-              <orient>wxVERTICAL</orient>
+              <orient>wxHORIZONTAL</orient>
               <object class="sizeritem">
-                <object class="wxBoxSizer">
-                  <orient>wxHORIZONTAL</orient>
-                  <object class="sizeritem">
-                    <object class="wxRadioButton" name="OutputSimple">
-                      <label>Simple</label>
-                    </object>
-                    <flag>wxALL</flag>
-                    <border>5</border>
-                  </object>
-                  <object class="sizeritem">
-                    <object class="wxRadioButton" name="OutputQuartz2D">
-                      <label translate="0">Quartz2D</label>
-                    </object>
-                    <flag>wxALL</flag>
-                    <border>5</border>
-                  </object>
-                  <object class="sizeritem">
-                    <object class="wxRadioButton" name="OutputMetal">
-                      <label translate="0">Metal</label>
-                    </object>
-                    <flag>wxALL</flag>
-                    <border>5</border>
-                  </object>
-                  <object class="sizeritem">
-                    <object class="wxRadioButton" name="OutputOpenGL">
-                      <label translate="0">OpenGL</label>
-                    </object>
-                    <flag>wxALL</flag>
-                    <border>5</border>
-                  </object>
-                  <object class="sizeritem">
-                    <object class="wxRadioButton" name="OutputSDL">
-                      <label translate="0">SDL</label>
-                    </object>
-                    <flag>wxALL</flag>
-                    <border>5</border>
-                  </object>
-                  <object class="sizeritem">
-                    <object class="wxRadioButton" name="OutputDirect3D">
-                      <label translate="0">Direct3D 9</label>
-                    </object>
-                    <flag>wxALL</flag>
-                    <border>5</border>
-                  </object>
-              <label>Device</label>
-              <orient>wxVERTICAL</orient>
+                <object class="wxRadioButton" name="OutputSimple">
+                  <label>Simple</label>
                 </object>
+                <flag>wxALL</flag>
+                <border>5</border>
               </object>
+              <object class="sizeritem">
+                <object class="wxRadioButton" name="OutputQuartz2D">
+                  <label translate="0">Quartz2D</label>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxRadioButton" name="OutputMetal">
+                  <label translate="0">Metal</label>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxRadioButton" name="OutputOpenGL">
+                  <label translate="0">OpenGL</label>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxRadioButton" name="OutputSDL">
+                  <label translate="0">SDL</label>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxRadioButton" name="OutputDirect3D">
+                  <label translate="0">Direct3D 9</label>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+            </object>
+            <flag>wxALL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxFlexGridSizer">
+              <object class="sizeritem">
+                <object class="wxStaticText" name="SDLRendererLab">
+                  <label>SDL Renderer:</label>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxChoice" name="SDLRenderer">
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxCheckBox" name="SDLPixelArt">
+                  <label>SDL Pixel Art Filter</label>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <cols>2</cols>
+              <growablecols>1</growablecols>
             </object>
           </object>
           <object class="sizeritem">
@@ -90,11 +109,11 @@
           <object class="sizeritem">
             <object class="wxFlexGridSizer">
               <object class="sizeritem">
-                <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
-                <border>5</border>
                 <object class="wxStaticText">
                   <label>Display filter:</label>
                 </object>
+                <flag>wxALL</flag>
+                <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxChoice" name="Filter">
@@ -124,26 +143,26 @@
                     <item>Plugin</item>
                   </content>
                 </object>
-				<flag>wxALL|wxEXPAND</flag>
-				<border>5</border>
+                <flag>wxALL</flag>
+                <border>5</border>
               </object>
-			  <object class="sizeritem">
+              <object class="sizeritem">
                 <object class="wxStaticText" name="PluginLab">
                   <label>Plugin:</label>
                 </object>
-				<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
-				<border>5</border>
+                <flag>wxALL</flag>
+                <border>5</border>
               </object>
-			  <object class="sizeritem">
+              <object class="sizeritem">
                 <object class="wxChoice" name="Plugin"/>
-                <flag>wxALL|wxEXPAND</flag>
+                <flag>wxALL</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText">
                   <label>Interframe blending:</label>
                 </object>
-                <flag>wxRIGHT|wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+                <flag>wxALL</flag>
                 <border>5</border>
               </object>
               <object class="sizeritem">
@@ -154,34 +173,12 @@
                     <item>Motion Blur</item>
                   </content>
                 </object>
-                <flag>wxALL|wxEXPAND</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxStaticText" name="SDLRendererLab">
-                  <label>SDL Renderer:</label>
-                </object>
-                <flag>wxRIGHT|wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxChoice" name="SDLRenderer">
-                </object>
-                <flag>wxALL|wxEXPAND</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxCheckBox" name="SDLPixelArt">
-                  <label>SDL Pixel Art Filter</label>
-                </object>
-                <flag>wxALL|wxEXPAND</flag>
+                <flag>wxALL</flag>
                 <border>5</border>
               </object>
               <cols>2</cols>
               <growablecols>1</growablecols>
             </object>
-            <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
           </object>
         </object>
       </object>
@@ -256,8 +253,6 @@
                     <flag>wxALL</flag>
                     <border>5</border>
                   </object>
-              <label>Profile</label>
-              <orient>wxVERTICAL</orient>
                 </object>
               </object>
             </object>
