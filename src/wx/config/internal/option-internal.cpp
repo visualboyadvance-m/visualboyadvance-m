@@ -220,7 +220,7 @@ std::array<Option, kNbOptions>& Option::All() {
         wxString recording_dir = wxEmptyString;
         wxString screenshot_dir = wxEmptyString;
         wxString state_dir = wxEmptyString;
-        bool statusbar = false;
+        bool statusbar = true;
         uint32_t ini_version = kIniLatestVersion;
 
         /// Joypad
