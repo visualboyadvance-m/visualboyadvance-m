@@ -1312,7 +1312,7 @@ EVT_HANDLER(AllowKeyboardBackgroundInput, "Allow keyboard background input (togg
 
 EVT_HANDLER(AllowJoystickBackgroundInput, "Allow joystick background input (toggle)")
 {
-    GetMenuOptionConfig("AllowKeyboardBackgroundInput",
+    GetMenuOptionConfig("AllowJoystickBackgroundInput",
                         config::OptionID::kUIAllowJoystickBackgroundInput);
 }
 
