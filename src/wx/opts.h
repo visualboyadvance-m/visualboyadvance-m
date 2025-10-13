@@ -42,7 +42,7 @@ extern struct opts_t {
     wxFileHistory* recent = NULL;
 
     /// UI Config
-    bool hide_menu_bar = true;
+    bool hide_menu_bar = false;
     bool suspend_screensaver = false;
 
     /// wxWindows

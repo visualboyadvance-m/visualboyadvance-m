@@ -150,7 +150,7 @@ wxString AllEnumValuesForArray(const std::array<wxString, SIZE>& input) {
 std::array<Option, kNbOptions>& Option::All() {
     struct OwnedOptions {
         /// Display
-        bool bilinear = true;
+        bool bilinear = false;
         bool sdl_pixel_art = false;
         Filter filter = Filter::kNone;
         wxString filter_plugin = wxEmptyString;
