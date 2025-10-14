@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git stash:*)",
+      "Bash(git log:*)",
+      "Bash(cat:*)",
+      "Read(//c/Users/rkito/Games/gb/**)",
+      "Bash(md5sum:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nGB: Generate V-Blank interrupt for all hardware types\n\nFix V-Blank interrupt generation to work for all Game Boy hardware\ntypes (GB, GBC, SGB, GBA) instead of only specific combinations.\n\nThe original code had split logic:\n- gbHardware & 0x5 (GB/SGB only) for first V-Blank path\n- gbHardware & 0xa (GBC/GBA only) for second V-Blank path  \n\nThis caused GB games to miss V-Blank interrupts entirely, preventing\nsome games like RoboCop (Rev.01) from progressing past the title screen.\n\nChanges:\n- Remove hardware restrictions on V-Blank interrupt generation\n- Add missing gbInterruptLaunched flag setting in first code path\n- Add gbInterruptWait mechanism for GBC/GBA to prevent premature clearing\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(ninja)",
+      "Bash(git checkout:*)",
+      "Bash(./visualboyadvance-m.exe:*)",
+      "Bash(timeout:*)",
+      "Bash(ninja -t clean:*)",
+      "Bash(ninja:*)",
+      "Bash(awk:*)",
+      "WebSearch",
+      "WebFetch(domain:gbdev.io)",
+      "Read(//c/Users/rkito/source/repos/mgba/src/gb/**)",
+      "Read(//c/Users/rkito/source/repos/mgba/**)",
+      "Bash(git show:*)",
+      "Bash(xargs ls:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
