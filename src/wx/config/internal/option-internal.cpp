@@ -150,7 +150,7 @@ wxString AllEnumValuesForArray(const std::array<wxString, SIZE>& input) {
 std::array<Option, kNbOptions>& Option::All() {
     struct OwnedOptions {
         /// Display
-        bool bilinear = true;
+        bool bilinear = false;
         bool sdl_pixel_art = false;
         Filter filter = Filter::kNone;
         wxString filter_plugin = wxEmptyString;
@@ -220,7 +220,7 @@ std::array<Option, kNbOptions>& Option::All() {
         wxString recording_dir = wxEmptyString;
         wxString screenshot_dir = wxEmptyString;
         wxString state_dir = wxEmptyString;
-        bool statusbar = false;
+        bool statusbar = true;
         uint32_t ini_version = kIniLatestVersion;
 
         /// Joypad

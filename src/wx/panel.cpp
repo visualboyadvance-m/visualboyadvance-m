@@ -2411,6 +2411,10 @@ void SDLDrawingPanel::DrawingPanelInit()
         systemScreenMessage(_("Failed to set OpenGL properties"));
     }
 
+    // This is necessary for joysticks to work at all with SDL video.
+    // We control this ourselves so it does not affect the GUI option.
+    SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+
     sdlwindow = SDL_CreateWindowWithProperties(props);
     SDL_DestroyProperties(props);
 
