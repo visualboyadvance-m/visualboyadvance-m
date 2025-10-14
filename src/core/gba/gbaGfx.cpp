@@ -20,14 +20,10 @@ bool gfxInWin0[240];
 bool gfxInWin1[240];
 int lineOBJpixleft[128];
 
-int gfxBG2Changed = 0;
-int gfxBG3Changed = 0;
-
 int gfxBG2X = 0;
 int gfxBG2Y = 0;
 int gfxBG3X = 0;
 int gfxBG3Y = 0;
-int gfxLastVCOUNT = 0;
 
 #ifdef TILED_RENDERING
 #ifdef _MSC_VER

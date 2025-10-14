@@ -4030,6 +4030,23 @@ void gbDrawLine()
             *dest++ = (uint8_t)(color & 0xFF);
             *dest++ = (uint8_t)((color >> 8) & 0xFF);
             *dest++ = (uint8_t)((color >> 16) & 0xFF);
+
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
         }
     } break;
     case 32: {
@@ -4290,9 +4307,10 @@ void gbEmulate(int ticksToStop)
                         if (register_LY == kGBHeight) {
                             // Yes, V-Blank
                             // set the LY increment counter
-                            if (gbHardware & 0x5) {
-                                register_IF |= 1; // V-Blank interrupt
-                            }
+                            register_IF |= 1; // V-Blank interrupt
+                            gbInterruptLaunched |= 1;
+                            if (gbHardware & 0xa)
+                                gbInterruptWait = 1;
 
                             gbInt48Signal &= ~6;
                             if (register_STAT & 0x10) {
@@ -4474,11 +4492,10 @@ void gbEmulate(int ticksToStop)
                             // set the LY increment counter
 
                             if (register_LCDC & 0x80) {
-                                if (gbHardware & 0xa) {
-
-                                    register_IF |= 1; // V-Blank interrupt
-                                    gbInterruptLaunched |= 1;
-                                }
+                                register_IF |= 1; // V-Blank interrupt
+                                gbInterruptLaunched |= 1;
+                                if (gbHardware & 0xa)
+                                    gbInterruptWait = 1;
                             }
 
                             gbLcdTicksDelayed += GBLCD_MODE_1_CLOCK_TICKS;
@@ -5186,6 +5203,8 @@ bool gbReadSaveState(const uint8_t* data)
 
     utilReadMem(gbPalette, data, sizeof(gbPalette));
 
+    gbResetPalette();
+
     utilReadMem(&gbMemory[0x8000], data, 0x8000);
 
     if (g_gbCartData.HasRam()) {
@@ -5249,6 +5268,7 @@ bool gbReadSaveState(const uint8_t* data)
             break;
         case gbCartData::MapperType::kMbc5:
             memoryUpdateMapMBC5();
+            break;
         case gbCartData::MapperType::kMbc7:
             memoryUpdateMapMBC7();
             break;

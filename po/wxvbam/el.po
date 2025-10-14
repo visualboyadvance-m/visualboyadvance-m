@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-04 04:00+0000\n"
+"POT-Creation-Date: 2025-10-11 01:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Orfeas Artinopoulos, 2025\n"
 "Language-Team: Greek (http://app.transifex.com/bgk/vba-m/language/el/)\n"
@@ -204,12 +204,12 @@ msgid "Error saving snapshot file %s"
 msgstr "Σφάλμα αποθήκευσης αρχείου στιγμιότυπου %s"
 
 #: cmdevents.cpp:783 cmdevents.cpp:864 cmdevents.cpp:937 cmdevents.cpp:1009
-#: gfxviewers.cpp:1692 gfxviewers.cpp:1840 viewers.cpp:588 viewers.cpp:808
+#: gfxviewers.cpp:1716 gfxviewers.cpp:1884 viewers.cpp:588 viewers.cpp:808
 #: viewsupt.cpp:1199
 msgid "Select output file"
 msgstr "Επιλογή αρχείου εξόδου"
 
-#: cmdevents.cpp:784 gfxviewers.cpp:1693 gfxviewers.cpp:1841 viewsupt.cpp:1200
+#: cmdevents.cpp:784 gfxviewers.cpp:1717 gfxviewers.cpp:1885 viewsupt.cpp:1200
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "Εικόνες PNG|*.png|Εικόνες BMP|*.bmp"
 
@@ -348,37 +348,37 @@ msgstr ""
 msgid "Browse"
 msgstr ""
 
-#: dialogs/display-config.cpp:100
+#: dialogs/display-config.cpp:102
 msgid "Invalid value for Default magnification."
 msgstr ""
 
-#: dialogs/display-config.cpp:420
+#: dialogs/display-config.cpp:469
 msgid "Invalid color correction profile"
 msgstr ""
 
-#: dialogs/display-config.cpp:475 xrc/DisplayConfig.xrc:102
-#: xrc/DisplayConfig.xrc:152 xrc/DisplayConfig.xrc:432
+#: dialogs/display-config.cpp:538 xrc/DisplayConfig.xrc:121
+#: xrc/DisplayConfig.xrc:171 xrc/DisplayConfig.xrc:427
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:227 xrc/SoundConfig.xrc:317
 msgid "None"
 msgstr "Κανένα"
 
-#: dialogs/display-config.cpp:505
+#: dialogs/display-config.cpp:568
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Δεν βρέθηκαν χρήσιμες επεκτάσεις rpi στο %s"
 
-#: dialogs/display-config.cpp:544 dialogs/display-config.cpp:623
-#: xrc/DisplayConfig.xrc:124
+#: dialogs/display-config.cpp:607 dialogs/display-config.cpp:686
+#: xrc/DisplayConfig.xrc:143
 msgid "Plugin"
 msgstr "Επέκταση"
 
-#: dialogs/display-config.cpp:551
+#: dialogs/display-config.cpp:614
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr ""
 
-#: dialogs/display-config.cpp:558
+#: dialogs/display-config.cpp:621
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr ""
@@ -535,7 +535,7 @@ msgstr ""
 msgid "%04X (Actual: %04X)"
 msgstr ""
 
-#: dialogs/sound-config.cpp:271
+#: dialogs/sound-config.cpp:303
 #, c-format
 msgid "%d frame = %.2f ms"
 msgstr ""
@@ -568,11 +568,11 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-#: gfxviewers.cpp:1229
+#: gfxviewers.cpp:1247
 msgid "Select output file and type"
 msgstr "Επιλογή τύπου και αρχείου εξόδου"
 
-#: gfxviewers.cpp:1230
+#: gfxviewers.cpp:1248
 msgid ""
 "Windows Palette (*.pal)|*.pal|PaintShop Palette (*.pal)|*.pal|Adobe Color "
 "Table (*.act)|*.act"
@@ -756,7 +756,7 @@ msgstr "Πρόβλημα φόρτωσης αρχείου"
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Αδυναμία φόρτωσης Game Boy ROM %s"
 
-#: panel.cpp:326 panel.cpp:437 panel.cpp:1193
+#: panel.cpp:326 panel.cpp:437 panel.cpp:1178
 msgid "Could not initialize the sound driver!"
 msgstr ""
 
@@ -800,164 +800,160 @@ msgstr "Αποθηκεύτηκε η κατάσταση %s"
 msgid "Error saving state %s"
 msgstr "Σφάλμα αποθήκευσης κατάστασης %s"
 
-#: panel.cpp:1026
+#: panel.cpp:1011
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 msgstr ""
 
-#: panel.cpp:1064
+#: panel.cpp:1049
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
 msgstr ""
 
-#: panel.cpp:1069
+#: panel.cpp:1054
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
 msgstr ""
 
-#: panel.cpp:1077
+#: panel.cpp:1062
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
 msgstr ""
 
-#: panel.cpp:1081
+#: panel.cpp:1066
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr ""
 
-#: panel.cpp:1168
+#: panel.cpp:1153
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr ""
 
-#: panel.cpp:1357
+#: panel.cpp:1338
 msgid "No memory for rewinding"
 msgstr "Ελλιπής μνήμη για επανάληψη"
 
-#: panel.cpp:1367
+#: panel.cpp:1348
 msgid "Error writing rewind state"
 msgstr "Σφάλμα εγγραφής κατάστασης επανάληψης"
 
-#: panel.cpp:2360
+#: panel.cpp:2341
 msgid "Failed to set wayland display"
 msgstr ""
 
-#: panel.cpp:2388
+#: panel.cpp:2369
 msgid "Failed to initialize SDL video subsystem"
 msgstr ""
 
-#: panel.cpp:2399
+#: panel.cpp:2380
 msgid "Failed to initialize SDL video"
 msgstr ""
 
-#: panel.cpp:2408
+#: panel.cpp:2389
 msgid "Failed to set wayland surface"
 msgstr ""
 
-#: panel.cpp:2422
-msgid "Failed to set DX9 window"
-msgstr ""
-
-#: panel.cpp:2430
+#: panel.cpp:2402
 msgid "Failed to set parent window"
 msgstr ""
 
-#: panel.cpp:2439
+#: panel.cpp:2411
 msgid "Failed to set OpenGL properties"
 msgstr ""
 
-#: panel.cpp:2446 panel.cpp:2480
+#: panel.cpp:2418 panel.cpp:2452
 msgid "Failed to create SDL window"
 msgstr ""
 
-#: panel.cpp:2464 panel.cpp:2512
+#: panel.cpp:2436 panel.cpp:2484
 msgid "Failed to create SDL renderer"
 msgstr ""
 
-#: panel.cpp:3067
+#: panel.cpp:3052
 msgid "Enabling EGL VSync."
 msgstr ""
 
-#: panel.cpp:3069
+#: panel.cpp:3054
 msgid "Disabling EGL VSync."
 msgstr ""
 
-#: panel.cpp:3076
+#: panel.cpp:3061
 msgid "Enabling GLX VSync."
 msgstr ""
 
-#: panel.cpp:3078
+#: panel.cpp:3063
 msgid "Disabling GLX VSync."
 msgstr ""
 
-#: panel.cpp:3096
+#: panel.cpp:3081
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:3105
+#: panel.cpp:3090
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:3114
+#: panel.cpp:3099
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:3121
+#: panel.cpp:3106
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr ""
 
-#: panel.cpp:3124
+#: panel.cpp:3109
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:3133
+#: panel.cpp:3118
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:3139
+#: panel.cpp:3124
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:3235
+#: panel.cpp:3220
 msgid "Memory allocation error"
 msgstr ""
 
-#: panel.cpp:3238
+#: panel.cpp:3223
 msgid "Error initializing codec"
 msgstr ""
 
-#: panel.cpp:3241
+#: panel.cpp:3226
 msgid "Error writing to output file"
 msgstr ""
 
-#: panel.cpp:3244
+#: panel.cpp:3229
 msgid "Can't guess output format from file name"
 msgstr ""
 
-#: panel.cpp:3249
+#: panel.cpp:3234
 msgid "Programming error; aborting!"
 msgstr ""
 
-#: panel.cpp:3261 panel.cpp:3290
+#: panel.cpp:3246 panel.cpp:3275
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Αδυναμία έναρξης εγγραφής σε %s (%s)"
 
-#: panel.cpp:3318
+#: panel.cpp:3303
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr ""
 
-#: panel.cpp:3324
+#: panel.cpp:3309
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Σφάλμα στην εγγραφή ήχου (%s), τερματισμός"
 
-#: panel.cpp:3334
+#: panel.cpp:3319
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Σφάλμα στην εγγραφή βίντεο (%s), τερματισμός"
 
-#: panel.cpp:3525
+#: panel.cpp:3510
 #, c-format
 msgid "Volume: %d %%"
 msgstr ""
@@ -1237,7 +1233,7 @@ msgid "Auto B"
 msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
-#: xrc/DisplayConfig.xrc:410
+#: xrc/DisplayConfig.xrc:405
 msgid "Speed"
 msgstr "Ταχύτητα"
 
@@ -2365,195 +2361,187 @@ msgstr "Ρυθμίσεις οθόνης"
 msgid "Output module"
 msgstr "Μονάδα εξόδου"
 
-#: xrc/DisplayConfig.xrc:34
+#: xrc/DisplayConfig.xrc:29
 msgid "Simple"
 msgstr "Απλή"
 
-#: xrc/DisplayConfig.xrc:74 xrc/SoundConfig.xrc:154
-msgid "Device"
-msgstr "Συσκευή"
-
-#: xrc/DisplayConfig.xrc:82
-msgid "Filters"
-msgstr "Φίλτρα"
-
-#: xrc/DisplayConfig.xrc:96
-msgid "Display filter:"
-msgstr ""
-
-#: xrc/DisplayConfig.xrc:104
-msgid "Super 2xSaI"
-msgstr "Super 2xSaI"
-
-#: xrc/DisplayConfig.xrc:105
-msgid "Super Eagle"
-msgstr "Super Eagle"
-
-#: xrc/DisplayConfig.xrc:106
-msgid "Pixelate"
-msgstr "Pixelate"
-
-#: xrc/DisplayConfig.xrc:107
-msgid "Advance MAME Scale 2x"
-msgstr ""
-
-#: xrc/DisplayConfig.xrc:108
-msgid "Bilinear"
-msgstr "Bilinear"
-
-#: xrc/DisplayConfig.xrc:109
-msgid "Bilinear Plus"
-msgstr "Bilinear Plus"
-
-#: xrc/DisplayConfig.xrc:110
-msgid "Scanlines"
-msgstr "Scanlines"
-
-#: xrc/DisplayConfig.xrc:111
-msgid "TV Mode"
-msgstr "TV Mode"
-
-#: xrc/DisplayConfig.xrc:114
-msgid "Simple 2x"
-msgstr "Simple 2x"
-
-#: xrc/DisplayConfig.xrc:115
-msgid "Simple 3x"
-msgstr "Simple 3x"
-
-#: xrc/DisplayConfig.xrc:117
-msgid "Simple 4x"
-msgstr "Simple 4x"
-
-#: xrc/DisplayConfig.xrc:132
-msgid "Plugin:"
-msgstr ""
-
-#: xrc/DisplayConfig.xrc:144
-msgid "Interframe blending:"
-msgstr ""
-
-#: xrc/DisplayConfig.xrc:153
-msgid "Smart"
-msgstr ""
-
-#: xrc/DisplayConfig.xrc:154
-msgid "Motion Blur"
-msgstr ""
-
-#: xrc/DisplayConfig.xrc:162
+#: xrc/DisplayConfig.xrc:77
 msgid "SDL Renderer:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:175
+#: xrc/DisplayConfig.xrc:90
 msgid "SDL Pixel Art Filter"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:188 xrc/SoundConfig.xrc:93
+#: xrc/DisplayConfig.xrc:101
+msgid "Filters"
+msgstr "Φίλτρα"
+
+#: xrc/DisplayConfig.xrc:113
+msgid "Display filter:"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:123
+msgid "Super 2xSaI"
+msgstr "Super 2xSaI"
+
+#: xrc/DisplayConfig.xrc:124
+msgid "Super Eagle"
+msgstr "Super Eagle"
+
+#: xrc/DisplayConfig.xrc:125
+msgid "Pixelate"
+msgstr "Pixelate"
+
+#: xrc/DisplayConfig.xrc:126
+msgid "Advance MAME Scale 2x"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:127
+msgid "Bilinear"
+msgstr "Bilinear"
+
+#: xrc/DisplayConfig.xrc:128
+msgid "Bilinear Plus"
+msgstr "Bilinear Plus"
+
+#: xrc/DisplayConfig.xrc:129
+msgid "Scanlines"
+msgstr "Scanlines"
+
+#: xrc/DisplayConfig.xrc:130
+msgid "TV Mode"
+msgstr "TV Mode"
+
+#: xrc/DisplayConfig.xrc:133
+msgid "Simple 2x"
+msgstr "Simple 2x"
+
+#: xrc/DisplayConfig.xrc:134
+msgid "Simple 3x"
+msgstr "Simple 3x"
+
+#: xrc/DisplayConfig.xrc:136
+msgid "Simple 4x"
+msgstr "Simple 4x"
+
+#: xrc/DisplayConfig.xrc:151
+msgid "Plugin:"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:163
+msgid "Interframe blending:"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:172
+msgid "Smart"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:173
+msgid "Motion Blur"
+msgstr ""
+
+#: xrc/DisplayConfig.xrc:185 xrc/SoundConfig.xrc:93
 msgid "Basic"
 msgstr "Βασική"
 
-#: xrc/DisplayConfig.xrc:198
+#: xrc/DisplayConfig.xrc:195
 msgid "Bit Depth:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:204
+#: xrc/DisplayConfig.xrc:201
 msgid "8"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:205
+#: xrc/DisplayConfig.xrc:202
 msgid "16"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:206
+#: xrc/DisplayConfig.xrc:203
 msgid "24"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:207
+#: xrc/DisplayConfig.xrc:204
 msgid "32"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:217
+#: xrc/DisplayConfig.xrc:214
 msgid "Bit Depth"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:227
+#: xrc/DisplayConfig.xrc:224
 msgid "Profile:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:259
-msgid "Profile"
-msgstr ""
-
-#: xrc/DisplayConfig.xrc:269
+#: xrc/DisplayConfig.xrc:264
 msgid "GBA Darken:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:287
+#: xrc/DisplayConfig.xrc:282
 msgid "Lighter"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:298
+#: xrc/DisplayConfig.xrc:293
 msgid "Very Dark"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:315
+#: xrc/DisplayConfig.xrc:310
 msgid "GBC Lighten:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:333
+#: xrc/DisplayConfig.xrc:328
 msgid "Darker"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:344
+#: xrc/DisplayConfig.xrc:339
 msgid "Very Light"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:362
+#: xrc/DisplayConfig.xrc:357
 msgid "Color Correction"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:370
+#: xrc/DisplayConfig.xrc:365
 msgid "Frame Skip"
 msgstr "Παράλειψη καρέ"
 
-#: xrc/DisplayConfig.xrc:388
+#: xrc/DisplayConfig.xrc:383
 msgid "&Number of frames to skip:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:426
+#: xrc/DisplayConfig.xrc:421
 msgid "Speed indicator:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:433
+#: xrc/DisplayConfig.xrc:428
 msgid "Percentage"
 msgstr "Ποσοστό"
 
-#: xrc/DisplayConfig.xrc:434
+#: xrc/DisplayConfig.xrc:429
 msgid "Detailed"
 msgstr "Λεπτομερής"
 
-#: xrc/DisplayConfig.xrc:448
+#: xrc/DisplayConfig.xrc:443
 msgid "On-Screen Display"
 msgstr "Ένδειξη οθόνης"
 
-#: xrc/DisplayConfig.xrc:458
+#: xrc/DisplayConfig.xrc:453
 msgid "Default magnification:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:477
+#: xrc/DisplayConfig.xrc:472
 msgid "Maximum magnification factor:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:478
+#: xrc/DisplayConfig.xrc:473
 msgid "0 = no maximum"
 msgstr "0 = χωρίς μέγιστο"
 
-#: xrc/DisplayConfig.xrc:486
+#: xrc/DisplayConfig.xrc:481
 msgid "0 = no limit"
 msgstr "0 = χωρίς όριο"
 
-#: xrc/DisplayConfig.xrc:496
+#: xrc/DisplayConfig.xrc:491
 msgid "Zoom"
 msgstr "Ζουμ"
 
@@ -4112,6 +4100,10 @@ msgstr "11 KHz"
 #: xrc/SoundConfig.xrc:119
 msgid "Direct Sound"
 msgstr ""
+
+#: xrc/SoundConfig.xrc:154
+msgid "Device"
+msgstr "Συσκευή"
 
 #: xrc/SoundConfig.xrc:162
 msgid "Enable stereo upmixing"

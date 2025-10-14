@@ -26,6 +26,14 @@ static void UpdateSliderTooltip(wxSlider* slider, wxCommandEvent& event) {
     event.Skip();
 }
 
+// Helper function to update slider tooltip on mouse enter
+static void UpdateSliderTooltipOnHover(wxSlider* slider, wxMouseEvent& event) {
+    if (slider) {
+        slider->SetToolTip(wxString::Format("%d", slider->GetValue()));
+    }
+    event.Skip();
+}
+
 void utilReadScreenPixels(uint8_t* dest, int w, int h) {
     uint8_t* b = dest;
     int sizeX = w;
@@ -1563,6 +1571,7 @@ public:
         if (palette_slider) {
             palette_slider->SetToolTip(wxString::Format("%d", palette_slider->GetValue()));
             palette_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, palette_slider, std::placeholders::_1));
+            palette_slider->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, palette_slider, std::placeholders::_1));
         }
         getlab(tileno_, "Tile", "1WWW");
         getlab(addr_, "Address", "06WWWWWW");
@@ -1765,6 +1774,7 @@ public:
                 UpdateSliderTooltip(palette_slider, event);
                 this->Update(); // Refresh display
                 });
+            palette_slider->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, palette_slider, std::placeholders::_1));
         }
         getlab(tileno, "Tile", "2WW");
         getlab(addr, "Address", "WWWW");

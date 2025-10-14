@@ -6,6 +6,7 @@
 *.dll
 *.exe
 .vscode/
+.claude/
 
 # clangd files
 compile_commands.json

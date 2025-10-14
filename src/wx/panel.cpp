@@ -939,21 +939,6 @@ void GameArea::ResetPanel() {
 
 void GameArea::ShowFullScreen(bool full)
 {
-    if ((OPTION(kDispRenderMethod) == config::RenderMethod::kSDL) && (OPTION(kSDLRenderer) == wxString("direct3d"))) {
-        if (panel == NULL)
-            return;
-
-        if (panel->d3dframe == NULL)
-            return;
-
-        if (panel->d3dframe->IsFullScreen() == false)
-            panel->d3dframe->ShowFullScreen(true);
-        else
-            panel->d3dframe->ShowFullScreen(false);
- 
-        return;
-    }
-
     if (full == fullscreen) {
         // in case the tlw somehow lost its mind, force it to proper mode
         if (wxGetApp().frame->IsFullScreen() != fullscreen)
@@ -1238,10 +1223,6 @@ void GameArea::OnIdle(wxIdleEvent& event)
         wxWindow* w = NULL;
 
         w = panel->GetWindow();
-
-        if (panel->d3dframe != NULL) {
-             panel->d3dframe->Bind(VBAM_EVT_USER_INPUT, &GameArea::OnUserInput, this);
-        }
 
         // set up event handlers
         w->Bind(VBAM_EVT_USER_INPUT, &GameArea::OnUserInput, this);
@@ -2413,16 +2394,7 @@ void SDLDrawingPanel::DrawingPanelInit()
 #elif defined(__WXMAC__)
         if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_COCOA_VIEW_POINTER, wxGetApp().frame->GetPanel()->GetHandle()) == false)
 #elif defined(__WXMSW__)
-        if (OPTION(kSDLRenderer) == wxString("direct3d")) {
-            d3dframe = new wxFrame(GetWindow(), wxID_ANY, "visualboyadvance-m SDL DX9", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, "SDL_DX9");
-            d3dframe->Show();
-
-            if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_WIN32_HWND_POINTER, d3dframe->GetHandle()) == false)
-            {
-                systemScreenMessage(_("Failed to set DX9 window"));
-                return;
-            }
-        } else if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_WIN32_HWND_POINTER, GetHandle()) == false)
+        if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_WIN32_HWND_POINTER, GetHandle()) == false)
 #else
         if (SDL_SetPointerProperty(props, "sdl2-compat.external_window", GetWindow()->GetHandle()) == false)
 #endif
@@ -2438,6 +2410,10 @@ void SDLDrawingPanel::DrawingPanelInit()
     if (SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_OPENGL_BOOLEAN, true) == false) {
         systemScreenMessage(_("Failed to set OpenGL properties"));
     }
+
+    // This is necessary for joysticks to work at all with SDL video.
+    // We control this ourselves so it does not affect the GUI option.
+    SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
 
     sdlwindow = SDL_CreateWindowWithProperties(props);
     SDL_DestroyProperties(props);
@@ -2836,10 +2812,23 @@ BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
 void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
 {
     wxImage* im;
-            
-    if (out_24) {
+
+    if (out_24 && OPTION(kDispFilter) == config::Filter::kNone) {
         // never scaled, no borders, no transformations needed
         im = new wxImage(width, height, todraw, true);
+    } else if (out_24) {
+        // 24-bit with filter: scaled by filters, no color transform needed
+        int scaled_width = (int)std::ceil(width * scale);
+        int scaled_height = (int)std::ceil(height * scale);
+        im = new wxImage(scaled_width, scaled_height, false);
+        uint8_t* src = todraw + scaled_width * 3;
+        uint8_t* dst = im->GetData();
+
+        for (int y = 0; y < scaled_height; y++) {
+            std::memcpy(dst, src, scaled_width * 3);
+            dst += scaled_width * 3;
+            src += scaled_width * 3;
+        }
     } else if (out_8) {
         // scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);

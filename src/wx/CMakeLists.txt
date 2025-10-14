@@ -347,7 +347,7 @@ function(configure_wx_target target)
     # SDL.
     _add_link_libraries(${VBAM_SDL_LIBS})
 
-    if(APPLE)
+    if(APPLE AND NOT NIX)
         _add_link_libraries(sharpyuv)
     endif()
 
@@ -521,7 +521,12 @@ if(APPLE)
     )
 
     target_link_libraries(visualboyadvance-m
-      tiff zstd deflate)
+      tiff)
+
+    if(NOT NIX)
+        target_link_libraries(visualboyadvance-m
+          zstd deflate)
+    endif()
 endif()
 
 # link libgcc/libstdc++ statically on mingw

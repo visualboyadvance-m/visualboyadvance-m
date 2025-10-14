@@ -127,6 +127,7 @@ endif()
 
 if(ENABLE_LINK OR ENABLE_WX)
     find_path(LIBINTL_INC libintl.h)
+
     find_library(LIBINTL_LIB    NAMES libintl    intl)
     find_library(LIBICONV_LIB   NAMES libiconv   iconv)
     find_library(LIBCHARSET_LIB NAMES libcharset charset)

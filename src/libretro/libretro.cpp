@@ -979,14 +979,16 @@ static void gb_init(void)
 void retro_deinit(void)
 {
     emulating = 0;
-    core->emuCleanUp();
+    if (core)
+        core->emuCleanUp();
     soundShutdown();
     libretro_supports_bitmasks = false;
 }
 
 void retro_reset(void)
 {
-    core->emuReset();
+    if (core)
+        core->emuReset();
     set_gbPalette();
 }
 
@@ -1539,6 +1541,8 @@ size_t retro_serialize_size(void)
 
 bool retro_serialize(void* data, size_t size)
 {
+    if (!core)
+        return false;
     if (size == serialize_size)
         return core->emuWriteState((uint8_t*)data);
     return false;
@@ -1546,6 +1550,8 @@ bool retro_serialize(void* data, size_t size)
 
 bool retro_unserialize(const void* data, size_t size)
 {
+    if (!core)
+        return false;
     if (size == serialize_size)
         return core->emuReadState((uint8_t*)data);
     return false;

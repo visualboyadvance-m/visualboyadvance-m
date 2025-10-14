@@ -583,6 +583,33 @@ inline int CPUUpdateTicks()
     return cpuLoopTicks;
 }
 
+void gfxUpdateBG2X() {
+    gfxBG2X = (BG2X_L) | ((BG2X_H & 0x07FF) << 16);
+    if (BG2X_H & 0x0800) gfxBG2X |= 0xF8000000;
+}
+
+void gfxUpdateBG2Y() {
+    gfxBG2Y = (BG2Y_L) | ((BG2Y_H & 0x07FF) << 16);
+    if (BG2Y_H & 0x0800) gfxBG2Y |= 0xF8000000;
+}
+
+void gfxUpdateBG3X() {
+    gfxBG3X = (BG3X_L) | ((BG3X_H & 0x07FF) << 16);
+    if (BG3X_H & 0x0800) gfxBG3X |= 0xF8000000;
+}
+
+void gfxUpdateBG3Y() {
+    gfxBG3Y = (BG3Y_L) | ((BG3Y_H & 0x07FF) << 16);
+    if (BG3Y_H & 0x0800) gfxBG3Y |= 0xF8000000;
+}
+
+void gfxNewFrame() {
+    gfxUpdateBG2X();
+    gfxUpdateBG2Y();
+    gfxUpdateBG3X();
+    gfxUpdateBG3Y();
+}
+
 void CPUUpdateWindow0()
 {
     int x00 = WIN0H >> 8;
@@ -1859,7 +1886,7 @@ int CPULoadRomData(const char* data, int size)
 
     uint16_t* temp = (uint16_t*)(g_rom + ((romSize + 1) & ~1));
     int i;
-    for (i = (romSize + 1) & ~1; i < SIZE_ROM; i += 2) {
+    for (i = (romSize + 1) & ~1; i < SIZE_ROM * 4; i += 2) {
         WRITE16LE(temp, (i >> 1) & 0xFFFF);
         temp++;
     }
@@ -3040,22 +3067,22 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
     case 0x28:
         BG2X_L = value;
         UPDATE_REG(0x28, BG2X_L);
-        gfxBG2Changed |= 1;
+        gfxUpdateBG2X();
         break;
     case 0x2A:
         BG2X_H = (value & 0xFFF);
         UPDATE_REG(0x2A, BG2X_H);
-        gfxBG2Changed |= 1;
+        gfxUpdateBG2X();
         break;
     case 0x2C:
         BG2Y_L = value;
         UPDATE_REG(0x2C, BG2Y_L);
-        gfxBG2Changed |= 2;
+        gfxUpdateBG2Y();
         break;
     case 0x2E:
         BG2Y_H = value & 0xFFF;
         UPDATE_REG(0x2E, BG2Y_H);
-        gfxBG2Changed |= 2;
+        gfxUpdateBG2Y();
         break;
     case 0x30:
         BG3PA = value;
@@ -3076,22 +3103,22 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
     case 0x38:
         BG3X_L = value;
         UPDATE_REG(0x38, BG3X_L);
-        gfxBG3Changed |= 1;
+        gfxUpdateBG3X();
         break;
     case 0x3A:
         BG3X_H = value & 0xFFF;
         UPDATE_REG(0x3A, BG3X_H);
-        gfxBG3Changed |= 1;
+        gfxUpdateBG3X();
         break;
     case 0x3C:
         BG3Y_L = value;
         UPDATE_REG(0x3C, BG3Y_L);
-        gfxBG3Changed |= 2;
+        gfxUpdateBG3Y();
         break;
     case 0x3E:
         BG3Y_H = value & 0xFFF;
         UPDATE_REG(0x3E, BG3Y_H);
-        gfxBG3Changed |= 2;
+        gfxUpdateBG3Y();
         break;
     case 0x40:
         WIN0H = value;
@@ -4086,6 +4113,7 @@ void CPULoop(int ticks)
                         VCOUNT = 0;
                         UPDATE_REG(0x06, VCOUNT);
                         CPUCompareVCOUNT();
+                        gfxNewFrame();
                     }
                 } else {
                     int framesToSkip = systemFrameSkip;
