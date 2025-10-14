@@ -4290,10 +4290,9 @@ void gbEmulate(int ticksToStop)
                         if (register_LY == kGBHeight) {
                             // Yes, V-Blank
                             // set the LY increment counter
-                            register_IF |= 1; // V-Blank interrupt
-                            gbInterruptLaunched |= 1;
-                            if (gbHardware & 0xa)
-                                gbInterruptWait = 1;
+                            if (gbHardware & 0x5) {
+                                register_IF |= 1; // V-Blank interrupt
+                            }
 
                             gbInt48Signal &= ~6;
                             if (register_STAT & 0x10) {
@@ -4475,10 +4474,11 @@ void gbEmulate(int ticksToStop)
                             // set the LY increment counter
 
                             if (register_LCDC & 0x80) {
-                                register_IF |= 1; // V-Blank interrupt
-                                gbInterruptLaunched |= 1;
-                                if (gbHardware & 0xa)
-                                    gbInterruptWait = 1;
+                                if (gbHardware & 0xa) {
+
+                                    register_IF |= 1; // V-Blank interrupt
+                                    gbInterruptLaunched |= 1;
+                                }
                             }
 
                             gbLcdTicksDelayed += GBLCD_MODE_1_CLOCK_TICKS;
