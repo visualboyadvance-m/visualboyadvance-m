@@ -135,7 +135,7 @@ DISTS=$DISTS'
     getopt          http://frodo.looijaard.name/system/files/software/getopt/getopt-1.1.6.tar.gz                bin/getopt
     gsed            http://ftp.gnu.org/gnu/sed/sed-4.9.tar.xz                                                   bin/sed
     bison           https://ftp.gnu.org/gnu/bison/bison-3.8.2.tar.xz                                            bin/bison
-    texinfo         http://ftp.gnu.org/gnu/texinfo/texinfo-7.2.tar.gz                                           bin/makeinfo
+    texinfo         http://mirrors.ocf.berkeley.edu/gnu/texinfo/texinfo-7.2.tar.gz                              bin/makeinfo
     flex            https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz                   bin/flex
     gperf           http://ftp.gnu.org/pub/gnu/gperf/gperf-3.3.tar.gz                                           bin/gperf
     libicu          https://github.com/unicode-org/icu/releases/download/release-78.1rc/icu4c-78.1rc-sources.tgz lib/libicud*t*.a
