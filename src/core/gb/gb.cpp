@@ -4030,6 +4030,23 @@ void gbDrawLine()
             *dest++ = (uint8_t)(color & 0xFF);
             *dest++ = (uint8_t)((color >> 8) & 0xFF);
             *dest++ = (uint8_t)((color >> 16) & 0xFF);
+
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
+            color = systemColorMap32[gbLineMix[x++]];
+            *dest++ = (uint8_t)(color & 0xFF);
+            *dest++ = (uint8_t)((color >> 8) & 0xFF);
+            *dest++ = (uint8_t)((color >> 16) & 0xFF);
         }
     } break;
     case 32: {
@@ -5186,6 +5203,8 @@ bool gbReadSaveState(const uint8_t* data)
 
     utilReadMem(gbPalette, data, sizeof(gbPalette));
 
+    gbResetPalette();
+
     utilReadMem(&gbMemory[0x8000], data, 0x8000);
 
     if (g_gbCartData.HasRam()) {
@@ -5249,6 +5268,7 @@ bool gbReadSaveState(const uint8_t* data)
             break;
         case gbCartData::MapperType::kMbc5:
             memoryUpdateMapMBC5();
+            break;
         case gbCartData::MapperType::kMbc7:
             memoryUpdateMapMBC7();
             break;
