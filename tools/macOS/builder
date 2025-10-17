@@ -131,6 +131,8 @@ fi
 clang_path=${best_llvm_path%%:*}
 xcode_path=$(xcode-select -p)
 
+export CMAKE_BASE_ARGS="$CMAKE_BASE_ARGS -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET"
+
 BUILD_ENV=$(cat <<EOF
 export MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET
 export COMMAND_MODE=unix2003
@@ -142,9 +144,9 @@ export CXX="$clang_path/bin/clang++ $target_build_arch"
 export ARCHFLAGS="$target_build_arch"
 export CPPFLAGS="-DICONV_CONST="
 export CFLAGS="-F$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wno-error=incompatible-function-pointer-types -fpermissive -Wno-error=unguarded-availability"
-export CXXFLAGS="-F$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wno-error=unguarded-availability"
+export CXXFLAGS="-F$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wno-error=unguarded-availability -nostdinc++ -isystem $xcode_path/Platforms/MacOSX.platform/Developer//SDKs/MacOSX.sdk/usr/include/c++/v1 -isystem $xcode_path/Platforms/MacOSX.platform/Developer//SDKs/MacOSX.sdk/usr/include"
 export OBJCXXFLAGS="-F$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wno-error=unguarded-availability"
-export LDFLAGS="-L\"\$BUILD_ROOT/root/lib\" -L$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib -F$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wl,-no_compact_unwind $rt_lib"
+export LDFLAGS="-L\"\$BUILD_ROOT/root/lib\" -L$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib -F$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
 
 export UUID_CFLAGS="-I\"\$BUILD_ROOT/root/stow/libuuid/include\""
 export UUID_LIBS="-L\"\$BUILD_ROOT/root/stow/libuuid/lib\" -luuid"
