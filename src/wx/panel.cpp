@@ -2413,7 +2413,9 @@ void SDLDrawingPanel::DrawingPanelInit()
 
     // This is necessary for joysticks to work at all with SDL video.
     // We control this ourselves so it does not affect the GUI option.
+#ifdef ENABLE_SDL3
     SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+#endif
 
     sdlwindow = SDL_CreateWindowWithProperties(props);
     SDL_DestroyProperties(props);
