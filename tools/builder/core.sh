@@ -322,7 +322,7 @@ DIST_POST_BUILD="$DIST_POST_BUILD
 DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
     ccache      cmake -G Ninja $CMAKE_INSTALL_ARGS -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -S .. -B .
     zlib-ng        ./configure --prefix=/usr --static --zlib-compat
-    openssl     ./config no-shared --prefix=/usr --openssldir=/etc/ssl
+    openssl     ./config no-shared no-unit-test --prefix=/usr --openssldir=/etc/ssl
     cmake       ./configure --prefix=/usr --no-qt-gui --parallel=\$NUM_CPUS
     XML-SAX     echo no | PERL_MM_USE_DEFAULT=0 \"\$perl\" Makefile.PL
     libvpx      ./configure --disable-shared --enable-static --prefix=/usr --disable-unit-tests --disable-tools --disable-docs --disable-examples
