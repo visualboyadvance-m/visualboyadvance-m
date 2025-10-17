@@ -152,7 +152,7 @@ DISTS=$DISTS'
     XML-SAX         https://cpan.metacpan.org/authors/id/G/GR/GRANTM/XML-SAX-1.02.tar.gz                        perl5/lib/perl5/XML/SAX.pm
     docbook2x       https://downloads.sourceforge.net/docbook2x/docbook2X-0.8.8.tar.gz  bin/docbook2man
     expat           https://github.com/libexpat/libexpat/releases/download/R_2_7_3/expat-2.7.3.tar.xz           lib/libexpat.a
-    libpng          https://sourceforge.net/projects/libpng/files/libpng17/1.7.0beta89/libpng-1.7.0beta89.tar.xz lib/libpng.a
+    libpng          https://sourceforge.net/projects/libpng/files/libpng16/1.6.50/libpng-1.6.50.tar.xz           lib/libpng.a
     libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/3.1.2.tar.gz                         lib/libjpeg.a
     libtiff         https://download.osgeo.org/libtiff/tiff-4.7.1.tar.xz                                        lib/libtiff.a
 #    libcroco        http://ftp.gnome.org/pub/gnome/sources/libcroco/0.6/libcroco-0.6.13.tar.xz                  lib/libcroco-0.6.a
