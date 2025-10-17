@@ -256,6 +256,7 @@ DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     pkgconf         autoreconf_noargs
     libffi          autoreconf
     libgd           cmake
+    libpng          autoreconf
     python2         autoreconf
     python3         autoreconf
     graphviz        autoreconf
@@ -280,6 +281,7 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
                     sed -i.bak '/SUBDIRS/{; s/ doc//; }' Makefile.am;
     graphviz        sed -i.bak 's/ -export-symbols/ -Wl,-export-symbols/g' \$(find . -name Makefile.am); \
                     putsln '#define __declspec(x)' > declspec.h;
+    libpng          rm autogen.sh
     xvidcore        cd build/generic; \
                     sed -i.bak '/^all:/{ s/ *\\\$(SHARED_LIB)//; }; \
                                 /^install:/{ s, *\\\$(BUILD_DIR)/\\\$(SHARED_LIB),,; }; \
@@ -359,6 +361,7 @@ DIST_FLAGS="$DIST_FLAGS
     gettext     no_sdk_paths_in_flags
     bison       no_sdk_paths_in_flags
     libwebp     remove_arch_flags_from_build_ninja
+    libpng      no_autotools_cross_options
     docbook2x   no_autotools_cross_options
     libuuid     no_autotools_cross_options
     python3     no_autotools_cross_options
