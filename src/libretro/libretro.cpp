@@ -1117,13 +1117,9 @@ static void update_variables(bool startup)
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         if (strcmp(var.value, "auto") == 0) {
             gbBorderAutomatic = true;
-        }
-        else if (!strcmp(var.value, "enabled")) {
+        } else {
             gbBorderAutomatic = false;
-            gbBorderOn = false;
-        } else { // disabled
-            gbBorderOn = true;
-            gbBorderAutomatic = false;
+            gbBorderOn = (bool)(!strcmp(var.value, "enabled"));
         }
 
         if ((type == IMAGE_GB) && !startup)
