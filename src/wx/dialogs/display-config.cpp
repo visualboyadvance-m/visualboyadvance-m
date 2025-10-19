@@ -577,8 +577,6 @@ void DisplayConfig::PopulatePluginOptions() {
 
     plugin_selector_->SetValidator(PluginSelectorValidator());
     ShowPluginOptions();
-
-    Fit();
 }
 
 void DisplayConfig::StopPluginHandler() {
