@@ -44,6 +44,8 @@ private:
         this->SaveValue("y", dialog_rect.y);
         this->SaveValue("width", dialog_rect.width);
         this->SaveValue("height", dialog_rect.height);
+        const long dpi = this->Get()->GetDPIScaleFactor() * 100;
+        this->SaveValue("dpi", dpi);
 #endif  // WX_RESIZE_DIALOGS
     }
 
@@ -51,6 +53,17 @@ private:
         dialog_shown_ = true;
 
 #if WX_RESIZE_DIALOGS
+        const long current_dpi = this->Get()->GetDPIScaleFactor() * 100;
+        long saved_dpi = 1;
+        if (!this->RestoreValue("dpi", &saved_dpi)) {
+            return false;
+        };
+        if (saved_dpi != current_dpi) {
+            // DPI changed, do not restore.
+            return false;
+        }
+
+        // Restore position and size.
         wxRect dialog_rect(0, 0, 0, 0);
         if (!this->RestoreValue("x", &dialog_rect.x)) {
             return false;
@@ -104,7 +117,17 @@ wxWindow* BaseDialog::GetValidatedChild(const wxString& name) const {
 }
 
 void BaseDialog::OnBaseDialogShow(wxShowEvent& event) {
-    if (event.IsShown()) {
+    // Let the event propagate.
+    event.Skip();
+
+    if (!event.IsShown()) {
+        return;
+    }
+
+    if (!dialog_shown_) {
+        // First time call.
+        dialog_shown_ = true;
+
         // Restore the dialog saved position.
         if (wxPersistenceManager::Get().Restore(this)) {
             // Ensure we are not restoring the dialog out of bounds.
@@ -112,16 +135,17 @@ void BaseDialog::OnBaseDialogShow(wxShowEvent& event) {
                 this->RepositionDialog();
             }
         } else {
-            // First-time use.
+            // First time this dialog is shown.
             this->RepositionDialog();
         }
 
-        // Do not run this again.
-        this->Unbind(wxEVT_SHOW, &BaseDialog::OnBaseDialogShow, this);
-    }
+        return;
+    } 
 
-    // Let the event propagate.
-    event.Skip();
+    // The screen setup might have changed, check we are not out of bounds.
+    if (!widgets::GetDisplayRect().Intersects(this->GetRect())) {
+        this->RepositionDialog();
+    }
 }
 
 void BaseDialog::RepositionDialog() {
