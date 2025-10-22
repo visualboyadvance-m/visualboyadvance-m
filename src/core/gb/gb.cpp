@@ -4977,7 +4977,7 @@ void gbEmulate(int ticksToStop)
 
         gbBlackScreen = false;
 
-        if (ticksToStop <= 0 || (frameDone && soundTicks >= SOUND_CLOCK_TICKS)) { // Stop loop
+        if (ticksToStop <= 0 || frameDone && soundTicks >= SOUND_CLOCK_TICKS) { // Stop loop
             break;
         }
     }
