@@ -4503,7 +4503,6 @@ void gbEmulate(int ticksToStop)
 
                             gbFrameCount++;
                             systemFrame();
-                            gbSoundTick(soundTicks);
 
                             if ((gbFrameCount % 10) == 0)
                                 system10Frames();
@@ -4711,7 +4710,6 @@ void gbEmulate(int ticksToStop)
                         gbFrameCount++;
 
                         systemFrame();
-                        gbSoundTick(soundTicks);
 
                         if ((gbFrameCount % 10) == 0)
                             system10Frames();
@@ -4847,11 +4845,14 @@ void gbEmulate(int ticksToStop)
         // On VBA-M (gb core running twice as fast?), each vblank is uses 35112 cycles.
         // on some cases no vblank is generated causing sound ticks to keep accumulating causing core to crash.
         // This forces core to flush sound buffers when expected sound ticks has passed and no frame is done yet.which then ends cpuloop
-        if ((soundTicks > SOUND_CLOCK_TICKS) && !frameDone) {
-            int last_st = soundTicks;
-            gbSoundTick(soundTicks);
-            soundTicks = (last_st - SOUND_CLOCK_TICKS);
-        }
+
+        // UPDATE: since audio is flush at the end of loop, no need for this workaround
+
+        //if ((soundTicks > SOUND_CLOCK_TICKS) && !frameDone) {
+        //    int last_st = soundTicks;
+        //    gbSoundTick(soundTicks);
+        //    soundTicks = (last_st - SOUND_CLOCK_TICKS);
+        //}
 
         // timer emulation
 
@@ -4976,10 +4977,14 @@ void gbEmulate(int ticksToStop)
 
         gbBlackScreen = false;
 
-        if (ticksToStop <= 0 || frameDone) { // Stop loop
-            return;
+        if (ticksToStop <= 0 || frameDone && soundTicks >= SOUND_CLOCK_TICKS) { // Stop loop
+            break;
         }
     }
+
+    /* Flush sound */
+    gbSoundTick(soundTicks);
+    soundTicks = 0;
 }
 
 bool gbLoadRomData(const char* data, size_t size) {
