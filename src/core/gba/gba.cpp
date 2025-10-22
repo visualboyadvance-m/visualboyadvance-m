@@ -3990,14 +3990,6 @@ void CPUInterrupt()
 static uint32_t joy;
 static bool has_frames;
 
-static void gbaUpdateJoypads(void)
-{
-    // update joystick information
-    if (systemReadJoypads())
-        // read default joystick
-        joy = systemReadJoypad(-1);
-}
-
 void CPULoop(int ticks)
 {
     int clockTicks;
@@ -4380,8 +4372,6 @@ void CPULoop(int ticks)
                             }
                             capturePrevious = capture;
 
-                            psoundTickfn();
-
                             if (frameCount >= framesToSkip) {
                                 systemDrawScreen();
                                 frameCount = 0;
@@ -4624,25 +4614,29 @@ void CPULoop(int ticks)
 #endif
 }
 
-void gbaEmulate(int ticks)
+void GBAEmulate(int ticks)
 {
     has_frames = false;
 
-    // Read and process inputs
-    gbaUpdateJoypads();
+    // update joystick information
+    if (systemReadJoypads())
+        // read default joystick
+        joy = systemReadJoypad(-1);
 
     // Runs nth number of ticks till vblank, outputs audio
     // then the video frames.
     // sanity check:
     // wrapped in loop in case frames has not been written yet
-    do {
+    while (!has_frames && (soundTicks < SOUND_CLOCK_TICKS))
         CPULoop(ticks);
-    } while (!has_frames);
+
+    // Flush sound using accumulated soundTick
+    psoundTickfn();
 }
 
 struct EmulatedSystem GBASystem = {
     // emuMain
-    gbaEmulate,
+    GBAEmulate,
     // emuReset
     CPUReset,
     // emuCleanUp
