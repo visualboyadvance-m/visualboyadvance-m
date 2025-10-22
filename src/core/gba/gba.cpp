@@ -3990,6 +3990,37 @@ void CPUInterrupt()
 static uint32_t joy;
 static bool has_frames;
 
+static void gbaUpdateJoypads(void)
+{
+    // update joystick information
+    if (systemReadJoypads())
+        // read default joystick
+        joy = systemReadJoypad(-1);
+
+    P1 = 0x03FF ^ (joy & 0x3FF);
+    systemUpdateMotionSensor();
+    UPDATE_REG(0x130, P1);
+    uint16_t P1CNT = READ16LE(((uint16_t*)&g_ioMem[0x132]));
+
+    // this seems wrong, but there are cases where the game
+    // can enter the stop state without requesting an IRQ from
+    // the joypad.
+    if ((P1CNT & 0x4000) || stopState) {
+        uint16_t p1 = (0x3FF ^ P1) & 0x3FF;
+        if (P1CNT & 0x8000) {
+            if (p1 == (P1CNT & 0x3FF)) {
+                IF |= 0x1000;
+                UPDATE_REG(0x202, IF);
+            }
+        } else {
+            if (p1 & P1CNT) {
+                IF |= 0x1000;
+                UPDATE_REG(0x202, IF);
+            }
+        }
+    }
+}
+
 void CPULoop(int ticks)
 {
     int clockTicks;
@@ -4138,29 +4169,6 @@ void CPULoop(int ticks)
                         lcdTicks += 1008;
                         DISPSTAT &= 0xFFFD;
                         if (VCOUNT == 160) {
-                            P1 = 0x03FF ^ (joy & 0x3FF);
-                            systemUpdateMotionSensor();
-                            UPDATE_REG(0x130, P1);
-                            uint16_t P1CNT = READ16LE(((uint16_t*)&g_ioMem[0x132]));
-
-                            // this seems wrong, but there are cases where the game
-                            // can enter the stop state without requesting an IRQ from
-                            // the joypad.
-                            if ((P1CNT & 0x4000) || stopState) {
-                                uint16_t p1 = (0x3FF ^ P1) & 0x3FF;
-                                if (P1CNT & 0x8000) {
-                                    if (p1 == (P1CNT & 0x3FF)) {
-                                        IF |= 0x1000;
-                                        UPDATE_REG(0x202, IF);
-                                    }
-                                } else {
-                                    if (p1 & P1CNT) {
-                                        IF |= 0x1000;
-                                        UPDATE_REG(0x202, IF);
-                                    }
-                                }
-                            }
-
                             DISPSTAT |= 1;
                             DISPSTAT &= 0xFFFD;
                             UPDATE_REG(0x04, DISPSTAT);
@@ -4371,6 +4379,8 @@ void CPULoop(int ticks)
                                 systemScreenCapture(captureNumber);
                             }
                             capturePrevious = capture;
+
+                            psoundTickfn();
 
                             if (frameCount >= framesToSkip) {
                                 systemDrawScreen();
@@ -4614,29 +4624,25 @@ void CPULoop(int ticks)
 #endif
 }
 
-void GBAEmulate(int ticks)
+void gbaEmulate(int ticks)
 {
     has_frames = false;
 
-    // update joystick information
-    if (systemReadJoypads())
-        // read default joystick
-        joy = systemReadJoypad(-1);
+    // Read and process inputs
+    gbaUpdateJoypads();
 
     // Runs nth number of ticks till vblank, outputs audio
     // then the video frames.
     // sanity check:
     // wrapped in loop in case frames has not been written yet
-    while (!has_frames && (soundTicks < SOUND_CLOCK_TICKS))
+    do {
         CPULoop(ticks);
-
-    // Flush sound using accumulated soundTick
-    psoundTickfn();
+    } while (!has_frames);
 }
 
 struct EmulatedSystem GBASystem = {
     // emuMain
-    GBAEmulate,
+    gbaEmulate,
     // emuReset
     CPUReset,
     // emuCleanUp
