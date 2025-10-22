@@ -4038,7 +4038,7 @@ void CPULoop(int ticks)
     cpuNextEvent = CPUUpdateTicks();
     if (cpuNextEvent > ticks)
         cpuNextEvent = ticks;
-
+    
     for (;;) {
         if (!holdState && !SWITicks) {
             if (armState) {
@@ -4169,41 +4169,6 @@ void CPULoop(int ticks)
                         lcdTicks += 1008;
                         DISPSTAT &= 0xFFFD;
                         if (VCOUNT == 160) {
-                            g_count++;
-                            systemFrame();
-
-                            if ((g_count % 10) == 0) {
-                                system10Frames();
-                            }
-                            if (g_count == 60) {
-                                uint32_t time = systemGetClock();
-                                if (time != lastTime) {
-                                    uint32_t t = 100000 / (time - lastTime);
-                                    systemShowSpeed(t);
-                                } else
-                                    systemShowSpeed(0);
-                                lastTime = time;
-                                g_count = 0;
-                            }
-
-                            uint32_t ext = (joy >> 10);
-                            // If no (m) code is enabled, apply the cheats at each LCDline
-                            if ((coreOptions.cheatsEnabled) && (mastercode == 0))
-                                remainingTicks += cheatsCheckKeys(P1 ^ 0x3FF, ext);
-
-                            coreOptions.speedup = false;
-
-                            if (ext & 1 && !speedup_throttle_set)
-                                coreOptions.speedup = true;
-
-                            capture = (ext & 2) ? true : false;
-
-                            if (capture && !capturePrevious) {
-                                captureNumber++;
-                                systemScreenCapture(captureNumber);
-                            }
-                            capturePrevious = capture;
-
                             DISPSTAT |= 1;
                             DISPSTAT &= 0xFFFD;
                             UPDATE_REG(0x04, DISPSTAT);
@@ -4212,20 +4177,6 @@ void CPULoop(int ticks)
                                 UPDATE_REG(0x202, IF);
                             }
                             CPUCheckDMA(1, 0x0f);
-
-                            psoundTickfn();
-
-                            if (frameCount >= framesToSkip) {
-                                systemDrawScreen();
-                                frameCount = 0;
-                            } else {
-                                frameCount++;
-                                systemSendScreen();
-                            }
-                            if (systemPauseOnFrame())
-                                ticks = 0;
-
-                            has_frames = true;
                         }
 
                         UPDATE_REG(0x04, DISPSTAT);
@@ -4392,6 +4343,58 @@ void CPULoop(int ticks)
                         if (DISPSTAT & 16) {
                             IF |= 2;
                             UPDATE_REG(0x202, IF);
+                        }
+                        if (VCOUNT == 159) {
+                            g_count++;
+                            systemFrame();
+
+                            if ((g_count % 10) == 0) {
+                                system10Frames();
+                            }
+                            if (g_count == 60) {
+                                uint32_t time = systemGetClock();
+                                if (time != lastTime) {
+                                    uint32_t t = 100000 / (time - lastTime);
+                                    systemShowSpeed(t);
+                                } else
+                                    systemShowSpeed(0);
+                                lastTime = time;
+                                g_count = 0;
+                            }
+
+                            uint32_t ext = (joy >> 10);
+                            // If no (m) code is enabled, apply the cheats at each LCDline
+                            if ((coreOptions.cheatsEnabled) && (mastercode == 0))
+                                remainingTicks += cheatsCheckKeys(P1 ^ 0x3FF, ext);
+
+                            coreOptions.speedup = false;
+
+                            if (ext & 1 && !speedup_throttle_set)
+                                coreOptions.speedup = true;
+
+                            capture = (ext & 2) ? true : false;
+
+                            if (capture && !capturePrevious) {
+                                captureNumber++;
+                                systemScreenCapture(captureNumber);
+                            }
+                            capturePrevious = capture;
+
+                            psoundTickfn();
+
+                            if (frameCount >= framesToSkip) {
+                                systemDrawScreen();
+                                frameCount = 0;
+                            } else {
+                                frameCount++;
+                                systemSendScreen();
+                            }
+                            if (systemPauseOnFrame()) {
+                                ticks = 0;
+                            }
+                            
+                            has_frames = true;
+                            cpuBreakLoop = true;
                         }
                     }
                 }
@@ -4611,7 +4614,7 @@ void CPULoop(int ticks)
                 cpuNextEvent = ticks;
 
             // end loop when a frame is done
-            if (ticks <= 0 || cpuBreakLoop || has_frames)
+            if (ticks <= 0 || cpuBreakLoop)
                 break;
         }
     }
