@@ -152,7 +152,7 @@ DISTS=$DISTS'
     XML-SAX         https://cpan.metacpan.org/authors/id/G/GR/GRANTM/XML-SAX-1.02.tar.gz                        perl5/lib/perl5/XML/SAX.pm
     docbook2x       https://downloads.sourceforge.net/docbook2x/docbook2X-0.8.8.tar.gz  bin/docbook2man
     expat           https://github.com/libexpat/libexpat/releases/download/R_2_7_3/expat-2.7.3.tar.xz           lib/libexpat.a
-    libpng          https://sourceforge.net/projects/libpng/files/libpng17/1.7.0beta89/libpng-1.7.0beta89.tar.xz lib/libpng.a
+    libpng          https://sourceforge.net/projects/libpng/files/libpng16/1.6.50/libpng-1.6.50.tar.xz           lib/libpng.a
     libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/3.1.2.tar.gz                         lib/libjpeg.a
     libtiff         https://download.osgeo.org/libtiff/tiff-4.7.1.tar.xz                                        lib/libtiff.a
 #    libcroco        http://ftp.gnome.org/pub/gnome/sources/libcroco/0.6/libcroco-0.6.13.tar.xz                  lib/libcroco-0.6.a
@@ -256,6 +256,7 @@ DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     pkgconf         autoreconf_noargs
     libffi          autoreconf
     libgd           cmake
+    libpng          autoreconf
     python2         autoreconf
     python3         autoreconf
     graphviz        autoreconf
@@ -280,6 +281,7 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
                     sed -i.bak '/SUBDIRS/{; s/ doc//; }' Makefile.am;
     graphviz        sed -i.bak 's/ -export-symbols/ -Wl,-export-symbols/g' \$(find . -name Makefile.am); \
                     putsln '#define __declspec(x)' > declspec.h;
+    libpng          rm autogen.sh
     xvidcore        cd build/generic; \
                     sed -i.bak '/^all:/{ s/ *\\\$(SHARED_LIB)//; }; \
                                 /^install:/{ s, *\\\$(BUILD_DIR)/\\\$(SHARED_LIB),,; }; \
@@ -320,7 +322,7 @@ DIST_POST_BUILD="$DIST_POST_BUILD
 DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
     ccache      cmake -G Ninja $CMAKE_INSTALL_ARGS -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -S .. -B .
     zlib-ng        ./configure --prefix=/usr --static --zlib-compat
-    openssl     ./config no-shared --prefix=/usr --openssldir=/etc/ssl
+    openssl     ./config no-shared no-unit-test --prefix=/usr --openssldir=/etc/ssl
     cmake       ./configure --prefix=/usr --no-qt-gui --parallel=\$NUM_CPUS
     XML-SAX     echo no | PERL_MM_USE_DEFAULT=0 \"\$perl\" Makefile.PL
     libvpx      ./configure --disable-shared --enable-static --prefix=/usr --disable-unit-tests --disable-tools --disable-docs --disable-examples
@@ -359,6 +361,7 @@ DIST_FLAGS="$DIST_FLAGS
     gettext     no_sdk_paths_in_flags
     bison       no_sdk_paths_in_flags
     libwebp     remove_arch_flags_from_build_ninja
+    libpng      no_autotools_cross_options
     docbook2x   no_autotools_cross_options
     libuuid     no_autotools_cross_options
     python3     no_autotools_cross_options

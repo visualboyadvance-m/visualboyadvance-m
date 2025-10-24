@@ -97,8 +97,6 @@ void gbSoundTick(int st)
         if (soundVolume_ != soundGetVolume())
             apply_volume();
     }
-
-    soundTicks = 0;
 }
 
 static void reset_apu()
