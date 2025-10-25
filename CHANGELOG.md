@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [2.2.3] - 2025-10-25 
 
+We have finally added working color correction. The initial code was done by
+Squall-Leonhart <danialhorton@hotmail.com> and is not in the Git history, with
+the config added by Rafael Kitover <rkitover@gmail.com>, then everything was put
+together by Andy Vandijck <andyvand@gmail.com>.
+
 =========================
 * 034447fa - libretro: Fix GB Show Border option was reversed. [negativeExponent]
 * 1fda4f4b - Update libretro header [negativeExponent]
