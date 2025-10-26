@@ -36,7 +36,7 @@ msgstr "Standardenhet"
 
 #: audio/internal/coreaudio.cpp:381
 msgid "Could not get CoreAudio device"
-msgstr ""
+msgstr "Kunde inte få CoreAudio-enhet"
 
 #: cmdevents.cpp:63 wxvbam.cpp:634
 msgid "Could not create main window"
@@ -553,7 +553,7 @@ msgstr "&Tillämpa"
 
 #: extra-translations.cpp:14
 msgid "Artists"
-msgstr ""
+msgstr "Konstnärer"
 
 #: extra-translations.cpp:15
 msgid "Cancel"
@@ -1263,7 +1263,7 @@ msgstr "Använd bilinjärt filter med 3d-renderare"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:432
 msgid "Use the SDL pixel art filter with an SDL renderer"
-msgstr ""
+msgstr "Använd SDL pixel art-filtret med en SDL-renderare"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:433
 msgid "Full-screen filter to apply"
@@ -1271,11 +1271,11 @@ msgstr "Helskärmsfilter att tillämpa"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:434
 msgid "Filter plugin library"
-msgstr ""
+msgstr "Bibliotek för filtertillägg"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:435
 msgid "Interframe blending function"
-msgstr ""
+msgstr "Interframe blandningsfunktion"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:436
 msgid "Bit depth"
@@ -1351,7 +1351,7 @@ msgstr "Samla automatiskt en hel sida innan utskrift"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:465
 msgid "Automatically save printouts as screen captures with -print suffix"
-msgstr ""
+msgstr "Spara automatiskt utskrifter som skärmfångster med suffixet -print"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:467
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:496
@@ -1380,7 +1380,7 @@ msgstr "Aktivera snabbare nätverksprotokoll som standard"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:489
 msgid "Default network link client host"
-msgstr ""
+msgstr "Klientvärd för nätverkslänk som standard"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:490
 msgid "Default network link server IP to bind"
@@ -1454,15 +1454,15 @@ msgid ""
 "names which map to joypad #<n> button <button>. Button is one of Up, Down, "
 "Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
-msgstr ""
+msgstr "Parametern Joypad/<n>/<button> innehåller en kommaseparerad lista med tangentnamn som mappar till joypad #<n> knapp <button>. Knappen är en av Upp, Ned, Vänster, Höger, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, AutoB, Speed, Capture, GS"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:526
 msgid "The autofire toggle period, in frames (1/60 s)"
-msgstr ""
+msgstr "Växlingsperiod för autofire, i bildrutor (1/60 s)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:527
 msgid "The number of the stick to use in single-player mode"
-msgstr ""
+msgstr "Numret för spaken att använda i enspelarläge"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:529
 msgid "Whether to enable SDL GameController mode"
@@ -1557,7 +1557,7 @@ msgstr "Aktivera RTC (åsidosättning av vba-over.ini är rtcEnabled"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:571
 msgid "Native save (\"battery\") hardware type"
-msgstr ""
+msgstr "Inbyggd hårdvarutyp för sparning (\"batteri\")"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:572
 msgid "Show speed indicator"
@@ -1577,7 +1577,7 @@ msgstr "Skriv inte över fusklistan när tillståndet läses in"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:579
 msgid "Do not overwrite native (battery) save when loading state"
-msgstr ""
+msgstr "Skriv inte över inbyggd sparning (batteri) vid inläsning av tillstånd"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:581
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
@@ -1593,7 +1593,7 @@ msgstr "Antal bildrutor att hoppa över vid uppsnabbning (istället för att str
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:589
 msgid "Use frame skip for speedup throttle"
-msgstr ""
+msgstr "Använd överhoppning av bildrutor för att snabba upp"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:591
 msgid "Mute sound during speedup"
@@ -1669,7 +1669,7 @@ msgstr "Antal ljudbuffertar"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:619
 msgid "Bit mask of sound channels to enable"
-msgstr ""
+msgstr "Bitmask av ljudkanaler att aktivera"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:620
 msgid "Game Boy Advance sound filtering (%)"
@@ -1681,7 +1681,7 @@ msgstr "Ljudinterpolering för Game Boy Advance"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:623
 msgid "Game Boy sound declicking"
-msgstr ""
+msgstr "Avklickning av Game Boy-ljud"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:624
 msgid "Game Boy echo effect (%)"
@@ -1786,23 +1786,23 @@ msgstr "Num Home"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:34
 msgid "Num left"
-msgstr ""
+msgstr "Num vänster"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:35
 msgid "Num Up"
-msgstr ""
+msgstr "Num upp"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:36
 msgid "Num Right"
-msgstr ""
+msgstr "Num höger"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:37
 msgid "Num Down"
-msgstr ""
+msgstr "Num ned"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:38
 msgid "Num PageUp"
-msgstr ""
+msgstr "Num PageUp"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:39
 msgid "Num PageDown"
@@ -1923,22 +1923,22 @@ msgstr "%s: Knapp %d"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:274
 #, c-format
 msgid "%s: Hat %d North"
-msgstr ""
+msgstr "%s: Hat %d Norr"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:276
 #, c-format
 msgid "%s: Hat %d South"
-msgstr ""
+msgstr "%s: Hat %d Söder"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:278
 #, c-format
 msgid "%s: Hat %d West"
-msgstr ""
+msgstr "%s: Hat %d Väst"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:280
 #, c-format
 msgid "%s: Hat %d East"
-msgstr ""
+msgstr "%s: Hat %d Öst"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:315
 msgid "Key"
@@ -2092,7 +2092,7 @@ msgstr "5 eller fler GBA stöds inte."
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2726
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2745
 msgid "Error opening event"
-msgstr ""
+msgstr "Fel vid öppning av händelsen"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2845
 msgid "Lost link; reinitialize to reconnect"
@@ -2104,7 +2104,7 @@ msgstr "Förlorade länk; återansluten"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2973
 msgid "Unknown slave timed out; resetting comm"
-msgstr ""
+msgstr "Okänd slav översteg tidsgränsen; återställer komm"
 
 #: xrc/AccelConfig.xrc:4
 msgid "Key Shortcuts"
@@ -2378,7 +2378,7 @@ msgstr "SDL-renderare:"
 
 #: xrc/DisplayConfig.xrc:90
 msgid "SDL Pixel Art Filter"
-msgstr ""
+msgstr "Filter för SDL Pixel Art"
 
 #: xrc/DisplayConfig.xrc:101
 msgid "Filters"
@@ -2438,7 +2438,7 @@ msgstr "Insticksmodul:"
 
 #: xrc/DisplayConfig.xrc:163
 msgid "Interframe blending:"
-msgstr ""
+msgstr "Interframe-blandning:"
 
 #: xrc/DisplayConfig.xrc:172
 msgid "Smart"
@@ -2482,7 +2482,7 @@ msgstr "Profil:"
 
 #: xrc/DisplayConfig.xrc:264
 msgid "GBA Darken:"
-msgstr ""
+msgstr "GBA mörkare:"
 
 #: xrc/DisplayConfig.xrc:282
 msgid "Lighter"
@@ -2494,7 +2494,7 @@ msgstr "Mycket mörkt"
 
 #: xrc/DisplayConfig.xrc:310
 msgid "GBC Lighten:"
-msgstr ""
+msgstr "GBC ljusare:"
 
 #: xrc/DisplayConfig.xrc:328
 msgid "Darker"
@@ -2827,7 +2827,7 @@ msgstr "Licenskod:"
 
 #: xrc/GBROMInfo.xrc:144
 msgid "Header checksum:"
-msgstr ""
+msgstr "Kontrollsumma för header:"
 
 #: xrc/GBROMInfo.xrc:156
 msgid "Cartridge checksum:"
@@ -3554,7 +3554,7 @@ msgstr "Surroundljudseffekt för &Game Boy"
 
 #: xrc/MainMenu.xrc:410
 msgid "&Game Boy sound declicking"
-msgstr ""
+msgstr "Av&klickning av Game Boy-ljud"
 
 #: xrc/MainMenu.xrc:415
 msgid "&Input"
