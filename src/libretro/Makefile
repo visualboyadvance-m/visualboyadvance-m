@@ -57,7 +57,7 @@ else ifneq ($(findstring MINGW,$(shell uname -a)),)
 	system_platform = win
 endif
 
-CORE_DIR     := ..
+CORE_DIR     := ../../src
 LIBRETRO_DIR := $(CORE_DIR)/libretro
 TARGET_NAME  := vbam
 
