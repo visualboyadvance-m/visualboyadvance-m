@@ -612,7 +612,7 @@ void retro_init(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &dir) && dir)
         snprintf(retro_system_directory, sizeof(retro_system_directory), "%s", dir);
 
-#ifdef FRONTEND_SUPPORT_BGR1555
+#ifdef FRONTEND_SUPPORTS_BGR1555
     systemColorDepth = 16;
     systemRedShift = 0;
     systemGreenShift = 5;
