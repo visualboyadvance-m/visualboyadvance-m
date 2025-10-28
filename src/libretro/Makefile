@@ -6,7 +6,7 @@ ifeq ($(platform), ps2)
 FRONTEND_SUPPORTS_RGB565=0
 FRONTEND_SUPPORTS_BGR1555=1
 else
-FRONTEND_SUPPORTS_RGB565=0
+FRONTEND_SUPPORTS_RGB565=1
 FRONTEND_SUPPORTS_BGR1555=0
 endif
 
@@ -76,6 +76,7 @@ ifneq (,$(findstring unix,$(platform)))
 	fpic := -fPIC
 	SHARED := -shared -Wl,-version-script=$(LIBRETRO_DIR)/link.T -Wl,-no-undefined
 	TILED_RENDERING=1
+	FRONTEND_SUPPORTS_RGB565=0
 
 # Classic Platforms ####################
 # Platform affix = classic_<ISA>_<µARCH>
@@ -556,6 +557,7 @@ else
 	CXX ?= g++
 	SHARED := -shared -static-libgcc -static-libstdc++ -Wl,-no-undefined -Wl,-version-script=$(LIBRETRO_DIR)/link.T
 	TILED_RENDERING=1
+	FRONTEND_SUPPORTS_RGB565=0
 endif
 
 include Makefile.common
