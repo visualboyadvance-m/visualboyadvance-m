@@ -1157,6 +1157,30 @@ static void update_variables(bool startup)
         option_turboEnable = (!strcmp(var.value, "enabled")) ? true : false;
     }
 
+    var.key = "vbam_gb_effects_enabled";
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        gb_effects_config.enabled = (!strcmp(var.value, "enabled")) ? true : false;
+    }
+
+    var.key = "vbam_gb_effects_echo_enabled";
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        gb_effects_config.echo = atoi(var.value) / 10.0f;
+    }
+    
+    var.key = "vbam_gb_effects_stereo_enabled";
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        gb_effects_config.stereo = atoi(var.value) / 10.0f;
+    }
+
+    var.key = "vbam_gb_effects_surround_enabled";
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        gb_effects_config.surround = (!strcmp(var.value, "enabled")) ? true : false;
+    }
+
     var.key = "vbam_turbodelay";
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
