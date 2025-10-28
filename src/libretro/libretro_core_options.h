@@ -268,9 +268,9 @@ struct retro_core_option_v2_definition option_defs_us[] = {
     },
     {
         "vbam_soundinterpolation",
-        "Sound Interpolation",
+        "(GBA) Sound Interpolation",
         NULL,
-        "Enable or disable sound filtering.",
+        "Applies low-pass filtering to smooth high-frequency noise in PCM audio.",
         NULL,
         "audio",
         {
@@ -282,9 +282,9 @@ struct retro_core_option_v2_definition option_defs_us[] = {
     },
     {
         "vbam_soundfiltering",
-        "Sound Filtering",
+        "(GBA) Sound Filtering",
         NULL,
-        "Sets the amount of filtering to use. Higher value reduces higher frequencies.",
+        "Adjusts the intensity of the low-pass filter applied to audio (0 = none, 10 = maximum).",
         NULL,
         "audio",
         {
@@ -302,6 +302,80 @@ struct retro_core_option_v2_definition option_defs_us[] = {
             { NULL, NULL },
         },
         "5"
+    },
+    {
+        "vbam_gb_effects_enabled",
+        "(GB) Sound Effects",
+        NULL,
+        "Enables or disabled all Game Boy sound effects.",
+        NULL,
+        "audio",
+        {
+            { "disabled",  NULL },
+            { "enabled", NULL },
+            { NULL, NULL },
+        },
+        "disabled"
+    },
+    {
+        "vbam_gb_effects_echo_enabled",
+        "(GB) Echo Effects",
+        NULL,
+        "Mix level for the reflected (echo) signal (0 = none, 10 = maximum).",
+        NULL,
+        "audio",
+        {
+            { "0",  NULL },
+            { "1",  NULL },
+            { "2",  NULL },
+            { "3",  NULL },
+            { "4",  NULL },
+            { "5",  NULL },
+            { "6",  NULL },
+            { "7",  NULL },
+            { "8",  NULL },
+            { "9",  NULL },
+            { "10",  NULL },
+            { NULL, NULL },
+        },
+        "2"
+    },
+    {
+        "vbam_gb_effects_stereo_enabled",
+        "(GB) Stereo Effects",
+        NULL,
+        "Adjusts stereo effect strength — higher values widen left/right placement (0 = none, 10 = maximum)",
+        NULL,
+        "audio",
+        {
+            { "0",  NULL },
+            { "1",  NULL },
+            { "2",  NULL },
+            { "3",  NULL },
+            { "4",  NULL },
+            { "5",  NULL },
+            { "6",  NULL },
+            { "7",  NULL },
+            { "8",  NULL },
+            { "9",  NULL },
+            { "10",  NULL },
+            { NULL, NULL },
+        },
+        "1"
+    },
+    {
+        "vbam_gb_effects_surround_enabled",
+        "(GB) Surround Effects",
+        NULL,
+        "Adds a surround effect, placing some channels behind the listener for a wider soundstage.",
+        NULL,
+        "audio",
+        {
+            { "disabled",  NULL },
+            { "enabled", NULL },
+            { NULL, NULL },
+        },
+        "disabled"
     },
     {
         "vbam_turboenable",
