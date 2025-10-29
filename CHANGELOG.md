@@ -4,6 +4,73 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.2.3] - 2025-10-25 
+
+We have finally added working color correction. The initial code was done by
+Squall-Leonhart <danialhorton@hotmail.com> and is not in the Git history, with
+the config added by Rafael Kitover <rkitover@gmail.com>, then everything was put
+together by Andy Vandijck <andyvand@gmail.com>.
+
+=========================
+* 034447fa - libretro: Fix GB Show Border option was reversed. [negativeExponent]
+* 1fda4f4b - Update libretro header [negativeExponent]
+* 050507ff - libretro: Fixed segfault when loading invalid or unsupported game [negativeExponent]
+* c7db3a4c - libretro: Fix missing break statement in MBC5 state handler [negativeExponent]
+* 20bf9bf3 - GB: Fix undefined behavior in gbDrawLine [negativeExponent]
+* b96da415 - GBA: Fix affine BG reference point update timing during HBLANK/VBLANK [negativeExponent]
+* 339f71fd - Fix joysticks with SDL video [rkitover]
+* c9d61758 - Default statusbar=true [rkitover]
+* 53bc1c17 - Default bilinear=false, hide_menu_bar=false [rkitover]
+* 49773388 - Fix 3d6cad6d for revert of 56ea6456 [rkitover]
+* f86ab610 - fix wiiu libretro build [eric]
+* f6046a5d - Fix apple, windows libretro builds [eric]
+* e0cbf10c - Fix out-of-bounds access [negativeExponent]
+* 5d5a9f7e - Replace crc32 with proper 256 table variant [negativeExponent]
+* 14a00ca0 - Improve layout of Basic panel in Video Config [rkitover]
+* 7495501b - Add autorelease and release temp objects in Metal [danialhorton]
+* ce1ef970 - Don't create a new window for SDL D3D9 [rkitover]
+* 1fba5774 - Fix 24bpp Simple video with filters [rkitover]
+* c2d1bf48 - Show tooltip values on sliders on hover [rkitover]
+* f955600c - Fix the Tile viewer for DMG in CGB mode [danialhorton]
+* 4cf3ecfc - Fix DMG OBP layer in CGB and GBA modes [rkitover]
+* 3eee0483 - Fix list cheats dialog for dark mode [rkitover]
+* 9551313e - Add tooltips with numerical value to all sliders [rkitover]
+* 6e20fdc2 - build: check CMake variable ENABLE_SHARED [rkitover]
+* 4208f5af - Fix issues and default dev in Mac CoreAudio driver [rkitover]
+* b499c2d5 - Fix mem leak and wrong API use in Metal driver [rkitover]
+* e8aa4467 - build: disable default bundling of dylibs on macOS [rkitover]
+* 68e7d98b - Fix pause when inactive for new wxWidgets [rkitover]
+* e889e895 - don't run Color Correct on SGB Hardware, Run GBA Color correct on GBC game run  on GBA Hardware [danialhorton]
+* ede668b7 - Fixes for BSD build [brad]
+* 3f005837 - Rename swap16/swap32 functions which conflict with OpenBSD macros [brad]
+* ab01be33 - Add option to enable SDL pixel art texture filter [rkitover]
+* 6ec0ba06 - Apply bilinear option for SDL texture [rkitover]
+* e3e14232 - Set gba_darken opt default to 37 [rkitover]
+* 7565cac2 - Update 2xSaI.cpp [danialhorton]
+* 33c5aeb8 - Default LCD Filter to enabled for GBA/GB [rkitover]
+* a17df26e - build: fix Debian installdeps for current Ubuntu [rkitover]
+* b2dd03c6 - build: guard cmake_policy() w if(POLICY) [rkitover]
+* 99f97138 - Add LCD filter parameters and add GBC filter [andyvand]
+* c334e3ff - Fix PS2 colors for libretro [andyvand]
+* 35f8ba0b - Add libretro PlayStation2 support [andyvand]
+* b92fcf7e - prevent the zip program from being incompletely downloaded [danialhorton]
+* d7507200 - Set params when no image is loaded [andyvand]
+* 0e32b900 - Fix LCD color filter [andyvand]
+* 1778d605 - Add config for color correction [rkitover]
+* f83aa940 - Fix GB reset [andyvand]
+* b08ecd12 - Fix libretro 24 bit color [andyvand]
+* d154a6ab - Add games app category for macOS (optimisations) [andyvand]
+* b134bacc - Fix SDL audio on Windows [andyvand]
+* 9ae1473f - Fix 8 bit PNG recording [andyvand]
+* 9cd0c5c0 - Fix 8 bit video recording [andyvand]
+* 9e41c547 - Fix 8 bit color [andyvand]
+* e9117145 - Fix policy in newer CMake [andyvand]
+* bad10342 - build: use pkg-config on UNIX for SDL3 [rkitover]
+* 82617ea7 - correct memory alignment [danialhorton]
+* 0561ef91 - Fix CoreAudio stall [andyvand]
+* 031ae2eb - build: fix CMake slowness [rkitover]
+* 6242679e - initialise stereo_buffer to 0 to prevent a race condition [danialhorton]
+
 ## [2.2.2] - 2025-07-30
 
 ========================

@@ -1,13 +1,13 @@
 DEBUG=0
-TILED_RENDERING=0
+TILED_RENDERING=1
 STATIC_LINKING=0
 
 ifeq ($(platform), ps2)
-FRONTEND_SUPPORT_RGB565=0
-FRONTEND_SUPPORT_BGR1555=1
+FRONTEND_SUPPORTS_RGB565=0
+FRONTEND_SUPPORTS_BGR1555=1
 else
-FRONTEND_SUPPORT_RGB565=1
-FRONTEND_SUPPORT_BGR1555=0
+FRONTEND_SUPPORTS_RGB565=1
+FRONTEND_SUPPORTS_BGR1555=0
 endif
 
 NO_LINK=1
@@ -57,7 +57,7 @@ else ifneq ($(findstring MINGW,$(shell uname -a)),)
 	system_platform = win
 endif
 
-CORE_DIR     := ..
+CORE_DIR     := ../../src
 LIBRETRO_DIR := $(CORE_DIR)/libretro
 TARGET_NAME  := vbam
 
@@ -76,6 +76,7 @@ ifneq (,$(findstring unix,$(platform)))
 	fpic := -fPIC
 	SHARED := -shared -Wl,-version-script=$(LIBRETRO_DIR)/link.T -Wl,-no-undefined
 	TILED_RENDERING=1
+	FRONTEND_SUPPORTS_RGB565=0
 
 # Classic Platforms ####################
 # Platform affix = classic_<ISA>_<µARCH>
@@ -556,6 +557,7 @@ else
 	CXX ?= g++
 	SHARED := -shared -static-libgcc -static-libstdc++ -Wl,-no-undefined -Wl,-version-script=$(LIBRETRO_DIR)/link.T
 	TILED_RENDERING=1
+	FRONTEND_SUPPORTS_RGB565=0
 endif
 
 include Makefile.common

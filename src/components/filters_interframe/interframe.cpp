@@ -191,12 +191,11 @@ void SmartIB8(uint8_t *srcPtr, uint32_t srcPitch, int width, int starty, int hei
       pos++;
     }
 
-    /* Swap buffers around */
-    uint8_t *temp = frm1;
-    frm1 = frm3;
-    frm3 = frm2;
-    frm2 = temp;
-
+  /* Swap buffers around */
+  uint8_t *temp = frm1;
+  frm1 = frm3;
+  frm3 = frm2;
+  frm2 = temp;
 }
 
 void SmartIB8(uint8_t *srcPtr, uint32_t srcPitch, int width, int height)

@@ -612,7 +612,7 @@ void retro_init(void)
     if (environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &dir) && dir)
         snprintf(retro_system_directory, sizeof(retro_system_directory), "%s", dir);
 
-#ifdef FRONTEND_SUPPORT_BGR1555
+#ifdef FRONTEND_SUPPORTS_BGR1555
     systemColorDepth = 16;
     systemRedShift = 0;
     systemGreenShift = 5;
@@ -1155,6 +1155,30 @@ static void update_variables(bool startup)
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         option_turboEnable = (!strcmp(var.value, "enabled")) ? true : false;
+    }
+
+    var.key = "vbam_gb_effects_enabled";
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        gb_effects_config.enabled = (!strcmp(var.value, "enabled")) ? true : false;
+    }
+
+    var.key = "vbam_gb_effects_echo_enabled";
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        gb_effects_config.echo = atoi(var.value) / 10.0f;
+    }
+    
+    var.key = "vbam_gb_effects_stereo_enabled";
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        gb_effects_config.stereo = atoi(var.value) / 10.0f;
+    }
+
+    var.key = "vbam_gb_effects_surround_enabled";
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        gb_effects_config.surround = (!strcmp(var.value, "enabled")) ? true : false;
     }
 
     var.key = "vbam_turbodelay";
