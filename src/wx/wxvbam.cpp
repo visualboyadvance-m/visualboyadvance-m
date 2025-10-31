@@ -358,7 +358,7 @@ wxLocale *wxvbam_locale = NULL;
 bool wxvbamApp::OnInit() {
     using_wayland = IsWayland();
 
-#if ((wxMAJOR_VERSION == 3) && (wxMINOR_VERSION >= 3)) || (wxMAJOR_VERSION > 3)
+#if !defined(WINXP) && ((wxMAJOR_VERSION == 3) && (wxMINOR_VERSION >= 3)) || (wxMAJOR_VERSION > 3)
     SetAppearance(Appearance::System);
 #endif
 

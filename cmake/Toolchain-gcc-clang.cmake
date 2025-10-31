@@ -7,10 +7,10 @@ if(UPSTREAM_RELEASE)
         # Require and optimize for Core2 level support, tune for generic.
         if(APPLE)
             add_compile_options(-march=core2 -mtune=skylake)
-        else()
+        elseif(WIN32)
             add_compile_options(-march=core2 -mtune=generic)
         endif()
-    elseif(X86_32)
+    elseif(WIN32 AND X86_32)
         # Optimize for pentiumi3 and tune for generic for Windows XP builds.
         set(WINXP TRUE)
         add_compile_options(-march=pentium3 -mtune=generic)
