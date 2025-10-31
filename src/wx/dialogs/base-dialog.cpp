@@ -1,5 +1,8 @@
 #include "wx/dialogs/base-dialog.h"
 
+#include <functional>
+
+#include <wx/notebook.h>
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
 #include <wx/xrc/xmlres.h>
@@ -90,6 +93,31 @@ BaseDialog::BaseDialog(wxWindow* parent, const wxString& xrc_file)
 #endif
 
     VBAM_CHECK(wxXmlResource::Get()->LoadDialog(this, parent, xrc_file));
+
+#ifdef WINXP
+    // Force white background on all notebook pages on Windows XP where dark mode is unsupported.
+    // This function recursively finds all notebooks, including nested ones.
+    std::function<void(wxWindow*)> fix_notebooks = [&fix_notebooks](wxWindow* window) {
+        wxWindowList& children = window->GetChildren();
+        for (wxWindowList::iterator it = children.begin(); it != children.end(); ++it) {
+            wxWindow* child = *it;
+            if (wxNotebook* notebook = wxDynamicCast(child, wxNotebook)) {
+                for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
+                    wxWindow* page = notebook->GetPage(i);
+                    if (page) {
+                        page->SetBackgroundColour(*wxWHITE);
+                        // Recursively check for nested notebooks
+                        fix_notebooks(page);
+                    }
+                }
+            } else {
+                // Recursively check children
+                fix_notebooks(child);
+            }
+        }
+    };
+    fix_notebooks(this);
+#endif
 
     // Bind the event handler.
     this->Bind(wxEVT_SHOW, &BaseDialog::OnBaseDialogShow, this);
