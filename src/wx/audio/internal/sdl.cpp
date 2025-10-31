@@ -119,7 +119,7 @@ bool SDLAudio::init(long sampleRate) {
 #ifdef ENABLE_SDL3
 
 #ifdef WINXP
-    SDL_SetHint("SDL_AUDIODRIVER", "directsound");
+    SDL_SetHint("SDL_AUDIODRIVER", "winmm");
 #endif
 
     int current_device = SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK;
