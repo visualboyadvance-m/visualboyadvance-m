@@ -14,6 +14,11 @@
 // on Creative for making a typedef to void in the first place)
 // #define ALC_NO_PROTOTYPES 1
 
+#ifdef _WIN32
+#include <windows.h>
+#include <versionhelpers.h>
+#endif
+
 #ifdef ENABLE_SDL3
 #include <SDL3/SDL.h>
 #else
@@ -118,8 +123,11 @@ SDLAudio::~SDLAudio() {
 bool SDLAudio::init(long sampleRate) {
 #ifdef ENABLE_SDL3
 
-#ifdef WINXP
-    SDL_SetHint("SDL_AUDIODRIVER", "winmm");
+#ifdef _WIN32
+    // On Windows XP, use the winmm audio driver instead of the default wasapi driver.
+    if (!IsWindowsVistaOrGreater()) {
+        SDL_SetHint("SDL_AUDIODRIVER", "winmm");
+    }
 #endif
 
     int current_device = SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK;
