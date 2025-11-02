@@ -183,8 +183,7 @@ option(ENABLE_GBA_LOGGING "Enable extended GBA logging" ON)
 option(UPSTREAM_RELEASE "do some optimizations and release automation tasks" OFF)
 
 if(WIN32)
-    # not yet implemented
-    option(ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" OFF)
+    option(ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" ON)
 
     set(XAUDIO2_DEFAULT ON)
     if ((MSVC AND CMAKE_CXX_COMPILER_ID STREQUAL Clang))

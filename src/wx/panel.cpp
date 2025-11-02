@@ -3194,24 +3194,324 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 #if defined(__WXMSW__) && !defined(NO_D3D)
 #define DIRECT3D_VERSION 0x0900
 #include <d3d9.h> // main include file
-        //#include <d3dx9core.h> // required for font rendering
-#include <dxerr9.h> // contains debug functions
-        
+
 DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
         : DrawingPanel(parent, _width, _height)
+        , d3d(NULL)
+        , device(NULL)
+        , texture(NULL)
+        , texture_width(0)
+        , texture_height(0)
 {
-    // FIXME: implement
+    // Create Direct3D 9 interface
+    d3d = Direct3DCreate9(D3D_SDK_VERSION);
+    if (!d3d) {
+        wxLogError(_("Failed to create Direct3D 9 interface"));
+        return;
+    }
+
+    // Get display mode
+    D3DDISPLAYMODE d3ddm;
+    HRESULT hr = d3d->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm);
+    if (FAILED(hr)) {
+        wxLogError(_("Failed to get adapter display mode: 0x%08X"), hr);
+        return;
+    }
+
+    // Set up present parameters
+    D3DPRESENT_PARAMETERS d3dpp;
+    ZeroMemory(&d3dpp, sizeof(d3dpp));
+    d3dpp.Windowed = TRUE;
+    d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+    d3dpp.BackBufferFormat = d3ddm.Format;
+    d3dpp.BackBufferWidth = 0;  // Use window size
+    d3dpp.BackBufferHeight = 0; // Use window size
+    d3dpp.PresentationInterval = OPTION(kPrefVsync) ?
+                                  D3DPRESENT_INTERVAL_ONE :
+                                  D3DPRESENT_INTERVAL_IMMEDIATE;
+
+    // Create Direct3D device
+    hr = d3d->CreateDevice(
+        D3DADAPTER_DEFAULT,
+        D3DDEVTYPE_HAL,
+        (HWND)GetHandle(),
+        D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+        &d3dpp,
+        &device
+    );
+
+    if (FAILED(hr)) {
+        wxLogError(_("Failed to create Direct3D device: 0x%08X"), hr);
+        return;
+    }
+
+    wxLogDebug(wxT("Direct3D 9 device created successfully"));
 }
-        
+
+DXDrawingPanel::~DXDrawingPanel()
+{
+    if (texture) {
+        texture->Release();
+        texture = NULL;
+    }
+    if (device) {
+        device->Release();
+        device = NULL;
+    }
+    if (d3d) {
+        d3d->Release();
+        d3d = NULL;
+    }
+}
+
+void DXDrawingPanel::DrawingPanelInit()
+{
+    DrawingPanelBase::DrawingPanelInit();
+
+    if (!device) {
+        return;
+    }
+
+    // Calculate texture size (use actual scaled size)
+    texture_width = (int)std::ceil(width * scale);
+    texture_height = (int)std::ceil(height * scale);
+
+    wxLogDebug(wxT("DXDrawingPanel initialized: %dx%d (scale: %f)"),
+               texture_width, texture_height, scale);
+}
+
 void DXDrawingPanel::DrawArea(wxWindowDC& dc)
 {
-    // FIXME: implement
+    (void)dc; // unused params
+
+    if (!device) {
+        return;
+    }
+
     if (!did_init) {
         DrawingPanelInit();
     }
-            
-    if (todraw) {
+
+    if (!todraw) {
+        // Clear screen if no data to draw
+        device->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+        device->Present(NULL, NULL, NULL, NULL);
+        return;
     }
+
+    // Determine texture format based on output format
+    D3DFORMAT tex_format;
+    int pixel_size;
+    if (out_16) {
+        tex_format = D3DFMT_R5G6B5;
+        pixel_size = 2;
+    } else {
+        // out_24 or 32-bit - convert to 32-bit XRGB for D3D
+        tex_format = D3DFMT_X8R8G8B8;
+        pixel_size = 4;
+    }
+
+    int scaled_width = (int)std::ceil(width * scale);
+    int scaled_height = (int)std::ceil(height * scale);
+
+    // Create or recreate texture if size changed
+    if (!texture || texture_width != scaled_width || texture_height != scaled_height) {
+        if (texture) {
+            texture->Release();
+            texture = NULL;
+        }
+
+        HRESULT hr = device->CreateTexture(
+            scaled_width,
+            scaled_height,
+            1,
+            D3DUSAGE_DYNAMIC,
+            tex_format,
+            D3DPOOL_DEFAULT,
+            &texture,
+            NULL
+        );
+
+        if (FAILED(hr)) {
+            wxLogError(_("Failed to create texture: 0x%08X"), hr);
+            return;
+        }
+
+        texture_width = scaled_width;
+        texture_height = scaled_height;
+    }
+
+    // Lock texture and copy pixel data
+    D3DLOCKED_RECT locked_rect;
+    HRESULT hr = texture->LockRect(0, &locked_rect, NULL, D3DLOCK_DISCARD);
+    if (FAILED(hr)) {
+        wxLogError(_("Failed to lock texture: 0x%08X"), hr);
+        return;
+    }
+
+    // Calculate source pitch (bytes per row)
+    int src_pitch = scaled_width;
+    if (out_8) {
+        src_pitch = scaled_width + 4; // +4 for border
+    } else if (out_16) {
+        src_pitch = (scaled_width + 2) * 2; // +2 for border
+    } else if (out_24) {
+        src_pitch = scaled_width * 3;
+    } else {
+        // 32-bit
+        src_pitch = (scaled_width + 1) * 4; // +1 for border
+    }
+
+    // Copy pixel data
+    uint8_t* src = todraw;
+    uint8_t* dst = (uint8_t*)locked_rect.pBits;
+
+    if (out_8) {
+        // 8-bit palette mode - convert to 32-bit
+        src += scaled_width + 4; // Skip top border
+        for (int y = 0; y < scaled_height; y++) {
+            uint8_t* src_row = src;
+            uint8_t* dst_row = dst;
+            for (int x = 0; x < scaled_width; x++) {
+                uint8_t palIndex = *src_row++;
+                // Simple palette expansion (this may need adjustment)
+                if (palIndex == 0xff) {
+                    dst_row[0] = dst_row[1] = dst_row[2] = 0xff;
+                } else {
+                    dst_row[0] = (palIndex & 0x3) << 6;       // B
+                    dst_row[1] = ((palIndex >> 2) & 0x7) << 5; // G
+                    dst_row[2] = ((palIndex >> 5) & 0x7) << 5; // R
+                }
+                dst_row[3] = 0;
+                dst_row += 4;
+            }
+            src += src_pitch;
+            dst += locked_rect.Pitch;
+        }
+    } else if (out_16) {
+        // Convert 16-bit data from system format (1-5-5-5) to D3D R5G6B5
+        uint16_t* src16 = (uint16_t*)src + (scaled_width + 2); // Skip top border
+        for (int y = 0; y < scaled_height; y++) {
+            uint16_t* src_row = src16;
+            uint16_t* dst_row = (uint16_t*)dst;
+            for (int x = 0; x < scaled_width; x++, src_row++) {
+                // Extract RGB components using system shifts (5 bits each)
+                uint16_t pixel = *src_row;
+                uint8_t r5 = ((pixel >> systemRedShift) & 0x1f);
+                uint8_t g5 = ((pixel >> systemGreenShift) & 0x1f);
+                uint8_t b5 = ((pixel >> systemBlueShift) & 0x1f);
+                // Expand 5-bit green to 6-bit by duplicating the MSB
+                uint8_t g6 = (g5 << 1) | (g5 >> 4);
+                // Pack into D3D R5G6B5 format: RRRRRGGGGGGBBBBB
+                *dst_row++ = (r5 << 11) | (g6 << 5) | b5;
+            }
+            src16 += (scaled_width + 2); // Move to next row including border
+            dst += locked_rect.Pitch;
+        }
+    } else if (out_24) {
+        // Convert 24-bit RGB to 32-bit XRGB
+        src += scaled_width * 3; // Skip top border if any
+        for (int y = 0; y < scaled_height; y++) {
+            uint8_t* src_row = src;
+            uint8_t* dst_row = dst;
+            for (int x = 0; x < scaled_width; x++) {
+                dst_row[0] = src_row[2]; // B
+                dst_row[1] = src_row[1]; // G
+                dst_row[2] = src_row[0]; // R
+                dst_row[3] = 0;          // X
+                src_row += 3;
+                dst_row += 4;
+            }
+            src += src_pitch;
+            dst += locked_rect.Pitch;
+        }
+    } else {
+        // 32-bit - convert RGBA to BGRX (swap R and B)
+        src += (scaled_width + 1) * 4; // Skip top border
+        for (int y = 0; y < scaled_height; y++) {
+            uint8_t* src_row = src;
+            uint8_t* dst_row = dst;
+            for (int x = 0; x < scaled_width; x++) {
+                dst_row[0] = src_row[2]; // B
+                dst_row[1] = src_row[1]; // G
+                dst_row[2] = src_row[0]; // R
+                dst_row[3] = src_row[3]; // A/X
+                src_row += 4;
+                dst_row += 4;
+            }
+            src += src_pitch;
+            dst += locked_rect.Pitch;
+        }
+    }
+
+    texture->UnlockRect(0);
+
+    // Begin rendering
+    device->BeginScene();
+
+    // Clear background
+    device->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+
+    // Set texture
+    device->SetTexture(0, texture);
+
+    // Set texture filtering
+    D3DTEXTUREFILTERTYPE filter = OPTION(kDispBilinear) ?
+                                   D3DTEXF_LINEAR : D3DTEXF_POINT;
+    device->SetSamplerState(0, D3DSAMP_MAGFILTER, filter);
+    device->SetSamplerState(0, D3DSAMP_MINFILTER, filter);
+
+    // Disable lighting
+    device->SetRenderState(D3DRS_LIGHTING, FALSE);
+
+    // Set up orthographic projection for 2D rendering
+    device->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
+
+    // Get window client size
+    wxSize client_size = GetClientSize();
+    float win_width = (float)client_size.GetWidth();
+    float win_height = (float)client_size.GetHeight();
+
+    // Calculate aspect ratios
+    float tex_aspect = (float)scaled_width / (float)scaled_height;
+    float win_aspect = win_width / win_height;
+
+    // Calculate dimensions to maintain aspect ratio
+    float render_width, render_height;
+    float offset_x = 0.0f, offset_y = 0.0f;
+
+    if (win_aspect > tex_aspect) {
+        // Window is wider than texture
+        render_height = win_height;
+        render_width = win_height * tex_aspect;
+        offset_x = (win_width - render_width) / 2.0f;
+    } else {
+        // Window is taller than texture
+        render_width = win_width;
+        render_height = win_width / tex_aspect;
+        offset_y = (win_height - render_height) / 2.0f;
+    }
+
+    // Define vertices for textured quad
+    struct Vertex {
+        float x, y, z, rhw;
+        float u, v;
+    };
+
+    Vertex vertices[4] = {
+        { offset_x,              offset_y,               0.0f, 1.0f, 0.0f, 0.0f },
+        { offset_x + render_width, offset_y,               0.0f, 1.0f, 1.0f, 0.0f },
+        { offset_x + render_width, offset_y + render_height, 0.0f, 1.0f, 1.0f, 1.0f },
+        { offset_x,              offset_y + render_height, 0.0f, 1.0f, 0.0f, 1.0f }
+    };
+
+    // Draw the quad
+    device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertices, sizeof(Vertex));
+
+    device->EndScene();
+
+    // Present the frame
+    device->Present(NULL, NULL, NULL, NULL);
 }
 #endif
         

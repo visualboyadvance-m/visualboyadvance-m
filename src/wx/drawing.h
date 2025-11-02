@@ -75,12 +75,26 @@ private:
 };
 
 #if defined(__WXMSW__) && !defined(NO_D3D)
+// Forward declarations for Direct3D 9
+struct IDirect3D9;
+struct IDirect3DDevice9;
+struct IDirect3DTexture9;
+
 class DXDrawingPanel : public DrawingPanel {
 public:
     DXDrawingPanel(wxWindow* parent, int _width, int _height);
+    virtual ~DXDrawingPanel();
 
 protected:
     void DrawArea(wxWindowDC&);
+    void DrawingPanelInit();
+
+private:
+    IDirect3D9* d3d;
+    IDirect3DDevice9* device;
+    IDirect3DTexture9* texture;
+    int texture_width;
+    int texture_height;
 };
 #endif
 
