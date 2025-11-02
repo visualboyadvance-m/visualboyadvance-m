@@ -3196,23 +3196,32 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 #include <d3d9.h> // main include file
 
 DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
-        : DrawingPanel(parent, _width, _height)
-        , d3d(NULL)
-        , device(NULL)
-        , texture(NULL)
-        , texture_width(0)
-        , texture_height(0)
+    : DrawingPanel(parent, _width, _height)
+    , d3d(NULL)
+    , device(NULL)
+    , texture(NULL)
+    , texture_width(0)
+    , texture_height(0)
+    , using_d3d9ex(false)
 {
-    // Create Direct3D 9 interface
-    d3d = Direct3DCreate9(D3D_SDK_VERSION);
-    if (!d3d) {
-        wxLogError(_("Failed to create Direct3D 9 interface"));
-        return;
+    // Try to create Direct3D 9Ex interface (Vista+)
+    HRESULT hr = Direct3DCreate9Ex(D3D_SDK_VERSION, (IDirect3D9Ex**)&d3d);
+    if (SUCCEEDED(hr)) {
+        using_d3d9ex = true;
+        wxLogDebug(wxT("Using Direct3D 9Ex"));
+    } else {
+        // Fall back to regular Direct3D 9
+        d3d = Direct3DCreate9(D3D_SDK_VERSION);
+        if (!d3d) {
+            wxLogError(_("Failed to create Direct3D 9 interface"));
+            return;
+        }
+        wxLogDebug(wxT("Using Direct3D 9"));
     }
 
     // Get display mode
     D3DDISPLAYMODE d3ddm;
-    HRESULT hr = d3d->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm);
+    hr = d3d->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm);
     if (FAILED(hr)) {
         wxLogError(_("Failed to get adapter display mode: 0x%08X"), hr);
         return;
@@ -3222,30 +3231,70 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
     D3DPRESENT_PARAMETERS d3dpp;
     ZeroMemory(&d3dpp, sizeof(d3dpp));
     d3dpp.Windowed = TRUE;
-    d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
     d3dpp.BackBufferFormat = d3ddm.Format;
     d3dpp.BackBufferWidth = 0;  // Use window size
     d3dpp.BackBufferHeight = 0; // Use window size
     d3dpp.PresentationInterval = OPTION(kPrefVsync) ?
-                                  D3DPRESENT_INTERVAL_ONE :
-                                  D3DPRESENT_INTERVAL_IMMEDIATE;
+                                   D3DPRESENT_INTERVAL_ONE :
+                                   D3DPRESENT_INTERVAL_IMMEDIATE;
 
-    // Create Direct3D device
-    hr = d3d->CreateDevice(
-        D3DADAPTER_DEFAULT,
-        D3DDEVTYPE_HAL,
-        (HWND)GetHandle(),
-        D3DCREATE_SOFTWARE_VERTEXPROCESSING,
-        &d3dpp,
-        &device
-    );
+    const wxChar* final_swap_effect = wxT("UNKNOWN"); // Variable to log the successful swap effect
+
+    // Try up to 2 times: FlipEx first (if D3D9Ex), then Discard
+    for (int swap_attempt = 0; swap_attempt < 2; swap_attempt++) {
+        // First attempt with D3D9Ex: try FlipEx, otherwise use Discard
+        if (swap_attempt == 0 && using_d3d9ex) {
+            d3dpp.SwapEffect = D3DSWAPEFFECT_FLIPEX;
+            d3dpp.BackBufferCount = 2;
+        } else {
+            if (swap_attempt == 1) wxLogDebug(wxT("FlipEx not supported, falling back to Discard swap effect"));
+            d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+            d3dpp.BackBufferCount = 0;
+        }
+
+        // Create Direct3D device - try hardware vertex processing first
+        hr = d3d->CreateDevice(
+            D3DADAPTER_DEFAULT,
+            D3DDEVTYPE_HAL,
+            (HWND)GetHandle(),
+            D3DCREATE_HARDWARE_VERTEXPROCESSING,
+            &d3dpp,
+            &device
+        );
+
+        if (FAILED(hr)) {
+            wxLogDebug(wxT("Hardware vertex processing not available, falling back to software"));
+            
+            // Fallback to software vertex processing
+            hr = d3d->CreateDevice(
+                D3DADAPTER_DEFAULT,
+                D3DDEVTYPE_HAL,
+                (HWND)GetHandle(),
+                D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+                &d3dpp,
+                &device
+            );
+        }
+
+        // If succeeded or not using D3D9Ex, break out
+        if (SUCCEEDED(hr) || !using_d3d9ex) {
+            if (SUCCEEDED(hr)) {
+                // Record the successful swap effect for logging
+                final_swap_effect = (d3dpp.SwapEffect == D3DSWAPEFFECT_FLIPEX) ? wxT("FLIPEX") : wxT("DISCARD");
+            }
+            break;
+        }
+    }
 
     if (FAILED(hr)) {
         wxLogError(_("Failed to create Direct3D device: 0x%08X"), hr);
         return;
     }
 
-    wxLogDebug(wxT("Direct3D 9 device created successfully"));
+    // Log the successful device creation along with the final swap effect
+    wxLogDebug(wxT("Direct3D 9%s device created successfully (SwapEffect: %s)"), 
+               using_d3d9ex ? wxT("Ex") : wxT(""), 
+               final_swap_effect);
 }
 
 DXDrawingPanel::~DXDrawingPanel()
@@ -3309,22 +3358,52 @@ bool DXDrawingPanel::ResetDevice()
     D3DPRESENT_PARAMETERS d3dpp;
     ZeroMemory(&d3dpp, sizeof(d3dpp));
     d3dpp.Windowed = TRUE;
-    d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
     d3dpp.BackBufferFormat = d3ddm.Format;
     d3dpp.BackBufferWidth = client_size.GetWidth();
     d3dpp.BackBufferHeight = client_size.GetHeight();
     d3dpp.PresentationInterval = OPTION(kPrefVsync) ?
-                                  D3DPRESENT_INTERVAL_ONE :
-                                  D3DPRESENT_INTERVAL_IMMEDIATE;
+                                   D3DPRESENT_INTERVAL_ONE :
+                                   D3DPRESENT_INTERVAL_IMMEDIATE;
+
+    const wxChar* attempted_swap_effect = wxT("DISCARD"); // Variable to track the attempted/final swap effect
+
+    // Apply SwapEffect logic based on D3D9Ex usage (which was determined in the constructor)
+    if (using_d3d9ex) {
+        // Try FlipEx first, as it's the preferred mode for D3D9Ex
+        d3dpp.SwapEffect = D3DSWAPEFFECT_FLIPEX;
+        d3dpp.BackBufferCount = 2; 
+        attempted_swap_effect = wxT("FLIPEX");
+    } else {
+        // Fall back to standard Discard for regular D3D9
+        d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+        d3dpp.BackBufferCount = 0; 
+    }
+
+    wxLogDebug(wxT("Attempting Direct3D device reset (SwapEffect: %s)"), attempted_swap_effect);
 
     // Reset the device with current window size
     hr = device->Reset(&d3dpp);
+    
+    // If Reset with FlipEx fails on D3D9Ex, try Discard as a fallback for the reset
+    if (FAILED(hr) && using_d3d9ex && d3dpp.SwapEffect == D3DSWAPEFFECT_FLIPEX) {
+        wxLogDebug(wxT("Reset with FlipEx failed, retrying with Discard swap effect"));
+        d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+        d3dpp.BackBufferCount = 0;
+        hr = device->Reset(&d3dpp);
+        
+        if (SUCCEEDED(hr)) {
+            // Update logging variable to reflect the successful fallback
+            attempted_swap_effect = wxT("DISCARD (Fallback)");
+        }
+    }
+    
     if (FAILED(hr)) {
         wxLogError(_("Failed to reset Direct3D device: 0x%08X"), hr);
         return false;
     }
 
-    wxLogDebug(wxT("Direct3D device reset successfully"));
+    // Log the successful reset along with the final swap effect used
+    wxLogDebug(wxT("Direct3D device reset successfully (Final SwapEffect: %s)"), attempted_swap_effect);
     return true;
 }
 
@@ -3385,7 +3464,7 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
             1,
             D3DUSAGE_DYNAMIC,
             tex_format,
-            D3DPOOL_DEFAULT,
+            using_d3d9ex ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED,  // Use DEFAULT for 9Ex, MANAGED for 9
             &texture,
             NULL
         );
