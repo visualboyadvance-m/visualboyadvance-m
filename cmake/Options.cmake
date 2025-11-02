@@ -210,7 +210,7 @@ set(ENABLE_FAUDIO_DEFAULT OFF)
 
 find_package(FAudio QUIET)
 
-if(FAudio_FOUND AND NOT (MINGW AND X86))
+if(FAudio_FOUND)
     set(ENABLE_FAUDIO_DEFAULT ON)
 endif()
 
