@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-11 01:00+0000\n"
+"POT-Creation-Date: 2025-11-02 16:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Damian Drakon <dragon1590@gmail.com>, 2019-2020,2022-2023\n"
 "Language-Team: Polish (Poland) (http://app.transifex.com/bgk/vba-m/language/pl_PL/)\n"
@@ -19,9 +19,9 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
 #: audio/internal/coreaudio.cpp:375 audio/internal/coreaudio.cpp:581
-#: audio/internal/sdl.cpp:179 audio/internal/sdl.cpp:197
-#: audio/internal/sdl.cpp:328 audio/internal/sdl.cpp:339
-#: audio/internal/sdl.cpp:359 audio/internal/faudio.cpp:490
+#: audio/internal/sdl.cpp:191 audio/internal/sdl.cpp:209
+#: audio/internal/sdl.cpp:340 audio/internal/sdl.cpp:351
+#: audio/internal/sdl.cpp:371 audio/internal/faudio.cpp:508
 #: audio/internal/xaudio2.cpp:604
 msgid "Default device"
 msgstr "Urządzenie domyślne"
@@ -367,17 +367,17 @@ msgstr "Brak"
 msgid "No usable rpi plugins found in %s"
 msgstr "Nie znaleziono użytecznych wtyczek rpi w %s"
 
-#: dialogs/display-config.cpp:607 dialogs/display-config.cpp:686
+#: dialogs/display-config.cpp:605 dialogs/display-config.cpp:684
 #: xrc/DisplayConfig.xrc:143
 msgid "Plugin"
 msgstr "Wtyczka"
 
-#: dialogs/display-config.cpp:614
+#: dialogs/display-config.cpp:612
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "Używany filtr pikseli: %s"
 
-#: dialogs/display-config.cpp:621
+#: dialogs/display-config.cpp:619
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr "Używane mieszanie międzyklatkowe: %s"
@@ -860,99 +860,123 @@ msgstr ""
 msgid "Failed to set OpenGL properties"
 msgstr ""
 
-#: panel.cpp:2418 panel.cpp:2452
+#: panel.cpp:2424 panel.cpp:2458
 msgid "Failed to create SDL window"
 msgstr ""
 
-#: panel.cpp:2436 panel.cpp:2484
+#: panel.cpp:2442 panel.cpp:2490
 msgid "Failed to create SDL renderer"
 msgstr ""
 
-#: panel.cpp:3052
+#: panel.cpp:3058
 msgid "Enabling EGL VSync."
 msgstr "Włączenie EGL VSync."
 
-#: panel.cpp:3054
+#: panel.cpp:3060
 msgid "Disabling EGL VSync."
 msgstr "Wyłączenie EGL VSync."
 
-#: panel.cpp:3061
+#: panel.cpp:3067
 msgid "Enabling GLX VSync."
 msgstr "Włączenie GLX VSync."
 
-#: panel.cpp:3063
+#: panel.cpp:3069
 msgid "Disabling GLX VSync."
 msgstr "Wyłączenie GLX VSync."
 
-#: panel.cpp:3081
+#: panel.cpp:3087
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Nie udało się ustawić glXSwapIntervalEXT"
 
-#: panel.cpp:3090
+#: panel.cpp:3096
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Nie udało się ustawić glXSwapIntervalSGI"
 
-#: panel.cpp:3099
+#: panel.cpp:3105
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Nie udało się ustawić glXSwapIntervalMESA"
 
-#: panel.cpp:3106
+#: panel.cpp:3112
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "Brak wsparcia dla wglGetExtensionsStringEXT"
 
-#: panel.cpp:3109
+#: panel.cpp:3115
 msgid "No support for WGL_EXT_swap_control"
 msgstr "Brak wsparcia dla WGL_EXT_swap_control"
 
-#: panel.cpp:3118
+#: panel.cpp:3124
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Nie udało się ustawić wglSwapIntervalEXT"
 
-#: panel.cpp:3124
+#: panel.cpp:3130
 msgid "No VSYNC available on this platform"
 msgstr "VSYNC jest niedostępne na tej platformie"
 
-#: panel.cpp:3220
+#: panel.cpp:3209
+msgid "Failed to create Direct3D 9 interface"
+msgstr ""
+
+#: panel.cpp:3217
+#, c-format
+msgid "Failed to get adapter display mode: 0x%08X"
+msgstr ""
+
+#: panel.cpp:3244
+#, c-format
+msgid "Failed to create Direct3D device: 0x%08X"
+msgstr ""
+
+#: panel.cpp:3336
+#, c-format
+msgid "Failed to create texture: 0x%08X"
+msgstr ""
+
+#: panel.cpp:3348
+#, c-format
+msgid "Failed to lock texture: 0x%08X"
+msgstr ""
+
+#: panel.cpp:3526
 msgid "Memory allocation error"
 msgstr ""
 
-#: panel.cpp:3223
+#: panel.cpp:3529
 msgid "Error initializing codec"
 msgstr ""
 
-#: panel.cpp:3226
+#: panel.cpp:3532
 msgid "Error writing to output file"
 msgstr ""
 
-#: panel.cpp:3229
+#: panel.cpp:3535
 msgid "Can't guess output format from file name"
 msgstr ""
 
-#: panel.cpp:3234
+#: panel.cpp:3540
 msgid "Programming error; aborting!"
 msgstr ""
 
-#: panel.cpp:3246 panel.cpp:3275
+#: panel.cpp:3552 panel.cpp:3581
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Nie można rozpocząć nagrywania do %s (%s)"
 
-#: panel.cpp:3303
+#: panel.cpp:3609
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "Błąd podczas nagrywania dźwięku / obrazu (%s); przerywanie"
 
-#: panel.cpp:3309
+#: panel.cpp:3615
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Błąd podczas nagrywania dźwięku (%s); przerywanie"
 
-#: panel.cpp:3319
+#: panel.cpp:3625
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Błąd podczas nagrywania wideo (%s); przerywanie"
 
-#: panel.cpp:3510
+#: panel.cpp:3816
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Głośność: %d %%"
@@ -1976,19 +2000,19 @@ msgstr "Nie można Play primary %08x"
 msgid "dsbSecondary->Lock() failed: %08x"
 msgstr "dsbSecondary->Lock() niepowodzenie: %08x"
 
-#: audio/internal/faudio.cpp:41 audio/internal/faudio.cpp:482
+#: audio/internal/faudio.cpp:52 audio/internal/faudio.cpp:500
 msgid "FAudio: Enumerating devices failed!"
 msgstr "FAudio: Urządzenia wyliczające zawiodły!"
 
-#: audio/internal/faudio.cpp:209 audio/internal/faudio.cpp:475
+#: audio/internal/faudio.cpp:227 audio/internal/faudio.cpp:493
 msgid "The FAudio interface failed to initialize!"
 msgstr "Nie można zainicjować interfejsu FAudio!"
 
-#: audio/internal/faudio.cpp:240
+#: audio/internal/faudio.cpp:258
 msgid "FAudio: Creating mastering voice failed!"
 msgstr "FAudio: Tworzenie masterowania głosu nie powiodło się!"
 
-#: audio/internal/faudio.cpp:249
+#: audio/internal/faudio.cpp:267
 msgid "FAudio: Creating source voice failed!"
 msgstr "FAudio: Tworzenie głosu źródłowego nie powiodło się!"
 
