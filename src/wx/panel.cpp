@@ -3194,6 +3194,7 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 #if defined(__WXMSW__) && !defined(NO_D3D)
 #define DIRECT3D_VERSION 0x0900
 #include <d3d9.h> // main include file
+typedef HRESULT (WINAPI *LPDIRECT3DCREATE9EX)(UINT, IDirect3D9Ex**);
 
 DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
     : DrawingPanel(parent, _width, _height)
@@ -3204,12 +3205,33 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
     , texture_height(0)
     , using_d3d9ex(false)
 {
-    // Try to create Direct3D 9Ex interface (Vista+)
-    HRESULT hr = Direct3DCreate9Ex(D3D_SDK_VERSION, (IDirect3D9Ex**)&d3d);
-    if (SUCCEEDED(hr)) {
-        using_d3d9ex = true;
-        wxLogDebug(wxT("Using Direct3D 9Ex"));
+    HRESULT hr = E_FAIL; // Initialize hr to a failure value
+
+    // Try to create Direct3D 9Ex interface (Vista+) via dynamic loading
+    // This is required to support Windows XP, which doesn't export Direct3DCreate9Ex
+    HMODULE hD3D9 = LoadLibrary(TEXT("d3d9.dll"));
+
+    if (hD3D9) {
+        // Attempt to get the function address
+        LPDIRECT3DCREATE9EX Direct3DCreate9ExPtr =
+            (LPDIRECT3DCREATE9EX)GetProcAddress(hD3D9, "Direct3DCreate9Ex");
+
+        if (Direct3DCreate9ExPtr) {
+            // Function found: try to create D3D9Ex
+            hr = Direct3DCreate9ExPtr(D3D_SDK_VERSION, (IDirect3D9Ex**)&d3d);
+
+            if (SUCCEEDED(hr)) {
+                using_d3d9ex = true;
+                wxLogDebug(wxT("Using Direct3D 9Ex (dynamically loaded)"));
+            }
+        }
     } else {
+        wxLogError(_("Failed to load d3d9.dll"));
+        return;
+    }
+
+    // If XP, or Direct3DCreate9Ex failed
+    if (!d3d) {
         // Fall back to regular Direct3D 9
         d3d = Direct3DCreate9(D3D_SDK_VERSION);
         if (!d3d) {
@@ -3218,7 +3240,7 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
         }
         wxLogDebug(wxT("Using Direct3D 9"));
     }
-
+    
     // Get display mode
     D3DDISPLAYMODE d3ddm;
     hr = d3d->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm);
@@ -3254,26 +3276,26 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
 
         // Create Direct3D device - try hardware vertex processing first
         hr = d3d->CreateDevice(
-            D3DADAPTER_DEFAULT,
-            D3DDEVTYPE_HAL,
-            (HWND)GetHandle(),
-            D3DCREATE_HARDWARE_VERTEXPROCESSING,
-            &d3dpp,
-            &device
-        );
-
-        if (FAILED(hr)) {
-            wxLogDebug(wxT("Hardware vertex processing not available, falling back to software"));
-            
-            // Fallback to software vertex processing
-            hr = d3d->CreateDevice(
                 D3DADAPTER_DEFAULT,
                 D3DDEVTYPE_HAL,
                 (HWND)GetHandle(),
-                D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+                D3DCREATE_HARDWARE_VERTEXPROCESSING,
                 &d3dpp,
                 &device
             );
+
+        if (FAILED(hr)) {
+            wxLogDebug(wxT("Hardware vertex processing not available, falling back to software"));
+
+            // Fallback to software vertex processing
+            hr = d3d->CreateDevice(
+                    D3DADAPTER_DEFAULT,
+                    D3DDEVTYPE_HAL,
+                    (HWND)GetHandle(),
+                    D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+                    &d3dpp,
+                    &device
+                );
         }
 
         // If succeeded or not using D3D9Ex, break out
@@ -3292,8 +3314,8 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
     }
 
     // Log the successful device creation along with the final swap effect
-    wxLogDebug(wxT("Direct3D 9%s device created successfully (SwapEffect: %s)"), 
-               using_d3d9ex ? wxT("Ex") : wxT(""), 
+    wxLogDebug(wxT("Direct3D 9%s device created successfully (SwapEffect: %s)"),
+               using_d3d9ex ? wxT("Ex") : wxT(""),
                final_swap_effect);
 }
 
