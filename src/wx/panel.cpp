@@ -3280,6 +3280,64 @@ void DXDrawingPanel::DrawingPanelInit()
                texture_width, texture_height, scale);
 }
 
+bool DXDrawingPanel::ResetDevice()
+{
+    if (!device || !d3d) {
+        return false;
+    }
+
+    // Release texture before reset (required for D3DPOOL_DEFAULT resources)
+    if (texture) {
+        texture->Release();
+        texture = NULL;
+        texture_width = 0;
+        texture_height = 0;
+    }
+
+    // Get current display mode
+    D3DDISPLAYMODE d3ddm;
+    HRESULT hr = d3d->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm);
+    if (FAILED(hr)) {
+        wxLogError(_("Failed to get adapter display mode for reset: 0x%08X"), hr);
+        return false;
+    }
+
+    // Get current client size
+    wxSize client_size = GetClientSize();
+
+    // Set up present parameters
+    D3DPRESENT_PARAMETERS d3dpp;
+    ZeroMemory(&d3dpp, sizeof(d3dpp));
+    d3dpp.Windowed = TRUE;
+    d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+    d3dpp.BackBufferFormat = d3ddm.Format;
+    d3dpp.BackBufferWidth = client_size.GetWidth();
+    d3dpp.BackBufferHeight = client_size.GetHeight();
+    d3dpp.PresentationInterval = OPTION(kPrefVsync) ?
+                                  D3DPRESENT_INTERVAL_ONE :
+                                  D3DPRESENT_INTERVAL_IMMEDIATE;
+
+    // Reset the device with current window size
+    hr = device->Reset(&d3dpp);
+    if (FAILED(hr)) {
+        wxLogError(_("Failed to reset Direct3D device: 0x%08X"), hr);
+        return false;
+    }
+
+    wxLogDebug(wxT("Direct3D device reset successfully"));
+    return true;
+}
+
+void DXDrawingPanel::OnSize(wxSizeEvent& ev)
+{
+    if (device) {
+        // Reset device to apply new back buffer size
+        ResetDevice();
+    }
+
+    ev.Skip();
+}
+
 void DXDrawingPanel::DrawArea(wxWindowDC& dc)
 {
     (void)dc; // unused params
@@ -3472,24 +3530,30 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
     float win_width = (float)client_size.GetWidth();
     float win_height = (float)client_size.GetHeight();
 
-    // Calculate aspect ratios
-    float tex_aspect = (float)scaled_width / (float)scaled_height;
-    float win_aspect = win_width / win_height;
-
-    // Calculate dimensions to maintain aspect ratio
+    // Calculate dimensions based on aspect ratio setting
     float render_width, render_height;
     float offset_x = 0.0f, offset_y = 0.0f;
 
-    if (win_aspect > tex_aspect) {
-        // Window is wider than texture
-        render_height = win_height;
-        render_width = win_height * tex_aspect;
-        offset_x = (win_width - render_width) / 2.0f;
+    if (OPTION(kDispStretch)) {
+        // Retain aspect ratio - add letterboxing
+        float tex_aspect = (float)scaled_width / (float)scaled_height;
+        float win_aspect = win_width / win_height;
+
+        if (win_aspect > tex_aspect) {
+            // Window is wider than texture
+            render_height = win_height;
+            render_width = win_height * tex_aspect;
+            offset_x = (win_width - render_width) / 2.0f;
+        } else {
+            // Window is taller than texture
+            render_width = win_width;
+            render_height = win_width / tex_aspect;
+            offset_y = (win_height - render_height) / 2.0f;
+        }
     } else {
-        // Window is taller than texture
+        // Stretch to fill - ignore aspect ratio
         render_width = win_width;
-        render_height = win_width / tex_aspect;
-        offset_y = (win_height - render_height) / 2.0f;
+        render_height = win_height;
     }
 
     // Define vertices for textured quad

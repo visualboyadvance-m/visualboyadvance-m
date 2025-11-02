@@ -88,8 +88,11 @@ public:
 protected:
     void DrawArea(wxWindowDC&);
     void DrawingPanelInit();
+    void OnSize(wxSizeEvent& ev);
 
 private:
+    bool ResetDevice();
+
     IDirect3D9* d3d;
     IDirect3DDevice9* device;
     IDirect3DTexture9* texture;
