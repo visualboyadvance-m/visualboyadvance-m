@@ -122,17 +122,16 @@ SDLAudio::~SDLAudio() {
 
 bool SDLAudio::init(long sampleRate) {
 #ifdef ENABLE_SDL3
+    int current_device = SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK;
+    sdl_devices = SDL_GetAudioPlaybackDevices(&sdl_devices_count);
+    const char *devs = NULL;
+#endif
 
 #ifdef _WIN32
     // On Windows XP, use the winmm audio driver instead of the default wasapi driver.
     if (!IsWindowsVistaOrGreater()) {
         SDL_SetHint("SDL_AUDIODRIVER", "winmm");
     }
-#endif
-
-    int current_device = SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK;
-    sdl_devices = SDL_GetAudioPlaybackDevices(&sdl_devices_count);
-    const char *devs = NULL;
 #endif
 
     winlog("SDLAudio::init\n");
