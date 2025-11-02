@@ -187,7 +187,7 @@ if(WIN32)
     option(ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" OFF)
 
     set(XAUDIO2_DEFAULT ON)
-    if ((MSVC AND CMAKE_CXX_COMPILER_ID STREQUAL Clang) OR (MINGW AND X86))
+    if ((MSVC AND CMAKE_CXX_COMPILER_ID STREQUAL Clang))
         # TODO: We should update the XAudio headers to build with clang-cl. See
         # https://github.com/visualboyadvance-m/visualboyadvance-m/issues/1021
         set(XAUDIO2_DEFAULT OFF)
