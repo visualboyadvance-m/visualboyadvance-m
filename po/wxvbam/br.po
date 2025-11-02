@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-02 16:00+0000\n"
+"POT-Creation-Date: 2025-11-02 20:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Irriep Nala Novram <per.morvan.bzh29@gmail.com>, 2017,2019\n"
 "Language-Team: Breton (http://app.transifex.com/bgk/vba-m/language/br/)\n"
@@ -926,57 +926,67 @@ msgstr ""
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3336
+#: panel.cpp:3301
+#, c-format
+msgid "Failed to get adapter display mode for reset: 0x%08X"
+msgstr ""
+
+#: panel.cpp:3323
+#, c-format
+msgid "Failed to reset Direct3D device: 0x%08X"
+msgstr ""
+
+#: panel.cpp:3394
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3348
+#: panel.cpp:3406
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3526
+#: panel.cpp:3590
 msgid "Memory allocation error"
 msgstr ""
 
-#: panel.cpp:3529
+#: panel.cpp:3593
 msgid "Error initializing codec"
 msgstr ""
 
-#: panel.cpp:3532
+#: panel.cpp:3596
 msgid "Error writing to output file"
 msgstr ""
 
-#: panel.cpp:3535
+#: panel.cpp:3599
 msgid "Can't guess output format from file name"
 msgstr ""
 
-#: panel.cpp:3540
+#: panel.cpp:3604
 msgid "Programming error; aborting!"
 msgstr ""
 
-#: panel.cpp:3552 panel.cpp:3581
+#: panel.cpp:3616 panel.cpp:3645
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Divarrek da gregiñ da enrollañ da %s (%s)"
 
-#: panel.cpp:3609
+#: panel.cpp:3673
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr ""
 
-#: panel.cpp:3615
+#: panel.cpp:3679
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Fazi gant an enrolladur an aodio (%s); oc'h arsav"
 
-#: panel.cpp:3625
+#: panel.cpp:3689
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Fazi en ur enrollañ ar video (%s); oc'h arsav"
 
-#: panel.cpp:3816
+#: panel.cpp:3880
 #, c-format
 msgid "Volume: %d %%"
 msgstr ""
