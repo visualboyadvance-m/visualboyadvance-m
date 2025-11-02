@@ -945,37 +945,37 @@ msgstr "Não há VSYNC disponível nesta plataforma"
 
 #: panel.cpp:3209
 msgid "Failed to create Direct3D 9 interface"
-msgstr ""
+msgstr "Falhou em criar a interface do Direct3D 9"
 
 #: panel.cpp:3217
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
-msgstr ""
+msgstr "Falhou em obter o modo de exibição do adaptador: 0x%08X"
 
 #: panel.cpp:3244
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
-msgstr ""
+msgstr "Falhou em criar o dispositivo Direct3D: 0x%08X"
 
 #: panel.cpp:3301
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
-msgstr ""
+msgstr "Falhou em obter o modo de exibição do adaptador pro reset: 0x%08X"
 
 #: panel.cpp:3323
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
-msgstr ""
+msgstr "Falhou em resetar o dispositivo Direct3D: 0x%08X"
 
 #: panel.cpp:3394
 #, c-format
 msgid "Failed to create texture: 0x%08X"
-msgstr ""
+msgstr "Falhou em criar a textura: 0x%08X"
 
 #: panel.cpp:3406
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
-msgstr ""
+msgstr "Falhou em trancar a textura: 0x%08X"
 
 #: panel.cpp:3590
 msgid "Memory allocation error"
