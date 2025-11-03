@@ -54,13 +54,12 @@ static char biosfile[4096];
 static bool can_dupe = false;
 
 // core options
-static bool option_sndInterpolation = true;
 static bool option_useBios = false;
 static bool option_colorizerHack = false;
 static bool option_forceRTCenable = false;
-static double option_sndFiltering = 0.5;
 static unsigned option_gbPalette = 0;
 static bool option_lcdfilter = false;
+static unsigned option_gbBorder = 0;
 
 // filters
 typedef void (*IFBFilterFunc)(uint8_t*, uint32_t, int, int);
@@ -1013,6 +1012,99 @@ static const unsigned turbo_binds[TURBO_BUTTONS] = {
     RETRO_DEVICE_ID_JOYPAD_Y
 };
 
+enum LayerMask {
+    LAYER_BG0     = (0x100 << 0),
+    LAYER_BG1     = (0x100 << 1),
+    LAYER_BG2     = (0x100 << 2),
+    LAYER_BG3     = (0x100 << 3),
+    LAYER_OBJ     = (0x100 << 4),
+    LAYER_WIN0    = (0x100 << 5),
+    LAYER_WIN1    = (0x100 << 6),
+    LAYER_OBJWIN  = (0x100 << 7)
+};
+
+enum SoundMask {
+    SOUND_CH1_SQUARE1  = (1 << 0),
+    SOUND_CH2_SQUARE2  = (1 << 1),
+    SOUND_CH3_WAVE     = (1 << 2),
+    SOUND_CH4_NOISE    = (1 << 3),
+    SOUND_CH5_DIRECTA  = (1 << 8),
+    SOUND_CH6_DIRECTB  = (1 << 9)
+};
+
+/* ================================
+ * OPTION STRUCTS
+ * ================================ */
+struct LayerOption {
+    const char *key;
+    uint16_t mask;
+};
+
+struct SoundOption {
+    const char *key;
+    uint16_t mask;
+};
+
+/* ================================
+ * OPTION TABLES
+ * ================================ */
+static const LayerOption layerOptions[] = {
+    { "vbam_layer_1", LAYER_BG0 },
+    { "vbam_layer_2", LAYER_BG1 },
+    { "vbam_layer_3", LAYER_BG2 },
+    { "vbam_layer_4", LAYER_BG3 },
+    { "vbam_layer_5", LAYER_OBJ },
+    { "vbam_layer_6", LAYER_WIN0 },
+    { "vbam_layer_7", LAYER_WIN1 },
+    { "vbam_layer_8", LAYER_OBJWIN }
+};
+
+static const SoundOption soundOptions[] = {
+    { "vbam_sound_1", SOUND_CH1_SQUARE1 },
+    { "vbam_sound_2", SOUND_CH2_SQUARE2 },
+    { "vbam_sound_3", SOUND_CH3_WAVE },
+    { "vbam_sound_4", SOUND_CH4_NOISE },
+    { "vbam_sound_5", SOUND_CH5_DIRECTA },
+    { "vbam_sound_6", SOUND_CH6_DIRECTB }
+};
+
+/* ================================
+ * MAIN FUNCTION
+ * ================================ */
+void ApplyLayerAndSoundSettings(void)
+{
+    struct retro_variable var = { NULL, NULL };
+
+    /* --- LAYERS --- */
+    uint16_t disabled_layers = 0; // all layers enabled
+    for (int i = 0; i < (int)(sizeof(layerOptions)/sizeof(layerOptions[0])); i++) {
+        var.key = layerOptions[i].key;
+        var.value = NULL;
+
+        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0] == 'd') {
+            disabled_layers |= layerOptions[i].mask;
+        }
+    }
+
+    coreOptions.layerSettings = ~disabled_layers & 0xFF00;
+    coreOptions.layerEnable   = DISPCNT & coreOptions.layerSettings;
+    CPUUpdateRenderBuffers(false);
+
+    /* --- SOUND --- */
+    uint16_t sound_enabled = 0x3FF; /* assume all on by default */
+    for (int i = 0; i < (int)(sizeof(soundOptions)/sizeof(soundOptions[0])); i++) {
+        var.key = soundOptions[i].key;
+        var.value = NULL;
+
+        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0] == 'd') {
+            sound_enabled &= ~soundOptions[i].mask;
+        }
+    }
+
+    // Write back into the emulator's sound control
+    soundSetEnable(sound_enabled);
+}
+
 static void systemUpdateSolarSensor(int level);
 static uint8_t sensorDarkness = 0xE8;
 static uint8_t sensorDarknessLevel = 0; // so we can adjust sensor from gamepad
@@ -1028,62 +1120,21 @@ static float prev_color_change = 0.0f;
 static void update_variables(bool startup)
 {
     struct retro_variable var = { NULL, NULL };
-    char key[256] = {0};
-    int disabled_layers = 0;
-    int sound_enabled = 0x30F;
-    bool sound_changed = false;
 
-    var.key = key;
-    strcpy(key, "vbam_layer_x");
-    for (int i = 0; i < 8; i++) {
-        key[strlen("vbam_layer_")] = '1' + i;
-        var.value = NULL;
-        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0] == 'd')
-            disabled_layers |= 0x100 << i;
-    }
-
-    coreOptions.layerSettings = 0xFF00 ^ disabled_layers;
-    coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
-    CPUUpdateRenderBuffers(false);
-
-    strcpy(key, "vbam_sound_x");
-    for (unsigned i = 0; i < 6; i++) {
-        key[strlen("vbam_sound_")] = '1' + i;
-        var.value = NULL;
-        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0] == 'd') {
-            int which = (i < 4) ? (1 << i) : (0x100 << (i - 4));
-            sound_enabled &= ~(which);
-        }
-    }
-
-    if (soundGetEnable() != sound_enabled)
-        soundSetEnable(sound_enabled & 0x30F);
+    ApplyLayerAndSoundSettings();
 
     var.key = "vbam_soundinterpolation";
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        bool newval = (!strcmp(var.value, "enabled"));
-        if (option_sndInterpolation != newval) {
-            option_sndInterpolation = newval;
-            sound_changed = true;
-        }
+        g_gbaSoundInterpolation = (bool)(!strcmp(var.value, "enabled"));
     }
 
     var.key = "vbam_soundfiltering";
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        double newval = atof(var.value) * 0.1f;
-        if (option_sndFiltering != newval) {
-            option_sndFiltering = newval;
-            sound_changed = true;
-        }
-    }
-
-    if (sound_changed) {
-        g_gbaSoundInterpolation = option_sndInterpolation;
-        soundFiltering          = option_sndFiltering;
+        soundFiltering = atof(var.value) * 0.1f;
     }
 
     var.key = "vbam_usebios";
@@ -1112,15 +1163,35 @@ static void update_variables(bool startup)
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        if (strcmp(var.value, "auto") == 0) {
-            gbBorderAutomatic = true;
+        int val;
+        if (strcmp(var.value, "disabled") == 0) {
+            val = 0;
+        } if (strcmp(var.value, "enabled") == 0) {
+            val = 1;
         } else {
-            gbBorderAutomatic = false;
-            gbBorderOn = (bool)(!strcmp(var.value, "enabled"));
+            val = 2;
         }
 
-        if ((type == IMAGE_GB) && !startup)
-            SetGBBorder(gbBorderOn);
+        if ((type == IMAGE_GB) && !startup) {
+            if (option_gbBorder != val) {
+                option_gbBorder = val;
+                switch (val) {
+                default:
+                case 0:
+                    gbBorderOn = false;
+                    gbBorderAutomatic = false;
+                    break;
+                case 1:
+                    gbBorderOn = true;
+                    break;
+                case 2:
+                    gbBorderOn = false;
+                    gbBorderAutomatic = true;
+                    break;
+                }
+                SetGBBorder(gbBorderOn);
+            }
+        }
     }
 
     var.key = "vbam_gbHardware";
