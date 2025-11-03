@@ -98,6 +98,7 @@ private:
     IDirect3DTexture9* texture;
     int texture_width;
     int texture_height;
+    bool using_d3d9ex;
 };
 #endif
 
