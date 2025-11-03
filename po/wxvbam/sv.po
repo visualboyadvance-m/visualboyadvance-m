@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-02 20:00+0000\n"
+"POT-Creation-Date: 2025-11-03 15:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>, 2025\n"
 "Language-Team: Swedish (http://app.transifex.com/bgk/vba-m/language/sv/)\n"
@@ -920,81 +920,85 @@ msgstr "Misslyckades sätta wglSwapIntervalEXT"
 msgid "No VSYNC available on this platform"
 msgstr "Ingen VSYNC tillgänglig på denna plattform"
 
-#: panel.cpp:3209
+#: panel.cpp:3229
+msgid "Failed to load d3d9.dll"
+msgstr ""
+
+#: panel.cpp:3238
 msgid "Failed to create Direct3D 9 interface"
 msgstr ""
 
-#: panel.cpp:3217
+#: panel.cpp:3248
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3244
+#: panel.cpp:3312
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3301
+#: panel.cpp:3372
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3323
+#: panel.cpp:3423
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3394
+#: panel.cpp:3495
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3406
+#: panel.cpp:3507
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3590
+#: panel.cpp:3691
 msgid "Memory allocation error"
 msgstr "Fel vid minnesallokering"
 
-#: panel.cpp:3593
+#: panel.cpp:3694
 msgid "Error initializing codec"
 msgstr "Fel vid initiering av kodek"
 
-#: panel.cpp:3596
+#: panel.cpp:3697
 msgid "Error writing to output file"
 msgstr "Fel vid skrivning till utdatafil"
 
-#: panel.cpp:3599
+#: panel.cpp:3700
 msgid "Can't guess output format from file name"
 msgstr "Kan inte gissa utdataformatet från filnamnet"
 
-#: panel.cpp:3604
+#: panel.cpp:3705
 msgid "Programming error; aborting!"
 msgstr "Programmeringsfel; avbryter!"
 
-#: panel.cpp:3616 panel.cpp:3645
+#: panel.cpp:3717 panel.cpp:3746
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Oförmögen att börja inspelning till %s (%s)"
 
-#: panel.cpp:3673
+#: panel.cpp:3774
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "Fel i ljud-/videoinspelning (%s); avbryter"
 
-#: panel.cpp:3679
+#: panel.cpp:3780
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Fel i ljudinspelning (%s); avbryter"
 
-#: panel.cpp:3689
+#: panel.cpp:3790
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Fel i videoinspelning (%s); avbryter"
 
-#: panel.cpp:3880
+#: panel.cpp:3981
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Volym: %d %%"
