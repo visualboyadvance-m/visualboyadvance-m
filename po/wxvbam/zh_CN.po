@@ -930,37 +930,37 @@ msgstr "垂直同步在该平台上不可用 "
 
 #: panel.cpp:3209
 msgid "Failed to create Direct3D 9 interface"
-msgstr ""
+msgstr "创建 Direct3D 9 接口失败"
 
 #: panel.cpp:3217
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
-msgstr ""
+msgstr "获取适配器显示模式失败: 0x%08X"
 
 #: panel.cpp:3244
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
-msgstr ""
+msgstr "创建 Direct3D 设备失败: 0x%08X"
 
 #: panel.cpp:3301
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
-msgstr ""
+msgstr "获取适配器显示模式进行重置失败: 0x%08X"
 
 #: panel.cpp:3323
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
-msgstr ""
+msgstr "重置 Direct3D 设备失败: 0x%08X"
 
 #: panel.cpp:3394
 #, c-format
 msgid "Failed to create texture: 0x%08X"
-msgstr ""
+msgstr "创建纹理失败: 0x%08X"
 
 #: panel.cpp:3406
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
-msgstr ""
+msgstr "锁定纹理失败: 0x%08X"
 
 #: panel.cpp:3590
 msgid "Memory allocation error"
