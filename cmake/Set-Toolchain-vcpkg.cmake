@@ -59,6 +59,15 @@ if(NOT DEFINED VCPKG_TARGET_TRIPLET)
     message(STATUS "Inferred VCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}")
 endif()
 
+if(WIN32 AND VCPKG_TARGET_TRIPLET MATCHES "^x86-mingw")
+    find_program(make_path NAME mingw32-make.exe)
+
+    if(NOT make_path)
+        # Assume MSYS2 MinGW32 toolchain.
+        set(ENV{PATH} "/msys64/mingw32/bin;$ENV{PATH}")
+    endif()
+endif()
+
 function(vcpkg_seconds)
     if(CMAKE_HOST_SYSTEM MATCHES Windows OR ((NOT DEFINED CMAKE_HOST_SYSTEM) AND WIN32))
         execute_process(
