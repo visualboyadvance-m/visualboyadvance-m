@@ -1183,15 +1183,12 @@ brew_installdeps() {
     [ -n "$ENABLE_FFMPEG" ] && brews="$brews ffmpeg"
 
     # This is necessary for the GitHub Actions CI:
-    brew -v install python
-    brew link --overwrite python
+    if [ -n "$CI" ]; then
+        brew -v install python
+        brew link --overwrite python
+    fi
 
     check brew -v install -f $brews
-
-    for brew in gettext wxwidgets; do
-        brew unlink $brew
-        brew link   $brew --force
-    done
 
     brew -v cleanup
 
