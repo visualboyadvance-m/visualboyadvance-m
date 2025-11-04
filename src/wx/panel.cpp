@@ -2590,15 +2590,16 @@ void SDLDrawingPanel::DrawArea()
 
     if (!did_init)
         DrawingPanelInit();
-            
+
+    int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
     if (out_8) {
-        srcPitch = std::ceil(width * scale) + 4;
+        srcPitch = std::ceil((width + inrb) * scale * 1);
     } else if (out_16) {
-        srcPitch = std::ceil(width * scale * 2) + 4;
+        srcPitch = std::ceil((width + inrb) * scale * 2);
     } else if (out_24) {
         srcPitch = std::ceil(width * scale * 3);
     } else {
-        srcPitch = std::ceil(width * scale * 4) + 4;
+        srcPitch = std::ceil((width + inrb) * scale * 4);
     }
 
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
@@ -3172,7 +3173,8 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
         DrawingPanelInit();
             
     if (todraw) {
-        int rowlen = std::ceil(width * scale) + (out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1);
+        int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
+        int rowlen = std::ceil((width + inrb) * scale);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, rowlen);
 #if wxBYTE_ORDER == wxBIG_ENDIAN
                 
