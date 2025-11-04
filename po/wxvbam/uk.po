@@ -915,41 +915,41 @@ msgstr "Вертикальна синхронізація недоступна �
 
 #: panel.cpp:3229
 msgid "Failed to load d3d9.dll"
-msgstr ""
+msgstr "Не вдалося завантажити d3d9.dll."
 
 #: panel.cpp:3238
 msgid "Failed to create Direct3D 9 interface"
-msgstr ""
+msgstr "Не вдалося створити інтерфейс Direct 3D 9."
 
 #: panel.cpp:3248
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
-msgstr ""
+msgstr "Не вдалося отримати режим відображення адаптера: 0x%08X."
 
 #: panel.cpp:3312
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
-msgstr ""
+msgstr "Не вдалося створити Direct 3D-пристрій: 0x%08X."
 
 #: panel.cpp:3372
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
-msgstr ""
+msgstr "Не вдалося отримати режим відображення адаптера для перезавантаження: 0x%08X."
 
 #: panel.cpp:3423
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
-msgstr ""
+msgstr "Не вдалося перезавантажити Direct 3D-пристрій: 0x%08X."
 
 #: panel.cpp:3495
 #, c-format
 msgid "Failed to create texture: 0x%08X"
-msgstr ""
+msgstr "Не вдалося створити текстуру: 0x%08X."
 
 #: panel.cpp:3507
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
-msgstr ""
+msgstr "Не вдалося заблокувати текстуру: 0x%08X."
 
 #: panel.cpp:3691
 msgid "Memory allocation error"
