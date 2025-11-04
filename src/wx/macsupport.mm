@@ -505,16 +505,7 @@ void Quartz2DDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
     CGContextDrawImage(context, NSRectToCGRect(view.bounds), image);
 
     CGContextRestoreGState(context);
-
-    // have to draw something on the dc or it doesn't allow the frame to appear,
-    // I don't know of any better way to do this.
-    {
-        wxCoord w, h;
-        dc.GetSize(&w, &h);
-        dc.SetPen(*wxTRANSPARENT_PEN);
-        dc.SetBrush(*wxTRANSPARENT_BRUSH);
-        dc.DrawRectangle(w-2, h-2, w, h);
-    }
+    CGContextFlush(context);
 
     [view setNeedsDisplay:YES];
 
