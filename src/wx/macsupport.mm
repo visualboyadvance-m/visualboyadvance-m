@@ -216,7 +216,7 @@ id<MTLTexture> MetalDrawingPanel::loadTextureUsingData(void *data)
     [textureDescriptor release];
 
     // Calculate the number of bytes per row in the image.
-    NSUInteger bytesPerRow = std::ceil(width * scale * 4) + 4;
+    NSUInteger bytesPerRow = std::ceil((width + 1) * scale * 4);
 
     MTLRegion region = {
         { 0, 0, 0 },                   // MTLOrigin
