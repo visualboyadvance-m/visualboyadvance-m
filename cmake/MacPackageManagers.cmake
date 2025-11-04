@@ -47,6 +47,8 @@ endif()
 
 message(STATUS "Checking for Mac package managers")
 
+find_program(HOMEBREW_EXECUTABLE brew)
+
 if(NOT "$ENV{IN_NIX_SHELL}" STREQUAL "")
     message(STATUS "Configuring for Nix")
 
@@ -54,12 +56,18 @@ if(NOT "$ENV{IN_NIX_SHELL}" STREQUAL "")
 
     set(CMAKE_IGNORE_PATH /opt/local /opt/local/bin /opt/local/include /opt/local/Library/Frameworks /opt/local/lib ${CMAKE_IGNORE_PATH})
     set(CMAKE_IGNORE_PATH /sw /sw/bin /sw/include /sw/Library/Frameworks /sw/lib ${CMAKE_IGNORE_PATH})
-elseif(NOT "$ENV{HOMEBREW_PREFIX}" STREQUAL "")
-    message(STATUS "Configuring for Mac Homebrew ($ENV{HOMEBREW_PREFIX})")
+elseif((NOT "$ENV{HOMEBREW_PREFIX}" STREQUAL "") OR HOMEBREW_EXECUTABLE)
+    if(NOT "$ENV{HOMEBREW_PREFIX}" STREQUAL "")
+        set(MAC_HOMEBREW_PREFIX $ENV{HOMEBREW_PREFIX})
+    else()
+        execute_process(COMMAND ${HOMEBREW_EXECUTABLE} --prefix
+                        OUTPUT_VARIABLE MAC_HOMEBREW_PREFIX
+                        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    endif()
+
+    message(STATUS "Configuring for Mac Homebrew (${MAC_HOMEBREW_PREFIX})")
 
     set(MAC_HOMEBREW ON)
-
-    set(MAC_HOMEBREW_PREFIX $ENV{HOMEBREW_PREFIX})
 
     set(CMAKE_IGNORE_PATH /opt/local /opt/local/bin /opt/local/include /opt/local/Library/Frameworks /opt/local/lib ${CMAKE_IGNORE_PATH})
     set(CMAKE_IGNORE_PATH /sw /sw/bin /sw/include /sw/Library/Frameworks /sw/lib ${CMAKE_IGNORE_PATH})
@@ -77,18 +85,31 @@ elseif(NOT "$ENV{HOMEBREW_PREFIX}" STREQUAL "")
     set(ZLIB_ROOT ${MAC_HOMEBREW_PREFIX}/opt/zlib)
 
     file(GLOB MAC_HOMEBREW_GETTEXT_DIR "${MAC_HOMEBREW_PREFIX}/Cellar/gettext/*")
-    list(SORT MAC_HOMEBREW_GETTEXT_DIR)
-    list(REVERSE MAC_HOMEBREW_GETTEXT_DIR)
-    list(GET MAC_HOMEBREW_GETTEXT_DIR 0 MAC_HOMEBREW_GETTEXT_PREFIX)
+    if(MAC_HOMEBREW_GETTEXT_DIR)
+        list(SORT MAC_HOMEBREW_GETTEXT_DIR)
+        list(REVERSE MAC_HOMEBREW_GETTEXT_DIR)
+        list(GET MAC_HOMEBREW_GETTEXT_DIR 0 MAC_HOMEBREW_GETTEXT_PREFIX)
+    endif()
 
     file(GLOB MAC_HOMEBREW_BZIP2_DIR "${MAC_HOMEBREW_PREFIX}/Cellar/bzip2/*")
-    list(SORT MAC_HOMEBREW_BZIP2_DIR)
-    list(REVERSE MAC_HOMEBREW_BZIP2_DIR)
-    list(GET MAC_HOMEBREW_BZIP2_DIR 0 MAC_HOMEBREW_BZIP2_PREFIX)
+    if(MAC_HOMEBREW_BZIP2_DIR)
+        list(SORT MAC_HOMEBREW_BZIP2_DIR)
+        list(REVERSE MAC_HOMEBREW_BZIP2_DIR)
+        list(GET MAC_HOMEBREW_BZIP2_DIR 0 MAC_HOMEBREW_BZIP2_PREFIX)
 
-    set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${MAC_HOMEBREW_GETTEXT_PREFIX};${MAC_HOMEBREW_BZIP2_PREFIX}")
+        include_directories(SYSTEM "${MAC_HOMEBREW_BZIP2_PREFIX}/include")
+    endif()
 
-    include_directories(SYSTEM "${MAC_HOMEBREW_BZIP2_PREFIX}/include")
+    file(GLOB MAC_HOMEBREW_LZMA_DIR "${MAC_HOMEBREW_PREFIX}/Cellar/xz/*")
+    if(MAC_HOMEBREW_LZMA_DIR)
+        list(SORT MAC_HOMEBREW_LZMA_DIR)
+        list(REVERSE MAC_HOMEBREW_LZMA_DIR)
+        list(GET MAC_HOMEBREW_LZMA_DIR 0 MAC_HOMEBREW_LZMA_PREFIX)
+
+        include_directories(SYSTEM "${MAC_HOMEBREW_LZMA_PREFIX}/include")
+    endif()
+
+    set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${MAC_HOMEBREW_GETTEXT_PREFIX};${MAC_HOMEBREW_BZIP2_PREFIX};${MAC_HOMEBREW_LZMA_PREFIX}")
 elseif(EXISTS /opt/local/bin/port AND $ENV{PATH} MATCHES "(^|:)/opt/local/bin/?(:|$)")
     message(STATUS "Configuring for MacPorts")
 
