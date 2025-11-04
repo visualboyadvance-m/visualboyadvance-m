@@ -2835,9 +2835,11 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
     } else if (out_8) {
         // scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
-        uint8_t* src = (uint8_t*)todraw + (int)std::ceil((width * scale) + 4); // skip top border
+        int inrb = 4; // 8-bit has 4-pixel filter border
+        int scaled_stride = (int)std::ceil((width + inrb) * scale);
+        uint8_t* src = (uint8_t*)todraw + scaled_stride; // skip top border (1 row)
         uint8_t* dst = im->GetData();
-                
+
         for (int y = 0; y < std::ceil(height * scale); y++) {
             for (int x = 0; x < std::ceil(width * scale); x++, src++) {
                 // White color fix
@@ -2851,13 +2853,15 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
                     *dst++ = ((*src & 0x3) << 6);
                 }
             }
-                    
-            src += 4;
+
+            src += (int)std::ceil(inrb * scale); // skip rhs border (scaled)
         }
     } else if (out_16) {
         // scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
-        uint16_t* src = (uint16_t*)todraw + (int)std::ceil((width + 2) * scale); // skip top border
+        int inrb = 2; // 16-bit has 2-pixel filter border
+        int scaled_stride = (int)std::ceil((width + inrb) * scale);
+        uint16_t* src = (uint16_t*)todraw + scaled_stride; // skip top border (1 row)
         uint8_t* dst = im->GetData();
 
         for (int y = 0; y < std::ceil(height * scale); y++) {
@@ -2866,8 +2870,8 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
                 *dst++ = ((*src >> systemGreenShift) & 0x1f) << 3;
                 *dst++ = ((*src >> systemBlueShift) & 0x1f) << 3;
             }
-                    
-            src += 2; // skip rhs border
+
+            src += (int)std::ceil(inrb * scale); // skip rhs border (scaled)
         }
     } else if (OPTION(kDispFilter) != config::Filter::kNone) {
         // scaled by filters, top/right borders, transform to 24-bit

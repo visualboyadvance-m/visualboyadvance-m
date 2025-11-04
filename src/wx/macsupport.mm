@@ -287,19 +287,21 @@ void MetalDrawingPanel::DrawArea()
         if (!did_init)
             DrawingPanelInit();
 
+        int inrb = (systemColorDepth == 8) ? 4 : (systemColorDepth == 16) ? 2 : (systemColorDepth == 24) ? 0 : 1;
         if (systemColorDepth == 8) {
-            srcPitch = std::ceil(width * scale) + 4;
+            srcPitch = std::ceil((width + inrb) * scale * 1);
         } else if (systemColorDepth == 16) {
-            srcPitch = std::ceil(width * scale * 2) + 4;
+            srcPitch = std::ceil((width + inrb) * scale * 2);
         } else if (systemColorDepth == 24) {
             srcPitch = std::ceil(width * scale * 3);
         } else {
-            srcPitch = std::ceil(width * scale * 4) + 4;
+            srcPitch = std::ceil((width + inrb) * scale * 4);
         }
 
         if (systemColorDepth == 8) {
             int pos = 0;
             int src_pos = 0;
+            int scaled_border = (int)std::ceil(inrb * scale);
             uint8_t *src = todraw + srcPitch;
             uint32_t *dst = (uint32_t *)calloc(4, std::ceil((width * scale) * (height * scale) + 1));
 
@@ -322,7 +324,7 @@ void MetalDrawingPanel::DrawArea()
                     src_pos++;
                 }
                 pos++;
-                src_pos += 4;
+                src_pos += scaled_border;
             }
 
             if (_texture != nil) {
@@ -337,6 +339,7 @@ void MetalDrawingPanel::DrawArea()
         } else if (systemColorDepth == 16) {
             int pos = 0;
             int src_pos = 0;
+            int scaled_border = (int)std::ceil(inrb * scale);
             uint8_t *src = todraw + srcPitch;
             uint32_t *dst = (uint32_t *)calloc(4, std::ceil((width * scale) * (height * scale) + 1));
             uint16_t *src16 = (uint16_t *)src;
@@ -360,7 +363,7 @@ void MetalDrawingPanel::DrawArea()
                     src_pos++;
                 }
                 pos++;
-                src_pos += 2;
+                src_pos += scaled_border;
             }
 
             if (_texture != nil) {
