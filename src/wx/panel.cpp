@@ -1612,8 +1612,8 @@ public:
         const int instride32 = width_ * 4;
         const int outbpp = systemColorDepth >> 3;
         const int outrb = out_8 ? 4 : out_24 ? 0 : 4;
-        const int outstride = std::ceil(width_ * outbpp * scale_) + outrb;
-        const int outstride32 = std::ceil(width_ * 4 * scale_);
+        const int outstride = std::ceil((width_ + inrb) * outbpp * scale_);
+        const int outstride32 = std::ceil((width_ + inrb) * 4 * scale_);
         uint8_t *dest = NULL;
         int pos = 0;
         uint32_t *src2_ = NULL;
@@ -1969,15 +1969,15 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     //   if filtering, this is filter output, retained for redraws
     //   if not filtering, we still retain current image for redraws
     int outbpp = systemColorDepth >> 3;
-    int outrb = out_8 ? 4 : out_24 ? 0 : 4;
-    int outstride = std::ceil(width * outbpp * scale) + outrb;
+    int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
+    int outstride = std::ceil((width + inrb) * outbpp * scale);
 
     if (!pixbuf2) {
         int allocstride = outstride, alloch = height;
 
         // gb may write borders, so allocate enough for them
         if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
-            allocstride = std::ceil(GameArea::SGBWidth * outbpp * scale) + outrb;
+            allocstride = std::ceil((GameArea::SGBWidth + inrb) * outbpp * scale);
             alloch = GameArea::SGBHeight;
         }
 
@@ -2647,8 +2647,8 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
     //   if filtering, this is filter output, retained for redraws
     //   if not filtering, we still retain current image for redraws
     int outbpp = systemColorDepth >> 3;
-    int outrb = out_8 ? 4 : out_24 ? 0 : 4;
-    int outstride = std::ceil(width * outbpp * scale) + outrb;
+    int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
+    int outstride = std::ceil((width + inrb) * outbpp * scale);
             
     // FIXME: filters race condition?
     const int max_threads = 1;
@@ -2658,7 +2658,7 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
                 
         // gb may write borders, so allocate enough for them
         if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
-            allocstride = std::ceil(GameArea::SGBWidth * outbpp * scale) + outrb;
+            allocstride = std::ceil((GameArea::SGBWidth + inrb) * outbpp * scale);
             alloch = GameArea::SGBHeight;
         }
 
@@ -2871,7 +2871,9 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
     } else if (OPTION(kDispFilter) != config::Filter::kNone) {
         // scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
-        uint32_t* src = (uint32_t*)todraw + (int)std::ceil(width * scale) + 1; // skip top border
+        int inrb = 1; // 32-bit has 1-pixel filter border
+        int scaled_stride = (int)std::ceil((width + inrb) * scale);
+        uint32_t* src = (uint32_t*)todraw + scaled_stride; // skip top border (1 row)
         uint8_t* dst = im->GetData();
 
         for (int y = 0; y < std::ceil(height * scale); y++) {
@@ -2880,8 +2882,8 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
                 *dst++ = *src >> (systemGreenShift - 3);
                 *dst++ = *src >> (systemBlueShift - 3);
             }
-                    
-            ++src; // skip rhs border
+
+            src += (int)std::ceil(inrb * scale); // skip rhs border (scaled)
         }
     } else {  // 32 bit
         // not scaled by filters, top/right borders, transform to 24-bit
@@ -3509,16 +3511,19 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
     }
 
     // Calculate source pitch (bytes per row)
+    // Border is scaled by the filter, so 1 pixel becomes scale pixels
+    int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1; // border in pixels
+    int scaled_border = (int)std::ceil(inrb * scale);
     int src_pitch = scaled_width;
     if (out_8) {
-        src_pitch = scaled_width + 4; // +4 for border
+        src_pitch = (scaled_width + scaled_border) * 1;
     } else if (out_16) {
-        src_pitch = (scaled_width + 2) * 2; // +2 for border
+        src_pitch = (scaled_width + scaled_border) * 2;
     } else if (out_24) {
         src_pitch = scaled_width * 3;
     } else {
         // 32-bit
-        src_pitch = (scaled_width + 1) * 4; // +1 for border
+        src_pitch = (scaled_width + scaled_border) * 4;
     }
 
     // Copy pixel data
@@ -3527,7 +3532,7 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
 
     if (out_8) {
         // 8-bit palette mode - convert to 32-bit
-        src += scaled_width + 4; // Skip top border
+        src += src_pitch; // Skip top border (1 row)
         for (int y = 0; y < scaled_height; y++) {
             uint8_t* src_row = src;
             uint8_t* dst_row = dst;
@@ -3549,7 +3554,7 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
         }
     } else if (out_16) {
         // Convert 16-bit data from system format (1-5-5-5) to D3D R5G6B5
-        uint16_t* src16 = (uint16_t*)src + (scaled_width + 2); // Skip top border
+        uint16_t* src16 = (uint16_t*)src + src_pitch / 2; // Skip top border (1 row, pitch in bytes so divide by 2)
         for (int y = 0; y < scaled_height; y++) {
             uint16_t* src_row = src16;
             uint16_t* dst_row = (uint16_t*)dst;
@@ -3564,7 +3569,7 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
                 // Pack into D3D R5G6B5 format: RRRRRGGGGGGBBBBB
                 *dst_row++ = (r5 << 11) | (g6 << 5) | b5;
             }
-            src16 += (scaled_width + 2); // Move to next row including border
+            src16 += src_pitch / 2; // Move to next row including border (pitch in bytes, divide by 2 for uint16_t)
             dst += locked_rect.Pitch;
         }
     } else if (out_24) {
@@ -3586,7 +3591,7 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
         }
     } else {
         // 32-bit - convert RGBA to BGRX (swap R and B)
-        src += (scaled_width + 1) * 4; // Skip top border
+        src += src_pitch; // Skip top border (1 row)
         for (int y = 0; y < scaled_height; y++) {
             uint8_t* src_row = src;
             uint8_t* dst_row = dst;
@@ -4005,8 +4010,8 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
     //   if filtering, this is filter output, retained for redraws
     //   if not filtering, we still retain current image for redraws
     int outbpp = systemColorDepth >> 3;
-    int outrb = out_8 ? 4 : out_24 ? 0 : 4;
-    int outstride = std::ceil(width * outbpp * scale) + outrb;
+    int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
+    int outstride = std::ceil((width + inrb) * outbpp * scale);
             
     // FIXME: filters race condition?
     const int max_threads = 1;
@@ -4016,7 +4021,7 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
                 
         // gb may write borders, so allocate enough for them
         if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
-            allocstride = std::ceil(GameArea::SGBWidth * outbpp * scale) + outrb;
+            allocstride = std::ceil((GameArea::SGBWidth + inrb) * outbpp * scale);
             alloch = GameArea::SGBHeight;
         }
                 

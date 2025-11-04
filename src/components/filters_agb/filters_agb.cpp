@@ -114,6 +114,8 @@ void gbafilter_update_colors(bool lcd) {
     } break;
     case 16: {
         for (int i = 0x0; i < 0x10000; i++) {
+            // GBA uses BGR555 format: 0BBBBBGGGGGRRRRR
+            // Red: bits 0-4, Green: bits 5-9, Blue: bits 10-14
             systemColorMap16[i] = ((i & 0x1f) << systemRedShift) |
                 (((i & 0x3e0) >> 5) << systemGreenShift) |
                 (((i & 0x7c00) >> 10) << systemBlueShift);
@@ -124,6 +126,8 @@ void gbafilter_update_colors(bool lcd) {
     case 24:
     case 32: {
         for (int i = 0; i < 0x10000; i++) {
+            // GBA uses BGR555 format: 0BBBBBGGGGGRRRRR
+            // Red: bits 0-4, Green: bits 5-9, Blue: bits 10-14
             systemColorMap32[i] = ((i & 0x1f) << systemRedShift) |
                 (((i & 0x3e0) >> 5) << systemGreenShift) |
                 (((i & 0x7c00) >> 10) << systemBlueShift);
