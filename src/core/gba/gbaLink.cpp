@@ -454,7 +454,8 @@ public:
 static int linktimeout = 1;
 static LANLINKDATA lanlink;
 static uint16_t cable_data[4];
-static uint8_t cable_gb_data[4];
+// Add extra byte to suppress warning.
+static uint8_t cable_gb_data[5];
 static CableServer ls;
 static CableClient lc;
 

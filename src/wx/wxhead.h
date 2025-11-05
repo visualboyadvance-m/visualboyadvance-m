@@ -7,6 +7,23 @@
 
 #include <cstdint>
 
+// Silence warning about Windows header order on MinGW.
+#ifdef __WXMSW__
+
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcpp"
+#endif
+
+#include <winsock2.h>
+
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
+
+#include <windows.h>
+#endif
+
 #include <wx/wx.h>
 
 // The following are not pulled in by wx.h
