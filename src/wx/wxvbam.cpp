@@ -496,8 +496,6 @@ bool wxvbamApp::OnInit() {
         wxvbam_locale->Init();
     }
 
-    fprintf(stderr, "Language: %d\n", language);
-
     // load selected language
 
 #ifdef _WIN32
