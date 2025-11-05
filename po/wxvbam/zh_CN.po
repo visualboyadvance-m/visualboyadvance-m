@@ -930,7 +930,7 @@ msgstr "垂直同步在该平台上不可用 "
 
 #: panel.cpp:3229
 msgid "Failed to load d3d9.dll"
-msgstr ""
+msgstr "加载 d3d9.dll 失败"
 
 #: panel.cpp:3238
 msgid "Failed to create Direct3D 9 interface"
