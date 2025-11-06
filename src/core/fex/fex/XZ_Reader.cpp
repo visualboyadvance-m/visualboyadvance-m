@@ -69,7 +69,7 @@ size_t XZ_Reader::get_uncompressed_size()
    if (in_pos != stream_flags.backward_size) {
      lzma_index_end(index, NULL);
      free((void *)data);
-     fprintf(stderr, "Error: input position %u is not equal to backward size %llu\n", in_pos, stream_flags.backward_size);
+     fprintf(stderr, "Error: input position %lu is not equal to backward size %llu\n", (long unsigned int)in_pos, (long long unsigned int)stream_flags.backward_size);
      return 0;
    }
 

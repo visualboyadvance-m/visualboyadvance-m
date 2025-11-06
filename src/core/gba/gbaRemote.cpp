@@ -3645,7 +3645,7 @@ void remoteOutput(const char* s, uint32_t addr)
     if (s) {
         char c = *s++;
         while (c) {
-            snprintf(d, sizeof(buffer), "%02x", c);
+            snprintf(d, (sizeof(buffer) - (d - buffer)), "%02x", c);
             d += 2;
             c = *s++;
         }
@@ -3653,7 +3653,7 @@ void remoteOutput(const char* s, uint32_t addr)
         char c = debuggerReadByte(addr);
         addr++;
         while (c) {
-            snprintf(d, sizeof(buffer), "%02x", c);
+            snprintf(d, (sizeof(buffer) - (d - buffer)), "%02x", c);
             d += 2;
             c = debuggerReadByte(addr);
             addr++;
@@ -3678,7 +3678,7 @@ void remoteSendStatus()
     s += 3;
     for (int i = 0; i < 15; i++) {
         uint32_t v = reg[i].I;
-        snprintf(s, sizeof(buffer), "%02x:%02x%02x%02x%02x;", i,
+        snprintf(s, (sizeof(buffer) - (s - buffer)), "%02x:%02x%02x%02x%02x;", i,
             (v & 255),
             (v >> 8) & 255,
             (v >> 16) & 255,
@@ -3686,14 +3686,14 @@ void remoteSendStatus()
         s += 12;
     }
     uint32_t v = armNextPC;
-    snprintf(s, sizeof(buffer), "0f:%02x%02x%02x%02x;", (v & 255),
+    snprintf(s, (sizeof(buffer) - (s - buffer)), "0f:%02x%02x%02x%02x;", (v & 255),
         (v >> 8) & 255,
         (v >> 16) & 255,
         (v >> 24) & 255);
     s += 12;
     CPUUpdateCPSR();
     v = reg[16].I;
-    snprintf(s, sizeof(buffer), "19:%02x%02x%02x%02x;", (v & 255),
+    snprintf(s, (sizeof(buffer) - (s - buffer)), "19:%02x%02x%02x%02x;", (v & 255),
         (v >> 8) & 255,
         (v >> 16) & 255,
         (v >> 24) & 255);
