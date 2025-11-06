@@ -1071,7 +1071,19 @@ static const SoundOption soundOptions[] = {
 /* ================================
  * MAIN FUNCTION
  * ================================ */
-void ApplyLayerAndSoundSettings(void)
+static void systemUpdateSolarSensor(int level);
+static uint8_t sensorDarkness = 0xE8;
+static uint8_t sensorDarknessLevel = 0; // so we can adjust sensor from gamepad
+static int option_analogDeadzone;
+static int option_gyroSensitivity, option_tiltSensitivity;
+static bool option_swapAnalogSticks;
+
+static int color_mode = 0;
+static int prev_color_mode = 0;
+static float color_change = 0.0f;
+static float prev_color_change = 0.0f;
+
+static void ApplyLayerAndSoundSettings(void)
 {
     struct retro_variable var = { NULL, NULL };
 
@@ -1105,65 +1117,14 @@ void ApplyLayerAndSoundSettings(void)
     soundSetEnable(sound_enabled);
 }
 
-static void systemUpdateSolarSensor(int level);
-static uint8_t sensorDarkness = 0xE8;
-static uint8_t sensorDarknessLevel = 0; // so we can adjust sensor from gamepad
-static int option_analogDeadzone;
-static int option_gyroSensitivity, option_tiltSensitivity;
-static bool option_swapAnalogSticks;
-
-static int color_mode = 0;
-static int prev_color_mode = 0;
-static float color_change = 0.0f;
-static float prev_color_change = 0.0f;
-
-static void update_variables(bool startup)
-{
+static void update_variables_gb(bool startup) {
     struct retro_variable var = { NULL, NULL };
-
-    ApplyLayerAndSoundSettings();
-
-    var.key = "vbam_soundinterpolation";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        g_gbaSoundInterpolation = (bool)(!strcmp(var.value, "enabled"));
-    }
-
-    var.key = "vbam_soundfiltering";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        soundFiltering = atof(var.value) * 0.1f;
-    }
-
-    var.key = "vbam_usebios";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        option_useBios = (!strcmp(var.value, "enabled")) ? true : false;
-    }
-
-    var.key = "vbam_forceRTCenable";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        option_forceRTCenable = (!strcmp(var.value, "enabled")) ? true : false;
-    }
-
-    var.key = "vbam_solarsensor";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        sensorDarknessLevel = atoi(var.value);
-        systemUpdateSolarSensor(sensorDarknessLevel);
-    }
 
     var.key = "vbam_showborders";
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        int val;
+        unsigned val;
         if (strcmp(var.value, "disabled") == 0) {
             val = 0;
         } if (strcmp(var.value, "enabled") == 0) {
@@ -1219,12 +1180,6 @@ static void update_variables(bool startup)
         option_colorizerHack = (!strcmp(var.value, "enabled")) ? true : false;
     }
 
-    var.key = "vbam_turboenable";
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        option_turboEnable = (!strcmp(var.value, "enabled")) ? true : false;
-    }
-
     var.key = "vbam_gb_effects_enabled";
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
@@ -1247,40 +1202,6 @@ static void update_variables(bool startup)
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         gb_effects_config.surround = (!strcmp(var.value, "enabled")) ? true : false;
-    }
-
-    var.key = "vbam_turbodelay";
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        option_turboDelay = atoi(var.value);
-    }
-
-    var.key = "vbam_astick_deadzone";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        option_analogDeadzone = (int)(atof(var.value) * 0.01 * 0x8000);
-    }
-
-    var.key = "vbam_tilt_sensitivity";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        option_tiltSensitivity = atoi(var.value);
-    }
-
-    var.key = "vbam_gyro_sensitivity";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        option_gyroSensitivity = atoi(var.value);
-    }
-
-    var.key = "vbam_swap_astick";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        option_swapAnalogSticks = (!strcmp(var.value, "enabled")) ? true : false;
     }
 
     var.key = "vbam_palettes";
@@ -1317,6 +1238,130 @@ static void update_variables(bool startup)
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         gbColorOption = (!strcmp(var.value, "enabled"));
+    }
+
+    char options[9][35] = {
+        "vbam_showborders",
+        "vbam_gbHardware",
+        "vbam_allowcolorizerhack",
+        "vbam_gb_effects_enabled",
+        "vbam_gb_effects_echo_enabled",
+        "vbam_gb_effects_stereo_enabled",
+        "vbam_gb_effects_surround_enabled",
+        "vbam_palettes",
+        "vbam_gbcoloroption",
+    };
+
+    struct retro_core_option_display option_display_gb;
+    option_display_gb.visible = (type == IMAGE_GB) ? true : false;
+    size_t array_size = sizeof(options) / sizeof(options[0]);
+    for (size_t i = 0; i < array_size; i++) {
+        option_display_gb.key = options[i];
+        environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display_gb);
+    }
+}
+
+static void update_variables_gba() {
+    struct retro_variable var = { NULL, NULL };
+
+    var.key = "vbam_soundinterpolation";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        g_gbaSoundInterpolation = (bool)(!strcmp(var.value, "enabled"));
+    }
+
+    var.key = "vbam_soundfiltering";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        soundFiltering = atof(var.value) * 0.1f;
+    }
+
+    var.key = "vbam_forceRTCenable";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        option_forceRTCenable = (!strcmp(var.value, "enabled")) ? true : false;
+    }
+
+    var.key = "vbam_solarsensor";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        sensorDarknessLevel = atoi(var.value);
+        systemUpdateSolarSensor(sensorDarknessLevel);
+    }
+
+    char options[4][35] = {
+        "vbam_soundinterpolation",
+        "vbam_soundfiltering",
+        "vbam_forceRTCenable",
+        "vbam_solarsensor",
+    };
+
+    struct retro_core_option_display option_display_gba;
+    option_display_gba.visible = (type == IMAGE_GBA) ? true : false;
+    size_t array_size = sizeof(options) / sizeof(options[0]);
+    for (size_t i = 0; i < array_size; i++) {
+        option_display_gba.key = options[i];
+        environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display_gba);
+    }
+}
+
+static void update_variables(bool startup)
+{
+    struct retro_variable var = { NULL, NULL };
+
+    ApplyLayerAndSoundSettings();
+    update_variables_gb(startup);
+    update_variables_gba();
+
+    var.key = "vbam_usebios";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        option_useBios = (!strcmp(var.value, "enabled")) ? true : false;
+    }
+
+    var.key = "vbam_turboenable";
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        option_turboEnable = (!strcmp(var.value, "enabled")) ? true : false;
+    }
+
+    var.key = "vbam_turbodelay";
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        option_turboDelay = atoi(var.value);
+    }
+
+    var.key = "vbam_astick_deadzone";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        option_analogDeadzone = (int)(atof(var.value) * 0.01 * 0x8000);
+    }
+
+    var.key = "vbam_tilt_sensitivity";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        option_tiltSensitivity = atoi(var.value);
+    }
+
+    var.key = "vbam_gyro_sensitivity";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        option_gyroSensitivity = atoi(var.value);
+    }
+
+    var.key = "vbam_swap_astick";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        option_swapAnalogSticks = (!strcmp(var.value, "enabled")) ? true : false;
     }
 
     var.key = "vbam_lcdfilter_type";
@@ -1385,40 +1430,6 @@ static void update_variables(bool startup)
     }
     else
         ifb_filter_func = NULL;
-
-    // Hide some core options depending on rom image type
-    if (startup) {
-        unsigned i;
-        struct retro_core_option_display option_display;
-        char gb_options[5][25] = {
-            "vbam_palettes",
-            "vbam_gbHardware",
-            "vbam_allowcolorizerhack",
-            "vbam_showborders",
-            "vbam_gbcoloroption"
-        };
-        char gba_options[3][22] = {
-            "vbam_solarsensor",
-            "vbam_gyro_sensitivity",
-            "vbam_forceRTCenable"
-        };
-
-        // Show or hide GB/GBC only options
-        option_display.visible = (type == IMAGE_GB) ? 1 : 0;
-        for (i = 0; i < 5; i++)
-        {
-            option_display.key = gb_options[i];
-            environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
-        }
-
-        // Show or hide GBA only options
-        option_display.visible = (type == IMAGE_GBA) ? 1 : 0;
-        for (i = 0; i < 3; i++)
-        {
-            option_display.key = gba_options[i];
-            environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
-        }
-    }
 }
 
 // System analog stick range is -0x7fff to 0x7fff
