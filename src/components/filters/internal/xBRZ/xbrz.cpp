@@ -21,10 +21,6 @@
 #include <cmath> //std::sqrt
 #include "xbrz_tools.h"
 
-#ifdef WINXP
-#include "quake3-sqrt.h"
-#endif
-
 // some gcc versions lie about having this C++17 feature
 #define static_assert(x) static_assert(x, "assertion failed")
 
@@ -70,12 +66,12 @@ uint32_t gradientARGB(uint32_t pixFront, uint32_t pixBack) //find intermediate c
 
 inline double fastSqrt(double n)
 {
-#ifdef WINXP
-    return quake3_sqrt((float)n);
-#elif (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
+#if (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
+    // Use x87 FPU fsqrt - very accurate and available on all x86 CPUs including Pentium 3
     __asm__ ("fsqrt" : "+t" (n));
     return n;
 #elif defined(_MSC_VER) && defined(_M_IX86)
+    // MSVC 32-bit: use inline assembly for x87 fsqrt
     // speeds up xBRZ by about 9% compared to std::sqrt which internally uses
     // the same assembler instructions but adds some "fluff"
     __asm {
@@ -85,7 +81,8 @@ inline double fastSqrt(double n)
 #elif defined(_MSC_VER)
     // On MSVC x64 use intrinsic with /Oi and /fp:fast
     return sqrt(n);
-#else // Other platforms.
+#else
+    // Other platforms use standard library
     return std::sqrt(n);
 #endif
 }
