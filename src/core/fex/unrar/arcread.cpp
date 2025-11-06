@@ -467,8 +467,17 @@ unrar_err_t Archive::ReadHeader50(size_t *ReadSize)
         }
             break;
         case HEAD_MARK:
+        case HEAD_UNKNOWN:
         case HEAD3_MARK:
         case HEAD3_MAIN:
+        case HEAD3_FILE:
+        case HEAD3_CMT:
+        case HEAD3_AV:
+        case HEAD3_OLDSERVICE:
+        case HEAD3_PROTECT:
+        case HEAD3_SIGN:
+        case HEAD3_SERVICE:
+        case HEAD3_ENDARC:
             break;
     }
     
@@ -724,10 +733,12 @@ void Archive::ConvertFileHeader(FileHeader *hd)
     if (Format==RARFMT15 && hd->UnpVer<20 && (hd->FileAttr & 0x10))
         hd->Dir=true;
     if (hd->HSType==HSYS_UNKNOWN)
+    {
         if (hd->Dir)
             hd->FileAttr=0x10;
         else
             hd->FileAttr=0x20;
+    }
 }
 
 
