@@ -215,8 +215,8 @@ TEST(OptionTest, AudioApi) {
     EXPECT_EQ(option->type(), config::Option::Type::kAudioApi);
     EXPECT_TRUE(option->is_audio_api());
 
-    EXPECT_TRUE(option->SetAudioApi(config::AudioApi::kOpenAL));
-    EXPECT_EQ(option->GetAudioApi(), config::AudioApi::kOpenAL);
+    EXPECT_TRUE(option->SetAudioApi(config::AudioApi::kSDL));
+    EXPECT_EQ(option->GetAudioApi(), config::AudioApi::kSDL);
 
     EXPECT_DEATH(option->SetBool(true), "is_bool\\(\\)");
     EXPECT_DEATH(option->SetDouble(2.0), "is_double\\(\\)");

@@ -790,7 +790,7 @@ AudioApi StringToAudioApi(const wxString& config_name, const wxString& input) {
         wxLogWarning(_("Invalid value %s for option %s; valid values are %s"),
                      input, config_name,
                      AllEnumValuesForType(Option::Type::kAudioApi));
-        return AudioApi::kOpenAL;
+        return AudioApi::kSDL;
     }
     return iter->second;
 }
