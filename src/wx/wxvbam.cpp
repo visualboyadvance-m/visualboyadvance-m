@@ -1097,6 +1097,7 @@ void MainFrame::OnSize(wxSizeEvent& event)
 
 void MainFrame::OnIconize(wxIconizeEvent& event)
 {
+    (void)event; // unused
     if (!init_complete_) {
         return;
     }

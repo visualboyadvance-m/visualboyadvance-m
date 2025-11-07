@@ -1612,6 +1612,7 @@ public:
         const int instride32 = width_ * 4;
         const int outbpp = systemColorDepth >> 3;
         const int outrb = out_8 ? 4 : out_24 ? 0 : 4;
+        (void)outrb; // unused
         const int outstride = std::ceil((width_ + inrb) * outbpp * scale_);
         const int outstride32 = std::ceil((width_ + inrb) * 4 * scale_);
         uint8_t *dest = NULL;

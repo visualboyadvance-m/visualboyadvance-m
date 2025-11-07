@@ -236,6 +236,7 @@ static inline void gfxDrawTextScreen(uint16_t control, uint16_t hofs, uint16_t v
 static inline void gfxDrawRotScreen(uint16_t control, uint16_t x_l, uint16_t x_h, uint16_t y_l, uint16_t y_h, uint16_t pa, uint16_t pb,
     uint16_t pc, uint16_t pd, int& currentX, int& currentY, uint32_t* line)
 {
+    (void)x_l; (void)x_h; (void)y_l; (void)y_h; // unused
     uint16_t* palette = (uint16_t*)g_paletteRAM;
     uint8_t* charBase = &g_vram[((control >> 2) & 0x03) * 0x4000];
     uint8_t* screenBase = (uint8_t*)&g_vram[((control >> 8) & 0x1f) * 0x800];
@@ -347,6 +348,7 @@ static inline void gfxDrawRotScreen16Bit(uint16_t control, uint16_t x_l, uint16_
     uint16_t pb, uint16_t pc, uint16_t pd, int& currentX, int& currentY,
     uint32_t* line)
 {
+    (void)x_l; (void)x_h; (void)y_l; (void)y_h; // unused
     uint16_t* screenBase = (uint16_t*)&g_vram[0];
     int prio = ((control & 3) << 25) + 0x1000000;
     int sizeX = 240;
