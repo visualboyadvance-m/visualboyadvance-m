@@ -61,7 +61,7 @@ CORE_DIR     := ../../src
 LIBRETRO_DIR := $(CORE_DIR)/libretro
 TARGET_NAME  := vbam
 
-VBAM_VERSION   := $(shell sed -En 's/.*\[([0-9]+[^]]+).*/\1/p; T; q' ../../CHANGELOG.md 2>/dev/null)
+VBAM_VERSION   := $(shell grep -hoE '\[[0-9][^]]*]' ../../CHANGELOG.md 2>/dev/null | head -n1 | tr -d '[]')
 TAG_COMMIT     := $(shell git rev-list -n 1 v$(VBAM_VERSION) --abbrev-commit 2>/dev/null)
 CURRENT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null)
 
