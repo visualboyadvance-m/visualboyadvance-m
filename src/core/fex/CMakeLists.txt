@@ -151,7 +151,7 @@ target_link_libraries(vbam-fex
 
 # Suppress warnings for third-party code
 if(MSVC)
-    # Disable all warnings for third-party code (MSVC will warn about overriding /W4, which is expected)
+    # Disable warnings for third-party code
     target_compile_options(vbam-fex PRIVATE
         /wd4244 # conversion warnings
         /wd4267 # size_t conversion warnings
@@ -163,5 +163,6 @@ if(MSVC)
         /wd4389 # signed/unsigned mismatch
         /wd4611 # interaction between setjmp and C++ object destruction
         /wd4291 # no matching operator delete found
+        /wd4701 # potentially uninitialized local variable (Debug only)
     )
 endif()

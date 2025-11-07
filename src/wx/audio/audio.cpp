@@ -60,7 +60,6 @@ std::vector<AudioDevice> EnumerateAudioDevices(const config::AudioApi& audio_api
             VBAM_NOTREACHED();
             return {};
     }
-    return {};
 }
 
 std::unique_ptr<SoundDriver> CreateSoundDriver(const config::AudioApi& api) {
@@ -98,7 +97,6 @@ std::unique_ptr<SoundDriver> CreateSoundDriver(const config::AudioApi& api) {
             VBAM_NOTREACHED();
             return NULL;
     }
-    return NULL;
 }
 
 }  // namespace audio
