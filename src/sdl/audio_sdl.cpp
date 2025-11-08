@@ -50,8 +50,8 @@ void SoundSDL::soundCallback(void* data, SDL_AudioStream *stream, int additional
 
     while (length > 0)
     {
-        reinterpret_cast<SoundSDL*>(data)->read(reinterpret_cast<uint16_t*>(streamdata), length > sizeof(streamdata) ? sizeof(streamdata) : length);
-        SDL_PutAudioStreamData(stream, streamdata, length > sizeof(streamdata) ? sizeof(streamdata) : length);
+        reinterpret_cast<SoundSDL*>(data)->read(reinterpret_cast<uint16_t*>(streamdata), static_cast<size_t>(length) > sizeof(streamdata) ? sizeof(streamdata) : length);
+        SDL_PutAudioStreamData(stream, streamdata, static_cast<size_t>(length) > sizeof(streamdata) ? sizeof(streamdata) : length);
         length -= sizeof(streamdata);
     }
 }

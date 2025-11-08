@@ -347,6 +347,11 @@ DEF_GETTER(d) DEF_GETTER(e) DEF_GETTER(f)
 DEF_GETTER(g) DEF_GETTER(h) DEF_GETTER(i)
 #undef DEF_GETTER
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#endif
+
 #define DEF_GETTER(x, y) template <> inline uint32_t get_##x<ROT_90>(const Kernel_3x3& ker) { return ker.y; }
 DEF_GETTER(a, g) DEF_GETTER(b, d) DEF_GETTER(c, a)
 DEF_GETTER(d, h) DEF_GETTER(e, e) DEF_GETTER(f, b)
@@ -364,6 +369,10 @@ DEF_GETTER(a, c) DEF_GETTER(b, f) DEF_GETTER(c, i)
 DEF_GETTER(d, b) DEF_GETTER(e, e) DEF_GETTER(f, h)
 DEF_GETTER(g, a) DEF_GETTER(h, d) DEF_GETTER(i, g)
 #undef DEF_GETTER
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 
 //compress four blend types into a single byte

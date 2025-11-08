@@ -164,7 +164,7 @@ bool ReadBatteryFile(const char* file_name) {
     bool ret = true;
     int total_read = 0;
     for (const VBamIoVec& vec : g_vbamIoVecs) {
-        const int sizeToRead = (const int)vec.length;
+        const int sizeToRead = (int)vec.length;
         const int sizeToReadWithLeeway = sizeToRead + vec.leeway;
         const int read = gzread(gzFile, vec.data, sizeToRead);
         total_read += read;
@@ -198,7 +198,7 @@ bool ReadBatteryFile(const char* file_name) {
 
     // Check if the battery file is larger than expected.
     uint8_t data = 0;
-    const int read = (const int)gzread(gzFile, &data, 1);
+    const int read = (int)gzread(gzFile, &data, 1);
     total_read += read;
     if (read != 0) {
         systemMessage(

@@ -1504,10 +1504,6 @@ yyreturn:
             yystos[*yyssp], yyvsp);
         YYPOPSTACK(1);
     }
-#ifndef yyoverflow
-    if (yyss != yyssa)
-        YYSTACK_FREE(yyss);
-#endif
 #if YYERROR_VERBOSE
     if (yymsg != yymsgbuf)
         YYSTACK_FREE(yymsg);

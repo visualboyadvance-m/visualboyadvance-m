@@ -272,10 +272,10 @@ typedef struct {
 } LINKDATA;
 
 class RFUServer {
-    int numbytes;
+    [[maybe_unused]] int numbytes;
     sf::SocketSelector fdset;
-    int counter;
-    int done;
+    [[maybe_unused]] int counter;
+    [[maybe_unused]] int done;
     uint8_t current_host;
 
 public:
@@ -305,7 +305,7 @@ public:
 };
 
 // RFU crap (except for numtransfers note...should probably check that out)
-static LINKDATA* linkmem = NULL;
+[[maybe_unused]] static LINKDATA* linkmem = NULL;
 static LINKDATA rfu_data;
 static uint8_t rfu_cmd, rfu_qsend, rfu_qrecv_broadcast_data_len;
 static int rfu_state, rfu_polarity, rfu_counter, rfu_masterq;
@@ -418,7 +418,7 @@ class CableServer {
     int32_t* intoutbuffer;
     uint16_t* uint16_toutbuffer;
     int counter;
-    int done;
+    [[maybe_unused]] int done;
 
 public:
     sf::TcpSocket tcpsocket[4];
@@ -461,7 +461,7 @@ static CableClient lc;
 
 // time to end of single GBA's transfer, in 16.78 MHz clock ticks
 // first index is GBA #
-static const int trtimedata[4][4] = {
+[[maybe_unused]] static const int trtimedata[4][4] = {
     // 9600 38400 57600 115200
     { 34080, 8520, 5680, 2840 },
     { 65536, 16384, 10923, 5461 },
@@ -488,13 +488,13 @@ static uint16_t linkid = 0;
 #if (defined __WIN32__ || defined _WIN32)
 static HANDLE linksync[4];
 #else
-static sem_t* linksync[4];
+[[maybe_unused]] static sem_t* linksync[4];
 #endif
 static int transfer_start_time_from_master = 0;
 #if (defined __WIN32__ || defined _WIN32)
 static HANDLE mmf = NULL;
 #else
-static int mmf = -1;
+[[maybe_unused]] static int mmf = -1;
 #endif
 static char linkevent[] =
 #if !(defined __WIN32__ || defined _WIN32)
@@ -1993,6 +1993,7 @@ static void StartRFUSocket(uint16_t value)
                             rfu_numclients = 0;
                             rfu_data.rfu_is_host[linkid] = 0; //to prevent both GBAs from acting as Host and thinking both of them have Client?
                             rfu_data.rfu_q[linkid] = 0; //to prevent leftover data from previous session received immediately in the new session
+                            [[fallthrough]];
                         case 0x1d: // no visible difference
                             rfu_data.rfu_is_host[linkid] = 0;
                             memset(rfu_masterdata, 0, sizeof(rfu_data.rfu_broadcastdata[linkid]));
@@ -2116,6 +2117,7 @@ static void StartRFUSocket(uint16_t value)
                             rfu_data.rfu_listfront[linkid] = 0;
                             rfu_data.rfu_listback[linkid] = 0;
                             rfu_data.rfu_q[linkid] = 0; //to prevent leftover data from previous session received immediately in the new session
+                            [[fallthrough]];
                         case 0x1b: //host, might reset some data? may be used in the middle of host<->client communication w/o causing clients to dc?
                             rfu_data.rfu_broadcastdata[linkid][0] = 0; //0 may cause player unable to join in pokemon union room?
                             rfu_cmd ^= 0x80;
@@ -2146,6 +2148,7 @@ static void StartRFUSocket(uint16_t value)
 
                         case 0x3d: // init/reset rfu data
                             rfu_initialized = false;
+                            [[fallthrough]];
                         case 0x10: // init/reset rfu data
                             if (linkid != gbaid) { //(rfu_data.numgbas >= 2)
                                 rfu_data.rfu_is_host[gbaid] &= ~(1 << linkid); //rfu_data.rfu_request[gbaid] = 0;
@@ -2283,6 +2286,7 @@ static void StartRFUSocket(uint16_t value)
                             } else {
                                 log("IgnoredSend[%02X] %d\n", rfu_cmd, rfu_qsend2);
                             }
+                            [[fallthrough]];
                         //TODO: there is still a chance for 0x25 to be used at the same time on both GBA (both GBAs acting as client but keep sending & receiving using 0x25 & 0x26 for infinity w/o updating the screen much)
                         //Waiting here for previous data to be received might be too late! as new data already sent before finalization cmd
                         case 0x27: // wait for data ?
@@ -2444,6 +2448,7 @@ static void StartRFUSocket(uint16_t value)
 
         if (rfu_polarity)
             value ^= 4; // sometimes it's the other way around
+        [[fallthrough]];
     default:
         UPDATE_REG(COMM_SIOCNT, value);
         return;

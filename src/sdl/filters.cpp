@@ -601,7 +601,7 @@ struct IFBFilterDesc {
     IFBFilterFunc func32;
 };
 
-const IFBFilterDesc IFBFilters[] = {{"No interframe blending", 0, 0, 0},
+const IFBFilterDesc IFBFilters[] = {{"No interframe blending", 0, 0, 0, 0},
                                     {"Interframe motion blur", MotionBlurIB8, MotionBlurIB, MotionBlurIB24, MotionBlurIB32},
                                     {"Smart interframe blending", SmartIB8, SmartIB, SmartIB24, SmartIB32}};
 

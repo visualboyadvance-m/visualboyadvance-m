@@ -888,7 +888,8 @@ void debuggerDoSearch()
                 start = g_rom + (SearchStart & 0x01FFFFFF);
                 end = g_rom + 0x01FFFFFF;
                 break;
-            };
+            }
+            [[fallthrough]];
         default: {
             snprintf(monbuf, sizeof(monbuf), "Search completed.\n");
             monprintf(monbuf);
@@ -2935,6 +2936,7 @@ void executeBreakCommands(int n, char** cmd)
         } else {
             operation(address, flag, NULL, 0);
         }
+        return;
     } else if (!hasAddress && (operation == deleteBreak)) {
         {
             snprintf(monbuf, sizeof(monbuf), "Delete breakpoint operation requires at least one address;\n");

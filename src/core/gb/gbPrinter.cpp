@@ -183,6 +183,7 @@ uint8_t gbPrinterSend(uint8_t b)
             break;
         }
         gbPrinterState++;
+        [[fallthrough]];
     // intentionally move to next if no data to receive
     case 4:
         // receiving CRC

@@ -165,4 +165,6 @@ if(MSVC)
         /wd4291 # no matching operator delete found
         /wd4701 # potentially uninitialized local variable (Debug only)
     )
+else()
+    target_compile_options(vbam-fex PRIVATE -w)
 endif()

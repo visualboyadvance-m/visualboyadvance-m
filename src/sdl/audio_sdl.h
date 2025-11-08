@@ -67,7 +67,7 @@ private:
         SDL_semaphore* data_read;
 #endif
 
-        SDL_AudioSpec audio_spec;
+        [[maybe_unused]] SDL_AudioSpec audio_spec;
 
         unsigned short current_rate;
 

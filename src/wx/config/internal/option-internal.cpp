@@ -629,8 +629,8 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"Sound/DSoundHWAccel", "DSoundHWAccel", _("Use DirectSound hardware acceleration")},
     OptionData{"Sound/Upmix", "Upmix", _("Upmix stereo to surround")},
     OptionData{"Sound/Volume", "", _("Sound volume (%)")},
-    OptionData{"Language/Locale", _("Language")},
-    OptionData{"Language/ExternalTranslations", _("External translations")},
+    OptionData{"Language/Locale", "", _("Language")},
+    OptionData{"Language/ExternalTranslations", "", _("External translations")},
 
     // Last. This should never be used, it actually maps to OptionID::kLast.
     // This is to prevent a memory access violation error in case something
