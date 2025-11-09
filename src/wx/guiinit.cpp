@@ -2032,8 +2032,8 @@ bool MainFrame::BindControls()
         rb = SafeXRCCTRL<wxRadioButton>(d, n);       \
         rb->SetValidator(wxBoolIntValidator(&o, v)); \
     } while (0)
-        wxBoolEnValidator* benval;
-        wxBoolEnHandler* ben;
+        [[maybe_unused]] wxBoolEnValidator* benval;
+        [[maybe_unused]] wxBoolEnHandler* ben;
 #define getbe(n, o, cv, t, wt)                                        \
     do {                                                              \
         cv = SafeXRCCTRL<t>(d, n);                                    \
@@ -2045,7 +2045,7 @@ bool MainFrame::BindControls()
     } while (0)
         // brenval & friends are here just to allow yes/no radioboxes in place
         // of checkboxes.  A lot of work for little benefit.
-        wxBoolRevEnValidator* brenval;
+        [[maybe_unused]] wxBoolRevEnValidator* brenval;
 #define getbre(n, o, cv, t, wt)                                           \
     do {                                                                  \
         cv = SafeXRCCTRL<t>(d, n);                                        \
