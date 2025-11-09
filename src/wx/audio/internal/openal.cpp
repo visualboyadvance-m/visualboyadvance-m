@@ -179,7 +179,7 @@ bool OpenAL::init(long sampleRate) {
     winlog("OpenAL::init\n");
     VBAM_CHECK(initialized == false);
 
-    const wxString& audio_device = OPTION(kSoundAudioDevice);
+    const wxString audio_device = OPTION(kSoundAudioDevice);
     if (!audio_device.empty()) {
         device = alcOpenDevice(audio_device.utf8_str());
         if (device == NULL) {
