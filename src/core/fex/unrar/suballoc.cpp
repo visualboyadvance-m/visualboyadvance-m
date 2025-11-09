@@ -92,7 +92,6 @@ bool SubAllocator::StartSubAllocator(int SASize)
 	if ((HeapStart=(byte *)rarmalloc(AllocSize)) == NULL)
 	{
 		ErrHandler->MemoryError();
-		return false;
 	}
 	HeapEnd=HeapStart+AllocSize-UNIT_SIZE;
 	SubAllocatorSize=t;

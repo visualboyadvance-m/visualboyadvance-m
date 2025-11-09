@@ -96,8 +96,6 @@ wxString GetCartCGBFlag() {
     }
 
     VBAM_NOTREACHED();
-    return "";
-
 }
 
 // Returns a localized string indicating the ROM size of the loaded GB/GBC cartridge.
@@ -160,7 +158,6 @@ wxString GetCartDestinationCode() {
     }
 
     VBAM_NOTREACHED();
-    return "";
 }
 
 }  // namespace

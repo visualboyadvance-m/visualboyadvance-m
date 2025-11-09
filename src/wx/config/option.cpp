@@ -483,7 +483,6 @@ bool Option::SetEnumString(const wxString& value) {
             return false;
     }
     VBAM_NOTREACHED();
-    return false;
 }
 
 bool Option::SetGbPalette(const std::array<uint16_t, 8>& value) {

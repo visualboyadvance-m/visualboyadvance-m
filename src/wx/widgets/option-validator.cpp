@@ -86,7 +86,6 @@ bool OptionSelectedValidator::WriteToOption() {
     }
 
     VBAM_NOTREACHED();
-    return false;
 }
 
 OptionIntValidator::OptionIntValidator(config::OptionID option_id) : OptionValidator(option_id) {
@@ -130,7 +129,6 @@ bool OptionIntValidator::WriteToOption() {
     }
 
     VBAM_NOTREACHED();
-    return false;
 }
 
 OptionUnsignedValidator::OptionUnsignedValidator(config::OptionID option_id) : OptionValidator(option_id) {
@@ -174,7 +172,6 @@ bool OptionUnsignedValidator::WriteToOption() {
     }
 
     VBAM_NOTREACHED();
-    return false;
 }
 
 OptionChoiceValidator::OptionChoiceValidator(config::OptionID option_id)
@@ -198,7 +195,6 @@ bool OptionChoiceValidator::WriteToWindow() {
     }
 
     VBAM_NOTREACHED();
-    return false;
 }
 
 bool OptionChoiceValidator::WriteToOption() {
@@ -208,7 +204,6 @@ bool OptionChoiceValidator::WriteToOption() {
     }
 
     VBAM_NOTREACHED();
-    return false;
 }
 
 OptionBoolValidator::OptionBoolValidator(config::OptionID option_id) : OptionValidator(option_id) {
@@ -231,7 +226,6 @@ bool OptionBoolValidator::WriteToWindow() {
     }
 
     VBAM_NOTREACHED();
-    return false;
 }
 
 bool OptionBoolValidator::WriteToOption() {
@@ -241,7 +235,6 @@ bool OptionBoolValidator::WriteToOption() {
     }
 
     VBAM_NOTREACHED();
-    return false;
 }
 
 }  // namespace widgets

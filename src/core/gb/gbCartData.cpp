@@ -63,7 +63,6 @@ char byte_to_char(uint8_t byte) {
         return 'A' + (byte - 10);
     } else {
         VBAM_NOTREACHED();
-        return '\0';
     }
 }
 

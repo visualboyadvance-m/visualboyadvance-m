@@ -851,10 +851,8 @@ wxString AllEnumValuesForType(Option::Type type) {
         case Option::Type::kString:
         case Option::Type::kGbPalette:
             VBAM_NOTREACHED();
-            return wxEmptyString;
     }
     VBAM_NOTREACHED();
-    return wxEmptyString;
 }
 
 size_t MaxForType(Option::Type type) {
@@ -882,10 +880,8 @@ size_t MaxForType(Option::Type type) {
         case Option::Type::kString:
         case Option::Type::kGbPalette:
             VBAM_NOTREACHED();
-            return 0;
     }
     VBAM_NOTREACHED();
-    return 0;
 }
 
 }  // namespace internal
