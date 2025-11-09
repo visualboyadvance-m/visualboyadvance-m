@@ -59,11 +59,15 @@ struct gbRomHeader {
 char byte_to_char(uint8_t byte) {
     if (byte < 10) {
         return '0' + byte;
-    } else if (byte < 16) {
-        return 'A' + (byte - 10);
-    } else {
-        VBAM_NOTREACHED();
     }
+    if (byte < 16) {
+        return 'A' + (byte - 10);
+    }
+    VBAM_NOTREACHED();
+#ifdef _MSC_VER
+#pragma warning(suppress: 4702)  // Unreachable code (in release builds)
+#endif
+    return '\0';
 }
 
 std::string old_licensee_to_string(uint8_t licensee) {
