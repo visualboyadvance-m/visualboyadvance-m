@@ -59,16 +59,15 @@
 
 // Macro for non-void functions that need to return after VBAM_NOTREACHED().
 // This avoids both "not all control paths return a value" and "unreachable code" warnings.
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(DEBUG)
+// In MSVC release builds, just return the value and mark everything after as unreachable.
+// This avoids the "unreachable code" warning that would occur if VBAM_NOTREACHED (which
+// expands to __assume(0)) came before the return statement.
 #define VBAM_NOTREACHED_RETURN(value) \
-    do {                              \
-        VBAM_NOTREACHED();            \
-        __pragma(warning(push))       \
-        __pragma(warning(disable: 4702)) \
-        return (value);               \
-        __pragma(warning(pop))        \
-    } while (0)
+    return (value)
 #else
+// In debug builds or other compilers, VBAM_NOTREACHED crashes with a message.
+// The return statement is needed to satisfy the compiler but won't be reached.
 #define VBAM_NOTREACHED_RETURN(value) \
     do {                              \
         VBAM_NOTREACHED();            \
