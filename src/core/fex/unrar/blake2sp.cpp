@@ -155,3 +155,6 @@ void blake2sp_final( blake2sp_state *S, byte *digest )
 }
 
 #endif
+
+// Dummy symbol to suppress ranlib "has no symbols" warning
+[[maybe_unused]] void vbam_dummy_symbol_blake2sp() {}

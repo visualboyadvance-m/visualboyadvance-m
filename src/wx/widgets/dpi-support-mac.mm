@@ -20,7 +20,7 @@ double DPIScaleFactorForWindow(wxWindow* window) {
 #endif  // WX_HAS_NATIVE_HI_DPI_SUPPORT
 }
 
-void RequestHighResolutionOpenGlSurfaceForWindow(wxWindow* window) {
+void RequestHighResolutionOpenGlSurfaceForWindow([[maybe_unused]] wxWindow* window) {
 #if !WX_HAS_NATIVE_HI_DPI_SUPPORT
     NSView* view = (NSView*)(window->GetHandle());
 

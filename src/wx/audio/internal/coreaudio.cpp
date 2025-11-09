@@ -63,12 +63,6 @@ static const AudioObjectPropertyAddress devlist_address = {
     kAudioObjectPropertyElementMain
 };
 
-static const AudioObjectPropertyAddress default_playback_device_address = {
-    kAudioHardwarePropertyDefaultOutputDevice,
-    kAudioObjectPropertyScopeGlobal,
-    kAudioObjectPropertyElementMain
-};
-
 const AudioObjectPropertyAddress addr = {
     kAudioDevicePropertyStreamConfiguration,
     kAudioDevicePropertyScopeOutput,

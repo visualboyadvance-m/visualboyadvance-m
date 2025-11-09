@@ -24,3 +24,6 @@ std::wstring ToUTF16(const char* utf8) {
 
 }  // namespace internal
 }  // namespace core
+
+// Dummy symbol to suppress ranlib "has no symbols" warning
+[[maybe_unused]] void vbam_dummy_symbol_file_util_internal() {}

@@ -14,8 +14,15 @@
 // on Creative for making a typedef to void in the first place)
 // #define ALC_NO_PROTOTYPES 1
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunknown-pragmas"
+#endif
 #include <al.h>
 #include <alc.h>
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 // since the ALC typedefs are broken on Mac:
 

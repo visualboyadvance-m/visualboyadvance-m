@@ -726,7 +726,6 @@ void MemView::Resize(wxSizeEvent& ev)
     sb.Move(sz.GetWidth(), 0);
     sb.SetSize(sbw, sz.GetHeight());
     nlines = (sz.GetHeight() + charheight - 1) / charheight;
-    wxString val;
     disp.SetSize(sz.GetWidth(), (nlines + 1) * charheight);
 
     if ((size_t)nlines > words.size() / 4) {

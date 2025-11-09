@@ -17,4 +17,5 @@
 	s = _("Developers");
 	s = _("License");
 	s = _("OK");
+	(void)s;
 }

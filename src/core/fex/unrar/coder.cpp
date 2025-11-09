@@ -48,3 +48,6 @@ inline void RangeCoder::Decode()
 	range *= SubRange.HighCount-SubRange.LowCount;
 }
 #endif
+
+// Dummy symbol to suppress ranlib "has no symbols" warning
+[[maybe_unused]] void vbam_dummy_symbol_coder() {}

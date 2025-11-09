@@ -10,27 +10,19 @@ if(APPLE)
     add_compile_options(-Wno-deprecated-declarations)
 endif()
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    add_compile_options(-Wno-unused-command-line-argument)
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    add_compile_options(-feliminate-unused-debug-types)
-endif()
-
 # check if ssp flags are supported.
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     check_cxx_compiler_flag(-fstack-protector-strong STACK_PROTECTOR_SUPPORTED)
 
     if(STACK_PROTECTOR_SUPPORTED)
-        add_compile_options(-fstack-protector-strong)
+        add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fstack-protector-strong> $<$<COMPILE_LANGUAGE:C>:-fstack-protector-strong>)
 
         check_cxx_compiler_flag("--param ssp-buffer-size=4" SSP_BUFFER_SIZE_SUPPORTED)
         if(SSP_BUFFER_SIZE_SUPPORTED)
-            add_compile_options(--param ssp-buffer-size=4)
+            add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:--param;ssp-buffer-size=4>" "$<$<COMPILE_LANGUAGE:C>:--param;ssp-buffer-size=4>")
         endif()
     endif()
 endif()
-
-#add_compile_options(-std=c++14)
 
 if(NOT ENABLE_ASM) # inline asm is not allowed with -fPIC
     add_compile_options(-fPIC)
@@ -64,6 +56,12 @@ else()
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         add_compile_options(-fexpensive-optimizations)
     endif()
+endif()
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    add_compile_options(-Wno-unused-command-line-argument -Wno-unknown-pragmas)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(-feliminate-unused-debug-types)
 endif()
 
 # for some reason this is necessary

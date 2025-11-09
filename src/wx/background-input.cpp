@@ -489,7 +489,7 @@ protected:
     virtual wxThread::ExitCode CheckKeyboard();
     virtual void Cleanup();
 private:
-    wxEvtHandler *handler;
+    [[maybe_unused]] wxEvtHandler *handler;
 #if defined(__WXMSW__)
     SHORT previousState[0xFF];
 #elif defined(__WXMAC__)

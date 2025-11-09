@@ -262,3 +262,6 @@ void SubAllocator::FreeUnits(void* ptr,int OldNU)
 	InsertNode(ptr,Units2Indx[OldNU-1]);
 }
 #endif
+
+// Dummy symbol to suppress ranlib "has no symbols" warning
+[[maybe_unused]] void vbam_dummy_symbol_suballoc() {}
