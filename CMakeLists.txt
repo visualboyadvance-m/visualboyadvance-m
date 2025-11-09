@@ -141,6 +141,13 @@ if(BUILD_TESTING)
 
     if(EXISTS third_party/googletest/CMakeLists.txt)
         add_subdirectory(./third_party/googletest)
+
+        # Make sure not use fast-math optimizations for gtest
+        if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+            target_compile_options(gtest      PRIVATE -fno-fast-math)
+            target_compile_options(gtest_main PRIVATE -fno-fast-math)
+        endif()
+
         include(GoogleTest)
     else()
         set(BUILD_TESTING OFF)
