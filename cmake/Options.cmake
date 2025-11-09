@@ -1,6 +1,14 @@
 option(BUILD_TESTING "Build testing" ON)
 option(BUILD_SHARED_LIBS "Build dynamic libraries" OFF)
 
+# Detect CI environment or allow explicit setting
+if(DEFINED ENV{CI} OR DEFINED ENV{GITHUB_ACTIONS} OR DEFINED ENV{GITLAB_CI})
+    set(VBAM_CI_DEFAULT ON)
+else()
+    set(VBAM_CI_DEFAULT OFF)
+endif()
+option(ENABLE_WERROR "Treat warnings as errors (enabled in CI)" ${VBAM_CI_DEFAULT})
+
 option(TRANSLATIONS_ONLY "Build only the translations.zip" OFF)
 if(TRANSLATIONS_ONLY)
     set(BUILD_DEFAULT OFF)

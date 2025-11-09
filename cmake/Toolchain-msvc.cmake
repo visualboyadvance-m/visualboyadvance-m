@@ -32,6 +32,11 @@ add_compile_options(
     /EHsc
 )
 
+# Treat warnings as errors in CI
+if(ENABLE_WERROR)
+    add_compile_options(/WX)
+endif()
+
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(_DEBUG)
     add_compile_options(/Ob0 /Od /RTC1)

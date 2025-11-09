@@ -6,6 +6,11 @@ add_compile_options(
     -fdiagnostics-color=always
 )
 
+# Treat warnings as errors in CI
+if(ENABLE_WERROR)
+    add_compile_options(-Werror)
+endif()
+
 if(APPLE)
     add_compile_options(-Wno-deprecated-declarations)
 endif()
