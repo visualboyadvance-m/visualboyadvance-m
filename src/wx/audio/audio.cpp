@@ -57,7 +57,7 @@ std::vector<AudioDevice> EnumerateAudioDevices(const config::AudioApi& audio_api
 
         case config::AudioApi::kLast:
         default:
-            VBAM_NOTREACHED_RETURN({});
+            VBAM_NOTREACHED_RETURN(std::vector<AudioDevice>());
     }
 }
 
