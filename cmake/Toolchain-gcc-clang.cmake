@@ -6,6 +6,10 @@ add_compile_options(
     -fdiagnostics-color=always
 )
 
+if(APPLE)
+    add_compile_options(-Wno-deprecated-declarations)
+endif()
+
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     add_compile_options(-Wno-unused-command-line-argument)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
