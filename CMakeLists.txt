@@ -144,8 +144,8 @@ if(BUILD_TESTING)
 
         # Make sure not use fast-math optimizations for gtest
         if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-            target_compile_options(gtest      PRIVATE -fno-fast-math)
-            target_compile_options(gtest_main PRIVATE -fno-fast-math)
+            target_compile_options(gtest      PRIVATE -fno-fast-math -Wno-error -w)
+            target_compile_options(gtest_main PRIVATE -fno-fast-math -Wno-error -w)
         endif()
 
         include(GoogleTest)
