@@ -2963,24 +2963,6 @@ void executeBreakCommands(int n, char** cmd)
         operation(address, flag, cmd + 1, n - 1);
         return;
     }
-//brkcmd_special_register:
-    switch (command[4]) {
-    case 'l':
-        debuggerBreakRegisterList((n > 0) && (tolower(cmd[0][0]) == 'v'));
-        return;
-    case 'c':
-        debuggerBreakRegisterClear(n, cmd);
-        return;
-    case 'd':
-        debuggerBreakRegisterDelete(n, cmd);
-        return;
-
-    case 'm':
-        debuggerBreakRegister(n, cmd);
-    default:
-        return;
-    };
-    return;
 }
 
 void debuggerDisable(int n, char** args)
