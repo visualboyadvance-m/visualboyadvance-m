@@ -257,8 +257,7 @@ wxString JoyInput::ToConfigString() const {
             return wxString::Format("%s-Hat%dE", joy_string, control_index_);
     }
 
-    VBAM_NOTREACHED();
-    return wxEmptyString;
+    VBAM_NOTREACHED_RETURN(wxEmptyString);
 }
 
 wxString JoyInput::ToLocalizedString() const {
@@ -280,8 +279,7 @@ wxString JoyInput::ToLocalizedString() const {
             return wxString::Format(_("%s: Hat %d East"), joy_string, control_index_);
     }
 
-    VBAM_NOTREACHED();
-    return wxEmptyString;
+    VBAM_NOTREACHED_RETURN(wxEmptyString);
 }
 
 wxString KeyboardInput::ToConfigString() const {
@@ -366,8 +364,7 @@ wxString UserInput::ToConfigString() const {
             return joy_input().ToConfigString();
     }
 
-    VBAM_NOTREACHED();
-    return wxEmptyString;
+    VBAM_NOTREACHED_RETURN(wxEmptyString);
 }
 
 wxString UserInput::ToLocalizedString() const {
@@ -380,8 +377,7 @@ wxString UserInput::ToLocalizedString() const {
             return joy_input().ToLocalizedString();
     }
 
-    VBAM_NOTREACHED();
-    return wxEmptyString;
+    VBAM_NOTREACHED_RETURN(wxEmptyString);
 }
 
 }  // namespace config

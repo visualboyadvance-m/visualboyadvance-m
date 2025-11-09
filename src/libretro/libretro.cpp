@@ -184,10 +184,9 @@ static void* gb_rtcdata_prt(void)
     case gbCartData::MapperType::kGameGenie:
     case gbCartData::MapperType::kGameShark:
     case gbCartData::MapperType::kUnknown:
-        VBAM_NOTREACHED();
-        return NULL;
+        VBAM_NOTREACHED_RETURN(NULL);
     }
-    return NULL;
+    VBAM_NOTREACHED_RETURN(NULL);
 }
 
 static size_t gb_rtcdata_size(void)
@@ -212,7 +211,6 @@ static size_t gb_rtcdata_size(void)
     case gbCartData::MapperType::kGameShark:
     case gbCartData::MapperType::kUnknown:
         VBAM_NOTREACHED();
-        break;
     }
     return 0;
 }
@@ -278,7 +276,6 @@ static void gbInitRTC(void)
     case gbCartData::MapperType::kGameShark:
     case gbCartData::MapperType::kUnknown:
         VBAM_NOTREACHED();
-        break;
     }
 }
 
@@ -1529,7 +1526,6 @@ void retro_run(void)
             case gbCartData::MapperType::kGameShark:
             case gbCartData::MapperType::kUnknown:
                 VBAM_NOTREACHED();
-                break;
             }
             /* Initialize RTC using local time if needed */
             if (initRTC)

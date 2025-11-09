@@ -248,8 +248,7 @@ struct std::hash<config::UserInput> {
                        std::hash<config::KeyboardInput>{}(user_input.keyboard_input());
         }
 
-        VBAM_NOTREACHED();
-        return 0;
+        VBAM_NOTREACHED_RETURN(0);
     }
 };
 

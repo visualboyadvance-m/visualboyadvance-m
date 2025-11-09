@@ -107,11 +107,9 @@ double GetFilterScale() {
             return 6.0;
         case config::Filter::kPlugin:
         case config::Filter::kLast:
-            VBAM_NOTREACHED();
-            return 1.0;
+            VBAM_NOTREACHED_RETURN(1.0);
     }
-    VBAM_NOTREACHED();
-    return 1.0;
+    VBAM_NOTREACHED_RETURN(1.0);
 }
 
 long GetSampleRate() {
@@ -129,11 +127,9 @@ long GetSampleRate() {
             return 11025;
             break;
         case config::AudioRate::kLast:
-            VBAM_NOTREACHED();
-            return 44100;
+            VBAM_NOTREACHED_RETURN(44100);
     }
-    VBAM_NOTREACHED();
-    return 44100;
+    VBAM_NOTREACHED_RETURN(44100);
 }
 
 #define out_8  (systemColorDepth ==  8)
@@ -1816,7 +1812,6 @@ private:
 
             case config::Interframe::kLast:
                 VBAM_NOTREACHED();
-                break;
         }
     }
 

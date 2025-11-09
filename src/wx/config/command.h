@@ -202,8 +202,7 @@ public:
                     return shortcut() < other.shortcut();
             }
 
-            VBAM_NOTREACHED();
-            return false;
+            VBAM_NOTREACHED_RETURN(false);
         } else {
             return tag_ < other.tag_;
         }
@@ -260,8 +259,7 @@ struct std::hash<config::Command> {
                 return std::hash<config::ShortcutCommand>{}(control.shortcut());
         }
 
-        VBAM_NOTREACHED();
-        return 0;
+        VBAM_NOTREACHED_RETURN(0);
     }
 };
 

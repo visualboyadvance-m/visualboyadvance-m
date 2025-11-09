@@ -64,8 +64,7 @@ bool OptionSelectedValidator::WriteToWindow() {
         return true;
     }
 
-    VBAM_NOTREACHED();
-    return false;
+    VBAM_NOTREACHED_RETURN(false);
 }
 
 bool OptionSelectedValidator::WriteToOption() {
@@ -85,7 +84,7 @@ bool OptionSelectedValidator::WriteToOption() {
         return true;
     }
 
-    VBAM_NOTREACHED();
+    VBAM_NOTREACHED_RETURN(false);
 }
 
 OptionIntValidator::OptionIntValidator(config::OptionID option_id) : OptionValidator(option_id) {
@@ -113,8 +112,7 @@ bool OptionIntValidator::WriteToWindow() {
         return true;
     }
 
-    VBAM_NOTREACHED();
-    return false;
+    VBAM_NOTREACHED_RETURN(false);
 }
 
 bool OptionIntValidator::WriteToOption() {
@@ -128,7 +126,7 @@ bool OptionIntValidator::WriteToOption() {
         return option()->SetInt(slider->GetValue());
     }
 
-    VBAM_NOTREACHED();
+    VBAM_NOTREACHED_RETURN(false);
 }
 
 OptionUnsignedValidator::OptionUnsignedValidator(config::OptionID option_id) : OptionValidator(option_id) {
@@ -156,8 +154,7 @@ bool OptionUnsignedValidator::WriteToWindow() {
         return true;
     }
 
-    VBAM_NOTREACHED();
-    return false;
+    VBAM_NOTREACHED_RETURN(false);
 }
 
 bool OptionUnsignedValidator::WriteToOption() {
@@ -171,7 +168,7 @@ bool OptionUnsignedValidator::WriteToOption() {
         return option()->SetUnsigned(slider->GetValue());
     }
 
-    VBAM_NOTREACHED();
+    VBAM_NOTREACHED_RETURN(false);
 }
 
 OptionChoiceValidator::OptionChoiceValidator(config::OptionID option_id)
@@ -194,7 +191,7 @@ bool OptionChoiceValidator::WriteToWindow() {
         return true;
     }
 
-    VBAM_NOTREACHED();
+    VBAM_NOTREACHED_RETURN(false);
 }
 
 bool OptionChoiceValidator::WriteToOption() {
@@ -203,7 +200,7 @@ bool OptionChoiceValidator::WriteToOption() {
         return option()->SetUnsigned(choice->GetSelection());
     }
 
-    VBAM_NOTREACHED();
+    VBAM_NOTREACHED_RETURN(false);
 }
 
 OptionBoolValidator::OptionBoolValidator(config::OptionID option_id) : OptionValidator(option_id) {
@@ -225,7 +222,7 @@ bool OptionBoolValidator::WriteToWindow() {
         return true;
     }
 
-    VBAM_NOTREACHED();
+    VBAM_NOTREACHED_RETURN(false);
 }
 
 bool OptionBoolValidator::WriteToOption() {
@@ -234,7 +231,7 @@ bool OptionBoolValidator::WriteToOption() {
         return option()->SetBool(checkbox->GetValue());
     }
 
-    VBAM_NOTREACHED();
+    VBAM_NOTREACHED_RETURN(false);
 }
 
 }  // namespace widgets

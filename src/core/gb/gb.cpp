@@ -305,7 +305,6 @@ bool gbInitializeRom(size_t romSize) {
             case gbCartData::Validity::kValid:
             case gbCartData::Validity::kUninitialized:
                 VBAM_NOTREACHED();
-                break;
             case gbCartData::Validity::kSizeTooSmall:
                 systemMessage(MSG_UNSUPPORTED_ROM_SIZE,
                               N_("Unsupported rom size %02x"), romSize);

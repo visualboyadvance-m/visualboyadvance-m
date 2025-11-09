@@ -95,7 +95,7 @@ wxString GetCartCGBFlag() {
             return wxString::Format(_("%02X (Required)"), g_gbCartData.cgb_flag());
     }
 
-    VBAM_NOTREACHED();
+    VBAM_NOTREACHED_RETURN(wxEmptyString);
 }
 
 // Returns a localized string indicating the ROM size of the loaded GB/GBC cartridge.
@@ -157,7 +157,7 @@ wxString GetCartDestinationCode() {
             return wxString::Format(_("%02X (Unknown)"), g_gbCartData.destination_code_flag());
     }
 
-    VBAM_NOTREACHED();
+    VBAM_NOTREACHED_RETURN(wxEmptyString);
 }
 
 }  // namespace

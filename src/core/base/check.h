@@ -7,6 +7,8 @@
 // * VBAM_NOTREACHED() - crashes the program if this line of code is reached.
 //   In release builds, this macro also tells the compiler that this code path
 //   is unreachable, which can help the compiler generate better code.
+// * VBAM_NOTREACHED_RETURN(value) - same as VBAM_NOTREACHED() but for non-void
+//   functions. Returns the provided value to satisfy compiler requirements.
 // * VBAM_STRINGIFY(x) - converts the argument to a string literal.
 // While a number of other macros are defined in this file, they are not
 // intended for general use and should be avoided.
@@ -54,5 +56,24 @@
 #define VBAM_NOTREACHED() VBAM_INTRINSIC_UNREACHABLE_DETAIL()
 
 #endif  // defined(DEBUG)
+
+// Macro for non-void functions that need to return after VBAM_NOTREACHED().
+// This avoids both "not all control paths return a value" and "unreachable code" warnings.
+#if defined(_MSC_VER)
+#define VBAM_NOTREACHED_RETURN(value) \
+    do {                              \
+        VBAM_NOTREACHED();            \
+        __pragma(warning(push))       \
+        __pragma(warning(disable: 4702)) \
+        return (value);               \
+        __pragma(warning(pop))        \
+    } while (0)
+#else
+#define VBAM_NOTREACHED_RETURN(value) \
+    do {                              \
+        VBAM_NOTREACHED();            \
+        return (value);               \
+    } while (0)
+#endif
 
 #endif  // VBAM_CORE_BASE_CHECK_H_

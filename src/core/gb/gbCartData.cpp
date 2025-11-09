@@ -63,11 +63,7 @@ char byte_to_char(uint8_t byte) {
     if (byte < 16) {
         return 'A' + (byte - 10);
     }
-    VBAM_NOTREACHED();
-#ifdef _MSC_VER
-#pragma warning(suppress: 4702)  // Unreachable code (in release builds)
-#endif
-    return '\0';
+    VBAM_NOTREACHED_RETURN('\0');
 }
 
 std::string old_licensee_to_string(uint8_t licensee) {
