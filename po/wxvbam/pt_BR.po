@@ -945,7 +945,7 @@ msgstr "Não há VSYNC disponível nesta plataforma"
 
 #: panel.cpp:3229
 msgid "Failed to load d3d9.dll"
-msgstr ""
+msgstr "Falhou em carregar o d3d9.dll"
 
 #: panel.cpp:3238
 msgid "Failed to create Direct3D 9 interface"
