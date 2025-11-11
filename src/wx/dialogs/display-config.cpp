@@ -525,6 +525,8 @@ void DisplayConfig::OnDialogShowEvent(wxShowEvent& event) {
 
     FillRendererList(dummy_event);
 
+    Fit();
+
     // Let the event propagate.
     event.Skip();
 }
@@ -715,7 +717,7 @@ void DisplayConfig::UpdateSDLOptionsVisibility(wxCommandEvent& event) {
         HideSDLOptions();
     }
 
-    Layout();
+    Fit();
 
     // Let the event propagate
     event.Skip();
