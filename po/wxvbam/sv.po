@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-03 15:00+0000\n"
+"POT-Creation-Date: 2025-11-11 18:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>, 2025\n"
 "Language-Team: Swedish (http://app.transifex.com/bgk/vba-m/language/sv/)\n"
@@ -26,7 +26,7 @@ msgstr ""
 "Language: sv\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: audio/internal/coreaudio.cpp:375 audio/internal/coreaudio.cpp:581
+#: audio/internal/coreaudio.cpp:369 audio/internal/coreaudio.cpp:575
 #: audio/internal/sdl.cpp:191 audio/internal/sdl.cpp:209
 #: audio/internal/sdl.cpp:340 audio/internal/sdl.cpp:351
 #: audio/internal/sdl.cpp:371 audio/internal/faudio.cpp:508
@@ -34,11 +34,11 @@ msgstr ""
 msgid "Default device"
 msgstr "Standardenhet"
 
-#: audio/internal/coreaudio.cpp:381
+#: audio/internal/coreaudio.cpp:375
 msgid "Could not get CoreAudio device"
 msgstr "Kunde inte få CoreAudio-enhet"
 
-#: cmdevents.cpp:63 wxvbam.cpp:634
+#: cmdevents.cpp:63 wxvbam.cpp:640
 msgid "Could not create main window"
 msgstr "Kunde inte skapa huvudfönster"
 
@@ -100,7 +100,7 @@ msgstr "Om du importerar en batterifil raderas alla sparade spel (permanent efte
 msgid "Confirm import"
 msgstr "Bekräfta import"
 
-#: cmdevents.cpp:519 panel.cpp:526
+#: cmdevents.cpp:519 panel.cpp:522
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Läste in batteri %s"
@@ -183,7 +183,7 @@ msgstr "Fel vid inläsning av ögonblicksfilen %s"
 msgid "Wrote battery %s"
 msgstr "Skrev batteri %s"
 
-#: cmdevents.cpp:721 panel.cpp:839
+#: cmdevents.cpp:721 panel.cpp:835
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Fel vid skrivning av batteri %s"
@@ -212,11 +212,11 @@ msgstr "Fel vid sparandet av ögonblicksfilen %s"
 
 #: cmdevents.cpp:783 cmdevents.cpp:864 cmdevents.cpp:937 cmdevents.cpp:1009
 #: gfxviewers.cpp:1716 gfxviewers.cpp:1884 viewers.cpp:588 viewers.cpp:808
-#: viewsupt.cpp:1199
+#: viewsupt.cpp:1198
 msgid "Select output file"
 msgstr "Välj utdatafil"
 
-#: cmdevents.cpp:784 gfxviewers.cpp:1717 gfxviewers.cpp:1885 viewsupt.cpp:1200
+#: cmdevents.cpp:784 gfxviewers.cpp:1717 gfxviewers.cpp:1885 viewsupt.cpp:1199
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG bilder|*.png|BMP-bilder|*.bmp"
 
@@ -355,37 +355,37 @@ msgstr "Detta kommer att avmarkera ”%s” från ”%s”. Är du säker?"
 msgid "Browse"
 msgstr "Bläddra"
 
-#: dialogs/display-config.cpp:102
+#: dialogs/display-config.cpp:109
 msgid "Invalid value for Default magnification."
 msgstr "Ogiltigt värde för standardförstoring."
 
-#: dialogs/display-config.cpp:469
+#: dialogs/display-config.cpp:476
 msgid "Invalid color correction profile"
 msgstr "Ogiltig färgkorrigeringsprofil"
 
-#: dialogs/display-config.cpp:538 xrc/DisplayConfig.xrc:121
-#: xrc/DisplayConfig.xrc:171 xrc/DisplayConfig.xrc:427
+#: dialogs/display-config.cpp:547 xrc/DisplayConfig.xrc:119
+#: xrc/DisplayConfig.xrc:165 xrc/DisplayConfig.xrc:395
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:227 xrc/SoundConfig.xrc:317
 msgid "None"
 msgstr "Inga"
 
-#: dialogs/display-config.cpp:568
+#: dialogs/display-config.cpp:577
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Inga användbara rpi plugins funna i %s"
 
-#: dialogs/display-config.cpp:605 dialogs/display-config.cpp:684
-#: xrc/DisplayConfig.xrc:143
+#: dialogs/display-config.cpp:614 dialogs/display-config.cpp:693
+#: xrc/DisplayConfig.xrc:141
 msgid "Plugin"
 msgstr "Plugin"
 
-#: dialogs/display-config.cpp:612
+#: dialogs/display-config.cpp:621
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "Använder bildpunktsfilter: %s"
 
-#: dialogs/display-config.cpp:619
+#: dialogs/display-config.cpp:628
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr "Använda interframe-blandning: %s"
@@ -451,93 +451,93 @@ msgstr "%02X (stöds inte)"
 msgid "%02X (Required)"
 msgstr "%02X (krävs)"
 
-#: dialogs/gb-rom-info.cpp:107 dialogs/gb-rom-info.cpp:141
+#: dialogs/gb-rom-info.cpp:105 dialogs/gb-rom-info.cpp:139
 #, c-format
 msgid "%02X (32 KiB)"
 msgstr "%02X (32 KiB)"
 
-#: dialogs/gb-rom-info.cpp:109 dialogs/gb-rom-info.cpp:145
+#: dialogs/gb-rom-info.cpp:107 dialogs/gb-rom-info.cpp:143
 #, c-format
 msgid "%02X (64 KiB)"
 msgstr "%02X (64 KiB)"
 
-#: dialogs/gb-rom-info.cpp:111 dialogs/gb-rom-info.cpp:143
+#: dialogs/gb-rom-info.cpp:109 dialogs/gb-rom-info.cpp:141
 #, c-format
 msgid "%02X (128 KiB)"
 msgstr "%02X (128 KiB)"
 
-#: dialogs/gb-rom-info.cpp:113
+#: dialogs/gb-rom-info.cpp:111
 #, c-format
 msgid "%02X (256 KiB)"
 msgstr "%02X (256 KiB)"
 
-#: dialogs/gb-rom-info.cpp:115
+#: dialogs/gb-rom-info.cpp:113
 #, c-format
 msgid "%02X (512 KiB)"
 msgstr "%02X (512 KiB)"
 
-#: dialogs/gb-rom-info.cpp:117
+#: dialogs/gb-rom-info.cpp:115
 #, c-format
 msgid "%02X (1 MiB)"
 msgstr "%02X (1 MiB)"
 
-#: dialogs/gb-rom-info.cpp:119
+#: dialogs/gb-rom-info.cpp:117
 #, c-format
 msgid "%02X (2 MiB)"
 msgstr "%02X (2 MiB)"
 
-#: dialogs/gb-rom-info.cpp:121
+#: dialogs/gb-rom-info.cpp:119
 #, c-format
 msgid "%02X (4 MiB)"
 msgstr "%02X (4 MiB)"
 
-#: dialogs/gb-rom-info.cpp:123 dialogs/gb-rom-info.cpp:147
-#: dialogs/gb-rom-info.cpp:159
+#: dialogs/gb-rom-info.cpp:121 dialogs/gb-rom-info.cpp:145
+#: dialogs/gb-rom-info.cpp:157
 #, c-format
 msgid "%02X (Unknown)"
 msgstr "%02X (okänt)"
 
-#: dialogs/gb-rom-info.cpp:131
+#: dialogs/gb-rom-info.cpp:129
 #, c-format
 msgid "%02X (None)"
 msgstr "%02X (ingen)"
 
-#: dialogs/gb-rom-info.cpp:133
+#: dialogs/gb-rom-info.cpp:131
 #, c-format
 msgid "%02X (256 B)"
 msgstr "%02X (256 B)"
 
-#: dialogs/gb-rom-info.cpp:135
+#: dialogs/gb-rom-info.cpp:133
 #, c-format
 msgid "%02X (512 B)"
 msgstr "%02X (512 B)"
 
-#: dialogs/gb-rom-info.cpp:137
+#: dialogs/gb-rom-info.cpp:135
 #, c-format
 msgid "%02X (2 KiB)"
 msgstr "%02X (2 KiB)"
 
-#: dialogs/gb-rom-info.cpp:139
+#: dialogs/gb-rom-info.cpp:137
 #, c-format
 msgid "%02X (8 KiB)"
 msgstr "%02X (8 KiB)"
 
-#: dialogs/gb-rom-info.cpp:155
+#: dialogs/gb-rom-info.cpp:153
 #, c-format
 msgid "%02X (Japan)"
 msgstr "%02X (Japan)"
 
-#: dialogs/gb-rom-info.cpp:157
+#: dialogs/gb-rom-info.cpp:155
 #, c-format
 msgid "%02X (World)"
 msgstr "%02X (Världen)"
 
-#: dialogs/gb-rom-info.cpp:201
+#: dialogs/gb-rom-info.cpp:198
 #, c-format
 msgid "%02X (Actual: %02X)"
 msgstr "%02X (Faktisk: %02X)"
 
-#: dialogs/gb-rom-info.cpp:204
+#: dialogs/gb-rom-info.cpp:201
 #, c-format
 msgid "%04X (Actual: %04X)"
 msgstr "%04X (Faktisk: %04X)"
@@ -633,7 +633,7 @@ msgstr "Välj fuskfil"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA fusklistor (*.clt)|*.clt|CHT fusklistor (*.cht)|*.cht"
 
-#: guiinit.cpp:280 panel.cpp:583
+#: guiinit.cpp:280 panel.cpp:579
 msgid "Loaded cheats"
 msgstr "Laddade fusk"
 
@@ -689,40 +689,40 @@ msgstr "Osignerad decimal"
 msgid "Unsigned hexadecimal"
 msgstr "Osignerad hexadecimal"
 
-#: guiinit.cpp:1654
+#: guiinit.cpp:1655
 msgid "Main icon not found"
 msgstr "Huvudikon ej funnen"
 
-#: guiinit.cpp:1672
+#: guiinit.cpp:1673
 msgid "Main display panel not found"
 msgstr "Huvudvisningspanel ej funnen"
 
-#: guiinit.cpp:1964
+#: guiinit.cpp:1965
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Ogiltigt menyföremål %s; tar bort"
 
-#: guiinit.cpp:2149
+#: guiinit.cpp:2150
 msgid "Code"
 msgstr "Kod"
 
-#: guiinit.cpp:2158
+#: guiinit.cpp:2159
 msgid "Description"
 msgstr "Beskrivning"
 
-#: guiinit.cpp:2232 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:2233 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Adress"
 
-#: guiinit.cpp:2233
+#: guiinit.cpp:2234
 msgid "Old Value"
 msgstr "Gammalt värde"
 
-#: guiinit.cpp:2234
+#: guiinit.cpp:2235
 msgid "New Value"
 msgstr "Nytt värde"
 
-#: guiinit.cpp:2454
+#: guiinit.cpp:2455
 msgid "JoyBus host invalid; disabling"
 msgstr "JoyBus värd ogiltig; inaktiverar"
 
@@ -732,273 +732,273 @@ msgid ""
 " values may have been reset."
 msgstr "INI-filen skrevs för en nyare version av VBA-M. Vissa INI-alternativvärden kan ha återställts."
 
-#: opts.cpp:326 opts.cpp:342 opts.cpp:499
+#: opts.cpp:326 opts.cpp:342 opts.cpp:500
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Ogiltig tangentbindning %s för %s"
 
-#: opts.cpp:444 opts.cpp:453 opts.cpp:462 opts.cpp:471
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:514
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:525
+#: opts.cpp:445 opts.cpp:454 opts.cpp:463 opts.cpp:472
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:512
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:523
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr "Ogiltigt värde %s för alternativet %s"
 
-#: opts.cpp:505
+#: opts.cpp:506
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr "Okänt alternativ %s med värdet %s"
 
-#: panel.cpp:240
+#: panel.cpp:236
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s är inte en giltig ROM fil"
 
-#: panel.cpp:241 panel.cpp:302 panel.cpp:375
+#: panel.cpp:237 panel.cpp:298 panel.cpp:371
 msgid "Problem loading file"
 msgstr "Problem vid laddning av fil"
 
-#: panel.cpp:301
+#: panel.cpp:297
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Oförmögen att ladda Game Boy ROM %s"
 
-#: panel.cpp:326 panel.cpp:437 panel.cpp:1178
+#: panel.cpp:322 panel.cpp:433 panel.cpp:1174
 msgid "Could not initialize the sound driver!"
 msgstr "Kunde inte initiera ljuddrivrutin!"
 
-#: panel.cpp:337
+#: panel.cpp:333
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
 msgstr "Det går inte att använda Game Boy BIOS-filen när Colorizer Hack är aktiverat, vilket inaktiverar Game Boy BIOS-filen."
 
-#: panel.cpp:351 panel.cpp:450
+#: panel.cpp:347 panel.cpp:446
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Kunde inte ladda BIOS %s"
 
-#: panel.cpp:374
+#: panel.cpp:370
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Oförmögen att ladda Game Boy Advance ROM %s"
 
-#: panel.cpp:620
+#: panel.cpp:616
 msgid " player "
 msgstr " spelare "
 
-#: panel.cpp:787
+#: panel.cpp:783
 #, c-format
 msgid "Loaded state %s"
 msgstr "Laddade tillstånd %s"
 
-#: panel.cpp:787
+#: panel.cpp:783
 #, c-format
 msgid "Error loading state %s"
 msgstr "Fel vid laddning av tillstånd %s"
 
-#: panel.cpp:811
+#: panel.cpp:807
 #, c-format
 msgid "Saved state %s"
 msgstr "Sparade tillstånd %s"
 
-#: panel.cpp:811
+#: panel.cpp:807
 #, c-format
 msgid "Error saving state %s"
 msgstr "Fel vid sparande av tillstånd %s"
 
-#: panel.cpp:1011
+#: panel.cpp:1007
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 msgstr "Helskärmsläge %d x %d - %d @ %d stöds inte; söker efter ett annat"
 
-#: panel.cpp:1049
+#: panel.cpp:1045
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
 msgstr "Helskärmsläge %d x %d - %d @ %d stöds inte"
 
-#: panel.cpp:1054
+#: panel.cpp:1050
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
 msgstr "Giltigt läge: %d x %d - %d @ %d"
 
-#: panel.cpp:1062
+#: panel.cpp:1058
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
 msgstr "Välj läge %d x %d - %d @ %d"
 
-#: panel.cpp:1066
+#: panel.cpp:1062
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr "Det gick inte att ändra läge till %d x %d - %d @ %d"
 
-#: panel.cpp:1153
+#: panel.cpp:1149
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr "Ingen giltig Game Boy Advance-kassett"
 
-#: panel.cpp:1338
+#: panel.cpp:1334
 msgid "No memory for rewinding"
 msgstr "Inget minne för återspolning"
 
-#: panel.cpp:1348
+#: panel.cpp:1344
 msgid "Error writing rewind state"
 msgstr "Fel vid skrivande av återspolningstillstånd"
 
-#: panel.cpp:2341
+#: panel.cpp:2337
 msgid "Failed to set wayland display"
 msgstr "Misslyckades med att ställa in wayland display"
 
-#: panel.cpp:2369
+#: panel.cpp:2365
 msgid "Failed to initialize SDL video subsystem"
 msgstr "Det gick inte att initialisera SDL-videosubsystemet."
 
-#: panel.cpp:2380
+#: panel.cpp:2376
 msgid "Failed to initialize SDL video"
 msgstr "Det gick inte att initialisera SDL-video"
 
-#: panel.cpp:2389
+#: panel.cpp:2385
 msgid "Failed to set wayland surface"
 msgstr "Misslyckades med att ställa in wayland surface"
 
-#: panel.cpp:2402
+#: panel.cpp:2398
 msgid "Failed to set parent window"
 msgstr "Misslyckades med att ställa in överordnat fönster"
 
-#: panel.cpp:2411
+#: panel.cpp:2407
 msgid "Failed to set OpenGL properties"
 msgstr "Misslyckades med att ställa in OpenGL-egenskaper"
 
-#: panel.cpp:2424 panel.cpp:2458
+#: panel.cpp:2420 panel.cpp:2454
 msgid "Failed to create SDL window"
 msgstr "Misslyckades med att skapa SDL-fönster"
 
-#: panel.cpp:2442 panel.cpp:2490
+#: panel.cpp:2438 panel.cpp:2486
 msgid "Failed to create SDL renderer"
 msgstr "Misslyckades med att skapa SDL-renderare"
 
-#: panel.cpp:3058
+#: panel.cpp:3061
 msgid "Enabling EGL VSync."
 msgstr "Aktiverar EGL VSync."
 
-#: panel.cpp:3060
+#: panel.cpp:3063
 msgid "Disabling EGL VSync."
 msgstr "Inaktiverar EGL VSync."
 
-#: panel.cpp:3067
+#: panel.cpp:3070
 msgid "Enabling GLX VSync."
 msgstr "Aktiverar GLX VSync."
 
-#: panel.cpp:3069
+#: panel.cpp:3072
 msgid "Disabling GLX VSync."
 msgstr "Inaktiverar GLX VSync."
 
-#: panel.cpp:3087
+#: panel.cpp:3090
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Misslyckades sätta glXSwapIntervalEXT"
 
-#: panel.cpp:3096
+#: panel.cpp:3099
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Misslyckades sätta glXSwapIntervalSGI"
 
-#: panel.cpp:3105
+#: panel.cpp:3108
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Misslyckades sätta glXSwapIntervalMESA"
 
-#: panel.cpp:3112
+#: panel.cpp:3115
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "Inget stöd för wglGetExtensionsStringEXT"
 
-#: panel.cpp:3115
+#: panel.cpp:3118
 msgid "No support for WGL_EXT_swap_control"
 msgstr "Inget stöd för WGL_EXT_swap_control"
 
-#: panel.cpp:3124
+#: panel.cpp:3127
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Misslyckades sätta wglSwapIntervalEXT"
 
-#: panel.cpp:3130
+#: panel.cpp:3133
 msgid "No VSYNC available on this platform"
 msgstr "Ingen VSYNC tillgänglig på denna plattform"
 
-#: panel.cpp:3229
+#: panel.cpp:3233
 msgid "Failed to load d3d9.dll"
 msgstr ""
 
-#: panel.cpp:3238
+#: panel.cpp:3242
 msgid "Failed to create Direct3D 9 interface"
 msgstr ""
 
-#: panel.cpp:3248
+#: panel.cpp:3252
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3312
+#: panel.cpp:3316
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3372
+#: panel.cpp:3376
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3423
+#: panel.cpp:3427
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3495
+#: panel.cpp:3499
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3507
+#: panel.cpp:3511
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3691
+#: panel.cpp:3698
 msgid "Memory allocation error"
 msgstr "Fel vid minnesallokering"
 
-#: panel.cpp:3694
+#: panel.cpp:3701
 msgid "Error initializing codec"
 msgstr "Fel vid initiering av kodek"
 
-#: panel.cpp:3697
+#: panel.cpp:3704
 msgid "Error writing to output file"
 msgstr "Fel vid skrivning till utdatafil"
 
-#: panel.cpp:3700
+#: panel.cpp:3707
 msgid "Can't guess output format from file name"
 msgstr "Kan inte gissa utdataformatet från filnamnet"
 
-#: panel.cpp:3705
+#: panel.cpp:3712
 msgid "Programming error; aborting!"
 msgstr "Programmeringsfel; avbryter!"
 
-#: panel.cpp:3717 panel.cpp:3746
+#: panel.cpp:3724 panel.cpp:3753
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Oförmögen att börja inspelning till %s (%s)"
 
-#: panel.cpp:3774
+#: panel.cpp:3781
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "Fel i ljud-/videoinspelning (%s); avbryter"
 
-#: panel.cpp:3780
+#: panel.cpp:3787
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Fel i ljudinspelning (%s); avbryter"
 
-#: panel.cpp:3790
+#: panel.cpp:3797
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Fel i videoinspelning (%s); avbryter"
 
-#: panel.cpp:3981
+#: panel.cpp:3988
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Volym: %d %%"
@@ -1085,15 +1085,15 @@ msgstr "Minnesdumpar (*.dmp;*.bin)|*.dmp;*.bin|"
 msgid "Select memory dump file"
 msgstr "Välj minnesdumpsfil"
 
-#: viewsupt.cpp:789
+#: viewsupt.cpp:788
 msgid "Red:"
 msgstr "Röd:"
 
-#: viewsupt.cpp:798
+#: viewsupt.cpp:797
 msgid "Green:"
 msgstr "Grön:"
 
-#: viewsupt.cpp:807
+#: viewsupt.cpp:806
 msgid "Blue:"
 msgstr "Blå:"
 
@@ -1102,76 +1102,76 @@ msgstr "Blå:"
 msgid "Unable to load dialog %s from resources"
 msgstr "Kan inte läsa in dialog %s från resurser"
 
-#: wxvbam.cpp:449 wxvbam.cpp:466
+#: wxvbam.cpp:457 wxvbam.cpp:474
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "Ogiltig konfigurationsfil angiven: %s"
 
-#: wxvbam.cpp:716
+#: wxvbam.cpp:722
 msgid "Save built-in XRC file and exit"
 msgstr "Spara inbyggd XRC-fil och avsluta"
 
-#: wxvbam.cpp:719
+#: wxvbam.cpp:725
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Spara inbyggd vba-over.ini och avsluta"
 
-#: wxvbam.cpp:722
+#: wxvbam.cpp:728
 msgid "Print configuration path and exit"
 msgstr "Skriv ut konfigurationssökväg och avsluta"
 
-#: wxvbam.cpp:725
+#: wxvbam.cpp:731
 msgid "Start in full-screen mode"
 msgstr "Starta i helskärmsläge"
 
-#: wxvbam.cpp:728
+#: wxvbam.cpp:734
 msgid "Set a configuration file"
 msgstr "Välj en konfigurationsfil"
 
-#: wxvbam.cpp:732
+#: wxvbam.cpp:738
 msgid "Delete shared link state first, if it exists"
 msgstr "Radera delat länktillstånd först, om det existerar"
 
-#: wxvbam.cpp:739
+#: wxvbam.cpp:745
 msgid "List all settable options and exit"
 msgstr "Lista alla inställbara alternativ och avsluta"
 
-#: wxvbam.cpp:742
+#: wxvbam.cpp:748
 msgid "ROM file"
 msgstr "ROM-fil"
 
-#: wxvbam.cpp:744
+#: wxvbam.cpp:750
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:775
+#: wxvbam.cpp:781
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "Konfigurations-/byggfel: kan inte hitta inbyggd xrc"
 
-#: wxvbam.cpp:783
+#: wxvbam.cpp:789
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Skrev inbyggd konfiguration till %s.\nFör att åsidosätta, ta bort alla utom ändrade rotnod(er). Den första rotnoden med rätt namn som hittas i någon .xrc- eller .xrs-fil i följande sökväg åsidosätter den inbyggda:"
 
-#: wxvbam.cpp:797
+#: wxvbam.cpp:803
 msgid "Configuration is read from, in order:"
 msgstr "Konfiguration läses från, i ordning:"
 
-#: wxvbam.cpp:811
+#: wxvbam.cpp:817
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "Skrev inbyggd åsidosättningsfil till %s\nFör att åsidosätta, ta bort allt utom den ändrade sektionen. Den första sektionen som hittas används från sökvägen:"
 
-#: wxvbam.cpp:817
+#: wxvbam.cpp:823
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n⇥inbyggd"
 
-#: wxvbam.cpp:832
+#: wxvbam.cpp:838
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1179,17 +1179,17 @@ msgid ""
 "\n"
 msgstr "Alternativen från kommandoraden sparas om några konfigurationsändringar görs i användargränssnittet.\n\nFör flaggalternativ, sant och falskt anges som 1 och 0, respektive.\n\n"
 
-#: wxvbam.cpp:840
+#: wxvbam.cpp:846
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "De tillgängliga kommandona för Tangentbord/* alternativ är:\n\n"
 
-#: wxvbam.cpp:852
+#: wxvbam.cpp:858
 msgid "Configuration file not found."
 msgstr "Hittade inte konfigurationsfil"
 
-#: wxvbam.cpp:883
+#: wxvbam.cpp:889
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Dåligt konfigurationsalternativ eller flera ROM-filer angivna:\n"
 
@@ -1278,7 +1278,7 @@ msgid "Auto B"
 msgstr "Auto B"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
-#: xrc/DisplayConfig.xrc:405
+#: xrc/DisplayConfig.xrc:332
 msgid "Speed"
 msgstr "Hastighet"
 
@@ -1771,13 +1771,13 @@ msgstr "Externa översättningar"
 msgid "Invalid value %s for option %s; valid values are %s"
 msgstr "Ogiltigt värde %s för alternativet %s; giltiga värden är %s"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:341
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:340
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Ogiltigt värde %f för alternativ %s; giltiga värden är %f - %f"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:356
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:371
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:355
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:370
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Ogiltigt värde %d för alternativet %s; giltiga värden är %d - %d"
@@ -1943,42 +1943,42 @@ msgstr "Meta+"
 msgid "Joystick %d"
 msgstr "Styrspak %d"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:268
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:267
 #, c-format
 msgid "%s: Axis %d+"
 msgstr "%s: Axel %d+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:270
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:269
 #, c-format
 msgid "%s: Axis %d-"
 msgstr "%s: Axel %d-"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:272
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:271
 #, c-format
 msgid "%s: Button %d"
 msgstr "%s: Knapp %d"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:274
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:273
 #, c-format
 msgid "%s: Hat %d North"
 msgstr "%s: Hat %d Norr"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:276
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:275
 #, c-format
 msgid "%s: Hat %d South"
 msgstr "%s: Hat %d Söder"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:278
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:277
 #, c-format
 msgid "%s: Hat %d West"
 msgstr "%s: Hat %d Väst"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:280
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:279
 #, c-format
 msgid "%s: Hat %d East"
 msgstr "%s: Hat %d Öst"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:315
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:313
 msgid "Key"
 msgstr "Tangent"
 
@@ -2054,93 +2054,93 @@ msgstr "XAudio2: Skapande av huvudröst misslyckades!"
 msgid "XAudio2: Creating source voice failed!"
 msgstr "XAudio2: Skapande av källröst misslyckades!"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:680
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:681
 msgid "Error, link already connected"
 msgstr "Fel, länk redan ansluten"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:694
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:695
 msgid "Unable to find link driver"
 msgstr "Kunde inte hitta länkdrivrutin"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:737
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:738
 msgid "Link connection does not need updates."
 msgstr "Länkanslutning behöver inte uppdateras."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:876
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:940
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1594
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2926
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:877
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:941
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1595
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2932
 #, c-format
 msgid "Player %d disconnected."
 msgstr "Spelare %d kopplade från."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:980
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1020
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1060
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1703
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:981
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1021
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1061
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1704
 msgid "Server disconnected."
 msgstr "Servern kopplade från."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1151
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1182
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1727
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1759
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1152
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1183
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1728
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1760
 msgid "Network error."
 msgstr "Nätverksfel."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1159
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1735
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1160
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1736
 #, c-format
 msgid "Player %d connected"
 msgstr "Spelare %d ansluten"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1173
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1749
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1174
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1750
 msgid "All players connected"
 msgstr "Alla spelare anslutna"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1194
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1771
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1195
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1772
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
 msgstr "Ansluten som #%d, Väntar på att %d spelare ska gå med"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1203
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1780
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1204
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1781
 msgid "All players joined."
 msgstr "Alla spelare har gått med."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1696
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1697
 msgid "Server timed out."
 msgstr "Servern har överskridit tidsgränsen."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2649
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2670
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2655
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2676
 msgid "Error creating file mapping"
 msgstr "Fel vid skapande av filmappning"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2660
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2666
 msgid "Error mapping file"
 msgstr "Fel vid mappning av fil"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2707
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2713
 msgid "5 or more GBAs not supported."
 msgstr "5 eller fler GBA stöds inte."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2726
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2745
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2732
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2751
 msgid "Error opening event"
 msgstr "Fel vid öppning av händelsen"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2845
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2851
 msgid "Lost link; reinitialize to reconnect"
 msgstr "Förlorade länk; återinitiera för att återansluta"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2852
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2858
 msgid "Lost link; reconnected"
 msgstr "Förlorade länk; återansluten"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2973
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2979
 msgid "Unknown slave timed out; resetting comm"
 msgstr "Okänd slav översteg tidsgränsen; återställer komm"
 
@@ -2402,193 +2402,193 @@ msgstr "&Nästa"
 msgid "Display settings"
 msgstr "Visningsinställningar"
 
-#: xrc/DisplayConfig.xrc:16
-msgid "Output module"
-msgstr "Utmatningsmodule"
-
-#: xrc/DisplayConfig.xrc:29
-msgid "Simple"
-msgstr "Enkel"
-
-#: xrc/DisplayConfig.xrc:77
-msgid "SDL Renderer:"
-msgstr "SDL-renderare:"
-
-#: xrc/DisplayConfig.xrc:90
-msgid "SDL Pixel Art Filter"
-msgstr "Filter för SDL Pixel Art"
-
-#: xrc/DisplayConfig.xrc:101
-msgid "Filters"
-msgstr "Filter"
-
-#: xrc/DisplayConfig.xrc:113
-msgid "Display filter:"
-msgstr "Visningsfilter:"
-
-#: xrc/DisplayConfig.xrc:123
-msgid "Super 2xSaI"
-msgstr "Super 2xSaI"
-
-#: xrc/DisplayConfig.xrc:124
-msgid "Super Eagle"
-msgstr "Super Eagle"
-
-#: xrc/DisplayConfig.xrc:125
-msgid "Pixelate"
-msgstr "Pixellera"
-
-#: xrc/DisplayConfig.xrc:126
-msgid "Advance MAME Scale 2x"
-msgstr "Advance MAME Scale 2x"
-
-#: xrc/DisplayConfig.xrc:127
-msgid "Bilinear"
-msgstr "Bilinjärt"
-
-#: xrc/DisplayConfig.xrc:128
-msgid "Bilinear Plus"
-msgstr "Bilinjärt Plus"
-
-#: xrc/DisplayConfig.xrc:129
-msgid "Scanlines"
-msgstr "Avsökningsrader"
-
-#: xrc/DisplayConfig.xrc:130
-msgid "TV Mode"
-msgstr "TV-läge"
-
-#: xrc/DisplayConfig.xrc:133
-msgid "Simple 2x"
-msgstr "Enkel 2x"
-
-#: xrc/DisplayConfig.xrc:134
-msgid "Simple 3x"
-msgstr "Enkel 3x"
-
-#: xrc/DisplayConfig.xrc:136
-msgid "Simple 4x"
-msgstr "Enkel 4x"
-
-#: xrc/DisplayConfig.xrc:151
-msgid "Plugin:"
-msgstr "Insticksmodul:"
-
-#: xrc/DisplayConfig.xrc:163
-msgid "Interframe blending:"
-msgstr "Interframe-blandning:"
-
-#: xrc/DisplayConfig.xrc:172
-msgid "Smart"
-msgstr "Smart"
-
-#: xrc/DisplayConfig.xrc:173
-msgid "Motion Blur"
-msgstr "Rörelseoskärpa"
-
-#: xrc/DisplayConfig.xrc:185 xrc/SoundConfig.xrc:93
+#: xrc/DisplayConfig.xrc:12 xrc/SoundConfig.xrc:93
 msgid "Basic"
 msgstr "Grundläggande"
 
-#: xrc/DisplayConfig.xrc:195
-msgid "Bit Depth:"
-msgstr "Bitdjup:"
+#: xrc/DisplayConfig.xrc:23
+msgid "Output module"
+msgstr "Utmatningsmodule"
 
-#: xrc/DisplayConfig.xrc:201
-msgid "8"
-msgstr "8"
+#: xrc/DisplayConfig.xrc:33
+msgid "Simple"
+msgstr "Enkel"
 
-#: xrc/DisplayConfig.xrc:202
-msgid "16"
-msgstr "16"
+#: xrc/DisplayConfig.xrc:74
+msgid "SDL Renderer:"
+msgstr "SDL-renderare:"
 
-#: xrc/DisplayConfig.xrc:203
-msgid "24"
-msgstr "24"
+#: xrc/DisplayConfig.xrc:83
+msgid "SDL Pixel Art Filter"
+msgstr "Filter för SDL Pixel Art"
 
-#: xrc/DisplayConfig.xrc:204
-msgid "32"
-msgstr "32"
+#: xrc/DisplayConfig.xrc:97
+msgid "Filters"
+msgstr "Filter"
 
-#: xrc/DisplayConfig.xrc:214
+#: xrc/DisplayConfig.xrc:112
+msgid "Display filter:"
+msgstr "Visningsfilter:"
+
+#: xrc/DisplayConfig.xrc:121
+msgid "Super 2xSaI"
+msgstr "Super 2xSaI"
+
+#: xrc/DisplayConfig.xrc:122
+msgid "Super Eagle"
+msgstr "Super Eagle"
+
+#: xrc/DisplayConfig.xrc:123
+msgid "Pixelate"
+msgstr "Pixellera"
+
+#: xrc/DisplayConfig.xrc:124
+msgid "Advance MAME Scale 2x"
+msgstr "Advance MAME Scale 2x"
+
+#: xrc/DisplayConfig.xrc:125
+msgid "Bilinear"
+msgstr "Bilinjärt"
+
+#: xrc/DisplayConfig.xrc:126
+msgid "Bilinear Plus"
+msgstr "Bilinjärt Plus"
+
+#: xrc/DisplayConfig.xrc:127
+msgid "Scanlines"
+msgstr "Avsökningsrader"
+
+#: xrc/DisplayConfig.xrc:128
+msgid "TV Mode"
+msgstr "TV-läge"
+
+#: xrc/DisplayConfig.xrc:131
+msgid "Simple 2x"
+msgstr "Enkel 2x"
+
+#: xrc/DisplayConfig.xrc:132
+msgid "Simple 3x"
+msgstr "Enkel 3x"
+
+#: xrc/DisplayConfig.xrc:134
+msgid "Simple 4x"
+msgstr "Enkel 4x"
+
+#: xrc/DisplayConfig.xrc:148
+msgid "Plugin:"
+msgstr "Insticksmodul:"
+
+#: xrc/DisplayConfig.xrc:158
+msgid "Interframe blending:"
+msgstr "Interframe-blandning:"
+
+#: xrc/DisplayConfig.xrc:166
+msgid "Smart"
+msgstr "Smart"
+
+#: xrc/DisplayConfig.xrc:167
+msgid "Motion Blur"
+msgstr "Rörelseoskärpa"
+
+#: xrc/DisplayConfig.xrc:179
 msgid "Bit Depth"
 msgstr "Bitdjup"
 
-#: xrc/DisplayConfig.xrc:224
-msgid "Profile:"
-msgstr "Profil:"
+#: xrc/DisplayConfig.xrc:188
+msgid "Bit Depth:"
+msgstr "Bitdjup:"
 
-#: xrc/DisplayConfig.xrc:264
-msgid "GBA Darken:"
-msgstr "GBA mörkare:"
+#: xrc/DisplayConfig.xrc:196
+msgid "8"
+msgstr "8"
 
-#: xrc/DisplayConfig.xrc:282
-msgid "Lighter"
-msgstr "Ljusare"
+#: xrc/DisplayConfig.xrc:197
+msgid "16"
+msgstr "16"
 
-#: xrc/DisplayConfig.xrc:293
-msgid "Very Dark"
-msgstr "Mycket mörkt"
+#: xrc/DisplayConfig.xrc:198
+msgid "24"
+msgstr "24"
 
-#: xrc/DisplayConfig.xrc:310
-msgid "GBC Lighten:"
-msgstr "GBC ljusare:"
+#: xrc/DisplayConfig.xrc:199
+msgid "32"
+msgstr "32"
 
-#: xrc/DisplayConfig.xrc:328
-msgid "Darker"
-msgstr "Mörkare"
-
-#: xrc/DisplayConfig.xrc:339
-msgid "Very Light"
-msgstr "Mycket ljust"
-
-#: xrc/DisplayConfig.xrc:357
+#: xrc/DisplayConfig.xrc:207
 msgid "Color Correction"
 msgstr "Färgkorrigering"
 
-#: xrc/DisplayConfig.xrc:365
+#: xrc/DisplayConfig.xrc:216
+msgid "Profile:"
+msgstr "Profil:"
+
+#: xrc/DisplayConfig.xrc:250
+msgid "GBA Darken:"
+msgstr "GBA mörkare:"
+
+#: xrc/DisplayConfig.xrc:269
+msgid "Lighter"
+msgstr "Ljusare"
+
+#: xrc/DisplayConfig.xrc:280
+msgid "Very Dark"
+msgstr "Mycket mörkt"
+
+#: xrc/DisplayConfig.xrc:291
+msgid "GBC Lighten:"
+msgstr "GBC ljusare:"
+
+#: xrc/DisplayConfig.xrc:310
+msgid "Darker"
+msgstr "Mörkare"
+
+#: xrc/DisplayConfig.xrc:321
+msgid "Very Light"
+msgstr "Mycket ljust"
+
+#: xrc/DisplayConfig.xrc:338
 msgid "Frame Skip"
 msgstr "Hoppa över bildruta"
 
-#: xrc/DisplayConfig.xrc:383
+#: xrc/DisplayConfig.xrc:356
 msgid "&Number of frames to skip:"
 msgstr "An&tal bildrutor att hoppa över:"
 
-#: xrc/DisplayConfig.xrc:421
-msgid "Speed indicator:"
-msgstr "Hastighetsindikator:"
-
-#: xrc/DisplayConfig.xrc:428
-msgid "Percentage"
-msgstr "Procentandel"
-
-#: xrc/DisplayConfig.xrc:429
-msgid "Detailed"
-msgstr "Detaljerad"
-
-#: xrc/DisplayConfig.xrc:443
+#: xrc/DisplayConfig.xrc:380
 msgid "On-Screen Display"
 msgstr "Visning på skärmen"
 
-#: xrc/DisplayConfig.xrc:453
+#: xrc/DisplayConfig.xrc:387
+msgid "Speed indicator:"
+msgstr "Hastighetsindikator:"
+
+#: xrc/DisplayConfig.xrc:396
+msgid "Percentage"
+msgstr "Procentandel"
+
+#: xrc/DisplayConfig.xrc:397
+msgid "Detailed"
+msgstr "Detaljerad"
+
+#: xrc/DisplayConfig.xrc:405
+msgid "Zoom"
+msgstr "Zoom"
+
+#: xrc/DisplayConfig.xrc:415
 msgid "Default magnification:"
 msgstr "Standardförstorning:"
 
-#: xrc/DisplayConfig.xrc:472
+#: xrc/DisplayConfig.xrc:433
 msgid "Maximum magnification factor:"
 msgstr "Maximal förstoringsfaktor:"
 
-#: xrc/DisplayConfig.xrc:473
+#: xrc/DisplayConfig.xrc:434
 msgid "0 = no maximum"
 msgstr "0 = inget max"
 
-#: xrc/DisplayConfig.xrc:481
+#: xrc/DisplayConfig.xrc:441
 msgid "0 = no limit"
 msgstr "0 = ingen begränsning"
-
-#: xrc/DisplayConfig.xrc:491
-msgid "Zoom"
-msgstr "Zoom"
 
 #: xrc/ExportSPS.xrc:10
 msgid "Title:"

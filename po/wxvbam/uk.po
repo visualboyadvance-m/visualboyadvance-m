@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-03 15:00+0000\n"
+"POT-Creation-Date: 2025-11-11 18:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Svyatoslav <zarazafamila@gmail.com>, 2023\n"
 "Language-Team: Ukrainian (http://app.transifex.com/bgk/vba-m/language/uk/)\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Language: uk\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
-#: audio/internal/coreaudio.cpp:375 audio/internal/coreaudio.cpp:581
+#: audio/internal/coreaudio.cpp:369 audio/internal/coreaudio.cpp:575
 #: audio/internal/sdl.cpp:191 audio/internal/sdl.cpp:209
 #: audio/internal/sdl.cpp:340 audio/internal/sdl.cpp:351
 #: audio/internal/sdl.cpp:371 audio/internal/faudio.cpp:508
@@ -27,11 +27,11 @@ msgstr ""
 msgid "Default device"
 msgstr "Типовий пристрій"
 
-#: audio/internal/coreaudio.cpp:381
+#: audio/internal/coreaudio.cpp:375
 msgid "Could not get CoreAudio device"
 msgstr "Неможливо отримати пристрій Core Audio."
 
-#: cmdevents.cpp:63 wxvbam.cpp:634
+#: cmdevents.cpp:63 wxvbam.cpp:640
 msgid "Could not create main window"
 msgstr "Неможливо створити головне вікно."
 
@@ -93,7 +93,7 @@ msgstr "Видалити всі збережені ігри імпортом б�
 msgid "Confirm import"
 msgstr "Підтвердити імпорт"
 
-#: cmdevents.cpp:519 panel.cpp:526
+#: cmdevents.cpp:519 panel.cpp:522
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Завантажено батарею %s."
@@ -176,7 +176,7 @@ msgstr "Помилка завантаження знімка %s."
 msgid "Wrote battery %s"
 msgstr "Записано батарею %s."
 
-#: cmdevents.cpp:721 panel.cpp:839
+#: cmdevents.cpp:721 panel.cpp:835
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Помилка запису батареї %s."
@@ -205,11 +205,11 @@ msgstr "Помилка збереження знімка %s."
 
 #: cmdevents.cpp:783 cmdevents.cpp:864 cmdevents.cpp:937 cmdevents.cpp:1009
 #: gfxviewers.cpp:1716 gfxviewers.cpp:1884 viewers.cpp:588 viewers.cpp:808
-#: viewsupt.cpp:1199
+#: viewsupt.cpp:1198
 msgid "Select output file"
 msgstr "Вибір кінцевого файлу"
 
-#: cmdevents.cpp:784 gfxviewers.cpp:1717 gfxviewers.cpp:1885 viewsupt.cpp:1200
+#: cmdevents.cpp:784 gfxviewers.cpp:1717 gfxviewers.cpp:1885 viewsupt.cpp:1199
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG-зображення|*.png|BMP-зображення|*.bmp"
 
@@ -348,37 +348,37 @@ msgstr "Скасувати призначення \"%s\" з \"%s\"?"
 msgid "Browse"
 msgstr "Огляд"
 
-#: dialogs/display-config.cpp:102
+#: dialogs/display-config.cpp:109
 msgid "Invalid value for Default magnification."
 msgstr "Недійсне значення типового збільшення."
 
-#: dialogs/display-config.cpp:469
+#: dialogs/display-config.cpp:476
 msgid "Invalid color correction profile"
 msgstr "Недійсний профіль виправлення кольору."
 
-#: dialogs/display-config.cpp:538 xrc/DisplayConfig.xrc:121
-#: xrc/DisplayConfig.xrc:171 xrc/DisplayConfig.xrc:427
+#: dialogs/display-config.cpp:547 xrc/DisplayConfig.xrc:119
+#: xrc/DisplayConfig.xrc:165 xrc/DisplayConfig.xrc:395
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:227 xrc/SoundConfig.xrc:317
 msgid "None"
 msgstr "Не вказано"
 
-#: dialogs/display-config.cpp:568
+#: dialogs/display-config.cpp:577
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Не знайдено придатних rpi-плаґінів у %s."
 
-#: dialogs/display-config.cpp:605 dialogs/display-config.cpp:684
-#: xrc/DisplayConfig.xrc:143
+#: dialogs/display-config.cpp:614 dialogs/display-config.cpp:693
+#: xrc/DisplayConfig.xrc:141
 msgid "Plugin"
 msgstr "Плаґін"
 
-#: dialogs/display-config.cpp:612
+#: dialogs/display-config.cpp:621
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "Використання піксельного фільтра: %s."
 
-#: dialogs/display-config.cpp:619
+#: dialogs/display-config.cpp:628
 #, c-format
 msgid "Using interframe blending: %s"
 msgstr "Використання міжкадрового змішування: %s."
@@ -444,93 +444,93 @@ msgstr "%02X (Не підтримувано)"
 msgid "%02X (Required)"
 msgstr "%02X (Необхідно)"
 
-#: dialogs/gb-rom-info.cpp:107 dialogs/gb-rom-info.cpp:141
+#: dialogs/gb-rom-info.cpp:105 dialogs/gb-rom-info.cpp:139
 #, c-format
 msgid "%02X (32 KiB)"
 msgstr "%02X (32 Кбайт)"
 
-#: dialogs/gb-rom-info.cpp:109 dialogs/gb-rom-info.cpp:145
+#: dialogs/gb-rom-info.cpp:107 dialogs/gb-rom-info.cpp:143
 #, c-format
 msgid "%02X (64 KiB)"
 msgstr "%02X (64 Кбайт)"
 
-#: dialogs/gb-rom-info.cpp:111 dialogs/gb-rom-info.cpp:143
+#: dialogs/gb-rom-info.cpp:109 dialogs/gb-rom-info.cpp:141
 #, c-format
 msgid "%02X (128 KiB)"
 msgstr "%02X (128 Кбайт)"
 
-#: dialogs/gb-rom-info.cpp:113
+#: dialogs/gb-rom-info.cpp:111
 #, c-format
 msgid "%02X (256 KiB)"
 msgstr "%02X (256 Кбайт)"
 
-#: dialogs/gb-rom-info.cpp:115
+#: dialogs/gb-rom-info.cpp:113
 #, c-format
 msgid "%02X (512 KiB)"
 msgstr "%02X (512 Кбайт)"
 
-#: dialogs/gb-rom-info.cpp:117
+#: dialogs/gb-rom-info.cpp:115
 #, c-format
 msgid "%02X (1 MiB)"
 msgstr "%02X (1 Мбайт)"
 
-#: dialogs/gb-rom-info.cpp:119
+#: dialogs/gb-rom-info.cpp:117
 #, c-format
 msgid "%02X (2 MiB)"
 msgstr "%02X (2 Мбайт)"
 
-#: dialogs/gb-rom-info.cpp:121
+#: dialogs/gb-rom-info.cpp:119
 #, c-format
 msgid "%02X (4 MiB)"
 msgstr "%02X (4 Мбайт)"
 
-#: dialogs/gb-rom-info.cpp:123 dialogs/gb-rom-info.cpp:147
-#: dialogs/gb-rom-info.cpp:159
+#: dialogs/gb-rom-info.cpp:121 dialogs/gb-rom-info.cpp:145
+#: dialogs/gb-rom-info.cpp:157
 #, c-format
 msgid "%02X (Unknown)"
 msgstr "%02X (Невідомо)"
 
-#: dialogs/gb-rom-info.cpp:131
+#: dialogs/gb-rom-info.cpp:129
 #, c-format
 msgid "%02X (None)"
 msgstr "%02X (Не вказано)"
 
-#: dialogs/gb-rom-info.cpp:133
+#: dialogs/gb-rom-info.cpp:131
 #, c-format
 msgid "%02X (256 B)"
 msgstr "%02X (256 байт)"
 
-#: dialogs/gb-rom-info.cpp:135
+#: dialogs/gb-rom-info.cpp:133
 #, c-format
 msgid "%02X (512 B)"
 msgstr "%02X (512 байт)"
 
-#: dialogs/gb-rom-info.cpp:137
+#: dialogs/gb-rom-info.cpp:135
 #, c-format
 msgid "%02X (2 KiB)"
 msgstr "%02X (2 Кбайт)"
 
-#: dialogs/gb-rom-info.cpp:139
+#: dialogs/gb-rom-info.cpp:137
 #, c-format
 msgid "%02X (8 KiB)"
 msgstr "%02X (8 Кбайт)"
 
-#: dialogs/gb-rom-info.cpp:155
+#: dialogs/gb-rom-info.cpp:153
 #, c-format
 msgid "%02X (Japan)"
 msgstr "%02X (Японія)"
 
-#: dialogs/gb-rom-info.cpp:157
+#: dialogs/gb-rom-info.cpp:155
 #, c-format
 msgid "%02X (World)"
 msgstr "%02X (Світ)"
 
-#: dialogs/gb-rom-info.cpp:201
+#: dialogs/gb-rom-info.cpp:198
 #, c-format
 msgid "%02X (Actual: %02X)"
 msgstr "%02X (Дійсний: %02X)"
 
-#: dialogs/gb-rom-info.cpp:204
+#: dialogs/gb-rom-info.cpp:201
 #, c-format
 msgid "%04X (Actual: %04X)"
 msgstr "%04X (Дійсний: %04X)"
@@ -626,7 +626,7 @@ msgstr "Вибір чітів"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Visual Boy Advance-чіти|*.clt|CHT-чіти|*.cht"
 
-#: guiinit.cpp:280 panel.cpp:583
+#: guiinit.cpp:280 panel.cpp:579
 msgid "Loaded cheats"
 msgstr "Завантажено чіти."
 
@@ -682,40 +682,40 @@ msgstr "Беззнакове десяткове"
 msgid "Unsigned hexadecimal"
 msgstr "Беззнакове шістнадцяткове"
 
-#: guiinit.cpp:1654
+#: guiinit.cpp:1655
 msgid "Main icon not found"
 msgstr "Головну піктограму не знайдено."
 
-#: guiinit.cpp:1672
+#: guiinit.cpp:1673
 msgid "Main display panel not found"
 msgstr "Головну панель дисплея не знайдено."
 
-#: guiinit.cpp:1964
+#: guiinit.cpp:1965
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Вилучено недійсний пункт меню %s."
 
-#: guiinit.cpp:2149
+#: guiinit.cpp:2150
 msgid "Code"
 msgstr "Код"
 
-#: guiinit.cpp:2158
+#: guiinit.cpp:2159
 msgid "Description"
 msgstr "Опис"
 
-#: guiinit.cpp:2232 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:2233 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Адреса"
 
-#: guiinit.cpp:2233
+#: guiinit.cpp:2234
 msgid "Old Value"
 msgstr "Старе значення"
 
-#: guiinit.cpp:2234
+#: guiinit.cpp:2235
 msgid "New Value"
 msgstr "Нове значення"
 
-#: guiinit.cpp:2454
+#: guiinit.cpp:2455
 msgid "JoyBus host invalid; disabling"
 msgstr "Вимкнено недійсний хост Joy Bus."
 
@@ -725,273 +725,273 @@ msgid ""
 " values may have been reset."
 msgstr "INI записано для новішої версії Visual Boy Advance-M. Можливе відновлення деяких значень INI-опцій."
 
-#: opts.cpp:326 opts.cpp:342 opts.cpp:499
+#: opts.cpp:326 opts.cpp:342 opts.cpp:500
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "Недійсна призначена кнопка %s для %s."
 
-#: opts.cpp:444 opts.cpp:453 opts.cpp:462 opts.cpp:471
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:514
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:525
+#: opts.cpp:445 opts.cpp:454 opts.cpp:463 opts.cpp:472
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:512
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:523
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr "Недійсне значення %s для опції %s."
 
-#: opts.cpp:505
+#: opts.cpp:506
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr "Невідома опція %s зі значенням %s."
 
-#: panel.cpp:240
+#: panel.cpp:236
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s - недійсний ROM."
 
-#: panel.cpp:241 panel.cpp:302 panel.cpp:375
+#: panel.cpp:237 panel.cpp:298 panel.cpp:371
 msgid "Problem loading file"
 msgstr "Проблема завантаження файлу."
 
-#: panel.cpp:301
+#: panel.cpp:297
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Неможливо завантажити Game Boy ROM %s."
 
-#: panel.cpp:326 panel.cpp:437 panel.cpp:1178
+#: panel.cpp:322 panel.cpp:433 panel.cpp:1174
 msgid "Could not initialize the sound driver!"
 msgstr "Неможливо визначити аудіодрайвер!"
 
-#: panel.cpp:337
+#: panel.cpp:333
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
 msgstr "Неможливо використати Game Boy BIOS при увімкненому колірному хаку, Game Boy BIOS вимкнено."
 
-#: panel.cpp:351 panel.cpp:450
+#: panel.cpp:347 panel.cpp:446
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Неможливо завантажити BIOS %s."
 
-#: panel.cpp:374
+#: panel.cpp:370
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Неможливо завантажити Game Boy Advance ROM %s."
 
-#: panel.cpp:620
+#: panel.cpp:616
 msgid " player "
 msgstr " гравець "
 
-#: panel.cpp:787
+#: panel.cpp:783
 #, c-format
 msgid "Loaded state %s"
 msgstr "Завантажено стан %s."
 
-#: panel.cpp:787
+#: panel.cpp:783
 #, c-format
 msgid "Error loading state %s"
 msgstr "Помилка завантаження стану %s."
 
-#: panel.cpp:811
+#: panel.cpp:807
 #, c-format
 msgid "Saved state %s"
 msgstr "Збережено стан %s."
 
-#: panel.cpp:811
+#: panel.cpp:807
 #, c-format
 msgid "Error saving state %s"
 msgstr "Помилка збереження стану %s."
 
-#: panel.cpp:1011
+#: panel.cpp:1007
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 msgstr "Непідтримуваний повний екран %d * %d - %d @ %d; пошук іншого."
 
-#: panel.cpp:1049
+#: panel.cpp:1045
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
 msgstr "Непідтримуваний повний екран %d * %d - %d @ %d."
 
-#: panel.cpp:1054
+#: panel.cpp:1050
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
 msgstr "Дійсний режим: %d * %d - %d @ %d."
 
-#: panel.cpp:1062
+#: panel.cpp:1058
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
 msgstr "Вибрано режим %d * %d - %d @ %d."
 
-#: panel.cpp:1066
+#: panel.cpp:1062
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr "Не вдалося змінити режим на %d * %d - %d @ %d."
 
-#: panel.cpp:1153
+#: panel.cpp:1149
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr "Недійсний Game Boy Advance-картридж."
 
-#: panel.cpp:1338
+#: panel.cpp:1334
 msgid "No memory for rewinding"
 msgstr "Відсутня пам'ять для звороту."
 
-#: panel.cpp:1348
+#: panel.cpp:1344
 msgid "Error writing rewind state"
 msgstr "Помилка запису стану звороту."
 
-#: panel.cpp:2341
+#: panel.cpp:2337
 msgid "Failed to set wayland display"
 msgstr "Не вдалося встановити Wayland-відображення."
 
-#: panel.cpp:2369
+#: panel.cpp:2365
 msgid "Failed to initialize SDL video subsystem"
 msgstr "Не вдалося визначити підсистему SDL-відео."
 
-#: panel.cpp:2380
+#: panel.cpp:2376
 msgid "Failed to initialize SDL video"
 msgstr "Не вдалося визначити SDL-відео."
 
-#: panel.cpp:2389
+#: panel.cpp:2385
 msgid "Failed to set wayland surface"
 msgstr "Не вдалося встановити Wayland-поверхню."
 
-#: panel.cpp:2402
+#: panel.cpp:2398
 msgid "Failed to set parent window"
 msgstr "Не вдалося встановити головне вікно."
 
-#: panel.cpp:2411
+#: panel.cpp:2407
 msgid "Failed to set OpenGL properties"
 msgstr "Не вдалося встановити властивості Open GL."
 
-#: panel.cpp:2424 panel.cpp:2458
+#: panel.cpp:2420 panel.cpp:2454
 msgid "Failed to create SDL window"
 msgstr "Не вдалося створити SDL-вікно."
 
-#: panel.cpp:2442 panel.cpp:2490
+#: panel.cpp:2438 panel.cpp:2486
 msgid "Failed to create SDL renderer"
 msgstr "Не вдалося створити SDL-опрацьовувач."
 
-#: panel.cpp:3058
+#: panel.cpp:3061
 msgid "Enabling EGL VSync."
 msgstr "Увімкнення вертикальної синхронізації EGL."
 
-#: panel.cpp:3060
+#: panel.cpp:3063
 msgid "Disabling EGL VSync."
 msgstr "Вимкнення вертикальної синхронізації EGL."
 
-#: panel.cpp:3067
+#: panel.cpp:3070
 msgid "Enabling GLX VSync."
 msgstr "Увімкнення вертикальної синхронізації GLX."
 
-#: panel.cpp:3069
+#: panel.cpp:3072
 msgid "Disabling GLX VSync."
 msgstr "Вимкнення вертикальної синхронізації GLX."
 
-#: panel.cpp:3087
+#: panel.cpp:3090
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Не вдалося встановити glXSwapIntervalEXT."
 
-#: panel.cpp:3096
+#: panel.cpp:3099
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Не вдалося встановити glXSwapIntervalSGI."
 
-#: panel.cpp:3105
+#: panel.cpp:3108
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Не вдалося встановити glXSwapIntervalMESA."
 
-#: panel.cpp:3112
+#: panel.cpp:3115
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "Відсутня підтримка wglGetExtensionsStringEXT."
 
-#: panel.cpp:3115
+#: panel.cpp:3118
 msgid "No support for WGL_EXT_swap_control"
 msgstr "Відсутня підтримка WGL_EXT_swap_control."
 
-#: panel.cpp:3124
+#: panel.cpp:3127
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Не вдалося встановити wglSwapIntervalEXT."
 
-#: panel.cpp:3130
+#: panel.cpp:3133
 msgid "No VSYNC available on this platform"
 msgstr "Вертикальна синхронізація недоступна для платформи."
 
-#: panel.cpp:3229
+#: panel.cpp:3233
 msgid "Failed to load d3d9.dll"
 msgstr "Не вдалося завантажити d3d9.dll."
 
-#: panel.cpp:3238
+#: panel.cpp:3242
 msgid "Failed to create Direct3D 9 interface"
 msgstr "Не вдалося створити інтерфейс Direct 3D 9."
 
-#: panel.cpp:3248
+#: panel.cpp:3252
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr "Не вдалося отримати режим відображення адаптера: 0x%08X."
 
-#: panel.cpp:3312
+#: panel.cpp:3316
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr "Не вдалося створити Direct 3D-пристрій: 0x%08X."
 
-#: panel.cpp:3372
+#: panel.cpp:3376
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr "Не вдалося отримати режим відображення адаптера для перезавантаження: 0x%08X."
 
-#: panel.cpp:3423
+#: panel.cpp:3427
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr "Не вдалося перезавантажити Direct 3D-пристрій: 0x%08X."
 
-#: panel.cpp:3495
+#: panel.cpp:3499
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr "Не вдалося створити текстуру: 0x%08X."
 
-#: panel.cpp:3507
+#: panel.cpp:3511
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr "Не вдалося заблокувати текстуру: 0x%08X."
 
-#: panel.cpp:3691
+#: panel.cpp:3698
 msgid "Memory allocation error"
 msgstr "Помилка розподілу пам'яті."
 
-#: panel.cpp:3694
+#: panel.cpp:3701
 msgid "Error initializing codec"
 msgstr "Помилка визначення кодека."
 
-#: panel.cpp:3697
+#: panel.cpp:3704
 msgid "Error writing to output file"
 msgstr "Помилка запису до кінцевого файлу."
 
-#: panel.cpp:3700
+#: panel.cpp:3707
 msgid "Can't guess output format from file name"
 msgstr "Неможливо визначити кінцевий формат імені файлу."
 
-#: panel.cpp:3705
+#: panel.cpp:3712
 msgid "Programming error; aborting!"
 msgstr "Програмна помилка; перервано!"
 
-#: panel.cpp:3717 panel.cpp:3746
+#: panel.cpp:3724 panel.cpp:3753
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Неможливо почати запис до %s (%s)."
 
-#: panel.cpp:3774
+#: panel.cpp:3781
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "Помилка аудіо- / відеозапису (%s); перервано."
 
-#: panel.cpp:3780
+#: panel.cpp:3787
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Помилка аудіозапису (%s); перервано."
 
-#: panel.cpp:3790
+#: panel.cpp:3797
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Помилка відеозапису (%s); перервано."
 
-#: panel.cpp:3981
+#: panel.cpp:3988
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Гучність: %d %%"
@@ -1078,15 +1078,15 @@ msgstr "Дампи пам'яті|*.dmp;*.bin|"
 msgid "Select memory dump file"
 msgstr "Вибір дампа пам'яті"
 
-#: viewsupt.cpp:789
+#: viewsupt.cpp:788
 msgid "Red:"
 msgstr "Червоний:"
 
-#: viewsupt.cpp:798
+#: viewsupt.cpp:797
 msgid "Green:"
 msgstr "Зелений:"
 
-#: viewsupt.cpp:807
+#: viewsupt.cpp:806
 msgid "Blue:"
 msgstr "Синій:"
 
@@ -1095,76 +1095,76 @@ msgstr "Синій:"
 msgid "Unable to load dialog %s from resources"
 msgstr "Неможливо завантажити вікно %s з ресурсів."
 
-#: wxvbam.cpp:449 wxvbam.cpp:466
+#: wxvbam.cpp:457 wxvbam.cpp:474
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "Надано недійсний файл конфігурації: %s."
 
-#: wxvbam.cpp:716
+#: wxvbam.cpp:722
 msgid "Save built-in XRC file and exit"
 msgstr "Зберегти вбудований XRC та вийти"
 
-#: wxvbam.cpp:719
+#: wxvbam.cpp:725
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Зберегти вбудований vba-over.ini та вийти"
 
-#: wxvbam.cpp:722
+#: wxvbam.cpp:728
 msgid "Print configuration path and exit"
 msgstr "Роздрукувати шлях конфігурації та вийти"
 
-#: wxvbam.cpp:725
+#: wxvbam.cpp:731
 msgid "Start in full-screen mode"
 msgstr "Запускати в повному екрані"
 
-#: wxvbam.cpp:728
+#: wxvbam.cpp:734
 msgid "Set a configuration file"
 msgstr "Встановити файл конфігурації"
 
-#: wxvbam.cpp:732
+#: wxvbam.cpp:738
 msgid "Delete shared link state first, if it exists"
 msgstr "Видалити спочатку стан загального з'єднання за наявності"
 
-#: wxvbam.cpp:739
+#: wxvbam.cpp:745
 msgid "List all settable options and exit"
 msgstr "Показати всі налаштовувані опції та вийти"
 
-#: wxvbam.cpp:742
+#: wxvbam.cpp:748
 msgid "ROM file"
 msgstr "ROM-файл"
 
-#: wxvbam.cpp:744
+#: wxvbam.cpp:750
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:775
+#: wxvbam.cpp:781
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "Помилка конфігурації / випуску: неможливо знайти вбудований xrc."
 
-#: wxvbam.cpp:783
+#: wxvbam.cpp:789
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Записано вбудовану конфігурацію до %s.\nДля перевизначення вилучи всі вузли, крім змінених кореневих. Перший знайдений кореневий вузол із правильним іменем у будь-якому файлі .xrc чи .xrs у наведених шляхах пошуку перевизначає вбудований:"
 
-#: wxvbam.cpp:797
+#: wxvbam.cpp:803
 msgid "Configuration is read from, in order:"
 msgstr "Конфігурацію прочитано з файлів за порядком:"
 
-#: wxvbam.cpp:811
+#: wxvbam.cpp:817
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "Записано вбудоване перевизначення файлу до %s.\nДля перевизначення видали всі розділи, крім змінених. Перший знайдений розділ буде використано зі шляху пошуку:"
 
-#: wxvbam.cpp:817
+#: wxvbam.cpp:823
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tвбудовано"
 
-#: wxvbam.cpp:832
+#: wxvbam.cpp:838
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1172,17 +1172,17 @@ msgid ""
 "\n"
 msgstr "Опції, встановлені з командного рядка, буде збережено при зміні конфігурації інтерфейсу користувача.\n\nДля позначення значення \"істина\" та \"хиба\" вказуються як 1 і 0 відповідно.\n\n"
 
-#: wxvbam.cpp:840
+#: wxvbam.cpp:846
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Доступні команди для опцій клавіатури:\n"
 
-#: wxvbam.cpp:852
+#: wxvbam.cpp:858
 msgid "Configuration file not found."
 msgstr "Файл конфігурації не знайдено."
 
-#: wxvbam.cpp:883
+#: wxvbam.cpp:889
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Неправильна опція конфігурації чи вибрано декілька ROM'ів:\n"
 
@@ -1271,7 +1271,7 @@ msgid "Auto B"
 msgstr "B-Turbo"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
-#: xrc/DisplayConfig.xrc:405
+#: xrc/DisplayConfig.xrc:332
 msgid "Speed"
 msgstr "Швидкість"
 
@@ -1764,13 +1764,13 @@ msgstr "Зовнішні переклади"
 msgid "Invalid value %s for option %s; valid values are %s"
 msgstr "Недійсне значення %s для опції %s; дійсні значення: %s."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:341
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:340
 #, c-format
 msgid "Invalid value %f for option %s; valid values are %f - %f"
 msgstr "Недійсне значення %f для опції %s; дійсні значення: %f - %f."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:356
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:371
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:355
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:370
 #, c-format
 msgid "Invalid value %d for option %s; valid values are %d - %d"
 msgstr "Недійсне значення %d для опції %s; дійсні значення: %d - %d."
@@ -1936,42 +1936,42 @@ msgstr "Meta+"
 msgid "Joystick %d"
 msgstr "Джойстик %d"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:268
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:267
 #, c-format
 msgid "%s: Axis %d+"
 msgstr "%s: Вісь %d+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:270
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:269
 #, c-format
 msgid "%s: Axis %d-"
 msgstr "%s: Вісь %d-"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:272
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:271
 #, c-format
 msgid "%s: Button %d"
 msgstr "%s: Кнопка %d"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:274
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:273
 #, c-format
 msgid "%s: Hat %d North"
 msgstr "%s: Капелюх %d ↑"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:276
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:275
 #, c-format
 msgid "%s: Hat %d South"
 msgstr "%s: Капелюх %d ↓"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:278
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:277
 #, c-format
 msgid "%s: Hat %d West"
 msgstr "%s: Капелюх %d ←"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:280
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:279
 #, c-format
 msgid "%s: Hat %d East"
 msgstr "%s: Капелюх %d →"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:315
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:313
 msgid "Key"
 msgstr "Кнопка"
 
@@ -2047,93 +2047,93 @@ msgstr "XAudio2: Не вдалося створити основний голо�
 msgid "XAudio2: Creating source voice failed!"
 msgstr "XAudio2: Не вдалося створити голос-джерело!"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:680
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:681
 msgid "Error, link already connected"
 msgstr "Помилка, посилання вже з'єднано."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:694
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:695
 msgid "Unable to find link driver"
 msgstr "Неможливо знайти драйвер посилання."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:737
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:738
 msgid "Link connection does not need updates."
 msgstr "З'єднання за посиланням не потребує оновлення."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:876
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:940
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1594
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2926
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:877
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:941
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1595
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2932
 #, c-format
 msgid "Player %d disconnected."
 msgstr "Гравця %d роз'єднано."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:980
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1020
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1060
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1703
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:981
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1021
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1061
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1704
 msgid "Server disconnected."
 msgstr "Сервер роз'єднано."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1151
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1182
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1727
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1759
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1152
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1183
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1728
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1760
 msgid "Network error."
 msgstr "Помилка мережі."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1159
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1735
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1160
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1736
 #, c-format
 msgid "Player %d connected"
 msgstr "Гравця %d з'єднано."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1173
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1749
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1174
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1750
 msgid "All players connected"
 msgstr "Усіх гравців з'єднано."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1194
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1771
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1195
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1772
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
 msgstr "З'єднано як %d, очікування приєднання %d гравців."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1203
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1780
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1204
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1781
 msgid "All players joined."
 msgstr "Усіх гравців приєднано."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1696
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1697
 msgid "Server timed out."
 msgstr "Час очікування сервера минув."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2649
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2670
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2655
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2676
 msgid "Error creating file mapping"
 msgstr "Помилка створення відображення файлів."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2660
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2666
 msgid "Error mapping file"
 msgstr "Помилка відображення файлу."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2707
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2713
 msgid "5 or more GBAs not supported."
 msgstr "5+ GBA непідтримувані."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2726
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2745
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2732
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2751
 msgid "Error opening event"
 msgstr "Помилка відкриття події."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2845
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2851
 msgid "Lost link; reinitialize to reconnect"
 msgstr "Втрачено посилання; перевизначення для перез'єднання."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2852
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2858
 msgid "Lost link; reconnected"
 msgstr "Втрачено посилання; перез'єднання."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2973
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2979
 msgid "Unknown slave timed out; resetting comm"
 msgstr "Час очікування невідомого підпорядкування минув; перезавантаження зв'язку."
 
@@ -2395,193 +2395,193 @@ msgstr "&Наступний"
 msgid "Display settings"
 msgstr "Налаштування відображення"
 
-#: xrc/DisplayConfig.xrc:16
-msgid "Output module"
-msgstr "Кінцевий модуль"
-
-#: xrc/DisplayConfig.xrc:29
-msgid "Simple"
-msgstr "Simple"
-
-#: xrc/DisplayConfig.xrc:77
-msgid "SDL Renderer:"
-msgstr "SDL-опрацьовувач:"
-
-#: xrc/DisplayConfig.xrc:90
-msgid "SDL Pixel Art Filter"
-msgstr "SDL-фільтр піксельної графіки"
-
-#: xrc/DisplayConfig.xrc:101
-msgid "Filters"
-msgstr "Фільтри"
-
-#: xrc/DisplayConfig.xrc:113
-msgid "Display filter:"
-msgstr "Фільтр відображення:"
-
-#: xrc/DisplayConfig.xrc:123
-msgid "Super 2xSaI"
-msgstr "Super 2xSaI"
-
-#: xrc/DisplayConfig.xrc:124
-msgid "Super Eagle"
-msgstr "Super Eagle"
-
-#: xrc/DisplayConfig.xrc:125
-msgid "Pixelate"
-msgstr "Pixelate"
-
-#: xrc/DisplayConfig.xrc:126
-msgid "Advance MAME Scale 2x"
-msgstr "Advance MAME Scale 2x"
-
-#: xrc/DisplayConfig.xrc:127
-msgid "Bilinear"
-msgstr "Bilinear"
-
-#: xrc/DisplayConfig.xrc:128
-msgid "Bilinear Plus"
-msgstr "Bilinear Plus"
-
-#: xrc/DisplayConfig.xrc:129
-msgid "Scanlines"
-msgstr "Scanlines"
-
-#: xrc/DisplayConfig.xrc:130
-msgid "TV Mode"
-msgstr "TV Mode"
-
-#: xrc/DisplayConfig.xrc:133
-msgid "Simple 2x"
-msgstr "Simple 2x"
-
-#: xrc/DisplayConfig.xrc:134
-msgid "Simple 3x"
-msgstr "Simple 3x"
-
-#: xrc/DisplayConfig.xrc:136
-msgid "Simple 4x"
-msgstr "Simple 4x"
-
-#: xrc/DisplayConfig.xrc:151
-msgid "Plugin:"
-msgstr "Плаґін:"
-
-#: xrc/DisplayConfig.xrc:163
-msgid "Interframe blending:"
-msgstr "Міжкадрове накладання:"
-
-#: xrc/DisplayConfig.xrc:172
-msgid "Smart"
-msgstr "Розумне"
-
-#: xrc/DisplayConfig.xrc:173
-msgid "Motion Blur"
-msgstr "Міжкадрове розмиття"
-
-#: xrc/DisplayConfig.xrc:185 xrc/SoundConfig.xrc:93
+#: xrc/DisplayConfig.xrc:12 xrc/SoundConfig.xrc:93
 msgid "Basic"
 msgstr "Основні"
 
-#: xrc/DisplayConfig.xrc:195
-msgid "Bit Depth:"
-msgstr "Бітова глибина:"
+#: xrc/DisplayConfig.xrc:23
+msgid "Output module"
+msgstr "Кінцевий модуль"
 
-#: xrc/DisplayConfig.xrc:201
-msgid "8"
-msgstr "8"
+#: xrc/DisplayConfig.xrc:33
+msgid "Simple"
+msgstr "Simple"
 
-#: xrc/DisplayConfig.xrc:202
-msgid "16"
-msgstr "16"
+#: xrc/DisplayConfig.xrc:74
+msgid "SDL Renderer:"
+msgstr "SDL-опрацьовувач:"
 
-#: xrc/DisplayConfig.xrc:203
-msgid "24"
-msgstr "24"
+#: xrc/DisplayConfig.xrc:83
+msgid "SDL Pixel Art Filter"
+msgstr "SDL-фільтр піксельної графіки"
 
-#: xrc/DisplayConfig.xrc:204
-msgid "32"
-msgstr "32"
+#: xrc/DisplayConfig.xrc:97
+msgid "Filters"
+msgstr "Фільтри"
 
-#: xrc/DisplayConfig.xrc:214
+#: xrc/DisplayConfig.xrc:112
+msgid "Display filter:"
+msgstr "Фільтр відображення:"
+
+#: xrc/DisplayConfig.xrc:121
+msgid "Super 2xSaI"
+msgstr "Super 2xSaI"
+
+#: xrc/DisplayConfig.xrc:122
+msgid "Super Eagle"
+msgstr "Super Eagle"
+
+#: xrc/DisplayConfig.xrc:123
+msgid "Pixelate"
+msgstr "Pixelate"
+
+#: xrc/DisplayConfig.xrc:124
+msgid "Advance MAME Scale 2x"
+msgstr "Advance MAME Scale 2x"
+
+#: xrc/DisplayConfig.xrc:125
+msgid "Bilinear"
+msgstr "Bilinear"
+
+#: xrc/DisplayConfig.xrc:126
+msgid "Bilinear Plus"
+msgstr "Bilinear Plus"
+
+#: xrc/DisplayConfig.xrc:127
+msgid "Scanlines"
+msgstr "Scanlines"
+
+#: xrc/DisplayConfig.xrc:128
+msgid "TV Mode"
+msgstr "TV Mode"
+
+#: xrc/DisplayConfig.xrc:131
+msgid "Simple 2x"
+msgstr "Simple 2x"
+
+#: xrc/DisplayConfig.xrc:132
+msgid "Simple 3x"
+msgstr "Simple 3x"
+
+#: xrc/DisplayConfig.xrc:134
+msgid "Simple 4x"
+msgstr "Simple 4x"
+
+#: xrc/DisplayConfig.xrc:148
+msgid "Plugin:"
+msgstr "Плаґін:"
+
+#: xrc/DisplayConfig.xrc:158
+msgid "Interframe blending:"
+msgstr "Міжкадрове накладання:"
+
+#: xrc/DisplayConfig.xrc:166
+msgid "Smart"
+msgstr "Розумне"
+
+#: xrc/DisplayConfig.xrc:167
+msgid "Motion Blur"
+msgstr "Міжкадрове розмиття"
+
+#: xrc/DisplayConfig.xrc:179
 msgid "Bit Depth"
 msgstr "Бітова глибина"
 
-#: xrc/DisplayConfig.xrc:224
-msgid "Profile:"
-msgstr "Профіль:"
+#: xrc/DisplayConfig.xrc:188
+msgid "Bit Depth:"
+msgstr "Бітова глибина:"
 
-#: xrc/DisplayConfig.xrc:264
-msgid "GBA Darken:"
-msgstr "Затемнення Game Boy Advance: "
+#: xrc/DisplayConfig.xrc:196
+msgid "8"
+msgstr "8"
 
-#: xrc/DisplayConfig.xrc:282
-msgid "Lighter"
-msgstr "Світліше"
+#: xrc/DisplayConfig.xrc:197
+msgid "16"
+msgstr "16"
 
-#: xrc/DisplayConfig.xrc:293
-msgid "Very Dark"
-msgstr "Дуже темно"
+#: xrc/DisplayConfig.xrc:198
+msgid "24"
+msgstr "24"
 
-#: xrc/DisplayConfig.xrc:310
-msgid "GBC Lighten:"
-msgstr "Освітлення Game Boy Color: "
+#: xrc/DisplayConfig.xrc:199
+msgid "32"
+msgstr "32"
 
-#: xrc/DisplayConfig.xrc:328
-msgid "Darker"
-msgstr "Темніше"
-
-#: xrc/DisplayConfig.xrc:339
-msgid "Very Light"
-msgstr "Дуже світло"
-
-#: xrc/DisplayConfig.xrc:357
+#: xrc/DisplayConfig.xrc:207
 msgid "Color Correction"
 msgstr "Виправлення кольору"
 
-#: xrc/DisplayConfig.xrc:365
+#: xrc/DisplayConfig.xrc:216
+msgid "Profile:"
+msgstr "Профіль:"
+
+#: xrc/DisplayConfig.xrc:250
+msgid "GBA Darken:"
+msgstr "Затемнення Game Boy Advance: "
+
+#: xrc/DisplayConfig.xrc:269
+msgid "Lighter"
+msgstr "Світліше"
+
+#: xrc/DisplayConfig.xrc:280
+msgid "Very Dark"
+msgstr "Дуже темно"
+
+#: xrc/DisplayConfig.xrc:291
+msgid "GBC Lighten:"
+msgstr "Освітлення Game Boy Color: "
+
+#: xrc/DisplayConfig.xrc:310
+msgid "Darker"
+msgstr "Темніше"
+
+#: xrc/DisplayConfig.xrc:321
+msgid "Very Light"
+msgstr "Дуже світло"
+
+#: xrc/DisplayConfig.xrc:338
 msgid "Frame Skip"
 msgstr "Пропуск кадрів"
 
-#: xrc/DisplayConfig.xrc:383
+#: xrc/DisplayConfig.xrc:356
 msgid "&Number of frames to skip:"
 msgstr "&Кількість кадрів для пропуску:"
 
-#: xrc/DisplayConfig.xrc:421
-msgid "Speed indicator:"
-msgstr "Указівник швидкості:"
-
-#: xrc/DisplayConfig.xrc:428
-msgid "Percentage"
-msgstr "Проценти"
-
-#: xrc/DisplayConfig.xrc:429
-msgid "Detailed"
-msgstr "Докладний"
-
-#: xrc/DisplayConfig.xrc:443
+#: xrc/DisplayConfig.xrc:380
 msgid "On-Screen Display"
 msgstr "Екранне відображення"
 
-#: xrc/DisplayConfig.xrc:453
+#: xrc/DisplayConfig.xrc:387
+msgid "Speed indicator:"
+msgstr "Указівник швидкості:"
+
+#: xrc/DisplayConfig.xrc:396
+msgid "Percentage"
+msgstr "Проценти"
+
+#: xrc/DisplayConfig.xrc:397
+msgid "Detailed"
+msgstr "Докладний"
+
+#: xrc/DisplayConfig.xrc:405
+msgid "Zoom"
+msgstr "Масштабувати"
+
+#: xrc/DisplayConfig.xrc:415
 msgid "Default magnification:"
 msgstr "Типове збільшення:"
 
-#: xrc/DisplayConfig.xrc:472
+#: xrc/DisplayConfig.xrc:433
 msgid "Maximum magnification factor:"
 msgstr "Максимальний коефіцієнт збільшення:"
 
-#: xrc/DisplayConfig.xrc:473
+#: xrc/DisplayConfig.xrc:434
 msgid "0 = no maximum"
 msgstr "0: не максимум"
 
-#: xrc/DisplayConfig.xrc:481
+#: xrc/DisplayConfig.xrc:441
 msgid "0 = no limit"
 msgstr "0: без обмежень"
-
-#: xrc/DisplayConfig.xrc:491
-msgid "Zoom"
-msgstr "Масштабувати"
 
 #: xrc/ExportSPS.xrc:10
 msgid "Title:"
