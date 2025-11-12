@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-11 18:00+0000\n"
+"POT-Creation-Date: 2025-11-12 23:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Ds886 <daniel.ashkenazi@gmail.com>, 2022\n"
 "Language-Team: Hebrew (Israel) (http://app.transifex.com/bgk/vba-m/language/he_IL/)\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Language: he_IL\n"
 "Plural-Forms: nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;\n"
 
-#: audio/internal/coreaudio.cpp:369 audio/internal/coreaudio.cpp:575
+#: audio/internal/coreaudio.cpp:387 audio/internal/coreaudio.cpp:597
 #: audio/internal/sdl.cpp:191 audio/internal/sdl.cpp:209
 #: audio/internal/sdl.cpp:340 audio/internal/sdl.cpp:351
 #: audio/internal/sdl.cpp:371 audio/internal/faudio.cpp:508
@@ -27,8 +27,18 @@ msgstr ""
 msgid "Default device"
 msgstr "מכשיר ברירת מחדל"
 
-#: audio/internal/coreaudio.cpp:375
+#: audio/internal/coreaudio.cpp:393
 msgid "Could not get CoreAudio device"
+msgstr ""
+
+#: audio/internal/coreaudio.cpp:440
+#, c-format
+msgid "Failed to allocate CoreAudio buffer %d: error %d"
+msgstr ""
+
+#: audio/internal/coreaudio.cpp:452
+#, c-format
+msgid "Failed to start CoreAudio queue: error %d"
 msgstr ""
 
 #: cmdevents.cpp:63 wxvbam.cpp:640
@@ -837,161 +847,161 @@ msgstr "אין זכרון עבור החזרה לאחורה"
 msgid "Error writing rewind state"
 msgstr "קרתה שגיאה בעת כתיבת מצב זכרון של חזרה אחורה"
 
-#: panel.cpp:2337
+#: panel.cpp:2336
 msgid "Failed to set wayland display"
 msgstr ""
 
-#: panel.cpp:2365
+#: panel.cpp:2364
 msgid "Failed to initialize SDL video subsystem"
 msgstr ""
 
-#: panel.cpp:2376
+#: panel.cpp:2375
 msgid "Failed to initialize SDL video"
 msgstr ""
 
-#: panel.cpp:2385
+#: panel.cpp:2384
 msgid "Failed to set wayland surface"
 msgstr ""
 
-#: panel.cpp:2398
+#: panel.cpp:2397
 msgid "Failed to set parent window"
 msgstr ""
 
-#: panel.cpp:2407
+#: panel.cpp:2406
 msgid "Failed to set OpenGL properties"
 msgstr ""
 
-#: panel.cpp:2420 panel.cpp:2454
+#: panel.cpp:2419 panel.cpp:2453
 msgid "Failed to create SDL window"
 msgstr ""
 
-#: panel.cpp:2438 panel.cpp:2486
+#: panel.cpp:2437 panel.cpp:2485
 msgid "Failed to create SDL renderer"
 msgstr ""
 
-#: panel.cpp:3061
+#: panel.cpp:3064
 msgid "Enabling EGL VSync."
 msgstr ""
 
-#: panel.cpp:3063
+#: panel.cpp:3066
 msgid "Disabling EGL VSync."
 msgstr ""
 
-#: panel.cpp:3070
+#: panel.cpp:3073
 msgid "Enabling GLX VSync."
 msgstr ""
 
-#: panel.cpp:3072
+#: panel.cpp:3075
 msgid "Disabling GLX VSync."
 msgstr ""
 
-#: panel.cpp:3090
+#: panel.cpp:3093
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "קרתה שגיאה בעת קביעת glXSwapIntervalEXT"
 
-#: panel.cpp:3099
+#: panel.cpp:3102
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "קרתה שגיאה בעת קביעת glXSwapIntervalSGI"
 
-#: panel.cpp:3108
+#: panel.cpp:3111
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "קרתה שגיאה בעת קביעת glXSwapIntervalMESA"
 
-#: panel.cpp:3115
+#: panel.cpp:3118
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "אין תמיכה ב-‎wglGetExtensionsStringEXT"
 
-#: panel.cpp:3118
+#: panel.cpp:3121
 msgid "No support for WGL_EXT_swap_control"
 msgstr "אין תמיכה עבור WGL_EXT_swap_control"
 
-#: panel.cpp:3127
+#: panel.cpp:3130
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "קרתה שגיאה בעת קביעת wglSwapIntervalEXT"
 
-#: panel.cpp:3133
+#: panel.cpp:3136
 msgid "No VSYNC available on this platform"
 msgstr "אף VSYNC איננו זמין על פלטפורמה זו"
 
-#: panel.cpp:3233
+#: panel.cpp:3236
 msgid "Failed to load d3d9.dll"
 msgstr ""
 
-#: panel.cpp:3242
+#: panel.cpp:3245
 msgid "Failed to create Direct3D 9 interface"
 msgstr ""
 
-#: panel.cpp:3252
+#: panel.cpp:3255
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3316
+#: panel.cpp:3319
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3376
+#: panel.cpp:3379
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3427
+#: panel.cpp:3430
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3499
+#: panel.cpp:3502
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3511
+#: panel.cpp:3514
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3698
+#: panel.cpp:3705
 msgid "Memory allocation error"
 msgstr ""
 
-#: panel.cpp:3701
+#: panel.cpp:3708
 msgid "Error initializing codec"
 msgstr ""
 
-#: panel.cpp:3704
+#: panel.cpp:3711
 msgid "Error writing to output file"
 msgstr ""
 
-#: panel.cpp:3707
+#: panel.cpp:3714
 msgid "Can't guess output format from file name"
 msgstr ""
 
-#: panel.cpp:3712
+#: panel.cpp:3719
 msgid "Programming error; aborting!"
 msgstr ""
 
-#: panel.cpp:3724 panel.cpp:3753
+#: panel.cpp:3731 panel.cpp:3760
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "לא יכל להתחיל הקלטה  עבור %s (%s)"
 
-#: panel.cpp:3781
+#: panel.cpp:3788
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr ""
 
-#: panel.cpp:3787
+#: panel.cpp:3794
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "קרתה שגיאה בעת הקלטת הקול (%s); מבטל"
 
-#: panel.cpp:3797
+#: panel.cpp:3804
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "קרתה שגיאה בעת הקלטת הוידאו (%s); מבטל"
 
-#: panel.cpp:3988
+#: panel.cpp:3995
 #, c-format
 msgid "Volume: %d %%"
 msgstr ""

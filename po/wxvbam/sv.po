@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-11 18:00+0000\n"
+"POT-Creation-Date: 2025-11-12 23:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>, 2025\n"
 "Language-Team: Swedish (http://app.transifex.com/bgk/vba-m/language/sv/)\n"
@@ -26,7 +26,7 @@ msgstr ""
 "Language: sv\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: audio/internal/coreaudio.cpp:369 audio/internal/coreaudio.cpp:575
+#: audio/internal/coreaudio.cpp:387 audio/internal/coreaudio.cpp:597
 #: audio/internal/sdl.cpp:191 audio/internal/sdl.cpp:209
 #: audio/internal/sdl.cpp:340 audio/internal/sdl.cpp:351
 #: audio/internal/sdl.cpp:371 audio/internal/faudio.cpp:508
@@ -34,9 +34,19 @@ msgstr ""
 msgid "Default device"
 msgstr "Standardenhet"
 
-#: audio/internal/coreaudio.cpp:375
+#: audio/internal/coreaudio.cpp:393
 msgid "Could not get CoreAudio device"
 msgstr "Kunde inte få CoreAudio-enhet"
+
+#: audio/internal/coreaudio.cpp:440
+#, c-format
+msgid "Failed to allocate CoreAudio buffer %d: error %d"
+msgstr ""
+
+#: audio/internal/coreaudio.cpp:452
+#, c-format
+msgid "Failed to start CoreAudio queue: error %d"
+msgstr ""
 
 #: cmdevents.cpp:63 wxvbam.cpp:640
 msgid "Could not create main window"
@@ -844,161 +854,161 @@ msgstr "Inget minne för återspolning"
 msgid "Error writing rewind state"
 msgstr "Fel vid skrivande av återspolningstillstånd"
 
-#: panel.cpp:2337
+#: panel.cpp:2336
 msgid "Failed to set wayland display"
 msgstr "Misslyckades med att ställa in wayland display"
 
-#: panel.cpp:2365
+#: panel.cpp:2364
 msgid "Failed to initialize SDL video subsystem"
 msgstr "Det gick inte att initialisera SDL-videosubsystemet."
 
-#: panel.cpp:2376
+#: panel.cpp:2375
 msgid "Failed to initialize SDL video"
 msgstr "Det gick inte att initialisera SDL-video"
 
-#: panel.cpp:2385
+#: panel.cpp:2384
 msgid "Failed to set wayland surface"
 msgstr "Misslyckades med att ställa in wayland surface"
 
-#: panel.cpp:2398
+#: panel.cpp:2397
 msgid "Failed to set parent window"
 msgstr "Misslyckades med att ställa in överordnat fönster"
 
-#: panel.cpp:2407
+#: panel.cpp:2406
 msgid "Failed to set OpenGL properties"
 msgstr "Misslyckades med att ställa in OpenGL-egenskaper"
 
-#: panel.cpp:2420 panel.cpp:2454
+#: panel.cpp:2419 panel.cpp:2453
 msgid "Failed to create SDL window"
 msgstr "Misslyckades med att skapa SDL-fönster"
 
-#: panel.cpp:2438 panel.cpp:2486
+#: panel.cpp:2437 panel.cpp:2485
 msgid "Failed to create SDL renderer"
 msgstr "Misslyckades med att skapa SDL-renderare"
 
-#: panel.cpp:3061
+#: panel.cpp:3064
 msgid "Enabling EGL VSync."
 msgstr "Aktiverar EGL VSync."
 
-#: panel.cpp:3063
+#: panel.cpp:3066
 msgid "Disabling EGL VSync."
 msgstr "Inaktiverar EGL VSync."
 
-#: panel.cpp:3070
+#: panel.cpp:3073
 msgid "Enabling GLX VSync."
 msgstr "Aktiverar GLX VSync."
 
-#: panel.cpp:3072
+#: panel.cpp:3075
 msgid "Disabling GLX VSync."
 msgstr "Inaktiverar GLX VSync."
 
-#: panel.cpp:3090
+#: panel.cpp:3093
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Misslyckades sätta glXSwapIntervalEXT"
 
-#: panel.cpp:3099
+#: panel.cpp:3102
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Misslyckades sätta glXSwapIntervalSGI"
 
-#: panel.cpp:3108
+#: panel.cpp:3111
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Misslyckades sätta glXSwapIntervalMESA"
 
-#: panel.cpp:3115
+#: panel.cpp:3118
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "Inget stöd för wglGetExtensionsStringEXT"
 
-#: panel.cpp:3118
+#: panel.cpp:3121
 msgid "No support for WGL_EXT_swap_control"
 msgstr "Inget stöd för WGL_EXT_swap_control"
 
-#: panel.cpp:3127
+#: panel.cpp:3130
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Misslyckades sätta wglSwapIntervalEXT"
 
-#: panel.cpp:3133
+#: panel.cpp:3136
 msgid "No VSYNC available on this platform"
 msgstr "Ingen VSYNC tillgänglig på denna plattform"
 
-#: panel.cpp:3233
+#: panel.cpp:3236
 msgid "Failed to load d3d9.dll"
 msgstr ""
 
-#: panel.cpp:3242
+#: panel.cpp:3245
 msgid "Failed to create Direct3D 9 interface"
 msgstr ""
 
-#: panel.cpp:3252
+#: panel.cpp:3255
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3316
+#: panel.cpp:3319
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3376
+#: panel.cpp:3379
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3427
+#: panel.cpp:3430
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3499
+#: panel.cpp:3502
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3511
+#: panel.cpp:3514
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3698
+#: panel.cpp:3705
 msgid "Memory allocation error"
 msgstr "Fel vid minnesallokering"
 
-#: panel.cpp:3701
+#: panel.cpp:3708
 msgid "Error initializing codec"
 msgstr "Fel vid initiering av kodek"
 
-#: panel.cpp:3704
+#: panel.cpp:3711
 msgid "Error writing to output file"
 msgstr "Fel vid skrivning till utdatafil"
 
-#: panel.cpp:3707
+#: panel.cpp:3714
 msgid "Can't guess output format from file name"
 msgstr "Kan inte gissa utdataformatet från filnamnet"
 
-#: panel.cpp:3712
+#: panel.cpp:3719
 msgid "Programming error; aborting!"
 msgstr "Programmeringsfel; avbryter!"
 
-#: panel.cpp:3724 panel.cpp:3753
+#: panel.cpp:3731 panel.cpp:3760
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Oförmögen att börja inspelning till %s (%s)"
 
-#: panel.cpp:3781
+#: panel.cpp:3788
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "Fel i ljud-/videoinspelning (%s); avbryter"
 
-#: panel.cpp:3787
+#: panel.cpp:3794
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Fel i ljudinspelning (%s); avbryter"
 
-#: panel.cpp:3797
+#: panel.cpp:3804
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Fel i videoinspelning (%s); avbryter"
 
-#: panel.cpp:3988
+#: panel.cpp:3995
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Volym: %d %%"

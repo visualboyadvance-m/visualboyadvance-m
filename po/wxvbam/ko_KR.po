@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-11 18:00+0000\n"
+"POT-Creation-Date: 2025-11-12 23:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Hoseok Seo <ddinghoya@gmail.com>, 2022-2025\n"
 "Language-Team: Korean (Korea) (http://app.transifex.com/bgk/vba-m/language/ko_KR/)\n"
@@ -22,7 +22,7 @@ msgstr ""
 "Language: ko_KR\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: audio/internal/coreaudio.cpp:369 audio/internal/coreaudio.cpp:575
+#: audio/internal/coreaudio.cpp:387 audio/internal/coreaudio.cpp:597
 #: audio/internal/sdl.cpp:191 audio/internal/sdl.cpp:209
 #: audio/internal/sdl.cpp:340 audio/internal/sdl.cpp:351
 #: audio/internal/sdl.cpp:371 audio/internal/faudio.cpp:508
@@ -30,8 +30,18 @@ msgstr ""
 msgid "Default device"
 msgstr "기본 장치"
 
-#: audio/internal/coreaudio.cpp:375
+#: audio/internal/coreaudio.cpp:393
 msgid "Could not get CoreAudio device"
+msgstr ""
+
+#: audio/internal/coreaudio.cpp:440
+#, c-format
+msgid "Failed to allocate CoreAudio buffer %d: error %d"
+msgstr ""
+
+#: audio/internal/coreaudio.cpp:452
+#, c-format
+msgid "Failed to start CoreAudio queue: error %d"
 msgstr ""
 
 #: cmdevents.cpp:63 wxvbam.cpp:640
@@ -840,161 +850,161 @@ msgstr "되감기할 메모리가 없습니다."
 msgid "Error writing rewind state"
 msgstr "오류 - 되감기 상태 작성을 할 수 없습니다."
 
-#: panel.cpp:2337
+#: panel.cpp:2336
 msgid "Failed to set wayland display"
 msgstr "Wayland 디스플레이 설정에 실패함"
 
-#: panel.cpp:2365
+#: panel.cpp:2364
 msgid "Failed to initialize SDL video subsystem"
 msgstr "SDL 비디오 하위 시스템 초기화 실패함"
 
-#: panel.cpp:2376
+#: panel.cpp:2375
 msgid "Failed to initialize SDL video"
 msgstr "SDL 비디오 초기화 실패함"
 
-#: panel.cpp:2385
+#: panel.cpp:2384
 msgid "Failed to set wayland surface"
 msgstr "Wayland 표면 설정 실패함"
 
-#: panel.cpp:2398
+#: panel.cpp:2397
 msgid "Failed to set parent window"
 msgstr "부모 창 설정 실패함"
 
-#: panel.cpp:2407
+#: panel.cpp:2406
 msgid "Failed to set OpenGL properties"
 msgstr "OpenGL 속성 설정 설패함"
 
-#: panel.cpp:2420 panel.cpp:2454
+#: panel.cpp:2419 panel.cpp:2453
 msgid "Failed to create SDL window"
 msgstr "SDL 창 생성 실패함"
 
-#: panel.cpp:2438 panel.cpp:2486
+#: panel.cpp:2437 panel.cpp:2485
 msgid "Failed to create SDL renderer"
 msgstr "SDL 렌더러 생성 실패함"
 
-#: panel.cpp:3061
+#: panel.cpp:3064
 msgid "Enabling EGL VSync."
 msgstr "EGL 수직동기화 활성화"
 
-#: panel.cpp:3063
+#: panel.cpp:3066
 msgid "Disabling EGL VSync."
 msgstr "EGL 수직동기화 비활성화"
 
-#: panel.cpp:3070
+#: panel.cpp:3073
 msgid "Enabling GLX VSync."
 msgstr "GLX 수직동기화 활성화"
 
-#: panel.cpp:3072
+#: panel.cpp:3075
 msgid "Disabling GLX VSync."
 msgstr "GLX 수직동기화 비활성화"
 
-#: panel.cpp:3090
+#: panel.cpp:3093
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "glXSwapIntervalEXT 설정 실패"
 
-#: panel.cpp:3099
+#: panel.cpp:3102
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "glXSwapIntervalSGI 설정 실패"
 
-#: panel.cpp:3108
+#: panel.cpp:3111
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "glXSwapIntervalMESA 설정 실패"
 
-#: panel.cpp:3115
+#: panel.cpp:3118
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "wglGetExtensionsStringEXT은 지원하지 않습니다."
 
-#: panel.cpp:3118
+#: panel.cpp:3121
 msgid "No support for WGL_EXT_swap_control"
 msgstr "WGL_EXT_swap_control은 지원하지 않습니다."
 
-#: panel.cpp:3127
+#: panel.cpp:3130
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "wglSwapIntervalEXT 설정 실패"
 
-#: panel.cpp:3133
+#: panel.cpp:3136
 msgid "No VSYNC available on this platform"
 msgstr "이 플랫폼에서는 VSYNC를 사용할 수 없습니다."
 
-#: panel.cpp:3233
+#: panel.cpp:3236
 msgid "Failed to load d3d9.dll"
 msgstr ""
 
-#: panel.cpp:3242
+#: panel.cpp:3245
 msgid "Failed to create Direct3D 9 interface"
 msgstr ""
 
-#: panel.cpp:3252
+#: panel.cpp:3255
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3316
+#: panel.cpp:3319
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3376
+#: panel.cpp:3379
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3427
+#: panel.cpp:3430
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3499
+#: panel.cpp:3502
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3511
+#: panel.cpp:3514
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3698
+#: panel.cpp:3705
 msgid "Memory allocation error"
 msgstr "메모리 할당 오류"
 
-#: panel.cpp:3701
+#: panel.cpp:3708
 msgid "Error initializing codec"
 msgstr "코덱 초기화 오류"
 
-#: panel.cpp:3704
+#: panel.cpp:3711
 msgid "Error writing to output file"
 msgstr "출력 파일에 쓰는 중 오류"
 
-#: panel.cpp:3707
+#: panel.cpp:3714
 msgid "Can't guess output format from file name"
 msgstr "파일 이름으로 출력 형식을 추측할 수 없음"
 
-#: panel.cpp:3712
+#: panel.cpp:3719
 msgid "Programming error; aborting!"
 msgstr "프로그래밍 오류; 중단합니다!"
 
-#: panel.cpp:3724 panel.cpp:3753
+#: panel.cpp:3731 panel.cpp:3760
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "%s (%s)부터 녹화를 시작할 수 없습니다."
 
-#: panel.cpp:3781
+#: panel.cpp:3788
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "오디오 / 비디오 녹음 중 오류 (%s); 중단 중"
 
-#: panel.cpp:3787
+#: panel.cpp:3794
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "(%s) 에서 오디오 녹음 오류; 종료합니다."
 
-#: panel.cpp:3797
+#: panel.cpp:3804
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "(%s) 에서 비디오 녹화 오류; 종료합니다."
 
-#: panel.cpp:3988
+#: panel.cpp:3995
 #, c-format
 msgid "Volume: %d %%"
 msgstr "볼륨: %d %%"
