@@ -717,7 +717,11 @@ void DisplayConfig::UpdateSDLOptionsVisibility(wxCommandEvent& event) {
         HideSDLOptions();
     }
 
+#ifdef __WXMAC__
+    Layout();
+#else
     Fit();
+#endif
 
     // Let the event propagate
     event.Skip();
