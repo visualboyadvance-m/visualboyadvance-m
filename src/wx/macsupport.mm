@@ -196,7 +196,7 @@ void MetalDrawingPanel::DrawingPanelInit()
     did_init = true;
 }
 
-id<MTLTexture> MetalDrawingPanel::loadTextureUsingData(void *data)
+id<MTLTexture> MetalDrawingPanel::loadTextureUsingData(void *data, NSUInteger bytesPerRow)
 {
     MTLTextureDescriptor *textureDescriptor = [[MTLTextureDescriptor alloc] init];
 
@@ -214,9 +214,6 @@ id<MTLTexture> MetalDrawingPanel::loadTextureUsingData(void *data)
 
     // Release the descriptor after use
     [textureDescriptor release];
-
-    // Calculate the number of bytes per row in the image.
-    NSUInteger bytesPerRow = std::ceil((width + 1) * scale * 4);
 
     MTLRegion region = {
         { 0, 0, 0 },                   // MTLOrigin
@@ -302,6 +299,7 @@ void MetalDrawingPanel::DrawArea()
             int pos = 0;
             int src_pos = 0;
             int scaled_border = (int)std::ceil(inrb * scale);
+            // Skip 1 row of top border
             uint8_t *src = todraw + srcPitch;
             uint32_t *dst = (uint32_t *)calloc(4, std::ceil((width * scale) * (height * scale) + 1));
 
@@ -323,7 +321,6 @@ void MetalDrawingPanel::DrawArea()
                     pos++;
                     src_pos++;
                 }
-                pos++;
                 src_pos += scaled_border;
             }
 
@@ -331,7 +328,8 @@ void MetalDrawingPanel::DrawArea()
                 [_texture release];
                 _texture = nil;
             }
-            _texture = loadTextureUsingData(dst);
+            // Converted dst buffer is tightly packed without borders
+            _texture = loadTextureUsingData(dst, (width * scale) * 4);
 
             if (dst != NULL) {
                 free(dst);
@@ -340,6 +338,7 @@ void MetalDrawingPanel::DrawArea()
             int pos = 0;
             int src_pos = 0;
             int scaled_border = (int)std::ceil(inrb * scale);
+            // Skip 1 row of top border
             uint8_t *src = todraw + srcPitch;
             uint32_t *dst = (uint32_t *)calloc(4, std::ceil((width * scale) * (height * scale) + 1));
             uint16_t *src16 = (uint16_t *)src;
@@ -362,7 +361,6 @@ void MetalDrawingPanel::DrawArea()
                     pos++;
                     src_pos++;
                 }
-                pos++;
                 src_pos += scaled_border;
             }
 
@@ -370,7 +368,8 @@ void MetalDrawingPanel::DrawArea()
                 [_texture release];
                 _texture = nil;
             }
-            _texture = loadTextureUsingData(dst);
+            // Converted dst buffer is tightly packed without borders
+            _texture = loadTextureUsingData(dst, (width * scale) * 4);
 
             if (dst != NULL) {
                 free(dst);
@@ -378,6 +377,7 @@ void MetalDrawingPanel::DrawArea()
         } else if (systemColorDepth == 24) {
             int pos = 0;
             int src_pos = 0;
+            // Skip 1 row of top border
             uint8_t *src = todraw + srcPitch;
             uint8_t *dst = (uint8_t *)calloc(4, std::ceil((width * scale) * (height * scale) + 1));
 
@@ -391,15 +391,14 @@ void MetalDrawingPanel::DrawArea()
                     pos += 4;
                     src_pos += 3;
                 }
-
-                pos += 4;
             }
 
             if (_texture != nil) {
                 [_texture release];
                 _texture = nil;
             }
-            _texture = loadTextureUsingData(dst);
+            // Converted dst buffer is tightly packed without borders
+            _texture = loadTextureUsingData(dst, (width * scale) * 4);
 
             if (dst != NULL) {
                 free(dst);
@@ -409,7 +408,8 @@ void MetalDrawingPanel::DrawArea()
                 [_texture release];
                 _texture = nil;
             }
-            _texture = loadTextureUsingData(todraw + srcPitch);
+            // 32bpp todraw has borders; skip 1 row of top border
+            _texture = loadTextureUsingData(todraw + srcPitch, srcPitch);
         }
 
         // Create a new command buffer for each render pass to the current drawable

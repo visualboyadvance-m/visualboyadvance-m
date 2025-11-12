@@ -1617,14 +1617,9 @@ public:
         uint32_t *dst2_ = NULL;
         delta_ += instride * procy;
 
-        // FIXME: fugly hack
-        if (OPTION(kDispRenderMethod) == config::RenderMethod::kOpenGL) {
-            dst_ += (int)std::ceil(outstride * (procy + 1) * scale_);
-        } else if (OPTION(kDispRenderMethod) == config::RenderMethod::kSDL) {
-            dst_ += (int)std::ceil(outstride * (procy + 1) * scale_);
-        } else {
-            dst_ += (int)std::ceil(outstride * (procy + (1 / scale_)) * scale_);
-        }
+        // Skip scale rows of top border in output buffer
+        // All renderers skip the same amount in the filter output
+        dst_ += (int)std::ceil(outstride * (procy + 1) * scale_);
 
         dest = dst_;
 
@@ -1656,8 +1651,8 @@ public:
             if (systemColorDepth == 32) {
                 ApplyFilter(instride, outstride);
             } else {
-                src2_ = (uint32_t *)calloc(4, std::ceil(width_ * height_real));
-                dst2_ = (uint32_t *)calloc(4, std::ceil((width_ * scale_) * (height_real * scale_)));
+                src2_ = (uint32_t *)calloc(4, std::ceil((width_ + inrb) * height_real));
+                dst2_ = (uint32_t *)calloc(4, std::ceil((width_ + inrb) * scale_ * height_real * scale_));
 
                 if (out_8) {
                     int src_pos = 0;
@@ -1714,6 +1709,7 @@ public:
                 if (out_8) {
                     int dst_pos = 0;
                     pos = 0;
+                    int scaled_border = (int)std::ceil(inrb * scale_);
                     for (int y = 0; y < (height_real * scale_); y++) {
                         for (int x = 0; x < (width_ * scale_); x++) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
@@ -1724,12 +1720,14 @@ public:
                             pos++;
                             dst_pos += 4;
                         }
-                        pos += 4;
+                        pos += scaled_border;
+                        dst_pos += scaled_border * 4; // Skip border in 32bpp buffer too
                     }
                 } else if (out_16) {
                     uint16_t *dest16_ = (uint16_t *)dest;
                     int dst_pos = 0;
                     pos = 0;
+                    int scaled_border = (int)std::ceil(inrb * scale_);
                     for (int y = 0; y < (height_real * scale_); y++) {
                         for (int x = 0; x < (width_ * scale_); x++) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
@@ -1740,7 +1738,8 @@ public:
                             pos++;
                             dst_pos += 4;
                         }
-                        pos += 2;
+                        pos += scaled_border;
+                        dst_pos += scaled_border * 4; // Skip border in 32bpp buffer too
                     }
                 } else if (out_24) {
                     int dst_pos = 0;
@@ -2820,6 +2819,7 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
         int scaled_width = (int)std::ceil(width * scale);
         int scaled_height = (int)std::ceil(height * scale);
         im = new wxImage(scaled_width, scaled_height, false);
+        // Skip 1 row of top border
         uint8_t* src = todraw + scaled_width * 3;
         uint8_t* dst = im->GetData();
 
@@ -2833,7 +2833,8 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
         int inrb = 4; // 8-bit has 4-pixel filter border
         int scaled_stride = (int)std::ceil((width + inrb) * scale);
-        uint8_t* src = (uint8_t*)todraw + scaled_stride; // skip top border (1 row)
+        // Skip 1 row of top border
+        uint8_t* src = (uint8_t*)todraw + scaled_stride;
         uint8_t* dst = im->GetData();
 
         for (int y = 0; y < std::ceil(height * scale); y++) {
@@ -2857,7 +2858,8 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
         int inrb = 2; // 16-bit has 2-pixel filter border
         int scaled_stride = (int)std::ceil((width + inrb) * scale);
-        uint16_t* src = (uint16_t*)todraw + scaled_stride; // skip top border (1 row)
+        // Skip 1 row of top border
+        uint16_t* src = (uint16_t*)todraw + scaled_stride;
         uint8_t* dst = im->GetData();
 
         for (int y = 0; y < std::ceil(height * scale); y++) {
@@ -2874,7 +2876,8 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
         int inrb = 1; // 32-bit has 1-pixel filter border
         int scaled_stride = (int)std::ceil((width + inrb) * scale);
-        uint32_t* src = (uint32_t*)todraw + scaled_stride; // skip top border (1 row)
+        // Skip 1 row of top border
+        uint32_t* src = (uint32_t*)todraw + scaled_stride;
         uint8_t* dst = im->GetData();
 
         for (int y = 0; y < std::ceil(height * scale); y++) {
@@ -3184,7 +3187,7 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
                 
 #endif
         glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, (int)std::ceil(width * scale), (int)std::ceil(height * scale),
-                     0, tex_fmt, todraw + (int)std::ceil(rowlen * ((systemColorDepth >> 3) * scale)));
+                     0, tex_fmt, todraw + (int)std::ceil(rowlen * (systemColorDepth >> 3)));
                 
         glCallList(vlist);
     } else
@@ -3534,7 +3537,8 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
 
     if (out_8) {
         // 8-bit palette mode - convert to 32-bit
-        src += src_pitch; // Skip top border (1 row)
+        // Skip 1 row of top border
+        src += src_pitch;
         for (int y = 0; y < scaled_height; y++) {
             uint8_t* src_row = src;
             uint8_t* dst_row = dst;
@@ -3556,7 +3560,8 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
         }
     } else if (out_16) {
         // Convert 16-bit data from system format (1-5-5-5) to D3D R5G6B5
-        uint16_t* src16 = (uint16_t*)src + src_pitch / 2; // Skip top border (1 row, pitch in bytes so divide by 2)
+        // Skip 1 row of top border (pitch in bytes so divide by 2)
+        uint16_t* src16 = (uint16_t*)src + src_pitch / 2;
         for (int y = 0; y < scaled_height; y++) {
             uint16_t* src_row = src16;
             uint16_t* dst_row = (uint16_t*)dst;
@@ -3576,7 +3581,8 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
         }
     } else if (out_24) {
         // Convert 24-bit RGB to 32-bit XRGB
-        src += scaled_width * 3; // Skip top border if any
+        // Skip 1 row of top border
+        src += scaled_width * 3;
         for (int y = 0; y < scaled_height; y++) {
             uint8_t* src_row = src;
             uint8_t* dst_row = dst;
@@ -3593,7 +3599,8 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
         }
     } else {
         // 32-bit - convert RGBA to BGRX (swap R and B)
-        src += src_pitch; // Skip top border (1 row)
+        // Skip 1 row of top border
+        src += src_pitch;
         for (int y = 0; y < scaled_height; y++) {
             uint8_t* src_row = src;
             uint8_t* dst_row = dst;

@@ -158,7 +158,7 @@ protected:
 #ifdef __OBJC__
 private:
     void CreateMetalView();
-    id<MTLTexture> loadTextureUsingData(void *data);
+    id<MTLTexture> loadTextureUsingData(void *data, NSUInteger bytesPerRow);
 
     NSView *view;
     MTKView *metalView;
