@@ -972,7 +972,7 @@ msgstr "No se pudo crear la textura: 0x%08X"
 #: panel.cpp:3511
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
-msgstr ""
+msgstr "No se pudo bloquear la textura: 0x%08X"
 
 #: panel.cpp:3698
 msgid "Memory allocation error"
@@ -1317,7 +1317,7 @@ msgstr "Utilizar filtro bilineal con renderizado 3d"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:432
 msgid "Use the SDL pixel art filter with an SDL renderer"
-msgstr ""
+msgstr "Utilizar el filtro de pixel art de SDL con un renderizador SDL"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:433
 msgid "Full-screen filter to apply"
@@ -1508,7 +1508,7 @@ msgid ""
 "names which map to joypad #<n> button <button>. Button is one of Up, Down, "
 "Left, Right, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, "
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
-msgstr ""
+msgstr "El parámetro Joypad/<n>/<button> contiene una lista separada por comas con los nombres de las teclas que se asignan al joypad #<n> del botón<button>. El botón es uno de los siguientes: Arriba, Abajo, Izquierda, Derecha, A, B, L, R, Seleccionar, Inicio, Mover hacia arriba, Mover hacia abajo, Mover hacia la izquierda, Mover hacia la derecha, AutoA, AutoB, Velocidad, Capturar, GS"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:526
 msgid "The autofire toggle period, in frames (1/60 s)"
