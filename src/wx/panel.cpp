@@ -4001,7 +4001,7 @@ MetalDrawingPanel::MetalDrawingPanel(wxWindow* parent, int _width, int _height)
         : DrawingPanel(parent, _width, _height)
 {
     memset(delta, 0xff, sizeof(delta));
-            
+
     // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
     // 16 or 32, though
     if (OPTION(kDispFilter) == config::Filter::kNone &&
@@ -4009,7 +4009,7 @@ MetalDrawingPanel::MetalDrawingPanel(wxWindow* parent, int _width, int _height)
         // changing from 32 to 24 does not require regenerating color tables
         systemColorDepth = (OPTION(kBitDepth) + 1) << 3;
     }
-            
+
     DrawingPanelInit();
 }
         

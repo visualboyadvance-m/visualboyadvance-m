@@ -158,14 +158,11 @@ protected:
 #ifdef __OBJC__
 private:
     void CreateMetalView();
-    id<MTLTexture> loadTextureUsingData(void *data, NSUInteger bytesPerRow);
+    id<MTLTexture> CreateTextureWithData(void *data, NSUInteger bytesPerRow);
 
     NSView *view;
     MTKView *metalView;
     NSRect metalFrame;
-    MTLRenderPassDescriptor *renderPassDescriptor;
-    id<MTLRenderCommandEncoder> renderEncoder;
-    id<MTLCommandBuffer> commandBuffer;
     id<MTLDevice> _device;
     id<MTLCommandQueue> _commandQueue;
     id<MTLRenderPipelineState> _pipelineState;
@@ -174,6 +171,8 @@ private:
     NSUInteger _numVertices;
     vector_uint2 _viewportSize;
     vector_uint2 _contentSize;
+    uint32_t *_conversion_buffer;
+    size_t _conversion_buffer_size;
 #endif
 };
 #endif
