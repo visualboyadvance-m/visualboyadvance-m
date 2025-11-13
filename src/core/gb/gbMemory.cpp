@@ -328,16 +328,16 @@ void memoryUpdateMBC3Clock()
         diff /= 24;
 
         gbDataMBC3.mapperDays += (int)(diff & 0xffffffff);
-        if (gbDataMBC3.mapperDays > 511) {
-            gbDataMBC3.mapperDays %= 512;
-            gbDataMBC3.mapperControl |= 0x80; // Set overflow bit
-        } else {
-            gbDataMBC3.mapperControl &= ~0x80; // Clear overflow bit
-        }
         if (gbDataMBC3.mapperDays > 255) {
-            gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0xfe) | 0x01;
-        } else {
-            gbDataMBC3.mapperControl &= ~0x01;
+            // Preserve halt/overflow, clear unused bits, and set high-day bit (bit 0)
+            gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0xC1) | 0x01;
+
+            if (gbDataMBC3.mapperDays > 511) {
+                // Wrap day counter to 9-bit range and set overflow flag (bit 7)
+                gbDataMBC3.mapperDays %= 512;
+                gbDataMBC3.mapperControl |= 0x80; // Set overflow bit
+                gbDataMBC3.mapperControl &= 0xC0; // Preserve only overflow + halt, clear others
+            }
         }
     }
     gbDataMBC3.mapperLastTime = now;
@@ -434,10 +434,7 @@ void mapperMBC3RAM(uint16_t address, uint8_t value)
                 gbDataMBC3.mapperDays = value;
                 break;
             case 0x0c:
-                if (gbDataMBC3.mapperControl & 0x80)
-                    gbDataMBC3.mapperControl = 0x80 | value;
-                else
-                    gbDataMBC3.mapperControl = value;
+                gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0x80) | (value & 0xC1);
                 break;
             }
         }
