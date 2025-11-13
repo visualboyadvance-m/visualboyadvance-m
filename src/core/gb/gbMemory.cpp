@@ -334,7 +334,11 @@ void memoryUpdateMBC3Clock()
         } else {
             gbDataMBC3.mapperControl &= ~0x80; // Clear overflow bit
         }
-        gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0xfe) | (gbDataMBC3.mapperDays > 255 ? 1 : 0);
+        if (gbDataMBC3.mapperDays > 255) {
+            gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0xfe) | 0x01;
+        } else {
+            gbDataMBC3.mapperControl &= ~0x01;
+        }
     }
     gbDataMBC3.mapperLastTime = now;
 }
