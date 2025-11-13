@@ -328,13 +328,13 @@ void memoryUpdateMBC3Clock()
         diff /= 24;
 
         gbDataMBC3.mapperDays += (int)(diff & 0xffffffff);
-        if (gbDataMBC3.mapperDays > 255) {
-            if (gbDataMBC3.mapperDays > 511) {
-                gbDataMBC3.mapperDays %= 512;
-                gbDataMBC3.mapperControl |= 0x80;
-            }
-            gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0xfe) | (gbDataMBC3.mapperDays > 255 ? 1 : 0);
+        if (gbDataMBC3.mapperDays > 511) {
+            gbDataMBC3.mapperDays %= 512;
+            gbDataMBC3.mapperControl |= 0x80; // Set overflow bit
+        } else {
+            gbDataMBC3.mapperControl &= ~0x80; // Clear overflow bit
         }
+        gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0xfe) | (gbDataMBC3.mapperDays > 255 ? 1 : 0);
     }
     gbDataMBC3.mapperLastTime = now;
 }
