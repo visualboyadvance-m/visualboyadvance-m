@@ -65,18 +65,28 @@ std::vector<VBamIoVec> g_vbamIoVecs;
 
 void ResetMBC3RTC() {
     time(&gbDataMBC3.mapperLastTime);
+    struct tm lt_storage;
     struct tm* lt = NULL;
 #if __STDC_WANT_SECURE_LIB__
-    localtime_s(lt, &gbDataMBC3.mapperLastTime);
+    localtime_s(&lt_storage, &gbDataMBC3.mapperLastTime);
+    lt = &lt_storage;
 #else
     lt = localtime(&gbDataMBC3.mapperLastTime);
 #endif
     gbDataMBC3.mapperSeconds = lt->tm_sec;
     gbDataMBC3.mapperMinutes = lt->tm_min;
     gbDataMBC3.mapperHours = lt->tm_hour;
-    gbDataMBC3.mapperDays = lt->tm_yday & 255;
-    gbDataMBC3.mapperControl =
-        (gbDataMBC3.mapperControl & 0xfe) | (lt->tm_yday > 255 ? 1 : 0);
+    gbDataMBC3.mapperDays = lt->tm_yday; // Keep full 9-bit value
+
+    // Set control register: bit 0 = day bit 8, bits 6-7 = 0 (not halted, no overflow)
+    gbDataMBC3.mapperControl = (gbDataMBC3.mapperDays >> 8) & 0x01;
+
+    // Initialize latched values
+    gbDataMBC3.mapperLSeconds = gbDataMBC3.mapperSeconds;
+    gbDataMBC3.mapperLMinutes = gbDataMBC3.mapperMinutes;
+    gbDataMBC3.mapperLHours = gbDataMBC3.mapperHours;
+    gbDataMBC3.mapperLDays = gbDataMBC3.mapperDays & 0xFF;
+    gbDataMBC3.mapperLControl = gbDataMBC3.mapperControl;
 }
 
 void ResetTama5RTC() {
@@ -194,6 +204,19 @@ bool ReadBatteryFile(const char* file_name) {
         // No need to perform any further check, just close the file.
         gzclose(gzFile);
         return false;
+    }
+
+    // Previous versions would initialize the 
+    // mapper.control bit to 0x80 in new saves
+    // causing it to be stuck, and triggering
+    // Time Not Set in Pokemon Gold/Silver/Crystal.
+    // So we check for it and and clear it if needed.
+    if (g_gbCartData.has_rtc()) {
+        if (gbDataMBC3.mapperControl & 0x80) {
+            if (gbDataMBC3.mapperDays < 512) {
+                gbDataMBC3.mapperControl &= ~0x80;
+            }
+        }
     }
 
     // Check if the battery file is larger than expected.

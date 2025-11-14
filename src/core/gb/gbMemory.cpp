@@ -295,15 +295,29 @@ mapperMBC3 gbDataMBC3 = {
     0, // timer latched hours
     0, // timer latched days
     0, // timer latched control
-    {0}  // last time
+    {-1}  // last time
 };
 
 void memoryUpdateMBC3Clock()
 {
+    // Check halt bit (bit 6)
+    if (gbDataMBC3.mapperControl & 0x40) {
+        return;
+    }
     time_t now = time(NULL);
+
+    // If mapperLastTime is -1, initialize it to now and skip the update cycle.
+    // This prevents calculating thousands of days since Epoch
+    // and RTC Control initializing immediately to 0x80 
+    // thus no longer causing Time not Set in GSC.
+    if (gbDataMBC3.mapperLastTime == -1) {
+        gbDataMBC3.mapperLastTime = now;
+        return;
+    }
+
     time_t diff = now - gbDataMBC3.mapperLastTime;
     if (diff > 0) {
-        // update the clock according to the last update time
+        // Update seconds
         gbDataMBC3.mapperSeconds += (int)(diff % 60);
         if (gbDataMBC3.mapperSeconds > 59) {
             gbDataMBC3.mapperSeconds -= 60;
@@ -312,6 +326,7 @@ void memoryUpdateMBC3Clock()
 
         diff /= 60;
 
+        // Update minutes
         gbDataMBC3.mapperMinutes += (int)(diff % 60);
         if (gbDataMBC3.mapperMinutes > 59) {
             gbDataMBC3.mapperMinutes -= 60;
@@ -320,24 +335,27 @@ void memoryUpdateMBC3Clock()
 
         diff /= 60;
 
+        // Update hours
         gbDataMBC3.mapperHours += (int)(diff % 24);
         if (gbDataMBC3.mapperHours > 23) {
             gbDataMBC3.mapperHours -= 24;
             gbDataMBC3.mapperDays++;
         }
+
         diff /= 24;
 
+        // Update days (9-bit counter: 0-511)
         gbDataMBC3.mapperDays += (int)(diff & 0xffffffff);
-        if (gbDataMBC3.mapperDays > 511) {
-            gbDataMBC3.mapperDays %= 512;
-            gbDataMBC3.mapperControl |= 0x80; // Set overflow bit
-        } else {
-            gbDataMBC3.mapperControl &= ~0x80; // Clear overflow bit
+        // Handle 9-bit overflow (512 days)
+        if (gbDataMBC3.mapperDays >= 512) {
+            gbDataMBC3.mapperDays &= 0x1FF; // Keep only lower 9 bits
+            gbDataMBC3.mapperControl |= 0x80; // Set carry bit (sticky - stays set)
         }
-        if (gbDataMBC3.mapperDays > 255) {
-            gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0xfe) | 0x01;
+        // Update bit 0 of control register (day counter bit 8)
+        if (gbDataMBC3.mapperDays & 0x100) {
+            gbDataMBC3.mapperControl |= 0x01; // Set bit 0
         } else {
-            gbDataMBC3.mapperControl &= ~0x01;
+            gbDataMBC3.mapperControl &= ~0x01; // Clear bit 0
         }
     }
     gbDataMBC3.mapperLastTime = now;
@@ -399,8 +417,9 @@ void mapperMBC3ROM(uint16_t address, uint8_t value)
                 gbDataMBC3.mapperLSeconds = gbDataMBC3.mapperSeconds;
                 gbDataMBC3.mapperLMinutes = gbDataMBC3.mapperMinutes;
                 gbDataMBC3.mapperLHours = gbDataMBC3.mapperHours;
-                gbDataMBC3.mapperLDays = gbDataMBC3.mapperDays;
-                gbDataMBC3.mapperLControl = gbDataMBC3.mapperControl;
+                gbDataMBC3.mapperLDays = gbDataMBC3.mapperDays & 0xFF;
+                gbDataMBC3.mapperLControl = ((gbDataMBC3.mapperDays >> 8) & 0x01)
+                                           | (gbDataMBC3.mapperControl & 0xC0);
             }
             if (value == 0x00 || value == 0x01)
                 gbDataMBC3.mapperClockLatch = value;
@@ -431,13 +450,23 @@ void mapperMBC3RAM(uint16_t address, uint8_t value)
                 gbDataMBC3.mapperHours = value;
                 break;
             case 0x0b:
-                gbDataMBC3.mapperDays = value;
+                gbDataMBC3.mapperDays = (gbDataMBC3.mapperDays & 0x100) | value;
                 break;
             case 0x0c:
-                if (gbDataMBC3.mapperControl & 0x80)
-                    gbDataMBC3.mapperControl = 0x80 | value;
-                else
-                    gbDataMBC3.mapperControl = value;
+                // When writing to control register, preserve the carry bit (bit 7)
+                // but allow setting halt bit (bit 6) and day bit 8 (bit 0)
+                if (gbDataMBC3.mapperControl & 0x80) {
+                    // Preserve carry bit even if game tries to clear it
+                    gbDataMBC3.mapperControl = 0x80 | (value & 0x47);
+                } else {
+                    gbDataMBC3.mapperControl = value & 0x47;
+                }
+                // Update internal day counter to match bit 0
+                if (value & 0x01) {
+                    gbDataMBC3.mapperDays |= 0x100;
+                } else {
+                    gbDataMBC3.mapperDays &= 0xFF;
+                }
                 break;
             }
         }
@@ -450,22 +479,37 @@ uint8_t mapperMBC3ReadRAM(uint16_t address)
     if (gbDataMBC3.mapperRAMEnable) {
         if (gbDataMBC3.mapperRAMBank >= 0) {
             return gbMemoryMap[address >> 12][address & 0x0fff];
-        } else if (g_gbCartData.has_rtc()) {
+        }
+        else if (g_gbCartData.has_rtc()) {
             switch (gbDataMBC3.mapperClockRegister) {
+#ifdef DEBUG
             case 0x08:
+                printf("RTC Read: Seconds = %d\n", gbDataMBC3.mapperLSeconds);
                 return (uint8_t)(gbDataMBC3.mapperLSeconds);
-                break;
             case 0x09:
+                printf("RTC Read: Minutes = %d\n", gbDataMBC3.mapperLMinutes);
                 return (uint8_t)(gbDataMBC3.mapperLMinutes);
-                break;
             case 0x0a:
+                printf("RTC Read: Hours = %d\n", gbDataMBC3.mapperLHours);
                 return (uint8_t)(gbDataMBC3.mapperLHours);
-                break;
             case 0x0b:
-                return (uint8_t)(gbDataMBC3.mapperLDays);
-                break;
+                printf("RTC Read: Days (low) = %d\n", gbDataMBC3.mapperLDays & 0xFF);
+                return (uint8_t)(gbDataMBC3.mapperLDays & 0xFF);
             case 0x0c:
+                printf("RTC Read: Control = 0x%02X\n", gbDataMBC3.mapperLControl);
                 return (uint8_t)(gbDataMBC3.mapperLControl);
+#else
+            case 0x08: 
+                return (uint8_t)(gbDataMBC3.mapperLSeconds);
+            case 0x09: 
+                return (uint8_t)(gbDataMBC3.mapperLMinutes);
+            case 0x0a: 
+                return (uint8_t)(gbDataMBC3.mapperLHours);
+            case 0x0b: 
+                return (uint8_t)(gbDataMBC3.mapperLDays & 0xFF);
+            case 0x0c: 
+                return (uint8_t)(gbDataMBC3.mapperLControl);
+#endif
             }
         }
     }
