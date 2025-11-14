@@ -349,7 +349,7 @@ void memoryUpdateMBC3Clock()
         // Handle 9-bit overflow (512 days)
         if (gbDataMBC3.mapperDays >= 512) {
             gbDataMBC3.mapperDays &= 0x1FF; // Keep only lower 9 bits
-            gbDataMBC3.mapperControl |= 0x80; // Set carry bit (sticky - stays set)
+            gbDataMBC3.mapperControl |= 0x80; // Set carry bit (sticky - stays set until unset by program)
         }
         // Update bit 0 of control register (day counter bit 8)
         if (gbDataMBC3.mapperDays & 0x100) {
@@ -453,14 +453,8 @@ void mapperMBC3RAM(uint16_t address, uint8_t value)
                 gbDataMBC3.mapperDays = (gbDataMBC3.mapperDays & 0x100) | value;
                 break;
             case 0x0c:
-                // When writing to control register, preserve the carry bit (bit 7)
-                // but allow setting halt bit (bit 6) and day bit 8 (bit 0)
-                if (gbDataMBC3.mapperControl & 0x80) {
-                    // Preserve carry bit even if game tries to clear it
-                    gbDataMBC3.mapperControl = 0x80 | (value & 0x47);
-                } else {
-                    gbDataMBC3.mapperControl = value & 0x47;
-                }
+                // Bits 7 (carry), 6 (halt), and 0 (day bit 8) are all writable
+                gbDataMBC3.mapperControl = value & 0xC1;
                 // Update internal day counter to match bit 0
                 if (value & 0x01) {
                     gbDataMBC3.mapperDays |= 0x100;
