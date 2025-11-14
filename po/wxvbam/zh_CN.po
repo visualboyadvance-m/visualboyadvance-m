@@ -49,12 +49,12 @@ msgstr "无法获取核心音频设备"
 #: audio/internal/coreaudio.cpp:440
 #, c-format
 msgid "Failed to allocate CoreAudio buffer %d: error %d"
-msgstr ""
+msgstr "分配核心音频缓冲区失败%d: 错误 %d"
 
 #: audio/internal/coreaudio.cpp:452
 #, c-format
 msgid "Failed to start CoreAudio queue: error %d"
-msgstr ""
+msgstr "启动核心音频队列失败: 错误 %d"
 
 #: cmdevents.cpp:63 wxvbam.cpp:640
 msgid "Could not create main window"
