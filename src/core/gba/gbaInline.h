@@ -76,6 +76,27 @@ static inline int8_t Downcast8(T value) {
 
 extern uint32_t myROM[];
 
+static inline uint32_t CPUReadROM32(uint32_t address) {
+    uint32_t pos = address & 0x01FFFFFC;
+    if ((pos + 3) < static_cast<uint32_t>(gbaGetRomSize()))
+        return READ32LE(((uint32_t*)&g_rom[pos]));
+    return (((((pos + 2) >> 1) & 0xFFFF) << 16) | ((pos >> 1) & 0xFFFF));
+}
+
+static inline uint16_t CPUReadROM16(uint32_t address) {
+    uint32_t pos = address & 0x01FFFFFE;
+    if ((pos + 1) < static_cast<uint32_t>(gbaGetRomSize()))
+        return READ16LE(((uint16_t*)&g_rom[pos]));
+    return (uint16_t)(pos >> 1) & 0xFFFF;
+}
+
+static inline uint8_t CPUReadROM8(uint32_t address) {
+    uint32_t pos = address & 0x01FFFFFF;
+    if (pos < static_cast<uint32_t>(gbaGetRomSize()))
+        return g_rom[pos];
+    return (uint8_t)(pos >> 1) & 0xFF;
+}
+
 static inline uint32_t CPUReadMemory(uint32_t address)
 {
 #ifdef VBAM_ENABLE_DEBUGGER
@@ -147,7 +168,7 @@ static inline uint32_t CPUReadMemory(uint32_t address)
     case 10:
     case 11:
     case 12:
-        value = READ32LE(((uint32_t*)&g_rom[address & 0x1FFFFFC]));
+        value = CPUReadROM32(address);
         break;
     case 13:
         if (cpuEEPROMEnabled)
@@ -296,7 +317,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
         if (address == 0x80000c4 || address == 0x80000c6 || address == 0x80000c8)
             value = rtcRead(address);
         else
-            value = READ16LE(((uint16_t*)&g_rom[address & 0x1FFFFFE]));
+            value = CPUReadROM16(address);
         break;
     case 13:
         if (cpuEEPROMEnabled)
@@ -416,7 +437,7 @@ static inline uint8_t CPUReadByte(uint32_t address)
     case 10:
     case 11:
     case 12:
-        return g_rom[address & 0x1FFFFFF];
+        return CPUReadROM8(address);
     case 13:
         if (cpuEEPROMEnabled)
             return DowncastU8(eepromRead(address));

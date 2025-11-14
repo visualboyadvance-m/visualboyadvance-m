@@ -519,13 +519,11 @@ void gbaUpdateRomSize(int size)
 
         uint8_t* tmp = (uint8_t*)realloc(g_rom, romSize);
         g_rom = tmp;
-
-        uint16_t* temp = (uint16_t*)(g_rom + ((romSize + 1) & ~1));
-        for (int i = (romSize + 1) & ~1; i < romSize; i += 2) {
-            WRITE16LE(temp, (i >> 1) & 0xFFFF);
-            temp++;
-        }
     }
+}
+
+size_t gbaGetRomSize() {
+    return romSize;
 }
 
 #ifdef PROFILING
@@ -1765,13 +1763,6 @@ int CPULoadRom(const char* szFile)
     memset(&GBAMatrix, 0, sizeof(GBAMatrix));
     pristineRomSize = romSize;
 
-    uint16_t* temp = (uint16_t*)(g_rom + ((romSize + 1) & ~1));
-    int i;
-    for (i = (romSize + 1) & ~1; i < romSize; i += 2) {
-        WRITE16LE(temp, (i >> 1) & 0xFFFF);
-        temp++;
-    }
-
     char ident = 0;
 
     if (romSize > SIZE_ROM) {
@@ -1883,13 +1874,6 @@ int CPULoadRomData(const char* data, int size)
 
     memset(&GBAMatrix, 0, sizeof(GBAMatrix));
     pristineRomSize = romSize;
-
-    uint16_t* temp = (uint16_t*)(g_rom + ((romSize + 1) & ~1));
-    int i;
-    for (i = (romSize + 1) & ~1; i < SIZE_ROM * 4; i += 2) {
-        WRITE16LE(temp, (i >> 1) & 0xFFFF);
-        temp++;
-    }
 
     if (romSize > SIZE_ROM) {
         char ident = 0;
