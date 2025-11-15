@@ -34,12 +34,12 @@ msgstr "Неможливо отримати пристрій Core Audio."
 #: audio/internal/coreaudio.cpp:440
 #, c-format
 msgid "Failed to allocate CoreAudio buffer %d: error %d"
-msgstr ""
+msgstr "Не вдалося призначити буфер Core Audio %d: помилка %d."
 
 #: audio/internal/coreaudio.cpp:452
 #, c-format
 msgid "Failed to start CoreAudio queue: error %d"
-msgstr ""
+msgstr "Не вдалося почати чергу Core Audio: помилка %d."
 
 #: cmdevents.cpp:63 wxvbam.cpp:640
 msgid "Could not create main window"
