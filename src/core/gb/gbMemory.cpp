@@ -301,7 +301,20 @@ mapperMBC3 gbDataMBC3 = {
 void memoryUpdateMBC3Clock()
 {
     time_t now = time(NULL);
+
+    // Halt (0=Active, 1=Stop Timer)
+    if (gbDataMBC3.mapperControl & 0x40) {
+        return;
+    }
+
+    // mapperLastTime should have already been initialize on init or reset on first run
+    if (gbDataMBC3.mapperLastTime == now) {
+        return;
+    }
+
     time_t diff = now - gbDataMBC3.mapperLastTime;
+    gbDataMBC3.mapperLastTime = now;
+
     if (diff > 0) {
         // update the clock according to the last update time
         gbDataMBC3.mapperSeconds += (int)(diff % 60);
@@ -311,7 +324,6 @@ void memoryUpdateMBC3Clock()
         }
 
         diff /= 60;
-
         gbDataMBC3.mapperMinutes += (int)(diff % 60);
         if (gbDataMBC3.mapperMinutes > 59) {
             gbDataMBC3.mapperMinutes -= 60;
@@ -319,14 +331,13 @@ void memoryUpdateMBC3Clock()
         }
 
         diff /= 60;
-
         gbDataMBC3.mapperHours += (int)(diff % 24);
         if (gbDataMBC3.mapperHours > 23) {
             gbDataMBC3.mapperHours -= 24;
             gbDataMBC3.mapperDays++;
         }
-        diff /= 24;
 
+        diff /= 24;
         gbDataMBC3.mapperDays += (int)(diff & 0xffffffff);
         if (gbDataMBC3.mapperDays > 255) {
             // Preserve halt/overflow, clear unused bits, and set high-day bit (bit 0)
@@ -340,7 +351,6 @@ void memoryUpdateMBC3Clock()
             }
         }
     }
-    gbDataMBC3.mapperLastTime = now;
 }
 
 // MBC3 ROM write registers
