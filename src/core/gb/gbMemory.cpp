@@ -470,6 +470,17 @@ void mapperMBC3RAM(uint16_t address, uint8_t value)
 // MBC3 read RAM
 uint8_t mapperMBC3ReadRAM(uint16_t address)
 {
+#ifdef DEBUG
+    static int prevLSeconds = -1;
+    static int prevLMinutes = -1;
+    static int prevLHours = -1;
+    static int prevLDays = -1;
+    static int prevLControl = -1;
+
+    bool valueChanged = false;
+    uint8_t currentValue = 
+#endif
+
     if (gbDataMBC3.mapperRAMEnable) {
         if (gbDataMBC3.mapperRAMBank >= 0) {
             return gbMemoryMap[address >> 12][address & 0x0fff];
@@ -478,33 +489,68 @@ uint8_t mapperMBC3ReadRAM(uint16_t address)
             switch (gbDataMBC3.mapperClockRegister) {
 #ifdef DEBUG
             case 0x08:
-                printf("RTC Read: Seconds = %d\n", gbDataMBC3.mapperLSeconds);
+                currentValue = (uint8_t)(gbDataMBC3.mapperLSeconds);
+                if (currentValue != prevLSeconds) {
+                    valueChanged = true;
+                }
+                break;
+            case 0x09:
+                currentValue = (uint8_t)(gbDataMBC3.mapperLMinutes);
+                if (currentValue != prevLMinutes) {
+                    valueChanged = true;
+                }
+                break;
+            case 0x0a:
+                currentValue = (uint8_t)(gbDataMBC3.mapperLHours);
+                if (currentValue != prevLHours) {
+                    valueChanged = true;
+                }
+                break;
+            case 0x0b:
+                currentValue = (uint8_t)(gbDataMBC3.mapperLDays & 0xFF);
+                if (currentValue != prevLDays) {
+                    valueChanged = true;
+                }
+                break;
+            case 0x0c:
+                currentValue = (uint8_t)(gbDataMBC3.mapperLControl);
+                if (currentValue != prevLControl) {
+                    valueChanged = true;
+                }
+                break;
+#else
+            case 0x08:
                 return (uint8_t)(gbDataMBC3.mapperLSeconds);
             case 0x09:
-                printf("RTC Read: Minutes = %d\n", gbDataMBC3.mapperLMinutes);
                 return (uint8_t)(gbDataMBC3.mapperLMinutes);
             case 0x0a:
-                printf("RTC Read: Hours = %d\n", gbDataMBC3.mapperLHours);
                 return (uint8_t)(gbDataMBC3.mapperLHours);
             case 0x0b:
-                printf("RTC Read: Days (low) = %d\n", gbDataMBC3.mapperLDays & 0xFF);
                 return (uint8_t)(gbDataMBC3.mapperLDays & 0xFF);
             case 0x0c:
-                printf("RTC Read: Control = 0x%02X\n", gbDataMBC3.mapperLControl);
-                return (uint8_t)(gbDataMBC3.mapperLControl);
-#else
-            case 0x08: 
-                return (uint8_t)(gbDataMBC3.mapperLSeconds);
-            case 0x09: 
-                return (uint8_t)(gbDataMBC3.mapperLMinutes);
-            case 0x0a: 
-                return (uint8_t)(gbDataMBC3.mapperLHours);
-            case 0x0b: 
-                return (uint8_t)(gbDataMBC3.mapperLDays & 0xFF);
-            case 0x0c: 
                 return (uint8_t)(gbDataMBC3.mapperLControl);
 #endif
             }
+
+#ifdef DEBUG
+            if (valueChanged) {
+                printf("--- RTC Update ---\n");
+                printf("Seconds: %d\n", (uint8_t)gbDataMBC3.mapperLSeconds);
+                printf("Minutes: %d\n", (uint8_t)gbDataMBC3.mapperLMinutes);
+                printf("Hours:   %d\n", (uint8_t)gbDataMBC3.mapperLHours);
+                printf("Days:    %d\n", (uint8_t)(gbDataMBC3.mapperLDays & 0xFF));
+                printf("Control: 0x%02X\n", (uint8_t)gbDataMBC3.mapperLControl);
+
+                prevLSeconds = (uint8_t)gbDataMBC3.mapperLSeconds;
+                prevLMinutes = (uint8_t)gbDataMBC3.mapperLMinutes;
+                prevLHours = (uint8_t)gbDataMBC3.mapperLHours;
+                prevLDays = (uint8_t)(gbDataMBC3.mapperLDays & 0xFF);
+                prevLControl = (uint8_t)gbDataMBC3.mapperLControl;
+            }
+
+            return currentValue;
+
+#endif
         }
     }
 

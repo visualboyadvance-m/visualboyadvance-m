@@ -150,6 +150,57 @@ static inline uint32_t Q_INTERPOLATE(uint32_t A, uint32_t B, uint32_t C, uint32_
             ((A & 0x03) + (B & 0x03) + (C & 0x03) + (D & 0x03)))));
 }
 
+// Modified INTERPOLATE for 32-bit mode that works correctly with LCD filter's bit packing
+static inline uint32_t INTERPOLATE_PACKED(uint32_t A, uint32_t B) {
+    if (A == B) {
+        return A;
+    }
+    
+    // Extract each 8-bit channel by reading the full byte at each color position
+    uint32_t r_a = (A >> 16) & 0xFF;
+    uint32_t g_a = (A >> 8) & 0xFF;
+    uint32_t b_a = A & 0xFF;
+    
+    uint32_t r_b = (B >> 16) & 0xFF;
+    uint32_t g_b = (B >> 8) & 0xFF;
+    uint32_t b_b = B & 0xFF;
+    
+    // Average properly
+    uint32_t r_avg = (r_a + r_b) >> 1;
+    uint32_t g_avg = (g_a + g_b) >> 1;
+    uint32_t b_avg = (b_a + b_b) >> 1;
+    
+    // Repack
+    return (r_avg << 16) | (g_avg << 8) | b_avg;
+}
+
+static inline uint32_t Q_INTERPOLATE_PACKED(uint32_t A, uint32_t B, uint32_t C, uint32_t D) {
+    // Extract each 8-bit channel
+    uint32_t r_a = (A >> 16) & 0xFF;
+    uint32_t g_a = (A >> 8) & 0xFF;
+    uint32_t b_a = A & 0xFF;
+    
+    uint32_t r_b = (B >> 16) & 0xFF;
+    uint32_t g_b = (B >> 8) & 0xFF;
+    uint32_t b_b = B & 0xFF;
+    
+    uint32_t r_c = (C >> 16) & 0xFF;
+    uint32_t g_c = (C >> 8) & 0xFF;
+    uint32_t b_c = C & 0xFF;
+    
+    uint32_t r_d = (D >> 16) & 0xFF;
+    uint32_t g_d = (D >> 8) & 0xFF;
+    uint32_t b_d = D & 0xFF;
+    
+    // Average across 4 pixels
+    uint32_t r_avg = (r_a + r_b + r_c + r_d) >> 2;
+    uint32_t g_avg = (g_a + g_b + g_c + g_d) >> 2;
+    uint32_t b_avg = (b_a + b_b + b_c + b_d) >> 2;
+    
+    // Repack
+    return (r_avg << 16) | (g_avg << 8) | b_avg;
+}
+
 [[maybe_unused]] static inline int GetResult1_32 (uint32_t A, uint32_t B, uint32_t C, uint32_t D,
                                  uint32_t /* E */)
 {
@@ -498,27 +549,32 @@ void SuperEagle (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
       bP = (uint16_t *) srcPtr;
       xP = (uint16_t *) deltaPtr;
       dP = dstPtr;
+      
       for (uint32_t finish = width; finish; finish -= inc_bP) {
         uint32_t color4, color5, color6;
         uint32_t color1, color2, color3;
         uint32_t colorA1, colorA2, colorB1, colorB2, colorS1, colorS2;
         uint32_t product1a, product1b, product2a, product2b;
 
-        colorB1 = *(bP - Nextline);
-        colorB2 = *(bP - Nextline + 1);
+        // Calculate current pixel position relative to width
+        uint32_t currentPos = width - finish;
+        
+        // Safe boundary checks
+        colorB1 = (height > 0) ? *(bP - Nextline) : *(bP);
+        colorB2 = (height > 0 && currentPos < width - 1) ? *(bP - Nextline + 1) : colorB1;
 
-        color4 = *(bP - 1);
+        color4 = (currentPos > 0) ? *(bP - 1) : *(bP);
         color5 = *(bP);
-        color6 = *(bP + 1);
-        colorS2 = *(bP + 2);
+        color6 = (currentPos < width - 1) ? *(bP + 1) : color5;
+        colorS2 = (currentPos < width - 2) ? *(bP + 2) : color6;
 
-        color1 = *(bP + Nextline - 1);
+        color1 = (currentPos > 0) ? *(bP + Nextline - 1) : *(bP + Nextline);
         color2 = *(bP + Nextline);
-        color3 = *(bP + Nextline + 1);
-        colorS1 = *(bP + Nextline + 2);
+        color3 = (currentPos < width - 1) ? *(bP + Nextline + 1) : color2;
+        colorS1 = (currentPos < width - 2) ? *(bP + Nextline + 2) : color3;
 
-        colorA1 = *(bP + Nextline + Nextline);
-        colorA2 = *(bP + Nextline + Nextline + 1);
+        colorA1 = (height > 1) ? *(bP + Nextline + Nextline) : color2;
+        colorA2 = (height > 1 && currentPos < width - 1) ? *(bP + Nextline + Nextline + 1) : colorA1;
 
         // --------------------------------------
         if (color2 == color6 && color5 != color3) {
@@ -633,63 +689,69 @@ void SuperEagle32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
     bP = (uint32_t *) srcPtr;
     xP = (uint32_t *) deltaPtr;
     dP = (uint32_t *)dstPtr;
+    
     for (uint32_t finish = width; finish; finish -= inc_bP) {
       uint32_t color4, color5, color6;
       uint32_t color1, color2, color3;
       uint32_t colorA1, colorA2, colorB1, colorB2, colorS1, colorS2;
       uint32_t product1a, product1b, product2a, product2b;
 
-      colorB1 = *(bP - Nextline);
-      colorB2 = *(bP - Nextline + 1);
+      // Calculate current pixel position relative to width
+      uint32_t currentPos = width - finish;
+      
+      // Safe boundary checks
+      colorB1 = (height > 0) ? *(bP - Nextline) : *(bP);
+      colorB2 = (height > 0 && currentPos < width - 1) ? *(bP - Nextline + 1) : colorB1;
 
-      color4 = *(bP - 1);
+      color4 = (currentPos > 0) ? *(bP - 1) : *(bP);
       color5 = *(bP);
-      color6 = *(bP + 1);
-      colorS2 = *(bP + 2);
+      color6 = (currentPos < width - 1) ? *(bP + 1) : color5;
+      colorS2 = (currentPos < width - 2) ? *(bP + 2) : color6;
 
-      color1 = *(bP + Nextline - 1);
+      color1 = (currentPos > 0) ? *(bP + Nextline - 1) : *(bP + Nextline);
       color2 = *(bP + Nextline);
-      color3 = *(bP + Nextline + 1);
-      colorS1 = *(bP + Nextline + 2);
+      color3 = (currentPos < width - 1) ? *(bP + Nextline + 1) : color2;
+      colorS1 = (currentPos < width - 2) ? *(bP + Nextline + 2) : color3;
 
-      colorA1 = *(bP + Nextline + Nextline);
-      colorA2 = *(bP + Nextline + Nextline + 1);
+      colorA1 = (height > 1) ? *(bP + Nextline + Nextline) : color2;
+      colorA2 = (height > 1 && currentPos < width - 1) ? *(bP + Nextline + Nextline + 1) : colorA1;
 
       // --------------------------------------
+      // 32-bit mode uses INTERPOLATE_PACKED for LCD filter compatibility
       if (color2 == color6 && color5 != color3) {
         product1b = product2a = color2;
         if ((color1 == color2) || (color6 == colorB2)) {
-          product1a = INTERPOLATE (color2, color5);
-          product1a = INTERPOLATE (color2, product1a);
+          product1a = INTERPOLATE_PACKED (color2, color5);
+          product1a = INTERPOLATE_PACKED (color2, product1a);
           //                       product1a = color2;
         } else {
-          product1a = INTERPOLATE (color5, color6);
+          product1a = INTERPOLATE_PACKED (color5, color6);
         }
 
         if ((color6 == colorS2) || (color2 == colorA1)) {
-          product2b = INTERPOLATE (color2, color3);
-          product2b = INTERPOLATE (color2, product2b);
+          product2b = INTERPOLATE_PACKED (color2, color3);
+          product2b = INTERPOLATE_PACKED (color2, product2b);
           //                       product2b = color2;
         } else {
-          product2b = INTERPOLATE (color2, color3);
+          product2b = INTERPOLATE_PACKED (color2, color3);
         }
       } else if (color5 == color3 && color2 != color6) {
         product2b = product1a = color5;
 
         if ((colorB1 == color5) || (color3 == colorS1)) {
-          product1b = INTERPOLATE (color5, color6);
-          product1b = INTERPOLATE (color5, product1b);
+          product1b = INTERPOLATE_PACKED (color5, color6);
+          product1b = INTERPOLATE_PACKED (color5, product1b);
           //                       product1b = color5;
         } else {
-          product1b = INTERPOLATE (color5, color6);
+          product1b = INTERPOLATE_PACKED (color5, color6);
         }
 
         if ((color3 == colorA2) || (color4 == color5)) {
-          product2a = INTERPOLATE (color5, color2);
-          product2a = INTERPOLATE (color5, product2a);
+          product2a = INTERPOLATE_PACKED (color5, color2);
+          product2a = INTERPOLATE_PACKED (color5, product2a);
           //                       product2a = color5;
         } else {
-          product2a = INTERPOLATE (color2, color3);
+          product2a = INTERPOLATE_PACKED (color2, color3);
         }
 
       } else if (color5 == color3 && color2 == color6) {
@@ -702,32 +764,33 @@ void SuperEagle32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
 
         if (r > 0) {
           product1b = product2a = color2;
-          product1a = product2b = INTERPOLATE (color5, color6);
+          product1a = product2b = INTERPOLATE_PACKED (color5, color6);
         } else if (r < 0) {
           product2b = product1a = color5;
-          product1b = product2a = INTERPOLATE (color5, color6);
+          product1b = product2a = INTERPOLATE_PACKED (color5, color6);
         } else {
           product2b = product1a = color5;
           product1b = product2a = color2;
         }
       } else {
-        product2b = product1a = INTERPOLATE (color2, color6);
+        product2b = product1a = INTERPOLATE_PACKED (color2, color6);
         product2b =
-          Q_INTERPOLATE (color3, color3, color3, product2b);
+          Q_INTERPOLATE_PACKED (color3, color3, color3, product2b);
         product1a =
-          Q_INTERPOLATE (color5, color5, color5, product1a);
+          Q_INTERPOLATE_PACKED (color5, color5, color5, product1a);
 
-        product2a = product1b = INTERPOLATE (color5, color3);
+        product2a = product1b = INTERPOLATE_PACKED (color5, color3);
         product2a =
-          Q_INTERPOLATE (color2, color2, color2, product2a);
+          Q_INTERPOLATE_PACKED (color2, color2, color2, product2a);
         product1b =
-          Q_INTERPOLATE (color6, color6, color6, product1b);
+          Q_INTERPOLATE_PACKED (color6, color6, color6, product1b);
 
         //                    product1a = color5;
         //                    product1b = color6;
         //                    product2a = color2;
         //                    product2b = color3;
       }
+      
       *(dP) = product1a;
       *(dP+1) = product1b;
       *(dP + (dstPitch >> 2)) = product2a;
