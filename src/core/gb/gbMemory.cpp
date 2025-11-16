@@ -429,22 +429,26 @@ void mapperMBC3RAM(uint16_t address, uint8_t value)
                 systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
             }
         } else if (g_gbCartData.has_rtc()) {
-            time(&gbDataMBC3.mapperLastTime);
             switch (gbDataMBC3.mapperClockRegister) {
             case 0x08:
-                gbDataMBC3.mapperSeconds = value;
+                gbDataMBC3.mapperSeconds = value % 60;
                 break;
             case 0x09:
-                gbDataMBC3.mapperMinutes = value;
+                gbDataMBC3.mapperMinutes = value % 60;
                 break;
             case 0x0a:
-                gbDataMBC3.mapperHours = value;
+                gbDataMBC3.mapperHours = value % 24;
                 break;
             case 0x0b:
-                gbDataMBC3.mapperDays = value;
+                gbDataMBC3.mapperDays = (gbDataMBC3.mapperDays & 0x100) | value;
                 break;
             case 0x0c:
-                gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0x80) | (value & 0xC1);
+                gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0x80) | (value & 0x41);
+                if (value & 0x01) {
+                    gbDataMBC3.mapperDays |= 0x100;
+                } else {
+                    gbDataMBC3.mapperDays &= ~0x100;
+                }
                 break;
             }
         }
@@ -461,16 +465,12 @@ uint8_t mapperMBC3ReadRAM(uint16_t address)
             switch (gbDataMBC3.mapperClockRegister) {
             case 0x08:
                 return (uint8_t)(gbDataMBC3.mapperLSeconds);
-                break;
             case 0x09:
                 return (uint8_t)(gbDataMBC3.mapperLMinutes);
-                break;
             case 0x0a:
                 return (uint8_t)(gbDataMBC3.mapperLHours);
-                break;
             case 0x0b:
                 return (uint8_t)(gbDataMBC3.mapperLDays);
-                break;
             case 0x0c:
                 return (uint8_t)(gbDataMBC3.mapperLControl);
             }
