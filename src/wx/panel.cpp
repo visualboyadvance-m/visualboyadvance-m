@@ -1605,12 +1605,16 @@ public:
         const int inrb = out_8 ? 4 : out_16  ? 2
                          : out_24 ? 0 : 1;
         const int instride = (width_ + inrb) * inbpp;
-        const int instride32 = width_ * 4;
+        // For 32bpp conversion: 32bpp filters need left+right borders of 1 each
+        const int inrb32 = 1;
+        const int total_width32 = 1 + width_ + inrb32;  // left + image + right
+        const int instride32 = total_width32 * 4;
         const int outbpp = systemColorDepth >> 3;
         const int outrb = out_8 ? 4 : out_24 ? 0 : 4;
         (void)outrb; // unused
         const int outstride = std::ceil((width_ + inrb) * outbpp * scale_);
-        const int outstride32 = std::ceil((width_ + inrb) * 4 * scale_);
+        // For 32bpp conversion output: filters write width*scale pixels (no borders)
+        const int outstride32 = std::ceil(width_ * 4 * scale_);
         uint8_t *dest = NULL;
         int pos = 0;
         uint32_t *src2_ = NULL;
@@ -1651,12 +1655,22 @@ public:
             if (systemColorDepth == 32) {
                 ApplyFilter(instride, outstride);
             } else {
-                src2_ = (uint32_t *)calloc(4, std::ceil((width_ + inrb) * height_real));
-                dst2_ = (uint32_t *)calloc(4, std::ceil((width_ + inrb) * scale_ * height_real * scale_));
+                // 32bpp filters need both left and right borders (1 pixel each) in INPUT
+                // Also need 1 row at top for filters to read from (bP - Nextline)
+                // Allocate: row0 (top border) + height_real rows of [1 left][width][1 right]
+                src2_ = (uint32_t *)calloc(4, std::ceil(total_width32 * (height_real + 1)));
+                // Output buffer: filters write width*scale x height*scale (no borders)
+                // Allocate extra rows at top for filters to read from (e.g., bP - Nextline)
+                dst2_ = (uint32_t *)calloc(4, std::ceil(width_ * scale_ * (height_real * scale_ + scale_)));
 
+                // Fill buffer starting at row 1 (skip row 0 for top border)
+                pos = total_width32;
                 if (out_8) {
                     int src_pos = 0;
                     for (int y = 0; y < height_real; y++) {
+                        int left_border_pos = pos;
+                        pos++;  // Move to first image pixel
+                        // Convert and copy width pixels
                         for (int x = 0; x < width_; x++) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
                             src2_[pos] = (src_[src_pos] & 0xe0) + ((src_[src_pos] & 0x1c) << 11) + ((src_[src_pos] & 0x3) << 22);
@@ -1666,12 +1680,21 @@ public:
                             pos++;
                             src_pos++;
                         }
-                        src_pos += 4;
+                        // Fill left border with first pixel of this row
+                        src2_[left_border_pos] = src2_[left_border_pos + 1];
+                        // Fill right border with last pixel of this row
+                        src2_[pos] = src2_[pos - 1];
+                        pos++;
+                        // Skip rest of source border
+                        src_pos += inrb;
                     }
                 } else if (out_16) {
                     uint16_t *src16_ = (uint16_t *)src_;
                     int src_pos = 0;
                     for (int y = 0; y < height_real; y++) {
+                        int left_border_pos = pos;
+                        pos++;  // Move to first image pixel
+                        // Convert and copy width pixels
                         for (int x = 0; x < width_; x++) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
                             src2_[pos] = ((src16_[src_pos] & 0x7c00) >> 7) + ((src16_[src_pos] & 0x03e0) << 6) + ((src16_[src_pos] & 0x1f) << 19);
@@ -1681,65 +1704,95 @@ public:
                             pos++;
                             src_pos++;
                         }
-                        src_pos += 2;
+                        // Fill left border with first pixel of this row
+                        src2_[left_border_pos] = src2_[left_border_pos + 1];
+                        // Fill right border with last pixel of this row
+                        src2_[pos] = src2_[pos - 1];
+                        pos++;
+                        // Skip rest of source border
+                        src_pos += inrb;
                     }
                 } else if (out_24) {
                     int src_pos = 0;
-                    uint8_t *src8_ = (uint8_t *)src2_;
                     for (int y = 0; y < height_real; y++) {
+                        int left_border_pos = pos;
+                        pos++;  // Move to first image pixel
+                        // Convert and copy width pixels
                         for (int x = 0; x < width_; x++) {
-                            src8_[pos] = src_[src_pos];
-                            src8_[pos+1] = src_[src_pos+1];
-                            src8_[pos+2] = src_[src_pos+2];
-                            src8_[pos+3] = 0;
-
-                            pos += 4;
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+                            src2_[pos] = (src_[src_pos] << 0) | (src_[src_pos+1] << 8) | (src_[src_pos+2] << 16);
+#else
+                            src2_[pos] = (src_[src_pos] << 24) | (src_[src_pos+1] << 16) | (src_[src_pos+2] << 8);
+#endif
+                            pos++;
                             src_pos += 3;
                         }
+                        // Fill left border with first pixel of this row
+                        src2_[left_border_pos] = src2_[left_border_pos + 1];
+                        // Fill right border with last pixel of this row
+                        src2_[pos] = src2_[pos - 1];
+                        pos++;
+                        // 24bpp has no border in source (inrb=0)
                     }
                 }
 
-                src_ = (uint8_t *)src2_;
-                dst_ = (uint8_t *)dst2_;
+                // Fill row 0 (top border) by duplicating row 1
+                for (int x = 0; x < total_width32; x++) {
+                    src2_[x] = src2_[total_width32 + x];
+                }
+
+                // Offset src_ to point to first image pixel of row 1 (skip top row + left border)
+                src_ = (uint8_t *)(src2_ + total_width32 + 1);
+                // Offset dst_ to skip top border rows that filters need for reading
+                // Filters need 'scale_' rows above to read from (e.g., bP - Nextline)
+                // Each output row is width_*scale_ pixels wide, skip scale_ rows
+                dst_ = (uint8_t *)(dst2_ + (int)std::ceil(width_ * scale_ * scale_));
 
                 ApplyFilter(instride32, outstride32);
 
-                dst_ = (uint8_t *)dst2_;
+                // dst2_ points to the buffer start, filters wrote starting at offset
+                dst_ = (uint8_t *)(dst2_ + (int)std::ceil(width_ * scale_ * scale_));
 
                 if (out_8) {
+                    uint32_t *dst32_ = (uint32_t *)dst_;
                     int dst_pos = 0;
                     pos = 0;
-                    int scaled_border = (int)std::ceil(inrb * scale_);
+                    // Destination buffer uses original depth's border
+                    int scaled_border_dest = (int)std::ceil(inrb * scale_);
+                    // Source 32bpp buffer has NO borders in output
                     for (int y = 0; y < (height_real * scale_); y++) {
                         for (int x = 0; x < (width_ * scale_); x++) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
-                            dest[pos] = (uint8_t)(((dst_[dst_pos] >> 5) << 5) + ((dst_[dst_pos+1] >> 5) << 2) + ((dst_[dst_pos+2] >> 6) & 0x3));
+                            dest[pos] = (uint8_t)((dst32_[dst_pos] & 0xE0) | ((dst32_[dst_pos] >> 11) & 0x1C) | ((dst32_[dst_pos] >> 22) & 0x3));
 #else
-                            dest[pos] = (uint8_t)(((dst_[dst_pos+3] >> 5) << 5) + ((dst_[dst_pos+2] >> 5) << 2) + ((dst_[dst_pos+1] >> 6) & 0x3));
+                            dest[pos] = (uint8_t)(((dst32_[dst_pos] >> 24) & 0xE0) | ((dst32_[dst_pos] >> 19) & 0x1C) | ((dst32_[dst_pos] >> 14) & 0x3));
 #endif
                             pos++;
-                            dst_pos += 4;
+                            dst_pos++;
                         }
-                        pos += scaled_border;
-                        dst_pos += scaled_border * 4; // Skip border in 32bpp buffer too
+                        pos += scaled_border_dest;
+                        // No border skip needed - output buffer has no borders
                     }
                 } else if (out_16) {
+                    uint32_t *dst32_ = (uint32_t *)dst_;
                     uint16_t *dest16_ = (uint16_t *)dest;
                     int dst_pos = 0;
                     pos = 0;
-                    int scaled_border = (int)std::ceil(inrb * scale_);
+                    // Destination buffer uses original depth's border
+                    int scaled_border_dest = (int)std::ceil(inrb * scale_);
+                    // Source 32bpp buffer has NO borders in output
                     for (int y = 0; y < (height_real * scale_); y++) {
                         for (int x = 0; x < (width_ * scale_); x++) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
-                            dest16_[pos] = (uint16_t)(((dst_[dst_pos] >> 3) << 10) + ((dst_[dst_pos+1] >> 3) << 5) + (dst_[dst_pos+2] >> 3));
+                            dest16_[pos] = (uint16_t)((((dst32_[dst_pos] >> 3) & 0x1F) << 10) | (((dst32_[dst_pos] >> 11) & 0x1F) << 5) | ((dst32_[dst_pos] >> 19) & 0x1F));
 #else
-                            dest16_[pos] = (uint16_t)(((dst_[dst_pos+3] >> 3) << 10) + ((dst_[dst_pos+2] >> 3) << 5) + (dst_[dst_pos+1] >> 3));
+                            dest16_[pos] = (uint16_t)((((dst32_[dst_pos] >> 27) & 0x1F) << 10) | (((dst32_[dst_pos] >> 19) & 0x1F) << 5) | ((dst32_[dst_pos] >> 11) & 0x1F));
 #endif
                             pos++;
-                            dst_pos += 4;
+                            dst_pos++;
                         }
-                        pos += scaled_border;
-                        dst_pos += scaled_border * 4; // Skip border in 32bpp buffer too
+                        pos += scaled_border_dest;
+                        // No border skip needed - output buffer has no borders
                     }
                 } else if (out_24) {
                     int dst_pos = 0;
@@ -3516,7 +3569,7 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
     }
 
     // Calculate source pitch (bytes per row)
-    // Border is scaled by the filter, so 1 pixel becomes scale pixels
+    // Border is scaled by the filter
     int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1; // border in pixels
     int scaled_border = (int)std::ceil(inrb * scale);
     int src_pitch = scaled_width;

@@ -247,6 +247,7 @@ void Bilinear32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
   int from_width = width;
 
   uint32_t *from = (uint32_t *)srcPtr;
+  uint32_t Nextline = srcPitch >> 2;  // srcPitch in bytes / 4 = stride in uint32_t elements
   fill_rgb_row_32(from, from_width, rgb_row_cur, width+1);
 
   for(int y = 0; y < height; y++) {
@@ -254,7 +255,7 @@ void Bilinear32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
     uint32_t *to_orig = to;
 
     if (y+1 < height)
-      fill_rgb_row_32(from+width+1, from_width, rgb_row_next,
+      fill_rgb_row_32(from+Nextline, from_width, rgb_row_next,
                    width+1);
     else
       fill_rgb_row_32(from, from_width, rgb_row_next, width+1);
@@ -331,6 +332,7 @@ void BilinearPlus32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */
   int from_width = width;
 
   uint32_t *from = (uint32_t *)srcPtr;
+  uint32_t Nextline = srcPitch >> 2;  // srcPitch in bytes / 4 = stride in uint32_t elements
   fill_rgb_row_32(from, from_width, rgb_row_cur, width+1);
 
   for(int y = 0; y < height; y++) {
@@ -338,7 +340,7 @@ void BilinearPlus32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */
     uint32_t *to_orig = to;
 
     if (y+1 < height)
-      fill_rgb_row_32(from+width+1, from_width, rgb_row_next,
+      fill_rgb_row_32(from+Nextline, from_width, rgb_row_next,
                    width+1);
     else
       fill_rgb_row_32(from, from_width, rgb_row_next, width+1);
