@@ -66,6 +66,11 @@ MetalDrawingPanel::~MetalDrawingPanel()
             _vertices = nil;
         }
 
+        if (_sampler != nil) {
+            [_sampler release];
+            _sampler = nil;
+        }
+
         if (_pipelineState != nil) {
             [_pipelineState release];
             _pipelineState = nil;
@@ -117,6 +122,9 @@ void MetalDrawingPanel::CreateMetalView()
 
     CAMetalLayer *metalLayer = (CAMetalLayer *)metalView.layer;
     metalLayer.device = metalView.device;
+
+    // Enable VSync based on user preference
+    metalLayer.displaySyncEnabled = OPTION(kPrefVsync);
 
     _device = [metalView.device retain];
 
@@ -176,6 +184,14 @@ void MetalDrawingPanel::CreateMetalView()
         _commandQueue = [_device newCommandQueue];
     }
 
+    // Create sampler for texture filtering (bilinear or nearest)
+    MTLSamplerDescriptor *samplerDescriptor = [[MTLSamplerDescriptor alloc] init];
+    samplerDescriptor.minFilter = OPTION(kDispBilinear) ? MTLSamplerMinMagFilterLinear : MTLSamplerMinMagFilterNearest;
+    samplerDescriptor.magFilter = OPTION(kDispBilinear) ? MTLSamplerMinMagFilterLinear : MTLSamplerMinMagFilterNearest;
+    samplerDescriptor.sAddressMode = MTLSamplerAddressModeClampToEdge;
+    samplerDescriptor.tAddressMode = MTLSamplerAddressModeClampToEdge;
+    _sampler = [_device newSamplerStateWithDescriptor:samplerDescriptor];
+    [samplerDescriptor release];
 
     if (OPTION(kDispStretch) == false) {
         metalView.frame = view.frame;
@@ -224,6 +240,7 @@ void MetalDrawingPanel::DrawingPanelInit()
     _pipelineState = nil;
     _texture = nil;
     _vertices = nil;
+    _sampler = nil;
     _conversion_buffer = NULL;
     _conversion_buffer_size = 0;
 
@@ -488,6 +505,10 @@ void MetalDrawingPanel::DrawArea()
 
         [renderEncoder setFragmentTexture:_texture
                                   atIndex:AAPLTextureIndexBaseColor];
+
+        // Set the sampler for texture filtering
+        [renderEncoder setFragmentSamplerState:_sampler
+                                       atIndex:0];
 
         // Draw the quad
         [renderEncoder drawPrimitives:MTLPrimitiveTypeTriangle

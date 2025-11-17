@@ -168,6 +168,7 @@ private:
     id<MTLRenderPipelineState> _pipelineState;
     id<MTLTexture> _texture;
     id<MTLBuffer> _vertices;
+    id<MTLSamplerState> _sampler;
     NSUInteger _numVertices;
     vector_uint2 _viewportSize;
     vector_uint2 _contentSize;
