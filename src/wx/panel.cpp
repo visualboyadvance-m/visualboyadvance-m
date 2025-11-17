@@ -2485,10 +2485,15 @@ void SDLDrawingPanel::DrawingPanelInit()
             renderer = SDL_CreateRenderer(sdlwindow, NULL);
         }
     }
-            
+
     if (renderer == NULL) {
         wxLogError(_("Failed to create SDL renderer"));
         return;
+    }
+
+    // Set vsync
+    if (SDL_SetRenderVSync(renderer, OPTION(kPrefVsync) ? 1 : 0) == false) {
+        wxLogError(_("Failed to set vsync for SDL renderer"));
     }
 
     renderername = wxString(SDL_GetRendererName(renderer));
@@ -2507,33 +2512,35 @@ void SDLDrawingPanel::DrawingPanelInit()
         return;
     }
 
+    int vsync_flag = OPTION(kPrefVsync) ? SDL_RENDERER_PRESENTVSYNC : 0;
+
     if (OPTION(kSDLRenderer) == wxString("default")) {
-        renderer = SDL_CreateRenderer(sdlwindow, -1, 0);
+        renderer = SDL_CreateRenderer(sdlwindow, -1, vsync_flag);
         wxLogDebug(_("SDL renderer: default"));
     } else {
         for (int i = 0; i < SDL_GetNumRenderDrivers(); i++) {
             wxString renderer_name = OPTION(kSDLRenderer);
             SDL_RendererInfo render_info;
-                    
+
             SDL_GetRenderDriverInfo(i, &render_info);
-                    
+
             if (!strcmp(renderer_name.mb_str(), render_info.name)) {
                 if (!strcmp(render_info.name, "software")) {
-                    renderer = SDL_CreateRenderer(sdlwindow, i, SDL_RENDERER_SOFTWARE);
+                    renderer = SDL_CreateRenderer(sdlwindow, i, SDL_RENDERER_SOFTWARE | vsync_flag);
                 } else {
-                    renderer = SDL_CreateRenderer(sdlwindow, i, SDL_RENDERER_ACCELERATED);
+                    renderer = SDL_CreateRenderer(sdlwindow, i, SDL_RENDERER_ACCELERATED | vsync_flag);
                 }
 
                 wxLogDebug(_("SDL renderer: %s"), render_info.name);
             }
         }
-                
+
         if (renderer == NULL) {
             wxLogError(_("Renderer creating failed, using default renderer"));
-            renderer = SDL_CreateRenderer(sdlwindow, -1, 0);
+            renderer = SDL_CreateRenderer(sdlwindow, -1, vsync_flag);
         }
     }
-            
+
     if (renderer == NULL) {
         wxLogError(_("Failed to create SDL renderer"));
         return;
