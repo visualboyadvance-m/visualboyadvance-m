@@ -1655,10 +1655,30 @@ public:
             if (systemColorDepth == 32) {
                 ApplyFilter(instride, outstride);
             } else {
+                // Save current shift values (set for original depth)
+                int saved_red_shift = systemRedShift;
+                int saved_green_shift = systemGreenShift;
+                int saved_blue_shift = systemBlueShift;
+                int saved_rgb_low_bits_mask = RGB_LOW_BITS_MASK;
+
+                // Set shift values for 32bpp format that filters expect
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+                systemRedShift = 19;
+                systemGreenShift = 11;
+                systemBlueShift = 3;
+                RGB_LOW_BITS_MASK = 0x00010101;
+#else
+                systemRedShift = 27;
+                systemGreenShift = 19;
+                systemBlueShift = 11;
+                RGB_LOW_BITS_MASK = 0x01010100;
+#endif
+
                 // 32bpp filters need both left and right borders (1 pixel each) in INPUT
                 // Also need 1 row at top for filters to read from (bP - Nextline)
-                // Allocate: row0 (top border) + height_real rows of [1 left][width][1 right]
-                src2_ = (uint32_t *)calloc(4, std::ceil(total_width32 * (height_real + 1)));
+                // Some filters (SuperEagle) read 2 rows ahead, so allocate 2 extra rows at bottom
+                // Allocate: row0 (top border) + height_real rows + 2 extra rows at bottom
+                src2_ = (uint32_t *)calloc(4, std::ceil(total_width32 * (height_real + 3)));
                 // Output buffer: filters write width*scale x height*scale (no borders)
                 // Allocate extra rows at top for filters to read from (e.g., bP - Nextline)
                 dst2_ = (uint32_t *)calloc(4, std::ceil(width_ * scale_ * (height_real * scale_ + scale_)));
@@ -1671,11 +1691,20 @@ public:
                         int left_border_pos = pos;
                         pos++;  // Move to first image pixel
                         // Convert and copy width pixels
+                        // 8bpp format: RRRGGGBB (3 red, 3 green, 2 blue bits)
                         for (int x = 0; x < width_; x++) {
+                            uint8_t src_val = src_[src_pos];
+                            uint8_t r3 = (src_val >> 5) & 0x7;
+                            uint8_t g3 = (src_val >> 2) & 0x7;
+                            uint8_t b2 = src_val & 0x3;
+                            // Expand to 8 bits by replication
+                            uint8_t r8 = (r3 << 5) | (r3 << 2) | (r3 >> 1);
+                            uint8_t g8 = (g3 << 5) | (g3 << 2) | (g3 >> 1);
+                            uint8_t b8 = (b2 << 6) | (b2 << 4) | (b2 << 2) | b2;
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
-                            src2_[pos] = (src_[src_pos] & 0xe0) + ((src_[src_pos] & 0x1c) << 11) + ((src_[src_pos] & 0x3) << 22);
+                            src2_[pos] = b8 | (g8 << 8) | (r8 << 16);
 #else
-                            src2_[pos] = ((src_[src_pos] & 0xe0) << 24) + ((src_[src_pos] & 0x1c) << 19) + ((src_[src_pos] & 0x3) << 14);
+                            src2_[pos] = (r8 << 24) | (g8 << 16) | (b8 << 8);
 #endif
                             pos++;
                             src_pos++;
@@ -1695,11 +1724,20 @@ public:
                         int left_border_pos = pos;
                         pos++;  // Move to first image pixel
                         // Convert and copy width pixels
+                        // 16bpp RGB555 format: xRRRRRGGGGGBBBBB (5 bits each)
                         for (int x = 0; x < width_; x++) {
+                            uint16_t src_val = src16_[src_pos];
+                            uint8_t r5 = (src_val >> 10) & 0x1f;
+                            uint8_t g5 = (src_val >> 5) & 0x1f;
+                            uint8_t b5 = src_val & 0x1f;
+                            // Expand 5 bits to 8 bits by replication
+                            uint8_t r8 = (r5 << 3) | (r5 >> 2);
+                            uint8_t g8 = (g5 << 3) | (g5 >> 2);
+                            uint8_t b8 = (b5 << 3) | (b5 >> 2);
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
-                            src2_[pos] = ((src16_[src_pos] & 0x7c00) >> 7) + ((src16_[src_pos] & 0x03e0) << 6) + ((src16_[src_pos] & 0x1f) << 19);
+                            src2_[pos] = b8 | (g8 << 8) | (r8 << 16);
 #else
-                            src2_[pos] = ((src16_[src_pos] & 0x7c00) << 17) + ((src16_[src_pos] & 0x03e0) << 14) + ((src16_[src_pos] & 0x1f) << 11);
+                            src2_[pos] = (r8 << 24) | (g8 << 16) | (b8 << 8);
 #endif
                             pos++;
                             src_pos++;
@@ -1741,6 +1779,14 @@ public:
                     src2_[x] = src2_[total_width32 + x];
                 }
 
+                // Fill bottom 2 extra rows by duplicating the last image row
+                int last_image_row_offset = total_width32 * height_real;
+                for (int row = 0; row < 2; row++) {
+                    for (int x = 0; x < total_width32; x++) {
+                        src2_[last_image_row_offset + total_width32 * (row + 1) + x] = src2_[last_image_row_offset + x];
+                    }
+                }
+
                 // Offset src_ to point to first image pixel of row 1 (skip top row + left border)
                 src_ = (uint8_t *)(src2_ + total_width32 + 1);
                 // Offset dst_ to skip top border rows that filters need for reading
@@ -1762,11 +1808,21 @@ public:
                     // Source 32bpp buffer has NO borders in output
                     for (int y = 0; y < (height_real * scale_); y++) {
                         for (int x = 0; x < (width_ * scale_); x++) {
+                            uint32_t color = dst32_[dst_pos];
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
-                            dest[pos] = (uint8_t)((dst32_[dst_pos] & 0xE0) | ((dst32_[dst_pos] >> 11) & 0x1C) | ((dst32_[dst_pos] >> 22) & 0x3));
+                            uint8_t r8 = (color >> 16) & 0xff;
+                            uint8_t g8 = (color >> 8) & 0xff;
+                            uint8_t b8 = color & 0xff;
 #else
-                            dest[pos] = (uint8_t)(((dst32_[dst_pos] >> 24) & 0xE0) | ((dst32_[dst_pos] >> 19) & 0x1C) | ((dst32_[dst_pos] >> 14) & 0x3));
+                            uint8_t r8 = (color >> 24) & 0xff;
+                            uint8_t g8 = (color >> 16) & 0xff;
+                            uint8_t b8 = (color >> 8) & 0xff;
 #endif
+                            // Convert 8-bit channels to 3/3/2 bit (RRRGGGBB)
+                            uint8_t r3 = r8 >> 5;
+                            uint8_t g3 = g8 >> 5;
+                            uint8_t b2 = b8 >> 6;
+                            dest[pos] = (r3 << 5) | (g3 << 2) | b2;
                             pos++;
                             dst_pos++;
                         }
@@ -1783,11 +1839,21 @@ public:
                     // Source 32bpp buffer has NO borders in output
                     for (int y = 0; y < (height_real * scale_); y++) {
                         for (int x = 0; x < (width_ * scale_); x++) {
+                            uint32_t color = dst32_[dst_pos];
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
-                            dest16_[pos] = (uint16_t)((((dst32_[dst_pos] >> 3) & 0x1F) << 10) | (((dst32_[dst_pos] >> 11) & 0x1F) << 5) | ((dst32_[dst_pos] >> 19) & 0x1F));
+                            uint8_t r8 = (color >> 16) & 0xff;
+                            uint8_t g8 = (color >> 8) & 0xff;
+                            uint8_t b8 = color & 0xff;
 #else
-                            dest16_[pos] = (uint16_t)((((dst32_[dst_pos] >> 27) & 0x1F) << 10) | (((dst32_[dst_pos] >> 19) & 0x1F) << 5) | ((dst32_[dst_pos] >> 11) & 0x1F));
+                            uint8_t r8 = (color >> 24) & 0xff;
+                            uint8_t g8 = (color >> 16) & 0xff;
+                            uint8_t b8 = (color >> 8) & 0xff;
 #endif
+                            // Convert 8-bit channels to 5/5/5 bit (RGB555)
+                            uint8_t r5 = r8 >> 3;
+                            uint8_t g5 = g8 >> 3;
+                            uint8_t b5 = b8 >> 3;
+                            dest16_[pos] = (r5 << 10) | (g5 << 5) | b5;
                             pos++;
                             dst_pos++;
                         }
@@ -1815,6 +1881,12 @@ public:
                 if (dst2_ != NULL) {
                     free(dst2_);
                 }
+
+                // Restore original shift values
+                systemRedShift = saved_red_shift;
+                systemGreenShift = saved_green_shift;
+                systemBlueShift = saved_blue_shift;
+                RGB_LOW_BITS_MASK = saved_rgb_low_bits_mask;
             }
 
             if (nthreads_ == 1) {
