@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-12 23:00+0000\n"
+"POT-Creation-Date: 2025-11-17 11:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Allan Nordhøy <epost@anotheragency.no>, 2016-2017\n"
 "Language-Team: Norwegian Bokmål (http://app.transifex.com/bgk/vba-m/language/nb/)\n"
@@ -841,6 +841,10 @@ msgstr ""
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr ""
 
+#: panel.cpp:1195
+msgid "Metal is unavailable, defaulting to OpenGL"
+msgstr ""
+
 #: panel.cpp:1334
 msgid "No memory for rewinding"
 msgstr "Intet minne for tilbakespoling"
@@ -849,161 +853,223 @@ msgstr "Intet minne for tilbakespoling"
 msgid "Error writing rewind state"
 msgstr "Feil under skriving av tilbakespolingstilstand"
 
-#: panel.cpp:2336
+#: panel.cpp:2389
 msgid "Failed to set wayland display"
 msgstr ""
 
-#: panel.cpp:2364
+#: panel.cpp:2417
 msgid "Failed to initialize SDL video subsystem"
 msgstr ""
 
-#: panel.cpp:2375
+#: panel.cpp:2428
 msgid "Failed to initialize SDL video"
 msgstr ""
 
-#: panel.cpp:2384
+#: panel.cpp:2437
 msgid "Failed to set wayland surface"
 msgstr ""
 
-#: panel.cpp:2397
+#: panel.cpp:2450
 msgid "Failed to set parent window"
 msgstr ""
 
-#: panel.cpp:2406
+#: panel.cpp:2459
 msgid "Failed to set OpenGL properties"
 msgstr ""
 
-#: panel.cpp:2419 panel.cpp:2453
+#: panel.cpp:2472 panel.cpp:2511
 msgid "Failed to create SDL window"
 msgstr ""
 
-#: panel.cpp:2437 panel.cpp:2485
+#: panel.cpp:2482 panel.cpp:2539
+msgid "Renderer creating failed, using default renderer"
+msgstr ""
+
+#: panel.cpp:2483
+#, c-format
+msgid "SDL Error: %s"
+msgstr ""
+
+#: panel.cpp:2490 panel.cpp:2545
 msgid "Failed to create SDL renderer"
 msgstr ""
 
-#: panel.cpp:3064
+#: panel.cpp:2496
+msgid "Failed to set vsync for SDL renderer"
+msgstr ""
+
+#: panel.cpp:2500 panel.cpp:2534
+#, c-format
+msgid "SDL renderer: %s"
+msgstr ""
+
+#: panel.cpp:2519
+msgid "SDL renderer: default"
+msgstr ""
+
+#: panel.cpp:3124
 msgid "Enabling EGL VSync."
 msgstr ""
 
-#: panel.cpp:3066
+#: panel.cpp:3126
 msgid "Disabling EGL VSync."
 msgstr ""
 
-#: panel.cpp:3073
+#: panel.cpp:3133
 msgid "Enabling GLX VSync."
 msgstr ""
 
-#: panel.cpp:3075
+#: panel.cpp:3135
 msgid "Disabling GLX VSync."
 msgstr ""
 
-#: panel.cpp:3093
+#: panel.cpp:3153
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:3102
+#: panel.cpp:3162
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:3111
+#: panel.cpp:3171
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:3118
+#: panel.cpp:3178
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr ""
 
-#: panel.cpp:3121
+#: panel.cpp:3181
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:3130
+#: panel.cpp:3190
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:3136
+#: panel.cpp:3196
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:3236
+#: panel.cpp:3292
+msgid "Using Direct3D 9Ex (dynamically loaded)"
+msgstr ""
+
+#: panel.cpp:3296
 msgid "Failed to load d3d9.dll"
 msgstr ""
 
-#: panel.cpp:3245
+#: panel.cpp:3305
 msgid "Failed to create Direct3D 9 interface"
 msgstr ""
 
-#: panel.cpp:3255
+#: panel.cpp:3308
+msgid "Using Direct3D 9"
+msgstr ""
+
+#: panel.cpp:3315
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3319
-#, c-format
-msgid "Failed to create Direct3D device: 0x%08X"
+#: panel.cpp:3339
+msgid "FlipEx not supported, falling back to Discard swap effect"
+msgstr ""
+
+#: panel.cpp:3355
+msgid "Hardware vertex processing not available, falling back to software"
 msgstr ""
 
 #: panel.cpp:3379
 #, c-format
+msgid "Failed to create Direct3D device: 0x%08X"
+msgstr ""
+
+#: panel.cpp:3384
+#, c-format
+msgid "Direct3D 9%s device created successfully (SwapEffect: %s)"
+msgstr ""
+
+#: panel.cpp:3417
+#, c-format
+msgid "DXDrawingPanel initialized: %dx%d (scale: %f)"
+msgstr ""
+
+#: panel.cpp:3439
+#, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3430
+#: panel.cpp:3471
+#, c-format
+msgid "Attempting Direct3D device reset (SwapEffect: %s)"
+msgstr ""
+
+#: panel.cpp:3478
+msgid "Reset with FlipEx failed, retrying with Discard swap effect"
+msgstr ""
+
+#: panel.cpp:3490
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3502
+#: panel.cpp:3495
+#, c-format
+msgid "Direct3D device reset successfully (Final SwapEffect: %s)"
+msgstr ""
+
+#: panel.cpp:3562
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3514
+#: panel.cpp:3574
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3705
+#: panel.cpp:3765
 msgid "Memory allocation error"
 msgstr ""
 
-#: panel.cpp:3708
+#: panel.cpp:3768
 msgid "Error initializing codec"
 msgstr ""
 
-#: panel.cpp:3711
+#: panel.cpp:3771
 msgid "Error writing to output file"
 msgstr ""
 
-#: panel.cpp:3714
+#: panel.cpp:3774
 msgid "Can't guess output format from file name"
 msgstr ""
 
-#: panel.cpp:3719
+#: panel.cpp:3779
 msgid "Programming error; aborting!"
 msgstr ""
 
-#: panel.cpp:3731 panel.cpp:3760
+#: panel.cpp:3791 panel.cpp:3820
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Kunne ikke starte opptak til %s (%s)"
 
-#: panel.cpp:3788
+#: panel.cpp:3848
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr ""
 
-#: panel.cpp:3794
+#: panel.cpp:3854
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Feil i lydopptak (%s); avbryter"
 
-#: panel.cpp:3804
+#: panel.cpp:3864
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Feil i videoopptak (%s); avbryter"
 
-#: panel.cpp:3995
+#: panel.cpp:4055
 #, c-format
 msgid "Volume: %d %%"
 msgstr ""
@@ -4211,10 +4277,10 @@ msgstr ""
 msgid "Speedup Throttle"
 msgstr ""
 
-#: xrc/SpeedupConfig.xrc:54
+#: xrc/SpeedupConfig.xrc:55
 msgid "Frame skip"
 msgstr ""
 
-#: xrc/SpeedupConfig.xrc:61
+#: xrc/SpeedupConfig.xrc:62
 msgid "Mute Sound"
 msgstr ""
