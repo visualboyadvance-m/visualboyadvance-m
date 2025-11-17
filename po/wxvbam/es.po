@@ -10,6 +10,7 @@
 # Dani Quiroz, 2022
 # Dani Quiroz, 2022
 # Dex Galaxy, 2022
+# DiegoJavier GonzalezMuñoz, 2025
 # MELERIX, 2015
 # Eequiis Vásquez, 2025
 # Ein Striker <ein.striker@gmail.com>, 2017
@@ -34,7 +35,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-12 23:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Eequiis Vásquez, 2025\n"
+"Last-Translator: DiegoJavier GonzalezMuñoz, 2025\n"
 "Language-Team: Spanish (http://app.transifex.com/bgk/vba-m/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -57,12 +58,12 @@ msgstr "No se pudo detectar el dispositivo CoreAudio"
 #: audio/internal/coreaudio.cpp:440
 #, c-format
 msgid "Failed to allocate CoreAudio buffer %d: error %d"
-msgstr ""
+msgstr "Fallo al Asignar CoreAudio buffer 1%d"
 
 #: audio/internal/coreaudio.cpp:452
 #, c-format
 msgid "Failed to start CoreAudio queue: error %d"
-msgstr ""
+msgstr "Error: no se pudo iniciar la cola de CoreAudio 1%d"
 
 #: cmdevents.cpp:63 wxvbam.cpp:640
 msgid "Could not create main window"
@@ -1785,7 +1786,7 @@ msgstr "Idioma"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:633
 msgid "External translations"
-msgstr ""
+msgstr "Traducciones Externas"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:708
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:728
@@ -2082,15 +2083,15 @@ msgstr "XAudio2: ¡Creando fuente de voz fallido!"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:681
 msgid "Error, link already connected"
-msgstr ""
+msgstr "Error, Conexion Ya esta conectada"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:695
 msgid "Unable to find link driver"
-msgstr ""
+msgstr "No se pudo encontrar el Controlador del link"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:738
 msgid "Link connection does not need updates."
-msgstr ""
+msgstr "La conexion del link no necesita actualizacion"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:877
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:941
@@ -2147,7 +2148,7 @@ msgstr "Error al crear la asignación de archivos."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2666
 msgid "Error mapping file"
-msgstr ""
+msgstr "Error Al Mapear el archivo"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2713
 msgid "5 or more GBAs not supported."
@@ -2160,11 +2161,11 @@ msgstr "Error al abrir evento"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2851
 msgid "Lost link; reinitialize to reconnect"
-msgstr ""
+msgstr "Conexion Perdida; Reinciala Para reconectar"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2858
 msgid "Lost link; reconnected"
-msgstr ""
+msgstr "Conexion Perdida; Se Reconecto"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2979
 msgid "Unknown slave timed out; resetting comm"
