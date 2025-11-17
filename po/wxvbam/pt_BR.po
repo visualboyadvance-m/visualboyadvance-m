@@ -64,12 +64,12 @@ msgstr "Não pôde obter o dispositivo CoreAudio"
 #: audio/internal/coreaudio.cpp:440
 #, c-format
 msgid "Failed to allocate CoreAudio buffer %d: error %d"
-msgstr ""
+msgstr "Falhou em alocar o buffer do CoreAudio %d: erro %d"
 
 #: audio/internal/coreaudio.cpp:452
 #, c-format
 msgid "Failed to start CoreAudio queue: error %d"
-msgstr ""
+msgstr "Falhou em iniciar a fila do CoreAudio: erro %d"
 
 #: cmdevents.cpp:63 wxvbam.cpp:640
 msgid "Could not create main window"
@@ -871,7 +871,7 @@ msgstr "Não é um cartucho de Game Boy Advance válido"
 
 #: panel.cpp:1195
 msgid "Metal is unavailable, defaulting to OpenGL"
-msgstr ""
+msgstr "O Metal não está disponível, revertendo pro padrão OpenGL"
 
 #: panel.cpp:1334
 msgid "No memory for rewinding"
@@ -911,12 +911,12 @@ msgstr "Falhou em criar a janela SDL"
 
 #: panel.cpp:2482 panel.cpp:2539
 msgid "Renderer creating failed, using default renderer"
-msgstr ""
+msgstr "A criação do renderizador falhou, usando o renderizador padrão"
 
 #: panel.cpp:2483
 #, c-format
 msgid "SDL Error: %s"
-msgstr ""
+msgstr "Erro do SDL: %s"
 
 #: panel.cpp:2490 panel.cpp:2545
 msgid "Failed to create SDL renderer"
@@ -924,16 +924,16 @@ msgstr "Falhou em criar o renderizador SDL"
 
 #: panel.cpp:2496
 msgid "Failed to set vsync for SDL renderer"
-msgstr ""
+msgstr "Falhou em definir o vsync no renderizador SDL"
 
 #: panel.cpp:2500 panel.cpp:2534
 #, c-format
 msgid "SDL renderer: %s"
-msgstr ""
+msgstr "Renderizador SDL: %s"
 
 #: panel.cpp:2519
 msgid "SDL renderer: default"
-msgstr ""
+msgstr "Renderizador SDL: padrão"
 
 #: panel.cpp:3124
 msgid "Enabling EGL VSync."
@@ -981,7 +981,7 @@ msgstr "Não há VSYNC disponível nesta plataforma"
 
 #: panel.cpp:3292
 msgid "Using Direct3D 9Ex (dynamically loaded)"
-msgstr ""
+msgstr "Usando o Direct3D 9Ex (carregado dinamicamente)"
 
 #: panel.cpp:3296
 msgid "Failed to load d3d9.dll"
@@ -993,7 +993,7 @@ msgstr "Falhou em criar a interface do Direct3D 9"
 
 #: panel.cpp:3308
 msgid "Using Direct3D 9"
-msgstr ""
+msgstr "Usando o Direct3D 9"
 
 #: panel.cpp:3315
 #, c-format
@@ -1002,11 +1002,11 @@ msgstr "Falhou em obter o modo de exibição do adaptador: 0x%08X"
 
 #: panel.cpp:3339
 msgid "FlipEx not supported, falling back to Discard swap effect"
-msgstr ""
+msgstr "FlipEx não suportado, voltando ao efeito de troca do descarte"
 
 #: panel.cpp:3355
 msgid "Hardware vertex processing not available, falling back to software"
-msgstr ""
+msgstr "Processamento de vértice do hardware não disponível, voltando pro software"
 
 #: panel.cpp:3379
 #, c-format
@@ -1016,12 +1016,12 @@ msgstr "Falhou em criar o dispositivo Direct3D: 0x%08X"
 #: panel.cpp:3384
 #, c-format
 msgid "Direct3D 9%s device created successfully (SwapEffect: %s)"
-msgstr ""
+msgstr "Dispositivo Direct3D 9%s criado com sucesso (SwapEffect: %s)"
 
 #: panel.cpp:3417
 #, c-format
 msgid "DXDrawingPanel initialized: %dx%d (scale: %f)"
-msgstr ""
+msgstr "DXDrawingPanel inicializado: %dx%d (escala: %f)"
 
 #: panel.cpp:3439
 #, c-format
@@ -1031,11 +1031,11 @@ msgstr "Falhou em obter o modo de exibição do adaptador pro reset: 0x%08X"
 #: panel.cpp:3471
 #, c-format
 msgid "Attempting Direct3D device reset (SwapEffect: %s)"
-msgstr ""
+msgstr "Tentando resetar o dispositivo Direct3D (SwapEffect: %s)"
 
 #: panel.cpp:3478
 msgid "Reset with FlipEx failed, retrying with Discard swap effect"
-msgstr ""
+msgstr "O reset com o FlipEx falhou, tentando de novo com o efeito de troca do descarte"
 
 #: panel.cpp:3490
 #, c-format
@@ -1045,7 +1045,7 @@ msgstr "Falhou em resetar o dispositivo Direct3D: 0x%08X"
 #: panel.cpp:3495
 #, c-format
 msgid "Direct3D device reset successfully (Final SwapEffect: %s)"
-msgstr ""
+msgstr "Dispositivo Direct3D resetado com sucesso (SwapEffect Final: %s)"
 
 #: panel.cpp:3562
 #, c-format
