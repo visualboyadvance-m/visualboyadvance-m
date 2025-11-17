@@ -478,7 +478,7 @@ uint8_t mapperMBC3ReadRAM(uint16_t address)
     static int prevLControl = -1;
 
     bool valueChanged = false;
-    uint8_t currentValue = 
+    uint8_t currentValue = 0;
 #endif
 
     if (gbDataMBC3.mapperRAMEnable) {

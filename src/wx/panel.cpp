@@ -1192,7 +1192,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
                     new MetalDrawingPanel(this, basic_width, basic_height);
                 } else {
                     panel = new GLDrawingPanel(this, basic_width, basic_height);
-                    log("Metal is unavailable, defaulting to OpenGL");
+                    wxLogInfo(_("Metal is unavailable, defaulting to OpenGL"));
                 }
                 break;
 #endif
@@ -2386,7 +2386,7 @@ void SDLDrawingPanel::DrawingPanelInit()
         wayland_surface = gdk_wayland_window_get_wl_surface(gtk_widget_get_window(widget));
 
         if (SDL_SetPointerProperty(SDL_GetGlobalProperties(), SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, wayland_display) == false) {
-            systemScreenMessage(_("Failed to set wayland display"));
+            wxLogError(_("Failed to set wayland display"));
             return;
         }
     } else {
@@ -2414,7 +2414,7 @@ void SDLDrawingPanel::DrawingPanelInit()
 #else
     if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0) {
 #endif
-        systemScreenMessage(_("Failed to initialize SDL video subsystem"));
+        wxLogError(_("Failed to initialize SDL video subsystem"));
         return;
     }
 
@@ -2425,7 +2425,7 @@ void SDLDrawingPanel::DrawingPanelInit()
     if (SDL_WasInit(SDL_INIT_VIDEO) < 0) {
         if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 #endif
-            systemScreenMessage(_("Failed to initialize SDL video"));
+            wxLogError(_("Failed to initialize SDL video"));
             return;
         }
     }
@@ -2434,7 +2434,7 @@ void SDLDrawingPanel::DrawingPanelInit()
 #ifdef __WXGTK__
     if (GDK_IS_WAYLAND_WINDOW(gtk_widget_get_window(widget))) {
         if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, wayland_surface) == false) {
-            systemScreenMessage(_("Failed to set wayland surface"));
+            wxLogError(_("Failed to set wayland surface"));
             return;
         }
     } else {
@@ -2447,7 +2447,7 @@ void SDLDrawingPanel::DrawingPanelInit()
         if (SDL_SetPointerProperty(props, "sdl2-compat.external_window", GetWindow()->GetHandle()) == false)
 #endif
         {
-            systemScreenMessage(_("Failed to set parent window"));
+            wxLogError(_("Failed to set parent window"));
             return;
         }
 
@@ -2456,7 +2456,7 @@ void SDLDrawingPanel::DrawingPanelInit()
 #endif
 
     if (SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_OPENGL_BOOLEAN, true) == false) {
-        systemScreenMessage(_("Failed to set OpenGL properties"));
+        wxLogError(_("Failed to set OpenGL properties"));
     }
 
     // This is necessary for joysticks to work at all with SDL video.
@@ -2469,7 +2469,7 @@ void SDLDrawingPanel::DrawingPanelInit()
     SDL_DestroyProperties(props);
 
     if (sdlwindow == NULL) {
-        systemScreenMessage(_("Failed to create SDL window"));
+        wxLogError(_("Failed to create SDL window"));
         return;
     }
 
@@ -2479,20 +2479,20 @@ void SDLDrawingPanel::DrawingPanelInit()
         renderer = SDL_CreateRenderer(sdlwindow, renderer_name.mb_str());
 
         if (renderer == NULL) {
-            log("ERROR: Renderer creating failed, using default renderer");
-            printf("SDL Error: %s\n", SDL_GetError());
+            wxLogError(_("Renderer creating failed, using default renderer"));
+            wxLogDebug(_("SDL Error: %s"), SDL_GetError());
 
             renderer = SDL_CreateRenderer(sdlwindow, NULL);
         }
     }
             
     if (renderer == NULL) {
-        systemScreenMessage(_("Failed to create SDL renderer"));
+        wxLogError(_("Failed to create SDL renderer"));
         return;
     }
 
     renderername = wxString(SDL_GetRendererName(renderer));
-    log("SDL renderer: %s", (const char*)renderername.mb_str());
+    wxLogDebug(_("SDL renderer: %s"), (const char*)renderername.mb_str());
 #else
 #ifdef __WXGTK__
     sdlwindow = SDL_CreateWindowFrom((void *)xid);
@@ -2501,15 +2501,15 @@ void SDLDrawingPanel::DrawingPanelInit()
 #else
     sdlwindow = SDL_CreateWindowFrom(GetWindow()->GetHandle());
 #endif
-            
+
     if (sdlwindow == NULL) {
-        systemScreenMessage(_("Failed to create SDL window"));
+        wxLogError(_("Failed to create SDL window"));
         return;
     }
 
     if (OPTION(kSDLRenderer) == wxString("default")) {
         renderer = SDL_CreateRenderer(sdlwindow, -1, 0);
-        log("SDL renderer: default");
+        wxLogDebug(_("SDL renderer: default"));
     } else {
         for (int i = 0; i < SDL_GetNumRenderDrivers(); i++) {
             wxString renderer_name = OPTION(kSDLRenderer);
@@ -2523,19 +2523,19 @@ void SDLDrawingPanel::DrawingPanelInit()
                 } else {
                     renderer = SDL_CreateRenderer(sdlwindow, i, SDL_RENDERER_ACCELERATED);
                 }
-                        
-                log("SDL renderer: %s", render_info.name);
+
+                wxLogDebug(_("SDL renderer: %s"), render_info.name);
             }
         }
                 
         if (renderer == NULL) {
-            log("ERROR: Renderer creating failed, using default renderer");
+            wxLogError(_("Renderer creating failed, using default renderer"));
             renderer = SDL_CreateRenderer(sdlwindow, -1, 0);
         }
     }
             
     if (renderer == NULL) {
-        systemScreenMessage(_("Failed to create SDL renderer"));
+        wxLogError(_("Failed to create SDL renderer"));
         return;
     }
 
@@ -3143,7 +3143,7 @@ void GLDrawingPanel::DrawingPanelInit()
                 glXSwapIntervalEXT(glXGetCurrentDisplay(),
                                     glXGetCurrentDrawable(), OPTION(kPrefVsync));
             else
-                systemScreenMessage(_("Failed to set glXSwapIntervalEXT"));
+                wxLogError(_("Failed to set glXSwapIntervalEXT"));
         }
         if (strstr(glxQuery, "GLX_SGI_swap_control") != NULL)
         {
@@ -3152,7 +3152,7 @@ void GLDrawingPanel::DrawingPanelInit()
             if (glXSwapIntervalSGI)
                 glXSwapIntervalSGI(OPTION(kPrefVsync));
             else
-                systemScreenMessage(_("Failed to set glXSwapIntervalSGI"));
+                wxLogError(_("Failed to set glXSwapIntervalSGI"));
         }
         if (strstr(glxQuery, "GLX_MESA_swap_control") != NULL)
         {
@@ -3161,17 +3161,17 @@ void GLDrawingPanel::DrawingPanelInit()
             if (glXSwapIntervalMESA)
                 glXSwapIntervalMESA(OPTION(kPrefVsync));
             else
-                systemScreenMessage(_("Failed to set glXSwapIntervalMESA"));
+                wxLogError(_("Failed to set glXSwapIntervalMESA"));
         }
     }
 #elif defined(__WXMSW__)
     typedef const char* (*wglext)();
     wglext wglGetExtensionsStringEXT = (wglext)wglGetProcAddress("wglGetExtensionsStringEXT");
     if (wglGetExtensionsStringEXT == NULL) {
-        systemScreenMessage(_("No support for wglGetExtensionsStringEXT"));
+        wxLogError(_("No support for wglGetExtensionsStringEXT"));
     }
     else if (strstr(wglGetExtensionsStringEXT(), "WGL_EXT_swap_control") == 0) {
-        systemScreenMessage(_("No support for WGL_EXT_swap_control"));
+        wxLogError(_("No support for WGL_EXT_swap_control"));
     }
             
     typedef BOOL (__stdcall *PFNWGLSWAPINTERVALEXTPROC)(BOOL);
@@ -3180,7 +3180,7 @@ void GLDrawingPanel::DrawingPanelInit()
     if (wglSwapIntervalEXT)
         wglSwapIntervalEXT(OPTION(kPrefVsync));
     else
-        systemScreenMessage(_("Failed to set wglSwapIntervalEXT"));
+        wxLogError(_("Failed to set wglSwapIntervalEXT"));
 #elif defined(__WXMAC__)
     int swap_interval = OPTION(kPrefVsync) ? 1 : 0;
     CGLContextObj cgl_context = CGLGetCurrentContext();
@@ -3282,7 +3282,7 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
 
             if (SUCCEEDED(hr)) {
                 using_d3d9ex = true;
-                wxLogDebug(wxT("Using Direct3D 9Ex (dynamically loaded)"));
+                wxLogDebug(_("Using Direct3D 9Ex (dynamically loaded)"));
             }
         }
     } else {
@@ -3298,7 +3298,7 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
             wxLogError(_("Failed to create Direct3D 9 interface"));
             return;
         }
-        wxLogDebug(wxT("Using Direct3D 9"));
+        wxLogDebug(_("Using Direct3D 9"));
     }
 
     // Get display mode
@@ -3329,7 +3329,7 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
             d3dpp.SwapEffect = D3DSWAPEFFECT_FLIPEX;
             d3dpp.BackBufferCount = 2;
         } else {
-            if (swap_attempt == 1) wxLogDebug(wxT("FlipEx not supported, falling back to Discard swap effect"));
+            if (swap_attempt == 1) wxLogDebug(_("FlipEx not supported, falling back to Discard swap effect"));
             d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
             d3dpp.BackBufferCount = 0;
         }
@@ -3345,7 +3345,7 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
             );
 
         if (FAILED(hr)) {
-            wxLogDebug(wxT("Hardware vertex processing not available, falling back to software"));
+            wxLogDebug(_("Hardware vertex processing not available, falling back to software"));
 
             // Fallback to software vertex processing
             hr = d3d->CreateDevice(
@@ -3374,7 +3374,7 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
     }
 
     // Log the successful device creation along with the final swap effect
-    wxLogDebug(wxT("Direct3D 9%s device created successfully (SwapEffect: %s)"),
+    wxLogDebug(_("Direct3D 9%s device created successfully (SwapEffect: %s)"),
                using_d3d9ex ? wxT("Ex") : wxT(""),
                final_swap_effect);
 }
@@ -3407,7 +3407,7 @@ void DXDrawingPanel::DrawingPanelInit()
     texture_width = (int)std::ceil(width * scale);
     texture_height = (int)std::ceil(height * scale);
 
-    wxLogDebug(wxT("DXDrawingPanel initialized: %dx%d (scale: %f)"),
+    wxLogDebug(_("DXDrawingPanel initialized: %dx%d (scale: %f)"),
                texture_width, texture_height, scale);
 }
 
@@ -3461,14 +3461,14 @@ bool DXDrawingPanel::ResetDevice()
         d3dpp.BackBufferCount = 0;
     }
 
-    wxLogDebug(wxT("Attempting Direct3D device reset (SwapEffect: %s)"), attempted_swap_effect);
+    wxLogDebug(_("Attempting Direct3D device reset (SwapEffect: %s)"), attempted_swap_effect);
 
     // Reset the device with current window size
     hr = device->Reset(&d3dpp);
 
     // If Reset with FlipEx fails on D3D9Ex, try Discard as a fallback for the reset
     if (FAILED(hr) && using_d3d9ex && d3dpp.SwapEffect == D3DSWAPEFFECT_FLIPEX) {
-        wxLogDebug(wxT("Reset with FlipEx failed, retrying with Discard swap effect"));
+        wxLogDebug(_("Reset with FlipEx failed, retrying with Discard swap effect"));
         d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
         d3dpp.BackBufferCount = 0;
         hr = device->Reset(&d3dpp);
@@ -3485,7 +3485,7 @@ bool DXDrawingPanel::ResetDevice()
     }
 
     // Log the successful reset along with the final swap effect used
-    wxLogDebug(wxT("Direct3D device reset successfully (Final SwapEffect: %s)"), attempted_swap_effect);
+    wxLogDebug(_("Direct3D device reset successfully (Final SwapEffect: %s)"), attempted_swap_effect);
     return true;
 }
 
