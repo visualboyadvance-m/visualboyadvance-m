@@ -233,6 +233,210 @@ static inline void gfxDrawTextScreen(uint16_t control, uint16_t hofs, uint16_t v
 }
 #endif // !__TILED_RENDERING
 
+#ifdef AFFINE_BG_UNIFIED
+static inline int32_t signExtend(uint32_t value, unsigned bits) {
+    // bits = number of meaningful bits BEFORE extension (e.g. 16-bit → bits = 16)
+    uint32_t shift = 32u - bits;
+    return (int32_t)(value << shift) >> shift;
+}
+
+static inline void applyVerticalMosaic_Mod(uint16_t control, int& realX, int& realY, int dmx, int dmy) {
+    if (!(control & 0x40)) return;
+    int mosaicY = ((MOSAIC & 0xF0) >> 4) + 1;
+    int y = VCOUNT % mosaicY;
+    realX -= y * dmx;
+    realY -= y * dmy;
+}
+
+static inline void applyVerticalMosaic_FloorDiv(uint16_t control, int& realX, int& realY, int dmx, int dmy, int startX, int startY) {
+    if (!(control & 0x40)) return;
+    int mosaicY = ((MOSAIC & 0xF0) >> 4) + 1;
+    int y = VCOUNT - (VCOUNT % mosaicY);
+    realX = startX + y * dmx;
+    realY = startY + y * dmy;
+}
+
+static inline void drawAffineLine240(
+    int mode, uint16_t control,
+    uint16_t x_l, uint16_t x_h,
+    uint16_t y_l, uint16_t y_h,
+    uint16_t pa, uint16_t pb, uint16_t pc, uint16_t pd,
+    int& currentX, int& currentY, uint32_t* line)
+{
+    int prio = ((control & 3) << 25) + 0x1000000;
+
+    int dx  = signExtend(pa, 16);
+    int dmx = signExtend(pb, 16);
+    int dy  = signExtend(pc, 16);
+    int dmy = signExtend(pd, 16);
+
+    int realX = currentX;
+    int realY = currentY;
+
+    switch (mode) {
+    case 1: case 2: { // Tiled affine modes
+        uint16_t* palette = reinterpret_cast<uint16_t*>(g_paletteRAM);
+        uint8_t* charBase = &g_vram[((control >> 2) & 0x03) * 0x4000];
+        uint8_t* screenBase = &g_vram[((control >> 8) & 0x1f) * 0x800];
+        int sizeX = 128 << ((control >> 14) & 3);
+        int sizeY = sizeX;
+        int maskX = sizeX - 1;
+        int maskY = sizeY - 1;
+        int yshift = ((control >> 14) & 3) + 4;
+
+        applyVerticalMosaic_Mod(control, realX, realY, dmx, dmy);
+
+        for (int x = 0; x < gbaWidth; x++) {
+            int xxx = realX >> 8;
+            int yyy = realY >> 8;
+            uint32_t out = 0x80000000;
+
+            if (control & 0x2000) { // wrap-around
+                xxx &= maskX;
+                yyy &= maskY;
+            }
+
+            if (xxx >= 0 && yyy >= 0 && xxx < sizeX && yyy < sizeY) {
+                int tile = screenBase[(xxx >> 3) + ((yyy >> 3) << yshift)];
+                int tileX = xxx & 7;
+                int tileY = yyy & 7;
+                uint8_t color = charBase[(tile << 6) + (tileY << 3) + tileX];
+                if (color) out = READ16LE(&palette[color]) | prio;
+            }
+
+            line[x] = out;
+            realX += dx;
+            realY += dy;
+        }
+    } break;
+
+    case 3: case 5: { // Bitmap 16bpp modes
+        uint16_t* screenBase;
+        int sizeX, sizeY;
+
+        if (mode == 3) {
+            screenBase = reinterpret_cast<uint16_t*>(g_vram);
+            sizeX = 240;
+            sizeY = 160;
+
+            applyVerticalMosaic_Mod(control, realX, realY, dmx, dmy);
+        } else {
+            screenBase = (DISPCNT & 0x0010 ? reinterpret_cast<uint16_t*>(&g_vram[0xA000]) :
+                              reinterpret_cast<uint16_t*>(&g_vram[0]));
+            sizeX = 160;
+            sizeY = 128;
+
+            int startX = signExtend((x_l) | ((x_h & 0x0FFF) << 16), 28);
+            int startY = signExtend((y_l) | ((y_h & 0x0FFF) << 16), 28);
+
+            applyVerticalMosaic_FloorDiv(control, realX, realY, dmx, dmy, startX, startY);
+        }
+
+        for (int x = 0; x < gbaWidth; x++) {
+            int xxx = realX >> 8;
+            int yyy = realY >> 8;
+            uint32_t out = 0x80000000;
+
+            if (xxx >= 0 && yyy >= 0 && xxx < sizeX && yyy < sizeY) {
+                out = READ16LE(&screenBase[yyy * sizeX + xxx]) | prio;
+            }
+
+            line[x] = out;
+            realX += dx;
+            realY += dy;
+        }
+    } break;
+
+    case 4: { // Bitmap 8bpp mode
+        uint16_t* palette = reinterpret_cast<uint16_t*>(g_paletteRAM);
+        uint8_t* screenBase = (DISPCNT & 0x0010) ? &g_vram[0xA000] : &g_vram[0];
+        int sizeX = 240;
+        int sizeY = 160;
+
+        int startX = signExtend((x_l) | ((x_h & 0x0FFF) << 16), 28);
+        int startY = signExtend((y_l) | ((y_h & 0x0FFF) << 16), 28);
+
+        applyVerticalMosaic_FloorDiv(control, realX, realY, dmx, dmy, startX, startY);
+
+        for (int x = 0; x < gbaWidth; x++) {
+            int xxx = realX >> 8;
+            int yyy = realY >> 8;
+            uint32_t out = 0x80000000;
+
+            if (xxx >= 0 && yyy >= 0 && xxx < sizeX && yyy < sizeY) {
+                uint8_t color = screenBase[yyy * sizeX + xxx];
+                if (color) out = READ16LE(&palette[color]) | prio;
+            }
+
+            line[x] = out;
+            realX += dx;
+            realY += dy;
+        }
+    } break;
+    } // switch (mode)
+
+    // Horizontal mosaic
+    if (control & 0x40) {
+        int mosaicX = (MOSAIC & 0xF) + 1;
+        if (mosaicX > 1) {
+            int m = 1;
+            for (int i = 0; i < 239; i++) {
+                line[i + 1] = line[i];
+                m++;
+                if (m == mosaicX) {
+                    m = 1;
+                    i++;
+                }
+            }
+        }
+    }
+
+    currentX += dmx;
+    currentY += dmy;
+}
+
+static inline void gfxDrawRotScreen(
+    uint16_t control,
+    uint16_t x_l, uint16_t x_h,
+    uint16_t y_l, uint16_t y_h,
+    uint16_t pa, uint16_t pb, uint16_t pc, uint16_t pd,
+    int& currentX, int& currentY, uint32_t* line) {
+
+    (void)x_l; (void)x_h; (void)y_l; (void)y_h; // unused
+    drawAffineLine240(2, control, 0, 0, 0, 0, pa, pb, pc, pd, currentX, currentY, line);
+}
+
+static inline void gfxDrawRotScreen16Bit(
+    uint16_t control,
+    uint16_t x_l, uint16_t x_h,
+    uint16_t y_l, uint16_t y_h,
+    uint16_t pa, uint16_t pb, uint16_t pc, uint16_t pd,
+    int& currentX, int& currentY, uint32_t* line) {
+
+    (void)x_l; (void)x_h; (void)y_l; (void)y_h; // unused
+    drawAffineLine240(3, control, x_l, x_h, y_l, y_h, pa, pb, pc, pd, currentX, currentY, line);
+}
+
+static inline void gfxDrawRotScreen256(
+    uint16_t control,
+    uint16_t x_l, uint16_t x_h,
+    uint16_t y_l, uint16_t y_h,
+    uint16_t pa, uint16_t pb, uint16_t pc, uint16_t pd,
+    int& currentX, int& currentY, uint32_t* line) {
+
+    drawAffineLine240(4, control, x_l, x_h, y_l, y_h, pa, pb, pc, pd, currentX, currentY, line);
+}
+
+static inline void gfxDrawRotScreen16Bit160(
+    uint16_t control,
+    uint16_t x_l, uint16_t x_h,
+    uint16_t y_l, uint16_t y_h,
+    uint16_t pa, uint16_t pb, uint16_t pc, uint16_t pd,
+    int& currentX, int& currentY, uint32_t* line) {
+
+    drawAffineLine240(5, control, x_l, x_h, y_l, y_h, pa, pb, pc, pd, currentX, currentY, line);
+}
+#else
 static inline void gfxDrawRotScreen(uint16_t control, uint16_t x_l, uint16_t x_h, uint16_t y_l, uint16_t y_h, uint16_t pa, uint16_t pb,
     uint16_t pc, uint16_t pd, int& currentX, int& currentY, uint32_t* line)
 {
@@ -571,6 +775,7 @@ static inline void gfxDrawRotScreen16Bit160(uint16_t control, uint16_t x_l, uint
     currentX += dmx;
     currentY += dmy;
 }
+#endif
 
 static inline void gfxDrawSprites(uint32_t* lineOBJ)
 {

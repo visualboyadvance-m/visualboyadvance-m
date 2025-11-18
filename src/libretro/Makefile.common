@@ -19,6 +19,10 @@ ifeq ($(NO_LINK),1)
 VBA_DEFINES += -DNO_LINK
 endif
 
+ifeq ($(AFFINE_BG_UNIFIED),1)
+VBA_DEFINES += -DAFFINE_BG_UNIFIED
+endif
+
 SOURCES_CXX :=
 
 SOURCES_CXX += \
