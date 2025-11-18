@@ -136,6 +136,141 @@ long GetSampleRate() {
 #define out_16 (systemColorDepth == 16)
 #define out_24 (systemColorDepth == 24)
 
+// Draw Unicode text on raw pixel buffer using wxWidgets
+void drawTextWx(uint8_t* buffer, int pitch, int x, int y, const wxString& text,
+                bool transparent, int buffer_width, int buffer_height, double scale) {
+    if (text.empty()) return;
+
+    (void)transparent;  // unused param
+
+    // Determine bytes per pixel based on color depth
+    int bpp = systemColorDepth >> 3;  // 16->2, 24->3, 32->4
+
+    // Scale font size with filter scale (base size: 8pt, bold font with Unicode)
+    int fontSize = (int)std::ceil(8 * scale);
+    // Use system GUI font which has Unicode support
+    wxFont font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    font.SetPointSize(fontSize);
+    font.SetWeight(wxFONTWEIGHT_BOLD);
+
+    // Create memory DC to measure text and handle line wrapping
+    wxBitmap tempBmp(1, 1);
+    wxMemoryDC tempDc(tempBmp);
+    tempDc.SetFont(font);
+
+    // Calculate maximum width for text (leave small right margin)
+    int maxWidth = buffer_width - x - (int)std::ceil(5 * scale);
+    if (maxWidth <= 0) return;
+
+    // Character-wrap the text into lines (breaks at any character)
+    wxArrayString lines;
+    wxString currentLine;
+
+    for (size_t i = 0; i < text.length(); i++) {
+        wxChar ch = text[i];
+
+        // Handle newline characters
+        if (ch == '\n') {
+            lines.Add(currentLine);
+            currentLine.clear();
+            continue;
+        }
+
+        // Try adding this character to the current line
+        wxString testLine = currentLine + ch;
+        wxSize testSize = tempDc.GetTextExtent(testLine);
+
+        if (testSize.GetWidth() > maxWidth && !currentLine.empty()) {
+            // Current line is full, start a new line with this character
+            lines.Add(currentLine);
+            currentLine = ch;
+        } else {
+            // Add character to current line
+            currentLine += ch;
+        }
+    }
+
+    // Add the last line if not empty
+    if (!currentLine.empty()) {
+        lines.Add(currentLine);
+    }
+
+    // Measure total size needed
+    int maxLineWidth = 0;
+    int lineHeight = tempDc.GetCharHeight();
+    // Add extra line spacing for better readability and to avoid clipping
+    int lineSpacing = lineHeight + 2;
+    for (size_t i = 0; i < lines.GetCount(); i++) {
+        wxSize lineSize = tempDc.GetTextExtent(lines[i]);
+        if (lineSize.GetWidth() > maxLineWidth) {
+            maxLineWidth = lineSize.GetWidth();
+        }
+    }
+
+    int textWidth = maxLineWidth + 8;
+    int textHeight = (int)(lines.GetCount() * lineSpacing) + 8;
+
+    // Don't clamp bitmap size - let it be full size and clip during pixel copy
+    if (textWidth <= 0 || textHeight <= 0) return;
+
+    wxBitmap textBmp(textWidth, textHeight, 24);
+    wxMemoryDC dc(textBmp);
+
+    // Set up the DC for text rendering with bold red text
+    dc.SetFont(font);
+    dc.SetBackground(*wxBLACK_BRUSH);
+    dc.Clear();
+    dc.SetTextForeground(*wxRED);
+
+    // Draw each line of text
+    int currentY = 2;
+    int drawLineSpacing = dc.GetCharHeight() + 2;
+    for (size_t i = 0; i < lines.GetCount(); i++) {
+        dc.DrawText(lines[i], 2, currentY);
+        currentY += drawLineSpacing;
+    }
+    dc.SelectObject(wxNullBitmap);
+
+    // Convert bitmap to image to access pixel data
+    wxImage textImg = textBmp.ConvertToImage();
+    const unsigned char* imgData = textImg.GetData();
+
+    // Blend the text image into the buffer
+    for (int ty = 0; ty < textHeight; ty++) {
+        for (int tx = 0; tx < textWidth; tx++) {
+            int bufX = x + tx;
+            int bufY = y + ty;
+
+            if (bufX >= buffer_width || bufY >= buffer_height) continue;
+
+            // Get pixel from text image (always 24-bit RGB)
+            int imgIdx = (ty * textWidth + tx) * 3;
+            uint8_t r = imgData[imgIdx];
+            (void)imgData[imgIdx + 1];  // g - unused
+            (void)imgData[imgIdx + 2];  // b - unused
+
+            // Calculate buffer position
+            uint8_t* bufPtr = buffer + (bufY * pitch) + (bufX * bpp);
+
+            // Only draw if pixel is part of red text (red channel is significantly higher than others)
+            if (r > 20) {
+                // Always write pure red for text pixels to avoid dark anti-aliased edges
+                if (systemColorDepth == 16) {
+                    uint16_t* pixel = (uint16_t*)bufPtr;
+                    *pixel = (0x1f << systemRedShift);  // Pure red in 16-bit
+                } else if (systemColorDepth == 24) {
+                    bufPtr[0] = 0;
+                    bufPtr[1] = 0;
+                    bufPtr[2] = 255;  // Pure red in 24-bit BGR
+                } else if (systemColorDepth == 32) {
+                    uint32_t* pixel = (uint32_t*)bufPtr;
+                    *pixel = (0xff << systemRedShift);  // Pure red in 32-bit
+                }
+            }
+        }
+    }
+}
+
 }  // namespace
 
 int emulating;
@@ -2199,37 +2334,24 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     if (wxGetApp().frame->IsFullScreen() || !OPTION(kPrefDisableStatus)) {
         GameArea* panel = wxGetApp().frame->GetPanel();
 
-        if (panel->osdstat.size())
-            drawText(todraw + outstride * (systemColorDepth != 24), outstride,
-                10, 20, UTF8(panel->osdstat), OPTION(kPrefShowSpeedTransparent));
+        int scaled_width = (int)std::ceil(width * scale);
+        int scaled_height = (int)std::ceil(height * scale);
+
+        if (panel->osdstat.size()) {
+            wxString statText = wxString::FromUTF8(panel->osdstat.c_str());
+            drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
+                (int)std::ceil(10 * scale), (int)std::ceil(20 * scale), statText,
+                OPTION(kPrefShowSpeedTransparent), scaled_width, scaled_height, scale);
+        }
 
         if (!panel->osdtext.empty()) {
             if (systemGetClock() - panel->osdtime < OSD_TIME) {
-                wxString message = panel->osdtext;
-                int linelen = std::ceil(width * scale - 20) / 8;
-                int nlines = (message.size() + linelen - 1) / linelen;
-                int cury = height - 14 - nlines * 10;
-                char* buf = strdup(UTF8(message));
-                char* ptr = buf;
-
-                while (nlines > 1) {
-                    char lchar = ptr[linelen];
-                    ptr[linelen] = 0;
-                    drawText(todraw + outstride * (systemColorDepth != 24),
-                        outstride, 10, cury, ptr,
-                        OPTION(kPrefShowSpeedTransparent));
-                    cury += 10;
-                    nlines--;
-                    ptr += linelen;
-                    *ptr = lchar;
-                }
-
-                drawText(todraw + outstride * (systemColorDepth != 24),
-                    outstride, 10, cury, ptr,
-                    OPTION(kPrefShowSpeedTransparent));
-
-                free(buf);
-                buf = NULL;
+                // Position near bottom of screen, scaled with filter
+                int x = (int)std::ceil(3 * scale);
+                int y = scaled_height - (int)std::ceil(44 * scale);
+                drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
+                    x, y, panel->osdtext, OPTION(kPrefShowSpeedTransparent),
+                    scaled_width, scaled_height, scale);
             } else
                 panel->osdtext.clear();
         }
@@ -2884,38 +3006,25 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
     // new style flickers too much, so we'll stick to this for now
     if (wxGetApp().frame->IsFullScreen() || !OPTION(kPrefDisableStatus)) {
         GameArea* panel = wxGetApp().frame->GetPanel();
-                
-        if (panel->osdstat.size())
-            drawText(todraw + outstride * (systemColorDepth != 24), outstride,
-                        10, 20, UTF8(panel->osdstat), OPTION(kPrefShowSpeedTransparent));
-                
+
+        int scaled_width = (int)std::ceil(width * scale);
+        int scaled_height = (int)std::ceil(height * scale);
+
+        if (panel->osdstat.size()) {
+            wxString statText = wxString::FromUTF8(panel->osdstat.c_str());
+            drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
+                (int)std::ceil(10 * scale), (int)std::ceil(20 * scale), statText,
+                OPTION(kPrefShowSpeedTransparent), scaled_width, scaled_height, scale);
+        }
+
         if (!panel->osdtext.empty()) {
             if (systemGetClock() - panel->osdtime < OSD_TIME) {
-                wxString message = panel->osdtext;
-                int linelen = std::ceil(width * scale - 20) / 8;
-                int nlines = (message.size() + linelen - 1) / linelen;
-                int cury = height - 14 - nlines * 10;
-                char* buf = strdup(UTF8(message));
-                char* ptr = buf;
-
-                while (nlines > 1) {
-                    char lchar = ptr[linelen];
-                    ptr[linelen] = 0;
-                    drawText(todraw + outstride * (systemColorDepth != 24),
-                                outstride, 10, cury, ptr,
-                                OPTION(kPrefShowSpeedTransparent));
-                    cury += 10;
-                    nlines--;
-                    ptr += linelen;
-                    *ptr = lchar;
-                }
-                        
-                drawText(todraw + outstride * (systemColorDepth != 24),
-                            outstride, 10, cury, ptr,
-                            OPTION(kPrefShowSpeedTransparent));
-                        
-                free(buf);
-                buf = NULL;
+                // Position near bottom of screen, scaled with filter
+                int x = (int)std::ceil(3 * scale);
+                int y = scaled_height - (int)std::ceil(44 * scale);
+                drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
+                    x, y, panel->osdtext, OPTION(kPrefShowSpeedTransparent),
+                    scaled_width, scaled_height, scale);
             } else
                 panel->osdtext.clear();
         }
@@ -4261,42 +4370,29 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
     if (wxGetApp().frame->IsFullScreen() || !OPTION(kPrefDisableStatus)) {
         GameArea* panel = wxGetApp().frame->GetPanel();
 
-        if (panel->osdstat.size())
-            drawText(todraw + outstride * (systemColorDepth != 24), outstride,
-                        10, 20, UTF8(panel->osdstat), OPTION(kPrefShowSpeedTransparent));
-                
+        int scaled_width = (int)std::ceil(width * scale);
+        int scaled_height = (int)std::ceil(height * scale);
+
+        if (panel->osdstat.size()) {
+            wxString statText = wxString::FromUTF8(panel->osdstat.c_str());
+            drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
+                (int)std::ceil(10 * scale), (int)std::ceil(20 * scale), statText,
+                OPTION(kPrefShowSpeedTransparent), scaled_width, scaled_height, scale);
+        }
+
         if (!panel->osdtext.empty()) {
             if (systemGetClock() - panel->osdtime < OSD_TIME) {
-                wxString message = panel->osdtext;
-                int linelen = std::ceil(width * scale - 20) / 8;
-                int nlines = (message.size() + linelen - 1) / linelen;
-                int cury = height - 14 - nlines * 10;
-                char* buf = strdup(UTF8(message));
-                char* ptr = buf;
-
-                while (nlines > 1) {
-                    char lchar = ptr[linelen];
-                    ptr[linelen] = 0;
-                    drawText(todraw + outstride * (systemColorDepth != 24),
-                                outstride, 10, cury, ptr,
-                                OPTION(kPrefShowSpeedTransparent));
-                    cury += 10;
-                    nlines--;
-                    ptr += linelen;
-                    *ptr = lchar;
-                }
-
-                drawText(todraw + outstride * (systemColorDepth != 24),
-                            outstride, 10, cury, ptr,
-                            OPTION(kPrefShowSpeedTransparent));
-
-                free(buf);
-                buf = NULL;
+                // Position near bottom of screen, scaled with filter
+                int x = (int)std::ceil(3 * scale);
+                int y = scaled_height - (int)std::ceil(44 * scale);
+                drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
+                    x, y, panel->osdtext, OPTION(kPrefShowSpeedTransparent),
+                    scaled_width, scaled_height, scale);
             } else
                 panel->osdtext.clear();
         }
     }
- 
+
     // Draw the current frame
     DrawArea();
 }
