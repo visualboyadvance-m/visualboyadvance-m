@@ -856,7 +856,7 @@ msgstr "无效 GBA 卡带"
 
 #: panel.cpp:1195
 msgid "Metal is unavailable, defaulting to OpenGL"
-msgstr ""
+msgstr "Metal 后端不可用，默认使用 OpenGL"
 
 #: panel.cpp:1334
 msgid "No memory for rewinding"
@@ -896,12 +896,12 @@ msgstr "创建 SDL 窗口失败"
 
 #: panel.cpp:2482 panel.cpp:2539
 msgid "Renderer creating failed, using default renderer"
-msgstr ""
+msgstr "渲染器创建失败，开始使用默认渲染器"
 
 #: panel.cpp:2483
 #, c-format
 msgid "SDL Error: %s"
-msgstr ""
+msgstr "SDL 错误: %s"
 
 #: panel.cpp:2490 panel.cpp:2545
 msgid "Failed to create SDL renderer"
@@ -909,16 +909,16 @@ msgstr "创建 SDL 渲染器失败"
 
 #: panel.cpp:2496
 msgid "Failed to set vsync for SDL renderer"
-msgstr ""
+msgstr "无法为 SDL 渲染器设置垂直同步"
 
 #: panel.cpp:2500 panel.cpp:2534
 #, c-format
 msgid "SDL renderer: %s"
-msgstr ""
+msgstr "SDL 渲染器: %s"
 
 #: panel.cpp:2519
 msgid "SDL renderer: default"
-msgstr ""
+msgstr "SDL 渲染器: 默认"
 
 #: panel.cpp:3124
 msgid "Enabling EGL VSync."
@@ -966,7 +966,7 @@ msgstr "垂直同步在该平台上不可用 "
 
 #: panel.cpp:3292
 msgid "Using Direct3D 9Ex (dynamically loaded)"
-msgstr ""
+msgstr "使用 Direct3D 9Ex（动态加载）"
 
 #: panel.cpp:3296
 msgid "Failed to load d3d9.dll"
@@ -978,7 +978,7 @@ msgstr "创建 Direct3D 9 接口失败"
 
 #: panel.cpp:3308
 msgid "Using Direct3D 9"
-msgstr ""
+msgstr "使用 Direct3D 9"
 
 #: panel.cpp:3315
 #, c-format
@@ -987,11 +987,11 @@ msgstr "获取适配器显示模式失败: 0x%08X"
 
 #: panel.cpp:3339
 msgid "FlipEx not supported, falling back to Discard swap effect"
-msgstr ""
+msgstr "FlipEx 功能不支持，回退到弃用 SwapEffect"
 
 #: panel.cpp:3355
 msgid "Hardware vertex processing not available, falling back to software"
-msgstr ""
+msgstr "硬件顶点处理不可用，回退到软件顶点处理"
 
 #: panel.cpp:3379
 #, c-format
@@ -1001,12 +1001,12 @@ msgstr "创建 Direct3D 设备失败: 0x%08X"
 #: panel.cpp:3384
 #, c-format
 msgid "Direct3D 9%s device created successfully (SwapEffect: %s)"
-msgstr ""
+msgstr "Direct3D 9%s 设备创建成功(SwapEffect: %s)"
 
 #: panel.cpp:3417
 #, c-format
 msgid "DXDrawingPanel initialized: %dx%d (scale: %f)"
-msgstr ""
+msgstr "DXDrawingPanel 已初始化: %dx%d(缩放: %f)"
 
 #: panel.cpp:3439
 #, c-format
@@ -1016,11 +1016,11 @@ msgstr "获取适配器显示模式进行重置失败: 0x%08X"
 #: panel.cpp:3471
 #, c-format
 msgid "Attempting Direct3D device reset (SwapEffect: %s)"
-msgstr ""
+msgstr "尝试重置 Direct3D 设备(SwapEffect: %s)"
 
 #: panel.cpp:3478
 msgid "Reset with FlipEx failed, retrying with Discard swap effect"
-msgstr ""
+msgstr "使用 FlipEx 重置失败，正在尝试弃用 SwapEffect"
 
 #: panel.cpp:3490
 #, c-format
@@ -1030,7 +1030,7 @@ msgstr "重置 Direct3D 设备失败: 0x%08X"
 #: panel.cpp:3495
 #, c-format
 msgid "Direct3D device reset successfully (Final SwapEffect: %s)"
-msgstr ""
+msgstr "Direct3D 设备重置成功(最终 SwapEffect: %s)"
 
 #: panel.cpp:3562
 #, c-format
