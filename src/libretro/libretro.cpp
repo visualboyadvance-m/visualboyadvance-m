@@ -810,7 +810,7 @@ static void load_image_preferences(void)
     unsigned i = 0, found_no = 0;
     unsigned long romCrc32 = crc32(0, g_rom, romSize);
 
-    coreOptions.cpuSaveType = GBA_SAVE_AUTO;
+    coreOptions.saveType = GBA_SAVE_AUTO;
     g_flashSize = SIZE_FLASH512;
     eepromSize = SIZE_EEPROM_512;
     coreOptions.rtcEnabled = false;
@@ -847,24 +847,24 @@ static void load_image_preferences(void)
         log("Name            : %s\n", gbaover[found_no].romtitle);
 
         coreOptions.rtcEnabled = gbaover[found_no].rtcEnabled;
-        coreOptions.cpuSaveType = gbaover[found_no].saveType;
+        coreOptions.saveType = gbaover[found_no].saveType;
 
         unsigned size = gbaover[found_no].saveSize;
-        if (coreOptions.cpuSaveType == GBA_SAVE_SRAM)
+        if (coreOptions.saveType == GBA_SAVE_SRAM)
             g_flashSize = SIZE_SRAM;
-        else if (coreOptions.cpuSaveType == GBA_SAVE_FLASH)
+        else if (coreOptions.saveType == GBA_SAVE_FLASH)
             g_flashSize = (size == SIZE_FLASH1M) ? SIZE_FLASH1M : SIZE_FLASH512;
-        else if ((coreOptions.cpuSaveType == GBA_SAVE_EEPROM) || (coreOptions.cpuSaveType == GBA_SAVE_EEPROM_SENSOR))
+        else if ((coreOptions.saveType == GBA_SAVE_EEPROM) || (coreOptions.saveType == GBA_SAVE_EEPROM_SENSOR))
             eepromSize = (size == SIZE_EEPROM_8K) ? SIZE_EEPROM_8K : SIZE_EEPROM_512;
     }
 
     // gameID that starts with 'F' are classic/famicom games
     coreOptions.mirroringEnable = (buffer[0] == 'F') ? true : false;
 
-    if (!coreOptions.cpuSaveType)
+    if (!coreOptions.saveType)
         flashDetectSaveType(romSize);
 
-    coreOptions.saveType = coreOptions.cpuSaveType;
+    coreOptions.saveType = coreOptions.saveType;
 
     if (g_flashSize == SIZE_FLASH512 || g_flashSize == SIZE_FLASH1M)
         flashSetSize(g_flashSize);
@@ -884,10 +884,10 @@ static void load_image_preferences(void)
 
     log("romSize         : %dKB\n", (romSize + 1023) / 1024);
     log("has RTC         : %s.\n", coreOptions.rtcEnabled ? "Yes" : "No");
-    log("cpuSaveType     : %s.\n", savetype[coreOptions.cpuSaveType]);
-    if (coreOptions.cpuSaveType == 3)
+    log("saveType        : %s.\n", savetype[coreOptions.saveType]);
+    if (coreOptions.saveType == 3)
         log("g_flashSize       : %d.\n", g_flashSize);
-    else if (coreOptions.cpuSaveType == 1)
+    else if (coreOptions.saveType == 1)
         log("eepromSize      : %d.\n", eepromSize);
     log("mirroringEnable : %s.\n", coreOptions.mirroringEnable ? "Yes" : "No");
 }
