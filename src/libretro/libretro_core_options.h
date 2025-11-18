@@ -176,20 +176,6 @@ struct retro_core_option_v2_definition option_defs_us[] = {
         "disabled"
     },
     {
-        "vbam_gbcoloroption",
-        "(GB) Color Correction",
-        NULL,
-        "Applies color correction which fixes colors in some games.",
-        NULL,
-        "video",
-        {
-            { "disabled",  NULL },
-            { "enabled",   NULL },
-            { NULL, NULL },
-        },
-        "disabled"
-    },
-    {
         "vbam_lcdfilter",
         "LCD Color Filter",
         NULL,

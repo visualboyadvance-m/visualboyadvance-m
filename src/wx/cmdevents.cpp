@@ -2489,11 +2489,6 @@ EVT_HANDLER_MASK(GBLcdFilter, "Enable LCD filter", CMDEN_GB)
     GetMenuOptionConfig("GBLcdFilter", config::OptionID::kGBLCDFilter);
 }
 
-EVT_HANDLER(GBColorOption, "Enable GB color option")
-{
-    GetMenuOptionConfig("GBColorOption", config::OptionID::kGBColorOption);
-}
-
 EVT_HANDLER(ApplyPatches, "Apply IPS/UPS/IPF patches if found")
 {
     GetMenuOptionConfig("ApplyPatches", config::OptionID::kPrefAutoPatch);

@@ -287,37 +287,6 @@ static constexpr std::array<uint16_t, 0x40> kGbGbaSpPalette = {
 
 static constexpr size_t kTama5RamSize = k256B;
 
-int gbGetValue(int min, int max, int v) {
-    return (int)(min + (float)(max - min) *
-                           (2.0 * (v / 31.0) - (v / 31.0) * (v / 31.0)));
-}
-
-void gbGenFilter() {
-    for (int r = 0; r < 32; r++) {
-        for (int g = 0; g < 32; g++) {
-            for (int b = 0; b < 32; b++) {
-                int nr =
-                    gbGetValue(gbGetValue(4, 14, g), gbGetValue(24, 29, g), r) -
-                    4;
-                int ng = gbGetValue(gbGetValue(4 + gbGetValue(0, 5, r),
-                                               14 + gbGetValue(0, 3, r), b),
-                                    gbGetValue(24 + gbGetValue(0, 3, r),
-                                               29 + gbGetValue(0, 1, r), b),
-                                    g) -
-                         4;
-                int nb = gbGetValue(gbGetValue(4 + gbGetValue(0, 5, r),
-                                               14 + gbGetValue(0, 3, r), g),
-                                    gbGetValue(24 + gbGetValue(0, 3, r),
-                                               29 + gbGetValue(0, 1, r), g),
-                                    b) -
-                         4;
-                gbColorFilter[(b << 10) | (g << 5) | r] =
-                    (uint16_t)((nb << 10) | (ng << 5) | nr);
-            }
-        }
-    }
-}
-
 // Initializes the `g_gbCartData` variable with the data in `gbRom`, expecting a
 // size of `romSize` bytes. Returns true on success.
 bool gbInitializeRom(size_t romSize) {
@@ -469,7 +438,6 @@ bool gbInitializeRom(size_t romSize) {
         memset(gbRam, gbRamFill, ramSize);
     }
 
-    gbGenFilter();
     gbSgbInit();
     setColorizerHack(false);
 
@@ -4616,9 +4584,9 @@ void gbEmulate(int ticksToStop)
                                         gbRenderLine();
                                         gbDrawSprites(true);
                                     } else if (gbBlackScreen) {
-                                        uint16_t color = gbColorOption ? gbColorFilter[0] : 0;
+                                        uint16_t color = 0;
                                         if (!gbCgbMode)
-                                            color = gbColorOption ? gbColorFilter[gbPalette[3] & 0x7FFF] : gbPalette[3] & 0x7FFF;
+                                            color = gbPalette[3] & 0x7FFF;
                                         for (size_t i = 0; i < kGBWidth; i++) {
                                             gbLineMix[i] = color;
                                             gbLineBuffer[i] = 0;
@@ -4681,9 +4649,9 @@ void gbEmulate(int ticksToStop)
                     gbWhiteScreen = 1;
                     uint8_t register_LYLcdOff = ((register_LY + 154) % 154);
                     for (register_LY = 0; register_LY <= 0x90; register_LY++) {
-                        uint16_t color = gbColorOption ? gbColorFilter[0x7FFF] : 0x7FFF;
+                        uint16_t color = 0x7FFF;
                         if (!gbCgbMode)
-                            color = gbColorOption ? gbColorFilter[gbPalette[0] & 0x7FFF] : gbPalette[0] & 0x7FFF;
+                            color = gbPalette[0] & 0x7FFF;
                         for (size_t i = 0; i < kGBWidth; i++) {
                             gbLineMix[i] = color;
                             gbLineBuffer[i] = 0;
@@ -4702,9 +4670,9 @@ void gbEmulate(int ticksToStop)
                     gbLcdLYIncrementTicks += GBLY_INCREMENT_CLOCK_TICKS;
                     if (register_LY < kGBHeight) {
 
-                        uint16_t color = gbColorOption ? gbColorFilter[0x7FFF] : 0x7FFF;
+                        uint16_t color = 0x7FFF;
                         if (!gbCgbMode)
-                            color = gbColorOption ? gbColorFilter[gbPalette[0] & 0x7FFF] : gbPalette[0] & 0x7FFF;
+                            color = gbPalette[0] & 0x7FFF;
                         for (size_t i = 0; i < kGBWidth; i++) {
                             gbLineMix[i] = color;
                             gbLineBuffer[i] = 0;

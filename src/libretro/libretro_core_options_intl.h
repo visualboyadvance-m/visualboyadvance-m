@@ -200,20 +200,6 @@ struct retro_core_option_v2_definition option_defs_tr[] = {
         "disabled"
     },
     {
-        "vbam_gbcoloroption",
-        "(GB) Renk Düzeltme",
-        NULL,
-        "Bazı oyunlarda renkleri düzelten renk düzeltmesini uygular.",
-        NULL,
-        "video",
-        {
-            { "disabled",  NULL },
-            { "enabled",   NULL },
-            { NULL, NULL },
-        },
-        "disabled"
-    },
-    {
         "vbam_soundinterpolation",
         "Ses Enterpolasyonu",
         NULL,

@@ -1241,13 +1241,6 @@ static void update_variables(bool startup)
             set_gbPalette();
     }
 
-    var.key = "vbam_gbcoloroption";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        gbColorOption = (!strcmp(var.value, "enabled"));
-    }
-
     var.key = "vbam_lcdfilter_type";
     var.value = NULL;
 

@@ -517,10 +517,6 @@
           <label>Configure...</label>
         </object>
         <object class="separator"/>
-        <object class="wxMenuItem" name="GBColorOption">
-          <label>_Game Boy color option</label>
-          <checkable>1</checkable>
-        </object>
         <object class="wxMenuItem" name="GBLcdFilter">
           <label>_LCD Filter</label>
           <checkable>1</checkable>

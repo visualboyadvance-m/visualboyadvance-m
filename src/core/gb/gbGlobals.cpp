@@ -17,7 +17,6 @@ uint8_t gbObp0[4] = { 0, 1, 2, 3 };
 uint8_t gbObp1[4] = { 0, 1, 2, 3 };
 int gbWindowLine = -1;
 
-uint16_t gbColorFilter[32768];
 uint32_t gbEmulatorType = 0;
 uint32_t gbPaletteOption = 0;
 int gbBorderLineSkip = 160;
@@ -28,6 +27,5 @@ bool gbBorderAutomatic = false;
 bool gbBorderOn = false;
 bool gbCgbMode = false;
 bool gbSgbMode = false;
-bool gbColorOption = false;
 
 uint8_t (*gbSerialFunction)(uint8_t) = NULL;

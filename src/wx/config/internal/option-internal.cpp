@@ -296,7 +296,6 @@ std::array<Option, kNbOptions>& Option::All() {
 
         /// GB
         Option(OptionID::kGBBiosFile, &g_owned_opts.gb_bios),
-        Option(OptionID::kGBColorOption, &gbColorOption),
         Option(OptionID::kGBColorizerHack, &g_owned_opts.colorizer_hack),
         Option(OptionID::kGBLCDFilter, &g_owned_opts.gb_lcd_filter),
         Option(OptionID::kGBGBCBiosFile, &g_owned_opts.gbc_bios),
@@ -446,7 +445,6 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
 
     /// GB
     OptionData{"GB/BiosFile", "", _("BIOS file to use for Game Boy, if enabled")},
-    OptionData{"GB/ColorOption", "GBColorOption", _("Game Boy color enhancement, if enabled")},
     OptionData{"GB/ColorizerHack", "ColorizerHack", _("Enable DX Colorization Hacks")},
     OptionData{"GB/LCDFilter", "GBLcdFilter", _("Apply LCD filter, if enabled")},
     OptionData{"GB/GBCBiosFile", "", _("BIOS file to use for Game Boy Color, if enabled")},

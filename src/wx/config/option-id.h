@@ -23,7 +23,6 @@ enum class OptionID {
 
     /// GB
     kGBBiosFile,
-    kGBColorOption,
     kGBColorizerHack,
     kGBLCDFilter,
     kGBGBCBiosFile,

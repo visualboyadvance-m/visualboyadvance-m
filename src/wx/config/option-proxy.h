@@ -27,7 +27,6 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
 
     /// GB
     /*kGBBiosFile*/ Option::Type::kString,
-    /*kGBColorOption*/ Option::Type::kBool,
     /*kGBColorizerHack*/ Option::Type::kBool,
     /*kGBLCDFilter*/ Option::Type::kBool,
     /*kGBGBCBiosFile*/ Option::Type::kString,

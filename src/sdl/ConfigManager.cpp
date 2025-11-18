@@ -87,7 +87,6 @@ enum named_opts
 	OPT_DOTCODE_FILE_NAME_SAVE,
 	OPT_GB_BORDER_AUTOMATIC,
 	OPT_GB_BORDER_ON,
-	OPT_GB_COLOR_OPTION,
 	OPT_GB_EMULATOR_TYPE,
 	OPT_GB_FRAME_SKIP,
 	OPT_GB_PALETTE_OPTION,
@@ -176,7 +175,6 @@ struct option argOptions[] = {
 	{ "cheat", required_argument, 0, OPT_CHEAT },
 	{ "cheats-enabled", no_argument, &coreOptions.cheatsEnabled, 1 },
 	{ "color-depth", required_argument, 0, 'z'},
-	{ "color-option", no_argument, 0, OPT_GB_COLOR_OPTION },
 	{ "config", required_argument, 0, 'c' },
 	{ "cpu-disable-sfx", no_argument, &coreOptions.cpuDisableSfx, 1 },
 	{ "cpu-save-type", required_argument, 0, OPT_CPU_SAVE_TYPE },
@@ -193,7 +191,6 @@ struct option argOptions[] = {
 	{ "full-screen", no_argument, &fullScreen, 1 },
 	{ "gb-border-automatic", no_argument, 0, OPT_GB_BORDER_AUTOMATIC },
 	{ "gb-border-on", no_argument, 0, OPT_GB_BORDER_ON },
-	{ "gb-color-option", no_argument, 0, OPT_GB_COLOR_OPTION },
 	{ "gb-emulator-type", required_argument, 0, OPT_GB_EMULATOR_TYPE },
 	{ "gb-frame-skip", required_argument, 0, OPT_GB_FRAME_SKIP },
 	{ "gb-palette-option", required_argument, 0, OPT_GB_PALETTE_OPTION },
@@ -327,7 +324,6 @@ void LoadConfig()
 	fullScreen = ReadPrefHex("fullScreen");
 	gbBorderAutomatic = ReadPref("borderAutomatic", 1);
 	gbBorderOn = ReadPrefHex("borderOn");
-	gbColorOption = ReadPref("colorOption", 0);
 	gbEmulatorType = ReadPref("emulatorType", 0);
 	gbFrameSkip = ReadPref("gbFrameSkip", 0);
 	gbPaletteOption = ReadPref("gbPaletteOption", 0);
@@ -966,12 +962,6 @@ int ReadOpts(int argc, char ** argv)
 			// --border-on
 			// --gb-border-on
 			gbBorderOn = true;
-			break;
-
-		case OPT_GB_COLOR_OPTION:
-			// --color-option
-			// --gb-color-option
-			gbColorOption = true;
 			break;
 
 		case OPT_GB_EMULATOR_TYPE:
