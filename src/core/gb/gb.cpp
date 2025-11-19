@@ -65,7 +65,7 @@ std::vector<VBamIoVec> g_vbamIoVecs;
 
 void ResetMBC3RTC() {
     time(&gbDataMBC3.mapperLastTime);
-    struct tm lt_storage;
+    [[maybe_unused]] struct tm lt_storage;
     struct tm* lt = NULL;
 #if __STDC_WANT_SECURE_LIB__
     localtime_s(&lt_storage, &gbDataMBC3.mapperLastTime);
