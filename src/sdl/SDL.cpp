@@ -2227,9 +2227,19 @@ int main(int argc, char** argv)
             if (!failed) {
                 gbGetHardwareType();
 
-                // used for the handling of the gb Boot Rom
-                if (gbHardware & 7)
+                // Load BIOS for the actual system being emulated
+                // gbHardware: 1=GB, 2=GBC, 4=SGB/SGB2, 8=GBA
+                // Only load BIOS for GB and GBC modes
+                if (gbHardware == 2) {
+                    // Game Boy Color
+                    gbCPUInit(biosFileNameGBC, coreOptions.useBios);
+                } else if (gbHardware == 1) {
+                    // Game Boy
                     gbCPUInit(biosFileNameGB, coreOptions.useBios);
+                } else {
+                    // SGB/SGB2 (4) or GBA (8) - no BIOS loaded
+                    gbCPUInit(NULL, false);
+                }
 
                 cartridgeType = IMAGE_GB;
                 emulator = GBSystem;

@@ -472,10 +472,23 @@ void GameArea::LoadGame(const wxString& name)
         // Set up the core for the colorizer hack.
         setColorizerHack(OPTION(kGBColorizerHack));
 
-        const bool use_bios = gbCgbMode ? OPTION(kPrefUseBiosGBC).Get()
-                                        : OPTION(kPrefUseBiosGB).Get();
+        // Load BIOS for the actual system being emulated
+        // gbHardware: 1=GB, 2=GBC, 4=SGB/SGB2, 8=GBA
+        // Only load BIOS for GB and GBC modes
+        bool use_bios = false;
+        wxString bios_file;
 
-        const wxString bios_file = gbCgbMode ? OPTION(kGBGBCBiosFile).Get() : OPTION(kGBBiosFile).Get();
+        if (gbHardware == 2) {
+            // Game Boy Color
+            use_bios = OPTION(kPrefUseBiosGBC).Get();
+            bios_file = OPTION(kGBGBCBiosFile).Get();
+        } else if (gbHardware == 1) {
+            // Game Boy
+            use_bios = OPTION(kPrefUseBiosGB).Get();
+            bios_file = OPTION(kGBBiosFile).Get();
+        }
+        // For SGB/SGB2 (4) and GBA (8), use_bios remains false (no BIOS loaded)
+
         gbCPUInit(bios_file.To8BitData().data(), use_bios);
 
         if (use_bios && !coreOptions.useBios) {
