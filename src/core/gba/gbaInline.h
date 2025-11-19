@@ -107,7 +107,7 @@ static inline uint32_t CPUReadMemory(uint32_t address)
         }
     }
 #endif
-    uint32_t value = 0;
+    uint32_t value = 0xFFFFFFFF;
 
     switch (address >> 24) {
     case 0:
@@ -249,7 +249,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
     }
 #endif
 
-    uint32_t value = 0;
+    uint32_t value = 0xFFFFFFFF;
 
     switch (address >> 24) {
     case 0:
@@ -457,7 +457,7 @@ static inline uint8_t CPUReadByte(uint32_t address)
         case 0x8500:
             return DowncastU8(systemGetSensorY() >> 8);
         }
-	/* fallthrough */
+        return 0xFF;
     default:
     unreadable:
 #ifdef GBA_LOGGING
@@ -576,7 +576,7 @@ static inline void CPUWriteMemory(uint32_t address, uint32_t value)
     case 0x0E:
     case 0x0F:
         if ((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled) {
-            (*cpuSaveGameFunc)(address, (uint8_t)value);
+            (*cpuSaveGameFunc)(address, (uint8_t)(value >> (8 * (address & 3))));
             break;
         }
         goto unwritable;
@@ -700,7 +700,7 @@ static inline void CPUWriteHalfWord(uint32_t address, uint16_t value)
     case 14:
     case 15:
         if ((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled) {
-            (*cpuSaveGameFunc)(address, (uint8_t)value);
+            (*cpuSaveGameFunc)(address, (uint8_t)(value >> (8 * (address & 1))));
             break;
         }
         /* fallthrough */
@@ -848,8 +848,6 @@ static inline void CPUWriteByte(uint32_t address, uint8_t b)
     case 14:
     case 15:
         if ((coreOptions.saveType != 5) && ((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled)) {
-            // if(!cpuEEPROMEnabled && (cpuSramEnabled | cpuFlashEnabled)) {
-
             (*cpuSaveGameFunc)(address, b);
             break;
         }
