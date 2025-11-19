@@ -791,6 +791,29 @@ static const ini_t gbaover[512] = {
     #include "gba-over.inc"
 };
 
+/* --------------------------------------------------------------
+   RARE / NON-STANDARD IDENTIFIER CASES
+   These games do NOT use the normal "SRAM_", "FLASH1M_", etc.
+   signatures found in commercial GBA titles.
+   They must be explicitly detected by name or unique byte strings.
+   -------------------------------------------------------------- */
+static bool find_string(const uint8_t *buf, size_t size, const char *str) {
+    int i, j;
+    int len = 0;
+
+    while (str[len]) len++;
+
+    for (i = 0; i <= size - len; i++) {
+        for (j = 0; j < len; j++) {
+            if (buf[i + j] != (unsigned char)str[j])
+                break;
+        }
+        if (j == len)
+            return true; /* found */
+    }
+    return false; /* not found */
+}
+
 static int romSize = 0;
 
 static void load_image_preferences(void)
@@ -861,10 +884,19 @@ static void load_image_preferences(void)
     // gameID that starts with 'F' are classic/famicom games
     coreOptions.mirroringEnable = (buffer[0] == 'F') ? true : false;
 
-    if (!coreOptions.saveType)
+    /* --------------------------------------------------------------
+       SHANTAE ADVANCE (PROTOTYPE)  —  VERY RARE CASE
+       Does NOT contain standard save signatures, mostly detected to be
+       using EEPROM.
+       -------------------------------------------------------------- */
+    if (find_string(g_rom, romSize, "Shantae Advance") ||
+        find_string(g_rom, romSize, "Shantae") /* fallback */ )
+    {
+        coreOptions.saveType = GBA_SAVE_SRAM; /* SRAM */
+        g_flashSize = SIZE_SRAM;
+    } else if (!coreOptions.saveType) {
         flashDetectSaveType(romSize);
-
-    coreOptions.saveType = coreOptions.saveType;
+    }
 
     if (g_flashSize == SIZE_FLASH512 || g_flashSize == SIZE_FLASH1M)
         flashSetSize(g_flashSize);
