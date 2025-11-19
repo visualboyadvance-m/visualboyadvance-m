@@ -558,23 +558,23 @@ void SuperEagle (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
 
         // Calculate current pixel position relative to width
         uint32_t currentPos = width - finish;
-        
+
         // Safe boundary checks
         colorB1 = (height > 0) ? *(bP - Nextline) : *(bP);
-        colorB2 = (height > 0 && currentPos < width - 1) ? *(bP - Nextline + 1) : colorB1;
+        colorB2 = (height > 0 && currentPos < static_cast<uint32_t>(width - 1)) ? *(bP - Nextline + 1) : colorB1;
 
         color4 = (currentPos > 0) ? *(bP - 1) : *(bP);
         color5 = *(bP);
-        color6 = (currentPos < width - 1) ? *(bP + 1) : color5;
-        colorS2 = (currentPos < width - 2) ? *(bP + 2) : color6;
+        color6 = (currentPos < static_cast<uint32_t>(width - 1)) ? *(bP + 1) : color5;
+        colorS2 = (currentPos < static_cast<uint32_t>(width - 2)) ? *(bP + 2) : color6;
 
         color1 = (currentPos > 0) ? *(bP + Nextline - 1) : *(bP + Nextline);
         color2 = *(bP + Nextline);
-        color3 = (currentPos < width - 1) ? *(bP + Nextline + 1) : color2;
-        colorS1 = (currentPos < width - 2) ? *(bP + Nextline + 2) : color3;
+        color3 = (currentPos < static_cast<uint32_t>(width - 1)) ? *(bP + Nextline + 1) : color2;
+        colorS1 = (currentPos < static_cast<uint32_t>(width - 2)) ? *(bP + Nextline + 2) : color3;
 
         colorA1 = (height > 1) ? *(bP + Nextline + Nextline) : color2;
-        colorA2 = (height > 1 && currentPos < width - 1) ? *(bP + Nextline + Nextline + 1) : colorA1;
+        colorA2 = (height > 1 && currentPos < static_cast<uint32_t>(width - 1)) ? *(bP + Nextline + Nextline + 1) : colorA1;
 
         // --------------------------------------
         if (color2 == color6 && color5 != color3) {
@@ -698,23 +698,23 @@ void SuperEagle32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
 
       // Calculate current pixel position relative to width
       uint32_t currentPos = width - finish;
-      
+
       // Safe boundary checks
       colorB1 = (height > 0) ? *(bP - Nextline) : *(bP);
-      colorB2 = (height > 0 && currentPos < width - 1) ? *(bP - Nextline + 1) : colorB1;
+      colorB2 = (height > 0 && currentPos < static_cast<uint32_t>(width - 1)) ? *(bP - Nextline + 1) : colorB1;
 
       color4 = (currentPos > 0) ? *(bP - 1) : *(bP);
       color5 = *(bP);
-      color6 = (currentPos < width - 1) ? *(bP + 1) : color5;
-      colorS2 = (currentPos < width - 2) ? *(bP + 2) : color6;
+      color6 = (currentPos < static_cast<uint32_t>(width - 1)) ? *(bP + 1) : color5;
+      colorS2 = (currentPos < static_cast<uint32_t>(width - 2)) ? *(bP + 2) : color6;
 
       color1 = (currentPos > 0) ? *(bP + Nextline - 1) : *(bP + Nextline);
       color2 = *(bP + Nextline);
-      color3 = (currentPos < width - 1) ? *(bP + Nextline + 1) : color2;
-      colorS1 = (currentPos < width - 2) ? *(bP + Nextline + 2) : color3;
+      color3 = (currentPos < static_cast<uint32_t>(width - 1)) ? *(bP + Nextline + 1) : color2;
+      colorS1 = (currentPos < static_cast<uint32_t>(width - 2)) ? *(bP + Nextline + 2) : color3;
 
       colorA1 = (height > 1) ? *(bP + Nextline + Nextline) : color2;
-      colorA2 = (height > 1 && currentPos < width - 1) ? *(bP + Nextline + Nextline + 1) : colorA1;
+      colorA2 = (height > 1 && currentPos < static_cast<uint32_t>(width - 1)) ? *(bP + Nextline + Nextline + 1) : colorA1;
 
       // --------------------------------------
       // 32-bit mode uses INTERPOLATE_PACKED for LCD filter compatibility
