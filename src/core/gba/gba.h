@@ -172,6 +172,7 @@ void SetSaveDotCodeFile(const char* szFile);
 void gbaUpdateRomSize(int size);
 
 // Retrieve the current ROM size in bytes.
+// NOTE: size will not be always be power-of-twos, dont use for mask calculation
 size_t gbaGetRomSize();
 
 extern struct EmulatedSystem GBASystem;

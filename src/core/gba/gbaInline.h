@@ -77,24 +77,21 @@ static inline int8_t Downcast8(T value) {
 extern uint32_t myROM[];
 
 static inline uint32_t CPUReadROM32(uint32_t address) {
-    uint32_t pos = address & 0x01FFFFFC;
-    if ((pos + 3) < static_cast<uint32_t>(gbaGetRomSize()))
-        return READ32LE(((uint32_t*)&g_rom[pos]));
-    return (((((pos + 2) >> 1) & 0xFFFF) << 16) | ((pos >> 1) & 0xFFFF));
+    if (address >= gbaGetRomSize())
+        return (((((address | 2) >> 1) & 0xFFFF) << 16) | (((address & ~2) >> 1) & 0xFFFF));
+    return READ32LE(((uint32_t*)&g_rom[address & ~3]));
 }
 
 static inline uint16_t CPUReadROM16(uint32_t address) {
-    uint32_t pos = address & 0x01FFFFFE;
-    if ((pos + 1) < static_cast<uint32_t>(gbaGetRomSize()))
-        return READ16LE(((uint16_t*)&g_rom[pos]));
-    return (uint16_t)(pos >> 1) & 0xFFFF;
+    if (address >= gbaGetRomSize())
+        return (uint16_t)(address >> 1) & 0xFFFF;
+    return READ16LE(((uint16_t*)&g_rom[address & ~1]));
 }
 
 static inline uint8_t CPUReadROM8(uint32_t address) {
-    uint32_t pos = address & 0x01FFFFFF;
-    if (pos < static_cast<uint32_t>(gbaGetRomSize()))
-        return g_rom[pos];
-    return (uint8_t)(pos >> 1) & 0xFF;
+    if (address >= gbaGetRomSize())
+        return (uint8_t)(address >> 1) & 0xFF;
+    return g_rom[address];
 }
 
 static inline uint32_t CPUReadMemory(uint32_t address)
@@ -168,7 +165,7 @@ static inline uint32_t CPUReadMemory(uint32_t address)
     case 10:
     case 11:
     case 12:
-        value = CPUReadROM32(address);
+        value = CPUReadROM32(address & 0x1FFFFFC);
         break;
     case 13:
         if (cpuEEPROMEnabled)
@@ -317,7 +314,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
         if (address == 0x80000c4 || address == 0x80000c6 || address == 0x80000c8)
             value = rtcRead(address);
         else
-            value = CPUReadROM16(address);
+            value = CPUReadROM16(address & 0x1FFFFFE);
         break;
     case 13:
         if (cpuEEPROMEnabled)
@@ -437,7 +434,7 @@ static inline uint8_t CPUReadByte(uint32_t address)
     case 10:
     case 11:
     case 12:
-        return CPUReadROM8(address);
+        return CPUReadROM8(address & 0x1FFFFFF);
     case 13:
         if (cpuEEPROMEnabled)
             return DowncastU8(eepromRead(address));
