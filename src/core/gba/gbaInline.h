@@ -28,7 +28,6 @@ extern bool cpuFlashEnabled;
 extern bool cpuEEPROMEnabled;
 extern bool cpuEEPROMSensorEnabled;
 extern bool cpuDmaRunning;
-extern uint32_t cpuDmaLast;
 extern uint32_t cpuDmaPC;
 extern bool timer0On;
 extern int timer0Ticks;
@@ -43,6 +42,9 @@ extern bool timer3On;
 extern int timer3Ticks;
 extern int timer3ClockReload;
 extern int cpuTotalTicks;
+
+extern uint32_t cpuDmaLatchData[4];
+extern int cpuDmaChannelActive;
 
 #define CPUReadByteQuick(addr) map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask]
 
@@ -189,7 +191,7 @@ static inline uint32_t CPUReadMemory(uint32_t address)
         }
 #endif
         if (cpuDmaRunning || ((reg[15].I - cpuDmaPC) == (armState ? 4u : 2u))) {
-            value = cpuDmaLast;
+            value = cpuDmaLatchData[cpuDmaChannelActive];
         } else {
             if (armState) {
                 value = CPUReadMemoryQuick(reg[15].I);
@@ -332,7 +334,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
     default:
     unreadable:
         if (cpuDmaRunning|| ((reg[15].I - cpuDmaPC) == (armState ? 4u : 2u))) {
-            value = cpuDmaLast & 0xFFFF;
+            value = cpuDmaLatchData[cpuDmaChannelActive] & 0xFFFF;
         } else {
             int param = reg[15].I;
             if (armState)
@@ -465,7 +467,7 @@ static inline uint8_t CPUReadByte(uint32_t address)
         }
 #endif
         if (cpuDmaRunning || ((reg[15].I - cpuDmaPC) == (armState ? 4u : 2u))) {
-            return cpuDmaLast & 0xFF;
+            return cpuDmaLatchData[cpuDmaChannelActive] & 0xFF;
         } else {
             if (armState) {
                 return CPUReadByteQuick(reg[15].I + (address & 3));
