@@ -85,9 +85,9 @@ if (Test-Path $zipFile) {
 
 # Determine compression level
 if ($maxCompression) {
-    $compressionLevel = [System.IO.Compression.CompressionLevel]::Optimal
+    $compressionLevel = [System.IO.Compression.CompressionLevel]::SmallestSize
 } else {
-    $compressionLevel = [System.IO.Compression.CompressionLevel]::Fastest
+    $compressionLevel = [System.IO.Compression.CompressionLevel]::Optimal
 }
 
 try {
@@ -129,45 +129,66 @@ try {
             # It's a directory
             if ($recursive) {
                 # Get base path for relative entry names
-                $baseDir = Split-Path $sourcePath -Parent
-                if ([string]::IsNullOrEmpty($baseDir)) {
-                    $baseDir = (Get-Location).Path
-                }
+                # Use the source path itself as base to avoid adding the root directory
+                $baseDir = $sourcePath
 
-                # Get all files recursively
-                $files = Get-ChildItem $sourcePath -Recurse -File
+                # Collect all entries (directories and files) with their metadata
+                $allEntries = @()
 
-                foreach ($file in $files) {
-                    # Create relative path for zip entry
-                    $relativePath = $file.FullName.Substring($baseDir.Length).TrimStart('\', '/')
-                    $entryName = $relativePath -replace '\\', '/'
-
-                    # Check if it's a symbolic link
-                    if ($storeSymlinks -and $file.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
-                        Write-Verbose "Adding symbolic link: $entryName"
-                    }
-
-                    [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
-                        $zipArchive,
-                        $file.FullName,
-                        $entryName,
-                        $compressionLevel
-                    ) | Out-Null
-
-                    Write-Verbose "Added: $entryName"
-                }
-
-                # Add empty directories
-                $dirs = Get-ChildItem $sourcePath -Recurse -Directory | Where-Object {
-                    (Get-ChildItem $_.FullName).Count -eq 0
-                }
-
+                # Add directories
+                $dirs = Get-ChildItem $sourcePath -Recurse -Directory
                 foreach ($dir in $dirs) {
                     $relativePath = $dir.FullName.Substring($baseDir.Length).TrimStart('\', '/')
                     $entryName = ($relativePath -replace '\\', '/') + '/'
+                    $allEntries += @{
+                        Type = 'Directory'
+                        EntryName = $entryName
+                        FullPath = $dir.FullName
+                    }
+                }
 
-                    $zipArchive.CreateEntry($entryName) | Out-Null
-                    Write-Verbose "Added directory: $entryName"
+                # Add files
+                $files = Get-ChildItem $sourcePath -Recurse -File
+                foreach ($file in $files) {
+                    $relativePath = $file.FullName.Substring($baseDir.Length).TrimStart('\', '/')
+                    $entryName = $relativePath -replace '\\', '/'
+                    $allEntries += @{
+                        Type = 'File'
+                        EntryName = $entryName
+                        FullPath = $file.FullName
+                        IsSymlink = $file.Attributes -band [System.IO.FileAttributes]::ReparsePoint
+                    }
+                }
+
+                # Sort entries by path using ordinal comparison (like zip.exe does)
+                # This creates depth-first order: parent/, parent/child/, parent/child/file
+                $allEntries = [System.Linq.Enumerable]::OrderBy(
+                    [object[]]$allEntries,
+                    [Func[object,string]]{ param($x) $x.EntryName },
+                    [StringComparer]::Ordinal
+                )
+
+                # Add entries in sorted order
+                foreach ($entry in $allEntries) {
+                    if ($entry.Type -eq 'Directory') {
+                        $zipArchive.CreateEntry($entry.EntryName) | Out-Null
+                        Write-Verbose "Added directory: $($entry.EntryName)"
+                    }
+                    else {
+                        # Check if it's a symbolic link
+                        if ($storeSymlinks -and $entry.IsSymlink) {
+                            Write-Verbose "Adding symbolic link: $($entry.EntryName)"
+                        }
+
+                        [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
+                            $zipArchive,
+                            $entry.FullPath,
+                            $entry.EntryName,
+                            $compressionLevel
+                        ) | Out-Null
+
+                        Write-Verbose "Added: $($entry.EntryName)"
+                    }
                 }
             }
             else {
