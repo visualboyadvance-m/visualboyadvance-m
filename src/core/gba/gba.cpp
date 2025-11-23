@@ -2633,7 +2633,7 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
 
     if (transfer32) {
         s &= 0xFFFFFFFC;
-        if (s < 0x02000000 && (reg[15].I >> 24)) {
+        if (s < 0x02000000) {
             while (c != 0) {
                 CPUWriteMemory(d & ~3, cpuDmaLatchData[ch]);
                 d += di;
@@ -2655,7 +2655,7 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
         s &= 0xFFFFFFFE;
         si = (int)si >> 1;
         di = (int)di >> 1;
-        if (s < 0x02000000 && (reg[15].I >> 24)) {
+        if (s < 0x02000000) {
             while (c != 0) {
                 CPUWriteHalfWord(d & ~1, DowncastU16(cpuDmaLatchData[ch] >> (8 * (d & 2))));
                 d += di;
