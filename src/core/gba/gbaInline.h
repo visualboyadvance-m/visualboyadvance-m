@@ -76,7 +76,49 @@ static inline int8_t Downcast8(T value) {
     return static_cast<int8_t>(value);
 }
 
-extern uint32_t myROM[];
+static inline uint32_t CPUReadOpenBus()
+{
+    /* DMA shadowing overrides everything */
+    if (cpuDmaRunning || ((reg[15].I - cpuDmaPC) == (armState ? 4u : 2u)))
+        return cpuDmaLatchData[cpuDmaChannelActive];
+
+    /* THUMB: compose 32-bit from last fetched halfwords according to region/alignment */
+    if (!armState) {
+        uint32_t reg15 = reg[15].I;
+        auto region = reg15 >> 24;
+
+        switch (region)
+        {
+        /* Sequential regions: both halves from the newer fetch */
+        case 0x02: /* EWRAM */
+        case 0x05: /* PALRAM */
+        case 0x06: /* VRAM */
+        case 0x08:
+        case 0x09:
+        case 0x0A:
+        case 0x0B:
+        case 0x0C:
+        case 0x0D: /* CART regions */
+            return cpuPrefetch[1] | (cpuPrefetch[1] << 16);
+
+        /* BIOS / OAM: alignment affects low/high halves */
+        case 0x00: /* BIOS */
+        case 0x07: /* OAM */
+            if ((reg15 & 2) == 0)
+                return cpuPrefetch[1] | (cpuPrefetch[1] << 16);
+            return cpuPrefetch[0] | (cpuPrefetch[1] << 16);
+
+        /* IWRAM: opposite order for aligned case */
+        case 0x03: /* IWRAM */
+            if ((reg15 & 2) == 0)
+                return cpuPrefetch[1] | (cpuPrefetch[0] << 16);
+            return cpuPrefetch[0] | (cpuPrefetch[1] << 16);
+        }
+    }
+
+    /* ARM: open bus is the last fetched 32-bit word */
+    return cpuPrefetch[1];
+}
 
 static inline uint32_t CPUReadROM32(uint32_t address) {
     if (address >= gbaGetRomSize())
@@ -190,15 +232,7 @@ static inline uint32_t CPUReadMemory(uint32_t address)
                 armMode ? armNextPC - 4 : armNextPC - 2);
         }
 #endif
-        if (cpuDmaRunning || ((reg[15].I - cpuDmaPC) == (armState ? 4u : 2u))) {
-            value = cpuDmaLatchData[cpuDmaChannelActive];
-        } else {
-            if (armState) {
-                value = CPUReadMemoryQuick(reg[15].I);
-            } else {
-                value = CPUReadHalfWordQuick(reg[15].I) | CPUReadHalfWordQuick(reg[15].I) << 16;
-            }
-        }
+        value = CPUReadOpenBus();
         break;
     }
 
@@ -333,14 +367,6 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
 	/* fallthrough */
     default:
     unreadable:
-        if (cpuDmaRunning|| ((reg[15].I - cpuDmaPC) == (armState ? 4u : 2u))) {
-            value = cpuDmaLatchData[cpuDmaChannelActive] & 0xFFFF;
-        } else {
-            int param = reg[15].I;
-            if (armState)
-                param += (address & 2);
-            value = CPUReadHalfWordQuick(param);
-        }
 #ifdef GBA_LOGGING
         if (systemVerbose & VERBOSE_ILLEGAL_READ) {
             log("Illegal halfword read: %08x at %08x (%08x)\n",
@@ -349,6 +375,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
                 value);
         }
 #endif
+        value = (uint16_t)(CPUReadOpenBus() >> (8 * address & 2));
         break;
     }
 
@@ -466,15 +493,7 @@ static inline uint8_t CPUReadByte(uint32_t address)
                 armMode ? armNextPC - 4 : armNextPC - 2);
         }
 #endif
-        if (cpuDmaRunning || ((reg[15].I - cpuDmaPC) == (armState ? 4u : 2u))) {
-            return cpuDmaLatchData[cpuDmaChannelActive] & 0xFF;
-        } else {
-            if (armState) {
-                return CPUReadByteQuick(reg[15].I + (address & 3));
-            } else {
-                return CPUReadByteQuick(reg[15].I + (address & 1));
-            }
-        }
+        return (uint8_t)(CPUReadOpenBus() >> (8 * (address & 3)));
     }
 }
 
