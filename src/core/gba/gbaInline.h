@@ -394,9 +394,9 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
     return value;
 }
 
-static inline int16_t CPUReadHalfWordSigned(uint32_t address)
+static inline int32_t CPUReadHalfWordSigned(uint32_t address)
 {
-    int32_t value = (int32_t)CPUReadHalfWord(address);
+    uint16_t value = CPUReadHalfWord(address);
     if ((address & 1)) {
 #ifdef GBA_LOGGING
         if (systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
@@ -406,9 +406,9 @@ static inline int16_t CPUReadHalfWordSigned(uint32_t address)
                 value);
         }
 #endif
-        return (int8_t)value;
+        return (int32_t)(int8_t)value;
     }
-    return (int16_t)value;
+    return (int32_t)(int16_t)value;
 }
 
 static inline uint8_t CPUReadByte(uint32_t address)
