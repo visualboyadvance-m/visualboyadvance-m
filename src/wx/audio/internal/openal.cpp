@@ -14,8 +14,15 @@
 // on Creative for making a typedef to void in the first place)
 // #define ALC_NO_PROTOTYPES 1
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunknown-pragmas"
+#endif
 #include <al.h>
 #include <alc.h>
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 // since the ALC typedefs are broken on Mac:
 
@@ -172,7 +179,7 @@ bool OpenAL::init(long sampleRate) {
     winlog("OpenAL::init\n");
     VBAM_CHECK(initialized == false);
 
-    const wxString& audio_device = OPTION(kSoundAudioDevice);
+    const wxString audio_device = OPTION(kSoundAudioDevice);
     if (!audio_device.empty()) {
         device = alcOpenDevice(audio_device.utf8_str());
         if (device == NULL) {

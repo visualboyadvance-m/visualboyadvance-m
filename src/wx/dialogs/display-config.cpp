@@ -10,7 +10,15 @@
 #include <wx/radiobut.h>
 #include <wx/slider.h>
 #include <wx/textctrl.h>
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-copy"
+#endif
 #include <wx/valnum.h>
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 #include <wx/xrc/xmlres.h>
 
@@ -94,7 +102,6 @@ public:
 
     // Returns a copy of the object.
     wxObject* Clone() const override { return new ScaleValidator(); }
-
 private:
     // wxValidator implementation.
     bool TransferFromWindow() final {
@@ -518,6 +525,8 @@ void DisplayConfig::OnDialogShowEvent(wxShowEvent& event) {
 
     FillRendererList(dummy_event);
 
+    Fit();
+
     // Let the event propagate.
     event.Skip();
 }
@@ -708,7 +717,11 @@ void DisplayConfig::UpdateSDLOptionsVisibility(wxCommandEvent& event) {
         HideSDLOptions();
     }
 
+#ifdef __WXMAC__
     Layout();
+#else
+    Fit();
+#endif
 
     // Let the event propagate
     event.Skip();

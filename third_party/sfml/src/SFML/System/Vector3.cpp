@@ -63,3 +63,6 @@ T Vector3<T>::length() const
 //template class sf::Vector3<float>;
 //template class sf::Vector3<double>;
 //template class sf::Vector3<long double>;
+
+// Dummy symbol to suppress ranlib "has no symbols" warning
+[[maybe_unused]] void vbam_dummy_symbol_vector3() {}

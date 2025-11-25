@@ -43,6 +43,9 @@ private:
     // Repositions the dialog to the bottom-right of the parent.
     void RepositionDialog();
 
+    // Set to true once the dialog has been shown for the first time.
+    bool dialog_shown_ = false;
+
     const widgets::KeepOnTopStyler keep_on_top_styler_;
 };
 

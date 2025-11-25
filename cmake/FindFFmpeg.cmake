@@ -99,7 +99,7 @@ endmacro()
 if (NOT FFMPEG_LIBRARIES)
   set(x265_lib "x265")
 
-  if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg" AND FFMPEG_STATIC)
+  if(MSVC AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg" AND FFMPEG_STATIC)
     set(x265_lib "x265-static")
   endif()
 

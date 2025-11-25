@@ -36,27 +36,50 @@ MetalDrawingPanel::~MetalDrawingPanel()
 {
     if (did_init)
     {
-        renderPassDescriptor = nil;
-        commandBuffer = nil;
-        renderEncoder = nil;
+        // Wait for all pending GPU work to complete before releasing resources
+        if (_commandQueue != nil) {
+            // Finish any pending command buffers to prevent use-after-free
+            id<MTLCommandBuffer> syncBuffer = [_commandQueue commandBuffer];
+            [syncBuffer commit];
+            [syncBuffer waitUntilCompleted];
+        }
 
-        if (metalView != nil)
+        // Clean up conversion buffer
+        if (_conversion_buffer != NULL) {
+            free(_conversion_buffer);
+            _conversion_buffer = NULL;
+        }
+
+        if (metalView != nil) {
             [metalView removeFromSuperview];
+            [metalView release];
+            metalView = nil;
+        }
 
-        if (_device != nil)
-            [_device release];
-
-        if (_commandQueue != nil)
-            [_commandQueue release];
-
-        if (_pipelineState != nil)
-            [_pipelineState release];
-
-        if (_texture != nil)
+        if (_texture != nil) {
             [_texture release];
+            _texture = nil;
+        }
 
-        if (_vertices != nil)
+        if (_vertices != nil) {
             [_vertices release];
+            _vertices = nil;
+        }
+
+        if (_pipelineState != nil) {
+            [_pipelineState release];
+            _pipelineState = nil;
+        }
+
+        if (_commandQueue != nil) {
+            [_commandQueue release];
+            _commandQueue = nil;
+        }
+
+        if (_device != nil) {
+            [_device release];
+            _device = nil;
+        }
 
         did_init = false;
     }
@@ -91,7 +114,9 @@ void MetalDrawingPanel::CreateMetalView()
     metalView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     metalView.layer.autoresizingMask = kCALayerHeightSizable | kCALayerWidthSizable;
     metalView.layer.needsDisplayOnBoundsChange = YES;
-    ((CAMetalLayer *)metalView.layer).device = metalView.device;
+
+    CAMetalLayer *metalLayer = (CAMetalLayer *)metalView.layer;
+    metalLayer.device = metalView.device;
 
     _device = [metalView.device retain];
 
@@ -151,6 +176,7 @@ void MetalDrawingPanel::CreateMetalView()
         _commandQueue = [_device newCommandQueue];
     }
 
+
     if (OPTION(kDispStretch) == false) {
         metalView.frame = view.frame;
         metalFrame = view.frame;
@@ -191,39 +217,39 @@ void MetalDrawingPanel::CreateMetalView()
 
 void MetalDrawingPanel::DrawingPanelInit()
 {
+    // Initialize Objective-C pointers to nil to prevent accessing uninitialized memory
+    metalView = nil;
+    _device = nil;
+    _commandQueue = nil;
+    _pipelineState = nil;
+    _texture = nil;
+    _vertices = nil;
+    _conversion_buffer = NULL;
+    _conversion_buffer_size = 0;
+
     CreateMetalView();
 
     did_init = true;
 }
 
-id<MTLTexture> MetalDrawingPanel::loadTextureUsingData(void *data)
+id<MTLTexture> MetalDrawingPanel::CreateTextureWithData(void *data, NSUInteger bytesPerRow)
 {
+    // Create a new texture each frame to avoid GPU synchronization issues
     MTLTextureDescriptor *textureDescriptor = [[MTLTextureDescriptor alloc] init];
-
-    // Indicate that each pixel has a blue, green, red, and alpha channel, where each channel is
-    // an 8-bit unsigned normalized value (i.e. 0 maps to 0.0 and 255 maps to 1.0)
     textureDescriptor.pixelFormat = metalView.colorPixelFormat;
     textureDescriptor.usage = MTLTextureUsageShaderRead;
-
-    // Set the pixel dimensions of the texture
     textureDescriptor.width = width * scale;
     textureDescriptor.height = height * scale;
 
-    // Create the texture from the device by using the descriptor
     id<MTLTexture> texture = [_device newTextureWithDescriptor:textureDescriptor];
-
-    // Release the descriptor after use
     [textureDescriptor release];
-
-    // Calculate the number of bytes per row in the image.
-    NSUInteger bytesPerRow = std::ceil(width * scale * 4) + 4;
 
     MTLRegion region = {
         { 0, 0, 0 },                   // MTLOrigin
         {(NSUInteger)(width * scale), (NSUInteger)(height * scale), 1} // MTLSize
     };
 
-    // Copy the bytes from the data object into the texture
+    // Upload pixel data to the new texture
     [texture replaceRegion:region
                 mipmapLevel:0
                   withBytes:data
@@ -287,96 +313,120 @@ void MetalDrawingPanel::DrawArea()
         if (!did_init)
             DrawingPanelInit();
 
+        int inrb = (systemColorDepth == 8) ? 4 : (systemColorDepth == 16) ? 2 : (systemColorDepth == 24) ? 0 : 1;
         if (systemColorDepth == 8) {
-            srcPitch = std::ceil(width * scale) + 4;
+            srcPitch = std::ceil((width + inrb) * scale * 1);
         } else if (systemColorDepth == 16) {
-            srcPitch = std::ceil(width * scale * 2) + 4;
+            srcPitch = std::ceil((width + inrb) * scale * 2);
         } else if (systemColorDepth == 24) {
             srcPitch = std::ceil(width * scale * 3);
         } else {
-            srcPitch = std::ceil(width * scale * 4) + 4;
+            srcPitch = std::ceil((width + inrb) * scale * 4);
         }
 
         if (systemColorDepth == 8) {
+            // Idiomatic Metal: pre-allocate and reuse conversion buffer
+            size_t required_size = (width * scale) * (height * scale) * sizeof(uint32_t);
+            if (_conversion_buffer_size < required_size) {
+                if (_conversion_buffer != NULL) {
+                    free(_conversion_buffer);
+                }
+                _conversion_buffer = (uint32_t *)malloc(required_size);
+                _conversion_buffer_size = required_size;
+            }
+
             int pos = 0;
             int src_pos = 0;
+            int scaled_border = (int)std::ceil(inrb * scale);
+            // Skip 1 row of top border
             uint8_t *src = todraw + srcPitch;
-            uint32_t *dst = (uint32_t *)calloc(4, std::ceil((width * scale) * (height * scale) + 1));
 
             for (int y = 0; y < (height * scale); y++) {
                 for (int x = 0; x < (width * scale); x++) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
                     if (src[src_pos] == 0xff) {
-                        dst[pos] = 0x00ffffff;
+                        _conversion_buffer[pos] = 0x00ffffff;
                     } else {
-                        dst[pos] = (src[src_pos] & 0xe0) + ((src[src_pos] & 0x1c) << 11) + ((src[src_pos] & 0x3) << 22);
+                        _conversion_buffer[pos] = (src[src_pos] & 0xe0) + ((src[src_pos] & 0x1c) << 11) + ((src[src_pos] & 0x3) << 22);
                     }
 #else
                     if (src[src_pos] == 0xff) {
-                        dst[pos] = 0xffffff00;
+                        _conversion_buffer[pos] = 0xffffff00;
                     } else {
-                        dst[pos] = ((src[src_pos] & 0xe0) << 24) + ((src[src_pos] & 0x1c) << 19) + ((src[src_pos] & 0x3) << 14);
+                        _conversion_buffer[pos] = ((src[src_pos] & 0xe0) << 24) + ((src[src_pos] & 0x1c) << 19) + ((src[src_pos] & 0x3) << 14);
                     }
 #endif
                     pos++;
                     src_pos++;
                 }
-                pos++;
-                src_pos += 4;
+                src_pos += scaled_border;
             }
 
+            // Release old texture and create new one with converted data
             if (_texture != nil) {
                 [_texture release];
-                _texture = nil;
             }
-            _texture = loadTextureUsingData(dst);
-
-            if (dst != NULL) {
-                free(dst);
-            }
+            _texture = CreateTextureWithData(_conversion_buffer, (width * scale) * 4);
         } else if (systemColorDepth == 16) {
+            // Idiomatic Metal: pre-allocate and reuse conversion buffer
+            size_t required_size = (width * scale) * (height * scale) * sizeof(uint32_t);
+            if (_conversion_buffer_size < required_size) {
+                if (_conversion_buffer != NULL) {
+                    free(_conversion_buffer);
+                }
+                _conversion_buffer = (uint32_t *)malloc(required_size);
+                _conversion_buffer_size = required_size;
+            }
+
             int pos = 0;
             int src_pos = 0;
+            int scaled_border = (int)std::ceil(inrb * scale);
+            // Skip 1 row of top border
             uint8_t *src = todraw + srcPitch;
-            uint32_t *dst = (uint32_t *)calloc(4, std::ceil((width * scale) * (height * scale) + 1));
             uint16_t *src16 = (uint16_t *)src;
 
             for (int y = 0; y < (height * scale); y++) {
                 for (int x = 0; x < (width * scale); x++) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
                     if (src16[src_pos] == 0x7fff) {
-                        dst[pos] = 0x00ffffff;
+                        _conversion_buffer[pos] = 0x00ffffff;
                     } else {
-                        dst[pos] = ((src16[src_pos] & 0x7c00) >> 7) + ((src16[src_pos] & 0x03e0) << 6) + ((src16[src_pos] & 0x1f) << 19);
+                        _conversion_buffer[pos] = ((src16[src_pos] & 0x7c00) >> 7) + ((src16[src_pos] & 0x03e0) << 6) + ((src16[src_pos] & 0x1f) << 19);
                     }
 #else
                     if (src16[src_pos] == 0x7fff) {
-                        dst[pos] = 0xffffff00;
+                        _conversion_buffer[pos] = 0xffffff00;
                     } else {
-                        dst[pos] = ((src16[src_pos] & 0x7c00) << 17) + ((src16[src_pos] & 0x03e0) << 14) + ((src16[src_pos] & 0x1f) << 11);
+                        _conversion_buffer[pos] = ((src16[src_pos] & 0x7c00) << 17) + ((src16[src_pos] & 0x03e0) << 14) + ((src16[src_pos] & 0x1f) << 11);
                     }
 #endif
                     pos++;
                     src_pos++;
                 }
-                pos++;
-                src_pos += 2;
+                src_pos += scaled_border;
             }
 
+            // Release old texture and create new one with converted data
             if (_texture != nil) {
                 [_texture release];
-                _texture = nil;
             }
-            _texture = loadTextureUsingData(dst);
-
-            if (dst != NULL) {
-                free(dst);
-            }
+            _texture = CreateTextureWithData(_conversion_buffer, (width * scale) * 4);
         } else if (systemColorDepth == 24) {
+            // Idiomatic Metal: pre-allocate and reuse conversion buffer
+            size_t required_size = (width * scale) * (height * scale) * 4; // RGBA
+            if (_conversion_buffer_size < required_size) {
+                if (_conversion_buffer != NULL) {
+                    free(_conversion_buffer);
+                }
+                _conversion_buffer = (uint32_t *)malloc(required_size);
+                _conversion_buffer_size = required_size;
+            }
+
             int pos = 0;
             int src_pos = 0;
+            // Skip 1 row of top border
             uint8_t *src = todraw + srcPitch;
-            uint8_t *dst = (uint8_t *)calloc(4, std::ceil((width * scale) * (height * scale) + 1));
+            uint8_t *dst = (uint8_t *)_conversion_buffer;
 
             for (int y = 0; y < (height * scale); y++) {
                 for (int x = 0; x < (width * scale); x++) {
@@ -388,74 +438,66 @@ void MetalDrawingPanel::DrawArea()
                     pos += 4;
                     src_pos += 3;
                 }
-
-                pos += 4;
             }
 
+            // Release old texture and create new one with converted data
             if (_texture != nil) {
                 [_texture release];
-                _texture = nil;
             }
-            _texture = loadTextureUsingData(dst);
-
-            if (dst != NULL) {
-                free(dst);
-            }
+            _texture = CreateTextureWithData(_conversion_buffer, (width * scale) * 4);
         } else {
+            // Release old texture and create new one
+            // 32bpp todraw has borders; skip 1 row of top border
             if (_texture != nil) {
                 [_texture release];
-                _texture = nil;
             }
-            _texture = loadTextureUsingData(todraw + srcPitch);
+            _texture = CreateTextureWithData(todraw + srcPitch, srcPitch);
         }
 
-        // Create a new command buffer for each render pass to the current drawable
-        commandBuffer = [_commandQueue commandBuffer];
-        commandBuffer.label = @"MyCommand";
-
-        // Obtain a renderPassDescriptor
-        renderPassDescriptor = [metalView currentRenderPassDescriptor];
-
-        if(renderPassDescriptor != nil)
-        {
-            // Cache the drawable to avoid potential race condition
-            id<CAMetalDrawable> currentDrawable = metalView.currentDrawable;
-
-            renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
-            renderEncoder.label = @"MyRenderEncoder";
-
-            [renderEncoder setViewport:(MTLViewport){0.0, 0.0, (double)(_contentSize.x), (double)(_contentSize.y), 0.0, 1.0 }];
-
-            [renderEncoder setRenderPipelineState:_pipelineState];
-
-            [renderEncoder setVertexBuffer:_vertices
-                                    offset:0
-                                  atIndex:AAPLVertexInputIndexVertices];
-
-            [renderEncoder setVertexBytes:&_viewportSize
-                                   length:sizeof(_viewportSize)
-                                  atIndex:AAPLVertexInputIndexViewportSize];
-
-            // Set the texture object.  The AAPLTextureIndexBaseColor enum value corresponds
-            ///  to the 'colorMap' argument in the 'samplingShader' function because its
-            //   texture attribute qualifier also uses AAPLTextureIndexBaseColor for its index.
-            [renderEncoder setFragmentTexture:_texture
-                                      atIndex:AAPLTextureIndexBaseColor];
-
-            // Draw the triangles.
-            [renderEncoder drawPrimitives:MTLPrimitiveTypeTriangle
-                              vertexStart:0
-                              vertexCount:_numVertices];
-
-            [renderEncoder endEncoding];
-
-            // Schedule a present once the framebuffer is complete using the cached drawable
-            if (currentDrawable) {
-                [commandBuffer presentDrawable:currentDrawable];
-            }
+        // Get the drawable from MTKView (non-blocking)
+        id<CAMetalDrawable> drawable = metalView.currentDrawable;
+        if (drawable == nil) {
+            return;  // No drawable available, skip this frame
         }
 
-        // Finalize rendering here & push the command buffer to the GPU
+        // Create a new command buffer for each render pass to the next drawable
+        id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
+        commandBuffer.label = @"VBAMFrame";
+
+        // Create render pass descriptor with the drawable's texture
+        MTLRenderPassDescriptor *renderPassDescriptor = [MTLRenderPassDescriptor renderPassDescriptor];
+        renderPassDescriptor.colorAttachments[0].texture = drawable.texture;
+        renderPassDescriptor.colorAttachments[0].loadAction = MTLLoadActionClear;
+        renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(0.0, 0.0, 0.0, 1.0);
+        renderPassDescriptor.colorAttachments[0].storeAction = MTLStoreActionStore;
+
+        // Create render encoder and encode rendering commands
+        id<MTLRenderCommandEncoder> renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
+        renderEncoder.label = @"VBAMRenderEncoder";
+
+        [renderEncoder setViewport:(MTLViewport){0.0, 0.0, (double)(_contentSize.x), (double)(_contentSize.y), 0.0, 1.0 }];
+        [renderEncoder setRenderPipelineState:_pipelineState];
+
+        [renderEncoder setVertexBuffer:_vertices
+                                offset:0
+                              atIndex:AAPLVertexInputIndexVertices];
+
+        [renderEncoder setVertexBytes:&_viewportSize
+                               length:sizeof(_viewportSize)
+                              atIndex:AAPLVertexInputIndexViewportSize];
+
+        [renderEncoder setFragmentTexture:_texture
+                                  atIndex:AAPLTextureIndexBaseColor];
+
+        // Draw the quad
+        [renderEncoder drawPrimitives:MTLPrimitiveTypeTriangle
+                          vertexStart:0
+                          vertexCount:_numVertices];
+
+        [renderEncoder endEncoding];
+
+        // Schedule presentation and commit to GPU
+        [commandBuffer presentDrawable:drawable];
         [commandBuffer commit];
     }
 }
@@ -466,7 +508,7 @@ Quartz2DDrawingPanel::Quartz2DDrawingPanel(wxWindow* parent, int _width, int _he
 {
 }
 
-void Quartz2DDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
+void Quartz2DDrawingPanel::DrawImage([[maybe_unused]] wxWindowDC& dc, wxImage* im)
 {
     NSView *view = (NSView *)GetWindow()->GetHandle();
     size_t w    = std::ceil(width  * scale);
@@ -502,16 +544,7 @@ void Quartz2DDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
     CGContextDrawImage(context, NSRectToCGRect(view.bounds), image);
 
     CGContextRestoreGState(context);
-
-    // have to draw something on the dc or it doesn't allow the frame to appear,
-    // I don't know of any better way to do this.
-    {
-        wxCoord w, h;
-        dc.GetSize(&w, &h);
-        dc.SetPen(*wxTRANSPARENT_PEN);
-        dc.SetBrush(*wxTRANSPARENT_BRUSH);
-        dc.DrawRectangle(w-2, h-2, w, h);
-    }
+    CGContextFlush(context);
 
     [view setNeedsDisplay:YES];
 

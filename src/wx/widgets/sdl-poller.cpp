@@ -42,8 +42,7 @@ config::JoyControl AxisStatusToJoyControl(const JoyAxisStatus& status) {
         case JoyAxisStatus::Neutral:
         default:
             // This should never happen.
-            VBAM_NOTREACHED();
-            return config::JoyControl::AxisPlus;
+            VBAM_NOTREACHED_RETURN(config::JoyControl::AxisPlus);
     }
 }
 
@@ -59,8 +58,7 @@ config::JoyControl HatStatusToJoyControl(const uint8_t status) {
             return config::JoyControl::HatEast;
         default:
             // This should never happen.
-            VBAM_NOTREACHED();
-            return config::JoyControl::HatNorth;
+            VBAM_NOTREACHED_RETURN(config::JoyControl::HatNorth);
     }
 }
 

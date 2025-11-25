@@ -54,7 +54,7 @@ size_t XZ_Reader::get_uncompressed_size()
    footer_ptr = data + (in->size() - 12);
 
    // Decode the footer, so we have the backward_size pointing to the index
-   (void)lzma_stream_footer_decode(&stream_flags, (const uint8_t *)footer_ptr);
+   [[maybe_unused]] auto _ignored = lzma_stream_footer_decode(&stream_flags, (const uint8_t *)footer_ptr);
    // This is the index pointer, where the size is ultimately stored...
    index_ptr = data + ((in->size() - 12) - stream_flags.backward_size);
 
@@ -69,7 +69,7 @@ size_t XZ_Reader::get_uncompressed_size()
    if (in_pos != stream_flags.backward_size) {
      lzma_index_end(index, NULL);
      free((void *)data);
-     fprintf(stderr, "Error: input position %u is not equal to backward size %llu\n", in_pos, stream_flags.backward_size);
+     fprintf(stderr, "Error: input position %lu is not equal to backward size %llu\n", (long unsigned int)in_pos, (long long unsigned int)stream_flags.backward_size);
      return 0;
    }
 

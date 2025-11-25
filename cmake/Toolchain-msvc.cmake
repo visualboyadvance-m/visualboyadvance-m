@@ -32,6 +32,11 @@ add_compile_options(
     /EHsc
 )
 
+# Treat warnings as errors in CI
+if(ENABLE_WERROR)
+    add_compile_options(/WX)
+endif()
+
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(_DEBUG)
     add_compile_options(/Ob0 /Od /RTC1)
@@ -83,3 +88,6 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "" CACHE STRING "" FORCE)
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_MINSIZEREL "" CACHE STRING "" FORCE)
 set(CMAKE_C_FLAGS_MINSIZEREL "" CACHE STRING "" FORCE)
+
+# Suppress duplicate symbol linker warnings
+set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /IGNORE:4006")

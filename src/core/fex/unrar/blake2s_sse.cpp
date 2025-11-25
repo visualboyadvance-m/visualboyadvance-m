@@ -129,3 +129,6 @@ static int blake2s_compress_sse( blake2s_state *S, const byte block[BLAKE2S_BLOC
 }
 
 #endif
+
+// Dummy symbol to suppress ranlib "has no symbols" warning
+[[maybe_unused]] void vbam_dummy_symbol_blake2s_sse() {}

@@ -21,10 +21,6 @@
 #include <cmath> //std::sqrt
 #include "xbrz_tools.h"
 
-#ifdef WINXP
-#include "quake3-sqrt.h"
-#endif
-
 // some gcc versions lie about having this C++17 feature
 #define static_assert(x) static_assert(x, "assertion failed")
 
@@ -70,12 +66,12 @@ uint32_t gradientARGB(uint32_t pixFront, uint32_t pixBack) //find intermediate c
 
 inline double fastSqrt(double n)
 {
-#ifdef WINXP
-    return quake3_sqrt((float)n);
-#elif (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
+#if (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
+    // Use x87 FPU fsqrt - very accurate and available on all x86 CPUs including Pentium 3
     __asm__ ("fsqrt" : "+t" (n));
     return n;
 #elif defined(_MSC_VER) && defined(_M_IX86)
+    // MSVC 32-bit: use inline assembly for x87 fsqrt
     // speeds up xBRZ by about 9% compared to std::sqrt which internally uses
     // the same assembler instructions but adds some "fluff"
     __asm {
@@ -85,7 +81,8 @@ inline double fastSqrt(double n)
 #elif defined(_MSC_VER)
     // On MSVC x64 use intrinsic with /Oi and /fp:fast
     return sqrt(n);
-#else // Other platforms.
+#else
+    // Other platforms use standard library
     return std::sqrt(n);
 #endif
 }
@@ -350,6 +347,11 @@ DEF_GETTER(d) DEF_GETTER(e) DEF_GETTER(f)
 DEF_GETTER(g) DEF_GETTER(h) DEF_GETTER(i)
 #undef DEF_GETTER
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#endif
+
 #define DEF_GETTER(x, y) template <> inline uint32_t get_##x<ROT_90>(const Kernel_3x3& ker) { return ker.y; }
 DEF_GETTER(a, g) DEF_GETTER(b, d) DEF_GETTER(c, a)
 DEF_GETTER(d, h) DEF_GETTER(e, e) DEF_GETTER(f, b)
@@ -367,6 +369,10 @@ DEF_GETTER(a, c) DEF_GETTER(b, f) DEF_GETTER(c, i)
 DEF_GETTER(d, b) DEF_GETTER(e, e) DEF_GETTER(f, h)
 DEF_GETTER(g, a) DEF_GETTER(h, d) DEF_GETTER(i, g)
 #undef DEF_GETTER
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 
 //compress four blend types into a single byte

@@ -1,7 +1,18 @@
-#include <wx/string.h>
 #if !defined(VBAM_ENABLE_FAUDIO)
 #error "This file should only be compiled if FAudio is enabled"
 #endif
+
+#ifdef WINXP
+#include <windows.h>
+#include <versionhelpers.h>
+#ifdef ENABLE_SDL3
+#include <SDL3/SDL.h>
+#else
+#include <SDL.h>
+#endif
+#endif
+
+#include <wx/string.h>
 
 #include "wx/audio/internal/faudio.h"
 
@@ -196,6 +207,13 @@ void FAudio_Output::close() {
 bool FAudio_Output::init(long sampleRate) {
     if (failed || initialized)
         return false;
+
+#ifdef WINXP
+    // On Windows XP, use the winmm audio driver for SDL instead of the default wasapi driver.
+    if (!IsWindowsVistaOrGreater()) {
+        SDL_SetHint("SDL_AUDIODRIVER", "winmm");
+    }
+#endif
 
     uint32_t hr;
     // Initialize FAudio

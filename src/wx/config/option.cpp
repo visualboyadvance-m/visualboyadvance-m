@@ -301,8 +301,7 @@ wxString Option::GetEnumString() const {
             VBAM_CHECK(false);
             return wxEmptyString;
     }
-    VBAM_NOTREACHED();
-    return wxEmptyString;
+    VBAM_NOTREACHED_RETURN(wxEmptyString);
 }
 
 std::array<uint16_t, 8> Option::GetGbPalette() const {
@@ -482,8 +481,7 @@ bool Option::SetEnumString(const wxString& value) {
             VBAM_CHECK(false);
             return false;
     }
-    VBAM_NOTREACHED();
-    return false;
+    VBAM_NOTREACHED_RETURN(false);
 }
 
 bool Option::SetGbPalette(const std::array<uint16_t, 8>& value) {

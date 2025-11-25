@@ -148,3 +148,23 @@ endif()
 target_link_libraries(vbam-fex
     PRIVATE ${ZLIB_LIBRARY}
 )
+
+# Suppress warnings for third-party code
+if(MSVC)
+    # Disable warnings for third-party code
+    target_compile_options(vbam-fex PRIVATE
+        /wd4244 # conversion warnings
+        /wd4267 # size_t conversion warnings
+        /wd4100 # unreferenced parameter
+        /wd4456 # declaration hides previous local declaration
+        /wd4458 # declaration hides class member
+        /wd4127 # conditional expression is constant
+        /wd4018 # signed/unsigned mismatch
+        /wd4389 # signed/unsigned mismatch
+        /wd4611 # interaction between setjmp and C++ object destruction
+        /wd4291 # no matching operator delete found
+        /wd4701 # potentially uninitialized local variable (Debug only)
+    )
+else()
+    target_compile_options(vbam-fex PRIVATE -w)
+endif()

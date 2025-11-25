@@ -888,7 +888,8 @@ void debuggerDoSearch()
                 start = g_rom + (SearchStart & 0x01FFFFFF);
                 end = g_rom + 0x01FFFFFF;
                 break;
-            };
+            }
+            [[fallthrough]];
         default: {
             snprintf(monbuf, sizeof(monbuf), "Search completed.\n");
             monprintf(monbuf);
@@ -2935,6 +2936,7 @@ void executeBreakCommands(int n, char** cmd)
         } else {
             operation(address, flag, NULL, 0);
         }
+        return;
     } else if (!hasAddress && (operation == deleteBreak)) {
         {
             snprintf(monbuf, sizeof(monbuf), "Delete breakpoint operation requires at least one address;\n");
@@ -2961,24 +2963,6 @@ void executeBreakCommands(int n, char** cmd)
         operation(address, flag, cmd + 1, n - 1);
         return;
     }
-//brkcmd_special_register:
-    switch (command[4]) {
-    case 'l':
-        debuggerBreakRegisterList((n > 0) && (tolower(cmd[0][0]) == 'v'));
-        return;
-    case 'c':
-        debuggerBreakRegisterClear(n, cmd);
-        return;
-    case 'd':
-        debuggerBreakRegisterDelete(n, cmd);
-        return;
-
-    case 'm':
-        debuggerBreakRegister(n, cmd);
-    default:
-        return;
-    };
-    return;
 }
 
 void debuggerDisable(int n, char** args)
@@ -3645,7 +3629,7 @@ void remoteOutput(const char* s, uint32_t addr)
     if (s) {
         char c = *s++;
         while (c) {
-            snprintf(d, sizeof(buffer), "%02x", c);
+            snprintf(d, (sizeof(buffer) - (d - buffer)), "%02x", c);
             d += 2;
             c = *s++;
         }
@@ -3653,7 +3637,7 @@ void remoteOutput(const char* s, uint32_t addr)
         char c = debuggerReadByte(addr);
         addr++;
         while (c) {
-            snprintf(d, sizeof(buffer), "%02x", c);
+            snprintf(d, (sizeof(buffer) - (d - buffer)), "%02x", c);
             d += 2;
             c = debuggerReadByte(addr);
             addr++;
@@ -3678,7 +3662,7 @@ void remoteSendStatus()
     s += 3;
     for (int i = 0; i < 15; i++) {
         uint32_t v = reg[i].I;
-        snprintf(s, sizeof(buffer), "%02x:%02x%02x%02x%02x;", i,
+        snprintf(s, (sizeof(buffer) - (s - buffer)), "%02x:%02x%02x%02x%02x;", i,
             (v & 255),
             (v >> 8) & 255,
             (v >> 16) & 255,
@@ -3686,14 +3670,14 @@ void remoteSendStatus()
         s += 12;
     }
     uint32_t v = armNextPC;
-    snprintf(s, sizeof(buffer), "0f:%02x%02x%02x%02x;", (v & 255),
+    snprintf(s, (sizeof(buffer) - (s - buffer)), "0f:%02x%02x%02x%02x;", (v & 255),
         (v >> 8) & 255,
         (v >> 16) & 255,
         (v >> 24) & 255);
     s += 12;
     CPUUpdateCPSR();
     v = reg[16].I;
-    snprintf(s, sizeof(buffer), "19:%02x%02x%02x%02x;", (v & 255),
+    snprintf(s, (sizeof(buffer) - (s - buffer)), "19:%02x%02x%02x%02x;", (v & 255),
         (v >> 8) & 255,
         (v >> 16) & 255,
         (v >> 24) & 255);

@@ -114,6 +114,8 @@ void gbcfilter_update_colors(bool lcd) {
     } break;
     case 16: {
         for (int i = 0x0; i < 0x10000; i++) {
+            // GB/GBC uses BGR555 format: 0BBBBBGGGGGRRRRR
+            // Red: bits 0-4, Green: bits 5-9, Blue: bits 10-14
             systemColorMap16[i] = ((i & 0x1f) << systemRedShift) |
                 (((i & 0x3e0) >> 5) << systemGreenShift) |
                 (((i & 0x7c00) >> 10) << systemBlueShift);
@@ -124,6 +126,8 @@ void gbcfilter_update_colors(bool lcd) {
     case 24:
     case 32: {
         for (int i = 0; i < 0x10000; i++) {
+            // GB/GBC uses BGR555 format: 0BBBBBGGGGGRRRRR
+            // Red: bits 0-4, Green: bits 5-9, Blue: bits 10-14
             systemColorMap32[i] = ((i & 0x1f) << systemRedShift) |
                 (((i & 0x3e0) >> 5) << systemGreenShift) |
                 (((i & 0x7c00) >> 10) << systemBlueShift);
@@ -306,14 +310,11 @@ void gbcfilter_pal32(uint32_t* buf, int count)
 
 
         // Convert the floating-point values to 8-bit integer components (0-255).
+        // Values are already guaranteed to be in 0-255 range since they are uint8_t
+        // and the floating point values are clamped to 0.0-1.0 before conversion.
         uint8_t final_red_8bit = (uint8_t)(transformed_r * 255.0f + 0.5f);
         uint8_t final_green_8bit = (uint8_t)(transformed_g * 255.0f + 0.5f);
         uint8_t final_blue_8bit = (uint8_t)(transformed_b * 255.0f + 0.5f);
-
-        // Ensure values are strictly within 0-255 range after rounding
-        if (final_red_8bit > 255) final_red_8bit = 255;
-        if (final_green_8bit > 255) final_green_8bit = 255;
-        if (final_blue_8bit > 255) final_blue_8bit = 255;
 
         // --- NEW PACKING LOGIC ---
         // This is the critical change to correctly map 8-bit color to the 5-bit shifted format,

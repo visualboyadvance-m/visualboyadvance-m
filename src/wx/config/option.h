@@ -94,7 +94,9 @@ static constexpr size_t kNbColorCorrectionProfiles = static_cast<size_t>(ColorCo
 
 // Values for kAudioApi.
 enum class AudioApi {
+#if defined(VBAM_ENABLE_OPENAL)
     kOpenAL,
+#endif  // VBAM_ENABLE_OPENAL
     kSDL,
 #if defined(__WXMSW__)
     kDirectSound,

@@ -1001,7 +1001,7 @@ ELFAbbrev** elfReadAbbrevs(uint8_t* data, uint32_t offset)
     uint32_t number = elfReadLEB128(data, &bytes);
     data += bytes;
     while (number) {
-        ELFAbbrev* abbrev = (ELFAbbrev*)calloc(sizeof(ELFAbbrev), 1);
+        ELFAbbrev* abbrev = (ELFAbbrev*)calloc(1, sizeof(ELFAbbrev));
 
         // read tag information
         abbrev->number = number;
@@ -1380,13 +1380,13 @@ void elfParseType(uint8_t* data, uint32_t offset, ELFAbbrev* abbrev, CompileUnit
     } break;
     case DW_TAG_union_type:
     case DW_TAG_structure_type: {
-        Type* t = (Type*)calloc(sizeof(Type), 1);
+        Type* t = (Type*)calloc(1, sizeof(Type));
         if (abbrev->tag == DW_TAG_structure_type)
             t->type = TYPE_struct;
         else
             t->type = TYPE_union;
 
-        Struct* s = (Struct*)calloc(sizeof(Struct), 1);
+        Struct* s = (Struct*)calloc(1, sizeof(Struct));
         t->structure = s;
         elfAddType(t, unit, offset);
 
@@ -1500,7 +1500,7 @@ void elfParseType(uint8_t* data, uint32_t offset, ELFAbbrev* abbrev, CompileUnit
         return;
     } break;
     case DW_TAG_base_type: {
-        Type* t = (Type*)calloc(sizeof(Type), 1);
+        Type* t = (Type*)calloc(1, sizeof(Type));
 
         t->type = TYPE_base;
         elfAddType(t, unit, offset);
@@ -1532,7 +1532,7 @@ void elfParseType(uint8_t* data, uint32_t offset, ELFAbbrev* abbrev, CompileUnit
         return;
     } break;
     case DW_TAG_pointer_type: {
-        Type* t = (Type*)calloc(sizeof(Type), 1);
+        Type* t = (Type*)calloc(1, sizeof(Type));
 
         t->type = TYPE_pointer;
 
@@ -1559,7 +1559,7 @@ void elfParseType(uint8_t* data, uint32_t offset, ELFAbbrev* abbrev, CompileUnit
         return;
     } break;
     case DW_TAG_reference_type: {
-        Type* t = (Type*)calloc(sizeof(Type), 1);
+        Type* t = (Type*)calloc(1, sizeof(Type));
 
         t->type = TYPE_reference;
 
@@ -1628,9 +1628,9 @@ void elfParseType(uint8_t* data, uint32_t offset, ELFAbbrev* abbrev, CompileUnit
         return;
     } break;
     case DW_TAG_enumeration_type: {
-        Type* t = (Type*)calloc(sizeof(Type), 1);
+        Type* t = (Type*)calloc(1, sizeof(Type));
         t->type = TYPE_enum;
-        Enum* e = (Enum*)calloc(sizeof(Enum), 1);
+        Enum* e = (Enum*)calloc(1, sizeof(Enum));
         t->enumeration = e;
         elfAddType(t, unit, offset);
         int count = 0;
@@ -1695,9 +1695,9 @@ void elfParseType(uint8_t* data, uint32_t offset, ELFAbbrev* abbrev, CompileUnit
         return;
     } break;
     case DW_TAG_subroutine_type: {
-        Type* t = (Type*)calloc(sizeof(Type), 1);
+        Type* t = (Type*)calloc(1, sizeof(Type));
         t->type = TYPE_function;
-        FunctionType* f = (FunctionType*)calloc(sizeof(FunctionType), 1);
+        FunctionType* f = (FunctionType*)calloc(1, sizeof(FunctionType));
         t->function = f;
         elfAddType(t, unit, offset);
         for (int i = 0; i < abbrev->numAttrs; i++) {
@@ -1755,8 +1755,8 @@ void elfParseType(uint8_t* data, uint32_t offset, ELFAbbrev* abbrev, CompileUnit
     case DW_TAG_array_type: {
         uint32_t typeref = 0;
         int _i;
-        Array* array = (Array*)calloc(sizeof(Array), 1);
-        Type* t = (Type*)calloc(sizeof(Type), 1);
+        Array* array = (Array*)calloc(1, sizeof(Array));
+        Type* t = (Type*)calloc(1, sizeof(Type));
         t->type = TYPE_array;
         elfAddType(t, unit, offset);
 
@@ -1839,7 +1839,7 @@ Type* elfParseType(CompileUnit* unit, uint32_t offset)
         _t = _t->next;
     }
     if (offset == 0) {
-        Type* t = (Type*)calloc(sizeof(Type), 1);
+        Type* t = (Type*)calloc(1, sizeof(Type));
         t->type = TYPE_void;
         t->offset = 0;
         elfAddType(t, unit, 0);
@@ -1915,7 +1915,7 @@ void elfGetObjectAttributes(CompileUnit* unit, uint32_t offset, Object* o)
 uint8_t* elfParseObject(uint8_t* data, ELFAbbrev* abbrev, CompileUnit* unit,
     Object** object)
 {
-    Object* o = (Object*)calloc(sizeof(Object), 1);
+    Object* o = (Object*)calloc(1, sizeof(Object));
 
     o->next = NULL;
 
@@ -2125,7 +2125,7 @@ void elfGetFunctionAttributes(CompileUnit* unit, uint32_t offset, Function* func
 uint8_t* elfParseFunction(uint8_t* data, ELFAbbrev* abbrev, CompileUnit* unit,
     Function** f)
 {
-    Function* func = (Function*)calloc(sizeof(Function), 1);
+    Function* func = (Function*)calloc(1, sizeof(Function));
     *f = func;
 
     int bytes;
@@ -2406,7 +2406,7 @@ CompileUnit* elfParseCompUnit(uint8_t* data, uint8_t* abbrevData)
 
     ELFAbbrev* abbrev = elfGetAbbrev(abbrevs, abbrevNum);
 
-    CompileUnit* unit = (CompileUnit*)calloc(sizeof(CompileUnit), 1);
+    CompileUnit* unit = (CompileUnit*)calloc(1, sizeof(CompileUnit));
     unit->top = top;
     unit->length = length;
     unit->abbrevs = abbrevs;
@@ -2467,7 +2467,7 @@ void elfParseAranges(uint8_t* data)
     uint8_t* end = data + READ32LE(&sh->size);
 
     int max = 4;
-    ARanges* ranges = (ARanges*)calloc(sizeof(ARanges), 4);
+    ARanges* ranges = (ARanges*)calloc(4, sizeof(ARanges));
 
     int index = 0;
 
@@ -2484,7 +2484,7 @@ void elfParseAranges(uint8_t* data)
         data += 4;
         ranges[index].count = (_len - 20) / 8;
         ranges[index].offset = offset;
-        ranges[index].ranges = (ARange*)calloc(sizeof(ARange), (_len - 20) / 8);
+        ranges[index].ranges = (ARange*)calloc((_len - 20) / 8, sizeof(ARange));
         int i = 0;
         while (true) {
             uint32_t addr = elfRead4Bytes(data);
@@ -2671,7 +2671,7 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
             goto end;
         }
 
-        elfDebugInfo = (DebugInfo*)calloc(sizeof(DebugInfo), 1);
+        elfDebugInfo = (DebugInfo*)calloc(1, sizeof(DebugInfo));
         uint8_t* abbrevdata = elfReadSection(data, h);
 
         h = elfGetSectionByName(".debug_str");

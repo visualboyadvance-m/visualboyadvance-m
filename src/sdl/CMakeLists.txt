@@ -27,6 +27,8 @@ target_sources(vbam
     SDL.cpp
 )
 
+target_compile_definitions(vbam PRIVATE YY_NO_INPUT)
+
 if(MSVC)
     # We should probably use an external library for this.
     target_sources(vbam

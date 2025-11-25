@@ -12,7 +12,7 @@ if(ENABLE_LTO)
     include(CheckIPOSupported)
     check_ipo_supported(RESULT LTO_SUPPORTED)
 
-    # MINGW64 does not support LTO
+    # MINGW64 does not support LTO yet.
     if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         set(LTO_SUPPORTED FALSE)
     endif()
@@ -20,7 +20,6 @@ if(ENABLE_LTO)
     if(LTO_SUPPORTED)
         set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
     else()
-        message(WARNING "LTO is not supported by the compiler, diasabling LTO")
         set(ENABLE_LTO OFF)
     endif()
 endif()

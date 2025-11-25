@@ -33,6 +33,7 @@
               <object class="sizeritem">
                 <object class="wxSpinCtrl" name="SpeedupThrottleSpin">
                   <size>40,-1d</size>
+                  <style>wxSP_ARROW_KEYS|wxTE_PROCESS_ENTER</style>
                 </object>
                 <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
                 <border>5</border>

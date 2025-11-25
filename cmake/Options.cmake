@@ -1,6 +1,14 @@
 option(BUILD_TESTING "Build testing" ON)
 option(BUILD_SHARED_LIBS "Build dynamic libraries" OFF)
 
+# Detect CI environment or allow explicit setting
+if(DEFINED ENV{CI} OR DEFINED ENV{GITHUB_ACTIONS} OR DEFINED ENV{GITLAB_CI})
+    set(VBAM_CI_DEFAULT ON)
+else()
+    set(VBAM_CI_DEFAULT OFF)
+endif()
+option(ENABLE_WERROR "Treat warnings as errors (enabled in CI)" ${VBAM_CI_DEFAULT})
+
 option(TRANSLATIONS_ONLY "Build only the translations.zip" OFF)
 if(TRANSLATIONS_ONLY)
     set(BUILD_DEFAULT OFF)
@@ -183,11 +191,10 @@ option(ENABLE_GBA_LOGGING "Enable extended GBA logging" ON)
 option(UPSTREAM_RELEASE "do some optimizations and release automation tasks" OFF)
 
 if(WIN32)
-    # not yet implemented
-    option(ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" OFF)
+    option(ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" ON)
 
     set(XAUDIO2_DEFAULT ON)
-    if ((MSVC AND CMAKE_CXX_COMPILER_ID STREQUAL Clang) OR (MINGW AND X86))
+    if ((MSVC AND CMAKE_CXX_COMPILER_ID STREQUAL Clang))
         # TODO: We should update the XAudio headers to build with clang-cl. See
         # https://github.com/visualboyadvance-m/visualboyadvance-m/issues/1021
         set(XAUDIO2_DEFAULT OFF)
@@ -210,7 +217,7 @@ set(ENABLE_FAUDIO_DEFAULT OFF)
 
 find_package(FAudio QUIET)
 
-if(FAudio_FOUND AND NOT (MINGW AND X86))
+if(FAudio_FOUND)
     set(ENABLE_FAUDIO_DEFAULT ON)
 endif()
 

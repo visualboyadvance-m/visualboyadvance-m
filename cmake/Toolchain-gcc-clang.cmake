@@ -1,24 +1,3 @@
-if(X86_32 OR X86_64)
-    add_compile_options(-msse2)
-endif()
-
-if(UPSTREAM_RELEASE)
-    if(X86_64)
-        # Require and optimize for Core2 level support, tune for generic.
-        if(APPLE)
-            add_compile_options(-march=core2 -mtune=skylake)
-        else()
-            add_compile_options(-march=core2 -mtune=generic)
-        endif()
-    elseif(X86_32)
-        # Optimize for pentiumi3 and tune for generic for Windows XP builds.
-        set(WINXP TRUE)
-        add_compile_options(-march=pentium3 -mtune=generic)
-        add_compile_definitions(-DWINXP)
-    endif()
-endif()
-
-# Common flags.
 add_compile_options(
     -pipe
     $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-copy>
@@ -27,10 +6,13 @@ add_compile_options(
     -fdiagnostics-color=always
 )
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    add_compile_options(-Wno-unused-command-line-argument)
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    add_compile_options(-feliminate-unused-debug-types)
+# Treat warnings as errors in CI
+if(ENABLE_WERROR)
+    add_compile_options(-Werror)
+endif()
+
+if(APPLE)
+    add_compile_options(-Wno-deprecated-declarations)
 endif()
 
 # check if ssp flags are supported.
@@ -38,25 +20,53 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     check_cxx_compiler_flag(-fstack-protector-strong STACK_PROTECTOR_SUPPORTED)
 
     if(STACK_PROTECTOR_SUPPORTED)
-        add_compile_options(-fstack-protector-strong)
+        add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fstack-protector-strong> $<$<COMPILE_LANGUAGE:C>:-fstack-protector-strong>)
 
         check_cxx_compiler_flag("--param ssp-buffer-size=4" SSP_BUFFER_SIZE_SUPPORTED)
         if(SSP_BUFFER_SIZE_SUPPORTED)
-            add_compile_options(--param ssp-buffer-size=4)
+            add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:--param;ssp-buffer-size=4>" "$<$<COMPILE_LANGUAGE:C>:--param;ssp-buffer-size=4>")
         endif()
     endif()
 endif()
-
-#add_compile_options(-std=c++14)
 
 if(NOT ENABLE_ASM) # inline asm is not allowed with -fPIC
     add_compile_options(-fPIC)
 endif()
 
+if(UPSTREAM_RELEASE)
+    if(X86_64)
+        if(APPLE)
+            add_compile_options(-march=core2 -mtune=skylake)
+        elseif(WIN32)
+            add_compile_options(-march=core2 -mtune=generic)
+        endif()
+    elseif(WIN32 AND X86_32)
+        set(WINXP TRUE)
+        add_compile_definitions(-DWINXP)
+        add_compile_options(-march=pentium3 -mmmx -msse -mfpmath=sse)
+    elseif(X86_32 OR X86_64)
+        add_compile_options(-msse2)
+    endif()
+endif()
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-ggdb3 -fno-omit-frame-pointer -Wall -Wextra)
 else()
-    add_compile_options(-O3 -ffast-math -fomit-frame-pointer)
+    if(NOT WINXP)
+        add_compile_options(-O3 -ffast-math -fomit-frame-pointer)
+    else()
+        add_compile_options(-O3 -fomit-frame-pointer)
+    endif()
+
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        add_compile_options(-fexpensive-optimizations)
+    endif()
+endif()
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    add_compile_options(-Wno-unused-command-line-argument -Wno-unknown-pragmas)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(-feliminate-unused-debug-types)
 endif()
 
 # for some reason this is necessary

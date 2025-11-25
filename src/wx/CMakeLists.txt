@@ -342,6 +342,8 @@ function(configure_wx_target target)
     # Direct3D.
     if(NOT ENABLE_DIRECT3D)
         _add_compile_definitions(NO_D3D)
+    else()
+        _add_link_libraries(d3d9)
     endif()
 
     # SDL.

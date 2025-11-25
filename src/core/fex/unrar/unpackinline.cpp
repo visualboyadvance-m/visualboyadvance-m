@@ -144,3 +144,6 @@ inline uint Unpack::SlotToLength(BitInput &Inp,uint Slot)
 }
 
 #endif
+
+// Dummy symbol to suppress ranlib "has no symbols" warning
+[[maybe_unused]] void vbam_dummy_symbol_unpackinline() {}

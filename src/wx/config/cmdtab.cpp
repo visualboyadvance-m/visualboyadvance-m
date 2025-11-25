@@ -24,8 +24,7 @@ namespace config {
         }
 
         // Command not found. This should never happen.
-        VBAM_NOTREACHED();
-        return wxEmptyString;
+        VBAM_NOTREACHED_RETURN(wxEmptyString);
     }
 
     wxString GetCommandHelper(int command) {
@@ -36,8 +35,7 @@ namespace config {
         }
 
         // Command not found. This should never happen.
-        VBAM_NOTREACHED();
-        return wxEmptyString;
+        VBAM_NOTREACHED_RETURN(wxEmptyString);
     }
 
     nonstd::optional<int> CommandFromConfigString(const wxString& config) {

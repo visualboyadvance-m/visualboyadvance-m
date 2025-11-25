@@ -281,6 +281,7 @@ void gbSgbDrawBorderTile(int x, int y, int tile, int attr)
 #else
                     gbSgbDraw8Bit(dest8b + yyy * (256 + 2) + xxx, cc);
 #endif
+                    break;
                 case 16:
 #ifdef __LIBRETRO__
                     gbSgbDraw16Bit(dest + yyy * 256 + xxx, cc);

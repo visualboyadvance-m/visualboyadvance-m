@@ -57,10 +57,8 @@ std::vector<AudioDevice> EnumerateAudioDevices(const config::AudioApi& audio_api
 
         case config::AudioApi::kLast:
         default:
-            VBAM_NOTREACHED();
-            return {};
+            VBAM_NOTREACHED_RETURN(std::vector<AudioDevice>());
     }
-    return {};
 }
 
 std::unique_ptr<SoundDriver> CreateSoundDriver(const config::AudioApi& api) {
@@ -95,10 +93,8 @@ std::unique_ptr<SoundDriver> CreateSoundDriver(const config::AudioApi& api) {
 
         case config::AudioApi::kLast:
         default:
-            VBAM_NOTREACHED();
-            return NULL;
+            VBAM_NOTREACHED_RETURN(NULL);
     }
-    return NULL;
 }
 
 }  // namespace audio

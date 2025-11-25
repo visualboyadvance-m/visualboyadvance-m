@@ -652,3 +652,6 @@ void Unpack::InitFilters()
 }
 
 #endif
+
+// Dummy symbol to suppress ranlib "has no symbols" warning
+[[maybe_unused]] void vbam_dummy_symbol_unpack50() {}

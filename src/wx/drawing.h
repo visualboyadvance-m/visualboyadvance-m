@@ -75,12 +75,30 @@ private:
 };
 
 #if defined(__WXMSW__) && !defined(NO_D3D)
+// Forward declarations for Direct3D 9
+struct IDirect3D9;
+struct IDirect3DDevice9;
+struct IDirect3DTexture9;
+
 class DXDrawingPanel : public DrawingPanel {
 public:
     DXDrawingPanel(wxWindow* parent, int _width, int _height);
+    virtual ~DXDrawingPanel();
 
 protected:
     void DrawArea(wxWindowDC&);
+    void DrawingPanelInit();
+    void OnSize(wxSizeEvent& ev);
+
+private:
+    bool ResetDevice();
+
+    IDirect3D9* d3d;
+    IDirect3DDevice9* device;
+    IDirect3DTexture9* texture;
+    int texture_width;
+    int texture_height;
+    bool using_d3d9ex;
 };
 #endif
 
@@ -140,14 +158,11 @@ protected:
 #ifdef __OBJC__
 private:
     void CreateMetalView();
-    id<MTLTexture> loadTextureUsingData(void *data);
+    id<MTLTexture> CreateTextureWithData(void *data, NSUInteger bytesPerRow);
 
     NSView *view;
     MTKView *metalView;
     NSRect metalFrame;
-    MTLRenderPassDescriptor *renderPassDescriptor;
-    id<MTLRenderCommandEncoder> renderEncoder;
-    id<MTLCommandBuffer> commandBuffer;
     id<MTLDevice> _device;
     id<MTLCommandQueue> _commandQueue;
     id<MTLRenderPipelineState> _pipelineState;
@@ -156,6 +171,8 @@ private:
     NSUInteger _numVertices;
     vector_uint2 _viewportSize;
     vector_uint2 _contentSize;
+    uint32_t *_conversion_buffer;
+    size_t _conversion_buffer_size;
 #endif
 };
 #endif

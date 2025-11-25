@@ -1542,6 +1542,7 @@ T* SafeXRCCTRL(wxWindow* parent, const char* name)
     wxString dname = wxString::FromUTF8(name);
     //This is needed to work around a bug in XRCCTRL
     wxString Ldname = dname;
+    (void)Ldname;
     T* output = XRCCTRL_D(*parent, dname, T);
     CheckThrowXRCError(output, name);
     return output;
@@ -2031,8 +2032,8 @@ bool MainFrame::BindControls()
         rb = SafeXRCCTRL<wxRadioButton>(d, n);       \
         rb->SetValidator(wxBoolIntValidator(&o, v)); \
     } while (0)
-        wxBoolEnValidator* benval;
-        wxBoolEnHandler* ben;
+        [[maybe_unused]] wxBoolEnValidator* benval;
+        [[maybe_unused]] wxBoolEnHandler* ben;
 #define getbe(n, o, cv, t, wt)                                        \
     do {                                                              \
         cv = SafeXRCCTRL<t>(d, n);                                    \
@@ -2044,7 +2045,7 @@ bool MainFrame::BindControls()
     } while (0)
         // brenval & friends are here just to allow yes/no radioboxes in place
         // of checkboxes.  A lot of work for little benefit.
-        wxBoolRevEnValidator* brenval;
+        [[maybe_unused]] wxBoolRevEnValidator* brenval;
 #define getbre(n, o, cv, t, wt)                                           \
     do {                                                                  \
         cv = SafeXRCCTRL<t>(d, n);                                        \

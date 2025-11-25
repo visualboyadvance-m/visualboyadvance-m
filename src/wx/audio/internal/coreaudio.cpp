@@ -63,12 +63,6 @@ static const AudioObjectPropertyAddress devlist_address = {
     kAudioObjectPropertyElementMain
 };
 
-static const AudioObjectPropertyAddress default_playback_device_address = {
-    kAudioHardwarePropertyDefaultOutputDevice,
-    kAudioObjectPropertyScopeGlobal,
-    kAudioObjectPropertyElementMain
-};
-
 const AudioObjectPropertyAddress addr = {
     kAudioDevicePropertyStreamConfiguration,
     kAudioDevicePropertyScopeOutput,
@@ -126,27 +120,29 @@ static void PlaybackBufferReadyCallback(void *inUserData, AudioQueueRef inAQ, Au
     CoreAudioAudio *cadevice = (CoreAudioAudio *)inUserData;
     (void)inAQ;
 
+    // Safety check: if buffers is NULL, we're shutting down - just return
+    if (cadevice->buffers == NULL) {
+        wxLogDebug(wxT("PlaybackBufferReadyCallback - buffers is NULL (shutting down)"));
+        return;
+    }
+
+    // Find which buffer this is
     for (curbuf = 0; curbuf < OPTION(kSoundBuffers); curbuf++) {
         if (cadevice->buffers[curbuf] == inBuffer) {
             break;
         }
     }
 
-    if (curbuf >= OPTION(kSoundBuffers))
+    if (curbuf >= OPTION(kSoundBuffers)) {
+        wxLogError(wxT("PlaybackBufferReadyCallback - buffer not found in array"));
         return;
-
-    // buffer is unexpectedly here? We're probably dying, but try to requeue this buffer with silence.
-    if (cadevice->buffers[curbuf] != NULL) {
-        AudioQueueFreeBuffer(inAQ, cadevice->buffers[curbuf]);
-        cadevice->soundBufferLen = (soundGetSampleRate() / 60) * cadevice->description.mBytesPerPacket;
-        AudioQueueAllocateBuffer(inAQ, cadevice->soundBufferLen, &cadevice->buffers[curbuf]);
-        cadevice->buffers[curbuf]->mAudioDataByteSize = 0;
-    } else {
-        cadevice->soundBufferLen = (soundGetSampleRate() / 60) * cadevice->description.mBytesPerPacket;
-        AudioQueueAllocateBuffer(inAQ, cadevice->soundBufferLen, &cadevice->buffers[curbuf]);
-        cadevice->buffers[curbuf]->mAudioDataByteSize = 0;
     }
 
+    // Idiomatic CoreAudio: just reset the buffer size to mark it as empty
+    // The buffer is reused, not freed and reallocated
+    cadevice->buffers[curbuf]->mAudioDataByteSize = 0;
+
+    // Decrement filled buffers count so write() knows this buffer is available
     std::lock_guard<std::mutex> lock(cadevice->buffer_mutex);
     if (cadevice->filled_buffers > 0) {
         cadevice->filled_buffers--;
@@ -261,37 +257,53 @@ void CoreAudioAudio::deinit() {
     if (!initialized)
         return;
 
+    initialized = false;
+
     if (device != 0) {
         AudioObjectRemovePropertyListener(device, &alive_address, DeviceAliveNotification, this);
+        device = 0;
     }
 
-    if (buffers != NULL) {
+    // Idiomatic CoreAudio cleanup order:
+    // 1. Stop the queue (blocks until callbacks complete)
+    // 2. Free buffers explicitly
+    // 3. Dispose timeline
+    // 4. Dispose queue
+
+    // Stop the audio queue first and wait for all callbacks to complete
+    if (audioQueue != NULL) {
+        AudioQueueStop(audioQueue, TRUE);  // TRUE = immediate/synchronous stop
+    }
+
+    // Set buffers to NULL so any straggling callbacks will see it and return early
+    AudioQueueBufferRef *buffers_to_free = buffers;
+    buffers = NULL;
+
+    // Free all allocated buffers
+    if (buffers_to_free != NULL) {
         for (int i = 0; i < OPTION(kSoundBuffers); i++) {
-            if (buffers[i] != NULL) {
-                AudioQueueFreeBuffer(audioQueue, buffers[i]);
+            if (buffers_to_free[i] != NULL) {
+                AudioQueueFreeBuffer(audioQueue, buffers_to_free[i]);
+                buffers_to_free[i] = NULL;
             }
         }
-        free(buffers);
-        buffers = NULL;
+        free(buffers_to_free);
     }
 
-    AudioQueueStop(audioQueue, TRUE);
-
+    // Dispose timeline if it exists
     if (timeline != NULL) {
         AudioQueueDisposeTimeline(audioQueue, timeline);
         timeline = NULL;
     }
 
+    // Finally dispose the queue itself
     if (audioQueue != NULL) {
-        AudioQueueDispose(audioQueue, TRUE);
+        AudioQueueDispose(audioQueue, TRUE);  // TRUE = synchronous dispose
         audioQueue = NULL;
     }
 
-    device = 0;
     current_buffer = 0;
     filled_buffers = 0;
-
-    initialized = false;
 }
 
 CoreAudioAudio::~CoreAudioAudio() {
@@ -425,17 +437,21 @@ bool CoreAudioAudio::init(long sampleRate) {
         result = AudioQueueAllocateBuffer(audioQueue, soundBufferLen, &buffers[i]);
 
         if (result != noErr) {
+            wxLogError(_("Failed to allocate CoreAudio buffer %d: error %d"), i, (int)result);
             return false;
         }
 
+        // Initialize buffer with silence and set size to 0 (empty, ready for write())
         memset(buffers[i]->mAudioData, 0x00, buffers[i]->mAudioDataBytesCapacity);
-        buffers[i]->mAudioDataByteSize = buffers[i]->mAudioDataBytesCapacity;
-
-        PlaybackBufferReadyCallback(this, audioQueue, buffers[i]);
         buffers[i]->mAudioDataByteSize = 0;
     }
 
     result = AudioQueueStart(audioQueue, NULL);
+
+    if (result != noErr) {
+        wxLogError(_("Failed to start CoreAudio queue: error %d"), (int)result);
+        return false;
+    }
 
     return initialized = true;
 }

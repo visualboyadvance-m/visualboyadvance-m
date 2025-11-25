@@ -107,11 +107,9 @@ double GetFilterScale() {
             return 6.0;
         case config::Filter::kPlugin:
         case config::Filter::kLast:
-            VBAM_NOTREACHED();
-            return 1.0;
+            VBAM_NOTREACHED_RETURN(1.0);
     }
-    VBAM_NOTREACHED();
-    return 1.0;
+    VBAM_NOTREACHED_RETURN(1.0);
 }
 
 long GetSampleRate() {
@@ -129,11 +127,9 @@ long GetSampleRate() {
             return 11025;
             break;
         case config::AudioRate::kLast:
-            VBAM_NOTREACHED();
-            return 44100;
+            VBAM_NOTREACHED_RETURN(44100);
     }
-    VBAM_NOTREACHED();
-    return 44100;
+    VBAM_NOTREACHED_RETURN(44100);
 }
 
 #define out_8  (systemColorDepth ==  8)
@@ -1612,22 +1608,18 @@ public:
         const int instride32 = width_ * 4;
         const int outbpp = systemColorDepth >> 3;
         const int outrb = out_8 ? 4 : out_24 ? 0 : 4;
-        const int outstride = std::ceil(width_ * outbpp * scale_) + outrb;
-        const int outstride32 = std::ceil(width_ * 4 * scale_);
+        (void)outrb; // unused
+        const int outstride = std::ceil((width_ + inrb) * outbpp * scale_);
+        const int outstride32 = std::ceil((width_ + inrb) * 4 * scale_);
         uint8_t *dest = NULL;
         int pos = 0;
         uint32_t *src2_ = NULL;
         uint32_t *dst2_ = NULL;
         delta_ += instride * procy;
 
-        // FIXME: fugly hack
-        if (OPTION(kDispRenderMethod) == config::RenderMethod::kOpenGL) {
-            dst_ += (int)std::ceil(outstride * (procy + 1) * scale_);
-        } else if (OPTION(kDispRenderMethod) == config::RenderMethod::kSDL) {
-            dst_ += (int)std::ceil(outstride * (procy + 1) * scale_);
-        } else {
-            dst_ += (int)std::ceil(outstride * (procy + (1 / scale_)) * scale_);
-        }
+        // Skip scale rows of top border in output buffer
+        // All renderers skip the same amount in the filter output
+        dst_ += (int)std::ceil(outstride * (procy + 1) * scale_);
 
         dest = dst_;
 
@@ -1659,8 +1651,8 @@ public:
             if (systemColorDepth == 32) {
                 ApplyFilter(instride, outstride);
             } else {
-                src2_ = (uint32_t *)calloc(4, std::ceil(width_ * height_real));
-                dst2_ = (uint32_t *)calloc(4, std::ceil((width_ * scale_) * (height_real * scale_)));
+                src2_ = (uint32_t *)calloc(4, std::ceil((width_ + inrb) * height_real));
+                dst2_ = (uint32_t *)calloc(4, std::ceil((width_ + inrb) * scale_ * height_real * scale_));
 
                 if (out_8) {
                     int src_pos = 0;
@@ -1717,6 +1709,7 @@ public:
                 if (out_8) {
                     int dst_pos = 0;
                     pos = 0;
+                    int scaled_border = (int)std::ceil(inrb * scale_);
                     for (int y = 0; y < (height_real * scale_); y++) {
                         for (int x = 0; x < (width_ * scale_); x++) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
@@ -1727,12 +1720,14 @@ public:
                             pos++;
                             dst_pos += 4;
                         }
-                        pos += 4;
+                        pos += scaled_border;
+                        dst_pos += scaled_border * 4; // Skip border in 32bpp buffer too
                     }
                 } else if (out_16) {
                     uint16_t *dest16_ = (uint16_t *)dest;
                     int dst_pos = 0;
                     pos = 0;
+                    int scaled_border = (int)std::ceil(inrb * scale_);
                     for (int y = 0; y < (height_real * scale_); y++) {
                         for (int x = 0; x < (width_ * scale_); x++) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
@@ -1743,7 +1738,8 @@ public:
                             pos++;
                             dst_pos += 4;
                         }
-                        pos += 2;
+                        pos += scaled_border;
+                        dst_pos += scaled_border * 4; // Skip border in 32bpp buffer too
                     }
                 } else if (out_24) {
                     int dst_pos = 0;
@@ -1815,7 +1811,6 @@ private:
 
             case config::Interframe::kLast:
                 VBAM_NOTREACHED();
-                break;
         }
     }
 
@@ -1969,15 +1964,15 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     //   if filtering, this is filter output, retained for redraws
     //   if not filtering, we still retain current image for redraws
     int outbpp = systemColorDepth >> 3;
-    int outrb = out_8 ? 4 : out_24 ? 0 : 4;
-    int outstride = std::ceil(width * outbpp * scale) + outrb;
+    int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
+    int outstride = std::ceil((width + inrb) * outbpp * scale);
 
     if (!pixbuf2) {
         int allocstride = outstride, alloch = height;
 
         // gb may write borders, so allocate enough for them
         if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
-            allocstride = std::ceil(GameArea::SGBWidth * outbpp * scale) + outrb;
+            allocstride = std::ceil((GameArea::SGBWidth + inrb) * outbpp * scale);
             alloch = GameArea::SGBHeight;
         }
 
@@ -2590,15 +2585,16 @@ void SDLDrawingPanel::DrawArea()
 
     if (!did_init)
         DrawingPanelInit();
-            
+
+    int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
     if (out_8) {
-        srcPitch = std::ceil(width * scale) + 4;
+        srcPitch = std::ceil((width + inrb) * scale * 1);
     } else if (out_16) {
-        srcPitch = std::ceil(width * scale * 2) + 4;
+        srcPitch = std::ceil((width + inrb) * scale * 2);
     } else if (out_24) {
         srcPitch = std::ceil(width * scale * 3);
     } else {
-        srcPitch = std::ceil(width * scale * 4) + 4;
+        srcPitch = std::ceil((width + inrb) * scale * 4);
     }
 
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
@@ -2647,8 +2643,8 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
     //   if filtering, this is filter output, retained for redraws
     //   if not filtering, we still retain current image for redraws
     int outbpp = systemColorDepth >> 3;
-    int outrb = out_8 ? 4 : out_24 ? 0 : 4;
-    int outstride = std::ceil(width * outbpp * scale) + outrb;
+    int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
+    int outstride = std::ceil((width + inrb) * outbpp * scale);
             
     // FIXME: filters race condition?
     const int max_threads = 1;
@@ -2658,7 +2654,7 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
                 
         // gb may write borders, so allocate enough for them
         if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
-            allocstride = std::ceil(GameArea::SGBWidth * outbpp * scale) + outrb;
+            allocstride = std::ceil((GameArea::SGBWidth + inrb) * outbpp * scale);
             alloch = GameArea::SGBHeight;
         }
 
@@ -2823,6 +2819,7 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
         int scaled_width = (int)std::ceil(width * scale);
         int scaled_height = (int)std::ceil(height * scale);
         im = new wxImage(scaled_width, scaled_height, false);
+        // Skip 1 row of top border
         uint8_t* src = todraw + scaled_width * 3;
         uint8_t* dst = im->GetData();
 
@@ -2834,9 +2831,12 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
     } else if (out_8) {
         // scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
-        uint8_t* src = (uint8_t*)todraw + (int)std::ceil((width * scale) + 4); // skip top border
+        int inrb = 4; // 8-bit has 4-pixel filter border
+        int scaled_stride = (int)std::ceil((width + inrb) * scale);
+        // Skip 1 row of top border
+        uint8_t* src = (uint8_t*)todraw + scaled_stride;
         uint8_t* dst = im->GetData();
-                
+
         for (int y = 0; y < std::ceil(height * scale); y++) {
             for (int x = 0; x < std::ceil(width * scale); x++, src++) {
                 // White color fix
@@ -2850,13 +2850,16 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
                     *dst++ = ((*src & 0x3) << 6);
                 }
             }
-                    
-            src += 4;
+
+            src += (int)std::ceil(inrb * scale); // skip rhs border (scaled)
         }
     } else if (out_16) {
         // scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
-        uint16_t* src = (uint16_t*)todraw + (int)std::ceil((width + 2) * scale); // skip top border
+        int inrb = 2; // 16-bit has 2-pixel filter border
+        int scaled_stride = (int)std::ceil((width + inrb) * scale);
+        // Skip 1 row of top border
+        uint16_t* src = (uint16_t*)todraw + scaled_stride;
         uint8_t* dst = im->GetData();
 
         for (int y = 0; y < std::ceil(height * scale); y++) {
@@ -2865,13 +2868,16 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
                 *dst++ = ((*src >> systemGreenShift) & 0x1f) << 3;
                 *dst++ = ((*src >> systemBlueShift) & 0x1f) << 3;
             }
-                    
-            src += 2; // skip rhs border
+
+            src += (int)std::ceil(inrb * scale); // skip rhs border (scaled)
         }
     } else if (OPTION(kDispFilter) != config::Filter::kNone) {
         // scaled by filters, top/right borders, transform to 24-bit
         im = new wxImage(std::ceil(width * scale), std::ceil(height * scale), false);
-        uint32_t* src = (uint32_t*)todraw + (int)std::ceil(width * scale) + 1; // skip top border
+        int inrb = 1; // 32-bit has 1-pixel filter border
+        int scaled_stride = (int)std::ceil((width + inrb) * scale);
+        // Skip 1 row of top border
+        uint32_t* src = (uint32_t*)todraw + scaled_stride;
         uint8_t* dst = im->GetData();
 
         for (int y = 0; y < std::ceil(height * scale); y++) {
@@ -2880,8 +2886,8 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
                 *dst++ = *src >> (systemGreenShift - 3);
                 *dst++ = *src >> (systemBlueShift - 3);
             }
-                    
-            ++src; // skip rhs border
+
+            src += (int)std::ceil(inrb * scale); // skip rhs border (scaled)
         }
     } else {  // 32 bit
         // not scaled by filters, top/right borders, transform to 24-bit
@@ -3170,7 +3176,8 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
         DrawingPanelInit();
             
     if (todraw) {
-        int rowlen = std::ceil(width * scale) + (out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1);
+        int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
+        int rowlen = std::ceil((width + inrb) * scale);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, rowlen);
 #if wxBYTE_ORDER == wxBIG_ENDIAN
                 
@@ -3180,7 +3187,7 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
                 
 #endif
         glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, (int)std::ceil(width * scale), (int)std::ceil(height * scale),
-                     0, tex_fmt, todraw + (int)std::ceil(rowlen * ((systemColorDepth >> 3) * scale)));
+                     0, tex_fmt, todraw + (int)std::ceil(rowlen * (systemColorDepth >> 3)));
                 
         glCallList(vlist);
     } else
@@ -3194,24 +3201,496 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 #if defined(__WXMSW__) && !defined(NO_D3D)
 #define DIRECT3D_VERSION 0x0900
 #include <d3d9.h> // main include file
-        //#include <d3dx9core.h> // required for font rendering
-#include <dxerr9.h> // contains debug functions
-        
+typedef HRESULT (WINAPI *LPDIRECT3DCREATE9EX)(UINT, IDirect3D9Ex**);
+
 DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
         : DrawingPanel(parent, _width, _height)
+        , d3d(NULL)
+        , device(NULL)
+        , texture(NULL)
+        , texture_width(0)
+        , texture_height(0)
+        , using_d3d9ex(false)
 {
-    // FIXME: implement
+    HRESULT hr = E_FAIL; // Initialize hr to a failure value
+
+    // Try to create Direct3D 9Ex interface (Vista+) via dynamic loading
+    // This is required to support Windows XP, which doesn't export Direct3DCreate9Ex
+    HMODULE hD3D9 = LoadLibrary(TEXT("d3d9.dll"));
+
+    if (hD3D9) {
+        // Attempt to get the function address
+        LPDIRECT3DCREATE9EX Direct3DCreate9ExPtr =
+            (LPDIRECT3DCREATE9EX)GetProcAddress(hD3D9, "Direct3DCreate9Ex");
+
+        if (Direct3DCreate9ExPtr) {
+            // Function found: try to create D3D9Ex
+            hr = Direct3DCreate9ExPtr(D3D_SDK_VERSION, (IDirect3D9Ex**)&d3d);
+
+            if (SUCCEEDED(hr)) {
+                using_d3d9ex = true;
+                wxLogDebug(wxT("Using Direct3D 9Ex (dynamically loaded)"));
+            }
+        }
+    } else {
+        wxLogError(_("Failed to load d3d9.dll"));
+        return;
+    }
+
+    // If XP, or Direct3DCreate9Ex failed
+    if (!d3d) {
+        // Fall back to regular Direct3D 9
+        d3d = Direct3DCreate9(D3D_SDK_VERSION);
+        if (!d3d) {
+            wxLogError(_("Failed to create Direct3D 9 interface"));
+            return;
+        }
+        wxLogDebug(wxT("Using Direct3D 9"));
+    }
+
+    // Get display mode
+    D3DDISPLAYMODE d3ddm;
+    hr = d3d->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm);
+    if (FAILED(hr)) {
+        wxLogError(_("Failed to get adapter display mode: 0x%08X"), hr);
+        return;
+    }
+
+    // Set up present parameters
+    D3DPRESENT_PARAMETERS d3dpp;
+    ZeroMemory(&d3dpp, sizeof(d3dpp));
+    d3dpp.Windowed = TRUE;
+    d3dpp.BackBufferFormat = d3ddm.Format;
+    d3dpp.BackBufferWidth = 0;  // Use window size
+    d3dpp.BackBufferHeight = 0; // Use window size
+    d3dpp.PresentationInterval = OPTION(kPrefVsync) ?
+                                  D3DPRESENT_INTERVAL_ONE :
+                                  D3DPRESENT_INTERVAL_IMMEDIATE;
+
+    const wxChar* final_swap_effect = wxT("UNKNOWN"); // Variable to log the successful swap effect
+
+    // Try up to 2 times: FlipEx first (if D3D9Ex), then Discard
+    for (int swap_attempt = 0; swap_attempt < 2; swap_attempt++) {
+        // First attempt with D3D9Ex: try FlipEx, otherwise use Discard
+        if (swap_attempt == 0 && using_d3d9ex) {
+            d3dpp.SwapEffect = D3DSWAPEFFECT_FLIPEX;
+            d3dpp.BackBufferCount = 2;
+        } else {
+            if (swap_attempt == 1) wxLogDebug(wxT("FlipEx not supported, falling back to Discard swap effect"));
+            d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+            d3dpp.BackBufferCount = 0;
+        }
+
+        // Create Direct3D device - try hardware vertex processing first
+        hr = d3d->CreateDevice(
+                D3DADAPTER_DEFAULT,
+                D3DDEVTYPE_HAL,
+                (HWND)GetHandle(),
+                D3DCREATE_HARDWARE_VERTEXPROCESSING,
+                &d3dpp,
+                &device
+            );
+
+        if (FAILED(hr)) {
+            wxLogDebug(wxT("Hardware vertex processing not available, falling back to software"));
+
+            // Fallback to software vertex processing
+            hr = d3d->CreateDevice(
+                    D3DADAPTER_DEFAULT,
+                    D3DDEVTYPE_HAL,
+                    (HWND)GetHandle(),
+                    D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+                    &d3dpp,
+                    &device
+                );
+        }
+
+        // If succeeded or not using D3D9Ex, break out
+        if (SUCCEEDED(hr) || !using_d3d9ex) {
+            if (SUCCEEDED(hr)) {
+                // Record the successful swap effect for logging
+                final_swap_effect = (d3dpp.SwapEffect == D3DSWAPEFFECT_FLIPEX) ? wxT("FLIPEX") : wxT("DISCARD");
+            }
+            break;
+        }
+    }
+
+    if (FAILED(hr)) {
+        wxLogError(_("Failed to create Direct3D device: 0x%08X"), hr);
+        return;
+    }
+
+    // Log the successful device creation along with the final swap effect
+    wxLogDebug(wxT("Direct3D 9%s device created successfully (SwapEffect: %s)"),
+               using_d3d9ex ? wxT("Ex") : wxT(""),
+               final_swap_effect);
 }
-        
+
+DXDrawingPanel::~DXDrawingPanel()
+{
+    if (texture) {
+        texture->Release();
+        texture = NULL;
+    }
+    if (device) {
+        device->Release();
+        device = NULL;
+    }
+    if (d3d) {
+        d3d->Release();
+        d3d = NULL;
+    }
+}
+
+void DXDrawingPanel::DrawingPanelInit()
+{
+    DrawingPanelBase::DrawingPanelInit();
+
+    if (!device) {
+        return;
+    }
+
+    // Calculate texture size (use actual scaled size)
+    texture_width = (int)std::ceil(width * scale);
+    texture_height = (int)std::ceil(height * scale);
+
+    wxLogDebug(wxT("DXDrawingPanel initialized: %dx%d (scale: %f)"),
+               texture_width, texture_height, scale);
+}
+
+bool DXDrawingPanel::ResetDevice()
+{
+    if (!device || !d3d) {
+        return false;
+    }
+
+    // Release texture before reset (required for D3DPOOL_DEFAULT resources)
+    if (texture) {
+        texture->Release();
+        texture = NULL;
+        texture_width = 0;
+        texture_height = 0;
+    }
+
+    // Get current display mode
+    D3DDISPLAYMODE d3ddm;
+    HRESULT hr = d3d->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm);
+    if (FAILED(hr)) {
+        wxLogError(_("Failed to get adapter display mode for reset: 0x%08X"), hr);
+        return false;
+    }
+
+    // Get current client size
+    wxSize client_size = GetClientSize();
+
+    // Set up present parameters
+    D3DPRESENT_PARAMETERS d3dpp;
+    ZeroMemory(&d3dpp, sizeof(d3dpp));
+    d3dpp.Windowed = TRUE;
+    d3dpp.BackBufferFormat = d3ddm.Format;
+    d3dpp.BackBufferWidth = client_size.GetWidth();
+    d3dpp.BackBufferHeight = client_size.GetHeight();
+    d3dpp.PresentationInterval = OPTION(kPrefVsync) ?
+                                  D3DPRESENT_INTERVAL_ONE :
+                                  D3DPRESENT_INTERVAL_IMMEDIATE;
+
+    const wxChar* attempted_swap_effect = wxT("DISCARD"); // Variable to track the attempted/final swap effect
+
+    // Apply SwapEffect logic based on D3D9Ex usage (which was determined in the constructor)
+    if (using_d3d9ex) {
+        // Try FlipEx first, as it's the preferred mode for D3D9Ex
+        d3dpp.SwapEffect = D3DSWAPEFFECT_FLIPEX;
+        d3dpp.BackBufferCount = 2;
+        attempted_swap_effect = wxT("FLIPEX");
+    } else {
+        // Fall back to standard Discard for regular D3D9
+        d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+        d3dpp.BackBufferCount = 0;
+    }
+
+    wxLogDebug(wxT("Attempting Direct3D device reset (SwapEffect: %s)"), attempted_swap_effect);
+
+    // Reset the device with current window size
+    hr = device->Reset(&d3dpp);
+
+    // If Reset with FlipEx fails on D3D9Ex, try Discard as a fallback for the reset
+    if (FAILED(hr) && using_d3d9ex && d3dpp.SwapEffect == D3DSWAPEFFECT_FLIPEX) {
+        wxLogDebug(wxT("Reset with FlipEx failed, retrying with Discard swap effect"));
+        d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+        d3dpp.BackBufferCount = 0;
+        hr = device->Reset(&d3dpp);
+
+        if (SUCCEEDED(hr)) {
+            // Update logging variable to reflect the successful fallback
+            attempted_swap_effect = wxT("DISCARD (Fallback)");
+        }
+    }
+
+    if (FAILED(hr)) {
+        wxLogError(_("Failed to reset Direct3D device: 0x%08X"), hr);
+        return false;
+    }
+
+    // Log the successful reset along with the final swap effect used
+    wxLogDebug(wxT("Direct3D device reset successfully (Final SwapEffect: %s)"), attempted_swap_effect);
+    return true;
+}
+
+void DXDrawingPanel::OnSize(wxSizeEvent& ev)
+{
+    if (device) {
+        // Reset device to apply new back buffer size
+        ResetDevice();
+    }
+
+    ev.Skip();
+}
+
 void DXDrawingPanel::DrawArea(wxWindowDC& dc)
 {
-    // FIXME: implement
+    (void)dc; // unused params
+
+    if (!device) {
+        return;
+    }
+
     if (!did_init) {
         DrawingPanelInit();
     }
-            
-    if (todraw) {
+
+    if (!todraw) {
+        // Clear screen if no data to draw
+        device->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+        device->Present(NULL, NULL, NULL, NULL);
+        return;
     }
+
+    // Determine texture format based on output format
+    D3DFORMAT tex_format;
+    int pixel_size;
+    if (out_16) {
+        tex_format = D3DFMT_R5G6B5;
+        pixel_size = 2;
+    } else {
+        // out_24 or 32-bit - convert to 32-bit XRGB for D3D
+        tex_format = D3DFMT_X8R8G8B8;
+        pixel_size = 4;
+    }
+
+    int scaled_width = (int)std::ceil(width * scale);
+    int scaled_height = (int)std::ceil(height * scale);
+
+    // Create or recreate texture if size changed
+    if (!texture || texture_width != scaled_width || texture_height != scaled_height) {
+        if (texture) {
+            texture->Release();
+            texture = NULL;
+        }
+
+        HRESULT hr = device->CreateTexture(
+            scaled_width,
+            scaled_height,
+            1,
+            D3DUSAGE_DYNAMIC,
+            tex_format,
+            D3DPOOL_DEFAULT,
+            &texture,
+            NULL
+        );
+
+        if (FAILED(hr)) {
+            wxLogError(_("Failed to create texture: 0x%08X"), hr);
+            return;
+        }
+
+        texture_width = scaled_width;
+        texture_height = scaled_height;
+    }
+
+    // Lock texture and copy pixel data
+    D3DLOCKED_RECT locked_rect;
+    HRESULT hr = texture->LockRect(0, &locked_rect, NULL, D3DLOCK_DISCARD);
+    if (FAILED(hr)) {
+        wxLogError(_("Failed to lock texture: 0x%08X"), hr);
+        return;
+    }
+
+    // Calculate source pitch (bytes per row)
+    // Border is scaled by the filter, so 1 pixel becomes scale pixels
+    int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1; // border in pixels
+    int scaled_border = (int)std::ceil(inrb * scale);
+    int src_pitch = scaled_width;
+    if (out_8) {
+        src_pitch = (scaled_width + scaled_border) * 1;
+    } else if (out_16) {
+        src_pitch = (scaled_width + scaled_border) * 2;
+    } else if (out_24) {
+        src_pitch = scaled_width * 3;
+    } else {
+        // 32-bit
+        src_pitch = (scaled_width + scaled_border) * 4;
+    }
+
+    // Copy pixel data
+    uint8_t* src = todraw;
+    uint8_t* dst = (uint8_t*)locked_rect.pBits;
+
+    if (out_8) {
+        // 8-bit palette mode - convert to 32-bit
+        // Skip 1 row of top border
+        src += src_pitch;
+        for (int y = 0; y < scaled_height; y++) {
+            uint8_t* src_row = src;
+            uint8_t* dst_row = dst;
+            for (int x = 0; x < scaled_width; x++) {
+                uint8_t palIndex = *src_row++;
+                // Simple palette expansion (this may need adjustment)
+                if (palIndex == 0xff) {
+                    dst_row[0] = dst_row[1] = dst_row[2] = 0xff;
+                } else {
+                    dst_row[0] = (palIndex & 0x3) << 6;       // B
+                    dst_row[1] = ((palIndex >> 2) & 0x7) << 5; // G
+                    dst_row[2] = ((palIndex >> 5) & 0x7) << 5; // R
+                }
+                dst_row[3] = 0;
+                dst_row += 4;
+            }
+            src += src_pitch;
+            dst += locked_rect.Pitch;
+        }
+    } else if (out_16) {
+        // Convert 16-bit data from system format (1-5-5-5) to D3D R5G6B5
+        // Skip 1 row of top border (pitch in bytes so divide by 2)
+        uint16_t* src16 = (uint16_t*)src + src_pitch / 2;
+        for (int y = 0; y < scaled_height; y++) {
+            uint16_t* src_row = src16;
+            uint16_t* dst_row = (uint16_t*)dst;
+            for (int x = 0; x < scaled_width; x++, src_row++) {
+                // Extract RGB components using system shifts (5 bits each)
+                uint16_t pixel = *src_row;
+                uint8_t r5 = ((pixel >> systemRedShift) & 0x1f);
+                uint8_t g5 = ((pixel >> systemGreenShift) & 0x1f);
+                uint8_t b5 = ((pixel >> systemBlueShift) & 0x1f);
+                // Expand 5-bit green to 6-bit by duplicating the MSB
+                uint8_t g6 = (g5 << 1) | (g5 >> 4);
+                // Pack into D3D R5G6B5 format: RRRRRGGGGGGBBBBB
+                *dst_row++ = (r5 << 11) | (g6 << 5) | b5;
+            }
+            src16 += src_pitch / 2; // Move to next row including border (pitch in bytes, divide by 2 for uint16_t)
+            dst += locked_rect.Pitch;
+        }
+    } else if (out_24) {
+        // Convert 24-bit RGB to 32-bit XRGB
+        // Skip 1 row of top border
+        src += scaled_width * 3;
+        for (int y = 0; y < scaled_height; y++) {
+            uint8_t* src_row = src;
+            uint8_t* dst_row = dst;
+            for (int x = 0; x < scaled_width; x++) {
+                dst_row[0] = src_row[2]; // B
+                dst_row[1] = src_row[1]; // G
+                dst_row[2] = src_row[0]; // R
+                dst_row[3] = 0;          // X
+                src_row += 3;
+                dst_row += 4;
+            }
+            src += src_pitch;
+            dst += locked_rect.Pitch;
+        }
+    } else {
+        // 32-bit - convert RGBA to BGRX (swap R and B)
+        // Skip 1 row of top border
+        src += src_pitch;
+        for (int y = 0; y < scaled_height; y++) {
+            uint8_t* src_row = src;
+            uint8_t* dst_row = dst;
+            for (int x = 0; x < scaled_width; x++) {
+                dst_row[0] = src_row[2]; // B
+                dst_row[1] = src_row[1]; // G
+                dst_row[2] = src_row[0]; // R
+                dst_row[3] = src_row[3]; // A/X
+                src_row += 4;
+                dst_row += 4;
+            }
+            src += src_pitch;
+            dst += locked_rect.Pitch;
+        }
+    }
+
+    texture->UnlockRect(0);
+
+    // Begin rendering
+    device->BeginScene();
+
+    // Clear background
+    device->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+
+    // Set texture
+    device->SetTexture(0, texture);
+
+    // Set texture filtering
+    D3DTEXTUREFILTERTYPE filter = OPTION(kDispBilinear) ?
+                                   D3DTEXF_LINEAR : D3DTEXF_POINT;
+    device->SetSamplerState(0, D3DSAMP_MAGFILTER, filter);
+    device->SetSamplerState(0, D3DSAMP_MINFILTER, filter);
+
+    // Disable lighting
+    device->SetRenderState(D3DRS_LIGHTING, FALSE);
+
+    // Set up orthographic projection for 2D rendering
+    device->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
+
+    // Get window client size
+    wxSize client_size = GetClientSize();
+    float win_width = (float)client_size.GetWidth();
+    float win_height = (float)client_size.GetHeight();
+
+    // Calculate dimensions based on aspect ratio setting
+    float render_width, render_height;
+    float offset_x = 0.0f, offset_y = 0.0f;
+
+    if (OPTION(kDispStretch)) {
+        // Retain aspect ratio - add letterboxing
+        float tex_aspect = (float)scaled_width / (float)scaled_height;
+        float win_aspect = win_width / win_height;
+
+        if (win_aspect > tex_aspect) {
+            // Window is wider than texture
+            render_height = win_height;
+            render_width = win_height * tex_aspect;
+            offset_x = (win_width - render_width) / 2.0f;
+        } else {
+            // Window is taller than texture
+            render_width = win_width;
+            render_height = win_width / tex_aspect;
+            offset_y = (win_height - render_height) / 2.0f;
+        }
+    } else {
+        // Stretch to fill - ignore aspect ratio
+        render_width = win_width;
+        render_height = win_height;
+    }
+
+    // Define vertices for textured quad
+    struct Vertex {
+        float x, y, z, rhw;
+        float u, v;
+    };
+
+    Vertex vertices[4] = {
+        { offset_x,              offset_y,               0.0f, 1.0f, 0.0f, 0.0f },
+        { offset_x + render_width, offset_y,               0.0f, 1.0f, 1.0f, 0.0f },
+        { offset_x + render_width, offset_y + render_height, 0.0f, 1.0f, 1.0f, 1.0f },
+        { offset_x,              offset_y + render_height, 0.0f, 1.0f, 0.0f, 1.0f }
+    };
+
+    // Draw the quad
+    device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertices, sizeof(Vertex));
+
+    device->EndScene();
+
+    // Present the frame
+    device->Present(NULL, NULL, NULL, NULL);
 }
 #endif
         
@@ -3522,7 +4001,7 @@ MetalDrawingPanel::MetalDrawingPanel(wxWindow* parent, int _width, int _height)
         : DrawingPanel(parent, _width, _height)
 {
     memset(delta, 0xff, sizeof(delta));
-            
+
     // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
     // 16 or 32, though
     if (OPTION(kDispFilter) == config::Filter::kNone &&
@@ -3530,7 +4009,7 @@ MetalDrawingPanel::MetalDrawingPanel(wxWindow* parent, int _width, int _height)
         // changing from 32 to 24 does not require regenerating color tables
         systemColorDepth = (OPTION(kBitDepth) + 1) << 3;
     }
-            
+
     DrawingPanelInit();
 }
         
@@ -3540,8 +4019,8 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
     //   if filtering, this is filter output, retained for redraws
     //   if not filtering, we still retain current image for redraws
     int outbpp = systemColorDepth >> 3;
-    int outrb = out_8 ? 4 : out_24 ? 0 : 4;
-    int outstride = std::ceil(width * outbpp * scale) + outrb;
+    int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
+    int outstride = std::ceil((width + inrb) * outbpp * scale);
             
     // FIXME: filters race condition?
     const int max_threads = 1;
@@ -3551,7 +4030,7 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
                 
         // gb may write borders, so allocate enough for them
         if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
-            allocstride = std::ceil(GameArea::SGBWidth * outbpp * scale) + outrb;
+            allocstride = std::ceil((GameArea::SGBWidth + inrb) * outbpp * scale);
             alloch = GameArea::SGBHeight;
         }
                 

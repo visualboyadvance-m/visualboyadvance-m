@@ -150,7 +150,7 @@ static inline uint32_t Q_INTERPOLATE(uint32_t A, uint32_t B, uint32_t C, uint32_
             ((A & 0x03) + (B & 0x03) + (C & 0x03) + (D & 0x03)))));
 }
 
-static inline int GetResult1_32 (uint32_t A, uint32_t B, uint32_t C, uint32_t D,
+[[maybe_unused]] static inline int GetResult1_32 (uint32_t A, uint32_t B, uint32_t C, uint32_t D,
                                  uint32_t /* E */)
 {
     int x = 0;
@@ -172,7 +172,7 @@ static inline int GetResult1_32 (uint32_t A, uint32_t B, uint32_t C, uint32_t D,
     return r;
 }
 
-static inline int GetResult2_32 (uint32_t A, uint32_t B, uint32_t C, uint32_t D,
+[[maybe_unused]] static inline int GetResult2_32 (uint32_t A, uint32_t B, uint32_t C, uint32_t D,
                                  uint32_t /* E */)
 {
   int x = 0;
@@ -203,7 +203,7 @@ static inline int GetResult2_32 (uint32_t A, uint32_t B, uint32_t C, uint32_t D,
 #define GREEN_MASK555 0x03E003E0
 
 void Super2xSaI (uint8_t *srcPtr, uint32_t srcPitch,
-                 uint8_t *deltaPtr, uint8_t *dstPtr, uint32_t dstPitch,
+                 [[maybe_unused]] uint8_t *deltaPtr, uint8_t *dstPtr, uint32_t dstPitch,
                  int width, int height)
 {
   uint16_t *bP;
@@ -745,7 +745,7 @@ void SuperEagle32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
   }                   // endof: for (height; height; height--)
 }
 
-void _2xSaI (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
+void _2xSaI (uint8_t *srcPtr, uint32_t srcPitch, [[maybe_unused]] uint8_t *deltaPtr,
              uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
   uint8_t  *dP;

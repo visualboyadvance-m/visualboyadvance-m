@@ -105,3 +105,6 @@ size_t FragmentedWindow::GetBlockSize(size_t StartPos,size_t RequiredSize)
 }
 
 #endif
+
+// Dummy symbol to suppress ranlib "has no symbols" warning
+[[maybe_unused]] void vbam_dummy_symbol_unpack50frag() {}

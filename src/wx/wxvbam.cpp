@@ -2,6 +2,7 @@
 
 #ifdef __WXMSW__
 #include <windows.h>
+#include <versionhelpers.h>
 #endif
 
 #ifdef __WXGTK3__
@@ -359,7 +360,14 @@ bool wxvbamApp::OnInit() {
     using_wayland = IsWayland();
 
 #if ((wxMAJOR_VERSION == 3) && (wxMINOR_VERSION >= 3)) || (wxMAJOR_VERSION > 3)
-    SetAppearance(Appearance::System);
+    // SetAppearance is available in wxWidgets 3.3+
+    // Skip on Windows XP where it's not supported
+#ifdef __WXMSW__
+    if (IsWindowsVistaOrGreater())
+#endif
+    {
+        SetAppearance(Appearance::System);
+    }
 #endif
 
     // use consistent names for config, DO NOT TRANSLATE
@@ -495,8 +503,6 @@ bool wxvbamApp::OnInit() {
     } else {
         wxvbam_locale->Init();
     }
-
-    fprintf(stderr, "Language: %d\n", language);
 
     // load selected language
 
@@ -1091,6 +1097,7 @@ void MainFrame::OnSize(wxSizeEvent& event)
 
 void MainFrame::OnIconize(wxIconizeEvent& event)
 {
+    (void)event; // unused
     if (!init_complete_) {
         return;
     }

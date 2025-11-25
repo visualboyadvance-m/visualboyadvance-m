@@ -1,13 +1,5 @@
 add_library(vbam-components-filters OBJECT)
 
-unset(extra_src)
-if(WINXP)
-    list(APPEND extra_src
-        ${CMAKE_SOURCE_DIR}/third_party/quake3-sqrt/quake3-sqrt.h
-    )
-    target_include_directories(vbam-components-filters PRIVATE ${CMAKE_SOURCE_DIR}/third_party/quake3-sqrt)
-endif()
-
 target_sources(vbam-components-filters
     PRIVATE
     internal/2xSaI.cpp
@@ -25,7 +17,6 @@ target_sources(vbam-components-filters
     internal/xBRZ/xbrz_config.h
     internal/xBRZ/xbrz_tools.h
     internal/xbrzfilter.cpp
-    ${extra_src}
 
     PUBLIC
     filters.h

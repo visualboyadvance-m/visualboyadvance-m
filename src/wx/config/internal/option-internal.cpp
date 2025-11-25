@@ -629,8 +629,8 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"Sound/DSoundHWAccel", "DSoundHWAccel", _("Use DirectSound hardware acceleration")},
     OptionData{"Sound/Upmix", "Upmix", _("Upmix stereo to surround")},
     OptionData{"Sound/Volume", "", _("Sound volume (%)")},
-    OptionData{"Language/Locale", _("Language")},
-    OptionData{"Language/ExternalTranslations", _("External translations")},
+    OptionData{"Language/Locale", "", _("Language")},
+    OptionData{"Language/ExternalTranslations", "", _("External translations")},
 
     // Last. This should never be used, it actually maps to OptionID::kLast.
     // This is to prevent a memory access violation error in case something
@@ -790,7 +790,7 @@ AudioApi StringToAudioApi(const wxString& config_name, const wxString& input) {
         wxLogWarning(_("Invalid value %s for option %s; valid values are %s"),
                      input, config_name,
                      AllEnumValuesForType(Option::Type::kAudioApi));
-        return AudioApi::kOpenAL;
+        return AudioApi::kSDL;
     }
     return iter->second;
 }
@@ -850,11 +850,9 @@ wxString AllEnumValuesForType(Option::Type type) {
         case Option::Type::kUnsigned:
         case Option::Type::kString:
         case Option::Type::kGbPalette:
-            VBAM_NOTREACHED();
-            return wxEmptyString;
+            VBAM_NOTREACHED_RETURN(wxEmptyString);
     }
-    VBAM_NOTREACHED();
-    return wxEmptyString;
+    VBAM_NOTREACHED_RETURN(wxEmptyString);
 }
 
 size_t MaxForType(Option::Type type) {
@@ -881,11 +879,9 @@ size_t MaxForType(Option::Type type) {
         case Option::Type::kUnsigned:
         case Option::Type::kString:
         case Option::Type::kGbPalette:
-            VBAM_NOTREACHED();
-            return 0;
+            VBAM_NOTREACHED_RETURN(0);
     }
-    VBAM_NOTREACHED();
-    return 0;
+    VBAM_NOTREACHED_RETURN(0);
 }
 
 }  // namespace internal
