@@ -40,7 +40,7 @@ extern bool stopState; // TODO: silence sound when true
 
 int const SOUND_CLOCK_TICKS_ = 280896; // ~1074 samples per frame
 
-static uint16_t soundFinalWave[1600];
+static uint16_t soundFinalWave[4096];
 long soundSampleRate = 44100;
 bool g_gbaSoundInterpolation = true;
 bool soundPaused = true;
