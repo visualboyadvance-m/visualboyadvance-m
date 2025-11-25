@@ -2610,7 +2610,7 @@ void CPUCompareVCOUNT()
     }
 }
 
-void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t c, int transfer32)
+void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t c, int transfer32, bool isFIFO)
 {
     int sm = s >> 24;
     int dm = d >> 24;
@@ -2635,17 +2635,23 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
         s &= 0xFFFFFFFC;
         if (s < 0x02000000) {
             while (c != 0) {
-                CPUWriteMemory(d & ~3, cpuDmaLatchData[ch]);
-                d += di;
+                bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
+
+                CPUWriteMemory(d & 0xFFFFFFFC, cpuDmaLatchData[ch]);
+                d += dstInROM ? 4u : di;
                 d &= cpuDmaDstMask[ch];
+                s &= cpuDmaSrcMask[ch];
                 c--;
             }
         } else {
             while (c != 0) {
+                bool srcInROM = ((s >> 24) >= REGION_ROM0) && ((s >> 24) < REGION_SRAM);
+                bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
+
                 cpuDmaLatchData[ch] = CPUReadMemory(s);
-                CPUWriteMemory(d & ~3, cpuDmaLatchData[ch]);
-                d += di;
-                s += si;
+                CPUWriteMemory(d & 0xFFFFFFFC, cpuDmaLatchData[ch]);
+                s += srcInROM ? 4u : si;
+                d += dstInROM ? 4u : di;
                 d &= cpuDmaDstMask[ch];
                 s &= cpuDmaSrcMask[ch];
                 c--;
@@ -2657,18 +2663,23 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
         di = (int)di >> 1;
         if (s < 0x02000000) {
             while (c != 0) {
-                CPUWriteHalfWord(d & ~1, DowncastU16(cpuDmaLatchData[ch] >> (8 * (d & 2))));
-                d += di;
+                bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
+
+                CPUWriteHalfWord(d & 0xFFFFFFFE, DowncastU16(cpuDmaLatchData[ch] >> (8 * (d & 2))));
+                d += dstInROM ? 2u : di;
                 d &= cpuDmaDstMask[ch];
                 c--;
             }
         } else {
             while (c != 0) {
+                bool srcInROM = ((s >> 24) >= REGION_ROM0) && ((s >> 24) < REGION_SRAM);
+                bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
+
                 cpuDmaLatchData[ch] = CPUReadHalfWord(s);
                 cpuDmaLatchData[ch] |= (cpuDmaLatchData[ch] << 16);
-                CPUWriteHalfWord(d & ~1, DowncastU16(cpuDmaLatchData[ch] >> (8 * (d & 2))));
-                d += di;
-                s += si;
+                CPUWriteHalfWord(d & 0xFFFFFFFE, DowncastU16(cpuDmaLatchData[ch] >> (8 * (d & 2))));
+                s += srcInROM ? 2u : si;
+                d += dstInROM ? 2u : di;
                 d &= cpuDmaDstMask[ch];
                 s &= cpuDmaSrcMask[ch];
                 c--;
@@ -2733,7 +2744,7 @@ void CPUCheckDMA(int reason, int dmamask)
 #endif
             doDMA(0, dma0Source, dma0Dest, sourceIncrement, destIncrement,
                 DM0CNT_L ? DM0CNT_L : 0x4000,
-                DM0CNT_H & 0x0400);
+                DM0CNT_H & 0x0400, false);
 
             if (DM0CNT_H & 0x4000) {
                 IF |= 0x0100;
@@ -2786,7 +2797,7 @@ void CPUCheckDMA(int reason, int dmamask)
                 }
 #endif
                 doDMA(1, dma1Source, dma1Dest, sourceIncrement, 0, 4,
-                    0x0400);
+                    0x0400, true);
             } else {
 #ifdef GBA_LOGGING
                 if (systemVerbose & VERBOSE_DMA1) {
@@ -2800,7 +2811,7 @@ void CPUCheckDMA(int reason, int dmamask)
 #endif
                 doDMA(1, dma1Source, dma1Dest, sourceIncrement, destIncrement,
                     DM1CNT_L ? DM1CNT_L : 0x4000,
-                    DM1CNT_H & 0x0400);
+                    DM1CNT_H & 0x0400, false);
             }
 
             if (DM1CNT_H & 0x4000) {
@@ -2855,7 +2866,7 @@ void CPUCheckDMA(int reason, int dmamask)
                 }
 #endif
                 doDMA(2, dma2Source, dma2Dest, sourceIncrement, 0, 4,
-                    0x0400);
+                    0x0400, true);
             } else {
 #ifdef GBA_LOGGING
                 if (systemVerbose & VERBOSE_DMA2) {
@@ -2869,7 +2880,7 @@ void CPUCheckDMA(int reason, int dmamask)
 #endif
                 doDMA(2, dma2Source, dma2Dest, sourceIncrement, destIncrement,
                     DM2CNT_L ? DM2CNT_L : 0x4000,
-                    DM2CNT_H & 0x0400);
+                    DM2CNT_H & 0x0400, false);
             }
 
             if (DM2CNT_H & 0x4000) {
@@ -2926,7 +2937,7 @@ void CPUCheckDMA(int reason, int dmamask)
 #endif
             doDMA(3, dma3Source, dma3Dest, sourceIncrement, destIncrement,
                 DM3CNT_L ? DM3CNT_L : 0x10000,
-                DM3CNT_H & 0x0400);
+                DM3CNT_H & 0x0400, false);
 
             if (DM3CNT_H & 0x4000) {
                 IF |= 0x0800;
