@@ -125,15 +125,58 @@ void gbcfilter_update_colors(bool lcd) {
     } break;
     case 24:
     case 32: {
-        for (int i = 0; i < 0x10000; i++) {
-            // GB/GBC uses BGR555 format: 0BBBBBGGGGGRRRRR
-            // Red: bits 0-4, Green: bits 5-9, Blue: bits 10-14
-            systemColorMap32[i] = ((i & 0x1f) << systemRedShift) |
-                (((i & 0x3e0) >> 5) << systemGreenShift) |
-                (((i & 0x7c00) >> 10) << systemBlueShift);
-        }
-        if (lcd)
+        if (lcd) {
+            for (int i = 0; i < 0x10000; i++) {
+                // GB/GBC uses BGR555 format: 0BBBBBGGGGGRRRRR
+                // Red: bits 0-4, Green: bits 5-9, Blue: bits 10-14
+                systemColorMap32[i] = ((i & 0x1f) << systemRedShift) |
+                    (((i & 0x3e0) >> 5) << systemGreenShift) |
+                    (((i & 0x7c00) >> 10) << systemBlueShift);
+            }
             gbcfilter_pal32(systemColorMap32, 0x10000);
+        }
+        else {
+            // --- 8bit shift scaling logic ---
+            // This maps 8-bit color to the 5-bit shifted format,
+            // while allowing FFFFFF, enhancing whites and color.
+            // It uses the top 5 bits of the 8-bit value for the GBC's 5-bit component position,
+            // and the bottom 3 bits to fill the lower, normally zeroed, positions.
+            for (int i = 0; i < 0x10000; i++) {
+                uint8_t r5 = (i & 0x1f);
+                uint8_t g5 = ((i & 0x3e0) >> 5);
+                uint8_t b5 = ((i & 0x7c00) >> 10);
+
+                // Scale 5-bit to 8-bit: 0x1F -> 0xFF
+                uint8_t final_red_8bit = (r5 << 3) | (r5 >> 2);
+                uint8_t final_green_8bit = (g5 << 3) | (g5 >> 2);
+                uint8_t final_blue_8bit = (b5 << 3) | (b5 >> 2);
+
+                uint32_t final_pix = 0;
+
+                // Red component
+                // 5 most significant bits (MSBs) for the 'systemRedShift' position
+                final_pix |= ((final_red_8bit >> 3) & 0x1f) << systemRedShift;
+                // 3 least significant bits (LSBs) for the 'base' position (systemRedShift - 3)
+                final_pix |= (final_red_8bit & 0x07) << (systemRedShift - 3);
+
+                // Green component
+                // 5 MSBs for the 'systemGreenShift' position
+                final_pix |= ((final_green_8bit >> 3) & 0x1f) << systemGreenShift;
+                // 3 LSBs for the 'base' position (systemGreenShift - 3)
+                final_pix |= (final_green_8bit & 0x07) << (systemGreenShift - 3);
+
+                // Blue component
+                // 5 MSBs for the 'systemBlueShift' position
+                final_pix |= ((final_blue_8bit >> 3) & 0x1f) << systemBlueShift;
+                // 3 LSBs for the 'base' position (systemBlueShift - 3)
+                final_pix |= (final_blue_8bit & 0x07) << (systemBlueShift - 3);
+
+                // Note: The alpha preservation logic from the new snippet was omitted 
+                // as it was irrelevant to the lookup table generation from 'i'.
+
+                systemColorMap32[i] = final_pix;
+            }
+        }
     } break;
     }
 }
