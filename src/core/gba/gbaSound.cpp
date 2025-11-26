@@ -517,13 +517,18 @@ void soundReset()
     if (!soundDriver)
         return;
 
+    soundDriver->pause();
     soundDriver->reset();
 
-    remake_stereo_buffer();
-    reset_apu();
+    if (gb_apu) {
+        gb_apu->end_frame(soundTicks);
+    }
 
-    soundPaused = true;
+    reset_apu();
+    remake_stereo_buffer();
+
     soundTicks = 0;
+    soundPaused = 1;
 
     soundEvent8(NR52, (uint8_t)0x80);
 }
