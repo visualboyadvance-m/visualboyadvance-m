@@ -932,13 +932,26 @@ static void gb_init(void)
     if (option_colorizerHack)
         option_useBios = false;
 
-    if (option_useBios) {
+    // Load BIOS for the actual system being emulated
+    // gbHardware: 1=GB, 2=GBC, 4=SGB/SGB2, 8=GBA
+    // Only load BIOS for GB and GBC modes
+    bool useBios = false;
+    if (option_useBios && (gbHardware == 1 || gbHardware == 2)) {
+        int biosIndex;
+        if (gbHardware == 2) {
+            // Game Boy Color
+            biosIndex = 1;  // gbc_bios.bin
+        } else {
+            // Game Boy
+            biosIndex = 0;  // gb_bios.bin
+        }
         snprintf(biosfile, sizeof(biosfile), "%s%c%s",
-            retro_system_directory, SLASH, biosname[gbCgbMode ? 1 : 0]);
+            retro_system_directory, SLASH, biosname[biosIndex]);
         log("Loading bios: %s\n", biosfile);
+        useBios = true;
     }
-
-    gbCPUInit(biosfile, option_useBios);
+    // For SGB/SGB2 (4) and GBA (8), no BIOS is loaded
+    gbCPUInit(biosfile, useBios);
 
     if (gbBorderOn) {
         systemWidth = gbBorderLineSkip = kSGBWidth;
