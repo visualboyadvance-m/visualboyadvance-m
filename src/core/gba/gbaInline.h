@@ -310,14 +310,24 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
     case REGION_IO:
         if ((address < 0x4000400) && ioReadable[address & 0x3fe]) {
             value = READ16LE(((uint16_t*)&g_ioMem[address & 0x3fe]));
+            switch(address & 0x3FE) {
+            case IO_REG_SOUND1CNT_X: value &= 0x4000; break;
+            case IO_REG_SOUND2CNT_L: value &= 0xFFC0; break;
+            case IO_REG_SOUND2CNT_H: value &= 0x4000; break;
+            case IO_REG_SOUND3CNT_L: value &= 0x00E0; break;
+            case IO_REG_SOUND3CNT_H: value &= 0xE000; break;
+            case IO_REG_SOUND3CNT_X: value &= 0x4000; break;
+            case IO_REG_SOUND4CNT_L: value &= 0xFF00; break;
+            case IO_REG_SOUND4CNT_H: value &= 0x40FF; break;
+            }
             if (((address & 0x3fe) > 0xFF) && ((address & 0x3fe) < 0x10E)) {
-                if (((address & 0x3fe) == 0x100) && timer0On)
+                if (((address & 0x3fe) == IO_REG_TM0CNT_L) && timer0On)
                     value = 0xFFFF - ((timer0Ticks - cpuTotalTicks) >> timer0ClockReload);
-                else if (((address & 0x3fe) == 0x104) && timer1On && !(TM1CNT & 4))
+                else if (((address & 0x3fe) == IO_REG_TM1CNT_L) && timer1On && !(TM1CNT & 4))
                     value = 0xFFFF - ((timer1Ticks - cpuTotalTicks) >> timer1ClockReload);
-                else if (((address & 0x3fe) == 0x108) && timer2On && !(TM2CNT & 4))
+                else if (((address & 0x3fe) == IO_REG_TM2CNT_L) && timer2On && !(TM2CNT & 4))
                     value = 0xFFFF - ((timer2Ticks - cpuTotalTicks) >> timer2ClockReload);
-                else if (((address & 0x3fe) == 0x10C) && timer3On && !(TM3CNT & 4))
+                else if (((address & 0x3fe) == IO_REG_TM3CNT_L) && timer3On && !(TM3CNT & 4))
                     value = 0xFFFF - ((timer3Ticks - cpuTotalTicks) >> timer3ClockReload);
             }
         } else if ((address < 0x4000400) && ioReadable[address & 0x3fc]) {
@@ -767,49 +777,53 @@ static inline void CPUWriteByte(uint32_t address, uint8_t b)
     case REGION_IO:
         if (address < 0x4000400) {
             switch (address & 0x3FF) {
-            case 0x60:
-            case 0x61:
-            case 0x62:
-            case 0x63:
-            case 0x64:
-            case 0x65:
-            case 0x68:
-            case 0x69:
-            case 0x6c:
-            case 0x6d:
-            case 0x70:
-            case 0x71:
-            case 0x72:
-            case 0x73:
-            case 0x74:
-            case 0x75:
-            case 0x78:
-            case 0x79:
-            case 0x7c:
-            case 0x7d:
-            case 0x80:
-            case 0x81:
-            case 0x84:
-            case 0x85:
-            case 0x90:
-            case 0x91:
-            case 0x92:
-            case 0x93:
-            case 0x94:
-            case 0x95:
-            case 0x96:
-            case 0x97:
-            case 0x98:
-            case 0x99:
-            case 0x9a:
-            case 0x9b:
-            case 0x9c:
-            case 0x9d:
-            case 0x9e:
-            case 0x9f:
+            case IO_REG_SOUND1CNT_L:
+            //case IO_REG_SOUND1CNT_L + 1:
+            case IO_REG_SOUND1CNT_H:
+            case IO_REG_SOUND1CNT_H + 1:
+            case IO_REG_SOUND1CNT_X:
+            case IO_REG_SOUND1CNT_X + 1:
+            case IO_REG_SOUND2CNT_L:
+            case IO_REG_SOUND2CNT_L + 1:
+            case IO_REG_SOUND2CNT_H:
+            case IO_REG_SOUND2CNT_H + 1:
+            case IO_REG_SOUND3CNT_L:
+            case IO_REG_SOUND3CNT_L + 1:
+            case IO_REG_SOUND3CNT_H:
+            case IO_REG_SOUND3CNT_H + 1:
+            case IO_REG_SOUND3CNT_X:
+            case IO_REG_SOUND3CNT_X + 1:
+            case IO_REG_SOUND4CNT_L:
+            case IO_REG_SOUND4CNT_L + 1:
+            case IO_REG_SOUND4CNT_H:
+            case IO_REG_SOUND4CNT_H + 1:
+            case IO_REG_SOUNDCNT_L:
+            case IO_REG_SOUNDCNT_L + 1:
+            //case IO_REG_SOUNDCNT_H:
+            //case IO_REG_SOUNDCNT_H + 1:
+            case IO_REG_SOUNDCNT_X:
+            //case IO_REG_SOUNDCNT_X + 1:
+            //case IO_REG_SOUNDBIAS:
+            //case IO_REG_SOUNDBIAS + 1:
+            case IO_REG_WAVE_RAM0_L + 0:
+            case IO_REG_WAVE_RAM0_L + 1:
+            case IO_REG_WAVE_RAM0_L + 2:
+            case IO_REG_WAVE_RAM0_L + 3:
+            case IO_REG_WAVE_RAM1_L + 0:
+            case IO_REG_WAVE_RAM1_L + 1:
+            case IO_REG_WAVE_RAM1_L + 2:
+            case IO_REG_WAVE_RAM1_L + 3:
+            case IO_REG_WAVE_RAM2_L + 0:
+            case IO_REG_WAVE_RAM2_L + 1:
+            case IO_REG_WAVE_RAM2_L + 2:
+            case IO_REG_WAVE_RAM2_L + 3:
+            case IO_REG_WAVE_RAM3_L + 0:
+            case IO_REG_WAVE_RAM3_L + 1:
+            case IO_REG_WAVE_RAM3_L + 2:
+            case IO_REG_WAVE_RAM3_L + 3:
                 soundEvent8(address & 0xFF, b);
                 break;
-            case 0x301: // HALTCNT, undocumented
+            case IO_REG_HALTCNT: // HALTCNT, undocumented
                 if (b == 0x80)
                     stopState = true;
                 holdState = 1;
