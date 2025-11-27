@@ -600,6 +600,8 @@ endif()
 # XAudio2.
 if(ENABLE_XAUDIO2)
     target_sources(visualboyadvance-m PRIVATE audio/internal/xaudio2.cpp)
+    target_sources(visualboyadvance-m PRIVATE audio/internal/xaudio2_7.cpp)
+    target_sources(visualboyadvance-m PRIVATE audio/internal/xaudio2_9.cpp)
 endif()
 
 # FAudio.
@@ -902,6 +904,8 @@ list(APPEND VBAM_LOCALIZABLE_FILES
     audio/internal/dsound.cpp
     audio/internal/faudio.cpp
     audio/internal/xaudio2.cpp
+    audio/internal/xaudio2_7.cpp
+    audio/internal/xaudio2_9.cpp	
     autoupdater/autoupdater.h
     autoupdater/macos/autoupdater.cpp
     autoupdater/macos/sparkle-wrapper.h
