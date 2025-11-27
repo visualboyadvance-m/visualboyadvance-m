@@ -177,58 +177,29 @@ void Gba_Pcm::update(int dac)
 void Gba_Pcm_Fifo::timer_overflowed(int which_timer)
 {
     if (which_timer == timer && enabled) {
-        /* Mother 3 fix, refined to not break Metroid Fusion */
-        /* 2025-10-20 - negativeExponent
-         * GBA PCM FIFO behavior emulation
-         *
-         * Restores the original FIFO handling logic while preserving the
-         * Mother 3 HLE BIOS workaround and Summon Night 2 underrun fix.
-         *
-         * Hardware behavior:
-         *  - DMA refill is triggered whenever FIFO count <= 16.
-         *  - If FIFO runs empty and DMA does not refill immediately,
-         *    the APU outputs silence until new data arrives.
-         *
-         * Emulation notes:
-         *  - Mother 3: HLE BIOS initialization can misalign the first
-         *    DMA trigger, causing an audible pop in the intro. A redundant
-         *    DMA check (count == 16 after first refill) mitigates this.
-         *  - Summon Night 2: Transitions may begin with count == 15,
-         *    leading to a short underrun and click. Zero-filling the FIFO
-         *    ensures smooth output.
-         *  - Metroid Fusion: Sensitive to timing; earlier “Mother 3 fix”
-         *    caused FMV desync. This refined logic avoids that regression.
-         *
-         * Summary:
-         *  1. Check DMA refill when count <= 16 (real hardware threshold).
-         *  2. Retry DMA once if count was 0 → 16 (HLE workaround).
-         *  3. Zero-fill only if count < 16 after DMA (true underrun).
-         *  4. Decrement FIFO after handling refills.
-         */
-        if (count <= 16) { /* Restored original entry threshold */
-            int saved_count = count;
+        // 2025-11-24 - negativeExponent
+        // Timer overflow: consume 1 FIFO sample and update PCM
+        // This ensures that DMA refill is triggered after the FIFO drops to ≤16,
+        // matching original DMA behavior. Zero-fill occurs only if FIFO remains
+        // low after DMA. Preserves Mother 3 and Summon Night 2 timing-sensitive fixes.
 
-            // Request DMA refill
+        // Read next sample from FIFO
+        count--;
+        dac = fifo[readIndex];
+        readIndex = (readIndex + 1) & 31;
+        pcm.update(dac);
+
+        if (count <= 16) {
+            // Need to fill FIFO
             CPUCheckDMA(3, which ? 4 : 2);
-
-            if (saved_count == 0 && count == 16) { /* Mother 3 HLE workaround */
-                CPUCheckDMA(3, which ? 4 : 2);
-            }
-
-            if (count < 16) { /* prevent underrun click, (Summon Night 2 using original bios) */
+            if (count <= 16) {
                 const int io_reg = which ? FIFOB_L : FIFOA_L;
-                for (int n = 8; n--;) {
+                for (int n = 4; n--;) {
                     soundEvent16(io_reg,     0);
                     soundEvent16(io_reg + 2, 0);
                 }
             }
         }
-
-        // Consume one sample (normal APU timing)
-        count--;
-        dac = fifo[readIndex];
-        readIndex = (readIndex + 1) & 31;
-        pcm.update(dac);
     }
 }
 
