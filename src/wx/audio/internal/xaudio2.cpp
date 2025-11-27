@@ -28,6 +28,121 @@ enum class XAudio2Version {
     XAudio2_9
 };
 
+// Device Notifier for hotplug support
+class XAudio2_Device_Notifier : public IMMNotificationClient {
+    volatile LONG registered;
+    IMMDeviceEnumerator* pEnumerator;
+    std::wstring last_device;
+    CRITICAL_SECTION lock;
+    std::vector<class XAudio2_Output*> instances;
+
+public:
+    XAudio2_Device_Notifier() : registered(0), pEnumerator(nullptr) { 
+        InitializeCriticalSection(&lock); 
+    }
+    
+    ~XAudio2_Device_Notifier() { 
+        DeleteCriticalSection(&lock); 
+    }
+
+    ULONG STDMETHODCALLTYPE AddRef() override { return 1; }
+    ULONG STDMETHODCALLTYPE Release() override { return 1; }
+
+    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, VOID** ppvInterface) override {
+        if (IID_IUnknown == riid) {
+            *ppvInterface = (IUnknown*)this;
+        } else if (__uuidof(IMMNotificationClient) == riid) {
+            *ppvInterface = (IMMNotificationClient*)this;
+        } else {
+            *ppvInterface = NULL;
+            return E_NOINTERFACE;
+        }
+        return S_OK;
+    }
+
+    HRESULT STDMETHODCALLTYPE OnDefaultDeviceChanged(EDataFlow flow, ERole, LPCWSTR pwstrDeviceId) override {
+        if (flow == eRender) {
+            EnterCriticalSection(&lock);
+            last_device = pwstrDeviceId ? pwstrDeviceId : L"";
+            for (auto instance : instances) {
+                if (instance) {
+                    instance->device_change();
+                }
+            }
+            LeaveCriticalSection(&lock);
+            log("XAudio2: Default audio device changed\n");
+        }
+        return S_OK;
+    }
+
+    HRESULT STDMETHODCALLTYPE OnDeviceAdded(LPCWSTR) override { return S_OK; }
+    
+    HRESULT STDMETHODCALLTYPE OnDeviceRemoved(LPCWSTR pwstrDeviceId) override {
+        EnterCriticalSection(&lock);
+        log("XAudio2: Audio device removed\n");
+        // Trigger device change on removal as well
+        for (auto instance : instances) {
+            if (instance) {
+                instance->device_change();
+            }
+        }
+        LeaveCriticalSection(&lock);
+        return S_OK;
+    }
+    
+    HRESULT STDMETHODCALLTYPE OnDeviceStateChanged(LPCWSTR, DWORD) override { return S_OK; }
+    HRESULT STDMETHODCALLTYPE OnPropertyValueChanged(LPCWSTR, const PROPERTYKEY) override { return S_OK; }
+
+    void do_register(class XAudio2_Output* p_instance) {
+        EnterCriticalSection(&lock);
+        
+        if (InterlockedIncrement(&registered) == 1) {
+            HRESULT hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER,
+                                          __uuidof(IMMDeviceEnumerator), (void**)&pEnumerator);
+            if (SUCCEEDED(hr) && pEnumerator) {
+                pEnumerator->RegisterEndpointNotificationCallback(this);
+                log("XAudio2: Registered for device notifications\n");
+            }
+        }
+
+        instances.push_back(p_instance);
+        LeaveCriticalSection(&lock);
+    }
+
+    void do_unregister(class XAudio2_Output* p_instance) {
+        EnterCriticalSection(&lock);
+        
+        // Remove instance from list
+        for (auto it = instances.begin(); it != instances.end(); ) {
+            if (*it == p_instance) {
+                it = instances.erase(it);
+            } else {
+                ++it;
+            }
+        }
+
+        if (InterlockedDecrement(&registered) == 0) {
+            if (pEnumerator) {
+                pEnumerator->UnregisterEndpointNotificationCallback(this);
+                pEnumerator->Release();
+                pEnumerator = nullptr;
+                log("XAudio2: Unregistered from device notifications\n");
+            }
+        }
+        
+        LeaveCriticalSection(&lock);
+    }
+};
+
+// Forward declaration
+class XAudio2_Output {
+public:
+    virtual void device_change() = 0;
+    virtual ~XAudio2_Output() = default;
+};
+
+XAudio2_Device_Notifier g_notifier;
+
 struct XAudio2Context {
     XAudio2Version version = XAudio2Version::None;
     HMODULE hXAudio2 = nullptr;

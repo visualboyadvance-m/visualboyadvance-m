@@ -22,7 +22,18 @@ namespace internal {
 
 namespace {
 
-class XAudio2_7_Output : public SoundDriver {
+// Forward declaration for the notifier
+class XAudio2_Device_Notifier;
+extern XAudio2_Device_Notifier g_notifier;
+
+// Forward declaration for XAudio2_Output base class
+class XAudio2_Output {
+public:
+    virtual void device_change() = 0;
+    virtual ~XAudio2_Output() = default;
+};
+
+class XAudio2_7_Output : public SoundDriver, public XAudio2_Output {
 public:
     XAudio2_7_Output(IXAudio2* xaudio2);
     ~XAudio2_7_Output() override;
@@ -35,9 +46,11 @@ public:
     void write(uint16_t* finalWave, int length) override;
     void setThrottle(unsigned short throttle_) override;
 
+    // XAudio2_Output interface for device change
+    void device_change() override;
+
 private:
     void close();
-    void device_change();
     int XA2GetDev();
     bool SetupStereoUpmix();
 
@@ -233,7 +246,15 @@ XAudio2_7_Output::XAudio2_7_Output(IXAudio2* xaudio2) : xaud(xaudio2) {
 }
 
 XAudio2_7_Output::~XAudio2_7_Output() {
+    // Unregister from device notifications
+    g_notifier.do_unregister(this);
+    
     close();
+}
+
+void XAudio2_7_Output::device_change() {
+    device_changed = true;
+    log("XAudio2: Device change notified, will reinitialize\n");
 }
 
 void XAudio2_7_Output::close() {
@@ -259,10 +280,6 @@ void XAudio2_7_Output::close() {
 
     delete notify;
     notify = nullptr;
-}
-
-void XAudio2_7_Output::device_change() {
-    device_changed = true;
 }
 
 bool XAudio2_7_Output::init(long sampleRate) {
@@ -339,6 +356,9 @@ bool XAudio2_7_Output::init(long sampleRate) {
         return false;
     }
     
+    // Register for device change notifications
+    g_notifier.do_register(this);
+    
     playing = true;
     currentBuffer = 0;
     device_changed = false;
@@ -352,6 +372,7 @@ void XAudio2_7_Output::write(uint16_t* finalWave, int) {
 
     while (true) {
         if (device_changed) {
+            log("XAudio2: Reinitializing due to device change\n");
             close();
             if (!init(freq))
                 return;
