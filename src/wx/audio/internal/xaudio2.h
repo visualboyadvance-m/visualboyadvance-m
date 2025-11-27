@@ -2,6 +2,8 @@
 #define WX_AUDIO_INTERNAL_XAUDIO2_H_
 
 #include "wx/audio/audio.h"
+#include <memory>
+#include <vector>
 
 namespace audio {
 namespace internal {
