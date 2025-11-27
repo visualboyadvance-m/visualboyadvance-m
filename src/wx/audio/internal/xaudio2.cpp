@@ -61,7 +61,7 @@ struct XAudio2Context {
                 HRESULT hr = pXAudio2Create(&xaudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
                 if (SUCCEEDED(hr)) {
                     version = XAudio2Version::XAudio2_9;
-                    log("XAudio2: Using XAudio 2.9 (Windows 10+)");
+                    log("XAudio2: Using XAudio 2.9 (Windows 10+)\n");
                     return true;
                 }
             }
@@ -78,7 +78,7 @@ struct XAudio2Context {
                 HRESULT hr = pXAudio2Create(&xaudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
                 if (SUCCEEDED(hr)) {
                     version = XAudio2Version::XAudio2_8;
-                    log("XAudio2: Using XAudio 2.8 (Windows 8)");
+                    log("XAudio2: Using XAudio 2.8 (Windows 8)\n");
                     return true;
                 }
             }
@@ -107,22 +107,22 @@ struct XAudio2Context {
                 hr = xaudio2->Initialize(0, XAUDIO2_DEFAULT_PROCESSOR);
                 if (SUCCEEDED(hr)) {
                     version = XAudio2Version::XAudio2_7;
-                    log("XAudio2: Using XAudio 2.7 (Windows 7)");
+                    log("XAudio2: Using XAudio 2.7 (Windows 7)\n");
                     return true;
                 } else {
-                    log("XAudio2: XAudio2_7 Initialize failed with HRESULT: 0x%08X", hr);
+                    wxLogError(_("XAudio2: XAudio2_7 Initialize failed with HRESULT: 0x%08X"), hr);
                     xaudio2->Release();
                     xaudio2 = nullptr;
                 }
             } else {
-                log("XAudio2: Failed to create XAudio2 2.7");
+                wxLogError(_("XAudio2: Failed to create XAudio2 2.7"));
             }
             
             FreeLibrary(hXAudio2);
             hXAudio2 = nullptr;
         }
         
-        log("XAudio2: Could not load XAudio2_9.dll, XAudio2_8.dll, or XAudio2_7.dll!");
+        wxLogError(_("XAudio2: Could not load XAudio2_9.dll, XAudio2_8.dll, or XAudio2_7.dll!"));
         return false;
     }
 };
@@ -141,7 +141,7 @@ std::vector<AudioDevice> GetXAudio2Devices() {
         try {
             return GetXAudio2_7_Devices(g_xaudio2_context.xaudio2);
         } catch (...) {
-            log("XAudio2: Failed to enumerate devices for XAudio2 2.7");
+            wxLogError(_("XAudio2: Failed to enumerate devices for XAudio2 2.7"));
             return {};
         }
     } else {
