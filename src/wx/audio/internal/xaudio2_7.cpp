@@ -2,6 +2,8 @@
 #error "This file should only be compiled if XAudio2 is enabled"
 #endif
 
+#include "wx/audio/internal/xaudio2.h"
+
 #include "xaudio2_7.h"
 
 #include <cstdio>
@@ -21,17 +23,6 @@ namespace audio {
 namespace internal {
 
 namespace {
-
-// Forward declaration for the notifier
-class XAudio2_Device_Notifier;
-extern XAudio2_Device_Notifier g_notifier;
-
-// Forward declaration for XAudio2_Output base class
-class XAudio2_Output {
-public:
-    virtual void device_change() = 0;
-    virtual ~XAudio2_Output() = default;
-};
 
 class XAudio2_7_Output : public SoundDriver, public XAudio2_Output {
 public:
