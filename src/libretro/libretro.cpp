@@ -1432,9 +1432,9 @@ static void update_variables(bool startup)
         }
         if ((prev_lcdfilter != option_lcdfilter) || (prev_color_change != color_change) || (prev_color_mode != color_mode)) {
             if (type == IMAGE_GBA) {
-                gbafilter_update_colors(option_lcdfilter);
+                gbafilter_update_colors_native(option_lcdfilter);
             } else {
-                gbcfilter_update_colors(option_lcdfilter);
+                gbcfilter_update_colors_native(option_lcdfilter);
             }
         }
     }
@@ -1794,7 +1794,7 @@ bool retro_load_game(const struct retro_game_info *game)
       return false;
    }
 
-   gbafilter_update_colors(option_lcdfilter);
+   gbcfilter_update_colors_native(option_lcdfilter);
    update_variables(true);
    soundInit();
 

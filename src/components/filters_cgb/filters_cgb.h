@@ -9,4 +9,8 @@ void gbcfilter_pal(uint16_t* buf, int count);
 void gbcfilter_pal32(uint32_t* buf, int count);
 void gbcfilter_set_params(int color_mode, float lighten_screen);
 
+void gbcfilter_update_colors_native(bool lcd = false);
+void gbcfilter_pal_565(uint16_t* buf, int count);
+void gbcfilter_pal_888(uint32_t* buf, int count);
+
 #endif  // VBAM_COMPONENTS_FILTERS_CGB_FILTERS_CGB_H_

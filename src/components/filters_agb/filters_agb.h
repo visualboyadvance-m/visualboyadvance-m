@@ -9,4 +9,8 @@ void gbafilter_pal(uint16_t* buf, int count);
 void gbafilter_pal32(uint32_t* buf, int count);
 void gbafilter_set_params(int color_mode, float darken_screen);
 
+void gbafilter_update_colors_native(bool lcd = false);
+void gbafilter_pal_565(uint16_t* buf, int count);
+void gbafilter_pal_888(uint32_t* buf, int count);
+
 #endif  // VBAM_COMPONENTS_FILTERS_AGB_FILTERS_AGB_H_
