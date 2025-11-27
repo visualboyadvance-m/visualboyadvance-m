@@ -54,13 +54,12 @@ static char biosfile[4096];
 static bool can_dupe = false;
 
 // core options
-static bool option_sndInterpolation = true;
 static bool option_useBios = false;
 static bool option_colorizerHack = false;
 static bool option_forceRTCenable = false;
-static double option_sndFiltering = 0.5;
 static unsigned option_gbPalette = 0;
 static bool option_lcdfilter = false;
+static unsigned option_gbBorder = 0;
 
 // filters
 typedef void (*IFBFilterFunc)(uint8_t*, uint32_t, int, int);
@@ -792,6 +791,29 @@ static const ini_t gbaover[512] = {
     #include "gba-over.inc"
 };
 
+/* --------------------------------------------------------------
+   RARE / NON-STANDARD IDENTIFIER CASES
+   These games do NOT use the normal "SRAM_", "FLASH1M_", etc.
+   signatures found in commercial GBA titles.
+   They must be explicitly detected by name or unique byte strings.
+   -------------------------------------------------------------- */
+static bool find_string(const uint8_t *buf, size_t size, const char *str) {
+    int i, j;
+    int len = 0;
+
+    while (str[len]) len++;
+
+    for (i = 0; i <= size - len; i++) {
+        for (j = 0; j < len; j++) {
+            if (buf[i + j] != (unsigned char)str[j])
+                break;
+        }
+        if (j == len)
+            return true; /* found */
+    }
+    return false; /* not found */
+}
+
 static int romSize = 0;
 
 static void load_image_preferences(void)
@@ -811,7 +833,7 @@ static void load_image_preferences(void)
     unsigned i = 0, found_no = 0;
     unsigned long romCrc32 = crc32(0, g_rom, romSize);
 
-    coreOptions.cpuSaveType = GBA_SAVE_AUTO;
+    coreOptions.saveType = GBA_SAVE_AUTO;
     g_flashSize = SIZE_FLASH512;
     eepromSize = SIZE_EEPROM_512;
     coreOptions.rtcEnabled = false;
@@ -848,24 +870,33 @@ static void load_image_preferences(void)
         log("Name            : %s\n", gbaover[found_no].romtitle);
 
         coreOptions.rtcEnabled = gbaover[found_no].rtcEnabled;
-        coreOptions.cpuSaveType = gbaover[found_no].saveType;
+        coreOptions.saveType = gbaover[found_no].saveType;
 
         unsigned size = gbaover[found_no].saveSize;
-        if (coreOptions.cpuSaveType == GBA_SAVE_SRAM)
+        if (coreOptions.saveType == GBA_SAVE_SRAM)
             g_flashSize = SIZE_SRAM;
-        else if (coreOptions.cpuSaveType == GBA_SAVE_FLASH)
+        else if (coreOptions.saveType == GBA_SAVE_FLASH)
             g_flashSize = (size == SIZE_FLASH1M) ? SIZE_FLASH1M : SIZE_FLASH512;
-        else if ((coreOptions.cpuSaveType == GBA_SAVE_EEPROM) || (coreOptions.cpuSaveType == GBA_SAVE_EEPROM_SENSOR))
+        else if ((coreOptions.saveType == GBA_SAVE_EEPROM) || (coreOptions.saveType == GBA_SAVE_EEPROM_SENSOR))
             eepromSize = (size == SIZE_EEPROM_8K) ? SIZE_EEPROM_8K : SIZE_EEPROM_512;
     }
 
     // gameID that starts with 'F' are classic/famicom games
     coreOptions.mirroringEnable = (buffer[0] == 'F') ? true : false;
 
-    if (!coreOptions.cpuSaveType)
+    /* --------------------------------------------------------------
+       SHANTAE ADVANCE (PROTOTYPE)  —  VERY RARE CASE
+       Does NOT contain standard save signatures, mostly detected to be
+       using EEPROM.
+       -------------------------------------------------------------- */
+    if (find_string(g_rom, romSize, "Shantae Advance") ||
+        find_string(g_rom, romSize, "Shantae") /* fallback */ )
+    {
+        coreOptions.saveType = GBA_SAVE_SRAM; /* SRAM */
+        g_flashSize = SIZE_SRAM;
+    } else if (!coreOptions.saveType) {
         flashDetectSaveType(romSize);
-
-    coreOptions.saveType = coreOptions.cpuSaveType;
+    }
 
     if (g_flashSize == SIZE_FLASH512 || g_flashSize == SIZE_FLASH1M)
         flashSetSize(g_flashSize);
@@ -885,10 +916,10 @@ static void load_image_preferences(void)
 
     log("romSize         : %dKB\n", (romSize + 1023) / 1024);
     log("has RTC         : %s.\n", coreOptions.rtcEnabled ? "Yes" : "No");
-    log("cpuSaveType     : %s.\n", savetype[coreOptions.cpuSaveType]);
-    if (coreOptions.cpuSaveType == 3)
+    log("saveType        : %s.\n", savetype[coreOptions.saveType]);
+    if (coreOptions.saveType == 3)
         log("g_flashSize       : %d.\n", g_flashSize);
-    else if (coreOptions.cpuSaveType == 1)
+    else if (coreOptions.saveType == 1)
         log("eepromSize      : %d.\n", eepromSize);
     log("mirroringEnable : %s.\n", coreOptions.mirroringEnable ? "Yes" : "No");
 }
@@ -1013,6 +1044,65 @@ static const unsigned turbo_binds[TURBO_BUTTONS] = {
     RETRO_DEVICE_ID_JOYPAD_Y
 };
 
+enum LayerMask {
+    LAYER_BG0     = (0x100 << 0),
+    LAYER_BG1     = (0x100 << 1),
+    LAYER_BG2     = (0x100 << 2),
+    LAYER_BG3     = (0x100 << 3),
+    LAYER_OBJ     = (0x100 << 4),
+    LAYER_WIN0    = (0x100 << 5),
+    LAYER_WIN1    = (0x100 << 6),
+    LAYER_OBJWIN  = (0x100 << 7)
+};
+
+enum SoundMask {
+    SOUND_CH1_SQUARE1  = (1 << 0),
+    SOUND_CH2_SQUARE2  = (1 << 1),
+    SOUND_CH3_WAVE     = (1 << 2),
+    SOUND_CH4_NOISE    = (1 << 3),
+    SOUND_CH5_DIRECTA  = (1 << 8),
+    SOUND_CH6_DIRECTB  = (1 << 9)
+};
+
+/* ================================
+ * OPTION STRUCTS
+ * ================================ */
+struct LayerOption {
+    const char *key;
+    uint16_t mask;
+};
+
+struct SoundOption {
+    const char *key;
+    uint16_t mask;
+};
+
+/* ================================
+ * OPTION TABLES
+ * ================================ */
+static const LayerOption layerOptions[] = {
+    { "vbam_layer_1", LAYER_BG0 },
+    { "vbam_layer_2", LAYER_BG1 },
+    { "vbam_layer_3", LAYER_BG2 },
+    { "vbam_layer_4", LAYER_BG3 },
+    { "vbam_layer_5", LAYER_OBJ },
+    { "vbam_layer_6", LAYER_WIN0 },
+    { "vbam_layer_7", LAYER_WIN1 },
+    { "vbam_layer_8", LAYER_OBJWIN }
+};
+
+static const SoundOption soundOptions[] = {
+    { "vbam_sound_1", SOUND_CH1_SQUARE1 },
+    { "vbam_sound_2", SOUND_CH2_SQUARE2 },
+    { "vbam_sound_3", SOUND_CH3_WAVE },
+    { "vbam_sound_4", SOUND_CH4_NOISE },
+    { "vbam_sound_5", SOUND_CH5_DIRECTA },
+    { "vbam_sound_6", SOUND_CH6_DIRECTB }
+};
+
+/* ================================
+ * MAIN FUNCTION
+ * ================================ */
 static void systemUpdateSolarSensor(int level);
 static uint8_t sensorDarkness = 0xE8;
 static uint8_t sensorDarknessLevel = 0; // so we can adjust sensor from gamepad
@@ -1025,102 +1115,76 @@ static int prev_color_mode = 0;
 static float color_change = 0.0f;
 static float prev_color_change = 0.0f;
 
-static void update_variables(bool startup)
+static void ApplyLayerAndSoundSettings(void)
 {
     struct retro_variable var = { NULL, NULL };
-    char key[256] = {0};
-    int disabled_layers = 0;
-    int sound_enabled = 0x30F;
-    bool sound_changed = false;
 
-    var.key = key;
-    strcpy(key, "vbam_layer_x");
-    for (int i = 0; i < 8; i++) {
-        key[strlen("vbam_layer_")] = '1' + i;
+    /* --- LAYERS --- */
+    uint16_t disabled_layers = 0; // all layers enabled
+    for (int i = 0; i < (int)(sizeof(layerOptions)/sizeof(layerOptions[0])); i++) {
+        var.key = layerOptions[i].key;
         var.value = NULL;
-        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0] == 'd')
-            disabled_layers |= 0x100 << i;
+
+        if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0] == 'd') {
+            disabled_layers |= layerOptions[i].mask;
+        }
     }
 
-    coreOptions.layerSettings = 0xFF00 ^ disabled_layers;
-    coreOptions.layerEnable = DISPCNT & coreOptions.layerSettings;
+    coreOptions.layerSettings = ~disabled_layers & 0xFF00;
+    coreOptions.layerEnable   = DISPCNT & coreOptions.layerSettings;
     CPUUpdateRenderBuffers(false);
 
-    strcpy(key, "vbam_sound_x");
-    for (unsigned i = 0; i < 6; i++) {
-        key[strlen("vbam_sound_")] = '1' + i;
+    /* --- SOUND --- */
+    uint16_t sound_enabled = 0x3FF; /* assume all on by default */
+    for (int i = 0; i < (int)(sizeof(soundOptions)/sizeof(soundOptions[0])); i++) {
+        var.key = soundOptions[i].key;
         var.value = NULL;
+
         if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value && var.value[0] == 'd') {
-            int which = (i < 4) ? (1 << i) : (0x100 << (i - 4));
-            sound_enabled &= ~(which);
+            sound_enabled &= ~soundOptions[i].mask;
         }
     }
 
-    if (soundGetEnable() != sound_enabled)
-        soundSetEnable(sound_enabled & 0x30F);
+    // Write back into the emulator's sound control
+    soundSetEnable(sound_enabled);
+}
 
-    var.key = "vbam_soundinterpolation";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        bool newval = (!strcmp(var.value, "enabled"));
-        if (option_sndInterpolation != newval) {
-            option_sndInterpolation = newval;
-            sound_changed = true;
-        }
-    }
-
-    var.key = "vbam_soundfiltering";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        double newval = atof(var.value) * 0.1f;
-        if (option_sndFiltering != newval) {
-            option_sndFiltering = newval;
-            sound_changed = true;
-        }
-    }
-
-    if (sound_changed) {
-        g_gbaSoundInterpolation = option_sndInterpolation;
-        soundFiltering          = option_sndFiltering;
-    }
-
-    var.key = "vbam_usebios";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        option_useBios = (!strcmp(var.value, "enabled")) ? true : false;
-    }
-
-    var.key = "vbam_forceRTCenable";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        option_forceRTCenable = (!strcmp(var.value, "enabled")) ? true : false;
-    }
-
-    var.key = "vbam_solarsensor";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        sensorDarknessLevel = atoi(var.value);
-        systemUpdateSolarSensor(sensorDarknessLevel);
-    }
+static void update_variables_gb(bool startup) {
+    struct retro_variable var = { NULL, NULL };
 
     var.key = "vbam_showborders";
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        if (strcmp(var.value, "auto") == 0) {
-            gbBorderAutomatic = true;
+        unsigned val;
+        if (strcmp(var.value, "disabled") == 0) {
+            val = 0;
+        } if (strcmp(var.value, "enabled") == 0) {
+            val = 1;
         } else {
-            gbBorderAutomatic = false;
-            gbBorderOn = (bool)(!strcmp(var.value, "enabled"));
+            val = 2;
         }
 
-        if ((type == IMAGE_GB) && !startup)
-            SetGBBorder(gbBorderOn);
+        if ((type == IMAGE_GB) && !startup) {
+            if (option_gbBorder != val) {
+                option_gbBorder = val;
+                switch (val) {
+                default:
+                case 0:
+                    gbBorderOn = false;
+                    gbBorderAutomatic = false;
+                    break;
+                case 1:
+                    gbBorderOn = true;
+                    break;
+                case 2:
+                    gbBorderOn = false;
+                    gbBorderAutomatic = true;
+                    break;
+                }
+                SetGBBorder(gbBorderOn);
+            }
+        }
     }
 
     var.key = "vbam_gbHardware";
@@ -1148,12 +1212,6 @@ static void update_variables(bool startup)
         option_colorizerHack = (!strcmp(var.value, "enabled")) ? true : false;
     }
 
-    var.key = "vbam_turboenable";
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        option_turboEnable = (!strcmp(var.value, "enabled")) ? true : false;
-    }
-
     var.key = "vbam_gb_effects_enabled";
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
@@ -1176,6 +1234,132 @@ static void update_variables(bool startup)
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         gb_effects_config.surround = (!strcmp(var.value, "enabled")) ? true : false;
+    }
+
+    var.key = "vbam_palettes";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        unsigned lastpal = option_gbPalette;
+
+        if (!strcmp(var.value, "black and white"))
+            option_gbPalette = 0;
+        else if (!strcmp(var.value, "blue sea"))
+            option_gbPalette = 1;
+        else if (!strcmp(var.value, "dark knight"))
+            option_gbPalette = 2;
+        else if (!strcmp(var.value, "green forest"))
+            option_gbPalette = 3;
+        else if (!strcmp(var.value, "hot desert"))
+            option_gbPalette = 4;
+        else if (!strcmp(var.value, "pink dreams"))
+            option_gbPalette = 5;
+        else if (!strcmp(var.value, "wierd colors"))
+            option_gbPalette = 6;
+        else if (!strcmp(var.value, "original gameboy"))
+            option_gbPalette = 7;
+        else if (!strcmp(var.value, "gba sp"))
+            option_gbPalette = 8;
+
+        if (lastpal != option_gbPalette)
+            set_gbPalette();
+    }
+
+    var.key = "vbam_gbcoloroption";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        gbColorOption = (!strcmp(var.value, "enabled"));
+    }
+
+    char options[9][35] = {
+        "vbam_showborders",
+        "vbam_gbHardware",
+        "vbam_allowcolorizerhack",
+        "vbam_gb_effects_enabled",
+        "vbam_gb_effects_echo_enabled",
+        "vbam_gb_effects_stereo_enabled",
+        "vbam_gb_effects_surround_enabled",
+        "vbam_palettes",
+        "vbam_gbcoloroption",
+    };
+
+    struct retro_core_option_display option_display_gb;
+    option_display_gb.visible = (type == IMAGE_GB) ? true : false;
+    size_t array_size = sizeof(options) / sizeof(options[0]);
+    for (size_t i = 0; i < array_size; i++) {
+        option_display_gb.key = options[i];
+        environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display_gb);
+    }
+}
+
+static void update_variables_gba() {
+    struct retro_variable var = { NULL, NULL };
+
+    var.key = "vbam_soundinterpolation";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        g_gbaSoundInterpolation = (bool)(!strcmp(var.value, "enabled"));
+    }
+
+    var.key = "vbam_soundfiltering";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        soundFiltering = atof(var.value) * 0.1f;
+    }
+
+    var.key = "vbam_forceRTCenable";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        option_forceRTCenable = (!strcmp(var.value, "enabled")) ? true : false;
+    }
+
+    var.key = "vbam_solarsensor";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        sensorDarknessLevel = atoi(var.value);
+        systemUpdateSolarSensor(sensorDarknessLevel);
+    }
+
+    char options[4][35] = {
+        "vbam_soundinterpolation",
+        "vbam_soundfiltering",
+        "vbam_forceRTCenable",
+        "vbam_solarsensor",
+    };
+
+    struct retro_core_option_display option_display_gba;
+    option_display_gba.visible = (type == IMAGE_GBA) ? true : false;
+    size_t array_size = sizeof(options) / sizeof(options[0]);
+    for (size_t i = 0; i < array_size; i++) {
+        option_display_gba.key = options[i];
+        environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display_gba);
+    }
+}
+
+static void update_variables(bool startup)
+{
+    struct retro_variable var = { NULL, NULL };
+
+    ApplyLayerAndSoundSettings();
+    update_variables_gb(startup);
+    update_variables_gba();
+
+    var.key = "vbam_usebios";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        option_useBios = (!strcmp(var.value, "enabled")) ? true : false;
+    }
+
+    var.key = "vbam_turboenable";
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        option_turboEnable = (!strcmp(var.value, "enabled")) ? true : false;
     }
 
     var.key = "vbam_turbodelay";
@@ -1210,35 +1394,6 @@ static void update_variables(bool startup)
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         option_swapAnalogSticks = (!strcmp(var.value, "enabled")) ? true : false;
-    }
-
-    var.key = "vbam_palettes";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        unsigned lastpal = option_gbPalette;
-
-        if (!strcmp(var.value, "black and white"))
-            option_gbPalette = 0;
-        else if (!strcmp(var.value, "blue sea"))
-            option_gbPalette = 1;
-        else if (!strcmp(var.value, "dark knight"))
-            option_gbPalette = 2;
-        else if (!strcmp(var.value, "green forest"))
-            option_gbPalette = 3;
-        else if (!strcmp(var.value, "hot desert"))
-            option_gbPalette = 4;
-        else if (!strcmp(var.value, "pink dreams"))
-            option_gbPalette = 5;
-        else if (!strcmp(var.value, "wierd colors"))
-            option_gbPalette = 6;
-        else if (!strcmp(var.value, "original gameboy"))
-            option_gbPalette = 7;
-        else if (!strcmp(var.value, "gba sp"))
-            option_gbPalette = 8;
-
-        if (lastpal != option_gbPalette)
-            set_gbPalette();
     }
 
     var.key = "vbam_lcdfilter_type";
@@ -1307,40 +1462,6 @@ static void update_variables(bool startup)
     }
     else
         ifb_filter_func = NULL;
-
-    // Hide some core options depending on rom image type
-    if (startup) {
-        unsigned i;
-        struct retro_core_option_display option_display;
-        char gb_options[5][25] = {
-            "vbam_palettes",
-            "vbam_gbHardware",
-            "vbam_allowcolorizerhack",
-            "vbam_showborders",
-            "vbam_gbcoloroption"
-        };
-        char gba_options[3][22] = {
-            "vbam_solarsensor",
-            "vbam_gyro_sensitivity",
-            "vbam_forceRTCenable"
-        };
-
-        // Show or hide GB/GBC only options
-        option_display.visible = (type == IMAGE_GB) ? 1 : 0;
-        for (i = 0; i < 5; i++)
-        {
-            option_display.key = gb_options[i];
-            environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
-        }
-
-        // Show or hide GBA only options
-        option_display.visible = (type == IMAGE_GBA) ? 1 : 0;
-        for (i = 0; i < 3; i++)
-        {
-            option_display.key = gba_options[i];
-            environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY, &option_display);
-        }
-    }
 }
 
 // System analog stick range is -0x7fff to 0x7fff

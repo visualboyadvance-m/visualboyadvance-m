@@ -532,9 +532,9 @@ struct retro_core_option_v2_definition option_defs_us[] = {
     },
     {
         "vbam_sound_1",
-        "Sound Channel 1",
+        "Square Channel 1 (Sweep)",
         NULL,
-        "Enables or disables tone & sweep sound channel.",
+        "Enables or disables square wave channel 1 with frequency sweep (tone + sweep).",
         NULL,
         "advanced",
         {
@@ -546,9 +546,9 @@ struct retro_core_option_v2_definition option_defs_us[] = {
     },
     {
         "vbam_sound_2",
-        "Sound Channel 2",
+        "Square Channel 2",
         NULL,
-        "Enables or disables tone sound channel.",
+        "Enables or disables square wave channel 2 (tone only).",
         NULL,
         "advanced",
         {
@@ -560,9 +560,9 @@ struct retro_core_option_v2_definition option_defs_us[] = {
     },
     {
         "vbam_sound_3",
-        "Sound Channel 3",
+        "Wave Channel",
         NULL,
-        "Enables or disables wave output sound channel.",
+        "Enables or disables programmable waveform channel (custom samples).",
         NULL,
         "advanced",
         {
@@ -574,9 +574,9 @@ struct retro_core_option_v2_definition option_defs_us[] = {
     },
     {
         "vbam_sound_4",
-        "Sound Channel 4",
+        "Noise Channel",
         NULL,
-        "Enables or disables noise audio channel.",
+        "Enables or disables noise generator channel (percussion / effects).",
         NULL,
         "advanced",
         {
@@ -588,9 +588,9 @@ struct retro_core_option_v2_definition option_defs_us[] = {
     },
     {
         "vbam_sound_5",
-        "Sound DMA Channel A",
+        "Direct Sound A (GBA only)",
         NULL,
-        "Enables or disables DMA sound channel A.",
+        "Enables or disables Direct Sound channel A (PCM / DMA audio stream).",
         NULL,
         "advanced",
         {
@@ -602,9 +602,9 @@ struct retro_core_option_v2_definition option_defs_us[] = {
     },
     {
         "vbam_sound_6",
-        "Sound DMA Channel B",
+        "Direct Sound B (GBA only)",
         NULL,
-        "Enables or disables DMA sound channel B.",
+        "Enables or disables Direct Sound channel B (PCM / DMA audio stream).",
         NULL,
         "advanced",
         {

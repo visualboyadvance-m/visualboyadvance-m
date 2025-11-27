@@ -28,7 +28,6 @@ extern bool cpuFlashEnabled;
 extern bool cpuEEPROMEnabled;
 extern bool cpuEEPROMSensorEnabled;
 extern bool cpuDmaRunning;
-extern uint32_t cpuDmaLast;
 extern uint32_t cpuDmaPC;
 extern bool timer0On;
 extern int timer0Ticks;
@@ -43,6 +42,9 @@ extern bool timer3On;
 extern int timer3Ticks;
 extern int timer3ClockReload;
 extern int cpuTotalTicks;
+
+extern uint32_t cpuDmaLatchData[4];
+extern int cpuDmaChannelActive;
 
 #define CPUReadByteQuick(addr) map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask]
 
@@ -74,7 +76,67 @@ static inline int8_t Downcast8(T value) {
     return static_cast<int8_t>(value);
 }
 
-extern uint32_t myROM[];
+static inline uint32_t CPUReadOpenBus()
+{
+    /* DMA shadowing overrides everything */
+    if (cpuDmaRunning || ((reg[15].I - cpuDmaPC) == (armState ? 4u : 2u)))
+        return cpuDmaLatchData[cpuDmaChannelActive];
+
+    /* THUMB: compose 32-bit from last fetched halfwords according to region/alignment */
+    if (!armState) {
+        uint32_t reg15 = reg[15].I;
+        auto region = reg15 >> 24;
+
+        switch (region)
+        {
+        /* Sequential regions: both halves from the newer fetch */
+        case 0x02: /* EWRAM */
+        case 0x05: /* PALRAM */
+        case 0x06: /* VRAM */
+        case 0x08:
+        case 0x09:
+        case 0x0A:
+        case 0x0B:
+        case 0x0C:
+        case 0x0D: /* CART regions */
+            return cpuPrefetch[1] | (cpuPrefetch[1] << 16);
+
+        /* BIOS / OAM: alignment affects low/high halves */
+        case 0x00: /* BIOS */
+        case 0x07: /* OAM */
+            if ((reg15 & 2) == 0)
+                return cpuPrefetch[1] | (cpuPrefetch[1] << 16);
+            return cpuPrefetch[0] | (cpuPrefetch[1] << 16);
+
+        /* IWRAM: opposite order for aligned case */
+        case 0x03: /* IWRAM */
+            if ((reg15 & 2) == 0)
+                return cpuPrefetch[1] | (cpuPrefetch[0] << 16);
+            return cpuPrefetch[0] | (cpuPrefetch[1] << 16);
+        }
+    }
+
+    /* ARM: open bus is the last fetched 32-bit word */
+    return cpuPrefetch[1];
+}
+
+static inline uint32_t CPUReadROM32(uint32_t address) {
+    if (address >= gbaGetRomSize())
+        return (((((address | 2) >> 1) & 0xFFFF) << 16) | (((address & ~2) >> 1) & 0xFFFF));
+    return READ32LE(((uint32_t*)&g_rom[address & ~3]));
+}
+
+static inline uint16_t CPUReadROM16(uint32_t address) {
+    if (address >= gbaGetRomSize())
+        return (uint16_t)(address >> 1) & 0xFFFF;
+    return READ16LE(((uint16_t*)&g_rom[address & ~1]));
+}
+
+static inline uint8_t CPUReadROM8(uint32_t address) {
+    if (address >= gbaGetRomSize())
+        return (uint8_t)(address >> 1) & 0xFF;
+    return g_rom[address];
+}
 
 static inline uint32_t CPUReadMemory(uint32_t address)
 {
@@ -86,7 +148,7 @@ static inline uint32_t CPUReadMemory(uint32_t address)
         }
     }
 #endif
-    uint32_t value = 0;
+    uint32_t value = 0xFFFFFFFF;
 
     switch (address >> 24) {
     case 0:
@@ -147,7 +209,7 @@ static inline uint32_t CPUReadMemory(uint32_t address)
     case 10:
     case 11:
     case 12:
-        value = READ32LE(((uint32_t*)&g_rom[address & 0x1FFFFFC]));
+        value = CPUReadROM32(address & 0x1FFFFFC);
         break;
     case 13:
         if (cpuEEPROMEnabled)
@@ -170,15 +232,7 @@ static inline uint32_t CPUReadMemory(uint32_t address)
                 armMode ? armNextPC - 4 : armNextPC - 2);
         }
 #endif
-        if (cpuDmaRunning || ((reg[15].I - cpuDmaPC) == (armState ? 4u : 2u))) {
-            value = cpuDmaLast;
-        } else {
-            if (armState) {
-                value = CPUReadMemoryQuick(reg[15].I);
-            } else {
-                value = CPUReadHalfWordQuick(reg[15].I) | CPUReadHalfWordQuick(reg[15].I) << 16;
-            }
-        }
+        value = CPUReadOpenBus();
         break;
     }
 
@@ -228,7 +282,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
     }
 #endif
 
-    uint32_t value = 0;
+    uint32_t value = 0xFFFFFFFF;
 
     switch (address >> 24) {
     case 0:
@@ -296,7 +350,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
         if (address == 0x80000c4 || address == 0x80000c6 || address == 0x80000c8)
             value = rtcRead(address);
         else
-            value = READ16LE(((uint16_t*)&g_rom[address & 0x1FFFFFE]));
+            value = CPUReadROM16(address & 0x1FFFFFE);
         break;
     case 13:
         if (cpuEEPROMEnabled)
@@ -313,14 +367,6 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
 	/* fallthrough */
     default:
     unreadable:
-        if (cpuDmaRunning|| ((reg[15].I - cpuDmaPC) == (armState ? 4u : 2u))) {
-            value = cpuDmaLast & 0xFFFF;
-        } else {
-            int param = reg[15].I;
-            if (armState)
-                param += (address & 2);
-            value = CPUReadHalfWordQuick(param);
-        }
 #ifdef GBA_LOGGING
         if (systemVerbose & VERBOSE_ILLEGAL_READ) {
             log("Illegal halfword read: %08x at %08x (%08x)\n",
@@ -329,6 +375,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
                 value);
         }
 #endif
+        value = (uint16_t)(CPUReadOpenBus() >> (8 * address & 2));
         break;
     }
 
@@ -416,7 +463,7 @@ static inline uint8_t CPUReadByte(uint32_t address)
     case 10:
     case 11:
     case 12:
-        return g_rom[address & 0x1FFFFFF];
+        return CPUReadROM8(address & 0x1FFFFFF);
     case 13:
         if (cpuEEPROMEnabled)
             return DowncastU8(eepromRead(address));
@@ -436,7 +483,7 @@ static inline uint8_t CPUReadByte(uint32_t address)
         case 0x8500:
             return DowncastU8(systemGetSensorY() >> 8);
         }
-	/* fallthrough */
+        return 0xFF;
     default:
     unreadable:
 #ifdef GBA_LOGGING
@@ -446,15 +493,7 @@ static inline uint8_t CPUReadByte(uint32_t address)
                 armMode ? armNextPC - 4 : armNextPC - 2);
         }
 #endif
-        if (cpuDmaRunning || ((reg[15].I - cpuDmaPC) == (armState ? 4u : 2u))) {
-            return cpuDmaLast & 0xFF;
-        } else {
-            if (armState) {
-                return CPUReadByteQuick(reg[15].I + (address & 3));
-            } else {
-                return CPUReadByteQuick(reg[15].I + (address & 1));
-            }
-        }
+        return (uint8_t)(CPUReadOpenBus() >> (8 * (address & 3)));
     }
 }
 
@@ -555,7 +594,7 @@ static inline void CPUWriteMemory(uint32_t address, uint32_t value)
     case 0x0E:
     case 0x0F:
         if ((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled) {
-            (*cpuSaveGameFunc)(address, (uint8_t)value);
+            (*cpuSaveGameFunc)(address, (uint8_t)(value >> (8 * (address & 3))));
             break;
         }
         goto unwritable;
@@ -679,7 +718,7 @@ static inline void CPUWriteHalfWord(uint32_t address, uint16_t value)
     case 14:
     case 15:
         if ((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled) {
-            (*cpuSaveGameFunc)(address, (uint8_t)value);
+            (*cpuSaveGameFunc)(address, (uint8_t)(value >> (8 * (address & 1))));
             break;
         }
         /* fallthrough */
@@ -827,8 +866,6 @@ static inline void CPUWriteByte(uint32_t address, uint8_t b)
     case 14:
     case 15:
         if ((coreOptions.saveType != 5) && ((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled)) {
-            // if(!cpuEEPROMEnabled && (cpuSramEnabled | cpuFlashEnabled)) {
-
             (*cpuSaveGameFunc)(address, b);
             break;
         }
