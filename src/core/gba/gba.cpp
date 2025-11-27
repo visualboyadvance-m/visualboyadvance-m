@@ -2638,9 +2638,9 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
                 bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
 
                 CPUWriteMemory(d & 0xFFFFFFFC, cpuDmaLatchData[ch]);
-                d += dstInROM ? 4u : di;
+                if (!isFIFO)
+                    d += dstInROM ? 4u : di;
                 d &= cpuDmaDstMask[ch];
-                s &= cpuDmaSrcMask[ch];
                 c--;
             }
         } else {
@@ -2650,8 +2650,9 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
 
                 cpuDmaLatchData[ch] = CPUReadMemory(s);
                 CPUWriteMemory(d & 0xFFFFFFFC, cpuDmaLatchData[ch]);
+                if (!isFIFO)
+                    d += dstInROM ? 4u : di;
                 s += srcInROM ? 4u : si;
-                d += dstInROM ? 4u : di;
                 d &= cpuDmaDstMask[ch];
                 s &= cpuDmaSrcMask[ch];
                 c--;
@@ -2666,7 +2667,8 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
                 bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
 
                 CPUWriteHalfWord(d & 0xFFFFFFFE, DowncastU16(cpuDmaLatchData[ch] >> (8 * (d & 2))));
-                d += dstInROM ? 2u : di;
+                if (!isFIFO)
+                    d += dstInROM ? 2u : di;
                 d &= cpuDmaDstMask[ch];
                 c--;
             }
@@ -2678,8 +2680,9 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
                 cpuDmaLatchData[ch] = CPUReadHalfWord(s);
                 cpuDmaLatchData[ch] |= (cpuDmaLatchData[ch] << 16);
                 CPUWriteHalfWord(d & 0xFFFFFFFE, DowncastU16(cpuDmaLatchData[ch] >> (8 * (d & 2))));
+                if (!isFIFO)
+                    d += dstInROM ? 2u : di;
                 s += srcInROM ? 2u : si;
-                d += dstInROM ? 2u : di;
                 d &= cpuDmaDstMask[ch];
                 s &= cpuDmaSrcMask[ch];
                 c--;
