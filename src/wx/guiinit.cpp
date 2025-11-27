@@ -7,6 +7,10 @@
 
 #include "wx/wxvbam.h"
 
+#ifdef __WXGTK__
+#include <gtk/gtk.h>
+#endif
+
 #include <cmath>
 #include <stdexcept>
 #include <typeinfo>
@@ -1871,6 +1875,23 @@ bool MainFrame::BindControls()
         for (int i = 0; i < 10; i++)
             loadst_mi[i] = savest_mi[i] = NULL;
     }
+
+#ifdef __WXGTK__
+    // Force mnemonic underlines to always be visible in menus
+    // GTK3 hides them by default until Alt is pressed, but we want them always visible
+    GtkSettings* settings = gtk_settings_get_default();
+    if (settings) {
+        // Disable auto-mnemonics so underlines are always visible (GTK < 3.10)
+        g_object_set(settings, "gtk-auto-mnemonics", FALSE, NULL);
+        // Ensure mnemonics are enabled
+        g_object_set(settings, "gtk-enable-mnemonics", TRUE, NULL);
+    }
+
+    GtkWidget* toplevel = GetHandle();
+    if (toplevel && GTK_IS_WINDOW(toplevel)) {
+        gtk_window_set_mnemonics_visible(GTK_WINDOW(toplevel), TRUE);
+    }
+#endif
 
     // just setting to UNLOAD_CMDEN_KEEP is invalid
     // so just set individual flags here

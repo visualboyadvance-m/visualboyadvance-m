@@ -229,13 +229,9 @@ public:
     void StartModal();
     void StopModal();
 
-#if defined(__WXMSW__)
-
-    // On Windows, we need to disable the audio loop when the menu is open. We also disable
-    // shortcuts to prevent issues. This is not necessary on other systems.
+    // Menu event handler for tracking menu state on all platforms.
+    // On Windows, also disables audio loop when menu is open.
     void MenuPopped(wxMenuEvent& evt);
-
-#endif  // defined(__WXMSW__)
 
     // flags for enabling commands
     int cmd_enable;
@@ -296,9 +292,7 @@ public:
 
     virtual bool MenusOpened() { return menus_opened; }
 
-#if defined(__WXMSW__)
     void SetMenusOpened(bool state);
-#endif  // defined(__WXMSW__)
 
     virtual bool DialogOpened() { return dialog_opened != 0; }
 

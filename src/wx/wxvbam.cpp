@@ -5,6 +5,11 @@
 #include <versionhelpers.h>
 #endif
 
+#ifdef __WXGTK__
+#include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
+#endif
+
 #ifdef __WXGTK3__
 #include <gdk/gdk.h>
 #endif
@@ -27,6 +32,7 @@
 #include <wx/string.h>
 #include <wx/txtstrm.h>
 #include <wx/url.h>
+#include <wx/uiaction.h>
 #include <wx/wfstream.h>
 #include <wx/wxcrtvararg.h>
 #include <wx/zipstrm.h>
@@ -51,6 +57,13 @@
 #if defined(VBAM_ENABLE_DEBUGGER)
 #include "core/gba/gbaRemote.h"
 #endif  // defined(VBAM_ENABLE_DEBUGGER)
+
+#ifdef __WXGTK__
+// Global pointers for GTK mnemonic handling (defined later, declared here for OnInit)
+static GtkWidget* g_main_window = nullptr;
+static GtkWidget* g_menubar_widget = nullptr;
+static void ForceMenubarMnemonicsVisible(GtkWidget* menubar_widget);
+#endif
 
 namespace {
 
@@ -287,6 +300,22 @@ wxvbamApp::wxvbamApp()
         if (!event.GetActive()) {
             keyboard_input_handler_.Reset();
         }
+#ifdef __WXGTK__
+        else {
+            // When app is activated (e.g., after dialog closes), ensure menubar mnemonics are visible
+            if (frame) {
+                wxMenuBar* menubar = frame->GetMenuBar();
+                if (menubar) {
+                    GtkWidget* menubar_widget = menubar->GetHandle();
+                    if (menubar_widget) {
+                        GtkWidget* toplevel = gtk_widget_get_toplevel(menubar_widget);
+                        if (toplevel && GTK_IS_WINDOW(toplevel))
+                            gtk_window_set_mnemonics_visible(GTK_WINDOW(toplevel), TRUE);
+                    }
+                }
+            }
+        }
+#endif
         event.Skip();
     });
 }
@@ -658,12 +687,29 @@ bool wxvbamApp::OnInit() {
         frame->ShowFullScreen(is_fullscreen);
 
     frame->Show(true);
-    
+
     // Windows can render the taskbar icon late if this is done in MainFrame
     // It may also not update at all until the Window has been minimized/restored
     // This seems timing related, possibly based on HWND
     // So do this here since it reliably draws the Taskbar icon on Window creation.
-    frame->BindAppIcon();  
+    frame->BindAppIcon();
+
+#ifdef __WXGTK__
+    // Initialize menubar mnemonic visibility and global pointers
+    wxMenuBar* menubar = frame->GetMenuBar();
+    if (menubar) {
+        GtkWidget* menubar_widget = menubar->GetHandle();
+        if (menubar_widget) {
+            g_menubar_widget = menubar_widget;
+            GtkWidget* toplevel = gtk_widget_get_toplevel(menubar_widget);
+            if (toplevel && GTK_IS_WINDOW(toplevel)) {
+                g_main_window = toplevel;
+                gtk_window_set_mnemonics_visible(GTK_WINDOW(toplevel), TRUE);
+            }
+            ForceMenubarMnemonicsVisible(menubar_widget);
+        }
+    }
+#endif  
 
 
 #ifndef NO_ONLINEUPDATES
@@ -993,14 +1039,10 @@ EVT_MOVE_END(MainFrame::OnMoveEnd)
 EVT_SIZE(MainFrame::OnSize)
 EVT_ICONIZE(MainFrame::OnIconize)
 
-#if defined(__WXMSW__)
-
-// For tracking menubar state.
+// For tracking menubar state on all platforms.
 EVT_MENU_OPEN(MainFrame::MenuPopped)
 EVT_MENU_CLOSE(MainFrame::MenuPopped)
 EVT_MENU_HIGHLIGHT_ALL(MainFrame::MenuPopped)
-
-#endif  // defined(__WXMSW__)
 
 END_EVENT_TABLE()
 
@@ -1273,30 +1315,60 @@ void MainFrame::ResetMenuAccelerators() {
     ResetRecentAccelerators();
 }
 
-#if defined(__WXMSW__)
+#ifdef __WXGTK__
+// Forward declarations for GTK mnemonic visibility functions
+static void EnsureMnemonicsVisible(GtkWidget* widget);
+static void ForceMenuMnemonicsVisible(GtkWidget* menu_widget);
+static void ScheduleMnemonicTimeouts(GtkWidget* menu_widget);
+// Note: g_main_window, g_menubar_widget, and ForceMenubarMnemonicsVisible are declared at the top of the file
+#endif
 
 void MainFrame::MenuPopped(wxMenuEvent& evt) {
-    // We consider the menu closed when the main menubar or system menu is closed, not any submenus.
-    // On Windows NULL is the system menu.
+    // Track menu open/close state for audio handling
+#if defined(__WXMSW__)
     if (evt.GetEventType() == wxEVT_MENU_CLOSE && (evt.GetMenu() == NULL || evt.GetMenu()->GetMenuBar() == GetMenuBar()))
+#else
+    if (evt.GetEventType() == wxEVT_MENU_CLOSE && evt.GetMenu() && evt.GetMenu()->GetMenuBar() == GetMenuBar())
+#endif
         SetMenusOpened(false);
     else
         SetMenusOpened(true);
 
+#ifdef __WXGTK__
+    // Force mnemonic underlines to always be visible (GTK3 hides them by default)
+    EnsureMnemonicsVisible(GetHandle());
+
+    wxMenuBar* menubar = GetMenuBar();
+    if (menubar) {
+        GtkWidget* menubar_widget = menubar->GetHandle();
+        if (menubar_widget)
+            ForceMenubarMnemonicsVisible(menubar_widget);
+    }
+
+    wxMenu* menu = evt.GetMenu();
+    if (menu && evt.GetEventType() == wxEVT_MENU_OPEN) {
+        GtkWidget* menu_widget = menu->m_menu;
+        if (menu_widget && GTK_IS_MENU(menu_widget))
+            ForceMenuMnemonicsVisible(menu_widget);
+    }
+
+    ScheduleMnemonicTimeouts(nullptr);
+#endif
+
     evt.Skip();
 }
 
-// On Windows, opening the menubar will stop the app, but DirectSound will
-// loop, so we pause audio here.
 void MainFrame::SetMenusOpened(bool state) {
     menus_opened = state;
+#if defined(__WXMSW__)
+    // On Windows, opening the menubar will stop the app, but DirectSound will
+    // loop, so we pause audio here.
     if (menus_opened)
         soundPause();
     else if (!paused)
         soundResume();
+#endif
 }
-
-#endif  // defined(__WXMSW__)
 
 // ShowModal that also disables emulator loop
 // uses dialog_opened as a nesting counter
@@ -1445,6 +1517,814 @@ void MainFrame::IdentifyRom()
     }
 }
 
+// Forward declarations
+static bool SearchAndActivateMenuItem(wxMenu* menu, wxChar mnemonic, int depth = 0);
+static bool ActivateMenuItemByMnemonic(wxMenu* menu, wxChar mnemonic);
+
+#ifdef __WXGTK__
+//==============================================================================
+// GTK Menu Keyboard Navigation and Mnemonic Handling
+//==============================================================================
+// This section implements custom keyboard navigation for menus on GTK/Linux.
+// GTK3 has issues with mnemonic (underline) visibility and keyboard navigation
+// that require custom handling:
+//
+// 1. Mnemonic underlines are hidden by default until Alt is pressed
+// 2. Keyboard navigation can trigger unwanted focus changes
+// 3. First-letter navigation (pressing a letter to activate matching item)
+//    needs to work in addition to explicit mnemonics
+//
+// The code below:
+// - Forces mnemonic underlines to always be visible
+// - Adds first-letter underlines to items without matching mnemonics
+// - Implements custom arrow key navigation
+// - Handles letter/number key activation of menu items
+//==============================================================================
+
+// Ensure mnemonic underlines are visible on the window
+static void EnsureMnemonicsVisible(GtkWidget* widget) {
+    if (!widget)
+        return;
+    GtkWidget* toplevel = gtk_widget_get_toplevel(widget);
+    if (toplevel && GTK_IS_WINDOW(toplevel)) {
+        gtk_window_set_mnemonics_visible(GTK_WINDOW(toplevel), TRUE);
+        g_main_window = toplevel;
+    }
+}
+
+// Force mnemonics visible on menubar items
+static void ForceMenubarMnemonicsVisible(GtkWidget* menubar_widget) {
+    if (!menubar_widget || !GTK_IS_MENU_BAR(menubar_widget))
+        return;
+
+    g_menubar_widget = menubar_widget;
+    EnsureMnemonicsVisible(menubar_widget);
+
+    GList* children = gtk_container_get_children(GTK_CONTAINER(menubar_widget));
+    for (GList* l = children; l != NULL; l = l->next) {
+        GtkWidget* item = GTK_WIDGET(l->data);
+        if (GTK_IS_MENU_ITEM(item)) {
+            GtkWidget* label = gtk_bin_get_child(GTK_BIN(item));
+            if (label && GTK_IS_LABEL(label))
+                gtk_label_set_use_underline(GTK_LABEL(label), TRUE);
+        }
+    }
+    g_list_free(children);
+}
+
+// Walk up the menu hierarchy forcing mnemonics on each level
+static void ForceMenuHierarchyMnemonicsVisible(GtkWidget* menu_widget) {
+    if (!menu_widget || !GTK_IS_MENU(menu_widget))
+        return;
+
+    ForceMenuMnemonicsVisible(menu_widget);
+
+    GtkWidget* attach_widget = gtk_menu_get_attach_widget(GTK_MENU(menu_widget));
+    while (attach_widget && GTK_IS_MENU_ITEM(attach_widget)) {
+        GtkWidget* parent = gtk_widget_get_parent(attach_widget);
+        if (parent && GTK_IS_MENU(parent)) {
+            ForceMenuMnemonicsVisible(parent);
+            attach_widget = gtk_menu_get_attach_widget(GTK_MENU(parent));
+        } else if (parent && GTK_IS_MENU_BAR(parent)) {
+            ForceMenubarMnemonicsVisible(parent);
+            break;
+        } else {
+            break;
+        }
+    }
+}
+
+// Timeout callback to force mnemonics after GTK finishes processing
+static gboolean ForceMenuMnemonicsTimeoutCallback(gpointer user_data) {
+    GtkWidget* menu_widget = GTK_WIDGET(user_data);
+    if (menu_widget && GTK_IS_MENU(menu_widget))
+        ForceMenuHierarchyMnemonicsVisible(menu_widget);
+
+    EnsureMnemonicsVisible(g_main_window);
+    return G_SOURCE_REMOVE;
+}
+
+// Timeout callback for menubar mnemonics only
+static gboolean ForceMenubarMnemonicsTimeoutCallback(gpointer user_data) {
+    (void)user_data;
+    if (g_menubar_widget)
+        ForceMenubarMnemonicsVisible(g_menubar_widget);
+    EnsureMnemonicsVisible(g_main_window);
+    return G_SOURCE_REMOVE;
+}
+
+// Schedule timeout callbacks to force mnemonics after GTK finishes
+static void ScheduleMnemonicTimeouts(GtkWidget* menu_widget) {
+    if (menu_widget && GTK_IS_MENU(menu_widget)) {
+        g_timeout_add(1, ForceMenuMnemonicsTimeoutCallback, menu_widget);
+        g_timeout_add(10, ForceMenuMnemonicsTimeoutCallback, menu_widget);
+        g_timeout_add(50, ForceMenuMnemonicsTimeoutCallback, menu_widget);
+    } else {
+        g_timeout_add(1, ForceMenubarMnemonicsTimeoutCallback, NULL);
+        g_timeout_add(10, ForceMenubarMnemonicsTimeoutCallback, NULL);
+        g_timeout_add(50, ForceMenubarMnemonicsTimeoutCallback, NULL);
+        // Additional longer timeouts for when dialogs open asynchronously
+        g_timeout_add(100, ForceMenubarMnemonicsTimeoutCallback, NULL);
+        g_timeout_add(200, ForceMenubarMnemonicsTimeoutCallback, NULL);
+    }
+}
+
+// Signal handler called when a menu is shown/mapped
+static void OnMenuShow(GtkWidget* menu_widget, gpointer user_data) {
+    (void)user_data;
+    ForceMenuHierarchyMnemonicsVisible(menu_widget);
+    ScheduleMnemonicTimeouts(menu_widget);
+}
+
+// Signal handler called when a menu item with submenu is selected
+static void OnMenuItemSelect(GtkMenuItem* menu_item, gpointer user_data) {
+    (void)user_data;
+
+    GtkWidget* parent_menu = gtk_widget_get_parent(GTK_WIDGET(menu_item));
+    if (parent_menu && GTK_IS_MENU(parent_menu)) {
+        ForceMenuMnemonicsVisible(parent_menu);
+        ScheduleMnemonicTimeouts(parent_menu);
+    }
+
+    GtkWidget* submenu = gtk_menu_item_get_submenu(menu_item);
+    if (submenu && GTK_IS_MENU(submenu)) {
+        ForceMenuMnemonicsVisible(submenu);
+        ScheduleMnemonicTimeouts(submenu);
+    }
+}
+
+// Add first-letter underline to a label if its mnemonic doesn't match the first letter
+// This provides visual feedback for the first-letter handler fallback
+static void AddFirstLetterUnderline(GtkLabel* label) {
+    if (!label)
+        return;
+
+    const gchar* text = gtk_label_get_label(label);
+    if (!text || !*text)
+        return;
+
+    // Find existing mnemonic position (underscore not followed by another underscore)
+    const gchar* p = text;
+    gunichar mnemonic_char = 0;
+    gunichar first_char = 0;
+    gboolean found_first = FALSE;
+
+    while (*p) {
+        gunichar c = g_utf8_get_char(p);
+
+        // Track the first actual character (not underscore)
+        if (!found_first && c != '_') {
+            first_char = g_unichar_toupper(c);
+            found_first = TRUE;
+        }
+
+        if (c == '_') {
+            const gchar* next = g_utf8_next_char(p);
+            if (*next) {
+                gunichar next_c = g_utf8_get_char(next);
+                if (next_c == '_') {
+                    // Escaped underscore, skip both
+                    p = g_utf8_next_char(next);
+                    continue;
+                } else {
+                    // Found mnemonic
+                    mnemonic_char = g_unichar_toupper(next_c);
+                    break;
+                }
+            }
+        }
+        p = g_utf8_next_char(p);
+    }
+
+    // If mnemonic already matches first letter, nothing to do
+    if (mnemonic_char && mnemonic_char == first_char)
+        return;
+
+    // If there's no mnemonic, or the mnemonic doesn't match first letter,
+    // add underscore before first character
+    if (first_char) {
+        // Build new text with underscore before first character
+        GString* new_text = g_string_new("");
+        p = text;
+        gboolean added_underscore = FALSE;
+
+        while (*p) {
+            gunichar c = g_utf8_get_char(p);
+
+            // Add underscore before the first non-underscore character
+            if (!added_underscore && c != '_') {
+                g_string_append_c(new_text, '_');
+                added_underscore = TRUE;
+            }
+
+            // Append the current character
+            gchar buf[6];
+            gint len = g_unichar_to_utf8(c, buf);
+            g_string_append_len(new_text, buf, len);
+
+            p = g_utf8_next_char(p);
+        }
+
+        gtk_label_set_label(label, new_text->str);
+        g_string_free(new_text, TRUE);
+    }
+}
+
+// Force mnemonics visible on a menu and all its items (recursive)
+static void ForceMenuMnemonicsVisible(GtkWidget* menu_widget) {
+    if (!menu_widget || !GTK_IS_MENU(menu_widget))
+        return;
+
+    EnsureMnemonicsVisible(menu_widget);
+
+    // Connect show/map signals (only once per menu)
+    static GQuark show_handler_quark = g_quark_from_static_string("vbam-menu-show-handler");
+    if (!g_object_get_qdata(G_OBJECT(menu_widget), show_handler_quark)) {
+        g_signal_connect(menu_widget, "show", G_CALLBACK(OnMenuShow), NULL);
+        g_signal_connect(menu_widget, "map", G_CALLBACK(OnMenuShow), NULL);
+        g_object_set_qdata(G_OBJECT(menu_widget), show_handler_quark, GINT_TO_POINTER(1));
+    }
+
+    // Connect select signal on menu items with submenus (only once per item)
+    static GQuark select_handler_quark = g_quark_from_static_string("vbam-menuitem-select-handler");
+    // Track whether we've already processed first-letter underlines for this menu
+    static GQuark first_letter_menu_quark = g_quark_from_static_string("vbam-first-letter-menu-done");
+
+    GList* children = gtk_container_get_children(GTK_CONTAINER(menu_widget));
+
+    // Only process first-letter underlines once per menu
+    if (!g_object_get_qdata(G_OBJECT(menu_widget), first_letter_menu_quark)) {
+        g_object_set_qdata(G_OBJECT(menu_widget), first_letter_menu_quark, GINT_TO_POINTER(1));
+
+        // Track which first letters have been claimed (by mnemonic or first-letter underline)
+        GHashTable* claimed_letters = g_hash_table_new(g_direct_hash, g_direct_equal);
+
+        // First pass: collect all existing mnemonics
+        for (GList* l = children; l != NULL; l = l->next) {
+            GtkWidget* item = GTK_WIDGET(l->data);
+            if (!GTK_IS_MENU_ITEM(item))
+                continue;
+
+            GtkWidget* label = gtk_bin_get_child(GTK_BIN(item));
+            if (!label || !GTK_IS_LABEL(label))
+                continue;
+
+            const gchar* text = gtk_label_get_label(GTK_LABEL(label));
+            if (!text || !*text)
+                continue;
+
+            // Find existing mnemonic
+            const gchar* p = text;
+            while (*p) {
+                gunichar c = g_utf8_get_char(p);
+                if (c == '_') {
+                    const gchar* next = g_utf8_next_char(p);
+                    if (*next) {
+                        gunichar next_c = g_utf8_get_char(next);
+                        if (next_c != '_') {
+                            // Found mnemonic - mark this letter as claimed
+                            g_hash_table_insert(claimed_letters,
+                                GUINT_TO_POINTER(g_unichar_toupper(next_c)),
+                                GINT_TO_POINTER(1));
+                            break;
+                        }
+                        p = g_utf8_next_char(next);
+                        continue;
+                    }
+                }
+                p = g_utf8_next_char(p);
+            }
+        }
+
+        // Second pass: add first-letter underlines where appropriate
+        for (GList* l = children; l != NULL; l = l->next) {
+            GtkWidget* item = GTK_WIDGET(l->data);
+            if (!GTK_IS_MENU_ITEM(item))
+                continue;
+
+            GtkWidget* label = gtk_bin_get_child(GTK_BIN(item));
+            if (!label || !GTK_IS_LABEL(label))
+                continue;
+
+            gtk_label_set_use_underline(GTK_LABEL(label), TRUE);
+
+            const gchar* text = gtk_label_get_label(GTK_LABEL(label));
+            if (!text || !*text)
+                continue;
+
+            // Find if this item has a mnemonic and what its first letter is
+            const gchar* p = text;
+            gunichar first_char = 0;
+            gunichar mnemonic_char = 0;
+
+            while (*p) {
+                gunichar c = g_utf8_get_char(p);
+
+                // Track first non-underscore character
+                if (!first_char && c != '_')
+                    first_char = g_unichar_toupper(c);
+
+                if (c == '_') {
+                    const gchar* next = g_utf8_next_char(p);
+                    if (*next) {
+                        gunichar next_c = g_utf8_get_char(next);
+                        if (next_c != '_') {
+                            mnemonic_char = g_unichar_toupper(next_c);
+                            break;
+                        }
+                        p = g_utf8_next_char(next);
+                        continue;
+                    }
+                }
+                p = g_utf8_next_char(p);
+            }
+
+            // Skip if mnemonic already matches first letter
+            if (mnemonic_char && mnemonic_char == first_char)
+                continue;
+
+            // Skip if first letter is already claimed
+            if (first_char && g_hash_table_contains(claimed_letters, GUINT_TO_POINTER(first_char)))
+                continue;
+
+            // Add first-letter underline and claim the letter
+            if (first_char) {
+                g_hash_table_insert(claimed_letters, GUINT_TO_POINTER(first_char), GINT_TO_POINTER(1));
+                AddFirstLetterUnderline(GTK_LABEL(label));
+            }
+        }
+
+        g_hash_table_destroy(claimed_letters);
+    }
+
+    // Enable underlines and recurse into submenus
+    for (GList* l = children; l != NULL; l = l->next) {
+        GtkWidget* item = GTK_WIDGET(l->data);
+        if (GTK_IS_MENU_ITEM(item)) {
+            GtkWidget* label = gtk_bin_get_child(GTK_BIN(item));
+            if (label && GTK_IS_LABEL(label))
+                gtk_label_set_use_underline(GTK_LABEL(label), TRUE);
+
+            GtkWidget* submenu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(item));
+            if (submenu && GTK_IS_MENU(submenu)) {
+                if (!g_object_get_qdata(G_OBJECT(item), select_handler_quark)) {
+                    g_signal_connect(item, "select", G_CALLBACK(OnMenuItemSelect), NULL);
+                    g_object_set_qdata(G_OBJECT(item), select_handler_quark, GINT_TO_POINTER(1));
+                }
+                ForceMenuMnemonicsVisible(submenu);
+            }
+        }
+    }
+    g_list_free(children);
+}
+
+// Disable take_focus and ensure mnemonics stay visible
+static void DisableTakeFocusAndShowMnemonics(GtkMenuShell* menu_shell, GtkWidget* menubar_widget) {
+    gtk_menu_shell_set_take_focus(menu_shell, FALSE);
+    EnsureMnemonicsVisible(menubar_widget);
+    ForceMenuMnemonicsVisible(GTK_WIDGET(menu_shell));
+}
+
+// Select a menu item without triggering GTK keyboard navigation mode
+static void SelectMenuItemWithoutKeyboardMode(GtkMenuShell* menu_shell, GtkWidget* item, GtkMenuShell* menubar_shell) {
+    GtkWidget* menubar_widget = GTK_WIDGET(menubar_shell);
+
+    DisableTakeFocusAndShowMnemonics(menu_shell, menubar_widget);
+    if (menubar_shell && menubar_shell != menu_shell)
+        DisableTakeFocusAndShowMnemonics(menubar_shell, menubar_widget);
+
+    if (GTK_IS_MENU_ITEM(item)) {
+        GtkWidget* item_submenu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(item));
+        if (item_submenu && GTK_IS_MENU(item_submenu))
+            DisableTakeFocusAndShowMnemonics(GTK_MENU_SHELL(item_submenu), menubar_widget);
+    }
+
+    gtk_menu_shell_select_item(menu_shell, item);
+    ForceMenuMnemonicsVisible(GTK_WIDGET(menu_shell));
+}
+
+// Helper to find next/previous selectable menu item
+static GtkWidget* FindSelectableMenuItem(GtkMenuShell* menu_shell, GtkWidget* current, bool forward) {
+    GList* children = gtk_container_get_children(GTK_CONTAINER(menu_shell));
+    gint count = g_list_length(children);
+    gint current_idx = -1;
+
+    // Find current item index
+    for (gint i = 0; i < count; i++) {
+        if (g_list_nth_data(children, i) == current) {
+            current_idx = i;
+            break;
+        }
+    }
+
+    // Search for next/previous selectable item
+    GtkWidget* result = nullptr;
+    if (forward) {
+        // Search forward, wrapping to start
+        for (gint i = 1; i <= count; i++) {
+            gint idx = (current_idx + i) % count;
+            GtkWidget* item = GTK_WIDGET(g_list_nth_data(children, idx));
+            if (item && GTK_IS_MENU_ITEM(item) && gtk_widget_get_visible(item) &&
+                gtk_widget_get_sensitive(item) && !GTK_IS_SEPARATOR_MENU_ITEM(item)) {
+                result = item;
+                break;
+            }
+        }
+    } else {
+        // Search backward, wrapping to end
+        for (gint i = 1; i <= count; i++) {
+            gint idx = (current_idx - i + count) % count;
+            GtkWidget* item = GTK_WIDGET(g_list_nth_data(children, idx));
+            if (item && GTK_IS_MENU_ITEM(item) && gtk_widget_get_visible(item) &&
+                gtk_widget_get_sensitive(item) && !GTK_IS_SEPARATOR_MENU_ITEM(item)) {
+                result = item;
+                break;
+            }
+        }
+    }
+
+    g_list_free(children);
+    return result;
+}
+
+// Helper to find first selectable menu item
+static GtkWidget* FindFirstSelectableMenuItem(GtkMenuShell* menu_shell) {
+    GList* children = gtk_container_get_children(GTK_CONTAINER(menu_shell));
+    GtkWidget* result = nullptr;
+
+    for (GList* l = children; l != NULL; l = l->next) {
+        GtkWidget* item = GTK_WIDGET(l->data);
+        if (item && GTK_IS_MENU_ITEM(item) && gtk_widget_get_visible(item) &&
+            gtk_widget_get_sensitive(item) && !GTK_IS_SEPARATOR_MENU_ITEM(item)) {
+            result = item;
+            break;
+        }
+    }
+
+    g_list_free(children);
+    return result;
+}
+
+// Helper to check if item is the first selectable in menu
+static bool IsFirstSelectableMenuItem(GtkMenuShell* menu_shell, GtkWidget* item) {
+    return FindFirstSelectableMenuItem(menu_shell) == item;
+}
+
+// Signal handler to intercept and handle keyboard navigation in menus
+static gboolean HandleMenuKeyboardNavigation(GtkWidget* widget, GdkEventKey* event, gpointer user_data) {
+    (void)widget;
+    guint keyval = event->keyval;
+
+    MainFrame* frame = (MainFrame*)user_data;
+    if (!frame)
+        return FALSE;
+
+    wxMenuBar* menubar = frame->GetMenuBar();
+    if (!menubar)
+        return FALSE;
+
+    GtkWidget* menubar_widget = menubar->GetHandle();
+    if (!menubar_widget)
+        return FALSE;
+
+    EnsureMnemonicsVisible(menubar_widget);
+
+    // Handle Escape to close menu
+    if (keyval == GDK_KEY_Escape) {
+        GtkMenuShell* menu_shell = GTK_MENU_SHELL(menubar_widget);
+        gtk_grab_remove(menubar_widget);
+        gtk_menu_shell_deselect(menu_shell);
+        gtk_menu_shell_cancel(menu_shell);
+        frame->SetMenusOpened(false);
+        return TRUE;
+    }
+
+    GtkMenuShell* menubar_shell = GTK_MENU_SHELL(menubar_widget);
+    GtkWidget* selected_menubar_item = gtk_menu_shell_get_selected_item(menubar_shell);
+    GtkWidget* active_submenu = nullptr;
+    GtkWidget* selected_submenu_item = nullptr;
+    GtkWidget* active_sub_submenu = nullptr;
+    GtkWidget* selected_sub_submenu_item = nullptr;
+
+    DisableTakeFocusAndShowMnemonics(menubar_shell, menubar_widget);
+
+    if (selected_menubar_item && GTK_IS_MENU_ITEM(selected_menubar_item)) {
+        active_submenu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(selected_menubar_item));
+        if (active_submenu && GTK_IS_MENU(active_submenu)) {
+            DisableTakeFocusAndShowMnemonics(GTK_MENU_SHELL(active_submenu), menubar_widget);
+            selected_submenu_item = gtk_menu_shell_get_selected_item(GTK_MENU_SHELL(active_submenu));
+
+            if (selected_submenu_item && GTK_IS_MENU_ITEM(selected_submenu_item)) {
+                active_sub_submenu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(selected_submenu_item));
+                if (active_sub_submenu && GTK_IS_MENU(active_sub_submenu)) {
+                    DisableTakeFocusAndShowMnemonics(GTK_MENU_SHELL(active_sub_submenu), menubar_widget);
+                    selected_sub_submenu_item = gtk_menu_shell_get_selected_item(GTK_MENU_SHELL(active_sub_submenu));
+                }
+            }
+        }
+    }
+
+    // Helper lambda to select item and handle submenu deselection
+    auto selectMenuItem = [&](GtkMenuShell* shell, GtkWidget* item) {
+        SelectMenuItemWithoutKeyboardMode(shell, item, menubar_shell);
+        GtkWidget* item_submenu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(item));
+        if (item_submenu) {
+            DisableTakeFocusAndShowMnemonics(GTK_MENU_SHELL(item_submenu), menubar_widget);
+            gtk_menu_shell_deselect(GTK_MENU_SHELL(item_submenu));
+        }
+    };
+
+    // Determine target menu for vertical navigation
+    GtkWidget* target_menu = nullptr;
+    GtkWidget* target_item = nullptr;
+    if (active_sub_submenu && selected_sub_submenu_item) {
+        target_menu = active_sub_submenu;
+        target_item = selected_sub_submenu_item;
+    } else if (selected_submenu_item) {
+        target_menu = active_submenu;
+        target_item = selected_submenu_item;
+    } else if (active_submenu) {
+        target_menu = active_submenu;
+        target_item = nullptr;
+    }
+
+    // Handle DOWN arrow
+    if (keyval == GDK_KEY_Down && target_menu) {
+        GtkMenuShell* shell = GTK_MENU_SHELL(target_menu);
+        GtkWidget* next = target_item ? FindSelectableMenuItem(shell, target_item, true)
+                                      : FindFirstSelectableMenuItem(shell);
+        if (next)
+            selectMenuItem(shell, next);
+
+        if (active_submenu) ForceMenuMnemonicsVisible(active_submenu);
+        if (active_sub_submenu) ForceMenuMnemonicsVisible(active_sub_submenu);
+        return TRUE;
+    }
+
+    // Handle UP arrow
+    if (keyval == GDK_KEY_Up && target_menu && target_item) {
+        GtkMenuShell* shell = GTK_MENU_SHELL(target_menu);
+        if (IsFirstSelectableMenuItem(shell, target_item)) {
+            // On first item, deselect to return focus to parent
+            gtk_menu_shell_deselect(shell);
+            DisableTakeFocusAndShowMnemonics(shell, menubar_widget);
+        } else {
+            GtkWidget* prev = FindSelectableMenuItem(shell, target_item, false);
+            if (prev)
+                selectMenuItem(shell, prev);
+        }
+
+        if (active_submenu) ForceMenuMnemonicsVisible(active_submenu);
+        if (active_sub_submenu) ForceMenuMnemonicsVisible(active_sub_submenu);
+        return TRUE;
+    }
+
+    // Handle RIGHT arrow - enter submenu or move to next top-level menu
+    if (keyval == GDK_KEY_Right) {
+        // Try to enter submenu of selected item
+        if (selected_submenu_item && GTK_IS_MENU_ITEM(selected_submenu_item)) {
+            GtkWidget* sub_submenu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(selected_submenu_item));
+            if (sub_submenu && GTK_IS_MENU(sub_submenu)) {
+                GtkMenuShell* sub_shell = GTK_MENU_SHELL(sub_submenu);
+                DisableTakeFocusAndShowMnemonics(menubar_shell, menubar_widget);
+                DisableTakeFocusAndShowMnemonics(GTK_MENU_SHELL(active_submenu), menubar_widget);
+                DisableTakeFocusAndShowMnemonics(sub_shell, menubar_widget);
+                gtk_widget_set_can_focus(sub_submenu, FALSE);
+
+                g_signal_connect(sub_submenu, "key-press-event",
+                                G_CALLBACK(HandleMenuKeyboardNavigation), frame);
+
+                SelectMenuItemWithoutKeyboardMode(GTK_MENU_SHELL(active_submenu), selected_submenu_item, menubar_shell);
+
+                GtkWidget* first = FindFirstSelectableMenuItem(sub_shell);
+                if (first) {
+                    gtk_menu_shell_select_item(sub_shell, first);
+                    GtkWidget* first_sub = gtk_menu_item_get_submenu(GTK_MENU_ITEM(first));
+                    if (first_sub)
+                        DisableTakeFocusAndShowMnemonics(GTK_MENU_SHELL(first_sub), menubar_widget);
+                }
+
+                ForceMenuMnemonicsVisible(sub_submenu);
+                if (active_submenu) {
+                    ForceMenuMnemonicsVisible(active_submenu);
+                    ScheduleMnemonicTimeouts(active_submenu);
+                }
+                ScheduleMnemonicTimeouts(sub_submenu);
+                return TRUE;
+            }
+        }
+
+        // Move to next top-level menu (wrapping)
+        // First close/deselect the current submenu and menubar item
+        if (active_submenu)
+            gtk_menu_shell_deselect(GTK_MENU_SHELL(active_submenu));
+        gtk_menu_shell_deselect(menubar_shell);
+        if (selected_menubar_item) {
+            GtkWidget* next = FindSelectableMenuItem(menubar_shell, selected_menubar_item, true);
+            if (next)
+                SelectMenuItemWithoutKeyboardMode(menubar_shell, next, menubar_shell);
+        }
+        return TRUE;
+    }
+
+    // Handle LEFT arrow - close submenu or move to previous top-level menu
+    if (keyval == GDK_KEY_Left) {
+        // If in a sub-submenu, go back to parent submenu
+        if (active_sub_submenu && selected_sub_submenu_item) {
+            gtk_menu_shell_deselect(GTK_MENU_SHELL(active_sub_submenu));
+            if (active_submenu)
+                ForceMenuMnemonicsVisible(active_submenu);
+            return TRUE;
+        }
+
+        // If a submenu item is selected (or dropdown is open), move to previous top-level menu
+        // First close/deselect the current submenu and menubar item
+        if (active_submenu)
+            gtk_menu_shell_deselect(GTK_MENU_SHELL(active_submenu));
+        gtk_menu_shell_deselect(menubar_shell);
+        if (selected_menubar_item) {
+            GtkWidget* prev = FindSelectableMenuItem(menubar_shell, selected_menubar_item, false);
+            if (prev)
+                SelectMenuItemWithoutKeyboardMode(menubar_shell, prev, menubar_shell);
+        }
+        return TRUE;
+    }
+
+    // Handle ENTER
+    if (keyval == GDK_KEY_Return || keyval == GDK_KEY_KP_Enter) {
+        GtkWidget* item_to_activate = selected_sub_submenu_item ? selected_sub_submenu_item : selected_submenu_item;
+        if (item_to_activate && GTK_IS_MENU_ITEM(item_to_activate)) {
+            gtk_menu_item_activate(GTK_MENU_ITEM(item_to_activate));
+            frame->SetMenusOpened(false);
+            // Ensure globals are set for timeout callbacks
+            GtkWidget* toplevel = gtk_widget_get_toplevel(menubar_widget);
+            if (toplevel && GTK_IS_WINDOW(toplevel))
+                g_main_window = toplevel;
+            g_menubar_widget = menubar_widget;
+            // Keep menubar mnemonics visible after menu closes
+            ScheduleMnemonicTimeouts(nullptr);
+        }
+        return TRUE;
+    }
+
+    // Handle letter/number keys for mnemonics - only in the currently active menu
+    gunichar unicode = gdk_keyval_to_unicode(keyval);
+    if (g_unichar_isalnum(unicode)) {
+        wxChar letter = wxToupper((wxChar)unicode);
+
+        // Find the currently active wxMenu based on GTK selection state
+        wxMenu* active_wx_menu = nullptr;
+
+        // Find which top-level menu is selected
+        if (selected_menubar_item) {
+            GList* menubar_children = gtk_container_get_children(GTK_CONTAINER(menubar_shell));
+            gint menubar_idx = 0;
+            for (GList* l = menubar_children; l != NULL; l = l->next, menubar_idx++) {
+                if (GTK_WIDGET(l->data) == selected_menubar_item) {
+                    if ((size_t)menubar_idx < menubar->GetMenuCount())
+                        active_wx_menu = menubar->GetMenu(menubar_idx);
+                    break;
+                }
+            }
+            g_list_free(menubar_children);
+        }
+
+        // Only switch to submenu if an item within it is actually selected
+        // (not just when the submenu is open but focus is still on parent menu item)
+        if (active_sub_submenu && selected_sub_submenu_item && active_wx_menu) {
+            // active_wx_menu is currently the top-level menu (e.g., File)
+            // active_sub_submenu is the submenu with a selected item
+            // Find which menu item's submenu matches active_sub_submenu
+            wxMenuItemList& items = active_wx_menu->GetMenuItems();
+            for (wxMenuItemList::iterator it = items.begin(); it != items.end(); ++it) {
+                wxMenuItem* item = *it;
+                if (item && item->IsSubMenu()) {
+                    wxMenu* submenu = item->GetSubMenu();
+                    if (submenu && submenu->m_menu == active_sub_submenu) {
+                        active_wx_menu = submenu;
+                        break;
+                    }
+                }
+            }
+        }
+        // If submenu is open but no item selected within it, stay with the parent menu
+
+        if (active_wx_menu && ActivateMenuItemByMnemonic(active_wx_menu, letter)) {
+            frame->SetMenusOpened(false);
+            gtk_grab_remove(menubar_widget);
+            gtk_menu_shell_deselect(menubar_shell);
+            gtk_menu_shell_cancel(menubar_shell);
+            // Ensure globals are set and force mnemonics visible after menu closes
+            g_menubar_widget = menubar_widget;
+            EnsureMnemonicsVisible(menubar_widget);
+            ForceMenubarMnemonicsVisible(menubar_widget);
+            ScheduleMnemonicTimeouts(nullptr);
+            return TRUE;
+        }
+        return TRUE;
+    }
+
+    // Let other keys through
+    return FALSE;
+}
+
+#endif  // __WXGTK__
+
+//==============================================================================
+// Menu Item Activation Helpers (Cross-Platform)
+//==============================================================================
+
+// Helper to activate a menu item (handles checkable items)
+static bool ActivateMenuItem(wxMenu* menu, wxMenuItem* item) {
+    if (!item)
+        return false;
+
+    // For checkable items, toggle the state first
+    if (item->IsCheckable())
+        item->Check(!item->IsChecked());
+
+    wxCommandEvent event(wxEVT_MENU, item->GetId());
+    event.SetEventObject(menu);
+    // For checkable items, set the int value to the new checked state
+    if (item->IsCheckable())
+        event.SetInt(item->IsChecked() ? 1 : 0);
+    wxTheApp->GetTopWindow()->GetEventHandler()->ProcessEvent(event);
+    return true;
+}
+
+// Search within a single menu (non-recursive) for a menu item with the given mnemonic/first letter and activate it
+// Priority: 1) mnemonic match (character after &), 2) first letter match
+static bool ActivateMenuItemByMnemonic(wxMenu* menu, wxChar letter) {
+    if (!menu)
+        return false;
+
+    wxMenuItem* first_letter_match = nullptr;
+
+    wxMenuItemList& items = menu->GetMenuItems();
+    for (wxMenuItemList::iterator it = items.begin(); it != items.end(); ++it) {
+        wxMenuItem* item = *it;
+        if (!item || item->IsSeparator() || item->IsSubMenu())
+            continue;
+
+        wxString full_label = item->GetItemLabel();
+        int mnemonic_pos = full_label.Find('&');
+
+        // Check for mnemonic match (highest priority)
+        if (mnemonic_pos != wxNOT_FOUND && mnemonic_pos + 1 < (int)full_label.length()) {
+            wxChar item_mnemonic = wxToupper(full_label[mnemonic_pos + 1]);
+            if (item_mnemonic == letter)
+                return ActivateMenuItem(menu, item);
+        }
+
+        // Track first letter match as fallback (only remember the first one found)
+        if (!first_letter_match && !item->GetItemLabelText().IsEmpty()) {
+            wxChar first_char = wxToupper(item->GetItemLabelText()[0]);
+            if (first_char == letter)
+                first_letter_match = item;
+        }
+    }
+
+    // No mnemonic match found, try first letter match
+    if (first_letter_match)
+        return ActivateMenuItem(menu, first_letter_match);
+
+    return false;
+}
+
+// Recursively search a menu for a menu item with the given mnemonic and activate it
+static bool SearchAndActivateMenuItem(wxMenu* menu, wxChar mnemonic, int depth) {
+    if (!menu)
+        return false;
+
+    wxMenuItemList& items = menu->GetMenuItems();
+    for (wxMenuItemList::iterator it = items.begin(); it != items.end(); ++it) {
+        wxMenuItem* item = *it;
+        if (!item || item->IsSeparator())
+            continue;
+
+        if (item->IsSubMenu()) {
+            if (SearchAndActivateMenuItem(item->GetSubMenu(), mnemonic, depth + 1))
+                return true;
+        } else {
+            wxChar item_mnemonic = 0;
+            wxString full_label = item->GetItemLabel();
+            int mnemonic_pos = full_label.Find('&');
+            if (mnemonic_pos != wxNOT_FOUND && mnemonic_pos + 1 < (int)full_label.length())
+                item_mnemonic = wxToupper(full_label[mnemonic_pos + 1]);
+            else if (!item->GetItemLabelText().IsEmpty())
+                item_mnemonic = wxToupper(item->GetItemLabelText()[0]);
+
+            if (item_mnemonic && item_mnemonic == mnemonic) {
+                wxCommandEvent event(wxEVT_MENU, item->GetId());
+                event.SetEventObject(menu);
+                wxTheApp->GetTopWindow()->GetEventHandler()->ProcessEvent(event);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 int wxvbamApp::FilterEvent(wxEvent& event)
 {
     if (!frame) {
@@ -1453,6 +2333,168 @@ int wxvbamApp::FilterEvent(wxEvent& event)
     }
 
     if (event.GetEventType() == wxEVT_KEY_DOWN || event.GetEventType() == wxEVT_KEY_UP) {
+#ifdef __WXGTK__
+        // Keep menubar mnemonics visible when Alt is released
+        // GTK hides them by default on Alt release
+        if (event.GetEventType() == wxEVT_KEY_UP) {
+            wxKeyEvent& key_event = static_cast<wxKeyEvent&>(event);
+            int key_code = key_event.GetKeyCode();
+            if (key_code == WXK_ALT || key_code == WXK_RAW_CONTROL) {
+                wxMenuBar* menubar = frame->GetMenuBar();
+                if (menubar) {
+                    GtkWidget* menubar_widget = menubar->GetHandle();
+                    if (menubar_widget)
+                        EnsureMnemonicsVisible(menubar_widget);
+                }
+            }
+        }
+#endif
+        // If menus are open, handle menu item mnemonics recursively
+        if (!frame->CanProcessShortcuts()) {
+            if (event.GetEventType() == wxEVT_KEY_DOWN) {
+                wxKeyEvent& key_event = static_cast<wxKeyEvent&>(event);
+                int key_code = key_event.GetKeyCode();
+
+                // Check for Esc to close menu
+                if (key_code == WXK_ESCAPE) {
+#ifdef __WXGTK__
+                    // On GTK, remove the grab and close the menu
+                    wxMenuBar* menubar = frame->GetMenuBar();
+                    if (menubar) {
+                        GtkWidget* menubar_widget = menubar->GetHandle();
+                        if (menubar_widget) {
+                            gtk_grab_remove(menubar_widget);
+                            GtkMenuShell* menu_shell = GTK_MENU_SHELL(menubar_widget);
+                            gtk_menu_shell_deselect(menu_shell);
+                            gtk_menu_shell_cancel(menu_shell);
+                        }
+                    }
+#endif
+                    // Mark menus as closed
+                    frame->SetMenusOpened(false);
+                    return wxEventFilter::Event_Processed;
+                }
+
+                // Arrow keys and Enter are handled by HandleMenuKeyboardNavigation on GTK
+                // Just skip them here to let the GTK handler process them
+                if (key_code == WXK_UP || key_code == WXK_DOWN || key_code == WXK_LEFT ||
+                    key_code == WXK_RIGHT || key_code == WXK_RETURN) {
+                    return wxEventFilter::Event_Skip;
+                }
+
+                // Letter/number keys are handled by HandleMenuKeyboardNavigation on GTK
+#ifdef __WXGTK__
+                // Let the GTK handler process letter keys for menu mnemonics
+                return wxEventFilter::Event_Skip;
+#else
+                // Non-GTK fallback: search all menus for matching mnemonic
+                if ((key_code >= 'A' && key_code <= 'Z') || (key_code >= 'a' && key_code <= 'z') ||
+                    (key_code >= '0' && key_code <= '9')) {
+                    wxChar letter = wxToupper(static_cast<wxChar>(key_code));
+                    wxMenuBar* menubar = frame->GetMenuBar();
+                    if (menubar) {
+                        for (size_t i = 0; i < menubar->GetMenuCount(); i++) {
+                            wxMenu* menu = menubar->GetMenu(i);
+                            if (menu && SearchAndActivateMenuItem(menu, letter))
+                                return wxEventFilter::Event_Processed;
+                        }
+                    }
+                }
+#endif
+            }
+            return wxEventFilter::Event_Skip;
+        }
+
+#ifndef __WXMAC__
+        // On non-macOS platforms, check if this is an Alt+letter menu mnemonic BEFORE calling ProcessKeyEvent.
+        if (event.GetEventType() == wxEVT_KEY_DOWN) {
+            wxKeyEvent& key_event = static_cast<wxKeyEvent&>(event);
+            if (key_event.AltDown() && !key_event.ControlDown() && !key_event.ShiftDown()) {
+                int key_code = key_event.GetKeyCode();
+                if ((key_code >= 'A' && key_code <= 'Z') || (key_code >= 'a' && key_code <= 'z')) {
+                    wxMenuBar* menubar = frame->GetMenuBar();
+                    if (menubar && frame->CanProcessShortcuts()) {
+                        wxChar letter = wxToupper(static_cast<wxChar>(key_code));
+                        for (size_t i = 0; i < menubar->GetMenuCount(); i++) {
+                            wxString label = menubar->GetMenuLabel(i);
+                            int mnemonic_pos = label.Find('&');
+                            if (mnemonic_pos != wxNOT_FOUND && mnemonic_pos + 1 < (int)label.length()) {
+                                wxChar mnemonic = wxToupper(label[mnemonic_pos + 1]);
+                                if (mnemonic == letter) {
+#ifdef __WXGTK__
+                                    GtkWidget* menubar_widget = menubar->GetHandle();
+                                    if (menubar_widget && GTK_IS_MENU_BAR(menubar_widget)) {
+                                        GtkMenuShell* menu_shell = GTK_MENU_SHELL(menubar_widget);
+
+                                        // Force mnemonic underlines to be visible
+                                        EnsureMnemonicsVisible(menubar_widget);
+
+                                        // Install keyboard navigation handler and disable GTK's default
+                                        g_signal_connect(menubar_widget, "key-press-event",
+                                                        G_CALLBACK(HandleMenuKeyboardNavigation), frame);
+                                        DisableTakeFocusAndShowMnemonics(menu_shell, menubar_widget);
+
+                                        // Setup submenus
+                                        GList* menubar_children = gtk_container_get_children(GTK_CONTAINER(menu_shell));
+                                        for (GList* l = menubar_children; l != NULL; l = l->next) {
+                                            GtkWidget* menu_item_widget = GTK_WIDGET(l->data);
+                                            if (GTK_IS_MENU_ITEM(menu_item_widget)) {
+                                                GtkWidget* submenu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(menu_item_widget));
+                                                if (submenu && GTK_IS_MENU(submenu)) {
+                                                    DisableTakeFocusAndShowMnemonics(GTK_MENU_SHELL(submenu), menubar_widget);
+                                                    g_signal_connect(submenu, "key-press-event",
+                                                                    G_CALLBACK(HandleMenuKeyboardNavigation), frame);
+
+                                                    // Setup sub-submenus and enable underlines
+                                                    GList* menu_children = gtk_container_get_children(GTK_CONTAINER(submenu));
+                                                    for (GList* m = menu_children; m != NULL; m = m->next) {
+                                                        GtkWidget* item = GTK_WIDGET(m->data);
+                                                        if (GTK_IS_MENU_ITEM(item)) {
+                                                            GtkWidget* sub_submenu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(item));
+                                                            if (sub_submenu && GTK_IS_MENU(sub_submenu))
+                                                                DisableTakeFocusAndShowMnemonics(GTK_MENU_SHELL(sub_submenu), menubar_widget);
+
+                                                            GtkWidget* item_label = gtk_bin_get_child(GTK_BIN(item));
+                                                            if (item_label && GTK_IS_LABEL(item_label)) {
+                                                                gtk_label_set_use_underline(GTK_LABEL(item_label), TRUE);
+                                                                gtk_label_set_mnemonic_widget(GTK_LABEL(item_label), item);
+                                                            }
+                                                        }
+                                                    }
+                                                    g_list_free(menu_children);
+                                                }
+                                            }
+                                        }
+                                        g_list_free(menubar_children);
+
+                                        // Select the target menu
+                                        GList* children = gtk_container_get_children(GTK_CONTAINER(menu_shell));
+                                        if (children && g_list_length(children) > i) {
+                                            GtkWidget* menu_item = GTK_WIDGET(g_list_nth_data(children, i));
+                                            if (menu_item && GTK_IS_MENU_ITEM(menu_item)) {
+                                                gtk_widget_set_can_focus(menubar_widget, TRUE);
+                                                gtk_widget_grab_focus(menubar_widget);
+                                                gtk_grab_add(menubar_widget);
+                                                gtk_menu_shell_select_first(menu_shell, TRUE);
+                                                SelectMenuItemWithoutKeyboardMode(menu_shell, menu_item, menu_shell);
+                                            }
+                                        }
+                                        g_list_free(children);
+                                    }
+                                    return wxEventFilter::Event_Skip;
+#elif defined(__WXMSW__)
+                                    HWND hwnd = (HWND)frame->GetHandle();
+                                    ::PostMessage(hwnd, WM_SYSCOMMAND, SC_KEYMENU, (LPARAM)letter);
+                                    return wxEventFilter::Event_Processed;
+#endif
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+#endif
         // Handle keyboard input events here to generate user input events.
         keyboard_input_handler_.ProcessKeyEvent(static_cast<wxKeyEvent&>(event));
         return wxEventFilter::Event_Skip;
