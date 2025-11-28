@@ -501,9 +501,9 @@ void gbcfilter_pal_888(uint32_t* buf, int count)
 
         // Extract original 5-bit R, G, B values from the shifted positions in the 32-bit pixel.
         // These shifts pull out the 5-bit value from its shifted position (e.g., bits 3-7 for Red).
-        uint8_t original_r_val_8bit = (uint8_t)((pix >> systemRedShift) & 0xff);
-        uint8_t original_g_val_8bit = (uint8_t)((pix >> systemGreenShift) & 0xff);
-        uint8_t original_b_val_8bit = (uint8_t)((pix >> systemBlueShift) & 0xff);
+        uint8_t original_r_val_8bit = (uint8_t)((pix >> (systemRedShift - 3)) & 0xff);
+        uint8_t original_g_val_8bit = (uint8_t)((pix >> (systemGreenShift - 3)) & 0xff);
+        uint8_t original_b_val_8bit = (uint8_t)((pix >> (systemBlueShift - 3)) & 0xff);
 
 
         // Normalize to 0.0-1.0 for calculations
