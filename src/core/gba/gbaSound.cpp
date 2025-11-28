@@ -40,7 +40,7 @@ extern bool stopState; // TODO: silence sound when true
 
 int const SOUND_CLOCK_TICKS_ = 280896; // ~1074 samples per frame
 
-static uint16_t soundFinalWave[4096];
+static uint16_t soundFinalWave[2048];
 long soundSampleRate = 44100;
 bool g_gbaSoundInterpolation = true;
 bool soundPaused = true;
@@ -341,9 +341,26 @@ static void end_frame(blip_time_t time)
 #ifdef __LIBRETRO__
 void flush_samples(Multi_Buffer* buffer)
 {
-    int numSamples = buffer->read_samples((blip_sample_t*)soundFinalWave, buffer->samples_avail());
-    soundDriver->write(soundFinalWave, numSamples);
-    systemOnWriteDataToSoundBuffer(soundFinalWave, numSamples);
+    int numSamples = buffer->samples_avail();
+    if ((numSamples * 2) > sizeof(soundFinalWave)) {
+        // when there is more than 1-frame worth of samples, we
+        // split it so as not to overflow our buffer.
+        // Flush samples 2048 samples at a time
+        while (numSamples > 2048) {
+            buffer->read_samples((blip_sample_t*)soundFinalWave, 2048);
+            soundDriver->write(soundFinalWave, 2048);
+            numSamples -= 2048;
+        }
+        if (numSamples) {
+            // flush remaining samples
+            buffer->read_samples((blip_sample_t*)soundFinalWave, numSamples);
+            soundDriver->write(soundFinalWave, numSamples);
+        }
+    } else {
+        buffer->read_samples((blip_sample_t*)soundFinalWave, numSamples);
+        soundDriver->write(soundFinalWave, numSamples);
+        systemOnWriteDataToSoundBuffer(soundFinalWave, numSamples);
+    }
 }
 #else
 void flush_samples(Multi_Buffer* buffer)
@@ -369,6 +386,8 @@ void flush_samples(Multi_Buffer* buffer)
         soundDriver->write(soundFinalWave, soundBufferLen);
         systemOnWriteDataToSoundBuffer(soundFinalWave, soundBufferLen);
     }
+    int remain = buffer->samples_avail();
+    if (remain) log("samples remaining\n", remain);
 }
 #endif // ! __LIBRETRO__
 
