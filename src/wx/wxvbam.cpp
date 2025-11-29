@@ -27,6 +27,8 @@
 #include <wx/protocol/http.h>
 #include <wx/regex.h>
 #include <wx/spinctrl.h>
+#include <wx/textctrl.h>
+#include <wx/combobox.h>
 #include <wx/sstream.h>
 #include <wx/stdpaths.h>
 #include <wx/string.h>
@@ -38,6 +40,8 @@
 #include <wx/zipstrm.h>
 
 #include "components/user_config/user_config.h"
+#include "core/base/system.h"
+#include "core/gb/gbGlobals.h"
 #include "core/gba/gbaSound.h"
 #include "wx/gb-builtin-over.h"
 #include "wx/builtin-over.h"
@@ -1149,12 +1153,49 @@ void MainFrame::OnIconize(wxIconizeEvent& event)
     }
 }
 
+// Get system name string for the currently loaded ROM
+// Returns "GBA", "GBC", "SGB", or "GB" based on the ROM type
+static wxString GetSystemName(GameArea* panel) {
+    if (!panel)
+        return wxT("GBA");
+
+    IMAGE_TYPE game_type = panel->game_type();
+    if (game_type == IMAGE_GBA)
+        return wxT("GBA");
+
+    // For Game Boy ROMs, check for GBC and SGB modes
+    if (game_type == IMAGE_GB) {
+        if (gbCgbMode)
+            return wxT("GBC");
+        if (gbSgbMode)
+            return wxT("SGB");
+        return wxT("GB");
+    }
+
+    return wxT("GBA");
+}
+
 wxString MainFrame::GetGamePath(wxString path)
 {
     wxString game_path = path;
 
+    // Expand %s to system name (GBA, GBC, SGB, or GB)
+    if (game_path.Contains(wxT("%s"))) {
+        wxString system_name = GetSystemName(panel);
+        game_path.Replace(wxT("%s"), system_name);
+    }
+
     if (game_path.size()) {
         game_path = wxGetApp().GetAbsolutePath(game_path);
+        // Try to create the directory if it doesn't exist
+        if (!wxFileName::DirExists(game_path)) {
+            if (!wxFileName::Mkdir(game_path, 0777, wxPATH_MKDIR_FULL)) {
+                wxMessageBox(
+                    wxString::Format(_("Could not create directory:\n%s\n\nPlease check your configured path in Options > Directories."), game_path),
+                    _("Directory Error"),
+                    wxOK | wxICON_ERROR);
+            }
+        }
     } else {
         game_path = panel->game_dir();
         wxFileName::Mkdir(game_path, 0777, wxPATH_MKDIR_FULL);
@@ -2333,6 +2374,13 @@ int wxvbamApp::FilterEvent(wxEvent& event)
     }
 
     if (event.GetEventType() == wxEVT_KEY_DOWN || event.GetEventType() == wxEVT_KEY_UP) {
+        // Skip keyboard processing when focus is on a text entry control
+        // to allow typing special characters like %
+        wxWindow* focused = wxWindow::FindFocus();
+        if (focused && (wxDynamicCast(focused, wxTextCtrl) ||
+                        wxDynamicCast(focused, wxComboBox))) {
+            return wxEventFilter::Event_Skip;
+        }
 #ifdef __WXGTK__
         // Keep menubar mnemonics visible when Alt is released
         // GTK hides them by default on Alt release

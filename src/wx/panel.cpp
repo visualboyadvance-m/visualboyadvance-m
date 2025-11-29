@@ -756,26 +756,72 @@ void GameArea::SetFrameTitle()
     wxGetApp().frame->SetTitle(tit);
 }
 
+// Get system name string for the currently loaded ROM
+// Returns "GBA", "GBC", "SGB", or "GB" based on the ROM type
+static wxString GetCurrentSystemName(IMAGE_TYPE game_type) {
+    if (game_type == IMAGE_GBA)
+        return wxT("GBA");
+
+    // For Game Boy ROMs, check for GBC and SGB modes
+    if (game_type == IMAGE_GB) {
+        if (gbCgbMode)
+            return wxT("GBC");
+        if (gbSgbMode)
+            return wxT("SGB");
+        return wxT("GB");
+    }
+
+    return wxT("GBA");
+}
+
+// Expand %s in path to system name (GBA, GBC, SGB, or GB)
+static wxString ExpandSystemPath(const wxString& path, IMAGE_TYPE game_type) {
+    wxString result = path;
+    if (result.Contains(wxT("%s"))) {
+        wxString system_name = GetCurrentSystemName(game_type);
+        result.Replace(wxT("%s"), system_name);
+    }
+    return result;
+}
+
 void GameArea::recompute_dirs()
 {
-    batdir = OPTION(kGenBatteryDir);
+    batdir = ExpandSystemPath(OPTION(kGenBatteryDir), loaded);
 
     if (batdir.empty()) {
         batdir = loaded_game.GetPathWithSep();
     } else {
         batdir = wxGetApp().GetAbsolutePath(batdir);
+        // Try to create the directory if it doesn't exist
+        if (!wxFileName::DirExists(batdir)) {
+            if (!wxFileName::Mkdir(batdir, 0777, wxPATH_MKDIR_FULL)) {
+                wxMessageBox(
+                    wxString::Format(_("Could not create Native Saves directory:\n%s\n\nPlease check your configured path in Options > Directories."), batdir),
+                    _("Directory Error"),
+                    wxOK | wxICON_ERROR);
+            }
+        }
     }
 
     if (!wxIsWritable(batdir)) {
         batdir = wxGetApp().GetDataDir();
     }
 
-    statedir = OPTION(kGenStateDir);
+    statedir = ExpandSystemPath(OPTION(kGenStateDir), loaded);
 
     if (statedir.empty()) {
         statedir = loaded_game.GetPathWithSep();
     } else {
         statedir = wxGetApp().GetAbsolutePath(statedir);
+        // Try to create the directory if it doesn't exist
+        if (!wxFileName::DirExists(statedir)) {
+            if (!wxFileName::Mkdir(statedir, 0777, wxPATH_MKDIR_FULL)) {
+                wxMessageBox(
+                    wxString::Format(_("Could not create Emulator Saves directory:\n%s\n\nPlease check your configured path in Options > Directories."), statedir),
+                    _("Directory Error"),
+                    wxOK | wxICON_ERROR);
+            }
+        }
     }
 
     if (!wxIsWritable(statedir)) {

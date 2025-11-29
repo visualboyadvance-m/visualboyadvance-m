@@ -62,7 +62,7 @@
           <object class="sizeritem">
             <object class="wxDirPickerCtrl" name="BatSaves">
               <message>Native Saves</message>
-              <style>wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST</style>
+              <style>wxDIRP_USE_TEXTCTRL</style>
             </object>
             <flag>wxALL|wxEXPAND</flag>
             <border>5</border>
@@ -77,7 +77,7 @@
           <object class="sizeritem">
             <object class="wxDirPickerCtrl" name="StateSaves">
               <message>Emulator Saves</message>
-              <style>wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST</style>
+              <style>wxDIRP_USE_TEXTCTRL</style>
             </object>
             <flag>wxALL|wxEXPAND</flag>
             <border>5</border>
@@ -92,7 +92,7 @@
           <object class="sizeritem">
             <object class="wxDirPickerCtrl" name="Screenshots">
               <message>Screenshots</message>
-              <style>wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST</style>
+              <style>wxDIRP_USE_TEXTCTRL</style>
             </object>
             <flag>wxALL|wxEXPAND</flag>
             <border>5</border>
@@ -107,7 +107,7 @@
           <object class="sizeritem">
             <object class="wxDirPickerCtrl" name="Recordings">
               <message>Recordings</message>
-              <style>wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST</style>
+              <style>wxDIRP_USE_TEXTCTRL</style>
             </object>
             <flag>wxALL|wxEXPAND</flag>
             <border>5</border>
@@ -117,6 +117,14 @@
         </object>
         <option>1</option>
         <flag>wxEXPAND</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label>Use %s in paths for the system name (GBA, GBC, SGB, or GB).</label>
+          <style>wxALIGN_LEFT</style>
+        </object>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
       </object>
       <object class="sizeritem">
         <object class="wxStdDialogButtonSizer">
