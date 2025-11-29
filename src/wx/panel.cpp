@@ -757,24 +757,24 @@ void GameArea::SetFrameTitle()
 }
 
 // Get system name string for the currently loaded ROM
-// Returns "GBA", "GBC", "SGB", or "GB" based on the ROM type
+// Returns expanded system name based on the ROM type
 static wxString GetCurrentSystemName(IMAGE_TYPE game_type) {
     if (game_type == IMAGE_GBA)
-        return wxT("GBA");
+        return wxT("GameBoy Advance");
 
     // For Game Boy ROMs, check for GBC and SGB modes
     if (game_type == IMAGE_GB) {
         if (gbCgbMode)
-            return wxT("GBC");
+            return wxT("GameBoy Color");
         if (gbSgbMode)
-            return wxT("SGB");
-        return wxT("GB");
+            return wxT("Super GameBoy");
+        return wxT("GameBoy");
     }
 
-    return wxT("GBA");
+    return wxT("GameBoy Advance");
 }
 
-// Expand %s in path to system name (GBA, GBC, SGB, or GB)
+// Expand %s in path to system name
 static wxString ExpandSystemPath(const wxString& path, IMAGE_TYPE game_type) {
     wxString result = path;
     if (result.Contains(wxT("%s"))) {

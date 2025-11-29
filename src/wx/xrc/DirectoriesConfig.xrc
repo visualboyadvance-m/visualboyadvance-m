@@ -120,7 +120,7 @@
       </object>
       <object class="sizeritem">
         <object class="wxStaticText">
-          <label>Use %s in paths for the system name (GBA, GBC, SGB, or GB).</label>
+          <label>Use %s in paths for the system name (GameBoy Advance, GameBoy Color, Super GameBoy, or GameBoy).</label>
           <style>wxALIGN_LEFT</style>
         </object>
         <flag>wxALL|wxEXPAND</flag>
