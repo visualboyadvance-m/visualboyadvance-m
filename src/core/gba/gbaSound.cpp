@@ -386,8 +386,6 @@ void flush_samples(Multi_Buffer* buffer)
         soundDriver->write(soundFinalWave, soundBufferLen);
         systemOnWriteDataToSoundBuffer(soundFinalWave, soundBufferLen);
     }
-    int remain = buffer->samples_avail();
-    if (remain) log("samples remaining\n", remain);
 }
 #endif // ! __LIBRETRO__
 
