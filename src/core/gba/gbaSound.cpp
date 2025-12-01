@@ -341,7 +341,7 @@ static void end_frame(blip_time_t time)
 #ifdef __LIBRETRO__
 void flush_samples(Multi_Buffer* buffer)
 {
-    int numSamples = buffer->samples_avail();
+    size_t numSamples = buffer->samples_avail();
     if ((numSamples * 2) > sizeof(soundFinalWave)) {
         // when there is more than 1-frame worth of samples, we
         // split it so as not to overflow our buffer.

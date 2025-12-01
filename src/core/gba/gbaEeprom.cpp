@@ -4,6 +4,7 @@
 
 #include "core/base/file_util.h"
 #include "core/gba/gba.h"
+#include "gbaEeprom.h"
 
 extern int cpuDmaCount;
 
@@ -17,6 +18,7 @@ uint8_t eepromData[SIZE_EEPROM_8K];
 uint8_t eepromBuffer[16];
 bool eepromInUse = false;
 int eepromSize = SIZE_EEPROM_512;
+uint32_t eepromMask = 0;
 
 variable_desc eepromSaveData[] = {
     { &eepromMode, sizeof(int) },
@@ -42,6 +44,11 @@ void eepromReset()
     eepromByte = 0;
     eepromBits = 0;
     eepromAddress = 0;
+}
+
+void eepromSetSize(int size) {
+    eepromSize = size;
+    eepromMask = (gbaGetRomSize() > (16 * 1024 * 1024)) ? 0x01FFFF00 : 0x01000000;
 }
 
 #ifdef __LIBRETRO__
@@ -145,8 +152,8 @@ void eepromWrite(uint32_t /* address */, uint8_t value)
         }
         if (cpuDmaCount == 0x11 || cpuDmaCount == 0x51) {
             if (eepromBits == 0x11) {
+                eepromSetSize(SIZE_EEPROM_8K);
                 eepromInUse = true;
-                eepromSize = SIZE_EEPROM_8K;
                 eepromAddress = ((eepromBuffer[0] & 0x3F) << 8) | ((eepromBuffer[1] & 0xFF));
                 if (!(eepromBuffer[0] & 0x40)) {
                     eepromBuffer[0] = (uint8_t)bit;
@@ -161,6 +168,7 @@ void eepromWrite(uint32_t /* address */, uint8_t value)
             }
         } else {
             if (eepromBits == 9) {
+                eepromSetSize(SIZE_EEPROM_512);
                 eepromInUse = true;
                 eepromAddress = (eepromBuffer[0] & 0x3F);
                 if (!(eepromBuffer[0] & 0x40)) {

@@ -20,8 +20,10 @@ extern int eepromRead(uint32_t address);
 extern void eepromWrite(uint32_t address, uint8_t value);
 extern void eepromInit();
 extern void eepromReset();
+extern void eepromSetSize(int size);
 extern bool eepromInUse;
 extern int eepromSize;
+extern uint32_t eepromMask;
 
 #define EEPROM_IDLE 0
 #define EEPROM_READADDRESS 1

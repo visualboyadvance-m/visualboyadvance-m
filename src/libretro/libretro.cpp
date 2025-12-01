@@ -797,21 +797,27 @@ static const ini_t gbaover[512] = {
    signatures found in commercial GBA titles.
    They must be explicitly detected by name or unique byte strings.
    -------------------------------------------------------------- */
-static bool find_string(const uint8_t *buf, size_t size, const char *str) {
-    int i, j;
-    int len = 0;
+bool find_string(const uint8_t* buf, size_t size, const char* str) {
+    if (!buf || !str) return false;
 
-    while (str[len]) len++;
+    size_t len = strlen(str);
+    if (len == 0 || size < len) return false;
 
-    for (i = 0; i <= size - len; i++) {
-        for (j = 0; j < len; j++) {
-            if (buf[i + j] != (unsigned char)str[j])
-                break;
-        }
-        if (j == len)
-            return true; /* found */
+    // Build bad-character shift table
+    size_t shift[256];
+    for (size_t i = 0; i < 256; ++i) shift[i] = len;
+    for (size_t i = 0; i < len - 1; ++i)
+        shift[(unsigned char)str[i]] = len - 1 - i;
+
+    size_t i = 0;
+    while (i <= size - len) {
+        size_t j = len - 1;
+        while (j < len && buf[i + j] == (unsigned char)str[j])
+            if (j-- == 0) return true; // found
+        i += shift[buf[i + len - 1]];
     }
-    return false; /* not found */
+
+    return false;
 }
 
 static int romSize = 0;
@@ -828,13 +834,16 @@ static void load_image_preferences(void)
     };
 
     bool found = false;
+    int saveType;
+    int saveSize;
+    bool hasRtc;
     bool hasRumble = false;
     char buffer[12 + 1];
     unsigned i = 0, found_no = 0;
     unsigned long romCrc32 = crc32(0, g_rom, romSize);
 
     coreOptions.saveType = GBA_SAVE_AUTO;
-    g_flashSize = SIZE_FLASH512;
+    g_flashSize = SIZE_FLASH1M;
     eepromSize = SIZE_EEPROM_512;
     coreOptions.rtcEnabled = false;
     coreOptions.mirroringEnable = false;
@@ -869,20 +878,10 @@ static void load_image_preferences(void)
     if (found) {
         log("Name            : %s\n", gbaover[found_no].romtitle);
 
-        coreOptions.rtcEnabled = gbaover[found_no].rtcEnabled;
-        coreOptions.saveType = gbaover[found_no].saveType;
-
-        unsigned size = gbaover[found_no].saveSize;
-        if (coreOptions.saveType == GBA_SAVE_SRAM)
-            g_flashSize = SIZE_SRAM;
-        else if (coreOptions.saveType == GBA_SAVE_FLASH)
-            g_flashSize = (size == SIZE_FLASH1M) ? SIZE_FLASH1M : SIZE_FLASH512;
-        else if ((coreOptions.saveType == GBA_SAVE_EEPROM) || (coreOptions.saveType == GBA_SAVE_EEPROM_SENSOR))
-            eepromSize = (size == SIZE_EEPROM_8K) ? SIZE_EEPROM_8K : SIZE_EEPROM_512;
+        saveType = gbaover[found_no].saveType;
+        saveSize = gbaover[found_no].saveSize;
+        hasRtc   = gbaover[found_no].rtcEnabled;
     }
-
-    // gameID that starts with 'F' are classic/famicom games
-    coreOptions.mirroringEnable = (buffer[0] == 'F') ? true : false;
 
     /* --------------------------------------------------------------
        SHANTAE ADVANCE (PROTOTYPE)  —  VERY RARE CASE
@@ -892,26 +891,40 @@ static void load_image_preferences(void)
     if (find_string(g_rom, romSize, "Shantae Advance") ||
         find_string(g_rom, romSize, "Shantae") /* fallback */ )
     {
-        coreOptions.saveType = GBA_SAVE_SRAM; /* SRAM */
-        g_flashSize = SIZE_SRAM;
+        saveType = GBA_SAVE_SRAM; /* SRAM */
+        saveSize = SIZE_SRAM;
     } else if (!coreOptions.saveType) {
         flashDetectSaveType(romSize);
     }
 
-    if (g_flashSize == SIZE_FLASH512 || g_flashSize == SIZE_FLASH1M)
-        flashSetSize(g_flashSize);
+    switch (saveType) {
+    case GBA_SAVE_SRAM:
+        coreOptions.saveType = GBA_SAVE_SRAM;
+        g_flashSize = SIZE_SRAM;
+        break;
+    case GBA_SAVE_FLASH:
+        coreOptions.saveType = GBA_SAVE_FLASH;
+        flashSetSize(saveSize);
+        break;
+    case GBA_SAVE_EEPROM:
+    case GBA_SAVE_EEPROM_SENSOR:
+        coreOptions.saveType = saveType;
+        eepromSetSize(saveSize);
+        break;
+    }
 
     if (option_forceRTCenable)
-        coreOptions.rtcEnabled = true;
-
+        hasRtc = true;
+    
+    coreOptions.rtcEnabled = hasRtc;
     rtcEnable(coreOptions.rtcEnabled);
 
     // game code starting with 'R' or 'V' has rumble support
-    if ((buffer[0] == 'R') || (buffer[0] == 'V'))
-        hasRumble = true;
-
+    if ((buffer[0] == 'R') || (buffer[0] == 'V')) hasRumble = true;
     rtcEnableRumble(!coreOptions.rtcEnabled && hasRumble);
 
+    // gameID that starts with 'F' are classic/famicom games
+    coreOptions.mirroringEnable = (buffer[0] == 'F') ? true : false;
     doMirroring(coreOptions.mirroringEnable);
 
     log("romSize         : %dKB\n", (romSize + 1023) / 1024);
