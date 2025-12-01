@@ -345,7 +345,9 @@ debian_installdeps() {
         sdl_lib=$(apt-cache search libsdl3-dev | grep libsdl3-dev | awk '{ print $1 }')
         [ -z "$sdl_lib" ] && sdl_lib=libsdl2-dev
 
-        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev $sdl_lib libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev $glew_lib $wx_libs libgtk2.0-dev libgtk-3-dev ccache zip ninja-build libopenal-dev"
+        faudio_lib=$(apt-cache search libfaudio-dev | grep libfaudio-dev | awk '{ print $1 }')
+
+        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev $sdl_lib libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev $glew_lib $wx_libs libgtk2.0-dev libgtk-3-dev ccache zip ninja-build libopenal-dev $faudio_lib"
 
         [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs libavcodec-dev libavformat-dev libswscale-dev libavutil-dev $libswresample_dev libx264-dev libx265-dev"
 
