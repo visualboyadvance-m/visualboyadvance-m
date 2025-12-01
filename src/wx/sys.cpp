@@ -1437,6 +1437,7 @@ void log(const char* defaultMsg, ...)
     wxGetApp().log.append(msg);
 
     if (wxGetApp().IsMainLoopRunning()) {
+        // Only update if the log dialog has already been created (don't lazy-load here)
         LogDialog* d = wxGetApp().frame->logdlg.get();
 
         if (d && d->IsShown()) {

@@ -33,7 +33,7 @@
 #include "wx/widgets/utils.h"
 
 #define GetXRCDialog(n) \
-    wxStaticCast(wxGetApp().frame->FindWindowByName(n), wxDialog)
+    wxGetApp().frame->LoadDialog(n)
 
 void RefreshFrame(void)
 {
@@ -1841,7 +1841,7 @@ EVT_HANDLER_MASK(Disassemble, "Disassemble...", CMDEN_GB | CMDEN_GBA)
 
 EVT_HANDLER(Logging, "Logging...")
 {
-    wxDialog* dlg = wxGetApp().frame->logdlg.get();
+    wxDialog* dlg = wxGetApp().frame->GetLogDialog();
     dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
     dlg->Show();
     dlg->Raise();

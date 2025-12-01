@@ -713,7 +713,7 @@ bool wxvbamApp::OnInit() {
             ForceMenubarMnemonicsVisible(menubar_widget);
         }
     }
-#endif  
+#endif
 
 
 #ifndef NO_ONLINEUPDATES

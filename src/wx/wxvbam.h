@@ -5,6 +5,7 @@
 #include <ctime>
 #include <list>
 #include <memory>
+#include <set>
 #include <stdexcept>
 #include <iostream>
 
@@ -202,6 +203,9 @@ public:
     ~MainFrame() override;
 
     bool BindControls();
+    // Lazy dialog loading - each dialog loaded on first access
+    wxDialog* LoadDialog(const wxString& name);  // Load and initialize a dialog by name
+    std::set<wxString> dialogs_initialized_;
     void MenuOptionIntMask(const wxString& menuName, int field, int mask);
     void MenuOptionIntRadioValue(const wxString& menuName, int field, int mask);
     void MenuOptionBool(const wxString& menuName, bool field);
@@ -282,6 +286,7 @@ public:
     // this won't actually be destroyed, but it needs to be tracked so only
     // one is ever up and it needs to be pinged when new messages arrive
     std::unique_ptr<LogDialog> logdlg;
+    LogDialog* GetLogDialog();  // Lazy-load the log dialog
 
     // the cheat search dialog isn't destroyed or tracked, but it needs
     // to be cleared between games

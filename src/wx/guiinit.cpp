@@ -1981,6 +1981,7 @@ bool MainFrame::BindControls()
         MenuOptionBool("ExternalTranslations", OPTION(kExternalTranslations));
     }
 
+
     for (size_t i = 0; i < checkable_mi.size(); i++) {
         if (!checkable_mi[i].initialized) {
             wxLogError(_("Invalid menu item %s; removing"),
@@ -1991,58 +1992,86 @@ bool MainFrame::BindControls()
     }
 
     ResetMenuAccelerators();
-
-    // preload and verify all resource dialogs
-    // this will take init time and memory, but catches errors in xrc sooner
-    // note that the only verification done is to ensure no crashes.  It's the
-    // user's responsibility to ensure that the GUI works as intended after
-    // modifications
-    try {
-        wxDialog* d = NULL;
-        //// displayed during run
-        d = LoadXRCDialog("GBPrinter");
-        // just verify preview window & mag sel present
-        {
-            wxPanel* prev;
-            prev = SafeXRCCTRL<wxPanel>(d, "Preview");
-
-            if (!wxDynamicCast(prev->GetParent(), wxScrolledWindow))
-                throw std::runtime_error("Unable to load a dialog control from the builtin xrc file: Preview");
-
-            SafeXRCCTRL<wxControlWithItems>(d, "Magnification");
-            d->Fit();
-        }
-        //// File menu
-        d = LoadXRCDialog("GBAROMInfo");
-        // just verify fields present
-        wxControl* lab;
-#define getlab(n) lab = SafeXRCCTRL<wxControl>(d, n)
-        getlab("Title");
-        getlab("GameCode");
-        getlab("MakerCode");
-        getlab("MakerName");
-        getlab("UnitCode");
-        getlab("DeviceType");
-        getlab("Version");
-        getlab("CRC");
-        d->Fit();
-        dialogs::GbRomInfo::NewInstance(this);
-        d = LoadXRCDialog("CodeSelect");
-        // just verify list present
-        SafeXRCCTRL<wxControlWithItems>(d, "CodeList");
-        d->Fit();
-        d = LoadXRCDialog("ExportSPS");
-        // just verify text fields present
-        SafeXRCCTRL<wxTextCtrl>(d, "Title");
-        SafeXRCCTRL<wxTextCtrl>(d, "Description");
-        SafeXRCCTRL<wxTextCtrl>(d, "Notes");
-        d->Fit();
-//// Emulation menu
-#ifndef NO_LINK
-        d = LoadXRCDialog("NetLink");
+// activate OnDropFile event handler
+#if !defined(__WXGTK__) || wxCHECK_VERSION(2, 8, 10)
+    // may not actually do anything, but verfied to work w/ Linux/Nautilus
+    DragAcceptFiles(true);
 #endif
-        wxRadioButton* rb;
-#define getrbo(name, option_id, value)                            \
+
+    // delayed fullscreen
+    if (wxGetApp().pending_fullscreen) {
+        panel->ShowFullScreen(true);
+    }
+
+#ifndef NO_LINK
+    LinkMode link_mode = GetConfiguredLinkMode();
+
+    if (link_mode == LINK_GAMECUBE_DOLPHIN) {
+        bool isv = !gopts.link_host.empty();
+
+        if (isv) {
+            isv = SetLinkServerHost(gopts.link_host.utf8_str());
+        }
+
+        if (!isv) {
+            wxLogError(_("JoyBus host invalid; disabling"));
+        } else {
+            link_mode = LINK_DISCONNECTED;
+        }
+    }
+
+    ConnectionState linkState = InitLink(link_mode);
+
+    if (linkState != LINK_OK) {
+        CloseLink();
+    }
+
+    if (GetLinkMode() != LINK_DISCONNECTED) {
+        cmd_enable |= CMDEN_LINK_ANY;
+        SetLinkTimeout(gopts.link_timeout);
+        EnableSpeedHacks(OPTION(kGBALinkFast));
+    }
+
+    EnableNetworkMenu();
+#endif
+    enable_menus();
+    panel->SetFrameTitle();
+    // All OK; activate idle loop
+    panel->SetExtraStyle(panel->GetExtraStyle() | wxWS_EX_PROCESS_IDLE);
+
+    // Re-adjust size now to nudge some sense into Widgets.
+    panel->AdjustSize(false);
+
+    // Frame initialization is complete.
+    init_complete_ = true;
+
+    return true;
+}
+
+// Load and initialize a dialog by name (lazy loading)
+wxDialog* MainFrame::LoadDialog(const wxString& name)
+{
+    // Check if already initialized
+    if (dialogs_initialized_.count(name)) {
+        return wxStaticCast(FindWindowByName(name), wxDialog);
+    }
+
+    wxMenuBar* menubar = GetMenuBar();
+
+    // Helper macros for dialog setup
+    wxDialog* d = NULL;
+    wxControl* lab = nullptr;
+    wxRadioButton* rb = nullptr;
+    wxTextCtrl* tc = nullptr;
+    wxSpinCtrl* sc = nullptr;
+    wxChoice* ch = nullptr;
+    wxFilePickerCtrl* fp = nullptr;
+    [[maybe_unused]] wxBoolEnValidator* benval = nullptr;
+    [[maybe_unused]] wxBoolEnHandler* ben = nullptr;
+    [[maybe_unused]] wxBoolRevEnValidator* brenval = nullptr;
+
+#define getlab(n) lab = SafeXRCCTRL<wxControl>(d, n)
+#define getrbo(name, option_id, value)                             \
     do {                                                           \
         rb = SafeXRCCTRL<wxRadioButton>(d, name);                  \
         rb->SetValidator(                                          \
@@ -2053,8 +2082,6 @@ bool MainFrame::BindControls()
         rb = SafeXRCCTRL<wxRadioButton>(d, n);       \
         rb->SetValidator(wxBoolIntValidator(&o, v)); \
     } while (0)
-        [[maybe_unused]] wxBoolEnValidator* benval;
-        [[maybe_unused]] wxBoolEnHandler* ben;
 #define getbe(n, o, cv, t, wt)                                        \
     do {                                                              \
         cv = SafeXRCCTRL<t>(d, n);                                    \
@@ -2064,9 +2091,6 @@ bool MainFrame::BindControls()
         ben = &_ben;                                                  \
         wx##wt##BoolEnHandlerConnect(cv, wxID_ANY, _ben);             \
     } while (0)
-        // brenval & friends are here just to allow yes/no radioboxes in place
-        // of checkboxes.  A lot of work for little benefit.
-        [[maybe_unused]] wxBoolRevEnValidator* brenval;
 #define getbre(n, o, cv, t, wt)                                           \
     do {                                                                  \
         cv = SafeXRCCTRL<t>(d, n);                                        \
@@ -2099,7 +2123,6 @@ bool MainFrame::BindControls()
     } while (0)
 #define getrbbe(n, o) getbe(n, o, rb, wxRadioButton, RBE)
 #define getrbbd(n, o) getbre(n, o, rb, wxRadioButton, RBD)
-        wxTextCtrl* tc;
 #define gettc(n, o)                                           \
     do {                                                      \
         tc = SafeXRCCTRL<wxTextCtrl>(d, n);                   \
@@ -2110,54 +2133,133 @@ bool MainFrame::BindControls()
         tc = SafeXRCCTRL<wxTextCtrl>(d, n);                   \
         tc->SetValidator(wxUIntValidator(&o));                \
     } while (0)
-#ifndef NO_LINK
-        {
-            net_link_handler.dlg = d;
-            net_link_handler.n_players = gopts.link_num_players;
-            getrbbe("Server", net_link_handler.server);
-            getrbbd("Client", net_link_handler.server);
-            getlab("PlayersLab");
-            addrber(lab, false);
-            getrbi("Link2P", net_link_handler.n_players, 2);
-            addrber(rb, false);
-            getrbi("Link3P", net_link_handler.n_players, 3);
-            addrber(rb, false);
-            getrbi("Link4P", net_link_handler.n_players, 4);
-            addrber(rb, false);
-            getlab("ServerIPLab");
-            gettc("ServerIP", gopts.link_host);
-            getutc("ServerPort", gopts.link_port);
-            wxWindow* okb = d->FindWindow(wxID_OK);
+#define getsc(n, o)                               \
+    do {                                          \
+        sc = SafeXRCCTRL<wxSpinCtrl>(d, n);       \
+        sc->SetValidator(wxGenericValidator(&o)); \
+    } while (0)
+#define getsc_uint(n, o)                          \
+    do {                                          \
+        sc = SafeXRCCTRL<wxSpinCtrl>(d, n);       \
+        sc->SetValidator(wxUIntValidator(&o));    \
+    } while (0)
+#define getfp(n, o, l)                                     \
+    do {                                                   \
+        fp = SafeXRCCTRL<wxFilePickerCtrl>(d, n);          \
+        fp->SetValidator(wxFileDirPickerValidator(&o, l)); \
+    } while (0)
+#define getgbaw(n)                             \
+    do {                                       \
+        wxWindow* w = d->FindWindow(XRCID(n)); \
+        CheckThrowXRCError(w, n);              \
+        w->SetValidator(GBACtrlEnabler());     \
+    } while (0)
 
-            if (okb) // may be gone if style guidlines removed it
-            {
-                net_link_handler.okb = wxStaticCast(okb, wxButton);
-                d->Connect(XRCID("Server"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
-                    wxCommandEventHandler(NetLink_t::ServerOKButton),
-                    NULL, &net_link_handler);
-                d->Connect(XRCID("Client"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
-                    wxCommandEventHandler(NetLink_t::ClientOKButton),
-                    NULL, &net_link_handler);
-            }
+    try {
+        if (name == "GBPrinter") {
+            d = LoadXRCDialog("GBPrinter");
+            wxPanel* prev;
+            prev = SafeXRCCTRL<wxPanel>(d, "Preview");
 
-            // Bind server IP when the server radio button is selected.
-            d->Connect(XRCID("Server"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
-                wxCommandEventHandler(NetLink_t::BindServerIP),
-                NULL, &net_link_handler);
-            // Bind client link_host when client radio button is selected.
-            d->Connect(XRCID("Client"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
-                wxCommandEventHandler(NetLink_t::BindLinkHost),
-                NULL, &net_link_handler);
+            if (!wxDynamicCast(prev->GetParent(), wxScrolledWindow))
+                throw std::runtime_error("Unable to load a dialog control from the builtin xrc file: Preview");
 
-            // this should intercept wxID_OK before the dialog handler gets it
-            d->Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED,
-                wxCommandEventHandler(NetLink_t::NetConnect),
-                NULL, &net_link_handler);
+            SafeXRCCTRL<wxControlWithItems>(d, "Magnification");
             d->Fit();
         }
+        else if (name == "GBAROMInfo") {
+            d = LoadXRCDialog("GBAROMInfo");
+            getlab("Title");
+            getlab("GameCode");
+            getlab("MakerCode");
+            getlab("MakerName");
+            getlab("UnitCode");
+            getlab("DeviceType");
+            getlab("Version");
+            getlab("CRC");
+            d->Fit();
+        }
+        else if (name == "GBROMInfo") {
+            dialogs::GbRomInfo::NewInstance(this);
+            d = wxStaticCast(FindWindowByName(name), wxDialog);
+        }
+        else if (name == "CodeSelect") {
+            d = LoadXRCDialog("CodeSelect");
+            SafeXRCCTRL<wxControlWithItems>(d, "CodeList");
+            d->Fit();
+        }
+        else if (name == "ExportSPS") {
+            d = LoadXRCDialog("ExportSPS");
+            SafeXRCCTRL<wxTextCtrl>(d, "Title");
+            SafeXRCCTRL<wxTextCtrl>(d, "Description");
+            SafeXRCCTRL<wxTextCtrl>(d, "Notes");
+            d->Fit();
+        }
+#ifndef NO_LINK
+        else if (name == "NetLink") {
+            // NetLink and LinkConfig share ben/benval state, so initialize both together
+            d = LoadXRCDialog("NetLink");
+            {
+                net_link_handler.dlg = d;
+                net_link_handler.n_players = gopts.link_num_players;
+                getrbbe("Server", net_link_handler.server);
+                getrbbd("Client", net_link_handler.server);
+                getlab("PlayersLab");
+                addrber(lab, false);
+                getrbi("Link2P", net_link_handler.n_players, 2);
+                addrber(rb, false);
+                getrbi("Link3P", net_link_handler.n_players, 3);
+                addrber(rb, false);
+                getrbi("Link4P", net_link_handler.n_players, 4);
+                addrber(rb, false);
+                getlab("ServerIPLab");
+                gettc("ServerIP", gopts.link_host);
+                getutc("ServerPort", gopts.link_port);
+                wxWindow* okb = d->FindWindow(wxID_OK);
+
+                if (okb) {
+                    net_link_handler.okb = wxStaticCast(okb, wxButton);
+                    d->Connect(XRCID("Server"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
+                        wxCommandEventHandler(NetLink_t::ServerOKButton),
+                        NULL, &net_link_handler);
+                    d->Connect(XRCID("Client"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
+                        wxCommandEventHandler(NetLink_t::ClientOKButton),
+                        NULL, &net_link_handler);
+                }
+
+                d->Connect(XRCID("Server"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
+                    wxCommandEventHandler(NetLink_t::BindServerIP),
+                    NULL, &net_link_handler);
+                d->Connect(XRCID("Client"), wxEVT_COMMAND_RADIOBUTTON_SELECTED,
+                    wxCommandEventHandler(NetLink_t::BindLinkHost),
+                    NULL, &net_link_handler);
+                d->Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED,
+                    wxCommandEventHandler(NetLink_t::NetConnect),
+                    NULL, &net_link_handler);
+                d->Fit();
+            }
+            dialogs_initialized_.insert("NetLink");
+
+            // Also initialize LinkConfig since it shares ben/benval
+            {
+                wxDialog* d2 = LoadXRCDialog("LinkConfig");
+                getlab("LinkTimeoutLab");
+                addbe(lab);
+                getsc("LinkTimeout", gopts.link_timeout);
+                addbe(sc);
+                d2->Fit();
+                dialogs_initialized_.insert("LinkConfig");
+            }
+        }
+        else if (name == "LinkConfig") {
+            // LinkConfig requires NetLink to be initialized first (shared ben/benval)
+            // Calling LoadDialog for NetLink will also initialize LinkConfig
+            LoadDialog("NetLink");
+            d = wxStaticCast(FindWindowByName(name), wxDialog);
+        }
 #endif
-        d = LoadXRCDialog("CheatList");
-        {
+        else if (name == "CheatList") {
+            d = LoadXRCDialog("CheatList");
             cheat_list_handler.dlg = d;
             d->SetEscapeId(wxID_OK);
             wxCheckedListCtrl* cl;
@@ -2169,54 +2271,29 @@ bool MainFrame::BindControls()
             cheat_list_handler.list = cl;
             cl->SetValidator(CheatListFill());
             cl->InsertColumn(0, _("Code"));
-            // can't just set font for whole column; must set in each
-            // individual item
             wxFont of = cl->GetFont();
-            // of.SetFamily(wxFONTFAMILY_MODERN);  // doesn't work (no font change)
             wxFont f(of.GetPointSize(), wxFONTFAMILY_MODERN, of.GetStyle(),
                 of.GetWeight());
             cheat_list_handler.item0.SetFont(f);
             cheat_list_handler.item0.SetColumn(0);
             cl->InsertColumn(1, _("Description"));
-            // too bad I can't just set the size to windowwidth - other cols
-            // default width is header width, but using following will probably
-            // make it 80 pixels wide regardless
-            // cl->SetColumnWidth(1, wxLIST_AUTOSIZE_USEHEADER);
             cheat_list_handler.col1minw = cl->GetColumnWidth(1);
-            // on wxGTK, column 1 seems to inherit column 0's font regardless
-            // of requested font
             cheat_list_handler.item1.SetFont(cl->GetFont());
             cheat_list_handler.item1.SetColumn(1);
-#if 0
-            // the ideal way to set col 0's width would be to use
-            // wxLIST_AUTOSIZE after setting value to a sample:
-            cheat_list_handler.item0.SetText(wxT("00000000 00000000"));
-            cl->InsertItem(cheat_list_handler.item0);
-            cl->SetColumnWidth(0, wxLIST_AUTOSIZE);
-            cl->RemoveItem(0);
-#else
-            // however, the generic listctrl implementation uses the wrong
-            // font to determine width (window vs. item), and does not
-            // calculate the margins the same way in calculation vs. actual
-            // drawing.  so calculate manually, using knowledge of underlying
-            // code.  This is highly version-unportable, but better than using
-            // buggy wx code..
+
             int w, h;
             cl->GetImageList(wxIMAGE_LIST_SMALL)->GetSize(0, w, h);
-            w += 5; // IMAGE_MARGIN_IN_REPORT_MODE
-            // following is missing from wxLIST_AUTOSIZE
-            w += 8; // ??? subtracted from width avail for text
+            w += 5;
+            w += 8;
             {
                 int charwidth, charheight;
                 wxClientDC dc(cl);
-                // following is item font instead of window font,
-                // and so is missing from wxLIST_AUTOSIZE
                 dc.SetFont(f);
                 dc.GetTextExtent(wxT('M'), &charwidth, &charheight);
                 w += (8 + 1 + 8) * charwidth;
             }
             cl->SetColumnWidth(0, w);
-#endif
+
             d->Connect(wxEVT_COMMAND_TOOL_CLICKED,
                 wxCommandEventHandler(CheatList_t::Tool),
                 NULL, &cheat_list_handler);
@@ -2231,10 +2308,8 @@ bool MainFrame::BindControls()
                 NULL, &cheat_list_handler);
             d->Fit();
         }
-        d = LoadXRCDialog("CheatEdit");
-        wxChoice* ch;
-        {
-            // d->Reparent(cheat_list_handler.dlg); // broken
+        else if (name == "CheatEdit") {
+            d = LoadXRCDialog("CheatEdit");
             ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "Type", wxGenericValidator(&cheat_list_handler.ce_type));
             cheat_list_handler.ce_type_ch = ch;
             gettc("Desc", cheat_list_handler.ce_desc);
@@ -2243,8 +2318,8 @@ bool MainFrame::BindControls()
             cheat_list_handler.ce_codes_tc = tc;
             d->Fit();
         }
-        d = LoadXRCDialog("CheatCreate");
-        {
+        else if (name == "CheatCreate") {
+            d = LoadXRCDialog("CheatCreate");
             cheat_find_handler.dlg = d;
             d->SetEscapeId(wxID_OK);
             CheatListCtrl* list;
@@ -2314,38 +2389,20 @@ bool MainFrame::BindControls()
                 NULL, &cheat_find_handler);
             d->Fit();
         }
-        d = LoadXRCDialog("CheatAdd");
-        {
-            // d->Reparent(cheat_find_handler.dlg); // broken
+        else if (name == "CheatAdd") {
+            d = LoadXRCDialog("CheatAdd");
             gettc("Desc", cheat_find_handler.ca_desc);
             tc->SetMaxLength(sizeof(cheatsList[0].desc) - 1);
             gettc("Value", cheat_find_handler.ca_val);
             cheat_find_handler.ca_val_tc = tc;
-            // MFC interface used this for cheat list's generic code adder as well,
-            // and made format selectable in interface.  I think the plain
-            // interface is good enough, even though the format for GB cheats
-            // is non-obvious.  Therefore, the format is now just a read-only
-            // field.
             getlab("Format");
             cheat_find_handler.ca_fmt = lab;
             getlab("Address");
             cheat_find_handler.ca_addr = lab;
             d->Fit();
         }
-        //// config menu
-        d = LoadXRCDialog("GeneralConfig");
-        wxSpinCtrl* sc;
-#define getsc(n, o)                               \
-    do {                                          \
-        sc = SafeXRCCTRL<wxSpinCtrl>(d, n);       \
-        sc->SetValidator(wxGenericValidator(&o)); \
-    } while (0)
-#define getsc_uint(n, o)                          \
-    do {                                          \
-        sc = SafeXRCCTRL<wxSpinCtrl>(d, n);       \
-        sc->SetValidator(wxUIntValidator(&o));    \
-    } while (0)
-        {
+        else if (name == "GeneralConfig") {
+            d = LoadXRCDialog("GeneralConfig");
             getrbo("PNG", config::OptionID::kPrefCaptureFormat, 0);
             getrbo("BMP", config::OptionID::kPrefCaptureFormat, 1);
             getsc("RewindInterval", gopts.rewind_interval);
@@ -2362,29 +2419,12 @@ bool MainFrame::BindControls()
                 NULL, &throttle_ctrl);
             d->Fit();
         }
-
-        wxMenuItem* suspend_scr_saver_mi = XRCITEM("SuspendScreenSaver");
-        if (suspend_scr_saver_mi)
-        {
-            // TODO: change preprocessor directive to fit other platforms
-#if !defined(HAVE_XSS)
-            suspend_scr_saver_mi->GetMenu()->Remove(suspend_scr_saver_mi);
-#else
-            if (wxGetApp().UsingWayland())
-                suspend_scr_saver_mi->GetMenu()->Remove(suspend_scr_saver_mi);
-#endif // !HAVE_XSS
+        else if (name == "GameBoyConfig") {
+            dialogs::GameBoyConfig::NewInstance(this);
+            d = wxStaticCast(FindWindowByName(name), wxDialog);
         }
-
-        wxFilePickerCtrl* fp;
-#define getfp(n, o, l)                                     \
-    do {                                                   \
-        fp = SafeXRCCTRL<wxFilePickerCtrl>(d, n);          \
-        fp->SetValidator(wxFileDirPickerValidator(&o, l)); \
-    } while (0)
-        dialogs::GameBoyConfig::NewInstance(this);
-        d = LoadXRCDialog("GameBoyAdvanceConfig");
-        {
-            /// System and peripherals
+        else if (name == "GameBoyAdvanceConfig") {
+            d = LoadXRCDialog("GameBoyAdvanceConfig");
             ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "SaveType", wxGenericValidator(&coreOptions.cpuSaveType));
             BatConfigHandler.type = ch;
             ch = GetValidatedChild<wxChoice, widgets::OptionChoiceValidator>(
@@ -2395,24 +2435,15 @@ bool MainFrame::BindControls()
             d->Connect(XRCID("SaveType"), wxEVT_COMMAND_CHOICE_SELECTED,
                 wxCommandEventHandler(BatConfig_t::ChangeType),
                 NULL, &BatConfigHandler);
-#define getgbaw(n)                             \
-    do {                                       \
-        wxWindow* w = d->FindWindow(XRCID(n)); \
-        CheckThrowXRCError(w, n);              \
-        w->SetValidator(GBACtrlEnabler());     \
-    } while (0)
             getgbaw("Detect");
             d->Connect(XRCID("Detect"), wxEVT_COMMAND_BUTTON_CLICKED,
                 wxCommandEventHandler(BatConfig_t::Detect),
                 NULL, &BatConfigHandler);
-            /// Boot ROM
             wxStaticText *label = SafeXRCCTRL<wxStaticText>(d, "BiosFile");
             if (!gopts.gba_bios.empty()) label->SetLabel(gopts.gba_bios);
             getfp("BootRom", gopts.gba_bios, label);
             getlab("BootRomLab");
-            /// Game Overrides
             getgbaw("GameSettings");
-            // the rest must be filled in by command handler; just validate
             SafeXRCCTRL<wxTextCtrl>(d, "Comment");
             SafeXRCCTRL<wxChoice>(d, "OvRTC");
             SafeXRCCTRL<wxChoice>(d, "OvSaveType");
@@ -2420,89 +2451,48 @@ bool MainFrame::BindControls()
             SafeXRCCTRL<wxChoice>(d, "OvMirroring");
             d->Fit();
         }
-
-        dialogs::DisplayConfig::NewInstance(this);
-        dialogs::SoundConfig::NewInstance(this);
-        dialogs::DirectoriesConfig::NewInstance(this);
-        dialogs::JoypadConfig::NewInstance(this, std::bind(&wxvbamApp::bindings, &wxGetApp()));
-        dialogs::SpeedupConfig::NewInstance(this);
-
-#ifndef NO_LINK
-        d = LoadXRCDialog("LinkConfig");
-        {
-            getlab("LinkTimeoutLab");
-            addbe(lab);
-            getsc("LinkTimeout", gopts.link_timeout);
-            addbe(sc);
-            d->Fit();
+        else if (name == "DisplayConfig") {
+            dialogs::DisplayConfig::NewInstance(this);
+            d = wxStaticCast(FindWindowByName(name), wxDialog);
         }
-#endif
-        dialogs::AccelConfig::NewInstance(this, menubar, recent,
-                                          std::bind(&wxvbamApp::bindings, &wxGetApp()));
+        else if (name == "SoundConfig") {
+            dialogs::SoundConfig::NewInstance(this);
+            d = wxStaticCast(FindWindowByName(name), wxDialog);
+        }
+        else if (name == "DirectoriesConfig") {
+            dialogs::DirectoriesConfig::NewInstance(this);
+            d = wxStaticCast(FindWindowByName(name), wxDialog);
+        }
+        else if (name == "JoypadConfig") {
+            dialogs::JoypadConfig::NewInstance(this, std::bind(&wxvbamApp::bindings, &wxGetApp()));
+            d = wxStaticCast(FindWindowByName(name), wxDialog);
+        }
+        else if (name == "SpeedupConfig") {
+            dialogs::SpeedupConfig::NewInstance(this);
+            d = wxStaticCast(FindWindowByName(name), wxDialog);
+        }
+        else if (name == "AccelConfig") {
+            dialogs::AccelConfig::NewInstance(this, menubar, recent,
+                                              std::bind(&wxvbamApp::bindings, &wxGetApp()));
+            d = wxStaticCast(FindWindowByName(name), wxDialog);
+        }
+        else {
+            // Unknown dialog - just try to load it from XRC
+            d = LoadXRCDialog(name.utf8_str());
+        }
     } catch (std::exception& e) {
         wxLogError(wxString::FromUTF8(e.what()));
-        return false;
+        return nullptr;
     }
 
-    //// Debug menu
-    // actually, the viewers can be instantiated multiple times.
-    // since they're for debugging, it's probably OK to just detect errors
-    // at popup time.
-    // The only one that can only be popped up once is logging, so allocate
-    // and check it already.
-    logdlg = std::make_unique<LogDialog>();
-// activate OnDropFile event handler
-#if !defined(__WXGTK__) || wxCHECK_VERSION(2, 8, 10)
-    // may not actually do anything, but verfied to work w/ Linux/Nautilus
-    DragAcceptFiles(true);
-#endif
+    dialogs_initialized_.insert(name);
+    return d;
+}
 
-    // delayed fullscreen
-    if (wxGetApp().pending_fullscreen) {
-        panel->ShowFullScreen(true);
+LogDialog* MainFrame::GetLogDialog()
+{
+    if (!logdlg) {
+        logdlg = std::make_unique<LogDialog>();
     }
-
-#ifndef NO_LINK
-    LinkMode link_mode = GetConfiguredLinkMode();
-
-    if (link_mode == LINK_GAMECUBE_DOLPHIN) {
-        bool isv = !gopts.link_host.empty();
-
-        if (isv) {
-            isv = SetLinkServerHost(gopts.link_host.utf8_str());
-        }
-
-        if (!isv) {
-            wxLogError(_("JoyBus host invalid; disabling"));
-        } else {
-            link_mode = LINK_DISCONNECTED;
-        }
-    }
-
-    ConnectionState linkState = InitLink(link_mode);
-
-    if (linkState != LINK_OK) {
-        CloseLink();
-    }
-
-    if (GetLinkMode() != LINK_DISCONNECTED) {
-        cmd_enable |= CMDEN_LINK_ANY;
-        SetLinkTimeout(gopts.link_timeout);
-        EnableSpeedHacks(OPTION(kGBALinkFast));
-    }
-
-    EnableNetworkMenu();
-#endif
-    enable_menus();
-    panel->SetFrameTitle();
-    // All OK; activate idle loop
-    panel->SetExtraStyle(panel->GetExtraStyle() | wxWS_EX_PROCESS_IDLE);
-
-    // Re-adjust size now to nudge some sense into Widgets.
-    panel->AdjustSize(false);
-
-    // Frame initialization is complete.
-    init_complete_ = true;
-
-    return true;
+    return logdlg.get();
 }
