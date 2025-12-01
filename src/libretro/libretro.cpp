@@ -834,9 +834,9 @@ static void load_image_preferences(void)
     };
 
     bool found = false;
-    int saveType;
-    int saveSize;
-    bool hasRtc;
+    int saveType = 0;
+    int saveSize = 0;
+    bool hasRtc = false;
     bool hasRumble = false;
     char buffer[12 + 1];
     unsigned i = 0, found_no = 0;
@@ -868,7 +868,7 @@ static void load_image_preferences(void)
     log("Game Code       : %s\n", buffer);
 
     for (i = 0; i < 512; i++) {
-        if (!strcmp(gbaover[i].romid, buffer)) {
+        if (gbaover[i].romid[0] && !strcmp(gbaover[i].romid, buffer)) {
             found = true;
             found_no = i;
             break;
@@ -876,11 +876,19 @@ static void load_image_preferences(void)
     }
 
     if (found) {
+        log("Found game in gba-over.ini\n");
         log("Name            : %s\n", gbaover[found_no].romtitle);
 
         saveType = gbaover[found_no].saveType;
         saveSize = gbaover[found_no].saveSize;
         hasRtc   = gbaover[found_no].rtcEnabled;
+
+        if ((saveType != 5) && !saveSize) {
+            if (saveType == GBA_SAVE_EEPROM || saveType == GBA_SAVE_EEPROM_SENSOR)
+                saveSize = SIZE_EEPROM_512;
+            if (saveType == GBA_SAVE_FLASH)
+                saveSize = SIZE_FLASH512;
+        }
     }
 
     /* --------------------------------------------------------------
@@ -892,9 +900,49 @@ static void load_image_preferences(void)
         find_string(g_rom, romSize, "Shantae") /* fallback */ )
     {
         saveType = GBA_SAVE_SRAM; /* SRAM */
-        saveSize = SIZE_SRAM;
-    } else if (!coreOptions.saveType) {
-        flashDetectSaveType(romSize);
+    }
+    
+    // Autodetect save type is needed
+    if (!saveType) {
+        log("Autodetecting save type...\n");
+        // FLASH 1M Sanyo
+        if (find_string(g_rom, romSize, "FLASH1M_"))
+        {
+            log("Found FLASH1M_\n");
+            saveType = GBA_SAVE_FLASH;
+            saveSize = SIZE_FLASH1M;
+        } else
+        
+        // FLASH 512K Panasonic
+        if (find_string(g_rom, romSize, "FLASH_") ||
+            find_string(g_rom, romSize, "FLASH512_"))
+        {
+            log("Found FLASH512_\n");
+            saveType = GBA_SAVE_FLASH;
+            saveSize = SIZE_FLASH512;
+        } else
+
+        // EEPROM
+        if (find_string(g_rom, romSize, "EEPROM_"))
+        {
+            log("Found EEPROM_ (8K default)\n");
+            saveType = GBA_SAVE_EEPROM;
+            saveSize = SIZE_EEPROM_8K; // set as default
+        } else
+
+        // SRAM
+        if (find_string(g_rom, romSize, "SRAM_F") ||
+            find_string(g_rom, romSize, "SRAM_"))
+        {
+            log("Found SRAM_\n");
+            saveType = GBA_SAVE_SRAM;
+        }
+
+        // RTC flag
+        if (find_string(g_rom, romSize, "SIIRTC_V")) {
+            log("Found SRAM_\n");
+            hasRtc = true;
+        }
     }
 
     switch (saveType) {
@@ -910,6 +958,13 @@ static void load_image_preferences(void)
     case GBA_SAVE_EEPROM_SENSOR:
         coreOptions.saveType = saveType;
         eepromSetSize(saveSize);
+        break;
+    case GBA_SAVE_NONE:
+        coreOptions.saveType = GBA_SAVE_NONE;
+        break;
+    default:
+    case GBA_SAVE_AUTO:
+        coreOptions.saveType = GBA_SAVE_AUTO;
         break;
     }
 
@@ -931,7 +986,7 @@ static void load_image_preferences(void)
     log("has RTC         : %s.\n", coreOptions.rtcEnabled ? "Yes" : "No");
     log("saveType        : %s.\n", savetype[coreOptions.saveType]);
     if (coreOptions.saveType == 3)
-        log("g_flashSize       : %d.\n", g_flashSize);
+        log("flashSize       : %d.\n", g_flashSize);
     else if (coreOptions.saveType == 1)
         log("eepromSize      : %d.\n", eepromSize);
     log("mirroringEnable : %s.\n", coreOptions.mirroringEnable ? "Yes" : "No");
