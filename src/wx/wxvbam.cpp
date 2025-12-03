@@ -67,6 +67,7 @@
 static GtkWidget* g_main_window = nullptr;
 static GtkWidget* g_menubar_widget = nullptr;
 static void ForceMenubarMnemonicsVisible(GtkWidget* menubar_widget);
+
 #endif
 
 namespace {
@@ -1361,6 +1362,8 @@ void MainFrame::ResetMenuAccelerators() {
 static void EnsureMnemonicsVisible(GtkWidget* widget);
 static void ForceMenuMnemonicsVisible(GtkWidget* menu_widget);
 static void ScheduleMnemonicTimeouts(GtkWidget* menu_widget);
+static void DisableTakeFocusAndShowMnemonics(GtkMenuShell* menu_shell, GtkWidget* menubar_widget);
+static gboolean HandleMenuKeyboardNavigation(GtkWidget* widget, GdkEventKey* event, gpointer user_data);
 // Note: g_main_window, g_menubar_widget, and ForceMenubarMnemonicsVisible are declared at the top of the file
 #endif
 
@@ -1380,8 +1383,9 @@ void MainFrame::MenuPopped(wxMenuEvent& evt) {
     EnsureMnemonicsVisible(GetHandle());
 
     wxMenuBar* menubar = GetMenuBar();
+    GtkWidget* menubar_widget = nullptr;
     if (menubar) {
-        GtkWidget* menubar_widget = menubar->GetHandle();
+        menubar_widget = menubar->GetHandle();
         if (menubar_widget)
             ForceMenubarMnemonicsVisible(menubar_widget);
     }
@@ -1389,8 +1393,22 @@ void MainFrame::MenuPopped(wxMenuEvent& evt) {
     wxMenu* menu = evt.GetMenu();
     if (menu && evt.GetEventType() == wxEVT_MENU_OPEN) {
         GtkWidget* menu_widget = menu->m_menu;
-        if (menu_widget && GTK_IS_MENU(menu_widget))
+        if (menu_widget && GTK_IS_MENU(menu_widget)) {
             ForceMenuMnemonicsVisible(menu_widget);
+
+            // Connect keyboard handler for menus opened with mouse
+            // Use a quark to ensure we only connect once per menu
+            static GQuark key_handler_quark = g_quark_from_static_string("vbam-menu-key-handler");
+            if (!g_object_get_qdata(G_OBJECT(menu_widget), key_handler_quark)) {
+                g_signal_connect(menu_widget, "key-press-event",
+                                G_CALLBACK(HandleMenuKeyboardNavigation), this);
+                g_object_set_qdata(G_OBJECT(menu_widget), key_handler_quark, GINT_TO_POINTER(1));
+            }
+
+            // Disable GTK's default keyboard handling which can interfere
+            if (menubar_widget)
+                DisableTakeFocusAndShowMnemonics(GTK_MENU_SHELL(menu_widget), menubar_widget);
+        }
     }
 
     ScheduleMnemonicTimeouts(nullptr);
@@ -1593,24 +1611,33 @@ static void EnsureMnemonicsVisible(GtkWidget* widget) {
     }
 }
 
-// Force mnemonics visible on menubar items
+// Forward declaration
+static void ApplyPermanentUnderline(GtkLabel* label);
+
+// Force mnemonics visible on menubar items using Pango attributes
 static void ForceMenubarMnemonicsVisible(GtkWidget* menubar_widget) {
     if (!menubar_widget || !GTK_IS_MENU_BAR(menubar_widget))
         return;
 
     g_menubar_widget = menubar_widget;
-    EnsureMnemonicsVisible(menubar_widget);
 
-    GList* children = gtk_container_get_children(GTK_CONTAINER(menubar_widget));
-    for (GList* l = children; l != NULL; l = l->next) {
-        GtkWidget* item = GTK_WIDGET(l->data);
-        if (GTK_IS_MENU_ITEM(item)) {
-            GtkWidget* label = gtk_bin_get_child(GTK_BIN(item));
-            if (label && GTK_IS_LABEL(label))
-                gtk_label_set_use_underline(GTK_LABEL(label), TRUE);
+    // Track whether we've already applied permanent underlines to menubar labels
+    static GQuark menubar_underline_quark = g_quark_from_static_string("vbam-menubar-underline-done");
+
+    if (!g_object_get_qdata(G_OBJECT(menubar_widget), menubar_underline_quark)) {
+        g_object_set_qdata(G_OBJECT(menubar_widget), menubar_underline_quark, GINT_TO_POINTER(1));
+
+        GList* children = gtk_container_get_children(GTK_CONTAINER(menubar_widget));
+        for (GList* l = children; l != NULL; l = l->next) {
+            GtkWidget* item = GTK_WIDGET(l->data);
+            if (GTK_IS_MENU_ITEM(item)) {
+                GtkWidget* label = gtk_bin_get_child(GTK_BIN(item));
+                if (label && GTK_IS_LABEL(label))
+                    ApplyPermanentUnderline(GTK_LABEL(label));
+            }
         }
+        g_list_free(children);
     }
-    g_list_free(children);
 }
 
 // Walk up the menu hierarchy forcing mnemonics on each level
@@ -1694,9 +1721,10 @@ static void OnMenuItemSelect(GtkMenuItem* menu_item, gpointer user_data) {
     }
 }
 
-// Add first-letter underline to a label if its mnemonic doesn't match the first letter
-// This provides visual feedback for the first-letter handler fallback
-static void AddFirstLetterUnderline(GtkLabel* label) {
+// Apply permanent underline to a label using Pango attributes
+// This underlines the mnemonic character (after _) or the first letter if no mnemonic
+// Unlike GTK's mnemonic system, Pango attributes are always visible
+static void ApplyPermanentUnderline(GtkLabel* label) {
     if (!label)
         return;
 
@@ -1704,79 +1732,94 @@ static void AddFirstLetterUnderline(GtkLabel* label) {
     if (!text || !*text)
         return;
 
-    // Find existing mnemonic position (underscore not followed by another underscore)
+    // Parse text to find: mnemonic position (char after _) and first letter position
+    // Build display text (without mnemonic underscores) and track underline position
+    GString* display_text = g_string_new("");
     const gchar* p = text;
-    gunichar mnemonic_char = 0;
-    gunichar first_char = 0;
-    gboolean found_first = FALSE;
+    gint display_pos = 0;
+    gint display_underline_start = -1;
+    gint display_underline_end = -1;
+    gint mnemonic_display_pos = -1;  // Position in display text where mnemonic char appears
+    gint first_char_display_pos = -1;  // Position in display text of first letter
 
     while (*p) {
         gunichar c = g_utf8_get_char(p);
-
-        // Track the first actual character (not underscore)
-        if (!found_first && c != '_') {
-            first_char = g_unichar_toupper(c);
-            found_first = TRUE;
-        }
 
         if (c == '_') {
             const gchar* next = g_utf8_next_char(p);
             if (*next) {
                 gunichar next_c = g_utf8_get_char(next);
                 if (next_c == '_') {
-                    // Escaped underscore, skip both
+                    // Escaped underscore - output single underscore
+                    g_string_append_c(display_text, '_');
+                    display_pos++;
                     p = g_utf8_next_char(next);
                     continue;
                 } else {
-                    // Found mnemonic
-                    mnemonic_char = g_unichar_toupper(next_c);
-                    break;
+                    // Mnemonic underscore - skip it, next char is the mnemonic
+                    mnemonic_display_pos = display_pos;
+                    p = next;
+                    continue;
                 }
             }
         }
+
+        // Track first non-underscore character position
+        if (first_char_display_pos < 0 && c != '_') {
+            first_char_display_pos = display_pos;
+        }
+
+        // Append the current character
+        gchar buf[6];
+        gint len = g_unichar_to_utf8(c, buf);
+        g_string_append_len(display_text, buf, len);
+        display_pos += len;
+
         p = g_utf8_next_char(p);
     }
 
-    // If mnemonic already matches first letter, nothing to do
-    if (mnemonic_char && mnemonic_char == first_char)
-        return;
-
-    // If there's no mnemonic, or the mnemonic doesn't match first letter,
-    // add underscore before first character
-    if (first_char) {
-        // Build new text with underscore before first character
-        GString* new_text = g_string_new("");
-        p = text;
-        gboolean added_underscore = FALSE;
-
-        while (*p) {
-            gunichar c = g_utf8_get_char(p);
-
-            // Add underscore before the first non-underscore character
-            if (!added_underscore && c != '_') {
-                g_string_append_c(new_text, '_');
-                added_underscore = TRUE;
-            }
-
-            // Append the current character
-            gchar buf[6];
-            gint len = g_unichar_to_utf8(c, buf);
-            g_string_append_len(new_text, buf, len);
-
-            p = g_utf8_next_char(p);
-        }
-
-        gtk_label_set_label(label, new_text->str);
-        g_string_free(new_text, TRUE);
+    // Determine which character to underline in the display text
+    if (mnemonic_display_pos >= 0) {
+        // Has explicit mnemonic - underline that character
+        display_underline_start = mnemonic_display_pos;
+        // Find end of the mnemonic character
+        const gchar* disp = display_text->str + mnemonic_display_pos;
+        display_underline_end = mnemonic_display_pos + (g_utf8_next_char(disp) - disp);
+    } else if (first_char_display_pos >= 0) {
+        // No mnemonic - underline first letter
+        display_underline_start = first_char_display_pos;
+        const gchar* disp = display_text->str + first_char_display_pos;
+        display_underline_end = first_char_display_pos + (g_utf8_next_char(disp) - disp);
     }
+
+    if (display_underline_start < 0 || display_underline_end <= display_underline_start) {
+        g_string_free(display_text, TRUE);
+        return;
+    }
+
+    // Create Pango attribute list with underline
+    PangoAttrList* attrs = pango_attr_list_new();
+    PangoAttribute* underline_attr = pango_attr_underline_new(PANGO_UNDERLINE_SINGLE);
+    underline_attr->start_index = display_underline_start;
+    underline_attr->end_index = display_underline_end;
+    pango_attr_list_insert(attrs, underline_attr);
+
+    // Set the label text without mnemonic parsing and apply attributes
+    gtk_label_set_text(label, display_text->str);
+    gtk_label_set_attributes(label, attrs);
+
+    // Disable mnemonic parsing since we're handling it manually
+    gtk_label_set_use_underline(label, FALSE);
+
+    pango_attr_list_unref(attrs);
+    g_string_free(display_text, TRUE);
 }
 
 // Force mnemonics visible on a menu and all its items (recursive)
+// Uses Pango attributes for permanent underlines that don't flash
 static void ForceMenuMnemonicsVisible(GtkWidget* menu_widget) {
     if (!menu_widget || !GTK_IS_MENU(menu_widget))
         return;
-
-    EnsureMnemonicsVisible(menu_widget);
 
     // Connect show/map signals (only once per menu)
     static GQuark show_handler_quark = g_quark_from_static_string("vbam-menu-show-handler");
@@ -1788,124 +1831,31 @@ static void ForceMenuMnemonicsVisible(GtkWidget* menu_widget) {
 
     // Connect select signal on menu items with submenus (only once per item)
     static GQuark select_handler_quark = g_quark_from_static_string("vbam-menuitem-select-handler");
-    // Track whether we've already processed first-letter underlines for this menu
-    static GQuark first_letter_menu_quark = g_quark_from_static_string("vbam-first-letter-menu-done");
+    // Track whether we've already applied permanent underlines to this menu
+    static GQuark underline_done_quark = g_quark_from_static_string("vbam-menu-underline-done");
 
     GList* children = gtk_container_get_children(GTK_CONTAINER(menu_widget));
 
-    // Only process first-letter underlines once per menu
-    if (!g_object_get_qdata(G_OBJECT(menu_widget), first_letter_menu_quark)) {
-        g_object_set_qdata(G_OBJECT(menu_widget), first_letter_menu_quark, GINT_TO_POINTER(1));
+    // Only apply permanent underlines once per menu
+    if (!g_object_get_qdata(G_OBJECT(menu_widget), underline_done_quark)) {
+        g_object_set_qdata(G_OBJECT(menu_widget), underline_done_quark, GINT_TO_POINTER(1));
 
-        // Track which first letters have been claimed (by mnemonic or first-letter underline)
-        GHashTable* claimed_letters = g_hash_table_new(g_direct_hash, g_direct_equal);
-
-        // First pass: collect all existing mnemonics
+        // Apply permanent underlines to all menu item labels
         for (GList* l = children; l != NULL; l = l->next) {
             GtkWidget* item = GTK_WIDGET(l->data);
             if (!GTK_IS_MENU_ITEM(item))
                 continue;
 
             GtkWidget* label = gtk_bin_get_child(GTK_BIN(item));
-            if (!label || !GTK_IS_LABEL(label))
-                continue;
-
-            const gchar* text = gtk_label_get_label(GTK_LABEL(label));
-            if (!text || !*text)
-                continue;
-
-            // Find existing mnemonic
-            const gchar* p = text;
-            while (*p) {
-                gunichar c = g_utf8_get_char(p);
-                if (c == '_') {
-                    const gchar* next = g_utf8_next_char(p);
-                    if (*next) {
-                        gunichar next_c = g_utf8_get_char(next);
-                        if (next_c != '_') {
-                            // Found mnemonic - mark this letter as claimed
-                            g_hash_table_insert(claimed_letters,
-                                GUINT_TO_POINTER(g_unichar_toupper(next_c)),
-                                GINT_TO_POINTER(1));
-                            break;
-                        }
-                        p = g_utf8_next_char(next);
-                        continue;
-                    }
-                }
-                p = g_utf8_next_char(p);
-            }
+            if (label && GTK_IS_LABEL(label))
+                ApplyPermanentUnderline(GTK_LABEL(label));
         }
-
-        // Second pass: add first-letter underlines where appropriate
-        for (GList* l = children; l != NULL; l = l->next) {
-            GtkWidget* item = GTK_WIDGET(l->data);
-            if (!GTK_IS_MENU_ITEM(item))
-                continue;
-
-            GtkWidget* label = gtk_bin_get_child(GTK_BIN(item));
-            if (!label || !GTK_IS_LABEL(label))
-                continue;
-
-            gtk_label_set_use_underline(GTK_LABEL(label), TRUE);
-
-            const gchar* text = gtk_label_get_label(GTK_LABEL(label));
-            if (!text || !*text)
-                continue;
-
-            // Find if this item has a mnemonic and what its first letter is
-            const gchar* p = text;
-            gunichar first_char = 0;
-            gunichar mnemonic_char = 0;
-
-            while (*p) {
-                gunichar c = g_utf8_get_char(p);
-
-                // Track first non-underscore character
-                if (!first_char && c != '_')
-                    first_char = g_unichar_toupper(c);
-
-                if (c == '_') {
-                    const gchar* next = g_utf8_next_char(p);
-                    if (*next) {
-                        gunichar next_c = g_utf8_get_char(next);
-                        if (next_c != '_') {
-                            mnemonic_char = g_unichar_toupper(next_c);
-                            break;
-                        }
-                        p = g_utf8_next_char(next);
-                        continue;
-                    }
-                }
-                p = g_utf8_next_char(p);
-            }
-
-            // Skip if mnemonic already matches first letter
-            if (mnemonic_char && mnemonic_char == first_char)
-                continue;
-
-            // Skip if first letter is already claimed
-            if (first_char && g_hash_table_contains(claimed_letters, GUINT_TO_POINTER(first_char)))
-                continue;
-
-            // Add first-letter underline and claim the letter
-            if (first_char) {
-                g_hash_table_insert(claimed_letters, GUINT_TO_POINTER(first_char), GINT_TO_POINTER(1));
-                AddFirstLetterUnderline(GTK_LABEL(label));
-            }
-        }
-
-        g_hash_table_destroy(claimed_letters);
     }
 
-    // Enable underlines and recurse into submenus
+    // Recurse into submenus and connect select handlers
     for (GList* l = children; l != NULL; l = l->next) {
         GtkWidget* item = GTK_WIDGET(l->data);
         if (GTK_IS_MENU_ITEM(item)) {
-            GtkWidget* label = gtk_bin_get_child(GTK_BIN(item));
-            if (label && GTK_IS_LABEL(label))
-                gtk_label_set_use_underline(GTK_LABEL(label), TRUE);
-
             GtkWidget* submenu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(item));
             if (submenu && GTK_IS_MENU(submenu)) {
                 if (!g_object_get_qdata(G_OBJECT(item), select_handler_quark)) {
