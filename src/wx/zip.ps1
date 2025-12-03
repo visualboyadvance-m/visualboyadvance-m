@@ -9,12 +9,13 @@
     It supports maximum compression, recursive operation, and symbolic link handling.
 
 .PARAMETER Options
-    Short options: -9 (max compression), -r (recursive), -y (store symlinks)
-    Can be combined like -9yr or separate like -9 -y -r
+    Short options: -9 (max compression), -r (recursive), -y (store symlinks),
+                   -j (junk directory names), -q (quiet operation)
+    Can be combined like -9yrjq or separate like -9 -y -r -j -q
 
 .EXAMPLE
     .\zip.ps1 -9 -r archive.zip folder/
-    .\zip.ps1 -9yr archive.zip folder/
+    .\zip.ps1 -9yrjq archive.zip folder/
 #>
 
 param(
@@ -22,10 +23,13 @@ param(
     [string[]]$Arguments
 )
 
+
 # Parse options and arguments
 $maxCompression = $false
 $recursive = $false
 $storeSymlinks = $false
+$junkPaths = $false
+$quiet = $false
 $zipFile = $null
 $filesToAdd = @()
 
@@ -44,6 +48,8 @@ while ($i -lt $Arguments.Count) {
                 '9' { $maxCompression = $true }
                 'r' { $recursive = $true }
                 'y' { $storeSymlinks = $true }
+                'j' { $junkPaths = $true }
+                'q' { $quiet = $true }
                 default {
                     Write-Error "Unknown option: -$char"
                     exit 1
@@ -66,7 +72,7 @@ while ($i -lt $Arguments.Count) {
 # Validate arguments
 if ($null -eq $zipFile) {
     Write-Error "Usage: zip.ps1 [options] zipfile files..."
-    Write-Error "Options: -9 (max compression), -r (recursive), -y (store symlinks)"
+    Write-Error "Options: -9 (max compression), -r (recursive), -y (store symlinks), -j (junk paths), -q (quiet)"
     exit 1
 }
 
@@ -113,7 +119,9 @@ try {
             if ($storeSymlinks -and $fileInfo.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
                 # For symbolic links, we'll just add the file normally
                 # PowerShell/.NET doesn't have great symlink support in ZIP
-                Write-Verbose "Adding symbolic link: $entryName"
+                if (-not $quiet) {
+                    Write-Verbose "Adding symbolic link: $entryName"
+                }
             }
 
             [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
@@ -123,7 +131,9 @@ try {
                 $compressionLevel
             ) | Out-Null
 
-            Write-Verbose "Added: $entryName"
+            if (-not $quiet) {
+                Write-Verbose "Added: $entryName"
+            }
         }
         elseif (Test-Path $sourcePath -PathType Container) {
             # It's a directory
@@ -135,23 +145,30 @@ try {
                 # Collect all entries (directories and files) with their metadata
                 $allEntries = @()
 
-                # Add directories
-                $dirs = Get-ChildItem $sourcePath -Recurse -Directory
-                foreach ($dir in $dirs) {
-                    $relativePath = $dir.FullName.Substring($baseDir.Length).TrimStart('\', '/')
-                    $entryName = ($relativePath -replace '\\', '/') + '/'
-                    $allEntries += @{
-                        Type = 'Directory'
-                        EntryName = $entryName
-                        FullPath = $dir.FullName
+                # Add directories (only if not junking paths)
+                if (-not $junkPaths) {
+                    $dirs = Get-ChildItem $sourcePath -Recurse -Directory
+                    foreach ($dir in $dirs) {
+                        $relativePath = $dir.FullName.Substring($baseDir.Length).TrimStart('\', '/')
+                        $entryName = ($relativePath -replace '\\', '/') + '/'
+                        $allEntries += @{
+                            Type = 'Directory'
+                            EntryName = $entryName
+                            FullPath = $dir.FullName
+                        }
                     }
                 }
 
                 # Add files
                 $files = Get-ChildItem $sourcePath -Recurse -File
                 foreach ($file in $files) {
-                    $relativePath = $file.FullName.Substring($baseDir.Length).TrimStart('\', '/')
-                    $entryName = $relativePath -replace '\\', '/'
+                    if ($junkPaths) {
+                        # Just use the filename, no directory path
+                        $entryName = $file.Name
+                    } else {
+                        $relativePath = $file.FullName.Substring($baseDir.Length).TrimStart('\', '/')
+                        $entryName = $relativePath -replace '\\', '/'
+                    }
                     $allEntries += @{
                         Type = 'File'
                         EntryName = $entryName
@@ -172,12 +189,16 @@ try {
                 foreach ($entry in $allEntries) {
                     if ($entry.Type -eq 'Directory') {
                         $zipArchive.CreateEntry($entry.EntryName) | Out-Null
-                        Write-Verbose "Added directory: $($entry.EntryName)"
+                        if (-not $quiet) {
+                            Write-Verbose "Added directory: $($entry.EntryName)"
+                        }
                     }
                     else {
                         # Check if it's a symbolic link
                         if ($storeSymlinks -and $entry.IsSymlink) {
-                            Write-Verbose "Adding symbolic link: $($entry.EntryName)"
+                            if (-not $quiet) {
+                                Write-Verbose "Adding symbolic link: $($entry.EntryName)"
+                            }
                         }
 
                         [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
@@ -187,17 +208,23 @@ try {
                             $compressionLevel
                         ) | Out-Null
 
-                        Write-Verbose "Added: $($entry.EntryName)"
+                        if (-not $quiet) {
+                            Write-Verbose "Added: $($entry.EntryName)"
+                        }
                     }
                 }
             }
             else {
-                Write-Warning "Skipping directory (use -r for recursive): $sourcePath"
+                if (-not $quiet) {
+                    Write-Warning "Skipping directory (use -r for recursive): $sourcePath"
+                }
             }
         }
     }
 
-    Write-Host "Created archive: $zipFile"
+    if (-not $quiet) {
+        Write-Host "Created archive: $zipFile"
+    }
 }
 catch {
     Write-Error "Failed to create ZIP archive: $_"
