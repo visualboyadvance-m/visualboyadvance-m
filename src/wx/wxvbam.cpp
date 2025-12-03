@@ -1577,7 +1577,9 @@ void MainFrame::IdentifyRom()
 }
 
 // Forward declarations
+#ifndef __WXGTK__
 static bool SearchAndActivateMenuItem(wxMenu* menu, wxChar mnemonic, int depth = 0);
+#endif
 static bool ActivateMenuItemByMnemonic(wxMenu* menu, wxChar mnemonic);
 
 #ifdef __WXGTK__
@@ -2282,6 +2284,7 @@ static bool ActivateMenuItemByMnemonic(wxMenu* menu, wxChar letter) {
     return false;
 }
 
+#ifndef __WXGTK__
 // Recursively search a menu for a menu item with the given mnemonic and activate it
 static bool SearchAndActivateMenuItem(wxMenu* menu, wxChar mnemonic, int depth) {
     if (!menu)
@@ -2315,6 +2318,7 @@ static bool SearchAndActivateMenuItem(wxMenu* menu, wxChar mnemonic, int depth) 
     }
     return false;
 }
+#endif
 
 int wxvbamApp::FilterEvent(wxEvent& event)
 {
