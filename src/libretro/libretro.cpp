@@ -278,33 +278,34 @@ static void gbInitRTC(void)
     }
 }
 
+static bool gbUpdateGeometry = false;
+static bool gbFullReInit = false;
+static void geometry_changed() {
+    struct retro_system_av_info avinfo;
+    retro_get_system_av_info(&avinfo);
+    if (!gbFullReInit)
+        environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &avinfo);
+    else
+        environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &avinfo);
+}
+
 static void SetGBBorder(unsigned val)
 {
-    struct retro_system_av_info avinfo;
-    unsigned _changed = 0;
-
     switch (val) {
         case 0:
-            _changed = ((systemWidth != kGBWidth) || (systemHeight != kGBHeight)) ? 1 : 0;
+            gbFullReInit = ((systemWidth != kGBWidth) || (systemHeight != kGBHeight)) ? 1 : 0;
             systemWidth = gbBorderLineSkip = kGBWidth;
             systemHeight = kGBHeight;
             gbBorderColumnSkip = gbBorderRowSkip = 0;
             break;
         case 1:
-            _changed = ((systemWidth != kSGBWidth) || (systemHeight != kSGBHeight)) ? 1 : 0;
+            gbFullReInit = ((systemWidth != kSGBWidth) || (systemHeight != kSGBHeight)) ? 1 : 0;
             systemWidth = gbBorderLineSkip = kSGBWidth;
             systemHeight = kSGBHeight;
             gbBorderColumnSkip = (kSGBWidth - kGBWidth) >> 1;
             gbBorderRowSkip = (kSGBHeight - kGBHeight) >> 1;
             break;
     }
-
-    retro_get_system_av_info(&avinfo);
-
-    if (!_changed)
-        environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &avinfo);
-    else
-        environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &avinfo);
 }
 
 void* retro_get_memory_data(unsigned id)
@@ -1251,6 +1252,7 @@ static void update_variables_gb(bool startup) {
                     break;
                 }
                 SetGBBorder(gbBorderOn);
+                gbUpdateGeometry = true;
             }
         }
     }
@@ -1717,6 +1719,11 @@ void retro_run(void)
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated)
         update_variables(false);
+    
+    if (gbUpdateGeometry) {
+        gbUpdateGeometry = false;
+        geometry_changed();
+    }
 
     poll_cb();
 
@@ -2057,6 +2064,7 @@ void systemFrame(void)
 void systemGbBorderOn(void)
 {
     SetGBBorder(1);
+    gbUpdateGeometry = true;
 }
 
 void systemMessage(const char* fmt, ...)
