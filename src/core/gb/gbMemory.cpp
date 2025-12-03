@@ -448,7 +448,8 @@ void mapperMBC3RAM(uint16_t address, uint8_t value)
                 gbDataMBC3.mapperDays = (gbDataMBC3.mapperDays & 0x100) | value;
                 break;
             case 0x0c:
-                gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0x80) | (value & 0x41);
+                // Allow writing bits 0, 6, and 7 (day high bit, halt, overflow)
+                gbDataMBC3.mapperControl = value & 0xC1;
                 if (value & 0x01) {
                     gbDataMBC3.mapperDays |= 0x100;
                 } else {
