@@ -1277,14 +1277,6 @@ static void update_variables_gb(bool startup) {
         if (lastpal != option_gbPalette)
             set_gbPalette();
     }
-
-    var.key = "vbam_gbcoloroption";
-    var.value = NULL;
-
-    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        gbColorOption = (!strcmp(var.value, "enabled"));
-    }
-
     char options[9][35] = {
         "vbam_showborders",
         "vbam_gbHardware",
