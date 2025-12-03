@@ -246,7 +246,7 @@ if(FAudio_FOUND)
     endforeach()
 
     # For static libraries without INTERFACE_LINK_LIBRARIES, check symbols.
-    if(NOT _faudio_sdl_mismatch AND VBAM_STATIC)
+    if(NOT WIN32 AND NOT _faudio_sdl_mismatch AND VBAM_STATIC)
         foreach(_faudio_target FAudio::FAudio-static FAudio::FAudio)
             if(TARGET ${_faudio_target})
                 get_target_property(_faudio_location ${_faudio_target} IMPORTED_LOCATION)
@@ -284,7 +284,7 @@ if(FAudio_FOUND)
     endif()
 
     # For dynamic libraries, also check with ldd/otool if target properties didn't help.
-    if(NOT _faudio_sdl_mismatch AND NOT VBAM_STATIC)
+    if(NOT WIN32 AND NOT _faudio_sdl_mismatch AND NOT VBAM_STATIC)
         foreach(_faudio_target FAudio::FAudio-shared FAudio::FAudio)
             if(TARGET ${_faudio_target})
                 get_target_property(_faudio_location ${_faudio_target} IMPORTED_LOCATION)
