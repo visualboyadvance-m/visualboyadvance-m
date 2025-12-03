@@ -43,8 +43,7 @@ extern int timer3Ticks;
 extern int timer3ClockReload;
 extern int cpuTotalTicks;
 
-extern uint32_t cpuDmaLatchData[4];
-extern int cpuDmaChannelActive;
+extern uint32_t cpuDmaBusValue;
 
 #define CPUReadByteQuick(addr) map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask]
 
@@ -80,7 +79,7 @@ static inline uint32_t CPUReadOpenBus()
 {
     /* DMA shadowing overrides everything */
     if (cpuDmaRunning || ((reg[15].I - cpuDmaPC) == (armState ? 4u : 2u)))
-        return cpuDmaLatchData[cpuDmaChannelActive];
+        return cpuDmaBusValue;
 
     /* THUMB: compose 32-bit from last fetched halfwords according to region/alignment */
     if (!armState) {

@@ -68,8 +68,8 @@ int cpuDmaCount = 0;
 bool cpuDmaRunning = false;
 uint32_t cpuDmaPC = 0;
 int dummyAddress = 0;
-uint32_t cpuDmaLatchData[4] = {};
-int cpuDmaChannelActive;
+uint32_t cpuDmaLatchData[4];
+uint32_t cpuDmaBusValue = 0;
 
 const uint32_t cpuDmaSrcMask[4] = { 0x07ffffff, 0x0fffffff, 0x0fffffff, 0x0fffffff };
 const uint32_t cpuDmaDstMask[4] = { 0x07ffffff, 0x07ffffff, 0x07ffffff, 0x0fffffff };
@@ -2621,7 +2621,6 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
     cpuDmaRunning = true;
     cpuDmaPC = reg[15].I;
     cpuDmaCount = c;
-    cpuDmaChannelActive = ch;
     // This is done to get the correct waitstates.
     if (sm > 15)
         sm = 15;
@@ -2637,7 +2636,8 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
             while (c != 0) {
                 bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
 
-                CPUWriteMemory(d & 0xFFFFFFFC, cpuDmaLatchData[ch]);
+                uint32_t value = cpuDmaLatchData[ch];
+                CPUWriteMemory(d & 0xFFFFFFFC, value);
                 if (!isFIFO)
                     d += dstInROM ? 4u : di;
                 d &= cpuDmaDstMask[ch];
@@ -2648,8 +2648,10 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
                 bool srcInROM = ((s >> 24) >= REGION_ROM0) && ((s >> 24) < REGION_SRAM);
                 bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
 
-                cpuDmaLatchData[ch] = CPUReadMemory(s);
-                CPUWriteMemory(d & 0xFFFFFFFC, cpuDmaLatchData[ch]);
+                uint32_t value = CPUReadMemory(s);
+                cpuDmaLatchData[ch] = value;
+                cpuDmaBusValue = value;
+                CPUWriteMemory(d & 0xFFFFFFFC, value);
                 if (!isFIFO)
                     d += dstInROM ? 4u : di;
                 s += srcInROM ? 4u : si;
@@ -2666,7 +2668,8 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
             while (c != 0) {
                 bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
 
-                CPUWriteHalfWord(d & 0xFFFFFFFE, DowncastU16(cpuDmaLatchData[ch] >> (8 * (d & 2))));
+                uint32_t value = cpuDmaLatchData[ch];
+                CPUWriteHalfWord(d & 0xFFFFFFFE, DowncastU16(value));
                 if (!isFIFO)
                     d += dstInROM ? 2u : di;
                 d &= cpuDmaDstMask[ch];
@@ -2677,9 +2680,10 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
                 bool srcInROM = ((s >> 24) >= REGION_ROM0) && ((s >> 24) < REGION_SRAM);
                 bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
 
-                cpuDmaLatchData[ch] = CPUReadHalfWord(s);
-                cpuDmaLatchData[ch] |= (cpuDmaLatchData[ch] << 16);
-                CPUWriteHalfWord(d & 0xFFFFFFFE, DowncastU16(cpuDmaLatchData[ch] >> (8 * (d & 2))));
+                uint32_t value = CPUReadHalfWord(s);
+                cpuDmaLatchData[ch] = value * 0x00010001;
+                cpuDmaBusValue = value * 0x00010001;
+                CPUWriteHalfWord(d & 0xFFFFFFFE, DowncastU16(value));
                 if (!isFIFO)
                     d += dstInROM ? 2u : di;
                 s += srcInROM ? 2u : si;
