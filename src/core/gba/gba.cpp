@@ -2612,6 +2612,7 @@ void CPUCompareVCOUNT()
 
 void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t c, int transfer32, bool isFIFO)
 {
+    (void)isFIFO;  // Reserved for future use
     int sm = s >> 24;
     int dm = d >> 24;
     int sw = 0;

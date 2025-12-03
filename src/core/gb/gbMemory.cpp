@@ -464,10 +464,6 @@ void mapperMBC3RAM(uint16_t address, uint8_t value)
 uint8_t mapperMBC3ReadRAM(uint16_t address)
 {
 #ifdef DEBUG
-    static int prevLSeconds = -1;
-    static int prevLMinutes = -1;
-    static int prevLHours = -1;
-    static int prevLDays = -1;
     static int prevLControl = -1;
 
     bool valueChanged = false;
@@ -518,10 +514,6 @@ uint8_t mapperMBC3ReadRAM(uint16_t address)
                 printf("Days:    %d\n", (uint8_t)(gbDataMBC3.mapperLDays & 0xFF));
                 printf("Control: 0x%02X\n", (uint8_t)gbDataMBC3.mapperLControl);
 
-                prevLSeconds = (uint8_t)gbDataMBC3.mapperLSeconds;
-                prevLMinutes = (uint8_t)gbDataMBC3.mapperLMinutes;
-                prevLHours = (uint8_t)gbDataMBC3.mapperLHours;
-                prevLDays = (uint8_t)(gbDataMBC3.mapperLDays & 0xFF);
                 prevLControl = (uint8_t)gbDataMBC3.mapperLControl;
             }
 
