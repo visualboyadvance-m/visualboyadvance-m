@@ -2154,8 +2154,11 @@ uint8_t gbReadMemory(uint16_t address)
     if (gbCheatMap[address])
         return gbCheatRead(address);
 
-    if (address < 0x8000)
-        return gbMemoryMap[address >> 12][address & 0x0fff];
+    if (address < 0x8000) {
+        // Update cart bus with value read from ROM
+        gbCartBus = gbMemoryMap[address >> 12][address & 0x0fff];
+        return gbCartBus;
+    }
 
     if (address < 0xa000) {
         if (gbVramReadAccessValid())
@@ -2730,6 +2733,7 @@ void gbReset()
     gbBlackScreen = false;
     gbInterruptWait = 0;
     gbDmaTicks = 0;
+    gbCartBus = 0xff;
     clockTicks = 0;
 
     // clean Wram
@@ -3276,6 +3280,7 @@ variable_desc gbSaveGameStruct[] = {
     { &gbObp1[1], sizeof(uint8_t) },
     { &gbObp1[2], sizeof(uint8_t) },
     { &gbObp1[3], sizeof(uint8_t) },
+    { &gbCartBus, sizeof(uint8_t) },
     { NULL, 0 }
 };
 
@@ -4152,6 +4157,10 @@ void gbEmulate(int ticksToStop)
             opcode1 = 0;
             opcode2 = 0;
             execute = true;
+
+            // Decay cart bus when executing from RAM (PC outside cartridge ROM)
+            if (PC.W >= 0x8000)
+                gbCartBus = 0xff;
 
             opcode2 = opcode1 = opcode = gbReadMemory(PC.W++);
 

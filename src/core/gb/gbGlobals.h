@@ -56,6 +56,7 @@ extern int gbBorderLineSkip;
 extern int gbBorderRowSkip;
 extern int gbBorderColumnSkip;
 extern int gbDmaTicks;
+extern uint8_t gbCartBus;
 
 extern uint8_t (*gbSerialFunction)(uint8_t);
 

@@ -23,6 +23,7 @@ int gbBorderLineSkip = 160;
 int gbBorderRowSkip = 0;
 int gbBorderColumnSkip = 0;
 int gbDmaTicks = 0;
+uint8_t gbCartBus = 0xff;
 bool gbBorderAutomatic = false;
 bool gbBorderOn = false;
 bool gbCgbMode = false;
