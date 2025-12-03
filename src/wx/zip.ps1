@@ -81,6 +81,9 @@ if ($filesToAdd.Count -eq 0) {
     exit 1
 }
 
+# Store original name for display purposes
+$zipFileDisplay = $zipFile
+
 # Ensure zip file path is absolute (relative to current directory, not user profile)
 if (-not [System.IO.Path]::IsPathRooted($zipFile)) {
     $zipFile = Join-Path (Get-Location).Path $zipFile
@@ -246,7 +249,7 @@ try {
     }
 
     if (-not $quiet) {
-        Write-Host "Created archive: $zipFile"
+        Write-Host "Created archive: $zipFileDisplay"
     }
 }
 catch {
