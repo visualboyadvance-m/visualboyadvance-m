@@ -218,7 +218,130 @@ set(ENABLE_FAUDIO_DEFAULT OFF)
 find_package(FAudio QUIET)
 
 if(FAudio_FOUND)
-    set(ENABLE_FAUDIO_DEFAULT ON)
+    # Check that FAudio links to the same SDL version we're using.
+    # FAudio built with SDL2 won't work with SDL3 and vice versa.
+    set(_faudio_sdl_mismatch OFF)
+
+    # Check INTERFACE_LINK_LIBRARIES on FAudio targets for SDL version.
+    foreach(_faudio_target FAudio::FAudio FAudio::FAudio-shared FAudio::FAudio-static)
+        if(TARGET ${_faudio_target})
+            get_target_property(_faudio_link_libs ${_faudio_target} INTERFACE_LINK_LIBRARIES)
+            if(_faudio_link_libs)
+                if(ENABLE_SDL3)
+                    # We're using SDL3, FAudio must link to SDL3
+                    if(_faudio_link_libs MATCHES "SDL2")
+                        set(_faudio_sdl_mismatch ON)
+                        message(STATUS "FAudio was built with SDL2, but we're using SDL3 - disabling FAudio")
+                    endif()
+                else()
+                    # We're using SDL2, FAudio must link to SDL2
+                    if(_faudio_link_libs MATCHES "SDL3")
+                        set(_faudio_sdl_mismatch ON)
+                        message(STATUS "FAudio was built with SDL3, but we're using SDL2 - disabling FAudio")
+                    endif()
+                endif()
+                break()
+            endif()
+        endif()
+    endforeach()
+
+    # For static libraries without INTERFACE_LINK_LIBRARIES, check symbols.
+    if(NOT _faudio_sdl_mismatch AND VBAM_STATIC)
+        foreach(_faudio_target FAudio::FAudio-static FAudio::FAudio)
+            if(TARGET ${_faudio_target})
+                get_target_property(_faudio_location ${_faudio_target} IMPORTED_LOCATION)
+                if(NOT _faudio_location)
+                    get_target_property(_faudio_location ${_faudio_target} IMPORTED_LOCATION_RELEASE)
+                endif()
+                if(NOT _faudio_location)
+                    get_target_property(_faudio_location ${_faudio_target} IMPORTED_LOCATION_RELWITHDEBINFO)
+                endif()
+                if(_faudio_location AND EXISTS "${_faudio_location}")
+                    # SDL_GetNumAudioDevices exists in SDL2 but not SDL3
+                    # SDL_GetAudioPlaybackDevices exists in SDL3 but not SDL2
+                    execute_process(
+                        COMMAND nm -g "${_faudio_location}"
+                        OUTPUT_VARIABLE _faudio_symbols
+                        ERROR_QUIET
+                        OUTPUT_STRIP_TRAILING_WHITESPACE
+                    )
+                    if(_faudio_symbols)
+                        string(FIND "${_faudio_symbols}" "SDL_GetNumAudioDevices" _has_sdl2_symbol)
+                        string(FIND "${_faudio_symbols}" "SDL_GetAudioPlaybackDevices" _has_sdl3_symbol)
+
+                        if(ENABLE_SDL3 AND _has_sdl2_symbol GREATER -1 AND _has_sdl3_symbol EQUAL -1)
+                            set(_faudio_sdl_mismatch ON)
+                            message(STATUS "Static FAudio uses SDL2 symbols, but we're using SDL3 - disabling FAudio")
+                        elseif(NOT ENABLE_SDL3 AND _has_sdl3_symbol GREATER -1 AND _has_sdl2_symbol EQUAL -1)
+                            set(_faudio_sdl_mismatch ON)
+                            message(STATUS "Static FAudio uses SDL3 symbols, but we're using SDL2 - disabling FAudio")
+                        endif()
+                    endif()
+                    break()
+                endif()
+            endif()
+        endforeach()
+    endif()
+
+    # For dynamic libraries, also check with ldd/otool if target properties didn't help.
+    if(NOT _faudio_sdl_mismatch AND NOT VBAM_STATIC)
+        foreach(_faudio_target FAudio::FAudio-shared FAudio::FAudio)
+            if(TARGET ${_faudio_target})
+                get_target_property(_faudio_location ${_faudio_target} IMPORTED_LOCATION)
+                if(NOT _faudio_location)
+                    get_target_property(_faudio_location ${_faudio_target} IMPORTED_LOCATION_RELEASE)
+                endif()
+                if(NOT _faudio_location)
+                    get_target_property(_faudio_location ${_faudio_target} IMPORTED_LOCATION_RELWITHDEBINFO)
+                endif()
+                if(_faudio_location AND EXISTS "${_faudio_location}")
+                    if(APPLE)
+                        execute_process(
+                            COMMAND otool -L "${_faudio_location}"
+                            OUTPUT_VARIABLE _faudio_deps
+                            ERROR_QUIET
+                            OUTPUT_STRIP_TRAILING_WHITESPACE
+                        )
+                    elseif(UNIX)
+                        execute_process(
+                            COMMAND ldd "${_faudio_location}"
+                            OUTPUT_VARIABLE _faudio_deps
+                            ERROR_QUIET
+                            OUTPUT_STRIP_TRAILING_WHITESPACE
+                        )
+                    endif()
+                    if(_faudio_deps)
+                        string(FIND "${_faudio_deps}" "libSDL2" _links_sdl2)
+                        string(FIND "${_faudio_deps}" "libSDL3" _links_sdl3)
+
+                        if(ENABLE_SDL3 AND _links_sdl2 GREATER -1)
+                            set(_faudio_sdl_mismatch ON)
+                            message(STATUS "FAudio links to libSDL2, but we're using SDL3 - disabling FAudio")
+                        elseif(NOT ENABLE_SDL3 AND _links_sdl3 GREATER -1)
+                            set(_faudio_sdl_mismatch ON)
+                            message(STATUS "FAudio links to libSDL3, but we're using SDL2 - disabling FAudio")
+                        endif()
+                    endif()
+                    break()
+                endif()
+            endif()
+        endforeach()
+    endif()
+
+    if(NOT _faudio_sdl_mismatch)
+        set(ENABLE_FAUDIO_DEFAULT ON)
+    endif()
+
+    unset(_faudio_sdl_mismatch)
+    unset(_faudio_link_libs)
+    unset(_faudio_target)
+    unset(_faudio_location)
+    unset(_faudio_symbols)
+    unset(_faudio_deps)
+    unset(_has_sdl2_symbol)
+    unset(_has_sdl3_symbol)
+    unset(_links_sdl2)
+    unset(_links_sdl3)
 endif()
 
 option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" ${ENABLE_FAUDIO_DEFAULT})
