@@ -522,9 +522,9 @@ void soundReset()
 
     if (gb_apu) {
         gb_apu->end_frame(soundTicks);
+        reset_apu();
     }
 
-    reset_apu();
     remake_stereo_buffer();
 
     soundTicks = 0;

@@ -16,6 +16,7 @@
 
 #include "wx/audio/internal/faudio.h"
 
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <vector>
@@ -151,7 +152,7 @@ private:
     int currentBuffer;
     int sound_buffer_len_;
 
-    volatile bool device_changed;
+    std::atomic<bool> device_changed;
 
     FAudio* faud;
     FAudioMasteringVoice* mVoice;  // listener
@@ -273,7 +274,7 @@ bool FAudio_Output::init(long sampleRate) {
         // set up stereo upmixing
         FAudioDeviceDetails dd{};
         VBAM_CHECK(FAudio_GetDeviceDetails(faud, 0, &dd) == 0);
-        std::vector<float> matrix(sizeof(float) * 2 * dd.OutputFormat.Format.nChannels);
+        std::vector<float> matrix(2 * dd.OutputFormat.Format.nChannels);
 
         bool matrixAvailable = true;
 
@@ -446,7 +447,7 @@ void FAudio_Output::resume() {
         return;
 
     if (!playing) {
-        [[maybe_unused]] int32_t hr = FAudioSourceVoice_Start(sVoice, 0, FAUDIO_COMMIT_NOW);
+        [[maybe_unused]] uint32_t hr = FAudioSourceVoice_Start(sVoice, 0, FAUDIO_COMMIT_NOW);
         VBAM_CHECK(hr == 0);
         playing = true;
     }
@@ -461,8 +462,10 @@ void FAudio_Output::reset() {
         VBAM_CHECK(hr == 0);
     }
 
-    FAudioSourceVoice_FlushSourceBuffers(sVoice);
-    FAudioSourceVoice_Start(sVoice, 0, FAUDIO_COMMIT_NOW);
+    [[maybe_unused]] uint32_t hr = FAudioSourceVoice_FlushSourceBuffers(sVoice);
+    VBAM_CHECK(hr == 0);
+    hr = FAudioSourceVoice_Start(sVoice, 0, FAUDIO_COMMIT_NOW);
+    VBAM_CHECK(hr == 0);
     playing = true;
 }
 
@@ -498,6 +501,7 @@ std::vector<AudioDevice> GetFAudioDevices() {
     hr = FAudio_GetDeviceCount(fa, &dev_count);
     if (hr != 0) {
         wxLogError(_("FAudio: Enumerating devices failed!"));
+        FAudio_Release(fa);
         return {};
     }
 
