@@ -2376,9 +2376,10 @@ int wxvbamApp::FilterEvent(wxEvent& event)
     if (event.GetEventType() == wxEVT_KEY_DOWN || event.GetEventType() == wxEVT_KEY_UP) {
         // Skip keyboard processing when focus is on a text entry control
         // to allow typing special characters like %
+        // Exception: UserInputCtrl needs keyboard processing to capture key bindings
         wxWindow* focused = wxWindow::FindFocus();
-        if (focused && (wxDynamicCast(focused, wxTextCtrl) ||
-                        wxDynamicCast(focused, wxComboBox))) {
+        if (focused && !wxDynamicCast(focused, widgets::UserInputCtrl) &&
+            (wxDynamicCast(focused, wxTextCtrl) || wxDynamicCast(focused, wxComboBox))) {
             return wxEventFilter::Event_Skip;
         }
 #ifdef __WXGTK__
@@ -2398,7 +2399,8 @@ int wxvbamApp::FilterEvent(wxEvent& event)
         }
 #endif
         // If menus are open, handle menu item mnemonics recursively
-        if (!frame->CanProcessShortcuts()) {
+        // Exception: UserInputCtrl needs keyboard processing to capture key bindings
+        if (!frame->CanProcessShortcuts() && !wxDynamicCast(focused, widgets::UserInputCtrl)) {
             if (event.GetEventType() == wxEVT_KEY_DOWN) {
                 wxKeyEvent& key_event = static_cast<wxKeyEvent&>(event);
                 int key_code = key_event.GetKeyCode();
