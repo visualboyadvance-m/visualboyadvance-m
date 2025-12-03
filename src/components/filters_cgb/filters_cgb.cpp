@@ -142,9 +142,9 @@ void gbcfilter_update_colors(bool lcd) {
             // It uses the top 5 bits of the 8-bit value for the GBC's 5-bit component position,
             // and the bottom 3 bits to fill the lower, normally zeroed, positions.
             for (int i = 0; i < 0x10000; i++) {
-                uint8_t r5 = (i & 0x1f);
-                uint8_t g5 = ((i & 0x3e0) >> 5);
-                uint8_t b5 = ((i & 0x7c00) >> 10);
+                uint8_t r5 = static_cast<uint8_t>(i & 0x1f);
+                uint8_t g5 = static_cast<uint8_t>((i & 0x3e0) >> 5);
+                uint8_t b5 = static_cast<uint8_t>((i & 0x7c00) >> 10);
 
                 // Scale 5-bit to 8-bit: 0x1F -> 0xFF
                 uint8_t final_red_8bit = (r5 << 3) | (r5 >> 2);

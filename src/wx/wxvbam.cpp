@@ -1579,8 +1579,9 @@ void MainFrame::IdentifyRom()
 // Forward declarations
 #ifndef __WXGTK__
 static bool SearchAndActivateMenuItem(wxMenu* menu, wxChar mnemonic, int depth = 0);
-#endif
+#else
 static bool ActivateMenuItemByMnemonic(wxMenu* menu, wxChar mnemonic);
+#endif
 
 #ifdef __WXGTK__
 //==============================================================================
@@ -2223,8 +2224,9 @@ static gboolean HandleMenuKeyboardNavigation(GtkWidget* widget, GdkEventKey* eve
 
 #endif  // __WXGTK__
 
+#ifdef __WXGTK__
 //==============================================================================
-// Menu Item Activation Helpers (Cross-Platform)
+// Menu Item Activation Helpers (GTK only)
 //==============================================================================
 
 // Helper to activate a menu item (handles checkable items)
@@ -2244,7 +2246,6 @@ static bool ActivateMenuItem(wxMenu* menu, wxMenuItem* item) {
     wxTheApp->GetTopWindow()->GetEventHandler()->ProcessEvent(event);
     return true;
 }
-
 // Search within a single menu (non-recursive) for a menu item with the given mnemonic/first letter and activate it
 // Priority: 1) mnemonic match (character after &), 2) first letter match
 static bool ActivateMenuItemByMnemonic(wxMenu* menu, wxChar letter) {
@@ -2283,8 +2284,7 @@ static bool ActivateMenuItemByMnemonic(wxMenu* menu, wxChar letter) {
 
     return false;
 }
-
-#ifndef __WXGTK__
+#else  // !__WXGTK__
 // Recursively search a menu for a menu item with the given mnemonic and activate it
 static bool SearchAndActivateMenuItem(wxMenu* menu, wxChar mnemonic, int depth) {
     if (!menu)
