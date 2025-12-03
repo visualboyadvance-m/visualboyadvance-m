@@ -81,8 +81,44 @@ if ($filesToAdd.Count -eq 0) {
     exit 1
 }
 
+# Ensure zip file path is absolute (relative to current directory, not user profile)
+if (-not [System.IO.Path]::IsPathRooted($zipFile)) {
+    $zipFile = Join-Path (Get-Location).Path $zipFile
+}
+
 # Load required .NET assembly
 Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+# Helper function to add a file to a zip archive
+# Using streams instead of ZipFileExtensions::CreateEntryFromFile for ps12exe compatibility
+function Add-FileToZip {
+    param(
+        [System.IO.Compression.ZipArchive]$archive,
+        [string]$filePath,
+        [string]$entryName,
+        [System.IO.Compression.CompressionLevel]$compression
+    )
+
+    $entry = $archive.CreateEntry($entryName, $compression)
+
+    # Preserve the file's last write time
+    $fileInfo = [System.IO.FileInfo]::new($filePath)
+    $entry.LastWriteTime = $fileInfo.LastWriteTime
+
+    $entryStream = $entry.Open()
+    try {
+        $fileStream = [System.IO.File]::OpenRead($filePath)
+        try {
+            $fileStream.CopyTo($entryStream)
+        }
+        finally {
+            $fileStream.Dispose()
+        }
+    }
+    finally {
+        $entryStream.Dispose()
+    }
+}
 
 # Delete existing zip file if it exists
 if (Test-Path $zipFile) {
@@ -90,11 +126,8 @@ if (Test-Path $zipFile) {
 }
 
 # Determine compression level
-if ($maxCompression) {
-    $compressionLevel = [System.IO.Compression.CompressionLevel]::SmallestSize
-} else {
-    $compressionLevel = [System.IO.Compression.CompressionLevel]::Optimal
-}
+# Note: SmallestSize is not available in older .NET versions, Optimal is the best available
+$compressionLevel = [System.IO.Compression.CompressionLevel]::Optimal
 
 try {
     # Create the zip archive
@@ -124,12 +157,7 @@ try {
                 }
             }
 
-            [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
-                $zipArchive,
-                $sourcePath,
-                $entryName,
-                $compressionLevel
-            ) | Out-Null
+            Add-FileToZip $zipArchive $sourcePath $entryName $compressionLevel
 
             if (-not $quiet) {
                 Write-Verbose "Added: $entryName"
@@ -201,12 +229,7 @@ try {
                             }
                         }
 
-                        [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
-                            $zipArchive,
-                            $entry.FullPath,
-                            $entry.EntryName,
-                            $compressionLevel
-                        ) | Out-Null
+                        Add-FileToZip $zipArchive $entry.FullPath $entry.EntryName $compressionLevel
 
                         if (-not $quiet) {
                             Write-Verbose "Added: $($entry.EntryName)"

@@ -65,19 +65,66 @@ set(VBAM_WX_COMMON
 
 if(NOT ZIP_PROGRAM)
     find_program(ZIP_PROGRAM zip DOC "zip compressor executable")
-    if(WIN32 AND NOT ZIP_PROGRAM AND NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/zip.exe)
+    if(WIN32 AND NOT ZIP_PROGRAM)
         if(NOT DEFINED POWERSHELL)
             message(FATAL_ERROR "Powershell is required for zip file support when the `zip` program is not available.")
         endif()
-        set(ZIP_PROGRAM "${CMAKE_SOURCE_DIR}/src/wx/zip.bat" CACHE STRING "zip compressor executable" FORCE)
-        set(ENV{PATH} "$ENV{PATH};${CMAKE_SOURCE_DIR}/src/wx")
-    endif()
-    if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/zip.exe)
-        set(ZIP_PROGRAM "${CMAKE_CURRENT_BINARY_DIR}/zip.exe")
+
+        # Build zip.exe from zip.ps1 using ps12exe
+        set(ZIP_EXE_DIR "${CMAKE_BINARY_DIR}/zip-bin")
+        set(ZIP_EXE "${ZIP_EXE_DIR}/zip.exe")
+        set(PS12EXE_DIR "${CMAKE_BINARY_DIR}/ps12exe")
+
+        if(NOT EXISTS "${ZIP_EXE}")
+            file(MAKE_DIRECTORY "${ZIP_EXE_DIR}")
+
+            message(STATUS "Building zip.exe from zip.ps1 using ps12exe...")
+
+            # Download ps12exe repository if not present
+            if(NOT EXISTS "${PS12EXE_DIR}/ps12exe.ps1")
+                message(STATUS "Downloading ps12exe...")
+                file(DOWNLOAD
+                    "https://github.com/steve02081504/ps12exe/archive/refs/heads/master.zip"
+                    "${CMAKE_BINARY_DIR}/ps12exe.zip"
+                    STATUS DOWNLOAD_STATUS
+                )
+                list(GET DOWNLOAD_STATUS 0 DOWNLOAD_RESULT)
+
+                if(NOT DOWNLOAD_RESULT EQUAL 0)
+                    message(FATAL_ERROR "Failed to download ps12exe. The zip program is required for building.")
+                endif()
+
+                # Extract the archive
+                execute_process(
+                    COMMAND ${POWERSHELL} -NoProfile -ExecutionPolicy Bypass -Command
+                        "Expand-Archive -Path '${CMAKE_BINARY_DIR}/ps12exe.zip' -DestinationPath '${CMAKE_BINARY_DIR}' -Force"
+                    RESULT_VARIABLE EXTRACT_RESULT
+                )
+
+                if(NOT EXTRACT_RESULT EQUAL 0)
+                    message(FATAL_ERROR "Failed to extract ps12exe. The zip program is required for building.")
+                endif()
+
+                file(RENAME "${CMAKE_BINARY_DIR}/ps12exe-master" "${PS12EXE_DIR}")
+            endif()
+
+            execute_process(
+                COMMAND ${POWERSHELL} -NoProfile -ExecutionPolicy Bypass -Command
+                    "& '${PS12EXE_DIR}/ps12exe.ps1' -inputFile '${CMAKE_SOURCE_DIR}/src/wx/zip.ps1' -outputFile '${ZIP_EXE}' -noConsole:$false -architecture 'x86' -localize 'en'"
+                RESULT_VARIABLE PS12EXE_BUILD_RESULT
+            )
+
+            if(NOT PS12EXE_BUILD_RESULT EQUAL 0)
+                message(FATAL_ERROR "Failed to build zip.exe with ps12exe. The zip program is required for building.")
+            endif()
+        endif()
+
+        set(ZIP_PROGRAM "${ZIP_EXE}")
+        set(ENV{PATH} "${ZIP_EXE_DIR};$ENV{PATH}")
     endif()
     if(ZIP_PROGRAM)
         set(ZIP_PROGRAM "${ZIP_PROGRAM}" CACHE STRING "zip compressor executable" FORCE)
-    else(NOT ZIP_PROGRAM)
+    else()
         message(FATAL_ERROR "The zip compressor program is required for building.")
     endif()
 endif()
