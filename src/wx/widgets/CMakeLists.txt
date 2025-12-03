@@ -43,7 +43,7 @@ target_sources(vbam-wx-widgets
 target_link_libraries(vbam-wx-widgets PUBLIC vbam-wx-config)
 configure_wx_target(vbam-wx-widgets)
 
-if(BUILD_TESTING)
+if(BUILD_TESTING AND NOT COMPILE_ONLY)
     add_executable(vbam-wx-widgets-tests
         client-data-test.cpp
         group-check-box-test.cpp

@@ -259,6 +259,9 @@ function(configure_wx_target target)
     elseif(target_type STREQUAL "INTERFACE_LIBRARY")
         set(target_is_executable FALSE)
         set(target_is_interface_library TRUE)
+    elseif(target_type STREQUAL "OBJECT_LIBRARY")
+        set(target_is_executable FALSE)
+        set(target_is_object_library TRUE)
     else()
         set(target_is_executable FALSE)
     endif()
@@ -269,6 +272,7 @@ function(configure_wx_target target)
         elseif(${target_is_interface_library})
             target_link_libraries(${target} INTERFACE ${ARGN})
         else()
+            # For object libraries and static/shared libraries, use PUBLIC
             target_link_libraries(${target} PUBLIC ${ARGN})
         endif()
     endfunction()
@@ -412,13 +416,17 @@ add_subdirectory(widgets)
 set(VBAM_ICON visualboyadvance-m.icns)
 set(VBAM_ICON_PATH ${CMAKE_CURRENT_SOURCE_DIR}/icons/${VBAM_ICON})
 
-add_executable(
-    visualboyadvance-m
-    WIN32
-    MACOSX_BUNDLE
-)
+if(COMPILE_ONLY)
+    add_library(visualboyadvance-m OBJECT)
+else()
+    add_executable(
+        visualboyadvance-m
+        WIN32
+        MACOSX_BUNDLE
+    )
+endif()
 
-if(APPLE)
+if(APPLE AND NOT COMPILE_ONLY)
     if(CMAKE_Metal_COMPILER)
         set(VBAM_SHADER default.metallib)
 
@@ -440,7 +448,9 @@ if(APPLE)
             default
         )
     endif()
+endif()
 
+if(APPLE)
 # Needed for CoreAudio.
     target_compile_options(visualboyadvance-m PRIVATE -Wno-error=elaborated-enum-base)
 endif()
@@ -465,17 +475,19 @@ if(ENABLE_OPENAL)
 endif()
 
 
-target_link_libraries(
-    visualboyadvance-m
-    vbam-components-draw-text
-    vbam-components-filters
-    vbam-components-filters-agb
-    vbam-components-filters-cgb
-    vbam-components-filters-interframe
-    vbam-components-user-config
-    vbam-wx-config
-    vbam-wx-widgets
-)
+if(NOT COMPILE_ONLY)
+    target_link_libraries(
+        visualboyadvance-m
+        vbam-components-draw-text
+        vbam-components-filters
+        vbam-components-filters-agb
+        vbam-components-filters-cgb
+        vbam-components-filters-interframe
+        vbam-components-user-config
+        vbam-wx-config
+        vbam-wx-widgets
+    )
+endif()
 
 # adjust link command when making a static binary for gcc
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND VBAM_STATIC)
@@ -503,10 +515,14 @@ if(NOT WIN32 AND NOT APPLE)
 
     if(X11_X11_LIB)
         target_include_directories(visualboyadvance-m PRIVATE ${X11_INCLUDE_DIR})
-        target_link_libraries(visualboyadvance-m ${X11_X11_LIB})
+        if(NOT COMPILE_ONLY)
+            target_link_libraries(visualboyadvance-m ${X11_X11_LIB})
+        endif()
         target_compile_definitions(visualboyadvance-m PRIVATE HAVE_X11)
         if(X11_Xscreensaver_LIB)
-        target_link_libraries(visualboyadvance-m ${X11_Xscreensaver_LIB})
+            if(NOT COMPILE_ONLY)
+                target_link_libraries(visualboyadvance-m ${X11_Xscreensaver_LIB})
+            endif()
             target_compile_definitions(visualboyadvance-m PRIVATE HAVE_XSS)
         endif()
     endif()
@@ -514,12 +530,14 @@ if(NOT WIN32 AND NOT APPLE)
     find_library(EGL_LIBRARY EGL)
 
     if(EGL_LIBRARY)
-    target_link_libraries(visualboyadvance-m ${EGL_LIBRARY})
+        if(NOT COMPILE_ONLY)
+            target_link_libraries(visualboyadvance-m ${EGL_LIBRARY})
+        endif()
         target_compile_definitions(visualboyadvance-m PRIVATE HAVE_EGL)
     endif()
 
     find_library(WAYLAND_LIBRARY wayland-client)
-    if(WAYLAND_LIBRARY)
+    if(WAYLAND_LIBRARY AND NOT COMPILE_ONLY)
         target_link_libraries(visualboyadvance-m ${WAYLAND_LIBRARY})
     endif()
 endif()
@@ -531,18 +549,20 @@ if(WIN32)
         wxvbam.rc
         wxvbam_translations.rc
     )
-    target_link_libraries(visualboyadvance-m
-        dxguid dsound wsock32 ws2_32 imm32 version winmm)
+    if(NOT COMPILE_ONLY)
+        target_link_libraries(visualboyadvance-m
+            dxguid dsound wsock32 ws2_32 imm32 version winmm)
 
-    # Force a re-link when the manifest file is modified.
-    set_target_properties(visualboyadvance-m
-        PROPERTIES
-        LINK_DEPENDS
-        "${CMAKE_CURRENT_LIST_DIR}/visualboyadvance-m.manifest")
+        # Force a re-link when the manifest file is modified.
+        set_target_properties(visualboyadvance-m
+            PROPERTIES
+            LINK_DEPENDS
+            "${CMAKE_CURRENT_LIST_DIR}/visualboyadvance-m.manifest")
 
-    if(MSVC)
-        # Disable the auto-generated manifest from CMake.
-        target_link_options(visualboyadvance-m PRIVATE "/MANIFEST:NO")
+        if(MSVC)
+            # Disable the auto-generated manifest from CMake.
+            target_link_options(visualboyadvance-m PRIVATE "/MANIFEST:NO")
+        endif()
     endif()
 endif()
 
@@ -551,12 +571,14 @@ if(APPLE)
         macsupport.mm
     )
 
-    target_link_libraries(visualboyadvance-m
-      tiff)
-
-    if(NOT NIX)
+    if(NOT COMPILE_ONLY)
         target_link_libraries(visualboyadvance-m
-          zstd deflate)
+          tiff)
+
+        if(NOT NIX)
+            target_link_libraries(visualboyadvance-m
+              zstd deflate)
+        endif()
     endif()
 endif()
 
@@ -613,18 +635,22 @@ if(NOT WIN32 AND NOT APPLE)
             message(FATAL_ERROR "Could not find gtk4")
         endif()
         target_include_directories(visualboyadvance-m PRIVATE ${GTK4_INCLUDE_DIRS})
-        target_link_directories(visualboyadvance-m PRIVATE ${GTK4_LIBRARY_DIRS})
         target_compile_options(visualboyadvance-m PRIVATE ${GTK4_CFLAGS_OTHER})
-        target_link_libraries(visualboyadvance-m ${GTK4_LIBRARIES})
+        if(NOT COMPILE_ONLY)
+            target_link_directories(visualboyadvance-m PRIVATE ${GTK4_LIBRARY_DIRS})
+            target_link_libraries(visualboyadvance-m ${GTK4_LIBRARIES})
+        endif()
     elseif(WX_USING_GTK3)
         pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
         if(NOT GTK3_INCLUDE_DIRS)
             message(FATAL_ERROR "Could not find gtk3")
         endif()
         target_include_directories(visualboyadvance-m PRIVATE ${GTK3_INCLUDE_DIRS})
-        target_link_directories(visualboyadvance-m PRIVATE ${GTK3_LIBRARY_DIRS})
         target_compile_options(visualboyadvance-m PRIVATE ${GTK3_CFLAGS_OTHER})
-        target_link_libraries(visualboyadvance-m ${GTK3_LIBRARIES})
+        if(NOT COMPILE_ONLY)
+            target_link_directories(visualboyadvance-m PRIVATE ${GTK3_LIBRARY_DIRS})
+            target_link_libraries(visualboyadvance-m ${GTK3_LIBRARIES})
+        endif()
     else()
         check_cxx_symbol_exists(__WXGTK20__ ${WX_CONFIG_H} WX_USING_GTK2)
         if(WX_USING_GTK2)
@@ -632,9 +658,11 @@ if(NOT WIN32 AND NOT APPLE)
             pkg_check_modules(GTK2 REQUIRED gtk+-2.0)
             if(GTK2_INCLUDE_DIRS)
                 target_include_directories(visualboyadvance-m PRIVATE ${GTK2_INCLUDE_DIRS})
-                target_link_directories(visualboyadvance-m PRIVATE ${GTK2_LIBRARY_DIRS})
                 target_compile_options(visualboyadvance-m PRIVATE ${GTK2_CFLAGS_OTHER})
-                target_link_libraries(visualboyadvance-m ${GTK2_LIBRARIES})
+                if(NOT COMPILE_ONLY)
+                    target_link_directories(visualboyadvance-m PRIVATE ${GTK2_LIBRARY_DIRS})
+                    target_link_libraries(visualboyadvance-m ${GTK2_LIBRARIES})
+                endif()
             else()
                 # and if that fails, use the cmake module
                 find_package(GTK2 REQUIRED gtk)
@@ -643,7 +671,9 @@ if(NOT WIN32 AND NOT APPLE)
                 endif()
                 target_include_directories(visualboyadvance-m PRIVATE ${GTK2_INCLUDE_DIRS})
                 target_compile_options(visualboyadvance-m PRIVATE ${GTK2_DEFINITIONS})
-                target_link_libraries(visualboyadvance-m ${GTK2_LIBRARIES})
+                if(NOT COMPILE_ONLY)
+                    target_link_libraries(visualboyadvance-m ${GTK2_LIBRARIES})
+                endif()
             endif()
         else()
             find_package(GTK REQUIRED gtk)
@@ -652,13 +682,15 @@ if(NOT WIN32 AND NOT APPLE)
             endif()
             target_include_directories(visualboyadvance-m PRIVATE ${GTK_INCLUDE_DIRS})
             target_compile_options(visualboyadvance-m PRIVATE ${GTK_DEFINITIONS})
-            target_link_libraries(visualboyadvance-m ${GTK_LIBRARIES})
+            if(NOT COMPILE_ONLY)
+                target_link_libraries(visualboyadvance-m ${GTK_LIBRARIES})
+            endif()
         endif()
     endif()
 endif()
 
 # FFMPeg.
-if(ENABLE_FFMPEG)
+if(ENABLE_FFMPEG AND NOT COMPILE_ONLY)
     target_link_libraries(
         visualboyadvance-m
         vbam-components-av-recording
@@ -670,7 +702,11 @@ if(ENABLE_FFMPEG)
     endif()
 endif()
 
-target_link_libraries(visualboyadvance-m nonstd-lib)
+if(COMPILE_ONLY)
+    target_link_libraries(visualboyadvance-m PUBLIC nonstd-lib)
+else()
+    target_link_libraries(visualboyadvance-m nonstd-lib)
+endif()
 
 # wxrc does not support xrs files in -c output (> 10x compression)
 # we do it using the bin2c.c utility.

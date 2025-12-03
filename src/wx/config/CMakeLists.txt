@@ -63,7 +63,7 @@ target_sources(vbam-wx-config
 
 configure_wx_target(vbam-wx-config)
 
-if(BUILD_TESTING)
+if(BUILD_TESTING AND NOT COMPILE_ONLY)
     add_executable(vbam-wx-config-tests
         bindings-test.cpp
         command-test.cpp

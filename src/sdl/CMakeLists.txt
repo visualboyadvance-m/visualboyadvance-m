@@ -2,8 +2,12 @@ if(NOT ENABLE_SDL)
     return()
 endif()
 
-# Define the vbam executable.
-add_executable(vbam WIN32)
+# Define the vbam executable (or object library in COMPILE_ONLY mode).
+if(COMPILE_ONLY)
+    add_library(vbam OBJECT)
+else()
+    add_executable(vbam WIN32)
+endif()
 
 target_sources(vbam
     PRIVATE
@@ -52,48 +56,60 @@ else()
     )
 endif()
 
-target_link_libraries(vbam
-    vbam-core
-    vbam-components-draw-text
-    vbam-components-filters
-    vbam-components-filters-agb
-    vbam-components-filters-cgb
-    vbam-components-filters-interframe
-    vbam-components-user-config
-    ${OPENGL_LIBRARIES}
-    ${VBAM_SDL_LIBS}
-    nonstd-lib
-)
+if(COMPILE_ONLY)
+    target_link_libraries(vbam PUBLIC nonstd-lib)
+else()
+    target_link_libraries(vbam nonstd-lib)
+endif()
 
-if(WIN32)
-    if(ENABLE_SDL3)
-        target_link_libraries(vbam ${SDL3_LIBRARY})
-    else()
-        target_link_libraries(vbam ${SDL2_LIBRARY} ${SDL2MAIN_LIBRARY})
+if(NOT COMPILE_ONLY)
+    target_link_libraries(vbam
+        vbam-core
+        vbam-components-draw-text
+        vbam-components-filters
+        vbam-components-filters-agb
+        vbam-components-filters-cgb
+        vbam-components-filters-interframe
+        vbam-components-user-config
+        ${OPENGL_LIBRARIES}
+        ${VBAM_SDL_LIBS}
+    )
+
+    if(WIN32)
+        if(ENABLE_SDL3)
+            target_link_libraries(vbam ${SDL3_LIBRARY})
+        else()
+            target_link_libraries(vbam ${SDL2_LIBRARY} ${SDL2MAIN_LIBRARY})
+        endif()
+    endif()
+
+    if(ENABLE_LIRC)
+        target_link_libraries(vbam lirc_client)
+    endif()
+
+    if(WIN32)
+        target_link_libraries(vbam wsock32 ws2_32 winmm version imm32)
     endif()
 endif()
 
 if(ENABLE_LIRC)
-    target_link_libraries(vbam lirc_client)
     target_compile_definitions(vbam PUBLIC VBAM_ENABLE_LIRC)
 endif()
 
-if(WIN32)
-    target_link_libraries(vbam wsock32 ws2_32 winmm version imm32)
-endif()
-
 # Installation scripts.
-install(
-    PROGRAMS ${PROJECT_BINARY_DIR}/vbam${CMAKE_EXECUTABLE_SUFFIX}
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
-install(
-    FILES ${CMAKE_CURRENT_LIST_DIR}/vbam.cfg-example
-    DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}
-    RENAME vbam.cfg
-)
+if(NOT COMPILE_ONLY)
+    install(
+        PROGRAMS ${PROJECT_BINARY_DIR}/vbam${CMAKE_EXECUTABLE_SUFFIX}
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+    install(
+        FILES ${CMAKE_CURRENT_LIST_DIR}/vbam.cfg-example
+        DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}
+        RENAME vbam.cfg
+    )
 
-if(UNIX)
-    # man pages.
-    install(FILES ${CMAKE_SOURCE_DIR}/src/debian/vbam.6 DESTINATION ${CMAKE_INSTALL_MANDIR}/man6)
+    if(UNIX)
+        # man pages.
+        install(FILES ${CMAKE_SOURCE_DIR}/src/debian/vbam.6 DESTINATION ${CMAKE_INSTALL_MANDIR}/man6)
+    endif()
 endif()

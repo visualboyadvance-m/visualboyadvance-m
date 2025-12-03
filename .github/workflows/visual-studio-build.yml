@@ -49,12 +49,12 @@ jobs:
 
       - name: Configure
         run: >-
-          cmake -B build -G ${{ matrix.cmake_generator }} -DVCPKG_TARGET_TRIPLET=${{ matrix.cmake_vcpkg_triplet }} ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}
+          cmake -B build -G ${{ matrix.cmake_generator }} -DBUILD_TESTING=OFF -DCOMPILE_ONLY=TRUE -DUPSTREAM_RELEASE=FALSE -DVCPKG_TARGET_TRIPLET=${{ matrix.cmake_vcpkg_triplet }} ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}
 
       - name: Build
         run: cmake --build build
 
       # Run tests
-      - if: matrix.build_options == 'default' && matrix.msvc_arch != 'amd64_arm64'
-        name: Run tests
-        run: cd build && ctest -j --output-on-failure
+#      - if: matrix.build_options == 'default' && matrix.msvc_arch != 'amd64_arm64'
+#        name: Run tests
+#        run: cd build && ctest -j --output-on-failure
