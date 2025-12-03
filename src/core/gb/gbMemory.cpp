@@ -28,7 +28,7 @@ void mapperMBC1ROM(uint16_t address, uint8_t value)
 
     switch (address & 0x6000) {
     case 0x0000: // RAM enable register
-        gbDataMBC1.mapperRAMEnable = ((value & 0x0a) == 0x0a ? 1 : 0);
+        gbDataMBC1.mapperRAMEnable = ((value & 0x0f) == 0x0a ? 1 : 0);
         break;
     case 0x2000: // ROM bank select
         //    value = value & 0x1f;
@@ -364,7 +364,7 @@ void mapperMBC3ROM(uint16_t address, uint8_t value)
 
     switch (address & 0x6000) {
     case 0x0000: // RAM enable register
-        gbDataMBC3.mapperRAMEnable = ((value & 0x0a) == 0x0a ? 1 : 0);
+        gbDataMBC3.mapperRAMEnable = ((value & 0x0f) == 0x0a ? 1 : 0);
         break;
     case 0x2000: { // ROM bank select
         if (g_gbCartData.rom_size() != k4MiB)
@@ -569,7 +569,7 @@ void mapperMBC5ROM(uint16_t address, uint8_t value)
 
     switch (address & 0x6000) {
     case 0x0000: // RAM enable register
-        gbDataMBC5.mapperRAMEnable = ((value & 0x0a) == 0x0a ? 1 : 0);
+        gbDataMBC5.mapperRAMEnable = ((value & 0x0f) == 0x0a ? 1 : 0);
         break;
     case 0x2000: // ROM bank select
 
@@ -920,7 +920,7 @@ void mapperHuC1ROM(uint16_t address, uint8_t value)
 
     switch (address & 0x6000) {
     case 0x0000: // RAM enable register
-        gbDataHuC1.mapperRAMEnable = ((value & 0x0a) == 0x0a ? 1 : 0);
+        gbDataHuC1.mapperRAMEnable = ((value & 0x0f) == 0x0a ? 1 : 0);
         break;
     case 0x2000: // ROM bank select
         value = value & 0x3f;
@@ -1550,7 +1550,7 @@ void mapperMMM01ROM(uint16_t address, uint8_t value)
 
     switch (address & 0x6000) {
     case 0x0000: // RAM enable register
-        gbDataMMM01.mapperRAMEnable = ((value & 0x0a) == 0x0a ? 1 : 0);
+        gbDataMMM01.mapperRAMEnable = ((value & 0x0f) == 0x0a ? 1 : 0);
         break;
     case 0x2000: // ROM bank select
         //    value = value & 0x1f;
