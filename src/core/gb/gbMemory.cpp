@@ -350,7 +350,7 @@ void memoryUpdateMBC3Clock()
                 gbDataMBC3.mapperControl &= 0xC0; // Preserve only overflow + halt, clear others
             }
         } else {
-            gbDataMBC3.mapperControl &= 0x01; // clear high-day bit
+            gbDataMBC3.mapperControl &= ~0x01; // clear high-day bit
         }
     }
 }
