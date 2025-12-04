@@ -349,6 +349,8 @@ void memoryUpdateMBC3Clock()
                 gbDataMBC3.mapperControl |= 0x80; // Set overflow bit
                 gbDataMBC3.mapperControl &= 0xC0; // Preserve only overflow + halt, clear others
             }
+        } else {
+            gbDataMBC3.mapperControl &= ~0x01; // clear high-day bit
         }
     }
 }
@@ -443,7 +445,7 @@ void mapperMBC3RAM(uint16_t address, uint8_t value)
                 gbDataMBC3.mapperDays = (gbDataMBC3.mapperDays & 0x100) | value;
                 break;
             case 0x0c:
-                gbDataMBC3.mapperControl = (gbDataMBC3.mapperControl & 0x80) | (value & 0x41);
+                gbDataMBC3.mapperControl = value;
                 if (value & 0x01) {
                     gbDataMBC3.mapperDays |= 0x100;
                 } else {

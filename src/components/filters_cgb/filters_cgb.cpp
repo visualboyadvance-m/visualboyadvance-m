@@ -351,3 +351,200 @@ void gbcfilter_pal32(uint32_t* buf, int count)
         *buf++ = final_pix;
     }
 }
+
+void gbcfilter_update_colors_native(bool lcd) {
+    switch (systemColorDepth) {
+    case 8: {
+        for (int i = 0; i < 0x10000; i++) {
+            systemColorMap8[i] = (uint8_t)((((i & 0x1f) << 3) & 0xE0) |
+                ((((i & 0x3e0) >> 5) << 0) & 0x1C) |
+                ((((i & 0x7c00) >> 10) >> 3) & 0x3));
+        }
+        if (lcd)
+            gbcfilter_pal8(systemColorMap8, 0x10000);
+    } break;
+    case 16: {
+        for (int i = 0x0; i < 0x10000; i++) {
+            // GB/GBC uses BGR555 format: 0BBBBBGGGGGRRRRR
+            // Red: bits 0-4, Green: bits 5-9, Blue: bits 10-14
+            int r5 = i & 0x1F;
+            int g5 = (i >> 5) & 0x1F;
+            int b5 = (i >> 10) & 0x1F;
+
+            // Map to 16-bit RGB565 (5-6-5)
+            int g6 = (g5 << 1) | (g5 >> 4);
+
+            systemColorMap16[i] =
+                (r5 << systemRedShift) |
+                (g6 << (systemGreenShift - 1)) |
+                (b5 << systemBlueShift);
+        }
+        if (lcd)
+            gbcfilter_pal_565(systemColorMap16, 0x10000);
+    } break;
+    case 24:
+    case 32: {
+        for (int i = 0; i < 0x10000; i++) {
+            // GB/GBC uses BGR555 format: 0BBBBBGGGGGRRRRR
+            // Red: bits 0-4, Green: bits 5-9, Blue: bits 10-14
+            int r5 = i & 0x1F;
+            int g5 = (i >> 5) & 0x1F;
+            int b5 = (i >> 10) & 0x1F;
+
+            // Expand 5-bit to 8-bit components
+            uint8_t final_red_8bit = (r5 << 3) | (r5 >> 2);
+            uint8_t final_green_8bit = (g5 << 3) | (g5 >> 2);
+            uint8_t final_blue_8bit = (b5 << 3) | (b5 >> 2);
+
+            uint32_t final_pix = 0;
+
+            // Red component
+            // 5 most significant bits (MSBs) for the 'systemRedShift' position
+            final_pix |= ((final_red_8bit >> 3) & 0x1f) << systemRedShift;
+            // 3 least significant bits (LSBs) for the 'base' position (systemRedShift - 3)
+            final_pix |= (final_red_8bit & 0x07) << (systemRedShift - 3);
+
+            // Green component
+            // 5 MSBs for the 'systemGreenShift' position
+            final_pix |= ((final_green_8bit >> 3) & 0x1f) << systemGreenShift;
+            // 3 LSBs for the 'base' position (systemGreenShift - 3)
+            final_pix |= (final_green_8bit & 0x07) << (systemGreenShift - 3);
+
+            // Blue component
+            // 5 MSBs for the 'systemBlueShift' position
+            final_pix |= ((final_blue_8bit >> 3) & 0x1f) << systemBlueShift;
+            // 3 LSBs for the 'base' position (systemBlueShift - 3)
+            final_pix |= (final_blue_8bit & 0x07) << (systemBlueShift - 3);
+
+            systemColorMap32[i] = final_pix;
+        }
+        if (lcd)
+            gbcfilter_pal_888(systemColorMap32, 0x10000);
+    } break;
+    }
+}
+
+#define APPLY_FILTER(r, g, b) \
+    do { \
+        /* 1. Apply initial gamma (including darken_screen as exponent) to convert to linear space. */ \
+        /* This step will affect non-"white" values. */ \
+        r = powf(r, target_gamma_exponent); \
+        g = powf(g, target_gamma_exponent); \
+        b = powf(b, target_gamma_exponent); \
+        /* 2. Apply luminance factor and clamp. */ \
+        r = fmaxf(0.0f, fminf(1.0f, r * luminance_factor)); \
+        g = fmaxf(0.0f, fminf(1.0f, g * luminance_factor)); \
+        b = fmaxf(0.0f, fminf(1.0f, b * luminance_factor)); \
+        /* 3. Apply color profile matrix (using profile[column][row] access) */ \
+        transformed_r = profile[0][0] * r + profile[1][0] * g + profile[2][0] * b; \
+        transformed_g = profile[0][1] * r + profile[1][1] * g + profile[2][1] * b; \
+        transformed_b = profile[0][2] * r + profile[1][2] * g + profile[2][2] * b; \
+        /* 4. Apply display gamma to convert back for display. */ \
+        transformed_r = copysignf(powf(fabsf(transformed_r), display_gamma_reciprocal), transformed_r); \
+        transformed_g = copysignf(powf(fabsf(transformed_g), display_gamma_reciprocal), transformed_g); \
+        transformed_b = copysignf(powf(fabsf(transformed_b), display_gamma_reciprocal), transformed_b); \
+        /* Final clamp: ensure values are within 0.0-1.0 range */ \
+        transformed_r = fmaxf(0.0f, fminf(1.0f, transformed_r)); \
+        transformed_g = fmaxf(0.0f, fminf(1.0f, transformed_g)); \
+        transformed_b = fmaxf(0.0f, fminf(1.0f, transformed_b)); \
+    } while(0)
+
+void gbcfilter_pal_565(uint16_t* buf, int count)
+{
+    // Pre-calculate constants for efficiency within function scope
+    const float target_gamma_exponent = target_gamma + (lighten_screen * -1.0f);
+    const float display_gamma_reciprocal = 1.0f / display_gamma;
+    const float luminance_factor = profile[3][3]; // profile[3].w from GLSL
+
+    while (count--) {
+        float transformed_r, transformed_g, transformed_b;
+        uint16_t pix = *buf;
+
+        uint8_t original_r_val_5bit = (uint8_t)((pix >> systemRedShift) & 0x1f);
+        uint8_t original_g_val_6bit = (uint8_t)((pix >> (systemGreenShift - 1)) & 0x3f);
+        uint8_t original_b_val_5bit = (uint8_t)((pix >> systemBlueShift) & 0x1f);
+
+        // Normalize to 0.0-1.0 for calculations
+        float r = (float)original_r_val_5bit / 31.0f;
+        float g = (float)original_g_val_6bit / 63.0f;
+        float b = (float)original_b_val_5bit / 31.0f;
+
+        APPLY_FILTER(r, g, b);
+
+        // Convert back to 5-bit (0-31) integer and combine into uint16_t
+        // Apply 5-bit to 5-bit conversion, as this palette is for 16-bit output.
+        uint8_t final_red = (uint8_t)(transformed_r * 31.0f + 0.5f);
+        uint8_t final_green = (uint8_t)(transformed_g * 63.0f + 0.5f);
+        uint8_t final_blue = (uint8_t)(transformed_b * 31.0f + 0.5f);
+
+        // Ensure values are strictly within 0-31 range after rounding
+        if (final_red > 31) final_red = 31;
+        if (final_green > 63) final_green = 63;
+        if (final_blue > 31) final_blue = 31;
+
+        *buf++ = (final_red << systemRedShift) |
+            (final_green << (systemGreenShift - 1)) |
+            (final_blue << systemBlueShift);
+    }
+}
+
+void gbcfilter_pal_888(uint32_t* buf, int count)
+{
+    // Pre-calculate constants for efficiency within function scope
+    const float target_gamma_exponent = target_gamma + (lighten_screen * -1.0f);
+    const float display_gamma_reciprocal = 1.0f / display_gamma;
+    const float luminance_factor = profile[3][3]; // profile[3].w from GLSL
+
+    while (count--) {
+        float transformed_r, transformed_g, transformed_b;
+        uint32_t pix = *buf;
+
+        // Extract original 5-bit R, G, B values from the shifted positions in the 32-bit pixel.
+        // These shifts pull out the 5-bit value from its shifted position (e.g., bits 3-7 for Red).
+        uint8_t original_r_val_8bit = (uint8_t)((pix >> (systemRedShift - 3)) & 0xff);
+        uint8_t original_g_val_8bit = (uint8_t)((pix >> (systemGreenShift - 3)) & 0xff);
+        uint8_t original_b_val_8bit = (uint8_t)((pix >> (systemBlueShift - 3)) & 0xff);
+
+
+        // Normalize to 0.0-1.0 for calculations
+        float r = (float)original_r_val_8bit / 255.0f;
+        float g = (float)original_g_val_8bit / 255.0f;
+        float b = (float)original_b_val_8bit / 255.0f;
+
+        APPLY_FILTER(r, g, b);
+
+        // Convert the floating-point values to 8-bit integer components (0-255).
+        // Values are already guaranteed to be in 0-255 range since they are uint8_t
+        // and the floating point values are clamped to 0.0-1.0 before conversion.
+        uint8_t final_red_8bit = (uint8_t)(transformed_r * 255.0f + 0.5f);
+        uint8_t final_green_8bit = (uint8_t)(transformed_g * 255.0f + 0.5f);
+        uint8_t final_blue_8bit = (uint8_t)(transformed_b * 255.0f + 0.5f);
+
+        uint32_t final_pix = 0;
+
+        // Red component
+        // 5 most significant bits (MSBs) for the 'systemRedShift' position
+        final_pix |= ((final_red_8bit >> 3) & 0x1f) << systemRedShift;
+        // 3 least significant bits (LSBs) for the 'base' position (systemRedShift - 3)
+        final_pix |= (final_red_8bit & 0x07) << (systemRedShift - 3);
+
+        // Green component
+        // 5 MSBs for the 'systemGreenShift' position
+        final_pix |= ((final_green_8bit >> 3) & 0x1f) << systemGreenShift;
+        // 3 LSBs for the 'base' position (systemGreenShift - 3)
+        final_pix |= (final_green_8bit & 0x07) << (systemGreenShift - 3);
+
+        // Blue component
+        // 5 MSBs for the 'systemBlueShift' position
+        final_pix |= ((final_blue_8bit >> 3) & 0x1f) << systemBlueShift;
+        // 3 LSBs for the 'base' position (systemBlueShift - 3)
+        final_pix |= (final_blue_8bit & 0x07) << (systemBlueShift - 3);
+
+        // Preserve existing alpha if present (assuming it's at bits 24-31 for 32-bit depth)
+        if (systemColorDepth == 32) {
+            final_pix |= (pix & (0xFF << 24));
+        }
+
+        *buf++ = final_pix;
+    }
+}

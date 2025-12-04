@@ -68,8 +68,8 @@ int cpuDmaCount = 0;
 bool cpuDmaRunning = false;
 uint32_t cpuDmaPC = 0;
 int dummyAddress = 0;
-uint32_t cpuDmaLatchData[4] = {};
-int cpuDmaChannelActive;
+uint32_t cpuDmaLatchData[4];
+uint32_t cpuDmaBusValue = 0;
 
 const uint32_t cpuDmaSrcMask[4] = { 0x07ffffff, 0x0fffffff, 0x0fffffff, 0x0fffffff };
 const uint32_t cpuDmaDstMask[4] = { 0x07ffffff, 0x07ffffff, 0x07ffffff, 0x0fffffff };
@@ -690,6 +690,13 @@ unsigned int CPUWriteState(uint8_t* data)
     utilWriteIntMem(data, stopState);
     utilWriteIntMem(data, IRQTicks);
 
+    // new DMA variables
+    utilWriteIntMem(data, cpuDmaRunning);
+    utilWriteIntMem(data, cpuDmaPC);
+    utilWriteIntMem(data, cpuDmaCount);
+    utilWriteIntMem(data, cpuDmaBusValue);
+    utilWriteMem(data, cpuDmaLatchData, sizeof(uint32_t) * 4);
+
     utilWriteMem(data, g_internalRAM, SIZE_IRAM);
     utilWriteMem(data, g_paletteRAM, SIZE_PRAM);
     utilWriteMem(data, g_workRAM, SIZE_WRAM);
@@ -719,7 +726,7 @@ bool CPUReadState(const uint8_t* data)
 {
     // Don't really care about version.
     int version = utilReadIntMem(data);
-    if (version != SAVE_GAME_VERSION)
+    if (version > SAVE_GAME_VERSION || version < SAVE_GAME_VERSION_1)
         return false;
 
     char romname[16];
@@ -742,6 +749,14 @@ bool CPUReadState(const uint8_t* data)
     else {
         intState = false;
         IRQTicks = 0;
+    }
+
+    if (version >= SAVE_GAME_VERSION_11) {
+        cpuDmaRunning = utilReadIntMem(data) ? true : false;
+        cpuDmaPC = utilReadIntMem(data);
+        cpuDmaCount = utilReadIntMem(data);
+        cpuDmaBusValue = utilReadIntMem(data);
+        utilReadMem(cpuDmaLatchData, data, sizeof(uint32_t) * 4);
     }
 
     utilReadMem(g_internalRAM, data, SIZE_IRAM);
@@ -835,6 +850,13 @@ static bool CPUWriteState(gzFile gzFile)
     utilWriteInt(gzFile, stopState);
     // new to version 0.8
     utilWriteInt(gzFile, IRQTicks);
+
+    // new DMA variables
+    utilWriteInt(gzFile, cpuDmaRunning);
+    utilWriteInt(gzFile, cpuDmaPC);
+    utilWriteInt(gzFile, cpuDmaCount);
+    utilWriteInt(gzFile, cpuDmaBusValue);
+    utilGzWrite(gzFile, cpuDmaLatchData, sizeof(uint32_t) * 4);
 
     utilGzWrite(gzFile, g_internalRAM, SIZE_IRAM);
     utilGzWrite(gzFile, g_paletteRAM, SIZE_PRAM);
@@ -957,6 +979,15 @@ static bool CPUReadState(gzFile gzFile)
             intState = false;
             IRQTicks = 0;
         }
+    }
+
+    // new DMA variables
+    if (version >= SAVE_GAME_VERSION_11) {
+        cpuDmaRunning = utilReadInt(gzFile) ? true : false;
+        cpuDmaPC = utilReadInt(gzFile);
+        cpuDmaCount = utilReadInt(gzFile);
+        cpuDmaBusValue = utilReadInt(gzFile);
+        utilGzRead(gzFile, cpuDmaLatchData, sizeof(uint32_t) * 4);
     }
 
     utilGzRead(gzFile, g_internalRAM, SIZE_IRAM);
@@ -2593,15 +2624,15 @@ void CPUCompareVCOUNT()
 {
     if (VCOUNT == (DISPSTAT >> 8)) {
         DISPSTAT |= 4;
-        UPDATE_REG(0x04, DISPSTAT);
+        UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
 
         if (DISPSTAT & 0x20) {
             IF |= 4;
-            UPDATE_REG(0x202, IF);
+            UPDATE_REG(IO_REG_IF, IF);
         }
     } else {
         DISPSTAT &= 0xFFFB;
-        UPDATE_REG(0x4, DISPSTAT);
+        UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
     }
     if (layerEnableDelay > 0) {
         layerEnableDelay--;
@@ -2621,7 +2652,6 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
     cpuDmaRunning = true;
     cpuDmaPC = reg[15].I;
     cpuDmaCount = c;
-    cpuDmaChannelActive = ch;
     // This is done to get the correct waitstates.
     if (sm > 15)
         sm = 15;
@@ -2637,10 +2667,11 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
             while (c != 0) {
                 bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
 
-                CPUWriteMemory(d & 0xFFFFFFFC, cpuDmaLatchData[ch]);
-                d += dstInROM ? 4u : di;
+                uint32_t value = cpuDmaLatchData[ch];
+                CPUWriteMemory(d & 0xFFFFFFFC, value);
+                if (!isFIFO)
+                    d += dstInROM ? 4u : di;
                 d &= cpuDmaDstMask[ch];
-                s &= cpuDmaSrcMask[ch];
                 c--;
             }
         } else {
@@ -2648,10 +2679,13 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
                 bool srcInROM = ((s >> 24) >= REGION_ROM0) && ((s >> 24) < REGION_SRAM);
                 bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
 
-                cpuDmaLatchData[ch] = CPUReadMemory(s);
-                CPUWriteMemory(d & 0xFFFFFFFC, cpuDmaLatchData[ch]);
+                uint32_t value = CPUReadMemory(s);
+                cpuDmaLatchData[ch] = value;
+                cpuDmaBusValue = value;
+                CPUWriteMemory(d & 0xFFFFFFFC, value);
+                if (!isFIFO)
+                    d += dstInROM ? 4u : di;
                 s += srcInROM ? 4u : si;
-                d += dstInROM ? 4u : di;
                 d &= cpuDmaDstMask[ch];
                 s &= cpuDmaSrcMask[ch];
                 c--;
@@ -2665,8 +2699,10 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
             while (c != 0) {
                 bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
 
-                CPUWriteHalfWord(d & 0xFFFFFFFE, DowncastU16(cpuDmaLatchData[ch] >> (8 * (d & 2))));
-                d += dstInROM ? 2u : di;
+                uint32_t value = cpuDmaLatchData[ch];
+                CPUWriteHalfWord(d & 0xFFFFFFFE, DowncastU16(value));
+                if (!isFIFO)
+                    d += dstInROM ? 2u : di;
                 d &= cpuDmaDstMask[ch];
                 c--;
             }
@@ -2675,11 +2711,13 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
                 bool srcInROM = ((s >> 24) >= REGION_ROM0) && ((s >> 24) < REGION_SRAM);
                 bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
 
-                cpuDmaLatchData[ch] = CPUReadHalfWord(s);
-                cpuDmaLatchData[ch] |= (cpuDmaLatchData[ch] << 16);
-                CPUWriteHalfWord(d & 0xFFFFFFFE, DowncastU16(cpuDmaLatchData[ch] >> (8 * (d & 2))));
+                uint32_t value = CPUReadHalfWord(s);
+                cpuDmaLatchData[ch] = value * 0x00010001;
+                cpuDmaBusValue = value * 0x00010001;
+                CPUWriteHalfWord(d & 0xFFFFFFFE, DowncastU16(value));
+                if (!isFIFO)
+                    d += dstInROM ? 2u : di;
                 s += srcInROM ? 2u : si;
-                d += dstInROM ? 2u : di;
                 d &= cpuDmaDstMask[ch];
                 s &= cpuDmaSrcMask[ch];
                 c--;
@@ -2748,7 +2786,7 @@ void CPUCheckDMA(int reason, int dmamask)
 
             if (DM0CNT_H & 0x4000) {
                 IF |= 0x0100;
-                UPDATE_REG(0x202, IF);
+                UPDATE_REG(IO_REG_IF, IF);
                 cpuNextEvent = cpuTotalTicks;
             }
 
@@ -2758,7 +2796,7 @@ void CPUCheckDMA(int reason, int dmamask)
 
             if (!(DM0CNT_H & 0x0200) || (reason == 0)) {
                 DM0CNT_H &= 0x7FFF;
-                UPDATE_REG(0xBA, DM0CNT_H);
+                UPDATE_REG(IO_REG_DMA0CTL, DM0CNT_H);
             }
         }
     }
@@ -2816,7 +2854,7 @@ void CPUCheckDMA(int reason, int dmamask)
 
             if (DM1CNT_H & 0x4000) {
                 IF |= 0x0200;
-                UPDATE_REG(0x202, IF);
+                UPDATE_REG(IO_REG_IF, IF);
                 cpuNextEvent = cpuTotalTicks;
             }
 
@@ -2826,7 +2864,7 @@ void CPUCheckDMA(int reason, int dmamask)
 
             if (!(DM1CNT_H & 0x0200) || (reason == 0)) {
                 DM1CNT_H &= 0x7FFF;
-                UPDATE_REG(0xC6, DM1CNT_H);
+                UPDATE_REG(IO_REG_DMA1CTL, DM1CNT_H);
             }
         }
     }
@@ -2885,7 +2923,7 @@ void CPUCheckDMA(int reason, int dmamask)
 
             if (DM2CNT_H & 0x4000) {
                 IF |= 0x0400;
-                UPDATE_REG(0x202, IF);
+                UPDATE_REG(IO_REG_IF, IF);
                 cpuNextEvent = cpuTotalTicks;
             }
 
@@ -2895,7 +2933,7 @@ void CPUCheckDMA(int reason, int dmamask)
 
             if (!(DM2CNT_H & 0x0200) || (reason == 0)) {
                 DM2CNT_H &= 0x7FFF;
-                UPDATE_REG(0xD2, DM2CNT_H);
+                UPDATE_REG(IO_REG_DMA2CTL, DM2CNT_H);
             }
         }
     }
@@ -2941,7 +2979,7 @@ void CPUCheckDMA(int reason, int dmamask)
 
             if (DM3CNT_H & 0x4000) {
                 IF |= 0x0800;
-                UPDATE_REG(0x202, IF);
+                UPDATE_REG(IO_REG_IF, IF);
                 cpuNextEvent = cpuTotalTicks;
             }
 
@@ -2951,7 +2989,7 @@ void CPUCheckDMA(int reason, int dmamask)
 
             if (!(DM3CNT_H & 0x0200) || (reason == 0)) {
                 DM3CNT_H &= 0x7FFF;
-                UPDATE_REG(0xDE, DM3CNT_H);
+                UPDATE_REG(IO_REG_DMA3CTL, DM3CNT_H);
             }
         }
     }
@@ -2960,7 +2998,7 @@ void CPUCheckDMA(int reason, int dmamask)
 void CPUUpdateRegister(uint32_t address, uint16_t value)
 {
     switch (address) {
-    case 0x00: { // we need to place the following code in { } because we declare & initialize variables in a case statement
+    case IO_REG_DISPCNT: { // we need to place the following code in { } because we declare & initialize variables in a case statement
         if ((value & 7) > 5) {
             // display modes above 0-5 are prohibited
             DISPCNT = (value & 7);
@@ -2970,7 +3008,7 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         uint16_t changeBGon = ((~DISPCNT) & value) & 0x0F00; // these layers are being activated
 
         DISPCNT = (value & 0xFFF7); // bit 3 can only be accessed by the BIOS to enable GBC mode
-        UPDATE_REG(0x00, DISPCNT);
+        UPDATE_REG(IO_REG_DISPCNT, DISPCNT);
 
         if (changeBGon) {
             layerEnableDelay = 4;
@@ -2985,9 +3023,9 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
             if (!(DISPSTAT & 1)) {
                 //lcdTicks = 1008;
                 //      VCOUNT = 0;
-                //      UPDATE_REG(0x06, VCOUNT);
+                //      UPDATE_REG(IO_REG_VCOUNT, VCOUNT);
                 DISPSTAT &= 0xFFFC;
-                UPDATE_REG(0x04, DISPSTAT);
+                UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
                 CPUCompareVCOUNT();
             }
             //        (*renderLine)();
@@ -2999,234 +3037,249 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         }
         break;
     }
-    case 0x04:
+    case IO_REG_DISPSTAT:
         DISPSTAT = (value & 0xFF38) | (DISPSTAT & 7);
-        UPDATE_REG(0x04, DISPSTAT);
+        UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
         break;
-    case 0x06:
+    case IO_REG_VCOUNT:
         // not writable
         break;
-    case 0x08:
-        BG0CNT = (value & 0xDFCF);
-        UPDATE_REG(0x08, BG0CNT);
+    case IO_REG_BG0CNT:
+        BG0CNT = (value & 0xDFFF);
+        UPDATE_REG(IO_REG_BG0CNT, BG0CNT);
         break;
-    case 0x0A:
-        BG1CNT = (value & 0xDFCF);
-        UPDATE_REG(0x0A, BG1CNT);
+    case IO_REG_BG1CNT:
+        BG1CNT = (value & 0xDFFF);
+        UPDATE_REG(IO_REG_BG1CNT, BG1CNT);
         break;
-    case 0x0C:
-        BG2CNT = (value & 0xFFCF);
-        UPDATE_REG(0x0C, BG2CNT);
+    case IO_REG_BG2CNT:
+        BG2CNT = (value & 0xFFFF);
+        UPDATE_REG(IO_REG_BG2CNT, BG2CNT);
         break;
-    case 0x0E:
-        BG3CNT = (value & 0xFFCF);
-        UPDATE_REG(0x0E, BG3CNT);
+    case IO_REG_BG3CNT:
+        BG3CNT = (value & 0xFFFF);
+        UPDATE_REG(IO_REG_BG3CNT, BG3CNT);
         break;
-    case 0x10:
+    case IO_REG_BG0HOFS:
         BG0HOFS = value & 511;
-        UPDATE_REG(0x10, BG0HOFS);
+        UPDATE_REG(IO_REG_BG0HOFS, BG0HOFS);
         break;
-    case 0x12:
+    case IO_REG_BG0VOFS:
         BG0VOFS = value & 511;
-        UPDATE_REG(0x12, BG0VOFS);
+        UPDATE_REG(IO_REG_BG0VOFS, BG0VOFS);
         break;
-    case 0x14:
+    case IO_REG_BG1HOFS:
         BG1HOFS = value & 511;
-        UPDATE_REG(0x14, BG1HOFS);
+        UPDATE_REG(IO_REG_BG1HOFS, BG1HOFS);
         break;
-    case 0x16:
+    case IO_REG_BG1VOFS:
         BG1VOFS = value & 511;
-        UPDATE_REG(0x16, BG1VOFS);
+        UPDATE_REG(IO_REG_BG1VOFS, BG1VOFS);
         break;
-    case 0x18:
+    case IO_REG_BG2HOFS:
         BG2HOFS = value & 511;
-        UPDATE_REG(0x18, BG2HOFS);
+        UPDATE_REG(IO_REG_BG2HOFS, BG2HOFS);
         break;
-    case 0x1A:
+    case IO_REG_BG2VOFS:
         BG2VOFS = value & 511;
-        UPDATE_REG(0x1A, BG2VOFS);
+        UPDATE_REG(IO_REG_BG2VOFS, BG2VOFS);
         break;
-    case 0x1C:
+    case IO_REG_BG3HOFS:
         BG3HOFS = value & 511;
-        UPDATE_REG(0x1C, BG3HOFS);
+        UPDATE_REG(IO_REG_BG3HOFS, BG3HOFS);
         break;
-    case 0x1E:
+    case IO_REG_BG3VOFS:
         BG3VOFS = value & 511;
-        UPDATE_REG(0x1E, BG3VOFS);
+        UPDATE_REG(IO_REG_BG3VOFS, BG3VOFS);
         break;
-    case 0x20:
+
+    case IO_REG_BG2PA:
         BG2PA = value;
-        UPDATE_REG(0x20, BG2PA);
+        UPDATE_REG(IO_REG_BG2PA, BG2PA);
         break;
-    case 0x22:
+    case IO_REG_BG2PB:
         BG2PB = value;
-        UPDATE_REG(0x22, BG2PB);
+        UPDATE_REG(IO_REG_BG2PB, BG2PB);
         break;
     case 0x24:
         BG2PC = value;
-        UPDATE_REG(0x24, BG2PC);
+        UPDATE_REG(IO_REG_BG2PC, BG2PC);
         break;
-    case 0x26:
+    case IO_REG_BG2PD:
         BG2PD = value;
-        UPDATE_REG(0x26, BG2PD);
+        UPDATE_REG(IO_REG_BG2PD, BG2PD);
         break;
-    case 0x28:
+    case IO_REG_BG2X_L:
         BG2X_L = value;
-        UPDATE_REG(0x28, BG2X_L);
+        UPDATE_REG(IO_REG_BG2X_L, BG2X_L);
         gfxUpdateBG2X();
         break;
-    case 0x2A:
+    case IO_REG_BG2X_H:
         BG2X_H = (value & 0xFFF);
-        UPDATE_REG(0x2A, BG2X_H);
+        UPDATE_REG(IO_REG_BG2X_H, BG2X_H);
         gfxUpdateBG2X();
         break;
-    case 0x2C:
+    case IO_REG_BG2Y_L:
         BG2Y_L = value;
-        UPDATE_REG(0x2C, BG2Y_L);
+        UPDATE_REG(IO_REG_BG2Y_L, BG2Y_L);
         gfxUpdateBG2Y();
         break;
-    case 0x2E:
+    case IO_REG_BG2Y_H:
         BG2Y_H = value & 0xFFF;
-        UPDATE_REG(0x2E, BG2Y_H);
+        UPDATE_REG(IO_REG_BG2Y_H, BG2Y_H);
         gfxUpdateBG2Y();
         break;
-    case 0x30:
+    case IO_REG_BG3PA:
         BG3PA = value;
-        UPDATE_REG(0x30, BG3PA);
+        UPDATE_REG(IO_REG_BG3PA, BG3PA);
         break;
-    case 0x32:
+    case IO_REG_BG3PB:
         BG3PB = value;
-        UPDATE_REG(0x32, BG3PB);
+        UPDATE_REG(IO_REG_BG3PB, BG3PB);
         break;
-    case 0x34:
+    case IO_REG_BG3PC:
         BG3PC = value;
-        UPDATE_REG(0x34, BG3PC);
+        UPDATE_REG(IO_REG_BG3PC, BG3PC);
         break;
-    case 0x36:
+    case IO_REG_BG3PD:
         BG3PD = value;
-        UPDATE_REG(0x36, BG3PD);
+        UPDATE_REG(IO_REG_BG3PD, BG3PD);
         break;
-    case 0x38:
+    case IO_REG_BG3X_L:
         BG3X_L = value;
-        UPDATE_REG(0x38, BG3X_L);
+        UPDATE_REG(IO_REG_BG3X_L, BG3X_L);
         gfxUpdateBG3X();
         break;
-    case 0x3A:
+    case IO_REG_BG3X_H:
         BG3X_H = value & 0xFFF;
-        UPDATE_REG(0x3A, BG3X_H);
+        UPDATE_REG(IO_REG_BG3X_H, BG3X_H);
         gfxUpdateBG3X();
         break;
-    case 0x3C:
+    case IO_REG_BG3Y_L:
         BG3Y_L = value;
-        UPDATE_REG(0x3C, BG3Y_L);
+        UPDATE_REG(IO_REG_BG3Y_L, BG3Y_L);
         gfxUpdateBG3Y();
         break;
-    case 0x3E:
+    case IO_REG_BG3Y_H:
         BG3Y_H = value & 0xFFF;
-        UPDATE_REG(0x3E, BG3Y_H);
+        UPDATE_REG(IO_REG_BG3Y_H, BG3Y_H);
         gfxUpdateBG3Y();
         break;
-    case 0x40:
+
+    case IO_REG_WIN0H:
         WIN0H = value;
-        UPDATE_REG(0x40, WIN0H);
+        UPDATE_REG(IO_REG_WIN0H, WIN0H);
         CPUUpdateWindow0();
         break;
-    case 0x42:
+    case IO_REG_WIN1H:
         WIN1H = value;
-        UPDATE_REG(0x42, WIN1H);
+        UPDATE_REG(IO_REG_WIN1H, WIN1H);
         CPUUpdateWindow1();
         break;
-    case 0x44:
+    case IO_REG_WIN0V:
         WIN0V = value;
-        UPDATE_REG(0x44, WIN0V);
+        UPDATE_REG(IO_REG_WIN0V, WIN0V);
         break;
-    case 0x46:
+    case IO_REG_WIN1V:
         WIN1V = value;
-        UPDATE_REG(0x46, WIN1V);
+        UPDATE_REG(IO_REG_WIN1V, WIN1V);
         break;
-    case 0x48:
+    case IO_REG_WININ:
         WININ = value & 0x3F3F;
-        UPDATE_REG(0x48, WININ);
+        UPDATE_REG(IO_REG_WININ, WININ);
         break;
-    case 0x4A:
+    case IO_REG_WINOUT:
         WINOUT = value & 0x3F3F;
-        UPDATE_REG(0x4A, WINOUT);
+        UPDATE_REG(IO_REG_WINOUT, WINOUT);
         break;
-    case 0x4C:
+    case IO_REG_MOSAIC:
         MOSAIC = value;
-        UPDATE_REG(0x4C, MOSAIC);
+        UPDATE_REG(IO_REG_MOSAIC, MOSAIC);
         break;
-    case 0x50:
+    case IO_REG_BLDCNT:
         BLDMOD = value & 0x3FFF;
-        UPDATE_REG(0x50, BLDMOD);
+        UPDATE_REG(IO_REG_BLDCNT, BLDMOD);
         fxOn = ((BLDMOD >> 6) & 3) != 0;
         CPUUpdateRender();
         break;
-    case 0x52:
+    case IO_REG_BLDALPHA:
         COLEV = value & 0x1F1F;
-        UPDATE_REG(0x52, COLEV);
+        UPDATE_REG(IO_REG_BLDALPHA, COLEV);
         break;
-    case 0x54:
+    case IO_REG_BLDY:
         COLY = value & 0x1F;
-        UPDATE_REG(0x54, COLY);
+        UPDATE_REG(IO_REG_BLDY, COLY);
         break;
-    case 0x60:
-    case 0x62:
-    case 0x64:
-    case 0x68:
-    case 0x6c:
-    case 0x70:
-    case 0x72:
-    case 0x74:
-    case 0x78:
-    case 0x7c:
-    case 0x80:
-    case 0x84:
+
+    case IO_REG_SOUND1CNT_L:
+    case IO_REG_SOUND1CNT_H:
+    case IO_REG_SOUND1CNT_X:
+    case IO_REG_SOUND2CNT_L:
+    case IO_REG_SOUND2CNT_H:
+    case IO_REG_SOUND3CNT_L:
+    case IO_REG_SOUND3CNT_H:
+    case IO_REG_SOUND3CNT_X:
+    case IO_REG_SOUND4CNT_L:
+    case IO_REG_SOUND4CNT_H:
+    case IO_REG_SOUNDCNT_L:
+    case IO_REG_SOUNDCNT_X:
+        if (address == IO_REG_SOUND1CNT_L) {
+            value &= 0x007F;
+        } else if (address == IO_REG_SOUND1CNT_H) {
+            value &= 0xFFC0;
+        } else if (address == IO_REG_SOUND1CNT_X) {
+            value &= 0xFFC0;
+        } else if (address == IO_REG_SOUNDCNT_L) {
+            value &= 0xFF77;
+        } else if (address == IO_REG_SOUNDCNT_X) {
+            value &= 0x0080;
+        }
         soundEvent8(address & 0xFF, (uint8_t)(value & 0xFF));
         soundEvent8((address & 0xFF) + 1, (uint8_t)(value >> 8));
         break;
-    case 0x82:
-    case 0x88:
-    case 0xa0:
-    case 0xa2:
-    case 0xa4:
-    case 0xa6:
-    case 0x90:
-    case 0x92:
-    case 0x94:
-    case 0x96:
-    case 0x98:
-    case 0x9a:
-    case 0x9c:
-    case 0x9e:
+    case IO_REG_SOUNDCNT_H:
+    case IO_REG_SOUNDBIAS:
+    case IO_REG_FIFO_A_L:
+    case IO_REG_FIFO_A_H:
+    case IO_REG_FIFO_B_L:
+    case IO_REG_FIFO_B_H:
+    case IO_REG_WAVE_RAM0_L:
+    case IO_REG_WAVE_RAM0_H:
+    case IO_REG_WAVE_RAM1_L:
+    case IO_REG_WAVE_RAM1_H:
+    case IO_REG_WAVE_RAM2_L:
+    case IO_REG_WAVE_RAM2_H:
+    case IO_REG_WAVE_RAM3_L:
+    case IO_REG_WAVE_RAM3_H:
         soundEvent16(address & 0xFF, value);
         break;
-    case 0xB0:
+
+    case IO_REG_DMA0SAD_L:
         DM0SAD_L = value;
-        UPDATE_REG(0xB0, DM0SAD_L);
+        UPDATE_REG(IO_REG_DMA0SAD_L, DM0SAD_L);
         break;
-    case 0xB2:
+    case IO_REG_DMA0SAD_H:
         DM0SAD_H = value & 0x07FF;
-        UPDATE_REG(0xB2, DM0SAD_H);
+        UPDATE_REG(IO_REG_DMA0SAD_H, DM0SAD_H);
         break;
-    case 0xB4:
+    case IO_REG_DMA0DAD_L:
         DM0DAD_L = value;
-        UPDATE_REG(0xB4, DM0DAD_L);
+        UPDATE_REG(IO_REG_DMA0DAD_L, DM0DAD_L);
         break;
-    case 0xB6:
+    case IO_REG_DMA0DAD_H:
         DM0DAD_H = value & 0x07FF;
-        UPDATE_REG(0xB6, DM0DAD_H);
+        UPDATE_REG(IO_REG_DMA0DAD_H, DM0DAD_H);
         break;
-    case 0xB8:
+    case IO_REG_DMA0CNT:
         DM0CNT_L = value & 0x3FFF;
-        UPDATE_REG(0xB8, 0);
+        UPDATE_REG(IO_REG_DMA0CNT, 0);
         break;
-    case 0xBA: {
+    case IO_REG_DMA0CTL: {
         bool start = ((DM0CNT_H ^ value) & 0x8000) ? true : false;
         value &= 0xF7E0;
 
         DM0CNT_H = value;
-        UPDATE_REG(0xBA, DM0CNT_H);
+        UPDATE_REG(IO_REG_DMA0CTL, DM0CNT_H);
 
         if (start && (value & 0x8000)) {
             dma0Source = DM0SAD_L | (DM0SAD_H << 16);
@@ -3234,32 +3287,33 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
             CPUCheckDMA(0, 1);
         }
     } break;
-    case 0xBC:
+
+    case IO_REG_DMA1SAD_L:
         DM1SAD_L = value;
-        UPDATE_REG(0xBC, DM1SAD_L);
+        UPDATE_REG(IO_REG_DMA1SAD_L, DM1SAD_L);
         break;
-    case 0xBE:
+    case IO_REG_DMA1SAD_H:
         DM1SAD_H = value & 0x0FFF;
-        UPDATE_REG(0xBE, DM1SAD_H);
+        UPDATE_REG(IO_REG_DMA1SAD_H, DM1SAD_H);
         break;
-    case 0xC0:
+    case IO_REG_DMA1DAD_L:
         DM1DAD_L = value;
-        UPDATE_REG(0xC0, DM1DAD_L);
+        UPDATE_REG(IO_REG_DMA1DAD_L, DM1DAD_L);
         break;
-    case 0xC2:
+    case IO_REG_DMA1DAD_H:
         DM1DAD_H = value & 0x07FF;
-        UPDATE_REG(0xC2, DM1DAD_H);
+        UPDATE_REG(IO_REG_DMA1DAD_H, DM1DAD_H);
         break;
-    case 0xC4:
+    case IO_REG_DMA1CNT:
         DM1CNT_L = value & 0x3FFF;
-        UPDATE_REG(0xC4, 0);
+        UPDATE_REG(IO_REG_DMA1CNT, 0);
         break;
-    case 0xC6: {
+    case IO_REG_DMA1CTL: {
         bool start = ((DM1CNT_H ^ value) & 0x8000) ? true : false;
         value &= 0xF7E0;
 
         DM1CNT_H = value;
-        UPDATE_REG(0xC6, DM1CNT_H);
+        UPDATE_REG(IO_REG_DMA1CTL, DM1CNT_H);
 
         if (start && (value & 0x8000)) {
             dma1Source = DM1SAD_L | (DM1SAD_H << 16);
@@ -3267,33 +3321,34 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
             CPUCheckDMA(0, 2);
         }
     } break;
-    case 0xC8:
+
+    case IO_REG_DMA2SAD_L:
         DM2SAD_L = value;
-        UPDATE_REG(0xC8, DM2SAD_L);
+        UPDATE_REG(IO_REG_DMA2SAD_L, DM2SAD_L);
         break;
-    case 0xCA:
+    case IO_REG_DMA2SAD_H:
         DM2SAD_H = value & 0x0FFF;
-        UPDATE_REG(0xCA, DM2SAD_H);
+        UPDATE_REG(IO_REG_DMA2SAD_H, DM2SAD_H);
         break;
-    case 0xCC:
+    case IO_REG_DMA2DAD_L:
         DM2DAD_L = value;
-        UPDATE_REG(0xCC, DM2DAD_L);
+        UPDATE_REG(IO_REG_DMA2DAD_L, DM2DAD_L);
         break;
-    case 0xCE:
+    case IO_REG_DMA2DAD_H:
         DM2DAD_H = value & 0x07FF;
-        UPDATE_REG(0xCE, DM2DAD_H);
+        UPDATE_REG(IO_REG_DMA2DAD_H, DM2DAD_H);
         break;
-    case 0xD0:
+    case IO_REG_DMA2CNT:
         DM2CNT_L = value & 0x3FFF;
-        UPDATE_REG(0xD0, 0);
+        UPDATE_REG(IO_REG_DMA2CNT, 0);
         break;
-    case 0xD2: {
+    case IO_REG_DMA2CTL: {
         bool start = ((DM2CNT_H ^ value) & 0x8000) ? true : false;
 
         value &= 0xF7E0;
 
         DM2CNT_H = value;
-        UPDATE_REG(0xD2, DM2CNT_H);
+        UPDATE_REG(IO_REG_DMA2CTL, DM2CNT_H);
 
         if (start && (value & 0x8000)) {
             dma2Source = DM2SAD_L | (DM2SAD_H << 16);
@@ -3302,33 +3357,34 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
             CPUCheckDMA(0, 4);
         }
     } break;
-    case 0xD4:
+
+    case IO_REG_DMA3SAD_L:
         DM3SAD_L = value;
-        UPDATE_REG(0xD4, DM3SAD_L);
+        UPDATE_REG(IO_REG_DMA3SAD_L, DM3SAD_L);
         break;
-    case 0xD6:
+    case IO_REG_DMA3SAD_H:
         DM3SAD_H = value & 0x0FFF;
-        UPDATE_REG(0xD6, DM3SAD_H);
+        UPDATE_REG(IO_REG_DMA3SAD_H, DM3SAD_H);
         break;
-    case 0xD8:
+    case IO_REG_DMA3DAD_L:
         DM3DAD_L = value;
-        UPDATE_REG(0xD8, DM3DAD_L);
+        UPDATE_REG(IO_REG_DMA3DAD_L, DM3DAD_L);
         break;
-    case 0xDA:
+    case IO_REG_DMA3DAD_H:
         DM3DAD_H = value & 0x0FFF;
-        UPDATE_REG(0xDA, DM3DAD_H);
+        UPDATE_REG(IO_REG_DMA3DAD_H, DM3DAD_H);
         break;
-    case 0xDC:
+    case IO_REG_DMA3CNT:
         DM3CNT_L = value;
-        UPDATE_REG(0xDC, 0);
+        UPDATE_REG(IO_REG_DMA3CNT, 0);
         break;
-    case 0xDE: {
+    case IO_REG_DMA3CTL: {
         bool start = ((DM3CNT_H ^ value) & 0x8000) ? true : false;
 
         value &= 0xFFE0;
 
         DM3CNT_H = value;
-        UPDATE_REG(0xDE, DM3CNT_H);
+        UPDATE_REG(IO_REG_DMA3CTL, DM3CNT_H);
 
         if (start && (value & 0x8000)) {
             dma3Source = DM3SAD_L | (DM3SAD_H << 16);
@@ -3336,36 +3392,37 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
             CPUCheckDMA(0, 8);
         }
     } break;
-    case 0x100:
+
+    case IO_REG_TM0CNT_L:
         timer0Reload = value;
         interp_rate();
         break;
-    case 0x102:
+    case IO_REG_TM0CNT_H:
         timer0Value = value;
         timerOnOffDelay |= 1;
         cpuNextEvent = cpuTotalTicks;
         break;
-    case 0x104:
+    case IO_REG_TM1CNT_L:
         timer1Reload = value;
         interp_rate();
         break;
-    case 0x106:
+    case IO_REG_TM1CNT_H:
         timer1Value = value;
         timerOnOffDelay |= 2;
         cpuNextEvent = cpuTotalTicks;
         break;
-    case 0x108:
+    case IO_REG_TM2CNT_L:
         timer2Reload = value;
         break;
-    case 0x10A:
+    case IO_REG_TM2CNT_H:
         timer2Value = value;
         timerOnOffDelay |= 4;
         cpuNextEvent = cpuTotalTicks;
         break;
-    case 0x10C:
+    case IO_REG_TM3CNT_L:
         timer3Reload = value;
         break;
-    case 0x10E:
+    case IO_REG_TM3CNT_H:
         timer3Value = value;
         timerOnOffDelay |= 8;
         cpuNextEvent = cpuTotalTicks;
@@ -3383,7 +3440,7 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
             if (value & 1 && (value & 0x4000)) {
                 UPDATE_REG(COMM_SIOCNT, 0xFF);
                 IF |= 0x80;
-                UPDATE_REG(0x202, IF);
+                UPDATE_REG(IO_REG_IF, IF);
                 value &= 0x7f7f;
             }
         }
@@ -3397,13 +3454,13 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         break;
 #endif
 
-    case 0x130:
+    case IO_REG_KEYINPUT:
         P1 |= (value & 0x3FF);
-        UPDATE_REG(0x130, P1);
+        UPDATE_REG(IO_REG_KEYINPUT, P1);
         break;
 
-    case 0x132:
-        UPDATE_REG(0x132, value & 0xC3FF);
+    case IO_REG_KEYCNT:
+        UPDATE_REG(IO_REG_KEYCNT, value & 0xC3FF);
         break;
 
 
@@ -3455,17 +3512,17 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         break;
 #endif
 
-    case 0x200:
+    case IO_REG_IE:
         IE = value & 0x3FFF;
-        UPDATE_REG(0x200, IE);
+        UPDATE_REG(IO_REG_IE, IE);
         if ((IME & 1) && (IF & IE) && armIrqEnable)
             cpuNextEvent = cpuTotalTicks;
         break;
-    case 0x202:
+    case IO_REG_IF:
         IF ^= (value & IF);
-        UPDATE_REG(0x202, IF);
+        UPDATE_REG(IO_REG_IF, IF);
         break;
-    case 0x204: {
+    case IO_REG_WAITCNT: {
         memoryWait[0x0e] = memoryWaitSeq[0x0e] = gamepakRamWaitState[value & 3];
 
         if (!coreOptions.speedHack) {
@@ -3502,19 +3559,20 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
             busPrefetch = false;
             busPrefetchCount = 0;
         }
-        UPDATE_REG(0x204, value & 0x7FFF);
+        UPDATE_REG(IO_REG_WAITCNT, value & 0x7FFF);
 
     } break;
-    case 0x208:
+    case IO_REG_IME:
         IME = value & 1;
-        UPDATE_REG(0x208, IME);
+        UPDATE_REG(IO_REG_IME, IME);
         if ((IME & 1) && (IF & IE) && armIrqEnable)
             cpuNextEvent = cpuTotalTicks;
         break;
-    case 0x300:
+
+    case IO_REG_POSTFLG:
         if (value != 0)
             value &= 0xFFFE;
-        UPDATE_REG(0x300, value);
+        UPDATE_REG(IO_REG_POSTFLG, value);
         break;
     default:
         UPDATE_REG(address & 0x3FE, value);
@@ -3530,12 +3588,12 @@ void applyTimer()
             // reload the counter
             TM0D = DowncastU16(timer0Reload);
             timer0Ticks = (0x10000 - TM0D) << timer0ClockReload;
-            UPDATE_REG(0x100, TM0D);
+            UPDATE_REG(IO_REG_TM0CNT_L, TM0D);
         }
         timer0On = timer0Value & 0x80 ? true : false;
         TM0CNT = timer0Value & 0xC7;
         interp_rate();
-        UPDATE_REG(0x102, TM0CNT);
+        UPDATE_REG(IO_REG_TM0CNT_H, TM0CNT);
         //    CPUUpdateTicks();
     }
     if (timerOnOffDelay & 2) {
@@ -3544,12 +3602,12 @@ void applyTimer()
             // reload the counter
             TM1D = DowncastU16(timer1Reload);
             timer1Ticks = (0x10000 - TM1D) << timer1ClockReload;
-            UPDATE_REG(0x104, TM1D);
+            UPDATE_REG(IO_REG_TM1CNT_L, TM1D);
         }
         timer1On = timer1Value & 0x80 ? true : false;
         TM1CNT = timer1Value & 0xC7;
         interp_rate();
-        UPDATE_REG(0x106, TM1CNT);
+        UPDATE_REG(IO_REG_TM1CNT_H, TM1CNT);
     }
     if (timerOnOffDelay & 4) {
         timer2ClockReload = TIMER_TICKS[timer2Value & 3];
@@ -3557,11 +3615,11 @@ void applyTimer()
             // reload the counter
             TM2D = DowncastU16(timer2Reload);
             timer2Ticks = (0x10000 - TM2D) << timer2ClockReload;
-            UPDATE_REG(0x108, TM2D);
+            UPDATE_REG(IO_REG_TM2CNT_L, TM2D);
         }
         timer2On = timer2Value & 0x80 ? true : false;
         TM2CNT = timer2Value & 0xC7;
-        UPDATE_REG(0x10A, TM2CNT);
+        UPDATE_REG(IO_REG_TM2CNT_H, TM2CNT);
     }
     if (timerOnOffDelay & 8) {
         timer3ClockReload = TIMER_TICKS[timer3Value & 3];
@@ -3569,11 +3627,11 @@ void applyTimer()
             // reload the counter
             TM3D = DowncastU16(timer3Reload);
             timer3Ticks = (0x10000 - TM3D) << timer3ClockReload;
-            UPDATE_REG(0x10C, TM3D);
+            UPDATE_REG(IO_REG_TM3CNT_L, TM3D);
         }
         timer3On = timer3Value & 0x80 ? true : false;
         TM3CNT = timer3Value & 0xC7;
-        UPDATE_REG(0x10E, TM3CNT);
+        UPDATE_REG(IO_REG_TM3CNT_H, TM3CNT);
     }
     cpuNextEvent = CPUUpdateTicks();
     timerOnOffDelay = 0;
@@ -3641,7 +3699,7 @@ void CPUInit(const char* biosFileName, bool useBiosFile)
         ioReadable[i] = false;
     for (i = 0x54; i < 0x60; i++)
         ioReadable[i] = false;
-    for (i = 0x8c; i < 0x90; i++)
+    for (i = 0x8a; i < 0x90; i++)
         ioReadable[i] = false;
     for (i = 0xa0; i < 0xb8; i++)
         ioReadable[i] = false;
@@ -3659,14 +3717,24 @@ void CPUInit(const char* biosFileName, bool useBiosFile)
         ioReadable[i] = false;
     for (i = 0x138; i < 0x140; i++)
         ioReadable[i] = false;
-    for (i = 0x144; i < 0x150; i++)
+    for (i = 0x142; i < 0x150; i++)
         ioReadable[i] = false;
-    for (i = 0x15c; i < 0x200; i++)
+    for (i = 0x15a; i < 0x200; i++)
         ioReadable[i] = false;
-    for (i = 0x20c; i < 0x300; i++)
+    for (i = 0x20a; i < 0x300; i++)
         ioReadable[i] = false;
-    for (i = 0x304; i < 0x400; i++)
+    for (i = 0x302; i < 0x400; i++)
         ioReadable[i] = false;
+    ioReadable[0x0066] = ioReadable[0x0067] = false;
+    ioReadable[0x006A] = ioReadable[0x006B] = false;
+    ioReadable[0x006E] = ioReadable[0x006F] = false;
+    ioReadable[0x0076] = ioReadable[0x0077] = false;
+    ioReadable[0x007A] = ioReadable[0x007B] = false;
+    ioReadable[0x007E] = ioReadable[0x007F] = false;
+    ioReadable[0x0086] = ioReadable[0x0087] = false;
+    // Ancient - Infrared Register (Prototypes only)
+    ioReadable[0x0136] = ioReadable[0x0137] = false;
+    ioReadable[0x0206] = ioReadable[0x0207] = false;
 
     if (romSize < 0x1fe2000) {
         *((uint16_t*)&g_rom[0x1fe209c]) = 0xdffa; // SWI 0xFA
@@ -3851,14 +3919,14 @@ void CPUReset()
     }
     armState = true;
     C_FLAG = V_FLAG = N_FLAG = Z_FLAG = false;
-    UPDATE_REG(0x00, DISPCNT);
-    UPDATE_REG(0x06, VCOUNT);
-    UPDATE_REG(0x20, BG2PA);
-    UPDATE_REG(0x26, BG2PD);
-    UPDATE_REG(0x30, BG3PA);
-    UPDATE_REG(0x36, BG3PD);
-    UPDATE_REG(0x130, P1);
-    UPDATE_REG(0x88, 0x200);
+    UPDATE_REG(IO_REG_DISPCNT, DISPCNT);
+    UPDATE_REG(IO_REG_VCOUNT, VCOUNT);
+    UPDATE_REG(IO_REG_BG2PA, BG2PA);
+    UPDATE_REG(IO_REG_BG2PD, BG2PD);
+    UPDATE_REG(IO_REG_BG3PA, BG3PA);
+    UPDATE_REG(IO_REG_BG3PD, BG3PD);
+    UPDATE_REG(IO_REG_KEYINPUT, P1);
+    UPDATE_REG(IO_REG_SOUNDBIAS, 0x200);
 
     // disable FIQ
     reg[16].I |= 0x40;
@@ -4068,25 +4136,25 @@ void CPULoop(int ticks)
                     if (DISPSTAT & 2) {
                         lcdTicks += 1008;
                         VCOUNT++;
-                        UPDATE_REG(0x06, VCOUNT);
+                        UPDATE_REG(IO_REG_VCOUNT, VCOUNT);
                         DISPSTAT &= 0xFFFD;
-                        UPDATE_REG(0x04, DISPSTAT);
+                        UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
                         CPUCompareVCOUNT();
                     } else {
                         lcdTicks += 224;
                         DISPSTAT |= 2;
-                        UPDATE_REG(0x04, DISPSTAT);
+                        UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
                         if (DISPSTAT & 16) {
                             IF |= 2;
-                            UPDATE_REG(0x202, IF);
+                            UPDATE_REG(IO_REG_IF, IF);
                         }
                     }
 
                     if (VCOUNT > 227) { //Reaching last line
                         DISPSTAT &= 0xFFFC;
-                        UPDATE_REG(0x04, DISPSTAT);
+                        UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
                         VCOUNT = 0;
-                        UPDATE_REG(0x06, VCOUNT);
+                        UPDATE_REG(IO_REG_VCOUNT, VCOUNT);
                         CPUCompareVCOUNT();
                         gfxNewFrame();
                     }
@@ -4139,14 +4207,14 @@ void CPULoop(int ticks)
                     if (DISPSTAT & 2) {
                         // if in H-Blank, leave it and move to drawing mode
                         VCOUNT++;
-                        UPDATE_REG(0x06, VCOUNT);
+                        UPDATE_REG(IO_REG_VCOUNT, VCOUNT);
 
                         lcdTicks += 1008;
                         DISPSTAT &= 0xFFFD;
                         if (VCOUNT == 160) {
                             P1 = 0x03FF ^ (joy & 0x3FF);
                             systemUpdateMotionSensor();
-                            UPDATE_REG(0x130, P1);
+                            UPDATE_REG(IO_REG_KEYINPUT, P1);
                             uint16_t P1CNT = READ16LE(((uint16_t*)&g_ioMem[0x132]));
 
                             // this seems wrong, but there are cases where the game
@@ -4157,27 +4225,27 @@ void CPULoop(int ticks)
                                 if (P1CNT & 0x8000) {
                                     if (p1 == (P1CNT & 0x3FF)) {
                                         IF |= 0x1000;
-                                        UPDATE_REG(0x202, IF);
+                                        UPDATE_REG(IO_REG_IF, IF);
                                     }
                                 } else {
                                     if (p1 & P1CNT) {
                                         IF |= 0x1000;
-                                        UPDATE_REG(0x202, IF);
+                                        UPDATE_REG(IO_REG_IF, IF);
                                     }
                                 }
                             }
 
                             DISPSTAT |= 1;
                             DISPSTAT &= 0xFFFD;
-                            UPDATE_REG(0x04, DISPSTAT);
+                            UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
                             if (DISPSTAT & 0x0008) {
                                 IF |= 1;
-                                UPDATE_REG(0x202, IF);
+                                UPDATE_REG(IO_REG_IF, IF);
                             }
                             CPUCheckDMA(1, 0x0f);
                         }
 
-                        UPDATE_REG(0x04, DISPSTAT);
+                        UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
                         CPUCompareVCOUNT();
 
                     } else {
@@ -4335,12 +4403,12 @@ void CPULoop(int ticks)
                         }
                         // entering H-Blank
                         DISPSTAT |= 2;
-                        UPDATE_REG(0x04, DISPSTAT);
+                        UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
                         lcdTicks += 224;
                         CPUCheckDMA(2, 0x0f);
                         if (DISPSTAT & 16) {
                             IF |= 2;
-                            UPDATE_REG(0x202, IF);
+                            UPDATE_REG(IO_REG_IF, IF);
                         }
                         if (VCOUNT == 159) {
                             g_count++;
@@ -4415,11 +4483,11 @@ void CPULoop(int ticks)
                         soundTimerOverflow(0);
                         if (TM0CNT & 0x40) {
                             IF |= 0x08;
-                            UPDATE_REG(0x202, IF);
+                            UPDATE_REG(IO_REG_IF, IF);
                         }
                     }
                     TM0D = 0xFFFF - DowncastU16(timer0Ticks >> timer0ClockReload);
-                    UPDATE_REG(0x100, TM0D);
+                    UPDATE_REG(IO_REG_TM0CNT_L, TM0D);
                 }
 
                 if (timer1On) {
@@ -4432,10 +4500,10 @@ void CPULoop(int ticks)
                                 soundTimerOverflow(1);
                                 if (TM1CNT & 0x40) {
                                     IF |= 0x10;
-                                    UPDATE_REG(0x202, IF);
+                                    UPDATE_REG(IO_REG_IF, IF);
                                 }
                             }
-                            UPDATE_REG(0x104, TM1D);
+                            UPDATE_REG(IO_REG_TM1CNT_L, TM1D);
                         }
                     } else {
                         timer1Ticks -= clockTicks;
@@ -4445,11 +4513,11 @@ void CPULoop(int ticks)
                             soundTimerOverflow(1);
                             if (TM1CNT & 0x40) {
                                 IF |= 0x10;
-                                UPDATE_REG(0x202, IF);
+                                UPDATE_REG(IO_REG_IF, IF);
                             }
                         }
                         TM1D = 0xFFFF - DowncastU16(timer1Ticks >> timer1ClockReload);
-                        UPDATE_REG(0x104, TM1D);
+                        UPDATE_REG(IO_REG_TM1CNT_L, TM1D);
                     }
                 }
 
@@ -4462,10 +4530,10 @@ void CPULoop(int ticks)
                                 timerOverflow |= 4;
                                 if (TM2CNT & 0x40) {
                                     IF |= 0x20;
-                                    UPDATE_REG(0x202, IF);
+                                    UPDATE_REG(IO_REG_IF, IF);
                                 }
                             }
-                            UPDATE_REG(0x108, TM2D);
+                            UPDATE_REG(IO_REG_TM2CNT_L, TM2D);
                         }
                     } else {
                         timer2Ticks -= clockTicks;
@@ -4474,11 +4542,11 @@ void CPULoop(int ticks)
                             timerOverflow |= 4;
                             if (TM2CNT & 0x40) {
                                 IF |= 0x20;
-                                UPDATE_REG(0x202, IF);
+                                UPDATE_REG(IO_REG_IF, IF);
                             }
                         }
                         TM2D = 0xFFFF - DowncastU16(timer2Ticks >> timer2ClockReload);
-                        UPDATE_REG(0x108, TM2D);
+                        UPDATE_REG(IO_REG_TM2CNT_L, TM2D);
                     }
                 }
 
@@ -4490,10 +4558,10 @@ void CPULoop(int ticks)
                                 TM3D += DowncastU16(timer3Reload);
                                 if (TM3CNT & 0x40) {
                                     IF |= 0x40;
-                                    UPDATE_REG(0x202, IF);
+                                    UPDATE_REG(IO_REG_IF, IF);
                                 }
                             }
-                            UPDATE_REG(0x10C, TM3D);
+                            UPDATE_REG(IO_REG_TM3CNT_L, TM3D);
                         }
                     } else {
                         timer3Ticks -= clockTicks;
@@ -4501,11 +4569,11 @@ void CPULoop(int ticks)
                             timer3Ticks += (0x10000 - timer3Reload) << timer3ClockReload;
                             if (TM3CNT & 0x40) {
                                 IF |= 0x40;
-                                UPDATE_REG(0x202, IF);
+                                UPDATE_REG(IO_REG_IF, IF);
                             }
                         }
                         TM3D = 0xFFFF - DowncastU16(timer3Ticks >> timer3ClockReload);
-                        UPDATE_REG(0x10C, TM3D);
+                        UPDATE_REG(IO_REG_TM3CNT_L, TM3D);
                     }
                 }
             }
