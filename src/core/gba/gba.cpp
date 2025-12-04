@@ -690,6 +690,13 @@ unsigned int CPUWriteState(uint8_t* data)
     utilWriteIntMem(data, stopState);
     utilWriteIntMem(data, IRQTicks);
 
+    // new DMA variables
+    utilWriteIntMem(data, cpuDmaRunning);
+    utilWriteIntMem(data, cpuDmaPC);
+    utilWriteIntMem(data, cpuDmaCount);
+    utilWriteIntMem(data, cpuDmaBusValue);
+    utilWriteMem(data, cpuDmaLatchData, sizeof(uint32_t) * 4);
+
     utilWriteMem(data, g_internalRAM, SIZE_IRAM);
     utilWriteMem(data, g_paletteRAM, SIZE_PRAM);
     utilWriteMem(data, g_workRAM, SIZE_WRAM);
@@ -719,7 +726,7 @@ bool CPUReadState(const uint8_t* data)
 {
     // Don't really care about version.
     int version = utilReadIntMem(data);
-    if (version != SAVE_GAME_VERSION)
+    if (version > SAVE_GAME_VERSION || version < SAVE_GAME_VERSION_1)
         return false;
 
     char romname[16];
@@ -742,6 +749,14 @@ bool CPUReadState(const uint8_t* data)
     else {
         intState = false;
         IRQTicks = 0;
+    }
+
+    if (version >= SAVE_GAME_VERSION_11) {
+        cpuDmaRunning = utilReadIntMem(data) ? true : false;
+        cpuDmaPC = utilReadIntMem(data);
+        cpuDmaCount = utilReadIntMem(data);
+        cpuDmaBusValue = utilReadIntMem(data);
+        utilReadMem(cpuDmaLatchData, data, sizeof(uint32_t) * 4);
     }
 
     utilReadMem(g_internalRAM, data, SIZE_IRAM);
@@ -835,6 +850,13 @@ static bool CPUWriteState(gzFile gzFile)
     utilWriteInt(gzFile, stopState);
     // new to version 0.8
     utilWriteInt(gzFile, IRQTicks);
+
+    // new DMA variables
+    utilWriteInt(gzFile, cpuDmaRunning);
+    utilWriteInt(gzFile, cpuDmaPC);
+    utilWriteInt(gzFile, cpuDmaCount);
+    utilWriteInt(gzFile, cpuDmaBusValue);
+    utilGzWrite(gzFile, cpuDmaLatchData, sizeof(uint32_t) * 4);
 
     utilGzWrite(gzFile, g_internalRAM, SIZE_IRAM);
     utilGzWrite(gzFile, g_paletteRAM, SIZE_PRAM);
@@ -957,6 +979,15 @@ static bool CPUReadState(gzFile gzFile)
             intState = false;
             IRQTicks = 0;
         }
+    }
+
+    // new DMA variables
+    if (version >= SAVE_GAME_VERSION_11) {
+        cpuDmaRunning = utilReadInt(gzFile) ? true : false;
+        cpuDmaPC = utilReadInt(gzFile);
+        cpuDmaCount = utilReadInt(gzFile);
+        cpuDmaBusValue = utilReadInt(gzFile);
+        utilGzRead(gzFile, cpuDmaLatchData, sizeof(uint32_t) * 4);
     }
 
     utilGzRead(gzFile, g_internalRAM, SIZE_IRAM);

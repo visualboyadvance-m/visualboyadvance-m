@@ -71,6 +71,7 @@ static unsigned systemHeight = gbaHeight;
 static EmulatedSystem* core = NULL;
 static IMAGE_TYPE type = IMAGE_UNKNOWN;
 static bool libretro_supports_bitmasks = false;
+static bool enable_variable_serialization_size;
 
 // global vars
 uint8_t  systemColorMap8[0x10000];
@@ -589,6 +590,7 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
 
 void retro_init(void)
 {
+    uint64_t serialization_quirks = RETRO_SERIALIZATION_QUIRK_CORE_VARIABLE_SIZE;
     // The libretro core uses a few different defaults.
     coreOptions.mirroringEnable = false;
     coreOptions.parseDebug = true;
@@ -648,6 +650,9 @@ void retro_init(void)
       libretro_supports_bitmasks = true;
       log_cb(RETRO_LOG_INFO, "SET_SUPPORT_INPUT_BITMASK: yes\n");
    }
+   if (environ_cb(RETRO_ENVIRONMENT_SET_SERIALIZATION_QUIRKS, &serialization_quirks) &&
+       (serialization_quirks & RETRO_SERIALIZATION_QUIRK_FRONT_VARIABLE_SIZE))
+      enable_variable_serialization_size = true;
 }
 
 static const char *gbGetCartridgeType(void)
@@ -1741,6 +1746,12 @@ static unsigned serialize_size = 0;
 
 size_t retro_serialize_size(void)
 {
+    if (!core)
+        return 0;
+    if (enable_variable_serialization_size) {
+        uint8_t data[2 * 1024 * 1024]; // just big enough
+        serialize_size = core->emuWriteState((uint8_t*)data);
+    }
     return serialize_size;
 }
 
@@ -1750,6 +1761,8 @@ bool retro_serialize(void* data, size_t size)
         return false;
     if (size == serialize_size)
         return core->emuWriteState((uint8_t*)data);
+    if (enable_variable_serialization_size)
+        return core->emuWriteState((uint8_t*)data);
     return false;
 }
 
@@ -1757,7 +1770,7 @@ bool retro_unserialize(const void* data, size_t size)
 {
     if (!core)
         return false;
-    if (size == serialize_size)
+    //if (size == serialize_size)
         return core->emuReadState((uint8_t*)data);
     return false;
 }
