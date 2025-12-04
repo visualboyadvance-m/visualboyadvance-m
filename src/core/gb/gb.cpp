@@ -1,5 +1,6 @@
 #include "core/gb/gb.h"
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstdio>
@@ -2267,7 +2268,66 @@ uint8_t gbReadMemory(uint16_t address)
                     b |= 0x01;
 
                 gbMemory[0xff00] = (uint8_t)b;
+            } else if ((b & 0x30) == 0x00) {
+                // Both P14 and P15 selected (directly accent the buttons accent accent)
+                // Return AND of both button groups - if ANY button is pressed, show it
+                b &= 0xf0;
+
+                int joy = 0;
+                if (gbSgbMode && gbSgbMultiplayer) {
+                    switch (gbSgbNextController) {
+                    case 0x0f:
+                        joy = 0;
+                        break;
+                    case 0x0e:
+                        joy = 1;
+                        break;
+                    case 0x0d:
+                        joy = 2;
+                        break;
+                    case 0x0c:
+                        joy = 3;
+                        break;
+                    default:
+                        joy = 0;
+                    }
+                }
+                int joystate = gbJoymask[joy];
+
+                // P14 selected (d-pad): bits 0-3 = Right, Left, Up, Down (joystate bits 4-7)
+                // P15 selected (buttons): bits 0-3 = A, B, Select, Start (joystate bits 0-3)
+                // When both selected, AND the results (button pressed = 0, so AND shows any press)
+                //
+                // Build results same way as original code: start at 0, OR in bits for NOT pressed
+                int p14_result = 0;
+                int p15_result = 0;
+
+                // D-pad (P14) - OR in bit if button NOT pressed
+                if (!(joystate & 128)) // Down NOT pressed
+                    p14_result |= 0x08;
+                if (!(joystate & 64))  // Up NOT pressed
+                    p14_result |= 0x04;
+                if (!(joystate & 32))  // Left NOT pressed
+                    p14_result |= 0x02;
+                if (!(joystate & 16))  // Right NOT pressed
+                    p14_result |= 0x01;
+
+                // Buttons (P15) - OR in bit if button NOT pressed
+                if (!(joystate & 8))   // Start NOT pressed
+                    p15_result |= 0x08;
+                if (!(joystate & 4))   // Select NOT pressed
+                    p15_result |= 0x04;
+                if (!(joystate & 2))   // B NOT pressed
+                    p15_result |= 0x02;
+                if (!(joystate & 1))   // A NOT pressed
+                    p15_result |= 0x01;
+
+                // AND the results - a 0 bit in either means button pressed
+                b |= (p14_result & p15_result);
+
+                gbMemory[0xff00] = (uint8_t)b;
             } else {
+                // Neither selected (P14=1, P15=1) - return 0x0f in lower nibble
                 if (gbSgbMode && gbSgbMultiplayer) {
                     gbMemory[0xff00] = 0xf0 | gbSgbNextController;
                 } else {
