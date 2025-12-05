@@ -1640,11 +1640,11 @@ static void updateInput_Joypad(void)
 
         if (retropad_device[port] == RETRO_DEVICE_JOYPAD) {
             if (libretro_supports_bitmasks)
-                inbuf = input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
+                inbuf = input_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
             else
             {
                 for (int i = 0; i < (RETRO_DEVICE_ID_JOYPAD_R3 + 1); i++)
-                    inbuf |= input_cb(0, RETRO_DEVICE_JOYPAD, 0, i) ? (1 << i) : 0;
+                    inbuf |= input_cb(port, RETRO_DEVICE_JOYPAD, 0, i) ? (1 << i) : 0;
             }
 
             for (unsigned button = 0; button < max_buttons; button++)
