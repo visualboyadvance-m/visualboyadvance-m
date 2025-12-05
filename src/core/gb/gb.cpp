@@ -2207,82 +2207,60 @@ uint8_t gbReadMemory(uint16_t address)
 
             int b = gbMemory[0xff00];
 
-            if ((b & 0x30) == 0x20) {
-                b &= 0xf0;
+            // Choose joystick index for SGB multiplayer if enabled, otherwise 0
+            int joy = 0;
 
-                int joy = 0;
-                if (gbSgbMode && gbSgbMultiplayer) {
-                    switch (gbSgbNextController) {
-                    case 0x0f:
-                        joy = 0;
-                        break;
-                    case 0x0e:
-                        joy = 1;
-                        break;
-                    case 0x0d:
-                        joy = 2;
-                        break;
-                    case 0x0c:
-                        joy = 3;
-                        break;
-                    default:
-                        joy = 0;
-                    }
-                }
-                int joystate = gbJoymask[joy];
-                if (!(joystate & 128))
-                    b |= 0x08;
-                if (!(joystate & 64))
-                    b |= 0x04;
-                if (!(joystate & 32))
-                    b |= 0x02;
-                if (!(joystate & 16))
-                    b |= 0x01;
-
-                gbMemory[0xff00] = (uint8_t)b;
-            } else if ((b & 0x30) == 0x10) {
-                b &= 0xf0;
-
-                int joy = 0;
-                if (gbSgbMode && gbSgbMultiplayer) {
-                    switch (gbSgbNextController) {
-                    case 0x0f:
-                        joy = 0;
-                        break;
-                    case 0x0e:
-                        joy = 1;
-                        break;
-                    case 0x0d:
-                        joy = 2;
-                        break;
-                    case 0x0c:
-                        joy = 3;
-                        break;
-                    default:
-                        joy = 0;
-                    }
-                }
-                int joystate = gbJoymask[joy];
-                if (!(joystate & 8))
-                    b |= 0x08;
-                if (!(joystate & 4))
-                    b |= 0x04;
-                if (!(joystate & 2))
-                    b |= 0x02;
-                if (!(joystate & 1))
-                    b |= 0x01;
-
-                gbMemory[0xff00] = (uint8_t)b;
-            } else {
-                if (gbSgbMode && gbSgbMultiplayer) {
-                    gbMemory[0xff00] = 0xf0 | gbSgbNextController;
-                } else {
-                    gbMemory[0xff00] = 0xff;
+            if (gbSgbMode && gbSgbMultiplayer) {
+                switch (gbSgbNextController) {
+                case 0x0f: joy = 0; break;
+                case 0x0e: joy = 1; break;
+                case 0x0d: joy = 2; break;
+                case 0x0c: joy = 3; break;
+                default:   joy = 0; break;
                 }
             }
-        }
+
+            int joystate = gbJoymask[joy];
+
+            if (gbSgbMode && gbSgbMultiplayer) {
+            }
+
+            // Bit 7 - Not used
+            // Bit 6 - Not used
+            // Bit 5 - P15 Select Action buttons    (0=Select)
+            // Bit 4 - P14 Select Direction buttons (0=Select)
+            // Bit 3 - P13 Input: Down  or Start    (0=Pressed) (Read Only)
+            // Bit 2 - P12 Input: Up    or Select   (0=Pressed) (Read Only)
+            // Bit 1 - P11 Input: Left  or B        (0=Pressed) (Read Only)
+            // Bit 0 - P10 Input: Right or A        (0=Pressed) (Read Only)
+            uint8_t data_dir =
+                (!(joystate & 0x80) ? 0x08 : 0x00) | // Down -> bit3
+                (!(joystate & 0x40) ? 0x04 : 0x00) | // Up   -> bit2
+                (!(joystate & 0x20) ? 0x02 : 0x00) | // Left -> bit1
+                (!(joystate & 0x10) ? 0x01 : 0x00);  // Right-> bit0
+
+            uint8_t data_action =
+                (!(joystate & 0x08) ? 0x08 : 0x00) | // Start  -> bit3
+                (!(joystate & 0x04) ? 0x04 : 0x00) | // Select -> bit2
+                (!(joystate & 0x02) ? 0x02 : 0x00) | // B      -> bit1
+                (!(joystate & 0x01) ? 0x01 : 0x00);  // A      -> bit0
+
+            b &= 0xf0; // keep selector bits in upper nibble
+            switch (b & 0x30) {
+            case 0x00: b |= data_dir & data_action; break;
+            case 0x10: b |= data_action; break;
+            case 0x20: b |= data_dir; break;
+            case 0x30:
+                if (gbSgbMode && gbSgbMultiplayer) {
+                    b = 0xf0 | gbSgbNextController;
+                } else {
+                    b = 0xff;
+                }
+                break;
+            }
+            gbMemory[0xff00] = b;
+            }
             return gbMemory[0xff00];
-            break;
         case 0x01:
             return gbMemory[0xff01];
         case 0x02:
