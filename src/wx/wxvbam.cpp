@@ -1369,14 +1369,17 @@ static gboolean HandleMenuKeyboardNavigation(GtkWidget* widget, GdkEventKey* eve
 
 void MainFrame::MenuPopped(wxMenuEvent& evt) {
     // Track menu open/close state for audio handling
+    // On macOS, the menubar is in the OS menubar and doesn't need this tracking
+#if !defined(__WXMAC__)
 #if defined(__WXMSW__)
     if (evt.GetEventType() == wxEVT_MENU_CLOSE && (evt.GetMenu() == NULL || evt.GetMenu()->GetMenuBar() == GetMenuBar()))
 #else
     if (evt.GetEventType() == wxEVT_MENU_CLOSE && evt.GetMenu() && evt.GetMenu()->GetMenuBar() == GetMenuBar())
 #endif
         SetMenusOpened(false);
-    else
+    else if (evt.GetEventType() == wxEVT_MENU_OPEN)
         SetMenusOpened(true);
+#endif
 
 #ifdef __WXGTK__
     // Force mnemonic underlines to always be visible (GTK3 hides them by default)
@@ -1434,7 +1437,6 @@ void MainFrame::SetMenusOpened(bool state) {
 int MainFrame::ShowModal(wxDialog* dlg)
 {
     dlg->SetWindowStyle(dlg->GetWindowStyle() | wxCAPTION | wxRESIZE_BORDER);
-
     CheckPointer(dlg);
     StartModal();
     int ret = dlg->ShowModal();

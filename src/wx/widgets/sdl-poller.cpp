@@ -521,6 +521,7 @@ void SdlPoller::Notify() {
 #endif
                 joystick_states_.erase(sdl_event.jdevice.which);
                 break;
+
         }
 
         if (!event_data.empty()) {
@@ -562,6 +563,55 @@ void SdlPoller::RemapControllers() {
             joystick_states_.insert({joy_state.joystick_id(), std::move(joy_state)});
         }
     }
+}
+
+uint32_t SdlPoller::GetCurrentSdlMods() {
+#ifndef ENABLE_SDL3
+    SDL_Keymod sdl_mod = SDL_GetModState();
+#else
+    SDL_Keymod sdl_mod = SDL_GetModState();
+#endif
+
+    uint32_t mod = config::kKeyModNone;
+
+    // Check for specific left/right modifiers
+#ifndef ENABLE_SDL3
+    if (sdl_mod & KMOD_LSHIFT)
+        mod |= config::kKeyModLeftShift;
+    if (sdl_mod & KMOD_RSHIFT)
+        mod |= config::kKeyModRightShift;
+    if (sdl_mod & KMOD_LCTRL)
+        mod |= config::kKeyModLeftControl;
+    if (sdl_mod & KMOD_RCTRL)
+        mod |= config::kKeyModRightControl;
+    if (sdl_mod & KMOD_LALT)
+        mod |= config::kKeyModLeftAlt;
+    if (sdl_mod & KMOD_RALT)
+        mod |= config::kKeyModRightAlt;
+    if (sdl_mod & KMOD_LGUI)
+        mod |= config::kKeyModLeftMeta;
+    if (sdl_mod & KMOD_RGUI)
+        mod |= config::kKeyModRightMeta;
+#else
+    if (sdl_mod & SDL_KMOD_LSHIFT)
+        mod |= config::kKeyModLeftShift;
+    if (sdl_mod & SDL_KMOD_RSHIFT)
+        mod |= config::kKeyModRightShift;
+    if (sdl_mod & SDL_KMOD_LCTRL)
+        mod |= config::kKeyModLeftControl;
+    if (sdl_mod & SDL_KMOD_RCTRL)
+        mod |= config::kKeyModRightControl;
+    if (sdl_mod & SDL_KMOD_LALT)
+        mod |= config::kKeyModLeftAlt;
+    if (sdl_mod & SDL_KMOD_RALT)
+        mod |= config::kKeyModRightAlt;
+    if (sdl_mod & SDL_KMOD_LGUI)
+        mod |= config::kKeyModLeftMeta;
+    if (sdl_mod & SDL_KMOD_RGUI)
+        mod |= config::kKeyModRightMeta;
+#endif
+
+    return mod;
 }
 
 }  // namespace widgets

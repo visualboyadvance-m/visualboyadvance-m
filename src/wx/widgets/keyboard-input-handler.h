@@ -1,6 +1,7 @@
 #ifndef VBAM_WX_WIDGETS_KEYBOARD_INPUT_HANDLER_H_
 #define VBAM_WX_WIDGETS_KEYBOARD_INPUT_HANDLER_H_
 
+#include <unordered_map>
 #include <unordered_set>
 
 #include <wx/event.h>
@@ -39,6 +40,8 @@ private:
     std::unordered_set<wxKeyCode> active_keys_;
     std::unordered_set<wxKeyModifier> active_mods_;
     std::unordered_set<config::KeyboardInput> active_mod_inputs_;
+    // Track extended modifiers (with L/R distinction) for each key press
+    std::unordered_map<wxKeyCode, uint32_t> key_extended_mods_;
 
     // The provider of event handlers to send the events to.
     EventHandlerProvider* const handler_provider_;

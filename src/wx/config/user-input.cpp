@@ -65,45 +65,85 @@ bool KeyIsModifier(int key) {
     return key == WXK_CONTROL || key == WXK_SHIFT || key == WXK_ALT || key == WXK_RAW_CONTROL;
 }
 
-wxString ModToConfigString(int mod) {
+wxString ModToConfigString(uint32_t mod) {
     wxString config_string;
-    if (mod & wxMOD_ALT) {
+    // Check for extended (L/R specific) modifiers first
+    if (mod & kKeyModLeftAlt) {
+        config_string += "LALT+";
+    } else if (mod & kKeyModRightAlt) {
+        config_string += "RALT+";
+    } else if (mod & (kKeyModAlt | wxMOD_ALT)) {
         config_string += "ALT+";
     }
-    if (mod & wxMOD_CONTROL) {
+    // For control modifiers, extended L/R flags take precedence.
+    // On macOS, both wxMOD_RAW_CONTROL (base) and kKeyModL/RControl (extended)
+    // may be set when pressing actual Ctrl key. Extended takes priority.
+    if (mod & kKeyModLeftControl) {
+        config_string += "LCTRL+";
+    } else if (mod & kKeyModRightControl) {
+        config_string += "RCTRL+";
+    } else if (mod & (kKeyModControl | wxMOD_CONTROL)) {
         config_string += "CTRL+";
-    }
 #ifdef __WXMAC__
-    if (mod & wxMOD_RAW_CONTROL) {
+    } else if (mod & wxMOD_RAW_CONTROL) {
+        // Only output RAWCTRL if no extended control modifier was set
         config_string += "RAWCTRL+";
-    }
 #endif
-    if (mod & wxMOD_SHIFT) {
+    }
+    if (mod & kKeyModLeftShift) {
+        config_string += "LSHIFT+";
+    } else if (mod & kKeyModRightShift) {
+        config_string += "RSHIFT+";
+    } else if (mod & (kKeyModShift | wxMOD_SHIFT)) {
         config_string += "SHIFT+";
     }
-    if (mod & wxMOD_META) {
+    if (mod & kKeyModLeftMeta) {
+        config_string += "LMETA+";
+    } else if (mod & kKeyModRightMeta) {
+        config_string += "RMETA+";
+    } else if (mod & (kKeyModMeta | wxMOD_META)) {
         config_string += "META+";
     }
     return config_string;
 }
 
-wxString ModToLocalizedString(int mod) {
+wxString ModToLocalizedString(uint32_t mod) {
     wxString config_string;
-    if (mod & wxMOD_ALT) {
+    // Check for extended (L/R specific) modifiers first
+    if (mod & kKeyModLeftAlt) {
+        config_string += _("LAlt+");
+    } else if (mod & kKeyModRightAlt) {
+        config_string += _("RAlt+");
+    } else if (mod & (kKeyModAlt | wxMOD_ALT)) {
         config_string += _("Alt+");
     }
-    if (mod & wxMOD_CONTROL) {
+    // For control modifiers, extended L/R flags take precedence.
+    // On macOS, both wxMOD_RAW_CONTROL (base) and kKeyModL/RControl (extended)
+    // may be set when pressing actual Ctrl key. Extended takes priority.
+    if (mod & kKeyModLeftControl) {
+        config_string += _("LCtrl+");
+    } else if (mod & kKeyModRightControl) {
+        config_string += _("RCtrl+");
+    } else if (mod & (kKeyModControl | wxMOD_CONTROL)) {
         config_string += _("Ctrl+");
-    }
 #ifdef __WXMAC__
-    if (mod & wxMOD_RAW_CONTROL) {
+    } else if (mod & wxMOD_RAW_CONTROL) {
+        // Only output Rawctrl if no extended control modifier was set
         config_string += _("Rawctrl+");
-    }
 #endif
-    if (mod & wxMOD_SHIFT) {
+    }
+    if (mod & kKeyModLeftShift) {
+        config_string += _("LShift+");
+    } else if (mod & kKeyModRightShift) {
+        config_string += _("RShift+");
+    } else if (mod & (kKeyModShift | wxMOD_SHIFT)) {
         config_string += _("Shift+");
     }
-    if (mod & wxMOD_META) {
+    if (mod & kKeyModLeftMeta) {
+        config_string += _("LMeta+");
+    } else if (mod & kKeyModRightMeta) {
+        config_string += _("RMeta+");
+    } else if (mod & (kKeyModMeta | wxMOD_META)) {
         config_string += _("Meta+");
     }
     return config_string;
@@ -133,13 +173,36 @@ UserInput StringToUserInput(const wxString& string) {
     // Standalone modifiers do not get parsed properly by wxWidgets.
     static const std::map<wxString, UserInput> kStandaloneModifiers = {
         {"ALT", KeyboardInput(WXK_ALT, wxMOD_ALT)},
+        {"LALT", KeyboardInput(WXK_ALT, kKeyModLeftAlt)},
+        {"RALT", KeyboardInput(WXK_ALT, kKeyModRightAlt)},
         {"SHIFT", KeyboardInput(WXK_SHIFT, wxMOD_SHIFT)},
+        {"LSHIFT", KeyboardInput(WXK_SHIFT, kKeyModLeftShift)},
+        {"RSHIFT", KeyboardInput(WXK_SHIFT, kKeyModRightShift)},
         {"RAWCTRL", KeyboardInput(WXK_RAW_CONTROL, wxMOD_RAW_CONTROL)},
         {"RAW_CTRL", KeyboardInput(WXK_RAW_CONTROL, wxMOD_RAW_CONTROL)},
         {"RAWCONTROL", KeyboardInput(WXK_RAW_CONTROL, wxMOD_RAW_CONTROL)},
         {"RAW_CONTROL", KeyboardInput(WXK_RAW_CONTROL, wxMOD_RAW_CONTROL)},
+#ifdef __WXMAC__
+        // On macOS, Command key is WXK_CONTROL and actual Ctrl is WXK_RAW_CONTROL.
+        // LCTRL/RCTRL refer to the actual Ctrl key (WXK_RAW_CONTROL) for consistency
+        // with what the keyboard handler generates when these keys are pressed.
         {"CTRL", KeyboardInput(WXK_CONTROL, wxMOD_CONTROL)},
         {"CONTROL", KeyboardInput(WXK_CONTROL, wxMOD_CONTROL)},
+        {"LCTRL", KeyboardInput(WXK_RAW_CONTROL, kKeyModLeftControl)},
+        {"LCONTROL", KeyboardInput(WXK_RAW_CONTROL, kKeyModLeftControl)},
+        {"RCTRL", KeyboardInput(WXK_RAW_CONTROL, kKeyModRightControl)},
+        {"RCONTROL", KeyboardInput(WXK_RAW_CONTROL, kKeyModRightControl)},
+#else
+        {"CTRL", KeyboardInput(WXK_CONTROL, wxMOD_CONTROL)},
+        {"CONTROL", KeyboardInput(WXK_CONTROL, wxMOD_CONTROL)},
+        {"LCTRL", KeyboardInput(WXK_CONTROL, kKeyModLeftControl)},
+        {"LCONTROL", KeyboardInput(WXK_CONTROL, kKeyModLeftControl)},
+        {"RCTRL", KeyboardInput(WXK_CONTROL, kKeyModRightControl)},
+        {"RCONTROL", KeyboardInput(WXK_CONTROL, kKeyModRightControl)},
+#endif
+        {"META", KeyboardInput(WXK_WINDOWS_LEFT, wxMOD_META)},
+        {"LMETA", KeyboardInput(WXK_WINDOWS_LEFT, kKeyModLeftMeta)},
+        {"RMETA", KeyboardInput(WXK_WINDOWS_RIGHT, kKeyModRightMeta)},
     };
 
     if (string.empty()) {
@@ -201,6 +264,76 @@ UserInput StringToUserInput(const wxString& string) {
     if (iter != kStandaloneModifiers.end()) {
         // Stand-alone modifier key.
         return iter->second;
+    }
+
+    // Parse extended modifiers (LCTRL+, RCTRL+, LALT+, RALT+, LSHIFT+, RSHIFT+, LMETA+, RMETA+)
+    // that wxAcceleratorEntry doesn't understand.
+    // Map of extended modifier prefixes to their flags
+    static const std::vector<std::pair<wxString, uint32_t>> kExtendedModPrefixes = {
+        {"LCTRL+", kKeyModLeftControl},
+        {"LCONTROL+", kKeyModLeftControl},
+        {"RCTRL+", kKeyModRightControl},
+        {"RCONTROL+", kKeyModRightControl},
+        {"LALT+", kKeyModLeftAlt},
+        {"RALT+", kKeyModRightAlt},
+        {"LSHIFT+", kKeyModLeftShift},
+        {"RSHIFT+", kKeyModRightShift},
+        {"LMETA+", kKeyModLeftMeta},
+        {"RMETA+", kKeyModRightMeta},
+    };
+
+    uint32_t extended_mod = kKeyModNone;
+    wxString remaining = upper;
+    bool found_extended = true;
+    while (found_extended) {
+        found_extended = false;
+        for (const auto& prefix : kExtendedModPrefixes) {
+            if (remaining.StartsWith(prefix.first)) {
+                extended_mod |= prefix.second;
+                remaining = remaining.Mid(prefix.first.length());
+                found_extended = true;
+                break;
+            }
+        }
+    }
+
+    if (extended_mod != kKeyModNone) {
+        // We found extended modifiers, parse the rest with wxAcceleratorEntry
+        // but we also need to handle the remaining part which may have standard modifiers
+        const wxLogNull disable_logging;
+        wxAcceleratorEntry accel;
+        // If remaining is just a key (no +), we need to format it properly
+        wxString accel_string = remaining;
+        if (!remaining.Contains("+")) {
+            // Just a key, no standard modifiers
+            accel_string = remaining;
+        }
+        // Try to parse what's left
+        if (accel.FromString(accel_string)) {
+            key = accel.GetKeyCode();
+            if (key < WXK_START && wxIslower(key)) {
+                key = wxToupper(key);
+            }
+            // Combine extended modifiers with any standard modifiers from accel
+            extended_mod |= static_cast<uint32_t>(accel.GetFlags());
+            return KeyboardInput(static_cast<wxKeyCode>(key), extended_mod);
+        }
+        // If FromString failed, try to parse as a single character or special key
+        if (remaining.length() == 1) {
+            key = static_cast<long>(remaining[0]);
+            if (key >= 'a' && key <= 'z') {
+                key = wxToupper(key);
+            }
+            return KeyboardInput(static_cast<wxKeyCode>(key), extended_mod);
+        }
+        // Check for special keys in our map
+        for (const auto& kv : kKeyCodeOverrides) {
+            if (remaining == kv.second.config_name) {
+                return KeyboardInput(kv.first, extended_mod);
+            }
+        }
+        // Invalid
+        return UserInput();
     }
 
     // Need to disable logging to parse the string.
@@ -285,7 +418,25 @@ wxString JoyInput::ToLocalizedString() const {
 wxString KeyboardInput::ToConfigString() const {
     // Handle the modifier case separately.
     if (KeyIsModifier(key_)) {
-        return ModToConfigString(mod_).RemoveLast();
+        wxString mod_str = ModToConfigString(mod_);
+        if (!mod_str.empty()) {
+            return mod_str.RemoveLast();
+        }
+        // Fallback for modifier keys without extended info
+        switch (key_) {
+            case WXK_SHIFT:
+                return "SHIFT";
+            case WXK_CONTROL:
+                return "CTRL";
+            case WXK_ALT:
+                return "ALT";
+#ifdef __WXMAC__
+            case WXK_RAW_CONTROL:
+                return "RAWCTRL";
+#endif
+            default:
+                return wxEmptyString;
+        }
     }
 
     // Custom overrides.
@@ -299,7 +450,18 @@ wxString KeyboardInput::ToConfigString() const {
         return wxString::Format("%d:%d", key_, mod_);
     }
 
-    const wxString accel_string = wxAcceleratorEntry(mod_, key_).ToRawString().MakeUpper();
+    // For keys with extended modifiers, build the string manually
+    if (HasExtendedModifiers(mod_)) {
+        wxString result = ModToConfigString(mod_);
+        // Get the key name using wxAcceleratorEntry but without modifiers
+        wxString key_str = wxAcceleratorEntry(wxMOD_NONE, key_).ToRawString().MakeUpper();
+        if (!key_str.IsAscii()) {
+            return wxString::Format("%d:%d", key_, mod_);
+        }
+        return result + key_str;
+    }
+
+    const wxString accel_string = wxAcceleratorEntry(mod(), key_).ToRawString().MakeUpper();
     if (!accel_string.IsAscii()) {
         // Unicode handling.
         return wxString::Format("%d:%d", key_, mod_);
@@ -310,7 +472,27 @@ wxString KeyboardInput::ToConfigString() const {
 wxString KeyboardInput::ToLocalizedString() const {
     // Handle the modifier case separately.
     if (KeyIsModifier(key_)) {
-        return ModToLocalizedString(mod_) + _("Key");
+        // For standalone modifier keys, show the L/R distinction if available
+        wxString mod_str = ModToLocalizedString(mod_);
+        if (!mod_str.empty()) {
+            // Remove trailing '+' and return just the modifier name
+            return mod_str.RemoveLast();
+        }
+        // Fallback for modifier keys without extended info
+        switch (key_) {
+            case WXK_SHIFT:
+                return _("Shift");
+            case WXK_CONTROL:
+                return _("Ctrl");
+            case WXK_ALT:
+                return _("Alt");
+#ifdef __WXMAC__
+            case WXK_RAW_CONTROL:
+                return _("Rawctrl");
+#endif
+            default:
+                return _("Key");
+        }
     }
 
     // Custom overrides.
@@ -319,7 +501,15 @@ wxString KeyboardInput::ToLocalizedString() const {
         return ModToLocalizedString(mod_) + iter->second.display_name;
     }
 
-    const wxString accel_string = wxAcceleratorEntry(mod_, key_).ToRawString().MakeUpper();
+    // For keys with extended modifiers, build the string manually
+    if (HasExtendedModifiers(mod_)) {
+        wxString result = ModToLocalizedString(mod_);
+        // Get the key name using wxAcceleratorEntry but without modifiers
+        wxString key_str = wxAcceleratorEntry(wxMOD_NONE, key_).ToRawString().MakeUpper();
+        return result + key_str;
+    }
+
+    const wxString accel_string = wxAcceleratorEntry(mod(), key_).ToRawString().MakeUpper();
     return accel_string;
 }
 

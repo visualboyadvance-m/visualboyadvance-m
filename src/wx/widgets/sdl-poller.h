@@ -1,6 +1,7 @@
 #ifndef WX_WIDGETS_SDL_POLLER_H_
 #define WX_WIDGETS_SDL_POLLER_H_
 
+#include <cstdint>
 #include <map>
 
 #include <wx/timer.h>
@@ -37,6 +38,11 @@ public:
 
     // Sets or unsets the controller rumble.
     void SetRumble(bool rumble);
+
+    // Get the current keyboard modifier state from SDL with L/R distinction.
+    // This can be called from wxWidgets keyboard handlers to get extended
+    // modifier information.
+    static uint32_t GetCurrentSdlMods();
 
 private:
     // Helper method to find a joystick state from a joystick ID.
