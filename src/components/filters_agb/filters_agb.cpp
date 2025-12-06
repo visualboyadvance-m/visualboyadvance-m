@@ -171,9 +171,6 @@ void gbafilter_update_colors(bool lcd) {
                 // 3 LSBs for the 'base' position (systemBlueShift - 3)
                 final_pix |= (final_blue_8bit & 0x07) << (systemBlueShift - 3);
 
-                // Note: The alpha preservation logic from the new snippet was omitted 
-                // as it was irrelevant to the lookup table generation from 'i'.
-
                 systemColorMap32[i] = final_pix;
             }
         }
@@ -360,9 +357,9 @@ void gbafilter_pal32(uint32_t* buf, int count)
         uint8_t final_green_8bit = (uint8_t)(transformed_g * 255.0f + 0.5f);
         uint8_t final_blue_8bit = (uint8_t)(transformed_b * 255.0f + 0.5f);
 
-        // --- NEW PACKING LOGIC ---
-        // This is the critical change to correctly map 8-bit color to the 5-bit shifted format,
-        // while allowing FFFFFF.
+        // --- 8bit shift scaling logic ---
+        // This maps 8-bit color to the 5-bit shifted format,
+        // while allowing FFFFFF, enhancing whites and color.
         // It uses the top 5 bits of the 8-bit value for the GBA's 5-bit component position,
         // and the bottom 3 bits to fill the lower, normally zeroed, positions.
 
