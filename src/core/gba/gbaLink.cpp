@@ -718,7 +718,7 @@ void StartLink(uint16_t siocnt)
             if (siocnt & 1 && (siocnt & 0x4000)) {
                 UPDATE_REG(COMM_SIOCNT, 0xFF);
                 IF |= 0x80;
-                UPDATE_REG(0x202, IF);
+                UPDATE_REG(IO_REG_IF, IF);
                 siocnt &= 0x7f7f;
             }
         }
@@ -1280,7 +1280,7 @@ static void UpdateCableSocket(int ticks)
     if (transfer_direction == RECEIVING && linktime >= trtimeend[lanlink.numslaves - 1][tspeed]) {
         if (READ16LE(&g_ioMem[COMM_SIOCNT]) & 0x4000) {
             IF |= 0x80;
-            UPDATE_REG(0x202, IF);
+            UPDATE_REG(IO_REG_IF, IF);
         }
 
         UPDATE_REG(COMM_SIOCNT, (READ16LE(&g_ioMem[COMM_SIOCNT]) & 0xff0f) | (linkid << 4));
@@ -1450,7 +1450,7 @@ static void JoyBusUpdate(int ticks)
         if (((cmd == JOY_CMD_RESET) || (cmd == JOY_CMD_READ) || (cmd == JOY_CMD_WRITE))
             && (READ16LE(&g_ioMem[COMM_JOYCNT]) & JOYCNT_INT_ENABLE)) {
             IF |= 0x80;
-            UPDATE_REG(0x202, IF);
+            UPDATE_REG(IO_REG_IF, IF);
         }
 
         lastcommand = 0;
@@ -1812,7 +1812,7 @@ static void StartRFUSocket(uint16_t value)
             if (READ16LE(&g_ioMem[COMM_SIOCNT]) & SIO_IRQ_ENABLE) //IRQ Enable
             {
                 IF |= 0x80; //Serial Communication
-                UPDATE_REG(0x202, IF); //Interrupt Request Flags / IRQ Acknowledge
+                UPDATE_REG(IO_REG_IF, IF); //Interrupt Request Flags / IRQ Acknowledge
             }
             value &= ~SIO_TRANS_START; //Start bit.7 reset //may cause the game to retry sending again
             value |= SIO_TRANS_FLAG_SEND_DISABLE; //SO bit.3 set automatically upon transfer completion
@@ -2526,7 +2526,7 @@ static void UpdateRFUSocket(int ticks)
                 uint16_t value = READ16LE(&g_ioMem[COMM_SIOCNT]);
                 if (value & SIO_IRQ_ENABLE) {
                     IF |= 0x80;
-                    UPDATE_REG(0x202, IF);
+                    UPDATE_REG(IO_REG_IF, IF);
                 }
 
                 //if (rfu_polarity) value ^= 4;
@@ -2993,7 +2993,7 @@ static void UpdateCableIPC(int)
         UPDATE_REG(COMM_RCNT, linkid ? 15 : 11);
         if (value & 0x4000) {
             IF |= 0x80;
-            UPDATE_REG(0x202, IF);
+            UPDATE_REG(IO_REG_IF, IF);
         }
     }
 }
@@ -3021,7 +3021,7 @@ static void StartRFU(uint16_t value)
             if (READ16LE(&g_ioMem[COMM_SIOCNT]) & 0x4000) //IRQ Enable
             {
                 IF |= 0x80; //Serial Communication
-                UPDATE_REG(0x202, IF); //Interrupt Request Flags / IRQ Acknowledge
+                UPDATE_REG(IO_REG_IF, IF); //Interrupt Request Flags / IRQ Acknowledge
             }
             value &= 0xff7f; //Start bit.7 reset //may cause the game to retry sending again
             //value |= 0x0008; //SO bit.3 set automatically upon transfer completion
@@ -4032,7 +4032,7 @@ static void UpdateRFUIPC(int ticks)
                 uint16_t value = READ16LE(&g_ioMem[COMM_SIOCNT]);
                 if (value & 0x4000) {
                     IF |= 0x80;
-                    UPDATE_REG(0x202, IF);
+                    UPDATE_REG(IO_REG_IF, IF);
                 }
 
                 //if (rfu_polarity) value ^= 4;

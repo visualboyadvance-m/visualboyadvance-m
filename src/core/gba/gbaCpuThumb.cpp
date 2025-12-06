@@ -1398,7 +1398,7 @@ static INSN_REGPARM void thumb5E(uint32_t opcode)
     if (busPrefetchCount == 0)
         busPrefetch = busPrefetchEnable;
     uint32_t address = reg[(opcode >> 3) & 7].I + reg[(opcode >> 6) & 7].I;
-    reg[opcode & 7].I = (uint32_t)CPUReadHalfWordSigned(address);
+    reg[opcode & 7].I = CPUReadHalfWordSigned(address);
     clockTicks = 3 + dataTicksAccess16(address) + codeTicksAccess16(armNextPC);
 }
 

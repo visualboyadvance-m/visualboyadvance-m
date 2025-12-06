@@ -71,6 +71,7 @@ static unsigned systemHeight = gbaHeight;
 static EmulatedSystem* core = NULL;
 static IMAGE_TYPE type = IMAGE_UNKNOWN;
 static bool libretro_supports_bitmasks = false;
+static bool enable_variable_serialization_size;
 
 // global vars
 uint8_t  systemColorMap8[0x10000];
@@ -278,33 +279,34 @@ static void gbInitRTC(void)
     }
 }
 
+static bool gbUpdateGeometry = false;
+static bool gbFullReInit = false;
+static void geometry_changed() {
+    struct retro_system_av_info avinfo;
+    retro_get_system_av_info(&avinfo);
+    if (!gbFullReInit)
+        environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &avinfo);
+    else
+        environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &avinfo);
+}
+
 static void SetGBBorder(unsigned val)
 {
-    struct retro_system_av_info avinfo;
-    unsigned _changed = 0;
-
     switch (val) {
         case 0:
-            _changed = ((systemWidth != kGBWidth) || (systemHeight != kGBHeight)) ? 1 : 0;
+            gbFullReInit = ((systemWidth != kGBWidth) || (systemHeight != kGBHeight)) ? 1 : 0;
             systemWidth = gbBorderLineSkip = kGBWidth;
             systemHeight = kGBHeight;
             gbBorderColumnSkip = gbBorderRowSkip = 0;
             break;
         case 1:
-            _changed = ((systemWidth != kSGBWidth) || (systemHeight != kSGBHeight)) ? 1 : 0;
+            gbFullReInit = ((systemWidth != kSGBWidth) || (systemHeight != kSGBHeight)) ? 1 : 0;
             systemWidth = gbBorderLineSkip = kSGBWidth;
             systemHeight = kSGBHeight;
             gbBorderColumnSkip = (kSGBWidth - kGBWidth) >> 1;
             gbBorderRowSkip = (kSGBHeight - kGBHeight) >> 1;
             break;
     }
-
-    retro_get_system_av_info(&avinfo);
-
-    if (!_changed)
-        environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &avinfo);
-    else
-        environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &avinfo);
 }
 
 void* retro_get_memory_data(unsigned id)
@@ -588,6 +590,7 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
 
 void retro_init(void)
 {
+    uint64_t serialization_quirks = RETRO_SERIALIZATION_QUIRK_CORE_VARIABLE_SIZE;
     // The libretro core uses a few different defaults.
     coreOptions.mirroringEnable = false;
     coreOptions.parseDebug = true;
@@ -647,6 +650,9 @@ void retro_init(void)
       libretro_supports_bitmasks = true;
       log_cb(RETRO_LOG_INFO, "SET_SUPPORT_INPUT_BITMASK: yes\n");
    }
+   if (environ_cb(RETRO_ENVIRONMENT_SET_SERIALIZATION_QUIRKS, &serialization_quirks) &&
+       (serialization_quirks & RETRO_SERIALIZATION_QUIRK_FRONT_VARIABLE_SIZE))
+      enable_variable_serialization_size = true;
 }
 
 static const char *gbGetCartridgeType(void)
@@ -797,21 +803,27 @@ static const ini_t gbaover[512] = {
    signatures found in commercial GBA titles.
    They must be explicitly detected by name or unique byte strings.
    -------------------------------------------------------------- */
-static bool find_string(const uint8_t *buf, size_t size, const char *str) {
-    int i, j;
-    int len = 0;
+bool find_string(const uint8_t* buf, size_t size, const char* str) {
+    if (!buf || !str) return false;
 
-    while (str[len]) len++;
+    size_t len = strlen(str);
+    if (len == 0 || size < len) return false;
 
-    for (i = 0; i <= size - len; i++) {
-        for (j = 0; j < len; j++) {
-            if (buf[i + j] != (unsigned char)str[j])
-                break;
-        }
-        if (j == len)
-            return true; /* found */
+    // Build bad-character shift table
+    size_t shift[256];
+    for (size_t i = 0; i < 256; ++i) shift[i] = len;
+    for (size_t i = 0; i < len - 1; ++i)
+        shift[(unsigned char)str[i]] = len - 1 - i;
+
+    size_t i = 0;
+    while (i <= size - len) {
+        size_t j = len - 1;
+        while (j < len && buf[i + j] == (unsigned char)str[j])
+            if (j-- == 0) return true; // found
+        i += shift[buf[i + len - 1]];
     }
-    return false; /* not found */
+
+    return false;
 }
 
 static int romSize = 0;
@@ -828,13 +840,16 @@ static void load_image_preferences(void)
     };
 
     bool found = false;
+    int saveType = 0;
+    int saveSize = 0;
+    bool hasRtc = false;
     bool hasRumble = false;
     char buffer[12 + 1];
     unsigned i = 0, found_no = 0;
     unsigned long romCrc32 = crc32(0, g_rom, romSize);
 
     coreOptions.saveType = GBA_SAVE_AUTO;
-    g_flashSize = SIZE_FLASH512;
+    g_flashSize = SIZE_FLASH1M;
     eepromSize = SIZE_EEPROM_512;
     coreOptions.rtcEnabled = false;
     coreOptions.mirroringEnable = false;
@@ -859,7 +874,7 @@ static void load_image_preferences(void)
     log("Game Code       : %s\n", buffer);
 
     for (i = 0; i < 512; i++) {
-        if (!strcmp(gbaover[i].romid, buffer)) {
+        if (gbaover[i].romid[0] && !strcmp(gbaover[i].romid, buffer)) {
             found = true;
             found_no = i;
             break;
@@ -867,22 +882,20 @@ static void load_image_preferences(void)
     }
 
     if (found) {
+        log("Found game in gba-over.ini\n");
         log("Name            : %s\n", gbaover[found_no].romtitle);
 
-        coreOptions.rtcEnabled = gbaover[found_no].rtcEnabled;
-        coreOptions.saveType = gbaover[found_no].saveType;
+        saveType = gbaover[found_no].saveType;
+        saveSize = gbaover[found_no].saveSize;
+        hasRtc   = gbaover[found_no].rtcEnabled;
 
-        unsigned size = gbaover[found_no].saveSize;
-        if (coreOptions.saveType == GBA_SAVE_SRAM)
-            g_flashSize = SIZE_SRAM;
-        else if (coreOptions.saveType == GBA_SAVE_FLASH)
-            g_flashSize = (size == SIZE_FLASH1M) ? SIZE_FLASH1M : SIZE_FLASH512;
-        else if ((coreOptions.saveType == GBA_SAVE_EEPROM) || (coreOptions.saveType == GBA_SAVE_EEPROM_SENSOR))
-            eepromSize = (size == SIZE_EEPROM_8K) ? SIZE_EEPROM_8K : SIZE_EEPROM_512;
+        if ((saveType != 5) && !saveSize) {
+            if (saveType == GBA_SAVE_EEPROM || saveType == GBA_SAVE_EEPROM_SENSOR)
+                saveSize = SIZE_EEPROM_512;
+            if (saveType == GBA_SAVE_FLASH)
+                saveSize = SIZE_FLASH512;
+        }
     }
-
-    // gameID that starts with 'F' are classic/famicom games
-    coreOptions.mirroringEnable = (buffer[0] == 'F') ? true : false;
 
     /* --------------------------------------------------------------
        SHANTAE ADVANCE (PROTOTYPE)  —  VERY RARE CASE
@@ -892,33 +905,94 @@ static void load_image_preferences(void)
     if (find_string(g_rom, romSize, "Shantae Advance") ||
         find_string(g_rom, romSize, "Shantae") /* fallback */ )
     {
-        coreOptions.saveType = GBA_SAVE_SRAM; /* SRAM */
-        g_flashSize = SIZE_SRAM;
-    } else if (!coreOptions.saveType) {
-        flashDetectSaveType(romSize);
+        saveType = GBA_SAVE_SRAM; /* SRAM */
+    }
+    
+    // Autodetect save type is needed
+    if (!saveType) {
+        log("Autodetecting save type...\n");
+        // FLASH 1M Sanyo
+        if (find_string(g_rom, romSize, "FLASH1M_"))
+        {
+            log("Found FLASH1M_\n");
+            saveType = GBA_SAVE_FLASH;
+            saveSize = SIZE_FLASH1M;
+        } else
+        
+        // FLASH 512K Panasonic
+        if (find_string(g_rom, romSize, "FLASH_") ||
+            find_string(g_rom, romSize, "FLASH512_"))
+        {
+            log("Found FLASH512_\n");
+            saveType = GBA_SAVE_FLASH;
+            saveSize = SIZE_FLASH512;
+        } else
+
+        // EEPROM
+        if (find_string(g_rom, romSize, "EEPROM_"))
+        {
+            log("Found EEPROM_ (8K default)\n");
+            saveType = GBA_SAVE_EEPROM;
+            saveSize = SIZE_EEPROM_8K; // set as default
+        } else
+
+        // SRAM
+        if (find_string(g_rom, romSize, "SRAM_F") ||
+            find_string(g_rom, romSize, "SRAM_"))
+        {
+            log("Found SRAM_\n");
+            saveType = GBA_SAVE_SRAM;
+        }
+
+        // RTC flag
+        if (find_string(g_rom, romSize, "SIIRTC_V")) {
+            log("Found SRAM_\n");
+            hasRtc = true;
+        }
     }
 
-    if (g_flashSize == SIZE_FLASH512 || g_flashSize == SIZE_FLASH1M)
-        flashSetSize(g_flashSize);
+    switch (saveType) {
+    case GBA_SAVE_SRAM:
+        coreOptions.saveType = GBA_SAVE_SRAM;
+        g_flashSize = SIZE_SRAM;
+        break;
+    case GBA_SAVE_FLASH:
+        coreOptions.saveType = GBA_SAVE_FLASH;
+        flashSetSize(saveSize);
+        break;
+    case GBA_SAVE_EEPROM:
+    case GBA_SAVE_EEPROM_SENSOR:
+        coreOptions.saveType = saveType;
+        eepromSetSize(saveSize);
+        break;
+    case GBA_SAVE_NONE:
+        coreOptions.saveType = GBA_SAVE_NONE;
+        break;
+    default:
+    case GBA_SAVE_AUTO:
+        coreOptions.saveType = GBA_SAVE_AUTO;
+        break;
+    }
 
     if (option_forceRTCenable)
-        coreOptions.rtcEnabled = true;
-
+        hasRtc = true;
+    
+    coreOptions.rtcEnabled = hasRtc;
     rtcEnable(coreOptions.rtcEnabled);
 
     // game code starting with 'R' or 'V' has rumble support
-    if ((buffer[0] == 'R') || (buffer[0] == 'V'))
-        hasRumble = true;
-
+    if ((buffer[0] == 'R') || (buffer[0] == 'V')) hasRumble = true;
     rtcEnableRumble(!coreOptions.rtcEnabled && hasRumble);
 
+    // gameID that starts with 'F' are classic/famicom games
+    coreOptions.mirroringEnable = (buffer[0] == 'F') ? true : false;
     doMirroring(coreOptions.mirroringEnable);
 
     log("romSize         : %dKB\n", (romSize + 1023) / 1024);
     log("has RTC         : %s.\n", coreOptions.rtcEnabled ? "Yes" : "No");
     log("saveType        : %s.\n", savetype[coreOptions.saveType]);
     if (coreOptions.saveType == 3)
-        log("g_flashSize       : %d.\n", g_flashSize);
+        log("flashSize       : %d.\n", g_flashSize);
     else if (coreOptions.saveType == 1)
         log("eepromSize      : %d.\n", eepromSize);
     log("mirroringEnable : %s.\n", coreOptions.mirroringEnable ? "Yes" : "No");
@@ -1196,6 +1270,7 @@ static void update_variables_gb(bool startup) {
                     break;
                 }
                 SetGBBorder(gbBorderOn);
+                gbUpdateGeometry = true;
             }
         }
     }
@@ -1437,9 +1512,9 @@ static void update_variables(bool startup)
         }
         if ((prev_lcdfilter != option_lcdfilter) || (prev_color_change != color_change) || (prev_color_mode != color_mode)) {
             if (type == IMAGE_GBA) {
-                gbafilter_update_colors(option_lcdfilter);
+                gbafilter_update_colors_native(option_lcdfilter);
             } else {
-                gbcfilter_update_colors(option_lcdfilter);
+                gbcfilter_update_colors_native(option_lcdfilter);
             }
         }
     }
@@ -1654,6 +1729,11 @@ void retro_run(void)
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated)
         update_variables(false);
+    
+    if (gbUpdateGeometry) {
+        gbUpdateGeometry = false;
+        geometry_changed();
+    }
 
     poll_cb();
 
@@ -1671,6 +1751,12 @@ static unsigned serialize_size = 0;
 
 size_t retro_serialize_size(void)
 {
+    if (!core)
+        return 0;
+    if (enable_variable_serialization_size) {
+        uint8_t data[2 * 1024 * 1024]; // just big enough
+        serialize_size = core->emuWriteState((uint8_t*)data);
+    }
     return serialize_size;
 }
 
@@ -1680,6 +1766,8 @@ bool retro_serialize(void* data, size_t size)
         return false;
     if (size == serialize_size)
         return core->emuWriteState((uint8_t*)data);
+    if (enable_variable_serialization_size)
+        return core->emuWriteState((uint8_t*)data);
     return false;
 }
 
@@ -1687,7 +1775,7 @@ bool retro_unserialize(const void* data, size_t size)
 {
     if (!core)
         return false;
-    if (size == serialize_size)
+    //if (size == serialize_size)
         return core->emuReadState((uint8_t*)data);
     return false;
 }
@@ -1799,7 +1887,7 @@ bool retro_load_game(const struct retro_game_info *game)
       return false;
    }
 
-   gbafilter_update_colors(option_lcdfilter);
+   gbcfilter_update_colors_native(option_lcdfilter);
    update_variables(true);
    soundInit();
 
@@ -1994,6 +2082,7 @@ void systemFrame(void)
 void systemGbBorderOn(void)
 {
     SetGBBorder(1);
+    gbUpdateGeometry = true;
 }
 
 void systemMessage(const char* fmt, ...)
