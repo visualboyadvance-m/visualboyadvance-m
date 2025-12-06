@@ -43,8 +43,7 @@ extern int timer3Ticks;
 extern int timer3ClockReload;
 extern int cpuTotalTicks;
 
-extern uint32_t cpuDmaLatchData[4];
-extern int cpuDmaChannelActive;
+extern uint32_t cpuDmaBusValue;
 
 #define CPUReadByteQuick(addr) map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask]
 
@@ -80,7 +79,7 @@ static inline uint32_t CPUReadOpenBus()
 {
     /* DMA shadowing overrides everything */
     if (cpuDmaRunning || ((reg[15].I - cpuDmaPC) == (armState ? 4u : 2u)))
-        return cpuDmaLatchData[cpuDmaChannelActive];
+        return cpuDmaBusValue;
 
     /* THUMB: compose 32-bit from last fetched halfwords according to region/alignment */
     if (!armState) {
@@ -90,26 +89,26 @@ static inline uint32_t CPUReadOpenBus()
         switch (region)
         {
         /* Sequential regions: both halves from the newer fetch */
-        case 0x02: /* EWRAM */
-        case 0x05: /* PALRAM */
-        case 0x06: /* VRAM */
-        case 0x08:
-        case 0x09:
-        case 0x0A:
-        case 0x0B:
-        case 0x0C:
-        case 0x0D: /* CART regions */
+        case REGION_EWRAM: /* EWRAM */
+        case REGION_PRAM: /* PALRAM */
+        case REGION_VRAM: /* VRAM */
+        case REGION_ROM0:
+        case REGION_ROM0EX:
+        case REGION_ROM1:
+        case REGION_ROM1EX:
+        case REGION_ROM2:
+        case REGION_ROM2EX: /* CART regions */
             return cpuPrefetch[1] | (cpuPrefetch[1] << 16);
 
         /* BIOS / OAM: alignment affects low/high halves */
-        case 0x00: /* BIOS */
-        case 0x07: /* OAM */
+        case REGION_BIOS: /* BIOS */
+        case REGION_OAM: /* OAM */
             if ((reg15 & 2) == 0)
                 return cpuPrefetch[1] | (cpuPrefetch[1] << 16);
             return cpuPrefetch[0] | (cpuPrefetch[1] << 16);
 
         /* IWRAM: opposite order for aligned case */
-        case 0x03: /* IWRAM */
+        case REGION_IWRAM: /* IWRAM */
             if ((reg15 & 2) == 0)
                 return cpuPrefetch[1] | (cpuPrefetch[0] << 16);
             return cpuPrefetch[0] | (cpuPrefetch[1] << 16);
@@ -120,22 +119,8 @@ static inline uint32_t CPUReadOpenBus()
     return cpuPrefetch[1];
 }
 
-static inline uint32_t CPUReadROM32(uint32_t address) {
-    if (address >= gbaGetRomSize())
-        return (((((address | 2) >> 1) & 0xFFFF) << 16) | (((address & ~2) >> 1) & 0xFFFF));
-    return READ32LE(((uint32_t*)&g_rom[address & ~3]));
-}
-
-static inline uint16_t CPUReadROM16(uint32_t address) {
-    if (address >= gbaGetRomSize())
-        return (uint16_t)(address >> 1) & 0xFFFF;
-    return READ16LE(((uint16_t*)&g_rom[address & ~1]));
-}
-
-static inline uint8_t CPUReadROM8(uint32_t address) {
-    if (address >= gbaGetRomSize())
-        return (uint8_t)(address >> 1) & 0xFF;
-    return g_rom[address];
+static inline uint16_t ROMReadOOB(uint32_t address) {
+    return (address >> 1) & 0xFFFF;
 }
 
 static inline uint32_t CPUReadMemory(uint32_t address)
@@ -151,7 +136,7 @@ static inline uint32_t CPUReadMemory(uint32_t address)
     uint32_t value = 0xFFFFFFFF;
 
     switch (address >> 24) {
-    case 0:
+    case REGION_BIOS:
         if (reg[15].I >> 24) {
             if (address < 0x4000) {
 #ifdef GBA_LOGGING
@@ -168,13 +153,13 @@ static inline uint32_t CPUReadMemory(uint32_t address)
         } else
             value = READ32LE(((uint32_t*)&g_bios[address & 0x3FFC]));
         break;
-    case 2:
+    case REGION_EWRAM:
         value = READ32LE(((uint32_t*)&g_workRAM[address & 0x3FFFC]));
         break;
-    case 3:
+    case REGION_IWRAM:
         value = READ32LE(((uint32_t*)&g_internalRAM[address & 0x7ffC]));
         break;
-    case 4:
+    case REGION_IO:
         if ((address < 0x4000400) && ioReadable[address & 0x3fc]) {
             if (ioReadable[(address & 0x3fc) + 2]) {
                 value = READ32LE(((uint32_t*)&g_ioMem[address & 0x3fC]));
@@ -187,10 +172,10 @@ static inline uint32_t CPUReadMemory(uint32_t address)
         } else
             goto unreadable;
         break;
-    case 5:
+    case REGION_PRAM:
         value = READ32LE(((uint32_t*)&g_paletteRAM[address & 0x3fC]));
         break;
-    case 6: {
+    case REGION_VRAM: {
         unsigned addr = (address & 0x1fffc);
         if (((DISPCNT & 7) > 2) && ((addr & 0x1C000) == 0x18000)) {
             value = 0;
@@ -201,23 +186,30 @@ static inline uint32_t CPUReadMemory(uint32_t address)
         value = READ32LE(((uint32_t*)&g_vram[addr]));
         break;
     }
-    case 7:
+    case REGION_OAM:
         value = READ32LE(((uint32_t*)&g_oam[address & 0x3FC]));
         break;
-    case 8:
-    case 9:
-    case 10:
-    case 11:
-    case 12:
-        value = CPUReadROM32(address & 0x1FFFFFC);
+    case REGION_ROM0:
+    case REGION_ROM0EX:
+    case REGION_ROM1:
+    case REGION_ROM1EX:
+    case REGION_ROM2:
+        if ((address & 0x01FFFFFC) <= (gbaGetRomSize() - 4))
+            value = READ32LE(((uint32_t *)&g_rom[address & 0x01FFFFFC]));
+        else if (cpuEEPROMEnabled && ((address & eepromMask) == eepromMask))
+            return 0; // ignore reads from eeprom region outside 0x0D page reads
+        else {
+            value = (uint16_t)ROMReadOOB(address & 0x01FFFFFC);
+            value |= (uint16_t)ROMReadOOB((address & 0x01FFFFFC) + 2) << 16;
+        }
         break;
-    case 13:
+    case REGION_ROM2EX:
         if (cpuEEPROMEnabled)
             // no need to swap this
             return eepromRead(address);
         goto unreadable;
-    case 14:
-    case 15:
+    case REGION_SRAM:
+    case REGION_SRAMEX:
         if (cpuFlashEnabled | cpuSramEnabled) { // no need to swap this
             value = flashRead(address) * 0x01010101;
             break;
@@ -285,7 +277,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
     uint32_t value = 0xFFFFFFFF;
 
     switch (address >> 24) {
-    case 0:
+    case REGION_BIOS:
         if (reg[15].I >> 24) {
             if (address < 0x4000) {
 #ifdef GBA_LOGGING
@@ -301,23 +293,33 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
         } else
             value = READ16LE(((uint16_t*)&g_bios[address & 0x3FFE]));
         break;
-    case 2:
+    case REGION_EWRAM:
         value = READ16LE(((uint16_t*)&g_workRAM[address & 0x3FFFE]));
         break;
-    case 3:
+    case REGION_IWRAM:
         value = READ16LE(((uint16_t*)&g_internalRAM[address & 0x7ffe]));
         break;
-    case 4:
+    case REGION_IO:
         if ((address < 0x4000400) && ioReadable[address & 0x3fe]) {
             value = READ16LE(((uint16_t*)&g_ioMem[address & 0x3fe]));
+            switch(address & 0x3FE) {
+            case IO_REG_SOUND1CNT_X: value &= 0x4000; break;
+            case IO_REG_SOUND2CNT_L: value &= 0xFFC0; break;
+            case IO_REG_SOUND2CNT_H: value &= 0x4000; break;
+            case IO_REG_SOUND3CNT_L: value &= 0x00E0; break;
+            case IO_REG_SOUND3CNT_H: value &= 0xE000; break;
+            case IO_REG_SOUND3CNT_X: value &= 0x4000; break;
+            case IO_REG_SOUND4CNT_L: value &= 0xFF00; break;
+            case IO_REG_SOUND4CNT_H: value &= 0x40FF; break;
+            }
             if (((address & 0x3fe) > 0xFF) && ((address & 0x3fe) < 0x10E)) {
-                if (((address & 0x3fe) == 0x100) && timer0On)
+                if (((address & 0x3fe) == IO_REG_TM0CNT_L) && timer0On)
                     value = 0xFFFF - ((timer0Ticks - cpuTotalTicks) >> timer0ClockReload);
-                else if (((address & 0x3fe) == 0x104) && timer1On && !(TM1CNT & 4))
+                else if (((address & 0x3fe) == IO_REG_TM1CNT_L) && timer1On && !(TM1CNT & 4))
                     value = 0xFFFF - ((timer1Ticks - cpuTotalTicks) >> timer1ClockReload);
-                else if (((address & 0x3fe) == 0x108) && timer2On && !(TM2CNT & 4))
+                else if (((address & 0x3fe) == IO_REG_TM2CNT_L) && timer2On && !(TM2CNT & 4))
                     value = 0xFFFF - ((timer2Ticks - cpuTotalTicks) >> timer2ClockReload);
-                else if (((address & 0x3fe) == 0x10C) && timer3On && !(TM3CNT & 4))
+                else if (((address & 0x3fe) == IO_REG_TM3CNT_L) && timer3On && !(TM3CNT & 4))
                     value = 0xFFFF - ((timer3Ticks - cpuTotalTicks) >> timer3ClockReload);
             }
         } else if ((address < 0x4000400) && ioReadable[address & 0x3fc]) {
@@ -325,10 +327,10 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
         } else
             goto unreadable;
         break;
-    case 5:
+    case REGION_PRAM:
         value = READ16LE(((uint16_t*)&g_paletteRAM[address & 0x3fe]));
         break;
-    case 6: {
+    case REGION_VRAM: {
         unsigned addr = (address & 0x1fffe);
         if (((DISPCNT & 7) > 2) && ((addr & 0x1C000) == 0x18000)) {
             value = 0;
@@ -339,26 +341,30 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
         value = READ16LE(((uint16_t*)&g_vram[addr]));
         break;
     }
-    case 7:
+    case REGION_OAM:
         value = READ16LE(((uint16_t*)&g_oam[address & 0x3fe]));
         break;
-    case 8:
-    case 9:
-    case 10:
-    case 11:
-    case 12:
-        if (address == 0x80000c4 || address == 0x80000c6 || address == 0x80000c8)
+    case REGION_ROM0:
+    case REGION_ROM0EX:
+    case REGION_ROM1:
+    case REGION_ROM1EX:
+    case REGION_ROM2:
+        if ((address & 0x01FFFFFE) <= (gbaGetRomSize() - 2))
+            value = READ16LE(((uint16_t *)&g_rom[address & 0x01FFFFFE]));
+        else if (address == 0x80000c4 || address == 0x80000c6 || address == 0x80000c8)
             value = rtcRead(address);
+        else if (cpuEEPROMEnabled && ((address & eepromMask) == eepromMask))
+            return 0; // ignore reads from eeprom region outside 0x0D page reads
         else
-            value = CPUReadROM16(address & 0x1FFFFFE);
+            value = (uint16_t)ROMReadOOB(address & 0x01FFFFFE);
         break;
-    case 13:
+    case REGION_ROM2EX:
         if (cpuEEPROMEnabled)
             // no need to swap this
             return eepromRead(address);
         goto unreadable;
-    case 14:
-    case 15:
+    case REGION_SRAM:
+    case REGION_SRAMEX:
         if (cpuFlashEnabled | cpuSramEnabled) {
             // no need to swap this
             value = flashRead(address) * 0x0101;
@@ -394,9 +400,9 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
     return value;
 }
 
-static inline int16_t CPUReadHalfWordSigned(uint32_t address)
+static inline int32_t CPUReadHalfWordSigned(uint32_t address)
 {
-    int32_t value = (int32_t)CPUReadHalfWord(address);
+    uint16_t value = CPUReadHalfWord(address);
     if ((address & 1)) {
 #ifdef GBA_LOGGING
         if (systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
@@ -406,9 +412,9 @@ static inline int16_t CPUReadHalfWordSigned(uint32_t address)
                 value);
         }
 #endif
-        return (int8_t)value;
+        return (int32_t)(int8_t)value;
     }
-    return (int16_t)value;
+    return (int32_t)(int16_t)value;
 }
 
 static inline uint8_t CPUReadByte(uint32_t address)
@@ -423,7 +429,7 @@ static inline uint8_t CPUReadByte(uint32_t address)
 #endif
 
     switch (address >> 24) {
-    case 0:
+    case REGION_BIOS:
         if (reg[15].I >> 24) {
             if (address < 0x4000) {
 #ifdef GBA_LOGGING
@@ -438,38 +444,42 @@ static inline uint8_t CPUReadByte(uint32_t address)
                 goto unreadable;
         }
         return g_bios[address & 0x3FFF];
-    case 2:
+    case REGION_EWRAM:
         return g_workRAM[address & 0x3FFFF];
-    case 3:
+    case REGION_IWRAM:
         return g_internalRAM[address & 0x7fff];
-    case 4:
+    case REGION_IO:
         if ((address < 0x4000400) && ioReadable[address & 0x3ff])
             return g_ioMem[address & 0x3ff];
         else
             goto unreadable;
-    case 5:
+    case REGION_PRAM:
         return g_paletteRAM[address & 0x3ff];
-    case 6:
+    case REGION_VRAM:
         address = (address & 0x1ffff);
         if (((DISPCNT & 7) > 2) && ((address & 0x1C000) == 0x18000))
             return 0;
         if ((address & 0x18000) == 0x18000)
             address &= 0x17fff;
         return g_vram[address];
-    case 7:
+    case REGION_OAM:
         return g_oam[address & 0x3ff];
-    case 8:
-    case 9:
-    case 10:
-    case 11:
-    case 12:
-        return CPUReadROM8(address & 0x1FFFFFF);
-    case 13:
+    case REGION_ROM0:
+    case REGION_ROM0EX:
+    case REGION_ROM1:
+    case REGION_ROM1EX:
+    case REGION_ROM2:
+        if ((address & 0x01FFFFFF) <= gbaGetRomSize())
+            return g_rom[address & 0x01FFFFFF];
+        else if (cpuEEPROMEnabled && ((address & eepromMask) == eepromMask))
+            return 0; // ignore reads from eeprom region outside 0x0D page reads
+        return (uint8_t)ROMReadOOB(address & 0x01FFFFFE);
+    case REGION_ROM2EX:
         if (cpuEEPROMEnabled)
             return DowncastU8(eepromRead(address));
         goto unreadable;
-    case 14:
-    case 15:
+    case REGION_SRAM:
+    case REGION_SRAMEX:
         if (cpuSramEnabled | cpuFlashEnabled)
             return flashRead(address);
 
@@ -520,7 +530,7 @@ static inline void CPUWriteMemory(uint32_t address, uint32_t value)
 #endif
 
     switch (address >> 24) {
-    case 0x02:
+    case REGION_EWRAM:
 #ifdef VBAM_ENABLE_DEBUGGER
         if (*((uint32_t*)&freezeWorkRAM[address & 0x3FFFC]))
             cheatsWriteMemory(address & 0x203FFFC, value);
@@ -528,7 +538,7 @@ static inline void CPUWriteMemory(uint32_t address, uint32_t value)
 #endif
             WRITE32LE(((uint32_t*)&g_workRAM[address & 0x3FFFC]), value);
         break;
-    case 0x03:
+    case REGION_IWRAM:
 #ifdef VBAM_ENABLE_DEBUGGER
         if (*((uint32_t*)&freezeInternalRAM[address & 0x7ffc]))
             cheatsWriteMemory(address & 0x3007FFC, value);
@@ -536,14 +546,14 @@ static inline void CPUWriteMemory(uint32_t address, uint32_t value)
 #endif
             WRITE32LE(((uint32_t*)&g_internalRAM[address & 0x7ffC]), value);
         break;
-    case 0x04:
+    case REGION_IO:
         if (address < 0x4000400) {
             CPUUpdateRegister((address & 0x3FC), value & 0xFFFF);
             CPUUpdateRegister((address & 0x3FC) + 2, (value >> 16));
         } else
             goto unwritable;
         break;
-    case 0x05:
+    case REGION_PRAM:
 #ifdef VBAM_ENABLE_DEBUGGER
         if (*((uint32_t*)&freezePRAM[address & 0x3fc]))
             cheatsWriteMemory(address & 0x70003FC, value);
@@ -551,7 +561,7 @@ static inline void CPUWriteMemory(uint32_t address, uint32_t value)
 #endif
             WRITE32LE(((uint32_t*)&g_paletteRAM[address & 0x3FC]), value);
         break;
-    case 0x06:
+    case REGION_VRAM:
         address = (address & 0x1fffc);
         if (((DISPCNT & 7) > 2) && ((address & 0x1C000) == 0x18000))
             return;
@@ -566,7 +576,7 @@ static inline void CPUWriteMemory(uint32_t address, uint32_t value)
 
             WRITE32LE(((uint32_t*)&g_vram[address]), value);
         break;
-    case 0x07:
+    case REGION_OAM:
 #ifdef VBAM_ENABLE_DEBUGGER
         if (*((uint32_t*)&freezeOAM[address & 0x3fc]))
             cheatsWriteMemory(address & 0x70003FC, value);
@@ -574,25 +584,25 @@ static inline void CPUWriteMemory(uint32_t address, uint32_t value)
 #endif
             WRITE32LE(((uint32_t*)&g_oam[address & 0x3fc]), value);
         break;
-    case 0x08:
-    case 0x09:
-    case 0x0A:
-    case 0x0B:
-    case 0x0C:
+    case REGION_ROM0:
+    case REGION_ROM0EX:
+    case REGION_ROM1:
+    case REGION_ROM1EX:
+    case REGION_ROM2:
         if (GBAMatrix.size && (address & 0x01FFFF00) == 0x00800100)
         {
             GBAMatrixWrite(&GBAMatrix, address & 0x3C, value);
             break;
         }
         goto unwritable;
-    case 0x0D:
+    case REGION_ROM2EX:
         if (cpuEEPROMEnabled) {
             eepromWrite(address, DowncastU8(value));
             break;
         }
         goto unwritable;
-    case 0x0E:
-    case 0x0F:
+    case REGION_SRAM:
+    case REGION_SRAMEX:
         if ((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled) {
             (*cpuSaveGameFunc)(address, (uint8_t)(value >> (8 * (address & 3))));
             break;
@@ -636,7 +646,7 @@ static inline void CPUWriteHalfWord(uint32_t address, uint16_t value)
 #endif
 
     switch (address >> 24) {
-    case 2:
+    case REGION_EWRAM:
 #ifdef VBAM_ENABLE_DEBUGGER
         if (*((uint16_t*)&freezeWorkRAM[address & 0x3FFFE]))
             cheatsWriteHalfWord(address & 0x203FFFE, value);
@@ -644,7 +654,7 @@ static inline void CPUWriteHalfWord(uint32_t address, uint16_t value)
 #endif
             WRITE16LE(((uint16_t*)&g_workRAM[address & 0x3FFFE]), value);
         break;
-    case 3:
+    case REGION_IWRAM:
 #ifdef VBAM_ENABLE_DEBUGGER
         if (*((uint16_t*)&freezeInternalRAM[address & 0x7ffe]))
             cheatsWriteHalfWord(address & 0x3007ffe, value);
@@ -652,13 +662,13 @@ static inline void CPUWriteHalfWord(uint32_t address, uint16_t value)
 #endif
             WRITE16LE(((uint16_t*)&g_internalRAM[address & 0x7ffe]), value);
         break;
-    case 4:
+    case REGION_IO:
         if (address < 0x4000400)
             CPUUpdateRegister(address & 0x3fe, value);
         else
             goto unwritable;
         break;
-    case 5:
+    case REGION_PRAM:
 #ifdef VBAM_ENABLE_DEBUGGER
         if (*((uint16_t*)&freezePRAM[address & 0x03fe]))
             cheatsWriteHalfWord(address & 0x70003fe, value);
@@ -666,7 +676,7 @@ static inline void CPUWriteHalfWord(uint32_t address, uint16_t value)
 #endif
             WRITE16LE(((uint16_t*)&g_paletteRAM[address & 0x3fe]), value);
         break;
-    case 6:
+    case REGION_VRAM:
         address = (address & 0x1fffe);
         if (((DISPCNT & 7) > 2) && ((address & 0x1C000) == 0x18000))
             return;
@@ -679,7 +689,7 @@ static inline void CPUWriteHalfWord(uint32_t address, uint16_t value)
 #endif
             WRITE16LE(((uint16_t*)&g_vram[address]), value);
         break;
-    case 7:
+    case REGION_OAM:
 #ifdef VBAM_ENABLE_DEBUGGER
         if (*((uint16_t*)&freezeOAM[address & 0x03fe]))
             cheatsWriteHalfWord(address & 0x70003fe, value);
@@ -687,8 +697,8 @@ static inline void CPUWriteHalfWord(uint32_t address, uint16_t value)
 #endif
             WRITE16LE(((uint16_t*)&g_oam[address & 0x3fe]), value);
         break;
-    case 8:
-    case 9:
+    case REGION_ROM0:
+    case REGION_ROM0EX:
         if (GBAMatrix.size && (address & 0x01FFFF00) == 0x00800100)
         {
             GBAMatrixWrite16(&GBAMatrix, address & 0x3C, value);
@@ -700,23 +710,23 @@ static inline void CPUWriteHalfWord(uint32_t address, uint16_t value)
         } else if (!agbPrintWrite(address, value))
             goto unwritable;
         break;
-    case 10:
-    case 11:
-    case 12:
+    case REGION_ROM1:
+    case REGION_ROM1EX:
+    case REGION_ROM2:
         if (GBAMatrix.size && (address & 0x01FFFF00) == 0x00800100)
         {
             GBAMatrixWrite16(&GBAMatrix, address & 0x3C, value);
             break;
         }
         goto unwritable;
-    case 13:
+    case REGION_ROM2EX:
         if (cpuEEPROMEnabled) {
             eepromWrite(address, (uint8_t)value);
             break;
         }
         goto unwritable;
-    case 14:
-    case 15:
+    case REGION_SRAM:
+    case REGION_SRAMEX:
         if ((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled) {
             (*cpuSaveGameFunc)(address, (uint8_t)(value >> (8 * (address & 1))));
             break;
@@ -748,7 +758,7 @@ static inline void CPUWriteByte(uint32_t address, uint8_t b)
 #endif
 
     switch (address >> 24) {
-    case 2:
+    case REGION_EWRAM:
 #ifdef VBAM_ENABLE_DEBUGGER
         if (freezeWorkRAM[address & 0x3FFFF])
             cheatsWriteByte(address & 0x203FFFF, b);
@@ -756,7 +766,7 @@ static inline void CPUWriteByte(uint32_t address, uint8_t b)
 #endif
             g_workRAM[address & 0x3FFFF] = b;
         break;
-    case 3:
+    case REGION_IWRAM:
 #ifdef VBAM_ENABLE_DEBUGGER
         if (freezeInternalRAM[address & 0x7fff])
             cheatsWriteByte(address & 0x3007fff, b);
@@ -764,52 +774,56 @@ static inline void CPUWriteByte(uint32_t address, uint8_t b)
 #endif
             g_internalRAM[address & 0x7fff] = b;
         break;
-    case 4:
+    case REGION_IO:
         if (address < 0x4000400) {
             switch (address & 0x3FF) {
-            case 0x60:
-            case 0x61:
-            case 0x62:
-            case 0x63:
-            case 0x64:
-            case 0x65:
-            case 0x68:
-            case 0x69:
-            case 0x6c:
-            case 0x6d:
-            case 0x70:
-            case 0x71:
-            case 0x72:
-            case 0x73:
-            case 0x74:
-            case 0x75:
-            case 0x78:
-            case 0x79:
-            case 0x7c:
-            case 0x7d:
-            case 0x80:
-            case 0x81:
-            case 0x84:
-            case 0x85:
-            case 0x90:
-            case 0x91:
-            case 0x92:
-            case 0x93:
-            case 0x94:
-            case 0x95:
-            case 0x96:
-            case 0x97:
-            case 0x98:
-            case 0x99:
-            case 0x9a:
-            case 0x9b:
-            case 0x9c:
-            case 0x9d:
-            case 0x9e:
-            case 0x9f:
+            case IO_REG_SOUND1CNT_L:
+            //case IO_REG_SOUND1CNT_L + 1:
+            case IO_REG_SOUND1CNT_H:
+            case IO_REG_SOUND1CNT_H + 1:
+            case IO_REG_SOUND1CNT_X:
+            case IO_REG_SOUND1CNT_X + 1:
+            case IO_REG_SOUND2CNT_L:
+            case IO_REG_SOUND2CNT_L + 1:
+            case IO_REG_SOUND2CNT_H:
+            case IO_REG_SOUND2CNT_H + 1:
+            case IO_REG_SOUND3CNT_L:
+            case IO_REG_SOUND3CNT_L + 1:
+            case IO_REG_SOUND3CNT_H:
+            case IO_REG_SOUND3CNT_H + 1:
+            case IO_REG_SOUND3CNT_X:
+            case IO_REG_SOUND3CNT_X + 1:
+            case IO_REG_SOUND4CNT_L:
+            case IO_REG_SOUND4CNT_L + 1:
+            case IO_REG_SOUND4CNT_H:
+            case IO_REG_SOUND4CNT_H + 1:
+            case IO_REG_SOUNDCNT_L:
+            case IO_REG_SOUNDCNT_L + 1:
+            //case IO_REG_SOUNDCNT_H:
+            //case IO_REG_SOUNDCNT_H + 1:
+            case IO_REG_SOUNDCNT_X:
+            //case IO_REG_SOUNDCNT_X + 1:
+            //case IO_REG_SOUNDBIAS:
+            //case IO_REG_SOUNDBIAS + 1:
+            case IO_REG_WAVE_RAM0_L + 0:
+            case IO_REG_WAVE_RAM0_L + 1:
+            case IO_REG_WAVE_RAM0_L + 2:
+            case IO_REG_WAVE_RAM0_L + 3:
+            case IO_REG_WAVE_RAM1_L + 0:
+            case IO_REG_WAVE_RAM1_L + 1:
+            case IO_REG_WAVE_RAM1_L + 2:
+            case IO_REG_WAVE_RAM1_L + 3:
+            case IO_REG_WAVE_RAM2_L + 0:
+            case IO_REG_WAVE_RAM2_L + 1:
+            case IO_REG_WAVE_RAM2_L + 2:
+            case IO_REG_WAVE_RAM2_L + 3:
+            case IO_REG_WAVE_RAM3_L + 0:
+            case IO_REG_WAVE_RAM3_L + 1:
+            case IO_REG_WAVE_RAM3_L + 2:
+            case IO_REG_WAVE_RAM3_L + 3:
                 soundEvent8(address & 0xFF, b);
                 break;
-            case 0x301: // HALTCNT, undocumented
+            case IO_REG_HALTCNT: // HALTCNT, undocumented
                 if (b == 0x80)
                     stopState = true;
                 holdState = 1;
@@ -830,11 +844,11 @@ static inline void CPUWriteByte(uint32_t address, uint8_t b)
         } else
             goto unwritable;
         break;
-    case 5:
+    case REGION_PRAM:
         // no need to switch
         *((uint16_t*)&g_paletteRAM[address & 0x3FE]) = (b << 8) | b;
         break;
-    case 6:
+    case REGION_VRAM:
         address = (address & 0x1fffe);
         if (((DISPCNT & 7) > 2) && ((address & 0x1C000) == 0x18000))
             return;
@@ -852,19 +866,19 @@ static inline void CPUWriteByte(uint32_t address, uint8_t b)
                 *((uint16_t*)&g_vram[address]) = (b << 8) | b;
         }
         break;
-    case 7:
+    case REGION_OAM:
         // no need to switch
         // byte writes to OAM are ignored
         //    *((uint16_t *)&g_oam[address & 0x3FE]) = (b << 8) | b;
         break;
-    case 13:
+    case REGION_ROM2EX:
         if (cpuEEPROMEnabled) {
             eepromWrite(address, b);
             break;
         }
         goto unwritable;
-    case 14:
-    case 15:
+    case REGION_SRAM:
+    case REGION_SRAMEX:
         if ((coreOptions.saveType != 5) && ((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled)) {
             (*cpuSaveGameFunc)(address, b);
             break;

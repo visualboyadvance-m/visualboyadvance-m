@@ -353,6 +353,8 @@ void memoryUpdateMBC3Clock()
                 gbDataMBC3.mapperControl |= 0x80; // Set overflow bit
                 gbDataMBC3.mapperControl &= 0xC0; // Preserve only overflow + halt, clear others
             }
+        } else {
+            gbDataMBC3.mapperControl &= ~0x01; // clear high-day bit
         }
     }
 }
@@ -436,12 +438,21 @@ void mapperMBC3RAM(uint16_t address, uint8_t value)
         } else if (g_gbCartData.has_rtc()) {
             switch (gbDataMBC3.mapperClockRegister) {
             case 0x08:
+                if (value >= 60) {
+                    log("RTC: write to seconds register with undefined bits: 0x%02X (valid range: 0-59)\n", value);
+                }
                 gbDataMBC3.mapperSeconds = value % 60;
                 break;
             case 0x09:
+                if (value >= 60) {
+                    log("RTC: write to minutes register with undefined bits: 0x%02X (valid range: 0-59)\n", value);
+                }
                 gbDataMBC3.mapperMinutes = value % 60;
                 break;
             case 0x0a:
+                if (value >= 24) {
+                    log("RTC: write to hours register with undefined bits: 0x%02X (valid range: 0-23)\n", value);
+                }
                 gbDataMBC3.mapperHours = value % 24;
                 break;
             case 0x0b:
@@ -449,6 +460,9 @@ void mapperMBC3RAM(uint16_t address, uint8_t value)
                 break;
             case 0x0c:
                 // Allow writing bits 0, 6, and 7 (day high bit, halt, overflow)
+                if (value & 0x3E) {
+                    log("RTC: write to control register with undefined bits: 0x%02X (defined bits: 0, 6, 7)\n", value);
+                }
                 gbDataMBC3.mapperControl = value & 0xC1;
                 if (value & 0x01) {
                     gbDataMBC3.mapperDays |= 0x100;

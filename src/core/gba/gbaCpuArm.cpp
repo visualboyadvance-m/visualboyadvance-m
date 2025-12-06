@@ -1521,7 +1521,7 @@ static INSN_REGPARM void arm121(uint32_t opcode)
 #define OP_LDR reg[dest].I = CPUReadMemory(address)
 #define OP_LDRH reg[dest].I = CPUReadHalfWord(address)
 #define OP_LDRB reg[dest].I = CPUReadByte(address)
-#define OP_LDRSH reg[dest].I = (uint32_t)CPUReadHalfWordSigned(address)
+#define OP_LDRSH reg[dest].I = CPUReadHalfWordSigned(address)
 #define OP_LDRSB reg[dest].I = (int8_t)CPUReadByte(address)
 
 #define WRITEBACK_NONE /*nothing*/

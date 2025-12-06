@@ -214,13 +214,13 @@ void BIOS_BgAffineSet()
         src += 4;
         int32_t cy = CPUReadMemory(src);
         src += 4;
-        int16_t dispx = CPUReadHalfWordSigned(src);
+        int16_t dispx = (int16_t)CPUReadHalfWordSigned(src);
         src += 2;
-        int16_t dispy = CPUReadHalfWordSigned(src);
+        int16_t dispy = (int16_t)CPUReadHalfWordSigned(src);
         src += 2;
-        int16_t rx = CPUReadHalfWordSigned(src);
+        int16_t rx = (int16_t)CPUReadHalfWordSigned(src);
         src += 2;
-        int16_t ry = CPUReadHalfWordSigned(src);
+        int16_t ry = (int16_t)CPUReadHalfWordSigned(src);
         src += 2;
         uint16_t theta = DowncastU16(CPUReadHalfWord(src) >> 8);
         src += 4; // keep structure alignment
@@ -812,9 +812,9 @@ void BIOS_ObjAffineSet()
     int offset = reg[3].I;
 
     for (int i = 0; i < num; i++) {
-        int16_t rx = CPUReadHalfWordSigned(src);
+        int16_t rx = (int16_t)CPUReadHalfWordSigned(src);
         src += 2;
-        int16_t ry = CPUReadHalfWordSigned(src);
+        int16_t ry = (int16_t)CPUReadHalfWordSigned(src);
         src += 2;
         uint16_t theta = DowncastU16(CPUReadHalfWord(src) >> 8);
         src += 4; // keep structure alignment
