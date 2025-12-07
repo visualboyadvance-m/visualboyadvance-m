@@ -402,7 +402,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
 
 static inline int32_t CPUReadHalfWordSigned(uint32_t address)
 {
-    uint16_t value = CPUReadHalfWord(address);
+    uint16_t value = static_cast<uint16_t>(CPUReadHalfWord(address));
     if ((address & 1)) {
 #ifdef GBA_LOGGING
         if (systemVerbose & VERBOSE_UNALIGNED_MEMORY) {

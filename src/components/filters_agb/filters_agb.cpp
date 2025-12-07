@@ -428,10 +428,10 @@ void gbafilter_update_colors_native(bool lcd) {
             // Map to 16-bit RGB565 (5-6-5)
             int g6 = (g5 << 1) | (g5 >> 4);
 
-            systemColorMap16[i] =
+            systemColorMap16[i] = static_cast<uint16_t>(
                 (r5 << systemRedShift) |
                 (g6 << (systemGreenShift - 1)) |
-                (b5 << systemBlueShift);
+                (b5 << systemBlueShift));
         }
         if (lcd)
             gbafilter_pal_565(systemColorMap16, 0x10000);
@@ -447,9 +447,9 @@ void gbafilter_update_colors_native(bool lcd) {
             int b5 = (i >> 10) & 0x1F;
 
             // Expand 5-bit to 8-bit components
-            uint8_t final_red_8bit = (r5 << 3) | (r5 >> 2);
-            uint8_t final_green_8bit = (g5 << 3) | (g5 >> 2);
-            uint8_t final_blue_8bit = (b5 << 3) | (b5 >> 2);
+            uint8_t final_red_8bit = static_cast<uint8_t>((r5 << 3) | (r5 >> 2));
+            uint8_t final_green_8bit = static_cast<uint8_t>((g5 << 3) | (g5 >> 2));
+            uint8_t final_blue_8bit = static_cast<uint8_t>((b5 << 3) | (b5 >> 2));
 
             uint32_t final_pix = 0;
 
