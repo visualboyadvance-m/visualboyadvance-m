@@ -132,20 +132,20 @@ if(BUILD_TESTING)
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 
-    if(NOT EXISTS third_party/googletest/CMakeLists.txt)
+    if(NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/googletest/CMakeLists.txt)
         execute_process(
             COMMAND git submodule update --init --recursive -- third_party/googletest
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         )
     endif()
 
-    if(EXISTS third_party/googletest/CMakeLists.txt)
+    if(EXISTS ${CMAKE_SOURCE_DIR}/third_party/googletest/CMakeLists.txt)
         add_subdirectory(./third_party/googletest)
 
         # Make sure not use fast-math optimizations for gtest
-        if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-            target_compile_options(gtest      PRIVATE -fno-fast-math -Wno-error -w)
-            target_compile_options(gtest_main PRIVATE -fno-fast-math -Wno-error -w)
+        if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+            target_compile_options(gtest      PRIVATE -O3 -fno-fast-math -Wno-error -w)
+            target_compile_options(gtest_main PRIVATE -O3 -fno-fast-math -Wno-error -w)
         endif()
 
         include(GoogleTest)
