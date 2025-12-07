@@ -124,7 +124,7 @@ DISTS=$DISTS'
     libpsl          https://github.com/rockdaboot/libpsl/archive/refs/heads/master.zip                          lib/libpsl.a
     zstd            https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz                 lib/libzstd.a
     curl            https://github.com/curl/curl/releases/download/curl-8_16_0/curl-8.16.0.tar.bz2              lib/libcurl.a
-    cmake           https://github.com/Kitware/CMake/releases/download/v4.1.2/cmake-4.1.2.tar.gz                bin/cmake
+    cmake           https://github.com/Kitware/CMake/releases/download/v4.2.0/cmake-4.2.0.tar.gz                bin/cmake
     libdeflate      https://github.com/ebiggers/libdeflate/releases/download/v1.24/libdeflate-1.24.tar.gz       lib/libdeflate.a
     hiredis         https://github.com/redis/hiredis/archive/refs/tags/v1.3.0.tar.gz                            lib/libhiredis.a
     ccache          https://github.com/ccache/ccache/releases/download/v4.12.1/ccache-4.12.1.tar.xz             bin/ccache
@@ -179,13 +179,13 @@ DISTS=$DISTS'
     swig            https://sourceforge.net/projects/swig/files/swig/swig-4.3.1/swig-4.3.1.tar.gz/download      bin/swig
     XML-Parser      https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.47.tar.gz                      perl5/man/man3/XML*Parser.3*
     intltool        https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz                bin/intltoolize
-    ninja           https://github.com/ninja-build/ninja/archive/v1.13.1.tar.gz                                 bin/ninja
+    ninja           https://github.com/ninja-build/ninja/archive/v1.13.2.tar.gz                                 bin/ninja
     glib            https://download.gnome.org/sources/glib/2.9/glib-2.9.6.tar.xz                               lib/libglib-2.0.a
     libgpg-error    https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.56.tar.bz2                         lib/libgpg-error.a
     libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.11.2.tar.bz2                             lib/libgcrypt.a
     libsecret       https://gitlab.gnome.org/GNOME/libsecret/-/archive/0.21.7/libsecret-0.21.7.tar.bz2          lib/libsecret-1.a
-    sdl3            https://github.com/libsdl-org/SDL/releases/download/release-3.2.24/SDL3-3.2.24.tar.gz       lib/libSDL3.a
-    faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/25.10.tar.gz                            lib/libFAudio.a
+    sdl3            https://github.com/libsdl-org/SDL/releases/download/release-3.2.28/SDL3-3.2.28.tar.gz       lib/libSDL3.a
+    faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/25.12.tar.gz                            lib/libFAudio.a
     flac            https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.5.0.tar.xz                             lib/libFLAC.a
     harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/12.1.0/harfbuzz-12.1.0.tar.xz        lib/libharfbuzz.a
     shared-mime-info https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.4/shared-mime-info-2.4.tar.bz2  bin/update-mime-database
@@ -1026,8 +1026,8 @@ download_needed_dists() {
                 write_job_info dist_name $current_dist
                 {
                     download_dist $current_dist
-                    write_job_exit_status
                 } 2>&1 | write_job_output
+                write_job_exit_status
             ) &
             running_jobs="$running_jobs $!"
 
@@ -1054,8 +1054,8 @@ unpack_needed_dists() {
                 write_job_info dist_name $current_dist
                 {
                     unpack_dist $current_dist
-                    write_job_exit_status
                 } 2>&1 | write_job_output
+                write_job_exit_status
             ) &
             running_jobs="$running_jobs $!"
 
@@ -1307,11 +1307,11 @@ running_jobs() {
         pid=$1 state=$2
         
         case "$state" in
-            Stopped)
+            [Ss]topped)
                 kill $pid 2>/dev/null || :
                 eval "$reaped_list_var=\"\$$reaped_list_var $pid\""
                 ;;
-            Running)
+            [Rr]unning)
                 eval "$alive_list_var=\"\$$alive_list_var $pid\""
                 ;;
         esac
