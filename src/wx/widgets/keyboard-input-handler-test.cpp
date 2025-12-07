@@ -34,6 +34,22 @@ protected:
         return data;
     }
 
+    // Track modifier state for creating realistic test events
+    void SetModifierState(wxKeyCode modifier, bool pressed) {
+        if (pressed) {
+            active_test_modifiers_.insert(modifier);
+        } else {
+            active_test_modifiers_.erase(modifier);
+        }
+    }
+
+    // Apply current modifier state to an event
+    void ApplyModifierState(wxKeyEvent& event) {
+        event.m_controlDown = active_test_modifiers_.count(WXK_CONTROL) > 0;
+        event.m_shiftDown = active_test_modifiers_.count(WXK_SHIFT) > 0;
+        event.m_altDown = active_test_modifiers_.count(WXK_ALT) > 0;
+    }
+
 private:
     void OnUserInputEvent(UserInputEvent& event) {
         // Do not let the event propagate.
@@ -48,6 +64,7 @@ private:
 
     KeyboardInputHandler handler_;
     std::vector<UserInputEvent::Data> pending_data_;
+    std::set<wxKeyCode> active_test_modifiers_;
 };
 
 static constexpr config::KeyboardInput kF1(wxKeyCode::WXK_F1);
@@ -175,23 +192,58 @@ TEST_F(KeyboardInputHandlerTest, Multiplemodifiers) {
     // F1 Down -> Ctrl Down -> Shift Down -> F1 Up -> Ctrl Up -> Shift Up
     // In this case, a Ctrl+Shift+F1 event should be generated when F1 is released.
     ASSERT_THAT(ProcessKeyEvent(F1DownEvent()), testing::ElementsAre(kF1Pressed));
-    ASSERT_THAT(ProcessKeyEvent(CtrlDownEvent()), testing::ElementsAre(kCtrlPressed));
-    ASSERT_THAT(ProcessKeyEvent(ShiftDownEvent()), testing::ElementsAre(kShiftPressed));
-    ASSERT_THAT(ProcessKeyEvent(F1UpEvent()),
+
+    SetModifierState(WXK_CONTROL, true);
+    wxKeyEvent ctrl_down = CtrlDownEvent();
+    ApplyModifierState(ctrl_down);
+    ASSERT_THAT(ProcessKeyEvent(ctrl_down), testing::ElementsAre(kCtrlPressed));
+
+    SetModifierState(WXK_SHIFT, true);
+    wxKeyEvent shift_down = ShiftDownEvent();
+    ApplyModifierState(shift_down);
+    ASSERT_THAT(ProcessKeyEvent(shift_down), testing::ElementsAre(kShiftPressed));
+
+    wxKeyEvent f1_up = F1UpEvent();
+    ApplyModifierState(f1_up);
+    ASSERT_THAT(ProcessKeyEvent(f1_up),
                 testing::ElementsAre(kCtrlShiftF1Pressed, kCtrlShiftF1Released, kF1Released));
-    ASSERT_THAT(ProcessKeyEvent(CtrlUpEvent()), testing::ElementsAre(kCtrlReleased));
-    ASSERT_THAT(ProcessKeyEvent(ShiftUpEvent()), testing::ElementsAre(kShiftReleased));
+
+    SetModifierState(WXK_CONTROL, false);
+    wxKeyEvent ctrl_up = CtrlUpEvent();
+    ApplyModifierState(ctrl_up);
+    ASSERT_THAT(ProcessKeyEvent(ctrl_up), testing::ElementsAre(kCtrlReleased));
+
+    SetModifierState(WXK_SHIFT, false);
+    wxKeyEvent shift_up = ShiftUpEvent();
+    ApplyModifierState(shift_up);
+    ASSERT_THAT(ProcessKeyEvent(shift_up), testing::ElementsAre(kShiftReleased));
 
     // Ctrl Down -> Shift Down -> F1 Down -> F1 Up -> Shift Up -> Ctrl Up
     // In this case, a Ctrl+Shift+F1 event should be generated when F1 is pressed.
-    ASSERT_THAT(ProcessKeyEvent(CtrlDownEvent()), testing::ElementsAre(kCtrlPressed));
-    ASSERT_THAT(ProcessKeyEvent(ShiftDownEvent()), testing::ElementsAre(kShiftPressed));
+    SetModifierState(WXK_CONTROL, true);
+    wxKeyEvent ctrl_down2 = CtrlDownEvent();
+    ApplyModifierState(ctrl_down2);
+    ASSERT_THAT(ProcessKeyEvent(ctrl_down2), testing::ElementsAre(kCtrlPressed));
+
+    SetModifierState(WXK_SHIFT, true);
+    wxKeyEvent shift_down2 = ShiftDownEvent();
+    ApplyModifierState(shift_down2);
+    ASSERT_THAT(ProcessKeyEvent(shift_down2), testing::ElementsAre(kShiftPressed));
+
     ASSERT_THAT(ProcessKeyEvent(CtrlShiftF1DownEvent()),
                 testing::ElementsAre(kCtrlShiftF1Pressed, kF1Pressed));
     ASSERT_THAT(ProcessKeyEvent(CtrlShiftF1UpEvent()),
                 testing::ElementsAre(kCtrlShiftF1Released, kF1Released));
-    ASSERT_THAT(ProcessKeyEvent(ShiftUpEvent()), testing::ElementsAre(kShiftReleased));
-    ASSERT_THAT(ProcessKeyEvent(CtrlUpEvent()), testing::ElementsAre(kCtrlReleased));
+
+    SetModifierState(WXK_SHIFT, false);
+    wxKeyEvent shift_up2 = ShiftUpEvent();
+    ApplyModifierState(shift_up2);
+    ASSERT_THAT(ProcessKeyEvent(shift_up2), testing::ElementsAre(kShiftReleased));
+
+    SetModifierState(WXK_CONTROL, false);
+    wxKeyEvent ctrl_up2 = CtrlUpEvent();
+    ApplyModifierState(ctrl_up2);
+    ASSERT_THAT(ProcessKeyEvent(ctrl_up2), testing::ElementsAre(kCtrlReleased));
 }
 
 }  // namespace widgets
