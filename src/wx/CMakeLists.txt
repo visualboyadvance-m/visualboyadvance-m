@@ -120,12 +120,21 @@ if(NOT ZIP_PROGRAM)
         endif()
 
         set(ZIP_PROGRAM "${ZIP_EXE}")
-        set(ENV{PATH} "${ZIP_EXE_DIR};$ENV{PATH}")
     endif()
     if(ZIP_PROGRAM)
         set(ZIP_PROGRAM "${ZIP_PROGRAM}" CACHE STRING "zip compressor executable" FORCE)
     else()
         message(FATAL_ERROR "The zip compressor program is required for building.")
+    endif()
+endif()
+
+# When ZIP_PROGRAM is cached, ENV{PATH} must be set every time.
+if(ZIP_PROGRAM)
+    get_filename_component(ZIP_PROGRAM_DIR ${ZIP_PROGRAM} DIRECTORY)
+    if(WIN32)
+        set(ENV{PATH} "${ZIP_PROGRAM_DIR};$ENV{PATH}")
+    else()
+        set(ENV{PATH} "${ZIP_PROGRAM_DIR}:$ENV{PATH}")
     endif()
 endif()
 
@@ -819,9 +828,26 @@ set(
     xrc/SpeedupConfig.xrc
 )
 
+# Include the dir containing wxrc in ENVPPATH} every run.
+get_filename_component(WXRC_DIR ${WXRC} DIRECTORY)
+if(WIN32)
+    set(ENV{PATH} "${WXRC_DIR};$ENV{PATH}")
+else()
+    set(ENV{PATH} "${WXRC_DIR}:$ENV{PATH}")
+endif()
+
+# It is necessary to set the PATH when invoking wxrc so that it can find ZIP_PROGRAM.
+
+# This is needed for builds in WSL.
+set(path_escaped "$ENV{PATH}")
+if(NOT WIN32)
+    string(REPLACE "(" "\\(" path_escaped "${path_escaped}")
+    string(REPLACE ")" "\\)" path_escaped "${path_escaped}")
+endif()
+
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/wxvbam.xrs
-    COMMAND ${CMAKE_COMMAND} -E env "PATH=$ENV{PATH}" ${WXRC} ${VBAM_XRC_FILES} -o ${CMAKE_CURRENT_BINARY_DIR}/wxvbam.xrs
+    COMMAND  ${CMAKE_COMMAND} -E env "PATH=${path_escaped}" ${WXRC} ${VBAM_XRC_FILES} -o ${CMAKE_CURRENT_BINARY_DIR}/wxvbam.xrs
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS ${VBAM_XRC_FILES}
 )
