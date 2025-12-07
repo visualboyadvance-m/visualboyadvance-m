@@ -1,20 +1,11 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
+
+emulate sh
 
 set -e
 
 LANG=C LC_COLLATE=C LC_CTYPE=C LC_MESSAGES=C LC_MONETARY=C LC_NUMERIC=C LC_TIME=C LC_ALL=C
 export LANG LC_COLLATE LC_CTYPE LC_MESSAGES LC_MONETARY LC_NUMERIC LC_TIME LC_ALL
-
-# bash 3 does not work for this code
-if [ -z "$IN_DASH" ]; then
-    if command -v dash >/dev/null; then
-        export IN_DASH=1
-        exec dash "$0" "$@"
-    else
-        echo >&2 "Please install dash from Nix/Homebrew to run this script."
-        exit 1
-    fi
-fi
 
 target_bits=64
 target_build_arch=

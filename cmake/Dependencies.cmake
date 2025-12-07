@@ -115,16 +115,6 @@ else()
     add_compile_definitions(NO_LINK)
 endif()
 
-# for now, only GBALink.cpp uses gettext() directly
-if(APPLE)
-    # use Homebrew gettext if available
-    if(EXISTS "/usr/local/opt/gettext")
-        set(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH};/usr/local/opt/gettext/include")
-        set(CMAKE_LIBRARY_PATH "${CMAKE_LIBRARY_PATH};/usr/local/opt/gettext/lib")
-        set(CMAKE_PROGRAM_PATH "${CMAKE_PROGRAM_PATH};/usr/local/opt/gettext/bin")
-    endif()
-endif()
-
 if(ENABLE_LINK OR ENABLE_WX)
     find_path(LIBINTL_INC libintl.h)
 
