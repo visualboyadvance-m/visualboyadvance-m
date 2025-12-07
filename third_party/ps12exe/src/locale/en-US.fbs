@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Data>
+	<Form Name="MainForm" Size="928,651" Tag="VisualStyle,DPIAware" Text="ps12exe GUI">
+		<GroupBox Name="InputsGroupBox" Location="8,1" Size="766,573">
+			<GroupBox Name="BaseIOGroupBox" Location="5,13" Size="626,102">
+				<Label Name="CompileFileLabel" Location="6,17" Size="611,36" Text="Input File">
+					<TextBox Name="CompileFileTextBox" AllowDrop="True" Location="0,13" Size="551,22" />
+					<Button Name="CompileFileButton" Location="552,10" Size="59,26" Text="..." />
+				</Label>
+				<Label Name="OutputFileLabel" Location="5,56" Size="613,37" Text="Output File">
+					<TextBox Name="OutputFileTextBox" AllowDrop="True" Location="1,14" Size="550,22" />
+					<Button Name="OutputFileButton" Location="554,12" Size="59,25" Text="..." />
+				</Label>
+			</GroupBox>
+			<GroupBox Name="OtherInputsGroupBox" Location="6,118" Size="374,136">
+				<Label Name="CompileParamsLabel" Location="6,14" Size="359,38" Text="Compile Params">
+					<TextBox Name="CompileParamsTextBox" Location="-1,16" Size="360,22" Text="/o+ /debug-" />
+				</Label>
+				<Label Name="TempDirLabel" Location="7,56" Size="358,36" Text="Temp Dir">
+					<TextBox Name="TempDirTextBox" Location="-2,14" Size="360,22" />
+				</Label>
+				<Label Name="MinifyScriptLabel" Location="4,94" Size="361,38" Text="Minify Script">
+					<TextBox Name="MinifyScriptTextBox" Location="1,16" Size="360,22" />
+				</Label>
+			</GroupBox>
+			<GroupBox Name="ArchitectureGroupBox" Location="15,262" Size="95,89" Text="Architecture">
+				<CheckBox Name="x64CheckBox" Location="8,15" Size="82,23" Text="x64" />
+				<CheckBox Name="x86CheckBox" Location="9,36" Size="81,26" Text="x86" />
+				<CheckBox Name="AnyCPUCheckBox" AutoCheck="False" Checked="True" CheckState="Checked" Location="8,58" Size="86,27" Text="AnyCPU" />
+			</GroupBox>
+			<GroupBox Name="CommonOptionsGroupBox" Location="642,14" Size="117,102" Text="Common Options">
+				<CheckBox Name="ConsoleAppCheckBox" Checked="True" CheckState="Checked" Location="7,15" Size="103,26" Text="Console App" />
+				<CheckBox Name="RequestAdminCheckBox" Location="9,57" Size="106,41" Text="Request Admin" />
+				<CheckBox Name="DebugInfoCheckBox" Location="7,36" Size="108,28" Text="Debug Info" />
+			</GroupBox>
+			<GroupBox Name="DetailedOptionsGroupBox" Location="642,124" Size="118,235" Text="Detailed Options">
+				<CheckBox Name="ConfigFileCheckBox" Location="15,19" Size="102,37" Text="Generate Config" />
+				<CheckBox Name="DisableOutputStreamCheckBox" Location="12,57" Size="100,30" Text="Disable Output" />
+				<CheckBox Name="DisableErrorStreamCheckBox" Location="10,85" Size="102,29" Text="Disable Error" />
+				<CheckBox Name="MoreOSFeaturesCheckBox" Location="12,183" Size="105,40" Text="More OS Features" />
+				<CheckBox Name="EnableVirtualizationCheckBox" Location="10,146" Size="105,38" Text="Enable Virtualization" />
+				<CheckBox Name="LongPathSupportCheckBox" Location="12,109" Size="102,40" Text="Long Path Support" />
+			</GroupBox>
+			<GroupBox Name="RegionIDGroupBox" Location="219,262" Size="86,70">
+				<Label Name="RegionIDLabel" Location="7,15" Size="71,45" Text="Region ID">
+					<TextBox Name="RegionIDTextBox" Location="-2,23" Size="73,22" />
+				</Label>
+			</GroupBox>
+			<GroupBox Name="ThreadModelGroupBox" Location="117,263" Size="87,94" Text="Thread Model">
+				<CheckBox Name="SingleThreadCheckBox" AutoCheck="False" Checked="True" CheckState="Checked" Location="10,30" Size="72,26" Text="Single" />
+				<CheckBox Name="MultiThreadCheckBox" Location="10,56" Size="73,30" Text="Multi" />
+			</GroupBox>
+			<GroupBox Name="ResourceParamsGroupBox" Location="18,359" Size="710,206" Text="Resource Params">
+				<Label Name="IconFileLabel" Location="14,18" Size="328,39" Text="Icon File">
+					<TextBox Name="IconFileTextBox" AllowDrop="True" Location="0,16" Size="284,22" />
+					<Button Name="IconFileButton" Location="288,14" Size="40,25" Text="..." />
+				</Label>
+				<Label Name="TitleLabel" Location="14,62" Size="329,42" Text="Title">
+					<TextBox Name="TitleTextBox" Location="1,20" Size="325,22" />
+				</Label>
+				<Label Name="DescriptionLabel" Location="12,110" Size="330,38" Text="Description">
+					<TextBox Name="DescriptionTextBox" Location="5,16" Size="325,22" />
+				</Label>
+				<Label Name="CompanyLabel" Location="16,154" Size="323,38" Text="Company">
+					<TextBox Name="CompanyTextBox" Location="-3,16" Size="326,22" />
+				</Label>
+				<Label Name="ProductNameLabel" Location="346,18" Size="358,38" Text="Product Name">
+					<TextBox Name="ProductNameTextBox" Location="-1,16" Size="359,22" />
+				</Label>
+				<Label Name="CopyrightInfoLabel" Location="346,62" Size="356,41" Text="Copyright">
+					<TextBox Name="CopyrightInfoTextBox" Location="0,19" Size="356,22" />
+				</Label>
+				<Label Name="TrademarkInfoLabel" Location="346,109" Size="358,39" Text="Trademark">
+					<TextBox Name="TrademarkInfoTextBox" Location="1,17" Size="357,22" />
+				</Label>
+				<Label Name="VersionLabel" Location="345,154" Size="360,38" Text="Version">
+					<TextBox Name="VersionTextBox" Location="3,16" Size="357,22" />
+				</Label>
+			</GroupBox>
+			<GroupBox Name="OptionsSplitterPanel" Location="385,119" Size="230,228">
+				<GroupBox Name="ConsoleOptionsSplitterPanel" Location="8,14" Size="206,75" Text="Console App Options">
+					<CheckBox Name="UnicodeEncodingCheckBox" Location="11,19" Size="187,28" Text="Force Unicode Encoding" />
+					<CheckBox Name="CredentialGUICheckBox" Location="10,48" Size="178,20" Text="Credential GUI" />
+				</GroupBox>
+				<GroupBox Name="WindowsOptionsSplitterPanel" Location="8,102" Size="212,116" Text="Window App Options">
+					<CheckBox Name="IgnoreVisualStylesCheckBox" Location="10,18" Size="196,24" Text="Ignore Visual Styles" />
+					<CheckBox Name="ExitOnCancelCheckBox" Location="10,88" Size="190,22" Text="Exit on Cancel" />
+					<CheckBox Name="DPIAwareCheckBox" Location="10,40" Size="189,23" Text="DPI Aware" />
+					<CheckBox Name="WinFormsDPIAwareCheckBox" Location="10,64" Size="194,24" Text="WinForms DPI Aware" />
+				</GroupBox>
+			</GroupBox>
+		</GroupBox>
+		<Button Name="LoadCfgButton" Location="801,13" Size="78,35" Text="Load Config" />
+		<Button Name="SaveCfgButton" Location="801,50" Size="78,34" Text="Save Config" />
+		<Button Name="SaveCfg2OtherFileButton" Location="801,94" Size="77,42" Text="Save Config As" />
+		<Button Name="CompileButton" Location="807,558" Size="75,30" Text="Compile" />
+		<Label Name="CfgFileLabel" Location="8,582" Size="778,22" Text="No config file selected yet, man." />
+		<Button Name="DarkModeSetButton" BackgroundImageLayout="Stretch" Location="807,474" Size="51,51" />
+		<Button Name="BGMSetButton" BackgroundImageLayout="Stretch" Location="807,411" Size="51,51" />
+	</Form>
+	<OpenFileDialog Name="OpenCfgFileDialog" DefaultExt="psccfg" Filter="Configuration Files (*.psccfg)|*.psccfg" Title="Select a config file, if you would" />
+	<SaveFileDialog Name="SaveCfgFileDialog" DefaultExt="psccfg" Filter="Configuration Files (*.psccfg)|*.psccfg" Title="Save the config file, dude" />
+	<OpenFileDialog Name="OpenCompileFileDialog" DefaultExt="ps1" Filter="Powershell Files (*.ps1)|*.ps1|Powershell Data Files (*.psd1)|*.psd1" Title="Select a compilation file, my man" />
+	<SaveFileDialog Name="OpenOutputFileDialog" DefaultExt="exe" Filter="Executable Files (*.exe)|*.exe" Title="Select an output file, if you please" />
+	<OpenFileDialog Name="OpenIconFileDialog" DefaultExt="ico" Filter="Icon Files (*.ico)|*.ico" Title="Select an icon file, dude" />
+</Data>
