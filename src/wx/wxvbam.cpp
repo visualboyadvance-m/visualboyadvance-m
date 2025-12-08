@@ -72,22 +72,62 @@ static void ForceMenubarMnemonicsVisible(GtkWidget* menubar_widget);
 
 namespace {
 
-// Resets the accelerator text for `menu_item` to the first keyboard input.
+// Resets the accelerator text for `menu_item` to the best keyboard input.
 void ResetMenuItemAccelerator(wxMenuItem* menu_item) {
     const wxString old_label = menu_item->GetItemLabel();
-    const size_t tab_index = old_label.find('\t');
     wxString new_label;
-    new_label = old_label;
+
+    // Remove existing accelerator text (either tab-separated or in parentheses)
+    const size_t tab_index = old_label.find('\t');
     if (tab_index != wxString::npos) {
-        new_label.resize(tab_index);
+        new_label = old_label.substr(0, tab_index);
+    } else {
+        // Check for parentheses format " (shortcut)"
+        const size_t paren_index = old_label.rfind(" (");
+        if (paren_index != wxString::npos && old_label.Last() == ')') {
+            new_label = old_label.substr(0, paren_index);
+        } else {
+            new_label = old_label;
+        }
     }
     std::unordered_set<config::UserInput> user_inputs =
         wxGetApp().bindings()->InputsForCommand(
             config::ShortcutCommand(menu_item->GetId()));
-    if (!user_inputs.empty()) {
-        const config::UserInput& user_input = *user_inputs.begin();
+
+    // Find the best keyboard shortcut to display (prefer ones with modifiers)
+    const config::UserInput* best_input = nullptr;
+    for (const auto& input : user_inputs) {
+        if (!input.is_keyboard()) {
+            continue;  // Skip joystick inputs
+        }
+        if (!best_input) {
+            best_input = &input;
+            continue;
+        }
+        // Prefer inputs with extended modifiers (L/R distinction)
+        const bool current_has_extended = config::HasExtendedModifiers(input.keyboard_input().mod_extended());
+        const bool best_has_extended = config::HasExtendedModifiers(best_input->keyboard_input().mod_extended());
+        if (current_has_extended && !best_has_extended) {
+            best_input = &input;
+            continue;
+        }
+        // Prefer inputs with any modifiers over those without
+        if (input.keyboard_input().mod() != wxMOD_NONE && best_input->keyboard_input().mod() == wxMOD_NONE) {
+            best_input = &input;
+        }
+    }
+
+    if (best_input) {
+#ifdef __WXMAC__
+        // On macOS, use space and parentheses instead of tab separator
+        // because wxWidgets may strip unrecognized modifiers from tab-separated accelerators
+        new_label.append(" (");
+        new_label.append(best_input->ToLocalizedString());
+        new_label.append(")");
+#else
         new_label.append('\t');
-        new_label.append(user_input.ToLocalizedString());
+        new_label.append(best_input->ToLocalizedString());
+#endif
     }
 
     if (old_label != new_label) {

@@ -68,11 +68,20 @@ private:
 };
 
 static constexpr config::KeyboardInput kF1(wxKeyCode::WXK_F1);
+#ifdef __WXMAC__
+// On macOS, Command key (WXK_CONTROL) maps to Meta, not Control
+static constexpr config::KeyboardInput kCtrlF1(wxKeyCode::WXK_F1, wxMOD_META);
+static constexpr config::KeyboardInput kCtrlShiftF1(wxKeyCode::WXK_F1,
+                                                    static_cast<wxKeyModifier>(wxMOD_META |
+                                                                               wxMOD_SHIFT));
+static constexpr config::KeyboardInput kCtrl(wxKeyCode::WXK_CONTROL, wxMOD_META);
+#else
 static constexpr config::KeyboardInput kCtrlF1(wxKeyCode::WXK_F1, wxMOD_CONTROL);
 static constexpr config::KeyboardInput kCtrlShiftF1(wxKeyCode::WXK_F1,
                                                     static_cast<wxKeyModifier>(wxMOD_CONTROL |
                                                                                wxMOD_SHIFT));
 static constexpr config::KeyboardInput kCtrl(wxKeyCode::WXK_CONTROL, wxMOD_CONTROL);
+#endif
 static constexpr config::KeyboardInput kShift(wxKeyCode::WXK_SHIFT, wxMOD_SHIFT);
 static const UserInputEvent::Data kF1Pressed(kF1, true);
 static const UserInputEvent::Data kF1Released(kF1, false);

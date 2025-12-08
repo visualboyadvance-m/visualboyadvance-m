@@ -120,18 +120,31 @@ wxString ModToLocalizedString(uint32_t mod) {
     // For control modifiers, extended L/R flags take precedence.
     // On macOS, both wxMOD_RAW_CONTROL (base) and kKeyModL/RControl (extended)
     // may be set when pressing actual Ctrl key. Extended takes priority.
+#ifdef __WXMAC__
+    // On macOS: wxMOD_CONTROL is Command key, wxMOD_RAW_CONTROL is actual Control key
+    if (mod & kKeyModLeftControl) {
+        // Left Control key (actual Control, not Command)
+        config_string += _("LCtrl+");
+    } else if (mod & kKeyModRightControl) {
+        // Right Control key (actual Control, not Command)
+        config_string += _("RCtrl+");
+    } else if (mod & (kKeyModControl | wxMOD_CONTROL)) {
+        // Command key on macOS
+        config_string += _("Cmd+");
+    } else if (mod & wxMOD_RAW_CONTROL) {
+        // Actual Control key (only if no extended control modifier was set)
+        config_string += _("Ctrl+");
+    }
+#else
+    // On other platforms: wxMOD_CONTROL is the standard Control key
     if (mod & kKeyModLeftControl) {
         config_string += _("LCtrl+");
     } else if (mod & kKeyModRightControl) {
         config_string += _("RCtrl+");
     } else if (mod & (kKeyModControl | wxMOD_CONTROL)) {
         config_string += _("Ctrl+");
-#ifdef __WXMAC__
-    } else if (mod & wxMOD_RAW_CONTROL) {
-        // Only output Rawctrl if no extended control modifier was set
-        config_string += _("Rawctrl+");
-#endif
     }
+#endif
     if (mod & kKeyModLeftShift) {
         config_string += _("LShift+");
     } else if (mod & kKeyModRightShift) {
@@ -139,12 +152,20 @@ wxString ModToLocalizedString(uint32_t mod) {
     } else if (mod & (kKeyModShift | wxMOD_SHIFT)) {
         config_string += _("Shift+");
     }
-    if (mod & kKeyModLeftMeta) {
-        config_string += _("LMeta+");
-    } else if (mod & kKeyModRightMeta) {
-        config_string += _("RMeta+");
-    } else if (mod & (kKeyModMeta | wxMOD_META)) {
-        config_string += _("Meta+");
+    if (mod & (kKeyModLeftMeta | kKeyModRightMeta | kKeyModMeta | wxMOD_META)) {
+#ifdef __WXMAC__
+        // On macOS, Meta/GUI is the Command key (no left/right distinction needed)
+        config_string += _("Cmd+");
+#else
+        // On other platforms, show left/right distinction for Meta keys
+        if (mod & kKeyModLeftMeta) {
+            config_string += _("LMeta+");
+        } else if (mod & kKeyModRightMeta) {
+            config_string += _("RMeta+");
+        } else {
+            config_string += _("Meta+");
+        }
+#endif
     }
     return config_string;
 }
@@ -483,12 +504,18 @@ wxString KeyboardInput::ToLocalizedString() const {
             case WXK_SHIFT:
                 return _("Shift");
             case WXK_CONTROL:
+#ifdef __WXMAC__
+                // On macOS, WXK_CONTROL is the Command key
+                return _("Cmd");
+#else
                 return _("Ctrl");
+#endif
             case WXK_ALT:
                 return _("Alt");
 #ifdef __WXMAC__
             case WXK_RAW_CONTROL:
-                return _("Rawctrl");
+                // On macOS, WXK_RAW_CONTROL is the actual Control key
+                return _("Ctrl");
 #endif
             default:
                 return _("Key");
@@ -504,8 +531,15 @@ wxString KeyboardInput::ToLocalizedString() const {
     // For keys with extended modifiers, build the string manually
     if (HasExtendedModifiers(mod_)) {
         wxString result = ModToLocalizedString(mod_);
-        // Get the key name using wxAcceleratorEntry but without modifiers
-        wxString key_str = wxAcceleratorEntry(wxMOD_NONE, key_).ToRawString().MakeUpper();
+        // Get the key name
+        wxString key_str;
+        if (key_ >= 32 && key_ < 127) {
+            // Printable ASCII character - use it directly
+            key_str = wxString(static_cast<wxChar>(wxToupper(key_)));
+        } else {
+            // Special key - use wxAcceleratorEntry
+            key_str = wxAcceleratorEntry(wxMOD_NONE, key_).ToRawString().MakeUpper();
+        }
         return result + key_str;
     }
 

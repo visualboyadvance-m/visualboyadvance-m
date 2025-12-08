@@ -228,10 +228,10 @@ uint32_t GetExtendedModForModifierKey(wxKeyCode key, const wxKeyEvent& event) {
             return config::kKeyModLeftAlt;
         case kVK_RightOption:
             return config::kKeyModRightAlt;
-        case kVK_Command:  // Command key - treat as Control for cross-platform compat
-            return config::kKeyModLeftControl;
+        case kVK_Command:  // Command key
+            return config::kKeyModLeftMeta;
         case kVK_RightCommand:
-            return config::kKeyModRightControl;
+            return config::kKeyModRightMeta;
         default:
             // For non-modifier keys or unrecognized raw codes, fall back to key parameter
             switch (key) {
@@ -240,7 +240,7 @@ uint32_t GetExtendedModForModifierKey(wxKeyCode key, const wxKeyEvent& event) {
                 case WXK_RAW_CONTROL:
                     return config::kKeyModControl;
                 case WXK_CONTROL:  // Command on Mac
-                    return config::kKeyModControl;
+                    return config::kKeyModMeta;
                 case WXK_ALT:
                     return config::kKeyModAlt;
                 default:
@@ -329,12 +329,12 @@ uint32_t WxModifierToExtended(wxKeyModifier wx_mod,
             result |= config::kKeyModControl;
     }
     if (wx_mod & wxMOD_CONTROL) {
-        // Command key on macOS - treat as Control for cross-platform compat
+        // Command key on macOS
         auto it = key_extended_mods.find(WXK_CONTROL);
         if (it != key_extended_mods.end())
             result |= it->second;
         else
-            result |= config::kKeyModControl;
+            result |= config::kKeyModMeta;  // Command key defaults to Meta
     }
 #else
     if (wx_mod & wxMOD_CONTROL) {
