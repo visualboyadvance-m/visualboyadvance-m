@@ -24,7 +24,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-06 15:05+0000\n"
+"POT-Creation-Date: 2025-12-08 23:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020,2022-2025\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/bgk/vba-m/language/zh_CN/)\n"
@@ -56,7 +56,7 @@ msgstr "分配核心音频缓冲区失败%d: 错误 %d"
 msgid "Failed to start CoreAudio queue: error %d"
 msgstr "启动核心音频队列失败: 错误 %d"
 
-#: cmdevents.cpp:63 wxvbam.cpp:674
+#: cmdevents.cpp:63 wxvbam.cpp:714
 msgid "Could not create main window"
 msgstr "无法创建主窗口"
 
@@ -814,7 +814,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "无法创建原生存档目录：\n%s\n\n请检查您在“选项”>“目录”中配置的路径。"
 
-#: panel.cpp:813 panel.cpp:834 wxvbam.cpp:1196
+#: panel.cpp:813 panel.cpp:834 wxvbam.cpp:1236
 msgid "Directory Error"
 msgstr "目录错误"
 
@@ -1208,76 +1208,76 @@ msgstr "Blue:"
 msgid "Unable to load dialog %s from resources"
 msgstr "无法从源加载对话框 %s "
 
-#: wxvbam.cpp:491 wxvbam.cpp:508
+#: wxvbam.cpp:531 wxvbam.cpp:548
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "提供的配置文件无效: %s"
 
-#: wxvbam.cpp:773
+#: wxvbam.cpp:813
 msgid "Save built-in XRC file and exit"
 msgstr "保存内置 XRC 文件并退出"
 
-#: wxvbam.cpp:776
+#: wxvbam.cpp:816
 msgid "Save built-in vba-over.ini and exit"
 msgstr "保存内置 vba-over.ini 文件并退出"
 
-#: wxvbam.cpp:779
+#: wxvbam.cpp:819
 msgid "Print configuration path and exit"
 msgstr "打印配置路径并退出"
 
-#: wxvbam.cpp:782
+#: wxvbam.cpp:822
 msgid "Start in full-screen mode"
 msgstr "以全屏模式启动"
 
-#: wxvbam.cpp:785
+#: wxvbam.cpp:825
 msgid "Set a configuration file"
 msgstr "设置配置文件"
 
-#: wxvbam.cpp:789
+#: wxvbam.cpp:829
 msgid "Delete shared link state first, if it exists"
 msgstr "请先删除共享联机状态，如果存在的话"
 
-#: wxvbam.cpp:796
+#: wxvbam.cpp:836
 msgid "List all settable options and exit"
 msgstr "列出所有可设置的选项并退出"
 
-#: wxvbam.cpp:799
+#: wxvbam.cpp:839
 msgid "ROM file"
 msgstr "ROM 文件"
 
-#: wxvbam.cpp:801
+#: wxvbam.cpp:841
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:832
+#: wxvbam.cpp:872
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "配置/建构错误：无法找到内置 xrc 文件"
 
-#: wxvbam.cpp:840
+#: wxvbam.cpp:880
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "将内置配置写入到 %s。\n如要覆盖，请删除所有未更改的根节点。首先在以下搜索覆盖内置路径里找到任意 .xrc 或 .xrs 文件中正确名称的根节点："
 
-#: wxvbam.cpp:854
+#: wxvbam.cpp:894
 msgid "Configuration is read from, in order:"
 msgstr "配置按顺序从中读取："
 
-#: wxvbam.cpp:868
+#: wxvbam.cpp:908
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "将内置覆盖文件写入到 %s\n 如要覆盖，请删除所有未更改的部分。首个找到的部分从以下搜索路径使用："
 
-#: wxvbam.cpp:874
+#: wxvbam.cpp:914
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\t内置"
 
-#: wxvbam.cpp:889
+#: wxvbam.cpp:929
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1285,21 +1285,21 @@ msgid ""
 "\n"
 msgstr "如果在用户界面中进行了任何配置更改，则保存从命令行设置的选项。\n\n对于标志选项，true 和 false 分别指定为 1 和 0。\n\n"
 
-#: wxvbam.cpp:897
+#: wxvbam.cpp:937
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "可用于键盘 /* 选项的命令是:\n\n"
 
-#: wxvbam.cpp:909
+#: wxvbam.cpp:949
 msgid "Configuration file not found."
 msgstr "未找到配置文件。"
 
-#: wxvbam.cpp:940
+#: wxvbam.cpp:980
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "错误的配置选项或多个 ROM 文件被指定:\n"
 
-#: wxvbam.cpp:1195
+#: wxvbam.cpp:1235
 #, c-format
 msgid ""
 "Could not create directory:\n"
@@ -2041,103 +2041,108 @@ msgstr "右Alt+"
 msgid "Alt+"
 msgstr "Alt+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:124
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:127
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:141
 msgid "LCtrl+"
 msgstr "左Ctrl+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:126
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:130
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:143
 msgid "RCtrl+"
 msgstr "右Ctrl+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:128
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:133
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:158
+msgid "Cmd+"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:136
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:145
 msgid "Ctrl+"
 msgstr "Ctrl+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:132
-msgid "Rawctrl+"
-msgstr "Rawctrl+"
-
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:136
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:149
 msgid "LShift+"
 msgstr "左Shift+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:138
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:151
 msgid "RShift+"
 msgstr "右Shift+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:140
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:153
 msgid "Shift+"
 msgstr "Shift+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:143
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:162
 msgid "LMeta+"
 msgstr "左Meta+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:145
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:164
 msgid "RMeta+"
 msgstr "右Meta+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:147
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:166
 msgid "Meta+"
 msgstr "Meta+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:371
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:392
 #, c-format
 msgid "Joystick %d"
 msgstr "摇杆 %d"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:400
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:421
 #, c-format
 msgid "%s: Axis %d+"
 msgstr "%s: 轴 %d+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:402
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:423
 #, c-format
 msgid "%s: Axis %d-"
 msgstr "%s: 轴 %d-"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:404
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:425
 #, c-format
 msgid "%s: Button %d"
 msgstr "%s: 按钮 %d"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:406
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:427
 #, c-format
 msgid "%s: Hat %d North"
 msgstr "%s: 方向键 %d 北"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:408
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:429
 #, c-format
 msgid "%s: Hat %d South"
 msgstr "%s: 方向键 %d 南"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:410
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:431
 #, c-format
 msgid "%s: Hat %d West"
 msgstr "%s: 方向键 %d 西"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:412
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:433
 #, c-format
 msgid "%s: Hat %d East"
 msgstr "%s: 方向键 %d 东"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:484
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:505
 msgid "Shift"
 msgstr "Shift"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:486
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:509
+msgid "Cmd"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:511
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:518
 msgid "Ctrl"
 msgstr "Ctrl"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:488
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:514
 msgid "Alt"
 msgstr "Alt"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:491
-msgid "Rawctrl"
-msgstr "Rawctrl"
-
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:494
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:521
 msgid "Key"
 msgstr "按键"
 

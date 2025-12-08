@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-06 15:05+0000\n"
+"POT-Creation-Date: 2025-12-08 23:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Svyatoslav <zarazafamila@gmail.com>, 2023\n"
 "Language-Team: Ukrainian (http://app.transifex.com/bgk/vba-m/language/uk/)\n"
@@ -41,7 +41,7 @@ msgstr "Не вдалося призначити буфер Core Audio %d: по�
 msgid "Failed to start CoreAudio queue: error %d"
 msgstr "Не вдалося почати чергу Core Audio: помилка %d."
 
-#: cmdevents.cpp:63 wxvbam.cpp:674
+#: cmdevents.cpp:63 wxvbam.cpp:714
 msgid "Could not create main window"
 msgstr "Неможливо створити головне вікно."
 
@@ -799,7 +799,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Неможливо створити каталог рідних збережень:\n%s.\n\nПеревір налаштований шлях у Опції → Каталоги."
 
-#: panel.cpp:813 panel.cpp:834 wxvbam.cpp:1196
+#: panel.cpp:813 panel.cpp:834 wxvbam.cpp:1236
 msgid "Directory Error"
 msgstr "Помилка каталогу."
 
@@ -1193,76 +1193,76 @@ msgstr "Синій:"
 msgid "Unable to load dialog %s from resources"
 msgstr "Неможливо завантажити вікно %s з ресурсів."
 
-#: wxvbam.cpp:491 wxvbam.cpp:508
+#: wxvbam.cpp:531 wxvbam.cpp:548
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "Надано недійсний файл конфігурації: %s."
 
-#: wxvbam.cpp:773
+#: wxvbam.cpp:813
 msgid "Save built-in XRC file and exit"
 msgstr "Зберегти вбудований XRC та вийти"
 
-#: wxvbam.cpp:776
+#: wxvbam.cpp:816
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Зберегти вбудований vba-over.ini та вийти"
 
-#: wxvbam.cpp:779
+#: wxvbam.cpp:819
 msgid "Print configuration path and exit"
 msgstr "Роздрукувати шлях конфігурації та вийти"
 
-#: wxvbam.cpp:782
+#: wxvbam.cpp:822
 msgid "Start in full-screen mode"
 msgstr "Запускати в повному екрані"
 
-#: wxvbam.cpp:785
+#: wxvbam.cpp:825
 msgid "Set a configuration file"
 msgstr "Встановити файл конфігурації"
 
-#: wxvbam.cpp:789
+#: wxvbam.cpp:829
 msgid "Delete shared link state first, if it exists"
 msgstr "Видалити спочатку стан загального з'єднання за наявності"
 
-#: wxvbam.cpp:796
+#: wxvbam.cpp:836
 msgid "List all settable options and exit"
 msgstr "Показати всі налаштовувані опції та вийти"
 
-#: wxvbam.cpp:799
+#: wxvbam.cpp:839
 msgid "ROM file"
 msgstr "ROM-файл"
 
-#: wxvbam.cpp:801
+#: wxvbam.cpp:841
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:832
+#: wxvbam.cpp:872
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "Помилка конфігурації / випуску: неможливо знайти вбудований xrc."
 
-#: wxvbam.cpp:840
+#: wxvbam.cpp:880
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Записано вбудовану конфігурацію до %s.\nДля перевизначення вилучи всі вузли, крім змінених кореневих. Перший знайдений кореневий вузол із правильним іменем у будь-якому файлі .xrc чи .xrs у наведених шляхах пошуку перевизначає вбудований:"
 
-#: wxvbam.cpp:854
+#: wxvbam.cpp:894
 msgid "Configuration is read from, in order:"
 msgstr "Конфігурацію прочитано з файлів за порядком:"
 
-#: wxvbam.cpp:868
+#: wxvbam.cpp:908
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "Записано вбудоване перевизначення файлу до %s.\nДля перевизначення видали всі розділи, крім змінених. Перший знайдений розділ буде використано зі шляху пошуку:"
 
-#: wxvbam.cpp:874
+#: wxvbam.cpp:914
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tвбудовано"
 
-#: wxvbam.cpp:889
+#: wxvbam.cpp:929
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1270,21 +1270,21 @@ msgid ""
 "\n"
 msgstr "Опції, встановлені з командного рядка, буде збережено при зміні конфігурації інтерфейсу користувача.\n\nДля позначення значення \"істина\" та \"хиба\" вказуються як 1 і 0 відповідно.\n\n"
 
-#: wxvbam.cpp:897
+#: wxvbam.cpp:937
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Доступні команди для опцій клавіатури:\n"
 
-#: wxvbam.cpp:909
+#: wxvbam.cpp:949
 msgid "Configuration file not found."
 msgstr "Файл конфігурації не знайдено."
 
-#: wxvbam.cpp:940
+#: wxvbam.cpp:980
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Неправильна опція конфігурації чи вибрано декілька ROM'ів:\n"
 
-#: wxvbam.cpp:1195
+#: wxvbam.cpp:1235
 #, c-format
 msgid ""
 "Could not create directory:\n"
@@ -2026,103 +2026,108 @@ msgstr "AltGreat+"
 msgid "Alt+"
 msgstr "Alt+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:124
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:127
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:141
 msgid "LCtrl+"
 msgstr "LeftControl+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:126
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:130
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:143
 msgid "RCtrl+"
 msgstr "RightControl+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:128
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:133
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:158
+msgid "Cmd+"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:136
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:145
 msgid "Ctrl+"
 msgstr "Ctrl+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:132
-msgid "Rawctrl+"
-msgstr "Rawctrl+"
-
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:136
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:149
 msgid "LShift+"
 msgstr "LeftShift+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:138
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:151
 msgid "RShift+"
 msgstr "RightShift+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:140
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:153
 msgid "Shift+"
 msgstr "Shift+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:143
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:162
 msgid "LMeta+"
 msgstr "LeftMeta+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:145
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:164
 msgid "RMeta+"
 msgstr "RightMeta+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:147
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:166
 msgid "Meta+"
 msgstr "Meta+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:371
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:392
 #, c-format
 msgid "Joystick %d"
 msgstr "Джойстик %d"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:400
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:421
 #, c-format
 msgid "%s: Axis %d+"
 msgstr "%s: Вісь %d+"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:402
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:423
 #, c-format
 msgid "%s: Axis %d-"
 msgstr "%s: Вісь %d-"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:404
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:425
 #, c-format
 msgid "%s: Button %d"
 msgstr "%s: Кнопка %d"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:406
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:427
 #, c-format
 msgid "%s: Hat %d North"
 msgstr "%s: Капелюх %d ↑"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:408
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:429
 #, c-format
 msgid "%s: Hat %d South"
 msgstr "%s: Капелюх %d ↓"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:410
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:431
 #, c-format
 msgid "%s: Hat %d West"
 msgstr "%s: Капелюх %d ←"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:412
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:433
 #, c-format
 msgid "%s: Hat %d East"
 msgstr "%s: Капелюх %d →"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:484
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:505
 msgid "Shift"
 msgstr "Shift"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:486
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:509
+msgid "Cmd"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:511
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:518
 msgid "Ctrl"
 msgstr "Control"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:488
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:514
 msgid "Alt"
 msgstr "Alt"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:491
-msgid "Rawctrl"
-msgstr "Rawcontrol"
-
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:494
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:521
 msgid "Key"
 msgstr "Кнопка"
 
