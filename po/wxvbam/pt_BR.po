@@ -2069,7 +2069,7 @@ msgstr "Ctrl+ Direita"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:133
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:158
 msgid "Cmd+"
-msgstr ""
+msgstr "Cmd+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:136
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:145
@@ -2146,7 +2146,7 @@ msgstr "Shift"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:509
 msgid "Cmd"
-msgstr ""
+msgstr "Cmd"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:511
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:518
