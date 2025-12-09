@@ -134,27 +134,6 @@ static inline uint32_t INTERPOLATE(uint32_t A, uint32_t B) {
     if (A == B) {
         return A;
     }
-    return (
-        (((((A >> 16) & 0xFF) & 0xFE) >> 1) + ((((B >> 16) & 0xFF) & 0xFE) >> 1) + (((A >> 16) & 0xFF) & ((B >> 16) & 0xFF) & 0x01)) << 16) |
-        ((((((A >> 8) & 0xFF) & 0xFE) >> 1) + ((((B >> 8) & 0xFF) & 0xFE) >> 1) + (((A >> 8) & 0xFF) & ((B >> 8) & 0xFF) & 0x01)) << 8) |
-        (((((A & 0xFF) & 0xFE) >> 1) + (((B & 0xFF) & 0xFE) >> 1) + ((A & 0xFF) & (B & 0xFF) & 0x01)));
-}
-
-static inline uint32_t Q_INTERPOLATE(uint32_t A, uint32_t B, uint32_t C, uint32_t D) {
-    return (
-        (((((A >> 16) & 0xFC) >> 2) + (((B >> 16) & 0xFC) >> 2) + (((C >> 16) & 0xFC) >> 2) + (((D >> 16) & 0xFC) >> 2) +
-            (((A >> 16) & 0x03) + ((B >> 16) & 0x03) + ((C >> 16) & 0x03) + ((D >> 16) & 0x03))) << 16) |
-        (((((A >> 8) & 0xFC) >> 2) + (((B >> 8) & 0xFC) >> 2) + (((C >> 8) & 0xFC) >> 2) + (((D >> 8) & 0xFC) >> 2) +
-            (((A >> 8) & 0x03) + ((B >> 8) & 0x03) + ((C >> 8) & 0x03) + ((D >> 8) & 0x03))) << 8) |
-        ((((A & 0xFC) >> 2) + ((B & 0xFC) >> 2) + ((C & 0xFC) >> 2) + ((D & 0xFC) >> 2) +
-            ((A & 0x03) + (B & 0x03) + (C & 0x03) + (D & 0x03)))));
-}
-
-// Modified INTERPOLATE for 32-bit mode that works correctly with LCD filter's bit packing
-static inline uint32_t INTERPOLATE_PACKED(uint32_t A, uint32_t B) {
-    if (A == B) {
-        return A;
-    }
     
     // Extract each 8-bit channel by reading the full byte at each color position
     uint32_t r_a = (A >> 16) & 0xFF;
@@ -174,7 +153,7 @@ static inline uint32_t INTERPOLATE_PACKED(uint32_t A, uint32_t B) {
     return (r_avg << 16) | (g_avg << 8) | b_avg;
 }
 
-static inline uint32_t Q_INTERPOLATE_PACKED(uint32_t A, uint32_t B, uint32_t C, uint32_t D) {
+static inline uint32_t Q_INTERPOLATE(uint32_t A, uint32_t B, uint32_t C, uint32_t D) {
     // Extract each 8-bit channel
     uint32_t r_a = (A >> 16) & 0xFF;
     uint32_t g_a = (A >> 8) & 0xFF;
@@ -717,41 +696,41 @@ void SuperEagle32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
       colorA2 = (height > 1 && currentPos < static_cast<uint32_t>(width - 1)) ? *(bP + Nextline + Nextline + 1) : colorA1;
 
       // --------------------------------------
-      // 32-bit mode uses INTERPOLATE_PACKED for LCD filter compatibility
+      // 32-bit mode uses INTERPOLATE for LCD filter compatibility
       if (color2 == color6 && color5 != color3) {
         product1b = product2a = color2;
         if ((color1 == color2) || (color6 == colorB2)) {
-          product1a = INTERPOLATE_PACKED (color2, color5);
-          product1a = INTERPOLATE_PACKED (color2, product1a);
+          product1a = INTERPOLATE (color2, color5);
+          product1a = INTERPOLATE (color2, product1a);
           //                       product1a = color2;
         } else {
-          product1a = INTERPOLATE_PACKED (color5, color6);
+          product1a = INTERPOLATE (color5, color6);
         }
 
         if ((color6 == colorS2) || (color2 == colorA1)) {
-          product2b = INTERPOLATE_PACKED (color2, color3);
-          product2b = INTERPOLATE_PACKED (color2, product2b);
+          product2b = INTERPOLATE (color2, color3);
+          product2b = INTERPOLATE (color2, product2b);
           //                       product2b = color2;
         } else {
-          product2b = INTERPOLATE_PACKED (color2, color3);
+          product2b = INTERPOLATE (color2, color3);
         }
       } else if (color5 == color3 && color2 != color6) {
         product2b = product1a = color5;
 
         if ((colorB1 == color5) || (color3 == colorS1)) {
-          product1b = INTERPOLATE_PACKED (color5, color6);
-          product1b = INTERPOLATE_PACKED (color5, product1b);
+          product1b = INTERPOLATE (color5, color6);
+          product1b = INTERPOLATE (color5, product1b);
           //                       product1b = color5;
         } else {
-          product1b = INTERPOLATE_PACKED (color5, color6);
+          product1b = INTERPOLATE (color5, color6);
         }
 
         if ((color3 == colorA2) || (color4 == color5)) {
-          product2a = INTERPOLATE_PACKED (color5, color2);
-          product2a = INTERPOLATE_PACKED (color5, product2a);
+          product2a = INTERPOLATE (color5, color2);
+          product2a = INTERPOLATE (color5, product2a);
           //                       product2a = color5;
         } else {
-          product2a = INTERPOLATE_PACKED (color2, color3);
+          product2a = INTERPOLATE (color2, color3);
         }
 
       } else if (color5 == color3 && color2 == color6) {
@@ -764,26 +743,26 @@ void SuperEagle32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
 
         if (r > 0) {
           product1b = product2a = color2;
-          product1a = product2b = INTERPOLATE_PACKED (color5, color6);
+          product1a = product2b = INTERPOLATE (color5, color6);
         } else if (r < 0) {
           product2b = product1a = color5;
-          product1b = product2a = INTERPOLATE_PACKED (color5, color6);
+          product1b = product2a = INTERPOLATE (color5, color6);
         } else {
           product2b = product1a = color5;
           product1b = product2a = color2;
         }
       } else {
-        product2b = product1a = INTERPOLATE_PACKED (color2, color6);
+        product2b = product1a = INTERPOLATE (color2, color6);
         product2b =
-          Q_INTERPOLATE_PACKED (color3, color3, color3, product2b);
+          Q_INTERPOLATE (color3, color3, color3, product2b);
         product1a =
-          Q_INTERPOLATE_PACKED (color5, color5, color5, product1a);
+          Q_INTERPOLATE (color5, color5, color5, product1a);
 
-        product2a = product1b = INTERPOLATE_PACKED (color5, color3);
+        product2a = product1b = INTERPOLATE (color5, color3);
         product2a =
-          Q_INTERPOLATE_PACKED (color2, color2, color2, product2a);
+          Q_INTERPOLATE (color2, color2, color2, product2a);
         product1b =
-          Q_INTERPOLATE_PACKED (color6, color6, color6, product1b);
+          Q_INTERPOLATE (color6, color6, color6, product1b);
 
         //                    product1a = color5;
         //                    product1b = color6;
