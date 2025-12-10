@@ -830,11 +830,22 @@ public:
 
     CheatFind_t()
         : wxEvtHandler()
+        , dlg(nullptr)
         , valsrc(0)
         , size(0)
         , op(0)
         , fmt(0)
         , val_s()
+        , val_tc(nullptr)
+        , list(nullptr)
+        , old_rb(nullptr)
+        , val_rb(nullptr)
+        , update_b(nullptr)
+        , clear_b(nullptr)
+        , add_b(nullptr)
+        , ca_val_tc(nullptr)
+        , ca_fmt(nullptr)
+        , ca_addr(nullptr)
     {
     }
     ~CheatFind_t()
@@ -1314,12 +1325,16 @@ void MainFrame::ResetCheatSearch()
     CheatFind_t& cfh = cheat_find_handler;
     cfh.fmt = cfh.size = cfh.op = cfh.valsrc = 0;
     cfh.val_s = wxEmptyString;
-    cfh.Deselect();
-    cfh.list->SetItemCount(0);
-    cfh.list->count8 = cfh.list->count16 = cfh.list->count32 = 0;
-    cfh.list->addrs.clear();
     cfh.ca_desc = wxEmptyString;
     cheatSearchCleanup(&cheatSearchData);
+
+    // Only access list if the CheatCreate dialog has been loaded
+    if (cfh.list) {
+        cfh.Deselect();
+        cfh.list->SetItemCount(0);
+        cfh.list->count8 = cfh.list->count16 = cfh.list->count32 = 0;
+        cfh.list->addrs.clear();
+    }
 }
 
 // onshow handler for above, in the form of an overzealous validator
@@ -1992,6 +2007,19 @@ bool MainFrame::BindControls()
     }
 
     ResetMenuAccelerators();
+
+    wxMenuItem* suspend_scr_saver_mi = XRCITEM("SuspendScreenSaver");
+    if (suspend_scr_saver_mi)
+    {
+        // TODO: change preprocessor directive to fit other platforms
+#if !defined(HAVE_XSS)
+        suspend_scr_saver_mi->GetMenu()->Remove(suspend_scr_saver_mi);
+#else
+        if (wxGetApp().UsingWayland())
+            suspend_scr_saver_mi->GetMenu()->Remove(suspend_scr_saver_mi);
+#endif // !HAVE_XSS
+    }
+
 // activate OnDropFile event handler
 #if !defined(__WXGTK__) || wxCHECK_VERSION(2, 8, 10)
     // may not actually do anything, but verfied to work w/ Linux/Nautilus
@@ -2307,6 +2335,9 @@ wxDialog* MainFrame::LoadDialog(const wxString& name)
                 wxListEventHandler(CheatList_t::Edit),
                 NULL, &cheat_list_handler);
             d->Fit();
+
+            // CheatEdit is used by CheatList, so load it now
+            LoadDialog("CheatEdit");
         }
         else if (name == "CheatEdit") {
             d = LoadXRCDialog("CheatEdit");
@@ -2388,6 +2419,9 @@ wxDialog* MainFrame::LoadDialog(const wxString& name)
                 wxListEventHandler(CheatFind_t::Select),
                 NULL, &cheat_find_handler);
             d->Fit();
+
+            // CheatAdd is used by CheatCreate, so load it now
+            LoadDialog("CheatAdd");
         }
         else if (name == "CheatAdd") {
             d = LoadXRCDialog("CheatAdd");
