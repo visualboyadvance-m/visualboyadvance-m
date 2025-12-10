@@ -2039,12 +2039,12 @@ msgstr "RightControl+"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:133
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:158
 msgid "Cmd+"
-msgstr ""
+msgstr "Command+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:136
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:145
 msgid "Ctrl+"
-msgstr "Ctrl+"
+msgstr "Control+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:149
 msgid "LShift+"
@@ -2093,22 +2093,22 @@ msgstr "%s: Кнопка %d"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:427
 #, c-format
 msgid "%s: Hat %d North"
-msgstr "%s: Капелюх %d ↑"
+msgstr "%s: Hat %d North"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:429
 #, c-format
 msgid "%s: Hat %d South"
-msgstr "%s: Капелюх %d ↓"
+msgstr "%s: Hat %d South"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:431
 #, c-format
 msgid "%s: Hat %d West"
-msgstr "%s: Капелюх %d ←"
+msgstr "%s: Hat %d West"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:433
 #, c-format
 msgid "%s: Hat %d East"
-msgstr "%s: Капелюх %d →"
+msgstr "%s: Hat %d East"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:505
 msgid "Shift"
@@ -2116,7 +2116,7 @@ msgstr "Shift"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:509
 msgid "Cmd"
-msgstr ""
+msgstr "Command"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:511
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:518
