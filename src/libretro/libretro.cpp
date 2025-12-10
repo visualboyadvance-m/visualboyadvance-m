@@ -840,7 +840,7 @@ static void load_image_preferences(void)
     };
 
     bool found = false;
-    int saveType = 0;
+    int saveType = GBA_SAVE_AUTO;
     int saveSize = 0;
     bool hasRtc = false;
     bool hasRumble = false;
@@ -909,7 +909,7 @@ static void load_image_preferences(void)
     }
     
     // Autodetect save type is needed
-    if (!saveType) {
+    if (saveType == GBA_SAVE_AUTO) {
         log("Autodetecting save type...\n");
         // FLASH 1M Sanyo
         if (find_string(g_rom, romSize, "FLASH1M_"))
@@ -942,11 +942,16 @@ static void load_image_preferences(void)
         {
             log("Found SRAM_\n");
             saveType = GBA_SAVE_SRAM;
+        } else
+        
+        // no save type found
+        {
+            saveType = GBA_SAVE_NONE;
         }
 
         // RTC flag
         if (find_string(g_rom, romSize, "SIIRTC_V")) {
-            log("Found SRAM_\n");
+            log("Found RTC\n");
             hasRtc = true;
         }
     }
@@ -1640,11 +1645,11 @@ static void updateInput_Joypad(void)
 
         if (retropad_device[port] == RETRO_DEVICE_JOYPAD) {
             if (libretro_supports_bitmasks)
-                inbuf = input_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
+                inbuf = input_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
             else
             {
                 for (int i = 0; i < (RETRO_DEVICE_ID_JOYPAD_R3 + 1); i++)
-                    inbuf |= input_cb(0, RETRO_DEVICE_JOYPAD, 0, i) ? (1 << i) : 0;
+                    inbuf |= input_cb(port, RETRO_DEVICE_JOYPAD, 0, i) ? (1 << i) : 0;
             }
 
             for (unsigned button = 0; button < max_buttons; button++)
