@@ -840,7 +840,7 @@ static void load_image_preferences(void)
     };
 
     bool found = false;
-    int saveType = 0;
+    int saveType = GBA_SAVE_AUTO;
     int saveSize = 0;
     bool hasRtc = false;
     bool hasRumble = false;
@@ -909,7 +909,7 @@ static void load_image_preferences(void)
     }
     
     // Autodetect save type is needed
-    if (!saveType) {
+    if (saveType == GBA_SAVE_AUTO) {
         log("Autodetecting save type...\n");
         // FLASH 1M Sanyo
         if (find_string(g_rom, romSize, "FLASH1M_"))
@@ -942,11 +942,16 @@ static void load_image_preferences(void)
         {
             log("Found SRAM_\n");
             saveType = GBA_SAVE_SRAM;
+        } else
+        
+        // no save type found
+        {
+            saveType = GBA_SAVE_NONE;
         }
 
         // RTC flag
         if (find_string(g_rom, romSize, "SIIRTC_V")) {
-            log("Found SRAM_\n");
+            log("Found RTC\n");
             hasRtc = true;
         }
     }

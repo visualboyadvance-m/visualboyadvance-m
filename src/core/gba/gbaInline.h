@@ -123,6 +123,31 @@ static inline uint16_t ROMReadOOB(uint32_t address) {
     return (address >> 1) & 0xFFFF;
 }
 
+static inline bool IsGPIO(uint32_t address) {
+    // TODO: Need to check which GPIO feature really is enabled
+    return (address == 0x80000c4 || address == 0x80000c6 || address == 0x80000c8);
+}
+
+// used for ROM boundary check
+static inline bool IsEEPROM(uint32_t address) {
+    return (cpuEEPROMEnabled && (address & eepromMask) == eepromMask);
+}
+
+static inline bool isSaveGame() {
+    return (coreOptions.saveType != 5) && (!eepromInUse || cpuSramEnabled || cpuFlashEnabled);
+}
+
+// Reads sram or flash
+static inline uint8_t CPUReadBackup(uint32_t address) {
+    return flashRead(address);
+}
+
+// writes sram or flash
+static inline void CPUWriteBackup(uint32_t address, uint8_t value) {
+    if (cpuSaveGameFunc)
+        (*cpuSaveGameFunc)(address, value);
+}
+
 static inline uint32_t CPUReadMemory(uint32_t address)
 {
 #ifdef VBAM_ENABLE_DEBUGGER
@@ -133,7 +158,7 @@ static inline uint32_t CPUReadMemory(uint32_t address)
         }
     }
 #endif
-    uint32_t value = 0xFFFFFFFF;
+    uint32_t value = 0;
 
     switch (address >> 24) {
     case REGION_BIOS:
@@ -194,10 +219,10 @@ static inline uint32_t CPUReadMemory(uint32_t address)
     case REGION_ROM1:
     case REGION_ROM1EX:
     case REGION_ROM2:
-        if ((address & 0x01FFFFFC) <= (gbaGetRomSize() - 4))
+        if (IsEEPROM(address))
+            return 0; // ignore reads from eeprom region outside 0x0D page reads    
+        else if ((address & 0x01FFFFFC) <= (gbaGetRomSize() - 4))
             value = READ32LE(((uint32_t *)&g_rom[address & 0x01FFFFFC]));
-        else if (cpuEEPROMEnabled && ((address & eepromMask) == eepromMask))
-            return 0; // ignore reads from eeprom region outside 0x0D page reads
         else {
             value = (uint16_t)ROMReadOOB(address & 0x01FFFFFC);
             value |= (uint16_t)ROMReadOOB((address & 0x01FFFFFC) + 2) << 16;
@@ -205,16 +230,23 @@ static inline uint32_t CPUReadMemory(uint32_t address)
         break;
     case REGION_ROM2EX:
         if (cpuEEPROMEnabled)
-            // no need to swap this
             return eepromRead(address);
         goto unreadable;
     case REGION_SRAM:
     case REGION_SRAMEX:
-        if (cpuFlashEnabled | cpuSramEnabled) { // no need to swap this
-            value = flashRead(address) * 0x01010101;
+        if (isSaveGame()) {
+            value = CPUReadBackup(address) * 0x01010101;
             break;
         }
-	/* fallthrough */
+#ifdef GBA_LOGGING
+        // Just normal log, not openbus
+        if (systemVerbose & VERBOSE_ILLEGAL_READ) {
+            log("Illegal word read: %08x at %08x\n",
+                address,
+                armMode ? armNextPC - 4 : armNextPC - 2);
+        }
+#endif
+        return 0xffffffff;
     default:
     unreadable:
 #ifdef GBA_LOGGING
@@ -274,7 +306,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
     }
 #endif
 
-    uint32_t value = 0xFFFFFFFF;
+    uint32_t value = 0;
 
     switch (address >> 24) {
     case REGION_BIOS:
@@ -349,28 +381,35 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
     case REGION_ROM1:
     case REGION_ROM1EX:
     case REGION_ROM2:
-        if ((address & 0x01FFFFFE) <= (gbaGetRomSize() - 2))
-            value = READ16LE(((uint16_t *)&g_rom[address & 0x01FFFFFE]));
-        else if (address == 0x80000c4 || address == 0x80000c6 || address == 0x80000c8)
+        if (IsGPIO(address))
             value = rtcRead(address);
-        else if (cpuEEPROMEnabled && ((address & eepromMask) == eepromMask))
+        else if (IsEEPROM(address))
             return 0; // ignore reads from eeprom region outside 0x0D page reads
+        else if ((address & 0x01FFFFFE) <= (gbaGetRomSize() - 2))
+            value = READ16LE(((uint16_t *)&g_rom[address & 0x01FFFFFE]));
         else
             value = (uint16_t)ROMReadOOB(address & 0x01FFFFFE);
         break;
     case REGION_ROM2EX:
         if (cpuEEPROMEnabled)
-            // no need to swap this
             return eepromRead(address);
         goto unreadable;
     case REGION_SRAM:
     case REGION_SRAMEX:
-        if (cpuFlashEnabled | cpuSramEnabled) {
-            // no need to swap this
-            value = flashRead(address) * 0x0101;
+        if (isSaveGame()) {
+            value = CPUReadBackup(address) * 0x0101;
             break;
         }
-	/* fallthrough */
+#ifdef GBA_LOGGING
+        // Just normal log, not openbus
+        if (systemVerbose & VERBOSE_ILLEGAL_READ) {
+            log("Illegal halfword read: %08x at %08x (%08x)\n",
+                address,
+                reg[15].I,
+                value);
+        }
+#endif
+        return 0xffff;
     default:
     unreadable:
 #ifdef GBA_LOGGING
@@ -469,20 +508,21 @@ static inline uint8_t CPUReadByte(uint32_t address)
     case REGION_ROM1:
     case REGION_ROM1EX:
     case REGION_ROM2:
-        if ((address & 0x01FFFFFF) <= gbaGetRomSize())
-            return g_rom[address & 0x01FFFFFF];
-        else if (cpuEEPROMEnabled && ((address & eepromMask) == eepromMask))
+        if (IsEEPROM(address))
             return 0; // ignore reads from eeprom region outside 0x0D page reads
-        return (uint8_t)ROMReadOOB(address & 0x01FFFFFE);
+        else if ((address & 0x01FFFFFF) <= gbaGetRomSize())
+            return g_rom[address & 0x01FFFFFF];
+        else 
+            return (uint8_t)ROMReadOOB(address & 0x01FFFFFE);
     case REGION_ROM2EX:
         if (cpuEEPROMEnabled)
             return DowncastU8(eepromRead(address));
         goto unreadable;
     case REGION_SRAM:
     case REGION_SRAMEX:
-        if (cpuSramEnabled | cpuFlashEnabled)
-            return flashRead(address);
-
+        if (isSaveGame()) {
+            return CPUReadBackup(address);
+        }
         switch (address & 0x00008f00) {
         case 0x8200:
             return DowncastU8(systemGetSensorX());
@@ -493,7 +533,15 @@ static inline uint8_t CPUReadByte(uint32_t address)
         case 0x8500:
             return DowncastU8(systemGetSensorY() >> 8);
         }
-        return 0xFF;
+#ifdef GBA_LOGGING
+        // Just normal log, not openbus
+        if (systemVerbose & VERBOSE_ILLEGAL_READ) {
+            log("Illegal byte read: %08x at %08x\n",
+                address,
+                armMode ? armNextPC - 4 : armNextPC - 2);
+        }
+#endif
+        return 0xff;
     default:
     unreadable:
 #ifdef GBA_LOGGING
@@ -603,12 +651,11 @@ static inline void CPUWriteMemory(uint32_t address, uint32_t value)
         goto unwritable;
     case REGION_SRAM:
     case REGION_SRAMEX:
-        if ((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled) {
-            (*cpuSaveGameFunc)(address, (uint8_t)(value >> (8 * (address & 3))));
+        if (isSaveGame()) {
+            CPUWriteBackup(address, (uint8_t)(value >> (8 * (address & 3))));
             break;
         }
-        goto unwritable;
-    // fallthrough
+        // fallthrough
     default:
     unwritable:
 #ifdef GBA_LOGGING
@@ -704,7 +751,7 @@ static inline void CPUWriteHalfWord(uint32_t address, uint16_t value)
             GBAMatrixWrite16(&GBAMatrix, address & 0x3C, value);
             break;
         }
-        if (address == 0x80000c4 || address == 0x80000c6 || address == 0x80000c8) {
+        if (IsGPIO(address)) {
             if (!rtcWrite(address, value))
                 goto unwritable;
         } else if (!agbPrintWrite(address, value))
@@ -727,11 +774,11 @@ static inline void CPUWriteHalfWord(uint32_t address, uint16_t value)
         goto unwritable;
     case REGION_SRAM:
     case REGION_SRAMEX:
-        if ((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled) {
-            (*cpuSaveGameFunc)(address, (uint8_t)(value >> (8 * (address & 1))));
+        if (isSaveGame()) {
+            CPUWriteBackup(address, (uint8_t)(value >> (8 * (address & 1))));
             break;
         }
-        /* fallthrough */
+        // fallthrough
     default:
     unwritable:
 #ifdef GBA_LOGGING
@@ -867,9 +914,6 @@ static inline void CPUWriteByte(uint32_t address, uint8_t b)
         }
         break;
     case REGION_OAM:
-        // no need to switch
-        // byte writes to OAM are ignored
-        //    *((uint16_t *)&g_oam[address & 0x3FE]) = (b << 8) | b;
         break;
     case REGION_ROM2EX:
         if (cpuEEPROMEnabled) {
@@ -879,12 +923,11 @@ static inline void CPUWriteByte(uint32_t address, uint8_t b)
         goto unwritable;
     case REGION_SRAM:
     case REGION_SRAMEX:
-        if ((coreOptions.saveType != 5) && ((!eepromInUse) | cpuSramEnabled | cpuFlashEnabled)) {
-            (*cpuSaveGameFunc)(address, b);
+        if (isSaveGame()) {
+            CPUWriteBackup(address, b);
             break;
         }
-        goto unwritable;
-    // default
+        // fallthrough
     default:
     unwritable:
 #ifdef GBA_LOGGING
