@@ -543,8 +543,23 @@ wxString KeyboardInput::ToLocalizedString() const {
         return result + key_str;
     }
 
+#ifdef __WXMAC__
+    // On macOS, wxAcceleratorEntry::ToRawString() outputs "CTRL+" for wxMOD_CONTROL
+    // even though wxMOD_CONTROL represents Command key. Use ModToLocalizedString instead.
+    wxString result = ModToLocalizedString(mod_);
+    wxString key_str;
+    if (key_ >= 32 && key_ < 127) {
+        // Printable ASCII character
+        key_str = wxString(static_cast<wxChar>(wxToupper(key_)));
+    } else {
+        // Special key - use wxAcceleratorEntry for key name only
+        key_str = wxAcceleratorEntry(wxMOD_NONE, key_).ToRawString().MakeUpper();
+    }
+    return result + key_str;
+#else
     const wxString accel_string = wxAcceleratorEntry(mod(), key_).ToRawString().MakeUpper();
     return accel_string;
+#endif
 }
 
 // static

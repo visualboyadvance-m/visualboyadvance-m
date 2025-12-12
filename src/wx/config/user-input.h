@@ -81,6 +81,33 @@ constexpr bool ModifiersMatch(uint32_t mod1, uint32_t mod2) {
     }
 
     // Control
+#ifdef __WXMAC__
+    // On macOS: wxMOD_CONTROL is Command key, wxMOD_RAW_CONTROL is actual Control key
+    // These must be treated as distinct modifiers and should not match each other
+    bool ctrl1_cmd = (mod1 & (kKeyModControl | wxMOD_CONTROL)) != 0;
+    bool ctrl1_raw = (mod1 & wxMOD_RAW_CONTROL) != 0;
+    bool ctrl1_left = (mod1 & kKeyModLeftControl) != 0;
+    bool ctrl1_right = (mod1 & kKeyModRightControl) != 0;
+    bool ctrl2_cmd = (mod2 & (kKeyModControl | wxMOD_CONTROL)) != 0;
+    bool ctrl2_raw = (mod2 & wxMOD_RAW_CONTROL) != 0;
+    bool ctrl2_left = (mod2 & kKeyModLeftControl) != 0;
+    bool ctrl2_right = (mod2 & kKeyModRightControl) != 0;
+
+    // Command key matching (wxMOD_CONTROL on macOS)
+    bool ctrl1_cmd_any = ctrl1_cmd;
+    bool ctrl2_cmd_any = ctrl2_cmd;
+    if (ctrl1_cmd_any != ctrl2_cmd_any) return false;
+
+    // Control key matching (wxMOD_RAW_CONTROL and extended modifiers on macOS)
+    bool ctrl1_ctrl_any = ctrl1_raw || ctrl1_left || ctrl1_right;
+    bool ctrl2_ctrl_any = ctrl2_raw || ctrl2_left || ctrl2_right;
+    if (ctrl1_ctrl_any != ctrl2_ctrl_any) return false;
+    // If both have specific L/R and they differ, no match
+    if ((ctrl1_left || ctrl1_right) && (ctrl2_left || ctrl2_right)) {
+        if (ctrl1_left != ctrl2_left || ctrl1_right != ctrl2_right) return false;
+    }
+#else
+    // On other platforms: wxMOD_CONTROL is Control key
     bool ctrl1_base = (mod1 & (kKeyModControl | wxMOD_CONTROL)) != 0;
     bool ctrl1_left = (mod1 & kKeyModLeftControl) != 0;
     bool ctrl1_right = (mod1 & kKeyModRightControl) != 0;
@@ -95,6 +122,7 @@ constexpr bool ModifiersMatch(uint32_t mod1, uint32_t mod2) {
     if ((ctrl1_left || ctrl1_right) && (ctrl2_left || ctrl2_right)) {
         if (ctrl1_left != ctrl2_left || ctrl1_right != ctrl2_right) return false;
     }
+#endif
 
     // Shift
     bool shift1_base = (mod1 & (kKeyModShift | wxMOD_SHIFT)) != 0;

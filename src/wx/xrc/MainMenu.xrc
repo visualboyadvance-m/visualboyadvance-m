@@ -518,7 +518,7 @@
           <checkable>1</checkable>
         </object>
         <object class="wxMenuItem" name="ColorizerHack">
-          <label>_Game Boy Colorizer Hack (requires restart)</label>
+          <label>_Game Boy Colorizer Hack [requires restart]</label>
           <checkable>1</checkable>
         </object>        
         <object class="wxMenuItem" name="Printer">
@@ -535,7 +535,7 @@
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="BootRomGB">
-          <label>_Use Game Boy BIOS file (requires restart)</label>
+          <label>_Use Game Boy BIOS file [requires restart]</label>
           <checkable>1</checkable>
         </object>
         <object class="wxMenuItem" name="BootRomGBC">
@@ -766,23 +766,23 @@
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language6">
-        <label>English (US)</label>
+        <label>English [US]</label>
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language7">
-        <label>Spanish (Latin American)</label>
+        <label>Spanish [Latin American]</label>
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language8">
-        <label>Spanish (Colombia)</label>
+        <label>Spanish [Colombia]</label>
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language9">
-        <label>Spanish (Peru)</label>
+        <label>Spanish [Peru]</label>
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language10">
-        <label>Spanish (United States)</label>
+        <label>Spanish [United States]</label>
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language11">
@@ -790,7 +790,7 @@
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language12">
-        <label>French (France)</label>
+        <label>French [France]</label>
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language13">
@@ -802,11 +802,11 @@
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language15">
-        <label>Hebrew (Israel)</label>
+        <label>Hebrew [Israel]</label>
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language16">
-        <label>Hungarian (Hungary)</label>
+        <label>Hungarian [Hungary]</label>
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language17">
@@ -826,7 +826,7 @@
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language21">
-        <label>Korean (Korea)</label>
+        <label>Korean [Korea]</label>
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language22">
@@ -834,7 +834,7 @@
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language23">
-        <label>Malay (Malaysia)</label>
+        <label>Malay [Malaysia]</label>
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language24">
@@ -846,7 +846,7 @@
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language26">
-        <label>Polish (Poland)</label>
+        <label>Polish [Poland]</label>
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language27">
@@ -854,15 +854,15 @@
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language28">
-        <label>Portuguese (Brazil)</label>
+        <label>Portuguese [Brazil]</label>
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language29">
-        <label>Portuguese (Portugal)</label>
+        <label>Portuguese [Portugal]</label>
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language30">
-        <label>Russian (Russia)</label>
+        <label>Russian [Russia]</label>
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language31">
@@ -878,11 +878,11 @@
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language34">
-        <label>Urdu (Pakistan)</label>
+        <label>Urdu [Pakistan]</label>
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="Language35">
-        <label>Chinese (China)</label>
+        <label>Chinese [China]</label>
         <radio>1</radio>
       </object>
       <object class="wxMenuItem" name="ExternalTranslations">

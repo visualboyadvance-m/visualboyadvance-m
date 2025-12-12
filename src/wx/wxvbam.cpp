@@ -119,11 +119,23 @@ void ResetMenuItemAccelerator(wxMenuItem* menu_item) {
 
     if (best_input) {
 #ifdef __WXMAC__
-        // On macOS, use space and parentheses instead of tab separator
-        // because wxWidgets may strip unrecognized modifiers from tab-separated accelerators
-        new_label.append(" (");
-        new_label.append(best_input->ToLocalizedString());
-        new_label.append(")");
+        // On macOS, check if we can use native display or need parentheses
+        const wxKeyModifier mod = best_input->keyboard_input().mod();
+        const bool has_raw_ctrl = (mod & wxMOD_RAW_CONTROL) != 0;
+        const bool has_extended = config::HasExtendedModifiers(best_input->keyboard_input().mod_extended());
+
+        if (has_raw_ctrl || has_extended) {
+            // Use parentheses for Control key and extended modifiers
+            new_label.append(" (");
+            new_label.append(best_input->ToLocalizedString());
+            new_label.append(")");
+        } else {
+            // Use wxAcceleratorEntry for native display (⌘ symbol for Command)
+            wxAcceleratorEntry* accel = new wxAcceleratorEntry(
+                mod,
+                best_input->keyboard_input().key());
+            menu_item->SetAccel(accel);
+        }
 #else
         new_label.append('\t');
         new_label.append(best_input->ToLocalizedString());
@@ -1394,6 +1406,23 @@ void MainFrame::ResetMenuAccelerators() {
         }
         ResetMenuItemAccelerator(cmd_item.mi);
     }
+
+    // Handle standard wxWidgets IDs that aren't in cmdtab
+    wxMenuBar* menu_bar = GetMenuBar();
+    if (menu_bar) {
+        // wxID_CLOSE (File -> Close)
+        wxMenuItem* close_item = menu_bar->FindItem(wxID_CLOSE);
+        if (close_item) {
+            ResetMenuItemAccelerator(close_item);
+        }
+
+        // wxID_EXIT (File -> Quit)
+        wxMenuItem* exit_item = menu_bar->FindItem(wxID_EXIT);
+        if (exit_item) {
+            ResetMenuItemAccelerator(exit_item);
+        }
+    }
+
     ResetRecentAccelerators();
 }
 

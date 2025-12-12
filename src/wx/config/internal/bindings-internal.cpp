@@ -3,7 +3,13 @@
 
 #include <unordered_set>
 
+#include <wx/defs.h>
 #include <wx/xrc/xmlres.h>
+
+// wxMOD_CMD is defined in wxWidgets 2.9.3+ as an enum value
+// On all platforms: wxMOD_CMD = wxMOD_CONTROL
+// On macOS: wxMOD_CONTROL represents the Command key (⌘)
+// On other platforms: wxMOD_CONTROL represents the Control key
 
 #define VBAM_BINDINGS_INTERNAL_INCLUDE
 #include "wx/config/internal/bindings-internal.h"
