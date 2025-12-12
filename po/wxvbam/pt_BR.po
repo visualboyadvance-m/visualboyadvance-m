@@ -320,12 +320,12 @@ msgstr "Esperando pelo GDB..."
 #: cmdevents.cpp:2282
 #, c-format
 msgid "Filter: %s"
-msgstr ""
+msgstr "Filtro: %s"
 
 #: cmdevents.cpp:2290
 #, c-format
 msgid "Interframe Blending: %s"
-msgstr ""
+msgstr "Mistura dos interframes: %s"
 
 #: cmdevents.cpp:2339
 msgid ""
