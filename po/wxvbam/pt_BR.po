@@ -39,7 +39,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 13:00+0000\n"
+"POT-Creation-Date: 2025-12-12 18:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Mateus, 2020\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/bgk/vba-m/language/pt_BR/)\n"
@@ -71,7 +71,7 @@ msgstr "Falhou em alocar o buffer do CoreAudio %d: erro %d"
 msgid "Failed to start CoreAudio queue: error %d"
 msgstr "Falhou em iniciar a fila do CoreAudio: erro %d"
 
-#: cmdevents.cpp:63 wxvbam.cpp:714
+#: cmdevents.cpp:63 wxvbam.cpp:726
 msgid "Could not create main window"
 msgstr "Não conseguiu criar a janela principal"
 
@@ -839,7 +839,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Não pôde criar o diretório de Salvamentos Nativos:\n%s\n\nPor favor verifique seu caminho configurado em Opções > Diretórios."
 
-#: panel.cpp:815 panel.cpp:836 wxvbam.cpp:1236
+#: panel.cpp:815 panel.cpp:836 wxvbam.cpp:1248
 msgid "Directory Error"
 msgstr "Erro do Diretório"
 
@@ -1233,76 +1233,76 @@ msgstr "Azul:"
 msgid "Unable to load dialog %s from resources"
 msgstr "Incapaz de carregar o diálogo %s a partir dos recursos"
 
-#: wxvbam.cpp:531 wxvbam.cpp:548
+#: wxvbam.cpp:543 wxvbam.cpp:560
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "Arquivo de configuração inválido fornecido: %s"
 
-#: wxvbam.cpp:813
+#: wxvbam.cpp:825
 msgid "Save built-in XRC file and exit"
 msgstr "Salvar o arquivo e a saída embutidos do XRC"
 
-#: wxvbam.cpp:816
+#: wxvbam.cpp:828
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Salvar o vba-over.ini embutido e sair"
 
-#: wxvbam.cpp:819
+#: wxvbam.cpp:831
 msgid "Print configuration path and exit"
 msgstr "Imprimir o caminho e a saída da configuração"
 
-#: wxvbam.cpp:822
+#: wxvbam.cpp:834
 msgid "Start in full-screen mode"
 msgstr "Iniciar no modo de tela cheia"
 
-#: wxvbam.cpp:825
+#: wxvbam.cpp:837
 msgid "Set a configuration file"
 msgstr "Definir um arquivo de configuração"
 
-#: wxvbam.cpp:829
+#: wxvbam.cpp:841
 msgid "Delete shared link state first, if it exists"
 msgstr "Apagar o estado do link compartilhado primeiro se ele existir"
 
-#: wxvbam.cpp:836
+#: wxvbam.cpp:848
 msgid "List all settable options and exit"
 msgstr "Listar todas as opções configuráveis e sair"
 
-#: wxvbam.cpp:839
+#: wxvbam.cpp:851
 msgid "ROM file"
 msgstr "Arquivo da ROM"
 
-#: wxvbam.cpp:841
+#: wxvbam.cpp:853
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:872
+#: wxvbam.cpp:884
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "Erro de configuração/compilação: não consegue achar o xrc embutido"
 
-#: wxvbam.cpp:880
+#: wxvbam.cpp:892
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Gravou a configuração embutida em %s.\nPra substituir remova tudo menos o(s) nó(s) raiz mudado(s). O Primeiro nó raiz encontrado do nome correto em quaisquer arquivos .xrc ou .xrs no seguinte caminho de busca substitui o embutido:"
 
-#: wxvbam.cpp:894
+#: wxvbam.cpp:906
 msgid "Configuration is read from, in order:"
 msgstr "De onde a configuração é lida, em ordem:"
 
-#: wxvbam.cpp:908
+#: wxvbam.cpp:920
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "Gravou o arquivo de substituição embutido em %s\nPra substituir apague tudo menos a seção mudada. A primeira seção encontrada é usada no caminho da busca:"
 
-#: wxvbam.cpp:914
+#: wxvbam.cpp:926
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tembutido"
 
-#: wxvbam.cpp:929
+#: wxvbam.cpp:941
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1310,21 +1310,21 @@ msgid ""
 "\n"
 msgstr "As opções definidas na linha de comando são salvas se quaisquer mudanças de configuração são feitas na interface do usuário.\n\nPras opções de bandeira o verdadeiro e o falso estão especificados como 1 e 0 respectivamente.\n\n"
 
-#: wxvbam.cpp:937
+#: wxvbam.cpp:949
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Os comandos disponíveis para a opção Teclado/* são:\n\n"
 
-#: wxvbam.cpp:949
+#: wxvbam.cpp:961
 msgid "Configuration file not found."
 msgstr "Arquivo de configuração não encontrado."
 
-#: wxvbam.cpp:980
+#: wxvbam.cpp:992
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Opção ruim da configuração ou múltiplos arquivos de ROMs dados:\n"
 
-#: wxvbam.cpp:1235
+#: wxvbam.cpp:1247
 #, c-format
 msgid ""
 "Could not create directory:\n"
@@ -3839,8 +3839,8 @@ msgid "&LCD Filter"
 msgstr "&Filtro LCD"
 
 #: xrc/MainMenu.xrc:521
-msgid "&Game Boy Colorizer Hack (requires restart)"
-msgstr "&Hack colorizador do Game Boy (requer reiniciar)"
+msgid "&Game Boy Colorizer Hack [requires restart]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:525
 msgid "&Game Boy printer"
@@ -3855,8 +3855,8 @@ msgid "&Save printouts as screen captures"
 msgstr "&Salvar as impressões como capturas de tela"
 
 #: xrc/MainMenu.xrc:538
-msgid "&Use Game Boy BIOS file (requires restart)"
-msgstr "&Usar o arquivo da BIOS do Game Boy (requer reiniciar)"
+msgid "&Use Game Boy BIOS file [requires restart]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:542
 msgid "&Use Game Boy Color BIOS file"
@@ -4055,32 +4055,32 @@ msgid "Greek"
 msgstr "Grego"
 
 #: xrc/MainMenu.xrc:769
-msgid "English (US)"
-msgstr "Inglês (EUA)"
+msgid "English [US]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:773
-msgid "Spanish (Latin American)"
-msgstr "Espanhol (Latino Americano)"
+msgid "Spanish [Latin American]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:777
-msgid "Spanish (Colombia)"
-msgstr "Espanhol (Colômbia)"
+msgid "Spanish [Colombia]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:781
-msgid "Spanish (Peru)"
-msgstr "Espanhol (Peru)"
+msgid "Spanish [Peru]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:785
-msgid "Spanish (United States)"
-msgstr "Espanhol (Estados Unidos)"
+msgid "Spanish [United States]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:789
 msgid "Spanish"
 msgstr "Espanhol"
 
 #: xrc/MainMenu.xrc:793
-msgid "French (France)"
-msgstr "Francês (França)"
+msgid "French [France]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:797
 msgid "French"
@@ -4091,12 +4091,12 @@ msgid "Galician"
 msgstr "Galego"
 
 #: xrc/MainMenu.xrc:805
-msgid "Hebrew (Israel)"
-msgstr "Hebraico (Israel)"
+msgid "Hebrew [Israel]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:809
-msgid "Hungarian (Hungary)"
-msgstr "Húngaro (Hungria)"
+msgid "Hungarian [Hungary]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:813
 msgid "Hungarian"
@@ -4115,16 +4115,16 @@ msgid "Japanese"
 msgstr "Japonês"
 
 #: xrc/MainMenu.xrc:829
-msgid "Korean (Korea)"
-msgstr "Coreano (Coréia)"
+msgid "Korean [Korea]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:833
 msgid "Korean"
 msgstr "Coreano"
 
 #: xrc/MainMenu.xrc:837
-msgid "Malay (Malaysia)"
-msgstr "Malaio (Malásia)"
+msgid "Malay [Malaysia]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:841
 msgid "Norwegian"
@@ -4135,24 +4135,24 @@ msgid "Dutch"
 msgstr "Holandês"
 
 #: xrc/MainMenu.xrc:849
-msgid "Polish (Poland)"
-msgstr "Polonês (Polônia)"
+msgid "Polish [Poland]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:853
 msgid "Polish"
 msgstr "Polonês"
 
 #: xrc/MainMenu.xrc:857
-msgid "Portuguese (Brazil)"
-msgstr "Português (Brasil)"
+msgid "Portuguese [Brazil]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:861
-msgid "Portuguese (Portugal)"
-msgstr "Português (Portugal)"
+msgid "Portuguese [Portugal]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:865
-msgid "Russian (Russia)"
-msgstr "Russo (Rússia)"
+msgid "Russian [Russia]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:869
 msgid "Swedish"
@@ -4167,12 +4167,12 @@ msgid "Ukrainian"
 msgstr "Ucraniano"
 
 #: xrc/MainMenu.xrc:881
-msgid "Urdu (Pakistan)"
-msgstr "Urdu (Paquistão)"
+msgid "Urdu [Pakistan]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:885
-msgid "Chinese (China)"
-msgstr "Chinês (China)"
+msgid "Chinese [China]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:889
 msgid "&Use external translations"

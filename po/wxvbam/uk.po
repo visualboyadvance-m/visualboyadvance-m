@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 13:00+0000\n"
+"POT-Creation-Date: 2025-12-12 18:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Svyatoslav <zarazafamila@gmail.com>, 2023\n"
 "Language-Team: Ukrainian (http://app.transifex.com/bgk/vba-m/language/uk/)\n"
@@ -41,7 +41,7 @@ msgstr "Не вдалося призначити буфер Core Audio %d: по�
 msgid "Failed to start CoreAudio queue: error %d"
 msgstr "Не вдалося почати чергу Core Audio: помилка %d."
 
-#: cmdevents.cpp:63 wxvbam.cpp:714
+#: cmdevents.cpp:63 wxvbam.cpp:726
 msgid "Could not create main window"
 msgstr "Неможливо створити головне вікно."
 
@@ -809,7 +809,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Неможливо створити каталог рідних збережень:\n%s.\n\nПеревір налаштований шлях у Опції → Каталоги."
 
-#: panel.cpp:815 panel.cpp:836 wxvbam.cpp:1236
+#: panel.cpp:815 panel.cpp:836 wxvbam.cpp:1248
 msgid "Directory Error"
 msgstr "Помилка каталогу."
 
@@ -1203,76 +1203,76 @@ msgstr "Синій:"
 msgid "Unable to load dialog %s from resources"
 msgstr "Неможливо завантажити вікно %s з ресурсів."
 
-#: wxvbam.cpp:531 wxvbam.cpp:548
+#: wxvbam.cpp:543 wxvbam.cpp:560
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "Надано недійсний файл конфігурації: %s."
 
-#: wxvbam.cpp:813
+#: wxvbam.cpp:825
 msgid "Save built-in XRC file and exit"
 msgstr "Зберегти вбудований XRC та вийти"
 
-#: wxvbam.cpp:816
+#: wxvbam.cpp:828
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Зберегти вбудований vba-over.ini та вийти"
 
-#: wxvbam.cpp:819
+#: wxvbam.cpp:831
 msgid "Print configuration path and exit"
 msgstr "Роздрукувати шлях конфігурації та вийти"
 
-#: wxvbam.cpp:822
+#: wxvbam.cpp:834
 msgid "Start in full-screen mode"
 msgstr "Запускати в повному екрані"
 
-#: wxvbam.cpp:825
+#: wxvbam.cpp:837
 msgid "Set a configuration file"
 msgstr "Встановити файл конфігурації"
 
-#: wxvbam.cpp:829
+#: wxvbam.cpp:841
 msgid "Delete shared link state first, if it exists"
 msgstr "Видалити спочатку стан загального з'єднання за наявності"
 
-#: wxvbam.cpp:836
+#: wxvbam.cpp:848
 msgid "List all settable options and exit"
 msgstr "Показати всі налаштовувані опції та вийти"
 
-#: wxvbam.cpp:839
+#: wxvbam.cpp:851
 msgid "ROM file"
 msgstr "ROM-файл"
 
-#: wxvbam.cpp:841
+#: wxvbam.cpp:853
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:872
+#: wxvbam.cpp:884
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "Помилка конфігурації / випуску: неможливо знайти вбудований xrc."
 
-#: wxvbam.cpp:880
+#: wxvbam.cpp:892
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Записано вбудовану конфігурацію до %s.\nДля перевизначення вилучи всі вузли, крім змінених кореневих. Перший знайдений кореневий вузол із правильним іменем у будь-якому файлі .xrc чи .xrs у наведених шляхах пошуку перевизначає вбудований:"
 
-#: wxvbam.cpp:894
+#: wxvbam.cpp:906
 msgid "Configuration is read from, in order:"
 msgstr "Конфігурацію прочитано з файлів за порядком:"
 
-#: wxvbam.cpp:908
+#: wxvbam.cpp:920
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "Записано вбудоване перевизначення файлу до %s.\nДля перевизначення видали всі розділи, крім змінених. Перший знайдений розділ буде використано зі шляху пошуку:"
 
-#: wxvbam.cpp:914
+#: wxvbam.cpp:926
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tвбудовано"
 
-#: wxvbam.cpp:929
+#: wxvbam.cpp:941
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1280,21 +1280,21 @@ msgid ""
 "\n"
 msgstr "Опції, встановлені з командного рядка, буде збережено при зміні конфігурації інтерфейсу користувача.\n\nДля позначення значення \"істина\" та \"хиба\" вказуються як 1 і 0 відповідно.\n\n"
 
-#: wxvbam.cpp:937
+#: wxvbam.cpp:949
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Доступні команди для опцій клавіатури:\n"
 
-#: wxvbam.cpp:949
+#: wxvbam.cpp:961
 msgid "Configuration file not found."
 msgstr "Файл конфігурації не знайдено."
 
-#: wxvbam.cpp:980
+#: wxvbam.cpp:992
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Неправильна опція конфігурації чи вибрано декілька ROM'ів:\n"
 
-#: wxvbam.cpp:1235
+#: wxvbam.cpp:1247
 #, c-format
 msgid ""
 "Could not create directory:\n"
@@ -3809,8 +3809,8 @@ msgid "&LCD Filter"
 msgstr "&LCD-фільтр"
 
 #: xrc/MainMenu.xrc:521
-msgid "&Game Boy Colorizer Hack (requires restart)"
-msgstr "Колірний &хак Game Boy (необхідний перезапуск)"
+msgid "&Game Boy Colorizer Hack [requires restart]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:525
 msgid "&Game Boy printer"
@@ -3825,8 +3825,8 @@ msgid "&Save printouts as screen captures"
 msgstr "&Зберегти роздруківки як захоплення екрана"
 
 #: xrc/MainMenu.xrc:538
-msgid "&Use Game Boy BIOS file (requires restart)"
-msgstr "&Використовувати Game Boy BIOS (необхідний перезапуск)"
+msgid "&Use Game Boy BIOS file [requires restart]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:542
 msgid "&Use Game Boy Color BIOS file"
@@ -4025,32 +4025,32 @@ msgid "Greek"
 msgstr "Elliniká (Ελληνικά)"
 
 #: xrc/MainMenu.xrc:769
-msgid "English (US)"
-msgstr "English (English)"
+msgid "English [US]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:773
-msgid "Spanish (Latin American)"
-msgstr "Spanish Latin American (Español Latinoamericano)"
+msgid "Spanish [Latin American]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:777
-msgid "Spanish (Colombia)"
-msgstr "Spanish Colombian (Español Colombiano)"
+msgid "Spanish [Colombia]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:781
-msgid "Spanish (Peru)"
-msgstr "Spanish Peruvian (Español Peruano)"
+msgid "Spanish [Peru]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:785
-msgid "Spanish (United States)"
-msgstr "Spanish American United States (Español Americano Estadounidense)"
+msgid "Spanish [United States]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:789
 msgid "Spanish"
 msgstr "Spanish (Español)"
 
 #: xrc/MainMenu.xrc:793
-msgid "French (France)"
-msgstr "French (Français)"
+msgid "French [France]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:797
 msgid "French"
@@ -4061,12 +4061,12 @@ msgid "Galician"
 msgstr "Galician (Galego)"
 
 #: xrc/MainMenu.xrc:805
-msgid "Hebrew (Israel)"
-msgstr "Ivrit (עברית)"
+msgid "Hebrew [Israel]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:809
-msgid "Hungarian (Hungary)"
-msgstr "Hungarian (Magyar)"
+msgid "Hungarian [Hungary]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:813
 msgid "Hungarian"
@@ -4085,16 +4085,16 @@ msgid "Japanese"
 msgstr "Nihongo (日本語)"
 
 #: xrc/MainMenu.xrc:829
-msgid "Korean (Korea)"
-msgstr "Hangug-Eo (한국어)"
+msgid "Korean [Korea]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:833
 msgid "Korean"
 msgstr "Hangug-Eo (한국어) (Non-Region-Specific)"
 
 #: xrc/MainMenu.xrc:837
-msgid "Malay (Malaysia)"
-msgstr "Malay (Melayu)"
+msgid "Malay [Malaysia]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:841
 msgid "Norwegian"
@@ -4105,24 +4105,24 @@ msgid "Dutch"
 msgstr "Dutch (Nederlands)"
 
 #: xrc/MainMenu.xrc:849
-msgid "Polish (Poland)"
-msgstr "Polish (Polski)"
+msgid "Polish [Poland]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:853
 msgid "Polish"
 msgstr "Polish (Polski) (Non-Region-Specific)"
 
 #: xrc/MainMenu.xrc:857
-msgid "Portuguese (Brazil)"
-msgstr "Portuguese Brazilian (Português Brasileiro)"
+msgid "Portuguese [Brazil]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:861
-msgid "Portuguese (Portugal)"
-msgstr "Portuguese (Português)"
+msgid "Portuguese [Portugal]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:865
-msgid "Russian (Russia)"
-msgstr "Russian (Русский)"
+msgid "Russian [Russia]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:869
 msgid "Swedish"
@@ -4137,12 +4137,12 @@ msgid "Ukrainian"
 msgstr "Ukrainian (Українська)"
 
 #: xrc/MainMenu.xrc:881
-msgid "Urdu (Pakistan)"
-msgstr "Urdū (اُردُو)"
+msgid "Urdu [Pakistan]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:885
-msgid "Chinese (China)"
-msgstr "Zhōngwén Jiǎntǐ (中文简体)"
+msgid "Chinese [China]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:889
 msgid "&Use external translations"

@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 13:00+0000\n"
+"POT-Creation-Date: 2025-12-12 18:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Thibault <thibaultbruneliere@gmail.com>, 2019\n"
 "Language-Team: French (France) (http://app.transifex.com/bgk/vba-m/language/fr_FR/)\n"
@@ -52,7 +52,7 @@ msgstr ""
 msgid "Failed to start CoreAudio queue: error %d"
 msgstr ""
 
-#: cmdevents.cpp:63 wxvbam.cpp:714
+#: cmdevents.cpp:63 wxvbam.cpp:726
 msgid "Could not create main window"
 msgstr "Impossible de créer la fenêtre principale"
 
@@ -820,7 +820,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr ""
 
-#: panel.cpp:815 panel.cpp:836 wxvbam.cpp:1236
+#: panel.cpp:815 panel.cpp:836 wxvbam.cpp:1248
 msgid "Directory Error"
 msgstr ""
 
@@ -1214,76 +1214,76 @@ msgstr "Bleu :"
 msgid "Unable to load dialog %s from resources"
 msgstr "Impossible de charger le dialogue %s depuis les ressources"
 
-#: wxvbam.cpp:531 wxvbam.cpp:548
+#: wxvbam.cpp:543 wxvbam.cpp:560
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "Fichier de configuration invalide : %s"
 
-#: wxvbam.cpp:813
+#: wxvbam.cpp:825
 msgid "Save built-in XRC file and exit"
 msgstr "Sauvegarder le fichier XRC intégré et quitter"
 
-#: wxvbam.cpp:816
+#: wxvbam.cpp:828
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Sauvegarder le fichier vba-over.ini intégré et quitter"
 
-#: wxvbam.cpp:819
+#: wxvbam.cpp:831
 msgid "Print configuration path and exit"
 msgstr "Afficher le chemin de configuration et quitter"
 
-#: wxvbam.cpp:822
+#: wxvbam.cpp:834
 msgid "Start in full-screen mode"
 msgstr "Démarrer en mode plein écran"
 
-#: wxvbam.cpp:825
+#: wxvbam.cpp:837
 msgid "Set a configuration file"
 msgstr "Choisir un fichier de configuration"
 
-#: wxvbam.cpp:829
+#: wxvbam.cpp:841
 msgid "Delete shared link state first, if it exists"
 msgstr "Supprimer l'objet de mémoire partagé, s'il existe"
 
-#: wxvbam.cpp:836
+#: wxvbam.cpp:848
 msgid "List all settable options and exit"
 msgstr "Lister toutes les options configurables et quitter"
 
-#: wxvbam.cpp:839
+#: wxvbam.cpp:851
 msgid "ROM file"
 msgstr "Fichier ROM"
 
-#: wxvbam.cpp:841
+#: wxvbam.cpp:853
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:872
+#: wxvbam.cpp:884
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "Erreur de configuration / d'assemblage : impossible de trouver le fichier xrc intégré"
 
-#: wxvbam.cpp:880
+#: wxvbam.cpp:892
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Configuration intégrée enregistrée sur %s.\nPour passer outre, tout enlever sauf le·s nœud·s de racine modifié·s. D'abord trouver le nœud racine au nom correct dans tous les fichiers .xrc ou .xrs dans le chemin de recherche suivant les chemins d'accès intégrés :"
 
-#: wxvbam.cpp:894
+#: wxvbam.cpp:906
 msgid "Configuration is read from, in order:"
 msgstr "La configuration est lue depuis, dans l'ordre :"
 
-#: wxvbam.cpp:908
+#: wxvbam.cpp:920
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "Override intégré enregistré sur %s\nPour passer outre, tout supprimer sauf la section changée. La première section trouvée est utilisée depuis le chemin de recherche :"
 
-#: wxvbam.cpp:914
+#: wxvbam.cpp:926
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tintégré"
 
-#: wxvbam.cpp:929
+#: wxvbam.cpp:941
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1291,21 +1291,21 @@ msgid ""
 "\n"
 msgstr "Les options définies depuis la ligne de commande sont sauvegardées si des changements de configuration sont faits dans l'interface utilisateur.\n\nPour les options flag, vrai et faux sont spécifiés comme 1 et 0, respectivement.\n\n"
 
-#: wxvbam.cpp:937
+#: wxvbam.cpp:949
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Les commandes disponibles pour les options Keyboard/* sont :\n\n"
 
-#: wxvbam.cpp:949
+#: wxvbam.cpp:961
 msgid "Configuration file not found."
 msgstr "Fichier de configuration introuvable."
 
-#: wxvbam.cpp:980
+#: wxvbam.cpp:992
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Mauvaise option de configuration ou plusieurs fichiers ROM fournis :\n"
 
-#: wxvbam.cpp:1235
+#: wxvbam.cpp:1247
 #, c-format
 msgid ""
 "Could not create directory:\n"
@@ -3820,8 +3820,8 @@ msgid "&LCD Filter"
 msgstr "Filtre &LCD"
 
 #: xrc/MainMenu.xrc:521
-msgid "&Game Boy Colorizer Hack (requires restart)"
-msgstr "Hack de colorisation &Game Boy (redémarrage requis)"
+msgid "&Game Boy Colorizer Hack [requires restart]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:525
 msgid "&Game Boy printer"
@@ -3836,8 +3836,8 @@ msgid "&Save printouts as screen captures"
 msgstr "&Sauvegarder les sorties d'impression en tant que captures d'écran"
 
 #: xrc/MainMenu.xrc:538
-msgid "&Use Game Boy BIOS file (requires restart)"
-msgstr "&Utiliser le fichier BIOS Game Boy (redémarrage requis)"
+msgid "&Use Game Boy BIOS file [requires restart]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:542
 msgid "&Use Game Boy Color BIOS file"
@@ -4036,32 +4036,32 @@ msgid "Greek"
 msgstr "Grec"
 
 #: xrc/MainMenu.xrc:769
-msgid "English (US)"
-msgstr "Anglais (US)"
+msgid "English [US]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:773
-msgid "Spanish (Latin American)"
-msgstr "Espagnol (Amérique latine)"
+msgid "Spanish [Latin American]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:777
-msgid "Spanish (Colombia)"
-msgstr "Espagnol (Colombie)"
+msgid "Spanish [Colombia]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:781
-msgid "Spanish (Peru)"
-msgstr "Espagnol (Pérou)"
+msgid "Spanish [Peru]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:785
-msgid "Spanish (United States)"
-msgstr "Espagnol (États-Unis)"
+msgid "Spanish [United States]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:789
 msgid "Spanish"
 msgstr "Espagnol"
 
 #: xrc/MainMenu.xrc:793
-msgid "French (France)"
-msgstr "Français (France)"
+msgid "French [France]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:797
 msgid "French"
@@ -4072,12 +4072,12 @@ msgid "Galician"
 msgstr "Galicien"
 
 #: xrc/MainMenu.xrc:805
-msgid "Hebrew (Israel)"
-msgstr "Hébreu (Israël)"
+msgid "Hebrew [Israel]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:809
-msgid "Hungarian (Hungary)"
-msgstr "Hongrois (Hongrie)"
+msgid "Hungarian [Hungary]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:813
 msgid "Hungarian"
@@ -4096,16 +4096,16 @@ msgid "Japanese"
 msgstr "Japonais"
 
 #: xrc/MainMenu.xrc:829
-msgid "Korean (Korea)"
-msgstr "Coréen (Corée)"
+msgid "Korean [Korea]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:833
 msgid "Korean"
 msgstr "Coréen"
 
 #: xrc/MainMenu.xrc:837
-msgid "Malay (Malaysia)"
-msgstr "Malaisien (Malaisie)"
+msgid "Malay [Malaysia]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:841
 msgid "Norwegian"
@@ -4116,24 +4116,24 @@ msgid "Dutch"
 msgstr "Néerlandais"
 
 #: xrc/MainMenu.xrc:849
-msgid "Polish (Poland)"
-msgstr "Polonais (Pologne)"
+msgid "Polish [Poland]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:853
 msgid "Polish"
 msgstr "Polonais"
 
 #: xrc/MainMenu.xrc:857
-msgid "Portuguese (Brazil)"
-msgstr "Portugais (Brésil)"
+msgid "Portuguese [Brazil]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:861
-msgid "Portuguese (Portugal)"
-msgstr "Portugais (Portugal)"
+msgid "Portuguese [Portugal]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:865
-msgid "Russian (Russia)"
-msgstr "Russe (Russie)"
+msgid "Russian [Russia]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:869
 msgid "Swedish"
@@ -4148,12 +4148,12 @@ msgid "Ukrainian"
 msgstr "Ukrainien"
 
 #: xrc/MainMenu.xrc:881
-msgid "Urdu (Pakistan)"
-msgstr "Ourdou (Pakistan)"
+msgid "Urdu [Pakistan]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:885
-msgid "Chinese (China)"
-msgstr "Chinois (Chine)"
+msgid "Chinese [China]"
+msgstr ""
 
 #: xrc/MainMenu.xrc:889
 msgid "&Use external translations"
