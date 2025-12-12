@@ -100,7 +100,6 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /*kPrefRTCEnabled*/ Option::Type::kInt,
     /*kPrefSaveType*/ Option::Type::kInt,
     /*kPrefShowSpeed*/ Option::Type::kUnsigned,
-    /*kPrefShowSpeedTransparent*/ Option::Type::kBool,
     /*kPrefSkipBios*/ Option::Type::kBool,
     /*kPrefSkipSaveGameCheats*/ Option::Type::kInt,
     /*kPrefSkipSaveGameBattery*/ Option::Type::kInt,

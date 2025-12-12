@@ -207,7 +207,6 @@ std::array<Option, kNbOptions>& Option::All() {
         bool gdb_break_on_load  = false;
         bool pause_when_inactive = false;
         uint32_t show_speed = 0;
-        bool show_speed_transparent = false;
         bool use_bios_file_gb = false;
         bool use_bios_file_gba = false;
         bool use_bios_file_gbc = false;
@@ -369,7 +368,6 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kPrefRTCEnabled, &coreOptions.rtcEnabled, 0, 1),
         Option(OptionID::kPrefSaveType, &coreOptions.cpuSaveType, 0, 5),
         Option(OptionID::kPrefShowSpeed, &g_owned_opts.show_speed, 0, 2),
-        Option(OptionID::kPrefShowSpeedTransparent, &g_owned_opts.show_speed_transparent),
         Option(OptionID::kPrefSkipBios, &coreOptions.skipBios),
         Option(OptionID::kPrefSkipSaveGameCheats, &coreOptions.skipSaveGameCheats, 0, 1),
         Option(OptionID::kPrefSkipSaveGameBattery, &coreOptions.skipSaveGameBattery, 0, 1),
@@ -568,8 +566,6 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                _("Enable RTC (vba-over.ini override is rtcEnabled")},
     OptionData{"preferences/saveType", "", _("Native save (\"battery\") hardware type")},
     OptionData{"preferences/showSpeed", "", _("Show speed indicator")},
-    OptionData{"preferences/showSpeedTransparent", "Transparent",
-               _("Draw on-screen messages transparently")},
     OptionData{"preferences/skipBios", "SkipIntro", _("Skip BIOS initialization")},
     OptionData{"preferences/skipSaveGameCheats", "",
                _("Do not overwrite cheat list when loading state")},

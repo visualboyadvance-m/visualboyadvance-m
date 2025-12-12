@@ -372,10 +372,6 @@
           <label>_Disable on-screen display</label>
           <checkable>1</checkable>
         </object>
-        <object class="wxMenuItem" name="Transparent">
-          <label>_Transparent on-screen display</label>
-          <checkable>1</checkable>
-        </object>
       </object>
       <object class="wxMenu">
         <label>_Audio</label>

@@ -2535,11 +2535,6 @@ EVT_HANDLER(RTC, "Enable RTC (vba-over.ini override is rtcEnabled")
     update_opts();
 }
 
-EVT_HANDLER(Transparent, "Draw on-screen messages transparently")
-{
-    GetMenuOptionConfig("Transparent", config::OptionID::kPrefShowSpeedTransparent);
-}
-
 EVT_HANDLER(SkipIntro, "Skip BIOS initialization")
 {
     GetMenuOptionConfig("SkipIntro", config::OptionID::kPrefSkipBios);

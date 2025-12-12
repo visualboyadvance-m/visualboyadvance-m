@@ -138,10 +138,8 @@ long GetSampleRate() {
 
 // Draw Unicode text on raw pixel buffer using wxWidgets
 void drawTextWx(uint8_t* buffer, int pitch, int x, int y, const wxString& text,
-                bool transparent, int buffer_width, int buffer_height, double scale) {
+                int buffer_width, int buffer_height, double scale) {
     if (text.empty()) return;
-
-    (void)transparent;  // unused param
 
     // Determine bytes per pixel based on color depth
     int bpp = systemColorDepth >> 3;  // 16->2, 24->3, 32->4
@@ -2407,8 +2405,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
             int x = (int)std::ceil(4 * scale);
             int y = (int)std::ceil(4 * scale);
             drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
-                x, y, statText,
-                OPTION(kPrefShowSpeedTransparent), scaled_width, scaled_height, scale);
+                x, y, statText, scaled_width, scaled_height, scale);
         }
 
         if (!panel->osdtext.empty()) {
@@ -2418,8 +2415,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                 int x = (int)std::ceil(4 * scale);
                 int y = scaled_height - (int)std::ceil(44 * scale);
                 drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
-                    x, y, panel->osdtext, OPTION(kPrefShowSpeedTransparent),
-                    scaled_width, scaled_height, scale);
+                    x, y, panel->osdtext, scaled_width, scaled_height, scale);
             } else
                 panel->osdtext.clear();
         }
@@ -2456,7 +2452,7 @@ void DrawingPanelBase::DrawOSD(wxWindowDC& dc)
     // directly into the output like DrawText, this is only enabled for
     // non-3d renderers.
     GameArea* panel = wxGetApp().frame->GetPanel();
-    dc.SetTextForeground(wxColour(255, 0, 0, OPTION(kPrefShowSpeedTransparent) ? 128 : 255));
+    dc.SetTextForeground(wxColour(255, 0, 0, 255));
     dc.SetTextBackground(wxColour(0, 0, 0, 0));
     dc.SetUserScale(1.0, 1.0);
 
@@ -3085,8 +3081,7 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
             int x = (int)std::ceil(4 * scale);
             int y = (int)std::ceil(4 * scale);
             drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
-                x, y, statText,
-                OPTION(kPrefShowSpeedTransparent), scaled_width, scaled_height, scale);
+                x, y, statText, scaled_width, scaled_height, scale);
         }
 
         if (!panel->osdtext.empty()) {
@@ -3096,8 +3091,7 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
                 int x = (int)std::ceil(4 * scale);
                 int y = scaled_height - (int)std::ceil(44 * scale);
                 drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
-                    x, y, panel->osdtext, OPTION(kPrefShowSpeedTransparent),
-                    scaled_width, scaled_height, scale);
+                    x, y, panel->osdtext, scaled_width, scaled_height, scale);
             } else
                 panel->osdtext.clear();
         }
@@ -4453,8 +4447,7 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
             int x = (int)std::ceil(4 * scale);
             int y = (int)std::ceil(4 * scale);
             drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
-                x, y, statText,
-                OPTION(kPrefShowSpeedTransparent), scaled_width, scaled_height, scale);
+                x, y, statText, scaled_width, scaled_height, scale);
         }
 
         if (!panel->osdtext.empty()) {
@@ -4464,8 +4457,7 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
                 int x = (int)std::ceil(4 * scale);
                 int y = scaled_height - (int)std::ceil(44 * scale);
                 drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
-                    x, y, panel->osdtext, OPTION(kPrefShowSpeedTransparent),
-                    scaled_width, scaled_height, scale);
+                    x, y, panel->osdtext, scaled_width, scaled_height, scale);
             } else
                 panel->osdtext.clear();
         }

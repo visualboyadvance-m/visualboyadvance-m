@@ -96,7 +96,6 @@ enum class OptionID {
     kPrefRTCEnabled,
     kPrefSaveType,
     kPrefShowSpeed,
-    kPrefShowSpeedTransparent,
     kPrefSkipBios,
     kPrefSkipSaveGameCheats,
     kPrefSkipSaveGameBattery,
