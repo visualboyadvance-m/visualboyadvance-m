@@ -2278,11 +2278,17 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
 EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
 {
     OPTION(kDispFilter).Next();
+    wxString msg;
+    msg.Printf(_("Filter: %s"), config::Option::ByID(config::OptionID::kDispFilter)->GetEnumString());
+    systemScreenMessage(msg);
 }
 
 EVT_HANDLER_MASK(ChangeIFB, "Change Interframe Blending", CMDEN_NREC_ANY)
 {
     OPTION(kDispIFB).Next();
+    wxString msg;
+    msg.Printf(_("Interframe Blending: %s"), config::Option::ByID(config::OptionID::kDispIFB)->GetEnumString());
+    systemScreenMessage(msg);
 }
 
 EVT_HANDLER_MASK(SoundConfigure, "Sound options...", CMDEN_NREC_ANY)
