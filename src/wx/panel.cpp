@@ -4,9 +4,11 @@
 
 #include "wx/wxvbam.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include <thread>
 
 #ifdef __WXGTK__
     #include <X11/Xlib.h>
@@ -110,6 +112,93 @@ double GetFilterScale() {
             VBAM_NOTREACHED_RETURN(1.0);
     }
     VBAM_NOTREACHED_RETURN(1.0);
+}
+
+// Maximum number of filter threads, capped at 6 to avoid diminishing returns
+// and potential issues with filter state sharing.
+int GetMaxFilterThreads() {
+    unsigned int hw_threads = std::thread::hardware_concurrency();
+    if (hw_threads == 0)
+        hw_threads = 1;  // Fallback if hardware_concurrency fails
+    return static_cast<int>(std::min(hw_threads, 6u));
+}
+
+// Apply the currently selected 32-bit filter to the image region.
+// This is the core filter dispatch function used by both threaded rendering
+// and seam smoothing. Plugin filters are not supported here.
+void ApplyFilter32(uint8_t* src, int instride, uint8_t* delta, uint8_t* dst,
+                   int outstride, int width, int height) {
+    switch (OPTION(kDispFilter)) {
+        case config::Filter::k2xsai:
+            _2xSaI32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kSuper2xsai:
+            Super2xSaI32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kSupereagle:
+            SuperEagle32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kPixelate:
+            Pixelate32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kAdvmame:
+            AdMame2x32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kBilinear:
+            Bilinear32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kBilinearplus:
+            BilinearPlus32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kScanlines:
+            Scanlines32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kTvmode:
+            ScanlinesTV32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kLQ2x:
+            lq2x32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kSimple2x:
+            Simple2x32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kSimple3x:
+            Simple3x32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kSimple4x:
+            Simple4x32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kHQ2x:
+            hq2x32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kHQ3x:
+            hq3x32_32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kHQ4x:
+            hq4x32_32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kXbrz2x:
+            xbrz2x32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kXbrz3x:
+            xbrz3x32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kXbrz4x:
+            xbrz4x32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kXbrz5x:
+            xbrz5x32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kXbrz6x:
+            xbrz6x32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kPlugin:
+            // Plugin filters require RENDER_PLUGIN_INFO, not supported here
+            break;
+        case config::Filter::kNone:
+        case config::Filter::kLast:
+            break;
+    }
 }
 
 long GetSampleRate() {
@@ -1771,7 +1860,14 @@ void DrawingPanelBase::EraseBackground(wxEraseEvent& ev)
 //   interface, I will allow them to be threaded at user's discretion.
 class FilterThread : public wxThread {
 public:
-    FilterThread() : wxThread(wxTHREAD_JOINABLE), lock_(), sig_(lock_) {}
+    FilterThread() : wxThread(wxTHREAD_JOINABLE), lock_(), sig_(lock_),
+                     src2_(nullptr), dst2_(nullptr), src2_size_(0), dst2_size_(0) {}
+
+    ~FilterThread() {
+        // Free pre-allocated conversion buffers
+        if (src2_) free(src2_);
+        if (dst2_) free(dst2_);
+    }
 
     wxMutex lock_;
     wxCondition sig_;
@@ -1791,52 +1887,95 @@ public:
     // if NULL, end thread
     uint8_t* src_;
 
+    // Pre-allocated conversion buffers (reused across frames)
+    uint32_t* src2_;
+    uint32_t* dst2_;
+    size_t src2_size_;
+    size_t dst2_size_;
+
     ExitCode Entry() override {
-        // This is the band this thread will process
-        // threadno == -1 means just do a dummy round on the border line
+        // Pre-compute all constants once at thread start (not per-frame)
         const int height_real = height_;
         const int procy = height_ * threadno_ / nthreads_;
         height_ = height_ * (threadno_ + 1) / nthreads_ - procy;
+
+        // Cache depth format flags for fast branching
+        const bool is_8bit = out_8;
+        const bool is_16bit = out_16;
+        const bool is_24bit = out_24;
+        const bool is_32bit = !is_8bit && !is_16bit && !is_24bit;
+
+        // Pre-compute strides using integer math where possible
         const int inbpp = systemColorDepth >> 3;
-        const int inrb = out_8 ? 4 : out_16  ? 2
-                         : out_24 ? 0 : 1;
+        const int inrb = is_8bit ? 4 : is_16bit ? 2 : is_24bit ? 0 : 1;
         const int instride = (width_ + inrb) * inbpp;
-        // For 32bpp conversion: 32bpp filters need left+right borders of 1 each
-        const int inrb32 = 1;
-        const int total_width32 = 1 + width_ + inrb32;  // left + image + right
+
+        // For 32bpp conversion: filters need left+right borders of 1 each
+        const int total_width32 = width_ + 2;  // left border + image + right border
         const int instride32 = total_width32 * 4;
+
         const int outbpp = systemColorDepth >> 3;
-        const int outrb = out_8 ? 4 : out_24 ? 0 : 4;
-        (void)outrb; // unused
-        const int outstride = std::ceil((width_ + inrb) * outbpp * scale_);
-        // For 32bpp conversion output: filters write width*scale pixels (no borders)
-        const int outstride32 = std::ceil(width_ * 4 * scale_);
-        uint8_t *dest = NULL;
-        int pos = 0;
-        uint32_t *src2_ = NULL;
-        uint32_t *dst2_ = NULL;
+        // Use integer scale calculation (scale_ is typically 2, 3, 4, etc.)
+        const int scale_int = static_cast<int>(scale_);
+        const int outstride = (width_ + inrb) * outbpp * scale_int;
+        const int outstride32 = width_ * 4 * scale_int;
+
+        // Pre-compute source offset (procy + 1 rows)
+        const int src_offset = instride * (procy + 1);
+
+        // Adjust delta once for this thread's band
         delta_ += instride * procy;
 
         // Skip scale rows of top border in output buffer
-        // All renderers skip the same amount in the filter output
-        dst_ += (int)std::ceil(outstride * (procy + 1) * scale_);
+        dst_ += outstride * (procy + 1) * scale_int;
 
-        dest = dst_;
+        uint8_t* const dest = dst_;
+
+        // Pre-allocate conversion buffers for non-32bpp modes (reused across frames)
+        if (!is_32bit) {
+            // Calculate required buffer sizes
+            const size_t src2_required = static_cast<size_t>(total_width32) * (height_real + 3);
+            const size_t dst2_required = static_cast<size_t>(width_ * scale_int) * (height_real * scale_int + scale_int);
+
+            // Reallocate only if needed (buffers persist across frames)
+            if (src2_size_ < src2_required) {
+                if (src2_) free(src2_);
+                src2_ = static_cast<uint32_t*>(calloc(4, src2_required));
+                src2_size_ = src2_required;
+            }
+            if (dst2_size_ < dst2_required) {
+                if (dst2_) free(dst2_);
+                dst2_ = static_cast<uint32_t*>(calloc(4, dst2_required));
+                dst2_size_ = dst2_required;
+            }
+        }
+
+        // Pre-compute scaled dimensions for conversion loops
+        const int scaled_height = height_real * scale_int;
+        const int scaled_width = width_ * scale_int;
+        const int scaled_border_dest = inrb * scale_int;
+
+        // Lock mutex before waiting on condition (required for wxCondition::Wait)
+        if (nthreads_ > 1)
+            lock_.Lock();
 
         while (nthreads_ == 1 || sig_.Wait() == wxCOND_NO_ERROR) {
-            if (!src_ /* && nthreads > 1 */) {
+            if (!src_) {
                 lock_.Unlock();
                 return 0;
             }
 
-            src_ += instride;
+            // Advance source pointer to this thread's band
+            src_ += src_offset;
 
-            // interframe blending filter
-            // definitely not thread safe by default
-            // added procy param to provide offset into accum buffers
-            ApplyInterframe(instride, procy);
+            // Cache filter options for this frame (avoid repeated lookups)
+            const config::Interframe ifb_option = OPTION(kDispIFB);
+            const config::Filter filter_option = OPTION(kDispFilter);
 
-            if (OPTION(kDispFilter) == config::Filter::kNone) {
+            // Apply interframe blending filter
+            ApplyInterframeOptimized(instride, procy, ifb_option, is_8bit, is_16bit, is_24bit);
+
+            if (filter_option == config::Filter::kNone) {
                 if (nthreads_ == 1)
                     return 0;
 
@@ -1844,18 +1983,17 @@ public:
                 continue;
             }
 
-            // src += instride * procy;
-
-            // naturally, any of these with accumulation buffers like those
-            // of the IFB filters will screw up royally as well
-            if (systemColorDepth == 32) {
-                ApplyFilter(instride, outstride);
+            // Apply filter - optimized path selection
+            if (is_32bit) {
+                // Direct 32bpp path - no conversion needed
+                ApplyFilterOptimized(instride, outstride, filter_option);
             } else {
+                // Non-32bpp: convert to 32bpp, apply filter, convert back
                 // Save current shift values (set for original depth)
-                int saved_red_shift = systemRedShift;
-                int saved_green_shift = systemGreenShift;
-                int saved_blue_shift = systemBlueShift;
-                int saved_rgb_low_bits_mask = RGB_LOW_BITS_MASK;
+                const int saved_red_shift = systemRedShift;
+                const int saved_green_shift = systemGreenShift;
+                const int saved_blue_shift = systemBlueShift;
+                const int saved_rgb_low_bits_mask = RGB_LOW_BITS_MASK;
 
                 // Set shift values for 32bpp format that filters expect
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
@@ -1870,212 +2008,146 @@ public:
                 RGB_LOW_BITS_MASK = 0x01010100;
 #endif
 
-                // 32bpp filters need both left and right borders (1 pixel each) in INPUT
-                // Also need 1 row at top for filters to read from (bP - Nextline)
-                // Some filters (SuperEagle) read 2 rows ahead, so allocate 2 extra rows at bottom
-                // Allocate: row0 (top border) + height_real rows + 2 extra rows at bottom
-                src2_ = (uint32_t *)calloc(4, std::ceil(total_width32 * (height_real + 3)));
-                // Output buffer: filters write width*scale x height*scale (no borders)
-                // Allocate extra rows at top for filters to read from (e.g., bP - Nextline)
-                dst2_ = (uint32_t *)calloc(4, std::ceil(width_ * scale_ * (height_real * scale_ + scale_)));
+                // Convert input to 32bpp (buffers pre-allocated above)
+                int pos = total_width32;  // Start at row 1 (skip row 0 for top border)
 
-                // Fill buffer starting at row 1 (skip row 0 for top border)
-                pos = total_width32;
-                if (out_8) {
+                if (is_8bit) {
+                    // 8bpp format: RRRGGGBB (3 red, 3 green, 2 blue bits)
                     int src_pos = 0;
                     for (int y = 0; y < height_real; y++) {
-                        int left_border_pos = pos;
-                        pos++;  // Move to first image pixel
-                        // Convert and copy width pixels
-                        // 8bpp format: RRRGGGBB (3 red, 3 green, 2 blue bits)
+                        const int left_border_pos = pos++;
                         for (int x = 0; x < width_; x++) {
-                            uint8_t src_val = src_[src_pos];
-                            uint8_t r3 = (src_val >> 5) & 0x7;
-                            uint8_t g3 = (src_val >> 2) & 0x7;
-                            uint8_t b2 = src_val & 0x3;
-                            // Expand to 8 bits by replication
-                            uint8_t r8 = (r3 << 5) | (r3 << 2) | (r3 >> 1);
-                            uint8_t g8 = (g3 << 5) | (g3 << 2) | (g3 >> 1);
-                            uint8_t b8 = (b2 << 6) | (b2 << 4) | (b2 << 2) | b2;
+                            const uint8_t src_val = src_[src_pos++];
+                            const uint8_t r3 = (src_val >> 5) & 0x7;
+                            const uint8_t g3 = (src_val >> 2) & 0x7;
+                            const uint8_t b2 = src_val & 0x3;
+                            const uint8_t r8 = (r3 << 5) | (r3 << 2) | (r3 >> 1);
+                            const uint8_t g8 = (g3 << 5) | (g3 << 2) | (g3 >> 1);
+                            const uint8_t b8 = (b2 << 6) | (b2 << 4) | (b2 << 2) | b2;
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
-                            src2_[pos] = b8 | (g8 << 8) | (r8 << 16);
+                            src2_[pos++] = b8 | (g8 << 8) | (r8 << 16);
 #else
-                            src2_[pos] = (r8 << 24) | (g8 << 16) | (b8 << 8);
+                            src2_[pos++] = (r8 << 24) | (g8 << 16) | (b8 << 8);
 #endif
-                            pos++;
-                            src_pos++;
                         }
-                        // Fill left border with first pixel of this row
                         src2_[left_border_pos] = src2_[left_border_pos + 1];
-                        // Fill right border with last pixel of this row
                         src2_[pos] = src2_[pos - 1];
                         pos++;
-                        // Skip rest of source border
                         src_pos += inrb;
                     }
-                } else if (out_16) {
-                    uint16_t *src16_ = (uint16_t *)src_;
+                } else if (is_16bit) {
+                    // 16bpp RGB555 format
+                    const uint16_t* src16 = reinterpret_cast<const uint16_t*>(src_);
                     int src_pos = 0;
                     for (int y = 0; y < height_real; y++) {
-                        int left_border_pos = pos;
-                        pos++;  // Move to first image pixel
-                        // Convert and copy width pixels
-                        // 16bpp RGB555 format: xRRRRRGGGGGBBBBB (5 bits each)
+                        const int left_border_pos = pos++;
                         for (int x = 0; x < width_; x++) {
-                            uint16_t src_val = src16_[src_pos];
-                            uint8_t r5 = (src_val >> 10) & 0x1f;
-                            uint8_t g5 = (src_val >> 5) & 0x1f;
-                            uint8_t b5 = src_val & 0x1f;
-                            // Expand 5 bits to 8 bits by replication
-                            uint8_t r8 = (r5 << 3) | (r5 >> 2);
-                            uint8_t g8 = (g5 << 3) | (g5 >> 2);
-                            uint8_t b8 = (b5 << 3) | (b5 >> 2);
+                            const uint16_t src_val = src16[src_pos++];
+                            const uint8_t r5 = (src_val >> 10) & 0x1f;
+                            const uint8_t g5 = (src_val >> 5) & 0x1f;
+                            const uint8_t b5 = src_val & 0x1f;
+                            const uint8_t r8 = (r5 << 3) | (r5 >> 2);
+                            const uint8_t g8 = (g5 << 3) | (g5 >> 2);
+                            const uint8_t b8 = (b5 << 3) | (b5 >> 2);
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
-                            src2_[pos] = b8 | (g8 << 8) | (r8 << 16);
+                            src2_[pos++] = b8 | (g8 << 8) | (r8 << 16);
 #else
-                            src2_[pos] = (r8 << 24) | (g8 << 16) | (b8 << 8);
+                            src2_[pos++] = (r8 << 24) | (g8 << 16) | (b8 << 8);
 #endif
-                            pos++;
-                            src_pos++;
                         }
-                        // Fill left border with first pixel of this row
                         src2_[left_border_pos] = src2_[left_border_pos + 1];
-                        // Fill right border with last pixel of this row
                         src2_[pos] = src2_[pos - 1];
                         pos++;
-                        // Skip rest of source border
                         src_pos += inrb;
                     }
-                } else if (out_24) {
+                } else {  // is_24bit
                     int src_pos = 0;
                     for (int y = 0; y < height_real; y++) {
-                        int left_border_pos = pos;
-                        pos++;  // Move to first image pixel
-                        // Convert and copy width pixels
+                        const int left_border_pos = pos++;
                         for (int x = 0; x < width_; x++) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
-                            src2_[pos] = (src_[src_pos] << 0) | (src_[src_pos+1] << 8) | (src_[src_pos+2] << 16);
+                            src2_[pos++] = src_[src_pos] | (src_[src_pos+1] << 8) | (src_[src_pos+2] << 16);
 #else
-                            src2_[pos] = (src_[src_pos] << 24) | (src_[src_pos+1] << 16) | (src_[src_pos+2] << 8);
+                            src2_[pos++] = (src_[src_pos] << 24) | (src_[src_pos+1] << 16) | (src_[src_pos+2] << 8);
 #endif
-                            pos++;
                             src_pos += 3;
                         }
-                        // Fill left border with first pixel of this row
                         src2_[left_border_pos] = src2_[left_border_pos + 1];
-                        // Fill right border with last pixel of this row
                         src2_[pos] = src2_[pos - 1];
                         pos++;
-                        // 24bpp has no border in source (inrb=0)
                     }
                 }
 
-                // Fill row 0 (top border) by duplicating row 1
-                for (int x = 0; x < total_width32; x++) {
-                    src2_[x] = src2_[total_width32 + x];
-                }
+                // Fill top border row by duplicating row 1
+                memcpy(src2_, src2_ + total_width32, total_width32 * sizeof(uint32_t));
 
                 // Fill bottom 2 extra rows by duplicating the last image row
-                int last_image_row_offset = total_width32 * height_real;
-                for (int row = 0; row < 2; row++) {
-                    for (int x = 0; x < total_width32; x++) {
-                        src2_[last_image_row_offset + total_width32 * (row + 1) + x] = src2_[last_image_row_offset + x];
-                    }
-                }
+                const int last_row_offset = total_width32 * height_real;
+                memcpy(src2_ + last_row_offset + total_width32, src2_ + last_row_offset, total_width32 * sizeof(uint32_t));
+                memcpy(src2_ + last_row_offset + total_width32 * 2, src2_ + last_row_offset, total_width32 * sizeof(uint32_t));
 
-                // Offset src_ to point to first image pixel of row 1 (skip top row + left border)
-                src_ = (uint8_t *)(src2_ + total_width32 + 1);
-                // Offset dst_ to skip top border rows that filters need for reading
-                // Filters need 'scale_' rows above to read from (e.g., bP - Nextline)
-                // Each output row is width_*scale_ pixels wide, skip scale_ rows
-                dst_ = (uint8_t *)(dst2_ + (int)std::ceil(width_ * scale_ * scale_));
+                // Point to first image pixel (skip top row + left border)
+                uint8_t* filter_src = reinterpret_cast<uint8_t*>(src2_ + total_width32 + 1);
+                // Skip top border rows in output
+                const int dst_offset = scaled_width * scale_int;
+                uint8_t* filter_dst = reinterpret_cast<uint8_t*>(dst2_ + dst_offset);
 
-                ApplyFilter(instride32, outstride32);
+                ApplyFilter32(filter_src, instride32, delta_, filter_dst, outstride32, width_, height_);
 
-                // dst2_ points to the buffer start, filters wrote starting at offset
-                dst_ = (uint8_t *)(dst2_ + (int)std::ceil(width_ * scale_ * scale_));
+                // Convert 32bpp output back to original depth
+                const uint32_t* dst32 = dst2_ + dst_offset;
 
-                if (out_8) {
-                    uint32_t *dst32_ = (uint32_t *)dst_;
+                if (is_8bit) {
                     int dst_pos = 0;
                     pos = 0;
-                    // Destination buffer uses original depth's border
-                    int scaled_border_dest = (int)std::ceil(inrb * scale_);
-                    // Source 32bpp buffer has NO borders in output
-                    for (int y = 0; y < (height_real * scale_); y++) {
-                        for (int x = 0; x < (width_ * scale_); x++) {
-                            uint32_t color = dst32_[dst_pos];
+                    for (int y = 0; y < scaled_height; y++) {
+                        for (int x = 0; x < scaled_width; x++) {
+                            const uint32_t color = dst32[dst_pos++];
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
-                            uint8_t r8 = (color >> 16) & 0xff;
-                            uint8_t g8 = (color >> 8) & 0xff;
-                            uint8_t b8 = color & 0xff;
+                            const uint8_t r8 = (color >> 16) & 0xff;
+                            const uint8_t g8 = (color >> 8) & 0xff;
+                            const uint8_t b8 = color & 0xff;
 #else
-                            uint8_t r8 = (color >> 24) & 0xff;
-                            uint8_t g8 = (color >> 16) & 0xff;
-                            uint8_t b8 = (color >> 8) & 0xff;
+                            const uint8_t r8 = (color >> 24) & 0xff;
+                            const uint8_t g8 = (color >> 16) & 0xff;
+                            const uint8_t b8 = (color >> 8) & 0xff;
 #endif
-                            // Convert 8-bit channels to 3/3/2 bit (RRRGGGBB)
-                            uint8_t r3 = r8 >> 5;
-                            uint8_t g3 = g8 >> 5;
-                            uint8_t b2 = b8 >> 6;
-                            dest[pos] = (r3 << 5) | (g3 << 2) | b2;
-                            pos++;
-                            dst_pos++;
+                            dest[pos++] = ((r8 >> 5) << 5) | ((g8 >> 5) << 2) | (b8 >> 6);
                         }
                         pos += scaled_border_dest;
-                        // No border skip needed - output buffer has no borders
                     }
-                } else if (out_16) {
-                    uint32_t *dst32_ = (uint32_t *)dst_;
-                    uint16_t *dest16_ = (uint16_t *)dest;
+                } else if (is_16bit) {
+                    uint16_t* dest16 = reinterpret_cast<uint16_t*>(dest);
                     int dst_pos = 0;
                     pos = 0;
-                    // Destination buffer uses original depth's border
-                    int scaled_border_dest = (int)std::ceil(inrb * scale_);
-                    // Source 32bpp buffer has NO borders in output
-                    for (int y = 0; y < (height_real * scale_); y++) {
-                        for (int x = 0; x < (width_ * scale_); x++) {
-                            uint32_t color = dst32_[dst_pos];
+                    for (int y = 0; y < scaled_height; y++) {
+                        for (int x = 0; x < scaled_width; x++) {
+                            const uint32_t color = dst32[dst_pos++];
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
-                            uint8_t r8 = (color >> 16) & 0xff;
-                            uint8_t g8 = (color >> 8) & 0xff;
-                            uint8_t b8 = color & 0xff;
+                            const uint8_t r8 = (color >> 16) & 0xff;
+                            const uint8_t g8 = (color >> 8) & 0xff;
+                            const uint8_t b8 = color & 0xff;
 #else
-                            uint8_t r8 = (color >> 24) & 0xff;
-                            uint8_t g8 = (color >> 16) & 0xff;
-                            uint8_t b8 = (color >> 8) & 0xff;
+                            const uint8_t r8 = (color >> 24) & 0xff;
+                            const uint8_t g8 = (color >> 16) & 0xff;
+                            const uint8_t b8 = (color >> 8) & 0xff;
 #endif
-                            // Convert 8-bit channels to 5/5/5 bit (RGB555)
-                            uint8_t r5 = r8 >> 3;
-                            uint8_t g5 = g8 >> 3;
-                            uint8_t b5 = b8 >> 3;
-                            dest16_[pos] = (r5 << 10) | (g5 << 5) | b5;
-                            pos++;
-                            dst_pos++;
+                            dest16[pos++] = ((r8 >> 3) << 10) | ((g8 >> 3) << 5) | (b8 >> 3);
                         }
                         pos += scaled_border_dest;
-                        // No border skip needed - output buffer has no borders
                     }
-                } else if (out_24) {
+                } else {  // is_24bit
                     int dst_pos = 0;
                     pos = 0;
-                    for (int y = 0; y < (height_real * scale_); y++) {
-                        for (int x = 0; x < (width_ * scale_); x++) {
-                            dest[pos] = dst_[dst_pos];
-                            dest[pos+1] = dst_[dst_pos+1];
-                            dest[pos+2] = dst_[dst_pos+2];
+                    for (int y = 0; y < scaled_height; y++) {
+                        for (int x = 0; x < scaled_width; x++) {
+                            const uint8_t* src_pixel = reinterpret_cast<const uint8_t*>(&dst32[dst_pos++]);
+                            dest[pos] = src_pixel[0];
+                            dest[pos+1] = src_pixel[1];
+                            dest[pos+2] = src_pixel[2];
                             pos += 3;
-                            dst_pos += 4;
                         }
                     }
-                }
-
-                if (src2_ != NULL) {
-                    free(src2_);
-                }
-
-                if (dst2_ != NULL) {
-                    free(dst2_);
                 }
 
                 // Restore original shift values
@@ -2090,191 +2162,63 @@ public:
             }
 
             done_->Post();
-            continue;
         }
 
         return 0;
     }
 
 private:
-    // interframe blending filter
-    // definitely not thread safe by default
-    // added procy param to provide offset into accum buffers
-    void ApplyInterframe(int instride, int procy) {
-        switch (OPTION(kDispIFB)) {
+    // Optimized interframe blending filter with cached options
+    void ApplyInterframeOptimized(int instride, int procy, config::Interframe ifb_option,
+                                   bool is_8bit, bool is_16bit, bool is_24bit) {
+        switch (ifb_option) {
             case config::Interframe::kNone:
                 break;
-
             case config::Interframe::kSmart:
-                if (out_8) {
+                if (is_8bit) {
                     SmartIB8(src_, instride, width_, procy, height_);
-                } else if (out_16) {
+                } else if (is_16bit) {
                     SmartIB(src_, instride, width_, procy, height_);
-                } else if (out_24) {
+                } else if (is_24bit) {
                     SmartIB24(src_, instride, width_, procy, height_);
                 } else {
                     SmartIB32(src_, instride, width_, procy, height_);
                 }
                 break;
-
             case config::Interframe::kMotionBlur:
-                // FIXME: if(renderer == d3d/gl && filter == NONE) break;
-                if (out_8) {
+                if (is_8bit) {
                     MotionBlurIB8(src_, instride, width_, procy, height_);
-                } else if (out_16) {
+                } else if (is_16bit) {
                     MotionBlurIB(src_, instride, width_, procy, height_);
-                } else if (out_24) {
+                } else if (is_24bit) {
                     MotionBlurIB24(src_, instride, width_, procy, height_);
                 } else {
                     MotionBlurIB32(src_, instride, width_, procy, height_);
                 }
                 break;
-
             case config::Interframe::kLast:
                 VBAM_NOTREACHED();
         }
     }
 
-    // naturally, any of these with accumulation buffers like those
-    // of the IFB filters will screw up royally as well
-    void ApplyFilter(int instride, int outstride) {
-        switch (OPTION(kDispFilter)) {
-            case config::Filter::k2xsai:
-                _2xSaI32(src_, instride, delta_, dst_, outstride, width_,
-                         height_);
-                break;
-
-            case config::Filter::kSuper2xsai:
-                Super2xSaI32(src_, instride, delta_, dst_, outstride, width_,
-                             height_);
-                break;
-
-            case config::Filter::kSupereagle:
-                SuperEagle32(src_, instride, delta_, dst_, outstride, width_,
-                             height_);
-                break;
-
-            case config::Filter::kPixelate:
-                Pixelate32(src_, instride, delta_, dst_, outstride, width_,
-                           height_);
-                break;
-
-            case config::Filter::kAdvmame:
-                AdMame2x32(src_, instride, delta_, dst_, outstride, width_,
-                           height_);
-                break;
-
-            case config::Filter::kBilinear:
-                Bilinear32(src_, instride, delta_, dst_, outstride, width_,
-                           height_);
-                break;
-
-            case config::Filter::kBilinearplus:
-                BilinearPlus32(src_, instride, delta_, dst_, outstride, width_,
-                               height_);
-                break;
-
-            case config::Filter::kScanlines:
-                Scanlines32(src_, instride, delta_, dst_, outstride, width_,
-                            height_);
-                break;
-
-            case config::Filter::kTvmode:
-                ScanlinesTV32(src_, instride, delta_, dst_, outstride, width_,
-                              height_);
-                break;
-
-            case config::Filter::kLQ2x:
-                lq2x32(src_, instride, delta_, dst_, outstride, width_,
-                       height_);
-                break;
-
-            case config::Filter::kSimple2x:
-                Simple2x32(src_, instride, delta_, dst_, outstride, width_,
-                           height_);
-                break;
-
-            case config::Filter::kSimple3x:
-                Simple3x32(src_, instride, delta_, dst_, outstride, width_,
-                           height_);
-                break;
-
-            case config::Filter::kSimple4x:
-                Simple4x32(src_, instride, delta_, dst_, outstride, width_,
-                           height_);
-                break;
-
-            case config::Filter::kHQ2x:
-                hq2x32(src_, instride, delta_, dst_, outstride, width_,
-                       height_);
-                break;
-
-            case config::Filter::kHQ3x:
-                hq3x32_32(src_, instride, delta_, dst_, outstride, width_,
-                          height_);
-                break;
-
-            case config::Filter::kHQ4x:
-                hq4x32_32(src_, instride, delta_, dst_, outstride, width_,
-                          height_);
-                break;
-
-            case config::Filter::kXbrz2x:
-                xbrz2x32(src_, instride, delta_, dst_, outstride, width_,
-                         height_);
-                break;
-
-            case config::Filter::kXbrz3x:
-                xbrz3x32(src_, instride, delta_, dst_, outstride, width_,
-                         height_);
-                break;
-
-            case config::Filter::kXbrz4x:
-                xbrz4x32(src_, instride, delta_, dst_, outstride, width_,
-                         height_);
-                break;
-
-            case config::Filter::kXbrz5x:
-                xbrz5x32(src_, instride, delta_, dst_, outstride, width_,
-                         height_);
-                break;
-
-            case config::Filter::kXbrz6x:
-                xbrz6x32(src_, instride, delta_, dst_, outstride, width_,
-                         height_);
-                break;
-
-            case config::Filter::kPlugin:
-                // MFC interface did not do plugins in parallel
-                // Probably because it's almost certain they carry state
-                // or do other non-thread-safe things But the user can
-                // always turn mt off of it's not working..
-                RENDER_PLUGIN_OUTP outdesc;
-                outdesc.Size = sizeof(outdesc);
-                outdesc.Flags = rpi_->Flags;
-                outdesc.SrcPtr = src_;
-                outdesc.SrcPitch = instride;
-                outdesc.SrcW = width_;
-                // FIXME: win32 code adds to H, saying that frame isn't
-                // fully rendered otherwise I need to verify that
-                // statement before I go adding stuff that may make it
-                // crash.
-                outdesc.SrcH = height_;  // + scale / 2
-                outdesc.DstPtr = dst_;
-                outdesc.DstPitch = outstride;
-                outdesc.DstW = std::ceil(width_ * scale_);
-                // on the other hand, there is at least 1 line below, so
-                // I'll add that to dest in case safety checks in plugin
-                // use < instead of <=
-                outdesc.DstH =
-                    std::ceil(height_ * scale_);  // + scale * (scale / 2)
-                rpi_->Output(&outdesc);
-                break;
-
-            case config::Filter::kNone:
-            case config::Filter::kLast:
-                VBAM_NOTREACHED();
-                break;
+    // Optimized filter application with cached option
+    void ApplyFilterOptimized(int instride, int outstride, config::Filter filter_option) {
+        if (filter_option == config::Filter::kPlugin) {
+            // Plugin filters require special handling
+            RENDER_PLUGIN_OUTP outdesc;
+            outdesc.Size = sizeof(outdesc);
+            outdesc.Flags = rpi_->Flags;
+            outdesc.SrcPtr = src_;
+            outdesc.SrcPitch = instride;
+            outdesc.SrcW = width_;
+            outdesc.SrcH = height_;
+            outdesc.DstPtr = dst_;
+            outdesc.DstPitch = outstride;
+            outdesc.DstW = static_cast<int>(width_ * scale_);
+            outdesc.DstH = static_cast<int>(height_ * scale_);
+            rpi_->Output(&outdesc);
+        } else {
+            ApplyFilter32(src_, instride, delta_, dst_, outstride, width_, height_);
         }
     }
 };
@@ -2308,8 +2252,8 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     } else
         todraw = pixbuf2;
 
-    // FIXME: filters race condition?
-    const int max_threads = 1;
+    // Use multiple threads for filter processing (up to 6)
+    const int max_threads = GetMaxFilterThreads();
 
     // First, apply filters, if applicable, in parallel, if enabled
     // FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur)
@@ -2356,7 +2300,6 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                     threads[i].delta_ = delta;
                     threads[i].rpi_ = rpi_;
                     threads[i].done_ = &filt_done;
-                    threads[i].lock_.Lock();
                     threads[i].Create();
                     threads[i].Run();
                 }
@@ -2382,6 +2325,41 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
             for (int i = 0; i < nthreads; i++)
                 filt_done.Wait();
+
+            // Smooth seams between thread regions by re-applying the filter
+            // to the boundary rows. This eliminates visual artifacts at thread
+            // boundaries that occur because filters read neighboring pixels.
+            if (nthreads > 1 && OPTION(kDispFilter) != config::Filter::kNone) {
+                // outbpp and inrb already declared in outer scope
+                int instride = (width + inrb) * (systemColorDepth >> 3);
+                int outstride_local = std::ceil((width + inrb) * outbpp * scale);
+
+                // For each seam between threads, re-process a few rows
+                // The seam rows in the source are at: height * i / nthreads
+                for (int i = 1; i < nthreads; i++) {
+                    int seam_row = height * i / nthreads;
+                    // Process 5 rows above and 5 rows below the seam (10 total)
+                    // to give the filter enough context for smooth blending
+                    int start_row = std::max(0, seam_row - 5);
+                    int end_row = std::min(height, seam_row + 5);
+                    int seam_height = end_row - start_row;
+
+                    if (seam_height <= 0) continue;
+
+                    // Calculate source and destination pointers for this seam region
+                    // Source needs 1 row of border above, so start from start_row
+                    uint8_t* seam_src = *data + instride * start_row;
+                    // Destination position accounts for scale and the 1-row top border
+                    uint8_t* seam_dst = todraw + (int)std::ceil(outstride_local * (start_row + 1) * scale);
+                    uint8_t* seam_delta = delta + instride * start_row;
+
+                    // Apply the filter to this seam region
+                    // The filter functions expect the src pointer to already be advanced past border
+                    seam_src += instride;  // Skip the top border row
+
+                    ApplyFilter32(seam_src, instride, seam_delta, seam_dst, outstride_local, width, seam_height);
+                }
+            }
         }
     }
 
@@ -2963,13 +2941,13 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
     int outbpp = systemColorDepth >> 3;
     int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
     int outstride = std::ceil((width + inrb) * outbpp * scale);
-            
-    // FIXME: filters race condition?
-    const int max_threads = 1;
-            
+
+    // Use multiple threads for filter processing (up to 6)
+    const int max_threads = GetMaxFilterThreads();
+
     if (!pixbuf2) {
         int allocstride = outstride, alloch = height;
-                
+
         // gb may write borders, so allocate enough for them
         if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
             allocstride = std::ceil((GameArea::SGBWidth + inrb) * outbpp * scale);
@@ -2978,7 +2956,7 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
 
         pixbuf2 = (uint8_t*)calloc(allocstride, std::ceil((alloch + 2) * scale));
     }
-            
+
     if (OPTION(kDispFilter) == config::Filter::kNone) {
         todraw = *data;
         // *data is assigned below, after old buf has been processed
@@ -3001,10 +2979,10 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
                         threads[i].lock_.Unlock();
                         threads[i].Wait();
                     }
-                        
+
                 delete[] threads;
             }
-                    
+
             nthreads = max_threads;
             threads = new FilterThread[nthreads];
             // first time around, no threading in order to avoid
@@ -3019,7 +2997,7 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
             threads[0].Entry();
-        
+
             // go ahead and start the threads up, though
             if (nthreads > 1) {
                 for (int i = 0; i < nthreads; i++) {
@@ -3032,7 +3010,6 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
                     threads[i].delta_ = delta;
                     threads[i].rpi_ = rpi_;
                     threads[i].done_ = &filt_done;
-                    threads[i].lock_.Lock();
                     threads[i].Create();
                     threads[i].Run();
                 }
@@ -3055,17 +3032,48 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
                 threads[i].sig_.Signal();
                 threads[i].lock_.Unlock();
             }
-                    
+
             for (int i = 0; i < nthreads; i++)
                 filt_done.Wait();
+
+            // Smooth seams between thread regions by re-applying the filter
+            // to the boundary rows. This eliminates visual artifacts at thread
+            // boundaries that occur because filters read neighboring pixels.
+            if (nthreads > 1 && OPTION(kDispFilter) != config::Filter::kNone) {
+                int instride = (width + inrb) * (systemColorDepth >> 3);
+                int outstride_local = std::ceil((width + inrb) * outbpp * scale);
+
+                // For each seam between threads, re-process a few rows
+                // The seam rows in the source are at: height * i / nthreads
+                for (int i = 1; i < nthreads; i++) {
+                    int seam_row = height * i / nthreads;
+                    // Process 5 rows above and 5 rows below the seam (10 total)
+                    // to give the filter enough context for smooth blending
+                    int start_row = std::max(0, seam_row - 5);
+                    int end_row = std::min(height, seam_row + 5);
+                    int seam_height = end_row - start_row;
+
+                    if (seam_height <= 0) continue;
+
+                    // Calculate source and destination pointers for this seam region
+                    uint8_t* seam_src = *data + instride * start_row;
+                    uint8_t* seam_dst = todraw + (int)std::ceil(outstride_local * (start_row + 1) * scale);
+                    uint8_t* seam_delta = delta + instride * start_row;
+
+                    // Apply the filter to this seam region
+                    seam_src += instride;  // Skip the top border row
+
+                    ApplyFilter32(seam_src, instride, seam_delta, seam_dst, outstride_local, width, seam_height);
+                }
+            }
         }
     }
-            
+
     // swap buffers now that src has been processed
     if (OPTION(kDispFilter) == config::Filter::kNone) {
         *data = pixbuf1;
     }
-            
+
     // draw OSD text old-style (directly into output buffer), if needed
     // new style flickers too much, so we'll stick to this for now
     if (wxGetApp().frame->IsFullScreen() || !OPTION(kPrefDisableStatus)) {
@@ -4329,19 +4337,19 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
     int outbpp = systemColorDepth >> 3;
     int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
     int outstride = std::ceil((width + inrb) * outbpp * scale);
-            
-    // FIXME: filters race condition?
-    const int max_threads = 1;
-            
+
+    // Use multiple threads for filter processing (up to 6)
+    const int max_threads = GetMaxFilterThreads();
+
     if (!pixbuf2) {
         int allocstride = outstride, alloch = height;
-                
+
         // gb may write borders, so allocate enough for them
         if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
             allocstride = std::ceil((GameArea::SGBWidth + inrb) * outbpp * scale);
             alloch = GameArea::SGBHeight;
         }
-                
+
         pixbuf2 = (uint8_t*)calloc(allocstride, std::ceil((alloch + 2) * scale));
     }
 
@@ -4367,7 +4375,7 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
                         threads[i].lock_.Unlock();
                         threads[i].Wait();
                     }
-                        
+
                 delete[] threads;
             }
 
@@ -4398,7 +4406,6 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
                     threads[i].delta_ = delta;
                     threads[i].rpi_ = rpi_;
                     threads[i].done_ = &filt_done;
-                    threads[i].lock_.Lock();
                     threads[i].Create();
                     threads[i].Run();
                 }
@@ -4421,17 +4428,48 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
                 threads[i].sig_.Signal();
                 threads[i].lock_.Unlock();
             }
-                    
+
             for (int i = 0; i < nthreads; i++)
                 filt_done.Wait();
+
+            // Smooth seams between thread regions by re-applying the filter
+            // to the boundary rows. This eliminates visual artifacts at thread
+            // boundaries that occur because filters read neighboring pixels.
+            if (nthreads > 1 && OPTION(kDispFilter) != config::Filter::kNone) {
+                int instride = (width + inrb) * (systemColorDepth >> 3);
+                int outstride_local = std::ceil((width + inrb) * outbpp * scale);
+
+                // For each seam between threads, re-process a few rows
+                // The seam rows in the source are at: height * i / nthreads
+                for (int i = 1; i < nthreads; i++) {
+                    int seam_row = height * i / nthreads;
+                    // Process 5 rows above and 5 rows below the seam (10 total)
+                    // to give the filter enough context for smooth blending
+                    int start_row = std::max(0, seam_row - 5);
+                    int end_row = std::min(height, seam_row + 5);
+                    int seam_height = end_row - start_row;
+
+                    if (seam_height <= 0) continue;
+
+                    // Calculate source and destination pointers for this seam region
+                    uint8_t* seam_src = *data + instride * start_row;
+                    uint8_t* seam_dst = todraw + (int)std::ceil(outstride_local * (start_row + 1) * scale);
+                    uint8_t* seam_delta = delta + instride * start_row;
+
+                    // Apply the filter to this seam region
+                    seam_src += instride;  // Skip the top border row
+
+                    ApplyFilter32(seam_src, instride, seam_delta, seam_dst, outstride_local, width, seam_height);
+                }
+            }
         }
     }
-            
+
     // swap buffers now that src has been processed
     if (OPTION(kDispFilter) == config::Filter::kNone) {
         *data = pixbuf1;
     }
-            
+
     // draw OSD text old-style (directly into output buffer), if needed
     // new style flickers too much, so we'll stick to this for now
     if (wxGetApp().frame->IsFullScreen() || !OPTION(kPrefDisableStatus)) {
