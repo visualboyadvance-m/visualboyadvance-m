@@ -305,12 +305,12 @@ msgstr "等待 GDB..."
 #: cmdevents.cpp:2282
 #, c-format
 msgid "Filter: %s"
-msgstr ""
+msgstr "滤镜: %s"
 
 #: cmdevents.cpp:2290
 #, c-format
 msgid "Interframe Blending: %s"
-msgstr ""
+msgstr "帧间混合: %s"
 
 #: cmdevents.cpp:2339
 msgid ""
@@ -3825,7 +3825,7 @@ msgstr "LCD 滤镜(&L)"
 
 #: xrc/MainMenu.xrc:521
 msgid "&Game Boy Colorizer Hack [requires restart]"
-msgstr ""
+msgstr "GB 色彩修改 [需要重启] (&G)"
 
 #: xrc/MainMenu.xrc:525
 msgid "&Game Boy printer"
@@ -3841,7 +3841,7 @@ msgstr "将打印输出保存为截图(&S)"
 
 #: xrc/MainMenu.xrc:538
 msgid "&Use Game Boy BIOS file [requires restart]"
-msgstr ""
+msgstr "使用 GB BIOS 文件 [需要重启] (&U)"
 
 #: xrc/MainMenu.xrc:542
 msgid "&Use Game Boy Color BIOS file"
@@ -4041,23 +4041,23 @@ msgstr "希腊语"
 
 #: xrc/MainMenu.xrc:769
 msgid "English [US]"
-msgstr ""
+msgstr "英语 [美国]"
 
 #: xrc/MainMenu.xrc:773
 msgid "Spanish [Latin American]"
-msgstr ""
+msgstr "西班牙语 [拉丁美洲]"
 
 #: xrc/MainMenu.xrc:777
 msgid "Spanish [Colombia]"
-msgstr ""
+msgstr "西班牙语 [哥伦比亚]"
 
 #: xrc/MainMenu.xrc:781
 msgid "Spanish [Peru]"
-msgstr ""
+msgstr "西班牙语 [秘鲁]"
 
 #: xrc/MainMenu.xrc:785
 msgid "Spanish [United States]"
-msgstr ""
+msgstr "西班牙语 [美国]"
 
 #: xrc/MainMenu.xrc:789
 msgid "Spanish"
@@ -4065,7 +4065,7 @@ msgstr "西班牙语"
 
 #: xrc/MainMenu.xrc:793
 msgid "French [France]"
-msgstr ""
+msgstr "法语 [法国]"
 
 #: xrc/MainMenu.xrc:797
 msgid "French"
@@ -4077,11 +4077,11 @@ msgstr "加利西亚语"
 
 #: xrc/MainMenu.xrc:805
 msgid "Hebrew [Israel]"
-msgstr ""
+msgstr "希伯来语 [以色列]"
 
 #: xrc/MainMenu.xrc:809
 msgid "Hungarian [Hungary]"
-msgstr ""
+msgstr "匈牙利语 [匈牙利]"
 
 #: xrc/MainMenu.xrc:813
 msgid "Hungarian"
@@ -4101,7 +4101,7 @@ msgstr "日语"
 
 #: xrc/MainMenu.xrc:829
 msgid "Korean [Korea]"
-msgstr ""
+msgstr "韩语 [韩国]"
 
 #: xrc/MainMenu.xrc:833
 msgid "Korean"
@@ -4109,7 +4109,7 @@ msgstr "韩语"
 
 #: xrc/MainMenu.xrc:837
 msgid "Malay [Malaysia]"
-msgstr ""
+msgstr "马来语 [马来西亚]"
 
 #: xrc/MainMenu.xrc:841
 msgid "Norwegian"
@@ -4121,7 +4121,7 @@ msgstr "荷兰语"
 
 #: xrc/MainMenu.xrc:849
 msgid "Polish [Poland]"
-msgstr ""
+msgstr "波兰语 [波兰]"
 
 #: xrc/MainMenu.xrc:853
 msgid "Polish"
@@ -4129,15 +4129,15 @@ msgstr "波兰语"
 
 #: xrc/MainMenu.xrc:857
 msgid "Portuguese [Brazil]"
-msgstr ""
+msgstr "葡萄牙语 [巴西]"
 
 #: xrc/MainMenu.xrc:861
 msgid "Portuguese [Portugal]"
-msgstr ""
+msgstr "葡萄牙语 [葡萄牙]"
 
 #: xrc/MainMenu.xrc:865
 msgid "Russian [Russia]"
-msgstr ""
+msgstr "俄语 [俄罗斯]"
 
 #: xrc/MainMenu.xrc:869
 msgid "Swedish"
@@ -4153,11 +4153,11 @@ msgstr "乌克兰语"
 
 #: xrc/MainMenu.xrc:881
 msgid "Urdu [Pakistan]"
-msgstr ""
+msgstr "乌尔都语 [巴基斯坦]"
 
 #: xrc/MainMenu.xrc:885
 msgid "Chinese [China]"
-msgstr ""
+msgstr "中文 [中国]"
 
 #: xrc/MainMenu.xrc:889
 msgid "&Use external translations"
