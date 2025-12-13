@@ -3840,7 +3840,7 @@ msgstr "&Filtro LCD"
 
 #: xrc/MainMenu.xrc:521
 msgid "&Game Boy Colorizer Hack [requires restart]"
-msgstr ""
+msgstr "&Hack colorizador do Game Boy (requer reiniciar)"
 
 #: xrc/MainMenu.xrc:525
 msgid "&Game Boy printer"
@@ -3856,7 +3856,7 @@ msgstr "&Salvar as impressões como capturas de tela"
 
 #: xrc/MainMenu.xrc:538
 msgid "&Use Game Boy BIOS file [requires restart]"
-msgstr ""
+msgstr "&Usar o arquivo da BIOS do Game Boy (requer reiniciar)"
 
 #: xrc/MainMenu.xrc:542
 msgid "&Use Game Boy Color BIOS file"
@@ -4056,23 +4056,23 @@ msgstr "Grego"
 
 #: xrc/MainMenu.xrc:769
 msgid "English [US]"
-msgstr ""
+msgstr "Inglês (EUA)"
 
 #: xrc/MainMenu.xrc:773
 msgid "Spanish [Latin American]"
-msgstr ""
+msgstr "Espanhol (Latino Americano)"
 
 #: xrc/MainMenu.xrc:777
 msgid "Spanish [Colombia]"
-msgstr ""
+msgstr "Espanhol (Colômbia)"
 
 #: xrc/MainMenu.xrc:781
 msgid "Spanish [Peru]"
-msgstr ""
+msgstr "Espanhol (Peru)"
 
 #: xrc/MainMenu.xrc:785
 msgid "Spanish [United States]"
-msgstr ""
+msgstr "Espanhol (Estados Unidos)"
 
 #: xrc/MainMenu.xrc:789
 msgid "Spanish"
@@ -4080,7 +4080,7 @@ msgstr "Espanhol"
 
 #: xrc/MainMenu.xrc:793
 msgid "French [France]"
-msgstr ""
+msgstr "Francês (França)"
 
 #: xrc/MainMenu.xrc:797
 msgid "French"
@@ -4092,11 +4092,11 @@ msgstr "Galego"
 
 #: xrc/MainMenu.xrc:805
 msgid "Hebrew [Israel]"
-msgstr ""
+msgstr "Hebraico (Israel)"
 
 #: xrc/MainMenu.xrc:809
 msgid "Hungarian [Hungary]"
-msgstr ""
+msgstr "Húngaro (Hungria)"
 
 #: xrc/MainMenu.xrc:813
 msgid "Hungarian"
@@ -4116,7 +4116,7 @@ msgstr "Japonês"
 
 #: xrc/MainMenu.xrc:829
 msgid "Korean [Korea]"
-msgstr ""
+msgstr "Coreano (Coréia)"
 
 #: xrc/MainMenu.xrc:833
 msgid "Korean"
@@ -4124,7 +4124,7 @@ msgstr "Coreano"
 
 #: xrc/MainMenu.xrc:837
 msgid "Malay [Malaysia]"
-msgstr ""
+msgstr "Malaio (Malásia)"
 
 #: xrc/MainMenu.xrc:841
 msgid "Norwegian"
@@ -4136,7 +4136,7 @@ msgstr "Holandês"
 
 #: xrc/MainMenu.xrc:849
 msgid "Polish [Poland]"
-msgstr ""
+msgstr "Polonês (Polônia)"
 
 #: xrc/MainMenu.xrc:853
 msgid "Polish"
@@ -4144,15 +4144,15 @@ msgstr "Polonês"
 
 #: xrc/MainMenu.xrc:857
 msgid "Portuguese [Brazil]"
-msgstr ""
+msgstr "Português (Brasil)"
 
 #: xrc/MainMenu.xrc:861
 msgid "Portuguese [Portugal]"
-msgstr ""
+msgstr "Português (Portugal)"
 
 #: xrc/MainMenu.xrc:865
 msgid "Russian [Russia]"
-msgstr ""
+msgstr "Russo (Rússia)"
 
 #: xrc/MainMenu.xrc:869
 msgid "Swedish"
@@ -4168,11 +4168,11 @@ msgstr "Ucraniano"
 
 #: xrc/MainMenu.xrc:881
 msgid "Urdu [Pakistan]"
-msgstr ""
+msgstr "Urdu (Paquistão)"
 
 #: xrc/MainMenu.xrc:885
 msgid "Chinese [China]"
-msgstr ""
+msgstr "Chinês (China)"
 
 #: xrc/MainMenu.xrc:889
 msgid "&Use external translations"
