@@ -65,6 +65,9 @@ if(WIN32 AND VCPKG_TARGET_TRIPLET MATCHES "^x86-mingw")
     if(NOT make_path)
         # Assume MSYS2 MinGW32 toolchain.
         set(ENV{PATH} "/msys64/mingw32/bin;$ENV{PATH}")
+
+        set(CMAKE_C_COMPILER   "/msys64/mingw32/bin/gcc.exe" CACHE STRING "MinGW GCC Compiler    " FORCE)
+        set(CMAKE_CXX_COMPILER "/msys64/mingw32/bin/g++.exe" CACHE STRING "MinGW GCC C++ Compiler" FORCE)
     endif()
 endif()
 
