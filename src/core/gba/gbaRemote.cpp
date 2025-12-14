@@ -31,6 +31,7 @@
 #endif // ! HAVE_ARPA_INET_H
 
 #define SOCKET int
+#define INVALID_SOCKET (-1)
 
 #endif  // defined(_WIN32)
 
