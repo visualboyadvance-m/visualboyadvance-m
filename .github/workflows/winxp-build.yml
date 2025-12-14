@@ -15,11 +15,6 @@ jobs:
           - cmake_options: '-DENABLE_LINK=OFF'
             build_options: link_off
     runs-on: windows-latest
-    env:
-      MSYSTEM: MINGW32
-    defaults:
-      run:
-        shell: msys2 {0}
 
     steps:
       - name: Checkout the code
@@ -27,25 +22,14 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup msys2
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW32
-          update: false
-
       - name: Download and extract Windows XP toolchain
         shell: pwsh
         run: |
           Invoke-WebRequest -Uri "https://cachemiss.com/files/winxp-mingw32.7z" -OutFile "winxp-mingw32.7z"
           7z x winxp-mingw32.7z -oC:\msys64 -y
 
-      - name: Install deps
-        run: |
-          # Install build tools (the toolchain itself comes from the downloaded archive)
-          pacman -Sy --noconfirm
-          pacman -S --noconfirm --needed cmake ninja
-
       - name: Configure CMake
+        shell: pwsh
         run: >-
           cmake -B build -G Ninja
           -DVCPKG_TARGET_TRIPLET=x86-mingw-static
@@ -54,8 +38,10 @@ jobs:
           ${{ matrix.cmake_options }}
 
       - name: Build
-        run: ninja -C build
+        shell: pwsh
+        run: cmake --build build
 
       - name: Run tests
         if: matrix.build_options == 'default'
-        run: cd build && ctest -j --output-on-failure
+        shell: pwsh
+        run: ctest -j --output-on-failure --test-dir build
