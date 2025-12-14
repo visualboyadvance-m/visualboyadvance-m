@@ -1,0 +1,61 @@
+name: Windows XP
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        build_type: [release, debug]
+        build_options: [default, link_off]
+        include:
+          - cmake_build: '-DCMAKE_BUILD_TYPE=Release'
+            build_type: release
+          - cmake_build: '-DCMAKE_BUILD_TYPE=Debug'
+            build_type: debug
+          - cmake_options: '-DENABLE_LINK=OFF'
+            build_options: link_off
+    runs-on: windows-latest
+    env:
+      MSYSTEM: MINGW32
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW32
+          update: false
+
+      - name: Download and extract Windows XP toolchain
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://cachemiss.com/files/winxp-mingw32.7z" -OutFile "winxp-mingw32.7z"
+          7z x winxp-mingw32.7z -oC:\msys64 -y
+
+      - name: Install deps
+        run: |
+          # Install build tools (the toolchain itself comes from the downloaded archive)
+          pacman -Sy --noconfirm
+          pacman -S --noconfirm --needed cmake ninja
+
+      - name: Configure CMake
+        run: >-
+          cmake -B build -G Ninja
+          -DVCPKG_TARGET_TRIPLET=x86-mingw-static
+          -DBUILD_TESTING=ON
+          ${{ matrix.cmake_build }}
+          ${{ matrix.cmake_options }}
+
+      - name: Build
+        run: ninja -C build
+
+      - name: Run tests
+        if: matrix.build_options == 'default'
+        run: cd build && ctest -j --output-on-failure
