@@ -24,7 +24,15 @@
 #if _MSC_VER
 #include <xaudio2.legacy.h>
 #else
+// Suppress warnings about MSVC-specific #pragma warning in third-party headers
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#endif
 #include <XAudio2.h>
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 #endif
 
 namespace audio {

@@ -3429,7 +3429,7 @@ void GLDrawingPanel::DrawingPanelInit()
     }
 #elif defined(__WXMSW__)
     typedef const char* (*wglext)();
-    wglext wglGetExtensionsStringEXT = (wglext)wglGetProcAddress("wglGetExtensionsStringEXT");
+    wglext wglGetExtensionsStringEXT = reinterpret_cast<wglext>(reinterpret_cast<void*>(wglGetProcAddress("wglGetExtensionsStringEXT")));
     if (wglGetExtensionsStringEXT == NULL) {
         wxLogError(_("No support for wglGetExtensionsStringEXT"));
     }
@@ -3439,7 +3439,7 @@ void GLDrawingPanel::DrawingPanelInit()
             
     typedef BOOL (__stdcall *PFNWGLSWAPINTERVALEXTPROC)(BOOL);
     static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = NULL;
-    wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
+    wglSwapIntervalEXT = reinterpret_cast<PFNWGLSWAPINTERVALEXTPROC>(reinterpret_cast<void*>(wglGetProcAddress("wglSwapIntervalEXT")));
     if (wglSwapIntervalEXT)
         wglSwapIntervalEXT(OPTION(kPrefVsync));
     else
@@ -3537,7 +3537,7 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
     if (hD3D9) {
         // Attempt to get the function address
         LPDIRECT3DCREATE9EX Direct3DCreate9ExPtr =
-            (LPDIRECT3DCREATE9EX)GetProcAddress(hD3D9, "Direct3DCreate9Ex");
+            reinterpret_cast<LPDIRECT3DCREATE9EX>(reinterpret_cast<void*>(GetProcAddress(hD3D9, "Direct3DCreate9Ex")));
 
         if (Direct3DCreate9ExPtr) {
             // Function found: try to create D3D9Ex
@@ -3783,14 +3783,11 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
 
     // Determine texture format based on output format
     D3DFORMAT tex_format;
-    int pixel_size;
     if (out_16) {
         tex_format = D3DFMT_R5G6B5;
-        pixel_size = 2;
     } else {
         // out_24 or 32-bit - convert to 32-bit XRGB for D3D
         tex_format = D3DFMT_X8R8G8B8;
-        pixel_size = 4;
     }
 
     int scaled_width = (int)std::ceil(width * scale);

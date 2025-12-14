@@ -3432,7 +3432,7 @@ int remoteTcpRecv(char* data, int len)
 
 bool remoteTcpInit()
 {
-    if (remoteSocket == -1) {
+    if (remoteSocket == INVALID_SOCKET) {
 #ifdef _WIN32
         WSADATA wsaData;
 #ifdef _DEBUG
@@ -3446,7 +3446,7 @@ bool remoteTcpInit()
 
         remoteListenSocket = s;
 
-        if (s < 0) {
+        if (s == INVALID_SOCKET) {
             fprintf(stderr, "Error opening socket\n");
             exit(-1);
         }

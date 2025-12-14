@@ -2906,7 +2906,7 @@ static void UpdateCableIPC(int)
         transfer_direction = 1;
         WRITE32LE(&g_ioMem[COMM_SIOMULTI0], 0xffffffff);
         WRITE32LE(&g_ioMem[COMM_SIOMULTI2], 0xffffffff);
-        UPDATE_REG(COMM_SIOCNT, READ16LE(&g_ioMem[COMM_SIOCNT]) & ~0x40 | 0x80);
+        UPDATE_REG(COMM_SIOCNT, (READ16LE(&g_ioMem[COMM_SIOCNT]) & ~0x40) | 0x80);
 #if 0
 			break;
 		}
@@ -3219,7 +3219,8 @@ static void StartRFU(uint16_t value)
                                     if (!ok) {
                                         rfu_curclient = rfu_numclients;
                                         linkmem->rfu_clientidx[(rfu_masterdata[0] - 0x61f1) >> 3] = rfu_numclients;
-                                        rfu_clientlist[rfu_numclients] = rfu_masterdata[0] | (rfu_numclients++ << 16);
+                                        rfu_clientlist[rfu_numclients] = rfu_masterdata[0] | (rfu_numclients << 16);
+                                        rfu_numclients++;
                                         gbaid = (rfu_masterdata[0] - 0x61f1) >> 3;
                                         linkmem->rfu_signal[gbaid] = 0xffffffff >> ((3 - (rfu_numclients - 1)) << 3);
                                     }
@@ -3262,6 +3263,7 @@ static void StartRFU(uint16_t value)
                             rfu_numclients = 0;
                             linkmem->rfu_is_host[vbaid] = 0; //to prevent both GBAs from acting as Host and thinking both of them have Client?
                             linkmem->rfu_q[vbaid] = 0; //to prevent leftover data from previous session received immediately in the new session
+                            [[fallthrough]];
                         case 0x1d: // no visible difference
                             linkmem->rfu_is_host[vbaid] = 0;
                             memset(rfu_masterdata, 0, sizeof(linkmem->rfu_broadcastdata[vbaid]));
@@ -3443,8 +3445,9 @@ static void StartRFU(uint16_t value)
                             linkmem->rfu_listfront[vbaid] = 0;
                             linkmem->rfu_listback[vbaid] = 0;
                             linkmem->rfu_q[vbaid] = 0; //to prevent leftover data from previous session received immediately in the new session
-                        //DATALIST.clear();
-                        //c_s.Unlock();
+                            //DATALIST.clear();
+                            //c_s.Unlock();
+                            [[fallthrough]];
                         case 0x1b: //host, might reset some data? may be used in the middle of host<->client communication w/o causing clients to dc?
                             //linkmem->rfu_request[vbaid] = 0; //to prevent both GBAs from acting as Client and thinking one of them is a Host?
                             linkmem->rfu_broadcastdata[vbaid][0] = 0; //0 may cause player unable to join in pokemon union room?
@@ -3495,6 +3498,7 @@ static void StartRFU(uint16_t value)
 
                         case 0x3d: // init/reset rfu data
                             rfu_initialized = false;
+                            [[fallthrough]];
                         case 0x10: // init/reset rfu data
                             if (vbaid != gbaid) { //(linkmem->numgbas >= 2)
                                 //linkmem->rfu_signal[gbaid] = 0;
@@ -3648,7 +3652,7 @@ static void StartRFU(uint16_t value)
                                 linktime = 1; //needed to synchronize both performance and for Digimon Racing's client to join successfully //numtransfers used to reset linktime to prevent it from reaching beyond max value of integer? //numtransfers doesn't seems to be used?
                             //linkmem->rfu_linktime[vbaid] = linktime; //save the ticks before reseted to zero
 
-                            if (rfu_cansend && rfu_qsend2 >= 0) {
+                            if (rfu_cansend) {
                                 /*memcpy(linkmem->rfu_data[vbaid],rfu_masterdata,4*rfu_qsend2);
 								linkmem->rfu_proto[vbaid] = 0; //UDP-like
 								if(rfu_ishost)
@@ -3726,12 +3730,13 @@ static void StartRFU(uint16_t value)
                             } else {
                                 //log("%08X : IgnoredSend[%02X] %d\n", GetTickCount(), rfu_cmd, rfu_qsend2);
                             }
-                        //numtransfers++; //not needed, just to keep track
-                        //if((numtransfers++)==0) linktime = 1; //may not be needed here?
-                        //linkmem->rfu_linktime[vbaid] = linktime; //may not be needed here? save the ticks before reseted to zero
-                        //linktime = 0; //may not be needed here? //need to zeroed when sending? //0 might cause slowdown in performance
-                        //TODO: there is still a chance for 0x25 to be used at the same time on both GBA (both GBAs acting as client but keep sending & receiving using 0x25 & 0x26 for infinity w/o updating the screen much)
-                        //Waiting here for previous data to be received might be too late! as new data already sent before finalization cmd
+                            //numtransfers++; //not needed, just to keep track
+                            //if((numtransfers++)==0) linktime = 1; //may not be needed here?
+                            //linkmem->rfu_linktime[vbaid] = linktime; //may not be needed here? save the ticks before reseted to zero
+                            //linktime = 0; //may not be needed here? //need to zeroed when sending? //0 might cause slowdown in performance
+                            //TODO: there is still a chance for 0x25 to be used at the same time on both GBA (both GBAs acting as client but keep sending & receiving using 0x25 & 0x26 for infinity w/o updating the screen much)
+                            //Waiting here for previous data to be received might be too late! as new data already sent before finalization cmd
+                            [[fallthrough]];
                         case 0x27: // wait for data ?
                         case 0x37: // wait for data ?
                             //numtransfers++; //not needed, just to keep track
@@ -3946,8 +3951,9 @@ static void StartRFU(uint16_t value)
 
         if (rfu_polarity)
             value ^= 4; // sometimes it's the other way around
-    /*value &= 0xfffb;
+        /*value &= 0xfffb;
 		value |= (value & 1)<<2;*/
+        [[fallthrough]];
     default:
         UPDATE_REG(COMM_SIOCNT, value);
         return;
