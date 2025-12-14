@@ -144,11 +144,16 @@ if(BUILD_TESTING)
 
         # Make sure not use fast-math optimizations for gtest
         if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-            target_compile_options(gtest      PRIVATE -O3 -fno-fast-math -Wno-error -w)
-            target_compile_options(gtest_main PRIVATE -O3 -fno-fast-math -Wno-error -w)
+            target_compile_options(gtest      PRIVATE -O3 -fno-fast-math -Wno-error -w -DGTEST_API_=/**/)
+            target_compile_options(gtest_main PRIVATE -O3 -fno-fast-math -Wno-error -w -DGTEST_API_=/**/)
+            target_compile_options(gmock      PRIVATE -O3 -fno-fast-math -Wno-error -w -DGTEST_API_=/**/)
+            target_compile_options(gmock_main PRIVATE -O3 -fno-fast-math -Wno-error -w -DGTEST_API_=/**/)
+
+            add_compile_definitions(-DGTEST_API_=/**/)
         endif()
 
         include(GoogleTest)
+        include(GTestDiscoverTests)
     else()
         set(BUILD_TESTING OFF)
     endif()

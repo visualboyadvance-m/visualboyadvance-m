@@ -84,6 +84,6 @@ if(BUILD_TESTING AND NOT COMPILE_ONLY)
 
     configure_wx_target(vbam-wx-config-tests)
     if (NOT CMAKE_CROSSCOMPILING)
-        gtest_discover_tests(vbam-wx-config-tests)
+        vbam_gtest_discover_tests(vbam-wx-config-tests)
     endif()
 endif()

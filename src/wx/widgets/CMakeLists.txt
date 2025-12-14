@@ -70,7 +70,7 @@ if(BUILD_TESTING AND NOT COMPILE_ONLY)
 
     configure_wx_target(vbam-wx-widgets-tests)
     if (NOT CMAKE_CROSSCOMPILING)
-        gtest_discover_tests(vbam-wx-widgets-tests)
+        vbam_gtest_discover_tests(vbam-wx-widgets-tests)
     endif()
 endif()
 
