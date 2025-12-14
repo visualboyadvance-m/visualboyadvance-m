@@ -65,21 +65,17 @@ endif()
 
 find_package(PkgConfig)
 
-if(UNIX AND NOT APPLE)
-    pkg_check_modules(SDL3 sdl3 QUIET)
-else()
-    find_package(SDL3 QUIET)
-endif()
+find_package(SDL3 QUIET)
 
 option(ENABLE_SDL3 "Use SDL3" "${SDL3_FOUND}")
 
 if(NOT TRANSLATIONS_ONLY)
-    if(ENABLE_SDL3)
-        if(NOT UNIX)
-            find_package(SDL3 REQUIRED)
-        endif()
-    else()
-        find_package(SDL2 REQUIRED)
+    if(NOT ENABLE_SDL3)
+        find_package(SDL2 QUIET)
+    endif()
+
+    if(NOT SDL3_FOUND AND NOT SDL2_FOUND)
+        message(FATAL_ERROR "SDL2 or SDL3 is required, preferred SDL3")
     endif()
 endif()
 
