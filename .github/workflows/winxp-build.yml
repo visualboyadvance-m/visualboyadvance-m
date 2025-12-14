@@ -26,6 +26,7 @@ jobs:
         shell: pwsh
         run: |
           Invoke-WebRequest -Uri "https://cachemiss.com/files/winxp-mingw32.7z" -OutFile "winxp-mingw32.7z"
+          ni -it dir C:\msys64
           7z x winxp-mingw32.7z -oC:\msys64 -y
 
       - name: Configure CMake
