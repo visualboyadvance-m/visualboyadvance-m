@@ -28,7 +28,7 @@ TEST(OptionTest, Bool) {
     EXPECT_DEATH(option->SetFilter(config::Filter::kNone), "is_filter\\(\\)");
     EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), "is_interframe\\(\\)");
     EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
-    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kSDL), "is_audio_api\\(\\)");
     EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), "is_audio_rate\\(\\)");
     EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), "is_gb_palette\\(\\)");
 }
@@ -61,7 +61,7 @@ TEST(OptionTest, Double) {
     EXPECT_DEATH(option->SetFilter(config::Filter::kNone), "is_filter\\(\\)");
     EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), "is_interframe\\(\\)");
     EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
-    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kSDL), "is_audio_api\\(\\)");
     EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), "is_audio_rate\\(\\)");
     EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), "is_gb_palette\\(\\)");
 }
@@ -94,7 +94,7 @@ TEST(OptionTest, Int) {
     EXPECT_DEATH(option->SetFilter(config::Filter::kNone), "is_filter\\(\\)");
     EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), "is_interframe\\(\\)");
     EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
-    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kSDL), "is_audio_api\\(\\)");
     EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), "is_audio_rate\\(\\)");
     EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), "is_gb_palette\\(\\)");
 }
@@ -125,7 +125,7 @@ TEST(OptionTest, Unsigned) {
     EXPECT_DEATH(option->SetFilter(config::Filter::kNone), "is_filter\\(\\)");
     EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), "is_interframe\\(\\)");
     EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
-    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kSDL), "is_audio_api\\(\\)");
     EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), "is_audio_rate\\(\\)");
     EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), "is_gb_palette\\(\\)");
 }
@@ -150,7 +150,7 @@ TEST(OptionTest, String) {
     EXPECT_DEATH(option->SetFilter(config::Filter::kNone), "is_filter\\(\\)");
     EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), "is_interframe\\(\\)");
     EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
-    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kSDL), "is_audio_api\\(\\)");
     EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), "is_audio_rate\\(\\)");
     EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), "is_gb_palette\\(\\)");
 }
@@ -175,7 +175,7 @@ TEST(OptionTest, Filter) {
     EXPECT_DEATH(option->SetString("foo"), "is_string\\(\\)");
     EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), "is_interframe\\(\\)");
     EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
-    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kSDL), "is_audio_api\\(\\)");
     EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), "is_audio_rate\\(\\)");
     EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), "is_gb_palette\\(\\)");
 }
@@ -200,7 +200,7 @@ TEST(OptionTest, Interframe) {
     EXPECT_DEATH(option->SetString("foo"), "is_string\\(\\)");
     EXPECT_DEATH(option->SetFilter(config::Filter::kNone), "is_filter\\(\\)");
     EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
-    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kSDL), "is_audio_api\\(\\)");
     EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), "is_audio_rate\\(\\)");
     EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), "is_gb_palette\\(\\)");
 }
@@ -251,7 +251,7 @@ TEST(OptionTest, AudioRate) {
     EXPECT_DEATH(option->SetFilter(config::Filter::kNone), "is_filter\\(\\)");
     EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), "is_interframe\\(\\)");
     EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
-    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kSDL), "is_audio_api\\(\\)");
     EXPECT_DEATH(option->SetGbPalette({0, 1, 2, 3, 4, 5, 6, 7}), "is_gb_palette\\(\\)");
 }
 
@@ -306,7 +306,7 @@ TEST(Optiontest, GbPalette) {
     EXPECT_DEATH(option->SetFilter(config::Filter::kNone), "is_filter\\(\\)");
     EXPECT_DEATH(option->SetInterframe(config::Interframe::kNone), "is_interframe\\(\\)");
     EXPECT_DEATH(option->SetRenderMethod(config::RenderMethod::kSimple), "is_render_method\\(\\)");
-    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kOpenAL), "is_audio_api\\(\\)");
+    EXPECT_DEATH(option->SetAudioApi(config::AudioApi::kSDL), "is_audio_api\\(\\)");
     EXPECT_DEATH(option->SetAudioRate(config::AudioRate::k11kHz), "is_audio_rate\\(\\)");
 }
 
