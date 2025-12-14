@@ -4,6 +4,7 @@
 *.o
 *.so
 *.dll
+!third_party/ps12exe/src/bin/**/*.dll
 *.exe
 .vscode/
 .claude/
