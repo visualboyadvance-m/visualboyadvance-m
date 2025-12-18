@@ -51,6 +51,7 @@
 #include "core/gb/gbPrinter.h"
 #include "core/gb/gbSound.h"
 #include "core/gba/gbaCheats.h"
+#include "core/gba/gbaEeprom.h"
 #include "core/gba/gbaFlash.h"
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaPrint.h"
@@ -766,6 +767,7 @@ void GameArea::LoadGame(const wxString& name)
                 case 0x200:
                 case 0x2000:
                     coreOptions.saveType = GBA_SAVE_EEPROM;
+                    eepromSetSize(bat.GetSize().GetValue());
                     break;
 
                 case 0x8000:
