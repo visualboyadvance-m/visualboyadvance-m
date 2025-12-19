@@ -381,10 +381,6 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
     case REGION_ROM1:
     case REGION_ROM1EX:
     case REGION_ROM2:
-        if (address == 0x80000c4 || address == 0x80000c6 || address == 0x80000c8)
-            value = rtcRead(address);
-        else if ((address & 0x01FFFFFE) <= (gbaGetRomSize() - 2))
-            value = READ16LE(((uint16_t*)&g_rom[address & 0x01FFFFFE]));
         if (IsGPIO(address))
             value = rtcRead(address);
         else if (IsEEPROM(address))
