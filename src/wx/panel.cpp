@@ -121,7 +121,7 @@ int GetMaxFilterThreads() {
     unsigned int hw_threads = std::thread::hardware_concurrency();
     if (hw_threads == 0)
         hw_threads = 1;  // Fallback if hardware_concurrency fails
-    return static_cast<int>(std::min(hw_threads, 6u));
+    return static_cast<int>(std::min(hw_threads, 8u));
 }
 
 // Apply the currently selected 32-bit filter to the image region.
