@@ -1972,7 +1972,8 @@ public:
         }
 
         // Pre-compute scaled dimensions for conversion loops
-        const int scaled_height = height_real * scale_int;
+        // Use height_ (this thread's slice) for multi-threaded mode, not height_real
+        const int scaled_height = height_ * scale_int;
         const int scaled_width = width_ * scale_int;
         const int scaled_border_dest = inrb * scale_int;
 
@@ -2035,7 +2036,7 @@ public:
                 if (is_8bit) {
                     // 8bpp format: RRRGGGBB (3 red, 3 green, 2 blue bits)
                     int src_pos = 0;
-                    for (int y = 0; y < height_real; y++) {
+                    for (int y = 0; y < height_; y++) {
                         const int left_border_pos = pos++;
                         for (int x = 0; x < width_; x++) {
                             const uint8_t src_val = src_[src_pos++];
@@ -2060,7 +2061,7 @@ public:
                     // 16bpp RGB555 format
                     const uint16_t* src16 = reinterpret_cast<const uint16_t*>(src_);
                     int src_pos = 0;
-                    for (int y = 0; y < height_real; y++) {
+                    for (int y = 0; y < height_; y++) {
                         const int left_border_pos = pos++;
                         for (int x = 0; x < width_; x++) {
                             const uint16_t src_val = src16[src_pos++];
@@ -2083,7 +2084,7 @@ public:
                     }
                 } else {  // is_24bit
                     int src_pos = 0;
-                    for (int y = 0; y < height_real; y++) {
+                    for (int y = 0; y < height_; y++) {
                         const int left_border_pos = pos++;
                         for (int x = 0; x < width_; x++) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
@@ -2103,7 +2104,7 @@ public:
                 memcpy(src2_, src2_ + total_width32, total_width32 * sizeof(uint32_t));
 
                 // Fill bottom 2 extra rows by duplicating the last image row
-                const int last_row_offset = total_width32 * height_real;
+                const int last_row_offset = total_width32 * height_;
                 memcpy(src2_ + last_row_offset + total_width32, src2_ + last_row_offset, total_width32 * sizeof(uint32_t));
                 memcpy(src2_ + last_row_offset + total_width32 * 2, src2_ + last_row_offset, total_width32 * sizeof(uint32_t));
 
