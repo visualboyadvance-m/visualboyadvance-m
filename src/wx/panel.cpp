@@ -628,42 +628,61 @@ void GameArea::LoadGame(const wxString& name)
         wxFileConfig* cfg = wxGetApp().overrides_.get();
         wxString id = wxString((const char*)&g_rom[0xac], wxConvLibc, 4);
 
+        // Check for game-specific overrides based on ROM ID
         if (cfg->HasGroup(id)) {
             cfg->SetPath(id);
+            // Apply RTC override
             bool enable_rtc = cfg->Read(wxT("rtcEnabled"), coreOptions.rtcEnabled);
-
             rtcEnable(enable_rtc);
 
+            // Set Flash size from config; fallback to global preference
             int fsz = cfg->Read(wxT("flashSize"), (long)0);
 
             if (fsz != 0x10000 && fsz != 0x20000)
                 fsz = 0x10000 << OPTION(kPrefFlashSize);
 
             flashSetSize(fsz);
+            // Set save type from override; fallback to detection if set to Auto (0)
             ovSaveType = cfg->Read(wxT("coreOptions.saveType"), coreOptions.cpuSaveType);
 
             if (ovSaveType < 0 || ovSaveType > 5)
                 ovSaveType = 0;
 
-            if (ovSaveType == 0)
+            if (ovSaveType == 0) {
                 flashDetectSaveType(rom_size);
-            else
+            } else {
                 coreOptions.saveType = ovSaveType;
+            }
 
+            // Initialize eepromMask to prevent DMA freeze on un-initialized battery
+            if (coreOptions.saveType == GBA_SAVE_EEPROM) {
+                eepromSetSize(SIZE_EEPROM_512);
+            }
+
+            // Apply ROM mirroring and reset path
             coreOptions.mirroringEnable = cfg->Read(wxT("mirroringEnabled"), (long)1);
             cfg->SetPath(wxT("/"));
         } else {
+            // Apply global defaults for games without specific overrides
             rtcEnable(coreOptions.rtcEnabled);
             flashSetSize(0x10000 << OPTION(kPrefFlashSize));
 
+            // Determine save type based on global preference or internal detection
             if (coreOptions.cpuSaveType < 0 || coreOptions.cpuSaveType > 5)
                 coreOptions.cpuSaveType = 0;
 
-            if (coreOptions.cpuSaveType == 0)
+            if (coreOptions.cpuSaveType == 0) {
                 flashDetectSaveType(rom_size);
-            else
+            } else {
                 coreOptions.saveType = coreOptions.cpuSaveType;
+            }
 
+            // Initialize eepromMask to prevent DMA freeze on un-initialized battery
+            if (coreOptions.saveType == GBA_SAVE_EEPROM) {
+                eepromSetSize(SIZE_EEPROM_512);
+            }
+
+            // Disable mirroring by default
             coreOptions.mirroringEnable = false;
         }
 
