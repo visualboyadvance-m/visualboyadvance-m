@@ -45,7 +45,7 @@ public:
     void setThrottle(unsigned short throttle_) override;
 
     // XAudio2_Output interface for device change
-    void device_change() override;
+    void signal_device_change() override;
 
 private:
     void close();
@@ -60,6 +60,9 @@ private:
     int currentBuffer = 0;
     int soundBufferLen = 0;
     volatile bool device_changed = false;
+    volatile bool is_destructing = false;
+    DWORD device_change_time = 0;
+    int reinit_attempts = 0;
 
     IXAudio2* xaud = nullptr;
     IXAudio2MasteringVoice* mVoice = nullptr;
@@ -202,24 +205,29 @@ XAudio2_9_Output::XAudio2_9_Output(IXAudio2* xaudio2) : xaud(xaudio2) {
 }
 
 XAudio2_9_Output::~XAudio2_9_Output() {
+    is_destructing = true;
     // Unregister from device notifications
     g_notifier.do_unregister(this);
-    
     close();
 }
 
-void XAudio2_9_Output::device_change() {
-    device_changed = true;
-    log("XAudio2: Device change notified, will reinitialize\n");
+void XAudio2_9_Output::signal_device_change() {
+    if (!is_destructing) {
+        device_changed = true;
+        device_change_time = GetTickCount();
+        log("XAudio2: Device change signaled (timer reset)\n");
+    }
 }
 
 void XAudio2_9_Output::close() {
     initialized = false;
+    playing = false;
 
     if (sVoice) {
-        if (playing) {
-            sVoice->Stop(0);
+        if (!device_changed) {
+            sVoice->Stop(0, XAUDIO2_COMMIT_NOW);
         }
+        sVoice->FlushSourceBuffers();
         sVoice->DestroyVoice();
         sVoice = nullptr;
     }
@@ -239,8 +247,13 @@ void XAudio2_9_Output::close() {
 }
 
 bool XAudio2_9_Output::init(long sampleRate) {
-    if (failed || initialized)
+    if (failed)
         return false;
+        
+    if (initialized) {
+        log("XAudio2: Warning - init() called while already initialized\n");
+        return true;
+    }
 
     if (!xaud) {
         wxLogError(_("XAudio2 instance not available!"));
@@ -316,17 +329,43 @@ bool XAudio2_9_Output::init(long sampleRate) {
 }
 
 void XAudio2_9_Output::write(uint16_t* finalWave, int) {
-    if (!initialized || failed)
+    if (failed)
+        return;
+
+    if (device_changed) {
+        if (!initialized) {
+            return;
+        }
+        
+        DWORD elapsed = GetTickCount() - device_change_time;
+        
+        if (elapsed < 200) {
+            return;
+        }
+        
+        if (reinit_attempts == 0) {
+            reinit_attempts = 1;
+            log("XAudio2: %dms since last device callback, attempting reinitialization\n", elapsed);
+            
+            close();
+            Sleep(50);
+            
+            if (init(freq)) {
+                log("XAudio2: Device reinitialized successfully\n");
+                device_changed = false;
+                reinit_attempts = 0;
+            } else {
+                log("XAudio2: Reinitialization failed, marking driver as failed\n");
+                failed = true;
+            }
+        }
+        return;
+    }
+    
+    if (!initialized)
         return;
 
     while (true) {
-        if (device_changed) {
-            log("XAudio2: Reinitializing due to device change\n");
-            close();
-            if (!init(freq))
-                return;
-        }
-
         sVoice->GetState(&vState, XAUDIO2_VOICE_NOSAMPLESPLAYED);
         if (vState.BuffersQueued > bufferCount) {
             wxLogWarning(_("XAudio2: Too many buffers queued, resetting"));
@@ -344,8 +383,15 @@ void XAudio2_9_Output::write(uint16_t* finalWave, int) {
             break;
         } else {
             if (!coreOptions.speedup && coreOptions.throttle && !gba_joybus_active) {
-                if (WaitForSingleObject(notify->hBufferEndEvent, 10000) == WAIT_TIMEOUT) {
-                    device_changed = true;
+                DWORD wait_result = WaitForSingleObject(notify->hBufferEndEvent, 200);
+                if (wait_result == WAIT_TIMEOUT) {
+                    if (!device_changed) {
+                        device_changed = true;
+                        device_change_time = GetTickCount();
+                        reinit_attempts = 0;
+                        log("XAudio2: Device appears unresponsive (timeout)\n");
+                    }
+                    return;
                 }
             } else {
                 return;
@@ -362,7 +408,11 @@ void XAudio2_9_Output::write(uint16_t* finalWave, int) {
     HRESULT submit_hr = sVoice->SubmitSourceBuffer(&newBuf);
     if (FAILED(submit_hr)) {
         wxLogError(_("XAudio2: SubmitSourceBuffer failed! HRESULT: 0x%08X"), submit_hr);
-        device_changed = true;
+        if (!device_changed) {
+            device_changed = true;
+            device_change_time = GetTickCount();
+            reinit_attempts = 0;
+        }
         return;
     }
 
@@ -415,8 +465,6 @@ std::unique_ptr<SoundDriver> CreateXAudio2_9_Driver(IXAudio2* xaudio2) {
 }
 
 std::vector<audio::AudioDevice> GetXAudio2_9_Devices(IXAudio2* xaudio2) {
-    // xaudio2 parameter is unused for XAudio2 2.9 since we use MMDeviceAPI
-    // Mark it as unused to suppress compiler warnings
     (void)xaudio2;
     
     std::vector<audio::AudioDevice> devices;

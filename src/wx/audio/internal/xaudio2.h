@@ -15,26 +15,33 @@ namespace internal {
 // XAudio2_Output interface for device change notifications
 class XAudio2_Output {
 public:
-    virtual void device_change() = 0;
+    // Signal that device has changed (sets flag only, safe to call from callback)
+    virtual void signal_device_change() = 0;
     virtual ~XAudio2_Output() = default;
 };
 
 // Device Notifier for hotplug support
 class XAudio2_Device_Notifier : public IMMNotificationClient {
-    volatile LONG registered;
-    IMMDeviceEnumerator* pEnumerator;
+    LONG _cRef;
+    IMMDeviceEnumerator* _pEnumerator;
     std::wstring last_device;
-    CRITICAL_SECTION lock;
-    std::vector<XAudio2_Output*> instances;
+    
+    // Simple array for lock-free access - we'll accept potential race conditions
+    // since missing one callback isn't critical (we'll get the next one)
+    static const int MAX_INSTANCES = 8;
+    XAudio2_Output* instances[MAX_INSTANCES];
+    volatile LONG instance_count;
 
 public:
     XAudio2_Device_Notifier();
     ~XAudio2_Device_Notifier();
 
+    // IUnknown methods
     ULONG STDMETHODCALLTYPE AddRef() override;
     ULONG STDMETHODCALLTYPE Release() override;
     HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, VOID** ppvInterface) override;
 
+    // IMMNotificationClient methods
     HRESULT STDMETHODCALLTYPE OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR pwstrDeviceId) override;
     HRESULT STDMETHODCALLTYPE OnDeviceAdded(LPCWSTR pwstrDeviceId) override;
     HRESULT STDMETHODCALLTYPE OnDeviceRemoved(LPCWSTR pwstrDeviceId) override;
